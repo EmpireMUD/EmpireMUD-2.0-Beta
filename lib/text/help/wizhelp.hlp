@@ -269,8 +269,8 @@ See also: GRANT
 #d
 EVOLVE EVOLVER EVOLUTIONS
 
-The 'evolve' utility is a separate program the EmpireMUD runs once per game
-day to update the map. This is normally silent, but will result in logs if
+The 'evolve' utility is a separate program the EmpireMUD runs once per 30
+minutes to update the map. This is normally silent, but will result in logs if
 you run it manually ('util evolve') or if the evolver fails to run.
 
 If not all of the evolver's suggested changes could be made, the most likely
@@ -311,6 +311,7 @@ Usage:  forgive <player>
 
 This command forgives the following conditions:
  - hostile flag
+ - hostile delay
  - rogue flag
  - empire defect timer
  - pvp flag cooldown
@@ -569,6 +570,8 @@ Island flags:
  !CUSTOMIZE - Cannot be renamed by players
  CONTINENT - Is a whole continent (affects adventure spawns)
  !CHART - Cannot be charted by players
+ !TEMPERATURE-PENALTIES - Players are not harmed by heat/cold here
+ ALWAYS-LIGHT - Outdoor tiles are lit at night
 
 See also: CHART, GRANT
 #d
@@ -596,7 +599,7 @@ number. This command is grantable.
 
 (For the mortal command, try LOAD VEHICLE.)
 
-You can load: mob, obj, vehicle
+You can load: mob, obj, vehicle, book
 
 Example:
 
@@ -645,15 +648,17 @@ NATURALIZE "NATURAL SECTOR"
 what that is by using 'stat room' on the map. It shows a display like this:
 Sector: [10 - Building], Base: [0 - Plains], Natural: [4 - Overgrown Forest]
 
-Newbie islands will naturalize their unclaimed tiles each year if the world
-config 'naturalize_newbie_islands' is turned on.
+Newbie islands will naturalize their unclaimed tiles each time depletions are
+reset (by default, this is every 7.5 real days) if the world config
+'naturalize_newbie_islands' is turned on. Check 'mudstats time' to see when
+that will be.
 
 The map editor can be used to naturalize a tile, island, or the whole world
 via '.map naturalize'.
 
 You can change a tile's (or island's) natural sector with '.map remember'.
 
-See also: CONFIG, MAPEDIT NATURALIZE, MAPEDIT REMEMBER
+See also: CONFIG, MAPEDIT NATURALIZE, MAPEDIT REMEMBER, MUDSTATS
 #d
 NOCUSTOMIZE !CUSTOMIZE "NO CUSTOMIZE"
 
@@ -799,7 +804,6 @@ any immortal:
 - prompt/display: additional options available
 - pursuit: mobs won't pursue imms
 - quit: not restricted by pvp timer
-- refashion: doesn't require a tailor
 - reply: still works after the target alternates
 - score: can target others
 - shops, quests, crafts, socials, morphs: Can use things with IN-DEV on them
@@ -824,6 +828,7 @@ with the 'empire' grant:
 - city: optional first arg to edit cities for any empire
 - eedit: optional first arg to specify which empire
 - einv: optional first arg to specify which empire
+- efind: optional first arg to specify which empire
 - elog: optional first arg to specify which empire
 - findmaint: optional first arg to specify which empire
 - islands: optional first arg to specify which empire
@@ -831,6 +836,7 @@ with the 'empire' grant:
 - offenses: optional first arg to specify which empire
 - progress: optional first arg to specify which empire
 - roster: optional first arg to specify which empire
+- ship: optional first arg to specify which empire
 - territory: optional first arg to specify which empire
 - warehouse: optional first arg to specify which empire
 
@@ -871,7 +877,7 @@ finding new places to build an island.
 #d
 REBOOT
 
-Usage:  reboot [now | minutes]
+Usage:  reboot [now | minutes | cancel]
 
 You can use this to either trigger an instant reboot, or count one down. 
 Because this is a reboot and saves everything, no information is ever lost.
@@ -888,10 +894,10 @@ RELOAD
 Usage:  reload < '*' | all | file >
 
 Reload is used to reload text files such as the MOTD from disk into memory. 
-Reload * reloads all the text files below. This command is grantable.
+Reload * reloads all the text files below. This command is grantable. Available
+files to reload are:
 
-Valid files are:
-
+Text files:
   credits    (/mud_dir/lib/text/credits)
   intros     (/mud_dir/lib/text/intros/*)
   handbook   (/mud_dir/lib/text/handbook)
@@ -903,8 +909,11 @@ Valid files are:
   info       (/mud_dir/lib/text/info)
   policy     (/mud_dir/lib/text/policies)
   wizlist    (/mud_dir/lib/text/wizlist)
-  xhelp      (/mud_dir/lib/text/help/*)
-  data       (/mud_dir/lib/misc/game_data)
+  
+Other:
+  xhelp          (/mud_dir/lib/text/help/*)
+  data           (/mud_dir/lib/misc/game_data)
+  fightmessages  (/mud_dir/lib/misc/messages)
 
 See also: GRANT
 #d
@@ -931,7 +940,7 @@ Usage:  restore <player | mobile | vehicle> [types]
 RESTORE is used to heal and cure a player or mobile. If you use it without a
 type argument, it fully restores the target. Or, you can choose one or more
 types to restore from: health, mana, movement, blood, hunger, thirst,
-drunkenness, cooldowns, and DoTs.
+drunkenness, temperature, cooldowns, and DoTs.
 
 When used on a vehicle, restore removes any damage and any needed resources or
 maintentance, and puts out any fire. It will complete the vehicle if it is
@@ -940,6 +949,9 @@ incomplete.
 If a full restore (all) is performed on an immortal, it also sets all skill
 levels to 100, gives all abilities (on the main skill set only), and grants
 all languages.
+
+Restoring a player will remove deathshroud and mummify effects. This helps
+prevent an immortal from being stuck in those states.
 
 This command is grantable.
 
@@ -950,6 +962,8 @@ RETURN
 Usage:  return
 
 RETURN returns you to your regular body if you are switched into a mob.
+
+For the script command, see RETURN STATEMENT.
 
 See also: SWITCH
 #d
@@ -1007,6 +1021,7 @@ password       PC      STRING       Change password
 sex            BOTH    MISC         Person's sex
 skill          PC      MISC         Changes a skill level
 title          PC      STRING       Player's title
+unlockedarchetype  PC  MISC         Add or remove an unlocked archetype
 vampire        PC      BINARY       Makes/unmakes vampires
 
 blood          BOTH    NUMBER       Current blood
@@ -1034,6 +1049,7 @@ muted          PC      BINARY       Player is muted
 nocustomize    PC      BINARY       Player cannot use 'customize'
 nodelete       PC      BINARY       Can't be deleted
 noidleout      PC      BINARY       Won't idle out
+nofriends      PC      BINARY       Set no-friends toggle for offline player.
 notitle        PC      BINARY       Can't change title
 nowizlist      PC      BINARY       Doesn't show on wizlist
 siteok         PC      BINARY       Can log in through ban
@@ -1132,6 +1148,7 @@ Mode       Level    Description
 ------     ------   -------------
 stats      God      Shows game stats including prototypes.
 ammotypes  Immort   Shows the 'ammo type' setting for all bows and ammo.
+author     Immort   Shows all books from a given author idnum.
 buildings  Immort   Shows occurrences of buildings (vnum/name optional).
 companions Immort   Shows a player's available companions.
 components Immort   Shows all items matching a generic component vnum.
@@ -1139,15 +1156,20 @@ crops      Immort   Shows tile counts for all the crops (vnum/name optional).
 currency   Immort   Shows coins and adventure currencies for a player.
 dailycycle Immort   Shows daily quests with a given cycle id.
 dropped    Immort   Shows all items an empire has on the ground.
+editors    Immort   Shows what each player is editing, if anything.
 factions   Immort   Shows a player's faction levels.
+fmessages  Immort   Shows a player's fight message toggles.
+friends    Immort   Shows another player's friends list.
 home       Immort   Shows where a player's home is, if any.
 homeless   Immort   Shows the homeless citizen list for an empire.
 ignoring   Immort   Shows you who a player has on their ignore list.
-inventory  Immort   Shows how many players have a certain item.
+inventory  Immort   Shows how many players and empires have a certain item.
 islands    Immort   Shows you which island ids have empire storage (for MOVEEINV).
 languages  Immort   Shows which languages a player knows and is speaking.
 lastnames  Immort   Shows target player's lastname list.
 learned    Immort   Shows you learned recipes.
+libraries  Immort   Shows where a book is shelved.
+lostbooks  Immort   Shows books that are not shelved in any libraries.
 minipets   Immort   Shows you minipets collected by a player.
 moons      Immort   Shows any moons and their current phases/positions.
 mounts     Immort   Shows you mounts owned by a player.
@@ -1162,18 +1184,20 @@ progression Immrt   Shows stats on progression goals in general.
 quests     Immort   Shows quests and quest trackers for players.
 rent       Immort   Shows a player's full equipment and inventory.
 resource   Immort   Shows stats on an item based on global empire storage.
+sectors    Immort   Shows tile counts for all sector types (vnum/name optional).
 shops      Immort   Shows any shops available in your current location.
 skills     Immort   Shows skill levels and abilities for a player.
+smessages  Immort   Shows a player's status message toggles.
 spawns     Immort   Shows where a mob spawns on the map, similar to ".mob search".
 startlocs  Immort   Shows the location of all starting location tiles.
 storage    Immort   Shows items that can be stored in a given building/room type.
 subzone    Immort   Shows room templates with a matching subzone id.
 technology Immort   Shows ability techs a player has.
-sectors    Immort   Shows tile counts for all sector types (vnum/name optional).
 terrain    Immort   Same as 'sectors' (for historical reasons).
 tomb       Immort   Shows where a player's tomb is, if any.
 tools      Immort   Shows all objects with a given tool type.
 unlearnable Immrt   Shows stats on LEANRED crafts with no assignments.
+unlockedarchetypes Immrt  Shows unlocked archetypes for a player's account.
 uses       Immort   Shows crafts (and vehicles, etc.) that use a component type.
 workforce  Immort   Shows you an empire's workforce setup.
 variables  Immort   Shows script variables on a player character.
@@ -1200,6 +1224,26 @@ Usage:  show ammotypes
 
 Lists all bows and ammo by ammotype. Useful for figuring out what ammotype
 to use for a new weapon/ammo.
+#e
+"SHOW AUTHOR" "SHOW LIBRARIES" "SHOW LOSTBOOKS" "SHOW LOST BOOKS" "LOST BOOKS"
+
+Usage:  show author <author idnum>
+        show libraries <book vnum>
+        show lostbooks
+
+These three show commands help manage the book system.
+
+&cshow author <author idnum>&0 - Look up all books by a given author, by idnum.
+   This also works on idnum 0, which are authorless books.
+
+&cshow libraries <book vnum>&0 - Show all the locations where a given book is
+   shelved.
+
+&cshow lostbooks&0 - Show all the books that do not appear in any libraries.
+   Immortals can load books directly, as can the %load% command in scripts.
+   Scripts can load a random lost book with "%load% book lost".
+
+See also: LOAD, %LOAD%
 #e
 "SHOW COMPANIONS"
 
@@ -1244,6 +1288,14 @@ with 'util rescan [empire].
 
 See also: EINVENTORY
 #e
+"SHOW EDITORS"
+
+Usage:  show editors
+
+This command shows you which players are editing anything. This includes OLC
+editing and string editing. You cannot see exactly what immortals above you in
+access level are editing.
+#e
 "SHOW FACTIONS"
 
 Usage:  show factions <player> [filter]
@@ -1252,6 +1304,22 @@ This command shows you all of a player's faction reputation levels. It can
 be filtered by name.
 
 See also: FACTION, SET FACTION
+#e
+"SHOW FMESSAGES" "SHOW FIGHTMESSAGES" "SHOW FIGHT MESSAGES"
+
+Usage:  show fmessages <player>
+
+This command shows which fight messages a player has toggled on or off.
+
+See also: FMESSAGES
+#e
+"SHOW FRIENDS" "SHOW FRIENDS LIST" "SHOW FRIEND LIST"
+
+Usage:  show friends <player>
+
+This command views another player's friends list.
+
+See also: FRIENDS
 #e
 "SHOW HOME"
 
@@ -1282,11 +1350,11 @@ See also: IGNORE, SHOW
 
 Usage:  show inventory <obj vnum> [all]
 
-Searches all players, including offline ones, to see how many of a certain
-object they have in their inventory, equipment, and home storage.
+Searches all players, including offline ones, and all empires, to see how many
+of a certain object they have in their inventory, equipment, and storage.
 
 Without the "all" argument, only checks players that have been online in the
-last two months.
+last two months and empires that are not timed out.
 #e
 "SHOW ISLANDS"
 
@@ -1317,6 +1385,8 @@ See also: SET LASTNAME
 "SHOW LEARNED"
 
 Usage:  show learned <player | empire> [search phrase]
+        show learned empire <name> [search phrase]
+        show learned player <name> [search phrase]
 
 Shows you the recipes learned by a player or empire. For multi-word empire
 names, use "quotation marks".
@@ -1453,6 +1523,14 @@ The numbers displayed are: [level, experience, unspent points]
 If there is an asterisk after the unspent ability points, it indicates that the
 player has skill resets available for that skill.
 #e
+"SHOW SMESSAGES" "SHOW STATUSMESSAGES" "SHOW STATUS MESSAGES"
+
+Usage:  show smessages <player>
+
+This command shows which status messages a player has toggled on or off.
+
+See also: SMESSAGES
+#e
 "SHOW SPAWNS"
 
 Usage:  show spawns <mob vnum>
@@ -1530,6 +1608,17 @@ or progression goal that grants them.
 Warning: If a craft recipe is given by a script, this command will still show
 it as unlearnable.
 #e
+"SHOW UNLOCKED ARCHETYPES" "SHOW UNLOCKEDARCHETYPES" "UNLOCKED ARCHETYPES"
+
+Usage:  show unlockedarchetypes <player> [keywords]
+
+Shows which archetypes a player has unlocked for their account. These allow the
+player to choose those archetypes during character creation.
+
+Immortals can use the set command to give or take away unlocked archetypes.
+
+See also: SHOW
+#e
 "SHOW USES"
 
 Usage:  show uses <component name/vnum>
@@ -1591,20 +1680,21 @@ If you don't specify an option, you will see their list of active quests.
 #e
 SHUTDOWN
 
-Usage:  shutdown [now | timer] [pause | die | complete]
+Usage:  shutdown [now | timer | cancel] [normal | pause | die | complete]
 
 SHUTDOWN shuts the MUD down. The SHUTDOWN command works in conjunction with
 EmpireMUD's 'autorun' script. If you are not using autorun, the arguments are
 meaningless. If you are using autorun, the following arguments are available:
 
+normal - Will shut down then reboot.
 pause - Create a file called 'pause' in Empire's root directory; do not
-   try to restart the MUD until 'paused' is removed.
+   try to restart the MUD until 'pause' is removed.
 die - Kill the autorun script; the MUD will not reboot until autorun is
    explicitly run again.
 complete - Like die, but also frees all allocated memory, which helps detect
-   memory leaks. This is slow, and should be done in profiler like valgrind.
+   memory leaks. This is slow, and should be done in a profiler like valgrind.
 
-You can also set a timer, giving the players some warning before the reboot.
+You can also set a timer, giving the players some warning before the shutdown.
 
 If you type this command with no arguments, it will give the current status.
 If you want to shutdown with no timer, use the 'now' option. This command is
@@ -1792,7 +1882,7 @@ Available utilities:
  &cclearroles&0 - Clears the group roles and abilities of all players.
  &cdiminish <number> <scale>&0 - Applies the game's diminishing returns formula,
     and returns the result.
- &cevolve&0 - Triggers map evolutions (just like a normal day), see EVOLVER.
+ &cevolve&0 - Triggers map evolutions (just like a normal cycle), see EVOLVER.
  &cexportcsv&0 - Output a csv file with some game data.
  &cislandsize&0 - Counts and displays tile counts for all islands.
  &cpathtest&0 - Test function for the pathfinding code.
@@ -1807,8 +1897,10 @@ Available utilities:
  &cresetbuildingtriggers <vnum | all>&0 - Reattaches triggers to buildings/rooms,
     e.g. if you made a change in OLC and want live buildings updated.
  &cstrlen&0 - Give various measures of string length.
+ &ctemperature&0 - Gives a temperature breakdown of the room. You can also
+    give it any sun status or season to simulate those here (e.g. spring dark).
  &cwipeprogress&0 - Clears and fully resets empire progress for 1 or all empires.
- &cyearly&0 - Runs a full annual update on the world.
+ &cyearly&0 - Runs a full maintenance/decay/newbie reset on the world.
 #d
 "UTILITY BLDCONVERT" "UTIL BLDCONVERT" "UTILITY BLD CONVERT" "UTIL BLD CONVERT" "UTILITY BUILD CONVERT" "UTIL BUILD CONVERT" BLDCONVERT
 
@@ -1852,14 +1944,14 @@ VNUM
 
 Usage:  vnum <type> <keywords>
 
-Gives a list of the virtual numbers of objects or mobiles which have the
-specified name. If you specify more than one keyword, it will find things
+Gives a list of the virtual numbers (vnums) of objects or mobiles which have
+the specified name. If you specify more than one keyword, it will find things
 that match ALL of those keywords.
 
-Valid types are: adventure, ability, archetype, augment, book, building, craft,
-                 class, crop, event, faction, global, generic, mob, morph, obj, 
-                 progress, quest, roomtemplate, sector, shop, skill, social,
-                 trigger, vehicle
+Valid types are: adventure, ability, archetype, attack, augment, book,
+                 building, craft, class, crop, event, faction, global, generic,
+                 mob, morph, obj,  progress, quest, roomtemplate, sector, shop,
+                 skill, social, trigger, vehicle
 
 Examples:
 
@@ -1877,12 +1969,14 @@ VSTAT
 
 Usage:  vstat <type> <vnum>
 
-Used to stat a prototypical object by virtual number.
+Used to stat a prototypical object (or thing) by virtual number (vnum).
 
-Valid types are: adventure, ability, archetype, augment, building, book, craft,
-                class, crop, empire, event, faction, global, generic, mob,
-                morph, obj, progress, quest, roomtemplate, sector, shop, skill,
-                social, trigger, vehicle
+Valid types are: adventure, ability, archetype, attack, augment, book,
+                 building, craft, class, crop, empire, event, faction, global,
+                 generic, mob, morph, obj,  progress, quest, roomtemplate,
+                 sector, shop, skill, social, trigger, vehicle
+
+For attack messages, this supports the -d option to see the full messages.
 
 Examples:
 

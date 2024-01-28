@@ -2,7 +2,7 @@
 *   File: utils.c                                         EmpireMUD 2.0b5 *
 *  Usage: various internal functions of a utility nature                  *
 *                                                                         *
-*  EmpireMUD code base by Paul Clarke, (C) 2000-2015                      *
+*  EmpireMUD code base by Paul Clarke, (C) 2000-2024                      *
 *  All rights reserved.  See license.doc for complete information.        *
 *                                                                         *
 *  EmpireMUD based upon CircleMUD 3.0, bpl 17, by Jeremy Elson.           *
@@ -10,7 +10,6 @@
 *  CircleMUD is based on DikuMUD, Copyright (C) 1990, 1991.               *
 ************************************************************************ */
 
-#include <math.h>
 #include <sys/time.h>
 
 #include "conf.h"
@@ -49,7 +48,6 @@
 *   Type Utils
 *   World Utils
 *   Misc Utils
-*   Converter Utils
 */
 
 // local prototypes
@@ -408,6 +406,10 @@ void run_delayed_refresh(void) {
 	// player portion
 	HASH_ITER(hh, char_delayed_update_list, cdu, next_cdu) {
 		// CDU_x: functionality for delayed update types
+		if (IS_SET(cdu->type, CDU_TRAIT_HOOKS)) {
+			check_trait_hooks(cdu->ch);
+			REMOVE_BIT(cdu->type, CDU_TRAIT_HOOKS);
+		}
 		if (IS_SET(cdu->type, CDU_PASSIVE_BUFFS)) {
 			refresh_passive_buffs(cdu->ch);
 			REMOVE_BIT(cdu->type, CDU_PASSIVE_BUFFS);
@@ -674,7 +676,9 @@ void score_empires(void) {
 		num = 0;
 		HASH_ITER(hh, EMPIRE_ISLANDS(emp), isle, next_isle) {
 			HASH_ITER(hh, isle->store, store, next_store) {
-				SAFE_ADD(num, store->amount, 0, MAX_INT, FALSE);
+				if (store->amount > 0) {
+					SAFE_ADD(num, store->amount, 0, MAX_INT, FALSE);
+				}
 			}
 		}
 		num /= 1000;	// for sanity of number size
@@ -785,10 +789,7 @@ bool process_import_one(empire_data *emp) {
 	int limit = config_get_int("imports_per_day");
 	bool any = FALSE;
 	obj_data *orn;
-	double cost;
-	
-	// round to %.1f
-	#define IMPORT_ROUND(amt)  (((int)((amt) * 10)) / 10.0)
+	double cost, gain;
 	
 	// find trading partners
 	HASH_ITER(hh, empire_table, partner, next_partner) {
@@ -819,7 +820,7 @@ bool process_import_one(empire_data *emp) {
 			if (!(p_trade = find_trade_entry(plt->emp, TRADE_EXPORT, trade->vnum))) {
 				continue;	// not trading this item
 			}
-			if (IMPORT_ROUND(p_trade->cost * (1.0/plt->rate)) > trade->cost) {
+			if (p_trade->cost * (1.0/plt->rate) > trade->cost) {
 				continue;	// too expensive
 			}
 			if ((their_amt = get_total_stored_count(plt->emp, trade->vnum, FALSE)) <= p_trade->limit) {
@@ -836,7 +837,7 @@ bool process_import_one(empire_data *emp) {
 				pair->emp = plt->emp;
 				pair->amount = their_amt;
 				pair->rate = plt->rate;
-				pair->cost = IMPORT_ROUND(p_trade->cost * (1.0/plt->rate));
+				pair->cost = p_trade->cost * (1.0/plt->rate);
 				DL_APPEND(pair_list, pair);
 			}
 		}
@@ -866,10 +867,13 @@ bool process_import_one(empire_data *emp) {
 			// compute cost for this trade (pair->cost is already rate-exchanged)
 			cost = trade_amt * pair->cost;
 			
+			// round off to 0.1 now
+			cost = round(cost * 10.0) / 10.0;
+			
 			// can we afford it?
 			if (EMPIRE_COINS(emp) < cost) {
-				trade_amt = EMPIRE_COINS(emp) / pair->cost;	// reduce to how many we can afford
-				cost = trade_amt * pair->cost;
+				trade_amt = floor(EMPIRE_COINS(emp) / pair->cost);	// reduce to how many we can afford
+				cost = round(trade_amt * pair->cost * 10.0) / 10.0;
 				if (trade_amt < 1) {
 					continue;	// can't afford any
 				}
@@ -878,8 +882,9 @@ bool process_import_one(empire_data *emp) {
 			// only store it if we did find an island to store to
 			if (found_island != NO_ISLAND || (found_island = get_main_island(emp)) != NO_ISLAND) {
 				// items
-				add_to_empire_storage(emp, found_island, trade->vnum, trade_amt);
-				charge_stored_resource(pair->emp, ANY_ISLAND, trade->vnum, trade_amt);
+				orn = obj_proto(trade->vnum);
+				add_to_empire_storage(emp, found_island, trade->vnum, trade_amt, orn ? GET_OBJ_TIMER(orn) : 0);
+				charge_stored_resource(pair->emp, ANY_ISLAND, trade->vnum, trade_amt, TRUE);
 				
 				// mark gather trackers
 				add_production_total(emp, trade->vnum, trade_amt);
@@ -888,7 +893,8 @@ bool process_import_one(empire_data *emp) {
 				
 				// money
 				decrease_empire_coins(emp, emp, cost);
-				increase_empire_coins(pair->emp, pair->emp, cost * pair->rate);
+				gain = cost * pair->rate;
+				increase_empire_coins(pair->emp, pair->emp, gain);
 				
 				// update limit
 				limit -= trade_amt;
@@ -896,9 +902,8 @@ bool process_import_one(empire_data *emp) {
 				any = TRUE;
 				
 				// log
-				orn = obj_proto(trade->vnum);
-				log_to_empire(emp, ELOG_TRADE, "Imported %s x%d from %s for %.1f coins", GET_OBJ_SHORT_DESC(orn), trade_amt, EMPIRE_NAME(pair->emp), cost);
-				log_to_empire(pair->emp, ELOG_TRADE, "Exported %s x%d to %s for %.1f coins", GET_OBJ_SHORT_DESC(orn), trade_amt, EMPIRE_NAME(emp), cost * pair->rate);
+				log_to_empire(emp, ELOG_TRADE, "Imported %s x%d from %s for %.1f coins", orn ? GET_OBJ_SHORT_DESC(orn) : "???", trade_amt, EMPIRE_NAME(pair->emp), cost);
+				log_to_empire(pair->emp, ELOG_TRADE, "Exported %s x%d to %s for %.1f coins", orn ? GET_OBJ_SHORT_DESC(orn) : "???", trade_amt, EMPIRE_NAME(emp), gain);
 			}
 		}
 		
@@ -1807,10 +1812,15 @@ void log_to_empire(empire_data *emp, int type, const char *str, ...) {
 	// show to players
 	if (show_empire_log_type[type] == TRUE) {
 		for (i = descriptor_list; i; i = i->next) {
-			if (STATE(i) != CON_PLAYING || IS_NPC(i->character))
+			if (STATE(i) != CON_PLAYING || IS_NPC(i->character)) {
 				continue;
-			if (GET_LOYALTY(i->character) != emp)
-				continue;
+			}
+			if (GET_LOYALTY(i->character) != emp) {
+				continue;	// wrong empire
+			}
+			if (!SHOW_STATUS_MESSAGES(i->character, SM_EMPIRE_LOGS)) {
+				continue;	// elogs off
+			}
 
 			stack_msg_to_desc(i, "%s[ %s ]&0\r\n", EMPIRE_BANNER(emp), output);
 		}
@@ -1833,7 +1843,7 @@ void mortlog(const char *str, ...) {
 	vsprintf(output, str, tArgList);
 
 	for (i = descriptor_list; i; i = i->next) {
-		if (STATE(i) == CON_PLAYING && i->character && PRF_FLAGGED(i->character, PRF_MORTLOG)) {
+		if (STATE(i) == CON_PLAYING && i->character && SHOW_STATUS_MESSAGES(i->character, SM_MORTLOG)) {
 			stack_msg_to_desc(i, "&c[ %s ]&0\r\n", output);
 		}
 	}
@@ -2318,6 +2328,40 @@ char *one_word(char *argument, char *first_arg) {
 
 
 /**
+* This is similar to one_word() in that it checks for quotes around the args,
+* but different in that unquoted text will return the whole argument, not just
+* the first word.
+*
+* @param char *argument The incoming argument(s).
+* @param char *found_arg The variable where the detected argument will be stored.
+* @return char* A pointer to whatever remains of argument.
+*/
+char *quoted_arg_or_all(char *argument, char *found_arg) {
+	skip_spaces(&argument);
+	if (*argument == '\"') {
+		// found quote: pull whole thing
+		argument++;
+		while (*argument && *argument != '\"') {
+			*(found_arg++) = *argument;
+			argument++;
+		}
+		*found_arg = '\0';
+	}
+	else {
+		// no quote: pull the entire arg
+		strcpy(found_arg, argument);
+		
+		// and advance argument to the very end
+		while (*argument) {
+			++argument;
+		}
+	}
+	
+	return (argument);
+}
+
+
+/**
 * @param char *argument The argument to test.
 * @return int TRUE if the argument is in the reserved_words[] list.
 */
@@ -2348,7 +2392,7 @@ int search_block(char *arg, const char **list, int exact) {
 
 	l = strlen(arg);
 
-	for (i = 0; **(list + i) != '\n'; i++) {
+	for (i = 0; **(list + i) != '\n'; ++i) {
 		if (!str_cmp(arg, *(list + i))) {
 			return i;	// exact or otherwise
 		}
@@ -2358,6 +2402,30 @@ int search_block(char *arg, const char **list, int exact) {
 	}
 
 	return part;	// if any
+}
+
+
+/**
+* Variant of search_block that uses multi_isname for matches. This simpilfies
+* typing some text, especially in OLC. It still prefers exact matches.
+*
+* @param char *arg The input.
+* @param const char **list A "\n"-terminated name list.
+* @return int The entry in the list, or NOTHING if not found.
+*/
+int search_block_multi_isname(char *arg, const char **list) {
+	int iter, partial = NOTHING;
+	
+	for (iter = 0; **(list + iter) != '\n'; ++iter) {
+		if (!str_cmp(arg, *(list + iter))) {
+			return iter;	// exact match
+		}
+		else if (partial == NOTHING && multi_isname(arg, *(list + iter))) {
+			partial = iter;
+		}
+	}
+	
+	return partial;	// if any
 }
 
 
@@ -2677,7 +2745,9 @@ void despawn_charmies(char_data *ch, any_vnum only_vnum) {
 	DL_FOREACH_SAFE(character_list, iter, next_iter) {
 		if (IS_NPC(iter) && GET_LEADER(iter) == ch && (only_vnum == NOTHING || GET_MOB_VNUM(iter) == only_vnum)) {
 			if (GET_COMPANION(iter) == ch || AFF_FLAGGED(iter, AFF_CHARM)) {
-				act("$n leaves.", TRUE, iter, NULL, NULL, TO_ROOM);
+				if (!AFF_FLAGGED(iter, AFF_HIDDEN | AFF_NO_SEE_IN_ROOM)) {
+					act("$n leaves.", TRUE, iter, NULL, NULL, TO_ROOM);
+				}
 				extract_char(iter);
 			}
 		}
@@ -2767,7 +2837,7 @@ int get_attribute_by_apply(char_data *ch, int apply_type) {
 			return GET_BONUS_MAGICAL(ch);
 		}
 		case APPLY_BONUS_HEALING: {
-			return total_bonus_healing(ch);
+			return GET_BONUS_HEALING(ch);
 		}
 		case APPLY_RESIST_MAGICAL: {
 			return GET_RESIST_MAGICAL(ch);
@@ -2780,6 +2850,18 @@ int get_attribute_by_apply(char_data *ch, int apply_type) {
 		}
 		case APPLY_NIGHT_VISION: {
 			return GET_EXTRA_ATT(ch, ATT_NIGHT_VISION);
+		}
+		case APPLY_NEARBY_RANGE: {
+			return GET_EXTRA_ATT(ch, ATT_NEARBY_RANGE);
+		}
+		case APPLY_WHERE_RANGE: {
+			return GET_EXTRA_ATT(ch, ATT_WHERE_RANGE);
+		}
+		case APPLY_WARMTH: {
+			return GET_EXTRA_ATT(ch, ATT_WARMTH);
+		}
+		case APPLY_COOLING: {
+			return GET_EXTRA_ATT(ch, ATT_COOLING);
 		}
 	}
 	return 0;	// if we got this far
@@ -2958,6 +3040,58 @@ double rate_item(obj_data *obj) {
 //// PLAYER UTILS ////////////////////////////////////////////////////////////
 
 /**
+* Determines if an effect appears to be bad for you or not.
+*
+* @param struct affected_type *aff Which aff.
+* @return bool TRUE if it's a good aff, FALSE if it's a bad one.
+*/
+bool affect_is_beneficial(struct affected_type *aff) {
+	bitvector_t bitv;
+	int pos;
+	
+	if (aff->location != APPLY_NONE && (apply_values[(int) aff->location] == 0.0 || aff->modifier < 0)) {
+		return FALSE;	// bad apply
+	}
+	if ((bitv = aff->bitvector) != NOBITS) {
+		// check each bit
+		for (pos = 0; bitv; ++pos, bitv >>= 1) {
+			if (IS_SET(bitv, BIT(0)) && aff_is_bad[pos]) {
+				return FALSE;
+			}
+		}
+	}
+	
+	// otherwise default to TRUE
+	return TRUE;
+}
+
+
+/**
+* If the character chose bonus health, moves, or mana during creation, adds or
+* removes those now.
+*
+* TODO would like to replace this with special abilities, through the passive
+* buff ability engine.
+*
+* @param char_data *ch The player.
+* @param bool add If TRUE, adds the bonus. If FALSE, removes it.
+*/
+void apply_bonus_pools(char_data *ch, bool add) {
+	if (!IS_NPC(ch)) {
+		if (HAS_BONUS_TRAIT(ch, BONUS_HEALTH)) {
+			affect_modify(ch, APPLY_HEALTH, (config_get_int("pool_bonus_amount") * (1 + (GET_HIGHEST_KNOWN_LEVEL(ch) / 25))), NOBITS, add);
+		}
+		if (HAS_BONUS_TRAIT(ch, BONUS_MOVES)) {
+			affect_modify(ch, APPLY_MOVE, (config_get_int("pool_bonus_amount") * (1 + (GET_HIGHEST_KNOWN_LEVEL(ch) / 25))), NOBITS, add);
+		}
+		if (HAS_BONUS_TRAIT(ch, BONUS_MANA)) {
+			affect_modify(ch, APPLY_MANA, (config_get_int("pool_bonus_amount") * (1 + (GET_HIGHEST_KNOWN_LEVEL(ch) / 25))), NOBITS, add);
+		}
+	}
+}
+
+
+/**
 * Player's carry limit. This was formerly a macro.
 *
 * @param char_data *ch The player/character.
@@ -3007,7 +3141,7 @@ bool can_see_in_dark_room(char_data *ch, room_data *room, bool count_adjacent_li
 	}
 	
 	// check if the room is actually light
-	if (room_is_light(room, count_adjacent_light)) {
+	if (room_is_light(room, count_adjacent_light, CAN_SEE_IN_MAGIC_DARKNESS(ch))) {
 		return TRUE;
 	}
 	
@@ -3039,7 +3173,7 @@ EVENTFUNC(check_leading_event) {
 	
 	// NOTE: if you add conditions here, check _QUALIFY_CHECK_LEADING(ch) too
 	if (GET_LEADING_VEHICLE(ch) && IN_ROOM(ch) != IN_ROOM(GET_LEADING_VEHICLE(ch))) {
-		act("You have lost $V and stop leading it.", FALSE, ch, NULL, GET_LEADING_VEHICLE(ch), TO_CHAR);
+		act("You have lost $V and stop leading it.", FALSE, ch, NULL, GET_LEADING_VEHICLE(ch), TO_CHAR | ACT_VEH_VICT);
 		VEH_LED_BY(GET_LEADING_VEHICLE(ch)) = NULL;
 		GET_LEADING_VEHICLE(ch) = NULL;
 	}
@@ -3077,6 +3211,7 @@ void command_lag(char_data *ch, int wait_type) {
 	// base
 	wait = universal_wait;
 	
+	// WAIT_x: functionality for wait states
 	switch (wait_type) {
 		case WAIT_SPELL: {	// spells (but not combat spells)
 			if (has_player_tech(ch, PTECH_FASTCASTING)) {
@@ -3085,14 +3220,16 @@ void command_lag(char_data *ch, int wait_type) {
 				
 				// ensure minimum of 0.5 seconds
 				wait = MAX(wait, 0.5 RL_SEC);
+				
+				gain_player_tech_exp(ch, PTECH_FASTCASTING, 5);
 			}
 			break;
 		}
 		case WAIT_MOVEMENT: {	// normal movement (special handling)
-			if (AFF_FLAGGED(ch, AFF_SLOW)) {
+			if (IS_SLOWED(ch)) {
 				wait = 1 RL_SEC;
 			}
-			else if (IS_RIDING(ch) || IS_ROAD(IN_ROOM(ch))) {
+			else if (IS_RIDING(ch) || IS_ROAD(IN_ROOM(ch)) || (IS_COMPLETE(IN_ROOM(ch)) && (ROOM_BLD_FLAGGED(IN_ROOM(ch), BLD_ROAD_ICON | BLD_ROAD_ICON_WIDE) || ROOM_BLD_FLAGGED(IN_ROOM(ch), BLD_ATTACH_ROAD)))) {
 				wait = 0;	// no wait on riding/road
 			}
 			else if (IS_OUTDOORS(ch)) {
@@ -3106,6 +3243,14 @@ void command_lag(char_data *ch, int wait_type) {
 			else {
 				wait = 0;	// indoors
 			}
+			break;
+		}
+		case WAIT_LONG: {
+			wait = 2 RL_SEC;
+			break;
+		}
+		case WAIT_VERY_LONG: {
+			wait = 4 RL_SEC;
 			break;
 		}
 	}
@@ -3253,6 +3398,107 @@ int get_view_height(char_data *ch, room_data *from_room) {
 	}
 	
 	return height;
+}
+
+
+/**
+* Determines if a character is missing a tool that's required for all
+* interactions of a given type in a list.
+*
+* @param char_data *ch The player trying to interact.
+* @param struct interaction_item *list The list of interactions to check.
+* @param int type The INTERACT_ type we're checking.
+* @return bitvector_t The missing tool type(s) if any, or NOBITS if the player has all tools (or needs none).
+*/
+bitvector_t interaction_list_missing_tools(char_data *ch, struct interaction_item *list, int type) {
+	bitvector_t found = NOBITS;
+	bool any;
+	struct interaction_item *interact;
+	struct interact_restriction *rest;
+	
+	if (!ch || !list) {
+		return NOBITS;
+	}
+	
+	LL_FOREACH(list, interact) {
+		if (interact->type == type) {
+			any = FALSE;
+			LL_FOREACH(interact->restrictions, rest) {
+				if (rest->type == INTERACT_RESTRICT_TOOL) {
+					if (IS_SET(found, rest->vnum)) {
+						// already checked and failed this type
+						any = TRUE;
+					}
+					else if (!has_tool(ch, rest->vnum)) {
+						found |= rest->vnum;
+						any = TRUE;
+					}
+				}
+			}
+			
+			if (!any) {
+				// made it! found an interact we can do
+				return NOBITS;
+			}
+		}
+	}
+	
+	// if we got here, there may be an error to return
+	return found;
+}
+
+
+/**
+* Checks interaction_list_missing_tools() on all the interaction lists in the
+* room and determines if the player can proceed on any of them, or if they are
+* missing a tool for all of them.
+*
+* @param char_data *ch The player trying to interact.
+* @param room_data *room The room to check for interactions.
+* @param int type The INTERACT_ type we're checking.
+* @return bitvector_t The missing tool type(s) if any, or NOBITS if the player has all tools (or needs none).
+*/
+bitvector_t interaction_list_missing_tools_room(char_data *ch, room_data *room, int type) {
+	bitvector_t bits, found = NOBITS;
+	
+	if (!ch || !room) {
+		return NOBITS;
+	}
+	
+	if (SECT_CAN_INTERACT_ROOM(room, type)) {
+		if ((bits = interaction_list_missing_tools(ch, GET_SECT_INTERACTIONS(SECT(room)), type))) {
+			found |= bits;
+		}
+		else {
+			return NOBITS;
+		}
+	}
+	if (BLD_CAN_INTERACT_ROOM(room, type)) {
+		if ((bits = interaction_list_missing_tools(ch, GET_BLD_INTERACTIONS(GET_BUILDING(room)), type))) {
+			found |= bits;
+		}
+		else {
+			return NOBITS;
+		}
+	}
+	if (RMT_CAN_INTERACT_ROOM(room, type)) {
+		if ((bits = interaction_list_missing_tools(ch, GET_RMT_INTERACTIONS(GET_ROOM_TEMPLATE(room)), type))) {
+			found |= bits;
+		}
+		else {
+			return NOBITS;
+		}
+	}
+	if (CROP_CAN_INTERACT_ROOM(room, type)) {
+		if ((bits = interaction_list_missing_tools(ch, GET_CROP_INTERACTIONS(ROOM_CROP(room)), type))) {
+			found |= bits;
+		}
+		else {
+			return NOBITS;
+		}
+	}
+	
+	return found;
 }
 
 
@@ -3413,22 +3659,22 @@ void apply_resource(char_data *ch, struct resource_data *res, struct resource_da
 			}
 			case APPLY_RES_CRAFT: {
 				if (!messaged_char && obj_has_custom_message(use_obj, OBJ_CUSTOM_CRAFT_TO_CHAR)) {
-					act(obj_get_custom_message(use_obj, OBJ_CUSTOM_CRAFT_TO_CHAR), FALSE, ch, use_obj, crafting_veh, TO_CHAR | TO_SPAMMY);
+					act(obj_get_custom_message(use_obj, OBJ_CUSTOM_CRAFT_TO_CHAR), FALSE, ch, use_obj, crafting_veh, TO_CHAR | TO_SPAMMY | ACT_VEH_VICT);
 					messaged_char = TRUE;
 				}
 				if (!messaged_room && obj_has_custom_message(use_obj, OBJ_CUSTOM_CRAFT_TO_ROOM)) {
-					act(obj_get_custom_message(use_obj, OBJ_CUSTOM_CRAFT_TO_ROOM), FALSE, ch, use_obj, crafting_veh, TO_ROOM | TO_SPAMMY);
+					act(obj_get_custom_message(use_obj, OBJ_CUSTOM_CRAFT_TO_ROOM), FALSE, ch, use_obj, crafting_veh, TO_ROOM | TO_SPAMMY | ACT_VEH_VICT);
 					messaged_room = TRUE;
 				}
 				break;
 			}
 			case APPLY_RES_REPAIR: {
 				if (!messaged_char) {
-					act("You use $p to repair $V.", FALSE, ch, use_obj, crafting_veh, TO_CHAR | TO_SPAMMY);
+					act("You use $p to repair $V.", FALSE, ch, use_obj, crafting_veh, TO_CHAR | TO_SPAMMY | ACT_VEH_VICT);
 					messaged_char = TRUE;
 				}
 				if (!messaged_room) {
-					act("$n uses $p to repair $V.", FALSE, ch, use_obj, crafting_veh, TO_ROOM | TO_SPAMMY);
+					act("$n uses $p to repair $V.", FALSE, ch, use_obj, crafting_veh, TO_ROOM | TO_SPAMMY | ACT_VEH_VICT);
 					messaged_room = TRUE;
 				}
 				break;
@@ -3454,10 +3700,10 @@ void apply_resource(char_data *ch, struct resource_data *res, struct resource_da
 				}
 				case APPLY_RES_CRAFT: {
 					if (!messaged_char) {
-						act("You place $p onto $V.", FALSE, ch, use_obj, crafting_veh, TO_CHAR | TO_SPAMMY);
+						act("You place $p onto $V.", FALSE, ch, use_obj, crafting_veh, TO_CHAR | TO_SPAMMY | ACT_VEH_VICT);
 					}
 					if (!messaged_room) {
-						act("$n places $p onto $V.", FALSE, ch, use_obj, crafting_veh, TO_ROOM | TO_SPAMMY);
+						act("$n places $p onto $V.", FALSE, ch, use_obj, crafting_veh, TO_ROOM | TO_SPAMMY | ACT_VEH_VICT);
 					}
 					break;
 				}
@@ -3488,10 +3734,10 @@ void apply_resource(char_data *ch, struct resource_data *res, struct resource_da
 				}
 				case APPLY_RES_CRAFT: {
 					if (!messaged_char) {
-						act("You pour $p into $V.", FALSE, ch, use_obj, crafting_veh, TO_CHAR | TO_SPAMMY);
+						act("You pour $p into $V.", FALSE, ch, use_obj, crafting_veh, TO_CHAR | TO_SPAMMY | ACT_VEH_VICT);
 					}
 					if (!messaged_room) {
-						act("$n pours $p into $V.", FALSE, ch, use_obj, crafting_veh, TO_ROOM | TO_SPAMMY);
+						act("$n pours $p into $V.", FALSE, ch, use_obj, crafting_veh, TO_ROOM | TO_SPAMMY | ACT_VEH_VICT);
 					}
 					break;
 				}
@@ -3516,17 +3762,20 @@ void apply_resource(char_data *ch, struct resource_data *res, struct resource_da
 		}
 		case RES_COINS: {
 			empire_data *coin_emp = real_empire(res->vnum);
+			char buf2[MAX_STRING_LENGTH];
+			*buf2 = '\0';
+			
+			charge_coins(ch, coin_emp, res->amount, build_used_list, msg_type == APPLY_RES_SILENT ? NULL : buf2);
 			
 			if (!messaged_char && msg_type != APPLY_RES_SILENT) {
-				snprintf(buf, sizeof(buf), "You spend %s.", money_amount(coin_emp, res->amount));
+				snprintf(buf, sizeof(buf), "You spend %s.", buf2);
 				act(buf, FALSE, ch, NULL, NULL, TO_CHAR | TO_SPAMMY);
 			}
 			if (!messaged_room && msg_type != APPLY_RES_SILENT) {
-				snprintf(buf, sizeof(buf), "$n spends %s.", money_amount(coin_emp, res->amount));
+				snprintf(buf, sizeof(buf), "$n spends %s.", buf2);
 				act(buf, FALSE, ch, NULL, NULL, TO_ROOM | TO_SPAMMY);
 			}
 			
-			charge_coins(ch, coin_emp, res->amount, build_used_list);
 			res->amount = 0;	// cost paid in full
 			break;
 		}
@@ -3585,19 +3834,19 @@ void apply_resource(char_data *ch, struct resource_data *res, struct resource_da
 				}
 				case APPLY_RES_CRAFT: {
 					if (!messaged_char && gen && GEN_STRING(gen, GSTR_ACTION_CRAFT_TO_CHAR)) {
-						act(GEN_STRING(gen, GSTR_ACTION_CRAFT_TO_CHAR), FALSE, ch, NULL, crafting_veh, TO_CHAR | TO_SPAMMY);
+						act(GEN_STRING(gen, GSTR_ACTION_CRAFT_TO_CHAR), FALSE, ch, NULL, crafting_veh, TO_CHAR | TO_SPAMMY | ACT_VEH_VICT);
 					}
 					if (!messaged_room && gen && GEN_STRING(gen, GSTR_ACTION_CRAFT_TO_ROOM)) {
-						act(GEN_STRING(gen, GSTR_ACTION_CRAFT_TO_ROOM), FALSE, ch, NULL, crafting_veh, TO_ROOM | TO_SPAMMY);
+						act(GEN_STRING(gen, GSTR_ACTION_CRAFT_TO_ROOM), FALSE, ch, NULL, crafting_veh, TO_ROOM | TO_SPAMMY | ACT_VEH_VICT);
 					}
 					break;
 				}
 				case APPLY_RES_REPAIR: {
 					if (!messaged_char && gen && GEN_STRING(gen, GSTR_ACTION_REPAIR_TO_CHAR)) {
-						act(GEN_STRING(gen, GSTR_ACTION_REPAIR_TO_CHAR), FALSE, ch, NULL, crafting_veh, TO_CHAR | TO_SPAMMY);
+						act(GEN_STRING(gen, GSTR_ACTION_REPAIR_TO_CHAR), FALSE, ch, NULL, crafting_veh, TO_CHAR | TO_SPAMMY | ACT_VEH_VICT);
 					}
 					if (!messaged_room && gen && GEN_STRING(gen, GSTR_ACTION_REPAIR_TO_ROOM)) {
-						act(GEN_STRING(gen, GSTR_ACTION_REPAIR_TO_ROOM), FALSE, ch, NULL, crafting_veh, TO_ROOM | TO_SPAMMY);
+						act(GEN_STRING(gen, GSTR_ACTION_REPAIR_TO_ROOM), FALSE, ch, NULL, crafting_veh, TO_ROOM | TO_SPAMMY | ACT_VEH_VICT);
 					}
 					break;
 				}
@@ -3744,7 +3993,7 @@ void extract_resources(char_data *ch, struct resource_data *list, bool ground, s
 					break;
 				}
 				case RES_COINS: {
-					charge_coins(ch, real_empire(res->vnum), res->amount, build_used_list);
+					charge_coins(ch, real_empire(res->vnum), res->amount, build_used_list, NULL);
 					res->amount = 0;	// got full amount
 					break;
 				}
@@ -4032,7 +4281,9 @@ void give_resources(char_data *ch, struct resource_data *list, bool split) {
 						obj_to_room(obj, IN_ROOM(ch));
 					}
 					
-					load_otrigger(obj);
+					if (load_otrigger(obj) && obj->carried_by) {
+						get_otrigger(obj, obj->carried_by, FALSE);
+					}
 				}
 				break;
 			}
@@ -4202,6 +4453,9 @@ bool has_resources(char_data *ch, struct resource_data *list, bool ground, bool 
 			else if (!HASRES_OBJS && res->type == RES_OBJECT) {
 				continue;
 			}
+			else if (!HASRES_OTHER && (res->type == RES_COINS || res->type == RES_CURRENCY || res->type == RES_POOL)) {
+				continue;	// only do these once: in the othe cycle
+			}
 		
 			// RES_x: check resources by type
 			switch (res->type) {
@@ -4282,7 +4536,7 @@ bool has_resources(char_data *ch, struct resource_data *list, bool ground, bool 
 				case RES_POOL: {
 					// special rule: require that blood or health costs not reduce player below 1
 					amt = res->amount + ((res->vnum == HEALTH || res->vnum == BLOOD) ? 1 : 0);
-					res->amount -= MAX(amt, GET_CURRENT_POOL(ch, res->vnum));
+					res->amount -= MIN(amt, GET_CURRENT_POOL(ch, res->vnum));
 					break;
 				}
 				case RES_ACTION: {
@@ -4450,6 +4704,46 @@ sector_data *find_first_matching_sector(bitvector_t with_flags, bitvector_t with
 //// STRING UTILS ////////////////////////////////////////////////////////////
 
 /**
+* Determines if any word in str is an abbrev for any keyword in namelist,
+* separately -- even if the other words in str are not.
+*
+* @param const char *str The search arguments, e.g. "hug blue"
+* @param const char *namelist The keyword list, e.g. "bear white huge"
+* @return bool TRUE if any word in str is an abbrev for any keyword in namelist, even if the others aren't.
+*/
+bool any_isname(const char *str, const char *namelist) {
+	char *newlist, *curtok, word[MAX_INPUT_LENGTH];
+	const char *ptr;
+	bool found = FALSE;
+	
+	if (!*str || !*namelist) {
+		return FALSE;	// shortcut
+	}
+	if (!str_cmp(str, namelist)) {
+		return TRUE;	// the easy way
+	}
+
+	newlist = strdup(namelist);
+
+	// for each word in newlist
+	for (curtok = strtok(newlist, WHITESPACE); curtok && !found; curtok = strtok(NULL, WHITESPACE)) {
+		if (curtok) {
+			ptr = str;
+			while (*ptr && !found) {
+				ptr = any_one_arg((char*)ptr, word);
+				if (*word && is_abbrev(word, curtok)) {
+					found = TRUE;
+				}
+			}
+		}
+	}
+
+	free(newlist);
+	return found;
+}
+
+
+/**
 * This converts data file entries into bitvectors, where they may be written
 * as "abdo" in the file, or as a number.
 *
@@ -4577,6 +4871,61 @@ char *CAP(char *txt) {
 
 
 /**
+* Converts a number of seconds (or minutes) from a large number to a 0:00
+* format (or 0:00:00 or even 0:00:00:00).
+*
+* @param long seconds How long the time is.
+* @param bool minutes_instead if TRUE, the 'seconds' field is actually minutes and the time returned will be minutes as well.
+* @param char *unlimited_str If the time can be -1/UNLIMITED, returns this string instead (may be NULL).
+* @return char* The time string formatted with colons, or the "unlimited_str" if seconds was -1/UNLIMITED
+*/
+char *colon_time(long seconds, bool minutes_instead, char *unlimited_str) {
+	static char output[256];
+	int minutes, hours, days;
+	
+	// some things using this function allow UNLIMITED as a value
+	if (seconds == UNLIMITED) {
+		return unlimited_str ? unlimited_str : "unlimited";
+	}
+	
+	// multiplier if the unit is minutes
+	if (minutes_instead) {
+		seconds *= SECS_PER_REAL_MIN;
+	}
+	
+	// a negative here would be meaningless
+	seconds = ABSOLUTE(seconds);
+	
+	// compute
+	days = seconds / SECS_PER_REAL_DAY;
+	seconds %= SECS_PER_REAL_DAY;
+	
+	hours = seconds / SECS_PER_REAL_HOUR;
+	seconds %= SECS_PER_REAL_HOUR;
+	
+	minutes = seconds / SECS_PER_REAL_MIN;
+	seconds %= SECS_PER_REAL_MIN;
+	
+	if (days > 0) {
+		snprintf(output, sizeof(output), "%d:%02d:%02d:%02d", days, hours, minutes, (int)seconds);
+	}
+	else if (hours > 0) {
+		snprintf(output, sizeof(output), "%d:%02d:%02d", hours, minutes, (int)seconds);
+	}
+	else {
+		snprintf(output, sizeof(output), "%d:%02d", minutes, (int)seconds);
+	}
+	
+	// if we started with minutes, shave the seconds off
+	if (minutes_instead && strlen(output) >= 3) {
+		output[strlen(output) - 3] = '\0';
+	}
+	
+	return output;
+}
+
+
+/**
 * Counts the number of chars in a string that are color codes and will be
 * invisible to the player.
 *
@@ -4651,6 +5000,39 @@ int count_icon_codes(char *string) {
 	}
 	
 	return count;
+}
+
+
+/**
+* Doubles the ampersands in a 4-char icon and returns the result. This is
+* mainly for loading stored map memories.
+*
+* @param char *icon The incoming 4-char icon.
+* @return char* The modified icon, or the original if there were no ampersands.
+*/
+char *double_map_ampersands(char *icon) {
+	static char output[32];
+	int iter, pos;
+	
+	// shortcut: easy in, easy out
+	if (!strchr(icon, COLOUR_CHAR)) {
+		return icon;
+	}
+	
+	// copy while doubling
+	for (iter = 0, pos = 0; icon[iter] && pos < 30; ++iter) {
+		if (icon[iter] == COLOUR_CHAR) {
+			// double the ampersand
+			output[pos++] = COLOUR_CHAR;
+		}
+		// and copy the char
+		output[pos++] = icon[iter];
+	}
+	
+	// and terminate
+	output[pos++] = '\0';
+	
+	return output;
 }
 
 
@@ -4736,7 +5118,7 @@ bool isname(const char *str, const char *namelist) {
 	char *newlist, *curtok;
 	bool found = FALSE;
 	
-	if (!*str || !*namelist) {
+	if (!*str || !*namelist || (*str == UID_CHAR && isdigit(*(str+1)))) {
 		return FALSE;	// shortcut
 	}
 
@@ -4749,6 +5131,52 @@ bool isname(const char *str, const char *namelist) {
 
 	for (curtok = strtok(newlist, WHITESPACE); curtok && !found; curtok = strtok(NULL, WHITESPACE)) {
 		if (curtok && is_abbrev(str, curtok)) {
+			found = TRUE;
+		}
+	}
+
+	free(newlist);
+	return found;
+}
+
+
+/**
+* Variant of isname that also deterines if it used an abbreviation.
+*
+* @param const char *str The search argument, e.g. "be"
+* @param const char *namelist The keyword list, e.g. "bear white huge"
+* @param bool *was_exact Optional: Will be set to TRUE if an exact keyword was typed instead of an abbrev. (Pass NULL to skip this.)
+* @return bool TRUE if str is an abbrev for any keyword in namelist
+*/
+bool isname_check_exact(const char *str, const char *namelist, bool *was_exact) {
+	char *newlist, *curtok;
+	bool found = FALSE;
+	
+	if (was_exact) {
+		// initialize
+		*was_exact = FALSE;
+	}
+	
+	if (!*str || !*namelist || (*str == UID_CHAR && isdigit(*(str+1)))) {
+		return FALSE;	// shortcut
+	}
+
+	/* the easy way */
+	if (!str_cmp(str, namelist)) {
+		if (was_exact) {
+			*was_exact = TRUE;
+		}
+		return TRUE;
+	}
+
+	newlist = strdup(namelist);
+
+	for (curtok = strtok(newlist, WHITESPACE); curtok && (!found || (was_exact && !*was_exact)); curtok = strtok(NULL, WHITESPACE)) {
+		if (curtok && was_exact && !str_cmp(str, curtok)) {
+			*was_exact = TRUE;
+			found = TRUE;
+		}
+		else if (curtok && is_abbrev(str, curtok)) {
 			found = TRUE;
 		}
 	}
@@ -4821,7 +5249,7 @@ bool multi_isname(const char *arg, const char *namelist) {
 		ptr = any_one_arg(ptr, argword);
 	} while (fill_word(argword));
 	
-	ok = TRUE;
+	ok = *argword ? TRUE : FALSE;
 	while (*argword && ok) {
 		if (!isname(argword, namelist)) {
 			ok = FALSE;
@@ -5090,6 +5518,55 @@ const char *skip_filler(const char *string) {
 }
 
 
+/**
+* This function gets just the portion of a string after removing any initial
+* word that was on the conjure_words[] list.
+*
+* If you want to save the result somewhere, you should str_dup() it
+*
+* @param const char *string The original string.
+* @param const char **wordlist The list of words to skip.
+* @param bool also_skip_filler If TRUE, also skips fill words and reserved words.
+*/
+const char *skip_wordlist(const char *string, const char **wordlist, bool also_skip_filler) {
+	static char remainder[MAX_STRING_LENGTH];
+	char temp[MAX_STRING_LENGTH];
+	char *ptr, *ot;
+	int pos = 0;
+	
+	*remainder = '\0';
+	
+	if (!string || !wordlist) {
+		log("SYSERR: skip_wordlist received a NULL %s pointer.", string ? "string" : "wordlist");
+		return (const char *)remainder;
+	}
+	
+	do {
+		string += pos;
+		ot = (char*)string;	// just to skip_spaces on it, which won't modify the string
+		skip_spaces(&ot);
+		string = ot;
+		
+		if ((ptr = strchr(string, ' '))) {
+			pos = ptr - string;
+		}
+		else {
+			pos = 0;
+		}
+		
+		if (pos > 0) {
+			strncpy(temp, string, pos);
+		}
+		temp[pos] = '\0';
+	} while (search_block(temp, wordlist, TRUE) != NOTHING && (also_skip_filler || fill_word(temp) || reserved_word(temp)));
+	
+	// when we get here, string is a pointer to the start of the real name
+	strcpy(remainder, string);
+	
+	return (const char *)remainder;
+}
+
+
 /*
  * If you don't have a 'const' array, just cast it as such.  It's safer
  * to cast a non-const array as const than to cast a const one as non-const.
@@ -5145,7 +5622,7 @@ void sprinttype(int type, const char *names[], char *result, size_t max_result_s
 		snprintf(result, max_result_size, "%s", names[nr]);
 	}
 	else {
-		snprintf(result, max_result_size, "%s", error_value);
+		snprintf(result, max_result_size, "%s", NULLSAFE(error_value));
 	}
 }
 
@@ -5411,12 +5888,12 @@ int strn_cmp(const char *arg1, const char *arg2, int n) {
 /*
 * Version of str_str from dg_scripts -- better than the base CircleMUD version.
 *
-* @param char *cs The string to search.
-* @param char *ct The string to search for...
+* @param const char *cs The string to search.
+* @param const char *ct The string to search for...
 * @return char* A pointer to the substring within cs, or NULL if not found.
 */
-char *str_str(char *cs, char *ct) {
-	char *s, *t;
+char *str_str(const char *cs, const char *ct) {
+	const char *s, *t;
 
 	if (!cs || !ct || !*ct)
 		return NULL;
@@ -5435,7 +5912,7 @@ char *str_str(char *cs, char *ct) {
 		}
 
 		if (!*t)
-			return s;
+			return (char*)s;
 	}
 
 	return NULL;
@@ -5511,6 +5988,38 @@ char *trim(char *string) {
 	}
 	
 	return ptr;
+}
+
+
+/**
+* Un-doubles ampersands in 4-char map icons and returns the result. This is
+* used for writing map memory, which does not have room for doubled ampersands.
+*
+* @param char *icon The incoming icon, which may have doubled ampersands.
+* @return char* The modified icon with any doubled ampersands reduced to one, or the original icon if there were no ampersands.
+*/
+char *undouble_map_ampersands(char *icon) {
+	static char output[32];
+	int iter, pos;
+	
+	// shortcut: easy in, easy out
+	if (!strchr(icon, COLOUR_CHAR)) {
+		return icon;
+	}
+	
+	// copy while doubling
+	for (iter = 0, pos = 0; icon[iter] && pos < 30; ++iter) {
+		if (icon[iter] == COLOUR_CHAR && icon[iter+1] == COLOUR_CHAR) {
+			++iter;	// skip 1
+		}
+		// and copy the char
+		output[pos++] = icon[iter];
+	}
+	
+	// and terminate
+	output[pos++] = '\0';
+	
+	return output;
 }
 
 
@@ -5596,7 +6105,7 @@ sector_data *get_sect_by_name(char *name) {
 */
 bool check_sunny(room_data *room) {
 	bool sun_sect = !ROOM_IS_CLOSED(room) || (IS_ADVENTURE_ROOM(room) && RMT_FLAGGED(room, RMT_OUTDOOR));
-	return (sun_sect && get_sun_status(room) != SUN_DARK && !ROOM_AFF_FLAGGED(room, ROOM_AFF_DARK));
+	return (sun_sect && get_sun_status(room) != SUN_DARK && !ROOM_AFF_FLAGGED(room, ROOM_AFF_MAGIC_DARKNESS));
 }
 
 
@@ -5767,6 +6276,81 @@ int distance_to_nearest_player(room_data *room) {
 
 
 /**
+* Determines the full climate type of a given room. This should be used instead
+* of GET_SECT_CLIMATE() in most cases because it checks additional fields.
+*
+* @param room_data *room The room to check climate for.
+* @return bitvector_t The full set of CLIM_ flags for the room.
+*/
+bitvector_t get_climate(room_data *room) {
+	bitvector_t flags = GET_SECT_CLIMATE(SECT(room));
+	room_data *home = HOME_ROOM(room);
+	
+	// base sect?
+	if (ROOM_SECT_FLAGGED(room, SECTF_INHERIT_BASE_CLIMATE)) {
+		flags |= GET_SECT_CLIMATE(BASE_SECT(room));
+		
+		// home room -- only if checking base sect
+		if (home != room) {
+			flags |= GET_SECT_CLIMATE(SECT(home));
+			
+			// and base of the home room?
+			if (ROOM_SECT_FLAGGED(home, SECTF_INHERIT_BASE_CLIMATE)) {
+				flags |= GET_SECT_CLIMATE(BASE_SECT(home));
+			}
+		}
+	}
+	
+	// should this check for TEMPERATURE_USE_CLIMATE too? I think "maybe not" -pc
+	
+	return flags;
+}
+
+
+/**
+* Determines the maximum depletion amount the interactions in a given room
+* allow.
+*
+* @param room_data *room Which room (to find interactions in).
+* @param int depletion_type Which depletion we're looking for.
+* @return int Detected deletion cap if any; -1 if not detected.
+*/
+int get_depletion_max(room_data *room, int depletion_type) {
+	int iter, list_size, max, best = -1;
+	struct interaction_item *interact, *list[4] = { NULL, NULL, NULL, NULL };
+	
+	if (!room) {
+		return best;
+	}
+	
+	// build lists of interactions to check
+	list_size = 0;
+	list[list_size++] = GET_SECT_INTERACTIONS(SECT(room));
+	if (ROOM_SECT_FLAGGED(room, SECTF_CROP) && ROOM_CROP(room)) {
+		list[list_size++] = GET_CROP_INTERACTIONS(ROOM_CROP(room));
+	}
+	if (GET_BUILDING(room) && IS_COMPLETE(room)) {
+		list[list_size++] = GET_BLD_INTERACTIONS(GET_BUILDING(room));
+	}
+	if (GET_ROOM_TEMPLATE(room)) {
+		list[list_size++] = GET_RMT_INTERACTIONS(GET_ROOM_TEMPLATE(room));
+	}
+	
+	// check all lists
+	for (iter = 0; iter < list_size; ++iter) {
+		LL_FOREACH(list[iter], interact) {
+			if (determine_depletion_type(interact) == depletion_type) {
+				max = interact_data[interact->type].one_at_a_time ? interact->quantity : DEPLETION_LIMIT(room);
+				best = MAX(best, max);
+			}
+		}
+	}
+	
+	return best;
+}
+
+
+/**
 * This finds the ultimate map point for a given room, resolving any number of
 * layers of boats and home rooms.
 *
@@ -5915,7 +6499,7 @@ room_data *find_load_room(char_data *ch) {
 	}
 	
 	// still here?
-	return find_starting_location();
+	return find_starting_location(real_room(GET_LAST_ROOM(ch)));
 }
 
 
@@ -6033,16 +6617,36 @@ bool find_sect_within_distance_from_room(room_data *room, sector_vnum sect, int 
 
 
 /**
-* find a random starting location
+* Find a starting location near a given room, or a random starting location.
 *
+* @param room_data *near_room Optional: Gets the start loc closest to here if provided, or a random one if NULL.
 * @return room_data* A random starting location.
 */
-room_data *find_starting_location() {
+room_data *find_starting_location(room_data *near_room) {
+	int iter, dist, best, best_dist;
+	
 	if (highest_start_loc_index < 0) {
 		return NULL;
 	}
-
-	return (real_room(start_locs[number(0, highest_start_loc_index)]));
+	
+	if (near_room) {
+		// find nearest
+		best = 0;
+		best_dist = -1;
+		for (iter = 0; iter <= highest_start_loc_index; ++iter) {
+			dist = compute_distance(near_room, real_room(start_locs[iter]));
+			if (best_dist == -1 || dist < best_dist) {
+				best = iter;
+				best_dist = dist;
+			}
+		}
+		
+		return real_room(start_locs[best]);
+	}
+	else {
+		// random
+		return real_room(start_locs[number(0, highest_start_loc_index)]);
+	}
 }
 
 
@@ -6215,33 +6819,13 @@ int get_direction_to(room_data *from, room_data *to) {
 * @param bool abbrev If TRUE, gets e.g. "ene". If FALSE, gets e.g. "east-northeast".
 * @return char* The string for the direction. May be an empty string if to == from.
 */
-char *get_partial_direction_to(char_data *ch, room_data *from, room_data *to, bool abbrev) {
+const char *get_partial_direction_to(char_data *ch, room_data *from, room_data *to, bool abbrev) {
 	room_data *origin = HOME_ROOM(from), *dest = HOME_ROOM(to);
 	int from_x = X_COORD(origin), from_y = Y_COORD(origin);
 	int to_x = X_COORD(dest), to_y = Y_COORD(dest);
 	int x_diff = to_x - from_x, y_diff = to_y - from_y;
 	int iter;
 	double radians, slope, degrees;
-	
-	char *partial_dirs[][2] = {
-		// counter-clockwise from ENE, ending with E
-		{ "east-northeast", "ene" },
-		{ "northeast", "ne" },
-		{ "north-northeast", "nne" },
-		{ "north", "n" },
-		{ "north-northwest", "nnw" },
-		{ "northwest", "nw" },
-		{ "west-northwest", "wnw" },
-		{ "west", "w" },
-		{ "west-southwest", "wsw" },
-		{ "southwest", "sw" },
-		{ "south-southwest", "ssw" },
-		{ "south", "s" },
-		{ "south-southeast", "sse" },
-		{ "southeast", "se" },
-		{ "east-southeast", "ese" },
-		{ "east", "e" }		// must be last for the iterator to work
-	};
 	
 	// adjust for edges
 	if (WRAP_X) {
@@ -6302,7 +6886,7 @@ char *get_partial_direction_to(char_data *ch, room_data *from, room_data *to, bo
 	
 	// each dir is 22.5 degrees of the circle (11.25 each way)
 	// so we remove that first 11.25 and do East (0 degrees) at the end...
-	for (iter = 0; strcmp(partial_dirs[iter][1], "e"); ++iter) {
+	for (iter = 0; *partial_dirs[iter][1] != '\n'; ++iter) {
 		if ((degrees - 11.25) < ((iter + 1) * 22.5)) {
 			// found!
 			return partial_dirs[iter][(abbrev ? 1 : 0)];
@@ -6333,6 +6917,8 @@ bool is_deep_mine(room_data *room) {
 */
 void lock_icon(room_data *room, struct icon_data *use_icon) {
 	struct icon_data *icon;
+	char buffer[256];
+	char *temp;
 
 	// don't do it if a custom icon is set (or no room provided)
 	if (!room || ROOM_CUSTOM_ICON(room)) {
@@ -6341,11 +6927,33 @@ void lock_icon(room_data *room, struct icon_data *use_icon) {
 	if (SHARED_DATA(room) == &ocean_shared_data) {
 		return;	// never on the ocean
 	}
-
+	
+	// hich icon?
 	if (!(icon = use_icon)) {
-		icon = get_icon_from_set(GET_SECT_ICONS(SECT(room)), GET_SEASON(room));
+		if (ROOM_SECT_FLAGGED(room, SECTF_CROP) && ROOM_CROP(room)) {
+			icon = get_icon_from_set(GET_CROP_ICONS(ROOM_CROP(room)), GET_SEASON(room));
+		}
+		else {
+			icon = get_icon_from_set(GET_SECT_ICONS(SECT(room)), GET_SEASON(room));
+		}
 	}
-	set_room_custom_icon(room, icon->icon);
+	
+	// did we find one
+	if (icon) {
+		// prepend color (it's not automatically there)
+		snprintf(buffer, sizeof(buffer), "%s%s", icon->color, icon->icon);
+	
+		// check for variable colors that must be stored
+		if (strstr(buffer, "&?")) {
+			temp = str_replace("&?", icon->color, buffer);
+			set_room_custom_icon(room, temp);
+			free(temp);
+		}
+		else {
+			set_room_custom_icon(room, buffer);
+		}
+	}
+	// else nothing to do
 }
 
 
@@ -6358,6 +6966,7 @@ void lock_icon(room_data *room, struct icon_data *use_icon) {
 */
 void lock_icon_map(struct map_data *loc, struct icon_data *use_icon) {
 	struct icon_data *icon;
+	char buffer[256];
 	
 	// safety first
 	if (!loc || loc->shared->icon) {
@@ -6368,14 +6977,35 @@ void lock_icon_map(struct map_data *loc, struct icon_data *use_icon) {
 	}
 
 	if (!(icon = use_icon)) {
-		icon = get_icon_from_set(GET_SECT_ICONS(loc->sector_type), y_coord_to_season[MAP_Y_COORD(loc->vnum)]);
+		if (SECT_FLAGGED(loc->sector_type, SECTF_CROP) && loc->crop_type && CROP_FLAGGED(loc->crop_type, CROPF_LOCK_ICON)) {
+			icon = get_icon_from_set(GET_CROP_ICONS(loc->crop_type), y_coord_to_season[MAP_Y_COORD(loc->vnum)]);
+		}
+		else {
+			icon = get_icon_from_set(GET_SECT_ICONS(loc->sector_type), y_coord_to_season[MAP_Y_COORD(loc->vnum)]);
+		}
 	}
 	
-	if (loc->shared->icon) {
-		free(loc->shared->icon);
+	// did we find one
+	if (icon) {
+		if (loc->shared->icon) {
+			free(loc->shared->icon);
+		}
+		
+		// prepend color code
+		snprintf(buffer, sizeof(buffer), "%s%s", icon->color, icon->icon);
+	
+		// finally, check for variable colors that must be stored
+		if (strstr(buffer, "&?")) {
+			// str_replace allocates a new string
+			loc->shared->icon = str_replace("&?", icon->color, buffer);
+		}
+		else {
+			loc->shared->icon = str_dup(buffer);
+		}
+		
+		request_world_save(loc->vnum, WSAVE_ROOM);
 	}
-	loc->shared->icon = icon ? str_dup(icon->icon) : NULL;
-	request_world_save(loc->vnum, WSAVE_ROOM);
+	// if no icon, no work
 }
 
 
@@ -6439,11 +7069,12 @@ void relocate_players(room_data *room, room_data *to_room) {
 			}
 			
 			char_to_room(ch, target);
+			enter_triggers(ch, NO_DIR, "system", FALSE);
 			qt_visit_room(ch, IN_ROOM(ch));
 			GET_LAST_DIR(ch) = NO_DIR;
 			look_at_room(ch);
 			act("$n arrives.", TRUE, ch, NULL, NULL, TO_ROOM);
-			enter_wtrigger(IN_ROOM(ch), ch, NO_DIR, "system");
+			greet_triggers(ch, NO_DIR, "system", FALSE);
 			msdp_update_room(ch);
 		}
 	}
@@ -6456,14 +7087,18 @@ void relocate_players(room_data *room, room_data *to_room) {
 *
 * @param room_data *room The room to check (which may be light).
 * @param bool count_adjacent_light If TRUE, light cascades from adjacent tiles.
+* @param bool ignore_magic_darkness If TRUE, ignores ROOM_AFF_MAGIC_DARKNESS -- presumably because you already checked it.
 * @return bool TRUE if the room is light, FALSE if not.
 */
-bool room_is_light(room_data *room, bool count_adjacent_light) {
-	if (MAGIC_DARKNESS(room)) {
+bool room_is_light(room_data *room, bool count_adjacent_light, bool ignore_magic_darkness) {
+	if (!ignore_magic_darkness && MAGIC_DARKNESS(room)) {
 		return FALSE;	// always dark
 	}
 	
 	// things that make the room light
+	if (GET_ISLAND(room) && IS_SET(GET_ISLAND(room)->flags, ISLE_ALWAYS_LIGHT) && IS_OUTDOOR_TILE(room)) {
+		return TRUE;
+	}
 	if (ROOM_LIGHTS(room) > 0 || RMT_FLAGGED(room, RMT_LIGHT)) {
 		return TRUE;	// not dark: has a light source
 	}
@@ -6476,7 +7111,7 @@ bool room_is_light(room_data *room, bool count_adjacent_light) {
 	if (ROOM_OWNER(room) && EMPIRE_HAS_TECH(ROOM_OWNER(room), TECH_CITY_LIGHTS) && get_territory_type_for_empire(room, ROOM_OWNER(room), FALSE, NULL, NULL) != TER_FRONTIER) {
 		return TRUE;	// not dark: city lights
 	}
-	if (count_adjacent_light && adjacent_room_is_light(room)) {
+	if (count_adjacent_light && adjacent_room_is_light(room, ignore_magic_darkness)) {
 		return TRUE;	// not dark: adjacent room is light
 	}
 	
@@ -7102,142 +7737,4 @@ void update_all_players(char_data *to_message, PLAYER_UPDATE_FUNC(*func)) {
 			queue_delayed_update(ch, CDU_SAVE);
 		}
 	}
-}
-
-
- //////////////////////////////////////////////////////////////////////////////
-//// CONVERTER UTILS /////////////////////////////////////////////////////////
-
-/**
-* This convertions the pre-b5.88 components to the new versions.
-*
-* @param int old_type The old component type, previously CMP_x.
-* @param bitvector_t old_flags Any flags that were set on the old component, callled CMPF_x.
-* @return any_vnum The new generic vnum component that matches it.
-*/
-any_vnum b5_88_old_component_to_new_component(int old_type, bitvector_t old_flags) {
-	// first, we need the pre-b5.88 component types (ones not listed do not need conversion)
-	const int cmp_BONE = 2, cmp_BLOCK = 3, cmp_CLAY = 4, cmp_FIBERS = 7,
-		cmp_FLOUR = 8, cmp_FRUIT = 9, cmp_FUR = 10, cmp_GEM = 11,
-		cmp_GRAIN = 12, cmp_HANDLE = 13, cmp_HERB = 14, cmp_LEATHER = 15,
-		cmp_LUMBER = 16, cmp_MEAT = 17, cmp_METAL = 18, cmp_NAILS = 19,
-		cmp_OIL = 20, cmp_PILLAR = 21, cmp_ROCK = 22, cmp_SEEDS = 23,
-		cmp_SKIN = 24, cmp_SAPLING = 25, cmp_TEXTILE = 26, cmp_VEGETABLE = 27,
-		cmp_ROPE = 28, cmp_PAINT = 29, cmp_WAX = 30, cmp_SWEETENER = 31,
-		cmp_SAND = 32, cmp_GLASS = 33;
-	// and old component flags
-	const int cmpf_ANIMAL = BIT(0), cmpf_BUNCH = BIT(1), cmpf_DESERT = BIT(2),
-		cmpf_FINE = BIT(3), cmpf_HARD = BIT(4), cmpf_LARGE = BIT(5),
-		cmpf_MAGIC = BIT(6), cmpf_PLANT = BIT(8), cmpf_POOR = BIT(9),
-		cmpf_RARE = BIT(10), cmpf_RAW = BIT(11), cmpf_REFINED = BIT(12),
-		cmpf_SINGLE = BIT(13), cmpf_SMALL = BIT(14), cmpf_SOFT = BIT(15),
-		cmpf_TEMPERATE = BIT(16), cmpf_TROPICAL = BIT(17),
-		cmpf_COMMON = BIT(18), cmpf_AQUATIC = BIT(19);
-	
-	const struct {
-		int type, flags;
-		any_vnum new_comp;
-	} b5_88_conversion[] = {
-		// This will run in order from top to bottom, matching component +
-		// exact flags, and returning the number on the right
-		{ cmp_BONE, cmpf_LARGE | cmpf_MAGIC | cmpf_RARE, 6565 },	// dragon bone
-		{ cmp_BONE, cmpf_LARGE | cmpf_RARE, 6563 },	// ivory
-		{ cmp_BONE, cmpf_MAGIC, 6564 },	// magic bone
-		{ cmp_BONE, NOBITS, 6560 },	// bone
-		{ cmp_BLOCK, cmpf_BUNCH, 6076 },	// bricks
-		{ cmp_BLOCK, cmpf_SINGLE, 6077 },	// large block
-		{ cmp_BLOCK, NOBITS, 6075 },	// block
-		{ cmp_CLAY, NOBITS, 6090 },	// clay (no variants)
-		{ cmp_FIBERS, cmpf_HARD | cmpf_PLANT, 6422 },	// hard plant fibers
-		{ cmp_FIBERS, cmpf_SOFT | cmpf_PLANT, 6421 },	// soft plant fibers
-		{ cmp_FIBERS, cmpf_SOFT | cmpf_ANIMAL, 6441 },	// wool
-		{ cmp_FIBERS, NOBITS, 6400 },	// basic fibers
-		{ cmp_FLOUR, NOBITS, 6300 },	// basic flour
-		{ cmp_FRUIT, cmpf_MAGIC | cmpf_SINGLE, 6121 },	// small magic fruit
-		{ cmp_FRUIT, cmpf_MAGIC | cmpf_BUNCH, 6131 },	// large magic fruit
-		{ cmp_FRUIT, cmpf_TEMPERATE | cmpf_SINGLE, 6122 },	// small temperate fruit
-		{ cmp_FRUIT, cmpf_TEMPERATE | cmpf_BUNCH, 6132 },	// large temperate fruit
-		{ cmp_FRUIT, cmpf_DESERT | cmpf_SINGLE, 6124 },	// small desert fruit
-		{ cmp_FRUIT, cmpf_DESERT | cmpf_BUNCH, 6134 },	// large desert fruit
-		{ cmp_FRUIT, cmpf_TROPICAL | cmpf_SINGLE, 6123 },	// small tropical fruit
-		{ cmp_FRUIT, cmpf_TROPICAL | cmpf_BUNCH, 6133 },	// large tropical fruit
-		{ cmp_FRUIT, cmpf_SINGLE, 6120 },	// small fruit
-		{ cmp_FRUIT, cmpf_BUNCH, 6130 },	// large fruit
-		{ cmp_FRUIT, NOBITS, 6120 },	// small fruit
-		{ cmp_VEGETABLE, cmpf_MAGIC | cmpf_SINGLE, 6141 },	// small magic veg
-		{ cmp_VEGETABLE, cmpf_MAGIC | cmpf_BUNCH, 6151 },	// large magic veg
-		{ cmp_VEGETABLE, cmpf_TEMPERATE | cmpf_SINGLE, 6142 },	// small temperate veg
-		{ cmp_VEGETABLE, cmpf_TEMPERATE | cmpf_BUNCH, 6152 },	// large temperate veg
-		{ cmp_VEGETABLE, cmpf_DESERT | cmpf_SINGLE, 6144 },	// small desert veg
-		{ cmp_VEGETABLE, cmpf_DESERT | cmpf_BUNCH, 6154 },	// large desert veg
-		{ cmp_VEGETABLE, cmpf_TROPICAL | cmpf_SINGLE, 6143 },	// small tropical veg
-		{ cmp_VEGETABLE, cmpf_TROPICAL | cmpf_BUNCH, 6153 },	// large tropical veg
-		{ cmp_VEGETABLE, cmpf_SINGLE, 6140 },	// small veg
-		{ cmp_VEGETABLE, cmpf_BUNCH, 6150 },	// large veg
-		{ cmp_VEGETABLE, NOBITS, 6140 },	// small veg
-		{ cmp_GRAIN, cmpf_SINGLE, 6160 },	// small grain
-		{ cmp_GRAIN, cmpf_BUNCH, 6170 },	// large grain
-		{ cmp_GRAIN, NOBITS, 6160 },	// small grain
-		{ cmp_SEEDS, NOBITS, 6181 },	// edible seeds
-		{ cmp_GEM, cmpf_REFINED, 6601 },	// powerful magic gem
-		{ cmp_GEM, NOBITS, 6600 },	// magic gem
-		{ cmp_HERB, cmpf_REFINED, 6651 },	// refined herb
-		{ cmp_HERB, NOBITS, 6650 },	// herb
-		{ cmp_SWEETENER, NOBITS, 6340 },	// basic sweetener
-		{ cmp_OIL, NOBITS, 6320 },	// basic oil -- there are more types but no way to tell from flags
-		{ cmp_GLASS, cmpf_RAW, 6831 },	// glass ingot
-		{ cmp_GLASS, NOBITS, 6830 },	// glass
-		{ cmp_SAND, NOBITS, 6085 },	// only 1 type of sand
-		{ cmp_WAX, NOBITS, 6891 },	// basic wax
-		{ cmp_PAINT, NOBITS, 6890 },	// basic paint
-		{ cmp_ROPE, NOBITS, 6880 },	// basic rope
-		{ cmp_HANDLE, cmpf_MAGIC, 6851 },	// magic handle
-		{ cmp_HANDLE, NOBITS, 6850 },	// basic handle
-		{ cmp_TEXTILE, cmpf_MAGIC, 6810 },	// magic cloth
-		{ cmp_TEXTILE, NOBITS, 6800 },	// basic cloth
-		{ cmp_NAILS, NOBITS, 6790 },	// only 1 type
-		{ cmp_METAL, cmpf_POOR, 6710 },	// poor metal
-		{ cmp_METAL, cmpf_COMMON, 6720 },	// common metal
-		{ cmp_METAL, cmpf_HARD, 6740 },	// hardened metal
-		{ cmp_METAL, cmpf_FINE, 6750 },	// precious metal 1
-		{ cmp_METAL, cmpf_REFINED, 6750 },	// precious metal 2
-		{ cmp_METAL, cmpf_MAGIC, 6760 },	// magic metal
-		{ cmp_METAL, cmpf_RARE, 6730 },	// rare metal
-		{ cmp_METAL, NOBITS, 6700 },	// basic metal
-		{ cmp_ROCK, NOBITS, 6050 },	// basic rock
-		{ cmp_SAPLING, cmpf_FINE, 6026 },	// fine sapling
-		{ cmp_SAPLING, NOBITS, 6025 },	// basic sapling
-		{ cmp_LUMBER, cmpf_MAGIC, 6001 },	// magic lumber
-		{ cmp_LUMBER, cmpf_FINE, 6002 },	// fine lumber
-		{ cmp_LUMBER, NOBITS, 6000 },	// basic lumber
-		{ cmp_PILLAR, cmpf_LARGE, 6017 },	// large pillar
-		{ cmp_PILLAR, cmpf_FINE, 6016 },	// fine pillar
-		{ cmp_PILLAR, NOBITS, 6015 },	// basic pillar
-		{ cmp_FUR, cmpf_LARGE, 6550 },	// large fur
-		{ cmp_FUR, cmpf_SMALL, 6541 },	// small fur
-		{ cmp_FUR, NOBITS, 6540 },	// basic fur
-		{ cmp_SKIN, cmpf_MAGIC, 6511 },	// magic skin
-		{ cmp_SKIN, cmpf_LARGE, 6510 },	// thick skin
-		{ cmp_SKIN, cmpf_SMALL, 6501 },	// thin skin
-		{ cmp_SKIN, NOBITS, 6500 },	// basic skin
-		{ cmp_LEATHER, cmpf_MAGIC, 6531 },	// magic leather
-		{ cmp_LEATHER, cmpf_LARGE, 6530 },	// thick leather
-		{ cmp_LEATHER, cmpf_SMALL, 6521 },	// thin leather
-		{ cmp_LEATHER, NOBITS, 6520 },	// basic leather
-		{ cmp_MEAT, cmpf_AQUATIC, 6203 },	// raw fish
-		{ cmp_MEAT, NOBITS, 6200 },	// raw meat
-		
-		{ -1, -1, -1 }	// LAST
-	};
-	
-	int iter;
-	
-	for (iter = 0; b5_88_conversion[iter].type != -1; ++iter) {
-		if (b5_88_conversion[iter].type == old_type && (b5_88_conversion[iter].flags == NOBITS || IS_SET_STRICT(old_flags, b5_88_conversion[iter].flags))) {
-			return b5_88_conversion[iter].new_comp;
-		}
-	}
-	
-	// didn't find it? no valid component type
-	return NOTHING;
 }

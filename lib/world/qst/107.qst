@@ -31,8 +31,9 @@ S
 Hey Diddle Diddle~
    Hey diddle diddle, it seems the cat has lost its fiddle. Find the fiddle and
 return it to the musical cat in exchange for a starry cloak.
-   You can 'use' the fiddle to teleport back to the nearest Mother Goose
-adventure. From there, try 'where musical' to find the cat.
+   If you're not on the newbie island, you can 'use' the fiddle to teleport
+back to the nearest Mother Goose adventure. From there, try 'where musical' to
+find the cat.
 ~
    You give the cat his fiddle. He seems so grateful that he immediately plays
 you a little tune:
@@ -73,15 +74,15 @@ it out. There are a few ways to find it. Try these steps:
   your way to its location. You can use nearby or scan again along the way. You
   may have to go around mountains or other terrain to find it.
 - Don't be afraid to 'sleep' to regenerate movement points faster on your way.
-- Once you get to the Giant Shoe, type 'quest finish Nearby: Find the Giant
-  Shoe' -- or just 'quest finish all'.
+- Once you get to the Giant Shoe, type 'finish Nearby: Find the Giant Shoe'
+  -- or just 'finish all'.
 ~
    You have reached the Giant Shoe but this adventure -- Misplaced Mother Goose
 -- doesn't have much to do right here. Type 'adventure' at the Giant Shoe for
 more information about it. To complete the quests for this adventure, look for
 items like the fiddle, pail, candlestick, and more whenever you kill a low-
-level mob anywhere in the world. When you find one, use 'quest start all' and
-look at the item for information on how to get it back to its rightful owner.
+level mob anywhere in the world. When you find one, use 'start all' and look at
+the item for information on how to get it back to its rightful owner.
 ~
 2 0 0 100 -1
 A
@@ -113,8 +114,9 @@ To Fetch a Pail of Water~
    Jack and his sister are trying to fetch a pail of water, but it seems they
 lost their pail. Return the pail to Jack and receive a fetching pair of
 trousers.
-   You can 'use' the pail to teleport back to the nearest Mother Goose
-adventure. From there, try 'where jack' or 'where jill' to find them.
+   If you're not on the newbie island, you can 'use' the pail to teleport back
+to the nearest Mother Goose adventure. From there, try 'where jack' or 'where
+jill' to find them.
 ~
 You give Jack the pail. In exchange, he sings you a little rhyme:
 Jack and Jill went up the hill
@@ -141,8 +143,9 @@ S
 Jill Came Tumbling After~
    Jill and her brother are trying to fetch a pail of water, but it seems they
 lost their pail. Return the pail to Jill and receive a fetching skirt.
-   You can 'use' the pail to teleport back to the nearest Mother Goose
-adventure. From there, try 'where jack' or 'where jill' to find them.
+   If you're not on the newbie island, you can 'use' the pail to teleport back
+to the nearest Mother Goose adventure. From there, try 'where jack' or 'where
+jill' to find them.
 ~
 You give Jill the pail. In exchange, she sings you a little rhyme:
 Jack and Jill went up the hill
@@ -170,8 +173,9 @@ Jack Be Nimble~
    Jack is a real daredevil, but there's nothing to jump around here but the
 creek. If you could bring Jack his candlestick, perhaps he'd share his best
 jumping shoes.
-   You can 'use' the candlestick to teleport back to the nearest Mother Goose
-adventure. From there, try 'where nimble' to find the right Jack.
+   If you're not on the newbie island, you can 'use' the candlestick to
+teleport back to the nearest Mother Goose adventure. From there, try 'where
+nimble' to find the right Jack.
 ~
    You hand Jack his candlestick, which he lights and proceeds to jump over.
 He looks no worse for the wear, other than his singed shoes. He chants a little
@@ -204,8 +208,9 @@ Jack Be Nimble~
    Jack is a real daredevil, but there's nothing to jump around here but the
 creek. If you could bring Jack his candlestick, perhaps he'd share his best
 jumping shoes.
-   You can 'use' the candlestick to teleport back to the nearest Mother Goose
-adventure. From there, try 'where nimble' to find the right Jack.
+   If you're not on the newbie island, you can 'use' the candlestick to
+teleport back to the nearest Mother Goose adventure. From there, try 'where
+nimble' to find the right Jack.
 ~
    You hand Jack his candlestick, which he immediately jumps over. He
 looks no worse for the wear, other than his singed shoes. He chants a little
@@ -235,8 +240,9 @@ Jack Sprat Could Eat No Fat~
    Jack Sprat is looking for the fatty ham which he was to share with his wife.
 Jack is all skin and bones, and looks like he needs the ham more than you do.
 Perhaps if you return it to him, he'll give you his old belt.
-   You can 'use' the ham to teleport back to the nearest Mother Goose
-adventure. From there, try 'where sprat' to find the right Jack.
+   If you're not on the newbie island, you can 'use' the ham to teleport back
+to the nearest Mother Goose adventure. From there, try 'where sprat' to find
+the right Jack.
 ~
 You give Jack the fatty ham, and he sings you a little tune:
 Jack Sprat could eat no fat.
@@ -262,8 +268,9 @@ S
 Little Jack Horner Sat In The Corner~
    Little Jack Horner is looking for his Christmas pie. If you find it and
 return it, Jack might give you his old gloves.
-   You can 'use' the pie to teleport back to the nearest Mother Goose
-adventure. From there, try 'where horner' to find the right Jack.
+   If you're not on the newbie island, you can 'use' the pie to teleport back
+to the nearest Mother Goose adventure. From there, try 'where horner' to find
+the right Jack.
 ~
 You hand Jack his pie, which he takes eagerly and sings:
 Little Jack Horner
@@ -291,8 +298,9 @@ S
 Eating Her Curds And Whey~
    Little Miss Muffet has lost her curds and whey. If you could find her lunch,
 she would happily give you a nice earring in exchange.
-   You can 'use' the curds to teleport back to the nearest Mother Goose
-adventure. From there, try 'where muffet' to find her.
+   If you're not on the newbie island, you can 'use' the curds to teleport back
+to the nearest Mother Goose adventure. From there, try 'where muffet' to find
+her.
 ~
    Miss Muffet quickly snatches the meal and sits down to eat, while a voice
 nearby sings:
@@ -321,8 +329,9 @@ S
 Its Fleece Was White As Snow~
    Mary has lost her little lamb. Or, more importantly, the bell that calls the
 lamb. Return it to her in exchange for a warm reward.
-   You can 'use' the bell to teleport back to the nearest Mother Goose
-adventure. From there, try 'where mary' to find her.
+   If you're not on the newbie island, you can 'use' the bell to teleport back
+to the nearest Mother Goose adventure. From there, try 'where mary' to find
+her.
 ~
 Mary takes the bell and gives it a jingle while singing:
 Mary had a little lamb,
@@ -349,8 +358,8 @@ Some Broth Without Any Bread~
    The old woman in the giant shoe has lost the only thing she had to feed her
 children: her broth. If you could find it and return it to her, she might be
 able to spare a shoelace as reward.
-   You can 'use' the broth to teleport back to the nearest Mother Goose
-adventure, where you can turn in this quest.
+   If you're not on the newbie island, you can 'use' the broth to teleport back
+to the nearest Mother Goose adventure, where you can turn in this quest.
 ~
 You give the soup to the old woman, who sings as she ladles:
 There was an old woman who lived in a shoe.
@@ -386,8 +395,8 @@ these steps to find it:
   be on the edge of the mountains -- make sure you don't walk onto a mountain
   tile trying to get there. You may have to go around other mountains.
 - Don't be afraid to 'sleep' to regenerate movement points faster on your way.
-- Once you get to the Goblin Mines, type 'quest finish Nearby: Find the Goblin
-  Mine' -- or just 'quest finish all'.
+- Once you get to the Goblin Mines, type 'finish Nearby: Find the Goblin Mine'
+  -- or just 'finish all'.
 ~
    You have reached the Goblin Mine but it looks like the goblins have fled.
 You can find them outside the mine with the command 'where goblin'. But there's

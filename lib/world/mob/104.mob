@@ -3,7 +3,7 @@ guard panicked~
 the panicked guard~
 A panicked guard is fleeing the hamlet!
 ~
-0 0 bdvDI nD 3
+0 0 bdvDIL nD 3
 1 0 0 15 -1
 D
    The guard is still dressed in his city colors, albeit streaked with red and
@@ -901,6 +901,7 @@ T 10455
 T 10457
 T 10458
 T 10459
+T 9807
 S
 #10452
 pimmin shaman goblin~
@@ -975,6 +976,7 @@ T 10457
 T 10458
 T 10459
 T 10461
+T 9807
 S
 #10453
 shivsper goblin assassin~
@@ -1034,6 +1036,7 @@ T 10455
 T 10457
 T 10458
 T 10459
+T 9807
 S
 #10454
 wargreyn goblin smith blacksmith~
@@ -1102,11 +1105,12 @@ T 10455
 T 10457
 T 10458
 T 10459
+T 9807
 S
 #10455
 rat war armored giant~
 a giant war rat~
-An giant, armored war rat bares its teeth at you! (difficulty)
+A giant, armored war rat bares its teeth at you! (difficulty)
 ~
 0 0 adjA c 2
 0 0 7 9 -1
@@ -1226,5 +1230,6 @@ T 10457
 T 10458
 T 10459
 T 10462
+T 9807
 S
 $

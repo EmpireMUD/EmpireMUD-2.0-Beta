@@ -2,15 +2,13 @@
 *   File: db.world.c                                      EmpireMUD 2.0b5 *
 *  Usage: Modify functions for the map, interior, and game world          *
 *                                                                         *
-*  EmpireMUD code base by Paul Clarke, (C) 2000-2015                      *
+*  EmpireMUD code base by Paul Clarke, (C) 2000-2024                      *
 *  All rights reserved.  See license.doc for complete information.        *
 *                                                                         *
 *  EmpireMUD based upon CircleMUD 3.0, bpl 17, by Jeremy Elson.           *
 *  CircleMUD (C) 1993, 94 by the Trustees of the Johns Hopkins University *
 *  CircleMUD is based on DikuMUD, Copyright (C) 1990, 1991.               *
 ************************************************************************ */
-
-#include <math.h>
 
 #include "conf.h"
 #include "sysdep.h"
@@ -30,12 +28,11 @@
 * Contents:
 *   World-Changers
 *   Management
-*   Annual Map Update
+*   World Reset Cycle
 *   Burning Buildings
 *   City Lib
 *   Room Resets
 *   Sector Indexing
-*   Taverns
 *   Territory
 *   Trench Filling
 *   Evolutions
@@ -106,10 +103,6 @@ void change_chop_territory(room_data *room) {
 		// normal case
 		change_terrain(room, evo->becomes, NOTHING);
 	}
-	else {
-		// it's actually okay to call this on an unchoppable room... just mark it more depleted
-		add_depletion(room, DPLTN_CHOP, FALSE);
-	}
 }
 
 
@@ -172,7 +165,7 @@ void change_terrain(room_data *room, sector_vnum sect, sector_vnum base_sect) {
 	
 	// need to determine a crop?
 	if (!new_crop && SECT_FLAGGED(st, SECTF_HAS_CROP_DATA) && !ROOM_CROP(room)) {
-		new_crop = get_potential_crop_for_location(room, FALSE);
+		new_crop = get_potential_crop_for_location(room, NOTHING);
 		if (!new_crop) {
 			new_crop = crop_table;
 		}
@@ -202,7 +195,7 @@ void change_terrain(room_data *room, sector_vnum sect, sector_vnum base_sect) {
 	}
 	
 	// do we need to lock the icon?
-	if (ROOM_SECT_FLAGGED(room, SECTF_LOCK_ICON)) {
+	if (ROOM_SECT_FLAGGED(room, SECTF_LOCK_ICON) || (ROOM_SECT_FLAGGED(room, SECTF_CROP) && ROOM_CROP(room) && CROP_FLAGGED(ROOM_CROP(room), CROPF_LOCK_ICON))) {
 		lock_icon(room, NULL);
 	}
 	
@@ -509,6 +502,10 @@ void delete_room(room_data *room, bool check_exits) {
 		ROOM_UNLOAD_EVENT(room) = NULL;
 	}
 	
+	if (HAS_FUNCTION(room, FNC_LIBRARY)) {
+		delete_library(room);
+	}
+	
 	// ensure not owned (and update empire stuff if so)
 	if ((emp = ROOM_OWNER(room))) {
 		if ((ter = find_territory_entry(emp, room))) {
@@ -791,11 +788,13 @@ GLB_FUNCTION(run_global_mine_data) {
 		multiply_room_extra_data(room, ROOM_EXTRA_MINE_AMOUNT, 1.5);
 		if (ch) {
 			gain_player_tech_exp(ch, PTECH_DEEP_MINES, 15);
+			run_ability_hooks_by_player_tech(ch, PTECH_DEEP_MINES, NULL, NULL, NULL, IN_ROOM(ch));
 		}
 	}
 	
 	if (ch && GET_GLOBAL_ABILITY(glb) != NO_ABIL) {
 		gain_ability_exp(ch, GET_GLOBAL_ABILITY(glb), 75);
+		run_ability_hooks(ch, AHOOK_ABILITY, GET_GLOBAL_ABILITY(glb), 0, NULL, NULL, NULL, room, NOBITS);
 	}
 	
 	return TRUE;
@@ -1004,6 +1003,7 @@ void uncrop_tile(room_data *room) {
 	
 	// 4. attempt to find one
 	if (!to_sect) {
+		// should this be get_climate(room) rather than GET_SECT_CLIMATE(SECT(room)) ?
 		to_sect = find_first_matching_sector(NOBITS, invalid_sect_flags, GET_SECT_CLIMATE(SECT(room)));
 	}
 	
@@ -1123,6 +1123,12 @@ void set_crop_type(room_data *room, crop_data *cp) {
 	ROOM_CROP(room) = cp;
 	if (GET_ROOM_VNUM(room) < MAP_SIZE) {
 		world_map[FLAT_X_COORD(room)][FLAT_Y_COORD(room)].crop_type = cp;
+		
+		// check locking
+		if (cp && ROOM_SECT_FLAGGED(room, SECTF_CROP) && CROP_FLAGGED(cp, CROPF_LOCK_ICON)) {
+			lock_icon(room, NULL);
+		}
+		
 		request_world_save(GET_ROOM_VNUM(room), WSAVE_MAP);
 	}
 	else {
@@ -1139,8 +1145,8 @@ void set_crop_type(room_data *room, crop_data *cp) {
 * @param double damage_amount How much to set its damage to (not bounded).
 */
 void set_room_damage(room_data *room, double damage_amount) {
-	// cheap rounding to %.2f
-	damage_amount = ((int)(damage_amount * 100)) / 100.0;
+	// rounding to 0.01
+	damage_amount = round(damage_amount * 100.0) / 100.0;
 	if (COMPLEX_DATA(room) && COMPLEX_DATA(room)->damage != damage_amount) {
 		COMPLEX_DATA(room)->damage = damage_amount;
 		request_world_save(GET_ROOM_VNUM(room), WSAVE_ROOM);
@@ -1176,10 +1182,11 @@ void schedule_map_unloads(void) {
 
 
  //////////////////////////////////////////////////////////////////////////////
-//// ANNUAL MAP UPDATE ///////////////////////////////////////////////////////
+//// WORLD RESET CYCLE ///////////////////////////////////////////////////////
 
 /**
-* Updates a set of depletions (halves them each year).
+* Updates a set of depletions (quarters them each cycle). This is part of the
+* world reset.
 *
 * @param struct depletion_data **list The list to update.
 */
@@ -1200,12 +1207,13 @@ void annual_update_depletions(struct depletion_data **list) {
 
 
 /**
-* Process map-only annual updates on one map tile.
+* Process map-only world resets on one map tile.
 * Note: This is not called on OCEAN tiles (ones that don't go in the land map).
 *
 * @param struct map_data *tile The map tile to update.
 */
 void annual_update_map_tile(struct map_data *tile) {
+	struct affected_type *aff, *next_aff;
 	struct resource_data *old_list;
 	sector_data *old_sect;
 	int trenched, amount;
@@ -1221,8 +1229,10 @@ void annual_update_map_tile(struct map_data *tile) {
 		if (ROOM_BLD_FLAGGED(room, BLD_IS_RUINS)) {
 			// roughly 2 real years for average chance for ruins to be gone
 			if (!number(0, 89)) {
+				if (!GET_BUILDING(room) || !BLD_FLAGGED(GET_BUILDING(room), BLD_NO_ABANDON_WHEN_RUINED)) {
+					abandon_room(room);
+				}
 				disassociate_building(room);
-				abandon_room(room);
 			
 				if (ROOM_PEOPLE(room)) {
 					act("The ruins finally crumble to dust!", FALSE, ROOM_PEOPLE(room), NULL, NULL, TO_CHAR | TO_ROOM);
@@ -1239,15 +1249,18 @@ void annual_update_map_tile(struct map_data *tile) {
 			else {
 				dmg = (double) GET_BLD_MAX_DAMAGE(GET_BUILDING(room)) / (double) config_get_int("disrepair_limit_unfinished");
 			}
+			
+			// ensure at least 1.0 and round to nearest 0.1
 			dmg = MAX(1.0, dmg);
+			dmg = round(dmg * 10.0) / 10.0;
 		
 			// apply damage
 			set_room_damage(room, BUILDING_DAMAGE(room) + dmg);
 		
-			// apply maintenance resources (if any, and if it's not being dismantled)
-			if (GET_BLD_YEARLY_MAINTENANCE(GET_BUILDING(room)) && !IS_DISMANTLING(room)) {
+			// apply maintenance resources (if any, and if it's not being dismantled, and it's either complete or has had at least 1 resource added)
+			if (GET_BLD_REGULAR_MAINTENANCE(GET_BUILDING(room)) && !IS_DISMANTLING(room) && (IS_COMPLETE(room) || GET_BUILT_WITH(room))) {
 				old_list = GET_BUILDING_RESOURCES(room);
-				GET_BUILDING_RESOURCES(room) = combine_resources(old_list, GET_BLD_YEARLY_MAINTENANCE(GET_BUILDING(room)));
+				GET_BUILDING_RESOURCES(room) = combine_resources(old_list, GET_BLD_REGULAR_MAINTENANCE(GET_BUILDING(room)));
 				free_resource_list(old_list);
 			}
 		
@@ -1273,6 +1286,15 @@ void annual_update_map_tile(struct map_data *tile) {
 		if (IS_ROAD(room) && !ROOM_OWNER(room) && number(1, 100) <= 2) {
 			// this will tear it back down to its base type
 			disassociate_building(room);
+		}
+		
+		// random chance to lose permanent affs
+		if (!ROOM_OWNER(room)) {
+			LL_FOREACH_SAFE(ROOM_AFFECTS(room), aff, next_aff) {
+				if (aff->expire_time == UNLIMITED && number(1, 100) <= 5) {
+					affect_remove_room(room, aff);
+				}
+			}
 		}
 	}
 	
@@ -1333,10 +1355,14 @@ void annual_update_map_tile(struct map_data *tile) {
 
 
 /**
-* Runs an annual update (mainly, maintenance) on the vehicle.
+* Runs world reset (mainly maintenance) on the vehicle.
 */
 void annual_update_vehicle(vehicle_data *veh) {
 	char *msg;
+	
+	if (VEH_OWNER(veh) && EMPIRE_IMM_ONLY(VEH_OWNER(veh))) {
+		return;	// skip immortal vehicles
+	}
 	
 	// ensure a save
 	request_vehicle_save_in_world(veh);
@@ -1345,7 +1371,7 @@ void annual_update_vehicle(vehicle_data *veh) {
 	annual_update_depletions(&VEH_DEPLETION(veh));
 	
 	// does not take annual damage (unless incomplete)
-	if (!VEH_YEARLY_MAINTENANCE(veh) && VEH_IS_COMPLETE(veh)) {
+	if (!VEH_REGULAR_MAINTENANCE(veh) && VEH_IS_COMPLETE(veh)) {
 		// check if it's abandoned furniture: no owner, unowned room, no instance id, not in an adventure, no players here
 		if (!VEH_OWNER(veh) && VEH_INSTANCE_ID(veh) != NOTHING && IN_ROOM(veh) && !ROOM_OWNER(IN_ROOM(veh)) && !IS_ADVENTURE_ROOM(IN_ROOM(veh)) && !any_players_in_room(IN_ROOM(veh))) {
 			// random chance of decay
@@ -1372,12 +1398,13 @@ void annual_update_vehicle(vehicle_data *veh) {
 
 
 /**
-* This runs once a mud year to update the world.
+* World reset: runs every "world_reset_hours" (real hours) to update the world.
 */
 void annual_world_update(void) {
 	char message[MAX_STRING_LENGTH];
+	const char *str;
 	vehicle_data *veh;
-	descriptor_data *d;
+	descriptor_data *desc;
 	room_data *room, *next_room;
 	struct map_data *tile;
 	int newb_count = 0;
@@ -1385,23 +1412,14 @@ void annual_world_update(void) {
 	bool naturalize_newbie_islands = config_get_bool("naturalize_newbie_islands");
 	bool naturalize_unclaimable = config_get_bool("naturalize_unclaimable");
 	
-	snprintf(message, sizeof(message), "\r\n%s\r\n\r\n", config_get_string("newyear_message"));
-	
-	// MESSAGE TO ALL
-	for (d = descriptor_list; d; d = d->next) {
-		if (STATE(d) == CON_PLAYING && d->character) {
-			write_to_descriptor(d->descriptor, message);
-			d->has_prompt = FALSE;
-			
-			if (!IS_IMMORTAL(d->character)) {
-				if (GET_POS(d->character) > POS_SITTING && !number(0, GET_DEXTERITY(d->character))) {
-					if (IS_RIDING(d->character)) {
-						perform_dismount(d->character);
-					}
-					write_to_descriptor(d->descriptor, "You're knocked to the ground!\r\n\r\n");
-					act("$n is knocked to the ground!", TRUE, d->character, NULL, NULL, TO_ROOM);
-					GET_POS(d->character) = POS_SITTING;
-				}
+	// MESSAGE TO ALL ?
+	if ((str = config_get_string("world_reset_message")) && *str) {
+		snprintf(message, sizeof(message), "\r\n%s\r\n\r\n", str);
+		
+		LL_FOREACH(descriptor_list, desc) {
+			if (STATE(desc) == CON_PLAYING && desc->character) {
+				write_to_descriptor(desc->descriptor, message);
+				desc->has_prompt = FALSE;
 			}
 		}
 	}
@@ -1425,7 +1443,7 @@ void annual_world_update(void) {
 	}
 	
 	// crumble cities that lost their buildings
-	check_ruined_cities();
+	check_ruined_cities(NULL);
 	
 	// rename islands
 	update_island_names();
@@ -1435,6 +1453,18 @@ void annual_world_update(void) {
 	
 	if (newb_count) {
 		log("New year: naturalized %d tile%s on newbie islands.", newb_count, PLURAL(newb_count));
+	}
+}
+
+
+/**
+* Checks periodically if it's time to reset maintenance and depletions.
+*
+* This is based on DATA_LAST_NEW_YEAR and the "world_reset_hours" config.
+*/
+void check_maintenance_and_depletion_reset(void) {
+	if (data_get_long(DATA_LAST_NEW_YEAR) + (config_get_int("world_reset_hours") * SECS_PER_REAL_HOUR) < time(0)) {
+		annual_world_update();
 	}
 }
 
@@ -1493,7 +1523,7 @@ int naturalize_newbie_island(struct map_data *tile, bool do_unclaim) {
 		
 		if (SECT_FLAGGED(tile->natural_sector, SECTF_HAS_CROP_DATA)) {
 			room = real_room(tile->vnum);	// need it loaded after all
-			new_crop = get_potential_crop_for_location(room, FALSE);
+			new_crop = get_potential_crop_for_location(room, NOTHING);
 			set_crop_type(room, new_crop ? new_crop : crop_table);
 		}
 		else {
@@ -1609,7 +1639,7 @@ EVENTFUNC(burn_down_event) {
 		}
 		DL_FOREACH_SAFE2(ROOM_PEOPLE(room), ch, next_ch, next_in_room) {
 			if (!IS_NPC(ch)) {
-				death_log(ch, ch, TYPE_SUFFERING);
+				death_log(ch, ch, ATTACK_SUFFERING);
 			}
 			die(ch, ch);
 		}
@@ -1690,7 +1720,7 @@ void start_burning(room_data *room) {
 	}
 	
 	set_room_extra_data(room, ROOM_EXTRA_FIRE_REMAINING, config_get_int("fire_extinguish_value"));
-	set_burn_down_time(room, time(0) + config_get_int("burn_down_time"), TRUE);
+	set_burn_down_time(room, time(0) + get_burn_down_time_seconds(room), TRUE);
 	
 	// ensure no building or dismantling
 	stop_room_action(room, ACT_BUILDING);
@@ -1796,6 +1826,7 @@ int count_city_points_used(empire_data *emp) {
 * @return struct empire_city_data* the city object
 */
 struct empire_city_data *create_city_entry(empire_data *emp, char *name, room_data *location, int type) {
+	char buf[256];
 	struct empire_city_data *city;
 	
 	// sanity first
@@ -1827,6 +1858,10 @@ struct empire_city_data *create_city_entry(empire_data *emp, char *name, room_da
 		complete_building(location);
 	}
 	
+	// rename
+	snprintf(buf, sizeof(buf), "The Center of %s", name);
+	set_room_custom_name(location, buf);
+	
 	// verify ownership
 	claim_room(location, emp);
 	
@@ -1849,6 +1884,7 @@ void reset_one_room(room_data *room) {
 	struct reset_com *reset, *next_reset;
 	char_data *tmob = NULL; /* for trigger assignment */
 	char_data *mob = NULL;
+	morph_data *morph;
 	trig_data *trig;
 	
 	// shortcut
@@ -1938,6 +1974,11 @@ void reset_one_room(room_data *room) {
 					half_chop(reset->sarg1, field, str);
 					if (is_abbrev(field, "sex")) {
 						change_sex(mob, atoi(str));
+					}
+					else if (is_abbrev(field, "morph")) {
+						if ((morph = morph_proto(atoi(str)))) {
+							perform_morph(mob, morph);
+						}
 					}
 					else if (is_abbrev(field, "keywords")) {
 						change_keywords(mob, str);
@@ -2243,7 +2284,7 @@ void perform_change_sect(room_data *loc, struct map_data *map, sector_data *sect
 	}
 	
 	// check for icon locking
-	if (SECT_FLAGGED(sect, SECTF_LOCK_ICON)) {
+	if (SECT_FLAGGED(sect, SECTF_LOCK_ICON) || (SECT_FLAGGED(sect, SECTF_CROP) && map && map->crop_type && CROP_FLAGGED(map->crop_type, CROPF_LOCK_ICON)) || (SECT_FLAGGED(sect, SECTF_CROP) && loc && ROOM_CROP(loc) && CROP_FLAGGED(ROOM_CROP(loc), CROPF_LOCK_ICON))) {
 		if (map) {
 			lock_icon_map(map, NULL);
 		}
@@ -2254,92 +2295,6 @@ void perform_change_sect(room_data *loc, struct map_data *map, sector_data *sect
 	
 	request_mapout_update(map ? map->vnum : GET_ROOM_VNUM(loc));
 	request_world_save(map ? map->vnum : GET_ROOM_VNUM(loc), WSAVE_MAP | WSAVE_ROOM);
-}
-
-
- //////////////////////////////////////////////////////////////////////////////
-//// TAVERNS /////////////////////////////////////////////////////////////////
-
-EVENTFUNC(tavern_update) {
-	struct room_event_data *data = (struct room_event_data *)event_obj;
-	room_data *room;
-	
-	// grab data but don't free (we usually reschedule this)
-	room = data->room;
-	
-	// still a tavern?
-	if (!ROOM_OWNER(room) || !room_has_function_and_city_ok(NULL, room, FNC_TAVERN)) {
-		// remove data and cancel event
-		remove_room_extra_data(room, ROOM_EXTRA_TAVERN_TYPE);
-		remove_room_extra_data(room, ROOM_EXTRA_TAVERN_BREWING_TIME);
-		remove_room_extra_data(room, ROOM_EXTRA_TAVERN_AVAILABLE_TIME);
-		delete_stored_event_room(room, SEV_TAVERN);
-		free(data);
-		return 0;
-	}
-	
-	if (get_room_extra_data(room, ROOM_EXTRA_TAVERN_BREWING_TIME) > 0) {
-		add_to_room_extra_data(room, ROOM_EXTRA_TAVERN_BREWING_TIME, -1);
-		if (get_room_extra_data(room, ROOM_EXTRA_TAVERN_BREWING_TIME) == 0) {
-			// brew's ready!
-			set_room_extra_data(room, ROOM_EXTRA_TAVERN_AVAILABLE_TIME, config_get_int("tavern_timer"));
-		}
-	}
-	else if (get_room_extra_data(room, ROOM_EXTRA_TAVERN_AVAILABLE_TIME) >= 0) {
-		// count down to re-brew
-		add_to_room_extra_data(room, ROOM_EXTRA_TAVERN_AVAILABLE_TIME, -1);
-		
-		if (get_room_extra_data(room, ROOM_EXTRA_TAVERN_AVAILABLE_TIME) <= 0) {
-			// enough to go again?
-			if (extract_tavern_resources(room)) {
-				set_room_extra_data(room, ROOM_EXTRA_TAVERN_AVAILABLE_TIME, config_get_int("tavern_timer"));
-			}
-			else {
-				// can't afford to keep brewing
-				remove_room_extra_data(room, ROOM_EXTRA_TAVERN_TYPE);
-				remove_room_extra_data(room, ROOM_EXTRA_TAVERN_BREWING_TIME);
-				remove_room_extra_data(room, ROOM_EXTRA_TAVERN_AVAILABLE_TIME);
-				
-				// free up data and cancel the event (it'll be rescheduled if they set a brew)
-				delete_stored_event_room(room, SEV_TAVERN);
-				free(data);
-				return 0;
-			}
-		}
-	}
-
-	return (7.5 * 60) RL_SEC;	// reenqueue for the original time
-}
-
-
-/**
-* Checks if a building is a tavern and can run. If so, sets up the data for
-* it and schedules the event. If not, it clears that data.
-*
-* @param room_data *room The room to check for tavernness.
-*/
-void check_tavern_setup(room_data *room) {
-	struct room_event_data *data;
-	struct dg_event *ev;
-	
-	if (!ROOM_OWNER(room) || !room_has_function_and_city_ok(NULL, room, FNC_TAVERN)) {
-		// not a tavern or not set up
-		remove_room_extra_data(room, ROOM_EXTRA_TAVERN_BREWING_TIME);
-		remove_room_extra_data(room, ROOM_EXTRA_TAVERN_TYPE);
-		remove_room_extra_data(room, ROOM_EXTRA_TAVERN_AVAILABLE_TIME);
-		cancel_stored_event_room(room, SEV_TAVERN);
-		return;
-	}
-	
-	// otherwise, it IS a tavern and we'll just let the event function handle it
-	if (!find_stored_event_room(room, SEV_TAVERN)) {
-		CREATE(data, struct room_event_data, 1);
-		data->room = room;
-		
-		// schedule every 7.5 minutes -- the same frequency this ran under the old system
-		ev = dg_event_create(tavern_update, (void*)data, (7.5 * 60) RL_SEC);
-		add_stored_event_room(room, SEV_TAVERN, ev);
-	}
 }
 
 
@@ -2417,7 +2372,7 @@ void adjust_vehicle_tech(vehicle_data *veh, room_data *room, bool add) {
 	if (!emp || !veh || !VEH_IS_COMPLETE(veh) || !room) {
 		return;
 	}
-	if (GET_ROOM_VEHICLE(room) && VEH_FLAGGED(GET_ROOM_VEHICLE(room), VEH_DRIVING | VEH_SAILING | VEH_FLYING)) {
+	if (GET_ROOM_VEHICLE(room) && VEH_FLAGGED(GET_ROOM_VEHICLE(room), MOVABLE_VEH_FLAGS)) {
 		return;	// do NOT adjust tech if inside a moving vehicle
 	}
 	
@@ -3305,16 +3260,17 @@ int get_main_island(empire_data *emp) {
 * for the purposes of spawning fresh crops. This is only an approximation.
 * 
 * @param room_data *location The location to pick a crop for.
-* @param bool must_have_forage If TRUE, only crops with a forage interaction can be chosen.
+* @param int must_have_interact Optional: Only pick crops with this interaction (pass NOTHING to skip).
 * @return crop_data* Any crop, or NULL if it can't find one.
 */
-crop_data *get_potential_crop_for_location(room_data *location, bool must_have_forage) {
+crop_data *get_potential_crop_for_location(room_data *location, int must_have_interact) {
 	int x = X_COORD(location), y = Y_COORD(location);
 	bool water = find_flagged_sect_within_distance_from_room(location, SECTF_FRESH_WATER, NOBITS, config_get_int("water_crop_distance"));
 	bool x_min_ok, x_max_ok, y_min_ok, y_max_ok;
 	struct island_info *isle = NULL;
 	crop_data *found, *crop, *next_crop;
 	int num_found = 0;
+	bitvector_t climate;
 	
 	// small amount of random so the edges of the crops are less linear on the map
 	x += number(-10, 10);
@@ -3324,11 +3280,13 @@ crop_data *get_potential_crop_for_location(room_data *location, bool must_have_f
 	x = WRAP_X_COORD(x);
 	y = WRAP_Y_COORD(y);
 	
+	climate = get_climate(location);
+	
 	// find any match
 	found = NULL;
 	HASH_ITER(hh, crop_table, crop, next_crop) {
 		// basic checks
-		if (!MATCH_CROP_SECTOR_CLIMATE(crop, SECT(location))) {
+		if (!MATCH_CROP_SECTOR_CLIMATE(crop, climate)) {
 			continue;
 		}
 		if (CROP_FLAGGED(crop, CROPF_REQUIRES_WATER) && !water) {
@@ -3338,7 +3296,7 @@ crop_data *get_potential_crop_for_location(room_data *location, bool must_have_f
 			continue;	// must be wild
 		}
 
-		if (must_have_forage && !has_interaction(GET_CROP_INTERACTIONS(crop), INTERACT_FORAGE)) {
+		if (must_have_interact != NOTHING && !has_interaction(GET_CROP_INTERACTIONS(crop), must_have_interact)) {
 			continue;
 		}
 
@@ -3490,6 +3448,8 @@ void init_room(room_data *room, room_vnum vnum) {
 * Interaction function for building-ruins-to-building. This replaces the
 * building, ignoring interaction quantity, and transfers built-with resources
 * and contents.
+*
+* INTERACTION_FUNC provides: ch, interaction, inter_room, inter_mob, inter_item, inter_veh
 */
 INTERACTION_FUNC(ruin_building_to_building_interaction) {
 	struct resource_data *res, *next_res, *save = NULL;
@@ -3520,7 +3480,9 @@ INTERACTION_FUNC(ruin_building_to_building_interaction) {
 	}
 	
 	// abandon first -- this will take care of accessory rooms, too
-	abandon_room(inter_room);
+	if (!old_bld || !BLD_FLAGGED(old_bld, BLD_NO_ABANDON_WHEN_RUINED)) {
+		abandon_room(inter_room);
+	}
 	disassociate_building(inter_room);
 	
 	if (ROOM_PEOPLE(inter_room)) {	// messaging to anyone left
@@ -3545,6 +3507,7 @@ INTERACTION_FUNC(ruin_building_to_building_interaction) {
 	if (strstr(GET_BLD_TITLE(proto), "#n")) {
 		set_room_custom_name(inter_room, NULL);
 		temp = str_replace("#n", old_bld ? GET_BLD_NAME(old_bld) : "a Building", GET_BLD_TITLE(proto));
+		CAP(temp);
 		set_room_custom_name(inter_room, temp);
 		free(temp);
 	}
@@ -3582,6 +3545,8 @@ INTERACTION_FUNC(ruin_building_to_building_interaction) {
 * Interaction function for building-ruins-to-vehicle. This loads a new vehicle,
 * ignoring interaction quantity, and transfers built-with resources and
 * contents.
+*
+* INTERACTION_FUNC provides: ch, interaction, inter_room, inter_mob, inter_item, inter_veh
 */
 INTERACTION_FUNC(ruin_building_to_vehicle_interaction) {
 	struct resource_data *res, *next_res, *save = NULL;
@@ -3644,7 +3609,9 @@ INTERACTION_FUNC(ruin_building_to_vehicle_interaction) {
 	}
 	
 	// abandon first -- this will take care of accessory rooms, too
-	abandon_room(inter_room);
+	if (!old_bld || !BLD_FLAGGED(old_bld, BLD_NO_ABANDON_WHEN_RUINED)) {
+		abandon_room(inter_room);
+	}
 	disassociate_building(inter_room);
 	
 	if (ROOM_PEOPLE(inter_room)) {	// messaging to anyone left
@@ -3690,6 +3657,7 @@ INTERACTION_FUNC(ruin_building_to_vehicle_interaction) {
 	if (strstr(VEH_LONG_DESC(ruin), "#n")) {
 		to_free = (!proto || VEH_LONG_DESC(ruin) != VEH_LONG_DESC(proto)) ? VEH_LONG_DESC(ruin) : NULL;
 		VEH_LONG_DESC(ruin) = str_replace("#n", old_bld ? GET_BLD_NAME(old_bld) : "a building", VEH_LONG_DESC(ruin));
+		CAP(VEH_LONG_DESC(ruin));
 		if (to_free) {
 			free(to_free);
 		}
@@ -3723,7 +3691,9 @@ void ruin_one_building(room_data *room) {
 	}
 	else {	// failed to run a ruins interaction	
 		// abandon first -- this will take care of accessory rooms, too
-		abandon_room(room);
+		if (!bld || !BLD_FLAGGED(bld, BLD_NO_ABANDON_WHEN_RUINED)) {
+			abandon_room(room);
+		}
 		disassociate_building(room);
 	
 		if (ROOM_PEOPLE(room)) {
@@ -4625,6 +4595,11 @@ bool write_map_and_room_to_file(room_vnum vnum, bool force_obj_pack) {
 						strip_crlf(temp);
 						fprintf(fl, "Load: S look\n%s~\n", temp);
 					}
+				}
+				
+				// morph?
+				if (GET_MORPH(mob)) {
+					fprintf(fl, "Load: S morph %d\n", MORPH_VNUM(GET_MORPH(mob)));
 				}
 			
 				if (SCRIPT(mob)) {

@@ -26,11 +26,11 @@ T 10227
 S
 #10226
 The Hidden Garden~
-   The druid's tiny garden has changed somehow. The air is thick and fills your
+   The mage's tiny garden has changed somehow. The air is thick and fills your
 lungs, although its strange fragrance is totally unknown to you. The landscape
 in the distance is blurry, as if the air is waving and blocking your view. And
 then you realize what has happened: you have stumbled back into the
-Magiterranean, the hidden realm of druids.
+Magiterranean, the hidden realm of natural magic.
 ~
 acegi 0 0 10226
 D0
@@ -46,6 +46,7 @@ D3
 ~
 0 10230
 M 1 10225 100.00 3
+Z1 10
 S
 #10227
 The Cactus Garden~
@@ -58,8 +59,8 @@ acegi 0 0 10226
 D2
 ~
 0 10226
-I 6 10228 50.00 1 X  # FORAGE: stack of cactus pads
-I 6 10229 100.00 1 X  # FORAGE: cactus fruit
+I 6 10228 50.00 25 X  # FORAGE: stack of cactus pads
+I 6 10229 100.00 25 X  # FORAGE: cactus fruit
 I 7 1206 8.33 50 p  # PICK: iridescent blue iris
 I 7 1200 13.62 50 p  # PICK: handful of whitegrass
 I+ 0 70  # Ability: Find Herbs
@@ -77,6 +78,7 @@ I 7 10228 10.00 50 p  # PICK: stack of cactus pads
 I 7 123 90.00 50 p  # PICK: small flower
 M 0 10226 33.00 4
 M 1 10243 10.00 1
+Z1 10
 S
 #10228
 A Pineapple Field~
@@ -90,8 +92,8 @@ acegi 0 0 10226
 D3
 ~
 0 10226
-I 6 10226 50.00 1 X  # FORAGE: pineapple
-I 6 10231 100.00 1 X  # FORAGE: desert dandelions
+I 6 10226 50.00 25 X  # FORAGE: pineapple
+I 6 10231 100.00 25 X  # FORAGE: desert dandelions
 I 7 1206 8.33 50 p  # PICK: iridescent blue iris
 I 7 1200 13.62 50 p  # PICK: handful of whitegrass
 I+ 0 70  # Ability: Find Herbs
@@ -109,6 +111,7 @@ I 7 10226 10.00 50 p  # PICK: pineapple
 I 7 123 90.00 50 p  # PICK: small flower
 M 0 10226 33.00 4
 M 1 10232 10.00 1
+Z1 10
 S
 #10229
 An Agave Field~
@@ -122,8 +125,8 @@ acegi 0 0 10226
 D0
 ~
 0 10226
-I 6 10227 50.00 1 X  # FORAGE: agave heart
-I 6 10231 100.00 1 X  # FORAGE: desert dandelions
+I 6 10227 50.00 25 X  # FORAGE: agave heart
+I 6 10231 100.00 25 X  # FORAGE: desert dandelions
 I 7 1206 8.33 50 p  # PICK: iridescent blue iris
 I 7 1200 13.62 50 p  # PICK: handful of whitegrass
 I+ 0 70  # Ability: Find Herbs
@@ -141,21 +144,22 @@ I 7 10227 10.00 50 p  # PICK: agave heart
 I 7 123 90.00 50 p  # PICK: small flower
 M 0 10226 33.00 4
 M 1 10241 10.00 1
+Z1 10
 S
 #10230
 An Aloe Garden~
    The aloe garden is covered in dozens of small, green, succulent aloe plants.
 Each is spaced far enough that you can comfortably work at it, which makes it
 easier not to get stuck on the sharp, fleshy leaves. Aloe has long been used to
-soothe the skin and treat painful wounds. Perhaps that's what the druids of the
-Magiterranean are growing it for.
+soothe the skin and treat painful wounds. Perhaps that's what the weavers of
+the Magiterranean are growing it for.
 ~
 acegi 0 0 10226
 D1
 ~
 0 10226
-I 6 10230 50.00 1 X  # FORAGE: thick aloe leaves
-I 6 10231 100.00 1 X  # FORAGE: desert dandelions
+I 6 10230 50.00 25 X  # FORAGE: thick aloe leaves
+I 6 10231 100.00 25 X  # FORAGE: desert dandelions
 I 7 1206 8.33 50 p  # PICK: iridescent blue iris
 I 7 1200 13.62 50 p  # PICK: handful of whitegrass
 I+ 0 70  # Ability: Find Herbs
@@ -173,6 +177,7 @@ I 7 10230 10.00 50 p  # PICK: thick aloe leaves
 I 7 123 90.00 50 p  # PICK: small flower
 M 0 10226 33.00 4
 M 1 10245 10.00 1
+Z1 10
 S
 #10250
 Base Camp~
@@ -192,18 +197,19 @@ them. The gate is tall, but it doesn't look strong enough to protect the camp
 from the animals you can hear calling in the distance. Only the sorcerers'
 magic is holding them back.
 ~
-I 5 100 60.00 1 X  # DIG: rock
-I 5 106 20.00 1 X  # DIG: rough piece of obsidian
-I 5 102 10.00 1 X  # DIG: flint stone
-I 5 103 2.50 1 X  # DIG: yellow lightning stone
-I 5 104 2.50 1 X  # DIG: red bloodstone
-I 5 1206 2.50 1 X  # DIG: iridescent blue iris
-I 5 1300 2.50 1 X  # DIG: glowing green seashell
+I 5 100 60.00 125 X  # DIG: rock
+I 5 106 20.00 125 X  # DIG: rough piece of obsidian
+I 5 102 10.00 125 X  # DIG: flint stone
+I 5 103 2.50 125 X  # DIG: yellow lightning stone
+I 5 104 2.50 125 X  # DIG: red bloodstone
+I 5 1206 2.50 125 X  # DIG: iridescent blue iris
+I 5 1300 2.50 125 X  # DIG: glowing green seashell
 M 0 10250 100.00 1
 M 0 10251 100.00 1
 T 10274
 T 10255
 T 10267
+Z1 10
 S
 #10251
 Backtracking Toward Camp~
@@ -218,6 +224,7 @@ D2
 0 10250
 T 10274
 T 10268
+Z1 10
 S
 #10252
 The Primeval Forest~
@@ -245,6 +252,7 @@ M 1 10260 100.00 5
 T 10274
 T 10251
 T 10266
+Z1 10
 S
 #10253
 The Primeval Forest~
@@ -272,6 +280,7 @@ M 1 10260 100.00 5
 T 10274
 T 10251
 T 10266
+Z1 10
 S
 #10254
 The Primeval Forest~
@@ -299,6 +308,7 @@ M 1 10260 100.00 5
 T 10274
 T 10251
 T 10266
+Z1 10
 S
 #10255
 The Primeval Forest~
@@ -326,6 +336,7 @@ M 1 10260 100.00 5
 T 10274
 T 10251
 T 10266
+Z1 10
 S
 #10256
 The Primeval Forest~
@@ -353,6 +364,7 @@ M 1 10257 100.00 1
 T 10274
 T 10251
 T 10266
+Z1 10
 S
 #10257
 The Primeval Forest~
@@ -380,6 +392,7 @@ M 1 10260 100.00 5
 T 10274
 T 10251
 T 10266
+Z1 10
 S
 #10258
 A Clearing in the Primeval Forest~
@@ -399,16 +412,17 @@ volcano eruption smoke ash~
 stretches clear to the heavens, and even the sun seems to have trouble breaking
 through its dooming shadow.
 ~
-I 5 100 60.00 1 X  # DIG: rock
-I 5 106 20.00 1 X  # DIG: rough piece of obsidian
-I 5 102 10.00 1 X  # DIG: flint stone
-I 5 103 2.50 1 X  # DIG: yellow lightning stone
-I 5 104 2.50 1 X  # DIG: red bloodstone
-I 5 1206 2.50 1 X  # DIG: iridescent blue iris
-I 5 1300 2.50 1 X  # DIG: glowing green seashell
+I 5 100 60.00 125 X  # DIG: rock
+I 5 106 20.00 125 X  # DIG: rough piece of obsidian
+I 5 102 10.00 125 X  # DIG: flint stone
+I 5 103 2.50 125 X  # DIG: yellow lightning stone
+I 5 104 2.50 125 X  # DIG: red bloodstone
+I 5 1206 2.50 125 X  # DIG: iridescent blue iris
+I 5 1300 2.50 125 X  # DIG: glowing green seashell
 M 1 10264 100.00 1
 T 10274
 T 10255
+Z1 10
 S
 #10259
 Outside of Base Camp~
@@ -432,5 +446,6 @@ drowns out any hint that people are living out here.
 ~
 T 10274
 T 10267
+Z1 10
 S
 $

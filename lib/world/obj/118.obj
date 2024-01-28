@@ -7,7 +7,7 @@ foul), crisps, crackers, carrots, cuts of fish and game, brightly colored
 birds, and pots set into the table that hold soup. It has an inviting aroma
 that feels like it's exactly what you need right now.
 ~
-6 0 0 0 4
+6 B 0 0 0 5
 1000 0 0
 7 0
 C
@@ -29,7 +29,7 @@ the Tower Skycleave on the heel.
 they trudge up and down the tower's long spiral walkway. One thing is certain:
 These shoes were made for walking.
 ~
-2 mo ag 0 6
+2 mo ag 0 0 6
 -1 -1 -1
 11 0
 A
@@ -58,7 +58,7 @@ well-funded research and development.
    Unbridled innovation is the skeleton key to progress -- at least, according
 to Professor Scaldorran.
 ~
-2 mo ak 0 8
+2 mo ak 0 0 8
 -1 -1 -1
 10 0
 A
@@ -111,7 +111,7 @@ phase of their respective floors.
                           &cC&0---  liberated wand
                           ----  crystal ball
 ~
-3 p a 0 3
+3 p a 0 0 3
 0 0 0
 0 0
 C
@@ -133,7 +133,7 @@ a way of encouraging guests to become clients -- or even patrons. Self-filling
 vessels such as this one are difficult to find outside, however, as the
 sorcerers usually enchant them to be unpilferable.
 ~
-5 ep a 0 11
+5 ep a 0 0 11
 72 72 11804
 3 0
 C
@@ -152,7 +152,7 @@ a looker~
 A looker is here.~
 This item causes the player to 'look' when it loads, then vanishes.
 ~
-3 0 a 0 3
+3 0 a 0 0 3
 0 0 0
 0 1
 C
@@ -171,7 +171,7 @@ creatures, granting some degree of night vision.
 though most of these are created ad hoc by sorcerers looking to shortcut
 whatever difficult task they're working on at the moment.
 ~
-2 mo ae 0 18
+2 mo ae 0 0 18
 0 0 0
 7 0
 A
@@ -201,7 +201,7 @@ anthropomorphic household items: teapot, broom, sponge, bucket, mop
 punitive transformation is nevertheless a longstanding tradition for pupils who
 prove disappointing.
 ~
-3 o a 0 3
+3 o a 0 0 3
 0 0 0
 0 0
 C
@@ -218,12 +218,13 @@ top, it is completely unbranched and flawlessly straight.
 life that was given returns to the pixy, and the thing's un-nature is revealed
 in its death.
 ~
-3 0 a 0 4
+3 0 a 0 0 5
 0 0 0
 0 0
 C
 1 1
 I 11 184 100.00 1  # LIGHT: torch
+I 16 142 100.00 1  # SCRAPE: wooden pole
 O+ 1 6025
 R
 4 5118 0
@@ -234,7 +235,7 @@ the directory~
 There is a directory engraved on a stone slab.~
 This look description is updated by trigger 11811.
 ~
-3 0 0 0 4
+3 B 0 0 0 5
 0 0 0
 1 0
 C
@@ -253,7 +254,7 @@ began setting traps to capture any goblin who dared enter. But even caged --
 or perhaps even moreso when caged -- a goblin is a crafty sort, and it requires
 a skilled wrangler to keep them under control.
 ~
-1 hmo an 0 5
+1 hmo an 0 0 5
 0 1 7
 7 0
 A
@@ -279,7 +280,7 @@ have long faced what they euphemistically call "the goblin problem". It's a
 common occurrence for goblins to attempt to steal the tower's priceless relics,
 so wrangler spears are often stashed around the tower.
 ~
-1 ehmo an b 9
+1 ehmo an b 0 9
 0 1 3
 0 0
 A
@@ -310,7 +311,7 @@ of your wrist.
 or iron, though natural glasses like obsidian are desperately fragile and
 ephemeral.
 ~
-1 mo an a 10
+1 mo an a 0 10
 0 4 2
 8 0
 A
@@ -337,7 +338,7 @@ Grand High Sorcerer Kofi and though the tower no longer manufactures them, the
 artificers are still known to shape old glass ingots into tools and weapons
 from time to time.
 ~
-1 emno an 0 12
+1 emno an 0 0 12
 0 4 1
 8 0
 A
@@ -366,7 +367,7 @@ the great sorcerer Celiya, one of the famed leaders of Skycleave.
 history is strictly mythological -- and fantastical indeed -- it has produced
 so many High Sorcerers that few question its claims of descent from divinity.
 ~
-1 eimo an 0 11
+1 eimo an p 0 12
 0 4 17
 0 0
 A
@@ -395,7 +396,7 @@ staff, pulsing like a heartbeat.
 refers only to the current holder of the Apollus Chair, the sorcerer who
 oversees magics related to disease, poison, and healing.
 ~
-1 ehmo an 0 10
+1 ehmo an p 0 11
 0 0 19
 0 0
 A
@@ -421,7 +422,7 @@ merely fertilize their fields.
    Carving a great victory -- or defeat -- into the bones of the fallen is an
 ancient tradition.
 ~
-1 emo an 0 13
+1 emo an 0 0 13
 0 3 5
 14 0
 A
@@ -447,7 +448,7 @@ they emanate in the dark tells you their purpose is to channel mana.
    When he had defeated his last foe, Wildermage Indrik carved the bones of his
 fallen allies to celebrate the victory they seized from the tusks of defeat.
 ~
-1 emo an 0 13
+1 emo an p 0 14
 0 3 18
 14 0
 A
@@ -474,7 +475,7 @@ bow appears to be the goblin symbol for rain.
 called because they were shot off the gobbrabakhs during the driest months to
 strike water from clouds.
 ~
-20 emo ap 0 13
+20 emo ap 0 0 13
 29 1 0
 14 0
 C
@@ -495,7 +496,7 @@ otherworlder's strange tools and inscrutible magics led the Tower Skycleaver to
 study him, that they might learn enough to stand their ground if an army of
 otherworlders should follow.
 ~
-27 emo aq 0 17
+27 emo aq 0 0 17
 3 0 0
 2 0
 A
@@ -529,7 +530,7 @@ life of its own when an errant spell from Scaldorran brought all the costumes
 to life. For his part, Scaldorran insisted he was only trying to liven up the
 party.
 ~
-27 emo aq 0 16
+27 emo aq 0 0 16
 1 0 0
 14 0
 A
@@ -564,7 +565,7 @@ image. For these sorcerers, living in death as a shadow of the spells they wove
 in life is still a form of immortality, but few erudite wizards would consider
 the lich to be the same person.
 ~
-27 emo aq 0 17
+27 emo aq 0 0 17
 0 0 0
 11 0
 A
@@ -600,7 +601,7 @@ stand the robes on their own soon became a complex animus spell. Perhaps
 thinking himself above casting his own spells, Knezz eventually enchanted the
 long sleeves of the robe to move his arms for him as well.
 ~
-27 emo aq 0 18
+27 emo aq 0 0 18
 0 0 0
 11 0
 A
@@ -632,7 +633,7 @@ rogue.
    The goblins once traded for weapons and armor, but as their society fell,
 they began to imitate the crafts they had once purchased.
 ~
-27 emo aq 0 19
+27 emo aq 0 0 19
 2 0 0
 0 0
 A
@@ -662,7 +663,7 @@ takes blow after blow, ringing out like a bell but never shattering.
    Glass armaments were the clear choice under Grand High Sorcerer Kofi, but
 since have become rather rare.
 ~
-23 emo ao 0 15
+23 emo ao 0 0 15
 0 0 0
 8 0
 A
@@ -689,7 +690,7 @@ and pops the blade makes in the heat.
 Permafrost Wars, though most melted before High Sorcerer Chun devised a spell
 that could preserve them on our plane.
 ~
-1 imo ano f 19
+1 imo ano f 0 19
 0 1 4
 2 0
 A
@@ -719,7 +720,7 @@ Barrad. Sorcery came rarely to their line, and it was necessary from the first
 generations to commit spells to text to ensure the family's fortune was not
 lost.
 ~
-3 emo ao 0 16
+3 emo ao 0 0 16
 0 0 0
 0 0
 A
@@ -748,7 +749,7 @@ moves from target to target.
 of a magical beacon to a new source of magewood, helping secure his legacy and
 elevating him to the tower's top rank.
 ~
-3 mo ao 0 17
+3 mo ao 0 0 17
 0 0 0
 12 0
 A
@@ -775,7 +776,7 @@ though its rough finish hardly scatters light.
 this, it is exceedingly rare to find the place where one has fallen, making
 starmetal one of the most sought-after minerals.
 ~
-23 emo ao 0 17
+23 emo ao 0 0 17
 0 0 0
 2 0
 A
@@ -806,7 +807,7 @@ under the near-constant threat of invasion, burglary, and assault. Stabilized
 mana shields are de rigueur for the vanguard, which is often full of less-
 experienced students incapable of conjuring a shield of their own.
 ~
-23 emo ao 0 18
+23 emo ao 0 0 18
 0 0 0
 2 0
 A
@@ -835,7 +836,7 @@ square inch of it catches and reflects light like nothing you've ever seen!
 metal carriage at the bottom of a steep crater. To the erudite lords of
 Skycleave, this was an unparalleled prize and it earned her high acclaim.
 ~
-2 mp ad 0 8
+2 mp ad 0 0 8
 0 0 0
 11 0
 A
@@ -864,7 +865,7 @@ keeping whatever is up there at bay.
    Use the 'difficulty' command to set the difficulty for the next floor before
 proceeding.
 ~
-3 0 0 0 5
+3 B 0 0 0 6
 0 0 0
 10 0
 C
@@ -880,7 +881,7 @@ labeled as precious relics, dangerous artifacts, and irreplaceable books. All
 of the crates are nailed shut. The floor around and under the crates looks
 scorched.
 ~
-3 0 0 0 4
+3 B 0 0 0 5
 0 0 0
 0 0
 C
@@ -903,7 +904,7 @@ to have a thick brow ridge above where the eyes would be.
    The sculpture is warded by a shimmering wall of light that surrounds the
 dais and prevents you from getting too close.
 ~
-3 0 0 0 3
+3 B 0 0 0 4
 0 0 0
 2 0
 C
@@ -918,7 +919,7 @@ unceremoniously onto its side and one of the legs is cracked. Still, this
 hefty mahogany table provides a safe spot to fling spells -- or arrows -- at
 any threat.
 ~
-3 0 0 0 3
+3 B 0 0 0 4
 0 0 0
 0 0
 C
@@ -935,7 +936,7 @@ against intruders or rescuers, you cannot tell. The makeshift barricade has
 collapsed as it burns. Luckily, it doesn't seem to catch any of the tower's
 rare and expensive ebony paneling on fire.
 ~
-29 0 0 0 5
+29 B 0 0 0 6
 -1 1 9
 0 12
 C
@@ -955,7 +956,7 @@ the death of a sorcerer. But when a sorcerer commands vast power and abundant
 cleverness, it is possible to prepare a repository to anchor their magic to the
 mortal plane after their body has rotted and their soul has moved on.
 ~
-3 0 0 0 5
+3 B 0 0 0 6
 0 0 0
 4 0
 C
@@ -968,7 +969,7 @@ a skycleave BoE loot controller~
 A skycleave BoE loot controller is here.~
 Loads a bind-on-equip item.
 ~
-3 mo a 0 3
+3 mo a 0 0 3
 0 0 0
 0 0
 C
@@ -981,7 +982,7 @@ a skycleave BoP loot controller~
 A skycleave BoP loot controller is here.~
 Loads a bind-on-pickup item.
 ~
-3 mp a 0 4
+3 mp a 0 0 4
 0 0 0
 0 0
 C
@@ -997,7 +998,7 @@ standing on legs. The tower and legs are both made of stone, though the tower
 is a bit crooked and doesn't form a perfect cylinder. In all regards except for
 the legs, it resembles a little sorcery tower.
 ~
-3 0 0 0 2
+3 B 0 0 0 3
 0 0 0
 1 0
 C
@@ -1016,7 +1017,7 @@ pen, clasp, button, and plate in Skycleave was made from magitanium. Still,
 among the innovations credited to the Tower, magitanium is the one most valued
 by smiths across the land.
 ~
-27 mp af 0 22
+27 mp af 0 0 22
 3 0 0
 2 0
 A
@@ -1041,7 +1042,7 @@ when rubbed together, while the inside is lined with the finest cloth.
 hiding from others. Though it was her brother who dubbed her "Niamh the Shadow
 Hide", she reclaimed the title for herself at Skycleave.
 ~
-27 mp af 0 23
+27 mp af 0 0 23
 1 0 0
 7 0
 A
@@ -1065,7 +1066,7 @@ straight into a sorcerer's body to strengthen their offensive magic.
 moths that pupated at the lightning-kissed tops of the trees. No pixy cities
 yet remain that produce it.
 ~
-27 mp af 0 24
+27 mp af 0 0 24
 0 0 0
 11 0
 A
@@ -1089,7 +1090,7 @@ from the infinitely dark, unseeable void that lies at the heart of the fabric.
 When the cloth is done, it is boiled along with the weaver in a stone cauldron,
 trapping the weaver's soul within. This is considered the greatest honor.
 ~
-27 mp af 0 26
+27 mp af 0 0 26
 0 0 0
 11 0
 A
@@ -1119,7 +1120,7 @@ blows even when they should be strong enough to pierce it.
    Moxteel was a late invention of Skycleave, after the fad for enchanted glass
 armor had started to wane.
 ~
-27 mp af 0 23
+27 mp af 0 0 23
 2 0 0
 2 0
 A
@@ -1146,7 +1147,7 @@ dream.
 imperium, though in reality it has been created from many light metals by the
 artificers of Skycleave.
 ~
-27 mp al 0 24
+27 mp al 0 0 24
 3 0 0
 2 0
 A
@@ -1178,7 +1179,7 @@ the sound it makes as it rubs against other pieces of armor and clothing.
 foxes, shrinking and silencing their plush fur. Soon, Niamh devised a better
 technique that worked on common leather and required no wild animal.
 ~
-27 mp al 0 27
+27 mp al 0 0 27
 1 0 0
 7 0
 A
@@ -1205,7 +1206,7 @@ energy channeled into your body -- and your magic.
 created in small squares that must be stitched together, a trait common to all
 pixy fabrics.
 ~
-27 mp al 0 25
+27 mp al 0 0 25
 0 0 0
 11 0
 A
@@ -1231,7 +1232,7 @@ within and freezes both your fingers and your soul.
    Some mageweavers spend their entire careers dreaming of the day they will
 make a single bolt of soulcloth, such is the promise of immortality it brings.
 ~
-27 mp al 0 26
+27 mp al 0 0 26
 0 0 0
 11 0
 A
@@ -1260,7 +1261,7 @@ is, a material suited to crowns and scepters. When it never achieved the
 glister of gold, Skycleave turned to its more practical property and began
 working armor from it.
 ~
-27 mp al 0 24
+27 mp al 0 0 24
 2 0 0
 2 0
 A
@@ -1287,7 +1288,7 @@ the magitanium seem to follow every movement.
    Magitanium originated outside the tower, but it triggered a small feud when
 some sorcerers preferred it over moxteel.
 ~
-27 mp aj 0 23
+27 mp aj 0 0 23
 3 0 0
 2 0
 A
@@ -1318,7 +1319,7 @@ against other fabrics.
 Skycleave, the Shadow Hide immediately began infusing it into every jewel,
 trinket, device, and creature, and she found a different result with each.
 ~
-27 mp aj 0 25
+27 mp aj 0 0 25
 1 0 0
 7 0
 A
@@ -1346,7 +1347,7 @@ before.
 cities. There existed a particular technique for unraveling the coccoon while
 the pupa slept soundly, able to emerge without cutting the precious silk.
 ~
-27 mp aj 0 27
+27 mp aj 0 0 27
 0 0 0
 11 0
 A
@@ -1379,7 +1380,7 @@ release an ear-piercing screech that leaves you momentarily stunned.
 placed into an ever-burning fire, of which few are known, and the sheer value
 of soulcloth is such that this has never been tested.
 ~
-27 mp aj 0 28
+27 mp aj 0 0 28
 0 0 0
 11 0
 A
@@ -1410,7 +1411,7 @@ light.
    Moxteel took its name from the way its thinness and exceptional durability
 make a mockery of traditional steel.
 ~
-27 mp aj 0 26
+27 mp aj 0 0 26
 2 0 0
 2 0
 A
@@ -1444,7 +1445,7 @@ relics that line Skycleave's shelves. But her true genius was trading for the
 secrets to make them as well, and the process for crafting magitanium was her
 crowning achievement.
 ~
-2 mp am 0 26
+2 mp am 0 0 26
 0 0 0
 4 0
 A
@@ -1484,7 +1485,7 @@ quietly in battle.
 twirl it like ribbons and sculpt it like clay. The two were fast friends, and
 each shaped the other.
 ~
-2 mp am 0 26
+2 mp am 0 0 26
 0 0 0
 4 0
 A
@@ -1511,7 +1512,7 @@ earrings, it doesn't make that characteristic crackle as it does.
 trees, where lightning is at its closest. Their caterpillars have furry backs
 that crisp and sizzle as stray sparks in the air are caught and channeled.
 ~
-2 mp am 0 26
+2 mp am 0 0 26
 0 0 0
 4 0
 A
@@ -1544,7 +1545,7 @@ does when you disturb it.
 single bolt of the stuff is often split into many smaller pieces, at the cost
 of fragmenting the soul held within.
 ~
-2 mp am 0 26
+2 mp am 0 0 26
 0 0 0
 4 0
 A
@@ -1578,7 +1579,7 @@ even after its sorcerers were twice abducted by envious ironmongers who forced
 the secret out by nefarious means. Both abductors vanished within a fortnight
 of the kidnappings.
 ~
-2 mp am 0 28
+2 mp am 0 0 28
 0 0 0
 4 0
 A
@@ -1616,7 +1617,7 @@ gold ink and an elegant script:
                         4. Cultivator is single-use
                 5. Skycleave does not warrant against death
 ~
-3 gp a 0 2
+3 gp a 0 0 2
 0 0 0
 12 0
 C
@@ -1637,7 +1638,7 @@ peacock to Marquel of Trense and Lady Gorgea as a wedding gift, it was meant as
 a slight. But Lord Marquel had the bird replicated in gold and placed above the
 mantle.
 ~
-15 0 a 0 1
+15 0 a 0 0 1
 100 0 0
 4 0
 C
@@ -1656,7 +1657,7 @@ with a foreword by Instructor Huberus of Skycleave.
 though the man had no fondness for children. He sent her to a series of
 boarding schools, where she excelled at his great expense.
 ~
-28 0 a 0 1
+28 0 a 0 0 1
 11862 0 0
 0 0
 C
@@ -1671,7 +1672,7 @@ touch it, but it's solid. You can't force your arm through and it seems to be
 impervious to magic. This powerful shadow magic must be coming from somewhere
 nearby.
 ~
-3 0 0 0 4
+3 B 0 0 0 5
 0 0 0
 10 0
 C
@@ -1691,7 +1692,7 @@ to turn it on; or, perhaps it isn't working any more.
 stray thoughts and dreams of wizards and sorcerers. Purifying mana is nearly
 impossible, but deconfabulating it can be done with the right equipment.
 ~
-15 e a 0 6
+15 e a 0 0 6
 1 2 0
 2 0
 C
@@ -1710,7 +1711,7 @@ touch, but you can't figure out how to open it, nor what it's doing.
    You can 'use' this condenser to throw it at an enemy in combat.
    Magic scholars have posited that the ether can be used as a source of mana.
 ~
-15 e a 0 6
+15 e a 0 0 6
 1 2 0
 2 0
 C
@@ -1731,7 +1732,7 @@ distinct arms and hands that join near its waist.
    Many cultures practice woodcarving to create ornaments, dolls, and religious
 sculptures.
 ~
-15 0 a 0 6
+15 0 a 0 0 6
 1 2 0
 0 0
 C
@@ -1751,7 +1752,7 @@ you do notice that it's ice cold to the touch.
    When mana becomes too pure, it sometimes becomes explosive. As this can be a
 side-effect of deconfabulation, the proper solution is a reconfabulator.
 ~
-15 e a 0 6
+15 e a 0 0 6
 1 2 0
 2 0
 C
@@ -1771,7 +1772,7 @@ prototype; you can't figure out how to make it do anything.
    The magineers at Skycleave design far more gizmos than they ever create.
 Some take years of research and experimentation and, of those, many still fail.
 ~
-15 0 a 0 6
+15 0 a 0 0 6
 1 2 0
 1 0
 C
@@ -1794,7 +1795,7 @@ nothing you do or say seems to control it.
 thank-you notes, and Dear John letters. It perfectly mimics one's handwriting,
 though the text is rarely original.
 ~
-15 0 a 0 7
+15 0 a 0 0 7
 1 2 0
 2 0
 C
@@ -1810,7 +1811,7 @@ A swirling vortex atop the tower keeps you from climbing the stairs.~
 can't even climb the stairs. It sounds like somebody is locked in mortal combat
 above you and you won't be able to climb the stairs until someone has died.
 ~
-3 0 0 0 5
+3 B 0 0 0 6
 0 0 0
 10 0
 C
@@ -1830,7 +1831,7 @@ in an endless cycle. Surely this is what is responsible for the sorry state of
 the Tower Skycleave. Your only recourse now is to burn the heartwood in hopes
 of ending the cycle and rescuing the sorcerers from this odious time loop.
 ~
-3 j 0 0 6
+3 jB 0 0 0 7
 0 0 0
 12 0
 C
@@ -1855,7 +1856,7 @@ A hand-written note is lying here.~
 
              P.S. -- Do NOT tell Marina.
 ~
-3 k a 0 7
+3 k a 0 0 7
 0 0 0
 7 0
 C
@@ -1870,7 +1871,7 @@ of yellow, like pixy dust caught in a whirlpool. There's no label on the flask
 and no way to tell what effect it will have but to quaff it.
    Potions are a quick way to shore up one's particular deficiencies.
 ~
-25 0 a 0 7
+25 0 a 0 0 7
 -1 0 3030
 8 0
 A
@@ -1894,7 +1895,7 @@ thin gold chain, tarnished at the back from heavy wear.
 of the school's excellent grade point average, and equally notorious, is its
 low tolerance for under-achievers.
 ~
-2 0 ac 0 7
+2 0 ac 0 0 7
 0 0 0
 2 0
 C
@@ -1913,11 +1914,17 @@ together by pitch and leather. Scratch-marks run the length of the handle; but,
 though the head of the pick is slightly worn, there are no signs of cracks.
    Using stone to mine ore is far from ideal. In fact, it's nearly impossible.
 ~
-1 imo an h 5
+1 imo an h 0 6
 0 1 8
 1 0
 C
 150 250
+M
+26
+You claw at the wall with $p in search of ore.~
+M
+27
+$n claws at the wall with $p in search of ore.~
 S
 #11876
 stabber obsidian~
@@ -1929,7 +1936,7 @@ around the base serves as a simple handle. It may be small, but this thing is
 thin enough to slide between ribs and long enough to pierce the heart.
    Goblin tools are, as a rule, simple and 'to the point'.
 ~
-1 imo ano f 5
+1 imo ano f 0 5
 0 1 4
 1 0
 C
@@ -1948,7 +1955,7 @@ transcendental.
 gifted him one made by pixies in an earlier age. In the right hands, it has the
 power to evoke powerful emotions and draw listeners into an enchanted dance.
 ~
-22 0 ao 0 5
+22 0 ao 0 0 5
 1 0 0
 12 0
 C
@@ -2087,7 +2094,7 @@ boundary.
    The magic required to fuse dissimilar gemstones is deeply rooted in Tagra
 Nes, whose ancestral grandmothers, the Ebru, guard it from beyond death.
 ~
-1 mo ano f 8
+1 mo ano f 0 8
 0 1 4
 1 0
 A
@@ -2106,7 +2113,7 @@ brilliance is as ephemeral as the setting sun.
    Tresydions tended Tagra Nes and its people for thousands of years, growing
 the community as well as the tree.
 ~
-29 0 a 0 11
+29 0 a 0 0 11
 96 1 0
 0 0
 C
@@ -2130,9 +2137,9 @@ melts away into cloying sweetness.
 the earth and releasing it into the world, a task it performed ceaselessly
 beneath both sun and stars for 8200 years, but not a day longer.
 ~
-6 m a 0 9
+6 mC a 0 0 11
 24 0 0
-12 168
+12 8760
 A
 16 1 0
 A
@@ -2152,6 +2159,8 @@ M
 18
 $p breaks into little pieces and blows away.~
 O+ 1 11880
+R
+4 5619 0
 S
 #11881
 flask lightning~
@@ -2165,7 +2174,7 @@ quaff it.
 due to heavy dependence on potions. It never pays to fall behind in the black
 tower.
 ~
-25 m a 0 7
+25 m a 0 0 7
 -1 0 3030
 8 0
 A
@@ -2188,7 +2197,7 @@ you take care not to trip into it as there's no railing or step protecting it.
 The viridescent light from the glowing shell shimmers off of the water and
 dances around on the ceiling.
 ~
-5 0 0 0 7
+5 B 0 0 0 8
 1000000 1000000 11885
 12 0
 C
@@ -2214,7 +2223,7 @@ tremendous manaflows for enormous spells, it also contains a number of wands of
 true power. These relics of an earlier age have brought both renown and ruin to
 even the greatest wizards of myth and legend.
 ~
-1 mpwx ao 0 7
+1 mpwx ao 0 0 7
 0 1 22
 0 0
 A
@@ -2238,9 +2247,9 @@ Mushrooms like this grow all over.
 important to correctly identify them first. Many mushrooms are difficult to
 distinguish when they're small.
 ~
-6 km a 0 1
+6 kmC a 0 0 4
 6 0 0
-0 0
+0 72
 C
 150 150
 M
@@ -2249,6 +2258,8 @@ $p rots and you throw it out.~
 M
 18
 $p rots on the ground.~
+R
+4 5619 0
 T 11950
 S
 #11885
@@ -2260,7 +2271,7 @@ avoid falling in. Each one is almost as wide as your armspan, and round in
 shape, but none of them is very deep. The pools closer to the stairs are
 well-lit, while the ones in the back of the grotto are difficult to see.
 ~
-5 0 0 0 5
+5 B 0 0 0 6
 1000000 1000000 11885
 12 0
 C
@@ -2285,7 +2296,7 @@ nevertheless a great work of art.
    Destroying the sculpture is the furthest thing from your mind. Or, it was,
 until just now. Vanity and narcissism are common pitfalls of great sorcerers.
 ~
-3 0 0 0 5
+3 B 0 0 0 6
 0 0 0
 8 0
 C
@@ -2302,7 +2313,7 @@ reach through it. As you try, you see visions of the pixy queen in your mind.
 A crooked grin breaks on her face as she laughs -- cackles, even -- at your
 attempt to pass her impenetrable shield.
 ~
-3 0 0 0 4
+3 B 0 0 0 5
 0 0 0
 10 0
 C
@@ -2321,7 +2332,7 @@ revolting urge to taste it.
    In Smol Nes-Pik, wasting the tree's sap is a great crime, as every last
 pint of it is precious.
 ~
-3 0 0 0 4
+3 B 0 0 0 5
 0 0 0
 0 0
 C
@@ -2339,7 +2350,7 @@ Thousands of tiny splinters hover in the air!~
 drawing more and more wood from the sides of the hollow, until the air is so
 full of them you can hardly breathe!
 ~
-3 0 0 0 2
+3 B 0 0 0 3
 0 0 0
 0 0
 C
@@ -2351,7 +2362,7 @@ the struggle~
 The remains of a struggle are evident all around.~
 Sometimes it's necessary to 'struggle' to get free.
 ~
-3 0 a 0 5
+3 0 a 0 0 5
 0 0 0
 0 5
 C
@@ -2372,7 +2383,7 @@ Sap is flowing from the tree.~
    The sap has totally encased you! You can do little else but watch the Great
 Tree fall into rot and ruin.
 ~
-3 0 0 0 3
+3 B 0 0 0 4
 0 0 0
 0 10
 C
@@ -2393,7 +2404,7 @@ interest to scholars and sorcerers alike.
 as apprentices repeatedly unleashed primordial horrors upon the world, those
 keys were melted, one by one, until only water and shadow remained.
 ~
-15 0 a 0 7
+15 0 a 0 0 7
 1 2 0
 10 0
 C
@@ -2412,7 +2423,7 @@ as though someone has been carrying it around in their mouth.
    Though housepets began as working companions, aiding in hunting, guarding,
 and carrying, they quickly discovered it's easier to be pampered and overfed.
 ~
-19 o a 0 7
+19 o a 0 0 7
 11893 0 0
 0 0
 C
@@ -2429,7 +2440,7 @@ impressions where her eyes would be.
    Many types of statuettes with women's forms are described as Venus
 figurines, though they rarely relate to the Greek goddess.
 ~
-15 0 a 0 9
+15 0 a 0 0 9
 1 2 0
 0 0
 C
@@ -2446,7 +2457,7 @@ when it catches the light, its lustrous surface shimmers like a pastel rainbow.
    Pearls often symbolize beauty, wisdom, and luxury. But to a person whose
 diet is made of shellfish, they can instead represent abundance.
 ~
-15 0 a 0 10
+15 0 a 0 0 10
 1 2 0
 14 0
 C
@@ -2465,7 +2476,7 @@ string tied securely around it, but even when it's closed, it smells of lilac.
    The light, lilac wine, sweet and heady, is said to dull the deep pain of
 losing a lover.
 ~
-5 0 a 0 11
+5 0 a 0 0 11
 48 48 11896
 14 0
 C
@@ -2482,7 +2493,7 @@ mostly gray.
 one city and deposit it in a pile in the next city, carrying it with them as
 protection on the road.
 ~
-3 m a e 11
+3 m a e 0 11
 0 0 0
 1 0
 C
@@ -2508,7 +2519,7 @@ of the person the stone is attuned to. The process rarely succeeds at enriching
 the stone as the stone's power is easily absorbed by an injured soul rather
 than the other way around.
 ~
-15 0 a 0 10
+15 0 a 0 0 10
 1 2 0
 1 0
 C
@@ -2527,7 +2538,7 @@ and knapped into a rough circle.
 resemblance to the sky. When properly attuned, blue jade can also hold a
 tremendous amount of mana.
 ~
-3 p a 0 10
+3 p a 0 0 10
 0 0 0
 1 0
 C

@@ -3,7 +3,7 @@ cat black familiar~
 a black cat~
 A black cat sits perfectly still, watching everything. (familiar)
 ~
-1 50 doG cfmG 2
+1 100 doG cfmG 2
 0 0 0 10 -1
 D
    This appears on first glance to be an ordinary black housecat, but upon
@@ -15,7 +15,7 @@ saber-toothed sabertoothed toothed cat familiar~
 a saber-toothed cat~
 A saber-toothed cat glares around hungrily. (familiar)
 ~
-50 100 doG cfmG 4
+50 0 doG cfmG 4
 0 0 0 10 -1
 D
    This is a large feline, about the size of a lion or tiger. It can be
@@ -29,14 +29,14 @@ sphinx familiar~
 a sphinx~
 A deadly sphinx paces back and forth. (familiar)
 ~
-75 100 dopG cfmG 4
+75 0 dopG cfmsG 4
 0 0 0 10 -1
 D
    The sphinx is a strange beast with the head of a human, and the body of a
 lion. While they're best known as guardians of tombs, temples and crossroads,
 forcing travellers to answer riddles, this one seems to have chosen to become
-the guardian of a mage instead. In combat, it will attempt to rescue its player
-from attackers by forcing them to attack it instead.
+the guardian of a mage instead. In combat, it will attempt to rescue its
+companion from attackers by forcing them to attack it instead.
 ~
 S
 #503
@@ -50,8 +50,8 @@ D
    The griffin is a powerful and majestic magical beast with the body of a
 lion, and the head and wings of an eagle. While traditionally known for
 guarding treasure, this one has instead decided to guard the mage it serves.
-In combat, it will attempt to rescue its player from attackers by forcing them
-to attack it instead.
+In combat, it will attempt to rescue its companion from attackers by forcing
+them to attack it instead.
 ~
 S
 #504
@@ -81,7 +81,9 @@ exactly like a normal rabbit, but bright white, and possessing a permanent,
 unearthly pale glow to its fur. It is highly intelligent and can channel the
 power of the moon into protective enchantments, often forming a bond with mages
 who do the same. In combat, it uses its innate magical abilities to support its
-player.
+companion.
+   The rabbit's companion can type 'order companion status' to set which
+ability it should use in combat.
 ~
 T 505
 T 506
@@ -91,13 +93,13 @@ tortoise giant familiar~
 a giant tortoise~
 A giant tortoise eyes you placidly. (familiar)
 ~
-100 0 dnopyG cfmG 3
-0 0 16 10 -1
+75 0 dnopyG cfmG 3
+0 0 16 9 -1
 D
    This man-sized, hard-shelled testudon makes up for what it lacks in ferocity
 with sheer implacable persistence. The glint of magic in its eye suggests that
 it may be a mage's familiar. In combat, it does not attack at all, but will
-attempt to rescue its player from attackers by forcing them to attack it
+attempt to rescue its companion from attackers by forcing them to attack it
 instead.
 ~
 S
@@ -111,8 +113,11 @@ A spirit wolf flitters in and out of sight as it leaps about. (familiar)
 D
    Those who become greatly accomplished in spirit magic become capable of
 calling forth their own spirit animals. This pale blue spectral wolf is one
-such animal, given its own intelligence and physical form by its player's
-power. In combat, it uses its innate magical abilities to support its player.
+such animal, given its own intelligence and physical form by its companion's
+power. In combat, it uses its innate magical abilities to support its
+companion.
+   The wolf's companion can type 'order companion status' to set which ability
+it should use in combat.
 ~
 T 507
 T 508
@@ -142,7 +147,10 @@ D
    A bird made entirely from flames, and associated with life, rebirth, and
 High Sorcery, phoenixes are intelligent, loyal, and powerful allies. This one
 is only the size of an ordinary bird, but it still commands powerful magic of
-its own. In combat, it uses its innate magical abilities to support its player.
+its own. In combat, it uses its innate magical abilities to support its
+companion.
+   The phoenix's companion can type 'order companion status' to set which
+ability it should use in combat.
 ~
 T 509
 T 516
@@ -159,7 +167,9 @@ D
 becomes so great that their shadow can move independently of their body, and no
 longer resembles their physical form. This one has taken the form of a venomous
 scorpion. In combat, it uses its innate magical abilities to support its
-player.
+companion.
+   The shadow's companion can type 'order companion status' to set which
+ability it should use in combat.
 ~
 T 510
 T 514
@@ -176,7 +186,9 @@ D
    These strange shadow beings are created when a mage's command over shadows
 becomes so great that their shadow can move independently of their body, and no
 longer resembles their physical form. This one has taken the form of a huge
-owl. In combat, it uses its innate magical abilities to support its player.
+owl. In combat, it uses its innate magical abilities to support its companion.
+   The shadow's companion can type 'order companion status' to set which
+ability it should use in combat.
 ~
 T 511
 T 514
@@ -194,7 +206,9 @@ D
 Its most famous and dangerous feature is not its venomous bite, but its bright
 yellow, serpentine eyes, capable of turning anyone or anything who meets its
 gaze into stone. This one has formed a bond with a mage. In combat, it uses its
-innate magical abilities to support its player.
+innate magical abilities to support its companion.
+   The basilisk's companion can type 'order companion status' to set which
+ability it should use in combat.
 ~
 T 512
 T 519
@@ -211,7 +225,9 @@ D
 transmute it into short-lived but powerful bursts of magical energy,
 salamanders normally live in deserts and volcanos. This one appears to be a
 mage's familiar. In combat, it uses its innate magical abilities to support its
-player.
+companion.
+   The salamander's companion can type 'order companion status' to set which
+ability it should use in combat.
 ~
 T 513
 T 520
@@ -243,7 +259,9 @@ D
 of those who hear them, banshees resemble ethereal human women formed from
 white mist. This banshee has found someone to follow around who sees a lot of
 death... In combat, she uses her innate magical abilities to support her
-player.
+companion.
+   The banshee's companion can type 'order companion status' to set which
+ability it should use in combat.
 ~
 T 515
 T 521
@@ -430,5 +448,17 @@ M
 0
 $n shuffles around on the ground.~
 T 9805
+S
+#550
+minion dark~
+a dark minion~
+A dark minion is standing here.
+~
+0 200 bdqvG cm 3
+0 0 0 11 -1
+D
+This hapless citizen has a strange pallor about them.
+~
+T 550
 S
 $

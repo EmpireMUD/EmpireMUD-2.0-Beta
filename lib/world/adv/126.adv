@@ -6,11 +6,10 @@ watch this rift to the elemental plane. But it seems the apprentice wasn't
 strong enough to contain the elementals, and now four have escaped! Track down
 the elementals of earth, fire, wind, and water. Defeat them and return their
 essences to the apprentice for re-summoning.
-   Start the apprentice's quests with 'quest start all'. There is one quest
-per elemental, and you can repeat these quests if you wait at least an hour
-after finishing them. You can purchase rewards from the apprentice with the
-'list' and 'buy' commands. Hint: If you're a thief, try pickpocketing the
-apprentice.
+   Start the apprentice's quests with 'start all'. There is one quest per
+elemental, and you can repeat these quests if you wait at least an hour after
+finishing them. You can purchase rewards from the apprentice with the 'list'
+and 'buy' commands. Hint: If you're a thief, try pickpocketing the apprentice.
 
 EmpireMUD Administrators: You can raise the instance limit on this
 adventure to equal the number of newbie you have.
@@ -19,15 +18,15 @@ adventure to equal the number of newbie you have.
 1 0 h 0
 L
 5 0
-10080 -1 -1
+10080 -1 -1 -1
 -1 0 0
 L
 1 0
-12600 -1 -1
+12600 -1 -1 -1
 9 bdel 0
 L
 6 0
-100 -1 -1
+100 -1 -1 -1
 -1 0 0
 S
 #12650
@@ -35,24 +34,25 @@ Magiterranean: The Grove~
 Paul Clarke and Owen Morris~
    You have discovered a portal into a small grove deep in the Magiterranean,
 the plane of magic. This is a place where the forces of nature run deep, and
-interlopers are unwelcome. But what could the druids of the Magiterranean be
+interlopers are unwelcome. But what could the mages of the Magiterranean be
 planning? And is it too late to stop them?
-   Enter the portal, but be prepared for both unfriendly druids and hidden
+   Enter the portal, but be prepared for both unfriendly manaweavers and hidden
 predators as you explore the otherworldly forest of the Magiterranean.
 ~
 12650 12699 1-75
 25 0 k 0
 L
 5 0
-4320 -1 -1
+4320 -1 -1 -1
 -1 0 0
 L
 6 0
-50 -1 -1
+50 -1 -1 -1
 -1 0 0
 L
 4 0
-12650 12650 12651
+12650 12650 12651 -1
 -1 d 0
+Z1 1
 S
 $

@@ -6,6 +6,7 @@ if %actor.char_target(%arg%)% != %self%
   return 0
   halt
 end
+set from_room %self.room%
 set room i18201
 if !%instance.start%
   %echo% ~%self% disappears! Or... was it ever there in the first place?
@@ -17,6 +18,18 @@ end
 %echoaround% %actor% ~%actor% boards ~%self%.
 %send% %actor% You board ~%self%.
 %force% %actor% look
+* companions
+set ch %from_room.people%
+while %ch%
+  set next_ch %ch.next_in_room%
+  if %ch.is_npc% && %ch.leader% == %actor% && !%ch.fighting% && !%ch.disabled%
+    %echoaround% %ch% ~%ch% boards ~%self%.
+    %teleport% %ch% %room%
+    %echoaround% %ch% ~%ch% boards ~%self%.
+    %send% %ch% You board ~%self%.
+  end
+  set ch %next_ch%
+done
 ~
 #18201
 City turtle greet~
@@ -83,6 +96,19 @@ end
 %teleport% %actor% %target%
 %force% %actor% look
 %echoaround% %actor% ~%actor% disembarks from the turtle.
+* companions
+set ch %self.people%
+while %ch%
+  set next_ch %ch.next_in_room%
+  if %ch.is_npc% && %ch.leader% == %actor% && !%ch.fighting% && !%ch.disabled%
+    %send% %ch% You disembark from the turtle.
+    %echoaround% %ch% ~%ch% disembarks from the turtle.
+    %teleport% %ch% %target%
+    %echoaround% %ch% ~%ch% disembarks from the turtle.
+  end
+  set ch %next_ch%
+done
+
 ~
 #18205
 City turtle look out~
@@ -405,6 +431,9 @@ end
 Adventuring guild block vault~
 0 s 100
 ~
+if %self.disabled% || %self.position% == Sleeping
+  halt
+end
 * One quick trick to get the target room
 set room_var %self.room%
 eval tricky %%room_var.%direction%(room)%%
@@ -541,8 +570,11 @@ Atlasian Turtle Egg: Hatch~
 set room %self.room%
 %load% veh 18224
 set tortoise %room.vehicles%
-%echo% The huge atlasian egg cracks open, and @%tortoise% pokes its head out!
-%own% %tortoise% %room.empire%
+if %tortoise% && %tortoise.vnum% == 18224
+  nop %tortoise.unlink_instance%
+  %echo% The huge egg cracks open, and %tortoise.shortdesc% pokes its head out!
+  %own% %tortoise% %room.empire%
+end
 %build% %room% demolish
 return 0
 %purge% %self%
@@ -677,14 +709,10 @@ end
 * try to do the thing
 %send% %actor% You swoop toward ~%vict% with the gilded net... and catch it!
 %echoaround% %actor% ~%actor% swoops toward ~%vict% with @%self%... and catches it!
-eval 18243_bug_count %actor.var(18243_bug_count,0)% + 1
-remote 18243_bug_count %actor.id%
+%quest% %actor% trigger 18243
 %purge% %vict%
-if %18243_bug_count% >= %num_needed%
+if %actor.quest_finished(18243)%
   %send% %actor% That's all the bugs you needed... and good thing, too. Your net just broke!
-  if %actor.on_quest(18243)%
-    %quest% %actor% trigger 18243
-  end
   %purge% %self%
 end
 ~
@@ -720,6 +748,13 @@ if borrow /= %cmd%
   end
   halt
 end
+* check other things with a release trigger
+set otar %actor.obj_target(%arg%)%
+if %otar% && %otar.vnum% == 11836
+  * has its own release
+  return 0
+  halt
+end
 * RELEASE SECOND
 set needed 3
 if !%self.val0%
@@ -745,10 +780,8 @@ if %found%
   %send% %actor% Rodentmort is already out of his cage.
   halt
 end
-if %actor.var(18245_food_count,0)% >= %needed%
+if %actor.quest_finished(18245)%
   %send% %actor% Rodentmort is sleeping in his cage; you already finished this quest.
-  * in case
-  %quest% %actor% trigger 18245
   halt
 end
 * ok, summon him
@@ -784,12 +817,10 @@ while %loop% <= 1
     %echo% ~%self% devours @%obj%! &&Z&%self% makes a huge mess.
     nop %obj.empty%
     %purge% %obj%
-    eval 18245_food_count %leader.var(18245_food_count,0)% + 1
-    remote 18245_food_count %leader.id%
+    %quest% %leader% trigger 18245
     wait 1 s
-    if %18245_food_count% >= %needed%
+    if %leader.quest_finished(18245)%
       %echo% ~%self% hops back into ^%self% cage and falls asleep.
-      %quest% %leader% trigger 18245
       %purge% %self%
     end
     halt
@@ -1328,8 +1359,9 @@ else
   * oops
   set extract 0
 end
-* check completion
-if %self.val0% && %self.val1% && %self.val2%
+* consequences!
+if %extract%
+  * update completion
   set ch %room.people%
   while %ch%
     if %ch.on_quest(18254)%
@@ -1337,9 +1369,7 @@ if %self.val0% && %self.val1% && %self.val2%
     end
     set ch %ch.next_in_room%
   done
-end
-* consequences!
-if %extract%
+  * and purge
   %echo% ~%vict% is sucked into the mirror with a puff of smoke!
   %purge% %vict%
 else
@@ -1527,7 +1557,7 @@ Give wildling net on quest start~
 %load% obj 18256 %actor% inv
 ~
 #18258
-Adventurer Guild, Monsoon Attunement: Speak to Druid~
+Adventurer Guild, Monsoon Attunement: Speak to Manaweaver~
 0 c 0
 speak~
 if %actor.inventory(18258)%
@@ -1558,10 +1588,10 @@ while %cycles_left% >= 0
   switch %cycles_left%
     case 5
       %echoaround% %actor% ~%actor% starts talking to ~%self%...
-      %send% %actor% You greet the druid and ask *%self% about the rift...
+      %send% %actor% You greet the manaweaver and ask *%self% about the rift...
     break
     case 4
-      say We druids open these rifts wherever the desert is oppressed by the advance of the cities of mankind.
+      say We weavers open these rifts wherever the desert is oppressed by the advance of the cities of mankind.
     break
     case 3
       say As we quench the desert with our magical rain, the plants themselves take up arms to defend their homes.
@@ -1589,7 +1619,7 @@ done
 Monsoon quest finish: trigger adventurer guild quest~
 2 v 100
 ~
-* Have we already talked to the druid?
+* Have we already talked to the manaweaver?
 if %actor.on_quest(18258)% && %actor.inventory(18258)%
   %quest% %actor% trigger 18258
 end
@@ -1633,9 +1663,9 @@ if !%actor.can_afford(50)%
   %send% %actor% ~%self% tells you, 'Human needs 50 coin to buy that.'
   halt
 end
-nop %actor.charge_coins(50)%
+set coinstr %actor.charge_coins(50)%
 %load% obj %vnum% %actor% inv
-%send% %actor% You buy %named% for 50 coins.
+%send% %actor% You buy %named% for %coinstr%.
 %echoaround% %actor% ~%actor% buys %named%.
 ~
 #18261
@@ -1647,10 +1677,9 @@ if %questvnum% == 18260
 elseif %questvnum% == 18272
   %load% obj 18272 %actor% inv
 elseif %questvnum% == 18270
-  set guild_siphoned_10551 0
-  set guild_siphoned_10552 0
-  remote guild_siphoned_10551 %actor.id%
-  remote guild_siphoned_10552 %actor.id%
+  * old vars (now use quest trackers)
+  rdelete guild_siphoned_10551 %actor.id%
+  rdelete guild_siphoned_10552 %actor.id%
   %load% obj 18270 %actor% inv
 end
 ~
@@ -1663,7 +1692,10 @@ if %actor.obj_target(%arg.car%)% != %self%
   halt
 end
 set target %actor.char_target(%arg.cdr%)%
-if !%target%
+if !%arg.cdr%
+  %send% %actor% Use the siphon on whom?
+  halt
+elseif !%target%
   %send% %actor% You don't see a '%arg.cdr%' here.
   halt
 end
@@ -1673,22 +1705,19 @@ if %target.vnum% != 10551 && %target.vnum% != 10552
   halt
 end
 set valid 1
-if %actor.varexists(guild_siphoned_%target.vnum%)%
-  eval check %%actor.guild_siphoned_%target.vnum%%%
-  if %check%
-    %send% %actor% You've already siphoned energy from ~%target%.
-    set valid 0
-  end
+if %self.var(siphoned_%target.vnum%)%
+  %send% %actor% You've already siphoned energy from ~%target%.
+  set valid 0
 end
 if %valid%
   %send% %actor% You siphon energy from ~%target%...
-  set guild_siphoned_%target.vnum% 1
-  remote guild_siphoned_%target.vnum% %actor.id%
+  %quest% %actor% trigger 18270
+  set siphoned_%target.vnum% 1
+  remote siphoned_%target.vnum% %self.id%
 end
 * Check quest completion
-if %actor.guild_siphoned_10551% && %actor.guild_siphoned_10552%
+if %actor.quest_finished(18270)%
   %send% %actor% You have siphoned both apprentices.
-  %quest% %actor% trigger 18270
 end
 ~
 #18272
@@ -1739,13 +1768,13 @@ switch %questvnum%
   break
   case 18243
     %load% obj 18220 %actor% inv
-    set 18243_bug_count 0
-    remote 18243_bug_count %actor.id%
+    * old var (uses tracker now)
+    rdelete 18243_bug_count %actor.id%
   break
   case 18245
     %load% obj 18224 %actor% inv
-    set 18245_food_count 0
-    remote 18245_food_count %actor.id%
+    * old var (uses tracker now)
+    rdelete 18245_food_count %actor.id%
   break
   case 18246
     %load% obj 18248 %actor% inv

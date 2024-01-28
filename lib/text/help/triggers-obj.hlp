@@ -32,6 +32,9 @@ lighter, but you MUST return 0 if you purge the lighter itself.
 Note: If you purge a poison or arrow object in its consume trigger, you must
 return 0 to prevent trying to extract the item afterwards.
 
+Only the FIRST consume trigger on an object will run unless it also has the
+Allow-Multiple type.
+
 Variables:
   &c%actor%&0 - The character attempting to consume the object.
   &c%target%&0 - The target of the consumption (poison/shoot only; the target
@@ -64,8 +67,22 @@ Return value:  return 0 to cancel getting the object
 
 Activated any time a character attempts to pick up the object.
 
+This trigger also fires when a character retrieves an object from storage,
+collects it from the trading post, collects event rewards, produces the item
+directly to their inventory from a chore, and other similar cases. However, in
+these cases, returning 0 does NOT prevent the character from having the item.
+
+If this trigger would purge the object, consider using "wait 1" before the
+purge to avoid conflicts.
+
+Only the FIRST get trigger on an object will run unless it also has the
+Allow-Multiple type.
+
 Variables:
   &c%actor%&0 - The character trying to get the object.
+  &c%preventable%&0 - 1 means the "get" can be blocked, 0 means it cannot. If
+     the "get" is not preventable, you can still attempt to remove it from the
+     player's inventory in the script.
 #d
 "GIVE TRIGGER" "OTRIG GIVE" TRIGEDIT-OBJ-GIVE
 
@@ -75,6 +92,9 @@ Argument type:  percent chance to execute
 Return value:  return 0 to prevent giving the item
 
 Activated when a player attempts to give this object to another character.
+
+Only the FIRST give trigger on an object will run unless it also has the
+Allow-Multiple type.
 
 Variables:
   &c%actor%&0 - The character giving away the object.
@@ -109,6 +129,7 @@ help files for more info):
 
 &c%adventurecomplete%&0 - Triggers completion of the adventure it's in.
 &c%aoe%&0 - Deals scaled damage to all people in the room.
+&c%asound%&0 - Sends a message to surrounding rooms.
 &c%at%&0 - Performs a command as if it's at that location.
 &c%build%&0 - Adds or removes a building on the map.
 &c%buildingecho%&0 - Sends a message to everyone at a certain map location.
@@ -146,6 +167,7 @@ Objects can trigger on the following events:
 &cGlobal&0 - Can happen even without players present (combine with Random).
 &cRandom&0 - Triggers randomly when players are around.
 &cCommand&0 - Responds to a player command.
+&cGreet&0 - Triggers when someone enters the room the object is in.
 &cTimer&0 - Triggers when the object's timer expires.
 &cGet&0 - Triggers when picked up.
 &cDrop&0 - Triggers when dropped/put.
@@ -163,6 +185,8 @@ Objects can trigger on the following events:
 &cReboot&0 - Triggers when the mud starts up.
 &cBuy&0 - Triggers when someone tries to buy in the room.
 &cKill&0 - Triggers when the object's owner, or their ally, kills someone here.
+&cAllow-Multiple&0 - For some triggers, multiple triggers can run. Put the
+  triggers with this flag first; any trigger without it will end the list.
 
 For each type, there is a help file named &yOTRIG <type>&0.
 #d
@@ -174,6 +198,7 @@ The correct way to get an object's short description in a send/echo is:
 &c@%obj%&0 - short desc, something
 
 When using field  - The variable returns:
+&cadd_wear(flag)&0, &cremove_wear(flag)&0 - Add or remove a wear flag like TAKE.
 &cattack(field)&0 - Gets info on a weapon's attack type. Valid fields are:
   &yname&0 - attack name             &yfirst-person or 1&0 - 1st person attack message
   &ynoun&0 - noun form of attack     &ythird-person or 3&0 - 3rd person attack message
@@ -197,6 +222,7 @@ When using field  - The variable returns:
 &chas_in(str)&0 - Has an object (name/vnum) inside it.
 &chas_trigger(vnum)&0 - Has the specified trigger attached.
 &cid&0 - The unique id of the object.
+&cin_obj&0 - If the object is inside another object, returns that object.
 &cis_component(name/vnum, ...)&0 - Returns whether or not the object matches
    one of the components listed here. Specify as many as you want, separated
    by commas.
@@ -247,6 +273,9 @@ Return value:  return 0 to prevent removing the item
 
 Activated each time a character is wearing this object and tries to remove it.
 
+Only the FIRST remove trigger on an object will run unless it also has the
+Allow-Multiple type.
+
 Variables:
   &c%actor%&0 - The character attempting to remove the object.
 #d
@@ -270,6 +299,9 @@ Wear (object trigger)
 Return value:  return 0 to prevent wearing the item
 
 Activated each time a character attempts to wear the object.
+
+Only the FIRST wear trigger on an object will run unless it also has the
+Allow-Multiple type.
 
 Variables:
   &c%actor%&0 - The character attempting to wear the object.

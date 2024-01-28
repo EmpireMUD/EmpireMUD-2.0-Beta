@@ -245,7 +245,7 @@ if %room.template% == 10850
   end
   if (!%actor.on_quest(10850)% && !%actor.completed_quest(10850)%)
     %send% %actor% You must start the quest 'Enter the Soulstream' before entering.
-    %send% %actor% Use 'quest start Enter' to begin the quest.
+    %send% %actor% Use 'start Enter Soulstream' to begin the quest.
     %send% %actor% (If you can't see the quest, try 'toggle tutorials'.)
     %echoaround% %actor% ~%actor% is pushed back through the portal.
     return 0

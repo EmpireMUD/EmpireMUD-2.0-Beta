@@ -2,7 +2,7 @@
 *   File: db.player.c                                     EmpireMUD 2.0b5 *
 *  Usage: Database functions related to players and the player table      *
 *                                                                         *
-*  EmpireMUD code base by Paul Clarke, (C) 2000-2015                      *
+*  EmpireMUD code base by Paul Clarke, (C) 2000-2024                      *
 *  All rights reserved.  See license.doc for complete information.        *
 *                                                                         *
 *  EmpireMUD based upon CircleMUD 3.0, bpl 17, by Jeremy Elson.           *
@@ -37,6 +37,7 @@
 *   Helpers
 *   Languages
 *   Map Memory
+*   Player Wipe
 *   Playtime Tracking
 *   Empire Member/Greatness Tracking
 *   Empire Player Management
@@ -50,13 +51,10 @@
 extern const char *anonymous_public_hosts[];
 extern const char *default_channels[];
 extern int top_account_id;
-extern int top_idnum;
 
 // external funcs
 ACMD(do_slash_channel);
-void add_all_gain_hooks(char_data *ch);
 void add_archetype_lore(char_data *ch);
-void apply_all_ability_techs(char_data *ch);
 EVENT_CANCEL_FUNC(cancel_affect_expire_event);
 void check_minipets_and_companions(char_data *ch);
 void check_player_events(char_data *ch);
@@ -362,6 +360,10 @@ void free_account(account_data *acct) {
 		free(pkd);
 	}
 	
+	// free unlocks
+	free_account_friends(&acct->friends);
+	free_unlocked_archetypes(acct);
+	
 	free(acct);
 }
 
@@ -373,10 +375,11 @@ void free_account(account_data *acct) {
 * @param int nr The id of the account.
 */
 void parse_account(FILE *fl, int nr) {
-	char err_buf[MAX_STRING_LENGTH], line[256], str_in[256];
+	char err_buf[MAX_STRING_LENGTH], line[256], str_in[256], str_in2[256];
 	struct account_player *plr;
 	account_data *acct, *find;
 	struct pk_data *pk;
+	struct unlocked_archetype *unarch;
 	int int_in[3];
 	long l_in;
 	
@@ -414,6 +417,43 @@ void parse_account(FILE *fl, int nr) {
 			exit(1);
 		}
 		switch (*line) {
+			case 'D': { // data
+				switch (*(line+1)) {
+					case '0': {	// D0: unlocked archetypes
+						if ((sscanf(line, "D0 %d", &int_in[0])) != 1) {
+							log("SYSERR: Format error in D0 data section of %s", err_buf);
+							exit(1);
+						}
+						
+						// add if not present
+						HASH_FIND_INT(acct->unlocked_archetypes, &int_in[0], unarch);
+						if (!unarch) {
+							CREATE(unarch, struct unlocked_archetype, 1);
+							unarch->vnum = int_in[0];
+							HASH_ADD_INT(acct->unlocked_archetypes, vnum, unarch);
+						}
+						break;
+					}
+					default: {
+						log("SYSERR: Format error in D%c data section of %s", *(line+1), err_buf);
+						exit(1);
+					}
+				}
+				break;
+			}
+			case 'F': {	// friend
+				if (sscanf(line, "F%d %d %s %s", &int_in[0], &int_in[1], str_in, str_in2) != 4) {
+					log("SYSERR: Format error in F line of %s", err_buf);
+					exit(1);
+				}
+				
+				// runs twice: import original name, import current name
+				if (strcmp(str_in, "*")) {
+					add_account_friend_id(acct, int_in[1], int_in[0], str_in);
+				}
+				add_account_friend_id(acct, int_in[1], int_in[0], str_in2);
+				break;
+			}
 			case 'K': {	// killed by
 				if (sscanf(line, "K %d %d %d %ld", &int_in[0], &int_in[1], &int_in[2], &l_in) != 4) {
 					log("SYSERR: Format error in K section of %s", err_buf);
@@ -564,7 +604,9 @@ void write_account_index(FILE *fl) {
 void write_account_to_file(FILE *fl, account_data *acct) {
 	char temp[MAX_STRING_LENGTH];
 	struct account_player *plr;
+	struct friend_data *friend, *next_friend;
 	struct pk_data *pk;
+	struct unlocked_archetype *unarch, *next_unarch;
 	
 	if (!fl || !acct) {
 		syslog(SYS_ERROR, LVL_START_IMM, TRUE, "SYSERR: write_account_to_file called without %s", !fl ? "file" : "account");
@@ -577,6 +619,17 @@ void write_account_to_file(FILE *fl, account_data *acct) {
 	strcpy(temp, NULLSAFE(acct->notes));
 	strip_crlf(temp);
 	fprintf(fl, "%s~\n", temp);
+	
+	// D: data
+	// D0: unlocked archetypes
+	HASH_ITER(hh, acct->unlocked_archetypes, unarch, next_unarch) {
+		fprintf(fl, "D0 %d\n", unarch->vnum);
+	}
+	
+	// F: friends
+	HASH_ITER(hh, acct->friends, friend, next_friend) {
+		fprintf(fl, "F%d %d %s %s\n", friend->status, friend->account_id, (friend->original_name ? friend->original_name : "*"), (friend->name ? friend->name : "Unknown"));
+	}
 	
 	// K: player kills
 	LL_FOREACH(acct->killed_by, pk) {
@@ -647,7 +700,7 @@ bool add_player_to_table(player_index_data *plr) {
 * be run after accounts are loaded, but before the mud boots up.
 *
 * This also determines:
-*   top_idnum
+*   top_idnum / DATA_TOP_IDNUM
 *   top_account_id
 */
 void build_player_index(void) {
@@ -656,6 +709,8 @@ void build_player_index(void) {
 	player_index_data *index;
 	bool has_players;
 	char_data *ch;
+	
+	int top_idnum = data_get_int(DATA_TOP_IDNUM);
 	
 	HASH_ITER(hh, account_table, acct, next_acct) {
 		acct->last_logon = 0;	// reset
@@ -688,6 +743,7 @@ void build_player_index(void) {
 				
 				GET_ACCOUNT(ch) = acct;	// not set by load_player
 
+				affect_total(ch);
 				CREATE(index, player_index_data, 1);
 				update_player_index(index, ch);
 				
@@ -730,6 +786,9 @@ void build_player_index(void) {
 			free_account(acct);
 		}
 	}
+	
+	// update this
+	data_set_int(DATA_TOP_IDNUM, top_idnum);
 }
 
 
@@ -823,7 +882,7 @@ void free_char(char_data *ch) {
 		free_mob_tags(&MOB_TAGGED_BY(ch));
 		while ((purs = MOB_PURSUIT(ch))) {
 			MOB_PURSUIT(ch) = purs->next;
-			free(purs);
+			free_pursuit(purs);
 		}
 	}
 	
@@ -902,8 +961,8 @@ void free_char(char_data *ch) {
 		if (GET_DISGUISED_NAME(ch)) {
 			free(GET_DISGUISED_NAME(ch));
 		}
-		if (GET_MOVEMENT_STRING(ch)) {
-			free(GET_MOVEMENT_STRING(ch));
+		if (GET_ACTION_STRING(ch)) {
+			free(GET_ACTION_STRING(ch));
 		}
 		
 		free_resource_list(GET_ACTION_RESOURCES(ch));
@@ -1016,6 +1075,7 @@ void free_char(char_data *ch) {
 			free(mount);
 		}
 		free_player_event_data(GET_EVENT_DATA(ch));
+		free_trait_hooks(&GET_ABILITY_TRAIT_HOOKS(ch));
 		
 		while ((eq_set = GET_EQ_SETS(ch))) {
 			GET_EQ_SETS(ch) = eq_set->next;
@@ -1039,7 +1099,7 @@ void free_char(char_data *ch) {
 				add_to_object_list(eus->obj);
 				extract_obj(eus->obj);
 			}
-			free(eus);
+			free_empire_unique_storage(eus);
 		}
 		
 		free_player_completed_quests(&GET_COMPLETED_QUESTS(ch));
@@ -1169,12 +1229,12 @@ char_data *load_player(char *name, bool normal) {
 * @return char_data* The loaded character.
 */
 char_data *read_player_from_file(FILE *fl, char *name, bool normal, char_data *ch) {
-	char line[MAX_INPUT_LENGTH], error[MAX_STRING_LENGTH], str_in[MAX_INPUT_LENGTH], *read;
+	char line[MAX_INPUT_LENGTH], error[MAX_STRING_LENGTH], str_in[MAX_INPUT_LENGTH], *read, *tmp;
 	int account_id = NOTHING, ignore_pos = 0, junk;
 	struct lore_data *lore, *last_lore = NULL, *new_lore;
 	struct over_time_effect_type *dot, *last_dot = NULL;
 	struct affected_type *af, *next_af, *af_list = NULL;
-	struct empire_unique_storage *eus;
+	struct empire_unique_storage *eus, *last_eus = NULL;
 	struct player_quest *plrq, *last_plrq = NULL;
 	struct offer_data *offer, *last_offer = NULL;
 	struct alias_data *alias, *last_alias = NULL;
@@ -1196,10 +1256,13 @@ char_data *read_player_from_file(FILE *fl, char *name, bool normal, char_data *c
 	account_data *acct;
 	bitvector_t bit_in;
 	bool end = FALSE;
+	room_data *room;
 	trig_data *trig;
 	double dbl_in;
 	long l_in[3], stored;
 	char c_in[2];
+	
+	pause_affect_total = TRUE;
 	
 	// allocate player if we didn't receive one
 	if (!ch) {
@@ -1307,6 +1370,12 @@ char_data *read_player_from_file(FILE *fl, char *name, bool normal, char_data *c
 						GET_ACTION_ROOM(ch) = i_in[3];
 					}
 				}
+				else if (!strn_cmp(line, "Actstr: ", 8)) {
+					if (GET_ACTION_STRING(ch)) {
+						free(GET_ACTION_STRING(ch));
+					}
+					GET_ACTION_STRING(ch) = str_dup(trim(line + 10));
+				}
 				else if (!strn_cmp(line, "Action-res: ", 12)) {
 					if (sscanf(line + 12, "%d %d %d %d", &i_in[0], &i_in[1], &i_in[2], &i_in[3]) == 4) {
 						// argument order is for consistency with other resource lists
@@ -1323,6 +1392,17 @@ char_data *read_player_from_file(FILE *fl, char *name, bool normal, char_data *c
 							GET_ACTION_RESOURCES(ch) = res;
 						}
 						last_res = res;
+					}
+				}
+				else if (!strn_cmp(line, "Action-targets: ", 16)) {
+					if (sscanf(line + 16, "%d %lld %d %d", &i_in[0], &bit_in, &i_in[2], &i_in[3]) == 4) {
+						// character and vehicle must be converted once in the game
+						GET_ACTION_TEMPORARY_CHAR_ID(ch) = i_in[0];
+						GET_ACTION_MULTI_TARG(ch) = bit_in;
+						GET_ACTION_TEMPORARY_VEH_ID(ch) = i_in[2];
+						GET_ACTION_ROOM_TARG(ch) = i_in[3];
+						
+						// object targets are lost in this process
 					}
 				}
 				else if (!strn_cmp(line, "Action-vnum: ", 13)) {
@@ -1428,7 +1508,8 @@ char_data *read_player_from_file(FILE *fl, char *name, bool normal, char_data *c
 					CAN_GAIN_NEW_SKILLS(ch) = atoi(line + 21) ? TRUE : FALSE;
 				}
 				else if (!strn_cmp(line, "Can Get Bonus Skills: ", 22)) {
-					CAN_GET_BONUS_SKILLS(ch) = atoi(line + 22) ? TRUE : FALSE;
+					// this property is no longer used
+					// CAN_GET_BONUS_SKILLS(ch) = atoi(line + 22) ? TRUE : FALSE;
 				}
 				else if (!strn_cmp(line, "Class: ", 7)) {
 					GET_CLASS(ch) = find_class_by_vnum(atoi(line + 7));
@@ -1681,17 +1762,42 @@ char_data *read_player_from_file(FILE *fl, char *name, bool normal, char_data *c
 				break;
 			}
 			case 'H': {
-				if (!strn_cmp(line, "Highest Known Level: ", 21)) {
+				if (!strn_cmp(line, "Highest Greatness: ", 19)) {
+					GET_HIGHEST_KNOWN_GREATNESS(ch) = atoi(line + 19);
+				}
+				else if (!strn_cmp(line, "Highest Known Level: ", 21)) {
 					GET_HIGHEST_KNOWN_LEVEL(ch) = atoi(line + 21);
 				}
 				else if (!strn_cmp(line, "History: ", 9)) {
-					sscanf(line + 9, "%d %ld", &i_in[0], &l_in[1]);
+					if (sscanf(line + 9, "%d %ld %d %d %d %d", &i_in[0], &l_in[1], &i_in[2], &i_in[3], &i_in[4], &i_in[5]) != 6) {
+						// backwards-compatible
+						i_in[2] = 0;	// access_level
+						i_in[3] = 0;	// rank
+						i_in[4] = NOTHING;	// language
+						i_in[5] = 0;	// is_disguised
+						if (sscanf(line + 9, "%d %ld", &i_in[0], &l_in[1]) != 2) {
+							// discard unknown message
+							tmp = fread_string(fl, error);
+							free(tmp);
+							break;
+						}
+					}
 					if (i_in[0] >= 0 && i_in[0] < NUM_CHANNEL_HISTORY_TYPES) {
 						struct channel_history_data *hist;
 						CREATE(hist, struct channel_history_data, 1);
 						hist->timestamp = l_in[1];
+						hist->access_level = i_in[2];
+						hist->rank = i_in[3];
+						hist->language = i_in[4];
+						hist->is_disguised = i_in[5] ? TRUE : FALSE;
 						hist->message = fread_string(fl, error);
 						DL_APPEND(GET_HISTORY(ch, i_in[0]), hist);
+					}
+				}
+				else if (!strn_cmp(line, "Home Room: ", 11)) {
+					GET_HOME_LOCATION(ch) = atoi(line + 11);
+					if (GET_HOME_LOCATION(ch) != NOWHERE && (!(room = real_room(GET_HOME_LOCATION(ch))) || ROOM_PRIVATE_OWNER(room) != GET_IDNUM(ch))) {
+						GET_HOME_LOCATION(ch) = NOWHERE;
 					}
 				}
 				else if (!strn_cmp(line, "Home Storage: ", 14)) {
@@ -1713,6 +1819,15 @@ char_data *read_player_from_file(FILE *fl, char *name, bool normal, char_data *c
 						eus->obj = obj;
 						
 						DL_APPEND(GET_HOME_STORAGE(ch), eus);
+						
+						last_eus = eus;
+					}
+				}
+				else if (!strn_cmp(line, "Home Store Timer: ", 18)) {
+					if (sscanf(line + 18, "%d %d", &i_in[0], &i_in[1]) == 2) {
+						if (last_eus) {
+							add_storage_timer(&last_eus->timers, i_in[0], i_in[1]);
+						}
 					}
 				}
 				BAD_TAG_WARNING(line);
@@ -1892,10 +2007,11 @@ char_data *read_player_from_file(FILE *fl, char *name, bool normal, char_data *c
 					GET_MOUNT_VNUM(ch) = atoi(line + 12);
 				}
 				else if (!strn_cmp(line, "Mvstring: ", 10)) {
-					if (GET_MOVEMENT_STRING(ch)) {
-						free(GET_MOVEMENT_STRING(ch));
+					// old version of "Actstr:"
+					if (GET_ACTION_STRING(ch)) {
+						free(GET_ACTION_STRING(ch));
 					}
-					GET_MOVEMENT_STRING(ch) = str_dup(trim(line + 10));
+					GET_ACTION_STRING(ch) = str_dup(trim(line + 10));
 				}
 				BAD_TAG_WARNING(line);
 				break;
@@ -2127,6 +2243,9 @@ char_data *read_player_from_file(FILE *fl, char *name, bool normal, char_data *c
 				else if (!strn_cmp(line, "Speaking: ", 10)) {
 					GET_SPEAKING(ch) = atoi(line + 10);
 				}
+				else if (!strn_cmp(line, "Status Messages: ", 17)) {
+					GET_STATUS_MESSAGES(ch) = asciiflag_conv(line + 17);
+				}
 				else if (!strn_cmp(line, "Syslog Flags: ", 14)) {
 					SYSLOG_FLAGS(ch) = asciiflag_conv(line + 14);
 				}
@@ -2134,7 +2253,10 @@ char_data *read_player_from_file(FILE *fl, char *name, bool normal, char_data *c
 				break;
 			}
 			case 'T': {
-				if (!strn_cmp(line, "Temporary Account: ", 19)) {
+				if (!strn_cmp(line, "Temperature: ", 13)) {
+					GET_TEMPERATURE(ch) = atoi(line + 13);
+				}
+				else if (!strn_cmp(line, "Temporary Account: ", 19)) {
 					GET_TEMPORARY_ACCOUNT_ID(ch) = atoi(line + 19);
 				}
 				else if (!strn_cmp(line, "Title: ", 7)) {
@@ -2256,6 +2378,8 @@ char_data *read_player_from_file(FILE *fl, char *name, bool normal, char_data *c
 		}
 	}
 	free(cont_row);
+
+	pause_affect_total = FALSE;	
 	
 	return ch;
 }
@@ -2422,6 +2546,9 @@ void update_player_index(player_index_data *index, char_data *ch) {
 	
 	index->account_id = GET_ACCOUNT(ch) ? GET_ACCOUNT(ch)->id : 0;	// may not be set yet
 	index->last_logon = ch->prev_logon;
+	if (GET_ACCOUNT(ch)) {
+		GET_ACCOUNT(ch)->last_logon = MAX(GET_ACCOUNT(ch)->last_logon, ch->prev_logon);
+	}
 	index->birth = ch->player.time.birth;
 	index->played = ch->player.time.played;
 	index->access_level = GET_ACCESS_LEVEL(ch);
@@ -2447,7 +2574,7 @@ void update_player_index(player_index_data *index, char_data *ch) {
 * @param char_data *ch The player to write.
 */
 void write_player_primary_data_to_file(FILE *fl, char_data *ch) {
-	struct affected_type *af, *new_af, *next_af, *af_list;
+	struct affected_type *af;
 	struct player_ability_data *abil, *next_abil;
 	struct player_skill_data *skill, *next_skill;
 	struct player_craft_data *pcd, *next_pcd;
@@ -2459,10 +2586,10 @@ void write_player_primary_data_to_file(FILE *fl, char_data *ch) {
 	struct over_time_effect_type *dot;
 	struct slash_channel *loadslash;
 	struct slash_channel *channel;
-	obj_data *char_eq[NUM_WEARS];
 	char temp[MAX_STRING_LENGTH];
 	struct cooldown_data *cool;
 	struct resource_data *res;
+	struct obj_apply *apply;
 	int iter, deficit[NUM_POOLS], pool[NUM_POOLS];
 	long timer;
 	
@@ -2483,39 +2610,34 @@ void write_player_primary_data_to_file(FILE *fl, char_data *ch) {
 		deficit[iter] = GET_DEFICIT(ch, iter);
 		pool[iter] = GET_CURRENT_POOL(ch, iter);
 	}
-	
-	// unaffect the character to store raw numbers: equipment
+
+	// unaffect: gear
 	for (iter = 0; iter < NUM_WEARS; ++iter) {
-		if (GET_EQ(ch, iter)) {
-			char_eq[iter] = unequip_char(ch, iter);
-			/* this is almopst certainly an error here as this is called on every save:
-			#ifndef NO_EXTRANEOUS_TRIGGERS
-				remove_otrigger(char_eq[iter], ch);
-			#endif
-			*/
-		}
-		else {
-			char_eq[iter] = NULL;
+		if (GET_EQ(ch, iter) && wear_data[iter].count_stats) {
+			for (apply = GET_OBJ_APPLIES(GET_EQ(ch, iter)); apply; apply = apply->next) {
+				affect_modify(ch, apply->location, apply->modifier, NOBITS, FALSE);
+			}
+			if (GET_OBJ_AFF_FLAGS(GET_EQ(ch, iter))) {
+				affect_modify(ch, APPLY_NONE, 0, GET_OBJ_AFF_FLAGS(GET_EQ(ch, iter)), FALSE);
+			}
 		}
 	}
 	
-	// unaffect: passives
+	// unaffect: passive buffs
 	LL_FOREACH(GET_PASSIVE_BUFFS(ch), af) {
 		affect_modify(ch, af->location, af->modifier, af->bitvector, FALSE);
 	}
 	
 	// unaffect: affects
-	af_list = NULL;
-	while ((af = ch->affected)) {
-		CREATE(new_af, struct affected_type, 1);
-		*new_af = *af;
-		new_af->expire_event = NULL;
-		LL_PREPEND(af_list, new_af);
-		affect_remove(ch, af);
+	LL_FOREACH(ch->affected, af) {
+		affect_modify(ch, af->location, af->modifier, af->bitvector, FALSE);
 	}
 	
-	// this is almost certainly ignored due to pause_affect_total
-	affect_total(ch);
+	// unaffect: bonus pools
+	apply_bonus_pools(ch, FALSE);
+	
+	// balance out any deficits before saving
+	check_deficits(ch);
 	
 	// reset attributes
 	for (iter = 0; iter < NUM_ATTRIBUTES; ++iter) {
@@ -2582,13 +2704,22 @@ void write_player_primary_data_to_file(FILE *fl, char_data *ch) {
 			// argument order is for consistency with other resource lists
 			fprintf(fl, "Action-res: %d %d %d %d\n", res->vnum, res->amount, res->type, res->misc);
 		}
+		if (GET_ACTION_CHAR_TARG(ch) || GET_ACTION_MULTI_TARG(ch) || GET_ACTION_VEH_TARG(ch) || GET_ACTION_ROOM_TARG(ch) != NOWHERE || GET_ACTION_TEMPORARY_CHAR_ID(ch) != 0 || GET_ACTION_TEMPORARY_VEH_ID(ch) != NOTHING) {
+			// object targets are not quit-safe and are not saved
+			fprintf(fl, "Action-targets: %d %lld %d %d\n", GET_ACTION_CHAR_TARG(ch) ? CAST_BY_ID(GET_ACTION_CHAR_TARG(ch)) : GET_ACTION_TEMPORARY_CHAR_ID(ch), GET_ACTION_MULTI_TARG(ch), GET_ACTION_VEH_TARG(ch) ? VEH_VNUM(GET_ACTION_VEH_TARG(ch)) : GET_ACTION_TEMPORARY_VEH_ID(ch), GET_ACTION_ROOM_TARG(ch));
+		}
+	}
+	if (GET_ACTION_STRING(ch)) {
+		strcpy(temp, GET_ACTION_STRING(ch));
+		temp[MAX_ACTION_STRING] = '\0';	// ensure not longer than this (we would not be able to load it)
+		fprintf(fl, "Actstr: %s\n", temp);
 	}
 	if (GET_ADVENTURE_SUMMON_RETURN_LOCATION(ch) != NOWHERE) {
 		fprintf(fl, "Adventure Summon Instance: %d\n", GET_ADVENTURE_SUMMON_INSTANCE_ID(ch));
 		fprintf(fl, "Adventure Summon Loc: %d\n", GET_ADVENTURE_SUMMON_RETURN_LOCATION(ch));
 		fprintf(fl, "Adventure Summon Map: %d\n", GET_ADVENTURE_SUMMON_RETURN_MAP(ch));
 	}
-	for (af = af_list; af; af = af->next) {	// stored earlier
+	LL_FOREACH(ch->affected, af) {
 		if (af->expire_time == UNLIMITED) {
 			timer = UNLIMITED;
 		}
@@ -2620,9 +2751,6 @@ void write_player_primary_data_to_file(FILE *fl, char_data *ch) {
 	// 'C'
 	if (CAN_GAIN_NEW_SKILLS(ch)) {
 		fprintf(fl, "Can Gain New Skills: 1\n");
-	}
-	if (CAN_GET_BONUS_SKILLS(ch)) {
-		fprintf(fl, "Can Get Bonus Skills: 1\n");
 	}
 	fprintf(fl, "Class: %d\n", GET_CLASS(ch) ? CLASS_VNUM(GET_CLASS(ch)) : NOTHING);
 	fprintf(fl, "Class Progression: %d\n", GET_CLASS_PROGRESSION(ch));
@@ -2697,7 +2825,11 @@ void write_player_primary_data_to_file(FILE *fl, char_data *ch) {
 	}
 	
 	// 'H'
+	fprintf(fl, "Highest Greatness: %d\n", GET_HIGHEST_KNOWN_GREATNESS(ch));
 	fprintf(fl, "Highest Known Level: %d\n", GET_HIGHEST_KNOWN_LEVEL(ch));
+	if (GET_HOME_LOCATION(ch) != NOWHERE) {
+		fprintf(fl, "Home Room: %d\n", GET_HOME_LOCATION(ch));
+	}
 	
 	// 'I'
 	for (iter = 0; iter < MAX_IGNORES; ++iter) {
@@ -2767,11 +2899,6 @@ void write_player_primary_data_to_file(FILE *fl, char_data *ch) {
 	if (GET_MOUNT_VNUM(ch) != NOTHING) {
 		fprintf(fl, "Mount Vnum: %d\n", GET_MOUNT_VNUM(ch));
 	}
-	if (GET_MOVEMENT_STRING(ch)) {
-		strcpy(temp, GET_MOVEMENT_STRING(ch));
-		temp[MAX_MOVEMENT_STRING] = '\0';	// ensure not longer than this (we would not be able to load it)
-		fprintf(fl, "Mvstring: %s\n", temp);
-	}
 	
 	// 'O'
 	if (GET_OLC_MAX_VNUM(ch) > 0 || GET_OLC_MIN_VNUM(ch) > 0 || GET_OLC_FLAGS(ch) != NOBITS) {
@@ -2837,11 +2964,15 @@ void write_player_primary_data_to_file(FILE *fl, char_data *ch) {
 	if (GET_SPEAKING(ch) != NOTHING) {
 		fprintf(fl, "Speaking: %d\n", GET_SPEAKING(ch));
 	}
+	fprintf(fl, "Status Messages: %s\n", bitv_to_alpha(GET_STATUS_MESSAGES(ch)));
 	if (SYSLOG_FLAGS(ch)) {
 		fprintf(fl, "Syslog Flags: %s\n", bitv_to_alpha(SYSLOG_FLAGS(ch)));
 	}
 	
 	// 'T'
+	if (GET_TEMPERATURE(ch)) {
+		fprintf(fl, "Temperature: %d\n", GET_TEMPERATURE(ch));
+	}
 	if (GET_TITLE(ch)) {
 		fprintf(fl, "Title: %s\n", GET_TITLE(ch));
 	}
@@ -2859,49 +2990,51 @@ void write_player_primary_data_to_file(FILE *fl, char_data *ch) {
 	
 	// # save equipment
 	for (iter = 0; iter < NUM_WEARS; ++iter) {
-		if (char_eq[iter]) {
-			Crash_save(char_eq[iter], fl, iter + 1);	// save at iter+1 because 0 == LOC_INVENTORY
+		if (GET_EQ(ch, iter)) {
+			Crash_save(GET_EQ(ch, iter), fl, iter + 1);	// save at iter+1 because 0 == LOC_INVENTORY
 		}
 	}
 	
 	// END PLAYER FILE
 	fprintf(fl, "End Player File\n");
 	
-	// re-affect: passives
+	// re-affect: bonus pools
+	apply_bonus_pools(ch, TRUE);
+	
+	// re-affect: gear
+	for (iter = 0; iter < NUM_WEARS; ++iter) {
+		if (GET_EQ(ch, iter) && wear_data[iter].count_stats) {
+			for (apply = GET_OBJ_APPLIES(GET_EQ(ch, iter)); apply; apply = apply->next) {
+				affect_modify(ch, apply->location, apply->modifier, NOBITS, TRUE);
+			}
+			if (GET_OBJ_AFF_FLAGS(GET_EQ(ch, iter))) {
+				affect_modify(ch, APPLY_NONE, 0, GET_OBJ_AFF_FLAGS(GET_EQ(ch, iter)), TRUE);
+			}
+		}
+	}
+	
+	// re-affect: passive buffs
 	LL_FOREACH(GET_PASSIVE_BUFFS(ch), af) {
 		affect_modify(ch, af->location, af->modifier, af->bitvector, TRUE);
 	}
 	
-	// re-apply: affects
-	for (af = af_list; af; af = next_af) {
-		next_af = af->next;
-		affect_to_char_silent(ch, af);
-		free(af);
+	// re-affect: affects
+	for (af = ch->affected; af; af = af->next) {
+		affect_modify(ch, af->location, af->modifier, af->bitvector, TRUE);
 	}
 	
-	// re-apply: equipment
-	for (iter = 0; iter < NUM_WEARS; ++iter) {
-		if (char_eq[iter]) {
-			/* this is almost certainly an error since this is called on every save:
-			#ifndef NO_EXTRANEOUS_TRIGGERS
-				if (wear_otrigger(char_eq[iter], ch, iter)) {
-			#endif
-			*/
-					// this line may depend on the above if NO_EXTRANEOUS_TRIGGERS is off
-					equip_char(ch, char_eq[iter], iter);
-			/* probably an error here (see above):
-			#ifndef NO_EXTRANEOUS_TRIGGERS
-				}
-				else {
-					obj_to_char(char_eq[iter], ch);
-				}
-			#endif
-			*/
-		}
-	}
+	// this will ensure caps and pay off any deficits
+	check_deficits(ch);
 	
 	// restore pools, which may have been modified
 	for (iter = 0; iter < NUM_POOLS; ++iter) {
+		// TODO remove this if these never log
+		if (GET_CURRENT_POOL(ch, iter) != pool[iter]) {
+			log("Debug: Current pool changed in write_player_primary_data_to_file for %s: %d to %d", GET_NAME(ch), pool[iter], GET_CURRENT_POOL(ch, iter));
+		}
+		if (GET_DEFICIT(ch, iter) != deficit[iter]) {
+			log("Debug: Deficit changed in write_player_primary_data_to_file for %s: %d to %d", GET_NAME(ch), deficit[iter], GET_DEFICIT(ch, iter));
+		}
 		GET_CURRENT_POOL(ch, iter) = pool[iter];	// set ok: character cannot have taken damage here
 		GET_DEFICIT(ch, iter) = deficit[iter];
 	}
@@ -2931,6 +3064,7 @@ void write_player_delayed_data_to_file(FILE *fl, char_data *ch) {
 	struct player_lastname *lastn;
 	struct trig_proto_list *tpro;
 	struct player_eq_set *eq_set;
+	struct storage_timer *stimer;
 	struct companion_mod *cmod;
 	struct trig_var_data *vars;
 	struct player_quest *plrq;
@@ -3006,7 +3140,7 @@ void write_player_delayed_data_to_file(FILE *fl, char_data *ch) {
 	// 'H'
 	for (iter = 0; iter < NUM_CHANNEL_HISTORY_TYPES; ++iter) {
 		DL_FOREACH(GET_HISTORY(ch, iter), hist) {
-			fprintf(fl, "History: %d %ld\n%s~\n", iter, hist->timestamp, NULLSAFE(hist->message));
+			fprintf(fl, "History: %d %ld %d %d %d %d\n%s~\n", iter, hist->timestamp, hist->access_level, hist->rank, hist->language, hist->is_disguised ? 1 : 0, NULLSAFE(hist->message));
 		}
 	}
 	DL_FOREACH(GET_HOME_STORAGE(ch), eus) {
@@ -3015,6 +3149,10 @@ void write_player_delayed_data_to_file(FILE *fl, char_data *ch) {
 		}
 		fprintf(fl, "Home Storage: %d %d %d\n", eus->island, eus->amount, eus->flags);
 		Crash_save_one_obj_to_file(fl, eus->obj, 0);
+		
+		DL_FOREACH(eus->timers, stimer) {
+			fprintf(fl, "Home Store Timer: %d %d\n", stimer->timer, stimer->amount);
+		}
 	}
 	
 	// 'I'
@@ -3294,11 +3432,10 @@ void add_loaded_player(char_data *ch) {
 
 
 /**
-* This has the same purpose as get_player_vis_or_file, but won't screw anything
-* up if the target is online but invisible. You can call SAVE_CHAR(ch) like
-* normal. You should call store_loaded_char() if is_file == TRUE, or the player
-* won't be stored. If you do NOT wish to save the character, you can use
-* free_char() instead.
+* This function finds a character in-game or loads them from file. You can call
+* SAVE_CHAR(ch) like normal. You should call store_loaded_char() if is_file ==
+* TRUE, or changes to the player won't be stored. If you do NOT wish to save
+* the character, you can use free_char() instead.
 *
 * If you do not free the character yourself, it will automatically be freed
 * within 1 second. Leaving characters in this state can be advantageous if you
@@ -3326,9 +3463,11 @@ char_data *find_or_load_player(char *name, bool *is_file) {
 				ch = lpd->ch;
 			}
 			else if ((ch = load_player(index->name, TRUE))) {
-				SET_BIT(PLR_FLAGS(ch), PLR_KEEP_LAST_LOGIN_INFO);
+				SET_BIT(PLR_FLAGS(ch), PLR_KEEP_LAST_LOGIN_INFO);;
 				*is_file = TRUE;
 				add_loaded_player(ch);
+				refresh_character_on_load(ch);
+				affect_total(ch);
 			}
 		}
 	}
@@ -3344,6 +3483,46 @@ char_data *find_or_load_player(char *name, bool *is_file) {
 	}
 	
 	return ch;
+}
+
+
+/**
+* This function finds a character in-game or loads them from file. You can call
+* SAVE_CHAR(ch) like normal. You should call store_loaded_char() if is_file ==
+* TRUE, or changes to the player won't be stored. If you do NOT wish to save
+* the character, you can use free_char() instead.
+*
+* If you do not free the character yourself, it will automatically be freed
+* within 1 second. Leaving characters in this state can be advantageous if you
+* expect several functions to load them in sequence.
+*
+* @param int idnum The player id.
+* @param bool *is_file A place to store whether or not we loaded from file
+* @return char_data *ch or NULL
+*/
+char_data *find_or_load_player_by_idnum(int idnum, bool *is_file) {
+	struct loaded_player_data *lpd;
+	player_index_data *index;
+	char_data *ch = NULL;
+	
+	*is_file = FALSE;
+	
+	if (!(ch = is_playing(idnum))) {
+		HASH_FIND_INT(loaded_player_hash, &idnum, lpd);
+		if (lpd) {	// look in the loaded player hash first
+			*is_file = TRUE;
+			ch = lpd->ch;
+		}
+		else if ((index = find_player_index_by_idnum(idnum)) && (ch = load_player(index->name, TRUE))) {
+			SET_BIT(PLR_FLAGS(ch), PLR_KEEP_LAST_LOGIN_INFO);
+			*is_file = TRUE;
+			add_loaded_player(ch);
+			refresh_character_on_load(ch);
+			affect_total(ch);
+		}
+	}
+	
+	return ch;	// if any
 }
 
 
@@ -3713,29 +3892,33 @@ void announce_login(char_data *ch) {
 			if (!IS_IMMORTAL(desc->character) || !PRF_FLAGGED(desc->character, PRF_AUTONOTES)) {
 				continue;
 			}
-			if (GET_ACCESS_LEVEL(desc->character) < GET_ACCESS_LEVEL(ch)) {
+			if (GET_ACCESS_LEVEL(desc->character) < get_highest_access_level(GET_ACCOUNT(ch))) {
 				continue;
 			}
 			
+			// header divider
 			snprintf(buf, sizeof(buf), "(%s account notes)", GET_NAME(ch));
-			msg_to_char(desc->character, "%s- %s ", GET_ACCOUNT(ch)->notes, buf);
+			msg_to_char(desc->character, "- %s ", buf);
 			
 			// rest of the divider
 			for (iter = 0; iter < 79 - (3 + strlen(buf)); ++iter) {
 				buf2[iter] = '-';
 			}
 			buf2[iter] = '\0';	// terminate
-			msg_to_char(desc->character, "%s\r\n", buf2);
+			msg_to_char(desc->character, "%s\r\n%s", buf2, GET_ACCOUNT(ch)->notes);
 		}
 	}
 	
 	// mortlog
-	if (GET_INVIS_LEV(ch) == 0) {
-		if (config_get_bool("public_logins") && !PLR_FLAGGED(ch, PLR_NEEDS_NEWBIE_SETUP)) {
+	if (GET_INVIS_LEV(ch) == 0 && !PLR_FLAGGED(ch, PLR_NEEDS_NEWBIE_SETUP)) {
+		if (config_get_bool("public_logins")) {
 			mortlog("%s has entered the game", PERS(ch, ch, TRUE));
 		}
-		else if (GET_LOYALTY(ch)) {
-			log_to_empire(GET_LOYALTY(ch), ELOG_LOGINS, "%s has entered the game", PERS(ch, ch, TRUE));
+		else {
+			mortlog_friends(ch, "%s has entered the game", PERS(ch, ch, TRUE));
+			if (GET_LOYALTY(ch)) {
+				log_to_empire(GET_LOYALTY(ch), ELOG_LOGINS, "%s has entered the game", PERS(ch, ch, TRUE));
+			}
 		}
 	}
 }
@@ -3881,7 +4064,7 @@ void check_skills_and_abilities(char_data *ch) {
 			plsk->level = SKILL_MAX_LEVEL(plsk->ptr);
 		}
 	}
-	update_class(ch);
+	update_class_and_abilities(ch);
 	check_ability_levels(ch, NOTHING);
 }
 
@@ -3935,6 +4118,7 @@ void clear_player(char_data *ch) {
 	GET_MARK_LOCATION(ch) = NOWHERE;
 	GET_MOUNT_VNUM(ch) = NOTHING;
 	GET_PLEDGE(ch) = NOTHING;
+	GET_HOME_LOCATION(ch) = NOWHERE;
 	GET_TOMB_ROOM(ch) = NOWHERE;
 	GET_ADVENTURE_SUMMON_RETURN_LOCATION(ch) = NOWHERE;
 	GET_ADVENTURE_SUMMON_RETURN_MAP(ch) = NOWHERE;
@@ -3944,6 +4128,7 @@ void clear_player(char_data *ch) {
 	GET_IMMORTAL_LEVEL(ch) = -1;	// Not an immortal
 	GET_LAST_VEHICLE(ch) = NOTHING;
 	GET_SPEAKING(ch) = NOTHING;
+	GET_ACTION_ROOM_TARG(ch) = NOWHERE;
 }
 
 
@@ -4149,7 +4334,7 @@ void enter_player_game(descriptor_data *d, int dolog, bool fresh) {
 	player_index_data *index;
 	vehicle_data *veh;
 	empire_data *emp;
-	int iter, duration;
+	int iter, duration, top_idnum;
 	
 	pause_affect_total = TRUE;	// prevent unnecessary totaling
 
@@ -4173,7 +4358,10 @@ void enter_player_game(descriptor_data *d, int dolog, bool fresh) {
 	
 	// ensure the player has an idnum and is in the index
 	if (GET_IDNUM(ch) <= 0) {
-		GET_IDNUM(ch) = ++top_idnum;
+		top_idnum = data_get_int(DATA_TOP_IDNUM) + 1;
+		data_set_int(DATA_TOP_IDNUM, top_idnum);
+		GET_IDNUM(ch) = top_idnum;
+		
 		ch->script_id = GET_IDNUM(ch);
 	}
 	if (!(index = find_player_index_by_idnum(GET_IDNUM(ch)))) {
@@ -4209,8 +4397,14 @@ void enter_player_game(descriptor_data *d, int dolog, bool fresh) {
 				// ensure they are on the same continent they used to be when it finds them a new loadroom
 				GET_LAST_ROOM(ch) = GET_LOAD_ROOM_CHECK(ch);
 				load_room = NULL;
-				stop_action = TRUE;
+				try_home = TRUE;
 			}
+		}
+		else if (!load_room) {
+			// instance gone?
+			GET_LAST_ROOM(ch) = GET_LOAD_ROOM_CHECK(ch);
+			load_room = NULL;
+			try_home = TRUE;
 		}
 	}
 	
@@ -4283,18 +4477,9 @@ void enter_player_game(descriptor_data *d, int dolog, bool fresh) {
 		announce_login(ch);
 	}
 	
-	affect_total(ch);
-	
 	if (stop_action) {
 		cancel_action(ch);
 	}
-		
-	// verify skills, abilities, and class and skill/gear levels are up-to-date
-	check_skills_and_abilities(ch);
-	determine_gear_level(ch);
-	add_all_gain_hooks(ch);
-	
-	queue_delayed_update(ch, CDU_SAVE);
 
 	// re-join slash-channels
 	global_mute_slash_channel_joins = TRUE;
@@ -4317,6 +4502,14 @@ void enter_player_game(descriptor_data *d, int dolog, bool fresh) {
 	}
 	global_mute_slash_channel_joins = FALSE;
 	
+	// refresh and apply abilities, bonuses, etc
+	refresh_character_on_load(ch);
+	add_all_gain_hooks(ch);
+	
+	// update the index in case any of this changed
+	index = find_player_index_by_idnum(GET_IDNUM(ch));
+	update_player_index(index, ch);
+	
 	// in some cases, we need to re-read tech when the character logs in
 	if ((emp = GET_LOYALTY(ch))) {
 		if (REREAD_EMPIRE_TECH_ON_LOGIN(ch)) {
@@ -4330,56 +4523,20 @@ void enter_player_game(descriptor_data *d, int dolog, bool fresh) {
 		}
 	}
 	
-	// remove stale coins
-	cleanup_coins(ch);
-	
-	// verify abils
-	if (emp) {
-		adjust_abilities_to_empire(ch, emp, FALSE);
-	}
-	assign_class_abilities(ch, NULL, NOTHING);
-	if (emp) {
-		adjust_abilities_to_empire(ch, emp, TRUE);
-	}
-	give_level_zero_abilities(ch);
-	
-	if (!IS_IMMORTAL(ch)) {
-		// ensure player has penalty if at war
-		if (fresh && GET_LOYALTY(ch) && is_at_war(GET_LOYALTY(ch)) && (duration = config_get_int("war_login_delay")) > 0) {
-			af = create_flag_aff(ATYPE_WAR_DELAY, duration, AFF_IMMUNE_PHYSICAL | AFF_NO_ATTACK | AFF_HARD_STUNNED, ch);
-			affect_join(ch, af, ADD_DURATION);
-			msg_to_char(ch, "\trYou are stunned for %d second%s because your empire is at war.\r\n", duration, PLURAL(duration));
-		}
-		else if (fresh && IN_HOSTILE_TERRITORY(ch) && (duration = config_get_int("hostile_login_delay")) > 0) {
-			af = create_flag_aff(ATYPE_HOSTILE_DELAY, duration, AFF_IMMUNE_PHYSICAL | AFF_NO_ATTACK | AFF_HARD_STUNNED, ch);
-			affect_join(ch, af, ADD_DURATION);
-			msg_to_char(ch, "\trYou are stunned for %d second%s because you logged in in hostile territory.\r\n", duration, PLURAL(duration));
-		}
-	}
-
-	// script/trigger stuff
-	pre_greet_mtrigger(ch, IN_ROOM(ch), NO_DIR, "login");	// cannot pre-greet for this
-	enter_wtrigger(IN_ROOM(ch), ch, NO_DIR, "login");
-	greet_mtrigger(ch, NO_DIR, "login");
-	greet_memory_mtrigger(ch);
-	greet_vtrigger(ch, NO_DIR, "login");
-	
-	// update the index in case any of this changed
-	index = find_player_index_by_idnum(GET_IDNUM(ch));
-	update_player_index(index, ch);
-	
 	// ensure data is up-to-date
-	apply_all_ability_techs(ch);
-	refresh_all_quests(ch);
+	cleanup_coins(ch);
 	check_learned_crafts(ch);
 	check_currencies(ch);
 	check_eq_sets(ch);
+	check_friends(ch);
 	check_languages(ch);
 	check_minipets_and_companions(ch);
+	check_unlocked_archetypes(ch);
+	refresh_all_quests(ch);
 	check_player_events(ch);
-	refresh_passive_buffs(ch);
-	convert_and_schedule_player_affects(ch);
 	schedule_all_obj_timers(ch);
+	ensure_home_storage_timers(ch, NOTHING);
+	RESET_LAST_MESSAGED_TEMPERATURE(ch);
 	
 	// break last reply if invis
 	if (GET_LAST_TELL(ch) && (repl = is_playing(GET_LAST_TELL(ch))) && (GET_INVIS_LEV(repl) > GET_ACCESS_LEVEL(ch) || (!IS_IMMORTAL(ch) && PRF_FLAGGED(repl, PRF_INCOGNITO)))) {
@@ -4399,7 +4556,6 @@ void enter_player_game(descriptor_data *d, int dolog, bool fresh) {
 	queue_delayed_update(ch, CDU_SAVE);
 	
 	pause_affect_total = FALSE;
-	affect_total(ch);
 	
 	// free reset?
 	if (RESTORE_ON_LOGIN(ch)) {
@@ -4426,7 +4582,7 @@ void enter_player_game(descriptor_data *d, int dolog, bool fresh) {
 		RESTORE_ON_LOGIN(ch) = FALSE;
 		clean_lore(ch);
 		clean_player_kills(ch);
-		affect_total(ch);	// again, in case things changed
+		reset_player_temperature(ch);
 	}
 	else {
 		// ensure not dead
@@ -4435,7 +4591,7 @@ void enter_player_game(descriptor_data *d, int dolog, bool fresh) {
 	}
 	
 	// position must be reset
-	if (AFF_FLAGGED(ch, AFF_EARTHMELD | AFF_MUMMIFY | AFF_DEATHSHROUD)) {
+	if (AFF_FLAGGED(ch, AFF_EARTHMELDED | AFF_MUMMIFIED | AFF_DEATHSHROUDED)) {
 		GET_POS(ch) = POS_SLEEPING;
 	}
 	else {
@@ -4457,6 +4613,8 @@ void enter_player_game(descriptor_data *d, int dolog, bool fresh) {
 	if (GET_LAST_COMPANION(ch) != NOTHING && (compan = has_companion(ch, GET_LAST_COMPANION(ch)))) {
 		load_companion_mob(ch, compan);
 	}
+	// redetect targets afterwards in case the companion was the target
+	redetect_ability_targets_on_login(ch);
 	
 	// ensure these are fresh
 	if (GET_LOYALTY(ch)) {
@@ -4464,9 +4622,30 @@ void enter_player_game(descriptor_data *d, int dolog, bool fresh) {
 		update_empire_members_and_greatness(GET_LOYALTY(ch));
 	}
 	
+	if (!IS_IMMORTAL(ch)) {
+		// ensure player has penalty if at war
+		if (fresh && GET_LOYALTY(ch) && is_at_war(GET_LOYALTY(ch)) && (duration = config_get_int("war_login_delay")) > 0) {
+			af = create_flag_aff(ATYPE_WAR_DELAY, duration, AFF_IMMUNE_PHYSICAL | AFF_NO_ATTACK | AFF_HARD_STUNNED, ch);
+			affect_join(ch, af, NOBITS);
+			msg_to_char(ch, "\trYou are stunned for %d second%s because your empire is at war.\r\n", duration, PLURAL(duration));
+		}
+		else if (fresh && IN_HOSTILE_TERRITORY(ch) && (duration = config_get_int("hostile_login_delay")) > 0) {
+			af = create_flag_aff(ATYPE_HOSTILE_DELAY, duration, AFF_IMMUNE_PHYSICAL | AFF_NO_ATTACK | AFF_HARD_STUNNED, ch);
+			affect_join(ch, af, NOBITS);
+			msg_to_char(ch, "\trYou are stunned for %d second%s because you logged in in hostile territory.\r\n", duration, PLURAL(duration));
+		}
+	}
+	
 	if (ch->desc) {
 		send_initial_MSDP(ch->desc);
 	}
+	
+	affect_total(ch);	// final affect total
+	
+	// script/trigger stuff
+	pre_greet_mtrigger(ch, IN_ROOM(ch), NO_DIR, "login");	// cannot pre-greet for this
+	enter_triggers(ch, NO_DIR, "login", FALSE);
+	greet_triggers(ch, NO_DIR, "login", FALSE);
 }
 
 
@@ -4493,8 +4672,10 @@ int get_highest_access_level(account_data *acct) {
 	struct account_player *plr;
 	int highest = 0;
 	
-	LL_FOREACH(acct->players, plr) {
-		highest = MAX(highest, plr->player->access_level);
+	if (acct) {
+		LL_FOREACH(acct->players, plr) {
+			highest = MAX(highest, plr->player->access_level);
+		}
 	}
 	
 	return highest;
@@ -4553,7 +4734,7 @@ void init_player(char_data *ch) {
 	int account_id = NOTHING;
 	account_data *acct;
 	bool first = FALSE;
-	int i, iter;
+	int i, iter, top_idnum;
 
 	// create a player_special structure, if needed
 	if (ch->player_specials == NULL) {
@@ -4617,7 +4798,10 @@ void init_player(char_data *ch) {
 	
 	// assign idnum
 	if (GET_IDNUM(ch) <= 0) {
-		GET_IDNUM(ch) = ++top_idnum;
+		top_idnum = data_get_int(DATA_TOP_IDNUM) + 1;
+		data_set_int(DATA_TOP_IDNUM, top_idnum);
+		GET_IDNUM(ch) = top_idnum;
+		
 		ch->script_id = GET_IDNUM(ch);
 	}
 	// ensure in index
@@ -4648,6 +4832,7 @@ void init_player(char_data *ch) {
 	
 	ch->char_specials.affected_by = 0;
 	GET_FIGHT_MESSAGES(ch) = DEFAULT_FIGHT_MESSAGES;
+	GET_STATUS_MESSAGES(ch) = DEFAULT_STATUS_MESSAGES;
 
 	for (i = 0; i < NUM_CONDS; i++) {
 		GET_COND(ch, i) = (GET_ACCESS_LEVEL(ch) == LVL_IMPL ? UNLIMITED : 0);
@@ -4679,6 +4864,28 @@ void purge_bound_items(int idnum) {
 			extract_obj(obj);
 		}
 	}
+}
+
+
+/**
+* Calls a series of functions when a character has been loaded from file either
+* to player the game or for some other purpose. Consider calling affect_total()
+* after calling this, when you're done loading everything.
+*
+* @param char_data *ch The player.
+*/
+void refresh_character_on_load(char_data *ch) {
+	if (!ch || IS_NPC(ch)) {
+		return;	// not for me
+	}
+	
+	determine_gear_level(ch);
+	check_skills_and_abilities(ch);
+	give_level_zero_abilities(ch);
+	apply_all_ability_techs(ch);
+	apply_bonus_pools(ch, TRUE);
+	refresh_passive_buffs(ch);
+	convert_and_schedule_player_affects(ch);
 }
 
 
@@ -4799,7 +5006,6 @@ void start_new_character(char_data *ch) {
 	set_title(ch, NULL);
 
 	/* Default Flags */
-	SET_BIT(PRF_FLAGS(ch), PRF_MORTLOG);
 	if (GET_ACCOUNT(ch) && config_get_bool("siteok_everyone")) {
 		SET_BIT(GET_ACCOUNT(ch)->flags, ACCT_SITEOK);
 	}
@@ -4881,7 +5087,7 @@ void start_new_character(char_data *ch) {
 		// skills
 		for (sk = GET_ARCH_SKILLS(arch); sk; sk = sk->next) {
 			level = get_skill_level(ch, sk->skill) + sk->level;
-			level = MIN(level, CLASS_SKILL_CAP);
+			level = MIN(level, MAX_SKILL_CAP);
 			set_skill(ch, sk->skill, level);
 			
 			// special case for vampire
@@ -4924,13 +5130,16 @@ void start_new_character(char_data *ch) {
 	}
 	
 	// set up class/level data
-	update_class(ch);
+	update_class_and_abilities(ch);
 	
 	// restore pools (last, in case they changed during bonus traits or somewhere)
 	set_health(ch, GET_MAX_HEALTH(ch));
 	set_move(ch, GET_MAX_MOVE(ch));
 	set_mana(ch, GET_MAX_MANA(ch));
 	set_blood(ch, GET_MAX_BLOOD(ch));
+	
+	// starting temperature
+	reset_player_temperature(ch);
 	
 	// prevent a repeat
 	REMOVE_BIT(PLR_FLAGS(ch), PLR_NEEDS_NEWBIE_SETUP);
@@ -5440,7 +5649,7 @@ void load_map_memory(char_data *ch) {
 					*name = '\0';
 				}
 				// and add
-				add_player_map_memory(ch, vnum, icon, name, timestamp);
+				add_player_map_memory(ch, vnum, double_map_ampersands(icon), name, timestamp);
 			}
 			else {
 				log("Warning: Unknown map memory line for %s: %s", GET_PC_NAME(ch), line);
@@ -5500,7 +5709,7 @@ void write_map_memory(char_data *ch) {
 	
 	HASH_ITER(hh, GET_MAP_MEMORY(ch), map_mem, next) {
 		if (map_mem->icon) {
-			fprintf(fl, "%d %ld %-4.4s %s\n", map_mem->vnum, map_mem->timestamp, map_mem->icon, (map_mem->name && *map_mem->name) ? map_mem->name : "~");
+			fprintf(fl, "%d %ld %-4.4s %s\n", map_mem->vnum, map_mem->timestamp, undouble_map_ampersands(map_mem->icon), (map_mem->name && *map_mem->name) ? map_mem->name : "~");
 		}
 		else {	// no icon
 			fprintf(fl, "* %d %ld %s\n", map_mem->vnum, map_mem->timestamp, (map_mem->name && *map_mem->name) ? map_mem->name : "~");
@@ -5509,6 +5718,59 @@ void write_map_memory(char_data *ch) {
 	
 	fclose(fl);
 	rename(tempname, filename);
+}
+
+
+ //////////////////////////////////////////////////////////////////////////////
+//// PLAYER WIPE /////////////////////////////////////////////////////////////
+
+/**
+* Checks for a player wipe (no players exist at startup) and initializes some
+* data.
+*/
+void check_for_player_wipe(void) {
+	account_data *acct, *next_acct;
+	book_data *book, *next_book;
+	struct author_data *author, *next_author;
+	
+	if (player_table_by_idnum) {
+		// players exist -- nothing to do
+		return;
+	}
+	if (data_get_int(DATA_TOP_IDNUM) < 1) {
+		// probably first startup, not a player wipe
+		return;
+	}
+	
+	log("Detected player wipe...");
+	
+	log("  Resetting top idnum");
+	data_set_int(DATA_TOP_IDNUM, 0);
+	
+	log("  Clearing accounts");
+	HASH_ITER(hh, account_table, acct, next_acct) {
+		HASH_DEL(account_table, acct);
+		free_account(acct);
+	}
+	save_index(DB_BOOT_ACCT);
+	
+	log("  Clearing book authors");
+	HASH_ITER(hh, book_table, book, next_book) {
+		if (BOOK_AUTHOR(book) > 1) {
+			BOOK_AUTHOR(book) = 0;
+		}
+	}
+	HASH_ITER(hh, author_table, author, next_author) {
+		if (author->idnum > 1) {
+			HASH_DEL(author_table, author);
+			free(author);
+		}
+	}
+	add_book_author(0);
+	save_author_books(0);
+	save_author_index();
+	
+	log("  Done");
 }
 
 
@@ -5770,7 +6032,7 @@ void update_member_data(char_data *ch) {
 	if ((acct = get_member_account(GET_LOYALTY(ch), GET_ACCOUNT(ch)->id, TRUE))) {
 		if ((data = get_member_account_player(acct, GET_IDNUM(ch), TRUE))) {
 			data->timeout_at = get_member_timeout_ch(ch);
-			data->greatness = GET_GREATNESS(ch);
+			data->greatness = GET_HIGHEST_KNOWN_GREATNESS(ch);
 		}
 	}
 }
@@ -5884,6 +6146,7 @@ void read_empire_members(empire_data *only_empire, bool read_techs) {
 			EMPIRE_NEXT_TIMEOUT(emp) = 0;
 			EMPIRE_MIN_LEVEL(emp) = 0;
 			EMPIRE_MAX_LEVEL(emp) = 0;
+			free_member_data(emp);
 		}
 	}
 	
@@ -5895,7 +6158,7 @@ void read_empire_members(empire_data *only_empire, bool read_techs) {
 		// load the player unless they're in-game
 		if ((ch = find_or_load_player(index->name, &is_file))) {
 			// check_delayed_load(ch);	// no longer need this as equipment is in the main file
-			affect_total(ch);
+			// affect_total(ch);	// no longer need this -- they are already totaled
 		}
 		
 		// check ch for empire traits
@@ -5925,10 +6188,6 @@ void read_empire_members(empire_data *only_empire, bool read_techs) {
 					EMPIRE_MIN_LEVEL(e) = level;
 				}
 				EMPIRE_MAX_LEVEL(e) = MAX(EMPIRE_MAX_LEVEL(e), level);
-
-				if (read_techs) {
-					adjust_abilities_to_empire(ch, e, TRUE);
-				}
 			}
 			
 			// update next timeout check
@@ -5955,6 +6214,7 @@ void read_empire_members(empire_data *only_empire, bool read_techs) {
 		
 		// delete emptypires
 		if ((!only_empire || emp == only_empire) && should_delete_empire(emp)) {
+			syslog(SYS_EMPIRE, 0, TRUE, "DEL: Empire %s auto-deleted with %d members", EMPIRE_NAME(emp), EMPIRE_TOTAL_MEMBER_COUNT(emp));
 			delete_empire(emp);
 			
 			// don't accidentally keep deleting if we were only doing 1 (it's been freed)
@@ -6252,20 +6512,20 @@ PROMO_APPLY(promo_facebook) {
 }
 
 
-// 1.5x skills
+// +10 to starting skills
 PROMO_APPLY(promo_skillups) {
 	struct player_skill_data *skill, *next_skill;
 	
 	HASH_ITER(hh, GET_SKILL_HASH(ch), skill, next_skill) {
 		if (skill->level > 0) {
 			if (get_skill_level(ch, skill->vnum) < BASIC_SKILL_CAP) {
-				set_skill(ch, skill->vnum, MIN(BASIC_SKILL_CAP, skill->level * 1.5));
+				set_skill(ch, skill->vnum, MIN(BASIC_SKILL_CAP, skill->level + 10));
 			}
 			else if (get_skill_level(ch, skill->vnum) < SPECIALTY_SKILL_CAP) {
-				set_skill(ch, skill->vnum, MIN(SPECIALTY_SKILL_CAP, skill->level * 1.5));
+				set_skill(ch, skill->vnum, MIN(SPECIALTY_SKILL_CAP, skill->level + 10));
 			}
 			else {
-				set_skill(ch, skill->vnum, MIN(CLASS_SKILL_CAP, skill->level * 1.5));
+				set_skill(ch, skill->vnum, MIN(MAX_SKILL_CAP, skill->level + 10));
 			}
 		}
 	}

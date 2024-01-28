@@ -14,19 +14,6 @@ which set of skills to use.
 
 See also: SCAVENGING, ROLE, SKILL, SKILL SYNERGY
 #
-BUTCHER
-
-Usage:  butcher <corpse>
-Tool:  knife
-
-With a little practice, you can butcher a corpse into smaller cuts of meat.
-This command succeeds about 60% of the time unskilled, and 100% of the time
-with the Huntsman ability. Not all corpses can be butchered.
-
-Gains experience when you butcher something.
-
-See also: HUNTSMAN, SKIN COMMAND
-#
 "BY MOONLIGHT"
 
 By Moonlight (Survival ability)
@@ -40,7 +27,7 @@ The improved version is called Nightsight.
 
 Gains experience passively when you're standing in a dark room.
 
-See also: DARK, NIGHTSIGHT
+See also: DARK, NIGHTSIGHT, PASSIVES
 #
 CARTOGRAPHY
 
@@ -58,8 +45,8 @@ Find Herbs (Survival ability)
 
 Usage:  pick
 
-With the ability to find herbs, your "pick" command will find new things instead
-of flowers.
+With the ability to find herbs, your "pick" command will find new things
+instead of flowers.
 
 Find Herbs gains experience when you pick herbs.
 
@@ -71,7 +58,7 @@ Herbs you can find:
  daggerbite - deserts
  bileberries - floodplains, riverbanks
 
-See also: HERBS, DISTILLED HERBS, PICK
+See also: MAGIC HERBS, DISTILLED HERBS, PICK
 #
 "FIND SHELTER" SHELTERS
 
@@ -169,7 +156,9 @@ Those with the Huntsman ability deal twice as much damage to animals. This
 ability has a chance to not activate at low levels.
 
 Huntsmen (and huntswomen) also gain access to the hunt command and get a 100%
-chance to skin or butcher corpses.
+chance to skin or butcher corpses -- at least, when there's something to skin
+or butcher from the corpse. Some corpses have no skin or butcher results, and
+some may only have rare results even with Huntsman.
 
 Gains experience when successfully hunt, when you hit an animal, or skin or
 butcher a corpse.
@@ -181,12 +170,22 @@ Immortals see also: MHUNT
 
 Master Survivalist (Survival ability)
 
-This ability gives you a 33% chance to dodge a blow that would deal fatal
-damage. You will be briefly stunned and unable to enter commands, for an amount
-of time based on your Dexterity (max 3 seconds).
+This ability gives you a 1/3 chance to survive a blow that would deal fatal
+damage. It can only trigger once every 75 seconds.
 
 Gains experience when you take a potentially fatal blow, whether you die or
 survive.
+#
+"MASTER TRACKER"
+
+Master Tracker (Survival ability)
+
+Usage:  where [name]
+Range:  75 tiles
+
+Increases the base range of your "where" command to 75 tiles.
+
+See also: WHERE
 #
 MOUNT DISMOUNT RIDING RIDE "ALL-TERRAIN RIDING" "ALL TERRAIN RIDING" ATR SADDLE
 
@@ -215,7 +214,7 @@ can make a simple saddle with Basic Crafts.
 Flying mounts require All-Terrain Riding, or Fly + Ride. Flying mounts allow
 you to see over blocked terrain that's at the same elevation as you are.
 
-Mounts with the waterwalk effect require All-Terrain Riding.
+Mounts with the waterwalking effect require All-Terrain Riding.
 
 Ride gains experience just from moving around while mounted, but All-Terrain
 Riding only gains experience when you cross water or mountains while mounted.
@@ -294,19 +293,17 @@ Gain skill by walking around in the wilderness without leaving tracks.
 
 See also: TRACK, WHERE, UNSEEN PASSING
 #
-"LAY PATHS" "MOUNTAIN PATHS"
+"MOUNTAIN PATHS"
 
-Lay Paths (Survival ability)
+Mountain Paths (Survival ability)
 
-Usage:  lay
-Cost:  20x (rock)
+Usage:  build mountain path
+Chameleon:  &y/\/\&0
 
-With the Lay Paths ability, you can lay roads on mountains. This ability
-also lets you remove them with the same command.
+Construct paths over the mountains to make for quick and easy travel even in
+rough terrain. These function as roads.
 
-Gains experience when you lay mountain roads.
-
-See also: ROADS
+See also: EXTENDED RADIUS, ROADS
 #
 PICK
 
@@ -359,7 +356,7 @@ Usage:  mount <swap | list> <keyword(s)>
 
 Stablemaster allows you to change your active mount anywhere. It also lets you
 release your active mount so that it can be traded to others. Gains experience
-passively, as long as you have at least one mount.
+when used.
 
 Without Stablemaster, you can't release your mount at all.
 
@@ -387,7 +384,7 @@ wasting movement points or wandering into the mouth of a shark.
 
 Gains experience when you swim around.
 
-See also: CANOE, SHIPBUILDING, SWIM, AUTOSWIM, WATERWALK
+See also: CANOE, SHIPBUILDING, SWIM, AUTOSWIM, WATERWALKING, PASSIVES
 #
 THIRST "SATED THIRST"
 
@@ -414,29 +411,6 @@ Gains experience when you find tracks.
 Example:
   > track dog
   You sense a trail south from here!
-
-See also: NO TRACE, UNSEEN PASSING
-#
-WHERE "MASTER TRACKER"
-
-Master Tracker (Survival ability)
-
-Usage:  where [animal | player]
-Range:  20 / 75 tiles
-
-Tells you the location of a near-by animal or player. Anybody can use this
-to find things that are close by, but master trackers can use it over a much
-larger area.
-
-If used with no argument, "where" instead tells you the location of all nearby
-players.
-
-Master Tracker gains experience when you find someone or something using 'where'
-even if it is within the normal range.
-
-Example:
-  > where
-  > where dragon
 
 See also: NO TRACE, UNSEEN PASSING
 #

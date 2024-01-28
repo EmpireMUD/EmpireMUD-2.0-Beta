@@ -87,7 +87,7 @@ set arg1 %arg.car%
 set arg %arg.cdr%
 set arg2 %arg.car%
 * discard the rest
-if %actor.char_target(%arg1%)% != %self%
+if %actor.char_target(%arg1%)% != %self% && !(companion /= %arg1%)
   return 0
   halt
 end
@@ -203,7 +203,7 @@ set arg1 %arg.car%
 set arg %arg.cdr%
 set arg2 %arg.car%
 * discard the rest
-if %actor.char_target(%arg1%)% != %self%
+if %actor.char_target(%arg1%)% != %self% && !(companion /= %arg1%)
   return 0
   halt
 end
@@ -662,7 +662,7 @@ end
 if !%leader.ability(Hide)%
   halt
 end
-dg_affect %self% HIDE on -1
+dg_affect %self% HIDDEN on -1
 ~
 #515
 Banshee Familiar Debuffs~
@@ -734,7 +734,7 @@ set arg1 %arg.car%
 set arg %arg.cdr%
 set arg2 %arg.car%
 * discard the rest
-if %actor.char_target(%arg1%)% != %self%
+if %actor.char_target(%arg1%)% != %self% && !(companion /= %arg1%)
   return 0
   halt
 end
@@ -796,7 +796,7 @@ set arg1 %arg.car%
 set arg %arg.cdr%
 set arg2 %arg.car%
 * discard the rest
-if %actor.char_target(%arg1%)% != %self%
+if %actor.char_target(%arg1%)% != %self% && !(companion /= %arg1%)
   return 0
   halt
 end
@@ -851,14 +851,14 @@ if %selected_ability%
 end
 ~
 #518
-Owl Shadow commmands~
+Owl Shadow commands~
 0 ct 0
 order~
 set arg1 %arg.car%
 set arg %arg.cdr%
 set arg2 %arg.car%
 * discard the rest
-if %actor.char_target(%arg1%)% != %self%
+if %actor.char_target(%arg1%)% != %self% && !(companion /= %arg1%)
   return 0
   halt
 end
@@ -920,7 +920,7 @@ set arg1 %arg.car%
 set arg %arg.cdr%
 set arg2 %arg.car%
 * discard the rest
-if %actor.char_target(%arg1%)% != %self%
+if %actor.char_target(%arg1%)% != %self% && !(companion /= %arg1%)
   return 0
   halt
 end
@@ -982,7 +982,7 @@ set arg1 %arg.car%
 set arg %arg.cdr%
 set arg2 %arg.car%
 * discard the rest
-if %actor.char_target(%arg1%)% != %self%
+if %actor.char_target(%arg1%)% != %self% && !(companion /= %arg1%)
   return 0
   halt
 end
@@ -1044,7 +1044,7 @@ set arg1 %arg.car%
 set arg %arg.cdr%
 set arg2 %arg.car%
 * discard the rest
-if %actor.char_target(%arg1%)% != %self%
+if %actor.char_target(%arg1%)% != %self% && !(companion /= %arg1%)
   return 0
   halt
 end
@@ -1096,6 +1096,19 @@ if %selected_ability%
   %echoaround% %actor% ~%actor% gives ~%self% an order.
   return 1
   halt
+end
+~
+#550
+Dark Minion: Rescale on load~
+0 n 100
+~
+set actor %self.leader%
+if %actor%
+  set skill %actor.skill(Vampire)%
+  if %skill% < 100
+    %scale% %self% %skill%
+    %restore% %self%
+  end
 end
 ~
 $

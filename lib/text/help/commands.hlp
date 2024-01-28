@@ -65,12 +65,21 @@ See also: TOGGLE
 #
 AFFECTS
 
-Usage:  affects
+Usage:  affects [person]
 
 This command shows a list of spells and abilities that are currently affecting
-you, along with their durations and a short summary of what they modify.
+you, along with their durations and a short summary of what they modify. Or,
+if you use it on someone else, you will see a simpler view of their affects.
 
-Affects are automatically shown at the bottom of the score.
+Your affects are also automatically shown at the bottom of the score.
+
+Buffs are shown in cyan for users with color displays. Debuffs are shown in red
+and, for screen-reader users, will also say (debuff) after the name. DoTs are
+similarly marked.
+
+When using this on another person, affects caused by you are marked with a
+(you) tag so that you can tell which are yours and which came from someone
+else.
 
 See also: SCORE
 #
@@ -174,7 +183,7 @@ have. For example, if you have an alias named "foo" and you import aliases, it
 won't overwrite the "foo" you already have with one from an alt.
 
 You can import: aliases, prompt, fprompt, preferences, fightmessages, recolors,
-slash-channels, and ignores.
+slash-channels, statusmessages, and ignores.
 
 "Preferences" will import some toggles, as well as mapsize.
 
@@ -298,7 +307,7 @@ Usage: toggle bother
 When bother is off, this toggle protects you from having your character
 affected by various other commands - you cannot be sired, you cannot be
 purified of vampirism, and vampires can't bite you unless you're restrained or
-unconscious. It also prevents players from ceding you land
+unconscious. It also prevents players from ceding you land.
 
 Turn bother on to allow yourself to be bitten or to have land ceded to you,
 but don't forget to turn it off again!
@@ -316,7 +325,16 @@ to 3.
 
 See also: COMPACT, MAPSIZE, TOGGLE
 #
-BUG TYPO IDEA
+BUFFS
+
+Usage:  buffs
+
+This command lists your buff abilities and whether or not they are currently
+active on you and your group.
+
+See also: BUFF
+#
+BUG BUGS TYPO TYPOS IDEA IDEAS SUBMISSIONS
 
 Usage:  bug <bug report>
         idea <your new idea>
@@ -369,7 +387,7 @@ Usage:  burn <building | vehicle | area | direction>
 
 To burn something, you must have fire sticks or some other lighter. You can use
 this command to light a building on fire, either from the same tile as the
-building (burn building), or from an adjecent tile (burn <direction>). If the
+building (burn building), or from an adjacent tile (burn <direction>). If the
 building is claimed, you must be at war with the owner to do this. Buildings
 may also catch fire when a torch is dropped or thrown into them.
 
@@ -389,6 +407,19 @@ requires the 'dismantle' privilege.
 To light torches or other items, use 'light'.
 
 See also: DOUSE, LIGHT, LIGHTERS, TORCH, PRIVILEGES
+#
+BUTCHER
+
+Usage:  butcher <corpse>
+Tool:  knife
+
+With a little practice, you can butcher a corpse into smaller cuts of meat.
+This command succeeds about 60% of the time unskilled, and 100% of the time
+with the Huntsman ability -- at least, when there's something to be butchered
+from the corpse. Not all corpses can be butchered, and some corpses only have
+rare results even with Huntsman.
+
+See also: HUNTSMAN, SKIN COMMAND
 #
 BUY LIST SHOP SHOPS
 
@@ -420,12 +451,25 @@ else.
 #
 CHANNEL-JOINS CHANNELJOINS "CHANNEL JOINS"
 
-Usage:  toggle channel-joins [on/off]
+Usage:  smessage channel joins [on | off]
 
 This toggles the messages which display when a player joins or leaves a
 slash-channel you are currently in.
 
-See also: SLASH-CHANNELS, TOGGLE
+See also: SLASH-CHANNELS, STATUS MESSAGES
+#
+CHANT CHANTS
+
+Usage:  chant [name] [target]
+        chant "<name>" [target]
+
+There are several ancient chants whose power you can still wield today. Type
+chant by itself to see if you know any chants. If a chant has multiple words
+in the name, you can use "quotes" around the name.
+
+Type "stop" to cancel a chant. Some chants do not end on their own.
+
+See also: help for individual chants, like HELP CHANT OF NATURE
 #
 CHART CHARTS
 
@@ -554,6 +598,17 @@ When a reboot has been set to a specific time, players are allowed to speed it
 up. If everyone types 'confirm,' it will reboot early. This should only be
 done when you're ready for the reboot, because you can't take it back.
 #
+CONJURE CONJURATION
+
+Usage:  conjure [object]
+        conjure [liquid] [container]
+
+Some abilities allow you to conjure items, or even fill drink containers with
+liquids. Typing this command without any arguments will tell you what you know
+how to conjure.
+
+Try "helpsearch conjure" to look for abilities like this.
+#
 CONSIDER
 
 Usage:  consider <target>
@@ -618,12 +673,12 @@ You cannot remove the global name from an island, even if you set its name to
 'none'.
 
 There are three ways an island name can become that island's global name:
-Discovery (the first empire to name an unexplored island sets its global name)
-Sole ownership (if yours is the only empire with a city on the island)
-Consensus (if all empires with cities on the island use the same name for it)
+ Discovery (the first empire to name an unexplored island sets its global name)
+ Sole ownership (if yours is the only empire with a city on the island)
+ Consensus (if all empires with cities on the island use the same name for it)
 
 Only discovery changes an island's global name immediately; all other changes
-only happen at the beginning of a new MUD year.
+only happen later, at the same time maintenance and depletions reset.
 #
 DIAGNOSE
 
@@ -811,7 +866,7 @@ Examples:
   
 Some vampires can also taste the blood of others.
 
-See also: FILL, HUNGER, POUR, TASTE BLOOD
+See also: FILL, HUNGER, POUR
 #
 EMOTE :
 
@@ -827,6 +882,15 @@ You can also do the following complex emotes:
  - Use #item to insert an item (e.g. "#sword")
 
 See also: SOCIALS
+#
+EMPTY
+
+Usage:  empty <thing>
+
+This command can be used to dump out a vehicle or container. It will even work
+on bound items in the vehicle.
+
+See also: GET
 #
 EQUIPMENT
 
@@ -865,7 +929,7 @@ This command gets quick info on your empire (or another). It is a short version
 of the longer info shown with the "empire" command, and it defaults to your
 empire if you give no argument.
 
-See also: EMPIRE
+See also: EMPIRE, COINS, TREASURE
 #
 EVENT EVENTS
 
@@ -991,14 +1055,14 @@ Reputation levels and values:
 #
 FIGHTMESSAGES "FIGHT MESSAGES" FMESSAGES "FIGHT SPAM" "COMBAT SPAM" "COMBAT MESSAGES"
 
-Usage:  fightmessages [type]
+Usage:  fightmessages [type] [on | off]
         fmessages all <on | off>
 
 This command lets you toggle which fight messages you do or don't see. This can
 make combat less spammy and easier to understand. You can use multi-word
 abbreviations for these toggles, like "miss ag me" for "misses against me".
 
-See also: TOGGLE
+See also: SMESSAGES, TOGGLE
 #
 FILL
 
@@ -1020,6 +1084,24 @@ Example:
   > fill canteen fountain
 
 See also: POUR, DRINK
+#
+FIRE CATAPULT CANNONS
+
+Usage:  fire <vehicle> <direction | target vehicle> 
+
+Certain vehicles are siege weapons and can fire at buildings or at other
+vehicles. You need heavy shot for this. You can shoot at buildings in adjacent
+rooms, or at vehicles in the same room.
+
+If you're aboard a ship with cannons, you can fire from onboard the ship, but
+it still fires only at vehicles in the room the ship is in, or at adjacent
+rooms from there.
+
+Example:  
+  > fire catapult north
+  > fire brigantine 2.brigantine
+
+See also: COOKING FIRE, DOUSE, HARNESS
 #
 FLEE
 
@@ -1050,6 +1132,34 @@ Examples:
   > follow self
 
 See also: AVOID, BECKON, GROUP, SNEAK
+#
+FRIEND FRIENDS UNFRIEND "FRIEND LIST" "FRIENDS LIST" "TOGGLE NO-FRIENDS" "TOGGLE NOFRIENDS" "NO-FRIENDS" "NOFRIENDS" "FRIEND REQUEST"
+
+Usage:  friends [-all]
+        friend <request | cancel> <name>
+        friend <accept | deny> <name>
+        unfriend <name>
+        toggle no-friends
+
+These commands allow you to view and manage your friends list. This list is
+account-wide and helps you and your friends keep track of each other when you
+have a lot of characters.
+
+Friends will see when you log in or out, and can see when you were last online.
+When a friend was sending you tells then switches characters with alternate,
+your reply command will still go to the correct alt.
+
+If you have some characters who you keep secret for any reason, use 'toggle
+no-friends' to keep those particular characters hidden from friends lists. To
+create a new secret character without it showing up as a friend to anyone, link
+it to an alt that already has no-friends toggled on. It will inherit this
+setting.
+
+See a list of waiting friend requests with "friends -all" or "friend accept".
+
+If a player is bothering you with friend requests, 'ignore' will silence them.
+
+See also: ALTERNATE, IGNORE, REPLY
 #
 GET TAKE
 
@@ -1157,7 +1267,7 @@ See also: DISPLAY, IGNORE, GROUP, TELL, SAY
 #
 HELP
 
-Usage:  help [command]
+Usage:  help [topic]
 
 Help searches for a partial match of the entered word, including any
 spaces that may follow the word. Help alone will give a list of the
@@ -1167,6 +1277,8 @@ Examples:
 
   > help hide
     will find the help text for the hide ability.
+
+Immortals may view mortal help files with: help -m <topic>
 
 See also: COMMANDS, HELPSEARCH, SOCIALS
 #
@@ -1266,7 +1378,7 @@ good idea to read them every once in a while.
 INVENTORY INV I
 
 Usage:  inventory
-        inventory [-k | -n] <keywords>
+        inventory [-k | -n | -b | -u | -#] <keywords>
         inventory -c <component type>
         inventory -w <wear location> [keywords]
         inventory -t <type> [keywords]
@@ -1276,8 +1388,11 @@ to check that no thieves have got to your backpack. When in a storage building,
 this also checks the stored items there.
 
 You can also search your inventory by keyword, or use the following flags:
+  &c-#&0 Only show the first # items.
   &c-k&0 Only show items marked (keep).
   &c-n&0 Omit items marked (keep).
+  &c-b&0 Only show bound items.
+  &c-u&0 Only show BoE items that aren't bound.
   &c-c&0 Show items of component type (e.g. 'lumber', 'large, single block').
   &c-w&0 Show items which can be worn in a given slot (e.g. 'finger').
   &c-t&0 Show items of a given type (e.g. 'weapon').
@@ -1557,7 +1672,7 @@ This shows your combat meters from your recent fights. If you turn on the
 "clearmeters" toggle, your meters will clear before every new fight. You can
 also type "clearmeters" to clear them at any time.
 
-See also: CLEARMETERS
+See also: CLEARMETERS, DAMAGE, DAMAGE NUMBERS
 #
 MINIPET MINIPETS MINI-PET MINI-PETS "MINI PET" "MINI PETS" PET PETS
 
@@ -1575,11 +1690,13 @@ There is no limit to how many minipets you can collect. Gotta collect 'em all!
 #
 MORTLOG
 
-Usage:  toggle mortlog [on/off]
+Usage:  smessages mortlog [on | off]
 
-This will give you periodic updates, such as when a player creates, logs in, or
-leaves (depending on the game's settings). It's useful in keeping up on current
-events. Mortlog is colored cyan.
+This toggles mortlogs on and off. Mortlogs give you periodic updates, such as
+when a player creates, logs in, or leaves (depending on the game's settings).
+It's useful in keeping up on current events. Mortlog is colored cyan.
+
+See also: STATUS MESSAGES
 #
 MOTD
 
@@ -1751,7 +1868,7 @@ See also: BANNER, TOGGLE
 #
 PORTAL PORTALS ENTER
 
-Building:  ~&b][&0~ portal  20 logs, 12 blocks, 20 nexus crystal  (High Sorcery ability)
+Building:  ~&b][&0~ portal  20 logs, 12 blocks, 20 nexus crystals  (High Sorcery ability)
 Built on:  plains, desert
 Fame:  1
 Commands:  portal [coordinates | number | keywords]
@@ -1777,8 +1894,8 @@ target empire and ally portals by portal number, but the -all list can't be
 targeted this way.
 
 Portals can only connect two locations on the same land mass (continent or
-island) unless your empire has a Portal Master. You can't open a portal at all
-if there isn't at least a Portal Mage.
+island) unless your empire has the Astral Cartography progress goal. You can't
+open a portal at all unless your empire has the Portalmancy progression.
 
 You can't enter a portal of any kind if it's on a tile you don't have
 permission to use, such as one owned by an enemy empire. Infiltrate can get
@@ -1786,7 +1903,7 @@ around this (you still use the 'enter' command).
 
 Immortals can open portals between any two locations.
 
-See also: PORTAL MAGIC, PORTAL MASTER, PORTAL SICKNESS, COLLAPSE, INFILTRATE
+See also: PORTAL SICKNESS, COLLAPSE, INFILTRATE
 #
 "PORTAL SICKNESS" "PORTALING SICKNESS" "PORTALLING SICKNESS"
 
@@ -1799,13 +1916,12 @@ before it wears off, you'll get five minutes of portal sickness instead. After
 that, you can portal again as soon as your portal sickness is below one minute.
 You can see your current portal sickness by typing 'cooldowns'.
 
-Portal mages only get four minutes of portal sickness instead of five. City-to-
-city portals cause just two minutes instead of five.
+City-to-city portals cause just two minutes instead of five.
 
 Only entering portals causes portal sickness. You can still open portals while
 you have portal sickness.
 
-See also: COOLDOWNS, ENTER, PORTALS, PORTAL MAGE
+See also: COOLDOWNS, ENTER, PORTALS
 #
 POUR
 
@@ -1831,6 +1947,16 @@ EmpireMUD does not use the 'practice' system. Instead, manage your skills and
 abilities with the 'skill' command.
 
 See also: SKILLS
+#
+PROCESS PROCESSING
+
+Usage:  process [number] <thing>
+        process info <thing>
+        process list <keywords>
+
+"Process" is a crafting command used mainly for herbs and spices.
+
+See also: PROCESS INFO, RECIPES, CRAFTING ABILITIES
 #
 PROGRESS PROGRESSION "EMPIRE PROGRESSION" "PROGRESS GOALS" "PROGRESSION GOALS" "PROGRESS POINTS" GOAL GOALS
 
@@ -1874,7 +2000,8 @@ be different from your regular prompt. Using "fprompt default" will cause you
 to see your normal prompt in combat.
 
 Typing "prompt off" will remove your prompt entirely, and "prompt default"
-will restore your default prompt.
+will restore your default prompt. You can also use "smessages" to turn off
+prompts temporarily.
 
 The base prompt is: &&0|%i/%u [&&y%C&&0]> 
 
@@ -1884,11 +2011,11 @@ Here are the prompt codes and what they do:
   %i  Health text         %u  Move text          %n  Mana text
   
   %b  Current blood       %t  Time               %I  Inventory size
-  %B  Maximum blood       %a  Current action
+  %B  Maximum blood       %T  Temperature        %a  Current action
   %d  Blood text          %_  Line break
   
   %e  % health of enemy   %f  % health of enemy's focus (the tank)
-                          %F  Current/total health of enemy's focus (if player)
+  %E  enemy name          %F  Current/total health of enemy's focus (if player)
   
   %c  conditions abbreviated (afk, hunger, thirst, etc)
   %C  conditions as words
@@ -1900,7 +2027,7 @@ For immortals:
   %x  immortal conditions abbreviated
   %X  immortal conditions as words
 
-See also: PROMPT SUGGESTIONS
+See also: PROMPT SUGGESTIONS, STATUS MESSAGES
 #
 "PROMPT SUGGESTIONS" "SUGGESTED PROMPTS" "SAMPLE PROMPTS" "PROMPT SAMPLES"
 
@@ -2046,6 +2173,9 @@ TELL. It works just as if you had typed 'tell <player> <message>' but makes
 it a bit easier. It can also be very useful in case someone invisible sends
 you a message.
 
+If someone is on your friends list, you will even be able to reply after they
+switch characters using alternate.
+
 Example:
 
 Ras tells you, 'Hi!'
@@ -2056,7 +2186,7 @@ Someone tells you, 'I am your secret admirer.'
 > reply Who are you?
 You tell someone, 'Who are you?'
 
-See also: IGNORE, TELL, NOTELL
+See also: IGNORE, TELL, NOTELL, ALTERNATE, FRIENDS
 Immortals see also: BREAKREPLY
 #
 REPORT
@@ -2066,6 +2196,28 @@ your group members, try the 'group' command by itself or the 'summary' command.
 If you want to see your own stats from combat, use 'meters'.
 
 See also: GROUP, METERS, SUMMARY
+#
+RESPAWN
+
+Usage:  respawn
+
+When your character has died, you can still observe for a short time. When you
+are ready to respawn, use this command.
+
+See also: BRIEF RESPITE, DEATH, TOMB
+#
+RITUAL RITE
+
+Usage:  ritual [type] [target]
+        ritual "<type>" [target]
+
+Sorcerers can learn powerful rituals. Type the ritual command by itself to see
+which ones you know. If a ritual has multiple words in the name, you can put
+quotes around it when using the ritual, or abbreviate it to one word.
+
+Type "stop" to cancel a ritual.
+
+See also: help for individual rituals, like HELP RITUAL OF BURDENS
 #
 ROADSIGN "ROAD SIGN" SIGN "BLANK SIGN"
 
@@ -2180,6 +2332,9 @@ gatehouses and tunnels) and sail requires continuous water (including buildings
 you can sail through, like bridges). If automatic pathfinding takes too long or
 creates too complex a path, it will fail.
 
+Anybody inside the vehicle will receive a message each time the vehicle moves.
+This can be disabled with the "smessages" command.
+
 Examples:
  > drive east
  > sail 3e 4n 7nw
@@ -2189,7 +2344,7 @@ Examples:
 Many vehicles cannot move through portals.
 
 See also: BOARD, DISEMBARK, DRAG, LAND VEHICLES, LEAD, SHIPBUILDING, SHIPS,
-STOP, TOGGLE, RUN
+STATUS MESSAGES, STOP, TOGGLE, RUN
 #
 SAVE
 
@@ -2207,7 +2362,9 @@ SAY OOCSAY OSAY TELL ASK WHISPER ' \"
 Usage:  say <string>
         say #<language> <string>
         oocsay <string>
-        <tell | whisper | ask> <player> <string>
+        tell <player> <string>
+        ask <player> [#<language>] <string>
+        whisper <player> [#<language>] <string>
 
 If you consider communicating with other beings, you might be understood
 better if you start your sentences with either say, tell, whisper or shout.
@@ -2223,6 +2380,7 @@ Examples:
   > say Hey, does anyone know how to get to Oz?
   > say #low-goblish Hello!
   > tell catje hi, how are you?
+  > whisper phil #english Do you speak this language?
 
 You can use ' as a shorthand for say, and " for oocsay, as in:
 
@@ -2297,8 +2455,19 @@ Available options:
  * toggle informative - If on, tiles will indicate if they are being built
      or dismantled, need repair, and some other status types.
  * toggle political - Indicates who owns each map tile.
+ * fightmessages - Reduce combat spam.
+ * statusmessages - Turn off some status messages.
+ * /leave and /join - Control which slash-channels you're on.
 
-See also: DISPLAY, SCAN, TOGGLE, MAPSIZE, FMESSAGES, MAPSCAN, CHART
+Tips:
+ - If you're having trouble finding the entrance to a building, try looking in
+   the direction of the building. If it says the entrance is "from the east",
+   it means you need to be on the east side of the building and moving west to
+   enter it.
+ - You can type 'tip' to cycle through the tips that show when you log in.
+
+See also: DISPLAY, SCAN, TOGGLE, MAPSIZE, FMESSAGES, SMESSAGES, MAPSCAN, CHART,
+   SLASH CHANNELS
 #
 SCROLLING
 
@@ -2309,6 +2478,23 @@ amount of information. The information is sent all at once, as preferred by
 some people for features like the WHO list.
 
 See also: TOGGLE
+#
+SEARCH "SEARCH COMMAND"
+
+Usage:  search
+Cooldown:  10 seconds
+
+When you know where to look, it's easier to find hidden thieves and assassins.
+This ability reveals people who use the hide command, although it doesn't
+always find them on the first try, and it won't find anyone who has Cling to
+Shadow.
+
+You can also find out if someone is earthmelded beneath you.
+
+To use this command effectively, you need an ability that grants it such as
+the "Search" ability.
+
+See also: HIDE, SEARCH ABILITY, SENSE LIFE RITUAL
 #
 SEED SEEDS SEEDING DESEED DE-SEED "REMOVE SEEDS" "SEED COMMAND"
 
@@ -2379,8 +2565,9 @@ the island you're shipping from. Once you queue items to be shipped, your NPCs
 will load up empty ships and move them to the target island (you can also
 specify docks on that island by coordinates). You must have docks at both ends.
 
-Shipments happen 4 times per day and take up to 4 days of game time to arrive
-(2 hours real time), depending on distance.
+Shipments are updated every 10 minytes and take up to 2 hours (real time) to
+arrive, depending on distance. Be careful shipping perishable items as they
+will be dumped overboard if they expire before the shipment is delivered.
 
 Items will automatically transfer from the empire inventory on the origin
 island to the empire inventory on the destination island, and the ship will
@@ -2399,7 +2586,32 @@ shipping system. You can also set this option on individual ships. (Workforce
 is not required to use the shipping system, but 'workforce no-work' is still
 used to prevent shipping.)
 
+* Privileged immortals may check the status of other empires' shipments by
+typing: ship "empire name" status
+
 See also: DISPATCH, DOCKS, EINVENTORY, ISLANDS, SHIPBUILDING, SHIPS, WORKFORCE
+#
+"SKIN COMMAND" SKINNING
+
+Usage:  skin <corpse>
+Tool:  knife
+
+You can skin a fresh corpse to get usable material, which can later be turned
+into good equipment. This command succeeds about 60% of the time unskilled, or
+100% of the time with the Huntsman ability -- at least, when there's something
+to skin from the corpse. Some corpses cannot be skinned, especially severely
+damaged and putrid ones. Some other corpses may only have rare skinning results
+even with Huntsman.
+
+Possible results from skinning and example animals:
+  small skin: rabbit, squirrel
+  large skin: deer, buffalo
+  shark skin: shark
+  snakeskin: any snake
+  fox fur: fox
+  big cat pelt: tiger, jaguar, leopard
+
+See also: SKINS, SEWING, LEATHERWORKING, RAWHIDE STITCHING, TAN, HUNTSMAN
 #
 SLEEP
 
@@ -2454,6 +2666,18 @@ usually from progress goals, it will be indicated here.
 
 See also: SAY, SHOUT
 #
+STATUSMESSAGES "STATUS MESSAGES" SMESSAGES
+
+Usage:  statusmessages [type] [on | off]
+        smessages all <on | off>
+
+This command lets you toggle which status messages you do or don't see. This may
+reduce spam for messages you see regularly. Type "smessages" by itself to see
+what options are available. You can use multi-word abbreviations for these
+toggles, like "extr temp" for "extreme temperature".
+
+See also: FMESSAGES, TOGGLE
+#
 STEALTHABLE
 
 Usage:  toggle stealthable [on/off]
@@ -2505,6 +2729,12 @@ alias inf toggle informative;look
 alias pol toggle political;look
 
 See also: ALIAS, IDEA
+#
+SUMMARY "COMBAT SUMMARY"
+
+Usage:  summary
+
+This command shows a summary of you, your allies, and your enemies in combat.
 #
 "SUMMON PLAYERS"
 
@@ -2566,7 +2796,36 @@ Example:
  > tellhistory
  Khufu tells you, 'hi!'
 
-See also: SAYHISTORY, TELL
+See also: HISTORY, TELL
+#
+TEMPERATURE COLD HOT FREEZING SWELTERING BALMY SCORCHING CHILLY
+
+Usage:  temperature
+
+This command tells you how warm or cold it is around you right now as well as
+how warm or cold you are.
+
+When you move to a location that's warmer or colder, your temperature rises or
+falls over the course of an in-game hour. Having a lit torch or camp fire will
+help keep you warm in the winter, and being in the water will help keep you
+cool in the summer. Drinking warm or cool liquids may also provide some relief
+from the temperature as well.
+
+Cold temperatures (in order): &Cchilly, cold, frosty, icy, frigid, freezing&0
+Comfortable temperatures: &Jcool, pleasant, balmy&0
+Hot temperatures: &Owarm, hot, scorching, sweltering, blistering, searing&0
+
+Some EmpireMUDs have penalties for being too cold or too hot:
+
+Cold penalties: slow effect, get hungry faster, actions are slow
+Freezing penalties: distracted from timed actions, damage over time
+
+Hot penalties: poor regeneration rate, get thirsty faster, actions are slow
+Sweltering penalties: distracted from timed actions, damage over time
+
+You can turn off alerts about changes in temperature with "smessages".
+
+See also: SURVEY, STATUS MESSAGES, TIME, WEATHER
 #
 THROW
 
@@ -2603,13 +2862,10 @@ Just like the real world, time is different in different parts of the game
 world. Eastern parts of the map are later in the day (or even the next morning)
 than western parts of the map.
 
-Handy time-conversion chart:
- - 1 regeneration tick in-game = 5 seconds
- - 1 hour in-game = 75 seconds
- - 1 day in-game = 30 minutes
- - 1 year in-game = 7.5 days
+Regeneration ticks are every 5 seconds. You can see how long in-game hours,
+days, and years are by typing "mudstats configs".
 
-See also: TIME ZONE, YEARLY RESET
+See also: SURVEY, TEMPERATURE, TIME ZONE, WEATHER, WORLD RESET, MUDSTATS
 #
 TITLE
 
@@ -2639,7 +2895,6 @@ Toggles:
   autorecall - if you're logged out over an hour, automatically sends you home
   autoswim - can enter water without typing 'swim'
   bother - allows "bothersome" things like bite and purify
-  channel-joins - blocks slash-channel join messages
   clearmeters - automatically clears your meters between combats
   compact - no extra newlines
   exits - shows or hides exits and directions when you 'look'
@@ -2648,8 +2903,8 @@ Toggles:
   item-details - shows level and some other information in inventory/equipment
   item-quality - shows superior/hard/group/boss info in inventory/equipment
   map-color - shut off color for just the map
-  mortlog - see logs when people create characters
   no-empire - will not create a new empire when you try to claim or build
+  no-friends - this alt is hidden from friends lists
   no-paint - turns off custom paint colors on buildings
   no-repeat - Some commands will say "ok" instead of typing out your message
   political - shows empire colors instead of terrain colors
@@ -2662,7 +2917,6 @@ Toggles:
   shout - the local shout channel
   stealthable - if off, you will be prevented from accidentally stealing
   tell - the tell channel
-  travel-look - automatically 'looks' after each run or when your vehicle moves
   tutorials - you won't see available tutorial quests if this is off
 
 Immortal toggles:
@@ -2678,7 +2932,7 @@ Immortal toggles:
 Note: Political and informative views only show fully-lit tiles at night, not
 dim tiles.
 
-See also: FIGHT MESSAGES, TOGGLE <type>
+See also: FIGHT MESSAGES, FRIENDS, STATUS MESSAGES, TOGGLE <type>
 #
 "TOGGLE NO-EMPIRE" "TOGGLE NOEMPIRE" NOEMPIRE NO-EMPIRE
 
@@ -2720,13 +2974,15 @@ Basic tombs:
 
 See also: TOMB BUILDING, STARTING LOCATION
 #
-TRAVEL-LOOK "TRAVEL LOOK" "TOGGLE TRAVEL-LOOK"
+TRAVEL-LOOK TRAVEL-AUTO-LOOK "TRAVEL LOOK" "TRAVEL AUTO LOOK"
 
-Usage:  toggle travel-look [on/off]
+Usage:  smessage travel auto look [on | off]
 
-This toggle causes you to automatically 'look' after each time you move when
-running or when driving, piloting, or sailing a vehicle. With this toggle off,
+This setting causes you to automatically 'look' after each time you move when
+running or when driving, piloting, or sailing a vehicle. With this message off,
 you only see a short message indicating you moved.
+
+See also: STATUS MESSAGES
 #
 TUNNEL "TUNNEL COMMAND"
 
@@ -2825,6 +3081,11 @@ Usage:  weather
 If you're uncertain whether the sun is shining or the rain is pouring down. 
 You'll have to be outside in order to tell however. It will also tell you if
 the sun or moon are up.
+
+You also receive alerts as the weather changes when you're outdoors or near a
+window. These messages can be disabled with the "smessages" command.
+
+See also: STATUS MESSAGES, SURVEY, TEMPERATURE, TIME
 #
 WHO
 

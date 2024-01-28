@@ -415,12 +415,13 @@ if (%actor.position% != Standing)
   halt
 end
 set target %self.val0%
-%load% v %target%
-* Todo: eval vehicle %self.room.first_vehicle_in_room% / etc
-* and use %vehicle.name% instead of "a rib-bone boat"
-* (see minipet use for an example)
-%send% %actor% You use @%self% and a rib-bone boat appears!
-%echoaround% %actor% ~%actor% uses @%self% and a rib-bone boat appears!
+%load% veh %target%
+set boat %self.room.vehicles%
+if %boat% && %boat.vnum% == %target%
+  nop %boat.unlink_instance%
+  %send% %actor% You use @%self% and @%boat% appears!
+  %echoaround% %actor% ~%actor% uses @%self% and @%boat% appears!
+end
 %purge% %self%
 ~
 #11116
@@ -991,7 +992,7 @@ if !%target%
 end
 %send% %target% ~%self% wraps *%self%self around you, mummifying you and dragging you off to blissful slumber...
 %echoaround% %target% ~%self% wraps *%self%self around ~%target%, mummifying *%target% and dragging *%target% off to blissful slumber...
-if %target.affect(3050)% || %target.level% >= (%self.level% + 100)
+if %target.aff_flagged(!STUN)% || %target.level% >= (%self.level% + 100)
   * stun immunity or high level
   %damage% %target% 50
   dg_affect %self% HARD-STUNNED on 15

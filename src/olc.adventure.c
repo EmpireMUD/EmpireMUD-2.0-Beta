@@ -2,7 +2,7 @@
 *   File: olc.adventure.c                                 EmpireMUD 2.0b5 *
 *  Usage: OLC for adventure zones                                         *
 *                                                                         *
-*  EmpireMUD code base by Paul Clarke, (C) 2000-2015                      *
+*  EmpireMUD code base by Paul Clarke, (C) 2000-2024                      *
 *  All rights reserved.  See license.doc for complete information.        *
 *                                                                         *
 *  EmpireMUD based upon CircleMUD 3.0, bpl 17, by Jeremy Elson.           *
@@ -56,11 +56,25 @@ bool audit_adventure(adv_data *adv, char_data *ch, bool only_one) {
 	char buf[MAX_STRING_LENGTH];
 	struct trig_proto_list *tpl;
 	bool found_limit, problem = FALSE;
+	adv_data *adv_iter, *next_adv;
 	trig_data *trig;
 	
 	if (GET_ADV_START_VNUM(adv) == 0 || GET_ADV_END_VNUM(adv) == 0) {
 		olc_audit_msg(ch, GET_ADV_VNUM(adv), "Vnums not set");
 		problem = TRUE;
+	}
+	else {
+		// check overlapping vnums
+		HASH_ITER(hh, adventure_table, adv_iter, next_adv) {
+			if ((GET_ADV_START_VNUM(adv_iter) >= GET_ADV_START_VNUM(adv) && GET_ADV_START_VNUM(adv_iter) <= GET_ADV_END_VNUM(adv)) || (GET_ADV_END_VNUM(adv_iter) >= GET_ADV_START_VNUM(adv) && GET_ADV_END_VNUM(adv_iter) <= GET_ADV_END_VNUM(adv))) {
+				olc_audit_msg(ch, GET_ADV_VNUM(adv), "Adventure %d %s is entirely within its vnum range", GET_ADV_VNUM(adv_iter), GET_ADV_NAME(adv_iter));
+				problem = TRUE;
+			}
+			else if ((GET_ADV_START_VNUM(adv) >= GET_ADV_START_VNUM(adv_iter) && GET_ADV_START_VNUM(adv) <= GET_ADV_END_VNUM(adv_iter)) || (GET_ADV_END_VNUM(adv) >= GET_ADV_START_VNUM(adv_iter) && GET_ADV_END_VNUM(adv) <= GET_ADV_END_VNUM(adv_iter))) {
+				olc_audit_msg(ch, GET_ADV_VNUM(adv), "Entirely with the vnum range of adventure %d %s", GET_ADV_VNUM(adv_iter), GET_ADV_NAME(adv_iter));
+				problem = TRUE;
+			}
+		}
 	}
 	if (GET_ADV_START_VNUM(adv) > GET_ADV_END_VNUM(adv)) {
 		olc_audit_msg(ch, GET_ADV_VNUM(adv), "Bad vnum set");
@@ -147,6 +161,8 @@ bool audit_adventure(adv_data *adv, char_data *ch, bool only_one) {
 	if (only_one && GET_ADV_START_VNUM(adv) <= GET_ADV_END_VNUM(adv)) {
 		snprintf(buf, sizeof(buf), "%d %d", GET_ADV_START_VNUM(adv), GET_ADV_END_VNUM(adv));
 		// OLC_x: auto-auditors
+		msg_to_char(ch, "Attack messages:\r\n");
+		olc_audit(ch, OLC_ATTACK, buf);
 		msg_to_char(ch, "Crafts:\r\n");
 		olc_audit(ch, OLC_CRAFT, buf);
 		msg_to_char(ch, "Mobs:\r\n");
@@ -735,7 +751,7 @@ void get_adventure_linking_display(struct adventure_link_rule *list, char *save_
 				break;
 			}
 			case ADV_LINK_TIME_LIMIT: {
-				sprintf(lbuf, "expires after %d minutes (%d:%02d:%02d)", rule->value, (rule->value / (60 * 24)), ((rule->value % (60 * 24)) / 60), ((rule->value % (60 * 24)) % 60));
+				sprintf(lbuf, "expires after %d minutes (%s)", rule->value, colon_time(rule->value, TRUE, NULL));
 				break;
 			}
 			case ADV_LINK_NOT_NEAR_SELF: {
@@ -819,7 +835,6 @@ void get_adventure_linking_display(struct adventure_link_rule *list, char *save_
 void olc_show_adventure(char_data *ch) {
 	adv_data *adv = GET_OLC_ADVENTURE(ch->desc);
 	char lbuf[MAX_STRING_LENGTH];
-	int time;
 	
 	if (!adv) {
 		return;
@@ -837,6 +852,8 @@ void olc_show_adventure(char_data *ch) {
 	sprintbit(GET_ADV_FLAGS(adv), adventure_flags, lbuf, TRUE);
 	sprintf(buf + strlen(buf), "<%sflags\t0> %s\r\n", OLC_LABEL_VAL(GET_ADV_FLAGS(adv), ADV_IN_DEVELOPMENT), lbuf);
 	
+	sprintf(buf + strlen(buf), "<%stemperature\t0> %s\r\n", OLC_LABEL_VAL(GET_ADV_TEMPERATURE_TYPE(adv), 0), temperature_types[GET_ADV_TEMPERATURE_TYPE(adv)]);
+	
 	sprintf(buf + strlen(buf), "<%sminlevel\t0> %d\r\n", OLC_LABEL_VAL(GET_ADV_MIN_LEVEL(adv), 0), GET_ADV_MIN_LEVEL(adv));
 	sprintf(buf + strlen(buf), "<%smaxlevel\t0> %d\r\n", OLC_LABEL_VAL(GET_ADV_MAX_LEVEL(adv), 0), GET_ADV_MAX_LEVEL(adv));
 	
@@ -844,20 +861,13 @@ void olc_show_adventure(char_data *ch) {
 	sprintf(buf + strlen(buf), "<%splayerlimit\t0> %d\r\n", OLC_LABEL_VAL(GET_ADV_PLAYER_LIMIT(adv), 0), GET_ADV_PLAYER_LIMIT(adv));
 	
 	// reset time display helper
-	if (GET_ADV_RESET_TIME(adv) > (60 * 24)) {
-		time = GET_ADV_RESET_TIME(adv) - (GET_ADV_RESET_TIME(adv) / (60 * 24));
-		sprintf(lbuf, " (%2d:%02d:%02d)", (GET_ADV_RESET_TIME(adv) / (60 * 24)), (time / 60), (time % 60));
-	}
-	else if (GET_ADV_RESET_TIME(adv) > 60) {
-		sprintf(lbuf, " (%2d:%02d)", (GET_ADV_RESET_TIME(adv) / 60), (GET_ADV_RESET_TIME(adv) % 60));
-	}
-	else if (GET_ADV_RESET_TIME(adv) <= 0) {
+	if (GET_ADV_RESET_TIME(adv) <= 0) {
 		strcpy(lbuf, " (never)");
 	}
 	else {
-		*lbuf = '\0';
+		strcpy(lbuf, colon_time(GET_ADV_RESET_TIME(adv), TRUE, NULL));
 	}
-	sprintf(buf + strlen(buf), "<%sreset\t0> %d minutes%s\r\n", OLC_LABEL_VAL(GET_ADV_RESET_TIME(adv), default_adv_reset), GET_ADV_RESET_TIME(adv), lbuf);
+	sprintf(buf + strlen(buf), "<%sreset\t0> %d minutes %s\r\n", OLC_LABEL_VAL(GET_ADV_RESET_TIME(adv), default_adv_reset), GET_ADV_RESET_TIME(adv), lbuf);
 
 	sprintf(buf + strlen(buf), "Linking rules: <%slinking\t0>\r\n", OLC_LABEL_PTR(GET_ADV_LINKING(adv)));
 	if (GET_ADV_LINKING(adv)) {
@@ -1553,6 +1563,12 @@ OLC_MODULE(advedit_reset) {
 OLC_MODULE(advedit_script) {
 	adv_data *adv = GET_OLC_ADVENTURE(ch->desc);
 	olc_process_script(ch, argument, &(GET_ADV_SCRIPTS(adv)), WLD_TRIGGER);
+}
+
+
+OLC_MODULE(advedit_temperature) {
+	adv_data *adv = GET_OLC_ADVENTURE(ch->desc);
+	GET_ADV_TEMPERATURE_TYPE(adv) = olc_process_type(ch, argument, "temperature", "temperature", temperature_types, GET_ADV_TEMPERATURE_TYPE(adv));
 }
 
 

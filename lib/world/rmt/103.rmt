@@ -4,7 +4,7 @@ A Scorched Nest~
 of the cave. From the looks of the nest, it must be at least the size of a
 full-grown man. And from the burning embers, it probably isn't far away.
 ~
-cd 0
+cd 0 0 -1
 M 0 10300 100.00 1
 S
 #10330
@@ -13,11 +13,42 @@ Inside a Massive Nest~
 whole trees. It's difficult to tell how long since the dragon was last here,
 but it did leave scorch marks.
 ~
-ag 0
+ag 0 0 -1
 E
 scorch marks~
 It looks like dragon's breath left these scorch marks.
 ~
 M 1 10331 100.00 1
+S
+#10370
+In the Back Room~
+   You manage to sneak back into the back room of the shop, nearly tripping
+over a box as you enter. It's stuffy, almost stifling, without any windows. 
+The only exit is the doorway you came through.
+~
+cd 0 0 -1
+E
+windows~
+There aren't any windows.
+~
+E
+doorway~
+The doorway leads back out into the main part of the small building.
+~
+E
+box boxes~
+There are several small boxes, but they're covered in dust.
+~
+E
+dust~
+Virtually everything in here is blanketed in dust.
+~
+E
+floor~
+   A fine layer of dust carpets the floor, except for some shuffled footprints
+from the doorway to the middle of the room. And your footprints, of courpse.
+~
+M 0 10370 100.00 1
+M 1 10370 100.00 1
 S
 $

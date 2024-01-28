@@ -4,7 +4,7 @@ goblin clothing~
 A set of goblin clothing is rotting on the ground.~
 The goblin clothing is in poor condition.
 ~
-2 oy ad 0 2
+2 oy ad 0 0 2
 0 0 0
 11 0
 M
@@ -17,7 +17,7 @@ goblin pants~
 A pair of goblin pants is lying here.~
 The goblin pants are holey, and smell hellish.
 ~
-2 oy af 0 1
+2 oy af 0 0 1
 0 0 0
 11 0
 S
@@ -27,7 +27,7 @@ goblin shoes~
 A pair of goblin shoes are splitting on the ground.~
 The goblin shoes are in disrepair.
 ~
-2 moy ag 0 2
+2 moy ag 0 0 2
 0 0 0
 11 0
 A
@@ -41,7 +41,7 @@ a pile of goblin coins~
 A tarnished pile of coins is lying here.~
 It doesn't look like there are too many coins here.
 ~
-11 m a 0 2
+11 m a 0 0 2
 1 -1 0
 2 0
 C
@@ -53,7 +53,7 @@ a goblincraft saddle~
 A goblincraft saddle has been left behind.~
 The saddle appears to be in good condition!
 ~
-2 emoy as 0 2
+2 emoy as 0 0 2
 0 0 0
 7 0
 A
@@ -67,7 +67,7 @@ a tarnished necklace~
 A tarnished necklace is coiled in the dust.~
 The necklace appears to be goblincraft.
 ~
-2 moy ac 0 2
+2 moy ac 0 0 2
 0 0 0
 2 0
 A
@@ -83,7 +83,7 @@ a goblin timepiece~
 A strange goblin timepiece is lying here.~
 It seems to be a wristband that tells time, but you can't read it.
 ~
-2 moy aj 0 2
+2 moy aj 0 0 2
 0 0 0
 0 0
 A
@@ -99,7 +99,7 @@ open-fingered gloves~
 A pair of open-fingered gloves is lying here.~
 The gloves appear to be goblincraft.
 ~
-2 moy ah 0 3
+2 moy ah 0 0 3
 0 0 0
 11 0
 A
@@ -115,7 +115,7 @@ a goblin collar~
 A goblin collar has been left on the ground.~
 The collar looks strong enough to protect the neck.
 ~
-2 moy ac 0 3
+2 moy ac 0 0 3
 0 0 0
 2 0
 A
@@ -129,7 +129,7 @@ a warg-bone earring~
 A strange bone earring is lying here.~
 The earring appears to be goblincraft.
 ~
-2 jmoy am 0 5
+2 moy am 0 0 6
 0 0 0
 14 0
 A
@@ -143,7 +143,7 @@ Zelkab's bone club~
 A bone club is sitting on the ground.~
 This goblincraft club looks to be primarily warg bone.
 ~
-1 ehmp an 0 3
+1 ehmp an 0 0 3
 0 3 5
 14 0
 A
@@ -161,7 +161,7 @@ Zelkab's armored gauntlets~
 A pair of armored gauntlets are lying here.~
 The gauntlets appear to be goblincraft.
 ~
-27 mp ah 0 3
+27 mp ah 0 0 3
 1 0 0
 7 0
 A
@@ -177,7 +177,7 @@ Garlgarl's glowing staff~
 A glowing bone staff is lying here.~
 The staff appears to be goblincraft, and made from warg bone.
 ~
-1 ehmp an 0 3
+1 ehmp an p 0 4
 0 1 19
 14 0
 A
@@ -195,7 +195,7 @@ Garlgarl's belt of herbs~
 A belt made of herbs is scattered here.~
 The belt appears to be goblincraft, and crude.
 ~
-27 mp al 0 2
+27 mp al 0 0 2
 0 0 0
 0 0
 A
@@ -211,7 +211,7 @@ Filks's firebranded bow~
 A firebranded bow is lying here.~
 The bow appears to be goblincraft.
 ~
-20 eimp ap 0 3
+20 eimp ap 0 0 3
 29 1 0
 0 0
 C
@@ -223,7 +223,7 @@ a bundle of goblin arrows~
 A bundle of goblin arrows is lying here.~
 The goblincraft arrows seem strong, but small.
 ~
-21 m a 0 5
+21 m a 0 0 5
 30 1 0
 0 0
 C
@@ -235,7 +235,7 @@ Walts's reinforced leggings~
 A pair of reinforced leggings is lying here.~
 The leggings are goblincraft, for sure.
 ~
-27 emp af 0 2
+27 emp af 0 0 2
 1 0 0
 7 0
 A
@@ -254,7 +254,7 @@ A heavy belt is lying here.~
    The belt appears to be goblincraft. While it's heavy for a goblin, it looks
 quite light for a human.
 ~
-27 mp al 0 4
+27 mp al 0 0 4
 1 0 0
 7 0
 A
@@ -274,7 +274,7 @@ Nilbog's armored waistband~
 An armored waistband is lying here.~
 It is a goblincraft waistband.
 ~
-27 emp al 0 3
+27 emp al 0 0 3
 3 0 0
 0 0
 A
@@ -292,7 +292,7 @@ Nilbog's wargskull helm~
 A helm made from a skull is lying here.~
 The skull is goblincraft, with signature leather and beading.
 ~
-27 mp ae 0 2
+27 mp ae 0 0 2
 3 0 0
 14 0
 A
@@ -312,7 +312,7 @@ Furl's flaming wristbands~
 A pair of flaming wristbands are lying here.~
 The wristbands appear to be goblincraft, and are on fire.
 ~
-27 mp aj 0 4
+27 mp aj 0 0 4
 0 0 0
 0 0
 A
@@ -332,7 +332,7 @@ Furl's armored wristbands~
 A pair of armored wristbands are lying here.~
 The wristbands appear to be goblincraft, made from enchanted wood.
 ~
-27 mp aj 0 4
+27 mp aj 0 0 4
 2 0 0
 0 0
 A
@@ -350,7 +350,7 @@ a warg whistle~
 A warg whistle is lying here.~
 It looks like you could use it to summon a land mount.
 ~
-3 p a 0 13
+3 p a 0 0 13
 10222 0 0
 7 0
 T 9910
@@ -361,7 +361,7 @@ a winged wolf whistle~
 A winged wolf whistle is lying here.~
 It looks like you could use it to summon a flying mount.
 ~
-3 p a 0 14
+3 p a 0 0 14
 10224 0 0
 7 0
 T 9910
@@ -372,7 +372,7 @@ a hole, hidden behind the plants~
 It looks like there's a hole hidden behind the plants. (adventure)~
 It looks like there's more to the garden! Enter the hole to check it out.
 ~
-8 j 0 0 3
+8 jB 0 0 0 4
 10225 0 0
 0 0
 S
@@ -383,9 +383,9 @@ A pineapple is sitting on the ground.~
    You can eat this succulent tropical fruit, or plant it. You'll have to plant
 it on partially-cleared jungle.
 ~
-6 bgl a 0 5
+6 bglC a 0 0 7
 12 10225 0
-7 168
+7 120
 O+ 1 6133
 R
 4 5114 0
@@ -396,11 +396,11 @@ an agave heart~
 An agave heart is lying here.~
 You can eat this heart of the agave plant, or replant it.
 ~
-6 bl a 0 2
+6 blC a 0 0 4
 12 10226 0
-7 168
+7 72
 R
-4 5116 0
+4 5215 0
 S
 #10228
 pads cactus stack~
@@ -409,11 +409,11 @@ Some cactus pads are stacked here.~
    These cactus pads are edible, since they've been despined. They can also be
 used to plant more.
 ~
-6 bl a 0 2
+6 blC a 0 0 4
 6 10227 0
-7 168
+7 72
 R
-4 5114 0
+4 5215 0
 S
 #10229
 fruit cactus~
@@ -421,9 +421,11 @@ a cactus fruit~
 A cactus fruit is lying here.~
 This little red fruit came from a cactus, and it looks sweet.
 ~
-6 0 a 0 2
+6 C a 0 0 5
 1 0 0
-7 48
+7 336
+R
+4 5619 0
 S
 #10230
 aloe leaves thick~
@@ -431,7 +433,7 @@ some thick aloe leaves~
 Some thick aloe leaves are lying here.~
 The aloe leaves might be made into something soothing.
 ~
-3 bl a 0 2
+3 bl a 0 0 2
 0 10228 0
 7 0
 R
@@ -443,9 +445,11 @@ some desert dandelions~
 Some desert dandelions have been left here.~
 These plants, though not delicious, are still edible.
 ~
-6 0 a 0 2
+6 C a 0 0 4
 1 0 0
-7 48
+7 72
+R
+4 5619 0
 S
 #10232
 tumbleweed enchanted~
@@ -454,7 +458,7 @@ A tumbleweed is lying here.~
    This tumbleweed can be brought to life and ridden around! Type 'use
 tumbleweed' to bring it to life.
 ~
-3 j a 0 4
+3 j a 0 0 4
 0 0 0
 0 0
 T 10232
@@ -464,10 +468,10 @@ token fruit wooden~
 a wooden fruit token~
 A wooden fruit token has been dropped here.~
    It's a wooden token with a picture of some fruits. The back is carved with
-the symbol of the Magiterranean, the hidden world of druids. When you have all
-three tokens, type 'combine tokens'.
+the symbol of the Magiterranean, the hidden world of natural magic. When you
+have all three tokens, type 'combine tokens'.
 ~
-3 kp a 0 1
+3 kp a 0 0 1
 0 0 0
 0 0
 S
@@ -476,10 +480,10 @@ token grain copper~
 a copper grain token~
 A copper grain token is lying here.~
    It's a copper token with wheat stamped on one side. The back is carved with
-the symbol of the Magiterranean, the hidden world of druids. When you have all
-three tokens, type 'combine tokens'.
+the symbol of the Magiterranean, the hidden world of natural magic. When you
+have all three tokens, type 'combine tokens'.
 ~
-3 kp a 0 1
+3 kp a 0 0 1
 0 0 0
 13 0
 S
@@ -488,10 +492,10 @@ token silver tradegoods~
 a silver tradegoods token~
 A silver tradegoods token is lying here.~
    It's a silver token with a merchant ship etched into one side. The back is
-carved with the symbol of the Magiterranean, the hidden world of druids. When
-you have all three tokens, type 'combine tokens'.
+carved with the symbol of the Magiterranean, the hidden world of natural magic.
+When you have all three tokens, type 'combine tokens'.
 ~
-3 kp a 0 1
+3 kp a 0 0 1
 0 0 0
 3 0
 T 10235
@@ -504,14 +508,14 @@ A gnarled wooden token is lying here.~
 Magiterranean. Simply perform the chant of gardens ('chant gardens') inside the
 Hidden Garden adventure area.
 ~
-3 jp a 0 2
+3 jp a 0 0 2
 0 0 0
 0 0
 T 10236
 S
 #10237
-list first druid's~
-the druid's first list~
+list first gardener's~
+the gardener's first list~
 A list has been left behind.~
 It appears to be a list, scribbled quickly in green ink:
 
@@ -520,15 +524,15 @@ It appears to be a list, scribbled quickly in green ink:
   4x bag of cherries
   4x sack of oranges
 
-Return to any Hidden Gardens druid and type 'offer' to complete this.
+Return to any Hidden Gardens mage and type 'offer' to complete this.
 ~
-3 k a 0 1
+3 k a 0 0 1
 0 0 0
 0 0
 S
 #10238
-list second druid's~
-the druid's second list~
+list second gardener's~
+the gardener's second list~
 A list has been left behind.~
 It appears to be a list, scribbled quickly in green ink:
 
@@ -537,15 +541,15 @@ It appears to be a list, scribbled quickly in green ink:
   4x sack of rice
   4x sack of barley
 
-Return to any Hidden Gardens druid and type 'offer' to complete this.
+Return to any Hidden Gardens mage and type 'offer' to complete this.
 ~
-3 k a 0 1
+3 k a 0 0 1
 0 0 0
 0 0
 S
 #10239
-list druid's third~
-the druid's third list~
+list gardener's third~
+the gardener's third list~
 A list has been left behind.~
 It appears to be a list, scribbled quickly in green ink:
 
@@ -554,9 +558,9 @@ It appears to be a list, scribbled quickly in green ink:
   4x basket of squash
   4x basket of olives
 
-Return to any Hidden Gardens druid and type 'offer' to complete this.
+Return to any Hidden Gardens mage and type 'offer' to complete this.
 ~
-3 k a 0 2
+3 k a 0 0 2
 0 0 0
 0 0
 S
@@ -567,7 +571,7 @@ A spiked wooden breastplate is stuck into the ground.~
    This breastplate is made from wood and cactus needles, so it might be better
 for evasion than for taking damage.
 ~
-27 emo aq 0 1
+27 emo aq 0 0 1
 3 0 0
 0 0
 A
@@ -587,9 +591,11 @@ the spiked wooden breastplate pattern~
 The pattern for a spiked wooden breastplate is lying here.~
 This is the pattern for a spiked wooden breastplate.
 ~
-7 0 a 0 3
+7 0 a 0 0 4
 10240 0 0
 0 0
+C
+1 1
 S
 #10242
 sword cactus~
@@ -598,7 +604,7 @@ A cactus sword is stuck into the ground.~
    This sword is made from a plank of wood, spiked with hundreds of tiny cactus
 needles, and edged with imperium.
 ~
-1 emo ano 0 1
+1 emo ano 0 0 1
 0 1 1
 0 0
 A
@@ -614,9 +620,11 @@ the cactus sword pattern~
 The pattern for a cactus sword is lying here.~
 This is the recipe for the cactus sword.
 ~
-7 0 a 0 3
+7 0 a 0 0 4
 10242 0 0
 0 0
+C
+1 1
 S
 #10244
 elixir aloe soothing~
@@ -624,7 +632,7 @@ a soothing aloe elixir~
 A soothing aloe elixir has been left here.~
 Quaff this swirling greenish potion to regain health.
 ~
-25 m a 0 4
+25 m a 0 0 4
 -1 0 -1
 8 0
 C
@@ -641,9 +649,11 @@ an aloe recipe~
 An aloe recipe has been left here.~
 This is the recipe for the soothing aloe elixir.
 ~
-7 0 a 0 3
+7 0 a 0 0 4
 10244 0 0
 0 0
+C
+1 1
 S
 #10250
 portal raging red~
@@ -651,7 +661,7 @@ a raging red portal~
 A raging, red portal in the middle of the chamber seems to be unstable.~
 Through the portal, you see some tents and a very large jungle.
 ~
-8 0 0 0 1
+8 B 0 0 0 2
 -1 0 0
 10 0
 S
@@ -661,7 +671,7 @@ the portal home~
 This side of the portal home looks like it's barely staying open!~
 This portal looks like it leads back to the tower.
 ~
-8 0 0 0 1
+8 B 0 0 0 2
 -1 0 0
 10 0
 S
@@ -674,7 +684,7 @@ surprisingly light-weight. Although it might be difficult to craft anything
 useful from it, it looks like you would be able to make some items using
 patterns purchased from the Portal to the Primeval adventure.
 ~
-3 e a 0 3
+3 e a 0 0 3
 0 0 0
 14 0
 R
@@ -689,7 +699,7 @@ The essence of terror is lying here in a bottle.~
    This tiny glass bottle contains the essence of pure terror, harvested from
 the dawn of time from a flying creature who truly embodies the concept.
 ~
-3 0 a 0 2
+3 0 a 0 0 2
 0 0 0
 8 0
 R
@@ -704,7 +714,7 @@ A violet gem has been discarded here.~
    This stunning gem looks like it must contain some arcane power. Perhaps it
 can be used in some kind of crafting recipe.
 ~
-3 0 a 0 2
+3 0 a 0 0 2
 0 0 0
 10 0
 R
@@ -719,7 +729,7 @@ There is a dracosaur bone bracelet on the ground.~
    This bracelet is made from small dracosaur bones. It has a strange, almost
 primordial glow.
 ~
-27 mp aj 0 2
+27 mp aj 0 0 2
 1 0 0
 14 0
 A
@@ -739,7 +749,7 @@ A dracosaur scale wristband is lying on the ground.~
    The wristband is made from braided dracosaur leather inlaid with obsidian
 and bound together by nocturnium.
 ~
-27 mp aj 0 6
+27 mp aj 0 0 6
 0 0 0
 8 0
 A
@@ -758,7 +768,7 @@ the dracosaur miniboss spawner~
 The dracosaur miniboss spawner is lying here, useless.~
 This item spawns mini-bosses.
 ~
-3 0 0 0 1
+3 0 0 0 0 1
 0 0 0
 0 0
 T 10257
@@ -769,7 +779,7 @@ an obsidian bracelet~
 Someone has left an obsidian bracelet here.~
 The bracelet is made from black volcanic glass, and radiates with energy.
 ~
-27 mp aj 0 4
+27 mp aj 0 0 4
 0 0 0
 8 0
 A
@@ -788,7 +798,7 @@ a primitive satchel~
 There is a primitive satchel on the ground, empty.~
 This small satchel is made from dracosaur leather, and is quite durable.
 ~
-24 mp ar 0 1
+24 mp ar 0 0 1
 3 0 0
 7 0
 A
@@ -800,7 +810,7 @@ the dracosaur trash spawner~
 The dracosaur trash spawner is lying here, useless.~
 This item spawns trash mobs.
 ~
-3 0 0 0 1
+3 0 0 0 0 1
 0 0 0
 0 0
 T 10260
@@ -811,7 +821,7 @@ an unlit branch~
 An unlit branch is lying on the ground.~
 This branch is thick with sap, and looks like it would make a good torch.
 ~
-3 0 ao 0 1
+3 0 ao 0 0 1
 0 0 0
 0 0
 I 11 10262 100.00 1 X  # LIGHT: lit branch
@@ -822,7 +832,7 @@ a lit branch~
 A lit branch is burning on the ground.~
 The burning branch spits and sparks as pockets of sap catch fire.
 ~
-29 0 ao 0 2
+29 0 ao 0 0 2
 48 1 5
 0 0
 S
@@ -832,7 +842,7 @@ a dracosaur whistle~
 A small bone whistle is lying on the ground.~
 This whistle can be used just once, to summon a dracosaur mount.
 ~
-3 0 a 0 2
+3 0 a 0 0 2
 10263 0 0
 14 0
 T 9910
@@ -843,7 +853,7 @@ the dracosaur boss spawner~
 The dracosaur boss spawner is lying here, useless.~
 This item spawns a boss and then purges itself.
 ~
-3 0 0 0 1
+3 0 0 0 0 1
 0 0 0
 0 0
 T 10264
@@ -856,7 +866,7 @@ A thick piece of dracosaur hide has been left on the ground.~
 to work into anything useful. This hide can be used to craft items using
 patterns from the Portal to the Primeval adventure.
 ~
-3 0 a 0 2
+3 0 a 0 0 2
 0 0 0
 7 0
 R
@@ -874,7 +884,7 @@ The edge of extinction is lying here.~
 inlaid with primordial obsidian glass. Despite all this, it looks freshly
 forged and it's made in a fairly modern style.
 ~
-1 imp an f 6
+1 imp an f 0 6
 0 1 4
 14 0
 A
@@ -901,7 +911,7 @@ A serrated dracosaur tooth is lying here.~
 huge dracosaur. It looks like you might be able to make something useful from
 this, if you bought the patterns from the Portal to the Primeval adventure.
 ~
-3 0 a 0 2
+3 0 a 0 0 2
 0 0 0
 14 0
 R
@@ -919,7 +929,7 @@ A primordial bone axe is sticking up from the ground.~
 something huge, and ancient. The handle is wrapped in a hardened, scaly
 leather. It looks like you'd need to use both hands to wield it.
 ~
-1 ehmnp an a 5
+1 ehmnp an a 0 5
 0 5 2
 14 0
 A
@@ -946,7 +956,7 @@ rare resources from the dawn of time. Type 'learn schematics' to learn:
   jeweled bone staff  (Healer, Craft, Powerful Staves)
   Tome of the Primordium  (Caster, Wield/Hold, Mana Blast, Craft, Powerful Staves)
 ~
-3 0 a 0 7
+3 0 a 0 0 7
 0 0 0
 0 0
 T 10275
@@ -957,7 +967,7 @@ the dracosaur bone spear~
 A dracosaur bone spear is lying here.~
 This huge spear looks like it was made from the massive legbone of a dracosaur!
 ~
-1 emp an b 7
+1 emp an b 0 7
 0 1 3
 14 0
 A
@@ -991,9 +1001,11 @@ The pattern for a dracosaur bone spear is lying here.~
 This pattern allows you to craft the dracosaur bone spear, a strong tanking
 weapon from the Primeval age.
 ~
-7 0 a 0 3
+7 0 a 0 0 4
 10270 0 0
 0 0
+C
+1 1
 S
 #10272
 staff bone jeweled jewelled~
@@ -1003,7 +1015,7 @@ A jeweled bone staff has been discarded here.~
 Violet gems encircle its crown, and a thick, scaly hide is wrapped around the
 shaft.
 ~
-1 ehmp an p 4
+1 ehmp an p 0 4
 0 1 18
 14 0
 A
@@ -1037,7 +1049,7 @@ schematics' to learn:
   dracosaur tooth robe  (Caster, Sew, Magical Vestments)
   dracosaur fang armor  (PVP/Solo, Forge, Imperial Armors)
 ~
-3 0 a 0 5
+3 0 a 0 0 5
 0 0 0
 0 0
 T 10275
@@ -1049,7 +1061,7 @@ A dracosaur scale robe is crumpled in a heap.~
    This robe appears to be made from the hide of dracosaurs -- primitive
 dragons from the primeval age. The craftsmanship, however, is very modern.
 ~
-27 emp aq 0 3
+27 emp aq 0 0 3
 0 0 0
 7 0
 A
@@ -1082,9 +1094,11 @@ rare resources from the Primeval era. Type 'learn designs' to learn:
   dracosaur tooth boots  (Caster, Sew, Magical Vestments)
   dracosaur scale boots  (PVP/Solo, Forge, Imperial Armors)
 ~
-7 0 a 0 5
+7 0 a 0 0 6
 10274 0 0
 0 0
+C
+1 1
 T 10275
 S
 #10276
@@ -1093,7 +1107,7 @@ dracosaur scale boots~
 A pair of dracosaur scale boots is lying here.~
 The boots look to be made from hardened dracosaur scales and edged in imperium.
 ~
-27 emp ag 0 3
+27 emp ag 0 0 3
 2 0 0
 7 0
 A
@@ -1125,7 +1139,7 @@ learn:
   dracosaur scale wristband  (Caster, Sew, Magical Vestments)
   stunning dracosaur wristguard  (PVP/Solo, Forge, Imperial Armors)
 ~
-3 0 a 0 5
+3 0 a 0 0 5
 0 0 0
 0 0
 T 10275
@@ -1136,7 +1150,7 @@ a pair of primordial boots~
 A pair of primordial boots is lying here.~
 The boots are made from shaped dracosaur bone, laced with imperium.
 ~
-27 emp ag 0 3
+27 emp ag 0 0 3
 3 0 0
 14 0
 A
@@ -1164,9 +1178,11 @@ The pattern for the primordial boots is lying here.~
 This pattern allows you to forge the primordial boots, some of the best tanking
 boots in all of history.
 ~
-7 0 a 0 3
+7 0 a 0 0 4
 10278 0 0
 0 0
+C
+1 1
 S
 #10280
 wristguard dracosaur stunning~
@@ -1177,7 +1193,7 @@ deflect blows without hindering your movement or occupying one of your hands.
 More interesting, though, is that it is crafted from the hide and bones of a
 dracosaur -- a vicious, ancient dragon from beyond the Primeval portal.
 ~
-27 mp aj 0 4
+27 mp aj 0 0 4
 2 0 0
 7 0
 A
@@ -1206,7 +1222,7 @@ dracosaur parts from the dawn of time. Type 'learn patterns' to learn:
   obsidian dracosaur waistband  (Caster or Healer, Sew, Magical Vestments)
   mighty dracoscale belt  (Tank or PVP/Solo, Forge, Imperial Armors)
 ~
-3 0 a 0 6
+3 0 a 0 0 6
 0 0 0
 0 0
 T 10275
@@ -1218,7 +1234,7 @@ Someone has left a primordial tome here.~
    The tome is a heavy book, bound in a thick, scaly leather. A violet gem is
 set into its cover, and the whole thing reeks of ancient mana.
 ~
-1 mp ano 0 4
+1 mp ano 0 0 4
 0 1 28
 7 0
 A
@@ -1244,9 +1260,11 @@ The schematic for the Tome of the Primordium is lying here.~
    This pattern allows you to craft the tome of the primordium, a powerful
 magical relic from a bygone era.
 ~
-7 0 a 0 4
+7 0 a 0 0 5
 10282 0 0
 0 0
+C
+1 1
 S
 #10284
 crown bone primeval~
@@ -1256,7 +1274,7 @@ The bone crown of the primeval is lying here.~
 ancient form of dragon that existed before the age of man. Only someone who has
 conquered that lost age would dare wear this.
 ~
-2 o ae 0 2
+2 o ae 0 0 2
 0 0 0
 14 0
 A
@@ -1273,9 +1291,11 @@ The design for the bone crown of the primeval is lying here.~
    This pattern allows you to craft the bone crown of the primeval, an ancient
 symbol of kings from a less civilized age.
 ~
-7 0 a 0 5
+7 0 a 0 0 6
 10284 0 0
 0 0
+C
+1 1
 S
 #10286
 whistle bone strange terrosaur~
@@ -1283,7 +1303,7 @@ a terrosaur whistle~
 A strange bone whistle is lying on the ground.~
 This whistle can be used just once, to summon a terrosaur mount.
 ~
-3 0 a 0 2
+3 0 a 0 0 2
 10286 0 0
 14 0
 T 9910
@@ -1297,7 +1317,7 @@ from the dawn of time. A skilled (and modern) craftsman has hammered an
 imperium mesh to the outside of the scales, making the wearer nigh-impervious
 to harm.
 ~
-27 emp aq 0 6
+27 emp aq 0 0 6
 3 0 0
 7 0
 A
@@ -1327,7 +1347,7 @@ A suit of dracosaur hide armor is draped here.~
    The scaly hide of a primitive dracosaur has been masterfully worked to make
 it more pliable without sacrificing its dragon-like strength.
 ~
-27 emp aq 0 6
+27 emp aq 0 0 6
 1 0 0
 7 0
 A
@@ -1359,11 +1379,11 @@ worked by a modern artisan who has carefully arranged the teeth and cloth to
 prevent injuries to the wearer. The same cannot be said for anyone in front of
 them.
 ~
-27 emp aq 0 4
+27 emp aq 0 0 5
 0 0 0
 7 0
 A
-11 1 0
+16 1 0
 A
 8 1 0
 A
@@ -1389,7 +1409,7 @@ dracosaurs -- primitive dragons from the dawn of time. A modern master has
 worked the dracosaur into the sort of strong, nimble armor that a versatile
 fighter needs.
 ~
-27 emp aq 0 8
+27 emp aq 0 0 8
 2 0 0
 7 0
 A
@@ -1419,7 +1439,7 @@ A pair of dracosaur scale sandals have stopped here.~
    These sandals are made from dracosaur hide and scales. The materials may
 have come from the dawn of time, but the fine workmanship is modern.
 ~
-27 mp ag 0 4
+27 mp ag 0 0 4
 0 0 0
 7 0
 A
@@ -1448,7 +1468,7 @@ A pair of dracosaur tooth boots is lying here.~
 serrated teeth of a dracosaur -- a primitive dragon from the dawn of time. The
 workmanship, however, suggests they were made by a person.
 ~
-27 mp ag 0 5
+27 mp ag 0 0 5
 0 0 0
 7 0
 A
@@ -1478,7 +1498,7 @@ studded with the serrated points of its teeth. The shoes are quick and quiet
 for the bearer, and very painful for whoever might be on the receiving end of
 their kick.
 ~
-27 mp ag 0 6
+27 mp ag 0 0 6
 1 0 0
 14 0
 A
@@ -1506,7 +1526,7 @@ A pair of dracoscale vambraces has been left here.~
    These mighty vambraces, which fully cover your wrists and lower arms, appear
 to be made from tough dracosaur scales by a very, very skilled blacksmith.
 ~
-27 mp aj 0 4
+27 mp aj 0 0 4
 3 0 0
 7 0
 A
@@ -1525,7 +1545,7 @@ a teeny terrosaur minipet whistle~
 A teeny terrosaur minipet whistle is lying here.~
 Type 'use whistle' to gain a teeny terrosaur minipet.
 ~
-19 p a 0 8
+19 p a 0 0 8
 10295 0 0
 2 0
 S
@@ -1535,7 +1555,7 @@ the Primeval Portal loot replacer~
 The Primeval Portal loot replacer is here.~
 This item is automatically replaced with loot when it loads on a mob.
 ~
-3 p a 0 1
+3 p a 0 0 1
 0 0 0
 0 0
 T 10296
@@ -1549,7 +1569,7 @@ primitive dragon from the depths of the Primeval. The fine workmanship ensures
 that the sharp bits never pierce your stomach or thighs, but it would be
 dangerous to do anything intimate in this.
 ~
-2 mp al 0 6
+2 mp al 0 0 6
 0 0 0
 14 0
 A
@@ -1576,7 +1596,7 @@ some of the constellations have the wrong number of stars, as if they were
 recorded some time in the distant past, when the stars themselves were
 different.
 ~
-2 mp al 0 7
+2 mp al 0 0 7
 0 0 0
 14 0
 A
@@ -1599,7 +1619,7 @@ A mighty dracoscale belt is lying here.~
 it impossible to deliver a powerful blow to the wearer's midsection. It also
 seems to provide good back support, preventing that prehistoric "hunched" look.
 ~
-2 mp al 0 9
+2 mp al 0 0 9
 0 0 0
 7 0
 A

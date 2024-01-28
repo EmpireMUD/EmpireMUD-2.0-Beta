@@ -2,15 +2,13 @@
 *   File: act.empire.c                                    EmpireMUD 2.0b5 *
 *  Usage: stores all of the empire-related commands                       *
 *                                                                         *
-*  EmpireMUD code base by Paul Clarke, (C) 2000-2015                      *
+*  EmpireMUD code base by Paul Clarke, (C) 2000-2024                      *
 *  All rights reserved.  See license.doc for complete information.        *
 *                                                                         *
 *  EmpireMUD based upon CircleMUD 3.0, bpl 17, by Jeremy Elson.           *
 *  CircleMUD (C) 1993, 94 by the Trustees of the Johns Hopkins University *
 *  CircleMUD is based on DikuMUD, Copyright (C) 1990, 1991.               *
 ************************************************************************ */
-
-#include <math.h>
 
 #include "conf.h"
 #include "sysdep.h"
@@ -30,6 +28,7 @@
 /**
 * Contents:
 *   Helpers
+*   Chat History
 *   City Helpers
 *   Diplomacy Helpers
 *   Efind Helpers
@@ -37,7 +36,6 @@
 *   Inspire Helpers
 *   Islands Helpers
 *   Land Management
-*   Tavern Helpers
 *   Territory Helpers
 *   Empire Commands
 */
@@ -46,7 +44,7 @@
 extern struct empire_chore_type chore_data[NUM_CHORES];
 
 // external funcs
-void check_nowhere_einv(empire_data *emp, int new_island);
+void check_einv_auto_move(empire_data *emp, int new_island);
 bool empire_is_ignoring(empire_data *emp, char_data *victim);
 void warehouse_inventory(char_data *ch, char *argument, int mode);
 void warehouse_identify(char_data *ch, char *argument, int mode);
@@ -63,10 +61,49 @@ int sort_workforce_log(struct workforce_log *a, struct workforce_log *b);
 struct einv_type {
 	obj_vnum vnum;
 	int local;
-	int total;
 	int keep;
+	
+	int total;
+	int total_keep;
 	UT_hash_handle hh;
 };
+
+
+// scan helper
+struct _organize_general_dirs_t {
+	char dir[80];
+	char string[2048];
+	int count;
+	bool full;
+	UT_hash_handle hh;
+} *ogd_hash = NULL, *ogd, *next_ogd;
+
+
+// simple scan sorter
+int _sort_ogd(struct _organize_general_dirs_t *a, struct _organize_general_dirs_t *b) {
+	int a_pos = -1, b_pos = -1;
+	int iter;
+	
+	// empty string
+	if (!*a->dir) {
+		return -1;
+	}
+	else if (!*b->dir) {
+		return 1;
+	}
+	
+	// detect position
+	for (iter = 0; *partial_dirs[iter][1] != '\n'; ++iter) {
+		if (a_pos == -1 && (!strcmp(a->dir, partial_dirs[iter][1]) || !strcmp(a->dir, partial_dirs[iter][0]))) {
+			a_pos = iter;
+		}
+		if (b_pos == -1 && (!strcmp(b->dir, partial_dirs[iter][1]) || !strcmp(b->dir, partial_dirs[iter][0]))) {
+			b_pos = iter;
+		}
+	}
+	
+	return a_pos - b_pos;
+}
 
 
  //////////////////////////////////////////////////////////////////////////////
@@ -265,9 +302,9 @@ void copy_workforce_limits_into_current_island(char_data *ch, struct island_info
 void do_customize_island(char_data *ch, char *argument) {
 	char type_arg[MAX_INPUT_LENGTH];
 	struct empire_city_data *city;
-	struct empire_island *eisle;
-	struct island_info *island;
-	bool alnum, has_city = FALSE;
+	struct empire_island *eisle, *eiter, *next_eiter;
+	struct island_info *island, *isle_iter, *next_isle;
+	bool alnum, unique, has_city = FALSE;
 	int iter;
 	
 	const char *allowed_special = " '-";	// chars allowed in island names
@@ -317,6 +354,36 @@ void do_customize_island(char_data *ch, char *argument) {
 			}
 		}
 		
+		// check unique
+		unique = TRUE;
+		HASH_ITER(hh, island_table, isle_iter, next_isle) {
+			if (isle_iter == island) {
+				continue;	// same isle
+			}
+			if (str_cmp(isle_iter->name, argument)) {
+				continue;	// no match
+			}
+			
+			// oops
+			unique = FALSE;
+			break;
+		}
+		if (GET_LOYALTY(ch) && unique) {
+			HASH_ITER(hh, EMPIRE_ISLANDS(GET_LOYALTY(ch)), eiter, next_eiter) {
+				if (eiter->island == island->id) {
+					continue;	// same isle
+				}
+				if (!eiter->name || str_cmp(eiter->name, argument)) {
+					continue;	// no custom name or no match
+				}
+				
+				// oops
+				unique = FALSE;
+				break;
+			}
+		}
+		
+		// ok check args
 		if (!*argument) {
 			msg_to_char(ch, "What would you like to name this island (or \"none\")?\r\n");
 		}
@@ -344,6 +411,9 @@ void do_customize_island(char_data *ch, char *argument) {
 		}
 		else if (!alnum) {
 			msg_to_char(ch, "Island names must be alphanumeric.\r\n");
+		}
+		else if (!unique) {
+			msg_to_char(ch, "That name is already taken by another island.\r\n");
 		}
 		else {
 			log_to_empire(GET_LOYALTY(ch), ELOG_TERRITORY, "%s has given %s the custom name of %s", PERS(ch, ch, TRUE), get_island_name_for(island->id, ch), argument);
@@ -431,6 +501,7 @@ int get_war_cost(empire_data *emp, empire_data *victim) {
 */
 bool is_affiliated_island(empire_data *emp, int island_id) {
 	struct empire_island *isle;
+	struct empire_storage_data *store, *next_store;
 	struct empire_unique_storage *eus;
 	
 	//Grab the empire_isle information.
@@ -441,9 +512,11 @@ bool is_affiliated_island(empire_data *emp, int island_id) {
 		return TRUE;
 	}
 	
-	//Check if the empire has at least an item in there.
-	if (isle->store) {
-		return TRUE;
+	// Check if the empire has at least one item in there.
+	HASH_ITER(hh, isle->store, store, next_store) {
+		if (store->amount > 0) {
+			return TRUE;
+		}
 	}
 	
 	//Check unique storage too
@@ -491,6 +564,8 @@ void set_workforce_limit(empire_data *emp, int island_id, int chore, int limit) 
 */
 void set_workforce_limit_all(empire_data *emp, int chore, int limit) {
 	struct empire_island *isle, *next_isle;
+	struct empire_storage_data *store, *next_store;
+	bool any;
 	
 	// sanity
 	if (!emp || chore < 0 || chore >= NUM_CHORES) {
@@ -502,8 +577,20 @@ void set_workforce_limit_all(empire_data *emp, int chore, int limit) {
 			continue;	// skip if non-island
 		}
 		if (limit != 0 && isle->workforce_limit[chore] == 0) {	// things we only skip if it's not "off" or there's already data
-			if (!isle->store && !isle->population && isle->territory[TER_TOTAL] < 1) {
+			if (!isle->population && isle->territory[TER_TOTAL] < 1) {
 				continue;	// appears to be a non-island
+			}
+			
+			// check storage for at least one
+			any = FALSE;
+			HASH_ITER(hh, isle->store, store, next_store) {
+				if (store->amount > 0) {
+					any = TRUE;
+					break;
+				}
+			}
+			if (!any) {
+				continue;	// no storage
 			}
 		}
 		
@@ -913,6 +1000,10 @@ static void show_empire_identify_to_char(char_data *ch, empire_data *emp, char *
 	
 	HASH_ITER(hh, EMPIRE_ISLANDS(emp), isle, next_isle) {
 		HASH_ITER(hh, isle->store, store, next_store) {
+			if (store->amount < 1) {
+				continue;	// must have at least 1 stored
+			}
+			
 			//If there isn't an item proto yet, the first item that matches the given argument will become the item used for the rest of the loop.
 			if ( !proto ) {
 				if (!multi_isname(argument, GET_OBJ_KEYWORDS(store->proto))) {
@@ -933,7 +1024,7 @@ static void show_empire_identify_to_char(char_data *ch, empire_data *emp, char *
 		}
 	}
 	if ( !proto ) {
-		msg_to_char(ch, "This empire has no item by that name.\r\n");
+		msg_to_char(ch, "This empire has no stored item by that name.\r\n");
 		return;
 	}
 	
@@ -986,9 +1077,10 @@ int sort_territory_nodes_by_distance(struct find_territory_node *a, struct find_
 * @param char *argument The requested inventory item, if any.
 */
 static void show_empire_inventory_to_char(char_data *ch, empire_data *emp, char *argument) {
-	char output[MAX_STRING_LENGTH*2], line[MAX_STRING_LENGTH], vstr[256], keepstr[256];
+	char output[MAX_STRING_LENGTH*2], line[MAX_STRING_LENGTH], vstr[256], keepstr[256], totalstr[256];
 	struct einv_type *einv, *next_einv, *list = NULL;
 	obj_vnum vnum, last_vnum = NOTHING;
+	struct empire_dropped_item *edi, *next_edi;
 	struct empire_storage_data *store, *next_store;
 	struct empire_island *isle, *next_isle;
 	struct shipping_data *shipd;
@@ -1000,19 +1092,23 @@ static void show_empire_inventory_to_char(char_data *ch, empire_data *emp, char 
 		return;
 	}
 	
-	if (!GET_ISLAND(IN_ROOM(ch)) && !IS_IMMORTAL(ch)) {
-		msg_to_char(ch, "You can't check any empire inventory here.\r\n");
-		return;
-	}
-	
 	if (!str_cmp(argument, "all") || !strn_cmp(argument, "all ", 4)) {
 		*argument = '\0';
 		all = TRUE;
 	}
 	
+	if (!GET_ISLAND(IN_ROOM(ch)) && !IS_IMMORTAL(ch) && !all && !*argument) {
+		msg_to_char(ch, "You don't have anything stored at sea.\r\n");
+		return;
+	}
+	
 	// build list
 	HASH_ITER(hh, EMPIRE_ISLANDS(emp), isle, next_isle) {
 		HASH_ITER(hh, isle->store, store, next_store) {
+			if (store->amount < 1) {
+				continue;	// none in storage here
+			}
+			
 			// prototype lookup
 			if (store->vnum != last_vnum) {
 				proto = store->proto;
@@ -1040,6 +1136,12 @@ static void show_empire_inventory_to_char(char_data *ch, empire_data *emp, char 
 		
 			// add
 			SAFE_ADD(einv->total, store->amount, 0, INT_MAX, FALSE);
+			if (store->keep == UNLIMITED) {
+				einv->total_keep = UNLIMITED;
+			}
+			else if (einv->total_keep != UNLIMITED) {
+				SAFE_ADD(einv->total_keep, store->keep, 0, INT_MAX, FALSE);
+			}
 			if (isle->island == GET_ISLAND_ID(IN_ROOM(ch))) {
 				SAFE_ADD(einv->local, store->amount, 0, INT_MAX, FALSE);
 				einv->keep = store->keep;
@@ -1056,17 +1158,49 @@ static void show_empire_inventory_to_char(char_data *ch, empire_data *emp, char 
 		if (einv) {	// have this?
 			SAFE_ADD(einv->total, shipd->amount, 0, INT_MAX, FALSE);
 		}
-		else if (all) {	// add an entry
-			CREATE(einv, struct einv_type, 1);
-			einv->vnum = vnum;
-			einv->total = shipd->amount;
-			HASH_ADD_INT(list, vnum, einv);
+		else {
+			if (!all && *argument && vnum != last_vnum) {
+				// prevent constant proto lookups
+				proto = obj_proto(vnum);
+				last_vnum = vnum;
+			}
+			
+			if (all || (proto && *argument && multi_isname(argument, GET_OBJ_KEYWORDS(proto)))) {	// add an entry
+				CREATE(einv, struct einv_type, 1);
+				einv->vnum = vnum;
+				einv->total = shipd->amount;
+				HASH_ADD_INT(list, vnum, einv);
+			}
 		}
 	}
 	
 	// apply dropped items
-	HASH_ITER(hh, list, einv, next_einv) {
-		SAFE_ADD(einv->total, count_dropped_items(emp, einv->vnum), 0, INT_MAX, FALSE);
+	HASH_ITER(hh, EMPIRE_DROPPED_ITEMS(emp), edi, next_edi) {
+		vnum = edi->vnum;
+		HASH_FIND_INT(list, &vnum, einv);
+		
+		if (einv) {	// have already
+			SAFE_ADD(einv->total, edi->count, 0, INT_MAX, FALSE);
+		}
+		else {
+			if (!all && *argument && vnum != last_vnum) {
+				// prevent constant proto lookups
+				proto = obj_proto(vnum);
+				last_vnum = vnum;
+			}
+			
+			// ensure storable
+			if (!proto || OBJ_FLAGGED(proto, OBJ_NO_BASIC_STORAGE) || !GET_OBJ_STORAGE(proto)) {
+				continue;
+			}
+			
+			if (*argument && multi_isname(argument, GET_OBJ_KEYWORDS(proto))) {	// add an entry
+				CREATE(einv, struct einv_type, 1);
+				einv->vnum = vnum;
+				einv->total = edi->count;
+				HASH_ADD_INT(list, vnum, einv);
+			}
+		}
 	}
 	
 	HASH_SORT(list, sort_einv_list);
@@ -1077,6 +1211,7 @@ static void show_empire_inventory_to_char(char_data *ch, empire_data *emp, char 
 	HASH_ITER(hh, list, einv, next_einv) {
 		// only display it if it's on the requested island, or if they requested it by name, or all
 		if (all || einv->local > 0 || *argument) {
+			// prefix
 			if (PRF_FLAGGED(ch, PRF_ROOMFLAGS)) {
 				sprintf(vstr, "[%5d] ", einv->vnum);
 			}
@@ -1084,6 +1219,7 @@ static void show_empire_inventory_to_char(char_data *ch, empire_data *emp, char 
 				*vstr = '\0';
 			}
 			
+			// keep section
 			if (einv->keep == UNLIMITED) {
 				strcpy(keepstr, " (keep)");
 			}
@@ -1094,12 +1230,24 @@ static void show_empire_inventory_to_char(char_data *ch, empire_data *emp, char 
 				*keepstr = '\0';
 			}
 			
+			// total?
 			if (einv->total > einv->local) {
-				lsize = snprintf(line, sizeof(line), "(%4d) %s%s%s (%d total)\r\n", einv->local, vstr, get_obj_name_by_proto(einv->vnum), keepstr, einv->total);
+				if (einv->total_keep == 0 || einv->total_keep == einv->keep) {
+					snprintf(totalstr, sizeof(totalstr), " (%d total)", einv->total);
+				}
+				else if (einv->total_keep == UNLIMITED) {
+					snprintf(totalstr, sizeof(totalstr), " (%d total, keep)", einv->total);
+				}
+				else if (einv->total_keep > 0) {
+					snprintf(totalstr, sizeof(totalstr), " (%d total, keep %d)", einv->total, einv->total_keep);
+				}
 			}
 			else {
-				lsize = snprintf(line, sizeof(line), "(%4d) %s%s%s\r\n", einv->local, vstr, get_obj_name_by_proto(einv->vnum), keepstr);
+				*totalstr = '\0';
 			}
+			
+			// actual line
+			lsize = snprintf(line, sizeof(line), "(%4d) %s%s%s%s\r\n", einv->local, vstr, get_obj_name_by_proto(einv->vnum), keepstr, totalstr);
 			
 			// append if room
 			if (size + lsize < sizeof(output)) {
@@ -1425,7 +1573,7 @@ void show_workforce_why(empire_data *emp, char_data *ch, char *argument) {
 				only_loc = GET_ROOM_VNUM(IN_ROOM(ch));
 				only_room = IN_ROOM(ch);
 			}
-			else if ((only_room = parse_room_from_coords(argument)) || (only_room = find_target_room(ch, argument))) {
+			else if ((only_room = parse_room_from_coords(argument))) {
 				only_loc = GET_ROOM_VNUM(only_room);
 			}
 			else {
@@ -1565,7 +1713,7 @@ void show_workforce_setup_to_char(empire_data *emp, char_data *ch) {
 		}
 		here = (this_isle ? (this_isle->workforce_limit[chore] != 0) : FALSE);
 		
-		snprintf(part, sizeof(part), "%s: %s%s", chore_data[chore].name, here ? "&con&0" : "&yoff&0", ((on && !here) || (off && here)) ? (PRF_FLAGGED(ch, PRF_SCREEN_READER) ? " (partial)" : "*") : "");
+		snprintf(part, sizeof(part), "%s: %s%s", chore_data[chore].name, here ? "&con&0" : "&yoff&0", ((on && !here) || (off && here)) ? (PRF_FLAGGED(ch, PRF_SCREEN_READER) ? (on > 1 ? " (some islands)" : " (one island)") : "*") : "");
 		size = 24 + color_code_length(part) + (PRF_FLAGGED(ch, PRF_SCREEN_READER) ? 24 : 0);
 		msg_to_char(ch, " %-*.*s%s", size, size, part, (PRF_FLAGGED(ch, PRF_SCREEN_READER) || !(count % 3)) ? "\r\n" : " ");
 	}
@@ -1586,6 +1734,156 @@ int sort_workforce_log(struct workforce_log *a, struct workforce_log *b) {
 	else {	// just sort by coords
 		return b->loc - a->loc;
 	}
+}
+
+
+ //////////////////////////////////////////////////////////////////////////////
+//// CHAT HISTORY ////////////////////////////////////////////////////////////
+
+/**
+* Filename for empire history.
+*
+* @param empire_data *emp The empire.
+* @return char* The filename for the empire chat history.
+*/
+char *empire_history_filename(empire_data *emp) {
+	static char fname[256];
+	snprintf(fname, sizeof(fname), "%s%d%s", EMPIRE_HISTORY_PREFIX, EMPIRE_VNUM(emp), EMPIRE_SUFFIX);
+	return fname;
+}
+
+
+/**
+* Adds a message to a empire chat history and writes it to the history file.
+*
+* @param empire_data *emp Which empire.
+* @param char_data *speaker Who said it (for invis, etc).
+* @param char *message The message itself.
+* @param int rank Rank required to view the message (optional; may be 0).
+*/
+void add_to_empire_history(empire_data *emp, char_data *speaker, char *message, int rank) {
+	struct channel_history_data *entry;
+	FILE *fl;
+	
+	if (block_all_saves_due_to_shutdown || !emp) {
+		return;
+	}
+	
+	// in case
+	load_empire_chat_history(emp);
+	
+	// add in-game
+	entry = process_add_to_channel_history(&EMPIRE_CHAT_HISTORY(emp), speaker, message, FALSE, rank, NOTHING);
+	
+	// save to file
+	if (!(fl = fopen(empire_history_filename(emp), "a"))) {
+		log("SYSERR: Unable to open empire history file '%s' for appending", empire_history_filename(emp));
+		return;	// unable to write
+	}
+	write_one_slash_channel_message(fl, entry);
+	fclose(fl);
+}
+
+
+/**
+* Removes old messages and writes a clean version of the empire chat history
+* file. Then, it also frees up the memory from older messages in memory.
+*
+* @param empire_data *emp The empire.
+*/
+void clean_empire_history(empire_data *emp) {
+	struct channel_history_data *hist, *next_hist;
+	time_t clear_before;
+	int count;
+	FILE *fl;
+	
+	if (block_all_saves_due_to_shutdown || !emp || !emp->history_loaded) {
+		return;
+	}
+	
+	clear_before = time(0) - (config_get_int("slash_message_log_days") * SECS_PER_REAL_DAY);
+	
+	// open the file for write (overwrite the old one)
+	if (!(fl = fopen(empire_history_filename(emp), "w"))) {
+		log("SYSERR: Unable to write empire history file '%s'", empire_history_filename(emp));
+		return;
+	}
+	
+	// clean the history and write any remaining history
+	count = 0;
+	DL_FOREACH_SAFE(EMPIRE_CHAT_HISTORY(emp), hist, next_hist) {
+		if (hist->timestamp >= clear_before) {
+			write_one_slash_channel_message(fl, hist);
+			++count;
+		}
+		else {
+			DL_DELETE(EMPIRE_CHAT_HISTORY(emp), hist);
+			if (hist->message) {
+				free(hist->message);
+			}
+			free(hist);
+		}
+	}
+	
+	fclose(fl);
+	
+	// free up memory for any entries that wouldn't be shown on histories
+	DL_FOREACH_SAFE(EMPIRE_CHAT_HISTORY(emp), hist, next_hist) {
+		if (count-- > KEEP_RECENT_CHANNELS) {
+			DL_DELETE(EMPIRE_CHAT_HISTORY(emp), hist);
+			if (hist->message) {
+				free(hist->message);
+			}
+			free(hist);
+		}
+	}
+}
+
+
+/**
+* Loads empire chat history on-request. Only does this once per uptime.
+*
+* @param empire_data *emp Which empire.
+*/
+void load_empire_chat_history(empire_data *emp) {
+	char line[256], error[256];
+	struct channel_history_data *hist;
+	FILE *fl;
+	
+	if (emp->history_loaded) {
+		return;	// already done
+	}
+	
+	// update this first
+	emp->history_loaded = TRUE;
+	
+	if (!(fl = fopen(empire_history_filename(emp), "r"))) {
+		// no history / not an error
+		return;
+	}
+	
+	// file open..
+	snprintf(error, sizeof(error), "empire history file for %d %s", EMPIRE_VNUM(emp), EMPIRE_NAME(emp));
+	
+	for (;;) {
+		if (!get_line(fl, line)) {
+			break;	// done (no terminating code)
+		}
+		
+		switch (*line) {
+			case 'M': {	// message
+				if ((hist = parse_channel_history_message(line, fl, error))) {
+					DL_APPEND(EMPIRE_CHAT_HISTORY(emp), hist);
+				}
+				break;
+			}
+			
+			// default: ignore the line as garbage
+		}
+	}
+		
+	fclose(fl);
+	clean_empire_history(emp);
 }
 
 
@@ -1970,8 +2268,14 @@ void found_city(char_data *ch, empire_data *emp, char *argument) {
 	stop_room_action(IN_ROOM(ch), ACT_HARVESTING);
 	stop_room_action(IN_ROOM(ch), ACT_PLANTING);
 	
+	// customize name
+	snprintf(buf, sizeof(buf), "The Center of %s", city->name);
+	set_room_custom_name(city->location, buf);
+	SET_BIT(ROOM_BASE_FLAGS(city->location), ROOM_AFF_HIDE_REAL_NAME);
+	affect_total_room(city->location);
+	
 	// move einv here if any is lost
-	check_nowhere_einv(emp, GET_ISLAND_ID(IN_ROOM(ch)));
+	check_einv_auto_move(emp, GET_ISLAND_ID(IN_ROOM(ch)));
 	
 	read_empire_territory(emp, FALSE);
 	EMPIRE_NEEDS_SAVE(emp) = TRUE;
@@ -2210,7 +2514,7 @@ void perform_abandon_city(empire_data *emp, struct empire_city_data *city, bool 
 
 
 void rename_city(char_data *ch, empire_data *emp, char *argument) {
-	char newname[MAX_INPUT_LENGTH];
+	char newname[MAX_INPUT_LENGTH], buf[256];
 	struct empire_city_data *city;
 
 	half_chop(argument, arg, newname);
@@ -2248,6 +2552,12 @@ void rename_city(char_data *ch, empire_data *emp, char *argument) {
 	city->name = str_dup(newname);
 	EMPIRE_NEEDS_SAVE(emp) = TRUE;
 	write_city_data_file();
+	
+	// and rename the center
+	snprintf(buf, sizeof(buf), "The Center of %s", newname);
+	set_room_custom_name(city->location, buf);
+	SET_BIT(ROOM_BASE_FLAGS(city->location), ROOM_AFF_HIDE_REAL_NAME);
+	affect_total_room(city->location);
 }
 
 
@@ -2758,25 +3068,26 @@ void perform_inspire(char_data *ch, char_data *vict, int type) {
 	
 	if (inspire_data[type].first_apply != APPLY_NONE) {
 		value = round((points * (two ? 0.5 : 1.0)) / apply_values[inspire_data[type].first_apply]);
-		if (value > 0) {
-			af = create_mod_aff(ATYPE_INSPIRE, time, inspire_data[type].first_apply, value, ch);
-			affect_join(vict, af, 0);
-			any = TRUE;
-		}
+		value = MAX(1, value);
+		
+		af = create_mod_aff(ATYPE_INSPIRE, time, inspire_data[type].first_apply, value, ch);
+		affect_join(vict, af, 0);
+		any = TRUE;
 	}
 	if (inspire_data[type].second_apply != APPLY_NONE) {
 		value = round((points * 0.5) / apply_values[inspire_data[type].second_apply]);
-		if (value > 0) {
-			af = create_mod_aff(ATYPE_INSPIRE, time, inspire_data[type].second_apply, value, ch);
-			affect_join(vict, af, 0);
-			any = TRUE;
-		}
+		value = MAX(1, value);
+		
+		af = create_mod_aff(ATYPE_INSPIRE, time, inspire_data[type].second_apply, value, ch);
+		affect_join(vict, af, 0);
+		any = TRUE;
 	}
 	
 	if (any) {
 		msg_to_char(vict, "You feel inspired!\r\n");
 		act("$n seems inspired!", FALSE, vict, NULL, NULL, TO_ROOM);
 		gain_ability_exp(ch, ABIL_INSPIRE, 33.4);
+		run_ability_hooks(ch, AHOOK_ABILITY, ABIL_INSPIRE, 0, vict, NULL, NULL, NULL, NOBITS);
 	}
 }
 
@@ -2887,89 +3198,6 @@ MANAGE_FUNC(mng_nowork) {
 
 
  //////////////////////////////////////////////////////////////////////////////
-//// TAVERN HELPERS //////////////////////////////////////////////////////////
-
-// for do_tavern, BREW_x
-const struct tavern_data_type tavern_data[] = {
-	{ "nothing", 0, { NOTHING } },
-	{ "ale", LIQ_ALE, { o_BARLEY, o_HOPS, NOTHING } },
-	{ "lager", LIQ_LAGER, { o_CORN, o_HOPS, NOTHING } },
-	{ "wheatbeer", LIQ_WHEATBEER, { o_WHEAT, o_BARLEY, NOTHING } },
-	{ "cider", LIQ_CIDER, { o_APPLES, o_PEACHES, NOTHING } },
-	
-	{ "\n", 0, { NOTHING } }
-};
-
-
-/**
-* @param room_data *room Tavern
-* @return TRUE if it was able to get resources from an empire, FALSE if not
-*/
-bool extract_tavern_resources(room_data *room) {
-	struct empire_storage_data *store;
-	empire_data *emp = ROOM_OWNER(room);
-	int type = get_room_extra_data(room, ROOM_EXTRA_TAVERN_TYPE);
-	int iter;
-	bool ok;
-	
-	int cost = 5;
-	
-	if (!emp) {
-		return FALSE;
-	}
-	
-	// check if they can afford it
-	ok = TRUE;
-	for (iter = 0; ok && tavern_data[type].ingredients[iter] != NOTHING; ++iter) {
-		store = find_stored_resource(emp, GET_ISLAND_ID(room), tavern_data[type].ingredients[iter]);
-		
-		if (!store || store->amount < cost) {
-			ok = FALSE;
-		}
-	}
-	
-	// extract resources
-	if (ok) {
-		for (iter = 0; tavern_data[type].ingredients[iter] != NOTHING; ++iter) {
-			charge_stored_resource(emp, GET_ISLAND_ID(room), tavern_data[type].ingredients[iter], cost);
-		}
-	}
-	
-	EMPIRE_NEEDS_STORAGE_SAVE(emp) = TRUE;
-	return ok;
-}
-
-
-/**
-* Displays all the empire's taverns to char.
-*
-* @param char_data *ch The person to display to.
-*/
-void show_tavern_status(char_data *ch) {
-	empire_data *emp = GET_LOYALTY(ch);
-	struct empire_territory_data *ter, *next_ter;
-	bool found = FALSE;
-	
-	if (!emp) {
-		return;
-	}
-	
-	msg_to_char(ch, "Your taverns:\r\n");
-	
-	HASH_ITER(hh, EMPIRE_TERRITORY_LIST(emp), ter, next_ter) {
-		if (room_has_function_and_city_ok(GET_LOYALTY(ch), ter->room, FNC_TAVERN)) {
-			found = TRUE;
-			msg_to_char(ch, "%s %s: %s\r\n", coord_display_room(ch, ter->room, FALSE), get_room_name(ter->room, FALSE), tavern_data[get_room_extra_data(ter->room, ROOM_EXTRA_TAVERN_TYPE)].name);
-		}
-	}
-	
-	if (!found) {
-		msg_to_char(ch, " none\r\n");
-	}
-}
-
-
- //////////////////////////////////////////////////////////////////////////////
 //// TERRITORY HELPERS ///////////////////////////////////////////////////////
 
 // sees if the room is within 10 spaces of any existing node
@@ -3041,19 +3269,20 @@ struct find_territory_node *reduce_territory_node_list(struct find_territory_nod
 * @param char_data *argument The tile to search for.
 * @param int max_dist How far to see (e.g. mapsize radius).
 * @param bitvector_t only_in_dirs Optional: Requires that any tiles be in one of the directions listed here as BIT(NORTH), BIT(EAST), etc. Ignored if empty.
+* @param bool organize_general_dirs If TRUE, sorts results into general directions. Otherwise, shows a full tile list.
 */
-void scan_for_tile(char_data *ch, char *argument, int max_dist, bitvector_t only_in_dirs) {
+void scan_for_tile(char_data *ch, char *argument, int max_dist, bitvector_t only_in_dirs, bool organize_general_dirs) {
 	struct find_territory_node *node_list = NULL, *node, *next_node;
 	int dist, total, x, y, check_x, check_y, over_count, dark_distance;
 	int iter, top_height, r_height, view_height;
-	char output[MAX_STRING_LENGTH], line[128], info[256], veh_string[MAX_STRING_LENGTH], temp[MAX_STRING_LENGTH], paint_str[256];
-	char *dir_str;
+	char output[MAX_STRING_LENGTH * 8], line[MAX_STRING_LENGTH], info[256], veh_string[MAX_STRING_LENGTH], temp[MAX_STRING_LENGTH], paint_str[256];
+	const char *dir_str;
 	vehicle_data *veh, *scanned_veh;
 	struct map_data *map_loc;
 	room_data *map, *room, *block_room;
 	size_t size, lsize;
 	crop_data *crop;
-	bool ok, claimed, unclaimed, foreign, adventures, check_blocking, is_blocked, blocking_veh;
+	bool ok, color, claimed, unclaimed, foreign, adventures, check_blocking, is_blocked, blocking_veh;
 	size_t vsize;
 	
 	static bitvector_t north_dirs = BIT(NORTH) | BIT(NORTHWEST) | BIT(NORTHEAST);
@@ -3066,10 +3295,12 @@ void scan_for_tile(char_data *ch, char *argument, int max_dist, bitvector_t only
 	if (!ch->desc) {
 		return;	// don't bother
 	}
+	/* now allowing this with no-arg
 	if (!*argument) {
 		msg_to_char(ch, "Scan for what?\r\n");
 		return;
 	}
+	*/
 	if (!(map_loc = GET_MAP_LOC(IN_ROOM(ch))) || !(map = real_room(map_loc->vnum))) {
 		msg_to_char(ch, "You can't scan for anything here.\r\n");
 		return;
@@ -3173,7 +3404,7 @@ void scan_for_tile(char_data *ch, char *argument, int max_dist, bitvector_t only
 			else if (adventures && find_instance_by_room(room, FALSE, TRUE)) {
 				ok = TRUE;
 			}
-			else if (multi_isname(argument, GET_SECT_NAME(SECT(room)))) {
+			else if (!*argument || multi_isname(argument, GET_SECT_NAME(SECT(room)))) {
 				ok = TRUE;
 			}
 			else if (GET_BUILDING(room) && multi_isname(argument, GET_BLD_NAME(GET_BUILDING(room)))) {
@@ -3202,7 +3433,7 @@ void scan_for_tile(char_data *ch, char *argument, int max_dist, bitvector_t only
 						if (vehicle_is_chameleon(veh, IN_ROOM(ch)) && !PRF_FLAGGED(ch, PRF_HOLYLIGHT) && (!GET_LOYALTY(ch) || VEH_OWNER(veh) != GET_LOYALTY(ch))) {
 							continue;	// can't see from here
 						}
-						if (!multi_isname(argument, VEH_KEYWORDS(veh))) {
+						if (!*argument || !multi_isname(argument, VEH_KEYWORDS(veh))) {
 							continue;
 						}
 					
@@ -3261,11 +3492,17 @@ void scan_for_tile(char_data *ch, char *argument, int max_dist, bitvector_t only
 		}
 	}
 
-	if (node_list) {
+	if (node_list && !organize_general_dirs) {
+		// default output: full tile list
 		sort_territory_from_loc = IN_ROOM(ch);
 	    DL_SORT(node_list, sort_territory_nodes_by_distance);
 		
-		size = snprintf(output, sizeof(output), "Nearby tiles matching '%s' within %d tile%s:\r\n", argument, max_dist, PLURAL(max_dist));
+		if (*argument) {
+			size = snprintf(output, sizeof(output), "Nearby tiles matching '%s' within %d tile%s:\r\n", argument, max_dist, PLURAL(max_dist));
+		}
+		else {
+			size = snprintf(output, sizeof(output), "Nearby tiles within a range of %d:\r\n", max_dist);
+		}
 		
 		// display and free the nodes
 		total = over_count = 0;
@@ -3330,6 +3567,79 @@ void scan_for_tile(char_data *ch, char *argument, int max_dist, bitvector_t only
 			size += snprintf(output + size, sizeof(output) - size, "... and %d more tile%s\r\n", over_count, PLURAL(over_count));
 		}
 		size += snprintf(output + size, sizeof(output) - size, "Total: %d\r\n", total);
+		page_string(ch->desc, output, TRUE);
+	}
+	else if (node_list && organize_general_dirs) {
+		// optionally organize into general directions
+		
+		sort_territory_from_loc = IN_ROOM(ch);
+	    DL_SORT(node_list, sort_territory_nodes_by_distance);
+		
+		if (*argument) {
+			size = snprintf(output, sizeof(output), "Nearby tiles matching '%s' within %d tile%s:\r\n", argument, max_dist, PLURAL(max_dist));
+		}
+		else {
+			size = snprintf(output, sizeof(output), "Nearby tiles within a range of %d:\r\n", max_dist);
+		}
+		
+		// display and free the nodes
+		total = over_count = 0;
+		DL_FOREACH_SAFE(node_list, node, next_node) {
+			total += node->count;
+			
+			// territory can be off the map (e.g. ships) and get a -1 here
+			check_x = X_COORD(node->loc);
+			check_y = Y_COORD(node->loc);
+			
+			// find ogd entry for this direction (or create one)
+			dir_str = get_partial_direction_to(ch, IN_ROOM(ch), node->loc, PRF_FLAGGED(ch, PRF_SCREEN_READER) ? FALSE : TRUE);
+			HASH_FIND_STR(ogd_hash, dir_str, ogd);
+			if (!ogd) {
+				CREATE(ogd, struct _organize_general_dirs_t, 1);
+				strcpy(ogd->dir, dir_str);
+				*ogd->string = '\0';
+				HASH_ADD_STR(ogd_hash, dir, ogd);
+			}
+			
+			// general entry
+			color = (++(ogd->count) % 2) ? TRUE : FALSE;
+			lsize = snprintf(line, sizeof(line), "%s%s%s%s", color ? "\tw" : "", screenread_one_tile(ch, IN_ROOM(ch), node->loc, FALSE), coord_display(ch, check_x, check_y, FALSE), color ? "\t0" : "");
+			
+			if (lsize + strlen(ogd->string) + 3 < sizeof(ogd->string)) {
+				snprintf(ogd->string + strlen(ogd->string), sizeof(ogd->string) - strlen(ogd->string), "%s%s", *ogd->string ? ", " : "", line);
+			}
+			else {
+				ogd->full = TRUE;
+			}
+			
+			// free node
+			DL_DELETE(node_list, node);
+			if (node->details) {
+				free(node->details);
+			}
+			free(node);
+		}
+		
+		// sort directions
+		HASH_SORT(ogd_hash, _sort_ogd);
+		
+		HASH_ITER(hh, ogd_hash, ogd, next_ogd) {
+			lsize = snprintf(line, sizeof(line), "%s: %s%s\r\n", (*ogd->dir ? CAP(ogd->dir) : "Here"), ogd->string, ogd->full ? "..." : "");
+			
+			if (lsize + size + 40 < sizeof(output)) {
+				strcat(output, line);
+				size += lsize;
+			}
+			
+			// and free
+			HASH_DEL(ogd_hash, ogd);
+			free(ogd);
+		}
+		
+		// space reserved for this
+		if (size < sizeof(output)) {
+			size += snprintf(output + size, sizeof(output) - size, "Total: %d\r\n", total);
+		}
 		page_string(ch->desc, output, TRUE);
 	}
 	else {
@@ -3430,8 +3740,8 @@ void do_abandon_vehicle(char_data *ch, vehicle_data *veh, bool confirm) {
 		if (GET_LOYALTY(ch) != VEH_OWNER(veh)) {
 			syslog(SYS_GC, GET_ACCESS_LEVEL(ch), TRUE, "ABUSE: %s abandoned %s owned by %s at %s", GET_NAME(ch), VEH_SHORT_DESC(veh), EMPIRE_NAME(VEH_OWNER(veh)), room_log_identifier(IN_ROOM(ch)));
 		}
-		act("You abandon $V.", FALSE, ch, NULL, veh, TO_CHAR);
-		act("$n abandons $V.", FALSE, ch, NULL, veh, TO_ROOM);
+		act("You abandon $V.", FALSE, ch, NULL, veh, TO_CHAR | ACT_VEH_VICT);
+		act("$n abandons $V.", FALSE, ch, NULL, veh, TO_ROOM | ACT_VEH_VICT);
 		perform_abandon_vehicle(veh);
 	}
 }
@@ -3439,7 +3749,7 @@ void do_abandon_vehicle(char_data *ch, vehicle_data *veh, bool confirm) {
 
 ACMD(do_abandon) {
 	bool imm_access = (GET_ACCESS_LEVEL(ch) >= LVL_CIMPL || IS_GRANTED(ch, GRANT_EMPIRES));
-	char arg[MAX_INPUT_LENGTH], *arg2;
+	char arg1[MAX_INPUT_LENGTH], arg2[MAX_INPUT_LENGTH];
 	vehicle_data *veh;
 	room_data *room = IN_ROOM(ch);
 	bool confirm, confirm_arg_1;
@@ -3449,9 +3759,9 @@ ACMD(do_abandon) {
 	}
 	
 	skip_spaces(&argument);
-	arg2 = one_word(argument, arg);
-	skip_spaces(&arg2);
-	confirm_arg_1 = !str_cmp(arg, "confirm");
+	chop_last_arg(argument, arg1, arg2);	// optional confirm
+	
+	confirm_arg_1 = !str_cmp(arg1, "confirm");
 	confirm = confirm_arg_1 || !str_cmp(arg2, "confirm");	// TRUE if they have the confirm arg
 	
 	if (!IS_APPROVED(ch) && config_get_bool("manage_empire_approval")) {
@@ -3463,14 +3773,14 @@ ACMD(do_abandon) {
 	else if (!imm_access && !GET_LOYALTY(ch)) {
 		msg_to_char(ch, "You're not part of an empire.\r\n");
 	}
-	else if (!imm_access && GET_RANK(ch) < EMPIRE_PRIV(GET_LOYALTY(ch), PRIV_CEDE)) {
+	else if (!imm_access && GET_LOYALTY(ch) && GET_RANK(ch) < EMPIRE_PRIV(GET_LOYALTY(ch), PRIV_CEDE)) {
 		// could probably now use has_permission
 		msg_to_char(ch, "You don't have permission to abandon.\r\n");
 	}
-	else if (*arg && !confirm_arg_1 && (veh = get_vehicle_in_room_vis(ch, arg, NULL))) {
+	else if (*arg1 && !confirm_arg_1 && (veh = get_vehicle_in_room_vis(ch, arg1, NULL))) {
 		do_abandon_vehicle(ch, veh, confirm);
 	}
-	else if (*arg && !confirm_arg_1 && !(room = parse_room_from_coords(argument)) && !(room = find_target_room(ch, arg))) {
+	else if (*arg1 && !confirm_arg_1 && !(room = parse_room_from_coords(argument)) && !(room = find_target_room(ch, arg1))) {
 		// sends own error
 	}
 	else if (!(room = HOME_ROOM(room))) {
@@ -3527,6 +3837,9 @@ ACMD(do_barde) {
 	else if (!IS_NPC(ch) && !has_resources(ch, res, TRUE, TRUE, NULL)) {
 		// messages itself
 	}
+	else if (run_ability_triggers_by_player_tech(ch, PTECH_BARDE, NULL, NULL, NULL)) {
+		// triggered
+	}
 	else {
 		// find interact
 		found = FALSE;
@@ -3577,6 +3890,7 @@ ACMD(do_barde) {
 			if (!IS_NPC(ch)) {
 				extract_resources(ch, res, TRUE, NULL);
 			}
+			run_ability_hooks_by_player_tech(ch, PTECH_BARDE, NULL, NULL, NULL, NULL);
 		}
 		else {
 			act("You can't barde $N!", FALSE, ch, NULL, mob, TO_CHAR);
@@ -3651,6 +3965,7 @@ void do_burn_building(char_data *ch, room_data *room, obj_data *lighter) {
 		}
 		else {
 			gain_player_tech_exp(ch, PTECH_LIGHT_FIRE, 15);
+			run_ability_hooks_by_player_tech(ch, PTECH_LIGHT_FIRE, NULL, NULL, NULL, room);
 		}
 	
 		// and an offense
@@ -3955,10 +4270,10 @@ void do_claim_vehicle(char_data *ch, vehicle_data *veh, empire_data *emp) {
 		send_config_msg(ch, "ok_string");
 		if (GET_LOYALTY(ch) != emp) {
 			syslog(SYS_GC, GET_ACCESS_LEVEL(ch), TRUE, "ABUSE: %s has claimed %s for %s at %s", GET_NAME(ch), VEH_SHORT_DESC(veh), EMPIRE_NAME(emp), room_log_identifier(IN_ROOM(ch)));
-			act("$V is now claimed.", FALSE, ch, NULL, veh, TO_CHAR | TO_ROOM);
+			act("$V is now claimed.", FALSE, ch, NULL, veh, TO_CHAR | TO_ROOM | ACT_VEH_VICT);
 		}
 		else {
-			act("$n claims $V.", FALSE, ch, NULL, veh, TO_ROOM);
+			act("$n claims $V.", FALSE, ch, NULL, veh, TO_ROOM | ACT_VEH_VICT);
 		}
 		perform_claim_vehicle(veh, emp);
 	}
@@ -4449,7 +4764,9 @@ ACMD(do_diplomacy) {
 
 
 ACMD(do_efind) {
+	bool imm_access = GET_ACCESS_LEVEL(ch) >= LVL_CIMPL || IS_GRANTED(ch, GRANT_EMPIRES);
 	char buf[MAX_STRING_LENGTH*2];
+	char *argptr;
 	obj_data *obj;
 	empire_data *emp;
 	int total;
@@ -4459,12 +4776,19 @@ ACMD(do_efind) {
 	vehicle_data *veh;
 	size_t size;
 	
-	one_argument(argument, arg);
+	// optional first arg (empire) and empire detection
+	argptr = any_one_word(argument, arg);
+	if (!imm_access || !(emp = get_empire_by_name(arg))) {
+		emp = GET_LOYALTY(ch);
+		argptr = argument;
+	}
+	
+	one_argument(argptr, arg);
 	
 	if (IS_NPC(ch) || !ch->desc) {
 		msg_to_char(ch, "You can't do that.\r\n");
 	}
-	else if (!(emp = GET_LOYALTY(ch))) {
+	else if (!emp) {
 		msg_to_char(ch, "You aren't in an empire.\r\n");
 	}
 	else if (!*arg) {
@@ -4497,6 +4821,9 @@ ACMD(do_efind) {
 			if (VEH_OWNER(veh) != emp && (VEH_OWNER(veh) != NULL || ROOM_OWNER(IN_ROOM(veh)) != emp)) {
 				continue;
 			}
+			if (all && VEH_FLAGGED(veh, VEH_BUILDING)) {
+				continue;	// 'all' skips buildings
+			}
 			if (!all && !isname(arg, VEH_KEYWORDS(veh))) {
 				continue;
 			}
@@ -4506,7 +4833,13 @@ ACMD(do_efind) {
 		}
 
 		if (total > 0) {
-			size = snprintf(buf, sizeof(buf), "You discover:");	// leave off \r\n
+			if (emp == GET_LOYALTY(ch)) {
+				size = snprintf(buf, sizeof(buf), "You discover:");	// leave off \r\n
+			}
+			else {
+				size = snprintf(buf, sizeof(buf), "You discover in %s%s\t0:", EMPIRE_BANNER(emp), EMPIRE_NAME(emp));	// leave off \r\n
+			}
+			
 			last_rm = NULL;
 			
 			DL_FOREACH_SAFE(list, eg, next_eg) {
@@ -4544,7 +4877,7 @@ ACMD(do_efind) {
 			page_string(ch->desc, buf, TRUE);
 		}
 		else {
-			msg_to_char(ch, "You don't discover anything like that in your empire.\r\n");
+			msg_to_char(ch, "You don't discover anything like that in %s.\r\n", (emp == GET_LOYALTY(ch) ? "your empire" : EMPIRE_NAME(emp)));
 		}
 	}
 }
@@ -4821,7 +5154,7 @@ ACMD(do_empire_inventory) {
 	if (!*arg || (GET_ACCESS_LEVEL(ch) < LVL_CIMPL && !IS_GRANTED(ch, GRANT_EMPIRES))) {
 		emp = GET_LOYALTY(ch);
 		if (*arg2) {
-			sprintf(buf, "%s %s", arg, arg2);
+			snprintf(buf, sizeof(buf), "%s %s", arg, arg2);
 			strcpy(arg2, buf);
 		}
 		else {
@@ -4834,7 +5167,7 @@ ACMD(do_empire_inventory) {
 		if (!emp) {
 			emp = GET_LOYALTY(ch);
 			if (*arg2) {
-				sprintf(buf, "%s %s", arg, arg2);
+				snprintf(buf, sizeof(buf), "%s %s", arg, arg2);
 				strcpy(arg2, buf);
 			}
 			else {
@@ -4847,8 +5180,8 @@ ACMD(do_empire_inventory) {
 	}
 	if (emp) {
 		// sort to get predictable order
-		sort_einv_for_empire(emp);
-		
+		sort_einv_for_empire(emp, EINV_SORT_AMOUNT);
+
 		if ( subcmd == SCMD_EINVENTORY ) {
 			show_empire_inventory_to_char(ch, emp, arg2);
 		} else {
@@ -4865,7 +5198,7 @@ ACMD(do_enroll) {
 	struct empire_island *from_isle, *next_isle, *isle;
 	struct empire_territory_data *ter, *next_ter;
 	struct empire_npc_data *npc;
-	struct empire_storage_data *store, *next_store;
+	struct empire_storage_data *store, *next_store, *merged;
 	struct empire_city_data *city, *next_city;
 	struct empire_needs *needs, *next_needs;
 	player_index_data *index, *next_index;
@@ -4926,6 +5259,9 @@ ACMD(do_enroll) {
 		
 		remove_lore(targ, LORE_PROMOTED);
 		add_lore(targ, LORE_JOIN_EMPIRE, "Honorably accepted into %s%s&0", EMPIRE_BANNER(e), EMPIRE_NAME(e));
+		
+		// reset max greatness now (max greatness in THIS empire)
+		GET_HIGHEST_KNOWN_GREATNESS(targ) = GET_GREATNESS(targ);
 		
 		SAVE_CHAR(targ);
 		update_member_data(targ);
@@ -5011,11 +5347,16 @@ ACMD(do_enroll) {
 				
 				// storage
 				HASH_ITER(hh, from_isle->store, store, next_store) {
-					add_to_empire_storage(e, from_isle->island, store->vnum, store->amount);
-					
-					// counts as imported items
-					add_production_total(e, store->vnum, store->amount);
-					mark_production_trade(e, store->vnum, store->amount, 0);
+					if (store->amount > 0) {
+						merged = add_to_empire_storage(e, from_isle->island, store->vnum, store->amount, 0);
+						if (merged) {
+							merge_storage_timers(&merged->timers, store->timers, merged->amount);
+						}
+						
+						// counts as imported items
+						add_production_total(e, store->vnum, store->amount);
+						mark_production_trade(e, store->vnum, store->amount, 0);
+					}
 				}
 				
 				// needs
@@ -5118,7 +5459,7 @@ ACMD(do_enroll) {
 		
 		// ensure no lost einv
 		if ((island = get_main_island(e)) != NO_ISLAND) {
-			check_nowhere_einv(e, island);
+			check_einv_auto_move(e, island);
 		}
 		
 		// This will PROPERLY reset wealth and land, plus members and abilities
@@ -5130,7 +5471,7 @@ ACMD(do_enroll) {
 				refresh_all_quests(victim);
 			}
 		}
-			
+		
 		// update goal trackers: AFTER rereading tech
 		update_empire_members_and_greatness(e);
 		refresh_empire_goals(e, NOTHING);
@@ -5152,20 +5493,17 @@ ACMD(do_esay) {
 	int level = 0, i;
 	empire_data *e;
 	bool emote = FALSE, extra_color = FALSE;
-	char buf[MAX_STRING_LENGTH], lstring[MAX_STRING_LENGTH], lbuf[MAX_STRING_LENGTH], output[MAX_STRING_LENGTH], color[8];
+	char buf[MAX_STRING_LENGTH], lstring[MAX_STRING_LENGTH], output[MAX_STRING_LENGTH], color[8];
+	char *tmp;
 
-	if (IS_NPC(ch))
+	if (IS_NPC(ch)) {
 		return;
+	}
 
 	if (!(e = GET_LOYALTY(ch))) {
 		msg_to_char(ch, "You don't belong to any empire.\r\n");
 		return;
-		}
-
-	if (ACCOUNT_FLAGGED(ch, ACCT_MUTED)) {
-		msg_to_char(ch, "You can't use the empire channel while muted.\r\n");
-		return;
-		}
+	}
 
 	skip_spaces(&argument);
 
@@ -5197,6 +5535,10 @@ ACMD(do_esay) {
 	skip_spaces(&argument);
 
 	level++;	// 1-based, not 0-based
+	if (level > GET_RANK(ch)) {
+		msg_to_char(ch, "You can't chat above your own rank.\r\n");
+		return;
+	}
 
 	if (level > 1) {
 		sprintf(lstring, " <%s%%s>", EMPIRE_RANK(e, level-1));
@@ -5224,12 +5566,7 @@ ACMD(do_esay) {
 		send_config_msg(ch, "ok_string");
 	}
 	else {
-		// for channel history
-		if (ch->desc) {
-			clear_last_act_message(ch->desc);
-		}
-
-		sprintf(color, "%s\t%c", EXPLICIT_BANNER_TERMINATOR(e), GET_CUSTOM_COLOR(ch, CUSTOM_COLOR_ESAY) ? GET_CUSTOM_COLOR(ch, CUSTOM_COLOR_ESAY) : '0');
+		sprintf(color, "%s\t%c", EXPLICIT_BANNER_TERMINATOR(e), CUSTOM_COLOR_CHAR(ch, CUSTOM_COLOR_ESAY));
 		if (extra_color) {
 			sprintf(output, buf, color, color, color);
 		}
@@ -5238,22 +5575,14 @@ ACMD(do_esay) {
 		}
 		
 		act(output, FALSE, ch, 0, 0, TO_CHAR | TO_SLEEP | TO_NODARK);
-		
-		// channel history
-		if (ch->desc && ch->desc->last_act_message) {
-			// the message was sent via act(), we can retrieve it from the desc
-			sprintf(lbuf, "%s", ch->desc->last_act_message);
-			add_to_channel_history(ch, CHANNEL_HISTORY_EMPIRE, ch, lbuf);
-		}
 	}
 
 	for (d = descriptor_list; d; d = d->next) {
-		if (STATE(d) != CON_PLAYING || !(tch = d->character) || IS_NPC(tch) || is_ignoring(tch, ch) || GET_LOYALTY(tch) != e || GET_RANK(tch) < level || tch == ch)
+		if (STATE(d) != CON_PLAYING || !(tch = d->character) || IS_NPC(tch) || is_ignoring(tch, ch) || GET_LOYALTY(tch) != e || GET_RANK(tch) < level || tch == ch) {
 			continue;
+		}
 		else {
-			clear_last_act_message(d);
-			
-			sprintf(color, "%s\t%c", EXPLICIT_BANNER_TERMINATOR(e), GET_CUSTOM_COLOR(tch, CUSTOM_COLOR_ESAY) ? GET_CUSTOM_COLOR(tch, CUSTOM_COLOR_ESAY) : '0');
+			sprintf(color, "%s\t%c", EXPLICIT_BANNER_TERMINATOR(e), CUSTOM_COLOR_CHAR(tch, CUSTOM_COLOR_ESAY));
 			if (extra_color) {
 				sprintf(output, buf, color, color, color);
 			}
@@ -5261,15 +5590,20 @@ ACMD(do_esay) {
 				sprintf(output, buf, color, color);
 			}
 			act(output, FALSE, ch, 0, tch, TO_VICT | TO_SLEEP | TO_NODARK);
-			
-			// channel history
-			if (d->last_act_message) {
-				// the message was sent via act(), we can retrieve it from the desc
-				sprintf(lbuf, "%s", d->last_act_message);
-				add_to_channel_history(tch, CHANNEL_HISTORY_EMPIRE, ch, lbuf);
-			}	
 		}
 	}
+	
+	// and add to chat history
+	sprintf(color, "%s\t0", EXPLICIT_BANNER_TERMINATOR(e));
+	if (extra_color) {
+		sprintf(output, buf, color, color, color);
+	}
+	else {
+		sprintf(output, buf, color, color);
+	}
+	tmp = str_replace("$o", PERS(ch, ch, TRUE), output);
+	add_to_empire_history(e, ch, tmp, level);
+	free(tmp);
 }
 
 
@@ -5428,11 +5762,11 @@ ACMD(do_findmaintenance) {
 			msg_to_char(ch, "Unknown location: %s.\r\n", arg);
 			return;
 		}
-		else if (find_room && ROOM_OWNER(find_room) != emp) {
+		else if (find_room && ROOM_OWNER(find_room) != emp && total_vehicles_in_room_by_empire(find_room, emp) < 1) {
 			msg_to_char(ch, "The empire does not own that location.\r\n");
 			return;
 		}
-		else if (find_room && !BUILDING_DAMAGE(find_room) && (!IS_COMPLETE(find_room) || !BUILDING_RESOURCES(find_room))) {
+		else if (find_room && !BUILDING_DAMAGE(find_room) && (!IS_COMPLETE(find_room) || !BUILDING_RESOURCES(find_room)) && total_vehicles_in_room_by_empire(find_room, emp) < 1) {
 			msg_to_char(ch, "That location needs no maintenance.\r\n");
 			return;
 		}
@@ -5440,9 +5774,24 @@ ACMD(do_findmaintenance) {
 	
 	// player is only checking one room (pre-validated)
 	if (find_room) {
-		show_resource_list(BUILDING_RESOURCES(find_room), partial);
+		if (ROOM_OWNER(find_room) == emp && (IS_COMPLETE(find_room) && BUILDING_RESOURCES(find_room))) {
+			old_res = total_list;
+			total_list = combine_resources(total_list, BUILDING_RESOURCES(find_room));
+			free_resource_list(old_res);
+		}
+		DL_FOREACH2(ROOM_VEHICLES(find_room), veh, next_in_room) {
+			if (VEH_OWNER(veh) == emp || (!VEH_OWNER(veh) && ROOM_OWNER(find_room) == emp)) {
+				if (VEH_IS_COMPLETE(veh) && VEH_NEEDS_RESOURCES(veh)) {
+					old_res = total_list;
+					total_list = combine_resources(total_list, VEH_NEEDS_RESOURCES(veh));
+					free_resource_list(old_res);
+				}
+			}
+		}
+		show_resource_list(total_list, partial);
 		// note: shows coords regardless of navigation
 		msg_to_char(ch, "Maintenance needed for %s%s: %s\r\n", get_room_name(find_room, FALSE), coord_display_room(ch, find_room, FALSE), partial);
+		free_resource_list(total_list);
 		return;
 	}
 	
@@ -5573,31 +5922,35 @@ ACMD(do_findmaintenance) {
 
 
 /**
-* Searches the world for the player's private home.
+* Gets the player's private home, if it's still valid.
+*
+* This function formerly searched the world for the player's private home; this
+* data is on the player as of b5.170.
 *
 * @param char_data *ch The player.
 * @return room_data* The home location, or NULL if none found.
 */
 room_data *find_home(char_data *ch) {
-	room_data *iter, *next_iter;
+	room_data *home;
 	
-	if (IS_NPC(ch) || !GET_LOYALTY(ch)) {
-		return NULL;
+	home = (!IS_NPC(ch) && GET_HOME_LOCATION(ch) != NOWHERE) ? real_room(GET_HOME_LOCATION(ch)) : NULL;
+	
+	// audit now for lost home:
+	if (home && ROOM_PRIVATE_OWNER(home) != GET_IDNUM(ch)) {
+		GET_HOME_LOCATION(ch) = NOWHERE;
+		home = NULL;
 	}
 	
-	HASH_ITER(hh, world_table, iter, next_iter) {
-		if (ROOM_PRIVATE_OWNER(iter) == GET_IDNUM(ch)) {
-			return iter;
-		}
-	}
-	
-	return NULL;
+	return home;
 }
 
 
 ACMD(do_home) {
+	bool found;
 	char command[MAX_INPUT_LENGTH];
 	struct empire_territory_data *ter;
+	char_data *targ;
+	player_index_data *index;
 	room_data *iter, *next_iter, *home = NULL, *real = HOME_ROOM(IN_ROOM(ch));
 	empire_data *emp = GET_LOYALTY(ch);
 	
@@ -5671,6 +6024,7 @@ ACMD(do_home) {
 			}
 			
 			set_private_owner(real, GET_IDNUM(ch));
+			GET_HOME_LOCATION(ch) = GET_ROOM_VNUM(real);
 
 			// interior only
 			DL_FOREACH_SAFE2(interior_room_list, iter, next_iter, next_interior) {
@@ -5707,13 +6061,38 @@ ACMD(do_home) {
 			msg_to_char(ch, "You can't take away somebody's home.\r\n");
 		}
 		else {
+			if ((targ = is_playing(ROOM_PRIVATE_OWNER(real)))) {
+				GET_HOME_LOCATION(targ) = NOWHERE;
+				queue_delayed_update(targ, CDU_SAVE);
+			}
 			clear_private_owner(ROOM_PRIVATE_OWNER(real));
 			msg_to_char(ch, "This home's private owner has been cleared.\r\n");
 		}
 	}
 	else if (!str_cmp(command, "unset")) {
 		clear_private_owner(GET_IDNUM(ch));
+		GET_HOME_LOCATION(ch) = NOWHERE;
+		queue_delayed_update(ch, CDU_SAVE);
 		msg_to_char(ch, "Your home has been unset.\r\n");
+	}
+	else if (is_abbrev(command, "list")) {
+		if (!emp) {
+			msg_to_char(ch, "You need to be in an empire to list homes.\r\n");
+		}
+		else {
+			msg_to_char(ch, "Private homes in the empire:\r\n");
+			
+			found = FALSE;
+			HASH_ITER(hh, world_table, iter, next_iter) {
+				if (ROOM_OWNER(iter) == emp && ROOM_PRIVATE_OWNER(iter) != NOBODY) {
+					msg_to_char(ch, "%s %s: %s\r\n", coord_display_room(ch, iter, TRUE), get_room_name(iter, FALSE), ((index = find_player_index_by_idnum(ROOM_PRIVATE_OWNER(iter))) ? index->fullname : "<unknown>"));
+					found = TRUE;
+				}
+			}
+			if (!found) {
+				msg_to_char(ch, " none\r\n");
+			}
+		}
 	}
 	else if (is_abbrev(command, "inventory")) {
 		warehouse_inventory(ch, argument, SCMD_HOME);
@@ -5732,7 +6111,7 @@ ACMD(do_home) {
 		warehouse_store(ch, argument, SCMD_HOME);
 	}
 	else {
-		msg_to_char(ch, "Usage: home [set | unset | clear | inventory | retrieve | store]\r\n");
+		msg_to_char(ch, "Usage: home [set | unset | list | clear | inventory | retrieve | store]\r\n");
 	}
 }
 
@@ -5783,7 +6162,9 @@ ACMD(do_islands) {
 		
 		// mark storage
 		HASH_ITER(hh, eisle->store, store, next_store) {
-			do_islands_add_einv(&list, eisle->island, store->amount);
+			if (store->amount > 0) {
+				do_islands_add_einv(&list, eisle->island, store->amount);
+			}
 		}
 	}
 	
@@ -5831,75 +6212,6 @@ ACMD(do_islands) {
 	}
 	
 	page_string(ch->desc, output, TRUE);
-}
-
-
-ACMD(do_tavern) {
-	int iter, type = NOTHING, pos, old;
-	
-	one_argument(argument, arg);
-	
-	if (*arg) {
-		for (iter = 0; type == NOTHING && *tavern_data[iter].name != '\n'; ++iter) {
-			if (is_abbrev(arg, tavern_data[iter].name)) {
-				type = iter;
-			}
-		}
-	}
-	
-	if (!room_has_function_and_city_ok(GET_LOYALTY(ch), IN_ROOM(ch), FNC_TAVERN)) {
-		show_tavern_status(ch);
-		msg_to_char(ch, "You can only change what's being brewed while actually in the tavern.\r\n");
-	}
-	else if (!check_in_city_requirement(IN_ROOM(ch), TRUE)) {
-		show_tavern_status(ch);
-		msg_to_char(ch, "This tavern only works in a city.\r\n");
-	}
-	else if (!IS_COMPLETE(IN_ROOM(ch))) {
-		show_tavern_status(ch);
-		msg_to_char(ch, "Complete the building to change what it's brewing.\r\n");
-	}
-	else if (!check_in_city_requirement(IN_ROOM(ch), TRUE)) {
-		msg_to_char(ch, "This building must be in a city to use it.\r\n");
-	}
-	else if (!GET_LOYALTY(ch) || GET_LOYALTY(ch) != ROOM_OWNER(IN_ROOM(ch))) {
-		msg_to_char(ch, "Your empire doesn't own this tavern.\r\n");
-	}
-	else if (!has_permission(ch, PRIV_WORKFORCE, IN_ROOM(ch))) {
-		msg_to_char(ch, "You need the workforce privilege to change what this tavern is brewing.\r\n");
-	}
-	else if (!*arg || type == NOTHING) {
-		if (*arg && type == NOTHING) {
-			msg_to_char(ch, "Invalid tavern type. ");	// deliberate lack of CRLF
-		}
-		else {
-			msg_to_char(ch, "This tavern is currently brewing %s.\r\n", tavern_data[get_room_extra_data(IN_ROOM(ch), ROOM_EXTRA_TAVERN_TYPE)].name);
-			show_tavern_status(ch);
-		}
-		send_to_char("You can have it make:\r\n", ch);
-		for (iter = 0; *tavern_data[iter].name != '\n'; ++iter) {
-			msg_to_char(ch, " %s", tavern_data[iter].name);
-			for (pos = 0; tavern_data[iter].ingredients[pos] != NOTHING; ++pos) {
-				msg_to_char(ch, "%s%s", pos > 0 ? " + " : ": ", get_obj_name_by_proto(tavern_data[iter].ingredients[pos]));
-			}
-			send_to_char("\r\n", ch);
-		}
-	}
-	else {
-		old = get_room_extra_data(IN_ROOM(ch), ROOM_EXTRA_TAVERN_TYPE);
-		set_room_extra_data(IN_ROOM(ch), ROOM_EXTRA_TAVERN_TYPE, type);
-		
-		if (extract_tavern_resources(IN_ROOM(ch))) {
-			set_room_extra_data(IN_ROOM(ch), ROOM_EXTRA_TAVERN_BREWING_TIME, config_get_int("tavern_brew_time"));
-			remove_room_extra_data(IN_ROOM(ch), ROOM_EXTRA_TAVERN_AVAILABLE_TIME);
-			msg_to_char(ch, "This tavern will now brew %s.\r\n", tavern_data[type].name);
-			check_tavern_setup(IN_ROOM(ch));
-		}
-		else {
-			set_room_extra_data(IN_ROOM(ch), ROOM_EXTRA_TAVERN_TYPE, old);
-			msg_to_char(ch, "Your empire doesn't have the resources to brew that.\r\n");
-		}
-	}
 }
 
 
@@ -6103,7 +6415,7 @@ ACMD(do_inspire) {
 	else if (vict && IS_NPC(vict)) {
 		msg_to_char(ch, "You can only inspire other players.\r\n");
 	}
-	else if (ABILITY_TRIGGERS(ch, vict, NULL, ABIL_INSPIRE)) {
+	else if (ABILITY_TRIGGERS(ch, vict, NULL, NULL, ABIL_INSPIRE)) {
 		return;
 	}
 	else {
@@ -6539,8 +6851,15 @@ ACMD(do_pledge) {
 	else {
 		GET_PLEDGE(ch) = EMPIRE_VNUM(e);
 		add_cooldown(ch, COOLDOWN_PLEDGE, SECS_PER_REAL_HOUR);
-		log_to_empire(e, ELOG_MEMBERS, "%s has offered %s pledge to this empire", PERS(ch, ch, 1), REAL_HSHR(ch));
-		msg_to_char(ch, "You offer your pledge to %s.\r\n", EMPIRE_NAME(e));
+		if (old) {
+			log_to_empire(e, ELOG_MEMBERS, "%s has offered to pledge %s to this empire", PERS(ch, ch, TRUE), EMPIRE_NAME(old));
+			log_to_empire(old, ELOG_MEMBERS, "%s has offered to pledge the empire to %s", PERS(ch, ch, TRUE), EMPIRE_NAME(e));
+			msg_to_char(ch, "You offer to pledge %s to %s.\r\n", EMPIRE_NAME(old), EMPIRE_NAME(e));
+		}
+		else {
+			log_to_empire(e, ELOG_MEMBERS, "%s has offered %s pledge to this empire", PERS(ch, ch, TRUE), REAL_HSHR(ch));
+			msg_to_char(ch, "You offer your pledge to %s.\r\n", EMPIRE_NAME(e));
+		}
 		queue_delayed_update(ch, CDU_SAVE);
 	}
 }
@@ -6945,8 +7264,14 @@ ACMD(do_progress) {
 			msg_to_char(ch, "Rewards:\r\n%s", buf);
 		}
 		if ((goal = get_current_goal(emp, PRG_VNUM(prg)))) {
-			get_tracker_display(goal->tracker, buf);
-			msg_to_char(ch, "Progress:\r\n%s", buf);
+			if (PRG_FLAGGED(prg, PRG_NO_TRACKER) && !IS_IMMORTAL(ch)) {
+				count_quest_tasks(goal->tracker, &complete, &total);
+				msg_to_char(ch, "Progress: %d/%d\r\n", complete, total);
+			}
+			else {
+				get_tracker_display(goal->tracker, buf);
+				msg_to_char(ch, "Progress:\r\n%s", buf);
+			}
 		}
 	}
 	
@@ -7127,7 +7452,7 @@ void process_reclaim(char_data *ch) {
 		abandon_room(target);
 		claim_room(target, emp);
 		
-		GET_ACTION(ch) = ACT_NONE;
+		end_action(ch);
 	}
 }
 
@@ -7171,7 +7496,7 @@ ACMD(do_reclaim) {
 	if (!*arg && GET_ACTION(ch) == ACT_RECLAIMING) {
 		msg_to_char(ch, "You stop trying to reclaim this area.\r\n");
 		act("$n stops trying to reclaim this area.", FALSE, ch, NULL, NULL, TO_ROOM);
-		GET_ACTION(ch) = ACT_NONE;
+		end_action(ch);
 	}
 	else if (GET_ACTION(ch) != ACT_NONE) {
 		msg_to_char(ch, "You're a little busy right now.\r\n");
@@ -7235,7 +7560,7 @@ ACMD(do_roster) {
 	// mortal usage: roster [all]
 	
 	// override for imm args: roster <empire> (with no quotes and no -all)
-	if (imm_access && *argument && (e = get_empire_by_name(argument))) {
+	if (imm_access && *argument && *argument != '"' && (e = get_empire_by_name(argument))) {
 		*argument = '\0';	// clear further args and accept the empire name as-is
 	}
 	
@@ -7321,17 +7646,20 @@ ACMD(do_roster) {
 
 
 ACMD(do_territory) {
-	char search_str[MAX_INPUT_LENGTH], exclude_str[MAX_INPUT_LENGTH], arg[MAX_INPUT_LENGTH], buf[MAX_STRING_LENGTH*4], line[256], *ptr;
-	struct find_territory_node *node_list = NULL, *node, *next_node;
-	empire_data *emp = GET_LOYALTY(ch);
-	room_data *iter, *next_iter;
-	bool outside_only = TRUE, outskirts_only = FALSE, frontier_only = FALSE, ok, junk, full;
+	char search_str[MAX_INPUT_LENGTH], exclude_str[MAX_INPUT_LENGTH], arg[MAX_INPUT_LENGTH], arg2[MAX_INPUT_LENGTH], buf[MAX_STRING_LENGTH*4], option_buf[1024], line[256], *remain;
+	bool ok, junk, full;
+	bool check_city, check_outskirts, check_frontier, any_type_found;
+	bool no_abandon, no_dismantle, no_work, public_only;
+	int dist_from_me, total, ttype;
 	size_t size, lsize;
-	int total;
 	crop_data *crop = NULL;
-	char *remain;
+	empire_data *emp = GET_LOYALTY(ch);
+	struct find_territory_node *node_list = NULL, *node, *next_node;
+	struct island_info *find_island;
+	room_data *iter, *next_iter;
+	vehicle_data *veh;
 	
-	// imms can target an empire, otherwise the only arg is optional sector type
+	// imms can target an empire as the FIRST argument
 	remain = any_one_word(argument, arg);
 	if (*arg && (GET_ACCESS_LEVEL(ch) >= LVL_CIMPL || IS_GRANTED(ch, GRANT_EMPIRES))) {
 		if ((emp = get_empire_by_name(arg))) {
@@ -7343,9 +7671,7 @@ ACMD(do_territory) {
 		}
 	}
 	
-	skip_spaces(&argument);
-	*search_str = *exclude_str = '\0';
-	
+	// preliminaries
 	if (!emp) {
 		msg_to_char(ch, "You are not in an empire.\r\n");
 		return;
@@ -7355,90 +7681,309 @@ ACMD(do_territory) {
 		return;
 	}
 	
-	// only if no argument (optional)
-	if (*argument && is_abbrev(argument, "outskirts") && strlen(argument) >= 4) {
-		// (allow partial abbrev)
-		outskirts_only = TRUE;
-		*argument = '\0';	// don't filter by text
-	}
-	else if (*argument && is_abbrev(argument, "frontier") && strlen(argument) >= 5) {
-		// (allow partial abbrev)
-		frontier_only = TRUE;
-		*argument = '\0';	// don't filter by text
-	}
-	else {
-		outside_only = *argument ? FALSE : TRUE;
+	// prepare options
+	*search_str = *exclude_str = '\0';
+	check_city = check_outskirts = check_frontier = TRUE;
+	any_type_found = FALSE;
+	no_abandon = no_dismantle = no_work = public_only = FALSE;
+	dist_from_me = -1;
+	find_island = NULL;
+	
+	// parse options
+	while (*argument) {
+		skip_spaces(&argument);
+		argument = any_one_word(argument, arg);
 		
-		// process the argument into search_str, exclude_str
-		ptr = argument;
-		while (*ptr) {
-			ptr = any_one_word(ptr, arg);
-			
-			if (*arg == '-') {
-				sprintf(exclude_str + strlen(exclude_str), "%s%s", *exclude_str ? " " : "", arg+1);
+		if (!str_cmp(arg, "city") || !str_cmp(arg, "cities") || is_abbrev(arg, "-city") || is_abbrev(arg, "-cities")) {
+			check_city = TRUE;
+			if (!any_type_found) {
+				// first type requested: shut off the others
+				check_outskirts = FALSE;
+				check_frontier = FALSE;
+				any_type_found = TRUE;
+			}
+		}
+		else if (!str_cmp(arg, "outskirts") || is_abbrev(arg, "-outskirts")) {
+			check_outskirts = TRUE;
+			if (!any_type_found) {
+				// first type requested: shut off the others
+				check_city = FALSE;
+				check_frontier = FALSE;
+				any_type_found = TRUE;
+			}
+		}
+		else if (!str_cmp(arg, "frontier") || is_abbrev(arg, "-frontier")) {
+			check_frontier = TRUE;
+			if (!any_type_found) {
+				// first type requested: shut off the others
+				check_city = FALSE;
+				check_outskirts = FALSE;
+				any_type_found = TRUE;
+			}
+		}
+		else if (is_abbrev(arg, "-distance")) {
+			argument = any_one_arg(argument, arg2);
+			if (*arg2 && isdigit(*arg2)) {
+				dist_from_me = atoi(arg2);
 			}
 			else {
-				sprintf(search_str + strlen(search_str), "%s%s", *search_str ? " " : "", arg);
+				msg_to_char(ch, "Territory: The -distance argument requires a number.\r\n");
+				return;
+			}
+		}
+		else if (is_abbrev(arg, "-island")) {
+			argument = any_one_word(argument, arg2);
+			if (!*arg2) {
+				msg_to_char(ch, "You must specify which island with -island \"Island Name\".\r\n");
+				return;
+			}
+			else if (find_island) {
+				msg_to_char(ch, "You can't specify more than one island at a time.\r\n");
+				return;
+			}
+			else if (!(find_island = get_island_by_name(ch, arg2))) {
+				msg_to_char(ch, "Unknown island '%s'.\r\n", arg2);
+				return;
+			}
+			// else: we found an island
+		}
+		else if (!str_cmp(arg, "no-abandon") || !str_cmp(arg, "noabandon") || is_abbrev(arg, "-no-abandon") || is_abbrev(arg, "-noabandon")) {
+			no_abandon = TRUE;
+		}
+		else if (!str_cmp(arg, "no-dismantle") || !str_cmp(arg, "nodismantle") || is_abbrev(arg, "-no-dismantle") || is_abbrev(arg, "-nodismantle")) {
+			no_dismantle = TRUE;
+		}
+		else if (!str_cmp(arg, "no-work") || !str_cmp(arg, "nowork") || is_abbrev(arg, "-no-work") || is_abbrev(arg, "-nowork")) {
+			no_work = TRUE;
+		}
+		else if (!str_cmp(arg, "public") || is_abbrev(arg, "-public")) {
+			public_only = TRUE;
+		}
+		else {
+			// unknown arg: treat as search
+			if (*arg != '-') {
+				// positive search term
+				snprintf(search_str + strlen(search_str), sizeof(search_str) - strlen(search_str), "%s%s", *search_str ? " " : "", arg);
+			}
+			else if (*(arg+1) == '-') {
+				// double dash: negative term
+				if (*arg+2) {
+					snprintf(exclude_str + strlen(exclude_str), sizeof(exclude_str) - strlen(exclude_str), "%s%s", *exclude_str ? " " : "", arg+2);
+				}
+				// else: empty/ignore
+			}
+			else if (*(arg+1)) {
+				// single dash: also a negative term
+				snprintf(exclude_str + strlen(exclude_str), sizeof(exclude_str) - strlen(exclude_str), "%s%s", *exclude_str ? " " : "", arg+1);
 			}
 		}
 	}
 	
-	// ready?
+	// ready? check world:
 	HASH_ITER(hh, world_table, iter, next_iter) {	
-		if (outside_only && GET_ROOM_VNUM(iter) >= MAP_SIZE) {
-			continue;	// not on map
+		if (!*search_str && GET_ROOM_VNUM(iter) >= MAP_SIZE) {
+			continue;	// not on map: ignore if no search terms given
 		}
 		if (ROOM_OWNER(iter) != emp) {
 			continue;	// not owned
 		}
-		if (outside_only && get_territory_type_for_empire(iter, emp, FALSE, &junk, NULL) == TER_CITY) {
-			continue;	// not outside
-		}
-		if (outskirts_only && get_territory_type_for_empire(iter, emp, FALSE, &junk, NULL) != TER_OUTSKIRTS) {
-			continue;	// not outskirts
-		}
-		if (frontier_only && get_territory_type_for_empire(iter, emp, FALSE, &junk, NULL) != TER_FRONTIER) {
-			continue;	// not outskirts
+		
+		// territory type flags: only if any where requested
+		if (any_type_found) {
+			ttype = get_territory_type_for_empire(iter, emp, FALSE, &junk, NULL);
+			if (!check_city && ttype == TER_CITY) {
+				continue;
+			}
+			else if (!check_outskirts && ttype == TER_OUTSKIRTS) {
+				continue;
+			}
+			else if (!check_frontier && ttype == TER_FRONTIER) {
+				continue;
+			}
 		}
 		
-		// compare request
-		if (!*search_str && !*exclude_str) {
-			ok = TRUE;
+		// manage flags
+		if (no_abandon && !ROOM_AFF_FLAGGED(iter, ROOM_AFF_NO_ABANDON)) {
+			continue;
 		}
-		else if ((!*search_str || multi_isname(search_str, GET_SECT_NAME(SECT(iter)))) && (!*exclude_str || !multi_isname(exclude_str, GET_SECT_NAME(SECT(iter))))) {
-			ok = TRUE;
+		if (no_dismantle && !ROOM_AFF_FLAGGED(iter, ROOM_AFF_NO_DISMANTLE)) {
+			continue;
 		}
-		else if (GET_BUILDING(iter) && (!*search_str || multi_isname(search_str, GET_BLD_NAME(GET_BUILDING(iter)))) && (!*exclude_str || !multi_isname(exclude_str, GET_BLD_NAME(GET_BUILDING(iter))))) {
-			ok = TRUE;
+		if (no_work && !ROOM_AFF_FLAGGED(iter, ROOM_AFF_NO_WORK)) {
+			continue;
 		}
-		else if (ROOM_SECT_FLAGGED(iter, SECTF_HAS_CROP_DATA) && (crop = ROOM_CROP(iter)) && (!*search_str || multi_isname(search_str, GET_CROP_NAME(crop))) && (!*exclude_str || !multi_isname(exclude_str, GET_CROP_NAME(crop)))) {
-			ok = TRUE;
-		}
-		else if ((!*search_str || multi_isname(search_str, get_room_name(iter, FALSE))) && (!*exclude_str || !multi_isname(exclude_str, get_room_name(iter, FALSE)))) {
-			ok = TRUE;
-		}
-		else {
-			ok = FALSE;
+		if (public_only && !ROOM_AFF_FLAGGED(iter, ROOM_AFF_PUBLIC)) {
+			continue;
 		}
 		
+		// distance?
+		if (dist_from_me >= 0 && compute_distance(IN_ROOM(ch), iter) > dist_from_me) {
+			continue;
+		}
+		if (find_island && GET_ISLAND(iter) != find_island) {
+			continue;
+		}
+		
+		// search requested text
+		ok = FALSE;
+		if (!*search_str) {
+			ok = TRUE;
+		}
+		else if (multi_isname(search_str, GET_SECT_NAME(SECT(iter)))) {
+			ok = TRUE;
+		}
+		else if (GET_BUILDING(iter) && multi_isname(search_str, GET_BLD_NAME(GET_BUILDING(iter)))) {
+			ok = TRUE;
+		}
+		else if (ROOM_SECT_FLAGGED(iter, SECTF_HAS_CROP_DATA) && (crop = ROOM_CROP(iter)) && multi_isname(search_str, GET_CROP_NAME(crop))) {
+			ok = TRUE;
+		}
+		else if (multi_isname(search_str, get_room_name(iter, FALSE))) {
+			ok = TRUE;
+		}
+		// check exclude text
+		if (ok && *exclude_str) {
+			if (any_isname(exclude_str, GET_SECT_NAME(SECT(iter)))) {
+				ok = FALSE;
+			}
+			else if (GET_BUILDING(iter) && any_isname(exclude_str, GET_BLD_NAME(GET_BUILDING(iter)))) {
+				ok = FALSE;
+			}
+			else if (ROOM_SECT_FLAGGED(iter, SECTF_HAS_CROP_DATA) && (crop = ROOM_CROP(iter)) && any_isname(exclude_str, GET_CROP_NAME(crop))) {
+				ok = FALSE;
+			}
+			else if (any_isname(exclude_str, get_room_name(iter, FALSE))) {
+				ok = FALSE;
+			}
+		}
+		
+		// final ok: add to the list
 		if (ok) {
 			CREATE(node, struct find_territory_node, 1);
 			node->loc = iter;
 			node->count = 1;
+			node->is_vehicle = FALSE;
 			DL_PREPEND(node_list, node);
 		}
+	} // end territory
+	
+	// check vehicles (except under certain options):	
+	if (!no_abandon && !public_only) {
+		DL_FOREACH(vehicle_list, veh) {
+			if (VEH_OWNER(veh) != emp || !VEH_FLAGGED(veh, VEH_BUILDING)) {
+				continue;	// not a building or not owned by emp
+			}
+		
+			// do we already have this location?
+			ok = TRUE;
+			DL_FOREACH(node_list, node) {
+				if (node->loc == IN_ROOM(veh)) {
+					ok = FALSE;
+					break;
+				}
+			}
+			if (!ok) {
+				continue;	// already marked this room
+			}
+		
+			// check options:
+			// territory type flags: only if any where requested
+			if (any_type_found) {
+				ttype = get_territory_type_for_empire(IN_ROOM(veh), emp, FALSE, &junk, NULL);
+				if (!check_city && ttype == TER_CITY) {
+					continue;
+				}
+				else if (!check_outskirts && ttype == TER_OUTSKIRTS) {
+					continue;
+				}
+				else if (!check_frontier && ttype == TER_FRONTIER) {
+					continue;
+				}
+			}
+		
+			// manage flags
+			if (no_dismantle && !VEH_FLAGGED(veh, VEH_PLAYER_NO_DISMANTLE) && (!VEH_INTERIOR_HOME_ROOM(veh) || !ROOM_AFF_FLAGGED(VEH_INTERIOR_HOME_ROOM(veh), ROOM_AFF_NO_DISMANTLE))) {
+				continue;
+			}
+			if (no_work && !VEH_FLAGGED(veh, VEH_PLAYER_NO_WORK) && (!VEH_INTERIOR_HOME_ROOM(veh) || !ROOM_AFF_FLAGGED(VEH_INTERIOR_HOME_ROOM(veh), ROOM_AFF_NO_WORK))) {
+				continue;
+			}
+		
+			// distance?
+			if (dist_from_me >= 0 && compute_distance(IN_ROOM(ch), IN_ROOM(veh)) > dist_from_me) {
+				continue;
+			}
+			if (find_island && GET_ISLAND(IN_ROOM(veh)) != find_island) {
+				continue;
+			}
+		
+			// search requested text
+			ok = FALSE;
+			if (!*search_str) {
+				ok = TRUE;
+			}
+			else if (multi_isname(search_str, VEH_SHORT_DESC(veh))) {
+				ok = TRUE;
+			}
+			// check exclude text
+			if (ok && *exclude_str && any_isname(exclude_str, VEH_SHORT_DESC(veh))) {
+				ok = FALSE;
+			}
+		
+			// final ok: add to the list
+			if (ok) {
+				CREATE(node, struct find_territory_node, 1);
+				node->loc = IN_ROOM(veh);
+				node->count = 1;
+				node->is_vehicle = TRUE;
+				DL_PREPEND(node_list, node);
+			}
+		}
+	} // end vehicles
+	
+	// build option buf for output
+	*option_buf = '\0';
+	if (find_island) {
+		snprintf(option_buf + strlen(option_buf), sizeof(option_buf) - strlen(option_buf), "%s%s", (*option_buf ? ", " : ""), get_island_name_for(find_island->id, ch));
+	}
+	if (dist_from_me >= 0) {
+		snprintf(option_buf + strlen(option_buf), sizeof(option_buf) - strlen(option_buf), "%swithin %d tile%s", (*option_buf ? ", " : ""), dist_from_me, PLURAL(dist_from_me));
+	}
+	if (any_type_found) {
+		if (check_city) {
+			snprintf(option_buf + strlen(option_buf), sizeof(option_buf) - strlen(option_buf), "%sin cities", (*option_buf ? ", " : ""));
+		}
+		if (check_outskirts) {
+			snprintf(option_buf + strlen(option_buf), sizeof(option_buf) - strlen(option_buf), "%sin the outskirts", (*option_buf ? ", " : ""));
+		}
+		if (check_frontier) {
+			snprintf(option_buf + strlen(option_buf), sizeof(option_buf) - strlen(option_buf), "%son the frontier", (*option_buf ? ", " : ""));
+		}
+	}
+	if (no_abandon) {
+		snprintf(option_buf + strlen(option_buf), sizeof(option_buf) - strlen(option_buf), "%sno-abandon", (*option_buf ? ", " : ""));
+	}
+	if (no_dismantle) {
+		snprintf(option_buf + strlen(option_buf), sizeof(option_buf) - strlen(option_buf), "%sno-dismantle", (*option_buf ? ", " : ""));
+	}
+	if (no_work) {
+		snprintf(option_buf + strlen(option_buf), sizeof(option_buf) - strlen(option_buf), "%sno-work", (*option_buf ? ", " : ""));
+	}
+	if (public_only) {
+		snprintf(option_buf + strlen(option_buf), sizeof(option_buf) - strlen(option_buf), "%sis public", (*option_buf ? ", " : ""));
+	}
+	if (*search_str) {
+		snprintf(option_buf + strlen(option_buf), sizeof(option_buf) - strlen(option_buf), "%scontaining '%s'", (*option_buf ? ", " : ""), search_str);
+	}
+	if (*exclude_str) {
+		snprintf(option_buf + strlen(option_buf), sizeof(option_buf) - strlen(option_buf), "%sexcluding '%s'", (*option_buf ? ", " : ""), exclude_str);
 	}
 	
 	if (node_list) {
 		node_list = reduce_territory_node_list(node_list);
-	
-		if (!*argument) {
-			size = snprintf(buf, sizeof(buf), "%s%s&0 territory outside of cities:\r\n", EMPIRE_BANNER(emp), EMPIRE_ADJECTIVE(emp));
-		}
-		else {
-			size = snprintf(buf, sizeof(buf), "'%s' tiles owned by %s%s&0:\r\n", argument, EMPIRE_BANNER(emp), EMPIRE_NAME(emp));
-			CAP(buf);
-		}
+		
+		// start buf
+		size = snprintf(buf, sizeof(buf), "%s%s&0 territory: %s\r\n", EMPIRE_BANNER(emp), EMPIRE_ADJECTIVE(emp), option_buf);
 		
 		// display and free the nodes
 		total = 0;
@@ -7448,10 +7993,10 @@ ACMD(do_territory) {
 			
 			if (!full) {
 				if (node->count > 1) {
-					lsize = snprintf(line, sizeof(line), "%2d tiles near%s %s\r\n", node->count, coord_display_room(ch, node->loc, TRUE), get_room_name(node->loc, FALSE));
+					lsize = snprintf(line, sizeof(line), "%2d tiles near%s %s%s\r\n", node->count, coord_display_room(ch, node->loc, TRUE), get_room_name(node->loc, FALSE), (node->is_vehicle ? " (building on tile)" : ""));
 				}
 				else {
-					lsize = snprintf(line, sizeof(line), "%s %s\r\n", coord_display_room(ch, node->loc, TRUE), get_room_name(node->loc, FALSE));
+					lsize = snprintf(line, sizeof(line), "%s %s%s\r\n", coord_display_room(ch, node->loc, TRUE), get_room_name(node->loc, FALSE), (node->is_vehicle ? " (building on tile)" : ""));
 				}
 				
 				if (size + lsize < sizeof(buf)) {
@@ -7478,7 +8023,13 @@ ACMD(do_territory) {
 		page_string(ch->desc, buf, TRUE);
 	}
 	else {
-		msg_to_char(ch, "No matching territory found.\r\n");
+		// none found
+		if (*option_buf) {
+			msg_to_char(ch, "No matching territory found: %s\r\n", option_buf);
+		}
+		else {
+			msg_to_char(ch, "No territory found.\r\n");
+		}
 	}
 }
 
@@ -7736,8 +8287,10 @@ ACMD(do_workforce) {
 		msg_to_char(ch, "Your empire has no workforce.\r\n");
 	}
 	else if (!*arg) {
-		msg_to_char(ch, "Usage: workforce [chore] [on | off | <limit>] [island name | all]\r\n");
 		show_workforce_setup_to_char(emp, ch);
+		if (!PRF_FLAGGED(ch, PRF_NO_TUTORIALS)) {
+			msg_to_char(ch, "See 'help workforce' for options.\r\n");
+		}
 	}
 	else if (!IS_APPROVED(ch) && config_get_bool("manage_empire_approval")) {
 		send_config_msg(ch, "need_approval_string");
@@ -7823,7 +8376,7 @@ ACMD(do_workforce) {
 		}
 		
 		// sort to ensure predictable order
-		sort_einv_for_empire(emp);
+		sort_einv_for_empire(emp, EINV_SORT_AMOUNT);
 		
 		found = FALSE;
 		HASH_ITER(hh, eisle->store, store, next_store) {

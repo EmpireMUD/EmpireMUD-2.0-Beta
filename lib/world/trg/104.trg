@@ -197,11 +197,12 @@ Hamlet burn-down (cleanup)~
 ~
 * check if instance was scaled at all -- if not, don't bother with ruins
 set guard %instance.mob(10400)%
-if %guard%
-  if !%guard.varexists(scaled)%
-    * never been scaled
-    halt
-  end
+if !%guard%
+  * not even loaded? no players have been inside
+  halt
+elseif !%guard.varexists(scaled)%
+  * never been scaled
+  halt
 end
 * check if any bosses remain
 set boss_mobs 10405 10410 10415
@@ -308,7 +309,7 @@ if !%self.affect(counterspell)%
 else
   switch %random.4%
     case 1
-      if %actor.trigger_counterspell%
+      if %actor.trigger_counterspell(%self%)%
         %send% %actor% ~%self% shoots a bolt of violet energy at you, but it breaks on your counterspell!
         %echoaround% %actor% ~%self% shoots a bolt of violet energy at ~%actor%, but it breaks on ^%actor% counterspell!
       else
@@ -332,7 +333,7 @@ else
     case 4
       set target %random.enemy%
       if (%target%)
-        if %target.trigger_counterspell%
+        if %target.trigger_counterspell(%self%)%
           %send% %target% ~%self% shoots a bolt of violet energy at you, but it breaks on your counterspell!
           %echoaround% %target% ~%self% shoots a bolt of violet energy at ~%target%, but it breaks on ^%target% counterspell!
         else
@@ -387,7 +388,7 @@ if !%self.affect(counterspell)%
 else
   switch %random.3%
     case 1
-      if %actor.trigger_counterspell%
+      if %actor.trigger_counterspell(%self%)%
         %send% %actor% ~%self% hurls a flaming meteor at you, but it fizzles on your counterspell!
         %echoaround% %actor% ~%self% hurls a flaming meteor at ~%actor%, but it fizzles on ^%actor% counterspell!
       else
@@ -406,7 +407,7 @@ else
     case 3
       set target %random.enemy%
       if (%target%)
-        if %target.trigger_counterspell%
+        if %target.trigger_counterspell(%self%)%
           %send% %target% ~%self% hurls a flaming meteor at you, but it fizzles on your counterspell!
           %echoaround% %target% ~%self% hurls a flaming meteor at ~%target%, but it fizzles on ^%target% counterspell!
         else
@@ -639,21 +640,21 @@ end
 ~
 #10458
 Goblin Outpost attack info~
-0 c 0
-kill hit kick bash lightningbolt backstab skybrand entangle shoot sunshock enervate slow siphon disarm job blind sap prick~
+0 B 0
+~
 if %self.aff_flagged(!ATTACK)%
   if %actor.char_target(%arg%)% != %self%
-    return 0
+    return 1
     halt
   end
   %send% %actor% You need to choose a difficulty before you can challenge ~%self%.
   %send% %actor% Usage: difficulty <normal \| hard \| group>
   %echoaround% %actor% ~%actor% considers attacking ~%self%.
-  return 1
+  return 0
 else
   * no need for this script anymore
   detach 10458 %self.id%
-  return 0
+  return 1
 end
 ~
 #10459

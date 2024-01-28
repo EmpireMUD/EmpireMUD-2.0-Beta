@@ -60,12 +60,12 @@ if %cmd% == make
       %send% %actor% You've stopped building the snowman.
       halt
     end
-  elseif (snowman /= %arg%)
+  elseif (snowman /= %arg%) && !(snow /= %arg%)
     %send% %actor% You don't have enough snowballs yet.
     halt
   end
 end
-if %cmd% == scoop && snowball /= %arg%
+if %cmd% == scoop && !(snowball /= %arg%)
   %send% %actor% You can only make snowballs when scooping.
   halt
 end
@@ -87,7 +87,7 @@ if !%actor.fighting% && %BuildRoom% == %self.room%
   %send% %actor% You shape the newly made snow into a perfect snowball for your snowman.
   %echoaround% %actor% %player_name% shapes the newly made snow into a perfect snowball for ^%actor% snowman.
   %load% obj 16605 %actor% inv
-  nop %actor.set_cooldown(16600, 30)%
+  nop %actor.set_cooldown(16600, 20)%
 else
   %send% %actor% You've stopped working on a snowball.
 end
@@ -198,7 +198,9 @@ switch %questvnum%
     %teleport% %SnowmanInRoom% %self%
     %force% %actor% follow snowman
     set PlayerOnAbominableQuest %actor%
+    set PlayerOnAbominableQuest_id %actor.id%
     remote PlayerOnAbominableQuest %SnowmanInRoomID%
+    remote PlayerOnAbominableQuest_id %SnowmanInRoomID%
   break
   case 16676
     %load% obj 16676 %actor% inv
@@ -421,7 +423,7 @@ xmas tree chopping~
 1 c 2
 chop~
 * config valid sects (must also update trig 16609)
-set valid_sects 4 26 28 45 54 55 71 602 603 604 612 613 614 10562 10563 10564 10565 16698 16699
+set valid_sects 4 26 28 45 54 55 71 72 80 81 89 104 145 154 602 603 604 612 613 614 617 618 10562 10563 10564 10565 11989 11990 11991 16698 16699
 return 0
 if %actor.inventory(16606)%
   %send% %actor% You really should get this tree back to your city center and plant it.
@@ -545,49 +547,30 @@ end
 %send% %actor% You spread @%self%, lay down, and swiftly make a snow angel on the ground.
 %echoaround% %actor% ~%actor% spreads @%self%, lays down, and swiftly makes a snow angel on the ground.
 %load% obj 16609 room
-nop %actor.set_cooldown(16610, 30)%
-if !%self.varexists(angel_count)%
-  set angel_count 1
-else
-  eval angel_count %self.angel_count% + 1
-end
-if %angel_count% < 5
-  remote angel_count %self.id%
-  eval angel_left 5 - %angel_count%
-  switch %angel_count%
+nop %actor.set_cooldown(16610, 20)%
+%quest% %actor% trigger 16610
+if !%actor.quest_finished(16610)%
+  switch %actor.quest_triggered(16610)%
     case 1
       set angel_count One
+      set angel_left four
     break
     case 2
       set angel_count Two
+      set angel_left three
     break
     case 3
       set angel_count Three
+      set angel_left two
     break
     case 4
       set angel_count Four
-    break
-  done
-  switch %angel_left%
-    case 1
       set angel_left one
-    break
-    case 2
-      set angel_left two
-    break
-    case 3
-      set angel_left three
-    break
-    case 4
-      set angel_left four
     break
   done
   %send% %actor% %angel_count% down, %angel_left% to go!
 else
-  %quest% %actor% trigger 16610
-  if %actor.quest_finished(16610)%
-    %quest% %actor% finish 16610
-  end
+  %quest% %actor% finish 16610
   %purge% %self%
 end
 ~
@@ -612,7 +595,7 @@ if !%SelfRoom.in_city%
 end
 if %actor.cooldown(16611)%
   %send% %actor% You're drawing too much attention to yourself. You need to cool off.
-  nop %actor.set_cooldown(16611, 30)%
+  nop %actor.set_cooldown(16611, 5)%
   halt
 end
 if !%MoveDir%
@@ -696,7 +679,7 @@ if %actor.cooldown(16601)% > 5
   halt
 elseif %actor.cooldown(16601)%
   %send% %actor% You probably shouldn't do that, ~%self% almost caught you once already.
-  nop %actor.set_cooldown(16601, 30)%
+  nop %actor.set_cooldown(16601, 20)%
   halt
 end
 set theft_roll %random.100%
@@ -746,18 +729,18 @@ end
 set arg %arg2%
 if normal /= %arg%
   %send% %actor% Setting difficulty to Normal...
-  set difficulty 1
+  set diff 1
 elseif hard /= %arg%
   %send% %actor% Setting difficulty to Hard...
-  set difficulty 2
+  set diff 2
 elseif group /= %arg%
   %send% %actor% Setting difficulty to Group...
-  set difficulty 3
+  set diff 3
 elseif boss /= %arg%
   %send% %actor% Setting difficulty to Boss...
-  set difficulty 4
+  set diff 4
 else
-  %send% %actor% That is not a valid difficulty level for this adventure.
+  %send% %actor% That is not a valid difficulty level for this encounter.
   halt
   return 1
 end
@@ -800,36 +783,39 @@ if %mob.vnum% != 16613
   halt
 end
 %echo% ~%mob% sidles into view and you rush forward with @%self%!
-if %difficulty% == 1
+if %diff% == 1
   * Then we don't need to do anything
-elseif %difficulty% == 2
+elseif %diff% == 2
   nop %mob.add_mob_flag(HARD)%
-elseif %difficulty% == 3
+elseif %diff% == 3
   nop %mob.add_mob_flag(GROUP)%
-elseif %difficulty% == 4
+elseif %diff% == 4
   nop %mob.add_mob_flag(HARD)%
   nop %mob.add_mob_flag(GROUP)%
 end
+remote diff %mob.id%
 %echo% @%self% bursts into blue flames and rapidly crumbles to ash.
 %purge% %self%
 ~
 #16614
-grinchy demon combat 1~
+Winter Wonderland: Grinchy demon combat 1~
 0 bw 40
 ~
-if !%self.fighting%
+if !%self.fighting% || %self.cooldown(16617)%
   halt
 end
-if %self.cooldown(16617)%
+set diff %self.var(diff,1)%
+set room %self.room%
+set person %room.people%
+set mob %room.people(16614)%
+if %mob%
+  * already have a dog
+  halt
+elseif %diff% == 1
+  * normal = no summon
+  nop %self.set_cooldown(16617, 90)%
   halt
 end
-set person %self.room.people%
-while %person%
-  if %person.vnum% == 16614
-    halt
-  end
-  set person %person.next_in_room%
-done
 set grinch_level 0
 if %self.mob_flagged(hard)%
   eval grinch_level %grinch_level% + 1
@@ -837,21 +823,20 @@ end
 if %self.mob_flagged(group)%
   eval grinch_level %grinch_level% + 2
 end
-if %grinch_level% == 0
-  halt
-end
 set grinch_roll %random.100%
-if %grinch_level% == 1 && %grinch_roll% > 30
+if %diff% == 2 && %grinch_roll% > 30
+  * chance to fail on hard
   halt
-elseif %grinch_level% == 2 && %grinch_roll% > 60
+elseif %diff% == 3 && %grinch_roll% > 60
+  * chance to fail on group
   halt
 end
-%echo% ~%self% shouts, "get 'hem Max!"
+%echo% &&G&&Z~%self% shouts, "get 'em Max!"&&0
 %load% mob 16614 ally
 nop %self.set_cooldown(16617, 90)%
 ~
 #16615
-grinchy combat 2~
+Winter Wonderland: Grinchy combat 2~
 0 k 25
 ~
 set grinch_level 0
@@ -1046,11 +1031,6 @@ if %actor.on_quest(16617)%
     halt
   else
     set morphnum 16617
-    if !%self.varexists(dress_up_counter)%
-      set dress_up_counter 2
-    else
-      set dress_up_counter %self.dress_up_counter%
-    end
   end
 end
 if %actor.on_quest(16618)%
@@ -1067,22 +1047,12 @@ if %actor.on_quest(16618)%
     else
       set morphnum 16619
     end
-    if !%self.varexists(dress_up_counter)%
-      set dress_up_counter 5
-    else
-      set dress_up_counter %self.dress_up_counter%
-    end
   end
 end
 %send% %actor% You dress ~%target% with @%self%.
 %echoaround% %actor% ~%actor% dresses ~%target% with @%self%.
 %morph% %target% %morphnum%
-eval dress_up_counter %dress_up_counter% - 1
-if %dress_up_counter% > 0
-  remote dress_up_counter %self.id%
-else
-  %quest% %actor% trigger %questnum%
-end
+%quest% %actor% trigger %questnum%
 if %actor.quest_finished(%questnum%)%
   %quest% %actor% finish %questnum%
   %purge% %self%
@@ -1112,12 +1082,8 @@ if %room.contents(16621)% || %room.contents(16622)% || %room.contents(16623)% ||
   %send% %actor% Someone has already put ornaments up here. You should probably find somewhere else.
   halt
 end
-if !%self.varexists(ornament_counter)%
-  set ornament_counter 1
-else
-  eval ornament_counter %self.ornament_counter% + 1
-end
-switch %ornament_counter%
+%quest% %actor% trigger 16620
+switch %actor.quest_triggered(16620)%
   case 1
     %send% %actor% You begin your decorating by stringing strands of garland all about the area.
     %echoaround% %actor% ~%actor% begins ^%actor% decorating by stringing strands of garland all about the area.
@@ -1137,22 +1103,32 @@ switch %ornament_counter%
     %send% %actor% You lift the reindeer hoofprint stamp and begin to deliver hammerblows to the ground, leaving behind realistic tracks, giving the impression there was a live reindeer here.
     %echoaround% %actor% ~%actor% takes out a reindeer hoofprint stamp and begins delivering hammerblows to the ground. The end result is some realistic tracks, giving the impression there was a live reindeer here.
     %load% obj 16624 room
-    %quest% %actor% trigger 16620
   break
 done
-if %ornament_counter% >= 4 && %actor.quest_finished(16620)%
+if %actor.quest_finished(16620)%
   %quest% %actor% finish 16620
   %purge% %self%
-else
-  remote ornament_counter %self.id%
 end
 ~
 #16621
-grinchy greeting~
-0 h 0
+Grinchy Demon and Krampus: Reset if out of combat.~
+0 ab 50
 ~
-if %actor.is_pc% && !%self.fighting%
-  dg_affect #16606 %self% off
+if %self.fighting%
+  halt
+end
+set room %self.room%
+* Buffs
+dg_affect #16618 %self% off
+dg_affect #16684 %self% off
+dg_affect #16687 %self% off
+dg_affect #16689 %self% off
+* Max?
+rdelete summoned_max %self.id%
+set max %room.people(16614)%
+if %max%
+  %echo% ~%max% runs off.
+  %purge% %max%
 end
 ~
 #16622
@@ -1370,7 +1346,7 @@ if !(%actor.obj_target(%arg.car%)% == %self%)
   return 0
   halt
 end
-if %arg.cdr% != freezing
+if !(freezing /= %arg.cdr%)
   %send% %actor% You must enchant @%self% with freezing to subdue the abominable snowman.
   halt
 end
@@ -1410,7 +1386,9 @@ done
 %teleport% %self% %self.room%
 %force% %AbominableSnowman% kill %self.pc_name%
 wait 1
-%send% %self.PlayerOnAbominableQuest% ~%self% tells you, 'The abominable snowman is here at %self.room.name%!'
+if %self.PlayerOnAbominableQuest% && %self.PlayerOnAbominableQuest.id% == %self.PlayerOnAbominableQuest_id%
+  %send% %self.PlayerOnAbominableQuest% ~%self% tells you, 'The abominable snowman is here at %self.room.name%!'
+end
 ~
 #16631
 snowman target will not escape~
@@ -1427,7 +1405,9 @@ abominable kills regular snowman~
 0 z 100
 ~
 if %actor.vnum% == 16600
-  %send% %actor.PlayerOnAbominableQuest% ~%self% tells you, 'You obviously aren't a very good protector, ~%actor% is mush.'
+  if %actor.PlayerOnAbominableQuest% && %actor.PlayerOnAbominableQuest.id% == %actor.PlayerOnAbominableQuest_id%
+    %send% %actor.PlayerOnAbominableQuest% ~%self% tells you, 'You obviously aren't a very good protector, ~%actor% is mush.'
+  end
   wait 1
   %echo% ~%self% runs off!
   %purge% %self%
@@ -1752,7 +1732,7 @@ else
     set xmas_pet_announce 1
     remote xmas_pet_announce %pc.id%
     * silently swap for the next pet
-    dg_affect %self% HIDE on 1
+    dg_affect %self% !SEE on 5
     * switch companions
     nop %pc.add_companion(%new_vnum%)%
     nop %pc.remove_companion(%self.vnum%)%
@@ -1767,8 +1747,8 @@ Holiday pet adoption certificate~
 adopt~
 return 1
 set usage Usage: adopt <coat> <puppy/kitten>
-set dog_coats chestnut silver beige gold brown chocolate golden wheaten cream rusty lilac orange striped brindle spotted dotted black white green violet purple magenta red yellow blue orange indigo grey gray
-set cat_coats ginger cream brown cinnamon tuxedo tabby mackerel tortoiseshell seal-point blue-point flame-point black white green violet purple magenta red yellow blue orange indigo grey gray
+set dog_coats chestnut silver beige gold brown chocolate golden wheaten cream rusty lilac orange striped brindle spotted dotted black white green violet purple magenta red yellow blue orange indigo pink grey gray
+set cat_coats ginger cream brown cinnamon tuxedo tabby mackerel tortoiseshell seal-point blue-point flame-point black white green violet purple magenta red yellow blue orange indigo pink grey gray
 * basic validation
 if %actor.is_npc%
   %send% %actor% Sorry, no.
@@ -2151,7 +2131,7 @@ if !%lighter% && !%actor.has_tech(Light-Fire)%
   halt
 end
 * chance to fail
-if %random.2% == 2 && !%self.disabled% && %actor.skill(Stealth)% < 100 && !%actor.aff_flagged(HIDE)% && !%self.aff_flagged(IMMOBILIZED)% && %self.position% == Standing
+if %random.2% == 2 && !%self.disabled% && %actor.skill(Stealth)% < 100 && !%actor.aff_flagged(HIDDEN)% && !%self.aff_flagged(IMMOBILIZED)% && %self.position% == Standing
   %send% %actor% You try to light the little straw goat on fire but it darts away!
   %echoaround% %actor% ~%actor% tries to light the little straw goat on fire but it darts away!
   * replace with fresh copy
@@ -2181,11 +2161,11 @@ if !%arg% || %actor.obj_target(%arg.car%)% != %self%
   halt
 end
 * check witnesses
-if !%ch.aff_flagged(HIDE)% && %ch.skill(Stealth)% < 100
+if !%actor.aff_flagged(HIDDEN)% && %actor.skill(Stealth)% < 100
   set witnesses 0
   set ch %actor.room.people%
   while %ch% && %witnesses% < 2
-    if %ch.position% == Standing && !%ch.leader% && !%ch.disabled% && !%ch.leader% && %ch.mob_flagged(HUMAN)%
+    if %ch.position% == Standing && !%ch.leader% && !%ch.disabled% && %ch.mob_flagged(HUMAN)% && !%ch.aff_flagged(STUNNED)%
       eval witnesses %witnesses% + 1
     end
     set ch %ch.next_in_room%
@@ -2368,9 +2348,10 @@ elseif %sleigh.animals_harnessed% > 0
   %echoaround% %actor% ~%actor% unharnesses the animal from %sleigh.shortdesc%...
   nop %sleigh.unharness%
 end
-%load% veh 16650
+%load% veh 16650 %sleigh.level%
 set upgr %self.room.vehicles%
 if %upgr.vnum% == 16650
+  nop %upgr.unlink_instance%
   %own% %upgr% %sleigh.empire%
   %send% %actor% You polish %sleigh.shortdesc% with @%self%...
   %echoaround% %actor% ~%actor% polishes %sleigh.shortdesc% with @%self%...
@@ -2430,10 +2411,243 @@ end
 %echoaround% %actor% ~%actor% uses @%self%!
 %purge% %self%
 ~
+#16653
+Grinchy combat: Present Toss, Pole Swing, Summon/Buff Max~
+0 k 100
+~
+if %self.cooldown(16680)% || %self.disabled%
+  halt
+end
+set room %self.room%
+set diff %self.diff%
+* order
+set moves_left %self.var(moves_left)%
+set num_left %self.var(num_left,0)%
+if !%moves_left% || !%num_left%
+  set moves_left 1 1 2 2 3
+  set num_left 5
+end
+* pick
+eval which %%random.%num_left%%%
+set old %moves_left%
+set moves_left
+set move 0
+while %which% > 0
+  set move %old.car%
+  if %which% != 1
+    set moves_left %moves_left% %move%
+  end
+  set old %old.cdr%
+  eval which %which% - 1
+done
+set moves_left %moves_left% %old%
+* store
+eval num_left %num_left% - 1
+remote moves_left %self.id%
+remote num_left %self.id%
+* perform move
+scfight lockout 16680 30 35
+if %move% == 1
+  * Present Toss
+  if %diff% <= 2
+    nop %self.add_mob_flag(NO-ATTACK)%
+  end
+  scfight clear dodge
+  set targ %random.enemy%
+  if !%targ%
+    set targ %actor%
+  end
+  set id %targ.id%
+  * random obj
+  set object_1 a gaudy neck tie
+  set object_2 a hideous Christmas sweater
+  set object_3 fluffy woolen socks
+  set object_4 a pet rock
+  set which %random.4%
+  eval obj %%object_%which%%%
+  if %which% == 1 || %which% == 3
+    set itthem them
+  else
+    set itthem it
+  end
+  if %diff% < 3
+    * normal/hard
+    %send% %targ% &&G**** &&Z~%self% grabs %obj% out of ^%self% sack and throws %itthem% at you! ****&&0 (dodge)
+    %echoaround% %targ% &&G~%self% grabs %obj% out of ^%self% sack and throws %itthem% at ~%targ%!&&0
+    scfight setup dodge %targ%
+    wait 5 s
+    nop %self.remove_mob_flag(NO-ATTACK)%
+    wait 3 s
+    if %self.disabled%
+      nop %self.remove_mob_flag(NO-ATTACK)%
+      halt
+    end
+    if !%targ% || %targ.id% != %id%
+      * gone
+      %echo% &&G%obj.cap% misses and lands on the ground.&&0
+      unset targ
+    elseif %targ.var(did_scfdodge)%
+      * dodged: switch targ
+      %echo% &&G%obj.cap% bounces and rebounds back toward ~%self%!&&0
+      set targ %self%
+      if %diff% == 1
+        dg_affect #16686 %targ% TO-HIT 25 20
+      end
+    end
+    * hit either them or me
+    if %targ%
+      * hit
+      switch %random.2%
+        case 1
+          %echo% &&G%obj% hits ~%targ% in the head!&&0
+          eval ouch 75 * %diff%
+          %damage% %targ% %ouch% physical
+          if %diff% > 1 && (%self.level% + 100) > %targ.level% && !%targ.aff_flagged(!STUN)%
+            dg_affect #16619 %targ% STUNNED on 5
+          end
+        break
+        case 2
+          %echo% &&G%obj% hits ~%targ% in the face, covering ^%targ% eyes!&&0
+          eval ouch 50 * %diff%
+          %damage% %targ% %ouch% physical
+          dg_affect #16620 %targ% BLIND on 5
+        break
+      done
+    end
+    scfight clear dodge
+  else
+    * group/boss
+    %echo% &&G**** &&Z~%self% grabs %obj% out of ^%self% sack and prepares to slam %itthem% to the ground... ****&&0 (dodge)
+    if %diff% == 1
+      nop %self.add_mob_flag(NO-ATTACK)%
+    end
+    scfight setup dodge all
+    eval wait 8 - %diff%
+    wait %wait% s
+    if %self.disabled%
+      nop %self.remove_mob_flag(NO-ATTACK)%
+      halt
+    end
+    %echo% &&G~%self% slams %obj% to the ground, releasing a snowy shockwave!&&0
+    set ch %room.people%
+    while %ch%
+      set next_ch %ch.next_in_room%
+      if %self.is_enemy(%ch%)%
+        if !%ch.var(did_scfdodge)%
+          set hit 1
+          %echo% &&GThe shockwave knocks ~%ch% back!&&0
+          %send% %ch% That really hurt!
+          %damage% %ch% 100 magical
+        elseif %ch.is_pc%
+          %send% %ch% &&GYou manage to take cover as the snowy shockwave barely misses you!&&0
+          if %diff% == 1
+            dg_affect #16686 %ch% TO-HIT 25 20
+          end
+        end
+      end
+      set ch %next_ch%
+    done
+    scfight clear dodge
+    if !%hit%
+      if %diff% < 3
+        %echo% &&G~%self% is blown back by the shockwave!&&0
+        dg_affect #16687 %self% HARD-STUNNED on 10
+      end
+    end
+  end
+elseif %move% == 2 && !%self.aff_flagged(BLIND)%
+  * Pole Swing
+  scfight clear dodge
+  %echo% &&G~%self% pulls a thirty-nine-and-a-half foot pole from his gift sack... This can't be good.&&0
+  eval dodge %diff% * 40
+  dg_affect #16684 %self% DODGE %dodge% 20
+  if %diff% == 1
+    nop %self.add_mob_flag(NO-ATTACK)%
+  end
+  scfight setup dodge all
+  wait 3 s
+  if %self.disabled%
+    dg_affect #16684 %self% off
+    nop %self.remove_mob_flag(NO-ATTACK)%
+    halt
+  end
+  %echo% &&G**** &&Z~%self% starts to swing the thirty-nine-and-a-half foot pole! ****&&0 (dodge)
+  set cycle 1
+  set hit 0
+  eval wait 10 - %diff%
+  while %cycle% <= %diff%
+    scfight setup dodge all
+    wait %wait% s
+    set ch %room.people%
+    while %ch%
+      set next_ch %ch.next_in_room%
+      if %self.is_enemy(%ch%)%
+        if !%ch.var(did_scfdodge)%
+          set hit 1
+          %echo% &&G~%self% whacks ~%ch% in the head with the pole!&&0
+          %send% %ch% That really hurt!
+          %damage% %ch% 100 physical
+          if %diff% > 1 && (%self.level% + 100) > %targ.level% && !%targ.aff_flagged(!STUN)%
+            dg_affect #16616 %ch% STUNNED on 5
+          end
+        elseif %ch.is_pc%
+          %send% %ch% &&GYou limbo under the pole and safely straighten back up.&&0
+          if %diff% == 1
+            dg_affect #16686 %ch% TO-HIT 25 20
+          end
+        end
+        if %cycle% < %diff%
+          %send% %ch% &&G**** Here comes the thirty-nine-and-a-half foot pole again... ****&&0 (dodge)
+        end
+      end
+      set ch %next_ch%
+    done
+    scfight clear dodge
+    eval cycle %cycle% + 1
+  done
+  dg_affect #16684 %self% off
+  if !%hit%
+    if %diff% < 3
+      %echo% &&G~%self% looks tired from all that swinging.&&0
+      dg_affect #16687 %self% HARD-STUNNED on 10
+    end
+  end
+  wait 8 s
+elseif %move% == 3
+  * Summon or Buff Max (no interrupt)
+  if %diff% == 1
+    * skip max
+    halt
+  end
+  set max %room.people(16614)%
+  if !%max% && %self.var(summoned_max,0)%
+    %echo% &&G&&Z~%self% says, 'This is for Max, you monster!'&&0
+    %echo% &&G&&Z~%self% turns even greener with rage!&&0
+    set amount %diff% * 4
+    dg_affect #16618 %self% BONUS-PHYSICAL %diff% 300
+    halt
+  elseif %max%
+    %echo% &&G&&Z~%self% says, 'That's it, Max, bite 'em! Gore 'em with the old antler!'&&0
+    set amount %diff% * 10
+    dg_affect #16618 %max% BONUS-PHYSICAL %diff% 300
+  else
+    set summoned_max 1
+    remote summoned_max %self.id%
+    %echo% &&G&&Z~%self% says, 'Get 'em, Max!'&&0
+    %load% mob 16614 ally
+    set max %room.people(16614)%
+    if %max%
+      %force% %max% maggro %self.fighting%
+    end
+  end
+end
+nop %self.remove_mob_flag(NO-ATTACK)%
+~
 #16655
 Upgrade Glitter: upgrade Winter Wonderland items~
 1 c 2
 upgrade~
+set max_level 400
 if !%arg%
   * Pass through to upgrade command
   return 0
@@ -2459,22 +2673,26 @@ end
 %send% %actor% You sprinkle @%self% onto @%target%...
 %echoaround% %actor% ~%actor% sprinkles @%self% onto @%target%...
 %echo% @%target% begins to shimmer and glow!
+* determine level
+set level %actor.highest_level%
+if %level% > %max_level%
+  * cap for this
+  set level %max_level%
+end
+* apply it
 if %target.vnum% == 16653
   * sweater version: replace item
   %load% obj 16654 %actor% inv
   set sweat %actor.inventory%
-  if %sweat% && %sweat.vnum% == %16654
+  if %sweat% && %sweat.vnum% == 16654
+    %scale% %sweat% %level%
     nop %sweat.bind(%target%)%
   end
   %purge% %target%
 else
   * non-sweater: just make superior
   nop %target.flag(SUPERIOR)%
-  if %target.level% > 0
-    %scale% %target% %target.level%
-  else
-    %scale% %target% 1
-  end
+  %scale% %target% %level%
 end
 %purge% %self%
 ~
@@ -2629,7 +2847,7 @@ return 1
 ~
 #16660
 Straw Goat vandalism driver~
-5 ab 33
+5 ab 66
 ~
 * configs
 set quest_vnum 16660
@@ -2643,6 +2861,10 @@ set male_list boy man gentleman farmhand merchant apprentice
 set male_count 6
 set female_list girl woman lady milkmaid merchant apprentice
 set female_count 6
+* check completion
+if !%self.complete%
+  halt
+end
 * ensure a crowd is present or just spawn one
 set found 0
 set room %self.room%
@@ -2821,7 +3043,7 @@ done
 if !%arg%
   %send% %actor% Protect what?
   halt
-elseif !(giant straw goat /= %arg%) && !(straw goat /= %arg%) && !(goat /= %arg%)
+elseif %actor.veh_target(%arg%) != %self% && !(giant straw goat /= %arg%) && !(straw goat /= %arg%) && !(goat /= %arg%)
   %send% %actor% You can't protect that.
   halt
 elseif %self.is_flagged(ON-FIRE)%
@@ -2994,6 +3216,45 @@ if %melt%
   %purge% %self%
 end
 ~
+#16670
+Christmas pony: Only leader may ride~
+0 ct 0
+mount ride~
+* Sanity check
+* I don't know why we'd have a mount called 'swap' but you never know
+if %arg.car% == list || %arg.car% == swap ||  %arg.car% == release
+  return 0
+  halt
+end
+* Target check
+if %actor.char_target(%arg%)% != %self%
+  return 0
+  halt
+end
+if %actor% != %self.leader%
+  %send% %actor% ~%self% won't let you get close enough to ride.
+  return 1
+  halt
+end
+return 0
+~
+#16671
+Winter Wonderland: Mount cannot be harnessed~
+0 ct 0
+harness~
+set anim_arg %arg.car%
+set veh_arg %arg.cdr%
+if (!%anim_arg% || !%veh_arg%)
+  return 0
+  halt
+elseif %actor.char_target(%anim_arg%)% != %self%
+  return 0
+  halt
+end
+* oops
+%send% %actor% ~%self% refuses to be harnessed to anything.
+return 1
+~
 #16675
 Citizen dances~
 0 bw 50
@@ -3023,10 +3284,6 @@ play~
 return 0
 set music_score 0
 remote music_score %self.id%
-if !%self.varexists(music_count)%
-  set music_count 0
-  remote music_count %self.id%
-end
 if !%self.has_trigger(16677)%
   attach 16677 %self.id%
 end
@@ -3040,13 +3297,16 @@ if %self.carried_by%
   set actor %self.carried_by%
 elseif %self.worn_by%
   set actor %self.worn_by%
+else
+  * no actor?
+  detach 16677 %self.id%
+  halt
 end
 if %actor.action% != playing
   detach 16677 %self.id%
   halt
 end
 set music_score %self.music_score%
-set music_count %self.music_count%
 switch %questid%
   case 16676
     * 10x citizens must dance
@@ -3056,7 +3316,7 @@ switch %questid%
       if %music_score% >= %random.100%
         if %person.is_npc% && !%person.disabled% && %person.empire% == %actor.empire% && %person.mob_flagged(SPAWNED)% && %person.mob_flagged(HUMAN)% && !%person.has_trigger(16675)%
           set any 1
-          eval music_count %music_count% + 1
+          %quest% %actor% trigger %questid%
           %echo% ~%person% starts dancing!
           attach 16675 %person.id%
           %morph% %person% 16675
@@ -3067,20 +3327,15 @@ switch %questid%
       set person %person.next_in_room%
     done
     if %any%
-      remote music_count %self.id%
       remote music_score %self.id%
-      %send% %actor% (That's %music_count%!)
+      %send% %actor% (That's %actor.quest_triggered(%questid%)%!)
     else
       eval music_score %music_score% + 25
       remote music_score %self.id%
     end
-    * check done
-    if %music_count% >= 10
-      %quest% %actor% trigger %questid%
-    end
   break
   case 16677
-    * 4x dedicate buildings
+    * 4x in dedicated buildings
     set room %actor.room%
     * check already played here
     set mob %room.people%
@@ -3119,16 +3374,12 @@ switch %questid%
       %load% mob %mobv%
       eval mobv 16674 + %random.3%
       %load% mob %mobv%
-      eval music_count %music_count% + 1
-      remote music_count %self.id%
-      %send% %actor% Your music has drawn a crowd (that's %music_count%)!
+      %quest% %actor% trigger %questid%
+      %send% %actor% Your music has drawn a crowd (that's %actor.quest_triggered(%questid%)%)!
       %echoaround% %actor% |%actor% music has drawn a crowd!
     else
       eval music_score %music_score% + 25
       remote music_score %self.id%
-    end
-    if %music_count% >= 4
-      %quest% %actor% trigger %questid%
     end
   break
 done
@@ -3225,18 +3476,18 @@ end
 set arg %arg2%
 if normal /= %arg%
   %send% %actor% Setting difficulty to Normal...
-  set difficulty 1
+  set diff 1
 elseif hard /= %arg%
   %send% %actor% Setting difficulty to Hard...
-  set difficulty 2
+  set diff 2
 elseif group /= %arg%
   %send% %actor% Setting difficulty to Group...
-  set difficulty 3
+  set diff 3
 elseif boss /= %arg%
   %send% %actor% Setting difficulty to Boss...
-  set difficulty 4
+  set diff 4
 else
-  %send% %actor% That is not a valid difficulty level for this interaction.
+  %send% %actor% That is not a valid difficulty level for this encounter.
   halt
   return 1
 end
@@ -3263,7 +3514,8 @@ while %cycles_left% >= 0
   end
   switch %cycles_left%
     case 3
-      %echo% You invoke the demon and start to look for a good hiding place to observe from.
+      %send% %actor% You invoke the demon and start to look for a good hiding place to observe from.
+      %echoaround% %actor% ~%actor% invokes the demon and you start to look for a good hiding place to observe from.
     break
     case 2
       %echo% A thump, a bump, and a clunk can be heard.
@@ -3293,16 +3545,17 @@ if %mob.vnum% != 16613 && %mob.vnum% != 16680
   halt
 end
 %echo% ~%mob% sidles into view and you rush forward to engage!
-if %difficulty% == 1
+if %diff% == 1
   * Then we don't need to do anything
-elseif %difficulty% == 2
+elseif %diff% == 2
   nop %mob.add_mob_flag(HARD)%
-elseif %difficulty% == 3
+elseif %diff% == 3
   nop %mob.add_mob_flag(GROUP)%
-elseif %difficulty% == 4
+elseif %diff% == 4
   nop %mob.add_mob_flag(HARD)%
   nop %mob.add_mob_flag(GROUP)%
 end
+remote diff %mob.id%
 %echo% @%self% bursts into blue flames and rapidly crumbles to ash.
 %purge% %self%
 ~
@@ -3399,6 +3652,314 @@ snow cube summon~
 ~
 * No script
 ~
+#16684
+Krampus combat: Birch Bundle, Sack Up, Hornbutt, Rage heal/buff~
+0 k 100
+~
+if %self.cooldown(16680)% || %self.disabled%
+  halt
+end
+set room %self.room%
+set diff %self.diff%
+* order
+set moves_left %self.var(moves_left)%
+set num_left %self.var(num_left,0)%
+if !%moves_left% || !%num_left%
+  set moves_left 1 2 3 4
+  set num_left 4
+end
+* pick
+eval which %%random.%num_left%%%
+set old %moves_left%
+set moves_left
+set move 0
+while %which% > 0
+  set move %old.car%
+  if %which% != 1
+    set moves_left %moves_left% %move%
+  end
+  set old %old.cdr%
+  eval which %which% - 1
+done
+set moves_left %moves_left% %old%
+* store
+eval num_left %num_left% - 1
+remote moves_left %self.id%
+remote num_left %self.id%
+* perform move
+scfight lockout 16680 30 35
+if %move% == 1
+  * Birch bundle AOE
+  scfight clear dodge
+  %regionecho% %room% 25 &&y~%self% shouts, 'I see everyone has been naughty!'&&0
+  %echo% &&G~%self% whips out a bundle of birch rods and begins winding up...&&0
+  eval dodge %diff% * 40
+  dg_affect #16684 %self% DODGE %dodge% 20
+  if %diff% == 1
+    nop %self.add_mob_flag(NO-ATTACK)%
+  end
+  scfight setup dodge all
+  wait 3 s
+  if %self.disabled%
+    dg_affect #16684 %self% off
+    nop %self.remove_mob_flag(NO-ATTACK)%
+    halt
+  end
+  %echo% &&G**** &&Z~%self% starts spinning... it's now or never if you want to avoid those birch rods! ****&&0 (dodge)
+  set cycle 1
+  set hit 0
+  eval wait 10 - %diff%
+  while %cycle% <= %diff%
+    scfight setup dodge all
+    wait %wait% s
+    set ch %room.people%
+    while %ch%
+      set next_ch %ch.next_in_room%
+      if %self.is_enemy(%ch%)%
+        if !%ch.var(did_scfdodge)%
+          set hit 1
+          %echo% &&G~%self% smacks ~%ch% with ^%self% bundle of birch rods!&&0
+          %send% %ch% That really hurt! You seem to be bleeding.
+          %dot% #16685 %ch% 100 40 physical 25
+        elseif %ch.is_pc%
+          %send% %ch% &&G~%self% whirls past you, narrowly missing you with the birch rods!&&0
+          if %diff% == 1
+            dg_affect #16686 %ch% TO-HIT 25 20
+          end
+        end
+        if %cycle% < %diff%
+          %send% %ch% &&G**** Here come those birch rods again... ****&&0 (dodge)
+        end
+      end
+      set ch %next_ch%
+    done
+    scfight clear dodge
+    eval cycle %cycle% + 1
+  done
+  dg_affect #16684 %self% off
+  if !%hit%
+    if %diff% < 3
+      %echo% &&G~%self% seems to exhaust *%self%self from all that spinning.&&0
+      dg_affect #16687 %self% HARD-STUNNED on 10
+    end
+  end
+  wait 8 s
+elseif %move% == 2 && !%self.aff_flagged(BLIND)%
+  * Sack up
+  scfight clear struggle
+  %echo% &&G~%self% opens an oversized burlap sack...&&0
+  wait 3 s
+  if %self.disabled%
+    halt
+  end
+  set targ %random.enemy%
+  if !%targ%
+    halt
+  end
+  set targ_id %targ.id%
+  if %self.fighting% == %targ% && %diff% < 4
+    dg_affect #16687 %self% HARD-STUNNED on 20
+  end
+  %send% %targ% &&G**** &&Z~%self% snatches you up in the burlap sack! You can't move! ****&&0 (struggle)
+  %echoaround% %targ% &&G~%self% snatches ~%targ% up in the burlap sack!&&0
+  scfight setup struggle %targ% 20
+  * messages
+  set scf_strug_char You try to wiggle out of the burlap sack...
+  set scf_strug_room You hear ~%%actor%% trying to wiggle out of the burlap sack...
+  remote scf_strug_char %actor.id%
+  remote scf_strug_room %actor.id%
+  set scf_free_char You wiggle out of the burlap sack!
+  set scf_free_room ~%%actor%% manages to wiggle out of the burlap sack!
+  remote scf_free_char %actor.id%
+  remote scf_free_room %actor.id%
+  set cycle 0
+  set done 0
+  while %cycle% < 5 && !%done%
+    wait 4 s
+    if %targ.id% == %targ_id% && %targ.affect(9602)% && %diff% > 1
+      %send% %targ% &&GThis is the scratchiest burlap sack you've ever been stuck in! It really hurts!&&0
+      %dot% #16688 %targ% 100 40 physical 25
+    else
+      set done 1
+    end
+    eval cycle %cycle% + 1
+  done
+  scfight clear struggle
+  dg_affect #16687 %self% off
+elseif %move% == 3
+  * Hornbutt
+  scfight clear dodge
+  %echo% &&G~%self% sharpens ^%self% horn with a piece of coal...&&0
+  wait 3 s
+  if %self.disabled%
+    halt
+  end
+  if %self.aff_flagged(BLIND)%
+    halt
+  end
+  set targ %random.enemy%
+  if !%targ%
+    halt
+  end
+  set targ_id %targ.id%
+  if %self.fighting% == %targ% && %diff% == 1
+    dg_affect #16687 %self% HARD-STUNNED on 20
+  end
+  %send% %targ% &&G**** &&Z~%self% leans forward and takes aim... at you! ****&&0 (dodge)
+  %echoaround% %targ% &&G~%self% leans forward and takes aim... at ~%targ%!&&0
+  scfight setup dodge %targ%
+  if %diff% > 1
+    set ouch 100
+  else
+    set ouch 50
+  end
+  set cycle 0
+  set done 0
+  while %cycle% < %diff% && !%done%
+    wait 4 s
+    if %targ.id% != %targ_id%
+      set done 1
+    elseif !%targ.var(did_scfdodge)%
+      %echo% &&G~%self% hornbutts ~%targ%!&&0
+      %send% %targ% That really hurts!
+      %damage% %targ% %ouch% physical
+    end
+    eval cycle %cycle% + 1
+    if %cycle% < %diff% && !%done%
+      %send% %targ% &&G**** &&Z~%self% looks like &%self%'s going to try to hit you again... ****&&0 (dodge)
+      scfight setup dodge %targ%
+    end
+  done
+  scfight clear dodge
+  dg_affect #16687 %self% off
+elseif %move% == 4
+  * Rage heal or buff
+  scfight clear interrupt
+  %echo% &&G**** &&Z~%self% is fuming with rage... ****&&0 (interrupt)
+  if %diff% == 1
+    nop %self.add_mob_flag(NO-ATTACK)%
+  end
+  scfight setup interrupt all
+  if %self.diff% < 3 || %room.players_present% < 2
+    set requires 1
+  else
+    set requires 2
+  end
+  wait 4 s
+  if %self.disabled%
+    nop %self.remove_mob_flag(NO-ATTACK)%
+    halt
+  end
+  if %self.var(sfinterrupt_count,0)% < %requires%
+    %echo% &&G**** &&Z~%self% shouts incoherently as the rage builds up within *%self%... ****&&0 (interrupt)
+  end
+  wait 4 s
+  if %self.disabled%
+    nop %self.remove_mob_flag(NO-ATTACK)%
+    halt
+  end
+  if %self.var(sfinterrupt_count,0)% >= %requires%
+    %echo% &&G~%self% is distracted from whatever &%self% was doing... thankfully!&&0
+    if %diff% == 1
+      dg_affect #16687 %self% HARD-STUNNED on 5
+    end
+    wait 30 s
+  else
+    %echo% &&G~%self% seems to swell with rage as &%self% fights with new vigor!
+    eval hitprc %self.health% * 100 / %self.maxhealth%
+    if %health% <= 20
+      * heal
+      %heal% %self% health 100
+    else
+      * buff
+      eval amount %diff% * 20
+      dg_affect #16689 %self% BONUS-PHYSICAL %amount% 300
+    end
+  end
+  scfight clear interrupt
+end
+nop %self.remove_mob_flag(NO-ATTACK)%
+~
+#16686
+Winter Wonderland: Boss fight tester~
+1 c 2
+test~
+return 1
+if !%arg% \|\| !%arg.cdr%
+  %send% %actor% Usage: test <grinch \| krampus> <normal \| hard \| group \| boss>
+  halt
+end
+* mob?
+set which %arg.car%
+if grinchy /= %which%
+  set vnum 16613
+elseif krampus /= %which%
+  set vnum 16680
+else
+  %send% %actor% Usage: test <grinch \| krampus> <normal \| hard \| group \| boss>
+  halt
+end
+* diff?
+set arg2 %arg.cdr%
+if normal /= %arg2%
+  set diff 1
+elseif hard /= %arg2%
+  set diff 2
+elseif group /= %arg2%
+  set diff 3
+elseif boss /= %arg2%
+  set diff 4
+else
+  %send% %actor% Usage: test <grinch \| krampus> <normal \| hard \| group \| boss>
+  halt
+end
+* remove old mob?
+set room %self.room%
+set old %room.people(16613)%
+if %old%
+  %echo% ~%old% vanishes...
+  %purge% %old%
+end
+set old %room.people(16680)%
+if %old%
+  %echo% ~%old% vanishes...
+  %purge% %old%
+end
+* new mob
+%load% mob %vnum%
+set mob %room.people%
+if %mob.vnum% != %vnum%
+  %send% %actor% An error occurred when loading the mob to test.
+  halt
+end
+* messaging
+%echo% ~%mob% appears for testing!
+* Clear existing difficulty flags and set new ones.
+remote diff %mob.id%
+nop %mob.remove_mob_flag(HARD)%
+nop %mob.remove_mob_flag(GROUP)%
+if %diff% == 1
+  * Then we don't need to do anything
+  %echo% ~%mob% has been set to Normal.
+elseif %diff% == 2
+  %echo% ~%mob% has been set to Hard.
+  nop %mob.add_mob_flag(HARD)%
+elseif %diff% == 3
+  %echo% ~%mob% has been set to Group.
+  nop %mob.add_mob_flag(GROUP)%
+elseif %diff% == 4
+  %echo% ~%mob% has been set to Boss.
+  nop %mob.add_mob_flag(HARD)%
+  nop %mob.add_mob_flag(GROUP)%
+end
+nop %mob.unscale_and_reset%
+* remove no-attack
+if %mob.aff_flagged(!ATTACK)%
+  dg_affect %mob% !ATTACK off
+end
+* unscale and restore me
+nop %mob.unscale_and_reset%
+~
 #16690
 feed the vortex~
 1 c 2
@@ -3408,9 +3969,13 @@ if %actor.aff_flagged(blind)%
   return 0
   halt
 end
-if !%actor.on_quest(16690)% && (%actor.obj_target(%arg.cdr%)% == %self% || %actor.obj_target(%arg.car%)% == %self%)
+if !%event.running(10700)% && (%actor.obj_target(%arg.cdr%)% == %self% || %actor.obj_target(%arg.car%)% == %self%)
   %send% %actor% @%self% suddenly vanishes!
+  %quest% %actor% drop 16690
   %purge% %self%
+  halt
+elseif !%actor.on_quest(16690)% && (%actor.obj_target(%arg.cdr%)% == %self% || %actor.obj_target(%arg.car%)% == %self%)
+  %send% %actor% You can't use @%self% while you're not on its quest.
   halt
 end
 set Cookie16660 %self.Cookie16660%
@@ -3543,8 +4108,10 @@ if !%CookieCount%
     %send% %actor% You don't seem to have %PutObj.ana% %PutObj%.
   end
 end
+* update stats
+%quest% %actor% settrigger 16690 %CookieTotal%
 * get a Cookie total and see if the quest is over
-if %CookieTotal% >= %Needs%
+if %CookieTotal% >= %Needs% || %actor.quest_finished(16690)%
   %quest% %actor% finish 16690
   %purge% %self%
 end
@@ -3559,6 +4126,19 @@ set Cookie16662 0
 remote Cookie16660 %self.id%
 remote Cookie16661 %self.id%
 remote Cookie16662 %self.id%
+~
+#16692
+Winter Wonderland: Randomly trash the vortex if event isn't running~
+1 b 20
+~
+if %event.running(10700)%
+  halt
+end
+if %self.carried_by%
+  %send% %self.carried_by% @%self% suddenly vanishes!
+  %quest% %self.carried_by% drop 16690
+end
+%purge% %self%
 ~
 #16695
 Capture nordlys in jar~

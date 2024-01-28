@@ -125,11 +125,11 @@ T0
 Your sunshock cooldown has ended.~
 S
 #2019
-teleport home~
+ritual of teleportation~
 3 0
 0 0 0 0
 T0
-Your teleport home cooldown has ended.~
+Your teleport cooldown has ended.~
 S
 #2020
 city teleportation~
@@ -432,6 +432,13 @@ bite~
 T0
 Your bite cooldown has ended.~
 S
+#2063
+shimmering anvil~
+3 0
+0 0 0 0
+T0
+Your shimmering anvil cooldown has ended.~
+S
 #2064
 shadowlash~
 3 0
@@ -604,5 +611,54 @@ S
 pathfinding~
 3 0
 0 0 0 0
+S
+#2089
+conjure fruit~
+3 0
+0 0 0 0
+T0
+Your cooldown for conjuring fruit has ended.~
+S
+#2090
+master survivalist~
+3 0
+0 0 0 0
+T0
+Your master survivalist cooldown has ended.~
+S
+#2091
+deathrise~
+3 0
+0 0 0 0
+T0
+Your deathrise cooldown has ended.~
+S
+#2092
+darkshroud~
+3 0
+0 0 0 0
+T0
+Your darkshroud cooldown has ended.~
+S
+#2093
+wilderblaze~
+3 0
+0 0 0 0
+T0
+Your wilderblaze cooldown has ended.~
+S
+#2094
+magivore~
+3 0
+0 0 0 0
+T0
+Your magivore cooldown has ended.~
+S
+#2095
+surge~
+3 0
+0 0 0 0
+T0
+Your surge cooldown has ended.~
 S
 $

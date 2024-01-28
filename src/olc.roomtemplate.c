@@ -2,7 +2,7 @@
 *   File: olc.roomtemplate.c                              EmpireMUD 2.0b5 *
 *  Usage: OLC for room templates                                          *
 *                                                                         *
-*  EmpireMUD code base by Paul Clarke, (C) 2000-2015                      *
+*  EmpireMUD code base by Paul Clarke, (C) 2000-2024                      *
 *  All rights reserved.  See license.doc for complete information.        *
 *                                                                         *
 *  EmpireMUD based upon CircleMUD 3.0, bpl 17, by Jeremy Elson.           *
@@ -418,7 +418,7 @@ void olc_delete_room_template(char_data *ch, rmt_vnum vnum) {
 * @param char *argument The argument they entered.
 */
 void olc_fullsearch_room_template(char_data *ch, char *argument) {
-	char buf[MAX_STRING_LENGTH * 2], line[MAX_STRING_LENGTH], type_arg[MAX_INPUT_LENGTH], val_arg[MAX_INPUT_LENGTH], find_keywords[MAX_INPUT_LENGTH];
+	char buf[MAX_STRING_LENGTH * 2], line[MAX_STRING_LENGTH], type_arg[MAX_INPUT_LENGTH], val_arg[MAX_INPUT_LENGTH], find_keywords[MAX_INPUT_LENGTH], extra_search[MAX_INPUT_LENGTH];
 	int count;
 	
 	bitvector_t only_flags = NOBITS, only_functions = NOBITS, only_affs = NOBITS;;
@@ -436,6 +436,7 @@ void olc_fullsearch_room_template(char_data *ch, char *argument) {
 	
 	// process argument
 	*find_keywords = '\0';
+	*extra_search = '\0';
 	while (*argument) {
 		// figure out a type
 		argument = any_one_arg(argument, type_arg);
@@ -445,6 +446,7 @@ void olc_fullsearch_room_template(char_data *ch, char *argument) {
 		}
 		
 		FULLSEARCH_FLAGS("affects", only_affs, room_aff_bits)
+		FULLSEARCH_STRING("extradesc", extra_search)
 		FULLSEARCH_FLAGS("flags", only_flags, room_template_flags)
 		FULLSEARCH_FLAGS("flagged", only_flags, room_template_flags)
 		FULLSEARCH_FLAGS("unflagged", not_flagged, room_template_flags)
@@ -481,6 +483,9 @@ void olc_fullsearch_room_template(char_data *ch, char *argument) {
 		if (only_functions != NOBITS && (GET_RMT_FUNCTIONS(rmt) & only_functions) != only_functions) {
 			continue;
 		}
+		if (*extra_search && !find_exdesc(extra_search, GET_RMT_EX_DESCS(rmt), NULL)) {
+			continue;
+		}
 		if (find_interacts) {	// look up its interactions
 			found_interacts = NOBITS;
 			LL_FOREACH(GET_RMT_INTERACTIONS(rmt), inter) {
@@ -507,8 +512,8 @@ void olc_fullsearch_room_template(char_data *ch, char *argument) {
 		}
 	}
 	
-	if (count > 0 && (size + 14) < sizeof(buf)) {
-		size += snprintf(buf + size, sizeof(buf) - size, "(%d room templates)\r\n", count);
+	if (count > 0 && (size + 20) < sizeof(buf)) {
+		size += snprintf(buf + size, sizeof(buf) - size, "(%d templates)\r\n", count);
 	}
 	else if (count == 0) {
 		size += snprintf(buf + size, sizeof(buf) - size, " none\r\n");
@@ -958,6 +963,8 @@ void olc_show_room_template(char_data *ch) {
 	
 	sprintbit(GET_RMT_BASE_AFFECTS(rmt), room_aff_bits, lbuf, TRUE);
 	sprintf(buf + strlen(buf), "<%saffects\t0> %s\r\n", OLC_LABEL_VAL(GET_RMT_BASE_AFFECTS(rmt), NOBITS), lbuf);
+	
+	sprintf(buf + strlen(buf), "<%stemperature\t0> %s\r\n", OLC_LABEL_VAL(GET_RMT_TEMPERATURE_TYPE(rmt), 0), temperature_types[GET_RMT_TEMPERATURE_TYPE(rmt)]);
 	
 	// exits
 	sprintf(buf + strlen(buf), "Exits: <%sexit\t0>, <%smatchexits\t0>\r\n", OLC_LABEL_PTR(GET_RMT_EXITS(rmt)), OLC_LABEL_PTR(GET_RMT_EXITS(rmt)));
@@ -1470,4 +1477,10 @@ OLC_MODULE(rmedit_subzone) {
 	else {
 		GET_RMT_SUBZONE(rmt) = olc_process_number(ch, argument, "subzone vnum", "subzone", 0, MAX_VNUM, GET_RMT_SUBZONE(rmt));
 	}
+}
+
+
+OLC_MODULE(rmedit_temperature) {
+	room_template *rmt = GET_OLC_ROOM_TEMPLATE(ch->desc);
+	GET_RMT_TEMPERATURE_TYPE(rmt) = olc_process_type(ch, argument, "temperature", "temperature", temperature_types, GET_RMT_TEMPERATURE_TYPE(rmt));
 }

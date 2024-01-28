@@ -14,13 +14,13 @@ E
 4 0 0.40 11989
 E
 22 0 5.00 11992
-I 5 103 2.00 1 d  # DIG: yellow lightning stone
-I 5 104 2.00 1 d  # DIG: red bloodstone
-I 5 1300 2.00 1 d  # DIG: glowing green seashell
-I 5 1206 2.00 1 d  # DIG: iridescent blue iris
-I 5 102 9.00 1 d  # DIG: flint stone
-I 5 100 83.00 1 d  # DIG: rock
-I 6 3017 100.00 1  # FORAGE: plump fig
+I 5 103 2.00 125 d  # DIG: yellow lightning stone
+I 5 104 2.00 125 d  # DIG: red bloodstone
+I 5 1300 2.00 125 d  # DIG: glowing green seashell
+I 5 1206 2.00 125 d  # DIG: iridescent blue iris
+I 5 102 9.00 125 d  # DIG: flint stone
+I 5 100 83.00 125 d  # DIG: rock
+I 6 3017 100.00 25  # FORAGE: plump fig
 X
 calamander grove stumps trees forest around~
    The stumps of this once-verdant grove have a strange, variegated pattern to
@@ -58,13 +58,13 @@ E
 4 0 0.40 11990
 E
 22 0 5.00 11992
-I 5 103 2.00 1 d  # DIG: yellow lightning stone
-I 5 104 2.00 1 d  # DIG: red bloodstone
-I 5 1300 2.00 1 d  # DIG: glowing green seashell
-I 5 1206 2.00 1 d  # DIG: iridescent blue iris
-I 5 102 9.00 1 d  # DIG: flint stone
-I 5 100 83.00 1 d  # DIG: rock
-I 6 11999 100.00 1  # FORAGE: piece of jade cheese
+I 5 103 2.00 125 d  # DIG: yellow lightning stone
+I 5 104 2.00 125 d  # DIG: red bloodstone
+I 5 1300 2.00 125 d  # DIG: glowing green seashell
+I 5 1206 2.00 125 d  # DIG: iridescent blue iris
+I 5 102 9.00 125 d  # DIG: flint stone
+I 5 100 83.00 125 d  # DIG: rock
+I 6 11999 100.00 25  # FORAGE: piece of jade cheese
 I 20 11995 100.00 1  # CHOP: calamander tree
 M
 11963 10.00 c
@@ -104,13 +104,13 @@ E
 4 0 0.40 11991
 E
 22 0 5.00 11992
-I 5 103 2.00 1 d  # DIG: yellow lightning stone
-I 5 104 2.00 1 d  # DIG: red bloodstone
-I 5 1300 2.00 1 d  # DIG: glowing green seashell
-I 5 1206 2.00 1 d  # DIG: iridescent blue iris
-I 5 102 9.00 1 d  # DIG: flint stone
-I 5 100 83.00 1 d  # DIG: rock
-I 6 11999 100.00 1  # FORAGE: piece of jade cheese
+I 5 103 2.00 125 d  # DIG: yellow lightning stone
+I 5 104 2.00 125 d  # DIG: red bloodstone
+I 5 1300 2.00 125 d  # DIG: glowing green seashell
+I 5 1206 2.00 125 d  # DIG: iridescent blue iris
+I 5 102 9.00 125 d  # DIG: flint stone
+I 5 100 83.00 125 d  # DIG: rock
+I 6 11999 100.00 25  # FORAGE: piece of jade cheese
 I 20 11995 100.00 1  # CHOP: calamander tree
 M
 11963 10.00 c
@@ -170,13 +170,13 @@ E
 0 0 100.00 11990
 E
 22 0 5.00 11992
-I 5 103 2.00 1 d  # DIG: yellow lightning stone
-I 5 104 2.00 1 d  # DIG: red bloodstone
-I 5 1300 2.00 1 d  # DIG: glowing green seashell
-I 5 1206 2.00 1 d  # DIG: iridescent blue iris
-I 5 102 9.00 1 d  # DIG: flint stone
-I 5 100 83.00 1 d  # DIG: rock
-I 6 11999 100.00 1  # FORAGE: piece of jade cheese
+I 5 103 2.00 125 d  # DIG: yellow lightning stone
+I 5 104 2.00 125 d  # DIG: red bloodstone
+I 5 1300 2.00 125 d  # DIG: glowing green seashell
+I 5 1206 2.00 125 d  # DIG: iridescent blue iris
+I 5 102 9.00 125 d  # DIG: flint stone
+I 5 100 83.00 125 d  # DIG: rock
+I 6 11999 100.00 25  # FORAGE: piece of jade cheese
 I 20 11995 100.00 1  # CHOP: calamander tree
 M
 11963 10.00 c
@@ -214,9 +214,9 @@ E
 4 0 0.80 65
 E
 9 0 50.00 27
-I 5 102 9.00 1 d  # DIG: flint stone
-I 5 100 91.00 1 d  # DIG: rock
-I 6 3017 75.00 1  # FORAGE: plump fig
+I 5 102 9.00 125 d  # DIG: flint stone
+I 5 100 91.00 125 d  # DIG: rock
+I 6 3017 75.00 25  # FORAGE: plump fig
 I 20 605 100.00 3 c  # CHOP: pile of dead wood
 X
 calamander jungle grove thicket trees wood forest around~

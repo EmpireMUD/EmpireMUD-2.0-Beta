@@ -105,7 +105,9 @@ Commands:
 - &ccity found <name>&0: This founds a new city on the spot where you're standing.
     It creates a "city center" building, which is open (does not block move-
     ment). It costs 1 city point. You must be 25 tiles away from a starting
-    location and 30 from another empire's city (10 tiles if allied).
+    location and 30 from another empire's city (10 tiles if allied). When you
+    found your empire's first city, anything stored on a newbie island is
+    automatically transferred there as a courtesy.
 - &ccity upgrade <name>&0: This upgrades the given city by 1 level at the cost of
     1 city point.
 - &ccity downgrade <name>&0: This downgrades the given city by 1 level, or
@@ -218,8 +220,8 @@ Mines will only display as 'deep' if, thanks to this bonus, they have more ore
 than the normal maximum.
 
 Once you have started a mine on (or prospected) a given mountain tile, it will
-remain a deep mine unless the mountain is reset at the end of the year. For
-more information on mountain resets, see HELP MINE.
+remain a deep mine until the mountain is reset. For more information on
+mountain resets, see HELP MINE.
 
 See also: MINE, PROSPECT, RARE METALS
 #
@@ -317,7 +319,7 @@ dismantled when they are empty. However, workers will only dismantle it if the
 building chore is turned on as well. You can prevent dismantling of individual
 mines using the nodismantle command.
 
-Mines must be dismantled each year in order for the ore to refresh.
+Mines must be dismantled when empty in order for the ore to refresh.
 
 See also: NODISMANTLE, WORKFORCE
 #
@@ -380,6 +382,10 @@ Immortals with the "EMPIRES" grant can set administrative flags on empires.
  &g!WAR&0 - Empire cannot unilaterally declare war.
  &g!STEAL&0 - Empire cannot steal from other empires.
  &gCITY-CLAIMS-ONLY&0 - Empire cannot claim out-of-city territory.
+ &g!RENAME&0 - Empire cannot change its name, adjective, description, or ranks.
+ &gDID-NEWBIE-MOVE&0 - Empire got its free move from the newbie island when it
+    built a city. Removing this flag then founding a new city will move newbie
+    items again.
 
 Both the !WAR and !STEAL flags will prevent 'reclaim' from being used by OR
 against the empire.
@@ -403,6 +409,10 @@ You can use "efind all" to find all items on the ground in your empire. The
 
 Example:
  > efind cart
+
+* Immortals may use this command on any empire. Mortals may only use it on
+their own empire. If the empire name has more than one word, you can use
+quotation marks.
 
 See also: EINVENTORY, NAVIGATION, EIDENTIFY
 #
@@ -428,6 +438,7 @@ Log types are:
  Trade - Logs related to empire trades.
  Workforce - Shows logs of production and consumption (shown only on request).
  Progress - Recently completed goals and purchased rewards.
+ Alert - Important messages.
  
 See also: PRIVILEGE
 #
@@ -482,7 +493,7 @@ You can use "warehouse inventory" to see items in warehouse (unique) storage.
 their own empire. If the empire name has more than one word, you can use
 quotation marks.
 
-See also: EFIND, SHIPPING, WORKFORCE, EIDENTIFY
+See also: AUTOSTORE, EFIND, SHIPPING, WORKFORCE, EIDENTIFY
 #
 "EMPIRE SCORE" ESCORE
 
@@ -591,8 +602,8 @@ that empire, the more even the exchange of money will be.
 The analyze command will show you which of your trading partners has the item
 available.
 
-An empire can only import 100 items per day total, and imports/exports run once
-per in-game day.
+An empire can only import 100 items at a time, and imports/exports run once per
+30 minutes.
 
 If you want to replace an entry with a new cost tolerance, you can "add" it
 again without removing it. It will replace the old entry.
@@ -640,7 +651,7 @@ needed to repair that location or all buildings you own on the island.
 If you are using Workforce to maintain your buildings, this generally means
 that only buildings not serviced by your workforce will show up on the list.
 
-Immortals can give an empire name as the first argument to see maintenance
+* Immortals can give an empire name as the first argument to see maintenance
 for that empire.
 
 See also: MAINTAIN, WORKFORCE
@@ -714,7 +725,7 @@ See also: PROGRESS
 #
 HOME "HOME STORAGE"
 
-Usage:  home [set/unset/clear]
+Usage:  home [set/unset/list/clear]
         home inventory [item keywords]
         home identify <item keywords>
         home retrieve [number] [item keywords]
@@ -726,11 +737,14 @@ highest-ranking leaders). You can unset your home from anywhere, or clear the
 owner for the building you're in. Only the empire leaders can clear homes they
 don't own.
 
+Any member may type "home list" to see all homes in the empire.
+
 You can store up to 300 unique items -- items that can't be stored in other
 buildings -- in your home. Identical items stack with each other and don't
 count toward that 300. When you move to a new home, you can access your stored
 items from your new home after 1 hour. You can check your home inventory and
-identify its items from anywhere.
+identify its items from anywhere. Perishable items will continue to decay in
+home storage, but only while you're in the game (just like your inventory).
 
 Only buildings that normally house citizens can be set as homes. This does not
 include buildings where adding a bedroom grants a citizen, if the building
@@ -769,6 +783,18 @@ all empires on the island share the same custom name for it.
 Note: Immortals with the 'empires' grant can list the islands of any empire.
 
 See also: CHART, CUSTOMIZE ISLAND, SURVEY
+#
+"LIVESTOCK LIVELIHOOD"
+
+Livestock Livelihood (Community goal)
+
+Buying this goal lets you build:
+  |CC|  chickencoops
+  &t|&G..&t|&0  pasture
+  |ST|  pigsty
+  (SS)  stable
+
+See also: PROGRESS
 #
 LUXURIES "LUXURIES GOAL"
 
@@ -821,6 +847,10 @@ You can add other players to your empire by having them type "pledge empire
 name", then you "enroll player". They don't have to be online at the same time
 as you to do this, so you can add other characters on your account to the
 empire this way.
+
+An empire's Greatness is the sum of the highest Greatness achieved by each of
+its members during their time in the empire. This number does not drop if those
+members lose greatness -- only if you lose members.
 
 When more than one character on an account is in the same empire, they all
 count as just 1 member. Only the highest Greatness among those alts is
@@ -998,8 +1028,7 @@ The following mines can only be found if you have Rare Metals:
 - moonstone mine (1.5% chance)
 
 Once you have started a mine (or prospected) a given mountain tile, it will
-keep its current metal type unless the mountain is reset at the end of the
-year. For more information on mountain resets, see HELP MINE.
+keep its current metal type until the mountain is reset (see HELP MINE).
 
 See also: MINE, DEEP MINES, PROSPECT, METALS
 #
@@ -1052,6 +1081,17 @@ If you don't use the "all" option, you won't see members who have timed out.
 High-level immortals can also target other empires with this command.
 
 See also: WHO
+#
+"SALT OF THE EARTH"
+
+Salt of the Earth (Industry goal)
+
+Buying this goal lets you build:
+  &0|&M88&0|  salterns
+  &y|&W__&y|&0  saltmine
+  &g.&0||&g.&0  saltsilo
+
+See also: PROGRESS
 #
 SEAFARERS
 
@@ -1142,27 +1182,37 @@ See also: CITIES, EMPIRE TIMEOUT, EXTENDED RADIUS, TERRITORY COMMAND, ESTATS
 #
 "TERRITORY COMMAND"
 
-Usage:  territory [keywords] [-exclude keyword]
-        territory [outskirts | frontier]
-        territory <empire> [type]  -- immortals only
+Usage:  territory [options] [keywords] [-exclude keyword]
 
-The territory command will list all your territory that is outside of your
-cities. This command groups tiles that are near each other so that it shows you
-fewer lines. It does not list territory inside of your cities, but you can find
-a list of your cities on the "city list" command.
+The territory command will list all your territory. This command groups tiles
+that are near each other so that it shows you fewer lines.
 
-You can optionally specify a building or terrain type and see all your tiles of
-that type. You can also specify 'outskirts' or 'frontier' to filter out-of-city
-territory to just one of those two categories. You can also type 'territory
-building' to get a list of all your buildings.
+Supported options:
+   -cities   Only tiles in cities.
+   -outskirts   Only tiles on outskirts.
+   -frontier   Only tiles on the frontier.
+   -distance N   Only locations within N tiles of you.
+   -island "name"   Only locations on the given island (use quotes if needed).
+   -no-abandon   Only no-abandon tiles.
+   -no-dismantle   Only no-dismantle tiles.
+   -no-work   Only no-work tiles.
+   -public   Only public tiles.
 
-If you put a dash (-) in front of a keyword, it will exclude results that
-match that keyword. You can specify more than 1 keyword to search or exclude.
+You can also add search keywords. Starting a keyword with a dash (-) will
+search for tiles that DON'T have that word. If you need to exclude a word
+such as "island" which is also a search option, use two dashes (--island).
+You can specify multiple keywords at once.
+
+Interior rooms, such as bedrooms, are only searched if keywords are given.
+Otherwise, this command only searches map tiles.
 
 You require the Navigation ability to use the "territory" command, because it
 gives coordinates.
 
-See also: CITIES, NAVIGATION, TERRITORY, MANAGE
+Immortals may provide an empire name as the first argument. Use quotes if it's
+more than 1 word.
+
+See also: CITIES, CITY COMMAND, NAVIGATION, TERRITORY, MANAGE
 #
 THIEVERY "THIEVERY PERMIT" "STEALING PERMIT"
 
@@ -1188,7 +1238,7 @@ Usage:  diplomacy trade <empire>
 Trade relations are required in order to import and export goods from/to
 another empire.
 
-Trade also allows you to store and withdrawl your empire's items from the other
+Trade also allows you to store and retrieve your empire's items from the other
 empire's buildings (if you also have permission to use that building, for
 example due to an alliance or if it's a public building). These resources still
 go to/from your own empire's storage.
@@ -1233,7 +1283,7 @@ Basic tree types are:
  - a large tree (temperate forests)
  - some rough wood (desert groves)
  - a massive jungle tree (tropical jungles)
- - an enchanted tree (magical forests)
+ - a starwood tree (magical forests)
 
 See also: CHANT OF NATURE, CHOP, BUILD, SCRAPE, PILLAR, LUMBER
 #
@@ -1464,7 +1514,6 @@ Workforce types:
   &ychopping:&0 NPCs will chop down forests and desert groves (Not orchards - 
      use farming without replanting for that).
   &ycrafting:&0 NPCs will make certain crafts (see WORKFORCE CRAFTING).
-  &ydigging:&0 NPCs will dig in any quarry, clay pit, or sand pit.
   &ydismantle-mines:&0 marks empty mines to be dismantled by the building chore.
   &yfarming:&0 NPCs will harvest crops. Costs no food.
   &yfire-brigade:&0 NPCs will put out fires.
@@ -1502,6 +1551,7 @@ Common things produced by this:
  Forge: nails
  Potter: bricks
  Glass blower: glass ingots
+ Tavern: barrels of ale
 
 See also: WORKFORCE CHORES, WORKFORCE LIMIT
 #
@@ -1555,7 +1605,7 @@ Examples:
  > workforce keep 200 spruce lumber
  > workforce keep default 1
 
-See also: WORKFORCE
+See also: WORKFORCE, WORKFORCE LIMIT
 #
 "WORKFORCE LIMIT" "WORKFORCE LIMITS"
 
@@ -1570,7 +1620,10 @@ You can use multiple keywords to try to get the right item. Example:
 
 Using this command without an amount lets you search your current limits.
 
-See also: WORKFORCE
+You can also set limits for a whole chore when turning a chore on using
+"workforce <chore> <limit> [island name]".
+
+See also: WORKFORCE, WORKFORCE KEEP
 #
 "WORKFORCE NEARBY"
 
@@ -1602,11 +1655,15 @@ your buildings. If you want to use this chore, but turn off specific items, use
 
 Common things produced by this:
  Apiary: honeycomb, beeswax
- Quarry: stone blocks
+ Chicken coops: eggs, poultry
+ Pasture: mutton, wool
+ Pigsty: pork
+ Quarry: flint, rocks, stone blocks
+ Salterns: sea salt
 
 Skilled labor also produces:
- Herb Gardens: various herbs
- Trapper's Post: skins
+ Herb Gardens: various magic herbs
+ Trapper's Post: skins, meat
 
 See also: WORKFORCE CHORES, WORKFORCE LIMIT, SKILLED LABOR
 #

@@ -4,7 +4,7 @@ some raw meat~
 Someone has left some raw meat here.~
 The meat doesn't look very fresh. Perhaps you should cook it.
 ~
-3 0 a 0 6
+3 C a 0 0 7
 0 0 0
 7 24
 C
@@ -19,7 +19,7 @@ some raw fish~
 Someone has left some raw fish here.~
 This fish can be cooked or eaten.
 ~
-6 0 a 0 5
+6 gC a 0 0 7
 24 0 0
 7 168
 C
@@ -35,7 +35,7 @@ Someone has left some cooked meat here.~
    There's no way to tell what sort of animal this came from, but at least it's
 been cooked.
 ~
-6 0 a 0 7
+6 gC a 0 0 9
 24 0 0
 7 96
 C
@@ -53,7 +53,7 @@ Someone has left some cooked poultry here.~
    There's no way to tell what sort of animal this came from, but at least it's
 been cooked.
 ~
-6 0 a 0 7
+6 gC a 0 0 9
 24 0 0
 7 96
 C
@@ -71,7 +71,7 @@ Someone has left some cooked pork here.~
    There's no way to tell what sort of animal this came from, but at least it's
 been cooked.
 ~
-6 0 a 0 8
+6 gC a 0 0 10
 24 0 0
 7 96
 C
@@ -89,7 +89,7 @@ Someone has left some cooked fish here.~
    There's no way to tell what sort of animal this came from, but at least it's
 been cooked.
 ~
-6 0 a 0 9
+6 gC a 0 0 11
 24 0 0
 7 96
 C
@@ -107,12 +107,44 @@ Someone has left some cooked red meat here.~
    There's no way to tell what sort of animal this came from, but at least it's
 been cooked.
 ~
-6 0 a 0 11
+6 gC a 0 0 13
 24 0 0
 7 96
 C
 1 1
 O+ 1 6224
+R
+4 5619 0
+R
+4 5119 0
+S
+#6225
+egg cooked~
+a cooked egg~
+A cooked egg is lying on the ground.~
+The egg has been cooked perhaps in hot water or in the coals by the fire.
+~
+6 gC a 0 0 10
+6 0 0
+7 336
+C
+1 1
+O+ 1 6220
+R
+4 5619 0
+S
+#6226
+mutton cooked~
+some cooked mutton~
+Some cooked mutton is lying here.~
+This rich meat has been cooked over the fire.
+~
+6 gC a 0 0 14
+24 0 0
+7 96
+C
+1 1
+O+ 1 6226
 R
 4 5619 0
 R
@@ -124,9 +156,9 @@ a cooked meal~
 A cooked meal has been left here.~
 This meal looks good enough to eat!
 ~
-6 0 a 0 10
+6 g a 0 0 12
 24 0 0
-7 96
+7 336
 C
 1 1
 O+ 1 6240
@@ -139,9 +171,9 @@ a cooked vegetarian meal~
 A cooked vegetarian meal has been left here.~
 This meal looks good enough to eat!
 ~
-6 0 a 0 8
+6 g a 0 0 10
 24 0 0
-7 96
+7 336
 C
 1 1
 O+ 1 6241
@@ -154,9 +186,9 @@ a meal of cooked meat~
 A meal of cooked meat has been left here.~
 This meal looks good enough to eat!
 ~
-6 0 a 0 9
+6 g a 0 0 11
 24 0 0
-7 96
+7 336
 C
 1 1
 O+ 1 6242

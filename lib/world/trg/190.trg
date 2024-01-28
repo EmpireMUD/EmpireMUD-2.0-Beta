@@ -139,7 +139,11 @@ if !%arg%
   return 1
   halt
 end
-* TODO: Check nobody's in the adventure before changing difficulty
+if %instance.players_present% > %self.room.players_present%
+  %send% %actor% You cannot set a difficulty while players are elsewhere in the adventure.
+  return 1
+  halt
+end
 if normal /= %arg%
   %echo% Setting difficulty to Normal...
   set difficulty 1
@@ -609,6 +613,7 @@ nop %instance.level(%level%)%
 * Load mob, apply difficulty setting
 %load% mob 10200
 set mob %room.people%
+nop %mob.link_instance%
 remote difficulty %mob.id%
 set mob_diff %difficulty%
 dg_affect #10215 %mob% !ATTACK on 5

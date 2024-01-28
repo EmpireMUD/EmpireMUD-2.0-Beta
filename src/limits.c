@@ -2,15 +2,13 @@
 *   File: limits.c                                        EmpireMUD 2.0b5 *
 *  Usage: Periodic updates and limiters                                   *
 *                                                                         *
-*  EmpireMUD code base by Paul Clarke, (C) 2000-2015                      *
+*  EmpireMUD code base by Paul Clarke, (C) 2000-2024                      *
 *  All rights reserved.  See license.doc for complete information.        *
 *                                                                         *
 *  EmpireMUD based upon CircleMUD 3.0, bpl 17, by Jeremy Elson.           *
 *  CircleMUD (C) 1993, 94 by the Trustees of the Johns Hopkins University *
 *  CircleMUD is based on DikuMUD, Copyright (C) 1990, 1991.               *
 ************************************************************************ */
-
-#include <math.h>
 
 #include "conf.h"
 #include "sysdep.h"
@@ -34,22 +32,28 @@
 *   Object Limits
 *   Room Limits
 *   Vehicle Limits
+*   Storage Limits
 *   Miscellaneous Limits
 *   Periodic Gainers
 *   Core Periodicals
 */
 
 // external vars
+extern int char_extractions_pending;
 
 // external funcs
 ACMD(do_dismount);
 ACMD(do_respawn);
 
 // local vars
+empire_data *decay_in_storage_empire = NULL;	// helps decay items in storage
+int decay_in_storage_isle = NO_ISLAND;	// helps decay items in storage
 int point_update_cycle = 0;	// helps spread out point updates
 
 // local funcs
-bool tick_obj_timer(obj_data *obj);
+bool run_timer_triggers_on_decaying_home_storage(char_data *ch, room_data *home, struct empire_unique_storage *eus, int amount);
+void run_timer_triggers_on_decaying_storage(empire_data *emp, struct empire_island *isle, obj_data *proto, int amount);
+bool run_timer_triggers_on_decaying_warehouse(empire_data *emp, struct empire_unique_storage *eus, int amount);
 
 
  //////////////////////////////////////////////////////////////////////////////
@@ -127,20 +131,124 @@ void check_attribute_gear(char_data *ch) {
 
 
 /**
-* Times out players who are sitting at the password or name prompt.
+* Checks if the player needs their daily cycle reset, and resets it if so (with
+* a message).
+*
+* @param char_data *ch The player.
 */
-void check_idle_passwords(void) {
-	descriptor_data *d, *next_d;
-
-	for (d = descriptor_list; d; d = next_d) {
-		next_d = d->next;
-		if (STATE(d) != CON_PASSWORD && STATE(d) != CON_GET_NAME)
-			continue;
-			
-		if (d->idle_tics < 2) {
-			++d->idle_tics;
+void check_daily_cycle_reset(char_data *ch) {
+	int gain;
+	
+	if (!IS_NPC(ch) && GET_DAILY_CYCLE(ch) < data_get_long(DATA_DAILY_CYCLE)) {
+		// other stuff that resets daily
+		gain = compute_bonus_exp_per_day(ch);
+		if (GET_DAILY_BONUS_EXPERIENCE(ch) < gain) {
+			GET_DAILY_BONUS_EXPERIENCE(ch) = gain;
+			update_MSDP_bonus_exp(ch, UPDATE_SOON);
 		}
-		else {
+		GET_DAILY_QUESTS(ch) = 0;
+		GET_EVENT_DAILY_QUESTS(ch) = 0;
+	
+		msg_to_char(ch, "\tjYour daily quests and bonus experience have reset!\t0\r\n");
+		
+		if (fail_daily_quests(ch, TRUE) | fail_daily_quests(ch, FALSE)) {
+			msg_to_char(ch, "\tjYour daily quests expire.\t0\r\n");
+		}
+	
+		// update to this cycle so it only happens once a day
+		GET_DAILY_CYCLE(ch) = data_get_long(DATA_DAILY_CYCLE);
+		queue_delayed_update(ch, CDU_SAVE);
+	}
+}
+
+
+/**
+* This is called after removing and re-applying affects/gear.
+* Players: Pays off any deficits they can afford, and checks maximums.
+* NPCS: Just checks maximums.
+*
+* @param char_data *ch The characters.
+*/
+void check_deficits(char_data *ch) {
+	int amount;
+	
+	// move
+	if (!IS_NPC(ch) && GET_MOVE(ch) > 0 && GET_MOVE_DEFICIT(ch) > 0) {
+		amount = MIN(GET_MOVE(ch), GET_MOVE_DEFICIT(ch));
+		set_move(ch, GET_MOVE(ch) - amount);
+		GET_MOVE_DEFICIT(ch) -= amount;
+	}
+	if (GET_MOVE(ch) > GET_MAX_MOVE(ch)) {
+		// we had to let it go over temporarily; cap it now through set_move
+		set_move(ch, GET_MAX_MOVE(ch));
+	}
+	else if (GET_MOVE(ch) < 0) {
+		set_move(ch, 0);
+	}
+	
+	// health
+	if (!IS_NPC(ch) && GET_HEALTH(ch) > 1 && GET_HEALTH_DEFICIT(ch) > 0) {
+		amount = MIN(GET_HEALTH(ch) - 1, GET_HEALTH_DEFICIT(ch));
+		set_health(ch, GET_HEALTH(ch) - amount);
+		GET_HEALTH_DEFICIT(ch) -= amount;
+	}
+	if (GET_HEALTH(ch) > GET_MAX_HEALTH(ch)) {
+		// we had to let it go over temporarily; cap it now through set_health
+		set_health(ch, GET_MAX_HEALTH(ch));
+	}
+	
+	// mana
+	if (!IS_NPC(ch) && GET_MANA(ch) > 0 && GET_MANA_DEFICIT(ch) > 0) {
+		amount = MIN(GET_MANA(ch), GET_MANA_DEFICIT(ch));
+		set_mana(ch, GET_MANA(ch) - amount);
+		GET_MANA_DEFICIT(ch) -= amount;
+	}
+	if (GET_MANA(ch) > GET_MAX_MANA(ch)) {
+		// we had to let it go over temporarily; cap it now through set_mana
+		set_mana(ch, GET_MAX_MANA(ch));
+	}
+	else if (GET_MANA(ch) < 0) {
+		set_mana(ch, 0);
+	}
+	
+	// blood
+	if (!IS_NPC(ch) && GET_BLOOD(ch) > 1 && GET_BLOOD_DEFICIT(ch) > 0) {
+		amount = MIN(GET_BLOOD(ch) - 1, GET_BLOOD_DEFICIT(ch));
+		set_blood(ch, GET_BLOOD(ch) - amount);
+		GET_BLOOD_DEFICIT(ch) -= amount;
+	}
+	if (GET_BLOOD(ch) > GET_MAX_BLOOD(ch)) {
+		// we had to let it go over temporarily; cap it now through set_blood
+		set_blood(ch, GET_MAX_BLOOD(ch));
+	}
+	
+	// do not call affect_total() in here: we are called from there
+}
+
+
+/**
+* Times out players who are sitting at various menus. This is  called every 15
+* seconds, so each of d->idle_tics are 15 seconds.
+*
+* Characters at the login or password prompt get 30 seconds; all other menus
+* get 5 minutes.
+*/
+void check_idle_menu_users(void) {
+	descriptor_data *d, *next_d;
+	int allowed;
+	
+	LL_FOREACH_SAFE(descriptor_list, d, next_d) {
+		if (STATE(d) == CON_PLAYING) {
+			continue;	// ignore in-game
+		}
+		
+		// add 1 (15 seconds of time)
+		++d->idle_tics;
+		
+		// determine how long they can stay
+		allowed = (STATE(d) == CON_PASSWORD || STATE(d) == CON_GET_NAME) ? 2 : 20;
+		
+		if (d->idle_tics > allowed) {
 			if (STATE(d) == CON_PASSWORD) {
 				ProtocolNoEcho(d, false);
 			}
@@ -190,7 +298,7 @@ void check_pointless_fight(char_data *mob) {
 	char_data *iter;
 	bool any;
 	
-	#define IS_POINTLESS(ch)  (GET_HEALTH(ch) <= 0 || MOB_FLAGGED(ch, MOB_NO_ATTACK))
+	#define IS_POINTLESS(ch)  (GET_HEALTH(ch) <= 0 || MOB_FLAGGED((ch), MOB_NO_ATTACK))
 	
 	if (!FIGHTING(mob) || !IS_POINTLESS(mob)) {
 		return;	// mob is not pointless (or not fighting)
@@ -201,16 +309,13 @@ void check_pointless_fight(char_data *mob) {
 	
 	any = FALSE;
 	DL_FOREACH2(ROOM_PEOPLE(IN_ROOM(mob)), iter, next_in_room) {
-		if (iter == mob || FIGHTING(iter) != mob) {
-			continue;	// only care about people fighting mob
-		}
-		if (!IS_POINTLESS(iter)) {
+		if (FIGHTING(iter) && (!IS_POINTLESS(iter) || !IS_POINTLESS(FIGHTING(iter)))) {
 			any = TRUE;
 			break;
 		}
 	}
 	
-	// did with find ANY non-pointless people hitting the mob?
+	// did with find ANY non-pointless people fighting?
 	if (!any) {
 		// stop mob
 		stop_fighting(mob);
@@ -248,11 +353,11 @@ void check_should_dismount(char_data *ch) {
 	else if (MOUNT_FLAGGED(ch, MOUNT_FLYING) && !CAN_RIDE_FLYING_MOUNT(ch)) {
 		ok = FALSE;
 	}
-	else if (DEEP_WATER_SECT(IN_ROOM(ch)) && !MOUNT_FLAGGED(ch, MOUNT_AQUATIC | MOUNT_WATERWALK) && !EFFECTIVELY_FLYING(ch)) {
+	else if (DEEP_WATER_SECT(IN_ROOM(ch)) && !MOUNT_FLAGGED(ch, MOUNT_AQUATIC | MOUNT_WATERWALKING) && !EFFECTIVELY_FLYING(ch)) {
 		ok = FALSE;
 	}
-	else if (!CAN_RIDE_WATERWALK_MOUNT(ch) && DEEP_WATER_SECT(IN_ROOM(ch)) && MOUNT_FLAGGED(ch, MOUNT_WATERWALK) && !EFFECTIVELY_FLYING(ch)) {
-		// has a waterwalk mount, in deep water, but is missing the riding upgrade
+	else if (!CAN_RIDE_WATERWALK_MOUNT(ch) && DEEP_WATER_SECT(IN_ROOM(ch)) && MOUNT_FLAGGED(ch, MOUNT_WATERWALKING) && !EFFECTIVELY_FLYING(ch)) {
+		// has a waterwalking mount, in deep water, but is missing the riding upgrade
 		ok = FALSE;
 	}
 	else if (!has_player_tech(ch, PTECH_RIDING_UPGRADE) && WATER_SECT(IN_ROOM(ch)) && !MOUNT_FLAGGED(ch, MOUNT_AQUATIC) && !EFFECTIVELY_FLYING(ch)) {
@@ -267,6 +372,8 @@ void check_should_dismount(char_data *ch) {
 
 /**
 * Interaction func for "decays-to" and "consumes-to".
+*
+* INTERACTION_FUNC provides: ch, interaction, inter_room, inter_mob, inter_item, inter_veh
 */
 INTERACTION_FUNC(consumes_or_decays_interact) {
 	obj_data *new_obj;
@@ -312,7 +419,9 @@ INTERACTION_FUNC(consumes_or_decays_interact) {
 		}
 		
 		if (!fail) {
-			load_otrigger(new_obj);
+			if (load_otrigger(new_obj) && new_obj->carried_by) {
+				get_otrigger(new_obj, new_obj->carried_by, FALSE);
+			}
 		}
 	}
 	
@@ -366,6 +475,9 @@ bool point_update_player(char_data *ch) {
 		return FALSE;
 	}
 	
+	// home item decay
+	check_home_storage_timers(ch);
+	
 	// remove stale offers -- this needs to happen even if dead (resurrect)
 	clean_offers(ch);
 	
@@ -393,17 +505,13 @@ bool point_update_player(char_data *ch) {
 		}
 	}
 	
-	if (IS_BLOOD_STARVED(ch)) {
+	if (IS_BLOOD_STARVED(ch) && SHOW_STATUS_MESSAGES(ch, SM_LOW_BLOOD)) {
 		msg_to_char(ch, "You are starving!\r\n");
 	}
 	
 	// light-based gains
 	if (IS_OUTDOORS(ch) && get_sun_status(IN_ROOM(ch)) == SUN_LIGHT) {
 		gain_player_tech_exp(ch, PTECH_VAMPIRE_SUN_IMMUNITY, 2);
-	}
-	
-	if (GET_MOUNT_LIST(ch)) {
-		gain_ability_exp(ch, ABIL_STABLEMASTER, 2);
 	}
 	
 	run_ability_gain_hooks(ch, NULL, AGH_PASSIVE_HOURLY);
@@ -464,6 +572,12 @@ void real_update_player(char_data *ch) {
 		return;
 	}
 	
+	if (EXTRACTED(ch) && char_extractions_pending == 0) {
+		log("SYSERR: Player %s is EXTRACED while no extractions are pending.\r\n", GET_NAME(ch));
+		++char_extractions_pending;
+		return;
+	}
+	
 	// put stuff that happens when dead here
 	
 	// DEAD players: check for auto-respawn
@@ -499,7 +613,7 @@ void real_update_player(char_data *ch) {
 		extract_char(GET_COMPANION(ch));
 	}
 	// earthmeld damage
-	if (!IS_IMMORTAL(ch) && AFF_FLAGGED(ch, AFF_EARTHMELD) && IS_COMPLETE(IN_ROOM(ch)) && (ROOM_IS_CLOSED(IN_ROOM(ch)) || ROOM_BLD_FLAGGED(IN_ROOM(ch), BLD_BARRIER))) {
+	if (!IS_IMMORTAL(ch) && AFF_FLAGGED(ch, AFF_EARTHMELDED) && IS_COMPLETE(IN_ROOM(ch)) && (ROOM_IS_CLOSED(IN_ROOM(ch)) || ROOM_BLD_FLAGGED(IN_ROOM(ch), BLD_BARRIER))) {
 		if (!affected_by_spell(ch, ATYPE_NATURE_BURN)) {
 			msg_to_char(ch, "You are beneath a building and begin taking nature burn as the earth you're buried in is separated from fresh air...\r\n");
 		}
@@ -544,33 +658,18 @@ void real_update_player(char_data *ch) {
 	}
 
 	// periodic exp and skill gain
-	if (GET_DAILY_CYCLE(ch) < data_get_long(DATA_DAILY_CYCLE)) {
-		// other stuff that resets daily
-		gain = compute_bonus_exp_per_day(ch);
-		if (GET_DAILY_BONUS_EXPERIENCE(ch) < gain) {
-			GET_DAILY_BONUS_EXPERIENCE(ch) = gain;
-			update_MSDP_bonus_exp(ch, UPDATE_SOON);
-		}
-		GET_DAILY_QUESTS(ch) = 0;
-		GET_EVENT_DAILY_QUESTS(ch) = 0;
-	
-		msg_to_char(ch, "&yYour daily quests and bonus experience have reset!&0\r\n");
-		
-		if (fail_daily_quests(ch, TRUE) | fail_daily_quests(ch, FALSE)) {
-			msg_to_char(ch, "Your daily quests expire.\r\n");
-		}
-	
-		// update to this cycle so it only happens once a day
-		GET_DAILY_CYCLE(ch) = data_get_long(DATA_DAILY_CYCLE);
-		queue_delayed_update(ch, CDU_SAVE);
-	}
+	check_daily_cycle_reset(ch);
 
 	/* Update conditions */
 	if (HAS_BONUS_TRAIT(ch, BONUS_NO_HUNGER) || has_player_tech(ch, PTECH_NO_HUNGER)) {			
 		gain_condition(ch, FULL, -1);
 	}
 	else {
-		if (!number(0, 1)) {
+		if (AFF_FLAGGED(ch, AFF_HUNGRIER)) {
+			gain_condition(ch, FULL, number(1, 2));
+		}
+		else if (number(0, 2)) {
+			// random chance of hunger
 			gain_condition(ch, FULL, 1);
 		}
 	}
@@ -582,7 +681,10 @@ void real_update_player(char_data *ch) {
 		gain_condition(ch, THIRST, -1);
 	}
 	else {
-		if (!number(0, 1)) {
+		if (AFF_FLAGGED(ch, AFF_THIRSTIER)) {
+			gain_condition(ch, THIRST, number(1, 2));
+		}
+		else if (number(0, 2)) {
 			gain_condition(ch, THIRST, 1);
 		}
 	}
@@ -615,7 +717,7 @@ void real_update_player(char_data *ch) {
 		if (GET_POS(ch) == POS_DEAD) {
 			msg_to_char(ch, "You die from your wounds!\r\n");
 			act("$n falls down, dead.", FALSE, ch, 0, 0, TO_ROOM);
-			death_log(ch, ch, TYPE_SUFFERING);
+			death_log(ch, ch, ATTACK_SUFFERING);
 			die(ch, ch);
 			return;
 		}
@@ -645,7 +747,7 @@ void real_update_player(char_data *ch) {
 		if (GET_MOVE(ch) <= 0) {
 			msg_to_char(ch, "You sink beneath the water and die!\r\n");
 			act("$n sinks beneath the water and dies!", FALSE, ch, NULL, NULL, TO_ROOM);
-			death_log(ch, ch, TYPE_SUFFERING);
+			death_log(ch, ch, ATTACK_SUFFERING);
 			die(ch, ch);
 			return;
 		}
@@ -676,6 +778,10 @@ void real_update_player(char_data *ch) {
 		}
 		msg_to_char(ch, "You revert to normal!\r\n");
 	}
+	
+	// temperature check
+	update_player_temperature(ch);
+	check_temperature_penalties(ch);
 
 	/* Blood check */
 	if (GET_BLOOD(ch) <= 0 && !GET_FED_ON_BY(ch) && !GET_FEEDING_FROM(ch)) {
@@ -683,7 +789,7 @@ void real_update_player(char_data *ch) {
 		return;
 	}
 	else if (IS_BLOOD_STARVED(ch)) {
-		cancel_blood_upkeeps(ch);
+		cancel_blood_upkeeps(ch, TRUE);
 		starving_vampire_aggro(ch);
 	}
 
@@ -735,7 +841,7 @@ void real_update_player(char_data *ch) {
 * @param struct empire_city_data *city The city to check.
 * @return TRUE if it destroys the city, FALSE otherwise.
 */
-static bool check_one_city_for_ruin(empire_data *emp, struct empire_city_data *city) {
+bool check_one_city_for_ruin(empire_data *emp, struct empire_city_data *city) {
 	room_data *to_room, *center = city->location;
 	int radius = city_type[city->type].radius;
 	bool found_building = FALSE;
@@ -790,23 +896,24 @@ static bool check_one_city_for_ruin(empire_data *emp, struct empire_city_data *c
 * Looks for cities that contain no buildings and destroys them. This prevents
 * old, expired empires from taking up city space near start locations, which
 * is common. -paul 5/22/2014
+*
+* @param empire_data *only_emp Optional: do one instead of all (or NULL for all).
 */
-void check_ruined_cities(void) {
+void check_ruined_cities(empire_data *only_emp) {
 	struct empire_city_data *city, *next_city;
 	empire_data *emp, *next_emp;
 	bool any = FALSE;
 	
 	HASH_ITER(hh, empire_table, emp, next_emp) {
-		if (!EMPIRE_IMM_ONLY(emp)) {
-			for (city = EMPIRE_CITY_LIST(emp); city; city = next_city) {
-				next_city = city->next;
+		if ((!only_emp || emp == only_emp) && !EMPIRE_IMM_ONLY(emp)) {
+			LL_FOREACH_SAFE(EMPIRE_CITY_LIST(emp), city, next_city) {
 				any |= check_one_city_for_ruin(emp, city);
 			}
 		}
 	}
 	
 	if (any) {
-		read_empire_territory(NULL, FALSE);
+		read_empire_territory(emp, FALSE);
 	}
 }
 
@@ -1180,7 +1287,7 @@ void update_empire_needs(empire_data *emp, struct empire_island *eisle, struct e
 			if (needs->needed < 1) {
 				break;	// done early
 			}
-			if (store->keep == UNLIMITED || store->amount <= store->keep || store->amount < 1 || !(obj = store->proto)) {
+			if (store->amount < 1 || store->keep == UNLIMITED || store->amount <= store->keep || store->amount < 1 || !(obj = store->proto)) {
 				continue;
 			}
 			
@@ -1217,7 +1324,7 @@ void update_empire_needs(empire_data *emp, struct empire_island *eisle, struct e
 			// amount we could take
 			if (amount > 0) {
 				any = TRUE;
-				add_to_empire_storage(emp, eisle->island, store->vnum, -amount);
+				add_to_empire_storage(emp, eisle->island, store->vnum, -amount, 0);
 				log_to_empire(emp, ELOG_WORKFORCE, "Consumed %s (x%d) on %s", GET_OBJ_SHORT_DESC(obj), amount, eisle->name ? eisle->name : island->name);
 			}
 		}
@@ -1228,8 +1335,8 @@ void update_empire_needs(empire_data *emp, struct empire_island *eisle, struct e
 			// ENEED_x: logging the problem
 			switch (needs->type) {
 				case ENEED_WORKFORCE: {
-					// this logs to TRADE because otherwise members won't see it
-					log_to_empire(emp, ELOG_TRADE, "Your workforce on %s is starving!", eisle->name ? eisle->name : island->name);
+					// this logs to ALERT because if it's on WORKFORCE, members won't see it
+					log_to_empire(emp, ELOG_ALERT, "Your workforce on %s is starving!", eisle->name ? eisle->name : island->name);
 					deactivate_workforce_island(emp, eisle->island);
 					break;
 				}
@@ -1417,7 +1524,7 @@ bool check_autostore(obj_data *obj, bool force, empire_data *override_emp) {
 			}
 			
 			if (islid != NO_ISLAND) {	// MUST be not-nowhere to autostore
-				add_to_empire_storage(emp, islid, GET_OBJ_VNUM(obj), 1);
+				add_to_empire_storage(emp, islid, GET_OBJ_VNUM(obj), 1, GET_OBJ_TIMER(obj));
 			}
 		}
 	}
@@ -1495,7 +1602,7 @@ EVENTFUNC(obj_hour_event) {
 	delete_stored_event(&GET_OBJ_STORED_EVENTS(obj), SEV_OBJ_TIMER);
 	
 	// ensure the object is in-game SOMEWHERE
-	if (!obj_room(obj)) {
+	if (!OBJ_IS_IN_WORLD(obj)) {
 		free(data);
 		return 0;	// do not re-enqueue
 	}
@@ -1595,7 +1702,7 @@ EVENTFUNC(obj_hour_event) {
 				// check for war
 				if (!emp || (enemy && (pol = find_relation(enemy, emp)) && IS_SET(pol->type, DIPL_WAR))) {
 					if (ROOM_PEOPLE(IN_ROOM(obj))) {
-						act("A stray ember from $p ignites $V!", FALSE, ROOM_PEOPLE(IN_ROOM(obj)), obj, veh, TO_CHAR | TO_ROOM);
+						act("A stray ember from $p ignites $V!", FALSE, ROOM_PEOPLE(IN_ROOM(obj)), obj, veh, TO_CHAR | TO_ROOM | ACT_VEH_VICT);
 					}
 					start_vehicle_burning(veh);
 					
@@ -1983,13 +2090,444 @@ void point_update_vehicle(vehicle_data *veh) {
 	if (VEH_FLAGGED(veh, VEH_ON_FIRE)) {
 		// burny burny burny!
 		if (ROOM_PEOPLE(IN_ROOM(veh))) {
-			act("The flames roar as they envelop $V!", FALSE, ROOM_PEOPLE(IN_ROOM(veh)), NULL, veh, TO_CHAR | TO_ROOM);
+			act("The flames roar as they envelop $V!", FALSE, ROOM_PEOPLE(IN_ROOM(veh)), NULL, veh, TO_CHAR | TO_ROOM | ACT_VEH_VICT);
 		}
 		if (!besiege_vehicle(NULL, veh, MAX(1, (VEH_MAX_HEALTH(veh) / 12)), SIEGE_BURNING, NULL)) {
 			// extracted
 			return;
 		}
 	}
+}
+
+
+ //////////////////////////////////////////////////////////////////////////////
+//// STORAGE LIMITS //////////////////////////////////////////////////////////
+
+
+// INTERACTION_FUNC provides: ch, interaction, inter_room, inter_mob, inter_item, inter_veh
+INTERACTION_FUNC(decay_in_home_storage_interact) {
+	obj_data *obj, *proto;
+	int num;
+	
+	// basics
+	if (!ch || !inter_room || !(proto = obj_proto(interaction->vnum))) {
+		return FALSE;
+	}
+	
+	if (GET_OBJ_STORAGE(proto) && GET_LOYALTY(ch) && GET_ISLAND_ID(inter_room) != NO_ISLAND) {
+		add_to_empire_storage(GET_LOYALTY(ch), GET_ISLAND_ID(inter_room), interaction->vnum, interaction->quantity, GET_OBJ_TIMER(proto));
+	}
+	else {
+		// just place in room?
+		for (num = 0; num < interaction->quantity; ++num) {
+			obj = read_object(interaction->vnum, TRUE);
+			scale_item_to_level(obj, 1);	// minimum level
+			obj_to_room(obj, inter_room);
+			load_otrigger(obj);
+		}
+	}
+	return TRUE;
+}
+
+
+// INTERACTION_FUNC provides: ch, interaction, inter_room, inter_mob, inter_item, inter_veh
+INTERACTION_FUNC(decay_in_storage_interact) {
+	obj_data *proto;
+	
+	// this data must be present
+	if (!decay_in_storage_empire || decay_in_storage_isle == NO_ISLAND) {
+		return FALSE;
+	}
+	
+	// ensure object exists and is storable
+	if (!(proto = obj_proto(interaction->vnum)) || !GET_OBJ_STORAGE(proto)) {
+		return FALSE;
+	}
+	
+	add_to_empire_storage(decay_in_storage_empire, decay_in_storage_isle, interaction->vnum, interaction->quantity, GET_OBJ_TIMER(proto));
+	return TRUE;
+}
+
+
+/**
+* To be called every game hour in order to check stored items for expiration
+* timers.
+*
+* Can be configured off with the empire config "decay_in_storage".
+*/
+void check_empire_storage_timers(void) {
+	bool counted;
+	empire_data *emp, *next_emp;
+	obj_data *proto;
+	struct empire_island *isle, *next_isle;
+	struct empire_storage_data *store, *next_store;
+	struct empire_unique_storage *eus, *next_eus;
+	struct shipping_data *shipd, *next_shipd;
+	struct storage_timer *st, *next_st;
+	
+	if (!config_get_bool("decay_in_storage")) {
+		return;
+	}
+	
+	// all empires
+	HASH_ITER(hh, empire_table, emp, next_emp) {
+		// store this in case decay_in_storage_interact is called
+		decay_in_storage_empire = emp;
+		
+		// each island
+		HASH_ITER(hh, EMPIRE_ISLANDS(emp), isle, next_isle) {
+			// store this in case decay_in_storage_interact is called
+			decay_in_storage_isle = isle->island;
+			
+			// each storage on the island
+			HASH_ITER(hh, isle->store, store, next_store) {
+				if ((proto = store->proto) && OBJ_FLAGGED(proto, OBJ_LONG_TIMER_IN_STORAGE) && number(0, 2)) {
+					// skip entirely (66% chance: long timer in storage)
+					continue;
+				}
+				DL_FOREACH_SAFE(store->timers, st, next_st) {
+					EMPIRE_NEEDS_STORAGE_SAVE(emp) = TRUE;
+					--st->timer;
+					
+					if (st->timer <= 0) {
+						// time to go
+						if (proto) {
+							if (prototype_has_timer_trigger(proto)) {
+								// has a timer trigger
+								run_timer_triggers_on_decaying_storage(emp, isle, proto, st->amount);
+							}
+							else if (has_interaction(GET_OBJ_INTERACTIONS(proto), INTERACT_DECAYS_TO)) {
+								run_interactions(NULL, GET_OBJ_INTERACTIONS(proto), INTERACT_DECAYS_TO, NULL, NULL, NULL, NULL, decay_in_storage_interact);
+							}
+						}
+						
+						// remove
+						store->amount = MAX(0, store->amount - st->amount);
+						DL_DELETE(store->timers, st);
+						free(st);
+						
+						// progress loss
+						et_get_obj(emp, store->proto, -st->amount, store->amount);
+						
+						// delete storage if needed
+						if (store->amount == 0 && !store->keep) {
+							HASH_DEL(isle->store, store);
+							free_empire_storage_data(store);
+							store = NULL;
+							break;	// must break out of store->timers as store is gone
+						}
+					}
+				}
+				// do no work here: store may have been deleted; let it loop instead
+			}
+		}
+		
+		// unique storage
+		DL_FOREACH_SAFE(EMPIRE_UNIQUE_STORAGE(emp), eus, next_eus) {
+			DL_FOREACH_SAFE(eus->timers, st, next_st) {
+				if (eus->obj && OBJ_FLAGGED(eus->obj, OBJ_LONG_TIMER_IN_STORAGE) && number(0, 2)) {
+					// skip entirely (66% chance: long timer in storage)
+					continue;
+				}
+				EMPIRE_NEEDS_STORAGE_SAVE(emp) = TRUE;
+				--st->timer;
+				
+				if (st->timer <= 0) {
+					counted = FALSE;
+					
+					// time to go
+					if (eus->obj) {
+						decay_in_storage_isle = eus->island;
+						if (SCRIPT_CHECK(eus->obj, OTRIG_TIMER) || IS_DRINK_CONTAINER(eus->obj)) {
+							// has a timer trigger
+							counted = run_timer_triggers_on_decaying_warehouse(emp, eus, st->amount);
+						}
+						else if (has_interaction(GET_OBJ_INTERACTIONS(eus->obj), INTERACT_DECAYS_TO)) {
+							run_interactions(NULL, GET_OBJ_INTERACTIONS(eus->obj), INTERACT_DECAYS_TO, NULL, NULL, NULL, NULL, decay_in_storage_interact);
+						}
+					}
+					
+					// remove amount if triggers didn't
+					if (!counted) {
+						eus->amount = MAX(0, eus->amount - st->amount);
+					}
+					
+					// remove this set of timers
+					DL_DELETE(eus->timers, st);
+					free(st);
+					
+					// delete storage if needed
+					if (eus->amount <= 0 || !eus->obj) {
+						DL_DELETE(EMPIRE_UNIQUE_STORAGE(emp), eus);
+						free_empire_unique_storage(eus);
+						break;	// must break out as eus is gone
+					}
+				}
+			}
+			// do no work here: eus may have been deleted; let it loop instead
+		}
+		
+		// shipping
+		DL_FOREACH_SAFE(EMPIRE_SHIPPING_LIST(emp), shipd, next_shipd) {
+			if ((proto = obj_proto(shipd->vnum)) && OBJ_FLAGGED(proto, OBJ_LONG_TIMER_IN_STORAGE) && number(0, 2)) {
+				// skip entirely (66% chance: long timer in storage)
+				continue;
+			}
+			DL_FOREACH_SAFE(shipd->timers, st, next_st) {
+				EMPIRE_NEEDS_STORAGE_SAVE(emp) = TRUE;
+				--st->timer;
+				
+				// items that decay in shipping are just list
+				if (st->timer <= 0) {
+					shipd->amount = MAX(0, shipd->amount - st->amount);
+					DL_DELETE(shipd->timers, st);
+					free(st);
+				}
+				
+				// do not remove shipping entry: it will remove itself when done with the ship
+			}
+		}
+	}
+	
+	// clear this data now
+	decay_in_storage_empire = NULL;
+	decay_in_storage_isle = NO_ISLAND;
+}
+
+
+/**
+* Checks items in a player's home storage for ones that have decay times. This
+* only operates on in-game characters: just like inventory, home items do not
+* tick down while offline.
+*
+* Can be configured off with the empire config "decay_in_storage".
+*
+* @param char_data *ch The player.
+*/
+void check_home_storage_timers(char_data *ch) {
+	bool any, counted;
+	room_data *home;
+	struct empire_unique_storage *eus, *next_eus;
+	struct storage_timer *st, *next_st;
+	
+	if (!ch || IS_NPC(ch) || !config_get_bool("decay_in_storage")) {
+		return;	// no work
+	}
+	
+	// home may be NULL -- items will still decay though
+	home = find_home(ch);
+	
+	any = FALSE;
+	DL_FOREACH_SAFE(GET_HOME_STORAGE(ch), eus, next_eus) {
+		if (eus->obj && OBJ_FLAGGED(eus->obj, OBJ_LONG_TIMER_IN_STORAGE) && number(0, 2)) {
+			// skip entirely (66% chance: long timer in storage)
+			continue;
+		}
+		DL_FOREACH_SAFE(eus->timers, st, next_st) {
+			--st->timer;
+			
+			if (st->timer <= 0) {
+				any = TRUE;
+				counted = FALSE;
+				
+				// time to go
+				if (eus->obj) {
+					decay_in_storage_isle = eus->island;
+					if (home && (SCRIPT_CHECK(eus->obj, OTRIG_TIMER) || IS_DRINK_CONTAINER(eus->obj))) {
+						// has a timer trigger
+						counted = run_timer_triggers_on_decaying_home_storage(ch, home, eus, st->amount);
+					}
+					else if (home && has_interaction(GET_OBJ_INTERACTIONS(eus->obj), INTERACT_DECAYS_TO)) {
+						run_interactions(ch, GET_OBJ_INTERACTIONS(eus->obj), INTERACT_DECAYS_TO, home, NULL, NULL, NULL, decay_in_home_storage_interact);
+					}
+				}
+				
+				// remove amount if triggers didn't
+				if (!counted) {
+					eus->amount = MAX(0, eus->amount - st->amount);
+				}
+				
+				// remove this set of timers
+				DL_DELETE(eus->timers, st);
+				free(st);
+				
+				// delete storage if needed
+				if (eus->amount <= 0 || !eus->obj) {
+					DL_DELETE(GET_HOME_STORAGE(ch), eus);
+					free_empire_unique_storage(eus);
+					break;	// must break out as eus is gone
+				}
+			}
+		}
+		// do no work here: eus may have been deleted; let it loop instead
+	}
+	
+	// clear this data now
+	decay_in_storage_isle = NO_ISLAND;
+	
+	// and save
+	if (any) {
+		queue_delayed_update(ch, CDU_SAVE);
+	}
+}
+
+
+/**
+* This is called when items decay in home unique storage while they have a
+* timer trigger on them. It will attempt to place them into the world to decay
+* and then possibly autostore again later.
+*
+* @param char_data *ch The player.
+* @param room_data *home The pre-validated home location.
+* @param struct empire_unique_storage *eus The unique storage item.
+* @param int amount How many of them are expiring.
+* @return bool TRUE if it removed the items already; FALSE if not.
+*/
+bool run_timer_triggers_on_decaying_home_storage(char_data *ch, room_data *home, struct empire_unique_storage *eus, int amount) {
+	int iter;
+	obj_data *obj;
+	trig_data *trig;
+	
+	if (!ch || IS_NPC(ch) || !home || !eus || !eus->obj || amount <= 0) {
+		return FALSE;	// no work
+	}
+	
+	// place in world
+	for (iter = 0; iter < MIN(amount, eus->amount); ++iter) {
+		if (eus->amount > 1) {
+			obj = copy_warehouse_obj(eus->obj);
+		}
+		else {
+			// last one
+			obj = eus->obj;
+			eus->obj = NULL;
+			add_to_object_list(obj);	// put back in object list
+			obj->script_id = 0;	// clear this out so it's guaranteed to get a new one
+			
+			// re-add trigs to the random list
+			if (SCRIPT(obj)) {
+				LL_FOREACH(TRIGGERS(SCRIPT(obj)), trig) {
+					add_trigger_to_global_lists(trig);
+				}
+			}
+		}
+		
+		if (obj) {
+			--eus->amount;
+			GET_OBJ_TIMER(obj) = 1;
+			obj_to_room(obj, home);
+			
+			// this may destroy it
+			tick_obj_timer(obj);
+		}
+	}
+	return TRUE;
+}
+
+
+/**
+* This is called when items decay in empire storage while they have a timer
+* trigger on them. It will attempt to place them into the world to decay and
+* then possibly autostore again later.
+*
+* @param empire_data *emp Which empire.
+* @param struct empire_island *isle Which island they're stored on.
+* @param obj_data *proto A pointer to the prototype.
+* @param int amount How many of that object are decaying.
+*/
+void run_timer_triggers_on_decaying_storage(empire_data *emp, struct empire_island *isle, obj_data *proto, int amount) {
+	int iter;
+	obj_data *obj;
+	room_data *room;
+	
+	if (!emp || !isle || !proto) {
+		return;	// no work
+	}
+	
+	// determine room
+	if (!(room = find_storage_location_for(emp, isle->island, proto))) {
+		// try interactions instead
+		if (has_interaction(GET_OBJ_INTERACTIONS(proto), INTERACT_DECAYS_TO)) {
+			run_interactions(NULL, GET_OBJ_INTERACTIONS(proto), INTERACT_DECAYS_TO, NULL, NULL, NULL, NULL, decay_in_storage_interact);
+		}
+		
+		// no room = done
+		return;
+	}
+	
+	// place items in room and decay them
+	for (iter = 0; iter < amount; ++iter) {
+		obj = read_object(GET_OBJ_VNUM(proto), TRUE);
+		GET_OBJ_TIMER(obj) = 1;
+		obj_to_room(obj, room);
+		
+		// this may destroy it
+		tick_obj_timer(obj);
+	}
+}
+
+
+/**
+* This is called when items decay in empire unique storage (warehouse) while
+* they have a timer trigger on them. It will attempt to place them into the
+* world to decay and then possibly autostore again later.
+*
+* @param empire_data *emp Which empire.
+* @param struct empire_unique_storage *eus The unique storage item.
+* @param int amount How many of them are expiring.
+* @return bool TRUE if it removed the items already; FALSE if not.
+*/
+bool run_timer_triggers_on_decaying_warehouse(empire_data *emp, struct empire_unique_storage *eus, int amount) {
+	int iter;
+	obj_data *obj;
+	room_data *room;
+	trig_data *trig;
+	
+	if (!emp || !eus || !eus->obj || amount <= 0) {
+		return FALSE;	// no work
+	}
+	
+	// determine room
+	if (!(room = find_warehouse_location_for(emp, eus->island, IS_SET(eus->flags, EUS_VAULT) ? TRUE : FALSE))) {
+		// try interactions instead
+		if (has_interaction(GET_OBJ_INTERACTIONS(eus->obj), INTERACT_DECAYS_TO)) {
+			run_interactions(NULL, GET_OBJ_INTERACTIONS(eus->obj), INTERACT_DECAYS_TO, NULL, NULL, NULL, NULL, decay_in_storage_interact);
+		}
+		
+		// no room = done
+		return FALSE;
+	}
+	
+	
+	for (iter = 0; iter < MIN(amount, eus->amount); ++iter) {
+		if (eus->amount > 1) {
+			obj = copy_warehouse_obj(eus->obj);
+		}
+		else {
+			// last one
+			obj = eus->obj;
+			eus->obj = NULL;
+			add_to_object_list(obj);	// put back in object list
+			obj->script_id = 0;	// clear this out so it's guaranteed to get a new one
+			
+			// re-add trigs to the random list
+			if (SCRIPT(obj)) {
+				LL_FOREACH(TRIGGERS(SCRIPT(obj)), trig) {
+					add_trigger_to_global_lists(trig);
+				}
+			}
+		}
+		
+		if (obj) {
+			--eus->amount;
+			GET_OBJ_TIMER(obj) = 1;
+			obj_to_room(obj, room);
+			
+			// this may destroy it
+			tick_obj_timer(obj);
+		}
+	}
+	return TRUE;
 }
 
 
@@ -2164,14 +2702,14 @@ void gain_condition(char_data *ch, int condition, int value) {
 
 	switch (condition) {
 		case FULL: {
-			if (IS_HUNGRY(ch) && value > 0) {
+			if (SHOW_STATUS_MESSAGES(ch, SM_HUNGER) && IS_HUNGRY(ch) && value > 0) {
 				msg_to_char(ch, "You are hungry.\r\n");
 				GET_LAST_COND_MESSAGE_TIME(ch, condition) = time(0);
 			}
 			return;
 		}
 		case THIRST: {
-			if (IS_THIRSTY(ch) && value > 0) {
+			if (SHOW_STATUS_MESSAGES(ch, SM_THIRST) && IS_THIRSTY(ch) && value > 0) {
 				msg_to_char(ch, "You are thirsty.\r\n");
 				GET_LAST_COND_MESSAGE_TIME(ch, condition) = time(0);
 			}
@@ -2249,14 +2787,14 @@ int health_gain(char_data *ch, bool info_only) {
 		gain = regen_by_pos[(int) GET_POS(ch)];
 		gain += GET_HEALTH_REGEN(ch);
 		
-		if (GET_POS(ch) == POS_SLEEPING && !AFF_FLAGGED(ch, AFF_EARTHMELD)) {
+		if (GET_POS(ch) == POS_SLEEPING && !AFF_FLAGGED(ch, AFF_EARTHMELDED)) {
 			needed = GET_MAX_HEALTH(ch) + GET_HEALTH_DEFICIT(ch);
 			min = round(needed / ((double) config_get_int("max_sleeping_regen_time") / (room_has_function_and_city_ok(GET_LOYALTY(ch), IN_ROOM(ch), FNC_BEDROOM) ? 2.0 : 1.0) / SECS_PER_REAL_UPDATE));
 			gain = MAX(gain, min);
 		}
 		
 		// put this last
-		if (IS_HUNGRY(ch) || IS_THIRSTY(ch) || IS_BLOOD_STARVED(ch)) {
+		if (AFF_FLAGGED(ch, AFF_POOR_REGENS) || IS_HUNGRY(ch) || IS_THIRSTY(ch) || IS_BLOOD_STARVED(ch)) {
 			gain /= 4;
 		}
 	}
@@ -2275,8 +2813,6 @@ int health_gain(char_data *ch, bool info_only) {
 int mana_gain(char_data *ch, bool info_only) {
 	double gain, min, needed;
 	
-	double solar_power_levels[] = { 2, 2.5, 2.5 };
-	
 	if (IS_INJURED(ch, INJ_STAKED | INJ_TIED)) {
 		return 0;
 	}
@@ -2289,28 +2825,18 @@ int mana_gain(char_data *ch, bool info_only) {
 		gain = regen_by_pos[(int) GET_POS(ch)];
 		gain += GET_MANA_REGEN(ch);
 		
-		if (has_ability(ch, ABIL_SOLAR_POWER)) {
-			if (IS_CLASS_ABILITY(ch, ABIL_SOLAR_POWER) || check_sunny(IN_ROOM(ch))) {
-				gain *= CHOOSE_BY_ABILITY_LEVEL(solar_power_levels, ch, ABIL_SOLAR_POWER);
-			
-				if (!info_only) {
-					gain_ability_exp(ch, ABIL_SOLAR_POWER, 1);
-				}
-			}
-		}
-		
 		if (HAS_BONUS_TRAIT(ch, BONUS_MANA_REGEN)) {
 			gain += 1 + (get_approximate_level(ch) / 20);
 		}
 		
-		if (GET_POS(ch) == POS_SLEEPING && !AFF_FLAGGED(ch, AFF_EARTHMELD)) {
+		if (GET_POS(ch) == POS_SLEEPING && !AFF_FLAGGED(ch, AFF_EARTHMELDED)) {
 			needed = GET_MAX_MANA(ch) + GET_MANA_DEFICIT(ch);
 			min = round(needed / ((double) config_get_int("max_sleeping_regen_time") / (room_has_function_and_city_ok(GET_LOYALTY(ch), IN_ROOM(ch), FNC_BEDROOM) ? 2.0 : 1.0) / SECS_PER_REAL_UPDATE));
 			gain = MAX(gain, min);
 		}
 		
 		// this goes last
-		if (IS_HUNGRY(ch) || IS_THIRSTY(ch) || IS_BLOOD_STARVED(ch)) {
+		if (AFF_FLAGGED(ch, AFF_POOR_REGENS) || IS_HUNGRY(ch) || IS_THIRSTY(ch) || IS_BLOOD_STARVED(ch)) {
 			gain /= 4;
 		}
 	}
@@ -2350,13 +2876,13 @@ int move_gain(char_data *ch, bool info_only) {
 			gain += 1 + (get_approximate_level(ch) / 20);
 		}
 		
-		if (GET_POS(ch) == POS_SLEEPING && !AFF_FLAGGED(ch, AFF_EARTHMELD)) {
+		if (GET_POS(ch) == POS_SLEEPING && !AFF_FLAGGED(ch, AFF_EARTHMELDED)) {
 			needed = GET_MAX_MOVE(ch) + GET_MOVE_DEFICIT(ch);
 			min = round(needed / ((double) config_get_int("max_sleeping_regen_time") / (room_has_function_and_city_ok(GET_LOYALTY(ch), IN_ROOM(ch), FNC_BEDROOM) ? 2.0 : 1.0) / SECS_PER_REAL_UPDATE));
 			gain = MAX(gain, min);
 		}
 
-		if (IS_HUNGRY(ch) || IS_THIRSTY(ch) || IS_BLOOD_STARVED(ch)) {
+		if (AFF_FLAGGED(ch, AFF_POOR_REGENS) || IS_HUNGRY(ch) || IS_THIRSTY(ch) || IS_BLOOD_STARVED(ch)) {
 			gain /= 4;
 		}
 	}

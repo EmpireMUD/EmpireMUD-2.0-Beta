@@ -110,11 +110,10 @@ strong enough to contain the elementals, and now four have escaped! Track down
 the elementals of earth, fire, wind, and water. Defeat them and return their
 essences to the apprentice for re-summoning.
 
-Start the apprentice's quests with 'quest start all'. There is one quest
-per elemental, and you can repeat these quests if you wait at least an hour
-after finishing them. You can purchase rewards from the apprentice with the
-'list' and 'buy' commands. Hint: If you're a thief, try pickpocketing the
-apprentice.
+Start the apprentice's quests with 'start all'. There is one quest per
+elemental, and you can repeat these quests if you wait at least an hour after
+finishing them. You can purchase rewards from the apprentice with the 'list'
+and 'buy' commands. Hint: If you're a thief, try pickpocketing the apprentice.
 
 The sorcerer's apprentice sells:
   a sorcerous biscuit - food
@@ -309,9 +308,9 @@ Magiterranean: The Grove (level 1-75 adventure)
 
    You have discovered a portal into a small grove deep in the Magiterranean,
 the plane of magic. This is a place where the forces of nature run deep, and
-interlopers are unwelcome. But what could the druids of the Magiterranean be
+interlopers are unwelcome. But what could the mages of the Magiterranean be
 planning? And is it too late to stop them?
-   Enter the portal, but be prepared for both unfriendly druids and hidden
+   Enter the portal, but be prepared for both unfriendly manaweavers and hidden
 predators as you explore the otherworldly forest of the Magiterranean.
 
 Grandmother Poplar's Poplar Goods sells for wooden nickels:
@@ -319,10 +318,10 @@ Grandmother Poplar's Poplar Goods sells for wooden nickels:
   tiny wildling trap - minipet
   animal totem of the Grove - more morphs for the Animal Forms ability
   wild fire - just like the ones you find in the Grove (a light that burns out)
-  robes of the Grove druids - the local fashion
+  robes of the Grove weavers - the local fashion
   wildling whistle - wildling mount
   wood henge stone - a henge building for your city
-  oil of the snake druid - use once each to improve the following items:
+  oil of the snake shifter - use once each to improve the following items:
   bark gauntlets - dodge gauntlets
   leaf gloves - to-hit/wits gloves
   petal gloves - mana/move regen gloves
@@ -334,7 +333,7 @@ Grandmother Poplar's Poplar Goods sells for wooden nickels:
   sash of the Magiterranean - intelligence/to-hit belt
 
 The belts, rings, and gloves can be upgraded (once each) using the oil of the
-snake druid by typing 'oil <item>'. You must be at least level 50 to upgrade
+snake shifter by typing 'oil <item>'. You must be at least level 50 to upgrade
 the gear with snake oil.
 
 You can find this adventure in most forests.
@@ -351,14 +350,6 @@ of the game's adventure zones. Rise through the ranks for power and prestige.
 (Hint: Use 'where atlasian' to find the tortoise.)
 
 The tavern shop sells:
-  a Guild of Adventurers seeker stone - finds the tortoise (Liked)
-  a baby tortoise whistle - minipet (Esteemed)
-  a ninja tortoise whistle - minipet (Venerated)
-  a tortoise trinket - teleports you to the tortoise (Venerated)
-  a dragon turtle whistle - minipet (Revered)
-  a Guild of Adventurers charter - builds a guildhall (Venerated)
-  an atlasian egg - your own atlasian tortoise (Venerated)
-
   a Guild of Adventurers seeker stone - finds the tortoise (Liked)
   a baby tortoise whistle - minipet (Esteemed)
   a Tipsy Tortoise transport trinket - teleports you to the tortoise (Esteemed)
@@ -440,6 +431,22 @@ has new crops.
 
 See also: ADVENTURE
 #
+"HOARFROST SERRAGON" SERRAGON
+
+Hoarfrost Serragon (level 100-200 adventure)
+
+   A hole to the frigid abyss has burst open in the heart of the desert,
+encasing the once-scalding sands in a glistening sheet of ice. A chilling hush
+pervades the air, and the ground beneath is now a carpet of feathery frost,
+marking the rise of the legendary hoarfrost serragon! These elusive behemoths,
+seldom seen beyond the confines of their icy lairs, wreak havoc on the land,
+devouring wildlife and freezing crops. Longer than a city street and with a maw
+wide enough to eat a camel -- or worse, an adventurer -- whole, an adult
+serragon is a threat that cannot stand. Can you thwart the serragon's frosty
+onslaught and save the empire from being entombed in an eternal winter?
+
+See also: ADVENTURE
+#
 "INTERDIMENSIONAL WHIRLWIND" WHIRLWIND "WHIRL WIND" "MAGITERRANEAN: INTERDIMENSIONAL WHIRLWIND" "MAGITERRANEAN INTERDIMENSIONAL WHIRLWIND"
 
 Magiterranean: Interdimensional Whirlwind
@@ -493,9 +500,9 @@ See also: ADVENTURE
 Misplaced Mother Goose (level 1-25 adventure)
 
 Low-level mobs all over the world carry lost items from children's tales. When
-you find one of these items, start its quest ('quest start <name>'), 'use' the
-item to teleport back to a newbie island, then use the enchanted breadcrumbs
-you receive to return home.
+you find one of these items, start its quest ('start <name>'), 'use' the item
+to teleport back to a newbie island, then use the enchanted breadcrumbs you
+receive to return home.
 
 Be sure to set a home first! Use 'home set' in a house you built and own.
 
@@ -741,13 +748,13 @@ quests, but do not use the quest command.
 
 See also: ADVENTURE
 #
-"RENEGADE SPELLCASTER!" "ROGUE WIZARD" "TEENAGE WITCH" "ROGUE DRUID"
+"RENEGADE SPELLCASTER!" "ROGUE WIZARD" "TEENAGE WITCH" "ROGUE MANAWEAVER"
 
 Renegade Spellcaster! (level 100-175 adventure)
 
 This adventure comes in three varieties: the rogue wizard, the rogue
-Magiterranean druid, and the teenage witches. You can often find them in the
-plains or desert.
+manaweaver, and the teenage witches. You can often find them in the plains or
+desert.
 
 The enemies from this adventure have names and are separate from the randomly-
 spawned unnamed rogue wizards.
@@ -899,12 +906,22 @@ Tutorial Quests ("Soulstream", level 1-50 adventure)
 
 This adventure has a short tutorial quest for each of the skill trees.
 
-When you first enter the game at a Tower of Souls, use 'quest start enter' to
-start the "Enter the Soulstream" quest, then 'enter soulstream' to get inside.
-The spirits inside have one quest for each skill tree you've learned. You can
-come back when you learn new skills to complete their tutorials as well.
+When you first enter the game at a Tower of Souls, use 'start Enter Soulstream'
+to start the "Enter the Soulstream" quest, then 'enter soulstream' to get
+inside. The spirits inside have one quest for each skill tree you've learned.
+You can come back when you learn new skills to complete their tutorials as
+well.
 
 See also: ADVENTURE, QUEST, TOWER OF SOULS
+#
+"UNINVITED GUEST" "AN UNINVITED GUEST"
+
+An Uninvited Guest (level 100-200 adventure)
+
+It seems someone has been sleeping in the back of a local artisan's shop!
+Perhaps you should investigate.
+
+See also: ADVENTURE
 #
 "UNSTABLE PORTAL"
 

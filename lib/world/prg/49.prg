@@ -44,4 +44,24 @@ K 1 1
 P 2013
 P 1003
 S
+#4905
+Astral Cartography~
+   Your sorcerers have studied the torrential courses of the portals the
+crisscross the world and mapped them according to the stars. Now, thanks to
+their study, your empire extends its reach across the sea. Your city portals
+are no longer limited by distance; the world is at your fingertips!
+~
+2 4 0 5 0
+K 0 9
+P 1907
+P 1021
+P 2013
+P 2040
+W
+7 5164 0 1 a
+W
+7 5185 0 5 a
+W
+34 1115 0 150 a
+S
 $

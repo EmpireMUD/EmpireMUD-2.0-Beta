@@ -4,10 +4,10 @@ ALCHEMIST
 
 (AA)  Alchemist  (Foundations goal)
 
-Stored here:  herbs, poisons
+Stored here:  magic herbs, poisons
 
 The alchemist is a specialty building that allows you to store and process many
-types of herbs. You can brew potions and mix poisons.
+types of magic herbs. You can brew potions and mix poisons.
 
 See also: BREW, LABORATORY, MIX, STORAGE
 #
@@ -36,6 +36,8 @@ BAKERY
 
 (BB)  Bakery  (Foundations goal)
 
+Temperature:  warmer than outside
+
 The bakery is a warm, pleasant building that always smells of fresh breads.
 You can use its oven to bake or cook all manner of foods.
 
@@ -53,13 +55,17 @@ military to the city, and can be interlinked with other buildings.
 
 See also: DESIGNATE, INTERLINK
 #
-BATH BATHS
+BATH BATHS BATHE
 
 [&b~~&0]  Baths  (Architect ability)
+
+Command:  bathe
 
 The most opulent empires construct bath houses for their citizens. These
 luxuries serve as meeting places and relaxation houses for persons of dist-
 inction throughout the empire, and are a good way to entertain guests.
+
+Bathing in the baths gives a buff to Charisma and Dexterity.
 
 You can only have this building in a city.
 
@@ -112,7 +118,6 @@ Basic buildings granted by the Build ability:
   (FF) forge
   (MM) mill  (must be by a river)
   (PP) potter
-  (SS) stable
   &g.^.&co&0 park
   .{}. shrine
   vvvv fence
@@ -122,6 +127,7 @@ Basic buildings granted by the Build ability:
   {GG} granary -- store grains
   {PP} gravelpit -- store rocks
   {LL} lumberyard -- store lumber
+  {RR} rootcellar -- store vegetables
   |SS| seedsilo -- store seeds
   {SS} smokehouse -- store meats
   {TT} tannery -- store skins
@@ -140,6 +146,7 @@ BURIALCAVERN "BURIAL CAVERN"
 &y/&0()&y\&0  Burial Cavern  (Mountain Engineering goal)
 
 Chameleon:  &y/\/\&0
+Temperature:  cooler than outside
 
 Some people prefer to be buried in hidden caves in the mountains.
 
@@ -153,6 +160,7 @@ Extra rooms:  6
 Special rooms:  crypt, tunnel
 Citizens:  1
 Chameleon:  &g^^^^&0
+Temperature:  milder than outside
 
 Havens are houses specifically for vampires. They provide increased protection
 for dwellers of the night.
@@ -205,6 +213,7 @@ CASTLE PORTCULLIS
 
 Extra rooms:  30, interlink
 Special rooms:  greathall, crypt, throne, vault, baths, laboratory
+Temperature:  milder than outside
 
 This building serves as the entrance to a castle, with a huge number of rooms
 available to designate. You can also interlink it with other buildings to make
@@ -225,6 +234,7 @@ Extra rooms:  6
 Special rooms:  crypt, tunnel
 Citizens:  1
 Chameleon:  &y/\/\&0
+Temperature:  milder than outside
 
 Havens are houses specifically for vampires. They provide increased protection
 for dwellers of the night.
@@ -249,6 +259,7 @@ CELESTIALFORGE "CELESTIAL FORGE" SHATTER SHARD SHARDS
 
 Command:  shatter <item to destroy>
 Fame:  5
+Temperature:  always comfortable
 
 The celestial forge is a place not only to forge gear, but to destroy gear you
 no longer need and recycle it into shards. The number and type of shards you
@@ -271,6 +282,17 @@ you can re-spawn at a cemetery if your empire owns one on the same continent
 
 See also: STARTING LOCATION, TOMB COMMAND
 #
+"CHICKEN COOPS" CHICKENCOOPS COOP COOPS
+
+|CC|  Chicken Coops  (Livestock Livelihood goal)
+
+Stores:  eggs
+
+Building chicken coops in your empire will provide it with a steady supply of
+eggs and poultry. Workforce will produce these items with the production chore.
+
+See also: WORKFORCE PRODUCTION
+#
 CLAYPIT "CLAY PIT"
 
 &y|__|&0  Clay Pit  (Build ability)
@@ -292,6 +314,7 @@ CLIFFDWELLING "CLIFF DWELLING"
 
 Extra rooms:  3, interlink
 Citizens:  2
+Temperature:  warmer when cold
 
 Cliff dwellings are an ancient type of home, generally built directly into
 the hollow sides of cliffs. Their location makes them resistant to sieges, as
@@ -430,6 +453,7 @@ FOUNDRY
 {FF}  Foundry  (Build ability)
 
 Stored here:  metals
+Temperature:  warmer than outside
 
 A foundry is a place for smelting and storing the empire's metal. Like all
 storage facilities, your NPCs move metal between yards so that you can retrieve
@@ -473,6 +497,8 @@ See also: INFILTRATE, PUBLICIZE, WALL, WALLED TOWN
 GLASSBLOWER "GLASS BLOWER" GLASSBLOWING "GLASS BLOWING"
 
 (GG)  Glass Blower  (Foundations goal)
+
+Temperature:  warmer than outside
 
 The glass blower is an artisan shop that creates flasks, vials, panes, and
 many other glass items for the empire. Most of these require Basic Crafts.
@@ -547,11 +573,11 @@ Building:  <<>>  henge
 Fame:  4
 
 The henge is a great, circular monument made of massive stones. It is used in
-some druidic practices. In fact, it is said that by chanting at a henge, you
+some mysterious practices. In fact, it is said that by chanting at a henge, you
 can align yourself the natural flow of mana through the world, and gain an
 understanding of Natural Magic.
 
-See also: CHANT OF DRUIDS, PROGRESS
+See also: CHANT OF MAGIC, PROGRESS
 #
 HIGHTEMPLE "HIGH TEMPLE"
 
@@ -571,6 +597,7 @@ HOUSE "SMALL HOUSE"
 
 Extra rooms:  2
 Citizens:  2
+Temperature:  warmer when cold
 
 A house is slightly larger than a cabin and supports extra rooms. You
 can build this type of home only on regular plains; the desert equivalent is
@@ -585,6 +612,7 @@ HOUSEHAVEN "HOUSE HAVEN" "RICKETY OLD HOUSE"
 Extra rooms:  6
 Special rooms:  crypt
 Citizens:  1
+Temperature:  milder than outside
 
 Havens are houses specifically for vampires. They provide increased protection
 for dwellers of the night.
@@ -620,6 +648,7 @@ LARGEHOUSE "LARGE HOUSE"
 
 Extra rooms:  7
 Citizens:  4
+Temperature:  warmer when cold
 
 This is the largest of the ordinary houses.
 
@@ -654,6 +683,7 @@ MINECOMPLEX "MINE COMPLEX"
 Extra rooms:  7, interlink
 Special rooms:  tunnel
 Citizens:  4
+Temperature:  milder than outside
 
 A mine complex looks like a mine from the surface, but is really a network of
 tunnels adapted for living. These complexes can hold a large number of people.
@@ -665,6 +695,7 @@ MOUNTAINCRYPT "MOUNTAIN CRYPT"
 &y[oo]&0  Mountain Crypt  (Mountain Engineering goal)
 
 Fame: 2
+Temperature:  cooler than outside
 
 This crypt is constructed near the mountain peaks to bring glory to the hero
 interred within.
@@ -677,6 +708,7 @@ MOUNTAINGARRISON "MOUNTAIN GARRISON"
 
 Extra rooms:  10, interlink
 Military:  20
+Temperature:  warmer when cold
 
 House your military in the mountains, out of the reach of your enemies.
 
@@ -688,6 +720,7 @@ MOUNTAINHALL "MOUNTAIN HALL"
 
 Extra rooms:  30, interlink
 Special rooms:  greathall, crypt, throne, vault, baths, laboratory, tunnel
+Temperature:  warmer when cold
 
 This great hall is carved into the side of the mountain, the most defensible
 type of terrain. Build your mountain empire by interlinking mountain halls and
@@ -703,6 +736,7 @@ MOUNTAINLODGE "MOUNTAIN LODGE"
 
 Extra rooms:  3
 Citizens:  2
+Temperature:  warmer when cold
 
 Live comfortably atop a snowy mountain with this rustic lodge.
 
@@ -730,6 +764,7 @@ MUDHUT "MUD HUT"
 &y.&0()&y.&0  Mud Hut  (Build ability)
 
 Citizens:  1
+Temperature:  cooler when warm
 
 A mud hut is a small, simple house which is built in the desert using any
 available water. Construction starts with a small pit, usually just two feet
@@ -742,6 +777,7 @@ OASISGARDEN "OASIS GARDEN"
 &G^&C##&G^&0  Oasis Garden  (Luxury Resources goal)
 
 Grows:  daggerbite, magewhisper
+Temperature:  milder than the surroundings
 
 The best gardeners have learned to farm both daggerbite and magewhisper -- two
 rare desert herbs -- in the fertile soil around oases.
@@ -781,6 +817,7 @@ PALACE
 
 Extra rooms:  30, interlink
 Special rooms:  greathall, crypt, throne, vault, baths, laboratory
+Temperature:  milder than outside
 
 A palace is a lavish place for a king or queen to hold audience with
 dignitaries and to rule from their throne. It holds a huge number of rooms and
@@ -796,6 +833,16 @@ PARK
 
 Parks are a pleasant place to spend the day.
 #
+PASTURE
+
+&t|&G..&t|&0  Pasture  (Livestock Livelihood goal)
+
+Enclose the open grassland to provide a pasture for your shepherds to tend
+their flocks. Workforce will produce a steady supply of wool and mutton from
+these pastures, and the grass is sure to look amazing.
+
+See also: WORKFORCE PRODUCTION
+#
 PIGEONPOST "PIGEON POST"
 
 |PP|  Pigeon Post  (Foundations goal)
@@ -805,12 +852,22 @@ the world. You can receive mail anywhere, but must send it from the Post.
 
 See also: MAIL
 #
+PIGSTY PIGSTIES STY STIES "PIG STY" "PIG STIES"
+
+|ST|  Pigsty  (Livestock Livelihood goal)
+
+The pigsty gives your empire's swineherd a place to keep pigs and allows your
+workforce to produce a steady supply of pork with the production chore.
+
+See also: WORKFORCE PRODUCTION
+#
 PUEBLO
 
 &y.&0[]&y.&0  Pueblo  (Build ability)
 
 Citizens:  2
 Extra rooms:  2
+Temperature:  cooler when warm
 
 A pueblo is a common desert home, easily built from local materials. It is
 constructed in a shallow pit to help insulate against summer temperatures.
@@ -826,6 +883,7 @@ PUEBLOHAVEN "PUEBLO HAVEN" "OLD PUEBLO"
 Extra rooms:  6
 Special rooms:  crypt
 Citizens:  1
+Temperature:  milder than outside
 
 Havens are houses specifically for vampires. They provide increased protection
 for dwellers of the night.
@@ -875,6 +933,58 @@ while you sleep.
 
 When you're done with the shelter, be sure to abandon it.
 #
+"ROOT CELLAR" "COMMUNITY ROOT CELLAR" ROOTCELLAR CELLAR
+
+{RR}  Root Cellar  (Build ability)
+
+Stored here:  vegetables, some fruits
+
+The community root cellar is a building for storing vegetables that aren't
+intended for canning, especially root vegetables such as potatoes. Like all
+storage facilities, your NPCs move vegetables between root cellars so that you
+can retrieve them from any such location on the same island.
+
+There is also a designated room by the same name: a root cellar for homes.
+
+See also: DESIGNATE, STORAGE
+#
+SALTERNS "SALT POOLS"
+
+&0|&M88&0|  Salterns  (Salt of the Earth goal)
+
+Stored here:  sea salt crystals
+
+Dig pools for evaporating seawater at the edge of seas. Your workforce will
+produce sea salt from these salterns, or you can dig it out yourself.
+
+Salterns count as in-city territory when built in the outskirts (4x radius).
+
+See also: DIG, EXTENDED RADIUS, SALT, WORKFORCE PRODUCTION
+#
+SALTSILO "SALT SILO"
+
+&g.&0||&g.&0  Salt Silo  (Salt of the Earth goal)
+
+Stored here:  salt
+
+This silo stores all your empire's salt where it will be safe and dry in all
+weather.
+
+See also: SALT, STORAGE
+#
+SALTMINE "SALT MINE"
+
+&y|&W__&y|&0  Salt Mine  (Salt of the Earth goal)
+
+Stored here:  rock salt
+
+Dig for salt at the base of mountains with the salt mine. Workforce will also
+produce salt in the salt mine.
+
+Salt mines count as in-city territory when built in the outskirts (4x radius).
+
+See also: DIG, EXTENDED RADIUS, SALT, WORKFORCE PRODUCTION
+#
 SANDPIT "SAND PIT"
 
 &Y|__|&0  Sand Pit  (Build ability)
@@ -907,6 +1017,7 @@ SHADYGARDEN "SHADY GARDEN"
 &g|&y##&g|&0  Shady Garden  (Luxury Resources goal)
 
 Grows:  fiveleaf
+Temperature:  cooler when warm
 
 It is possible to grow the rare fiveleaf plant, if the soil is right and the
 area is shady. This garden helps you grow a lot of it in one place.
@@ -932,6 +1043,7 @@ SMOKEHOUSE "SMOKE HOUSE"
 
 Features: cooking fire
 Stored here:  meats
+Temperature:  warmer than outside
 
 A smoke house is a place to preserve and store meat for the empire. Like all
 storage facilities, your NPCs move meats between yards so that you can retrieve
@@ -941,7 +1053,7 @@ See also: STORAGE
 #
 STABLE
 
-(SS)  Stable  (Build ability)
+(SS)  Stable  (Livestock Livelihood ability)
 
 Stables are a safe place to keep your animals. You can also use them as a place
 to milk cows or shear sheep. This is also where you can barde horses.
@@ -950,7 +1062,7 @@ Most animals will not despawn if left in a stable, but there is a limit on the
 number of duplicate animals in each stable, after which any extras will despawn
 normally. (By default, this limit is 2, and only applies to spawned animals.)
 
-See also: BARDE, MILK, SHEAR
+See also: BARDE, MILK, PROGRESS, SHEAR
 #
 STATUE
 
@@ -986,6 +1098,7 @@ STONEHOUSE "STONE HOUSE"
 
 Extra rooms:  3
 Citizens:  2
+Temperature:  warmer when cold
 
 A stone house is a larger, more permanent home that resists burning. It has
 more space than a regular house, and can be built on plains or desert.
@@ -1082,27 +1195,33 @@ Tanning skins at a tannery causes the process to go faster.
 
 See also: STORAGE, TAN
 #
-TAVERN
+TAVERN BARREL ALE LAGER "WHEAT BEER" CIDER
 
-Tavern building (Foundations goal)
+Tavern building (To the Tavern When the Job's Done goal)
 
 Building:  [TT]  Tavern
-Command:  tavern [type]
+Temperature:  milder than outside
+Stored here:  barrels of alcohol
 
-You can use this command to change what a Tavern is brewing. It will charge
-your empire the resources for the brew right away, and then will take roughly
-two game days to finish brewing. The empire will be charged the ingredients
-again every few days.
+The tavern is a great gathering place for you and your citizens, and may offer
+the occasional quest, as well. The empire's workforce will craft ale and other
+drinks in wooden barrels from hops, barley, and other ingredients.
 
-There are rumors that members of a secretive guild of thieves meet in taverns.
+The tavern will sell barrels of ale, lager, wheat, cider, or mead, if any are
+available in storage. You can set the price with the 'price' command in the
+tavern.
 
-The available brews are:
-  ale -- barley + hops
-  lager -- corn + hops
-  wheatbeer -- wheat + barley
-  cider -- apples + peaches
+Basic brews workforce will make:
+ barrel of ale: wooden barrel, 5x sack of barley, 5x bushel of hops
+ barrel of lager: wooden barrel, 5x bushel of corn, 5x bushel of hops
+ barrel of wheat beer: wooden barrel, 5x bundle of wheat, 5x sack of barley
+ barrel of cider: wooden barrel, 5x bunch of apples, 5x basket of peaches
 
-Brewing takes 5 of each ingredient at a time.
+There are more tavern recipes to find, such as mead (Beekeeping goal).
+
+Barrels are crafted at the carpenter. Workforce will make these, too.
+
+See also: CARPENTER, WORKFORCE CRAFTING
 #
 TEMPLE
 
@@ -1152,6 +1271,7 @@ Special rooms: sorcery tower, skybridge
 Citizens:  1
 Fame:  1
 Stored here:  magical gems
+Temperature:  milder than outside
 
 The Tower of Sorcery is a shining symbol to people for miles around. It is
 the home of the masters of High Sorcery. This is where you can come to study
@@ -1257,6 +1377,8 @@ See also: CABINET OF CURIOSITIES, STORAGE
 
 &y/&0OO&y\&0  Tunnel  (Mountain Engineering goal)
 
+Temperature:  cooler than outside
+
 A pair of tunnel entrances on opposite sides of a mountain allow you to cross
 the mountains with ease. Start one with the 'tunnel' command.
 
@@ -1272,6 +1394,7 @@ Extra rooms:  7, interlink
 Special rooms:  tunnel
 Citizens:  4
 Chameleon:  &g....&0 or &Y....&0
+Temperature:  milder than outside
 
 The underground complex is a large subterranean home which is easy to obscure,
 due to its shallow entrance.
@@ -1296,6 +1419,8 @@ See also: STORAGE
 VOLCANICFORGE "VOLCANIC FORGE"
 
 &y(FF)&0  Volcanic Forge  (Mountain Engineering goal)
+
+Temperature:  hot
 
 This forge uses a magma chamber deep inside the mountain to smelt and shape
 powerful metals.

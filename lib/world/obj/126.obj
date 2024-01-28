@@ -6,7 +6,7 @@ An elemental binding trap is lying here.~
 to the trap indicates that you can type 'trap elemental' to capture one of the
 escaped elementals in the area.
 ~
-3 kp a 0 3
+3 kp a 0 0 3
 0 0 0
 2 48
 T 12600
@@ -17,7 +17,7 @@ the essence of earth~
 The essence of earth is piled here.~
 It's a pile of dirt.
 ~
-3 k a 0 1
+3 k a 0 0 1
 0 0 0
 1 0
 S
@@ -27,7 +27,7 @@ the essence of fire~
 The essence of fire is burning here.~
 It's just a wisp of flame.
 ~
-3 k a 0 3
+3 k a 0 0 3
 0 0 0
 10 0
 S
@@ -37,7 +37,7 @@ the essence of wind~
 The essence of wind is blowing here.~
 It's barely a breeze.
 ~
-3 k a 0 3
+3 k a 0 0 3
 0 0 0
 10 0
 S
@@ -47,7 +47,7 @@ the essence of water~
 The essence of water is leaking on the ground.~
 It's just a trickle of water.
 ~
-3 k a 0 4
+3 k a 0 0 4
 0 0 0
 10 0
 S
@@ -58,13 +58,15 @@ A sorcerous biscuit is lying here.~
    This flaky, crumbly biscuit is bright pink in color, a sure sign it was made
 by sorcerers.
 ~
-6 m a 0 4
+6 m a 0 0 6
 24 0 0
 7 336
 A
 15 1 0
 C
 1 25
+R
+4 5619 0
 S
 #12606
 necklace fire opal~
@@ -74,7 +76,7 @@ A fire opal necklace is dangling here.~
 the burning embers of a trapped flame elemental. Some clever sorcerer has
 managed to fashion an elemental into jewelry!
 ~
-2 mp ac 0 1
+2 mp ac 0 0 1
 0 0 0
 4 0
 A
@@ -91,7 +93,7 @@ seashells drip with warm water and have the salty scent of the ocean, as if
 enchanted. It would seem some sorcerer has bound a water elemental to the
 shells.
 ~
-2 mp aj 0 2
+2 mp aj 0 0 2
 0 0 0
 4 0
 A
@@ -107,7 +109,7 @@ A stone breastplate lies flat on the ground.~
 to be light enough to wear. It has been bound to an earth elemental to grant it
 strength as eternal as the rocks themselves.
 ~
-2 mp aq 0 3
+2 mp aq 0 0 3
 0 0 0
 1 0
 A
@@ -123,7 +125,7 @@ A gust of wind is trapped in a jar.~
 can release the wind (by wearing it) to benefit from the gusts of the wind
 elemental trapped inside.
 ~
-2 mp ak 0 4
+2 mp ak 0 0 4
 0 0 0
 10 0
 A
@@ -137,7 +139,7 @@ the elemental despawner~
 The delayed elemental despawner is here.~
 If this is here, the adventure is ticking down.
 ~
-3 0 0 0 2
+3 B 0 0 0 3
 0 0 0
 0 48
 T 12610
@@ -148,7 +150,7 @@ a flickering flame~
 A tiny, flickering flame burns brightly on the ground.~
 This tiny spark of flame puts out a surprising amount of light!
 ~
-29 0 0 0 3
+29 0 0 0 0 3
 -1 1 0
 10 10080
 C
@@ -162,7 +164,7 @@ A rolling rock whistle is lying here.~
 battle, but they do help you show off your accomplishments! Type 'use whistle'
 to summon it.
 ~
-19 p a 0 5
+19 p a 0 0 5
 12612 0 0
 2 0
 S
@@ -174,7 +176,7 @@ A ball of fire whistle is lying here.~
 battle, but they do help you show off your accomplishments! Type 'use whistle'
 to summon it.
 ~
-19 p a 0 6
+19 p a 0 0 6
 12613 0 0
 2 0
 S
@@ -186,7 +188,7 @@ A light breeze whistle is lying here.~
 battle, but they do help you show off your accomplishments! Type 'use whistle'
 to summon it.
 ~
-19 p a 0 7
+19 p a 0 0 7
 12614 0 0
 2 0
 S
@@ -198,7 +200,7 @@ A little puddle whistle is lying here.~
 battle, but they do help you show off your accomplishments! Type 'use whistle'
 to summon it.
 ~
-19 p a 0 8
+19 p a 0 0 8
 12615 0 0
 2 0
 S
@@ -210,7 +212,7 @@ A tiny broom whistle is lying here.~
 battle, but they do help you show off your accomplishments! Type 'use whistle'
 to summon it.
 ~
-19 p a 0 9
+19 p a 0 0 9
 12616 0 0
 2 0
 S
@@ -222,7 +224,7 @@ A heartstone pendant is hanging here.~
 by sorcery to an elemental. It gives you a warm, comforted feeling when you
 wear it.
 ~
-2 mp ac 0 2
+2 mp ac 0 0 2
 0 0 0
 1 0
 A
@@ -238,7 +240,7 @@ A strange green portal has opened in one of the trees! (adventure)~
 and unnatural. You can tell by the way the portal has formed in a tree that
 there are powerful natural forces at work here.
 ~
-8 0 0 0 4
+8 B 0 0 0 5
 0 0 0
 10 0
 S
@@ -250,7 +252,7 @@ The fog swirls into a portal back into the forests of your own world!~
 and unnatural. This is surely your only escape from this dark Magiterranean
 realm.
 ~
-8 0 0 0 5
+8 B 0 0 0 6
 0 0 0
 10 0
 S
@@ -261,7 +263,7 @@ The dense fog bank seems to part along the path as you approach... (difficulty <
 The fog bank seems to part as you approach. Select a difficulty to continue.
 Usage: difficulty <normal | hard>
 ~
-3 0 0 0 3
+3 B 0 0 0 4
 0 0 0
 10 0
 T 12655
@@ -272,7 +274,7 @@ fog bank dense~
 the fog bank~
 The fog has parted, revealing a path.~
 ~
-3 0 0 0 3
+3 B 0 0 0 4
 0 0 0
 10 48
 T 12653
@@ -285,7 +287,7 @@ A little fire is burning on the ground.~
 These little fires are safe enough to put in your pocket, and they'll burn even
 in the depths of the ocean, but only for a little while.
 ~
-29 my ao 0 5
+29 my ao 0 0 5
 168 1 5
 10 0
 A
@@ -299,9 +301,9 @@ S
 corpse drowned interloper~
 the corpse of a drowned interloper~
 A drowned corpse floats in front of you, held in place by a long root.~
-It looks like this interloper messed with the wrong druids.
+It looks like this interloper messed with the wrong mages.
 ~
-3 0 0 0 1
+3 0 0 0 0 1
 0 0 0
 7 0
 S
@@ -312,7 +314,7 @@ A pair of bark gauntlets is lying here.~
    These gauntlets are woven from thin, pliable bark, but they're surprisingly
 sturdy.
 ~
-2 mp ah 0 7
+2 mp ah 0 0 7
 -1 -1 -1
 7 0
 A
@@ -326,7 +328,7 @@ leaf gloves~
 A pair of leaf gloves is lying here.~
 These gloves are woven from fine, green leaves.
 ~
-2 mp ah 0 7
+2 mp ah 0 0 7
 -1 -1 -1
 7 0
 A
@@ -342,7 +344,7 @@ petal gloves~
 A pair of petal gloves is lying here.~
 These gloves are woven from delicate white flower petals.
 ~
-2 mp ah 0 8
+2 mp ah 0 0 8
 -1 -1 -1
 7 0
 A
@@ -358,7 +360,7 @@ the ring of the turtle~
 A scaly ring is lying on the ground.~
 The ring is made from scales and covered in scutes.
 ~
-2 mp ab 0 5
+2 mp ab 0 0 5
 -1 -1 -1
 7 0
 A
@@ -374,7 +376,7 @@ the ring of the badger~
 A furry ring is lying here.~
 The ring is covered in coarse fur, half black and half white.
 ~
-2 mp ab 0 4
+2 mp ab 0 0 4
 -1 -1 -1
 7 0
 A
@@ -391,7 +393,7 @@ A feathered ring is lying here.~
    The ring is made from woven feathers, with a few long black feathers
 sticking out.
 ~
-2 mp ab 0 5
+2 mp ab 0 0 5
 -1 -1 -1
 7 0
 A
@@ -407,7 +409,7 @@ the belt of the Grove~
 The belt of the Grove is lying on the ground.~
 This fur-lined belt is marked with the sigil of the Grove of the Magiterranean!
 ~
-2 mp al 0 4
+2 mp al 0 0 4
 -1 -1 -1
 7 0
 A
@@ -426,7 +428,7 @@ The girdle of the Forest is lying on the ground.~
    This girdle is made from oak bark and branded with the sigil of the Forest
 of the Magiterranean!
 ~
-2 mp al 0 5
+2 mp al 0 0 5
 -1 -1 -1
 7 0
 A
@@ -445,7 +447,7 @@ The sash of the Magiterranean is lying here.~
    This sash appears to be made from black fur, into which someone has shaved
 the sigil of the Grove of the Magiterranean!
 ~
-2 mp al 0 6
+2 mp al 0 0 6
 -1 -1 -1
 7 0
 A
@@ -458,20 +460,20 @@ C
 0 75
 S
 #12667
-robes grove druids~
-robes of the Grove druids~
-The robes of the Grove druids are lying here.~
-   These layered brown robes are the sort worn by the druids of the Grove of
-the Magiterranean.
+robes grove weavers~
+robes of the Grove weavers~
+The robes of the Grove weavers are lying here.~
+   These layered brown robes are the sort worn by the manaweavers of the Grove
+of the Magiterranean.
 ~
-2 p ad 0 4
+2 p ad 0 0 4
 0 0 0
 11 0
 C
 75 75
 M
 12
-The druid $n stands before you in heavy brown robes.~
+The manaweaver $n stands before you in heavy brown robes.~
 S
 #12668
 trap wildling tiny~
@@ -480,7 +482,7 @@ A tiny wildling trap is sitting on the ground.~
 This trap can summon a noncombat pet!
 Type 'use trap' to summon it.
 ~
-19 p a 0 5
+19 p a 0 0 5
 12668 0 0
 2 0
 S
@@ -490,7 +492,7 @@ a wildling whistle~
 A wildling whistle is dangling here.~
 This whistle can be used to summon a wildling mount.
 ~
-3 p a 0 6
+3 p a 0 0 6
 12669 0 0
 14 0
 T 9910
@@ -504,7 +506,7 @@ Temperate: elk, boar
 Desert: jackrabbit, desert tortoise
 Tropical: giant anaconda, baboon
 ~
-3 p a 0 3
+3 p a 0 0 3
 0 0 0
 0 0
 S
@@ -516,7 +518,7 @@ This massive sacred stone can imbue its power to a wood henge. Use it to build
 yours in one of your cities.
 Usage: build woodhenge
 ~
-3 e a 0 1
+3 e a 0 0 1
 0 0 0
 1 0
 S
@@ -528,7 +530,7 @@ The totem of tranquility is on the ground.~
 a spiral around the totem are the words to the chant of tranquility. Use 'chant
 tranquility' to tranquilize the Grove.
 ~
-3 0 a 0 2
+3 0 a 0 0 2
 0 0 0
 0 0
 Q 12650
@@ -539,7 +541,7 @@ tranquility aura~
 an aura of tranquility~
 An aura of tranquility permeates the fog.~
 ~
-3 0 0 0 4
+3 B 0 0 0 5
 0 0 0
 10 0
 S
@@ -548,21 +550,21 @@ breath~
 your breath~
 Your breath is here, and it is breathtaking.~
 ~
-3 p a 0 3
+3 p a 0 0 3
 0 0 0
 10 2
 T 12675
 S
 #12677
-oil jar snake druid~
-oil of the snake druid~
-A jar of oil of the snake druid is lying here.~
+oil jar snake shifter~
+oil of the snake shifter~
+A jar of oil of the snake shifter is lying here.~
    This tiny jar of oil is just enough to polish one item. When used on any of
 the rings, belts, or gloves from the Grove of the Magiterranean, this oil
 permanently enhances the item.
 Usage: oil <item>
 ~
-3 p a 0 2
+3 p a 0 0 2
 0 0 0
 10 0
 C
@@ -575,17 +577,17 @@ a Grove seeker stone~
 A Grove seeker stone lies here.~
 Use 'seek grove' to find the nearest Magiterranean: The Grove adventure.
 ~
-3 p a 0 10
+3 p a 0 0 10
 0 0 0
 12 0
 T 12678
 S
 #12679
-spawner druid~
-a druid~
-A druid spawner is here.~
+spawner manaweaver~
+a manaweaver~
+A manaweaver spawner is here.~
 ~
-3 0 0 0 3
+3 0 0 0 0 3
 0 0 0
 0 0
 T 12679
@@ -598,7 +600,7 @@ Some grove mix is scattered on the ground.~
 nuts. The whole mixture has a strange, blue sparkle that seems to indicate mana
 flowing through it. It tastes good, though.
 ~
-6 p a 0 3
+6 p a 0 0 3
 24 0 0
 0 1152
 B
@@ -607,7 +609,7 @@ C
 1 1
 M
 4
-You munch away at the grove mix, wistfully remembering how you saved the druids of the Grove.~
+You munch away at the grove mix, wistfully remembering how you saved the mages of the Grove.~
 S
 #12682
 mix grove pocketful~
@@ -617,7 +619,7 @@ Some grove mix is scattered on the ground.~
 nuts. The whole mixture has a strange, blue sparkle that seems to indicate mana
 flowing through it. It tastes good, though.
 ~
-6 p a 0 4
+6 p a 0 0 4
 24 0 0
 0 1152
 B
@@ -626,7 +628,7 @@ C
 1 1
 M
 4
-You weep as you eat the grove mix, remembering all those druids you killed.~
+You weep as you eat the grove mix, remembering all those manaweavers you killed.~
 S
 #12684
 seedling golden~
@@ -635,7 +637,7 @@ A golden seedling is sitting here.~
    It looks like a tiny plant, but made from solid gold. Still, you swear it
 blows in the wind when you put it down.
 ~
-15 0 a 0 1
+15 0 a 0 0 1
 1 0 0
 4 0
 C
@@ -650,7 +652,7 @@ Some pocket lint is lying here.~
    This seems like ordinary brown robe lint until you look at it long enough,
 and notice it sparkle with the magic of the Magiterranean.
 ~
-3 k a 0 3
+3 k a 0 0 3
 0 0 0
 0 0
 S
@@ -661,10 +663,12 @@ Some sugar cubes are scattered on the ground.~
    These strange sugar cubes are glimmering with sparks of Magiterranean magic.
 Perhaps you could plant them...
 ~
-6 b a 0 12
+6 bC a 0 0 14
 1 12687 0
-10 168
+10 8760
 O+ 1 6340
+R
+4 5619 0
 S
 #12687
 candy cotton bunch~
@@ -673,9 +677,9 @@ A bunch of cotton candy is sitting here.~
    This cotton candy is impossibly light and fluffy, like the pixies have spun
 floss from sugar.
 ~
-6 b a 0 10
+6 bC a 0 0 11
 6 12687 0
-10 168
+10 4320
 R
 4 5621 0
 R
@@ -687,9 +691,9 @@ a bolt of candy cloth~
 A bolt of candy cloth is sitting out.~
 This strange, sweet cloth is woven from sugar and yet surprisingly durable.
 ~
-6 l a 0 9
+6 lC a 0 0 10
 2 0 0
-11 0
+11 8760
 M
 6
 You hang some candy cloth on $V.~

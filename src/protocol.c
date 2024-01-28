@@ -2,7 +2,7 @@
 *   File: protocol.c                                      EmpireMUD 2.0b5 *
 *  Usage: KaVir's protocol snippet                                        *
 *                                                                         *
-*  EmpireMUD code base by Paul Clarke, (C) 2000-2015                      *
+*  EmpireMUD code base by Paul Clarke, (C) 2000-2024                      *
 *  All rights reserved.  See license.doc for complete information.        *
 *                                                                         *
 *  EmpireMUD based upon CircleMUD 3.0, bpl 17, by Jeremy Elson.           *
@@ -157,6 +157,8 @@ static variable_name_t VariableNameTable[eMSDP_MAX+1] = {
 	{ eMSDP_BONUS_EXP, "BONUS_EXP", NUMBER_READ_ONLY },
 	{ eMSDP_INVENTORY, "INVENTORY", NUMBER_READ_ONLY },
 	{ eMSDP_INVENTORY_MAX, "INVENTORY_MAX", NUMBER_READ_ONLY },
+	{ eMSDP_TEMPERATURE, "TEMPERATURE", NUMBER_READ_ONLY },
+	{ eMSDP_TEMPERATURE_LABEL, "TEMPERATURE_LABEL", STRING_READ_ONLY },
 	
 	{ eMSDP_STR, "STR", NUMBER_READ_ONLY },
 	{ eMSDP_DEX, "DEX", NUMBER_READ_ONLY },
@@ -214,6 +216,8 @@ static variable_name_t VariableNameTable[eMSDP_MAX+1] = {
 	{ eMSDP_WORLD_MONTH, "WORLD_MONTH", STRING_READ_ONLY },
 	{ eMSDP_WORLD_YEAR, "WORLD_YEAR", NUMBER_READ_ONLY },
 	{ eMSDP_WORLD_SEASON, "WORLD_SEASON", STRING_READ_ONLY },
+	{ eMSDP_AMBIENT_TEMPERATURE, "AMBIENT_TEMPERATURE", NUMBER_READ_ONLY },
+	{ eMSDP_AMBIENT_TEMPERATURE_LABEL, "AMBIENT_TEMPERATURE_LABEL", STRING_READ_ONLY },
 	
 	/* Configurable variables */
 	{ eMSDP_CLIENT_ID, "CLIENT_ID", STRING_WRITE_ONCE(1,40) },
@@ -2647,16 +2651,34 @@ static const char *GetMSSP_DB_Size() {
 	// we're not 100% sure what counts toward DB Size, but here is a rough guess
 	size += HASH_CNT(idnum_hh, player_table_by_idnum);
 	size += HASH_COUNT(empire_table);
-	size += HASH_COUNT(mobile_table);
-	size += HASH_COUNT(object_table);
+	
+	size += HASH_COUNT(ability_table);
 	size += HASH_COUNT(adventure_table);
-	size += HASH_COUNT(world_table);
+	size += HASH_COUNT(archetype_table);
+	size += HASH_COUNT(augment_table);
 	size += HASH_COUNT(building_table);
+	size += HASH_COUNT(class_table);
+	size += HASH_COUNT(craft_table);
+	size += HASH_COUNT(crop_table);
+	size += HASH_COUNT(event_table);
+	size += HASH_COUNT(faction_table);
+	size += HASH_COUNT(generic_table);
+	size += HASH_COUNT(globals_table);
+	size += HASH_COUNT(mobile_table);
+	size += HASH_COUNT(morph_table);
+	size += HASH_COUNT(object_table);
+	size += HASH_COUNT(progress_table);
+	size += HASH_COUNT(quest_table);
 	size += HASH_COUNT(room_template_table);
 	size += HASH_COUNT(sector_table);
-	size += HASH_COUNT(crop_table);
+	size += HASH_COUNT(shop_table);
+	size += HASH_COUNT(skill_table);
+	size += HASH_COUNT(social_table);
 	size += HASH_COUNT(trigger_table);
-	size += HASH_COUNT(craft_table);
+	size += HASH_COUNT(vehicle_table);
+	size += HASH_COUNT(island_table);
+	
+	// size += HASH_COUNT(world_table);
 	
 	snprintf(buf, sizeof(buf), "%d", size);
 	return buf;
@@ -2706,8 +2728,16 @@ static const char *GetMSSP_Extra_Descs() {
 }
 
 static const char *GetMSSP_Helpfiles() {
-	static char buf[256];	
-	snprintf(buf, sizeof(buf), "%d", top_of_helpt + 1);
+	static char buf[256];
+	int iter, count = 0;
+	
+	for (iter = 0; iter <= top_of_helpt; ++iter) {
+		if (!help_table[iter].duplicate) {
+			++count;
+		}
+	}
+	
+	snprintf(buf, sizeof(buf), "%d", count);
 	return buf;
 }
 
@@ -2738,7 +2768,7 @@ static const char *GetMSSP_IP() {
 static const char *GetMSSP_Levels() {
 	adv_data *iter, *next_iter;
 	static char buf[256];
-	int max = CLASS_SKILL_CAP;	// to start
+	int max = MAX_SKILL_CAP;	// to start
 	
 	// find highest level adventure zone:
 	HASH_ITER(hh, adventure_table, iter, next_iter) {
@@ -2927,8 +2957,8 @@ static void SendMSSP(descriptor_t *apDescriptor) {
 		{ "EQUIPMENT SYSTEM", "Level and Skill" },
 		{ "MULTIPLAYING", "No" },
 		{ "PLAYERKILLING", "Restricted" },
-		{ "QUEST SYSTEM", "0" },
-		{ "ROLEPLAYING", "" },
+		{ "QUEST SYSTEM", "Integrated" },
+		{ "ROLEPLAYING", "Encouraged" },
 		{ "TRAINING SYSTEM", "Skill" },
 		{ "WORLD ORIGINALITY", "All Original" },
 		
@@ -3128,6 +3158,7 @@ void send_initial_MSDP(descriptor_data *desc) {
 	update_MSDP_inventory(ch, NO_UPDATE);
 	update_MSDP_level(ch, NO_UPDATE);
 	update_MSDP_money(ch, NO_UPDATE);
+	update_MSDP_temperature(ch, FALSE, NO_UPDATE);
 	
 	// lists
 	update_MSDP_affects(ch, NO_UPDATE);
@@ -3175,6 +3206,9 @@ void update_MSDP_affects(char_data *ch, int send_update) {
 		buf_size = 0;
 		LL_FOREACH(ch->affected, aff) {
 			buf_size += snprintf(buf + buf_size, sizeof(buf) - buf_size, "%c%s%c%ld", (char)MSDP_VAR, get_generic_name_by_vnum(aff->type), (char)MSDP_VAL, (aff->expire_time == UNLIMITED ? -1 : (aff->expire_time - time(0))));
+			if (buf_size >= sizeof(buf)) {
+				break;
+			}
 		}
 		MSDPSetTable(ch->desc, eMSDP_AFFECTS, buf);
 		
@@ -3219,7 +3253,7 @@ void update_MSDP_attributes(char_data *ch, int send_update) {
 		MSDPSetNumber(ch->desc, eMSDP_RESIST_MAGICAL, GET_RESIST_MAGICAL(ch));
 		MSDPSetNumber(ch->desc, eMSDP_BONUS_PHYSICAL, GET_BONUS_PHYSICAL(ch));
 		MSDPSetNumber(ch->desc, eMSDP_BONUS_MAGICAL, GET_BONUS_MAGICAL(ch));
-		MSDPSetNumber(ch->desc, eMSDP_BONUS_HEALING, total_bonus_healing(ch));
+		MSDPSetNumber(ch->desc, eMSDP_BONUS_HEALING, GET_BONUS_HEALING(ch));
 		MSDPSetNumber(ch->desc, eMSDP_CRAFTING_LEVEL, get_crafting_level(ch));
 		MSDPSetNumber(ch->desc, eMSDP_INVENTORY_MAX, CAN_CARRY_N(ch));
 		
@@ -3493,6 +3527,37 @@ void update_MSDP_skills(char_data *ch, int send_update) {
 		}
 		MSDPSetTable(ch->desc, eMSDP_SKILLS, buf);
 	
+		check_send_msdp_update(ch, send_update);
+	}
+}
+
+
+/**
+* Updates temperature for MSDP.
+*
+* @param char_data *ch A player.
+* @param bool room_only If TRUE, skips the player's temperature.
+* @param int send_update NO_UPDATE, UPDATE_NOW (immediately send MSDP update), or UPDATE_SOON (send MSDP update within 1 second).
+*/
+void update_MSDP_temperature(char_data *ch, bool room_only, int send_update) {
+	char buf[256];
+	int temp, ambient;
+	
+	if (ch->desc) {
+		if (!room_only) {
+			// mine
+			temp = get_relative_temperature(ch);
+			MSDPSetNumber(ch->desc, eMSDP_TEMPERATURE, temp);
+			strcpy(buf, temperature_to_string(temp));
+			MSDPSetString(ch->desc, eMSDP_TEMPERATURE_LABEL, buf);
+		}
+		
+		// room (always)
+		ambient = get_room_temperature(IN_ROOM(ch));
+		MSDPSetNumber(ch->desc, eMSDP_AMBIENT_TEMPERATURE, ambient);
+		strcpy(buf, temperature_to_string(ambient));
+		MSDPSetString(ch->desc, eMSDP_AMBIENT_TEMPERATURE_LABEL, buf);
+		
 		check_send_msdp_update(ch, send_update);
 	}
 }

@@ -1,10 +1,125 @@
+#230
+barrel wooden~
+a wooden barrel~
+A wooden barrel is sitting here.~
+The barrel is well-made, with metal hoops around sturdy, curved planks of wood.
+~
+5 el a 0 0 2
+96 0 0
+0 0
+C
+50 50
+R
+4 5138 0
+R
+4 5134 0
+S
+#232
+barrel ale~
+a barrel of ale~
+A barrel of ale is sitting here.~
+   The barrel is well-made, with metal hoops around sturdy, curved planks of
+wood. It has the hoppy smell of ale to it.
+   You can 'setup ale' to set this up in the room for everyone.
+~
+5 eg a 0 0 7
+96 96 3
+0 0
+C
+50 50
+I 26 230 100.00 1  # DECAYS-TO: wooden barrel
+I 27 230 100.00 1  # CONSUMES-TO: wooden barrel
+R
+4 5138 0
+T 232
+T 233
+S
+#233
+barrel lager~
+a barrel of lager~
+A barrel of lager is sitting here.~
+   The barrel is well-made, with metal hoops around sturdy, curved planks of
+wood. The acrid smell of lager is strong around it.
+   You can 'setup lager' to set this up in the room for everyone.
+~
+5 eg a 0 0 8
+96 96 1
+0 0
+C
+50 50
+I 26 230 100.00 1  # DECAYS-TO: wooden barrel
+I 27 230 100.00 1  # CONSUMES-TO: wooden barrel
+R
+4 5138 0
+T 232
+T 233
+S
+#234
+barrel wheat beer~
+a barrel of wheat beer~
+A barrel of wheat beer is sitting here.~
+   The barrel is well-made, with metal hoops around sturdy, curved planks of
+wood. It has the fragrant citrus-like aroma of wheat beer.
+   You can 'setup beer' to set this up in the room for everyone.
+~
+5 eg a 0 0 8
+96 96 2
+0 0
+C
+50 50
+I 26 230 100.00 1  # DECAYS-TO: wooden barrel
+I 27 230 100.00 1  # CONSUMES-TO: wooden barrel
+R
+4 5138 0
+T 232
+T 233
+S
+#235
+barrel cider~
+a barrel of cider~
+A barrel of cider is sitting here.~
+   The barrel is well-made, with metal hoops around sturdy, curved planks of
+wood. It has the crisp aroma of hard cider.
+   You can 'setup cider' to set this up in the room for everyone.
+~
+5 eg a 0 0 8
+96 96 4
+0 0
+C
+50 50
+I 26 230 100.00 1  # DECAYS-TO: wooden barrel
+I 27 230 100.00 1  # CONSUMES-TO: wooden barrel
+R
+4 5138 0
+T 232
+T 233
+S
+#236
+barrel mead~
+a mead barrel~
+A mead barrel is stacked here.~
+   The well-made wooden barrel is suffused with the sweet aroma of mead.
+   You can 'setup mead' to set this up in the room for everyone.
+~
+5 eg a 0 0 9
+96 96 14
+0 0
+C
+50 50
+I 26 230 100.00 1  # DECAYS-TO: wooden barrel
+I 27 230 100.00 1  # CONSUMES-TO: wooden barrel
+R
+4 5138 0
+T 232
+T 233
+S
 #250
 bowl earthenware~
 an earthenware bowl~
 An earthenware bowl is lying on the ground.~
 The bowl looks like it would be good for holding water.
 ~
-5 0 a 0 4
+5 0 a 0 0 4
 12 0 0
 6 0
 R
@@ -16,7 +131,7 @@ an earthenware pot~
 An earthenware pot is lying here, slightly cracked.~
 You can carry water in the pot.
 ~
-5 0 a 0 4
+5 0 a 0 0 4
 24 0 0
 6 0
 C
@@ -30,7 +145,7 @@ an earthenware vessel~
 An earthenware vessel has been left here.~
 The vessel looks like it would hold a lot of water.
 ~
-5 0 a 0 4
+5 0 a 0 0 4
 56 0 0
 6 0
 C
@@ -47,7 +162,7 @@ A hestian trinket is sitting on the ground.~
    You can use the trinket to teleport home. Use the home command to set your
 home.
 ~
-3 0 a 0 8
+3 0 a 0 0 8
 256 3600 0
 6 0
 C
@@ -87,7 +202,7 @@ Some bricks are piled on the ground.~
    These bricks have been made from fired clay, with holes in the middle to
 reduce the weight. You can use the bricks for building.
 ~
-3 el a 0 6
+3 el a 0 0 7
 0 0 0
 6 0
 C
@@ -101,6 +216,8 @@ $n puts down a layer of bricks.~
 O+ 1 6076
 R
 4 5117 0
+R
+4 5110 0
 S
 #258
 pipe peace~
@@ -110,7 +227,7 @@ A peace pipe is lying on the ground.~
 looks like you could type 'smoke' to use it.
 Usage:  smoke <herb>
 ~
-3 0 a 0 3
+3 0 a 0 0 3
 0 0 0
 6 0
 C
@@ -125,7 +242,7 @@ a tethyan focus~
 Someone has left a tethyan focus here.~
 You can hold this item in your off-hand.
 ~
-3 mo ao 0 1
+3 mo ao 0 0 1
 0 0 0
 6 0
 A
@@ -141,7 +258,7 @@ an areios charm~
 An areios charm is sitting on the ground.~
 You can hold this item in your off-hand.
 ~
-3 mo ao 0 1
+3 mo ao 0 0 1
 0 0 0
 6 0
 A
@@ -157,7 +274,7 @@ a gaian effigy~
 A gaian effigy is sticking up out of the ground.~
 You can hold this item in your off-hand.
 ~
-3 mo ao 0 1
+3 mo ao 0 0 1
 0 0 0
 6 0
 A
@@ -171,7 +288,7 @@ a trinket of conveyance~
 A trinket of conveyance seems to have been dropped here.~
 You can use this trinket to teleport to a random starting location.
 ~
-3 0 a 0 5
+3 0 a 0 0 5
 262 1800 0
 6 0
 C
@@ -212,11 +329,15 @@ A letheian icon is lying on the ground.~
 different set of abilities for that skill tree. Type 'use icon Skill Name' to
 gain the reset, then 'skill reset Skill Name' to use it.
 ~
-3 0 a 0 4
+3 0 a 0 0 5
 0 0 0
 0 0
 C
 1 1
+R
+4 5121 0
+R
+4 5610 0
 T 263
 S
 $

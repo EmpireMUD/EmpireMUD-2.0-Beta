@@ -15,12 +15,15 @@ D3
 D4
 &0.&?%%&0.~
 &P~
-I 6 12686 100.00 1  # FORAGE: sugar cubes
+I 6 12686 100.00 25  # FORAGE: sugar cubes
 I 8 12687 20.00 2 H  # HARVEST: bunch of cotton candy
 I 8 12687 20.00 3 H  # HARVEST: bunch of cotton candy
 I 8 12687 20.00 4 H  # HARVEST: bunch of cotton candy
 I 8 12687 20.00 5 H  # HARVEST: bunch of cotton candy
 I 8 12687 20.00 6 H  # HARVEST: bunch of cotton candy
+U
+0
+Bits of sweet fluff take to the wind as the field bursts open with pink cotton!~
 X
 bush cotton candy plants bushes crop~
    Your eyes widen at the sight of the fluffy pink clouds of cotton candy

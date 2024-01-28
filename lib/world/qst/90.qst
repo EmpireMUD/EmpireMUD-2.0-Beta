@@ -98,7 +98,7 @@ trinkets enchanted by a class of novice sorcerers as practice.
 ~
 The High Sorcerer takes the trinkets and thanks you for your help.
 ~
-14 ef 1 75 -1
+17 efk 1 75 -1
 A
 1 228
 P
@@ -109,16 +109,16 @@ T 9003
 W
 2 9036 0 5 a
 W+
-11 0 0 1 a
+11 0 0 5 a
 Disenchant 5 useless trinkets~
 Z
 1 228
 S
 #9039
 Herbs for the Alchemist~
-   The alchemist needs some herbs for his latest experiment. Since apparently
-nobody else knows what a herb looks like and he's too busy watching the
-experiment, he asks you to bring him the herbs.
+   The alchemist needs some magic herbs for his latest experiment. Since
+apparently nobody else knows what a herb looks like and he's too busy watching
+the experiment, he asks you to bring him the herbs.
 ~
    You give the herbs to the alchemist, who immediately criticizes your
 herb-picking technique. At least you learned something from it.

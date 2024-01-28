@@ -2,15 +2,13 @@
 *   File: mobact.c                                        EmpireMUD 2.0b5 *
 *  Usage: Functions for generating intelligent (?) behavior in mobiles    *
 *                                                                         *
-*  EmpireMUD code base by Paul Clarke, (C) 2000-2015                      *
+*  EmpireMUD code base by Paul Clarke, (C) 2000-2024                      *
 *  All rights reserved.  See license.doc for complete information.        *
 *                                                                         *
 *  EmpireMUD based upon CircleMUD 3.0, bpl 17, by Jeremy Elson.           *
 *  CircleMUD (C) 1993, 94 by the Trustees of the Johns Hopkins University *
 *  CircleMUD is based on DikuMUD, Copyright (C) 1990, 1991.               *
 ************************************************************************ */
-
-#include <math.h>
 
 #include "conf.h"
 #include "sysdep.h"
@@ -39,8 +37,6 @@
 */
 
 // external vars
-extern bool catch_up_mobs;
-extern bool caught_up_mobs;
 
 // external funcs
 ACMD(do_exit);
@@ -90,7 +86,45 @@ void add_pursuit(char_data *ch, char_data *target) {
 	purs->last_seen = time(0);
 	purs->location = GET_ROOM_VNUM(HOME_ROOM(IN_ROOM(ch)));
 	
+	purs->morph = (GET_MORPH(target) && CHAR_MORPH_FLAGGED(target, MORPHF_ANIMAL)) ? MORPH_VNUM(GET_MORPH(target)) : NOTHING;
+	purs->disguise = (IS_DISGUISED(target) && GET_DISGUISED_NAME(target)) ? strdup(GET_DISGUISED_NAME(target)) : NULL;
+	
 	schedule_pursuit_event(ch);
+}
+
+
+/**
+* Checks if a person is the one a pursuit item refers to. This checks morphs
+* and disguise unless over-leveled.
+*
+* @param char_data *mob The mob doing pursuit.
+* @param struct pursuit_data *purs The pursuit entry.
+* @param char_data *ch The person to check.
+* @return bool TRUE if this is the target; FALSE if not.
+*/
+bool check_pursuit_target(char_data *mob, struct pursuit_data *purs, char_data *ch) {
+	bool morph_ok, disguise_ok;
+	
+	if (!purs || !ch) {
+		return FALSE;	// no person
+	}
+	else if (IS_NPC(ch) || purs->idnum != GET_IDNUM(ch)) {
+		return FALSE;	// wrong person
+	}
+	else if (get_approximate_level(mob) > get_approximate_level(ch) + 25) {
+		return TRUE;	// over-level: ignore morph and disguise
+	}
+	
+	// check morph
+	morph_ok = (purs->morph == NOTHING && (!GET_MORPH(ch) || !CHAR_MORPH_FLAGGED(ch, MORPHF_ANIMAL)));
+	morph_ok |= (purs->morph != NOTHING && GET_MORPH(ch) && purs->morph == MORPH_VNUM(GET_MORPH(ch)));
+	
+	// check disguise
+	disguise_ok = (!purs->disguise && !IS_DISGUISED(ch));
+	disguise_ok |= (purs->disguise && IS_DISGUISED(ch) && GET_DISGUISED_NAME(ch) && !strcmp(purs->disguise, GET_DISGUISED_NAME(ch)));
+	
+	// can we recognize them?
+	return morph_ok && disguise_ok;
 }
 
 
@@ -114,8 +148,21 @@ void end_pursuit(char_data *ch, char_data *target) {
 		
 		if (purs->idnum == GET_IDNUM(target)) {
 			LL_DELETE(MOB_PURSUIT(ch), purs);
-			free(purs);
+			free_pursuit(purs);
 		}
+	}
+}
+
+
+/**
+* @param struct pursuit_data *purs Ths pursuit data to free.
+*/
+void free_pursuit(struct pursuit_data *purs) {
+	if (purs) {
+		if (purs->disguise) {
+			free(purs->disguise);
+		}
+		free(purs);
 	}
 }
 
@@ -148,7 +195,7 @@ bool return_to_pursuit_location(char_data *ch) {
 	
 	// reset pursue data to avoid loops
 	LL_FOREACH_SAFE(MOB_PURSUIT(ch), purs, next_purs) {
-		free(purs);
+		free_pursuit(purs);
 	}
 	MOB_PURSUIT(ch) = NULL;
 	
@@ -187,6 +234,7 @@ int mob_coins(char_data *mob) {
 }
 
 
+// INTERACTION_FUNC provides: ch, interaction, inter_room, inter_mob, inter_item, inter_veh
 INTERACTION_FUNC(run_one_encounter) {
 	char_data *aggr;
 	int iter;
@@ -226,7 +274,7 @@ void random_encounter(char_data *ch) {
 		return;
 	}
 
-	if (AFF_FLAGGED(ch, AFF_FLY | AFF_MAJESTY)) {
+	if (AFF_FLAGGED(ch, AFF_FLYING | AFF_MAJESTY)) {
 		return;
 	}
 	
@@ -435,6 +483,7 @@ void setup_generic_npc(char_data *mob, empire_data *emp, int name, int sex) {
 	}
 	if (strchr(GET_LONG_DESC(proto ? proto : mob), '#')) {
 		GET_LONG_DESC(mob) = str_dup(replace_npc_names(GET_LONG_DESC(proto ? proto : mob), name_set->names[name], !emp ? "afar" : EMPIRE_NAME(emp), !emp ? "lost" : EMPIRE_ADJECTIVE(emp)));
+		CAP(GET_LONG_DESC(mob));
 		if (free_long) {
 			free(free_long);
 		}
@@ -881,7 +930,7 @@ bool check_mob_pursuit(char_data *ch) {
 		// check pursuit timeout and distance
 		if (time(0) - purs->last_seen > config_get_int("mob_pursuit_timeout") * SECS_PER_REAL_MIN || compute_distance(IN_ROOM(ch), real_room(purs->location)) > config_get_int("mob_pursuit_distance")) {
 			LL_DELETE(MOB_PURSUIT(ch), purs);
-			free(purs);
+			free_pursuit(purs);
 			continue;
 		}
 		
@@ -890,8 +939,10 @@ bool check_mob_pursuit(char_data *ch) {
 
 		// look in this room
 		DL_FOREACH2(ROOM_PEOPLE(IN_ROOM(ch)), vict, next_in_room) {
-			if (!IS_NPC(vict) && GET_IDNUM(vict) == purs->idnum && CAN_SEE(ch, vict) && CAN_RECOGNIZE(ch, vict) && can_fight(ch, vict)) {
+			if (!IS_NPC(vict) && CAN_SEE(ch, vict) && check_pursuit_target(ch, purs, vict) && can_fight(ch, vict)) {
 				found = TRUE;
+				act("$n runs toward you!", FALSE, ch, NULL, vict, TO_VICT);
+				act("$n runs toward $N!", FALSE, ch, NULL, vict, TO_NOTVICT);
 				engage_combat(ch, vict, FALSE);
 				
 				// exit early: we're now in combat
@@ -902,7 +953,7 @@ bool check_mob_pursuit(char_data *ch) {
 		// track to next room
 		HASH_ITER(hh, ROOM_TRACKS(IN_ROOM(ch)), track, next_track) {
 			// don't bother checking track lifespan here -- just let mobs follow it till it gets removed
-			if ((-1 * track->id) == purs->idnum) {
+			if (track->id == purs->idnum) {
 				found = TRUE;
 				dir = track->dir;
 				track_to_room = track->to_room;
@@ -915,7 +966,7 @@ bool check_mob_pursuit(char_data *ch) {
 			// first see if they're playing
 			if (!(vict = is_playing(purs->idnum))) {
 				LL_DELETE(MOB_PURSUIT(ch), purs);
-				free(purs);
+				free_pursuit(purs);
 				continue;
 			}
 			
@@ -962,8 +1013,11 @@ bool check_mob_pursuit(char_data *ch) {
 			next_purs = purs->next;
 			
 			DL_FOREACH2(ROOM_PEOPLE(IN_ROOM(ch)), vict, next_in_room) {
-				if (!IS_NPC(vict) && GET_IDNUM(vict) == purs->idnum && can_fight(ch, vict)) {
+				if (!IS_NPC(vict) && CAN_SEE(ch, vict) && check_pursuit_target(ch, purs, vict) && can_fight(ch, vict)) {
 					found = TRUE;
+					act("$n runs toward you!", FALSE, ch, NULL, vict, TO_VICT);
+					act("$n runs toward $N!", FALSE, ch, NULL, vict, TO_NOTVICT);
+					
 					engage_combat(ch, vict, FALSE);
 					
 					// exit now: we are in combat
@@ -1011,7 +1065,7 @@ bool mob_can_move_to_sect(char_data *mob, room_data *to_room) {
 	else if (SECT_FLAGGED(sect, SECTF_IS_ROAD) && !MOB_FLAGGED(mob, MOB_AQUATIC) && move_type != MOB_MOVE_SWIM) {
 		ok = TRUE;
 	}
-	else if (AFF_FLAGGED(mob, AFF_FLY)) {
+	else if (AFF_FLAGGED(mob, AFF_FLYING)) {
 		ok = TRUE;
 	}
 	else if (SECT_FLAGGED(sect, SECTF_ROUGH)) {
@@ -1020,7 +1074,7 @@ bool mob_can_move_to_sect(char_data *mob, room_data *to_room) {
 		}
 	}
 	else if (SECT_FLAGGED(sect, SECTF_FRESH_WATER | SECTF_OCEAN)) {
-		if (MOB_FLAGGED(mob, MOB_AQUATIC) || HAS_WATERWALK(mob) || move_type == MOB_MOVE_SWIM || move_type == MOB_MOVE_PADDLE) {
+		if (MOB_FLAGGED(mob, MOB_AQUATIC) || HAS_WATERWALKING(mob) || move_type == MOB_MOVE_SWIM || move_type == MOB_MOVE_PADDLE) {
 			ok = TRUE;
 		}
 	}
@@ -1034,7 +1088,7 @@ bool mob_can_move_to_sect(char_data *mob, room_data *to_room) {
 	// overrides: things that cancel previous oks
 	
 	// non-humans won't enter buildings (open buildings only count if finished)
-	if (!MOB_FLAGGED(mob, MOB_HUMAN) && SECT_FLAGGED(sect, SECTF_MAP_BUILDING | SECTF_INSIDE) && (!ROOM_BLD_FLAGGED(to_room, BLD_OPEN) || IS_COMPLETE(to_room))) {
+	if (!MOB_FLAGGED(mob, MOB_HUMAN) && SECT_FLAGGED(sect, SECTF_MAP_BUILDING | SECTF_INSIDE) && ROOM_IS_CLOSED(to_room)) {
 		ok = FALSE;
 	}
 	
@@ -1091,9 +1145,10 @@ bool validate_mobile_move(char_data *ch, int dir, room_data *to_room) {
 * @return bool TRUE if the mobile moved successfully
 */
 bool try_mobile_movement(char_data *ch) {
-	int dir, count;
+	bool try_vehicle = FALSE;
+	int dir = -1, count;
 	room_data *to_room, *temp_room, *was_in = IN_ROOM(ch);
-	struct room_direction_data *ex;
+	struct room_direction_data *ex_iter, *use_exit = NULL;
 	vehicle_data *veh;
 	
 	// animals don't move indoors
@@ -1101,24 +1156,38 @@ bool try_mobile_movement(char_data *ch) {
 		return FALSE;
 	}
 	
-	// 40% random chance to attempt a move indoors or 20% outdoors
-	if (number(1, 100) > 20 * (COMPLEX_DATA(IN_ROOM(ch)) ? 2 : 1)) {
+	if (number(1, 100) > 20 * (ROOM_IS_CLOSED(IN_ROOM(ch)) ? 1.5 : 1)) {
 		return FALSE;
 	}
 	
 	// pick a random direction
-	if (IS_OUTDOORS(ch) && !IS_ADVENTURE_ROOM(IN_ROOM(ch))) {
+	if (IS_OUTDOORS(ch) && GET_ROOM_VNUM(IN_ROOM(ch)) < MAP_SIZE) {
 		dir = number(-1, NUM_2D_DIRS-1);
+		try_vehicle = (dir == -1);
+	}
+	else if (COMPLEX_DATA(IN_ROOM(ch))) {
+		if (number(1, 100) <= 10) {
+			try_vehicle = TRUE;
+		}
+		else {
+			count = 0;
+			LL_FOREACH(COMPLEX_DATA(IN_ROOM(ch))->exits, ex_iter) {
+				if (!number(0, count++)) {
+					use_exit = ex_iter;
+				}
+			}
+		}
 	}
 	else {
-		dir = number(-1, NUM_NATURAL_DIRS-1);
+		// nowhere to go, nothing to do
+		return FALSE;
 	}
 	
-	// -1 will attempt to enter/exit a vehicle instead
-	if (dir == -1 && ROOM_CAN_EXIT(IN_ROOM(ch)) && (!GET_ROOM_VEHICLE(IN_ROOM(ch)) || VEH_FLAGGED(GET_ROOM_VEHICLE(IN_ROOM(ch)), VEH_BUILDING))) {
+	// vehicle?
+	if (try_vehicle && ROOM_CAN_EXIT(IN_ROOM(ch)) && (!GET_ROOM_VEHICLE(IN_ROOM(ch)) || VEH_FLAGGED(GET_ROOM_VEHICLE(IN_ROOM(ch)), VEH_BUILDING))) {
 		do_exit(ch, "", 0, 0);
 	}
-	else if (dir == -1) {	// look for a vehicle to enter
+	else if (try_vehicle) {	// look for a vehicle to enter
 		to_room = NULL;
 		count = 0;
 		DL_FOREACH2(ROOM_VEHICLES(IN_ROOM(ch)), veh, next_in_room) {
@@ -1146,7 +1215,7 @@ bool try_mobile_movement(char_data *ch) {
 			perform_move(ch, NO_DIR, to_room, MOVE_ENTER_VEH);
 		}
 	}	// end attempt enter/exit
-	else if (IS_OUTDOORS(ch) && !IS_ADVENTURE_ROOM(IN_ROOM(ch))) {
+	else if (dir != -1 && IS_OUTDOORS(ch) && GET_ROOM_VNUM(IN_ROOM(ch)) < MAP_SIZE) {
 		// map movement:
 		to_room = real_shift(IN_ROOM(ch), shift_dir[dir][0], shift_dir[dir][1]);
 		
@@ -1160,12 +1229,12 @@ bool try_mobile_movement(char_data *ch) {
 			}
 		}
 	}
-	else if (COMPLEX_DATA(IN_ROOM(ch)) && (ex = find_exit(IN_ROOM(ch), dir)) && CAN_GO(ch, ex)) {
+	else if (use_exit && CAN_GO(ch, use_exit)) {
 		// indoor movement
-		to_room = ex->room_ptr;
+		to_room = use_exit->room_ptr;
 		
-		if (to_room && mob_can_move_to_sect(ch, to_room) && validate_mobile_move(ch, dir, to_room)) {
-			perform_move(ch, dir, to_room, MOVE_WANDER);
+		if (to_room && mob_can_move_to_sect(ch, to_room) && validate_mobile_move(ch, use_exit->dir, to_room)) {
+			perform_move(ch, use_exit->dir, to_room, MOVE_WANDER);
 		}
 	}
 
@@ -1359,13 +1428,22 @@ void run_mob_echoes(void) {
 			// ok now find a random message to show?
 			LL_FOREACH(MOB_CUSTOM_MSGS(mob), mcm) {
 				// MOB_CUSTOM_x: types we use here
-				if (mcm->type == MOB_CUSTOM_ECHO || mcm->type == MOB_CUSTOM_SAY) {
+				if (mcm->type == MOB_CUSTOM_ECHO) {
 					// ok = true
 				}
-				else if ((mcm->type == MOB_CUSTOM_SAY_DAY || mcm->type == MOB_CUSTOM_ECHO_DAY) && (sun == SUN_LIGHT || sun == SUN_RISE)) {
+				else if (mcm->type == MOB_CUSTOM_ECHO_DAY && (sun == SUN_LIGHT || sun == SUN_RISE)) {
 					// day ok
 				}
-				else if ((mcm->type == MOB_CUSTOM_SAY_NIGHT || mcm->type == MOB_CUSTOM_ECHO_NIGHT) && (sun == SUN_DARK || sun == SUN_SET)) {
+				else if (mcm->type == MOB_CUSTOM_ECHO_NIGHT && (sun == SUN_DARK || sun == SUN_SET)) {
+					// night ok
+				}
+				else if (mcm->type == MOB_CUSTOM_SAY && !ROOM_AFF_FLAGGED(IN_ROOM(mob), ROOM_AFF_SILENT)) {
+					// ok = true
+				}
+				else if (mcm->type == MOB_CUSTOM_SAY_DAY && (sun == SUN_LIGHT || sun == SUN_RISE) && !ROOM_AFF_FLAGGED(IN_ROOM(mob), ROOM_AFF_SILENT)) {
+					// day ok
+				}
+				else if (mcm->type == MOB_CUSTOM_SAY_NIGHT && (sun == SUN_DARK || sun == SUN_SET) && !ROOM_AFF_FLAGGED(IN_ROOM(mob), ROOM_AFF_SILENT)) {
 					// night ok
 				}
 				else {
@@ -1757,7 +1835,7 @@ static void spawn_one_room(room_data *room, bool only_artisans) {
 				data->x_coord = X_COORD(room);
 				data->y_coord = Y_COORD(room);
 				data->in_city = (ROOM_OWNER(home) && is_in_city_for_empire(room, ROOM_OWNER(home), TRUE, &junk)) ? TRUE : FALSE;
-				run_globals(GLOBAL_MAP_SPAWNS, run_global_map_spawns, TRUE, GET_SECT_CLIMATE(BASE_SECT(room)), NULL, NULL, 0, validate_global_map_spawns, data);
+				run_globals(GLOBAL_MAP_SPAWNS, run_global_map_spawns, TRUE, get_climate(room), NULL, NULL, 0, validate_global_map_spawns, data);
 				free(data);
 			}
 		}
@@ -1926,6 +2004,9 @@ bool check_reset_mob(char_data *ch, bool force) {
 	if (!IS_NPC(ch)) {
 		return FALSE;	// oops
 	}
+	if (AFF_FLAGGED(ch, AFF_POOR_REGENS)) {
+		return FALSE;	// delay due to poor-regen affect
+	}
 	
 	// things to check first (if not forced)
 	if (!force) {
@@ -2024,11 +2105,13 @@ int determine_best_scale_level(char_data *ch, bool check_group) {
 	int iter, level = 0;
 	
 	// level caps for sub-100 scaling -- TODO this is very similar to what's done in can_wear_item()
-	int level_ranges[] = { BASIC_SKILL_CAP, SPECIALTY_SKILL_CAP, CLASS_SKILL_CAP, -1 };	// terminate with -1
+	int level_ranges[] = { BASIC_SKILL_CAP, SPECIALTY_SKILL_CAP, MAX_SKILL_CAP, -1 };	// terminate with -1
 	
-	// determine who we're really scaling to
-	while (IS_NPC(scale_to) && GET_LEADER(scale_to)) {
-		scale_to = GET_LEADER(scale_to);
+	// determine who we're really scaling to (ONLY if check_group)
+	if (check_group) {
+		while (IS_NPC(scale_to) && GET_LEADER(scale_to)) {
+			scale_to = GET_LEADER(scale_to);
+		}
 	}
 	
 	// now determine the ideal level based on scale_to
@@ -2045,7 +2128,7 @@ int determine_best_scale_level(char_data *ch, bool check_group) {
 		level = GET_COMPUTED_LEVEL(scale_to);
 		
 		// for people under the class cap, also cap scaling on their level range
-		if (GET_SKILL_LEVEL(scale_to) < CLASS_SKILL_CAP) {
+		if (GET_SKILL_LEVEL(scale_to) < MAX_SKILL_CAP) {
 			for (iter = 0; level_ranges[iter] != -1; ++iter) {
 				if (GET_SKILL_LEVEL(scale_to) <= level_ranges[iter]) {
 					level = MIN(level, level_ranges[iter]);
@@ -2086,9 +2169,9 @@ void scale_mob_as_companion(char_data *mob, char_data *leader, int use_level) {
 		scale_level = get_approximate_level(leader);
 	}
 	
-	if (scale_level > CLASS_SKILL_CAP) {
+	if (scale_level > MAX_SKILL_CAP) {
 		// 25 levels lower if over 100
-		scale_level = MAX(CLASS_SKILL_CAP, scale_level - 25);
+		scale_level = MAX(MAX_SKILL_CAP, scale_level - 25);
 	}
 	scale_mob_to_level(mob, scale_level);
 	set_mob_flags(mob, MOB_NO_RESCALE);	// ensure it doesn't rescale itself
@@ -2120,6 +2203,7 @@ void scale_mob_to_level(char_data *mob, int level) {
 	int room_lev = 0, room_min = 0, room_max = 0;
 	int pools_down[NUM_POOLS];
 	int iter;
+	attack_message_data *amd;
 	
 	// sanity
 	if (!IS_NPC(mob)) {
@@ -2149,6 +2233,11 @@ void scale_mob_to_level(char_data *mob, int level) {
 		level = MIN(room_max, level);
 	}
 	
+	// rounding?
+	if (round_level_scaling_to_nearest > 1 && level > 1 && (level % round_level_scaling_to_nearest) > 0) {
+		level += (round_level_scaling_to_nearest - (level % round_level_scaling_to_nearest));
+	}
+	
 	// insanity!
 	if (level <= 0) {
 		return;
@@ -2162,8 +2251,8 @@ void scale_mob_to_level(char_data *mob, int level) {
 	// set up: determine how many levels the mob gets in each level range
 	low_level = MAX(0, MIN(level, BASIC_SKILL_CAP));
 	mid_level = MAX(0, MIN(level, SPECIALTY_SKILL_CAP) - BASIC_SKILL_CAP);
-	high_level = MAX(0, MIN(level, CLASS_SKILL_CAP) - SPECIALTY_SKILL_CAP);
-	over_level = MAX(0, level - CLASS_SKILL_CAP);
+	high_level = MAX(0, MIN(level, MAX_SKILL_CAP) - SPECIALTY_SKILL_CAP);
+	over_level = MAX(0, level - MAX_SKILL_CAP);
 	
 	GET_CURRENT_SCALE_LEVEL(mob) = level;
 
@@ -2243,11 +2332,12 @@ void scale_mob_to_level(char_data *mob, int level) {
 	
 	// damage
 	target = (low_level / 20.0) + (mid_level / 17.5) + (high_level / 15.0) + (over_level / 9.5);
-	value = target * attack_hit_info[MOB_ATTACK_TYPE(mob)].speed[SPD_NORMAL];
+	amd = real_attack_message(MOB_ATTACK_TYPE(mob));
+	value = target * ((amd && ATTACK_SPEED(amd, SPD_NORMAL) > 0.0) ? ATTACK_SPEED(amd, SPD_NORMAL) : basic_speed);
 	value *= MOB_FLAGGED(mob, MOB_DPS) ? 2.5 : 1.0;
 	value *= MOB_FLAGGED(mob, MOB_HARD) ? 2.5 : 1.0;
 	value *= MOB_FLAGGED(mob, MOB_GROUP) ? 3.5 : 1.0;
-	if (!attack_hit_info[MOB_ATTACK_TYPE(mob)].disarmable) {
+	if (AFF_FLAGGED(mob, AFF_NO_DISARM) || (amd && !ATTACK_FLAGGED(amd, AMDF_DISARMABLE))) {
 		value *= 0.7;	// disarm would cut damage in half; this brings it closer together
 	}
 	if (MOB_FLAGGED(mob, MOB_HARD | MOB_GROUP)) {

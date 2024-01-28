@@ -42,6 +42,60 @@ else
 end
 detach 230 %self.id%
 ~
+#232
+Barrel of Fun: Setup command~
+1 c 6
+setup~
+set room %actor.room%
+if %actor.obj_target(%arg.car%)% != %self%
+  return 0
+  halt
+elseif %actor.fighting%
+  %send% %actor% You're a little busy right now.
+  halt
+elseif %room.sector_flagged(OCEAN)% || %room.sector_flagged(FRESH-WATER)%
+  %send% %actor% You can't set it up here.
+  halt
+elseif !%actor.canuseroom_guest%
+  %send% %actor% You can't set it up here.
+  halt
+end
+* Check items in room?
+set count 0
+set iter %room.contents%
+while %iter% && %count% < 10
+  eval count %count% + 1
+  set iter %iter.next_in_list%
+done
+if %count% >= 10
+  %send% %actor% There's too much here to set up @%self%.
+  halt
+end
+* ok: ensure I'm in the room
+%teleport% %self% %room%
+otimer 168
+nop %self.remove_wear(TAKE)%
+%mod% %self% longdesc &Z%self.shortdesc% has been set up here.
+if !%self.is_flagged(NO-BASIC-STORAGE)%
+  nop %self.flag(NO-BASIC-STORAGE)%
+end
+* and message
+%send% %actor% You set up @%self% here.
+%echoaround% %actor% ~%actor% sets up @%self% here.
+* and remove triggers
+detach 232 %self.id%
+~
+#233
+Barrel of Fun: Block 2nd setup~
+1 c 4
+setup~
+if %actor.obj_target(%arg.car%)% == %self%
+  %send% %actor% It has already been set up.
+  halt%
+else
+  return 0
+end
+~
 #250
 City Guard: Distract~
 0 k 50

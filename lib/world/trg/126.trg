@@ -226,6 +226,10 @@ Ember: Attack~
 %send% %actor% ~%self% shoots a small bolt of fire at you.
 %echoaround% %actor% ~%self% shoots a small bolt of fire at ~%actor%.
 %damage% %actor% 25
+* attempt to ensure the actor is in combat because this mob does not trigger combat itself
+if %actor.position% == Standing && !%actor.disabled% && !%actor.fighting%
+  %force% %actor% hit ember
+end
 ~
 #12609
 Delayed completion on quest start~
@@ -275,7 +279,7 @@ end
 Give rejection~
 0 j 100
 ~
-%send% %actor% Don't give the item to ~%self%, use 'quest finish <quest name>' instead (or 'quest finish all').
+%send% %actor% Don't give the item to ~%self%, use 'quest finish <quest name>' instead (or 'finish all').
 return 0
 ~
 #12650
@@ -312,12 +316,12 @@ end
 return 0
 ~
 #12651
-Grove 2.0: Druid death~
+Grove 2.0: Manaweaver death~
 0 f 100
 ~
 if %actor.on_quest(12650)%
   %quest% %actor% drop 12650
-  %send% %actor% You fail the quest Tranquility of the Grove for killing a druid.
+  %send% %actor% You fail the quest Tranquility of the Grove for killing a manaweaver.
   set fox %instance.mob(12676)%
   if %fox%
     %at% %fox.room% %load% mob 12677
@@ -391,7 +395,11 @@ if !%arg%
   return 1
   halt
 end
-* TODO: Check nobody's in the adventure before changing difficulty
+if %instance.players_present% > %self.room.players_present%
+  %send% %actor% You cannot set a difficulty while players are elsewhere in the adventure.
+  return 1
+  halt
+end
 if normal /= %arg%
   %echo% Setting difficulty to Normal...
   set difficulty 1
@@ -664,7 +672,7 @@ nop %self.set_cooldown(12657, 30)%
 %dot% #12658 %actor% 100 30 physical
 ~
 #12659
-Faun Druid 2.0: Rejuvenate~
+Faun Shifter 2.0: Rejuvenate~
 0 k 100
 ~
 if %self.cooldown(12657)%
@@ -676,7 +684,7 @@ eval amount (%level%/10) + 1
 dg_affect #12659 %self% HEAL-OVER-TIME %amount% 30
 ~
 #12660
-Grove Druid 2.0: Firebolt~
+Grove Manaweaver 2.0: Firebolt~
 0 k 100
 ~
 if %self.cooldown(12657)%
@@ -685,7 +693,7 @@ end
 nop %self.set_cooldown(12657, 30)%
 wait 1 sec
 dg_affect #12670 %self% HARD-STUNNED on 5
-if %actor.trigger_counterspell%
+if %actor.trigger_counterspell(%self%)%
   %send% %actor% ~%self% launches a bolt of fire at you, but your counterspell blocks it completely.
   %echoaround% %actor% ~%self% launches a bolt of fire at ~%actor%, but it fizzles out in the air in front of *%actor%.
   halt
@@ -706,7 +714,7 @@ mmove
 mmove
 ~
 #12662
-Squirrel Druid: Morph/Nibble~
+Squirrel Shifter: Morph/Nibble~
 0 k 100
 ~
 if %self.cooldown(12657)%
@@ -727,7 +735,7 @@ else
 end
 ~
 #12663
-Badger Druid: Morph~
+Badger Shifter: Morph~
 0 k 50
 ~
 if %self.cooldown(12657)%
@@ -745,12 +753,13 @@ wait 1 sec
 %damage% %actor% 100 physical
 ~
 #12664
-Badger Druid: Earthen Claws~
+Badger Shifter: Earthen Claws~
 0 k 100
 ~
 if %self.cooldown(12657)%
   halt
 end
+set actor_id %actor.id%
 nop %self.set_cooldown(12657, 30)%
 dg_affect #12670 %self% HARD-STUNNED on 5
 if %self.morph%
@@ -759,7 +768,10 @@ if %self.morph%
   %echo% %current% rapidly morphs into ~%self%!
 end
 wait 1 sec
-if %actor.trigger_counterspell%
+if %actor.id% != %actor_id%
+  * gone?
+  halt
+elseif %actor.trigger_counterspell(%self%)%
   %send% %actor% ~%self% gestures, and earthen claws burst from the soil, dissolving as they meet your counterspell!
   %echoaround% %actor% ~%self% gestures, and earthen claws burst from the soil, dissolving as they near ~%actor%!
   halt
@@ -772,7 +784,7 @@ else
 end
 ~
 #12665
-Archdruid: Grand Fireball~
+Archweaver: Grand Fireball~
 0 k 50
 ~
 if %self.affect(12666)%
@@ -799,7 +811,7 @@ if !%actor%
 end
 %send% %actor% ~%self% hurls the grand fireball at you!
 %echoaround% %actor% ~%self% hurls the grand fireball at ~%actor%!
-if %actor.trigger_counterspell%
+if %actor.trigger_counterspell(%self%)%
   %send% %actor% The fireball strikes your counterspell and explodes with a fiery roar!
   %echoaround% %actor% The fireball explodes in front of ~%actor% with a fiery roar!
 else
@@ -812,7 +824,7 @@ end
 %aoe% 75 fire
 ~
 #12666
-Archdruid: Ignite Weapon~
+Archweaver: Ignite Weapon~
 0 k 100
 ~
 if %self.affect(12666)%
@@ -829,7 +841,7 @@ wait 1 sec
 dg_affect #12666 %self% SLOW on 15
 ~
 #12667
-Crow Druid: Morph~
+Crow Shifter: Morph~
 0 k 50
 ~
 if %self.cooldown(12657)%
@@ -852,7 +864,7 @@ if %actor.id% == %id%
 end
 ~
 #12668
-Crow Druid: Squall~
+Crow Shifter: Squall~
 0 k 100
 ~
 if %self.cooldown(12657)%
@@ -876,7 +888,7 @@ while %person%
 done
 ~
 #12669
-Turtle Druid: Morph~
+Turtle Shifter: Morph~
 0 k 50
 ~
 if %self.aff_flagged(IMMUNE-DAMAGE)% && %random.4% == 4
@@ -900,7 +912,7 @@ dg_affect #12669 %self% IMMUNE-DAMAGE on -1
 nop %self.add_mob_flag(NO-ATTACK)%
 ~
 #12670
-Turtle Druid: Riptide~
+Turtle Shifter: Riptide~
 0 k 100
 ~
 if %self.cooldown(12657)%
@@ -935,7 +947,7 @@ done
 %echo% |%self% riptide dissipates.
 ~
 #12671
-Stomp turtle druid~
+Stomp turtle shifter~
 0 c 0
 stomp~
 if !%self.affect(12669)%
@@ -1022,8 +1034,13 @@ while %cycles_left% >= 0
       %send% %actor% A peaceful feeling fills the area...
     break
     case 1
-      %echoaround% %actor% ~%actor% whispers into the air, and the feeling of tranquility spreads...
-      %send% %actor% You whisper into the air, and the feeling of tranquility spreads...
+      if %room.template% == 12664 || %room.template% == 12665
+        %echoaround% %actor% ~%actor% burble into the water, and the feeling of tranquility spreads...
+        %send% %actor% You burble into the water, and the feeling of tranquility spreads...
+      else
+        %echoaround% %actor% ~%actor% whispers into the air, and the feeling of tranquility spreads...
+        %send% %actor% You whisper into the air, and the feeling of tranquility spreads...
+      end
     break
     case 0
       if %random.2% == 2
@@ -1060,11 +1077,11 @@ while %cycles_left% >= 0
       set done 1
       set vnum 12654
       while %vnum% <= 12657
-        set druid %instance.mob(%vnum%)%
-        if !%druid%
+        set mage %instance.mob(%vnum%)%
+        if !%mage%
           set done 0
         else
-          if !%druid.affect(12673)%
+          if !%mage.affect(12673)%
             set done 0
           end
         end
@@ -1073,14 +1090,14 @@ while %cycles_left% >= 0
       set person %self.room.people%
       while %person%
         if %person.is_pc% && %person.on_quest(12650)%
+          %quest% %person% trigger 12650
           if %give_token%
             set curname %currency.12650(1)%.
             %send% %person% You receive %curname.ana% %curname%.
             nop %person.give_currency(12650, 1)%
           end
-          if %done%
-            %send% %person% You have tranquilized all four of the druid leaders.
-            %quest% %person% trigger 12650
+          if %person.quest_finished(12650)%
+            %send% %person% You have tranquilized all four of the manaweaver leaders.
           end
         end
         set person %person.next_in_room%
@@ -1264,7 +1281,7 @@ else
 end
 ~
 #12679
-Druid spawner~
+Manaweaver spawner~
 1 n 100
 ~
 if %random.2% == 2
@@ -1290,12 +1307,12 @@ if !%arg%
 end
 if badger /= %arg%
   set target badger
-elseif druid /= %arg% || grove /= %arg%
-  set target druid
+elseif manaweaver /= %arg% || weaver /= %arg% || grove /= %arg% || shifter /= %arg%
+  set target manaweaver
 elseif wildling /= %arg% || ambusher /= %arg%
   set target wildling
-elseif archdruid /= %arg%
-  set target archdruid
+elseif archweaver /= %arg%
+  set target archweaver
 elseif crow /= %arg%
   set target crow
 elseif turtle /= %arg%
@@ -1331,7 +1348,7 @@ Grove 2.0 Quest Finish completes adventure~
 %adventurecomplete%
 ~
 #12683
-Grove Druid 2.0 Underwater: Water Blast~
+Grove Manaweaver 2.0 Underwater: Water Blast~
 0 k 100
 ~
 if %self.cooldown(12657)%
@@ -1341,7 +1358,7 @@ nop %self.set_cooldown(12657, 30)%
 dg_affect #12670 %self% HARD-STUNNED on 5
 %send% %actor% ~%self% flicks ^%self% wrist and launches a blast of pressurized water at you!
 %echoaround% %actor% ~%self% flicks ^%self% wrist and launches a blast of pressurized water at ~%actor%!
-if %actor.trigger_counterspell%
+if %actor.trigger_counterspell(%self%)%
   %send% %actor% The water blast hits your counterspell and dissipates.
   %echoaround% %actor% The water blast dissipates in front of ~%actor%.
   halt
@@ -1399,11 +1416,11 @@ if %success% && !%failure%
   set done 1
   set vnum 12654
   while %vnum% <= 12657
-    set druid %instance.mob(%vnum%)%
-    if !%druid%
+    set mage %instance.mob(%vnum%)%
+    if !%mage%
       set done 0
     else
-      if !%druid.affect(12673)%
+      if !%mage.affect(12673)%
         set done 0
       end
     end
@@ -1412,14 +1429,14 @@ if %success% && !%failure%
   set person %self.room.people%
   while %person%
     if %person.is_pc% && %person.on_quest(12650)%
+      %quest% %person% trigger 12650
       if %give_token%
         set curname %currency.12650(1)%
         %send% %person% You receive %curname.ana% %curname%.
         nop %person.give_currency(12650, 1)%
       end
-      if %done%
-        %send% %person% You have tranquilized all four of the druid leaders.
-        %quest% %person% trigger 12650
+      if %person.quest_finished(12650)%
+        %send% %person% You have tranquilized all four of the manaweaver leaders.
       end
     end
     set person %person.next_in_room%

@@ -97,7 +97,7 @@ while %person%
     if %dodged%
       eval dodged %%self.dodged_%person.id%%%
     end
-    if !%person.aff_flagged(HIDE)%
+    if !%person.aff_flagged(HIDDEN)%
       if %dodged%
         %send% %person% &&wYou scramble out of the way as the colossus fires its eye lasers!&&0
         %echoaround% %person% &&w~%person% scrambles out of the way of the colossus's eye lasers!&&0
@@ -529,7 +529,7 @@ adventure~
 if !(summon /= %arg.car%)
   %teleport% %actor% %instance.real_location%
   %force% %actor% adventure
-  %teleport% %actor% %self%
+  %teleport% %actor% %self.room%
   return 1
   halt
 end
@@ -1109,7 +1109,7 @@ done
 ~
 #12538
 Other adventurer load~
-0 nx 100
+0 n 100
 ~
 if %self.room.template% == 12504
   %morph% %self% 12504

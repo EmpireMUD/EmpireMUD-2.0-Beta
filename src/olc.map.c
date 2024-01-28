@@ -2,7 +2,7 @@
 *   File: olc.map.c                                       EmpireMUD 2.0b5 *
 *  Usage: OLC for the map and map-building rooms                          *
 *                                                                         *
-*  EmpireMUD code base by Paul Clarke, (C) 2000-2015                      *
+*  EmpireMUD code base by Paul Clarke, (C) 2000-2024                      *
 *  All rights reserved.  See license.doc for complete information.        *
 *                                                                         *
 *  EmpireMUD based upon CircleMUD 3.0, bpl 17, by Jeremy Elson.           *
@@ -270,8 +270,20 @@ OLC_MODULE(mapedit_convert2newbie) {
 
 OLC_MODULE(mapedit_decay) {
 	room_data *room = HOME_ROOM(IN_ROOM(ch));
+	vehicle_data *veh;
 	
-	if (GET_ROOM_VNUM(room) >= MAP_SIZE) {
+	one_argument(argument, arg);
+	
+	if (*arg) {
+		if ((veh = get_vehicle_in_room_vis(ch, arg, NULL))) {
+			msg_to_char(ch, "Ok.\r\n");
+			annual_update_vehicle(veh);
+		}
+		else {
+			msg_to_char(ch, "You don't see %s %s here.\r\n", AN(arg), arg);
+		}
+	}
+	else if (GET_ROOM_VNUM(room) >= MAP_SIZE) {
 		msg_to_char(ch, "You can only decay map tiles.\r\n");
 	}
 	else {
@@ -342,7 +354,7 @@ OLC_MODULE(mapedit_terrain) {
 			}
 		}
 		else if (cp) {
-			if (!(sect = find_first_matching_sector(SECTF_CROP, NOBITS, GET_SECT_CLIMATE(SECT(IN_ROOM(ch)))))) {
+			if (!(sect = find_first_matching_sector(SECTF_CROP, NOBITS, get_climate(IN_ROOM(ch))))) {
 				msg_to_char(ch, "No crop sector types are set up.\r\n");
 				return;
 			}
@@ -747,7 +759,7 @@ OLC_MODULE(mapedit_naturalize) {
 				// already same -- but refresh crop type if applicable
 				if (SECT_FLAGGED(map->sector_type, SECTF_HAS_CROP_DATA)) {
 					if (room || (room = real_room(map->vnum))) {
-						new_crop = get_potential_crop_for_location(room, FALSE);
+						new_crop = get_potential_crop_for_location(room, NOTHING);
 						set_crop_type(room, new_crop ? new_crop : crop_table);
 					}
 				}
@@ -775,7 +787,7 @@ OLC_MODULE(mapedit_naturalize) {
 				
 				if (SECT_FLAGGED(map->natural_sector, SECTF_HAS_CROP_DATA)) {
 					room = real_room(map->vnum);	// need it loaded after all
-					new_crop = get_potential_crop_for_location(room, FALSE);
+					new_crop = get_potential_crop_for_location(room, NOTHING);
 					set_crop_type(room, new_crop ? new_crop : crop_table);
 				}
 				else {
@@ -813,7 +825,7 @@ OLC_MODULE(mapedit_naturalize) {
 		
 		// reset crop?
 		if (ROOM_SECT_FLAGGED(IN_ROOM(ch), SECTF_HAS_CROP_DATA)) {
-			new_crop = get_potential_crop_for_location(IN_ROOM(ch), FALSE);
+			new_crop = get_potential_crop_for_location(IN_ROOM(ch), NOTHING);
 			set_crop_type(IN_ROOM(ch), new_crop ? new_crop : crop_table);
 		}
 		

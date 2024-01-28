@@ -2,7 +2,7 @@
 *   File: comm.h                                          EmpireMUD 2.0b5 *
 *  Usage: header file: prototypes of public communication functions       *
 *                                                                         *
-*  EmpireMUD code base by Paul Clarke, (C) 2000-2015                      *
+*  EmpireMUD code base by Paul Clarke, (C) 2000-2024                      *
 *  All rights reserved.  See license.doc for complete information.        *
 *                                                                         *
 *  EmpireMUD based upon CircleMUD 3.0, bpl 17, by Jeremy Elson.           *
@@ -31,6 +31,7 @@ void send_to_outdoor(bool weather, const char *messg, ...) __attribute__((format
 void send_stacked_msgs(descriptor_data *desc);
 void stack_msg_to_desc(descriptor_data *desc, const char *messg, ...);
 void stack_simple_msg_to_desc(descriptor_data *desc, const char *messg);
+const char *telnet_go_ahead(descriptor_data *desc);
 void perform_to_all(const char *messg, char_data *ch);
 char *replace_prompt_codes(char_data *ch, char *str);
 char *prompt_color_by_prc(int cur, int max);
@@ -56,21 +57,48 @@ void update_reboot();
 #define BACKGROUND_WHITE  "\033[47m"
 
 
-// act() target flags
-#define TO_ROOM		BIT(0)	/* To everyone but ch				*/
-#define TO_VICT		BIT(1)	/* To vict_obj						*/
-#define TO_NOTVICT	BIT(2)	/* To everyone but ch and vict_obj	*/
-#define TO_CHAR		BIT(3)	/* To ch							*/
-#define TO_SLEEP	BIT(8)	/* to char, even if sleeping		*/
-#define TO_NODARK	BIT(9)	/* ignore darkness for CAN_SEE		*/
-#define TO_SPAMMY	BIT(10)	// check PRF_NOSPAM
-#define TO_NOT_IGNORING  BIT(11)	// doesn't send to people who are ignoring the main actor
-#define TO_IGNORE_BAD_CODE  BIT(12)	// ignores bad $ codes
-#define DG_NO_TRIG  BIT(13)	// don't check act trigger
-#define ACT_VEHICLE_OBJ  BIT(14)  // the middle/obj param is a vehicle
-#define TO_COMBAT_HIT  BIT(15)	// is a hit (fightmessages) -- REQUIRES vict_obj is a char
-#define TO_COMBAT_MISS  BIT(16)	// is a miss (fightmessages) -- REQUIRES vict_obj is a char
-#define TO_QUEUE  BIT(17)	// message goes into the stackable queue
+// act(): target flags
+#define TO_ROOM			BIT(0)	// To everyone but ch
+#define TO_VICT			BIT(1)	// To vict_obj
+#define TO_NOTVICT		BIT(2)	// To everyone but ch and vict_obj
+#define TO_CHAR			BIT(3)	// To ch
+
+// act(): modifier flags
+#define TO_SLEEP		BIT(4)	// to char, even if sleeping
+#define TO_NODARK		BIT(5)	// ignore darkness for CAN_SEE
+#define TO_SPAMMY		BIT(6)	// check PRF_NOSPAM
+#define TO_QUEUE		BIT(7)	// message goes into the stackable queue
+#define TO_GROUP_ONLY	BIT(8)	// only shows to members of ch's group
+#define TO_NOT_IGNORING	BIT(9)	// doesn't send to people who are ignoring the main actor
+#define TO_IGNORE_BAD_CODE	BIT(10)	// ignores bad $ codes
+#define DG_NO_TRIG		BIT(11)	// don't check act trigger
+
+// act(): things other than objects in the 'obj' slot (required)
+#define ACT_STR_OBJ		BIT(12)	// 'obj' param is a string
+#define ACT_VEH_OBJ		BIT(13)	// 'obj' param is a vehicle
+
+// act(): things other than mobs in the 'vict_obj' slot (required
+#define ACT_OBJ_VICT	BIT(14)	// 'vict_obj' is an object
+#define ACT_STR_VICT	BIT(15)	// 'vict_obj' is a string
+#define ACT_VEH_VICT	BIT(16)	// 'vict_obj' is a vehicle
+
+// act(): fmessage flags
+#define ACT_COMBAT_HIT	BIT(17)	// is a hit (fightmessages)
+#define ACT_COMBAT_MISS	BIT(18)	// is a miss (fightmessages)
+#define ACT_ANIMAL_MOVE	BIT(19)	// allows SM_ANIMAL_MOVEMENT to ignore the message
+#define ACT_BUFF		BIT(20)	// is a non-violent buff ability for FM_MY_BUFFS_IN_COMBAT, etc
+#define ACT_AFFECT		BIT(21)	// indicates it's an affect apply/wear-off for FM_*_AFFECTS_IN_COMBAT
+#define ACT_ABILITY		BIT(22)	// indicates it's an ability, for FM_ ability flags
+#define ACT_HEAL		BIT(23)	// is a heal, for FM_ flags
+
+// shorthand flags
+#define ACT_NON_OBJ_OBJ		(ACT_STR_OBJ | ACT_VEH_OBJ)
+#define ACT_NON_MOB_VICT	(ACT_OBJ_VICT | ACT_STR_VICT | ACT_VEH_VICT)
+
+
+// consts
+extern FILE *logfile;
+
 
 /* I/O functions */
 int write_to_descriptor(socket_t desc, const char *txt);

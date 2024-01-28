@@ -124,6 +124,13 @@ the adventure summon. (Except random-teleport.)
 
 See also: ACCEPT, COMBAT GIMMICK, DIFFICULTY SELECTOR, GROUP, NEARBY
 #
+AOE "AREA OF EFFECT" "AREA EFFECT" "AREA-OF-EFFECT"
+
+An area-of-effect ability is one that hits multiple targets in the room. In
+general, these abilities only target NPCs.
+
+Examples: OUTRAGE
+#
 ATTRIBUTES STATS
 
 Current stat implementations are as follows:
@@ -356,6 +363,8 @@ Advanced traits (require 12 hours of playtime):
  Salt blooded (never thirsty)
  Tenacious waif (never hungry)
  Surveyor (+1 view height)
+ Fireborn (tolerates warm climates)
+ Frostborn (tolerates cold climates)
 #
 BONUS-HEALING "BONUS HEALING" "HEALING ATTRIBUTE" "HEALING TRAIT"
 
@@ -376,7 +385,9 @@ is faster than that, a smaller amount may be added to your damage -- and the
 opposite if it's slower. It is worth 0.25 damage per second. Speed boosts like
 Wits and Haste will increase the percentage of bonus damage added.
 
-See also: SCORE
+Bonus-Magical will generally help you in the Caster or Solo roles.
+
+See also: CASTER, ROLE, SCORE, SOLO
 #
 BONUS-PHYSICAL "BONUS PHYSICAL" "PHYSICAL ATTRIBUTE" "PHYSICAL TRAIT"
 
@@ -389,7 +400,17 @@ is faster than that, a smaller amount may be added to your damage -- and the
 opposite if it's slower. It is worth 0.25 damage per second. Speed boosts like
 Wits and Haste will increase the percentage of bonus damage added.
 
-See also: SCORE
+Bonus-Physical will generally only help you in the Melee or Solo roles.
+
+See also: MELEE, ROLE, SCORE, SOLO
+#
+"BRIEF RESPITE" RESPITE
+
+After death, your character receives a brief respite during which they are
+unaffected by heat or cold. This should give you time to move if the location
+of your tomb is suffering inclement weather.
+
+See also: RESPAWN
 #
 "CAMPING FIRE" "COOKING FIRE" "CAMP FIRE"
 
@@ -512,7 +533,7 @@ on claimed land, or disappear over time on unclaimed land.
 The 'coins' command also shows special currencies (e.g. from adventures). You
 can search for specific ones by typing the name, such as 'coins permafrost'.
 
-See also: DEPOSIT, EXCHANGE, MINT, SPLIT, WITHDRAW
+See also: DEPOSIT, EXCHANGE, MINT, SPLIT, TREASURE, WITHDRAW
 #
 COMPONENT COMPONENTS RESOURCE RESOURCES
 
@@ -568,8 +589,13 @@ This command lists abilities and actions that you currently have cooling down.
 That is, things you can't use yet because the timer hasn't expired. Some
 abilities can only be used every so often, usually for reasons relating to
 game balance.
+
+If you don't want to see alerts when your cooldowns expire, you can turn them
+off with the "smessages" command.
+
+See also: STATUS MESSAGES
 #
-DAMAGE "DAMAGE TEXT" "DAMAGE MESSAGES" MAUL MASSACRE DECIMATE OBLITERATE ANNIHILATE MUTILATE SLAUGHTER ERADICATE **ERADICATE** LIQUIDATE **LIQUIDATE**
+DAMAGE "DAMAGE TEXT" "DAMAGE MESSAGES" SCRATCH BATTER WALLOP FEROCIOUSLY SAVAGELY MAUL RAVAGE MASSACRE DECIMATE BRUTALLY VICIOUSLY CRUSH WRECK OBLITERATE ANNIHILATE MUTILATE SLAUGHTER DEMOLISH DEVASTATE ERADICATE LIQUIDATE EXTERMINATE VANQUISH CONQUER
 
 Use the 'hit' command (or any attack ability) to initiate combat and deal
 damage to other creatures. Getting better gear will increase the a mount of
@@ -581,28 +607,62 @@ type of weapon and the amount of damage you dealt.
 
 Damage text:
       0 damage: miss
-      1 damage: tickle
-    2-3 damage: barely
-   4-10 damage: [normal]
-  11-14 damage: hard
-  15-16 damage: very hard
-  17-20 damage: extremely hard
-  21-24 damage: maul
-  25-28 damage: massacre
-  29-32 damage: decimate
-  33-45 damage: OBLITERATE
-  46-60 damage: ANNIHILATE
-  61-75 damage: MUTILATE
- 76-100 damage: SLAUGHTER
-101-125 damage: **ERADICATE**
-   126+ damage: **LIQUIDATE**
+      1 damage: rattle
+      2 damage: jostle
+      3 damage: tickle
+      4 damage: graze
+      5 damage: barely
+      6 damage: bruise
+      7 damage: scratch
+    8-9 damage: gently
+  10-11 damage: wound
+  12-13 damage: injure
+  14-15 damage: [normal]
+  16-18 damage: batter
+  19-22 damage: hard
+  23-26 damage: stagger
+  27-30 damage: very hard
+  31-35 damage: wallop
+  36-40 damage: extremely hard
+  41-45 damage: ferociously
+  46-50 damage: savagely
+  51-54 damage: maul
+  55-60 damage: ravage
+  61-65 damage: massacre
+  66-70 damage: decimate
+  71-80 damage: brutally
+  81-90 damage: viciously
+ 91-100 damage: CRUSH
+101-125 damage: WRECK
+126-150 damage: SHATTER
+151-175 damage: OBLITERATE
+176-200 damage: ANNIHILATE
+201-233 damage: MUTILATE
+234-266 damage: SLAUGHTER
+267-300 damage: **DEMOLISH**
+301-350 damage: **DEVASTATE**
+351-400 damage: **ERADICATE**
+401-450 damage: **LIQUIDATE**
+451-500 damage: **EXTERMINATE**
+501-550 damage: **VANQUISH**
+   551+ damage: **CONQUER**
 
 Examples:
   You slash the ship very hard!
   You SLAUGHTER the pig with your chop!
   You **LIQUIDATE** the ice sculpture with your fire!
 
-See also: CASTER DPS, DOT, HIT, MELEE DPS, METERS
+See also: CASTER DPS, DAMAGE NUMBERS, DOT, HIT, MELEE DPS, METERS
+#
+"DAMAGE NUMBERS"
+
+You can see the amount of damage you deal, as well as the amount dealt to you,
+by turning on "fmessages damage numbers". Damage you deal is shown as a
+positive number, and damage dealt to you is shown as a negative number.
+
+To see cumulative damage over the course of a fight, use "meters".
+
+See also: METERS
 #
 DARK NIGHT DIM "DIMLY-LIT" "DIMLY LIT"
 
@@ -647,8 +707,8 @@ telling you the area is depleted. For example, digging might tell you the
 ground is too hard and there are no good rocks left.
 
 Most depleted resources recover over time. In each tile, most of the depleted
-resources will return each year. However, mountains will ONLY replenish ore if
-you dismantle the mines on them completely before the end of the year.
+resources will return each reset cycle. However, mountains will ONLY replenish
+ore if you dismantle the mines on them completely before reset.
 
 Forests will spread at their edges over time, creating more trees to chop.
 Desert Groves grow out of desert tiles at random. If you leave stumps behind
@@ -658,6 +718,7 @@ the copses will grow into full forests or groves.
 Some vehicles and buildings have their own depletions, separate from the
 location they are in.
 
+See also: WORLD RESET
 Immortals see also: OLC DEPLETION
 #
 DEXTERITY DEX
@@ -678,8 +739,10 @@ See also: ATTRIBUTES, MELEE, CASTER, TANK, TO-HIT, DODGE
 "DIMINISHING RETURNS"
 
 Diminishing returns are numbers that increase quickly at low levels, but more
-slowly at higher levels. For example, the first +20 dodge you get is applied
-directly, but the next +20 dodge only brings you up to +30.
+slowly at higher levels. For example, the first +20 you get in a diminishing
+stat is applied directly, but the next +20 only brings you up to +30.
+
+This is currently only used for resistances.
 #
 DISPLAY
 
@@ -777,7 +840,7 @@ Temperate crops (plains):
  &g%&Bo&g%%&0  Blueberries         &Y^^&Ro&Y^&0  Cherries             &Y^&to&Y^^&0  Coffee
  &giiii&0  Corn                &T,,,,&0  Garlic               &gxgxx&0  Grapes
  &g::::&0  Hops                &Tiiii&0  Oats                 &Y^o^^&0  Peaches
- &G....&0  Peas                &g^^&vo&g^&0  Plums                &gnnnn&0  Potatoes
+ &G&u....&0  Peas                &g^^&vo&g^&0  Plums                &gnnnn&0  Potatoes
  &gn&Rv&gnn&0  Strawberries        &Ro&g88&Ro&0  Tomatoes             &Y;;;;&0  Wheat
 
 River crops (plains near river):
@@ -799,8 +862,8 @@ Newbie island crops:
 
 Most crops are used to make food and drink. Some, like cotton, have other uses.
 Make sure you claim all your map tiles that have crops as unclaimed crops may
-vanish at the end of the year. Crops can be burnt to remove them, even when
-they're still growing.
+vanish on their own. Crops can be burnt to remove them, even when they're still
+growing.
 
 See also: BURN, CHOP, COOK, FORAGE, HARVEST, MILL, PICK, PLANT, TAVERN, WEAVE,
    IRRIGATION
@@ -845,14 +908,15 @@ Type:  passive (you can go as low as 0)
 Greatness is a measure of the majesty your character portrays, as well as how
 others perceive you.
 
+Each character also contributes their Greatness score to their empire. This
+amount never goes down; it's always the highest Greatness the character has had
+since joining the empire. If you have multiple alts (your other characters) in
+the same empire, only the highest Greatness among them is counted.
+
 Greatness is used for:
  - Increasing the amount of territory your empire can control.
  - Increasing your empire's score and ranking.
  - Certain synergy abilities such as Noble Bearing.
-
-Empires also have a Greatness rating, equal to the total Greatness of their
-members. However, if you have multiple alts (your other characters) in the same
-empire, only the highest Greatness is counted.
 
 See also: ALTS, ATTRIBUTES, ESCORE, TERRITORY, NOBLE BEARING
 #
@@ -941,7 +1005,12 @@ are hungry, thirsty, or blood-starved.
 Regeneration drops to very low levels when a character is hungry, thirsty, or
 starving. Sleeping may be the only way to regenerate in this case.
 
-See also: BLOOD, EAT, UNNATURAL THIRST, REGENS, SATED THIRST, SLEEP, TIME
+You can turn off the hunger, thirst, and low blood warnings with the
+"smessages" command. These conditions can also be put into your prompt or found
+through MSDP.
+
+See also: BLOOD, EAT, MSDP, PROMPT, REGENS, SATED THIRST, SLEEP, 
+   STATUS MESSAGES, TIME, UNNATURAL THIRST
 #
 INFRA INFRAVISION
 
@@ -1018,6 +1087,9 @@ Composite/total level: This is the sum of your skill and gear levels. It is the
    number used for scaling mobs to fight you. This is the level shown on your
    "score".
 
+Levels for mobs and items are rounded up to the next 5 (e.g. 73 to 75, 109 to
+110).
+
 Note: Until level 100, you must be in the same level range as an item
    (1-50, 50-75, 75-100, or 100+) or higher to equip it. After level 100, you
    can't use gear that's more than 25 levels above you (50 for BoP items). Your
@@ -1060,7 +1132,7 @@ The mana pool is the amount of magical energy you can channel before you must
 stop to recover some. All players begin with 50 mana points. Some abilities and
 gear give you a larger mana pool, and you can enchant gear to get even more.
 
-See also: ARCANE POWER, GIFT OF NATURE, SOLAR POWER
+See also: ARCANE POWER, GIFT OF NATURE, BY THE SUN AND STARS
 #
 MAP-MEMORY "MAP MEMORY"
 
@@ -1161,6 +1233,8 @@ EmpireMUD supports the following MSDP variables:
  BONUS_EXP - Daily bonus experience remaining
  INVENTORY - Current inventory size
  INVENTORY_MAX - Maximum inventory size
+ TEMPERATURE - Numeric value of player's temperature
+ TEMPERATURE_LABEL - Player's temperature as a string
 
  Current attributes: STR, DEX, CHA, GRT, INT, WIT
  Natural attributes: STR_PERM, DEX_PERM, CHA_PERM, GRT_PERM, INT_PERM, WIT_PERM
@@ -1205,6 +1279,8 @@ EmpireMUD supports the following MSDP variables:
  WORLD_MONTH - Current month (January, etc)
  WORLD_YEAR - Current year number
  WORLD_SEASON - Current season
+ AMBIENT_TEMPERATURE - Numeric value of room temperature
+ AMBIENT_TEMPERATURE_LABEL - Room temperature as a string
 
  The following GUI variables are provided, for a generic GUI:
   BUTTON_1, BUTTON_2, BUTTON_3, BUTTON_4, BUTTON_5
@@ -1217,7 +1293,9 @@ Usage:  mudstats <option>
 This command displays various statistics about this EmpireMUD.
 
 Options:
- - empires: Shows averages for the numbers used to compute empire scores.
+ configs: Shows how the game is configured.
+ empires: Shows averages for the numbers used to compute empire scores.
+ time: Shows time left until events such as the next daily cycle.
 #
 MULTIPLAYING MULTI-PLAYING "MULTI PLAYING"
 
@@ -1242,10 +1320,24 @@ If you have the Navigation ability, this will also include the location.
 You can specify what type of thing to look (cities, adventures, starting
 locations) if you want a shorter list, or you can specify search terms.
 
+Nearby has a default range of 50 tiles. Some buildings, items, and effects can
+increase this. When used on a newbie island, it only shows locations on the
+island.
+
 Certain adventures won't show up on 'nearby', usually because of the
 adventure's design.
 
-See also: LEVEL COLORS
+See also: LEVEL COLORS, NEARBY RANGE
+#
+NEARBY-RANGE "NEARBY RANGE"
+
+Items and effects can increase or decrease the range of your "nearby" command.
+Some buildings also increase the range. These effects are cumulative.
+
+You can view your current nearby range by typing "nearby"; it's given at the
+top.
+
+See also: NEARBY
 #
 "NEWBIE ISLANDS"
 
@@ -1256,6 +1348,9 @@ may happen on newbie islands:
   (they may still claim a small number of tiles).
 - The map returns to its natural state each week on the newbie island.
 - Hostile mobs like the highwayman won't attack you on a newbie island.
+
+When you found your empire's first city, anything stored on a newbie island is
+automatically transferred there as a courtesy.
 
 See also: INFO, GETTING STARTED
 #
@@ -1348,7 +1443,7 @@ You can identify items to see which quest they belong to.
 
 See also: IDENTIFY
 #
-REGEN REGENS REGENERATION "REGEN RATE" "MANA REGENERATION" "MOVE REGENERATION" "HEALTH REGENERATION"
+REGEN REGENS REGENERATION "REGEN RATE" "MANA REGENERATION" "MOVE REGENERATION" "HEALTH REGENERATION" MANA-REGEN MOVE-REGEN
 
 'Regens' refer to the rate at which a character regenerates health, moves, or
 mana. For example, your 'mana regen' is the amount of mana you gain every 5
@@ -1441,6 +1536,8 @@ to the level of the player or group that is fighting them. Each mob has a
 minimum and maximum scale level, and will scale to any level in that range,
 based on the composite skill of the player.
 
+Levels for mobs are rounded up to the next 5 (e.g. 73 to 75, 109 to 110).
+
 Some mobs have additional adjustments that make them harder or require more
 effort to beat them. You can use the 'consider' command to determine if you
 should be fighting a given mob.
@@ -1457,6 +1554,7 @@ Usage:  scan <direction>
         scan <tile/vehicle name>
         scan <claimed/unclaimed/foreign/adventures>
         scan [max-distance] [-direction]
+        scan <-distance | +distance>
 
 This command shows you the same information as the screen-reader map display,
 but in only one direction. The distance you see on a scan is based on your
@@ -1476,6 +1574,12 @@ All scans may include the max-distance and -direction modifiers. This lets you
 specify a shorter distance, such as "scan 1" or "scan forest 3", or filter a
 specific direction from a larger scan, such as "scan forest -east". This is
 different from scanning in a direction with "scan east".
+
+When scanning just by max-distance, a plus in front of the distance ("scan +2")
+will show all tiles within that distance individually; distance with a dash
+("scan -2") will show all tiles organized into approxiate directions. A
+distance without the dash or plus ("scan 2") will do a normal 8-direction scan
+showing each direction up to that distance.
 
 Example:
  > scan southwest
@@ -1572,6 +1676,20 @@ head, and then crafting the spear from the spearhead and the handle.
 
 See also: CRAFT, CHIP, FISH
 #
+SPEED "COMBAT SPEED" "FIGHT SPEED" "FIGHTING SPEED"
+
+On EmpireMUD, combat is speed-based, not round-based or turn-based. Each
+weapon or other attack has an associated speed, which determines how long or
+short your character waits between attacks.
+
+Your current speed is shown on your score display. A lower speed is better,
+since it is the time between attacks.
+
+Things that boost your speed, such as Wits and Hasten, increase your damage
+proportionally.
+
+See also: SCORE, WITS, HASTEN, SLOW
+#
 STRENGTH STR
 
 Strength (physical attribute)
@@ -1586,7 +1704,7 @@ Strength is used for:
  - Increasing melee DPS (damage per second) from physical weapons.
  - Wearing heavy armor (tank armor sometimes has -STRENGTH).
 
-See also: ATTRIBUTES, MELEE DPS, CHOP, MINE
+See also: ATTRIBUTES, MELEE DPS
 #
 STUMPS COPSE COPPICE COPPICING
 
@@ -1611,6 +1729,21 @@ Characters will normally recover from this through normal regeneration.
 Note: Some scripting NPCs can stun characters even while they have stun
 immunity. This is part of the combat script.
 #
+SUN SUNRISE SUNSET DAY
+
+The sun generally rises and sets each day, with the exact time determined by
+the time of year and the latitude where you're standing on the map.
+
+If you have not already typed "look" or moved around as the sun rises or sets,
+you will automatically look at the map (you can disable this with the command
+"smessages sun auto look"). The "smessages" command can also be used to turn
+off sunrise and sunset messages.
+
+You can check the current time of day with the "time" command, which will also
+tell you whether it's daytime or nighttime.
+
+See also: PROMPT, STATUS MESSAGES, TIME
+#
 TAGS "MOB TAGS" TAGGING "MOB TAGGING"
 
 When a player damages a mob, that mob becomes tagged by the player and his or
@@ -1626,15 +1759,20 @@ See also: BINDING
 This game has different time zones that depend on how far east or west you
 travel on the map. By default, the world has 24 time zones and wraps from east
 to west. The latest time zone is always the one that's furthest east, and is
-the time zone used for global events like the yearly reset.
+the time zone used for global events.
 
-See also: TIME, YEARLY RESET
+See also: TIME
 #
 TIP TIPS "TIP OF THE DAY" HINT
 
 Usage:  tip
 
 This command will give you a helpful tip about the game.
+
+You also receive an automatic tip when you log into the game -- unless you
+toggle tutorials off.
+
+See also: TUTORIALS
 #
 TO-HIT "TO HIT" TOHIT "HIT CHANCE" "HIT CAP"
 
@@ -1675,6 +1813,17 @@ around the world. These types of transportation require harnessed animals to
 lead them, but can store far more than you can carry alone.
 
 See also: WOODWORKING, RIDE, HARNESS, PUT, GET
+#
+TREASURE TREASURES
+
+An empire's treasure is the part of their wealth that's made of valuable items
+and precious metals, excluding coins. Storing an item that gives wealth (as
+shown on "identify") will increase the treasure shown on your "estats".
+
+Many types of treasure can be minted to produce coins. This does not change the
+value; you get 10x the wealth rating in coins, and coins are worth 0.1 wealth.
+
+See also: COINS, ESTATS, IDENTIFY, MINT, WEALTH
 #
 TOOL TOOLS "TOOL TYPES" "TOOL FLAGS"
 
@@ -1725,18 +1874,44 @@ people.
 See also: BOARD, CUSTOMIZE, DESIGNATE, DISEMBARK, DRAG, DRIVE, HARNESS,
 LAND VEHICLES, LEAD, LIGHT, REPAIR, SCRAP, SHIPS, SIT
 #
-WATERWALK "WATER WALK" "WATER WALKING" "WALK ON WATER" "WALKING ON WATER"
+WATERWALK "WATER WALK" "WATER WALKING" "WALK ON WATER" "WALKING ON WATER" WATERWALKING
 
-The WATERWALK effect allows you to walk normally on water. You will not drown
-or lose movement points from swimming.
+The WATERWALKING effect allows you to walk normally on water. You will not
+drown or lose movement points from swimming.
 
-Normal land mounts do not benefit from WATERWALK on the player -- you still
+Normal land mounts do not benefit from WATERWALKING on the player -- you still
 need the correct mount ability to cross water while mounted.
 
 On mobs, this is different from the AQUATIC mob flag, which allows the mob to
 move on water but forbids it from moving onto land.
 
 See also: DROWNING
+#
+WHERE
+
+Usage:  where [name]
+
+If you provide a name, tells you the location of the nearest person or creature
+with that name.
+
+If used with no argument, "where" instead tells you the location of all players
+around you. This will also show your current maximum range.
+
+Example:
+  > where
+  > where dragon
+
+See also: MASTER TRACKER, NO TRACE, UNSEEN PASSING, WHERE RANGE
+#
+WHERE-RANGE "WHERE RANGE"
+
+Items and effects can increase or decrease the range of your "where" command.
+Some abilities also increase the range. These effects are cumulative.
+
+You can view your current where range by typing "where" by itself; it's given
+at the top.
+
+See also: WHERE
 #
 WHEREAMI "WHERE AM I"
 
@@ -1781,23 +1956,27 @@ tier above that.
 
 Many different types of items and recipes appear as world drops.
 #
-"YEARLY RESET" EARTHQUAKE QUAKE "NEW YEAR" "NEW YEARS"
+"WORLD RESET" "YEARLY RESET" EARTHQUAKE QUAKE "NEW YEAR" "NEW YEARS" "DEPLETION RESET" "MINE RESET" "MAINTENANCE RESET" "RESET CYCLE" "MAINTENANCE CYCLE" "DEPLETION CYCLE"
 
-When the game world reaches a new year, there is an earthquake with the message
-'The ground under you shakes violently!' This causes a little damage to
-buildings and vehicles; they now require maintenance.
+The game periodically resets its mines and other depletions and dilapidates
+buildings and vehicles, which need maintenance. You can view the time left
+until the next reset by typing "mudstats time".
 
-This yearly reset also refreshes any mountain tile that no longer has a mine or
-other building on it, giving them a new type and fresh amount of ore. Other
-types of depletion, such as areas that have been dug until there's nothing left
-to dig up, refresh by 50% during the yearly reset -- even if there's still a
-building on them.
+This is accompanied by a message that 'The ground under you shakes violently!'
 
-The new year and earthquake happen at the end of December 30 and start of
-January 1 on the 'time' command in the latest time zone in the game. This means
-they may happen before the end of December 30 for many players.
+This reset only refreshes mountain tiles that no longer have a mine or other
+building on them, giving them a new type and fresh amount of ore.
 
-See also: MAINTAIN, TIME, TIME ZONE
+All other types of depletion, such as areas that have been dug until there's
+nothing left to dig up, refresh most of their resources during this reset, even
+if there's still a building on them.
+
+This reset was, in days past, linked to the game's calendar year and happened
+on December 30 or January 1, depending on your location in the world. Now, it
+happens on its own cycle (usually every 7.5 real days). However, it is still
+sometimes called the "yearly reset".
+
+See also: MAINTAIN, MUDSTATS, TIME, TIME ZONE
 #
 ZENITH "ZENITH PASSAGE" "SUN ZENITH"
 

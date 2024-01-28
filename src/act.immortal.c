@@ -2,7 +2,7 @@
 *   File: act.immortal.c                                  EmpireMUD 2.0b5 *
 *  Usage: Player-level imm commands and other goodies                     *
 *                                                                         *
-*  EmpireMUD code base by Paul Clarke, (C) 2000-2015                      *
+*  EmpireMUD code base by Paul Clarke, (C) 2000-2024                      *
 *  All rights reserved.  See license.doc for complete information.        *
 *                                                                         *
 *  EmpireMUD based upon CircleMUD 3.0, bpl 17, by Jeremy Elson.           *
@@ -23,6 +23,7 @@
 #include "skills.h"
 #include "olc.h"
 #include "dg_scripts.h"
+#include "dg_event.h"
 #include "constants.h"
 
 /**
@@ -45,7 +46,6 @@ extern int buf_switches, buf_largecount, buf_overflows, top_of_helpt;
 extern int total_accounts, active_accounts, active_accounts_week;
 
 // external functions
-char *ability_color(char_data *ch, ability_data *abil);
 struct instance_data *build_instance_loc(adv_data *adv, struct adventure_link_rule *rule, room_data *loc, int dir);
 void Crash_listrent(char_data *ch, char *name);
 void do_stat_vehicle(char_data *ch, vehicle_data *veh);
@@ -81,6 +81,41 @@ void decustomize_island(int island_id) {
 			EMPIRE_NEEDS_SAVE(emp) = TRUE;
 		}
 	}
+}
+
+
+/**
+* Approves a character.
+*
+* @param char_data *ch The character to approve.
+*/
+void perform_approve(char_data *ch) {
+	if (config_get_bool("approve_per_character")) {
+		SET_BIT(PLR_FLAGS(ch), PLR_APPROVED);
+	}
+	else {	// per-account (default)
+		SET_BIT(GET_ACCOUNT(ch)->flags, ACCT_APPROVED);
+		SAVE_ACCOUNT(GET_ACCOUNT(ch));
+	}
+	
+	if (GET_ACCESS_LEVEL(ch) < LVL_MORTAL) {
+		GET_ACCESS_LEVEL(ch) = LVL_MORTAL;
+	}
+	
+	SAVE_CHAR(ch);
+}
+
+
+/**
+* Rescinds approval for a character.
+*
+* @param char_data *ch The character to unapprove.
+*/
+void perform_unapprove(char_data *ch) {
+	REMOVE_BIT(GET_ACCOUNT(ch)->flags, ACCT_APPROVED);
+	SAVE_ACCOUNT(GET_ACCOUNT(ch));
+	REMOVE_BIT(PLR_FLAGS(ch), PLR_APPROVED);
+	SAVE_CHAR(ch);
 }
 
 
@@ -141,6 +176,7 @@ static void perform_goto(char_data *ch, room_data *to_room) {
 	char_from_room(ch);
 	char_to_room(ch, to_room);
 	GET_LAST_DIR(ch) = NO_DIR;
+	RESET_LAST_MESSAGED_TEMPERATURE(ch);
 
 	if (!IS_NPC(ch) && POOFIN(ch)) {
 		if (!strstr(POOFIN(ch), "$n"))
@@ -165,7 +201,8 @@ static void perform_goto(char_data *ch, room_data *to_room) {
 	
 	qt_visit_room(ch, IN_ROOM(ch));
 	look_at_room(ch);
-	enter_wtrigger(IN_ROOM(ch), ch, NO_DIR, "goto");
+	enter_triggers(ch, NO_DIR, "goto", FALSE);
+	greet_triggers(ch, NO_DIR, "goto", FALSE);
 	msdp_update_room(ch);	// once we're sure we're staying
 }
 
@@ -194,7 +231,7 @@ void perform_immort_invis(char_data *ch, int level) {
 
 /* Immortal visible command, different than mortals' */
 void perform_immort_vis(char_data *ch) {
-	if (GET_INVIS_LEV(ch) == 0 && !AFF_FLAGGED(ch, AFF_HIDE) && !PRF_FLAGGED(ch, PRF_WIZHIDE | PRF_INCOGNITO)) {
+	if (GET_INVIS_LEV(ch) == 0 && !AFF_FLAGGED(ch, AFF_HIDDEN) && !PRF_FLAGGED(ch, PRF_WIZHIDE | PRF_INCOGNITO)) {
 		send_to_char("You are already fully visible.\r\n", ch);
 		return;
 	}
@@ -326,6 +363,7 @@ ADMIN_UTIL(util_redo_islands);
 ADMIN_UTIL(util_rescan);
 ADMIN_UTIL(util_resetbuildingtriggers);
 ADMIN_UTIL(util_strlen);
+ADMIN_UTIL(util_temperature);
 ADMIN_UTIL(util_tool);
 ADMIN_UTIL(util_wipeprogress);
 ADMIN_UTIL(util_yearly);
@@ -351,6 +389,7 @@ struct {
 	{ "rescan", LVL_START_IMM, util_rescan },
 	{ "resetbuildingtriggers", LVL_CIMPL, util_resetbuildingtriggers },
 	{ "strlen", LVL_START_IMM, util_strlen },
+	{ "temperature", LVL_START_IMM, util_temperature },
 	{ "tool", LVL_IMPL, util_tool },
 	{ "wipeprogress", LVL_CIMPL, util_wipeprogress },
 	{ "yearly", LVL_CIMPL, util_yearly },
@@ -480,7 +519,7 @@ ADMIN_UTIL(util_bldconvert) {
 	// stuff to copy
 	bitvector_t functions = NOBITS, designate = NOBITS, room_affs = NOBITS;
 	int fame = 0, military = 0, max_dam = 0, extra_rooms = 0;
-	struct resource_data *yearly_maintenance = NULL;
+	struct resource_data *regular_maintenance = NULL;
 	struct interaction_item *interactions = NULL;
 	struct extra_descr_data *ex_descs = NULL;
 	struct bld_relation *relations = NULL;
@@ -591,8 +630,8 @@ ADMIN_UTIL(util_bldconvert) {
 		GET_BLD_DESIGNATE_FLAGS(to_bld) = NOBITS;
 		room_affs = GET_BLD_BASE_AFFECTS(to_bld);
 		GET_BLD_BASE_AFFECTS(to_bld) = NOBITS;
-		yearly_maintenance = GET_BLD_YEARLY_MAINTENANCE(to_bld);
-		GET_BLD_YEARLY_MAINTENANCE(to_bld) = NULL;
+		regular_maintenance = GET_BLD_REGULAR_MAINTENANCE(to_bld);
+		GET_BLD_REGULAR_MAINTENANCE(to_bld) = NULL;
 		
 		// flags that change
 		REMOVE_BIT(GET_BLD_FLAGS(to_bld), BLD_OPEN | BLD_CLOSED | BLD_TWO_ENTRANCES);
@@ -647,7 +686,7 @@ ADMIN_UTIL(util_bldconvert) {
 		spawns = copy_spawn_list(GET_BLD_SPAWNS(from_bld));
 		relations = copy_bld_relations(GET_BLD_RELATIONS(from_bld));
 		interactions = copy_interaction_list(GET_BLD_INTERACTIONS(from_bld));
-		yearly_maintenance = copy_resource_list(GET_BLD_YEARLY_MAINTENANCE(from_bld));
+		regular_maintenance = copy_resource_list(GET_BLD_REGULAR_MAINTENANCE(from_bld));
 		
 		// validate ruins
 		LL_FOREACH_SAFE(interactions, inter, next_inter) {
@@ -754,7 +793,7 @@ ADMIN_UTIL(util_bldconvert) {
 		VEH_RELATIONS(to_veh) = relations;
 		VEH_ROOM_AFFECTS(to_veh) = room_affs | ROOM_AFF_NO_WORKFORCE_EVOS;
 		VEH_SPAWNS(to_veh) = spawns;
-		VEH_YEARLY_MAINTENANCE(to_veh) = yearly_maintenance;
+		VEH_REGULAR_MAINTENANCE(to_veh) = regular_maintenance;
 		
 		if (room_affs) {
 			sprintbit(room_affs, room_aff_bits, buf, TRUE);
@@ -866,7 +905,7 @@ ADMIN_UTIL(util_bldconvert) {
 			continue;	// skip self
 		}
 		LL_FOREACH(GET_BLD_INTERACTIONS(bld_iter), inter) {
-			if (interact_vnum_types[inter->type] == TYPE_BLD && inter->vnum == from_vnum) {
+			if (interact_data[inter->type].vnum_type == TYPE_BLD && inter->vnum == from_vnum) {
 				msg_to_char(ch, "- Building %d %s in interactions for BLD [%d %s].\r\n", to_vnum, GET_BLD_NAME(from_bld), GET_BLD_VNUM(bld_iter), GET_BLD_NAME(bld_iter));
 				break;
 			}
@@ -934,7 +973,7 @@ ADMIN_UTIL(util_bldconvert) {
 			msg_to_char(ch, "- Building %d %s in interior room for VEH [%d %s].\r\n", to_vnum, GET_BLD_NAME(from_bld), VEH_VNUM(veh_iter), VEH_SHORT_DESC(veh_iter));
 		}
 		LL_FOREACH(VEH_INTERACTIONS(veh_iter), inter) {
-			if (interact_vnum_types[inter->type] == TYPE_BLD && inter->vnum == from_vnum) {
+			if (interact_data[inter->type].vnum_type == TYPE_BLD && inter->vnum == from_vnum) {
 				msg_to_char(ch, "- Building %d %s in interaction for VEH [%d %s].\r\n", to_vnum, GET_BLD_NAME(from_bld), VEH_VNUM(veh_iter), VEH_SHORT_DESC(veh_iter));
 				break;
 			}
@@ -995,7 +1034,7 @@ PLAYER_UPDATE_FUNC(update_clear_roles) {
 	}
 	
 	GET_CLASS_ROLE(ch) = ROLE_NONE;
-	assign_class_abilities(ch, NULL, NOTHING);
+	assign_class_and_extra_abilities(ch, NULL, NOTHING);
 	
 	if (!is_file) {
 		msg_to_char(ch, "Your group role has been reset.\r\n");
@@ -1076,7 +1115,7 @@ ADMIN_UTIL(util_exportcsv) {
 			// wear, type, flags, attack
 			sprintbit(GET_OBJ_WEAR(obj) & ~ITEM_WEAR_TAKE, wear_bits, str1, TRUE);
 			sprintbit(GET_OBJ_EXTRA(obj), extra_bits, str2, TRUE);
-			fprintf(fl, "%s,%s,%s,%s,", str1, item_types[GET_OBJ_TYPE(obj)], str2, IS_WEAPON(obj) ? attack_hit_info[GET_WEAPON_TYPE(obj)].name : "");
+			fprintf(fl, "%s,%s,%s,%s,", str1, item_types[GET_OBJ_TYPE(obj)], str2, IS_WEAPON(obj) ? get_attack_name_by_vnum(GET_WEAPON_TYPE(obj)) : "");
 			
 			// applies, affects, triggers
 			fprintf(fl, "\"");	// leading quote for applies
@@ -1347,6 +1386,7 @@ ADMIN_UTIL(util_rescan) {
 		reread_empire_tech(emp);
 		refresh_empire_goals(emp, NOTHING);
 		refresh_empire_dropped_items(emp);
+		check_ruined_cities(emp);
 		send_config_msg(ch, "ok_string");
 	}
 }
@@ -1397,6 +1437,120 @@ ADMIN_UTIL(util_strlen) {
 	msg_to_char(ch, "strlen: %d\r\n", (int)strlen(argument));
 	msg_to_char(ch, "color_strlen: %d\r\n", (int)color_strlen(argument));
 	msg_to_char(ch, "color_code_length: %d\r\n", color_code_length(argument));
+}
+
+
+ADMIN_UTIL(util_temperature) {
+	int calc_temp, climate_val, season_count, season_val, sun_count, sun_val, bit, find;
+	int use_sun = get_sun_status(IN_ROOM(ch)), use_season = GET_SEASON(IN_ROOM(ch));
+	double season_mod, sun_mod, temperature, cold_mod, heat_mod;
+	bitvector_t climates;
+	char cold_mod_part[256], heat_mod_part[256], season_part[256], sun_part[256], arg[MAX_INPUT_LENGTH];
+	
+	argument = one_argument(argument, arg);
+	while (*arg) {
+		if ((find = search_block(arg, sun_types, FALSE)) != NOTHING) {
+			use_sun = find;
+		}
+		else if ((find = search_block(arg, icon_types, FALSE)) != NOTHING && find != TILESET_ANY) {
+			use_season = find;
+		}
+		else {
+			msg_to_char(ch, "Invalid argument: %s\r\n", arg);
+			return;
+		}
+		
+		// repeat
+		argument = one_argument(argument, arg);
+	}
+	
+	msg_to_char(ch, "Temperature information for this room:\r\n");
+	
+	// init
+	climate_val = 0;
+	season_val = season_temperature[use_season];
+	sun_val = sun_temperature[use_sun];
+	season_count = sun_count = 0;
+	season_mod = sun_mod = 0.0;
+	cold_mod = heat_mod = 1.0;
+	climates = get_climate(IN_ROOM(ch));
+	
+	msg_to_char(ch, "Base season value: %+d (%s)\r\n", season_val, icon_types[use_season]);
+	msg_to_char(ch, "Base sun value: %+d (%s)\r\n", sun_val, sun_types[use_sun]);
+	
+	// determine climates
+	for (bit = 0; climates; ++bit, climates >>= 1) {
+		if (IS_SET(climates, BIT(0))) {
+			climate_val += climate_temperature[bit].base_add;
+			
+			if (climate_temperature[bit].season_weight != NO_TEMP_MOD) {
+				season_mod += climate_temperature[bit].season_weight;
+				++season_count;
+				snprintf(season_part, sizeof(season_part), "%.1f%%", 100.0 * climate_temperature[bit].season_weight);
+			}
+			else {
+				strcpy(season_part, "no mod for");
+			}
+			if (climate_temperature[bit].sun_weight != NO_TEMP_MOD) {
+				sun_mod += climate_temperature[bit].sun_weight;
+				++sun_count;
+				snprintf(sun_part, sizeof(sun_part), "%.1f%%", 100.0 * climate_temperature[bit].sun_weight);
+			}
+			else {
+				strcpy(sun_part, "no mod for");
+			}
+			
+			if (climate_temperature[bit].cold_modifier != NO_TEMP_MOD && climate_temperature[bit].cold_modifier != 1.0) {
+				cold_mod *= climate_temperature[bit].cold_modifier;
+				snprintf(cold_mod_part, sizeof(cold_mod_part), ", %.2f cold modifier", climate_temperature[bit].cold_modifier);
+			}
+			else {
+				*cold_mod_part = '\0';
+			}
+			if (climate_temperature[bit].heat_modifier != NO_TEMP_MOD && climate_temperature[bit].heat_modifier != 1.0) {
+				heat_mod *= climate_temperature[bit].heat_modifier;
+				snprintf(heat_mod_part, sizeof(heat_mod_part), ", %.2f heat modifier", climate_temperature[bit].heat_modifier);
+			}
+			else {
+				*heat_mod_part = '\0';
+			}
+			
+			msg_to_char(ch, "%s: %+d, %s sun, %s seasonal%s%s\r\n", climate_flags[bit], climate_temperature[bit].base_add, sun_part, season_part, cold_mod_part, heat_mod_part);
+		}
+	}
+	
+	// final math
+	temperature = climate_val;
+	
+	if (season_count > 0) {
+		season_mod /= season_count;
+		temperature += season_val * season_mod;
+	}
+	else {
+		temperature += sun_val;
+	}
+	
+	if (sun_count > 0) {
+		sun_mod /= sun_count;
+		temperature += sun_val * sun_mod;
+	}
+	else {
+		temperature += sun_val;
+	}
+	
+	// overall modifiers
+	if (temperature < 0) {
+		temperature *= cold_mod;
+	}
+	if (temperature > 0) {
+		temperature *= heat_mod;
+	}
+	
+	msg_to_char(ch, "Final temperature: %.1f (%s), %.1f%% sun, %.1f%% seasonal\r\n", temperature, temperature_to_string((int) (temperature + 0.5)), 100.0 * sun_mod, 100.0 * season_mod);
+	
+	// and now using internal funcs
+	calc_temp = calculate_temperature(TEMPERATURE_USE_CLIMATE, get_climate(IN_ROOM(ch)), use_season, use_sun);
+	msg_to_char(ch, "Computed temperature for verification: %d %s.\r\n", calc_temp, temperature_to_string(calc_temp));
 }
 
 
@@ -1571,7 +1725,7 @@ void do_instance_delete_all(char_data *ch, char *argument) {
 	// warn players of lag on 'all'
 	LL_FOREACH(descriptor_list, desc) {
 		if (STATE(desc) == CON_PLAYING && desc->character) {
-			write_to_descriptor(desc->descriptor, "The game is performing a brief update... this will take a moment.\r\n");
+			write_to_descriptor(desc->descriptor, "\r\nThe game is performing a brief update... this will take a moment.\r\n");
 			desc->has_prompt = FALSE;
 		}
 	}
@@ -1969,10 +2123,11 @@ struct set_struct {
 		{ "drunk",		LVL_START_IMM, 	BOTH, 	MISC },
 		{ "hunger",		LVL_START_IMM, 	BOTH, 	MISC },
 		{ "thirst",		LVL_START_IMM, 	BOTH, 	MISC },
-		{ "account",	LVL_START_IMM,	PC,		MISC },
+		{ "account",	LVL_TO_SEE_ACCOUNTS, PC,MISC },
 		{ "access",		LVL_CIMPL, 	PC, 	NUMBER },
 		{ "siteok",		LVL_START_IMM, 	PC, 	BINARY },
 		{ "nowizlist", 	LVL_START_IMM, 	PC, 	BINARY },
+		{ "nofriends", 	LVL_START_IMM, 	PC, 	BINARY },
 		{ "loadroom", 	LVL_START_IMM, 	PC, 	MISC },
 		{ "password",	LVL_CIMPL, 	PC, 	MISC },
 		{ "nodelete", 	LVL_CIMPL, 	PC, 	BINARY },
@@ -2002,6 +2157,7 @@ struct set_struct {
 		{ "mount", LVL_START_IMM, PC, MISC },
 		{ "currency", LVL_START_IMM, PC, MISC },
 		{ "companion", LVL_START_IMM, PC, MISC },
+		{ "unlockedarchetype", LVL_START_IMM, PC, MISC },
 
 		{ "strength",	LVL_START_IMM,	BOTH,	NUMBER },
 		{ "dexterity",	LVL_START_IMM,	BOTH,	NUMBER },
@@ -2108,25 +2264,8 @@ int perform_set(char_data *ch, char_data *vict, int mode, char *val_arg) {
 		affect_total(vict);
 	}
 	else if SET_CASE("greatness") {
-		// only update greatness if ch is in a room (playing)
-		emp = GET_LOYALTY(vict);
-		if (emp && IN_ROOM(vict)) {
-			EMPIRE_GREATNESS(emp) -= vict->real_attributes[GREATNESS];
-		}
-
-		// set the actual greatness
 		vict->real_attributes[GREATNESS] = RANGE(1, att_max(vict));
-		
-		// add greatness back
-		if (emp && IN_ROOM(vict)) {
-			EMPIRE_GREATNESS(emp) += vict->real_attributes[GREATNESS];
-		}
-		
 		affect_total(vict);
-		if (emp) {
-			update_member_data(vict);
-			update_empire_members_and_greatness(emp);
-		}
 	}
 	else if SET_CASE("intelligence") {
 		vict->real_attributes[INTELLIGENCE] = RANGE(1, att_max(vict));
@@ -2142,10 +2281,18 @@ int perform_set(char_data *ch, char_data *vict, int mode, char *val_arg) {
 			send_to_char("Better not -- could be a long winter!\r\n", ch);
 			return (0);
 		}
+		if (get_highest_access_level(GET_ACCOUNT(vict)) >= GET_ACCESS_LEVEL(ch)) {
+			msg_to_char(ch, "Maybe that's not such a great idea.\r\n");
+			return 0;
+		}
 		SET_OR_REMOVE(GET_ACCOUNT(vict)->flags, ACCT_FROZEN);
 		SAVE_ACCOUNT(GET_ACCOUNT(vict));
 	}
 	else if SET_CASE("muted") {
+		if (get_highest_access_level(GET_ACCOUNT(vict)) >= GET_ACCESS_LEVEL(ch)) {
+			msg_to_char(ch, "Maybe that's not such a great idea.\r\n");
+			return 0;
+		}
 		SET_OR_REMOVE(GET_ACCOUNT(vict)->flags, ACCT_MUTED);
 		SAVE_ACCOUNT(GET_ACCOUNT(vict));
 	}
@@ -2154,6 +2301,10 @@ int perform_set(char_data *ch, char_data *vict, int mode, char *val_arg) {
 		SAVE_ACCOUNT(GET_ACCOUNT(vict));
 	}
 	else if SET_CASE("notitle") {
+		if (get_highest_access_level(GET_ACCOUNT(vict)) >= GET_ACCESS_LEVEL(ch)) {
+			msg_to_char(ch, "Maybe that's not such a great idea.\r\n");
+			return 0;
+		}
 		SET_OR_REMOVE(GET_ACCOUNT(vict)->flags, ACCT_NOTITLE);
 		SAVE_ACCOUNT(GET_ACCOUNT(vict));
 	}
@@ -2238,6 +2389,7 @@ int perform_set(char_data *ch, char_data *vict, int mode, char *val_arg) {
 		}
 		
 		if (!IS_NPC(vict) && GET_ACCESS_LEVEL(vict) < LVL_START_IMM && value >= LVL_START_IMM) {
+			perform_approve(vict);
 			SET_BIT(PRF_FLAGS(vict), PRF_HOLYLIGHT | PRF_ROOMFLAGS | PRF_NOHASSLE);
 		
 			// turn on all syslogs
@@ -2260,6 +2412,9 @@ int perform_set(char_data *ch, char_data *vict, int mode, char *val_arg) {
 	}
 	else if SET_CASE("nowizlist") {
 		SET_OR_REMOVE(PLR_FLAGS(vict), PLR_NOWIZLIST);
+	}
+	else if SET_CASE("nofriends") {
+		SET_OR_REMOVE(PRF_FLAGS(vict), PRF_NO_FRIENDS);
 	}
 	else if SET_CASE("loadroom") {
 		if (!str_cmp(val_arg, "off")) {
@@ -2461,6 +2616,12 @@ int perform_set(char_data *ch, char_data *vict, int mode, char *val_arg) {
 		else if (!str_cmp(onoff_arg, "off")) {
 			remove_companion(vict, GET_MOB_VNUM(pet));
 			sprintf(output, "%s: removed companion %d %s.", GET_NAME(vict), GET_MOB_VNUM(pet), GET_SHORT_DESC(pet));
+			if (GET_COMPANION(vict) && GET_MOB_VNUM(GET_COMPANION(vict)) == GET_MOB_VNUM(pet)) {
+				if (!AFF_FLAGGED(vict, AFF_HIDDEN | AFF_NO_SEE_IN_ROOM)) {
+					act("$n leaves.", TRUE, GET_COMPANION(vict), NULL, NULL, TO_ROOM);
+				}
+				extract_char(GET_COMPANION(vict));
+			}
 		}
 		else {
 			msg_to_char(ch, "Do you want to turn it on or off?\r\n");
@@ -2547,8 +2708,8 @@ int perform_set(char_data *ch, char_data *vict, int mode, char *val_arg) {
 			msg_to_char(ch, "Usage: set <name> skill <skill> <level>\r\n");
 			return 0;
 		}
-		if (!isdigit(*skillval) || (level = atoi(skillval)) < 0 || level > CLASS_SKILL_CAP) {
-			msg_to_char(ch, "You must choose a level between 0 and %d.\r\n", CLASS_SKILL_CAP);
+		if (!isdigit(*skillval) || (level = atoi(skillval)) < 0 || level > MAX_SKILL_CAP) {
+			msg_to_char(ch, "You must choose a level between 0 and %d.\r\n", MAX_SKILL_CAP);
 			return 0;
 		}
 		else if (!(skill = find_skill(skillname))) {
@@ -2558,9 +2719,8 @@ int perform_set(char_data *ch, char_data *vict, int mode, char *val_arg) {
 
 		// victory
 		set_skill(vict, SKILL_VNUM(skill), level);
-		update_class(vict);
+		update_class_and_abilities(vict);
 		check_ability_levels(vict, SKILL_VNUM(skill));
-		assign_class_abilities(vict, NULL, NOTHING);
 		sprintf(output, "%s's %s set to %d.", GET_NAME(vict), SKILL_NAME(skill), level);
 	}
 	else if SET_CASE("language") {
@@ -2737,6 +2897,42 @@ int perform_set(char_data *ch, char_data *vict, int mode, char *val_arg) {
 		amt = add_currency(vict, GEN_VNUM(gen), amt - get_currency(vict, GEN_VNUM(gen)));
 		sprintf(output, "%s's %d %s set to %d.", GET_NAME(vict), GEN_VNUM(gen), GEN_NAME(gen), amt);
 	}
+	else if SET_CASE("unlockedarchetype") {
+		char vnum_arg[MAX_INPUT_LENGTH], onoff_arg[MAX_INPUT_LENGTH];
+		archetype_data *arch;
+		
+		half_chop(val_arg, vnum_arg, onoff_arg);
+		
+		if (!*vnum_arg || !isdigit(*vnum_arg) || !*onoff_arg) {
+			msg_to_char(ch, "Usage: set <name> unlockedarchetype <archetype vnum> <on | off>\r\n");
+			return 0;
+		}
+		if (!(arch = archetype_proto(atoi(vnum_arg)))) {
+			msg_to_char(ch, "Invalid archetype vnum.\r\n");
+			return 0;
+		}
+		if (ARCHETYPE_FLAGGED(arch, ARCH_IN_DEVELOPMENT)) {
+			msg_to_char(ch, "Archetype %d %s is set IN-DEVELOPMENT.\r\n", GET_ARCH_VNUM(arch), GET_ARCH_NAME(arch));
+			return 0;
+		}
+		if (!ARCHETYPE_FLAGGED(arch, ARCH_LOCKED)) {
+			msg_to_char(ch, "Archetype %d %s is not LOCKED.\r\n", GET_ARCH_VNUM(arch), GET_ARCH_NAME(arch));
+			return 0;
+		}
+		
+		if (!str_cmp(onoff_arg, "on")) {
+			add_unlocked_archetype(vict, GET_ARCH_VNUM(arch));
+			sprintf(output, "%s: unlocked archetype %d %s.", GET_NAME(vict), GET_ARCH_VNUM(arch), GET_ARCH_NAME(arch));
+		}
+		else if (!str_cmp(onoff_arg, "off")) {
+			remove_unlocked_archetype(vict, GET_ARCH_VNUM(arch));
+			sprintf(output, "%s: removed unlocked archetype %d %s.", GET_NAME(vict), GET_ARCH_VNUM(arch), GET_ARCH_NAME(arch));
+		}
+		else {
+			msg_to_char(ch, "Do you want to turn it on or off?\r\n");
+			return 0;
+		}
+	}
 
 	else if SET_CASE("account") {
 		if (get_highest_access_level(GET_ACCOUNT(vict)) > GET_ACCESS_LEVEL(ch)) {
@@ -2802,7 +2998,11 @@ int perform_set(char_data *ch, char_data *vict, int mode, char *val_arg) {
 	else if SET_CASE("name") {
 		SAVE_CHAR(vict);
 		one_argument(val_arg, buf);
-		if (_parse_name(buf, newname) || fill_word(newname) || strlen(newname) > MAX_NAME_LENGTH || strlen(newname) < 2 || !Valid_Name(newname)) {
+		if (_parse_name(buf, newname, ch->desc, TRUE)) {
+			// sends own message
+			return 0;
+		}
+		if (!Valid_Name(newname)) {
 			msg_to_char(ch, "Invalid name.\r\n");
 			return 0;
 		}
@@ -2988,6 +3188,89 @@ SHOW(show_data) {
 }
 
 
+SHOW(show_editors) {
+	bool any;
+	char output[MAX_STRING_LENGTH], line[256], part[256];
+	int count = 0;
+	size_t size, lsize;
+	char_data *targ;
+	descriptor_data *desc;
+	player_index_data *index;
+	
+	size = snprintf(output, sizeof(output), "Players using editors:\r\n");
+	
+	LL_FOREACH(descriptor_list, desc) {
+		if (STATE(desc) != CON_PLAYING || !(targ = desc->character)) {
+			continue;	// not in-game
+		}
+		if (GET_INVIS_LEV(targ) > GET_ACCESS_LEVEL(ch)) {
+			continue;	// can't see
+		}
+		
+		// start line in case
+		lsize = snprintf(line, sizeof(line), "%s", GET_NAME(targ));
+		any = FALSE;
+		
+		// olc?
+		if (GET_OLC_TYPE(desc)) {
+			any = TRUE;
+			if (GET_ACCESS_LEVEL(targ) > GET_ACCESS_LEVEL(ch)) {
+				// cannot see due to level
+				lsize += snprintf(line + lsize, sizeof(line) - lsize, " - olc");
+			}
+			else {
+				sprintbit(GET_OLC_TYPE(desc), olc_type_bits, part, FALSE);
+				lsize += snprintf(line + lsize, sizeof(line) - lsize, " - %s %d", part, GET_OLC_VNUM(desc));
+			}
+		}
+		
+		// string editor?
+		if (desc->str) {
+			any = TRUE;
+			if (GET_ACCESS_LEVEL(targ) > GET_ACCESS_LEVEL(ch)) {
+				// cannot see due to level
+				lsize += snprintf(line + lsize, sizeof(line) - lsize, " - editing a string");
+			}
+			else if (PLR_FLAGGED(targ, PLR_MAILING)) {
+				lsize += snprintf(line + lsize, sizeof(line) - lsize, " - mailing %s", (index = find_player_index_by_idnum(desc->mail_to)) ? index->fullname : "someone");
+			}
+			else if (desc->notes_id > 0) {
+				lsize += snprintf(line + lsize, sizeof(line) - lsize, " - editing notes for account %d", desc->notes_id);
+			}
+			else if (desc->island_desc_id != NOTHING) {
+				lsize += snprintf(line + lsize, sizeof(line) - lsize, " - editing description for island %s", get_island(desc->island_desc_id, TRUE) ? get_island(desc->island_desc_id, TRUE)->name : "???");
+			}
+			else if (desc->file_storage) {
+				lsize += snprintf(line + lsize, sizeof(line) - lsize, " - editing file %s", desc->file_storage);
+			}
+			else if (desc->save_empire != NOTHING) {
+				lsize += snprintf(line + lsize, sizeof(line) - lsize, " - editing empire text for %s", real_empire(desc->save_empire) ? EMPIRE_NAME(real_empire(desc->save_empire)) : "an empire");
+			}
+			else {
+				lsize += snprintf(line + lsize, sizeof(line) - lsize, " - editing a string");
+			}
+		}
+		
+		if (any && size + lsize + 20 < sizeof(output)) {
+			++count;
+			size += snprintf(output + size, sizeof(output) - size, "%s\r\n", line);
+		}
+		else if (any) {
+			size += snprintf(output + size, sizeof(output) - size, "OVERFLOW\r\n");
+			break;
+		}
+	}
+	
+	if (!count) {
+		size += snprintf(output + size, sizeof(output) - size, " none\r\n");
+	}
+	
+	if (ch->desc) {
+		page_string(ch->desc, output, TRUE);
+	}
+}
+
+
 SHOW(show_factions) {
 	char name[MAX_INPUT_LENGTH], *arg2, buf[MAX_STRING_LENGTH];
 	struct player_faction_data *pfd, *next_pfd;
@@ -3003,9 +3286,6 @@ SHOW(show_factions) {
 	
 	if (!(vict = find_or_load_player(name, &file))) {
 		msg_to_char(ch, "No player by that name.\r\n");
-	}
-	else if (GET_ACCESS_LEVEL(vict) > GET_ACCESS_LEVEL(ch)) {
-		msg_to_char(ch, "You can't do that.\r\n");
 	}
 	else {
 		check_delayed_load(vict);
@@ -3040,6 +3320,106 @@ SHOW(show_factions) {
 }
 
 
+SHOW(show_fmessages) {
+	char arg[MAX_INPUT_LENGTH];
+	int count, iter;
+	char_data *plr = NULL;
+	bool on, screenreader = (PRF_FLAGGED(ch, PRF_SCREEN_READER) ? TRUE : FALSE), file = FALSE;
+	
+	argument = one_word(argument, arg);
+	skip_spaces(&argument);
+	
+	if (!*arg) {
+		msg_to_char(ch, "Usage: show fmessages <player>\r\n");
+	}
+	else if (!(plr = find_or_load_player(arg, &file))) {
+		send_to_char("There is no such player.\r\n", ch);
+	}
+	else {
+		msg_to_char(ch, "Fight message toggles for %s:\r\n", GET_NAME(plr));
+		
+		count = 0;
+		for (iter = 0; *combat_message_types[iter] != '\n'; ++iter) {
+			on = (IS_SET(GET_FIGHT_MESSAGES(plr), BIT(iter)) ? TRUE : FALSE);
+			if (screenreader) {
+				msg_to_char(ch, "%s: %s\r\n", combat_message_types[iter], on ? "on" : "off");
+			}
+			else {
+				msg_to_char(ch, " [%s%3.3s\t0] %-25.25s%s", on ? "\tg" : "\tr", on ? "on" : "off", combat_message_types[iter], (!(++count % 2) ? "\r\n" : ""));
+			}
+		}
+		
+		if (count % 2 && !screenreader) {
+			send_to_char("\r\n", ch);
+		}
+	}
+	
+	if (plr && file) {
+		free_char(plr);
+	}
+}
+
+
+SHOW(show_friends) {
+	bool file = FALSE;
+	char output[MAX_STRING_LENGTH * 2], line[256];
+	int count;
+	size_t size, lsize;
+	char_data *plr = NULL;
+	account_data *acct;
+	struct friend_data *friend, *next_friend;
+	
+	one_argument(argument, arg);
+	
+	if (!*arg) {
+		msg_to_char(ch, "Show friends for whom?\r\n");
+	}
+	else if (!(plr = find_or_load_player(arg, &file))) {
+		msg_to_char(ch, "No player by that name.\r\n");
+	}
+	else if (get_highest_access_level(GET_ACCOUNT(plr)) > GET_ACCESS_LEVEL(ch)) {
+		msg_to_char(ch, "You can't do that.\r\n");
+	}
+	else {
+		size = snprintf(output, sizeof(output), "Friends list for %s%s:\r\n", GET_NAME(plr), PRF_FLAGGED(plr, PRF_NO_FRIENDS) ? " (no-friends toggled on)" : "");
+		count = 0;
+		
+		HASH_ITER(hh, GET_ACCOUNT_FRIENDS(plr), friend, next_friend) {
+			if (friend->status == FRIEND_NONE) {
+				continue;	// not a friend
+			}
+			if (!(acct = find_account(friend->account_id))) {
+				continue;	// no such account?
+			}
+			
+			// actual line
+			lsize = snprintf(line, sizeof(line), " %s - %s\r\n", (friend->name ? friend->name : "Unknown"), friend_status_types[friend->status]);
+			++count;
+			
+			if (size + lsize + 80 < sizeof(output)) {
+				strcat(output, line);
+				size += lsize;
+			}
+			else {
+				// space reserved for this
+				strcat(output, "... and more\r\n");
+				break;
+			}
+		}
+		
+		if (!count) {
+			strcat(output, " none\r\n");
+		}
+		
+		page_string(ch->desc, output, TRUE);
+	}
+	
+	if (plr && file) {
+		free_char(plr);
+	}
+}
+
+
 SHOW(show_home) {
 	char name[MAX_INPUT_LENGTH];
 	bool file = FALSE;
@@ -3050,9 +3430,6 @@ SHOW(show_home) {
 	
 	if (!(vict = find_or_load_player(name, &file))) {
 		msg_to_char(ch, "No player by that name.\r\n");
-	}
-	else if (GET_ACCESS_LEVEL(vict) > GET_ACCESS_LEVEL(ch)) {
-		msg_to_char(ch, "You can't do that.\r\n");
 	}
 	else {
 		home = find_home(vict);
@@ -3145,7 +3522,8 @@ SHOW(show_inventory) {
 	bool all = FALSE, loaded;
 	char_data *load;
 	size_t size, lsize;
-	int count, pos, players;
+	int count, pos, players, empires;
+	empire_data *emp, *next_emp;
 	
 	half_chop(argument, arg1, arg2);
 	all = !str_cmp(arg2, "all") || !str_cmp(arg2, "-all");
@@ -3162,7 +3540,9 @@ SHOW(show_inventory) {
 	else {
 		timer = microtime();
 		size = snprintf(buf, sizeof(buf), "Searching%s inventories for %d %s:\r\n", (all ? " all" : ""), vnum, get_obj_name_by_proto(vnum));
-		players = 0;
+		players = empires = 0;
+		
+		// players
 		HASH_ITER(idnum_hh, player_table_by_idnum, index, next_index) {
 			// determine if we should load them
 			if (!all && (time(0) - index->last_logon) > 60 * SECS_PER_REAL_DAY) {
@@ -3177,16 +3557,16 @@ SHOW(show_inventory) {
 			count = 0;
 			for (pos = 0; pos < NUM_WEARS; ++pos) {
 				if (GET_EQ(load, pos)) {
-					count += count_objs_by_vnum(vnum, GET_EQ(load, pos));
+					SAFE_ADD(count, count_objs_by_vnum(vnum, GET_EQ(load, pos)), 0, INT_MAX, FALSE);
 				}
 			}
 			if (load->carrying) {
-				count += count_objs_by_vnum(vnum, load->carrying);
+				SAFE_ADD(count, count_objs_by_vnum(vnum, load->carrying), 0, INT_MAX, FALSE);
 			}
 			
 			DL_FOREACH(GET_HOME_STORAGE(load), eus) {
 				if (eus->obj && GET_OBJ_VNUM(eus->obj) == vnum) {
-					count += eus->amount;
+					SAFE_ADD(count, eus->amount, 0, INT_MAX, FALSE);
 					// does not have contents in home storage
 				}
 			}
@@ -3212,7 +3592,42 @@ SHOW(show_inventory) {
 			}
 		}
 		
-		lsize = snprintf(line, sizeof(line), "(%d player%s, %.2f seconds for search)\r\n", players, PLURAL(players), (microtime() - timer) / 1000000.0);
+		// empires
+		HASH_ITER(hh, empire_table, emp, next_emp) {
+			if (!all && EMPIRE_IS_TIMED_OUT(emp)) {
+				continue;	// skip due to timeout
+			}
+			
+			// fresh count: basic storage
+			count = get_total_stored_count(emp, vnum, FALSE);
+			
+			// and unique storage
+			DL_FOREACH(EMPIRE_UNIQUE_STORAGE(emp), eus) {
+				if (eus->obj && GET_OBJ_VNUM(eus->obj) == vnum) {
+					SAFE_ADD(count, eus->amount, 0, INT_MAX, FALSE);
+					// does not have contents in warehouse
+				}
+			}
+			
+			if (count <= 0) {
+				continue;	// nothing to show
+			}
+			
+			// build text
+			lsize = snprintf(line, sizeof(line), "%s%s\t0: %d\r\n", EMPIRE_BANNER(emp), EMPIRE_NAME(emp), count);
+			++empires;
+			
+			if (size + lsize + 10 < sizeof(buf)) {
+				strcat(buf, line);
+				size += lsize;
+			}
+			else {	// full
+				size += snprintf(buf + size, sizeof(buf) - size, "OVERFLOW\r\n");
+				break;
+			}
+		}
+		
+		lsize = snprintf(line, sizeof(line), "(%d player%s, %d empire%s, %.2f seconds for search)\r\n", players, PLURAL(players), empires, PLURAL(empires), (microtime() - timer) / 1000000.0);
 		if (size + lsize < sizeof(buf)) {
 			strcat(buf, line);
 		}
@@ -3399,7 +3814,7 @@ SHOW(show_player) {
 	// Www Mmm dd hh:mm:ss yyyy
 	sprintf(buf + strlen(buf), "Started: %-16.16s %4.4s   Last: %-16.16s %4.4s\r\n", birth, birth+20, lastlog, lastlog+20);
 	
-	if (GET_ACCESS_LEVEL(plr) <= GET_ACCESS_LEVEL(ch) && GET_ACCESS_LEVEL(ch) >= LVL_TO_SEE_ACCOUNTS) {
+	if (get_highest_access_level(GET_ACCOUNT(plr)) <= GET_ACCESS_LEVEL(ch) && GET_ACCESS_LEVEL(ch) >= LVL_TO_SEE_ACCOUNTS) {
 		sprintf(buf + strlen(buf), "Creation host: %s\r\n", NULLSAFE(GET_CREATION_HOST(plr)));
 	}
 	
@@ -3517,14 +3932,11 @@ SHOW(show_quests) {
 	if (!(vict = find_or_load_player(name, &file))) {
 		msg_to_char(ch, "No player by that name.\r\n");
 	}
-	else if (GET_ACCESS_LEVEL(vict) > GET_ACCESS_LEVEL(ch)) {
-		msg_to_char(ch, "You can't do that.\r\n");
-	}
 	else if (!*arg2 || is_abbrev(arg2, "active")) {
 		// active quest list
 		check_delayed_load(vict);
 		if (IS_NPC(vict) || !GET_QUESTS(vict)) {
-			msg_to_char(ch, "%s is not on any quests.\r\n", GET_NAME(vict));
+			msg_to_char(ch, "%s is not on any quests (%d/%d dailies, %d/%d event dailies).\r\n", GET_NAME(vict), GET_DAILY_QUESTS(vict), config_get_int("dailies_per_day"), GET_EVENT_DAILY_QUESTS(vict), config_get_int("dailies_per_day"));
 			if (vict && file) {
 				file = FALSE;
 				free_char(vict);
@@ -3751,6 +4163,46 @@ SHOW(show_resource) {
 }
 
 
+SHOW(show_smessages) {
+	char arg[MAX_INPUT_LENGTH];
+	int count, iter;
+	char_data *plr = NULL;
+	bool on, screenreader = (PRF_FLAGGED(ch, PRF_SCREEN_READER) ? TRUE : FALSE), file = FALSE;
+	
+	argument = one_word(argument, arg);
+	skip_spaces(&argument);
+	
+	if (!*arg) {
+		msg_to_char(ch, "Usage: show smessages <player>\r\n");
+	}
+	else if (!(plr = find_or_load_player(arg, &file))) {
+		send_to_char("There is no such player.\r\n", ch);
+	}
+	else {
+		msg_to_char(ch, "Status message toggles for %s:\r\n", GET_NAME(plr));
+		
+		count = 0;
+		for (iter = 0; *status_message_types[iter] != '\n'; ++iter) {
+			on = (IS_SET(GET_STATUS_MESSAGES(plr), BIT(iter)) ? TRUE : FALSE);
+			if (screenreader) {
+				msg_to_char(ch, "%s: %s\r\n", status_message_types[iter], on ? "on" : "off");
+			}
+			else {
+				msg_to_char(ch, " [%s%3.3s\t0] %-25.25s%s", on ? "\tg" : "\tr", on ? "on" : "off", status_message_types[iter], (!(++count % 2) ? "\r\n" : ""));
+			}
+		}
+		
+		if (count % 2 && !screenreader) {
+			send_to_char("\r\n", ch);
+		}
+	}
+	
+	if (plr && file) {
+		free_char(plr);
+	}
+}
+
+
 SHOW(show_stats) {
 	int num_active_empires = 0, num_objs = 0, num_mobs = 0, num_vehs = 0, num_players = 0, num_descs = 0, menu_count = 0;
 	int num_trigs = 0, num_goals = 0, num_rewards = 0, num_mort_helps = 0, num_imm_helps = 0, num_inst = 0;
@@ -3870,6 +4322,9 @@ SHOW(show_site) {
 	size = 0;
 	k = 0;
 	HASH_ITER(idnum_hh, player_table_by_idnum, index, next_index) {
+		if (get_highest_access_level(find_account(index->account_id)) > GET_ACCESS_LEVEL(ch)) {
+			continue;
+		}
 		if (str_str(index->last_host, argument)) {
 			snprintf(line, sizeof(line), " %-15.15s %s", index->name, ((++k % 3)) ? "|" : "\r\n");
 			line[1] = UPPER(line[1]);	// cap name
@@ -3895,6 +4350,7 @@ SHOW(show_site) {
 
 
 SHOW(show_skills) {
+	char exp_part[256];
 	struct player_ability_data *plab, *next_plab;
 	struct player_skill_data *plsk, *next_plsk;
 	ability_data *abil;
@@ -3932,7 +4388,14 @@ SHOW(show_skills) {
 	HASH_ITER(hh, GET_SKILL_HASH(vict), plsk, next_plsk) {
 		skill = plsk->ptr;
 		
-		msg_to_char(ch, "&y%s&0 [%d, %.1f%%, %d%s]: ", SKILL_NAME(skill), get_skill_level(vict, SKILL_VNUM(skill)), get_skill_exp(vict, SKILL_VNUM(skill)), get_ability_points_available_for_char(vict, SKILL_VNUM(skill)), plsk->resets ? "*" : "");
+		if (plsk->noskill) {
+			snprintf(exp_part, sizeof(exp_part), "noskill");
+		}
+		else {
+			snprintf(exp_part, sizeof(exp_part), "%.1f%%", get_skill_exp(vict, SKILL_VNUM(skill)));
+		}
+		
+		msg_to_char(ch, "&y%s&0 [%d, %s, %d%s]: ", SKILL_NAME(skill), get_skill_level(vict, SKILL_VNUM(skill)), exp_part, get_ability_points_available_for_char(vict, SKILL_VNUM(skill)), plsk->resets ? "*" : "");
 		
 		found = FALSE;
 		HASH_ITER(hh, GET_ABILITY_HASH(vict), plab, next_plab) {
@@ -3957,14 +4420,30 @@ SHOW(show_skills) {
 	HASH_ITER(hh, GET_ABILITY_HASH(vict), plab, next_plab) {
 		abil = plab->ptr;
 		
-		// ALWAYS use current set for class abilities
 		if (!plab->purchased[GET_CURRENT_SKILL_SET(vict)]) {
-			continue;
+			continue;	// not in current set
 		}
-		if (ABIL_IS_PURCHASE(abil)) {
-			continue;	// only looking for non-skill abilities
+		if (!ABIL_IS_SYNERGY(abil)) {
+			continue;	// only looking for synergy abilities
 		}
 
+		msg_to_char(ch, "%s%s", (found ? ", " : ""), ABIL_NAME(abil));
+		found = TRUE;
+	}
+	msg_to_char(ch, "&0%s\r\n", (found ? "" : "none"));
+	
+	msg_to_char(ch, "&yOther&0: &g");
+	found = FALSE;
+	HASH_ITER(hh, GET_ABILITY_HASH(vict), plab, next_plab) {
+		abil = plab->ptr;
+		
+		if (!plab->purchased[GET_CURRENT_SKILL_SET(vict)]) {
+			continue;	// not in current set
+		}
+		if (!has_ability_data_any(abil, ADL_PARENT)) {
+			continue;	// only looking for abilities with parents
+		}
+		
 		msg_to_char(ch, "%s%s", (found ? ", " : ""), ABIL_NAME(abil));
 		found = TRUE;
 	}
@@ -4069,12 +4548,17 @@ SHOW(show_commons) {
 	descriptor_data *d, *nd;
 	
 	*buf = '\0';
-	for (d = descriptor_list; d; d = d->next)
-		for (nd = descriptor_list; nd; nd = nd->next)
+	for (d = descriptor_list; d; d = d->next) {
+		if (d->character && get_highest_access_level(GET_ACCOUNT(d->character)) > GET_ACCESS_LEVEL(ch)) {
+			continue;
+		}
+		for (nd = descriptor_list; nd; nd = nd->next) {
 			if (!str_cmp(d->host, nd->host) && d != nd && (!d->character || !PLR_FLAGGED(d->character, PLR_IPMASK))) {
 				sprintf(buf + strlen(buf), "%s\r\n", d->character ? GET_NAME(d->character) : "<No Player>");
 				break;
 			}
+		}
+	}
 	msg_to_char(ch, "Common sites:\r\n");
 	if (*buf)
 		send_to_char(buf, ch);
@@ -4418,7 +4902,7 @@ SHOW(show_technology) {
 				continue;
 			}
 			
-			snprintf(one, sizeof(one), "\t%c%s, ", (++count % 2) ? 'W' : 'w', player_tech_types[ptech->id]);
+			snprintf(one, sizeof(one), "\t%c%s%s, ", (++count % 2) ? 'W' : 'w', player_tech_types[ptech->id], ptech->check_solo ? " (synergy)" : "");
 			
 			if (color_strlen(one) + lsize >= 79) {
 				// send line
@@ -4526,9 +5010,6 @@ SHOW(show_tomb) {
 	
 	if (!(vict = find_or_load_player(name, &file))) {
 		msg_to_char(ch, "No player by that name.\r\n");
-	}
-	else if (GET_ACCESS_LEVEL(vict) > GET_ACCESS_LEVEL(ch)) {
-		msg_to_char(ch, "You can't do that.\r\n");
 	}
 	else {
 		tomb = real_room(GET_TOMB_ROOM(vict));
@@ -4697,7 +5178,7 @@ SHOW(show_uses) {
 				break;
 			}
 			
-			LL_FOREACH(GET_BLD_YEARLY_MAINTENANCE(bld), res) {
+			LL_FOREACH(GET_BLD_REGULAR_MAINTENANCE(bld), res) {
 				if (res->type != RES_COMPONENT) {
 					continue;
 				}
@@ -4820,7 +5301,7 @@ SHOW(show_uses) {
 				break;
 			}
 			
-			LL_FOREACH(VEH_YEARLY_MAINTENANCE(veh), res) {
+			LL_FOREACH(VEH_REGULAR_MAINTENANCE(veh), res) {
 				if (res->type != RES_COMPONENT) {
 					continue;
 				}
@@ -4977,18 +5458,22 @@ SHOW(show_notes) {
 			msg_to_char(ch, "Unknown account '%s'.\r\n", argument);
 			return;
 		}
+		if (get_highest_access_level(acct) > GET_ACCESS_LEVEL(ch)) {
+			msg_to_char(ch, "You can't show notes for accounts of that level.\r\n");
+			return;
+		}
 	}
 	else {
 		if (!(index = find_player_index_by_name(argument))) {
 			msg_to_char(ch, "There is no such player.\r\n");
 			return;
 		}
-		if (index->access_level >= GET_ACCESS_LEVEL(ch)) {
-			msg_to_char(ch, "You can't show notes for players of that level.\r\n");
-			return;
-		}
 		if (!(acct = find_account(index->account_id))) {
 			msg_to_char(ch, "There are no notes for that player.\r\n");
+			return;
+		}
+		if (get_highest_access_level(acct) > GET_ACCESS_LEVEL(ch)) {
+			msg_to_char(ch, "You can't show notes for accounts of that level.\r\n");
 			return;
 		}
 	}
@@ -5129,6 +5614,56 @@ SHOW(show_ammotypes) {
 }
 
 
+SHOW(show_author) {
+	char arg[MAX_INPUT_LENGTH], output[MAX_STRING_LENGTH], line[MAX_STRING_LENGTH];
+	int idnum;
+	size_t size, count;
+	book_data *book, *next_book;
+	player_index_data *index;
+	
+	one_word(argument, arg);
+	
+	if (!*arg || !isdigit(*arg)) {
+		msg_to_char(ch, "Usage: show author <author idnum>\r\n");
+	}
+	else if ((idnum = atoi(arg)) < 0) {
+		msg_to_char(ch, "Invalid author idnum.\r\n");
+	}
+	else {
+		size = snprintf(output, sizeof(output), "Books authored by [%d] %s:\r\n", idnum, (index = find_player_index_by_idnum(idnum)) ? index->fullname : "nobody");
+		
+		count = 0;
+		HASH_ITER(hh, book_table, book, next_book) {
+			if (BOOK_AUTHOR(book) != idnum) {
+				continue;
+			}
+			
+			snprintf(line, sizeof(line), "[%7d] %s\r\n", BOOK_VNUM(book), BOOK_TITLE(book));
+			
+			if (size + strlen(line) < sizeof(output)) {
+				strcat(output, line);
+				size += strlen(line);
+				++count;
+			}
+			else {
+				if (size + 10 < sizeof(output)) {
+					strcat(output, "OVERFLOW\r\n");
+				}
+				break;
+			}
+		}
+		
+		if (!count) {
+			strcat(output, "  none\r\n");	// space reserved for this for sure
+		}
+		
+		if (ch->desc) {
+			page_string(ch->desc, output, TRUE);
+		}
+	}
+}
+
+
 SHOW(show_ignoring) {
 	char arg[MAX_INPUT_LENGTH];
 	player_index_data *index;
@@ -5195,7 +5730,7 @@ SHOW(show_currency) {
 			size += snprintf(buf + size, sizeof(buf) - size, "Currencies:\r\n");
 		
 			HASH_ITER(hh, GET_CURRENCIES(plr), cur, next_cur) {
-				snprintf(line, sizeof(line), "%3d %s (%d)\r\n", cur->amount, get_generic_string_by_vnum(cur->vnum, GENERIC_CURRENCY, WHICH_CURRENCY(cur->amount)), cur->vnum);
+				snprintf(line, sizeof(line), "[%5d] %3d %s\r\n", cur->vnum, cur->amount, get_generic_string_by_vnum(cur->vnum, GENERIC_CURRENCY, WHICH_CURRENCY(cur->amount)));
 			
 				if (size + strlen(line) < sizeof(buf)) {
 					strcat(buf, line);
@@ -5434,34 +5969,113 @@ SHOW(show_learned) {
 	argument = one_word(argument, arg);
 	skip_spaces(&argument);
 	
+	// arg parsing
 	if (!*arg) {
 		msg_to_char(ch, "Usage: show learned <player | empire>\r\n");
+		return;
+	}
+	else if (is_abbrev(arg, "empire") && strlen(arg) >= 3) {
+		argument = one_word(argument, arg);
+		if (!*arg) {
+			msg_to_char(ch, "Show learned for what empire?\r\n");
+			return;
+		}
+		else if (!(emp = get_empire_by_name(arg))) {
+			msg_to_char(ch, "No such empire '%s'.\r\n", arg);
+			return;
+		}
+	}
+	else if (is_abbrev(arg, "player")) {
+		argument = one_word(argument, arg);
+		if (!*arg) {
+			msg_to_char(ch, "Show learned for what player?\r\n");
+			return;
+		}
+		else if (!(plr = find_or_load_player(arg, &file))) {
+			msg_to_char(ch, "No such player '%s'.\r\n", arg);
+			return;
+		}
 	}
 	else if (!(plr = find_or_load_player(arg, &file)) && !(emp = get_empire_by_name(arg))) {
 		send_to_char("There is no such player or empire.\r\n", ch);
+		return;
 	}
-	else {	// plr OR emp is guaranteed
-		if (*argument) {
-			size = snprintf(output, sizeof(output), "Learned recipes matching '%s' for %s:\r\n", argument, plr ? GET_NAME(plr) : EMPIRE_NAME(emp));
+	
+	// must have plr or emp by now
+	if (*argument) {
+		size = snprintf(output, sizeof(output), "Learned recipes matching '%s' for %s:\r\n", argument, plr ? GET_NAME(plr) : EMPIRE_NAME(emp));
+	}
+	else {
+		size = snprintf(output, sizeof(output), "Learned recipes for %s:\r\n", plr ? GET_NAME(plr) : EMPIRE_NAME(emp));
+	}
+	
+	count = 0;
+	HASH_ITER(hh, (plr ? GET_LEARNED_CRAFTS(plr) : EMPIRE_LEARNED_CRAFTS(emp)), pcd, next_pcd) {
+		if (!(craft = craft_proto(pcd->vnum))) {
+			continue;	// no craft?
+		}
+		if (CRAFT_FLAGGED(craft, CRAFT_IN_DEVELOPMENT)) {
+			continue;	// in-dev
+		}
+		if (*argument && !multi_isname(argument, GET_CRAFT_NAME(craft))) {
+			continue;	// searched
+		}
+	
+		// show it
+		snprintf(line, sizeof(line), " [%5d] %s (%s)\r\n", GET_CRAFT_VNUM(craft), GET_CRAFT_NAME(craft), craft_types[GET_CRAFT_TYPE(craft)]);
+		if (size + strlen(line) < sizeof(output)) {
+			strcat(output, line);
+			size += strlen(line);
+			++count;
 		}
 		else {
-			size = snprintf(output, sizeof(output), "Learned recipes for %s:\r\n", plr ? GET_NAME(plr) : EMPIRE_NAME(emp));
+			if (size + 10 < sizeof(output)) {
+				strcat(output, "OVERFLOW\r\n");
+			}
+			break;
 		}
+	}
+
+	if (!count) {
+		strcat(output, "  none\r\n");	// space reserved for this for sure
+	}
+
+	if (ch->desc) {
+		page_string(ch->desc, output, TRUE);
+	}
+	
+	if (plr && file) {
+		free_char(plr);
+	}
+}
+
+
+SHOW(show_libraries) {
+	char arg[MAX_INPUT_LENGTH], output[MAX_STRING_LENGTH], line[MAX_STRING_LENGTH];
+	size_t size, count;
+	book_data *book;
+	room_data *room;
+	struct library_info *libr, *next_libr;
+	
+	one_word(argument, arg);
+	
+	if (!*arg || !isdigit(*arg)) {
+		msg_to_char(ch, "Usage: show libraries <book vnum>\r\n");
+	}
+	else if (!(book = book_proto(atoi(arg)))) {
+		msg_to_char(ch, "No such book %d.\r\n", atoi(arg));
+	}
+	else {
+		size = snprintf(output, sizeof(output), "Library locations for [%d] %s:\r\n", BOOK_VNUM(book), BOOK_TITLE(book));
 		
 		count = 0;
-		HASH_ITER(hh, (plr ? GET_LEARNED_CRAFTS(plr) : EMPIRE_LEARNED_CRAFTS(emp)), pcd, next_pcd) {
-			if (!(craft = craft_proto(pcd->vnum))) {
-				continue;	// no craft?
+		HASH_ITER(hh, library_table, libr, next_libr) {
+			if (!(room = real_room(libr->room))) {
+				continue;
 			}
-			if (CRAFT_FLAGGED(craft, CRAFT_IN_DEVELOPMENT)) {
-				continue;	// in-dev
-			}
-			if (*argument && !multi_isname(argument, GET_CRAFT_NAME(craft))) {
-				continue;	// searched
-			}
-		
-			// show it
-			snprintf(line, sizeof(line), " [%5d] %s (%s)\r\n", GET_CRAFT_VNUM(craft), GET_CRAFT_NAME(craft), craft_types[GET_CRAFT_TYPE(craft)]);
+			
+			snprintf(line, sizeof(line), "[%7d] %s\r\n", GET_ROOM_VNUM(room), get_room_name(room, FALSE));
+			
 			if (size + strlen(line) < sizeof(output)) {
 				strcat(output, line);
 				size += strlen(line);
@@ -5474,18 +6088,53 @@ SHOW(show_learned) {
 				break;
 			}
 		}
-	
+		
 		if (!count) {
 			strcat(output, "  none\r\n");	// space reserved for this for sure
 		}
-	
+		
 		if (ch->desc) {
 			page_string(ch->desc, output, TRUE);
 		}
 	}
+}
+
+
+SHOW(show_lost_books) {
+	char output[MAX_STRING_LENGTH], line[MAX_STRING_LENGTH];
+	size_t size, count;
+	book_data *book, *next_book;
+	player_index_data *index;
 	
-	if (plr && file) {
-		free_char(plr);
+	size = snprintf(output, sizeof(output), "Books not in any libraries:\r\n");
+	
+	count = 0;
+	HASH_ITER(hh, book_table, book, next_book) {
+		if (find_book_in_any_library(BOOK_VNUM(book))) {
+			continue;
+		}
+		
+		snprintf(line, sizeof(line), "[%7d] %s (%s)\r\n", BOOK_VNUM(book), BOOK_TITLE(book), (index = find_player_index_by_idnum(BOOK_AUTHOR(book))) ? index->name : "???");
+		
+		if (size + strlen(line) < sizeof(output)) {
+			strcat(output, line);
+			size += strlen(line);
+			++count;
+		}
+		else {
+			if (size + 10 < sizeof(output)) {
+				strcat(output, "OVERFLOW\r\n");
+			}
+			break;
+		}
+	}
+	
+	if (!count) {
+		strcat(output, "  none\r\n");	// space reserved for this for sure
+	}
+	
+	if (ch->desc) {
+		page_string(ch->desc, output, TRUE);
 	}
 }
 
@@ -5841,7 +6490,7 @@ SHOW(show_spawns) {
 		for (sp = GET_SECT_SPAWNS(sect); sp; sp = sp->next) {
 			if (sp->vnum == vnum) {
 				sprintbit(sp->flags, spawn_flags, buf2, TRUE);
-				sprintf(buf1, "%s: %.2f%% %s\r\n", GET_SECT_NAME(sect), sp->percent, buf2);
+				snprintf(buf1, sizeof(buf1), "%s: %.2f%% %s\r\n", GET_SECT_NAME(sect), sp->percent, buf2);
 				if (strlen(buf) + strlen(buf1) < MAX_STRING_LENGTH) {
 					strcat(buf, buf1);
 				}
@@ -5854,7 +6503,7 @@ SHOW(show_spawns) {
 		for (sp = GET_CROP_SPAWNS(crop); sp; sp = sp->next) {
 			if (sp->vnum == vnum) {
 				sprintbit(sp->flags, spawn_flags, buf2, TRUE);
-				sprintf(buf1, "%s: %.2f%% %s\r\n", GET_CROP_NAME(crop), sp->percent, buf2);
+				snprintf(buf1, sizeof(buf1), "%s: %.2f%% %s\r\n", GET_CROP_NAME(crop), sp->percent, buf2);
 				CAP(buf1);	// crop names are lowercase
 				if (strlen(buf) + strlen(buf1) < MAX_STRING_LENGTH) {
 					strcat(buf, buf1);
@@ -5868,7 +6517,7 @@ SHOW(show_spawns) {
 		for (sp = GET_BLD_SPAWNS(bld); sp; sp = sp->next) {
 			if (sp->vnum == vnum) {
 				sprintbit(sp->flags, spawn_flags, buf2, TRUE);
-				sprintf(buf1, "%s: %.2f%% %s\r\n", GET_BLD_NAME(bld), sp->percent, buf2);
+				snprintf(buf1, sizeof(buf1), "%s: %.2f%% %s\r\n", GET_BLD_NAME(bld), sp->percent, buf2);
 				if (strlen(buf) + strlen(buf1) < MAX_STRING_LENGTH) {
 					strcat(buf, buf1);
 				}
@@ -5881,7 +6530,7 @@ SHOW(show_spawns) {
 		LL_FOREACH(VEH_SPAWNS(veh), sp) {
 			if (sp->vnum == vnum) {
 				sprintbit(sp->flags, spawn_flags, buf2, TRUE);
-				sprintf(buf1, "%s: %.2f%% %s\r\n", VEH_SHORT_DESC(veh), sp->percent, buf2);
+				snprintf(buf1, sizeof(buf1), "%s: %.2f%% %s\r\n", VEH_SHORT_DESC(veh), sp->percent, buf2);
 				if (strlen(buf) + strlen(buf1) < MAX_STRING_LENGTH) {
 					strcat(buf, buf1);
 				}
@@ -5894,6 +6543,70 @@ SHOW(show_spawns) {
 	}
 	else {
 		msg_to_char(ch, "No spawns found for mob %d.\r\n", vnum);
+	}
+}
+
+
+SHOW(show_unlocked_archetypes) {
+	char arg[MAX_INPUT_LENGTH], output[MAX_STRING_LENGTH], line[MAX_STRING_LENGTH];
+	archetype_data *arch;
+	struct unlocked_archetype *unarch, *next_unarch;
+	char_data *plr = NULL;
+	size_t size, count;
+	bool file = FALSE;
+	
+	argument = one_word(argument, arg);
+	skip_spaces(&argument);
+	
+	if (!*arg) {
+		msg_to_char(ch, "Usage: show unlockedarchetypes <player> [keywords]\r\n");
+	}
+	else if (!(plr = find_or_load_player(arg, &file))) {
+		send_to_char("There is no such player.\r\n", ch);
+	}
+	else {
+		if (*argument) {
+			size = snprintf(output, sizeof(output), "Unlocked archetypes matching '%s' for %s:\r\n", argument, GET_NAME(plr));
+		}
+		else {
+			size = snprintf(output, sizeof(output), "Unlocked archetypes for %s:\r\n", GET_NAME(plr));
+		}
+		
+		count = 0;
+		HASH_ITER(hh, ACCOUNT_UNLOCKED_ARCHETYPES(plr), unarch, next_unarch) {
+			if (!(arch = archetype_proto(unarch->vnum))) {
+				continue;	// no archetype?
+			}
+			if (*argument && !multi_isname(argument, GET_ARCH_NAME(arch))) {
+				continue;	// searched
+			}
+		
+			// show it
+			snprintf(line, sizeof(line), " [%5d] %s\r\n", GET_ARCH_VNUM(arch), GET_ARCH_NAME(arch));
+			if (size + strlen(line) < sizeof(output)) {
+				strcat(output, line);
+				size += strlen(line);
+				++count;
+			}
+			else {
+				if (size + 10 < sizeof(output)) {
+					strcat(output, "OVERFLOW\r\n");
+				}
+				break;
+			}
+		}
+	
+		if (!count) {
+			strcat(output, "  none\r\n");	// space reserved for this for sure
+		}
+	
+		if (ch->desc) {
+			page_string(ch->desc, output, TRUE);
+		}
+	}
+	
+	if (plr && file) {
+		free_char(plr);
 	}
 }
 
@@ -5987,7 +6700,6 @@ void show_spawn_summary_to_char(char_data *ch, struct spawn_info *list) {
 */
 void do_stat_adventure(char_data *ch, adv_data *adv) {
 	char lbuf[MAX_STRING_LENGTH];
-	int time;
 	
 	if (!adv) {
 		return;
@@ -6002,12 +6714,8 @@ void do_stat_adventure(char_data *ch, adv_data *adv) {
 	if (GET_ADV_RESET_TIME(adv) == 0) {
 		strcpy(lbuf, "never");
 	}
-	else if (GET_ADV_RESET_TIME(adv) > (60 * 24)) {
-		time = GET_ADV_RESET_TIME(adv) - (GET_ADV_RESET_TIME(adv) / (60 * 24));
-		sprintf(lbuf, "%d:%02d:%02d", (GET_ADV_RESET_TIME(adv) / (60 * 24)), (time / 60), (time % 60));
-	}
 	else if (GET_ADV_RESET_TIME(adv) > 60) {
-		sprintf(lbuf, "%2d:%02d", (GET_ADV_RESET_TIME(adv) / 60), (GET_ADV_RESET_TIME(adv) % 60));
+		strcpy(lbuf, colon_time(GET_ADV_RESET_TIME(adv), TRUE, NULL));
 	}
 	else {
 		sprintf(lbuf, "%d min", GET_ADV_RESET_TIME(adv));
@@ -6017,6 +6725,8 @@ void do_stat_adventure(char_data *ch, adv_data *adv) {
 	
 	sprintbit(GET_ADV_FLAGS(adv), adventure_flags, lbuf, TRUE);
 	msg_to_char(ch, "Flags: &g%s&0\r\n", lbuf);
+	
+	msg_to_char(ch, "Temperature: [\tc%s\t0]\r\n", temperature_types[GET_ADV_TEMPERATURE_TYPE(adv)]);
 	
 	get_adventure_linking_display(GET_ADV_LINKING(adv), lbuf);
 	msg_to_char(ch, "Linking rules:\r\n%s", lbuf);
@@ -6042,19 +6752,21 @@ void do_stat_book(char_data *ch, book_data *book) {
 	int count, len, num;
 	char *ptr, *txt;
 	
-	size += snprintf(buf + size, sizeof(buf) - size, "Book VNum: [\tc%d\t0], Author: \ty%s\t0 (\tc%d\t0)\r\n", book->vnum, (index = find_player_index_by_idnum(book->author)) ? index->fullname : "nobody", book->author);
-	size += snprintf(buf + size, sizeof(buf) - size, "Title: %s\t0\r\n", book->title);
-	size += snprintf(buf + size, sizeof(buf) - size, "Byline: %s\t0\r\n", book->byline);
-	size += snprintf(buf + size, sizeof(buf) - size, "Item: [%s]\r\n", book->item_name);
-	size += snprintf(buf + size, sizeof(buf) - size, "%s", book->item_description);	// desc has its own crlf
+	size += snprintf(buf + size, sizeof(buf) - size, "Book VNum: [\tc%d\t0], Author: \ty%s\t0 (\tc%d\t0)\r\n", BOOK_VNUM(book), (index = find_player_index_by_idnum(BOOK_AUTHOR(book))) ? index->fullname : "nobody", BOOK_AUTHOR(book));
+	size += snprintf(buf + size, sizeof(buf) - size, "Title: %s\t0\r\n", BOOK_TITLE(book));
+	size += snprintf(buf + size, sizeof(buf) - size, "Byline: %s\t0\r\n", BOOK_BYLINE(book));
+	size += snprintf(buf + size, sizeof(buf) - size, "Item: [%s]\r\n", BOOK_ITEM_NAME(book));
+	size += snprintf(buf + size, sizeof(buf) - size, "%s", BOOK_ITEM_DESC(book));	// desc has its own crlf
 	
 	// precompute number of paragraphs
 	num = 0;
-	for (para = book->paragraphs; para; para = para->next) {
+	LL_FOREACH(BOOK_PARAGRAPHS(book), para) {
 		++num;
 	}
 	
-	for (para = book->paragraphs, count = 1; para; para = para->next, ++count) {
+	count = 0;
+	LL_FOREACH(BOOK_PARAGRAPHS(book), para) {
+		++count;
 		txt = para->text;
 		skip_spaces(&txt);
 		len = strlen(txt);
@@ -6120,6 +6832,8 @@ void do_stat_building(char_data *ch, bld_data *bdg) {
 	sprintbit(GET_BLD_BASE_AFFECTS(bdg), room_aff_bits, buf, TRUE);
 	msg_to_char(ch, "Base affects: &g%s&0\r\n", buf);
 	
+	msg_to_char(ch, "Temperature: [\tc%s\t0]\r\n", temperature_types[GET_BLD_TEMPERATURE_TYPE(bdg)]);
+	
 	if (GET_BLD_EX_DESCS(bdg)) {
 		struct extra_descr_data *desc;
 		sprintf(buf, "Extra descs:&c");
@@ -6136,9 +6850,9 @@ void do_stat_building(char_data *ch, bld_data *bdg) {
 		send_to_char(buf, ch);
 	}
 	
-	if (GET_BLD_YEARLY_MAINTENANCE(bdg)) {
-		get_resource_display(GET_BLD_YEARLY_MAINTENANCE(bdg), buf);
-		msg_to_char(ch, "Yearly maintenance:\r\n%s", buf);
+	if (GET_BLD_REGULAR_MAINTENANCE(bdg)) {
+		get_resource_display(ch, GET_BLD_REGULAR_MAINTENANCE(bdg), buf);
+		msg_to_char(ch, "Regular maintenance:\r\n%s", buf);
 	}
 	
 	get_script_display(GET_BLD_SCRIPTS(bdg), lbuf);
@@ -6185,6 +6899,12 @@ void do_stat_character(char_data *ch, char_data *k) {
 		}
 	}
 	
+	if (k->desc) {
+		// protocol info
+		msg_to_char(ch, "Connection info: Client: [%s], X-Colors: [%s\t0], MSDP: [%s\t0],\r\n", NULLSAFE(k->desc->pProtocol->pVariables[eMSDP_CLIENT_ID]->pValueString), ((k->desc->pProtocol->b256Support || k->desc->pProtocol->pVariables[eMSDP_XTERM_256_COLORS]->ValueInt) ? "\tgyes" : "\trno"), (k->desc->pProtocol->bMSDP ? "\tgyes" : "\trno"));
+		msg_to_char(ch, "   MSP: [%s\t0], MXP: [%s\t0], NAWS: [%s\t0], Screen: [%dx%d]\r\n", ((k->desc->pProtocol->bMSP || k->desc->pProtocol->pVariables[eMSDP_SOUND]->ValueInt) ? "\tgyes" : "\trno"), ((k->desc->pProtocol->bMXP || k->desc->pProtocol->pVariables[eMSDP_MXP]->ValueInt) ? "\tgyes" : "\trno"), (k->desc->pProtocol->bNAWS ? "\tgyes" : "\trno"), k->desc->pProtocol->ScreenWidth, k->desc->pProtocol->ScreenHeight);
+	}
+	
 	if (IS_MOB(k)) {
 		msg_to_char(ch, "Alias: &y%s&0, VNum: [&c%5d&0]\r\n", GET_PC_NAME(k), GET_MOB_VNUM(k));
 		msg_to_char(ch, "L-Des: &y%s&0%s", (GET_LONG_DESC(k) ? GET_LONG_DESC(k) : "<None>\r\n"), NULLSAFE(GET_LOOK_DESC(k)));
@@ -6223,7 +6943,7 @@ void do_stat_character(char_data *ch, char_data *k) {
 		buf2[4] = '\0';	// get only year
 
 		msg_to_char(ch, "Created: [%s, %s], Played [%dh %dm], Age [%d]\r\n", buf1, buf2, k->player.time.played / SECS_PER_REAL_HOUR, ((k->player.time.played % SECS_PER_REAL_HOUR) / SECS_PER_REAL_MIN), age(k)->year);
-		if (GET_ACCESS_LEVEL(k) <= GET_ACCESS_LEVEL(ch) && GET_ACCESS_LEVEL(ch) >= LVL_TO_SEE_ACCOUNTS) {
+		if (get_highest_access_level(GET_ACCOUNT(k)) <= GET_ACCESS_LEVEL(ch) && GET_ACCESS_LEVEL(ch) >= LVL_TO_SEE_ACCOUNTS) {
 			msg_to_char(ch, "Created from host: [%s]\r\n", NULLSAFE(GET_CREATION_HOST(k)));
 		}
 		
@@ -6250,7 +6970,7 @@ void do_stat_character(char_data *ch, char_data *k) {
 	
 		sprintf(lbuf, "Physical  [%s%+d&0]", HAPPY_COLOR(GET_BONUS_PHYSICAL(k), 0), GET_BONUS_PHYSICAL(k));
 		sprintf(lbuf2, "Magical  [%s%+d&0]", HAPPY_COLOR(GET_BONUS_MAGICAL(k), 0), GET_BONUS_MAGICAL(k));
-		sprintf(lbuf3, "Healing  [%s%+d&0]", HAPPY_COLOR(total_bonus_healing(k), 0), total_bonus_healing(k));
+		sprintf(lbuf3, "Healing  [%s%+d&0]", HAPPY_COLOR(GET_BONUS_HEALING(k), 0), GET_BONUS_HEALING(k));
 		msg_to_char(ch, "  %-28.28s %-28.28s %-28.28s\r\n", lbuf, lbuf2, lbuf3);
 
 		// dex is removed from to-hit to make it easier to compare to caps
@@ -6274,7 +6994,7 @@ void do_stat_character(char_data *ch, char_data *k) {
 	sprintf(buf, "Pos: %s, Fighting: %s", buf2, (FIGHTING(k) ? GET_NAME(FIGHTING(k)) : "Nobody"));
 
 	if (IS_NPC(k)) {
-		sprintf(buf + strlen(buf), ", Attack: %s, Move: %s, Size: %s", attack_hit_info[MOB_ATTACK_TYPE(k)].name, mob_move_types[(int)MOB_MOVE_TYPE(k)], size_types[GET_SIZE(k)]);
+		sprintf(buf + strlen(buf), ", Attack: %d %s, Move: %s, Size: %s", MOB_ATTACK_TYPE(k), get_attack_name_by_vnum(MOB_ATTACK_TYPE(k)), mob_move_types[(int)MOB_MOVE_TYPE(k)], size_types[GET_SIZE(k)]);
 	}
 	if (k->desc) {
 		sprinttype(STATE(k->desc), connected_types, buf2, sizeof(buf2), "UNDEFINED");
@@ -6331,6 +7051,7 @@ void do_stat_character(char_data *ch, char_data *k) {
 
 	if (!IS_NPC(k)) {
 		msg_to_char(ch, "Hunger: %d, Thirst: %d, Drunk: %d\r\n", GET_COND(k, FULL), GET_COND(k, THIRST), GET_COND(k, DRUNK));
+		msg_to_char(ch, "Temperature: %d (%s), Warmth: %d, Cooling: %d\r\n", get_relative_temperature(k), temperature_to_string(get_relative_temperature(k)), GET_WARMTH(k), GET_COOLING(k));
 		msg_to_char(ch, "Speaking: %s, Recent deaths: %d\r\n", get_generic_name_by_vnum(GET_SPEAKING(k)), GET_RECENT_DEATH_COUNT(k));
 	}
 	
@@ -6369,7 +7090,7 @@ void do_stat_character(char_data *ch, char_data *k) {
 			diff = cool->expire_time - time(0);
 			
 			if (diff > 0) {
-				msg_to_char(ch, "%s&c%s&0 %d:%02d", (found ? ", ": ""), get_generic_name_by_vnum(cool->type), (diff / 60), (diff % 60));
+				msg_to_char(ch, "%s&c%s&0 %s", (found ? ", ": ""), get_generic_name_by_vnum(cool->type), colon_time(diff, FALSE, NULL));
 				
 				found = TRUE;
 			}
@@ -6394,12 +7115,7 @@ void do_stat_character(char_data *ch, char_data *k) {
 			else {
 				duration = aff->expire_time - time(0);
 				duration = MAX(duration, 0);
-				if (duration >= 60 * 60) {
-					sprintf(lbuf, "%d:%02d:%02d", (duration / 3600), ((duration % 3600) / 60), ((duration % 3600) % 60));
-				}
-				else {
-					sprintf(lbuf, "%d:%02d", (duration / 60), (duration % 60));
-				}
+				strcpy(lbuf, colon_time(duration, FALSE, NULL));
 			}
 
 			sprintf(buf, "TYPE: (%s) &c%s&0 ", lbuf, get_generic_name_by_vnum(aff->type));
@@ -6422,8 +7138,7 @@ void do_stat_character(char_data *ch, char_data *k) {
 	
 	// dots
 	for (dot = k->over_time_effects; dot; dot = dot->next) {
-		sprintf(lbuf, "%d:%02d", dot->time_remaining / 60, dot->time_remaining % 60);
-		msg_to_char(ch, "TYPE: (%s) &r%s&0 %d %s damage (%d/%d)\r\n", lbuf, get_generic_name_by_vnum(dot->type), dot->damage * dot->stack, damage_types[dot->damage_type], dot->stack, dot->max_stack);
+		msg_to_char(ch, "TYPE: (%s) &r%s&0 %d %s damage (%d/%d)\r\n", colon_time(dot->time_remaining, FALSE, NULL), get_generic_name_by_vnum(dot->type), dot->damage * dot->stack, damage_types[dot->damage_type], dot->stack, dot->max_stack);
 	}
 
 	/* check mobiles for a script */
@@ -6482,7 +7197,7 @@ void do_stat_craft(char_data *ch, craft_data *craft) {
 	
 	if (!CRAFT_IS_BUILDING(craft) && !CRAFT_IS_VEHICLE(craft)) {
 		seconds = GET_CRAFT_TIME(craft) * ACTION_CYCLE_TIME;
-		msg_to_char(ch, ", Time: [&g%d action tick%s&0 | &g%d:%02d&0]\r\n", GET_CRAFT_TIME(craft), PLURAL(GET_CRAFT_TIME(craft)), seconds / SECS_PER_REAL_MIN, seconds % SECS_PER_REAL_MIN);
+		msg_to_char(ch, ", Time: [&g%d action tick%s&0 | &g%s&0]\r\n", GET_CRAFT_TIME(craft), PLURAL(GET_CRAFT_TIME(craft)), colon_time(seconds, FALSE, NULL));
 	}
 	else {
 		msg_to_char(ch, "\r\n");
@@ -6510,7 +7225,7 @@ void do_stat_craft(char_data *ch, craft_data *craft) {
 
 	// resources
 	msg_to_char(ch, "Resources required:\r\n");
-	get_resource_display(GET_CRAFT_RESOURCES(craft), buf);
+	get_resource_display(ch, GET_CRAFT_RESOURCES(craft), buf);
 	send_to_char(buf, ch);
 }
 
@@ -6522,6 +7237,8 @@ void do_stat_craft(char_data *ch, craft_data *craft) {
 * @param crop_data *cp The crop to stat.
 */
 void do_stat_crop(char_data *ch, crop_data *cp) {
+	struct custom_message *ocm;
+	
 	msg_to_char(ch, "Crop VNum: [&c%d&0], Name: '&c%s&0'\r\n", GET_CROP_VNUM(cp), GET_CROP_NAME(cp));
 	msg_to_char(ch, "Room Title: %s, Mapout Color: %s\r\n", GET_CROP_TITLE(cp), mapout_color_names[GET_CROP_MAPOUT(cp)]);
 	
@@ -6547,6 +7264,13 @@ void do_stat_crop(char_data *ch, crop_data *cp) {
 			strcat(buf, desc->keyword);
 		}
 		msg_to_char(ch, "%s&0\r\n", buf);
+	}
+	
+	if (GET_CROP_CUSTOM_MSGS(cp)) {
+		msg_to_char(ch, "Custom messages:\r\n");
+		LL_FOREACH(GET_CROP_CUSTOM_MSGS(cp), ocm) {
+			msg_to_char(ch, " %s: %s\r\n", crop_custom_types[ocm->type], ocm->msg);
+		}
 	}
 	
 	if (GET_CROP_INTERACTIONS(cp)) {
@@ -6694,6 +7418,12 @@ void do_stat_global(char_data *ch, struct global_data *glb) {
 			msg_to_char(ch, "Levels: [&g%s&0], Mob Flags: &c%s&0, Exclude: &c%s&0\r\n", level_range_string(GET_GLOBAL_MIN_LEVEL(glb), GET_GLOBAL_MAX_LEVEL(glb), 0), buf, buf2);
 			break;
 		}
+		case GLOBAL_OBJ_INTERACTIONS: {
+			sprintbit(GET_GLOBAL_TYPE_FLAGS(glb), extra_bits, buf, TRUE);
+			sprintbit(GET_GLOBAL_TYPE_EXCLUDE(glb), extra_bits, buf2, TRUE);
+			msg_to_char(ch, "Levels: [&g%s&0], Obj Flags: &c%s&0, Exclude: &c%s&0\r\n", level_range_string(GET_GLOBAL_MIN_LEVEL(glb), GET_GLOBAL_MAX_LEVEL(glb), 0), buf, buf2);
+			break;
+		}
 		case GLOBAL_MINE_DATA: {
 			sprintbit(GET_GLOBAL_TYPE_FLAGS(glb), sector_flags, buf, TRUE);
 			sprintbit(GET_GLOBAL_TYPE_EXCLUDE(glb), sector_flags, buf2, TRUE);
@@ -6780,9 +7510,12 @@ void do_stat_object(char_data *ch, obj_data *j) {
 	prettier_sprintbit(GET_OBJ_TOOL_FLAGS(j), tool_flags, buf);
 	msg_to_char(ch, "Tool types: &y%s&0\r\n", buf);
 	
+	prettier_sprintbit(GET_OBJ_REQUIRES_TOOL(j), tool_flags, buf);
+	msg_to_char(ch, "Requires tool to use when crafting: \tg%s\t0\r\n", buf);
+	
 	if (GET_OBJ_TIMER(j) > 0) {
 		minutes = GET_OBJ_TIMER(j) * SECS_PER_MUD_HOUR / SECS_PER_REAL_MIN;
-		snprintf(part, sizeof(part), "%d tick%s (%d:%02d)", GET_OBJ_TIMER(j), PLURAL(GET_OBJ_TIMER(j)), minutes / 60, minutes % 60);
+		snprintf(part, sizeof(part), "%d tick%s (%s%s)", GET_OBJ_TIMER(j), PLURAL(GET_OBJ_TIMER(j)), colon_time(minutes, TRUE, NULL), GET_OBJ_TIMER(j) < 60 ? " minutes" : "");
 	}
 	else {
 		strcpy(part, "none");
@@ -6834,7 +7567,7 @@ void do_stat_object(char_data *ch, obj_data *j) {
 	switch (GET_OBJ_TYPE(j)) {
 		case ITEM_BOOK: {
 			book_data *book = book_proto(GET_BOOK_ID(j));
-			msg_to_char(ch, "Book: %d - %s\r\n", GET_BOOK_ID(j), (book ? book->title : "unknown"));
+			msg_to_char(ch, "Book: %d - %s\r\n", GET_BOOK_ID(j), (book ? BOOK_TITLE(book) : "unknown"));
 			break;
 		}
 		case ITEM_POISON: {
@@ -6849,7 +7582,7 @@ void do_stat_object(char_data *ch, obj_data *j) {
 		}
 		case ITEM_WEAPON:
 			msg_to_char(ch, "Speed: %.2f, Damage: %d (%s+%.2f base dps)\r\n", get_weapon_speed(j), GET_WEAPON_DAMAGE_BONUS(j), (IS_MAGIC_ATTACK(GET_WEAPON_TYPE(j)) ? "Intelligence" : "Strength"), get_base_dps(j));
-			msg_to_char(ch, "Damage type: %s (%s/%s)\r\n", attack_hit_info[GET_WEAPON_TYPE(j)].name, weapon_types[attack_hit_info[GET_WEAPON_TYPE(j)].weapon_type], damage_types[attack_hit_info[GET_WEAPON_TYPE(j)].damage_type]);
+			msg_to_char(ch, "Damage type: %d %s (%s/%s)\r\n", GET_WEAPON_TYPE(j), get_attack_name_by_vnum(GET_WEAPON_TYPE(j)), weapon_types[get_attack_weapon_type_by_vnum(GET_WEAPON_TYPE(j))], damage_types[get_attack_damage_type_by_vnum(GET_WEAPON_TYPE(j))]);
 			break;
 		case ITEM_ARMOR:
 			msg_to_char(ch, "Armor type: %s\r\n", armor_types[GET_ARMOR_TYPE(j)]);
@@ -6870,10 +7603,10 @@ void do_stat_object(char_data *ch, obj_data *j) {
 			msg_to_char(ch, "Corpse of: ");
 
 			if (IS_NPC_CORPSE(j)) {
-				msg_to_char(ch, "%s\r\n", get_mob_name_by_proto(GET_CORPSE_NPC_VNUM(j), FALSE));
+				msg_to_char(ch, "[%d] %s\r\n", GET_CORPSE_NPC_VNUM(j), get_mob_name_by_proto(GET_CORPSE_NPC_VNUM(j), FALSE));
 			}
 			else if (IS_PC_CORPSE(j)) {
-				msg_to_char(ch, "%s\r\n", (index = find_player_index_by_idnum(GET_CORPSE_PC_ID(j))) ? index->fullname : "a player");
+				msg_to_char(ch, "[%d] %s\r\n", GET_CORPSE_PC_ID(j), (index = find_player_index_by_idnum(GET_CORPSE_PC_ID(j))) ? index->fullname : "a player");
 			}
 			else {
 				msg_to_char(ch, "unknown\r\n");
@@ -6893,7 +7626,7 @@ void do_stat_object(char_data *ch, obj_data *j) {
 		}
 		case ITEM_MISSILE_WEAPON:
 			msg_to_char(ch, "Speed: %.2f, Damage: %d (%s+%.2f base dps)\r\n", get_weapon_speed(j), GET_MISSILE_WEAPON_DAMAGE(j), (IS_MAGIC_ATTACK(GET_MISSILE_WEAPON_TYPE(j)) ? "Intelligence" : "Strength"), get_base_dps(j));
-			msg_to_char(ch, "Damage type: %s\r\n", attack_hit_info[GET_MISSILE_WEAPON_TYPE(j)].name);
+			msg_to_char(ch, "Damage type: %s\r\n", get_attack_name_by_vnum(GET_MISSILE_WEAPON_TYPE(j)));
 			msg_to_char(ch, "Ammo type: %c\r\n", 'A' + GET_MISSILE_WEAPON_AMMO_TYPE(j));
 			break;
 		case ITEM_AMMO:
@@ -7071,7 +7804,7 @@ void do_stat_room(char_data *ch) {
 	struct depletion_data *dep;
 	struct empire_city_data *city;
 	struct time_info_data tinfo;
-	int found, num, zenith;
+	int duration, found, max, num, zenith;
 	bool comma;
 	adv_data *adv;
 	obj_data *j;
@@ -7148,6 +7881,13 @@ void do_stat_room(char_data *ch) {
 	}
 	else {
 		msg_to_char(ch, "Globe: no data available (location is not on the map)\r\n");
+	}
+	
+	// temperature info
+	msg_to_char(ch, "Temperature: \ty%d\t0 (\ty%s\t0), Season: \ty%s\t0\r\n", get_room_temperature(IN_ROOM(ch)), temperature_to_string(get_room_temperature(IN_ROOM(ch))), icon_types[GET_SEASON(IN_ROOM(ch))]);
+	if (get_climate(IN_ROOM(ch)) != NOBITS) {
+		ordered_sprintbit(get_climate(IN_ROOM(ch)), climate_flags, climate_flags_order, FALSE, buf);
+		msg_to_char(ch, "Climate: \tc%s\t0\r\n", buf);
 	}
 	
 	if (home != IN_ROOM(ch)) {
@@ -7340,8 +8080,15 @@ void do_stat_room(char_data *ch) {
 		
 		comma = FALSE;
 		for (dep = ROOM_DEPLETION(IN_ROOM(ch)); dep; dep = dep->next) {
-			if (dep->type < NUM_DEPLETION_TYPES) {
-				msg_to_char(ch, "%s%s (%d)", comma ? ", " : "", depletion_type[dep->type], dep->count);
+			if (dep->count > 0 && dep->type < NUM_DEPLETION_TYPES) {
+				max = get_depletion_max(IN_ROOM(ch), dep->type);
+				if (max > 0) {
+					msg_to_char(ch, "%s%s (%d, %d%%)", comma ? ", " : "", depletion_types[dep->type], dep->count, dep->count * 100 / max);
+				}
+				else {
+					// can't detect max
+					msg_to_char(ch, "%s%s (%d)", comma ? ", " : "", depletion_types[dep->type], dep->count);
+				}
 				comma = TRUE;
 			}
 		}
@@ -7353,17 +8100,29 @@ void do_stat_room(char_data *ch) {
 		for (aff = ROOM_AFFECTS(IN_ROOM(ch)); aff; aff = aff->next) {
 			*buf2 = '\0';
 
-			sprintf(buf, "Affect: (%3ldsec) &c%s&0 ", (aff->expire_time - time(0)), get_generic_name_by_vnum(aff->type));
+			// duration setup
+			if (aff->expire_time == UNLIMITED) {
+				strcpy(buf3, "infinite");
+			}
+			else {
+				duration = aff->expire_time - time(0);
+				duration = MAX(duration, 0);
+				strcpy(buf3, colon_time(duration, FALSE, NULL));
+			}
+
+			sprintf(buf, "Affect: (%s) &c%s&0", buf3, get_generic_name_by_vnum(aff->type));
 
 			if (aff->modifier) {
-				sprintf(buf2, "%+d to %s", aff->modifier, apply_types[(int) aff->location]);
+				sprintf(buf2, " %+d to %s", aff->modifier, apply_types[(int) aff->location]);
 				strcat(buf, buf2);
 			}
 			if (aff->bitvector) {
-				if (*buf2)
+				if (*buf2) {
 					strcat(buf, ", sets ");
-				else
-					strcat(buf, "sets ");
+				}
+				else {
+					strcat(buf, " sets ");
+				}
 				sprintbit(aff->bitvector, room_aff_bits, buf2, TRUE);
 				strcat(buf, buf2);
 			}
@@ -7418,6 +8177,8 @@ void do_stat_room_template(char_data *ch, room_template *rmt) {
 	sprintbit(GET_RMT_BASE_AFFECTS(rmt), room_aff_bits, lbuf, TRUE);
 	msg_to_char(ch, "Affects: &g%s&0\r\n", lbuf);
 	
+	msg_to_char(ch, "Temperature: [\tc%s\t0]\r\n", temperature_types[GET_RMT_TEMPERATURE_TYPE(rmt)]);
+	
 	if (GET_RMT_EX_DESCS(rmt)) {
 		struct extra_descr_data *desc;
 		sprintf(buf, "Extra descs:&c");
@@ -7454,6 +8215,7 @@ void do_stat_room_template(char_data *ch, room_template *rmt) {
 void do_stat_sector(char_data *ch, sector_data *st) {
 	struct sector_index_type *idx = find_sector_index(GET_SECT_VNUM(st));
 	char buf[MAX_STRING_LENGTH];
+	struct custom_message *ocm;
 	
 	msg_to_char(ch, "Sector VNum: [&c%d&0], Name: '&c%s&0', Live Count [&c%d&0/&c%d&0]\r\n", st->vnum, st->name, idx->sect_count, idx->base_count);
 	msg_to_char(ch, "Room Title: %s\r\n", st->title);
@@ -7474,7 +8236,7 @@ void do_stat_sector(char_data *ch, sector_data *st) {
 	msg_to_char(ch, "Sector flags: &g%s&0\r\n", buf);
 	
 	ordered_sprintbit(GET_SECT_CLIMATE(st), climate_flags, climate_flags_order, FALSE, buf);
-	msg_to_char(ch, "Climate: &c%s&0\r\n", buf);
+	msg_to_char(ch, "Temperature: [\tc%s\t0], Climate: &c%s&0\r\n", temperature_types[GET_SECT_TEMPERATURE_TYPE(st)], buf);
 	
 	ordered_sprintbit(st->build_flags, bld_on_flags, bld_on_flags_order, TRUE, buf);
 	msg_to_char(ch, "Build flags: &g%s&0\r\n", buf);
@@ -7493,6 +8255,13 @@ void do_stat_sector(char_data *ch, sector_data *st) {
 			strcat(buf, desc->keyword);
 		}
 		msg_to_char(ch, "%s&0\r\n", buf);
+	}
+	
+	if (GET_SECT_CUSTOM_MSGS(st)) {
+		msg_to_char(ch, "Custom messages:\r\n");
+		LL_FOREACH(GET_SECT_CUSTOM_MSGS(st), ocm) {
+			msg_to_char(ch, " %s: %s\r\n", sect_custom_types[ocm->type], ocm->msg);
+		}
 	}
 
 	if (st->interactions) {
@@ -7545,8 +8314,8 @@ int vnum_book(char *searchname, char_data *ch) {
 	int found = 0;
 	
 	HASH_ITER(hh, book_table, book, next_book) {
-		if (multi_isname(searchname, book->title) || multi_isname(searchname, book->byline)) {
-			msg_to_char(ch, "%3d. [%5d] %s\t0 (%s\t0)\r\n", ++found, book->vnum, book->title, book->byline);
+		if (multi_isname(searchname, BOOK_TITLE(book)) || multi_isname(searchname, BOOK_BYLINE(book))) {
+			msg_to_char(ch, "%3d. [%5d] %s\t0 (%s\t0)\r\n", ++found, BOOK_VNUM(book), BOOK_TITLE(book), BOOK_BYLINE(book));
 		}
 	}
 
@@ -7635,6 +8404,11 @@ int vnum_global(char *searchname, char_data *ch) {
 			switch (GET_GLOBAL_TYPE(iter)) {
 				case GLOBAL_MOB_INTERACTIONS: {
 					sprintbit(GET_GLOBAL_TYPE_FLAGS(iter), action_bits, flags, TRUE);
+					msg_to_char(ch, "%3d. [%5d] %s (%s) %s (%s)\r\n", ++found, GET_GLOBAL_VNUM(iter), GET_GLOBAL_NAME(iter), level_range_string(GET_GLOBAL_MIN_LEVEL(iter), GET_GLOBAL_MAX_LEVEL(iter), 0), flags, global_types[GET_GLOBAL_TYPE(iter)]);
+					break;
+				}
+				case GLOBAL_OBJ_INTERACTIONS: {
+					sprintbit(GET_GLOBAL_TYPE_FLAGS(iter), extra_bits, flags, TRUE);
 					msg_to_char(ch, "%3d. [%5d] %s (%s) %s (%s)\r\n", ++found, GET_GLOBAL_VNUM(iter), GET_GLOBAL_NAME(iter), level_range_string(GET_GLOBAL_MIN_LEVEL(iter), GET_GLOBAL_MAX_LEVEL(iter), 0), flags, global_types[GET_GLOBAL_TYPE(iter)]);
 					break;
 				}
@@ -7773,13 +8547,17 @@ ACMD(do_addnotes) {
 			msg_to_char(ch, "Unknown account '%s'.\r\n", arg);
 			return;
 		}
+		if (get_highest_access_level(acct) > GET_ACCESS_LEVEL(ch)) {
+			msg_to_char(ch, "You can't add notes for accounts above your access level.\r\n");
+			return;
+		}
 	}
 	else {
 		if (!(index = find_player_index_by_name(arg))) {
 			send_to_char("There is no such player.\r\n", ch);
 			return;
 		}
-		if (index->access_level >= GET_ACCESS_LEVEL(ch)) {
+		if (index->access_level > GET_ACCESS_LEVEL(ch)) {
 			msg_to_char(ch, "You cannot add notes for players of that level.\r\n");
 			return;
 		}
@@ -7889,6 +8667,7 @@ ACMD(do_advance) {
 		syslog(SYS_LVL, GET_INVIS_LEV(ch), TRUE, "LVL: %s has promoted %s to level %d (from %d)", GET_NAME(ch), GET_NAME(victim), newlevel, oldlevel);
 
 	if (oldlevel < LVL_START_IMM && newlevel >= LVL_START_IMM) {
+		perform_approve(victim);
 		SET_BIT(PRF_FLAGS(victim), PRF_HOLYLIGHT | PRF_ROOMFLAGS | PRF_NOHASSLE);
 		
 		// turn on all syslogs
@@ -7927,22 +8706,10 @@ ACMD(do_approve) {
 	}
 	else {
 		if (subcmd == SCMD_APPROVE) {
-			if (config_get_bool("approve_per_character")) {
-				SET_BIT(PLR_FLAGS(vict), PLR_APPROVED);
-			}
-			else {	// per-account (default)
-				SET_BIT(GET_ACCOUNT(vict)->flags, ACCT_APPROVED);
-				SAVE_ACCOUNT(GET_ACCOUNT(vict));
-			}
-			
-			if (GET_ACCESS_LEVEL(vict) < LVL_MORTAL) {
-				GET_ACCESS_LEVEL(vict) = LVL_MORTAL;
-			}
+			perform_approve(vict);
 		}
 		else {
-			REMOVE_BIT(GET_ACCOUNT(vict)->flags, ACCT_APPROVED);
-			SAVE_ACCOUNT(GET_ACCOUNT(vict));
-			REMOVE_BIT(PLR_FLAGS(vict), PLR_APPROVED);
+			perform_unapprove(vict);
 		}
 		
 		if (!file) {
@@ -8074,6 +8841,11 @@ ACMD(do_automessage) {
 			msg_to_char(ch, "Usage: automessage add <type> [interval] <msg>\r\n");
 			return;
 		}
+		else if (strlen(argument) >= 255) {
+			// fread_string won't be able to read it beyond this.
+			msg_to_char(ch, "Message too long.\r\n");
+			return;
+		}
 		
 		// ready!
 		CREATE(msg, struct automessage, 1);
@@ -8148,6 +8920,11 @@ ACMD(do_automessage) {
 				msg_to_char(ch, "Change the message to what?\r\n");
 				return;
 			}
+			else if (strlen(argument) >= 255) {
+				// fread_string won't be able to read it beyond this.
+				msg_to_char(ch, "Message too long.\r\n");
+				return;
+			}
 			
 			syslog(SYS_GC, GET_INVIS_LEV(ch), TRUE, "GC: %s changed automessage %d to: %s", GET_NAME(ch), msg->id, argument);
 			msg_to_char(ch, "You change automessage %d from: %s\r\nTo: %s\r\n", msg->id, NULLSAFE(msg->msg), argument);
@@ -8215,7 +8992,7 @@ ACMD(do_autostore) {
 			perform_autostore(obj, emp, GET_ISLAND_ID(IN_ROOM(ch)));
 		}
 		else if (veh) {
-			act("$n auto-stores items in $V.", FALSE, ch, NULL, veh, TO_ROOM | DG_NO_TRIG);
+			act("$n auto-stores items in $V.", FALSE, ch, NULL, veh, TO_ROOM | DG_NO_TRIG | ACT_VEH_VICT);
 			
 			DL_FOREACH_SAFE2(VEH_CONTAINS(veh), obj, next_obj, next_content) {
 				perform_autostore(obj, VEH_OWNER(veh), GET_ISLAND_ID(IN_ROOM(ch)));
@@ -8404,7 +9181,7 @@ ACMD(do_dc) {
 
 // do_directions
 ACMD(do_distance) {
-	char *dir_str;
+	const char *dir_str;
 	room_data *target;
 	int dist;
 	
@@ -8528,7 +9305,7 @@ ACMD(do_echo) {
 				*hbuf = '\0';
 			}
 			strcat(hbuf, ch->desc->last_act_message);
-			add_to_channel_history(ch, CHANNEL_HISTORY_SAY, ch, hbuf);
+			add_to_channel_history(ch, CHANNEL_HISTORY_SAY, ch, hbuf, FALSE, 0, NOTHING);
 		}
 	}
 
@@ -8544,7 +9321,7 @@ ACMD(do_echo) {
 			}
 		}
 		
-		act(lbuf, FALSE, ch, obj, vict, TO_NOTVICT | TO_IGNORE_BAD_CODE);
+		act(lbuf, FALSE, ch, obj, vict, TO_NOTVICT | TO_IGNORE_BAD_CODE | DG_NO_TRIG);
 
 		// fetch and store channel history for the room
 		DL_FOREACH2(ROOM_PEOPLE(IN_ROOM(ch)), c, next_in_room) {
@@ -8557,7 +9334,7 @@ ACMD(do_echo) {
 					*hbuf = '\0';
 				}
 				strcat(hbuf, c->desc->last_act_message);
-				add_to_channel_history(c, CHANNEL_HISTORY_SAY, ch, hbuf);
+				add_to_channel_history(c, CHANNEL_HISTORY_SAY, ch, hbuf, (IS_MORPHED(ch) || IS_DISGUISED(ch)), 0, NOTHING);
 			}
 			else if (c->desc && c != ch && c != vict) {
 				// just in case
@@ -8586,7 +9363,7 @@ ACMD(do_echo) {
 		
 			// send to vict
 			if (vict != ch) {
-				act(lbuf, FALSE, ch, obj, vict, TO_VICT | TO_IGNORE_BAD_CODE);
+				act(lbuf, FALSE, ch, obj, vict, TO_VICT | TO_IGNORE_BAD_CODE | DG_NO_TRIG);
 			}
 		
 			// channel history
@@ -8599,7 +9376,7 @@ ACMD(do_echo) {
 					*hbuf = '\0';
 				}
 				strcat(hbuf, vict->desc->last_act_message);
-				add_to_channel_history(vict, CHANNEL_HISTORY_SAY, ch, hbuf);
+				add_to_channel_history(vict, CHANNEL_HISTORY_SAY, ch, hbuf, (IS_MORPHED(ch) || IS_DISGUISED(ch)), 0, NOTHING);
 			}
 		}
 	}
@@ -8616,7 +9393,7 @@ ACMD(do_echo) {
 		}
 		
 		// send to room
-		act(lbuf, FALSE, ch, obj, vict, TO_ROOM | TO_NOT_IGNORING | TO_IGNORE_BAD_CODE);
+		act(lbuf, FALSE, ch, obj, vict, TO_ROOM | TO_NOT_IGNORING | TO_IGNORE_BAD_CODE | DG_NO_TRIG);
 
 		// fetch and store channel history for the room
 		DL_FOREACH2(ROOM_PEOPLE(IN_ROOM(ch)), c, next_in_room) {
@@ -8629,7 +9406,7 @@ ACMD(do_echo) {
 					*hbuf = '\0';
 				}
 				strcat(hbuf, c->desc->last_act_message);
-				add_to_channel_history(c, CHANNEL_HISTORY_SAY, ch, hbuf);
+				add_to_channel_history(c, CHANNEL_HISTORY_SAY, ch, hbuf, (IS_MORPHED(ch) || IS_DISGUISED(ch)), 0, NOTHING);
 			}
 			else if (c->desc && c != ch) {
 				// just in case
@@ -8684,18 +9461,22 @@ ACMD(do_editnotes) {
 			msg_to_char(ch, "Unknown account '%s'.\r\n", arg);
 			return;
 		}
+		if (get_highest_access_level(acct) > GET_ACCESS_LEVEL(ch)) {
+			msg_to_char(ch, "You can't edit notes for accounts above your access level.\r\n");
+			return;
+		}
 	}
 	else {
 		if (!(index = find_player_index_by_name(arg))) {
 			send_to_char("There is no such player.\r\n", ch);
 			return;
 		}
-		if (index->access_level >= GET_ACCESS_LEVEL(ch)) {
-			msg_to_char(ch, "You cannot edit notes for players of that level.\r\n");
-			return;
-		}
 		if (!(acct = find_account(index->account_id))) {
 			msg_to_char(ch, "Unable to find account for that player.\r\n");
+			return;
+		}
+		if (get_highest_access_level(acct) >= GET_ACCESS_LEVEL(ch)) {
+			msg_to_char(ch, "You cannot edit notes for accounts above your access level.\r\n");
 			return;
 		}
 	}
@@ -8963,6 +9744,15 @@ ACMD(do_forgive) {
 			msg_to_char(ch, "Hostile flag forgiven.\r\n");
 			if (ch != vict) {
 				act("$n has forgiven your hostile flag.", FALSE, ch, NULL, vict, TO_VICT | DG_NO_TRIG);
+			}
+			any = TRUE;
+		}
+		
+		if (affected_by_spell(vict, ATYPE_HOSTILE_DELAY)) {
+			affect_from_char(vict, ATYPE_HOSTILE_DELAY, FALSE);
+			msg_to_char(ch, "Hostile delay forgiven.\r\n");
+			if (ch != vict) {
+				act("$n has forgiven your hostile delay.", FALSE, ch, NULL, vict, TO_VICT | DG_NO_TRIG);
 			}
 			any = TRUE;
 		}
@@ -9359,7 +10149,7 @@ ACMD(do_load) {
 	two_arguments(argument, buf, buf2);
 
 	if (!*buf || !*buf2 || !isdigit(*buf2)) {
-		send_to_char("Usage: load { obj | mob | vehicle } <number>\r\n", ch);
+		send_to_char("Usage: load { obj | mob | vehicle | book } <number>\r\n", ch);
 		return;
 	}
 	if ((number = atoi(buf2)) < 0) {
@@ -9400,7 +10190,9 @@ ACMD(do_load) {
 		act("$n makes a strange magical gesture.", TRUE, ch, 0, 0, TO_ROOM | DG_NO_TRIG);
 		act("$n has created $p!", FALSE, ch, obj, 0, TO_ROOM | DG_NO_TRIG);
 		act("You create $p.", FALSE, ch, obj, 0, TO_CHAR | DG_NO_TRIG);
-		load_otrigger(obj);
+		if (load_otrigger(obj) && obj->carried_by) {
+			get_otrigger(obj, obj->carried_by, FALSE);
+		}
 	}
 	else if (is_abbrev(buf, "vehicle")) {
 		if (!vehicle_proto(number)) {
@@ -9412,20 +10204,35 @@ ACMD(do_load) {
 		scale_vehicle_to_level(veh, 0);	// attempt auto-detect of level
 		get_vehicle_interior(veh);	// ensure inside is loaded
 		act("$n makes an odd magical gesture.", TRUE, ch, NULL, NULL, TO_ROOM | DG_NO_TRIG);
-		act("$n has created $V!", FALSE, ch, NULL, veh, TO_ROOM | DG_NO_TRIG);
-		act("You create $V.", FALSE, ch, NULL, veh, TO_CHAR | DG_NO_TRIG);
+		act("$n has created $V!", FALSE, ch, NULL, veh, TO_ROOM | DG_NO_TRIG | ACT_VEH_VICT);
+		act("You create $V.", FALSE, ch, NULL, veh, TO_CHAR | DG_NO_TRIG | ACT_VEH_VICT);
 		
 		if (VEH_CLAIMS_WITH_ROOM(veh) && ROOM_OWNER(HOME_ROOM(IN_ROOM(veh)))) {
 			perform_claim_vehicle(veh, ROOM_OWNER(HOME_ROOM(IN_ROOM(veh))));
 		}
-		
-		load_vtrigger(veh);
 		
 		if ((mort = find_mortal_in_room(IN_ROOM(ch)))) {
 			syslog(SYS_GC, GET_ACCESS_LEVEL(ch), TRUE, "ABUSE: %s loaded vehicle %s with mortal present (%s) at %s", GET_NAME(ch), VEH_SHORT_DESC(veh), GET_NAME(mort), room_log_identifier(IN_ROOM(ch)));
 		}
 		else if (ROOM_OWNER(IN_ROOM(ch)) && !EMPIRE_IMM_ONLY(ROOM_OWNER(IN_ROOM(ch)))) {
 			syslog(SYS_GC, GET_ACCESS_LEVEL(ch), TRUE, "ABUSE: %s loaded vehicle %s in mortal empire (%s) at %s", GET_NAME(ch), VEH_SHORT_DESC(veh), EMPIRE_NAME(ROOM_OWNER(IN_ROOM(ch))), room_log_identifier(IN_ROOM(ch)));
+		}
+		
+		load_vtrigger(veh);
+	}
+	else if (is_abbrev(buf, "book")) {
+		if (!book_proto(number)) {
+			msg_to_char(ch, "There is no book with that number.\r\n");
+			return;
+		}
+		
+		obj = create_book_obj(book_proto(number));
+		obj_to_char(obj, ch);
+		act("$n makes a strange magical gesture.", TRUE, ch, NULL, NULL, TO_ROOM | DG_NO_TRIG);
+		act("$n has created $p!", FALSE, ch, obj, NULL, TO_ROOM | DG_NO_TRIG);
+		act("You create $p.", FALSE, ch, obj, NULL, TO_CHAR | DG_NO_TRIG);
+		if (load_otrigger(obj) && obj->carried_by) {
+			get_otrigger(obj, obj->carried_by, FALSE);
 		}
 	}
 	else {
@@ -9437,7 +10244,7 @@ ACMD(do_load) {
 ACMD(do_moveeinv) {
 	char arg1[MAX_INPUT_LENGTH], arg2[MAX_INPUT_LENGTH], arg3[MAX_INPUT_LENGTH];
 	struct empire_unique_storage *unique;
-	struct empire_storage_data *store, *next_store;
+	struct empire_storage_data *store, *next_store, *new_store;
 	struct empire_island *eisle;
 	int island_from, island_to, count;
 	empire_data *emp;
@@ -9464,15 +10271,34 @@ ACMD(do_moveeinv) {
 		count = 0;
 		eisle = get_empire_island(emp, island_from);
 		HASH_ITER(hh, eisle->store, store, next_store) {
-			count += store->amount;
-			add_to_empire_storage(emp, island_to, store->vnum, store->amount);
+			if (store->amount > 0) {
+				SAFE_ADD(count, store->amount, 0, INT_MAX, FALSE);
+				new_store = add_to_empire_storage(emp, island_to, store->vnum, store->amount, 0);
+				if (new_store) {
+					merge_storage_timers(&new_store->timers, store->timers, new_store->amount);
+				}
+			}
+			else {
+				new_store = find_stored_resource(emp, island_to, store->vnum);
+			}
+			
+			// translate keep?
+			if (new_store && new_store->keep != UNLIMITED) {
+				if (store->keep == UNLIMITED) {
+					new_store->keep = UNLIMITED;
+				}
+				else {
+					SAFE_ADD(new_store->keep, store->keep, 0, INT_MAX, FALSE);
+				}
+			}
+			
 			HASH_DEL(eisle->store, store);
-			free(store);
+			free_empire_storage_data(store);
 		}
 		DL_FOREACH(EMPIRE_UNIQUE_STORAGE(emp), unique) {
 			if (unique->island == island_from) {
 				unique->island = island_to;
-				count += unique->amount;
+				SAFE_ADD(count, unique->amount, 0, INT_MAX, FALSE);
 				
 				// does not consolidate
 			}
@@ -9588,6 +10414,8 @@ ACMD(do_oset) {
 ACMD(do_peace) {
 	struct txt_block *inq, *next_inq;
 	char_data *iter, *next_iter;
+	trig_data *trig;
+	struct pursuit_data *purs, *next_purs;
 	
 	DL_FOREACH_SAFE2(ROOM_PEOPLE(IN_ROOM(ch)), iter, next_iter, next_in_room) {
 		// stop fighting
@@ -9605,8 +10433,28 @@ ACMD(do_peace) {
 		}
 		
 		// clear DOTs (could restart a fight)
-		while (ch->over_time_effects) {
-			dot_remove(ch, ch->over_time_effects);
+		while (iter->over_time_effects) {
+			dot_remove(iter, iter->over_time_effects);
+		}
+		
+		// cancel combat scripts (could keep players in combat)
+		if (IS_NPC(iter) && SCRIPT(iter)) {
+			LL_FOREACH(TRIGGERS(SCRIPT(iter)), trig) {
+				if (GET_TRIG_WAIT(trig) && GET_TRIG_DEPTH(trig) && IS_SET(GET_TRIG_TYPE(trig), MTRIG_FIGHT)) {
+					dg_event_cancel(GET_TRIG_WAIT(trig), cancel_wait_event);
+					GET_TRIG_WAIT(trig) = NULL;
+				}
+			}
+		}
+		
+		// cancel pursuit
+		if (IS_NPC(iter) && MOB_PURSUIT(iter)) {
+			return_to_pursuit_location(iter);
+			
+			LL_FOREACH_SAFE(MOB_PURSUIT(iter), purs, next_purs) {
+				free_pursuit(purs);
+			}
+			MOB_PURSUIT(iter) = NULL;
 		}
 	}
 	
@@ -9634,7 +10482,7 @@ ACMD(do_playerdelete) {
 	else if (!(victim = find_or_load_player(name, &file))) {
 		msg_to_char(ch, "Unknown player '%s'.\r\n", name);
 	}
-	else if (GET_ACCESS_LEVEL(victim) >= GET_ACCESS_LEVEL(ch)) {
+	else if (get_highest_access_level(GET_ACCOUNT(victim)) >= GET_ACCESS_LEVEL(ch) && GET_ACCOUNT(victim) != GET_ACCOUNT(ch)) {
 		msg_to_char(ch, "No, no, no, no, no, no, no.\r\n");
 	}
 	else if (PLR_FLAGGED(victim, PLR_NODELETE)) {
@@ -9655,8 +10503,11 @@ ACMD(do_playerdelete) {
 				if (config_get_bool("public_logins")) {
 					mortlog("%s has left the game", PERS(victim, victim, TRUE));
 				}
-				else if (GET_LOYALTY(victim)) {
-					log_to_empire(GET_LOYALTY(victim), ELOG_LOGINS, "%s has left the game", PERS(victim, victim, TRUE));
+				else {
+					mortlog_friends(victim, "%s has left the game", PERS(victim, victim, TRUE));
+					if (GET_LOYALTY(victim)) {
+						log_to_empire(GET_LOYALTY(victim), ELOG_LOGINS, "%s has left the game", PERS(victim, victim, TRUE));
+					}
 				}
 			}
 			msg_to_char(victim, "Your character has been deleted. Goodbye...\r\n");
@@ -9746,7 +10597,7 @@ ACMD(do_purge) {
 	struct shipping_data *shipd, *next_shipd;
 	char_data *vict, *next_v;
 	vehicle_data *veh;
-	obj_data *obj;
+	obj_data *obj, *next_o;
 	int number;
 	char *arg;
 
@@ -9791,9 +10642,9 @@ ACMD(do_purge) {
 				request_vehicle_save_in_world(veh);
 			}
 			
-			act("$n destroys $V.", FALSE, ch, NULL, veh, TO_ROOM | DG_NO_TRIG);
+			act("$n destroys $V.", FALSE, ch, NULL, veh, TO_ROOM | DG_NO_TRIG | ACT_VEH_VICT);
 			if (IN_ROOM(veh) != IN_ROOM(ch) && ROOM_PEOPLE(IN_ROOM(veh))) {
-				act("$V is destroyed!", FALSE, ROOM_PEOPLE(IN_ROOM(veh)), NULL, veh, TO_CHAR | TO_ROOM | DG_NO_TRIG);
+				act("$V is destroyed!", FALSE, ROOM_PEOPLE(IN_ROOM(veh)), NULL, veh, TO_CHAR | TO_ROOM | DG_NO_TRIG | ACT_VEH_VICT);
 			}
 			extract_vehicle(veh);
 		}
@@ -9810,12 +10661,15 @@ ACMD(do_purge) {
 		send_to_room("The world seems a little cleaner.\r\n", IN_ROOM(ch));
 		
 		DL_FOREACH_SAFE2(ROOM_PEOPLE(IN_ROOM(ch)), vict, next_v, next_in_room) {
-			if (REAL_NPC(vict))
+			if (REAL_NPC(vict) && !MOB_FLAGGED(vict, MOB_IMPORTANT)) {
 				extract_char(vict);
+			}
 		}
 
-		while (ROOM_CONTENTS(IN_ROOM(ch))) {
-			extract_obj(ROOM_CONTENTS(IN_ROOM(ch)));
+		DL_FOREACH_SAFE2(ROOM_CONTENTS(IN_ROOM(ch)), obj, next_o, next_content) {
+			if (!OBJ_FLAGGED(obj, OBJ_IMPORTANT)) {
+				extract_obj(obj);
+			}
 		}
 	}
 }
@@ -9846,6 +10700,7 @@ ACMD(do_random) {
 }
 
 
+// also do_shutdown
 ACMD(do_reboot) {
 	char arg[MAX_INPUT_LENGTH];
 	descriptor_data *desc;
@@ -9857,7 +10712,7 @@ ACMD(do_reboot) {
 	no_arg = !*arg;
 	while (*arg) {
 		if (is_number(arg)) {
-			if ((time = atoi(arg)) == 0) {
+			if ((time = atoi(arg)) <= 0) {
 				msg_to_char(ch, "Invalid amount of time!\r\n");
 				return;
 			}
@@ -9867,6 +10722,17 @@ ACMD(do_reboot) {
 		}
 		else if ((type = search_block(arg, shutdown_types, TRUE)) != NOTHING) {
 			reboot_control.level = type;
+		}
+		else if (!str_cmp(arg, "cancel")) {
+			if (reboot_control.type != subcmd) {
+				msg_to_char(ch, "There's no %s scheduled.\r\n", reboot_types[subcmd]);
+			}
+			else {
+				reboot_control.type = REBOOT_NONE;
+				reboot_control.time = -1;
+				msg_to_char(ch, "You have canceled the %s.\r\n", reboot_types[subcmd]);
+			}
+			return;
 		}
 		else {
 			msg_to_char(ch, "Unknown reboot option '%s'.\r\n", arg);
@@ -9882,18 +10748,21 @@ ACMD(do_reboot) {
 		reboot_control.type = subcmd;
 	}
 	
-	if (subcmd == SCMD_REBOOT) {
+	if (subcmd == REBOOT_REBOOT) {
 		reboot_control.level = SHUTDOWN_NORMAL;	// prevent a reboot from using a shutdown type
 	}
 
 	if (reboot_control.immediate) {
-		msg_to_char(ch, "Preparing for imminent %s...\r\n", reboot_type[reboot_control.type]);
+		msg_to_char(ch, "Preparing for imminent %s...\r\n", reboot_types[reboot_control.type]);
+	}
+	else if (reboot_control.type == REBOOT_NONE || reboot_control.time < 0) {
+		msg_to_char(ch, "There is no %s scheduled.\r\n", reboot_types[subcmd]);
 	}
 	else {
 		var = (no_arg ? reboot_control.time : time);
-		msg_to_char(ch, "The %s is set for %d minute%s (%s).\r\n", reboot_type[reboot_control.type], var, PLURAL(var), shutdown_types[reboot_control.level]);
+		msg_to_char(ch, "The %s is set for %d minute%s (%s).\r\n", reboot_types[reboot_control.type], var, PLURAL(var), shutdown_types[reboot_control.level]);
 		if (no_arg) {
-			msg_to_char(ch, "Players blocking the %s:\r\n", reboot_type[reboot_control.type]);
+			msg_to_char(ch, "Players blocking the %s:\r\n", reboot_types[reboot_control.type]);
 			for (desc = descriptor_list; desc; desc = desc->next) {
 				if (STATE(desc) != CON_PLAYING || !desc->character) {
 					msg_to_char(ch, " %s at menu\r\n", (desc->character ? GET_NAME(desc->character) : "New connection"));
@@ -9983,6 +10852,9 @@ ACMD(do_reload) {
 		top_of_helpt = 0;
 		index_boot_help();
 	}
+	else if (!str_cmp(arg, "fmessages") || !str_cmp(arg, "fightmessages")) {
+		load_fight_messages();
+	}
 	else if (!str_cmp(arg, "data")) {
 		load_data_table();
 	}
@@ -10039,8 +10911,8 @@ ACMD(do_rescale) {
 		scale_vehicle_to_level(veh, level);
 		syslog(SYS_GC, GET_ACCESS_LEVEL(ch), TRUE, "ABUSE: %s has rescaled vehicle %s to level %d at %s", GET_NAME(ch), VEH_SHORT_DESC(veh), VEH_SCALE_LEVEL(veh), room_log_identifier(IN_ROOM(ch)));
 		sprintf(buf, "You rescale $V to level %d.", VEH_SCALE_LEVEL(veh));
-		act(buf, FALSE, ch, NULL, veh, TO_CHAR | DG_NO_TRIG);
-		act("$n rescales $V.", FALSE, ch, NULL, veh, TO_ROOM | DG_NO_TRIG);
+		act(buf, FALSE, ch, NULL, veh, TO_CHAR | DG_NO_TRIG | ACT_VEH_VICT);
+		act("$n rescales $V.", FALSE, ch, NULL, veh, TO_ROOM | DG_NO_TRIG | ACT_VEH_VICT);
 	}
 	else if (obj) {
 		// item mode
@@ -10048,7 +10920,7 @@ ACMD(do_rescale) {
 			scale_item_to_level(obj, level);
 		}
 		else {
-			new = fresh_copy_obj(obj, level);
+			new = fresh_copy_obj(obj, level, TRUE, TRUE);
 			swap_obj_for_obj(obj, new);
 			extract_obj(obj);
 			obj = new;
@@ -10072,12 +10944,11 @@ ACMD(do_restore) {
 	struct cooldown_data *cool;
 	generic_data *gen, *next_gen;
 	vehicle_data *veh;
-	empire_data *emp;
 	char_data *vict;
 	int i, iter;
 	
 	// modes
-	bool all = FALSE, blood = FALSE, cds = FALSE, dots = FALSE, drunk = FALSE, health = FALSE, hunger = FALSE, mana = FALSE, moves = FALSE, thirst = FALSE;
+	bool all = FALSE, blood = FALSE, cds = FALSE, dots = FALSE, drunk = FALSE, health = FALSE, hunger = FALSE, mana = FALSE, moves = FALSE, thirst = FALSE, temperature = FALSE;
 
 	type_args = one_argument(argument, name_arg);
 	skip_spaces(&type_args);
@@ -10095,13 +10966,13 @@ ACMD(do_restore) {
 	if (veh) {
 		// found vehicle target here
 		syslog(SYS_GC, GET_ACCESS_LEVEL(ch), TRUE, "ABUSE: %s has restored %s at %s", GET_REAL_NAME(ch), VEH_SHORT_DESC(veh), room_log_identifier(IN_ROOM(ch)));
-		act("You restore $V!", FALSE, ch, NULL, veh, TO_CHAR | DG_NO_TRIG);
+		act("You restore $V!", FALSE, ch, NULL, veh, TO_CHAR | DG_NO_TRIG | ACT_VEH_VICT);
 
 		if (GET_INVIS_LEV(ch) > 1 || PRF_FLAGGED(ch, PRF_WIZHIDE)) {
-			act("$V is restored!", FALSE, ch, NULL, veh, TO_ROOM | DG_NO_TRIG);
+			act("$V is restored!", FALSE, ch, NULL, veh, TO_ROOM | DG_NO_TRIG | ACT_VEH_VICT);
 		}
 		else {
-			act("$n waves $s hand and restores $V!", FALSE, ch, NULL, veh, TO_ROOM | DG_NO_TRIG);
+			act("$n waves $s hand and restores $V!", FALSE, ch, NULL, veh, TO_ROOM | DG_NO_TRIG | ACT_VEH_VICT);
 		}
 		
 		remove_vehicle_flags(veh, VEH_ON_FIRE);
@@ -10152,6 +11023,9 @@ ACMD(do_restore) {
 			else if (is_abbrev(arg, "thirsty")) {
 				thirst = TRUE;
 			}
+			else if (is_abbrev(arg, "temperature")) {
+				temperature = TRUE;
+			}
 			else {
 				msg_to_char(ch, "Unknown restore type '%s'.\r\n", arg);
 				return;
@@ -10182,6 +11056,7 @@ ACMD(do_restore) {
 	
 	// fill pools
 	if (all || health) {
+		GET_DEFICIT(vict, HEALTH) = 0;
 		set_health(vict, GET_MAX_HEALTH(vict));
 		
 		if (GET_POS(vict) < POS_SLEEPING) {
@@ -10192,14 +11067,17 @@ ACMD(do_restore) {
 		sprintf(types + strlen(types), "%s health", *types ? "," : "");
 	}
 	if (all || mana) {
+		GET_DEFICIT(vict, MANA) = 0;
 		set_mana(vict, GET_MAX_MANA(vict));
 		sprintf(types + strlen(types), "%s mana", *types ? "," : "");
 	}
 	if (all || moves) {
+		GET_DEFICIT(vict, MOVE) = 0;
 		set_move(vict, GET_MAX_MOVE(vict));
 		sprintf(types + strlen(types), "%s moves", *types ? "," : "");
 	}
 	if (all || blood) {
+		GET_DEFICIT(vict, BLOOD) = 0;
 		set_blood(vict, GET_MAX_BLOOD(vict));
 		sprintf(types + strlen(types), "%s blood", *types ? "," : "");
 	}
@@ -10241,6 +11119,18 @@ ACMD(do_restore) {
 		}
 		sprintf(types + strlen(types), "%s drunkenness", *types ? "," : "");
 	}
+	
+	// temperature
+	if (all || temperature) {
+		reset_player_temperature(vict);
+		sprintf(types + strlen(types), "%s temperature", *types ? "," : "");
+	}
+	
+	// affects that could get a person stuck
+	if (all && AFF_FLAGGED(vict, AFF_DEATHSHROUDED | AFF_MUMMIFIED)) {
+		affects_from_char_by_aff_flag(vict, AFF_DEATHSHROUDED, TRUE);
+		affects_from_char_by_aff_flag(vict, AFF_MUMMIFIED, TRUE);
+	}
 
 	if (all && !IS_NPC(vict) && (GET_ACCESS_LEVEL(ch) >= LVL_GOD) && (GET_ACCESS_LEVEL(vict) >= LVL_GOD)) {
 		for (i = 0; i < NUM_CONDS; i++)
@@ -10253,26 +11143,15 @@ ACMD(do_restore) {
 		HASH_ITER(hh, skill_table, skill, next_skill) {
 			set_skill(vict, SKILL_VNUM(skill), SKILL_MAX_LEVEL(skill));
 		}
-		update_class(vict);
-		assign_class_abilities(vict, NULL, NOTHING);
 		
-		// temporarily remove empire abilities
-		emp = GET_LOYALTY(vict);
-		if (emp) {
-			adjust_abilities_to_empire(vict, emp, FALSE);
-		}
+		update_class_and_abilities(vict);
 		
 		HASH_ITER(hh, ability_table, abil, next_abil) {
 			// add abilities to set 0
 			add_ability_by_set(vict, abil, 0, TRUE);
 		}
-
-		affect_total(vict);
 		
-		// re-add abilities
-		if (emp) {
-			adjust_abilities_to_empire(vict, emp, TRUE);
-		}
+		affect_total(vict);
 		
 		// languages
 		HASH_ITER(hh, generic_table, gen, next_gen) {
@@ -10517,6 +11396,14 @@ ACMD(do_show) {
 		{ "oceanmobs", LVL_START_IMM, show_oceanmobs },
 		{ "subzone", LVL_START_IMM, show_subzone },
 		{ "tomb", LVL_START_IMM, show_tomb },
+		{ "fmessages", LVL_START_IMM, show_fmessages },
+		{ "smessages", LVL_START_IMM, show_smessages },
+		{ "unlockedarchetypes", LVL_START_IMM, show_unlocked_archetypes },
+		{ "friends", LVL_START_IMM, show_friends },
+		{ "libraries", LVL_START_IMM, show_libraries },
+		{ "author", LVL_START_IMM, show_author },
+		{ "lostbooks", LVL_START_IMM, show_lost_books },
+		{ "editors", LVL_START_IMM, show_editors },
 
 		// last
 		{ "\n", 0, NULL }
@@ -10583,21 +11470,23 @@ ACMD(do_slay) {
 			act("Surely you don't expect $N to let you slay $M, do you?", FALSE, ch, NULL, vict, TO_CHAR | DG_NO_TRIG);
 		}
 		else {
-			if (!IS_NPC(vict) && !affected_by_spell(ch, ATYPE_PHOENIX_RITE)) {
+			if (!IS_NPC(vict)) {
 				syslog(SYS_GC | SYS_DEATH, GET_INVIS_LEV(ch), TRUE, "ABUSE: %s has slain %s at %s", GET_REAL_NAME(ch), GET_REAL_NAME(vict), room_log_identifier(IN_ROOM(vict)));
 				log_to_slash_channel_by_name(DEATH_LOG_CHANNEL, NULL, "%s has been slain at (%d, %d)", PERS(vict, vict, TRUE), X_COORD(IN_ROOM(vict)), Y_COORD(IN_ROOM(vict)));
 			}
 			
-			act("You chop $M to pieces! Ah! The blood!", FALSE, ch, 0, vict, TO_CHAR);
-			act("$N chops you to pieces!", FALSE, vict, 0, ch, TO_CHAR);
-			act("$n brutally slays $N!", FALSE, ch, 0, vict, TO_NOTVICT);
+			act("You chop $M to pieces! Ah! The blood!", FALSE, ch, NULL, vict, TO_CHAR | DG_NO_TRIG);
+			act("$N chops you to pieces!", FALSE, vict, NULL, ch, TO_CHAR | DG_NO_TRIG);
+			act("$n brutally slays $N!", FALSE, ch, NULL, vict, TO_NOTVICT | DG_NO_TRIG);
 
 			check_scaling(vict, ch);	// ensure scaling
 			tag_mob(vict, ch);	// ensures loot binding if applicable
 
 			// this would prevent the death
-			if (affected_by_spell(vict, ATYPE_PHOENIX_RITE)) {
-				affect_from_char(vict, ATYPE_PHOENIX_RITE, FALSE);
+			if (AFF_FLAGGED(vict, AFF_AUTO_RESURRECT)) {
+				// remove ALL (unlike normal auto-rez)
+				affects_from_char_by_aff_flag(vict, AFF_AUTO_RESURRECT, FALSE);
+				REMOVE_BIT(AFF_FLAGS(vict), AFF_AUTO_RESURRECT);
 			}
 
 			die(vict, ch);
@@ -10758,8 +11647,6 @@ ACMD(do_stat) {
 			send_to_char("Sorry, you can't do that.\r\n", ch);
 		}
 		else {
-			refresh_passive_buffs(victim);
-			convert_and_schedule_player_affects(victim);	// ensures the timers are right on affects
 			do_stat_character(ch, victim);
 		}
 		
@@ -10974,7 +11861,9 @@ ACMD(do_trans) {
 				act("$n has transferred you!", FALSE, ch, 0, victim, TO_VICT | DG_NO_TRIG);
 				qt_visit_room(victim, IN_ROOM(victim));
 				look_at_room(victim);
-				enter_wtrigger(IN_ROOM(victim), victim, NO_DIR, "transfer");
+				enter_triggers(victim, NO_DIR, "transfer", FALSE);
+				greet_triggers(victim, NO_DIR, "transfer", FALSE);
+				RESET_LAST_MESSAGED_TEMPERATURE(victim);
 				msdp_update_room(victim);	// once we're sure we're staying
 			}
 		}
@@ -11002,7 +11891,9 @@ ACMD(do_trans) {
 			act("$n has transferred you!", FALSE, ch, 0, victim, TO_VICT | DG_NO_TRIG);
 			qt_visit_room(victim, IN_ROOM(victim));
 			look_at_room(victim);
-			enter_wtrigger(IN_ROOM(victim), victim, NO_DIR, "transfer");
+			enter_triggers(victim, NO_DIR, "transfer", FALSE);
+			greet_triggers(victim, NO_DIR, "transfer", FALSE);
+			RESET_LAST_MESSAGED_TEMPERATURE(victim);
 			msdp_update_room(victim);	// once we're sure we're staying
 			send_config_msg(ch, "ok_string");
 		}
@@ -11022,14 +11913,14 @@ ACMD(do_trans) {
 		}
 		
 		if (ROOM_PEOPLE(IN_ROOM(veh))) {
-			act("$V disappears in a mushroom cloud.", FALSE, ROOM_PEOPLE(IN_ROOM(veh)), NULL, veh, TO_CHAR | TO_ROOM | DG_NO_TRIG);
+			act("$V disappears in a mushroom cloud.", FALSE, ROOM_PEOPLE(IN_ROOM(veh)), NULL, veh, TO_CHAR | TO_ROOM | DG_NO_TRIG | ACT_VEH_VICT);
 		}
 		
 		vehicle_from_room(veh);
 		vehicle_to_room(veh, to_room);
 		
 		if (ROOM_PEOPLE(IN_ROOM(veh))) {
-			act("$V arrives from a puff of smoke.", FALSE, ROOM_PEOPLE(IN_ROOM(veh)), NULL, veh, TO_CHAR | TO_ROOM | DG_NO_TRIG);
+			act("$V arrives from a puff of smoke.", FALSE, ROOM_PEOPLE(IN_ROOM(veh)), NULL, veh, TO_CHAR | TO_ROOM | DG_NO_TRIG | ACT_VEH_VICT);
 		}
 		send_config_msg(ch, "ok_string");
 	}
@@ -11290,12 +12181,12 @@ ACMD(do_vnum) {
 	if (!*buf || !*buf2) {
 		send_to_char("Usage: vnum <type> <name>\r\n", ch);
 	}
-	else if (is_abbrev(buf, "mob")) {
+	else if (is_abbrev(buf, "mobile")) {
 		if (!vnum_mobile(buf2, ch)) {
 			send_to_char("No mobiles by that name.\r\n", ch);
 		}
 	}
-	else if (is_abbrev(buf, "obj")) {
+	else if (is_abbrev(buf, "object")) {
 		if (!vnum_object(buf2, ch)) {
 			send_to_char("No objects by that name.\r\n", ch);
 		}
@@ -11320,6 +12211,12 @@ ACMD(do_vnum) {
 		extern int vnum_archetype(char *searchname, char_data *ch);
 		if (!vnum_archetype(buf2, ch)) {
 			msg_to_char(ch, "No archetypes by that name.\r\n");
+		}
+	}
+	else if (is_abbrev(buf, "attack") || is_abbrev(buf, "attackmessage")) {
+		extern int vnum_attack_message(char *searchname, char_data *ch);
+		if (!vnum_attack_message(buf2, ch)) {
+			msg_to_char(ch, "No attack messages by that name.\r\n");
 		}
 	}
 	else if (is_abbrev(buf, "augment")) {
@@ -11431,6 +12328,10 @@ ACMD(do_vnum) {
 	}
 	else {
 		send_to_char("Usage: vnum <type> <name>\r\n", ch);
+		send_to_char("Valid types are: adventure, ability, archetype, attack, augment, book,\r\n"
+		"                 building, craft, class, crop, event, faction, global, generic,\r\n"
+		"                 mob, morph, obj,  progress, quest, roomtemplate, sector, shop,\r\n"
+		"                 skill, social, trigger, vehicle\r\n", ch);
 	}
 }
 
@@ -11441,7 +12342,7 @@ ACMD(do_vstat) {
 	obj_data *obj;
 	any_vnum number;
 
-	two_arguments(argument, buf, buf2);
+	half_chop(argument, buf, buf2);
 
 	if (!*buf || !*buf2 || !isdigit(*buf2)) {
 		send_to_char("Usage: vstat <type> <vnum>\r\n", ch);
@@ -11477,6 +12378,16 @@ ACMD(do_vstat) {
 			return;
 		}
 		do_stat_archetype(ch, arch);
+	}
+	else if (is_abbrev(buf, "attack") || is_abbrev(buf, "attackmessage")) {
+		void do_stat_attack_message(char_data *ch, attack_message_data *amd, bool full);
+		attack_message_data *amd = real_attack_message(number);
+		if (!amd) {
+			msg_to_char(ch, "There is no attack message with that number.\r\n");
+			return;
+		}
+		half_chop(buf2, buf1, arg);
+		do_stat_attack_message(ch, amd, !str_cmp(arg, "-d") ? TRUE : FALSE);
 	}
 	else if (is_abbrev(buf, "augment")) {
 		void do_stat_augment(char_data *ch, augment_data *aug);
@@ -11529,7 +12440,7 @@ ACMD(do_vstat) {
 		do_stat_crop(ch, crop);
 	}
 	else if (!strn_cmp(buf, "emp", 3) && is_abbrev(buf, "empire")) {
-		if ((emp = get_empire_by_name(buf2))) {
+		if ((emp = real_empire(number))) {
 			do_stat_empire(ch, emp);
 		}
 		else if (!*buf2) {
@@ -11684,8 +12595,13 @@ ACMD(do_vstat) {
 			extract_vehicle(veh);
 		}
 	}
-	else
-		send_to_char("Invalid type.\r\n", ch);
+	else {
+		send_to_char("Usage: vstat <type> <vnum>\r\n", ch);
+		send_to_char("Valid types are: adventure, ability, archetype, attack, augment, book,\r\n"
+		"                 building, craft, class, crop, event, faction, global, generic,\r\n"
+		"                 mob, morph, obj,  progress, quest, roomtemplate, sector, shop,\r\n"
+		"                 skill, social, trigger, vehicle\r\n", ch);
+	}
 }
 
 
@@ -11752,8 +12668,9 @@ ACMD(do_wizutil) {
 		send_to_char("There is no such player.\r\n", ch);
 	else if (IS_NPC(vict))
 		send_to_char("You can't do that to a mob!\r\n", ch);
-	else if (GET_ACCESS_LEVEL(vict) >= GET_ACCESS_LEVEL(ch))
+	else if (get_highest_access_level(GET_ACCOUNT(vict)) >= GET_ACCESS_LEVEL(ch) && subcmd != SCMD_THAW) {
 		send_to_char("Hmmm... you'd better not.\r\n", ch);
+	}
 	else {
 		switch (subcmd) {
 			case SCMD_NOTITLE:

@@ -33,6 +33,7 @@ See also: WAIT
 Complete (trigger type)
 
 Argument type:  percent chance to execute
+Return value:  return 0 to prevent further Complete triggers
 
 This trigger happens when a building is completed.
 
@@ -40,21 +41,6 @@ Variables:
   &c%room%&0 - The room that was just completed.
 
 See also: RTRIG LOAD
-#d
-"DISMANTLE TRIGGER" "RTRIG DISMANTLE" TRIGEDIT-ROOM-DISMANTLE TRIGEDIT-DISMANTLE TRIG-DISMANTLE
-
-Dismantle (trigger type)
-
-Return value:  return 0 to prevent the dismantle/redesignate
-
-This trigger is called when someone tries to dismantle or redesignate a room,
-or when the room is destroyed for any reason.
-
-Variables:
-  &c%room%&0 - The room about to be removed.
-  &c%actor%&0 - The person attempting to dismantle (there may be no actor if
-    the dismantle is caused by siege damage or decay).
-  &c%preventable%&0 - Whether or not you can attempt to prevent this action.
 #d
 "RTRIG COMMANDS" "ROOM COMMANDS" TRIGEDIT-ROOM-COMMANDS
 
@@ -149,6 +135,8 @@ Rooms can trigger on the following events:
 &cPlayer-in-Room&0 - Modifier: trigger requires a player present.
 &cReboot&0 - Triggers when the mud starts up.
 &cBuy&0 - Triggers when someone tries to buy in the room.
+&cAllow-Multiple&0 - For some triggers, multiple triggers can run. Put the
+  triggers with this flag first; any trigger without it will end the list.
 
 For each type, there is a help file named &yRTRIG <type>&0.
 #d
@@ -192,6 +180,7 @@ When using field - The variable returns:
       %room.north(room)% - room variable for room in direction (may be inside
          or on the map, depending on available exits and location)
       %room.north(map)% - room variable for the map location in the dir
+&chas_evolution(type)&0 - Room has a given evolution available (SECTEDIT EVO).
 &chas_trigger(vnum)&0 - Has the specified trigger attached.
 &cheight&0 - Get the current height of a map tile or set it with &cheight(num)&0.
    Use &cview_height&0 instead if you want to include things built on it.
@@ -199,6 +188,7 @@ When using field - The variable returns:
 &cin_city&0 - For claimed land, true if the tile is in a city for the owner.
 &cin_city(true)&0 - Like in_city but also checks the one-hour city wait time.
 &cin_vehicle&0 - The vehicle the room is inside of, if any.
+&cis_on_map&0 - True if the room is on the map (including closed buildings).
 &cis_outdoors&0 - True if it's on the map, in an outdoor adventure, etc.
 &cis_zenith_day&0 - True if it's the day of the sun's zenith passage here.
 &cmax_citizens&0 - If a building, the max number of citizens who can live here.
@@ -222,6 +212,7 @@ When using field - The variable returns:
 &csubzone&0 - The subzone id of the room template, if any (-1 if none).
 &csun&0 - Sun status at the room (regardless of indoor/outdoor): dark, rising,
    light, setting (only 'dark' makes the room dark).
+&ctemperature&0 - The room's temperature as a number (usually -100 to 100).
 &ctemplate&0 - The room template vnum, if any.
 &ctime(field)&0 - Time at this room. Fields: hour, day, month, year, day_of_year.
 &ctitle&0 - The room's title (shown on 'look').

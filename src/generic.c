@@ -2,15 +2,13 @@
 *   File: generic.c                                       EmpireMUD 2.0b5 *
 *  Usage: loading, saving, OLC, and functions for generics                *
 *                                                                         *
-*  EmpireMUD code base by Paul Clarke, (C) 2000-2015                      *
+*  EmpireMUD code base by Paul Clarke, (C) 2000-2024                      *
 *  All rights reserved.  See license.doc for complete information.        *
 *                                                                         *
 *  EmpireMUD based upon CircleMUD 3.0, bpl 17, by Jeremy Elson.           *
 *  CircleMUD (C) 1993, 94 by the Trustees of the Johns Hopkins University *
 *  CircleMUD is based on DikuMUD, Copyright (C) 1990, 1991.               *
 ************************************************************************ */
-
-#include <math.h>
 
 #include "conf.h"
 #include "sysdep.h"
@@ -36,6 +34,8 @@
 *   Displays
 *   Generic OLC Modules
 *   Action OLC Modules
+*   Currency OLC Modules
+*   Cooldown/Affect OLC Modules
 *   Component OLC Modules
 *   Liquid OLC Modules
 */
@@ -204,6 +204,25 @@ int get_generic_value_by_vnum(any_vnum vnum, int type, int pos) {
 
 
 /**
+* Checks liquid flags based on the liquid's vnum.
+*
+* @param any_vnum generic_liquid_vnum Which liquid (generic) vnum to check.
+* @param bitvector_t flag Which flag(s) to look for.
+* @return bool TRUE if ALL those flags are set on the liquid, FALSE if not.
+*/
+bool liquid_flagged(any_vnum generic_liquid_vnum, bitvector_t flag) {
+	generic_data *gen = real_generic(generic_liquid_vnum);
+	
+	if (gen && flag && (GET_LIQUID_FLAGS(gen) & flag) == flag) {
+		return TRUE;
+	}
+	else {
+		return FALSE;
+	}
+}
+
+
+/**
 * Determines if a generic has a given relationship with another generic.
 *
 * @param struct generic_relation *list The list to check.
@@ -252,6 +271,7 @@ bool audit_generic(generic_data *gen, char_data *ch) {
 	struct generic_relation *rel, *next_rel;
 	char temp[MAX_STRING_LENGTH];
 	bool problem = FALSE;
+	attack_message_data *amd;
 	generic_data *alt;
 	obj_data *proto;
 	
@@ -357,6 +377,10 @@ bool audit_generic(generic_data *gen, char_data *ch) {
 					problem = TRUE;
 				}
 			}
+			if (GET_AFFECT_DOT_ATTACK(gen) >= 0 && !(amd = real_attack_message(GET_AFFECT_DOT_ATTACK(gen)))) {
+				olc_audit_msg(ch, GEN_VNUM(gen), "DoT attack type is invalid.");
+				problem = TRUE;
+			}
 			break;
 		}
 		case GENERIC_COOLDOWN: {
@@ -416,6 +440,178 @@ char *list_one_generic(generic_data *gen, bool detail) {
 
 
 /**
+* Searches properties of generics.
+*
+* @param char_data *ch The person searching.
+* @param char *argument The argument they entered.
+*/
+void olc_fullsearch_generic(char_data *ch, char *argument) {
+	bool any;
+	char buf[MAX_STRING_LENGTH * 2], line[MAX_STRING_LENGTH], type_arg[MAX_INPUT_LENGTH], val_arg[MAX_INPUT_LENGTH], find_keywords[MAX_INPUT_LENGTH];
+	int count, iter;
+	
+	bitvector_t only_flags = NOBITS, not_flagged = NOBITS, only_liquid_flags = NOBITS;
+	int only_type = NOTHING, vmin = NOTHING, vmax = NOTHING;
+	int only_drunk = INT_MIN, drunk_over = INT_MIN, drunk_under = INT_MIN, only_hunger = INT_MIN, hunger_over = INT_MIN, hunger_under = INT_MIN, only_thirst = INT_MIN, thirst_over = INT_MIN, thirst_under = INT_MIN;
+	int only_moon = NOTHING, moon_over = NOTHING, moon_under = NOTHING;
+	
+	generic_data *gen, *next_gen;
+	size_t size;
+	
+	if (!*argument) {
+		msg_to_char(ch, "See HELP GENEDIT FULLSEARCH for syntax.\r\n");
+		return;
+	}
+	
+	// process argument
+	*find_keywords = '\0';
+	while (*argument) {
+		// figure out a type
+		argument = any_one_arg(argument, type_arg);
+		
+		if (!strcmp(type_arg, "-")) {
+			continue;	// just skip stray dashes
+		}
+		
+		FULLSEARCH_FLAGS("flags", only_flags, generic_flags)
+		FULLSEARCH_FLAGS("flagged", only_flags, generic_flags)
+		FULLSEARCH_FLAGS("unflagged", not_flagged, generic_flags)
+		FULLSEARCH_LIST("type", only_type, generic_types)
+		FULLSEARCH_INT("vmin", vmin, 0, INT_MAX)
+		FULLSEARCH_INT("vmax", vmax, 0, INT_MAX)
+		
+		// liquids
+		FULLSEARCH_INT("drunk", only_drunk, INT_MIN, INT_MAX)
+		FULLSEARCH_INT("drunkover", drunk_over, INT_MIN, INT_MAX)
+		FULLSEARCH_INT("drunkunder", drunk_under, INT_MIN, INT_MAX)
+		FULLSEARCH_INT("hunger", only_hunger, INT_MIN, INT_MAX)
+		FULLSEARCH_INT("hungerover", hunger_over, INT_MIN, INT_MAX)
+		FULLSEARCH_INT("hungerunder", hunger_under, INT_MIN, INT_MAX)
+		FULLSEARCH_INT("thirst", only_thirst, INT_MIN, INT_MAX)
+		FULLSEARCH_INT("thirstover", thirst_over, INT_MIN, INT_MAX)
+		FULLSEARCH_INT("thirstunder", thirst_under, INT_MIN, INT_MAX)
+		FULLSEARCH_FLAGS("liquidflags", only_liquid_flags, liquid_flags)
+		FULLSEARCH_FLAGS("liquidflagged", only_liquid_flags, liquid_flags)
+		
+		// moons
+		FULLSEARCH_INT("mooncycle", only_moon, -1, INT_MAX)
+		FULLSEARCH_INT("mooncycleover", moon_over, 0, INT_MAX)
+		FULLSEARCH_INT("mooncycleunder", moon_under, 0, INT_MAX)
+		
+		else {	// not sure what to do with it? treat it like a keyword
+			sprintf(find_keywords + strlen(find_keywords), "%s%s", *find_keywords ? " " : "", type_arg);
+		}
+		
+		// prepare for next loop
+		skip_spaces(&argument);
+	}
+	
+	size = snprintf(buf, sizeof(buf), "Generic fullsearch: %s\r\n", show_color_codes(find_keywords));
+	count = 0;
+	
+	// okay now look up generics
+	HASH_ITER(hh, generic_table, gen, next_gen) {
+		if ((vmin != NOTHING && GEN_VNUM(gen) < vmin) || (vmax != NOTHING && GEN_VNUM(gen) > vmax)) {
+			continue;	// vnum range
+		}
+		if (only_type != NOTHING && GEN_TYPE(gen) != only_type) {
+			continue;
+		}
+		if (not_flagged != NOBITS && IS_SET(GEN_FLAGS(gen), not_flagged)) {
+			continue;
+		}
+		if (only_flags != NOBITS && (GEN_FLAGS(gen) & only_flags) != only_flags) {
+			continue;
+		}
+		
+		// liquids
+		if (only_drunk != INT_MIN && (GEN_TYPE(gen) != GENERIC_LIQUID || GEN_VALUE(gen, GVAL_LIQUID_DRUNK) != only_drunk)) {
+			continue;
+		}
+		if (drunk_over != INT_MIN && (GEN_TYPE(gen) != GENERIC_LIQUID || GEN_VALUE(gen, GVAL_LIQUID_DRUNK) < drunk_over)) {
+			continue;
+		}
+		if (drunk_under != INT_MIN && (GEN_TYPE(gen) != GENERIC_LIQUID || GEN_VALUE(gen, GVAL_LIQUID_DRUNK) > drunk_under)) {
+			continue;
+		}
+		if (only_hunger != INT_MIN && (GEN_TYPE(gen) != GENERIC_LIQUID || GEN_VALUE(gen, GVAL_LIQUID_FULL) != only_hunger)) {
+			continue;
+		}
+		if (hunger_over != INT_MIN && (GEN_TYPE(gen) != GENERIC_LIQUID || GEN_VALUE(gen, GVAL_LIQUID_FULL) < hunger_over)) {
+			continue;
+		}
+		if (hunger_under != INT_MIN && (GEN_TYPE(gen) != GENERIC_LIQUID || GEN_VALUE(gen, GVAL_LIQUID_FULL) > hunger_under)) {
+			continue;
+		}
+		if (only_thirst != INT_MIN && (GEN_TYPE(gen) != GENERIC_LIQUID || GEN_VALUE(gen, GVAL_LIQUID_THIRST) != only_thirst)) {
+			continue;
+		}
+		if (thirst_over != INT_MIN && (GEN_TYPE(gen) != GENERIC_LIQUID || GEN_VALUE(gen, GVAL_LIQUID_THIRST) < thirst_over)) {
+			continue;
+		}
+		if (thirst_under != INT_MIN && (GEN_TYPE(gen) != GENERIC_LIQUID || GEN_VALUE(gen, GVAL_LIQUID_THIRST) > thirst_under)) {
+			continue;
+		}
+		if (only_liquid_flags != NOBITS && (GEN_TYPE(gen) != GENERIC_LIQUID || (GEN_VALUE(gen, GVAL_LIQUID_FLAGS) & only_liquid_flags) != only_liquid_flags)) {
+			continue;
+		}
+		
+		// moons
+		if (only_moon != NOTHING && (GEN_TYPE(gen) != GENERIC_MOON || GEN_VALUE(gen, GVAL_MOON_CYCLE) != only_moon)) {
+			continue;
+		}
+		if (moon_over != NOTHING && (GEN_TYPE(gen) != GENERIC_MOON || GEN_VALUE(gen, GVAL_MOON_CYCLE) < moon_over)) {
+			continue;
+		}
+		if (moon_under != NOTHING && (GEN_TYPE(gen) != GENERIC_MOON || GEN_VALUE(gen, GVAL_MOON_CYCLE) > moon_under)) {
+			continue;
+		}
+		
+		// search strings
+		if (*find_keywords) {
+			any = FALSE;
+			if (multi_isname(find_keywords, GEN_NAME(gen))) {
+				any = TRUE;
+			}
+			
+			for (iter = 0; iter < NUM_GENERIC_STRINGS && !any; ++iter) {
+				if (GEN_STRING(gen, iter) && multi_isname(find_keywords, GEN_STRING(gen, iter))) {
+					any = TRUE;
+				}
+			}
+			
+			// did we find a match in any string
+			if (!any) {
+				continue;
+			}
+		}
+		
+		// show it
+		snprintf(line, sizeof(line), "[%5d] %s (%s)\r\n", GEN_VNUM(gen), GEN_NAME(gen), generic_types[GEN_TYPE(gen)]);
+		if (strlen(line) + size < sizeof(buf)) {
+			size += snprintf(buf + size, sizeof(buf) - size, "%s", line);
+			++count;
+		}
+		else {
+			size += snprintf(buf + size, sizeof(buf) - size, "OVERFLOW\r\n");
+			break;
+		}
+	}
+	
+	if (count > 0 && (size + 20) < sizeof(buf)) {
+		size += snprintf(buf + size, sizeof(buf) - size, "(%d generics)\r\n", count);
+	}
+	else if (count == 0) {
+		size += snprintf(buf + size, sizeof(buf) - size, " none\r\n");
+	}
+	
+	if (ch->desc) {
+		page_string(ch->desc, buf, TRUE);
+	}
+}
+
+
+/**
 * Searches for all uses of a generic and displays them.
 *
 * @param char_data *ch The player.
@@ -427,6 +623,7 @@ void olc_search_generic(char_data *ch, any_vnum vnum) {
 	ability_data *abil, *next_abil;
 	craft_data *craft, *next_craft;
 	event_data *event, *next_event;
+	struct interaction_item *inter;
 	quest_data *quest, *next_quest;
 	progress_data *prg, *next_prg;
 	augment_data *aug, *next_aug;
@@ -452,6 +649,14 @@ void olc_search_generic(char_data *ch, any_vnum vnum) {
 		any = FALSE;
 		any |= (ABIL_AFFECT_VNUM(abil) == vnum);
 		any |= (ABIL_COOLDOWN(abil) == vnum);
+		
+		LL_FOREACH(ABIL_INTERACTIONS(abil), inter) {
+			if (interact_data[inter->type].vnum_type == TYPE_LIQUID && inter->vnum == vnum) {
+				any = TRUE;
+				break;
+			}
+		}
+		
 		if (any) {
 			++found;
 			size += snprintf(buf + size, sizeof(buf) - size, "ABIL [%5d] %s\r\n", ABIL_VNUM(abil), ABIL_NAME(abil));
@@ -473,7 +678,7 @@ void olc_search_generic(char_data *ch, any_vnum vnum) {
 	// buildings
 	HASH_ITER(hh, building_table, bld, next_bld) {
 		any = FALSE;
-		for (res = GET_BLD_YEARLY_MAINTENANCE(bld); res && !any; res = res->next) {
+		for (res = GET_BLD_REGULAR_MAINTENANCE(bld); res && !any; res = res->next) {
 			if (res->vnum == vnum && ((GEN_TYPE(gen) == GENERIC_ACTION && res->type == RES_ACTION) || (GEN_TYPE(gen) == GENERIC_LIQUID && res->type == RES_LIQUID) || (GEN_TYPE(gen) == GENERIC_COMPONENT && res->type == RES_COMPONENT))) {
 				any = TRUE;
 				++found;
@@ -536,6 +741,15 @@ void olc_search_generic(char_data *ch, any_vnum vnum) {
 			any = TRUE;
 		}
 		if (GEN_TYPE(gen) == GENERIC_COMPONENT && GET_OBJ_COMPONENT(obj) == vnum) {
+			any = TRUE;
+		}
+		if (GEN_TYPE(gen) == GENERIC_AFFECT && GET_POTION_AFFECT(obj) == vnum) {
+			any = TRUE;
+		}
+		if (GEN_TYPE(gen) == GENERIC_COOLDOWN && GET_POTION_COOLDOWN_TYPE(obj) == vnum) {
+			any = TRUE;
+		}
+		if (GEN_TYPE(gen) == GENERIC_AFFECT && GET_POISON_AFFECT(obj) == vnum) {
 			any = TRUE;
 		}
 		
@@ -627,7 +841,7 @@ void olc_search_generic(char_data *ch, any_vnum vnum) {
 	// vehicles
 	HASH_ITER(hh, vehicle_table, veh, next_veh) {
 		any = FALSE;
-		for (res = VEH_YEARLY_MAINTENANCE(veh); res && !any; res = res->next) {
+		for (res = VEH_REGULAR_MAINTENANCE(veh); res && !any; res = res->next) {
 			if (res->vnum == vnum && ((GEN_TYPE(gen) == GENERIC_ACTION && res->type == RES_ACTION) || (GEN_TYPE(gen) == GENERIC_LIQUID && res->type == RES_LIQUID) || (GEN_TYPE(gen) == GENERIC_COMPONENT && res->type == RES_COMPONENT))) {
 				any = TRUE;
 				++found;
@@ -1259,6 +1473,8 @@ void olc_delete_generic(char_data *ch, any_vnum vnum) {
 			found = TRUE;
 		}
 		
+		found |= delete_from_interaction_list(&ABIL_INTERACTIONS(abil), TYPE_LIQUID, vnum);
+		
 		if (found) {
 			save_library_file_for_vnum(DB_BOOT_ABIL, ABIL_VNUM(abil));
 		}
@@ -1275,7 +1491,7 @@ void olc_delete_generic(char_data *ch, any_vnum vnum) {
 	
 	// update buildings
 	HASH_ITER(hh, building_table, bld, next_bld) {
-		if (remove_thing_from_resource_list(&GET_BLD_YEARLY_MAINTENANCE(bld), res_type, vnum)) {
+		if (remove_thing_from_resource_list(&GET_BLD_REGULAR_MAINTENANCE(bld), res_type, vnum)) {
 			syslog(SYS_OLC, GET_INVIS_LEV(ch), TRUE, "OLC: Building %d %s lost deleted maintenance generic", GET_BLD_VNUM(bld), GET_BLD_NAME(bld));
 			save_library_file_for_vnum(DB_BOOT_BLD, GET_BLD_VNUM(bld));
 		}
@@ -1335,6 +1551,18 @@ void olc_delete_generic(char_data *ch, any_vnum vnum) {
 		if (GEN_TYPE(gen) == GENERIC_COMPONENT && GET_OBJ_COMPONENT(obj) == vnum) {
 			found = TRUE;
 			obj->proto_data->component = NOTHING;
+		}
+		if (GEN_TYPE(gen) == GENERIC_AFFECT && GET_POTION_AFFECT(obj) == vnum) {
+			found = TRUE;
+			set_obj_val(obj, VAL_POTION_AFFECT, NOTHING);
+		}
+		if (GEN_TYPE(gen) == GENERIC_COOLDOWN && GET_POTION_COOLDOWN_TYPE(obj) == vnum) {
+			found = TRUE;
+			set_obj_val(obj, VAL_POTION_COOLDOWN_TYPE, NOTHING);
+		}
+		if (GEN_TYPE(gen) == GENERIC_AFFECT && GET_POISON_AFFECT(obj) == vnum) {
+			found = TRUE;
+			set_obj_val(obj, VAL_POISON_AFFECT, NOTHING);
 		}
 		
 		if (found) {
@@ -1419,7 +1647,7 @@ void olc_delete_generic(char_data *ch, any_vnum vnum) {
 	
 	// update vehicles
 	HASH_ITER(hh, vehicle_table, veh, next_veh) {
-		if (remove_thing_from_resource_list(&VEH_YEARLY_MAINTENANCE(veh), res_type, vnum)) {
+		if (remove_thing_from_resource_list(&VEH_REGULAR_MAINTENANCE(veh), res_type, vnum)) {
 			syslog(SYS_OLC, GET_INVIS_LEV(ch), TRUE, "OLC: Vehicle %d %s lost deleted maintenance generic", VEH_VNUM(veh), VEH_SHORT_DESC(veh));
 			save_library_file_for_vnum(DB_BOOT_VEH, VEH_VNUM(veh));
 		}
@@ -1442,6 +1670,8 @@ void olc_delete_generic(char_data *ch, any_vnum vnum) {
 				found = TRUE;
 			}
 			
+			found |= delete_from_interaction_list(&ABIL_INTERACTIONS(GET_OLC_ABILITY(desc)), TYPE_LIQUID, vnum);
+			
 			if (found) {
 				msg_to_char(desc->character, "A generic used by the ability you're editing was deleted.\r\n");
 			}
@@ -1453,7 +1683,7 @@ void olc_delete_generic(char_data *ch, any_vnum vnum) {
 			}
 		}
 		if (GET_OLC_BUILDING(desc)) {
-			if (remove_thing_from_resource_list(&GET_BLD_YEARLY_MAINTENANCE(GET_OLC_BUILDING(desc)), res_type, vnum)) {
+			if (remove_thing_from_resource_list(&GET_BLD_REGULAR_MAINTENANCE(GET_OLC_BUILDING(desc)), res_type, vnum)) {
 				msg_to_char(desc->character, "One of the resources used in the building you're editing was deleted.\r\n");
 			}
 		}
@@ -1504,6 +1734,21 @@ void olc_delete_generic(char_data *ch, any_vnum vnum) {
 				found = TRUE;
 				GET_OLC_OBJECT(desc)->proto_data->component = NOTHING;
 				msg_to_char(desc->character, "The generic component used by the object you're editing was deleted.\r\n");
+			}
+			if (GEN_TYPE(gen) == GENERIC_AFFECT && GET_POTION_AFFECT(GET_OLC_OBJECT(desc)) == vnum) {
+				found = TRUE;
+				set_obj_val(GET_OLC_OBJECT(desc), VAL_POTION_AFFECT, NOTHING);
+				msg_to_char(desc->character, "The generic affect used by the potion you're editing was deleted.\r\n");
+			}
+			if (GEN_TYPE(gen) == GENERIC_COOLDOWN && GET_POTION_COOLDOWN_TYPE(GET_OLC_OBJECT(desc)) == vnum) {
+				found = TRUE;
+				set_obj_val(GET_OLC_OBJECT(desc), VAL_POTION_COOLDOWN_TYPE, NOTHING);
+				msg_to_char(desc->character, "The generic cooldown used by the potion you're editing was deleted.\r\n");
+			}
+			if (GEN_TYPE(gen) == GENERIC_AFFECT && GET_POISON_AFFECT(GET_OLC_OBJECT(desc)) == vnum) {
+				found = TRUE;
+				set_obj_val(GET_OLC_OBJECT(desc), VAL_POISON_AFFECT, NOTHING);
+				msg_to_char(desc->character, "The generic affect used by the poison you're editing was deleted.\r\n");
 			}
 		}
 		if (GET_OLC_PROGRESS(desc)) {
@@ -1564,7 +1809,7 @@ void olc_delete_generic(char_data *ch, any_vnum vnum) {
 			}
 		}
 		if (GET_OLC_VEHICLE(desc)) {
-			if (remove_thing_from_resource_list(&VEH_YEARLY_MAINTENANCE(GET_OLC_VEHICLE(desc)), res_type, vnum)) {
+			if (remove_thing_from_resource_list(&VEH_REGULAR_MAINTENANCE(GET_OLC_VEHICLE(desc)), res_type, vnum)) {
 				msg_to_char(desc->character, "One of the resources used for maintenance for the vehicle you're editing was deleted.\r\n");
 			}
 		}
@@ -1770,6 +2015,9 @@ void do_stat_generic(char_data *ch, generic_data *gen) {
 		case GENERIC_LIQUID: {
 			size += snprintf(buf + size, sizeof(buf) - size, "Liquid: \ty%s\t0, Color: \ty%s\t0\r\n", NULLSAFE(GET_LIQUID_NAME(gen)), NULLSAFE(GET_LIQUID_COLOR(gen)));
 			size += snprintf(buf + size, sizeof(buf) - size, "Hunger: [\tc%d\t0], Thirst: [\tc%d\t0], Drunk: [\tc%d\t0]\r\n", GET_LIQUID_FULL(gen), GET_LIQUID_THIRST(gen), GET_LIQUID_DRUNK(gen));
+			
+			sprintbit(GET_LIQUID_FLAGS(gen), liquid_flags, part, TRUE);
+			size += snprintf(buf + size, sizeof(buf) - size, "Liquid flags: \tg%s\t0\r\n", part);
 			break;
 		}
 		case GENERIC_ACTION: {
@@ -1786,6 +2034,7 @@ void do_stat_generic(char_data *ch, generic_data *gen) {
 			break;
 		}
 		case GENERIC_AFFECT: {
+			size += snprintf(buf + size, sizeof(buf) - size, "DoT attack type: %d %s\r\n", GET_AFFECT_DOT_ATTACK(gen), (GET_AFFECT_DOT_ATTACK(gen) > 0) ? get_attack_name_by_vnum(GET_AFFECT_DOT_ATTACK(gen)) : "(none)");
 			size += snprintf(buf + size, sizeof(buf) - size, "Apply to-char: %s\r\n", GET_AFFECT_APPLY_TO_CHAR(gen) ? GET_AFFECT_APPLY_TO_CHAR(gen) : "(none)");
 			size += snprintf(buf + size, sizeof(buf) - size, "Apply to-room: %s\r\n", GET_AFFECT_APPLY_TO_ROOM(gen) ? GET_AFFECT_APPLY_TO_ROOM(gen) : "(none)");
 			size += snprintf(buf + size, sizeof(buf) - size, "Wear-off: %s\r\n", GET_AFFECT_WEAR_OFF_TO_CHAR(gen) ? GET_AFFECT_WEAR_OFF_TO_CHAR(gen) : "(none)");
@@ -1854,6 +2103,9 @@ void olc_show_generic(char_data *ch) {
 			sprintf(buf + strlen(buf), "<%shunger\t0> %d hour%s\r\n", OLC_LABEL_VAL(GET_LIQUID_FULL(gen), 0), GET_LIQUID_FULL(gen), PLURAL(GET_LIQUID_FULL(gen)));
 			sprintf(buf + strlen(buf), "<%sthirst\t0> %d hour%s\r\n", OLC_LABEL_VAL(GET_LIQUID_THIRST(gen), 0), GET_LIQUID_THIRST(gen), PLURAL(GET_LIQUID_THIRST(gen)));
 			sprintf(buf + strlen(buf), "<%sdrunk\t0> %d hour%s\r\n", OLC_LABEL_VAL(GET_LIQUID_DRUNK(gen), 0), GET_LIQUID_DRUNK(gen), PLURAL(GET_LIQUID_DRUNK(gen)));
+			
+			sprintbit(GET_LIQUID_FLAGS(gen), liquid_flags, lbuf, TRUE);
+			sprintf(buf + strlen(buf), "<%sliquidflags\t0> %s\r\n", OLC_LABEL_VAL(GET_LIQUID_FLAGS(gen), NOBITS), lbuf);
 			break;
 		}
 		case GENERIC_ACTION: {
@@ -1878,6 +2130,7 @@ void olc_show_generic(char_data *ch) {
 			sprintf(buf + strlen(buf), "<%swearoff2room\t0> %s\r\n", OLC_LABEL_STR(GEN_STRING(gen, GSTR_AFFECT_WEAR_OFF_TO_ROOM), ""), GET_AFFECT_WEAR_OFF_TO_ROOM(gen) ? GET_AFFECT_WEAR_OFF_TO_ROOM(gen) : "(none)");
 			sprintf(buf + strlen(buf), "<%slookatchar\t0> %s\r\n", OLC_LABEL_STR(GEN_STRING(gen, GSTR_AFFECT_LOOK_AT_CHAR), ""), GET_AFFECT_LOOK_AT_CHAR(gen) ? GET_AFFECT_LOOK_AT_CHAR(gen) : "(none)");
 			sprintf(buf + strlen(buf), "<%slookatroom\t0> %s\r\n", OLC_LABEL_STR(GEN_STRING(gen, GSTR_AFFECT_LOOK_AT_ROOM), ""), GET_AFFECT_LOOK_AT_ROOM(gen) ? GET_AFFECT_LOOK_AT_ROOM(gen) : "(none)");
+			sprintf(buf + strlen(buf), "<%sdotattack\t0> %d %s\r\n", OLC_LABEL_VAL(GET_AFFECT_DOT_ATTACK(gen), 0), GET_AFFECT_DOT_ATTACK(gen), (GET_AFFECT_DOT_ATTACK(gen) > 0) ? get_attack_name_by_vnum(GET_AFFECT_DOT_ATTACK(gen)) : "(none)");
 			break;
 		}
 		case GENERIC_CURRENCY: {
@@ -1941,6 +2194,18 @@ OLC_MODULE(genedit_flags) {
 	if (had_in_dev && !GEN_FLAGGED(gen, GEN_IN_DEVELOPMENT) && GET_ACCESS_LEVEL(ch) < LVL_UNRESTRICTED_BUILDER && !OLC_FLAGGED(ch, OLC_FLAG_CLEAR_IN_DEV)) {
 		msg_to_char(ch, "You don't have permission to remove the IN-DEVELOPMENT flag.\r\n");
 		SET_BIT(GEN_FLAGS(gen), GEN_IN_DEVELOPMENT);
+	}
+}
+
+
+OLC_MODULE(genedit_liquidflags) {
+	generic_data *gen = GET_OLC_GENERIC(ch->desc);
+	
+	if (GEN_TYPE(gen) != GENERIC_LIQUID) {
+		msg_to_char(ch, "You can only change that on a LIQUID generic.\r\n");
+	}
+	else {
+		GEN_VALUE(gen, GVAL_LIQUID_FLAGS) = olc_process_flag(ch, argument, "liquid", "liquidflags", liquid_flags, GET_LIQUID_FLAGS(gen));
 	}
 }
 
@@ -2217,6 +2482,40 @@ OLC_MODULE(genedit_apply2room) {
 		olc_process_string(ch, argument, "apply2room", &GEN_STRING(gen, pos));
 	}
 }
+
+
+OLC_MODULE(genedit_dotattack) {
+	generic_data *gen = GET_OLC_GENERIC(ch->desc);
+	int pos = 0;
+	attack_message_data *amd;
+	
+	switch (GEN_TYPE(gen)) {
+		case GENERIC_AFFECT: {
+			pos = GVAL_AFFECT_DOT_ATTACK;
+			break;
+		}
+		default: {
+			msg_to_char(ch, "You can only change that on an AFFECT generic.\r\n");
+			return;
+		}
+	}
+	
+	if (!*argument) {
+		msg_to_char(ch, "Set the custom DoT attack type to what (vnum or name)?\r\n");
+	}
+	else if (!str_cmp(argument, "none")) {
+		GEN_VALUE(gen, pos) = 0;
+		msg_to_char(ch, "Custom DoT attack type removed.\r\n");
+	}
+	else if (!(amd = find_attack_message_by_name_or_vnum(argument, FALSE))) {
+		msg_to_char(ch, "Unknown attack message '%s'.\r\n", argument);
+	}
+	else {
+		GEN_VALUE(gen, pos) = ATTACK_VNUM(amd);
+		msg_to_char(ch, "DoT attack type set to [%d] %s.\r\n", ATTACK_VNUM(amd), ATTACK_NAME(amd));
+	}
+}
+
 
 OLC_MODULE(genedit_lookatchar) {
 	generic_data *gen = GET_OLC_GENERIC(ch->desc);
@@ -2721,7 +3020,7 @@ OLC_MODULE(genedit_drunk) {
 		msg_to_char(ch, "You can only change that on a LIQUID generic.\r\n");
 	}
 	else {
-		GEN_VALUE(gen, DRUNK) = olc_process_number(ch, argument, "drunk", "drunk", -MAX_LIQUID_COND, MAX_LIQUID_COND, GET_LIQUID_DRUNK(gen));
+		GEN_VALUE(gen, GVAL_LIQUID_DRUNK) = olc_process_number(ch, argument, "drunk", "drunk", -MAX_LIQUID_COND, MAX_LIQUID_COND, GET_LIQUID_DRUNK(gen));
 	}
 }
 
@@ -2733,7 +3032,7 @@ OLC_MODULE(genedit_hunger) {
 		msg_to_char(ch, "You can only change that on a LIQUID generic.\r\n");
 	}
 	else {
-		GEN_VALUE(gen, FULL) = olc_process_number(ch, argument, "hunger", "hunger", -MAX_LIQUID_COND, MAX_LIQUID_COND, GET_LIQUID_FULL(gen));
+		GEN_VALUE(gen, GVAL_LIQUID_FULL) = olc_process_number(ch, argument, "hunger", "hunger", -MAX_LIQUID_COND, MAX_LIQUID_COND, GET_LIQUID_FULL(gen));
 	}
 }
 
@@ -2757,6 +3056,6 @@ OLC_MODULE(genedit_thirst) {
 		msg_to_char(ch, "You can only change that on a LIQUID generic.\r\n");
 	}
 	else {
-		GEN_VALUE(gen, THIRST) = olc_process_number(ch, argument, "thirst", "thirst", -MAX_LIQUID_COND, MAX_LIQUID_COND, GET_LIQUID_THIRST(gen));
+		GEN_VALUE(gen, GVAL_LIQUID_THIRST) = olc_process_number(ch, argument, "thirst", "thirst", -MAX_LIQUID_COND, MAX_LIQUID_COND, GET_LIQUID_THIRST(gen));
 	}
 }

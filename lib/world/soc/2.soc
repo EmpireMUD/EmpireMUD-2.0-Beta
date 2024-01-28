@@ -1028,4 +1028,23 @@ You just burst out laughing, unable to contain your amusement.~
 M7
 $n just bursts out laughing, $s amusement spilling over.~
 S
+#262
+annoint~
+annoint~
+0 5 5
+L
+1 6320 0 1 -
+M0
+Annoint whom with oil?~
+M2
+You annoint $N with oil.~
+M3
+$n annoints $N with oil.~
+M4
+$n annoints you with oil.~
+M5
+You don't see them here.~
+M6
+You can't exactly annoint yourself here.~
+S
 $

@@ -8,6 +8,9 @@ A
 21 -2
 A
 2 1
+D
+Looks like it's squirrels all the way down!
+~
 S
 #12663
 badger giant~
@@ -17,6 +20,9 @@ bj 10 0 0 0 3
 0 0 -1 -1
 A
 1 1
+D
+This must be how squirrels feel, looking up at a badger!
+~
 S
 #12666
 turtle snapping large~
@@ -26,6 +32,9 @@ bj 9 6 0 0 3
 0 0 -1 -1
 A
 12 1
+D
+This must be how fish feel, looking up at a massive turtle.
+~
 S
 #12667
 crow huge black-feathered feathered~
@@ -35,6 +44,10 @@ bj 26 2 0 m 3
 0 0 -1 -1
 A
 18 1
+D
+   With the massive crow looming above you, you suddenly hope you don't look
+like food.
+~
 S
 #12668
 elk~
@@ -50,6 +63,10 @@ A
 1 -1
 A
 8 -1
+D
+   The elk resembles a deer, but it is at least twice as bulky as any deer
+you've seen.
+~
 S
 #12669
 boar~
@@ -65,6 +82,11 @@ A
 1 -1
 A
 8 -1
+D
+   Though it resembles the pig in shape, this wild boar is thinner, larger, and
+considerably scruffier. It sniffs along the ground, perhaps looking for fungi
+or roots to eat.
+~
 S
 #12670
 jackrabbit rabbit~
@@ -80,6 +102,10 @@ A
 1 -1
 A
 8 -1
+D
+   The oversized jackrabbit -- actually a hare -- sits perfectly still and
+slowly moves its enormous, plate-shaped ears to scan for danger.
+~
 S
 #12671
 tortoise desert~
@@ -95,6 +121,11 @@ A
 1 -1
 A
 8 -1
+D
+   The tortoise has a hard, rounded shell as well as powerful armored legs.
+Its beak is made for eating fruits and leaves, but it looks as if it might take
+off a finger, given the chance.
+~
 S
 #12672
 anaconda giant~
@@ -110,6 +141,11 @@ A
 1 -1
 A
 8 -1
+D
+   The snake is as long as a boat, and as big around as a dog. It's capable of
+strangling an ox with its powerful muscles, and can unhinge its jaw to swallow
+one, too.
+~
 S
 #12673
 baboon~
@@ -125,5 +161,9 @@ A
 1 -1
 A
 8 -1
+D
+   The brown baboon chews a handful of leaves, watching you cautiously as if
+it's unsure of your intentions.
+~
 S
 $

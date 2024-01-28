@@ -4,7 +4,7 @@ the cave~
 A large cave opens beneath a hill on the seaside (adventure).~
 The cave is hard to see until you're almost right on top of it.
 ~
-8 0 0 0 4
+8 B 0 0 0 5
 -1 0 0
 1 0
 S
@@ -14,7 +14,7 @@ the cave exit~
 The mouth of the cave opens back out to the seashore (exit).~
 You can see the ocean.
 ~
-8 0 0 0 4
+8 B 0 0 0 5
 -1 0 0
 1 0
 T 12401
@@ -25,7 +25,7 @@ a swirling portal~
 A swirling portal has opened in the floor, and the water is draining through it.~
 Despite how much water is flowing through the portal, the outside looks dry.
 ~
-8 0 0 0 1
+8 B 0 0 0 2
 -1 0 0
 10 0
 S
@@ -36,7 +36,7 @@ An old barrel is stacked here.~
    This old barrel is stained green along the edges of its planks. The letters
 X X X X are scratched into the side.
 ~
-5 ep a 0 3
+5 ep a 0 0 3
 224 224 12402
 0 0
 S
@@ -47,7 +47,7 @@ A fillet of raw fish is stinking on the ground.~
    This raw fillet looks good enough to eat, but you could also cook it into
 something even better.
 ~
-6 0 a 0 2
+6 C a 0 0 3
 6 0 0
 7 24
 O+ 1 6203
@@ -63,7 +63,7 @@ there's an easy way around it. You just have to set the difficulty for the
 adventure to get by...
 Usage:  difficulty <normal | hard>
 ~
-3 0 0 0 3
+3 B 0 0 0 4
 0 0 0
 1 0
 T 12405
@@ -74,7 +74,7 @@ the magical bubble~
 A magical bubble barely holds back the sea water!~
 The bubble cast by the sea witch looks like it won't hold for long.
 ~
-3 0 0 0 2
+3 B 0 0 0 3
 0 0 0
 10 0
 S
@@ -84,10 +84,12 @@ some seaweed~
 Some seaweed is piled here.~
 The seaweed is a bit slimy, but edible.
 ~
-6 g a 0 4
+6 gC a 0 0 6
 4 0 0
 0 72
 O+ 1 6150
+R
+4 5619 0
 S
 #12408
 creature sea spawner~
@@ -95,7 +97,7 @@ a sea creature~
 A sea creature is floating here.~
 This item is supposed to summon a sea creature. You shouldn't see this.
 ~
-3 0 0 0 1
+3 0 0 0 0 1
 0 0 0
 1 0
 T 12408
@@ -105,7 +107,7 @@ breath~
 your breath~
 Your breath is here, and it is breathtaking.~
 ~
-3 p a 0 1
+3 p a 0 0 1
 0 0 0
 10 2
 T 12406
@@ -116,7 +118,7 @@ a crispy fillet of fish~
 A crispy fillet of fish is lying here.~
 The fish has been seasoned to perfection.
 ~
-6 m a 0 7
+6 m a 0 0 8
 24 0 0
 7 336
 A
@@ -132,7 +134,7 @@ dread pirate garb~
 Some pirate garb is lying here.~
 This is all the gear you'd need to be a fearsome pirate.
 ~
-2 p ad 0 1
+2 p ad 0 0 1
 0 0 0
 7 0
 A
@@ -147,7 +149,7 @@ a black tricorne hat~
 A black tricorne hat is lying here.~
 This fearsome naval hat would make you the envy of the many seas.
 ~
-2 mp ae 0 3
+2 mp ae 0 0 3
 0 0 0
 7 0
 A
@@ -164,9 +166,11 @@ the black tricorne hat pattern~
 The black tricorne hat pattern is on the ground.~
 This pattern will teach you to sew: black tricorne hat.
 ~
-7 0 a 0 1
+7 0 a 0 0 2
 12412 0 0
 0 0
+C
+1 1
 S
 #12414
 fat orca lump~
@@ -174,7 +178,7 @@ fat of orca~
 A lump of orca fat is lying on the ground.~
 This huge, disgusting lump of fat appears to have come from an orca.
 ~
-3 k a 0 3
+3 k a 0 0 3
 0 0 0
 7 48
 S
@@ -184,7 +188,7 @@ tentacle of squid~
 A squid tentacle is lying here.~
 This long, thin, slimy tentacle came from some unfortunate giant squid.
 ~
-3 k a 0 4
+3 k a 0 0 4
 0 0 0
 7 48
 S
@@ -195,7 +199,7 @@ A mermaid's eye is lying on the ground.~
    You're not sure who would pluck the eye from a mermaid, not what they'd use
 it for.
 ~
-3 k a 0 3
+3 k a 0 0 3
 0 0 0
 7 48
 S
@@ -206,7 +210,7 @@ A parrot whistle is lying here.~
 This whistle can summon a noncombat pet!
 Type 'use whistle' to summon it.
 ~
-19 p a 0 5
+19 p a 0 0 5
 12417 0 0
 0 0
 S
@@ -217,7 +221,7 @@ A hydra conch is lying here.~
 This conch can summon a noncombat pet!
 Type 'use conch' to summon it.
 ~
-19 p a 0 6
+19 p a 0 0 6
 12418 0 0
 0 0
 S
@@ -227,9 +231,9 @@ the deep-sea feast~
 A feast of deep-sea delights has been spread here.~
 The bounty of deep-sea creatures is impressive. This feast will boost casters.
 ~
-6 m 0 0 5
+6 m 0 0 0 6
 96 0 0
-7 336
+7 24
 A
 17 1 0
 A
@@ -248,9 +252,11 @@ the deep-sea feast recipe~
 The deep-sea feast recipe is on the ground.~
 This recipe will teach you to cook: deep-sea feast.
 ~
-7 0 a 0 1
+7 0 a 0 0 2
 12419 0 0
 0 0
+C
+1 1
 S
 #12421
 whistle orca green~
@@ -259,7 +265,7 @@ A green orca whistle is lying here.~
 This little whistle is black and white... and green.
 Type 'use orca' to summon this aquatic mount.
 ~
-3 p a 0 7
+3 p a 0 0 7
 12421 0 0
 14 0
 T 9910
@@ -271,7 +277,7 @@ A raging kraken shell is lying here.~
    This epic seashell has the Mark of the Kraken etched into the side of it.
 Type 'use kraken' to summon this aquatic mount.
 ~
-3 p a 0 6
+3 p a 0 0 6
 12422 0 0
 14 0
 T 9910
@@ -283,7 +289,7 @@ A giant albatross shell is lying here.~
    This epic seashell has the Mark of the Albatross painted on the side of it.
 Type 'use albatross' to summon this flying mount.
 ~
-3 p a 0 7
+3 p a 0 0 7
 12423 0 0
 14 0
 T 9910
@@ -297,7 +303,7 @@ in the manufacture of a goblin smuggler's hulk. These reputable ships are good
 for hiding extra cargo. You need the Shipbuilding ability and an upgraded
 shipyard.
 ~
-15 e a 0 5
+15 e a 0 0 5
 8 2 0
 0 0
 M
@@ -326,7 +332,7 @@ goblin pistols. It is sure to stoke fear in the hearts of all who see it. You
 will need the Shipbuilding ability and an upgraded shipyard to manufacture the
 goblin pirate ship.
 ~
-15 e a 0 6
+15 e a 0 0 6
 8 2 0
 11 0
 M
@@ -355,7 +361,7 @@ securely dock your ships where the mountains meet the sea, and these docks
 cannot be burned.
 Usage:  build cliffdocks <direction>
 ~
-3 0 a 0 2
+3 0 a 0 0 2
 0 0 0
 0 0
 S
@@ -368,7 +374,7 @@ that can't be seen from a distance. You require the Seafaring ability to make
 this.
 Usage:  build smugglerswharf <direction>
 ~
-3 0 a 0 2
+3 0 a 0 0 2
 0 0 0
 0 0
 S
@@ -379,7 +385,7 @@ A deep coral ring is lying here.~
    This ring is hand-crafted from deep-water coral, and bewitched with oceanic
 mana.
 ~
-2 moy ab 0 3
+2 moy ab 0 0 3
 0 0 0
 4 0
 A
@@ -396,7 +402,7 @@ A deep pearl ring is lying here.~
    This ring looks like it was carved by hand out of a giant pearl, harvested
 from a deep-water clam, and bewitched with oceanic mana.
 ~
-2 moy ab 0 4
+2 moy ab 0 0 4
 0 0 0
 14 0
 A
@@ -413,7 +419,7 @@ A deep seaweed ring is lying here.~
    This hand-crafted ring is made of seaweed, carefully dried and woven, and
 bewitched with oceanic mana so that it is at once both fragile and powerful.
 ~
-2 moy ab 0 6
+2 moy ab 0 0 6
 0 0 0
 0 0
 A
@@ -430,7 +436,7 @@ A deep sharktooth ring is lying here.~
    This ring has been hand-cut from the tooth of a truly massive shark, and
 bewitched with oceanic mana.
 ~
-2 moy ab 0 8
+2 moy ab 0 0 8
 0 0 0
 14 0
 A
@@ -447,7 +453,7 @@ A deep bone ring is lying here.~
    This ring has been cut from the bone of a drowned sailor, and bewitched with
 oceanic mana.
 ~
-2 moy ab 0 9
+2 moy ab 0 0 9
 0 0 0
 14 0
 A
@@ -467,7 +473,7 @@ A coral-buckled girdle is lying here.~
 buckle is carved from brain coral, and seems to be imbued with some kind of
 oceanic mana.
 ~
-27 moy al 0 6
+27 moy al 0 0 6
 3 0 0
 4 0
 A
@@ -486,7 +492,7 @@ A pearly sash is lying here.~
    This sash is made from woven seaweed cloth and finished with dozens of
 small, pure white pearls. It seems to be imbued with some kind of oceanic mana.
 ~
-27 moy al 0 8
+27 moy al 0 0 8
 0 0 0
 4 0
 A
@@ -505,7 +511,7 @@ A seaweed cumberbund is lying here.~
    This large cumberbund is stitched from seaweed cloth and seems to have been
 imbued with some kind of oceanic mana that's giving it some serious power.
 ~
-27 moy al 0 9
+27 moy al 0 0 9
 0 0 0
 4 0
 A
@@ -525,7 +531,7 @@ A sharktooth cincture is lying here.~
 looks like it hurts. Perhaps the strange, oceanic mana that imbues it redirects
 that pain into one's enemies.
 ~
-27 moy al 0 12
+27 moy al 0 0 12
 1 0 0
 4 0
 A
@@ -544,7 +550,7 @@ A band of human bones is lying here.~
    This band is made from dozens of human bones -- probably phalanges -- strung
 together like mail and imbued with some kind of oceanic mana.
 ~
-27 moy al 0 14
+27 moy al 0 0 14
 2 0 0
 14 0
 A
@@ -565,7 +571,7 @@ An imperium pirate hoop is lying on the ground.~
    This little hoop earring is exactly the sort a pirate would wear, if he
 could afford imperium.
 ~
-2 mp am 0 5
+2 mp am 0 0 5
 0 0 0
 4 0
 A
@@ -580,9 +586,11 @@ the imperium pirate hoop design~
 The imperium pirate hoop design is on the ground.~
 This design will teach you to forge: imperium pirate hoop.
 ~
-7 0 a 0 1
+7 0 a 0 0 2
 12438 0 0
 0 0
+C
+1 1
 S
 #12440
 hoop pirate nocturnium~
@@ -591,7 +599,7 @@ A nocturnium pirate hoop is lying on the ground.~
    This little hoop earring is exactly the sort a pirate would wear, if he
 could afford nocturnium.
 ~
-2 mp am 0 6
+2 mp am 0 0 6
 0 0 0
 4 0
 A
@@ -606,9 +614,11 @@ the nocturnium pirate hoop design~
 The nocturnium pirate hoop design is on the ground.~
 This design will teach you to forge: nocturnium pirate hoop.
 ~
-7 0 a 0 1
+7 0 a 0 0 2
 12440 0 0
 0 0
+C
+1 1
 S
 #12442
 salad seaweed~
@@ -616,9 +626,9 @@ a seaweed salad~
 A seaweed salad is drying out on the ground.~
 This lightly-dressed salad smells of the ocean.
 ~
-6 m a 0 7
+6 m a 0 0 10
 24 0 0
-7 336
+7 0
 A
 18 1 0
 C
@@ -630,7 +640,7 @@ M
 5
 $n grimmaces as $e crunches on a seaweed salad.~
 R
-4 5606 0
+4 5619 0
 S
 #12443
 monster sea spawner~
@@ -638,7 +648,7 @@ a sea monster~
 A sea monster is floating here.~
 This item is supposed to summon a sea creature. You shouldn't see this.
 ~
-3 0 0 0 4
+3 0 0 0 0 4
 0 0 0
 1 0
 T 12443
@@ -650,7 +660,7 @@ A golden pirate hoop is lying on the ground.~
    This little hoop earring looks like the kind pirates wear. It appears that
 it's only gold-plated; the core is nocturnium.
 ~
-2 mp am 0 7
+2 mp am 0 0 7
 0 0 0
 4 0
 A
@@ -665,9 +675,11 @@ the golden pirate hoop design~
 The golden pirate hoop design is on the ground.~
 This design will teach you to forge: golden pirate hoop.
 ~
-7 0 a 0 1
+7 0 a 0 0 2
 12444 0 0
 0 0
+C
+1 1
 S
 #12446
 hoop pirate silver~
@@ -675,7 +687,7 @@ a silver pirate hoop~
 A silver pirate hoop is lying on the ground.~
 This little hoop earring looks like it's made from silver-plated imperium.
 ~
-2 mp am 0 7
+2 mp am 0 0 7
 0 0 0
 4 0
 A
@@ -690,9 +702,11 @@ the silver pirate hoop design~
 The silver pirate hoop design is on the ground.~
 This design will teach you to forge: silver pirate hoop.
 ~
-7 0 a 0 2
+7 0 a 0 0 3
 12446 0 0
 0 0
+C
+1 1
 S
 #12448
 earring bone hoop~
@@ -700,7 +714,7 @@ a bone hoop earring~
 A bone hoop earring is lying here.~
 This exotic earring appears to be made from bone and interlaced with imperium.
 ~
-2 mp am 0 9
+2 mp am 0 0 9
 0 0 0
 14 0
 A
@@ -717,9 +731,11 @@ the bone hoop earring design~
 The bone hoop earring design is on the ground.~
 This design will teach you to forge: bone hoop earring.
 ~
-7 0 a 0 1
+7 0 a 0 0 2
 12448 0 0
 0 0
+C
+1 1
 S
 #12450
 pantaloons plated heavy pair~
@@ -727,7 +743,7 @@ heavy plated pantaloons~
 A pair of heavy plated pantaloons is lying here.~
 These pantaloons are a little small, but they look perfect for storming a ship.
 ~
-27 mp af 0 6
+27 mp af 0 0 6
 3 0 0
 11 0
 A
@@ -748,9 +764,11 @@ the heavy plated pantaloons pattern~
 The heavy plated pantaloons pattern is on the ground.~
 This pattern will teach you to forge: heavy plated pantaloons.
 ~
-7 0 a 0 1
+7 0 a 0 0 2
 12450 0 0
 0 0
+C
+1 1
 S
 #12452
 pantaloons scullery goblin pair~
@@ -760,7 +778,7 @@ A pair of goblin scullery pantaloons is lying here.~
 lot of housework, but someone has infused them with magic that almost brings
 them to life.
 ~
-27 mp af 0 7
+27 mp af 0 0 7
 0 0 0
 11 0
 A
@@ -781,9 +799,11 @@ the goblin scullery pantaloons pattern~
 The goblin scullery pantaloons pattern is on the ground.~
 This pattern will teach you to sew: goblin scullery pantaloons.
 ~
-7 0 a 0 1
+7 0 a 0 0 2
 12452 0 0
 0 0
+C
+1 1
 S
 #12454
 pantaloons goblin sea-shaman shaman pair~
@@ -792,7 +812,7 @@ A pair of goblin sea-shaman pantaloons is lying here.~
    These pantaloons are decked in talismans and trinkets from across the many
 seas.
 ~
-27 mp af 0 8
+27 mp af 0 0 8
 0 0 0
 11 0
 A
@@ -813,9 +833,11 @@ the goblin sea-shaman pantaloons pattern~
 The goblin sea-shaman pantaloons pattern is on the ground.~
 This pattern will teach you to sew: goblin sea-shaman pantaloons.
 ~
-7 0 a 0 1
+7 0 a 0 0 2
 12454 0 0
 0 0
+C
+1 1
 S
 #12456
 pantaloons pirate boarding~
@@ -823,7 +845,7 @@ pirate boarding pantaloons~
 A pair of pirate boarding pantaloons is lying here.~
 These pantaloons look perfect for boarding an enemy ship and plundering it!
 ~
-27 mp af 0 9
+27 mp af 0 0 9
 1 0 0
 11 0
 A
@@ -844,9 +866,11 @@ the pirate boarding pantaloons pattern~
 The pirate boarding pantaloons pattern is on the ground.~
 This pattern will teach you to sew: pirate boarding pantaloons.
 ~
-7 0 a 0 1
+7 0 a 0 0 2
 12456 0 0
 0 0
+C
+1 1
 S
 #12458
 pantaloons goblin dress pair~
@@ -855,7 +879,7 @@ A pair of goblin dress pantaloons is lying here.~
    These fancy pants are a little small, and look like they have been
 distressed by lots of dancing.
 ~
-27 mp af 0 11
+27 mp af 0 0 11
 2 0 0
 11 0
 A
@@ -874,9 +898,11 @@ the goblin dress pantaloons pattern~
 The goblin dress pantaloons pattern is on the ground.~
 This pattern will teach you to sew: goblin dress pantaloons.
 ~
-7 0 a 0 1
+7 0 a 0 0 2
 12458 0 0
 0 0
+C
+1 1
 S
 #12460
 dust goblin shaman enchanted~
@@ -885,7 +911,7 @@ Some enchanted goblin shaman dust is piled here.~
    The goblins swear you can't make goblincraft items without this dust, but it
 really just appears to be expensive dirt.
 ~
-3 0 a 0 2
+3 0 a 0 0 2
 0 0 0
 1 0
 R
@@ -900,7 +926,7 @@ A large, suspicious rock stands beside the path.~
    This rock is not blocking your path. Why are you staring at it? Adventure
 awaits!
 ~
-3 0 0 0 1
+3 B 0 0 0 2
 0 0 0
 1 72
 T 12404

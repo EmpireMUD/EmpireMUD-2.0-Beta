@@ -2,7 +2,7 @@
 *   File: augments.c                                      EmpireMUD 2.0b5 *
 *  Usage: DB and OLC for augments (item enchantments)                     *
 *                                                                         *
-*  EmpireMUD code base by Paul Clarke, (C) 2000-2015                      *
+*  EmpireMUD code base by Paul Clarke, (C) 2000-2024                      *
 *  All rights reserved.  See license.doc for complete information.        *
 *                                                                         *
 *  EmpireMUD based upon CircleMUD 3.0, bpl 17, by Jeremy Elson.           *
@@ -729,7 +729,7 @@ void do_stat_augment(char_data *ch, augment_data *aug) {
 	size += snprintf(buf + size, sizeof(buf) - size, "\r\n");
 	
 	// resources
-	get_resource_display(GET_AUG_RESOURCES(aug), part);
+	get_resource_display(ch, GET_AUG_RESOURCES(aug), part);
 	size += snprintf(buf + size, sizeof(buf) - size, "Resource cost:\r\n%s", part);
 	
 	page_string(ch->desc, buf, TRUE);
@@ -789,7 +789,7 @@ void olc_show_augment(char_data *ch) {
 	// resources
 	sprintf(buf + strlen(buf), "Resources required: <%sresource\t0>\r\n", OLC_LABEL_PTR(GET_AUG_RESOURCES(aug)));
 	if (GET_AUG_RESOURCES(aug)) {
-		get_resource_display(GET_AUG_RESOURCES(aug), lbuf);
+		get_resource_display(ch, GET_AUG_RESOURCES(aug), lbuf);
 		strcat(buf, lbuf);
 	}
 	

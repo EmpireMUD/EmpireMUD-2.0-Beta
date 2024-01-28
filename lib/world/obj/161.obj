@@ -5,7 +5,7 @@ A massive swell can be seen here. (adventure)~
    You shouldn't be seeing this. If you are seeing it, please file a bug report
 letting us know.
 ~
-8 0 0 0 4
+8 0 0 0 0 4
 -1 0 0
 0 0
 C
@@ -44,7 +44,7 @@ hydra shield (FORGE, Imperial Armors)
 plated hydra cape (FORGE, Imperial Armors)
 plated hydra gloves (FORGE, Imperial Armors)
 ~
-3 e a 0 16
+3 e a 0 0 16
 0 0 0
 7 0
 R
@@ -57,7 +57,7 @@ A hydra fang wand lies here.~
    A wand crafted from wood and inlaid with hydra fangs flickers with the same
 light as the beast did.
 ~
-1 m an 0 29
+1 m an 0 0 29
 0 2 22
 0 0
 A
@@ -79,7 +79,7 @@ A dagger made from a hydra fang lies here.~
    A pair of hydra fangs were bound together and sharpened to make a double
 edged blade perfect for puncturing flesh.
 ~
-1 im ao f 22
+1 im ao f 0 22
 0 5 4
 14 0
 A
@@ -101,7 +101,7 @@ A hydra fang trident stands here, impaled in the ground.~
    A centralized wooden shaft is encased in a magical metal sheathing, all
 leading to a triple point of hydra fangs.
 ~
-1 ehm an b 23
+1 ehm an b 0 23
 0 4 3
 2 0
 A
@@ -129,7 +129,7 @@ A hydra fang staff stands on end here.~
    A staff made up of multiple hydra fangs attached end to end and bound
 together by other materials is glowing faintly.
 ~
-1 em an 0 17
+1 em an p 0 18
 0 9 20
 0 0
 A
@@ -151,7 +151,7 @@ A hydra fang bow sits here unstrung.~
    A series of hydra fangs have been carved and interlocked together to form
 one solid bow. Attached at either end is a single leather rope.
 ~
-20 m ap 0 21
+20 m ap 0 0 21
 29 1 0
 0 0
 C
@@ -165,7 +165,7 @@ A hydra hide whip is coiled here.~
    A hydra hide is stripped and sewn into a single braided lash. At one end is
 a wooden handle; at the other, a fang tip for impact puncturing.
 ~
-1 im an 0 17
+1 im an 0 0 17
 0 3 7
 7 0
 A
@@ -189,7 +189,7 @@ A massive hydra bone stands upon its end here.~
    This bone, as thick as a log, is far too large to be used for anything worn.
 Seems it would make an excellent mast on a ship though.
 ~
-3 e a 0 7
+3 e a 0 0 7
 0 0 0
 14 0
 C
@@ -227,7 +227,7 @@ hydra fang trident (FORGE, Deadly Weapons)
 * Pvp
 hydra fang bow (CRAFT, Deadly Weapons)
 ~
-3 0 a 0 19
+3 0 a 0 0 19
 0 0 0
 14 0
 R
@@ -240,7 +240,7 @@ A petrified hydra skull is anchored here.~
    If you can see this, something has gone wrong and you should tell the
 immortals immediately as possible. Feel free to use the bug command to do so.
 ~
-3 0 0 0 5
+3 B 0 0 0 6
 0 0 0
 1 4
 T 16121
@@ -253,7 +253,7 @@ A surcoat of hydra hide sits here.~
 with the scaling of the monster it comes from, the protective value is
 undeniable.
 ~
-27 m aq 0 23
+27 m aq 0 0 23
 3 0 0
 2 0
 A
@@ -277,7 +277,7 @@ A hydra shield rests here.~
    This kite shield is made up of hydra hide and fangs. The face of the shield
 shows multiple overlapping hydra heads imprinted in the hide.
 ~
-23 m ao 0 21
+23 m ao 0 0 21
 0 0 0
 2 0
 A
@@ -301,7 +301,7 @@ A hydra hide cloak is crumpled here.~
    This cloak is pieced together from multiple hides. The design grants
 excellent protection, but also leaves range of motion open.
 ~
-27 m ak 0 18
+27 m ak 0 0 18
 1 0 0
 7 0
 A
@@ -325,7 +325,7 @@ A hydra hide robe is crumpled here.~
    A full length robe of hydra hide reflects all light sources and seems to
 enhance it with a mystical glow of its own.
 ~
-27 m aq 0 14
+27 m aq 0 0 14
 0 0 0
 7 0
 A
@@ -349,7 +349,7 @@ An aura of terror fills the room.~
    The terror evoked by swimming next to the oceanic hydra is gifted to the
 wearer of this aura.
 ~
-27 m ak 0 17
+27 m ak 0 0 17
 0 0 0
 10 0
 A
@@ -371,7 +371,7 @@ A hydra hide jacket is folded up here.~
    This jacket is made up of boiled hydra hide, worked into a close fitting cut
 for maximum combat ability.
 ~
-27 m aq 0 14
+27 m aq 0 0 14
 1 0 0
 7 0
 A
@@ -395,7 +395,7 @@ A pair of hydra hide pants are folded here.~
    This pair of pants is made of hydra hide and cut close to the body for
 maximum movement.
 ~
-27 m af 0 16
+27 m af 0 0 16
 1 0 0
 7 0
 A
@@ -419,7 +419,7 @@ A saddle cut to fit a hydra lies here.~
    The saddle fits a single necked mount well enough, but was clearly
 originally intended for a multiheaded beast.
 ~
-2 m as 0 10
+2 m as 0 0 10
 0 0 0
 7 0
 A
@@ -439,7 +439,7 @@ A hydra hide belt is looped here.~
    This stiff bit of hide resembles a wheel more than it does a belt.
 Nevertheless, its resistive nature is clear to see.
 ~
-27 m al 0 15
+27 m al 0 0 15
 3 0 0
 7 0
 A
@@ -465,7 +465,7 @@ A hydra scale belt is looped here.~
    This belt is crafted from hydra hide and scale, to form a layered effect. A
 low glow eminates from it, expressing possible mystical properties.
 ~
-27 m al 0 15
+27 m al 0 0 15
 0 0 0
 7 0
 A
@@ -490,7 +490,7 @@ A hydra fang belt is looped here.~
 an aggressive mindset. Fangs jut out at periodic intervals along the length
 for both intimidation and function.
 ~
-27 m al 0 13
+27 m al 0 0 13
 1 0 0
 7 0
 A
@@ -511,7 +511,7 @@ a pair of hydra scale gloves~
 A pair of hydra scale gloves are clasped together here.~
 These scaly gloves glow with mystical light.
 ~
-27 m ah 0 18
+27 m ah 0 0 18
 0 0 0
 7 0
 A
@@ -533,7 +533,7 @@ A pair of hydra hide gloves are clasped here.~
    These gloves are sewn together from boiled oceanic hydra hide, and studded
 with a few metal spikes for a vicious look.
 ~
-27 m ah 0 16
+27 m ah 0 0 16
 1 0 0
 7 0
 A
@@ -557,7 +557,7 @@ A hydra hide mask lies here.~
    A mask of boiled hydra hide conforms to the wearer's face, leaving one with
 a serpentine visage.
 ~
-27 m ae 0 15
+27 m ae 0 0 15
 1 0 0
 7 0
 A
@@ -580,7 +580,7 @@ a hydra hide helm~
 A hydra hide helm is sitting here.~
 A hardened helm of hydra hide is ready to protect someone's head from harm.
 ~
-27 m ae 0 16
+27 m ae 0 0 16
 3 0 0
 2 0
 A
@@ -605,7 +605,7 @@ a pair of hydra fang earrings~
 A pair of hydra fang earrings rests here.~
 Gold and hydra fangs join together into a pair of protective earrings.
 ~
-2 m am 0 16
+2 m am 0 0 16
 0 0 0
 14 0
 A
@@ -628,7 +628,7 @@ a single hydra fang stud~
 A single hydra fang stud lies here.~
 This single earring has two fangs bound by gold around a prismatic crystal.
 ~
-2 m am 0 18
+2 m am 0 0 18
 0 0 0
 14 0
 A
@@ -652,7 +652,7 @@ A hydra fang hoop is lying here.~
    A loop of precious metal forms the body of this adornment with two shaved
 fangs offering a striking effect.
 ~
-2 m am 0 17
+2 m am 0 0 17
 0 0 0
 14 0
 A
@@ -674,7 +674,7 @@ A hydra fang post earring lies here.~
    Two fangs are joined together, then shaved down until they work together as
 a single post.
 ~
-2 m am 0 16
+2 m am 0 0 16
 0 0 0
 14 0
 A
@@ -696,7 +696,7 @@ A hydra scale hood lies crumpled here.~
    This hood is sewn together from a boiled hydra hide, but also a fair few
 scales for a more magical feel.
 ~
-27 m ae 0 14
+27 m ae 0 0 14
 0 0 0
 7 0
 A
@@ -721,7 +721,7 @@ A hydra scale mask stares up from the ground here.~
 wearer looking rather cruel. A clearly visible glow eminates from not just the
 eye sockets, but the mask in general.
 ~
-27 m ae 0 13
+27 m ae 0 0 13
 0 0 0
 7 0
 A
@@ -742,7 +742,7 @@ a multi-headed whistle~
 A multi-headed whistle sits on the ground here.~
 Use this whistle once to receive one of the hydra minipets.
 ~
-3 p a 0 8
+3 p a 0 0 8
 0 0 0
 10 0
 C
@@ -756,7 +756,7 @@ A hydra seeking stone lies here.~
    This stone will tell you where the oceanic hydra was last seen. Just "seek
 hydra" to use it.
 ~
-3 p a 0 20
+3 p a 0 0 20
 0 0 0
 12 24
 C
@@ -787,7 +787,7 @@ majestic aura (CRAFT, Magical Vestments)
 * Tank
 hydra scale leggings (FORGE, Imperial Armors)
 ~
-15 e a 0 14
+15 e a 0 0 14
 2 2 0
 7 0
 R
@@ -799,7 +799,7 @@ a hydraling whistle~
 A hydraling whistle sits on the ground here.~
 Use this whistle once to receive an aquatic oceanic hydraling mount.
 ~
-3 p a 0 17
+3 p a 0 0 17
 16110 0 0
 10 0
 C
@@ -814,7 +814,7 @@ A hydra scale tunic is crumpled here.~
 shimmer coming off the scales seems to be a representation of the magical power
 it grants.
 ~
-27 m aq 0 16
+27 m aq 0 0 16
 0 0 0
 7 0
 A
@@ -838,7 +838,7 @@ A hydra scale girdle lies here.~
    This girdle not only grants its wearer a flattering look, but also gifts
 them with stronger mystical power.
 ~
-27 m al 0 11
+27 m al 0 0 11
 0 0 0
 7 0
 A
@@ -862,7 +862,7 @@ A pair of hydra hide handwraps are clasped here.~
    A pair of wraps, cut to fit about the hands are made up of hydra hide and
 glow with a mystical light.
 ~
-27 m ah 0 22
+27 m ah 0 0 22
 0 0 0
 7 0
 A
@@ -884,7 +884,7 @@ A pair of plated hydra gloves are clasped here.~
    Hydra hide, layered in plates of various metals, proves to be most effective
 protection against anything that might want at the wearer's hands.
 ~
-27 m ah 0 13
+27 m ah 0 0 13
 3 0 0
 2 0
 A
@@ -908,7 +908,7 @@ A claymore comprised of hydra fangs is staked in the ground here.~
    This massive sword has a core of fangs, coated in metal and sharpened to a
 combat-ready edge.
 ~
-1 ehmn an 0 13
+1 ehmn an 0 0 13
 0 13 1
 2 0
 A
@@ -929,7 +929,7 @@ A single hydra eye glares about.~
 on a hydra fang from the same head. The mystical properties are maintained and
 a slight glow can be seen.
 ~
-3 m ao 0 12
+3 m ao 0 0 12
 0 0 0
 7 0
 A
@@ -953,7 +953,7 @@ A fetish of hydra bits and pieces rests here.~
    A hydra skin pouch, tied with hydra sinew string holds bits and pieces of
 bone, fang, and scale from the same oceanic hydra.
 ~
-3 m ao 0 11
+3 m ao 0 0 11
 0 0 0
 7 0
 A
@@ -977,7 +977,7 @@ A plated hydra cape is folded here.~
    This cape is made up of a single piece of hydra hide, layered with metal
 plating and more hide patches for stability.
 ~
-27 m ak 0 11
+27 m ak 0 0 11
 3 0 0
 2 0
 A
@@ -1003,7 +1003,7 @@ A majestic aura fills the room.~
    The majesty of the oceanic hydra is captured by this aura and bestowed upon
 the wearer.
 ~
-27 m ak 0 13
+27 m ak 0 0 13
 0 0 0
 7 0
 A
@@ -1027,7 +1027,7 @@ A pair of hydra scale chainmail leggings lies piled up here.~
    A pair of dragonscale-weave chainmail leggings has been adorned with hydra
 scales instead of the standard.
 ~
-27 m af 0 11
+27 m af 0 0 11
 3 0 0
 2 0
 A
@@ -1049,7 +1049,7 @@ A skirt made of hydra hide is folded here.~
    A simple yet protective skirt made from a sheath of hydra hide wraps about
 the wearer.
 ~
-27 m af 0 11
+27 m af 0 0 11
 0 0 0
 7 0
 A
@@ -1074,7 +1074,7 @@ A pair of hydra hide trousers rests here, neatly folded.~
 mystical essence. They give off a faint glow, which grows and fades with the
 caster's use of magic.
 ~
-27 m af 0 12
+27 m af 0 0 12
 0 0 0
 7 0
 A
@@ -1098,7 +1098,7 @@ A longsword comprised of hydra fangs is staked in the ground here.~
    This massive sword has a core of fangs, coated in metal and sharpened to a
 combat ready edge.
 ~
-1 em an 0 12
+1 em an 0 0 12
 0 7 1
 2 0
 A
@@ -1118,7 +1118,7 @@ This is a hydra lootbox.~
    If you see this, then you should alert an imm via the bug command and tell
 when possible.
 ~
-3 kp a 0 5
+3 kp a 0 0 5
 0 0 0
 0 2
 T 16120
@@ -1132,7 +1132,7 @@ it with their serrated teeth in their death throws. You can use this to bind
 bones together and build an oceanic tower.
 Usage: build oceanictower <direction>
 ~
-3 0 a 0 3
+3 0 a 0 0 3
 0 0 0
 7 0
 R

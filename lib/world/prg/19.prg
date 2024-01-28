@@ -1,8 +1,10 @@
 #1900
-Henge Construction~
-   Like the druids of old, your empire has learned to construct henges from
-megalithic stones. These henges can be used to learn the secrets of the druids
-and the path of Natural Magic.
+Mysteries in the Shadow of Henge~
+   No one knows why the ancients built the first henges, but they have become
+an enduring symbol of the mysteries that lie beneath the surface of the world.
+Now, your empire has learned to construct these monumental henges from
+megalithic stone. In the shadow of these henges, you can learn the secrets of
+Natural Magic and follow the path of the manaweavers.
    The henge requires 120x (large blocks).
 ~
 4 1 50 0 b
@@ -99,5 +101,36 @@ K 0 18
 P 1003
 P 3000
 P 2013
+S
+#1907
+Portalmancy~
+   Your community has grown to include sorcerers unaccustomed to the rigors of
+overland travel. With them, they bring the promise of a new form of magic:
+portals. Your empire can now build the structures that anchor portals and allow
+travel across the land.
+   Building a portal costs 20x (pillars), 12x (large blocks), and 20x nexus
+crystals. Once built, any member of the empire can open a portal between two
+such buildings on the same island or continent.
+~
+3 1 50 0 b
+K 0 8
+K 2 1115
+K 2 5185
+P 1901
+P 1040
+S
+#1908
+Livestock Livelihood~
+   In order to satiate your empire's appetite for meat and eggs, it can now
+build chicken coops, pastures, and pigsties. Your workforce will produce eggs,
+poultry, mutton, wool, and pork from these outdoor buildings.
+~
+3 1 15 0 b
+K 2 5216
+K 2 5217
+K 2 5218
+K 2 5111
+P 1002
+P 2011
 S
 $

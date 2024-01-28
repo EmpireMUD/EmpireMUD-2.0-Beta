@@ -5,7 +5,7 @@ Paul Clarke~
 a place where the forces of nature run deep, and interlopers are unwelcome.
 The grove is but a small part of the greater realm, and can be found in deep
 forests.
-   Enter the portal, but be prepared for both unfriendly druids and hidden
+   Enter the portal, but be prepared for both unfriendly mages and hidden
 predators as you explore the otherworldly forest of the Magiterranean.
 
 This adventure is deprecated and replaced with 12650.
@@ -25,10 +25,10 @@ S
 Magiterranean: The Hidden Garden~
 Paul Clarke~
    You find a hidden garden, nestled through a hole in the bushes of another
-garden. But this is no ordinary place. Help the druid gardener with a few
+garden. But this is no ordinary place. Help the mysterious gardener with a few
 simple requests, and be transported to the Magiterranean, the secret world of
-druids! You can do this quest alone or with friends, but there's no combat
-here. This adventure is for farmers and gardeners.
+natural magic! You can do this quest alone or with friends, but there's no
+combat here. This adventure is for farmers and gardeners.
 ~
 10225 10249 15-0
 5 0 km 0
@@ -53,8 +53,8 @@ S
 Magiterranean: Interdimensional Whirlwind~
 Paul Clarke and Owen Morris~
    The magical whirlwind seems to be a portal between this plane and the
-Magiterranean, the secret realm of druids. You can't seem to penetrate the
-whirlwind, but it looks like the druids have been using it to spread their
+Magiterranean, the secret realm of natural magic. You can't seem to penetrate
+the whirlwind, but it looks like the mages have been using it to spread their
 magi-netically modified crops into our world.
 (This adventure contains only the magical crops on the map.)
 ~
@@ -74,8 +74,9 @@ S
 Magiterranean: Monsoon Rift~
 Paul Clarke and Owen Morris~
    A rift has opened in the fabric between your world and the Magiterranean,
-the druidic plane of nature magic. A vicious monsoon storm is escaping through
-the rift, but it's not the only thing: animated cacti are attacking your world!
+the mysterious plane of nature magic. A vicious monsoon storm is escaping
+through the rift, but it's not the only thing: animated cacti are attacking
+your world!
    You can seal the rift using your Battle, High Sorcery, Natural Magic,
 Stealth, Trade, or Vampire skill. Each skill solution can only be completed
 once per day, even if you find another rift. The invading cacti will vanish as
@@ -169,7 +170,7 @@ Paul Clarke~
 hideout of infamous bandits Berk, Jorr, and Tranc! These three are not renowned
 for fighting fair, but if you're lucky, maybe only one of them is home.
 ~
-10105 10109 100-200
+0 0 100-200
 20 0 acdk 0
 L
 0 ac
@@ -239,7 +240,7 @@ countryside! Can you hunt it down and kill it? Just follow the swath of
 scorched earth. The dragon is tough -- you might want to bring a partner.
 ~
 10300 10329 100-150
-5 0 d 0
+5 0 n 0
 L
 5 0
 43200 -1 -1 -1
@@ -261,7 +262,7 @@ nearby. Can you find and defeat it? Be careful, it might take a pair of stout
 adventurers -- but the rewards will be worth it.
 ~
 10330 10359 125-175
-10 0 0 0
+10 0 n 0
 L
 1 0
 10330 -1 -1 -1
@@ -311,7 +312,7 @@ crafting patterns and items at the end of the quest.
 can enter the nest at a time.
 ~
 11000 11074 100-125
-50 0 dg 1
+50 0 dgp 1
 L
 5 0
 1440 -1 -1 -1

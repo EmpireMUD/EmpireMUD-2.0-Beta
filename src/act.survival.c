@@ -2,7 +2,7 @@
 *   File: act.survival.c                                  EmpireMUD 2.0b5 *
 *  Usage: code related to the Survival skill and its abilities            *
 *                                                                         *
-*  EmpireMUD code base by Paul Clarke, (C) 2000-2015                      *
+*  EmpireMUD code base by Paul Clarke, (C) 2000-2024                      *
 *  All rights reserved.  See license.doc for complete information.        *
 *                                                                         *
 *  EmpireMUD based upon CircleMUD 3.0, bpl 17, by Jeremy Elson.           *
@@ -21,7 +21,6 @@
 #include "db.h"
 #include "skills.h"
 #include "dg_scripts.h"
-#include "vnums.h"
 #include "constants.h"
 
 /**
@@ -39,9 +38,11 @@ ACMD(do_dismount);
  //////////////////////////////////////////////////////////////////////////////
 //// HELPERS /////////////////////////////////////////////////////////////////
 
+// INTERACTION_FUNC provides: ch, interaction, inter_room, inter_mob, inter_item, inter_veh
 INTERACTION_FUNC(butcher_interact) {
 	obj_data *fillet = NULL;
-	int num;
+	char *cust;
+	int num, obj_ok = 0;
 	
 	if (!has_player_tech(ch, PTECH_BUTCHER_UPGRADE) && number(1, 100) > 60) {
 		return FALSE;	// 60% chance of failure without the ability
@@ -51,7 +52,10 @@ INTERACTION_FUNC(butcher_interact) {
 		fillet = read_object(interaction->vnum, TRUE);
 		scale_item_to_level(fillet, 1);	// minimum level
 		obj_to_char(fillet, ch);
-		load_otrigger(fillet);
+		obj_ok = load_otrigger(fillet);
+		if (obj_ok) {
+			get_otrigger(fillet, ch, FALSE);
+		}
 	}
 	
 	// mark gained
@@ -60,16 +64,26 @@ INTERACTION_FUNC(butcher_interact) {
 	}
 	
 	if (fillet) {
-		if (interaction->quantity != 1) {
-			sprintf(buf, "You skillfully butcher $p (x%d) from the corpse!", interaction->quantity);
-			act(buf, FALSE, ch, fillet, NULL, TO_CHAR);
+		if (!obj_ok) {
+			// obj likely self-purged
+			act("You skillfully butcher $P!", FALSE, ch, NULL, inter_item, TO_CHAR | ACT_OBJ_VICT);
+			act("$n butchers $P.", FALSE, ch, NULL, inter_item, TO_ROOM | ACT_OBJ_VICT);
+		}
+		else if (interaction->quantity != 1) {
+			cust = obj_get_custom_message(fillet, OBJ_CUSTOM_RESOURCE_TO_CHAR);
+			sprintf(buf, "%s (x%d)", cust ? cust : "You skillfully butcher $p from $P!", interaction->quantity);
+			act(buf, FALSE, ch, fillet, inter_item, TO_CHAR | ACT_OBJ_VICT);
 			
-			sprintf(buf, "$n butchers a corpse and gets $p (x%d).", interaction->quantity);
-			act(buf, FALSE, ch, fillet, NULL, TO_ROOM);
+			cust = obj_get_custom_message(fillet, OBJ_CUSTOM_RESOURCE_TO_ROOM);
+			sprintf(buf, "%s (x%d)", cust ? cust : "$n butchers $P and gets $p.", interaction->quantity);
+			act(buf, FALSE, ch, fillet, inter_item, TO_ROOM | ACT_OBJ_VICT);
 		}
 		else {
-			act("You skillfully butcher $p from the corpse!", FALSE, ch, fillet, NULL, TO_CHAR);
-			act("$n butchers a corpse and gets $p.", FALSE, ch, fillet, NULL, TO_ROOM);
+			cust = obj_get_custom_message(fillet, OBJ_CUSTOM_RESOURCE_TO_CHAR);
+			act(cust ? cust : "You skillfully butcher $p from $P!", FALSE, ch, fillet, inter_item, TO_CHAR | ACT_OBJ_VICT);
+			
+			cust = obj_get_custom_message(fillet, OBJ_CUSTOM_RESOURCE_TO_ROOM);
+			act(cust ? cust : "$n butchers $P and gets $p.", FALSE, ch, fillet, inter_item, TO_ROOM | ACT_OBJ_VICT);
 		}
 		return TRUE;
 	}
@@ -189,7 +203,7 @@ void do_mount_current(char_data *ch) {
 	else if (IS_MORPHED(ch)) {
 		msg_to_char(ch, "You can't ride anything in this form.\r\n");
 	}
-	else if (AFF_FLAGGED(ch, AFF_FLY)) {
+	else if (AFF_FLAGGED(ch, AFF_FLYING)) {
 		msg_to_char(ch, "You can't mount while flying.\r\n");
 	}
 	else if (AFF_FLAGGED(ch, AFF_SNEAK)) {
@@ -204,10 +218,10 @@ void do_mount_current(char_data *ch) {
 	else if (MOUNT_FLAGGED(ch, MOUNT_FLYING) && !CAN_RIDE_FLYING_MOUNT(ch)) {
 		msg_to_char(ch, "You don't have the correct ability to ride %s! (see HELP RIDE)\r\n", get_mob_name_by_proto(GET_MOUNT_VNUM(ch), TRUE));
 	}
-	else if (MOUNT_FLAGGED(ch, MOUNT_WATERWALK) && !CAN_RIDE_WATERWALK_MOUNT(ch)) {
+	else if (MOUNT_FLAGGED(ch, MOUNT_WATERWALKING) && !CAN_RIDE_WATERWALK_MOUNT(ch)) {
 		msg_to_char(ch, "You don't have the correct ability to ride %s! (see HELP RIDE)\r\n", get_mob_name_by_proto(GET_MOUNT_VNUM(ch), TRUE));
 	}
-	else if (run_ability_triggers_by_player_tech(ch, PTECH_RIDING, NULL, NULL)) {
+	else if (run_ability_triggers_by_player_tech(ch, PTECH_RIDING, NULL, NULL, NULL)) {
 		return;
 	}
 	else {
@@ -360,7 +374,7 @@ void do_mount_new(char_data *ch, char *argument) {
 	else if (GET_POS(mob) < POS_STANDING) {
 		act("You can't mount $N right now.", FALSE, ch, NULL, mob, TO_CHAR);
 	}
-	else if (run_ability_triggers_by_player_tech(ch, PTECH_RIDING, mob, NULL)) {
+	else if (run_ability_triggers_by_player_tech(ch, PTECH_RIDING, mob, NULL, NULL)) {
 		return;
 	}
 	else {
@@ -398,8 +412,8 @@ void do_mount_release(char_data *ch, char *argument) {
 	if (!can_use_room(ch, IN_ROOM(ch), MEMBERS_ONLY)) {
 		msg_to_char(ch, "You don't have permission to release mounts here (you wouldn't be able to re-mount it)!\r\n");
 	}
-	else if (!has_ability(ch, ABIL_STABLEMASTER)) {
-		msg_to_char(ch, "You need the Stablemaster ability to release a mount.\r\n");
+	else if (!has_player_tech(ch, PTECH_RIDING_RELEASE_MOUNT)) {
+		msg_to_char(ch, "You do not have the ability to release your mounts; they are only loyal to you.\r\n");
 	}
 	else if (*argument) {
 		msg_to_char(ch, "You can only release your active mount (you get this error if you type a name).\r\n");
@@ -433,6 +447,8 @@ void do_mount_release(char_data *ch, char *argument) {
 		queue_delayed_update(ch, CDU_SAVE);	// prevent mob duplication
 		
 		load_mtrigger(mob);
+		
+		gain_player_tech_exp(ch, PTECH_RIDING_RELEASE_MOUNT, 30);
 	}
 }
 
@@ -441,27 +457,25 @@ void do_mount_release(char_data *ch, char *argument) {
 void do_mount_swap(char_data *ch, char *argument) {
 	struct mount_data *mount, *iter, *next_iter;
 	char tmpname[MAX_INPUT_LENGTH], *tmp = tmpname;
-	bool was_mounted = FALSE;
+	bool was_mounted = FALSE, stablemaster;
 	char_data *proto;
 	int number;
 	
-	if (!has_ability(ch, ABIL_STABLEMASTER) && !room_has_function_and_city_ok(GET_LOYALTY(ch), IN_ROOM(ch), FNC_STABLE)) {
-		msg_to_char(ch, "You can only swap mounts in a stable unless you have the Stablemaster ability.\r\n");
+	stablemaster = has_player_tech(ch, PTECH_RIDING_SWAP_ANYWHERE);
+	
+	if (!stablemaster && !room_has_function_and_city_ok(GET_LOYALTY(ch), IN_ROOM(ch), FNC_STABLE)) {
+		msg_to_char(ch, "You can only swap mounts in a stable.\r\n");
 		return;
 	}
-	if (!has_ability(ch, ABIL_STABLEMASTER) && !check_in_city_requirement(IN_ROOM(ch), TRUE)) {
-		msg_to_char(ch, "This stable must be in a city for you to swap mounts without the Stablemaster ability.\r\n");
+	if (!stablemaster && !check_in_city_requirement(IN_ROOM(ch), TRUE)) {
+		msg_to_char(ch, "This stable must be in a city for you to swap mounts.\r\n");
 		return;
 	}
-	if (!has_ability(ch, ABIL_STABLEMASTER) && !IS_COMPLETE(IN_ROOM(ch))) {
+	if (!stablemaster && !IS_COMPLETE(IN_ROOM(ch))) {
 		msg_to_char(ch, "You must complete the stable first.\r\n");
 		return;
 	}
-	if (!has_ability(ch, ABIL_STABLEMASTER) && !check_in_city_requirement(IN_ROOM(ch), TRUE)) {
-		msg_to_char(ch, "This building must be in a city to swap mounts here.\r\n");
-		return;
-	}
-	if (!has_ability(ch, ABIL_STABLEMASTER) && !can_use_room(ch, IN_ROOM(ch), GUESTS_ALLOWED)) {
+	if (!stablemaster && !can_use_room(ch, IN_ROOM(ch), GUESTS_ALLOWED)) {
 		msg_to_char(ch, "You don't have permission to mount anything here!\r\n");
 		return;
 	}
@@ -516,6 +530,8 @@ void do_mount_swap(char_data *ch, char *argument) {
 	if (was_mounted) {
 		do_mount_current(ch);
 	}
+	
+	gain_player_tech_exp(ch, PTECH_RIDING_SWAP_ANYWHERE, 30);
 }
 
 
@@ -564,13 +580,14 @@ ACMD(do_butcher) {
 	else if (!has_tool(ch, TOOL_KNIFE)) {
 		msg_to_char(ch, "You need to equip a good knife to butcher with.\r\n");
 	}
-	else if (run_ability_triggers_by_player_tech(ch, PTECH_BUTCHER_UPGRADE, NULL, corpse)) {
+	else if (run_ability_triggers_by_player_tech(ch, PTECH_BUTCHER_UPGRADE, NULL, corpse, NULL)) {
 		return;
 	}
 	else {
 		if (!IS_SET(GET_CORPSE_FLAGS(corpse), CORPSE_NO_LOOT) && run_interactions(ch, proto->interactions, INTERACT_BUTCHER, IN_ROOM(ch), NULL, corpse, NULL, butcher_interact)) {
 			// success
 			gain_player_tech_exp(ch, PTECH_BUTCHER_UPGRADE, 15);
+			run_ability_hooks_by_player_tech(ch, PTECH_BUTCHER_UPGRADE, NULL, NULL, NULL, NULL);
 		}
 		else {
 			act("You butcher $p but get no useful meat.", FALSE, ch, corpse, NULL, TO_CHAR);
@@ -602,71 +619,6 @@ ACMD(do_dismount) {
 	}
 	else {
 		msg_to_char(ch, "You're not riding anything right now.\r\n");
-	}
-}
-
-
-ACMD(do_fish) {
-	room_data *room = IN_ROOM(ch);
-	char buf[MAX_STRING_LENGTH];
-	int dir = NO_DIR;
-	
-	any_one_arg(argument, arg);
-	
-	if (IS_NPC(ch)) {
-		msg_to_char(ch, "You can't fish.\r\n");
-	}
-	else if (GET_ACTION(ch) == ACT_FISHING && !*arg) {
-		msg_to_char(ch, "You stop fishing.\r\n");
-		act("$n stops fishing.", TRUE, ch, 0, 0, TO_ROOM);
-		cancel_action(ch);
-	}
-	else if (FIGHTING(ch) && GET_POS(ch) == POS_FIGHTING) {
-		msg_to_char(ch, "You can't do that now!\r\n");
-	}
-	else if (!has_player_tech(ch, PTECH_FISH)) {
-		msg_to_char(ch, "You don't have the correct ability to fish for anything.\r\n");
-	}
-	else if (!can_use_ability(ch, NOTHING, NOTHING, 0, NOTHING)) {
-		// own messages
-	}
-	else if (GET_ACTION(ch) != ACT_NONE && GET_ACTION(ch) != ACT_FISHING) {
-		msg_to_char(ch, "You're really too busy to do that.\r\n");
-	}
-	else if (!can_see_in_dark_room(ch, IN_ROOM(ch), TRUE)) {
-		msg_to_char(ch, "It's too dark to fish for anything here.\r\n");
-	}
-	else if (*arg && (dir = parse_direction(ch, arg)) == NO_DIR) {
-		msg_to_char(ch, "Fish in what direction?\r\n");
-	}
-	else if (dir != NO_DIR && !(room = dir_to_room(IN_ROOM(ch), dir, FALSE))) {
-		msg_to_char(ch, "You can't fish in that direction.\r\n");
-	}
-	else if (!can_interact_room(room, INTERACT_FISH)) {
-		msg_to_char(ch, "You can't fish for anything %s!\r\n", (room == IN_ROOM(ch)) ? "here" : "there");
-	}
-	else if (!can_use_room(ch, room, MEMBERS_ONLY)) {
-		msg_to_char(ch, "You don't have permission to fish %s.\r\n", (room == IN_ROOM(ch)) ? "here" : "there");
-	}
-	else if (!has_tool(ch, TOOL_FISHING)) {
-		msg_to_char(ch, "You aren't using any fishing equipment.\r\n");
-	}
-	else if (run_ability_triggers_by_player_tech(ch, PTECH_FISH, NULL, NULL)) {
-		return;
-	}
-	else {
-		if (dir != NO_DIR) {
-			sprintf(buf, " to the %s", dirs[get_direction_for_char(ch, dir)]);
-		}
-		else {
-			*buf = '\0';
-		}
-		
-		msg_to_char(ch, "You begin looking for fish%s...\r\n", buf);
-		act("$n begins looking for fish.", TRUE, ch, NULL, NULL, TO_ROOM);
-		
-		start_action(ch, ACT_FISHING, config_get_int("fishing_timer") / (player_tech_skill_check(ch, PTECH_FISH, DIFF_EASY) ? 2 : 1));
-		GET_ACTION_VNUM(ch, 0) = dir;
 	}
 }
 
@@ -742,6 +694,9 @@ ACMD(do_hunt) {
 		msg_to_char(ch, "The area is too crowded to hunt for anything.\r\n");
 		return;
 	}
+	if (run_ability_triggers_by_player_tech(ch, PTECH_HUNT_ANIMALS, NULL, NULL, NULL)) {
+		return;
+	}
 	
 	// build lists: vehicles
 	DL_FOREACH_SAFE2(ROOM_VEHICLES(IN_ROOM(ch)), veh, next_veh, next_in_room) {
@@ -783,7 +738,7 @@ ACMD(do_hunt) {
 	data->x_coord = x_coord;
 	data->y_coord = y_coord;
 	data->helpers = &helpers;	// reference current list
-	run_globals(GLOBAL_MAP_SPAWNS, run_global_hunt_for_map_spawns, TRUE, GET_SECT_CLIMATE(BASE_SECT(IN_ROOM(ch))), NULL, NULL, 0, validate_global_hunt_for_map_spawns, data);
+	run_globals(GLOBAL_MAP_SPAWNS, run_global_hunt_for_map_spawns, TRUE, get_climate(IN_ROOM(ch)), NULL, NULL, 0, validate_global_hunt_for_map_spawns, data);
 	free(data);
 	
 	// find the thing to hunt
@@ -887,7 +842,8 @@ ACMD(do_track) {
 	
 	one_argument(argument, arg);
 	
-	if (!can_use_ability(ch, ABIL_TRACK, NOTHING, 0, NOTHING)) {
+	if (!has_player_tech(ch, PTECH_TRACK_COMMAND)) {
+		msg_to_char(ch, "You don't know how to follow tracks.\r\n");
 		return;
 	}
 	else if (!can_see_in_dark_room(ch, IN_ROOM(ch), TRUE)) {
@@ -898,7 +854,7 @@ ACMD(do_track) {
 		msg_to_char(ch, "Track whom? Or what?\r\n");
 		return;
 	}
-	else if (ABILITY_TRIGGERS(ch, NULL, NULL, ABIL_TRACK)) {
+	else if (run_ability_triggers_by_player_tech(ch, PTECH_TRACK_COMMAND, NULL, NULL, NULL)) {
 		return;
 	}
 	else if (ROOM_AFF_FLAGGED(IN_ROOM(ch), ROOM_AFF_NO_TRACKS)) {
@@ -938,14 +894,15 @@ ACMD(do_track) {
 		}
 		else if ((veh = find_vehicle_in_room_with_interior(IN_ROOM(ch), track_to_room))) {
 			snprintf(buf, sizeof(buf), "You find a trail heading %sto $V!", IN_OR_ON(veh));
-			act(buf, FALSE, ch, NULL, veh, TO_CHAR);
+			act(buf, FALSE, ch, NULL, veh, TO_CHAR | ACT_VEH_VICT);
 		}
 		else if ((veh = GET_ROOM_VEHICLE(IN_ROOM(ch))) && IN_ROOM(veh) && GET_ROOM_VNUM(IN_ROOM(veh)) == track_to_room) {
 			snprintf(buf, sizeof(buf), "You find a trail heading %s of $V!", VEH_FLAGGED(veh, VEH_IN) ? "out" : "off");
-			act(buf, FALSE, ch, NULL, veh, TO_CHAR);
+			act(buf, FALSE, ch, NULL, veh, TO_CHAR | ACT_VEH_VICT);
 		}
-
-		gain_ability_exp(ch, ABIL_TRACK, 20);
+		
+		gain_player_tech_exp(ch, PTECH_TRACK_COMMAND, 20);
+		run_ability_hooks_by_player_tech(ch, PTECH_TRACK_COMMAND, NULL, NULL, NULL, IN_ROOM(ch));
 	}
 	else {
 		msg_to_char(ch, "You can't seem to find a trail.\r\n");

@@ -2,7 +2,7 @@
 *   File: olc.craft.c                                     EmpireMUD 2.0b5 *
 *  Usage: OLC for craft recipes                                           *
 *                                                                         *
-*  EmpireMUD code base by Paul Clarke, (C) 2000-2015                      *
+*  EmpireMUD code base by Paul Clarke, (C) 2000-2024                      *
 *  All rights reserved.  See license.doc for complete information.        *
 *                                                                         *
 *  EmpireMUD based upon CircleMUD 3.0, bpl 17, by Jeremy Elson.           *
@@ -155,7 +155,7 @@ bool audit_craft(craft_data *craft, char_data *ch) {
 		}
 	}
 	
-	if (GET_CRAFT_BUILD_ON(craft) && IS_SET(GET_CRAFT_BUILD_ON(craft), BLD_ON_FLAT_TERRAIN | BLD_FACING_CROP | BLD_FACING_OPEN_BUILDING)) {
+	if (GET_CRAFT_BUILD_ON(craft) && !CRAFT_IS_VEHICLE(craft) && IS_SET(GET_CRAFT_BUILD_ON(craft), BLD_ON_FLAT_TERRAIN | BLD_FACING_CROP | BLD_FACING_OPEN_BUILDING)) {
 		olc_audit_msg(ch, GET_CRAFT_VNUM(craft), "Craft has invalid build-on flags!");
 		problem = TRUE;
 	}
@@ -169,6 +169,10 @@ bool audit_craft(craft_data *craft, char_data *ch) {
 	}
 	if (CRAFT_FLAGGED(craft, CRAFT_VEHICLE) && CRAFT_FLAGGED(craft, CRAFT_BUILDING)) {
 		olc_audit_msg(ch, GET_CRAFT_VNUM(craft), "Craft has both VEHICLE and BUILDING flags");
+		problem = TRUE;
+	}
+	if (CRAFT_FLAGGED(craft, CRAFT_TOOL_OR_FUNCTION) && (GET_CRAFT_REQUIRES_TOOL(craft) == NOBITS || GET_CRAFT_REQUIRES_FUNCTION(craft) == NOBITS)) {
+		olc_audit_msg(ch, GET_CRAFT_VNUM(craft), "Craft has TOOL-OR-FUCTION but is missing %s", (GET_CRAFT_REQUIRES_FUNCTION(craft) == NOBITS ? "tool" : "function"));
 		problem = TRUE;
 	}
 	
@@ -370,7 +374,7 @@ void olc_fullsearch_craft(char_data *ch, char *argument) {
 		FULLSEARCH_FLAGS("flagged", only_flags, craft_flags)
 		FULLSEARCH_FLAGS("unflagged", not_flagged, craft_flags)
 		FULLSEARCH_INT("quantity", only_quantity, 0, INT_MAX)
-		FULLSEARCH_INT("quantitysover", quantity_over, 0, INT_MAX)
+		FULLSEARCH_INT("quantityover", quantity_over, 0, INT_MAX)
 		FULLSEARCH_INT("quantityunder", quantity_under, 0, INT_MAX)
 		FULLSEARCH_INT("level", only_level, 0, INT_MAX)
 		FULLSEARCH_INT("levelover", level_over, 0, INT_MAX)
@@ -468,7 +472,7 @@ void olc_fullsearch_craft(char_data *ch, char *argument) {
 		}
 	}
 	
-	if (count > 0 && (size + 14) < sizeof(buf)) {
+	if (count > 0 && (size + 18) < sizeof(buf)) {
 		size += snprintf(buf + size, sizeof(buf) - size, "(%d crafts)\r\n", count);
 	}
 	else if (count == 0) {
@@ -725,7 +729,7 @@ void olc_show_craft(char_data *ch) {
 
 	if (!CRAFT_IS_BUILDING(craft) && !CRAFT_IS_VEHICLE(craft)) {
 		seconds = (GET_CRAFT_TIME(craft) * ACTION_CYCLE_TIME);
-		sprintf(buf + strlen(buf), "<%stime\t0> %d action tick%s (%d:%02d)\r\n", OLC_LABEL_VAL(GET_CRAFT_TIME(craft), 1), GET_CRAFT_TIME(craft), (GET_CRAFT_TIME(craft) != 1 ? "s" : ""), seconds / 60, seconds % 60);
+		sprintf(buf + strlen(buf), "<%stime\t0> %d action tick%s (%s)\r\n", OLC_LABEL_VAL(GET_CRAFT_TIME(craft), 1), GET_CRAFT_TIME(craft), (GET_CRAFT_TIME(craft) != 1 ? "s" : ""), colon_time(seconds, FALSE, NULL));
 	}
 
 	sprintbit(GET_CRAFT_FLAGS(craft), craft_flags, buf1, TRUE);
@@ -741,7 +745,7 @@ void olc_show_craft(char_data *ch) {
 
 	// resources
 	sprintf(buf + strlen(buf), "Resources required: <%sresource\t0>\r\n", OLC_LABEL_PTR(GET_CRAFT_RESOURCES(craft)));
-	get_resource_display(GET_CRAFT_RESOURCES(craft), lbuf);
+	get_resource_display(ch, GET_CRAFT_RESOURCES(craft), lbuf);
 	strcat(buf, lbuf);
 		
 	page_string(ch->desc, buf, TRUE);

@@ -38,10 +38,12 @@ set obj %actor.inventory()%
 %purge% %self%
 ~
 #601
-Enchanted seed plant - desert (default)~
+Enchanted seed plant - desert~
 1 c 2
 plant~
-* default script for obj 601: can only make enchanted forests in the desert
+* optional desert-only script for obj 601: can only make enchanted forests in the desert
+set allow_sectors 26 71 72
+* basics
 if %actor.obj_target(%arg%)% != %self%
   return 0
   halt
@@ -52,8 +54,20 @@ if !%actor.canuseroom_member()%
   return 1
   halt
 end
-if %room.sector_vnum% != 26
-  %send% %actor% You can only plant @%self% in a desert grove.
+set ok 0
+while %allow_sectors% && !%ok%
+  if %room.sector_vnum% == %allow_sectors.car%
+    set ok 1
+  else
+    set allow_sectors %allow_sectors.cdr%
+  end
+done
+if !%ok%
+  %send% %actor% You can only plant @%self% in a desert grove or irrigated forest.
+  return 1
+  halt
+elseif !%actor.empire% || %room.empire% != %actor.empire%
+  %send% %actor% Claim the tile before planting the seed or else the necrovandals will come for it.
   return 1
   halt
 end
@@ -67,10 +81,16 @@ end
 Enchanted forest unclaimed chop~
 0 ab 100
 ~
+* sector lists
+set starwood 601 602 603 604 606 607 608
+set weirdwood 611 612 613 614 621 622 623
+set oasis 616 617 618
+set all_sects %starwood% %weirdwood% %oasis%
+* startup
 set room %self.room%
 set cycles_left 5
 while %cycles_left% >= 0
-  if (%self.room% != %room%) || %room.empire% || !(%room.sector% ~= Enchanted || %room.sector% ~= Weirdwood)
+  if (%self.room% != %room%) || %room.empire% || !(%all_sects% ~= %room.sector_vnum%)
     * We've either moved or the room's no longer suitable for deforesting - despawn the mob
     %echo% ~%self%, seeing no opportunity for destruction here, starts wandering away.
     nop %self.add_mob_flag(SPAWNED)%
@@ -103,11 +123,11 @@ while %cycles_left% >= 0
     case 0
       %echo% ~%self% completes ^%self% ritual, killing the forest!
       * terraform based on sector
-      if %room.sector_vnum% >= 600 && %room.sector_vnum% <= 604
+      if %starwood% ~= %room.sector_vnum%
         %terraform% %room% 605
-      elseif %room.sector_vnum% >= 610 && %room.sector_vnum% <= 614
+      elseif %weirdwood% ~= %room.sector_vnum%
         %terraform% %room% 615
-      elseif %room.sector_vnum% == 616
+      elseif %oasis% ~= %room.sector_vnum%
         %terraform% %room% 21
       else
         * not a sector we can finish
@@ -122,10 +142,13 @@ done
 %echo% ~%self% looks confused...
 ~
 #603
-Enchanted seed plant - desert AND plains~
+Enchanted seed plant - desert AND plains (default)~
 1 c 2
 plant~
-* If you prefer both desert AND temperate enchanted forests, put this script on obj vnum 601 instead of its normal one
+* optional script for obj 601 allowing enchanted forests in temperate or arid regions
+set desert_sectors 26 71 72
+set temperate_sectors 1 2 3 4 44 45 54 90
+* basics
 if %actor.obj_target(%arg%)% != %self%
   return 0
   halt
@@ -136,26 +159,47 @@ if !%actor.canuseroom_member()%
   return 1
   halt
 end
-if (%room.sector_vnum% != 0 && %room.sector_vnum% != 26)
-  %send% %actor% You can only plant @%self% on open plains or in a desert grove.
+set ok 0
+while %desert_sectors% && !%ok%
+  if %room.sector_vnum% == %desert_sectors.car%
+    set ok 1
+    set new_sect 610
+    set to_echo The trees around you twist and turn and take on a strange violet hue.
+  else
+    set desert_sectors %desert_sectors.cdr%
+  end
+done
+while %temperate_sectors% && !%ok%
+  if %room.sector_vnum% == %temperate_sectors.car%
+    set ok 1
+    set new_sect 600
+    set to_echo The trees around you contort themselves into strange pink saplings.
+  else
+    set temperate_sectors %temperate_sectors.cdr%
+  end
+done
+if !%ok%
+  %send% %actor% You can only plant @%self% in a temperate forest or a desert grove.
+  return 1
+  halt
+elseif !%actor.empire% || %room.empire% != %actor.empire%
+  %send% %actor% Claim the tile before planting the seed or else the necrovandals will come for it.
   return 1
   halt
 end
 %send% %actor% You dig a hole and plant @%self% in it.
 %echoaround% %actor% ~%actor% digs a hole and plant @%self% in it.
-%echo% Dozens of strange saplings spring up!
-if %room.sector_vnum% == 26
-  %terraform% %room% 610
-else
-  %terraform% %room% 600
-end
+%echo% %to_echo%
+%terraform% %room% %new_sect%
 %purge% %self%
 ~
 #604
 Enchanted seed plant - Temperate Only~
 1 c 2
 plant~
-* If your MUD has too few deserts, put this script on obj vnum 601 instead of its normal one
+* optional script for obj 601: allows planting ONLY on temperate tiles
+set allow_sectors 1 2 3 4 44 45 54 90
+* basics
 if %actor.obj_target(%arg%)% != %self%
   return 0
   halt
@@ -166,16 +210,38 @@ if !%actor.canuseroom_member()%
   return 1
   halt
 end
-if %room.sector_vnum% != 0
-  %send% %actor% You can only plant @%self% on open plains.
+set ok 0
+while %allow_sectors% && !%ok%
+  if %room.sector_vnum% == %allow_sectors.car%
+    set ok 1
+  else
+    set allow_sectors %allow_sectors.cdr%
+  end
+done
+if !%ok%
+  %send% %actor% You can only plant @%self% in a temperate forest.
+  return 1
+  halt
+elseif !%actor.empire% || %room.empire% != %actor.empire%
+  %send% %actor% Claim the tile before planting the seed or else the necrovandals will come for it.
   return 1
   halt
 end
 %send% %actor% You dig a hole and plant @%self% in it.
 %echoaround% %actor% ~%actor% digs a hole and plant @%self% in it.
-%echo% Dozens of strange saplings spring up!
+%echo% The trees around you contort themselves into strange pink saplings.
 %terraform% %room% 600
 %purge% %self%
+~
+#605
+Enchanted Forests: Start progress goals~
+1 g 100
+~
+return 1
+if %actor.is_pc% && %actor.empire%
+  nop %actor.empire.start_progress(4010)%
+  nop %actor.empire.start_progress(4030)%
+end
 ~
 #610
 Talking Horse script~
@@ -340,7 +406,7 @@ switch %random.4%
     %echo% ~%self% sneezes pixy dust all over you!
     set ch %self.room.people%
     while %ch%
-      dg_affect %ch% FLY on 60
+      dg_affect %ch% FLYING on 60
       set ch %ch.next_in_room%
     done
   break
@@ -369,7 +435,7 @@ switch %random.4%
     %echo% ~%self% sprinkles pixy dust all over you!
     set ch %self.room.people%
     while %ch%
-      dg_affect %ch% FLY on 60
+      dg_affect %ch% FLYING on 60
       set ch %ch.next_in_room%
     done
   break
@@ -421,5 +487,51 @@ Genie death~
 say No! Noooo! I won't go back in the bottle!
 %echo% ~%self% screams as he's sucked into a brass bottle, expelling all his power trying in vain to get free.
 return 0
+~
+#621
+Enchanted Forest: Awaken seed to disenchant forest~
+1 c 2
+awaken~
+set room %actor.room%
+return 1
+if %actor.obj_target(%arg%)% != %self%
+  %send% %actor% Awaken what?
+  halt
+elseif !%actor.canuseroom_member()%
+  %send% %actor% You don't have permission to do that here.
+  halt
+elseif %room.sector_vnum% < 600 || %room.sector_vnum% > 623
+  %send% %actor% You can't awaken the seed here.
+  halt
+elseif %room.sector_vnum% == 605 || %room.sector_vnum% == 615
+  %send% %actor% You're too late... The enchanted forest has already died.
+  halt
+elseif %room.sector_vnum% >= 616 && %room.sector_vnum% <= 618
+  %send% %actor% You can't seem to awaken the seed here.
+  halt
+elseif %room.sector_vnum% != 604 && %room.sector_vnum% != 614
+  %send% %actor% There doesn't seem to be enough magic in this forest. You need to let it grow.
+  halt
+end
+* ok... go!
+%send% %actor% You hold the nascent crystal seed aloft...
+%echoaround% %actor% ~%actor% holds @%self% aloft...
+switch %room.sector_vnum%
+  case 604
+    %echo% All the vibrant pink color drains from the trees as they wither and die.
+    %terraform% %room% 605
+  break
+  case 614
+    %echo% The stunning violet color of the forest drains from the trees as they wither and die.
+    %terraform% %room% 615
+  break
+  default
+    %echo% ... but nothing happens.
+    halt
+  break
+done
+%send% %actor% ... and the seed goes dark.
+%load% obj 600 %actor% inv
+%purge% %self%
 ~
 $

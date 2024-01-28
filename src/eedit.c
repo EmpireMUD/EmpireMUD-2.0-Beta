@@ -2,7 +2,7 @@
 *   File: eedit.c                                         EmpireMUD 2.0b5 *
 *  Usage: empire editor code                                              *
 *                                                                         *
-*  EmpireMUD code base by Paul Clarke, (C) 2000-2015                      *
+*  EmpireMUD code base by Paul Clarke, (C) 2000-2024                      *
 *  All rights reserved.  See license.doc for complete information.        *
 *                                                                         *
 *  EmpireMUD based upon CircleMUD 3.0, bpl 17, by Jeremy Elson.           *
@@ -333,6 +333,9 @@ EEDIT(eedit_adjective) {
 	if (ACCOUNT_FLAGGED(ch, ACCT_NOTITLE)) {
 		msg_to_char(ch, "You are not allowed to change the empire's adjective.\r\n");
 	}
+	else if (!IS_IMMORTAL(ch) && EMPIRE_ADMIN_FLAGGED(emp, EADM_NO_RENAME)) {
+		msg_to_char(ch, "You are not allowed to change the empire's adjective.\r\n");
+	}
 	else if (is_at_war(emp)) {
 		msg_to_char(ch, "You can't rename your empire while at war.\r\n");
 	}
@@ -518,6 +521,14 @@ EEDIT(eedit_description) {
 		msg_to_char(ch, "You can't do that.\r\n");
 		return;
 	}
+	if (ACCOUNT_FLAGGED(ch, ACCT_NOTITLE)) {
+		return;
+		msg_to_char(ch, "You are not allowed to change the empire's description.\r\n");
+	}
+	if (!IS_IMMORTAL(ch) && EMPIRE_ADMIN_FLAGGED(emp, EADM_NO_RENAME)) {
+		msg_to_char(ch, "You are not allowed to change the empire's description.\r\n");
+		return;
+	}
 	if (ch->desc->str) {
 		msg_to_char(ch, "You're already editing something else.\r\n");
 		return;
@@ -591,6 +602,9 @@ EEDIT(eedit_name) {
 	CAP(argument);
 	
 	if (ACCOUNT_FLAGGED(ch, ACCT_NOTITLE)) {
+		msg_to_char(ch, "You are not allowed to change the empire's name.\r\n");
+	}
+	else if (!IS_IMMORTAL(ch) && EMPIRE_ADMIN_FLAGGED(emp, EADM_NO_RENAME)) {
 		msg_to_char(ch, "You are not allowed to change the empire's name.\r\n");
 	}
 	else if (is_at_war(emp)) {
@@ -707,6 +721,9 @@ EEDIT(eedit_rank) {
 	CAP(argument);
 	
 	if (ACCOUNT_FLAGGED(ch, ACCT_NOTITLE)) {
+		msg_to_char(ch, "You are not allowed to change the empire's rank names.\r\n");
+	}
+	else if (!IS_IMMORTAL(ch) && EMPIRE_ADMIN_FLAGGED(emp, EADM_NO_RENAME)) {
 		msg_to_char(ch, "You are not allowed to change the empire's rank names.\r\n");
 	}
 	else if (!*argument || !*arg) {

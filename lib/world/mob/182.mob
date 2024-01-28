@@ -3,7 +3,7 @@ tortoise atlasian giant inn turtle~
 an atlasian tortoise~
 A giant atlasian tortoise plods past, carrying an inn on its back.
 ~
-300 300 dky n 6
+300 300 dkyL n 6
 0 0 16 9 -1
 D
    The tortoise is gigantic! It's no wonder they call it atlasian -- it looks
@@ -150,7 +150,7 @@ S
 #n of Clan Helius~
 #n pours a thick, red vial into his cauldron.
 ~
-0 0 bd nD 3
+0 0 bdL nD 3
 1 2 0 15 -1
 D
    Though his not-unhandsome face suggests a man in his thirties, his clothes
@@ -184,7 +184,7 @@ S
 #n the Umbramancer~
 The shadows curl around #n, guild umbramancer.
 ~
-0 0 bdvI nD 3
+0 0 bdvIL nD 3
 0 2 0 15 -1
 D
    Multiple varied forms can be seen in the shadows covering this being, though
@@ -212,7 +212,7 @@ S
 #n, guild Tinker~
 #n is working furiously at the tinker bench.
 ~
-0 0 bdvI nD 3
+0 0 bdvIL nD 3
 0 1 0 15 -1
 D
    The old tinker sits in the loft's best light, bespectacled in triple-lensed
@@ -256,7 +256,7 @@ Nostrazak incautious dragon avatar~
 Nostrazak the Incautious~
 An avatar of Nostrazak looms over you, more dragon than man.
 ~
-0 0 bd nD 4
+0 0 bdL nD 4
 1 0 0 15 -1
 D
    Though he has the general shape of a man, Nostrazak the Incautious's scaly
@@ -298,7 +298,7 @@ dwarf giant~
 the giant dwarf~
 A giant dwarf stands, arms crossed, in front of the door.
 ~
-0 0 bdvI nD 3
+0 0 bdvIL nD 3
 1 0 0 15 -1
 D
    Though he's rather taller than the average man, he has the proportions of a
@@ -312,7 +312,7 @@ S
 Fancy #n~
 Fancy #n stands here in a vest, hawking wares.
 ~
-100 150 bdvI nD 3
+100 150 bdvIL nD 3
 0 0 0 19 -1
 D
    It's clear Fancy is a suitable nickname: the shopkeep is dressed all in fine

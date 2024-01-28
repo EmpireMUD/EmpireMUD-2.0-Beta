@@ -12,6 +12,11 @@ Headless Centaur combat cooldown~
 3 0
 0 0 0 0
 S
+#18802
+missed~
+4 0
+0 0 0 0
+S
 #18803
 shockwave prance~
 4 0
@@ -27,6 +32,11 @@ neck chop~
 0 0 0 0
 T0
 You are no longer bleeding from the headless centaur's neck chop.~
+S
+#18805
+attack-o-lantern cooldown~
+3 0
+0 0 0 0
 S
 #18811
 infected bite~
@@ -138,6 +148,8 @@ S
 picking candy~
 3 0
 0 0 0 0
+T0
+The heat is off you. It should be safe to pickpocket more candy.~
 S
 #18858
 magic words~

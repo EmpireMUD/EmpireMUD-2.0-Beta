@@ -3,7 +3,7 @@ dragon flame~
 the flame dragon~
 A flame dragon is reducing the countryside to ash!
 ~
-100 150 dgxA c 6
+100 150 dgxAL c 6
 0 0 5 33 -1
 D
    The size of a large house, this red-orange dragon seems to have a bone to
@@ -135,7 +135,7 @@ wyvern wandering~
 a wandering wyvern~
 A wyvern is flying lazily above you.
 ~
-125 175 dgxyA cm 6
+125 175 dgxyAL cm 6
 0 0 2 27 -1
 D
    Though it isn't the largest dragon on the landscape, this wyvern still cases
@@ -169,7 +169,7 @@ dragon bull~
 a bull dragon~
 A bull dragon is stomping around.
 ~
-125 175 dgkxyA c 6
+125 175 dgkxyAL c 6
 1 0 9 27 -1
 D
    Though it has wings, the bull dragon seems to spend more of its time on the
@@ -203,7 +203,7 @@ dragon guardian~
 a dragon guardian~
 A dragon guardian stands proudly before you.
 ~
-125 175 dgxyA cm 6
+125 175 dgxyAL cm 6
 0 0 2 27 -1
 D
    Unlike most dragons, the guardian stands on its hind legs with its front
@@ -237,7 +237,7 @@ dragon emerald~
 an emerald dragon~
 An emerald dragon is flying above you.
 ~
-125 175 dgxyA cm 6
+125 175 dgxyAL cm 6
 0 0 2 27 -1
 D
    This shimmering green dragon's translucent scales have all the luster of
@@ -321,5 +321,62 @@ I 0 3012 100.00 1  # BUTCHER: fillet of raw meat
 I 0 3012 100.00 1  # BUTCHER: fillet of raw meat
 I 1 1351 100.00 1  # SKIN: large skin
 T 10337
+S
+#10370
+#n~
+#n~
+#n looks startled to see you.
+~
+0 0 bdwAIL c 3
+0 0 0 13 -1
+D
+   It almost seems as if you walked in on something, the way this pale, shifty
+guest is looking at you. There's a pale red glint in their eyes, which remain
+firmly locked on yours even as you try to move around the tiny back room.
+~
+I 4 10372 10.00 1  # LOOT: winged rat minipet whistle
+I 12 10372 10.00 1  # PICKPOCKET: winged rat minipet whistle
+M
+7
+say Oh! You startled me.~
+M
+7
+emote $n fidgets with $s fingers.~
+M
+7
+say I know what this looks like, but I shall only be staying the one night.~
+T 10372
+T 10374
+T 10375
+T 10376
+T 10377
+S
+#10372
+rat winged~
+a winged rat~
+A winged rat is flapping about.
+~
+1 1 bdo n 3
+0 0 2 9 -1
+D
+   This furry little rat has a pair of gray wings with black bands across them,
+not unlike a pigeon. It happily flaps its wings and wags its long pink tail,
+unbothered by anything that's going on as it bobs around in the air.
+~
+M
+0
+$n squeaks.~
+M
+0
+$n squeaks happily~
+M
+0
+$n squeaks to itself.~
+M
+0
+$n flaps around your head.~
+M
+0
+You feel something in your hair as $n flaps past you.~
 S
 $

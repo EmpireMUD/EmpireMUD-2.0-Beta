@@ -2,7 +2,7 @@
 *   File: act.fight.c                                     EmpireMUD 2.0b5 *
 *  Usage: non-skill commands and functions related to the fight system    *
 *                                                                         *
-*  EmpireMUD code base by Paul Clarke, (C) 2000-2015                      *
+*  EmpireMUD code base by Paul Clarke, (C) 2000-2024                      *
 *  All rights reserved.  See license.doc for complete information.        *
 *                                                                         *
 *  EmpireMUD based upon CircleMUD 3.0, bpl 17, by Jeremy Elson.           *
@@ -250,7 +250,7 @@ ACMD(do_execute) {
 		act("You can't execute $N!", FALSE, ch, NULL, victim, TO_CHAR);
 	}
 	else {
-		perform_execute(ch, victim, TYPE_UNDEFINED, DAM_PHYSICAL);
+		perform_execute(ch, victim, ATTACK_UNDEFINED, DAM_PHYSICAL);
 	}
 }
 
@@ -259,7 +259,7 @@ ACMD(do_flee) {
 	int i, attempt, try;
 	room_data *to_room = NULL;
 	char_data *was_fighting;
-	bool inside = ROOM_IS_CLOSED(IN_ROOM(ch));
+	bool upgrade, inside = ROOM_IS_CLOSED(IN_ROOM(ch));
 	struct room_direction_data *ex;
 
 	if (GET_POS(ch) < POS_FIGHTING) {
@@ -271,11 +271,13 @@ ACMD(do_flee) {
 		msg_to_char(ch, "You are immobilized and can't flee.\r\n");
 		return;
 	}
+	
+	upgrade = !IS_NPC(ch) && has_player_tech(ch, PTECH_FLEE_UPGRADE);
 
 	// try more times if FLEET
-	for (i = 0; i < NUM_2D_DIRS * ((!IS_NPC(ch) && has_ability(ch, ABIL_FLEET)) ? 2 : 1); i++) {
+	for (i = 0; i < NUM_2D_DIRS * (upgrade ? 2 : 1); i++) {
 		// chance to fail if not FLEET
-		if ((IS_NPC(ch) || !has_ability(ch, ABIL_FLEET)) && number(0, 2) == 0) {
+		if (!upgrade && number(0, 2) == 0) {
 			continue;
 		}
 
@@ -305,9 +307,10 @@ ACMD(do_flee) {
 			if (perform_move(ch, attempt, NULL, NOBITS)) {
 				send_to_char("You flee head over heels.\r\n", ch);
 				if (was_fighting && can_gain_exp_from(ch, was_fighting)) {
-					gain_ability_exp(ch, ABIL_FLEET, 5);
+					gain_player_tech_exp(ch, PTECH_FLEE_UPGRADE, 15);
 				}
 				GET_WAIT_STATE(ch) = 2 RL_SEC;
+				run_ability_hooks_by_player_tech(ch, PTECH_FLEE_UPGRADE, NULL, NULL, NULL, NULL);
 			}
 			else {
 				act("$n tries to flee, but can't!", TRUE, ch, 0, 0, TO_ROOM);
@@ -426,7 +429,7 @@ ACMD(do_meters) {
 	
 	// raw length
 	length = (mtr->over ? mtr->end : time(0)) - mtr->start;
-	msg_to_char(ch, "Fight length: %d:%02d (%d second%s)\r\n", (length/60), (length%60), length, PLURAL(length));
+	msg_to_char(ch, "Fight length: %s (%d second%s)\r\n", colon_time(length, FALSE, NULL), length, PLURAL(length));
 	
 	// prevent divide-by-zero
 	length = MAX(1, length);
@@ -458,6 +461,8 @@ ACMD(do_meters) {
 
 
 ACMD(do_respawn) {
+	struct affected_type *af;
+	
 	if (!IS_DEAD(ch) && !IS_INJURED(ch, INJ_STAKED)) {
 		msg_to_char(ch, "You aren't even dead yet!\r\n");
 	}
@@ -483,11 +488,16 @@ ACMD(do_respawn) {
 		
 		affect_total(ch);
 		queue_delayed_update(ch, CDU_SAVE);
-		enter_wtrigger(IN_ROOM(ch), ch, NO_DIR, "respawn");
-		greet_mtrigger(ch, NO_DIR, "respawn");
-		greet_memory_mtrigger(ch);
-		greet_vtrigger(ch, NO_DIR, "respawn");
+		enter_triggers(ch, NO_DIR, "respawn", FALSE);
+		greet_triggers(ch, NO_DIR, "respawn", FALSE);
+		
+		// temporary safety effect after a respawn
+		af = create_flag_aff(ATYPE_BRIEF_RESPITE, 30, AFF_IMMUNE_TEMPERATURE, ch);
+		affect_join(ch, af, NOBITS);
+		RESET_LAST_MESSAGED_TEMPERATURE(ch);
+		
 		msdp_update_room(ch);
+		run_ability_hooks(ch, AHOOK_RESPAWN, 0, 0, NULL, NULL, NULL, NULL, NOBITS);
 	}
 }
 
@@ -579,7 +589,9 @@ ACMD(do_stake) {
 		REMOVE_BIT(INJURY_FLAGS(victim), INJ_STAKED);
 		obj_to_char((stake = read_object(o_STAKE, TRUE)), ch);
 		scale_item_to_level(stake, 1);	// min scale
-		load_otrigger(stake);
+		if (load_otrigger(stake)) {
+			get_otrigger(stake, ch, FALSE);
+		}
 	}
 	else if (!can_fight(ch, victim))
 		act("You can't stake $M!", FALSE, ch, 0, victim, TO_CHAR);
@@ -737,8 +749,11 @@ ACMD(do_tie) {
 		if (GET_ROPE_VNUM(victim) != NOTHING && (rope = read_object(GET_ROPE_VNUM(victim), TRUE))) {
 			obj_to_char(rope, ch);
 			scale_item_to_level(rope, 1);	// minimum
-			load_otrigger(rope);
-			act("You receive $p.", FALSE, ch, rope, NULL, TO_CHAR);
+			if (load_otrigger(rope)) {
+				// conditional on not purging itself
+				act("You receive $p.", FALSE, ch, rope, NULL, TO_CHAR);
+				get_otrigger(rope, ch, FALSE);
+			}
 		}
 		GET_ROPE_VNUM(victim) = NOTHING;
 		request_char_save_in_world(victim);

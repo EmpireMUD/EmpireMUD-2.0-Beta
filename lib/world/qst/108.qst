@@ -165,7 +165,7 @@ Z
 1 10802
 S
 #10805
-collect 20 Saplings~
+Collect 20 Saplings~
    Rosemary wants you to collect some saplings. You can either gather them in
 the forest, or get them by scraping trees. You can also find them by chopping
 down copses.
@@ -700,8 +700,9 @@ Steps:
  3. Type 'skill buy sew'.
  4. Type 'sew info whip' and 'sew info tent' to see what's needed.
  5. Collect the 10 large leather (tan large skins) and 2 saplings.
- 6. Type 'sew whip' and 'sew tent' to make these items, one at a time.
- 7. Return to Horation at the museum.
+ 6. Scrape the saplings to make poles.
+ 7. Type 'sew whip' and 'sew tent' to make these items, one at a time.
+ 8. Return to Horation at the museum.
 ~
 Horation is impressed with your crafting skills.
 ~
@@ -935,10 +936,10 @@ Enter the Soulstream~
    Enter the Soulstream and begin the EmpireMUD basic tutorial! This area will
 teach you the basics of EmpireMUD including how to find and complete quests.
 Use the following commands:
- 1. quest start Enter the Soulstream (if you're not already on this quest)
+ 1. start Enter the Soulstream (if you're not already on this quest)
  2. enter soulstream
  3. quest track Enter the Soulstream (to see that it's completed)
- 4. quest finish Enter the Soulstream
+ 4. finish Enter the Soulstream
  5. You can leave the Soulstream any time by typing 'enter portal' inside.
 (You can abbreviate both commands and quest names.)
 ~
@@ -976,7 +977,7 @@ need to learn the Ritual of Burdens.
  2. Cast the ritual inside the Soulstream with 'ritual burdens'.
  3. Wait for the ritual to complete.
  4. Return to the Spirit of Order.
- 5. Type 'quest finish High Sorcery'.
+ 5. Type 'finish High Sorcery'.
 ~
 You have performed a ritual and satisfied the Spirit of Order!
 ~
@@ -1015,7 +1016,7 @@ most locations on the map. Follow these steps:
     the time, so it may take a few tries.
  5. When you have the rock and the flint, go back to the Tower of Souls and
     type 'enter soulstream' to get back inside.
- 6. Type 'quest finish Survival' at the Spirit of the Wild.
+ 6. Type 'finish Survival' at the Spirit of the Wild.
 ~
    You have satisfied the Spirit of the Wild! Digging and gathering are good
 ways to learn low-level Survival. When you reach Survival 5, use 'skill buy
@@ -1062,7 +1063,7 @@ it to learn how to use it. Here are the steps for this quest:
     'where rabbit'.
  6. When you have the small skin, go back to the Tower of Souls and type
     'enter soulstream' to get back inside.
- 7. Type 'quest finish Battle' at the Spirit of the Hunt.
+ 7. Type 'finish Battle' at the Spirit of the Hunt.
 ~
 You have satisfied the Spirit of the Hunt!
 ~
@@ -1096,7 +1097,7 @@ Natural Magic: Heal The Spirits~
 The Spirit of Mana seems to be fading, and needs you to heal it:
  1. Purchase the Healing ability using 'skill buy heal'.
  2. Heal the Spirit of Mana using 'heal mana'.
- 3. Type 'quest finish Natural Magic' when complete.
+ 3. Type 'finish Natural Magic' when complete.
 Note: The Heal ability can usually only be used on yourself (until you learn
 Heal Friend), but the Spirit of Mana can be healed with the basic Heal.
 ~
@@ -1139,7 +1140,7 @@ worry, you'll get better at it as you level up.
  5. Type 'quest track Stealth' to check.
  6. Sneak between the two rooms of the Soulstream until complete.
  7. When you succeed, turn in the quest to the Spirit of Darkness using
-    'quest finish Stealth'.
+    'finish Stealth'.
 ~
 You have satisfied the Spirit of Darkness with your stealth.
 ~
@@ -1178,8 +1179,9 @@ blood. Follow these steps:
  6. Use the 'bite' command to bite the unconscious victim.
  7. Wait to drink all its blood.
  8. Go back to the Tower of Souls and type 'enter soulstream' to get inside.
- 9. Type 'quest finish Vampire' at the Spirit of Blood.
+ 9. Type 'finish Vampire' at the Spirit of Blood.
 Note: This quest will not show as 'complete' until you re-enter the Soulstream.
+(The quest tracks how much blood you have when you re-enter.)
 ~
    You have satisfied the Spirit of Blood! Buy and use more abilities from the
 Vampire skill tree to become a sanguine master!
@@ -1220,7 +1222,7 @@ can be used like a knife for butchering and skinning. Try this:
     it becomes a spear head. (It becomes a chipped flint, then a handaxe, then
     a spear head).
  6. Return to the Tower of Souls and 'enter soulstream' to get back inside.
- 7. Type 'quest finish Trade' at the Spirit of Innovation with your spear head.
+ 7. Type 'finish Trade' at the Spirit of Innovation with your spear head.
 ~
    You have satisfied the Spirit of Innovation! That spear head can be used for
 butchering, scraping, skinning, and even sewing!
@@ -1360,7 +1362,7 @@ Z
 1 10851
 S
 #10864
-Natural Magic: Druidic Chant~
+Natural Magic: Chant of Magic~
 This quest has no description.
 ~
 You have completed the quest.
@@ -1396,10 +1398,12 @@ place to complete some tutorials, level some skills, and learn the game.
    When you've done all that and you're ready to leave, craft a canoe (Basic
 Crafts) or find a raft (surely one of those goblins sells one). You'll only
 be able to take what you can carry, but any items you stored on the newbie
-island will be safe there. Abandon your newbie island claims (use the territory
-command to find them) because you'll need to be able to claim in your new
-location (type estats to see your claim limits). Use these tips to find a good
-home:
+island will be safe there until you found a city. Abandon your newbie island
+claims (use the territory command to find them) because you'll need to be able
+to claim in your new location (type estats to see your claim limits).
+   When you found your empire's first city out in the world, any items you
+stored on a newbie island will be transferred there automatically.
+Use these tips to find a good home:
 - Check the game's website for a world map to help you find a location.
 - Use the 'mapscan' command to find out what lies beyond the sea.
 - Choose a continent (not an island) for your city. Continents have better

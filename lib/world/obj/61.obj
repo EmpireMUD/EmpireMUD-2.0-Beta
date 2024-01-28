@@ -4,10 +4,29 @@ a little edible plant~
 A little edible plant is lying on the ground.~
 This looks like you could eat it, but you're not sure what it is.
 ~
-6 g a 0 4
+6 gC a 0 0 7
 1 0 0
-7 48
+7 72
+C
+1 1
 O+ 1 6100
+R
+4 5619 0
+S
+#6101
+mushroom~
+a mushroom~
+There's a mushroom here.~
+It's a small fungus, and it looks edible.
+~
+6 gC a 0 0 6
+6 0 0
+7 72
+C
+1 1
+O+ 1 6101
+R
+4 5619 0
 S
 #6110
 plants edible~
@@ -16,14 +35,29 @@ Some edible plants have been left here.~
    There's a good amount of edible plant material here, although you can't
 identify any of it.
 ~
-6 g a 0 5
+6 gC a 0 0 6
 12 0 0
-7 48
+7 72
 C
 1 1
 O+ 1 6110
 R
 4 5114 0
+S
+#6111
+mushrooms bunch~
+a bunch of mushrooms~
+A bunch of mushrooms are here.~
+These mushrooms look fresh and tasty.
+~
+6 gC a 0 0 16
+24 10505 0
+7 72
+C
+1 1
+O+ 1 6111
+R
+4 5215 0
 S
 #6120
 fruit little~
@@ -31,10 +65,14 @@ a little fruit~
 A little fruit is lying on the ground.~
 This looks like you could eat it, but you're not sure what it is.
 ~
-6 g a 0 3
+6 gC a 0 0 6
 1 0 0
-7 48
+7 120
+C
+1 1
 O+ 1 6120
+R
+4 5619 0
 S
 #6121
 fruit magic small~
@@ -42,10 +80,14 @@ a small magic fruit~
 A small magic fruit is lying here.~
 This little fruit glows with magical power.
 ~
-6 g a 0 5
+6 gC a 0 0 8
 1 0 0
-7 48
+7 120
+C
+1 1
 O+ 1 6121
+R
+4 5619 0
 S
 #6122
 fruit temperate small~
@@ -53,10 +95,14 @@ a small temperate fruit~
 A small temperate fruit is lying on the ground.~
 This fruit looks like it was grown in a temperate region.
 ~
-6 g a 0 4
+6 gC a 0 0 7
 1 0 0
-7 48
+7 120
+C
+1 1
 O+ 1 6122
+R
+4 5619 0
 S
 #6123
 fruit small tropical~
@@ -64,10 +110,14 @@ a small tropical fruit~
 A small tropical fruit is lying on the ground.~
 This fruit looks like it was grown in a tropical region.
 ~
-6 g a 0 5
+6 gC a 0 0 8
 1 0 0
-7 48
+7 120
+C
+1 1
 O+ 1 6123
+R
+4 5619 0
 S
 #6124
 fruit desert small~
@@ -75,10 +125,29 @@ a small desert fruit~
 A small desert fruit is lying on the ground.~
 This fruit looks like it was grown in a desert region.
 ~
-6 g a 0 6
+6 gC a 0 0 9
 1 0 0
-7 48
+7 120
+C
+1 1
 O+ 1 6124
+R
+4 5619 0
+S
+#6125
+fruit cooked small~
+a small cooked fruit~
+A small cooked fruit is lying here.~
+It's been cooked until you can't really tell what it started out as.
+~
+6 gC a 0 0 11
+6 0 0
+7 336
+C
+1 1
+O+ 1 6125
+R
+4 5619 0
 S
 #6130
 fruit fresh~
@@ -87,9 +156,9 @@ Some fresh fruit is scattered on the ground.~
    There's a fair amount of fruit here, although you're not exactly sure what
 any of it is.
 ~
-6 g a 0 5
+6 gC a 0 0 7
 12 0 0
-7 48
+7 120
 C
 1 1
 O+ 1 6130
@@ -102,9 +171,9 @@ some magic fruit~
 Some magic fruit is floating near the ground.~
 This fruit hovers near the ground, glowing. You're not really sure what it is.
 ~
-6 g a 0 6
+6 gC a 0 0 7
 12 0 0
-7 48
+7 120
 C
 1 1
 O+ 1 6131
@@ -117,9 +186,9 @@ some temperate fruit~
 Some temperate fruit is piled on the ground.~
 This fruit looks like it comes from a temperate region.
 ~
-6 g a 0 7
+6 gC a 0 0 8
 12 0 0
-7 48
+7 120
 C
 1 1
 O+ 1 6132
@@ -132,9 +201,9 @@ some tropical fruit~
 Some tropical fruit is piled on the ground.~
 This fruit looks like it comes from a tropical region.
 ~
-6 g a 0 8
+6 gC a 0 0 9
 12 0 0
-7 48
+7 120
 C
 1 1
 O+ 1 6133
@@ -147,14 +216,29 @@ some desert fruit~
 Some desert fruit is piled on the ground.~
 This fruit looks like it comes from a desert region.
 ~
-6 g a 0 10
+6 gC a 0 0 11
 12 0 0
-7 48
+7 120
 C
 1 1
 O+ 1 6134
 R
 4 5114 0
+S
+#6135
+fruit cooked~
+some cooked fruit~
+Some cooked fruit is lying on the ground.~
+The fruit is well-cooked.
+~
+6 gC a 0 0 12
+24 0 0
+7 336
+C
+1 1
+O+ 1 6135
+R
+4 5619 0
 S
 #6140
 vegetable small~
@@ -162,10 +246,14 @@ a small vegetable~
 A small vegetable is lying here.~
 This looks like you could eat it, but you're not sure what it is.
 ~
-6 g a 0 4
+6 gC a 0 0 7
 1 0 0
-7 48
+7 72
+C
+1 1
 O+ 1 6140
+R
+4 5619 0
 S
 #6141
 vegetable magic small~
@@ -173,10 +261,14 @@ a small magic vegetable~
 A small magic vegetable is lying here.~
 This unidentifiable little vegetable is glowing!
 ~
-6 g a 0 5
+6 gC a 0 0 8
 1 0 0
-7 48
+7 72
+C
+1 1
 O+ 1 6141
+R
+4 5619 0
 S
 #6142
 vegetable temperate small~
@@ -184,10 +276,14 @@ a small temperate vegetable~
 A small temperate vegetable is lying here.~
 This vegetable looks like it was grown somewhere temperate.
 ~
-6 g a 0 6
+6 gC a 0 0 9
 1 0 0
-7 48
+7 72
+C
+1 1
 O+ 1 6142
+R
+4 5619 0
 S
 #6143
 vegetable tropical small~
@@ -195,10 +291,14 @@ a small tropical vegetable~
 A small tropical vegetable is lying here.~
 This vegetable looks like it was grown somewhere tropical.
 ~
-6 g a 0 7
+6 gC a 0 0 10
 1 0 0
-7 48
+7 72
+C
+1 1
 O+ 1 6143
+R
+4 5619 0
 S
 #6144
 vegetable desert small~
@@ -206,10 +306,14 @@ a small desert vegetable~
 A small desert vegetable is lying here.~
 This vegetable looks like it was grown somewhere arid.
 ~
-6 g a 0 8
+6 gC a 0 0 11
 1 0 0
-7 48
+7 72
+C
+1 1
 O+ 1 6144
+R
+4 5619 0
 S
 #6150
 vegetables bunch~
@@ -218,14 +322,14 @@ A bunch of vegetables are lying here.~
    There's a good amount of edible plant material here, although you can't
 identify any of it.
 ~
-6 g a 0 5
+6 gC a 0 0 7
 12 0 0
-7 48
+7 72
 C
 1 1
 O+ 1 6150
 R
-4 5114 0
+4 5215 0
 S
 #6151
 vegetables magic bunch~
@@ -233,14 +337,14 @@ a bunch of magic vegetables~
 A bunch of magic vegetables are lying here.~
 These plants are glowing! You could make a fair amount of food from this.
 ~
-6 g a 0 6
+6 gC a 0 0 8
 12 0 0
-7 48
+7 72
 C
 1 1
 O+ 1 6151
 R
-4 5114 0
+4 5215 0
 S
 #6152
 vegetables temperate bunch~
@@ -248,14 +352,14 @@ a bunch of temperate vegetables~
 A bunch of temperate vegetables are lying here.~
 These vegetables look like they were grown somewhere temperate.
 ~
-6 g a 0 7
+6 gC a 0 0 9
 12 0 0
-7 48
+7 72
 C
 1 1
 O+ 1 6152
 R
-4 5114 0
+4 5215 0
 S
 #6153
 vegetables tropical bunch~
@@ -263,14 +367,14 @@ a bunch of tropical vegetables~
 A bunch of tropical vegetables are lying here.~
 These vegetables look like they were grown somewhere tropical.
 ~
-6 g a 0 8
+6 gC a 0 0 10
 12 0 0
-7 48
+7 72
 C
 1 1
 O+ 1 6153
 R
-4 5114 0
+4 5215 0
 S
 #6154
 vegetables desert bunch~
@@ -278,14 +382,14 @@ a bunch of desert vegetables~
 A bunch of desert vegetables are lying here.~
 These vegetables look like they were grown somewhere warm.
 ~
-6 g a 0 9
+6 gC a 0 0 11
 12 0 0
-7 48
+7 72
 C
 1 1
 O+ 1 6154
 R
-4 5114 0
+4 5215 0
 S
 #6160
 grain handful~
@@ -293,10 +397,14 @@ a handful of grain~
 A handful of grain is scattered here.~
 You're not sure what this grain is but it doesn't look like you can eat it.
 ~
-3 0 a 0 3
+3 C a 0 0 6
 0 0 0
-0 1152
+0 1344
+C
+1 1
 O+ 1 6160
+R
+4 5116 0
 S
 #6170
 grain bunch~
@@ -304,9 +412,9 @@ a bunch of grain~
 A bunch of grain is lying here.~
 You're not sure what this grain is but it doesn't look like you can eat it.
 ~
-3 g a 0 7
+3 gC a 0 0 8
 0 0 0
-0 1152
+0 1344
 C
 1 1
 O+ 1 6170
@@ -319,10 +427,14 @@ some seeds~
 Some seeds are scattered here.~
 You can't tell where these seeds came from, but they probably aren't edible.
 ~
-3 0 a 0 4
+3 C a 0 0 7
 0 0 0
-0 0
+0 8760
+C
+1 1
 O+ 1 6180
+R
+4 5210 0
 S
 #6181
 seeds~
@@ -330,9 +442,84 @@ some seeds~
 Some seeds are scattered here.~
 These seeds seem okay to eat.
 ~
-6 0 a 0 4
+6 gC a 0 0 9
 1 0 0
-0 0
+0 8760
+C
+1 1
 O+ 1 6181
+R
+4 5210 0
+S
+#6182
+nuts handful~
+a handful of nuts~
+A handful of nuts is scattered here.~
+It's hard to identify the nuts, but they look edible.
+~
+6 gC a 0 0 8
+4 0 0
+0 3240
+C
+1 1
+O+ 1 6182
+R
+4 5619 0
+S
+#6183
+spice~
+some spice~
+Some spice is sprinkled here.~
+This fragrant spice is hard to identify.
+~
+3 0 a 0 0 3
+0 0 0
+0 0
+C
+1 1
+O+ 1 6183
+R
+4 12102 0
+S
+#6184
+herb~
+an herb~
+An herb is lying here.~
+This unidentifiable herb smells tasty.
+~
+3 0 a 0 0 3
+0 0 0
+0 0
+C
+1 1
+O+ 1 6184
+S
+#6192
+nuts bunch~
+a bunch of nuts~
+A bunch of nuts are lying on the ground.~
+These mixed nuts are hard to identify, but easy to eat.
+~
+6 gC a 0 0 9
+10 0 0
+0 3240
+C
+1 1
+O+ 1 6192
+R
+4 5210 0
+S
+#6193
+ingredient~
+an ingerdient~
+An ingredient was left behind.~
+This fragrant ingredient could pep up a recipe.
+~
+3 0 a 0 0 3
+0 0 0
+0 0
+C
+1 1
+O+ 1 6193
 S
 $

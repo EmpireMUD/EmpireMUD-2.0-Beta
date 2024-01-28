@@ -2,15 +2,13 @@
 *   File: event.c                                         EmpireMUD 2.0b5 *
 *  Usage: timed global events that reward players for participation       *
 *                                                                         *
-*  EmpireMUD code base by Paul Clarke, (C) 2000-2015                      *
+*  EmpireMUD code base by Paul Clarke, (C) 2000-2024                      *
 *  All rights reserved.  See license.doc for complete information.        *
 *                                                                         *
 *  EmpireMUD based upon CircleMUD 3.0, bpl 17, by Jeremy Elson.           *
 *  CircleMUD (C) 1993, 94 by the Trustees of the Johns Hopkins University *
 *  CircleMUD is based on DikuMUD, Copyright (C) 1990, 1991.               *
 ************************************************************************ */
-
-#include <math.h>
 
 #include "conf.h"
 #include "sysdep.h"
@@ -199,6 +197,54 @@ void end_event(struct event_running_data *re) {
 char *get_event_name_by_proto(any_vnum vnum) {
 	event_data *proto = find_event_by_vnum(vnum);
 	return proto ? EVT_NAME(proto) : "UNKNOWN";
+}
+
+
+/**
+* Determines if a player has any event rewards the haven't collected.
+*
+* @param char_data *ch The player.
+* @return bool TRUE if the player can collect rewards.
+*/
+bool has_uncollected_event_rewards(char_data *ch) {
+	struct player_event_data *ped, *next_ped;
+	struct event_reward *reward;
+	bool any;
+	
+	any = FALSE;
+	
+	// check player's event data
+	HASH_ITER(hh, GET_EVENT_DATA(ch), ped, next_ped) {
+		if (any) {
+			break;	// shortcut
+		}
+		if (!ped->event || EVT_FLAGGED(ped->event, EVTF_IN_DEVELOPMENT)) {
+			continue;	// no work if no event or in-dev
+		}
+		if (ped->status == EVTS_COLLECTED) {
+			continue;	// no work for fully-collected events
+		}
+		
+		// players can claim thresholds at any time, before the event ends
+		LL_FOREACH(EVT_THRESHOLD_REWARDS(ped->event), reward) {
+			if (ped->points >= reward->min && ped->collected_points < reward->min) {
+				any = TRUE;
+				break;
+			}
+		}
+		
+		// rank rewards: look for events in the 'complete' state (not 'collected')
+		if (ped->status == EVTS_COMPLETE) {
+			LL_FOREACH(EVT_RANK_REWARDS(ped->event), reward) {
+				if (ped->rank >= reward->min && ped->rank <= reward->max) {
+					any = TRUE;
+					break;
+				}
+			}
+		}
+	}
+	
+	return any;
 }
 
 
@@ -578,11 +624,15 @@ int gain_event_points(char_data *ch, any_vnum event_vnum, int points) {
 	
 	if (points > 0) {
 		msg_to_char(ch, "\tyYou gain %d point%s for '%s'! You now have %d%s point%s.\t0\r\n", real_gain, PLURAL(real_gain), running->event ? EVT_NAME(running->event) : "Unknown Event", ped->points, capstr, (ped->points != 1 || *capstr) ? "s" : "");
-		syslog(SYS_EVENT, 0, TRUE, "EVENT: %s gains %d point%s for %s (%d%s total)", GET_NAME(ch), real_gain, PLURAL(real_gain), running->event ? EVT_NAME(running->event) : "Unknown Event", ped->points, capstr);
+		if (real_gain > 0) {
+			syslog(SYS_EVENT, 0, TRUE, "EVENT: %s gains %d point%s for %s (%d%s total)", GET_NAME(ch), real_gain, PLURAL(real_gain), running->event ? EVT_NAME(running->event) : "Unknown Event", ped->points, capstr);
+		}
 	}
 	else if (points < 0) {
-		msg_to_char(ch, "\tyYou lose %d point%s for '%s'! You now have %d%s point%s.\t0\r\n", ABSOLUTE(points), PLURAL(ABSOLUTE(points)), running->event ? EVT_NAME(running->event) : "Unknown Event", ped->points, capstr, (ped->points != 1 || *capstr) ? "s" : "");
-		syslog(SYS_EVENT, 0, TRUE, "EVENT: %s loses %d point%s for %s (%d%s total)", GET_NAME(ch), ABSOLUTE(points), PLURAL(ABSOLUTE(points)), running->event ? EVT_NAME(running->event) : "Unknown Event", ped->points, capstr);
+		msg_to_char(ch, "\tyYou lose %d point%s for '%s'! You now have %d%s point%s.\t0\r\n", ABSOLUTE(real_gain), PLURAL(ABSOLUTE(real_gain)), running->event ? EVT_NAME(running->event) : "Unknown Event", ped->points, capstr, (ped->points != 1 || *capstr) ? "s" : "");
+		if (real_gain < 0) {
+			syslog(SYS_EVENT, 0, TRUE, "EVENT: %s loses %d point%s for %s (%d%s total)", GET_NAME(ch), ABSOLUTE(real_gain), PLURAL(ABSOLUTE(real_gain)), running->event ? EVT_NAME(running->event) : "Unknown Event", ped->points, capstr);
+		}
 	}
 	
 	queue_delayed_update(ch, CDU_SAVE);
@@ -2406,9 +2456,9 @@ void do_stat_event(char_data *ch, event_data *event) {
 		strcpy(part, "never");	// 0 is not a valid repeat time, unlike quests
 	}
 	else {
-		sprintf(part, "%d minutes (%d:%02d:%02d)", EVT_REPEATS_AFTER(event), (EVT_REPEATS_AFTER(event) / (60 * 24)), ((EVT_REPEATS_AFTER(event) % (60 * 24)) / 60), ((EVT_REPEATS_AFTER(event) % (60 * 24)) % 60));
+		sprintf(part, "%d minutes (%s)", EVT_REPEATS_AFTER(event), colon_time(EVT_REPEATS_AFTER(event), TRUE, NULL));
 	}
-	size += snprintf(buf + size, sizeof(buf) - size, "Level limits: [\tc%s\t0], Duration: [\tc%d minutes (%d:%02d:%02d)\t0], Repeatable: [\tc%s\t0]\r\n", level_range_string(EVT_MIN_LEVEL(event), EVT_MAX_LEVEL(event), 0), EVT_DURATION(event), (EVT_DURATION(event) / (60 * 24)), ((EVT_DURATION(event) % (60 * 24)) / 60), ((EVT_DURATION(event) % (60 * 24)) % 60), part);
+	size += snprintf(buf + size, sizeof(buf) - size, "Level limits: [\tc%s\t0], Duration: [\tc%d minutes (%s)\t0], Repeatable: [\tc%s\t0]\r\n", level_range_string(EVT_MIN_LEVEL(event), EVT_MAX_LEVEL(event), 0), EVT_DURATION(event), colon_time(EVT_DURATION(event), TRUE, NULL), part);
 	
 	if (EVT_MAX_POINTS(event) > 0) {
 		size += snprintf(buf + size, sizeof(buf) - size, "Maximum points: [\tc%d\t0]\r\n", EVT_MAX_POINTS(event));
@@ -2464,13 +2514,13 @@ void olc_show_event(char_data *ch) {
 		sprintf(buf + strlen(buf), "<%smaxlevel\t0> none\r\n", OLC_LABEL_UNCHANGED);
 	}
 	
-	sprintf(buf + strlen(buf), "<%sduration\t0> %d minutes (%d:%02d:%02d)\r\n", OLC_LABEL_VAL(EVT_DURATION(event), 0), EVT_DURATION(event), (EVT_DURATION(event) / (60 * 24)), ((EVT_DURATION(event) % (60 * 24)) / 60), ((EVT_DURATION(event) % (60 * 24)) % 60));
+	sprintf(buf + strlen(buf), "<%sduration\t0> %d minutes (%s)\r\n", OLC_LABEL_VAL(EVT_DURATION(event), 0), EVT_DURATION(event), colon_time(EVT_DURATION(event), TRUE, NULL));
 	
 	if (EVT_REPEATS_AFTER(event) == NOT_REPEATABLE || EVT_REPEATS_AFTER(event) == 0) {
 		sprintf(buf + strlen(buf), "<%srepeat\t0> never\r\n", OLC_LABEL_VAL(EVT_REPEATS_AFTER(event), NOT_REPEATABLE));
 	}
 	else if (EVT_REPEATS_AFTER(event) > 0) {
-		sprintf(buf + strlen(buf), "<%srepeat\t0> %d minutes (%d:%02d:%02d)\r\n", OLC_LABEL_VAL(EVT_REPEATS_AFTER(event), 0), EVT_REPEATS_AFTER(event), (EVT_REPEATS_AFTER(event) / (60 * 24)), ((EVT_REPEATS_AFTER(event) % (60 * 24)) / 60), ((EVT_REPEATS_AFTER(event) % (60 * 24)) % 60));
+		sprintf(buf + strlen(buf), "<%srepeat\t0> %d minutes (%s)\r\n", OLC_LABEL_VAL(EVT_REPEATS_AFTER(event), 0), EVT_REPEATS_AFTER(event), colon_time(EVT_REPEATS_AFTER(event), TRUE, NULL));
 	}
 	
 	if (EVT_MAX_POINTS(event) > 0) {
@@ -2855,7 +2905,7 @@ OLC_MODULE(evedit_duration) {
 	}
 	else if (isdigit(*argument)) {
 		EVT_DURATION(event) = olc_process_number(ch, argument, "duration", "duration", 1, MAX_INT, EVT_DURATION(event));
-		msg_to_char(ch, "It now runs for %d minutes (%d:%02d:%02d).\r\n", EVT_DURATION(event), (EVT_DURATION(event) / (60 * 24)), ((EVT_DURATION(event) % (60 * 24)) / 60), ((EVT_DURATION(event) % (60 * 24)) % 60));
+		msg_to_char(ch, "It now runs for %d minutes (%s).\r\n", EVT_DURATION(event), colon_time(EVT_DURATION(event), TRUE, NULL));
 	}
 	else {
 		msg_to_char(ch, "Invalid duration.\r\n");
@@ -2949,7 +2999,7 @@ OLC_MODULE(evedit_repeat) {
 	}
 	else if (isdigit(*argument)) {
 		EVT_REPEATS_AFTER(event) = olc_process_number(ch, argument, "repeats after", "repeat", 0, MAX_INT, EVT_REPEATS_AFTER(event));
-		msg_to_char(ch, "It now repeats after %d minutes (%d:%02d:%02d).\r\n", EVT_REPEATS_AFTER(event), (EVT_REPEATS_AFTER(event) / (60 * 24)), ((EVT_REPEATS_AFTER(event) % (60 * 24)) / 60), ((EVT_REPEATS_AFTER(event) % (60 * 24)) % 60));
+		msg_to_char(ch, "It now repeats after %d minutes (%s).\r\n", EVT_REPEATS_AFTER(event), colon_time(EVT_REPEATS_AFTER(event), TRUE, NULL));
 	}
 	else {
 		msg_to_char(ch, "Invalid repeat interval.\r\n");

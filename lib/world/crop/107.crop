@@ -15,10 +15,13 @@ D3
 D4
 .Y&to&0.~
 &0~
-I 6 10721 100.00 1  # FORAGE: handful of chestnuts
+I 6 10721 100.00 25  # FORAGE: handful of chestnuts
 I 7 10720 100.00 14  # PICK: basket of chestnuts
-I 9 121 100.00 1  # GATHER: sticks and leaves
+I 9 121 100.00 50  # GATHER: sticks and leaves
 I 20 120 100.00 1  # CHOP: large tree
+U
+0
+The little seedling knocks you back as it grows into an enormous, shady tree!~
 X
 chestnuts nuts trees grove orchard crop~
    A dense grove of chestnut trees grows before you, their branches heavy with

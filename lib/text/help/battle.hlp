@@ -19,13 +19,6 @@ which set of skills to use.
 
 See also: EVASION, WEAPON PROFICIENCY, ROLE, SKILL, SKILL SYNERGY
 #
-AOE "AREA OF EFFECT" "AREA EFFECT" "AREA-OF-EFFECT"
-
-An area-of-effect ability is one that hits multiple targets in the room. In
-general, these abilities only target NPCs.
-
-Examples: OUTRAGE
-#
 ABATE
 
 Usage:  abate [victim]
@@ -106,8 +99,8 @@ Cost:  15 move
 Debuff type:  physical, stun
 
 Bash your target with your weapon and send him flying to the ground. When you
-successfully bash, your target is briefly stunned. As a specialty ability, bash
-cannot miss. At Battle 100, bash does double damage.
+successfully bash, your target is briefly stunned. Has a chance to deal
+additional damage based on your Battle skill.
 
 Only one person in the room may be bash-stunned at a time. Using the ability on
 a second person will release the first one.
@@ -134,9 +127,9 @@ The Big Game Hunter branch of the Battle skill is for people who aren't
 satisfied with puny elephants. It's for people who want to take down the most
 dangerous game: vampires and mages.
 
-Big Game Hunter gives you a chance to inflict 5% (10% at Battle 100) extra
-damage against each of these supernaturals. It also opens up special abilities
-to help you take them down.
+Big Game Hunter gives you a chance to inflict extra damage against each of
+these supernaturals. It also opens up special abilities to help you take them
+down.
 
 This ability gains experience when you hit a vampire or mage.
 
@@ -167,12 +160,13 @@ Cost:  50 move
 Cooldown:  3 minutes
 Usage:  charge [target]
 
-This ability allows you to charge directly into melee range. It can only be
-used if you're in ranged combat (or running into melee) or aren't in combat
-at all.
+This ability allows you to charge directly into melee range and hit your target
+with your weapon. It can only be used if you're in ranged combat (or running
+into melee) or aren't in combat at all.
 
-You receive a brief boost to your to-hit and damage when you charge. The amount
-of the damage boost is based on your strength and intelligence.
+You receive a brief boost to your to-hit and damage when you charge.
+
+Gain experience by using Charge.
 #
 "CUT DEEP" "DEEP CUTS"
 
@@ -229,17 +223,6 @@ or 'mana blast', but not all mobs can be disarmed.
 
 Gain experience when you try to disarm someone, even if it fails.
 #
-"DUAL-WIELD" "DUAL WIELD"
-
-Dual-Wield
-Stealth Synergy Ability: 100 Battle OR 100 Survival OR 100 Trade
-
-With this ability, you can attack with weapons in both hands (the wield and
-hold slots). Without it, you can still hold a weapon in your off-hand, but
-will never attack with it.
-
-Your off-hand receives a significant to-hit penalty.
-#
 ENDURANCE
 
 Endurance (Battle ability)
@@ -254,7 +237,7 @@ solo roles.
 
 Gain experience when you take damage.
 
-See also: TANK, ROLE
+See also: TANK, PASSIVES, ROLE
 #
 EVASION EVADE
 
@@ -279,33 +262,12 @@ FINESSE
 
 Finesse (Battle ability)
 
-With finesse, your close-combat (non-Archery) automatic attacks happen faster,
-leading to more damage overall. As a basic ability, attacks are 10% faster. As a
-specialty ability, they are 15% faster. At Battle 100, they are 20% faster.
-
-The ranged (Archery) version of this ability is Quick Draw.
+With finesse, your close-combat (non-Archery) attacks happen faster, leading to
+more damage overall.
 
 Gain experience when you hit a combat opponent.
 
-See also: SPEED
-#
-FIRE CATAPULT CANNONS
-
-Usage:  fire <vehicle> <direction | target vehicle> 
-
-Certain vehicles are siege weapons and can fire at buildings or at other
-vehicles. You need heavy shot for this. You can shoot at buildings in adjacent
-rooms, or at vehicles in the same room.
-
-If you're aboard a ship with cannons, you can fire from onboard the ship, but
-it still fires only at vehicles in the room the ship is in, or at adjacent
-rooms from there.
-
-Example:  
-  > fire catapult north
-  > fire brigantine 2.brigantine
-
-See also: COOKING FIRE, DOUSE, HARNESS
+See also: QUICK DRAW, SPEED
 #
 FIRSTAID "FIRST AID"
 
@@ -447,9 +409,8 @@ Usage:  kick [victim]
 Cooldown:  6 seconds
 Cost:  10 move
 
-Kick is a special attack that does bonus damage (based on your Strength) outside
-of the combat round. As a specialty ability, it cannot miss. At Battle 100,
-it does increased damage.
+Kick is a special attack that does bonus damage (based on your Strength)
+outside of the combat round.
 
 Gain experience when you try to kick something.
 
@@ -488,8 +449,12 @@ tiny cuts.
 
 Noble Bearing (Battle ability)
 
-Damage to your character is reduced by your Greatness rating. Gain experience
-when you take damage.
+Damage to your character is reduced due to your Greatness. This effect is
+greater in the tank role.
+
+Gain experience when you take damage.
+
+See also: PASSIVES, TANK ROLE
 #
 "NULL MANA"
 
@@ -524,29 +489,25 @@ See also: RESCUE
 Quick Block (Battle ability)
 
 As you learn to block more quickly, your shield becomes more effective. Quick
-Block gives you +10 to Block. As a class-level ability, it instead gives +10%
-of your level, with a minimum of +10. This is included in the Block rating
-shown on your score.
+Block grants you a passive boost to your block rating. It is more effective in
+the tank role.
 
 Gain experience whenever you are attacked with a blockable attack and have a
 shield equipped.
 
-See also: BLOCK
+See also: BLOCK, PASSIVES, ROLE
 #
 "QUICK DRAW"
 
 Quick Draw (Battle ability)
 
 Shoot more arrows before your enemies reach you by learning to draw more
-quickly, leading to more damage per second. This improves your ranged combat
-speed by 25% (or 35% at Battle 100).
-
-The close-combat version of this ability is Finesse. It works on all ranged
-weapons, not just arrows.
+quickly, leading to more damage per second. It works on all ranged weapons, not
+just arrows.
 
 Gain experience when you successfully hit with a ranged weapon.
 
-See also: ARCHERY, SHOOT
+See also: ARCHERY, FINESSE, SHOOT
 #
 PREPARED
 
@@ -577,22 +538,18 @@ REFLEXES
 Reflexes (Battle ability)
 
 With training, your reflexes become good enough that you dodge more often.
-This ability gives at least +10 dodge automatically.
+This ability boosts your dodge rating passively. It is more effective in the
+tank role.
 
-As a specialty ability, it adds 5% of your total level to your dodge.
-At Battle 100, it adds 10% of your total level to your dodge.
+Gain experience when someone tries to hit you and you dodge.
 
-This dodge bonus is reflected on your 'score'.
-
-Gain experience when someone tries to hit you.
-
-See also: IMPROVED REFLEXES
+See also: IMPROVED REFLEXES, PASSIVES, ROLE
 #
 RESCUE
 
 Rescue (Battle ability)
 
-Usage:  rescue [victim]
+Usage:  rescue <person>
 Cooldown:  6 seconds
 Cost:  20 move
 
@@ -601,24 +558,12 @@ of your poor friend who is being pummeled. You can only 'turn' one enemy for
 each rescue attempt. This is very useful when working in hunting parties, of
 course.
 
-Typing "rescue" with no argument will attempt to rescue the first group member
-who needs it.
-
-Gain experience when you successfully rescue someone.
+Gain experience when you rescue someone.
 
 Example:
   > rescue Ranger
 
 See also: OUTRAGE
-#
-RESPAWN
-
-Usage:  respawn
-
-When your character has died, you can still observe for a short time. When you
-are ready to respawn, use this command.
-
-See also: DEATH, TOMB
 #
 "SHIELD BLOCK" SHIELDS
 
@@ -651,20 +596,6 @@ Gain experience when you attack something.
 
 See also: LIGHT ARMOR, KICK, BASH, CUT DEEP, STUNNING BLOW, FINESSE, FRENZY
 #
-SPEED "COMBAT SPEED" "FIGHT SPEED" "FIGHTING SPEED"
-
-On EmpireMUD, combat is speed-based, not round-based or turn-based. Each
-weapon or other attack has an associated speed, which determines how long or
-short your character waits between attacks.
-
-Your current speed is shown on your score display. A lower speed is better,
-since it is the time between attacks.
-
-Things that boost your speed, such as Wits and Hasten, increase your damage
-proportionally.
-
-See also: SCORE, WITS, HASTEN, SLOW
-#
 "STUNNING BLOW"
 
 Stunning Blow (Battle ability)
@@ -679,11 +610,19 @@ Gain experience when you inflict a stunning blow.
 
 See also: BASH
 #
-SUMMARY "COMBAT SUMMARY"
+SURGE
 
-Usage:  summary
+Surge (Battle ability)
 
-This command shows a summary of you, your allies, and your enemies in combat.
+Usage:  surge
+Cooldown:  6 minutes
+Duration:  30 seconds
+
+Grit your teeth and prepare for a surge in battle! This ability boosts your
+move regeneration significantly, if only briefly. It is stronger in the melee
+or tank role.
+
+See also: MOVE REGEN, MELEE ROLE, TANK ROLE
 #
 "BODYGUARD"
 
@@ -710,32 +649,28 @@ Trick Shots (Battle ability)
 
 Debuff type:  physical
 
-Your ranged attacks get new effects based on attack type. Your chance to apply
-the effect on each shot is based on your Battle skill.
+Your ranged attacks have a 10% chance of new effects based on the attack type.
 
-Available affects:
-  bow (shoot) - Slows the victim.
-  crossbow (shoot) - Causes a stackable physical DoT.
-  pistol (shoot) - The victim loses dodge based on your Dexterity.
-  musket (shoot) - Causes a stackable physical DoT.
-  sling (shoot) - Stuns the victim briefly.
-  spear-thrower (shoot) - Causes a stackable physical DoT.
+Trick Shots: Slow Leg (bow): SLOW for 10 seconds
+Trick Shots: Artery Bleed (crossbow, musket, spear-thrower): Physical DoT
+Trick Shots: Dodgey Arm (pistol): DODGE penalty for 10 seconds
+Trick Shots: Head Stun (sling): STUN for 5 seconds
 
-Gain experience when fighting at range.
+Gain experience when it goes off.
 
 See also: DODGE, DOT
 #
-"TWO-HANDED WEAPONS" "TWO HANDED WEAPONS" "TWOHANDED WEAPONS" "2HANDED WEAPONS" "2H"
+"TWO-HANDED WEAPONS MASTERY" "TWO-HANDED WEAPON MASTERY" "TWO-HANDED WEAPONS" "TWO HANDED WEAPONS" "TWOHANDED WEAPONS" "2HANDED WEAPONS" "2H"
 
-Two-Handed Weapons
+Two-Handed Weapons Mastery
 Battle Synergy Ability: 100 Survival OR 100 Trade
 
-This ability allows you to use two-handed weapons. These weapons require that
-you don't have an item in your off-hand (hold) slot. Only certain powerful
-melee synergies receive this ability.
+This ability grants 50% extra damage from two-handed weapons. Only certain
+powerful melee synergies receive this ability.
 
-Two-handed weapons are more powerful than ordinary weapons and are marked with
-the (2h) tag.
+All players can use two-handed weapons. These weapons require that you don't
+have an item in your off-hand (hold) slot. Two-handed weapons are more powerful
+than ordinary weapons and are marked with the (2h) tag.
 #
 UNDERMINE
 

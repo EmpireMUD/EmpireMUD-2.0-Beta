@@ -168,7 +168,7 @@ switch %random.4%
     set keep_going 1
     while %person% && %keep_going%
       if %self.is_enemy(%person%)%
-        if !%person.trigger_counterspell%
+        if !%person.trigger_counterspell(%self%)%
           %send% %person% You fall to your knees as your body stops responding to your commands!
           %echoaround% %person% ~%person% falls to ^%person% knees, stunned.
           dg_affect #18506 %person% DODGE -50 10
@@ -421,7 +421,7 @@ switch %random.3%
         halt
       end
     end
-    if %target.trigger_counterspell%
+    if %target.trigger_counterspell(%self%)%
       %send% %target% &&r~%self% shoots a bolt of crackling emerald light at you, but it hits your counterspell and explodes!
       %echoaround% %target% ~%self% shoots a bolt of crackling emerald light at ~%target%, but it explodes in mid flight!
     else
@@ -786,14 +786,17 @@ done
 ~
 #18512
 Search for Traps - Jungle Temple~
-2 p 100
-~
-if %abilityname% != Search
-  return 1
-  halt
-end
+2 c 0
+search~
+return 1
 %send% %actor% You search for traps...
 %echoaround% %actor% ~%actor% searches for traps...
+* lacking ability?
+if !%actor.has_tech(Search-Command)% || %actor.aff_flagged(BLIND)%
+  %send% %actor% You can't spot any traps in this room...
+  halt
+end
+* actual search
 context %instance.id%
 switch %room_trap%
   case 18504
@@ -809,8 +812,6 @@ switch %room_trap%
     %send% %actor% You can't spot any traps in this room...
   break
 done
-return 0
-halt
 ~
 #18513
 Mob block higher template id~
@@ -835,7 +836,11 @@ if !%arg%
   return 1
   halt
 end
-* TODO: Check nobody's in the adventure before changing difficulty
+if %instance.players_present% > %self.room.players_present%
+  %send% %actor% You cannot set a difficulty while players are elsewhere in the adventure.
+  return 1
+  halt
+end
 if normal /= %arg%
   %echo% Setting difficulty to Normal...
   set difficulty 1

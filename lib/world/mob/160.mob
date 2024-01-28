@@ -4,7 +4,7 @@ the necrogoblin~
 The goblin necromancer is chanting here.
 ~
 125 200 dxBE cd 2
-1 0 0 20
+1 0 0 20 -1
 D
    The translucent flesh of this goblin is stretched over a skeleton with
 little to no musculature or fat protection. A black cloud of magic seems to
@@ -54,7 +54,7 @@ a skeletal warrior~
 A skeletal warrior rattles here.
 ~
 125 200 cdhop cG 3
-0 0 22 15
+0 0 22 15 -1
 D
    This skeleton stands with no weapon in hand, but clearly ready to fight for
 its necromancer. The various marks on its bones indicate that it is no
@@ -77,7 +77,7 @@ a skeletal soldier~
 A skeletal soldier rattles here.
 ~
 125 200 cdhopz cqG 3
-0 0 22 1
+0 0 22 1 -1
 D
    This skeleton stands with a simple but effective blade in hand, clearly
 ready to fight for its necromancer. The various marks on its bones indicate
@@ -99,8 +99,8 @@ rawhead~
 the rawhead~
 The rawhead looms here.
 ~
-125 200 dghopyA ciwEG 4
-0 0 26 15
+125 200 dghopyA ciEG 4
+0 0 26 13 -1
 D
    A monster made up of a mixture of bones looms over you with it's arms
 outstretched. The head is clearly from some large beast, perhaps a rhino,
@@ -124,7 +124,7 @@ a mess~
 A mess of bone and natural materials stands here.
 ~
 125 200 dh cG 2
-0 0 13 15
+0 0 13 15 -1
 D
    A collection of dirt, bones, moss, and other organic materials are all
 formed here into some semblence of a creature. Standing about as high as a
@@ -149,8 +149,8 @@ plant skeletal skeleton~
 the skeletal plant~
 A skeleton with leaves for flesh and vines for veins sways here.
 ~
-125 200 bdhxzAE cowAG 2
-2 0 0 15
+125 200 bdhxzAE coAG 2
+2 0 0 13 -1
 D
    This clearly female goblin skeleton stands dressed in an astrakhan cloak and
 little else. Under the folds there's a skeleton frame, dressed in a variety of
@@ -186,7 +186,7 @@ a skeletal guard~
 A skeleton in what is clearly a guard's uniform stands here.
 ~
 125 200 abdhz cqG 3
-0 0 0 2
+0 0 0 2 -1
 D
    This guard has a bone to pick with anyone trying to get past. The uniform
 clearly was fit for a thin person, as even now it hangs well on the skeletal
@@ -215,7 +215,7 @@ a skeletal guard~
 A skeleton in what is clearly a guard's uniform stands here.
 ~
 125 200 adhz cqG 3
-0 0 0 4
+0 0 0 4 -1
 D
    This guard clearly takes its job seriously. Even after death, it paces a
 patrol through the underground passage.
@@ -243,7 +243,7 @@ a horse made of fragmented bone~
 A horse made up of fragmented bone stands here.
 ~
 125 200 dehj G 4
-0 0 22 11
+0 0 22 11 -1
 D
    This is clearly a horse, but also clearly not a proper horse skeleton. It
 seems like someone smashed up several skeletons, and just glooed all the pieces
@@ -257,7 +257,7 @@ a viney horse~
 A horse made up of more vine than anything else sways here.
 ~
 125 200 dehj G 4
-0 0 14 15
+0 0 14 15 -1
 D
    A horse has seemingly been grown from the ground, before leafing its roots
 behind.
@@ -270,7 +270,7 @@ a skeletal construct~
 A skeletal construct, made of many different creatures stands here.
 ~
 125 200 dehj G 4
-0 0 22 9
+0 0 22 9 -1
 D
    This bone monstrosity is clearly not made of a single type of skeleton. A
 donkey leg here, a crocodile skull there, and all sorts of different pieces in
@@ -285,7 +285,7 @@ a plant construct~
 A construct made up of various plants sways here.
 ~
 125 200 dehj G 4
-0 0 13 7
+0 0 13 36 -1
 D
    This living plant creature is made up of almost exclusively barky limbs and
 thorns. There's not even a defined shape to guess which way the thing might be
@@ -299,7 +299,7 @@ a beastial plant skeleton~
 A beastial plant skeleton thing rages here.
 ~
 14 0 cdkoyzB ciG 3
-0 0 0 15
+0 0 0 15 -1
 D
    This beast is formed of both bone and plant matter. The bones coming from
 various creatures and even some humanoids. The plant matter seeming to mostly
@@ -312,7 +312,7 @@ a skeletal dracolich~
 A skeletal dracolich stands here with flames in its eyes.
 ~
 125 200 dehj mG 5
-0 0 25 12
+0 0 25 12 -1
 D
    Still some how capable of flight, this complete dragon skeleton seems to be
 in perfect health, minus the fleshy bits.
@@ -325,7 +325,7 @@ a viney dragon~
 A viney dragon looks to have grown up out of the ground.
 ~
 125 200 dehj mG 5
-0 0 25 15
+0 0 25 15 -1
 D
    A rather viney dragon flaps here, clearly capable of flight. Every where
 that a flesh and blood creature would have veins and arteries, this one has
@@ -340,7 +340,7 @@ a viney shark~
 A shark made up entirely of vines and other plant life swims here.
 ~
 125 200 dehjl 0 5
-0 0 6 9
+0 0 6 9 -1
 D
    This green hued shark moves just as swiftly through the water as any other
 aquatic predator, but has a rubbery texture to its pseudo flesh. Close
@@ -355,7 +355,7 @@ a giant skeletal hawk~
 A giant skeletal hawk hovers here.
 ~
 125 200 dehj m 4
-0 0 2 26
+0 0 2 26 -1
 D
    The over-sized bird is no different than any other. Except maybe its great
 size, or perhaps the lack of feathers, or lack of flesh and organs. Okay, so
@@ -369,7 +369,7 @@ a leafy bird~
 A bird with leaves for feathers hovers here.
 ~
 125 200 dehj m 4
-0 0 2 26
+0 0 2 26 -1
 D
    This bird is just as colorful as any other tropical avian, the only
 difference being that its coloration is from flowers and autumnal leaves rather

@@ -4,7 +4,7 @@ a cut of poultry~
 There is a cut of poultry sitting on the ground.~
 You can eat the poultry raw... or cook it.
 ~
-6 0 a 0 4
+6 gC a 0 0 6
 6 0 0
 7 24
 C
@@ -19,12 +19,45 @@ a slab of pork~
 There is a slab of pork sitting on the ground.~
 You can eat the pork raw... or cook it.
 ~
-6 0 a 0 4
+6 gC a 0 0 6
 6 0 0
 7 24
 C
 1 1
 O+ 1 6202
+R
+4 5119 0
+S
+#3202
+egg white~
+a white egg~
+A white egg is lying on the ground.~
+It's a little white egg.
+~
+6 g a 0 0 10
+1 0 0
+7 336
+C
+1 1
+O+ 1 6205
+R
+4 5216 0
+R
+4 5619 0
+T 3202
+S
+#3203
+mutton raw side~
+a side of raw mutton~
+A side of raw mutton is lying here.~
+The dark red side of meat looks lean and firm. You can cook with it.
+~
+6 glC a 0 0 9
+6 0 0
+7 24
+C
+1 1
+O+ 1 6206
 R
 4 5119 0
 S

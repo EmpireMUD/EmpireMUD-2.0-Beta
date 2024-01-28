@@ -5,7 +5,7 @@ A shoddy raft is floating here.~
    This token should be replaced by a shoddy raft (vehicle). You shouldn't be
 reading this.
 ~
-3 0 a 0 2
+3 0 a 0 0 2
 0 0 0
 0 0
 T 900
@@ -17,7 +17,7 @@ A quiver of wooden arrows is lying here.~
    You can use arrows from your inventory, if you have a bow equipped. Try
 lighting them on fire, too.
 ~
-21 lo a 0 4
+21 lo a 0 0 4
 10 0 0
 0 0
 I 11 911 10.00 1  # LIGHT: quiver of flaming arrows
@@ -28,7 +28,7 @@ a short bow~
 A short bow has been left here.~
 Equip a quiver of arrows and then use "shoot" to start ranged combat.
 ~
-20 ehmo ap 0 3
+20 ehmo ap 0 0 3
 29 1 0
 0 0
 C
@@ -40,7 +40,7 @@ a long bow~
 A long bow has been dropped here.~
 Equip a quiver of arrows and then use "shoot" to start ranged combat.
 ~
-20 emo ap 0 2
+20 emo ap 0 0 2
 29 1 0
 0 0
 S
@@ -50,7 +50,7 @@ a quiver of flaming arrows~
 A quiver of flaming arrows is burning here.~
 Keep this in your inventory while shooting your bow.
 ~
-21 o a 0 3
+21 o a 0 0 3
 10 1 0
 0 4
 S
@@ -60,7 +60,7 @@ a lyre~
 Someone has left her lyre here.~
 You can play the lyre to make soothing music.
 ~
-22 0 ao 0 2
+22 0 ao 0 0 2
 0 0 0
 0 0
 C
@@ -86,7 +86,7 @@ a wooden flute~
 A wooden flute has been tossed here.~
 You can play the flute to entertain your friends.
 ~
-22 0 ao 0 1
+22 0 ao 0 0 1
 1 0 0
 0 0
 M
@@ -103,12 +103,12 @@ M
 $n plays $p.~
 S
 #914
-walking stick wooden long~
+stick walking wooden long~
 a walking stick~
 A long, wooden walking stick has been dropped here!~
 The walking stick helps you walk easier.
 ~
-1 ehmo ao 0 1
+1 ehmo ao 0 0 1
 0 1 5
 0 0
 A
@@ -120,7 +120,7 @@ a wooden stake~
 A sleek wooden stake has been jabbed into the ground!~
 This isn't a tent stake. It's a vampire stake!
 ~
-3 l ao 0 2
+3 l ao 0 0 2
 0 0 0
 0 0
 C
@@ -135,7 +135,7 @@ A large beehive has been left here.~
    Beehives are used to set up apiaries, where your citizens can tend bees to
 provide honey for your empire's food and crafts.
 ~
-3 e a 0 7
+3 e a 0 0 7
 0 0 0
 0 0
 C
@@ -157,7 +157,7 @@ A blank sign is lying on the ground.~
    If you have the right ability, you can use this sign to mark a road with the
 roadsign command (see HELP ROADSIGN).
 ~
-3 e a 0 2
+3 e a 0 0 2
 0 0 0
 0 0
 C
@@ -171,7 +171,7 @@ a wooden handle~
 A wooden handle has been dropped on the ground.~
 The handle can be attached to many things to build tools and weapons.
 ~
-1 l ano 0 4
+1 l ano 0 0 5
 0 3 5
 0 0
 C
@@ -180,6 +180,10 @@ I 11 184 100.00 1  # LIGHT: torch
 O+ 1 6850
 R
 4 5121 0
+R
+4 5610 0
+R
+4 5108 0
 S
 #923
 arrows quiver flint-tipped tipped~
@@ -187,7 +191,7 @@ a quiver of flint-tipped arrows~
 A quiver of flint-tipped arrows is lying here.~
 You can use arrows from your inventory, if you have a bow equipped.
 ~
-21 mo a 0 5
+21 mo a 0 0 5
 10 1 0
 0 0
 C
@@ -199,7 +203,7 @@ a quiver of iron arrows~
 A quiver of iron arrows is lying here.~
 You can use arrows from your inventory, if you have a bow equipped.
 ~
-21 mo a 0 6
+21 mo a 0 0 6
 20 1 0
 2 0
 C
@@ -211,7 +215,7 @@ a quiver of imperium bodkin arrows~
 A quiver of imperium bodkin arrows is lying here.~
 You can use arrows from your inventory, if you have a bow equipped.
 ~
-21 mo a 0 9
+21 mo a 0 0 9
 60 1 0
 2 0
 A
@@ -225,7 +229,7 @@ a quiver of nocturnium channeling arrows~
 A quiver of nocturnium channeling arrows is lying here.~
 You can use arrows from your inventory, if you have a bow equipped.
 ~
-21 mo a 0 10
+21 mo a 0 0 10
 60 1 0
 2 0
 A
@@ -239,7 +243,7 @@ a quiver of flowing arrows~
 A quiver of flowing arrows is lying here.~
 You can use arrows from your inventory, if you have a bow equipped.
 ~
-21 mo a 0 11
+21 mo a 0 0 11
 40 1 0
 2 0
 A
@@ -253,7 +257,7 @@ a quiver of thunderclap arrows~
 A quiver of thunderclap arrows is lying here.~
 You can use arrows from your inventory, if you have a bow equipped.
 ~
-21 mo a 0 12
+21 mo a 0 0 12
 40 1 0
 2 0
 A
@@ -268,7 +272,7 @@ A quiver of bloodletter arrows is lying here.~
    You can use arrows from your inventory, if you have a bow equipped.
 Bloodletter arrows have a chance to cause bleeding on a successful hit.
 ~
-21 mo a 0 13
+21 mo a 0 0 13
 40 1 0
 2 0
 C
@@ -284,7 +288,7 @@ carefully selected for being dry and ready to burn. You could light something
 on fire by rubbing these sticks together (just type 'light <object>' to light
 something with them).
 ~
-18 0 a 0 6
+18 0 a 0 0 6
 5 0 0
 0 0
 C
@@ -304,7 +308,7 @@ But instead of a hard drill bit, it spins bare wood against a plank to build
 friction and start a fire with very little effort. Unfortunately, it doesn't
 last very long before too much of the wood has burned away.
 ~
-18 0 a 0 2
+18 0 a 0 0 2
 25 0 0
 0 0
 C
@@ -320,7 +324,7 @@ the Pinnace~
 A small pinnace is floating here.~
 Type "board" to get onto the ship.
 ~
-17 0 0 0 2
+17 0 0 0 0 2
 0 0 0
 0 1
 S
@@ -330,7 +334,7 @@ the Brigantine~
 A small brigantine is floating here.~
 Type "board" to get onto the ship.
 ~
-17 0 0 0 2
+17 0 0 0 0 2
 1 0 0
 0 1
 S
@@ -340,7 +344,7 @@ the Galley~
 A large galley is floating here.~
 Type "board" to get onto the ship.
 ~
-17 0 0 0 2
+17 0 0 0 0 2
 2 0 0
 0 1
 S
@@ -350,7 +354,7 @@ the Argosy~
 A large argosy is floating here.~
 Type "board" to get onto the ship.
 ~
-17 0 0 0 2
+17 0 0 0 0 2
 3 0 0
 0 1
 S
@@ -360,7 +364,7 @@ the Galleon~
 A titanic galleon is floating here.~
 Type "board" to get onto the ship.
 ~
-17 0 0 0 3
+17 0 0 0 0 3
 4 0 0
 0 1
 S

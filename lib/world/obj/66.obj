@@ -4,7 +4,7 @@ a magic gem~
 A magic gem has been left here.~
 You can feel the gem buzzing with magical power.
 ~
-3 0 a 0 7
+3 0 a 0 0 7
 0 0 0
 8 0
 C
@@ -19,7 +19,7 @@ a powerful magic gem~
 A powerful magic gem is lying here.~
 The raw power of this gem is practically bursting through its cold, hard shell.
 ~
-3 0 a 0 8
+3 0 a 0 0 8
 0 0 0
 8 0
 C
@@ -29,12 +29,12 @@ R
 4 5164 0
 S
 #6650
-herbs~
-some herbs~
-Some herbs are scattered on the ground.~
+herbs magic~
+some magic herbs~
+Some magic herbs are scattered on the ground.~
 You can't quite tell what kind of herbs these are.
 ~
-3 g a 0 7
+3 g a 0 0 8
 0 0 0
 0 0
 C
@@ -50,7 +50,7 @@ There are some distilled herbs here.~
    You can't quite tell what kind of herbs these are. They've been processed
 and refined, and seem to be good quality.
 ~
-3 g a 0 11
+3 g a 0 0 11
 0 0 0
 0 0
 C

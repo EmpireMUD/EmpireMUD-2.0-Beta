@@ -389,7 +389,7 @@ if (%self.vnum% >= 11815 && %self.vnum% <= 11818) || %self.vnum% == 11821
       say Goblin doesn't want %object.shortdesc%, stupid human!
     end
   elseif %self.vnum% == 11821 && %actor.on_quest(11821)% && %object.vnum% == 11976
-    %send% %actor% Use 'quest finish Need It For A Friend' instead.
+    %send% %actor% Use 'finish Need It For A Friend' instead.
   else
     * actor has given a goblin object
     %send% %actor% You give ~%self% @%object%...
@@ -635,7 +635,7 @@ elseif %diff% == 4
   nop %mob.add_mob_flag(HARD)%
   nop %mob.add_mob_flag(GROUP)%
 end
-%restore% %mob%
+nop %mob.unscale_and_reset%
 * remove no-attack
 if %mob.aff_flagged(!ATTACK)%
   dg_affect %mob% !ATTACK off
@@ -753,7 +753,7 @@ if %spirit.phase2%
   %mod% %self% append-lookdesc-noformat &0      |            Second Floor: Apprentice Level             | |
   %mod% %self% append-lookdesc-noformat &0      |                     Goblin Cages                      | |
   %mod% %self% append-lookdesc-noformat &0      |                      Pixy Races                       | |
-  %mod% %self% append-lookdesc-noformat &0      |                Apprentice Dormatories                 | |
+  %mod% %self% append-lookdesc-noformat &0      |                Apprentice Dormitories                 | |
 else
   %mod% %self% append-lookdesc-noformat &0      |                 Second Floor: Danger!                 | |
   %mod% %self% append-lookdesc-noformat &0      |                  Goblins Everywhere                   | |
@@ -1042,7 +1042,7 @@ if %move% == 1 && !%self.aff_flagged(BLIND)%
         dg_affect #11841 %targ% BLIND on 5
       break
       case 3
-        if %targ.trigger_counterspell%
+        if %targ.trigger_counterspell(%self%)%
           %send% %targ% &&mYour counterspell prevents %obj% from draining your energy.&&0
           %echo% &&m%obj% bounces harmlessly off ~%targ%.&&0
         else
@@ -1446,7 +1446,7 @@ elseif %move% == 2
       set next_ch %ch.next_in_room%
       if %self.is_enemy(%ch%)%
         if !%ch.var(did_sfdodge)%
-          if %ch.trigger_counterspell%
+          if %ch.trigger_counterspell(%self%)%
             %echo% &&mThe blinding barrage blows back in Venjer's face as it hits |%ch% counterspell!&&0
             dg_affect #11823 %self% BLIND on 10
             set broke 1
@@ -1561,7 +1561,7 @@ elseif %move% == 4 && !%self.aff_flagged(BLIND)%
     elseif %targ.var(did_sfinterrupt)%
       %send% %targ% &&mYou knock Venjer's staff sideways and luminous bolts fly every which way, crashing all around you, but they all miss!&&0
       %echoaround% %targ% &&m~%targ% knocks Venjer's staff sideways and luminous bolts fly every which way, crashing around ~%targ%, but they all miss!&&0
-    elseif %targ.trigger_counterspell%
+    elseif %targ.trigger_counterspell(%self%)%
       %echo% &&mVenjer's luminous bolt explodes against |%targ% counterspell!&&0
       set broke 1
     else
@@ -1681,7 +1681,7 @@ if %move% == 1 && !%self.aff_flagged(BLIND)%
     %echo% &&m~%self% blasts ~%targ% with a rainbow beam... it picks *%targ% right up off the ground...&&0
   end
   if !%fail%
-    if %targ.trigger_counterspell%
+    if %targ.trigger_counterspell(%self%)%
       set fail 2
       %echo% &&mThe rainbow beam cascades off of |%targ% counterspell and ricochets back at ~%self%!&&0
     end
@@ -1770,7 +1770,7 @@ elseif %move% == 3
       dg_affect #11856 %targ% TO-HIT 25 20
     end
     dg_affect #11841 %self% BLIND on 5
-  elseif %targ.trigger_counterspell%
+  elseif %targ.trigger_counterspell(%self%)%
     %echo% &&mA shimmering beam of light from ~%self% ricochets off |%targ% counterspell and zaps the queen in the face!&&0
     dg_affect #11841 %self% BLIND on 10
   else
@@ -3186,7 +3186,7 @@ if break /= %cmd% || smash /= %cmd%
   if !%arg%
     %send% %actor% Break what?
     halt
-  elseif %arg% /= chains || %arg% /= shackles || %arg% /= gems
+  elseif chains /= %arg% || shackles /= %arg% || gems /= %arg%
     * ok
   else
     %send% %actor% You can't break that.
@@ -3196,7 +3196,13 @@ elseif !%arg%
   %send% %actor% Free whom?
   halt
 elseif %actor.char_target(%arg%)% != %self%
-  %send% %actor% You can't free that.
+  set rodent_cage %actor.obj_target(%arg%)%
+  if (%rodent_cage% && %rodent_cage.vnum% == 18224) || (%actor.inventory(18224)% && Rodentmort /= %arg%)
+    * has its own release trig
+    return 0
+  else
+    %send% %actor% You can't free that.
+  end
   halt
 end
 * more checks that apply to both modes
@@ -3822,7 +3828,7 @@ if %move% == 1 && !%self.aff_flagged(BLIND)%
       dg_affect #11873 %self% TO-HIT -15 20
     end
     %damage% %self% 50 magical
-  elseif %targ.trigger_counterspell%
+  elseif %targ.trigger_counterspell(%self%)%
     %echo% A vortex of smoke swirls briefly around |%targ% arm as ^%targ% counterspell breaks the magic.
   else
     * hit
@@ -4483,7 +4489,7 @@ if %move% == 1
               dg_affect #11856 %ch% off
               dg_affect #11856 %ch% TO-HIT 25 20
             end
-          elseif %ch.trigger_counterspell%
+          elseif %ch.trigger_counterspell(%self%)%
             %echo% &&m|%ch% counterspell deflects a bolt of lightning back at Lady Virduke!&&0
             eval amt 200 / %diff%
             %damage% %self% %amt% magical
@@ -4509,7 +4515,7 @@ if %move% == 1
 elseif %move% == 2
   * Arcane Tattoos
   skyfight clear interrupt
-  %echo% &&m**** ~%self% mutters an incantation... ****&&0 (interrupt)
+  %echo% &&m**** ~%self% mutters an incantation... ****&&0 (interrupt)
   if %diff% == 1
     nop %self.add_mob_flag(NO-ATTACK)%
   end
@@ -4834,7 +4840,7 @@ elseif %move% == 4
     dg_affect #11845 %self% HARD-STUNNED on 20
   end
   %send% %targ% &&m~%self% throws the shadow dagger at you, but it passes through you and strikes your shadow!&&0
-  %echoaround% %targ% &&m~%self% throws the shadow dagger at ~%actor%, but it passes through *%actor% and strikes ^%actor% shadow!&&0
+  %echoaround% %targ% &&m~%self% throws the shadow dagger at ~%targ%, but it passes through *%targ% and strikes ^%targ% shadow!&&0
   if %diff% <= 2 || (%self.level% + 100) <= %targ.level%
     %send% %targ% &&m**** The dagger has you stuck fast... You can't move! ****&&0 (struggle)
     %echoaround% %targ% &&m~%targ% suddenly freezes!&&0
@@ -5145,7 +5151,11 @@ elseif %move% == 5
   set mob %room.people%
   if %mob.vnum% == 11850
     %echo% &&mA corpse climbs out of its coffin and joins the fray!&&0
-    %force% %mob% mkill %self.fighting%
+    if %self.fighting%
+      %force% %mob% mkill %self.fighting%
+    else
+      %force% %mob% maggro
+    end
   end
 end
 * in case
@@ -5188,7 +5198,7 @@ switch %self.vnum%
     end
     %send% %actor% You seem to have broken @%self% but not before it protects you with some kind of counterspell!
     %echoaround% %actor% ~%actor% breaks @%self% and starts to glow, slightly.
-    dg_affect #3021 %actor% MANA-REGEN -1 1800
+    dg_affect #3021 %actor% COUNTERSPELL on 1800
     %purge% %self%
     * do not fall through
     halt
@@ -5688,7 +5698,7 @@ elseif %move% == 3
               dg_affect #11856 %ch% off
               dg_affect #11856 %ch% TO-HIT 25 20
             end
-          elseif %ch.trigger_counterspell%
+          elseif %ch.trigger_counterspell(%self%)%
             %echo% &&m|%ch% counterspell deflects a bolt of lightning toward ~%self%!&&0
             if %diff% == 1
               %damage% %self% 100 magical
@@ -5841,7 +5851,7 @@ if %move% == 1 && !%self.aff_flagged(BLIND)%
     %echo% &&m~%self% waves her hands as an eerie green light casts out over the tower...&&0
   end
   if !%fail%
-    if %targ.trigger_counterspell%
+    if %targ.trigger_counterspell(%self%)%
       set fail 2
       %echo% &&mThe green light rebounds and smacks ~%self% in the face -- she looks stunned!&&0
     end
@@ -5898,7 +5908,7 @@ elseif %move% == 2
         set next_ch %ch.next_in_room%
         eval skip %%skip_%ch.id%%%
         if !%skip% && %self.is_enemy(%ch%)%
-          if %ch.trigger_counterspell%
+          if %ch.trigger_counterspell(%self%)%
             set skip_%ch.id% 1
             %send% %ch% &&mA shield forms in front of you as you masterfully counterspell the blinding light of dawn!&&0
             %echoaround% %ch% &&mA shield forms in front of ~%ch% as &%ch% masterfully counterspells the blinding light!&&0
@@ -6062,7 +6072,7 @@ if %move% == 1
   if %self.fighting% == %targ% && %diff% < 4
     dg_affect #11852 %self% HARD-STUNNED on 20
   end
-  if %targ.trigger_counterspell%
+  if %targ.trigger_counterspell(%self%)%
     %echo% &&m~%self% sparks with primordial energy as it consumes |%targ% counterspell!&&0
     dg_affect #11864 %self% BONUS-MAGICAL 10 -1
   end
@@ -6155,7 +6165,7 @@ elseif %move% == 2
               dg_affect #11856 %ch% TO-HIT 25 20
             end
           else
-            if %ch.trigger_counterspell%
+            if %ch.trigger_counterspell(%self%)%
               %echo% &&mThe Shadow Ascendant sparks with primordial energy as it consumes |%ch% counterspell!&&0
               dg_affect #11864 %self% BONUS-MAGICAL 10 -1
             end
@@ -6209,7 +6219,7 @@ elseif %move% == 3
       while %ch%
         set next_ch %ch.next_in_room%
         if %self.is_enemy(%ch%)%
-          if %ch.trigger_counterspell%
+          if %ch.trigger_counterspell(%self%)%
             %echo% &&m~%self% sparks with primordial energy as it consumes |%ch% counterspell!&&0
             dg_affect #11864 %self% BONUS-MAGICAL 10 -1
           end
@@ -6239,7 +6249,7 @@ elseif %move% == 4
     set next_ch %ch.next_in_room%
     if %self.is_enemy(%ch%)%
       if !%ch.var(did_sfdodge)%
-        if %ch.trigger_counterspell%
+        if %ch.trigger_counterspell(%self%)%
           %echo% &&m~%self% sparks with primordial energy as it consumes |%ch% counterspell!&&0
           dg_affect #11864 %self% BONUS-MAGICAL 10 -1
         end
@@ -6723,7 +6733,7 @@ if %move% == 1 && !%self.aff_flagged(BLIND)%
     %echo% &&m~%self% stamps his staff three times...&&0
   end
   if !%fail%
-    if %targ.trigger_counterspell%
+    if %targ.trigger_counterspell(%self%)%
       set fail 2
       %echo% &&mThe spell rebounds off of |%targ% counterspell and smacks ~%self% in the face -- he looks stunned!&&0
     end
@@ -6770,7 +6780,7 @@ elseif %move% == 2
       while %ch%
         set next_ch %ch.next_in_room%
         if %self.is_enemy(%ch%)%
-          if %ch.trigger_counterspell%
+          if %ch.trigger_counterspell(%self%)%
             %echo% &&mA shield forms in front of ~%ch% to block the devastation ritual!&&0
           else
             %echo% &&mThe wave cuts through ~%ch%!&&0
@@ -6810,7 +6820,7 @@ elseif %move% == 3
     while %ch%
       set next_ch %ch.next_in_room%
       if %self.is_enemy(%ch%)%
-        if %ch.trigger_counterspell%
+        if %ch.trigger_counterspell(%self%)%
           %echo% &&mA shield forms in front of ~%ch% to block the wave!&&0
         else
           %send% %ch% &&mYou feel a wave of guilt as it passes through you!&&0
@@ -7088,6 +7098,7 @@ if %seconds% > %allow_time%
     if %self.mob_flagged(GROUP)%
       nop %mob.add_mob_flag(GROUP)%
     end
+    nop %mob.unscale_and_reset%
     %scale% %mob% %self.level%
     if %self.fighting%
       %force% %mob% %aggro% %self.fighting%
@@ -7375,6 +7386,7 @@ if %mez%
   if %spirit.diff4% >= 3
     nop %mez.add_mob_flag(GROUP)%
   end
+  nop %mez.unscale_and_reset%
 end
 * place a relocator
 %load% mob 11899
@@ -7540,6 +7552,7 @@ switch %line%
       if %spirit.diff4% >= 3
         nop %mob.add_mob_flag(GROUP)%
       end
+      nop %mob.unscale_and_reset%
       %restore% %mob%
     end
     %purge% %self%
@@ -8734,7 +8747,7 @@ taste eat drink sip lick~
 * This teleports players between templates 11887 and 11891
 * Note: See below for adding requirements to use it
 * 1. Basic checks
-if %actor.obj_target(%arg%)% != %self%
+if %actor.obj_target(%arg%)% != %self% && %arg% != sap && %arg% != putrid
   return 0
   halt
 elseif %actor.position% != Standing
@@ -8809,7 +8822,7 @@ if !%actor.affect(11822)%
   end
   %purge% %self%
   halt
-elseif !(%cmd% /= struggle)
+elseif !(struggle /= %cmd%)
   return 0
   halt
 end
@@ -9752,5 +9765,6 @@ elseif %diff% == 4
   nop %mob.add_mob_flag(HARD)%
   nop %mob.add_mob_flag(GROUP)%
 end
+nop %mob.unscale_and_reset%
 ~
 $

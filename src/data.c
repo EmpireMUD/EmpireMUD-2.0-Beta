@@ -2,7 +2,7 @@
 *   File: data.c                                          EmpireMUD 2.0b5 *
 *  Usage: Related to saving/loading/using the global game data system     *
 *                                                                         *
-*  EmpireMUD code base by Paul Clarke, (C) 2000-2015                      *
+*  EmpireMUD code base by Paul Clarke, (C) 2000-2024                      *
 *  All rights reserved.  See license.doc for complete information.        *
 *                                                                         *
 *  EmpireMUD based upon CircleMUD 3.0, bpl 17, by Jeremy Elson.           *
@@ -44,6 +44,7 @@ struct stored_data_type stored_data_info[] = {
 	{ "last_island_descs", DATYPE_LONG },	// DATA_LAST_ISLAND_DESCS
 	{ "last_construction_id", DATYPE_INT },	// DATA_LAST_CONSTRUCTION_ID
 	{ "start_playtime_tracking", DATYPE_LONG },	// DATA_START_PLAYTIME_TRACKING
+	{ "top_idnum", DATYPE_INT },	// DATA_TOP_IDNUM
 	
 	{ "\n", NOTHING }	// last
 };

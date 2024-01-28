@@ -2,7 +2,7 @@
 *   File: progress.c                                      EmpireMUD 2.0b5 *
 *  Usage: loading, saving, OLC, and functions for empire progression      *
 *                                                                         *
-*  EmpireMUD code base by Paul Clarke, (C) 2000-2015                      *
+*  EmpireMUD code base by Paul Clarke, (C) 2000-2024                      *
 *  All rights reserved.  See license.doc for complete information.        *
 *                                                                         *
 *  EmpireMUD based upon CircleMUD 3.0, bpl 17, by Jeremy Elson.           *
@@ -64,6 +64,43 @@ int count_diplomacy(empire_data *emp, bitvector_t dip_flags) {
 	
 	LL_FOREACH(EMPIRE_DIPLOMACY(emp), pol) {
 		if ((pol->type & dip_flags) == dip_flags) {
+			++count;
+		}
+	}
+	
+	return count;
+}
+
+
+/**
+* Checks diplomatic relations and counts how many have these relations or
+* better. "Better" is different for each diplomatic status -- nothing is a
+* better version of trade relations; an alliance is better than peace or a
+* non-aggression pact; war is better than thievery or distrust.
+*
+* @param empire_data *emp Which empire to check.
+* @param bitvector_t dip_flags Which flag(s) to match.
+*/
+int count_diplomacy_over(empire_data *emp, bitvector_t dip_flags) {
+	struct empire_political_data *pol;
+	bitvector_t bits;
+	bool ok;
+	int count = 0, pos;
+	
+	if (!emp || !dip_flags) {
+		return count;
+	}
+	
+	LL_FOREACH(EMPIRE_DIPLOMACY(emp), pol) {
+		ok = TRUE;
+		for (pos = 0, bits = dip_flags; bits && ok; ++pos, bits >>= 1) {
+			if (IS_SET(bits, BIT(0)) && !IS_SET(pol->type, diplomacy_better_list[pos])) {
+				ok = FALSE;
+			}
+		}
+		
+		// ok?
+		if (ok) {
 			++count;
 		}
 	}
@@ -140,7 +177,7 @@ int count_empire_crop_variety(empire_data *emp, int max_needed, int only_island)
 		}
 		
 		HASH_ITER(hh, isle->store, store, next_store) {
-			if (!(obj = store->proto)) {
+			if (store->amount < 1 || !(obj = store->proto)) {
 				continue;
 			}
 			if (!OBJ_FLAGGED(obj, OBJ_PLANTABLE)) {
@@ -191,7 +228,7 @@ int count_empire_objects(empire_data *emp, obj_vnum vnum) {
 	
 	HASH_ITER(hh, EMPIRE_ISLANDS(emp), isle, next_isle) {
 		HASH_ITER(hh, isle->store, store, next_store) {
-			if (store->vnum == vnum) {
+			if (store->amount > 0 && store->vnum == vnum) {
 				SAFE_ADD(count, store->amount, 0, INT_MAX, FALSE);
 			}
 		}
@@ -1051,6 +1088,10 @@ void refresh_one_goal_tracker(empire_data *emp, struct empire_goal *goal) {
 				task->current = count_diplomacy(emp, task->misc);
 				break;
 			}
+			case REQ_DIPLOMACY_OVER: {
+				task->current = count_diplomacy_over(emp, task->misc);
+				break;
+			}
 			case REQ_HAVE_CITY: {
 				task->current = count_cities(emp);
 				break;
@@ -1069,6 +1110,13 @@ void refresh_one_goal_tracker(empire_data *emp, struct empire_goal *goal) {
 			}
 			case REQ_EVENT_NOT_RUNNING: {
 				task->current = find_running_event_by_vnum(task->vnum) ? 0 : task->needed;
+				break;
+			}
+			
+			// ones that cannot be detected but are always true for progress goals
+			case REQ_DAYTIME:
+			case REQ_NIGHTTIME: {
+				task->current = task->needed;
 				break;
 			}
 			
@@ -1280,6 +1328,10 @@ void et_change_diplomacy(empire_data *emp) {
 		LL_FOREACH(goal->tracker, task) {
 			if (task->type == REQ_DIPLOMACY) {
 				task->current = count_diplomacy(emp, task->misc);
+				TRIGGER_DELAYED_REFRESH(emp, DELAY_REFRESH_GOAL_COMPLETE);
+			}
+			else if (task->type == REQ_DIPLOMACY_OVER) {
+				task->current = count_diplomacy_over(emp, task->misc);
 				TRIGGER_DELAYED_REFRESH(emp, DELAY_REFRESH_GOAL_COMPLETE);
 			}
 		}
@@ -2538,7 +2590,7 @@ void olc_fullsearch_progress(char_data *ch, char *argument) {
 		}
 	}
 	
-	if (count > 0 && (size + 14) < sizeof(buf)) {
+	if (count > 0 && (size + 25) < sizeof(buf)) {
 		size += snprintf(buf + size, sizeof(buf) - size, "(%d progress goals)\r\n", count);
 	}
 	else if (count == 0) {

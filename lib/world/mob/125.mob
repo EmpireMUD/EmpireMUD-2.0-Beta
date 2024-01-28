@@ -3,7 +3,7 @@ colossus clockwork enormous~
 the clockwork colossus~
 An enormous clockwork colossus towers over you (adventure).
 ~
-100 200 dkuyzABK cG 6
+100 200 dkuyzABKL cG 6
 0 0 26 14 -1
 D
    Looking up at this thing, you can scarcely comprehend what it is. It looks
@@ -30,7 +30,7 @@ colossus clockwork miniature~
 the clockwork colossus~
 A miniature clockwork colossus stomps toward you!
 ~
-100 200 dkuyzK cG 3
+100 200 dkuyzKL cG 3
 0 0 26 5 -1
 D
    This strange-looking metal man is made from bronze and iron. Exposed wheels
@@ -87,7 +87,7 @@ adventurer #n~
 the other adventurer~
 An adventurer is resting here, polishing an axe.
 ~
-100 200 bdpvyzI cm 3
+100 200 bdpvyzIL cm 3
 0 0 0 2 -1
 D
 The hapless adventurer looks tired from the difficult climb.
@@ -104,7 +104,7 @@ goblin junk dealer~
 the goblin junk dealer~
 A goblin junk dealer sorts through the wreckage (list).
 ~
-100 200 bdo 0 2
+100 200 bdoL 0 2
 1 0 0 15 -1
 D
    The little green fellow is smeared with dirty oil, which he occasionally
@@ -133,7 +133,7 @@ lasers eye~
 eye lasers~
 Eye lasers are being fired at here.
 ~
-0 0 bd clnK 0
+0 0 bdL clnK 0
 0 0 0 15 -1
 D
    Only immortals should see this. This mob is how the colossus fires lasers at
@@ -148,7 +148,7 @@ controller central apparatus~
 the central control apparatus~
 The central control apparatus is here.
 ~
-0 0 bdnF GK 4
+0 0 bdnFL GK 4
 0 0 0 15 -1
 D
    The strange apparatus is made mostly of wheels within wheels, spinning and
@@ -166,7 +166,7 @@ arm left colossal~
 the colossal arm~
 The left arm sways as the colossus moves.
 ~
-0 0 dhyK cGK 5
+0 0 bdhyKL cGK 5
 0 0 0 14 -1
 D
 The colossus's enormous arm is bigger than a tree!
@@ -181,7 +181,7 @@ arm right colossal~
 the colossal arm~
 The right arm sways as the colossus moves.
 ~
-0 0 dhyK cGK 5
+0 0 bdhyKL cGK 5
 0 0 0 5 -1
 D
    The arm is so big that it's hard to avoid being knocked off the colossus as

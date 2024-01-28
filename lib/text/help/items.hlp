@@ -46,8 +46,8 @@ stone blocks and clay bricks. Any recipes that call for (blocks) allow the use
 of either, while some buildings require a specific one.
 
 Common types of blocks are:
-  huge stone block (large block, basic)
-  pile of bricks (bricks, basic)
+  huge stone block (large block, basic) - stored at Gravel Pit or Quarry
+  pile of bricks (bricks, basic) - stored at Gravel Pit or Potter
 
 You can quarry stone blocks from the ground at a quarry. They are used in
 monumental architecture.
@@ -67,6 +67,16 @@ Bloodstone is a rare stone with mystical properties, sometimes found while
 digging in the mountains.
 
 See also: DIG
+#
+BRONZE "BRONZE INGOTS"
+
+Used for:  forge
+Stored in:  Foundry
+
+Bronze is a metal that was once so common that there is an entire Age named
+after it. Bronze is made by smelting copper and tin ingots together.
+
+See also: FORGE, METALS, MINE, SMELT
 #
 "BUFF FOOD" "BUFF FOODS" "WELL FED" WELL-FED
 
@@ -119,7 +129,7 @@ own help files. Here are some of the common types of components:
  &clumber&0 and &cpillars&0 - building materials
  &crocks&0 - common stones dug up from the ground, for building
  &cnails&0 - building materials
- &csaplings&0 - used in handles and primitive buildings
+ &csaplings&0 - scraped into poles for crafting and building
  &cclay&0 - moldable clay for crafting
  &cfibers&0, &cfeathers&0, and &csticks&0 - used for crafting and building
  &cfruits&0, &cvegetables&0, &cgrains&0, and &cseeds&0 - for cooking and baking
@@ -168,7 +178,9 @@ See also: COMPONENT, COOK, RAW MEAT, EAT
 
 A character's crafts (forge, sew, craft, etc.) are scaled up to the character's
 crafting level. This level is shown on your 'score' as Crafting. This is based
-on the character's skill level (1-100) plus bonuses from gear.
+on the character's skill level (1-100) plus bonuses from gear. Levels for all
+items, including crafted ones, are rounded up to the next 5 (e.g. 73 to 75, 109
+to 110).
 
 Crafter items come in four different equipment slots: head, clothes, waist, and
 off-hand (hold). You can get a new set of crafter items every 100 levels or so.
@@ -198,9 +210,9 @@ See also: CRAFT, ENCHANT, FORGE, SCORE, SEW, SCALABLE CRAFTS,
 
 Distilled herbs (component)
 
-Distilled herbs are herbs that have been processed to make them more potent, so
-that you can make more powerful potions. You must have the 'Healing Elixirs'
-ability to 'brew' these from herbs.
+Distilled herbs are magic herbs that have been processed to make them more
+potent, so that you can make more powerful potions. You must have the 'Healing
+Elixirs' ability to 'brew' these from herbs.
 
 The distilled herbs are:
  distilled whitegrass
@@ -243,6 +255,15 @@ component.
 
 See also: FRUIT COMPONENT, VEGETABLE COMPONENT
 #
+EGG EGGS
+
+Egg (component)
+
+Used for:  cooking
+Stored at:  Chicken Coops, Larder
+
+Eggs are a quick, easy food source.
+#
 FIBERS "FIBERS COMPONENT" "FIBER COMPONENT" "PLANT FIBER" FEATHERS
 
 Fibers (component)
@@ -271,7 +292,7 @@ See also: COMPONENT, GATHER
 FLINT FLINTS "FLINT STONE"
 
 Used for:  basic tool crafting
-Stored at:  Gravel Pit
+Stored at:  Gravel Pit, Quarry, Sand Pit
 
 Flint is a hard, sedimentary form of quartz that has long been used for tool-
 making by people all over the world. You can dig it up almost anywhere.
@@ -351,7 +372,7 @@ a specific one of these, but a few accept any of them.
 Common magic gems include:
   yellow lightning stone - buried in the desert
   red bloodstone - dug up in the mountains
-  iridescent blue iris - found near herbs
+  iridescent blue iris - found near magic herbs
   glowing green seashell - found while fishing
   prismatic crystal (powerful magic gem)
 
@@ -408,25 +429,25 @@ Handle (component)
 Used for:  forge, craft
 Stored in:  Utility Shed, Storage room
 
-Create a handle (from a sapling, or a bone handle from bone) using the craft
-command.
+Create a handle (from a sapling/pole, or a bone handle from bone) using the
+craft command.
 
 Handles are used in forging and crafting to provide a grasping surface to a
-tool or weapon. The most basic handles are made from saplings.
+tool or weapon. The most basic handles are made from saplings or poles.
 
 The more advanced elegant handle can be made from magic wood.
 
 See also: COMPONENT, CRAFT, FORGE, EXQUISITE WOODWORKING
 #
-HERB HERBS "HERB COMPONENT"
+HERB HERBS "MAGIC HERB" "MAGIC HERBS" "MAGIC HERB COMPONENT"
 
-Herb (component)
+Magic Herb (component)
 
 Used for:  potions, poisons, crafting
 
-The herb component type covers all the herbs which can be found using the Find
-Herbs ability. Most recipes call for a specific herb, though. The basic herbs
-are:
+The magic herb component type covers all the herbs which can be found using the
+Find Herbs ability. Most recipes call for a specific herb, though. The basic
+magic herbs are:
  whitegrass - beaches and shores
  fiveleaf - forests and plains
  redthorn - mountains
@@ -452,11 +473,34 @@ Iridescent Blue Iris (resource)
 
 Stored in:  Tower of Sorcery
 
-The iridescent blue iris is a rare herb found anywhere you could find herbs,
-and even if you don't have the Find Herbs ability. It is used in some spells
-and crafts.
+The iridescent blue iris is a rare herb found anywhere you could find magic 
+herbs, and even if you don't have the Find Herbs ability. It is used in some
+spells and crafts.
 
 See also: GEM, PICK, FIND HERBS
+#
+IMPERIUM "IMPERIUM ORE"
+
+Used for:  forge
+Stored in:  Foundry
+
+Imperium is a rare, strong metal with a bright white color. It is used to make
+powerful weapons and armor. Smelting imperium ingots requires mixing it with
+tin.
+
+See also: FORGE, METALS, MINE, SMELT
+#
+IRON "IRON INGOT" "IRON ORE"
+
+Used for:  forge, build, manufacture
+Stored in:  Foundry
+
+Iron ore is found by mining in the mountains. It is useful in building and
+forging equipment, as well as manufacturing ships.
+
+You can learn about getting iron via HELP IRON GUIDE.
+
+See also: BUILD, FORGE, METALS, MINE, MANUFACTURE, SMELT
 #
 KEEP UNKEEP
 
@@ -517,6 +561,16 @@ Common types of leather are:
 
 See also: COMPONENT, TAN, SKIN, VERDANT LEATHERS
 #
+"LETHEIAN ICON"
+
+usage: use icon <skill name>
+
+Letheian icons are consumable trinkets which grant an extra skill reset for a
+skill of your choice, allowing you to choose new abilities for that skill. They
+are crafted using the Master Craftsman ability.
+
+See also: MASTER CRAFTSMAN, SKILL RESET
+#
 "LIGHTNING STONE" "YELLOW LIGHTNING STONE" "YELLOW STONE"
 
 Yellow Lightning Stone (resource)
@@ -568,23 +622,29 @@ Common types of lumber are:
 
 See also: COMPONENT, CHOP, MAGEWOOD, SAW
 #
-MAGEWOOD "MAGE WOOD" "ENCHANTED TREE" "ENCHANTED FOREST" "ENCHANTED WOODS" "ENCHANTED COPSE" "CRYSTAL SEED" "PRISMATIC SEED" "STRANGE CRYSTAL SEED" WEIRDWOOD "WEIRD WOOD"
+MAGEWOOD "MAGE WOOD" "ENCHANTED TREE" "ENCHANTED FOREST" "ENCHANTED WOODS" "ENCHANTED COPSE" "CRYSTAL SEED" "PRISMATIC SEED" "STRANGE CRYSTAL SEED" WEIRDWOOD "WEIRD WOOD" STARWOOD "STAR WOOD"
 
 Magewood is a type of lumber sawn from the trees of the enchanted forest. This
 type of forest is extremely rare. To grow it, you must find the strange crystal
 seed, enchant it (Enchant Tools), plant it, then use the chant of nature to
 grow it.
 
-Enchanted Forests are protected from over-chopping because they will grow back
+Enchanted forests are protected from over-chopping because they will grow back
 even from stumps. Be sure to claim the forest, though, as necrovandal cultists
 will quickly detect and destroy any unclaimed enchanted forest tiles.
 
 The only way to remove the forest tiles is to abandon them and let the necro-
 vandals destroy them.
 
+Chant of Nature will speed up the growth of enchanted forest tiles. Once the
+chant is completed, the tiles will appear to be "sprouting" for 4 to 8 hours
+(depending on the amount of growth on the tile) and then will grow to the next
+size. If the tile is chopped while still sprouting, it yields dead wood and
+reverts to the previous size.
+
 This wood is generally used in crafts in the 200-300 level range.
 
-See also: ABANDON, CHOP, CLAIM, ENCHANT TOOLS, SAW
+See also: ABANDON, CHANT OF NATURE, CHOP, CLAIM, ENCHANT TOOLS, SAW
 #
 METALS INGOTS BARS "METAL COMPONENT"
 
@@ -613,7 +673,7 @@ Note: Glass ingots are made from sand using the 'craft' command.
 
 See also: COMPONENT, SMELT, SEPARATE, IRON, COPPER, MINE
 #
-MEAT "MEAT COMPONENT" "RAW MEAT" "RAW RED MEAT" "RAW POULTRY" "RAW PORK" "RAW FISH" "RED MEAT" POULTRY PORK
+MEAT "MEAT COMPONENT" "RAW MEAT" "RAW RED MEAT" "RAW POULTRY" "RAW PORK" "RAW FISH" "RAW MUTTON" "RED MEAT" POULTRY PORK MUTTON
 
 Raw meat (component)
 
@@ -621,7 +681,7 @@ Used for:  cooking
 
 Meat is a component type mostly used in cooking. It is obtained by butchering
 animal corpses or fishing. Common types of raw meat are:
-  fillet of raw meat (raw red meat)
+  fillet of raw meat, side of mutton (raw red meat)
   cut of poultry (raw poultry)
   slab of pork (raw pork)
   striped barbfish, giant linefish, magenta arrowfish (raw fish)
@@ -646,9 +706,21 @@ See also: COMPONENT, FORGE, MAINTAIN
 Nexus Crystal (resource)
 
 Nexus crystals are made from magical gems (such as the bloodstone). They are
-stored in Towers of Sorcery, and are used to build certain buildings.
+stored in Towers of Sorcery, and are used to build certain buildings. Crafting
+them requires the Portalmancy progression.
 
-See also: EXARCH CRAFTS, PORTAL, PORTAL MAGIC
+See also: EXARCH CRAFTS, PORTAL
+#
+NOCTURNIUM "NOCTURNIUM ORE"
+
+Used for:  forge, sew
+Stored in:  Foundry
+
+Nocturnium is a deep black metal, its surface swirling with mana. It is often
+plated onto powerful magical objects. Smelting stable nocturnium requires that
+you mix it with copper.
+
+See also: FORGE, METALS, MINE, SEW, SMELT
 #
 OIL OILS "OIL COMPONENT" "SEED OILS" "VEGETABLE OILS"
 
@@ -670,9 +742,9 @@ Pillar (component)
 Used for:  building
 
 The most commonly used pillars are simple wooden logs, made by scraping trees.
-You can also craft bound wooden columns from saplings and rope if you have
-Basic Crafts. This may be useful if you're unable to get logs (for example,
-rough wood cannot be scraped).
+You can also craft bound wooden columns from saplings or poles and cord or rope
+if you have Basic Crafts. This may be useful if you're unable to get logs (for
+example, rough wood cannot be scraped).
 
 Common types of pillars are:
   heavy log (basic)
@@ -681,6 +753,18 @@ Common types of pillars are:
   enormous mast (large pillar)
 
 See also: BASIC CRAFTS, COMPONENT, LOGS, SCRAPE
+#
+POLE POLES "POLE COMPONENT" "WOODEN POLE" "METAL POLE"
+
+Pole (component)
+
+Used for:  crafting, building
+
+Poles are straight lengths of wood made from saplings by scraping. They can
+also be forged from metal. These are used in many types of buildings and
+crafts.
+
+See also: COMPONENT, FORGE, SAPLING, SCRAPE
 #
 RETRIEVE
 
@@ -710,7 +794,7 @@ ROCKS "ROCK COMPONENT"
 Rock (component)
 
 Used for:  basic crafting, basic building
-Stored at:  Gravel Pit
+Stored at:  Gravel Pit, Quarry, Sand Pit
 
 You can find rocks by digging in the ground. They can be used as a primitive
 hammer for chipping flint, for laying roads, and as filler for many building.
@@ -724,11 +808,24 @@ Common types of rocks are:
 
 See also: BUILD, COMPONENT, DIG, CHIP, LAY, FLINT
 #
+SALT SALTS "ROCK SALT" "SEA SALT"
+
+Salt (component)
+
+Used for:  cooking
+Stored at:  Salt Silo
+
+Salt is found by the sea or at the base of mountains. This critical seasoning
+is used to preserve or flavor food.
+
+See also: DIG, SALT OF THE EARTH
+#
 SEEDS "SEED COMPONENT" "SEEDS COMPONENT" "EDIBLE SEEDS"
 
 Seeds (component)
 
 Used for:  planting, cooking, snacking
+Stored at:  Seed Silo
 
 Seeds are separated into two broad categories: edible seeds and inedible seeds.
 Some seeds can be planted (but you can often plant a crop using the fruit or
@@ -829,6 +926,7 @@ SAND "SAND COMPONENT"
 Sand (component)
 
 Used for:  glassmaking
+Stored at:  Gravel Pit, Glass Blower, Sand Pit
 
 Sand can be made into glass ingots at the glass blower.
 
@@ -841,11 +939,10 @@ SAPLING SAPLINGS "SAPLING COMPONENT"
 
 Sapling (component)
 
-Used for:  building, crafting
+Used for:  crafting, making poles
 
 Saplings are young, straight trees with very few branches. This makes them
-perfect for making handles, shafts, and arrows. They are also used to make
-many simple buildings.
+perfect for scraping poles.
 
 The best ways to get saplings are:
  chopping a copse
@@ -858,7 +955,7 @@ Common types of saplings are:
   reaching sapling (basic)
   large shoot (basic)
 
-See also: COMPONENT, GATHER, SCRAPE, SAW, COPSE
+See also: COMPONENT, GATHER, POLE, SCRAPE, SAW, COPSE
 #
 STORE STORAGE
 
@@ -874,18 +971,21 @@ citizens. Drink containers are usually emptied out when you store them. Items
 can be stored from your inventory or from the ground.
 
 If you don't have the "storage" empire privilege, you can store items, but
-can't retrieve them.
+can't retrieve them. This does not apply to home storage.
+
+Perishable items such as food will continue to decay while in storage.
 
 Unique, enchanted, superior, leveled, or otherwise-modified items can't be
 stored in regular storage buildings, but you can store them with the
-"warehouse" command in a warehouse or vault. 
+"warehouse" command in a warehouse or vault.  Bound items can be stored in your
+personal home with the "home store" command.
 
 If you're visiting another empire, you can store and retrieve your own items
 on credit from their public (or allied) buildings, IF you have a trade pact.
 
 You can identify an item to see where it can be stored.
 
-See also: AUTO-STORE, KEEP, RETRIEVE, IDENTIFY, INVENTORY, DIPLOMACY,
+See also: AUTO-STORE, HOME, KEEP, RETRIEVE, IDENTIFY, INVENTORY, DIPLOMACY,
    WAREHOUSE, VAULT
 #
 SUPERIOR MASTERWORK "MASTERY ABILITY"
@@ -931,6 +1031,16 @@ Common types of cloth are:
   manasilk cloth (magic cloth)
 
 See also: COMPONENT, COTTON, HERBCLOTH WEAVING, TAILOR, WEAVE, WOOL
+#
+TIN "TIN INGOT" "TIN ORE"
+
+Used for:  smelting bronze
+Stored in:  Foundry
+
+Tin is an uncommon white metal used since ancient times to create bronze. It
+can also be smelted with imperium ore to make imperium ingots.
+
+See also: FORGE, METALS, MINE, SMELT
 #
 "TRADE COMMAND"
 
@@ -1043,6 +1153,8 @@ For example, if an item costs you 4 coins to post and you sell it for 10 coins,
 You'll receive 9 coins (95% of the sale price) plus your original 4 back, for
 a total of 13 coins.
 
+You cannot post perishable items on the trading post.
+
 See also: TRADE COMMAND, TRADE BUY, TRADE CHECK, TRADE COLLECT
 #
 UNIQUE "UNIQUE ITEM" "UNIQUE OBJECT" (UNIQUE)
@@ -1098,7 +1210,8 @@ Command:  warehouse inventory [item keywords]
 
 While normal resource storage (e.g. the lumber yard) can store many simple
 items, you must use a warehouse (or vault) to store items which are unique,
-scaled, enchanted, superior, or otherwise modified.
+scaled, enchanted, superior, or otherwise modified. Perishable items will
+continue to decay while in storage.
 
 You must have the "warehouse" empire privilege to withdraw items from warehouse
 storage. Items which can be stored in normal resource storage may not be stored

@@ -9,13 +9,16 @@ i&W%&?i&W%~
 D0
 &W%&?i&W%&?i~
 &y~
-I 6 18484 100.00 1  # FORAGE: handful of popcorn
+I 6 18484 100.00 25  # FORAGE: handful of popcorn
 I 8 3342 100.00 1  # HARVEST: bale of straw
 I 8 18485 20.00 2 H  # HARVEST: bag of popcorn
 I 8 18485 20.00 3 H  # HARVEST: bag of popcorn
 I 8 18485 20.00 4 H  # HARVEST: bag of popcorn
 I 8 18485 20.00 5 H  # HARVEST: bag of popcorn
 I 8 18485 20.00 6 H  # HARVEST: bag of popcorn
+U
+0
+There's a deafening cacophony as the field bursts to life!~
 X
 popcorn corn field desolate plants crop~
    The field ahead is filled with tall cornstalks, their dull yellow leaves

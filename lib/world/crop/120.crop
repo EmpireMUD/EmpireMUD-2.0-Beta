@@ -21,13 +21,15 @@ D0
 D0
 .&o%&G^&?.~
 &y~
-I 6 3016 100.00 1  # FORAGE: handful of dates
+I 6 3016 100.00 25  # FORAGE: handful of dates
 I 7 12052 100.00 14  # PICK: bag of fresh dates
-I 9 132 100.00 1  # GATHER: thorny branches
-I 20 122 50.00 1 c  # CHOP: rough wood
-I 20 122 50.00 2 c  # CHOP: rough wood
+I 9 132 100.00 50  # GATHER: thorny branches
+I 20 122 100.00 2 c  # CHOP: rough wood
 M
 12052 15.00 c
+U
+0
+Thick palm trees rise, fully-formed, as clusters of orange fruit grow beneath them!~
 X
 palms dates stand trees crop~
    A stand of date palms towers over the arid desert landscape, their long

@@ -5,7 +5,7 @@ A corpse is lying on the ground.~
    The corpse has begun to stink, so you should loot it while you can ('get all
 from corpse'). You can also skin or butcher most corpses.
 ~
-10 gkp a 0 6
+10 gkp a 0 0 6
 0 0 0
 7 36
 M
@@ -15,13 +15,28 @@ M
 1
 $n buries $p.~
 S
+#1001
+gem rare fine~
+the rare, fine gem~
+A rare, fine gem is lying here.~
+   This gem is one of a kind! It would be perfect for the hilt of the sword
+you're preparing to forge.
+   Use it to forge an 'impressively large sword'.
+~
+3 p a 0 0 1
+0 0 0
+12 0
+C
+200 200
+Q 1506
+S
 #1002
 fire roaring~
 a roaring fire~
 A fire is roaring here!~
 It's warm and cozy.
 ~
-29 0 0 0 4
+29 0 0 0 0 4
 24 1 31
 0 0
 S
@@ -32,8 +47,45 @@ A gilded chest sits at the foot of the bed.~
    You can store your bound items safely in here. Items not bound to you may
 still be autostored.
 ~
-4 0 0 0 2
+4 0 0 0 0 2
 200 1 0
 0 0
+S
+#1011
+coin watcher~
+a watcher coin~
+A watcher coin lies hidden on the ground.~
+   This odd iron coin depicts only a veiled eye, and only on one side. The
+reverse side of the coin is blank. No writing or value is marked on the coin.
+The coin reminds you of the sort used by a certain shadowy guild to watch the
+activities of its members. Perhaps its purpose is to track your progress as a
+master pickpocket.
+~
+3 p a 0 0 2
+0 0 0
+2 0
+C
+100 100
+Q 1502
+T 1502
+S
+#1012
+stone peeping blood-red bloodred red~
+a blood-red peeping stone~
+A blood-red peeping stone is lying here.~
+   The odd gem is no larger than your eyeball, flat, and blood-red. It isn't
+cold, nor is it warm. It doesn't feel like anything in your hand. When you hold
+it up to your eye, people take on a faint outline.
+   Type 'peep <person>' to find the right citizen to become your minion. Once
+you find them, type 'minionize <person>' to complete the process.
+   Many vampires find a loyal minion crucial for survival.
+~
+3 p a 0 0 3
+0 0 0
+12 0
+C
+1 1
+Q 1503
+T 1503
 S
 $

@@ -60,4 +60,13 @@ You clean out the pigeon cages on $V.~
 T5
 $n cleans out the pigeon cages on $V.~
 S
+#5162
+freshly bathed~
+4 0
+0 0 0 0
+T0
+You don't feel so fresh anymore.~
+T4
+$e looks clean.~
+S
 $

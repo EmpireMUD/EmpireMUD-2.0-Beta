@@ -70,6 +70,7 @@ S
 sapling~
 6 a
 0 6025 0 0
+R 6037
 T0
 saplings~
 S
@@ -80,6 +81,28 @@ fine sapling~
 R 6025
 T0
 fine saplings~
+S
+#6035
+pole~
+6 a
+0 6035 0 0
+R 6037
+T0
+poles~
+S
+#6036
+fine pole~
+6 0
+0 6036 0 0
+T0
+fine poles~
+S
+#6037
+sapling or pole~
+6 a
+0 6035 0 0
+T0
+saplings or poles~
 S
 #6050
 rock~
@@ -103,6 +126,20 @@ obsidian~
 R 6050
 T0
 obsidians~
+S
+#6060
+bit of salt~
+6 0
+0 111 0 0
+T0
+bits of salt~
+S
+#6065
+block of salt~
+6 0
+0 6065 0 0
+T0
+blocks of salt~
 S
 #6075
 block~

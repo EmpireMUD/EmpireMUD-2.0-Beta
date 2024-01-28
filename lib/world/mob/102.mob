@@ -172,14 +172,14 @@ its own tail.
 ~
 S
 #10225
-druid #n~
-the druid #n~
+gardener #n~
+the gardener #n~
 #n is tending the gardens.
 ~
-50 50 bdvI nD 3
+50 50 bdvIL nD 3
 0 2 0 15 -1
 D
-   The druid is wearing a cool white robe, stained from the waist down from
+   The gardener is wearing a cool white robe, stained from the waist down from
 working in the dirt.
 ~
 T 10233
@@ -191,7 +191,7 @@ S
 the gardener~
 #n is tending the gardens.
 ~
-50 50 bdvI nD 3
+50 50 bdvIL nD 3
 0 0 0 15 -1
 D
 You can tell they take pride in these gardens.
@@ -214,7 +214,7 @@ chronomancer #n~
 Chronomancer #n~
 A chronomancer is holding the portal open.
 ~
-0 0 bdvI cnD 3
+0 0 bdvIL cnD 3
 0 2 0 16 -1
 D
    The chronomancer is well-dressed with stunning violet fur robes and perhaps
@@ -231,7 +231,7 @@ salesman~
 the salesman~
 A salesman is running a booth that says 'list'.
 ~
-0 0 bdvI cnD 3
+0 0 bdvIL cnD 3
 1 0 0 15 -1
 D
    From his clothes, he obviously works with the sorcerers. But the salesman
@@ -476,14 +476,14 @@ T 10262
 T 10265
 S
 #10258
-druid #n~
-the druid #n~
-A druid is magically growing the foliage over the path.
+mage hooded #n~
+the mage #n~
+A hooded mage is magically growing the foliage over the path.
 ~
 0 0 bdvxzAEI c 3
 1 3 0 16 -1
 D
-   The druid is clad in a simple brown robe with a mantle and hood. He seems
+   The mage is clad in a simple brown robe with a mantle and hood. He seems
 equally surprised to have found you as he is to have found the trail again, as
 every impression indicates he is very lost.
 ~
@@ -672,7 +672,7 @@ spirit time~
 a time spirit~
 A time spirit is floating in the air.
 ~
-0 0 bdh kln 3
+0 0 bdhL kln 3
 0 0 0 15 -1
 D
 This invisible mob helps delay-despawn the adventure.

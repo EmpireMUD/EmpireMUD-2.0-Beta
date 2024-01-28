@@ -3,7 +3,7 @@
 *  Usage: contains general functions for script usage.                    *
 *                                                                         *
 *  DG Scripts code had no header or author info in this file              *
-*  EmpireMUD code base by Paul Clarke, (C) 2000-2015                      *
+*  EmpireMUD code base by Paul Clarke, (C) 2000-2024                      *
 *  All rights reserved.  See license.doc for complete information.        *
 *                                                                         *
 *  EmpireMUD based upon CircleMUD 3.0, bpl 17, by Jeremy Elson.           *
@@ -11,8 +11,6 @@
 *  CircleMUD (C) 1993, 94 by the Trustees of the Johns Hopkins University *
 *  CircleMUD is based on DikuMUD, Copyright (C) 1990, 1991.               *
 ************************************************************************ */
-
-#include <math.h>
 
 #include "conf.h"
 #include "sysdep.h"
@@ -72,7 +70,7 @@ room_data *do_dg_add_room_dir(room_data *from, int dir, bld_data *bld) {
 #define APPLY_TYPE	1
 #define AFFECT_TYPE	2
 void do_dg_affect(void *go, struct script_data *sc, trig_data *trig, int script_type, char *cmd) {
-	char_data *ch = NULL;
+	char_data *ch = NULL, *caster = NULL;
 	int value = 0, duration = 0;
 	char junk[MAX_INPUT_LENGTH]; /* will be set to "dg_affect" */
 	char charname[MAX_INPUT_LENGTH], property[MAX_INPUT_LENGTH];
@@ -85,14 +83,28 @@ void do_dg_affect(void *go, struct script_data *sc, trig_data *trig, int script_
 
 	half_chop(cmd, junk, temp);
 	half_chop(temp, charname, cmd);
-	// sometimes charname is an affect vnum
-	if (*charname == '#') {
-		atype = atoi(charname+1);
-		half_chop(cmd, charname, temp);
-		strcpy(cmd, temp);
-		if (!find_generic(atype, GENERIC_AFFECT)) {
-			script_log("Trigger: %s, VNum %d. dg_affect: Missing requested generic affect vnum %d", GET_TRIG_NAME(trig), GET_TRIG_VNUM(trig), atype);
-			atype = ATYPE_DG_AFFECT;
+	
+	// sometimes charname is an affect vnum or caster instead
+	while (*charname == '#' || *charname == '@') {
+		if (*charname == '#') {	// vnum
+			atype = atoi(charname+1);
+			if (!find_generic(atype, GENERIC_AFFECT)) {
+				script_log("Trigger: %s, VNum %d. dg_affect: Missing requested generic affect vnum %d", GET_TRIG_NAME(trig), GET_TRIG_VNUM(trig), atype);
+				atype = ATYPE_DG_AFFECT;
+			}
+			// shift remaining args
+			half_chop(cmd, charname, temp);
+			strcpy(cmd, temp);
+		}
+		else if (*charname == '@') {	// caster
+			caster = get_char(charname+1);
+			if (!caster) {
+				script_log("Trigger: %s, VNum %d. dg_affect: Missing requested caster %s", GET_TRIG_NAME(trig), GET_TRIG_VNUM(trig), charname);
+				caster = NULL;
+			}
+			// shift remaining args
+			half_chop(cmd, charname, temp);
+			strcpy(cmd, temp);
 		}
 	}
 	
@@ -189,7 +201,7 @@ void do_dg_affect(void *go, struct script_data *sc, trig_data *trig, int script_
 
 	/* add the affect */
 	af.type = atype;
-	af.cast_by = (script_type == MOB_TRIGGER ? CAST_BY_ID((char_data*)go) : 0);
+	af.cast_by = caster ? CAST_BY_ID(caster) : (script_type == MOB_TRIGGER ? CAST_BY_ID((char_data*)go) : 0);
 	af.expire_time = (duration == -1 ? UNLIMITED : (time(0) + duration));
 	af.modifier = value;
 
@@ -220,18 +232,35 @@ void do_dg_affect_room(void *go, struct script_data *sc, trig_data *trig, int sc
 	room_data *room = NULL;
 	bool all_off = FALSE;
 	int duration = 0;
+	char_data *caster = NULL;
 
 	half_chop(cmd, junk, temp);
 	half_chop(temp, roomname, cmd);
-	// sometimes roomname is an affect vnum
-	if (*roomname == '#') {
-		atype = atoi(roomname+1);
-		half_chop(cmd, roomname, temp);
-		strcpy(cmd, temp);
-		if (!find_generic(atype, GENERIC_AFFECT)) {
-			atype = ATYPE_DG_AFFECT;
+	
+	// sometimes roomname is an affect vnum or caster instead
+	while (*roomname == '#' || *roomname == '@') {
+		if (*roomname == '#') {	// vnum
+			atype = atoi(roomname+1);
+			if (!find_generic(atype, GENERIC_AFFECT)) {
+				script_log("Trigger: %s, VNum %d. dg_affect_room: Missing requested generic affect vnum %d", GET_TRIG_NAME(trig), GET_TRIG_VNUM(trig), atype);
+				atype = ATYPE_DG_AFFECT;
+			}
+			// shift remaining args
+			half_chop(cmd, roomname, temp);
+			strcpy(cmd, temp);
+		}
+		else if (*roomname == '@') {	// caster
+			caster = get_char(roomname+1);
+			if (!caster) {
+				script_log("Trigger: %s, VNum %d. dg_affect_room: Missing requested caster %s", GET_TRIG_NAME(trig), GET_TRIG_VNUM(trig), roomname);
+				caster = NULL;
+			}
+			// shift remaining args
+			half_chop(cmd, roomname, temp);
+			strcpy(cmd, temp);
 		}
 	}
+	
 	half_chop(cmd, property, temp);
 	half_chop(temp, value_p, duration_p);
 
@@ -296,7 +325,7 @@ void do_dg_affect_room(void *go, struct script_data *sc, trig_data *trig, int sc
 
 	/* add the affect */
 	af.type = atype;
-	af.cast_by = (script_type == MOB_TRIGGER ? CAST_BY_ID((char_data*)go) : 0);
+	af.cast_by = caster ? CAST_BY_ID(caster) : (script_type == MOB_TRIGGER ? CAST_BY_ID((char_data*)go) : 0);
 	af.expire_time = (duration == -1 ? UNLIMITED : (time(0) + duration));
 	af.modifier = 0;
 	af.location = APPLY_NONE;
@@ -315,7 +344,6 @@ void do_dg_affect_room(void *go, struct script_data *sc, trig_data *trig, int sc
 */
 void do_dg_build(room_data *target, char *argument) {
 	char vnum_arg[MAX_INPUT_LENGTH], dir_arg[MAX_INPUT_LENGTH];
-	bool ruin = FALSE, demolish = FALSE;
 	any_vnum vnum = NOTHING;
 	bld_data *bld = NULL;
 	int dir = NORTH;
@@ -327,11 +355,33 @@ void do_dg_build(room_data *target, char *argument) {
 	}
 	
 	// parse arg
-	if (is_abbrev(argument, "ruin")) {
-		ruin = TRUE;
+	if (is_abbrev(argument, "complete")) {
+		if (!IS_DISMANTLING(target) && IS_INCOMPLETE(target)) {
+			complete_building(target);
+			request_world_save(GET_ROOM_VNUM(target), WSAVE_ROOM);
+		}
+		return;
+	}
+	else if (is_abbrev(argument, "ruin")) {
+		room_data *home = HOME_ROOM(target);
+		if (GET_ROOM_VNUM(home) < MAP_SIZE && GET_BUILDING(home)) {
+			ruin_one_building(home);
+			request_world_save(GET_ROOM_VNUM(target), WSAVE_ROOM);
+		}
+		return;
+	}
+	else if (is_abbrev(argument, "decay")) {
+		if (GET_ROOM_VNUM(target) < MAP_SIZE) {
+			annual_update_map_tile(&(world_map[FLAT_X_COORD(target)][FLAT_Y_COORD(target)]));
+			annual_update_depletions(&(SHARED_DATA(target)->depletion));
+			request_world_save(GET_ROOM_VNUM(target), WSAVE_ROOM);
+		}
+		return;
 	}
 	else if (is_abbrev(argument, "demolish")) {
-		demolish = TRUE;
+		disassociate_building(target);
+		request_world_save(GET_ROOM_VNUM(target), WSAVE_ROOM);
+		return;
 	}
 	else if (isdigit(*argument)) {
 		argument = any_one_arg(argument, vnum_arg);
@@ -358,16 +408,7 @@ void do_dg_build(room_data *target, char *argument) {
 	}
 	
 	
-	if (ruin) {
-		room_data *home = HOME_ROOM(target);
-		if (GET_ROOM_VNUM(home) < MAP_SIZE && GET_BUILDING(home)) {
-			ruin_one_building(home);
-		}
-	}
-	else if (demolish) {
-		disassociate_building(target);
-	}
-	else if (bld) {
+	if (bld) {
 		disassociate_building(target);
 	
 		construct_building(target, GET_BLD_VNUM(bld));
@@ -508,7 +549,7 @@ void dg_purge_instance(void *owner, struct instance_data *inst, char *argument) 
 			
 			// found
 			if (*argument && ROOM_PEOPLE(IN_ROOM(veh))) {
-				act(argument, TRUE, ROOM_PEOPLE(IN_ROOM(veh)), NULL, veh, TO_CHAR | TO_ROOM);
+				act(argument, TRUE, ROOM_PEOPLE(IN_ROOM(veh)), NULL, veh, TO_CHAR | TO_ROOM | ACT_VEH_VICT);
 			}
 			
 			empty_instance_vehicle(inst, veh, IN_ROOM(veh));
@@ -541,6 +582,7 @@ void do_dg_quest(int go_type, void *go, char *argument) {
 	argument = any_one_arg(argument, vict_arg);
 	argument = any_one_arg(argument, cmd_arg);
 	argument = any_one_arg(argument, vnum_arg);
+	skip_spaces(&argument);
 	
 	if (!*vict_arg || !*cmd_arg || !*vnum_arg) {
 		script_log_by_type(go_type, go, "dg_quest: too few args");
@@ -642,10 +684,22 @@ void do_dg_quest(int go_type, void *go, char *argument) {
 		}
 	}
 	else if (is_abbrev(cmd_arg, "trigger")) {
-		qt_triggered_task(vict, QUEST_VNUM(quest));
+		// passing 0 here leads to adding 1 instead of setting to a specific value
+		qt_triggered_task(vict, QUEST_VNUM(quest), 0);
 	}
 	else if (is_abbrev(cmd_arg, "untrigger")) {
-		qt_untrigger_task(vict, QUEST_VNUM(quest));
+		qt_untrigger_task(vict, QUEST_VNUM(quest), FALSE);
+	}
+	else if (is_abbrev(cmd_arg, "resettrigger")) {
+		qt_untrigger_task(vict, QUEST_VNUM(quest), TRUE);
+	}
+	else if (is_abbrev(cmd_arg, "settrigger")) {
+		if (isdigit(*argument)) {
+			qt_triggered_task(vict, QUEST_VNUM(quest), atoi(argument));
+		}
+		else {
+			script_log_by_type(go_type, go, "dg_quest: invalid settrigger argument '%s'", argument);
+		}
 	}
 	else {
 		script_log_by_type(go_type, go, "dg_quest: invalid command '%s'", cmd_arg);
@@ -667,7 +721,7 @@ void do_dg_terracrop(room_data *target, crop_data *cp) {
 		return;
 	}
 	
-	if (!(sect = find_first_matching_sector(SECTF_CROP, NOBITS, GET_SECT_CLIMATE(SECT(target))))) {
+	if (!(sect = find_first_matching_sector(SECTF_CROP, NOBITS, get_climate(target)))) {
 		// no crop sects?
 		return;
 	}
@@ -775,12 +829,15 @@ void send_char_pos(char_data *ch, int dam) {
 			//act("$n is dead!  R.I.P.", FALSE, ch, 0, 0, TO_ROOM);
 			send_to_char("You are dead!  Sorry...\r\n", ch);
 			break;
-		default:                        /* >= POSITION SLEEPING */
-			if (dam > (GET_MAX_HEALTH(ch) / 4))
-				act("That really did HURT!", FALSE, ch, 0, 0, TO_CHAR);
-			if (GET_HEALTH(ch) < (GET_MAX_HEALTH(ch) / 4))
-				msg_to_char(ch, "&rYou wish that your wounds would stop BLEEDING so much!&0\r\n");
+		default: {                        /* >= POSITION SLEEPING */
+			if (dam > (GET_MAX_HEALTH(ch) / 4)) {
+				act("That really did HURT!", FALSE, ch, NULL, NULL, TO_CHAR | ACT_COMBAT_HIT);
+			}
+			if (GET_HEALTH(ch) < (GET_MAX_HEALTH(ch) / 4)) {
+				act("&rYou wish that your wounds would stop BLEEDING so much!&0", FALSE, ch, NULL, NULL, TO_CHAR | ACT_COMBAT_HIT);
+			}
 			break;
+		}
 	}
 }
 
@@ -805,6 +862,28 @@ int valid_dg_target(char_data *ch, int bitvector) {
 		// lower-level gods who are visible
 		return TRUE;
 	}
+}
+
+
+/**
+* Determine if an objectd has a timer trigger, by prototype.
+*
+* @param obj_data *proto The object prototype to test.
+* @return bool TRUE if any timer trigger is attached; FALSE if not.
+*/
+bool prototype_has_timer_trigger(obj_data *proto) {
+	trig_data *trig;
+	struct trig_proto_list *iter;
+	
+	if (proto) {
+		LL_FOREACH(GET_OBJ_SCRIPTS(proto), iter) {
+			if ((trig = real_trigger(iter->vnum)) && IS_SET(GET_TRIG_TYPE(trig), OTRIG_TIMER)) {
+				return TRUE;
+			}
+		}
+	}
+	
+	return FALSE;
 }
 
 
@@ -840,8 +919,9 @@ void run_reboot_triggers(void) {
 * @param int level The level to scale damage to.
 * @param int dam_type The DAM_x type of damage.
 * @param double modifier Percent to multiply scaled damage by (to make it lower or higher).
+* @param int show_attack_message Optional: VNUM of an attack message to show (NOTHING/0 to ignore).
 */
-void script_damage(char_data *vict, char_data *killer, int level, int dam_type, double modifier) {
+void script_damage(char_data *vict, char_data *killer, int level, int dam_type, double modifier, int show_attack_message) {
 	double dam;
 	
 	// no point damaging the dead
@@ -901,7 +981,16 @@ void script_damage(char_data *vict, char_data *killer, int level, int dam_type, 
 		combat_meter_heal_taken(vict, -dam);
 	}
 	
+	// lethal damage?? check abilities like Master Survivalist
+	if ((vict != killer) && dam >= GET_HEALTH(vict)) {
+		run_ability_hooks(vict, AHOOK_DYING, 0, 0, killer, NULL, NULL, NULL, NOBITS);
+	}
+	
 	set_health(vict, GET_HEALTH(vict) - dam);
+	
+	if (show_attack_message > 0) {
+		skill_message(dam, killer ? killer : vict, vict, show_attack_message, NULL);
+	}
 
 	update_pos(vict);
 	send_char_pos(vict, dam);
@@ -909,7 +998,7 @@ void script_damage(char_data *vict, char_data *killer, int level, int dam_type, 
 	if (GET_POS(vict) == POS_DEAD) {
 		if (!IS_NPC(vict)) {
 			syslog(SYS_DEATH, 0, TRUE, "%s killed by script at %s", GET_NAME(vict), get_room_name(IN_ROOM(vict), FALSE));
-			death_log(vict, vict, TYPE_SUFFERING);
+			death_log(vict, vict, ATTACK_SUFFERING);
 		}
 		die(vict, killer ? killer : vict);
 	}
@@ -994,7 +1083,7 @@ void script_heal(void *thing, int type, char *argument) {
 				victim = get_char_room_vis((char_data*)thing, targ_arg, NULL);
 			}
 			
-			snprintf(log_root, sizeof(log_root), "Mob (%s, VNum %d)::", GET_SHORT((char_data*)thing), GET_MOB_VNUM((char_data*)thing));
+			snprintf(log_root, sizeof(log_root), "Mob (%s, VNum %d)::", GET_SHORT_DESC((char_data*)thing), GET_MOB_VNUM((char_data*)thing));
 			break;
 		}
 		case OBJ_TRIGGER: {
@@ -1122,16 +1211,18 @@ void script_modify(char *argument) {
 	char targ_arg[MAX_INPUT_LENGTH], field_arg[MAX_INPUT_LENGTH], value[MAX_INPUT_LENGTH], temp[MAX_STRING_LENGTH];
 	vehicle_data *veh = NULL;
 	struct companion_data *cd;
-	char_data *mob = NULL;
+	char_data *find, *mob = NULL;
 	obj_data *obj = NULL;
 	room_data *room = NULL;
 	bool clear;
 	int pos;
+	sector_data *preserve;
+	struct evolution_data *evo;
 	
 	half_chop(argument, targ_arg, temp);
 	half_chop(temp, field_arg, value);
 	
-	if (!*targ_arg || !*field_arg || !*value) {
+	if (!*targ_arg || !*field_arg) {
 		script_log("%%mod%% called without %s arguments", (!*targ_arg ? "any" : (!*field_arg ? "field and value" : "value")));
 		return;
 	}
@@ -1146,7 +1237,11 @@ void script_modify(char *argument) {
 	// CHARACTER MODE
 	if ((mob = get_char(targ_arg))) {
 		// player-targetable mods first
-		if (is_abbrev(field_arg, "companion")) {
+		if (!*value) {
+			// these all require a value
+			script_log("%%mod%% called without value argument");
+		}
+		else if (is_abbrev(field_arg, "companion")) {
 			if (!IS_NPC(mob)) {
 				if (!str_cmp(value, "none")) {
 					despawn_companion(mob, NOTHING);
@@ -1202,13 +1297,32 @@ void script_modify(char *argument) {
 		else if (is_abbrev(field_arg, "shortdescription")) {
 			change_short_desc(mob, clear ? NULL : value);
 		}
+		else if (is_abbrev(field_arg, "tag")) {
+			if (IS_NPC(mob)) {
+				if (*value && *value == UID_CHAR && (find = find_char(atoi(value+1)))) {
+					free_mob_tags(&MOB_TAGGED_BY(mob));
+					tag_mob(mob, find);
+				}
+				else if (!str_cmp(value, "none")) {
+					free_mob_tags(&MOB_TAGGED_BY(mob));
+				}
+				else {
+					script_log("%%mod%% tag: unable to find target");
+				}
+			}
+			// silent fail otherwise
+		}
 		else {
 			script_log("%%mod%% called with invalid mob field '%s'", field_arg);
 		}
 	}
 	// OBJECT MODE
 	else if ((obj = get_obj(targ_arg))) {
-		if (is_abbrev(field_arg, "keywords")) {
+		if (!*value) {
+			// these all require a value
+			script_log("%%mod%% called without value argument");
+		}
+		else if (is_abbrev(field_arg, "keywords")) {
 			set_obj_keywords(obj, clear ? NULL : value);
 		}
 		else if (is_abbrev(field_arg, "longdescription")) {
@@ -1248,6 +1362,10 @@ void script_modify(char *argument) {
 		if (SHARED_DATA(room) == &ocean_shared_data) {
 			script_log("%%mod%% cannot be used on Ocean rooms");
 		}
+		else if (!*value && !is_abbrev(field_arg, "magic-growth")) {
+			// these MOSTLY require a value
+			script_log("%%mod%% called without value argument");
+		}
 		else if (is_abbrev(field_arg, "icon")) {
 			if (!clear && str_cmp(value, "none") && !validate_icon(value)) {
 				script_log("%%mod%% called with invalid room icon '%s'", value);
@@ -1285,13 +1403,29 @@ void script_modify(char *argument) {
 				set_room_custom_description(room, temp);
 			}
 		}
+		else if (is_abbrev(field_arg, "magic-growth")) {
+			// attempt a magic growth evolution
+			if ((evo = get_evolution_by_type(SECT(room), EVO_MAGIC_GROWTH)) && !ROOM_AFF_FLAGGED(room, ROOM_AFF_NO_EVOLVE)) {
+				preserve = (BASE_SECT(room) != SECT(room)) ? BASE_SECT(room) : NULL;
+				change_terrain(room, evo->becomes, preserve ? GET_SECT_VNUM(preserve) : NOTHING);
+				remove_depletion(room, DPLTN_PICK);
+				remove_depletion(room, DPLTN_FORAGE);
+			}
+			else {
+				// currently just fails silently if no evolution is present or is rolled on the random chance
+			}
+		}
 		else {
 			script_log("%%mod%% called with invalid room field '%s'", field_arg);
 		}
 	}
 	// VEHICLE MODE
 	else if ((veh = get_vehicle(targ_arg))) {
-		if (is_abbrev(field_arg, "icon")) {
+		if (!*value) {
+			// these all require a value
+			script_log("%%mod%% called without value argument");
+		}
+		else if (is_abbrev(field_arg, "icon")) {
 			if (!clear && str_cmp(value, "none") && !validate_icon(value)) {
 				script_log("%%mod%% called with invalid vehicle icon '%s'", value);
 			}

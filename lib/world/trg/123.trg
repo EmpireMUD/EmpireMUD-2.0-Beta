@@ -192,21 +192,21 @@ if %loc% && %self.room% != %loc%
 ~
 #12306
 Fur Dragon: attack info before difficulty selection~
-0 c 0
-kill hit kick bash lightningbolt backstab skybrand entangle shoot sunshock enervate slow siphon disarm job blind sap prick~
+0 B 0
+~
 if %self.aff_flagged(!ATTACK)%
   if %actor.char_target(%arg%)% != %self%
-    return 0
+    return 1
     halt
   end
   %send% %actor% You need to choose a difficulty before you can attack ~%self%.
   %send% %actor% Usage: difficulty <hard \| group \| boss>
   %echoaround% %actor% ~%actor% considers attacking ~%self%.
-  return 1
+  return 0
 else
   * no need for this script anymore
   detach 12306 %self.id%
-  return 0
+  return 1
 end
 ~
 #12307
@@ -867,5 +867,982 @@ if %actor.id% == %id%
   %damage% %actor% 65 physical
   %damage% %actor% 80 physical
 end
+~
+#12350
+Hoarfrost Serragon: Leave pit on load~
+0 n 100
+~
+dg_affect #12350 %self% !ATTACK on -1
+if (!%instance.location% || %self.room.template% != 12350)
+  halt
+end
+mgoto %instance.location%
+%echo% ~%self% bursts forth from the pit!
+~
+#12351
+Hoarfrost Serragon: Delayed completion~
+1 f 0
+~
+%adventurecomplete%
+~
+#12352
+Hoarfrost Serragon: Death trigger~
+0 f 100
+~
+set inside %instance.start%
+if %inside%
+  %at% %inside% %load% obj 12350
+end
+~
+#12353
+Hoarfrost Serragon: Terraformer~
+0 i 100
+~
+* freezes the tile as the creature walks in, or leashes it
+* configs:
+set avoid_sects 6 15 16 27 28 29 34 35 55 61 62 63 64 65
+set ignore_sects 8 9
+set frozen_plains 0 7 13 36 40 41 46 50 54 56 59
+set frozen_forest 1 2 3 4 37 38 39 42 43 44 45 47 60 90
+set frozen_desert 20 23
+set frozen_grove 12 14 26 24 25
+set frozen_oasis 21 80 81 83 84
+set irrigated_field 70 73 75 77 78
+set irrigated_forest 71 74 79
+set irrigated_jungle 72 76
+set dry_oasis 82 91
+set irrigated_oasis 88 89
+set frozen_lake 32 33
+* note: sects 5, 19, 51, 53, 57, 58, 85, and 87 are checked individually below as well
+* basic checks
+set room %self.room%
+if %self.fighting% || %self.disabled%
+  halt
+end
+if %avoid_sects% ~= %room.sector_vnum%
+  * don't go there at all
+  return 0
+  halt
+end
+wait 1
+* check leash
+set dist %room.distance(%instance.location%)%
+if %instance.location% && (%dist% > 4 && %random.2% == 2)
+  if !%self.aff_flagged(!SEE)%
+    %echo% ~%self% burrows down and vanishes from sight!
+  end
+  mgoto %instance.location%
+  if !%self.aff_flagged(!SEE)%
+    %echo% The ground shakes as ~%self% bursts forth from the pit!
+  end
+  halt
+end
+* check if we can terraform
+if %room.sector_vnum% >= 100 || %ignore_sects% ~= %room.sector_vnum%
+  * everything outside of this block is forbidden
+  * ignore_sects is meant to avoid single-digit vnums matching partial strings
+  halt
+elseif %frozen_plains% ~= %room.sector_vnum%
+  %echo% Hoarfrost grows over the grass as a bitter cold descends upon the plains.
+  %terraform% %room% 12366
+elseif %frozen_forest% ~= %room.sector_vnum%
+  %echo% The trees wither and die as hoarfrost overtakes the leaves and ice pours down the trunks!
+  %terraform% %room% 12365
+elseif %frozen_desert% ~= %room.sector_vnum%
+  %echo% Hoarfrost grows on each plant and every grain of sand, until the desert is covered in ice!
+  %terraform% %room% 12350
+elseif %frozen_grove% ~= %room.sector_vnum%
+  %echo% The grove is glazed with ice as hoarfrost grows on every branch and leaf!
+  %terraform% %room% 12351
+elseif %frozen_oasis% ~= %room.sector_vnum%
+  %echo% The oases glazes over with ice as hoarfrost forms on the plants around it!
+  %terraform% %room% 12352
+elseif %room.sector_vnum% == 51
+  %echo% Hoarfrost spreads across the sandy beach like an arctic wave!
+  %terraform% %room% 12353
+elseif %room.sector_vnum% == 57
+  %echo% Icebergs form in the water around the frozen shore!
+  %terraform% %room% 12354
+elseif %irrigated_field% ~= %room.sector_vnum%
+  %echo% Hoarfrost covers every plant as the whole field ices over!
+  %terraform% %room% 12355
+elseif %irrigated_forest% ~= %room.sector_vnum%
+  %echo% Hoarfrost grows on the trees as the entire forest freezes over!
+  %terraform% %room% 12356
+elseif %irrigated_jungle% ~= %room.sector_vnum%
+  %echo% Ice and hoarfrost overtake the jungle!
+  %terraform% %room% 12357
+elseif %dry_oasis% ~= %room.sector_vnum%
+  %echo% Hoarfrost forms on every plant and rock as ice overtakes the whole area!
+  %terraform% %room% 12358
+elseif %room.sector_vnum% == 85
+  %echo% The canal freezes over with thick ice!
+  %terraform% %room% 12359
+elseif %room.sector_vnum% == 87
+  %echo% The canal freezes over with thick ice!
+  %terraform% %room% 12360
+elseif %room.sector_vnum% == 19
+  %echo% The canal freezes over with thick ice!
+  %terraform% %room% 12361
+elseif %irrigated_oasis% ~= %room.sector_vnum%
+  %echo% The oases glazes over with ice as hoarfrost forms on the plants around it!
+  %terraform% %room% 12362
+elseif %room.sector_vnum% == 5
+  %echo% The river grinds to a halt as it rapidly turns to ice!
+  %terraform% %room% 12363
+elseif %room.sector_vnum% == 53
+  %echo% The river grinds to a halt as the entire estuary turns to ice!
+  %terraform% %room% 12364
+elseif %room.sector_vnum% == 58
+  %echo% Hoarfrost grows on the grass as any icy cold overtakes the foothills!
+  %terraform% %room% 12367
+elseif %frozen_lake% ~= %room.sector_vnum%
+  %echo% Frost grows on the surface of the lake, freezing it in the blink of an eye!
+  %terraform% %room% 12368
+end
+~
+#12354
+Hoarfrost Serragon: Start progress goal (pit)~
+2 g 100
+~
+if %actor.is_pc% && %actor.empire%
+  nop %actor.empire.start_progress(12350)%
+end
+~
+#12355
+Hoarfrost Serragon: Start progress goal (mob)~
+0 h 100
+~
+if %actor.is_pc% && %actor.empire%
+  nop %actor.empire.start_progress(12350)%
+end
+~
+#12356
+Hoarfrost Serragon: Difficulty selector with retreat~
+0 c 0
+difficulty~
+if !%arg%
+  %send% %actor% You must specify a level of difficulty. (Normal, Hard, Group, or Boss)
+  return 1
+  halt
+end
+if %self.fighting%
+  %send% %actor% You can't change |%self% difficulty while &%self% is in combat!
+  return 1
+  halt
+end
+if normal /= %arg%
+  set difficulty 1
+elseif hard /= %arg%
+  set difficulty 2
+elseif group /= %arg%
+  set difficulty 3
+elseif boss /= %arg%
+  set difficulty 4
+else
+  %send% %actor% That is not a valid difficulty level for this adventure. (Normal, Hard, Group, or Boss)
+  return 1
+  halt
+end
+* messaging
+%send% %actor% You set the difficulty...
+%echoaround% %actor% ~%actor% sets the difficulty...
+* Clear existing difficulty flags and set new ones.
+nop %self.remove_mob_flag(HARD)%
+nop %self.remove_mob_flag(GROUP)%
+if %difficulty% == 1
+  * Then we don't need to do anything
+  %echo% ~%self% has been set to Normal.
+elseif %difficulty% == 2
+  %echo% ~%self% has been set to Hard.
+  nop %self.add_mob_flag(HARD)%
+elseif %difficulty% == 3
+  %echo% ~%self% has been set to Group.
+  nop %self.add_mob_flag(GROUP)%
+elseif %difficulty% == 4
+  %echo% ~%self% has been set to Boss.
+  nop %self.add_mob_flag(HARD)%
+  nop %self.add_mob_flag(GROUP)%
+end
+remote difficulty %self.id%
+%restore% %self%
+nop %self.unscale_and_reset%
+wait 1
+* send mob home
+set loc %instance.location%
+if %loc% && %self.room% != %loc%
+  %echo% &&C~%self% clacks its massive jaws and then burrows down and vanishes from sight!&&0
+  %echo% &&C...it can't have gone far!&&0
+  mgoto %loc%
+  nop %self.add_mob_flag(SENTINEL)%
+  dg_affect #12351 %self% BONUS-PHYSICAL 1 60
+  * no_sentinel is used by the storytime script to remove sentinel
+  set no_sentinel 0
+  remote no_sentinel %self.id%
+  wait 1
+  %regionecho% %loc% -12 The ground shakes as something enormous moves beneath it!
+  %echo% &&C~%self% bursts forth from the pit... and it looks angry!&&0
+end
+* remove no-attack
+if %self.affect(12350)%
+  dg_affect #12350 %self% off
+end
+* mark me as scaled
+set scaled 1
+remote scaled %self.id%
+* and allow me to wander again later
+attach 12358 %self.id%
+~
+#12357
+Hoarfrost Serragon: Instruction to diff-sel~
+0 B 0
+~
+if %self.affect(12360)%
+  %send% %actor% You can't attack ~%self% while it's in its death throes!
+  return 0
+elseif %self.affect(12350)% && %actor.char_target(%arg%)% == %self%
+  %send% %actor% You need to choose a difficulty before you can attack ~%self%.
+  %send% %actor% Usage: difficulty <normal \| hard \| group \| boss>
+  %echoaround% %actor% ~%actor% considers attacking ~%self%.
+  return 0
+else
+  return 1
+  halt
+end
+~
+#12358
+Hoarfrost Serragon: Resume wandering if nobody fights.~
+0 ab 10
+~
+* cancel sentinel and resume movement if nobody is around and fighting me
+if !%self.affect(12351)% && !%self.affect(12360)% && !%self.fighting% && %room.players_present% == 0
+  nop %self.remove_mob_flag(SENTINEL)%
+  dg_affect #12350 %self% !ATTACK on -1
+  * reset no-sentinel for storytime
+  set no_sentinel 1
+  remote no_sentinel %self.id%
+  * and detach me
+  detach 12358 %self.id%
+end
+~
+#12359
+Hoarfrost Serragon combat: Avalanche Slam, Coil, Snapping Jaws, Frost Pores / Heat Drain~
+0 k 100
+~
+if %self.cooldown(12352)% || %self.disabled%
+  halt
+end
+set room %self.room%
+set diff %self.var(difficulty,1)%
+* order
+set moves_left %self.var(moves_left)%
+set num_left %self.var(num_left,0)%
+if !%moves_left% || !%num_left%
+  set moves_left 1 2 3 4
+  set num_left 4
+end
+* pick
+eval which %%random.%num_left%%%
+set old %moves_left%
+set moves_left
+set move 0
+while %which% > 0
+  set move %old.car%
+  if %which% != 1
+    set moves_left %moves_left% %move%
+  end
+  set old %old.cdr%
+  eval which %which% - 1
+done
+set moves_left %moves_left% %old%
+* store
+eval num_left %num_left% - 1
+remote moves_left %self.id%
+remote num_left %self.id%
+* perform move
+scfight lockout 12352 30 35
+if %move% == 1
+  * Avalanche Slam
+  scfight clear dodge
+  %echo% &&C~%self% raises most of its long body up high into the air...&&0
+  eval dodge %diff% * 40
+  dg_affect #12357 %self% DODGE %dodge% 20
+  if %diff% == 1
+    nop %self.add_mob_flag(NO-ATTACK)%
+  end
+  scfight setup dodge all
+  wait 5 s
+  if %self.disabled% || %self.var(phase)% == 2
+    dg_affect #12357 %self% off
+    nop %self.remove_mob_flag(NO-ATTACK)%
+    halt
+  end
+  %echo% &&C**** &&Z~%self% slams into the ground! An avalanche is headed toward you! ****&&0 (dodge)
+  if %diff% > 1
+    set ouch 100
+  else
+    set ouch 50
+  end
+  set cycle 1
+  set hit 0
+  eval wait 9 - %diff%
+  while %cycle% <= %diff% && %self.var(phase)% != 2
+    scfight setup dodge all
+    wait %wait% s
+    set ch %room.people%
+    while %ch% && %self.var(phase)% != 2
+      set next_ch %ch.next_in_room%
+      if %self.is_enemy(%ch%)%
+        if !%ch.var(did_scfdodge)%
+          set hit 1
+          %echo% &&CThe avalanche knocks ~%ch% over and partially buries *%ch%!&&0
+          %send% %ch% That really hurt!
+          dg_affect #12359 %ch% SLOW on 10
+          dg_affect #12359 %ch% COOLING 20 10
+          %damage% %ch% %ouch% physical
+        elseif %ch.is_pc%
+          %send% %ch% &&CYou find high ground just in time as the avalanche roars past you!&&0
+          if %diff% == 1
+            dg_affect #12358 %ch% TO-HIT 25 10
+          end
+        end
+        if %cycle% < %diff%
+          %send% %ch% &&C**** The shockwave is still going... here comes another avalanche! ****&&0 (dodge)
+        end
+      end
+      set ch %next_ch%
+    done
+    scfight clear dodge
+    eval cycle %cycle% + 1
+  done
+  dg_affect #12357 %self% off
+  if !%hit% && %diff% == 1
+    %echo% &&C~%self% seems to exhaust *%self%self from all that spinning.&&0
+    dg_affect #12353 %self% HARD-STUNNED on 10
+  end
+  wait 8 s
+elseif %move% == 2
+  * Coil
+  scfight clear struggle
+  if %room.players_present% > 1
+    %echo% &&CThere's a screeching sound as ~%self% begins to coil around the whole party!&&0 (struggle)
+  else
+    %echo% &&CThere's a screeching sound as ~%self% begins to coil around you!&&0 (struggle)
+  end
+  if %diff% == 1
+    dg_affect #12353 %self% HARD-STUNNED on 20
+  end
+  scfight setup struggle all 20
+  set person %room.people%
+  while %person%
+    if %person.affect(9602)%
+      set scf_strug_char You struggle in pain against the serrated scales...
+      set scf_strug_room ~%%actor%% struggles against the serrated scales...
+      set scf_free_char You squeeze out of the serrated scales!
+      set scf_free_room ~%%actor%% squeezes out of the serrated scales!
+      remote scf_strug_char %person.id%
+      remote scf_strug_room %person.id%
+      remote scf_free_char %person.id%
+      remote scf_free_room %person.id%
+    end
+    set person %person.next_in_room%
+  done
+  * messages
+  set cycle 0
+  set ongoing 1
+  while %cycle% < 5 && %ongoing%
+    wait 4 s
+    set ongoing 0
+    set person %room.people%
+    while %person% && %self.var(phase)% != 2
+      if %person.affect(9602)%
+        set ongoing 1
+        if %diff% > 1
+          %send% %person% &&C**** You scream in pain as the serrated scales cut you! ****&&0 (struggle)
+          %dot% #12355 %person% 100 30 physical 5
+        else
+          %send% %person% &&C**** You strain to breath as the serrated scales coil around you! ****&&0 (struggle)
+        end
+      end
+      set person %person.next_in_room%
+    done
+    eval cycle %cycle% + 1
+  done
+  scfight clear struggle
+  dg_affect #12353 %self% off
+elseif %move% == 3
+  * Snapping Jaws
+  scfight clear dodge
+  %echo% &&C~%self% rears back and clacks its jaws open and shut...&&0
+  wait 3 s
+  if %self.disabled% || %self.aff_flagged(BLIND)% || %self.var(phase)% == 2
+    halt
+  end
+  set targ %random.enemy%
+  if !%targ%
+    halt
+  end
+  set targ_id %targ.id%
+  if %diff% == 1
+    dg_affect #12353 %self% HARD-STUNNED on 20
+  end
+  %send% %targ% &&C**** &&Z~%self% leans in and snaps its jaws... at you! ****&&0 (dodge)
+  %echoaround% %targ% &&C~%self% leans in and snaps its jaws... at ~%targ%!&&0
+  scfight setup dodge %targ%
+  if %diff% > 1
+    set ouch 100
+  else
+    set ouch 50
+  end
+  set cycle 0
+  eval times %diff% * 2
+  eval when 9 - %diff%
+  set done 0
+  while %cycle% < %times% && !%done%
+    wait %when% s
+    if %targ.id% != %targ_id% || %self.var(phase)% == 2
+      set done 1
+    elseif !%targ.var(did_scfdodge)%
+      %echo% &&C~%self% bites down on ~%targ% hard!&&0
+      %send% %targ% That really hurts!
+      %damage% %targ% %ouch% physical
+    end
+    eval cycle %cycle% + 1
+    if %cycle% < %times% && !%done%
+      wait 1
+      if %targ.id% == %targ_id%
+        %send% %targ% &&C**** &&Z~%self% is still snapping its jaws... looks like its coming for you again... ****&&0 (dodge)
+        %echoaround% %targ% &&C~%self% rears back to snap at ~%targ% again...&&0
+        scfight clear dodge
+        scfight setup dodge %targ%
+      end
+    elseif %done% && %targ.id% == %targ_id% && %diff% == 1
+      dg_affect #12358 %targ% TO-HIT 25 20
+    end
+  done
+  scfight clear dodge
+  dg_affect #12353 %self% off
+elseif %move% == 4
+  * Frost Pores / Heat Drain
+  scfight clear struggle
+  %echo% &&CA cold mist seeps from |%self% pores and flows over you...&&0
+  %echo% &&CYou begin to freeze in place!&&0 (struggle)
+  if %diff% == 1
+    dg_affect #12353 %self% HARD-STUNNED on 20
+  end
+  scfight setup struggle all 20
+  set person %room.people%
+  while %person%
+    if %person.affect(9602)%
+      set scf_strug_char You struggle against the draining frost...
+      set scf_strug_room ~%%actor%% struggles against the draining frost...
+      set scf_free_char You manage to get away from the frost!
+      set scf_free_room ~%%actor%% manages to get away from the frost!
+      remote scf_strug_char %person.id%
+      remote scf_strug_room %person.id%
+      remote scf_free_char %person.id%
+      remote scf_free_room %person.id%
+    end
+    set person %person.next_in_room%
+  done
+  * messages
+  eval punish -2 * %diff%
+  set cycle 0
+  set ongoing 1
+  while %cycle% < 5 && %ongoing%
+    wait 4 s
+    set ongoing 0
+    set person %room.people%
+    while %person% && %self.var(phase)% != 2
+      if %person.affect(9602)%
+        set ongoing 1
+        if %diff% > 1
+          %send% %person% &&CYou feel the heat draining out of your body!&&0 (struggle)
+          dg_affect #12356 %person% BONUS-PHYSICAL %punish% 20
+          dg_affect #12356 %person% BONUS-MAGICAL %punish% 20
+          dg_affect #12356 %person% COOLING 20 20
+        else
+          %send% %person% &&CYou're trapped in the frost!&&0 (struggle)
+        end
+      end
+      set person %person.next_in_room%
+    done
+    eval cycle %cycle% + 1
+  done
+  scfight clear struggle
+  dg_affect #12353 %self% off
+end
+nop %self.remove_mob_flag(NO-ATTACK)%
+~
+#12360
+Hoarfrost Serragon: Moving adventure command~
+0 c 0
+adventure~
+if !(summon /= %arg.car%)
+  %teleport% %actor% %instance.location%
+  %force% %actor% adventure
+  %teleport% %actor% %self.room%
+  return 1
+else
+  return 0
+end
+~
+#12361
+Hoarfrost Serragon: Leash for ice creatures~
+0 i 100
+~
+set room %self.room%
+if %room.building_vnum% == 12350
+  * pit
+  return 1
+elseif %room.sector_vnum% >= 12350 && %room.sector_vnum% <= 12399
+  * frost
+  return 1
+else
+  *nope
+  return 0
+end
+~
+#12362
+Hoarfrost Serragon: Pickpocket rejection strings~
+0 p 100
+~
+if %ability% != 142
+  * not pickpocket
+  return 1
+  halt
+else
+  return 0
+  * after messaging...
+end
+switch %self.vnum%
+  case 12350
+    case 12352
+      * hoarfrost serragon, juvenile serragon
+      if !%self.aff_flagged(!ATTACK)%
+        %send% %actor% You can't imagine which part of it might be the "pocket" but it doesn't matter... you've attracted too much attention!
+        %aggro% %actor%
+      else
+        %send% %actor% You can't imagine which part of it might be the "pocket".
+      end
+    break
+    case 12353
+      * rabbit ice
+      %send% %actor% It doesn't seem to have any pockets.
+    break
+    default
+      %send% %actor% There's no way to get close enough to pickpocket ~%self% without *%self% noticing.
+    break
+  done
+~
+#12363
+Hoarfrost Serragon: Frostscale hatchling combat: Coil, Snapping Jaws~
+0 k 100
+~
+if %self.cooldown(12352)% || %self.disabled%
+  halt
+end
+set room %self.room%
+set diff %self.var(difficulty,1)%
+* order
+set moves_left %self.var(moves_left)%
+set num_left %self.var(num_left,0)%
+if !%moves_left% || !%num_left%
+  set moves_left 1 2
+  set num_left 2
+end
+* pick
+eval which %%random.%num_left%%%
+set old %moves_left%
+set moves_left
+set move 0
+while %which% > 0
+  set move %old.car%
+  if %which% != 1
+    set moves_left %moves_left% %move%
+  end
+  set old %old.cdr%
+  eval which %which% - 1
+done
+set moves_left %moves_left% %old%
+* store
+eval num_left %num_left% - 1
+remote moves_left %self.id%
+remote num_left %self.id%
+* perform move
+scfight lockout 12352 30 25
+if %move% == 1
+  * Coil
+  scfight clear struggle
+  set targ %random.enemy%
+  if !%targ%
+    halt
+  end
+  set targ_id %targ.id%
+  %send% %targ% &&C**** &&Z~%self% launches itself through the air and coils its body around you! ****&&0 (struggle)
+  %echoaround% %targ% &&C~%self% launches itself through the air and coils itself around ~%targ%!&&0
+  dg_affect #12353 %self% HARD-STUNNED on 20
+  scfight setup struggle %targ% 20
+  set scf_strug_char You struggle in pain against the hatchling's serrated scales...
+  set scf_strug_room ~%%actor%% struggles against the hatchling's serrated scales...
+  set scf_free_char You slip out of the frostscale hatchling's coil!
+  set scf_free_room ~%%actor%% slips out of the frostscale hatchling's coil!
+  remote scf_strug_char %targ.id%
+  remote scf_strug_room %targ.id%
+  remote scf_free_char %targ.id%
+  remote scf_free_room %targ.id%
+  * messages
+  set cycle 0
+  set done 0
+  while %cycle% < 5 && !%done%
+    wait 4 s
+    if !%targ% || %targ_id% != %targ.id%
+      * gone?
+      set done 1
+    elseif !%targ.affect(9602)%
+      * struggled out
+      set done 1
+    else
+      %send% %targ% &&C**** You scream in pain as the serrated scales cut you! ****&&0 (struggle)
+      %dot% #12355 %targ% 33 30 physical 5
+    end
+    eval cycle %cycle% + 1
+  done
+  scfight clear struggle
+  dg_affect #12353 %self% off
+elseif %move% == 2
+  * Snapping Jaws
+  scfight clear dodge
+  %echo% &&C~%self% rears back and clacks its jaws open and shut...&&0
+  wait 3 s
+  if %self.disabled% || %self.aff_flagged(BLIND)%
+    halt
+  end
+  set targ %random.enemy%
+  if !%targ%
+    halt
+  end
+  set targ_id %targ.id%
+  if %diff% == 1
+    dg_affect #12353 %self% HARD-STUNNED on 20
+  end
+  %send% %targ% &&C**** &&Z~%self% leans in and snaps its jaws... at you! ****&&0 (dodge)
+  %echoaround% %targ% &&C~%self% leans in and snaps its jaws... at ~%targ%!&&0
+  scfight setup dodge %targ%
+  set cycle 0
+  eval times %diff% * 2
+  eval when 9 - %diff%
+  set done 0
+  while %cycle% < %times% && !%done%
+    wait %when% s
+    if %targ.id% != %targ_id%
+      set done 1
+    elseif !%targ.var(did_scfdodge)%
+      %echo% &&C~%self% bites down on ~%targ% hard!&&0
+      %send% %targ% That really hurts!
+      %damage% %targ% 50 physical
+    end
+    eval cycle %cycle% + 1
+    if %cycle% < %times% && !%done%
+      wait 1
+      if %targ.id% == %targ_id%
+        %send% %targ% &&C**** &&Z~%self% is still snapping its jaws... looks like its coming for you again... ****&&0 (dodge)
+        %echoaround% %targ% &&C~%self% rears back to snap at ~%targ% again...&&0
+        scfight clear dodge
+        scfight setup dodge %targ%
+      end
+    elseif %done% && %targ.id% == %targ_id% && %diff% == 1
+      dg_affect #12358 %targ% TO-HIT 25 20
+    end
+  done
+  scfight clear dodge
+  dg_affect #12353 %self% off
+end
+nop %self.remove_mob_flag(NO-ATTACK)%
+~
+#12364
+Hoarfrost Serragon: Fighting characters cannot flee~
+0 c 0
+flee~
+if %actor.fighting%
+  %send% %actor% PANIC! You couldn't escape! The serragon's enormous body is coiled around the entire area!
+  return 1
+else
+  return 0
+end
+~
+#12365
+Hoarfrost Serragon: Phase Transition~
+0 l 10
+~
+* Serragon has dropped below 10% and will teleport players inside for phase 2
+makeuid to_room room i12351
+if !%instance.location% || !%to_room%
+  * no instance?
+  halt
+end
+set phase 2
+remote phase %self.id%
+attach 12366 %self.id%
+* remove safety teleporter, if any
+set mob %instance.mob(12358)%
+if %mob%
+  %purge% %mob%
+end
+* Make me unattackable
+%restore% %self%
+nop %self.add_mob_flag(!RESCALE)%
+dg_affect #12360 %self% !ATTACK on -1
+* ensure a craw mob inside
+set mob %instance.mob(12357)%
+if %mob%
+  %purge% %mob%
+end
+%at% i12351 %load% mob 12357
+set craw %instance.mob(12357)%
+if %craw%
+  nop %craw.remove_mob_flag(HARD)%
+  nop %craw.remove_mob_flag(GROUP)%
+  switch %self.var(difficulty,2)%
+    case 1
+      set difficulty 1
+    break
+    case 2
+      set difficulty 1
+    break
+    case 3
+      set difficulty 2
+      nop %craw.add_mob_flag(HARD)%
+    break
+    case 4
+      set difficulty 3
+      nop %craw.add_mob_flag(GROUP)%
+    break
+  done
+  remote difficulty %craw.id%
+  nop %craw.unscale_and_reset%
+  %scale% %craw% %self.level%
+end
+* And transfer players inside
+set moved 0
+set ch %self.room.people%
+while %ch%
+  set next_ch %ch.next_in_room%
+  if %self.is_tagged_by(%ch%)%
+    eval moved %moved% + 1
+    %teleport% %ch% %to_room%
+    %send% %ch% &&C**** &&Z~%self% swallows you whole! ****&&0
+    %load% obj 11805 %ch% inv
+  elseif %ch.is_npc% && %ch.leader%
+    if %self.is_tagged_by(%ch.leader%)%
+      %teleport% %ch% %to_room%
+    end
+  end
+  set ch %next_ch%
+done
+%echo% &&C**** &&Z~%self% swallows the whole party! ****&&0
+~
+#12366
+Hoarfrost Serragon: Check end of phase 2~
+0 ab 100
+~
+* Brings the serragon out of phase 2 if everyone died inside
+set cancel 0
+if !%instance.location%
+  * no instance at all?
+  set cancel 1
+else
+  makeuid inside room i12351
+  if !%inside%
+    set cancel 1
+  elseif %inside.players_present% == 0
+    set cancel 1
+  end
+end
+* did we find a reason to cancel?
+if %cancel%
+  set phase 1
+  remote phase %self.id%
+  dg_affect #12360 %self% off
+  * remove interior mob (always needs a fresh one)
+  set craw %instance.mob(12357)%
+  if %craw%
+    %purge% %craw%
+  end
+  * put a safety mob inside
+  makeuid inside room i12351
+  if %inside%
+    %at% %inside% %load% mob 12358
+  end
+  * and remove this script
+  detach 12366 %self.id%
+end
+~
+#12367
+Hoarfrost Serragon: Inside serragon craw death trig~
+0 f 100
+~
+set room %self.room%
+set mob %instance.mob(12350)%
+if %mob%
+  set to_room %mob.room%
+else
+  set to_room %instance.location%
+end
+* teleport players out
+if %to_room%
+  set ch %room.people%
+  while %ch%
+    set next_ch %ch.next_in_room%
+    if %ch.vnum% == 12357 || %ch.vnum% == 12358
+      * nothing (these mobs are part of the fight)
+    elseif %ch.is_pc% || !%ch.linked_to_instance%
+      * Move ch
+      %send% %ch% &&CYou're hurled out of the serragon's mouth!&&0
+      %teleport% %ch% %to_room%
+      %at% %to_room% %echoaround% %ch% ~%ch% is hurled out of the serragon's mouth!
+    end
+    set ch %next_ch%
+  done
+  if %mob%
+    * remove immunity
+    dg_affect #12360 %mob% off
+    * tag mob for player
+    %mod% %mob% tag %actor%
+    * reskin self to change the kill message
+    %mod% %self% shortdesc something it ate
+    * and kill the mob
+    %slay% %mob%
+  end
+end
+* load safety mob
+%load% mob 12358
+* no death cry
+return 0
+~
+#12368
+Hoarfrost Serragon: Craw survival timer~
+0 bw 100
+~
+* Tracks each player's time inside and kills them if it's been too long.
+set room %self.room%
+switch %self.var(difficulty)%
+  case 1
+    set limit 50
+  break
+  case 2
+    set limit 90
+  break
+  case 3
+    set limit 160
+  break
+  default
+    set limit 160
+  break
+done
+set ch %room.people%
+while %ch%
+  set next_ch %ch.next_in_room%
+  if %ch.is_pc%
+    * find or set an entry time
+    set entry_time %self.var(entry_time_%ch.id%)%
+    if !%entry_time%
+      set entry_time %timestamp%
+      set entry_time_%ch.id% %timestamp%
+      remote entry_time_%ch.id% %self.id%
+    end
+    eval inside_time %timestamp% - %entry_time%
+    if %inside_time% >= %limit%
+      * death!
+      %load% obj 12370 %ch% inv
+    elseif %inside_time% >= %limit% / 2
+      %send% %ch% &&CIt's getting hard to breathe in here!
+    end
+  end
+  set ch %next_ch%
+done
+~
+#12369
+Hoarfrost Serragon: Post-kill safety teleporter~
+0 h 100
+~
+* Ensure no players accidentally log in inside this creature when it's not in phase 2
+if %actor.nohassle%
+  halt
+end
+wait 0
+set room %self.room%
+if %room.template% != 12351
+  * Only works inside the serragon's craw
+  %purge% %self%
+  halt
+end
+* Ensure part of the instance
+nop %self.link_instance%
+set to_room %instance.location%
+if !%to_room%
+  * No destination
+  %purge% %self%
+  halt
+end
+* Message now
+%echo% You're ejected from the hoarfrost serragon!
+* Check items here
+set obj %room.contents%
+while %obj%
+  set next_obj %obj.next_in_list%
+  if %obj.can_wear(TAKE)%
+    %teleport% %obj% %to_room%
+  end
+  set obj %next_obj%
+done
+* Check people here
+set ch %room.people%
+while %ch%
+  set next_ch %ch.next_in_room%
+  if %ch.nohassle% || %ch.vnum% == 12357 || %ch.vnum% == 12358
+    * nothing (these mobs are part of the fight)
+  elseif %ch.is_pc% || !%ch.linked_to_instance%
+    * Move ch
+    %teleport% %ch% %to_room%
+    %load% obj 11805 %ch%
+  end
+  set ch %next_ch%
+done
+~
+#12370
+Hoarfrost Serragon: You died in the craw~
+1 n 100
+~
+wait 0
+set actor %self.carried_by%
+set room %self.room%
+set outside %instance.location%
+if !%actor%
+  %purge% %self%
+  halt
+elseif !%outside%
+  %send% %actor% Error: Instance not detected.
+  %purge% %self%
+  halt
+end
+* teleport player and npc followers out
+set ch %room.people%
+while %ch%
+  set next_ch %ch.next_in_room%
+  if %ch.is_npc% && %ch.leader% == %actor%
+    %echo% ~%ch% vanishes down the gullet!
+    %teleport% %ch% %outside%
+    %at% %outside% %slay% %ch%
+  end
+  set ch %next_ch%
+done
+* and the person themselves
+%send% %actor% The world goes dark as you slip away down the serragon's gullet!
+%echoaround% %actor% ~%actor% disappears down the serragon's gullet!
+%teleport% %actor% %outside%
+%at% %outside% %echoaround% %actor% ~%actor% comes flying out the serragon's mouth!
+%slay% %actor% %actor.name% has been eaten by the hoarfrost serragon at %outside.coords%!
+%purge% %self%
 ~
 $

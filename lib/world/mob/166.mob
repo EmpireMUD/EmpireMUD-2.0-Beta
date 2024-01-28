@@ -41,7 +41,7 @@ demon grinchy tall green~
 a grinchy demon~
 A tall, green grinchy demon sneaks about.
 ~
-0 400 bdhoyK cG 4
+0 400 bdhoK cG 4
 1 0 9 7 -1
 D
    This demon is a furry green cave-dweller who absolutely hates Christmas.
@@ -59,18 +59,18 @@ I 4 16675 13.00 1 l  # LOOT: nostalgic Christmas spirit
 I 4 16664 4.00 1 l  # LOOT: mini-grinchy pet whistle
 I 4 16665 4.00 1 l  # LOOT: reindeer dog minipet whistle
 T 16603
-T 16614
-T 16615
-T 16616
-T 16605
 T 16621
+T 9600
+T 9601
+T 9604
+T 16653
 S
 #16614
 dog max reindeer~
 Max the reindeer dog~
 A dog is here, dressed as a reindeer.
 ~
-50 400 bdhjoADK qG 3
+50 400 bdhjoDK qG 3
 1 0 0 9 -1
 D
    Someone has attached a single fake antler to this little brown dog, and
@@ -263,6 +263,17 @@ This invisible mob moves around randomly then spawns a goat object.
 T 16645
 T 16643
 S
+#16650
+#n gooseherd~
+the gooseherd~
+#n is trying to herd the geese.
+~
+20 50 bdqvI 0 3
+0 0 0 15 -1
+D
+The young gooseherd is cautiously tending the flock.
+~
+S
 #16651
 goose plump~
 a plump goose~
@@ -273,7 +284,7 @@ A goose is waddling around.
 D
 This fat white goose looks ready to eat.
 ~
-I 0 3200 100.00 2  # BUTCHER: cut of poultry
+I 0 10715 100.00 2  # BUTCHER: fine cut of goose
 I 0 9025 100.00 1  # BUTCHER: bird feathers
 M
 0
@@ -284,6 +295,7 @@ $n honks loudly.~
 M
 0
 $n honks loudly at you.~
+T 9047
 S
 #16652
 reindeer deer flying red-nosed nosed rednosed~
@@ -558,9 +570,6 @@ M
 It's because I'm green, isn't it?~
 M
 0
-seems to be wallowing.~
-M
-0
 $n seems to be wallowing.~
 M
 0
@@ -693,6 +702,21 @@ north, where it is called lumememm.
 ~
 T 16669
 S
+#16670
+pony dappled~
+a dappled pony~
+A dappled pony with a ribbon is frolicking about.
+~
+1 1 bdeoD n 2
+0 0 62 9 -1
+D
+   This playful little pony prances circles around you while the red ribbon
+around its neck flaps in the air. The pony is brown and beige, with dappled
+hips and a fluffy mane that looks so, so soft.
+~
+T 16670
+T 16671
+S
 #16675
 #n~
 #n~
@@ -771,8 +795,8 @@ krampus demon~
 the Krampus demon~
 The Krampus demon stands on mismatched legs, brandishing a switch.
 ~
-25 400 bdozK cqEG 3
-1 0 14 15 -1
+25 400 bdoK cqEG 3
+1 0 14 27 -1
 D
    This demonic figure is half goat and half human, with the division down the
 center of his body. One side sports a hoof at the end of his leg, and the other
@@ -788,9 +812,12 @@ I 4 16674 13.00 1 l  # LOOT: anxious Christmas spirit
 I 4 16675 13.00 1 l  # LOOT: nostalgic Christmas spirit
 I 4 16679 4.00 1 l  # LOOT: tiny krampus whistle
 I 4 16685 4.00 1 l  # LOOT: burning straw goat whistle
-T 16681
-T 16682
 T 16603
+T 9600
+T 9601
+T 9604
+T 16684
+T 16621
 S
 #16682
 mobile new~

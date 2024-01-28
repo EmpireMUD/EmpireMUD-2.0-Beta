@@ -57,7 +57,7 @@ elseif %difficulty% == 4
   nop %mob.add_mob_flag(HARD)%
   nop %mob.add_mob_flag(GROUP)%
 end
-%restore% %mob%
+nop %mob.unscale_and_reset%
 ~
 #12002
 Old God death generic (unused)~
@@ -222,12 +222,18 @@ if !%self.cooldown(12005)% && !%yatpan%
   * Summon Yatpan
   shout Yatpan! Come to me!
   nop %self.set_cooldown(12005, 300)%
+  set actor_id %actor.id%
   wait 2 sec
   %load% mob 12001 ally
   set summon %self.room.people%
   if %summon.vnum% == 12001
     %echo% ~%summon% drops from the sky, holding a bow, which ~%self% takes.
-    %force% %summon% %aggro% %actor%
+    if %actor% && %actor.id% == %actor_id% && %actor.room% == %self.room%
+      %force% %summon% %aggro% %actor%
+    else
+      * gone?
+      %force% %summon% %aggro%
+    end
   end
 else
   * Rain of Arrows
@@ -556,14 +562,14 @@ if !%self.fighting% && %self.varexists(phase)%
         %send% %person% ~%self% turns his gaze inward upon you!
         %send% %person% &&rA torrent of lightning flows through you, blasting you out of the eye of the storm!
         %damage% %person% 99999 direct
-        %teleport% %person% %self%
+        %teleport% %person% %self.room%
       elseif %person.vnum% == 12031
         %purge% %person% $n fades away.
       else
         * What are you doing in here?
         * Maybe a familiar?
         %echo% ~%person% is expelled from the storm chamber.
-        %teleport% %person% %self%
+        %teleport% %person% %self.room%
       end
       set person %next_person%
     done
@@ -857,7 +863,7 @@ end
 if %ally%
   set target %ally.fighting%
   if %target%
-    if %target.trigger_counterspell%
+    if %target.trigger_counterspell(%self%)%
       %send% %target% A bolt of lightning flies out of nowhere and explodes against your counterspell!
       %send% %target% &&rThe bolt's explosion burns you!
       %echoaround% %target% A bolt of lightning flies out of nowhere and explodes in front of ~%target%!

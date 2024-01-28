@@ -278,7 +278,7 @@ cactus saguaro treant~
 a saguaro treant~
 A huge saguaro cactus bends its spiny arm down toward you.
 ~
-75 100 bdhxzAK cdiG 5
+75 100 bdhxzAKL cdiG 5
 0 0 8 23 -1
 D
    Though it's as tall as a tree, this treant has no branches or leaves. Its
@@ -291,14 +291,14 @@ T 10149
 T 10143
 S
 #10144
-druid head #n~
-Head Druid #n~
-Head Druid #n stands at the center of the circle, protected by powerful magic.
+archweaver weaver #n~
+Archweaver #n~
+Archweaver #n stands at the center of the circle, protected by powerful magic.
 ~
-0 0 bd n 3
+0 0 bdL n 3
 0 2 0 15 -1
 D
-   Robed in brown and with an air of superiority, the druid seems to think they
+   Robed in brown and with an air of superiority, the mage seems to think they
 are the master of the monsoon. It certainly seems to have bent to their will.
 ~
 T 18258
@@ -308,7 +308,7 @@ thief robed~
 a robed thief~
 A robed thief leans out from behind a large shrub.
 ~
-0 0 bd ein 3
+0 0 bdL ein 3
 1 0 0 15 -1
 D
 He's wearing beige and brown to blend into the desert.
@@ -321,7 +321,7 @@ merchant wandering~
 a wandering merchant~
 A wandering merchant stands here, lamenting the loss of his goods.
 ~
-0 0 d n 3
+0 0 dL n 3
 1 0 0 15 -1
 D
 He seems a little soaked by the monsoon.
@@ -334,7 +334,7 @@ man pale~
 a pale man~
 A pale man is lurking in the shadows.
 ~
-0 0 bdw in 3
+0 0 bdwL in 3
 1 0 0 15 -1
 D
    There's a reddish glint when the light catches his eyes, and he looks like
@@ -454,9 +454,7 @@ A desert bighorn sheep won't take its eyes off of you.
 D
 This scrawny sheep has horns that are bigger than its head!
 ~
-I 0 3012 100.00 1  # BUTCHER: fillet of raw meat
-I 0 3012 100.00 1  # BUTCHER: fillet of raw meat
-I 0 3012 100.00 1  # BUTCHER: fillet of raw meat
+I 0 3203 100.00 2  # BUTCHER: side of raw mutton
 I 1 1351 100.00 1  # SKIN: large skin
 M
 0

@@ -9,7 +9,7 @@ creature by a great leather strap, made from an animal so massive that the
 strap reaches unbroken around the tortoise's shell. The tavern is loud enough
 that you can nearly make out their song from here.
 ~
-8 0 0 0 3
+8 B 0 0 0 4
 18202 0 0
 0 0
 S
@@ -22,7 +22,7 @@ the outside. Its hinges are sturdy, perhaps imperium, although they don't match
 the rest of the hardware of the rest of the building, so they must have been
 replacements.
 ~
-8 0 0 0 2
+8 B 0 0 0 3
 18201 0 0
 0 0
 T 18206
@@ -35,7 +35,7 @@ A fountain of pitch-black water hovers in the air.~
 touch of water. It spins and cycles in the air, free of any container, as if
 gravity hasn't noticed it in this dark corner.
 ~
-5 0 0 0 1
+5 B 0 0 0 2
 2000 2000 0
 10 0
 S
@@ -48,7 +48,7 @@ and all manner of other foods. Each time you take a piece, a little more food
 falls out of the cornucopia. But if you move too far from it, the food crumbles
 and is gone.
 ~
-6 m 0 0 2
+6 mB 0 0 0 3
 500 0 0
 10 0
 A
@@ -92,7 +92,7 @@ The tavern patron spawner isn't working...~
    This despawns any old patrons, spawns a common and a silly patron, and
 purges itself.
 ~
-3 0 0 0 2
+3 0 0 0 0 2
 0 0 0
 0 0
 T 18207
@@ -104,7 +104,7 @@ A Guild of Adventurers seeker stone lies here.~
    Use 'seek guild' to find the nearest atlasian tortoise. This stone will lead
 you directly to the guildhall on the tortoise's back.
 ~
-3 p a 0 8
+3 p a 0 0 8
 0 0 0
 12 0
 T 18208
@@ -115,7 +115,7 @@ a chelonian shell token~
 A single chelonian shell token is lying here.~
 These tokens are used in the shop aboard the Tipsy Tortoise Tavern.
 ~
-12 p a 0 5
+12 p a 0 0 5
 1 18200 0
 0 0
 S
@@ -126,7 +126,7 @@ A frivolous bauble is floating here.~
    You're not sure what this is, but that sorcerer seemed to think it was
 important.
 ~
-3 j a 0 2
+3 j a 0 0 2
 0 0 0
 10 0
 A
@@ -141,7 +141,7 @@ A Tipsy Tortoise transport trinket is lying on its back.~
 been wrapped in a scaly leather and bound with cactus needles. You can 'use'
 this trinket to teleport to the nearest Tipsy Tortoise Tavern.
 ~
-3 p a 0 1
+3 p a 0 0 1
 0 0 0
 0 0
 T 18214
@@ -156,7 +156,7 @@ mana. According to the Guild of Adventurers, it has the power to shrink
 goblins to diminutive size. They want you to test it at the Goblin Challenge.
 Usage: shrink <goblin>
 ~
-3 0 a 0 1
+3 0 a 0 0 1
 0 0 0
 0 0
 C
@@ -173,7 +173,7 @@ is a difficult combination of wordiness and verbosity, but it appears to
 sanction the building of an Adventurer's Guildhall in your city.
 Use: build guildhall <direction> (city-only, single use)
 ~
-3 gp a 0 2
+3 gp a 0 0 2
 0 0 0
 0 0
 Q 18200
@@ -187,7 +187,7 @@ is a difficult combination of wordiness and verbosity, but it appears to
 sanction the building of an Adventurer's Guildhall in your city.
 Use: build guildhall <direction> (city-only, single use)
 ~
-3 gp a 0 3
+3 gp a 0 0 3
 0 0 0
 0 0
 S
@@ -204,7 +204,7 @@ berries crushed into paste, and some fiber to stablize it. And, as the
 librarian suggested, the page should be wadded up inside as well.
 Usage: craft smoke bomb
 ~
-3 0 a 0 3
+3 0 a 0 0 3
 0 0 0
 0 0
 C
@@ -222,7 +222,7 @@ Challenge and use the bomb to drive off the goblins, as the librarian asked,
 before this thing goes off in your hands.
 Usage: use bomb
 ~
-3 0 a 0 2
+3 0 a 0 0 2
 0 0 0
 13 0
 C
@@ -240,7 +240,7 @@ yellow in the light, and with the soft current of mana flowing through it to
 hint at its enchantment. Whoever crafted this was certainly an expert.
 Usage: net <target>
 ~
-3 0 a 0 4
+3 0 a 0 0 4
 0 0 0
 11 0
 C
@@ -260,7 +260,7 @@ reading somewhere in the guildhall that caring for an atlasian egg requires
 many rare materials such as magewood, wild fire, violet gems, molten essence,
 skystones, and burning salve.
 ~
-3 ep a 0 6
+3 ep a 0 0 6
 0 0 0
 14 0
 T 18221
@@ -272,7 +272,7 @@ An atlasian egg sits in a makeshift nest.~
    The egg is huge, and still growing! It has a soft, leathery texture that is,
 nevertheless, durable enough to protect the growing embryo inside.
 ~
-3 0 0 0 4
+3 B 0 0 0 5
 0 0 0
 7 8064
 T 18220
@@ -284,7 +284,7 @@ A shimmering violet fire burns at the base of the hatching egg!~
    A sparkling magewood fire has been built around the base of the egg. The egg
 has grown considerably, and looks as if it is about to hatch.
 ~
-29 0 0 0 6
+29 B 0 0 0 7
 -1 1 9
 7 144
 T 18225
@@ -302,7 +302,7 @@ like there's anybody inside. You had better take it to the swamp hag to pick
 up her pet.
 Use: borrow Rodentmort
 ~
-3 0 a 0 2
+3 0 a 0 0 2
 0 0 0
 0 0
 C
@@ -317,7 +317,7 @@ A baby tortoise is lying here.~
 This whistle can summon a noncombat pet!
 Type 'use whistle' to summon it.
 ~
-19 p a 0 5
+19 p a 0 0 5
 18225 0 0
 2 0
 S
@@ -328,7 +328,7 @@ A ninja tortoise whistle is lying here.~
 This whistle can summon a noncombat pet!
 Type 'use whistle' to summon it.
 ~
-19 p a 0 6
+19 p a 0 0 6
 18226 0 0
 2 0
 S
@@ -339,7 +339,7 @@ A dragon turtle whistle is lying here.~
 This whistle can summon a noncombat pet!
 Type 'use whistle' to summon it.
 ~
-19 p a 0 7
+19 p a 0 0 7
 18227 0 0
 2 0
 S
@@ -352,7 +352,7 @@ fingers sticky as you touch it. If you 'use' the whistle, it will summon a the
 sanguine monstrosity -- a blood mount.
    The mount requires that the player be Liked by the Guild of Adventurers.
 ~
-3 ep a 0 8
+3 ep a 0 0 8
 18228 0 0
 2 0
 T 9910
@@ -366,7 +366,7 @@ through it. When you 'use' this whistle, it will summon the scarlet nebulavion,
 a flying mount that appears like a cloud of red mist.
    The mount requires that the player be Venerated by the Guild of Adventurers.
 ~
-3 ep a 0 9
+3 ep a 0 0 9
 18229 0 0
 0 0
 T 9910
@@ -380,7 +380,7 @@ is made from pure shadow. You have no idea where something like this could have
 come from, but it does seem as if you could 'use' it to summon a new mount.
    The mount requires that the player be Liked by the Guild of Adventurers.
 ~
-3 ep a 0 7
+3 ep a 0 0 7
 18230 0 0
 2 0
 T 9910
@@ -394,7 +394,7 @@ a striking red outline. When you 'use' this whistle, it summons the eclipse
 shadowraptor, a flying mount with the form of a bird's shadow.
    The mount requires that the player be Venerated by the Guild of Adventurers.
 ~
-3 ep a 0 8
+3 ep a 0 0 8
 18231 0 0
 2 0
 T 9910
@@ -408,7 +408,7 @@ at least, it's simple: there is one large button marked 'use'. An inscription
 on the back indicates that it creates a clockwork steed mount.
    The mount requires that the player be Liked by the Guild of Adventurers.
 ~
-3 ep a 0 6
+3 ep a 0 0 6
 18232 0 0
 2 0
 T 9910
@@ -422,7 +422,7 @@ An aeroforge rotary assembler is lying here.~
 assembler, it creates the flying mount for you.
    The mount requires that the player be Venerated by the Guild of Adventurers.
 ~
-3 ep a 0 7
+3 ep a 0 0 7
 18233 0 0
 0 0
 T 9910
@@ -436,7 +436,7 @@ sigil of the Guild of Adventurers. If you 'use' this whistle, it will summon an
 imperium-clad bear as an epic mount.
    The mount requires that the player be Liked by the Guild of Adventurers.
 ~
-3 ep a 0 7
+3 ep a 0 0 7
 18234 0 0
 2 0
 T 9910
@@ -451,7 +451,7 @@ celestial warbalcon, an enormous horse with falcon wings that serves as a
 flying mount.
    The mount requires that the player be Venerated by the Guild of Adventurers.
 ~
-3 ep a 0 8
+3 ep a 0 0 8
 18235 0 0
 2 0
 T 9910
@@ -466,7 +466,7 @@ more. The ring has a surprisingly warm feeling to it, as if it has been
 enchanted, though you sense no enchantment. The top of the ring is emblazoned
 with the crest of the Guild of Adventurers.
 ~
-2 admp ab 0 6
+2 admp ab 0 0 6
 0 0 0
 14 0
 A
@@ -490,7 +490,7 @@ The testudinal ring of courage is lying on the ground.~
 both unusually heavy and curiously warm. The seal of the Guild of Adventurers
 is stamped repeatedly around the circumference of the ring.
 ~
-2 admp ab 0 5
+2 admp ab 0 0 5
 0 0 0
 14 0
 A
@@ -515,7 +515,7 @@ shell of a terrapin. But it also has the weight of imperium and hums with the
 same dark mana as nocturnium. The ring bears the seal of the Guild of
 Adventurers on its outward-facing side.
 ~
-2 admp ab 0 6
+2 admp ab 0 0 6
 0 0 0
 14 0
 A
@@ -542,7 +542,7 @@ material is simple hay. But the enchantment is powerful and you can see nothing
 but the scales on the ring, each with the tiny stamp of the seal of the Guild
 of Adventurers.
 ~
-2 admp ab 0 7
+2 admp ab 0 0 7
 0 0 0
 14 0
 A
@@ -566,7 +566,7 @@ the enchantment seems to have made it lighter, too, because it seems to be
 solid metal. Use it to pry gems loose in the Lost Temple.
 Usage: pry gem
 ~
-3 0 a 0 3
+3 0 a 0 0 3
 0 0 0
 2 0
 C
@@ -582,7 +582,7 @@ An important jade gem is lying on the ground.~
 its face. Though you know the gem is quite old, it looks pristine and is
 undoubtedly worth a great deal.
 ~
-15 0 a 0 3
+15 0 a 0 0 3
 18 2 0
 12 0
 C
@@ -600,7 +600,7 @@ special about it at all.
 gates, before selecting a difficulty.
 Usage: use orb
 ~
-3 0 a 0 3
+3 0 a 0 0 3
 0 0 0
 1 0
 C
@@ -619,7 +619,7 @@ and the drawstring is laced with nocturnium.
    Use this pouch to bribe the bandits in the ruins.
 Usage: bribe
 ~
-3 0 a 0 2
+3 0 a 0 0 2
 0 0 0
 7 0
 C
@@ -639,7 +639,7 @@ language you can't read.
 then drop it off at the Tipsy Tortoise.
 Usage: pilfer pixy
 ~
-3 0 a 0 3
+3 0 a 0 0 3
 0 0 0
 6 0
 C
@@ -657,7 +657,7 @@ themselves; to what end, you're not certain. All you know is that this key
 is supposed to open a drawer in the eruditorium at the Tower Skycleave.
 Usage: use key
 ~
-3 0 a 0 1
+3 0 a 0 0 1
 0 0 0
 14 0
 C
@@ -676,7 +676,7 @@ enchanted for a different purpose.
    In the Hamlet of the Undead, type 'reflect <person>' to use it on the
 various fiends who reside there.
 ~
-3 0 a 0 2
+3 0 a 0 0 2
 0 0 0
 8 0
 C
@@ -696,7 +696,7 @@ leave the area without violence.
 flutter, glide, stomp, wave, stretch, wiggle, clap, skip, hop, shake, tiptoe,
 kick, sashay, and pirouette.
 ~
-3 0 a 0 1
+3 0 a 0 0 1
 0 0 0
 0 0
 C
@@ -712,7 +712,7 @@ Someone has left a huge net here.~
 The net is reinforced to hold against sharp claws and strong muscles. Find a
 wildling in The Grove and 'net wildling' to capture it.
 ~
-3 e a 0 3
+3 e a 0 0 3
 0 0 0
 0 0
 Q 18256
@@ -725,7 +725,7 @@ A captured wildling is struggling against the net.~
    The wildling is struggling against the net so frantically that it just looks
 like a ball of dark fur. Hurry up and get this thing back to the guildhall!
 ~
-3 e a 0 1
+3 e a 0 0 1
 0 0 0
 0 0
 Q 18256
@@ -734,12 +734,12 @@ S
 propaganda pamphlet magiterranean~
 some Magiterranean propaganda~
 A propaganda pamphlet is on the ground.~
-   The pamphlet is written in some strange druidic script that you aren't
+   The pamphlet is written in some strange arcane script that you aren't
 familiar with, but from the illustrations, it seems to be describing the
 wildlife of the Magiterranean. Perhaps the Guild of Adventurers would be
 interested in this.
 ~
-3 0 a 0 4
+3 0 a 0 0 4
 0 0 0
 0 0
 Q 18258
@@ -752,7 +752,7 @@ A note for Dryleef is lying on the ground.~
 the symbol for gold coin. When you meet Dryleef, he'll be willing to sell you
 the ticket you need. Just type 'buy ticket' when you find him.
 ~
-3 0 a 0 5
+3 0 a 0 0 5
 0 0 0
 0 0
 Q 18260
@@ -766,7 +766,7 @@ A ticket to the Goblin Gala is lying here.~
 warthog and a smudge of blood. Bring it back to the Guild of Adventurers and
 see if they're interested in it.
 ~
-3 0 a 0 3
+3 0 a 0 0 3
 0 0 0
 0 0
 Q 18260
@@ -779,7 +779,7 @@ A frost siphon is lying on the ground.~
 enchanted eventide. You've never seen anything like it before, but at least the
 instructions are clearly labeled: use siphon <target>
 ~
-3 j a 0 3
+3 j a 0 0 3
 0 0 0
 10 0
 Q 18270
@@ -792,7 +792,7 @@ Someone in the room has nimble fingers.~
    Your fingers have been enchanted with the ability to pickpocket the bauble
 from a city sorcerer without being noticed!
 ~
-3 j a 0 2
+3 j a 0 0 2
 0 0 0
 10 0
 Q 18272
@@ -805,7 +805,7 @@ A sorcerous signalling stone is lying on the ground.~
    You can 'use' this item to contact Archsorcerer Malfernes. Just make sure to
 use it before you enter his clearing so he knows you're coming.
 ~
-3 p a 0 3
+3 p a 0 0 3
 0 0 0
 10 0
 T 18280
@@ -818,7 +818,7 @@ A countercurse talisman is lying here.~
 Manor. Just get the chalice and 'use talisman' while you're standing in Mill
 Manor.
 ~
-3 0 a 0 4
+3 0 a 0 0 4
 0 0 0
 0 0
 Q 18281
@@ -832,7 +832,7 @@ The Staff of Draconic Imagination is floating before you.~
 Skycleave to summon an imaginary dragon. You can use it on any of the dragons
 from the Flame Dragon or Abandoned Dragon Nest adventures.
 ~
-3 0 a 0 3
+3 0 a 0 0 5
 0 0 0
 2 0
 Q 18282
@@ -846,7 +846,7 @@ There is a golden chalice here.~
 by Malfernes's enchantment. You'd better take it back to him before it wears
 off...
 ~
-3 0 a 0 2
+3 0 a 0 0 2
 0 0 0
 4 0
 Q 18281
@@ -858,7 +858,7 @@ An imaginary whistle might be here.~
    This whistle might or might not summon a flying mount who might or might not
 be real, if you 'use whistle'.
 ~
-3 eo a 0 7
+3 eo a 0 0 7
 18284 0 0
 10 0
 T 9910
@@ -869,7 +869,7 @@ an imaginary egg~
 An imaginary egg might be here.~
 This egg lets you imagine having a pet dragon. Type 'use egg' to summon it.
 ~
-19 o a 0 6
+19 o a 0 0 6
 18285 0 0
 10 0
 S
@@ -879,7 +879,7 @@ a ratcatcher's net~
 A ratcatcher's net is here.~
 Type 'net rat' to catch a rat.
 ~
-3 0 a 0 3
+3 0 a 0 0 3
 0 0 0
 0 0
 Q 18285
@@ -891,7 +891,7 @@ a bagged rat~
 A bagged rat is lying here.~
 It sure squirms a lot.
 ~
-3 kp a 0 2
+3 kp a 0 0 2
 0 0 0
 7 1152
 S
@@ -903,7 +903,7 @@ A useless old lamp is lying here.~
 now.
 (This item was part of an old quest and is no longer needed.)
 ~
-3 p a 0 3
+3 p a 0 0 3
 0 0 0
 1 0
 S
@@ -914,7 +914,7 @@ A padded sack is lying here, empty.~
    Use this in a roc nest (while the egg is still there) to steal the egg. Get
 ready to run or fight...
 ~
-3 0 a 0 2
+3 0 a 0 0 2
 0 0 0
 11 0
 Q 18289
@@ -928,7 +928,7 @@ An enchanted scarab is here.~
 According to Scaldorran, you need to 'plant' this bug in Grand High Sorcerer's
 office while they aren't looking.
 ~
-3 0 a 0 5
+3 0 a 0 0 5
 0 0 0
 0 0
 T 18290
@@ -939,7 +939,7 @@ a giant egg sack~
 A giant egg sack is here.~
 Take this back to Scaldorran.
 ~
-3 0 a 0 1
+3 0 a 0 0 1
 0 0 0
 11 0
 Q 18289
@@ -950,7 +950,7 @@ an imaginary seed~
 An imaginary seed may or may not be here.~
 What a strange seed. Surely you could plant it in the plains.
 ~
-3 0 a 0 2
+3 0 a 0 0 2
 0 0 0
 10 0
 T 18293
@@ -962,7 +962,7 @@ A vivid imagination is here.~
    This item instantly triggers completion of a couple of Guild of Adventurers
 quests, if you already meet the requirements when you start them.
 ~
-3 p a 0 1
+3 p a 0 0 1
 0 0 0
 0 0
 T 18294
@@ -974,7 +974,7 @@ A verdant wand is here.~
    You can 'use wand' to restore scorched terrain or teleport yourself to a
 flame dragon cave.
 ~
-3 0 a 0 3
+3 0 a 0 0 3
 10 1 0
 0 0
 S
@@ -985,7 +985,7 @@ A great dragon tree lays on its side, still taller than you are.~
    The dragon tree is truly massive! When it stood, this tree was taller than a
 castle. Now it might provide enough lumber for an entire house.
 ~
-3 e a 0 5
+3 e a 0 0 5
 0 0 0
 0 0
 I 11 1002 100.00 1  # LIGHT: roaring fire

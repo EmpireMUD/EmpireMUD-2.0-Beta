@@ -75,7 +75,7 @@ if !%instance.location%
   %purge% %self%
   halt
 end
-if %room.sector_vnum% <= 4 || (%room.sector_vnum% >= 40 && %room.sector_vnum% <= 45) || %room.sector_vnum% == 50 || (%room.sector_vnum% >= 54 && %room.sector_vnum% <= 56)
+if %room.sector_vnum% <= 4 || (%room.sector_vnum% >= 40 && %room.sector_vnum% <= 45) || %room.sector_vnum% == 50 || %room.sector_vnum% == 90 || (%room.sector_vnum% >= 54 && %room.sector_vnum% <= 56)
   * valid, plains/forest or shore-jungle (55)
   set sector_valid 1
 elseif %room.sector_vnum% == 7 || %room.sector_vnum% == 13 || %room.sector_vnum% == 15 || %room.sector_vnum% == 16 || %room.sector_vnum% == 27 || %room.sector_vnum% == 28 || %room.sector_vnum% == 34
@@ -328,10 +328,14 @@ switch %gem%
     * failure - do nothing
   break
 done
-if %self.carried_by%
+if %self.carried_by% && %gem%
   %send% %self.carried_by% @%self% in your inventory disintegrates, leaving behind %object%!
-else
+elseif %gem%
   %echo% @%self% in the room disintegrates, leaving behind %object%!
+else
+  * nothing to show?
+  return 1
+  halt
 end
 return 0
 %purge% %self%
@@ -383,8 +387,8 @@ switch %random.3%
     while %person%
       if %person.is_enemy(%self%)%
         dg_affect #10552 %person% SLOW on 20
-        if %heroic_mode%
-          dg_affect #10552 %person% HARD-STUNNED on 5
+        if %heroic_mode% && !%person.aff_flagged(!STUN)%
+          dg_affect #10552 %person% STUNNED on 5
         else
           %echo% The ice shatters, but leaves a lingering chill...
         end
@@ -406,7 +410,7 @@ switch %random.3%
       %echo% The comet crashes to the ground, hitting nobody.
       halt
     end
-    if %actor.trigger_counterspell%
+    if %actor.trigger_counterspell(%self%)%
       set counterspell 1
     end
     if %heroic_mode%
@@ -420,7 +424,9 @@ switch %random.3%
         %send% %actor% &&rThe comet crashes into you, smashing you to the ground, and explodes!
         %echoaround% %actor% The comet crashes into ~%actor%, smashing *%actor% to the ground, and explodes!
         %damage% %actor% 400 physical
-        dg_affect #10553 %actor% HARD-STUNNED on 10
+        if !%actor.aff_flagged(!STUN)%
+          dg_affect #10553 %actor% STUNNED on 10
+        end
         %echo% &&rFragments fly in all directions!
         %aoe% 100 physical
       end
@@ -502,18 +508,22 @@ switch %random.3%
     * Blind and stun tank
     * Normal/Hard: 5 seconds
     * Group/Boss: 20 seconds, and adds 50% DoT
-    * If too easy, consider adding HIDE and looking for a new target...
+    * If too easy, consider adding HIDDEN and looking for a new target...
     %send% %actor% &&r~%self% makes an arcane gesture at you, and the snow beneath your feet swallows you!
     %echoaround% %actor% ~%self% makes an arcane gesture at ~%actor%, and the snow beneath ^%actor% feet swallows *%actor%!
     if %heroic_mode%
       %send% %actor% You attempt to dig yourself out of the deep, painfully cold snowdrift!
       %dot% %actor% 50 20 magical
       dg_affect #10555 %actor% BLIND on 20
-      dg_affect #10555 %actor% HARD-STUNNED on 20
+      if !%actor.aff_flagged(!STUN)%
+        dg_affect #10555 %actor% STUNNED on 20
+      end
     else
       %send% %actor% You scramble to pull yourself out of the pile of snow.
       dg_affect #10555 %actor% BLIND on 5
-      dg_affect #10555 %actor% HARD-STUNNED on 5
+      if !%actor.aff_flagged(!STUN)%
+        dg_affect #10555 %actor% STUNNED on 5
+      end
     end
   break
   case 3
@@ -553,7 +563,9 @@ switch %random.3%
     %echoaround% %actor% ~%self% makes an arcane gesture at ~%actor%, and hoar frost suddenly encases *%actor%!
     dg_affect #10557 %actor% SLOW on 20
     if %heroic_mode%
-      dg_affect #10556 %actor% HARD-STUNNED on 5
+      if !%actor.aff_flagged(!STUN)%
+        dg_affect #10556 %actor% STUNNED on 5
+      end
       %dot% #10557 %actor% 100 20 magical
     else
       %dot% #10557 %actor% 75 20 magical
@@ -681,7 +693,11 @@ if !%arg%
   return 1
   halt
 end
-* TODO: Check nobody's in the adventure before changing difficulty
+if %instance.players_present% > %self.room.players_present%
+  %send% %actor% You cannot set a difficulty while players are elsewhere in the adventure.
+  return 1
+  halt
+end
 if normal /= %arg%
   %echo% Setting difficulty to Normal...
   set difficulty 1
@@ -871,7 +887,7 @@ end
 Permafrost weather~
 2 c 0
 weather look~
-if %cmd% /= look
+if look /= %cmd%
   if out == %arg%
     %force% %actor% look snow
     return 1
@@ -938,7 +954,7 @@ if %actor.currency(10550)% < %cheapest_item_cost%
   halt
 end
 nop %self.remove_mob_flag(SILENT)%
-if %self.aff_flagged(HIDE)%
+if %self.aff_flagged(HIDDEN)%
   visible
   wait 1
   %echo% ~%self% shuffles out of the portal and sets up a shop on the ice.
@@ -1009,11 +1025,6 @@ end
 Wand of Polar Power activation~
 1 c 2
 freeze~
-if %actor.varexists(permafrost_mobs_iced)%
-  if %actor.permafrost_mobs_iced% >= 6
-    * Quest is completed but we currently allow you to keep zapping if you like
-  end
-end
 if !%arg%
   %send% %actor% What do you want to blast with @%self%?
   return 1
@@ -1046,16 +1057,7 @@ set person %actor.room.people%
 while %person%
   if %person.is_pc%
     if %person.on_quest(10550)%
-      if %person.varexists(permafrost_mobs_iced)%
-        eval permafrost_mobs_iced %person.permafrost_mobs_iced% + 1
-      else
-        set permafrost_mobs_iced 1
-      end
-      remote permafrost_mobs_iced %person.id%
-      if %permafrost_mobs_iced% >= 6
-        %quest% %person% trigger 10550
-        %send% %person% You have frozen enough enemies to complete your quest.
-      end
+      %quest% %person% trigger 10550
     end
   end
   set person %person.next_in_room%
@@ -1082,9 +1084,9 @@ done
 Pacify the Permafrost quest start~
 2 u 100
 ~
-set permafrost_mobs_iced 0
-remote permafrost_mobs_iced %actor.id%
 %load% obj 10593 %actor% inv
+* formerly saved a variable; now uses quest tracker
+rdelete permafrost_mobs_iced %actor.id%
 ~
 #10598
 Gem ice melt~
@@ -1115,6 +1117,7 @@ switch %random.4%
   break
   default
     * failure - do nothing
+    halt
   break
 done
 if %actor%

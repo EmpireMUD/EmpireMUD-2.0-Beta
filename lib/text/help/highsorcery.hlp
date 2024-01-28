@@ -36,7 +36,7 @@ without. Your total mana increases based on your level and role.
 
 Gains experience passively over time.
 
-See also: GIFT OF NATURE, ROLE
+See also: GIFT OF NATURE, PASSIVES, ROLE
 #
 ARCLIGHT "ARC LIGHT"
 
@@ -67,7 +67,7 @@ and the transition into a slower time frame deals serious magical damage.
 
 City Teleportation (High Sorcery ability)
 
-Usage:  ritual teleport <city>
+Usage:  ritual "city teleport" <city>
 Cooldown:  15 minutes
 Cost:  15 mana
 
@@ -76,7 +76,21 @@ can use the city's name or number. Use "city list" to see available cities.
 
 This ability gains experience any time you use it to teleport to a city.
 
-See also: TELEPORTATION, CITY
+See also: RITUAL, CITY
+#
+COLLAPSE "COLLAPSE PORTAL"
+
+Collapse Portal (High Sorcery ability)
+
+Command:  collapse <portal>
+Cost:  15 mana
+
+This power can close portals opened by players. Collapsing one end also closes
+the other end of the portal.
+
+Gain skill whenever you collapse a portal.
+
+See also: PORTAL, PORTAL SICKNESS
 #
 COLORBURST
 
@@ -84,12 +98,12 @@ Colorburst (High Sorcery ability)
 
 Usage:  colorburst [victim]
 Cooldown:  30 seconds
-Cost:  15 / 30 / 45 mana
+Cost:  14+ mana (based on level)
 Debuff type:  magical
 
 Shoot a disorienting burst of color at your foe and makes it harder for them
-to hit you. Colorburst causes a to-hit penalty of -5, -10, or -20 depending
-on your skill level, with a bonus based on your Intelligence.
+to hit anything in combat. The size of the penalty depends upon your skill
+level, with a bonus based on your Intelligence.
 
 In combat, colorburst will automatically target your current opponent if you
 do not provide a target.
@@ -209,21 +223,23 @@ ENERVATE
 
 Enervate (High Sorcery ability)
 
-Usage:  enervate <victim>
+Usage:  enervate [victim]
 Cooldown:  75 seconds
 Duration:  75 seconds
+Linked trait:  intelligence
 Cost:  20 mana
 Debuff type:  magical
 
-Your victim is enervated: he loses move regen. You are able to leech some
-of this for yourself, and your move regeneration receive a temporary boost.
+Your victim is enervated: he loses move regen and move points. You are able to
+leech some of this for yourself and your move regeneration receives a temporary
+boost.
 
-The amount of move regen your victim loses is based on your Intelligence, and
-the amount you gain is based on your High Sorcery level.
-
-In combat, enervate will automatically target your opponent.
+This ability is more effective in the caster role. In combat, enervate will
+automatically target your opponent.
 
 Gain experience by casting this spell.
+
+See also: CASTER ROLL
 #
 FORESIGHT
 
@@ -251,6 +267,19 @@ Gain experience when you apply any enchantment.
 
 See also: ENCHANT
 #
+MAGIVORE
+
+Magivore (High Sorcery ability)
+
+Usage:  magivore
+Cooldown:  6 minutes
+Duration:  30 seconds
+
+Consume mana from the air around you to greatly boost your mana regeneration
+for a short time. This effect is stronger in the caster or healer role.
+
+See also: MANA REGEN, CASTER ROLE, HEALER ROLE
+#
 MANASHIELD "MANA SHIELD"
 
 Manashield (High Sorcery ability)
@@ -259,11 +288,9 @@ Usage:  manashield
 Cost:  25 mana*
 
 By armoring herself with a manashield, a sorcerer sacrifices part of her mana
-pool for reduced combat damage.
+pool for increased resistance to damage.
 
-Mana Shield reduces your mana by 25.
-
-Gain skill by taking damage while manashielded, not by reapplying it.
+Gain skill by taking damage while manashielded.
 #
 MIRRORIMAGE "MIRROR IMAGE"
 
@@ -305,47 +332,6 @@ it saves you as well.
 
 See also: RITUAL
 #
-"PORTAL MAGIC" "PORTAL MAGE"
-
-Portal Magic (High Sorcery ability)
-
-Learning portal magic allows you to create portal nodes, craft nexus crystals,
-and allows members of your empire to use them. These portals can only connect
-two locations on the same island or continent, unless you have a Portal Master
-in the empire.
-
-A "portal mage" is a person with the Portal Magic ability. Without a portal
-mage in your empire, you cannot use portal buildings. Portal mages only get
-four minutes of portal sickness instead of five.
-
-You can gain Portal Magic skill whenever someone in your empire uses your
-portal magic to open a portal.
-
-See also: PORTAL, PORTAL MASTER
-#
-"PORTAL MASTER" COLLAPSE
-
-Portal Master (High Sorcery ability)
-
-Command:  collapse <portal>
-Cost:  15 mana
-
-Becoming a Portal Master removes the same-island-only limit on your empire's
-portals. It also allows you to collapse portals yourself.
-
-You can gain Portal Master skill whenever someone in your empire opens a
-portal, and whenever you collapse a portal.
-
-See also: PORTAL, PORTAL MAGIC, PORTAL SICKNESS
-#
-RITUAL RITE
-
-Usage:  ritual <type>
-
-This command allows a High Sorcerer to perform a variety of rituals, based on
-the different abilities they have learned. See the help file for individual
-rituals to learn more about them.
-#
 "RITUAL OF BURDENS" "BURDENS RITUAL" "BURDEN RITUAL"
 
 Ritual of Burdens (High Sorcery ability)
@@ -353,7 +339,7 @@ Ritual of Burdens (High Sorcery ability)
 Usage:  ritual burdens
 Cost:  5 mana
 
-This ritual allows you to carry 6, 12, or 18 more items (based on your level).
+This ritual allows you to carry more items (based on your level).
 
 You can gain experience by re-casting this ritual.
 
@@ -364,11 +350,10 @@ See also: RITUAL
 Ritual of Defense (High Sorcery ability)
 
 Usage:  ritual defense
-Cost:  15 mana; 1 imperium spike and 1 bloodstone per wall
+Cost:  50 mana; 1 imperium spike and 1 bloodstone per wall
 
 This ritual enchants a wall to be able to repel anyone flying. It will go away
-if you dismantle the wall. You will not get your resources back if you cancel
-the ritual; they are spent immediately.
+if you dismantle the wall.
 
 This ability gains experience each time the ritual is completed.
 
@@ -382,21 +367,24 @@ Usage:  ritual detection
 Cost:  15 mana
 
 This ability finds all players currently in your city, whether hidden, earth-
-melded, invisible, or any other condition. This ability only works inside of a
-city owned by your empire.
+melded, invisible, or any other condition. It can also find some adventures.
+This ability only works inside of a city owned by your empire.
+
+This can also detect players outside (but near) the city (up to your "where"
+range) and some adventures near the city (up to your base "nearby" range).
 
 Gains experience when you complete the ritual.
 
-See also: RITUAL
+See also: RITUAL, NEARBY, WHERE
 #
 "RITUAL OF SENSE LIFE" "SENSE LIFE RITUAL"
 
 Ritual of Sense Life (High Sorcery skill)
 
-Usage:  ritual senselife
+Usage:  ritual "sense life"
 Cost:  15 mana
 
-This spell works similar to the "search ability" and can find people hidden
+This spell works similar to the "search" ability and can find people hidden
 in the room with you, using simple magic. It also allows you to sense
 earthmelded people.
 
@@ -409,16 +397,15 @@ See also: RITUAL
 
 Ritual of Teleportation (High Sorcery skill)
 
-Usage:  ritual teleportation [target]
-Cooldown:  15 minutes (teleport home only)
+Usage:  ritual teleport [home]
+Cooldown:  10 minutes
 Cost:  25 mana
 
 With the basic teleportation ability, you can teleport at random (2 to 7 map
 tiles in any direction) or you can teleport to your home. You won't be able to
 teleport out of (or into) any room owned by a non-allied empire.
 
-This ability gains experience any time you teleport (using this ability or City
-Teleportation).
+This ability gains experience any time you use it to teleport.
 
 See also: CITY TELEPORTATION, RITUAL
 #
@@ -437,6 +424,19 @@ your victim's head for both instantaneous and lasting damage. It also blinds
 your victim briefly. The DoT effect stacks up to 3 times.
 
 See also: DOT
+#
+"SHIMMERING ANVIL" "CONJURE SHIMMERING ANVIL"
+
+Shimmering Anvil
+High Sorcery Synergy Ability: 75 Trade
+Trade Synergy Ability: 75 High Sorcery
+Cooldown:  1 hour
+Cost:  100 mana
+
+This allows you to conjure an anvil for one hour. Any player may forge using
+the shimmering anvil.
+
+See also: CONJURE
 #
 "SIEGE RITUAL"
 

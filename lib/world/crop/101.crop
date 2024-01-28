@@ -15,7 +15,7 @@ D3
 D4
 .&j'|&?.~
 &y~
-I 6 10147 100.00 1  # FORAGE: spiny red fruit
+I 6 10147 100.00 25  # FORAGE: spiny red fruit
 I 7 10146 100.00 14  # PICK: basket of saguaro fruit
 I 20 10149 100.00 1  # CHOP: fallen saguaro cactus
 M
@@ -38,6 +38,9 @@ M
 10158 0.40 d
 M
 10158 3.00 c
+U
+0
+Tall, straight cacti shoot upward from the dirt as red fruit forms on their crowns!~
 X
 cacti cactus saguaros sahuaros plants crop~
    The saguaro cacti stand tall and proud, their spiny arms reaching up to the
@@ -79,11 +82,10 @@ D4
 D4
 .&j^&?..~
 &y~
-I 6 3014 100.00 1  # FORAGE: dry beans
+I 6 3014 100.00 25  # FORAGE: dry beans
 I 7 10152 100.00 28  # PICK: handful of mesquite pods
-I 9 132 100.00 1  # GATHER: thorny branches
-I 20 10151 50.00 2 c  # CHOP: mesquite tree
-I 20 10151 50.00 1 c  # CHOP: mesquite tree
+I 9 132 100.00 50  # GATHER: thorny branches
+I 20 10151 100.00 2 c  # CHOP: mesquite tree
 M
 10150 5.00 a
 M
@@ -104,6 +106,9 @@ M
 10158 0.40 d
 M
 10158 3.00 c
+U
+0
+Gnarly mesquite trees climb out of the dirt before your eyes, and are soon draped with beige pods!~
 X
 trees mesquites pods plants crop~
    As you approach the grove of mesquite trees, the scent of their delicate,
@@ -137,10 +142,9 @@ D0
 D0
 .&G^&bo&?.~
 &y~
-I 6 10154 100.00 1  # FORAGE: ripe alligator pear
+I 6 10154 100.00 25  # FORAGE: ripe alligator pear
 I 7 10153 100.00 14  # PICK: basket of alligator pears
-I 20 122 50.00 2 c  # CHOP: rough wood
-I 20 122 50.00 1 c  # CHOP: rough wood
+I 20 122 100.00 2 c  # CHOP: rough wood
 M
 10150 5.00 a
 M
@@ -161,6 +165,9 @@ M
 10158 0.40 d
 M
 10158 3.00 c
+U
+0
+Trees climb from the dirt as wrinkled fruits grow magically beneath the branches!~
 X
 pears alligator avocados patch grove trees crop~
    The alligator pear trees stand tall in the hot, dusty desert, their leaves
@@ -191,10 +198,9 @@ D0
 D0
 .&l^o&?.~
 &y~
-I 6 10156 100.00 1  # FORAGE: single ripe lime
+I 6 10156 100.00 25  # FORAGE: single ripe lime
 I 7 10155 100.00 14  # PICK: basket of limes
-I 20 122 50.00 2 c  # CHOP: rough wood
-I 20 122 50.00 1 c  # CHOP: rough wood
+I 20 122 100.00 2 c  # CHOP: rough wood
 M
 10150 5.00 a
 M
@@ -215,6 +221,9 @@ M
 10158 0.40 d
 M
 10158 3.00 c
+U
+0
+Dark green lime trees unfold themselves as they rise from the ground!~
 X
 trees limes fruit grove crop~
    As you wander through the desert, you come across a grove of vibrant green
@@ -258,7 +267,7 @@ ww&Ro&?w~
 D0
 www&Ro~
 &G~
-I 6 3014 100.00 1  # FORAGE: dry beans
+I 6 3014 100.00 25  # FORAGE: dry beans
 I 8 10157 16.67 2 H  # HARVEST: maroon firemelon
 I 8 10157 16.67 3 H  # HARVEST: maroon firemelon
 I 8 10157 16.66 4 H  # HARVEST: maroon firemelon
@@ -285,6 +294,9 @@ M
 10158 0.40 d
 M
 10158 20.00 c
+U
+0
+Smouldering leaves unfold across the desert as bright firemelons grow beneath them!~
 X
 firemelons melons fruit vines bed field crop~
    As you wander through the hot desert, you come across a patch of unusual

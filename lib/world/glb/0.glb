@@ -555,7 +555,7 @@ M
 S
 #88
 Cold Spawns - North~
-3 0 f mop 0-0 dg
+3 0 f mopy 0-0 dg
 E
 -1 100.00
 0 0 0
@@ -582,7 +582,7 @@ M
 S
 #89
 Cold Spawns - South~
-3 0 f mop 0-0 dh
+3 0 f mopy 0-0 dh
 E
 -1 100.00
 0 0 0
@@ -699,7 +699,9 @@ E
 M
 246 0.30 0
 M
-250 0.10 a
+250 0.10 0
+M
+9065 0.02 0
 S
 #97
 Unclaimed Wandering Mobs~

@@ -9,12 +9,15 @@ D0
 D0
 &CJ&G|/&?.~
 &g~
-I 6 10500 100.00 1  # FORAGE: glowkra pod
+I 6 10500 100.00 25  # FORAGE: glowkra pod
 I 8 10501 20.00 2 H  # HARVEST: handful of glowkra pods
 I 8 10501 20.00 3 H  # HARVEST: handful of glowkra pods
 I 8 10501 20.00 4 H  # HARVEST: handful of glowkra pods
 I 8 10501 20.00 5 H  # HARVEST: handful of glowkra pods
 I 8 10501 20.00 6 H  # HARVEST: handful of glowkra pods
+U
+0
+Strange bushes unfold layer-by-layer from the ground as glowing blue fruits begin to climb from their stems!~
 X
 glowkra okra pods field plants crop glow~
    An eerie, pulsing glow casts shades of blue across the field of glowkra. The
@@ -30,7 +33,7 @@ A Field of Spadebrush~
 D0
 ||||~
 &y~
-I 6 10506 100.00 1  # FORAGE: handful of spadebrush seeds
+I 6 10506 100.00 25  # FORAGE: handful of spadebrush seeds
 I 8 10507 20.00 2 H  # HARVEST: bundle of spadebrush
 I 8 10507 20.00 3 H  # HARVEST: bundle of spadebrush
 I 8 10507 20.00 4 H  # HARVEST: bundle of spadebrush
@@ -38,7 +41,10 @@ I 8 10507 20.00 5 H  # HARVEST: bundle of spadebrush
 I 8 10507 20.00 6 H  # HARVEST: bundle of spadebrush
 I 8 10506 75.00 1 S  # HARVEST: handful of spadebrush seeds
 I 8 10506 25.00 2 S  # HARVEST: handful of spadebrush seeds
-I 9 121 100.00 1  # GATHER: sticks and leaves
+I 9 121 100.00 50  # GATHER: sticks and leaves
+U
+0
+Spades grow, fully-formed, from the soil!~
 X
 spadebrush spades field crop~
    These plants grow in neat rows, their branches twisted into perfect spades
@@ -54,7 +60,7 @@ A Field of Dragons' Teeth~
 D0
 ,,,,~
 &W~
-I 6 10536 100.00 1  # FORAGE: ashes
+I 6 10536 100.00 25  # FORAGE: ashes
 I 8 10504 20.00 2 H  # HARVEST: dragon's tooth
 I 8 10504 20.00 3 H  # HARVEST: dragon's tooth
 I 8 10504 20.00 4 H  # HARVEST: dragon's tooth
@@ -76,6 +82,9 @@ M
 10514 5.00 0
 M
 10509 5.00 0
+U
+0
+White teeth chomp their way up from the dirt!~
 X
 teeth tooth field bones crop~
    The sight of this field sends a shiver down your spine. From the earth,
@@ -98,7 +107,7 @@ D0
 D0
 ||||~
 &w~
-I 6 10509 100.00 1  # FORAGE: handful of bladegrass seeds
+I 6 10509 100.00 25  # FORAGE: handful of bladegrass seeds
 I 8 10510 20.00 2 H  # HARVEST: bushel of bladegrass
 I 8 10510 20.00 3 H  # HARVEST: bushel of bladegrass
 I 8 10510 20.00 4 H  # HARVEST: bushel of bladegrass
@@ -106,6 +115,9 @@ I 8 10510 20.00 5 H  # HARVEST: bushel of bladegrass
 I 8 10510 20.00 6 H  # HARVEST: bushel of bladegrass
 I 8 10509 75.00 1 S  # HARVEST: handful of bladegrass seeds
 I 8 10509 25.00 2 S  # HARVEST: handful of bladegrass seeds
+U
+0
+Blades of grass cut their way from the soil and glimmer in the light.~
 X
 bladegrass grass field crop~
    The blades of this odd grass are thin and pointed, like the edge of a razor.
@@ -133,12 +145,15 @@ D0
 D0
 /&Mo&g/&Mo~
 &g~
-I 6 10513 100.00 1  # FORAGE: unripe gemfruit
+I 6 10513 100.00 25  # FORAGE: unripe gemfruit
 I 8 10514 20.00 2 H  # HARVEST: basket of sparkling gemfruits
 I 8 10514 20.00 3 H  # HARVEST: basket of sparkling gemfruits
 I 8 10514 20.00 4 H  # HARVEST: basket of sparkling gemfruits
 I 8 10514 20.00 5 H  # HARVEST: basket of sparkling gemfruits
 I 8 10514 20.00 6 H  # HARVEST: basket of sparkling gemfruits
+U
+0
+Small bushes bloom up out of the soil as fruits of many colors form atop them!~
 X
 gemfruits fruits gems field bushes crop~
    As you gaze upon the field of bushes, you see an array of multi-colored
@@ -157,12 +172,15 @@ A Patch of Magic Mushrooms~
 D0
 nnnn~
 &0~
-I 6 10515 100.00 1  # FORAGE: magic mushroom
+I 6 10515 100.00 25  # FORAGE: magic mushroom
 I 8 10516 20.00 2 H  # HARVEST: basket of magic mushrooms
 I 8 10516 20.00 3 H  # HARVEST: basket of magic mushrooms
 I 8 10516 20.00 4 H  # HARVEST: basket of magic mushrooms
 I 8 10516 20.00 5 H  # HARVEST: basket of magic mushrooms
 I 8 10516 20.00 6 H  # HARVEST: basket of magic mushrooms
+U
+0
+Mushrooms grow from the soil all around you, forming a ring!~
 X
 mushrooms magic patch crop~
    These mushrooms are unlike any you've ever seen. The caps are dull gray, but
@@ -193,11 +211,14 @@ o^^^~
 D0
 ^^^^~
 &y~
-I 6 10521 1.00 1 a  # FORAGE: fig leaf
-I 6 10518 100.00 1 a  # FORAGE: unripe fig
+I 6 10521 1.00 25 a  # FORAGE: fig leaf
+I 6 10518 100.00 25 a  # FORAGE: unripe fig
 I 7 10519 100.00 14  # PICK: basket of pudding figs
-I 9 121 100.00 1  # GATHER: sticks and leaves
+I 9 121 100.00 50  # GATHER: sticks and leaves
 I 20 120 100.00 1  # CHOP: large tree
+U
+0
+Creamy trees climb from the soil, each one sporting a cluster of golden figs!~
 X
 figs pudding fruit trees crop~
    Even before you approach the orchard of pudding fig trees, you notice their
@@ -215,10 +236,13 @@ A Giant Beanstalk~
 D0
 &?.&g||&?.~
 &g~
-I 6 10523 100.00 1  # FORAGE: handful of magic beans
+I 6 10523 100.00 25  # FORAGE: handful of magic beans
 I 8 10537 100.00 1  # HARVEST: giant beanstalk
 I 8 10523 75.00 1 S  # HARVEST: handful of magic beans
 I 8 10523 25.00 2 S  # HARVEST: handful of magic beans
+U
+0
+An enormous beanstalk shoots up from the ground, twisting its way to the sky!~
 X
 beanstalks stalks beans plants crop~
    This towering plant is easily ten times your height, its thick stalk
@@ -235,12 +259,15 @@ A Plot of Axeroot~
 D0
 vvvv~
 &b~
-I 6 10524 100.00 1  # FORAGE: axeroot leaves
+I 6 10524 100.00 25  # FORAGE: axeroot leaves
 I 8 10525 20.00 2 H  # HARVEST: axeroot
 I 8 10525 20.00 3 H  # HARVEST: axeroot
 I 8 10525 20.00 4 H  # HARVEST: axeroot
 I 8 10525 20.00 5 H  # HARVEST: axeroot
 I 8 10525 20.00 6 H  # HARVEST: axeroot
+U
+0
+Woody stems grow instantly from the ground, each angled like an axe handle!~
 X
 axeroot roots plot field crop~
    This plant is unlike any you've ever seen, its thick root system branching
@@ -264,12 +291,15 @@ D0
 D0
 &?..&g\&yo~
 &g~
-I 6 10528 100.00 1  # FORAGE: crunchy chowberries
+I 6 10528 100.00 25  # FORAGE: crunchy chowberries
 I 8 10529 20.00 2 H  # HARVEST: puppy pod
 I 8 10529 20.00 3 H  # HARVEST: puppy pod
 I 8 10529 20.00 4 H  # HARVEST: puppy pod
 I 8 10529 20.00 5 H  # HARVEST: puppy pod
 I 8 10529 20.00 6 H  # HARVEST: puppy pod
+U
+0
+Huge cabbage heads grow down the rows of the field!~
 X
 plants puppies puppy cabbage field crop~
    The sight of these cabbage-like pods is instantly heartwarming: each pod
@@ -288,7 +318,7 @@ D0
 D0
 &?.&rL&?..~
 &g~
-I 6 10531 100.00 1  # FORAGE: red pickthorn fruit
+I 6 10531 100.00 25  # FORAGE: red pickthorn fruit
 I 8 10532 20.00 2 H  # HARVEST: pickthorn stalk
 I 8 10532 20.00 3 H  # HARVEST: pickthorn stalk
 I 8 10532 20.00 4 H  # HARVEST: pickthorn stalk
@@ -296,7 +326,10 @@ I 8 10532 20.00 5 H  # HARVEST: pickthorn stalk
 I 8 10532 20.00 6 H  # HARVEST: pickthorn stalk
 I 8 10531 75.00 1 S  # HARVEST: red pickthorn fruit
 I 8 10531 25.00 2 S  # HARVEST: red pickthorn fruit
-I 9 132 100.00 1  # GATHER: thorny branches
+I 9 132 100.00 50  # GATHER: thorny branches
+U
+0
+Crooked, thorny stems spring out of the soil!~
 X
 pickthorn thorns patch plants crop~
    The pickthorn bushes stand tall and proud, with thin and spindly branches
@@ -320,7 +353,7 @@ D0
 D0
 ..&&&&~
 &g~
-I 6 3015 100.00 1  # FORAGE: red berries
+I 6 3015 100.00 25  # FORAGE: red berries
 I 8 10535 20.00 2 H  # HARVEST: bundle of vigilant vines
 I 8 10535 20.00 3 H  # HARVEST: bundle of vigilant vines
 I 8 10535 20.00 4 H  # HARVEST: bundle of vigilant vines
@@ -330,6 +363,9 @@ M
 10515 50.00 e
 M
 10516 0.50 d
+U
+0
+The plants come to life as vines rise out of the soil!~
 X
 vines vigilant field plants crop~
    Vigilant Vines are a special type of plant that act as guardians to the
@@ -349,7 +385,7 @@ A Patch of Rhubarb~
 D0
 rrrr~
 &j~
-I 6 10552 100.00 1  # FORAGE: arctic brambleberries
+I 6 10552 100.00 25  # FORAGE: arctic brambleberries
 I 8 10551 20.00 2 H  # HARVEST: bunch of rhubarb
 I 8 10551 20.00 3 H  # HARVEST: bunch of rhubarb
 I 8 10551 20.00 4 H  # HARVEST: bunch of rhubarb
@@ -367,6 +403,9 @@ M
 10557 5.00 0
 M
 10558 5.00 0
+U
+0
+Leafy red stalks grow before your very eyes!~
 X
 rhubarb patch plants crop~
    The field is filled with rows of stout, leafy plants that reach up to the
@@ -387,7 +426,7 @@ A Dell of Frost Ferns~
 D0
 @@@@~
 &W~
-I 6 10552 100.00 1  # FORAGE: arctic brambleberries
+I 6 10552 100.00 25  # FORAGE: arctic brambleberries
 I 8 10561 50.00 1 H  # HARVEST: bouquet of frost ferns
 I 8 10561 50.00 2 H  # HARVEST: bouquet of frost ferns
 M
@@ -402,6 +441,9 @@ M
 10557 5.00 0
 M
 10558 5.00 0
+U
+0
+You watch in amazement as white ferns unfurl themselves across the field!~
 X
 ferns frost dell plants crop~
    The ferns are a sight to behold - small, delicate, and as white as freshly

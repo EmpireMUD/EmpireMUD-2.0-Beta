@@ -4,7 +4,7 @@ a studded whip~
 A studded leather whip is lying on the ground.~
 This whip has been studded with bolts at the end to make it more intimidating!
 ~
-1 mo an 0 2
+1 mo an 0 0 2
 0 1 7
 7 0
 A
@@ -17,7 +17,7 @@ A razor-studded whip is snaked out on the ground.~
    The end of this whip has been lined with razors! Surely no one will want to
 stand in striking range.
 ~
-1 imo an 0 2
+1 imo an 0 0 2
 0 1 7
 7 0
 A
@@ -29,7 +29,7 @@ an arming sword~
 An arming sword is lying here.~
 This is the standard weapon of the age: the arming sword.
 ~
-1 eimo ano 0 1
+1 eimo ano 0 0 1
 0 1 1
 2 0
 C
@@ -41,7 +41,7 @@ a falchion~
 A falchion is lying here.~
 This is a finely-crafted falchion, perfectly weighted for powerful slashes.
 ~
-1 emo ano 0 1
+1 emo ano 0 0 1
 0 4 1
 2 0
 A
@@ -53,7 +53,7 @@ a battle axe~
 A battle axe is stuck into the ground.~
 The battle axe is one of mankind's oldest, most familiar weapons.
 ~
-1 ehmo an a 2
+1 ehmo an a 0 2
 0 6 2
 2 0
 A
@@ -66,7 +66,7 @@ A great axe has been left here.~
    This axe is huge, and heavy, and it looks like you could split someone in
 half with it.
 ~
-1 ehmo an a 2
+1 ehmo an a 0 2
 0 5 2
 2 0
 A
@@ -78,7 +78,7 @@ a pike~
 A long pike is standing here.~
 The pike is a very long spear, and you only want to be on this end of it.
 ~
-1 ehmo an b 4
+1 ehmo an b 0 4
 0 5 3
 2 0
 A
@@ -97,7 +97,7 @@ A glaive is lying on the ground.~
    The glaive is an elaborate spear, mounted on a strong pole and absolutely
 fearsome. Many a foe has fallen to such a weapon.
 ~
-1 ehmo an b 4
+1 ehmo an b 0 4
 0 5 3
 2 0
 A
@@ -117,7 +117,7 @@ a dagger~
 A dagger is lying here.~
 The dagger is small and concealable, but sharp enough to be deadly.
 ~
-1 imo ano f 3
+1 imo ano f 0 3
 0 5 4
 2 0
 A
@@ -131,7 +131,7 @@ a deadly kris~
 A deadly kris is sticking out of the ground.~
 The kris is a flame-bladed dagger with deadly speed.
 ~
-1 mo ano f 2
+1 mo ano f 0 2
 0 3 4
 2 0
 A
@@ -143,7 +143,7 @@ a mace~
 A heavy mace has been dropped here.~
 The mace is a powerful weapon of war, capable of crushing armor.
 ~
-1 ehmo an 0 1
+1 ehmo an 0 0 1
 0 1 5
 2 0
 C
@@ -155,7 +155,7 @@ a brutal maul~
 A maul is lying on the ground.~
 The maul is a cross between a large axe and a larger hammer.
 ~
-1 emo an 0 1
+1 emo an 0 0 1
 0 3 5
 2 0
 A
@@ -167,9 +167,15 @@ a pickaxe~
 A pickaxe is laying here.~
 The pickaxe is both weapon and tool.
 ~
-1 ehmo an h 2
+1 ehmo an h 0 3
 0 1 8
 2 0
+M
+26
+You swing $p at the wall, looking for ore.~
+M
+27
+$n swings $p at the wall, looking for ore.~
 S
 #2213
 pick horseman's horsemans~
@@ -178,11 +184,17 @@ A horseman's pick is lying on the ground.~
    The horseman's pick is a pick mounted on a long, strong pole. It's meant for
 taking men off of horses, but it's equally effective at penetrating armor.
 ~
-1 eimo an h 2
+1 eimo an h 0 3
 0 3 8
 2 0
 A
 2 1 0
+M
+26
+You swing $p at the wall, looking for ore.~
+M
+27
+$n swings $p at the wall, looking for ore.~
 S
 #2214
 spear bronze~
@@ -190,7 +202,7 @@ a bronze spear~
 A bronze spear is planted in the ground.~
 This bronze spear is somewhat crude, but effective.
 ~
-1 ehmo an b 5
+1 ehmo an b 0 5
 0 5 3
 13 0
 A
@@ -208,7 +220,7 @@ a bronze knife~
 A bronze knife is jabbed into the ground.~
 This small bronze knife is quite sharp.
 ~
-1 mo ano f 3
+1 mo ano f 0 3
 0 5 4
 13 0
 A
@@ -220,7 +232,7 @@ a bronze mace~
 A bronze mace is lying here.~
 The mace is a powerful weapon of war, capable of crushing armor.
 ~
-1 ehmo an 0 2
+1 ehmo an 0 0 2
 0 1 5
 13 0
 A
@@ -232,7 +244,7 @@ a bronze axe~
 A bronze axe is stuck into the ground.~
 This bronze axe looks well-worn.
 ~
-1 ehmo an a 3
+1 ehmo an a 0 3
 0 6 2
 13 0
 S
@@ -242,7 +254,7 @@ a rawhide whip~
 A rawhide whip has been left on the ground.~
 The rawhide whip is firm and strong.
 ~
-1 mo an 0 2
+1 mo an 0 0 2
 0 1 7
 7 0
 A
@@ -255,7 +267,7 @@ An iron smith's hammer is lying here.~
    The hammer looks like it would be good for forging. Or, in a pinch, it would
 do in battle.
 ~
-1 hmo ano c 2
+1 hmo ano c 0 2
 0 1 6
 2 0
 S
@@ -265,7 +277,7 @@ an iron shovel~
 A shovel is stamped into the ground.~
 A shovel helps you dig or excavate faster.
 ~
-1 ehm ano o 2
+1 ehm ano o 0 2
 0 1 5
 2 0
 S
@@ -276,7 +288,7 @@ A mighty claymore is lying here.~
    This finely crafted two-handed sword looks like it could do some serious
 damage.
 ~
-1 ehmno an 0 1
+1 ehmno an 0 0 1
 0 4 1
 2 0
 A
@@ -290,7 +302,7 @@ a bronze scythe~
 A bronze scythe is leaning here.~
 The bronze scythe has a long, curving handle and a vicious curved blade.
 ~
-1 ehmo an d 9
+1 ehmo an d 0 9
 0 1 1
 13 0
 S
@@ -301,7 +313,7 @@ An iron sickle is lying here.~
    The sickle has a sharp, curved blade that functions equally well reaping
 grains as reaping foes.
 ~
-1 hmo an d 10
+1 hmo an d 0 10
 0 1 1
 2 0
 A
@@ -315,10 +327,28 @@ A reaping scythe is leaning here.~
 grain, but in times of war it's common for tools like this to be upgraded for
 use on the battlefield.
 ~
-1 ehmo an d 11
+1 ehmo an d 0 11
 0 1 1
 2 0
 A
 1 2 0
+S
+#2225
+pole metal~
+a metal pole~
+A metal pole is lying here.~
+   This heavy metal pole could be used to hole up a tent or create a handle, or
+lots of other things.
+~
+1 0 an 0 0 6
+0 2 5
+2 0
+C
+1 1
+O+ 1 6035
+R
+4 5121 0
+R
+4 5610 0
 S
 $

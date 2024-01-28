@@ -2,15 +2,13 @@
 *   File: morph.c                                         EmpireMUD 2.0b5 *
 *  Usage: morph loading, saving, and OLC                                  *
 *                                                                         *
-*  EmpireMUD code base by Paul Clarke, (C) 2000-2015                      *
+*  EmpireMUD code base by Paul Clarke, (C) 2000-2024                      *
 *  All rights reserved.  See license.doc for complete information.        *
 *                                                                         *
 *  EmpireMUD based upon CircleMUD 3.0, bpl 17, by Jeremy Elson.           *
 *  CircleMUD (C) 1993, 94 by the Trustees of the Johns Hopkins University *
 *  CircleMUD is based on DikuMUD, Copyright (C) 1990, 1991.               *
 ************************************************************************ */
-
-#include <math.h>
 
 #include "conf.h"
 #include "sysdep.h"
@@ -263,6 +261,7 @@ void finish_morphing(char_data *ch, morph_data *morph) {
 	
 	if (morph && MORPH_ABILITY(morph) != NO_ABIL) {
 		gain_ability_exp(ch, MORPH_ABILITY(morph), 33.4);
+		run_ability_hooks(ch, AHOOK_ABILITY, MORPH_ABILITY(morph), 0, ch, NULL, NULL, NULL, NOBITS);
 	}
 
 	// update msdp
@@ -324,19 +323,22 @@ const char *get_morph_desc(char_data *ch, bool long_desc_if_true) {
 */
 bool morph_affinity_ok(room_data *location, morph_data *morph) {
 	bool ok = TRUE;
+	bitvector_t climate;
 	
 	// shortcut
 	if (!morph) {
 		return TRUE;
 	}
 	
-	if (MORPH_FLAGGED(morph, MORPHF_TEMPERATE_AFFINITY) && !IS_SET(GET_SECT_CLIMATE(SECT(location)), CLIM_TEMPERATE)) {
+	climate = get_climate(location);
+	
+	if (MORPH_FLAGGED(morph, MORPHF_TEMPERATE_AFFINITY) && !IS_SET(climate, CLIM_TEMPERATE)) {
 		ok = FALSE;
 	}
-	if (MORPH_FLAGGED(morph, MORPHF_ARID_AFFINITY) && !IS_SET(GET_SECT_CLIMATE(SECT(location)), CLIM_ARID)) {
+	if (MORPH_FLAGGED(morph, MORPHF_ARID_AFFINITY) && !IS_SET(climate, CLIM_ARID)) {
 		ok = FALSE;
 	}
-	if (MORPH_FLAGGED(morph, MORPHF_TROPICAL_AFFINITY) && !IS_SET(GET_SECT_CLIMATE(SECT(location)), CLIM_TROPICAL)) {
+	if (MORPH_FLAGGED(morph, MORPHF_TROPICAL_AFFINITY) && !IS_SET(climate, CLIM_TROPICAL)) {
 		ok = FALSE;
 	}
 	
@@ -354,9 +356,9 @@ void perform_morph(char_data *ch, morph_data *morph) {
 	double move_mod, health_mod, mana_mod;
 	
 	// read current pools
-	health_mod = (double) GET_HEALTH(ch) / GET_MAX_HEALTH(ch);
-	move_mod = (double) GET_MOVE(ch) / GET_MAX_MOVE(ch);
-	mana_mod = (double) GET_MANA(ch) / GET_MAX_MANA(ch);
+	health_mod = (double) GET_HEALTH(ch) / MAX(1, GET_MAX_HEALTH(ch));
+	move_mod = (double) GET_MOVE(ch) / MAX(1, GET_MAX_MOVE(ch));
+	mana_mod = (double) GET_MANA(ch) / MAX(1, GET_MAX_MANA(ch));
 	
 	// remove all existing morph effects
 	affect_from_char(ch, ATYPE_MORPH, FALSE);
@@ -376,7 +378,7 @@ void perform_morph(char_data *ch, morph_data *morph) {
 	
 	// in case this is called by something else while they're already morphing
 	if (!IS_NPC(ch) && GET_ACTION(ch) == ACT_MORPHING) {
-		GET_ACTION(ch) = ACT_NONE;
+		end_action(ch);
 	}
 }
 
@@ -413,6 +415,7 @@ bool audit_morph(morph_data *morph, char_data *ch) {
 	char temp[MAX_STRING_LENGTH];
 	struct apply_data *app;
 	bool problem = FALSE;
+	attack_message_data *amd = NULL;
 	obj_data *obj = NULL;
 	
 	if (MORPH_FLAGGED(morph, MORPHF_IN_DEVELOPMENT)) {
@@ -481,8 +484,12 @@ bool audit_morph(morph_data *morph, char_data *ch) {
 		olc_audit_msg(ch, MORPH_VNUM(morph), "Flagged CONSUME-OBJ but no object required");
 		problem = TRUE;
 	}
-	if (MORPH_ATTACK_TYPE(morph) == TYPE_RESERVED) {
+	if (MORPH_ATTACK_TYPE(morph) == ATTACK_RESERVED || !(amd = real_attack_message(MORPH_ATTACK_TYPE(morph)))) {
 		olc_audit_msg(ch, MORPH_VNUM(morph), "Invalid attack type");
+		problem = TRUE;
+	}
+	if (amd && !ATTACK_FLAGGED(amd, AMDF_MOBILE)) {
+		olc_audit_msg(ch, MORPH_VNUM(morph), "Attack type %d is not valid (it is missing the MOBILE flag)", MORPH_ATTACK_TYPE(morph));
 		problem = TRUE;
 	}
 	
@@ -656,7 +663,6 @@ void clear_morph(morph_data *morph) {
 	MORPH_VNUM(morph) = NOTHING;
 	MORPH_ABILITY(morph) = NO_ABIL;
 	MORPH_REQUIRES_OBJ(morph) = NOTHING;
-	MORPH_ATTACK_TYPE(morph) = TYPE_HIT;
 	MORPH_SIZE(morph) = SIZE_NORMAL;
 }
 
@@ -1059,7 +1065,7 @@ void do_stat_morph(char_data *ch, morph_data *morph) {
 		size += snprintf(buf + size, sizeof(buf) - size, "Requires item: [%d] \tg%s\t0\r\n", MORPH_REQUIRES_OBJ(morph), skip_filler(get_obj_name_by_proto(MORPH_REQUIRES_OBJ(morph))));
 	}
 	
-	size += snprintf(buf + size, sizeof(buf) - size, "Attack type: \ty%s\t0, Move type: \ty%s\t0, Size: \ty%s\t0\r\n", attack_hit_info[MORPH_ATTACK_TYPE(morph)].name, mob_move_types[MORPH_MOVE_TYPE(morph)], size_types[MORPH_SIZE(morph)]);
+	size += snprintf(buf + size, sizeof(buf) - size, "Attack type: \ty%d %s\t0, Move type: \ty%s\t0, Size: \ty%s\t0\r\n", MORPH_ATTACK_TYPE(morph), get_attack_name_by_vnum(MORPH_ATTACK_TYPE(morph)), mob_move_types[MORPH_MOVE_TYPE(morph)], size_types[MORPH_SIZE(morph)]);
 	
 	sprintbit(MORPH_FLAGS(morph), morph_flags, part, TRUE);
 	size += snprintf(buf + size, sizeof(buf) - size, "Flags: \tg%s\t0\r\n", part);
@@ -1109,7 +1115,7 @@ void olc_show_morph(char_data *ch) {
 	sprintbit(MORPH_FLAGS(morph), morph_flags, lbuf, TRUE);
 	sprintf(buf + strlen(buf), "<%sflags\t0> %s\r\n", OLC_LABEL_VAL(MORPH_FLAGS(morph), MORPHF_IN_DEVELOPMENT), lbuf);
 	
-	sprintf(buf + strlen(buf), "<%sattack\t0> %s\r\n", OLC_LABEL_VAL(MORPH_ATTACK_TYPE(morph), 0), attack_hit_info[MORPH_ATTACK_TYPE(morph)].name);
+	sprintf(buf + strlen(buf), "<%sattack\t0> %d %s\r\n", OLC_LABEL_VAL(MORPH_ATTACK_TYPE(morph), 0), MORPH_ATTACK_TYPE(morph), get_attack_name_by_vnum(MORPH_ATTACK_TYPE(morph)));
 	sprintf(buf + strlen(buf), "<%smovetype\t0> %s\r\n", OLC_LABEL_VAL(MORPH_MOVE_TYPE(morph), 0), mob_move_types[MORPH_MOVE_TYPE(morph)]);
 	sprintf(buf + strlen(buf), "<%ssize\t0> %s\r\n", OLC_LABEL_VAL(MORPH_SIZE(morph), SIZE_NORMAL), size_types[MORPH_SIZE(morph)]);
 
@@ -1221,7 +1227,21 @@ OLC_MODULE(morphedit_apply) {
 
 OLC_MODULE(morphedit_attack) {
 	morph_data *morph = GET_OLC_MORPH(ch->desc);
-	MORPH_ATTACK_TYPE(morph) = olc_process_type(ch, argument, "attack type", "attack", (const char**)get_weapon_types_string(), MORPH_ATTACK_TYPE(morph));
+	attack_message_data *amd;
+	
+	if (!*argument) {
+		msg_to_char(ch, "Set the attack type to what attack message (vnum or name)?\r\n");
+	}
+	else if (!(amd = find_attack_message_by_name_or_vnum(argument, FALSE))) {
+		msg_to_char(ch, "Unknown attack message '%s'.\r\n", argument);
+	}
+	else if (!ATTACK_FLAGGED(amd, AMDF_MOBILE)) {
+		msg_to_char(ch, "That attack type is not available on morphs.\r\n");
+	}
+	else {
+		MORPH_ATTACK_TYPE(morph) = ATTACK_VNUM(amd);
+		msg_to_char(ch, "Attack type set to [%d] %s.\r\n", ATTACK_VNUM(amd), ATTACK_NAME(amd));
+	}
 }
 
 

@@ -2,7 +2,7 @@
 *   File: ban.c                                           EmpireMUD 2.0b5 *
 *  Usage: banning/unbanning/checking sites and player names               *
 *                                                                         *
-*  EmpireMUD code base by Paul Clarke, (C) 2000-2015                      *
+*  EmpireMUD code base by Paul Clarke, (C) 2000-2024                      *
 *  All rights reserved.  See license.doc for complete information.        *
 *                                                                         *
 *  EmpireMUD based upon CircleMUD 3.0, bpl 17, by Jeremy Elson.           *
@@ -158,9 +158,10 @@ ACMD(do_ban) {
 
 	CREATE(ban_node, struct ban_list_element, 1);
 	strncpy(ban_node->site, site, BANNED_SITE_LENGTH);
-	for (nextchar = ban_node->site; *nextchar; nextchar++)
-		*nextchar = LOWER(*nextchar);
 	ban_node->site[BANNED_SITE_LENGTH] = '\0';
+	for (nextchar = ban_node->site; *nextchar; nextchar++) {
+		*nextchar = LOWER(*nextchar);
+	}
 	strncpy(ban_node->name, GET_NAME(ch), MAX_NAME_LENGTH);
 	ban_node->name[MAX_NAME_LENGTH] = '\0';
 	ban_node->date = time(0);

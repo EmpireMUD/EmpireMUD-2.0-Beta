@@ -2,7 +2,7 @@
 *   File: statistics.c                                    EmpireMUD 2.0b5 *
 *  Usage: code related game stats                                         *
 *                                                                         *
-*  EmpireMUD code base by Paul Clarke, (C) 2000-2015                      *
+*  EmpireMUD code base by Paul Clarke, (C) 2000-2024                      *
 *  All rights reserved.  See license.doc for complete information.        *
 *                                                                         *
 *  EmpireMUD based upon CircleMUD 3.0, bpl 17, by Jeremy Elson.           *
@@ -19,6 +19,7 @@
 #include "comm.h"
 #include "handler.h"
 #include "constants.h"
+#include "skills.h"
 
 /**
 * Contents:
@@ -195,6 +196,115 @@ void display_statistics_to_char(char_data *ch) {
 
 
 /**
+* do_mudstats: show configurations
+*
+* @param char_data *ch Person to show it to.
+* @param char *argument In case some stats have sub-categories.
+*/
+void mudstats_configs(char_data *ch, char *argument) {
+	char output[MAX_STRING_LENGTH * 2], part[256];
+	
+	// start output
+	snprintf(output, sizeof(output), "Game configuration for %s:\r\n", config_get_string("mud_name"));
+	
+	// status/hiring
+	snprintf(output + strlen(output), sizeof(output) - strlen(output), "Status: %s", config_get_string("mud_status"));
+	if (config_get_bool("hiring_builders") || config_get_bool("hiring_coders")) {
+		snprintf(output + strlen(output), sizeof(output) - strlen(output), ", Hiring: %s", (config_get_bool("hiring_builders") && config_get_bool("hiring_coders")) ? "builders and coders" : (config_get_bool("hiring_builders") ? "builders" : "coders"));
+	}
+	snprintf(output + strlen(output), sizeof(output) - strlen(output), "\r\n");
+	
+	// time
+	snprintf(output + strlen(output), sizeof(output) - strlen(output), "Game time: %.2f minutes per game hour, %.2f hours per day, %.2f days per year\r\n", SECS_PER_MUD_HOUR / (double)SECS_PER_REAL_MIN, SECS_PER_MUD_DAY / (double) SECS_PER_REAL_HOUR, SECS_PER_MUD_YEAR / (double) SECS_PER_REAL_DAY);
+	
+	// skills
+	snprintf(output + strlen(output), sizeof(output) - strlen(output), "Skills: %d at %d, %d at %d, %d total\r\n", config_get_int("skills_at_max_level"), MAX_SKILL_CAP, config_get_int("skills_at_specialty_level"), SPECIALTY_SKILL_CAP, config_get_int("skills_per_char"));
+	
+	// environment
+	snprintf(output + strlen(output), sizeof(output) - strlen(output), "Environment: %s\r\n", config_get_bool("temperature_penalties") ? "temperature penalties" : "no penalties from temperature");
+	
+	// pk
+	prettier_sprintbit(config_get_bitvector("pk_mode"), pk_modes, part);
+	snprintf(output + strlen(output), sizeof(output) - strlen(output), "Player-killing: %s\r\n", config_get_bitvector("pk_mode") ? part : "forbidden");
+	
+	// war
+	snprintf(output + strlen(output), sizeof(output) - strlen(output), "War: %d offense%s required%s\r\n", config_get_int("offense_min_to_war"), PLURAL(config_get_int("offense_min_to_war")), config_get_bool("mutual_war_only") ? ", wars must be mutual" : "");
+	
+	// city
+	snprintf(output + strlen(output), sizeof(output) - strlen(output), "Cities: %d minutes to establish, %d tiles apart (%d for allies)\r\n", config_get_int("minutes_to_full_city"), config_get_int("min_distance_between_cities"), config_get_int("min_distance_between_ally_cities"));
+	
+	// storage
+	snprintf(output + strlen(output), sizeof(output) - strlen(output), "Storage: %s\r\n", config_get_bool("decay_in_storage") ? "items decay" : "no decay");
+	
+	// workforce
+	snprintf(output + strlen(output), sizeof(output) - strlen(output), "Workforce: %d cap per member, %d minimum cap per island, %d tile range\r\n", config_get_int("max_chore_resource_per_member"), config_get_int("max_chore_resource_over_total"), config_get_int("chore_distance"));
+	
+	// newbie island
+	snprintf(output + strlen(output), sizeof(output) - strlen(output), "Newbie islands: %s", config_get_bool("cities_on_newbie_islands") ? "allow cities" : "no cities allowed");
+	if (config_get_int("newbie_island_day_limit") > 0) {
+		snprintf(output + strlen(output), sizeof(output) - strlen(output), ", %d day limit", config_get_int("newbie_island_day_limit"));
+	}
+	if (config_get_bool("naturalize_newbie_islands")) {
+		snprintf(output + strlen(output), sizeof(output) - strlen(output), ", naturalized each year");
+	}
+	snprintf(output + strlen(output), sizeof(output) - strlen(output), "\r\n");
+	
+	// approval
+	snprintf(output + strlen(output), sizeof(output) - strlen(output), "Approval: %s%s", config_get_bool("auto_approve") ? "automatic" : "required", config_get_bool("approve_per_character") ? " (per character)" : "");
+	if (!config_get_bool("auto_approve")) {
+		snprintf(output + strlen(output), sizeof(output) - strlen(output), ", needed for:");
+		if (config_get_bool("build_approval")) {
+			snprintf(output + strlen(output), sizeof(output) - strlen(output), " building");
+		}
+		if (config_get_bool("chat_approval")) {
+			snprintf(output + strlen(output), sizeof(output) - strlen(output), " chatting");
+		}
+		if (config_get_bool("craft_approval")) {
+			snprintf(output + strlen(output), sizeof(output) - strlen(output), " crafting");
+		}
+		if (config_get_bool("event_approval")) {
+			snprintf(output + strlen(output), sizeof(output) - strlen(output), " events");
+		}
+		if (config_get_bool("gather_approval")) {
+			snprintf(output + strlen(output), sizeof(output) - strlen(output), " gathering");
+		}
+		if (config_get_bool("join_empire_approval")) {
+			snprintf(output + strlen(output), sizeof(output) - strlen(output), " empires");
+		}
+		if (config_get_bool("quest_approval")) {
+			snprintf(output + strlen(output), sizeof(output) - strlen(output), " quests");
+		}
+		if (config_get_bool("skill_gain_approval")) {
+			snprintf(output + strlen(output), sizeof(output) - strlen(output), " skills");
+		}
+		if (config_get_bool("tell_approval")) {
+			snprintf(output + strlen(output), sizeof(output) - strlen(output), " tells");
+		}
+		if (config_get_bool("terraform_approval")) {
+			snprintf(output + strlen(output), sizeof(output) - strlen(output), " terraforming");
+		}
+		if (config_get_bool("title_approval")) {
+			snprintf(output + strlen(output), sizeof(output) - strlen(output), " title");
+		}
+		if (config_get_bool("travel_approval")) {
+			snprintf(output + strlen(output), sizeof(output) - strlen(output), " travel");
+		}
+		if (config_get_bool("write_approval")) {
+			snprintf(output + strlen(output), sizeof(output) - strlen(output), " writing");
+		}
+	}
+	snprintf(output + strlen(output), sizeof(output) - strlen(output), "\r\n");
+	
+	// timeouts
+	snprintf(output + strlen(output), sizeof(output) - strlen(output), "Timeouts: %d days for newbies, up to %d days after %d hours of playtime\r\n", config_get_int("member_timeout_newbie"), config_get_int("member_timeout_full"), config_get_int("member_timeout_max_threshold"));
+	
+	if (ch->desc) {
+		page_string(ch->desc, output, TRUE);
+	}
+}
+
+
+/**
 * do_mudstats: empire score averages
 *
 * @param char_data *ch Person to show it to.
@@ -207,6 +317,43 @@ void mudstats_empires(char_data *ch, char *argument) {
 	
 	for (iter = 0; iter < NUM_SCORES; ++iter) {
 		msg_to_char(ch, " %s: %d\r\n", score_type[iter], (int) empire_score_average[iter]);
+	}
+}
+
+
+/**
+* do_mudstats: time until certain events
+*
+* @param char_data *ch Person to show it to.
+* @param char *argument In case some stats have sub-categories.
+*/
+void mudstats_time(char_data *ch, char *argument) {
+	char output[MAX_STRING_LENGTH * 2];
+	long when;
+	
+	// start output
+	snprintf(output, sizeof(output), "Time until:\r\n");
+	
+	// daily reset
+	when = (data_get_long(DATA_DAILY_CYCLE) + SECS_PER_REAL_DAY) - time(0);
+	if (when > 0) {
+		snprintf(output + strlen(output), sizeof(output) - strlen(output), "Daily quest and bonus cycle: %s%s\r\n", colon_time(when, FALSE, NULL), (when < 60 ? " seconds" : ""));
+	}
+	else {
+		snprintf(output + strlen(output), sizeof(output) - strlen(output), "Daily quest and bonus cycle: imminent\r\n");
+	}
+	
+	// maintenance cycle
+	when = (data_get_long(DATA_LAST_NEW_YEAR) + (config_get_int("world_reset_hours") * SECS_PER_REAL_HOUR)) - time(0);
+	if (when > 0) {
+		snprintf(output + strlen(output), sizeof(output) - strlen(output), "World reset (maintenance and depletion): %s%s\r\n", colon_time(when, FALSE, NULL), (when < 60 ? " seconds" : ""));
+	}
+	else {
+		snprintf(output + strlen(output), sizeof(output) - strlen(output), "World reset (maintenance and depletion): imminent\r\n");
+	}
+	
+	if (ch->desc) {
+		page_string(ch->desc, output, TRUE);
 	}
 }
 

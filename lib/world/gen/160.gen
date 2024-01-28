@@ -1,0 +1,117 @@
+#16006
+long bone~
+6 a
+0 16006 0 0
+R 6560
+R 6035
+T0
+long bones~
+S
+#16020
+elder vampire invasion currency~
+5 0
+0 0 0 0
+T0
+vampire fang~
+T1
+vampire fangs~
+S
+#16029
+Blood chain~
+4 0
+0 0 0 0
+T0
+The blood chain about your body fades.~
+S
+#16030
+bloodmage self buff~
+3 0
+0 0 0 0
+S
+#16031
+bloodmage blood mist spell~
+3 0
+0 0 0 0
+S
+#16032
+bloodmage soulchain spell~
+3 0
+0 0 0 0
+S
+#16033
+bloodmage bite attack~
+3 0
+0 0 0 0
+S
+#16034
+bloodmage blood hammer spell~
+3 0
+0 0 0 0
+S
+#16035
+blood hammer stun~
+4 0
+0 0 0 0
+S
+#16036
+poison gas~
+4 0
+0 0 0 0
+T0
+The poison leaves your lungs.~
+S
+#16041
+hammerfist~
+4 0
+0 0 0 0
+S
+#16042
+whip choke~
+4 0
+0 0 0 0
+T0
+The whip is drawn back from your neck and you can breathe again.~
+T1
+The whip about $n's neck is removed and $s can breathe again.~
+S
+#16043
+bloodslave summon cooldown~
+3 0
+0 0 0 0
+S
+#16048
+dark blessing~
+4 0
+0 0 0 0
+T0
+Your dark blessing fades.~
+T2
+The dark priestess passes her ritual knife over your head and you feel empowered.~
+S
+#16049
+dark priestess healing cooldown~
+3 0
+0 0 0 0
+S
+#16050
+dark priestess accolite summon cooldown~
+3 0
+0 0 0 0
+S
+#16051
+dark priestess curse~
+4 0
+0 0 0 0
+T0
+The curse of the dark priestess lifts.~
+T2
+The dark priestess smirks and suddenly you feel pain spreading through your limbs.~
+T3
+The dark priestess smirks and suddenly $n winces in pain.~
+S
+#16091
+withering head debuff~
+4 0
+0 0 0 0
+S
+$

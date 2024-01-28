@@ -2,7 +2,7 @@
 *   File: olc.trigger.c                                   EmpireMUD 2.0b5 *
 *  Usage: OLC for triggers                                                *
 *                                                                         *
-*  EmpireMUD code base by Paul Clarke, (C) 2000-2015                      *
+*  EmpireMUD code base by Paul Clarke, (C) 2000-2024                      *
 *  All rights reserved.  See license.doc for complete information.        *
 *                                                                         *
 *  EmpireMUD based upon CircleMUD 3.0, bpl 17, by Jeremy Elson.           *
@@ -627,7 +627,7 @@ void olc_fullsearch_trigger(char_data *ch, char *argument) {
 		}
 	}
 	
-	if (count > 0 && (size + 14) < sizeof(buf)) {
+	if (count > 0 && (size + 20) < sizeof(buf)) {
 		size += snprintf(buf + size, sizeof(buf) - size, "(%d triggers)\r\n", count);
 	}
 	else if (count == 0) {
@@ -1022,7 +1022,7 @@ void olc_show_trigger(char_data *ch) {
 		sprintf(buf + strlen(buf), "<%sstring\t0> %s\r\n", OLC_LABEL_STR(trig->arglist, ""), NULLSAFE(trig->arglist));
 	}
 	if (IS_SET(trig_arg_types, TRIG_ARG_COST)) {
-		sprintf(buf + strlen(buf), "<%scosts\t0> %d other coins\r\n", OLC_LABEL_VAL(trig->narg, 0), trig->narg);
+		sprintf(buf + strlen(buf), "<%scosts\t0> %d misc coins\r\n", OLC_LABEL_VAL(trig->narg, 0), trig->narg);
 	}
 	
 	sprintf(buf + strlen(buf), "<%scommands\t0>\r\n%s", OLC_LABEL_STR(GET_OLC_STORAGE(ch->desc), ""), show_color_codes(NULLSAFE(GET_OLC_STORAGE(ch->desc))));
@@ -1137,7 +1137,7 @@ OLC_MODULE(tedit_types) {
 	trig_data *trig = GET_OLC_TRIGGER(ch->desc);	
 	bitvector_t old = GET_TRIG_TYPE(trig), diff;
 	
-	bitvector_t ignore_changes = MTRIG_GLOBAL | MTRIG_PLAYER_IN_ROOM | MTRIG_ALLOW_MULTIPLE | MTRIG_CHARMED;	// all types ignore global changes
+	bitvector_t ignore_changes = MTRIG_GLOBAL | MTRIG_PLAYER_IN_ROOM | MTRIG_ALLOW_MULTIPLE;	// all types ignore global changes
 	
 	// mobs also ignore changes to the charmed flag
 	if (trig->attach_type == MOB_TRIGGER) {

@@ -300,7 +300,7 @@ wait 10
 %echo% Chiv sinks into the shadows...
 set verify_target %actor.id%
 wait 30
-if %verify_target% != %actor.id%
+if %verify_target% != %actor.id% || %actor.room% != %self.room%
   %echo% ~%self% appears from the shadows, seemingly without doing anything?
   halt
 end
@@ -723,15 +723,9 @@ while %cycles_left% >= 0
       %send% %actor% You complete your chant, and the raincloud fills the sky!
       %echo% Thunder rolls across the sky as heavy drops of rain begin to fall.
       %load% obj 10144 %room%
-      if %actor.varexists(monsoon_chant_counter)%
-        eval monsoon_chant_counter %actor.monsoon_chant_counter)% + 1
-      else
-        set monsoon_chant_counter 1
-      end
-      remote monsoon_chant_counter %actor.id%
-      if %monsoon_chant_counter% >= 6
-        %quest% %actor% trigger 10147
-        %send% %actor% You have finished quenching the cacti, and should return to the druid.
+      %quest% %actor% trigger 10147
+      if %actor.quest_finished(10147)%
+        %send% %actor% You have finished quenching the cacti, and should return to the Archweaver.
         %send% %actor% Your monsoon totem splinters and breaks!
         %echoaround% %actor% |%actor% ironwood totem splinters and breaks!
         %purge% %self%
@@ -801,13 +795,14 @@ done
 Natural Magic: Cacti quench quest start~
 2 u 100
 ~
-set monsoon_chant_counter 0
-remote monsoon_chant_counter %actor.id%
 if !%actor.inventory(10143)%
   %load% obj 10143 %actor% inv
   set item %actor.inventory(10143)%
   %send% %actor% You receive @%item%.
 end
+* this was formerly used to track chants on the player
+* (it now tracks on the quest)
+rdelete monsoon_chant_counter %actor.id%
 ~
 #10148
 Monsoon cactus death tracker + reward~
@@ -1059,7 +1054,7 @@ while %cycles_left% >= 0
       %send% %actor% You discover an anecdote about a sorcerer who traveled through an older monsoon rift and discovered its source in the Magiterranean.
     break
     case 2
-      %send% %actor% You learn that the rifts are opened by common druids, but require training in High Sorcery because of their similarity to portals.
+      %send% %actor% You learn that the rifts are opened by common nature mages, but require training in High Sorcery because of their similarity to portals.
     break
     case 1
       %send% %actor% It seems as if you should be able to close the rift using Sorcery, if you can find a good spell in one of these books...
@@ -1178,7 +1173,7 @@ set person %loc.people%
 while %person%
   set next_person %person.next_in_room%
   if %person% != %self% && %person.vnum% == %self.vnum%
-    if !%person.aff_flagged(HIDE)%
+    if !%person.aff_flagged(HIDDEN)%
       if %hide_again%
         %echoaround% %person% ~%person% steps into the shadows and disappears.
       end
@@ -1191,7 +1186,7 @@ if %loc%
   mgoto %loc%
 end
 if %hide_again%
-  dg_affect %self% HIDE on -1
+  dg_affect %self% HIDDEN on -1
 end
 ~
 #10168
@@ -1372,7 +1367,7 @@ if (!(eclipse /= %arg%) || %actor.position% != Standing)
 end
 set room %actor.room%
 * Check time of day (only at start to avoid sunset annoyances)
-if %room.time(hour)% < 7 || %room.time(hour)% > 19
+if %room.sun% != light
   %send% %actor% You can only perform this ritual during the day.
   halt
 end
@@ -1422,7 +1417,7 @@ while %cycles_left% >= 0
       %echoaround% %actor% ~%actor% completes ^%actor% ritual!
       %send% %actor% You complete your ritual!
       * Echo the eclipse globally
-      %regionecho% %actor.room% -9999 A dark shadow covers the land as the sun is momentarily eclipsed.
+      %regionecho% %actor.room% -300 A dark shadow covers the land as the sun is momentarily eclipsed.
       %quest% %actor% trigger 10157
       %send% %actor% @%self% splinters and breaks!
       %echoaround% %actor% @%self% splinters and breaks!
@@ -1607,7 +1602,7 @@ done
 * Quest finish will purge the ritual object for us
 ~
 #10181
-Druid tent fake search~
+Archweaver tent fake search~
 2 c 0
 search~
 if (%actor.position% != Standing)
@@ -1641,24 +1636,24 @@ while %cycles_left% >= 0
   * Fake ritual messages
   switch %cycles_left%
     case 5
-      %echoaround% %actor% ~%actor% starts searching the druid's tent...
-      %send% %actor% You start searching the druid's tent...
+      %echoaround% %actor% ~%actor% starts searching the weaver's tent...
+      %send% %actor% You start searching the weaver's tent...
     break
     case 4
-      %echoaround% %actor% ~%actor% rummages through the druid's belongings...
-      %send% %actor% You rummage through the druid's belongings...
+      %echoaround% %actor% ~%actor% rummages through the weaver's belongings...
+      %send% %actor% You rummage through the weaver's belongings...
     break
     case 3
-      %echoaround% %actor% ~%actor% searches through the scrolls on the druid's shelves...
-      %send% %actor% You search through the scrolls on the druid's shelves...
+      %echoaround% %actor% ~%actor% searches through the scrolls on the weaver's shelves...
+      %send% %actor% You search through the scrolls on the weaver's shelves...
     break
     case 2
-      %echoaround% %actor% ~%actor% opens the druid's ironwood trunk and peers inside...
-      %send% %actor% You open the druid's ironwood trunk and peer inside...
+      %echoaround% %actor% ~%actor% opens the weaver's ironwood trunk and peers inside...
+      %send% %actor% You open the weaver's ironwood trunk and peer inside...
     break
     case 1
-      %echoaround% %actor% ~%actor% searches the druid's writing desk...
-      %send% %actor% You search the druid's writing desk...
+      %echoaround% %actor% ~%actor% searches the weaver's writing desk...
+      %send% %actor% You search the weaver's writing desk...
     break
     case 0
       %echoaround% %actor% ~%actor% completes ^%actor% search!

@@ -2,7 +2,7 @@
 *   File: comm.c                                          EmpireMUD 2.0b5 *
 *  Usage: Communication, socket handling, main(), central game loop       *
 *                                                                         *
-*  EmpireMUD code base by Paul Clarke, (C) 2000-2015                      *
+*  EmpireMUD code base by Paul Clarke, (C) 2000-2024                      *
 *  All rights reserved.  See license.doc for complete information.        *
 *                                                                         *
 *  EmpireMUD based upon CircleMUD 3.0, bpl 17, by Jeremy Elson.           *
@@ -69,7 +69,8 @@ int perform_alias(descriptor_data *d, char *orig);
 char *prompt_olc_info(char_data *ch);
 
 // heartbeat functions
-void check_idle_passwords();
+void check_idle_menu_users();
+void check_maintenance_and_depletion_reset();
 void check_newbie_islands();
 void check_wars();
 void chore_update();
@@ -77,6 +78,8 @@ void display_automessages();
 void frequent_combat(unsigned long pulse);
 void perform_requested_world_saves();
 void process_import_evolutions();
+void process_imports();
+void process_shipping();
 void process_theft_logs();
 void real_update();
 void reduce_city_overages();
@@ -93,6 +96,7 @@ void update_instance_world_size();
 void update_trading_post();
 void weather_and_time();
 void write_binary_world_index_updates();
+void write_book_library_file();
 void write_mapout_updates();
 void write_running_events_file();
 
@@ -143,15 +147,13 @@ bool block_all_saves_due_to_shutdown = FALSE;	// if TRUE, nothing can be saved t
 // vars to prevent running multiple cycles during a missed-pulse catch-up cycle
 bool catch_up_combat = FALSE;	// frequent_combat()
 bool catch_up_actions = FALSE;	// update_actions()
-bool catch_up_mobs = FALSE;		// prevents mobile activity from running repeatedly
-bool caught_up_mobs = FALSE;	// used to ensure mobile activity ran
 
 // vars for detecting slow IPs and preventing repeat-lag
 char **detected_slow_ips = NULL;
 int num_slow_ips = 0;
 
-/* Reboot data (default to a normal reboot once per week) */
-struct reboot_control_data reboot_control = { SCMD_REBOOT, 7.5 * (24 * 60), SHUTDOWN_NORMAL, FALSE };
+/* Reboot data (config autoreboot_minutes to set a default auto-reboot) */
+struct reboot_control_data reboot_control = { REBOOT_NONE, -1, SHUTDOWN_NORMAL, FALSE };
 
 
 #ifdef __CXREF__
@@ -307,7 +309,10 @@ void msdp_update_room(char_data *ch) {
 	MSDPSetTable(desc, eMSDP_ROOM_EXITS, exits);
 	
 	// other stuff that's room-based
-	MSDPSetString(desc, eMSDP_WORLD_SEASON, seasons[GET_SEASON(IN_ROOM(ch))]);
+	MSDPSetString(desc, eMSDP_WORLD_SEASON, icon_types[GET_SEASON(IN_ROOM(ch))]);
+	
+	// temperature likely changed too
+	update_MSDP_temperature(ch, TRUE, NO_UPDATE);
 	
 	MSDPUpdate(desc);
 }
@@ -624,18 +629,23 @@ void perform_reboot(void) {
 	int gsize = 0;
 	FILE *fl = NULL;
 	
+	if (reboot_control.type == REBOOT_NONE) {
+		// no reboot scheduled
+		return;
+	}
+	
 	*group_data = '\0';
 
-	if (reboot_control.type == SCMD_REBOOT && !(fl = fopen(REBOOT_FILE, "w"))) {
+	if (reboot_control.type == REBOOT_REBOOT && !(fl = fopen(REBOOT_FILE, "w"))) {
 		syslog(SYS_ERROR, LVL_START_IMM, TRUE, "SYSERR: Reboot file not writeable, aborting reboot");
 		reboot_control.time = -1;
 		return;
 	}
 
-	if (reboot_control.type == SCMD_REBOOT) {
+	if (reboot_control.type == REBOOT_REBOOT) {
 		sprintf(buf, "\r\n[0;0;31m *** Rebooting ***[0;0;37m\r\nPlease be patient, this will take a second.\r\n\r\n");
 	}
-	else if (reboot_control.type == SCMD_SHUTDOWN) {
+	else if (reboot_control.type == REBOOT_SHUTDOWN) {
 		sprintf(buf, "\r\n[0;0;31m *** Shutting Down ***[0;0;37m\r\nThe mud is shutting down, please reconnect later.\r\n\r\n");
 	}
 
@@ -650,17 +660,22 @@ void perform_reboot(void) {
 			continue;
 		}
 
-		if (reboot_control.type == SCMD_REBOOT && fl) {
+		if (reboot_control.type == REBOOT_REBOOT && fl) {
 			fprintf(fl, "%d %s %s %s\n", desc->descriptor, GET_NAME(och), desc->host, CopyoverGet(desc));
 		
 			if (GROUP(och) && GROUP_LEADER(GROUP(och))) {
-				gsize += snprintf(group_data + gsize, sizeof(group_data) - gsize, "G %d %d\n", GET_IDNUM(och), GET_IDNUM(GROUP_LEADER(GROUP(och))));
+				gsize += snprintf(group_data + gsize, sizeof(group_data) - gsize, "G %d %d %llu\n", GET_IDNUM(och), GET_IDNUM(GROUP_LEADER(GROUP(och))), GROUP(och)->group_flags);
 			}
+		}
+		
+		if (GET_ACTION(desc->character) == ACT_OVER_TIME_ABILITY) {
+			// these are not reboot-safe
+			cancel_action(desc->character);
 		}
 		
 		// send output
 		write_to_descriptor(desc->descriptor, buf);
-		if (reboot_control.type == SCMD_REBOOT) {
+		if (reboot_control.type == REBOOT_REBOOT) {
 			write_to_descriptor(desc->descriptor, reboot_strings[number(0, num_of_reboot_strings - 1)]);
 		}
 		
@@ -682,15 +697,15 @@ void perform_reboot(void) {
 		binary_map_fl = NULL;
 	}
 
-	if (reboot_control.type == SCMD_REBOOT && fl) {
-		fprintf(fl, "-1 ~ ~\n");
+	if (reboot_control.type == REBOOT_REBOOT && fl) {
+		fprintf(fl, "-1 ~ ~ ~\n");
 		fprintf(fl, "%s", group_data);
 		fprintf(fl, "$\n");
 		fclose(fl);
 	}
 
 	// If this is a reboot, restart the mud!
-	if (reboot_control.type == SCMD_REBOOT) {
+	if (reboot_control.type == REBOOT_REBOOT) {
 		log("Reboot: performing live reboot");
 		
 		chdir("..");
@@ -766,14 +781,14 @@ void update_reboot(void) {
 	char buf[MAX_STRING_LENGTH];
 	
 	// neverboot
-	if (reboot_control.time < 0) {
+	if (reboot_control.time < 0 || reboot_control.type == REBOOT_NONE) {
 		return;
 	}
 	
 	// otherwise...
 	reboot_control.time -= 1;
 
-	if (reboot_control.time <= 0 || reboot_control.immediate || (check_reboot_confirms() && reboot_control.time <= 15)) {
+	if (reboot_control.time <= 0 || reboot_control.immediate || (check_reboot_confirms() && reboot_control.time <= config_get_int("reboot_warning_minutes"))) {
 		perform_reboot();
 		return;
 	}
@@ -781,14 +796,14 @@ void update_reboot(void) {
 	// wizlock last 5 minutes
 	if (reboot_control.time <= 5) {
 		wizlock_level = 1;	// newbie lock
-		sprintf(buf, "This mud is preparing to %s. The %s will happen in about %d minutes.", reboot_type[reboot_control.type], reboot_type[reboot_control.type], reboot_control.time);
+		sprintf(buf, "This mud is preparing to %s. The %s will happen in about %d minutes.", reboot_types[reboot_control.type], reboot_types[reboot_control.type], reboot_control.time);
 		wizlock_message = str_dup(buf);
 	}
 	
 	// alert everyone
-	if (reboot_control.time <= 5 || (reboot_control.time <= 15 && (reboot_control.time % 2))) {
-		syslog(SYS_SYSTEM, 0, FALSE, "The mud will %s in %d minute%s (type 'confirm' to %s faster)", reboot_type[reboot_control.type], reboot_control.time, PLURAL(reboot_control.time), reboot_type[reboot_control.type]);
-		mortlog("The mud will %s in %d minute%s (type 'confirm' to %s faster)", reboot_type[reboot_control.type], reboot_control.time, PLURAL(reboot_control.time), reboot_type[reboot_control.type]);
+	if (reboot_control.time <= config_get_int("reboot_warning_minutes")) {
+		syslog(SYS_SYSTEM, 0, FALSE, "The mud will %s in %d minute%s (type 'confirm' to %s faster)", reboot_types[reboot_control.type], reboot_control.time, PLURAL(reboot_control.time), reboot_types[reboot_control.type]);
+		mortlog("The mud will %s in %d minute%s (type 'confirm' to %s faster)", reboot_types[reboot_control.type], reboot_control.time, PLURAL(reboot_control.time), reboot_types[reboot_control.type]);
 	}
 }
 
@@ -800,6 +815,7 @@ void heartbeat(unsigned long heart_pulse) {
 	static int mins_since_crashsave = 0;
 	
 	#define HEARTBEAT(x)  !(heart_pulse % (int)((x) * PASSES_PER_SEC))
+	#define HEARTBEAT_OFFSET(x,y)	!(((int)(heart_pulse + ((y) * PASSES_PER_SEC))) % ((int)((x) * PASSES_PER_SEC)))
 	
 	// switch which of these is commented if you want timestamp logging:
 	// #define HEARTBEAT_LOG(id_str)  if (HEARTBEAT(15)) { log("debug %s:\t%lld", id_str, microtime()); }
@@ -809,13 +825,19 @@ void heartbeat(unsigned long heart_pulse) {
 	
 	HEARTBEAT_LOG("start")
 	
+	// time goes first because it changes the hour
+	if (HEARTBEAT(SECS_PER_MUD_HOUR)) {
+		weather_and_time();
+		HEARTBEAT_LOG("0")
+	}
+	
 	dg_event_process();
-	HEARTBEAT_LOG("0")
+	HEARTBEAT_LOG("0.1")
 	
 	free_freeable_dots();
 	HEARTBEAT_LOG("0.5")
 
-	// this is meant to be slightly longer than the mobile_activity pulse (10), and is mentioned in help files
+	// this is meant to be slightly longer than the (now-gone) mobile_activity pulse (10), and is mentioned in help files
 	if (HEARTBEAT(13)) {
 		script_trigger_check();
 		HEARTBEAT_LOG("1")
@@ -839,7 +861,7 @@ void heartbeat(unsigned long heart_pulse) {
 	}
 
 	if (HEARTBEAT(15)) {
-		check_idle_passwords();
+		check_idle_menu_users();
 		HEARTBEAT_LOG("6")
 		
 		run_mob_echoes();
@@ -856,7 +878,7 @@ void heartbeat(unsigned long heart_pulse) {
 		HEARTBEAT_LOG("9")
 	}
 	
-	if (HEARTBEAT(SECS_PER_MUD_HOUR)) {
+	if (HEARTBEAT(SECS_PER_REAL_MIN)) {
 		process_theft_logs();
 		HEARTBEAT_LOG("10")
 	}
@@ -864,13 +886,14 @@ void heartbeat(unsigned long heart_pulse) {
 		real_update();
 		HEARTBEAT_LOG("11")
 	}
-
-	if (HEARTBEAT(SECS_PER_MUD_HOUR)) {
-		weather_and_time();
+	
+	if (HEARTBEAT(10 * SECS_PER_REAL_MIN)) {
+		process_shipping();
 		HEARTBEAT_LOG("12")
 	}
 	
-	if (HEARTBEAT(WORKFORCE_CYCLE)) {
+	if (HEARTBEAT_OFFSET(WORKFORCE_CYCLE, 1)) {
+		// runs just off of the cycle, to space it out when it's the same as the hour cycle
 		chore_update();
 		HEARTBEAT_LOG("13")
 	}
@@ -887,9 +910,7 @@ void heartbeat(unsigned long heart_pulse) {
 		
 		reset_instances();
 		HEARTBEAT_LOG("16")
-	}
-
-	if (HEARTBEAT(SECS_PER_REAL_MIN)) {
+		
 		update_reboot();
 		HEARTBEAT_LOG("17")
 		
@@ -917,11 +938,17 @@ void heartbeat(unsigned long heart_pulse) {
 	}
 	
 	if (HEARTBEAT(30 * SECS_PER_REAL_MIN)) {
+		run_external_evolutions();
+		HEARTBEAT_LOG("22.5")
+		
 		reduce_outside_territory();
 		HEARTBEAT_LOG("23")
+		
+		process_imports();
+		HEARTBEAT_LOG("23.5")
 	}
 	
-	if (HEARTBEAT(3 * SECS_PER_REAL_MIN)) {
+	if (HEARTBEAT(2 * SECS_PER_REAL_MIN)) {
 		generate_adventure_instances();
 		HEARTBEAT_LOG("24")
 	}
@@ -932,6 +959,11 @@ void heartbeat(unsigned long heart_pulse) {
 		
 		update_trading_post();
 		HEARTBEAT_LOG("26")
+	}
+	
+	if (HEARTBEAT(SECS_PER_REAL_MIN)) {
+		check_maintenance_and_depletion_reset();
+		HEARTBEAT_LOG("26.5")
 	}
 	
 	if (HEARTBEAT(1)) {
@@ -962,7 +994,13 @@ void heartbeat(unsigned long heart_pulse) {
 		HEARTBEAT_LOG("32")
 	}
 	
-	// this goes roughly last -- update MSDP users
+	// check library updates
+	if (book_library_file_needs_save) {
+		write_book_library_file();
+		HEARTBEAT_LOG("33")
+	}
+	
+	// this goes roughly last -- update MSDP users etc
 	if (HEARTBEAT(1)) {
 		msdp_update();
 		HEARTBEAT_LOG("34")
@@ -1009,7 +1047,7 @@ void heartbeat(unsigned long heart_pulse) {
 
 void act(const char *str, int hide_invisible, char_data *ch, const void *obj, const void *vict_obj, bitvector_t act_flags) {
 	char_data *to, *list = NULL;
-	bool to_sleeping = FALSE, no_dark = FALSE, is_spammy = FALSE;
+	bool to_sleeping = FALSE, no_dark = FALSE, is_spammy = FALSE, is_animal_move = FALSE;
 
 	if (!str || !*str) {
 		return;
@@ -1024,6 +1062,10 @@ void act(const char *str, int hide_invisible, char_data *ch, const void *obj, co
 	
 	if (IS_SET(act_flags, TO_SPAMMY)) {
 		is_spammy = TRUE;
+	}
+	
+	if (IS_SET(act_flags, ACT_ANIMAL_MOVE)) {
+		is_animal_move = TRUE;
 	}
 
 	if (IS_SET(act_flags, TO_NODARK)) {
@@ -1044,10 +1086,10 @@ void act(const char *str, int hide_invisible, char_data *ch, const void *obj, co
 		if (ch && IN_ROOM(ch)) {
 			list = ROOM_PEOPLE(IN_ROOM(ch));
 		}
-		else if (!IS_SET(act_flags, ACT_VEHICLE_OBJ) && obj && IN_ROOM((obj_data*)obj)) {
+		else if (!IS_SET(act_flags, ACT_VEH_OBJ) && obj && IN_ROOM((obj_data*)obj)) {
 			list = ROOM_PEOPLE(IN_ROOM((obj_data*)obj));
 		}
-		else if (IS_SET(act_flags, ACT_VEHICLE_OBJ) && obj && IN_ROOM((vehicle_data*)obj)) {
+		else if (IS_SET(act_flags, ACT_VEH_OBJ) && obj && IN_ROOM((vehicle_data*)obj)) {
 			list = ROOM_PEOPLE(IN_ROOM((vehicle_data*)obj));
 		}
 		
@@ -1210,13 +1252,135 @@ void perform_act(const char *orig, char_data *ch, const void *obj, const void *v
 
 	const char *ACTNULL = "<NULL>";
 	#define CHECK_NULL(pointer, expression)  if ((pointer) == NULL) i = ACTNULL; else i = (expression);
+	#define IAF(flag)  IS_SET(act_flags, (flag))
+	
+	// check group?
+	if (IAF(TO_GROUP_ONLY) && to != ch && (!GROUP(to) || GROUP(to) != GROUP(ch))) {
+		return;
+	}
 	
 	// check fight messages (may exit early)
-	if (!IS_NPC(to) && ch != vict_obj && IS_SET(act_flags, TO_COMBAT_HIT | TO_COMBAT_MISS)) {
+	if (!IS_NPC(to) && FIGHTING(to) && IAF(ACT_BUFF)) {
+		show = any = FALSE;
+		if (!show && vict_obj && to == vict_obj) {
+			any = TRUE;
+			show |= SHOW_FIGHT_MESSAGES(to, FM_MY_BUFFS_IN_COMBAT);
+		}
+		if (!show && !vict_obj && to == ch) {
+			any = TRUE;
+			show |= SHOW_FIGHT_MESSAGES(to, FM_MY_BUFFS_IN_COMBAT);
+		}
+		if (!show && vict_obj && to != vict_obj && !IAF(ACT_NON_MOB_VICT) && is_fight_ally((char_data*)to, (char_data*)vict_obj)) {
+			any = TRUE;
+			show |= SHOW_FIGHT_MESSAGES(to, FM_ALLY_BUFFS_IN_COMBAT);
+		}
+		if (!show && !any) {
+			// other?
+			show |= SHOW_FIGHT_MESSAGES(to, FM_OTHER_BUFFS_IN_COMBAT);
+		}
+		// are we supposed to show it?
+		if (!show) {
+			return;
+		}
+	}
+	if (!IS_NPC(to) && FIGHTING(to) && IAF(ACT_AFFECT)) {
+		// aff flags in combat
+		show = any = FALSE;
+		if (!show && to == ch) {
+			any = TRUE;
+			show |= SHOW_FIGHT_MESSAGES(to, FM_MY_AFFECTS_IN_COMBAT);
+		}
+		if (!show && !vict_obj && to != ch && is_fight_ally((char_data*)to, (char_data*)ch)) {
+			any = TRUE;
+			show |= SHOW_FIGHT_MESSAGES(to, FM_ALLY_AFFECTS_IN_COMBAT);
+		}
+		if (!show && vict_obj && to != ch && !IAF(ACT_NON_MOB_VICT) && is_fight_ally((char_data*)to, (char_data*)vict_obj)) {
+			any = TRUE;
+			show |= SHOW_FIGHT_MESSAGES(to, FM_ALLY_AFFECTS_IN_COMBAT);
+		}
+		if (!show && !any) {
+			show |= SHOW_FIGHT_MESSAGES(to, FM_OTHER_AFFECTS_IN_COMBAT);
+		}
+		// triggered an affect but not showing it
+		if (!show) {
+			return;
+		}
+	}
+	if (!IS_NPC(to) && FIGHTING(to) && IAF(ACT_ABILITY)) {
+		show = any = FALSE;
+		if (!show && to == ch) {
+			any = TRUE;
+			show |= SHOW_FIGHT_MESSAGES(to, FM_MY_ABILITIES);
+		}
+		if (!show && to != ch && is_fight_ally((char_data*)to, (char_data*)ch)) {
+			any = TRUE;
+			show |= SHOW_FIGHT_MESSAGES(to, FM_ALLY_ABILITIES);
+		}
+		if (!show && vict_obj && to == vict_obj) {
+			any = TRUE;
+			show |= SHOW_FIGHT_MESSAGES(to, FM_ABILITIES_AGAINST_ME);
+		}
+		if (!show && vict_obj && to != vict_obj && !IAF(ACT_NON_MOB_VICT) && is_fight_ally((char_data*)to, (char_data*)vict_obj)) {
+			any = TRUE;
+			show |= SHOW_FIGHT_MESSAGES(to, FM_ABILITIES_AGAINST_ALLIES);
+		}
+		if (!show && vict_obj && FIGHTING(to) == vict_obj) {
+			any = TRUE;
+			show |= SHOW_FIGHT_MESSAGES(to, FM_ABILITIES_AGAINST_TARGET);
+		}
+		if (!show && vict_obj && FIGHTING(to) && FIGHTING(FIGHTING(to)) == vict_obj) {
+			any = TRUE;
+			show |= SHOW_FIGHT_MESSAGES(to, FM_ABILITIES_AGAINST_TANK);
+		}
+		if (!show && !any) {
+			show |= SHOW_FIGHT_MESSAGES(to, FM_OTHER_ABILITIES);
+		}
+		
+		// no?
+		if (!show) {
+			return;
+		}
+	}
+	if (!IS_NPC(to) && FIGHTING(to) && IAF(ACT_HEAL)) {
+		show = any = FALSE;
+		if (!show && to == ch) {
+			any = TRUE;
+			show |= SHOW_FIGHT_MESSAGES(to, FM_MY_HEALS);
+		}
+		if (!show && to == ch && !vict_obj) {
+			any = TRUE;
+			show |= SHOW_FIGHT_MESSAGES(to, FM_HEALS_ON_ME);
+		}
+		if (!show && to == vict_obj) {
+			any = TRUE;
+			show |= SHOW_FIGHT_MESSAGES(to, FM_HEALS_ON_ME);
+		}
+		if (!show && vict_obj && to != vict_obj && !IAF(ACT_NON_MOB_VICT) && is_fight_ally((char_data*)to, (char_data*)vict_obj)) {
+			any = TRUE;
+			show |= SHOW_FIGHT_MESSAGES(to, FM_HEALS_ON_ALLIES);
+		}
+		if (!show && vict_obj && to != vict_obj && FIGHTING(to) == vict_obj) {
+			any = TRUE;
+			show |= SHOW_FIGHT_MESSAGES(to, FM_HEALS_ON_TARGET);
+		}
+		if (!show && !any) {
+			show |= SHOW_FIGHT_MESSAGES(to, FM_HEALS_ON_OTHER);
+		}
+		
+		// are we supposed to show it?
+		if (!show) {
+			return;
+		}
+	}
+	if (!IS_NPC(to) && ch != vict_obj && IAF(ACT_COMBAT_HIT | ACT_COMBAT_MISS)) {
 		show = any = FALSE;
 		// hits
-		if (IS_SET(act_flags, TO_COMBAT_HIT)) {
-			if (!show && to == ch) {
+		if (IAF(ACT_COMBAT_HIT)) {
+			if (!show && to == ch && !vict_obj) {
+				any = TRUE;	// hitting self with no vict-obj
+				show |= SHOW_FIGHT_MESSAGES(to, FM_HITS_AGAINST_ME);
+			}
+			if (!show && to == ch && vict_obj) {
 				any = TRUE;
 				show |= SHOW_FIGHT_MESSAGES(to, FM_MY_HITS);
 			}
@@ -1228,15 +1392,15 @@ void perform_act(const char *orig, char_data *ch, const void *obj, const void *v
 				any = TRUE;
 				show |= SHOW_FIGHT_MESSAGES(to, FM_ALLY_HITS);
 			}
-			if (!show && to != ch && to != vict_obj && is_fight_ally((char_data*)to, (char_data*)vict_obj)) {
+			if (!show && vict_obj && to != ch && to != vict_obj && !IAF(ACT_NON_MOB_VICT) && is_fight_ally((char_data*)to, (char_data*)vict_obj)) {
 				any = TRUE;
 				show |= SHOW_FIGHT_MESSAGES(to, FM_HITS_AGAINST_ALLIES);
 			}
-			if (!show && to != ch && FIGHTING(to) == vict_obj) {
+			if (!show && vict_obj && to != ch && FIGHTING(to) == vict_obj) {
 				any = TRUE;
 				show |= SHOW_FIGHT_MESSAGES(to, FM_HITS_AGAINST_TARGET);
 			}
-			if (!show && to != ch && FIGHTING(to) && FIGHTING(FIGHTING(to)) == vict_obj) {
+			if (!show && vict_obj && to != ch && FIGHTING(to) && FIGHTING(FIGHTING(to)) == vict_obj) {
 				any = TRUE;
 				show |= SHOW_FIGHT_MESSAGES(to, FM_HITS_AGAINST_TANK);
 			}
@@ -1245,8 +1409,12 @@ void perform_act(const char *orig, char_data *ch, const void *obj, const void *v
 			}
 		}
 		// misses
-		if (IS_SET(act_flags, TO_COMBAT_MISS)) {
-			if (!show && to == ch) {
+		if (IAF(ACT_COMBAT_MISS)) {
+			if (!show && to == ch && !vict_obj) {
+				any = TRUE;	// hitting self with no vict-obj
+				show |= SHOW_FIGHT_MESSAGES(to, FM_MISSES_AGAINST_ME);
+			}
+			if (!show && to == ch && vict_obj) {
 				any = TRUE;
 				show |= SHOW_FIGHT_MESSAGES(to, FM_MY_MISSES);
 			}
@@ -1258,15 +1426,15 @@ void perform_act(const char *orig, char_data *ch, const void *obj, const void *v
 				any = TRUE;
 				show |= SHOW_FIGHT_MESSAGES(to, FM_ALLY_MISSES);
 			}
-			if (!show && to != ch && to != vict_obj && is_fight_ally((char_data*)to, (char_data*)vict_obj)) {
+			if (!show && vict_obj && to != ch && to != vict_obj && !IAF(ACT_NON_MOB_VICT) && is_fight_ally((char_data*)to, (char_data*)vict_obj)) {
 				any = TRUE;
 				show |= SHOW_FIGHT_MESSAGES(to, FM_MISSES_AGAINST_ALLIES);
 			}
-			if (!show && to != ch && FIGHTING(to) == vict_obj) {
+			if (!show && vict_obj && to != ch && FIGHTING(to) == vict_obj) {
 				any = TRUE;
 				show |= SHOW_FIGHT_MESSAGES(to, FM_MISSES_AGAINST_TARGET);
 			}
-			if (!show && to != ch && FIGHTING(to) && FIGHTING(FIGHTING(to)) == vict_obj) {
+			if (!show && vict_obj && to != ch && FIGHTING(to) && FIGHTING(FIGHTING(to)) == vict_obj) {
 				any = TRUE;
 				show |= SHOW_FIGHT_MESSAGES(to, FM_MISSES_AGAINST_TANK);
 			}
@@ -1286,22 +1454,29 @@ void perform_act(const char *orig, char_data *ch, const void *obj, const void *v
 	for (;;) {
 		if (*orig == '$') {
 			switch (*(++orig)) {
-				case 'n':
+				case 'n': {
 					i = PERS(ch, (char_data*)to, FALSE);
 					break;
-				case 'N':
+				}
+				case 'N': {
+					if (IAF(ACT_NON_MOB_VICT)) {
+						log("SYSERR: Using $N with a non-mob vict_obj flag: %s", orig);
+					}
 					CHECK_NULL(vict_obj, PERS((char_data*)vict_obj,(char_data*)to, FALSE));
 					dg_victim = (char_data*) vict_obj;
 					break;
-				case 'o':
+				}
+				case 'o': {
 					i = PERS(ch, (char_data*)to, TRUE);
 					real_ch = TRUE;
 					break;
-				case 'O':
+				}
+				case 'O': {
 					CHECK_NULL(vict_obj, PERS((char_data*)vict_obj, (char_data*)to, TRUE));
 					dg_victim = (char_data*) vict_obj;
 					real_vict = TRUE;
 					break;
+				}
 				case 'k': {	// loyalty/empire adjective of $n
 					if (GET_LOYALTY(ch)) {
 						snprintf(temp, sizeof(temp), "%s", EMPIRE_ADJECTIVE(GET_LOYALTY(ch)));
@@ -1313,6 +1488,9 @@ void perform_act(const char *orig, char_data *ch, const void *obj, const void *v
 					break;
 				}
 				case 'K': {	// loyalty/empire adjective of $N
+					if (IAF(ACT_NON_MOB_VICT)) {
+						log("SYSERR: Using $K with a non-mob vict_obj flag: %s", orig);
+					}
 					dg_victim = (char_data*) vict_obj;
 					if (dg_victim && GET_LOYALTY(dg_victim)) {
 						snprintf(temp, sizeof(temp), "%s", EMPIRE_ADJECTIVE(GET_LOYALTY(dg_victim)));
@@ -1334,6 +1512,9 @@ void perform_act(const char *orig, char_data *ch, const void *obj, const void *v
 					break;
 				}
 				case 'L': {	// loyalty/empire name of $N
+					if (IAF(ACT_NON_MOB_VICT)) {
+						log("SYSERR: Using $L with a non-mob vict_obj flag: %s", orig);
+					}
 					dg_victim = (char_data*) vict_obj;
 					if (dg_victim && GET_LOYALTY(dg_victim)) {
 						snprintf(temp, sizeof(temp), "%s", EMPIRE_NAME(GET_LOYALTY(dg_victim)));
@@ -1344,64 +1525,122 @@ void perform_act(const char *orig, char_data *ch, const void *obj, const void *v
 					}
 					break;
 				}
-				case 'm':
+				case 'm': {
 					i = real_ch ? REAL_HMHR(ch) : HMHR(ch);
 					break;
-				case 'M':
+				}
+				case 'M': {
+					if (IAF(ACT_NON_MOB_VICT)) {
+						log("SYSERR: Using $M with a non-mob vict_obj flag: %s", orig);
+					}
 					CHECK_NULL(vict_obj, (real_vict ? REAL_HMHR((char_data*) vict_obj) : HMHR((char_data*) vict_obj)));
 					dg_victim = (char_data*) vict_obj;
 					break;
-				case 's':
+				}
+				case 's': {
 					i = real_ch ? REAL_HSHR(ch) : HSHR(ch);
 					break;
-				case 'S':
+				}
+				case 'S': {
+					if (IAF(ACT_NON_MOB_VICT)) {
+						log("SYSERR: Using $S with a non-mob vict_obj flag: %s", orig);
+					}
 					CHECK_NULL(vict_obj, (real_vict ? REAL_HSHR((char_data*) vict_obj) : HSHR((char_data*) vict_obj)));
 					dg_victim = (char_data*) vict_obj;
 					break;
-				case 'e':
+				}
+				case 'e': {
 					i = real_ch ? REAL_HSSH(ch) : HSSH(ch);
 					break;
-				case 'E':
+				}
+				case 'E': {
+					if (IAF(ACT_NON_MOB_VICT)) {
+						log("SYSERR: Using $E with a non-mob vict_obj flag: %s", orig);
+					}
 					CHECK_NULL(vict_obj, (real_vict ? REAL_HSSH((char_data*) vict_obj) : HSSH((char_data*) vict_obj)));
 					dg_victim = (char_data*) vict_obj;
 					break;
-				case 'p':
+				}
+				case 'p': {
+					if (IAF(ACT_NON_OBJ_OBJ)) {
+						log("SYSERR: Using $p with a non-obj obj flag: %s", orig);
+					}
 					CHECK_NULL(obj, OBJS((obj_data*)obj, (char_data*)to));
 					break;
-				case 'P':
+				}
+				case 'P': {
+					if (!IAF(ACT_OBJ_VICT)) {
+						log("SYSERR: Using $P without ACT_OBJ_VICT: %s", orig);
+					}
 					CHECK_NULL(vict_obj, OBJS((obj_data*) vict_obj, (char_data*)to));
 					dg_target = (obj_data*) vict_obj;
 					break;
-				case 'a':
+				}
+				case 'a': {
+					if (IAF(ACT_NON_OBJ_OBJ)) {
+						log("SYSERR: Using $a with a non-obj obj flag: %s", orig);
+					}
 					CHECK_NULL(obj, SANA((obj_data*)obj));
 					break;
-				case 'A':
+				}
+				case 'A': {
+					if (!IAF(ACT_OBJ_VICT)) {
+						log("SYSERR: Using $A without ACT_OBJ_VICT: %s", orig);
+					}
 					CHECK_NULL(vict_obj, SANA((const obj_data*) vict_obj));
 					dg_target = (obj_data*) vict_obj;
 					break;
-				case 'T':
+				}
+				case 'T': {
+					if (!IAF(ACT_STR_VICT)) {
+						log("SYSERR: Using $T without ACT_STR_VICT: %s", orig);
+					}
 					CHECK_NULL(vict_obj, (const char *) vict_obj);
 					dg_arg = (char *) vict_obj;
 					break;
-				case 't':
-					CHECK_NULL(obj, (char *) obj);
+				}
+				case 't': {
+					if (!IAF(ACT_STR_OBJ)) {
+						log("SYSERR: Using $t without ACT_STR_OBJ: %s", orig);
+					}
+					CHECK_NULL(obj, (const char *) obj);
+					dg_arg = (char *) obj;
 					break;
-				case 'F':
+				}
+				case 'F': {
+					if (!IAF(ACT_STR_VICT)) {
+						log("SYSERR: Using $F without ACT_STR_VICT: %s", orig);
+					}
 					CHECK_NULL(vict_obj, fname((const char *) vict_obj));
 					break;
-				case 'v': {	// $v: vehicle -- you need to pass ACT_VEHICLE_OBJ to use this
+				}
+				case 'f': {
+					if (!IAF(ACT_STR_OBJ)) {
+						log("SYSERR: Using $f without ACT_STR_OBJ: %s", orig);
+					}
+					CHECK_NULL(obj, fname((const char *) obj));
+					break;
+				}
+				case 'v': {	// $v: vehicle
+					if (!IAF(ACT_VEH_OBJ)) {
+						log("SYSERR: Using $v without ACT_VEH_OBJ: %s", orig);
+					}
 					CHECK_NULL(obj, get_vehicle_short_desc((vehicle_data*)obj, (char_data*)to));
 					break;
 				}
 				case 'V': {	// $V: vehicle
+					if (!IAF(ACT_VEH_VICT)) {
+						log("SYSERR: Using $V without ACT_VEH_VICT: %s", orig);
+					}
 					CHECK_NULL(vict_obj, get_vehicle_short_desc((vehicle_data*)vict_obj, (char_data*)to));
 					break;
 				}
-				case '$':
+				case '$': {
 					i = "$";
 					break;
+				}
 				default: {
-					if (!IS_SET(act_flags, TO_IGNORE_BAD_CODE)) {
+					if (!IAF(TO_IGNORE_BAD_CODE)) {
 						log("SYSERR: Illegal $-code to act(): %c", *orig);
 						log("SYSERR: %s", orig);
 						i = "";
@@ -1443,7 +1682,7 @@ void perform_act(const char *orig, char_data *ch, const void *obj, const void *v
 		}
 		to->desc->last_act_message = strdup(lbuf);
 		
-		if (IS_SET(act_flags, TO_QUEUE)) {
+		if (IAF(TO_QUEUE)) {
 			stack_simple_msg_to_desc(to->desc, lbuf);
 		}
 		else {	// send normally
@@ -1452,9 +1691,10 @@ void perform_act(const char *orig, char_data *ch, const void *obj, const void *v
 	}
 
 	if ((IS_NPC(to) && dg_act_check) && (to != ch)) {
-		act_mtrigger(to, lbuf, ch, dg_victim, IS_SET(act_flags, ACT_VEHICLE_OBJ) ? NULL : (obj_data*)obj, dg_target, dg_arg);
+		act_mtrigger(to, lbuf, ch, dg_victim, IAF(ACT_NON_OBJ_OBJ) ? NULL : (obj_data*)obj, dg_target, dg_arg);
 	}
 }
+
 
 // this is the pre-circle3.1 send_to_char that doesn't have va_args
 void send_to_char(const char *messg, char_data *ch) {
@@ -1776,6 +2016,9 @@ void free_descriptor(descriptor_data *desc) {
 	}
 	if (desc->olc_archetype) {
 		free_archetype(desc->olc_archetype);
+	}
+	if (desc->olc_attack) {
+		free_attack_message(desc->olc_attack);
 	}
 	if (desc->olc_augment) {
 		free_augment(desc->olc_augment);
@@ -2189,6 +2432,7 @@ int new_descriptor(int s) {
 	struct hostent *from;
 	bool slow_ip;
 	time_t when;
+	char buf[MAX_STRING_LENGTH];
 
 	/* accept the new connection */
 	i = sizeof(peer);
@@ -2265,7 +2509,8 @@ int new_descriptor(int s) {
 	LL_PREPEND(descriptor_list, newd);
 	
 	ProtocolNegotiate(newd);
-	SEND_TO_Q(intro_screens[number(0, num_intro_screens-1)], newd);
+	snprintf(buf, sizeof(buf), "%s%s", intro_screens[number(0, num_intro_screens-1)], telnet_go_ahead(newd));
+	SEND_TO_Q(buf, newd);
 
 	return (0);
 }
@@ -2696,8 +2941,9 @@ static int process_output(descriptor_data *t) {
 		close_socket(t);
 		return (-1);
 	}
-	else if (result == 0)	/* Socket buffer full. Try later. */
+	else if (result == 0) {	/* Socket buffer full. Try later. */
 		return (0);
+	}
 
 	/* Handle snooping: prepend "% " and send to snooper. */
 	if (t->snoop_by && *t->output) {
@@ -2773,6 +3019,23 @@ int set_sendbuf(socket_t s) {
 #endif
 
 	return (0);
+}
+
+
+/**
+* For use on lines that are prompts and don't end in a crlf; this sends the
+* telnet codes IAC GA, if needed.
+*
+* @param descriptor_data *desc The descriptor that might need it.
+*/
+const char *telnet_go_ahead(descriptor_data *desc) {
+	if (desc) {
+		static const char string[3] = { IAC, GA, '\0' };
+		return string;
+	}
+	else {
+		return "";
+	}
 }
 
 
@@ -2922,10 +3185,12 @@ char *make_prompt(descriptor_data *d) {
 		// no prompt to people in the EXTRACTED state
 		*prompt = '\0';
 	}
-	else if (d->showstr_count)
-		sprintf(prompt, "\r\t0[ Return to continue, (q)uit, (r)efresh, (b)ack, or page number (%d/%d) ]", d->showstr_page, d->showstr_count);
-	else if (d->str && (STATE(d) != CON_PLAYING || d->straight_to_editor))
-		strcpy(prompt, "] ");
+	else if (d->showstr_count) {
+		sprintf(prompt, "\r\t0[ Return to continue, (q)uit, (r)efresh, (b)ack, or page number (%d/%d) ] %s", d->showstr_page, d->showstr_count, telnet_go_ahead(d));
+	}
+	else if (d->str && (STATE(d) != CON_PLAYING || d->straight_to_editor)) {
+		sprintf(prompt, "] %s", telnet_go_ahead(d));
+	}
 	else if (STATE(d) == CON_PLAYING) {
 		*prompt = '\0';
 		
@@ -2935,7 +3200,7 @@ char *make_prompt(descriptor_data *d) {
 		}
 
 		// append rendered prompt
-		snprintf(prompt + strlen(prompt), sizeof(prompt) - strlen(prompt), "%s", prompt_str(d->character));
+		snprintf(prompt + strlen(prompt), sizeof(prompt) - strlen(prompt), "%s%s", prompt_str(d->character), telnet_go_ahead(d));
 	}
 	else {
 		*prompt = '\0';
@@ -2976,10 +3241,21 @@ char *prompt_color_by_prc(int cur, int max) {
 char *prompt_str(char_data *ch) {
 	char *str;
 	
-	if (FIGHTING(ch)) {
-		str = GET_FIGHT_PROMPT(REAL_CHAR(ch)) ? GET_FIGHT_PROMPT(REAL_CHAR(ch)) : GET_PROMPT(REAL_CHAR(ch));
+	// determine what prompt to show
+	if (FIGHTING(ch) && !SHOW_STATUS_MESSAGES(REAL_CHAR(ch), SM_FIGHT_PROMPT)) {
+		// no fight prompt
+		return "";
+	}
+	else if (FIGHTING(ch) && GET_FIGHT_PROMPT(REAL_CHAR(ch))) {
+		// show fight prompt if they have one, otherwise fall through to regular prompt
+		str = GET_FIGHT_PROMPT(REAL_CHAR(ch));
+	}
+	else if (!SHOW_STATUS_MESSAGES(REAL_CHAR(ch), SM_PROMPT)) {
+		// no prompt at all please
+		return "";
 	}
 	else {
+		// shows out of combat; also shows in-combat if there's no fight prompt
 		str = GET_PROMPT(REAL_CHAR(ch));
 	}
 
@@ -3074,8 +3350,18 @@ char *replace_prompt_codes(char_data *ch, char *str) {
 					if (HAS_NEW_OFFENSES(ch)) {
 						strcat(i, "\t0O");
 					}
-					if (HAS_WATERWALK(ch)) {
+					if (HAS_WATERWALKING(ch)) {
 						strcat(i, "\t0W");
+					}
+					if (config_get_bool("temperature_penalties") && get_temperature_type(IN_ROOM(ch)) != TEMPERATURE_ALWAYS_COMFORTABLE) {
+						int temperature = get_relative_temperature(ch);
+						int t_limit = config_get_int("temperature_discomfort");
+						if (temperature <= -1 * t_limit) {
+							strcat(i, "\tcC");
+						}
+						if (temperature >= t_limit) {
+							strcat(i, "\toH");
+						}
 					}
 					if (!IS_NPC(ch)) {
 						if (get_cooldown_time(ch, COOLDOWN_ROGUE_FLAG) > 0) {
@@ -3126,8 +3412,18 @@ char *replace_prompt_codes(char_data *ch, char *str) {
 					if (IS_THIRSTY(ch)) {
 						sprintf(i + strlen(i), "%sthirsty", (*i ? " " : ""));
 					}
-					if (HAS_WATERWALK(ch)) {
-						sprintf(i + strlen(i), "%swaterwalk", (*i ? " " : ""));
+					if (HAS_WATERWALKING(ch)) {
+						sprintf(i + strlen(i), "%swaterwalking", (*i ? " " : ""));
+					}
+					if (config_get_bool("temperature_penalties") && get_temperature_type(IN_ROOM(ch)) != TEMPERATURE_ALWAYS_COMFORTABLE) {
+						int temperature = get_relative_temperature(ch);
+						int t_limit = config_get_int("temperature_discomfort");
+						if (temperature <= -1 * t_limit) {
+							sprintf(i + strlen(i), "%s%s", (*i ? " " : ""), temperature_to_string(temperature));
+						}
+						if (temperature >= t_limit) {
+							sprintf(i + strlen(i), "%s%s", (*i ? " " : ""), temperature_to_string(temperature));
+						}
 					}
 					if (!IS_NPC(ch)) {
 						if (get_cooldown_time(ch, COOLDOWN_ROGUE_FLAG) > 0) {
@@ -3206,6 +3502,16 @@ char *replace_prompt_codes(char_data *ch, char *str) {
 				case 'e': {	// %e enemy's health percent
 					if ((vict = FIGHTING(ch))) {
 						sprintf(i, "%d%%", GET_HEALTH(vict) * 100 / MAX(1, GET_MAX_HEALTH(vict)));
+					}
+					else {
+						*i = '\0';
+					}
+					tmp = i;
+					break;
+				}
+				case 'E': {	// %E enemy's name
+					if ((vict = FIGHTING(ch))) {
+						sprintf(i, "%s", skip_filler(PERS(vict, ch, FALSE)));
 					}
 					else {
 						*i = '\0';
@@ -3294,8 +3600,7 @@ char *replace_prompt_codes(char_data *ch, char *str) {
 					tmp = i;
 					break;
 				}
-				case 't':	/* Sun timer */
-				case 'T': {
+				case 't': {	/* Sun timer */
 					tinfo = get_local_time(IN_ROOM(ch));
 					sun = get_sun_status(IN_ROOM(ch));
 					
@@ -3326,10 +3631,32 @@ char *replace_prompt_codes(char_data *ch, char *str) {
 					tmp = i;
 					break;
 				}
+				case 'T': {	// temperature
+					int temperature = get_room_temperature(IN_ROOM(ch));
+					int limit = config_get_int("temperature_discomfort");
+					char *temp_color;
+					
+					if (temperature <= -1 * limit) {
+						temp_color = "\tc";
+					}
+					else if (temperature >= limit) {
+						temp_color = "\to";
+					}
+					else {
+						temp_color = "\t0";
+					}
+					
+					sprintf(i, "%s%s\t0", temp_color, temperature_to_string(temperature));
+					tmp = i;
+					break;
+				}
 				case 'a': {	// action
 					if (!IS_NPC(ch) && GET_ACTION(ch) == ACT_GEN_CRAFT) {
 						craft_data *ctype = craft_proto(GET_ACTION_VNUM(ch, 0));
 						strcpy(i, gen_craft_data[GET_CRAFT_TYPE(ctype)].verb);
+					}
+					else if (!IS_NPC(ch) && GET_ACTION(ch) == ACT_OVER_TIME_ABILITY) {
+						strcpy(i, get_ability_name_by_vnum(GET_ACTION_VNUM(ch, 0)));
 					}
 					else if (!IS_NPC(ch) && GET_ACTION(ch) != ACT_NONE) {
 						strcpy(i, action_data[GET_ACTION(ch)].name);
@@ -3455,7 +3782,8 @@ RETSIGTYPE checkpointing(int sig) {
 
 RETSIGTYPE hupsig(int sig) {
 	log("SYSERR: Received SIGHUP, SIGINT, or SIGTERM. Shutting down...");
-	reboot_control.type = SCMD_SHUTDOWN;
+	reboot_control.type = REBOOT_SHUTDOWN;
+	reboot_control.immediate = TRUE;
 	perform_reboot();
 	// exit(1);
 }
@@ -3776,16 +4104,9 @@ void game_loop(socket_t mother_desc) {
 		/* Now execute the heartbeat functions */
 		catch_up_combat = TRUE;
 		catch_up_actions = TRUE;
-		catch_up_mobs = TRUE;
-		caught_up_mobs = FALSE;
 		
 		while (missed_pulses--) {
 			heartbeat(++main_game_pulse);
-			
-			// check this and mark mobs as caught up now: this prevents too much mobile_activity when the mud is stalled
-			if (caught_up_mobs) {
-				catch_up_mobs = FALSE;
-			}
 		}
 
 		/* Update tics_passed for deadlock protection */
@@ -4014,6 +4335,7 @@ void reboot_recover(void) {
 	int desc, plid, leid;
 	bool fOld;
 	char name[MAX_INPUT_LENGTH];
+	bitvector_t flags;
 
 	log("Reboot is recovering players...");
 	
@@ -4086,7 +4408,7 @@ void reboot_recover(void) {
 		if (*line == '$') {
 			break;
 		}
-		else if (*line == 'G' && sscanf(line, "G %d %d", &plid, &leid) == 2) {
+		else if (*line == 'G' && sscanf(line, "G %d %d %llu", &plid, &leid, &flags) >= 2) {
 			if ((plr = is_playing(plid)) && (ldr = is_playing(leid))) {
 				if (!GROUP(ldr)) {
 					create_group(ldr);
@@ -4094,6 +4416,7 @@ void reboot_recover(void) {
 				if (GROUP(ldr) && !GROUP(plr)) {
 					join_group(plr, GROUP(ldr));
 				}
+				GROUP(ldr)->group_flags = flags;
 			}
 		}
 		else {

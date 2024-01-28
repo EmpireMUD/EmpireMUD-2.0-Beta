@@ -4,7 +4,7 @@ a portal~
 A portal spins and crackles before you.~
 You can enter the portal and find yourself somewhere else entirely!
 ~
-8 0 0 0 1
+8 B 0 0 0 2
 0 0 0
 10 0
 S
@@ -14,11 +14,19 @@ a crimson bloodsword~
 A bloodsword is puddling on the ground.~
 The sword drips with blood.
 ~
-1 gmp an 0 2
+1 gmp an 0 0 4
 0 3 1
 10 0
 A
 17 1 0
+A
+26 1 0
+M
+10
+As you release $p, it melts back into blood and drips to the ground.~
+M
+11
+As $n releases $p, it melts and drips to the ground in a puddle of blood.~
 S
 #1102
 spear bloodspear vicious~
@@ -26,17 +34,25 @@ a vicious bloodspear~
 A bloodspear is pooling on the ground.~
 The spear drips with blood.
 ~
-1 gmp an b 7
+1 gmp an b 0 10
 0 1 3
 10 0
 A
 18 3 0
+A
+26 1 0
 M
 15
 You jab your spear into the water and when you extract it you find $p on the end!~
 M
 16
 $n jabs $s spear into the water and when $e draws it out, it has $p on the end!~
+M
+10
+As you release $p, it melts back into blood and drips to the ground.~
+M
+11
+As $n releases $p, it melts and drips to the ground in a puddle of blood.~
 S
 #1103
 skean bloodskean deep red~
@@ -44,11 +60,19 @@ a deep red bloodskean~
 A bloodskean is dripping on the ground.~
 The skean drips with blood.
 ~
-1 gmp an f 4
+1 gmp an f 0 6
 0 3 4
 10 0
 A
 17 1 0
+A
+26 1 0
+M
+10
+As you release $p, it melts back into blood and drips to the ground.~
+M
+11
+As $n releases $p, it melts and drips to the ground in a puddle of blood.~
 S
 #1104
 mace bloodmace wicked~
@@ -56,11 +80,19 @@ a wicked bloodmace~
 A bloodmace has melted on the ground.~
 The mace drips with blood.
 ~
-1 gmp an 0 3
+1 gmp an 0 0 5
 0 3 5
 10 0
 A
 17 1 0
+A
+26 1 0
+M
+10
+As you release $p, it melts back into blood and drips to the ground.~
+M
+11
+As $n releases $p, it melts and drips to the ground in a puddle of blood.~
 S
 #1105
 fireball~
@@ -68,9 +100,15 @@ a fireball~
 A fireball is rolling around here.~
 You're ready to shoot fireballs.
 ~
-1 gmp ano 0 4
+1 gmp ano 0 0 5
 0 1 16
 10 0
+M
+10
+The flame in your hand flickers and goes out.~
+M
+11
+The flame in $n's hand flickers and goes out.~
 S
 #1106
 orb light glowing~
@@ -78,7 +116,7 @@ an orb of light~
 A glowing orb is floating here.~
 This orb provides a bright light to the room.
 ~
-29 g ao 0 2
+29 g ao 0 0 2
 36 1 4
 10 0
 S
@@ -88,7 +126,7 @@ a wooden staff~
 A wooden staff has been left here.~
 The staff is the signature weapon of High Sorcery.
 ~
-1 ehlmo an 0 1
+1 ehlmo an p 0 2
 0 1 5
 0 0
 C
@@ -100,7 +138,7 @@ a wanderer's staff~
 A wanderer's staff has fallen on the ground.~
 The staff is the signature weapon of High Sorcery.
 ~
-1 ehlmo an 0 2
+1 ehlmo an p 0 3
 0 3 17
 0 0
 A
@@ -114,7 +152,7 @@ a sorcerer's staff~
 A sorcerer's staff has been dropped here.~
 The staff is the signature weapon of High Sorcery.
 ~
-1 ehlmo an 0 2
+1 ehlmo an p 0 3
 0 4 17
 0 0
 A
@@ -126,7 +164,7 @@ a staff of wisdom~
 A staff of wisdom has fallen to the ground.~
 The staff is the signature weapon of High Sorcery.
 ~
-1 ehlmo an 0 2
+1 ehlmo an p 0 3
 0 4 17
 0 0
 A
@@ -138,7 +176,7 @@ a staff of lightning~
 A staff of lightning is crackling with energy on the ground.~
 The staff is the signature weapon of High Sorcery.
 ~
-1 emo an 0 2
+1 emo an p 0 3
 0 4 17
 0 0
 A
@@ -152,7 +190,7 @@ a burning staff~
 A burning staff is planted in the ground.~
 The staff is the signature weapon of High Sorcery.
 ~
-1 emo an 0 2
+1 emo an p 0 3
 0 6 18
 0 0
 A
@@ -166,7 +204,7 @@ a staff of agony~
 A staff of agony is wailing dreadfully.~
 The staff is the signature weapon of High Sorcery.
 ~
-1 emo an 0 2
+1 emo an p 0 3
 0 3 19
 0 0
 A
@@ -178,7 +216,7 @@ an imperium spike~
 An imperium spike is sitting on the ground.~
 The imperium spike can be used for the Ritual of Defense.
 ~
-1 h ano h 4
+1 h ano h 0 4
 0 3 8
 2 0
 C
@@ -193,7 +231,7 @@ A nexus crystal is lying here.~
    The nexus crystal is a small, fiery gem that is used to build certain
 magical buildings.
 ~
-3 0 a 0 4
+3 0 a 0 0 4
 0 0 0
 8 0
 C
@@ -207,11 +245,19 @@ a veined bloodstaff~
 A bloodstaff is puddling on the ground.~
 The staff drips with blood.
 ~
-1 gmp an 0 3
+1 gmp an p 0 6
 0 3 19
 10 0
 A
 17 1 0
+A
+26 1 0
+M
+10
+As you release $p, it melts back into blood and drips to the ground.~
+M
+11
+As $n releases $p, it melts and drips to the ground in a puddle of blood.~
 S
 #1117
 whip bloody bloodwhip dripping~
@@ -221,11 +267,19 @@ A bloody whip is pooling on the ground.~
 a horse, and coiled into a horrific mass. It splashes blood everywhere as you
 whip it around.
 ~
-1 gmp an 0 5
+1 gmp an 0 0 7
 0 1 7
 10 0
 A
 18 3 0
+A
+26 1 0
+M
+10
+As you release $p, it melts back into blood and drips to the ground.~
+M
+11
+As $n releases $p, it melts and drips to the ground in a puddle of blood.~
 S
 #1118
 axe bloodaxe~
@@ -234,11 +288,19 @@ A bloodaxe is dripping on the ground.~
    The axe is made from blood, handle and all. It drips and splashes as you
 swing it.
 ~
-1 gmp an a 8
+1 gmp an a 0 10
 0 1 2
 10 0
 A
 1 1 0
+A
+26 1 0
+M
+10
+As you release $p, it melts back into blood and drips to the ground.~
+M
+11
+As $n releases $p, it melts and drips to the ground in a puddle of blood.~
 S
 #1119
 spike nocturnium~
@@ -246,7 +308,7 @@ a nocturnium spike~
 A nocturnium spike is stamped into the ground.~
 The nocturnium spike can be used for the Chant of Illusions.
 ~
-1 h ano h 5
+1 h ano h 0 5
 0 3 8
 2 0
 C
@@ -261,11 +323,33 @@ A bloodmaul has been hammered into the ground.~
    This great maul is made from blood itself, though it looks like you could
 still use it as a hammer in the forge.
 ~
-1 gmp an c 10
+1 gmp an c 0 12
 0 1 6
 10 0
 A
 17 1 0
+A
+26 1 0
+M
+10
+As you release $p, it melts back into blood and drips to the ground.~
+M
+11
+As $n releases $p, it melts and drips to the ground in a puddle of blood.~
+S
+#1121
+cloth grave~
+a grave cloth~
+A flowing grave cloth is lying here.~
+   The flowing grave cloth is long enough to wrap a body several times over. A
+blood stain in the corner suggests it has already been used or, at least, that
+it was bound to someone in particular.
+~
+3 p a 0 0 1
+0 0 0
+11 0
+C
+1 1
 S
 #1122
 mattock bloodmattock~
@@ -274,10 +358,164 @@ A bloodmattock is dripping on the ground.~
    This pick mattock is made from red, dripping blood. It looks like you could
 use it for mining -- or murder.
 ~
-1 gmp an h 9
+1 gmp an h 0 11
 0 1 8
 10 0
 A
 1 1 0
+A
+26 1 0
+M
+10
+As you release $p, it melts back into blood and drips to the ground.~
+M
+11
+As $n releases $p, it melts and drips to the ground in a puddle of blood.~
+S
+#1123
+starberry berry twinkling~
+a twinkling starberry~
+A starberry twinkles on the ground.~
+   The petite little berry twinkles with the brilliance of the distant stars.
+Beneath its deep, celestial blue skin, the fruit's sweet flavor is as
+enchanting as a cloudless night.
+~
+6 g a 0 0 8
+6 0 0
+7 5
+C
+1 1
+M
+4
+You bite into the starberry and your vision goes dark, only for a second, followed by dazzling stars.~
+M
+5
+$n bites into $p and looks far away for a moment.~
+M
+17
+$p turns to glowing goo and evaporates in your hands.~
+M
+18
+$p turns to glowing goo and evaporates.~
+O+ 1 6121
+R
+4 5619 0
+S
+#1124
+sunapple apple orange~
+an orange sunapple~
+An orange sunapple glows softly on the ground.~
+   The juicy sunapple has a golden-orange hue and a soft, comforting glow. Its
+skin is smooth and slightly mottled, like a fresh apple.
+~
+6 g a 0 0 9
+6 0 0
+7 5
+C
+1 1
+M
+4
+You bite into the sunapple and, for an instant, your vision is blinded by a light as bright as the sun!~
+M
+5
+$n bites into $p and then blinks a few times as $e waves $s hand in front of $s face.~
+M
+17
+$p turns to glowing goo and evaporates in your hands.~
+M
+18
+$p turns to glowing goo and evaporates.~
+O+ 1 6121
+R
+4 5619 0
+S
+#1125
+rainbotan rainbow dewy~
+a dewy rainbotan~
+A rainbotan sits on the ground, covered in dew.~
+   The rainbotan resembles a tropical blossom with spines in a kaleidoscope of
+colors; but when you open the skin, the inside is a delicate fruit that
+glistens as it shifts from hue to hue.
+~
+6 g a 0 0 9
+6 0 0
+7 5
+C
+1 1
+M
+4
+As you eat the delicate rainbotan, you can almost feel the fresh burst of a tropical rain shower.~
+M
+5
+$n bites into $p and looks far away for a moment.~
+M
+17
+$p turns to glowing goo and evaporates in your hands.~
+M
+18
+$p turns to glowing goo and evaporates.~
+O+ 1 6121
+R
+4 5619 0
+S
+#1126
+mysticurrant currant gleaming~
+a gleaming mysticurrant~
+A mysticurrant gleams on the ground.~
+   It's a small, odd fruit with an otherworldly aura. Its skin is iridescent,
+shifting from color to color as it catches the light.
+~
+6 g a 0 0 9
+6 0 0
+7 5
+C
+1 1
+M
+4
+You eat the mysticurrant, which leaves you with the subtle taste of wonder and enchantment.~
+M
+5
+$n eats $p and a look of wonder crosses $s face.~
+M
+17
+$p turns to glowing goo and evaporates in your hands.~
+M
+18
+$p turns to glowing goo and evaporates.~
+O+ 1 6121
+R
+4 5619 0
+S
+#1127
+claws~
+claws~
+Some claws are lying here.~
+   The tips of your fingers have melded with your fingernails, turning to long
+claws that look capable of delivering grievous wounds!
+~
+1 gmp an f 0 6
+0 1 13
+14 0
+A
+21 1 0
+A
+26 2 0
+M
+10
+Your claws meld back into your fingers.~
+M
+11
+$n's claws meld back into $s fingers.~
+S
+#1128
+book lost~
+a lost book~
+A lost book is lying here.~
+It looks like someone lost this book.
+~
+3 0 a 0 0 2
+0 0 0
+0 0
+T 1128
 S
 $

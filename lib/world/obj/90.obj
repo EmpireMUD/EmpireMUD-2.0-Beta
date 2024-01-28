@@ -5,7 +5,7 @@ A wolf's fur is hanging here.~
    This wolf fur is in fine condition and could be used as-is or tanned into
 leather.
 ~
-3 e a 0 6
+3 e a 0 0 6
 0 0 0
 7 0
 C
@@ -21,7 +21,7 @@ a fine deer antler~
 A fine deer antler is lying on the ground.~
 The antler has 5 points and must have come from a good-sized buck.
 ~
-3 e a 0 4
+3 e a 0 0 4
 0 0 0
 14 0
 C
@@ -36,7 +36,7 @@ a horseshoe~
 A horseshoe is lying here.~
 Your empire's stablemaster may have a use for this newly forged horseshoe.
 ~
-3 p a 0 1
+3 p a 0 0 1
 0 0 0
 2 0
 Q 9009
@@ -48,7 +48,7 @@ The horseshoe pattern is lying here.~
    This pattern, received from the stablemaster, can be used to make horseshoes
 as long as you're on his quest.
 ~
-3 p a 0 1
+3 p a 0 0 1
 0 0 0
 2 0
 Q 9009
@@ -60,7 +60,7 @@ A fine tiger pelt is lying here.~
    This brilliant orange and black pelt can only have come from the largest
 jungle predator -- the tiger!
 ~
-3 0 a 0 6
+3 0 a 0 0 6
 0 0 0
 7 0
 C
@@ -76,7 +76,7 @@ A slab of shark meat is rotting on the ground.~
    The shark meat has begun to ferment. You could cook it into dried shark
 meat.
 ~
-3 0 a 0 5
+3 C a 0 0 6
 0 0 0
 7 24
 C
@@ -92,7 +92,7 @@ Some bird feathers are scattered here.~
    These bird feathers aren't in very good condition, but they could be used as
 stuffing or for other crafts.
 ~
-3 l a 0 7
+3 l a 0 0 7
 0 0 0
 7 0
 C
@@ -107,7 +107,7 @@ the head of a mighty beast~
 The severed head of a mighty beast has been left here.~
 The barkeep in your empire wants this.
 ~
-3 0 a 0 2
+3 0 a 0 0 2
 0 0 0
 0 0
 Q 9030
@@ -119,7 +119,7 @@ The barkeep's knife has been left here.~
    The barkeep asked you to use this knife to butcher a wolf or bear and bring
 back its head.
 ~
-1 p ano f 4
+1 p ano f 0 4
 0 1 1
 0 0
 C
@@ -133,7 +133,7 @@ a stolen trinket~
 A stolen trinket lies here.~
 Return this to the guildmaster.
 ~
-3 p a 0 2
+3 p a 0 0 2
 0 0 0
 0 0
 Q 9033
@@ -144,7 +144,7 @@ a picture of the trinket~
 A picture of a trinket is lying here.~
 You'll need this to identify the trinket the guildmaster wants you to steal.
 ~
-3 0 a 0 2
+3 0 a 0 0 2
 0 0 0
 0 0
 Q 9033
@@ -157,7 +157,7 @@ A useless trinket is sitting here.~
    These useless trinkets are used by novice sorcerers to practice enchanting.
 The High Sorcerer wants them disenchanted so they can be reused.
 ~
-3 jp a 0 4
+3 jp a 0 0 4
 0 0 0
 8 0
 Q 9036
@@ -170,7 +170,7 @@ A unicorn horn is sticking out of the ground.~
    This thin, spiralled horn is the stuff of legends. If it's real, it could
 fetch a lot of money.
 ~
-15 0 a 0 4
+15 0 a 0 0 4
 16 2 0
 14 0
 C
@@ -185,7 +185,7 @@ An undelivered letter is lying here.~
    This letter needs to be delivered to the smith (or forgemaster) in your
 empire... But maybe you could take a peek.
 ~
-3 0 a 0 3
+3 0 a 0 0 3
 0 0 0
 0 0
 Q 9042
@@ -198,7 +198,7 @@ An undelivered letter is lying here.~
    This letter needs to be delivered to the High Sorcerer in your empire...
 But maybe you could take a peek.
 ~
-3 0 a 0 2
+3 0 a 0 0 2
 0 0 0
 0 0
 Q 9042
@@ -211,7 +211,7 @@ An undelivered letter is lying here.~
    This letter needs to be delivered to the Alchemist in your empire... But
 maybe you could take a peek.
 ~
-3 0 a 0 3
+3 0 a 0 0 3
 0 0 0
 0 0
 Q 9042
@@ -224,7 +224,7 @@ A pair of jackalope antlers are lying here.~
    These antlers may resemble tiny deer antlers, but they are clearly from a
 legendary jackalope.
 ~
-15 0 a 0 5
+15 0 a 0 0 5
 16 2 0
 14 0
 C
@@ -238,7 +238,7 @@ a sasquatch hide~
 A sasquatch hide is draped here.~
 This huge hide could be from none other than the sasquatch!
 ~
-15 0 a 0 8
+15 0 a 0 0 8
 16 2 0
 7 0
 C
@@ -254,7 +254,7 @@ A luxurious yeti fur is draping here.~
    This huge, white fur could only have come from the elusive yeti. It must be
 worth its weight in gold!
 ~
-15 0 a 0 9
+15 0 a 0 0 9
 16 2 0
 7 0
 C
@@ -270,7 +270,7 @@ An enormous mammoth tusk is standing here.~
    The tusk is larger, longer, and curvier than any elephant's tusk. It can
 only have come from a mammoth, the rarest of the giant beasts.
 ~
-15 e a 0 9
+15 e a 0 0 9
 16 2 0
 14 0
 C
@@ -287,7 +287,7 @@ A hoard of gold has spilled onto the floor.~
 across the land. Each piece has long claw marks or signs of fire, both
 resulting from its time in a dragon's hoard.
 ~
-15 0 a 0 6
+15 0 a 0 0 6
 16 2 0
 4 0
 C
@@ -303,7 +303,7 @@ A mermaid's purse has been dropped here.~
 There doesn't seem to be a way to open it, but it feels like there are pearls
 inside. These purses are known to come from mermaids who swim in deep waters.
 ~
-15 0 a 0 6
+15 0 a 0 0 6
 16 2 0
 7 0
 C
@@ -318,7 +318,7 @@ A seeping wineskin is lying on the ground.~
    The wineskin is poorly made, and badly damage from decades -- or more -- of
 heavy use.
 ~
-5 p a 0 2
+5 p a 0 0 2
 72 0 6
 7 96
 S

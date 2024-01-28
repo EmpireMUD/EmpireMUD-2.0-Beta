@@ -4,10 +4,10 @@ a crab~
 A seaweed-covered crab is picking at bits of food with its claws.
 ~
 0 50 bdj G 1
-0 0 0 10
+0 0 0 10 -1
 D
    The flat little crustacean is covered in patches of seaweed that almost seem
-to be growing out of its shell. If it wasn't moving, you'd hardly notice it. 
+to be growing out of its shell. If it wasn't moving, you'd hardly notice it.
 You watch as it picks bits of fish from some discarded bones, eating every
 spare morsel.
 ~
@@ -18,7 +18,7 @@ a goblin pirate~
 A goblin pirate is washing the side of the ship.
 ~
 0 0 bd 0 2
-1 0 0 1
+1 0 0 1 -1
 D
    Sweat glistens on the green-skinned pirate's head and back as he tries in
 vain to scrub barnacles and salt from the side of the wooden ship.
@@ -46,8 +46,8 @@ deckhand hand human~
 the deckhand~
 A human deckhand is chained to the side of the ship.
 ~
-0 0 bdvI 0 3
-1 0 0 15
+0 0 bdvIL 0 3
+1 0 0 15 -1
 D
    Though he towers over the pirates, the pink-skinned deckhand seems to have
 no ability to free himself. He's thin -- too thin -- and his ankle is bruised
@@ -82,8 +82,8 @@ Smeegle goblin quartermaster master~
 Quartermaster Smeegle~
 Smeegle, the goblin quartermaster, is walking around with a list.
 ~
-0 0 bd c 2
-1 0 0 4
+0 0 bdL c 2
+1 0 0 4 -1
 D
    Smeegle is a tubby little goblin with dark green skin akin to a pine forest.
 He holds a paper list, checking things on the deck as he goes. He stops on
@@ -138,8 +138,8 @@ Hornswaggle first mate~
 First Mate Hornswaggle~
 Hornswaggle, the Golden Goblin's first mate, stands ready to fight!
 ~
-0 0 bdy c 2
-1 0 0 7
+0 0 bdyL c 2
+1 0 0 7 -1
 D
    Hornswaggle looks slightly ridiculous in his striped vest and wide hat. The
 whip coiled on his belt drips red, although it's the color of paint not blood.
@@ -188,8 +188,8 @@ Greenbeard captain~
 Captain Greenbeard~
 Captain Greenbeard stands on the aftercastle, sword held high!
 ~
-0 0 bdyz c 2
-1 0 0 1
+0 0 bdyzL c 2
+1 0 0 1 -1
 D
    Greenbeard is no taller than any other goblin here, but he's certainly
 bulkier. Though his skin is so pale as to be more gray than green, his beard
@@ -239,8 +239,8 @@ Fathma goblin sorceress~
 Fathma~
 Fathma, goblin sorceress of the deep, holds her wand high!
 ~
-0 0 bdxyz c 2
-2 0 0 21
+0 0 bdxyzL c 2
+2 0 0 21 -1
 D
    The old sorceress holds her glowing wand aloft, holding back the wall of
 water with all her magic. Her skin, though green, has a pale blue sheen in the
@@ -299,8 +299,8 @@ S
 deckhand #n~
 #n has been freed from his shackles (list).
 ~
-0 0 bdvI 0 3
-1 0 0 15
+0 0 bdvIL 0 3
+1 0 0 15 -1
 D
    The rail-thin deckhand massages his ankle, which is badly bruised from too
 long spent chained to the ship. He's human, though you can barely tell it for
@@ -328,7 +328,7 @@ a blue-ringed octopus~
 A blue-ringed octopus clings to the wall and flashes warning colors.
 ~
 0 0 bdj c 2
-0 0 6 7
+0 0 6 36 -1
 D
    This small yellow octopus is covered in dozens of blue rings that almost
 seem to glow. It's a clear warning that the size difference won't be enough to
@@ -352,7 +352,7 @@ a toothy anglerfish~
 A ball of light dances in the shadows.
 ~
 0 0 bdj c 2
-0 0 6 9
+0 0 6 9 -1
 D
    This thing is a true horror of the deep! What at first apepars to be a
 glowing orb in the dark cavern is actually the bioluminescent lure of the
@@ -374,7 +374,7 @@ a wolf eel~
 A wolf eel pokes its head out from a crevice.
 ~
 0 0 bdj c 2
-0 0 6 9
+0 0 6 9 -1
 D
    With a head bigger than yours, the wolf eel is a frightening sight indeed.
 It pokes out of a hole in the wall, flashing its snaggled teeth at you, but you
@@ -399,7 +399,7 @@ a banded sea snake~
 A banded sea snake coils around your legs.
 ~
 0 0 bdj c 2
-0 0 6 9
+0 0 6 9 -1
 D
    Few things could be more unnerving than exploring a deep-sea cave while
 holding your breath and coming face to face with a snake. Weren't they bad
@@ -419,7 +419,7 @@ a war orca~
 An armored war orca blocks your way!
 ~
 0 0 bdjy c 5
-0 0 6 9
+0 0 6 9 -1
 D
    The glint of metal in the dark cavern gives you the briefest hope that
 you've found another adventurer, but what foats into view is much larger and
@@ -454,7 +454,7 @@ a giant squid~
 A giant squid fills the cavern!
 ~
 0 0 bdjy c 5
-0 0 6 7
+0 0 6 36 -1
 D
    Tentacles line the walls of the cavern as you make your way through, ending
 at what almost seems to be a wall with an enormous beak. It takes you a moment
@@ -491,7 +491,7 @@ a mermidon warrior~
 A mermidon warrior aims her trident at you!
 ~
 0 0 bdvyI c 3
-2 0 6 3
+2 0 6 3 -1
 D
    Three glints of light appear in the dark cavern and you barely avoid them as
 they come fast at your throat. It's a trident! And the other end is held by a
@@ -530,7 +530,7 @@ the parrot~
 A parrot with an eyepatch is watching you with its good eye.
 ~
 1 1 bdoD mn 1
-0 0 2 9
+0 0 2 9 -1
 D
    The parrot is a tall, red bird with blue wings and a white spot around its
 good eye. The other eye is covered in a black leather eyepatch.
@@ -543,7 +543,7 @@ a tiny hydra~
 A tiny hydra is rolling around on the ground.
 ~
 1 1 bdoD n 1
-0 0 0 9
+0 0 0 9 -1
 D
    This little blob of a creature has heads coming out of every side. They look
 at you, one by one, as it rolls around on the ground. Luckily it seems playful.
@@ -569,8 +569,8 @@ hydra serpent massive nine-headed~
 the Hydra~
 A massive nine-headed serpent slithers out of the pool.
 ~
-0 0 bdjyA c 5
-0 0 6 9
+0 0 bdjyAL c 5
+0 0 6 9 -1
 D
    You can scarcely see the serpent's body as all nine of its heads snap at you
 from deep in the cavern. It's enormous! Each head and neck is more massive
@@ -630,8 +630,8 @@ scylla silla sylla~
 Scylla~
 Scylla floats in the center of the chamber as water swirls around her!
 ~
-0 0 bdzA c 4
-2 0 6 7
+0 0 bdzAL cG 4
+2 0 6 7 -1
 D
    Scylla is half alluring topless woman and half... Something else. She sings
 a sweet song as you enter, moving gracefully to lure you all the way into her
@@ -700,7 +700,7 @@ a green-tinged orca~
 A green-tinged orca is stalking you.
 ~
 100 125 dejl 0 5
-0 0 6 9
+0 0 6 9 -1
 D
    It's a huge black and green sea beast, like a killer whale that's been
 rolling in seaweed. It seems friendly as you approach, nudging your hand with
@@ -714,7 +714,7 @@ a raging kraken~
 A kraken rages violently in the water!
 ~
 100 125 dejl 0 5
-0 0 6 7
+0 0 6 36 -1
 D
    You can only see the mantle of this great squid as it cautiously trails its
 eight arms and two tentacles behind it. And then, without warning, it spins and
@@ -729,7 +729,7 @@ a giant albatross~
 A giant albatross with a saddle circles overhead!
 ~
 100 125 dej m 4
-0 0 2 9
+0 0 2 9 -1
 D
    The albatross is among the largest of birds, and this one perhaps most of
 all. Its long black wings seem too thin -- and too long -- for such a bird, but
@@ -744,7 +744,7 @@ the goblin dockmaster~
 A goblin dockmaster is pacing with a clipboard.
 ~
 30 60 bdqvI 0 2
-1 0 0 15
+1 0 0 15 -1
 D
    The little goblin looks hot and exhausted as he ensures everything is on
 schedule.
@@ -759,7 +759,7 @@ a goblin deckhand~
 A goblin deckhand is standing here.
 ~
 20 50 dqvI 0 2
-1 0 0 15
+1 0 0 15 -1
 D
    The little green goblin rushes from chore to chore as he keeps everything
 above board.

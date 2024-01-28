@@ -3,7 +3,7 @@
 *  Usage: contains the command_interpreter for vehicles, vehicle commands *
 *                                                                         *
 *  DG Scripts code by galion, 1996/08/04 23:10:16, revision 3.8           *
-*  EmpireMUD code base by Paul Clarke, (C) 2000-2015                      *
+*  EmpireMUD code base by Paul Clarke, (C) 2000-2024                      *
 *  All rights reserved.  See license.doc for complete information.        *
 *                                                                         *
 *  EmpireMUD based upon CircleMUD 3.0, bpl 17, by Jeremy Elson.           *
@@ -685,7 +685,7 @@ VCMD(do_vpurge) {
 	}
 	else if ((v = get_vehicle_by_vehicle(veh, arg))) {
 		if (*argument) {
-			act(argument, TRUE, ROOM_PEOPLE(IN_ROOM(v)), NULL, v, TO_CHAR | TO_ROOM);
+			act(argument, TRUE, ROOM_PEOPLE(IN_ROOM(v)), NULL, v, TO_CHAR | TO_ROOM | ACT_VEH_VICT);
 		}
 		extract_vehicle(v);
 	}
@@ -808,26 +808,26 @@ VCMD(do_vteleport) {
 	struct instance_data *inst;
 	char_data *ch, *next_ch;
 	vehicle_data *v;
-	obj_data *obj;
+	obj_data *obj, *cont;
 	int iter;
 
 	two_arguments(argument, arg1, arg2);
 
 	if (!*arg1 || !*arg2) {
-		veh_log(veh, "vteleport called with too few args");
+		veh_log(veh, "vteleport: called with too few args");
 		return;
 	}
 
-	target = get_room(orm, arg2);
-
-	if (!target) {
-		veh_log(veh, "vteleport target is an invalid room");
-		return;
-	}
+	// try to find a target for later -- this can fail
+	target = (*arg2 == UID_CHAR ? find_room(atoi(arg2 + 1)) : get_room(orm, arg2));
 	
 	if (!str_cmp(arg1, "all")) {
-		if (target == orm) {
-			veh_log(veh, "vteleport target is itself");
+		if (!target) {
+			veh_log(veh, "vteleport all: target is an invalid room");
+			return;
+		}
+		else if (target == orm) {
+			veh_log(veh, "vteleport all: target is itself");
 			return;
 		}
 		
@@ -837,8 +837,10 @@ VCMD(do_vteleport) {
 			char_from_room(ch);
 			char_to_room(ch, target);
 			GET_LAST_DIR(ch) = NO_DIR;
-			enter_wtrigger(IN_ROOM(ch), ch, NO_DIR, "script");
+			enter_triggers(ch, NO_DIR, "script", FALSE);
+			greet_triggers(ch, NO_DIR, "script", FALSE);
 			qt_visit_room(ch, IN_ROOM(ch));
+			RESET_LAST_MESSAGED_TEMPERATURE(ch);
 			msdp_update_room(ch);	// once we're sure we're staying
 		}
 	}
@@ -846,6 +848,10 @@ VCMD(do_vteleport) {
 		// teleport all players in the adventure
 		if (!orm || (!(inst = get_instance_by_id(VEH_INSTANCE_ID(veh))) && !(inst = find_instance_by_room(orm, FALSE, TRUE)))) {
 			veh_log(veh, "vteleport: 'adventure' mode called outside any adventure");
+			return;
+		}
+		else if (!target) {
+			veh_log(veh, "vteleport adventure: target is an invalid room");
 			return;
 		}
 		
@@ -862,32 +868,79 @@ VCMD(do_vteleport) {
 						char_from_room(ch);
 						char_to_room(ch, target);
 						GET_LAST_DIR(ch) = NO_DIR;
-						enter_wtrigger(IN_ROOM(ch), ch, NO_DIR, "script");
+						enter_triggers(ch, NO_DIR, "script", FALSE);
+						greet_triggers(ch, NO_DIR, "script", FALSE);
 						qt_visit_room(ch, IN_ROOM(ch));
+						RESET_LAST_MESSAGED_TEMPERATURE(ch);
 						msdp_update_room(ch);	// once we're sure we're staying
 					}
 				}
 			}
 		}
 	}
-	else {
+	else {	// single-target teleport
 		if ((ch = get_char_by_vehicle(veh, arg1))) {
+			if (!target) {
+				veh_log(veh, "vteleport character: target is an invalid room");
+				return;
+			}
 			if (valid_dg_target(ch, DG_ALLOW_GODS)) {
 				char_from_room(ch);
 				char_to_room(ch, target);
 				GET_LAST_DIR(ch) = NO_DIR;
-				enter_wtrigger(IN_ROOM(ch), ch, NO_DIR, "script");
+				enter_triggers(ch, NO_DIR, "script", FALSE);
+				greet_triggers(ch, NO_DIR, "script", FALSE);
 				qt_visit_room(ch, IN_ROOM(ch));
+				RESET_LAST_MESSAGED_TEMPERATURE(ch);
 				msdp_update_room(ch);	// once we're sure we're staying
 			}
 		}
 		else if ((v = get_vehicle_near_vehicle(veh, arg1))) {
+			if (!target) {
+				veh_log(veh, "vteleport vehicle: target is an invalid room");
+				return;
+			}
 			vehicle_from_room(v);
 			vehicle_to_room(v, target);
 			entry_vtrigger(v, "script");
 		}
 		else if ((obj = get_obj_by_vehicle(veh, arg1))) {
-			obj_to_room(obj, target);
+			// teleport object
+			if (target) {
+				// move obj to room
+				obj_to_room(obj, target);
+			}
+			else if ((ch = get_char_by_vehicle(veh, arg2))) {
+				// move obj to character
+				obj_to_char(obj, ch);
+			}
+			else if ((v = get_vehicle_near_vehicle(veh, arg2))) {
+				// move obj to vehicle
+				if (!VEH_FLAGGED(v, VEH_CONTAINER)) {
+					veh_log(veh, "wteleport object: attempting to put an object in a vehicle that's not a container");
+					return;
+				}
+				else {
+					obj_to_vehicle(obj, v);
+				}
+			}
+			else if ((cont = get_obj_by_vehicle(veh, arg2))) {
+				if (cont == obj || get_top_object(obj) == cont || get_top_object(cont) == obj) {
+					veh_log(veh, "mteleport object: attempting to put an object inside itself");
+					return;
+				}
+				else if (GET_OBJ_TYPE(cont) != ITEM_CONTAINER && GET_OBJ_TYPE(cont) != ITEM_CORPSE) {
+					veh_log(veh, "mteleport object: attempting to put an object in something that's not a container");
+					return;
+				}
+				else {
+					// move obj into obj
+					obj_to_obj(obj, cont);
+				}
+			}
+			else {
+				veh_log(veh, "wteleport object: no valid target location found");
+			}
 		}
 		else {
 			veh_log(veh, "vteleport: no target found");
@@ -996,20 +1049,29 @@ VCMD(do_vterraform) {
 
 
 VCMD(do_vload) {
-	char arg1[MAX_INPUT_LENGTH], arg2[MAX_INPUT_LENGTH];
+	char arg1[MAX_INPUT_LENGTH], arg2[MAX_INPUT_LENGTH], emp_arg[MAX_INPUT_LENGTH];
 	struct instance_data *inst = NULL;
-	int number = 0;
+	int number = 0, pos;
+	book_data *book;
+	empire_data *emp;
 	room_data *room, *in_room;
 	char_data *mob, *tch;
 	obj_data *object, *cnt;
 	vehicle_data *vehicle;
 	char *target;
-	int pos;
+	struct empire_storage_data *store;
 
 	target = two_arguments(argument, arg1, arg2);
 	skip_spaces(&target);
 
-	if (!*arg1 || !*arg2 || !is_number(arg2) || ((number = atoi(arg2)) < 0)) {
+	if (is_abbrev(arg1, "book")) {
+		// special checking for books
+		if (!*arg2 || (!is_number(arg2) && str_cmp(arg2, "lost")) || ((number = atoi(arg2)) < 0)) {
+			veh_log(veh, "vload: bad syntax (book)");
+			return;
+		}
+	}
+	else if (!*arg1 || !*arg2 || !is_number(arg2) || ((number = atoi(arg2)) < 0)) {
 		veh_log(veh, "vload: bad syntax");
 		return;
 	}
@@ -1042,12 +1104,53 @@ VCMD(do_vload) {
 		
 		load_mtrigger(mob);
 	}
-	else if (is_abbrev(arg1, "object")) {
-		if (!obj_proto(number)) {
-			veh_log(veh, "vload: bad object vnum");
+	else if (is_abbrev(arg1, "object") || is_abbrev(arg1, "book") || is_abbrev(arg1, "einventory")) {
+		// object, book, or empire resource
+		if (is_abbrev(arg1, "object")) {
+			if (!obj_proto(number)) {
+				veh_log(veh, "vload: bad object vnum");
+				return;
+			}
+			object = read_object(number, TRUE);
+		}
+		else if (is_abbrev(arg1, "book")) {
+			if (!str_cmp(arg2, "lost")) {
+				book = random_lost_book();
+			}
+			else {
+				book = book_proto(number);
+			}
+			
+			if (!book) {
+				veh_log(veh, "vload: bad book vnum%s", !str_cmp(arg2, "lost") ? " - no lost books" : "");
+				return;
+			}
+			
+			object = create_book_obj(book);
+		}
+		else if (is_abbrev(arg1, "einventory")) {
+			// %load% einv <vnum> <empire> [target]
+			target = any_one_word(target, emp_arg);
+			if (!*emp_arg || !(emp = get_empire(emp_arg))) {
+				veh_log(veh, "vload: bad empire '%s'", emp_arg);
+				return;
+			}
+			if (!(store = find_stored_resource(emp, GET_ISLAND_ID(IN_ROOM(veh)), number)) || store->amount < 1) {
+				veh_log(veh, "vload: empire has no stored #%d on island %d", number, GET_ISLAND_ID(IN_ROOM(veh)));
+				return;
+			}
+			
+			// ok: charge it
+			charge_stored_resource(emp, GET_ISLAND_ID(IN_ROOM(veh)), number, 1, TRUE);
+			EMPIRE_NEEDS_STORAGE_SAVE(emp) = TRUE;
+			
+			// and load it
+			object = read_object(number, TRUE);
+		}
+		else {
+			veh_log(veh, "vload: bad object type ??");
 			return;
 		}
-		object = read_object(number, TRUE);
 		
 		if (inst) {
 			instance_obj_setup(inst, object);
@@ -1102,14 +1205,17 @@ VCMD(do_vload) {
 				add_production_total(GET_LOYALTY(tch), GET_OBJ_VNUM(object), 1);
 			}
 			
-			if (*arg2 && (pos = find_eq_pos_script(arg2)) >= 0 && !GET_EQ(tch, pos) && can_wear_on_pos(object, pos)) {
+			if (*arg2 && (pos = find_eq_pos_script(arg2)) >= 0 && !GET_EQ(tch, pos) && CAN_WEAR(object, wear_data[pos].item_wear)) {
 				equip_char(tch, object, pos);
 				load_otrigger(object);
+				// get_otrigger(object, tch, FALSE);
 				determine_gear_level(tch);
 				return;
 			}
 			obj_to_char(object, tch);
-			load_otrigger(object);
+			if (load_otrigger(object)) {
+				get_otrigger(object, tch, FALSE);
+			}
 			return;
 		}
 		cnt = get_obj_near_vehicle(veh, arg1);
@@ -1163,7 +1269,17 @@ VCMD(do_vdamage) {
 	char name[MAX_INPUT_LENGTH], modarg[MAX_INPUT_LENGTH], typearg[MAX_INPUT_LENGTH], buf[MAX_STRING_LENGTH];
 	double modifier = 1.0;
 	char_data *ch;
-	int type;
+	int type, show_attack_message = NOTHING;
+	
+	// optional attack message arg
+	skip_spaces(&argument);
+	if (*argument == '#') {
+		argument = one_argument(argument, buf);
+		if ((show_attack_message = atoi(buf+1)) < 1 || !real_attack_message(show_attack_message)) {
+			veh_log(veh, "vdamage: invalid attack message #%s", buf);
+			show_attack_message = NOTHING;
+		}
+	}
 
 	argument = two_arguments(argument, name, modarg);
 	argument = one_argument(argument, typearg);	// optional
@@ -1203,20 +1319,30 @@ VCMD(do_vdamage) {
 		type = DAM_PHYSICAL;
 	}
 	
-	script_damage(ch, NULL, get_vehicle_scale_level(veh, ch), type, modifier);
+	script_damage(ch, NULL, get_vehicle_scale_level(veh, ch), type, modifier, show_attack_message);
 }
 
 
 VCMD(do_vaoe) {
 	char modarg[MAX_INPUT_LENGTH], typearg[MAX_INPUT_LENGTH];
 	double modifier = 1.0;
-	int level, type;
+	int level, type, show_attack_message = NOTHING;
 	room_data *orm = IN_ROOM(veh);
 	char_data *vict, *next_vict;
 	
 	// no room == no work
 	if (!orm) {
 		return;
+	}
+
+	// optional attack message arg
+	skip_spaces(&argument);
+	if (*argument == '#') {
+		argument = one_argument(argument, modarg);
+		if ((show_attack_message = atoi(modarg+1)) < 1 || !real_attack_message(show_attack_message)) {
+			veh_log(veh, "vaoe: invalid attack message #%s", modarg);
+			show_attack_message = NOTHING;
+		}
 	}
 
 	two_arguments(argument, modarg, typearg);
@@ -1239,7 +1365,7 @@ VCMD(do_vaoe) {
 	DL_FOREACH_SAFE2(ROOM_PEOPLE(orm), vict, next_vict, next_in_room) {
 		// harder to tell friend from foe: hit PCs or people following PCs
 		if (!IS_NPC(vict) || (GET_LEADER(vict) && !IS_NPC(GET_LEADER(vict)))) {
-			script_damage(vict, NULL, level, type, modifier);
+			script_damage(vict, NULL, level, type, modifier, show_attack_message);
 		}
 	}
 }
@@ -1627,7 +1753,7 @@ VCMD(do_vscale) {
 			scale_item_to_level(otarg, level);
 		}
 		else if ((proto = obj_proto(GET_OBJ_VNUM(otarg))) && OBJ_FLAGGED(proto, OBJ_SCALABLE)) {
-			fresh = fresh_copy_obj(otarg, level);
+			fresh = fresh_copy_obj(otarg, level, TRUE, TRUE);
 			swap_obj_for_obj(otarg, fresh);
 			extract_obj(otarg);
 		}

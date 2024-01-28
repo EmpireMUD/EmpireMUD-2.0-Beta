@@ -60,6 +60,7 @@ R
 1003 1 5 0
 R
 1010 1 5 0
+Z1 12
 S
 #5103
 Mud Hut~
@@ -81,6 +82,7 @@ R
 1000 1 5 0
 R
 1010 1 5 0
+Z1 8
 S
 #5104
 Pueblo~
@@ -99,6 +101,7 @@ R
 1002 1 5 0
 R
 1010 1 5 0
+Z1 8
 S
 #5105
 Cliff Dwelling~
@@ -117,6 +120,7 @@ R
 1003 1 5 0
 R
 1010 1 5 0
+Z1 12
 S
 #5106
 Well~
@@ -169,9 +173,9 @@ waiting for the next miners to venture into its depths.
 ~
 F
 o
-I 5 106 4.00 1 X  # DIG: rough piece of obsidian
-I 5 102 15.00 1 X  # DIG: flint stone
-I 5 100 100.00 1 X  # DIG: rock
+I 5 106 4.00 125 X  # DIG: rough piece of obsidian
+I 5 102 15.00 125 X  # DIG: flint stone
+I 5 100 100.00 125 X  # DIG: rock
 M
 232 5.00 c
 R
@@ -201,6 +205,7 @@ R
 1009 1 5 0
 R
 6000 1 1 0
+Z1 11
 S
 #5109
 Mill~
@@ -241,7 +246,7 @@ better pots and sculptures from their clay. The clay used here is dug from
 riversides and then sculpted and heated in the kiln.
 ~
 F
-rGL
+r
 I 29 5007 100.00 1 r  # RUINS-TO-BLD: Ruins
 M
 241 15.00 ce
@@ -249,6 +254,7 @@ R
 6000 1 1 0
 R
 6790 1 1 0
+Z1 11
 S
 #5111
 Stable~
@@ -295,7 +301,7 @@ those who constructed it, a bulwark against the dangers of the wilderness.
 R
 1003 1 5 0
 R
-6025 1 1 0
+6037 1 1 0
 S
 #5113
 Gate~
@@ -316,7 +322,7 @@ simultaneously marking the boundary between safety and the unknown.
 R
 1003 1 5 0
 R
-6025 1 1 0
+6035 1 1 0
 S
 #5114
 Cannery~
@@ -342,7 +348,7 @@ S
 Foundry~
 A Foundry~
 &0{FF}~
-8 0 bR 0
+8 0 bpR 0
 0 0 0 -1
 C
 inventory, retrieve, smelt, store~
@@ -358,6 +364,7 @@ R
 1009 1 5 0
 R
 1010 1 5 0
+Z1 11
 S
 #5116
 Granary~
@@ -443,7 +450,7 @@ S
 Smokehouse~
 The Smokehouse~
 &0{SS}~
-8 0 bR 0
+8 0 bpR 0
 0 0 0 -1
 C
 retrieve, store~
@@ -461,6 +468,7 @@ R
 1002 1 5 0
 R
 1010 1 5 0
+Z1 11
 S
 #5120
 Tannery~
@@ -509,7 +517,7 @@ S
 Quarry~
 A Quarry~
 &0|__|~
-4 0 dmnL 0
+4 0 dmn 0
 0 0 0 -1
 C
 dig, quarry~
@@ -527,14 +535,16 @@ to the monumental structures that it will one day become a part of. The quarry
 is a place of industry and hard work, a reminder that even the most humble of
 materials can be transformed into something magnificent.
 ~
-F
-f
-I 5 102 15.00 1 X  # DIG: flint stone
-I 5 100 100.00 1 X  # DIG: rock
+I 5 102 15.00 250 X  # DIG: flint stone
+I 5 100 100.00 250 X  # DIG: rock
 I 23 105 100.00 125  # QUARRY: huge stone block
 I 29 5006 100.00 1 r  # RUINS-TO-BLD: Ruins
-I 31 105 10.00 125  # PRODUCTION: huge stone block
+I 31 105 10.00 125 X  # PRODUCTION: huge stone block
 I+ 7 5  # Depletion: quarry
+I 31 102 15.00 250 X  # PRODUCTION: flint stone
+I+ 7 0  # Depletion: dig
+I 31 100 75.00 250 X  # PRODUCTION: rock
+I+ 7 0  # Depletion: dig
 R
 1000 1 5 0
 S
@@ -542,7 +552,7 @@ S
 Clay Pit~
 A Clay Pit~
 &y|__|~
-4 0 dmnL 0
+4 0 dmn 0
 0 0 0 -1
 C
 dig~
@@ -560,10 +570,10 @@ to create beautiful works of art. The clay pit is a place of raw materials and
 endless possibilities, a reminder that even the simplest of substances can be
 transformed into something beautiful and useful.
 ~
-F
-f
-I 5 101 100.00 1 X  # DIG: lump of clay
+I 5 101 100.00 250 X  # DIG: lump of clay
 I 29 5006 100.00 1 r  # RUINS-TO-BLD: Ruins
+I 31 101 100.00 250 X  # PRODUCTION: lump of clay
+I+ 7 0  # Depletion: dig
 R
 1000 1 5 0
 S
@@ -584,6 +594,7 @@ R
 1003 1 5 0
 R
 6790 1 1 0
+Z1 12
 S
 #5125
 Large House~
@@ -602,6 +613,7 @@ R
 6000 1 1 0
 R
 6790 1 1 0
+Z1 12
 S
 #5126
 Tree House~
@@ -662,6 +674,7 @@ R
 6015 1 1 0
 R
 6790 1 1 0
+Z1 2
 S
 #5129
 Mine Complex~
@@ -679,6 +692,7 @@ R
 6015 1 1 0
 R
 6790 1 1 0
+Z1 2
 S
 #5130
 Alchemist~
@@ -704,6 +718,7 @@ R
 6000 1 1 0
 R
 6790 1 1 0
+Z1 11
 S
 #5131
 Apiary~
@@ -751,12 +766,13 @@ R
 6000 1 1 0
 R
 6790 1 1 0
+Z1 11
 S
 #5133
 Bridge~
 A Bridge Over the River~
 &c~&0--&c~~
-16 0 dmosD 0
+16 0 dmopsD 0
 0 0 0 -1
 E
 bridge building~
@@ -837,6 +853,7 @@ R
 6000 1 1 0
 R
 6790 1 1 0
+Z1 11
 S
 #5136
 Pigeon Post~
@@ -895,7 +912,7 @@ The Tavern~
 10 0 pR 0
 0 0 0 220
 C
-fill, tavern~
+buy, list, inventory, retrieve, store, price~
 D
    Business is roaring at all hours as serfs and nobles alike pull up stools
 to drink, play cards, laugh, and brawl. The building is wooden, but most of the
@@ -933,6 +950,8 @@ R
 R
 6790 1 1 0
 T 5138
+T 5141
+Z1 2
 S
 #5139
 Warehouse~
@@ -1005,7 +1024,7 @@ A Stone Henge~
 128 4 d 0
 0 0 0 -1
 C
-chant druids~
+chant magic~
 E
 henge stone building around monument~
    As you approach the ancient henge, you can feel the weight of history and
@@ -1182,7 +1201,7 @@ A Grand Library~
 24 10 R 0
 0 0 0 -1
 C
-library, bookedit~
+browse, checkout, shelve, library, bookedit~
 D
    You take a step and are immersed in a musty swirl of dust. Stacks of books
 taller than your house are piled in oak bookshelves set against marble walls
@@ -1199,6 +1218,7 @@ R
 6000 1 1 0
 R
 6790 1 1 0
+T 5149
 S
 #5150
 High Temple~
@@ -1503,7 +1523,7 @@ the water. This is a place of cleanliness, so attendants regularly add fresh
 water to the bathing pools.
 ~
 F
-cF
+F
 I 29 5007 100.00 1 r  # RUINS-TO-BLD: Ruins
 M
 236 10.00 ce
@@ -1513,6 +1533,8 @@ R
 6000 1 1 0
 R
 6790 1 1 0
+T 5162
+T 9808
 S
 #5163
 Fountain~
@@ -1539,7 +1561,7 @@ S
 Tower of Sorcery~
 The Tower of Sorcery~
 .&b||&?.~
-128 1 lR eflm
+128 1 lR lm
 2 1 0 -1
 C
 inventory, retrieve, store~
@@ -1562,6 +1584,7 @@ R
 R
 6075 1 1 0
 T 5164
+Z1 2
 S
 #5165
 Castle~
@@ -1588,6 +1611,7 @@ R
 6000 2 1 0
 R
 6790 2 1 0
+Z1 2
 S
 #5166
 Palace~
@@ -1607,6 +1631,7 @@ R
 6000 2 1 0
 R
 6790 2 1 0
+Z1 2
 S
 #5167
 Guard Tower~
@@ -1813,7 +1838,7 @@ S
 Terraced Garden~
 A Terraced Garden~
 /&r##&?\~
-32 0 dn 0
+32 0 dnp 0
 0 0 0 -1
 C
 pick~
@@ -1839,7 +1864,7 @@ S
 Raft Garden~
 A Garden Made of Rafts~
 ~&b##&?~~
-10 0 dnD 0
+10 0 dnpD 0
 0 0 0 -1
 C
 pick~
@@ -1865,7 +1890,7 @@ S
 Oasis Garden~
 An Oasis Garden~
 &g^&C##&g^~
-10 0 dn 0
+10 0 dnp 0
 0 0 0 -1
 C
 pick~
@@ -1891,12 +1916,13 @@ R
 6000 1 1 0
 R
 6790 1 1 0
+Z1 2
 S
 #5180
 Estuary Garden~
 An Estuary Garden~
 ~&0##&?~~
-10 0 dnD 0
+10 0 dnpD 0
 0 0 0 -1
 C
 pick~
@@ -1921,7 +1947,7 @@ S
 Shady Garden~
 A Shady Garden~
 &g|&y##&g|~
-10 0 dn 0
+10 0 dnp 0
 0 0 0 -1
 C
 pick~
@@ -1942,6 +1968,7 @@ R
 6000 1 1 0
 R
 6790 1 1 0
+Z1 8
 S
 #5182
 Mint~
@@ -2075,6 +2102,7 @@ R
 R
 6790 1 1 0
 T 5186
+Z1 2
 S
 #5187
 Strange Burrow~
@@ -2100,6 +2128,7 @@ R
 R
 6790 1 1 0
 T 5187
+Z1 2
 S
 #5188
 Old Pueblo~
@@ -2124,6 +2153,7 @@ R
 R
 6790 1 1 0
 T 5186
+Z1 2
 S
 #5189
 Obscure Cave~
@@ -2149,6 +2179,7 @@ R
 R
 6790 1 1 0
 T 5187
+Z1 2
 S
 #5190
 Astral Nexus~
@@ -2294,12 +2325,15 @@ R
 R
 1007 1 5 0
 T 5195
+U
+1 5108
+Z1 1
 S
 #5196
 Ocean Fishery~
 A Fishery on the Coast~
 &0(&a~~&0)~
-8 0 dnpDL 0
+8 0 dnpD 0
 0 0 0 -1
 C
 fish~
@@ -2312,9 +2346,9 @@ of saltwater and fish is strong in the air.
 ~
 F
 I
-I 21 1302 33.00 1 f  # FISH: giant linefish
-I 21 1303 33.00 1 f  # FISH: magenta arrowfish
-I 21 1301 100.00 1 f  # FISH: striped barbfish
+I 21 1302 33.00 250 f  # FISH: giant linefish
+I 21 1303 33.00 250 f  # FISH: magenta arrowfish
+I 21 1301 100.00 250 f  # FISH: striped barbfish
 I 29 5010 100.00 1 r  # RUINS-TO-BLD: Flooded Ruins
 R
 1002 1 5 0

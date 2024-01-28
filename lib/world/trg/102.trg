@@ -60,6 +60,7 @@ return 0
 set difficulty %self.difficulty%
 %load% mob 10201
 set mob %self.room.people%
+nop %mob.link_instance%
 remote difficulty %mob.id%
 set mob_diff %difficulty%
 dg_affect #10216 %mob% !ATTACK on 5
@@ -119,6 +120,7 @@ set mob_num 10202
 while %mob_num% <= 10203
   %load% mob %mob_num%
   set mob %self.room.people%
+  nop %mob.link_instance%
   remote difficulty %mob.id%
   eval aff_id %mob_num% + 15
   dg_affect #%aff_id% %mob% !ATTACK on 5
@@ -174,6 +176,7 @@ if !%found%
   set difficulty %self.difficulty%
   %load% mob 10204
   set mob %self.room.people%
+  nop %mob.link_instance%
   remote difficulty %mob.id%
   set mob_diff %difficulty%
   dg_affect #10219 %mob% !ATTACK on 5
@@ -225,6 +228,7 @@ if !%found%
   set difficulty %self.difficulty%
   %load% mob 10204
   set mob %self.room.people%
+  nop %mob.link_instance%
   remote difficulty %mob.id%
   set mob_diff %difficulty%
   dg_affect #10219 %mob% !ATTACK on 5
@@ -280,6 +284,7 @@ return 0
 set difficulty %self.difficulty%
 %load% mob 10205
 set mob %self.room.people%
+nop %mob.link_instance%
 remote difficulty %mob.id%
 set mob_diff %difficulty%
 dg_affect #10220 %mob% !ATTACK on 5
@@ -402,6 +407,7 @@ if %filks_present% && !%walts_present% && !%fighting%
   %load% mob 10203
   set new_mob %room.people%
   if %new_mob.vnum% == 10203
+    nop %new_mob.link_instance%
     %echo% ~%new_mob% respawns.
     nop %new_mob.add_mob_flag(!LOOT)%
     nop %new_mob.add_mob_flag(NO-CORPSE)%
@@ -411,6 +417,7 @@ elseif %walts_present% && !%filks_present% && !%fighting%
   %load% mob 10202
   set new_mob %room.people%
   if %new_mob.vnum% == 10202
+    nop %new_mob.link_instance%
     %echo% ~%new_mob% respawns.
     nop %new_mob.add_mob_flag(!LOOT)%
     nop %new_mob.add_mob_flag(NO-CORPSE)%
@@ -439,7 +446,7 @@ if %new_mob%
 end
 ~
 #10225
-Druid greeting~
+Gardener greeting~
 0 g 100
 ~
 wait 5
@@ -454,7 +461,7 @@ wait 5
 %load% obj 10237 %actor% inv
 ~
 #10226
-Druid Offer~
+Gardener Offer~
 0 c 0
 offer~
 if (%actor.has_resources(3002,4)% && %actor.has_resources(3004,4)% && %actor.has_resources(3008,4)% && %actor.has_resources(3010,4)%)
@@ -974,8 +981,8 @@ elseif feathered /= %arg%
 elseif small /= %arg%
   set keyword small
   set target %instance.mob(10257)%
-elseif druid /= %arg%
-  set keyword druid
+elseif mage /= %arg%
+  set keyword mage
   set target %instance.mob(10258)%
 end
 * see if that keyword was already tracked here

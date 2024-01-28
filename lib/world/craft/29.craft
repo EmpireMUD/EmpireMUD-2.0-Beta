@@ -67,7 +67,7 @@ S
 #2908
 imperial carriage~
 2908 1
-2 264 nq 48 -1 c e
+2 264 nq 48 -1 0 e
 L
 100
 R
@@ -125,7 +125,7 @@ S
 #2916
 heroic caravan~
 2916 1
-2 264 nq 1 -1 c e
+2 264 nq 1 -1 0 e
 L
 200
 R
@@ -148,7 +148,7 @@ S
 #2917
 heroic galleon~
 2917 1
-11 61 nq 1 -1 c bu
+11 61 nq 1 -1 0 bu
 L
 200
 R
@@ -253,6 +253,32 @@ R
 1213 3 0 0
 R
 1215 3 0 0
+R
+800 1 0 0
+S
+#2930
+imperial warming potion~
+2930 1
+6 124 hq 3 -1 0 0
+L
+175
+R
+1211 3 0 0
+R
+1214 3 0 0
+R
+800 1 0 0
+S
+#2932
+imperial cooling potion~
+2932 1
+6 124 q 3 -1 0 0
+L
+175
+R
+1210 3 0 0
+R
+1212 3 0 0
 R
 800 1 0 0
 S

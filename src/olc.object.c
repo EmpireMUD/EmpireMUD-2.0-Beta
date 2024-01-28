@@ -2,7 +2,7 @@
 *   File: olc.object.c                                    EmpireMUD 2.0b5 *
 *  Usage: OLC for items                                                   *
 *                                                                         *
-*  EmpireMUD code base by Paul Clarke, (C) 2000-2015                      *
+*  EmpireMUD code base by Paul Clarke, (C) 2000-2024                      *
 *  All rights reserved.  See license.doc for complete information.        *
 *                                                                         *
 *  EmpireMUD based upon CircleMUD 3.0, bpl 17, by Jeremy Elson.           *
@@ -31,9 +31,6 @@
 *   Edit Modules
 */
 
-// external vars
-extern bitvector_t default_minipet_flags, default_minipet_affs;
-
 // locals
 const char *default_obj_keywords = "object new";
 const char *default_obj_short = "a new object";
@@ -58,6 +55,7 @@ bool audit_object(obj_data *obj, char_data *ch) {
 	char temp[MAX_STRING_LENGTH], temp2[MAX_STRING_LENGTH], temp3[MAX_STRING_LENGTH], unplural[MAX_STRING_LENGTH], *ptr;
 	obj_data *obj_iter, *next_obj;
 	bool problem = FALSE, found;
+	attack_message_data *amd = NULL;
 	
 	if (!GET_OBJ_KEYWORDS(obj) || !*GET_OBJ_KEYWORDS(obj) || !str_cmp(GET_OBJ_KEYWORDS(obj), default_obj_keywords)) {
 		olc_audit_msg(ch, GET_OBJ_VNUM(obj), "Keywords not set");
@@ -111,7 +109,7 @@ bool audit_object(obj_data *obj, char_data *ch) {
 		while (*temp && ispunct(temp[strlen(temp)-1])) {
 			temp[strlen(temp)-1] = '\0';
 		}
-		if (*temp && !fill_word(temp) && !reserved_word(temp) && !isname(temp, GET_OBJ_KEYWORDS(obj))) {
+		if (*temp && !fill_word(temp) && !reserved_word(temp) && !isname(temp, GET_OBJ_KEYWORDS(obj)) && search_block(temp, ignore_missing_keywords, TRUE) == NOTHING) {
 			olc_audit_msg(ch, GET_OBJ_VNUM(obj), "Suggested missing keyword '%s'", temp);
 			problem = TRUE;
 		}
@@ -127,6 +125,10 @@ bool audit_object(obj_data *obj, char_data *ch) {
 	}
 	if (OBJ_FLAGGED(obj, OBJ_CREATABLE)) {
 		olc_audit_msg(ch, GET_OBJ_VNUM(obj), "CREATABLE");
+		problem = TRUE;
+	}
+	if (OBJ_FLAGGED(obj, OBJ_LONG_TIMER_IN_STORAGE) && GET_OBJ_TIMER(obj) <= 0) {
+		olc_audit_msg(ch, GET_OBJ_VNUM(obj), "LONG-TIMER-IN-STORAGE set with no timer");
 		problem = TRUE;
 	}
 	if (OBJ_FLAGGED(obj, OBJ_LIGHT) && GET_OBJ_TIMER(obj) <= 0) {
@@ -149,6 +151,10 @@ bool audit_object(obj_data *obj, char_data *ch) {
 		olc_audit_msg(ch, GET_OBJ_VNUM(obj), "Two bind flags");
 		problem = TRUE;
 	}
+	if (OBJ_FLAGGED(obj, OBJ_BIND_ON_PICKUP) && GET_OBJ_STORAGE(obj)) {
+		olc_audit_msg(ch, GET_OBJ_VNUM(obj), "BoP item has storage locations");
+		problem = TRUE;
+	}
 	if (!is_adventure && OBJ_FLAGGED(obj, OBJ_SCALABLE) && GET_OBJ_MAX_SCALE_LEVEL(obj) == 0) {
 		olc_audit_msg(ch, GET_OBJ_VNUM(obj), "No maximum scale level on non-adventure obj");
 		problem = TRUE;
@@ -157,7 +163,7 @@ bool audit_object(obj_data *obj, char_data *ch) {
 		olc_audit_msg(ch, GET_OBJ_VNUM(obj), "Scalable object has storage locations");
 		problem = TRUE;
 	}
-	if (OBJ_FLAGGED(obj, OBJ_SCALABLE) && !OBJ_FLAGGED(obj, OBJ_BIND_ON_EQUIP | OBJ_BIND_ON_PICKUP)) {
+	if (OBJ_FLAGGED(obj, OBJ_SCALABLE) && !OBJ_FLAGGED(obj, OBJ_BIND_ON_EQUIP | OBJ_BIND_ON_PICKUP) && GET_OBJ_MAX_SCALE_LEVEL(obj) != GET_OBJ_MIN_SCALE_LEVEL(obj)) {
 		olc_audit_msg(ch, GET_OBJ_VNUM(obj), "Scalable object has no bind flags");
 		problem = TRUE;
 	}
@@ -226,8 +232,12 @@ bool audit_object(obj_data *obj, char_data *ch) {
 			break;
 		}
 		case ITEM_WEAPON: {
-			if (GET_WEAPON_TYPE(obj) == TYPE_RESERVED) {
+			if (GET_WEAPON_TYPE(obj) == ATTACK_RESERVED || !(amd = real_attack_message(GET_WEAPON_TYPE(obj)))) {
 				olc_audit_msg(ch, GET_OBJ_VNUM(obj), "Weapon type not set");
+				problem = TRUE;
+			}
+			if (amd && !ATTACK_FLAGGED(amd, AMDF_WEAPON)) {
+				olc_audit_msg(ch, GET_OBJ_VNUM(obj), "Weapon type %d is not valid (it is missing WEAPON)", GET_WEAPON_TYPE(obj));
 				problem = TRUE;
 			}
 			if (GET_WEAPON_DAMAGE_BONUS(obj) == 0) {
@@ -258,6 +268,14 @@ bool audit_object(obj_data *obj, char_data *ch) {
 			break;
 		}
 		case ITEM_MISSILE_WEAPON: {
+			if (GET_MISSILE_WEAPON_TYPE(obj) == ATTACK_RESERVED || !(amd = real_attack_message(GET_MISSILE_WEAPON_TYPE(obj)))) {
+				olc_audit_msg(ch, GET_OBJ_VNUM(obj), "Missile weapon type not set");
+				problem = TRUE;
+			}
+			if (amd && !ATTACK_FLAGGED(amd, AMDF_WEAPON)) {
+				olc_audit_msg(ch, GET_OBJ_VNUM(obj), "Missile weapon type %d is not valid (it is missing WEAPON)", GET_MISSILE_WEAPON_TYPE(obj));
+				problem = TRUE;
+			}
 			if (GET_MISSILE_WEAPON_DAMAGE(obj) == 0) {
 				olc_audit_msg(ch, GET_OBJ_VNUM(obj), "Damage amount not set");
 				problem = TRUE;
@@ -407,29 +425,6 @@ obj_data *create_obj_table_entry(obj_vnum vnum) {
 
 
 /**
-* @return char** A "\n"-terminated list of weapon types.
-*/
-char **get_weapon_types_string(void) {
-	static char **wtypes = NULL;
-	int iter;
-	
-	// this does not have a const char** list .. build one the first time
-	if (!wtypes) {
-		CREATE(wtypes, char*, NUM_ATTACK_TYPES+1);
-		
-		for (iter = 0; iter < NUM_ATTACK_TYPES; ++iter) {
-			wtypes[iter] = str_dup(attack_hit_info[iter].name);
-		}
-		
-		// must terminate
-		wtypes[NUM_ATTACK_TYPES] = str_dup("\n");
-	}
-	
-	return wtypes;
-}
-
-
-/**
 * For the .list command.
 *
 * @param obj_data *obj The thing to list.
@@ -467,7 +462,6 @@ char *list_one_object(obj_data *obj, bool detail) {
 */
 void olc_delete_object(char_data *ch, obj_vnum vnum) {
 	struct empire_trade_data *trade, *next_trade;
-	struct ability_data_list *adl, *next_adl;
 	struct trading_post_data *tpd, *next_tpd;
 	struct archetype_gear *gear, *next_gear;
 	obj_data *proto, *obj_iter, *next_obj;
@@ -641,13 +635,8 @@ void olc_delete_object(char_data *ch, obj_vnum vnum) {
 	// update abilities
 	HASH_ITER(hh, ability_table, abil, next_abil) {
 		found = FALSE;
-		LL_FOREACH_SAFE(ABIL_DATA(abil), adl, next_adl) {
-			if (adl->type == ADL_READY_WEAPON && adl->vnum == vnum) {
-				LL_DELETE(ABIL_DATA(abil), adl);
-				free(adl);
-				found = TRUE;
-			}
-		}
+		found |= delete_from_ability_data_list(abil, ADL_READY_WEAPON, vnum);
+		found |= delete_from_interaction_list(&ABIL_INTERACTIONS(abil), TYPE_OBJ, vnum);
 		
 		if (found) {
 			syslog(SYS_OLC, GET_INVIS_LEV(ch), TRUE, "OLC: Ability %d %s lost deleted related object", ABIL_VNUM(abil), ABIL_NAME(abil));
@@ -694,7 +683,7 @@ void olc_delete_object(char_data *ch, obj_vnum vnum) {
 	// update buildings
 	HASH_ITER(hh, building_table, bld, next_bld) {
 		found = delete_from_interaction_list(&GET_BLD_INTERACTIONS(bld), TYPE_OBJ, vnum);
-		found |= remove_thing_from_resource_list(&GET_BLD_YEARLY_MAINTENANCE(bld), RES_OBJECT, vnum);
+		found |= remove_thing_from_resource_list(&GET_BLD_REGULAR_MAINTENANCE(bld), RES_OBJECT, vnum);
 		if (found) {
 			syslog(SYS_OLC, GET_INVIS_LEV(ch), TRUE, "OLC: Building %d %s lost deleted related object", GET_BLD_VNUM(bld), GET_BLD_NAME(bld));
 			save_library_file_for_vnum(DB_BOOT_BLD, GET_BLD_VNUM(bld));
@@ -883,7 +872,7 @@ void olc_delete_object(char_data *ch, obj_vnum vnum) {
 	
 	// update vehicles
 	HASH_ITER(hh, vehicle_table, veh, next_veh) {
-		found = remove_thing_from_resource_list(&VEH_YEARLY_MAINTENANCE(veh), RES_OBJECT, vnum);
+		found = remove_thing_from_resource_list(&VEH_REGULAR_MAINTENANCE(veh), RES_OBJECT, vnum);
 		found |= delete_from_interaction_list(&VEH_INTERACTIONS(veh), TYPE_OBJ, vnum);
 		if (found) {
 			syslog(SYS_OLC, GET_INVIS_LEV(ch), TRUE, "OLC: Vehicle %d %s lost deleted related object", VEH_VNUM(veh), VEH_SHORT_DESC(veh));
@@ -899,16 +888,11 @@ void olc_delete_object(char_data *ch, obj_vnum vnum) {
 		
 		if (GET_OLC_ABILITY(desc)) {
 			found = FALSE;
-			LL_FOREACH_SAFE(ABIL_DATA(GET_OLC_ABILITY(desc)), adl, next_adl) {
-				if (adl->type == ADL_READY_WEAPON && adl->vnum == vnum) {
-					LL_DELETE(ABIL_DATA(GET_OLC_ABILITY(desc)), adl);
-					free(adl);
-					found = TRUE;
-				}
-			}
+			found |= delete_from_ability_data_list(GET_OLC_ABILITY(desc), ADL_READY_WEAPON, vnum);
+			found |= delete_from_interaction_list(&ABIL_INTERACTIONS(GET_OLC_ABILITY(desc)), TYPE_OBJ, vnum);
 		
 			if (found) {
-				msg_to_desc(desc, "An object listed in the data for the ability you're editing has been removed.\r\n");
+				msg_to_desc(desc, "An object listed in the data or interactions for the ability you're editing has been removed.\r\n");
 			}
 		}
 		if (GET_OLC_ADVENTURE(desc)) {
@@ -952,7 +936,7 @@ void olc_delete_object(char_data *ch, obj_vnum vnum) {
 		}
 		if (GET_OLC_BUILDING(desc)) {
 			found = delete_from_interaction_list(&GET_OLC_BUILDING(desc)->interactions, TYPE_OBJ, vnum);
-			found |= remove_thing_from_resource_list(&GET_BLD_YEARLY_MAINTENANCE(GET_OLC_BUILDING(desc)), RES_OBJECT, vnum);
+			found |= remove_thing_from_resource_list(&GET_BLD_REGULAR_MAINTENANCE(GET_OLC_BUILDING(desc)), RES_OBJECT, vnum);
 			if (found) {
 				msg_to_char(desc->character, "One of the objects used in the building you're editing was deleted.\r\n");
 			}
@@ -1093,7 +1077,7 @@ void olc_delete_object(char_data *ch, obj_vnum vnum) {
 			}
 		}
 		if (GET_OLC_VEHICLE(desc)) {
-			found = remove_thing_from_resource_list(&VEH_YEARLY_MAINTENANCE(GET_OLC_VEHICLE(desc)), RES_OBJECT, vnum);
+			found = remove_thing_from_resource_list(&VEH_REGULAR_MAINTENANCE(GET_OLC_VEHICLE(desc)), RES_OBJECT, vnum);
 			found |= delete_from_interaction_list(&VEH_INTERACTIONS(GET_OLC_VEHICLE(desc)), TYPE_OBJ, vnum);
 			if (found) {
 				msg_to_char(desc->character, "One of the objects used on the vehicle you're editing was deleted.\r\n");
@@ -1115,16 +1099,17 @@ void olc_delete_object(char_data *ch, obj_vnum vnum) {
 * @param char *argument The argument they entered.
 */
 void olc_fullsearch_obj(char_data *ch, char *argument) {
-	char buf[MAX_STRING_LENGTH * 2], line[MAX_STRING_LENGTH], type_arg[MAX_INPUT_LENGTH], val_arg[MAX_INPUT_LENGTH], find_keywords[MAX_INPUT_LENGTH];
+	char buf[MAX_STRING_LENGTH * 2], line[MAX_STRING_LENGTH], type_arg[MAX_INPUT_LENGTH], val_arg[MAX_INPUT_LENGTH], find_keywords[MAX_INPUT_LENGTH], extra_search[MAX_INPUT_LENGTH];
 	bitvector_t find_applies = NOBITS, found_applies, not_flagged = NOBITS, only_flags = NOBITS;
-	bitvector_t only_worn = NOBITS, only_affs = NOBITS;
+	bitvector_t only_worn = NOBITS, not_worn = NOBITS, only_affs = NOBITS;
 	bitvector_t find_interacts = NOBITS, found_interacts, find_custom = NOBITS, found_custom;
-	bitvector_t only_tools = NOBITS, only_light_flags = NOBITS;
+	bitvector_t only_tools = NOBITS, only_requires_tool = NOBITS, only_light_flags = NOBITS;
 	int count, only_level = NOTHING, only_type = NOTHING, only_mat = NOTHING;
-	int only_weapontype = NOTHING, vmin = NOTHING, vmax = NOTHING;
+	int vmin = NOTHING, vmax = NOTHING, only_timer = -2, timer_over = NOTHING, timer_under = NOTHING;
 	// light hours uses -2 because the valid range is -1 to INT_MAX
 	int only_light_hours = -2 ,light_hours_over = -2, light_hours_under = -2;
 	bool only_storable = FALSE, not_storable = FALSE, light_is_lit = FALSE, light_is_unlit = FALSE;
+	attack_message_data *only_weapontype = NULL;
 	struct interaction_item *inter;
 	struct custom_message *cust;
 	obj_data *obj, *next_obj;
@@ -1140,6 +1125,7 @@ void olc_fullsearch_obj(char_data *ch, char *argument) {
 	
 	// process argument
 	*find_keywords = '\0';
+	*extra_search = '\0';
 	while (*argument) {
 		// figure out a type
 		argument = any_one_arg(argument, type_arg);
@@ -1152,6 +1138,7 @@ void olc_fullsearch_obj(char_data *ch, char *argument) {
 		FULLSEARCH_FLAGS("apply", find_applies, apply_types)
 		FULLSEARCH_FLAGS("applies", find_applies, apply_types)
 		FULLSEARCH_FLAGS("custom", find_custom, obj_custom_types)
+		FULLSEARCH_STRING("extradesc", extra_search)
 		FULLSEARCH_FLAGS("flags", only_flags, extra_bits)
 		FULLSEARCH_FLAGS("flagged", only_flags, extra_bits)
 		FULLSEARCH_FLAGS("interaction", find_interacts, interact_types)
@@ -1163,14 +1150,20 @@ void olc_fullsearch_obj(char_data *ch, char *argument) {
 		FULLSEARCH_BOOL("lightislit", light_is_lit)
 		FULLSEARCH_BOOL("lightisunlit", light_is_unlit)
 		FULLSEARCH_LIST("material", only_mat, (const char **)olc_material_list)
+		FULLSEARCH_FLAGS("requirestools", only_requires_tool, tool_flags)
 		FULLSEARCH_BOOL("storable", only_storable)
+		FULLSEARCH_INT("timer", only_timer, -1, INT_MAX)
+		FULLSEARCH_INT("timerover", timer_over, 0, INT_MAX)
+		FULLSEARCH_INT("timerunder", timer_under, 0, INT_MAX)
 		FULLSEARCH_FLAGS("tools", only_tools, tool_flags)
 		FULLSEARCH_LIST("type", only_type, item_types)
 		FULLSEARCH_FLAGS("unflagged", not_flagged, extra_bits)
 		FULLSEARCH_BOOL("unstorable", not_storable)
-		FULLSEARCH_FUNC("weapontype", only_weapontype, get_attack_type_by_name(val_arg))
+		FULLSEARCH_FUNC("weapontype", only_weapontype, find_attack_message_by_name_or_vnum(val_arg, FALSE))
 		FULLSEARCH_FLAGS("wear", only_worn, wear_bits)
+		FULLSEARCH_FLAGS("nowear", not_worn, wear_bits)
 		FULLSEARCH_FLAGS("worn", only_worn, wear_bits)
+		FULLSEARCH_FLAGS("noworn", not_worn, wear_bits)
 		FULLSEARCH_INT("vmin", vmin, 0, INT_MAX)
 		FULLSEARCH_INT("vmax", vmax, 0, INT_MAX)
 		
@@ -1216,6 +1209,15 @@ void olc_fullsearch_obj(char_data *ch, char *argument) {
 		if (only_flags != NOBITS && (GET_OBJ_EXTRA(obj) & only_flags) != only_flags) {
 			continue;
 		}
+		if (only_timer != -2 && GET_OBJ_TIMER(obj) != only_timer) {
+			continue;
+		}
+		if (timer_over != NOTHING && GET_OBJ_TIMER(obj) < timer_over) {
+			continue;
+		}
+		if (timer_under != NOTHING && (GET_OBJ_TIMER(obj) <= 0 || GET_OBJ_TIMER(obj) > timer_under)) {
+			continue;
+		}
 		if (only_light_flags != NOBITS && (!IS_LIGHT(obj) || (GET_LIGHT_FLAGS(obj) & only_light_flags) != only_light_flags)) {
 			continue;
 		}
@@ -1240,13 +1242,22 @@ void olc_fullsearch_obj(char_data *ch, char *argument) {
 		if (only_worn != NOBITS && (GET_OBJ_WEAR(obj) & only_worn) != only_worn) {
 			continue;
 		}
+		if (not_worn != NOBITS && CAN_WEAR(obj, not_worn)) {
+			continue;
+		}
 		if (only_tools != NOBITS && (GET_OBJ_TOOL_FLAGS(obj) & only_tools) != only_tools) {
+			continue;
+		}
+		if (only_requires_tool != NOBITS && (GET_OBJ_REQUIRES_TOOL(obj) & only_requires_tool) != only_requires_tool) {
 			continue;
 		}
 		if (only_mat != NOTHING && GET_OBJ_MATERIAL(obj) != only_mat) {
 			continue;
 		}
-		if (only_weapontype != NOTHING && (!IS_WEAPON(obj) || GET_WEAPON_TYPE(obj) != only_weapontype)) {
+		if (only_weapontype && (!IS_WEAPON(obj) || GET_WEAPON_TYPE(obj) != ATTACK_VNUM(only_weapontype))) {
+			continue;
+		}
+		if (*extra_search && !find_exdesc(extra_search, GET_OBJ_EX_DESCS(obj), NULL)) {
 			continue;
 		}
 		if (find_applies) {	// look up its applies
@@ -1292,7 +1303,7 @@ void olc_fullsearch_obj(char_data *ch, char *argument) {
 		}
 	}
 	
-	if (count > 0 && (size + 14) < sizeof(buf)) {
+	if (count > 0 && (size + 18) < sizeof(buf)) {
 		size += snprintf(buf + size, sizeof(buf) - size, "(%d objects)\r\n", count);
 	}
 	else if (count == 0) {
@@ -1323,7 +1334,6 @@ void olc_search_obj(char_data *ch, obj_vnum vnum) {
 	morph_data *morph, *next_morph;
 	event_data *event, *next_event;
 	quest_data *quest, *next_quest;
-	struct ability_data_list *adl;
 	progress_data *prg, *next_prg;
 	room_template *rmt, *next_rmt;
 	sector_data *sect, *next_sect;
@@ -1352,12 +1362,20 @@ void olc_search_obj(char_data *ch, obj_vnum vnum) {
 	
 	// abilities
 	HASH_ITER(hh, ability_table, abil, next_abil) {
-		LL_FOREACH(ABIL_DATA(abil), adl) {
-			if (adl->type == ADL_READY_WEAPON && adl->vnum == vnum) {
-				++found;
-				size += snprintf(buf + size, sizeof(buf) - size, "ABIL [%5d] %s\r\n", ABIL_VNUM(abil), ABIL_NAME(abil));
+		any = FALSE;
+		if (find_ability_data_entry_for(abil, ADL_READY_WEAPON, vnum)) {
+			any = TRUE;
+		}
+		LL_FOREACH(ABIL_INTERACTIONS(abil), inter) {
+			if (interact_data[inter->type].vnum_type == TYPE_OBJ && inter->vnum == vnum) {
+				any = TRUE;
 				break;
 			}
+		}
+		
+		if (any) {
+			++found;
+			size += snprintf(buf + size, sizeof(buf) - size, "ABIL [%5d] %s\r\n", ABIL_VNUM(abil), ABIL_NAME(abil));
 		}
 	}
 	
@@ -1405,13 +1423,13 @@ void olc_search_obj(char_data *ch, obj_vnum vnum) {
 	HASH_ITER(hh, building_table, bld, next_bld) {
 		any = FALSE;
 		for (inter = GET_BLD_INTERACTIONS(bld); inter && !any; inter = inter->next) {
-			if (interact_vnum_types[inter->type] == TYPE_OBJ && inter->vnum == vnum) {
+			if (interact_data[inter->type].vnum_type == TYPE_OBJ && inter->vnum == vnum) {
 				any = TRUE;
 				++found;
 				size += snprintf(buf + size, sizeof(buf) - size, "BLD [%5d] %s\r\n", GET_BLD_VNUM(bld), GET_BLD_NAME(bld));
 			}
 		}
-		for (res = GET_BLD_YEARLY_MAINTENANCE(bld); res && !any; res = res->next) {
+		for (res = GET_BLD_REGULAR_MAINTENANCE(bld); res && !any; res = res->next) {
 			if (res->type == RES_OBJECT && res->vnum == vnum) {
 				any = TRUE;
 				++found;
@@ -1446,7 +1464,7 @@ void olc_search_obj(char_data *ch, obj_vnum vnum) {
 	HASH_ITER(hh, crop_table, crop, next_crop) {
 		any = FALSE;
 		for (inter = GET_CROP_INTERACTIONS(crop); inter && !any; inter = inter->next) {
-			if (interact_vnum_types[inter->type] == TYPE_OBJ && inter->vnum == vnum) {
+			if (interact_data[inter->type].vnum_type == TYPE_OBJ && inter->vnum == vnum) {
 				any = TRUE;
 				++found;
 				size += snprintf(buf + size, sizeof(buf) - size, "CRP [%5d] %s\r\n", GET_CROP_VNUM(crop), GET_CROP_NAME(crop));
@@ -1481,7 +1499,7 @@ void olc_search_obj(char_data *ch, obj_vnum vnum) {
 	HASH_ITER(hh, globals_table, glb, next_glb) {
 		any = FALSE;
 		for (inter = GET_GLOBAL_INTERACTIONS(glb); inter && !any; inter = inter->next) {
-			if (interact_vnum_types[inter->type] == TYPE_OBJ && inter->vnum == vnum) {
+			if (interact_data[inter->type].vnum_type == TYPE_OBJ && inter->vnum == vnum) {
 				any = TRUE;
 				++found;
 				size += snprintf(buf + size, sizeof(buf) - size, "GLB [%5d] %s\r\n", GET_GLOBAL_VNUM(glb), GET_GLOBAL_NAME(glb));
@@ -1500,7 +1518,7 @@ void olc_search_obj(char_data *ch, obj_vnum vnum) {
 	HASH_ITER(hh, mobile_table, mob, next_mob) {
 		any = FALSE;
 		for (inter = mob->interactions; inter && !any; inter = inter->next) {
-			if (interact_vnum_types[inter->type] == TYPE_OBJ && inter->vnum == vnum) {
+			if (interact_data[inter->type].vnum_type == TYPE_OBJ && inter->vnum == vnum) {
 				any = TRUE;
 				++found;
 				size += snprintf(buf + size, sizeof(buf) - size, "MOB [%5d] %s\r\n", GET_MOB_VNUM(mob), GET_SHORT_DESC(mob));
@@ -1520,7 +1538,7 @@ void olc_search_obj(char_data *ch, obj_vnum vnum) {
 	HASH_ITER(hh, object_table, obj, next_obj) {
 		any = FALSE;
 		for (inter = GET_OBJ_INTERACTIONS(obj); inter && !any; inter = inter->next) {
-			if (interact_vnum_types[inter->type] == TYPE_OBJ && inter->vnum == vnum) {
+			if (interact_data[inter->type].vnum_type == TYPE_OBJ && inter->vnum == vnum) {
 				any = TRUE;
 				++found;
 				size += snprintf(buf + size, sizeof(buf) - size, "OBJ [%5d] %s\r\n", GET_OBJ_VNUM(obj), GET_OBJ_SHORT_DESC(obj));
@@ -1580,7 +1598,7 @@ void olc_search_obj(char_data *ch, obj_vnum vnum) {
 			}
 		}
 		for (inter = GET_RMT_INTERACTIONS(rmt); inter && !any; inter = inter->next) {
-			if (interact_vnum_types[inter->type] == TYPE_OBJ && inter->vnum == vnum) {
+			if (interact_data[inter->type].vnum_type == TYPE_OBJ && inter->vnum == vnum) {
 				any = TRUE;
 				++found;
 				size += snprintf(buf + size, sizeof(buf) - size, "RMT [%5d] %s\r\n", GET_RMT_VNUM(rmt), GET_RMT_TITLE(rmt));
@@ -1592,7 +1610,7 @@ void olc_search_obj(char_data *ch, obj_vnum vnum) {
 	HASH_ITER(hh, sector_table, sect, next_sect) {
 		any = FALSE;
 		for (inter = GET_SECT_INTERACTIONS(sect); inter && !any; inter = inter->next) {
-			if (interact_vnum_types[inter->type] == TYPE_OBJ && inter->vnum == vnum) {
+			if (interact_data[inter->type].vnum_type == TYPE_OBJ && inter->vnum == vnum) {
 				any = TRUE;
 				++found;
 				size += snprintf(buf + size, sizeof(buf) - size, "SCT [%5d] %s\r\n", GET_SECT_VNUM(sect), GET_SECT_NAME(sect));
@@ -1634,7 +1652,7 @@ void olc_search_obj(char_data *ch, obj_vnum vnum) {
 	// vehicles
 	HASH_ITER(hh, vehicle_table, veh, next_veh) {
 		any = FALSE;
-		for (res = VEH_YEARLY_MAINTENANCE(veh); res && !any; res = res->next) {
+		for (res = VEH_REGULAR_MAINTENANCE(veh); res && !any; res = res->next) {
 			if (res->type == RES_OBJECT && res->vnum == vnum) {
 				any = TRUE;
 				++found;
@@ -1642,7 +1660,7 @@ void olc_search_obj(char_data *ch, obj_vnum vnum) {
 			}
 		}
 		LL_FOREACH(VEH_INTERACTIONS(veh), inter) {
-			if (interact_vnum_types[inter->type] == TYPE_OBJ && inter->vnum == vnum) {
+			if (interact_data[inter->type].vnum_type == TYPE_OBJ && inter->vnum == vnum) {
 				any = TRUE;
 				++found;
 				size += snprintf(buf + size, sizeof(buf) - size, "VEH [%5d] %s\r\n", VEH_VNUM(veh), VEH_SHORT_DESC(veh));
@@ -1697,12 +1715,12 @@ void update_live_obj_from_olc(obj_data *to_update, obj_data *old_proto, obj_data
 	if (SCRIPT(to_update)) {
 		remove_all_triggers(to_update, OBJ_TRIGGER);
 	}
-	if (to_update->proto_script && to_update->proto_script != old_proto->proto_script) {
-		free_proto_scripts(&to_update->proto_script);
+	if (GET_OBJ_SCRIPTS(to_update) && GET_OBJ_SCRIPTS(to_update) != GET_OBJ_SCRIPTS(old_proto)) {
+		free_proto_scripts(&GET_OBJ_SCRIPTS(to_update));
 	}
 	
 	// re-attach scripts
-	to_update->proto_script = copy_trig_protos(new_proto->proto_script);
+	GET_OBJ_SCRIPTS(to_update) = copy_trig_protos(GET_OBJ_SCRIPTS(new_proto));
 	assign_triggers(to_update, OBJ_TRIGGER);
 }
 
@@ -1719,12 +1737,16 @@ void save_olc_object(descriptor_data *desc) {
 	struct trading_post_data *tpd;
 	empire_data *emp, *next_emp;
 	char_data *chiter;
+	int old_timer;
 	UT_hash_handle hh;
 	
 	// have a place to save it?
 	if (!(proto = obj_proto(vnum))) {
 		proto = create_obj_table_entry(vnum);
 	}
+	
+	// for updating storage timers later
+	old_timer = GET_OBJ_TIMER(proto);
 	
 	// update the strings, pointers, and stats on live items
 	DL_FOREACH(object_list, obj_iter) {
@@ -1787,8 +1809,8 @@ void save_olc_object(descriptor_data *desc) {
 	GET_OBJ_APPLIES(proto) = NULL;
 	
 	// free old script?
-	if (proto->proto_script) {
-		free_proto_scripts(&proto->proto_script);
+	if (GET_OBJ_SCRIPTS(proto)) {
+		free_proto_scripts(&GET_OBJ_SCRIPTS(proto));
 	}
 	
 	// timer must be converted
@@ -1810,6 +1832,16 @@ void save_olc_object(descriptor_data *desc) {
 	
 	// and save to file
 	save_library_file_for_vnum(DB_BOOT_OBJ, vnum);
+	
+	// lastly, if timers changed:
+	if (GET_OBJ_TIMER(proto) != old_timer) {
+		ensure_storage_timers(vnum);
+		
+		// update objs in home storage
+		DL_FOREACH2(player_character_list, chiter, next_plr) {
+			ensure_home_storage_timers(chiter, vnum);
+		}
+	}
 }
 
 
@@ -1910,7 +1942,7 @@ obj_data *setup_olc_object(obj_data *input) {
 		
 		// copy scripts
 		SCRIPT(new) = NULL;
-		new->proto_script = copy_trig_protos(input->proto_script);
+		GET_OBJ_SCRIPTS(new) = copy_trig_protos(GET_OBJ_SCRIPTS(input));
 		
 		// update version number
 		OBJ_VERSION(new) += 1;
@@ -1926,7 +1958,7 @@ obj_data *setup_olc_object(obj_data *input) {
 		OBJ_VERSION(new) = 1;
 
 		SCRIPT(new) = NULL;
-		new->proto_script = NULL;
+		GET_OBJ_SCRIPTS(new) = NULL;
 	}
 	
 	// done
@@ -2143,7 +2175,7 @@ void olc_get_values_display(char_data *ch, char *storage) {
 			break;
 		}
 		case ITEM_WEAPON: {
-			sprintf(storage + strlen(storage), "<%sweapontype\t0> %s\r\n", OLC_LABEL_VAL(GET_WEAPON_TYPE(obj), 0), attack_hit_info[GET_WEAPON_TYPE(obj)].name);
+			sprintf(storage + strlen(storage), "<%sweapontype\t0> %d %s\r\n", OLC_LABEL_VAL(GET_WEAPON_TYPE(obj), 0), GET_WEAPON_TYPE(obj), get_attack_name_by_vnum(GET_WEAPON_TYPE(obj)));
 			if (OBJ_FLAGGED(obj, OBJ_SCALABLE)) {
 				sprintf(storage + strlen(storage), "<%sdamage\t0> %d (scalable, speed %.2f)\r\n", OLC_LABEL_VAL(GET_WEAPON_DAMAGE_BONUS(obj), 0), GET_WEAPON_DAMAGE_BONUS(obj), get_weapon_speed(obj));
 			}
@@ -2179,7 +2211,7 @@ void olc_get_values_display(char_data *ch, char *storage) {
 			break;
 		}
 		case ITEM_MISSILE_WEAPON: {
-			sprintf(storage + strlen(storage), "<%sweapontype\t0> %s\r\n", OLC_LABEL_VAL(GET_MISSILE_WEAPON_TYPE(obj), 0), attack_hit_info[GET_MISSILE_WEAPON_TYPE(obj)].name);
+			sprintf(storage + strlen(storage), "<%sweapontype\t0> %d %s\r\n", OLC_LABEL_VAL(GET_MISSILE_WEAPON_TYPE(obj), 0), GET_MISSILE_WEAPON_TYPE(obj), get_attack_name_by_vnum(GET_MISSILE_WEAPON_TYPE(obj)));
 			if (OBJ_FLAGGED(obj, OBJ_SCALABLE)) {
 				sprintf(storage + strlen(storage), "<%sdamage\t0> %d (scalable, speed %.2f)\r\n", OLC_LABEL_VAL(GET_MISSILE_WEAPON_DAMAGE(obj), 0), GET_MISSILE_WEAPON_DAMAGE(obj), get_weapon_speed(obj));
 			}
@@ -2224,7 +2256,7 @@ void olc_get_values_display(char_data *ch, char *storage) {
 		}
 		case ITEM_BOOK: {
 			book = book_proto(GET_BOOK_ID(obj));
-			sprintf(storage + strlen(storage), "<%stext\t0> [%d] %s\r\n", OLC_LABEL_VAL(GET_BOOK_ID(obj), 0), GET_BOOK_ID(obj), (book ? book->title : "not set"));
+			sprintf(storage + strlen(storage), "<%stext\t0> [%d] %s\r\n", OLC_LABEL_VAL(GET_BOOK_ID(obj), 0), GET_BOOK_ID(obj), (book ? BOOK_TITLE(book) : "not set"));
 			break;
 		}
 		case ITEM_WEALTH: {
@@ -2302,7 +2334,7 @@ void olc_show_object(char_data *ch) {
 	struct obj_storage_type *store;
 	struct custom_message *ocm;
 	struct obj_apply *apply;
-	int count, minutes;
+	int count, seconds;
 	
 	if (!obj) {
 		return;
@@ -2316,8 +2348,8 @@ void olc_show_object(char_data *ch) {
 	sprintf(buf + strlen(buf), "<%slookdescription\t0>\r\n%s", OLC_LABEL_STR(GET_OBJ_ACTION_DESC(obj), ""), NULLSAFE(GET_OBJ_ACTION_DESC(obj)));
 	
 	if (GET_OBJ_TIMER(obj) > 0) {
-		minutes = GET_OBJ_TIMER(obj) * SECS_PER_MUD_HOUR / SECS_PER_REAL_MIN;
-		sprintf(buf1, "%d tick%s (%d:%02d)", GET_OBJ_TIMER(obj), PLURAL(GET_OBJ_TIMER(obj)), minutes / 60, minutes % 60);
+		seconds = GET_OBJ_TIMER(obj) * SECS_PER_MUD_HOUR;
+		sprintf(buf1, "%d tick%s (%s)", GET_OBJ_TIMER(obj), PLURAL(GET_OBJ_TIMER(obj)), colon_time(seconds, FALSE, NULL));
 	}
 	else {
 		strcpy(buf1, "none");
@@ -2332,6 +2364,9 @@ void olc_show_object(char_data *ch) {
 	
 	sprintbit(GET_OBJ_TOOL_FLAGS(obj), tool_flags, buf1, TRUE);
 	sprintf(buf + strlen(buf), "<%stools\t0> %s\r\n", OLC_LABEL_VAL(GET_OBJ_TOOL_FLAGS(obj), NOBITS), buf1);
+	
+	sprintbit(GET_OBJ_REQUIRES_TOOL(obj), tool_flags, buf1, TRUE);
+	sprintf(buf + strlen(buf), "<%srequirestools\t0> %s\r\n", OLC_LABEL_VAL(GET_OBJ_REQUIRES_TOOL(obj), NOBITS), buf1);
 	
 	sprintf(buf + strlen(buf), "<%scomponent\t0> [%d] %s\r\n", OLC_LABEL_VAL(GET_OBJ_COMPONENT(obj), NOTHING), GET_OBJ_COMPONENT(obj), GET_OBJ_COMPONENT(obj) != NOTHING ? get_generic_name_by_vnum(GET_OBJ_COMPONENT(obj)) : "none");
 	
@@ -2400,13 +2435,13 @@ void olc_show_object(char_data *ch) {
 	sprintf(buf + strlen(buf), "Custom messages: <%scustom\t0>\r\n", OLC_LABEL_PTR(GET_OBJ_CUSTOM_MSGS(obj)));
 	count = 0;
 	for (ocm = GET_OBJ_CUSTOM_MSGS(obj); ocm; ocm = ocm->next) {
-		sprintf(buf + strlen(buf), " \ty%d\t0. [%s] %s\r\n", ++count, obj_custom_types[ocm->type], ocm->msg);
+		sprintf(buf + strlen(buf), " \ty%2d\t0. [%s] %s\r\n", ++count, obj_custom_types[ocm->type], ocm->msg);
 	}
 	
 	// scripts
-	sprintf(buf + strlen(buf), "Scripts: <%sscript\t0>\r\n", OLC_LABEL_PTR(obj->proto_script));
-	if (obj->proto_script) {
-		get_script_display(obj->proto_script, buf1);
+	sprintf(buf + strlen(buf), "Scripts: <%sscript\t0>\r\n", OLC_LABEL_PTR(GET_OBJ_SCRIPTS(obj)));
+	if (GET_OBJ_SCRIPTS(obj)) {
+		get_script_display(GET_OBJ_SCRIPTS(obj), buf1);
 		strcat(buf, buf1);
 	}
 	
@@ -2875,7 +2910,7 @@ OLC_MODULE(oedit_currency) {
 
 OLC_MODULE(oedit_custom) {
 	obj_data *obj = GET_OLC_OBJECT(ch->desc);
-	olc_process_custom_messages(ch, argument, &(obj->proto_data->custom_msgs), obj_custom_types);
+	olc_process_custom_messages(ch, argument, &(obj->proto_data->custom_msgs), obj_custom_types, obj_custom_type_help);
 }
 
 
@@ -3084,12 +3119,12 @@ OLC_MODULE(oedit_minipet) {
 			send_config_msg(ch, "ok_string");
 		}
 		
-		if (!MOB_FLAGGED(mob, default_minipet_flags)) {
-			sprintbit(default_minipet_flags, action_bits, buf, TRUE);
+		if (!MOB_FLAGGED(mob, DEFAULT_MINIPET_FLAGS)) {
+			sprintbit(DEFAULT_MINIPET_FLAGS, action_bits, buf, TRUE);
 			msg_to_char(ch, "Warning: mob should have these flags: buf\r\n");
 		}
-		if (!AFF_FLAGGED(mob, default_minipet_affs)) {
-			sprintbit(default_minipet_affs, affected_bits, buf, TRUE);
+		if (!AFF_FLAGGED(mob, DEFAULT_MINIPET_AFFS)) {
+			sprintbit(DEFAULT_MINIPET_AFFS, affected_bits, buf, TRUE);
 			msg_to_char(ch, "Warning: mob should have these affects: buf\r\n");
 		}
 	}
@@ -3275,6 +3310,12 @@ OLC_MODULE(oedit_requiresquest) {
 }
 
 
+OLC_MODULE(oedit_requirestools) {
+	obj_data *obj = GET_OLC_OBJECT(ch->desc);
+	obj->proto_data->requires_tool = olc_process_flag(ch, argument, "required tool", "requiredtools", tool_flags, GET_OBJ_REQUIRES_TOOL(obj));
+}
+
+
 OLC_MODULE(oedit_roomvnum) {
 	obj_data *obj = GET_OLC_OBJECT(ch->desc);
 	
@@ -3289,7 +3330,7 @@ OLC_MODULE(oedit_roomvnum) {
 
 OLC_MODULE(oedit_script) {
 	obj_data *obj = GET_OLC_OBJECT(ch->desc);
-	olc_process_script(ch, argument, &(obj->proto_script), OBJ_TRIGGER);
+	olc_process_script(ch, argument, &GET_OBJ_SCRIPTS(obj), OBJ_TRIGGER);
 }
 
 
@@ -3390,6 +3431,15 @@ OLC_MODULE(oedit_storage) {
 			msg_to_char(ch, "Invalid vehicle vnum '%s'.\r\n", val_arg);
 		}
 		else {
+			// ensure we don't already have it?
+			LL_FOREACH(GET_OBJ_STORAGE(obj), store) {
+				if (store->type == mode && store->vnum == num) {
+					msg_to_char(ch, "It already stores there.\r\n");
+					return;
+				}
+			}
+			
+			// ok:
 			CREATE(store, struct obj_storage_type, 1);
 			store->type = mode;
 			store->vnum = num;
@@ -3463,7 +3513,14 @@ OLC_MODULE(oedit_storage) {
 
 OLC_MODULE(oedit_timer) {
 	obj_data *obj = GET_OLC_OBJECT(ch->desc);
-	GET_OBJ_TIMER(obj) = olc_process_number(ch, argument, "decay timer", "timer", -1, MAX_INT, GET_OBJ_TIMER(obj));
+	
+	if (!str_cmp(argument, "none") || !str_cmp(argument, "unlimited") || !str_cmp(argument, "infinite")) {
+		GET_OBJ_TIMER(obj) = UNLIMITED;
+		msg_to_char(ch, "It now has no decay timer.\r\n");
+	}
+	else {
+		GET_OBJ_TIMER(obj) = olc_process_number(ch, argument, "decay timer", "timer", -1, MAX_INT, GET_OBJ_TIMER(obj));
+	}
 }
 
 
@@ -3501,7 +3558,6 @@ OLC_MODULE(oedit_type) {
 			}
 			case ITEM_WEAPON: {
 				// do not set a default, or it shows as 'changed' in the editor/auditor even if it was missed
-				// set_obj_val(obj, VAL_WEAPON_TYPE, TYPE_SLASH);
 				break;
 			}
 			case ITEM_POTION: {
@@ -3601,6 +3657,7 @@ OLC_MODULE(oedit_wealth) {
 
 OLC_MODULE(oedit_weapontype) {
 	obj_data *obj = GET_OLC_OBJECT(ch->desc);
+	attack_message_data *amd;
 	int pos = 0;
 	
 	switch (GET_OBJ_TYPE(obj)) {
@@ -3618,7 +3675,20 @@ OLC_MODULE(oedit_weapontype) {
 		}
 	}
 	
-	set_obj_val(obj, pos, olc_process_type(ch, argument, "weapon type", "weapontype", (const char**)get_weapon_types_string(), GET_OBJ_VAL(obj, pos)));
+	if (!*argument) {
+		msg_to_char(ch, "Set the weapon type to what attack message (vnum or name)?\r\n");
+	}
+	else if (!(amd = find_attack_message_by_name_or_vnum(argument, FALSE))) {
+		msg_to_char(ch, "Unknown attack message '%s'.\r\n", argument);
+	}
+	else if (!ATTACK_FLAGGED(amd, AMDF_WEAPON)) {
+		msg_to_char(ch, "That attack type is not available on weapons.\r\n");
+	}
+	else {
+		set_obj_val(obj, pos, ATTACK_VNUM(amd));
+		msg_to_char(ch, "Weapon type set to [%d] %s.\r\n", ATTACK_VNUM(amd), ATTACK_NAME(amd));
+	}
+
 }
 
 

@@ -64,7 +64,8 @@ set PRIVILEGE levels to restrict some actions to certain ranks in your empire.
 When you're ready to found your first city, find a good location with nothing
 around it on the NEARBY display. You'll want to be at least 30 tiles from any
 other city or starting location. CITY FOUND will start a city at your current
-location.
+location. When you found your very first city, items you stored on a newbie
+island will be transferred automatically.
 
 You can recruit additional members for your empire on the /recruit channel,
 but you may still want to roleplay the introduction and invitation when you
@@ -119,7 +120,8 @@ action will also CLAIM the tile where you stand.
 
 Once all the logs have been put in place, your construction will be complete
 and you will have your very first house! Use the HOME command to set this as
-your home, and you'll be able to use a HESTIAN TRINKET to teleport back.
+your home, and you'll be able to use a HESTIAN TRINKET to teleport back. You
+can also STORE some items, like BOUND items, in your home.
 
 Try the INFO command for more getting-started tips.
 #
@@ -141,7 +143,7 @@ must BUILD MINE to get at it.
 
 {FF}
 Before that, you'll want to make sure you've got a place to smelt all that iron
-ore you plan on mining. BUILD FOUNDRY requires 4 saplings and 20 stiff plant
+ore you plan on mining. BUILD FOUNDRY requires 4 wood poles and 20 stiff plant
 fibers (sticks) and this building will let you store your iron ore, as well as
 melt it down to ingots (see HELP FOUNDRY). This means that, if your MINE will
 be quite a distance from your main settlement, you can build a second FOUNDRY
@@ -169,14 +171,14 @@ empire's vault, which will increase its wealth rating. They can also be used in
 the FORGE, which will be discussed here shortly. When the MINE is finally
 depleted, DISMANTLE it so that the mountain tile can eventually replenish
 itself. Start another MINE along the mountain range in the meantime. Note: Only
-mines must be dismantled to replenish (because they have random ore each year);
-other resource buildings like quarries refresh themselves.
+mines must be dismantled to replenish (because they have random ore); other
+resource buildings like quarries refresh themselves.
 
 [FF]
 You'll need to get your empire's iron flowing before you BUILD FORGE, because
-this building requires 4 pillars (logs), 6 lumber, 15 rocks, and 10 iron
-ingots, an 20 stiff plant fibers (sticks); type HELP FORGE for more info.
-Once constructed, however, you will be able to FORGE ingots into various tools,
+this building requires 4 pillars (logs), 6 lumber, 15 rocks, 10 iron ingots,
+and 20 stiff plant fibers (sticks); type HELP FORGE for more info. Once
+constructed, however, you will be able to FORGE ingots into various tools,
 weapons, and armor, according to your skill level. You can make jewelry and
 special items with gold and silver, and the FORGE (or FOUNDRY) is also where
 you SMELT these valuable metals into coins or bars. Similar to the mining
@@ -200,13 +202,14 @@ EmpireMUD offers tutorial quests to help you learn the game. Most of these
 quests reward you with some bonus experience.
 
 If you aren't interested in tutorials, you can turn them off by typing
-'toggle tutorials'.
+'toggle tutorials off'. This also disables the automatic tip you receive on
+login.
 
 You can also find tutorial zones at the following locations:
  - The Soulstream (general) at any Tower of Souls.
  - The Museum of Early Man (Trade skill) on the newbie island.
 
-See also: NEARBY, QUEST, TOGGLE
+See also: NEARBY, QUEST, TIPS, TOGGLE
 #
 "VAMPIRE GUIDE"
 

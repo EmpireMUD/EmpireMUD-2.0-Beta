@@ -1,17 +1,15 @@
 #0
 Gift of Nature~
-ij -1 1.00 0 h
+ij -1 1.00 0 h 0
 A
 16 1
 T f 1
-X f
-0
 S
 #1
 Fly~
-cd -1 1.00 0 am
+cd -1 1.00 0 am 0
 C
-fly 8 bg 2 50 0 -1 0 0 5 0
+fly 8 g 2 50 0.00 -1 0 0 5 0
 D 1 40 0
 D 2 0 0
 M
@@ -22,40 +20,56 @@ M
 $n seems to concentrate for a moment and sparkling blue wings made of pure mana erupt from $s back!~
 T e 0
 T b 1
-X b
-3001 450 1800 m
+X+ 0 m
+X+ 1 3001
+X+ 2 450
+X+ 3 1800
 S
 #2
 Ancient Blood~
-0 -1 1.00 0 l
+0 -1 1.00 0 l 0
 A
 20 1
 D 1 76 0
+D 1 101 0
 T f 1
 T e 0
-X f
-0
 S
 #3
 Backstab~
-0 -1 1.00 0 0
-T m 0
+agkx -1 5.00 0 0 0
+C
+backstab 7 bf 1 25 0.00 2038 9 1 2 2
+D 16 28 4
+D 16 30 0
+M
+10
+You miss $S back! That could be costly...~
+M
+11
+$n leaps out of nowhere, aiming for your back, but misses!~
+M
+12
+$n leaps out of nowhere, aiming for $N's back, but misses!~
+T c 1
+X+ 4 62
 S
 #4
 Wolf Form~
-0 -1 1.00 0 0
+0 -1 1.00 0 0 0
 T k 1
 S
 #5
 Null Mana~
-0 -1 1.00 0 0
-T m 0
+0 -1 1.00 0 0 0
+D 1 100 0
+T e 1
 S
 #6
 Ready Blood Weapons~
-0 -1 1.00 0 bcn
+0 314 1.00 0 bcn 0
 C
-unknown 5 0 3 40 0 -1 0 0 2 0
+unknown 5 w 3 15 0.00 -1 0 0 2 0
 D 4 1101 0
 D 4 1102 0
 D 4 1103 0
@@ -65,63 +79,130 @@ D 4 1117 0
 D 4 1118 0
 D 4 1120 0
 D 4 1122 0
+M
+0
+*~
+M
+1
+*~
+M
+20
+You drain blood from your wrist and mold it into $p!~
+M
+21
+$n twists and molds $s own blood into $p!~
 T g 0
 S
 #7
 Boost~
-o -1 1.00 0 0
+o -1 1.00 0 0 0
 A
 20 50
 T f 1
 T m 0
-X f
-0
 S
 #8
 Claws~
-0 -1 1.00 0 0
-T m 0
+c 314 1.00 0 bn 0
+C
+claws 5 a 3 10 0.00 -1 0 0 2 0
+D 4 1127 0
+M
+0
+You focus your blood into your hands...~
+M
+1
+*~
+M
+20
+Your fingers grow into grotesque claws!~
+M
+21
+$n's fingers grow into grotesque claws!~
+T g 1
 S
 #9
 Command~
-0 -1 1.00 0 0
+0 -1 1.00 0 0 0
 T m 0
 S
 #10
 Touch of Flame~
-0 -1 1.00 0 0
+0 -1 1.00 0 0 0
 D 1 24 0
 T e 1
 S
 #11
 Darkness~
-0 -1 1.00 0 0
-T m 0
+c -1 1.00 0 0 0
+C
+darkness 8 o 1 15 0.00 2036 15 0 1 0
+D 1 84 0
+M
+0
+You draw upon the shadows to blanket the area in an inky darkness!~
+M
+1
+Shadows seem to spread from $n, blanketing the area in an inky darkness!~
+M
+23
+You wave your hand...~
+M
+24
+$n waves $s hand and the darkness dissipates.~
+T q 1
+T e 1
+X+ 0 a
+X+ 1 3003
+X+ 2 75
+X+ 3 75
 S
 #12
 Deathshroud~
-0 -1 1.00 0 0
-T m 0
+cq -1 1.00 0 ag 0
+A
+26 1
+C
+deathshroud 3 g 3 20 0.00 -1 0 0 1 0
+D 64 19 0
+M
+0
+You fall to the ground, dead!~
+M
+1
+$n falls to the ground, dead!~
+M
+23
+Your flesh returns to normal!~
+M
+24
+$n appears normal again!~
+T b 1
+T s 0
+X+ 0 x
+X+ 1 3041
+X+ 2 -1
+X+ 3 -1
 S
 #13
 Disguise~
-0 -1 1.00 0 0
+0 -1 1.00 0 0 0
 T m 0
 S
 #14
 Earthmeld~
-0 -1 1.00 0 0
+0 -1 1.00 0 0 0
 T m 0
 S
 #15
 Eartharmor~
-d -1 2.00 0 af
+d -1 2.00 0 af 0
 A
 12 1
 A
 24 1
 C
-eartharmor 5 be 2 10 1 -1 0 8 5 0
+eartharmor 5 be 2 10 1.00 -1 0 8 5 0
 M
 0
 You form a thick layer of mana over your body, and it hardens to solid earth!~
@@ -138,23 +219,28 @@ M
 4
 $n forms a thick layer of mana over $N, and it hardens to solid earth!~
 T b 1
-X b
-3012 150 150 0
+X+ 1 3012
+X+ 2 150
+X+ 3 150
 S
 #16
 Worm~
-0 -1 1.00 0 0
-T m 0
+0 -1 1.00 0 0 0
+C
+worm 3 w 0 0 0.00 -1 0 0 7 0
+D 16 52 16777216
+T B 1
+X+ 10 1
 S
 #17
 Terrify~
-af -1 1.00 C 0
+af -1 1.00 C 0 0
 A
 21 -1
 A
 22 -1
 C
-terrify 7 bf 1 10 1 2035 15 4 2 2
+terrify 7 bf 1 10 1.00 2035 15 4 2 2
 M
 2
 Shadows creep up around you and then strike out at $N!~
@@ -174,43 +260,79 @@ M
 12
 Shadows creep up around $n and then strike out at $N!~
 T b 1
-X b
-3048 30 30 0
+X+ 1 3048
+X+ 2 30
+X+ 3 30
 S
 #18
 Search~
-0 -1 1.00 0 0
-T m 0
+0 -1 1.00 0 0 0
+C
+unknown 8 0 0 0 0.00 -1 0 0 0 3
+D 1 49 0
+T e 1
 S
 #19
 Daywalking~
-0 -1 1.00 0 0
+0 -1 1.00 0 0 0
 D 1 68 0
 D 1 69 0
 T e 1
 S
 #20
 Hide~
-0 -1 1.00 0 0
-T m 0
+q -1 1.00 0 0 0
+C
+hide 5 a 0 0 0.00 -1 0 0 1 0
+D 16 39 0
+D 64 18 0
+D 2 0 0
+M
+0
+You attempt to hide yourself.~
+M
+1
+*~
+T s 1
 S
 #21
 Horrid Form~
-0 -1 1.00 0 0
+0 -1 1.00 0 0 0
 T k 1
 S
 #22
 Dispel~
-0 -1 1.00 0 0
-T m 0
+t -1 1.00 0 0 0
+C
+dispel 7 be 2 30 0.00 2046 9 0 5 0
+D 64 9 0
+D 64 10 0
+D 16 34 1
+D 16 34 2
+M
+0
+You shout 'KA!' and dispel your afflictions.~
+M
+1
+$n shouts 'KA!' and dispels $s afflictions.~
+M
+2
+You shout 'KA!' and dispel $N's afflictions.~
+M
+3
+$n shouts 'KA!' and dispels your afflictions.~
+M
+4
+$n shouts 'KA!' and dispels $N's afflictions.~
+T s 1
 S
 #23
 Majesty~
-cd -1 1.00 0 ah
+cd -1 1.00 0 ah 0
 A
 26 3
 C
-majesty 5 bg 3 0 0 -1 0 0 1 0
+majesty 5 g 3 0 0.00 -1 0 0 1 0
 M
 0
 You create a sense of supernatural majesty about yourself.~
@@ -218,70 +340,133 @@ M
 1
 $n glows majestically.~
 T b 1
-X b
-3043 -1 -1 b
+X+ 0 b
+X+ 1 3043
+X+ 2 -1
+X+ 3 -1
 S
 #24
 Mist Form~
-0 -1 1.00 0 0
+0 -1 1.00 0 0 0
 T k 1
 S
 #25
 Mummify~
-0 -1 1.00 0 0
-T m 0
+cq -1 1.00 0 ag 0
+A
+26 1
+C
+mummify 3 g 3 20 0.00 -1 0 0 1 0
+D 64 19 0
+M
+0
+Your flesh hardens as you mummify yourself!~
+M
+1
+$n's flesh hardens and $e falls to the ground!~
+M
+23
+Your flesh softens and the mummified layers flake off!~
+M
+24
+$n sheds a layer of skin and appears normal again!~
+T b 1
+T s 0
+X+ 0 jnz
+X+ 1 3011
+X+ 2 -1
+X+ 3 -1
 S
 #26
-Two-Handed Weapons~
-0 -1 1.00 0 b
+Two-Handed Weapon Mastery~
+0 -1 1.00 0 b 0
 D 1 50 0
 T e 1
 S
 #27
 Regenerate~
-0 -1 1.00 0 0
-T m 0
+0 -1 2.00 0 0 0
+C
+regenerate 1 gw 3 1 0.00 -1 0 0 1 0
+M
+0
+You focus your blood into regeneration.~
+M
+1
+$n's wounds seem to seal themselves.~
+M
+8
+You don't seem to need any regeneration.~
+M
+9
+*~
+T y 1
+X+ 7 0.40
+X+ 9 -1
 S
 #28
 Summon Thug~
-0 -1 1.00 0 0
+0 -1 1.00 0 0 0
 C
-unknown 8 0 1 50 0 2031 30 0 1 2
+summon 8 a 1 50 0.00 2031 30 0 1 2
 D 8 230 0
 M
-2
-You give the secret signal... $N appears.~
+0
+*~
 M
-4
-$N walks up.~
+1
+*~
 M
 8
-You give the secret signal... but nobody shows up.~
+... but nobody shows up.~
 M
 9
+*~
+M
+13
+You give the secret signal...~
+M
+14
 $n makes a hand gesture.~
+M
+25
+$N walks up.~
+M
+27
+$N walks up.~
 T j 0
 S
 #29
 Sneak~
-0 -1 1.00 0 0
-T m 0
+G -1 1.00 0 0 0
+C
+sneak 8 w 0 0 0.00 -1 0 0 7 1
+D 16 48 1
+D 16 15 0
+D 2 0 0
+D 16 50 0
+D 16 51 0
+T B 1
+X+ 0 d
 S
 #30
-Solar Power~
-0 -1 1.00 0 0
-T m 0
+By the Sun and Stars~
+ij -1 1.00 0 h 0
+A
+7 1
+T f 1
 S
 #31
 Soulsight~
-0 -1 1.00 0 0
-T m 0
+0 -1 1.00 0 0 0
+D 1 88 0
+T e 1
 S
 #32
 Soulmask~
-cd -1 1.00 0 ag
+cd -1 1.00 0 ag 0
 C
-soulmask 5 bg 3 0 0 -1 0 0 1 0
+soulmask 5 g 3 0 0.00 -1 0 0 1 0
 M
 0
 You conceal your magical aura!~
@@ -289,16 +474,18 @@ M
 1
 $n concentrates momentarily...~
 T b 1
-X b
-3042 -1 -1 A
+X+ 0 A
+X+ 1 3042
+X+ 2 -1
+X+ 3 -1
 S
 #33
 Alacrity~
-cd -1 1.00 0 abc
+cd -1 1.00 0 abc 0
 A
 26 3
 C
-alacrity 5 bg 3 10 0 -1 0 0 1 0
+alacrity 5 g 3 10 0.00 -1 0 0 1 0
 M
 0
 You focus your blood into your lithe muscles...~
@@ -306,14 +493,16 @@ M
 1
 $n flexes $s muscles...~
 T b 1
-X b
-3044 -1 -1 q
+X+ 0 q
+X+ 1 3044
+X+ 2 -1
+X+ 3 -1
 S
 #34
 Summon Animals~
-0 -1 1.00 0 0
+0 -1 1.00 0 0 0
 C
-unknown 8 0 2 10 0 2028 30 4 5 2
+summon 8 a 2 10 0.00 2028 30 4 5 2
 D 8 530 0
 D 8 531 0
 D 8 532 0
@@ -325,34 +514,52 @@ D 8 537 0
 D 8 538 0
 D 8 539 0
 M
+0
+*~
+M
+1
+*~
+M
+8
+... nobody seems to respond.~
+M
+9
+*~
+M
 13
 You whistle a melodic little tune into the air...~
 M
 14
 $n whistles a melodic little tune into the air...~
 M
-2
+25
 $N arrives suddenly!~
 M
-4
+27
 $N arrives suddenly!~
-M
-8
-Nobody seems to respond.~
-M
-9
-Nothing seems to happen.~
 T j 0
 S
 #35
 Summon Humans~
-0 -1 1.00 0 0
+0 -1 1.00 0 0 0
 C
-unknown 8 0 3 10 0 2027 60 4 1 2
+summon 8 a 3 10 0.00 2027 60 4 1 2
 D 8 9029 0
 D 8 9030 0
 D 8 9031 0
 D 8 9032 0
+M
+0
+*~
+M
+1
+*~
+M
+8
+... nobody seems to respond.~
+M
+9
+*~
 M
 13
 You focus your supernatural pheromones into a single drop of blood and let it fall to the ground...~
@@ -360,141 +567,183 @@ M
 14
 $n drips blood on the ground...~
 M
-2
+25
 $N arrives.~
 M
-8
-Nobody seems to respond.~
-M
-9
-Nothing seems to happen.~
-M
-4
+27
 $N arrives.~
 T j 0
 S
 #36
 Heartstop~
-0 -1 1.00 0 0
-T m 0
-S
-#37
-Taste Blood~
-0 -1 1.00 0 0
-T m 0
+a -1 1.00 h 0 0
+C
+heartstop 7 bfh 1 30 0.00 2026 30 0 2 3
+D 16 43 0
+M
+2
+*~
+M
+3
+Your blood becomes inert!~
+M
+4
+*~
+M
+10
+But nothing happens.~
+M
+11
+But nothing happens.~
+M
+12
+*~
+M
+15
+You grab $N and press hard against $S throat...~
+M
+16
+$n grabs you and presses hard against your throat...~
+M
+17
+$n grabs $N and presses hard against $S throat...~
+T b 1
+X+ 0 v
+X+ 1 3016
+X+ 2 15
+X+ 3 15
 S
 #38
 Blood Fortitude~
-0 -1 1.00 0 0
-T m 0
+l -1 2.50 0 f 0
+A
+12 1
+A
+24 1
+T f 1
+S
+#39
+Critical Backstab~
+aky -1 4.00 0 0 0
+C
+unknown 7 bfh 0 0 0.00 -1 0 1 0 4
+D 256 3 0
+H 1 3 100.00 0
+M
+10
+*~
+M
+11
+*~
+M
+12
+*~
+T c 1
+X+ 4 80
 S
 #51
 Forge~
-0 195 1.00 0 0
+0 195 1.00 0 0 0
 T a 0
 S
 #52
 Weaponcrafting~
-0 195 1.00 0 0
+0 195 1.00 0 0 0
 T a 0
 S
 #53
 Armorsmithing~
-0 195 1.00 0 0
+0 195 1.00 0 0 0
 T a 0
 S
 #54
 Jewelry~
-0 195 1.00 0 0
+0 195 1.00 0 0 0
 T a 0
 S
 #55
 Sew~
-0 194 1.00 0 0
+0 194 1.00 0 0 0
 T a 0
 S
 #56
 Leatherworking~
-0 194 1.00 0 0
+0 194 1.00 0 0 0
 T a 0
 S
 #57
 Pottery~
-0 203 1.00 0 0
+0 203 1.00 0 0 0
 T a 0
 S
 #58
 Woodworking~
-0 203 1.00 0 0
+0 203 1.00 0 0 0
 D 1 13 0
 T a 0
 T e 0
 S
 #59
 Advanced Woodworking~
-0 203 1.00 0 0
+0 203 1.00 0 0 0
 T a 0
 S
 #60
 Siegeworks~
-0 -1 1.00 0 0
+0 -1 1.00 0 0 0
 T a 0
 S
 #61
 Shipbuilding~
-0 -1 1.00 0 0
+0 -1 1.00 0 0 0
 T a 0
 S
 #62
 Swimming~
-0 -1 1.00 0 0
+0 -1 1.00 0 0 0
 D 1 48 0
 T e 1
 S
 #63
 Forage~
-0 -1 1.00 0 0
+0 -1 1.00 0 0 0
 D 1 17 0
 T e 1
 S
 #64
 Ride~
-0 -1 1.00 0 0
+0 -1 1.00 0 0 0
 D 1 39 0
 T e 1
 S
 #65
 All-Terrain Riding~
-0 -1 1.00 0 0
+0 -1 1.00 0 0 0
 D 1 41 0
 D 1 40 0
 T e 1
 S
 #66
 Stamina~
-0 -1 1.50 0 m
+0 -1 1.50 0 m 0
 A
 6 1
 T f 1
-X f
-0
 S
 #67
 By Moonlight~
-0 -1 1.00 0 gi
+0 -1 1.00 0 gipt 0
 A
 27 1
 D 1 62 0
 T e 0
 T f 1
-X f
-0
 S
 #68
 Nightsight~
-cd -1 1.00 0 ag
+cd -1 1.00 0 ag 0
 C
-nightsight 5 bg 0 0 0 -1 0 0 1 0
+nightsight 5 g 0 0 0.00 -1 0 0 1 0
 D 1 23 0
 M
 0
@@ -504,23 +753,25 @@ M
 $n concentrates for a moment.~
 T b 1
 T e 0
-X b
-3045 -1 -1 c
+X+ 0 c
+X+ 1 3045
+X+ 2 -1
+X+ 3 -1
 S
 #69
 Finder~
-0 -1 1.00 0 0
+0 -1 1.00 0 0 0
 D 1 15 0
 T e 1
 S
 #70
 Find Herbs~
-0 -1 1.00 0 0
-T m 0
+0 -1 1.00 0 0 0
+T w 1
 S
 #71
 Huntsman~
-0 -1 1.00 0 bk
+0 -1 1.00 0 bk 0
 D 1 8 0
 D 1 9 0
 D 1 53 0
@@ -529,159 +780,265 @@ T e 1
 S
 #72
 Fish~
-0 -1 1.00 0 0
+0 -1 1.00 0 0 0
+C
+unknown 8 0 0 0 0.00 -1 0 0 0 1
 D 1 16 0
 T e 1
 S
 #73
 Track~
-0 -1 1.00 0 0
-T m 0
+0 -1 1.00 0 0 0
+D 1 85 0
+T e 1
 S
 #74
 Master Tracker~
-0 -1 1.00 0 0
+0 -1 1.00 0 0 0
 D 1 51 0
 T e 1
 S
 #75
 Sated Thirst~
-0 -1 1.00 0 h
+0 -1 1.00 0 h 0
 D 1 30 0
 T e 1
 S
 #76
 No Trace~
-0 -1 1.00 0 0
+0 -1 1.00 0 0 0
 D 1 32 0
 T e 1
 S
 #77
 Resist Poison~
-0 -1 1.00 0 0
-T m 0
+0 -1 1.00 0 0 0
+D 1 86 0
+T e 1
 S
 #78
 Poison Immunity~
-0 -1 1.00 0 0
+0 -1 1.00 0 0 0
 D 1 29 0
 T e 1
 S
 #79
 Find Shelter~
-0 -1 1.00 0 0
+0 -1 1.00 0 0 0
 T a 0
 S
 #80
 Navigation~
-0 -1 1.00 0 0
+0 -1 1.00 0 0 0
 D 1 27 0
 T e 1
 S
 #81
 Butcher~
-0 -1 1.00 0 0
+0 -1 1.00 0 0 0
 D 1 9 0
 T e 1
 S
 #82
 Mountain Climbing~
-0 -1 1.00 0 0
+0 -1 1.00 0 0 0
 D 1 42 0
 T e 1
 S
 #83
-Lay Paths~
-0 -1 1.00 0 0
-T m 0
+Mountain Paths~
+0 -1 1.00 0 0 0
+T a 1
 S
 #84
 Reflexes~
-0 -1 1.00 0 0
-T m 0
+l -1 1.00 0 d 0
+A
+18 1
+T f 1
 S
 #85
 Shield Block~
-0 -1 1.00 0 0
+0 -1 1.00 0 0 0
 D 1 5 0
 T e 1
 S
 #86
 Quick Block~
-0 -1 1.00 0 0
-T m 0
+l -1 1.00 0 e 0
+A
+13 1
+T f 1
 S
 #87
-Reforge~
-0 -1 1.00 0 0
-T m 0
+Rework~
+0 -1 1.00 0 0 0
+D 1 96 0
+T a 1
+T e 1
 S
 #88
 Block Arrows~
-0 -1 1.00 0 0
+0 -1 1.00 0 0 0
 D 1 6 0
 T e 1
 S
 #89
 Light Armor~
-0 -1 1.00 0 0
+0 -1 1.00 0 0 0
 D 1 2 0
 T e 1
 S
 #90
 Medium Armor~
-0 -1 1.00 0 0
+0 -1 1.00 0 0 0
 D 1 4 0
 T e 1
 S
 #91
 Heavy Armor~
-0 -1 1.00 0 0
+0 -1 1.00 0 0 0
 D 1 1 0
 T e 1
 S
 #92
 Endurance~
-l -1 1.50 0 f
+l -1 1.50 0 f 0
 A
 15 1
 T f 1
-X f
-0
 S
 #93
 Rescue~
-0 -1 1.00 0 0
-T m 0
+0 -1 1.00 0 0 0
+C
+rescue 7 b 1 20 0.00 2010 6 0 2 0
+D 64 16 0
+D 16 36 0
+M
+2
+You move to rescue $n...~
+M
+3
+*~
+M
+4
+*~
+M
+10
+... but fail.~
+M
+12
+*~
+T s 1
 S
 #94
 Disarm~
-0 -1 1.00 0 0
-T m 0
+a -1 1.00 h 0 0
+C
+disarm 7 bfh 1 15 0.00 2008 30 0 2 3
+D 16 31 0
+M
+2
+You skillfully disarm $N!~
+M
+3
+$n disarms you! (Your weapon will not work until it wears off.)~
+M
+4
+$n skillfully disarms $N!~
+M
+10
+You attempt to disarm $N, but fail.~
+M
+11
+$n attempts to disarm you, but fails.~
+M
+12
+$n attempts to disarm $N, but fails.~
+T b 1
+X+ 0 p
+X+ 1 3018
+X+ 2 15
+X+ 3 25
 S
 #95
 Sparring~
-0 -1 1.00 0 0
-T m 0
+ik -1 1.00 0 bc 0
+A
+17 1
+T f 1
 S
 #96
 Kick~
-0 -1 1.00 0 0
-T m 0
+ak -1 1.00 0 0 0
+C
+kick 7 bf 1 10 0.00 2011 6 1 2 1
+T c 1
+X+ 4 54
 S
 #97
 Bash~
-0 -1 1.00 0 0
-T m 0
+agkpx -1 1.00 hE 0 0
+C
+bash 7 bf 1 15 0.00 2012 9 0 2 1
+D 16 27 0
+T c 1
+T b 1
+X+ 0 t
+X+ 1 3047
+X+ 2 5
+X+ 3 5
+X+ 4 55
 S
 #98
 Cut Deep~
-0 -1 1.00 0 0
-T m 0
+akx -1 1.00 h 0 0
+C
+unknown 7 bfh 0 0 0.00 -1 0 0 0 0
+H 128 1 10.00 0
+M
+2
+You cut deep wounds in $N -- $E is bleeding!~
+M
+3
+$n's last attack cuts deep -- you are bleeding!~
+M
+4
+$n's last attack cuts deep -- $N is bleeding!~
+M
+10
+*~
+M
+11
+*~
+M
+12
+*~
+T d 1
+X+ 1 3006
+X+ 2 15
+X+ 3 30
+X+ 6 5
 S
 #99
 Big Game Hunter~
-0 -1 1.00 0 0
-T m 0
+afik -1 1.00 0 0 0
+C
+unknown 7 bfh 0 0 0.00 -1 0 0 0 2
+H 4096 0 100.00 0
+H 8192 0 100.00 0
+M
+10
+*~
+M
+11
+*~
+M
+12
+*~
+T c 1
+X+ 4 99
+X+ 5 4
 S
 $

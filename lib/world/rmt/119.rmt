@@ -1360,7 +1360,6 @@ scrapes~
 looks more like the wall slides out, but you don't see how to open it. You'd
 have to search around.
 ~
-T 11921
 T 11936
 S
 #11916
@@ -1435,7 +1434,7 @@ be oak, though they're rough and unfinished.
 M 1 11922 100.00 4
 T 11917
 T 11825
-T 11921
+T 11936
 S
 #11918
 The Pixy Races~
@@ -1831,7 +1830,7 @@ There are nameplates under the portraits.
 ~
 M 1 11831 100.00 5
 T 11825
-T 11921
+T 11936
 S
 #11923
 A Small Bedroom~
@@ -2991,7 +2990,6 @@ bookshelf bookshelves shelf shelves chains spine~
 books on enchanting. Each and every book is chained to the shelf by its spine.
 ~
 T 11926
-T 11921
 T 11936
 S
 #11940
@@ -4364,6 +4362,7 @@ The house has no windows.
 T 11945
 T 11946
 T 11976
+Z1 10
 S
 #11976
 A Cozy Little House~
@@ -4449,6 +4448,7 @@ M 0 11976 100.00 1
 T 11945
 T 11946
 T 11976
+Z1 10
 S
 #11977
 A Cozy Little House~
@@ -4542,6 +4542,7 @@ M 0 11955 100.00 1
 T 11945
 T 11946
 T 11976
+Z1 10
 S
 #11978
 A Cozy Little House~
@@ -4617,6 +4618,7 @@ M 0 11951 100.00 1
 T 11945
 T 11946
 T 11976
+Z1 10
 S
 #11979
 The Altar Below~
@@ -4695,6 +4697,7 @@ T 11946
 T 11976
 T 11979
 T 11980
+Z1 10
 S
 #11980
 The Sepulcher of Orka~
@@ -4762,6 +4765,7 @@ M 0 11980 100.00 1
 T 11945
 T 11946
 T 11976
+Z1 10
 S
 #11981
 A Dark Rock-Cut Chamber~
@@ -4837,6 +4841,7 @@ T 11945
 T 11946
 T 11976
 T 11936
+Z1 10
 S
 #11982
 The Central Plaza of the Eastern Rooftop Walkway~
@@ -4918,6 +4923,7 @@ M 0 11971 100.00 1
 T 11945
 T 11946
 T 11976
+Z1 10
 S
 #11983
 The Eastern Rooftop Walkway~
@@ -5009,6 +5015,7 @@ M 0 11983 100.00 1
 T 11945
 T 11946
 T 11976
+Z1 10
 S
 #11984
 The Eastern Rooftop Walkway~
@@ -5102,6 +5109,7 @@ M 0 11952 100.00 1
 T 11945
 T 11946
 T 11976
+Z1 10
 S
 #11985
 The Eastern Rooftop Walkway, Above the Stairs~
@@ -5186,6 +5194,7 @@ M 0 11985 100.00 1
 T 11945
 T 11946
 T 11976
+Z1 10
 S
 #11986
 The Eastern Rooftop Walkway~
@@ -5285,6 +5294,7 @@ M 0 11953 100.00 1
 T 11945
 T 11946
 T 11976
+Z1 10
 S
 #11987
 The Western Rooftop Walkway~
@@ -5360,6 +5370,7 @@ M 0 11987 100.00 1
 T 11945
 T 11946
 T 11976
+Z1 10
 S
 #11988
 Wooden Steps Down the Cliffside~
@@ -5432,6 +5443,7 @@ You can't see the gate from here; it's around the corner.
 T 11945
 T 11946
 T 11976
+Z1 10
 S
 #11989
 The Great Gate of Gobbrabakh of Orka~
@@ -5513,6 +5525,7 @@ T 11945
 T 11946
 T 11976
 T 11936
+Z1 10
 S
 #11990
 The Stone Cauldrons~
@@ -5594,6 +5607,7 @@ M 0 11949 100.00 1
 T 11945
 T 11946
 T 11976
+Z1 10
 S
 #11991
 A Great Standing Stone Overlooking the Sea~
@@ -5681,6 +5695,7 @@ M 0 11948 100.00 1
 T 11945
 T 11946
 T 11976
+Z1 10
 S
 #11992
 On the Cliffside~
@@ -5737,6 +5752,7 @@ T 11945
 T 11946
 T 11976
 T 11970
+Z1 10
 S
 #11993
 An Endless River~
@@ -5770,15 +5786,16 @@ E
 water muddy~
 The water is a muddy brown color. You can't see anything in it.
 ~
-I 21 1300 20.00 1 f  # FISH: glowing green seashell
-I 21 1311 20.00 1 f  # FISH: spotted eel
-I 21 1313 20.00 1 f  # FISH: bright red leaping fish
-I 21 1312 20.00 1 f  # FISH: speckled trout
-I 21 11978 20.00 1 f  # FISH: mussels
+I 21 1300 20.00 125 f  # FISH: glowing green seashell
+I 21 1311 20.00 125 f  # FISH: spotted eel
+I 21 1313 20.00 125 f  # FISH: bright red leaping fish
+I 21 1312 20.00 125 f  # FISH: speckled trout
+I 21 11978 20.00 125 f  # FISH: mussels
 M 1 11979 100.00 1
 T 11945
 T 11946
 T 11994
+Z1 6
 S
 #11994
 In the Presence of the God~
@@ -5826,5 +5843,6 @@ T 11946
 T 11994
 T 11995
 T 11996
+Z1 1
 S
 $

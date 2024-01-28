@@ -1,0 +1,22 @@
+#1100
+Disenchant global list~
+4 0 0 0 0-0 0
+E
+-1 100.00
+0 0 0
+I 36 103 5.00 1 g  # DISENCHANT: yellow lightning stone
+I 36 104 5.00 1 g  # DISENCHANT: red bloodstone
+I 36 1206 5.00 1 g  # DISENCHANT: iridescent blue iris
+I 36 1300 5.00 1 g  # DISENCHANT: glowing green seashell
+I 36 602 0.10 1 g  # DISENCHANT: prismatic crystal
+S
+#1128
+Lost book global drop~
+0 0 0 D 51-0 0
+E
+-1 0.50
+0 0 0
+I 4 1128 100.00 1  # LOOT: lost book
+I 12 1128 100.00 1  # PICKPOCKET: lost book
+S
+$

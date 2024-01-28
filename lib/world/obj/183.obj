@@ -4,7 +4,7 @@ Cult of Sobek garments~
 The garments of the Cult of Sobek lie here.~
 These finely-woven linens are topped with a large, fearsome crocodile head.
 ~
-2 eo ad 0 6
+2 eo ad 0 0 6
 0 0 0
 7 0
 A
@@ -24,7 +24,7 @@ Cult of Bastet garments~
 The garments of the Cult of Bastet are neatly folded on the ground.~
 These finely-woven linens are topped with a large, alabaster lionness head.
 ~
-2 eo ad 0 6
+2 eo ad 0 0 6
 0 0 0
 7 0
 A
@@ -44,7 +44,7 @@ Cult of Anubis garments~
 The garments of the Cult of Anubis lie here.~
 These finely-woven linens are topped with a large, onyx jackal head.
 ~
-2 eo ad 0 5
+2 eo ad 0 0 5
 0 0 0
 7 0
 A
@@ -64,7 +64,7 @@ Cult of Horus garments~
 The garments of the Cult of Horus lie here.~
 These fine linen garments are topped with a large, golden falcon head.
 ~
-2 eo ad 0 4
+2 eo ad 0 0 4
 0 0 0
 7 0
 A
@@ -88,7 +88,7 @@ make sense to you seem to indicate the level of danger in the tomb.
 
 Select the danger level with: difficulty <hard | group | boss>
 ~
-3 0 0 0 4
+3 B 0 0 0 5
 0 0 0
 1 0
 T 18304
@@ -100,7 +100,7 @@ a bonus item~
 A bonus item has not replaced itself.~
 Spawns another item (boss only), purges itself.
 ~
-3 p a 0 3
+3 p a 0 0 3
 0 0 0
 0 0
 T 18307
@@ -113,7 +113,7 @@ A pair of Naqada wristguards is lying on the ground.~
 pictures of birds, cats, and eyes. They strap to the wrists with thick straps
 that appear to be made from bloodstained crocodile leather.
 ~
-27 mp aj 0 6
+27 mp aj 0 0 6
 3 0 0
 2 0
 A
@@ -135,7 +135,7 @@ A pair of pharaonic wristbands is lying here.~
 lazuli. Your fingers start to blister as you touch the wristbands, as the fiery
 spirit of the desert flows through you.
 ~
-27 mp aj 0 7
+27 mp aj 0 0 7
 1 0 0
 2 0
 A
@@ -155,7 +155,7 @@ A papyrus charm has planted itself here.~
 papyrus fibers. As you play with the charm between your fingers, you feel a
 deep, earthy connection to the plant, and its power of restoration.
 ~
-27 mp aj 0 8
+27 mp aj 0 0 8
 0 0 0
 2 0
 A
@@ -175,7 +175,7 @@ A set of golden bangles is lying on the ground.~
 expensive. As you slip them on your wrists, you suddenly feel like dancing. As
 the energy flows through you, you realize you can channel it with your magic.
 ~
-27 mp aj 0 8
+27 mp aj 0 0 8
 0 0 0
 2 0
 A
@@ -194,7 +194,7 @@ A scarab charm is sitting on the ground.~
    This little charm is made from the carapace of a shining scarab beetle,
 inlaid with lapis lazuli, and bound on a thin gold chain.
 ~
-27 mp aj 0 10
+27 mp aj 0 0 10
 2 0 0
 2 0
 A
@@ -216,7 +216,7 @@ A pair of plated sandals is lying here.~
 surface is made from gleaming argentine imperium, carved with tiny birds,
 people, and other shapes.
 ~
-27 mp ag 0 3
+27 mp ag 0 0 3
 3 0 0
 2 0
 A
@@ -232,7 +232,7 @@ Khufu's leather sandals are lying on the ground.~
 They look like little more than leather rope until laced around the foot, but
 imbue the user with incredible combat prowess.
 ~
-27 mp ag 0 3
+27 mp ag 0 0 3
 1 0 0
 7 0
 A
@@ -249,7 +249,7 @@ lotus, although it is far too delicate a flower to be so strong. As you hold
 your hand near the sandals, you feel the gentle pulse of the natural mana
 binding them together.
 ~
-27 mp ag 0 4
+27 mp ag 0 0 4
 0 0 0
 7 0
 A
@@ -264,7 +264,7 @@ The sandals of the burning dunes lie here, smoldering.~
    These sandals are made from fine ibis leather, soaked in beams of moonlight
 to grant them protection from the burning sand dunes of their homeland.
 ~
-27 mp ag 0 6
+27 mp ag 0 0 6
 0 0 0
 7 0
 A
@@ -279,7 +279,7 @@ The linen footwraps of a mummy have unraveled here.~
    You see a long, white linen cloth, of the sort that would be used to wrap
 the feet of a royal mummy before entombment.
 ~
-27 mp ag 0 7
+27 mp ag 0 0 7
 2 0 0
 7 0
 A
@@ -297,7 +297,7 @@ the aura of Geb~
 The aura of Geb hangs in the air.~
 Geb, god of the earth, husband of Nut, bestows his powerful aura upon you.
 ~
-27 mp ak 0 3
+27 mp ak 0 0 3
 3 0 0
 10 0
 A
@@ -321,7 +321,7 @@ the aura of Nekhbet~
 The aura of Nekhbet lingers around you.~
 Nekhbet, protector of the black lands, bestows her powerful aura upon you.
 ~
-27 mp ak 0 5
+27 mp ak 0 0 5
 1 0 0
 10 0
 A
@@ -347,7 +347,7 @@ the aura of Osiris~
 The aura of Osiris hangs in the air.~
 Osiris, god of the afterlife, bestows his powerful aura upon you.
 ~
-27 mp ak 0 5
+27 mp ak 0 0 5
 0 0 0
 10 0
 A
@@ -373,7 +373,7 @@ the aura of Thoth~
 The aura of Thoth surrounds you.~
 Thoth, god of wisdom, blesses you with his powerful aura.
 ~
-27 mp ak 0 6
+27 mp ak 0 0 6
 0 0 0
 10 0
 A
@@ -399,7 +399,7 @@ the aura of Khufu~
 The aura of Khufu fills the room.~
 Khnum-Khufu, called Medjedu, bestows the power of his legacy upon you.
 ~
-27 mp ak 0 7
+27 mp ak 0 0 7
 2 0 0
 10 0
 A
@@ -428,7 +428,7 @@ A bundle of flax fibers lies on the ground.~
    The golden flax fibers have been bundled together, and could be woven into
 fine linen cloth.
 ~
-3 0 a 0 3
+3 0 a 0 0 3
 0 0 0
 0 0
 O+ 1 6421
@@ -441,9 +441,9 @@ a sack of flaxseed~
 A sack of flaxseed is sitting on the ground.~
 The small seeds aren't very good to eat, but can be pressed into linseed oil.
 ~
-6 b a 0 5
+6 bC a 0 0 6
 2 18321 0
-0 96
+0 8760
 O+ 1 6181
 R
 4 5210 0
@@ -455,9 +455,9 @@ A jar of linseed oil is sitting here.~
    The jar of linseed oil, which is made from flax, has been sealed for
 storage. It could be used for cooking or for vehicle maintenance.
 ~
-3 0 a 0 8
+3 C a 0 0 9
 0 0 0
-6 168
+6 12960
 O+ 1 6321
 R
 4 5134 0
@@ -474,7 +474,7 @@ a bolt of linen~
 A bolt of linen is lying here.~
 The white linen cloth is very fine, like no other you've seen.
 ~
-3 0 a 0 11
+3 0 a 0 0 11
 0 0 0
 11 0
 M
@@ -498,7 +498,7 @@ form the symbol of eternal life. Its patron deity, Hedj-Wer, had the form of a
 baboon. It is said that this small totem allows you to assume the form of the
 baboon god yourself.
 ~
-3 p a 0 1
+3 p a 0 0 1
 0 0 0
 4 0
 S
@@ -509,7 +509,7 @@ A sacred bell is lying here.~
 This bell can summon a noncombat pet!
 Type 'use bell' to summon it.
 ~
-19 p a 0 5
+19 p a 0 0 5
 18326 0 0
 2 0
 S
@@ -520,7 +520,7 @@ A crocodile whistle is lying on the ground.~
    This whistle has a crocodile carved in the side. If you type 'use whistle',
 it will summon a mount.
 ~
-3 p a 0 8
+3 p a 0 0 8
 18327 0 0
 14 0
 T 9910
@@ -532,7 +532,7 @@ A falcon whistle is lying here.~
    This whistle has a falcon carved on the top. If you type 'use whistle', it
 will summon a flying mount.
 ~
-3 p a 0 8
+3 p a 0 0 8
 18328 0 0
 14 0
 T 9910
@@ -546,7 +546,7 @@ Once, long ago, these symbols decorated solar barges, ships which symbolize
 Ra's journey across the blue ocean of the sky. Take this disk to a talented
 shipbuilder, who can manufacture the solar barge.
 ~
-3 e a 0 1
+3 e a 0 0 1
 0 0 0
 4 0
 M

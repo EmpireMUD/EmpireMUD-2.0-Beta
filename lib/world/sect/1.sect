@@ -20,15 +20,15 @@ E
 8 0 100.00 113
 E
 9 0 100.00 139
-I 5 102 33.33 1 X  # DIG: flint stone
-I 5 101 16.67 1 X  # DIG: lump of clay
-I 5 100 50.00 1 X  # DIG: rock
-I 6 3013 33.00 1  # FORAGE: handful of nuts
+I 5 102 33.33 125 X  # DIG: flint stone
+I 5 101 16.67 125 X  # DIG: lump of clay
+I 5 100 50.00 125 X  # DIG: rock
+I 6 3013 33.00 25  # FORAGE: handful of nuts
 I 7 1206 8.33 125 p  # PICK: iridescent blue iris
 I 7 1201 100.00 125 p  # PICK: sack of fiveleaf
 I+ 0 70  # Ability: Find Herbs
 I 7 123 100.00 125 p  # PICK: small flower
-I 9 140 100.00 1  # GATHER: bundle of long grass
+I 9 140 100.00 50  # GATHER: bundle of long grass
 X
 plains field grass ground around~
    You stand in the middle of an expansive, flat open plain. The grasses
@@ -65,17 +65,20 @@ E
 4 0 2.00 102
 E
 9 0 100.00 102
-I 5 102 33.33 1 X  # DIG: flint stone
-I 5 101 16.67 1 X  # DIG: lump of clay
-I 5 100 50.00 1 X  # DIG: rock
-I 6 3015 33.00 1  # FORAGE: red berries
+I 5 102 33.33 125 X  # DIG: flint stone
+I 5 101 16.67 125 X  # DIG: lump of clay
+I 5 100 50.00 125 X  # DIG: rock
+I 6 3015 33.00 25  # FORAGE: red berries
 I 7 1206 8.33 125 p  # PICK: iridescent blue iris
 I 7 1201 100.00 125 p  # PICK: sack of fiveleaf
 I+ 0 70  # Ability: Find Herbs
 I 7 123 100.00 125 p  # PICK: small flower
-I 9 121 85.00 1 g  # GATHER: sticks and leaves
-I 9 131 15.00 1 g  # GATHER: green sapling
+I 9 121 85.00 50 g  # GATHER: sticks and leaves
+I 9 131 15.00 50 g  # GATHER: green sapling
 I 20 120 100.00 1  # CHOP: large tree
+U
+0
+A tree shoots up and spreads its canopy wide above you!~
 X
 forest trees leaves around~
    You find yourself standing at the edge of a light forest. The trees here are
@@ -114,17 +117,20 @@ E
 4 0 2.00 103
 E
 9 0 100.00 103
-I 5 102 33.33 1 X  # DIG: flint stone
-I 5 101 16.67 1 X  # DIG: lump of clay
-I 5 100 50.00 1 X  # DIG: rock
-I 6 3015 33.00 1  # FORAGE: red berries
+I 5 102 33.33 125 X  # DIG: flint stone
+I 5 101 16.67 125 X  # DIG: lump of clay
+I 5 100 50.00 125 X  # DIG: rock
+I 6 3015 33.00 25  # FORAGE: red berries
 I 7 1206 8.33 125 p  # PICK: iridescent blue iris
 I 7 1201 100.00 125 p  # PICK: sack of fiveleaf
 I+ 0 70  # Ability: Find Herbs
 I 7 123 100.00 125 p  # PICK: small flower
-I 9 121 85.00 1 g  # GATHER: sticks and leaves
-I 9 131 15.00 1 g  # GATHER: green sapling
+I 9 121 85.00 50 g  # GATHER: sticks and leaves
+I 9 131 15.00 50 g  # GATHER: green sapling
 I 20 120 100.00 1  # CHOP: large tree
+U
+0
+A second tree sprouts and reaches for the sky!~
 X
 forest trees leaves around~
    The forest air is cool and fresh, scented with earth and greenery. You can
@@ -162,17 +168,20 @@ E
 4 0 2.00 104
 E
 9 0 100.00 104
-I 5 102 33.33 1 X  # DIG: flint stone
-I 5 101 16.67 1 X  # DIG: lump of clay
-I 5 100 50.00 1 X  # DIG: rock
-I 6 3015 33.00 1  # FORAGE: red berries
+I 5 102 33.33 125 X  # DIG: flint stone
+I 5 101 16.67 125 X  # DIG: lump of clay
+I 5 100 50.00 125 X  # DIG: rock
+I 6 3015 33.00 25  # FORAGE: red berries
 I 7 1206 8.33 125 p  # PICK: iridescent blue iris
 I 7 1201 100.00 125 p  # PICK: sack of fiveleaf
 I+ 0 70  # Ability: Find Herbs
 I 7 123 100.00 125 p  # PICK: small flower
-I 9 121 85.00 1 g  # GATHER: sticks and leaves
-I 9 131 15.00 1 g  # GATHER: green sapling
+I 9 121 85.00 50 g  # GATHER: sticks and leaves
+I 9 131 15.00 50 g  # GATHER: green sapling
 I 20 120 100.00 1  # CHOP: large tree
+U
+0
+Another tree shoots up toward the sky and joins the growing canopy!~
 X
 forest shade shady trees leaves around~
    You are standing in a shady forest, where the trees grow close together and
@@ -235,17 +244,20 @@ E
 17 140 0.50 44
 E
 17 100 0.50 139
-I 5 102 33.33 1 X  # DIG: flint stone
-I 5 101 16.67 1 X  # DIG: lump of clay
-I 5 100 50.00 1 X  # DIG: rock
-I 6 3015 33.00 1  # FORAGE: red berries
+I 5 102 33.33 125 X  # DIG: flint stone
+I 5 101 16.67 125 X  # DIG: lump of clay
+I 5 100 50.00 125 X  # DIG: rock
+I 6 3015 33.00 25  # FORAGE: red berries
 I 7 1206 8.33 125 p  # PICK: iridescent blue iris
 I 7 1201 100.00 125 p  # PICK: sack of fiveleaf
 I+ 0 70  # Ability: Find Herbs
 I 7 123 100.00 125 p  # PICK: small flower
-I 9 121 85.00 1 g  # GATHER: sticks and leaves
-I 9 131 15.00 1 g  # GATHER: green sapling
+I 9 121 85.00 50 g  # GATHER: sticks and leaves
+I 9 131 15.00 50 g  # GATHER: green sapling
 I 20 120 100.00 1  # CHOP: large tree
+U
+0
+The canopy closes as another tree stretches upward and unfolds!~
 X
 forest trees leaves around~
    You are standing in an overgrown forest, where the underbrush is so thick
@@ -280,9 +292,12 @@ E
 16 0 100.00 100
 E
 19 0 100.00 100
-I 5 102 33.33 1 X  # DIG: flint stone
-I 5 101 16.67 1 X  # DIG: lump of clay
-I 5 100 50.00 1 X  # DIG: rock
+I 5 102 33.33 125 X  # DIG: flint stone
+I 5 101 16.67 125 X  # DIG: lump of clay
+I 5 100 50.00 125 X  # DIG: rock
+U
+0
+The crop grows with astounding speed!~
 _
 Newbie version of sect 7 Crop
 ~
@@ -304,9 +319,9 @@ E
 16 0 100.00 100
 E
 19 0 100.00 100
-I 5 102 33.33 1 X  # DIG: flint stone
-I 5 100 66.67 1 X  # DIG: rock
-I 6 3003 100.00 1  # FORAGE: handful of grain
+I 5 102 33.33 125 X  # DIG: flint stone
+I 5 100 66.67 125 X  # DIG: rock
+I 6 3003 100.00 25  # FORAGE: handful of grain
 X
 field seeded seeds plants crop around~
    You find yourself standing in a vast field of dirt, recently turned over in
@@ -359,10 +374,10 @@ E
 16 0 100.00 100
 E
 23 0 100.00 100
-I 5 102 33.33 1 X  # DIG: flint stone
-I 5 101 16.67 1 X  # DIG: lump of clay
-I 5 100 50.00 1 X  # DIG: rock
-I 6 3013 33.00 1  # FORAGE: handful of nuts
+I 5 102 33.33 125 X  # DIG: flint stone
+I 5 101 16.67 125 X  # DIG: lump of clay
+I 5 100 50.00 125 X  # DIG: rock
+I 6 3013 33.00 25  # FORAGE: handful of nuts
 X
 stumps field forest trees around~
    The plain is littered with stumps where the trees have been cut down. The
@@ -378,7 +393,7 @@ S
 #137
 Small Copse~
 A Small Copse on the Newbie Island~
-'.' 13 jr 1 d p
+'.' 13 jr 1 dl p
 C
 chop, dig~
 D1
@@ -401,11 +416,14 @@ E
 4 0 1.00 138
 E
 9 0 100.00 138
-I 5 102 33.33 1 X  # DIG: flint stone
-I 5 101 16.67 1 X  # DIG: lump of clay
-I 5 100 50.00 1 X  # DIG: rock
-I 6 3015 33.00 1  # FORAGE: red berries
+I 5 102 33.33 125 X  # DIG: flint stone
+I 5 101 16.67 125 X  # DIG: lump of clay
+I 5 100 50.00 125 X  # DIG: rock
+I 6 3015 33.00 25  # FORAGE: red berries
 I 20 131 100.00 1  # CHOP: green sapling
+U
+0
+Saplings spring forth from the edges of the stumps!~
 X
 copse small trees stumps wood forest around~
    As you approach the copse, you see small trees sprouting up from old stumps.
@@ -445,11 +463,14 @@ E
 4 0 0.50 102
 E
 9 0 100.00 102
-I 5 102 33.33 1 X  # DIG: flint stone
-I 5 101 16.67 1 X  # DIG: lump of clay
-I 5 100 50.00 1 X  # DIG: rock
-I 6 3015 33.00 1  # FORAGE: red berries
+I 5 102 33.33 125 X  # DIG: flint stone
+I 5 101 16.67 125 X  # DIG: lump of clay
+I 5 100 50.00 125 X  # DIG: rock
+I 6 3015 33.00 25  # FORAGE: red berries
 I 20 131 100.00 1  # CHOP: green sapling
+U
+0
+The horizon begins to vanish as more and more bushy saplings burst from the stumps!~
 X
 copse young trees wood forest stumps around~
    As you approach the copse, you see small trees sprouting up from old stumps.
@@ -466,7 +487,7 @@ S
 #139
 Forest Edge~
 The Edge of the Forest on the Newbie Island~
-'w' 13 jr 1 d np
+'w' 13 jr 1 dl np
 C
 chop, dig~
 D1
@@ -489,11 +510,14 @@ E
 4 0 1.00 101
 E
 9 0 100.00 101
-I 5 102 33.33 1 X  # DIG: flint stone
-I 5 101 16.67 1 X  # DIG: lump of clay
-I 5 100 50.00 1 X  # DIG: rock
-I 6 3015 33.00 1  # FORAGE: red berries
+I 5 102 33.33 125 X  # DIG: flint stone
+I 5 101 16.67 125 X  # DIG: lump of clay
+I 5 100 50.00 125 X  # DIG: rock
+I 6 3015 33.00 25  # FORAGE: red berries
 I 20 131 100.00 1  # CHOP: green sapling
+U
+0
+Small trees spring up from the grass!~
 X
 edge forest trees around~
    You find yourself standing at the edge of the forest, the last vestige of
@@ -530,15 +554,15 @@ E
 8 0 100.00 113
 E
 9 0 100.00 144
-I 5 102 9.00 1 x  # DIG: flint stone
-I 5 100 9.00 1 x  # DIG: rock
-I 5 101 82.00 1 x  # DIG: lump of clay
-I 6 3013 25.00 1  # FORAGE: handful of nuts
+I 5 102 9.00 125 x  # DIG: flint stone
+I 5 100 9.00 125 x  # DIG: rock
+I 5 101 82.00 125 x  # DIG: lump of clay
+I 6 3013 25.00 25  # FORAGE: handful of nuts
 I 7 1206 8.33 125 p  # PICK: iridescent blue iris
 I 7 1205 100.00 125 p  # PICK: bileberries
 I+ 0 70  # Ability: Find Herbs
 I 7 123 100.00 125 p  # PICK: small flower
-I 9 140 100.00 1  # GATHER: bundle of long grass
+I 9 140 100.00 50  # GATHER: bundle of long grass
 X
 plains riverbank bank water around~
    The riverbank is soft and muddy underfoot, with waterlogged earth and thick
@@ -588,17 +612,20 @@ E
 4 0 1.00 145
 E
 9 0 100.00 145
-I 5 102 9.00 1 x  # DIG: flint stone
-I 5 100 9.00 1 x  # DIG: rock
-I 5 101 82.00 1 x  # DIG: lump of clay
-I 6 3015 25.00 1  # FORAGE: red berries
+I 5 102 9.00 125 x  # DIG: flint stone
+I 5 100 9.00 125 x  # DIG: rock
+I 5 101 82.00 125 x  # DIG: lump of clay
+I 6 3015 25.00 25  # FORAGE: red berries
 I 7 1206 8.33 125 p  # PICK: iridescent blue iris
 I 7 1205 100.00 125 p  # PICK: bileberries
 I+ 0 70  # Ability: Find Herbs
 I 7 123 100.00 125 p  # PICK: small flower
-I 9 121 85.00 1 g  # GATHER: sticks and leaves
-I 9 131 15.00 1 g  # GATHER: green sapling
+I 9 121 85.00 50 g  # GATHER: sticks and leaves
+I 9 131 15.00 50 g  # GATHER: green sapling
 I 20 120 100.00 1  # CHOP: large tree
+U
+0
+New trees burst forth from the riverbank and wend their way toward the sky!~
 X
 trees forest riverbank bank water~
    You are standing at the edge of the forest, with the sounds of rushing water
@@ -649,17 +676,20 @@ E
 17 140 1.00 139
 E
 17 100 1.00 139
-I 5 102 9.00 1 x  # DIG: flint stone
-I 5 100 9.00 1 x  # DIG: rock
-I 5 101 82.00 1 x  # DIG: lump of clay
-I 6 3015 25.00 1  # FORAGE: red berries
+I 5 102 9.00 125 x  # DIG: flint stone
+I 5 100 9.00 125 x  # DIG: rock
+I 5 101 82.00 125 x  # DIG: lump of clay
+I 6 3015 25.00 25  # FORAGE: red berries
 I 7 1206 8.33 125 p  # PICK: iridescent blue iris
 I 7 1205 100.00 125 p  # PICK: bileberries
 I+ 0 70  # Ability: Find Herbs
 I 7 123 100.00 125 p  # PICK: small flower
-I 9 121 85.00 1 g  # GATHER: sticks and leaves
-I 9 131 15.00 1 g  # GATHER: green sapling
+I 9 121 85.00 50 g  # GATHER: sticks and leaves
+I 9 131 15.00 50 g  # GATHER: green sapling
 I 20 120 100.00 1  # CHOP: large tree
+U
+0
+The sky fills in with green as new trees streak toward the sky and unfurl their leaves!~
 X
 forest trees riverbank bank water river around~
    You are standing at the edge of the forest, with the sounds of rushing water
@@ -698,10 +728,10 @@ E
 16 0 100.00 140
 E
 23 0 100.00 140
-I 5 102 9.00 1 X  # DIG: flint stone
-I 5 100 9.00 1 X  # DIG: rock
-I 5 101 82.00 1 X  # DIG: lump of clay
-I 6 3013 25.00 1  # FORAGE: handful of nuts
+I 5 102 9.00 125 X  # DIG: flint stone
+I 5 100 9.00 125 X  # DIG: rock
+I 5 101 82.00 125 X  # DIG: lump of clay
+I 6 3013 25.00 25  # FORAGE: handful of nuts
 I 7 1206 8.33 125 p  # PICK: iridescent blue iris
 I 7 1205 100.00 125 p  # PICK: bileberries
 I+ 0 70  # Ability: Find Herbs
@@ -722,7 +752,7 @@ S
 #147
 Riverside Copse~
 A Copse on the Riverbank on the Newbie Island~
-'w' 13 jrv 1 d p
+'w' 13 jrv 1 dl p
 C
 chop, dig, pick~
 D1
@@ -757,15 +787,18 @@ E
 4 0 1.00 144
 E
 9 0 100.00 144
-I 5 102 9.00 1 X  # DIG: flint stone
-I 5 100 9.00 1 X  # DIG: rock
-I 5 101 82.00 1 X  # DIG: lump of clay
-I 6 3015 25.00 1  # FORAGE: red berries
+I 5 102 9.00 125 X  # DIG: flint stone
+I 5 100 9.00 125 X  # DIG: rock
+I 5 101 82.00 125 X  # DIG: lump of clay
+I 6 3015 25.00 25  # FORAGE: red berries
 I 7 1206 8.33 125 p  # PICK: iridescent blue iris
 I 7 1205 100.00 125 p  # PICK: bileberries
 I+ 0 70  # Ability: Find Herbs
 I 7 123 100.00 125 p  # PICK: small flower
 I 20 131 100.00 1  # CHOP: green sapling
+U
+0
+Fresh saplings shoot forth from the edges of the stumps!~
 X
 copse riverside riverbank bank trees forest stumps around~
    As you approach the river, a small copse comes into view, nestled on the
@@ -800,10 +833,11 @@ D4
 &0~
 E
 8 0 100.00 113
-I 5 107 75.00 1 x  # DIG: bag of sand
-I 5 101 25.00 1 x  # DIG: lump of clay
-I 6 3051 50.00 1 x  # FORAGE: sea urchin
-I 6 3052 50.00 1 x  # FORAGE: clam
+I 5 101 25.00 125 x  # DIG: lump of clay
+I 5 110 10.00 125 x  # DIG: sea salt crystals
+I 5 107 65.00 125 x  # DIG: bag of sand
+I 6 3051 50.00 25 x  # FORAGE: sea urchin
+I 6 3052 50.00 25 x  # FORAGE: clam
 I 7 1206 8.33 125 p  # PICK: iridescent blue iris
 I 7 1200 100.00 125 p  # PICK: handful of whitegrass
 I+ 0 70  # Ability: Find Herbs
@@ -857,18 +891,22 @@ E
 17 150 1.00 154
 E
 17 100 0.60 139
-I 5 102 9.00 1 x  # DIG: flint stone
-I 5 107 9.00 1 x  # DIG: bag of sand
-I 5 101 82.00 1 x  # DIG: lump of clay
-I 6 3051 40.00 1 x  # FORAGE: sea urchin
-I 6 3052 40.00 1 x  # FORAGE: clam
+I 5 102 9.00 125 x  # DIG: flint stone
+I 5 107 9.00 125 x  # DIG: bag of sand
+I 5 110 9.00 125 x  # DIG: sea salt crystals
+I 5 101 73.00 125 x  # DIG: lump of clay
+I 6 3051 40.00 25 x  # FORAGE: sea urchin
+I 6 3052 40.00 25 x  # FORAGE: clam
 I 7 1206 8.33 125 p  # PICK: iridescent blue iris
 I 7 1200 100.00 125 p  # PICK: handful of whitegrass
 I+ 0 70  # Ability: Find Herbs
 I 7 123 100.00 125 p  # PICK: small flower
-I 9 121 85.00 1 g  # GATHER: sticks and leaves
-I 9 131 15.00 1 g  # GATHER: green sapling
+I 9 121 85.00 50 g  # GATHER: sticks and leaves
+I 9 131 15.00 50 g  # GATHER: green sapling
 I 20 120 100.00 1  # CHOP: large tree
+U
+0
+A tree rises rapidly by the shore, quickly shading you with new leaves!~
 X
 tree shoreside water ocean around~
    A lone tree stands on the edge of the ocean, its roots entwined in the sandy
@@ -902,11 +940,12 @@ D4
 &0~
 E
 8 0 100.00 113
-I 5 102 9.00 1 x  # DIG: flint stone
-I 5 107 9.00 1 x  # DIG: bag of sand
-I 5 101 82.00 1 x  # DIG: lump of clay
-I 6 3051 50.00 1 x  # FORAGE: sea urchin
-I 6 3052 50.00 1 x  # FORAGE: clam
+I 5 102 9.00 125 x  # DIG: flint stone
+I 5 107 9.00 125 x  # DIG: bag of sand
+I 5 110 9.00 125 x  # DIG: sea salt crystals
+I 5 101 73.00 125 x  # DIG: lump of clay
+I 6 3051 50.00 25 x  # FORAGE: sea urchin
+I 6 3052 50.00 25 x  # FORAGE: clam
 I 7 1206 8.33 125 p  # PICK: iridescent blue iris
 I 7 1200 100.00 125 p  # PICK: handful of whitegrass
 I+ 0 70  # Ability: Find Herbs
@@ -944,15 +983,16 @@ D4
 &0~
 E
 8 0 100.00 113
-I 5 102 9.00 1 x  # DIG: flint stone
-I 5 100 9.00 1 x  # DIG: rock
-I 5 101 82.00 1 x  # DIG: lump of clay
-I 6 3013 33.00 1  # FORAGE: handful of nuts
+I 5 102 9.00 125 x  # DIG: flint stone
+I 5 100 9.00 125 x  # DIG: rock
+I 5 109 9.00 125 x  # DIG: chunk of rock salt
+I 5 101 73.00 125 x  # DIG: lump of clay
+I 6 3013 33.00 25  # FORAGE: handful of nuts
 I 7 1206 8.33 125 p  # PICK: iridescent blue iris
 I 7 1205 100.00 125 p  # PICK: bileberries
 I+ 0 70  # Ability: Find Herbs
 I 7 123 100.00 125 p  # PICK: small flower
-I 9 140 100.00 1  # GATHER: bundle of long grass
+I 9 140 100.00 50  # GATHER: bundle of long grass
 X
 foothills hills lake mountain around~
    The foothills rise up gently between the lake and the mountains, forming a
@@ -1005,11 +1045,12 @@ E
 16 0 100.00 150
 E
 23 0 100.00 150
-I 5 102 9.00 1 x  # DIG: flint stone
-I 5 107 9.00 1 x  # DIG: bag of sand
-I 5 101 82.00 1 x  # DIG: lump of clay
-I 6 3051 50.00 1 x  # FORAGE: sea urchin
-I 6 3052 50.00 1 x  # FORAGE: clam
+I 5 102 9.00 125 x  # DIG: flint stone
+I 5 107 9.00 125 x  # DIG: bag of sand
+I 5 110 9.00 125 x  # DIG: sea salt crystals
+I 5 101 73.00 125 x  # DIG: lump of clay
+I 6 3051 50.00 25 x  # FORAGE: sea urchin
+I 6 3052 50.00 25 x  # FORAGE: clam
 I 7 1206 8.33 125 p  # PICK: iridescent blue iris
 I 7 1200 100.00 125 p  # PICK: handful of whitegrass
 I+ 0 70  # Ability: Find Herbs
@@ -1066,16 +1107,20 @@ E
 4 0 1.00 154
 E
 9 0 100.00 154
-I 5 102 9.00 1 x  # DIG: flint stone
-I 5 107 9.00 1 x  # DIG: bag of sand
-I 5 101 82.00 1 x  # DIG: lump of clay
-I 6 3051 50.00 1 x  # FORAGE: sea urchin
-I 6 3052 50.00 1 x  # FORAGE: clam
+I 5 102 9.00 125 x  # DIG: flint stone
+I 5 107 9.00 125 x  # DIG: bag of sand
+I 5 110 9.00 125 x  # DIG: sea salt crystals
+I 5 101 73.00 125 x  # DIG: lump of clay
+I 6 3051 50.00 25 x  # FORAGE: sea urchin
+I 6 3052 50.00 25 x  # FORAGE: clam
 I 7 1206 8.33 125 p  # PICK: iridescent blue iris
 I 7 1200 100.00 125 p  # PICK: handful of whitegrass
 I+ 0 70  # Ability: Find Herbs
 I 7 123 100.00 125 p  # PICK: small flower
 I 20 131 100.00 1  # CHOP: green sapling
+U
+0
+New saplings squeak out of the edges of the stumps and grow up toward the sky!~
 X
 copse stumps seaside sea ocean water around forest trees~
    You stand before a seaside copse, the sound of the waves crashing against

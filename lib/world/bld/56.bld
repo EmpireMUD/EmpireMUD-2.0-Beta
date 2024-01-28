@@ -79,6 +79,9 @@ M
 241 20.00 ce
 U
 1 5115
+U
+1 5108
+Z1 11
 S
 #5604
 Great Hall~
@@ -276,6 +279,7 @@ M
 9198 2.00 0
 M
 9199 2.00 0
+Z1 7
 S
 #5613
 Sky Bridge~
@@ -317,11 +321,13 @@ the water. This is a place of cleanliness, so attendants regularly add fresh
 water to the bathing pools.
 ~
 F
-c
+F
 M
 236 20.00 ce
 M
 236 20.00 ce
+T 5162
+T 9808
 S
 #5615
 Shield Racks~
@@ -441,6 +447,7 @@ M
 9198 2.00 0
 M
 9199 2.00 0
+Z1 7
 S
 #5621
 Trophy Room~
@@ -461,5 +468,32 @@ M
 9198 2.00 0
 U
 1 5193
+S
+#5622
+Root Cellar~
+The Root Cellar~
+~
+0 0 a m
+0 0 0 -1
+C
+inventory, retrieve, store~
+D
+   It's chilly down in the root cellar, which has been carved from the earth
+and lined with shelves and bins to store vegetables in all seasons. There's a
+faintly musty smell, but everything here seems to be in good condition.
+~
+M
+9188 2.00 0
+M
+9189 2.00 0
+M
+9190 2.00 0
+M
+9198 2.00 0
+M
+9199 2.00 0
+U
+1 5215
+Z1 2
 S
 $

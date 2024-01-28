@@ -5,7 +5,7 @@
 *  Note: ITEM_CART is deprecated but this will still put items inside of  *
 *  one so that the 2.0 b3.8 auto-converter will move them to vehicles.    *
 *                                                                         *
-*  EmpireMUD code base by Paul Clarke, (C) 2000-2015                      *
+*  EmpireMUD code base by Paul Clarke, (C) 2000-2024                      *
 *  All rights reserved.  See license.doc for complete information.        *
 *                                                                         *
 *  EmpireMUD based upon CircleMUD 3.0, bpl 17, by Jeremy Elson.           *
@@ -117,7 +117,7 @@ obj_data *Obj_load_from_file(FILE *fl, obj_vnum vnum, int *location, char_data *
 	}
 	
 	// for fread_string
-	sprintf(error, "Obj_load_from_file %d", vnum);
+	sprintf(error, "Obj_load_from_file #%d %s", vnum, NULLSAFE(error_str));
 
 	while (!end) {
 		if (!get_line(fl, line)) {
@@ -343,6 +343,18 @@ obj_data *Obj_load_from_file(FILE *fl, obj_vnum vnum, int *location, char_data *
 				BAD_TAG_WARNING(line)
 				break;
 			}
+			case 'R': {
+				if (!strn_cmp(line, "Requires-tool: ", 15)) {
+					if (sscanf(line + 15, "%s", s_in)) {
+						if (GET_OBJ_VNUM(obj) == NOTHING) {
+							// only allowed for 'anonymous' objs
+							obj->proto_data->requires_tool = asciiflag_conv(s_in);
+						}
+					}
+				}
+				BAD_TAG_WARNING(line)
+				break;
+			}
 			case 'S': {
 				if (!strn_cmp(line, "Short-desc:", 11)) {
 					if (GET_OBJ_SHORT_DESC(obj) && (!proto || GET_OBJ_SHORT_DESC(obj) != GET_OBJ_SHORT_DESC(proto))) {
@@ -451,7 +463,7 @@ obj_data *Obj_load_from_file(FILE *fl, obj_vnum vnum, int *location, char_data *
 	
 	// check versioning: load a new version
 	if (obj && proto && OBJ_VERSION(obj) < OBJ_VERSION(proto) && config_get_bool("auto_update_items")) {
-		new = fresh_copy_obj(obj, GET_OBJ_CURRENT_SCALE_LEVEL(obj));		
+		new = fresh_copy_obj(obj, GET_OBJ_CURRENT_SCALE_LEVEL(obj), TRUE, TRUE);
 		extract_obj(obj);
 		obj = new;
 		
@@ -594,6 +606,9 @@ void Crash_save_one_obj_to_file(FILE *fl, obj_data *obj, int location) {
 	}
 	if (!proto && GET_OBJ_TOOL_FLAGS(obj) != NOBITS) {
 		fprintf(fl, "Tool: %s\n", bitv_to_alpha(GET_OBJ_TOOL_FLAGS(obj)));
+	}
+	if (!proto && GET_OBJ_REQUIRES_TOOL(obj) != NOBITS) {
+		fprintf(fl, "Requires-tool: %s\n", bitv_to_alpha(GET_OBJ_REQUIRES_TOOL(obj)));
 	}
 
 	if (obj->last_empire_id != NOTHING) {

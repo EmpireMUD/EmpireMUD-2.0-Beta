@@ -1,3 +1,29 @@
+ABILITY ABILITIES "ABILITY INFO" "ABILITY COMMAND"
+
+Usage:  ability <name>
+
+The 'ability' command displays information about the ability. This information
+comes from the game's database so it's always up-to-date. Abilities also have
+help files for more information.
+
+Abilities you purchase from skill trees can be used to gain levels in their
+skill tree up to 10 times each. Abilities below level 50 only gain skill up to
+50, and abilities below 75 only gain skill levels up to 75. See ABILITY LEVELS
+for how this affects them.
+
+See also: ABILITY LEVELS, ABILITY POINTS, TRAINING SKILLS, SKILLS, SKILL CAPS,
+   SPECIALIZE
+#
+"ABILITY LEVELS" "ABILITY POWER" "ABILITY SCALE" "ABILITY SCALING"
+
+Abilities that come from skills activate at different levels depending upon
+your level in that skill. Abilities from other things, such as synergies,
+always use your full level.
+
+When you use an ability from a skill tree that's below its maximum level, e.g.
+a skill you have at 50 or 75, it activates at that percent of your total level.
+For example, a level 50 ability will scale to 50% of your full level.
+#
 "ABILITY POINTS"
 
 You earn "ability" points at certain skill levels. These points are used to
@@ -32,13 +58,20 @@ Barde requires the Animal Husbandry ability.
 
 See also: ANIMAL HUSBANDRY, RIDE, STABLE
 #
-BATHE 
+CAST SPELL SPELLS
 
-Usage:  bathe 
+Usage:  cast <spell> [target]
+        cast "<multi-word spell>" target
 
-Bathe is used to begin cleaning yourself in either a bath house or a river.
-You must bathe regularly to keep clean. If you bathe in a bath house you will
-get cleaner faster than if you were to bathe in a river.
+The cast command is used for certain spells; however, unlike similar MUDs such
+as CircleMUD or DikuMUD, cast is not used for most magical abilities. If you
+have any spells that can be cast with this command, typing 'cast' by itself
+will list them.
+
+If a spell has more than 1 word in its name, you can try to abbreviate it to
+one word, or you can put quotation marks around the spell name.
+
+See also: SKILL, ABILITY
 #
 CHIP KNAPPER KNAPPING "FLINT KNAPPING"
 
@@ -88,7 +121,10 @@ down by one. When they run out, the effect ends until the daily skill reset.
 You can keep yourself from accidentally spending your daily bonus experience
 in the wrong skill by using 'noskill'.
 
-See also: ABILITY POINTS, SKILLS, SKILL CAPS, NOSKILL
+You can put your amount of bonus experience in your prompt if you want an easy
+way to see it.
+
+See also: ABILITY POINTS, SKILLS, SKILL CAPS, NOSKILL, PROMPT
 #
 DESIGNATE REDESIGNATE KITCHEN BEDROOM LABORATORY LARDER CLOSET CRYPT STUDY GREATHALL "GREAT HALL"
 
@@ -112,7 +148,8 @@ Room types:
  hall - A connecting room
  kitchen - Allows cooking, baking, and other fire-dependent tasks
  laboratory - Identical to the free-standing Alchemist
- larder - A place to store food
+ larder - A place to store many foods
+ root cellar - A place to store vegetables
  sitting room - No special features
  skybridge - Above-ground hallways used in some tree buildings
  store room - Holds certain items
@@ -162,9 +199,9 @@ who originally built the building.
 You can use 'nodismantle' to keep yourself from accidentally dismantling a
 building.
 
-Note: Mountain tiles only refresh with new ore each year if the mines (or other
-buildings) have been dismantled and removed. However, all other resource
-buildings refresh each year without being dismantled.
+Note: Mountain tiles only refresh with new ore if the mines (or other
+buildings) have been dismantled and removed before the reset cycle. However,
+all other resource buildings refresh over time without being dismantled.
 
 See also: BUILD, BUILD INFO, HOMELESS CITIZENS, NODISMANTLE
 #
@@ -264,7 +301,7 @@ See also: BOARD, DRAG, HARNESS, HERD
 #
 LIGHT TORCH
 
-Usage:  light <item | building | vehicle | area | direction>
+Usage:  light <item>
 
 To light something, you must have fire sticks or some other lighter. You may
 light sticks to create torches. You can also light trees or logs to make camp
@@ -295,7 +332,7 @@ MILL MILLING
 Mill (Basic Crafts ability)
 
 Building:  (MM)  Mill  (must be by a river; Build ability)
-Stored at the mill:  cornmeal, flour
+Stored at the mill:  cornmeal, flour, salt
 Command:  mill [number] <item>
           mill info <item>
 Tool:  grinding  stone
@@ -304,6 +341,7 @@ You can mill:
   wheat into flour
   corn into cornmeal
   oats into oatmeal
+  rock salt or sea salt
 
 You must do this at a Mill building or have a grinding stone equipped.
 However, it will take longer to do it without the building.
@@ -323,10 +361,11 @@ outside. To work a mine, you need a pick of some kind, although a simple
 handaxe will also work.
 
 Mines have a limited amount of ore, and do not replenish. However, if you fully
-dismantle a mine, its mountain will reset when the MUD celebrates a new year
-(every 7.5 real days). Once this reset happens, building a new mine on the
-tile will involve digging a new mine shaft and the mineral found there could be
-completely different.
+dismantle a mine, its mountain will reset at the end of the depletion cycle
+(usually every 7.5 real days). Once this reset happens, building a new mine on
+the tile will involve digging a new mine shaft and the mineral found there
+could be completely different. Type "mudstats time" to see how long until the
+next reset.
 
 Mines count as in-city territory as far away as 4x a city's normal radius.
 
@@ -380,7 +419,7 @@ you to fastmorph.
 
 See also: ANIMAL FORMS, WOLF FORM, BAT FORM, HORRID FORM, MIST FORM
 #
-NOSKILL
+NOSKILL NO-SKILL
 
 Usage:  noskill <skill>
 
@@ -532,10 +571,10 @@ Example:
 
 See also: APPROACH, USE
 #
-SKILL SKILLS ABILITY ABILITIES "SKILL BUY" "SKILL RESET" "SKILL LEVELS"
+SKILL SKILLS "SKILL BUY" "SKILL RESET" "SKILL LEVELS"
 
 Usage:  skills -- list all skills
-        skill <name> -- see details about a skill or ability
+        skill <name> [-all] -- see a skill's details and abilities 
         skill buy <ability> -- purchase an ability
         skill reset <skill> -- reset your ability points
         skill drop <skill> <level> -- lose skill levels
@@ -553,48 +592,36 @@ If you specify a skill, you'll see a breakdown of the abilities in that skill
 tree. Abilities marked with an "x" are the ones you already know. To buy a new
 ability, use "skill buy". You must have a free ability point to do this.
 
-If you specify an ability, you will see information about that ability. For
-more information, see the help page for each skill or ability.
-
-When you hit a skill cap level (50, 75, 100) you get to reset your abilities
-in that skill. To do that, you can type "skill reset <skill>". If you type it
-without the skill name, you can see which skills have free resets available.
-You can reset in order to buy a different set of abilities, because you bought
-the wrong ability, or because you were using a certain set of abilities to
-level up and are ready for a longterm set. Resetting a skill only resets your
-current set (see SKILL SWAP).
-
-It also shows the range in which you can gain the skill, although you can gain
-no more than 10 points from any one ability.
+Abilities in each skill tree show the range in which you can use them to gain
+the skill, although you can gain no more than 10 levels from any one ability.
 
 When you use an ability, its level is limited to your level in its parent skill
 unless you have 100 in that skill, in which case it scales all the way up to
 your full level.
 
-The ability/abilities commands are identical to the skills command.
+If you don't want to see alerts each time you gain a skill level, you can turn
+them off with the "smessages" command.
 
-See also: NOSKILL, SPECIALIZE, SKILL CAPS, SKILL DROP, TRAINING SKILLS,
-   ABILITY POINTS, SKILL SWAP, LETHEIAN ICON
+See also: NOSKILL, SPECIALIZE, SKILL CAPS, SKILL DROP, SKILL RESET, ABILITIES,
+   TRAINING SKILLS, ABILITY POINTS, SKILL SWAP, LETHEIAN ICON, STATUS MESSAGES
 #
-"SKILL CAPS" CAPS "MAX SKILL" "MAXIMUM SKILL" "CLASS SKILLS" "SPECIALTY SKILLS" "BASIC SKILLS"
+"SKILL CAPS" CAPS "MAX SKILL" "MAXIMUM SKILL" "PRIMARY SKILLS" "SPECIALTY SKILLS" "SECONDARY SKILLS" "BASIC SKILLS" "TERTIARY SKILLS"
 
 Skills are capped at certain levels to limit the number of abilities any one
 character can have. When you reach 50 or 75 in a skill, you will stop gaining
 points in that skill. To choose that skill for further advancement as one of
-your specialty or synergy skills, use the "specialize" command. This will get
-you a free level in the skill.
+your specialty skills, use the "specialize" command. This will give you a free
+level in the skill.
 
-* You can have two skills at 100. These are your class skills.
+* You can have two skill trees at level 100. These are your primary skills.
   These skills will get 16 abilities each.
-* You can have one skill at 75. This is your specialty skill.
+* You can have two more skills at level 75. These are your specialty skills.
   These skills will get 13 abilities each.
-* The rest of the skills are limited to 50. These are basic skills.
+* You can have two more skills at level 50. These are basic skills.
   These skills will get 9 abilities each.
 
-You can get a second specialty skill (75) if you keep one of your basic skills
-at zero (0). Once you have no basic skills left at zero, you can no longer
-choose to specialize an extra skill. The opposite is also true: if you
-specialize an extra skill, you'll no longer be able to gain in your last zero.
+This means you get a total of 6 skill trees on each character at levels 100,
+100, 75, 75, 50, and 50.
 
 You can use 'skill drop' if you want to lower one of your skills so that you
 can then start raising a different one.
@@ -615,6 +642,27 @@ lose any abilities you purchased above the new level.
 Some skills cannot be dropped all the way to zero voluntarily.
 
 See also: SKILL
+#
+"SKILL RESET" "ABILITY RESET" "RESET ABILITY" "RESET ABILITIES"
+
+Usage:  skill reset [skill]
+
+The "skill reset" command lets you choose different abilities in a skill tree.
+Your level in that tree will remain the same, but all your ability points are
+refunded.
+
+You can reset in order to buy a different set of abilities, because you bought
+the wrong ability, or because you were using a certain set of abilities to
+level up and are ready for a longterm set. Resetting a skill only resets your
+current set (see SKILL SWAP).
+
+Using "skill reset" without a skill name will display how many resets you have
+available in each skill tree. You get a free reset in each skill when you hit
+a cap level (50, 75, or 100) as well as when you specialize the skill. After
+that, you can get more skill resets by using certain items.
+
+See also: SKILLS, SPECIALIZE, SKILL CAPS, ABILITY POINTS, SKILL SWAP,
+   ABILITIES, LETHEIAN ICON
 #
 "SKILL SWAP" "SKILL SETS" MULTISPEC MULTI-SPEC "MULTI SPEC"
 
@@ -698,13 +746,12 @@ SPECIALIZE SPECIALTY
 
 Usage:  specialize <skill>
 
-This command allows you to choose which skills become your class skills and
-specialties. You can only specialize a skill that's at 50 (the basic skill cap)
-or 75 (the specialty skill cap). Doing this will gain you a free level in the
-skill and allow you to continue leveling it.
+This command allows you to choose which skills your character will specialize
+in. You can only specialize a skill that's at 50 (the basic skill cap) or 75
+(the specialty skill cap). Doing this will gain you a free level in the
+skill and allow you to continue leveling it to 75 or 100.
 
-NOTE: This is a temporary command. In the future, we intend to use quests and
-other mechanisms for players who want to specialize.
+Some skills may require additional work to specialize them.
 
 See also: SKILL, SKILL CAPS
 #
@@ -712,8 +759,9 @@ See also: SKILL, SKILL CAPS
 
 Command:  transport [destination]
 
-When you start, or die, you appear at a starting location. These are safe
-locations which will give you a moment to prepare to go out into the world.
+When you start the game, you appear at a starting location. When you die, if
+you don't have a tomb, you end up at the nearest starting locadtion. These are
+safe places which will give you a moment to prepare to go out into the world.
 No player can be attacked at a starting location.
 
 You can travel randomly between starting locations using the transport command.
@@ -722,6 +770,8 @@ of a person who is at one) to transport directly there.
 
 On EmpireMUD, starting locations are called Towers of Souls. Nobody may claim
 the area immediately around a Tower of Souls (&y*/\*&0).
+
+See also: TOMB, TRANSPORT
 #
 SUMMON
 
@@ -745,6 +795,17 @@ See also:
  ADVENTURE SUMMON  (inside an adventure)
 
 See also: COMPANION
+#
+SUPERCEDE SUPERCEDED "SUPERCEDED BY ABILITY"
+
+Some abilities are 'superceded by' other abilities. This means the 2nd ability
+is an upgraded version of the first one. Once you learn the superceding
+ability, you can no longer use the original one.
+
+For example, Heal is superceded by Heal Friend, which does the same thing and
+more. Heal Friend is, in turn, superceded by Heal Party.
+
+See also: ABILITY
 #
 TAME
 

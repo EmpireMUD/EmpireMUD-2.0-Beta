@@ -87,7 +87,7 @@ while %person%
     end
   else
     dg_affect #16102 %person% off
-    dg_affect #16102 %person% waterwalk on 15
+    dg_affect #16102 %person% waterwalking on 15
   end
   set person %person.next_in_room%
 done
@@ -132,7 +132,7 @@ while %person%
     if %person.affect(16102)%
       dg_affect #16102 %person% off
     end
-    dg_affect #16102 %person% waterwalk on 15
+    dg_affect #16102 %person% waterwalking on 15
     if %person.inventory(16133)%
       %send% %person% The hydra seeking stone flares and vanishes now that you've found the beast.
       %purge% %person.inventory(16133)%
@@ -172,7 +172,7 @@ adventure~
 if !(summon /= %arg.car%)
   %teleport% %actor% %instance.real_location%
   %force% %actor% adventure
-  %teleport% %actor% %self%
+  %teleport% %actor% %self.room%
   return 1
   halt
 end

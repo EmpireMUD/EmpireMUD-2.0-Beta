@@ -2,7 +2,7 @@
 *   File: structs.h                                       EmpireMUD 2.0b5 *
 *  Usage: header file for central structures and contstants               *
 *                                                                         *
-*  EmpireMUD code base by Paul Clarke, (C) 2000-2015                      *
+*  EmpireMUD code base by Paul Clarke, (C) 2000-2024                      *
 *  All rights reserved.  See license.doc for complete information.        *
 *                                                                         *
 *  EmpireMUD based upon CircleMUD 3.0, bpl 17, by Jeremy Elson.           *
@@ -51,6 +51,7 @@
 *     Ability Structs
 *     Adventure Structs
 *     Archetype Structs
+*     Attack Message Structs
 *     Augment Structs
 *     Book Structs
 *     Building Structs
@@ -66,7 +67,7 @@
 *     Event Structs
 *     Event Structs (Timed Event System)
 *     Faction Structs
-*     Fight Structs
+*     Fight Message Structs
 *     Game Structs
 *     Generic Structs
 *     Object Structs
@@ -85,6 +86,7 @@
 // by searching for CONST_PREFIX_x (e.g. WEAR_x for wear flags).
 
 
+#include <math.h>
 #include "protocol.h" // needed by everything
 #include "uthash.h"	// needed by everything
 #include "utlist.h"	// needed by everything
@@ -205,6 +207,8 @@
 #define NO_ABIL  NO_SKILL	// things that don't require an ability
 #define NO_FLAGS  0
 #define NO_SKILL  -1	// things that don't require a skill
+#define NO_TECH  NOTHING	// empire or player tech
+#define NO_TOOL  NOBITS		// does not require a tool
 #define NOT_REPEATABLE  -1	// quest's repeatable_after
 #define OTHER_COIN  NOTHING	// use the NOTHING value to store the "other" coin type (which stores by empire id)
 #define REAL_OTHER_COIN  NULL	// for when other-coin type is an empire pointer
@@ -216,13 +220,15 @@
 #define MAGIC_NUMBER  (0x06)	// Arbitrary number that won't be in a string
 
 
-// for things that hold more than one type of thing:
+// TYPE_x: for things that hold more than one type of thing:
 #define TYPE_OBJ  0
 #define TYPE_MOB  1
 #define TYPE_ROOM  2
 #define TYPE_MINE_DATA  3
 #define TYPE_BLD  4
 #define TYPE_VEH  5
+#define TYPE_ABIL  6
+#define TYPE_LIQUID  7
 
 
 // basic types
@@ -239,6 +245,7 @@ typedef unsigned short int ush_int;
 // 'unsigned long long' will give you at least 64 bits if you have GCC (or C99+)
 // -- THIS IS REQUIRED because some bit sets already use it
 typedef unsigned long long	bitvector_t;
+typedef signed long long sbitvector_t;	// signed version needed for some uses
 
 
 // vnums
@@ -263,6 +270,7 @@ typedef struct ability_data ability_data;
 typedef struct account_data account_data;
 typedef struct adventure_data adv_data;
 typedef struct archetype_data archetype_data;
+typedef struct attack_message_data attack_message_data;
 typedef struct augment_data augment_data;
 typedef struct bld_data bld_data;
 typedef struct book_data book_data;
@@ -327,6 +335,10 @@ typedef struct vehicle_data vehicle_data;
 #define APPLY_CRAFTING  25	// bonus craft levels
 #define APPLY_BLOOD_UPKEEP  26	// vampire blood requirement
 #define APPLY_NIGHT_VISION  27	// bonus to nighttime light radius
+#define APPLY_NEARBY_RANGE  28	// larger "nearby"
+#define APPLY_WHERE_RANGE  29	// larger "where"
+#define APPLY_WARMTH  30	// protects against cold weather
+#define APPLY_COOLING  31	// protects against warm weather
 
 
 // AUTOMSG_x: automessage types
@@ -360,6 +372,7 @@ typedef struct vehicle_data vehicle_data;
 #define GLOBAL_MINE_DATA  1
 #define GLOBAL_NEWBIE_GEAR  2
 #define GLOBAL_MAP_SPAWNS  3
+#define GLOBAL_OBJ_INTERACTIONS  4
 
 
 // GLB_FLAG_x flags for global_data
@@ -408,7 +421,14 @@ typedef struct vehicle_data vehicle_data;
 #define INTERACT_RUINS_TO_VEH  30
 #define INTERACT_PRODUCTION  31
 #define INTERACT_SKILLED_LABOR  32
-#define NUM_INTERACTS  33
+#define INTERACT_LIQUID_CONJURE  33
+#define INTERACT_OBJECT_CONJURE  34
+#define INTERACT_VEHICLE_CONJURE  35
+#define INTERACT_DISENCHANT  36
+#define NUM_INTERACTS  37
+
+// for do_gen_interact
+#define GEN_INTERACT_SPECIAL(name)	void (name)(char_data *ch, room_data *room, const struct gen_interact_data_t *data)
 
 
 // INTERACT_RESTRICT_x: types of interaction restrictions
@@ -420,6 +440,7 @@ typedef struct vehicle_data vehicle_data;
 #define INTERACT_RESTRICT_GROUP  5	// only when mob/obj is 'group' (but not hard)
 #define INTERACT_RESTRICT_BOSS  6	// only when mob/obj is 'hard' (hard + group)
 #define INTERACT_RESTRICT_DEPLETION  7	// determines which depletion is checked/applied, if applicable
+#define INTERACT_RESTRICT_TOOL  8	// tool required for the interaction
 
 
 // for object saving
@@ -471,6 +492,10 @@ typedef struct vehicle_data vehicle_data;
 #define REQ_OWN_VEHICLE_FUNCTION  40
 #define REQ_SPEAK_LANGUAGE  41
 #define REQ_RECOGNIZE_LANGUAGE  42
+#define REQ_COMPLETED_QUEST_EVER  43
+#define REQ_DAYTIME  44
+#define REQ_NIGHTTIME  45
+#define REQ_DIPLOMACY_OVER  46
 
 
 // REQ_AMT_x: How numbers displayed for different REQ_ types
@@ -485,15 +510,6 @@ typedef struct vehicle_data vehicle_data;
 #define SHIPPING_EN_ROUTE  1	// waiting to deliver
 #define SHIPPING_DELIVERED  2	// indicates the ship has been delivered and these can be offloaded to the destination
 #define SHIPPING_WAITING_FOR_SHIP  3	// waiting for a ship
-
-
-// SKILLF_x: skill flags
-#define SKILLF_IN_DEVELOPMENT  BIT(0)	// a. not live, won't show up on skill lists
-#define SKILLF_BASIC  BIT(1)	// b. always shows in the list
-#define SKILLF_NO_SPECIALIZE  BIT(2)	// c. players must pass 50/75 via script/quest
-#define SKILLF_VAMPIRE  BIT(3)	// d. players with this skill are considered vampires
-#define SKILLF_CASTER  BIT(4)	// e. players with this skill are considered spellcasters/mages
-#define SKILLF_REMOVED_BY_PURIFY  BIT(5)	// f. lose this skill if hit by the 'purify' spell
 
 
 // SPAWN_x: mob spawn flags
@@ -526,122 +542,7 @@ typedef struct vehicle_data vehicle_data;
  //////////////////////////////////////////////////////////////////////////////
 //// ABILITY DEFINES /////////////////////////////////////////////////////////
 
-// ABILF_x: ability flags
-#define ABILF_VIOLENT  BIT(0)	// a. hostile ability (can't target self, etc)
-#define ABILF_COUNTERSPELLABLE  BIT(1)	// b. can be counterspelled
-#define ABILF_TOGGLE  BIT(2)	// c. can be toggled off by re-using (buffs)
-#define ABILF_INVISIBLE  BIT(3)	// d. act messages don't show if char can't be seen
-#define ABILF_NO_ENGAGE  BIT(4)	// e. won't cause you to enter combat
-#define ABILF_RANGED  BIT(5)	// f. allows use in ranged combat
-#define ABILF_NO_ANIMAL  BIT(6)	// g. can't be used in animal form
-#define ABILF_NO_INVULNERABLE  BIT(7)	// h. can't be used in invulnerable form
-#define ABILF_CASTER_ROLE  BIT(8)	// i. bonus if in 'caster' role
-#define ABILF_HEALER_ROLE  BIT(9)	// j. bonus if in 'healer' role
-#define ABILF_MELEE_ROLE  BIT(10)	// k. bonus if in 'melee' role
-#define ABILF_TANK_ROLE  BIT(11)	// l. bonus if in 'tank' role
-#define ABILF_RANGED_ONLY  BIT(12)	// m. requires ranged combat
-#define ABILF_IGNORE_SUN  BIT(13)	// n. vampire ability ignores sunlight
-#define ABILF_UNSCALED_BUFF  BIT(14)	// o. buff does not scale at all (fixed values)
-#define ABILF_LIMIT_CROWD_CONTROL  BIT(15)	// p. cancels same buff on others in the room (using affectvnum)
-
-#define ABILITY_ROLE_FLAGS  (ABILF_CASTER_ROLE | ABILF_HEALER_ROLE | ABILF_MELEE_ROLE | ABILF_TANK_ROLE)
-
-// ABILT_x: ability type flags
-#define ABILT_CRAFT  BIT(0)	// related to crafting/building
-#define ABILT_BUFF  BIT(1)	// applies an affect
-#define ABILT_DAMAGE  BIT(2)	// deals damage
-#define ABILT_DOT  BIT(3)	// damage over time effect
-#define ABILT_PLAYER_TECH  BIT(4)	// some player tech feature
-#define ABILT_PASSIVE_BUFF  BIT(5)	// similar to a buff except always on
-#define ABILT_READY_WEAPONS  BIT(6)	// use READY-WEAPON data to add to a player's ready list
-#define ABILT_COMPANION  BIT(7)	// grants companions
-#define ABILT_SUMMON_ANY  BIT(8)	// player can summon from a list of mobs
-#define ABILT_SUMMON_RANDOM  BIT(9)	// player can summon a mob at random from a list
-#define ABILT_MORPH  BIT(10)	// ability has morphs that require it
-#define ABILT_AUGMENT  BIT(11)	// related to augments/enchants
-#define ABILT_CUSTOM  BIT(12)	// ability is hard-coded
-/*
-#define ABILT_UNAFFECTS  BIT(2)
-#define ABILT_POINTS  BIT(3)	// e.g. heal?
-#define ABILT_ALTER_OBJS  BIT(4)
-#define ABILT_GROUPS  BIT(5)
-#define ABILT_MASSES  BIT(6)
-#define ABILT_AREAS  BIT(7)
-#define ABILT_CREATIONS  BIT(9)
-#define ABILT_MANUAL  BIT(10)
-#define ABILT_ROOMS  BIT(11)
-*/
-
-
-// ATAR_x: ability targeting flags
-#define ATAR_IGNORE	BIT(0)	// ignore target
-#define ATAR_CHAR_ROOM	BIT(1)	// pc/npc in room
-#define ATAR_CHAR_WORLD  BIT(2)	// pc/npc in the world
-#define ATAR_CHAR_CLOSEST  BIT(3)	// closest pc/npc in the world
-#define ATAR_FIGHT_SELF  BIT(4)	// if fighting and no arg, targets self
-#define ATAR_FIGHT_VICT  BIT(5)	// if fighting and no arg, targets opponent
-#define ATAR_SELF_ONLY  BIT(6)	// targets self if no arg, and only allows self
-#define ATAR_NOT_SELF  BIT(7)	// target is any other char, always use with e.g. TAR_CHAR_ROOM
-#define ATAR_OBJ_INV  BIT(8)	// object in inventory
-#define ATAR_OBJ_ROOM  BIT(9)	// object in the room
-#define ATAR_OBJ_WORLD  BIT(10)	// object in the world
-#define ATAR_OBJ_EQUIP  BIT(11)	// object held/equipped
-#define ATAR_VEH_ROOM  BIT(12)	// vehicle in the room
-#define ATAR_VEH_WORLD  BIT(13)	// vehicle in the world
-
-
-// ABIL_CUSTOM_x: custom message types
-#define ABIL_CUSTOM_SELF_TO_CHAR  0
-#define ABIL_CUSTOM_SELF_TO_ROOM  1
-#define ABIL_CUSTOM_TARGETED_TO_CHAR  2
-#define ABIL_CUSTOM_TARGETED_TO_VICT  3
-#define ABIL_CUSTOM_TARGETED_TO_ROOM  4
-#define ABIL_CUSTOM_COUNTERSPELL_TO_CHAR  5
-#define ABIL_CUSTOM_COUNTERSPELL_TO_VICT  6
-#define ABIL_CUSTOM_COUNTERSPELL_TO_ROOM  7
-#define ABIL_CUSTOM_FAIL_SELF_TO_CHAR  8
-#define ABIL_CUSTOM_FAIL_SELF_TO_ROOM  9
-#define ABIL_CUSTOM_FAIL_TARGETED_TO_CHAR  10
-#define ABIL_CUSTOM_FAIL_TARGETED_TO_VICT  11
-#define ABIL_CUSTOM_FAIL_TARGETED_TO_ROOM  12
-#define ABIL_CUSTOM_PRE_SELF_TO_CHAR  13
-#define ABIL_CUSTOM_PRE_SELF_TO_ROOM  14
-#define ABIL_CUSTOM_PRE_TARGETED_TO_CHAR  15
-#define ABIL_CUSTOM_PRE_TARGETED_TO_VICT  16
-#define ABIL_CUSTOM_PRE_TARGETED_TO_ROOM  17
-
-
-// ABIL_EFFECT_x: things that happen when an ability is used
-#define ABIL_EFFECT_DISMOUNT  0	// player is dismounted
-
-
-// ADL_x: for ability_data_list (these are bit flags because one ability may have multiple types)
-#define ADL_PLAYER_TECH  BIT(0)	// vnum will be PTECH_ types
-#define ADL_EFFECT  BIT(1)	// an ABIL_EFFECT_ that happens when the ability is used
-#define ADL_READY_WEAPON  BIT(2)	// adds to the "ready"
-#define ADL_SUMMON_MOB  BIT(3)	// adds a mob to companions/summon-any/summon-random abilities (depending on skill type)
-
-
-// AGH_x: ability gain hooks
-#define AGH_ONLY_WHEN_AFFECTED  BIT(0)	// modifies other types: only when affected by this abil
-#define AGH_MELEE  BIT(1)	// gains when actor hits in melee
-#define AGH_RANGED  BIT(2)	// gains when actor hits at range
-#define AGH_DODGE  BIT(3)	// gains when actor dodges
-#define AGH_BLOCK  BIT(4)	// gains when actor blocks
-#define AGH_TAKE_DAMAGE  BIT(5)	// gains when hit in melee
-#define AGH_PASSIVE_FREQUENT  BIT(6)	// gains every "real update"
-#define AGH_PASSIVE_HOURLY  BIT(7)	// gains every game hour
-#define AGH_ONLY_DARK  BIT(8)	// only gains if it's dark
-#define AGH_ONLY_LIGHT  BIT(9)	// only gains if it's light
-#define AGH_ONLY_VS_ANIMAL  BIT(10)	// only if the target was an animal
-#define AGH_VAMPIRE_FEEDING  BIT(11)	// gains when feeding
-#define AGH_MOVING  BIT(12)	// gain when moving
-#define AGH_ONLY_USING_READY_WEAPON  BIT(13)	// only gains if a ready-weapon is equipped
-#define AGH_ONLY_USING_COMPANION  BIT(14)	// only if the player is using a companion from this ability
-
-
-// RUN_ABIL_x: modes for activating abilities
-#define RUN_ABIL_NORMAL  0	// normal command activation
+// see skills.h
 
 
  //////////////////////////////////////////////////////////////////////////////
@@ -663,6 +564,7 @@ typedef struct vehicle_data vehicle_data;
 #define ADV_IGNORE_ISLAND_LEVELS  BIT(12)	// m. does not skip islands with no players in the level range
 #define ADV_CHECK_OUTSIDE_FIGHTS  BIT(13)	// n. looks for mobs in combat before despawning
 #define ADV_GLOBAL_NEARBY  BIT(14)	// o. will show the closest one no matter how far away
+#define ADV_DETECTABLE  BIT(15)	// p. can be found with the ability action "detect adventures around"
 
 
 // ADV_LINK_x: adventure link rule types
@@ -733,6 +635,7 @@ typedef struct vehicle_data vehicle_data;
 // ARCH_x: archetype flags
 #define ARCH_IN_DEVELOPMENT  BIT(0)	// a. not available to players
 #define ARCH_BASIC  BIT(1)	// b. will show on the basic list
+#define ARCH_LOCKED  BIT(2)	// c. requires the player to unlock it
 
 
  //////////////////////////////////////////////////////////////////////////////
@@ -792,7 +695,7 @@ typedef struct vehicle_data vehicle_data;
 #define BLD_ROAD_ICON_WIDE  BIT(19)	// replaces its icon with wide road icons (equals signs)
 #define BLD_ATTACH_BARRIER  BIT(20)	// icons with @u/@v will attach to this
 #define BLD_NO_CUSTOMIZE  BIT(21)	// cannot be customized
-// #define BLD_UNUSED10  BIT(22)
+#define BLD_NO_ABANDON_WHEN_RUINED  BIT(22)	// won't auto-abandon when it becomes ruins
 // #define BLD_UNUSED11  BIT(23)
 // #define BLD_UNUSED12  BIT(24)
 // #define BLD_UNUSED13  BIT(25)
@@ -856,15 +759,6 @@ typedef struct vehicle_data vehicle_data;
 #define BLD_REL_FORCE_UPGRADE_VEH  5	// automatically upgrades on-reboot
 
 
-// tavern types
-#define BREW_NONE 0
-#define BREW_ALE  1
-#define BREW_LAGER  2
-#define BREW_WHEATBEER  3
-#define BREW_CIDER  4
-#define NUM_BREWS  5	// total
-
-
 // Designate flags -- DES_x -- can only designate if building and room both have a matching flag
 #define DES_CRYPT			BIT(0)
 #define DES_VAULT			BIT(1)
@@ -889,15 +783,15 @@ typedef struct vehicle_data vehicle_data;
 // FNC_x: function flags (for buildings)
 #define FNC_ALCHEMIST  BIT(0)	// can brew and mix here
 #define FNC_UPGRADED  BIT(1)	// used on upgraded buildings / advanced crafts
-#define FNC_BATHS  BIT(2)	// can use the bathe command here
+	#define FNC_UNUSED2  BIT(2)	// formerly BATHS; this now uses a script
 #define FNC_BEDROOM  BIT(3)	// boosts regen while sleeping
 #define FNC_CARPENTER  BIT(4)	// required by some crafts
-#define FNC_DIGGING  BIT(5)	// triggers the workforce digging chore (also need interact
+	#define FNC_UNUSED5  BIT(5)	// formerly DIGGING; no longer needed for workforce
 #define FNC_DOCKS  BIT(6)	// grants the seaport tech to the empire; counts as a dock fo
-#define FNC_FORGE  BIT(7)	// can use the forge and reforge commands here
+#define FNC_FORGE  BIT(7)	// can use the forge command here
 #define FNC_GLASSBLOWER  BIT(8)	// grants the Glassblowing tech to the empire
 #define FNC_GUARD_TOWER  BIT(9)	// hostile toward enemy players, at range
-#define FNC_HENGE  BIT(10)	// allows Chant of Druids
+	#define FNC_UNUSED  BIT(10)	// formerly "HENGE" which now uses a script
 #define FNC_LIBRARY  BIT(11)	// can write and store books here
 #define FNC_MAIL  BIT(12)	// players can send mail here
 #define FNC_MILL  BIT(13)	// can use the mill command here
@@ -911,9 +805,9 @@ typedef struct vehicle_data vehicle_data;
 #define FNC_SMELT  BIT(21)	// allows smelting here
 #define FNC_STABLE  BIT(22)	// can shear, milk, and barde animals here; animals in this 
 #define FNC_SUMMON_PLAYER  BIT(23)	// allows the summon player command
-#define FNC_TAILOR  BIT(24)	// counts as tailor; can use refashion here
+#define FNC_TAILOR  BIT(24)	// counts as tailor for crafts like weaving
 #define FNC_TANNERY  BIT(25)	// allows tanning here
-#define FNC_TAVERN  BIT(26)	// functions as a tavern (don't set this on the same buildin
+#define FNC_TAVERN  BIT(26)	// for workforce crafting
 #define FNC_TOMB  BIT(27)	// players can re-spawn here after dying
 #define FNC_TRADING_POST  BIT(28)	// access to global trade, e.g. a trading post
 #define FNC_VAULT  BIT(29)	// stores coins, can use the warehouse command for privileged
@@ -926,9 +820,10 @@ typedef struct vehicle_data vehicle_data;
 #define FNC_IN_CITY_ONLY  BIT(36)	// functions only work in-city
 #define FNC_OVEN  BIT(37)	// for cooking
 #define FNC_MAGIC_WORKFSHOP  BIT(38)	// no code purpose but can be used for workforce
+#define FNC_APOTHECARY  BIT(39)	// for use in crafts
 
 // These function flags don't work on movable vehicles (they require room data)
-#define IMMOBILE_FNCS  (FNC_MINE | FNC_TAVERN | FNC_TOMB | FNC_LIBRARY)
+#define IMMOBILE_FNCS  (FNC_MINE | FNC_TOMB | FNC_LIBRARY)
 
 
  //////////////////////////////////////////////////////////////////////////////
@@ -968,7 +863,11 @@ typedef struct vehicle_data vehicle_data;
 #define ATT_BLOOD_UPKEEP  12	// blood cost per hour
 #define ATT_AGE_MODIFIER  13	// +/- age
 #define ATT_NIGHT_VISION  14	// bonus light radius at night
-#define NUM_EXTRA_ATTRIBUTES  15
+#define ATT_NEARBY_RANGE  15	// larger "nearby"
+#define ATT_WHERE_RANGE  16		// larger "where"
+#define ATT_WARMTH  17	// from gear that keeps you warm in the cold
+#define ATT_COOLING  18	// from gear that keeps you cool in the heat
+#define NUM_EXTRA_ATTRIBUTES  19
 
 
 // AFF_x: Affect bits
@@ -977,15 +876,15 @@ typedef struct vehicle_data vehicle_data;
 #define AFF_MAJESTY  BIT(1)	// b. majesty
 #define AFF_INFRAVISION  BIT(2)	// c. Char can see full in dark
 #define AFF_SNEAK  BIT(3)	// d. Char can move quietly
-#define AFF_HIDE  BIT(4)	// e. Char is hidden
+#define AFF_HIDDEN  BIT(4)	// e. Char is hidden
 #define AFF_CHARM  BIT(5)	// f. Char is charmed
 #define AFF_INVISIBLE  BIT(6)	// g. Char is invisible
 #define AFF_IMMUNE_PHYSICAL_DEBUFFS  BIT(7)	// h. Immunity to 'physical' debuffs
-#define AFF_SENSE_HIDE  BIT(8)	// i. See hidden people
+#define AFF_SENSE_HIDDEN  BIT(8)	// i. See hidden people
 #define AFF_IMMUNE_PHYSICAL  BIT(9)	// j. Immune to physical damage
 #define AFF_NO_TARGET_IN_ROOM  BIT(10)	// k. no-target
 #define AFF_NO_SEE_IN_ROOM  BIT(11)	// l. don't see on look
-#define AFF_FLY  BIT(12)	// m. person can fly
+#define AFF_FLYING  BIT(12)	// m. person can fly
 #define AFF_NO_ATTACK  BIT(13)	// n. can't be attacked
 #define AFF_IMMUNE_MAGICAL_DEBUFFS  BIT(14)	// o. immune to 'magical' debuffs
 #define AFF_DISARMED  BIT(15)	// p. disarmed
@@ -995,11 +894,11 @@ typedef struct vehicle_data vehicle_data;
 #define AFF_STUNNED  BIT(19)	// t. stunned/unable to act
 #define AFF_STONED  BIT(20)	// u. trippy effects
 #define AFF_CANT_SPEND_BLOOD  BIT(21)	// v. prevents most vampire powers
-#define AFF_CLAWS  BIT(22)	// w. claws
-#define AFF_DEATHSHROUD  BIT(23)	// x. deathshroud
-#define AFF_EARTHMELD  BIT(24)	// y. interred in the earth
-#define AFF_MUMMIFY  BIT(25)	// z. mummified
-#define AFF_SOULMASK  BIT(26)	// A. soulmask
+	#define AFF_UNUSED  BIT(22)	// w. formerly AFF_CLAWS/CLAWS which were reworked in b5.166
+#define AFF_DEATHSHROUDED  BIT(23)	// x. deathshrouded
+#define AFF_EARTHMELDED  BIT(24)	// y. interred in the earth
+#define AFF_MUMMIFIED  BIT(25)	// z. mummified
+#define AFF_SOULMASK  BIT(26)	// A. shows no details to others on 'affects'
 #define AFF_NO_TRACKS  BIT(27)	// B. leaves no tracks
 #define AFF_IMMUNE_POISON_DEBUFFS  BIT(28)	// C. Immune to any 'poison' debuffs
 #define AFF_IMMUNE_MENTAL_DEBUFFS  BIT(29)	// D. Immune to any 'mental' debuffs
@@ -1010,8 +909,16 @@ typedef struct vehicle_data vehicle_data;
 #define AFF_HARD_STUNNED  BIT(34)	// I. Hard stuns are uncleansable and don't trigger stun-immunity
 #define AFF_IMMUNE_DAMAGE  BIT(35)	// J. Cannot take damage
 #define AFF_NO_WHERE  BIT(36)	// K. cannot be found using 'WHERE'
-#define AFF_WATERWALK  BIT(37)	// L. won't drown or be affected by water restrictions
+#define AFF_WATERWALKING  BIT(37)	// L. won't drown or be affected by water restrictions
 #define AFF_LIGHT  BIT(38)	// M. has a light (lights up the room)
+#define AFF_POOR_REGENS  BIT(39)	// N. dramatically lower regens
+#define AFF_SLOWER_ACTIONS  BIT(40)	// O. timed actions are slower
+#define AFF_HUNGRIER  BIT(41)	// P. character becomes hungry faster
+#define AFF_THIRSTIER  BIT(42)	// Q. character becomes thirsty faster
+#define AFF_IMMUNE_TEMPERATURE  BIT(43)	// R. character does not suffer effects of heat/cold
+#define AFF_AUTO_RESURRECT  BIT(44)	// S. will self-resurrect on death
+#define AFF_COUNTERSPELL  BIT(45)	// T. will block a counterspellable ability and then remove itself
+#define AFF_NO_DISARM  BIT(46)	// U. player cannot be disarmed
 
 
 // Injury flags -- IS_INJURED
@@ -1052,19 +959,7 @@ typedef struct vehicle_data vehicle_data;
  //////////////////////////////////////////////////////////////////////////////
 //// CLASS DEFINES ///////////////////////////////////////////////////////////
 
-// CLASSF_x: class flags
-#define CLASSF_IN_DEVELOPMENT  BIT(0)	// a. not available to players
-
-
-// ROLE_x: group roles for classes
-#define ROLE_NONE  0	// placeholder
-#define ROLE_TANK  1
-#define ROLE_MELEE  2
-#define ROLE_CASTER  3
-#define ROLE_HEALER  4
-#define ROLE_UTILITY  5
-#define ROLE_SOLO  6
-#define NUM_ROLES  7
+// see skills.h
 
 
  //////////////////////////////////////////////////////////////////////////////
@@ -1095,6 +990,7 @@ typedef struct vehicle_data vehicle_data;
 #define CRAFT_TYPE_PRESS  13
 #define CRAFT_TYPE_BAKE  14
 #define CRAFT_TYPE_MAKE  15
+#define CRAFT_TYPE_PROCESS  16
 
 
 // CRAFT_x: Craft Flags for do_gen_craft
@@ -1102,7 +998,7 @@ typedef struct vehicle_data vehicle_data;
 #define CRAFT_BUILDING  BIT(1)  // makes a building (on any craft type; BUILD type automatically counts as this)
 #define CRAFT_SKILLED_LABOR  BIT(2)  // workforce can only produce this if the empire has skilled labor
 #define CRAFT_SKIP_CONSUMES_TO  BIT(3)  // won't run the consumes-to interaction on components (e.g. keep the jar from paint when mixing it into a new paint)
-	#define CRAFT_UNUSED2  BIT(4)  // formerly carpenter (now using function)
+#define CRAFT_DARK_OK  BIT(4)  // light not necessary
 	#define CRAFT_UNUSED3  BIT(5)  // formerly alchemist (which ultimately was the same as FIRE)
 	#define CRAFT_UNUSED  BIT(6)  // formerly sharp-tool/knife (now uses requires-tool)
 #define CRAFT_FIRE  BIT(7)  // requires any fire source
@@ -1118,6 +1014,11 @@ typedef struct vehicle_data vehicle_data;
 #define CRAFT_BY_RIVER  BIT(17)	// must be within 1 tile of river
 #define CRAFT_REMOVE_PRODUCTION  BIT(18)	// empire will un-produce the resources; used for things like 'smelt' where nothing new is really made
 #define CRAFT_TAKE_REQUIRED_OBJ  BIT(19)	// causes the craft to take the 'required-obj' when created, if any (and may refund it on dismantle)
+#define CRAFT_DISMANTLE_WITHOUT_ABILITY  BIT(20)	// buildings and vehicles can be dismantled without the ability
+#define CRAFT_TOOL_OR_FUNCTION  BIT(21)	// with this flag, only requires the tool OR the function
+#define CRAFT_UNDAMAGED_DISMANTLE_REFUND  BIT(22)	// refunds all materials when dismantled while undamaged (instead of 90%)
+#define CRAFT_FULL_DISMANTLE_REFUND  BIT(23)	// refunds all materials when dismantled no matter what the health (instead of 20%-90%)
+
 
 // For find_building_list_entry
 #define FIND_BUILD_NORMAL  0
@@ -1140,6 +1041,11 @@ typedef struct vehicle_data vehicle_data;
 #define CROPF_NO_NEWBIE  BIT(4)	// never spawns on newbie islands
 #define CROPF_ANY_LISTED_CLIMATE  BIT(5)	// climtes are "or" not "and"
 #define CROPF_NO_GLOBAL_SPAWNS  BIT(6)	// won't use global spawn lists
+#define CROPF_LOCK_ICON  BIT(7)	// similar to sectors; crop has a permanent random icon
+
+
+// CROP_CUSTOM_x: custom messages
+#define CROP_CUSTOM_MAGIC_GROWTH		0	// shown on magic-growth evolution
 
 
  //////////////////////////////////////////////////////////////////////////////
@@ -1156,6 +1062,8 @@ typedef struct vehicle_data vehicle_data;
 #define EADM_NO_WAR  BIT(0)	// may not start a unilateral war
 #define EADM_NO_STEAL  BIT(1)	// may not steal from other empires
 #define EADM_CITY_CLAIMS_ONLY  BIT(2)	// may only claim in-city
+#define EADM_NO_RENAME  BIT(3)	// cannot change name/adjective/description
+#define EADM_DID_NEWBIE_MOVE  BIT(4)	// empire got its free move from the newbie island
 
 
 // EATT_x: empire attributes
@@ -1181,12 +1089,12 @@ typedef struct vehicle_data vehicle_data;
 #define CHORE_CHOPPING  3
 #define CHORE_MAINTENANCE  4
 #define CHORE_MINING  5
-#define CHORE_DIGGING  6
+	#define CHORE_UNUSED6  6	// formerly digging; merged into productions
 #define CHORE_SAWING  7
 #define CHORE_SCRAPING  8
 #define CHORE_SMELTING  9
 #define CHORE_WEAVING  10
-#define CHORE_PRODUCTION  11	// formerly quarry, trapping, beekeeping, herb-gardening
+#define CHORE_PRODUCTION  11	// formerly digging, quarry, trapping, beekeeping, herb-gardening
 #define CHORE_CRAFTING  12	// formerly nailmaking, brickmaking, glassmaking
 	#define CHORE_UNUSED1  13
 #define CHORE_ABANDON_DISMANTLED  14
@@ -1227,6 +1135,12 @@ typedef struct vehicle_data vehicle_data;
 #define CORE_DIPLS  ALL_DIPLS_EXCEPT(DIPL_TRADE)
 
 
+// EINV_SORT_x: how sort empire inventory, or how it is currently sorted
+#define EINV_UNSORTED			0	// something has unsorted it (must be 0)
+#define EINV_SORT_AMOUNT		1	// sort by amount
+#define EINV_SORT_PERISHABLE	2	// sort by decay timer
+
+
 // ELOG_x: empire_log_data types
 #define ELOG_NONE  0	// does not log to file
 #define ELOG_ADMIN  1	// administrative changes
@@ -1239,6 +1153,7 @@ typedef struct vehicle_data vehicle_data;
 #define ELOG_SHIPPING  8	// shipments via do_ship
 #define ELOG_WORKFORCE  9	// reporting related to workforce (does not echo, does not display unless requested)
 #define ELOG_PROGRESS  10	// empire progression goals
+#define ELOG_ALERT  11	// important messages
 
 
 // ENEED_x: empire need types
@@ -1417,8 +1332,8 @@ typedef struct vehicle_data vehicle_data;
 #define SEV_DESPAWN  1	// mob despawn
 #define SEV_BURN_DOWN  2	// for buildings
 #define SEV_GROW_CROP  3	// normal crop growth time
-#define SEV_TAVERN  4	// tavern resource use timer
-#define SEV_RESET_TRIGGER  5	// for tavern resets
+	#define SEV_UNUSED4  4	// was tavern; now unused
+#define SEV_RESET_TRIGGER  5	// for scripting reset triggers
 #define SEV_PURSUIT  6	// mob pursuing a target
 #define SEV_MOVEMENT  7	// normal mob movement
 #define SEV_AGGRO  8	// aggro or cityguard mobs
@@ -1438,6 +1353,7 @@ typedef struct vehicle_data vehicle_data;
 #define FCT_IN_DEVELOPMENT  BIT(0)	// a. not live
 #define FCT_REP_FROM_KILLS  BIT(1)	// b. killing mobs affects faction rating
 #define FCT_HIDE_IN_LIST  BIT(2)	// c. not shown in player's list
+#define FCT_HIDE_ON_MOB  BIT(3)	// d. does not appear under mob's description
 
 
 // FCTR_x: Relationship flags
@@ -1502,11 +1418,13 @@ typedef struct vehicle_data vehicle_data;
 #define LVL_TO_SEE_ACCOUNTS  LVL_CIMPL
 
 
-// Player killing options (config.c)
-#define PK_NONE  NOBITS
-#define PK_WAR  BIT(0)	// pk when at war
-#define PK_FULL  BIT(1)	// all pk all the time
-#define PK_REVENGE  BIT(2)	// pk when someone has pk'd you
+// PK_x: Player killing options for config_get_bitvector("pk_mode")
+#define PK_OPEN					BIT(0)	// a. all pk all the time
+#define PK_WAR					BIT(1)	// b. pk when at war
+#define PK_TRESPASSERS			BIT(2)	// c. when someone is on your land (or an ally's)
+#define PK_DISTRUST				BIT(3)	// d. when in a state of distrust
+#define PK_EMPIRE_OFFENSES		BIT(4)	// e. empire has any offenses against you
+#define PK_PERSONAL_OFFENSES	BIT(5)	// f. character has any offenses against you
 
 
 // mud-life time
@@ -1537,7 +1455,8 @@ typedef struct vehicle_data vehicle_data;
 #define DOT_INTERVAL  5	// seconds per tick for damage-over-time
 #define HISTORY_SIZE  5	// Keep last 5 commands.
 #define MOB_RESTORE_INTERVAL  60	// seconds between when a mob loses health and when it starts checking to restore itself
-#define WORKFORCE_CYCLE  76	// seconds between workforce chore updates
+#define WORKFORCE_CYCLE  75	// seconds between workforce chore updates
+#define WORKFORCE_LOG_AND_NEEDS_CYCLE  (30 * SECS_PER_REAL_MIN)	// how often it will update workforce logs and needs
 
 
 // System timing
@@ -1557,7 +1476,15 @@ typedef struct vehicle_data vehicle_data;
 #define LARGE_BUFSIZE  (MAX_SOCK_BUF - GARBAGE_SPACE - MAX_PROMPT_LENGTH)
 
 
-// shutdown types
+// REBOOT_x: reboot modes
+#define REBOOT_NONE			0	// no reboot is set
+#define REBOOT_REBOOT		1	// reboot mode
+#define REBOOT_SHUTDOWN		2	// shutdown mode
+
+#define REBOOT_IS_SET()		(reboot_control.type != REBOOT_NONE && (reboot_control.immediate || reboot_control.time >= 0))
+
+
+// SHUTDOWN_x: shutdown types
 #define SHUTDOWN_NORMAL  0	// comes up normally
 #define SHUTDOWN_PAUSE  1	// writes a pause file which must be removed
 #define SHUTDOWN_DIE  2	// kills the autorun
@@ -1582,10 +1509,11 @@ typedef struct vehicle_data vehicle_data;
 // GEN_x: generic flags
 #define GEN_BASIC  BIT(0)	// a. indicates it's basic (varies by type)
 #define GEN_IN_DEVELOPMENT  BIT(1)	// b. disables SOME types -- see generic_types_uses_in_dev[]
+#define GEN_SHOW_ADVENTURE  BIT(2)	// c. for some types, shows what adventure they came from
 
 
 // how many strings a generic stores (can be safely raised with no updates)
-#define NUM_GENERIC_STRINGS  6
+#define NUM_GENERIC_STRINGS  10
 
 // how many ints a generic stores (update write_generic_to_file if you change this)
 #define NUM_GENERIC_VALUES  4
@@ -1595,6 +1523,14 @@ typedef struct vehicle_data vehicle_data;
 #define LANG_UNKNOWN  0	// default: does not speak it, cannot recognize it
 #define LANG_RECOGNIZE  1	// knows which language it is, but can't speak it
 #define LANG_SPEAK  2	// full comprehension and speaking
+
+
+// LIQF_x: flags for liquids
+#define LIQF_WATER  BIT(0)	// counts as water for certain commands
+#define LIQF_COOLING  BIT(1)	// cools down the player, if warm
+#define LIQF_WARMING  BIT(2)	// warms up the player, if cold
+#define LIQF_BLOOD  BIT(3)	// counts as blood for vampires
+// BIT(31) limit: this is stored as an int (in the generic values)
 
 
  //////////////////////////////////////////////////////////////////////////////
@@ -1638,6 +1574,7 @@ typedef struct vehicle_data vehicle_data;
 #define MOB_COINS  BIT(34)	// I. mob drops coins on death/pickpocket
 #define MOB_NO_COMMAND  BIT(35)	// J. mob cannot be commanded/ordered
 #define MOB_NO_UNCONSCIOUS  BIT(36)	// K. mob cannot be knocked out; it's always killed instead
+#define MOB_IMPORTANT  BIT(37)	// L. won't be hit by no-arg "purge"; can be used by scripts
 
 
 // MOB_CUSTOM_x: custom message types
@@ -1945,11 +1882,14 @@ typedef enum {
 #define OBJ_HARD_DROP  BIT(22)	// w. dropped by a 'hard' mob
 #define OBJ_GROUP_DROP  BIT(23)	// x. dropped by a 'group' mob
 #define OBJ_GENERIC_DROP  BIT(24)	// y. blocks the hard/group drop flags
-#define OBJ_NO_STORE  BIT(25)	// z. cannot be stored
+#define OBJ_NO_BASIC_STORAGE  BIT(25)	// z. cannot be stored in basic storage anymore
 #define OBJ_SEEDED  BIT(26)	// A. has already been seeded
+#define OBJ_IMPORTANT  BIT(27)	// B. prevents casual purging; can be used by scripts
+#define OBJ_LONG_TIMER_IN_STORAGE  BIT(28)	// C. decays more slowly when stored
+#define OBJ_NO_WAREHOUSE  BIT(29)	// D. cannot be stored in the home/warehouse anymore
 
 #define OBJ_BIND_FLAGS  (OBJ_BIND_ON_EQUIP | OBJ_BIND_ON_PICKUP)	// all bind-on flags
-#define OBJ_PRESERVE_FLAGS  (OBJ_HARD_DROP | OBJ_GROUP_DROP | OBJ_SUPERIOR | OBJ_KEEP | OBJ_NO_STORE | OBJ_SEEDED | OBJ_BIND_FLAGS)	// flags that are preserved
+#define OBJ_PRESERVE_FLAGS  (OBJ_HARD_DROP | OBJ_GROUP_DROP | OBJ_SUPERIOR | OBJ_KEEP | OBJ_NO_BASIC_STORAGE | OBJ_NO_WAREHOUSE | OBJ_SEEDED | OBJ_BIND_FLAGS | OBJ_IMPORTANT)	// flags that are preserved
 
 
 // OBJ_CUSTOM_x: custom message types
@@ -1979,6 +1919,13 @@ typedef enum {
 #define OBJ_CUSTOM_SCRIPT_3  23	// called by scripts
 #define OBJ_CUSTOM_SCRIPT_4  24	// called by scripts
 #define OBJ_CUSTOM_SCRIPT_5  25	// called by scripts
+#define OBJ_CUSTOM_MINE_TO_CHAR  26
+#define OBJ_CUSTOM_MINE_TO_ROOM  27
+#define OBJ_CUSTOM_CHOP_TO_CHAR  28
+#define OBJ_CUSTOM_CHOP_TO_ROOM  29
+#define OBJ_CUSTOM_ENTER_PORTAL_TO_CHAR  30
+#define OBJ_CUSTOM_ENTER_PORTAL_TO_ROOM  31
+#define OBJ_CUSTOM_EXIT_PORTAL_TO_ROOM  32
 
 
 // RES_x: resource requirement types
@@ -2045,11 +1992,6 @@ typedef enum {
 #define NUM_WEARS  24	/* This must be the # of eq positions!! */
 
 
-// for item scaling based on wear flags
-#define WEAR_POS_MINOR  0
-#define WEAR_POS_MAJOR  1
-
-
  //////////////////////////////////////////////////////////////////////////////
 //// PLAYER DEFINES //////////////////////////////////////////////////////////
 
@@ -2089,14 +2031,14 @@ typedef enum {
 #define ACT_PICKING			18
 #define ACT_MORPHING		19
 #define ACT_SCRAPING		20
-#define ACT_BATHING			21
-#define ACT_CHANTING		22
+	#define ACT_BATHING			21	// deprecated as of b5.171
+	#define ACT_CHANTING		22	// deprecated as of b5.166
 #define ACT_PROSPECTING		23
 #define ACT_FILLING_IN		24
 #define ACT_RECLAIMING		25
-#define ACT_ESCAPING		26
+	#define ACT_ESCAPING		26	// deprecated as of b5.166
 #define ACT_RUNNING			27
-#define ACT_RITUAL			28
+	#define ACT_RITUAL			28	// deprecated as of b5.166
 #define ACT_SAWING			29
 #define ACT_QUARRYING		30
 #define ACT_DRIVING			31
@@ -2112,6 +2054,7 @@ typedef enum {
 #define ACT_HUNTING			41
 #define ACT_FORAGING		42
 #define ACT_DISMANTLE_VEHICLE  43
+#define ACT_OVER_TIME_ABILITY  44
 
 // ACTF_x: act flags
 #define ACTF_ANYWHERE  BIT(0)	// movement won't break it
@@ -2127,6 +2070,8 @@ typedef enum {
 #define ACTF_VEHICLE_SPEEDS BIT(10)  // signals that this action accelerates based on vehicle speeds
 #define ACTF_EVEN_FASTER  BIT(11)	// another speed boost for various actions
 #define ACTF_IGNORE_COND  BIT(12)	// not slowed by hunger/thirst/slow
+#define ACTF_FIGHTING  BIT(13)	// may be performed in combat
+#define ACTF_RESTING  BIT(14)	// may be used while resting
 
 
 // BONUS_x: bonus traits
@@ -2151,15 +2096,15 @@ typedef enum {
 #define BONUS_NO_THIRST  BIT(18)	// "salt blooded" - never thirsty
 #define BONUS_NO_HUNGER  BIT(19)	// "tenacious waif" - never hungry
 #define BONUS_VIEW_HEIGHT  BIT(20)	// "surveyor" - +1 view height
-#define BONUS_HEAT_RESIST  BIT(21)	// "fire born" - tolerant of hot climates (UNIMPLEMENTED)
-#define BONUS_COLD_RESIST  BIT(22)	// "frost born" - tolerant of cold climates (UNIMPLEMENTED)
+#define BONUS_WARM_RESIST  BIT(21)	// "fireborn" - tolerant of warm climates
+#define BONUS_COLD_RESIST  BIT(22)	// "frostborn" - tolerant of cold climates
 #define NUM_BONUS_TRAITS  23
 
 // bonus traits available to newbies (first 12h)
 #define NEWBIE_BONUS_TRAITS  (BONUS_STRENGTH | BONUS_DEXTERITY | BONUS_CHARISMA | BONUS_GREATNESS | BONUS_INTELLIGENCE | BONUS_WITS | BONUS_HEALTH | BONUS_MOVES | BONUS_MANA | BONUS_MOVE_REGEN | BONUS_MANA_REGEN | BONUS_EXTRA_DAILY_SKILLS)
 
 // bonus traits not available at all (not used on this mud)
-#define FORBIDDEN_BONUS_TRAITS  (BONUS_CLOCK | BONUS_HEAT_RESIST | BONUS_COLD_RESIST)
+#define FORBIDDEN_BONUS_TRAITS  (BONUS_CLOCK)
 
 
 // CDU_x: delayed update types
@@ -2173,16 +2118,22 @@ typedef enum {
 #define CDU_MSDP_EMPIRE_ALL  BIT(7)	// runs update_MSDP_empire_data()
 #define CDU_MSDP_EMPIRE_CLAIMS  BIT(8)	// runs update_MSDP_empire_claims()
 #define CDU_MSDP_SKILLS  BIT(9)	// runs update_MSDP_skills()
+#define CDU_TRAIT_HOOKS  BIT(10)	// runs check_trait_hooks()
 
 
-// types of channel histories -- act.comm.c
+// CHANNEL_HISTORY_x: types of channel histories -- act.comm.c
 #define NO_HISTORY  -1	// reserved
-#define CHANNEL_HISTORY_GOD  0
+#define CHANNEL_HISTORY_GOD  0	// no longer used: god channels are now global
 #define CHANNEL_HISTORY_TELLS  1
 #define CHANNEL_HISTORY_SAY  2
-#define CHANNEL_HISTORY_EMPIRE  3
+#define CHANNEL_HISTORY_EMPIRE  3	// no longer used: empire histories now saved to empire
 #define CHANNEL_HISTORY_ROLL  4
 #define NUM_CHANNEL_HISTORY_TYPES  5
+
+
+// GLOBAL_HISTORY_x: types of global channel histories -- act.comm.c
+#define GLOBAL_HISTORY_GOD  0		// god channel and wiznet
+#define NUM_GLOBAL_HISTORIES  1		// must be the total number
 
 
 // channels for announcements
@@ -2230,7 +2181,7 @@ typedef enum {
 #define CON_CONFIRM_PROMO_CODE  26	// promo confirmation
 
 
-// custom color types
+// CUSTOM_COLOR_x: custom color types
 #define CUSTOM_COLOR_EMOTE  0
 #define CUSTOM_COLOR_ESAY  1
 #define CUSTOM_COLOR_GSAY  2
@@ -2239,7 +2190,10 @@ typedef enum {
 #define CUSTOM_COLOR_SLASH  5
 #define CUSTOM_COLOR_TELL  6
 #define CUSTOM_COLOR_STATUS  7
-#define NUM_CUSTOM_COLORS  8	// total
+#define CUSTOM_COLOR_SUN  8
+#define CUSTOM_COLOR_TEMPERATURE  9
+#define CUSTOM_COLOR_WEATHER  10
+#define NUM_CUSTOM_COLORS  11	// total
 
 
 // COND_x: Player conditions
@@ -2265,8 +2219,35 @@ typedef enum {
 #define FM_OTHER_HITS  BIT(12)	// hits not covered by other rules
 #define FM_OTHER_MISSES  BIT(13)	// misses not covered by other rules
 #define FM_AUTO_DIAGNOSE  BIT(14)	// does a diagnose after each hit
+#define FM_MY_BUFFS_IN_COMBAT  BIT(15)	// buffs on me while fighting
+#define FM_ALLY_BUFFS_IN_COMBAT  BIT(16)	// buffs on allies while fighting
+#define FM_OTHER_BUFFS_IN_COMBAT  BIT(17)	// buffs on others while fighting
+#define FM_DAMAGE_NUMBERS  BIT(18)	// shows numbers after damage strings
+#define FM_MY_AFFECTS_IN_COMBAT  BIT(19)	// shows affects applying/wearing off me in combat
+#define FM_ALLY_AFFECTS_IN_COMBAT  BIT(20)	// ally affects applying/wearing off when in combat
+#define FM_OTHER_AFFECTS_IN_COMBAT  BIT(21)	// others' affects applying/wearing off when in combat
+#define FM_MY_ABILITIES  BIT(22)	// abilities I used
+#define FM_ALLY_ABILITIES  BIT(23)	// abilities allies used
+#define FM_OTHER_ABILITIES  BIT(24)	// abilities others used
+#define FM_ABILITIES_AGAINST_ME  BIT(25)	// abilities targeting me
+#define FM_ABILITIES_AGAINST_ALLIES  BIT(26)	// abilities targeting allies
+#define FM_ABILITIES_AGAINST_TARGET  BIT(27)	// abilities targeting my target
+#define FM_ABILITIES_AGAINST_TANK  BIT(28)	// abilities targeting the tank
+#define FM_MY_HEALS  BIT(29)	// heals I caused
+#define FM_HEALS_ON_ME  BIT(30)	// heal effects that hit me
+#define FM_HEALS_ON_ALLIES  BIT(31)	// heal effects that hit allies
+#define FM_HEALS_ON_TARGET  BIT(32)	// heal effects that hit my target
+#define FM_HEALS_ON_OTHER  BIT(33)	// heal effects that hit others
 
-#define DEFAULT_FIGHT_MESSAGES  (FM_MY_HITS | FM_MY_MISSES | FM_HITS_AGAINST_ME | FM_MISSES_AGAINST_ME | FM_ALLY_HITS | FM_ALLY_MISSES | FM_HITS_AGAINST_ALLIES | FM_MISSES_AGAINST_ALLIES | FM_HITS_AGAINST_TARGET | FM_MISSES_AGAINST_TARGET |FM_HITS_AGAINST_TANK | FM_MISSES_AGAINST_TANK | FM_OTHER_HITS | FM_OTHER_MISSES | FM_AUTO_DIAGNOSE)
+// flags set at character creation
+#define DEFAULT_FIGHT_MESSAGES  (FM_MY_HITS | FM_MY_MISSES | FM_HITS_AGAINST_ME | FM_MISSES_AGAINST_ME | FM_ALLY_HITS | FM_ALLY_MISSES | FM_HITS_AGAINST_ALLIES | FM_MISSES_AGAINST_ALLIES | FM_HITS_AGAINST_TARGET | FM_MISSES_AGAINST_TARGET |FM_HITS_AGAINST_TANK | FM_MISSES_AGAINST_TANK | FM_OTHER_HITS | FM_OTHER_MISSES | FM_AUTO_DIAGNOSE | FM_MY_BUFFS_IN_COMBAT | FM_ALLY_BUFFS_IN_COMBAT | FM_OTHER_BUFFS_IN_COMBAT | FM_MY_AFFECTS_IN_COMBAT | FM_ALLY_AFFECTS_IN_COMBAT | FM_OTHER_AFFECTS_IN_COMBAT | FM_MY_ABILITIES | FM_ALLY_ABILITIES | FM_OTHER_ABILITIES | FM_ABILITIES_AGAINST_ME | FM_ABILITIES_AGAINST_ALLIES | FM_ABILITIES_AGAINST_TARGET | FM_ABILITIES_AGAINST_TANK | FM_MY_HEALS | FM_HEALS_ON_ME | FM_HEALS_ON_ALLIES | FM_HEALS_ON_TARGET | FM_HEALS_ON_OTHER)
+
+
+// FRIEND_x: status on the friends list
+#define FRIEND_NONE					0	// not friends
+#define FRIEND_REQUEST_SENT			1	// sent a request to this player
+#define FRIEND_REQUEST_RECEIVED		2	// received a request from that player
+#define FRIEND_FRIENDSHIP			3	// true friendship
 
 
 // GRANT_X: Grant flags allow players to use abilities below the required access level
@@ -2372,7 +2353,7 @@ typedef enum {
 #define MOUNT_RIDING  BIT(0)	// player is currently mounted
 #define MOUNT_AQUATIC  BIT(1)	// mount can swim (but not go on land)
 #define MOUNT_FLYING  BIT(2)	// mount can fly
-#define MOUNT_WATERWALK  BIT(3)	// mount can do land/water
+#define MOUNT_WATERWALKING  BIT(3)	// mount can do land/water
 
 
 // OFFER_x - types for the do_accept/offer_data system
@@ -2412,7 +2393,7 @@ typedef enum {
 #define PRF_NOTELL  BIT(3)	// Can't receive tells
 #define PRF_POLITICAL  BIT(4)	// Changes map to political colors
 #define PRF_RP  BIT(5)	// RP-only
-#define PRF_MORTLOG  BIT(6)	// Views mortlogs, default: ON
+	#define PRF_UNUSED_1  BIT(6)	// was MORTLOG before b5.162
 #define PRF_NOREPEAT  BIT(7)	// No repetition of comm commands
 #define PRF_HOLYLIGHT  BIT(8)	// Immortal: Can see in dark
 #define PRF_INCOGNITO  BIT(9)	// Immortal: Can't be seen on the who list
@@ -2421,7 +2402,7 @@ typedef enum {
 #define PRF_NOHASSLE  BIT(12)	// Ignored by mobs and triggers
 #define PRF_NO_IDLE_OUT  BIT(13)	// Player won't idle out
 #define PRF_ROOMFLAGS  BIT(14)	// Sees vnums and flags on look
-#define PRF_NO_CHANNEL_JOINS  BIT(15)	// Won't wee channel joins
+	#define PRF_UNUSED_2  BIT(15)	// was !CHANNEL-JOINS before b5.162
 #define PRF_AUTOKILL  BIT(16)	// Stops from knocking players out
 #define PRF_SCROLLING  BIT(17)	// Turns off page_string
 #define PRF_NO_ROOM_DESCS  BIT(18)	// Removes room descs; formerly 'brief'
@@ -2441,13 +2422,14 @@ typedef enum {
 #define PRF_NO_TUTORIALS  BIT(32)	// shuts off new tutorial quests
 #define PRF_NO_PAINT  BIT(33)	// unable to see custom paint colors
 #define PRF_EXTRA_SPACING  BIT(34)	// causes an extra crlf before command interpreter
-#define PRF_TRAVEL_LOOK  BIT(35)	// auto-looks each time you run or move a vehicle
+	#define PRF_UNUSED_3  BIT(35)	// was TRAVEL-LOOK before b5.162
 #define PRF_AUTOCLIMB  BIT(36)	// will enter mountains without 'climb'
 #define PRF_AUTOSWIM  BIT(37)	// will enter water without 'swim'
 #define PRF_ITEM_QUALITY  BIT(38)	// shows loot quality color/tag in inv/eq
 #define PRF_ITEM_DETAILS  BIT(39)	// shows additional item details on inv/eq
 #define PRF_NO_EXITS  BIT(40)	// hides exits on look and auto-look
 #define PRF_SHORT_EXITS  BIT(41)	// shows circlemud-style exits
+#define PRF_NO_FRIENDS  BIT(42)	// this alt will not appear on friends lists
 // note: if you add prefs, consider adding them to alt_import_preferences()
 
 
@@ -2468,10 +2450,10 @@ typedef enum {
 #define PTECH_FAST_WOOD_PROCESSING  13	// saw/scrape go faster
 #define PTECH_FASTCASTING  14	// wits affects non-combat abilities instead of combat speed
 #define PTECH_FAST_FIND  15	// digging, gathering, panning, picking
-#define PTECH_FISH  16	// can use the 'fish' command/interaction
-#define PTECH_FORAGE  17	// can use the 'forage' command/interaction
+#define PTECH_FISH_COMMAND  16	// can use the 'fish' command/interaction
+#define PTECH_FORAGE_COMMAND  17	// can use the 'forage' command/interaction
 #define PTECH_HARVEST_UPGRADE  18	// more results from harvest
-#define PTECH_HEALING_BOOST  19	// increases healing effects
+	#define PTECH_UNUSED  19	// deprecated: was HEALING_BOOST
 #define PTECH_HIDE_UPGRADE  20	// improves hide and blocks search
 #define PTECH_INFILTRATE  21	// can enter buildings without permission
 #define PTECH_INFILTRATE_UPGRADE  22	// better infiltrates
@@ -2501,16 +2483,16 @@ typedef enum {
 #define PTECH_SHEAR_UPGRADE  46	// more results from shear
 #define PTECH_STEAL_UPGRADE  47	// can steal from vaults
 #define PTECH_SWIMMING  48	// player can enter water tiles
-#define PTECH_TELEPORT_CITY  49	// teleports can target cities
-#define PTECH_TWO_HANDED_WEAPONS  50	// can wield two-handed weapons
+#define PTECH_SEARCH_COMMAND  49	// allows 'search' command
+#define PTECH_TWO_HANDED_MASTERY  50	// bonus damage from 2H weapons
 #define PTECH_WHERE_UPGRADE  51	// 'where' command embiggens
 #define PTECH_DODGE_CAP  52	// improves your dodge cap
 #define PTECH_SKINNING_UPGRADE  53	// skinning always succeeds
 #define PTECH_BARDE  54	// can barde animals
-#define PTECH_HERD  55	// can herd animals
-#define PTECH_MILK  56	// can milk animals (at a stable)
-#define PTECH_SHEAR  57	// can shear animals (at a stable)
-#define PTECH_TAME  58	// can tame animals
+#define PTECH_HERD_COMMAND  55	// can herd animals
+#define PTECH_MILK_COMMAND  56	// can milk animals (at a stable)
+#define PTECH_SHEAR_COMMAND  57	// can shear animals (at a stable)
+#define PTECH_TAME_ANIMALS  58	// can tame animals
 #define PTECH_BITE_MELEE_UPGRADE  59	// melee features of 'bite'
 #define PTECH_BITE_TANK_UPGRADE  60	// tank features of 'bite'
 #define PTECH_BITE_STEAL_BLOOD  61	// steals blood on each 'bite' attack
@@ -2518,17 +2500,17 @@ typedef enum {
 #define PTECH_HUNT_ANIMALS  63	// can use the 'hunt' command on animals
 #define PTECH_CLOCK  64	// can tell time
 #define PTECH_CALENDAR  65	// can tell the date
-#define PTECH_MINT  66	// can mint coins
-#define PTECH_TAN  67	// can use the 'tan' command
+#define PTECH_MINT_COMMAND  66	// can mint coins
+#define PTECH_TAN_COMMAND  67	// can use the 'tan' command
 #define PTECH_NO_PURIFY  68	// cannot be affected by the 'purify' spell
 #define PTECH_VAMPIRE_SUN_IMMUNITY  69	// vampire not penalized in the sun
-#define PTECH_GATHER  70	// can 'gather'
-#define PTECH_CHOP  71	// can 'chop'
-#define PTECH_DIG  72	// can 'dig'
-#define PTECH_HARVEST  73	// can 'harvest'
-#define PTECH_PICK  74	// can 'pick'
-#define PTECH_QUARRY  75	// can 'quarry'
-#define PTECH_DRINK_BLOOD_FASTER  76	// vampires drink blood at 2x speed
+#define PTECH_GATHER_COMMAND  70	// can 'gather'
+#define PTECH_CHOP_COMMAND  71	// can 'chop'
+#define PTECH_DIG_COMMAND  72	// can 'dig'
+#define PTECH_HARVEST_COMMAND  73	// can 'harvest'
+#define PTECH_PICK_COMMAND  74	// can 'pick'
+#define PTECH_QUARRY_COMMAND  75	// can 'quarry'
+#define PTECH_DRINK_BLOOD_FASTER  76	// vampires drink more blood at a time
 #define PTECH_SUMMON_MATERIALS  77	// can use the 'summon materials' command
 #define PTECH_CUSTOMIZE_VEHICLE  78	// can use 'customize vehicle'
 #define PTECH_PLANT_CROPS  79	// can 'plant'
@@ -2536,6 +2518,48 @@ typedef enum {
 #define PTECH_SAW_COMMAND  81	// can 'saw'
 #define PTECH_SCRAPE_COMMAND  82	// can 'scrape'
 #define PTECH_MAP_MEMORY  83	// remembers blocked/dark tiles on look/scan
+#define PTECH_SEE_IN_MAGIC_DARKNESS  84	// sees through darkness room affect
+#define PTECH_TRACK_COMMAND  85	// can use 'track'
+#define PTECH_RESIST_POISON  86	// minor resistance
+#define PTECH_VAMPIRE_BITE  87	// can use 'bite' for blood instead of the social
+#define PTECH_ENEMY_BUFF_DETAILS  88	// can see details when using 'affects' on others
+#define PTECH_CONCEAL_EQUIPMENT  89	// others can't see your equipment
+#define PTECH_CONCEAL_INVENTORY  90	// others can't see your inventory
+#define PTECH_FLEE_UPGRADE  91	// increased chance to flee
+#define PTECH_FASTER_MELEE_COMBAT  92	// slight speed boost in melee
+#define PTECH_FASTER_RANGED_COMBAT  93	// slight speed boost in ranged combat
+#define PTECH_RIDING_SWAP_ANYWHERE  94	// can swap in any location
+#define PTECH_RIDING_RELEASE_MOUNT  95	// can release your mounts
+#define PTECH_REWORK_COMMAND  96	// allows refreshing and restringing gear
+#define PTECH_BITE_REGENERATION  97	// rapid regeneration while drinking blood from humans
+#define PTECH_STEAL_COMMAND  98	// can use 'steal'
+#define PTECH_USE_HONED_GEAR  99	// can use honed gear
+#define PTECH_REDIRECT_MAGICAL_DAMAGE_TO_MANA  100	// redirect part of magical damage to mana pool instead of health
+#define PTECH_MORE_BLOOD_FROM_HUMANS  101	// vampires get more out of blood from humans
+
+
+// SM_x: status messages
+#define SM_ANIMAL_MOVEMENT  BIT(0)	// animals wandering on the map
+#define SM_CHANNEL_JOINS  BIT(1)	// players joining/leaving slash-channels
+#define SM_COOLDOWNS  BIT(2)	// message when a cooldown expires
+#define SM_EMPIRE_LOGS   BIT(3)	// can turn off elog messages
+#define SM_HUNGER  BIT(4)	// hunger messages
+#define SM_THIRST  BIT(5)	// thirst messages
+#define SM_LOW_BLOOD  BIT(6)	// vampire starvation messages
+#define SM_MORTLOG  BIT(7)	// player creation logs, etc
+#define SM_PROMPT  BIT(8)	// show or hide prompt
+#define SM_SKILL_GAINS  BIT(9) // message when player gains skill points
+#define SM_SUN  BIT(10)	// sunrise/sunset messages
+#define SM_SUN_AUTO_LOOK  BIT(11)	// player looks when sun goes up or down
+#define SM_TEMPERATURE  BIT(12)	// basic temperature change messages
+#define SM_EXTREME_TEMPERATURE  BIT(13)	// warning messages for dangerous temperature
+#define SM_TRAVEL_AUTO_LOOK  BIT(14)	// auto-look when running
+#define SM_VEHICLE_MOVEMENT  BIT(15)	// messages shown to interior when vehicle moves
+#define SM_WEATHER  BIT(16)	// weather change messages
+#define SM_FIGHT_PROMPT  BIT(17)	// show or hide fprompt
+
+// flags set at character creation
+#define DEFAULT_STATUS_MESSAGES  (SM_ANIMAL_MOVEMENT | SM_CHANNEL_JOINS | SM_COOLDOWNS | SM_EMPIRE_LOGS | SM_HUNGER | SM_THIRST | SM_LOW_BLOOD | SM_MORTLOG | SM_PROMPT | SM_FIGHT_PROMPT | SM_SKILL_GAINS | SM_SUN | SM_SUN_AUTO_LOOK | SM_TEMPERATURE | SM_EXTREME_TEMPERATURE | SM_VEHICLE_MOVEMENT | SM_WEATHER)
 
 
 // summon types for oval_summon, ofin_summon, and add_offer
@@ -2567,6 +2591,8 @@ typedef enum {
 #define WAIT_MOVEMENT  4	// normal move lag
 #define WAIT_SPELL  5	// general spells
 #define WAIT_OTHER  6	// not covered by other categories
+#define WAIT_LONG  7	// longer than the others
+#define WAIT_VERY_LONG  8	// longest wait
 
 
  //////////////////////////////////////////////////////////////////////////////
@@ -2588,6 +2614,7 @@ typedef enum {
 #define PRG_HIDDEN  BIT(3)	// d. progress does not show up
 #define PRG_NO_ANNOUNCE  BIT(4)	// e. never announces when this goal is achieved
 #define PRG_NO_PREVIEW  BIT(5)	// f. cannot view it until you're on it
+#define PRG_NO_TRACKER  BIT(6)	// g. hide the tracker from the player
 
 
 // PRG_PERK_x: progress perks
@@ -2617,6 +2644,7 @@ typedef enum {
 #define QST_TUTORIAL  BIT(7)	// quest can be blocked by 'toggle tutorial'
 #define QST_GROUP_COMPLETION  BIT(8)	// group members auto-finish this quest, even if incomplete, if present when any member does
 #define QST_EVENT  BIT(9)	// shows as an event quest; splits dailies into 2 pools
+#define QST_IN_CITY_ONLY  BIT(10)	// requires that it's in a city
 
 
 // QG_x: quest giver types
@@ -2644,6 +2672,7 @@ typedef enum {
 #define QR_RECOGNIZE_LANGUAGE  11
 #define QR_GRANT_PROGRESS  12
 #define QR_START_PROGRESS  13
+#define QR_UNLOCK_ARCHETYPE  14
 
 
 // indicates empire (rather than misc) coins for a reward
@@ -2681,6 +2710,13 @@ typedef enum {
 #define SECTF_KEEPS_HEIGHT  BIT(24)	// retains its 'height' property but won't inherit a new one
 #define SECTF_SEPARATE_NOT_ADJACENTS  BIT(25)	// runs every NOT-ADJACENT evolution separately instead of ensuring it's not adjacent to ANY of them
 #define SECTF_SEPARATE_NOT_NEARS  BIT(26)	// runs every NOT-NEAR-SECTOR evolution separately instead of ensuring it's not near ANY of them
+#define SECTF_INHERIT_BASE_CLIMATE  BIT(27)	// inherits the climate of the base sector in addition to its own (e.g. road, building, etc)
+#define SECTF_IRRIGATES_AREA  BIT(28)	// tiles around this one trigger irrigation evolutions
+// note: evolutions use these as flags in a SIGNED sbitvector_t; limit is BIT(62)
+
+
+// SECT_CUSTOM_x: custom messages
+#define SECT_CUSTOM_MAGIC_GROWTH		0	// shown on magic-growth evolution
 
 
  //////////////////////////////////////////////////////////////////////////////
@@ -2759,6 +2795,10 @@ typedef enum {
 // VEH_CUSTOM_x: custom message types
 #define VEH_CUSTOM_RUINS_TO_ROOM  0	// sent when the building falls into ruin
 #define VEH_CUSTOM_CLIMATE_CHANGE_TO_ROOM 1	// sent when the vehicle is destroyed by climate flags
+#define VEH_CUSTOM_ENTER_TO_INSIDE  2	// sent inside a vehicle when a player enters
+#define VEH_CUSTOM_ENTER_TO_OUTSIDE  3	// sent outside a vehicle when a player enters
+#define VEH_CUSTOM_EXIT_TO_INSIDE  4	// sent inside a vehicle when a player exits
+#define VEH_CUSTOM_EXIT_TO_OUTSIDE  5	// sent outside a vehicle when a player exits
 
 
 // VSPEED_x: indicates the number of speed bonuses this vehicle gives to driving.
@@ -2857,6 +2897,9 @@ typedef enum {
 #define CLIM_OCEAN  BIT(19)	// r. out to sea (compare to salt-water which could also be a lake)
 #define CLIM_LAKE  BIT(20)	// s. either fresh or salt water
 #define CLIM_WATERSIDE  BIT(21)	// t. adjacent to fresh water
+#define CLIM_MILD  BIT(22)	// u. reduces temperature effects of other terrains
+#define CLIM_HARSH  BIT(23)	// v. increases temperature effects of other terrains
+#define CLIM_FROZEN_WATER  BIT(24)	// w. this would be a water sect but it's frozen
 
 
 // DPLTN_x: depletion types
@@ -2870,12 +2913,14 @@ typedef enum {
 #define DPLTN_TRAPPING  7
 #define DPLTN_CHOP  8
 #define DPLTN_HUNT  9
-#define DPLTN_PRODUCTION  10
-#define NUM_DEPLETION_TYPES  11	// total
+#define DPLTN_PRODUCTION  10	// for workforce
+#define DPLTN_SECONDARY  11		// for workforce
+#define DPLTN_TERTIARY  12		// for workforce
+#define NUM_DEPLETION_TYPES  13	// total
 
 
 // EVO_x: world evolutions
-#define EVO_CHOPPED_DOWN  0	// sect it becomes when a tree is removed, [value=# of trees]: controls chopping, chant of nature, etc
+#define EVO_CHOPPED_DOWN  0	// sect it becomes when a tree is removed, [value=# of trees]: controls chopping
 #define EVO_CROP_GROWS  1	// e.g. 'seeded field' crop-grows to 'crop' [no value]
 #define EVO_ADJACENT_ONE  2	// called when adjacent to at least 1 of [value=sector]
 #define EVO_ADJACENT_MANY  3	// called when adjacent to at least 6 of [value=sector]
@@ -2899,12 +2944,17 @@ typedef enum {
 #define EVO_OWNED  21	// evolves if owned
 #define EVO_UNOWNED  22	// evolves if un-owned
 #define EVO_BURN_STUMPS  23	// uses the burn-stumps workforce to evolve
-#define NUM_EVOS  24	// total
+#define EVO_ADJACENT_SECTOR_FLAG  24	// evolves adjacent to a sector flag
+#define EVO_NOT_ADJACENT_SECTOR_FLAG  25	// evolves when NOT adjacent to a sector flag
+#define EVO_NEAR_SECTOR_FLAG  26	// evolves within 2 tiles of a sector flag
+#define EVO_NOT_NEAR_SECTOR_FLAG  27	// evolves when NOT within 2 tiles of a sector flag
+#define NUM_EVOS  28	// total
 
 // EVO_VAL_x: evolution value types
 #define EVO_VAL_NONE  0
 #define EVO_VAL_SECTOR  1
 #define EVO_VAL_NUMBER  2
+#define EVO_VAL_SECTOR_FLAG  3
 
 
 // Exit info (doors)
@@ -2912,19 +2962,21 @@ typedef enum {
 #define EX_CLOSED  BIT(1)	// The door is closed
 
 
-// Island flags -- ISLE_x
+// ISLE_x: Island flags
 #define ISLE_NEWBIE  BIT(0)	// a. Island follows newbie rules
 #define ISLE_NO_AGGRO  BIT(1)	// b. Island will not fire aggro mobs or guard towers
 #define ISLE_NO_CUSTOMIZE  BIT(2)	// c. cannot be renamed
 #define ISLE_CONTINENT  BIT(3)	// d. island is a continent (usually large, affects spawns)
 #define ISLE_HAS_CUSTOM_DESC  BIT(4)	// e. ** island has a custom desc -- internal use only (not having this flag will get the desc replaced)
 #define ISLE_NO_CHART  BIT(5)	// f. island can't be targeted with the chart command
+#define ISLE_NO_TEMPERATURE_PENALTIES  BIT(6)	// g. players are not penalized for heat/cold here
+#define ISLE_ALWAYS_LIGHT  BIT(7)	// h. outdoor tiles are always light
 
 
 // ROOM_AFF_x: Room affects -- these are similar to room flags, but if you want to set them
 // in a "permanent" way, set the room's base_affects as well as its current
 // affects.
-#define ROOM_AFF_DARK  BIT(0)	// a. Torches don't work
+#define ROOM_AFF_MAGIC_DARKNESS  BIT(0)	// a. Torches don't work; requires a ptech to see
 #define ROOM_AFF_SILENT  BIT(1)	// b. Can't speak/hear
 #define ROOM_AFF_HAS_INSTANCE  BIT(2)	// c. an instance is linked here
 #define ROOM_AFF_CHAMELEON  BIT(3)	// d. Appears to be plains/desert
@@ -2950,6 +3002,7 @@ typedef enum {
 #define ROOM_AFF_HIDE_REAL_NAME  BIT(23)	// x. won't show the real name after a custom name, like Ruins of a House (Ruins)
 #define ROOM_AFF_MAPOUT_BUILDING  BIT(24)	// y. shows as a building on the mapout (set automatically)
 #define ROOM_AFF_NO_TRACKS  BIT(25)		// z. nobody leaves tracks and you cannot track
+#define ROOM_AFF_PERMANENT_PAINT  BIT(26)	// A. paint displays different and cannot be repainted; removed automatically on dismantle
 // NOTE: limit BIT(31) -- This is currently an unsigned int, to save space since there are a lot of rooms in the world
 
 
@@ -2960,9 +3013,9 @@ typedef enum {
 #define ROOM_EXTRA_MINE_AMOUNT  1
 #define ROOM_EXTRA_FIRE_REMAINING  2
 #define ROOM_EXTRA_SEED_TIME  3
-#define ROOM_EXTRA_TAVERN_TYPE  4
-#define ROOM_EXTRA_TAVERN_BREWING_TIME  5
-#define ROOM_EXTRA_TAVERN_AVAILABLE_TIME  6
+	#define ROOM_EXTRA_UNUSED4  4	// formerly tavern type
+	#define ROOM_EXTRA_UNUSED5  5	// formerly tavern brewing time
+	#define ROOM_EXTRA_UNUSED6  6	// formerly tavern available time
 	#define ROOM_EXTRA_UNUSED  7	// formerly ruins-icon
 #define ROOM_EXTRA_CHOP_PROGRESS  8
 #define ROOM_EXTRA_TRENCH_PROGRESS  9
@@ -2985,12 +3038,31 @@ typedef enum {
 #define SAVE_INFO_PACK_SAVED  BIT(0)	// indicates an obj/veh pack is already saved
 
 
+// TEMPERATURE_x: Temperature flags for adventures, buildings, and room templates
+#define TEMPERATURE_USE_CLIMATE  0	// inherit from local tile
+#define TEMPERATURE_ALWAYS_COMFORTABLE  1	// no penalties from temperature
+#define TEMPERATURE_MILDER  2	// milder than local tile
+#define TEMPERATURE_HARSHER  3	// harsher than local tile
+#define TEMPERATURE_FREEZING  4	// always freezing
+#define TEMPERATURE_COLD  5	// always cold
+#define TEMPERATURE_COOL  6	// always cool (no penalty)
+#define TEMPERATURE_COOLER  7	// cooler than local tile
+#define TEMPERATURE_COOLER_WHEN_HOT  8	// cooler than local tile when > 0
+#define TEMPERATURE_NEUTRAL  9	// temperature is always 0 (neutral)
+#define TEMPERATURE_WARM  10	// always warm (no penalty)
+#define TEMPERATURE_WARMER  11	// warmer than local tile
+#define TEMPERATURE_WARMER_WHEN_COLD  12	// warmer than local tile when < 0
+#define TEMPERATURE_HOT  13	// always hot
+#define TEMPERATURE_SWELTERING  14	// always sweltering
+
+
  //////////////////////////////////////////////////////////////////////////////
 //// MAXIMA AND LIMITS ///////////////////////////////////////////////////////
 
 // misc game limits
 #define BANNED_SITE_LENGTH    50	// how long ban hosts can be
 #define COLREDUC_SIZE  80	// how many characters long a color_reducer string can be
+#define MAX_ACTION_STRING  245	// any longer and it cannot be read from file
 #define MAX_ADMIN_NOTES_LENGTH  2400
 #define MAX_AFFECT  32
 #define MAX_CMD_LENGTH  (MAX_STRING_LENGTH-80)	// can't go bigger than this, altho DG Scripts wanted 16k
@@ -3006,14 +3078,11 @@ typedef enum {
 #define MAX_INT  2147483647	// useful for bounds checking
 #define MAX_INVALID_NAMES  200	// ban.c
 #define MAX_ISLAND_NAME  40	// island name length -- seems more than reasonable
-#define MAX_ITEM_DESCRIPTION  4000
+#define MAX_ITEM_DESCRIPTION  8000
 #define MAX_MAIL_SIZE  4096	// arbitrary
-#define MAX_MESSAGES  100	// fight.c
 #define MAX_MOTD_LENGTH  4000	// eedit.c, configs
-#define MAX_MOVEMENT_STRING  245	// any longer and it cannot be read from file
 #define MAX_NAME_LENGTH  20
 #define MAX_NOTES  8000
-#define MAX_OBJ_AFFECT  6
 #define MAX_PLAYER_DESCRIPTION  4000
 #define MAX_POOFIN_LENGTH  80
 #define MAX_POOF_LENGTH  80
@@ -3022,8 +3091,9 @@ typedef enum {
 #define MAX_RANKS  20	// Max levels in an empire
 #define MAX_RANK_LENGTH  20	// length limit
 #define MAX_RAW_INPUT_LENGTH  1536  // Max size of *raw* input
-#define MAX_REFERRED_BY_LENGTH  80
-#define MAX_RESOURCES_REQUIRED  10	// how many resources a recipe can need
+#define MAX_RECENT_CHANNELS  20		// number of messages to show in each history
+#define KEEP_RECENT_CHANNELS  60	// total number of messages to keep just in case some are hidden
+#define MAX_REFERRED_BY_LENGTH  160
 #define MAX_ROOM_DESCRIPTION  4000
 #define MAX_SKILL_RESETS  10	// number of skill resets you can save up
 #define MAX_SLASH_CHANNEL_NAME_LENGTH  16
@@ -3186,6 +3256,7 @@ struct find_territory_node {
 	room_data *loc;
 	char *details;	// optional string with vehicles, etc
 	int count;
+	bool is_vehicle;	// notes if the marked territory was from a vehicle
 	
 	struct find_territory_node *prev, *next;	// doubly-linked list
 };
@@ -3197,17 +3268,23 @@ struct gen_interact_data_t {
 	int action;	// ACT_ type
 	char *command;	// 'quarry'
 	char *verb;	// 'quarrying'
-	int timer;	// number of action ticks
-	int ptech;	// required ptech (may be NOTHING)
-	int depletion;	// DPLTN_ type (may be NOTHING)
+	char *timer_config;	// optional: config to get the timer (NULL to not use)
+	int timer;	// number of action ticks to use if a config is not set
+	int ptech;	// required ptech (may be NO_TECH)
 	char *approval_config;	// a 'bool' key for the config system like "gather_approval" (may be null)
+	bitvector_t tool;	// any TOOL_ needed
+	GEN_INTERACT_SPECIAL(*spec_proc);	// optional spec to run during the process such as gen_proc_nature_burn
+	bitvector_t flags;	// GI_ flags
 	struct {	// for all strings, index 0 is to-char and index 1 is to-room
 		char *start[2];	// shown at start-action
+		char *pre_finish;	// shown before attempting the resource interaction
 		char *finish[2];	// shown when resource is gained (unless there's a custom message), may contain $p
 		char *empty;	// char-only, shown at the end if there's nothing they can get
 		int random_frequency;	// 1-100% chance to see a message per tick
 		char *random_tick[10][2];
 	} msg;
+	int custom_tool_message_to_char;	// optional OBJ_CUSTOM_ type; may be NOTHING
+	int custom_tool_message_to_room;	// optional OBJ_CUSTOM_ type; may be NOTHING
 };
 
 
@@ -3327,7 +3404,7 @@ struct interact_exclusion_data {
 // restricts interactions to certain players
 struct interact_restriction {
 	int type;	// INTERACT_RESTRICT_ type
-	any_vnum vnum;	// based on type
+	signed long long vnum;	// based on type; support most bitvectors too
 	struct interact_restriction *next;
 };
 
@@ -3472,6 +3549,7 @@ struct shipping_data {
 	long status_time;	// when it gained that status
 	room_vnum ship_origin;	// where the ship is coming from (in case we have to send it back)
 	int shipping_id;	// VEH_SHIPPING_ID() of ship
+	struct storage_timer *timers;	// for items that decay
 	
 	struct shipping_data *prev, *next;	// DL: EMPIRE_SHIPPING_LIST()
 };
@@ -3615,6 +3693,7 @@ struct ability_data {
 	double scale;	// effectiveness scale (1.0 = 100%)
 	bitvector_t immunities;	// AFF_ flags that block this ability
 	bitvector_t gain_hooks;	// AGH_ flags
+	bitvector_t requires_tool;	// TOOL_ flags required to use it
 	
 	// command-related data
 	char *command;	// if ability has a command
@@ -3622,7 +3701,10 @@ struct ability_data {
 	bitvector_t targets;	// ATAR_ flags
 	int cost_type;	// HEALTH, MANA, etc.
 	int cost;	// amount of h/v/m
-	int cost_per_scale_point;	// cost modifier when scaled
+	double cost_per_amount;		// cost modifier for healing/damage
+	double cost_per_scale_point;	// cost modifier when scaled
+	double cost_per_target;		// cost modifier with multiple targets
+	struct resource_data *resource_cost;	// additional costs
 	any_vnum cooldown;	// generic cooldown if any
 	int cooldown_secs;	// how long to cooldown, if any
 	int wait_type;	// WAIT_ flag
@@ -3638,15 +3720,20 @@ struct ability_data {
 	struct apply_data *applies;	// affects
 	int attack_type;	// damage
 	int damage_type;	// damage
+	int pool_type;	// restore
 	int max_stacks;	// dot
+	int move_type;	// for move abilities
 	struct ability_data_list *data;	// LL of additional data
+	struct interaction_item *interactions;	// LL of regular interactions
+	struct ability_hook *hooks;	// LL of hooks for this ability
 	
 	// live cached (not saved) data:
 	skill_data *assigned_skill;	// skill for reverse-lookup
 	int skill_level;	// level of that skill required
 	bitvector_t types;	// summary of ABILT_ flags
+	bitvector_t hook_flags;	// quick reference for hook types
 	bool is_class;	// assignment comes from a class
-	bool is_synergy;	// assignemtn comes from a synergy
+	bool is_synergy;	// assignemnt comes from a synergy
 	
 	UT_hash_handle hh;	// ability_table hash handle
 	UT_hash_handle sorted_hh;	// sorted_abilities hash handle
@@ -3657,7 +3744,7 @@ struct ability_data {
 struct ability_data_list {
 	int type;	// ADL_ type of data list
 	any_vnum vnum;	// number of the list entry thing
-	int misc;	// future use?
+	signed long long misc;	// used by some types
 	struct ability_data_list *next;
 };
 
@@ -3670,11 +3757,75 @@ struct ability_gain_hook {
 };
 
 
+// Ability hooks (things that cause an ability to run itself)
+struct ability_hook {
+	bitvector_t type;	// AHOOK_ const
+	any_vnum value;	// depends on type
+	double percent;	// chance to execute
+	int misc;	// for expansion
+	
+	struct ability_hook *next;	// LL
+};
+
+
+// used to detect changes in attributes
+struct ability_trait_hook {
+	any_vnum ability;	// which ability to update
+	int linked_trait;	// which trait to watch
+	int last_value;		// last known value of the trait
+	
+	UT_hash_handle hh;	// GET_ABILITY_TRAIT_HOOKS(ch)
+};
+
+
 // determines the weight for each type, to affect scaling
 struct ability_type {
 	bitvector_t type;	// a single ABILT_ flag
 	int weight;	// how much weight to give that type
 	struct ability_type *next;
+};
+
+
+// passes data throughout an ability call
+struct ability_exec {
+	ability_data *abil;	// which ability (pointer)
+	bool stop;	// indicates no further types should process
+	bool success;	// indicates the player should be charged
+	bool sent_any_msg;	// if TRUE, it sent at least one message to the actor
+	bool sent_fail_msg;	// if TRUE, it sent at least one fail
+	bool no_msg;	// indicates you shouldn't send messages
+	bool engage_anyway;	// we engage combat if !stop || engage_anyway
+	
+	// costs
+	int cost;	// for types that raise the cost later
+	bool should_charge_cost;	// if TRUE, will charge regardless of success
+	int total_amount;	// for cost-per-amount
+	int total_targets;	// for cost-per-target
+	double max_scale;	// for cost-per-scale-point
+	
+	// core scaling data
+	bool has_mastery;	// TRUE if the player has the mastery ability
+	bool matching_role;	// if FALSE, has penalties from no matching role
+	double trait_modifier;	// 0.0 to 1.0 rating based on the required trait
+	
+	// data passed by types
+	int conjure_liquid_max;
+	int move_dir;
+	room_data *move_room;
+	any_vnum ready_weapon_val;
+	int restore_pool;
+	int restore_amount;
+	any_vnum summon_vnum;
+	
+	struct ability_exec_type *types;	// LL of type data
+};
+
+
+// preliminary data from ability setup
+struct ability_exec_type {
+	bitvector_t type;
+	double scale_points;
+	struct ability_exec_type *next;
 };
 
 
@@ -3697,6 +3848,7 @@ struct adventure_data {
 	int reset_time;	// how often to reset things (minutes)
 	bitvector_t flags;	// ADV_ flags
 	int player_limit;	// maximum number of players at a time (if over 0)
+	int temperature_type;	// TEMPERATURE_ const
 	
 	// lists
 	struct adventure_link_rule *linking;
@@ -3799,6 +3951,7 @@ struct room_template {
 	bitvector_t base_affects;	// ROOM_AFF_
 	bitvector_t functions;	// FNC_
 	rmt_vnum subzone;	// for subdividing where/shout/etc
+	int temperature_type;	// TEMPERATURE_ const
 	
 	// lists
 	struct adventure_spawn *spawns;	// list of objs/mobs
@@ -3856,11 +4009,75 @@ struct archetype_gear {
 };
 
 
-// used in character creation
-struct archetype_menu_type {
-	int type;
-	char *name;
-	char *description;
+ //////////////////////////////////////////////////////////////////////////////
+//// ATTACK MESSAGE STRUCTS //////////////////////////////////////////////////
+
+// AMDF_x: Attack message flags
+#define AMDF_WEAPON			BIT(0)	// a. allowed on weapons
+#define AMDF_MOBILE			BIT(1)	// b. allowed on mobiles
+#define AMDF_DISARMABLE		BIT(2)	// c. can be disarmed
+#define AMDF_APPLY_POISON	BIT(3)	// d. can trigger poison
+#define AMDF_IGNORE_MISSING	BIT(4)	// e. auditor won't warn on missing messages
+
+#define AMDF_FLAGS_REQUIRE_EXTENDED_DATA  (AMDF_WEAPON | AMDF_MOBILE)
+
+
+// MSG_x: each fight message has these 4 types
+#define MSG_DIE		0	// messages when death
+#define MSG_MISS	1	// messages when miss
+#define MSG_HIT		2	// messages when hit
+#define MSG_GOD		3	// messages when hit on god
+#define NUM_MSG_TYPES  4	// total
+
+
+// SPD_x: speeds for attacks
+#define SPD_FAST	0
+#define SPD_NORMAL	1
+#define SPD_SLOW	2
+#define NUM_ATTACK_SPEEDS  3
+
+
+// WEAPON_x: Weapon types
+#define WEAPON_BLUNT	0
+#define WEAPON_SHARP	1	// like wolverine
+#define WEAPON_MAGIC	2
+
+
+// fight message list
+struct attack_message_data {
+	any_vnum vnum;		// Attack vnum (usually an ATTACK_ or TYPE_ const)
+	char *name;	// for display purposes
+	char *death_log;	// optional message for how death is displayed
+	bitvector_t flags;	// AMDF_ flags
+	any_vnum counts_as;	// if it counts as another attack type, for ability requirements etc
+	
+	// used by attack types:
+	char *first_pers;	// You "slash"
+	char *third_pers;	// $n "slashes"
+	char *noun;		// ... with your "swing"
+	double speed[NUM_ATTACK_SPEEDS];	// SPD_ { fast, normal, slow }
+	int weapon_type;	// WEAPON_ type
+	int damage_type;	// DAM_ type
+	
+	struct attack_message_set *msg_list;	// Linked list of messages
+	int num_msgs;	// How many attack messages are in the list
+	
+	UT_hash_handle hh;	// attack_message_table hash (by vnum)
+};
+
+
+// individual trio of fight messages
+struct attack_message_type {
+	char *attacker_msg;	// message to attacker
+	char *victim_msg;	// message to victim
+	char *room_msg;	// message to room
+};
+
+
+// part of fight messages
+struct attack_message_set {
+	struct attack_message_type msg[NUM_MSG_TYPES];	// the 4 message types
+	struct attack_message_set *next;	// to next messages of this kind
 };
 
 
@@ -3881,16 +4098,6 @@ struct augment_data {
 	
 	UT_hash_handle hh;	// augment_table hash
 	UT_hash_handle sorted_hh;	// sorted_augments hash
-};
-
-
-// used by do_gen_augment
-struct augment_type_data {
-	char *noun;
-	char *verb;
-	int apply_type;	// APPLY_TYPE_x
-	bitvector_t default_flags;	// AUG_x always applied
-	bitvector_t use_obj_flag;	// OBJ_: optional; used by enchants
 };
 
 
@@ -3920,23 +4127,31 @@ struct book_data {
 	book_vnum vnum;
 	
 	int author;
-	unsigned int bits;
+	bitvector_t flags;
 	char *title;
 	char *byline;
 	char *item_name;
 	char *item_description;
 	
 	struct paragraph_data *paragraphs;	// linked list
-	struct library_data *in_libraries;	// places this book is kept
 	
 	UT_hash_handle hh;	// book_table
 };
 
 
-// linked list of locations the book occurs
-struct library_data {
-	room_vnum location;
-	struct library_data *next;
+// single book in a library
+struct library_book {
+	any_vnum vnum;		// book vnum
+	UT_hash_handle hh;	// hashed by vnum in the library
+};
+
+
+// tracks where books are stored
+struct library_info {
+	room_vnum room;	// location (hash key)
+	struct library_book *books;	// hash of books (by vnum)
+	
+	UT_hash_handle hh;
 };
 
 
@@ -3959,6 +4174,7 @@ struct bld_data {
 	bitvector_t functions;	// FNC_
 	bld_vnum upgrades_to;	// the vnum of any building
 	int height;	// 0+ addition to terrain height (map buildings only)
+	int temperature_type;	// TEMPERATURE_ const
 	
 	int extra_rooms;	// how many rooms it can have
 	bitvector_t designate_flags;	// DES_x
@@ -3972,7 +4188,7 @@ struct bld_data {
 	struct spawn_info *spawns;	// linked list of spawn data
 	struct interaction_item *interactions;	// interaction items
 	struct trig_proto_list *proto_script;	// list of default triggers
-	struct resource_data *yearly_maintenance;	// needed each year
+	struct resource_data *regular_maintenance;	// needed each reset cycle
 	struct bld_relation *relations;	// links to buildings/vehicles
 	
 	// live data (not saved, not freed)
@@ -4116,6 +4332,10 @@ struct pursuit_data {
 	time_t last_seen;	// time of last spotting
 	room_vnum location;	// prevents tracking forever
 	
+	// possible complications:
+	char *disguise;
+	any_vnum morph;
+	
 	struct pursuit_data *next;
 };
 
@@ -4131,7 +4351,10 @@ struct account_data {
 	bitvector_t flags;	// ACCT_
 	char *notes;	// account notes
 	
+	// lists/hashes
+	struct friend_data *friends;	// hash table of friends
 	struct pk_data *killed_by;	// LL of players who killed this player recently
+	struct unlocked_archetype *unlocked_archetypes;	// hash (vnum)
 	
 	UT_hash_handle hh;	// account_table
 };
@@ -4150,6 +4373,10 @@ struct account_player {
 struct channel_history_data {
 	int idnum;	// id of the author
 	int invis_level;	// if it's an invisible immortal
+	int access_level;	// not shown below this access level at all
+	int rank;	// for empire chats, required rank
+	any_vnum language;	// which language it was in, for some channels
+	bool is_disguised;	// indicates we need to show a real name to immortals
 	char *message;
 	long timestamp;
 	struct channel_history_data *prev, *next;	// doubly-linked list
@@ -4186,6 +4413,16 @@ struct companion_mod {
 	int num;	// numeric data (used by some types)
 	char *str;	// string data (used by some types)
 	struct companion_mod *next;
+};
+
+
+// account-wide friends list
+struct friend_data {
+	int account_id;			// id of the friend's account
+	int status;				// FRIEND_ status
+	char *name;				// last name seen
+	char *original_name;	// name we added with
+	UT_hash_handle hh;		// hash handle for account->friends
 };
 
 
@@ -4272,7 +4509,7 @@ struct descriptor_data {
 
 	char *host;	// hostname
 	byte bad_pws;	// number of bad pw attemps this login
-	byte idle_tics;	// tics idle at password prompt
+	byte idle_tics;	// tics idle at game menus prompt
 	int connected;	// STATE()
 	int submenu;	// SUBMENU() -- use varies by menu
 	int desc_num;	// unique num assigned to desc
@@ -4335,6 +4572,8 @@ struct descriptor_data {
 	ability_data *olc_ability;	// abil being edited
 	adv_data *olc_adventure;	// adv being edited
 	archetype_data *olc_archetype;	// arch being edited
+	attack_message_data *olc_attack;	// attack message being edited
+	int olc_attack_num;		// which message in the attack set is being edited
 	augment_data *olc_augment;	// aug being edited
 	book_data *olc_book;	// book being edited
 	class_data *olc_class;	// class being edited
@@ -4492,6 +4731,7 @@ struct player_slash_channel {
 struct player_tech {
 	int id;	// which PTECH_
 	any_vnum abil;	// which ability it came from
+	bool check_solo;	// if TRUE, need to check solo to allow it
 	struct player_tech *next;	// LL: GET_TECHS(ch)
 };
 
@@ -4515,6 +4755,7 @@ struct player_special_data {
 	bitvector_t syslogs;	// which syslogs people want to see
 	bitvector_t bonus_traits;	// BONUS_
 	bitvector_t fight_messages;	// FM_ flags
+	bitvector_t status_messages;	// SM_ flags
 	bitvector_t informative_flags;	// INFORMATIVE_ flags
 	ubyte bad_pws;	// number of bad password attemps
 	struct mail_data *mail_pending;	// uncollected letters
@@ -4548,11 +4789,13 @@ struct player_special_data {
 	// empire
 	empire_vnum pledge;	// Empire he's applying to
 	byte rank;	// Rank in the empire
+	sh_int highest_known_greatness;	// maximum greatness achieved (prevents empire greatness dropping)
 	
 	// misc player attributes
 	ubyte apparent_age;	// for vampires	
 	int conditions[NUM_CONDS];	// Drunk, full, thirsty
 	int resources[NUM_MATERIALS];	// God resources
+	int temperature;	// how warm/cold the player currently is
 	
 	// various lists
 	struct coin_data *coins;	// linked list of coin data
@@ -4584,12 +4827,20 @@ struct player_special_data {
 	room_vnum action_room;	// player location
 	int action_vnum[NUM_ACTION_VNUMS];	// slots for storing action data (use varies)
 	struct resource_data *action_resources;	// temporary list for resources stored during actions
-	char *movement_string;	// for run/etc
+	char *action_string;	// for run, abilities, etc
+	char_data *action_targ_char;	// action targets this char (saved as id)
+	int temporary_char_targ;	// helps when loading action_targ_char
+	bitvector_t action_targ_multi;	// action targets group/etc
+	obj_data *action_targ_obj;	// unsaved: action targets this object
+	vehicle_data *action_targ_veh;	// action targets this vehicle
+	int temporary_veh_targ;	// helps when loading action_targ_veh
+	room_vnum action_targ_room;	// action targets this room
 	
 	// locations and movement
 	room_vnum load_room;	// Which room to place char in
 	room_vnum load_room_check;	// this is the home room of the player's loadroom, used to check that they're still in the right place
 	room_vnum last_room;	// useful when dead
+	room_vnum home_location;	// player's private home, if any -- not called "home_room" to avoid confusion with the room_data version of a "home room"
 	room_vnum tomb_room;	// location of player's chosen tomb
 	int recent_death_count;	// for death penalty
 	long last_death_time;	// for death counts
@@ -4611,18 +4862,16 @@ struct player_special_data {
 	struct player_ability_data *ability_hash;
 	int current_skill_set;	// which skill set a player is currently in
 	bool can_gain_new_skills;	// not required to keep skills at zero
-	bool can_get_bonus_skills;	// can buy extra 75's
-	sh_int skill_level;  // levels computed based on class skills
+	sh_int skill_level;  // levels computed based on skills above level 75
 	sh_int highest_known_level;	// maximum level ever achieved (used for gear restrictions)
 	sh_int last_known_level;	// set on save/quit/alt
-	ubyte class_progression;	// % of the way from SPECIALTY_SKILL_CAP to CLASS_SKILL_CAP
+	ubyte class_progression;	// % of the way from SPECIALTY_SKILL_CAP to MAX_SKILL_CAP
 	ubyte class_role;	// ROLE_ chosen by the player
 	class_data *character_class;  // character's class as determined by top skills
 	any_vnum speaking;	// current language
 	struct player_language *languages;	// languages the player speaks/recognizes
 	struct player_craft_data *learned_crafts;	// crafts learned from patterns
 	struct minipet_data *minipets;	// collection of summonable pets
-	struct ability_gain_hook *gain_hooks;	// hash table of when to gain ability xp
 	struct player_tech *techs;	// techs from abilities
 	struct empire_unique_storage *home_storage;	// DLL: items stored in the home
 	time_t last_home_set_time;	// how long ago the player used home-set (blocks home retrieve)
@@ -4651,14 +4900,20 @@ struct player_special_data {
 	int group_invite_by;	// idnum of the last player to invite this one
 	time_t move_time[TRACK_MOVE_TIMES];	// timestamp of last X moves
 	int beckoned_by;	// idnum of player who beckoned (for follow)
+	int last_aff_wear_off_id;	// helps prevent duplicate wear-off messages
 	int last_aff_wear_off_vnum;	// helps prevent duplicate wear-off messages
 	time_t last_aff_wear_off_time;	// helps prevent duplicate wear-off messages
-	int last_cond_message_time[NUM_CONDS];	// last time we sent a message for drunk, full, thirsty
+	time_t last_cond_message_time[NUM_CONDS];	// last time we sent a message for drunk, full, thirsty
+	time_t last_cold_time;	// last time a player was told they're getting colder
+	time_t last_warm_time;	// last time a player was told they're getting warmer
+	int last_messaged_temperature;	// last temperature a player was warned about
 	int last_look_sun;	// used to determine if the player needs to 'look' at sunrise/set
 	bool map_memory_needs_save;	// whether or not to save the map memory file
 	bool map_memory_loaded;	// whether or not it has been loaded yet
 	int map_memory_count;	// how many tiles are currently remembered
 	
+	struct ability_gain_hook *gain_hooks;	// hash table of when to gain ability xp
+	struct ability_trait_hook *trait_hooks;	// hash table to watch for trait changes
 	struct combat_meters meters;	// combat meter data
 	
 	bool affects_converted;	// if FALSE, player's affs have seconds-of-duration instead of expire-timestamp
@@ -4666,6 +4921,13 @@ struct player_special_data {
 	bool dont_save_delay;	// marked when a player is partially unloaded, to prevent accidentally saving a delay file with no gear
 	bool restore_on_login;	// mark the player to trigger a free reset when they enter the game
 	bool reread_empire_tech_on_login;	// mark the player to trigger empire tech re-read on entering the game
+};
+
+
+// unlockable account perks
+struct unlocked_archetype {
+	any_vnum vnum;	// which archetype
+	UT_hash_handle hh;	// hashed in account_data->unlocked_archetypes by vnum
 };
 
 
@@ -4758,6 +5020,8 @@ struct char_special_data {
 	
 	int carry_items;	// Number of items carried
 	
+	struct ability_exec *running_ability_data;	// while running an ability, its data is here for reference anywhere
+	struct vnum_hash **running_ability_limiter;	// while running a chain of abilities, stores the limiter here
 	struct stored_event *stored_events;	// linked list of stored dg events
 };
 
@@ -4935,6 +5199,7 @@ struct crop_data {
 	int y_min;	// y >= this
 	int y_max;	// y <= this
 	
+	struct custom_message *custom_msgs;	// any custom messages
 	struct spawn_info *spawns;	// mob spawn data
 	struct interaction_item *interactions;	// interaction items
 	struct extra_descr_data *ex_description;	// extra descriptions
@@ -4956,74 +5221,12 @@ struct action_data_struct {
 };
 
 
-// STRENGTH, NUM_ATTRIBUTES, etc
-struct attribute_data_type {
-	char *name;
-	char *creation_description;	// shown if players need help during creation
-	char *low_error;	// You are "too weak" to use that item.
-};
-
-
-// used for city metadata
-struct city_metadata_type {
-	char *name;
-	char *icon;
-	int radius;
-	bool show_to_others;
-	bool is_capital;
-};
-
-
 // chore type data -- CHORE_
 struct empire_chore_type {
 	char *name;
 	mob_vnum mob;
 	bool hidden;	// won't show in the main chores list
 	int requires_tech;	// if any -- or NOTHING
-};
-
-
-// MAT_x
-struct material_data {
-	char *name;
-	bool floats;
-	double chance_to_dismantle;	// percent chance of getting it back when dismantling
-	char *decay_on_char;	// message sent if carried/used by a person
-	char *decay_in_room;	// message sent if it decays in the room
-};
-
-
-// for BREW_x
-struct tavern_data_type {
-	char *name;
-	int liquid;
-	int ingredients[3];
-};
-
-
-// for do_toggle
-struct toggle_data_type {
-	char *name;	// toggle display and subcommand
-	int type;	// TOG_ONOFF, TOG_OFFON
-	bitvector_t bit;	// PRF_
-	int level;	// required level to see/use toggle
-	void (*callback_func)(char_data *ch);	// optional function to alert changes
-};
-
-
-// WEAR_ data for each equipment slot
-struct wear_data_type {
-	char *eq_prompt;	// shown on 'eq' list
-	char *name;	// display name
-	bitvector_t item_wear;	// matching ITEM_WEAR_
-	bool count_stats;	// FALSE means it's a slot like in-sheath, and adds nothing to the character
-	double gear_level_mod;	// modifier (slot significance) when counting gear level
-	int cascade_pos;	// for ring 1 -> ring 2; use NO_WEAR if it doesn't cascade
-	char *already_wearing;	// error message when slot is full
-	char *wear_msg_to_room;	// msg act()'d to room on wear
-	char *wear_msg_to_char;	// msg act()'d to char on wear
-	bool allow_custom_msgs;	// some slots don't
-	bool save_to_eq_set;	// slots that can be saved with 'eq set'
 };
 
 
@@ -5116,7 +5319,7 @@ struct empire_island {
 	int workforce_limit[NUM_CHORES];	// workforce settings
 	char *name;	// empire's local name for the island
 	struct empire_storage_data *store;	// hash table of storage here
-	bool store_is_sorted;	// TRUE if the storage hasn't changed order
+	bool store_is_sorted;	// EINV_SORT_ id of how it's currently sorted, or EINV_UNSORTED if not
 	struct empire_needs *needs;	// hash of stuff needed
 	
 	// unsaved portion
@@ -5194,6 +5397,7 @@ struct empire_storage_data {
 	obj_data *proto;	// pointer to the obj proto
 	int amount;	// how much
 	int keep;	// how much workforce should ignore/keep (UNLIMITED/-1 or >0)
+	struct storage_timer *timers;	// doubly-linked list for expiration
 	UT_hash_handle hh;	// empire_island->store hash (by vnum)
 };
 
@@ -5227,7 +5431,8 @@ struct empire_trade_data {
 struct empire_unique_storage {
 	obj_data *obj;	// actual live object
 	int amount;	// stacking
-	sh_int flags;	// up to 15 flags, EUS_x
+	struct storage_timer *timers;	// for expiring items
+	sh_int flags;	// up to 15 flags, EUS_
 	int island;	// split by islands
 	
 	struct empire_unique_storage *prev, *next;
@@ -5301,10 +5506,11 @@ struct offense_data {
 };
 
 
-// offense configs - constants.c
-struct offense_info_type {
-	char *name;
-	int weight;	// how bad it is
+// for item decay timers in storage
+struct storage_timer {
+	int timer;
+	int amount;
+	struct storage_timer *next, *prev;	// stored as a doubly linked list in ascending order by timer
 };
 
 
@@ -5383,6 +5589,10 @@ struct empire_data {
 	struct workforce_production_limit *production_limits;	// limits on what workforce can make
 	struct workforce_production_log *production_logs;	// LL of things produced
 	struct empire_playtime_tracker *playtime_tracker;	// tracks real gameplay
+	struct channel_history_data *chat_history;
+	
+	// other saved data
+	time_t wf_log_and_needs_time;	// last time we updated wf logs and needs (saved to storage file)
 	
 	// unsaved data
 	struct empire_territory_data *territory_list;	// hash table by vnum
@@ -5418,6 +5628,7 @@ struct empire_data {
 	struct empire_dropped_item *dropped_items;	// hash (by vnum) of items dropped in the empire
 	char mapout_token;	// displayed for this empire on the graphical political map
 	
+	bool history_loaded;	// record whether or not chat history has been loaded
 	bool storage_loaded;	// record whether or not storage has been loaded, to prevent saving over it
 	bool logs_loaded;	// record whether or not logs have been loaded, to prevent saving over them
 	
@@ -5609,15 +5820,6 @@ struct faction_relation {
 };
 
 
-// used to determine the order and value of reputations
-struct faction_reputation_type {
-	int type;	// REP_ type
-	char *name;
-	char *color;	// & or \t color code
-	int value;	// points total a player must be at for this
-};
-
-
 // for hash table of player faction levels
 struct player_faction_data {
 	any_vnum vnum;	// faction vnum
@@ -5628,42 +5830,13 @@ struct player_faction_data {
 
 
  //////////////////////////////////////////////////////////////////////////////
-//// FIGHT STRUCTS ///////////////////////////////////////////////////////////
-
-// part of fight messages
-struct msg_type {
-	char *attacker_msg;	// message to attacker
-	char *victim_msg;	// message to victim
-	char *room_msg;	// message to room
-};
-
-
-// part of fight messages
-struct message_type {
-	struct msg_type die_msg;	// messages when death
-	struct msg_type miss_msg;	// messages when miss
-	struct msg_type hit_msg;	// messages when hit
-	struct msg_type god_msg;	// messages when hit on god
-	struct message_type *next;	// to next messages of this kind
-};
-
-
-// fight message list
-struct message_list {
-	int a_type;	// Attack type
-	int number_of_attacks;	// How many attack messages to chose from
-	struct message_type *msg;	// List of messages
-};
-
-
- //////////////////////////////////////////////////////////////////////////////
 //// GAME STRUCTS ////////////////////////////////////////////////////////////
 
 // For reboots/shutdowns
 struct reboot_control_data {
-	int type;	// SCMD_REBOOT, SCMD_SHUTDOWN
+	int type;	// REBOOT_NONE, REBOOT_REBOOT, REBOOT_SHUTDOWN
 	int time;	// minutes
-	int level;	// REBOOT_NORMAL, PAUSE, DIE
+	int level;	// SHUTDOWN_NORMAL, SHUTDOWN_PAUSE, SHUTDOWN_DIE, SHUTDOWN_COMPLETE
 	int immediate;	// TRUE/FALSE for instant reboot
 };
 
@@ -5733,6 +5906,7 @@ struct obj_proto_data {
 	int max_scale_level;	// maximum level this obj may be scaled to
 	
 	any_vnum requires_quest;	// can only have obj whilst on quest
+	bitvector_t requires_tool;	// tool required when crafting/building
 	
 	// lists
 	struct extra_descr_data *ex_description;	// extra descriptions
@@ -5963,9 +6137,11 @@ struct sector_data {
 	
 	int movement_loss;	// move point cost
 	bitvector_t climate;	// CLIM_ flags
-	bitvector_t flags;	// SECTF_ flags
+	bitvector_t flags;	// SECTF_ flags: warning: evolutions use these as flags in a SIGNED sbitvector_t
 	bitvector_t build_flags;	// matches up with craft_data.build_on and .build_facing
+	int temperature_type;	// TEMPERATURE_ const modifies the sector
 	
+	struct custom_message *custom_msgs;	// any custom messages
 	struct spawn_info *spawns;	// mob spawn data
 	struct evolution_data *evolution;	// change over time
 	struct interaction_item *interactions;	// interaction items
@@ -5980,7 +6156,7 @@ struct sector_data {
 // for sector_data, to describe how a tile changes over time
 struct evolution_data {
 	int type;	// EVO_
-	int value;	// used by some types, e.g. # of adjacent forests
+	sbitvector_t value;	// used by some types, e.g. # of adjacent forests; sector flags; etc
 	double percent;	// chance of happening per zone update
 	sector_vnum becomes;	// sector to transform to
 	
@@ -6151,7 +6327,7 @@ struct vehicle_attribute_data {
 	bld_vnum interior_room_vnum;	// Any ROOM-flagged bld to use as an interior
 	int max_rooms;	// 1 = can enter; >1 allows designate
 	bitvector_t designate_flags;	// DES_ flags
-	struct resource_data *yearly_maintenance;
+	struct resource_data *regular_maintenance;	// needed each reset cycle
 	int veh_move_speed;  // VSPEED_ for driving action speed
 	int size;	// vehicle size
 	struct extra_descr_data *ex_description;	// extra descriptions
@@ -6195,6 +6371,8 @@ struct tileset_data {
 };
 
 
+// global weather data
+// TODO - I dream of making this regional or per-island -pc
 struct weather_data {
 	int pressure;	// How is the pressure ( Mb )
 	int change;	// How fast and what way does it change
@@ -6404,17 +6582,4 @@ struct map_data {
 	struct map_data *next_in_sect;	// LL of all map locations of a given sect
 	struct map_data *next_in_base_sect;	// LL for base sect
 	struct map_data *next;	// linked list of non-ocean tiles, for iterating
-};
-
-
-// for character size, search SIZE_x
-struct character_size_data {
-	int max_blood;	// how much blood the mob has
-	bitvector_t corpse_flags;	// large or not
-	bool can_take_corpse;	// corpse is no-take if false
-	bool show_on_map;	// show (oo)/name on map at range
-	char *corpse_keywords;	// additional keywords on the corpse
-	char *corpse_long_desc;	// custom long desc with %s for the "corpse of"
-	char *body_long_desc;	// custom long desc with %s for "the body of"
-	char *show_on_look;	// if not null, shows when you look at a person of this size
 };

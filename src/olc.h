@@ -2,7 +2,7 @@
 *   File: olc.h                                           EmpireMUD 2.0b5 *
 *  Usage: On-Line Creation header file                                    *
 *                                                                         *
-*  EmpireMUD code base by Paul Clarke, (C) 2000-2015                      *
+*  EmpireMUD code base by Paul Clarke, (C) 2000-2024                      *
 *  All rights reserved.  See license.doc for complete information.        *
 *                                                                         *
 *  EmpireMUD based upon CircleMUD 3.0, bpl 17, by Jeremy Elson.           *
@@ -16,6 +16,7 @@
 
 
 #define MAX_VNUM  999999	// highest allowed vnum for olc
+#define START_PLAYER_BOOKS  (MAX_VNUM+1)	// start of vnums for player-written books
 
 
 // olc controls
@@ -53,7 +54,8 @@
 #define OLC_SHOP  BIT(23)
 #define OLC_PROGRESS  BIT(24)
 #define OLC_EVENT  BIT(25)
-#define NUM_OLC_TYPES  26
+#define OLC_ATTACK  BIT(26)
+#define NUM_OLC_TYPES  27
 
 
 // olc command flags
@@ -90,9 +92,34 @@
 #define OLC_FLAG_NO_SHOPS  BIT(24)	// cannot edit shops
 #define OLC_FLAG_NO_PROGRESS  BIT(25)	// cannot edit progress
 #define OLC_FLAG_NO_EVENTS  BIT(26)	// cannot edit events
+#define OLC_FLAG_NO_ATTACKS  BIT(27)	// cannot edit attacks
 
 
-// for trigger editing
+// ABILEDIT_x: Which parts of the ability menu and stats to show
+#define ABILEDIT_IMMUNITIES		BIT(0)
+#define ABILEDIT_COMMAND		BIT(1)
+#define ABILEDIT_TARGETS		BIT(2)
+#define ABILEDIT_COST			BIT(3)
+#define ABILEDIT_MIN_POS		BIT(4)
+#define ABILEDIT_WAIT			BIT(5)
+#define ABILEDIT_DURATION		BIT(6)
+#define ABILEDIT_AFFECTS		BIT(7)
+#define ABILEDIT_APPLIES		BIT(8)
+#define ABILEDIT_AFFECT_VNUM	BIT(9)
+#define ABILEDIT_ATTACK_TYPE	BIT(10)
+#define ABILEDIT_MAX_STACKS		BIT(11)
+#define ABILEDIT_INTERACTIONS	BIT(12)
+#define ABILEDIT_COOLDOWN		BIT(13)
+#define ABILEDIT_DIFFICULTY		BIT(14)
+#define ABILEDIT_TOOL			BIT(15)
+#define ABILEDIT_DAMAGE_TYPE	BIT(16)
+#define ABILEDIT_COST_PER_AMOUNT	BIT(17)
+#define ABILEDIT_COST_PER_TARGET	BIT(18)
+#define ABILEDIT_POOL_TYPE		BIT(19)
+#define ABILEDIT_MOVE_TYPE		BIT(20)
+
+
+// TRIG_ARG_x: for trigger editing
 #define TRIG_ARG_PERCENT  BIT(0)
 #define TRIG_ARG_COMMAND  BIT(1)
 #define TRIG_ARG_PHRASE_OR_WORDLIST  BIT(2)	// 0 = phrase, 1 = wordlist
@@ -124,16 +151,18 @@ struct olc_command_data {
 bool can_start_olc_edit(char_data *ch, int type, any_vnum vnum);
 void get_icons_display(struct icon_data *list, char *save_buffer);
 void get_interaction_display(struct interaction_item *list, char *save_buffer);
-void get_resource_display(struct resource_data *list, char *save_buffer);
+void get_resource_display(char_data *ch, struct resource_data *list, char *save_buffer);
 void get_script_display(struct trig_proto_list *list, char *save_buffer);
 int find_olc_type(char *name);
 bool interactions_are_identical(struct interaction_item *a, struct interaction_item *b);
 bool player_can_olc_edit(char_data *ch, int type, any_vnum vnum);
+int which_olc_command(char_data *ch, char *command, bitvector_t olc_type);
 
 // olc auditor functions
 bool audit_ability(ability_data *abil, char_data *ch);
 bool audit_adventure(adv_data *adv, char_data *ch, bool only_one);
 bool audit_archetype(archetype_data *arch, char_data *ch);
+bool audit_attack_message(attack_message_data *amd, char_data *ch);
 bool audit_augment(augment_data *aug, char_data *ch);
 bool audit_building(bld_data *bld, char_data *ch);
 bool audit_class(class_data *cls, char_data *ch);
@@ -183,6 +212,7 @@ void setup_extra_desc_editor(char_data *ch, struct extra_descr_data *ex);
 bool delete_bld_relation_by_vnum(struct bld_relation **list, int type, bld_vnum vnum);
 bool delete_event_reward_from_list(struct event_reward **list, int type, any_vnum vnum);
 bool delete_from_interaction_list(struct interaction_item **list, int vnum_type, any_vnum vnum);
+bool delete_from_interaction_restrictions(struct interaction_item **list, int type, any_vnum vnum);
 bool delete_link_rule_by_portal(struct adventure_link_rule **list, obj_vnum portal_vnum);
 bool delete_link_rule_by_type_value(struct adventure_link_rule **list, int type, any_vnum value);
 bool delete_from_spawn_template_list(struct adventure_spawn **list, int spawn_type, mob_vnum vnum);
@@ -192,7 +222,7 @@ bool remove_vnum_from_class_skill_reqs(struct class_skill_req **list, any_vnum v
 // olc processors/parsers
 void archedit_process_gear(char_data *ch, char *argument, struct archetype_gear **list);
 void olc_process_applies(char_data *ch, char *argument, struct apply_data **list);
-void olc_process_custom_messages(char_data *ch, char *argument, struct custom_message **list, const char **type_names);
+void olc_process_custom_messages(char_data *ch, char *argument, struct custom_message **list, const char **type_names, const char *type_help_string);
 double olc_process_double(char_data *ch, char *argument, char *name, char *command, double min, double max, double old_value);
 bitvector_t olc_process_flag(char_data *ch, char *argument, char *name, char *command, const char **flag_names, bitvector_t existing_bits);
 int olc_process_number(char_data *ch, char *argument, char *name, char *command, int min, int max, int old_value);
@@ -218,6 +248,7 @@ void save_olc_vehicle(descriptor_data *desc);
 ability_data *setup_olc_ability(ability_data *input);
 adv_data *setup_olc_adventure(adv_data *input);
 archetype_data *setup_olc_archetype(archetype_data *input);
+attack_message_data *setup_olc_attack_message(attack_message_data *input);
 augment_data *setup_olc_augment(augment_data *input);
 book_data *setup_olc_book(book_data *input);
 bld_data *setup_olc_building(bld_data *input);
@@ -245,6 +276,7 @@ vehicle_data *setup_olc_vehicle(vehicle_data *input);
 void olc_show_ability(char_data *ch);
 void olc_show_adventure(char_data *ch);
 void olc_show_archetype(char_data *ch);
+void olc_show_attack_message(char_data *ch);
 void olc_show_augment(char_data *ch);
 void olc_show_building(char_data *ch);
 void olc_show_class(char_data *ch);
@@ -283,7 +315,6 @@ void get_template_spawns_display(struct adventure_spawn *list, char *save_buffer
 
 // olc helpers
 const char *get_interaction_target(int type, any_vnum vnum);
-char **get_weapon_types_string();
 
 // word count: core functions
 int wordcount_custom_messages(struct custom_message *list);
@@ -295,6 +326,7 @@ int wordcount_string(const char *string);
 int wordcount_ability(ability_data *abil);
 int wordcount_adventure(struct adventure_data *adv);
 int wordcount_archetype(archetype_data *arch);
+int wordcount_attack_message(attack_message_data *amd);
 int wordcount_augment(augment_data *aug);
 int wordcount_book(book_data *book);
 int wordcount_building(bld_data *bld);
@@ -320,6 +352,7 @@ int wordcount_vehicle(vehicle_data *veh);
 
 // helpers from other systems
 bool find_event_reward_in_list(struct event_reward *list, int type, any_vnum vnum);
+bool find_interaction_restriction_in_list(struct interaction_item *list, int type, any_vnum vnum);
 bool find_shop_item_in_list(struct shop_item *list, any_vnum vnum);
 
 
@@ -334,6 +367,15 @@ bool find_shop_item_in_list(struct shop_item *list, any_vnum vnum);
 	else if (is_abbrev(type_arg, "-"string)) {	\
 		argument = any_one_word(argument, val_arg);	\
 		if (!(var = *val_arg)) {	\
+			msg_to_char(ch, "Invalid %s '%s'.\r\n", string, val_arg);	\
+			return;	\
+		}	\
+	}
+
+#define FULLSEARCH_DOUBLE(string, var, min, max)	\
+	else if (is_abbrev(type_arg, "-"string)) {	\
+		argument = any_one_word(argument, val_arg);	\
+		if (!isdigit(*val_arg) || (var = atof(val_arg)) < min || var > max) {	\
 			msg_to_char(ch, "Invalid %s '%s'.\r\n", string, val_arg);	\
 			return;	\
 		}	\

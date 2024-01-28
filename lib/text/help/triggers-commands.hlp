@@ -9,12 +9,15 @@ inside.
 #d
 %AOE% OAOE MAOE VAOE WAOE
 
-%aoe% [modifier] [damage type]
+%aoe% [#attack] [modifier] [damage type]
 
 This does AoE -- Area-of-Effect -- damage to every enemy in the room. The mob
 version only counts combat enemies. The other versions call any player (as well
 as their followers) an enemy. Like %damage%, the damage is scaled, and a
 negative modifier causes healing instead.
+
+This supports an optional first parameter, a hash sign and a vnum, to indicate
+which attack messages to use. Without this, the AoE is silent.
 
 You can optionally specify a damage type (physical, magical, fire, poison,
 direct).
@@ -24,8 +27,9 @@ if the mob is in combat. Otherwise, it will hit all player characters. Non-mob
 versions of %aoe% hit ALL characters.
 
 Examples:
-  %aoe% 100  - group damage
-  %aoe% -20    - group healing
+  %aoe% 100         - group damage
+  %aoe% -20         - group healing
+  %aoe% #11815 100  - sends attack message 11815 on each hit
 
 See also: DEATH, %DAMAGE%, %DOT%
 #d
@@ -77,11 +81,12 @@ See also: DETACH, TATTACH, TDETACH
 #d
 %BUILD% MBUILD OBUILD VBUILD WBUILD
 
-Usage:  %build% <location> <vnum [dir] | ruin | demolish>
+Usage:  %build% <location> <vnum [dir] | ruin | complete | demolish | decay>
 
 This allows you to place a building on the map, or remove or ruin one. It is
 usually a bad idea to %build% tiles by coordinates. It's almost always
-safest to do this on the map tile the script is running in.
+safest to do this on the map tile the script is running in. This command can
+also complete a building or add a cycle of decay to it.
 
 Example:
   if (%room.sector% ~= Forest)
@@ -169,11 +174,14 @@ See also: REMOTE
 #d
 %DAMAGE% ODAMAGE MDAMAGE WDAMAGE VDAMAGE
 
-%damage% <victim> [modifier] [damage type]
+%damage% [#attack] <victim> [modifier] [damage type]
 
 Cause amount points of damage to victim. Damage is automatically scaled based
 on the mob or adventure level. Modifier is a percent of the scaled damage,
 where 100 is the normal level.
+
+This supports an optional first parameter, a hash sign and a vnum, to indicate
+which attack messages to use. Without this, the damage is silent.
 
 If modifier is negative, the player will be healed, but you should use %heal%
 instead.
@@ -211,14 +219,18 @@ See also: TATTACH, TDETACH, TRIG-ATTACH
 #d
 DG_AFFECT DG_AFFECTS
 
-Usage:  dg_affect [#affect vnum] <target> <property> <value | off [silent]> <duration>
+Usage:  dg_affect [#affect vnum] [@caster] <target> <property> <value | off [silent]> <duration>
         dg_affect <#affect vnum> <target> off [silent]
 
 Puts an affection or apply on the target. Durations must be non-zero. You can
 use -1 for infinite duration ONLY if the target is an NPC.
 
-The affect vnum arg is optional, and requires a # if you're going to use it.
-For example, #3001 uses the "fly" generic affect.
+The first two arguments are optional:
+  #affect - Uses a specific "affect" generic, by vnum (e.g. #3001 for "fly").
+  @caster - Specify who this affect is from. This must be a character variable
+     (e.g. @%self%) if you provide it. The caster can affect abilities such as
+     "cleanse", which won't remove penalties whose "caster" is the victim
+     themselves. For mob triggers, the mob is the default caster.
 
 Using "off" with no property results in removing all affects of a given type.
 If you add "silent" after "off", no wear-off message is shown.
@@ -229,20 +241,24 @@ Examples:
   dg_affect %actor% STRENGTH off  -- Removes any STRENGTH affects.
   dg_affect #3024 %actor% off  -- Removes all affects of vnum 134.
   dg_affect %actor% HASTE off silent  -- Quietly removes anything with HASTE.
+  dg_affect #9602 @%actor% %actor% DODGE -50 15  -- Non-cleansable penalty.
 
 See also: APPLIES, AFFECT FLAGS, GENERIC AFFECTS
 #d
 DG_AFFECT_ROOM
 
-Usage:  dg_affect_room [#affect vnum] <room> <affect> <on|off> <duration>
+Usage:  dg_affect_room [#affect vnum] [@caster] <room> <affect> <on|off> <duration>
         dg_affect_room [#affect vnum] <room> off
 
 Puts a room affect onto the target room. Durations must be non-zero, and you
 can use -1 for infinite duration if you're not on the map. Infinite affects
 can't be added to map locations.
 
-The affect vnum arg is optional, and requires a # if you're going to use it.
-For example, #3001 uses the "fly" generic affect.
+The first two arguments are optional:
+  #affect - Uses a specific "affect" generic, by vnum (e.g. #3001 for "fly").
+  @caster - Specify who this affect is from. This must be a character variable
+     (e.g. @%self%) if you provide it. For mob triggers, the mob is the default
+     caster.
 
 Using "off" with no property results in removing all affects of a given type.
 
@@ -438,16 +454,33 @@ See also: EXPRESSIONS, NESTED-IFS
 %load% obj <vnum> <room> [scale level]
 %load% mob <vnum> [ally] [scale level]
 %load% veh <vnum> [scale level]
+%load% book <vnum | lost> <room | in-obj | name <position>>
+%load% einv <vnum> <empire> <room | in-obj | name <position>>
 
 This command loads a mob, object, or vehicle into the game. No-take objects
 loaded to a mob will load to the room. Mobs loading other mobs may specify
 "ally" to set the loaded mob as a follower, which assists combat scripts in
 determining whose side they are on.
 
+It can also load a book either by book vnum (not object vnum) or a lost book,
+if you specify "lost" as the vnum. A lost book is one that is either by author
+id 0, or which is shelved in no libraries.
+
+You can also use this to take items from empire storage with "%load% einv".
+In this case, you must specify which empire after the vnum of the item. Also
+check first that the empire has some with %empire.has_storage(vnum,room)%.
+
 The %load% command will automatically scale things to the same level as the
 thing that does the loading (when it can). However, you can specify a
 different scale level if you like. For object loading, you MUST also include
 the target to load to AND the load position before the scale level.
+
+Adventure instance note: mobs and vehicles will be attached to the same
+instance as the mob, vehicle, or room which loaded them. If they were loaded
+by an object, they will be linked to the instance if loaded in/at an instance
+and if the object loading them is from the same adventure as the instance. You
+can use "nop %mob.link_instance%" and "nop %mob.unlink_instance%" to get finer
+control over this. A linked mob or vehicle vanishes when its instance despawns.
 
 Load an object to the room:  %load% obj 1300 room
 Load a scaled mob to room:  %load% mob 1300 %actor.level%
@@ -524,18 +557,23 @@ automatically format itself.
 
 Supported fields are:
  Players: companion <vnum | none>
- Mobs: keywords, longdesc, sex, shortdesc, lookdesc, append-lookdesc,
-          append-lookdesc-noformat **
+ Mobs: keywords, longdesc, sex, tag *, shortdesc, lookdesc, append-lookdesc,
+          append-lookdesc-noformat
  Objects: keywords, longdesc, shortdesc, lookdesc, append-lookdesc,
           append-lookdesc-noformat
  Vehicles: icon, keywords, longdesc, shortdesc, lookdesc, append-lookdesc,
           append-lookdesc-noformat
- Rooms: icon, title, description, append-description, append-desc-noformat
+ Rooms: icon, title, description, append-description, append-desc-noformat,
+          magic-growth *
 
 Appending to descriptions triggers string formatting. Using the 'noformat'
 version will prevent this.
 
-** NOTE: Regular mobs do not save lookdescs to file (except companions).
+Special fields:
+ %mod% %mob% tag %player% - Changes who tagged the mob (and will get the loot)
+    to the specified player. Also accepts "none" to clear tags.
+ %mod% %room% magic-growth - Attempts to run a magic-growth evolution silently;
+    this can fail if there isn't one, or if the percent is below 100.
 
 &rWARNING&0: Each line of a script can be no longer than 255 characters.
 #d
@@ -554,7 +592,7 @@ See also: MORPH, MORPHEDIT
 #d
 %OWN% MOWN OOWN VOWN WOWN
 
-Usage:  %own% [type] <target> <empire>
+Usage:  %own% [type] <target> <empire | none>
 
 This command changes empire ownership of a thing (mob, obj, vehicle, or room).
 Be very careful using this command in scripts, as it wields a great deal of
@@ -576,6 +614,10 @@ Purge removes objects, mobs, or vehicles from the game. If no argument is
 given, then all objects and mobs (but not vehicles) in the room will be
 removed. If there is an argument, only that thing will be  purged. Players
 cannot be purged.
+
+If something purges itself in its own "load" (or "get", or similar) trigger,
+consider doing a "wait 1" before the purge to allow other scripts and code to
+run.
 
 The "purge instance" feature lets you purge ALL mobs or vehicles by vnum from
 the instance. It can also purge objects inside the instance by vnum, but this
@@ -614,10 +656,12 @@ Quest commands:
   &cstart&0 - Will give the player the quest, whether or not they meet the
     prerequisites, if they are not already on it. Consider checking
     %char.completed_quest(vnum)% or %char.can_start_quest(vnum)% first.
-  &ctrigger&0 - Activate any 'triggered' quest task, if the player is on that
-    quest. You can check %char.quest_triggered(vnum)% to see if the condition
-    is already triggered.
-  &cuntrigger&0 - Cancels a 'triggered' quest task, if the player has it.
+  &ctrigger&0 - Adds 1 to any 'triggered' quest task, if the player is on that
+    quest. You can check %char.quest_triggered(vnum)% to see how many times
+    the quest has been triggered (up to its maximum).
+  &cuntrigger&0 - Removes 1 from 'triggered' quest task, if the player has it.
+  &cresettrigger&0 - Cancels all progress on a 'triggered' quest task.
+  &csettrigger&0 - Sets a 'triggered' quest task to a specific value.
 
 See also: CHAR-VAR, QUEST
 #d
@@ -699,7 +743,9 @@ command does NOT end the trigger's execution. The value is returned after all
 the commands have been executed, or a wait or halt command is called.
 
 The help files for individual trigger types will explain what happens when the
-script returns 0, if anything.
+script returns 0, if anything. This result happens as soon as a 'wait' or
+'halt' statement occurs. Setting a return value AFTER a 'wait' will have no
+effect.
 
 See also: HALT, WAIT
 #d
@@ -800,12 +846,24 @@ Switch evaluates an expression and looks for a match amongst the case
 statements that follow. If none of the following case statements are a match,
 and a default statement exists, the default statement is considered a match.
 If a match is found, the commands that follow it, up until a break or done
-command, are executed. 
+command, are executed.
 
 &cbreak&0 - Used to terminate cases in a switch.
 &ccase&0 - Used to begin a new conditional group in a switch block.
 &cdefault&0 - Similar to case but matches any condition not met.
 &cdone&0 - Used to terminate a switch (or while) block.
+
+You can also chain cases like:
+  switch %var%
+    case 1
+    case 2
+      ...
+    break
+    case 3
+    default
+      ...
+    break
+  done
 #d
 %SUBECHO% MSUBECHO OSUBECHO WSUBECHO
 
@@ -892,6 +950,7 @@ See also: TATTACH, TRIG-DETACH, TRIG-ATTACH, OLC, TRIGEDIT, STAT
 %TELEPORT% MTELEPORT OTELEPORT VTELEPORT WTELEPORT
 
 %teleport% <victim | vehicle | object> <location>
+%teleport% <object> <person | vehicle | object | location>
 %teleport% all <location>
 %teleport% adventure <location>
 
@@ -902,6 +961,9 @@ command. Teleport can also move vehicles or objects.
 
 If you target 'adventure', all players in the entire adventure zone instance,
 plus their NPC followers, will be teleported to the target.
+
+Objects can be moved into other objects, into a person's inventory, or into
+a vehicle's inventory with this command.
 
 You can use i### to target a room in the current adventure instance by its
 room template vnum instead of live room number (if used in an instanced zone).
@@ -1009,7 +1071,7 @@ See also: REMOTE, RDELETE, SHOW VARIABLES
 #d
 WAIT WAITUNTIL WAIT-UNTIL PAUSE TRIGEDIT-TIMING TIMING
 
-Usage:  wait <time> [s]
+Usage:  wait <time> [s | t]
         wait until <mudtime>
 
 The wait statement is used to 'pause' the script execution for a period of 
@@ -1017,11 +1079,21 @@ time. When a script is being executed it will attempt to execute all commands
 right away. To get small breaks in, and perhaps give the players time to adjust, 
 use the wait command.
 
-Note: A trigger won't fire again while it's still in a 'wait', so be careful
-using this on Greet triggers.
-Note: Triggers attached to adventures or quests must not use 'wait', because
-those triggers only exist long enough to run, and will cancel themselves when
-they hit a 'wait'.
+Wait times are measured in 'passes', which are very very short; 'wait 1' will
+only pause long enough for players to get a fresh prompt, then will resume. You
+can use 'wait 1 s' to wait for 1 second instead, or 'wait 1 t' to wait for 1
+game hour.
+
+Beware of moving or dead targets when using 'wait'. For example, if %actor%
+dies during a wait, the variable may no longer be valid. This is hard to detect
+in DG Scripts because it ignores missing variables. The best way to check is to
+store %actor.id% to a variable before the 'wait', then compare that variable to
+%actor.id% again after the 'wait'. If it changed, the original actor is gone.
+
+A trigger won't fire again while it's still in a 'wait', so be careful using
+this on Greet triggers. Triggers attached directly to adventures or quests must
+not use 'wait', because those triggers only exist long enough to run, and will
+cancel themselves entirely when they hit a 'wait'.
 
 Examples:
   say GET OUT! NOW!
@@ -1061,6 +1133,9 @@ The "done" command is used to terminate a switch or while.
 while %something%
   ...
 done
+
+Note that "break" can be used to end a "while" loop early, as in many
+languages.
 
 See also: SWITCH
 #d

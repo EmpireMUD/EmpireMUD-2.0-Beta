@@ -1069,7 +1069,7 @@ E
 dust~
 Pixy dust hangs in the air, lingering without ever fully settling.
 ~
-I 20 11808 100.00 1  # CHOP: blue sapling
+I 20 11808 100.00 4  # CHOP: blue sapling
 T 11929
 T 11944
 T 11826
@@ -1124,7 +1124,7 @@ E
 dust~
 Pixy dust hangs in the air, lingering without ever fully settling.
 ~
-I 20 11808 100.00 1  # CHOP: blue sapling
+I 20 11808 100.00 4  # CHOP: blue sapling
 T 11929
 T 11943
 T 11826
@@ -1277,7 +1277,6 @@ scrapes~
 looks more like the wall slides out, but you don't see how to open it. You'd
 have to search around.
 ~
-T 11921
 T 11936
 S
 #11816
@@ -1351,7 +1350,7 @@ be oak, though they're rough and unfinished.
 ~
 M 1 11922 100.00 4
 T 11825
-T 11921
+T 11936
 S
 #11818
 A Most Peculiar Maze~
@@ -1394,7 +1393,7 @@ E
 dust~
 Pixy dust hangs in the air, lingering without ever fully settling.
 ~
-I 20 11808 100.00 1  # CHOP: blue sapling
+I 20 11808 100.00 4  # CHOP: blue sapling
 T 11929
 T 11943
 T 11826
@@ -1449,7 +1448,7 @@ E
 dust~
 Pixy dust hangs in the air, lingering without ever fully settling.
 ~
-I 20 11808 100.00 1  # CHOP: blue sapling
+I 20 11808 100.00 4  # CHOP: blue sapling
 T 11929
 T 11944
 T 11826
@@ -1504,7 +1503,7 @@ E
 dust~
 Pixy dust hangs in the air, lingering without ever fully settling.
 ~
-I 20 11808 100.00 1  # CHOP: blue sapling
+I 20 11808 100.00 4  # CHOP: blue sapling
 T 11929
 T 11943
 T 11826
@@ -1559,7 +1558,7 @@ E
 dust~
 Pixy dust hangs in the air, lingering without ever fully settling.
 ~
-I 20 11808 100.00 1  # CHOP: blue sapling
+I 20 11808 100.00 4  # CHOP: blue sapling
 T 11929
 T 11944
 T 11826
@@ -1705,7 +1704,7 @@ his portrait reads:
 ~
 M 1 11831 100.00 5
 T 11825
-T 11921
+T 11936
 S
 #11823
 A Most Peculiar Maze~
@@ -1757,7 +1756,7 @@ E
 dust~
 Pixy dust hangs in the air, lingering without ever fully settling.
 ~
-I 20 11808 100.00 1  # CHOP: blue sapling
+I 20 11808 100.00 4  # CHOP: blue sapling
 T 11929
 T 11943
 T 11826
@@ -1812,7 +1811,7 @@ E
 dust~
 Pixy dust hangs in the air, lingering without ever fully settling.
 ~
-I 20 11808 100.00 1  # CHOP: blue sapling
+I 20 11808 100.00 4  # CHOP: blue sapling
 T 11929
 T 11944
 T 11826
@@ -1867,7 +1866,7 @@ E
 dust~
 Pixy dust hangs in the air, lingering without ever fully settling.
 ~
-I 20 11808 100.00 1  # CHOP: blue sapling
+I 20 11808 100.00 4  # CHOP: blue sapling
 M 1 11887 100.00 1
 T 11929
 T 11943
@@ -1921,7 +1920,7 @@ E
 dust~
 Pixy dust hangs in the air, lingering without ever fully settling.
 ~
-I 20 11808 100.00 1  # CHOP: blue sapling
+I 20 11808 100.00 4  # CHOP: blue sapling
 M 1 11886 100.00 1
 T 11929
 T 11943
@@ -2544,8 +2543,7 @@ cabinets skeleton~
    You open one of the cabinets but there's a skeleton inside and you quickly
 shut it.
 ~
-T 11921
-T 11921
+T 11936
 S
 #11836
 The Lich Labs~
@@ -2633,7 +2631,6 @@ The walls in here are ebony, except the outer wall, which is stone.
 M 1 11836 100.00 1
 M 1 11834 100.00 5
 T 11936
-T 11921
 S
 #11837
 The Experimentation Chamber~
@@ -2842,7 +2839,6 @@ bookshelf bookshelves shelf shelves chains spine~
 books on enchanting. Each and every book is chained to the shelf by its spine.
 ~
 T 11926
-T 11921
 T 11936
 S
 #11840
@@ -2964,7 +2960,6 @@ The east doorway leads back to the main lab.
 ~
 M 1 11833 100.00 1
 T 11936
-T 11921
 S
 #11860
 The Upper Walkway of the Tower Skycleave~
@@ -4012,6 +4007,7 @@ The air is hazy and the sun barely shines through.
 T 11945
 T 11946
 T 11964
+Z1 6
 S
 #11876
 Along the Sloping Branch~
@@ -4080,6 +4076,7 @@ The air is hazy and the sun barely shines through.
 T 11945
 T 11946
 T 11964
+Z1 6
 S
 #11877
 A Fork in the Branch~
@@ -4151,6 +4148,7 @@ You can't see very far due to the heavy mist.
 T 11945
 T 11946
 T 11964
+Z1 6
 S
 #11878
 At the Top of a Ladder at the Base of the Branch~
@@ -4233,6 +4231,7 @@ The air is hazy and the sun barely shines through.
 T 11945
 T 11946
 T 11964
+Z1 6
 S
 #11879
 The Great Tree, Atop the Glimmering Stair~
@@ -4319,6 +4318,7 @@ T 11879
 T 11945
 T 11946
 T 11964
+Z1 6
 S
 #11880
 The Grand Overlook Above Smol Nes-Pik~
@@ -4393,6 +4393,7 @@ M 0 11880 100.00 1
 T 11945
 T 11946
 T 11964
+Z1 6
 S
 #11881
 On the Glimmering Staircase Around the Great Tree~
@@ -4480,6 +4481,7 @@ the mist below that you can't see much else.
 T 11945
 T 11946
 T 11964
+Z1 6
 S
 #11882
 The Great Green Seashell of Smol Nes-Pik~
@@ -4540,6 +4542,7 @@ M 0 11883 100.00 1
 T 11945
 T 11946
 T 11964
+Z1 1
 S
 #11883
 On the Glimmering Staircase Around the Great Tree~
@@ -4632,6 +4635,7 @@ M 0 11877 100.00 1
 T 11945
 T 11946
 T 11964
+Z1 6
 S
 #11884
 The Obsidian Palace of Smol Nes-Pik~
@@ -4747,6 +4751,7 @@ T 11945
 T 11946
 T 11960
 T 11964
+Z1 1
 S
 #11885
 The Dew Pools of Smol Nes-Pik~
@@ -4799,6 +4804,7 @@ M 0 11885 100.00 1
 T 11945
 T 11946
 T 11964
+Z1 1
 S
 #11886
 Around the Great Tree, Above the Broken Stair~
@@ -4881,6 +4887,7 @@ The obsidian palace casts a grim shadow in the mist.
 T 11945
 T 11946
 T 11964
+Z1 6
 S
 #11887
 A Rotten Hollow in the Great Tree~
@@ -4941,6 +4948,7 @@ M 0 11886 100.00 1
 T 11945
 T 11946
 T 11964
+Z1 6
 S
 #11888
 Rot and Ruin~
@@ -4995,6 +5003,7 @@ T 11942
 T 11945
 T 11946
 T 11964
+Z1 6
 S
 #11889
 The Royal Chambers~
@@ -5038,6 +5047,7 @@ to resemble trees, leaves, flowers, buds, and roots.
 T 11945
 T 11946
 T 11964
+Z1 1
 S
 #11890
 Trapped in a Jar~
@@ -5071,6 +5081,7 @@ T 11945
 T 11946
 T 11951
 T 11964
+Z1 1
 S
 #11891
 Rot and Ruin~
@@ -5089,5 +5100,6 @@ The staircase has fallen from the tree and lies in ruins around you!
 T 11952
 T 11953
 T 11964
+Z1 6
 S
 $

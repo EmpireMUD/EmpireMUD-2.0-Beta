@@ -21,7 +21,7 @@
 *       It has been tossed around rigorously, if you are going to use     *
 *       it, heed the warning above.                                       *
 *                                                                         *
-*  EmpireMUD code base by Paul Clarke, (C) 2000-2015                      *
+*  EmpireMUD code base by Paul Clarke, (C) 2000-2024                      *
 *  All rights reserved.  See license.doc for complete information.        *
 *                                                                         *
 *  EmpireMUD based upon CircleMUD 3.0, bpl 17, by Jeremy Elson.           *
@@ -299,7 +299,7 @@ struct b3_player_special_data_saved {
 	sh_int skill_level;  // levels computed based on class skills
 	sh_int highest_known_level;	// maximum level ever achieved (used for gear restrictions)
 	sh_int last_known_level;	// set on save/quit/alt
-	ubyte class_progression;	// % of the way from SPECIALTY_SKILL_CAP to CLASS_SKILL_CAP
+	ubyte class_progression;	// % of the way from SPECIALTY_SKILL_CAP to MAX_SKILL_CAP
 	ubyte class_role;	// ROLE_x chosen by the player
 	sh_int character_class;  // character's class as determined by top skills
 	
@@ -859,7 +859,9 @@ void read_from_file(void *buffer, int size, long filepos) {
 	}
 
 	fseek(mail_file, filepos, SEEK_SET);
-	fread(buffer, size, 1, mail_file);
+	if (fread(buffer, size, 1, mail_file) < 1) {
+		printf("SYSERR: Unable to read mail file '%s'.\r\n", MAIL_FILE);
+	}
 	fclose(mail_file);
 	return;
 }
@@ -1544,13 +1546,21 @@ int main(int argc, char *argv[]) {
 	
 	// first determine top account
 	while (!feof(ptOldHndl)) {
-		fread(&stOld, sizeof(struct b3_char_file_u), 1, ptOldHndl);
-		top_account_id = MAX(top_account_id, stOld.player_specials_saved.account_id);
+		if (fread(&stOld, sizeof(struct b3_char_file_u), 1, ptOldHndl) > 0) {
+			top_account_id = MAX(top_account_id, stOld.player_specials_saved.account_id);
+		}
+		else {
+			printf("Failure reading file: lib/etc/players\n");
+			exit(1);
+		}
 	}
 	rewind(ptOldHndl);
 	
 	while (!feof(ptOldHndl)) {
-		fread(&stOld, sizeof(struct b3_char_file_u), 1, ptOldHndl);
+		if (fread(&stOld, sizeof(struct b3_char_file_u), 1, ptOldHndl) > 0) {
+			printf("Failure reading file: lib/etc/players\n");
+			exit(1);
+		}
 		convert_char(&stOld);
 		
 		// log progress to screen

@@ -6,7 +6,7 @@ S
 #11804
 Enchanted Water~
 1 0
-0 0 3 0
+0 0 3 1
 T0
 enchanted water~
 T1
@@ -416,7 +416,7 @@ S
 #11885
 pure morning dew~
 1 0
--4 0 4 0
+-4 0 4 3
 T0
 pure morning dew~
 T1

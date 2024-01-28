@@ -6,7 +6,7 @@
 *
 * Game-specific tips
 The website has a graphical world map at http://empiremud.net/map-viewer/
-You can see a list of what's changed recently at http://empiremud.net/patch-notes/
+You can see a list of what's changed recently at https://empiremud.net/empiremud-patch-notes.html
 *
 * General tips
 You can always ask for help on the /newbie channel.
@@ -106,7 +106,7 @@ Some mobs will pursue you if you flee from them. Get far enough away or lose the
 Pursuing mobs will chase you down even if you go inside a building.
 You can gain reputation with factions in order to unlock more quests and rewards.
 You can do any 5 daily quests per day. Most of these quests repeat every day.
-Dismantle your mines before the end of the year. That's when mountains refresh with new ore.
+Dismantle your mines when they're empty. Clear mountains eventually refresh with new ore.
 You can use 'build info', 'craft info', etc. to see what's required to make something.
 If you flee from a mob, it will heal very quickly.
 Commands like /history, tellhistory, and sayhistory will tell you what you just missed.
@@ -148,6 +148,13 @@ You can use 'city list <empire>' to find the locations of other empires.
 Type 'climb' to move onto mountains, or 'toggle autoclimb' to remove the need to do this.
 Type 'swim' to move into water, or 'toggle autoswim' to remove the need to do this.
 Use 'mapscan' to locate islands across the sea.
-Use 'run' to set a path and move quickly. You can 'toggle travel-look' to stop seeing rooms while running.
+Use 'run' to set a path and move quickly. You can 'smessages travel auto look' to stop seeing rooms while running.
 Try the 'directions' command to figure out how to get to a set of coordinates.
+If the weather or temperature messages are overwhelming, try the 'statusmessages' command.
+You can look in the direction of a building to see who owns it and which direction to enter it from.
+Bound items can be stored in your home. See 'help home' for more info.
+You can see more information about an ability by typing 'ability info <name>'.
+You can see buffs and debuffs on other characters by using 'affects' on them.
+You can add other players as friends and see when they're online.
+Dump out a cart quickly with the empty command.
 $~

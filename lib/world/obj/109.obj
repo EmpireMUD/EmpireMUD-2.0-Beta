@@ -4,7 +4,7 @@ a dragon token~
 A dragon token is lying here.~
 This token can be used to buy items from the colossal red dragon token shop.
 ~
-12 p a 0 4
+12 p a 0 0 4
 1 10900 0
 7 0
 S
@@ -16,7 +16,7 @@ A large pile of red dragon hide is lying here.~
 specially treated and woven into dragon cloth. No matter what you do with it,
 it can be used to make powerful equipment.
 ~
-3 e a 0 6
+3 e a 0 0 6
 0 0 0
 7 0
 I 18 10928 100.00 1 x  # TAN: tough dragon leather
@@ -34,7 +34,7 @@ A colossal dragon bone lies across the walkway.~
 since it's almost as big as you are. Of course, you can also carry a lot of
 trees in that pack of yours.
 ~
-3 e a 0 5
+3 e a 0 0 5
 0 0 0
 14 0
 O+ 1 6565
@@ -50,7 +50,7 @@ A crimson serpent egg is smouldering on the ground.~
    The crimson red egg is the size of your head, and is hot to the touch. Type
 'use egg' to summon a crimson serpent mount.
 ~
-3 ep a 0 3
+3 ep a 0 0 3
 10904 0 0
 14 0
 T 9910
@@ -62,7 +62,7 @@ A crimson dragon egg is smouldering here.~
    The crimson red egg is the size of your head, and is hot to the touch. Type
 'use egg' to summon a crimson dragon mount.
 ~
-3 ep a 0 5
+3 ep a 0 0 5
 10905 0 0
 14 0
 T 9910
@@ -74,7 +74,7 @@ A sea dragon egg is smouldering here.~
    The crimson red egg is the size of your head, and is hot to the touch. Type
 'use egg' to summon a sea dragon mount.
 ~
-3 ep a 0 6
+3 ep a 0 0 6
 10906 0 0
 14 0
 T 9910
@@ -87,9 +87,9 @@ A huge dragon steak is lying on the ground.~
 long-lasting and very filling. Or, if you're a Gourmet Chef, you can make a
 roast dragon feast and boost the party's damage significantly.
 ~
-3 0 a 0 8
+3 C a 0 0 9
 0 0 0
-7 288
+7 48
 O+ 1 6204
 R
 4 5119 0
@@ -100,9 +100,11 @@ a dragon roast~
 Some roast dragon meat has been left here.~
 This giant piece of roast meat has the pre-charred aroma of dragon.
 ~
-6 0 a 0 6
+6 0 a 0 0 11
 72 0 0
-7 288
+7 0
+C
+100 100
 M
 4
 You nearly choke on a huge bite of $p.~
@@ -122,9 +124,9 @@ A roast dragon feast is set out here!~
    This feast of roast dragon meat is enough to feed the whole party. It will
 greatly increase damage in combat.
 ~
-6 m 0 0 5
+6 m 0 0 0 6
 96 0 0
-7 336
+7 24
 A
 21 1 0
 A
@@ -141,7 +143,7 @@ a dragonsteel warhammer~
 A dragonsteel warhammer is stamped into the ground.~
 The hammer is forged from dragonsteel, the distilled bone of a massive dragon.
 ~
-1 empy an 0 5
+1 empy an 0 0 5
 0 1 6
 14 0
 C
@@ -161,7 +163,7 @@ A great dragonsteel claymore is stuck into the ground!~
    The claymore is crafted from powerful dragonsteel, a metal so hard that no
 known metal can break it. Once forged, it is nearly unstoppable.
 ~
-1 ehmnpy an 0 5
+1 ehmnpy an 0 0 5
 0 1 1
 14 0
 C
@@ -181,7 +183,7 @@ A dragonbone mace is lying here.~
    The mace is made from dragonbone, wrapped in dragonsteel and lined with
 imperium make it unbreakable.
 ~
-1 empy an 0 5
+1 empy an 0 0 5
 0 1 5
 14 0
 A
@@ -208,7 +210,7 @@ A draconic wand is sticking out of the ground.~
 with no fuel and no sign of cooling off. Only a powerful caster can even stand
 to hold it.
 ~
-1 empy an 0 6
+1 empy an 0 0 6
 0 1 16
 14 0
 A
@@ -232,7 +234,7 @@ A dragonbone staff simmers on the ground.~
    The dragonbone staff is too large to hold, but with just the slightest touch
 of mana, it becomes effortless.
 ~
-1 empy an 0 7
+1 empy an p 0 8
 0 1 18
 14 0
 C
@@ -252,7 +254,7 @@ A dragonbone wristblade is lying on the ground.~
    The wristblade is sharp, and made to slide out from a sleeve and lock into
 place. Most victims would never see it coming.
 ~
-1 impy ano 0 7
+1 impy ano 0 0 7
 0 1 4
 14 0
 A
@@ -277,7 +279,7 @@ A dragonbone tower shield is standing here.~
 bones of some colossal dragon. The front is painted to look like the dragon's
 flames.
 ~
-23 empy ao 0 6
+23 empy ao 0 0 6
 0 0 0
 14 0
 A
@@ -302,7 +304,7 @@ A red dragon charm is lying here.~
 powerful magicks. It's warm to the touch, and imbues the user with healing
 fire.
 ~
-3 empy ao 0 8
+3 empy ao 0 0 8
 0 0 0
 14 0
 A
@@ -324,7 +326,7 @@ The tome of dragonkind is sitting here.~
 mortal can open it or read its pages. But in the hands of the right mage, it
 releases incredible power.
 ~
-3 empy ao 0 10
+3 empy ao 0 0 10
 0 0 0
 14 0
 A
@@ -349,7 +351,7 @@ A crimson dragon girdle is draped here.~
    The girdle is made from tough red dragon leather. It's surprisingly light
 and flexible, for how strong it is.
 ~
-27 mpy al 0 7
+27 mpy al 0 0 7
 1 0 0
 7 0
 A
@@ -370,7 +372,7 @@ A burning dragonsteel waistband is lying on the ground.~
 to melt as they strike it. The center of the waistband has the shape of a
 dragon's head, and glows bright crimson.
 ~
-27 mpy al 0 8
+27 mpy al 0 0 8
 3 0 0
 14 0
 A
@@ -395,7 +397,7 @@ a flaming draconic cincture~
 A flaming draconic cincture is burning on the ground.~
 The cincture is made from dragon cloth, and is forever aflame.
 ~
-27 mpy al 0 9
+27 mpy al 0 0 9
 0 0 0
 7 0
 A
@@ -416,7 +418,7 @@ a burning dragoncloth sash~
 A burning dragoncloth sash is lying here.~
 This burning sash brings the great power from the dragon it was sewn from.
 ~
-27 mpy al 0 9
+27 mpy al 0 0 9
 0 0 0
 7 0
 A
@@ -435,7 +437,7 @@ A dragonsflame butcher block is smouldering here.~
 tent' to make a building that is a stable with a cooking fire. Like regular
 stables, animals can be stored in it.
 ~
-3 e a 0 3
+3 e a 0 0 3
 0 0 0
 1 0
 R
@@ -451,7 +453,7 @@ A dragonstone hearth is lying here.~
 for yourself. Type 'build dragoncave <direction>' to set up this great house in
 the mountainside. You need the Luxury ability to start building it.
 ~
-3 e a 0 4
+3 e a 0 0 4
 0 0 0
 1 0
 R
@@ -466,7 +468,7 @@ A dragonseye ruby lying here.~
    The dragonseye ruby is hot to the touch, and quite large. You can use it to
 make a great statue with 'build dragonstatue'. Statues add fame to the empire.
 ~
-3 e a 0 3
+3 e a 0 0 3
 0 0 0
 12 0
 R
@@ -482,7 +484,7 @@ A dragonquill pen is stabbed into the ground.~
 great decoration in a magnificent library. Type 'build dragonlibrary
 <direction>' to construct it; this library comes with an alchemy laboratory.
 ~
-3 e a 0 4
+3 e a 0 0 4
 0 0 0
 1 0
 R
@@ -499,7 +501,7 @@ on a loom. The result is a tough, powerful, magical cloth. It is suited for
 many enchanted crafts. You can light the cloth on fire to return it to its
 original dragon hide state.
 ~
-3 e a 0 8
+3 e a 0 0 8
 0 0 0
 7 0
 I 11 10902 100.00 1 x  # LIGHT: red dragon hide
@@ -517,7 +519,7 @@ A pile of tough dragon leather is stacked here.~
 This could be made into powerful gear. You can light the leather on fire to
 return it to its original dragon hide state.
 ~
-3 e a 0 8
+3 e a 0 0 8
 0 0 0
 7 0
 I 11 10902 100.00 1 x  # LIGHT: red dragon hide
@@ -536,9 +538,11 @@ liquifies like metal and then can be forged into powerful weapons and armor.
 You can light the unforged dragonsteel ingot on fire to return it to its
 original dragon bone state.
 ~
-3 e a 0 8
+3 e a 0 0 9
 0 0 0
 14 0
+C
+100 100
 I 11 10903 100.00 1 x  # LIGHT: colossal dragon bone
 O+ 1 6760
 R
@@ -552,7 +556,7 @@ the sense of victory~
 A sense of victory hangs in the air.~
 It seems that this adventure has been completed.
 ~
-3 0 0 0 6
+3 B 0 0 0 7
 0 0 0
 10 144
 T 10930
@@ -564,9 +568,11 @@ The dragonsteel warhammer schematic is lying here.~
    This schematic makes a dragonsteel warhammer, a powerful 1-handed melee
 weapon. You require Mythic Forge (Trade/Battle) to forge this weapon.
 ~
-7 0 a 0 5
+7 0 a 0 0 6
 10910 0 0
 0 0
+C
+1 1
 S
 #10932
 schematic dragonsteel claymore~
@@ -575,9 +581,11 @@ The dragonsteel claymore schematic is lying here.~
    This schematic makes a dragonsteel claymore, a powerful 2-handed melee
 weapon. You require Mythic Forge (Trade/Battle) to forge this weapon.
 ~
-7 0 a 0 6
+7 0 a 0 0 7
 10911 0 0
 0 0
+C
+1 1
 S
 #10933
 schematic dragonbone mace~
@@ -586,9 +594,11 @@ The dragonbone mace schematic is lying here.~
    This schematic makes a dragonbone mace, a strong tank weapon. You require
 Mythic Forge (Trade/Battle) to forge this weapon.
 ~
-7 0 a 0 7
+7 0 a 0 0 8
 10912 0 0
 0 0
+C
+1 1
 S
 #10934
 schematic wand draconic~
@@ -597,9 +607,11 @@ The draconic wand schematic is lying here.~
    This schematic makes a flaming draconic wand, a powerful healer's weapon.
 You need Lore Crafts (Trade/High Sorcery) to craft this weapon.
 ~
-7 0 a 0 8
+7 0 a 0 0 9
 10913 0 0
 0 0
+C
+1 1
 S
 #10935
 schematic dragonbone staff~
@@ -608,9 +620,11 @@ The dragonbone staff schematic is lying here.~
    This schematic makes a flaming dragonbone staff, a powerful caster weapon.
 You need Lore Crafts (Trade/High Sorcery) to craft this weapon.
 ~
-7 0 a 0 9
+7 0 a 0 0 10
 10914 0 0
 0 0
+C
+1 1
 S
 #10936
 design wristblade dragonbone~
@@ -620,9 +634,11 @@ The dragonbone wristblade design is lying here.~
 melee warriors. You require Mythic Forge (Trade/Battle) to forge this off-hand
 weapon.
 ~
-7 0 a 0 10
+7 0 a 0 0 11
 10915 0 0
 0 0
+C
+1 1
 S
 #10937
 design dragonbone tower shield~
@@ -631,9 +647,11 @@ The dragonbone tower shield design is lying here.~
    This design is for a dragonbone tower shield, a strong shield for tanks.
 You require Mythic Forge (Trade/Battle) to forge this shield.
 ~
-7 0 a 0 11
+7 0 a 0 0 12
 10916 0 0
 0 0
+C
+1 1
 S
 #10938
 design red dragon charm~
@@ -642,9 +660,11 @@ The red dragon charm design is lying here.~
    This design is for a flaming red dragon charm, a powerful healer off-hand
 item. You need Lore Crafts (Trade/High Sorcery) to craft this off-hand trinket.
 ~
-7 0 a 0 12
+7 0 a 0 0 13
 10917 0 0
 0 0
+C
+1 1
 S
 #10939
 design tome dragonkind~
@@ -653,9 +673,11 @@ The dragonkind tome design is lying here.~
    This design creates the tome of dragonkind, a powerful caster off-hand item.
 You need Lore Crafts (Trade/High Sorcery) to craft this off-hand tome.
 ~
-7 0 a 0 13
+7 0 a 0 0 14
 10918 0 0
 0 0
+C
+1 1
 S
 #10940
 pattern dragon girdle crimson~
@@ -665,9 +687,11 @@ The crimson dragon girdle pattern is lying here.~
 waistband for melee warriors. You need Fabled Hides (Trade/Natural Magic) to
 sew this belt.
 ~
-7 0 a 0 14
+7 0 a 0 0 15
 10919 0 0
 0 0
+C
+1 1
 S
 #10941
 pattern burning dragonsteel waistband~
@@ -676,9 +700,11 @@ The burning dragonsteel waistband pattern is lying here.~
    This pattern creates a burning dragonsteel waistband, a heavy armored
 tanking belt. You need Fabled Hides (Trade/Natural Magic) to sew this belt.
 ~
-7 0 a 0 15
+7 0 a 0 0 16
 10920 0 0
 0 0
+C
+1 1
 S
 #10942
 pattern draconic flaming cincture~
@@ -687,9 +713,11 @@ The flaming draconic cincture pattern is lying here.~
    This pattern creates a flaming draconic cincture, a powerful mage armor belt
 for healers. You need Legendary Stitching (Trade/Stealth) to sew this belt.
 ~
-7 0 a 0 17
+7 0 a 0 0 18
 10921 0 0
 0 0
+C
+1 1
 S
 #10943
 pattern burning dragoncloth sash~
@@ -698,9 +726,11 @@ The burning dragoncloth sash pattern is lying here.~
    This pattern creates a burning dragoncloth sash, a powerful mage armor belt
 for casters. You need Legendary Stitching (Trade/Stealth) to sew this belt.
 ~
-7 0 a 0 17
+7 0 a 0 0 18
 10922 0 0
 0 0
+C
+1 1
 S
 #10944
 stone red dragon shining~
@@ -710,7 +740,7 @@ A shining red dragon stone is lying here.~
 of this one, it must have come from a colossal dragon! The dragon essence
 stored in this type of stone is used to craft legendary weapons and armor.
 ~
-15 0 a 0 3
+15 0 a 0 0 3
 1 2 0
 12 0
 C
@@ -728,7 +758,7 @@ The red dragon's hoard is lying here!~
 But fencing such a rare hoard would be impossible, so you should return it to
 Bangles the thief and let him reward you.
 ~
-3 0 a 0 1
+3 0 a 0 0 1
 0 0 0
 4 0
 C
@@ -743,7 +773,7 @@ A pair of magnificent dragon bracelets is lying here.~
 from the looks of the scales, it was a big one! These bracelets surely show off
 the majesty of your empire!
 ~
-2 eo aj 0 1
+2 eo aj 0 0 1
 0 0 0
 4 0
 A
@@ -761,9 +791,11 @@ The magnificent dragon bracelet schematic is lying here.~
 wrist item that brings Greatness to your empire! You require Fabled Hides
 (Trade/Natural Magic) to sew this item.
 ~
-7 0 a 0 7
+7 0 a 0 0 8
 10946 0 0
 0 0
+C
+1 1
 S
 #10950
 skin dragon molted moulted mountainous pile~
@@ -773,7 +805,7 @@ A mountainous pile of molted dragon skin rests in the muck.~
 only belong to a dragon which, like all serpents, sheds its outer skin en
 masse. Perhaps the dragon hasn't gone far.
 ~
-3 0 0 0 3
+3 B 0 0 0 4
 0 0 0
 7 1152
 C
@@ -787,7 +819,7 @@ The hoard of a muck dragon is piled high and gleaming.~
    This dragon's hoard is mostly gold, piled high, comprised of everything from
 coins to cups and crowns.
 ~
-15 0 a 0 2
+15 0 a 0 0 2
 32 0 0
 4 0
 R
@@ -801,7 +833,7 @@ An ancient book, the Draconomicon, hovers before you!~
 Unfortunately, it's also written in a dead draconic language, and you can't
 make out its words. But it's also worth its weight in gold.
 ~
-15 0 a 0 3
+15 0 a 0 0 3
 48 2 0
 7 0
 R
@@ -815,7 +847,7 @@ A princess stands petrified, turned completely to gold!~
 exquisite, as if an actual princess was turned into solid gold! But you know
 what they say: A good princess is worth her weight in gold.
 ~
-15 0 a 0 3
+15 0 a 0 0 3
 64 0 0
 4 0
 R
@@ -828,7 +860,7 @@ There are tiny red seeds scattered all across the ground.~
    These seeds are curiously small and you'd have to plant them in a jungle
 next to the river to see what they grow into.
 ~
-3 b a 0 3
+3 b a 0 0 3
 0 10956 0
 0 0
 S
@@ -839,7 +871,7 @@ A muck elemental stone is lying here.~
 This magical stone can summon a noncombat pet -- the muck elemental.
 Type 'use stone' to summon it.
 ~
-19 p a 0 5
+19 p a 0 0 5
 10955 0 0
 2 0
 S
@@ -852,9 +884,9 @@ They're tart, but they should cook up into something delicious.
 You can cook: cranberry jelly
 You can bake: cranbread
 ~
-3 bg a 0 9
+3 bgC a 0 0 10
 0 10956 0
-7 168
+7 336
 O+ 1 6133
 R
 4 5114 0
@@ -866,9 +898,9 @@ A jar of cranberry jelly has been left here.~
    This little old jar has been filled with a tart cranberry jelly. It would go
 perfectly with turkey.
 ~
-6 m a 0 8
+6 mC a 0 0 10
 24 0 0
-7 336
+7 8760
 A
 7 1 0
 C
@@ -876,9 +908,9 @@ C
 I 26 801 100.00 1  # DECAYS-TO: glass jar
 I 27 801 100.00 1  # CONSUMES-TO: glass jar
 R
-4 5606 0
-R
 4 5619 0
+R
+4 5114 0
 S
 #10958
 cranbread bread loaf~
@@ -886,15 +918,17 @@ a loaf of cranbread~
 A loaf of cranbread is molding on the ground.~
 It looks like an ordinary loaf of bread, with tart cranberry inclusions.
 ~
-6 m a 0 4
+6 m a 0 0 8
 24 0 0
-7 336
+7 0
 A
 21 1 0
 C
-50 50
+100 100
 R
-4 5606 0
+4 5132 0
+R
+4 5619 0
 S
 #10959
 skin dragon molted moulted mountainous~
@@ -904,7 +938,7 @@ A mountainous pile of molted dragon skin rests in the muck.~
 only belong to a dragon which, like all serpents, sheds its outer skin en
 masse. Perhaps the dragon hasn't gone far.
 ~
-3 0 0 0 3
+3 B 0 0 0 4
 0 0 0
 7 48
 C
@@ -920,7 +954,7 @@ dragon is still slimy, even in death, as if its scales exude mucus of their own
 accord. It looks as if the dragon has dropped the treasure it was clutching in
 its talons.
 ~
-10 0 0 0 2
+10 0 0 0 0 2
 10950 0 0
 7 48
 S
@@ -932,7 +966,7 @@ The ruins of a giant hovel are strewn about the area.~
 roof lies on the ground, upturned. The doorway, already crude, is distended and
 destroyed. Perhaps the hovel's owner outgrew it? Look nearby to find them.
 ~
-3 0 0 0 2
+3 B 0 0 0 3
 0 0 0
 0 1152
 T 10965
@@ -945,7 +979,7 @@ The ruins of a giant hovel are strewn about the area.~
 roof lies on the ground, upturned. The doorway, already crude, is distended and
 destroyed. Perhaps the hovel's owner outgrew it? Look nearby to find them.
 ~
-3 0 0 0 5
+3 B 0 0 0 6
 0 0 0
 0 24
 T 10965
@@ -957,7 +991,7 @@ The enormous corpse of a hill giant is draped across the landscape.~
    The hill giant corpse is far too large to pick up, and has already begun to
 smell. In truth, you suspect, it probably smelled foul before it died.
 ~
-10 0 0 0 2
+10 0 0 0 0 2
 10965 0 0
 7 48
 S
@@ -967,7 +1001,7 @@ a giant gold coin~
 A giant gold coin has been dropped here from some height.~
 This single giant coin is almost as big as your head!
 ~
-15 0 a 0 3
+15 0 a 0 0 3
 8 0 0
 4 0
 R
@@ -980,7 +1014,7 @@ A golden goose is sitting on the ground.~
    This golden goose is so well cast that you begin to suspect it was a living
 goose that was turned to gold. Either way, it's worth its weight in gold now.
 ~
-15 0 a 0 4
+15 0 a 0 0 4
 16 0 0
 4 0
 R
@@ -994,7 +1028,7 @@ A golden harp seems to play itself!~
 it. The harp is made from solid gold, too yellow to be mixed but too strong to
 be pure. The harp is also quite large. Perhaps it was made by giants?
 ~
-15 e a 0 5
+15 e a 0 0 5
 24 0 0
 4 0
 R
@@ -1008,7 +1042,7 @@ A giant ant whistle is lying here.~
    The whistle is actually surprisingly small. It's the summoned ant that's
 giant. Type 'use whistle' to summon this noncombat pet.
 ~
-19 p a 0 5
+19 p a 0 0 5
 10971 0 0
 2 0
 S
@@ -1019,9 +1053,11 @@ The giant's causeway schematic is on the ground.~
    This schematic teaches you to build a special bridge: the giant's causeway.
 This schematic requires the Architect ability.
 ~
-7 0 a 0 2
+7 0 a 0 0 3
 10972 0 0
 0 0
+C
+1 1
 S
 #10973
 club giant wooden~
@@ -1031,7 +1067,7 @@ A truly giant wooden club is lying across your path.~
 much bigger than you, as you can barely pick it up. But it looks like it could
 hold up the roof of a mine or be sawn into lumber.
 ~
-3 e a 0 2
+3 e a 0 0 2
 0 0 0
 0 0
 C
@@ -1048,9 +1084,11 @@ The giant hovel schematic is on the ground.~
    This schematic will teach you to build a new single-room large home, the
 giant hovel. This schematic requires the Architect ability.
 ~
-7 0 a 0 1
+7 0 a 0 0 2
 10974 0 0
 0 0
+C
+1 1
 S
 #10975
 schematic giant stone head~
@@ -1059,9 +1097,11 @@ The giant stone head schematic is on the ground.~
    This schematic will teach you to build a unique monument, the giant stone
 head. It requires the Architect ability.
 ~
-7 0 a 0 1
+7 0 a 0 0 2
 10975 0 0
 0 0
+C
+1 1
 S
 #10980
 tombstone stone~
@@ -1069,7 +1109,7 @@ the tombstone~
 There is a tombstone here.~
 It looks like someone must have died here.
 ~
-3 0 0 0 1
+3 B 0 0 0 2
 0 0 0
 1 48
 T 10982
@@ -1081,7 +1121,7 @@ A fiery brimstone is piled here.~
    This little black stone is actually on fire, though the fire does not burn
 you. It has the faint smell of rotten eggs.
 ~
-3 0 a 0 5
+3 0 a 0 0 5
 0 0 0
 1 0
 O+ 1 6600
@@ -1096,7 +1136,7 @@ A pure crystal orb is lying here.~
 beautifully shaped. Orbs like this are rare, and are sought after by powerful
 spellcasters for their clarity.
 ~
-15 0 a 0 6
+15 0 a 0 0 6
 16 2 0
 8 0
 R
@@ -1110,7 +1150,7 @@ A crystal skull is lying here.~
 skull of some crystalline demon. Either way, these skulls are supremely rare
 and are sought out by powerful spellcasters the world over.
 ~
-15 e a 0 7
+15 e a 0 0 7
 24 2 0
 8 0
 R
@@ -1124,7 +1164,7 @@ An ember of the eternal flame is floating on the breeze.~
 you force it to do so. As a piece of the eternal flame, this ember never goes
 out.
 ~
-18 p a 0 1
+18 p a 0 0 1
 -1 0 0
 0 0
 S
@@ -1134,7 +1174,7 @@ a talking skull~
 A talking skull is lying here.~
 This skull can become a minipet. Type 'use skull' to receive it.
 ~
-19 p a 0 5
+19 p a 0 0 5
 10987 0 0
 14 0
 S
@@ -1144,7 +1184,7 @@ Mother's grimoire~
 Mother's grimoire is floating here.~
 This grimoire can become a minipet. Type 'use grimoire' to receive it.
 ~
-19 p a 0 6
+19 p a 0 0 6
 10988 0 0
 14 0
 S
@@ -1154,7 +1194,7 @@ a cat's collar~
 A cat's collar is lying here.~
 This collar can become a minipet. Type 'use collar' to receive it.
 ~
-19 p a 0 7
+19 p a 0 0 7
 10989 0 0
 14 0
 S
@@ -1166,9 +1206,11 @@ A fractured sorcerer's stone is lying here.~
 mostly intact. You could use this to build a tower of sorcery:
 Build (requires Architect): fracturedtower
 ~
-3 e a 0 1
+3 e a 0 0 2
 0 0 0
 1 0
+C
+1 1
 S
 #10991
 spore strange~
@@ -1177,7 +1219,7 @@ A strange spore floats on the breeze.~
 This little spore can be used to grow a great mushroom house.
 Build: mushroomhouse
 ~
-3 g a 0 1
+3 g a 0 0 1
 0 0 0
 7 0
 S
@@ -1189,7 +1231,7 @@ The keys to the magicycle are here.~
 Of course, you'll have to build one first. Luckily, the magic is in the keys.
 Manufacture: magicycle
 ~
-3 0 a 0 1
+3 0 a 0 0 1
 0 0 0
 2 0
 S
@@ -1201,7 +1243,7 @@ The keys to the magicycle are here.~
 Of course, you'll have to build one first. Luckily, the magic is in the keys.
 Manufacture: magicycle
 ~
-3 0 a 0 2
+3 0 a 0 0 2
 0 0 0
 2 0
 S
@@ -1212,7 +1254,7 @@ A chocolate from is melting on the ground.~
    This little piece of candy is made in the shape of the frog. Just don't look
 too closely, because it still seems to be moving.
 ~
-6 p a 0 1
+6 p a 0 0 1
 2 0 0
 7 4
 C

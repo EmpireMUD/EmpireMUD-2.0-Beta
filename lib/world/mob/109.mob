@@ -3,8 +3,8 @@ dragon red colossal collosal collossal colosal~
 a colossal red dragon~
 A colossal red dragon looms over you!
 ~
-250 300 bdgxyzAB cmE 6
-2 0 2 10
+250 300 bdgxyzABL cmE 6
+2 0 2 10 -1
 D
    Towering over you like a scaly red keep, the dragon simultaneously chills
 you to the bone and brings your skin blisteringly close to burning. Perhaps she
@@ -65,8 +65,8 @@ Sir Vivor~
 Sir Vivor~
 Sir Vivor is glancing around nervously.
 ~
-250 300 bdkvxyzABI cE 3
-1 0 0 1
+250 300 bdkvxyzABIL cE 3
+1 0 0 1 -1
 D
    Rarely have these lands seen a man so gallant as this. His armor gleams even
 in the low light of the fire and his stark white teeth and protruding chin are
@@ -125,8 +125,8 @@ Bangles thief nervous~
 Bangles the thief~
 A nervous thief is hiding in the shadows.
 ~
-250 300 dkvI nD 3
-1 0 0 15
+250 300 dkvIL nD 3
+1 0 0 15 -1
 D
    True to his name, he's wearing a colossal number of bangles on his wrists.
 Some of them still have price tags attached!
@@ -140,8 +140,8 @@ vendor token~
 the token vendor~
 The token vendor is peddling his wares (list).
 ~
-250 300 bdovI nD 3
-1 0 0 15
+250 300 bdovIL nD 3
+1 0 0 15 -1
 D
    This hapless little man looks a little singed and his hands start to shake
 at any loud noise nearby.
@@ -154,7 +154,7 @@ a crimson serpent~
 A crimson serpent is coiled here.
 ~
 100 125 dej 0 2
-0 0 5 10
+0 0 5 10 -1
 D
    This stunning creature resembles a legless dragon. Its crimson scales are
 warm to the touch, and it seems docile enough to ride.
@@ -167,7 +167,7 @@ the crimson dragon~
 A small crimson dragon is circling.
 ~
 100 125 dej m 2
-0 0 2 10
+0 0 2 10 -1
 D
    Though small by dragon standards, this stunning crimson beast is easily
 twice the size of a horse and already strong enough to carry a full-grown man
@@ -181,7 +181,7 @@ a crimson sea dragon~
 A crimson sea dragon splashes around.
 ~
 100 125 dejl 0 2
-0 0 6 9
+0 0 6 9 -1
 D
    This elegant dragon has tall fins in place of wings. With webbed feet and a
 flattened tail, it seems to have taken to the sea.
@@ -193,8 +193,8 @@ dragon muck viscous vicious~
 a viscous muck dragon~
 A viscous muck dragon coils through the water.
 ~
-225 325 dghuB choCDL 6
-0 0 5 27
+225 325 dghuBL choCDL 6
+0 0 5 27 -1
 D
    You can only see the fins and head of the dragon as it moves through the
 water, but it is enormous! The muck dragon's turquoise scales drip mud as its
@@ -241,7 +241,7 @@ a muck elemental~
 A little elemental is rolling around in a puddle of muck.
 ~
 1 1 bdoD nL 1
-0 0 2 5
+0 0 2 5 -1
 D
 This little ball of muck is playing in its own mess.
 ~
@@ -271,8 +271,8 @@ giant hill~
 the hill giant~
 A hill giant towers over you, swinging a club the size of a tree!
 ~
-100 175 dkuvAI cEG 6
-0 0 26 5
+100 175 dkuvAIL cEG 6
+0 0 26 5 -1
 D
    The hill giant towers over you with an entire tree slung over its shoulder
 as a club. Luckily, the giant seems to be focused on problems its own size, and
@@ -314,8 +314,8 @@ giant river~
 the river giant~
 A river giant towers over you, barely missing you on its path across the countryside!
 ~
-100 175 dkuvAI cEG 6
-0 0 26 5
+100 175 dkuvAIL cEG 6
+0 0 26 5 -1
 D
    This giant is dressed mainly in gigantic nets, which appear to double as
 fishing tools. Its height dominates the landscape, taller than most trees. In
@@ -357,8 +357,8 @@ giant dune~
 the dune giant~
 A dune giant towers above you, with a tree over its shoulder!
 ~
-100 175 dkuvAI cEG 6
-0 0 26 5
+100 175 dkuvAIL cEG 6
+0 0 26 5 -1
 D
    This gigantic desert nomad has a massive tree slung over its shoulder like a
 club. The giant is so large that it doesn't even appear to notice you down
@@ -400,8 +400,8 @@ portents giant~
 portents of the giant~
 Portents of the giant linger in the air.
 ~
-100 175 bd kln 3
-0 0 0 15
+100 175 bdL kln 3
+0 0 0 15 -1
 D
    Only immortals should see this. This is the spawner for the giants in the
 wandering giant adventure.
@@ -414,7 +414,7 @@ a giant ant~
 A giant ant scurries past you.
 ~
 1 1 bdoD n 2
-0 0 7 9
+0 0 7 9 -1
 D
 It's an ant the size of a large dog.
 ~
@@ -438,8 +438,8 @@ portents doom~
 portents of doom~
 Portents of doom linger in the air.
 ~
-100 175 bd kln 3
-0 0 0 15
+100 175 bdL kln 3
+0 0 0 15 -1
 D
    Only immortals should see this. It spawns the renegade casters for the
 adventure by the same name.
@@ -451,8 +451,8 @@ S
 the rogue wizard #n~
 A rogue wizard is skulking here.
 ~
-100 175 dvxAI c 3
-1 0 0 20
+100 175 dvxAIL c 3
+1 0 0 20 -1
 D
    The black and gray robes immediately signify -- to those who are familiar
 with High Sorcery -- that this wizard is no friend. Indeed, only outcasts in
@@ -501,12 +501,12 @@ T 10983
 T 10981
 S
 #10982
-#n druid rogue magiterranean~
-the druid #n~
-A rogue Magiterranean druid is creeping through the shadows.
+#n manaweaver rogue magiterranean~
+the manaweaver #n~
+A rogue Magiterranean weaver is creeping through the shadows.
 ~
-100 175 dvxAI c 3
-1 3 9 21
+100 175 dvxAIL c 3
+1 3 9 21 -1
 D
    #n peers around nervously from beneath a brown hood, as if he
 fears something is following him. He catches your eye and a look of
@@ -548,8 +548,8 @@ S
 #n the teenage witch~
 A teenage witch stands with her hands on her hips.
 ~
-100 175 dvxyDI cD 3
-2 0 0 16
+100 175 dvxyDIL cD 3
+2 0 0 16 -1
 D
    #n stands with her hands on her hips, frowning. Her black hair and pale
 white skin look almost unnatural. Then, just as that thought passes through
@@ -590,8 +590,8 @@ S
 #n the teenage witch~
 A teenage witch is playing with fire.
 ~
-100 175 bdvxyDI cD 3
-2 0 0 16
+100 175 bdvxyDIL cD 3
+2 0 0 16 -1
 D
    As she runs a brush through her long red hair, #n's gaze appears
 to drift elsewhere, lost in thought if only momentarily. Suddenly she
@@ -632,7 +632,7 @@ a floating skull~
 A skull floats in the air.
 ~
 1 1 bdoDF n 1
-0 0 27 9
+0 0 27 9 -1
 D
    This skull is bleached white and completely devoid of everything except
 personality.
@@ -666,7 +666,7 @@ Mother's grimoire~
 Mother's grimoire is floating in the air.
 ~
 1 1 bdoDF n 1
-0 0 2 16
+0 0 2 16 -1
 D
 This old tome flaps its bindings to stay afloat in the air.
 ~
@@ -679,7 +679,7 @@ a black cat~
 A black cat is cleaning itself.
 ~
 1 1 bdoD n 1
-0 0 0 9
+0 0 0 9 -1
 D
    The black cat stares at you intently. It's wearing a collar that says
 'Danvers'.

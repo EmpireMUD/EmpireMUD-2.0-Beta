@@ -2,7 +2,7 @@
 *   File: faction.c                                       EmpireMUD 2.0b5 *
 *  Usage: code related to factions, including DB and OLC                  *
 *                                                                         *
-*  EmpireMUD code base by Paul Clarke, (C) 2000-2015                      *
+*  EmpireMUD code base by Paul Clarke, (C) 2000-2024                      *
 *  All rights reserved.  See license.doc for complete information.        *
 *                                                                         *
 *  EmpireMUD based upon CircleMUD 3.0, bpl 17, by Jeremy Elson.           *
@@ -804,7 +804,7 @@ void gain_reputation(char_data *ch, any_vnum vnum, int amount, bool is_kill, boo
 		amount = pfd->value - old_val;
 		msg_to_char(ch, "%sYou %s %d reputation with %s.\t0\r\n", reputation_levels[idx].color, (amount > 0 ? "gain" : "lose"), ABSOLUTE(amount), FCT_NAME(fct));
 		if (old_rep != pfd->rep) {
-			msg_to_char(ch, "%sYou are now %s by %s.\t0\r\n", reputation_levels[idx].color, reputation_levels[idx].name, FCT_NAME(fct));
+			msg_to_char(ch, "%sYou are now %s %s %s.\t0\r\n", reputation_levels[idx].color, reputation_levels[idx].name, reputation_levels[idx].by_to, FCT_NAME(fct));
 			qt_change_reputation(ch, FCT_VNUM(fct));
 		}
 	}
@@ -964,7 +964,7 @@ void set_reputation(char_data *ch, any_vnum vnum, int rep) {
 	
 	// and message
 	if (old_rep != pfd->rep) {
-		msg_to_char(ch, "%sYou are now %s by %s.\t0\r\n", reputation_levels[rep_idx].color, reputation_levels[rep_idx].name, FCT_NAME(fct));
+		msg_to_char(ch, "%sYou are now %s %s %s.\t0\r\n", reputation_levels[rep_idx].color, reputation_levels[rep_idx].name, reputation_levels[rep_idx].by_to, FCT_NAME(fct));
 		qt_change_reputation(ch, FCT_VNUM(fct));
 	}
 }

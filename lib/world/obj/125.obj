@@ -6,7 +6,7 @@ The colossus's ankle is unencumbered.~
 down... Perhaps if you 'manufacture colossal ankle brace', you can put a stop
 to its movement.
 ~
-3 0 0 0 2
+3 B 0 0 0 3
 0 0 0
 2 0
 M
@@ -22,7 +22,7 @@ the crippled right arm~
 The right arm dangles here, barely able to move.~
 The right arm is crippled and appears to only have a limited range of movement.
 ~
-3 e 0 0 2
+3 eB 0 0 0 3
 0 0 0
 2 0
 S
@@ -32,7 +32,7 @@ the destroyed left arm~
 The left arm dangles here, badly damaged.~
 The left arm is damaged beyond repair and will be no good in combat.
 ~
-3 e 0 0 1
+3 eB 0 0 0 2
 0 0 0
 2 0
 S
@@ -42,7 +42,7 @@ a sabotage counter~
 A sabotage counter is marked here.~
 This indicates the colossus has been sabotaged.
 ~
-3 0 0 0 2
+3 B 0 0 0 3
 0 0 0
 2 48
 T 12523
@@ -54,7 +54,7 @@ An enchanted brass bolt is lying here.~
    This bolt, surely made by some advanced metallurgist and enchanted by a
 master sorcerer, could be used for certain clockwork crafts.
 ~
-3 0 a 0 1
+3 0 a 0 0 1
 0 0 0
 2 0
 R
@@ -69,7 +69,7 @@ Some salvaged copper wire is lying here.~
    This strange wire is usually used in the construction of clockwork machines.
 Though frayed, you could probably use it for some new craft.
 ~
-3 0 a 0 3
+3 0 a 0 0 3
 0 0 0
 2 0
 M
@@ -90,7 +90,7 @@ A piece of brass scrap metal is lying here.~
    This scrap metal bears a sigil in the shape of a clockwork gear. It could
 probably be used for new clockwork creations.
 ~
-3 0 a 0 4
+3 0 a 0 0 4
 0 0 0
 2 0
 M
@@ -111,7 +111,7 @@ A pouch of little brass cannonballs is lying here.~
    You can use these little brass cannonballs using the clockwork lower cannon,
 a ranged weapon from the Clockwork Colossus.
 ~
-21 o a 0 5
+21 o a 0 0 5
 20 0 1
 2 0
 S
@@ -121,9 +121,11 @@ the little brass cannonballs schematic~
 The little brass cannonballs schematic is on the ground.~
 This schematic will teach you to craft: little brass cannonballs.
 ~
-7 0 a 0 1
+7 0 a 0 0 2
 12508 0 0
 0 0
+C
+1 1
 S
 #12510
 whistle magpie clockwork~
@@ -132,7 +134,7 @@ A clockwork magpie whistle is lying here.~
 This little brass whistle can summon a noncombat pet.
 Type 'use magpie' to summon it.
 ~
-19 p a 0 5
+19 p a 0 0 5
 12510 0 0
 2 0
 S
@@ -142,7 +144,7 @@ a clockwork elephant whistle~
 A clockwork elephant whistle is lying here.~
 This brass whistle can summon a new mount. Type 'use elephant' to summon it.
 ~
-3 p a 0 7
+3 p a 0 0 7
 12511 0 0
 2 0
 T 9910
@@ -154,7 +156,7 @@ A clockwork eagle whistle is lying here.~
    This brass whistle can summon a new flying mount. Type 'use eagle' to summon
 it.
 ~
-3 p a 0 8
+3 p a 0 0 8
 12512 0 0
 2 0
 T 9910
@@ -166,7 +168,7 @@ A gear with a boot inscribed on its face is here.~
    This strange clockwork gear has a boot inscribed on its face. You could use
 this to 'manufacture clockwork boot', a novel form of transportation.
 ~
-3 e a 0 2
+3 e a 0 0 2
 0 0 0
 2 0
 M
@@ -182,7 +184,7 @@ the colossus trash spawner~
 The colossus trash spawner is here.~
 This item spawns trash mobs then purges itself.
 ~
-3 0 0 0 3
+3 0 0 0 0 3
 0 0 0
 0 0
 T 12514
@@ -194,7 +196,7 @@ A brass messenger bag is hanging here.~
    This odd little messenger bag is made from tiny brass plates, interlinked
 with wire in a way that allows it to stretch as you put more items inside.
 ~
-24 mp ar 0 5
+24 mp ar 0 0 5
 1 0 0
 11 0
 T 12530
@@ -207,7 +209,7 @@ A tall brass saddle is racked here.~
 it fits mounts of varying sizes. Cogs on the back of the saddle spin even at an
 idle, though you can see no practical purpose.
 ~
-2 emp as 0 4
+2 emp as 0 0 4
 0 0 0
 2 0
 A
@@ -223,7 +225,7 @@ A pair of clockwork shoes is lying here.~
    These shoes each have a little key on the back. Once wound, the shoes
 practically walk themselves.
 ~
-2 mp ag 0 2
+2 mp ag 0 0 2
 0 0 0
 2 0
 A
@@ -240,7 +242,7 @@ A clockwork lower cannon was left here.~
 This piece of advanced weaponry accelerates brass cannonballs using a series of
 gears.
 ~
-20 emp ap 0 6
+20 emp ap 0 0 6
 32 1 1
 2 0
 T 12522
@@ -252,7 +254,7 @@ A clockwork embiggening suit is lying here.~
    This suit is made from the embiggening circuit of a clockwork colossus,
 although it's much less big at the moment.
 ~
-2 mpy ad 0 6
+2 mpy ad 0 0 6
 0 0 0
 2 0
 A
@@ -274,7 +276,7 @@ An imperium cog amulet is lying here.~
    This amulet has the shape of a cog (or gear), made from imperium. A series
 of symbols are etched into the face of it, but you cannot read them.
 ~
-2 moy ac 0 4
+2 moy ac 0 0 4
 0 0 0
 2 0
 A
@@ -294,7 +296,7 @@ A glass cog amulet hangs delicately here.~
 glass. A series of symbols are scratched into the face of the amulet, but you
 cannot read them.
 ~
-2 moy ac 0 6
+2 moy ac 0 0 6
 0 0 0
 8 0
 A
@@ -314,7 +316,7 @@ A shadowy cog amulet blows in the breeze.~
 has all the form of a shadow, and slips through your fingers. In dim light, a
 series of symbols glow from the face of the amulet, but you cannot read them.
 ~
-2 moy ac 0 7
+2 moy ac 0 0 7
 0 0 0
 10 0
 A
@@ -334,7 +336,7 @@ A steel cog amulet is dangling here.~
 you have ever seen. A series of symbols are cast in the face of the amulet, but
 you cannot read them.
 ~
-2 moy ac 0 7
+2 moy ac 0 0 7
 0 0 0
 2 0
 A
@@ -354,7 +356,7 @@ A cogwheel morning star is lying here.~
 imperium cogwheel. You aren't sure who crafted this, but they were very
 skilled.
 ~
-1 emoy an 0 7
+1 emoy an 0 0 7
 0 1 5
 2 0
 A
@@ -376,7 +378,7 @@ An ornate mechanical censer is lying here.~
 edges has the faint white glow of something infused with mana. The delicate
 brass censer is stamped with an intricate pattern of cogwheels and driveshafts.
 ~
-1 moy an 0 8
+1 moy an 0 0 8
 0 0 28
 2 0
 A
@@ -401,7 +403,7 @@ pages are turned. The tome's text is not written in any language you know, but
 these must be truly powerful words, as you can instinctively draw magic from
 the pages. And it is deadly magic indeed.
 ~
-1 emoy an 0 9
+1 emoy an 0 0 9
 0 5 21
 2 0
 A
@@ -422,7 +424,7 @@ some small part of a great contraption. The teeth on the belt are sharp, and
 they have been removed at one end to form a handle. Someone has repurposed this
 belt into a vicious whip.
 ~
-1 moy an 0 11
+1 moy an 0 0 11
 0 1 7
 2 0
 A
@@ -444,7 +446,7 @@ A massive lead counterweight is lying here.~
 contraption. It has been fastened to a pole (or possibly driveshaft) and looks
 to have been used as a weapon.
 ~
-1 emnoy an 0 11
+1 emnoy an 0 0 11
 0 5 14
 2 0
 A
@@ -464,7 +466,7 @@ A clockwork wristplate has fallen here.~
 using tiny gears to move damages plates to the sides and put stronger plates in
 the path of your opponent's weapon.
 ~
-27 mp aj 0 16
+27 mp aj 0 0 16
 3 0 0
 2 0
 A
@@ -483,9 +485,11 @@ the clockwork wristplate schematic~
 The clockwork wristplate schematic is on the ground.~
 This schematic will teach you to forge: clockwork wristplate.
 ~
-7 0 a 0 1
+7 0 a 0 0 2
 12529 0 0
 0 0
+C
+1 1
 S
 #12531
 bangles cogwheel wheel~
@@ -495,7 +499,7 @@ A set of cogwheel bangles is lying on the ground.~
 white with mana. The center of each wheel is just large enough to fit on your
 wrist.
 ~
-27 mp aj 0 16
+27 mp aj 0 0 16
 0 0 0
 2 0
 A
@@ -514,9 +518,11 @@ the cogwheel bangles schematic~
 The cogwheel bangles schematic is on the ground.~
 This schematic will teach you to forge: cogwheel bangles.
 ~
-7 0 a 0 1
+7 0 a 0 0 2
 12531 0 0
 0 0
+C
+1 1
 S
 #12533
 band manasilk silk oil-soaked oilsoaked soaked~
@@ -527,7 +533,7 @@ has been soaked in some kind of mystic oil that seems to be enhancing the
 magical properties of the silk. The scarf appears to be embroidered with
 unusual symbols, but you cannot read them.
 ~
-27 mp aj 0 17
+27 mp aj 0 0 17
 0 0 0
 11 0
 A
@@ -546,9 +552,11 @@ the oil-soaked band schematic~
 The oil-soaked band schematic is on the ground.~
 This schematic will teach you to sew: oil-soaked band.
 ~
-7 0 a 0 1
+7 0 a 0 0 2
 12533 0 0
 0 0
+C
+1 1
 S
 #12535
 wristband band black powder~
@@ -558,7 +566,7 @@ A black powder wristband is lying here.~
 powder. Arcane words have been scratched into the inside of the band, and seem
 to pulse with heat against your skin, but you cannot read the words.
 ~
-27 mp aj 0 18
+27 mp aj 0 0 18
 1 0 0
 2 0
 A
@@ -577,9 +585,11 @@ the black powder wristband schematic~
 The black powder wristband schematic is on the ground.~
 This schematic will teach you to craft: black powder wristband.
 ~
-7 0 a 0 1
+7 0 a 0 0 2
 12535 0 0
 0 0
+C
+1 1
 S
 #12537
 shield clockwork~
@@ -589,7 +599,7 @@ A clockwork shield is hanging here.~
 deflect swords, and to baffle the enemy. The gears seem to turn as you move,
 and bear no crank or handle.
 ~
-23 emp ao 0 16
+23 emp ao 0 0 16
 0 0 0
 2 0
 A
@@ -614,9 +624,11 @@ the clockwork shield schematic~
 The clockwork shield schematic is on the ground.~
 This schematic will teach you to forge: clockwork shield.
 ~
-7 0 a 0 1
+7 0 a 0 0 2
 12537 0 0
 0 0
+C
+1 1
 S
 #12539
 pendulum brass enchanted~
@@ -626,7 +638,7 @@ An enchanted brass pendulum is lying here.~
 clockwork construction. It has since been inscribed with arcane words, meaning
 lost to time, and is now drawing great power from some other realm.
 ~
-3 mp ao 0 18
+3 mp ao 0 0 18
 0 0 0
 2 0
 A
@@ -651,9 +663,11 @@ the brass pendulum schematic~
 The brass pendulum schematic is on the ground.~
 This schematic will teach you to forge: brass pendulum.
 ~
-7 0 a 0 1
+7 0 a 0 0 2
 12539 0 0
 0 0
+C
+1 1
 S
 #12541
 bedknob enchanted knob brass~
@@ -664,7 +678,7 @@ someone has removed it and scratched some arcane symbols into it. When you hold
 it in your hand, you see the world in new colors for a moment, as though
 everything is painted on a canvas.
 ~
-3 mp ao 0 18
+3 mp ao 0 0 18
 0 0 0
 2 0
 A
@@ -691,9 +705,11 @@ the enchanted bedknob schematic~
 The enchanted bedknob schematic is on the ground.~
 This schematic will teach you to forge: enchanted bedknob.
 ~
-7 0 a 0 1
+7 0 a 0 0 2
 12541 0 0
 0 0
+C
+1 1
 S
 #12543
 wristblade blade clockwork~
@@ -703,7 +719,7 @@ A clockwork wristblade is lying here.~
 forward at a moment's notice in order to stab, parry, or riposte an
 unsuspecting opponent.
 ~
-1 mp ao 0 20
+1 mp ao 0 0 20
 0 5 4
 2 0
 A
@@ -734,9 +750,11 @@ the clockwork wristblade schematic~
 The clockwork wristblade schematic is on the ground.~
 This schematic will teach you to forge: clockwork wristblade.
 ~
-7 0 a 0 1
+7 0 a 0 0 2
 12543 0 0
 0 0
+C
+1 1
 S
 #12545
 shield colossal~
@@ -746,7 +764,7 @@ A colossal shield is standing here.~
 one. You doubt you could even lift it if not for the arcane enchantment
 scrawled across the back of the shield.
 ~
-23 emp ao 0 17
+23 emp ao 0 0 17
 0 0 0
 2 0
 A
@@ -773,9 +791,11 @@ the colossal shield schematic~
 The colossal shield schematic is on the ground.~
 This schematic will teach you to forge: colossal shield.
 ~
-7 0 a 0 1
+7 0 a 0 0 2
 12545 0 0
 0 0
+C
+1 1
 S
 #12547
 box loot super-loot clockwork~
@@ -783,7 +803,7 @@ a clockwork super-loot box~
 A super-loot box is here.~
 Replaces with a super-loot item for boss+ difficulty.
 ~
-3 p a 0 2
+3 p a 0 0 2
 0 0 0
 0 0
 T 12547
@@ -794,7 +814,7 @@ a clockwork premium loot box~
 A premium loot box is here.~
 Replaces with premium loot for harder difficulties.
 ~
-3 p a 0 3
+3 p a 0 0 3
 0 0 0
 0 0
 T 12548
@@ -805,7 +825,7 @@ a clockwork BoP loot box~
 A clockwork BoP loot box is here.~
 Replaces with one of the BoP items. Used on most difficulties.
 ~
-3 p a 0 4
+3 p a 0 0 4
 0 0 0
 0 0
 T 12549
@@ -816,7 +836,7 @@ a normal clockwork loot box~
 A normal clockwork loot box is here.~
 Replaces with loot for players doing the adventure on 'normal'.
 ~
-3 p a 0 6
+3 p a 0 0 6
 0 0 0
 0 0
 T 12550
@@ -827,7 +847,7 @@ the clockwork loot controller~
 The clockwork loot controller is here.~
 This loads the correct loot boxes based on difficulty.
 ~
-3 p a 0 7
+3 p a 0 0 7
 0 0 0
 0 0
 T 12551
@@ -838,7 +858,7 @@ the panel~
 There is a closed panel above the belt.~
 It looks like you could pry it open. You wonder what's inside? ('open panel')
 ~
-3 0 0 0 2
+3 B 0 0 0 3
 0 0 0
 2 0
 T 12552
@@ -853,7 +873,7 @@ red wire is labeled with a hand shooting fire from its fingers. The green wire
 depicts the silhouette of a small puppy. The blue wire shows an hourglass.
 Use 'cut <red, green, or blue>' to choose one.
 ~
-3 0 0 0 6
+3 B 0 0 0 7
 0 0 0
 2 0
 T 12553
@@ -868,7 +888,7 @@ red wire is labeled with a large spider. The green wire depicts a boot crushing
 a house. The blue wire has an image of the sun. Use 'cut <red, green, or blue>'
 to choose one.
 ~
-3 0 0 0 5
+3 B 0 0 0 6
 0 0 0
 2 0
 T 12553
@@ -883,7 +903,7 @@ red wire is labeled with a large dragonfly. The green wire depicts a person
 running. The blue wire shows what appears to be a clockwork brain. Use 'cut
 <red, green, or blue>' to choose one.
 ~
-3 0 0 0 6
+3 B 0 0 0 7
 0 0 0
 2 0
 T 12553
@@ -898,7 +918,7 @@ red wire is labeled with a skull and crossbones. The green wire depicts a person
 petting a kitten. The blue wire has an image of a tortoise. Use 'cut <red,
 green, or blue>' to choose one.
 ~
-3 0 0 0 5
+3 B 0 0 0 6
 0 0 0
 2 0
 T 12553
@@ -913,7 +933,7 @@ red wire is labeled with a gear. The green wire depicts an eye shooting lasers.
 The blue wire has an image of a belt. Use 'cut <red, green, or blue>' to choose
 one.
 ~
-3 0 0 0 5
+3 B 0 0 0 6
 0 0 0
 2 0
 T 12553
@@ -928,7 +948,7 @@ red wire is labeled with a bird. The green wire depicts an torch. The blue wire
 has an image of a giant fist holding a helpless maiden. Use 'cut <red, green,
 or blue>' to choose one.
 ~
-3 0 0 0 5
+3 B 0 0 0 6
 0 0 0
 2 0
 T 12553
@@ -942,7 +962,7 @@ them, and black smoke from the core of the colossus vents out through the
 panels. The stench of burning coal permeates the air and your eyes begin to
 water.
 ~
-3 0 0 0 6
+3 B 0 0 0 7
 0 0 0
 2 0
 S
@@ -959,7 +979,7 @@ languages are magical? Four chants are still legible in the old book:
  - Lightning: A spell to call down a lightning strike.
  - Rats: A spell to summon friendly rats.
 ~
-3 k a 0 7
+3 k a 0 0 7
 0 0 0
 0 0
 T 12555
@@ -971,7 +991,7 @@ the words~
 Someone has scrawled some words onto the side of the alcove.~
 Someone has scrawled some words onto the side of the alcove.
 ~
-3 0 0 0 2
+3 B 0 0 0 3
 0 0 0
 2 0
 T 12556
@@ -983,7 +1003,7 @@ The clockwork control key is lying here. (debug item)~
    You can 'use' this control key to damage the clockwork colossus. It only
 works for immortals.
 ~
-3 0 a 0 1
+3 0 a 0 0 1
 0 0 0
 2 0
 T 12562

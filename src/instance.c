@@ -2,15 +2,13 @@
 *   File: instance.c                                      EmpireMUD 2.0b5 *
 *  Usage: code related to instantiating adventure zones                   *
 *                                                                         *
-*  EmpireMUD code base by Paul Clarke, (C) 2000-2015                      *
+*  EmpireMUD code base by Paul Clarke, (C) 2000-2024                      *
 *  All rights reserved.  See license.doc for complete information.        *
 *                                                                         *
 *  EmpireMUD based upon CircleMUD 3.0, bpl 17, by Jeremy Elson.           *
 *  CircleMUD (C) 1993, 94 by the Trustees of the Johns Hopkins University *
 *  CircleMUD is based on DikuMUD, Copyright (C) 1990, 1991.               *
 ************************************************************************ */
-
-#include <math.h>
 
 #include "conf.h"
 #include "sysdep.h"
@@ -728,7 +726,7 @@ bool validate_one_loc(adv_data *adv, struct adventure_link_rule *rule, room_data
 		isle = map ? map->shared->island_ptr : GET_ISLAND(loc);
 	}
 	if (isle && isle->id != NO_ISLAND) {
-		if (!ADVENTURE_FLAGGED(adv, ADV_IGNORE_ISLAND_LEVELS | ADV_NEWBIE_ONLY) && !IS_SET(isle->flags, ISLE_CONTINENT)) {	// not continent: check levels
+		if (!ADVENTURE_FLAGGED(adv, ADV_IGNORE_ISLAND_LEVELS | ADV_NEWBIE_ONLY) && !IS_SET(isle->flags, ISLE_CONTINENT) && !config_get_bool("ignore_island_levels")) {	// not continent: check levels
 			if (GET_ADV_MIN_LEVEL(adv) > 0 && (!isle->max_level || isle->max_level + 50 < GET_ADV_MIN_LEVEL(adv))) {
 				// island's max level is more than 50 below the adventure's minimum
 				return FALSE;
@@ -1066,7 +1064,9 @@ void delete_instance(struct instance_data *inst, bool run_cleanup) {
 				set_mob_flags(mob, MOB_SPAWNED);
 			}
 			else {
-				act("$n leaves.", TRUE, mob, NULL, NULL, TO_ROOM);
+				if (!AFF_FLAGGED(mob, AFF_HIDDEN | AFF_NO_SEE_IN_ROOM)) {
+					act("$n leaves.", TRUE, mob, NULL, NULL, TO_ROOM);
+				}
 				char_to_room(mob, extraction_room);
 				extract_all_items(mob);
 				extract_char(mob);
@@ -1146,7 +1146,7 @@ void despawn_instance_vehicles(struct instance_data *inst) {
 		// but this purge CANNOT be prevented by the trigger
 		if (destroy_vtrigger(veh, "despawn")) {		
 			if (ROOM_PEOPLE(IN_ROOM(veh))) {
-				act("$V is gone.", FALSE, ROOM_PEOPLE(IN_ROOM(veh)), NULL, veh, TO_CHAR | TO_ROOM);
+				act("$V is gone.", FALSE, ROOM_PEOPLE(IN_ROOM(veh)), NULL, veh, TO_CHAR | TO_ROOM | ACT_VEH_VICT);
 			}
 		}
 		
@@ -1198,17 +1198,13 @@ void empty_instance_vehicle(struct instance_data *inst, vehicle_data *veh, room_
 				char_to_room(ch, to_room);
 				GET_LAST_DIR(ch) = NO_DIR;
 				pre_greet_mtrigger(ch, IN_ROOM(ch), NO_DIR, "system");	// cannot pre-greet for this
+				enter_triggers(ch, NO_DIR, "system", FALSE);
 				look_at_room(ch);
 				
 				// and announce
 				act("$n arrives.", TRUE, ch, NULL, NULL, TO_ROOM);
 				
-				entry_mtrigger(ch, "system");
-				enter_wtrigger(IN_ROOM(ch), ch, NO_DIR, "system");
-				greet_mtrigger(ch, NO_DIR, "system");
-				greet_vtrigger(ch, NO_DIR, "system");
-				entry_memory_mtrigger(ch);
-				greet_memory_mtrigger(ch);
+				greet_triggers(ch, NO_DIR, "system", FALSE);
 			}
 		}
 	}
@@ -1330,7 +1326,7 @@ static void reset_instance_room(struct instance_data *inst, room_data *room) {
 							scale_vehicle_to_level(veh, INST_LEVEL(inst));
 						}
 						if (ROOM_PEOPLE(IN_ROOM(veh))) {
-							act("$V appears.", FALSE, ROOM_PEOPLE(IN_ROOM(veh)), NULL, veh, TO_CHAR | TO_ROOM);
+							act("$V appears.", FALSE, ROOM_PEOPLE(IN_ROOM(veh)), NULL, veh, TO_CHAR | TO_ROOM | ACT_VEH_VICT);
 						}
 						load_vtrigger(veh);
 					}
@@ -2497,6 +2493,11 @@ static struct instance_data *load_one_instance(FILE *fl, any_vnum idnum) {
 */
 int lock_instance_level(room_data *room, int level) {
 	struct instance_data *inst;
+	
+	// rounding?
+	if (round_level_scaling_to_nearest > 1 && level > 1 && (level % round_level_scaling_to_nearest) > 0) {
+		level += (round_level_scaling_to_nearest - (level % round_level_scaling_to_nearest));
+	}
 	
 	if (IS_ADVENTURE_ROOM(room) && COMPLEX_DATA(room) && (inst = COMPLEX_DATA(room)->instance)) {
 		if (INST_LEVEL(inst) <= 0) {

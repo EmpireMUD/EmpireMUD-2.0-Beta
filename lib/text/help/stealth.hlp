@@ -32,15 +32,15 @@ Backstab (Stealth ability)
 
 Usage:  backstab [victim]
 Cooldown:  9 seconds
-Cost:  15 move
+Cost:  25 move
 
 A brave warrior looks his foe in the eye, but a clever assassin looks his
 target in the back as he strikes. You must wield a stabbing weapon to use this
-ability.
+ability -- and have no one attacking you.
 
-Backstab deals 2x weapon damage on a successful attack, and the opponent has
-no chance to dodge if the attack succeeds. A particularly skilled assassin
-deals 4x weapon damage instead.
+Backstab deals massive weapon damage on a successful attack, and the opponent
+has no chance to dodge if the attack succeeds. A particularly skilled assassin
+can deal even more damage.
 
 Gains experience when you use Backstab, even if it fails.
 #
@@ -100,8 +100,7 @@ Crucial Jab
 Stealth Synergy Ability: 100 Survival
 Debuff type: physical
 
-Your Jab ability causes a debuff equal to your total level divided by 80 to
-your victim's Dexterity, for 10 seconds.
+Your Jab ability causes a debuff to your victim's Dexterity for 10 seconds.
 
 See also: JAB
 #
@@ -121,6 +120,22 @@ ability also grants the ability to see in the darkness it creates.
 Gains experience when you cast Darkness.
 
 See also: BLIND, DARK
+#
+DARKSHROUD "DARK SHROUD"
+
+Darkshroud (Stealth ability)
+
+Usage:  darkshroud
+Linked trait:  wits
+Cost:  50 move +25 per additional target
+Cooldown:  30 seconds
+Duration:  20 seconds
+
+This power allows you to strike out with shards of darkness, cutting through
+enemies beyond the physical level and causing traumatic damage over time. This
+ability hits all enemies in the room at once. It is stronger in the melee role.
+
+See also: MELEE ROLE
 #
 "DAGGER MASTERY"
 
@@ -152,13 +167,25 @@ DIVERSION
 Diversion
 Stealth Synergy Ability: 100 Trade
 Debuff type:  mental
-Cost:  50 move
+Linked trait:  Charisma
+Cost:  20 move + 10 per additional target
 Cooldown:  30 seconds
 Usage:  diversion
 
-You create a flashy diversion, penalizing all enemies. The first victim loses
-Wits equal to your Charisma. Each additional victim loses Wits equal to half
-your Charisma (rounded up) instead. This effect lasts 15 seconds.
+You create a flashy diversion, penalizing all enemies with reduced Wits. The
+first target receives a larger penalty; other targets are lower. This effect
+lasts 15 seconds.
+#
+"DUAL-WIELD" "DUAL WIELD"
+
+Dual-Wield
+Stealth Synergy Ability: 100 Battle OR 100 Survival OR 100 Trade
+
+With this ability, you can attack with weapons in both hands (the wield and
+hold slots). Without it, you can still hold a weapon in your off-hand, but
+will never attack with it.
+
+Your off-hand receives a significant to-hit penalty.
 #
 ESCAPE
 
@@ -170,10 +197,11 @@ Time:  5 seconds
 
 Escape lets you run for the nearest window and quickly exit the building or
 ship you're in, making a quick getaway from even the most confusing castles.
+This will also work in adventures only from indoor rooms that allow "look out".
 
 Gains experience when you escape.
 #
-HIDE HIDING
+HIDE HIDING HIDDEN
 
 Hide (Stealth ability)
 
@@ -191,14 +219,15 @@ HOWL
 
 Howl
 Stealth Synergy Ability: 100 Natural Magic
-Cost:  50 move
+Linked trait: charisma
+Cost:  20 move + 10 per additional target
 Cooldown:  30 seconds
 Debuff type:  mental
 Usage:  howl
 
-You let out a terrifying howl, penalizing all enemies. The first victim loses
-to-hit equal to 4x your Charisma. Each additional victim loses to-hit equal to
-2x Charisma instead.
+You let out a terrifying howl, lowering the accuracy of all enemies. The first
+target receives the largest penalty; other targets are lower. This effect lasts
+15 seconds.
 #
 INFILTRATE "IMPROVED INFILTRATE"
 
@@ -339,23 +368,17 @@ second person will release the first one.
 
 Gains experience when you use Sap, even if it fails.
 #
-SEARCH
+"SEARCH ABILITY"
 
 Search (Stealth ability)
 
 Usage:  search
 Cooldown:  10 seconds
 
-When you know where to look, it's easier to find hidden thieves and assassins.
-This ability reveals people who use the hide command, although it doesn't
-always find them on the first try, and it won't find anyone who has Cling to
-Shadow.
+This ability allows you to use the search command. Gains experience when you
+search a room.
 
-You can also find out if someone is earthmelded beneath you.
-
-Gains experience when you search a room.
-
-See also: HIDE, SENSE LIFE RITUAL
+See also: SEARCH COMMAND
 #
 "SECRET CACHE" SECRETCACHE
 
@@ -373,9 +396,10 @@ See also: BUILD, VAULT
 Shadow Jab
 Stealth Synergy Ability:  100 Vampire
 Debuff type:  physical
+Linked trait: Charisma
 
-Your Jab ability causes a debuff equal to your Charisma divided by 5 (rounded
-up) to your victim's dodge, for 15 seconds. This effect may stack.
+Your Jab ability now causes a debuff to your victim's dodge for 15 seconds.
+This effect may stack. It is stronger in the melee role.
 
 See also: JAB
 #
@@ -395,13 +419,14 @@ SHADOWCAGE "SHADOW CAGE"
 Shadowcage
 Stealth Synergy Ability:  100 High Sorcery
 Debuff type:  mental
-Cost:  50 move
+Linked trait: charisma
+Cost:  20 move + 10 per additional target.
 Cooldown:  30 seconds
 Usage:  shadowcage
 
-You create a cage of shadows, penalizing all enemies. The first victim loses
-dodge equal to 4x your Charisma. Each additional victim loses dodge equal to 2x
-Charisma instead. This effect lasts 15 seconds.
+You create a cage of shadows, making it harder for all enemies to dodge. The
+first target gets the largest penalty; other targets are lower. This effect
+lasts 15 seconds.
 #
 SHADOWSTEP "SHADOW STEP"
 
@@ -420,7 +445,7 @@ Players in the room you leave will not notice your departure, but players at
 your destination will notice your arrival.
 
 You cannot shadowstep to NPCs that belong to other empires, or that are on land
-that belongs to other empires.
+that belongs to other empires. You also can't shadowstep while distracted.
 
 Gains experience when you use Shadowstep.
 
@@ -447,9 +472,10 @@ See also: HIDE
 Stagger Jab
 Stealth Synergy Ability:  100 Battle
 Debuff type:  physical
+Linked trait: Charisma
 
-Your Jab ability causes a debuff equal to your Charisma divided by 5 (rounded
-up) to your victim's to-hit, for 15 seconds. This effect may stack.
+Your Jab ability now causes your victim to suffer lower to-hit for 15 seconds.
+This effect may stack. It is stronger in the melee role.
 
 See also: JAB
 #

@@ -5,12 +5,41 @@ ground lead you to the disquieting conclusion that this burrow is actually a
 dragon's lair. There isn't a lot of room to move, though, and you certainly
 would not be able to get past the dragon.
 ~
-cd 0 0
+cd 0 0 -1
 E
 gold traces ground~
    There are traces of gold on the ground, but it seems the dragon has hidden
 its hoard well, because you can't find enough gold to pick up.
 ~
 M 0 12300 100.00 1
+S
+#12350
+A Frozen Pit, Deep Underground~
+   The hole is enormous! You're only holding on because there are long grooves
+scratched into the frost on the sides. You can't see what's below, and you're
+trying your best not to think about it.
+~
+cdg 0 0 -1
+M 0 12350 100.00 1
+M 0 12351 100.00 1
+S
+#12351
+Down Its Icy Craw~
+   You tumble down the long, cold, jagged tunnel of the serragon's throat, only
+to meet your fate in its rocky stomach. There's precious little room to move in
+here, dimly lit by a pale blue glow from what light penetrates the serragon's
+translucent scales and thick skin. Worse, the creature is positioned upright in
+its pit and the walls of its stomach are impossible to climb.
+~
+cg 0 0 12351
+E
+rocks~
+Large rocks form your only footing.
+~
+E
+glow walls out~
+The walls of the craw have a pale blue glow showing through.
+~
+Z1 1
 S
 $

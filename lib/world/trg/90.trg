@@ -411,7 +411,7 @@ if %cmd% == feed
   halt
 end
 * Check target and tech
-if (!%actor.has_tech(Tame)% || %actor.char_target(%arg%)% != %self%)
+if (!%actor.has_tech(Tame-Command)% || %actor.char_target(%arg%)% != %self%)
   return 0
   halt
 end
@@ -562,15 +562,13 @@ set done 1
 set obj %actor.inventory()%
 while %obj%
   if %obj.vnum% == 9036
-    if %obj.is_flagged(ENCHANTED)% && %obj% != %self%
-      set done 0
+    if !%obj.is_flagged(ENCHANTED)% && %obj% != %self%
+      eval done %done% + 1
     end
   end
   set obj %obj.next_in_list%
 done
-if %done%
-  %quest% %actor% trigger 9036
-end
+%quest% %actor% settrigger 9036 %done%
 return 1
 ~
 #9042
@@ -631,6 +629,21 @@ set sheep %self.room.people%
 if %sheep.vnum% == 9004
   %echo% ~%self% is now ~%sheep%!
   %purge% %self%
+end
+~
+#9047
+Chicken: Lay egg~
+0 b 1
+~
+if %self.cooldown(9047)%
+  halt
+end
+nop %self.set_cooldown(9047,3600)%
+%echo% ~%self% lays an egg.
+%load% obj 3202 room 1
+set obj %self.room.contents%
+if %obj% && %obj.vnum% == 3202
+  nop %obj.flag(UNCOLLECTED-LOOT)%
 end
 ~
 #9061

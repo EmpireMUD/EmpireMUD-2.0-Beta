@@ -18,8 +18,10 @@ S
 Ruined Hamlet~
 The Burnt Ruins of a Small Hamlet~
 &?.&0\&?.&0]~
-10 -1 diou 0
+10 -1 diouw 0
 0 0 0 -1
+C
+dismantle~
 E
 hamlet ruined burnt ruins~
 It looks like the hamlet has burnt down. It smells terrible.
@@ -148,6 +150,7 @@ hides, and badly damaged armor. A roaring fire burns in the center of the tent.
 ~
 F
 G
+Z1 12
 S
 #10484
 Goblin Lab Tent~
@@ -167,5 +170,6 @@ F
 aG
 U
 1 5130
+Z1 12
 S
 $

@@ -70,8 +70,9 @@ mining_timer 45
 panning_timer 10
 pick_base_timer 4
 pick_depletion 14
-planting_base_timer 9000
-prospecting_workforce_hours 1440
+planting_base_timer 192
+planting_workforce_timer 24
+prospecting_workforce_hours 30
 shear_growth_time 6
 short_depletion 25
 tan_timer 12
@@ -81,6 +82,8 @@ trench_fill_time 43200
 trench_full_value 2000
 trench_gain_from_rain 5
 trench_initial_value -500
+world_reset_hours 180
+world_reset_message The ground under you shakes violently!
 *
 * City configs
 bonus_city_point_techs 10
@@ -100,6 +103,7 @@ players_per_city_point 2
 *
 * Empire configs
 building_population_timer 48
+decay_in_storage 1
 empire_log_ttl 30
 frontier_timeout 30
 homeless_citizen_speed 10
@@ -127,6 +131,7 @@ auto_update_items 1
 autostore_time 180
 bound_item_junk_time 10080
 long_autostore_time 720
+min_timer_after_retrieve 12
 room_item_limit 5
 scale_coin_amount 10.000000
 scale_drink_capacity 9.800000
@@ -136,6 +141,8 @@ scale_points_at_100 4.000000
 *
 * Mobs configs
 default_language_vnum 150
+default_magical_attack 28
+default_physical_attack 15
 max_npc_attribute 15
 mob_despawn_radius 3
 mob_pursuit_distance 25
@@ -187,7 +194,15 @@ num_daily_skill_points 15
 offer_time 75
 pool_bonus_amount 15
 remove_lore_after_years 2
+skills_at_max_level 2
+skills_at_specialty_level 2
+skills_per_char 6
 slash_message_log_days 7
+temperature_discomfort 20
+temperature_extreme 30
+temperature_from_fire 10
+temperature_from_water 10
+temperature_penalties 0
 *
 * Skills configs
 enchant_points_at_100 2.000000
@@ -204,10 +219,12 @@ summon_npc_limit 5
 tracks_lifespan 60
 *
 * System configs
+autoreboot_minutes 0
 log_losing_descriptor_without_char 0
 max_bad_pws 3
 max_filesize 50000
 nameserver_is_slow 0
+reboot_warning_minutes 15
 siteok_everyone 0
 use_autowiz 1
 *
@@ -228,8 +245,9 @@ hostile_login_delay 30
 mutual_war_only 0
 offense_min_to_war 0
 offenses_for_free_war 200
-rogue_flag_time 1440
+pk_mode b
 pvp_timer 5
+rogue_flag_time 1440
 seconds_per_death 30
 steal_death_penalty 60
 stolen_object_timer 30
@@ -248,6 +266,7 @@ default_inside_sect 11
 default_interior 1
 default_land_sect 0
 generic_facing bdeklmno
+ignore_island_levels 0
 interlink_distance 4
 interlink_mountain_limit 1
 interlink_river_limit 0

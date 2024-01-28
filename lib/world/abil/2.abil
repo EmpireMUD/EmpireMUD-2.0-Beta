@@ -1,16 +1,69 @@
+#200
+Stamina Burst~
+0 -1 1.00 0 0 0
+A
+6 1
+C
+unknown 7 g 0 0 0.00 -1 0 8 0 0
+D 256 174 0
+H 1 174 100.00 0
+M
+0
+*~
+M
+1
+*~
+M
+8
+*~
+M
+9
+*~
+T b 1
+X+ 1 3033
+X+ 2 75
+X+ 3 75
+S
+#201
+Mana Siphon~
+0 -1 1.00 0 0 0
+A
+7 1
+C
+unknown 7 g 0 0 0.00 -1 0 0 0 0
+D 256 176 0
+H 1 176 100.00 0
+M
+0
+*~
+M
+1
+*~
+M
+8
+*~
+M
+9
+*~
+T b 1
+X+ 1 3034
+X+ 2 20
+X+ 3 20
+S
 #202
 Fine Pottery~
-0 203 1.00 0 0
+0 203 1.00 0 0 0
 T a 0
 S
 #203
 Master Craftsman~
-0 203 1.00 0 0
-T a 0
+0 203 1.00 0 0 0
+T z 1
+T a 1
 S
 #204
 Master Farmer~
-0 -1 1.00 0 0
+0 -1 1.00 0 0 0
 D 1 18 0
 D 1 26 0
 D 1 46 0
@@ -18,229 +71,550 @@ T e 1
 S
 #205
 Master Survivalist~
-0 -1 1.00 0 0
-T m 0
+0 -1 1.00 0 q 0
+C
+unknown 0 g 0 0 0.00 2090 75 0 0 0
+H 256 0 33.33 0
+M
+0
+You bear down and prepare to survive this...~
+M
+1
+$n bears down and prepares to survive this...~
+T b 1
+X+ 0 S
+X+ 1 3111
+X+ 2 15
+X+ 3 15
 S
 #207
 Arcane Power~
-ij -1 1.00 0 h
+ij -1 1.00 0 h 0
 A
 16 1
 T f 1
-X f
-0
 S
 #209
 Outrage~
-0 -1 1.00 0 0
-T m 0
+a -1 1.00 0 0 0
+C
+outrage 7 AB 1 25 0.00 2009 9 0 2 2
+D 64 15 0
+M
+2
+*~
+M
+3
+*~
+M
+4
+*~
+M
+10
+*~
+M
+11
+*~
+M
+12
+*~
+M
+13
+You spin wildly with outrage, hitting everything in sight!~
+M
+14
+$n spins wildly with outrage, hitting everything in sight!~
+T x 1
+T s 1
+X+ 8 25.00
 S
 #210
 Unnatural Thirst~
-0 -1 1.00 0 hl
+0 -1 1.00 0 hl 0
 D 1 30 0
 D 1 28 0
 T e 1
 S
 #211
 Dread Blood Form~
-0 -1 1.00 0 0
+0 -1 1.00 0 0 0
 T k 1
 S
 #212
 Savage Werewolf Form~
-0 -1 1.00 0 0
+0 -1 1.00 0 0 0
 T k 1
 S
 #213
 Towering Werewolf Form~
-0 -1 1.00 0 0
+0 -1 1.00 0 0 0
 T k 1
 S
 #214
 Sage Werewolf Form~
-0 -1 1.00 0 0
+0 -1 1.00 0 0 0
 T k 1
 S
 #215
 Animal Forms~
-0 -1 1.00 0 0
+0 -1 1.00 0 0 0
 T k 1
-S
-#216
-Refashion~
-0 -1 1.00 0 0
-T m 0
 S
 #218
 Dual-Wield~
-0 -1 1.00 0 b
+0 -1 1.00 0 b 0
 D 1 12 0
 T e 1
 S
 #219
 Resurrect~
-0 -1 1.00 0 0
-T m 0
+0 -1 1.00 0 0 0
+C
+resurrect 8 bhijE 2 75 0.00 -1 0 0 5 0
+M
+2
+You begin channeling mana to resurrect $O...~
+M
+3
+*~
+M
+4
+$n glows with white light as $e begins to channel $s mana to resurrect $O...~
+M
+28
+A strange force lifts you up from the ground, and you seem to float back to your feet... You feel a rush of blood as your heart starts beating again.~
+M
+30
+A brilliant light bursts forth from $n's chest as $e floats up from the ground and comes back to life!~
+T v 1
 S
 #220
 Moonrise~
-0 -1 1.00 0 0
-T m 0
+0 -1 1.00 0 0 0
+C
+moonrise 7 bhijE 2 200 0.00 2044 1200 0 3 0
+M
+2
+You let out a bone-chilling howl...~
+M
+3
+$n lets out a bone-chilling howl...~
+M
+4
+$n lets out a bone-chilling howl...~
+M
+28
+A strange force lifts you up from the ground, and you seem to float back to your feet... You feel a rush of blood as your heart starts beating again.~
+M
+30
+An eerie light bursts forth from $n's chest as $e floats up from the ground and comes back to life!~
+T v 1
 S
 #221
 Iron Blades~
-0 195 1.00 0 0
+0 195 1.00 0 0 0
 T a 0
 S
 #222
 Sturdy Armors~
-0 195 1.00 0 0
+0 195 1.00 0 0 0
 T a 0
 S
 #223
 Rawhide Stitching~
-0 194 1.00 0 0
+0 194 1.00 0 0 0
 T a 0
 S
 #224
 Magic Attire~
-0 194 1.00 0 0
+0 194 1.00 0 0 0
 T a 0
 S
 #225
 Predator Vision~
-0 -1 1.00 0 gi
+0 -1 1.00 0 gip 0
 A
 27 1
 D 1 43 0
 T e 0
 T f 1
-X f
-0
 S
 #226
 Sanguine Restoration~
-o -1 1.00 0 0
+o -1 1.00 0 0 0
 A
 20 75
+D 1 97 0
 T f 1
-X f
-0
+T e 0
 S
 #227
 Ward Against Magic~
-0 -1 1.00 0 0
+0 -1 1.00 0 0 0
 D 1 7 0
 T e 1
 S
 #228
 Noble Bearing~
-0 -1 1.00 0 0
-T m 0
+0 -1 1.00 0 f 0
+A
+12 1
+A
+24 1
+C
+unknown 8 0 0 0 0.00 -1 0 5 0 0
+T f 1
 S
 #229
 Bloodsweat~
-0 -1 1.00 0 0
-T m 0
+d -1 1.00 0 0 0
+C
+bloodsweat 4 eg 3 20 0.00 2047 30 0 1 0
+D 64 11 0
+D 64 14 0
+M
+0
+You sweat blood through your pores, and poison with it!~
+M
+1
+$n begins sweating blood.~
+M
+8
+You're not even poisoned!~
+M
+9
+*~
+T s 1
 S
 #230
 Improved Reflexes~
-0 -1 1.00 0 d
+0 -1 1.00 0 d 0
 D 1 52 0
 T e 1
 S
 #231
 Shadow Kick~
-0 -1 1.00 0 0
-T m 0
+ak -1 2.00 h 0 0
+A
+21 -1
+A
+22 -1
+C
+unknown 7 bfh 0 0 0.00 -1 0 0 0 0
+H 1 96 100.00 0
+M
+2
+... Your shadow kicks $N hard!~
+M
+2
+... Your shadow kicks $N in the back!~
+M
+2
+... Your shadow kicks $N out of nowhere!~
+M
+3
+... $n's shadow kicks you hard!~
+M
+3
+... $n's shadow kicks you in the back!~
+M
+3
+... $n's shadow kicks you out of nowhere!~
+M
+4
+... $n's shadow kicks $N hard!~
+M
+4
+... $n's shadow kicks $N in the back!~
+M
+4
+... $n's shadow kicks $N out of nowhere!~
+M
+10
+*~
+M
+11
+*~
+M
+12
+*~
+T b 1
+X+ 1 3053
+X+ 2 10
+X+ 3 10
 S
 #232
 Stagger Jab~
-0 -1 1.00 0 0
-T m 0
+akv -1 0.50 h 0 0
+A
+17 -1
+C
+unknown 7 bfh 0 0 0.00 -1 0 4 0 0
+H 1 155 100.00 0
+M
+2
+$N is staggered by that jab!~
+M
+3
+You're staggered by that jab!~
+M
+4
+$N is staggered by that jab!~
+M
+10
+*~
+M
+11
+*~
+M
+12
+*~
+T b 1
+X+ 1 3054
+X+ 2 15
+X+ 3 15
 S
 #233
 Shadowcage~
-0 -1 1.00 0 0
-T m 0
+afC -1 1.00 D 0 0
+A
+18 -1
+C
+shadowcage 7 A 1 10 0.00 2049 30 4 2 0
+M
+2
+*~
+M
+3
+You can't seem to dodge as well in the shadowcage!~
+M
+4
+*~
+M
+13
+You shoot webs of pure shadow, forming a tight cage!~
+M
+14
+$n shoots webs of pure shadow, forming a tight cage!~
+M
+38
+$N doesn't seem to notice.~
+T b 1
+X+ 1 3055
+X+ 2 15
+X+ 3 15
+X+ 8 10.00
 S
 #234
 Howl~
-0 -1 1.00 0 0
-T m 0
+afC -1 1.00 D 0 0
+A
+17 -1
+C
+howl 7 A 1 10 10.00 2050 30 4 2 0
+M
+2
+*~
+M
+3
+You are too scared to aim effectively!~
+M
+4
+*~
+M
+13
+You let out a fearsome howl!~
+M
+14
+$n lets out a bone-chilling howl!~
+M
+38
+$N doesn't seem to notice.~
+T b 1
+X+ 1 3056
+X+ 2 15
+X+ 3 15
 S
 #235
 Crucial Jab~
-0 -1 1.00 0 0
-T m 0
+akv -1 0.20 h 0 0
+A
+2 -1
+C
+unknown 7 bfh 0 0 0.00 -1 0 0 0 0
+H 1 155 100.00 0
+M
+2
+That jab seems to have hit something crucial on $N!~
+M
+3
+That jab seems to have hit something crucial on you!~
+M
+4
+That jab seems to have hit something crucial on $N!~
+M
+10
+*~
+M
+11
+*~
+M
+12
+*~
+T b 1
+X+ 1 3057
+X+ 2 10
+X+ 3 10
 S
 #236
 Diversion~
-0 -1 1.00 0 0
-T m 0
+afC -1 1.00 D 0 0
+A
+9 -1
+C
+diversion 7 A 1 10 0.00 2051 30 4 2 0
+M
+2
+*~
+M
+3
+You can't seem to focus on the battle!~
+M
+4
+*~
+M
+13
+You release a small flock of pigeons into the melee!~
+M
+13
+You toss some firecrackers into the melee!~
+M
+13
+You throw a pocketful of sparkling dust into the melee!~
+M
+14
+$n releases a small flock of pigeons into the melee!~
+M
+14
+$n tosses some firecrackers into the melee!~
+M
+14
+$n throws a pocketful of sparkling dust into the melee!~
+M
+38
+$N doesn't seem to notice.~
+T b 1
+X+ 1 3058
+X+ 2 15
+X+ 3 15
+X+ 8 10.00
 S
 #237
 Shadow Jab~
-0 -1 1.00 0 0
-T m 0
+akv -1 0.50 h 0 0
+A
+18 -1
+C
+unknown 7 bfh 0 0 0.00 -1 0 4 0 0
+H 1 155 100.00 0
+M
+2
+Shadows spew from $N's wound to cover $M!~
+M
+3
+Shadows spew from the wound and cover you!~
+M
+4
+Shadows spew from $N's wound to cover $M!~
+M
+10
+*~
+M
+11
+*~
+M
+12
+*~
+T b 1
+X+ 1 3059
+X+ 2 15
+X+ 3 15
 S
 #238
 Fastcasting~
-0 -1 1.00 0 0
+0 -1 1.00 0 0 0
 D 1 14 0
 T e 1
 S
 #239
 Ancestral Healing~
-0 -1 1.00 0 0
-T m 0
+j -1 1.00 0 r 0
+A
+23 1
+C
+unknown 8 0 0 0 0.00 -1 0 5 0 0
+T f 1
 S
 #240
 Confer~
-0 -1 1.00 0 0
+0 -1 1.00 0 0 0
 T m 0
 S
 #241
 Steelsmith Crafts~
-0 -1 1.00 0 0
+0 -1 1.00 0 0 0
 T a 0
+S
+#242
+Deathrise~
+0 -1 1.00 0 0 0
+C
+deathrise 0 gE 3 50 0.00 2091 600 0 5 0
+M
+0
+You rise as suddenly as you fell, hungry for more!~
+M
+1
+$n rises from death with a hunger in $s eyes!~
+R
+1121 1 0 0
+T v 1
 S
 #243
 Artificer Crafts~
-0 -1 1.00 0 0
+0 -1 1.00 0 0 0
 T a 0
 S
 #244
 Alchemist Crafts~
-0 -1 1.00 0 0
+0 -1 1.00 0 0 0
 T a 0
 S
 #245
 Smuggler Crafts~
-0 -1 1.00 0 0
+0 -1 1.00 0 0 0
 T a 0
 S
 #246
 Tinker Crafts~
-0 -1 1.00 0 0
+0 -1 1.00 0 0 0
 T a 0
 S
 #247
 Antiquarian Crafts~
-0 -1 1.00 0 0
+0 -1 1.00 0 0 0
 T a 0
 S
 #248
 Exarch Crafts~
-0 -1 1.00 0 0
+0 -1 1.00 0 0 0
 T a 0
 S
 #250
 Griffin Familiar~
-0 -1 1.00 0 ho
+0 -1 1.00 0 ho 0
 C
-unknown 8 0 2 40 0 -1 0 0 5 0
+unknown 8 0 2 40 0.00 -1 0 0 5 0
 D 8 503 0
 M
 2
@@ -252,9 +626,9 @@ T h 0
 S
 #251
 Dire Wolf Familiar~
-0 -1 1.00 0 ho
+0 -1 1.00 0 ho 0
 C
-unknown 8 0 2 40 0 -1 0 0 5 0
+unknown 8 0 2 40 0.00 -1 0 0 5 0
 D 8 504 0
 M
 2
@@ -266,9 +640,9 @@ T h 0
 S
 #252
 Moon Rabbit Familiar~
-0 -1 1.00 0 ho
+0 -1 1.00 0 ho 0
 C
-unknown 8 0 2 40 0 -1 0 0 5 0
+unknown 8 0 2 40 0.00 -1 0 0 5 0
 D 8 505 0
 M
 2
@@ -280,9 +654,9 @@ T h 0
 S
 #253
 Spirit Wolf Familiar~
-0 -1 1.00 0 ho
+0 -1 1.00 0 ho 0
 C
-unknown 8 0 2 40 0 -1 0 0 5 0
+unknown 8 0 2 40 0.00 -1 0 0 5 0
 D 8 507 0
 M
 2
@@ -294,9 +668,9 @@ T h 0
 S
 #254
 Manticore Familiar~
-0 -1 1.00 0 ho
+0 -1 1.00 0 ho 0
 C
-unknown 8 0 2 40 0 -1 0 0 5 0
+unknown 8 0 2 40 0.00 -1 0 0 5 0
 D 8 508 0
 M
 2
@@ -308,9 +682,9 @@ T h 0
 S
 #255
 Phoenix Familiar~
-0 -1 1.00 0 ho
+0 -1 1.00 0 ho 0
 C
-unknown 8 0 2 40 0 -1 0 0 5 0
+unknown 8 0 2 40 0.00 -1 0 0 5 0
 D 8 509 0
 M
 2
@@ -322,9 +696,9 @@ T h 0
 S
 #256
 Scorpion Shadow Familiar~
-0 -1 1.00 0 ho
+0 -1 1.00 0 ho 0
 C
-unknown 8 0 2 40 0 -1 0 0 5 0
+unknown 8 0 2 40 0.00 -1 0 0 5 0
 D 8 510 0
 M
 2
@@ -336,9 +710,9 @@ T h 0
 S
 #257
 Owl Shadow Familiar~
-0 -1 1.00 0 ho
+0 -1 1.00 0 ho 0
 C
-unknown 8 0 2 40 0 -1 0 0 5 0
+unknown 8 0 2 40 0.00 -1 0 0 5 0
 D 8 511 0
 M
 2
@@ -350,9 +724,9 @@ T h 0
 S
 #258
 Basilisk Familiar~
-0 -1 1.00 0 ho
+0 -1 1.00 0 ho 0
 C
-unknown 8 0 2 40 0 -1 0 0 5 0
+unknown 8 0 2 40 0.00 -1 0 0 5 0
 D 8 512 0
 M
 2
@@ -364,9 +738,9 @@ T h 0
 S
 #259
 Salamander Familiar~
-0 -1 1.00 0 ho
+0 -1 1.00 0 ho 0
 C
-unknown 8 0 2 40 0 -1 0 0 5 0
+unknown 8 0 2 40 0.00 -1 0 0 5 0
 D 8 513 0
 M
 2
@@ -378,9 +752,9 @@ T h 0
 S
 #260
 Skeletal Hulk Familiar~
-0 -1 1.00 0 ho
+0 -1 1.00 0 ho 0
 C
-unknown 8 0 2 40 0 -1 0 0 5 0
+unknown 8 0 2 40 0.00 -1 0 0 5 0
 D 8 514 0
 M
 2
@@ -392,9 +766,9 @@ T h 0
 S
 #261
 Banshee Familiar~
-0 -1 1.00 0 ho
+0 -1 1.00 0 ho 0
 C
-unknown 8 0 2 40 0 -1 0 0 5 0
+unknown 8 0 2 40 0.00 -1 0 0 5 0
 D 8 515 0
 M
 2
@@ -406,191 +780,337 @@ T h 0
 S
 #262
 Hone~
-0 -1 1.00 0 0
+0 -1 1.00 0 0 0
+D 1 99 0
 T l 1
-S
-#263
-Healing Boost~
-0 -1 1.00 0 0
-D 1 19 0
 T e 1
 S
 #264
 Exquisite Woodworking~
-0 203 1.00 0 0
+0 203 1.00 0 0 0
 T a 0
 S
 #265
 Chant of Illusions~
-0 -1 1.00 0 0
-T m 0
+grst -1 1.00 0 0 0
+C
+chant 8 o 2 0 0.00 -1 0 0 5 0
+D 16 5 0
+D 16 3 0
+M
+8
+You finish the chant, but it has no effect.~
+M
+9
+*~
+M
+22
+$n is chanting around the road.~
+M
+32
+You start the chant of illusions...~
+M
+32
+You chant, 'In shadows whispered by ancient trees,'~
+M
+32
+*~
+M
+32
+You chant, 'Nature's cloak, a subtle tease.'~
+M
+32
+*~
+M
+32
+You chant, 'Illusions woven 'neath the boughs,'~
+M
+32
+*~
+M
+32
+You chant, 'Where secrets dance, where silence vows.'~
+M
+32
+*~
+M
+32
+You watch as plants begin to grow around the road...~
+M
+32
+*~
+M
+32
+You chant, 'Overgrowth veils the trodden way,'~
+M
+32
+*~
+M
+32
+You chant, 'Hidden path, in wild display!'~
+M
+32
+*~
+M
+32
+As you finish the chant, the road is cloaked in illusion!~
+M
+33
+$n starts the chant of illusions...~
+M
+33
+$n chants, 'In shadows whispered by ancient trees,'~
+M
+33
+*~
+M
+33
+$n chants, 'Nature's cloak, a subtle tease.'~
+M
+33
+*~
+M
+33
+$n chants, 'Illusions woven 'neath the boughs,'~
+M
+33
+*~
+M
+33
+$n chants, 'Where secrets dance, where silence vows.'~
+M
+33
+*~
+M
+33
+You watch as plants begin to grow around the road...~
+M
+33
+*~
+M
+33
+$n chants, 'Overgrowth veils the trodden way,'~
+M
+33
+*~
+M
+33
+$n chants, 'Hidden path, in wild display!'~
+M
+33
+*~
+M
+33
+As $n finishes the chant, the road is cloaked in illusion!~
+R
+1119 1 0 0
+R
+1206 1 0 0
+T q 1
+X+ 0 d
+X+ 2 -1
+X+ 3 -1
 S
 #267
 Astral Werewolf Form~
-0 -1 1.00 0 0
+0 -1 1.00 0 0 0
 T k 1
 S
 #268
 Whisperstride~
-0 -1 1.00 0 0
-T m 0
+0 -1 1.00 0 0 0
+C
+whisperstride 8 g 1 100 0.00 2054 300 0 1 0
+D 2 0 0
+M
+0
+You cloak yourself with dark whispers, muffling your movement...~
+M
+1
+$n is surrounded by dark whispers...~
+T b 1
+X+ 0 d
+X+ 1 3063
+X+ 2 30
+X+ 3 30
 S
 #269
 Werewolf Form~
-0 -1 1.00 0 0
+0 -1 1.00 0 0 0
 T k 1
 S
 #270
 Family Recipes~
-0 -1 1.00 0 0
+0 -1 1.00 0 0 0
 T a 0
 S
 #271
 Gourmet Chef~
-0 -1 1.00 0 0
+0 -1 1.00 0 0 0
 T a 0
 S
 #272
 Stablemaster~
-0 -1 1.00 0 0
-T m 0
+0 -1 1.00 0 0 0
+D 1 94 0
+D 1 95 0
+T e 1
 S
 #273
 Ablate~
-abi -1 1.00 o 0
+abi -1 1.00 o 0 0
 A
 12 -1
 C
-ablate 7 bf 2 11 4 2055 9 8 3 0
+ablate 7 bf 2 11 4.00 2055 9 8 3 0
 T c 3
 T b 2
-X b
-3065 10 10 0
-X c
-67 1
+X+ 1 3065
+X+ 2 10
+X+ 3 10
+X+ 4 67
+X+ 5 1
 S
 #274
 Acidblast~
-abi -1 1.00 o 0
+abi -1 1.00 o 0 0
 A
 24 -1
 C
-acidblast 7 bf 2 13 5 2056 9 8 3 0
+acidblast 7 bf 2 13 5.00 2056 9 8 3 0
 T c 6
 T b 4
-X b
-3066 10 10 0
-X c
-68 1
+X+ 1 3066
+X+ 2 10
+X+ 3 10
+X+ 4 68
+X+ 5 1
 S
 #275
 Arclight~
-abi -1 1.40 o 0
+abi -1 1.40 o 0 0
 C
-arclight 7 bf 2 10 3 2057 9 8 3 0
+arclight 7 bf 2 10 3.00 2057 9 8 3 0
 T c 1
-X c
-69 1
+X+ 4 69
+X+ 5 1
 S
 #276
 Astralclaw~
-abi -1 1.00 o 0
+abi -1 1.00 o 0 0
 C
-astralclaw 7 bf 2 10 3 2058 9 8 3 0
+astralclaw 7 bf 2 10 3.00 2058 9 8 3 0
 T c 4
 T d 6
-X c
-70 0
-X d
-3067 15 15 0 3
+X+ 1 3067
+X+ 2 15
+X+ 3 15
+X+ 4 70
+X+ 6 3
 S
 #277
 Chronoblast~
-abi -1 1.00 o 0
+abi -1 1.00 o 0 0
 C
-chronoblast 7 bf 2 11 4 2059 6 8 3 0
+chronoblast 7 bf 2 11 4.00 2059 6 8 3 0
 T b 1
 T c 9
-X b
-3068 5 5 s
-X c
-71 1
+X+ 0 s
+X+ 1 3068
+X+ 2 5
+X+ 3 5
+X+ 4 71
+X+ 5 1
 S
 #278
 Deathtouch~
-abi -1 1.20 o 0
+abi -1 1.20 o 0 0
 C
-deathtouch 7 bf 2 10 3 2060 6 8 3 0
+deathtouch 7 bf 2 10 3.00 2060 6 8 3 0
 T c 1
-X c
-72 1
+X+ 4 72
+X+ 5 1
 S
 #279
 Dispirit~
-abio -1 1.00 o 0
+abio -1 1.00 o 0 0
 A
 9 -4
 C
-dispirit 7 bf 2 11 4 2061 9 8 3 0
+dispirit 7 bf 2 11 4.00 2061 9 8 3 0
 T c 9
 T b 1
-X b
-3069 10 10 0
-X c
-73 4
+X+ 1 3069
+X+ 2 10
+X+ 3 10
+X+ 4 73
+X+ 5 4
 S
 #282
 Shadowlash~
-0 -1 1.00 0 0
+abi -1 1.00 0 0 0
+C
+shadowlash 7 bfh 2 10 3.00 2064 9 8 3 0
+T c 1
+T d 3
+X+ 1 3073
+X+ 2 15
+X+ 3 15
+X+ 4 76
+X+ 5 1
+X+ 6 3
 S
 #283
 Soulchain~
-abio -1 1.00 o 0
+abio -1 1.00 o 0 0
 A
 8 -4
 C
-soulchain 7 bf 2 11 4 2065 9 8 3 0
+soulchain 7 bf 2 11 4.00 2065 9 8 3 0
 T c 8
 T b 2
-X b
-3074 10 10 0
-X c
-77 1
+X+ 1 3074
+X+ 2 10
+X+ 3 10
+X+ 4 77
+X+ 5 1
 S
 #284
 Starstrike~
-abi -1 1.50 o 0
+abi -1 1.50 o 0 0
 C
-starstrike 7 bf 2 10 3 2066 9 8 3 0
+starstrike 7 bf 2 10 3.00 2066 9 8 3 0
 T c 1
-X c
-78 1
+X+ 4 78
+X+ 5 1
 S
 #285
 Thornlash~
-abi -1 1.00 h 0
+abi -1 1.00 h 0 0
 C
-thornlash 7 bf 2 10 3 2067 9 8 3 0
+thornlash 7 bf 2 10 3.00 2067 9 8 3 0
 T c 4
 T d 6
-X c
-79 3
-X d
-3075 15 15 3 3
+X+ 1 3075
+X+ 2 15
+X+ 3 15
+X+ 4 79
+X+ 5 3
+X+ 6 3
 S
 #286
 Evasion~
-0 -1 1.00 0 0
-T m 0
+a -1 1.00 0 df 0
+T x 1
 S
 #287
 Weapon Proficiency~
-0 -1 1.00 0 0
-T m 0
+a -1 1.00 0 bc 0
+T x 1
 S
 #288
 Primitive Crafts~
-0 203 1.00 0 0
+0 203 1.00 0 0 0
 D 1 81 0
 D 1 80 0
 D 1 82 0
@@ -599,12 +1119,43 @@ T e 0
 S
 #289
 Build~
-0 -1 1.00 0 0
+0 -1 1.00 0 0 0
 T a 0
+S
+#290
+Shadowlash Blinding~
+a -1 1.00 o 0 0
+C
+unknown 7 bfh 0 0 0.00 -1 0 0 0 0
+D 256 282 0
+H 1 282 100.00 0
+M
+2
+*~
+M
+3
+*~
+M
+4
+*~
+M
+10
+*~
+M
+11
+*~
+M
+12
+*~
+T b 1
+X+ 0 a
+X+ 1 3072
+X+ 2 5
+X+ 3 5
 S
 #291
 Scavenging~
-0 -1 1.00 0 0
+0 -1 1.00 0 0 0
 D 1 70 0
 D 1 71 0
 D 1 72 0
@@ -615,44 +1166,106 @@ T e 1
 S
 #292
 Bite~
-0 -1 1.00 0 0
-T m 0
+0 -1 1.00 0 0 0
+C
+unknown 8 0 0 0 0.00 -1 0 0 0 1
+D 1 87 0
+T e 1
 S
 #293
 Cook~
-0 -1 1.00 0 0
+0 -1 1.00 0 0 0
 D 1 79 0
 T a 0
 T e 0
 S
 #294
 Kite~
-0 -1 1.00 0 0
-T m 0
+0 -1 1.00 0 0 0
+C
+kite 7 eg 1 50 0.00 2068 30 0 2 0
+D 64 24 0
+D 16 47 0
+D 16 45 0
+M
+0
+You move back and attempt to kite...~
+M
+1
+$n moves back and attempts to kite...~
+M
+8
+There's nobody you can kite.~
+M
+9
+*~
+M
+25
+You successfully kite $N!~
+M
+26
+$n successfully kites you!~
+M
+27
+*~
+T s 1
 S
 #295
 Bowmaster~
-0 -1 1.00 0 0
+0 -1 1.00 0 0 0
 T m 0
 S
 #296
 Trick Shots~
-0 -1 1.00 0 0
-T m 0
+a -1 1.00 0 0 0
+T b 1
 S
 #297
 Charge~
-0 -1 1.00 0 0
-T m 0
+afmoF -1 1.00 0 0 0
+A
+17 100
+A
+21 15
+A
+22 15
+C
+charge 7 bfh 1 50 0.00 2069 180 0 2 0
+D 16 15 0
+M
+2
+You charge at $N!~
+M
+3
+$n charges at you!~
+M
+4
+$n charges at $N!~
+M
+10
+*~
+M
+11
+*~
+M
+12
+*~
+M
+31
+Charge at whom?~
+T b 1
+X+ 1 3080
+X+ 2 5
+X+ 3 5
 S
 #298
 Fletching~
-0 203 1.00 0 0
+0 203 1.00 0 0 0
 T a 0
 S
 #299
 Animal Husbandry~
-0 -1 1.00 0 0
+0 -1 1.00 0 0 0
 D 1 54 0
 D 1 55 0
 D 1 56 0

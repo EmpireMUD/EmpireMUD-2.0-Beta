@@ -2,7 +2,7 @@
 *   File: act.god.c                                       EmpireMUD 2.0b5 *
 *  Usage: Player-level god commands                                       *
 *                                                                         *
-*  EmpireMUD code base by Paul Clarke, (C) 2000-2015                      *
+*  EmpireMUD code base by Paul Clarke, (C) 2000-2024                      *
 *  All rights reserved.  See license.doc for complete information.        *
 *                                                                         *
 *  EmpireMUD based upon CircleMUD 3.0, bpl 17, by Jeremy Elson.           *
@@ -20,7 +20,6 @@
 #include "interpreter.h"
 #include "handler.h"
 #include "db.h"
-#include "skills.h"
 #include "dg_scripts.h"
 
 /**
@@ -84,7 +83,7 @@ static int perform_sacrifice(char_data *ch, char_data *god, obj_data *obj, bool 
 	if (OBJ_FLAGGED(obj, OBJ_CREATED))
 		bonus = 1;
 
-	GET_RESOURCE(god, GET_OBJ_MATERIAL(obj)) += (int)((1 + rate_item(obj)) * bonus);
+	SAFE_ADD(GET_RESOURCE(god, GET_OBJ_MATERIAL(obj)), (int)((1 + rate_item(obj)) * bonus), 0, INT_MAX, FALSE);
 
 	if (message) {
 		*buf2 = '\0';
@@ -119,7 +118,7 @@ ACMD(do_create) {
 	char *name;
 	obj_data *proto, *obj = NULL;
 	obj_data *obj_iter, *next_obj;
-	int cost, iter, mat, num = 1, count = 0;
+	int cost, iter, mat, num = 1, count = 0, obj_ok = 0;
 	bool imm_access = (GET_ACCESS_LEVEL(ch) >= LVL_CIMPL || IS_GRANTED(ch, GRANT_LOAD));
 	bool low_res = FALSE;
 
@@ -187,7 +186,10 @@ ACMD(do_create) {
 			}
 			
 			scale_item_to_level(obj, 1);	// minimum level
-			load_otrigger(obj);
+			obj_ok = load_otrigger(obj);
+			if (obj_ok && obj->carried_by) {
+				get_otrigger(obj, obj->carried_by, FALSE);
+			}
 		}
 		else {
 			low_res = TRUE;
@@ -196,9 +198,13 @@ ACMD(do_create) {
 
 	if (count == 0) {
 		msg_to_char(ch, "You fail to create it.\r\n");
-		if (obj) {
+		if (obj_ok && obj) {
 			extract_obj(obj);
 		}
+	}
+	else if (!obj_ok) {
+		// probably self-purged?
+		msg_to_char(ch, "You create it.\r\n");
 	}
 	else if (count == 1) {
 		act("You create $p!", FALSE, ch, obj, 0, TO_CHAR);

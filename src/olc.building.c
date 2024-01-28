@@ -2,7 +2,7 @@
 *   File: olc.building.c                                  EmpireMUD 2.0b5 *
 *  Usage: OLC for building prototypes                                     *
 *                                                                         *
-*  EmpireMUD code base by Paul Clarke, (C) 2000-2015                      *
+*  EmpireMUD code base by Paul Clarke, (C) 2000-2024                      *
 *  All rights reserved.  See license.doc for complete information.        *
 *                                                                         *
 *  EmpireMUD based upon CircleMUD 3.0, bpl 17, by Jeremy Elson.           *
@@ -87,12 +87,12 @@ bool audit_building(bld_data *bld, char_data *ch) {
 		olc_audit_msg(ch, GET_BLD_VNUM(bld), "2ND-TERRITORY flag on a non-designated building");
 		problem = TRUE;
 	}
-	if (!IS_SET(GET_BLD_FLAGS(bld), BLD_ROOM | BLD_IS_RUINS) && !GET_BLD_YEARLY_MAINTENANCE(bld)) {
+	if (!IS_SET(GET_BLD_FLAGS(bld), BLD_ROOM | BLD_IS_RUINS) && !GET_BLD_REGULAR_MAINTENANCE(bld)) {
 		olc_audit_msg(ch, GET_BLD_VNUM(bld), "Requires no maintenance");
 		problem = TRUE;
 	}
-	if (IS_SET(GET_BLD_FLAGS(bld), BLD_ROOM) && GET_BLD_YEARLY_MAINTENANCE(bld)) {
-		olc_audit_msg(ch, GET_BLD_VNUM(bld), "Interior room has yearly maintenance (will have no effect)");
+	if (IS_SET(GET_BLD_FLAGS(bld), BLD_ROOM) && GET_BLD_REGULAR_MAINTENANCE(bld)) {
+		olc_audit_msg(ch, GET_BLD_VNUM(bld), "Interior room has maintenance resources (will have no effect)");
 		problem = TRUE;
 	}
 	if (IS_SET(GET_BLD_FLAGS(bld), BLD_ROOM) && (count_bld_relations(bld, BLD_REL_UPGRADES_TO_BLD) > 0 || count_bld_relations(bld, BLD_REL_FORCE_UPGRADE_BLD) > 0 || count_bld_relations(bld, BLD_REL_UPGRADES_TO_VEH) > 0 || count_bld_relations(bld, BLD_REL_FORCE_UPGRADE_VEH) > 0)) {
@@ -655,7 +655,7 @@ void olc_delete_building(char_data *ch, bld_vnum vnum) {
 * @param char *argument The argument they entered.
 */
 void olc_fullsearch_building(char_data *ch, char *argument) {
-	char buf[MAX_STRING_LENGTH * 2], line[MAX_STRING_LENGTH], type_arg[MAX_INPUT_LENGTH], val_arg[MAX_INPUT_LENGTH], find_keywords[MAX_INPUT_LENGTH];
+	char buf[MAX_STRING_LENGTH * 2], line[MAX_STRING_LENGTH], type_arg[MAX_INPUT_LENGTH], val_arg[MAX_INPUT_LENGTH], find_keywords[MAX_INPUT_LENGTH], extra_search[MAX_INPUT_LENGTH];
 	int count;
 	bool found_one;
 	
@@ -686,6 +686,7 @@ void olc_fullsearch_building(char_data *ch, char *argument) {
 	
 	// process argument
 	*find_keywords = '\0';
+	*extra_search = '\0';
 	while (*argument) {
 		// figure out a type
 		argument = any_one_arg(argument, type_arg);
@@ -699,8 +700,9 @@ void olc_fullsearch_building(char_data *ch, char *argument) {
 		FULLSEARCH_INT("citizensover", cits_over, 0, INT_MAX)
 		FULLSEARCH_INT("citizensunder", cits_under, 0, INT_MAX)
 		FULLSEARCH_STRING("commands", only_commands)
-		FULLSEARCH_LIST("depletion", only_depletion, depletion_type)
+		FULLSEARCH_LIST("depletion", only_depletion, depletion_types)
 		FULLSEARCH_FLAGS("designate", only_designate, designate_flags)
+		FULLSEARCH_STRING("extradesc", extra_search)
 		FULLSEARCH_INT("fame", only_fame, 0, INT_MAX)
 		FULLSEARCH_INT("fameover", fame_over, 0, INT_MAX)
 		FULLSEARCH_INT("fameunder", fame_under, 0, INT_MAX)
@@ -792,6 +794,9 @@ void olc_fullsearch_building(char_data *ch, char *argument) {
 		if (hitpoints_under != NOTHING && GET_BLD_MAX_DAMAGE(bld) > hitpoints_under) {
 			continue;
 		}
+		if (*extra_search && !find_exdesc(extra_search, GET_BLD_EX_DESCS(bld), NULL)) {
+			continue;
+		}
 		if (*only_icon && !GET_BLD_ICON(bld)) {
 			continue;
 		}
@@ -862,7 +867,7 @@ void olc_fullsearch_building(char_data *ch, char *argument) {
 		}
 	}
 	
-	if (count > 0 && (size + 14) < sizeof(buf)) {
+	if (count > 0 && (size + 20) < sizeof(buf)) {
 		size += snprintf(buf + size, sizeof(buf) - size, "(%d buildings)\r\n", count);
 	}
 	else if (count == 0) {
@@ -932,7 +937,7 @@ void olc_search_building(char_data *ch, bld_vnum vnum) {
 		}
 		any = FALSE;
 		LL_FOREACH(GET_BLD_INTERACTIONS(bld), inter) {
-			if (interact_vnum_types[inter->type] == TYPE_BLD && inter->vnum == vnum) {
+			if (interact_data[inter->type].vnum_type == TYPE_BLD && inter->vnum == vnum) {
 				any = TRUE;
 				break;
 			}
@@ -1046,7 +1051,7 @@ void olc_search_building(char_data *ch, bld_vnum vnum) {
 			any = TRUE;
 		}
 		LL_FOREACH(VEH_INTERACTIONS(veh), inter) {
-			if (interact_vnum_types[inter->type] == TYPE_BLD && inter->vnum == vnum) {
+			if (interact_data[inter->type].vnum_type == TYPE_BLD && inter->vnum == vnum) {
 				any = TRUE;
 				break;
 			}
@@ -1123,8 +1128,8 @@ void save_olc_building(descriptor_data *desc) {
 		GET_BLD_SCRIPTS(proto) = trig->next;
 		free(trig);
 	}
-	if (GET_BLD_YEARLY_MAINTENANCE(proto)) {
-		free_resource_list(GET_BLD_YEARLY_MAINTENANCE(proto));
+	if (GET_BLD_REGULAR_MAINTENANCE(proto)) {
+		free_resource_list(GET_BLD_REGULAR_MAINTENANCE(proto));
 	}
 	if (GET_BLD_RELATIONS(proto)) {
 		free_bld_relations(GET_BLD_RELATIONS(proto));
@@ -1211,7 +1216,7 @@ bld_data *setup_olc_building(bld_data *input) {
 		GET_BLD_SCRIPTS(new) = copy_trig_protos(GET_BLD_SCRIPTS(input));
 		
 		// maintenance
-		GET_BLD_YEARLY_MAINTENANCE(new) = copy_resource_list(GET_BLD_YEARLY_MAINTENANCE(input));
+		GET_BLD_REGULAR_MAINTENANCE(new) = copy_resource_list(GET_BLD_REGULAR_MAINTENANCE(input));
 	}
 	else {
 		// brand new: some defaults
@@ -1333,6 +1338,8 @@ void olc_show_building(char_data *ch) {
 	sprintbit(GET_BLD_BASE_AFFECTS(bdg), room_aff_bits, lbuf, TRUE);
 	sprintf(buf + strlen(buf), "<%saffects\t0> %s\r\n", OLC_LABEL_VAL(GET_BLD_BASE_AFFECTS(bdg), NOBITS), lbuf);
 	
+	sprintf(buf + strlen(buf), "<%stemperature\t0> %s\r\n", OLC_LABEL_VAL(GET_BLD_TEMPERATURE_TYPE(bdg), 0), temperature_types[GET_BLD_TEMPERATURE_TYPE(bdg)]);
+	
 	sprintf(buf + strlen(buf), "Relationships: <%srelations\t0>\r\n", OLC_LABEL_PTR(GET_BLD_RELATIONS(bdg)));
 	if (GET_BLD_RELATIONS(bdg)) {
 		get_bld_relations_display(GET_BLD_RELATIONS(bdg), lbuf);
@@ -1353,9 +1360,9 @@ void olc_show_building(char_data *ch) {
 	}
 	
 	// maintenance resources
-	sprintf(buf + strlen(buf), "Yearly maintenance resources required: <%sresource\t0>\r\n", OLC_LABEL_PTR(GET_BLD_YEARLY_MAINTENANCE(bdg)));
-	if (GET_BLD_YEARLY_MAINTENANCE(bdg)) {
-		get_resource_display(GET_BLD_YEARLY_MAINTENANCE(bdg), lbuf);
+	sprintf(buf + strlen(buf), "Regular maintenance resources: <%sresource\t0>\r\n", OLC_LABEL_PTR(GET_BLD_REGULAR_MAINTENANCE(bdg)));
+	if (GET_BLD_REGULAR_MAINTENANCE(bdg)) {
+		get_resource_display(ch, GET_BLD_REGULAR_MAINTENANCE(bdg), lbuf);
 		strcat(buf, lbuf);
 	}
 
@@ -1600,7 +1607,7 @@ OLC_MODULE(bedit_relations) {
 
 OLC_MODULE(bedit_resource) {
 	bld_data *bdg = GET_OLC_BUILDING(ch->desc);
-	olc_process_resources(ch, argument, &GET_BLD_YEARLY_MAINTENANCE(bdg));
+	olc_process_resources(ch, argument, &GET_BLD_REGULAR_MAINTENANCE(bdg));
 }
 
 
@@ -1613,6 +1620,12 @@ OLC_MODULE(bedit_script) {
 OLC_MODULE(bedit_spawns) {
 	bld_data *bdg = GET_OLC_BUILDING(ch->desc);
 	olc_process_spawns(ch, argument, &GET_BLD_SPAWNS(bdg));
+}
+
+
+OLC_MODULE(bedit_temperature) {
+	bld_data *bdg = GET_OLC_BUILDING(ch->desc);
+	GET_BLD_TEMPERATURE_TYPE(bdg) = olc_process_type(ch, argument, "temperature", "temperature", temperature_types, GET_BLD_TEMPERATURE_TYPE(bdg));
 }
 
 

@@ -2,7 +2,7 @@
 *   File: interpreter.c                                   EmpireMUD 2.0b5 *
 *  Usage: parse user commands, search for specials, call ACMD functions   *
 *                                                                         *
-*  EmpireMUD code base by Paul Clarke, (C) 2000-2015                      *
+*  EmpireMUD code base by Paul Clarke, (C) 2000-2024                      *
 *  All rights reserved.  See license.doc for complete information.        *
 *                                                                         *
 *  EmpireMUD based upon CircleMUD 3.0, bpl 17, by Jeremy Elson.           *
@@ -14,12 +14,11 @@
 #include "sysdep.h"
 
 #include "structs.h"
+#include "utils.h"
 #include "comm.h"
 #include "interpreter.h"
 #include "db.h"
-#include "utils.h"
 #include "handler.h"
-#include "utils.h"
 #include "olc.h"
 #include "skills.h"
 #include "vnums.h"
@@ -48,6 +47,7 @@ void send_login_motd(descriptor_data *desc, int bad_pws);
 //// COMMAND PROTOTYPES //////////////////////////////////////////////////////
 
 ACMD(do_abandon);
+ACMD(do_ability);
 ACMD(do_accept);
 ACMD(do_addnotes);
 ACMD(do_admin_util);
@@ -65,24 +65,21 @@ ACMD(do_autostore);
 ACMD(do_autowiz);
 ACMD(do_avoid);
 
-ACMD(do_backstab);
 ACMD(do_ban);
 ACMD(do_barde);
-ACMD(do_bash);
-ACMD(do_bathe);
 ACMD(do_beckon);
 ACMD(do_bite);
-ACMD(do_bloodsweat);
 ACMD(do_board);
 ACMD(do_boost);
 ACMD(do_breakreply);
+ACMD(do_buffs);
 ACMD(do_burn);
 ACMD(do_buy);
 ACMD(do_butcher);
 
+ACMD(do_cast);
 ACMD(do_cede);
 ACMD(do_changepass);
-ACMD(do_charge);
 ACMD(do_chart);
 ACMD(do_chip);
 ACMD(do_chop);
@@ -90,14 +87,10 @@ ACMD(do_circle);
 ACMD(do_city);
 ACMD(do_claim);
 ACMD(do_class);
-ACMD(do_claws);
-ACMD(do_cleanse);
 ACMD(do_clearabilities);
 ACMD(do_clearmeters);
 ACMD(do_climb);
 ACMD(do_coins);
-ACMD(do_collapse);
-ACMD(do_colorburst);
 ACMD(do_combine);
 ACMD(do_compare);
 ACMD(do_command);
@@ -106,39 +99,31 @@ ACMD(do_companions);
 ACMD(do_confer);
 ACMD(do_config);
 ACMD(do_confirm);
+ACMD(do_conjure);
 ACMD(do_consider);
 ACMD(do_contents);
 ACMD(do_cooldowns);
-ACMD(do_counterspell);
 ACMD(do_create);
 ACMD(do_credits);
 ACMD(do_customize);
 
-ACMD(do_damage_spell);
-ACMD(do_darkness);
 ACMD(do_date);
 ACMD(do_dc);
-ACMD(do_deathshroud);
 ACMD(do_dedicate);
 ACMD(do_defect);
 ACMD(do_demote);
 ACMD(do_deposit);
 ACMD(do_designate);
 ACMD(do_diagnose);
-ACMD(do_dig);
 ACMD(do_diplomacy);
-ACMD(do_disarm);
 ACMD(do_disembark);
-ACMD(do_disenchant);
 ACMD(do_disguise);
 ACMD(do_dismantle);
 ACMD(do_dismiss);
 ACMD(do_dismount);
 ACMD(do_dispatch);
-ACMD(do_dispel);
 ACMD(do_display);
 ACMD(do_distance);
-ACMD(do_diversion);
 ACMD(do_douse);
 ACMD(do_drag);
 ACMD(do_drive);
@@ -157,13 +142,12 @@ ACMD(do_elog);
 ACMD(do_emotd);
 ACMD(do_empire_inventory);
 ACMD(do_empires);
+ACMD(do_empty);
 ACMD(do_endwar);
-ACMD(do_enervate);
 ACMD(do_enroll);
 ACMD(do_enter);
 ACMD(do_equipment);
 ACMD(do_esay);
-ACMD(do_escape);
 ACMD(do_estats);
 ACMD(do_events);
 ACMD(do_examine);
@@ -180,17 +164,15 @@ ACMD(do_fightmessages);
 ACMD(do_file);
 ACMD(do_fillin);
 ACMD(do_findmaintenance);
+ACMD(do_finish);
 ACMD(do_fire);
-ACMD(do_firstaid);
-ACMD(do_fish);
 ACMD(do_flee);
 ACMD(do_follow);
-ACMD(do_forage);
 ACMD(do_force);
 ACMD(do_forgive);
+ACMD(do_friend);
 ACMD(do_fullsave);
 
-ACMD(do_gather);
 ACMD(do_gecho);
 ACMD(do_gen_augment);
 ACMD(do_gen_craft);
@@ -208,17 +190,13 @@ ACMD(do_gsay);
 
 ACMD(do_harness);
 ACMD(do_harvest);
-ACMD(do_heal);
-ACMD(do_heartstop);
 ACMD(do_help);
 ACMD(do_helpsearch);
 ACMD(do_herd);
-ACMD(do_hide);
 ACMD(do_history);
 ACMD(do_hit);
 ACMD(do_home);
 ACMD(do_hostile);
-ACMD(do_howl);
 ACMD(do_hunt);
 
 ACMD(do_identify);
@@ -235,11 +213,7 @@ ACMD(do_invis);
 ACMD(do_island);
 ACMD(do_islands);
 
-ACMD(do_jab);
-
 ACMD(do_keep);
-ACMD(do_kick);
-ACMD(do_kite);
 
 ACMD(do_land);
 ACMD(do_last);
@@ -258,7 +232,6 @@ ACMD(do_look);
 ACMD(do_mail);
 ACMD(do_maintain);
 ACMD(do_manage);
-ACMD(do_manashield);
 ACMD(do_map);
 ACMD(do_mapscan);
 ACMD(do_mapsize);
@@ -271,13 +244,11 @@ ACMD(do_minipets);
 ACMD(do_mint);
 ACMD(do_mirrorimage);
 ACMD(do_missing_help_files);
-ACMD(do_moonrise);
 ACMD(do_morph);
 ACMD(do_mount);
 ACMD(do_move);
 ACMD(do_moveeinv);
 ACMD(do_mudstats);
-ACMD(do_mummify);
 ACMD(do_mydescription);
 
 ACMD(do_nearby);
@@ -289,11 +260,9 @@ ACMD(do_offenses);
 ACMD(do_olc);
 ACMD(do_oset);
 ACMD(do_order);
-ACMD(do_outrage);
 
 ACMD(do_page);
 ACMD(do_paint);
-ACMD(do_pan);
 ACMD(do_passives);
 ACMD(do_peace);
 ACMD(do_pickpocket);
@@ -305,7 +274,6 @@ ACMD(do_point);
 ACMD(do_poofset);
 ACMD(do_portal);
 ACMD(do_pour);
-ACMD(do_prick);
 ACMD(do_progress);
 ACMD(do_promote);
 ACMD(do_prompt);
@@ -313,7 +281,6 @@ ACMD(do_prospect);
 ACMD(do_pub_comm);
 ACMD(do_publicize);
 ACMD(do_purge);
-ACMD(do_purify);
 ACMD(do_put);
 
 ACMD(do_quaff);
@@ -327,22 +294,17 @@ ACMD(do_reboot);
 ACMD(do_recipes);
 ACMD(do_reclaim);
 ACMD(do_recolor);
-ACMD(do_reforge);
-ACMD(do_regenerate);
-ACMD(do_rejuvenate);
 ACMD(do_reload);
 ACMD(do_remove);
 ACMD(do_reply);
 ACMD(do_rescale);
-ACMD(do_rescue);
 ACMD(do_respawn);
 ACMD(do_respond);
 ACMD(do_rest);
 ACMD(do_restore);
-ACMD(do_resurrect);
 ACMD(do_retrieve);
 ACMD(do_return);
-ACMD(do_ritual);
+ACMD(do_rework);
 ACMD(do_roadsign);
 ACMD(do_role);
 ACMD(do_roll);
@@ -350,7 +312,6 @@ ACMD(do_roster);
 ACMD(do_run);
 
 ACMD(do_sacrifice);
-ACMD(do_sap);
 ACMD(do_save);
 ACMD(do_saw);
 ACMD(do_say);
@@ -364,34 +325,28 @@ ACMD(do_send);
 ACMD(do_selfdelete);
 ACMD(do_separate);
 ACMD(do_set);
-ACMD(do_shadowcage);
-ACMD(do_shadowstep);
 ACMD(do_share);
 ACMD(do_shear);
 ACMD(do_sheathe);
 ACMD(do_ship);
 ACMD(do_shoot);
 ACMD(do_show);
-ACMD(do_siphon);
 ACMD(do_sire);
 ACMD(do_sit);
 ACMD(do_skills);
 ACMD(do_skin);
-ACMD(do_skybrand);
 ACMD(do_slash_channel);
 ACMD(do_slay);
 ACMD(do_sleep);
-ACMD(do_slow);
-ACMD(do_sneak);
 ACMD(do_snoop);
 ACMD(do_socials);
-ACMD(do_soulsight);
 ACMD(do_speak);
 ACMD(do_spec_comm);
 ACMD(do_specialize);
 ACMD(do_split);
 ACMD(do_stake);
 ACMD(do_stand);
+ACMD(do_start);
 ACMD(do_stat);
 ACMD(do_steal);
 ACMD(do_stop);
@@ -408,9 +363,9 @@ ACMD(do_syslog);
 
 ACMD(do_tame);
 ACMD(do_tan);
-ACMD(do_tavern);
 ACMD(do_tedit);
 ACMD(do_tell);
+ACMD(do_temperature);
 ACMD(do_territory);
 ACMD(do_throw);
 ACMD(do_tie);
@@ -427,6 +382,7 @@ ACMD(do_tunnel);
 
 ACMD(do_unban);
 ACMD(do_unbind);
+ACMD(do_unfriend);
 ACMD(do_unharness);
 ACMD(do_unload_vehicle);
 ACMD(do_unpublicize);
@@ -438,8 +394,6 @@ ACMD(do_upgrade);
 ACMD(do_use);
 ACMD(do_users);
 
-ACMD(do_veintap);
-ACMD(do_vigor);
 ACMD(do_visible);
 ACMD(do_vnum);
 ACMD(do_vstat);
@@ -450,7 +404,6 @@ ACMD(do_wear);
 ACMD(do_weather);
 ACMD(do_where);
 ACMD(do_whereami);
-ACMD(do_whisperstride);
 ACMD(do_who);
 ACMD(do_whoami);
 ACMD(do_whois);
@@ -459,7 +412,6 @@ ACMD(do_withdraw);
 ACMD(do_wizlock);
 ACMD(do_wizutil);
 ACMD(do_workforce);
-ACMD(do_worm);
 ACMD(do_write);
 
 /* DG Script ACMD's */
@@ -568,8 +520,8 @@ cpp_extern const struct command_info cmd_info[] = {
 	
 	SIMPLE_CMD( "at", POS_DEAD, do_at, LVL_START_IMM, CTYPE_IMMORTAL ),
 	SIMPLE_CMD( "abandon", POS_RESTING, do_abandon, NO_MIN, CTYPE_EMPIRE ),
-	SIMPLE_CMD( "ability", POS_DEAD, do_skills, NO_MIN, CTYPE_UTIL ),
-	SIMPLE_CMD( "abilities", POS_DEAD, do_skills, NO_MIN, CTYPE_UTIL ),
+	SIMPLE_CMD( "ability", POS_DEAD, do_ability, NO_MIN, CTYPE_UTIL ),
+	SIMPLE_CMD( "abilities", POS_DEAD, do_ability, NO_MIN, CTYPE_UTIL ),
 	SCMD_CMD( "accept", POS_DEAD, do_accept, NO_MIN, CTYPE_UTIL, SCMD_ACCEPT ),
 	SIMPLE_CMD( "adventure", POS_RESTING, do_adventure, NO_MIN, CTYPE_UTIL ),
 	GRANT_CMD( "addnotes", POS_STANDING, do_addnotes, LVL_CIMPL, CTYPE_IMMORTAL, GRANT_EDITNOTES ),
@@ -588,20 +540,17 @@ cpp_extern const struct command_info cmd_info[] = {
 	SIMPLE_CMD( "avoid", POS_STANDING, do_avoid, NO_MIN, CTYPE_MOVE ),
 
 	STANDARD_CMD( "build", POS_DEAD, do_gen_craft, NO_MIN, NO_GRANTS, CRAFT_TYPE_BUILD, CTYPE_BUILD, CMD_NO_ANIMALS, NO_ABIL ),
-	ABILITY_CMD( "backstab", POS_FIGHTING, do_backstab, NO_MIN, CTYPE_COMBAT, ABIL_BACKSTAB ),
 	STANDARD_CMD( "bake", POS_DEAD, do_gen_craft, NO_MIN, NO_GRANTS, CRAFT_TYPE_BAKE, CTYPE_BUILD, CMD_NO_ANIMALS, NO_ABIL ),
 	GRANT_CMD( "ban", POS_DEAD, do_ban, LVL_CIMPL, CTYPE_IMMORTAL, GRANT_BAN ),
 	STANDARD_CMD( "barde", POS_STANDING, do_barde, NO_MIN, NO_GRANTS, NO_SCMD, CTYPE_SKILL, CMD_NO_ANIMALS, NO_ABIL ),
-	ABILITY_CMD( "bash", POS_FIGHTING, do_bash, NO_MIN, CTYPE_COMBAT, ABIL_BASH ),
-	SIMPLE_CMD( "bathe", POS_STANDING, do_bathe, NO_MIN, CTYPE_MOVE ),
 	SIMPLE_CMD( "beckon", POS_RESTING, do_beckon, NO_MIN, CTYPE_UTIL ),
 	STANDARD_CMD( "bite", POS_STUNNED, do_bite, NO_MIN, NO_GRANTS, NO_SCMD, CTYPE_COMBAT, CMD_NO_ANIMALS, NO_ABIL ),
-	ABILITY_CMD( "bloodsweat", POS_SLEEPING, do_bloodsweat, NO_MIN, CTYPE_SKILL, ABIL_BLOODSWEAT ),
 	SCMD_CMD( "board", POS_STANDING, do_board, NO_MIN, CTYPE_MOVE, SCMD_BOARD ),
 	ABILITY_CMD( "boost", POS_RESTING, do_boost, NO_MIN, CTYPE_UTIL, ABIL_BOOST ),
 	SCMD_CMD( "bookedit", POS_STANDING, do_library, NO_MIN, CTYPE_UTIL, SCMD_BOOKEDIT ),
 	STANDARD_CMD( "brew", POS_DEAD, do_gen_craft, NO_MIN, NO_GRANTS, CRAFT_TYPE_BREW, CTYPE_BUILD, CMD_NO_ANIMALS, NO_ABIL ),
 	SIMPLE_CMD( "breakreply", POS_DEAD, do_breakreply, LVL_START_IMM, CTYPE_IMMORTAL ),
+	SIMPLE_CMD( "buffs", POS_SLEEPING, do_buffs, NO_MIN, CTYPE_UTIL ),
 	SIMPLE_CMD( "buy", POS_RESTING, do_buy, NO_MIN, CTYPE_UTIL ),
 	SCMD_CMD( "bug", POS_DEAD, do_gen_write, NO_MIN, CTYPE_COMM, SCMD_BUG ),
 	SCMD_CMD( "burn", POS_SITTING, do_burn, NO_MIN, CTYPE_UTIL, SCMD_BURN ),
@@ -609,12 +558,12 @@ cpp_extern const struct command_info cmd_info[] = {
 	SCMD_CMD( "brief", POS_DEAD, do_no_cmd, NO_MIN, CTYPE_UTIL, NOCMD_TOGGLE ),
 
 	STANDARD_CMD( "chop", POS_STANDING, do_chop, NO_MIN, NO_GRANTS, NO_SCMD, CTYPE_BUILD, CMD_NO_ANIMALS, NO_ABIL ),
+	SCMD_CMD( "cast", POS_SLEEPING, do_cast, NO_MIN, CTYPE_SKILL, SCMD_CAST ),
 	SIMPLE_CMD( "cd", POS_DEAD, do_cooldowns, NO_MIN, CTYPE_UTIL ),
 	SIMPLE_CMD( "cede", POS_DEAD, do_cede, NO_MIN, CTYPE_EMPIRE ),
-	STANDARD_CMD( "chant", POS_STANDING, do_ritual, NO_MIN, NO_GRANTS, SCMD_CHANT, CTYPE_SKILL, CMD_NO_ANIMALS, NO_ABIL ),
+	SCMD_CMD( "chant", POS_SLEEPING, do_cast, NO_MIN, CTYPE_SKILL, SCMD_CHANT ),
 	SIMPLE_CMD( "chart", POS_DEAD, do_chart, NO_MIN, CTYPE_UTIL ),
 	SIMPLE_CMD( "changepass", POS_DEAD, do_changepass, NO_MIN, CTYPE_UTIL ),
-	ABILITY_CMD( "charge", POS_FIGHTING, do_charge, NO_MIN, CTYPE_COMBAT, ABIL_CHARGE ),
 	STANDARD_CMD( "chip", POS_STANDING, do_chip, NO_MIN, NO_GRANTS, NO_SCMD, CTYPE_BUILD, CMD_NO_ANIMALS, NO_ABIL ),
 	SIMPLE_CMD( "circle", POS_STANDING, do_circle, NO_MIN, CTYPE_MOVE ),
 	SIMPLE_CMD( "cities", POS_DEAD, do_city, NO_MIN, CTYPE_UTIL ),
@@ -622,8 +571,6 @@ cpp_extern const struct command_info cmd_info[] = {
 	SIMPLE_CMD( "claim", POS_RESTING, do_claim, NO_MIN, CTYPE_EMPIRE ),
 	// uncomment this if you use the old class system
 	// SIMPLE_CMD( "class", POS_DEAD, do_class, NO_MIN, CTYPE_UTIL ),
-	ABILITY_CMD( "claws", POS_RESTING, do_claws, NO_MIN, CTYPE_SKILL, ABIL_CLAWS ),
-	ABILITY_CMD( "cleanse", POS_FIGHTING, do_cleanse, NO_MIN, CTYPE_SKILL, ABIL_CLEANSE ),
 	SCMD_CMD( "clear", POS_DEAD, do_gen_ps, NO_MIN, CTYPE_UTIL, SCMD_CLEAR ),
 	SIMPLE_CMD( "clearmeters", POS_DEAD, do_clearmeters, NO_MIN, CTYPE_UTIL ),
 	GRANT_CMD( "clearabilities", POS_DEAD, do_clearabilities, LVL_CIMPL, CTYPE_IMMORTAL, GRANT_CLEARABILITIES ),
@@ -631,33 +578,28 @@ cpp_extern const struct command_info cmd_info[] = {
 	SCMD_CMD( "close", POS_SITTING, do_gen_door, NO_MIN, CTYPE_MOVE, SCMD_CLOSE ),
 	SCMD_CMD( "cls", POS_DEAD, do_gen_ps, NO_MIN, CTYPE_UTIL, SCMD_CLEAR ),
 	SCMD_CMD( "coins", POS_DEAD, do_coins, NO_MIN, CTYPE_UTIL, TRUE ),
-	SIMPLE_CMD( "collapse", POS_STANDING, do_collapse, NO_MIN, CTYPE_SKILL ),
-	ABILITY_CMD( "colorburst", POS_FIGHTING, do_colorburst, NO_MIN, CTYPE_COMBAT, ABIL_COLORBURST ),
 	SIMPLE_CMD( "combine", POS_RESTING, do_combine, NO_MIN, CTYPE_UTIL ),
-	SIMPLE_CMD( "compare", POS_RESTING, do_compare, NO_MIN, CTYPE_SKILL ),
 	ABILITY_CMD( "command", POS_STANDING, do_command, NO_MIN, CTYPE_SKILL, ABIL_VAMP_COMMAND ),
 	SCMD_CMD( "commands", POS_DEAD, do_commands, NO_MIN, CTYPE_UTIL, SCMD_COMMANDS ),
 	SIMPLE_CMD( "companions", POS_DEAD, do_companions, NO_MIN, CTYPE_SKILL ),
+	SIMPLE_CMD( "compare", POS_RESTING, do_compare, NO_MIN, CTYPE_SKILL ),
 	SIMPLE_CMD( "consider", POS_RESTING, do_consider, NO_MIN, CTYPE_UTIL ),
 	SIMPLE_CMD( "config", POS_DEAD, do_config, LVL_CIMPL, CTYPE_IMMORTAL ),
 	SIMPLE_CMD( "confirm", POS_DEAD, do_confirm, NO_MIN, CTYPE_UTIL ),
 	ABILITY_CMD( "confer", POS_RESTING, do_confer, NO_MIN, CTYPE_SKILL, ABIL_CONFER ),
+	SIMPLE_CMD( "conjure", POS_DEAD, do_conjure, NO_MIN, CTYPE_SKILL ),
 	SIMPLE_CMD( "contents", POS_RESTING, do_contents, NO_MIN, CTYPE_UTIL ),
 	STANDARD_CMD( "cook", POS_DEAD, do_gen_craft, NO_MIN, NO_GRANTS, CRAFT_TYPE_COOK, CTYPE_BUILD, CMD_NO_ANIMALS, NO_ABIL ),
 	SIMPLE_CMD( "cooldowns", POS_DEAD, do_cooldowns, NO_MIN, CTYPE_UTIL ),
-	ABILITY_CMD( "counterspell", POS_FIGHTING, do_counterspell, NO_MIN, CTYPE_SKILL, ABIL_COUNTERSPELL ),
 	STANDARD_CMD( "craft", POS_DEAD, do_gen_craft, NO_MIN, NO_GRANTS, CRAFT_TYPE_CRAFT, CTYPE_BUILD, CMD_NO_ANIMALS, NO_ABIL ),
 	SCMD_CMD( "credits", POS_DEAD, do_gen_text_string, NO_MIN, CTYPE_UTIL, TEXT_FILE_CREDITS ),
 	SIMPLE_CMD( "create", POS_STANDING, do_create, LVL_GOD, CTYPE_IMMORTAL ),
 	SIMPLE_CMD( "customize", POS_STANDING, do_customize, NO_MIN, CTYPE_BUILD ),
-	SCMD_CMD( "cast", POS_DEAD, do_no_cmd, NO_MIN, CTYPE_UTIL, NOCMD_CAST ),
 	SCMD_CMD( "compact", POS_DEAD, do_no_cmd, NO_MIN, CTYPE_UTIL, NOCMD_TOGGLE ),
 
-	ABILITY_CMD( "darkness", POS_STANDING, do_darkness, NO_MIN, CTYPE_SKILL, ABIL_DARKNESS ),
 	SCMD_CMD( "date", POS_DEAD, do_date, LVL_START_IMM, CTYPE_IMMORTAL, SCMD_DATE ),
 	GRANT_CMD( "dc", POS_DEAD, do_dc, LVL_CIMPL, CTYPE_IMMORTAL, GRANT_DC ),
 	SCMD_CMD( "drink", POS_RESTING, do_drink, NO_MIN, CTYPE_UTIL, SCMD_DRINK ),
-	ABILITY_CMD( "deathshroud", POS_STUNNED, do_deathshroud, NO_MIN, CTYPE_SKILL, ABIL_DEATHSHROUD ),
 	SIMPLE_CMD( "dedicate", POS_STANDING, do_dedicate, NO_MIN, CTYPE_UTIL ),
 	SIMPLE_CMD( "demote", POS_DEAD, do_demote, NO_MIN, CTYPE_EMPIRE ),
 	SIMPLE_CMD( "deposit", POS_STANDING, do_deposit, NO_MIN, CTYPE_EMPIRE ),
@@ -666,19 +608,15 @@ cpp_extern const struct command_info cmd_info[] = {
 	SIMPLE_CMD( "diagnose", POS_RESTING, do_diagnose, NO_MIN, CTYPE_UTIL ),
 	SIMPLE_CMD( "diplomacy", POS_DEAD, do_diplomacy, NO_MIN, CTYPE_EMPIRE ),
 	SIMPLE_CMD( "directions", POS_DEAD, do_distance, NO_MIN, CTYPE_IMMORTAL ),
-	ABILITY_CMD( "disarm", POS_FIGHTING, do_disarm, NO_MIN, CTYPE_COMBAT, ABIL_DISARM ),
-	ABILITY_CMD( "disenchant", POS_STANDING, do_disenchant, NO_MIN, CTYPE_SKILL, ABIL_DISENCHANT ),
 	ABILITY_CMD( "disguise", POS_STANDING, do_disguise, NO_MIN, CTYPE_SKILL, ABIL_DISGUISE ),
 	SIMPLE_CMD( "dismount", POS_SITTING, do_dismount, NO_MIN, CTYPE_MOVE ),
 	STANDARD_CMD( "dismantle", POS_STANDING, do_dismantle, NO_MIN, NO_GRANTS, NO_SCMD, CTYPE_BUILD, CMD_NO_ANIMALS, NO_ABIL ),
 	SIMPLE_CMD( "dismiss", POS_STANDING, do_dismiss, NO_MIN, CTYPE_UTIL ),
 	SIMPLE_CMD( "disembark", POS_STANDING, do_disembark, NO_MIN, CTYPE_MOVE ),
 	SIMPLE_CMD( "distance", POS_DEAD, do_distance, NO_MIN, CTYPE_IMMORTAL ),
-	STANDARD_CMD( "dig", POS_STANDING, do_dig, NO_MIN, NO_GRANTS, NO_SCMD, CTYPE_BUILD, CMD_NO_ANIMALS, NO_ABIL ),
+	STANDARD_CMD( "dig", POS_STANDING, do_gen_interact_room, NO_MIN, NO_GRANTS, INTERACT_DIG, CTYPE_BUILD, CMD_NO_ANIMALS, NO_ABIL ),
 	SIMPLE_CMD( "display", POS_DEAD, do_display, NO_MIN, CTYPE_UTIL ),
 	SIMPLE_CMD( "dispatch", POS_RESTING, do_dispatch, NO_MIN, CTYPE_UTIL ),
-	ABILITY_CMD( "dispel", POS_FIGHTING, do_dispel, NO_MIN, CTYPE_SKILL, ABIL_DISPEL ),
-	ABILITY_CMD( "diversion", POS_FIGHTING, do_diversion, NO_MIN, CTYPE_SKILL, ABIL_DIVERSION ),
 	SIMPLE_CMD( "douse", POS_STANDING, do_douse, NO_MIN, CTYPE_BUILD ),
 	SCMD_CMD( "drop", POS_RESTING, do_drop, NO_MIN, CTYPE_MOVE, SCMD_DROP ),
 	STANDARD_CMD( "drag", POS_STANDING, do_drag, NO_MIN, NO_GRANTS, NO_SCMD, CTYPE_MOVE, CMD_NO_ANIMALS, NO_ABIL ),
@@ -695,6 +633,7 @@ cpp_extern const struct command_info cmd_info[] = {
 	SIMPLE_CMD( "empires", POS_DEAD, do_empires, NO_MIN, CTYPE_EMPIRE ),
 	SCMD_CMD( "empireidentify", POS_DEAD, do_empire_inventory, NO_MIN, CTYPE_EMPIRE, SCMD_EIDENTIFY ),
 	SCMD_CMD( "empireinventory", POS_DEAD, do_empire_inventory, NO_MIN, CTYPE_EMPIRE, SCMD_EINVENTORY ),
+	SIMPLE_CMD( "empty", POS_STANDING, do_empty, NO_MIN, CTYPE_UTIL ),
 	SCMD_CMD( "einventory", POS_DEAD, do_empire_inventory, NO_MIN, CTYPE_EMPIRE, SCMD_EINVENTORY ),
 	SCMD_CMD( "eidentify", POS_DEAD, do_empire_inventory, NO_MIN, CTYPE_EMPIRE, SCMD_EIDENTIFY ),
 	SIMPLE_CMD( "emotd", POS_DEAD, do_emotd, NO_MIN, CTYPE_EMPIRE ),
@@ -704,13 +643,11 @@ cpp_extern const struct command_info cmd_info[] = {
 	SCMD_CMD( "ehistory", POS_DEAD, do_history, NO_MIN, CTYPE_COMM, SCMD_EMPIRE_HISTORY ),
 	STANDARD_CMD( "enchant", POS_STANDING, do_gen_augment, NO_MIN, NO_GRANTS, AUGMENT_ENCHANTMENT, CTYPE_BUILD, CMD_NO_ANIMALS, NO_ABIL ),
 	GRANT_CMD( "endwar", POS_DEAD, do_endwar, LVL_CIMPL, CTYPE_IMMORTAL, GRANT_EMPIRES ),
-	ABILITY_CMD( "enervate", POS_FIGHTING, do_enervate, NO_MIN, CTYPE_COMBAT, ABIL_ENERVATE ),
 	SIMPLE_CMD( "enter", POS_STANDING, do_enter, NO_MIN, CTYPE_MOVE ),
 	SIMPLE_CMD( "enroll", POS_DEAD, do_enroll, NO_MIN, CTYPE_EMPIRE ),
 	SIMPLE_CMD( "equipment", POS_DEAD, do_equipment, NO_MIN, CTYPE_UTIL ),
 	SIMPLE_CMD( "esay", POS_DEAD, do_esay, NO_MIN, CTYPE_EMPIRE ),
 	SIMPLE_CMD( "etalk", POS_DEAD, do_esay, NO_MIN, CTYPE_EMPIRE ),
-	ABILITY_CMD( "escape", POS_STANDING, do_escape, NO_MIN, CTYPE_MOVE, ABIL_ESCAPE ),
 	SIMPLE_CMD( "estats", POS_DEAD, do_estats, NO_MIN, CTYPE_EMPIRE ),
 	SIMPLE_CMD( "events", POS_DEAD, do_events, NO_MIN, CTYPE_UTIL ),
 	SIMPLE_CMD( "examine", POS_SITTING, do_examine, NO_MIN, CTYPE_UTIL ),
@@ -727,26 +664,27 @@ cpp_extern const struct command_info cmd_info[] = {
 	SIMPLE_CMD( "factions", POS_DEAD, do_factions, NO_MIN, CTYPE_UTIL ),
 	SCMD_CMD( "fastmorph", POS_RESTING, do_morph, NO_MIN, CTYPE_MOVE, SCMD_FASTMORPH ),
 	SIMPLE_CMD( "feed", POS_STANDING, do_feed, NO_MIN, CTYPE_UTIL ),
-	SIMPLE_CMD( "fightmessages", POS_DEAD, do_fightmessages, NO_MIN, CTYPE_UTIL ),
-	SIMPLE_CMD( "fmessages", POS_DEAD, do_fightmessages, NO_MIN, CTYPE_UTIL ),
+	SCMD_CMD( "fightmessages", POS_DEAD, do_fightmessages, NO_MIN, CTYPE_UTIL, SCMD_FIGHT ),
+	SCMD_CMD( "fmessages", POS_DEAD, do_fightmessages, NO_MIN, CTYPE_UTIL, SCMD_FIGHT ),
 	SIMPLE_CMD( "file", POS_DEAD, do_file, LVL_START_IMM, CTYPE_IMMORTAL ),
 	STANDARD_CMD( "fillin", POS_STANDING, do_fillin, NO_MIN, NO_GRANTS, NO_SCMD, CTYPE_BUILD, CMD_NO_ANIMALS, NO_ABIL ),
+	SIMPLE_CMD( "finish", POS_DEAD, do_finish, NO_MIN, CTYPE_UTIL ),
 	SIMPLE_CMD( "findmaintenance", POS_DEAD, do_findmaintenance, NO_MIN, CTYPE_EMPIRE ),
 	STANDARD_CMD( "fire", POS_SITTING, do_fire, NO_MIN, NO_GRANTS, NO_SCMD, CTYPE_COMBAT, CMD_NO_ANIMALS, NO_ABIL ),
-	ABILITY_CMD( "firstaid", POS_STANDING, do_firstaid, NO_MIN, CTYPE_SKILL, ABIL_FIRSTAID ),
-	STANDARD_CMD( "fish", POS_SITTING, do_fish, NO_MIN, NO_GRANTS, NO_SCMD, CTYPE_SKILL, CMD_NO_ANIMALS, NO_ABIL ),
+	STANDARD_CMD( "fish", POS_SITTING, do_gen_interact_room, NO_MIN, NO_GRANTS, INTERACT_FISH, CTYPE_SKILL, CMD_NO_ANIMALS, NO_ABIL ),
 	STANDARD_CMD( "flee", POS_FIGHTING, do_flee, NO_MIN, NO_GRANTS, NO_SCMD, CTYPE_COMBAT, CMD_NO_ABBREV, NO_ABIL ),
 	SIMPLE_CMD( "follow", POS_RESTING, do_follow, NO_MIN, CTYPE_MOVE ),
-	SIMPLE_CMD( "forage", POS_STANDING, do_forage, NO_MIN, CTYPE_SKILL ),
+	STANDARD_CMD( "forage", POS_STANDING, do_gen_interact_room, NO_MIN, NO_GRANTS, INTERACT_FORAGE, CTYPE_SKILL, CMD_NO_ANIMALS, NO_ABIL ),
 	GRANT_CMD( "force", POS_SLEEPING, do_force, LVL_CIMPL, CTYPE_IMMORTAL, GRANT_FORCE ),
 	STANDARD_CMD( "forge", POS_DEAD, do_gen_craft, NO_MIN, NO_GRANTS, CRAFT_TYPE_FORGE, CTYPE_BUILD, CMD_NO_ANIMALS, NO_ABIL ),
 	GRANT_CMD( "forgive", POS_DEAD, do_forgive, LVL_CIMPL, CTYPE_IMMORTAL, GRANT_FORGIVE ),
 	SCMD_CMD( "fprompt", POS_DEAD, do_prompt, NO_MIN, CTYPE_UTIL, SCMD_FPROMPT ),
+	SIMPLE_CMD( "friends", POS_DEAD, do_friend, NO_MIN, CTYPE_UTIL ),
 	SIMPLE_CMD( "fullsave", POS_DEAD, do_fullsave, LVL_TOP, CTYPE_IMMORTAL ),
 	STANDARD_CMD( "freeze", POS_DEAD, do_wizutil, LVL_CIMPL, GRANT_FREEZE, SCMD_FREEZE, CTYPE_IMMORTAL, NOBITS, NO_ABIL ),
 
 	SIMPLE_CMD( "get", POS_RESTING, do_get, NO_MIN, CTYPE_MOVE ),
-	STANDARD_CMD( "gather", POS_STANDING, do_gather, NO_MIN, NO_GRANTS, NO_SCMD, CTYPE_BUILD, CMD_NO_ANIMALS, NO_ABIL ),
+	STANDARD_CMD( "gather", POS_STANDING, do_gen_interact_room, NO_MIN, NO_GRANTS, INTERACT_GATHER, CTYPE_BUILD, CMD_NO_ANIMALS, NO_ABIL ),
 	GRANT_CMD( "gecho", POS_DEAD, do_gecho, LVL_CIMPL, CTYPE_IMMORTAL, GRANT_GECHO ),
 	SIMPLE_CMD( "give", POS_RESTING, do_give, NO_MIN, CTYPE_MOVE ),
 	SCMD_CMD( "goto", POS_SLEEPING, do_goto, LVL_START_IMM, CTYPE_IMMORTAL, SCMD_GOTO ),
@@ -765,11 +703,8 @@ cpp_extern const struct command_info cmd_info[] = {
 	SCMD_CMD( "handbook", POS_DEAD, do_gen_text_string, LVL_START_IMM, CTYPE_IMMORTAL, TEXT_FILE_HANDBOOK ),
 	STANDARD_CMD( "harness", POS_STANDING, do_harness, NO_MIN, NO_GRANTS, NO_SCMD, CTYPE_MOVE, CMD_NO_ANIMALS, NO_ABIL ),
 	STANDARD_CMD( "harvest", POS_STANDING, do_harvest, NO_MIN, NO_GRANTS, NO_SCMD, CTYPE_BUILD, CMD_NO_ANIMALS, NO_ABIL ),
-	SIMPLE_CMD( "heal", POS_FIGHTING, do_heal, NO_MIN, CTYPE_SKILL ),
 	SIMPLE_CMD( "herd", POS_STANDING, do_herd, NO_MIN, CTYPE_MOVE ),
-	ABILITY_CMD( "heartstop", POS_FIGHTING, do_heartstop, NO_MIN, CTYPE_COMBAT, ABIL_HEARTSTOP ),
 	SIMPLE_CMD( "helpsearch", POS_DEAD, do_helpsearch, NO_MIN, CTYPE_UTIL ),
-	ABILITY_CMD( "hide", POS_RESTING, do_hide, NO_MIN, CTYPE_MOVE, ABIL_HIDE ),
 	SIMPLE_CMD( "hint", POS_DEAD, do_tip, NO_MIN, CTYPE_UTIL ),
 	SCMD_CMD( "history", POS_DEAD, do_history, NO_MIN, CTYPE_COMM, SCMD_HISTORY ),
 	STANDARD_CMD( "hit", POS_FIGHTING, do_hit, NO_MIN, NO_GRANTS, SCMD_HIT, CTYPE_COMBAT, CMD_WHILE_FEEDING, NO_ABIL ),
@@ -777,7 +712,6 @@ cpp_extern const struct command_info cmd_info[] = {
 	SIMPLE_CMD( "home", POS_DEAD, do_home, NO_MIN, CTYPE_MOVE ),
 	STANDARD_CMD( "hone", POS_STANDING, do_gen_augment, NO_MIN, NO_GRANTS, AUGMENT_HONE, CTYPE_BUILD, CMD_NO_ANIMALS, NO_ABIL ),
 	GRANT_CMD( "hostile", POS_DEAD, do_hostile, LVL_CIMPL, CTYPE_IMMORTAL, GRANT_HOSTILE ),
-	ABILITY_CMD( "howl", POS_FIGHTING, do_howl, NO_MIN, CTYPE_SKILL, ABIL_HOWL ),
 	SIMPLE_CMD( "hunt", POS_STANDING, do_hunt, NO_MIN, CTYPE_SKILL ),
 
 	SIMPLE_CMD( "inventory", POS_DEAD, do_inventory, NO_MIN, CTYPE_UTIL ),
@@ -797,13 +731,10 @@ cpp_extern const struct command_info cmd_info[] = {
 	GRANT_CMD( "island", POS_DEAD, do_island, LVL_CIMPL, CTYPE_IMMORTAL, GRANT_ISLAND ),
 	SIMPLE_CMD( "islands", POS_DEAD, do_islands, NO_MIN, CTYPE_EMPIRE ),
 
-	ABILITY_CMD( "jab", POS_FIGHTING, do_jab, NO_MIN, CTYPE_COMBAT, ABIL_JAB ),
 	STANDARD_CMD( "junk", POS_RESTING, do_drop, NO_MIN, NO_GRANTS, SCMD_JUNK, CTYPE_UTIL, CMD_NO_ABBREV, NO_ABIL ),
 
 	STANDARD_CMD( "kill", POS_FIGHTING, do_hit, NO_MIN, NO_GRANTS, SCMD_KILL, CTYPE_COMBAT, CMD_WHILE_FEEDING, NO_ABIL ),
 	SCMD_CMD( "keep", POS_DEAD, do_keep, NO_MIN, CTYPE_UTIL, SCMD_KEEP ),
-	ABILITY_CMD( "kick", POS_FIGHTING, do_kick, NO_MIN, CTYPE_COMBAT, ABIL_KICK ),
-	ABILITY_CMD( "kite", POS_FIGHTING, do_kite, NO_MIN, CTYPE_COMBAT, ABIL_KITE ),
 
 	SCMD_CMD( "look", POS_RESTING, do_look, NO_MIN, CTYPE_UTIL, SCMD_LOOK ),
 	STANDARD_CMD( "lay", POS_STANDING, do_lay, NO_MIN, NO_GRANTS, NO_SCMD, CTYPE_BUILD, CMD_NO_ANIMALS, NO_ABIL ),
@@ -826,7 +757,6 @@ cpp_extern const struct command_info cmd_info[] = {
 	STANDARD_CMD( "maintain", POS_STANDING, do_maintain, NO_MIN, NO_GRANTS, NO_SCMD, CTYPE_BUILD, CMD_NO_ANIMALS, NO_ABIL ),
 	STANDARD_CMD( "make", POS_DEAD, do_gen_craft, NO_MIN, NO_GRANTS, CRAFT_TYPE_MAKE, CTYPE_BUILD, CMD_NO_ANIMALS, NO_ABIL ),
 	SIMPLE_CMD( "manage", POS_DEAD, do_manage, NO_MIN, CTYPE_UTIL ),
-	ABILITY_CMD( "manashield", POS_RESTING, do_manashield, NO_MIN, CTYPE_COMBAT, ABIL_MANASHIELD ),
 	STANDARD_CMD( "manufacture", POS_DEAD, do_gen_craft, NO_MIN, NO_GRANTS, CRAFT_TYPE_MANUFACTURE, CTYPE_BUILD, CMD_NO_ANIMALS, NO_ABIL ),
 	SIMPLE_CMD( "map", POS_RESTING, do_map, NO_MIN, CTYPE_UTIL ),
 	SIMPLE_CMD( "mapscan", POS_RESTING, do_mapscan, NO_MIN, CTYPE_UTIL ),
@@ -843,12 +773,10 @@ cpp_extern const struct command_info cmd_info[] = {
 	ABILITY_CMD( "mirrorimage", POS_FIGHTING, do_mirrorimage, NO_MIN, CTYPE_COMBAT, ABIL_MIRRORIMAGE ),
 	SIMPLE_CMD( "missinghelp", POS_DEAD, do_missing_help_files, LVL_START_IMM, CTYPE_IMMORTAL ),
 	STANDARD_CMD( "mix", POS_DEAD, do_gen_craft, NO_MIN, NO_GRANTS, CRAFT_TYPE_MIX, CTYPE_BUILD, CMD_NO_ANIMALS, NO_ABIL ),
-	ABILITY_CMD( "moonrise", POS_FIGHTING, do_moonrise, NO_MIN, CTYPE_COMBAT, ABIL_MOONRISE ),
 	SCMD_CMD( "morph", POS_FIGHTING, do_morph, NO_MIN, CTYPE_MOVE, SCMD_MORPH ),
 	SCMD_CMD( "motd", POS_DEAD, do_gen_text_string, NO_MIN, CTYPE_UTIL, TEXT_FILE_MOTD ),
 	GRANT_CMD( "moveeinv", POS_DEAD, do_moveeinv, LVL_CIMPL, CTYPE_IMMORTAL, GRANT_EMPIRES ),
 	SIMPLE_CMD( "mudstats", POS_DEAD, do_mudstats, NO_MIN, CTYPE_UTIL ),
-	ABILITY_CMD( "mummify", POS_STUNNED, do_mummify, NO_MIN, CTYPE_MOVE, ABIL_MUMMIFY ),
 	STANDARD_CMD( "murder", POS_FIGHTING, do_hit, NO_MIN, NO_GRANTS, SCMD_KILL, CTYPE_COMBAT, CMD_WHILE_FEEDING, NO_ABIL ),
 	SIMPLE_CMD( "mail", POS_STANDING, do_mail, NO_MIN, CTYPE_UTIL ),
 	STANDARD_CMD( "mute", POS_DEAD, do_wizutil, LVL_CIMPL, GRANT_MUTE, SCMD_MUTE, CTYPE_IMMORTAL, NOBITS, NO_ABIL ),
@@ -867,13 +795,12 @@ cpp_extern const struct command_info cmd_info[] = {
 	SCMD_CMD( "oocsay", POS_RESTING, do_say, NO_MIN, CTYPE_COMM, SCMD_OOCSAY ),
 	SCMD_CMD( "osay", POS_RESTING, do_say, NO_MIN, CTYPE_COMM, SCMD_OOCSAY ),
 	SCMD_CMD( "\"", POS_RESTING, do_say, NO_MIN, CTYPE_COMM, SCMD_OOCSAY ),
-	ABILITY_CMD( "outrage", POS_FIGHTING, do_outrage, NO_MIN, CTYPE_COMBAT, ABIL_OUTRAGE ),
 	GRANT_CMD( "olc", POS_DEAD, do_olc, LVL_BUILDER, CTYPE_OLC, GRANT_OLC ),
 
 	SIMPLE_CMD( "put", POS_RESTING, do_put, NO_MIN, CTYPE_MOVE ),
 	GRANT_CMD( "page", POS_DEAD, do_page, LVL_CIMPL, CTYPE_IMMORTAL, GRANT_PAGE ),
 	SIMPLE_CMD( "paint", POS_STANDING, do_paint, NO_MIN, CTYPE_BUILD ),
-	STANDARD_CMD( "pan", POS_STANDING, do_pan, NO_MIN, NO_GRANTS, NO_SCMD, CTYPE_BUILD, CMD_NO_ANIMALS, NO_ABIL ),
+	STANDARD_CMD( "pan", POS_STANDING, do_gen_interact_room, NO_MIN, NO_GRANTS, INTERACT_PAN, CTYPE_BUILD, CMD_NO_ANIMALS, NO_ABIL ),
 	SIMPLE_CMD( "party", POS_DEAD, do_group, NO_MIN, CTYPE_UTIL ),
 	SIMPLE_CMD( "passives", POS_DEAD, do_passives, NO_MIN, CTYPE_UTIL ),
 	GRANT_CMD( "peace", POS_DEAD, do_peace, LVL_CIMPL, CTYPE_IMMORTAL, GRANT_PEACE ),
@@ -891,14 +818,13 @@ cpp_extern const struct command_info cmd_info[] = {
 	SIMPLE_CMD( "portal", POS_STANDING, do_portal, NO_MIN, CTYPE_MOVE ),
 	SCMD_CMD( "pour", POS_RESTING, do_pour, NO_MIN, CTYPE_UTIL, SCMD_POUR ),
 	STANDARD_CMD( "press", POS_DEAD, do_gen_craft, NO_MIN, NO_GRANTS, CRAFT_TYPE_PRESS, CTYPE_BUILD, CMD_NO_ANIMALS, NO_ABIL ),
-	ABILITY_CMD( "prick", POS_FIGHTING, do_prick, NO_MIN, CTYPE_COMBAT, ABIL_PRICK ),
+	STANDARD_CMD( "process", POS_DEAD, do_gen_craft, NO_MIN, NO_GRANTS, CRAFT_TYPE_PROCESS, CTYPE_BUILD, CMD_NO_ANIMALS, NO_ABIL ),
 	SIMPLE_CMD( "progress", POS_DEAD, do_progress, NO_MIN, CTYPE_EMPIRE ),
 	SIMPLE_CMD( "promote", POS_DEAD, do_promote, NO_MIN, CTYPE_EMPIRE ),
 	SCMD_CMD( "prompt", POS_DEAD, do_prompt, NO_MIN, CTYPE_UTIL, SCMD_PROMPT ),
 	STANDARD_CMD( "prospect", POS_STANDING, do_prospect, NO_MIN, NO_GRANTS, NO_SCMD, CTYPE_MOVE, CMD_NO_ANIMALS, NO_ABIL ),
 	SIMPLE_CMD( "publicize", POS_RESTING, do_publicize, NO_MIN, CTYPE_EMPIRE ),
 	GRANT_CMD( "purge", POS_DEAD, do_purge, LVL_CIMPL, CTYPE_IMMORTAL, GRANT_PURGE ),
-	ABILITY_CMD( "purify", POS_STANDING, do_purify, NO_MIN, CTYPE_SKILL, ABIL_PURIFY ),
 	SIMPLE_CMD( "psay", POS_DEAD, do_gsay, NO_MIN, CTYPE_COMM ),
 	SIMPLE_CMD( "ptell", POS_DEAD, do_gsay, NO_MIN, CTYPE_COMM ),
 	SCMD_CMD( "practice", POS_DEAD, do_no_cmd, NO_MIN, CTYPE_UTIL, NOCMD_PRACTICE ),
@@ -912,31 +838,26 @@ cpp_extern const struct command_info cmd_info[] = {
 	SIMPLE_CMD( "random", POS_SLEEPING, do_random, LVL_START_IMM, CTYPE_IMMORTAL ),
 	SIMPLE_CMD( "read", POS_SITTING, do_read, NO_MIN, CTYPE_COMM ),
 	SIMPLE_CMD( "ready", POS_RESTING, do_ready, NO_MIN, CTYPE_COMBAT ),
-	STANDARD_CMD( "reboot", POS_DEAD, do_reboot, LVL_CIMPL, GRANT_REBOOT, SCMD_REBOOT, CTYPE_IMMORTAL, CMD_NO_ABBREV, NO_ABIL ),
+	STANDARD_CMD( "reboot", POS_DEAD, do_reboot, LVL_CIMPL, GRANT_REBOOT, REBOOT_REBOOT, CTYPE_IMMORTAL, CMD_NO_ABBREV, NO_ABIL ),
 	SIMPLE_CMD( "recipes", POS_DEAD, do_recipes, NO_MIN, CTYPE_UTIL ),
 	SIMPLE_CMD( "reclaim", POS_STANDING, do_reclaim, NO_MIN, CTYPE_EMPIRE ),
 	SIMPLE_CMD( "recolor", POS_DEAD, do_recolor, 0, CTYPE_UTIL ),
 	SCMD_CMD( "redesignate", POS_STANDING, do_designate, NO_MIN, CTYPE_BUILD, SCMD_REDESIGNATE ),
-	STANDARD_CMD( "refashion", POS_STANDING, do_reforge, NO_MIN, NO_GRANTS, SCMD_REFASHION, CTYPE_SKILL, NOBITS, ABIL_REFASHION ),
-	STANDARD_CMD( "reforge", POS_STANDING, do_reforge, NO_MIN, NO_GRANTS, SCMD_REFORGE, CTYPE_SKILL, NOBITS, ABIL_REFORGE ),
-	ABILITY_CMD( "regenerate", POS_MORTALLYW, do_regenerate, NO_MIN, CTYPE_COMBAT, ABIL_REGENERATE ),
-	ABILITY_CMD( "rejuvenate", POS_FIGHTING, do_rejuvenate, NO_MIN, CTYPE_SKILL, ABIL_REJUVENATE ),
 	SCMD_CMD( "reject", POS_DEAD, do_accept, NO_MIN, CTYPE_UTIL, SCMD_REJECT ),
 	GRANT_CMD( "reload", POS_DEAD, do_reload, LVL_CIMPL, CTYPE_IMMORTAL, GRANT_RELOAD ),
 	SIMPLE_CMD( "remove", POS_RESTING, do_remove, NO_MIN, CTYPE_COMM ),
 	STANDARD_CMD( "repair", POS_STANDING, do_maintain, NO_MIN, NO_GRANTS, NO_SCMD, CTYPE_BUILD, CMD_NO_ANIMALS, NO_ABIL ),
 	GRANT_CMD( "rescale", POS_RESTING, do_rescale, LVL_CIMPL, CTYPE_IMMORTAL, GRANT_RESCALE ),
-	ABILITY_CMD( "rescue", POS_FIGHTING, do_rescue, NO_MIN, CTYPE_COMBAT, ABIL_RESCUE ),
 	SIMPLE_CMD( "respawn", POS_DEAD, do_respawn, NO_MIN, CTYPE_UTIL ),
 	SIMPLE_CMD( "respond", POS_RESTING, do_respond, NO_MIN, CTYPE_COMM ),
 	SIMPLE_CMD( "rest", POS_RESTING, do_rest, NO_MIN, CTYPE_MOVE ),
 	GRANT_CMD( "restore", POS_DEAD, do_restore, LVL_CIMPL, CTYPE_IMMORTAL, GRANT_RESTORE ),
-	ABILITY_CMD( "resurrect", POS_STANDING, do_resurrect, NO_MIN, CTYPE_SKILL, ABIL_RESURRECT ),
 	SIMPLE_CMD( "retrieve", POS_STANDING, do_retrieve, NO_MIN, CTYPE_MOVE ),
 	SIMPLE_CMD( "return", POS_DEAD, do_return, NO_MIN, CTYPE_IMMORTAL ),
+	SIMPLE_CMD( "rework", POS_STANDING, do_rework, NO_MIN, CTYPE_SKILL ),
 	SIMPLE_CMD( "ride", POS_STANDING, do_mount, NO_MIN, CTYPE_MOVE ),
-	STANDARD_CMD( "rite", POS_STANDING, do_ritual, NO_MIN, NO_GRANTS, SCMD_RITUAL, CTYPE_SKILL, CMD_NO_ANIMALS, NO_ABIL ),
-	STANDARD_CMD( "ritual", POS_STANDING, do_ritual, NO_MIN, NO_GRANTS, SCMD_RITUAL, CTYPE_SKILL, CMD_NO_ANIMALS, NO_ABIL ),
+	SCMD_CMD( "rite", POS_SLEEPING, do_cast, NO_MIN, CTYPE_SKILL, SCMD_RITUAL ),
+	SCMD_CMD( "ritual", POS_SLEEPING, do_cast, NO_MIN, CTYPE_SKILL, SCMD_RITUAL ),
 	STANDARD_CMD( "roadsign", POS_STANDING, do_roadsign, NO_MIN, NO_GRANTS, NO_SCMD, CTYPE_BUILD, CMD_NO_ANIMALS, NO_ABIL ),
 	SIMPLE_CMD( "role", POS_DEAD, do_role, NO_MIN, CTYPE_UTIL ),
 	SIMPLE_CMD( "roll", POS_RESTING, do_roll, NO_MIN, CTYPE_UTIL ),
@@ -950,7 +871,6 @@ cpp_extern const struct command_info cmd_info[] = {
 	SCMD_CMD( "'", POS_RESTING, do_say, NO_MIN, CTYPE_COMM, SCMD_SAY ),
 	SIMPLE_CMD( "sacrifice", POS_STANDING, do_sacrifice, NO_MIN, CTYPE_MOVE ),
 	STANDARD_CMD( "sail", POS_SITTING, do_drive, NO_MIN, NO_GRANTS, SCMD_SAIL, CTYPE_MOVE, CMD_NO_ANIMALS, NO_ABIL ),
-	ABILITY_CMD( "sap", POS_STANDING, do_sap, NO_MIN, CTYPE_COMBAT, ABIL_SAP ),
 	SIMPLE_CMD( "save", POS_STUNNED, do_save, NO_MIN, CTYPE_UTIL ),
 	STANDARD_CMD( "saw", POS_STANDING, do_saw, NO_MIN, NO_GRANTS, NO_SCMD, CTYPE_BUILD, CMD_NO_ANIMALS, NO_ABIL ),
 	SCMD_CMD( "sayhistory", POS_DEAD, do_history, NO_MIN, CTYPE_COMM, SCMD_SAY_HISTORY ),
@@ -958,7 +878,7 @@ cpp_extern const struct command_info cmd_info[] = {
 	SIMPLE_CMD( "scan", POS_RESTING, do_scan, NO_MIN, CTYPE_UTIL ),
 	STANDARD_CMD( "scrap", POS_STANDING, do_scrap, NO_MIN, NO_GRANTS, NO_SCMD, CTYPE_BUILD, CMD_NO_ABBREV, NO_ABIL ),
 	STANDARD_CMD( "scrape", POS_STANDING, do_scrape, NO_MIN, NO_GRANTS, NO_SCMD, CTYPE_BUILD, CMD_NO_ANIMALS, NO_ABIL ),
-	ABILITY_CMD( "search", POS_STANDING, do_search, NO_MIN, CTYPE_COMBAT, ABIL_SEARCH ),
+	SIMPLE_CMD( "search", POS_STANDING, do_search, NO_MIN, CTYPE_MOVE ),
 	SIMPLE_CMD( "seed", POS_RESTING, do_seed, NO_MIN, CTYPE_EMPIRE ),
 	STANDARD_CMD( "selfdelete", POS_SLEEPING, do_selfdelete, NO_MIN, NO_GRANTS, NO_SCMD, CTYPE_UTIL, CMD_NO_ABBREV, NO_ABIL ),
 	GRANT_CMD( "send", POS_SLEEPING, do_send, LVL_CIMPL, CTYPE_IMMORTAL, GRANT_SEND ),
@@ -966,38 +886,33 @@ cpp_extern const struct command_info cmd_info[] = {
 	GRANT_CMD( "set", POS_DEAD, do_set, LVL_CIMPL, CTYPE_IMMORTAL, GRANT_SET ),
 	STANDARD_CMD( "sew", POS_DEAD, do_gen_craft, NO_MIN, NO_GRANTS, CRAFT_TYPE_SEW, CTYPE_BUILD, CMD_NO_ANIMALS, NO_ABIL ),
 	SIMPLE_CMD( "share", POS_RESTING, do_share, NO_MIN, CTYPE_UTIL ),
-	ABILITY_CMD( "shadowcage", POS_FIGHTING, do_shadowcage, NO_MIN, CTYPE_SKILL, ABIL_SHADOWCAGE ),
-	STANDARD_CMD( "shadowlash", POS_FIGHTING, do_damage_spell, NO_MIN, NO_GRANTS, ABIL_SHADOWLASH, CTYPE_COMBAT, NOBITS, ABIL_SHADOWLASH ),
-	ABILITY_CMD( "shadowstep", POS_STANDING, do_shadowstep, NO_MIN, CTYPE_MOVE, ABIL_SHADOWSTEP ),
 	STANDARD_CMD( "shear", POS_STANDING, do_shear, NO_MIN, NO_GRANTS, NO_SCMD, CTYPE_BUILD, CMD_NO_ANIMALS, NO_ABIL ),
 	SIMPLE_CMD( "sheathe", POS_RESTING, do_sheathe, NO_MIN, CTYPE_COMBAT ),
 	SIMPLE_CMD( "ship", POS_SLEEPING, do_ship, NO_MIN, CTYPE_EMPIRE ),
 	SIMPLE_CMD( "shoot", POS_FIGHTING, do_shoot, NO_MIN, CTYPE_COMBAT ),
 	SCMD_CMD( "shout", POS_RESTING, do_pub_comm, NO_MIN, CTYPE_COMM, SCMD_SHOUT ),
 	SIMPLE_CMD( "show", POS_DEAD, do_show, LVL_START_IMM, CTYPE_IMMORTAL ),
-	STANDARD_CMD( "shutdown", POS_DEAD, do_reboot, LVL_CIMPL, GRANT_SHUTDOWN, SCMD_SHUTDOWN, CTYPE_IMMORTAL, CMD_NO_ABBREV, NO_ABIL ),
+	STANDARD_CMD( "shutdown", POS_DEAD, do_reboot, LVL_CIMPL, GRANT_SHUTDOWN, REBOOT_SHUTDOWN, CTYPE_IMMORTAL, CMD_NO_ABBREV, NO_ABIL ),
 	SCMD_CMD( "sip", POS_RESTING, do_drink, NO_MIN, CTYPE_UTIL, SCMD_SIP ),
-	ABILITY_CMD( "siphon", POS_FIGHTING, do_siphon, NO_MIN, CTYPE_COMBAT, ABIL_SIPHON ),
 	SIMPLE_CMD( "sire", POS_STANDING, do_sire, NO_MIN, CTYPE_COMBAT ),
 	SIMPLE_CMD( "sit", POS_RESTING, do_sit, NO_MIN, CTYPE_MOVE ),
 	SIMPLE_CMD( "skills", POS_DEAD, do_skills, NO_MIN, CTYPE_UTIL ),
 	SIMPLE_CMD( "skin", POS_STANDING, do_skin, NO_MIN, CTYPE_SKILL ),
-	ABILITY_CMD( "skybrand", POS_FIGHTING, do_skybrand, NO_MIN, CTYPE_COMBAT, ABIL_SKYBRAND ),
 	SIMPLE_CMD( "sleep", POS_SLEEPING, do_sleep, NO_MIN, CTYPE_MOVE ),
 	GRANT_CMD( "slay", POS_RESTING, do_slay, LVL_CIMPL, CTYPE_IMMORTAL, GRANT_SLAY ),
-	ABILITY_CMD( "slow", POS_FIGHTING, do_slow, NO_MIN, CTYPE_COMBAT, ABIL_SLOW ),
 	STANDARD_CMD( "smelt", POS_DEAD, do_gen_craft, NO_MIN, NO_GRANTS, CRAFT_TYPE_SMELT, CTYPE_BUILD, CMD_NO_ANIMALS, NO_ABIL ),
-	STANDARD_CMD( "sneak", POS_STANDING, do_sneak, NO_MIN, NO_GRANTS, NO_SCMD, CTYPE_MOVE, CMD_STAY_HIDDEN, ABIL_SNEAK ),
 	GRANT_CMD( "snoop", POS_DEAD, do_snoop, LVL_CIMPL, CTYPE_IMMORTAL, GRANT_SNOOP ),
 	SIMPLE_CMD( "socials", POS_DEAD, do_socials, NO_MIN, CTYPE_UTIL ),
-	ABILITY_CMD( "soulsight", POS_RESTING, do_soulsight, NO_MIN, CTYPE_SKILL, ABIL_SOULSIGHT ),
 	SIMPLE_CMD( "speak", POS_DEAD, do_speak, NO_MIN, CTYPE_UTIL ),
 	SIMPLE_CMD( "specialize", POS_STANDING, do_specialize, NO_MIN, CTYPE_UTIL ),
 	SIMPLE_CMD( "split", POS_RESTING, do_split, NO_MIN, CTYPE_UTIL ),
 	SIMPLE_CMD( "stand", POS_RESTING, do_stand, NO_MIN, CTYPE_MOVE ),
 	SCMD_CMD( "stake", POS_FIGHTING, do_stake, NO_MIN, CTYPE_COMBAT, FALSE ),
+	SIMPLE_CMD( "start", POS_DEAD, do_start, NO_MIN, CTYPE_UTIL ),
 	SIMPLE_CMD( "stat", POS_DEAD, do_stat, LVL_START_IMM, CTYPE_IMMORTAL ),
-	ABILITY_CMD( "steal", POS_STANDING, do_steal, NO_MIN, CTYPE_COMBAT, ABIL_STEAL ),
+	SCMD_CMD( "statusmessages", POS_DEAD, do_fightmessages, NO_MIN, CTYPE_UTIL, SCMD_STATUS ),
+	SCMD_CMD( "smessages", POS_DEAD, do_fightmessages, NO_MIN, CTYPE_UTIL, SCMD_STATUS ),
+	SIMPLE_CMD( "steal", POS_STANDING, do_steal, NO_MIN, CTYPE_COMBAT ),
 	SIMPLE_CMD( "store", POS_STANDING, do_store, NO_MIN, CTYPE_MOVE ),
 	SIMPLE_CMD( "stop", POS_DEAD, do_stop, NO_MIN, CTYPE_UTIL ),
 	SIMPLE_CMD( "struggle", POS_STUNNED, do_struggle, NO_MIN, CTYPE_COMBAT ),
@@ -1014,12 +929,12 @@ cpp_extern const struct command_info cmd_info[] = {
 	STANDARD_CMD( "tame", POS_STANDING, do_tame, NO_MIN, NO_GRANTS, NO_SCMD, CTYPE_SKILL, CMD_NO_ANIMALS, NO_ABIL ),
 	STANDARD_CMD( "tan", POS_STANDING, do_tan, NO_MIN, NO_GRANTS, NO_SCMD, CTYPE_EMPIRE, CMD_NO_ANIMALS, NO_ABIL ),
 	SCMD_CMD( "taste", POS_RESTING, do_eat, NO_MIN, CTYPE_UTIL, SCMD_TASTE ),
-	STANDARD_CMD( "tavern", POS_STANDING, do_tavern, NO_MIN, NO_GRANTS, NO_SCMD, CTYPE_EMPIRE, CMD_NO_ANIMALS, NO_ABIL ),
 	GRANT_CMD( "tattach", POS_DEAD, do_tattach, LVL_CIMPL, CTYPE_IMMORTAL, GRANT_TRIGGERS ),
 	GRANT_CMD( "tdetach", POS_DEAD, do_tdetach, LVL_CIMPL, CTYPE_IMMORTAL, GRANT_TRIGGERS ),
 	GRANT_CMD( "tedit", POS_DEAD, do_tedit, LVL_CIMPL, CTYPE_IMMORTAL, GRANT_TEDIT ),
 	SCMD_CMD( "teleport", POS_STANDING, do_goto, LVL_GOD, CTYPE_IMMORTAL, SCMD_TELEPORT ),
 	SCMD_CMD( "tellhistory", POS_DEAD, do_history, NO_MIN, CTYPE_COMM, SCMD_TELL_HISTORY ),
+	SIMPLE_CMD( "temperature", POS_DEAD, do_temperature, NO_MIN, CTYPE_UTIL ),
 	SIMPLE_CMD( "territory", POS_DEAD, do_territory, NO_MIN, CTYPE_EMPIRE ),
 	STANDARD_CMD( "throw", POS_FIGHTING, do_throw, NO_MIN, NO_GRANTS, NO_SCMD, CTYPE_COMBAT, CMD_NO_ANIMALS, NO_ABIL ),
 	STANDARD_CMD( "thaw", POS_DEAD, do_wizutil, LVL_CIMPL, GRANT_FREEZE, SCMD_THAW, CTYPE_IMMORTAL, CMD_NO_ANIMALS, NO_ABIL ),
@@ -1029,7 +944,7 @@ cpp_extern const struct command_info cmd_info[] = {
 	SIMPLE_CMD( "title", POS_DEAD, do_title, NO_MIN, CTYPE_UTIL ),
 	SIMPLE_CMD( "toggles", POS_DEAD, do_toggle, NO_MIN, CTYPE_UTIL ),
 	SIMPLE_CMD( "tomb", POS_DEAD, do_tomb, NO_MIN, CTYPE_UTIL ),
-	ABILITY_CMD( "track", POS_STANDING, do_track, NO_MIN, CTYPE_SKILL, ABIL_TRACK ),
+	SIMPLE_CMD( "track", POS_STANDING, do_track, NO_MIN, CTYPE_SKILL ),
 	SIMPLE_CMD( "trade", POS_RESTING, do_trade, NO_MIN, CTYPE_MOVE ),
 	GRANT_CMD( "transfer", POS_SLEEPING, do_trans, LVL_CIMPL, CTYPE_IMMORTAL, GRANT_TRANSFER ),
 	SIMPLE_CMD( "transport", POS_STANDING, do_transport, NO_MIN, CTYPE_MOVE ),
@@ -1039,6 +954,7 @@ cpp_extern const struct command_info cmd_info[] = {
 	SCMD_CMD( "unalias", POS_DEAD, do_alias, NO_MIN, CTYPE_UTIL, SCMD_UNALIAS ),
 	STANDARD_CMD( "unapprove", POS_DEAD, do_approve, LVL_CIMPL, GRANT_APPROVE, SCMD_UNAPPROVE, CTYPE_IMMORTAL, NOBITS, NO_ABIL ),
 	GRANT_CMD( "unbind", POS_SLEEPING, do_unbind, LVL_CIMPL, CTYPE_IMMORTAL, GRANT_UNBIND ),
+	STANDARD_CMD( "unfriend", POS_DEAD, do_unfriend, NO_MIN, NO_GRANTS, NO_SCMD, CTYPE_UTIL, CMD_NO_ABBREV, NO_ABIL ),
 	STANDARD_CMD( "unharness", POS_STANDING, do_unharness, NO_MIN, NO_GRANTS, NO_SCMD, CTYPE_MOVE, CMD_NO_ANIMALS, NO_ABIL ),
 	SCMD_CMD( "unkeep", POS_DEAD, do_keep, NO_MIN, CTYPE_UTIL, SCMD_UNKEEP ),
 	STANDARD_CMD( "unload", POS_STANDING, do_unload_vehicle, NO_MIN, NO_GRANTS, NO_SCMD, CTYPE_MOVE, CMD_NO_ANIMALS, NO_ABIL ),
@@ -1058,9 +974,7 @@ cpp_extern const struct command_info cmd_info[] = {
 	SIMPLE_CMD( "utility", POS_DEAD, do_admin_util, LVL_START_IMM, CTYPE_IMMORTAL ),
 	SCMD_CMD( "ungroup", POS_DEAD, do_no_cmd, NO_MIN, CTYPE_UTIL, NOCMD_UNGROUP ),
 
-	ABILITY_CMD( "veintap", POS_STANDING, do_veintap, NO_MIN, CTYPE_SKILL, ABIL_VEINTAP ),
 	SCMD_CMD( "version", POS_DEAD, do_gen_ps, NO_MIN, CTYPE_UTIL, SCMD_VERSION ),
-	ABILITY_CMD( "vigor", POS_FIGHTING, do_vigor, NO_MIN, CTYPE_SKILL, ABIL_VIGOR ),
 	SIMPLE_CMD( "visible", POS_RESTING, do_visible, NO_MIN, CTYPE_UTIL ),
 	GRANT_CMD( "vnum", POS_DEAD, do_vnum, LVL_START_IMM, CTYPE_IMMORTAL, GRANT_OLC ),
 	GRANT_CMD( "vstat", POS_DEAD, do_vstat, LVL_START_IMM, CTYPE_IMMORTAL, GRANT_OLC ),
@@ -1077,7 +991,6 @@ cpp_extern const struct command_info cmd_info[] = {
 	SIMPLE_CMD( "where", POS_RESTING, do_where, NO_MIN, CTYPE_COMM ),
 	SIMPLE_CMD( "whereami", POS_RESTING, do_whereami, NO_MIN, CTYPE_UTIL ),
 	SCMD_CMD( "whisper", POS_RESTING, do_spec_comm, NO_MIN, CTYPE_COMM, SCMD_WHISPER ),
-	ABILITY_CMD( "whisperstride", POS_STANDING, do_whisperstride, NO_MIN, CTYPE_SKILL, ABIL_WHISPERSTRIDE ),
 	SIMPLE_CMD( "wield", POS_RESTING, do_wield, NO_MIN, CTYPE_UTIL ),
 	SIMPLE_CMD( "withdraw", POS_STANDING, do_withdraw, NO_MIN, CTYPE_EMPIRE ),
 	SCMD_CMD( "wiznet", POS_DEAD, do_pub_comm, LVL_START_IMM, CTYPE_IMMORTAL, SCMD_WIZNET ),
@@ -1087,7 +1000,6 @@ cpp_extern const struct command_info cmd_info[] = {
 	SCMD_CMD( "wizlist", POS_DEAD, do_gen_text_string, NO_MIN, CTYPE_UTIL, TEXT_FILE_WIZLIST ),
 	GRANT_CMD( "wizlock", POS_DEAD, do_wizlock, LVL_CIMPL, CTYPE_IMMORTAL, GRANT_WIZLOCK ),
 	SIMPLE_CMD( "workforce", POS_DEAD, do_workforce, NO_MIN, CTYPE_EMPIRE ),
-	ABILITY_CMD( "worm", POS_STUNNED, do_worm, NO_MIN, CTYPE_MOVE, ABIL_WORM ),
 	SIMPLE_CMD( "write", POS_STANDING, do_write, NO_MIN, CTYPE_COMM ),
 	SCMD_CMD( "wimpy", POS_DEAD, do_no_cmd, NO_MIN, CTYPE_UTIL, NOCMD_WIMPY ),
 	
@@ -1183,7 +1095,7 @@ void command_interpreter(char_data *ch, char *argument) {
 	}
 
 	/* otherwise, find the command */
-	for (length = strlen(arg), cmd = 0; *cmd_info[cmd].command != '\n'; cmd++) {
+	for (length = strlen(arg), cmd = 0; *cmd_info[cmd].command != '\n'; ++cmd) {
 		if (GET_ACCESS_LEVEL(ch) < cmd_info[cmd].minimum_level && (cmd_info[cmd].grants == NO_GRANTS || !IS_GRANTED(ch, cmd_info[cmd].grants))) {
 			continue;
 		}
@@ -1205,12 +1117,7 @@ void command_interpreter(char_data *ch, char *argument) {
 		break;
 	}
 	
-	// reveal hidden
-	if (AFF_FLAGGED(ch, AFF_HIDE) && !IS_SET(cmd_info[cmd].flags, CMD_STAY_HIDDEN | CMD_UNHIDE_AFTER)) {
-		REMOVE_BIT(AFF_FLAGS(ch), AFF_HIDE);
-		affects_from_char_by_aff_flag(ch, AFF_HIDE, FALSE);
-	}
-	
+	// check abilities and socials
 	if (*cmd_info[cmd].command == '\n' && check_ability(ch, argument, FALSE)) {
 		return;
 	}
@@ -1227,7 +1134,14 @@ void command_interpreter(char_data *ch, char *argument) {
 		// do the social instead.
 		return;
 	}
-	else if (*cmd_info[cmd].command == '\n') {
+	
+	// we are locked in, not doing a social, not doing an ability: now reveal hidden
+	if (AFF_FLAGGED(ch, AFF_HIDDEN) && !IS_SET(cmd_info[cmd].flags, CMD_STAY_HIDDEN | CMD_UNHIDE_AFTER)) {
+		REMOVE_BIT(AFF_FLAGS(ch), AFF_HIDDEN);
+		affects_from_char_by_aff_flag(ch, AFF_HIDDEN, FALSE);
+	}
+	
+	if (*cmd_info[cmd].command == '\n') {
 		// Command trigger (2/3): abbrev match on non-matching command
 		if (check_command_trigger(ch, arg, line, CMDTRG_ABBREV)) {
 			return;
@@ -1235,8 +1149,7 @@ void command_interpreter(char_data *ch, char *argument) {
 		// otherwise, no match
 		send_config_msg(ch, "huh_string");
 	}
-	
-	else if (!char_can_act(ch, cmd_info[cmd].minimum_position, !IS_SET(cmd_info[cmd].flags, CMD_NO_ANIMALS), (cmd_info[cmd].ctype != CTYPE_COMBAT && cmd_info[cmd].ctype != CTYPE_SKILL && cmd_info[cmd].ctype != CTYPE_BUILD))) {
+	else if (!char_can_act(ch, cmd_info[cmd].minimum_position, !IS_SET(cmd_info[cmd].flags, CMD_NO_ANIMALS), (cmd_info[cmd].ctype != CTYPE_COMBAT && cmd_info[cmd].ctype != CTYPE_SKILL && cmd_info[cmd].ctype != CTYPE_BUILD), IS_SET(cmd_info[cmd].flags, CMD_WHILE_FEEDING))) {
 		// sent own error message
 	}
 	else if (GET_FEEDING_FROM(ch) && cmd_info[cmd].minimum_position >= POS_SLEEPING && !IS_SET(cmd_info[cmd].flags, CMD_WHILE_FEEDING)) {
@@ -1263,7 +1176,8 @@ void command_interpreter(char_data *ch, char *argument) {
 
 	/* Unhide after ? */
 	if (ch && IS_SET(cmd_info[cmd].flags, CMD_UNHIDE_AFTER)) {
-		REMOVE_BIT(AFF_FLAGS(ch), AFF_HIDE);
+		REMOVE_BIT(AFF_FLAGS(ch), AFF_HIDDEN);
+		affects_from_char_by_aff_flag(ch, AFF_HIDDEN, FALSE);
 	}
 }
 
@@ -1510,9 +1424,10 @@ ACMD(do_alias) {
 * @param int min_pos The minimum allowed POS_ const.
 * @param bool allow_animal If FALSE, players can't do this in an animal morph.
 * @param bool allow_invulnerable If FALSE, players can't do this while un-attackable.
+* @param bool override_feeding If TRUE, ignores position for feeding vampires.
 * @return bool TRUE if the character can act, FALSE (with error msg) if not
 */
-bool char_can_act(char_data *ch, int min_pos, bool allow_animal, bool allow_invulnerable) {
+bool char_can_act(char_data *ch, int min_pos, bool allow_animal, bool allow_invulnerable, bool override_feeding) {
 	if (!IS_NPC(ch) && ACCOUNT_FLAGGED(ch, ACCT_FROZEN)) {
 		send_to_char("You try, but the mind-numbing cold prevents you...\r\n", ch);
 	}
@@ -1525,16 +1440,16 @@ bool char_can_act(char_data *ch, int min_pos, bool allow_animal, bool allow_invu
 	else if (AFF_FLAGGED(ch, AFF_STUNNED | AFF_HARD_STUNNED) && min_pos >= POS_SLEEPING && !IS_IMMORTAL(ch)) {
 		msg_to_char(ch, "You can't do that while stunned!\r\n");
 	}
-	else if (AFF_FLAGGED(ch, AFF_EARTHMELD) && min_pos >= POS_SLEEPING) {
-		msg_to_char(ch, "You can't do that while in earthmeld.\r\n");
+	else if (AFF_FLAGGED(ch, AFF_EARTHMELDED) && min_pos >= POS_SLEEPING) {
+		msg_to_char(ch, "You can't do that while earthmelded.\r\n");
 	}
-	else if (AFF_FLAGGED(ch, AFF_MUMMIFY) && min_pos >= POS_SLEEPING) {
+	else if (AFF_FLAGGED(ch, AFF_MUMMIFIED) && min_pos >= POS_SLEEPING) {
 		msg_to_char(ch, "You can't do that while mummified.\r\n");
 	}
-	else if (AFF_FLAGGED(ch, AFF_DEATHSHROUD) && min_pos >= POS_SLEEPING) {
-		msg_to_char(ch, "You can't do that while in deathshroud!\r\n");
+	else if (AFF_FLAGGED(ch, AFF_DEATHSHROUDED) && min_pos >= POS_SLEEPING) {
+		msg_to_char(ch, "You can't do that while deathshrouded!\r\n");
 	}
-	else if (GET_FEEDING_FROM(ch) && min_pos >= POS_SLEEPING) {
+	else if (GET_FEEDING_FROM(ch) && min_pos >= POS_SLEEPING && !override_feeding) {
 		msg_to_char(ch, "You can't do that right now!\r\n");
 	}
 	else if (GET_FED_ON_BY(ch) && min_pos >= POS_SLEEPING) {
@@ -1751,6 +1666,9 @@ ACMD(do_missing_help_files) {
 		if (!ABIL_NAME(abil)) {
 			continue;
 		}
+		if (has_ability_data_any(abil, ADL_PARENT)) {
+			continue;	// generally not needed
+		}
 		
 		if (!find_help_entry(LVL_TOP, ABIL_NAME(abil))) {
 			sprintf(lbuf, "%s %-19.19s", lbuf, ABIL_NAME(abil));
@@ -1767,7 +1685,7 @@ ACMD(do_missing_help_files) {
 	}
 	
 	// possible need for trailing crlf
-	if ((++count % 4) == 0) {
+	if ((count % 4) != 0) {
 		strcat(lbuf, "\r\n");
 	}
 	
@@ -1821,8 +1739,6 @@ struct {
 * @param descriptor_data *d the user
 */
 void prompt_creation(descriptor_data *d) {
-	char buf[MAX_STRING_LENGTH];
-	
 	switch (STATE(d)) {
 		case CON_Q_SCREEN_READER: {
 			SEND_TO_Q("\r\nEmpireMUD makes heavy use of an ascii map, but also supports screen\r\n", d);
@@ -1830,37 +1746,36 @@ void prompt_creation(descriptor_data *d) {
 			SEND_TO_Q("description of what you can see in each direction on the world map. This\r\n", d);
 			SEND_TO_Q("option is only recommended for players using screen readers. You can see\r\n", d);
 			SEND_TO_Q("HELP SCREEN READER once you're in the game for more information.\r\n", d);
-			SEND_TO_Q("\r\nAre you using a screen reader (y/n)? ", d);
+			msg_to_desc(d, "\r\nAre you using a screen reader (y/n)? %s", telnet_go_ahead(d));
 			break;
 		}
 		case CON_Q_HAS_ALT: {
 			SEND_TO_Q("\r\n&cMultiple characters and Alts:&0\r\n", d);
-			SEND_TO_Q("If you have an existing character on this game, you must link this new char-\r\n", d);
-			SEND_TO_Q("acter to your other one. This is not optional. We require that you link all\r\n", d);
+			SEND_TO_Q("If you have an existing character on this game, you must link this new\r\n", d);
+			SEND_TO_Q("character to your other one. This is not optional. We require that you link all\r\n", d);
 			SEND_TO_Q("your characters together so that the game can process you as the same person.\r\n", d);
 			SEND_TO_Q("Other players will NOT be informed who your alts are. Only immortals will know.\r\n", d);
 			SEND_TO_Q("\r\n", d);
-			SEND_TO_Q("Do you have an existing character (y/n)? ", d);
+			msg_to_desc(d, "Do you have an existing character (y/n)? %s", telnet_go_ahead(d));
 			break;
 		}
 		case CON_Q_ALT_NAME: {
-			SEND_TO_Q("\r\nEnter the name of any one of your other characters (leave blank to cancel): ", d);
+			msg_to_desc(d, "\r\nEnter the name of any one of your other characters (leave blank to cancel): %s", telnet_go_ahead(d));
 			break;
 		}
 		case CON_Q_ALT_PASSWORD: {
-			SEND_TO_Q("\r\nEnter the password for that character: ", d);
+			msg_to_desc(d, "\r\nEnter the password for that character: %s", telnet_go_ahead(d));
 			ProtocolNoEcho(d, true);
 			break;
 		}
 		case CON_NEWPASSWD: {
 			SEND_TO_Q("New character.\r\n\r\n", d);
-			sprintf(buf, "Give me a password for %s: ", GET_PC_NAME(d->character));
-			SEND_TO_Q(buf, d);
+			msg_to_desc(d, "Give me a password for %s: %s", GET_PC_NAME(d->character), telnet_go_ahead(d));
 			ProtocolNoEcho(d, true);
 			break;
 		}
 		case CON_CNFPASSWD: {
-			SEND_TO_Q("\r\n\r\nPlease retype password: ", d);
+			msg_to_desc(d, "\r\n\r\nPlease retype password: %s", telnet_go_ahead(d));
 			break;
 		}
 		case CON_QLAST_NAME: {
@@ -1870,7 +1785,7 @@ void prompt_creation(descriptor_data *d) {
 				break;
 			}
 			
-			SEND_TO_Q("\r\n\r\nWould you like a last name (y/n)? ", d);
+			msg_to_desc(d, "\r\n\r\nWould you like a last name (y/n)? %s", telnet_go_ahead(d));
 			break;
 		}
 		case CON_SLAST_NAME: {
@@ -1878,15 +1793,15 @@ void prompt_creation(descriptor_data *d) {
 			if (rules && *rules) {
 				msg_to_desc(d, "\r\n%s", rules);
 			}
-			SEND_TO_Q("\r\nEnter your last name: ", d);
+			msg_to_desc(d, "\r\nEnter your last name: %s", telnet_go_ahead(d));
 			break;
 		}
 		case CON_CLAST_NAME: {
-			msg_to_desc(d, "\r\nDid I get that name right, %s %s%s (y/n)? ", GET_PC_NAME(d->character), GET_PERSONAL_LASTNAME(d->character), (UPPER(*GET_PERSONAL_LASTNAME(d->character)) != *GET_PERSONAL_LASTNAME(d->character)) ? " (first letter is not capitalized)" : "");
+			msg_to_desc(d, "\r\nDid I get that name right, %s %s%s (y/n)? %s", GET_PC_NAME(d->character), GET_PERSONAL_LASTNAME(d->character), (UPPER(*GET_PERSONAL_LASTNAME(d->character)) != *GET_PERSONAL_LASTNAME(d->character)) ? " (first letter is not capitalized)" : "", telnet_go_ahead(d));
 			break;
 		}
 		case CON_QSEX: {
-			SEND_TO_Q("\r\nWhat is your sex (M/F)? ", d);
+			msg_to_desc(d, "\r\nWhat is your sex (M/F)? %s", telnet_go_ahead(d));
 			break;
 		}
 		case CON_Q_ARCHETYPE: {
@@ -1918,20 +1833,20 @@ void prompt_creation(descriptor_data *d) {
 				}
 			}
 			
-			msg_to_desc(d, "\r\nIs this correct (y/n)? ");
+			msg_to_desc(d, "\r\nIs this correct (y/n)? %s", telnet_go_ahead(d));
 			break;
 		}
 		case CON_PROMO_CODE: {
-			SEND_TO_Q("\r\nIf you have a promo code, enter it now. Otherwise, just leave it blank > ", d);
+			msg_to_desc(d, "\r\nIf you have a promo code, enter it now. Otherwise, just leave it blank > %s", telnet_go_ahead(d));
 			break;
 		}
 		case CON_CONFIRM_PROMO_CODE: {
-			SEND_TO_Q("\r\nUnknown promo code. Proceed without one (y/n)? ", d);
+			msg_to_desc(d, "\r\nUnknown promo code. Proceed without one (y/n)? %s", telnet_go_ahead(d));
 			break;
 		}
 		case CON_REFERRAL: {
 			if (!GET_REFERRED_BY(d->character)) {
-				SEND_TO_Q("\r\nWhere did you hear about us (optional, but please mention which website or friend): ", d);
+				msg_to_desc(d, "\r\nWhere did you hear about us (optional, but please mention which website or friend): %s", telnet_go_ahead(d));
 			}
 			else {
 				next_creation_step(d);
@@ -1939,7 +1854,7 @@ void prompt_creation(descriptor_data *d) {
 			break;
 		}
 		case CON_FINISH_CREATION: {
-			SEND_TO_Q("\r\n*** Press ENTER: ", d);
+			msg_to_desc(d, "\r\n*** Press ENTER: %s", telnet_go_ahead(d));
 			break;
 		}
 		case CON_BONUS_TRAIT: {
@@ -1949,7 +1864,7 @@ void prompt_creation(descriptor_data *d) {
 			else if (GET_ACCESS_LEVEL(d->character) > 0) {
 				// existing: send player to game
 				send_login_motd(d, GET_BAD_PWS(d->character));
-				SEND_TO_Q("\r\n*** Press ENTER: ", d);
+				msg_to_desc(d, "\r\n*** Press ENTER: %s", telnet_go_ahead(d));
 				STATE(d) = CON_RMOTD;
 			}
 			else {
@@ -1999,7 +1914,7 @@ void process_alt_name(descriptor_data *d, char *arg) {
 		next_creation_step(d);
 	}
 	else {
-		msg_to_desc(d, "Unable to load character '%s'...\r\nPlease enter a valid alt name or leave blank to cancel: ", arg);
+		msg_to_desc(d, "Unable to load character '%s'...\r\nPlease enter a valid alt name or leave blank to cancel: %s", arg, telnet_go_ahead(d));
 	}
 }
 
@@ -2026,11 +1941,11 @@ void process_alt_password(descriptor_data *d, char *arg) {
 				STATE(d) = CON_CLOSE;
 			}
 			else {
-				SEND_TO_Q("Wrong password.\r\nPassword: ", d);
-				ProtocolNoEcho(d, true);
+				msg_to_desc(d, "Wrong password.\r\nPassword: %s", telnet_go_ahead(d));
 			}
 		}
 		else {	// password ok
+			ProtocolNoEcho(d, false);
 			syslog(SYS_LOGIN, 0, TRUE, "NEW: associating new user %s with account for %s", GET_NAME(d->character), GET_NAME(alt));
 			
 			// does 2nd player have an account already? if not, make one
@@ -2040,11 +1955,17 @@ void process_alt_password(descriptor_data *d, char *arg) {
 			}
 			GET_TEMPORARY_ACCOUNT_ID(d->character) = GET_ACCOUNT(alt)->id;
 			
+			// copy referral
 			if ((!GET_REFERRED_BY(d->character) || !*GET_REFERRED_BY(d->character)) && GET_REFERRED_BY(alt)) {
 				if (GET_REFERRED_BY(d->character)) {
 					free(GET_REFERRED_BY(d->character));
 				}
 				GET_REFERRED_BY(d->character) = str_dup(GET_REFERRED_BY(alt));
+			}
+			
+			// copy no-friends pref
+			if (PRF_FLAGGED(alt, PRF_NO_FRIENDS)) {
+				SET_BIT(PRF_FLAGS(d->character), PRF_NO_FRIENDS);
 			}
 			
 			next_creation_step(d);
@@ -2069,7 +1990,7 @@ void process_alt_password(descriptor_data *d, char *arg) {
 		// state was set above
 	}
 	else {
-		msg_to_desc(d, "Unable to load alternate character...\r\nHit enter to return to the creation process: ");
+		msg_to_desc(d, "Unable to load alternate character...\r\nHit enter to return to the creation process: %s", telnet_go_ahead(d));
 	}
 }
 
@@ -2114,7 +2035,7 @@ void show_bonus_trait_menu(char_data *ch) {
 	reset = config_get_int("hours_to_bonus_trait_reset");
 	advanced = config_get_int("hours_to_advanced_bonus_traits");
 	
-	msg_to_char(ch, "\r\nBonus Traits:\r\n");
+	msg_to_char(ch, "\r\nBonus Traits (with %d hour%s of play):\r\n", hours, PLURAL(hours));
 	
 	// info section
 	if (first > 0) {
@@ -2130,7 +2051,7 @@ void show_bonus_trait_menu(char_data *ch) {
 		msg_to_char(ch, " and another after %d hour%s%s", second, PLURAL(second), (first == 0) ? " of play" : "");
 	}
 	if (reset > 0) {
-		msg_to_char(ch, ".\r\nYour bonus traits automatically reset after %d hour%s%s.\r\n", reset, PLURAL(reset), (first == 0 && second == 0) ? " of play" : "");
+		msg_to_char(ch, ".\r\nYour bonus traits automatically reset after your first %d hour%s%s.\r\n", reset, PLURAL(reset), (first == 0 && second == 0) ? " of play" : "");
 	}
 	else {
 		msg_to_char(ch, ".\r\n");
@@ -2147,7 +2068,7 @@ void show_bonus_trait_menu(char_data *ch) {
 		msg_to_char(ch, "%2d. %s%s\r\n", ++count, bonus_bit_descriptions[iter], (HAS_BONUS_TRAIT(ch, BIT(iter)) ? " &g(already chosen)&0" : ""));
 	}
 	
-	msg_to_char(ch, "\r\nEnter a number to choose (or 'skip' to choose later) > ");
+	msg_to_char(ch, "\r\nEnter a number to choose (or 'skip' to choose later) > %s", telnet_go_ahead(ch->desc));
 }
 
 
@@ -2385,39 +2306,92 @@ int perform_dupe_check(descriptor_data *d) {
 }
 
 
-// basic name validation and processing
-int _parse_name(char *arg, char *name) {
-	int i, iter, caps;
-	int max_caps = config_get_int("max_capitals_in_name");
-
-	/* skip whitespaces */
-	for (; isspace(*arg); arg++);
+/**
+* basic name validation and processing
+*
+* @param char *arg The name from the user.
+* @param char *name A buffer to store the modified name to.
+* @param descriptor_data *desc Optional: The person who will receive the error message if this fails. (May be NULL,)
+* @param bool reduced_restrictions For "set" or other immortal commands: checks fewer things if TRUE.
+* @return int 1 if the name was invalid (and sent a message); 0 if it was valid (no message sent).
+*/
+int _parse_name(char *arg, char *name, descriptor_data *desc, bool reduced_restrictions) {
+	int iter, caps;
+	descriptor_data *desc_iter;
 	
-	if (max_caps > 0) {
-		caps = 0;
-		for (iter = 0; iter < strlen(arg); ++iter) {
-			if (isupper(arg[iter])) {
-				++caps;
+	const char *allowed_chars = "'-";
+
+	// skip whitespace
+	skip_spaces(&arg);
+	
+	// validate parts of the string
+	caps = 0;
+	for (iter = 0; iter < strlen(arg); ++iter) {
+		if (!isalpha(arg[iter]) && !strchr(allowed_chars, arg[iter])) {
+			if (desc) {
+				msg_to_desc(desc, "Names cannot contain '%c'.\r\n", arg[iter]);
 			}
-		}
-		if (caps > max_caps) {
 			return 1;
 		}
+		else if (isupper(arg[iter])) {
+			++caps;
+		}
 	}
-	
-	// don't allow leading apostrophe or dash
-	if (*arg == '\'' || *arg == '-') {
+	if (!reduced_restrictions && config_get_int("max_capitals_in_name") > 0 && caps > config_get_int("max_capitals_in_name")) {
+		if (desc) {
+			msg_to_desc(desc, "Names may not contain more than %d capital letters.\r\n", config_get_int("max_capitals_in_name"));
+		}
 		return 1;
 	}
-
-	// check for anything that's not an apostrophe or dash
-	for (i = 0; (*name = *arg); arg++, i++, name++)
-		if (!isalpha(*arg) && *arg != '\'' && *arg != '-')
-			return 1;
-
-	if (!i)
-		return (1);
-
+	if (!reduced_restrictions && (strlen(arg) < 2 || strlen(arg) > MAX_NAME_LENGTH)) {
+		if (desc) {
+			msg_to_desc(desc, "Name must be between 2 and %d letters in length.\r\n", MAX_NAME_LENGTH);
+		}
+		return 1;
+	}
+	if (reduced_restrictions && strlen(arg) > MAX_NAME_LENGTH * 2) {
+		if (desc) {
+			msg_to_desc(desc, "Name too long.\r\n");
+		}
+		return 1;
+	}
+	if (!isalpha(*arg)) {
+		if (desc) {
+			msg_to_desc(desc, "Name must begin with a letter.\r\n");
+		}
+		return 1;
+	}
+	if (!isalpha(arg[strlen(arg) - 1])) {
+		if (desc) {
+			msg_to_desc(desc, "Name must end with a letter.\r\n");
+		}
+		return 1;
+	}
+	if (fill_word(arg) || reserved_word(arg)) {
+		if (desc) {
+			msg_to_desc(desc, "'&&Z%s' is an invalid name.\r\n", arg);
+		}
+		return 1;
+	}
+	
+	// check other descriptors for the same name
+	LL_FOREACH(descriptor_list, desc_iter) {
+		if (desc_iter->character && GET_NAME(desc_iter->character) && !str_cmp(GET_NAME(desc_iter->character), arg)) {
+			if (STATE(desc_iter) == CON_PLAYING || STATE(desc_iter) == CON_RMOTD) {
+				// playing state: name is valid (maybe just reconnecting)
+				continue;
+			}
+			else {
+				if (desc) {
+					msg_to_desc(desc, "Someone is already using that name.\r\n");
+				}
+				return 1;
+			}
+		}
+	}
+	
+	// seems good
+	strcpy(name, arg);
 	return (0);
 }
 
@@ -2426,8 +2400,8 @@ int _parse_name(char *arg, char *name) {
 * Main "socket nanny" for processing menu input.
 */
 void nanny(descriptor_data *d, char *arg) {
-	char buf[MAX_STRING_LENGTH], tmp_name[MAX_INPUT_LENGTH];
-	int load_result, i, iter;
+	char tmp_name[MAX_INPUT_LENGTH];
+	int load_result, i, iter, num;
 	bitvector_t bit;
 	bool show_start = FALSE;
 	char_data *temp_char;
@@ -2439,6 +2413,7 @@ void nanny(descriptor_data *d, char *arg) {
 	}
 
 	skip_spaces(&arg);
+	d->idle_tics = 0;
 
 	switch (STATE(d)) {
 		case CON_GET_NAME: {	/* wait for input of name */
@@ -2460,12 +2435,12 @@ void nanny(descriptor_data *d, char *arg) {
 			}
 			else if (!str_cmp(arg, "new")) {
 				// special case for players who typed "new"
-				SEND_TO_Q("\r\nEnter new character name: ", d);
+				msg_to_desc(d, "\r\nEnter new character name: %s", telnet_go_ahead(d));
 				return;
 			}
 			else {
-				if ((_parse_name(arg, tmp_name)) || strlen(tmp_name) < 2 || strlen(tmp_name) > MAX_NAME_LENGTH || !Valid_Name(tmp_name) || fill_word(strcpy(buf, tmp_name)) || reserved_word(buf)) {
-					SEND_TO_Q("Invalid name, please try another.\r\nName: ", d);
+				if (_parse_name(arg, tmp_name, d, FALSE)) {
+					msg_to_desc(d, "Please try another name: %s", telnet_go_ahead(d));
 					return;
 				}
 				if ((temp_char = load_player(tmp_name, TRUE))) {
@@ -2480,18 +2455,17 @@ void nanny(descriptor_data *d, char *arg) {
 					// flush messages because updated items appear here
 					send_stacked_msgs(d);
 					
-					SEND_TO_Q("Password: ", d);
+					msg_to_desc(d, "Password: %s", telnet_go_ahead(d));
 					ProtocolNoEcho(d, true);
-					d->idle_tics = 0;
 					STATE(d) = CON_PASSWORD;
 				}
 				else {
 					/* player unknown -- make new character */
 					const char *rules = config_get_string("name_rules");
 
-					/* Check for multiple creations of a character. */
+					// Check bans and multiple creations of a character.
 					if (!Valid_Name(tmp_name)) {
-						SEND_TO_Q("Invalid name, please try another.\r\nName: ", d);
+						msg_to_desc(d, "Invalid name, please try another.\r\nName: %s", telnet_go_ahead(d));
 						return;
 					}
 					GET_PC_NAME(d->character) = str_dup(CAP(tmp_name));
@@ -2501,8 +2475,7 @@ void nanny(descriptor_data *d, char *arg) {
 						msg_to_desc(d, "%s\r\n", rules);
 					}
 
-					sprintf(buf, "Did I get that name right, %s (Y/N)? ", tmp_name);
-					SEND_TO_Q(buf, d);
+					msg_to_desc(d, "Did I get that name right, %s (Y/N)? %s", tmp_name, telnet_go_ahead(d));
 					STATE(d) = CON_NAME_CNFRM;
 				}
 			}
@@ -2531,13 +2504,13 @@ void nanny(descriptor_data *d, char *arg) {
 				start_creation_process(d);
 			}
 			else if (*arg == 'n' || *arg == 'N') {
-				SEND_TO_Q("Okay, what IS it, then? ", d);
+				msg_to_desc(d, "Okay, what IS it, then? %s", telnet_go_ahead(d));
 				free(GET_PC_NAME(d->character));
 				GET_PC_NAME(d->character) = NULL;
 				STATE(d) = CON_GET_NAME;
 			}
 			else {
-				SEND_TO_Q("Please type Yes or No: ", d);
+				msg_to_desc(d, "Please type Yes or No: %s", telnet_go_ahead(d));
 			}
 			break;
 		}
@@ -2563,15 +2536,25 @@ void nanny(descriptor_data *d, char *arg) {
 			else {
 				if (strncmp(CRYPT(arg, PASSWORD_SALT), GET_PASSWD(d->character), MAX_PWD_LENGTH)) {
 					syslog(SYS_LOGIN, 0, TRUE, "BAD PW: %s [%s]", GET_NAME(d->character), d->host);
-					GET_BAD_PWS(d->character)++;
-					SET_BIT(PLR_FLAGS(d->character), PLR_KEEP_LAST_LOGIN_INFO);
-					SAVE_CHAR(d->character);
-					if (++(d->bad_pws) >= config_get_int("max_bad_pws")) {	/* 3 strikes and you're out. */
+					if ((temp_char = is_playing(GET_IDNUM(d->character)))) {
+						// update on in-game version instead
+						++GET_BAD_PWS(temp_char);
+						SAVE_CHAR(temp_char);
+					}
+					else {
+						// update on this one (not in-game)
+						++GET_BAD_PWS(d->character);
+						SET_BIT(PLR_FLAGS(d->character), PLR_KEEP_LAST_LOGIN_INFO);
+						SAVE_CHAR(d->character);
+					}
+					
+					// 3 strikes and you're out.
+					if (++(d->bad_pws) >= config_get_int("max_bad_pws")) {
 						SEND_TO_Q("Wrong password... disconnecting.\r\n", d);
 						STATE(d) = CON_CLOSE;
 					}
 					else {
-						SEND_TO_Q("Wrong password.\r\nPassword: ", d);
+						msg_to_desc(d, "Wrong password.\r\nPassword: %s", telnet_go_ahead(d));
 					}
 					return;
 				}
@@ -2640,7 +2623,7 @@ void nanny(descriptor_data *d, char *arg) {
 				send_login_motd(d, load_result);
 				
 				// send on to motd
-				SEND_TO_Q("\r\n*** Press ENTER: ", d);
+				msg_to_desc(d, "\r\n*** Press ENTER: %s", telnet_go_ahead(d));
 				STATE(d) = CON_RMOTD;
 			}
 			break;
@@ -2649,7 +2632,7 @@ void nanny(descriptor_data *d, char *arg) {
 		case CON_NEWPASSWD: {
 			if (!*arg || strlen(arg) > MAX_PWD_LENGTH || strlen(arg) < 3 || !str_cmp(arg, GET_PC_NAME(d->character))) {
 				SEND_TO_Q("\r\nIllegal password.\r\n", d);
-				SEND_TO_Q("Password: ", d);
+				msg_to_desc(d, "Password: %s", telnet_go_ahead(d));
 				return;
 			}
 			
@@ -2661,7 +2644,7 @@ void nanny(descriptor_data *d, char *arg) {
 		case CON_CNFPASSWD: {
 			if (strncmp(CRYPT(arg, PASSWORD_SALT), GET_PASSWD(d->character), MAX_PWD_LENGTH)) {
 				SEND_TO_Q("\r\nPasswords don't match... start over.\r\n", d);
-				SEND_TO_Q("Password: ", d);
+				msg_to_desc(d, "Password: %s", telnet_go_ahead(d));
 				STATE(d) = CON_NEWPASSWD;
 				return;
 			}
@@ -2680,7 +2663,7 @@ void nanny(descriptor_data *d, char *arg) {
 				break;
 			}
 			else {
-				SEND_TO_Q("\r\nPlease type Yes or No: ", d);
+				msg_to_desc(d, "\r\nPlease type Yes or No: %s", telnet_go_ahead(d));
 			}
 			
 			break;
@@ -2696,7 +2679,7 @@ void nanny(descriptor_data *d, char *arg) {
 				next_creation_step(d);
 			}
 			else {
-				SEND_TO_Q("\r\nPlease type Yes or No: ", d);
+				msg_to_desc(d, "\r\nPlease type Yes or No: %s", telnet_go_ahead(d));
 			}
 			break;
 		}
@@ -2709,7 +2692,7 @@ void nanny(descriptor_data *d, char *arg) {
 				set_creation_state(d, CON_Q_ARCHETYPE);
 			}
 			else {
-				SEND_TO_Q("\r\nPlease type Yes or No: ", d);
+				msg_to_desc(d, "\r\nPlease type Yes or No: %s", telnet_go_ahead(d));
 			}
 			break;
 		}
@@ -2718,7 +2701,6 @@ void nanny(descriptor_data *d, char *arg) {
 			break;
 		}
 		case CON_Q_ALT_PASSWORD: {
-			ProtocolNoEcho(d, false);
 			SEND_TO_Q("\r\n", d);	// echo-off usually hides the CR
 			process_alt_password(d, arg);
 			break;
@@ -2726,12 +2708,11 @@ void nanny(descriptor_data *d, char *arg) {
 
 		case CON_SLAST_NAME: {	/* What's yer last name? */
 			if (!*arg) {
-				SEND_TO_Q("\r\nEnter a last name: ", d);
+				msg_to_desc(d, "\r\nEnter a last name: %s", telnet_go_ahead(d));
 				return;
 			}
-			else if ((_parse_name(arg, tmp_name)) || !Valid_Name(tmp_name) || strlen(tmp_name) < 2 || strlen(tmp_name) > MAX_NAME_LENGTH || fill_word(strcpy(buf, tmp_name)) || reserved_word(buf)) {
-				SEND_TO_Q("\r\nInvalid last name, please try another.\r\n"
-						  "Enter a last name: ", d);
+			else if (_parse_name(arg, tmp_name, d, FALSE) || !Valid_Name(tmp_name)) {
+				msg_to_desc(d, "\r\nPlease try a different last name: %s", telnet_go_ahead(d));
 				return;
 			}
 			else {
@@ -2749,12 +2730,12 @@ void nanny(descriptor_data *d, char *arg) {
 				next_creation_step(d);
 			}
 			else if (UPPER(*arg) == 'N') {
-				SEND_TO_Q("Okay, what IS it, then? ", d);
+				msg_to_desc(d, "Okay, what IS it, then? %s", telnet_go_ahead(d));
 				change_personal_lastname(d->character, NULL);
 				STATE(d) = CON_SLAST_NAME;
 			}
 			else {
-				SEND_TO_Q("Please type Yes or No: ", d);
+				msg_to_desc(d, "Please type Yes or No: %s", telnet_go_ahead(d));
 			}
 			break;
 		}
@@ -2768,7 +2749,7 @@ void nanny(descriptor_data *d, char *arg) {
 					d->character->player.sex = SEX_FEMALE;
 					break;
 				default:
-					SEND_TO_Q("That is not a sex...\r\nWhat IS your sex? ", d);
+					msg_to_desc(d, "That is not a sex...\r\nWhat IS your sex? %s", telnet_go_ahead(d));
 					return;
 			}
 
@@ -2802,7 +2783,7 @@ void nanny(descriptor_data *d, char *arg) {
 			
 			send_login_motd(d, GET_BAD_PWS(d->character));
 			
-			SEND_TO_Q("\r\n*** Press ENTER: ", d);
+			msg_to_desc(d, "\r\n*** Press ENTER: %s", telnet_go_ahead(d));
 			STATE(d) = CON_RMOTD;
 
 			syslog(SYS_LOGIN, 0, TRUE, "NEW: %s [%s] (promo: %s)", GET_NAME(d->character), d->host, GET_PROMO_ID(d->character) > 0 ? promo_codes[GET_PROMO_ID(d->character)].code : "none");
@@ -2825,7 +2806,7 @@ void nanny(descriptor_data *d, char *arg) {
 				set_creation_state(d, CON_Q_ARCHETYPE);
 			}
 			else {
-				msg_to_desc(d, "\r\nPlease type YES or NO: ");
+				msg_to_desc(d, "\r\nPlease type YES or NO: %s", telnet_go_ahead(d));
 			}
 			break;
 		}
@@ -2871,7 +2852,7 @@ void nanny(descriptor_data *d, char *arg) {
 					break;
 				}
 				default: {
-					SEND_TO_Q("Please type YES or NO: ", d);
+					msg_to_desc(d, "Please type YES or NO: %s", telnet_go_ahead(d));
 					return;
 				}
 			}
@@ -2895,18 +2876,19 @@ void nanny(descriptor_data *d, char *arg) {
 				SEND_TO_Q("member in charge of authorization. When you are able to log into the mud,\r\n", d);
 				SEND_TO_Q("type HELP AUTHORIZATION for the appropriate e-mail address, or contact the\r\n", d);
 				SEND_TO_Q("staff member via the game.\r\n", d);
-				SEND_TO_Q("\r\nPress ENTER to continue: ", d);
+				msg_to_desc(d, "\r\nPress ENTER to continue: %s", telnet_go_ahead(d));
 				syslog(SYS_LOGIN, 0, TRUE, "Login denied: Multiplaying detected for %s [%s]", GET_NAME(d->character), d->host);
-
+				
 				STATE(d) = CON_GOODBYE;
 				return;
 			}
-			else if (IS_APPROVED(d->character) && has_anonymous_host(d)) {
+			else if (IS_APPROVED(d->character) && !IS_IMMORTAL(d->character) && has_anonymous_host(d)) {
 				SEND_TO_Q("\r\n\033[31mAccess Denied: Anonymous public host detected\033[0m\r\n", d);
 				SEND_TO_Q("This game does not allow existing 'approved' characters to log in from public\r\n", d);
 				SEND_TO_Q("hosts (such as Mudconnector) that do not provide your IP address. You can only\r\n", d);
 				SEND_TO_Q("log in from this host using a character that is not 'approved', or a new\r\n", d);
-				SEND_TO_Q("character (which will not be approved.\r\n", d);
+				SEND_TO_Q("character (which will not be approved). To install a MUD client on your own\r\n", d);
+				SEND_TO_Q("computer, visit https://empiremud.net/play-now.html\r\n", d);
 				syslog(SYS_LOGIN, 0, TRUE, "Login denied: Approved character %s connecting from anonymous host [%s]", GET_NAME(d->character), d->host);
 				
 				STATE(d) = CON_GOODBYE;
@@ -2933,7 +2915,7 @@ void nanny(descriptor_data *d, char *arg) {
 				show_start = TRUE;
 			}
 			
-			if (AFF_FLAGGED(d->character, AFF_EARTHMELD)) {
+			if (AFF_FLAGGED(d->character, AFF_EARTHMELDED)) {
 				msg_to_char(d->character, "You are earthmelded.\r\n");
 			}
 			else {
@@ -2948,17 +2930,28 @@ void nanny(descriptor_data *d, char *arg) {
 			
 			display_automessages_on_login(d->character);
 			
-			display_tip_to_char(d->character);
+			if (!PRF_FLAGGED(d->character, PRF_NO_TUTORIALS)) {
+				display_tip_to_char(d->character);
+			}
 			
 			if (GET_MAIL_PENDING(d->character)) {
-				send_to_char("&rYou have mail waiting.&0\r\n", d->character);
+				send_to_char("\trYou have mail waiting.\t0\r\n", d->character);
+			}
+			if ((num = has_pending_friend_requests(d->character))) {
+				msg_to_char(d->character, "\tAYou have %d friend request%s waiting.\t0\r\n", num, PLURAL(num));
+			}
+			if (has_uncollected_event_rewards(d->character)) {
+				msg_to_char(d->character, "\ttYou have uncollected event rewards. Type 'event collect' when you're in your own territory.\t0\r\n");
 			}
 			
+			// reset daily cycle now
+			check_daily_cycle_reset(d->character);
+			
 			if (!IS_APPROVED(d->character) && (msg = config_get_string("unapproved_greeting")) && *msg) {
-				msg_to_char(d->character, "\r\n&o%s&0", msg);
+				msg_to_char(d->character, "\r\n\to%s\t0", msg);
 			}
 			if (show_start && (msg = config_get_string("start_message")) && *msg) {
-				msg_to_char(d->character, "\r\n&Y%s&0", msg);
+				msg_to_char(d->character, "\r\n\tY%s\t0", msg);
 			}
 			
 			if (!IS_APPROVED(d->character) && !IS_IMMORTAL(d->character) && has_anonymous_host(d)) {
@@ -2997,7 +2990,7 @@ void nanny(descriptor_data *d, char *arg) {
 				}
 				
 				if ((i = atoi(arg)) < 1 || i > NUM_BONUS_TRAITS) {
-					SEND_TO_Q("\r\nInvalid trait choice. Try again > ", d);
+					msg_to_desc(d, "\r\nInvalid trait choice. Try again > %s", telnet_go_ahead(d));
 					return;
 				}
 				
@@ -3028,12 +3021,12 @@ void nanny(descriptor_data *d, char *arg) {
 				}
 				
 				if (!bit) {
-					SEND_TO_Q("\r\nInvalid trait choice. Try again > ", d);
+					msg_to_desc(d, "\r\nInvalid trait choice. Try again > %s", telnet_go_ahead(d));
 					return;
 				}
 				
 				if (HAS_BONUS_TRAIT(d->character, bit)) {
-					SEND_TO_Q("\r\nYou already have that trait! Try again > ", d);
+					msg_to_desc(d, "\r\nYou already have that trait! Try again > %s", telnet_go_ahead(d));
 					return;
 				}
 			
@@ -3057,7 +3050,7 @@ void nanny(descriptor_data *d, char *arg) {
 				// now send them to the motd
 				send_login_motd(d, GET_BAD_PWS(d->character));
 				
-				SEND_TO_Q("\r\n*** Press ENTER: ", d);
+				msg_to_desc(d, "\r\n*** Press ENTER: %s", telnet_go_ahead(d));
 				STATE(d) = CON_RMOTD;
 			}
 			else {

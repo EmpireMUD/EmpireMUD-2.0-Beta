@@ -53,6 +53,7 @@ T 18461
 T 18463
 T 18462
 T 18496
+Z1 1
 S
 #18463
 The Temple Of Midgaard~
@@ -95,6 +96,7 @@ T 18462
 T 18483
 T 18496
 T 18492
+Z1 1
 S
 #18464
 Cornfields of Popcorn~
@@ -130,13 +132,14 @@ The blue plaque reads:
 "The Wizard of Oz", to the 1939 film by that name, and to the song "Tragic
 Kingdom" by No Doubt.
 ~
-I 6 18484 100.00 1  # FORAGE: handful of popcorn
+I 6 18484 100.00 25  # FORAGE: handful of popcorn
 I 7 18485 100.00 1  # PICK: bag of popcorn
 M 0 18485 100.00 1
 T 18461
 T 18462
 T 18491
 T 18496
+Z1 13
 S
 #18465
 Twisty Little Passages~
@@ -168,6 +171,8 @@ T 18465
 T 18464
 T 18496
 T 18492
+T 18493
+Z1 6
 S
 #18466
 The Unstable~
@@ -193,6 +198,7 @@ T 18462
 T 18466
 T 18492
 T 18496
+Z1 1
 S
 #18467
 A Hobbit Hole~
@@ -230,6 +236,7 @@ T 18461
 T 18462
 T 18467
 T 18496
+Z1 1
 S
 #18468
 A Vast Field (88, 200)~
@@ -276,6 +283,7 @@ T 18462
 T 18488
 T 18491
 T 18496
+Z1 1
 S
 #18469
 The Coat Closet~
@@ -303,6 +311,7 @@ Typoes found in this room are kept intact from LambdaMOO's entry room.
 T 18461
 T 18462
 T 18496
+Z1 1
 S
 #18470
 A Massive Steel Vault~
@@ -326,6 +335,7 @@ T 18461
 T 18462
 T 18496
 T 18492
+Z1 1
 S
 #18471
 A Long Row of Glass Shops (5th, Main)~
@@ -369,6 +379,7 @@ T 18487
 T 18491
 T 18492
 T 18496
+Z1 10
 S
 #18472
 A Long, Dusty Trail~
@@ -401,6 +412,7 @@ T 18462
 T 18472
 T 18496
 T 18491
+Z1 13
 S
 #18473
 The Precipice of Anticipation~
@@ -519,7 +531,7 @@ rough human forms tucked together.
    Broken headstones are clustered around the base of the statue, perhaps too
 close to be graves. The statue is right at the edge of the cliff; you can't
 get behind it to see what it looks like from the back. From the sides, the
-woman's upper body seems to be hanging foward, as if she's attached by the arms
+woman's torso seems to be hanging foward, as if she's attached only by the arms
 and legs.
 ~
 E
@@ -747,6 +759,7 @@ T 18462
 T 18496
 T 18492
 T 18473
+Z1 6
 S
 #18474
 Portal 13~

@@ -6,7 +6,7 @@ A cloudy crystal ball sits in the middle of the table.~
 goods somewhere called the Amazon. It appears to be some sort of store! Try
 typing list or buy.
 ~
-3 0 0 0 2
+3 0 0 0 0 2
 0 0 0
 12 0
 S
@@ -17,7 +17,7 @@ A phial of swamp water is lying here.~
    It looks murky. The label on the phial suggests that the hag has been using
 this swamp water to empower her magical items.
 ~
-3 0 a 0 2
+3 0 a 0 0 2
 0 0 0
 8 0
 R
@@ -31,7 +31,7 @@ the Swamp Hag loot replacer~
 The Swamp Hag loot replacer isn't working.~
 If you're seeing this item in the world, please bug it.
 ~
-3 p a 0 1
+3 p a 0 0 1
 0 0 0
 0 0
 T 19015
@@ -42,7 +42,7 @@ a fistful of firebird feathers~
 Some firebird feathers are glowing on the ground.~
 The feathers come from the mythical firebird, and glow even when plucked.
 ~
-29 0 a 0 4
+29 0 a 0 0 4
 400 1 0
 10 0
 O+ 1 6442
@@ -55,7 +55,7 @@ A rope hangs down from the bottom of the hut. (difficulty)~
 ticket into the hut. You can select your difficulty here.
 Usage:  difficulty <normal | hard | group | boss>
 ~
-3 0 0 0 5
+3 B 0 0 0 6
 0 0 0
 0 0
 T 19005
@@ -68,7 +68,7 @@ the hag's clothing~
 The hag's clothing is lying here.~
 This clothing looks like someone has been washing it in a swamp.
 ~
-2 p ad 0 1
+2 p ad 0 0 1
 0 0 0
 0 0
 A
@@ -86,7 +86,7 @@ A swamp rat whistle is on the ground.~
 This whistle can summon a noncombat pet!
 Type 'use whistle' to summon it.
 ~
-19 p a 0 5
+19 p a 0 0 5
 19007 0 0
 0 0
 S
@@ -97,7 +97,7 @@ An R.O.U.S. whistle is lying here.~
    This whistle is made mostly from rat hair. It looks like you could use it to
 summon a land mount.
 ~
-3 p a 0 12
+3 p a 0 0 12
 19008 0 0
 7 0
 T 9910
@@ -109,7 +109,7 @@ A manatee whistle is here.~
    This whistle is made mostly from rat hair. It looks like you could use it to
 summon a aquatic mount.
 ~
-3 p a 0 13
+3 p a 0 0 13
 19009 0 0
 7 0
 T 9910
@@ -121,7 +121,7 @@ An enchanted broom is lying here.~
    This enchanted broom seems fairly inert, but if you 'use broom', it will
 summon a flying mount.
 ~
-3 jp a 0 14
+3 jp a 0 0 14
 19010 0 0
 7 0
 T 9910
@@ -132,7 +132,7 @@ a repulsive stench~
 A repulsive stench lingers in the air.~
 It just seems to be a lingering stench, but you're getting used to it.
 ~
-3 mp ak 0 6
+3 mp ak 0 0 6
 0 0 0
 10 0
 A
@@ -158,7 +158,7 @@ an offensive stench~
 An offensive stench hangs in the air.~
 It just seems to be a lingering stench, but you're getting used to it.
 ~
-3 mp ak 0 7
+3 mp ak 0 0 7
 0 0 0
 10 0
 A
@@ -184,7 +184,7 @@ a ghastly stench~
 A ghastly stench fills the air.~
 It just seems to be a lingering stench, but you're getting used to it.
 ~
-3 mp ak 0 8
+3 mp ak 0 0 8
 0 0 0
 10 0
 A
@@ -210,7 +210,7 @@ a vile stench~
 A vile stench hangs heavy in the air.~
 It just seems to be a lingering stench, but you're getting used to it.
 ~
-3 mp ak 0 9
+3 mp ak 0 0 9
 0 0 0
 10 0
 A
@@ -236,7 +236,7 @@ an assailing stench~
 An assailing stench permeates the air.~
 It just seems to be a lingering stench, but you're getting used to it.
 ~
-3 mp ak 0 10
+3 mp ak 0 0 10
 0 0 0
 10 0
 A
@@ -262,7 +262,7 @@ the hag's pestle~
 A large stone pestle is lying on the ground.~
 This looks like it could be used to grind bone!
 ~
-1 ehmp an 0 4
+1 ehmp an 0 0 4
 0 1 5
 1 0
 A
@@ -285,9 +285,11 @@ the hag's pestle schematic~
 The hag's pestle schematic is on the ground.~
 This schematic will teach you to forge: hag's pestle.
 ~
-7 0 a 0 1
+7 0 a 0 0 2
 19016 0 0
 0 0
+C
+1 1
 S
 #19018
 claws plague~
@@ -295,7 +297,7 @@ plague claws~
 A set of plague claws is lying here.~
 It looks like someone attached plague rat claws to a gauntlet for some reason.
 ~
-1 imp an 0 6
+1 imp an 0 0 6
 0 4 10
 1 0
 A
@@ -312,9 +314,11 @@ the plague claws schematic~
 The plague claws schematic is on the ground.~
 This schematic will teach you to craft: plague claws.
 ~
-7 0 a 0 1
+7 0 a 0 0 2
 19018 0 0
 0 0
+C
+1 1
 S
 #19020
 cauldron hag's hags~
@@ -322,7 +326,7 @@ the hag's cauldron~
 A cauldron is sitting on the ground.~
 This cauldron looks heavy!
 ~
-1 ehmnp an 0 7
+1 ehmnp an 0 0 7
 0 4 5
 2 0
 A
@@ -339,9 +343,11 @@ the hag's cauldron schematic~
 The hag's cauldron schematic is on the ground.~
 This schematic will teach you to forge: hag's cauldron.
 ~
-7 0 a 0 1
+7 0 a 0 0 2
 19020 0 0
 0 0
+C
+1 1
 S
 #19022
 swarm insects stinging~
@@ -349,7 +355,7 @@ a swarm of stinging insects~
 A swarm of stinging insects buzzes around you.~
 The insects seem tame, but rather sharp.
 ~
-1 ehmp an 0 8
+1 ehmp an 0 0 8
 0 1 23
 7 0
 A
@@ -370,9 +376,11 @@ the stinging swarm schematic~
 The stinging swarm schematic is on the ground.~
 This schematic will teach you to craft: stinging swarm.
 ~
-7 0 a 0 1
+7 0 a 0 0 2
 19022 0 0
 0 0
+C
+1 1
 S
 #19024
 broom hag's hags~
@@ -381,7 +389,7 @@ A broom is standing here.~
    This looks like a fairly standard broom, other than the mana coming out its
 straw end.
 ~
-1 emp an 0 9
+1 emp an 0 0 9
 0 4 19
 0 0
 A
@@ -398,9 +406,11 @@ the hag's broom schematic~
 The hag's broom schematic is on the ground.~
 This schematic will teach you to craft: hag's broom.
 ~
-7 0 a 0 1
+7 0 a 0 0 2
 19024 0 0
 0 0
+C
+1 1
 S
 #19026
 bow hunting hag's hags~
@@ -409,7 +419,7 @@ The hag's hunting bow is lying here.~
    Judging from the size of this bow, the hag must use it to hunt rodents of
 unusual size.
 ~
-20 imp ap 0 7
+20 imp ap 0 0 7
 29 1 0
 0 0
 C
@@ -422,9 +432,11 @@ the hag's hunting bow schematic~
 The hag's hunting bow schematic is on the ground.~
 This schematic will teach you to craft: hag's hunting bow.
 ~
-7 0 a 0 1
+7 0 a 0 0 2
 19026 0 0
 0 0
+C
+1 1
 S
 #19028
 boots wading hag's hags~
@@ -432,7 +444,7 @@ the hag's wading boots~
 The hag's wading boots are lying here.~
 These boots are air-tight and come all the way up to your waist.
 ~
-27 mp ag 0 1
+27 mp ag 0 0 1
 3 0 0
 7 0
 A
@@ -451,9 +463,11 @@ the hag's wading boots pattern~
 The hag's wading boots pattern is on the ground.~
 This pattern will teach you to forge: hag's wading boots.
 ~
-7 0 a 0 1
+7 0 a 0 0 2
 19028 0 0
 0 0
+C
+1 1
 S
 #19030
 sandals hag's hags~
@@ -461,7 +475,7 @@ the hag's sandals~
 The hag's sandals are standing here.~
 These sandals are made from leather, and look quite worn.
 ~
-27 mp ag 0 2
+27 mp ag 0 0 2
 1 0 0
 7 0
 A
@@ -480,9 +494,11 @@ the hag's sandals pattern~
 The hag's sandals pattern is on the ground.~
 This pattern will teach you to sew: hag's sandals.
 ~
-7 0 a 0 1
+7 0 a 0 0 2
 19030 0 0
 0 0
+C
+1 1
 S
 #19032
 slippers hag's hags~
@@ -490,7 +506,7 @@ the hag's slippers~
 The hag's slippers look warm on the ground.~
 The slippers look comfy, if a bit muddy.
 ~
-27 mp ag 0 3
+27 mp ag 0 0 3
 0 0 0
 7 0
 A
@@ -509,9 +525,11 @@ the hag's slippers pattern~
 The hag's slippers pattern is on the ground.~
 This pattern will teach you to sew: hag's slippers.
 ~
-7 0 a 0 1
+7 0 a 0 0 2
 19032 0 0
 0 0
+C
+1 1
 S
 #19034
 shoes pointe hag's hags~
@@ -519,7 +537,7 @@ the hag's pointe shoes~
 The hag's point shoes are dancing around.~
 These shoes look surprisingly graceful consider where they came from.
 ~
-27 mp ag 0 4
+27 mp ag 0 0 4
 0 0 0
 7 0
 A
@@ -538,9 +556,11 @@ the hag's pointe shoes pattern~
 The hag's pointe shoes pattern is on the ground.~
 This pattern will teach you to sew: hag's pointe shoes.
 ~
-7 0 a 0 1
+7 0 a 0 0 2
 19034 0 0
 0 0
+C
+1 1
 S
 #19036
 boots shearling hag's hags~
@@ -548,7 +568,7 @@ the hag's shearling boots~
 The hag's shearling boots are standing here.~
 These boots look quite warm.
 ~
-27 mp ag 0 3
+27 mp ag 0 0 3
 2 0 0
 7 0
 A
@@ -565,9 +585,11 @@ the hag's shearling boots pattern~
 The hag's shearling boots pattern is on the ground.~
 This pattern will teach you to sew: hag's shearling boots.
 ~
-7 0 a 0 1
+7 0 a 0 0 2
 19036 0 0
 0 0
+C
+1 1
 S
 #19038
 shoes walking hag's hags~
@@ -575,7 +597,7 @@ the hag's walking shoes~
 The hag's walking shoes are standing here.~
 These shoes look like they could even walk around on their own.
 ~
-2 mp ag 0 4
+2 mp ag 0 0 4
 0 0 0
 7 0
 A
@@ -592,18 +614,20 @@ the hag's walking shoes pattern~
 The hag's walking shoes pattern is on the ground.~
 This pattern will teach you to sew: hag's walking shoes.
 ~
-7 0 a 0 1
+7 0 a 0 0 2
 19038 0 0
 0 0
+C
+1 1
 S
 #19040
 sigil swamp rat~
 the swamp rat sigil~
 The swamp rat sigil is lying here.~
    This sheet of parchment has a sigil in the shape of a swamp rat. It enables
-druids who know the Animal Forms power to shapeshift into a swamp rat.
+nature mages who know the Animal Forms power to shapeshift into a swamp rat.
 ~
-3 p a 0 2
+3 p a 0 0 2
 0 0 0
 0 0
 C
@@ -615,9 +639,9 @@ some okra seeds~
 Some okra seeds are scattered here.~
 You have a handful of small, round seeds. They can be used to plant okra.
 ~
-6 b a 0 10
+6 bC a 0 0 11
 1 19041 0
-7 576
+7 8760
 O+ 1 6181
 R
 4 5210 0
@@ -629,12 +653,12 @@ A bunch of okra pods are lying here.~
    The okra pods are odd little green plants, but are delicious when cooked.
 You could use them to make gumbo or fried okra.
 ~
-6 g a 0 8
+6 gC a 0 0 11
 4 3017 0
-7 168
+7 336
 O+ 1 6153
 R
-4 5606 0
+4 5114 0
 S
 #19043
 gumbo bowl hearty~
@@ -643,15 +667,17 @@ A bowl of gumbo has been left on the ground.~
    This bowl of thick brown gumbo may not look like much, but the smell is
 intoxicating.
 ~
-6 m a 0 5
+6 m a 0 0 8
 48 0 0
-7 336
+7 0
 A
 16 2 0
 A
 7 1 0
 C
 0 175
+R
+4 5619 0
 S
 #19044
 okra sack fried crispy~
@@ -659,15 +685,17 @@ a sack of crispy fried okra~
 A sack of fried okra has spilled on the floor.~
 The okra has been sliced, breaded, and fried.
 ~
-6 m a 0 6
+6 m a 0 0 9
 48 0 0
-7 336
+7 0
 A
 22 1 0
 A
 23 1 0
 C
 0 175
+R
+4 5619 0
 S
 #19047
 legs chicken wooden pair~
@@ -676,7 +704,7 @@ A pair of wooden chicken legs are standing here.~
    It looks like someone carved these chicken legs from some exotic tropical
 wood. You could use them to manufacture a walking hut.
 ~
-3 e a 0 2
+3 e a 0 0 2
 0 0 0
 0 0
 C
@@ -689,7 +717,7 @@ A wooden mug is lying here.~
    This mug looks like it's been sitting in the swamp too long. A note
 scratched into the bottom says 'fill me at the hag's hut'.
 ~
-5 0 a 0 5
+5 0 a 0 0 5
 56 56 19048
 0 0
 S
@@ -700,7 +728,7 @@ A huge, crude bell is hanging nearby. (difficulty)~
 You can use this to set the adventure's difficulty.
 Usage: difficulty <normal | hard | group | boss>
 ~
-3 0 0 0 6
+3 B 0 0 0 7
 0 0 0
 13 0
 T 19060
@@ -712,7 +740,7 @@ Furl's sash is burning on the ground.~
    This sash appears to be on fire, or made of fire. It bears the logo of Furl,
 goblin war shaman.
 ~
-27 mp al 0 4
+27 mp al 0 0 4
 0 0 0
 10 0
 A
@@ -728,7 +756,7 @@ Zelkab's championship belt~
 You see Zelkab's championship belt on the ground.~
 This belt is big and shiny, with a tiny waistband.
 ~
-27 mp al 0 4
+27 mp al 0 0 4
 2 0 0
 2 0
 A
@@ -746,7 +774,7 @@ shinies of Garlgarl~
 A pile of Garlgarl's shinies is on the ground.~
 These sparkling bangles once belonged to Garlgarl, goblin shaman.
 ~
-27 mp aj 0 4
+27 mp aj 0 0 4
 0 0 0
 4 0
 A
@@ -765,7 +793,7 @@ A pair of reinforced wristbands is lying here.~
    These writsbands are goblincraft, for sure. You can always tell by the
 stitching.
 ~
-27 emp aj 0 4
+27 emp aj 0 0 4
 1 0 0
 7 0
 A
@@ -787,7 +815,7 @@ Nilbog's wargskull wristplates~
 Nilbog's wargskull wristplates are lying here.~
 The skulls is goblincraft, with signature leather and beading.
 ~
-27 mp aj 0 3
+27 mp aj 0 0 3
 3 0 0
 14 0
 A
@@ -807,7 +835,7 @@ Nilbog's family axe~
 Nilbog's family axe is sticking out of the ground.~
 This goblincraft axe has the crest of Nilbog.
 ~
-1 ehmp an a 6
+1 ehmp an a 0 6
 0 1 2
 14 0
 A
@@ -831,7 +859,7 @@ a ball of grungy goblin mana~
 A ball of goblin mana hovers before you.~
 This little ball of green mana is small, but powerful.
 ~
-1 hmp an 0 5
+1 hmp an 0 0 5
 0 1 28
 14 0
 A
@@ -853,7 +881,7 @@ Furl's nightmare pick~
 Furl's nightmare pick sticks out of the ground.~
 This pick is forged from hellfire, branded with goblin runes.
 ~
-1 eimp an h 5
+1 eimp an h 0 6
 0 3 8
 10 0
 A
@@ -864,6 +892,12 @@ A
 5 1 6
 C
 50 150
+M
+26
+You hurl $p into the wall to try to loosen the ore.~
+M
+27
+$n hurls $p into the wall to try to loosen the ore.~
 S
 #19069
 legplates plates goblin pair giant~
@@ -871,7 +905,7 @@ giant goblin legplates~
 A pair of giant goblin legplates is sitting on the ground.~
 These goblincraft plates actually look a little bit small for you.
 ~
-27 mp af 0 5
+27 mp af 0 0 5
 3 0 0
 2 0
 A
@@ -888,7 +922,7 @@ The goblin breeches of breaching are lying here.~
    These pants are obviously goblincraft, but you think you could squeeze into
 them.
 ~
-27 mp af 0 6
+27 mp af 0 0 6
 1 0 0
 7 0
 A
@@ -905,7 +939,7 @@ A goblin loincloth is lying here, untouched.~
    You are frightened to touch the loincloth, but it looks like it's made from
 horse skin.
 ~
-27 mp af 0 7
+27 mp af 0 0 7
 0 0 0
 7 0
 A
@@ -921,7 +955,7 @@ A carved human kneecap is lying here.~
 carved (or perhaps scratched) into the entire surface, and is held onto your
 leg by a leather strap.
 ~
-27 mp af 0 8
+27 mp af 0 0 8
 0 0 0
 7 0
 A
@@ -938,7 +972,7 @@ A goblin garter is lying here.~
    It appears to be a goblincraft garter. No telling what animal this was made
 from.
 ~
-27 mp af 0 7
+27 mp af 0 0 7
 2 0 0
 7 0
 A
@@ -959,7 +993,7 @@ The iron goblin gem is dangling here.~
    'Iron gem' is a generous term for what really just appears to be a rough-cut
 piece of iron on a chain.
 ~
-2 mp ac 0 5
+2 mp ac 0 0 5
 0 0 0
 2 0
 A
@@ -977,7 +1011,7 @@ a pilfered roc talon~
 A pilfered roc talon is dangling here.~
 The talon is quite large, and hangs from your neck by a chain.
 ~
-2 mp ac 0 8
+2 mp ac 0 0 8
 0 0 0
 14 0
 A
@@ -997,7 +1031,7 @@ A cracked celestial locket is dangling here.~
 popped and some of the gems are missing. Bits of rat fur stick out from inside
 the locket, which is bound shut by horse hair.
 ~
-2 mp ac 0 7
+2 mp ac 0 0 7
 0 0 0
 2 0
 A
@@ -1013,7 +1047,7 @@ a goblinsilk choker~
 A goblinsilk choker is dangling here.~
 This odd silk lace, if you can call it that, is clearly goblincraft.
 ~
-2 mp ac 0 8
+2 mp ac 0 0 8
 0 0 0
 11 0
 A
@@ -1032,7 +1066,7 @@ The metatarsal of guile is dangling here.~
    This appears to be a large toe bone, hung from a chain. Hopefully it's not
 human.
 ~
-2 mp ac 0 7
+2 mp ac 0 0 7
 0 0 0
 14 0
 A

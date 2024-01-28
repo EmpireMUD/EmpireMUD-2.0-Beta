@@ -19,7 +19,7 @@ which other skills you have at high levels. Use the 'role' command to choose
 which set of skills to use.
 
 See also: CRAFT, IDENTIFY, FORGE, SEWING, POTTERY, WOODWORKING, SHIPBUILDING,
-  REFORGE, PRIMITIVE CRAFTS, COOK, ROLE, SKILL, SKILL SYNERGY
+  REWORK, PRIMITIVE CRAFTS, COOK, ROLE, SKILL, SKILL SYNERGY
 #
 "ADVANCED WOODWORKING"
 
@@ -138,16 +138,6 @@ This ability also allows you to:
 See also: CRAFT INFO, CRAFTING LEVEL, WOODWORKING, RESOURCES, KEEP, MINT, TAN,
 PRIMITIVE CRAFTS, MILL, MASTER CRAFTSMAN
 #
-BRONZE "BRONZE INGOT"
-
-Used for:  forge
-Stored in:  Foundry
-
-Bronze is a metal that was once so common that there is an entire Age named
-after it. Bronze is made by smelting copper and tin ingots together.
-
-See also: FORGE, METALS, MINE, SMELT
-#
 CARTS WAGONS CARRIAGES CARAVANS "LAND VEHICLES"
 
 Carts and their more advanced cousins, carriages, caravans and wagons, are
@@ -191,9 +181,9 @@ CLOTHING CLOTHES
 These are items you can sew and wear, but which have no affect on your stats.
 
 Leather clothing:
- head: traveling hat, leather hood, fur hat
+ head: traveling hat (cooling), leather hood, fur hat (warm)
  body: leather jacket, spotted robe
- about body: cape, cloak, shawl
+ about body: cape, cloak, shawl (warm)
  hands: leather gloves
  feet: moccasins, sandals
  waist: belt
@@ -201,7 +191,8 @@ Leather clothing:
 
 Cloth clothing:
  head: hood, barbette, brimmed cap, bonnet, wimple, coif
- body: blouse, dress, shirt, toga, robe, doublet, waistcoat, tunic
+ body: blouse, dress, shirt, toga, robe, doublet, waistcoat, tunic,
+       breezy clothes (cooling), layered clothes (warm)
  about body: mantle
  hands: gloves
  waist: girdle
@@ -226,32 +217,30 @@ However, to bake anything, you'll need a kitchen, bakery, or another type of
 full-sized oven. Many basic cooked foods also give you small food buffs
 (see WELL-FED).
 
-You can cook:
-  bean soup                              fried meat pie (strength)              
-  fish plate (wits)                      catfish plate (intelligence)
-  tortilla                               jerky (bonus-physical)                 
-  burrito (resist-physical)              spicy jerky (bonus-magical)
-  fried rice (dexterity)                 prunes (age)
-  salt pork                              potato slices
-  chicken and vegetables (health)        orange chicken and pears
-  ham and cheese sandwich (move-regen)   strawberry jam (mana-regen)
-  fruit bowl                             candied mango
-  sausage link (to-hit)                  blueberry jam (mana)
-  road biscuit (block)                   coffee
-  candied apple                          mushroom plate (resist-magical)
-  gruel                                  rice
-  pickled vegetables                     fruit preserves
+You can see a full list of recipes from the Cook ability by typing 'ability
+cook'; this also works on other abilities. You can also check what any
+ingredient can be used for by typing 'recipes <item>'.
 
-You can bake:
-  bread (move-regen)                     
-  apple pie (charisma)                   nutty squash flatbread (dodge)
-  peach pie (charisma)                   roast plate (resist-physical)
-  cherry pie (charisma)                  strawberry pie (charisma)
-  blueberry pie (charisma)               plum pie (charisma)
-  banana pie (charisma)                  banana bread (moves)
-  pumpkin pie (charisma)                 blackberry tart
-  casserole (inventory)                  roast meat
-  oat cake (bonus-healing)
+Some of the things you can cook are:
+  veggie omelet (wits)                     fried meat pie (strength)              
+  fish plate (wits)                        catfish plate (intelligence)
+  burrito (resist-physical)                spicy jerky (bonus-magical)
+  fried rice (dexterity)                   prunes (age)
+  chicken and vegetables (health)          mushroom plate (resist-magical)
+  ham and cheese sandwiches (move-regen)   strawberry jam (mana-regen)
+  sausage link (to-hit)                    blueberry jam (mana)
+  road biscuits (block)                    jerky (bonus-physical)
+  honeyed fruit (charisma)
+
+Some of the things you can bake are:
+  bread (move-regen)                       mutton rolls (bonus-physical)
+  apple pie (charisma)                     nutty squash flatbread (dodge)
+  peach pie (charisma)                     roast plate (resist-physical)
+  cherry pie (charisma)                    strawberry pie (charisma)
+  blueberry pie (charisma)                 plum pie (charisma)
+  banana pie (charisma)                    banana bread (moves)
+  pumpkin pie (charisma)                   casserole (inventory)
+  oat cakes (bonus-healing)
 
 Raw meat, fish, poultry, and pork can be cooked by themselves but will not
 provide a food buff. There are also more recipes to find in the world.
@@ -271,7 +260,7 @@ All crafting abilities train when you finish recipes that require them.
 See also: CRAFT INFO, CRAFTING LEVEL, RESOURCES, KEEP, RECIPES, POTTERY,
    PRIMITIVE CRAFTS, WOODWORKING, CRAFTING ABILITIES
 #
-"CRAFT INFO" "FORGE INFO" "SEW INFO" "BUILD INFO" "MANUFACTURE INFO" "COOK INFO" "BAKE INFO" "WEAVE INFO" "MAKE INFO"
+"CRAFT INFO" "FORGE INFO" "SEW INFO" "BUILD INFO" "MANUFACTURE INFO" "COOK INFO" "BAKE INFO" "WEAVE INFO" "MAKE INFO" "PROCESS INFO"
 
 Usage:  <verb> info <recipe name>
 
@@ -354,6 +343,9 @@ Armor:
   viper helm
   shark skin vambraces
 
+Clothing:
+  warm leather outfit (warm)
+
 Misc:
   leather boots
   large backpack
@@ -413,14 +405,20 @@ effect for a while after you eat them. These foods are bind-on-pickup, so only
 the person who makes them can eat them.
 
 You can cook the following family recipes:
-  black sausage (to-hit)                   jellied eels (dodge)
-  pot roast (max-health)                   chili (max-moves)
-  fish and chips (charisma)                stewed vegetables (mana-regen)
+  traditional black sausage (to-hit)
+  grandma's jellied eels (dodge)
+  mom's pot roast (max-health)
+  dad's chili (max-moves)
+  dad's fish and chips (charisma)
+  grandpa's stewed vegetables (mana-regen)
   
 You can bake the following family recipes:
-  berry cobbler (wits)                     hearty meatloaf (strength)
-  biscuits and gravy (move-regen)          mom's pie (max-mana)
-  chicken and dumplings (intelligence)     shepherd's pie (dexterity)
+  grandma's berry cobbler (wits)
+  grandma's hearty meatloaf (strength)
+  grandma's biscuits and gravy (move-regen)
+  mom's fruit pie (max-mana)
+  mom's chicken and dumplings (intelligence)
+  grandpa's shepherd's pie (dexterity)
 
 See also: BUFF FOOD, BOP, COOKING FIRE
 #
@@ -460,6 +458,7 @@ FORGE
 Forge (Trade ability)
 
 Building:  (FF)  Forge  (Build ability)
+Temperature:  warmer than outside
 Tool:  hammer
 Commands:  forge [number] <item>
            forge info <item>
@@ -476,8 +475,8 @@ superior items and allows you to forge and smelt faster.
 
 With the basic Forge skill, you can create:
   nails (x4)
-  imperium spike (x3)
-  nocturnium spike (x3)
+  imperium spikes (x3)
+  nocturnium spikes (x3)
   hammer -- for forging
   knife -- for skinning, butchering, and crafting
   woodsman axe -- for chopping
@@ -485,6 +484,7 @@ With the basic Forge skill, you can create:
   pick -- for mining
   shovel -- dig faster
   pan -- pan for gold
+  pole -- used in crafts and buildings
   sickle -- used for harvesting
   saw -- for sawing lumber
   mirror
@@ -521,16 +521,18 @@ Usage:  cook [number] <recipe>
 Requirements:  cooking fire, sharp tool
 
 You can create lavish buff foods -- foods that give you an effect for a while
-after you eat them. These recipes are meant to share, so bring ingredients for
-your whole adventuring party! Each recipe provides food for 4 people but cannot
-be moved once prepared.
+after you eat them. You can also prepare feasts -- recipes meant to share --
+so bring ingredients for your whole adventuring party! Feast recipes provide
+food for 4 people but cannot be moved once prepared.
 
-You can make the following gourmet recipes:
+Gourmet feast recipes:
   extravagant dessert platter (general)
   mixed vegetable board (healer)
   roast meat platter (tank)
   roast turkey feast (melee)
   seafood feast (caster)
+
+More gourmet recipes can be found around the world.
 
 See also: BUFF FOOD, COOKING FIRE
 #
@@ -571,18 +573,6 @@ You can hone the following item slots:
 
 See also: RECIPES
 #
-IRON "IRON INGOT" "IRON ORE"
-
-Used for:  forge, build, manufacture
-Stored in:  Foundry
-
-Iron ore is found by mining in the mountains. It is useful in building and
-forging equipment, as well as manufacturing ships.
-
-You can learn about getting iron via HELP IRON GUIDE.
-
-See also: BUILD, FORGE, METALS, MINE, MANUFACTURE, SMELT
-#
 "IMPERIAL ARMORS" "IMPERIAL ARMORSMITHING"
 
 Imperial Armors (Trade ability)
@@ -607,17 +597,6 @@ Shield:
 Armorsmithing -> Sturdy Armors -> Imperial Armors
 
 See also: FORGE, WEAPONCRAFTING, ARMORSMITHING, STURDY ARMORS
-#
-IMPERIUM "IMPERIUM ORE"
-
-Used for:  forge
-Stored in:  Foundry
-
-Imperium is a rare, strong metal with a bright white color. It is used to make
-powerful weapons and armor. Smelting imperium ingots requires mixing it with
-tin.
-
-See also: FORGE, METALS, MINE, SMELT
 #
 "IRON BLADES"
 
@@ -698,16 +677,6 @@ Rawhide Stitching -> Leatherworking -> Dangerous Leathers
 See also: SEWING, DANGEROUS LEATHERS, MASTER TAILOR, RAWHIDE STITCHING, SKIN,
   TAN
 #
-"LETHEIAN ICON"
-
-usage: use <icon> <skill name>
-
-Letheian icons are consumable trinkets which grant an extra skill reset for a
-skill of your choice, allowing you to choose new abilities for that skill. They
-are crafted using the Master Craftsman ability.
-
-See also: MASTER CRAFTSMAN, SKILL RESET
-#
 "MAGIC ATTIRE" "MAGICAL ATTIRE" "MAGE ATTIRE"
 
 Magic Attire (Trade ability)
@@ -740,6 +709,8 @@ You can make:
   armbands of power
   earth-hewn sandals
   magewhisper pouch
+  snakeskin robe (cooling)
+  white fur robe (warm)
 
 Sew -> Magic Attire -> Magical Vestments
 
@@ -806,17 +777,6 @@ These metals are generally used in crafts in the 200-300 level range.
 
 See also: RARE METALS, SMELT
 #
-NOCTURNIUM "NOCTURNIUM ORE"
-
-Used for:  forge, sew
-Stored in:  Foundry
-
-Nocturnium is a deep black metal, its surface swirling with mana. It is often
-plated onto powerful magical objects. Smelting stable nocturnium requires that
-you mix it with copper.
-
-See also: FORGE, METALS, MINE, SEW, SMELT
-#
 PATTERNS "ADVENTURE CRAFTS" "CRAFTING PATTERNS" SCHEMATICS DESIGNS
 
 Some items can be found in adventures which teach you new crafting recipes.
@@ -837,6 +797,7 @@ POTTER POTTERY
 Pottery (Trade ability)
 
 Building:  (PP) potter
+Temperature:  warmer than outside
 Command:  craft [number] <item>
 
 A good potter can mold clay into many different useful items. You will need
@@ -932,6 +893,9 @@ Worn:
   rawhide skullcap
   rawhide bracers
 
+Clothing:
+  warm hide clothing (warm)
+
 Misc:
   rawhide boots
   rawhide knapsack
@@ -953,35 +917,36 @@ you know that require the item.
 
 See also: LEARN
 #
-REFORGE REFASHION
+REWORK REFORGE REFASHION
 
-Refashion (Trade ability)
-Reforge (Trade ability)
+Rework (Trade ability)
 
-Usage:  reforge <item | person> name <new name>
-        reforge <item | person> <renew | superior>
+Usage:  rework <item | person> name <new name>
+        rework <item | person> <renew | superior>
 
-A great blacksmith (weapons) or tailor (armors, clothing, shields) can use this
-ability in three ways:
+A great craftsman can use this ability in three ways:
 
-Name: You can take a generic item and give it a name. The name must contain
-the main keyword of the original item (like 'sword', 'clothes', etc, depending
-on the item). Requires 1 blue iris per 3 gear rating on the item.
+Name: You can take a generic item and give it a name. The name must contain at
+least part of the original item's name; usually this is its primary keyword
+(like 'sword' or 'clothes') but may be longer, depending upon the item.
 
-Renew: This undoes any enchantments, disenchantments, name, superior quality, 
-and all other effects, and restores the item to its base stats. Requires 1
-bloodstone per 3 gear rating on the base (unmodified) item.
+Renew: This undoes any enchantments, name, superior quality, and all other
+effects that have been applied to an item, and restores the item to its base
+stats.
 
 Superior: If the item is a crafted item that could have superior qualities,
 this adds those qualities and marks it (superior). You can only use this on
 the normal version of an item that can be made superior, and only if you have
-the correct Master ability. Requires 1 green seashell per 3 gear rating on the
-item. If the item came from a hard, group, or boss mob, it will lose this
-quality when you make it superior.
+the correct mastery ability. If the item came from a hard, group, or boss mob,
+it will lose this quality when you make it superior.
 
-An item must be in your inventory to reforge it. However, if another player
-"shares" an item, you can reforge that item by targeting that player by name
-(e.g. "reforge Lyra superior").
+An item must be in your inventory to rework it. However, if another player
+"shares" an item, you can rework that item by targeting that player by name
+(e.g. "rework Lyra superior").
+
+Reworking an item always costs 1 magic gem per 3 gear rating on the item. You
+can only renew an item or make it superior if you have the ability to craft it
+in the first place (but can rename most gear).
 
 See also: MASTER BLACKSMITH, MASTER TAILOR, SHARE
 #
@@ -997,6 +962,8 @@ For most recipes, the level of the resulting item will be the lowest of:
 
 For example, the arming sword from Iron Blades cannot be higher than level 75,
 since this ability is from the 50-75 level range.
+
+Levels for all items are rounded up to the next 5 (e.g. 73 to 75, 109 to 110).
 
 Recipes which come from crafting patterns follow slightly different rules - see
 HELP CRAFTING PATTERNS for more information. Most importantly, they aren't
@@ -1101,26 +1068,6 @@ Forge:
 
 See also: CRAFT, FORGE
 #
-"SKIN COMMAND" SKINNING
-
-Usage:  skin <corpse>
-Tool:  knife
-
-You can skin a fresh corpse to get usable material, which can later be turned
-into good equipment. Some corpses cannot be skinned, especially severely
-damaged and putrid ones. This command succeeds about 60% of the time unskilled,
-or 100% of the time with the Huntsman ability.
-
-Possible results from skinning and example animals:
-  small skin: rabbit, squirrel
-  large skin: deer, buffalo
-  shark skin: shark
-  snakeskin: any snake
-  fox fur: fox
-  big cat pelt: tiger, jaguar, leopard
-
-See also: SKINS, SEWING, LEATHERWORKING, RAWHIDE STITCHING, TAN, HUNTSMAN
-#
 "SMUGGLER CRAFTS"
 
 Smuggler Crafts
@@ -1171,16 +1118,6 @@ You can tan skins into leather. This process will go faster at a tannery. Both
 skins and leathers are used in sewing and crafting.
 
 See also: SKIN, LEATHER
-#
-TIN "TIN INGOT" "TIN ORE"
-
-Used for:  smelting bronze
-Stored in:  Foundry
-
-Tin is an uncommon white metal used since ancient times to create bronze. It
-can also be smelted with imperium ore to make imperium ingots.
-
-See also: FORGE, METALS, MINE, SMELT
 #
 "TINKER CRAFTS"
 

@@ -167,6 +167,8 @@ a ship. 'Ah, here it is. The Golden Goblin. I'm not sure which cave it's stuck
 in, but I'm sure it's nearby on the coast. Do be sure to let them know at the
 main guildhall when you've helped out. You know the one, in the Tipsy Tortoise.
 And be quick about it.'
+   Be sure to bring 12x (lumber) and 12x (nails); the goblins will need help
+repairing their ship.
 ~
    The vampire looks up from his cauldron as you approach, peering at you
 through dim yellow eyes.
@@ -308,7 +310,7 @@ the ladle down by his cauldron and approaches with interest.
    'Oh yes,' he says, examining the bugs. 'Yes, these will do nicely. Here is
 your reward. Don't lose it all in one place.'
 ~
-15 e 0 0 -1
+16 e 0 0 -1
 A
 1 18217
 D 18243
@@ -322,8 +324,8 @@ R
 1 -1 100
 T 18277
 W+
-11 0 0 1 -
-Catch 2 bugs~
+11 0 0 2 -
+Catch bugs~
 Z
 1 18208
 S
@@ -338,8 +340,8 @@ falls to you, and I'll hear no complaints.'
 briar hide or absinthian leather if you have some, or else rat skins and herbs
 if you don't. In either case, gather the materials and set out for the Tipsy
 Tortoise. Our tinker will put the suit together for her.'
-   Deliver 5x rat skins and 15x herbs, or else 5x thick magic leathers to the
-tinker in the guildhall at the Tipsy Tortoise for your reward.
+   Deliver 5x rat skins and 15x magic herbs, or else 5x thick magic leathers to
+the tinker in the guildhall at the Tipsy Tortoise for your reward.
 ~
    The old tinker looks at you through a set of colorful lenses and then takes
 the supplies you've brought, saying, 'Not exactly ideal but this should do. No
@@ -396,7 +398,7 @@ little thing? Good little Morty. Uncle Nosty has a treat for you...'
    Your reward is on the desk and you decide this is a good time to take it and
 leave.
 ~
-18 e 0 0 -1
+19 e 0 0 -1
 A
 1 18217
 D 18243
@@ -410,8 +412,8 @@ R
 1 -1 100
 T 18277
 W+
-11 0 0 1 a
-Feed Rodentmort three corpses~
+11 0 0 3 a
+Feed Rodentmort corpses~
 Z
 1 18211
 S
@@ -622,7 +624,8 @@ bribe will be enough to do the trick. Just be subtle about it.'
 ruins and type 'bribe'.
 ~
    'Hope they didn't give you any trouble,' the vampire says as you relate the
-story of bribing the bandits. He laughs when you tell him it cost extra.
+story of bribing the bandits. He laughs when you tell him they wanted more
+money.
    'But at least they took the marked coins. Good job.'
 ~
 20 e 0 0 -1
@@ -750,7 +753,7 @@ the old mirror. 'Quite spectacular, indeed. Oh, and you've nabbed a necrofiend?
 And what's this, is there a woman in here? She looks like some kind of dark
 wizard. You have outdone yourself this time. Truly, truly.'
 ~
-22 e 0 0 -1
+23 e 0 0 -1
 A
 1 18217
 D 18252
@@ -764,8 +767,8 @@ R
 1 -1 100
 T 18277
 W+
-11 0 0 1 a
-Capture 3 fiends in the mirror~
+11 0 0 3 a
+Capture fiends in the mirror~
 Z
 1 18210
 S
@@ -804,11 +807,11 @@ Monsoon Rift: Investigate the Rift~
    The Magiterranean is a dangerous place, but many adventurers get their start
 exploring its strange wilderness. The Guild needs more information about the
 rifts in the desert. Seek one out -- be careful of the cacti guarding it -- and
-venture inside. Speak to the head druid to learn more about the rifts. But
+venture inside. Speak to the archweaver to learn more about the rifts. But
 whatever he tells you, you must also find a way to collapse the rift. Return
-when you've accomplished this. (Type 'speak' when you find the druid.)
+when you've accomplished this. (Type 'speak' when you find the archweaver.)
 ~
-   The guild is satisfied that you closed the rift, and takes the druid's
+   The guild is satisfied that you closed the rift, and takes the archweaver's
 propaganda for further study. You can now perform daily quests in the Monsoon
 Rift for the Guild of Adventurers.
 ~
@@ -1126,7 +1129,7 @@ return the siphoned frost power to the guild.
 ~
 You hand over the siphon and the frosty power it contains.
 ~
-14 e 0 0 -1
+15 e 0 0 -1
 A
 1 18210
 A
@@ -1142,7 +1145,7 @@ R
 1 -1 50
 T 18261
 W+
-11 0 0 1 -
+11 0 0 2 -
 Use the siphon on the Cryomancer and Rime Mage~
 Z
 1 18210

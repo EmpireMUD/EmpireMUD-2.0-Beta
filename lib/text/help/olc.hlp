@@ -17,7 +17,8 @@ CONTROLS.
 
 Available types are:
  .abil - abilities               .adv - adventures
- .aug - augments                 .arch - archetypes
+ .arch - archetypes              .attack - attack messages
+ .aug - augments
  .b - buildings                  .book - books
  .c - crafts                     .class - classes
  .crop - crops                   .ev - events
@@ -57,7 +58,7 @@ For notes on the mud's building rules, see HELP BUILDING GUIDE.
  
 See also: OLC CONTROLS, OLC BUILDINGS, OLC CRAFTS, OLC CROPS, OLC FACTIONS,
    OLC GLOBALS, OLC MOBILES, OLC OBJECTS, OLC SECTORS, MAP OLC, OLC GENERICS,
-   OLC SHOPS
+   OLC SHOPS, OLC ATTACKS
 See also: OLC ABORT, OLC AUDIT, OLC COPY, OLC DELETE, OLC EDIT, OLC FREE, 
    OLC LIST, OLC SAVE, OLC SEARCH, OLC LICENSE, TEXT EDITOR, VNUM
 #d
@@ -68,8 +69,9 @@ some common ones:
 
 abil - ability
 adv - adventure
-aug - augment
 arch - archetypes
+attack - attack messages
+aug - augment
 bld (or bdg) - building (these include designated rooms)
 cft - craft
 cls - class
@@ -117,10 +119,6 @@ on the editors instead, see HELP OLC.
 
 ** Editor Notes **
 
-Abilities (ABILEDIT):
-- The mastery ability is mainly used to determine when a craft should be marked
-  (superior). Do not apply mastery abilities to abilities that don't need this.
-
 Adventures (ADVEDIT):
 - You should use the CAN-DELAY-LOAD flag whenever possible. This will reduce
   work (and lag) from having many copies of the adventure by not loading the
@@ -159,6 +157,13 @@ Augments (AUGEDIT):
 - CUMULATIVE-PRC and CHOOSE-LAST are not compatible. If you want a 100% last-
   choice for a cumulative set, give it 100% non-cumulative and the choose-last
   flag. If no cumulative choice is picked, it will be chosen.
+
+Books (BOOKEDIT):
+- Players can make books, too. Theirs have vnums over 1000000.
+- Books with author 0 or ones in no libraries can appear as lost books in
+  "show lostbooks" and "%load% book lost".
+- To preserve a book from a player, copy it to a permanent vnum and set the
+  author to 0. Leave the player's version on its existing vnum.
 
 Buildings (BEDIT):
 - Designated rooms are also built in the building editor, using the ROOM flag.
@@ -220,9 +225,6 @@ Crops (CROPEDIT):
 - Players foraging on any tile have a chance to find the forage item from any
   wild crop in the area, if they get nothing back from the sector's own forage
   list.
-
-Events (EVEDIT):
-- Use quests or scripts to give event points.
 
 Factions (FEDIT):
 - The REP-FROM-KILLS flag causes you to lose reputation if you kill a mob who
@@ -475,12 +477,12 @@ Vehicles (VEDIT):
 - The DRAGABLE flag always allows a vehicle to be dragged on land, never any
   other terrain.
 - A vehicle is effectively a chair if it has SIT but no movement flags.
-- Vehicles take 10% health damage each year ONLY if they require yearly
+- Vehicles take 10% health damage each weekly reset ONLY if they're set to need
   maintenance (or are incomplete). A vehicle with only 1 hitpoint won't last
   long.
 - When a vehicle takes at least 10% of its max hitpoints in damage, it will
-  also add 1 year's maintenance to its repair needs. If it has no yearly
-  maintenance set, it will add a "pouch of nails" instead.
+  also add 1 cycle's maintenance to its repair needs. If it has no maintenance
+  set, it will add a "pouch of nails" instead.
 - If a vehicle takes damage that's less than 10% of its hitpoints, it still
   needs repair but doesn't require any additional resources.
 - You should generally avoid putting object storage on moving vehicles.
@@ -514,7 +516,9 @@ Usage:  .abil <command>
         .command
 
 The .olc ability editor allows you to configure the data for various abilities.
-The main properties set up here are names and mastery abilities.
+Many types of abilities can be configured in this editor. See ABILEDIT types
+for a list of ability types; these also have help files with more information,
+such as ABILEDIT BUFF.
 
 All commands in the editor are highlighted in yellow/green and placed inside
 <angle braces>. You can get help on these commands by typing:
@@ -530,6 +534,59 @@ Example:
 For notes on the mud's building rules, see HELP BUILDING GUIDE.
 
 See also: OLC, OLC ABORT, OLC EDIT, OLC EDITOR, OLC SAVE
+#d
+"ABILEDIT ACTIONS" "ABILITY ACTIONS"
+
+Usage:  .data add action <type>
+
+These are things that happen when the ability is successful.
+
+Action types:
+ &capply poison&0 - If using a poison, applies it to the target (separate from
+   the chance to apply when using the WEAPON-HIT flag).
+ &cclose portal&0 - Will close both sides of a targeted portal.
+ &cclose to melee&0 - Character and victim will both drop from ranged to melee.
+ &cdetect hide&0 - Will show hidden characters. Requires a room target. Sends
+   per-char messages for each hidden character.
+ &cdetect earthmeld&0 - Will show earthmelded characters. Requires a room
+   target. Sends per-char messages for each hidden character.
+ &cdetect players around&0 - Find other players in near the user (or in same
+   city). Use $1 for the location in per-char messages to display the target.
+   Uses RANGE data, defaults to normal "where" range.
+ &cdetect adventures around&0 - Find DETECTABLE adventures nearby (or same
+   city). Use $1 for the tile name and $2 for the adventure in spec-to
+   messages. Uses RANGE data, defaults to normal "nearby" range.
+ &cdevastate area&0 - Collect resources from nearby tiles. Use $1 for the tile
+   name in per-item messages. Uses RANGE data, default 3 if not given.
+ &cdisenchant obj&0 - Remove enchantments from an item. Runs the DISENCHANT
+   interaction on the object (and globals) for a chance at something back.
+   Sends per-item messages when those interactions give an item.
+ &chide&0 - Attempts to hide, modified by the Hide-Upgrade ptech. Has its own
+   medium difficulty check without the ptech.
+ &clook at room&0 - Character is forced to do a normal 'look'.
+ &cmagic growth&0 - Triggers this map evolution, if possible. Use spec-to when
+   the evolution works with $1 as the old sector name and $2 as the new one.
+ &cpurify&0 - Removes flagged skills and vampire status from the target. Use in
+   conjuction with the 'can purify target' limitation.
+ &cpush back to ranged combat&0 - For abilities like 'kite', pushes a character
+   away from the user if in combat. Targeting self pushes back everyone;
+   otherwise only the target(s). Anyone pushed back shows a per-char message.
+ &cput to sleep&0 - Target is put to sleep.
+ &cremove debuffs&0 - Removes debuffs (except self-debuffs and penalties).
+ &cremove drunk&0 - Cancels any drunkenness on the target.
+ &cremove all DoTs&0 - Remove damage-over-time effects.
+ &cremove physical DoTs&0
+ &cremove magical DoTs&0
+ &cremove fire DoTs&0
+ &cremove poison DoTs&0
+ &crescue all&0 - People hitting the target will hit the actor instead.
+ &crescue one&0 - One person hitting the target will hit the actor instead.
+ &cset fighting target&0 - Ensures the user is attacking the victim specifically.
+ &ctaunt&0 - Target will switch combat focus to the actor.
+
+Example action abilities: 116 Cleanse, 209 Outrage
+
+See also: OLC ABILITIES, ABILEDIT DATA
 #d
 "ABILEDIT AFFECTS" "ABILEDIT AFFECT"
 
@@ -557,6 +614,48 @@ you have sapped.
 
 See also: OLC ABILITIES, BUFF ABILITY, ABILEDIT FLAGS
 #d
+"ABILEDIT HOOK" "ABILEDIT HOOKS" "ABILEDIT HOOKS" "ABILITY HOOKS" "HOOKED ABILITIES" "HOOK ABILITIES"
+
+Usage:  .hook add <type> <percent> [value]
+        .hook remove <number | all>
+
+The 'hook' field is for ability hooks -- conditions which can cause this
+ability to trigger. A hooked ability can only run once per execution, meaning
+abilities never trigger each other in circles. This also means abilities that
+target multiple things will only trigger a hooked ability once (including
+an ability with multiple summons). Hooked abilities may never use the OVER-TIME
+flag.
+
+Hooked abilities may have their own costs and cooldowns; they will generally
+be skipped if you don't meet those requirements. Without costs or cooldowns,
+the ability runs for free when its hook occurs.
+
+Available types of hooks are:
+ &cAbility&0 - Triggered by an ability successfully executing, targeting the same
+   targets if possible.
+ &cAttack&0 - Triggered by any attack, targeting the attack's target.
+ &cAttack-Type&0 - Triggered by an attack, targeting its target. See ATTACK TYPES.
+ &cDamage-Type&0 - Triggered by dealing damage, targeting the damage's victim.
+   Types are &yphysical&0, &ymagical&0, &yfire&0, &ypoison&0, &ydirect&0.
+ &cDying&0 - Triggered when the character begins to die.
+ &cKill&0 - Triggered by any kill, targeting self (e.g. buff on kill).
+ &cMelee-Attack&0 - Triggered by any melee attack, targeting the attack's target.
+ &cRanged-Attack&0 - By any ranged attack, targeting the attack's target.
+ &cRespawn&0 - Triggered after the character respawns from death.
+ &cResurrect&0 - Triggered after the character is resurrected.
+ &cWeapon-Type&0 - Triggered by any &yblunt&0, &ysharp&0, or &ymagic&0 attack,
+   targeting the attack's target.
+
+If the hook would normally target an enemy, but this ability only targets
+yourself, only targets the room, or has the IGNORE target flag, the target will
+change. Use this, for example, to have an ability that buffs you when you deal
+fire damage.
+
+Hooked abilities send normal &cpre-&0, &ctarg-&0, &cself-&0, and &cfail-&0
+messages. You can set custom messages to * to silence them, as usual.
+
+See also: OLC ABILITIES
+#d
 "ABILEDIT APPLY" "ABILEDIT APPLIES"
 
 Usage:  .apply add <value> <apply>
@@ -575,28 +674,28 @@ For a list of the applies, see: HELP OEDIT APPLY
 
 See also: OLC ABILITIES, BUFF ABILITY
 #d
+"ABILEDIT ATTACK" "ABILEDIT ATTACKS" "ATTACK ABILITY"
+
+An ATTACK ability is one that merely hits with the weapon in the character's
+wield slot.
+
+This is often paired with the STOP-ON-MISS flag to apply buffs or conjure items
+only if the attack succeeds.
+
+Messaging: This type of ability does not send default ability messages,
+including fail messages, because those are generally covered by its attacktype.
+
+Example attack abilities: 155 Jab, 209 Outrage
+
+Not to be confused with: ABILEDIT ATTACK TYPE
+See also: OLC ABILITIES
+#d
 "ABILEDIT ATTACKTYPE" "ABILEDIT ATTACK TYPE"
 
-Usage:  .attacktype <number>
+Usage:  .attacktype <name | vnum>
 
-This determines the attack message that a damage ability sends. These are
-numeric values matching the game's attack messages.
-
-In the future, attack messages will be moved to an in-game editor. Until then,
-if you need a new type, ask your game administrator to add one in the
-'messages' file.
-
-Current attack types:
- 52. execute                         53. arrow
- 54. kick                            55. bash
- 60. lightningbolt                   62. backstab
- 63. sunshock                        67. ablate
- 68. acidblast                       69. arclight
- 70. astralclaw                      71. chronoblast
- 72. deathtouch                      73. dispirit
- 74. erode (unused)                  75. scour (unused)
- 76. shadowlash                      77. soulchain
- 78. starstrike                      79. thornlash
+This determines the attack message that a damage ability sends. You can look up
+attacks with "vnum attack <name>" or create them with the .attack editor.
 
 See also: OLC ABILITIES, DAMAGE ABILITY
 #d
@@ -605,7 +704,8 @@ See also: OLC ABILITIES, DAMAGE ABILITY
 The BUFF ability type means that the ability gives some affects to the target.
 This includes 'debuffs', which give negative abilities to enemies.
 
-You must always set the VIOLENT flag on a debuff.
+You must always set the VIOLENT flag on a debuff. Also supports the TOGGLE
+flag for self-buffs.
 
 Buff abilities have the following properties:
  <&yshortduration&0> How long it lasts (at low skill level).
@@ -613,6 +713,27 @@ Buff abilities have the following properties:
  <&yaffects&0> Affect flags to set.
  <&yapply&0> Trait modifiers to give.
  <&yaffectvnum&0> Which affect (generic) to use for the buff.
+
+Example buff abilities: 1 Fly, 97 Bash, 166 Foresight, 205 Master Survivalist
+
+See also: OLC ABILITIES, ABILEDIT TYPES
+#d
+"ABILEDIT BUILDING-DAMAGE ABILITY" "BUILDING-DAMAGE ABILITY" "BUILDING-DAMAGE ABILITIES" "BUILDING DAMAGE ABILITY" "ABILEDIT BUILDING DAMAGE ABILITY"
+
+The BUILDING-DAMAGE type is capable of dealing damage to both buildings and
+vehicles, depending on the targets you set on the ability.
+
+You should always set the VIOLENT flag on this as well as the "distrust from
+hostile" effect and the "valid siege target" limitation.
+
+Messages:
+ Sent first: &cpre-self-to-char&0 and &cpre-self-to-room&0 (both optional)
+ Sent on each tick for building targets: &cself-to-char&0 and &cself-to-room&0
+ Sent on each tick for vehicle targets: &ctarg-to-char&0 and &ctarg-to-room&0
+ Sent on failure for building targets: &cfail-self-to-char&0 and &cfail-self-to-room&0
+ Sent on failure for vehicle targets: &cfail-targ-to-char&0 and &cfail-targ-to-room&0
+
+Example building-damage abilities: 172 Siege Ritual
 
 See also: OLC ABILITIES, ABILEDIT TYPES
 #d
@@ -637,12 +758,106 @@ Notes:
 When a companion is summoned, it automatically gets the SPAWNED, !LOOT, !EXP,
 and !DRINK-BLOOD flags.
 
+Example companion abilities: 122 Familiar, 138 Bodyguard
+
 See also: OLC ABILITIES, ABILEDIT TYPES, COMPANION
+#d
+"ABILEDIT CONJURE LIQUID ABILITY" "ABILEDIT CONJURE-LIQUID ABILITY" "CONJURE LIQUID ABILITY" "CONJURE-LIQUID ABILITY" "CONJURE LIQUID ABILITIES" "CONJURE-LIQUID ABILITIES" CONJURE-LIQUID
+
+The CONJURE-LIQUID ability type means that the ability will fill a drink
+container object with a liquid.
+
+This type of ability must always target objects. If you want to create a liquid
+in the room, use a conjure-object ability instead, with a puddle object.
+
+This ability supports both the 'conjure' command and its own command. In both
+cases, it must be set to target an object. It supports the cost-per-amount
+setting, in case the amount of liquid is important.
+
+This type of ability also supports a second argument for the amount of liquid,
+in case the player doesn't wish to conjure the maximum amount. The amount they
+specify cannot be more than the interaction quantity or the amount they can
+afford.
+
+Conjure-liquid abilities have the following properties:
+ <&ycommand&0> May be set to "conjure" to add to the conjure command instead of
+    its own command.
+ <&ycostperamount&0> You can optionally base the cost on how much of a liquid
+    is conjured.
+ <&yinteractions&0> Determine which liquid will be conjured. You must set at
+    least 1 LIQUID-CONJURE interaction, and only 1 should succeed. The quantity
+    value of this interaction is the maximum that can be conjured.
+ <&ytargets&0> Must target an object.
+
+This type of ability uses the &ctarg-to-*&0 custom messages with the &y$p&0 token for
+the targeted object.
+
+Example conjure-liquid abilities: 107 Veintap
+
+See also: OLC ABILITIES, ABILEDIT TYPES, INTERACTIONS, CONJURE
+#d
+"ABILEDIT CONJURE OBJECT ABILITY" "ABILEDIT CONJURE-OBJECT ABILITY" "CONJURE OBJECT ABILITY" "CONJURE-OBJECT ABILITY" "CONJURE OBJECT ABILITIES" "CONJURE-OBJECT ABILITIES" CONJURE-OBJECT
+
+The CONJURE-OBJECT ability type means that the ability will create one or more
+items.
+
+Objects will go to the player's inventory unless they do not have the TAKE wear
+bit. This will only work if there's at least 1 slot in the player's inventory
+(2 for a large item). Multiple items may over-fill the inventory if only 1
+space was available.
+
+This ability supports both the 'conjure' command and its own command. It does
+not have a target -- you must set the &gIGNORE&0 target.
+
+Conjure-object abilities have the following properties:
+ <&ycommand&0> May be set to "conjure" to add to the conjure command instead of
+    its own command.
+ <&yinteractions&0> Determine which object(s) will be conjured. You must set at
+    least 1 OBJECT-CONJURE interaction.
+
+Messages:
+ Sent first: &cpre-self-to-char&0 and &cpre-self-to-room&0 (both optional)
+ Sent when each item appears: &cper-item-to-char&0 and &cper-item-to-room&0
+   Using &y$p&0 for the item. These messages are also optional.
+ Sent on failure only if no pre-messages were sent: &cfail-self-to-char&0 and
+   &cfail-self-to-room&0
+
+Example conjure-liquid abilities: 1019 Conjure Fruit
+
+See also: OLC ABILITIES, ABILEDIT TYPES, INTERACTIONS, CONJURE
+#d
+"ABILEDIT CONJURE VEHICLE ABILITY" "ABILEDIT CONJURE-VEHICLE ABILITY" "CONJURE VEHICLE ABILITY" "CONJURE-VEHICLE ABILITY" "CONJURE VEHICLE ABILITIES" "CONJURE-VEHICLE ABILITIES" CONJURE-VEHICLE
+
+The CONJURE-VEHICLE ability type means that the ability will create one or more
+vehicles in the room.
+
+This ability supports both the 'conjure' command and its own command. It does
+not require or use a target. It does not have a target -- you must set the
+&gIGNORE&0 target.
+
+Conjure-vehicle abilities have the following properties:
+ <&ycommand&0> May be set to "conjure" to add to the conjure command instead of
+    its own command.
+ <&yinteractions&0> Determine which vehicle(s) will be conjured. You must set at
+    least 1 VEHICLE-CONJURE interaction.
+
+Messages:
+ Sent first: &cpre-self-to-char&0 and &cpre-self-to-room&0 (both optional)
+ Sent when each item appears: &cper-veh-to-char&0 and &cper-veh-to-room&0
+   Using &y$V&0 for the item. These messages are also optional.
+ Sent on failure only if no pre-messages were sent: &cfail-self-to-char&0 and
+   &cfail-self-to-room&0
+
+Example conjure-vehicle abilities: 1018 Shimmering Anvil
+
+See also: OLC ABILITIES, ABILEDIT TYPES, INTERACTIONS, CONJURE
 #d
 "ABILEDIT CRAFT ABILITY" "CRAFT ABILITY" "CRAFTING ABILITY" "CRAFT ABILITIES"
 
 The CRAFT ability type indicates that an ability is only used to make crafts.
 This type of ability has no "command" or other special properties.
+
+Example craft abilities: 51 Forge, 248 Exarch Crafts
 
 See also: OLC ABILITIES, ABILEDIT TYPES
 #d
@@ -657,11 +872,16 @@ NEVER share the name with a game command.
 Players can only use this command if they have this ability. You can use
 'skill buy <your skill name>' to buy and test the ability.
 
-See also: OLC ABILITIES
+Some commands have special behavior instead:
+ &cchant&0 - Add this ability to the player's chant command.
+ &cconjure&0 - Add this ability to the player's conjure command.
+ &critual&0 - Add this ability to the player's ritual command.
+
+See also: OLC ABILITIES, CHANT, CONJURE, RITUAL
 #d
 "ABILEDIT COOLDOWN" "ABILEDIT CDTIME"
 
-Usage:  .cooldown <vnum | none>
+Usage:  .cooldown <vnum | none> [seconds]
         .cdtime <seconds>
 
 These two properties determine what cooldown an ability has, if any. The vnum
@@ -674,7 +894,7 @@ See also: COOLDOWN GENERICS, OLC ABILITIES
 #d
 "ABILEDIT COST" "ABILEDIT COSTTYPE" "ABILEDIT COST TYPE" "ABILEDIT COSTPERSCALEPOINT" "ABILEDIT COST PER SCALE POINT"
 
-Usage:  .cost <amount>
+Usage:  .cost <amount> [health | move | mana | blood]
         .costperscalepoint <amount>
         .costtype <health | move | mana | blood>
 
@@ -690,6 +910,35 @@ higher cost.
 
 See also: OLC ABILITIES
 #d
+"ABILEDIT COSTPERAMOUNT" "ABILEDIT COST PER AMOUNT"
+
+Usage:  .costperamount <amount>
+
+Some types ability support a 'cost per amount' modifier. This generally the
+amount of damage, healing, etc.
+
+For example, if the cost per amount is 0.1 and the ability will deal 100
+damage, it costs an extra 10.
+
+See also: OLC ABILITIES, ABILEDIT COST
+#d
+"ABILEDIT COSTPERTARGET" "ABILEDIT COST PER TARGET"
+
+Usage:  .costpertarget <amount>
+
+When an ability can target multiple characters, it supports an optional 'cost
+per target' modifier, so each target will cost more, including the first
+target.
+
+For example, if the cost per target is 15 and the ability affects two
+characters, it costs an extra 30.
+
+If a player is too low on mana/move points for all possible targets, the
+ability will hit as many as possible and stop when the player cannot afford
+another target.
+
+See also: OLC ABILITIES, ABILEDIT COST
+#d
 "ABILEDIT CRAFT ABILITY" "CRAFT ABILITY"
 
 The CRAFT ability type indicates that it is used for crafting/building items.
@@ -704,6 +953,9 @@ Usage:  .custom add <type> <message>
         .custom change <number> <type | message> <value>
         .custom move <number> <up | down>
         .custom remove <number | all>
+        .custom sort
+
+(See also: ABILEDIT CUSTOM ABILITIES)
 
 You can set custom messages on abilities. Different types of abilities may use
 different messages; see the help files for each ability type for more info.
@@ -711,32 +963,71 @@ These messages may use the tokens $n/$e/$s/$m for name/he/his/him for the
 player using the ability, and capitalized letters for the target.
 
 If you set more than one message of the same type, one will be chosen at
-random each time.
+random each time -- except OVER-TIME messages, which will play in sequential
+order.
+
+Some messages have defaults that will show if you do not set them as custom
+messages. For abilities, the defaults can be prevented by setting a custom
+message that only contains * (asterisk).
 
 Message types:
  &cself-to-char&0 - Shown to the actor when the ability targets himself (or
    targets nobody).
  &cself-to-room&0 - Shown to the room when the ability targets self/nobody.
- &ctarg-to-char&0 - Shown to the actor when the ability targets a character.
- &ctarg-to-vict&0 - Shown to the victim when the ability targets a character.
- &ctarg-to-room&0 - Shown to the rest of the room when targeting a character.
- &ccounterspell-to-char&0 - Shown to the actor when a counterspell cancels the
-   ability.
- &ccounterspell-to-vict&0 - Shown to the ability's victim after the counterspell.
- &ccounterspell-to-room&0 - Shown to the room after the counterspell.
+ &ctarg-to-char&0 - Shown to the actor when the ability targets a character
+   or object.
+ &ctarg-to-vict&0 - Shown to the victim when the ability targets a char/obj.
+ &ctarg-to-room&0 - Shown to the rest of the room when targeting a char/obj.
+ &ccounter-to-char&0 - To the actor when a counterspell cancels the ability.
+ &ccounter-to-vict&0 - Shown to the ability's victim after the counterspell.
+ &ccounter-to-room&0 - Shown to the room after the counterspell.
  &cfail-self-to-char&0 - Shown to the actor when the ability fails targeting
    himself (or targets nobody).
- &cfail-self-to-room&0 - To the room when the ability fails targeting self/nobody.
- &cfail-targ-to-char&0 - To the actor when the ability fails targeting a character.
- &cfail-targ-to-vict&0 - To the victim when the ability fails targeting a character.
- &cfail-targ-to-room&0 - To the room when it fails targeting a character.
- &cpre-self-to-char&0 - To the actor before an ability executes, when targeting self/nobody.
- &cpre-self-to-room&0 - To the room before an ability executes, when targeting self/nobody.
- &cpre-targ-to-char&0 - To the actor before an ability executes, when targeted.
- &cpre-targ-to-vict&0 - To the victim before an ability executes, when targeted.
- &cpre-targ-to-room&0 - To the room before an ability executes, when targeted.
+ &cfail-self-to-room&0 - To room when the ability fails targeting self/nobody.
+ &cfail-targ-to-char&0 - To actor when the ability fails targeting a character.
+ &cfail-targ-to-vict&0 - To victim when the ability fails targeting a character.
+ &cfail-targ-to-room&0 - To room when it fails targeting a character.
+ &cpre-self-to-char&0 - To actor before an ability executes, when targeting self/nobody.
+ &cpre-self-to-room&0 - To room before an ability executes, when targeting self/nobody.
+ &cpre-targ-to-char&0 - To actor before an ability executes, when targeted.
+ &cpre-targ-to-vict&0 - To victim before an ability executes, when targeted.
+ &cpre-targ-to-room&0 - To room before an ability executes, when targeted.
+ &cper-veh-to-char&0 - To actor on types like conjure-vehicle, per vehicle.
+ &cper-veh-to-room&0 - To room on conjure-vehicle; use $V for the vehicle.
+ &cper-item-to-char&0 - To actor on types like conjure-object, per item.
+ &cper-item-to-room&0 - To room on types like conjure-object, per item.
+ &cover-time-longdesc&0 - How the player appears during an OVER-TIME ability.
+ &ctoggle-to-char&0 - To actor when turning off a TOGGLE ability.
+ &ctoggle-to-room&0 - To room when turning off a TOGGLE ability.
+ &cper-char-to-char&0 - To actor when some abilities hit multiple characters.
+ &cper-char-to-vict&0 - To target when some abilities hit multiple characters.
+ &cper-char-to-room&0 - To actor when some abilities hit multiple characters.
+ &cspec-to-char&0 - Special messaging on some abilities.
+ &cspec-to-vict&0 - Special messaging on some abilities, to the target.
+ &cspec-to-room&0 - Special messaging on some abilities, to the room.
+ &cno-argument&0 - Shown when the player does not type an argument.
+ &cot-self-to-char&0 - Over-time ability messages, showing every few seconds.
+ &cot-self-to-room&0
+ &cot-targ-to-char&0
+ &cot-targ-to-vict&0
+ &cot-targ-to-room&0
+ &cimmune-self-to-char&0 - To actor when immune to their own ability.
+ &cimmune-targ-to-char&0 - To actor when other target is immune to the ability.
+ &cno-target&0 - Shown when the ability target is not found.
 
-See also: OLC ABILITIES, DOLLAR SIGN CODES
+For messages to help test abilities, see HELP ABILEDIT TESTING.
+
+See also: OLC ABILITIES, ABILEDIT CUSTOM ABILITIES, DOLLAR SIGN CODES
+#d
+"ABILEDIT CUSTOM ABILITIES" "ABILEDIT CUSTOM ABILITY" "CUSTOM ABILITIES" "CUSTOM ABILITY"
+
+A CUSTOM ability is one that is hard-coded, not configured through the ability
+engine. This refers to a small number of abilities that are too complex to
+be managed by this system, usually due to complicated arguments or options.
+
+Example custom abilities: 136 Inspire, 177 Mirrorimage, 240 Confer
+
+See also: OLC ABILITIES, ABILEDIT TYPES
 #d
 "ABILEDIT DAMAGE ABILITY" "DAMAGE ABILITY" "DAMAGE ABILITIES"
 
@@ -745,9 +1036,14 @@ without a hit/dodge roll or an attack.
 
 You must always set the VIOLENT flag on a damage ability.
 
-DAmage abilities have the following properties:
+Damage abilities have the following properties:
  <&yattacktype&0> Determines the attack messages.
  <&ydamagetype&0> What type of damage it does.
+
+Messaging: This type of ability does not send default ability messages,
+including fail messages, because those are generally covered by its attacktype.
+
+Example damage abilities: 3 Backstab, 39 Critical Backstab, 308 Wilderblaze
 
 See also: OLC ABILITIES, ABILEDIT TYPES
 #d
@@ -761,7 +1057,7 @@ it.
 
 See also: OLC ABILITIES, DAMAGE ABILITY, DOT ABILITY
 #d
-"ABILEDIT DATA"
+"ABILEDIT DATA" "ABILEDIT SUMMON-MOB" "ABILEDIT PAINT-COLOR" "ABILEDIT RANGE"
 
 Usage:  .data add <type> <name | vnum>
         .data remove <number | all>
@@ -770,7 +1066,13 @@ The 'data' field is used by different types of abilities. Available types are:
  &cPTECH&0 - Player technologies. Used by the PTECH ability type.
  &cEFFECT&0 - Something happens when the ability activates. See ABILITY EFFECTS
  &cREADY-WEAPON&0 - Adds a weapon to the player's 'ready' command.
- &cSUMMON-MOB&0 - Adds a mob to a companion/summon ability
+ &cSUMMON-MOB&0 - Adds a mob to a companion/summon ability.
+ &cLIMITATION&0 - Adds a limitation to the ability. See ABILEDIT LIMITATIONS
+ &cPAINT-COLOR&0 - See PAINT ITEM for list of colors.
+ &cACTION&0 - Performs action(s) when successful. See ABILEDIT ACTIONS
+ &cRANGE&0 - Used by some actions, as noted.
+ &cPARENT&0 - Grants this ability if player has its parent. See ABILEDIT PARENT
+ &cSUPERCEDED-BY&0 - A better version of this ability. SEE ABILEDIT SUPERCEDE
 
 See also: ABILEDIT TYPES, ABILITY EFFECTS, PLAYER TECHNOLOGIES, OLC ABILITIES
 #d
@@ -781,7 +1083,10 @@ Usage:  .difficulty <type>
 Some abilities have a chance to fail. This setting determines how hard the
 ability is. If an ability can fail, you should set custom fail messages.
 
-See also: ABILEDIT CUSTOM, OLC ABILITIES
+For targeted abilities, they do not fail if the target is asleep or can't see
+you (unless it has the DIFFICULT-ANYWAY flag).
+
+See also: ABILEDIT CUSTOM, OLC ABILITIES, ABILEDIT FLAGS
 #d
 "ABILEDIT DOT ABILITY" "DOT ABILITY" "DOT ABILITIES"
 
@@ -796,6 +1101,8 @@ DoT abilities have the following properties:
  <&ymaxstacks&0> How many times this DoT can stack.
  <&yaffectvnum&0> Which affect (generic) to use for the DoT.
 
+Example DoT abilities: 98 Cut Deep, 125 Skybrand, 155 Jab
+
 See also: OLC ABILITIES, ABILEDIT SCALE, ABILEDIT TYPES
 #d
 "ABILEDIT FLAGS" "ABILITY FLAGS"
@@ -808,7 +1115,7 @@ The following ability flags are available:
  &cCOUNTERSPELLABLE&0 - Can trigger an opponent's counterspell (used for magic).
  &cTOGGLE&0 - Using this ability on twice  yourself will end its affect (for free).
  &cINVISIBLE&0 - Shows no message if the actor can't be seen, instead of 'Someone'.
- &c!ENGAGE&0 - Will not automatically add you to combat when used.
+ &c!ENGAGE&0 - Will not automatically add you to combat when used, if it succeeds.
  &cRANGED&0 - Can be used during ranged combat without giving a melee error.
  &c!ANIMAL&0 - Cannot be used in animal form.
  &c!INVULNERABLE&0 - Cannot be used while invulnerable (e.g. mistform).
@@ -820,6 +1127,28 @@ The following ability flags are available:
  &cIGNORE-SUN&0 - For a vampire ability, won't check sunlight.
  &cUNSCALED-BUFF&0 - Uses exact apply values rather than scaling them.
  &cLIMIT-CROWD-CONTROL&0 - Cancels the same affectvnum on other mobs in the room.
+ &cNOT-IN-COMBAT&0 - Ability cannot be used in combat even if min-position is low.
+ &cONE-AT-A-TIME&0 - For some ability types, prevents use when already active.
+ &cOVER-TIME&0 - Like a ritual or chant; see ABILEDIT OVER-TIME
+ &cSPOKEN&0 - Ability is spoken aloud and is blocked by the SILENT room affect.
+ &cREPEAT-OVER-TIME&0 - Over-time ability auto-repeats if successful.
+ &cCUMULATIVE-BUFF&0 - Buff can stack its effect.
+ &cCUMULATIVE-DURATION&0 - Buff can stack its duration.
+ &cWEAPON-HIT&0 - Counts as a weapon hit (applies poison, etc).
+ &cDIFFICULT-ANYWAY&0 - Checks difficulty even if the target can't see you.
+ &cNOT-IN-DARK&0 - Cannot be used in the dark unless you can see.
+ &cUNSCALED-PENALTY&0 - Negative buff attributes do not scale; positives do.
+ &cSTOP-ON-MISS&0 - Attack, Damage, or Restore abilities that miss won't
+   perform their other types, such as buffs or conjures.
+ &cREDUCED-ON-EXTRA-TARGETS&0 - For multi-targeting, scaled down 50% after the
+   first target.
+ &cUSE-SKILL-BELOW-MAX&0 - If the ability comes from a skill, will use only the
+   skill's level if the player isn't at the skill's maximum level.
+ &cUNREMOVABLE-BUFF&0 - Buff/debuff is marked as cast by the target so it
+   cannot be removed with the 'remove debuffs' action.
+ &cBUFF-SELF-NOT-TARGET&0 - Buff portion of the ability targets the user while
+   everything else hits the ability's target.
+ &cSTAY-HIDDEN&0 - Won't cancel a hide effect when typed.
 
 See also: OLC ABILITIES, ABILEDIT AFFECTVNUM
 #d
@@ -832,6 +1161,7 @@ can specify multiple fields if you want. Any arguments that don't start with a
 dash (-) are matched to the ability's keywords and other text.
 
 Fields:
+  &c-action&0 - Search a specific type from ABILEDIT ACTIONS
   &c-affects&0 - see HELP AFFECT FLAGS
   &c-apply&0 - see HELP APPLIES
   &c-attacktype&0 - see HELP ABILEDIT ATTACK TYPE
@@ -839,18 +1169,24 @@ Fields:
   &c-custom&0 - has a specific type, see HELP ABILEDIT CUSTOM
   &c-damagetype&0 - see HELP ABILEDIT DAMAGE TYPE
   &c-difficulty&0 - see HELP ABILEDIT DIFFICULTY
+  &c-effect&0 - Search a specific type from ABILEDIT EFFECTS
   &c-flagged&0, &cunflagged&0 - see HELP ABILEDIT FLAGS
   &c-gainhooks&0 - see HELP ABILEDIT GAIN HOOKS
   &c-immunities&0 - see HELP AFFECT FLAGS
+  &c-limitation&0 - Search a specific type from ABILEDIT LIMITS
   &c-linkedtrait&0 - see HELP APPLIES
   &c-mincooldown&0, &c-maxcooldown&0 - cooldown time within these limits
   &c-mincost&0, &c-maxcost&0 - base cost within these limits
   &c-mincostperscalepoint&0, &c-maxcostperscalepoint&0 - scaled cost limits
+  &c-mincostperamount&0, &c-maxcostperamount&0 - cost per amount limits
+  &c-mincostpertarget&0, &c-maxcostpertarget&0 - cost per target limits
   &c-minduration&0, &c-maxduration&0 - short/long duration within these limits
   &c-minposition&0, &c-maxposition&0 - required position within these limits
+  &c-paintcolor&0 - Search a specific paint color in ability data (PAINT ITEM has the list)
   &c-ptech&0 - see HELP PTECH
   &c-scale&0, &c-scaleunder&0, &c-scaleover&0 - scale percent within these limits
   &c-targets&0 - see HELP ABILEDIT TARGETS
+  &c-tools&0 - required tools, see HELP TOOL TYPES
   &c-type&0 - see HELP ABILEDIT TYPE
   &c-waittype&0 - see HELP ABILEDIT WAIT TYPE
   &c-vmin&0, &c-vmax&0 - VNUM range limits
@@ -868,23 +1204,33 @@ use ".gen search 1234".
 
 Usage:  .gainhooks [add | remove] <flags>
 
-This tells the ability when to trigger skill gain:
- &cONLY-WHEN-AFFECTED&0 - Below flags will only happen when the ability's affect
-   is on.
- &cMELEE&0 - Gains when you hit in melee combat.
- &cRANGED&0 - Gains when you hit in ranged combat.
- &cDODGE&0 - Gains when you dodge an attack.
+This tells the ability when to trigger skill gain. Abilities with commands also
+gain experience when their commands are used.
+
+Main gain hooks:
  &cBLOCK&0 - Gains when you block an attack.
- &cTAKE-DAMAGE&0 - Gains when you take damage.
- &cPASSIVE-FREQUENT&0 - Gains every 5 seconds.
- &cPASSIVE_HOURLY&0 - Gains every 75 seconds (game hour).
- &cONLY-DARK&0 - Only gains if it's dark here.
- &cONLY-LIGHT&0 - Only gains if it's NOT dark here.
- &cONLY-VS-ANIMAL&0 - Only gains if the ability is being used against an animal.
- &cVAMPIRE-FEEDING&0 - Gains when feeding on someone.
+ &cDO-HEAL&0 - Called when the player performs a healing ability.
+ &cDODGE&0 - Gains when you dodge an attack.
+ &cDYING&0 - Called when the player dies, before auto-resurrect.
+ &cMELEE&0 - Gains when you hit in melee combat.
  &cMOVING&0 - Gains when the player moves.
- &cONLY-USING-READY-WEAPON&0 - Only when using a ready-weapon from the ability.
- &cONLY-USING-SUMMONED-MOB&0 - Only if player has a follower from the ability.
+ &cPASSIVE-FREQUENT&0 - Gains every 5 seconds.
+ &cPASSIVE-HOURLY&0 - Gains every 75 seconds (game hour).
+ &cRANGED&0 - Gains when you hit in ranged combat.
+ &cTAKE-DAMAGE&0 - Gains when you take damage.
+ &cVAMPIRE-FEEDING&0 - Gains when feeding on someone.
+
+Gain hook modifiers (requires other hooks):
+ &yNOT-WHILE-ASLEEP&0 - Will not trigger skill gain while sleeping.
+ &yONLY-DARK&0 - Only gains if it's dark here.
+ &yONLY-INDOORS&0 - Must be inside.
+ &yONLY-LIGHT&0 - Only gains if it's NOT dark here.
+ &yONLY-OUTDOORS&0 - Must be outside,
+ &yONLY-USING-READY-WEAPON&0 - Only when using a ready-weapon from the ability.
+ &yONLY-USING-SUMMONED-MOB&0 - Only if player has a follower from the ability.
+ &yONLY-VS-ANIMAL&0 - Only gains if the ability is being used against an animal.
+ &yONLY-WHEN-AFFECTED&0 - Below flags will only happen when the ability's affect
+   is on.
 
 See also: OLC ABILITIES
 #d
@@ -899,6 +1245,110 @@ be targeted by this ability.
 Any affect flag can be used for this.
 
 See also: AFFECT FLAGS, OLC ABILITIES
+#d
+"ABILEDIT INTERACTIONS" "ABILITY INTERACTIONS"
+
+Usage:  .interaction add <type> <quantity> <vnum> <percent> [exclusion code | restrictions]
+        .interaction change <number> <field> <value>
+        .interaction copy <from type> <from vnum>
+        .interaction remove <number | all>
+        .interaction move <number> <up | down>
+
+This command adds or removes an interaction. These are objects or mobs that are
+generated by certain abilities.
+
+Ability interaction types:
+ &cLIQUID-CONJURE&0 - See ABILEDIT CONJURE LIQUID
+ &cOBJECT-CONJURE&0 - See ABILEDIT CONJURE OBJECT
+ &cVEHICLE-CONJURE&0 - See ABILEDIT CONJURE VEHICLE
+
+Optional interaction restrictions:
+ &c-ptech <name>&0 - Player must have this player-tech.
+ &c-tech <name>&0 - Empire must have this tech.
+
+See also: OLC ABILITIES, INTERACTIONS
+#d
+"ABILEDIT LIMITATIONS" "ABILEDIT LIMITS" "ABILITY LIMITATIONS" "ABILITY LIMITS"
+
+Usage:  .data add limitation <type>
+
+Limitation types:
+ &cally permission at target&0 - Has ally (or better) access at the target location.
+ &ccan purify target&0 - Target is valid for a purify ability.
+ &ccan teleport here&0 - Current room does not block teleport.
+ &ccan teleport target&0 - Target room does not block teleport.
+ &ccan use as ally&0 - Current room must be unclaimed or you are an ally (or better).
+ &ccan use as guest&0 - Current room must be unclaimed or you have guest access (or better).
+ &ccan use as member&0 - Current room must be unclaimed or owned by your empire.
+ &ccheck city found time&0 - Fails if the target city is not established yet.
+ &ccheck obj binding&0 - Ensures item target is not bound to someone else.
+ &cdisarmable target&0
+ &cguest permission at target&0 - Has guest (or better) access at the target location.
+ &chave an empire&0 - Must be a member of any empire.
+ &cin a city&0 - Must be in any city (tile must also be claimed).
+ &cin combat&0 - Must be fighting someone.
+ &cin role&0 - Actor must be in a certain role.
+ &cindoors&0 - Must be used indoors (including inside buildings on the map).
+ &cis affected by&0 - User must have an affect flag.
+ &citem type <TYPE>&0 - Obj target must be a specific type.
+ &cmember permission at target&0 - Has member access at the target location.
+ &cno witnesses&0 - Nobody is watching.
+ &cno witnesses hide&0 - Nobody is watching unless you're good at hiding.
+ &cnot affected by&0 - User is not affected by a given affect flag.
+ &cnot being attacked&0 - No characters in combat are targeting the actor.
+ &cnot being attacked melee&0 - Nobody targeting the actor in melee range.
+ &cnot being attacked mobile melee&0 - Nobody targeting the actor in melee range
+   who's not immobilized (for kite).
+ &cnot distracted&0 - User does not have DISTRACTED affect.
+ &cnot god target&0 - Target player must not be a god or immortal.
+ &cnot here&0 - Target cannot be in same room.
+ &cnot immobilized&0 - User does not have IMMOBILIZED affect.
+ &cnot leading mob&0 - User is not leading a mob.
+ &cnot leading vehicle&0 - User is not leading a vehicle.
+ &cobj flagged&0 - Object has a certain flag (see OEDIT FLAGS).
+ &cobj not flagged&0 - Object does not have a certain flag.
+ &con a barrier tile&0 - Must be used on a barrier (wall) tile.
+ &con a road&0 - Must be used on a road tile.
+ &con the map&0 - Must be used on the map (includes the main room of buildings).
+ &coutdoors&0 - Must be used outdoors (including some adventure rooms).
+ &cown the tile&0 - Your empire must own the location.
+ &cpaintable building&0 - Must be used on a building the player can paint.
+ &ctarget being attacked&0 - Target must have someone hitting them.
+ &ctarget has any DoT&0 - Target must be afflicted by a DoT.
+ &ctarget has DoT type&0 - Target must have a certain type of DoT.
+ &ctarget has mana&0 - Target must have mana (non-caster mobs don't count).
+ &ctarget is affected by&0 - Target must have an affect flag.
+ &ctarget is human&0 - Target must be a player or HUMAN-flagged mob.
+ &ctarget is vampire&0 - Target must be a vampire.
+ &ctarget not affeced by&0 - Target is not affected by a given affect flag.
+ &ctarget not foreign empire npc&0 - Target cannot be an NPC from another empire.
+ &cterraform approval&0 - Check if the player needs/has approval for this.
+ &cusing any poison&0 - Player must have poison ready.
+ &cvalid siege target&0 - Any vehicle or room target must be ok to attack.
+ &cwield any weapon&0 - Character is wielding any weapon and is not disarmed.
+ &cwield attack type&0 - Wielding a weapon with a specific attack type. See
+   WEAPON TYPES for a list or use "vnum attack".
+ &cwield weapon type&0 - Wielding a weapon with a specific weapon type: blunt,
+   sharp, or magic.
+ &cwithin range&0 - Compares distance to the target against RANGE data.
+
+See also: OLC ABILITIES, ABILEDIT DATA
+#d
+"ABILEDIT LINK ABILITY" "LINK ABILITY" "LINK ABILITIES"
+
+The LINK ability type has no real properties of its own. Its purpose is to help
+create complex abilities, for example by checking immunities on a target before
+an ability that targets one's self.
+
+The best example is 315 Splash Blood, which is a helper for ability
+314 Red Mist. Splash Blood hooks on any physical damage against a target but
+has a !DRINK-BLOOD immunity flag. If this immunity is present, nothing else
+happens. If not, it will chain to 314 Red Mist, which targets the player to
+restore blood. Red Mist cannot check the immunity itself because its target is
+the player who's attacking, not the victim of the attack. Splash Blood fills in
+the middle link for this.
+
+See also: OLC ABILITIES
 #d
 "ABILEDIT LINKEDTRAIT" "ABILEDIT LINKED TRAIT"
 
@@ -918,15 +1368,20 @@ See also: OLC ABILITIES, APPLIES
 #d
 "ABILEDIT MASTERYABILITY" "ABILEDIT MASTERY ABILITY"
 
-Usage:  .masterability <ability>
+Usage:  .masteryability <ability>
 
 The mastery ability is a separate ability which boosts the performance of this
 ability if a player has both. For example, many crafting abilities have linked
 mastery abilities that result in the (superior) flag on crafts.
 
-Most abilities have no mastery ability.
+Scalable abilities that aren't crafts get a 25% boost from masteries.
 
-See also: OLC ABILITIES
+MASTERY is also an ability type, for marking abilities that only give mastery
+to other abilities. This type of ability has no inherent properties.
+
+Example mastery abilities: 194 Master Tailor
+
+See also: OLC ABILITIES, ABILEDIT TYPES
 #d
 "ABILEDIT MAXSTACKS" "ABILEDIT MAX STACKS"
 
@@ -950,6 +1405,78 @@ most abilities, this is "resting", "fighting", or "standing". This applies to
 command abilities as well as companion, summon, and ready weapon abilities.
 
 See also: POSITIONS, OLC ABILITIES
+#d
+"ABILEDIT MORPH ABILITY" "ABILEDIT MORPH ABILITIES" "MORPH ABILITY" "MORPH ABILITIES"
+
+The MORPH ability type marks an ability that gives the player new morph forms.
+The data for morphs is not configured in the ability editor, however. Morphs
+are assigned to the ability inside the morph editor. This type of ability has
+no other properties.
+
+Example morph abilities: 4 Wolf Form, 215 Animal Forms
+
+See also: OLC ABILITIES, OLC MORPHS, MORPHEDIT REQUIRES ABILITY
+#d
+"ABILEDIT MOVE ABILITY" "MOVE ABILITY" "MOVE ABILITIES"
+
+The MOVE ability type is a special kind of movement. This should always have
+a command (like "sneak") and use the &gSTRING&0 argument type. The player uses
+a move ability by typing its command with a direction (e.g. "sneak east").
+
+Properties of move abilities:
+ <&yaffects&0> Any affect flags will be temporarily applied while moving.
+ <&ydifficulty&0> This field does not prevent the move itself. Instead, it
+   silently succeeds or fails to apply the effects (e.g. SNEAK).
+ <&ymovetype&0> What kind of special move it is.
+
+Messaging: This type of ability does not send default ability messages,
+including fail messages. You can configure these messages if you want them.
+After moving, it will send &cspec-to-char&0 and &cspec-to-room&0 messages if
+any are set. The move itself well send walking messages unless the SNEAK affect
+is on.
+
+Example move abilities: 16 Worm, 29 Sneak
+
+See also: OLC ABILITIES, ABILEDIT TYPES
+#d
+"ABILEDIT MOVETYPE" "ABILEDIT MOVE TYPE"
+
+Usage:  .movetype <type>
+
+This sets what type of special move the ability will do.
+
+See also: MOVE ABILITY
+#d
+"ABILEDIT MULTI" "ABILEDIT MULTIPLE TARGETS" "MULTIPLE TARGETS ABILITIES"
+
+Abilities may target more than one person. These abilities apply their full
+scaling points to each target; it's important to ensure the cost and scaling
+settings accommodate how powerful they can be.
+
+Targets: Use one or more of the following targets to indicate who it hits:
+ &cALLIES-MULTI&0 - All allies in the room including group members and empiremates.
+ &cGROUP-MULTI&0 - Members of your own group (and their companions).
+ &cANY-MULTI&0 - All characters in the room.
+ &cENEMIES-MULTI&0 - All enemies in the room, including most neutral mobs.
+ &yMULTI-CAN-SEE&0 - This modifier will only hit targets if you can see them.
+
+Costs: These abilities may be priced in different ways. Sometimes a flat cost
+is appropriate, and other times you should rely on the <costpertarget> field.
+
+Messaging: These should generally start with &cpre-self-to-&0 messages. Each
+character hit will trigger &ctarg-to-&0 messages except the player using the
+ability, who instead has &cself-to-&0 messages. If combined with the OVER-TIME
+flag, &cot-self-to-&0 messages are used (because there is no target character
+until the end of the over-time action).
+
+Immunity: If the ability has immunity flags that match characters who would be
+targeted by the ability, the player will see "Name is immune" messages for
+those characters, but no fail messages. Immune characters do not add to the
+cost even if there is a cost-per-target, but the ability's base cost will still
+be charged if all possible targets are immune (unlike a single-target ability)
+as the pre-messages have already been displayed.
+
+See also: OLC ABILITIES
 #d
 "ABILEDIT NAME"
 
@@ -977,6 +1504,93 @@ and via the 'stat' command. You can put any information you want in the notes.
 
 See also: OLC, STAT
 #d
+"ABILEDIT OVER-TIME" "ABILEDIT OVER TIME" "OVER TIME ABILITY" "OVER-TIME ABILITY"
+
+Using the OVER-TIME flag on an ability causes it to take multiple turns, like a
+chant or ritual. These abilities cannot be used in combat and require that the
+player be standing, regardless of your minimum position setting.
+
+Most types of abilities support this flag. You can set any command name you
+like, but if you set the command to "ritual" or "chant", it will add the
+ability to the player's ordinary ritual or chant command.
+
+The length of the over-time ability is determined by the number of to-char
+messages it has. It uses the ot-self-to- and ot-targ-to- messages. Set as
+many of these messages as you like and they will be played in order. The first
+message is played when the ability starts and the last one is played as it
+ends. Any message that only contains an asterisk (*) will take an action turn,
+but won't show a message for that turn.
+
+For example, Ritual of Burdens would be set up with these messages:
+ 1. [ot-self-to-char] You whisper your burdens into the air...
+ 2. [ot-self-to-char] *
+ 3. [ot-self-to-char] You feel the weight of the world lift from your shoulders!
+ 4. [ot-self-to-room] $n whispers $s burdens into the air...
+ 5. [ot-self-to-room] *
+ 6. [ot-self-to-room] $n seems uplifted!
+
+When the ritual completes, it will display the final ot- message and then will
+display a self-to- or targ-to- message, if one exists (but will not show the
+default message if not). If the REPEAT-OVER-TIME flag is set, the ability will
+also immediately show the first ot- message again, too.
+
+You can set how a player appears while performing the ability when someone
+types "look" in the room by setting an over-time-longdesc custom message with
+$n for their name.
+
+Over-time abilities can NOT have ability hooks. That is, you cannot chain into
+an over-time action. Non-over-time abilites can, however, chain from over-time
+ones.
+
+See also: OLC ABILITIES, CHANT, RITUAL
+#
+"ABILEDIT PAINT BUILDING ABILITY" "ABILEDIT PAINT-BUILDING ABILITY" "PAINT BUILDING ABILITY" "PAINT-BUILDING ABILITY" "PAINT BUILDING ABILITIES" "PAINT-BUILDING ABILITIES"
+
+A PAINT-BUILDING ability applies a color to the building. This requires at
+least one PAINT-COLOR data entry; more than 1 results in a random choice.
+It always targets the room -- you must set a &gROOM&0 target flag.
+
+For a list of paint colors, see HELP PAINT ITEM
+
+Example paint-building abilities: 186 Ritual of Defense
+
+See also: OLC ABILITIES, ABILEDIT TYPES
+#d
+"ABILEDIT PARENT" "PARENT ABILITY" "CHILD ABILITY" "CHAINED ABILITIES"
+
+Usage:  .data add parent <ability>
+
+Some abilities are too complex to be handled by just 1 ability entry. Using a
+combination of PARENT data and ABILITY hooks, it is possible to create more
+complex abilities.
+
+When an ability has a parent in its data, players who have that parent ability
+automatically gain the other one. An ability with parents may not be added to
+a skill or synergy -- it is ONLY granted if the player has at least one of its
+parent abilities.
+
+These abilities -- ones granted for free this way -- are not shown to the
+player unless they have a command, in which case they're shown on the "skills"
+command.
+
+Many abilities with parent data will also have an ability hook for the same
+ability as their parent, causing them to trigger whenever the parent ability
+goes off. If so, they will be shown on the "ability info" for the parent, like
+all abilities with hooks.
+
+Abilities can have more than one type, so you only need to use a 2nd ability
+with a parent relationship if the two effects are incompatible -- if they have
+different targets, different durations, or different limitations. If those
+things are the same, for example an ability that damages someone and gives them
+a debuff, it can be accomplished with one ability instead of two.
+
+Possible uses of parent-child abilities:
+- More complex abilities (debuff you, buff me)
+- Proc for more damage with a 2nd ability at higher difficulty
+- Grant a related command with an ability
+
+See also: OLC ABILITIES, ABILEDIT DATA, ABILEDIT HOOK
+#d
 "ABILEDIT PASSIVE-BUFF ABILITY" "PASSIVE-BUFF ABILITY" "PASSIVE-BUFF ABILITIES" "PASSIVE BUFF ABILITY"
 
 The PASSIVE-BUFF ability type means that the ability applies stats to the
@@ -990,9 +1604,11 @@ Buff abilities have the following properties:
 Note: Passive-buff abilities are not affected by the 'solo' role's limitation
 on being alone; they will remain active.
 
+Example passive-buff abilities: 0 Gift of Nature, 228 Noble Bearing
+
 See also: OLC ABILITIES, ABILEDIT TYPES, PASSIVES
 #d
-"ABILEDIT PLAYER-TECH ABILITY" "PTECH ABILITY" "PTECH ABILITIES" "PLAYER-TECH ABILITY" "PLAYER-TECH ABILITIES" "PLAYER TECH ABILITY" "PLAYER TECHNOLOGY" "PLAYER TECHNOLOGIES" PTECH
+"ABILEDIT PLAYER-TECH ABILITY" "PTECH ABILITY" "PTECH ABILITIES" "PLAYER-TECH ABILITY" "PLAYER-TECH ABILITIES" "PLAYER TECH ABILITY" "PLAYER TECHNOLOGY" "PLAYER TECHNOLOGIES" PTECH "ABILEDIT PTECH" PTECHS
 
 Usage:  .data add ptech <type>
 
@@ -1014,20 +1630,18 @@ Available techs are:
  &cCustomize-Building&0 * - Can customize buildings.
  &cDeep-Mines&0 * - Mines are 50% larger.
  &cDual-Wield&0 - Gets an offhand attack at a reduced accuracy.
- &c*&0 - Unused tech.
- &cFastcasting&0 - Wits reduces lag from non-combat abilities rather than
+ &cFastcasting&0 * - Wits reduces lag from non-combat abilities rather than
     improving combat speed.
  &cFast-Find&0 * - Dig, gather, and pick are faster.
- &cFish&0 * - Can use the fish command/interaction.
- &cForage&0 * - Can use the forage command/interaction.
- &cHarvest-Upgrade&0 * - Increases the number of items received from harvest.
- &cHealing-Boost&0 - Improves all healing abilities.
+ &cFish-Command&0 *
+ &cForage-Command&0 *
+ &cHarvest-Upgrade&0 * - More items received from harvest.
  &cHide-Upgrade&0 * - Guarantees hide and protects from normal 'search'.
  &cInfiltrate&0 * - Allows the player to enter claimed/restricted buildings.
  &cInfiltrate-Upgrade&0 * - Raises the success of infiltrate.
  &cLarger-Light-Radius&0 - +1 light radius (prefer NIGHT-VISION apply instead).
  &cLight-Fire&0 * - Can light torches/fires without any tools.
- &cMap-Invis&0 * - Can't be seen at a distance on the map.
+ &cMap-Invis&0 *^ - Can't be seen at a distance on the map.
  &cMill-Upgrade&0 * - Increases the number of items received from mill.
  &cNavigation&0 * - Orients the map and directions correctly.
  &c!Hunger&0 - Will not get hungry.
@@ -1035,11 +1649,11 @@ Available techs are:
  &c!Thirst&0 - Will not get thirsty.
  &c!Track-City&0 * - Leaves no tracks in the city or indoors.
  &c!Track-Wild&0 * - Leaves no tracks in the wild, outside of cities.
- &cPickpocket&0 * - Can use the pickpocket command/interaction.
- &cPoison&0 * - Can use poisons in combat.
+ &cPickpocket&0 *^ - Can use the pickpocket command/interaction.
+ &cPoison&0 *^ - Can use poisons in combat.
  &cPoison-Upgrade&0 * - Improves the effect of all poisons (requires Poison).
- &cPortal&0 * - Can open normal portals at the correct buildings.
- &cPortal-Upgrade&0 * - Can open longer-range portals (requires Portal).
+ &cPortal&0 * - Can open normal portals at the correct buildings; shorter sickness.
+ &cPortal-Upgrade&0 * - Can open longer-range portals (if you can open portals).
  &cRanged-Combat&0 * - Can use a ranged weapon.
  &cRiding&0 * - Can ride/mount.
  &cRiding-Flying&0 * - Can use flying mounts on all terrain (requires Riding).
@@ -1051,16 +1665,15 @@ Available techs are:
  &cShear-Upgrade&0 * - Increases the number of items received from shear.
  &cSteal-Upgrade&0 * - Can steal from vaults too.
  &cSwimming&0 * - Can move on water tiles with no boat.
- &cTeleport-City&0 * - Teleport can target your cities (requires an ability).
- &cTwo-Handed-Weapons&0 - Can wield two-handed weapons.
+ &cTwo-Handed-Mastery&0 * - Bonus damage from two-handed weapons.
  &cWhere-Upgrade&0 * - Increases the range of the 'where' command.
  &cDodge-Cap&0 - Improves the player's maximum dodge percent.
  &cSkinning-Upgrade&0 - Skinning always succeeds.
  &cBarde&0 - Can barde animals.
- &cHerd&0 - Can herd animals.
- &cMilk&0 - Can milk animals (in a stable).
- &cShear&0 - Can shear animals (in a stable).
- &cTame&0 - Can tame animals.
+ &cHerd-Command&0 *
+ &cMilk-Command&0 *
+ &cShear-Command&0 *
+ &cTame-Command&0 *
  &cBite-Melee-Upgrade&0 - Bite lowers cooldown, doesn't taunt, and has a Dot, 
     if in Melee/Solo roles.
  &cBite-Tank-Upgrade&0 - Bite loses the dodge penalty in Tank/Solo and always
@@ -1070,50 +1683,202 @@ Available techs are:
  &cHunt-Animals&0 * - Can use the 'hunt' command, on animals.
  &cClock&0 * - Can tell the time.
  &cCalendar&0 * - Knows the date.
- &cMint&0 * - Can mint coins.
- &cTan&0 * - Can use the 'tan' command.
+ &cMint-Command&0 *
+ &cTan-Command&0 *
  &cNo-Purify&0 - Player cannot be purified.
  &cVampire-Sun-Immunity&0 * - Vampire powers now work in the sun.
- &cGather&0 * - Can 'gather'.
- &cChop&0 * - Can 'chop'.
- &cDig&0 * - Can 'dig'.
- &cHarvest&0 * - Can 'harvest'.
- &cPick&0 * - Can 'pick'.
- &cQuarry&0 * - Can 'quarry'.
- &cDrink-Blood-Faster&0 - Vampires drink blood at 2x the speed.
+ &cGather-Command&0 *
+ &cChop-Command&0 *
+ &cDig-Command&0 *
+ &cHarvest-Command&0 *
+ &cPick-Command&0 *
+ &cQuarry-Command&0 *
+ &cDrink-Blood-Faster&0 - Vampires drink more blood at a time.
  &cSummon-Materials&0 * - Can use the 'summon materials' command. Supports
     custom pre-retrieve messages using self-to-char and self-to-room.
  &cCustomize-Vehicle&0 * - Can use 'customize vehicle'.
  &cPlant-Crops&0 * - Can use the 'plant' command.
- &cChip-Command&0 * - Can use the 'chip' command.
- &cSaw-Command&0 * - Can use the 'saw' command.
- &cScrape-Command&0 * - Can use the 'scrape' command.
- &cMap-Memory *&0 - Remembers blocked/dark tiles on look/scan.
+ &cChip-Command&0 *
+ &cSaw-Command&0 *
+ &cScrape-Command&0 *
+ &cMap-Memory&0 * - Remembers blocked/dark tiles on look/scan.
+ &cSearch-Command&0 *^
+ &cTrack-Command&0 *
+ &cResist-Poison&0 * - Reduced effect from poisons.
+ &cVampire-Bite&0 *^ - Can use bite for blood, if a vampire, rather than the social.
+ &cEnemy-Buff-Details&0 * - Can see full details using 'affects' on others.
+ &cConceal-Equipment&0 * - Others cannot see your equipment on 'look'.
+ &cConceal-Inventory&0 * - Others cannot see your inventory on 'look'.
+ &cFlee-Upgrade&0 * - Increased chance to flee.
+ &cFaster-Melee-Combat&0 * - Slight speed boost in melee combat.
+ &cFaster-Ranged-Combat&0 * - Slight speed boost in ranged combat.
+ &cRiding-Swap-Anywhere&0 * - Can mount-swap without a stable.
+ &cRiding-Release-Mount&0 * - Can release mounts as mobs.
+ &cRework-Command&0 * - Player can rework items.
+ &cBite-Regeneration&0 * - Rapid HMV regeneration while drinking blood.
+ &cSteal-Command&0 *^ - Allows 'steal'.
+ &cUse-Honed-Gear&0 - Allows the player to used items that have been honed.
+ &cRedirect-Magical-Damage-to-Mana&0 * - Half of magic damage drains mana not hp.
+ &cMore-Blood-From-Humans&0 - Vampires get a larger benefit drinking blood from humans.
 
-* Marked techs trigger ability gains on their own without gain hooks.
+* Techs marked with an asterisk trigger ability gains on their own without gain hooks.
+^ Techs marked with a carat support difficulty settings on the ability.
+
+Example player-tech abilities: 18 Search, 143 Steal
 
 See also: OLC ABILITIES, ABILEDIT DATA, ABILEDIT TYPES
 #d
 "ABILEDIT READY-WEAPONS ABILITY" "READY-WEAPONS ABILITY" "READY-WEAPONS ABILITIES" "READY WEAPONS ABILITY" "READY-WEAPON ABILITY" "READY WEAPON ABILITIES"
 
-The READY-WEAPONS ability type adds weapons to the player's 'ready' command.
-These are temporary weapons that the player can summon directly to their
-wield/ranged slots.
+The READY-WEAPONS ability type enables the player to summon items directly to
+their wield, hold, or ranged slot. These are temporary weapons and should be
+set to disappear when removed.
 
-Ready-Weapons abilities have the following properties:
+Ready-weapon abilities may have their own command, or the can add to the
+player's 'ready' command. This type supports the TOGGLE flag, which removes
+the weapon from the equipment slot if the command is typed again while still
+using it.
+
+Ready-Weapons abilities have the following:
+ <&ycommand&0> If the ability is adding options to the 'ready' command, set its
+   command to 'ready' (or leave it blank). If it has its own command, use that
+   instead.
  <&ydata&0> Add the READY-WEAPON data type to grant weapons.
-            - You should usually set the 1-USE flag on the weapon.
-            - Only weapons and ranged weapons can be used.
-            - If a weapon has HOLD but not WIELD, it will equip to the hold
-              slot. Otherwise, it will only equip to the wield slot.
+   - You should usually set the 1-USE flag on the weapon.
+   - Only weapons and ranged weapons can be used.
+   - If a weapon has HOLD but not WIELD, it will equip to the hold slot.
+     Otherwise, it will only equip to the wield slot.
+ <&ygainhooks&0> This set of gain hooks gives experience when fighting with
+   the weapons from this ability: MELEE RANGED ONLY-USING-READY-WEAPON
+ <&yminposition&0> Determine if they can ready a new weapon in combat.
+ <&ytargets&0> If there's only one weapon in the data, or it will pick at
+   random from the data, set the IGNORE target. If they choose from the list,
+   set the STRING target instead.
+ <&ymasteryability&0> A mastery ability will cause the readied weapon to be
+   superior in quality.
 
-Notes:
+Messages:
 - The ready command will use the &cself-to-char&0 and &cself-to-room&0 custom
-  messages. &c$n&0 represents the player and &c&p&0 represents the weapon.
-  For fails, use &cfail-self-to-char&0 and &cfail-self-to-room&0. For pre-
-  ability messages, use &cpre-self-to-char&0 and &cpre-self-to-room&0.
+  messages.
+- For pre-ability messages, use &cpre-self-to-char&0 and &cpre-self-to-room&0.
+- For the actual summoning of the item, it uses &cper-item-to-char&0 and
+  &cper-item-to-room. &y$n&0 represents the player and &y&p&0 represents the
+  weapon.
+- For fails, use &cfail-self-to-char&0 and &cfail-self-to-room&0.
+- With the TOGGLE flag, you may set &ctoggle-to-char&0 and &ctoggle-to-room&0,
+  but it may be better to set &gremove-to-char&0 and &gremove-to-room&0 on the
+  weapon itself because they are also displayed if the player removes the
+  weapon.
+
+Example ready-weapon abilities: 6 Ready Blood Weapons, 8 Claws
 
 See also: OLC ABILITIES, ABILEDIT TYPES, READY
+#d
+"ABILEDIT POOLTYPE" "ABILEDIT POOL TYPE"
+
+Usage:  .pooltype <health | mana | move | blood | any>
+
+This determines which pool a RESTORE ability will affect. If you set it to
+'any', the player will choose which to restore from health, mana, or move
+(not blood).
+
+See also: RESTORE ABILITY
+#d
+"ABILEDIT RESOURCE ABILITY" "ABILEDIT RESOURCE ABILITIES" "RESOURCE ABILITY" "RESOURCE ABILITIES"
+
+The RESOURCE ability type marks an ability as mainly related to resource-gain.
+This type of ability does not have properties of its own, but it's often used
+through other editors to give the player access to more things.
+
+For example, ability 70 Find Herbs is used in the interaction list of many
+sectors (terrains) to restrict who can get herbs by using 'pick' there. Here's
+an example of that interaction:
+ 1. PICK: 125-max iridescent blue iris (1206) 8.33% (p)
+ 2. PICK: 125-max sack of fiveleaf (1201) 100.00% (p) (Ability: Find Herbs)
+ 3. PICK: 125-max small flower (123) 100.00% (p)
+
+With those interactions, all players find the iris at 8.33%, but someone with
+Find Herbs will get fiveleaf the rest of the time, while someone without it
+finds only small flowers.
+
+See also: OLC ABILITIES
+#d
+"ABILEDIT RESOURCECOST" "ABILEDIT RESOURCE COST"
+
+Usage:  .resource add <type> <amount> <vnum/name>
+        .resource change <number> <quantity | vnum | name | flags> <value>
+        .resource remove <number | all>
+        .resource move <number> <up | down>
+
+This command sets the resources required to use the ability.
+
+See HELP OLC RESOURCES for more information.
+
+See also: OLC ABILITIES, RESOURCE ACTIONS
+#d
+"ABILEDIT RESTORE ABILITY" "ABILEDIT RESTORATION ABILITY" "RESTORE ABILITIES" "RESTORATION ABILITIES"
+
+The RESTORE ability type gives some health, mana, moves, or blood to the target
+when used. It can also offer the user the choice of health, mana, or moves
+(they cannot choose blood).
+
+Properties of restore abilities:
+ <&ypooltype&0> Which pool it restores, or "any" to let the user pick.
+
+Messaging:
+- Uses regular &cself-to-char&0 or &ctarg-to-char&0 messages, but will append
+  the amount that was restored.
+
+Example restore abilities: 27 Regenerate, 110 Heal Friend, 111 Heal Party
+
+See also: OLC ABILITIES, ABILEDIT TYPES
+#d
+"ABILEDIT RESURRECT ABILITY" "ABILEDIT RESURRECTION" "RESURRECT ABILITIES" "RESURRECTION ABILITIES"
+
+The RESURRECT ability offers resurrection to a dead player or corpse target.
+If the caster is in combat, the resurrected player will receive a boost to
+health, mana, moves, hungry, and thirst.
+
+For vampires, blood is reduced to 20% after resurrection.
+
+If the ability can target the character themselves while dead, the offer step
+is skipped.
+
+Targeted resurrection messages:
+ &ctarg-to-char&0 - Send to the caster when starting to resurrect.
+ &ctarg-to-vict&0 - Sent to the target, no matter where they are.
+ &ctarg-to-room&0 - Sent to the room the caster is in.
+
+Self-resurrection messages:
+ &cself-to-char&0 - Sent to the caster when resurrecting.
+ &cself-to-room&0 - Sent to teh room the caster is in when resurrecting.
+
+When the resurrection completes, it also sends:
+ &cspec-to-char&0 - Sent to the person being resurrected.
+ &cspec-to-room&0 - Sent ot the room the person resurrects in with $n as the
+   person being resurrected (not the caster).
+
+Example resurrect abilities: 219 Resurrect, 242 Deathrise
+
+See also: OLC ABILITIES, OFFERS
+#d
+"ABILEDIT ROOM AFFECT ABILITY" "ABILEDIT ROOM-AFFECT ABILITY" "ROOM AFFECT ABILITY" "ROOM-AFFECT ABILITY" "ROOM AFFECT ABILITIES" "ROOM-AFFECT ABILITIES"
+
+The ROOM-AFFECT ability type means that the ability will place an effect on the
+room. This type of ability cannot be combined with buff or passive-buff
+abilities. It always targets the room -- you must set a &gROOM&0 target flag.
+
+These support the TOGGLE flag if the player can choose to end them.
+
+Properties of room-affect abilities:
+ <&yshortduration&0> How long it lasts (at low skill level).
+ <&ylongduration&0> How long it lasts (at high skill level).
+ <&yaffects&0> Room affect flags to set.
+ <&yaffectvnum&0> Which affect (generic) to use for the affect.
+
+Example room-affect abilities: 11 Darkness, 186 Ritual of Defense
+
+See also: OLC ABILITIES, ABILEDIT TYPES, ROOM AFFECTS
 #d
 "ABILEDIT SCALE"
 
@@ -1125,19 +1890,21 @@ the 'scale' on an ability, you should also increase its cost and/or cooldown.
 
 See also: ABILEDIT COOLDOWN, ABILEDIT COST, OLC ABILITIES
 #d
-"ABILEDIT SHORTDURATION" "ABILEDIT SHORT DURATION" "ABILEDIT LONGDURATION" "ABILEDIT LONG DURATION"
+"ABILEDIT SHORTDURATION" "ABILEDIT SHORT DURATION" "ABILEDIT LONGDURATION" "ABILEDIT LONG DURATION" "ABILEDIT DURATIONS"
 
 Usage:  .shortduration <seconds | unlimited>
         .longduration <seconds | unlimited>
 
 For buff/dot abilities, this is how long the effect lasts. Short duration
-applies when the actor has the skill at a low level. Long duration is for
-high-level users and class abilities.
+applies when the actor has the skill at a low level. Long duration is used when
+the ability's assigned skill is at its max level. It the ability isn't from a
+skill tree, short duration is used under level 100.
 
 Be careful with unlimited duration buffs -- these should always be self-only
 toggles. DoTs cannot have unlimited duration.
 
-You can also choose to set both durations to the same amount of time.
+If an ability only has one duration, that duration is always used. You can also
+choose to set both durations to the same amount of time.
 
 See also: OLC ABILITIES, BUFF ABILITIES, DOT ABILITIES
 #d
@@ -1148,14 +1915,21 @@ Players can have a limited number of followers at a time, including ones from
 summons.
 
 Summon abilities have the following properties:
+ <&ycommand&0> Summons may have their own command or may share the 'summon'
+              command.
  <&ylinkedtrait&0> Optional: If you set a linked trait, more than one mob may
-            be summoned at a time if that trait is high.
+              be summoned at a time if that trait is high.
+ <&ytargets&0> Use IGNORE for SUMMON-RANDOM and STRING for SUMMON-ANY.
  <&ydata&0> Add the SUMMON-MOB data type to grant new mobs.
-            - A SUMMON-ANY ability will list the mobs individually on the
-              'summon' command.
-            - A SUMMON-RANDOM ability will only list the ability name on the
-              'summon' command.
+            - A SUMMON-ANY ability allows the player to choose which mob from
+              the ability's data. If using the 'summon' command, they're
+              summoned by mob name rather than ability name.
+            - A SUMMON-RANDOM ability chooses at random and, if using the
+              'summon' command, is summoned by ability name.
             - You can set level limits on the mob.
+ <&yflags&0> The ONE-AT-A-TIME flag will block new summons while any mobs from
+              the ability data are in the room and either following you or
+              following nobody (ones following other players are ignored).
 
 Notes:
 - Summoned mobs silently follow the player. Use a trigger like #9804 to cancel
@@ -1163,42 +1937,183 @@ Notes:
 - If you want the summoned mob to be charmed, use a trigger like #9805.
 - Setting a linked trait will increase the number of summons but it's really
   only implemented for base attributes like Strength and Wits.
-- Cannot use the INVISIBLE flag for messaging.
-- These abilities will use the &ctarg-to-char&0 and &ctarg-to-room&0 custom
-  messages when a player summons the mob. &c$n&0 represents the player and
-  &c&N&0 represents the mob. For fails, use &cfail-self-to-char&0 and
-  &cfail-self-to-room&0. For pre-ability messages, use &cpre-self-to-char&0 and
-  &cpre-self-to-room&0.
+- There is a limit on the number of mobs in the room at a time, which will
+  block some summons. All summons that use the 'summon' command are prevented
+  by this limit. Summons with their own command will still allow you to summon
+  1 mob and, in this case, should usually have the ONE-AT-A-TIME flag.
 
-When a companion is summoned, it automatically gets the SPAWNED, !LOOT, !EXP,
-and !DRINK-BLOOD flags.
+Messaging:
+- Displays &cpre-self-to-char&0 and &cpre-self-to-room&0 first, then &cself-to-char&0
+  and &cself-to-room&0 if it succeeds.
+- Displays &cfail-self-to-char&0 and &cfail-self-to-room&0 if it fails.
+- Successful summons each send &cper-char-to-char&0 and &cper-char-to-room&0
+  messages.
+
+When a mob is summoned, it automatically gets the SPAWNED, !LOOT, and !EXP
+flags.
+
+Example summon abilities: 168 Summon Swift, 34 Summon Animals
 
 See also: OLC ABILITIES, ABILEDIT TYPES, COMPANION
+#d
+"ABILEDIT SUPERCEDE" "ABILEDIT SUPERCEDED-BY" "SUPERCEDING ABILITIES" "SUPERCEDED-BY ABILITIES"
+
+The SUPERCEDED-BY ability data indicates that another ability replaces this
+one. If the player tries to use an ability and they also have the one it's
+superceded by, they automatically use that one instead. Generally both
+abilities should have the same command.
+
+This is used, for example, to improve the player's "heal" command:
+ [109] Heal - A basic ability that only heals the user.
+ [110] Heal Friend - A slightly cheaper heal that also heals others.
+ [111] Heal Party - An even better heal that can target the whole group.
+
+See also: OLC ABILITIES, ABILEDIT DATA
 #d
 "ABILEDIT TARGETS"
 
 Usage:  .targets [add | remove] <flag>
 
-This determines what targets an ability has. Many of these flags go together or
-modify each other. They are:
+This determines what targets an ability has.
+
+Character targets:
+ &ySELF-ONLY&0 - Targets the user.
+ &cCHAR-ROOM&0 - A character in the room with the actor.
+ &cCHAR-WORLD&0 - A character anywhere in the world.
+ &cCHAR-CLOSEST&0 - The closest person with that name.
+
+Object targets:
+ &cOBJ-INV&0 - An object in your inventory.
+ &cOBJ-ROOM&0 - An object on the ground.
+ &cOBJ-WORLD&0 - An object anywhere.
+ &cOBJ-EQUIP&0 - An object you're wearing.
+
+Room targets:
+ &cROOM-HERE&0 - Targets the room you're in.
+ &cROOM-ADJACENT&0 - A room in a given direction.
+ &cROOM-EXIT&0 - The room outside (from a building or vehicle).
+ &cROOM-HOME&0 - The player's home, if any.
+ &cROOM-RANDOM&0 - A random room (up to the distance from RANGE data).
+ &cROOM-RANDOM-CAN-USE&0 - A random room the player has at least guest
+   permission in (up to the distance from RANGE data).
+ &cROOM-CITY&0 - A city (center) in the player's empire, by city name.
+ &cROOM-COORDS&0 - Any room by coordinates.
+
+Vehicle targets:
+ &cVEH-ROOM&0 - A vehicle (or vehicle-style building) in the room.
+ &cVEH-WORLD&0 - A vehicle anywhere.
+
+Multiple targets (see ABILEDIT MULTI):
+ &cALLIES-MULTI&0 - Can target all allies.
+ &cGROUP-MULTI&0 - Can target whole group.
+ &cANY-MULTI&0 - Can target all characters in the room.
+ &cENEMIES-MULTI&0 - Can target all enemies.
+
+Miscellaneous targets:
  &cIGNORE&0 - Has no automatic targets.
- &cCHAR-ROOM&0 - Targets a character in the room with the actor.
- &cCHAR-WORLD&0 - Targets a character anywhere in the world.
- &cCHAR-CLOSEST&0 - Targets the closest person with that name.
- &yFIGHT-SELF&0 - Modifier: Targets self if no argument while fighting.
- &yFIGHT-VICTIM&0 - Modifier: Targets victim if no argument while fighting.
- &ySELF-ONLY&0 - Modifier: Can only target yourself.
- &yNOT-SELF&0 - Modifier: Character target cannot be self.
- &cOBJ-INV&0 - Targets an object in your inventory.
- &cOBJ-ROOM&0 - Targets an object on the ground.
- &cOBJ-WORLD&0 - Targets an object anywhere.
- &cOBJ-EQUIP&0 - Targets an object you're wearing.
- &cVEH-ROOM&0 - Targets a vehicle in the room.
- &cVEH-WORLD&0 - Targets a vehicle anywhere.
+ &cSTRING&0 - An argument is required, but not a traditional target.
+
+Modifier flags (use in combination with the above flags):
+ &yFIGHT-SELF&0 - Targets self if no argument while fighting.
+ &yFIGHT-VICTIM&0 - Targets victim if no argument while fighting.
+ &yNOT-SELF&0 - Character target cannot be self.
+ &yNOT-ALLY&0 - Cannot target an ally.
+ &yNOT-ENEMY&0 - Cannot target an enemy.
+ &yDEAD-OK&0 - Can target dead people (otherwise they are invalid).
+ &yMULTI-CAN-SEE&0 - For multi-targeting, must be able to see each target.
 
 See also: OLC ABILITIES
 #d
-"ABILEDIT TYPES"
+"ABILEDIT TELEPORT ABILITY" "TELEPORT ABILITY" "TELEPORT ABILITIES"
+
+The TELEPORT ability type moves the player from one room to another. It can
+target any target type.
+
+If you use the ROOM-RANDOM or ROOM-RANDOM-CAN-USE target, you must set a RANGE
+in the ability's data. This range will only apply to random targets unless you
+also add the "within range" limitation, which will apply it to all targets.
+
+Messages when teleporting to rooms:
+ Sent at the start: &cpre-self-to-char&0 and &cpre-self-to-room&0
+ Sent right before teleporting: &cself-to-char&0 and &cself-to-room&0
+ Sent after self-to-char with bad target: &cfail-self-to-char&0 and &cfail-self-to-room&0
+ Sent when appearing: &cspec-to-char&0 and &spec-to-room&0
+
+Messages when teleporting to targets:
+ Sent at the start: &cpre-targ-to-char&0 &cpre-targ-to-vict&0 &cpre-targ-to-room&0
+ Sent right before teleporting: &ctarg-to-char&0 &ctarg-to-vict&0 and &ctarg-to-room&0
+ Sent after targ-to-char with bad target: &cfail-targ-to-char&0 &cfail-targ-to-vict&0 and &cfail-targ-to-room&0
+ Sent when appearing: &cspec-to-char&0 &cspec-to-vict&0 and &spec-to-room&0
+ Note: &c-to-vict&0 messages are sent even from another room.
+
+Messages:
+ Sent first: &cpre-self-to-char&0 and &cpre-self-to-room&0 (both optional)
+ Sent when each item appears: &cper-item-to-char&0 and &cper-item-to-room&0
+   Using &y$p&0 for the item. These messages are also optional.
+ Sent on failure only if no pre-messages were sent: &cfail-self-to-char&0 and
+   &cfail-self-to-room&0
+
+Example teleport abilities: 146 Escape, 153 Shadowstep, 188 City Teleportation
+
+See also: OLC ABILITIES, ABILEDIT TYPES
+#d
+"ABILEDIT TESTING"
+
+This help file assists with building the correct set of messages for an
+ability. Many types of abilities can send several types of messages and one of
+the trickiest parts of building an ability is setting the correct ones.
+
+Add the following messages to your ability, save it, and use it to see which
+ones are displayed. These commands will add the full set of messages:
+
+.cust add self-to-char self-to-char
+.cust add self-to-room self-to-room
+.cust add targ-to-char targ-to-char $N
+.cust add targ-to-vict targ-to-vict
+.cust add targ-to-room targ-to-room
+.cust add counter-to-char counter-to-char $N
+.cust add counter-to-vict counter-to-vict
+.cust add counter-to-room counter-to-room
+.cust add fail-self-to-char fail-self-to-char
+.cust add fail-self-to-room fail-self-to-room
+.cust add fail-targ-to-char fail-targ-to-char $N
+.cust add fail-targ-to-vict fail-targ-to-vict
+.cust add fail-targ-to-room fail-targ-to-room
+.cust add pre-self-to-char pre-self-to-char
+.cust add pre-self-to-room pre-self-to-room
+.cust add pre-targ-to-char pre-targ-to-char $N
+.cust add pre-targ-to-vict pre-targ-to-vict
+.cust add pre-targ-to-room pre-targ-to-room
+.cust add per-veh-to-char per-veh-to-char $V
+.cust add per-veh-to-room per-veh-to-room
+.cust add per-item-to-char per-item-to-char $p
+.cust add per-item-to-room per-item-to-room
+.cust add over-time-longdesc over-time-longdesc
+.cust add toggle-to-char toggle-to-char
+.cust add toggle-to-room toggle-to-room
+.cust add per-char-to-char per-char-to-char $N
+.cust add per-char-to-vict per-char-to-vict
+.cust add per-char-to-room per-char-to-room
+.cust add spec-to-char spec-to-char $N
+.cust add spec-to-vict spec-to-vict
+.cust add spec-to-room spec-to-room
+.cust add no-argument no-argument
+.cust add ot-self-to-char ot-self-to-char start
+.cust add ot-self-to-room ot-self-to-room start
+.cust add ot-targ-to-char ot-targ-to-char start
+.cust add ot-targ-to-vict ot-targ-to-vict start
+.cust add ot-targ-to-room ot-targ-to-room start
+.cust add ot-self-to-char ot-self-to-char end
+.cust add ot-self-to-room ot-self-to-room end
+.cust add ot-targ-to-char ot-targ-to-char end
+.cust add ot-targ-to-vict ot-targ-to-vict end
+.cust add ot-targ-to-room ot-targ-to-room end
+.cust add immune-self-to-char immune-self-to-char
+.cust add immune-targ-to-char immune-targ-to-char $N
+
+See also: ABILEDIT CUSTOM
+#d
+"ABILEDIT TYPES" "ABILITY TYPES"
 
 Usage:  .types add <type> [weight]
         .types change <type> <weight>
@@ -1212,23 +2127,39 @@ Weights can be 0, meaning they don't take any scaling points from other types.
 Any type with a weight of 0 should still get 1 point worth of effect.
 
 The following types are available (each has its own help file):
- &cCRAFT&0 - Used for craft/building recipes.
+ &cACTION&0 - Executes and action; see ABILEDIT ACTIONS.
+ &cATTACK&0 - Perform a normal weapon attack; often paired with STOP-ON-MISS.
+ &cAUGMENT&0 - Used for augments/enchanting. No inherent properties.
  &cBUFF&0 - Puts affects on characters.
+ &cBUILDING-DAMAGE&0 - Damages a vehicle or building.
+ &cCOMPANION&0 - Adds 1 or more mobs to the player's 'companions' command.
+ &cCONJURE-LIQUID&0 - Creates liquid in a drink container.
+ &cCONJURE-OBJECT&0 - Creates one or more items.
+ &cCONJURE-VEHICLE&0 - Create a vehicle in the room.
+ &cCRAFT&0 - Used for craft/building recipes. No inherent properties.
+ &cCUSTOM&0 - Ability is hard-coded, not parameterized.
  &cDAMAGE&0 - Deals direct damage.
  &cDOT&0 - Adds a damage-over-time effect.
- &cPTECH&0 - Various 'techs' that players get from abilities.
+ &cLINK&0 - Helper type for complex hook abilities.
+ &cMASTERY&0 - No inherent properties; just a label where applicable.
+ &cMORPH&0 - Ability has morphs that require it.
+ &cMOVE&0 - Ability is a special type of move.
+ &cPAINT-BUILDING&0 - Applies a coat of paint to the buliding.
  &cPASSIVE-BUFF&0 - Applies stats to the player all the time.
+ &cPTECH&0 - Various 'techs' that players get from abilities.
  &cREADY-WEAPONS&0 - Adds weapons to the player's 'ready' command.
- &cCOMPANION&0 - Adds 1 or more mobs to the player's 'companions' command.
+ &cRESOURCE&0 - Used for resources, e.g. on interaction restrictions.
+ &cRESTORE&0 - Gives some health, move, mana, or blood points.
+ &cRESURRECT&0 - Offers resurrection.
+ &cROOM-AFFECT&0 - Similar to a buff, for the room.
  &cSUMMON-ANY&0 - Player chooses from a list of mobs to summon.
  &cSUMMON-RANDOM&0 - Player summons a random mob from this list.
- &cMORPH&0 - Ability has morphs that require ir.
- &cAUGMENT&0 - Used for augments/enchanting.
- &cCUSTOM&0 - Ability is hard-coded, not parameterized.
+ &cTELEPORT&0 - Teleports the player.
+
+These types have help files with more details under ABILEDIT <TYPE>.
 
 See also: OLC ABILITIES, BUFF ABILITY, CRAFT ABILITY, DAMAGE ABILITY,
-   DOT ABILITY, PLAYER-TECH ABILITY, PASSIVE-BUFF ABILITY,
-   READY-WEAPONS ABILITY, COMPANION ABILITY, SUMMON ABILITY
+   DOT ABILITY, PLAYER-TECH ABILITY, PASSIVE-BUFF ABILITY, etc.
 #d
 "ABILEDIT WAITTYPE" "ABILEDIT WAIT TYPE" "WAIT TYPES"
 
@@ -1252,11 +2183,16 @@ Choose the wait type that best fits your ability:
 
 See also: COMMAND LAG, OLC ABILITIES
 #d
-"ABILITY EFFECTS"
+"ABILITY EFFECTS" "ABILEDIT EFFECTS"
 
-Some abilities have 'effects' which happen when the ability is activated.
+Usage:  .data add effect <type>
+
+Some abilities have 'effects' which happen when the ability is activated. These
+happen at the beginning of the ability.
+
 Available effect types are:
- &cdismount&0 - the player will be dismounted
+ &cdismount&0 - The player will be dismounted
+ &cdistrust from hostile&0 - Triggers distrust from the target's empire
 
 See also: ABILEDIT DATA
 #d
@@ -1315,23 +2251,24 @@ See also: OLC ADVENTURES
 Usage:  .flags [add | remove] <flags>
 
 The following adventure flags are available:
- IN-DEVELOPMENT - The adventure will not be instantiated in the world.
- LOCK-LEVEL-ON-ENTER - Instance level locks when a player enters.
- LOCK-LEVEL-ON-COMBAT - Instance level locks when a player fights.
- !NEARBY - Instances do not show up when players type nearby.
- ROTATABLE - Each instance will have a random orientation (whole zone rotates).
- CONFUSING-RANDOMS - The instancer will not logically match random exits.
- !NEWBIE - Will not spawn on newbie islands.
- NEWBIE-ONLY - Only spawns on newbie islands.
- NO-MOB-CLEANUP - Won't despawn mobs that got out of the instance on cleanup.
- EMPTY-RESET-ONLY - Won't reset while players are inside.
- CAN-DELAY-LOAD - Saves memory by not loading until a player arrives for the
+ &cIN-DEVELOPMENT&0 - The adventure will not be instantiated in the world.
+ &cLOCK-LEVEL-ON-ENTER&0 - Instance level locks when a player enters.
+ &cLOCK-LEVEL-ON-COMBAT&0 - Instance level locks when a player fights.
+ &c!NEARBY&0 - Instances do not show up when players type nearby.
+ &cROTATABLE&0 - Each instance will have a random orientation (whole zone rotates).
+ &cCONFUSING-RANDOMS&0 - The instancer will not logically match random exits.
+ &c!NEWBIE&0 - Will not spawn on newbie islands.
+ &cNEWBIE-ONLY&0 - Only spawns on newbie islands.
+ &cNO-MOB-CLEANUP&0 - Won't despawn mobs that got out of the instance on cleanup.
+ &cEMPTY-RESET-ONLY&0 - Won't reset while players are inside.
+ &cCAN-DELAY-LOAD&0 - Saves memory by not loading until a player arrives for the
     first time.
- IGNORE-WORLD-SIZE - Won't adjust the number of instances based on the world.
- IGNORE-ISLAND-LEVELS - Will spawn on an island without checking player levels.
- CHECK-OUTSIDE-FIGHTS - Makes sure nobody is fighting a mob from the instance
-    outside the adventure, before despawning.
- GLOBAL-NEARBY - Shows the nearest location from any distance.
+ &cIGNORE-WORLD-SIZE&0 - Won't adjust the number of instances based on the world.
+ &cIGNORE-ISLAND-LEVELS&0 - Will spawn on an island without checking player levels.
+ &cCHECK-OUTSIDE-FIGHTS&0 - Makes sure nobody is fighting a mob from the instance
+ &c   outside the adventure, before despawning.
+ &cGLOBAL-NEARBY&0 - Shows the nearest location from any distance.
+ &cDETECTABLE&0 - Can be detected with the ability action "detect adventures around".
 
 See also: ADVEDIT MINLEVEL, OLC ADVENTURES, OLC REMOVEINDEV
 #d
@@ -1660,7 +2597,7 @@ de-spawns.
 
 See also: ADVEDIT LINKING, %ADVENTURECOMPLETE%
 #d
-"ADVEDIT LINKING" "ADVEDIT LINK RULE" "LINKING RULES" "LINK RULES"
+"ADVEDIT LINKING" ""ADVEDIT LINK" "ADVEDIT LINK RULE" "LINKING RULES" "LINK RULES"
 
 Usage: linking add <type> <data> [flags]
        linking change <number> <field> <value>
@@ -1768,48 +2705,87 @@ been instantiated.
 
 See also: OLC ADVENTURES
 #d
+"ADVEDIT TEMPERATURE" "BEDIT TEMPERATURE" "REDIT TEMPERATURE" "SECTEDIT TEMPERATURE"
+
+Usage:  .temperature <type>
+
+This field determines how warm or cold the area will be. Most of these are
+relative to the temperature of the tile the adventure/building/room or sector
+is on.
+
+A room template will override the adventure's setting unless the room is set
+to "use climate", which will then defer to the adventure setting.
+
+Available temperature types:
+ &cuse climate&0 - Inherits its temperature from the climate of the tile it's on.
+ &calways comfortable&0 - Player receives no temperature penalties.
+ &cmilder&0 - Temperature is milder (less hot/cold) than local area.
+ &charsher&0 - Temperature is harsher (more hot/cold).
+ &cfreezing&0 - Always extremely cold (high penalties).
+ &ccold&0 - Always cold (low penalties).
+ &ccool&0 - Always cool (no penalties).
+ &ccooler&0 - Cooler than the local area.
+ &ccooler when hot&0 - Cooler than the local area when temperature is over 0.
+ &cneutral&0 - Temperature is between hot and cold.
+ &cwarm&0 - Always warm (no penalties).
+ &cwarmer&0 - Warmer than the local area.
+ &cwarmer when cold&0 - Warmer than the local area when temperature is below 0.
+ &chot&0 - Always hot (low penalties).
+ &csweltering&0 - Always extremely hot (high penalties).
+
+See also: OLC ADVENTURES, OLC BUILDINGS, OLC ROOM TEMPLATES, TEMPERATURE
+#d
 "AFFECT FLAGS" "AFF FLAGS" "AFFECT BITS" "AFF BITS"
 
 The following affect flags are available:
- BLIND - Unable to see.
- MAJESTY - Hard to attack.
- INFRA - Can see in the dark (glowing red eyes).
- SNEAK - Cannot be seen while moving.
- HIDE - Cannot be seen in room (without search).
- *CHARM - NPC will take orders from its master -- do not use this on items.
- INVIS - Can't be seen, except by magic.
- IMMUNE-PHYSICAL-DEBUFFS - Immune to any 'physical' debuffs.
- SENSE-HIDE - Can see hidden people.
- !PHYSICAL - Immune to physical damage -- do not use this on items.
- !TARGET - Cannot be targeted in the room -- do not use this on items.
- !SEE - Cannot be seen in the room at all -- do not use this on items.
- FLY - Is flying.
- !ATTACK - Cannot be attacked -- do not use this on items.
- IMMUNE-MAGICAL-DEBUFFS- Immune to any 'magical' debuffs.
- DISARMED - Has lost their weapon -- do not use this on items.
- HASTE - Has the effect of the Hasten ability.
- IMMOBILIZED - Cannot move -- do not use this on items.
- SLOW - Combat speed reduced, like the Slow spell.
- STUNNED - Can't participate in combat or move -- do not use this on items.
- STONED - Sees the world in strange, trippy colors.
- !BLOOD - Cannot spend blood points.
- CLAWS - Boosted vampire claws as barehand melee attack.
- DEATHSHROUD - Appears as a corpse and cannot act -- do not use this on items.
- EARTHMELD - Submerged in the earth and can't take normal actions -- do not use this on items.
- MUMMIFY - Immune to attack and cannot act -- do not use this on items.
- SOULMASK - Immune to soulsight.
- NO-TRACKS - Does not leave tracks.
- IMMUNE-POISON-DEBUFFS - Immune to any 'poison' debuffs.
- IMMUNE-MENTAL-DEBUFFS - Immune to any 'mental' debuffs.
- !STUN - Immune to stun effects.
- !DRINK-BLOOD - Can't be bitten/sired by vampires.
- DISTRACTED - Cannot perform timed actions.
- HARD-STUNNED - A stun that cannot be cleansed and does not trigger immunity.
- IMMUNE-DAMAGE - Cannot take damage -- do not use this on items.
- !WHERE - Cannot be found using the 'where' command.
- WATERWALK - Does not need to swim and doesn't drown. Unlike the AQUATIC mob
-   flag, this allows it to move on both water and land.
- LIGHT - Character provides light to the room.
+ &cBLIND&0 - Unable to see.
+ &cMAJESTY&0 - Hard to attack (based on Charisma or, if from an ability, the
+   linked trait on that ability).
+ &cINFRA&0 - Can see in the dark (glowing red eyes).
+ &cSNEAK&0 - Cannot be seen while moving.
+ &cHIDE&0 - Cannot be seen in room (without search).
+ &c*CHARM&0 - NPC will take orders from its master -- do not use this on items.
+ &cINVIS&0 - Can't be seen, except by magic.
+ &cIMMUNE-PHYSICAL-DEBUFFS&0 - Immune to any 'physical' debuffs.
+ &cSENSE-HIDDEN&0 - Can see hidden people.
+ &c!PHYSICAL&0 - Immune to physical damage -- do not use this on items.
+ &c!TARGET&0 - Cannot be targeted in the room -- do not use this on items.
+ &c!SEE&0 - Cannot be seen in the room at all -- do not use this on items.
+ &cFLYING&0 - Is flying.
+ &c!ATTACK&0 - Cannot be attacked -- do not use this on items.
+ &cIMMUNE-MAGICAL-DEBUFFS- Immune to any 'magical' debuffs.
+ &cDISARMED&0 - Has lost their weapon -- do not use this on items.
+ &cHASTE&0 - Has the effect of the Hasten ability.
+ &cIMMOBILIZED&0 - Cannot move -- do not use this on items.
+ &cSLOW&0 - Combat speed reduced, like the Slow spell.
+ &cSTUNNED&0 - Can't participate in combat or move -- do not use this on items.
+ &cSTONED&0 - Sees the world in strange, trippy colors.
+ &c!BLOOD&0 - Cannot spend blood points.
+ &cDEATHSHROUDED&0 - Appears as a corpse and cannot act -- do not use this on items.
+ &cEARTHMELDED&0 - Submerged in the earth and can't take normal actions -- do not use this on items.
+ &cMUMMIFIED&0 - Immune to attack and cannot act -- do not use this on items.
+ &cSOULMASK&0 - Players cannot see affect details on character.
+ &cNO-TRACKS&0 - Does not leave tracks.
+ &cIMMUNE-POISON-DEBUFFS&0 - Immune to any 'poison' debuffs.
+ &cIMMUNE-MENTAL-DEBUFFS&0 - Immune to any 'mental' debuffs.
+ &c!STUN&0 - Immune to stun effects.
+ &c!DRINK-BLOOD&0 - Can't be bitten/sired by vampires.
+ &cDISTRACTED&0 - Cannot perform timed actions.
+ &cHARD-STUNNED&0 - A stun that cannot be cleansed and does not trigger immunity.
+ &cIMMUNE-DAMAGE&0 - Cannot take damage -- do not use this on items.
+ &c!WHERE&0 - Cannot be found using the 'where' command.
+ &cWATERWALKING&0 - Does not need to swim and doesn't drown. Unlike the AQUATIC
+   mob flag, this allows it to move on both water and land.
+ &cLIGHT&0 - Character provides light to the room.
+ &cPOOR-REGENS&0 - Players regenerate very slowly. Mobs won't regenerate.
+ &cSLOWER-ACTIONS&0 - Timed actions (e.g. chopping) are slower.
+ &cHUNGRIER&0 - Player becomes hungry faster.
+ &cTHIRSTIER&0 - Player becomes thirsty faster.
+ &cIMMUNE-TEMPERATURE&0 - Player does not suffer effects of heat or cold.
+ &cAUTO-RESURRECT&0 - Will resurrect on death.
+ &cCOUNTERSPELL&0 - Will cancel the next counterspellable ability then remove its
+   affect. If applied by an ability, will also trigger skill gain and hooks.
+ &c!DISARM&0 - Cannot be disarmed.
 #d
 ARCHEDIT "OLC ARCHETYPES" "ARCHETYPE OLC" "ARCHETYPE EDITOR"
 
@@ -1881,8 +2857,9 @@ Usage:  .flags [add | remove] <flags>
 Archetype flags are properties that affect how the archetype behaves.
 
 Available flags:
- IN-DEV - Cannot be chosen or displayed.
- BASIC - Shows up in the basic set of archetypes (others must be searched).
+ &cIN-DEV&0 - Cannot be chosen or displayed.
+ &cBASIC&0 - Shows up in the basic set of archetypes (others must be searched).
+ &cLOCKED&0 - Requires the player/account to unlock it via a quest reward.
 
 See also: OLC ARCHETYPES
 #d
@@ -1975,6 +2952,292 @@ Available types:
  HOBBY - Some bonus skill points.
 
 See also: OLC ARCHETYPES
+#d
+ATTACKEDIT "OLC ATTACKS" "OLC ATTACK MESSAGES" "ATTACK OLC" "ATTACK MESSAGE OLC" "ATTACK EDIT"
+
+Usage:  .attack <command>
+        .<command>
+
+The .olc attack message editor allows you to add, edit, or delete messages from
+the system. It provides an in-game menu for controlling how attacks appear in
+combat.
+
+All commands in the editor are highlighted in yellow/green and placed inside
+<angle braces>. You can get help on any of these commands by typing:
+  &yHELP ATTACKEDIT <COMMAND>&0
+
+You can close an open editor with .abort or .save.
+
+Example:
+ > .attack edit 123
+ > .name Smoosh
+ > .save
+
+For notes on the mud's building rules, see HELP BUILDING GUIDE.
+
+See also: OLC, OLC ABORT, OLC EDIT, OLC EDITOR, OLC SAVE
+#d
+"ATTACKEDIT BACK"
+
+Usage:  .back
+
+This command sends you back to the main menu when you were editing one of the
+individual messages inside the attack message set.
+
+See also: OLC ATTACKS
+#d
+"ATTACKEDIT CLEAREXTENDED" "ATTACKEDIT CLEAR EXTENDED"
+
+Usage:  .clearextended
+
+When you remove the WEAPON and MOB flags from an attack, it no longer needs
+most of the properties that appeared when those flags were added. You can
+quickly remove these extended properties and hide them with the .clearextended
+command.
+
+See also: OLC ATTACKS
+#d
+"ATTACKEDIT COUNTSAS" "ATTACKEDIT COUNTS AS"
+
+Usage:  .countsas <name | vnum | none>
+
+This allows one attack type to count as another.
+
+For example, Backstab requires a stabbing weapon. This field allows you to
+make custom types that still count as 'stab'.
+
+See also: OLC ATTACKS
+#d
+"ATTACKEDIT DAMAGETYPE" "ATTACKEDIT DAMAGE TYPE"
+
+Usage:  .damagetype <type>
+
+See HELP DAMAGE TYPES for the list.
+
+This is only used on attacks with the WEAPON or MOB flag. Special attacks do
+not have this property.
+
+See also: OLC ATTACKS
+#d
+"ATTACKEDIT DEATHLOG" "ATTACKEDIT DEATH LOG"
+
+Usage:  .deathlog <string | default>
+
+This allows you to set a custom log when a character is killed by this type of
+attack.
+
+Death logs automatically start with the player's name and end with the
+location. You cannot override these parts.
+
+The default death log is: has been killed at
+
+See also: OLC ATTACKS
+#d
+"ATTACKEDIT FIRSTPERSON" "ATTACKEDIT FIRST-PERSON" "ATTACKEDIT FIRST PERSON"
+
+Usage:  .firstperson <string>
+
+This is the attack's verb in first-person. For example, a slashing weapon's
+first-person verb is "slash", as in "You slash the rat."
+
+This is only used on attacks with the WEAPON or MOB flag. Special attacks use
+the hit2char, hit2vict, and hit2room messages instead.
+
+See also: OLC ATTACKS, ATTACKEDIT THIRD PERSON, ATTACKEDIT FLAGS
+#d
+"ATTACKEDIT FLAGS" "ATTACK FLAGS"
+
+Usage:  .flags [add | remove] <flags>
+
+The following ability flags are available:
+ &cWEAPON&0 - Available for use as a weapon's type. Has extra properties.
+ &cMOBILE&0 - Available for use on mobs and morphs. Has extra properties.
+ &cDISARMABLE&0 - Vulnerable to DISARM affects.
+ &cAPPLY-POISON&0 - On a successful hit, can apply character's poison.
+ &cIGNORE-MISSING&0 - Some attacks don't require all messages; this flag
+   silences the auditor if you're certain they aren't needed.
+
+Note: The WEAPON and MOBILE properties add the following fields to the attack:
+   firstperson, thirdperson, noun, damagetype, weapontype, speed
+
+See also: OLC ATTACKS
+#d
+"ATTACKEDIT FULLSEARCH" "ATTACK FULLSEARCH"
+
+Usage:  .attack fullsearch -<field> <argument> <...>
+
+This command allows you to search for attack messages matching certain
+criteria. You can specify multiple fields if you want. Any arguments that don't
+start with a dash (-) are matched to the attack's name and strings.
+
+Fields:
+  &c-damagetype&0 - See DAMAGE TYPES
+  &c-flagged&0, &c-unflagged&0 - See ATTACKEDIT FLAGS
+  &c-speed&0 - Attacks where this speed is in its range
+  &c-vmin&0, &c-vmax&0 - VNUM range limits
+  &c-weapontype&0 - blunt, sharp, or magic
+
+Examples:
+ > .attack fullsearch -flagged sharp -speed 2.0
+ > .attack fullsearch slash -vmin 10000 -vmax 10099
+#d
+"ATTACKEDIT HIT2CHAR" "ATTACKEDIT HIT2VICT" "ATTACKEDIT HIT2ROOM"
+
+Usage:  .hit2char <message | none>
+        .hit2vict <message | none>
+        .hit2room <message | none>
+
+These are the messages shown when one character hits another one. This message
+is not used for basic weapon/mob attacks but should be provided for special
+attacks unless they're not shown.
+
+The attacker (char) uses $n, $e, $m, and $s pronouns.
+The victim (vict) uses $N, $E, $M, and $S pronouns.
+
+See also: OLC ATTACKS
+#d
+"ATTACKEDIT DIE2CHAR" "ATTACKEDIT DIE2VICT" "ATTACKEDIT DIE2ROOM"
+
+Usage:  .die2char <message | none>
+        .die2vict <message | none>
+        .die2room <message | none>
+
+These are the messages shown when one character kills another one. This message
+should usually be provided by all messages.
+
+The killer (char) uses $n, $e, $m, and $s pronouns.
+The victim (vict) uses $N, $E, $M, and $S pronouns.
+
+See also: OLC ATTACKS
+#d
+"ATTACKEDIT MISS2CHAR" "ATTACKEDIT MISS2VICT" "ATTACKEDIT MISS2ROOM"
+
+Usage:  .miss2char <message | none>
+        .miss2vict <message | none>
+        .miss2room <message | none>
+
+These are the messages shown when one character tries to hit another, but
+misses. This message should usually be provided by all messages, but may be
+omitted for damage abilities that don't miss.
+
+The attacker (char) uses $n, $e, $m, and $s pronouns.
+The victim (vict) uses $N, $E, $M, and $S pronouns.
+
+See also: OLC ATTACKS
+#d
+"ATTACKEDIT GOD2CHAR" "ATTACKEDIT GOD2VICT" "ATTACKEDIT GOD2ROOM"
+
+Usage:  .god2char <message | none>
+        .god2vict <message | none>
+        .god2room <message | none>
+
+These are the messages shown when a character tries to hit a god or immortal.
+This message should usually be provided by all messages, but may be omitted,
+for example, on DoTs that don't show tick messages to immortals.
+
+The attacker (char) uses $n, $e, $m, and $s pronouns.
+The god (vict) uses $N, $E, $M, and $S pronouns.
+
+See also: OLC ATTACKS
+#d
+"ATTACKEDIT MESSAGE"
+
+Usage:  .message <number>
+        .message add
+        .message copy <vnum>
+        .message duplicate <message number>
+        .message remove <number>
+
+Each attack set has multiple messages. In combat, these are chosen at random to
+provide variety. Use the .message command to choose a set to edit. Once inside
+the message menu, use .back to return to the main menu.
+
+The "copy" function will copy any message sets not already on this one, from
+another attack message by vnum. "Duplicate" copies a message inside this set
+instead.
+
+The main menu only displays a preview of each set. Usually the preview is the
+hit2char or die2char message, if available.
+
+See also: OLC ATTACKS, ATTACKEDIT HIT2CHAR, ATTACKEDIT DIE2CHAR,
+   ATTACKEDIT MISS2CHAR, ATTACKEDIT GOD2CHAR
+#d
+"ATTACKEDIT NAME"
+
+Usage:  .name <name>
+
+The name of a attack message is used to identify it. The name should be short
+and concise. These are often lowercase for weapon attacks, but may start with a
+capital letter for special attacks.
+
+See also: OLC ATTACKS
+#d
+"ATTACKEDIT NOUN" "ATTACKEDIT NOUN" "ATTACKEDIT NOUN"
+
+Usage:  .noun <string>
+
+This is the attack type as a noun, used in sentences describing it as your
+attack. For example, a slashing weapon's noun verb is "slash", as in "You
+demolish the rat with your slash" and "Pulcherrima demolishes the rat with her
+slash."
+
+The noun is not necessarily the same as the first-person string or the attack's
+name. For example, slice attacks use "swing".
+
+This is only used on attacks with the WEAPON or MOB flag. Special attacks use
+the hit2char, hit2vict, and hit2room messages instead.
+
+See also: OLC ATTACKS, ATTACKEDIT FLAGS
+#d
+"ATTACKEDIT SPEED" "ATTACKEDIT FAST" "ATTACKEDIT SLOW" "ATTACKEDIT NORMAL"
+
+Usage:  .speed fast <time>
+        .speed normal <time>
+        .speed slow <time>
+
+This lets you set the base speed for the attack. The base speed is 4.0 but
+most weapons attack faster than this. Character damage is adjusted for the
+weapon's speed so that overall damage is the same, but slower weapons deal it
+in larger hits while fast ones do a lot of small hits.
+
+A lower time is faster; these times are the number of seconds between auto-
+attacks. When 3 speeds are listed, like on "vstat attack", the order is
+[fast | normal | slow].
+
+Weapons with the SLOW flag and characters with the SLOW affect use the attack's
+slow speed. Weapons with the FAST flag and characters with HASTE similarly use
+the fast speed.
+
+This is only used on attacks with the WEAPON or MOB flag. Special attacks do
+not have this property because they're used on abilities instead.
+
+See also: OLC ATTACKS
+#d
+"ATTACKEDIT THIRDPERSON" "ATTACKEDIT THIRD-PERSON" "ATTACKEDIT THIRD PERSON"
+
+Usage:  .thirdperson <string>
+
+This is the attack's verb in third-person. For example, a slashing weapon's
+third-person verb is "slashes", as in "Dasylirion slashes the rat."
+
+This is only used on attacks with the WEAPON or MOB flag. Special attacks use
+the hit2char, hit2vict, and hit2room messages instead.
+
+See also: OLC ATTACKS, ATTACKEDIT THIRD PERSON, ATTACKEDIT FLAGS
+#d
+"ATTACKEDIT WEAPONTYPE" "ATTACKEDIT WEAPON TYPE"
+
+Usage:  .weapontype <type>
+
+The following weapon types are available:
+ &cblunt&0 - dull, not sharp
+ &csharp&0 - cutting, piercing
+ &cmagic&0 - spell
+
+This is only used on attacks with the WEAPON or MOB flag. Special attacks do
+not have this property.
+
+See also: OLC ATTACKS
 #d
 AUGEDIT "OLC AUGMENTS" "AUGMENT OLC" "AUGMENT EDITOR"
 
@@ -2116,7 +3379,21 @@ Usually an augment should be locked down to just one wear flag.
 
 See also: OEDIT WEAR, OLC AUGMENTS
 #d
-"BEDIT AFFECTS" "REDIT AFFECTS" "VEDIT AFFECTS"
+"BASE SECTOR" "BASE SECTORS" "BASE TERRAIN"
+
+A map tile's "base sector" is the sector underneath its current one. It is used
+for roads, buildings, and other temporary map changes. You can view it with
+"stat room".
+
+Most map tiles have the same base and current sectors.
+
+In some cases, tiles inherit properties from the base sector. For example,
+roads have the same climate as their base sector due to their
+INHERIT-BASE-CLIMATE flag.
+
+See also: SECTOR, STAT
+#d
+"BEDIT AFFECTS" "REDIT AFFECTS" "VEDIT AFFECTS" "ROOM AFFECTS" "ROOM AFFECT FLAGS"
 
 Usage:  .affects [add | remove] <flags>
 
@@ -2141,6 +3418,7 @@ Available affects:
  NO-WORKFORCE-EVOS - workforce won't do chores that would change the tile type
  MAPOUT-BUILDING - appears as a building on the graphical map
  NO-TRACKS - characters do not leave tracks here and the track command fails
+ PERMANENT-PAINT - paint shows different and players cannot repaint
 
 Some affects are managed by live data and commands (do not set affects with *):
  *HAS-INSTANCE - an adventure is linked here
@@ -2315,12 +3593,15 @@ Available flags:
  ROAD-ICON-WIDE - replaces the icon with wide road icons: ====
  ATTACH-BARRIER - icons with @u/@v will attach to this building like a barrier
  NO-CUSTOMIZE - cannot be customized by players
+ NO-ABANDON-WHEN-RUINED - won't be abandoned when it turns to ruins; only
+    normally used on buildings that are part of adventures like the Hamlet.
  SAIL - can enter this building with a boat
  ITEM-LIMIT - only a certain number of items can be dropped here
  LONG-AUTOSTORE - autostore takes 72 hours instead of 3 here
- HIGH-DEPLETION - has more resources than a normal tile
+ HIGH-DEPLETION - has more resources than a normal tile; does not work with
+    interactions that set their own depletion limit (ones that show #-max).
  !DELETE - will not be deleted for not having a homeroom
- NEED-BOAT - requires a boat, flying, waterwalk, or swimming to enter
+ NEED-BOAT - requires a boat, flying, waterwalking, or swimming to enter
  LOOK-OUT - can see the map using "look out"
  2ND-TERRITORY - counts as territory off the map (e.g. in a ship)
  UPGRADED - modifies other building types like SHIPYARD
@@ -2345,6 +3626,7 @@ Fields:
   &c-commands&0 - match the text of the commands line, if any
   &c-depletion&0 - see HELP OLC DEPLETION
   &c-designate&0 - see HELP DESIGNATE FLAGS
+  &c-extradesc&0 - has a specific keyword in its extra descs
   &c-fame -fameover -fameunder&0 - specific fame amount
   &c-flagged -unflagged&0 - see HELP BEDIT FLAGS
   &c-functions&0 - see HELP BEDIT FUNCTIONS
@@ -2380,15 +3662,12 @@ Available functions:
  UPGRADED - building/vehicle is an upgraded version (modifies other functions)
  ALCHEMIST - can brew and mix here
  APIARY - no current use
- BATHS - can use the bathe command here
  BEDROOM - boosts regen while sleeping
  CARPENTER - required by some crafts
- DIGGING - triggers the workforce digging chore (also need interaction)
  DOCKS - grants the seaport tech to the empire; counts as a dock for ships
- FORGE - can use the forge and reforge commands here
+ FORGE - can use the forge command here
  GLASSBLOWER - required for some crafts
  GUARD-TOWER - hostile toward enemy players, at range
- HENGE - allows Chant of Druids
  &rLIBRARY*&0 - can write and store books here
  MAIL - players can send mail here
  MILL - can use the mill command here
@@ -2402,9 +3681,9 @@ Available functions:
  SMELT - allows smelting here
  STABLE - can shear, milk, and barde animals here; animals in this building don't despawn
  SUMMON-PLAYER - allows the summon player command
- TAILOR - counts as tailor; can use refashion here
+ TAILOR - counts as tailor for crafts like weaving
  TANNERY - allows tanning here
- &rTAVERN*&0 - functions as a tavern (don't set this on the same building as DRINK)
+ TAVERN - for workforce
  &rTOMB*&0 - players can re-spawn here after dying
  TRADING-POST - access to global trade, e.g. a trading post
  VAULT - stores coins, can use the warehouse command for privileged storage
@@ -2420,6 +3699,7 @@ Available functions:
  OVEN - allows baking
  MAGIC-WORKSHOP - no code functions, but can be used for workforce
  TRAPPER - no code functions, but can be used for workforce
+ APOTHECARY - To be used for crafts like herbs and spices.
  
 &r* Note:&0 Functions marked with &r*&0 cannot be used on moving vehicles, only
 buildings and stationary vehicles.
@@ -2454,7 +3734,7 @@ Intelligence + 1 damage. You can determine how many hitpoints to give a
 building based on this.
 
 If a building takes more than 10% of its hitpoints in damage from an attack,
-it will also need its yearly maintenance resources to be fixed.
+it will also need its regular maintenance resources to be fixed.
 
 Common hitpoint levels:
  house: 8-24
@@ -2463,7 +3743,7 @@ Common hitpoint levels:
  mountain building: 128
  adventure: 1000 (to discourage sieging)
 
-See also: BEDIT YEARLY MAINTENANCE, FIRE, OLC BUILDINGS, SIEGE RITUAL
+See also: BEDIT RESOURCE MAINTENANCE, FIRE, OLC BUILDINGS, SIEGE RITUAL
 #d
 "BEDIT ICON"
 
@@ -2492,6 +3772,58 @@ Examples:
  > .icon .&&0[]&&?.
 
 See also: COLOR, OLC BUILDINGS
+#d
+"BEDIT INTERACTIONS" "BUILDING INTERACTIONS" "REDIT INTERACTION" "ROOM INTERACTIONS" "SECTEDIT INTERACTION" "SECTOR INTERACTIONS" "SECT INTERACTIONS" "CROPEDIT INTERACTION" "CROP INTERACTIONS" "VEDIT INTERACTION" "VEHICLE INTERACTIONS"
+
+Usage:  .interaction add <type> <quantity> <vnum> <percent> [exclusion code | restrictions]
+        .interaction change <number> <field> <value>
+        .interaction copy <from type> <from vnum>
+        .interaction remove <number | all>
+        .interaction move <number> <up | down>
+
+This command adds or removes an interaction. These are objects or mobs that are
+generated by certain commands.
+
+Room/vehicle interaction types:
+ &cDIG&0 * - Items received when using the dig action.
+ &cFORAGE&0 * - Items received when using the Forage ability. Note that if the
+   player gets nothing from a sector's forage list, they may also receive a
+   forage item from any wild crop that grows in the area.
+ &cPICK&0 * - Items found when picking.
+ &cHARVEST&0 - Items received when harvesting a crop.
+ &cGATHER&0 * - Items received from the gather action.
+ &cENCOUNTER&0 - Hostile mob loaded when a random encounter triggers.
+ &cCHOP&0 * - Things that can be found when chopping here.
+ &cFISH&0 * - Things that can be found by fishing here.
+ &cPAN&0 * - Things that can be found by panning here.
+ &cQUARRY&0 * - Things you can find by quarrying here.
+ &cRUINS-TO-BLD&0 - What type of ruins building appears here when it's ruined.
+   Only works on buildings, not vehicles. Quantity is ignored. Use #n in the
+   room title to indicate the name of the lost building.
+ &cRUINS-TO-VEH&0 - What type of ruins vehicle appears here when it's ruined.
+   May use #n in the keywords and short/long desc to indicate the name of the
+   building/vehicle that was ruined. Quantity is ignored.
+ &cPRODUCTION&0 * - Workforce will produce it (on a building or vehicle only).
+   Production is 1 at a time; quantity is used as the depletion limit.
+ &cSKILLED-LABOR&0 * - Workforce will produce it with Skilled Labor (bld/veh only).
+   Production is 1 at a time; quantity is used as the depletion limit.
+
+* Room interactions marked with an asterisk are 'one-at-a-time' interactions,
+  where the 'quantity' field is used as the maximum depletion, and players (or
+  workforce) receive 1 item at a time rather than the full quantity at once.
+  One-at-a-time interactions do not support the HIGH-DEPLETION room flag.
+
+Optional interaction restrictions:
+ &c-ability <vnum/"name">&0 - Player must have this ability.
+ &c-ptech <name>&0 - Player must have this player-tech.
+ &c-tech <name>&0 - Empire must have this tech.
+ &c-tool <name>&0 - Require a specific tool for this interaction.
+ &c-depletion <type>&0 - Uses this type of depletion (see OLC DEPLETION).
+
+Examples:
+> .interaction add FORAGE 1 12345 100 x -ability "Find Herbs"
+
+See also: OLC BUILDINGS, OLC CROPS, OLC SECTORS, OLC VEHICLES, INTERACTIONS
 #d
 "BEDIT MILITARY" "VEDIT MILITARY"
 
@@ -2535,30 +3867,30 @@ Available relationship types:
 
 See also: OLC BUILDINGS
 #d
-"BEDIT RESOURCES" "BEDIT YEARLY MAINTENANCE"
+"BEDIT RESOURCES" "BEDIT REGULAR MAINTENANCE" "BEDIT YEARLY MAINTENANCE"
 
 Usage:  .resource add <type> <amount> <vnum/name>
         .resource change <number> <quantity | vnum | name | flags> <value>
         .resource remove <number | all>
         .resource move <number> <up | down>
 
-This command adds materials to the building's "yearly maintenance" list. These
-are resources needed to maintain the building each year. If you don't set any,
-then the building does not require maintenance.
+This command adds materials to the building's regular maintenance list. These
+are resources needed to maintain the building each time depletions and
+maintenance are reset. If you don't set any, then the building does not require
+maintenance.
 
 This uses the ".resource" command to be consistent with other editors, but
 these are not the resources needed to build the vehicle in the first place --
 only to repair it.
 
 If a building takes damage from any source, and that damage is more than 10% of
-its hitpoints, it will also add the yearly-maintenance resources to the repair
-cost.
+its hitpoints, it will also add the maintenance resources to the repair cost.
 
-Buildings with only 1 hitpoint will never get their yearly maintenance cost, as
-even 1 year of decay will destroy them.
+Buildings with only 1 hitpoint will never get their maintenance cost, as even 1
+cycle of decay will destroy them.
 
-Note: Interior rooms do not normally require any yearly maintenance and don't
-take damage.
+Note: Interior rooms do not normally require any maintenance and don't take
+damage.
 
 See HELP OLC RESOURCES for more information.
 
@@ -2750,27 +4082,35 @@ You must leave the IN-DEVELOPMENT flag set until the recipe is ready to go
 live, at which point it becomes available to players who have the right skill.
 
 Available flags:
- POTTERY - always requires cooking fire, goes faster at potter's hut
- BUILDING - makes a building (not needed on the BUILD craft type)
- SKILLED-LABOR - workforce cannot work this craft unless you have Skilled Labor
- SKIP-CONSUMES-TO - won't run consumes-to interactions on any of the resources
+ &cPOTTERY&0 - always requires cooking fire, goes faster at potter's hut
+ &cBUILDING&0 - makes a building (not needed on the BUILD craft type)
+ &cSKILLED-LABOR&0 - workforce cannot work this craft unless you have Skilled Labor
+ &cSKIP-CONSUMES-TO&0 - won't run consumes-to interactions on any of the resources
     (for example: if you're mixing paints and don't want to refund the jars)
- FIRE - requires cooking fire
- SOUP - requires a container of water and creates a liquid instead of an item
- IN-DEVELOPMENT - only immortals can use this recipe
- UPGRADE - for building recipes only, marks this recipe as the cost to upgrade
+ &cFIRE&0 - requires cooking fire
+ &cSOUP&0 - requires a container of water and creates a liquid instead of an item
+ &cIN-DEVELOPMENT&0 - only immortals can use this recipe
+ &cUPGRADE&0 - for building recipes only, marks this recipe as the cost to upgrade
     to this building type from some other type
- DISMANTLE-ONLY - for building recipes only, this recipe allows the building
+ &cDISMANTLE-ONLY&0 - for building recipes only, this recipe allows the building
     to be dismantled, but not built; it won't show up in the build list
- IN-CITY-ONLY - a craft or building can only be made in a city radius
- VEHICLE - creates a vehicle instead of an item, see CRAFT VEHICLES
- LEARNED - requires the player/empire 'learn' a recipe to use it
- BY-RIVER - must be adjacent to a river
- REMOVE-PRODUCTION - removes this craft's resources from empire production
+ &cIN-CITY-ONLY&0 - a craft or building can only be made in a city radius
+ &cVEHICLE&0 - creates a vehicle instead of an item, see CRAFT VEHICLES
+ &cLEARNED&0 - requires the player/empire 'learn' a recipe to use it
+ &cBY-RIVER&0 - must be adjacent to a river
+ &cREMOVE-PRODUCTION&0 - removes this craft's resources from empire production
     counts. Used e.g. in smelting copper bars, to prevent smelt/separate loops.
     Does not work on vehicles/buildings.
- TAKE-REQUIRED-OBJ - takes the 'required object' when you start the craft, and
+ &cTAKE-REQUIRED-OBJ&0 - takes the 'required object' when you start the craft, and
     may refund it when dismantled (unless the object is 1-USE)
+ &cDISMANTLE-WITHOUT-ABILITY&0 - buildings and vehicles can be dismantled without
+    the original ability
+ &cTOOL-OR-FUNCTION&0 - with this flag, requires the tool OR the function, not
+    both of them
+ &cUNDAMAGED-DISMANTLE-REFUND&0 - refunds all materials when dismantled while
+    undamaged (instead of 90%)
+ &cFULL-DISMANTLE-REFUND&0 - refunds all materials when dismantled no matter
+    what the health (instead of 20%-90%)
 
 Additional flags are available via the REQUIRESFUNCTION option.
 
@@ -2932,6 +4272,7 @@ Available types are:
  MANUFACTURE
  BAKE - requires a bakery or oven
  MAKE
+ PROCESS
 
 Note: The SOUP and VEHICLE craft flags both also modify the recipe.
 
@@ -3104,9 +4445,14 @@ If a crop has multiple climate flags, the sector must match ALL of them for the
 crop to be planted there, unless the crop has the ANY-LISTED-CLIMATE flag, in
 which case they must only match at least 1 climate.
 
+For sectors, you can test climate temperatures with ".checktemp" while editing
+a sector.
+
 Climates:
  &chot&0 - Hotter than normal for this type (modifier).
- &ccold&0 - Coler than normal for this type (modifier).
+ &ccold&0 - Colder than normal for this type (modifier).
+ &cmild&0 - Milder temperatures than normal for this type (modifier).
+ &charsh&0 - Harsher temperatures than normal for this type (modifier).
  &chigh&0 - Higher than normal for this type (modifier), e.g. mountain peak.
  &clow&0 - Lower than normal for this type (modifier).
  &cmagical&0 - Magical in some way (enchanted forest).
@@ -3120,8 +4466,28 @@ Climates:
  &cforest&0 - Any kind of forest or jungle.
  &cgrassland&0 - Plains, savannah, or steppe.
  &cwaterside&0 - Adjacent (or near) fresh water.
+ &cfrozen water&0 - Would be water but is currently frozen.
 
-See also: OLC CROPS, OLC SECTORS
+See also: OLC CROPS, OLC SECTORS, SECTEDIT CHECK TEMPERATURE
+#d
+"CROPEDIT CUSTOM" "CROPEDIT CUSTOM MESSAGES"
+
+Usage:  .custom add <type> <message>
+        .custom change <number> <type | message> <value>
+        .custom move <number> <up | down>
+        .custom remove <number | all>
+        .custom sort
+
+You can set custom messages on crops for various actions.
+
+If you set more than one message of the same type, one will be chosen at
+random each time.
+
+Message types:
+ &cmagic-growth&0 - Shown to the whole room when a MAGIC-GROWTH evolution occurs.
+   If the sector also has a magic-growth message, only the crop's will show.
+
+See also: OLC CROPS
 #d
 "CROPEDIT FLAGS" "CROP FLAGS"
 
@@ -3130,13 +4496,14 @@ Usage:  .flags [add | remove] <flags>
 Crop flags determine some various properties about crops.
 
 Available flags:
- REQUIRES-WATER - Can only be planted within 4 tiles of fresh water
- ORCHARD - Use 'pick' and 'chop' interactions instead of 'harvest'
- !WILD - Won't spawn in the wild
- NEWBIE-ONLY - Only spawns on newbie islands (can be planted anywhere)
- !NEWBIE - Does not spawn on newbie islands
- ANY-LISTED-CLIMATE - Only 1 of the climate flags must match to plant this.
- NO-GLOBAL-SPAWNS - Won't use global spawn lists.
+ &cREQUIRES-WATER&0 - Can only be planted within 4 tiles of fresh water
+ &cORCHARD&0 - Use 'pick' and 'chop' interactions instead of 'harvest'
+ &c!WILD&0 - Won't spawn in the wild
+ &cNEWBIE-ONLY&0 - Only spawns on newbie islands (can be planted anywhere)
+ &c!NEWBIE&0 - Does not spawn on newbie islands
+ &cANY-LISTED-CLIMATE&0 - Only 1 of the climate flags must match to plant this.
+ &cNO-GLOBAL-SPAWNS&0 - Won't use global spawn lists.
+ &cLOCK-ICON&0 - a random icon is chosen when the crop grows, and is kept
 
 See also: OLC CROPS
 #d
@@ -3150,6 +4517,7 @@ dash (-) are matched to the crop's name, title, and icons.
 
 Fields:
   &c-climate&0 - see HELP CROPEDIT CLIMATE
+  &c-extradesc&0 - has a specific keyword in its extra descs
   &c-flagged&0, &cunflagged&0 - see HELP CROPEDIT FLAGS
   &c-interaction&0 - has a specific type, see HELP CROPEDIT INTERACTION
   &c-mapout&0 - color name, see HELP CROPEDIT MAPOUT
@@ -3452,9 +4820,10 @@ See also: FACTION, OLC FACTIONS, STRING EDITOR
 Usage:  .flags [add | remove] <flags>
 
 The following faction flags are available:
- IN-DEVELOPMENT - The faction can't be seen by players, and won't gain rep.
- REP-FROM-KILLS - Players can gain/lose rep by killing faction mobs.
- HIDE-IN-LIST - Does not appear in the 'factions' command for players.
+ &cIN-DEVELOPMENT&0 - The faction can't be seen by players, and won't gain rep.
+ &cREP-FROM-KILLS&0 - Players can gain/lose rep by killing faction mobs.
+ &cHIDE-IN-LIST&0 - Does not appear in the 'factions' command for players.
+ &cHIDE-ON-MOB&0 - Does not appear below the mob description.
 
 See also: OLC FACTIONS, OLC REMOVEINDEV, RELATIONSHIP FLAGS
 #d
@@ -3580,7 +4949,7 @@ See also: OLC GENERICS, DOLLAR SIGN CODES
 Generic 'affects' are used by spells, abilities, and scripts to show names on
 the affect list, and to show messages when these effects wear off.
 
-Affects have 4 properties:
+Affects have several properties:
   <&yapply2char&0> An optional message shown to the character when the affect
     is applied.
   <&yapply2room&0> An optional message shown to the room when the affect is
@@ -3589,6 +4958,9 @@ Affects have 4 properties:
   <&ywearoff2room&0> An optional message shown to the rest of the room.
   <&ylookatchar&0> An optional message shown after description on 'look name'.
   <&ylookatroom&0> An optional message shown after the character on 'look'.
+
+Optional properties used for damage-over-time effects (DoTs):
+  <&ydotattack&0> Custom attack message type.
 
 You can use <&ystandardwearoff&0> to add the normal wear-off message. This only
 adds a message for the character -- normal effects don't show anything to the
@@ -3696,16 +5068,27 @@ You must set 2 properties on currency:
 
 See also: OLC GENERICS, GENEDIT PLURAL
 #d
+"GENEDIT DOTATTACK" "GENEDIT DOT ATTACK"
+
+Usage:  .dotattack <vnum | name | none>
+
+This is used on affect generics that are used for damage-over-time (DoT).
+If this field is set, the DoT will use the specified attack message instead of
+its default.
+
+See also: OLC GENERICS, GENERIC AFFECTS
+#d
 "GENERIC LIQUIDS" "LIQUID GENERICS" "LIQUID EDITOR" "GENEDIT LIQUID" "GENEDIT COLOR" "GENEDIT HUNGER" "GENEDIT THIRST" "GENEDIT DRUNK"
 
 The 'liquid' generic type is used in drink containers and resource lists.
 
-You must set 5 properties on liquids:
+You must set 6 properties on liquids:
   <&yliquid&0> the name as it appears in descriptions (a bottle of 'water')
   <&ycolor&0> the color of the liquid when the player looks in the bottle
   <&yhunger&0> number of hours to satiate hunger per unit of liquid
   <&ythirst&0> number of hours to satiate thirst per unit
   <&ydrunk&0> number of hours to cause drunknness per unit
+  <&yliquidflags&0> optional flags for liquids (see LIQUID FLAGS)
 
 Stock liquids can be found in the 0-99 vnum block, but new liquids should
 usually be added within an adventure zone's vnums.
@@ -3720,9 +5103,41 @@ The following flags for generics are available:
  &cBASIC&0 - For components, only basic components can substitute for simpler
     component types (fine pillar will substitute for pillar because of BASIC).
  &cIN-DEVELOPMENT&0 - Will not show up for players. This currently only applies
-    to MOON generics.
+    to MOON and LANGUAGE generics.
+ &cSHOW-ADVENTURE&0 - Shows what adventure it came from on some types (currency).
 
 See also: OLC GENERICS
+#d
+"GENEDIT FULLSEARCH" "GENERIC FULLSEARCH"
+
+Usage:  .gen fullsearch -<field> <argument> <...>
+
+This command allows you to search for generics matching certain criteria. You
+can specify multiple fields if you want. Any arguments that don't start with a
+dash (-) are matched to the generic's name and strings.
+
+Fields:
+  &c-flagged&0, &cunflagged&0 - see HELP GENEDIT FLAGS
+  &c-type&0 - see HELP GENEDIT TYPE
+  &c-vmin&0, &c-vmax&0 - VNUM range limits
+
+Liquid fields (see HELP GENERIC LIQUID):
+  &c-drunk&0, &c-drunkover&0, &c-drunkunder&0 - Search drunk values
+  &c-hunger&0, &c-hungerover&0, &c-hungerunder&0 - Search hunger values
+  &c-thirst&0, &c-thirstover&0, &c-thirstunder&0 - Search thirst values
+  &c-liquidflagged&0 - See GENEDIT LIQUID FLAGS
+
+Moon fields (see HELP GENERIC MOON):
+  &c-mooncycle&0, &c-mooncycleover&0, &c-mooncycleunder&0 - Search moon cycle values
+
+Examples:
+ > .gen fullsearch -type LIQUID brown
+ > .gen fullsearch -flagged BASIC -type COMPONENT
+ > .gen fullsearch -type MOON -vmin 10000 -vmax 10099
+
+To search other fields, you can generally use the normal "search" option for
+other OLC types. For example, to find component generics with obj 6423 ("some
+sticks") as their representative item, use ".o search 6423".
 #d
 "GENEDIT ITEM"
 
@@ -3755,6 +5170,18 @@ EmpireMUD comes with language [150] English and all characters start with this
 language. Add the IN-DEV flag to disable it.
 
 See also: OLC GENERICS, SPEAK, SET LANGUAGE, SHOW LANGUAGES
+#d
+"GENEDIT LIQUIDFLAGS" "GENEDIT LIQUID FLAGS" "LIQUID FLAGS"
+
+Usage:  .liquidflags [add | remove] <flags>
+
+The following flags are available for liquids:
+ &cWATER&0 - Counts as water for certain game commands (douse).
+ &cCOOLING&0 - Drinking this liquid makes the player cooler, if warm.
+ &cWARMING&0 - Drinking this liquid makes the player warmer, if cold.
+ &cBLOOD&0 - Counts as blood for vampires.
+
+See also: OLC GENERICS, GENERIC LIQUIDS
 #d
 "GENERIC MOON" "MOON GENERICS" "MOON EDITOR" "GENEDIT CYCLE"
 
@@ -3975,6 +5402,30 @@ table is for.
 
 See also: OLC GLOBALS
 #d
+"GEDIT OBJEXCLUDE"
+
+Usage:  .objexclude [add | remove] <flags>
+
+A 'Obj Interactions' global table may have obj flags set to exclude. If so, the
+global table is only used if a obj DOES NOT have all the flags in this set.
+For example, you can use it to create a set that does not apply to LARGE objs.
+
+These are the same set of flags from HELP OEDIT FLAGS.
+
+See also: OLC GLOBALS
+#d
+"GEDIT OBJFLAGS"
+
+Usage:  .objflags [add | remove] <flags>
+
+A 'Obj Interactions' global table may have obj flags set. If so, the global
+table is only used if a obj has ALL of the flags set here. For example, you
+might set a global table to only apply to LARGE objs.
+
+These are the same set of flags from HELP OEDIT FLAGS.
+
+See also: OLC GLOBALS
+#d
 "GEDIT PERCENT" CUMULATIVE-PRC
 
 Usage:  .percent <amount>
@@ -4050,6 +5501,8 @@ Types:
  Mine Data - Used for MINE interactions, see HELP MINE DATA GLOBAL.
  Newbie Gear - Given/equipped to all new players.
  Map Spawns - Global spawn lists for map tiles, based on climate.
+ Obj Interactions - Used for global DISENCHANT when an item doesn't have its
+   own disenchant results.
 
 See also: OLC GLOBALS
 #d
@@ -4120,6 +5573,22 @@ Notes on Mob Interactions globals:
 
 See also: BUILDING GUIDE, OLC GLOBALS
 #d
+"GLOBAL OBJ INTERACTIONS" "OBJ INTERACTIONS GLOBAL" "OBJ INTERACTION GLOBAL"
+
+The 'Obj Interactions' Global allows DISENCHANT globals to be applied to all
+objects in a matching range. This can be used for disenchant tables that are
+adventure-wide, or global.
+
+Notes on Obj Interactions globals:
+- Only DISENCHANT object interactions are supported.
+- The min/max levels, if any, apply to the items (not the player disenchanting
+  the obj).
+- Global disenchant tables are only used if an item has no DISENCHANT results
+  itself, either because it has none configured, or because the random roll
+  didn't result in any from its own list.
+
+See also: BUILDING GUIDE, OLC GLOBALS
+#d
 IN-DEVELOPMENT "IN DEVELOPMENT" IN-DEV
 
 The IN-DEVELOPMENT flag prevents an augment, craft, global, or other type from
@@ -4172,7 +5641,7 @@ Scaling based on item types:
  pack - the "capacity" value
 
 The following attributes never scale: greatness, age, crafting, blood-upkeep,
-night-vision
+night-vision, nearby-range, where-range
 
 Applies and item values of 0 are ignored and do not get any points assigned.
 
@@ -4190,7 +5659,7 @@ You can get help on any of the mapeditor commands with &yHELP MAPEDIT <COMMAND>&
 The following commands are available:
  complete - Finishes the building you're standing in.
  convert2newbie - Converts an island's terrains to/from newbie terrains.
- decay - Performs 1 year of decay (building, trench, mine data) on the tile.
+ decay - Performs 1 cycle of decay (building, trench) on the tile or vehicle.
  decustomize - Removes custom icon, name, and description.
  deleteexit - Removes an exit (careful about cutting off building interiors).
  deleteroom - Deletes the room you're standing in (interior rooms only).
@@ -4204,7 +5673,7 @@ The following commands are available:
  populate - Forces a building/room to populate an npc, if possible.
  remember - Stores the current terrain as the 'natural terrain'.
  roomtype - Change the type of an interior room.
- ruin - Turn a building to ruins.
+ ruin - Turn a building or vehicle to ruins.
  terrain - Change the tile you're standing on.
  unclaimable - Make a tile or square of tiles unclaimable (or not).
 
@@ -4257,8 +5726,8 @@ See also: MAP OLC, ISLAND COMMAND
 
 Usage:  .map decay
 
-Performs 1 year of decay (building, trench, mine data) on the tile, as if the
-new year had just rolled over.
+Performs 1 cycle of decay (building, trench, mine data) on the tile, as if the
+depletion/maintenance cycle had just rolled over.
 
 See also: MAP OLC
 #d
@@ -4413,7 +5882,8 @@ Usage:  .map remember [island]
 
 This command will store the current sector of the map tile you're in (or the
 entire island you're on) as the "natural" sector. This can be used to change
-how a newbie island will be restored at the end of the year, for example.
+how a newbie island will be restored at the end of the depletion/maintenance
+cycle, for example.
 
 Building and adventure tiles are ignored during this command.
 
@@ -4495,43 +5965,24 @@ See also: FACTION, OLC FACTIONS, SHOPEDIT ITEM, OLC MOBILES, OLC SHOPS
 #d
 "MEDIT ATTACK" "ATTACK TYPES"
 
-Usage:  .attack <type>
+Usage:  .attack <name | vnum>
 
 This command sets the base attack type of the mobile. It will deal damage as
 if it was using a weapon of that type.
 
-For humans with no weapon, use #16 hit.
+Use ".attack list" or "vnum attack" to find available attack types.
 
-The following attack types are available:
- 1. RESERVED - do not use
- 2. slash - sword
- 3. slice - axe
- 4. jab - rapier
- 5. stab - dagger
- 6. pound - rock
- 7. hammer - hammer
- 8. whip - whip weapon or tentacle-whip
- 9. pick - as for mining
-10. bite - animals
-11. claw - fist weapons; also used by animals
-12. kick - animals
-13. fire - physical fire like a torch
-14. vampire claws
-15. crush - animals or giants
-16. hit - normal punching (no weapon, or disarmed physical weapon)
-17. magic fire - fireball
-18. lightning staff
-19. burn staff
-20. agony staff
-21. magic frost - chill
-22. magic shock - shock
-23. magic light - flash
-24. sting - animals
-25. swipe - animals, giants, etc
-26. tail swipe - animals
-27. peck - animals
-28. gore - animals
-29. mana blast - normal magical attack (e.g. disarmed mage)
+Common attack vnums:
+  Humans with no weapon: [15] hit, [11] kick, [13] vampire claws, [37] punch
+  Sharp weapons: [1] slash, [2] slice, [3] jab, [4] stab
+  Blunt weapons: [5] pound, [6] hammer, [7] whip
+  Magic weapons: [16] fire, [20] frost, [21] shock, [22] light, [28] mana blast
+  Staff weapons: [17] lightning staff, [18] burn staff, [19] agony staff
+  Ranged weapons: [29] bow, [30] crossbow, [31] pistol, [32] musket,
+     [34] sling, [25] spear-thrower
+  Tool types: [2] slice, [8] pick, [12] fire/torch
+  Animal attacks: [9] bite, [10] claw, [11] kick, [23] sting, [24] swipe,
+     [25] tail swipe, [26] peck, [27] gore, [33] fire breath, [36] animal whip
 
 See also: OLC MOBILES
 #d
@@ -4541,6 +5992,7 @@ Usage:  .custom add <type> <message>
         .custom change <number> <type | message> <value>
         .custom move <number> <up | down>
         .custom remove <number | all>
+        .custom sort
 
 You can set custom messages on mobs, which are shown at different times
 depending upon the type of message.
@@ -4577,47 +6029,47 @@ that you cannot remove flag #4 ISNPC -- this indicates the mob is an NPC.
 Never set a flag marked with an * (asterisk).
 
 Available mob flags:
- BRING-A-FRIEND - Assists any non-charmed mob in combat. Without this, mobs
+ &cBRING-A-FRIEND&0 - Assists any non-charmed mob in combat. Without this, mobs
    will still assist other mobs in their same follow-chain if no players are
    in the chain and if neither are charmed.
- SENTINEL - Stays in one room and never wanders.
- AGGR - Aggressive; will attack players.
- ISNPC - Is an NPC (this is always set).
- MOUNTABLE - Can be ridden by players.
- MILKABLE - Can be milked in a stable.
- SCAVENGER - Eats corpses off the ground (not larger than the mob).
- NO-CORPSE - Leaves no corpse when it dies (loot falls on the ground).
- TIED - Tied to a hitching post; will not wander unless untied; does not despawn.
- ANIMAL - Counts as an animal for herding, tying, etc.
- MOUNTAIN-WALK - Can cross mountain tiles.
- AQUATIC - Can cross water tiles, but won't move on land. (see WATERWALK)
- *PLURAL - Uses the pronouns 'their', 'they', and 'them' in act messages.
- NO-ATTACK - Mob can be in combat, but will not hit
- SPAWNED - De-spawns after 5 minutes if no players are nearby.
- CHAMPION - Will rescue its leader in combat.
- EMPIRE - Will not be saved through reboots.
- * - Unused (formerly FAMILIAR)
- *PICKPOCKETED - Has already been pickpocketed; cannot be pickpocketed again.
- CITYGUARD - Will assist allies from the same empire. This will only work if it is spawned by the empire system.
- PURSUE - Will pursue players who flee in combat.
- HUMAN - Counts as a human for various commands.
- VAMPIRE - Counts as a vampire for various commands.
- CASTER - Has a mana pool; counts as a caster.
- TANK - Has a larger health pool and better tank attributes.
- DPS - Deals more damage and has better combat attributes.
- HARD - More difficult than other mobs of the same level.
- GROUP - Much more difficult, requires a group.
- *EXTRACTED - Do not set.
- !LOOT - Will not drop any loot.
- !TELEPORT - Cannot teleport to this mob.
- !EXP - Players get no experience from using abilities against this mob.
- !RESCALE - Mob will not rescale after its initial scaling, e.g. if you set
+ &cSENTINEL&0 - Stays in one room and never wanders.
+ &cAGGR&0 - Aggressive; will attack players.
+ &cISNPC&0 - Is an NPC (this is always set).
+ &cMOUNTABLE&0 - Can be ridden by players.
+ &cMILKABLE&0 - Can be milked in a stable.
+ &cSCAVENGER&0 - Eats corpses off the ground (not larger than the mob).
+ &cNO-CORPSE&0 - Leaves no corpse when it dies (loot falls on the ground).
+ &cTIED&0 - Tied to a hitching post; will not wander unless untied; does not despawn.
+ &cANIMAL&0 - Counts as an animal for herding, tying, etc.
+ &cMOUNTAIN-WALK&0 - Can cross mountain tiles.
+ &cAQUATIC&0 - Can cross water tiles, but won't move on land. (see WATERWALKING)
+ &c*PLURAL&0 - Uses the pronouns 'their', 'they', and 'them' in act messages.
+ &cNO-ATTACK&0 - Mob can be in combat, but will not hit
+ &cSPAWNED&0 - De-spawns after 5 minutes if no players are nearby.
+ &cCHAMPION&0 - Will rescue its leader in combat.
+ &cEMPIRE&0 - Will not be saved through reboots.
+ &c*PICKPOCKETED&0 - Has already been pickpocketed; cannot be pickpocketed again.
+ &cCITYGUARD&0 - Will assist allies from the same empire. This will only work if it is spawned by the empire system.
+ &cPURSUE&0 - Will pursue players who flee in combat.
+ &cHUMAN&0 - Counts as a human for various commands.
+ &cVAMPIRE&0 - Counts as a vampire for various commands.
+ &cCASTER&0 - Has a mana pool; counts as a caster.
+ &cTANK&0 - Has a larger health pool and better tank attributes.
+ &cDPS&0 - Deals more damage and has better combat attributes.
+ &cHARD&0 - More difficult than other mobs of the same level.
+ &cGROUP&0 - Much more difficult, requires a group.
+ &c*EXTRACTED&0 - Do not set.
+ &c!LOOT&0 - Will not drop any loot.
+ &c!TELEPORT&0 - Cannot teleport to this mob.
+ &c!EXP&0 - Players get no experience from using abilities against this mob.
+ &c!RESCALE&0 - Mob will not rescale after its initial scaling, e.g. if you set
     specific attributes on it after it loaded. Note that it will still scale
     the first time, so ensure that it is scaled before changing attributes.
- SILENT - Mob will not display custom strings while this flag is on.
- COINS - Mob will drop coins on death/pickpocket.
- NO-COMMAND - Cannot be commanded/ordered.
- NO-UNCONSCIOUS - Cannot be knocked unconscious (from toggle autokill).
+ &cSILENT&0 - Mob will not display custom strings while this flag is on.
+ &cCOINS&0 - Mob will drop coins on death/pickpocket.
+ &cNO-COMMAND&0 - Cannot be commanded/ordered.
+ &cNO-UNCONSCIOUS&0 - Cannot be knocked unconscious (from toggle autokill).
+ &cIMPORTANT&0 - won't be hit by an immortal "purge" with no args; can be used by scripts
 
 See also: OLC MOBILES
 #d
@@ -4655,7 +6107,7 @@ To search other fields, you can generally use the normal "search" option for
 other OLC types. For example, to find all mobs with the "Dismissable"
 trigger, use ".t search 9901".
 #d
-INTERACTION "MEDIT INTERACTION" "BEDIT INTERACTION" "OEDIT INTERACTION" "REDIT INTERACTION" "SECTEDIT INTERACTION" "CROPEDIT INTERACTION" "GEDIT INTERACTION" "VEDIT INTERACTION" INTERACTIONS INTERACT
+"MEDIT INTERACTIONS" "MOB INTERACTIONS" "MOBILE INTERACTIONS"
 
 Usage:  .interaction add <type> <quantity> <vnum> <percent> [exclusion code | restrictions]
         .interaction change <number> <field> <value>
@@ -4664,91 +6116,26 @@ Usage:  .interaction add <type> <quantity> <vnum> <percent> [exclusion code | re
         .interaction move <number> <up | down>
 
 This command adds or removes an interaction. These are objects or mobs that are
-generated by certain commands. Some are only used on mobs, while others are
-only used on rooms. You can copy interactions from other mobs, buildings,
-rooms, sectors, crops, and vehicles -- this may save you time if many are the
-same.
+generated by certain commands.
 
 Mob interaction types:
- &cBUTCHER&0 - Items received when the Butcher ability is used.
- &cSKIN&0 - Items received via the skin command.
+ &cBUTCHER&0 - Items received when the butcher command is used on mob's corpse.
+ &cSKIN&0 - Items received via the skin command is used on mob's corpse.
  &cSHEAR&0 - Items received when the shear command is used in a stable.
  &cBARDE&0 - Mob loaded when the Barde ability is used in a stable.
  &cLOOT&0 - Items dropped into the corpse when the mob is killed.
  &cPICKPOCKET&0 - Items gained from the pickpocket skill.
  &cTAME&0 - Becomes another mob when it is 'tamed'.
- 
-Object interaction types:
- &cLIGHT&0 - Item something is converted into when lit on fire.
- &cCOMBINE**&0 - Combine multiple copies of an obj into another obj (quantity is the
-    number required, rather than number you get).
- &cSEPARATE**&0 - Split this item into multiple other items.
- ** Both COMBINE and SEPARATE should be set exclusive, as they will extract
-    the original item.
- &cSCRAPE&0 - Items you get when scraping this item (tree -> log).
- &cSAW&0 - Items you get when sawing this item (tree -> lumber).
- &cTAN&0 - Items you get when tanning this item (skin -> leather).
- &cCHIP&0 - What you get for chipping at the item.
- &cSEED&0 - Gives an item when seeded.
- &cDECAYS-TO&0 - Becomes a different object when its timer expires (e.g. ashes).
- &cCONSUMES-TO&0 - Becomes a different object when eaten/used up (e.g. a jar).
- &cIDENTIFIES-TO&0 - Becomds a different object when identified (e.g. a rock).
-
-Room/vehicle interaction types:
- &cDIG&0 - Items received when using the dig action.
- &cFORAGE&0 - Items received when using the Forage ability. Note that if the player
-   gets nothing from a sector's forage list, they may also receive a forage
-   item from any wild crop that grows in the area.
- &cPICK&0 * - Items found when picking.
- &cHARVEST&0 - Items received when harvesting a crop.
- &cGATHER&0 - Items received from the gather action.
- &cENCOUNTER&0 - Hostile mob loaded when a random encounter triggers.
- &cCHOP&0 - Things that can be found when chopping here.
- &cFISH&0 - Things that can be found by fishing here.
- &cPAN&0 - Things that can be found by panning here.
- &cQUARRY&0 * - Things you can find by quarrying here.
- &cRUINS-TO-BLD&0 - What type of ruins building appears here when it's ruined.
-   Only works on buildings, not vehicles. Quantity is ignored. Use #n in the
-   room title to indicate the name of the lost building.
- &cRUINS-TO-VEH&0 - What type of ruins vehicle appears here when it's ruined.
-   May use #n in the keywords and short/long desc to indicate the name of the
-   building/vehicle that was ruined. Quantity is ignored.
- &cPRODUCTION&0 * - Workforce will produce it (on a building or vehicle only).
-   Production is 1 at a time; quantity is used as the depletion limit.
- &cSKILLED-LABOR&0 * - Workforce will produce it with Skilled Labor (bld/veh only).
-   Production is 1 at a time; quantity is used as the depletion limit.
-
-* Room interactions marked with an asterisk are 'one-at-a-time' interactions,
-  where the 'quantity' field is used as the maximum depletion, and players (or
-  workforce) receive 1 item at a time rather than the full quantity at once.
-
-The percent may be anywhere from 0.01 to 100.00 and if the quantity is greater
-than 1, the percent is only checked once for the entire quantity. If you want
-each copy of an item to have its own percent roll, list them separately as
-quantity 1.
-
-The exclusion code (optional) may be any letter, which changes how random
-interactions are chosen. All items with the same exclusion code have a cumu-
-lative roll (meaning if the percents add up to 100, one of them is guaranteed)
-but only one item from the same exclusion set will ever pass. The rest will
-fail. If you don't set an exclusion code, the interaction is not exclusive and
-always gets its own percent roll.
-
-You can use '.interact move' to rearrange entries. Interactions are always
-processed from top to bottom.
 
 Optional interaction restrictions:
  &c-ability <vnum/"name">&0 - Player must have this ability.
- &c-boss&0 - Mob must have HARD+GROUP flags; obj must have HARD- and GROUP-DROP.
- &c-hard&0 - Mob must have only HARD flag, or object must have only HARD-DROP.
- &c-group&0 - Mob must have only GROUP flag, or object must have only GROUP-DROP.
- &c-normal&0 - Mob/obj must have no HARD or GROUP flag.
+ &c-boss&0 - Mob must have HARD+GROUP flags.
+ &c-hard&0 - Mob must have only HARD flag.
+ &c-group&0 - Mob must have only GROUP flag.
+ &c-normal&0 - Mob must have no HARD or GROUP flag.
  &c-ptech <name>&0 - Player must have this player-tech.
  &c-tech <name>&0 - Empire must have this tech.
- &c-depletion <type>&0 - Uses this type of depletion (see OLC DEPLETION).
-
-Examples:
-> .interaction add FORAGE 1 12345 100 x -ability "Find Herbs"
+ &c-tool <name>&0 - Require a specific tool for this interaction.
 
 Example of a rare result from barding (order matters here):
  1. BARDE: 1x an epic warhorse .50% (e)
@@ -4759,8 +6146,7 @@ Example of possible multiple results from shear:
  2. SHEAR: 1x some wool 50.00%
  3. SHEAR: 1x some wool 5.00%
 
-See also: OLC BUILDINGS, OLC CROPS, OLC MOBILES, OLC SECTORS, OLC VEHICLES,
-  PRODUCTION INTERACTION, OLC WORKFORCE, OLC DEPLETIONS
+See also: OLC MOBILES, INTERACTIONS
 #d
 "MEDIT KEYWORDS"
 
@@ -4980,9 +6366,10 @@ See also: APPLIES, OLC MORPHS
 #d
 "MORPHEDIT ATTACK"
 
-Usage:  .attack <type>
+Usage:  .attack <name | vnum>
 
-This command sets the base attack type of the morph, when unarmed.
+This command sets the base attack type of the morph, when unarmed. See
+ATTACK TYPES for a list.
 
 See also: ATTACK TYPES, OLC MORPHS
 #d
@@ -5157,8 +6544,8 @@ an object, and set the object's <value0> field to the vnum of the mount. This
 is a 'use' command trigger that summons the mob.
 
 Types of mounts:
-  FLY affect: Flying mount; requires the Riding-Flying ptech.
-  WATERWALK affect: Can ride on water just like land; requires Riding-Upgrade.
+  FLYING affect: Flying mount; requires the Riding-Flying ptech.
+  WATERWALKING affect: Ride on water just like land; requires Riding-Upgrade.
   AQUATIC mob flag: Aquatic mount; can only ride on water tiles.
 
 See also: PTECH
@@ -5225,7 +6612,7 @@ Minipet:
  0 - vnum of mob to teach
 
 Missile Weapon:
- 0 - attack type (see ATTACK TYPES)
+ 0 - attack type (see WEAPON TYPES)
  1 - bonus damage (if scalable, this is the weight to scale the damage)
  2 - ammo type (must match type on the ammo object)
 
@@ -5262,7 +6649,7 @@ Wealth:
 
 Weapon:
  1 - bonus damage (if scalable, this is the weight to scale the damage)
- 2 - attack type (see ATTACK TYPES)
+ 2 - attack type (see WEAPON TYPES)
 #d
 "OEDIT AFFECTS"
 
@@ -5306,33 +6693,35 @@ other sources (the default is "natural"). The superior and *-drop apply types
 will only appear on the item if it has matching flags.
 
 Most applies are self-explanatory:
- STRENGTH - characters can't use an item that would reduce them below 1
- DEXTERITY - chance to hit/dodge
- HEALTH-REGEN - rate of health regen (per 5 second tick)
- CHARISMA - characters can't use an item that would reduce them below 1
- GREATNESS - empire meta-trait (unscaled)
- MOVE-REGEN - rate of move regen (per 5 second tick)
- MANA-REGEN - rate of mana regen (per 5 second tick)
- INTELLIGENCE - characters can't use an item that would reduce them below 1
- WITS - combat speed and damage
- AGE - this actually raises/lowers the player's age, which has no effect
- MAX-MOVE - move pool
- RESIST-PHYSICAL - physical damage reduction
- BLOCK - block only matters if the player has a shield
- HEAL-OVER-TIME - healing even during battle
- MAX-HEALTH - health pool
- MAX-MANA - mana pool
- TO-HIT - chance to hit (%)
- DODGE - chance to dodge (%)
- INVENTORY - this adds to inventory capacity
- MAX-BLOOD - blood pool size
- BONUS-PHYSICAL - added to strength-based damage and weapon dps
- BONUS-MAGICAL - added to magical damage and weapon dps
- BONUS-HEALING - added to damage healed (by abilities this player uses)
- RESIST-MAGICAL - magical damage reduction
- CRAFTING - bonus to craft level (unscaled)
- BLOOD-UPKEEP - adds to how much blood vampires must spend per hour (unscaled)
- NIGHT-VISION - adds to light radius at night (unscaled)
+ &cSTRENGTH&0 - characters can't use an item that would reduce them below 1
+ &cDEXTERITY&0 - chance to hit/dodge
+ &cHEALTH-REGEN&0 - rate of health regen (per 5 second tick)
+ &cCHARISMA&0 - characters can't use an item that would reduce them below 1
+ &cGREATNESS&0 - empire meta-trait (unscaled)
+ &cMOVE-REGEN&0 - rate of move regen (per 5 second tick)
+ &cMANA-REGEN&0 - rate of mana regen (per 5 second tick)
+ &cINTELLIGENCE&0 - characters can't use an item that would reduce them below 1
+ &cWITS&0 - combat speed and damage
+ &cAGE&0 - this actually raises/lowers the player's age, which has no effect
+ &cMAX-MOVE&0 - move pool
+ &cRESIST-PHYSICAL&0 - physical damage reduction
+ &cBLOCK&0 - block only matters if the player has a shield
+ &cHEAL-OVER-TIME&0 - healing even during battle
+ &cMAX-HEALTH&0 - health pool
+ &cMAX-MANA&0 - mana pool
+ &cTO-HIT&0 - chance to hit (%)
+ &cDODGE&0 - chance to dodge (%)
+ &cINVENTORY&0 - this adds to inventory capacity
+ &cMAX-BLOOD&0 - blood pool size
+ &cBONUS-PHYSICAL&0 - added to strength-based damage and weapon dps
+ &cBONUS-MAGICAL&0 - added to magical damage and weapon dps
+ &cBONUS-HEALING&0 - added to damage healed (by abilities this player uses)
+ &cRESIST-MAGICAL&0 - magical damage reduction
+ &cCRAFTING&0 - bonus to craft level (unscaled)
+ &cBLOOD-UPKEEP&0 - adds to how much blood vampires must spend per hour (unscaled)
+ &cNIGHT-VISION&0 - adds to light radius at night (unscaled)
+ &cNEARBY-RANGE&0 - increases the range of the player's nearby command
+ &cWHERE-RANGE&0 - increases the range of the player's where command
 
 See also: OLC OBJECTS
 #d
@@ -5498,6 +6887,7 @@ Usage:  .custom add <type> <message>
         .custom change <number> <type | message> <value>
         .custom move <number> <up | down>
         .custom remove <number | all>
+        .custom sort
 
 You can set custom messages on objects for various actions. These messages
 may use the tokens $n/$e/$s/$m for name/he/his/him for the player using the
@@ -5528,9 +6918,21 @@ Message types:
  &cdecays-on-char&0 - Shown to the holder/user of the item on decay, if any.
  &cdecays-in-room&0 - Shown to the room if the item decays on the ground.
  &cresource-to-char&0 - Shown to the character when they gain it as a resource.
- &cresource-to-room&0 - Shown to room when gained as a resource (e.g. chopped).
+ &cresource-to-room&0 - Shown to room when gained as a resource (see below).
  &cscript1&0 - &cscript5&0 - Can be referenced in scripts as
    %obj.custom(script1)%, %obj.custom(script1,0)%, etc.
+ &cmine-to-char&0 - Shown to the character when mining.
+ &cmine-to-room&0 - Shown to the room when mining.
+ &cchop-to-char&0 - Shown to the character when chopping.
+ &cchop-to-room&0 - Shown to the room when chopping.
+ &center-portal-to-char&0 - Shown to the character when entering a portal ($p).
+ &center-portal-to-room&0 - Shown to the room when char enters a portal ($p).
+ &cexit-portal-to-room&0 - Shown to the room when char exits a portal ($p).
+
+Resource messages are shown when received from: butcher, chop, dig, fish,
+forage, harvest, mine, pick, quarry, scrape, shear, or skin. These use $p for
+the item and $n for the person gathering them. Skin and butcher also provide
+$P for the corpse being used. Shear provides $N for the mob being sheared.
 
 See also: OLC OBJECTS, DOLLAR SIGN CODES
 #d
@@ -5589,31 +6991,34 @@ Object flags allow additional properties to be set on objects, with various
 effects. Never set a flag marked with an * (asterisk).
 
 Available flags:
- UNIQUE - can only equip 1 at a time
- PLANTABLE - can be planted as a crop (see OEDIT PLANTS)
- LIGHT - lights up the room (prefer LIGHT item type instead of the flag)
- SUPERIOR - crafted by a master craftsman, adds the (superior) tag
- LARGE - takes up 2 inventory slots, adds the (large) tag
- *CREATED - created by a god command
- 1-USE - is destroyed when un-equipped
- SLOW - for weapons, attacks slower
- FAST - for weapons, attacks faster
- ENCHANTED - unstorable, magical, and vulnerable to Disenchant, adds (enchanted) tag
- JUNK - will be cleaned up on the ground, even on claimed land -- worthless
- CREATABLE - can be created using the 'create' command (usually resources)
- SCALABLE - item can be scaled (see HELP ITEM SCALING)
- TWO-HANDED - weapon requires both hand slots
- BOE - item binds to a player when it is equipped (or used)
- BOP - item binds to a player when it is picked up
- STAFF - counts as a staff (even if it doesn't have a staff weapon type)
- UNCOLLECTED-LOOT - will decay on the ground if no player gets it
- *KEEP - player has marked the object with the 'keep' command
- !AUTOSTORE - will not autostore (e.g. furniture)
- HARD-DROP - was dropped by a HARD mob (CAUTION: it will set this itself when dropped as loot)
- GROUP-DROP - was dropped by a GROUP mob (CAUTION: it will set this itself when dropped as loot)
- GENERIC-DROP - never receives the HARD-DROP/GROUP-DROP flags
- !STORE - can't be stored (or home/warehouse stored), can be toggled by scripts
- SEEDED - has already been seeded with the 'seed' command
+ &cUNIQUE&0 - can only equip 1 at a time
+ &cPLANTABLE&0 - can be planted as a crop (see OEDIT PLANTS)
+ &cLIGHT&0 - lights up the room (prefer LIGHT item type instead of the flag)
+ &cSUPERIOR&0 - crafted by a master craftsman, adds the (superior) tag
+ &cLARGE&0 - takes up 2 inventory slots, adds the (large) tag
+ &c*CREATED&0 - created by a god command
+ &c1-USE&0 - is destroyed when un-equipped
+ &cSLOW&0 - for weapons, attacks slower
+ &cFAST&0 - for weapons, attacks faster
+ &cENCHANTED&0 - unstorable, magical, and vulnerable to Disenchant, adds (enchanted) tag
+ &cJUNK&0 - will be cleaned up on the ground, even on claimed land -- worthless
+ &cCREATABLE&0 - can be created using the 'create' command (usually resources)
+ &cSCALABLE&0 - item can be scaled (see HELP ITEM SCALING)
+ &cTWO-HANDED&0 - weapon requires both hand slots
+ &cBOE&0 - item binds to a player when it is equipped (or used)
+ &cBOP&0 - item binds to a player when it is picked up
+ &cSTAFF&0 - counts as a staff (even if it doesn't have a staff weapon type)
+ &cUNCOLLECTED-LOOT&0 - will decay on the ground if no player gets it
+ &c*KEEP&0 - player has marked the object with the 'keep' command
+ &c!AUTOSTORE&0 - will not autostore (e.g. furniture)
+ &cHARD-DROP&0 - was dropped by a HARD mob (CAUTION: it will set this itself when dropped as loot)
+ &cGROUP-DROP&0 - was dropped by a GROUP mob (CAUTION: it will set this itself when dropped as loot)
+ &cGENERIC-DROP&0 - never receives the HARD-DROP/GROUP-DROP flags
+ &cNO-BASIC-STORAGE&0 - can't be stored in basic storage; can be toggled by scripts
+ &cSEEDED&0 - has already been seeded with the 'seed' command
+ &cIMPORTANT&0 - won't be hit by an immortal "purge" with no args; can be used by scripts
+ &cLONG-TIMER-IN-STORAGE&0 - Decays slower while stored.
+ &cNO-WAREHOUSE&0 - can no longer be stored in home/warehouse storage
 
 See also: BINDING, OLC OBJECTS, LIGHT ITEM
 #d
@@ -5648,7 +7053,8 @@ Fields:
   &c-affects&0 - see HELP AFFECT FLAGS
   &c-apply&0 - see HELP OEDIT APPLY
   &c-custom&0 - has a specific type, see HELP OEDIT CUSTOM
-  &c-flagged&0, &cunflagged&0 - see HELP OEDIT FLAGS
+  &c-extradesc&0 - has a specific keyword in its extra descs
+  &c-flagged&0, &-cunflagged&0 - see HELP OEDIT FLAGS
   &c-interaction&0 - has a specific type, see HELP OEDIT INTERACTION
   &c-level&0 - matches anything where this level is within the range
      (note: will not account for objects whose levels are inherited from mobs
@@ -5660,11 +7066,13 @@ Fields:
   &c-lightislit&0 - find lights that default to lit, excluding the LIGHT flag
   &c-lightisunlit&0 - find lights that default to unlit
   &c-material&0 - see OEDIT MATERIAL
+  &c-requirestools&0 - see HELP OEDIT TOOLS
   &c-storable -unstorable&0 - Only get objects with or without storage sites.
+  &c-timer&0, &c-timerover&0, &c-timerunder&0 - Search timer values.
   &c-tools&0 - see HELP OEDIT TOOLS
   &c-type&0 - see HELP OEDIT TYPE
   &c-weapontype&0 - see HELP OEDIT WEAPONTYPE
-  &c-wear&0 - see HELP OEDIT WEAR
+  &c-wear&0, &c-nowear&0 - see HELP OEDIT WEAR
   &c-vmin&0, &c-vmax&0 - VNUM range limits
 
 Type-based fields:
@@ -5676,10 +7084,51 @@ Examples:
  > .o fullsearch -level 50 sword -vmin 10000 -vmax 10099
 
 To search other fields, you can generally use the normal "search" option for
-other OLC types. For example, to find all objects with the "Minipet Use"
-trigger, use ".t search 9900".
+other OLC types. For example, to find all objects with the "Summon Mob Whistle"
+trigger, use ".t search 9910".
 
 See also: LIGHT ITEM
+#d
+"OEDIT INTERACTIONS" "OBJ INTERACTIONS" "OBJECT INTERACTIONS"
+
+Usage:  .interaction add <type> <quantity> <vnum> <percent> [exclusion code | restrictions]
+        .interaction change <number> <field> <value>
+        .interaction copy <from type> <from vnum>
+        .interaction remove <number | all>
+        .interaction move <number> <up | down>
+
+This command adds or removes an interaction. These are objects that are
+generated by certain commands.
+ 
+Object interaction types:
+ &cLIGHT&0 - Item something is converted into when lit on fire.
+ &cCOMBINE**&0 - Combine multiple copies of an obj into another obj (quantity is the
+    number required, rather than number you get).
+ &cSEPARATE**&0 - Split this item into multiple other items.
+ &cSCRAPE&0 - Items you get when scraping this item (tree -> log).
+ &cSAW&0 - Items you get when sawing this item (tree -> lumber).
+ &cTAN&0 - Items you get when tanning this item (skin -> leather).
+ &cCHIP&0 - What you get for chipping at the item.
+ &cSEED&0 - Gives an item when seeded.
+ &cDECAYS-TO&0 - Becomes a different object when its timer expires (e.g. ashes).
+ &cCONSUMES-TO&0 - Becomes a different object when eaten/used up (e.g. a jar).
+ &cIDENTIFIES-TO&0 - Becomds a different object when identified (e.g. a rock).
+ &cDISENCHANT&0 - Items received when disenchanting (also a global type).
+
+ ** Both COMBINE and SEPARATE should be set exclusive, as they will extract
+    the original item.
+
+Optional interaction restrictions:
+ &c-ability <vnum/"name">&0 - Player must have this ability.
+ &c-boss&0 - Object must have HARD- and GROUP-DROP.
+ &c-hard&0 - Object must have only HARD-DROP.
+ &c-group&0 - Object must have only GROUP-DROP.
+ &c-normal&0 - Object must have no HARD or GROUP flag.
+ &c-ptech <name>&0 - Player must have this player-tech.
+ &c-tech <name>&0 - Empire must have this tech.
+ &c-tool <name>&0 - Require a specific tool for this interaction.
+
+See also: OLC OBJECTS
 #d
 "OEDIT KEYWORDS"
 
@@ -5724,7 +7173,10 @@ the available options:
  &cCOOKING-FIRE&0 - Can be used to cook.
  &cDESTROY-WHEN-DOUSED&0 - If the player douses this light, it is destroyed.
 
-See also: OLC OBJECTS, OEDIT LIGHT HOURS, OEDIT LIGHT IS LIT
+Lights with the LIGHT-FIRE or COOKING-FIRE flags will help buffer the player
+against cold (while lit).
+
+See also: OLC OBJECTS, OEDIT LIGHT HOURS, OEDIT LIGHT IS LIT, TEMPERATURE
 #d
 "OEDIT LIGHTISLIT" "OEDIT LIGHT IS LIT" "OEDIT IS LIT"
 
@@ -5799,7 +7251,7 @@ goes any longer than that, you should use /fi to format it with indent inside
 the string editor.
 
 See also: OLC OBJECTS, STRING EDITOR, MEDIT LOOKDESCRIPTION,
-MORPHEDIT LOOKDSECRIPTION
+MORPHEDIT LOOKDESCRIPTION
 #d
 "OEDIT MATERIAL"
 
@@ -5880,6 +7332,23 @@ are on.
 Requires objects will be lost when the quest ends.
 
 See also: OLC OBJECTS
+#d
+"OEDIT REQUIRESTOOLS" "OEDIT REQUIRES TOOLS"
+
+Usage:  .requirestools [add | remove] <flags>
+
+If an object requires a tool when you build or maintain a building WITH it, use
+this field. This is separate from any tools set on the building's craft itself.
+
+This does not apply to non-building/non-vehicle crafts, which are instant. For
+those, set the tool on the craft itself.
+
+Examples:
+ - nails require a hammer when crafting
+
+See &yHELP TOOLS&0 for a full list.
+
+See also: OLC OBJECTS, CEDIT TOOL, OEDIT TOOLS
 #d
 "OEDIT STORAGE"
 
@@ -5991,9 +7460,8 @@ It should not be capitalized unless it contains a proper noun. Names should
 always start with "a", "an", or "the" unless it wouldn't make sense in a
 sentence.
 
-If an object has a capital letter in its short description, the Reforge and
-Refashion abilities will treat it as already "named" and will not allow it to
-be renamed.
+If an object has a capital letter in its short description, the Rework
+ability will treat it as already "named" and will not allow it to be renamed.
 
 All of the words in the object name should also appear in the keywords list,
 except a/an/the.
@@ -6008,7 +7476,7 @@ See also: OEDIT KEYWORDS, OLC OBJECTS
 #d
 "OEDIT TIMER" "DECAY TIMER" TIMER
 
-Usage:  .timer <hours>
+Usage:  .timer <hours | none>
 
 This determines how long an item lasts before it decays and is lost. This can
 be used to make any item temporary, but it is used especially on food, drink
@@ -6029,18 +7497,21 @@ real hours, regardless of their decay timers.
 
 See also: AUTOSTORE, OEDIT TYPE, OLC OBJECTS
 #d
-"OEDIT TOOLS" "OEDIT TOOL FLAGS" "CEDIT TOOLS" "CEDIT TOOL FLAGS"
+"OEDIT TOOLS" "OEDIT TOOL FLAGS" "ABILEDIT TOOLS" "ABILEDIT TOOL FLAGS" "CEDIT TOOLS" "CEDIT TOOL FLAGS"
 
 Usage:  .tools [add | remove] <flags>
 
+Abilities: Player must be using this type of tool to use the ability.
 Objects: Tool flags allow an object to be used for various tasks, like sawing.
+         Objects also support a "requires tools" flag for tools needed to build
+         something that uses the object (e.g. nails require hammer).
 Crafts: You can require 1 or more tools to create the craft. These tools MUST
         be present, and you can't substitute with a building (e.g. tailor for
         sewing kit).
 
 See &yHELP TOOLS&0 for a full list.
 
-See also: OLC CRAFTS, OLC OBJECTS
+See also: OLC ABILITIES, OLC CRAFTS, OLC OBJECTS, OEDIT REQUIRES TOOLS
 #d
 "OEDIT TYPE"
 
@@ -6125,50 +7596,23 @@ that only people with the correct permission can withdraw it.
 
 See also: OEDIT STORAGE, OLC OBJECTS
 #d
-"OEDIT WEAPONTYPE" "OEDIT WEAPON TYPE" "WEAPON TYPES" "ATTACK TYPES"
+"OEDIT WEAPONTYPE" "OEDIT WEAPON TYPE" "WEAPON TYPES"
 
-Usage:  .weapontype <type>
+Usage:  .weapontype <name | vnum>
 
 The weapon type determines which combat messages are sent, how fast the weapon
 attacks in combat, and whether or not it is sharp. Both regular weapons and
 missile weapons share the same set of types.
 
-The following weapon types are available:
- 1. RESERVED - do not use
- 2. slash - sword
- 3. slice - axe (used by the chopping chore)
- 4. jab - rapier
- 5. stab - dagger (used by some Stealth skills)
- 6. pound - rock
- 7. hammer - hammer (used by the forge command)
- 8. whip - whip weapon or tentacle-whip
- 9. pick - used by the mining chore
-10. bite - animals
-11. claw - fist weapons; also used by animals
-12. kick - animals
-13. fire - torch
-14. vampire claws
-15. crush - animals or giants
-16. hit - normal punching (no weapon, or disarmed physical weapon)
-17. magic fire - fireball
-18. lightning staff
-19. burn staff
-20. agony staff
-21. magic frost - chill
-22. magic shock - shock
-23. magic light - flash
-24. sting - animals
-25. swipe - animals, giants, etc
-26. tail swipe - animals
-27. peck - animals
-28. gore - animals
-29. mana blast - normal magical attack (e.g. disarmed mage)
-30. bow (shoot) - a normal bow
-31. crossbow (shoot) - a crossbow
-32. pistol (shoot) - a small firearm
-33. musket (shoot) - a large firearm
-34. sling (shoot) - a primitive ranged weapon that shoots sling bullets
-35. spear-thrower (shoot) - a primitive ranged weapon that shoots spears/darts
+Common attack vnums:
+  Sharp weapons: [1] slash, [2] slice, [3] jab, [4] stab
+  Blunt weapons: [5] pound, [6] hammer, [7] whip
+  Magic weapons: [16] fire, [20] frost, [21] shock, [22] light, [28] mana blast
+  Staff weapons: [17] lightning staff, [18] burn staff, [19] agony staff
+  Ranged weapons: [29] bow, [30] crossbow, [31] pistol, [32] musket,
+     [34] sling, [25] spear-thrower
+  Tool types: [2] slice, [8] pick, [12] fire/torch
+  Special types: [13] vampire claws
 
 See also: OLC OBJECTS
 #d
@@ -6319,6 +7763,8 @@ Available flags:
  - !GENERICS - Cannot edit generics
  - !SHOPS - Cannot edit shops
  - !PROGRESS - Cannot edit progressions
+ - !EVENTS - Cannot edit events
+ - !ATTACKS - Cannot edit attack messages
 
 For notes on the mud's building rules, see HELP BUILDING GUIDE.
 #d
@@ -6437,7 +7883,9 @@ Available depletion types:
  trapping
  chop
  hunt
- production
+ production (for workforce)
+ secondary (for workforce buildings that produce more than 1 thing separately)
+ tertiary (for workforce buildings that produce more than 2 things separately)
 
 Note: This only applies to the PRODUCTION and SKILLED-LABOR interactions, and
 only on buildings and vehicles.
@@ -6484,16 +7932,23 @@ See the individual help files such as OEDIT FULLSEARCH.
 
 Supported types:
   ability
+  attack
   building (search designatable rooms with -flag ROOM)
   craft
   crop
+  generic
   mobile
   object
   progress
+  quest
   room template
   sector
+  skill
   trigger
   vehicle
+
+Unsupported types: adventure, augment, archetype, book, class, event, faction,
+   global, morph, shop, social
 #d
 "OLC LIST" OLIST MLIST RLIST
 
@@ -6508,6 +7963,7 @@ Information provided by the -d flag:
  abilities: mastery
  adventure: mob/object/room count
  archetypes: skills, skill point total, and attribute total
+ attacks: number of messages in the set
  augments: ability/skill, applies
  book: byline
  class: skill requirements
@@ -6817,13 +8273,16 @@ chore.
 
 The interaction's "quantity" is the depletion limit; workforce will produce the
 item 1 at a time. Depletions are slightly random; set this number 25% higher
-than the amount you want the player to get per year.
+than the amount you want the player to get per depletion cycle.
 
 All production on a single tile or building will share the same depletion
 counter unless you use the "-depletion <type>" option on each interaction. See
 the help file on OLC DEPLETION.
 
 The interaction's "percentage" is the chance per hour to produce the item.
+
+Basic production chores only eat food when they produce something, but skilled
+labor will eat if it COULD produce something, even if the random roll fails.
 
 See also: INTERACTIONS, OLC WORKFORCE, OLC DEPLETION
 #d
@@ -6882,6 +8341,7 @@ The following progress goal flags are available:
  &cHIDDEN&0 - Will not show up in lists until completed.
  &cNO-ANNOUNCE&0 - Does not announce/log completion.
  &cNO-PREVIEW&0 - Mortals can't view this goal before starting it.
+ &cNO-TRACKER&0 - Mortals can't see the detailed tracker while in-progress.
 
 See also: OLC PROGRESS
 #d
@@ -6985,7 +8445,7 @@ Task types that do not apply to empire progression:
  SKILL-LEVEL-UNDER, TRIGGERED, VISIT-BUILDING, VISIT-ROOM-TEMPLATE,
  VISIT-SECTOR, HAVE-ABILITY, REP-OVER, REP-UNDER, WEARING, WEARING-OR-HAS,
  GET-CURRENCY, CAN-GAIN-SKILL, LEVEL-UNDER, LEVEL-OVER, SPEAK-LANGUAGE,
- RECOGNIZE-LANGUAGE&0
+ RECOGNIZE-LANGUAGE, COMPLETED-QUEST-EVER&0
 
 See also: OLC PROGRESS, REQUIREMENTS
 #d
@@ -7056,22 +8516,52 @@ See also: OLC QUESTS, STRING EDITOR
 Usage:  .flags [add | remove] <flags>
 
 The following quest flags are available:
- IN-DEVELOPMENT - Mortals cannot see or get the quest.
- REPEAT-PER-INSTANCE - Clears completion when the instance closes.
- EXPIRES-AFTER-INSTANCE - Fails the quest when the instance closes.
- EXTRACT-TASK-OBJECTS - Items and components required for tasks will be lost.
- DAILY - Quest counts as a daily.
- EMPIRE-ONLY - Can only start/finish with mob/room of matching empire (or
+ &cIN-DEVELOPMENT&0 - Mortals cannot see or get the quest.
+ &cREPEAT-PER-INSTANCE&0 - Clears completion when the instance closes.
+ &cEXPIRES-AFTER-INSTANCE&0 - Fails the quest when the instance closes.
+ &cEXTRACT-TASK-OBJECTS&0 - Items and components required for tasks will be lost.
+ &cDAILY&0 - Quest counts as a daily.
+ &cEMPIRE-ONLY&0 - Can only start/finish with mob/room of matching empire (or
     matching not-in-empire).
- NO-GUESTS - Checks actual ownership on the room when you start/finish a quest.
- TUTORIAL - This quest will not appear if the player uses 'toggle tutorials'.
+ &cNO-GUESTS&0 - Checks actual ownership on the room when you start/finish a quest.
+ &cTUTORIAL&0 - This quest will not appear if the player uses 'toggle tutorials'.
     Use this flag for basic tutorials only, like ones on common items.
- GROUP-COMPLETION - Will auto-finish the quest if a group member turns it in
+ &cGROUP-COMPLETION&0 - Will auto-finish the quest if a group member turns it in
     while in the same room.
- EVENT - Quest is marked as part of an event. If it's a daily quest, it is
+ &cEVENT&0 - Quest is marked as part of an event. If it's a daily quest, it is
     separate from non-event dailies.
+ &cIN-CITY-ONLY&0 - Quest only starts/ends at in-city locations.
 
 See also: OLC QUESTS, DAILY QUEST
+#d
+"QEDIT FULLSEARCH" "QUEST FULLSEARCH"
+
+Usage:  .q fullsearch -<field> <argument> <...>
+
+This command allows you to search for quests matching certain criteria. You
+can specify multiple fields if you want. Any arguments that don't start with a
+dash (-) are matched to the quest's name and strings.
+
+Fields:
+  &c-flagged&0, &cunflagged&0 - see HELP QEDIT FLAGS
+  &c-level&0, &clevelover&0, &clevelunder&0 - Search the level range of quests
+  &c-dailycycle&0 - Search for a specific daily cycle id
+  &c-nodailycycle&0 - Search for daily quests with no cycle
+  &c-activedailycycle&0, &c-inactivedailycycle&0 - Dailies that are active or not
+  &c-repeat&0, &crepeatover&0, &crepeatunder&0 - Search for specific repeat times
+  &c-reward&0 - Search for 1 reward type; see HELP QEDIT REWARDS
+  &c-prereq&0 - Search for 1 prerequisite type; see HELP REQUIREMENTS
+  &c-task&0 - Search for 1 task type; see HELP REQUIREMENTS
+  &c-vmin&0, &c-vmax&0 - VNUM range limits
+
+Examples:
+ > .q fullsearch -level 150
+ > .q fullsearch -flagged EMPIRE-ONLY -task OWN-BUILDING
+ > .q fullsearch -repeatover 1 -vmin 10000 -vmax 10099
+
+To search other fields, you can generally use the normal "search" option for
+other OLC types. For example, to find quests that reward a green knitted
+stocking (object 16678), use ".o search 16678".
 #d
 "QEDIT MAXLEVEL" "QEDIT MAX LEVEL"
 
@@ -7125,23 +8615,24 @@ as few rewards as possible, and you can also use quest scripts to give more
 complicated rewards instead.
 
 Available reward types:
- BONUS-EXP - Give the player additional bonus exp today.
- COINS - Give the player some coins (empire or misc).
- OBJECT - Give the player items.
- SET-SKILL - Set the player's skill to a specific level (usually 0, 50, 75,
+ &cBONUS-EXP&0 - Give the player additional bonus exp today.
+ &cCOINS&0 - Give the player some coins (empire or misc).
+ &cOBJECT&0 - Give the player items.
+ &cSET-SKILL&0 - Set the player's skill to a specific level (usually 0, 50, 75,
     100). You should use prereqs to be sure what the player's skill is first.
- SKILL-EXP - Give the player some skill experience and a chance for skill gain.
- SKILL-LEVELS - Raise the player's skill level, if possible.
- QUEST-CHAIN - Starts a player on another quest, if they meet the pre-reqs and
+ &cSKILL-EXP&0 - Give the player some skill experience and a chance for skill gain.
+ &cSKILL-LEVELS&0 - Raise the player's skill level, if possible.
+ &cQUEST-CHAIN&0 - Starts a player on another quest, if they meet the pre-reqs and
     are not already on it.
- REPUTATION - Gain/lose faction reputation.
- CURRENCY - Gives generic currency (e.g. tokens).
- EVENT-POINTS - Points toward an event (only happens if the event is running).
- SPEAK-LANGUAGE - Can now speak a language.
- RECOGNIZE-LANGUAGE - Can now recognize a language (will not override one the
+ &cREPUTATION&0 - Gain/lose faction reputation.
+ &cCURRENCY&0 - Gives generic currency (e.g. tokens).
+ &cEVENT-POINTS&0 - Points toward an event (only happens if the event is running).
+ &cSPEAK-LANGUAGE&0 - Can now speak a language.
+ &cRECOGNIZE-LANGUAGE&0 - Can now recognize a language (will not override one the
     player can already speak).
- GRANT-PROGRESS - Player's empire completes a progress goal.
- START-PROGRESS - Player's empire starts a NO-AUTOSTART progress goal.
+ &cGRANT-PROGRESS&0 - Player's empire completes a progress goal.
+ &cSTART-PROGRESS&0 - Player's empire starts a NO-AUTOSTART progress goal.
+ &cUNLOCK-ARCHETYPE&0 - Grants the player/account a locked archetype for new chars.
 
 Note: If you set empire coins as the reward, but the mob is not part of an
 empire, the player will receive misc coins instead.
@@ -7223,7 +8714,7 @@ The following room template flags are available:
  LIGHT - Never requires a light.
  !MOB - Mobs will not wander into the room (they may still be spawned there).
  PEACEFUL - No combat allowed.
- NEED-BOAT - Requires a boat, swimming, waterwalk, or fly.
+ NEED-BOAT - Requires a boat, swimming, waterwalking, or flying.
  !TELEPORT - Cannot teleport in or out.
  LOOK-OUT - can see the map using "look out"
  !LOCATION - no location shown; disables "where"
@@ -7240,6 +8731,7 @@ with a dash (-) are matched to the template's title and other text.
 
 Fields:
   &c-affects&0 - see HELP REDIT AFFECTS
+  &c-extradesc&0 - has a specific keyword in its extra descs
   &c-flagged -unflagged&0 - see HELP REDIT FLAGS
   &c-functions&0 - see HELP REDIT FUNCTIONS
   &c-interactions&0 - has a specific type, see HELP REDIT INTERACTION
@@ -7348,7 +8840,7 @@ custom text, you MUST provide the [group] argument first, but it can be '-' or
 "none".
 
 Available tasks:
- &cCOMPLETED-QUEST&0 - Must complete a certain quest.
+ &cCOMPLETED-QUEST&0 - Must complete a certain quest (some need same-instance).
  &cGET-COMPONENT&0 - Must have components.
  &cGET-OBJECT&0 - Must have items.
  &cKILL-MOB &r*&0&0 - Must kill a certain mob.
@@ -7382,6 +8874,7 @@ Available tasks:
  &cEMPIRE-FAME&0 - Empire must have a certain amount of fame.
  &cEMPIRE-GREATNESS&0 - Empire must have a certain amount of greatness.
  &cDIPLOMACY&0 - Empire must have a number of matching diplomatic relations.
+ &cDIPLOMACY-OVER&0 - Empire must have N matching (or better) diplomatic relations.
  &cHAVE-CITY&0 - Empire must have a number of cities (of any size).
  &cEMPIRE-MILITARY&0 - Empire must have a certain amount of military.
  &cEMPIRE-PRODUCED-OBJECT&0 - Empire has produced an amount of an item.
@@ -7392,6 +8885,8 @@ Available tasks:
  &cLEVEL-OVER&0 - Composite/total level not lower than this.
  &cSPEAK-LANGUAGE&0 - Player knows how to speak a language.
  &cRECOGNIZE-LANGUAGE&0 - Player can recognize or speak a language.
+ &cCOMPLETED-QUEST-EVER&0 - Must complete a certain quest (ignoring same-instance).
+ &cDAYTIME&0, &cNIGHTTIME&0 - Only valid during certain times of day (quests only).
 
 &r*&0 Some types require a trackable quest, and cannot be used as prereqs.
 ^ If a type requires flags and you use more than one flag, you MUST put the
@@ -7438,6 +8933,15 @@ to one word, such as: "plains full desert" (the full stands for 'full forest').
 
 See also: CEDIT BUILDON, CEDIT BUILDFACING, OLC SECTORS
 #d
+"SECTEDIT CHECKTEMPERATURE" "SECTEDIT CHECK TEMPERATURE"
+
+Usage:  .checktemperature
+
+Use this command while editing a sector to see what temperatures its climate
+flags will give it during various parts of the year.
+
+See also: SECTEDIT CLIMATE
+#d
 "SECTEDIT COMMANDS"
 
 Usage:  .commands <list>
@@ -7453,6 +8957,25 @@ color codes in the commands list.
 
 Crop tiles will auto-generate their command lists if no sector commands are
 set. For buildings, the commands list from the building data is used instead.
+
+See also: OLC SECTORS
+#d
+"SECTEDIT CUSTOM" "SECTEDIT CUSTOM MESSAGES"
+
+Usage:  .custom add <type> <message>
+        .custom change <number> <type | message> <value>
+        .custom move <number> <up | down>
+        .custom remove <number | all>
+        .custom sort
+
+You can set custom messages on sectors for various actions.
+
+If you set more than one message of the same type, one will be chosen at
+random each time.
+
+Message types:
+ &cmagic-growth&0 - Shown to the whole room when a MAGIC-GROWTH evolution occurs.
+   This will not be shown if there is a crop here that has one.
 
 See also: OLC SECTORS
 #d
@@ -7504,6 +9027,11 @@ Available types ([value] isn't used unless specified):
  &cOWNED&0 - Evolves if the tile is claimed.
  &cUNOWNED&0 - Evolves if the tile is not claimed.
  &cBURN-STUMPS&0 - Sector this tile becomes when burnt by workforce.
+ &cADJACENT-SECTOR-FLAG&0 - Evolves when adjacent to a sector with this flag.
+    Note: For multiple sector flags, use quotes like "CROP IRRIGATES-AREA".
+ &cNOT-ADJACENT-SECTOR-FLAG&0 - ... NOT adjacent to a sector with this flag.
+ &cNEAR-SECTOR-FLAG&0 - Evolves within 2 tiles of a sector with this flag.
+ &cNOT-NEAR-SECTOR-FLAG&0 - ... NOT within 2 tiles of a sector with this flag.
 
 Examples:
  Jungle: .evolution add CHOPPED-DOWN 1 50% 28
@@ -7517,37 +9045,40 @@ See also: OLC SECTORS
 Usage:  .flags [add | remove] <flags>
 
 Available sector flags:
- LOCK-ICON - a random icon is chosen when the terrain changes to this, and kept
- IS-ADVENTURE - used only for adventure rooms
- NON-ISLAND - won't be detected as part of an island by the island detection
+ &cLOCK-ICON&0 - a random icon is chosen when the terrain changes to this, and kept
+ &cIS-ADVENTURE&0 - used only for adventure rooms
+ &cNON-ISLAND&0 - won't be detected as part of an island by the island detection
     system.
- CHORE - This sector may have a chore (required, or the chore will never trigger)
- !CLAIM - Cannot be claimed.
- START-LOCATION - A starting location for players; prevents combat here
- FRESH-WATER - Requires a boat, counts as a river
- OCEAN - Requires a boat, counts as ocean
- DRINK - Provides drinkable water; can also be used from adjacent rooms
- HAS-CROP-DATA - Has an associated crop (like a seeded field or a crop tile)
- CROP - Is a crop (visually replaced by crop data); you should also set HAS-CROP-DATA
- LAY-ROAD - The lay command here can be used to create a road
- IS-ROAD - This tile is a road
- CAN-MINE - The tile is mine-able; this allows the Prospect ability
- SHOW-ON-POLITICAL-MAPOUT - Still appears on the political version of the graphical map
- MAP-BUILDING - This sector represents a building on the map; shown using building data
- INSIDE-ROOM - This sector represents an interior (designated) ROOM building
- LARGE-CITY-RADIUS - This tile counts as in-city even in the outskirts
- OBSCURE-VISION - Players can't be seen here; also blocks guard towers
- IS-TRENCH - Sector counts as a trench and fills with water
- NO-GLOBAL-SPAWNS - Won't use global spawn lists.
- ROUGH - This is rough, raised terrain, like a mountain
- SHALLOW-WATER - The tile has water but requires no boat (like a swamp)
- NEEDS-HEIGHT - Uses the 'height' property in some way and will set itself from
+ &cCHORE&0 - This sector may have a chore (required, or the chore will never trigger)
+ &c!CLAIM&0 - Cannot be claimed.
+ &cSTART-LOCATION&0 - A starting location for players; prevents combat here
+ &cFRESH-WATER&0 - Requires a boat, counts as a river
+ &cOCEAN&0 - Requires a boat, counts as ocean
+ &cDRINK&0 - Provides drinkable water; can also be used from adjacent rooms
+ &cHAS-CROP-DATA&0 - Has an associated crop (like a seeded field or a crop tile)
+ &cCROP&0 - Is a crop (visually replaced by crop data); you should also set HAS-CROP-DATA
+ &cLAY-ROAD&0 - The lay command here can be used to create a road
+ &cIS-ROAD&0 - This tile is a road
+ &cCAN-MINE&0 - The tile is mine-able; this allows the Prospect ability
+ &cSHOW-ON-POLITICAL-MAPOUT&0 - Still appears on the political version of the graphical map
+ &cMAP-BUILDING&0 - This sector represents a building on the map; shown using building data
+ &cINSIDE-ROOM&0 - This sector represents an interior (designated) ROOM building
+ &cLARGE-CITY-RADIUS&0 - This tile counts as in-city even in the outskirts
+ &cOBSCURE-VISION&0 - Players can't be seen here; also blocks guard towers
+ &cIS-TRENCH&0 - Sector counts as a trench and fills with water
+ &cNO-GLOBAL-SPAWNS&0 - Won't use global spawn lists.
+ &cROUGH&0 - This is rough, raised terrain, like a mountain
+ &cSHALLOW-WATER&0 - The tile has water but requires no boat (like a swamp)
+ &cNEEDS-HEIGHT&0 - Uses the 'height' property in some way and will set itself from
     nearby tiles if missing.
- KEEPS-HEIGHT - Uses the 'height' property but won't change it (for roads etc).
- SEPARATE-NOT-ADJACENTS - Runs each NOT-ADJACENT evolution separately rather
+ &cKEEPS-HEIGHT&0 - Uses the 'height' property but won't change it (for roads etc).
+ &cSEPARATE-NOT-ADJACENTS&0 - Runs each NOT-ADJACENT evolution separately rather
     than making sure the tile isn't adjacent to ANY of them.
- SEPARATE-NOT-NEARS - Runs each NOT-NEAR-SECTOR evolution separately rather
+ &cSEPARATE-NOT-NEARS&0 - Runs each NOT-NEAR-SECTOR evolution separately rather
     than making sure the tile isn't near ANY of them.
+ &cINHERIT-BASE-CLIMATE&0 - Uses the climate flags of the base sector in addition
+    to the ones set on this sector. For example, a road or building sector.
+ &cIRRIGATES-AREA&0 - This flag is used to trigger irrigation evolutions.
 
 See also: OLC SECTORS, TERRAIN HEIGHT
 #d
@@ -7563,6 +9094,7 @@ Fields:
   &c-buildflagged&0 - see HELP SECTEDIT BUILDFLAGS
   &c-climate&0 - see HELP SECTEDIT CLIMATE
   &c-evolution&0 - has a certain evolution, see SECTEDIT EVOLUTIONS
+  &c-extradesc&0 - has a specific keyword in its extra descs
   &c-flagged&0, &cunflagged&0 - see HELP SECTEDIT FLAGS
   &c-interaction&0 - has a specific type, see HELP SECTEDIT INTERACTION
   &c-mapout&0 - color name, see HELP SECTEDIT MAPOUT
@@ -7661,6 +9193,17 @@ punctuation at the end, and should be a reasonably short description of the
 sector.
 
 See also: OLC SECTORS
+#d
+SECTOR SECTORS "SECTOR TYPE" "CURRENT SECTOR"
+
+A "sector" is a terrain type, such as "Plains" or "Calamander Jungle". These
+are configured in the sector editor (SECTEDIT), appear on "show sector", and
+can be manually added to the map with MAPEDIT TERRAIN.
+
+Each map room also has a BASE SECTOR and a NATURAL SECTOR. You can view all
+three sector types on a room using "stat room".
+
+See also: BASE SECTOR, MAPEDIT TERRAIN, NATURAL SECTOR, SECTEDIT, SHOW SECTORS
 #d
 SHOPEDIT "OLC SHOPS" "SHOP OLC"
 
@@ -7828,6 +9371,29 @@ Available flags:
  &cREMOVED-BY-PURIFY&0 - Lose this skill if hit by the purify spell.
 
 See also: OLC SKILLS, OLC REMOVEINDEV
+#d
+"SKILLEDIT FULLSEARCH" "SKILL FULLSEARCH"
+
+Usage:  .skill fullsearch -<field> <argument> <...>
+
+This command allows you to search for skills matching certain criteria. You
+can specify multiple fields if you want. Any arguments that don't start with a
+dash (-) are matched to the skill's name and strings.
+
+Fields:
+  &c-flagged&0, &cunflagged&0 - see HELP SKILLEDIT FLAGS
+  &c-maxlevel&0, &cmaxlevelover&0, &cmaxlevelunder&0 - Search the max-level setting
+  &c-mindrop&0, &cmindropover&0, &cmindropunder&0 - Search the min-drop-level setting
+  &c-vmin&0, &c-vmax&0 - VNUM range limits
+
+Examples:
+ > .skill fullsearch -maxlevel 75
+ > .skill fullsearch -flag BASIC -flag CASTER
+ > .skill fullsearch -flag CASTER -vmin 0 -vmax 99
+
+To search other fields, you can generally use the normal "search" option for
+other OLC types. For example, to find skills that have "Resurrect" (ability
+219), use ".abil search 219".
 #d
 "SKILLEDIT MAXLEVEL" "SKILLEDIT MAX LEVEL"
 
@@ -8045,6 +9611,21 @@ TIP: If your string is longer than 80 characters (normal telnet window width),
 use '/fi' to format it with indentation. This puts the whole thing into a
 single paragraph, indented 3 spaces, with each line no longer than 80
 characters.
+#
+"TOGGLE ABILITY"
+
+Abilities with the TOGGLE flag are ones the user can turn off at will,
+generally by typing the ability's command again. This only applies to BUFF and
+ROOM-AFFECT abilities.
+
+These abilities have two additional custom messages available.
+ &ctoggle-to-char&0 - Shown to the character. If missing, they see "Okay."
+ &ctoggle-to-room&0 - Shown to the room. Nothing is shown if this is missing.
+
+If the affect itself has a wearoff or wearoff2room message on its generic,
+those are shown after the toggle messages.
+
+See also: ABILEDIT CUSTOM MESSAGES, AFFECT GENERIC
 #
 "TRIGEDIT ARGUMENTS"
 
@@ -8280,6 +9861,18 @@ Object values:
  1 - corpse size
  2 - corpse flags (1 = eaten, 2 = skinned, 4 = human)
 #d
+"CROWD CONTROL" CROWD-CONTROL "LIMIT CROWD CONTROL" LIMIT-CROWD-CONTROL
+
+The term "crowd control" refers to abilities that manage additional mobs in a
+fight. For example, stunning a mob or transforming it into a form that doesn't
+deal damage are forms of crowd control.
+
+On abilities, the LIMIT-CROWD-CONTROL flag ensures only 1 mob is
+crowd-controlled by that ability at a time. When the ability is used, all other
+mobs in the room who are affected by it will return to normal.
+
+See also: ABILEDIT FLAGS
+#d
 "CURRENCY ITEM" "CURRENCY OBJECT"
 
 Currency items represent a pile of adventure currency. The name of the currency
@@ -8290,6 +9883,17 @@ Object values:
  1 - generic currency vnum
 
 See also: GENERIC CURRENCY
+#d
+"DAMAGE TYPES" "DAMAGE TYPE"
+
+The following damage types are available:
+ &cphysical&0
+ &cmagical&0
+ &cfire&0
+ &cpoison&0 - affected by Poison Immunity
+ &cdirect&0 - not resisted by anything
+
+See also: ATTACK TYPES
 #d
 "DRINKCON ITEM" "DRINKCON OBJECT" "DRINK ITEM" "DRINK OBJECT" "DRINK CONTAINER ITEM" "DRINK CONTAINER OBJECT"
 
@@ -8308,12 +9912,21 @@ players can 'fill' from it like a fountain.
 
 Note: Unlike other items, if there is a 'timer' on a drink container, it will
 only cause the liquid inside to go bad and be poured out, rather than purging
-the whole container.
+the whole container -- unless it has a 1-USE flag, in which case it the drink
+container is also destroyed. Consuming the last liquid in a 1-USE drink
+container will also cause it to be destroyed.
 
 Object values:
  0 - max capacity (scalable)
  1 - current amount
  2 - generic liquid vnum
+
+Custom messages:
+ decays-on-char - shown when contents expire
+ decays-in-room - shown when contents expire
+
+Interactions:
+ DECAYS-TO - only when a 1-USE drink container's timer expires
 #d
 "FOOD ITEM" "FOOD OBJECT"
 
@@ -8339,6 +9952,121 @@ be displayed randomly every few action ticks.
 
 See also: OEDIT CUSTOM
 #d
+INTERACTION INTERACTIONS INTERACT "GEDIT INTERACTION" "GLOBAL INTERACTIONS"
+
+Usage:  .interaction add <type> <quantity> <vnum> <percent> [exclusion code | restrictions]
+        .interaction change <number> <field> <value>
+        .interaction copy <from type> <from vnum>
+        .interaction remove <number | all>
+        .interaction move <number> <up | down>
+
+This command adds or removes an interaction. These are objects or mobs that are
+generated by certain commands. Some are only used on mobs, while others are
+only used on rooms. You can copy interactions from other mobs, buildings,
+rooms, sectors, crops, and vehicles -- this may save you time if many are the
+same.
+
+Mob interaction types:
+ &cBUTCHER&0 - Items received when the butcher command is used on mob's corpse.
+ &cSKIN&0 - Items received via the skin command is used on mob's corpse.
+ &cSHEAR&0 - Items received when the shear command is used in a stable.
+ &cBARDE&0 - Mob loaded when the Barde ability is used in a stable.
+ &cLOOT&0 - Items dropped into the corpse when the mob is killed.
+ &cPICKPOCKET&0 - Items gained from the pickpocket skill.
+ &cTAME&0 - Becomes another mob when it is 'tamed'.
+ 
+Object interaction types:
+ &cLIGHT&0 - Item something is converted into when lit on fire.
+ &cCOMBINE**&0 - Combine multiple copies of an obj into another obj (quantity is the
+    number required, rather than number you get).
+ &cSEPARATE**&0 - Split this item into multiple other items.
+ ** Both COMBINE and SEPARATE should be set exclusive, as they will extract
+    the original item.
+ &cSCRAPE&0 - Items you get when scraping this item (tree -> log).
+ &cSAW&0 - Items you get when sawing this item (tree -> lumber).
+ &cTAN&0 - Items you get when tanning this item (skin -> leather).
+ &cCHIP&0 - What you get for chipping at the item.
+ &cSEED&0 - Gives an item when seeded.
+ &cDECAYS-TO&0 - Becomes a different object when its timer expires (e.g. ashes).
+ &cCONSUMES-TO&0 - Becomes a different object when eaten/used up (e.g. a jar).
+ &cIDENTIFIES-TO&0 - Becomds a different object when identified (e.g. a rock).
+ &cDISENCHANT&0 - Items received when disenchanting (also a global type).
+
+Room/vehicle interaction types:
+ &cDIG&0 * - Items received when using the dig action.
+ &cFORAGE&0 * - Items received when using the Forage ability. Note that if the
+   player gets nothing from a sector's forage list, they may also receive a
+   forage item from any wild crop that grows in the area.
+ &cPICK&0 * - Items found when picking.
+ &cHARVEST&0 - Items received when harvesting a crop.
+ &cGATHER&0 * - Items received from the gather action.
+ &cENCOUNTER&0 - Hostile mob loaded when a random encounter triggers.
+ &cCHOP&0 * - Things that can be found when chopping here.
+ &cFISH&0 * - Things that can be found by fishing here.
+ &cPAN&0 * - Things that can be found by panning here.
+ &cQUARRY&0 * - Things you can find by quarrying here.
+ &cRUINS-TO-BLD&0 - What type of ruins building appears here when it's ruined.
+   Only works on buildings, not vehicles. Quantity is ignored. Use #n in the
+   room title to indicate the name of the lost building.
+ &cRUINS-TO-VEH&0 - What type of ruins vehicle appears here when it's ruined.
+   May use #n in the keywords and short/long desc to indicate the name of the
+   building/vehicle that was ruined. Quantity is ignored.
+ &cPRODUCTION&0 * - Workforce will produce it (on a building or vehicle only).
+   Production is 1 at a time; quantity is used as the depletion limit.
+ &cSKILLED-LABOR&0 * - Workforce will produce it with Skilled Labor (bld/veh only).
+   Production is 1 at a time; quantity is used as the depletion limit.
+
+Ability interaction types:
+ &cLIQUID-CONJURE&0 - See ABILEDIT CONJURE LIQUID
+ &cOBJECT-CONJURE&0 - See ABILEDIT CONJURE OBJECT
+ &cVEHICLE-CONJURE&0 - See ABILEDIT CONJURE VEHICLE
+
+* Room interactions marked with an asterisk are 'one-at-a-time' interactions,
+  where the 'quantity' field is used as the maximum depletion, and players (or
+  workforce) receive 1 item at a time rather than the full quantity at once.
+  One-at-a-time interactions do not support the HIGH-DEPLETION room flag.
+
+The percent may be anywhere from 0.01 to 100.00 and if the quantity is greater
+than 1, the percent is only checked once for the entire quantity. If you want
+each copy of an item to have its own percent roll, list them separately as
+quantity 1.
+
+The exclusion code (optional) may be any letter, which changes how random
+interactions are chosen. All items with the same exclusion code have a cumu-
+lative roll (meaning if the percents add up to 100, one of them is guaranteed)
+but only one item from the same exclusion set will ever pass. The rest will
+fail. If you don't set an exclusion code, the interaction is not exclusive and
+always gets its own percent roll.
+
+You can use '.interact move' to rearrange entries. Interactions are always
+processed from top to bottom.
+
+Optional interaction restrictions:
+ &c-ability <vnum/"name">&0 - Player must have this ability.
+ &c-boss&0 - Mob must have HARD+GROUP flags; obj must have HARD- and GROUP-DROP.
+ &c-hard&0 - Mob must have only HARD flag, or object must have only HARD-DROP.
+ &c-group&0 - Mob must have only GROUP flag, or object must have only GROUP-DROP.
+ &c-normal&0 - Mob/obj must have no HARD or GROUP flag.
+ &c-ptech <name>&0 - Player must have this player-tech.
+ &c-tech <name>&0 - Empire must have this tech.
+ &c-tool <name>&0 - Require a specific tool for this interaction.
+ &c-depletion <type>&0 - Uses this type of depletion (see OLC DEPLETION).
+
+Examples:
+> .interaction add FORAGE 1 12345 100 x -ability "Find Herbs"
+
+Example of a rare result from barding (order matters here):
+ 1. BARDE: 1x an epic warhorse .50% (e)
+ 2. BARDE: 1x a warhorse 100% (e)
+
+Example of possible multiple results from shear:
+ 1. SHEAR: 1x some wool 100.00%
+ 2. SHEAR: 1x some wool 50.00%
+ 3. SHEAR: 1x some wool 5.00%
+
+See also: OLC BUILDINGS, OLC CROPS, OLC MOBILES, OLC SECTORS, OLC VEHICLES,
+  PRODUCTION INTERACTION, OLC WORKFORCE, OLC DEPLETIONS
+#d
 "LIGHT ITEM" "LIGHT OBJECT"
 
 The LIGHT item illuminates dark areas. Players need these items to work outside
@@ -8363,6 +10091,9 @@ Light items also use these custom messages:
    carried.
  decays-in-room - When the light burns out (or its timer expires) in a room.
 
+Lights with the LIGHT-FIRE or COOKING-FIRE flags will help buffer the player
+against cold (while lit).
+
 Example lights:
 - torch: 18 hours of light, LIGHT-FIRE, CAN-DOUSE, JUNK-WHEN-EXPIRED
 - campfire: 24 hours of light, LIGHT-FIRE, JUNK-WHEN-EXPIRED, COOKING-FIRE,
@@ -8370,7 +10101,7 @@ Example lights:
 - lantern: 24 hours of light, CAN-DOUSE
 
 See also: LIGHTER OBJECT, OEDIT LIGHT HOURS, OEDIT LIGHT IS LIT,
-   OEDIT LIGHT FLAGS
+   OEDIT LIGHT FLAGS, TEMPERATURE
 #d
 "LIGHTER ITEM" "LIGHTER OBJECT"
 
@@ -8638,15 +10369,23 @@ Usage:  .custom add <type> <message>
         .custom change <number> <type | message> <value>
         .custom move <number> <up | down>
         .custom remove <number | all>
+        .custom sort
 
 You can set custom messages on vehicles.
 
 If you set more than one message of the same type, one will be chosen at
-random each time.
+random each time. These generally use $V for the vehicle. Messages that involve
+a person also use $n, $e, $m, and $s.
 
-Message types:
+Decay messages:
  &cruins-to-room&0 - Shown when it falls into ruins (from decay).
  &cclimate-change-to-room&0 - Shown when ruined due to climate flag change.
+
+Player entering/exiting messages:
+ &center-to-inside&0 - Shown to people in a vehicle when a player enters.
+ &center-to-outside&0 - Shown to people outside a vehicle when a player goes in.
+ &cexit-to-inside&0 - Shown to people inside a vehicle as a player exits.
+ &cexit-to-outside&0 - Shown to people outside a vehicle as a player exits.
 
 See also: OLC VEHICLES, DOLLAR SIGN CODES
 #d
@@ -8769,6 +10508,7 @@ Fields:
   &c-capacity -capacityover -capacityunder&0 - specific capacity
   &c-depletion&0 - see HELP OLC DEPLETION
   &c-designate&0 - see HELP DESIGNATE FLAGS
+  &c-extradesc&0 - has a specific keyword in its extra descs
   &c-fame -fameover -fameunder&0 - specific fame amount
   &c-flagged -unflagged&0 - see HELP VEDIT FLAGS
   &c-functions&0 - see HELP VEDIT FUNCTIONS
@@ -8821,8 +10561,8 @@ Vehicles like catapults deal 8 damage per 100 levels, per shot. Siege rituals
 deal Intelligence + 1 damage. You can determine how many hitpoints to give a
 building based on this.
 
-Any damage over 10% of a vehicle's health will also add "1 year" of required
-maintenance to the vehicle (or nails, if the vehicle requires no yearly work).
+Any damage over 10% of a vehicle's health will also add "1 cycle" of required
+maintenance to the vehicle (or nails, if the vehicle requires no regular work).
 The repair command can be used to restore hitpoints.
 
 Common hitpoint levels:
@@ -8833,7 +10573,7 @@ Common hitpoint levels:
  medium ship: 96
  large ship: 128
 
-See also: VEDIT YEARLY MAINTENANCE, FIRE, OLC VEHICLES, REPAIR, SIEGE RITUAL
+See also: VEDIT RESOURCE MAINTENANCE, FIRE, OLC VEHICLES, REPAIR, SIEGE RITUAL
 #d
 "VEDIT ICON"
 
@@ -8960,27 +10700,27 @@ appropriate for vehicles.
 
 See also: OLC VEHICLES
 #d
-"VEDIT RESOURCES" "VEDIT YEARLY MAINTENANCE"
+"VEDIT RESOURCES" "VEDIT YEARLY MAINTENANCE" "VEDIT REGULAR MAINTENANCE"
 
 Usage:  .resource add <type> <amount> <vnum/name>
         .resource change <number> <quantity | vnum | name | flags> <value>
         .resource remove <number | all>
         .resource move <number> <up | down>
 
-This command adds materials to the vehicle's "yearly maintenance" list. These
-are resources needed to maintain the vehicle each year. If you don't set any,
-then the vehicle does not require maintenance.
+This command adds materials to the vehicle's "regular maintenance" list. These
+are resources needed to maintain the vehicle after each depletion/maintenance
+cycle. If you don't set any, then the vehicle does not require maintenance.
 
 This uses the ".resource" command to be consistent with other editors, but
 these are not the resources needed to build the vehicle in the first place --
 only to repair it.
 
 If a vehicle takes damage from any source, and that damage is more than 10% of
-its hitpoints, it will also add the yearly-maintenance resources to the repair
+its hitpoints, it will also add the regular maintenance resources to the repair
 cost.
 
-Vehicles with only 1 hitpoint will never get their yearly maintenance cost, as
-even 1 year of decay will destroy them.
+Vehicles with only 1 hitpoint will never get their regular maintenance cost, as
+even 1 cycle of decay will destroy them.
 
 See HELP OLC RESOURCES for more information.
 
@@ -9098,12 +10838,13 @@ Item variables:
  $a - a/an for the 1st item             $A - a/an for the 2nd item
 
 Vehicle variables:
- $v - short desc for the 1st vehicle (in the code, requires ACT_VEHICLE_OBJ)
+ $v - short desc for the 1st vehicle
  $V - short desc for the 2nd vehicle
 
 Misc variables (code only):
  $t - The obj parameter as a string
  $T - The vict_obj parameter as a string
+ $f - The first word of a string passed to the obj parameter
  $F - The first word of a string passed to the vict_obj parameter
 #d
 $~

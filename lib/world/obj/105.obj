@@ -3,12 +3,12 @@ pod glowkra glowing vegetable~
 a glowkra pod~
 Someone has dropped a glowing vegetable.~
    It has a faint sky-blue glow, although not enough to light the way. This
-appears to be a magi-netically modified crop from the deranged druids of the
-Magiterranean.
+appears to be a magi-netically modified crop from the deranged manaweavers of
+the Magiterranean.
 ~
-6 0 a 0 7
+6 C a 0 0 10
 1 0 0
-7 48
+7 336
 I 14 10501 100.00 4 x  # COMBINE: handful of glowkra pods
 M
 5
@@ -16,6 +16,8 @@ $n pops a glowing seedpod into $s mouth.~
 M
 4
 You pop a glowing seedpod into your mouth.~
+R
+4 5619 0
 S
 #10501
 pods handful glowkra~
@@ -24,11 +26,12 @@ A handful of glowkra pods are scattered on the ground.~
    The glowkra are a bright sky-blue fruit that seems to have a faint glow.
 You've heard they glow brighter when pickled. You also have a good recipe for
 seafood glowkra gumbo that just needs some magenta arrowfish and some rice.
-This strange crop is surely the work of the mad druids of the Magiterranean.
+This strange crop is surely the work of the mad manaweavers of the
+Magiterranean.
 ~
-6 b a 0 7
+6 bC a 0 0 8
 12 10500 0
-7 168
+7 336
 I 15 10500 100.00 4 x  # SEPARATE: glowkra pod
 R
 4 5114 0
@@ -40,9 +43,9 @@ A jar of pickled glowkra is shining away.~
    This jar contains freshly pickled glowkra pods. It's bright enough to light
 the way at night.
 ~
-6 c a 0 8
+6 cC a 0 0 9
 12 0 0
-8 336
+8 8760
 B
 c
 C
@@ -65,7 +68,7 @@ A plate of seafood glowkra gumbo is resting here.~
    This dish has the rich smell of garlic, pepper, fish, and okra. The okra
 seem to be glowing.
 ~
-6 0 a 0 4
+6 0 a 0 0 6
 48 0 0
 0 336
 M
@@ -74,6 +77,8 @@ You can taste the fresh fish as you eat $p.~
 M
 4
 You can taste the fresh glowkra as you eat $p.~
+R
+4 5619 0
 S
 #10504
 tooth dragon's dragons~
@@ -85,7 +90,7 @@ to summon skeletal guards for your empire.
 
 Craft (Jewelry): dragonstooth sceptre
 ~
-3 b a 0 9
+3 b a 0 0 9
 0 10502 0
 14 0
 R
@@ -99,7 +104,7 @@ A dragonstooth sceptre is lying here.~
 with 'use sceptre' when wielded to summon skeleton minions to guard your
 empire!
 ~
-1 ho an 0 8
+1 ho an 0 0 8
 0 2 5
 14 0
 A
@@ -116,9 +121,9 @@ A handful of spadebrush seeds is scattered here.~
    These magi-netically modified seeds can be used to plant spadebrush, or as a
 light snack.
 ~
-6 b a 0 4
+6 bC a 0 0 5
 1 10501 0
-0 48
+0 8760
 C
 0 1
 R
@@ -128,15 +133,15 @@ S
 spadebrush bundle~
 a bundle of spadebrush~
 A bundle of spadebrush is lying here.~
-   Spadebrush is a plant that has been magi-netically engineered by the druids
-of the Magiterranean to make handy spades for digging. If you get an axeroot,
-you can craft a combination tool - a spade-axe.
+   Spadebrush is a plant that has been magi-netically engineered by the mana-
+weavers of the Magiterranean to make handy spades for digging. If you get an
+axeroot, you can craft a combination tool - a spade-axe.
 
 Craft (requires Basic Crafts): spadebrush shovel
 ~
-3 k a 0 6
+3 kC a 0 0 7
 0 0 0
-0 336
+0 1344
 R
 4 5116 0
 S
@@ -146,7 +151,7 @@ a spadebrush shovel~
 A spadebrush shovel is poking out of the ground.~
 This shovel is made from the mystical spadebrush plant.
 ~
-1 eo ao o 2
+1 eo ao o 0 2
 0 4 5
 0 0
 C
@@ -163,9 +168,9 @@ A handful of bladegrass seeds is lying here.~
    These magi-netically modified wheat grains can be used to plant razor-sharp
 bladegrass in temperate climates. But good luck eating them.
 ~
-3 b a 0 6
+3 bC a 0 0 7
 0 10503 0
-2 168
+2 8760
 R
 4 5210 0
 S
@@ -180,7 +185,7 @@ can craft a combination tool - a pick-and-pan.
 
 Craft (Archery): bladegrass arrows
 ~
-3 0 a 0 7
+3 0 a 0 0 7
 0 0 0
 2 0
 R
@@ -197,13 +202,13 @@ iron rations.
 Bake (no skill required): ironbread
   2x sack of ironflour
 ~
-3 0 a 0 7
+3 0 a 0 0 8
 0 0 0
 2 0
 R
 4 5109 0
 R
-4 5606 0
+4 5619 0
 S
 #10512
 ration ironbread~
@@ -213,7 +218,7 @@ An ironbread ration has been dropped here.~
 ironflour, using the ancient cooking techniques of the Dwarves! It keeps for
 months and is rich in iron. Actually, it might even be made of iron.
 ~
-6 0 a 0 8
+6 0 a 0 0 10
 120 0 0
 2 0
 M
@@ -229,7 +234,9 @@ M
 5
 $n bites into $p with a sound like tearing metal.~
 R
-4 5606 0
+4 5132 0
+R
+4 5619 0
 S
 #10513
 gemfruit unripe~
@@ -238,11 +245,11 @@ An unripe gemfruit is lying here.~
    This magi-netically engineered crystalline apple-like fruit looks rather
 soft and underripe, but possibly edible.
 ~
-6 0 a 0 6
+6 C a 0 0 9
 6 0 0
-7 48
+7 120
 R
-4 5114 0
+4 5619 0
 S
 #10514
 gemfruits sparkling basket~
@@ -253,7 +260,7 @@ magical crystal. It can also be planted to grow more gemfruit. Some gemfruits
 will fail to produce gems, and you must be holding them in your inventory when
 they decay to get any gems at all.
 ~
-6 b a 0 15
+6 b a 0 0 15
 48 10504 0
 12 240
 T 10514
@@ -264,36 +271,40 @@ a magic mushroom~
 A magic mushroom is lying here.~
 You trip while looking at the mushroom.
 ~
-6 0 a 0 6
+6 C a 0 0 9
 1 0 0
-7 48
+7 72
 B
 u
 I 14 10516 100.00 4 x  # COMBINE: basket of magic mushrooms
 M
 4
 You chew $p until your mouth is dry, and suddenly you don't feel so good...~
+O+ 1 6101
+R
+4 5619 0
 S
 #10516
 basket mushrooms magic~
 a basket of magic mushrooms~
 A basket of magic mushrooms is sitting here.~
-   These mushrooms don't look terribly appetizing, but those druids sure were
+   These mushrooms don't look terribly appetizing, but those mages sure were
 growing a lot of them.
 
 Brew (Healing Elixirs): magic mushroom potion
 ~
-6 b a 0 10
+6 bC a 0 0 14
 12 10505 0
-7 168
+7 72
 B
 u
 I 15 10515 100.00 4 x  # SEPARATE: magic mushroom
 M
 4
 You chew $p until your mouth is dry, and suddenly you don't feel so good...~
+O+ 1 6111
 R
-4 5606 0
+4 5215 0
 S
 #10517
 potion magic mushroom~
@@ -301,7 +312,7 @@ a magic mushroom potion~
 A magic mushroom potion is sitting here.~
 This foul-smelling mana potion is made from magic mushrooms.
 ~
-25 m a 0 7
+25 m a 0 0 7
 -1 0 -1
 8 0
 C
@@ -318,23 +329,25 @@ an unripe fig~
 An unripe fig is lying here.~
 This fig looks a little under-ripe, but it's strangely mushy.
 ~
-6 0 a 0 3
+6 C a 0 0 6
 1 0 0
-7 48
+7 120
+R
+4 5619 0
 S
 #10519
 basket pudding figs~
 a basket of pudding figs~
 A basket of pudding figs is sitting on the ground.~
    These pudding figs seem to be the latest magi-netically modified fruit crop
-from the druids of the Magiterranean.
+from the manaweavers of the Magiterranean.
 
 Cook: figgy pudding
  2x basket of pudding figs
 ~
-6 b a 0 3
+6 bC a 0 0 5
 24 10506 0
-7 168
+7 120
 R
 4 5114 0
 S
@@ -342,12 +355,14 @@ S
 pudding figgy~
 a figgy pudding~
 A figgy pudding has been left on the ground.~
-   This figgy pudding has the mystical smell of druidic herbs. Somehow, it's
-still warm and each bite reminds you of home.
+   This figgy pudding has the mystical smell of Magiterranean herbs. Somehow,
+it's still warm and each bite reminds you of home.
 ~
-6 0 a 0 1
+6 0 a 0 0 3
 48 0 0
 7 336
+R
+4 5619 0
 S
 #10521
 leaf fig~
@@ -355,7 +370,7 @@ a fig leaf~
 A fig leaf has fallen here.~
 This fig leaf looks just big enough to hide your shame.
 ~
-2 o al 0 2
+2 o al 0 0 2
 0 0 0
 0 0
 C
@@ -367,14 +382,14 @@ a pouch of dried figs~
 A pouch of dried figs is lying here.~
 These figs are dried, but still have the moist taste of pudding.
 ~
-6 0 a 0 4
+6 C a 0 0 6
 48 0 0
-7 672
+7 4320
 M
 4
 You eat $p. The figs are surprisingly moist.~
 R
-4 5606 0
+4 5619 0
 S
 #10523
 beans magic handful~
@@ -383,9 +398,9 @@ A handful of magic beans is scattered here.~
    These beans look strangely ordinary... You can't believe anyone would sell a
 whole cow just for these.
 ~
-6 b a 0 5
+6 bC a 0 0 8
 6 10507 0
-10 48
+10 8760
 O+ 1 6141
 R
 4 5116 0
@@ -395,16 +410,18 @@ leaves dark gray grey axeroot~
 some axeroot leaves~
 Some dark gray leaves are lying here.~
    These dark gray leaves come from the axeroot plant, one of the many strange
-magi-netically modified plants collected by druids.
+magi-netically modified plants collected by manaweavers.
 ~
-6 0 a 0 1
+6 C a 0 0 3
 6 0 0
-2 48
+2 72
+R
+4 5619 0
 S
 #10525
-axeroot root~
-an axeroot~
-An axeroot is lying here, uprooted.~
+axeroot root robust~
+a robust axeroot~
+A robust axeroot is lying here, uprooted.~
    The magi-netically engineered axeroot grows in a distinctive blade shape,
 and need only be sharpened to make a suitable chopper. You can also plant it to
 start a new crop.
@@ -412,21 +429,21 @@ start a new crop.
 Craft (Basic Crafts): axeroot chopper
 Craft (Master Craftsman, level 150): spade-axe
 ~
-3 be a 0 7
+3 beC a 0 0 10
 0 10508 0
-2 168
+2 2160
 R
-4 5116 0
+4 5215 0
 S
 #10526
 chopper axeroot~
 an axeroot chopper~
 An axeroot chopper sticks up from the ground.~
    This trusty axe is made from a sharpened axeroot, one of the bizarre plants
-created by the druids of the Magiterranean in their magi-netically modified
-foods program.
+created by the manaweavers of the Magiterranean in their magi-netically
+modified foods program.
 ~
-1 0 an a 5
+1 0 an a 0 5
 0 5 2
 2 0
 C
@@ -442,9 +459,9 @@ a spade-axe~
 A spade-axe is sticking out of the ground.~
    This strange multi-tool is made from an axeroot and a spadebrush, and looks
 to be good for both chopping and digging. It's no wonder the Magiterranean
-druids have been magi-netically engineering new plants. This is useful!
+manaweavers have been magi-netically engineering new plants. This is useful!
 ~
-1 emo ano ao 9
+1 emo ano ao 0 9
 0 1 2
 2 0
 C
@@ -455,29 +472,31 @@ chowberries crunchy~
 some crunchy chowberries~
 Some chowberries are scattered on the ground.~
    This handful of berries is surprisingly crunchy. Surely this was thought up
-by some half-fiveleafed Magiterranean druid working late in the magi-netic
+by some half-fiveleafed Magiterranean manaweaver working late in the magi-netic
 engineering lab.
 ~
-6 0 a 0 2
+6 C a 0 0 4
 6 0 0
-7 48
+7 336
 M
 4
 You crunch away on $p.~
 M
 5
 $n crunches away on $p.~
+R
+4 5619 0
 S
 #10529
 pod puppy~
 a puppy pod~
 A puppy pod is sitting on the ground.~
-   The latest innovation from the Magiterranean druids, this magi-netically
-engineered puppy pod can be used to grow a furry friend. Grow your own best
-friend!
+   The latest innovation from the Magiterranean manaweavers, this
+magi-netically engineered puppy pod can be used to grow a furry friend. Grow
+your own best friend!
 Type 'use pod' to summon a temporary puppy pet.
 ~
-3 be a 0 3
+3 be a 0 0 3
 0 10509 0
 0 336
 R
@@ -492,7 +511,7 @@ A quiver of bladegrass arrows is lying here.~
 magi-netically engineered bladegrass, while the shaft is made from a piece of
 stalk. They look rather vicious.
 ~
-21 mo a 0 3
+21 mo a 0 0 3
 20 1 0
 2 0
 C
@@ -503,25 +522,25 @@ fruit pickthorn red~
 a red pickthorn fruit~
 A pickthorn fruit is lying here.~
    This strange red fruit comes from the pickthorn plant, which was
-magi-netically engineered by a group of druids to grow natural tools.
+magi-netically engineered by a group of manaweavers to grow natural tools.
 ~
-6 b a 0 2
+6 b a 0 0 4
 6 10510 0
-0 48
+0 336
 R
-4 5114 0
+4 5619 0
 S
 #10532
 stalk pickthorn~
 a pickthorn stalk~
 A pickthorn stalk seems planted here.~
-   The pickthorn is a plant magi-netically engineered by Magiterranean druids
+   The pickthorn is a plant magi-netically engineered by Magiterranean mages
 to grow useful tools on unused farmland.
 
 Craft (Basic Crafts): thorn pick
 Craft (Master Craftsman, level 150): pick-and-pan
 ~
-3 0 a 0 8
+3 0 a 0 0 8
 0 0 0
 0 0
 R
@@ -533,13 +552,19 @@ a thorn pick~
 A thorn pick is stuck into the ground.~
    This plant-based pick was made from a pickthorn plant, magi-netically
 modified from a woody desert plant into a temperate tool. What will those
-Magiterranean druids come up with next?
+Magiterranean manaweavers come up with next?
 ~
-1 0 an h 5
+1 0 an h 0 6
 0 3 8
 2 0
 C
 50 50
+M
+26
+You swing $p hard into the wall, searching for ore.~
+M
+27
+$n swings $p hard into the wall, searching for ore.~
 R
 4 5121 0
 R
@@ -553,11 +578,17 @@ A pick-and-pan is lying on the ground.~
 pickthorn and bladegrass. It can be used for mining metals, or for panning them
 in the stream.
 ~
-1 emo ano hi 6
+1 emo ano hi 0 7
 0 1 8
 0 0
 C
 0 125
+M
+26
+You scrape at the walls with $p in search of ore.~
+M
+27
+$n scrapes at the walls with $p in search of ore.~
 S
 #10535
 vines vigilant bundle~
@@ -566,9 +597,9 @@ A bundle of vigilant vines is piled up here.~
    These vicious magi-netically engineered vines can be planted in your cities,
 and will grow carnivorous flora to attack invaders.
 ~
-3 b a 0 12
+3 bC a 0 0 14
 0 10511 0
-7 168
+7 0
 O+ 1 6424
 R
 4 5111 0
@@ -579,7 +610,7 @@ some ashes~
 Some ashes are scattered on the ground.~
 You find only ash, suitable for feeding no one.
 ~
-3 k a 0 1
+3 k a 0 0 1
 0 0 0
 14 6
 S
@@ -589,7 +620,7 @@ a giant beanstalk~
 A giant beanstalk has been felled here.~
 Beanstalks work as pillars in place of logs.
 ~
-3 e a 0 4
+3 e a 0 0 4
 0 0 0
 0 0
 I 11 1002 100.00 1  # LIGHT: roaring fire
@@ -605,7 +636,7 @@ A frosty portal spews flurries of snow from beneath an arch of ice!~
 portal. Snow blasts through the portal and, as the snow lands on your skin, you
 feel the electric mana of the Magiterranean -- the realm of nature mages.
 ~
-8 0 0 0 2
+8 B 0 0 0 3
 -1 0 0
 10 0
 S
@@ -616,12 +647,12 @@ A bunch of rhubarb is piled on the ground.~
    These rhubarb stems are bright red, and fresh. There are some seeds
 intermixed in the bunch, so you could also plant them.
 ~
-6 bg a 0 7
+6 bgC a 0 0 9
 12 10551 0
-7 168
+7 72
 O+ 1 6132
 R
-4 5114 0
+4 5215 0
 S
 #10552
 berries brambleberries arctic~
@@ -629,10 +660,12 @@ some arctic brambleberries~
 Some arctic brambleberries are scattered on the ground.~
 You can eat the berries.
 ~
-6 g a 0 6
+6 gC a 0 0 8
 2 0 0
-7 48
+7 336
 O+ 1 6122
+R
+4 5619 0
 S
 #10553
 pie rhubarb~
@@ -640,7 +673,7 @@ a rhubarb pie~
 All you can smell is that warm rhubarb pie on the ground.~
 The pie looks delicious!
 ~
-6 m a 0 4
+6 m a 0 0 7
 24 0 0
 7 336
 A
@@ -650,7 +683,9 @@ A
 C
 1 1
 R
-4 5606 0
+4 5132 0
+R
+4 5619 0
 S
 #10554
 runes strange glacier~
@@ -661,7 +696,7 @@ must come and defeat the Polar Baron, should he use his glacial powers to
 spread frost across the world. There is a small plaque beneath the runes.
 Usage:  difficulty <normal | hard | group | boss>
 ~
-3 0 0 0 5
+3 B 0 0 0 6
 0 0 0
 10 0
 E
@@ -677,7 +712,7 @@ The glacier has split and is beginning to melt.~
    Massive crevices have formed in the glacier, and a steady stream of
 meltwater is pouring from them.
 ~
-3 0 0 0 6
+3 B 0 0 0 7
 0 0 0
 9 48
 T 10555
@@ -689,7 +724,7 @@ A permafrost token is lying here.~
    This token, redeemable for rewards at the Permafrost adventure's shop, will
 be automatically stored in your pouch when taken.
 ~
-12 p a 0 7
+12 p a 0 0 7
 1 10550 0
 7 0
 S
@@ -700,7 +735,7 @@ A fallen spruce tree is lying here.~
    The spruce tree is covered in thin branches, and still has the fresh scent
 of winter about it.
 ~
-3 e a 0 6
+3 e a 0 0 6
 0 0 0
 0 0
 I 11 1002 100.00 1  # LIGHT: roaring fire
@@ -728,7 +763,7 @@ Some fresh spruce lumber is piled here.~
    The pale, knotty wood is nevertheless strong. Lumber is used in building
 construction.
 ~
-3 e a 0 6
+3 e a 0 0 6
 0 0 0
 0 0
 I 11 1002 100.00 1  # LIGHT: roaring fire
@@ -756,7 +791,7 @@ a spruce post~
 A spruce post is lying here.~
 This post is made from fresh spruce wood, and can be used in construction.
 ~
-3 e a 0 6
+3 e a 0 0 6
 0 0 0
 0 0
 I 11 1002 100.00 1  # LIGHT: roaring fire
@@ -779,7 +814,7 @@ A bouquet of frost ferns is lying here.~
 snow, though it isn't cold to the touch. It looks like it can be planted in the
 plains, but also in deep forests.
 ~
-3 b a 0 2
+3 b a 0 0 2
 0 10560 0
 0 0
 C
@@ -792,9 +827,9 @@ a handful of red and green seeds~
 A handful of red and green seeds are scattered on the ground.~
 These small, thin seeds are colored red and green.
 ~
-6 b a 0 8
+6 bC a 0 0 9
 1 10551 0
-7 576
+7 8760
 C
 1 1
 R
@@ -806,7 +841,7 @@ a seed of pure ice~
 A seed made of ice is lying here.~
 This seed looks like a tiny crystal, but for its delicate, icy touch.
 ~
-3 b a 0 5
+3 b a 0 0 5
 0 10560 0
 9 0
 C
@@ -821,7 +856,7 @@ A polar bear charm is lying here.~
    This charm is carved from marble, in the shape of a polar bear. Though the
 charm is small, if you 'use charm', it will summon a mount.
 ~
-3 p a 0 10
+3 p a 0 0 10
 10564 0 0
 1 0
 T 9910
@@ -833,7 +868,7 @@ A penguin charm is lying here.~
    This charm is carved from marble, in the shape of a penguin. Though the
 charm is small, if you 'use charm', it will summon a swimming mount.
 ~
-3 p a 0 11
+3 p a 0 0 11
 10565 0 0
 1 0
 T 9910
@@ -845,7 +880,7 @@ A wyvern charm is floating in the air.~
    This charm is carved from marble, in the shape of a wyvern. Though the charm
 is small, if you 'use charm', it will summon a flying mount.
 ~
-3 p a 0 12
+3 p a 0 0 12
 10566 0 0
 1 0
 T 9910
@@ -857,7 +892,7 @@ A polar cub whistle is lying here.~
 This whistle can summon a noncombat pet!
 Type 'use whistle' to summon it.
 ~
-19 p a 0 5
+19 p a 0 0 5
 10567 0 0
 2 0
 S
@@ -869,7 +904,7 @@ A yeti charm has been dropped here.~
 abominable yeti. It gives you the power to 'morph yeti', and take on the form
 of this rare creature.
 ~
-3 p a 0 12
+3 p a 0 0 12
 0 0 0
 1 0
 S
@@ -881,7 +916,7 @@ A pile of fine gossamer sails are piled here.~
 hands. A talented shipbuilder can use these sails to build the infamous Polar
 Wind, the ship of the north.
 ~
-3 e a 0 1
+3 e a 0 0 1
 0 0 0
 10 0
 S
@@ -892,7 +927,7 @@ Some boss loot has bugged out.~
    This item purges itself and spawns an actual boss-kill reward. But only on
 Group and Boss difficulties.
 ~
-3 p a 0 6
+3 p a 0 0 6
 0 0 0
 10 0
 T 10570
@@ -906,7 +941,7 @@ of lashing out with all the blistering cold of the arctic. This mystic weapon
 is a powerful deterrent to attackers, who cannot bear to approach the one who
 wields it.
 ~
-1 hmo an 0 2
+1 hmo an 0 0 2
 0 1 7
 10 0
 A
@@ -923,9 +958,11 @@ The whipping winds of the North pattern is lying here.~
    This looks complicated to do... This pattern teaches you to sew the whipping
 winds of the North.
 ~
-7 0 a 0 3
+7 0 a 0 0 4
 10571 0 0
 0 0
+C
+1 1
 S
 #10573
 sword pykrete frozen~
@@ -935,7 +972,7 @@ A frozen pykrete sword is staked into the ground.~
 wear gloves or risk your own fingers. The blade is sharp enough to cut through
 bone and, perhaps from some enchantment, never seems to dull.
 ~
-1 emo an 0 2
+1 emo an 0 0 2
 0 4 1
 10 0
 A
@@ -952,9 +989,11 @@ The frozen pykrete sword is lying here.~
    Forging is easy. Forging ice without shattering it is a lot harder. This
 pattern teaches you to forge a frozen pykrete sword.
 ~
-7 0 a 0 2
+7 0 a 0 0 3
 10573 0 0
 0 0
+C
+1 1
 S
 #10575
 star winter icy~
@@ -964,7 +1003,7 @@ The icy star of winter hovers in the North.~
 to draw heat from the entire room and chills onlookers to the core of their
 bones, it is warm to the touch.
 ~
-1 mo an 0 3
+1 mo an 0 0 3
 0 1 20
 10 0
 A
@@ -983,9 +1022,11 @@ The icy star of winter pattern is lying here.~
    Cutting ice is basically like cutting gems. The tricky bit is trapping a
 star inside it. This pattern teaches you to craft the icy star of winter.
 ~
-7 0 a 0 2
+7 0 a 0 0 3
 10575 0 0
 0 0
+C
+1 1
 S
 #10577
 staff glacial maelstrom~
@@ -996,7 +1037,7 @@ holds its form as you touch it. Above it, the air whips itself into a dark
 cloud and begins shooting bolts of lightning down into the staff. Are you
 powerful enough to channel these bolts?
 ~
-1 emo an 0 4
+1 emo an p 0 5
 0 3 17
 10 0
 A
@@ -1016,9 +1057,11 @@ The glacial staff of the Maelstrom pattern is lying here.~
 anathema to high sorcerers, so normal staffmaking skill isn't required to craft
 it. This pattern teaches you to craft a glacial staff of the Maelstrom.
 ~
-7 0 a 0 2
+7 0 a 0 0 3
 10577 0 0
 0 0
+C
+1 1
 S
 #10579
 echoes cold future~
@@ -1028,7 +1071,7 @@ Cold echoes of the future linger in the air.~
 come. As you hold the echoes to your ear, it is as if every moment of combat is
 predestined -- and you are the only one who knows it.
 ~
-2 mp am 0 4
+2 mp am 0 0 4
 0 0 0
 10 0
 A
@@ -1054,7 +1097,7 @@ There is a whisper of icy cataclysm in the air.~
 bring them close to your ear, you can hear their plans for the destruction of
 your foes.
 ~
-2 mp am 0 4
+2 mp am 0 0 4
 0 0 0
 10 0
 A
@@ -1078,7 +1121,7 @@ A pair of dangling baubles of the eternal sun are lying here.~
 They look far too enormous to wear but instead, you feel lighter for wearing
 them. The baubles instill in you the glow of the undying arctic sun in summer.
 ~
-2 mp am 0 4
+2 mp am 0 0 4
 0 0 0
 10 0
 A
@@ -1097,7 +1140,7 @@ your fingers as you touch them, but give no discomfort as you place them on
 your ears. Instead, you begin to hear the icy winds of the North whisper in
 your mind.
 ~
-2 mp am 0 5
+2 mp am 0 0 5
 0 0 0
 10 0
 A
@@ -1115,7 +1158,7 @@ A pair of hoarfrost earplates are lying here.~
 hoarfrost that you cannot see what lies beneath it. Still, they are
 surprisingly warm when you wear them.
 ~
-2 mp am 0 5
+2 mp am 0 0 5
 0 0 0
 10 0
 A
@@ -1132,7 +1175,7 @@ somehow different. Its luster is somehow brighter, in a way that almost
 staggers you as you stare at it. It catches the light at every angle, and would
 surely distract your enemies if you wore it around your neck.
 ~
-2 mp ac 0 3
+2 mp ac 0 0 3
 0 0 0
 2 0
 A
@@ -1149,7 +1192,7 @@ golden chain. It's surprisingly light even for its size. As you wear it, you
 feel your own veins run cold, and you can see the warm blood of your foes
 coursing just beneath their skin.
 ~
-2 mp ac 0 6
+2 mp ac 0 0 6
 0 0 0
 4 0
 A
@@ -1168,7 +1211,7 @@ nocturnium, but the color is far too light. It almost has the color of the
 blue, cloudless arctic sky and as you stare into it, you're momentarily lost in
 the comforting thoughts of winter.
 ~
-2 mp ac 0 5
+2 mp ac 0 0 5
 0 0 0
 2 0
 A
@@ -1185,7 +1228,7 @@ pearls you have ever seen in nature. Gazing upon the pearls sends a chill down
 your spine, but actually touching them with your bare skin gives you that warm,
 comforting feeling that someone gets just before freezing to death.
 ~
-2 mp ac 0 6
+2 mp ac 0 0 6
 0 0 0
 2 0
 A
@@ -1203,7 +1246,7 @@ The aegis charm of the Permafrost is lying here.~
 symbol of the Magiterranean's terrifying Permafrost realm. The necklace is cold
 to wear, but gives you an odd feeling of strength.
 ~
-2 mp ac 0 5
+2 mp ac 0 0 5
 0 0 0
 2 0
 A
@@ -1221,7 +1264,7 @@ A polar bear shield is propped up here.~
 on the surface, you can see the whole head of a polar bear, its face frozen in
 a permanent grimace.
 ~
-23 emp ao 0 5
+23 emp ao 0 0 5
 0 0 0
 8 0
 A
@@ -1243,7 +1286,7 @@ An intricately runed walrus tusk is staked into the ground.~
 runes that glow a faint, frosty blue. You don't understand the runic language,
 though it reminds you of symbols you saw in the Magiterranean.
 ~
-2 emp ao 0 5
+2 emp ao 0 0 5
 0 0 0
 14 0
 A
@@ -1264,7 +1307,7 @@ These stones have long been used in the north to ward against disease and harm.
 But this adder stone has a special glow about it, like no other stone you've
 ever seen.
 ~
-2 emp ao 0 6
+2 emp ao 0 0 6
 0 0 0
 8 0
 A
@@ -1286,7 +1329,7 @@ the Polar Barons, a great lineage of mages from the Permafrost realm of the
 Magiterranean. As your hand touches the icy tome, you realize you can draw out
 the mana from that arctic dimension.
 ~
-2 emp ao 0 8
+2 emp ao 0 0 8
 0 0 0
 8 0
 A
@@ -1306,7 +1349,7 @@ A wand of polar power has been dropped here.~
 within the Permafrost realm of the Magiterranean. Use 'freeze <target>' to get
 rid of any critters from this realm which block your passage.
 ~
-3 0 a 0 5
+3 0 a 0 0 5
 0 0 0
 10 0
 Q 10550
@@ -1318,7 +1361,7 @@ the permafrost trash spawner~
 The permafrost trash spawner is lying here, useless.~
 This item spawns trash mobs.
 ~
-3 0 0 0 2
+3 0 0 0 0 2
 0 0 0
 0 0
 T 10594
@@ -1329,7 +1372,7 @@ a large block of ice~
 A large block of ice is standing here.~
 Upon closer inspection, there appears to be a creature trapped inside...
 ~
-3 0 0 0 1
+3 0 0 0 0 1
 0 0 0
 8 8064
 S
@@ -1340,7 +1383,7 @@ There is a fillet of frozen meat sitting on the ground.~
    This meat is frozen solid and you simply cannot eat it in this state. Try
 cooking it first...
 ~
-3 0 a 0 4
+3 0 a 0 0 4
 0 0 0
 7 720
 O+ 1 6200
@@ -1352,13 +1395,15 @@ A plate of cold cuts is lying on the ground.~
    These cold cuts are, indeed, very cold. It's as if they were made from
 frozen meat.
 ~
-6 m a 0 4
+6 m a 0 0 6
 18 0 0
-7 96
+7 336
 A
 24 1 0
 C
 1 1
+R
+4 5619 0
 S
 #10598
 gemstone stone frozen~
@@ -1366,7 +1411,7 @@ a frozen gemstone~
 A frozen gemstone is melting on the ground.~
 It twinkles like a gemstone, but it seems to be mere ice.
 ~
-3 0 a 0 5
+3 0 a 0 0 5
 0 0 0
 1 24
 O+ 1 6600
@@ -1380,7 +1425,7 @@ A strange vial of frostblood is lying here.~
 it swirls effortlessly as you twirl the vial in your fingers. Take this vial to
 any crypt to complete the quest.
 ~
-3 0 a 0 2
+3 0 a 0 0 2
 0 0 0
 8 0
 Q 10555

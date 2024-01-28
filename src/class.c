@@ -2,7 +2,7 @@
 *   File: class.c                                         EmpireMUD 2.0b5 *
 *  Usage: code related to classes, including DB and OLC                   *
 *                                                                         *
-*  EmpireMUD code base by Paul Clarke, (C) 2000-2015                      *
+*  EmpireMUD code base by Paul Clarke, (C) 2000-2024                      *
 *  All rights reserved.  See license.doc for complete information.        *
 *                                                                         *
 *  EmpireMUD based upon CircleMUD 3.0, bpl 17, by Jeremy Elson.           *
@@ -49,14 +49,15 @@ int sort_class_abilities(struct class_ability *a, struct class_ability *b);
 //// HELPERS ////////////////////////////////////////////////////////////////
 
 /**
-* Checks that the player has the correct set of class abilities, and removes
-* any they shouldn't have. This function ignores immortals.
+* Checks that the player has the correct set of abilities from their class,
+* role, synergy, etc; and removes any they shouldn't have. This function
+* ignores immortals.
 *
 * @param char_data *ch The player to check.
 * @param class_data *cls Optional: Any player class, or NULL to detect from the player.
 * @param int role Optional: Any ROLE_ const, or NOTHING to detect from the player.
 */
-void assign_class_abilities(char_data *ch, class_data *cls, int role) {
+void assign_class_and_extra_abilities(char_data *ch, class_data *cls, int role) {
 	// helper type
 	struct assign_abil_t {
 		any_vnum vnum;	// which abil
@@ -65,9 +66,10 @@ void assign_class_abilities(char_data *ch, class_data *cls, int role) {
 		UT_hash_handle hh;
 	};
 	
-	struct assign_abil_t *hash = NULL, *aat, *next_aat;
+	struct assign_abil_t *hash = NULL, *aat, *next_aat, *check;
 	struct player_skill_data *plsk, *next_plsk;
 	ability_data *abil, *next_abil;
+	struct ability_data_list *adl;
 	struct synergy_ability *syn;
 	struct class_ability *clab;
 	skill_data *skill;
@@ -92,7 +94,7 @@ void assign_class_abilities(char_data *ch, class_data *cls, int role) {
 			continue;	// skip skill-purchase abils entirely
 		}
 		
-		// STEAP 1a: find/add an 'aat' entry
+		// STEP 1a: find/add an 'aat' entry
 		vnum = ABIL_VNUM(abil);
 		HASH_FIND_INT(hash, &vnum, aat);
 		if (!aat) {
@@ -102,8 +104,8 @@ void assign_class_abilities(char_data *ch, class_data *cls, int role) {
 			HASH_ADD_INT(hash, vnum, aat);
 		}
 		
-		// STEP 1b: determine if the player's class/role has this abil -- only if they are at the class skill cap (100)
-		if (cls && GET_SKILL_LEVEL(ch) >= CLASS_SKILL_CAP) {
+		// STEP 1b: determine if the player's class/role has this abil -- only if they are at the max skill cap (100)
+		if (cls && !aat->can_have && GET_SKILL_LEVEL(ch) >= MAX_SKILL_CAP) {
 			LL_FOREACH(CLASS_ABILITIES(cls), clab) {
 				if (clab->role != NOTHING && clab->role != role) {
 					continue;	// wrong role
@@ -145,16 +147,60 @@ void assign_class_abilities(char_data *ch, class_data *cls, int role) {
 		}
 	}
 	
-	// STEP 3: assign/remove abilities
+	// STEP 3: check parent abilities
+	HASH_ITER(hh, ability_table, abil, next_abil) {
+		if (!has_ability_data_any(abil, ADL_PARENT)) {
+			continue;	// parentless
+		}
+		
+		// STEP 3a: find/add an 'aat' entry
+		vnum = ABIL_VNUM(abil);
+		HASH_FIND_INT(hash, &vnum, aat);
+		if (!aat) {
+			CREATE(aat, struct assign_abil_t, 1);
+			aat->vnum = vnum;
+			aat->ptr = abil;
+			HASH_ADD_INT(hash, vnum, aat);
+		}
+		
+		// STEP 3b: determine if a 'parent' type allows it
+		LL_FOREACH(ABIL_DATA(abil), adl) {
+			if (adl->type != ADL_PARENT) {
+				continue;	// not apparent
+			}
+			
+			// check ITS aat
+			vnum = adl->vnum;
+			HASH_FIND_INT(hash, &vnum, check);
+			
+			if (check && !check->can_have) {
+				continue;	// missing synergy/class/role ability
+			}
+			if (!check && !has_ability(ch, adl->vnum)) {
+				continue;	// missing basic ability
+			}
+			if (!ability_proto(adl->vnum)) {
+				continue;	// cannot find parent
+			}
+			
+			// if we got here, it's safe to have
+			aat->can_have = TRUE;
+			break;
+		}
+	}
+	
+	// STEP 4: assign/remove abilities
 	HASH_ITER(hh, hash, aat, next_aat) {
 		// remove any they shouldn't have
 		if (has_ability(ch, aat->vnum) && !aat->can_have) {
 			remove_ability(ch, aat->ptr, FALSE);
 			check_skill_sell(ch, aat->ptr);
+			qt_change_ability(ch, aat->vnum);
 		}
 		// add if needed
 		if (aat->can_have) {
 			add_ability(ch, aat->ptr, FALSE);
+			qt_change_ability(ch, aat->vnum);
 		}
 		
 		// clean up memory
@@ -301,22 +347,45 @@ class_data *find_class_by_vnum(any_vnum vnum) {
 
 
 /**
+* @param ability_data *abil An ability to check.
+* @return bool TRUE if that ability is assigned to any class, or FALSE if not.
+*/
+bool is_class_ability(ability_data *abil) {
+	class_data *class, *next_class;
+	struct class_ability *clab;
+	
+	if (!abil) {
+		return FALSE;
+	}
+	
+	HASH_ITER(hh, class_table, class, next_class) {
+		LL_SEARCH_SCALAR(CLASS_ABILITIES(class), clab, vnum, ABIL_VNUM(abil));
+		if (clab) {
+			return TRUE;
+		}
+	}
+	
+	return FALSE;	// no match
+}
+
+
+/**
 * This function updates a player's class and skill levelability data based
-* on current skill levels.
+* on current skill levels. It will also update abilities that come from the
+* class, role, synergies, or parent abilities.
 *
 * @param char_data *ch the player
 */
-void update_class(char_data *ch) {
+void update_class_and_abilities(char_data *ch) {
 	#define NUM_BEST  3
 	#define IGNORE_BOTTOM_SKILL_POINTS  35	// amount newbies should start with
-	#define BEST_SUM_REQUIRED_FOR_100  (2 * CLASS_SKILL_CAP + SPECIALTY_SKILL_CAP)
-	#define CLASS_LEVEL_BUFFER  24	// allows the class when still this much under the final level requirement
+	#define BEST_SUM_REQUIRED_FOR_100  (2 * MAX_SKILL_CAP + SPECIALTY_SKILL_CAP)
+	#define CLASS_LEVEL_BUFFER  (MAX_SKILL_CAP - SPECIALTY_SKILL_CAP - 1)	// allows the class when still this much under the final level requirement
 	
-	int at_zero, over_basic, over_specialty, old_level, best_class_count, class_count;
+	int over_zero, old_level, best_class_count, class_count;
 	int best[NUM_BEST], best_level[NUM_BEST], best_iter, best_sub, best_total;
 	class_data *class, *next_class, *old_class, *best_class;
 	struct player_skill_data *skdata, *next_skdata;
-	skill_data *skill, *next_skill;
 	struct class_skill_req *csr;
 	bool ok;
 	
@@ -329,27 +398,12 @@ void update_class(char_data *ch) {
 		best[best_iter] = NO_SKILL;
 		best_level[best_iter] = 0;
 	}
-	over_basic = 0, over_specialty = 0;
-	at_zero = 0;
-	HASH_ITER(hh, skill_table, skill, next_skill) {
-		if (!SKILL_FLAGGED(skill, SKILLF_IN_DEVELOPMENT) && SKILL_FLAGGED(skill, SKILLF_BASIC)) {
-			++at_zero;	// count total live skills (ignoring non-basics)
-		}
-	}
+	over_zero = 0;
 	
 	// find skill counts
 	HASH_ITER(hh, GET_SKILL_HASH(ch), skdata, next_skdata) {
-		if (!SKILL_FLAGGED(skdata->ptr, SKILLF_BASIC)) {
-			continue;	// ignore non-basics
-		}
 		if (skdata->level > 0) {
-			--at_zero;
-		}
-		if (skdata->level > BASIC_SKILL_CAP) {
-			++over_basic;
-		}
-		if (skdata->level > SPECIALTY_SKILL_CAP) {
-			++over_specialty;
+			++over_zero;
 		}
 		
 		// update best
@@ -374,11 +428,8 @@ void update_class(char_data *ch) {
 	
 	// set up skill limits:
 	
-	// can still gain new skills (gain from 0) if either you have more zeroes than required for bonus skills, or you're not using bonus skills
-	CAN_GAIN_NEW_SKILLS(ch) = (at_zero > ZEROES_REQUIRED_FOR_BONUS_SKILLS) || (over_basic <= NUM_SPECIALTY_SKILLS_ALLOWED);
-	
-	// you qualify for bonus skills so long as you have enough skills at zero
-	CAN_GET_BONUS_SKILLS(ch) = (at_zero >= ZEROES_REQUIRED_FOR_BONUS_SKILLS);
+	// can still gain new skills (gain from 0)?
+	CAN_GAIN_NEW_SKILLS(ch) = (over_zero < config_get_int("skills_per_char"));
 	
 	old_class = GET_CLASS(ch);
 	old_level = GET_SKILL_LEVEL(ch);
@@ -424,17 +475,17 @@ void update_class(char_data *ch) {
 	
 	// set level
 	GET_SKILL_LEVEL(ch) = (best_total - IGNORE_BOTTOM_SKILL_POINTS) * 100 / MAX(1, BEST_SUM_REQUIRED_FOR_100 - IGNORE_BOTTOM_SKILL_POINTS);
-	GET_SKILL_LEVEL(ch) = MIN(CLASS_SKILL_CAP, MAX(1, GET_SKILL_LEVEL(ch)));
+	GET_SKILL_LEVEL(ch) = MIN(MAX_SKILL_CAP, MAX(1, GET_SKILL_LEVEL(ch)));
 	
 	// disallow role if level is too low
-	if (GET_SKILL_LEVEL(ch) < CLASS_SKILL_CAP) {
+	if (GET_SKILL_LEVEL(ch) < MAX_SKILL_CAP) {
 		GET_CLASS_ROLE(ch) = ROLE_NONE;
 	}
 	
 	// set progression (% of the way from 75 to 100)
 	if (best_class && GET_SKILL_LEVEL(ch) >= SPECIALTY_SKILL_CAP) {
 		// class progression level based on % of the way
-		GET_CLASS_PROGRESSION(ch) = (GET_SKILL_LEVEL(ch) - SPECIALTY_SKILL_CAP) * 100 / (CLASS_SKILL_CAP - SPECIALTY_SKILL_CAP);
+		GET_CLASS_PROGRESSION(ch) = (GET_SKILL_LEVEL(ch) - SPECIALTY_SKILL_CAP) * 100 / (MAX_SKILL_CAP - SPECIALTY_SKILL_CAP);
 	}
 	else {
 		GET_CLASS_PROGRESSION(ch) = 0;
@@ -442,13 +493,7 @@ void update_class(char_data *ch) {
 	
 	// set class and assign abilities
 	GET_CLASS(ch) = best_class;
-	if (GET_LOYALTY(ch)) {
-		adjust_abilities_to_empire(ch, GET_LOYALTY(ch), FALSE);
-	}
-	assign_class_abilities(ch, NULL, NOTHING);
-	if (GET_LOYALTY(ch)) {
-		adjust_abilities_to_empire(ch, GET_LOYALTY(ch), TRUE);
-	}
+	assign_class_and_extra_abilities(ch, NULL, NOTHING);
 	
 	if (GET_CLASS(ch) != old_class || GET_SKILL_LEVEL(ch) != old_level) {
 		affect_total(ch);
@@ -1078,8 +1123,7 @@ void olc_delete_class(char_data *ch, any_vnum vnum) {
 		if (GET_CLASS(chiter) != cls) {
 			continue;
 		}
-		update_class(chiter);
-		assign_class_abilities(chiter, NULL, NOTHING);
+		update_class_and_abilities(chiter);
 	}
 
 	// save index and class file now
@@ -1150,8 +1194,7 @@ void save_olc_class(descriptor_data *desc) {
 	// update all players in-game
 	DL_FOREACH(character_list, ch_iter) {
 		if (!IS_NPC(ch_iter)) {
-			update_class(ch_iter);
-			assign_class_abilities(ch_iter, NULL, NOTHING);
+			update_class_and_abilities(ch_iter);
 		}
 	}
 }
@@ -1411,7 +1454,7 @@ OLC_MODULE(classedit_requires) {
 	skill_data *skill;
 	int iter, level = 0;
 	
-	int valid_levels[] = { 0, BASIC_SKILL_CAP, SPECIALTY_SKILL_CAP, CLASS_SKILL_CAP, -1 };
+	int valid_levels[] = { 0, BASIC_SKILL_CAP, SPECIALTY_SKILL_CAP, MAX_SKILL_CAP, -1 };
 	
 	if (!*argument) {
 		msg_to_char(ch, "Usage: requires <skill> <level>\r\n");
@@ -1589,7 +1632,6 @@ OLC_MODULE(classedit_role) {
 
 ACMD(do_class) {
 	char arg2[MAX_INPUT_LENGTH], buf[MAX_STRING_LENGTH];
-	empire_data *emp = GET_LOYALTY(ch);
 	int found;
 	
 	two_arguments(argument, arg, arg2);
@@ -1600,8 +1642,8 @@ ACMD(do_class) {
 	else if (*arg && !str_cmp(arg, "role")) {
 		// Handle role selection or display
 		
-		if (GET_SKILL_LEVEL(ch) < CLASS_SKILL_CAP) {
-			msg_to_char(ch, "You can't set a group role until you hit skill level %d.\r\n", CLASS_SKILL_CAP);
+		if (GET_SKILL_LEVEL(ch) < MAX_SKILL_CAP) {
+			msg_to_char(ch, "You can't set a group role until you hit skill level %d.\r\n", MAX_SKILL_CAP);
 		}
 		else if (!*arg2) {
 			msg_to_char(ch, "Your group role is currently set to: %s.\r\n", class_role[(int) GET_CLASS_ROLE(ch)]);
@@ -1616,20 +1658,11 @@ ACMD(do_class) {
 			msg_to_char(ch, "Unknown role '%s'.\r\n", arg2);
 		}
 		else {
-			// remove old abilities
-			if (emp) {
-				adjust_abilities_to_empire(ch, emp, FALSE);
-			}
-			
 			// change role
 			GET_CLASS_ROLE(ch) = found;
 			
 			// add new abilities
-			assign_class_abilities(ch, NULL, NOTHING);
-			if (emp) {
-				adjust_abilities_to_empire(ch, emp, TRUE);
-				resort_empires(FALSE);
-			}
+			assign_class_and_extra_abilities(ch, NULL, NOTHING);
 			
 			msg_to_char(ch, "Your group role is now: %s.\r\n", class_role[(int) GET_CLASS_ROLE(ch)]);
 		}
@@ -1656,11 +1689,11 @@ ACMD(do_class) {
 ACMD(do_role) {
 	char arg[MAX_INPUT_LENGTH], roles[NUM_ROLES+2][MAX_STRING_LENGTH], part[MAX_STRING_LENGTH];
 	struct player_skill_data *plsk, *next_plsk;
-	empire_data *emp = GET_LOYALTY(ch);
 	struct synergy_ability *syn;
 	size_t sizes[NUM_ROLES+2];
 	int found, iter;
 	bool any;
+	struct string_hash *str_iter, *next_str, *str_hash[NUM_ROLES+2];
 	
 	one_argument(argument, arg);
 
@@ -1672,8 +1705,8 @@ ACMD(do_role) {
 	if (*arg) {
 		// Handle role selection or display
 		
-		if (GET_SKILL_LEVEL(ch) < CLASS_SKILL_CAP) {
-			msg_to_char(ch, "You can't set a group role until you hit skill level %d.\r\n", CLASS_SKILL_CAP);
+		if (GET_SKILL_LEVEL(ch) < MAX_SKILL_CAP) {
+			msg_to_char(ch, "You can't set a group role until you hit skill level %d.\r\n", MAX_SKILL_CAP);
 		}
 		else if (FIGHTING(ch) || GET_POS(ch) == POS_FIGHTING) {
 			msg_to_char(ch, "You can't do that while fighting!\r\n");
@@ -1685,20 +1718,11 @@ ACMD(do_role) {
 			msg_to_char(ch, "Unknown role '%s'.\r\n", arg);
 		}
 		else {
-			// remove old abilities
-			if (emp) {
-				adjust_abilities_to_empire(ch, emp, FALSE);
-			}
-			
 			// change role
 			GET_CLASS_ROLE(ch) = found;
 			
 			// add new abilities
-			assign_class_abilities(ch, NULL, NOTHING);
-			if (emp) {
-				adjust_abilities_to_empire(ch, emp, TRUE);
-				resort_empires(FALSE);
-			}
+			assign_class_and_extra_abilities(ch, NULL, NOTHING);
 			
 			msg_to_char(ch, "Your group role is now: %s.\r\n", class_role[(int) GET_CLASS_ROLE(ch)]);
 			queue_delayed_update(ch, CDU_PASSIVE_BUFFS);
@@ -1714,27 +1738,37 @@ ACMD(do_role) {
 		for (iter = 0; iter < NUM_ROLES+2; ++iter) {
 			*roles[iter] = '\0';
 			sizes[iter] = 0;
+			str_hash[iter] = NULL;
 		}
 		
-		// check player's skills
+		// check player's skills to build role hashes
 		HASH_ITER(hh, GET_SKILL_HASH(ch), plsk, next_plsk) {
 			if (plsk->level < SKILL_MAX_LEVEL(plsk->ptr)) {
 				continue;	// skip ones not at max
 			}
 			
+			// build role hashes
 			LL_FOREACH(SKILL_SYNERGIES(plsk->ptr), syn) {
 				if (get_skill_level(ch, syn->skill) < syn->level) {
 					continue;	// too low
 				}
 				
 				// ok found, let's append -- for roles, +1 is to account for -1 == all
-				sprintf(part, "%s%s%s\t0", (*roles[syn->role+1] ? ", " : ""), (has_ability(ch, syn->ability) ? "\tg" : ""), get_ability_name_by_vnum(syn->ability));
-				
-				if (sizes[syn->role+1] + strlen(part) + 1 < MAX_STRING_LENGTH) {
-					strcat(roles[syn->role+1], part);
-					sizes[syn->role+1] += strlen(part);
+				sprintf(part, "%s%s\t0", (has_ability(ch, syn->ability) ? "\tg" : ""), get_ability_name_by_vnum(syn->ability));
+				add_string_hash(&str_hash[syn->role+1], part, 1);
+			}
+		}
+		
+		// now build strings from the hashes
+		for (iter = 0; iter < NUM_ROLES+2; ++iter) {
+			HASH_ITER(hh, str_hash[iter], str_iter, next_str) {
+				if (sizes[iter] + strlen(str_iter->str) + 3 < MAX_STRING_LENGTH) {
+					sizes[iter] += snprintf(roles[iter] + sizes[iter], sizeof(roles[iter]) - sizes[iter], "%s%s", (*roles[iter] ? ", " : ""), str_iter->str);
 				}
 			}
+			
+			// free as we go
+			free_string_hash(&str_hash[iter]);
 		}
 		
 		// and show them

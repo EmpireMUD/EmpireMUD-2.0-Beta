@@ -2,7 +2,7 @@
 *   File: db.c                                            EmpireMUD 2.0b5 *
 *  Usage: Loading/saving chars, booting/resetting world, internal funcs   *
 *                                                                         *
-*  EmpireMUD code base by Paul Clarke, (C) 2000-2015                      *
+*  EmpireMUD code base by Paul Clarke, (C) 2000-2024                      *
 *  All rights reserved.  See license.doc for complete information.        *
 *                                                                         *
 *  EmpireMUD based upon CircleMUD 3.0, bpl 17, by Jeremy Elson.           *
@@ -53,7 +53,7 @@ void build_all_shop_lookups();
 void build_land_map();
 void build_player_index();
 void build_world_map();
-void check_abilities();
+void check_abilities_on_startup();
 void check_and_link_faction_relations();
 void check_archetypes();
 void check_classes();
@@ -62,6 +62,7 @@ void check_for_new_map();
 void check_learned_empire_crafts();
 void check_newbie_islands();
 void check_nowhere_einv_all();
+void check_for_player_wipe();
 void check_sector_times(any_vnum only_sect);
 void check_skills();
 void check_triggers();
@@ -83,9 +84,10 @@ void link_and_check_vehicles();
 void load_automessages();
 void load_banned();
 void load_binary_map_file();
+void load_book_library_file();
 void load_daily_quest_file();
 void load_empire_storage();
-void load_fight_messages();
+void load_global_history();
 void load_instances();
 void load_islands();
 void load_running_events_file();
@@ -101,6 +103,7 @@ void setup_island_levels();
 void sort_commands();
 void startup_room_reset();
 void update_instance_world_size();
+void verify_daily_quest_cycles();
 void verify_empire_goals();
 void verify_running_events();
 void verify_sectors();
@@ -114,7 +117,7 @@ int sort_skills_by_data(skill_data *a, skill_data *b);
 int sort_socials_by_data(social_data *a, social_data *b);
 
 // local functions
-void get_one_line(FILE *fl, char *buf);
+void get_one_line(FILE *fl, char *buf, const char *filename);
 
 
  //////////////////////////////////////////////////////////////////////////////
@@ -130,6 +133,9 @@ adv_data *adventure_table = NULL;	// adventure hash table
 // archetype
 archetype_data *archetype_table = NULL;	// main hash (hh)
 archetype_data *sorted_archetypes = NULL;	// sorted hash (sorted_hh)
+
+// attack message system
+attack_message_data *attack_message_table = NULL;	// hash table of fighting messages by vnum/ATTACK_ const
 
 // augments
 augment_data *augment_table = NULL;	// main augment hash table
@@ -171,9 +177,6 @@ faction_data *faction_table = NULL;	// main hash (hh)
 faction_data *sorted_factions = NULL;	// alpha hash (sorted_hh)
 int MAX_REPUTATION = 0;	// highest possible rep value, auto-detected at startup
 int MIN_REPUTATION = 0;	// lowest possible rep value, auto-detected at startup
-
-// fight system
-struct message_list fight_messages[MAX_MESSAGES];	// fighting messages
 
 // game config
 time_t boot_time = 0;	// time of mud boot
@@ -233,7 +236,6 @@ obj_data *global_next_obj = NULL;	// used in limits.c
 account_data *account_table = NULL;	// hash table of accounts
 player_index_data *player_table_by_idnum = NULL;	// hash table by idnum
 player_index_data *player_table_by_name = NULL;	// hash table by name
-int top_idnum = 0;	// highest idnum in use
 int top_account_id = 0;  // highest account number in use, determined during startup
 struct group_data *group_list = NULL;	// global LL of groups
 bool pause_affect_total = FALSE;	// helps prevent unnecessary calls to affect_total
@@ -242,6 +244,7 @@ struct int_hash *inherent_ptech_hash = NULL;	// hash of PTECH_ that are automati
 struct player_quest *global_next_player_quest = NULL;	// for safely iterating
 struct player_quest *global_next_player_quest_2 = NULL;	// it may be possible for 2 iterators at once on this
 struct over_time_effect_type *free_dots_list = NULL;	// global LL of DOTs that have expired and must be free'd late to prevent issues
+struct channel_history_data *global_channel_history[NUM_GLOBAL_HISTORIES];	// history for channels like wiznet/immortal
 
 // progress
 progress_data *progress_table = NULL;	// hashed by vnum, sorted by vnum
@@ -353,6 +356,14 @@ struct db_boot_info_type db_boot_info[NUM_DB_BOOT_TYPES] = {
 };
 
 
+// GLOBAL_HISTORY_x: types of global channel histories
+const char *global_history_files[] = {
+	// names should start with '_'
+	LIB_CHANNELS "_god",	// GLOBAL_HISTORY_GOD
+	"\n"
+};
+
+
  //////////////////////////////////////////////////////////////////////////////
 //// STARTUP /////////////////////////////////////////////////////////////////
 
@@ -366,6 +377,10 @@ void boot_db(void) {
 	log("Loading game config system.");
 	init_config_system();
 	init_inherent_player_techs();
+	
+	// ensure time configurations are valid
+	assert(SECS_PER_MUD_HOUR >= SECS_PER_REAL_UPDATE);
+	assert((SECS_PER_MUD_HOUR % SECS_PER_REAL_UPDATE) == 0);
 	
 	log("Loading game data system.");
 	load_data_table();
@@ -386,7 +401,8 @@ void boot_db(void) {
 	log("Loading help entries.");
 	index_boot_help();
 	
-	// logs its own message
+	// log their own messages
+	load_global_history();
 	load_slash_channels();
 	
 	log("Loading player accounts.");
@@ -397,6 +413,9 @@ void boot_db(void) {
 
 	log("Loading fight messages.");
 	load_fight_messages();
+	
+	log("Loading book libraries.");
+	load_book_library_file();
 	
 	log("Loading trading post.");
 	load_trading_post();
@@ -460,10 +479,13 @@ void boot_db(void) {
 	check_nowhere_einv_all();
 	check_languages_all_empires();
 	verify_empire_goals();
+	
+	log("Updating progress goals.");
 	need_progress_refresh = TRUE;
+	check_progress_refresh();
 	
 	log("Checking for ruined cities...");
-	check_ruined_cities();
+	check_ruined_cities(NULL);
 	
 	log("Abandoning lost vehicles...");
 	abandon_lost_vehicles();
@@ -474,6 +496,8 @@ void boot_db(void) {
 	
 	log("Activating workforce.");
 	chore_update();
+	
+	check_for_player_wipe();
 	
 	log("Final startup...");
 	write_whole_mapout();
@@ -493,6 +517,11 @@ void boot_db(void) {
 	if (converted_to_b5_116) {
 		log(" deleting pre-b5.116 world files...");
 		delete_pre_b5_116_world_files();
+	}
+	if (config_get_int("autoreboot_minutes") > 0) {
+		reboot_control.type = REBOOT_REBOOT;
+		reboot_control.time = config_get_int("autoreboot_minutes");
+		log("Setting autoreboot for %d minute%s", reboot_control.time, PLURAL(reboot_control.time));
 	}
 	// put things here
 	
@@ -590,7 +619,7 @@ void boot_world(void) {
 	log("Loading quests.");
 	index_boot(DB_BOOT_QST);
 	
-	log("Loading books into libraries.");
+	log("Loading books.");
 	index_boot(DB_BOOT_BOOKS);
 	
 	log("Loading adventures.");
@@ -619,6 +648,7 @@ void boot_world(void) {
 	
 	log("Loading empire storage and logs.");
 	load_empire_storage();
+	ensure_storage_timers(NOTHING);
 	clean_empire_logs();
 	
 	log("Loading daily quest cycles.");
@@ -629,7 +659,7 @@ void boot_world(void) {
 	
 	// check for bad data
 	log("Verifying data.");
-	check_abilities();
+	check_abilities_on_startup();
 	check_and_link_faction_relations();
 	check_archetypes();
 	check_classes();
@@ -637,6 +667,7 @@ void boot_world(void) {
 	check_for_bad_buildings();
 	check_for_bad_sectors();
 	perform_force_upgrades();
+	verify_daily_quest_cycles();
 	verify_running_events();
 	read_ability_requirements();
 	check_triggers();
@@ -956,7 +987,7 @@ void verify_sectors(void) {
 			if (!room) {
 				room = real_room(map->vnum);	// load it into memory
 			}
-			new_crop = get_potential_crop_for_location(room, FALSE);
+			new_crop = get_potential_crop_for_location(room, NOTHING);
 			set_crop_type(room, new_crop ? new_crop : crop_table);
 		}
 	}
@@ -1052,7 +1083,6 @@ void renum_world(void) {
 		}
 		
 		// other room setup
-		check_tavern_setup(room);
 		
 		// ensure affects
 		affect_total_room(room);
@@ -1078,18 +1108,18 @@ void renum_world(void) {
  * did add the 'goto' and changed some "while()" into "do { } while()".
  *	-gg 6/24/98 (technically 6/25/98, but I care not.)
  */
-int count_alias_records(FILE *fl) {
+int count_alias_records(FILE *fl, const char *filename) {
 	char key[READ_SIZE], next_key[READ_SIZE];
 	char line[READ_SIZE], *scan;
 	int total_keywords = 0;
 
 	/* get the first keyword line */
-	get_one_line(fl, key);
+	get_one_line(fl, key, filename);
 
 	while (*key != '$') {
 		/* skip the text */
 		do {
-			get_one_line(fl, line);
+			get_one_line(fl, line, filename);
 			if (feof(fl))
 				goto ackeof;
 		} while (*line != '#');
@@ -1103,7 +1133,7 @@ int count_alias_records(FILE *fl) {
 		} while (*next_key);
 
 		/* get next keyword line (or $) */
-		get_one_line(fl, key);
+		get_one_line(fl, key, filename);
 
 		if (feof(fl))
 			goto ackeof;
@@ -1184,78 +1214,56 @@ int file_to_string_alloc(const char *name, char **buf) {
 }
 
 
-// reads in one action line
-char *fread_action(FILE * fl, int nr) {
-	char buf[MAX_STRING_LENGTH], *rslt;
-
-	fgets(buf, MAX_STRING_LENGTH, fl);
-	if (feof(fl)) {
-		log("SYSERR: fread_action - unexpected EOF near action #%d", nr+1);
-		exit(1);
-		}
-	if (*buf == '#')
-		return (NULL);
-	else {
-		*(buf + strlen(buf) - 1) = '\0';
-		CREATE(rslt, char, strlen(buf) + 1);
-		strcpy(rslt, buf);
-		return (rslt);
-	}
-}
-
-
 /* read and allocate space for a '~'-terminated string from a given file */
 char *fread_string(FILE * fl, char *error) {
-	char buf[MAX_STRING_LENGTH], tmp[MAX_INPUT_LENGTH], *rslt;
+	char buf[MAX_STRING_LENGTH], tmp[513];
+	char *point;
 	int done = 0, length = 0, templength;
-	register int pos;
-
+	
 	*buf = '\0';
-
+	
 	do {
 		if (!fgets(tmp, 512, fl)) {
 			log("SYSERR: fread_string: format error at or near %s", error);
 			exit(1);
 		}
-				
-		// upgrade to allow ~ when not at the end
-		pos = strlen(tmp);
+		/* If there is a '~', end the string; else put an "\r\n" over the '\n'. */
+		/* now only removes trailing ~'s -- Welcor */
+		point = strchr(tmp, '\0');
+		templength = point - tmp;
 		
-		// backtrack past any \r\n or trailing space or tab
-		for (--pos; pos > 0 && (tmp[pos] == '\r' || tmp[pos] == '\n' || tmp[pos] == ' ' || tmp[pos] == '\t'); --pos);
+		for (point-- ; point >= tmp && (*point == '\r' || *point == '\n' || *point == '\t' || *point == ' '); point--);
 		
-		// look for a trailing ~
-		if (tmp[pos] == '~') {
-			tmp[pos] = '\0';
+		if (point >= tmp && *point == '~') {
+			*point = '\0';
 			done = 1;
 		}
-		else {
-			strcpy(tmp + pos + (pos > 0 ? 1 : 0), "\r\n");
+		else if (templength == 511) {
+			// read all the way to the end of a very long line -- don't add a \r\n
+			*(++point) = '\0';
 		}
-
-		templength = strlen(tmp);
-
+		else {
+			*(++point) = '\r';
+			*(++point) = '\n';
+			*(++point) = '\0';
+		}
+		
+		// recalculate
+		templength = point - tmp;
+		
 		if (length + templength >= MAX_STRING_LENGTH) {
 			log("SYSERR: fread_string: string too large (db.c)");
 			log("%s", error);
 			exit(1);
 		}
 		else {
-			strcat(buf + length, tmp);
+			strcat(buf + length, tmp);	/* strcat: OK (size checked above) */
 			length += templength;
 		}
 	} while (!done);
-
+	
 	/* allocate space for the new string and copy it */
-	if (strlen(buf) > 0) {
-		CREATE(rslt, char, length + 1);
-		strcpy(rslt, buf);
-	}
-	else {
-		rslt = NULL;
-	}
-
-	return (rslt);
+	return (strlen(buf) ? strdup(buf) : NULL);
 }
 
 
@@ -1264,10 +1272,11 @@ char *fread_string(FILE * fl, char *error) {
 *
 * @param FILE *fl The file to read from.
 * @param char *buf Where to store the string.
+* @param const char *filename Which help file, for error reporting.
 */
-void get_one_line(FILE *fl, char *buf) {
+void get_one_line(FILE *fl, char *buf, const char *filename) {
 	if (fgets(buf, READ_SIZE, fl) == NULL) {
-		log("SYSERR: error reading help file: not terminated with $?");
+		log("SYSERR: error reading help file %s: not terminated with $?", filename);
 		exit(1);
 	}
 
@@ -1311,25 +1320,73 @@ void reload_text_string(int type) {
 //// HELP I/O ////////////////////////////////////////////////////////////////
 
 /**
+* Peels off the first term from the string for use as a help keyword. This is
+* similar to any_one_arg and any_one_word except that it only uses "quotes" for
+* grouping multiple words in 1 term, and it allows escaping of the quotes.
+*
+* @param char *string The input string (read only).
+* @param char *next_key A string buffer to write the next keyword to.
+* @return char* A pointer to the rest of 'string'.
+*/
+char *next_help_keyword(char *string, char *next_key) {
+	char *write = next_key;
+	int iter, offset;
+	
+	skip_spaces(&string);
+
+	if (*string == '\"') {
+		++string;
+		while (*string && *string != '\"') {
+			*(write++) = *string;
+			++string;
+		}
+		if (*string) {
+			++string;
+		}
+	}
+	else {
+		// copy to first space
+		while (*string && !isspace(*string)) {
+			*(write++) = *string;
+			++string;
+		}
+	}
+
+	*write = '\0';
+	
+	// check for escaped \"
+	for (iter = 0, offset = 0; iter < strlen(next_key); ++iter) {
+		if (next_key[iter] == '\\' && (next_key[iter+1] == '\\' || next_key[iter+1] == '"')) {
+			++offset;
+		}
+		next_key[iter] = next_key[iter + offset];
+	}
+
+	return (string);
+}
+
+
+/**
 * Loads one help file.
 *
 * @param FILE *fl The input file.
+* @param const char *filename Which help file, for error-reporting.
 */
-void load_help(FILE *fl) {
+void load_help(FILE *fl, const char *filename) {
 	char key[READ_SIZE+1], next_key[READ_SIZE+1], entry[32384];
 	char line[READ_SIZE+1], *scan;
 	struct help_index_element el;
 	int iter;
 
 	/* get the first keyword line */
-	get_one_line(fl, key);
+	get_one_line(fl, key, filename);
 	while (*key != '$') {
 		/* read in the corresponding help entry */
 		strcpy(entry, strcat(key, "\r\n"));
-		get_one_line(fl, line);
+		get_one_line(fl, line, filename);
 		while (*line != '#') {
 			strcat(entry, strcat(line, "\r\n"));
-			get_one_line(fl, line);
+			get_one_line(fl, line, filename);
 		}
 
 		el.level = 0;
@@ -1368,7 +1425,7 @@ void load_help(FILE *fl) {
 		
 		// convert ampersand codes like &0 to tab codes like \t0 -- string length won't change
 		for (iter = 0; iter < strlen(entry); ++iter) {
-			if (entry[iter] == '&') {
+			if (entry[iter] == COLOUR_CHAR) {
 				entry[iter] = '\t';
 				// skip next letter as part of the code:
 				++iter;
@@ -1378,16 +1435,16 @@ void load_help(FILE *fl) {
 		/* now, add the entry to the index with each keyword on the keyword line */
 		el.duplicate = 0;
 		el.entry = str_dup(entry);
-		scan = any_one_word(key, next_key);
+		scan = next_help_keyword(key, next_key);
 		while (*next_key) {
 			el.keyword = str_dup(next_key);
 			help_table[top_of_helpt++] = el;
 			el.duplicate++;
-			scan = any_one_word(scan, next_key);
+			scan = next_help_keyword(scan, next_key);
 		}
 
 		/* get next keyword line (or $) */
-		get_one_line(fl, key);
+		get_one_line(fl, key, filename);
 	}
 }
 
@@ -1421,7 +1478,7 @@ void index_boot_help(void) {
 			continue;
 		}
 		else
-			rec_count += count_alias_records(db_file);
+			rec_count += count_alias_records(db_file, buf1);
 
 		fclose(db_file);
 		fscanf(index, "%s\n", buf1);
@@ -1456,7 +1513,7 @@ void index_boot_help(void) {
 		 * If you think about it, we have a race here.  Although, this is the
 		 * "point-the-gun-at-your-own-foot" type of race.
 		 */
-		load_help(db_file);
+		load_help(db_file, buf1);
 
 		fclose(db_file);
 		fscanf(index, "%s\n", buf1);
@@ -1811,6 +1868,7 @@ void init_player_specials(char_data *ch) {
 	GET_MARK_LOCATION(ch) = NOWHERE;
 	GET_MOUNT_VNUM(ch) = NOTHING;
 	GET_PLEDGE(ch) = NOTHING;
+	GET_HOME_LOCATION(ch) = NOWHERE;
 	GET_TOMB_ROOM(ch) = NOWHERE;
 	GET_ADVENTURE_SUMMON_RETURN_LOCATION(ch) = NOWHERE;
 	GET_ADVENTURE_SUMMON_RETURN_MAP(ch) = NOWHERE;
@@ -1820,6 +1878,9 @@ void init_player_specials(char_data *ch) {
 	GET_IMMORTAL_LEVEL(ch) = -1;	// Not an immortal
 	USING_POISON(ch) = NOTHING;
 	GET_MAP_MEMORY_LOADED(ch) = FALSE;
+	GET_ACTION_TEMPORARY_CHAR_ID(ch) = 0;
+	GET_ACTION_TEMPORARY_VEH_ID(ch) = NOTHING;
+	GET_ACTION_ROOM_TARG(ch) = NOWHERE;
 	
 	for (iter = 0; iter < NUM_ARCHETYPE_TYPES; ++iter) {
 		CREATION_ARCHETYPE(ch, iter) = NOTHING;
@@ -2079,65 +2140,6 @@ void setup_start_locations(void) {
 
  //////////////////////////////////////////////////////////////////////////////
 //// MISCELLANEOUS LOADERS ///////////////////////////////////////////////////
-
-/**
-* Loads the "messages" file, which contains damage messages for various attack
-* types.
-*/
-void load_fight_messages(void) {
-	FILE *fl;
-	int i, type;
-	struct message_type *messages;
-	char chk[128];
-
-	if (!(fl = fopen(MESS_FILE, "r"))) {
-		log("SYSERR: Error reading combat message file %s: %s", MESS_FILE, strerror(errno));
-		exit(1);
-	}
-	for (i = 0; i < MAX_MESSAGES; i++) {
-		fight_messages[i].a_type = NOTHING;
-		fight_messages[i].number_of_attacks = 0;
-		fight_messages[i].msg = 0;
-	}
-
-	fgets(chk, 128, fl);
-	while (!feof(fl) && (*chk == '\n' || *chk == '*'))
-		fgets(chk, 128, fl);
-
-	while (*chk == 'M') {
-		fgets(chk, 128, fl);
-		sscanf(chk, " %d\n", &type);
-		for (i = 0; (i < MAX_MESSAGES) && (fight_messages[i].a_type != type) && (fight_messages[i].a_type != NOTHING); i++);
-		if (i >= MAX_MESSAGES) {
-			log("SYSERR: Too many combat messages. Increase MAX_MESSAGES and recompile.");
-			exit(1);
-		}
-		CREATE(messages, struct message_type, 1);
-		fight_messages[i].number_of_attacks++;
-		fight_messages[i].a_type = type;
-		
-		LL_PREPEND(fight_messages[i].msg, messages);
-
-		messages->die_msg.attacker_msg = fread_action(fl, i);
-		messages->die_msg.victim_msg = fread_action(fl, i);
-		messages->die_msg.room_msg = fread_action(fl, i);
-		messages->miss_msg.attacker_msg = fread_action(fl, i);
-		messages->miss_msg.victim_msg = fread_action(fl, i);
-		messages->miss_msg.room_msg = fread_action(fl, i);
-		messages->hit_msg.attacker_msg = fread_action(fl, i);
-		messages->hit_msg.victim_msg = fread_action(fl, i);
-		messages->hit_msg.room_msg = fread_action(fl, i);
-		messages->god_msg.attacker_msg = fread_action(fl, i);
-		messages->god_msg.victim_msg = fread_action(fl, i);
-		messages->god_msg.room_msg = fread_action(fl, i);
-		fgets(chk, 128, fl);
-		while (!feof(fl) && (*chk == '\n' || *chk == '*'))
-			fgets(chk, 128, fl);
-	}
-
-	fclose(fl);
-}
-
 
 /**
 * Loads the game's various connect screens.

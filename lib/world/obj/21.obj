@@ -5,7 +5,7 @@ A stone axe has been stuck in the ground.~
    The stone axe may look primitive, but it's great for chopping down trees,
 scraping logs, and general crafts.
 ~
-1 i an a 3
+1 i an a 0 3
 0 2 2
 1 0
 C
@@ -23,7 +23,7 @@ A woodsman's axe has been left here.~
 many times you can't see the original edge at all. But it's still good for
 chopping, scraping, and crafting.
 ~
-1 ilmo an a 2
+1 ilmo an a 0 2
 0 1 2
 13 0
 S
@@ -33,7 +33,7 @@ a short sword~
 A short sword is staked into the ground.~
 This short sword is small and simple, but durable.
 ~
-1 hmo ano 0 1
+1 hmo ano 0 0 1
 0 1 1
 13 0
 S
@@ -44,7 +44,7 @@ A small shiv is lying on the ground.~
    This shiv is made from simple flint, but it's good when you need to hide a
 weapon.
 ~
-1 imo ano f 2
+1 imo ano f 0 2
 0 1 4
 1 0
 S
@@ -54,7 +54,7 @@ a torch~
 Someone has dropped their torch!~
 This long-lasting torch is one of the few things you packed for this journey.
 ~
-29 0 ao 0 2
+29 0 ao 0 0 2
 72 1 7
 0 0
 S
@@ -65,7 +65,7 @@ A blacksmith's hammer has been dropped here.~
    The hammer looks like it would be good for forging. Or, in a pinch, it would
 do in battle.
 ~
-1 hlmo ano c 2
+1 hlmo ano c 0 2
 0 1 6
 13 0
 S
@@ -75,7 +75,7 @@ a stone hammer~
 A stone hammer is lying on the ground.~
 This hammer, though primitive, can function as both a weapon and a tool.
 ~
-1 ho ano c 3
+1 ho ano c 0 3
 0 3 6
 1 0
 C
@@ -88,7 +88,7 @@ A rawhide saddle is sitting on the ground.~
    The saddle is required in order to ride. Keep it in your inventory and it
 will equip itself.
 ~
-2 emo as 0 1
+2 emo as 0 0 1
 0 0 0
 7 0
 A
@@ -104,7 +104,7 @@ A braided whip is coiled on the ground.~
 strong enough to be used as a weapon. A whip like this could really keep
 someone at bay.
 ~
-1 mo an 0 3
+1 mo an 0 0 3
 0 1 7
 7 0
 A
@@ -116,7 +116,7 @@ a wooden sword~
 A wooden sword is stuck in the ground.~
 This sword doesn't look like it would do too much damage.
 ~
-1 eimo ano 0 1
+1 eimo ano 0 0 1
 0 1 1
 0 0
 S
@@ -126,9 +126,15 @@ a pick~
 A simple pick is lying here.~
 The pick is small, but very useful in prying loose ore.
 ~
-1 hmo an h 2
+1 hmo an h 0 3
 0 1 8
 13 0
+M
+26
+You pick at the walls, looking for ore.~
+M
+27
+$n picks at the walls, looking for ore.~
 S
 #2111
 robe simple brown mage~
@@ -136,7 +142,7 @@ a brown mage robe~
 A simple brown robe is lying here.~
 This robe is made for a mage, to be worn in lieu of armor.
 ~
-27 mo aq 0 1
+27 mo aq 0 0 1
 0 0 0
 7 0
 A
@@ -151,7 +157,7 @@ A gourd bottle rolls around on the ground.~
    This bottle gourd has been dried and hollowed out to make it perfect to hold
 water. Type 'fill bottle' near the river or at an oasis to refill it.
 ~
-5 0 a 0 3
+5 0 a 0 0 3
 12 12 0
 7 0
 S
@@ -162,7 +168,7 @@ A saddle is lying on the ground.~
    The saddle is required in order to ride. Keep it in your inventory and it
 will equip itself.
 ~
-2 emo as 0 1
+2 emo as 0 0 1
 0 0 0
 7 0
 A
@@ -177,7 +183,7 @@ A fine leather saddle is lying here.~
    The saddle is required in order to ride. Keep it in your inventory and it
 will equip itself.
 ~
-2 emo as 0 1
+2 emo as 0 0 1
 0 0 0
 7 0
 A
@@ -191,7 +197,7 @@ a cask~
 A wooden cask is sitting here.~
 Casks are good for holding all kinds of liquids.
 ~
-5 e a 0 1
+5 e a 0 0 1
 168 168 3
 0 0
 S
@@ -202,7 +208,7 @@ A snakeskin saddle has been left behind.~
    The saddle is required in order to ride. Keep it in your inventory and it
 will equip itself.
 ~
-2 emo as 0 1
+2 emo as 0 0 1
 0 0 0
 7 0
 A
@@ -219,7 +225,7 @@ in order to have a nearby respawn point when you die. This grave marker can
 only be used once, so pick a good spot for it. Later, you can build other types
 of tombs and graves with various abilities, such as the family grave site.
 ~
-3 g a 0 1
+3 g a 0 0 1
 0 0 0
 0 0
 S
@@ -229,7 +235,7 @@ a shovel~
 A shovel is stamped into the ground.~
 A shovel helps you dig or excavate faster.
 ~
-1 ehl ano o 3
+1 ehl ano o 0 3
 0 4 5
 13 0
 C
@@ -245,7 +251,7 @@ a metal pan~
 A pan has been left here.~
 You can pan at the edge of the river to look for gold.
 ~
-3 l ao i 3
+3 l ao i 0 3
 0 0 0
 13 0
 C
@@ -261,7 +267,7 @@ a small silver ring~
 A small, silver ring is lying on the ground.~
 It's a nice silver ring.
 ~
-2 0 ab 0 3
+2 0 ab 0 0 3
 0 0 0
 3 0
 C
@@ -275,7 +281,7 @@ a pair of silver earrings~
 A pair of earrings is lying on the ground.~
 They're a nice pair of earrings.
 ~
-2 0 am 0 2
+2 0 am 0 0 2
 0 0 0
 3 0
 C
@@ -289,7 +295,7 @@ a sparkling gold ring~
 A small ring is lying on the ground.~
 It's a sparkling gold ring.
 ~
-2 0 ab 0 2
+2 0 ab 0 0 2
 0 0 0
 4 0
 A
@@ -305,7 +311,7 @@ a pair of sparkling earrings~
 A pair of gold earrings is lying on the ground.~
 These are a nice pair of gold earrings.
 ~
-2 0 am 0 2
+2 0 am 0 0 2
 0 0 0
 4 0
 A
@@ -322,7 +328,7 @@ An engagement ring is lying on the ground.~
    This is a brilliant engagement ring. You watch as it twinkles in the light.
 It symbolizes the commitment between two people in love.
 ~
-2 o ab 0 3
+2 o ab 0 0 3
 0 0 0
 4 0
 A
@@ -339,7 +345,7 @@ A wedding band was dropped here!~
    This lovely little ring is just as precious as the metal it was forged from.
 It stands as an enduring symbol of love and commitment.
 ~
-2 o ab 0 3
+2 o ab 0 0 3
 0 0 0
 4 0
 A
@@ -355,7 +361,7 @@ silver bracelets~
 A pair of silver bracelets is lying here.~
 These fine silver bracelets accent any costume.
 ~
-2 0 aj 0 2
+2 0 aj 0 0 2
 -1 -1 -1
 3 0
 C
@@ -369,7 +375,7 @@ gold bracelets~
 A pair of gold bracelets is lying here.~
 These gold bracelets look amazing with your shoes.
 ~
-2 0 aj 0 3
+2 0 aj 0 0 3
 -1 -1 -1
 4 0
 A
@@ -385,7 +391,7 @@ a golden crown~
 A golden crown has fallen here.~
 The crown shines and sparkles.
 ~
-2 o ae 0 2
+2 o ae 0 0 2
 0 0 0
 4 0
 A
@@ -401,7 +407,7 @@ a long spear~
 A long spear is protruding from the ground.~
 Spears can be used for fishing or fighting.
 ~
-1 ehl an b 9
+1 ehl an b 0 9
 0 2 3
 1 0
 A
@@ -421,7 +427,7 @@ a leather backpack~
 A leather backpack has fallen here.~
 Equip the backpack to increase your carrying capacity.
 ~
-24 mo ar 0 1
+24 mo ar 0 0 1
 1 0 0
 7 0
 S
@@ -431,7 +437,7 @@ a leather satchel~
 A leather satchel has fallen here.~
 Equip the satchel to increase your carrying capacity.
 ~
-24 mo ar 0 1
+24 mo ar 0 0 1
 1 0 0
 7 0
 S
@@ -441,7 +447,7 @@ a large backpack~
 A large backpack has been left behind.~
 Equip the backpack to increase your carrying capacity.
 ~
-24 mo ar 0 1
+24 mo ar 0 0 1
 1 0 0
 7 0
 S
@@ -451,7 +457,7 @@ an anchor~
 A heavy anchor is lying here.~
 Anchors are used in shipbuilding.
 ~
-3 el a 0 2
+3 el a 0 0 2
 0 0 0
 2 0
 C
@@ -473,7 +479,7 @@ a cannon~
 A ship's cannon is resting on the ground.~
 This cannon is used to build some ships.
 ~
-3 el a 0 2
+3 el a 0 0 2
 0 0 0
 2 0
 C
@@ -495,7 +501,7 @@ heavy shot~
 A heavy shot ball is lying on the ground.~
 Heavy shot is used by catapults and cannons.
 ~
-3 e a 0 2
+3 e a 0 0 2
 0 0 0
 2 0
 C
@@ -510,7 +516,7 @@ A gourd bottle rolls around on the ground.~
    This bottle gourd has been dried and hollowed out to make it perfect to hold
 water. Type 'fill bottle' near the river or at an oasis to refill it.
 ~
-5 0 a 0 5
+5 0 a 0 0 5
 12 0 0
 7 0
 C
@@ -528,7 +534,7 @@ An obsidian knife is sticking out of the ground.~
 of hide wrapped around the base for a handle. It's incredible sharp for such a
 simple stone tool.
 ~
-1 imo ano f 4
+1 imo ano f 0 4
 0 1 4
 8 0
 C
@@ -541,7 +547,7 @@ An obsidian spear is stuck in the ground.~
    This strong, light spear is tipped with pitch-black obsidian, sharp enough
 to penetrate even a mammoth hide.
 ~
-1 eho an b 7
+1 eho an b 0 7
 0 2 3
 8 0
 A
@@ -563,7 +569,7 @@ An obsidian sword is sticking up out of the ground.~
 sharpened obsidian embedded in the side of it to form a brutally sharp stone
 tool -- one that strikes as much fear as it does damage.
 ~
-1 hmo an 0 3
+1 hmo an 0 0 3
 0 1 1
 8 0
 C
@@ -576,7 +582,7 @@ A bone handle is lying here.~
    The handle is carved from bone, or perhaps horn. It can be attached to many
 things to build tools and weapons.
 ~
-1 0 ano 0 5
+1 0 ano 0 0 6
 0 3 5
 14 0
 C
@@ -584,6 +590,10 @@ C
 O+ 1 6850
 R
 4 5121 0
+R
+4 5610 0
+R
+4 5108 0
 S
 #2141
 sickle flint~
@@ -592,7 +602,7 @@ A flint sickle is sticking out of the ground.~
    The sickle is made from a curved wooden handle with a row of flint
 spearheads embedded in it like teeth. It can be used to harvest.
 ~
-1 hm an d 5
+1 hm an d 0 5
 0 1 1
 1 0
 C
@@ -607,7 +617,7 @@ A sickle is lying here.~
    The sickle is a curved metal blade with a short wooden handle, used since
 ancient times for harvesting grain by hand.
 ~
-1 hlmo an d 7
+1 hlmo an d 0 7
 0 1 1
 1 0
 S
@@ -617,7 +627,7 @@ a knife~
 A knife is stuck into the ground.~
 This knife is good for skinning, butchering, or crafting.
 ~
-1 mo ano f 4
+1 mo ano f 0 4
 0 1 4
 2 0
 A
@@ -630,7 +640,7 @@ A large saw is lying on the ground.~
    This saw is so large you can barely use it alone, but it will allow you to
 saw trees into lumber anywhere. 'Use' the saw to equip it as a tool.
 ~
-3 em a l 6
+3 em a l 0 6
 0 0 0
 2 0
 C
@@ -649,7 +659,7 @@ carefully punctured to put an eye in each needle. You can 'use' this kit to
 equip it. It will enable you to sew all manner of things, if you learn the
 Trade skill.
 ~
-3 0 a m 4
+3 0 a m 0 4
 0 0 0
 14 0
 C
@@ -670,7 +680,7 @@ needles are perfect for doing fine stitching without damaging the cloth. You
 can 'use' this kit to equip it. It will enable you to sew all manner of things,
 if you learn the Trade skill.
 ~
-3 mo a m 5
+3 mo a m 0 5
 0 0 0
 3 0
 C
@@ -683,7 +693,7 @@ A simple skinning knife stands in the ground here.~
    This knife isn't really good for fighting, but you can 'use' it to equip it
 in your tool slot and use it for skinning, butchering, and even crafting.
 ~
-3 p a f 1
+3 p a f 0 1
 0 0 0
 1 0
 C
@@ -696,7 +706,7 @@ A hobby knife has been stuck into the ground.~
    This knife isn't really good for fighting, but you case 'use' it to equip it
 in your tool slot and use it for skinning, butchering, and even crafting.
 ~
-3 p a f 2
+3 p a f 0 2
 0 0 0
 2 0
 C
@@ -710,7 +720,7 @@ A guard whistle is lying here.~
 your established cities. Be sure to use it on a claimed tile.
 Usage: use guardwhistle (Requires Jewelry ability)
 ~
-3 o a 0 6
+3 o a 0 0 6
 204 0 0
 2 0
 C
@@ -720,5 +730,19 @@ R
 R
 4 5610 0
 T 2149
+S
+#2150
+sword impressively large~
+an impressively large sword~
+An impressively large sword is sticking out of the ground.~
+   The sword is expertly forged and gorgeously embellished, but it is far, far
+too large to wield.
+   Perhaps you could use it to build a 'hero statue', though...
+~
+3 enp a 0 0 2
+0 0 0
+2 0
+C
+200 200
 S
 $

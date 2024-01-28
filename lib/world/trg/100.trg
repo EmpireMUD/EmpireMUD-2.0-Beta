@@ -21,7 +21,7 @@ Wildling combat: Nasty Bite~
 %dot% %actor% %random.100% 60 physical
 ~
 #10003
-Druid combat~
+Manaweaver combat~
 0 k 10
 ~
 set chance %random.3%
@@ -35,7 +35,7 @@ else
 end
 ~
 #10004
-Archdruid combat: frost~
+Archweaver combat: frost~
 0 k 10
 ~
 set chance %random.3%

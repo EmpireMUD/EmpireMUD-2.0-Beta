@@ -4,7 +4,7 @@ the town portal~
 A portal back to the entrance to town has opened here.~
 It looks like the portal leads back to the entrance.
 ~
-8 0 0 0 2
+8 B 0 0 0 3
 10400 0 0
 10 8
 T 10415
@@ -16,7 +16,7 @@ Some hamlet rubble lies here.~
    If you're seeing this, trigger 10414 failed to set this up as any of the
 hamlet rubble items.
 ~
-3 0 0 0 3
+3 0 0 0 0 3
 0 0 0
 0 0
 T 10407
@@ -28,7 +28,7 @@ a new threat~
 The Hamlet of the Undead trash spawner is malfunctioning.~
 This item spawns trash mobs.
 ~
-3 0 0 0 3
+3 0 0 0 0 3
 0 0 0
 0 0
 T 10402
@@ -39,7 +39,7 @@ the necromaster's wand~
 The necromaster's wand is lying on the ground.~
 This odd wand is unusually heavy and seems to have been cast from eventide.
 ~
-1 mp an 0 7
+1 mp an 0 0 7
 0 1 20
 2 0
 A
@@ -61,7 +61,7 @@ An icy necrofiend fang has been stabbed into the ground.~
 surprisingly, makes the fang safe to hold. You've seen fangs like this used by
 assassins because the long, hollow fang is perfect for delivering venom.
 ~
-1 imp ano f 10
+1 imp ano f 0 10
 0 2 4
 14 0
 A
@@ -79,7 +79,7 @@ A pair of fine hamlet gauntlets has been left here.~
 They look sturdy and well-made, so you're surprised the original owner lost
 them.
 ~
-27 mp ah 0 4
+27 mp ah 0 0 4
 2 0 0
 2 0
 A
@@ -101,7 +101,7 @@ A city guard's kilt is lying here.~
 hamlets. There's no indication how it came to be here. It's made of
 iron-reinforced leather and is of high quality.
 ~
-27 emp af 0 3
+27 emp af 0 0 3
 2 0 0
 2 0
 A
@@ -125,7 +125,7 @@ imported at great expense. Though it fires ordinary arrows, the enchantments on
 this bow ensure a truly wicked amount of damage. The name 'Hexerei' is
 emblazoned on the side of the bow in inlaid onyx.
 ~
-20 emp ap 0 4
+20 emp ap 0 0 4
 29 1 0
 0 0
 S
@@ -135,7 +135,7 @@ tarnished silver earrings~
 A pair of tarnished earrings has been discarded here.~
 These earrings look like they were quite nice once, and give you a rustic look.
 ~
-2 moy am 0 2
+2 moy am 0 0 2
 0 0 0
 3 0
 A
@@ -151,7 +151,7 @@ a steel chain~
 A steel chain is crumpled in a pile.~
 The chain looks just long enough to wear around your neck.
 ~
-2 moy ac 0 1
+2 moy ac 0 0 1
 0 0 0
 2 0
 A
@@ -166,7 +166,7 @@ A pair of ringmail bracers is lying here.~
    The craftsmanship on this ringmail is fine, although they don't seem
 well-maintained.
 ~
-2 moy aj 0 1
+2 moy aj 0 0 1
 0 0 0
 2 0
 A
@@ -180,7 +180,7 @@ a ring of pearls~
 A pearl ring is lying in the dust.~
 This shimmering ring seems to be made from fused pearls.
 ~
-2 moy ab 0 2
+2 moy ab 0 0 2
 0 0 0
 14 0
 A
@@ -194,7 +194,7 @@ a fine village dress~
 A fine village dress has been carefully draped here.~
 The dress is certainly rural, but has its own sort of charm.
 ~
-2 mo ad 0 5
+2 mo ad 0 0 5
 0 0 0
 11 0
 A
@@ -214,7 +214,7 @@ A handsome village suit is carefully hung here.~
    The suit is nothing you'd wear to the castle on ball night. Still, it has a
 rustic, rural charm that is not soon forgotten.
 ~
-2 mo ad 0 4
+2 mo ad 0 0 4
 0 0 0
 11 0
 A
@@ -233,7 +233,7 @@ an imperium wedding band~
 An imperium wedding band is lying here.~
 Though the ring looks old, it has not rusted.
 ~
-2 moy ab 0 2
+2 moy ab 0 0 2
 0 0 0
 2 0
 A
@@ -250,7 +250,7 @@ An heirloom necklace has been carelessly left behind.~
    The necklace is old, but made of carefully crafted lace such that it still
 has the same gorgeous quality as the day it was made.
 ~
-27 moy ac 0 2
+27 moy ac 0 0 2
 0 0 0
 2 0
 A
@@ -266,7 +266,7 @@ a giant bone mace~
 A giant bone mace stands before you.~
 It looks like the mace's handle is made from the bone of a giant!
 ~
-1 emp an 0 2
+1 emp an 0 0 2
 0 1 5
 14 0
 A
@@ -282,7 +282,7 @@ a tattered cloak of manasilk~
 A tattered cloak is lying here.~
 This cloak was once made of fine manasilk. Now, it's in tatters.
 ~
-2 mp ak 0 5
+2 mp ak 0 0 5
 0 0 0
 11 0
 A
@@ -298,7 +298,7 @@ a skeletal horse whip~
 A skeletal horse whip is lying here.~
 This whip can be used, just once, to summon a skeletal horse mount.
 ~
-3 p a 0 3
+3 p a 0 0 3
 10418 0 0
 14 0
 T 9910
@@ -310,7 +310,7 @@ A pair of enchanted boots is marching in circles.~
    The boots seem to be made for walkin'. The soles bear the image of a burning
 hamlet.
 ~
-2 moy ag 0 3
+2 moy ag 0 0 3
 0 0 0
 11 0
 A
@@ -326,7 +326,7 @@ a skeletal mammoth crop~
 A skeletal mammoth crop is lying here.~
 This riding crop can be used, just once, to summon a skeletal mammoth mount.
 ~
-3 p a 0 3
+3 p a 0 0 3
 10420 0 0
 14 0
 T 9910
@@ -337,7 +337,7 @@ a mammoth spear~
 A mammoth spear protrudes from the ground.~
 This spear looks like it could be used to take down a mammoth!
 ~
-1 ehmnp an b 8
+1 ehmnp an b 0 8
 0 5 3
 0 0
 A
@@ -360,7 +360,7 @@ An imperium-weave cloak is lying on the ground.~
    The cloak is made from fine imperium-weave cloth, of the sort they drape
 over war mammoths.
 ~
-2 mp ak 0 3
+2 mp ak 0 0 3
 0 0 0
 2 0
 A
@@ -379,7 +379,7 @@ couldn't escape their necromasters. Now, though, all the power they sapped from
 those ghosts is transferred to the wearer, where it can be channeled into
 powerful healing.
 ~
-2 mp af 0 2
+2 mp af 0 0 2
 0 0 0
 11 0
 A
@@ -396,7 +396,7 @@ A necrofiend leg is lying here, bloody.~
    It looks like the long, thin leg from a necrofiend has been turned into some
 sort of whip!
 ~
-1 ehmp an 0 6
+1 ehmp an 0 0 6
 0 4 7
 7 0
 A
@@ -415,7 +415,7 @@ A studded bone shield is lying on the ground.~
    The shield is made mostly from bones, bound in leather, and studded with
 imperium. You'd hate to have been the raw materials for one of these.
 ~
-23 emp ao 0 3
+23 emp ao 0 0 3
 0 0 0
 14 0
 A
@@ -431,7 +431,7 @@ the necrofiend's majesty~
 A strange aura of majesty hovers in the air.~
 It has all the majesty of a hideous necrofiend.
 ~
-27 mp ae 0 6
+27 mp ae 0 0 6
 0 0 0
 10 0
 A
@@ -451,7 +451,7 @@ the infernomancer's flame~
 A magical flame hovers in mid-air.~
 This glinting magical flame has the potential to do a lot of damage.
 ~
-1 imp an 0 6
+1 imp an 0 0 6
 0 1 16
 10 0
 A
@@ -469,7 +469,7 @@ the purifying flame~
 A glinting white flame dances across the air.~
 This beautiful fire looks like it could heal as much as it could damage.
 ~
-3 mp ao 0 2
+3 mp ao 0 0 2
 0 0 0
 10 0
 A
@@ -485,7 +485,7 @@ a terrifying leather mask~
 A terrifying mask lies on the ground.~
 The mask is stained in blood, and has fangs carved from its mouth.
 ~
-27 mp ae 0 4
+27 mp ae 0 0 4
 1 0 0
 0 0
 A
@@ -505,7 +505,7 @@ the necromancer's staff~
 A twisted staff is staked into the ground.~
 This twisted old staff is crawling with maggots!
 ~
-1 eimp an p 3
+1 eimp an p 0 3
 0 4 19
 0 0
 A
@@ -520,7 +520,7 @@ A pair of ghoulsbane gauntlets is lying here.~
    These gauntlets have backwards-facing spines to make them more effective
 against ghouls of all sorts.
 ~
-27 mp ah 0 3
+27 mp ah 0 0 3
 1 0 0
 7 0
 A
@@ -538,7 +538,7 @@ A necrotic mail skirt is lying here.~
 decaying. But due to some strange magical infusion, the decay is only making it
 stronger.
 ~
-27 emp af 0 2
+27 emp af 0 0 2
 3 0 0
 2 0
 A
@@ -554,7 +554,7 @@ Fiendclaw~
 A vicious claw weapon is lying here.~
 This huge claw would fit right over your hand!
 ~
-1 mp an 0 3
+1 mp an 0 0 3
 0 1 10
 14 0
 A
@@ -573,7 +573,7 @@ A pair of lace gloves has been left behind.~
    These gloves are laced from death itself, and you'd hate to be on the
 receiving end of their wrath.
 ~
-27 mp ah 0 1
+27 mp ah 0 0 1
 0 0 0
 11 0
 A
@@ -590,7 +590,7 @@ A hanged man's hand is lying here.~
    This hand, though slightly rotted, looks as fresh as the day it was hanged.
 It seems to drip some kind of otherworldly power like an icy fog.
 ~
-3 mp ao 0 6
+3 mp ao 0 0 6
 0 0 0
 7 0
 A
@@ -609,7 +609,7 @@ A skeletal terrosaur whistle is lying here.~
    This whistle can be used, just once, to summon a flying skeletal terrosaur
 mount.
 ~
-3 p a 0 4
+3 p a 0 0 4
 10422 0 0
 14 0
 T 9910
@@ -620,7 +620,7 @@ a skeletal mammoth minipet whistle~
 A skeletal mammoth minipet whistle is lying here.~
 Type 'use whistle' to gain a mini skeletal mammoth pet.
 ~
-19 p a 0 7
+19 p a 0 0 7
 10437 0 0
 2 0
 S
@@ -634,7 +634,7 @@ mana core. Shadows drip from every edge of the shield, and attacks that hit it
 seem to disappear into nothing. Yet Shadowkeeper is stunningly light and
 effortlessly maneuverable.
 ~
-23 mp ao 0 6
+23 mp ao 0 0 6
 0 0 0
 10 0
 A
@@ -657,7 +657,7 @@ glints off the striking orange cloth. But when you wear it, the cloth begins to
 dance and crackle in the light, pulling up like true fire and giving the
 impression that you are truly flame incarnate!
 ~
-27 mp ae 0 6
+27 mp ae 0 0 6
 0 0 0
 11 0
 A
@@ -680,7 +680,7 @@ along the back of the skull show it was reanimated by necromancy before falling
 a second time. After that, someone removed the bottom so it can be worn as a
 helmet. Perhaps some of that necromantic magic still lingers in the skull.
 ~
-27 mp ae 0 5
+27 mp ae 0 0 5
 3 0 0
 0 0
 A
@@ -703,7 +703,7 @@ existential torment of trapped souls trying to escape the eternal void where
 all dead things go as they wait to be raised by necromancers on the day of
 judgment.
 ~
-2 mp ak 0 3
+2 mp ak 0 0 3
 0 0 0
 10 0
 A
@@ -724,7 +724,7 @@ can feel the searing anguish of the thousands of trapped souls whose suffering
 fuels the pit's magic. If these flames can be harnessed, their power might be
 limitless.
 ~
-2 mp ak 0 4
+2 mp ak 0 0 4
 0 0 0
 10 0
 A
@@ -745,7 +745,7 @@ the skin of an outer demon. Like the finest leather, they have been hardened.
 But like imperium, they do not flex under pressure. These are truly fine
 gauntlets, if slightly haunting.
 ~
-27 mp ah 0 3
+27 mp ah 0 0 3
 3 0 0
 7 0
 A
@@ -770,7 +770,7 @@ necromantic magic in the gloves, and you can feel their power as soon as you
 slip them on. But you also can't shake an uneasy feeling at what the gloves are
 made from.
 ~
-27 mp ah 0 5
+27 mp ah 0 0 5
 0 0 0
 7 0
 A
@@ -788,7 +788,7 @@ A swirling mass of shadow has collected on the ground.~
 necromantic magic streak through the shadow. Someone must have enchanted this
 to pool around the legs of an assassin to make them harder to see or hear.
 ~
-27 emp af 0 3
+27 emp af 0 0 3
 1 0 0
 10 0
 A
@@ -811,7 +811,7 @@ can no longer be seen. Instead, as the wearer walks, the legs of the trousers
 swish together to create an ominous knell, foretelling the death of all who
 hear it.
 ~
-27 emp af 0 6
+27 emp af 0 0 6
 0 0 0
 11 0
 A
@@ -829,7 +829,7 @@ A fiendskull cap has been left here.~
 symbols carved in the skull are almost certainly to keep the fiend's soul from
 possessing you when you wear it.
 ~
-27 mp ae 0 7
+27 mp ae 0 0 7
 2 0 0
 14 0
 A
@@ -851,7 +851,7 @@ A ring of the night watch is lying here.~
 words 'Night Watch' scratched into it by an amateur jeweler. Still, what it
 symbolizes is protecting the city from dark and terrifying nights.
 ~
-2 moy ab 0 4
+2 moy ab 0 0 4
 0 0 0
 2 0
 A
@@ -873,7 +873,7 @@ A pair of imperium ear guards lie here.~
 the wearer's ears from sharp blows. The workmanship is simple -- they were
 probably made in a local hamlet. Still, these are valuable in battle.
 ~
-2 moy am 0 2
+2 moy am 0 0 2
 0 0 0
 3 0
 A
@@ -889,7 +889,7 @@ an open sewer grate~
 The sewer grate is propped open. (adventure)~
 The sewer grate is propped open and you can hear sounds coming from beneath.
 ~
-8 0 0 0 3
+8 B 0 0 0 4
 -1 0 0
 2 0
 S
@@ -899,7 +899,7 @@ the exit~
 A ladder leads up to the sewer's exit. (climb)~
 The scent of fresh air wafts down from the sewer's exit.
 ~
-8 0 0 0 4
+8 B 0 0 0 5
 -1 0 0
 2 0
 T 10450
@@ -911,7 +911,7 @@ Pimmin's ring~
 Pimmin's ring is lying on the ground.~
 The ring is made of copper, but it shines like gold.
 ~
-2 mp ab 0 3
+2 mp ab 0 0 3
 0 0 0
 13 0
 A
@@ -930,7 +930,7 @@ a bone charm necklace~
 A bone charm necklace is lying on the ground.~
 The necklace looks to be made mostly from chicken bones.
 ~
-2 mp ac 0 3
+2 mp ac 0 0 3
 0 0 0
 14 0
 A
@@ -954,7 +954,7 @@ A chicken-bone wand is lying here.~
    This double-pronged wand is made from the wishbone of a chicken. Lightning
 arcs between the tips of the wand, enough to make your hair stand up on end.
 ~
-1 hmp an 0 3
+1 hmp an 0 0 3
 0 7 21
 14 0
 A
@@ -971,7 +971,7 @@ the goblinward tome~
 A goblin tome is lying here.~
 This tome is written in goblinese, and barely legible at that.
 ~
-3 mp ao 0 4
+3 mp ao 0 0 4
 0 0 0
 7 0
 A
@@ -994,7 +994,7 @@ a violet leopard shawl~
 A violet leopard shawl is lying here.~
 This goblincraft shawl may be the height of fashion somewhere, but not here.
 ~
-27 mp ak 0 5
+27 mp ak 0 0 5
 0 0 0
 7 0
 A
@@ -1018,7 +1018,7 @@ A pair of wildfire gloves is lying here.~
    These gloves appear to be made from ratskins, and have the faint glow of
 wildfire.
 ~
-27 mp ah 0 5
+27 mp ah 0 0 5
 0 0 0
 7 0
 A
@@ -1041,7 +1041,7 @@ Shivsper's poison ring~
 Shivsper's poison ring is lying on the ground.~
 This ring hides a tiny compartment for a bit of poison.
 ~
-2 mp ab 0 3
+2 mp ab 0 0 3
 0 0 0
 13 0
 A
@@ -1062,7 +1062,7 @@ a gaudy copper chain~
 A gaudy copper chain is lying here.~
 This goblincraft chain appears to spell out "BLING" in goblinese.
 ~
-2 mp ac 0 3
+2 mp ac 0 0 3
 0 0 0
 13 0
 A
@@ -1083,7 +1083,7 @@ someone else's axe~
 An axe is lying here.~
 This axe looks too nice to have been made by the goblin you got it from.
 ~
-1 emp an a 6
+1 emp an a 0 8
 0 6 2
 2 0
 A
@@ -1092,6 +1092,12 @@ A
 21 2 0
 C
 1 175
+M
+28
+You swing someone else's axe hard!~
+M
+29
+$n swings someone else's axe hard!~
 T 10460
 S
 #10461
@@ -1100,7 +1106,7 @@ a giant dagger~
 A giant dagger is lying here.~
 This is a giant dagger -- or perhaps a goblin longsword.
 ~
-1 imp ano f 4
+1 imp ano f 0 4
 0 2 4
 2 0
 A
@@ -1117,7 +1123,7 @@ a rat-fur cloak~
 A fur cloak is lying here.~
 This goblincraft cloak looks to be sewn from a dozen rats.
 ~
-27 mp ak 0 5
+27 mp ak 0 0 5
 1 0 0
 7 0
 A
@@ -1140,7 +1146,7 @@ wooden gauntlets~
 A pair of wooden gauntlets appear to have been planted here.~
 These gauntlets are unmistakably goblincraft, and smell of pine.
 ~
-27 emp ah 0 5
+27 emp ah 0 0 5
 1 0 0
 0 0
 A
@@ -1161,7 +1167,7 @@ Wargreyn's ring~
 Wargreyn's ring has been dropped here.~
 This ring is made from volcanic glass. Luckily, it's made for a large goblin.
 ~
-2 mp ab 0 5
+2 mp ab 0 0 5
 0 0 0
 8 0
 A
@@ -1186,7 +1192,7 @@ the blacksmith's charm~
 A black charm is lying here.~
 This charm appears to have been made by a goblin, but you're not sure how.
 ~
-2 mp ac 0 3
+2 mp ac 0 0 3
 0 0 0
 2 0
 A
@@ -1209,7 +1215,7 @@ the goblinsmith's hammer~
 A goblinsmith's hammer is lying here.~
 This hammer has made many a goblincraft weapon.
 ~
-1 hmp an c 4
+1 hmp an c 0 4
 0 1 6
 2 0
 A
@@ -1230,7 +1236,7 @@ a wargskull shield~
 A skull shield is lying here.~
 This shield is made from a warg skull, coated in imperium!
 ~
-23 emp ao 0 3
+23 emp ao 0 0 3
 0 0 0
 2 0
 A
@@ -1254,7 +1260,7 @@ A mesh cloak is draped on the ground.~
    This goblincraft cloak is made from a tightly woven metal mesh. Even with a
 tongue like a goblin, you can't say that five times fast.
 ~
-27 mp ak 0 4
+27 mp ak 0 0 4
 3 0 0
 2 0
 A
@@ -1273,7 +1279,7 @@ heavy goblin gauntlets~
 A pair of heavy gauntlets is lying here.~
 These goblincraft gauntlets are lined with coarse rat fur.
 ~
-27 mp ah 0 4
+27 mp ah 0 0 4
 3 0 0
 2 0
 A
@@ -1295,7 +1301,7 @@ A saddle made of rat fur is lying here.~
    This saddle is unquestionably goblincraft, and you're not sure what their
 obsession with rat fur is.
 ~
-3 mo as 0 3
+3 mo as 0 0 3
 0 0 0
 7 0
 A
@@ -1309,7 +1315,7 @@ a goblin go-bag~
 A goblin bag is lying here.~
 This goblincraft bag is light and portable.
 ~
-24 mo ar 0 2
+24 mo ar 0 0 2
 1 0 0
 7 0
 S
@@ -1319,7 +1325,7 @@ some wooden goblin pipes~
 A set of wooden goblin pipes is lying here.~
 You might be able to play these pipes like an instrument.
 ~
-22 0 ao 0 3
+22 0 ao 0 0 3
 1 0 0
 0 0
 C
@@ -1355,9 +1361,11 @@ the violet leopard shawl pattern~
 The violet leopard shawl pattern is lying here.~
 This pattern teaches you to sew a violet leopard shawl.
 ~
-7 0 a 0 4
+7 0 a 0 0 5
 10456 0 0
 0 0
+C
+1 1
 S
 #10474
 pattern wildfire gloves~
@@ -1365,9 +1373,11 @@ the wildfire gloves pattern~
 The wildfire gloves pattern is lying here.~
 This pattern teaches you to sew wildfire gloves.
 ~
-7 0 a 0 5
+7 0 a 0 0 6
 10457 0 0
 0 0
+C
+1 1
 S
 #10475
 pattern cloak rat-fur fur~
@@ -1375,9 +1385,11 @@ the rat-fur cloak pattern~
 The rat-fur cloak pattern is lying here.~
 This pattern teaches you to sew a rat-fur cloak.
 ~
-7 0 a 0 5
+7 0 a 0 0 6
 10462 0 0
 0 0
+C
+1 1
 S
 #10476
 pattern wooden gauntlets~
@@ -1385,9 +1397,11 @@ the wooden gauntlets pattern~
 The wooden gauntlets pattern is lying here.~
 This pattern teaches you to craft wooden gauntlets.
 ~
-7 0 a 0 5
+7 0 a 0 0 6
 10463 0 0
 0 0
+C
+1 1
 S
 #10477
 pattern cloak mesh~
@@ -1395,9 +1409,11 @@ the mesh cloak pattern~
 The mesh cloak pattern is lying here.~
 This pattern teaches you to forge a mesh cloak.
 ~
-7 0 a 0 5
+7 0 a 0 0 6
 10468 0 0
 0 0
+C
+1 1
 S
 #10478
 pattern heavy goblin gauntlets~
@@ -1405,9 +1421,11 @@ the heavy goblin gauntlets pattern~
 The heavy goblin gauntlets pattern is lying here.~
 This pattern teaches you to forge heavy goblin gauntlets.
 ~
-7 0 a 0 5
+7 0 a 0 0 6
 10469 0 0
 0 0
+C
+1 1
 S
 #10479
 tent war goblin~
@@ -1423,7 +1441,7 @@ Rooms: 2
 Citizens: 1
 Features: cooking fire
 ~
-3 e a 0 6
+3 e a 0 0 6
 0 0 0
 7 0
 S
@@ -1439,7 +1457,7 @@ prefer birds of prey.
 Usage: build goblinmessagepost
 Features: can send and receive mail
 ~
-3 e a 0 6
+3 e a 0 0 6
 0 0 0
 0 0
 S
@@ -1454,7 +1472,7 @@ ings, as they hate to settle down for long periods of time.
 Usage: build goblin lab tent
 Features: cooking fire, alchemy
 ~
-3 e a 0 5
+3 e a 0 0 5
 0 0 0
 7 0
 S
@@ -1469,7 +1487,7 @@ and will remove the valuable dolmen stones to use for building new tombs.
 Usage: build goblindolmen <direction>
 Features: tomb
 ~
-3 e a 0 3
+3 e a 0 0 3
 0 0 0
 1 0
 S
@@ -1480,7 +1498,7 @@ Haxaw's poison ring has been left behind.~
    The ring is made of copper and has turned slightly green around the edges of
 a small, hidden chamber meant to hide poison behind the ring's jewel.
 ~
-2 mp ab 0 5
+2 mp ab 0 0 5
 0 0 0
 13 0
 A
@@ -1502,7 +1520,7 @@ A goblin necklace has been left here.~
    The necklace is made of teeth that, when worn, look like you have a smile
 around your neck. On closer inspection, these might be human teeth.
 ~
-2 mp ac 0 4
+2 mp ac 0 0 4
 0 0 0
 14 0
 A
@@ -1526,7 +1544,7 @@ attached to a stick by a leather rope. The size and the, er, quality indicate
 that it's goblincraft. Some sort of enchantment is making it feel warm,
 although for a goblin weapon that's not necessarily good.
 ~
-1 hmp an 0 3
+1 hmp an 0 0 3
 0 1 16
 0 0
 A
@@ -1546,7 +1564,7 @@ A goose-beak totem has been dropped here.~
    The totem is made from wood, leather, and apparently a real goose's beak,
 bound by something that mells strangely like goblin magic.
 ~
-3 mp ao 0 4
+3 mp ao 0 0 4
 0 0 0
 0 0
 A
@@ -1571,7 +1589,7 @@ A goblin deathshroud is hanging here.~
 healers after they have died. However, it is also commonly stolen from goblin
 graves by other goblins and used to channel the magic of the dead.
 ~
-27 mp ak 0 5
+27 mp ak 0 0 5
 0 0 0
 7 0
 A
@@ -1596,7 +1614,7 @@ A pair of doubleskin gloves is lying here.~
 But in reality, it seems someone has skinned a person's actual hands to stitch
 these gloves. It seems like the sort of thing a goblin would do.
 ~
-27 mp ah 0 5
+27 mp ah 0 0 5
 0 0 0
 7 0
 A
@@ -1619,7 +1637,7 @@ Dryleef's pitfighting ring has been left behind.~
 pitfighting league. It's hard to tell if this was won by a champion or just
 belonged to a member of the league.
 ~
-2 mp ab 0 5
+2 mp ab 0 0 5
 0 0 0
 13 0
 A
@@ -1643,7 +1661,7 @@ eye. In fact, this makes the goblin mostly eye. But for goblins, looking at
 something with your eyes (as opposed to turning and running) is the symbol of
 bravery.
 ~
-2 mp ac 0 3
+2 mp ac 0 0 3
 0 0 0
 13 0
 A
@@ -1669,7 +1687,7 @@ surface and odd balance come from the sword being made from low-quality bog
 iron. But the bloodstains on the blade tell a story of success in the goblin
 pits.
 ~
-1 imp an 0 5
+1 imp an 0 0 5
 0 5 1
 2 0
 A
@@ -1692,7 +1710,7 @@ A pitfighting buckler is lying here.~
 the goblin pits. It's small enough to be light and maneuverable even for a
 goblin, but strong enough to take a full-size blow without going down.
 ~
-23 mp ao 0 3
+23 mp ao 0 0 3
 0 0 0
 2 0
 A
@@ -1715,7 +1733,7 @@ A goblin pitfighter's cape lies here.~
 laughable on a human. Still, it's well-made and could serve as a useful
 distraction or taunt in the tight combat of the goblin pits.
 ~
-27 mp ak 0 5
+27 mp ak 0 0 5
 2 0 0
 2 0
 A
@@ -1737,7 +1755,7 @@ A pair of goblin punching bags are lying here.~
    On further inspection, these are just ordinary bags that goblins wear on
 their hands while punching.
 ~
-27 mp ah 0 4
+27 mp ah 0 0 4
 2 0 0
 11 0
 A
@@ -1771,7 +1789,7 @@ Type 'learn sketches' to learn the following crafts for healers:
  goblin deathshroud  (about body, sewn, Magical Vestments)
  doubleskin gloves  (hands, sewn, Magical Vestments)
 ~
-3 0 a 0 7
+3 0 a 0 0 7
 0 0 0
 0 0
 C
@@ -1793,7 +1811,7 @@ Type 'learn roll' to learn the following crafts for casters:
  violet leopard shawl  (about body, sewn, Magical Vestments)
  wildfire gloves  (hands, sewn, Magical Vestments)
 ~
-3 0 a 0 11
+3 0 a 0 0 11
 0 0 0
 11 0
 C
@@ -1816,7 +1834,7 @@ Type 'learn patterns' to learn the following crafts for melee fighters:
  rat-fur cloak  (about body, sewn, Dangerous Leathers)
  wooden gauntlets  (hands, crafted, Dangerous Leathers)
 ~
-3 0 a 0 6
+3 0 a 0 0 6
 0 0 0
 0 0
 C
@@ -1839,7 +1857,7 @@ Type 'learn plates' to learn the following crafts for tanks:
  mesh cloak  (about body, forged, Imperial Armors)
  heavy goblin gauntlets  (hands, forged, Imperial Armors)
 ~
-3 0 a 0 5
+3 0 a 0 0 5
 0 0 0
 2 0
 C
@@ -1862,7 +1880,7 @@ Type 'learn goblincrafts' to learn the following crafts for soloists and PVPers:
  goblin pitfighter's cape  (about body, forged, Dangerous Leathers)
  goblin punching bags  (hands, forged, Dangerous Leathers)
 ~
-3 0 a 0 3
+3 0 a 0 0 3
 0 0 0
 0 0
 C

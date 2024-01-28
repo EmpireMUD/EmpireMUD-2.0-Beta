@@ -471,9 +471,10 @@ Winter Wonderland minipet whistle (random order) 2021-2022~
 1 c 2
 use~
 * List of vnums granted by this whistle (minipet mobs)
-set list 10709 16657 16658 10723 10724 10725 10726 16653 16654 16655 16656 16666 16667 16668 16669 10706
+set list 10709 16657 16658 10723 10724 10725 10726 16653 16654 16655 16656 16666 16667 16668 16669 10706 16670
 * length is used to shuffle the start point of the list
-set length 15
+set length 17
+*
 * Check targeting
 if %actor.obj_target(%arg.car%)% != %self%
   return 0
@@ -1032,18 +1033,21 @@ if !%actor.can_afford(50)%
   %send% %actor% ~%self% tells you, 'Big human needs 50 coin to buy that.'
   halt
 end
-nop %actor.charge_coins(50)%
+set coinstr %actor.charge_coins(50)%
 if !%is_veh%
   %load% obj %vnum% %actor% inv 25
 else
   %load% veh %vnum% 25
   set emp %actor.empire%
   set veh %self.room.vehicles%
-  if %emp%
-    %own% %veh% %emp%
+  if %veh% && %veh.vnum% == %vnum%
+    nop %veh.unlink_instance%
+    if %emp%
+      %own% %veh% %emp%
+    end
   end
 end
-%send% %actor% You buy %named% for 50 coins.
+%send% %actor% You buy %named% for %coinstr%.
 %echoaround% %actor% ~%actor% buys %named%.
 ~
 #10753
@@ -1067,9 +1071,9 @@ if !%actor.can_afford(30)%
   %send% %actor% ~%self% tells you, 'Big human needs 30 coin to buy that.'
   halt
 end
-nop %actor.charge_coins(30)%
+set coinstr %actor.charge_coins(30)%
 %load% obj %vnum% %actor% inv 25
-%send% %actor% You buy %named% for 30 coins.
+%send% %actor% You buy %named% for %coinstr%.
 %echoaround% %actor% ~%actor% buys %named%.
 ~
 #10754
@@ -1166,9 +1170,9 @@ if !%actor.can_afford(50)%
   %send% %actor% ~%self% tells you, 'Big human needs 50 coin to buy that.'
   halt
 end
-nop %actor.charge_coins(50)%
+set coinstr %actor.charge_coins(50)%
 %load% obj %vnum% %actor% inv 25
-%send% %actor% You buy %named% for 50 coins.
+%send% %actor% You buy %named% for %coinstr%.
 %echoaround% %actor% ~%actor% buys %named%.
 ~
 #10759
@@ -1192,14 +1196,16 @@ if !%actor.can_afford(50)%
   %send% %actor% ~%self% tells you, 'Big human needs 50 coin to buy that.'
   halt
 end
-nop %actor.charge_coins(50)%
+set coinstr %actor.charge_coins(50)%
 %load% veh %vnum% 25
 set emp %actor.empire%
-set veh %self.room.vehicles%
-if %emp%
-  %own% %veh% %emp%
+if %veh% && %veh.vnum% == %vnum%
+  nop %veh.unlink_instance%
+  if %emp%
+    %own% %veh% %emp%
+  end
 end
-%send% %actor% You buy %named% for 50 coins.
+%send% %actor% You buy %named% for %coinstr%.
 %echoaround% %actor% ~%actor% buys %named%.
 ~
 #10760
@@ -1321,6 +1327,10 @@ Goblin raft replacer~
 1 n 100
 ~
 %load% veh 10771
+set raft %self.room.vehicles%
+if %raft% && %raft.vnum% == 10771
+  nop %raft.unlink_instance%
+end
 %purge% %self%
 ~
 #10775
@@ -1405,7 +1415,7 @@ wait 1
 set actor %self.carried_by%
 if !%actor%
   %purge% %self%
-  %halt%
+  halt
 end
 set try 10
 set done 0

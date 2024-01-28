@@ -2,15 +2,13 @@
 *   File: quest.c                                         EmpireMUD 2.0b5 *
 *  Usage: quest loading, saving, OLC, and processing                      *
 *                                                                         *
-*  EmpireMUD code base by Paul Clarke, (C) 2000-2015                      *
+*  EmpireMUD code base by Paul Clarke, (C) 2000-2024                      *
 *  All rights reserved.  See license.doc for complete information.        *
 *                                                                         *
 *  EmpireMUD based upon CircleMUD 3.0, bpl 17, by Jeremy Elson.           *
 *  CircleMUD (C) 1993, 94 by the Trustees of the Johns Hopkins University *
 *  CircleMUD is based on DikuMUD, Copyright (C) 1990, 1991.               *
 ************************************************************************ */
-
-#include <math.h>
 
 #include "conf.h"
 #include "sysdep.h"
@@ -47,7 +45,6 @@ const char *default_quest_complete_msg = "You have completed the quest.\r\n";
 // local protos
 void add_quest_lookup(struct quest_lookup **list, quest_data *quest);
 void add_to_quest_temp_list(struct quest_temp_list **list, quest_data *quest, struct instance_data *instance);
-struct player_completed_quest *has_completed_quest_any(char_data *ch, any_vnum quest);
 bool remove_quest_lookup(struct quest_lookup **list, quest_data *quest);
 void update_mob_quest_lookups(mob_vnum vnum);
 void update_veh_quest_lookups(any_vnum vnum);
@@ -79,7 +76,7 @@ bool can_turn_in_quest_at(char_data *ch, room_data *loc, quest_data *quest, empi
 		// QG_x: find quest giver here
 		switch (giver->type) {
 			case QG_BUILDING: {
-				if (GET_BUILDING(loc) && GET_BLD_VNUM(GET_BUILDING(loc)) == giver->vnum) {
+				if (GET_BUILDING(loc) && GET_BLD_VNUM(GET_BUILDING(loc)) == giver->vnum && IS_COMPLETE(loc)) {
 					*giver_emp = ROOM_OWNER(loc);
 					return TRUE;
 				}
@@ -87,7 +84,7 @@ bool can_turn_in_quest_at(char_data *ch, room_data *loc, quest_data *quest, empi
 			}
 			case QG_MOBILE: {
 				DL_FOREACH2(ROOM_PEOPLE(IN_ROOM(ch)), mob, next_in_room) {
-					if (IS_NPC(mob) && GET_MOB_VNUM(mob) == giver->vnum && CAN_SEE(ch, mob)) {
+					if (IS_NPC(mob) && GET_MOB_VNUM(mob) == giver->vnum && CAN_SEE(ch, mob) && !AFF_FLAGGED(mob, AFF_NO_SEE_IN_ROOM)) {
 						*giver_emp = GET_LOYALTY(mob);
 						return TRUE;
 					}
@@ -118,7 +115,7 @@ bool can_turn_in_quest_at(char_data *ch, room_data *loc, quest_data *quest, empi
 			}
 			case QG_VEHICLE: {
 				DL_FOREACH2(ROOM_VEHICLES(IN_ROOM(ch)), veh, next_in_room) {
-					if (VEH_VNUM(veh) == giver->vnum && !VEH_IS_EXTRACTED(veh) && CAN_SEE_VEHICLE(ch, veh)) {
+					if (VEH_VNUM(veh) == giver->vnum && !VEH_IS_EXTRACTED(veh) && VEH_IS_COMPLETE(veh) && CAN_SEE_VEHICLE(ch, veh)) {
 						*giver_emp = VEH_OWNER(veh);
 						return TRUE;
 					}
@@ -346,15 +343,17 @@ int count_owned_homes(empire_data *emp) {
 * @return int The number of tiles with that sector vnum, owned by emp.
 */
 int count_owned_sector(empire_data *emp, sector_vnum vnum) {
-	room_data *room, *next_room;
+	struct sector_index_type *idx;
+	struct map_data *map;
 	int count = 0;	// ah ah ah
 	
 	if (!emp || vnum == NOTHING) {
 		return count;
 	}
 	
-	HASH_ITER(hh, world_table, room, next_room) {
-		if (ROOM_OWNER(room) == emp && GET_SECT_VNUM(SECT(room)) == vnum) {
+	idx = find_sector_index(vnum);
+	LL_FOREACH2(idx->sect_rooms, map, next_in_sect) {
+		if (map->room && ROOM_OWNER(map->room) == emp) {
 			++count;
 		}
 	}
@@ -631,7 +630,7 @@ void get_tracker_display(struct req_data *tracker, char *save_buffer) {
 	LL_FOREACH(tracker, task) {
 		if (last_group != task->group) {
 			if (task->group) {
-				sprintf(save_buffer + strlen(save_buffer), "  %sAll of:\r\n", (count > 0 ? "or " : ""));
+				sprintf(save_buffer + strlen(save_buffer), "  %s:\r\n", (count > 0 ? "Or all of" : "All of"));
 			}
 			last_group = task->group;
 			sub = 0;
@@ -681,6 +680,8 @@ void get_tracker_display(struct req_data *tracker, char *save_buffer) {
 */
 void give_quest_rewards(char_data *ch, struct quest_reward *list, int reward_level, empire_data *quest_giver_emp, int instance_id) {
 	char buf[MAX_STRING_LENGTH];
+	int sub;
+	archetype_data *arch;
 	struct quest_reward *reward;
 	struct empire_goal *goal;
 	progress_data *prog;
@@ -710,7 +711,8 @@ void give_quest_rewards(char_data *ch, struct quest_reward *list, int reward_lev
 			}
 			case QR_OBJECT: {
 				obj_data *obj = NULL;
-				int iter;
+				int iter, obj_ok = 0;
+				
 				for (iter = 0; iter < reward->amount; ++iter) {
 					obj = read_object(reward->vnum, TRUE);
 					scale_item_to_level(obj, reward_level);
@@ -727,7 +729,10 @@ void give_quest_rewards(char_data *ch, struct quest_reward *list, int reward_lev
 						reduce_obj_binding(obj, ch);
 					}
 					
-					load_otrigger(obj);
+					obj_ok = load_otrigger(obj);
+					if (obj_ok) {
+						get_otrigger(obj, ch, FALSE);
+					}
 				}
 				
 				// mark gained
@@ -742,13 +747,13 @@ void give_quest_rewards(char_data *ch, struct quest_reward *list, int reward_lev
 					snprintf(buf, sizeof(buf), "\tyYou receive $p!\t0");
 				}
 				
-				if (obj) {
+				if (obj_ok && obj) {
 					act(buf, FALSE, ch, obj, NULL, TO_CHAR);
 				}
 				break;
 			}
 			case QR_SET_SKILL: {
-				int val = MAX(0, MIN(CLASS_SKILL_CAP, reward->amount));
+				int val = MAX(0, MIN(MAX_SKILL_CAP, reward->amount));
 				bool loss;
 				
 				loss = (val < get_skill_level(ch, reward->vnum));
@@ -829,6 +834,22 @@ void give_quest_rewards(char_data *ch, struct quest_reward *list, int reward_lev
 							msg_to_char(ch, "\tyYour empire starts the progress goal: %s\t0\r\n", PRG_NAME(prog));
 							refresh_one_goal_tracker(GET_LOYALTY(ch), goal);
 						}
+					}
+				}
+				break;
+			}
+			case QR_UNLOCK_ARCHETYPE: {
+				if ((arch = archetype_proto(reward->vnum))) {
+					// look up name
+					for (sub = 0; archetype_menu[sub].type != NOTHING; ++sub) {
+						if (archetype_menu[sub].type == GET_ARCH_TYPE(arch)) {
+							break;
+						}
+					}
+					
+					if (!has_unlocked_archetype(ch, reward->vnum)) {
+						msg_to_char(ch, "\tyYou have unlocked the starting %s '%s' for your account (available on new characters)!\t0\r\n", archetype_menu[sub].name, GET_ARCH_NAME(arch));
+						add_unlocked_archetype(ch, reward->vnum);
 					}
 				}
 				break;
@@ -991,6 +1012,11 @@ char *quest_reward_string(struct quest_reward *reward, bool show_vnums) {
 			snprintf(output, sizeof(output), "Starts progress: %s%s", vnum, get_progress_name_by_proto(reward->vnum));
 			break;
 		}
+		case QR_UNLOCK_ARCHETYPE: {
+			archetype_data *arch = archetype_proto(reward->vnum);
+			snprintf(output, sizeof(output), "Unlocks archetype: %s%s", vnum, (arch ? GET_ARCH_NAME(arch) : "UNKNOWN"));
+			break;
+		}
 		default: {
 			snprintf(output, sizeof(output), "%s%dx Unknown", vnum, reward->amount);
 			break;
@@ -1018,6 +1044,10 @@ void refresh_one_quest_tracker(char_data *ch, struct player_quest *pq) {
 		switch (task->type) {
 			case REQ_COMPLETED_QUEST: {
 				task->current = has_completed_quest(ch, task->vnum, pq->instance_id) ? task->needed : 0;
+				break;
+			}
+			case REQ_COMPLETED_QUEST_EVER: {
+				task->current = has_completed_quest_any(ch, task->vnum) ? task->needed : 0;
 				break;
 			}
 			case REQ_GET_COMPONENT: {
@@ -1177,6 +1207,10 @@ void refresh_one_quest_tracker(char_data *ch, struct player_quest *pq) {
 				task->current = GET_LOYALTY(ch) ? count_diplomacy(GET_LOYALTY(ch), task->misc) : 0;
 				break;
 			}
+			case REQ_DIPLOMACY_OVER: {
+				task->current = GET_LOYALTY(ch) ? count_diplomacy_over(GET_LOYALTY(ch), task->misc) : 0;
+				break;
+			}
 			case REQ_HAVE_CITY: {
 				task->current = GET_LOYALTY(ch) ? count_cities(GET_LOYALTY(ch)) : 0;
 				break;
@@ -1212,6 +1246,14 @@ void refresh_one_quest_tracker(char_data *ch, struct player_quest *pq) {
 			case REQ_RECOGNIZE_LANGUAGE: {
 				int mode = speaks_language(ch, task->vnum);
 				task->current = (mode == LANG_RECOGNIZE || mode == LANG_SPEAK) ? task->needed : 0;
+				break;
+			}
+			case REQ_DAYTIME: {
+				task->current = (IN_ROOM(ch) && get_sun_status(IN_ROOM(ch)) == SUN_LIGHT) ? task->needed : 0;
+				break;
+			}
+			case REQ_NIGHTTIME: {
+				task->current = (IN_ROOM(ch) && get_sun_status(IN_ROOM(ch)) != SUN_LIGHT) ? task->needed : 0;
 				break;
 			}
 		}
@@ -1461,6 +1503,40 @@ void smart_copy_quest_rewards(struct quest_reward **to_list, struct quest_reward
 			reward->amount = iter->amount;
 			reward->vnum = iter->vnum;
 			LL_APPEND(*to_list, reward);
+		}
+	}
+}
+
+
+/**
+* Verifies all cycling daily quests (ones with the QST_DAILY flag and a
+* QUEST_DAILY_CYCLE() id). All cycling dailies will have 1 active quest in the
+* cycle after this.
+*/
+void verify_daily_quest_cycles(void) {
+	quest_data *qst, *next_qst, *iter, *next_iter;
+	bool any;
+	
+	HASH_ITER(hh, quest_table, qst, next_qst) {
+		if (QUEST_FLAGGED(qst, QST_IN_DEVELOPMENT) || !IS_DAILY_QUEST(qst) || QUEST_DAILY_CYCLE(qst) == NOTHING) {
+			continue;	// not a cycling daily
+		}
+		if (QUEST_DAILY_ACTIVE(qst)) {
+			continue;	// if it's active the cycle has already been set up
+		}
+		
+		// if we have an inactive daily then see if something else on the same cycle is active yet
+		any = FALSE;
+		HASH_ITER(hh, quest_table, iter, next_iter) {
+			if (iter != qst && QUEST_DAILY_ACTIVE(iter) && QUEST_DAILY_CYCLE(iter) == QUEST_DAILY_CYCLE(qst) && !QUEST_FLAGGED(iter, QST_IN_DEVELOPMENT)) {
+				any = TRUE;
+				break;
+			}
+		}
+		
+		// did we find any?
+		if (!any) {
+			setup_daily_quest_cycles(QUEST_DAILY_CYCLE(qst));
 		}
 	}
 }
@@ -1717,7 +1793,7 @@ bool can_get_quest_from_mob(char_data *ch, char_data *mob, struct quest_temp_lis
 	bool any = FALSE;
 	bool dailies, event_dailies;
 	
-	if (IS_NPC(ch) || !MOB_QUEST_LOOKUPS(mob) || !CAN_SEE(ch, mob)) {
+	if (IS_NPC(ch) || !MOB_QUEST_LOOKUPS(mob) || !CAN_SEE(ch, mob) || AFF_FLAGGED(mob, AFF_NO_SEE_IN_ROOM)) {
 		return FALSE;
 	}
 	
@@ -1746,6 +1822,9 @@ bool can_get_quest_from_mob(char_data *ch, char_data *mob, struct quest_temp_lis
 		}
 		if (!can_use_room(ch, IN_ROOM(ch), QUEST_FLAGGED(ql->quest, QST_NO_GUESTS) ? MEMBERS_ONLY : GUESTS_ALLOWED)) {
 			continue;	// room permissions
+		}
+		if (QUEST_FLAGGED(ql->quest, QST_IN_CITY_ONLY) && (!ROOM_OWNER(IN_ROOM(mob)) || !is_in_city_for_empire(IN_ROOM(mob), ROOM_OWNER(IN_ROOM(mob)), TRUE, NULL))) {
+			continue;	// not in-city
 		}
 		// already on quest?
 		if (is_on_quest(ch, QUEST_VNUM(ql->quest))) {
@@ -1820,6 +1899,9 @@ bool can_get_quest_from_obj(char_data *ch, obj_data *obj, struct quest_temp_list
 		if (room && !obj->carried_by && !can_use_room(ch, room, QUEST_FLAGGED(ql->quest, QST_NO_GUESTS) ? MEMBERS_ONLY : GUESTS_ALLOWED)) {
 			continue;	// room permissions
 		}
+		if (QUEST_FLAGGED(ql->quest, QST_IN_CITY_ONLY) && (!ROOM_OWNER(IN_ROOM(ch)) || !is_in_city_for_empire(IN_ROOM(ch), ROOM_OWNER(IN_ROOM(ch)), TRUE, NULL))) {
+			continue;	// not in-city
+		}
 		
 		// success
 		inst = (room ? find_instance_by_room(room, FALSE, TRUE) : NULL);
@@ -1893,6 +1975,9 @@ bool can_get_quest_from_room(char_data *ch, room_data *room, struct quest_temp_l
 			if (!can_use_room(ch, room, QUEST_FLAGGED(ql->quest, QST_NO_GUESTS) ? MEMBERS_ONLY : GUESTS_ALLOWED)) {
 				continue;	// room permissions
 			}
+			if (QUEST_FLAGGED(ql->quest, QST_IN_CITY_ONLY) && (!ROOM_OWNER(room) || !is_in_city_for_empire(room, ROOM_OWNER(room), TRUE, NULL))) {
+				continue;	// not in-city
+			}
 			// already on quest?
 			if (is_on_quest(ch, QUEST_VNUM(ql->quest))) {
 				continue;
@@ -1962,6 +2047,9 @@ bool can_get_quest_from_vehicle(char_data *ch, vehicle_data *veh, struct quest_t
 		if (!can_use_vehicle(ch, veh, QUEST_FLAGGED(ql->quest, QST_NO_GUESTS) ? MEMBERS_ONLY : GUESTS_ALLOWED)) {
 			continue;	// vehicle permissions
 		}
+		if (QUEST_FLAGGED(ql->quest, QST_IN_CITY_ONLY) && (!ROOM_OWNER(IN_ROOM(veh)) || !is_in_city_for_empire(IN_ROOM(veh), ROOM_OWNER(IN_ROOM(veh)), TRUE, NULL))) {
+			continue;	// not in-city
+		}
 		// already on quest?
 		if (is_on_quest(ch, QUEST_VNUM(ql->quest))) {
 			continue;
@@ -2000,7 +2088,7 @@ bool can_turn_quest_in_to_mob(char_data *ch, char_data *mob, struct quest_temp_l
 	int complete, total;
 	bool any = FALSE;
 	
-	if (IS_NPC(ch) || !MOB_QUEST_LOOKUPS(mob) || !CAN_SEE(ch, mob)) {
+	if (IS_NPC(ch) || !MOB_QUEST_LOOKUPS(mob) || !CAN_SEE(ch, mob) || AFF_FLAGGED(mob, AFF_NO_SEE_IN_ROOM)) {
 		return FALSE;
 	}
 	
@@ -2015,6 +2103,9 @@ bool can_turn_quest_in_to_mob(char_data *ch, char_data *mob, struct quest_temp_l
 		}
 		if (!can_use_room(ch, IN_ROOM(ch), QUEST_FLAGGED(ql->quest, QST_NO_GUESTS) ? MEMBERS_ONLY : GUESTS_ALLOWED)) {
 			continue;	// room permissions
+		}
+		if (QUEST_FLAGGED(ql->quest, QST_IN_CITY_ONLY) && (!ROOM_OWNER(IN_ROOM(mob)) || !is_in_city_for_empire(IN_ROOM(mob), ROOM_OWNER(IN_ROOM(mob)), TRUE, NULL))) {
+			continue;	// not in-city
 		}
 		// are they on quest?
 		if (!(pq = is_on_quest(ch, QUEST_VNUM(ql->quest)))) {
@@ -2074,6 +2165,9 @@ bool can_turn_quest_in_to_obj(char_data *ch, obj_data *obj, struct quest_temp_li
 		if (room && !obj->carried_by && !can_use_room(ch, room, QUEST_FLAGGED(ql->quest, QST_NO_GUESTS) ? MEMBERS_ONLY : GUESTS_ALLOWED)) {
 			continue;	// room permissions
 		}
+		if (QUEST_FLAGGED(ql->quest, QST_IN_CITY_ONLY) && (!ROOM_OWNER(IN_ROOM(ch)) || !is_in_city_for_empire(IN_ROOM(ch), ROOM_OWNER(IN_ROOM(ch)), TRUE, NULL))) {
+			continue;	// not in-city
+		}
 		
 		count_quest_tasks(pq->tracker, &complete, &total);
 		if (complete < total) {
@@ -2107,7 +2201,7 @@ bool can_turn_quest_in_to_room(char_data *ch, room_data *room, struct quest_temp
 	struct player_quest *pq;
 	bool any = FALSE;
 	
-	if (IS_NPC(ch)) {
+	if (IS_NPC(ch) || !IS_COMPLETE(room)) {
 		return FALSE;
 	}
 	
@@ -2130,6 +2224,9 @@ bool can_turn_quest_in_to_room(char_data *ch, room_data *room, struct quest_temp
 			}
 			if (!can_use_room(ch, room, QUEST_FLAGGED(ql->quest, QST_NO_GUESTS) ? MEMBERS_ONLY : GUESTS_ALLOWED)) {
 				continue;	// room permissions
+			}
+			if (QUEST_FLAGGED(ql->quest, QST_IN_CITY_ONLY) && (!ROOM_OWNER(room) || !is_in_city_for_empire(room, ROOM_OWNER(room), TRUE, NULL))) {
+				continue;	// not in-city
 			}
 			// are they on quest?
 			if (!(pq = is_on_quest(ch, QUEST_VNUM(ql->quest)))) {
@@ -2169,7 +2266,7 @@ bool can_turn_quest_in_to_vehicle(char_data *ch, vehicle_data *veh, struct quest
 	int complete, total;
 	bool any = FALSE;
 	
-	if (IS_NPC(ch) || !VEH_QUEST_LOOKUPS(veh) || !CAN_SEE_VEHICLE(ch, veh)) {
+	if (IS_NPC(ch) || !VEH_QUEST_LOOKUPS(veh) || !VEH_IS_COMPLETE(veh) || !CAN_SEE_VEHICLE(ch, veh)) {
 		return FALSE;
 	}
 	
@@ -2184,6 +2281,9 @@ bool can_turn_quest_in_to_vehicle(char_data *ch, vehicle_data *veh, struct quest
 		}
 		if (!can_use_vehicle(ch, veh, QUEST_FLAGGED(ql->quest, QST_NO_GUESTS) ? MEMBERS_ONLY : GUESTS_ALLOWED)) {
 			continue;	// vehicle
+		}
+		if (QUEST_FLAGGED(ql->quest, QST_IN_CITY_ONLY) && (!ROOM_OWNER(IN_ROOM(veh)) || !is_in_city_for_empire(IN_ROOM(veh), ROOM_OWNER(IN_ROOM(veh)), TRUE, NULL))) {
+			continue;	// not in-city
 		}
 		// are they on quest?
 		if (!(pq = is_on_quest(ch, QUEST_VNUM(ql->quest)))) {
@@ -2483,6 +2583,39 @@ void qt_change_skill_level(char_data *ch, any_vnum skl) {
 
 
 /**
+* Quest Tracker: Check sun status for player
+*
+* @param char_data *ch The player.
+*/
+void qt_check_day_and_night(char_data *ch) {
+	struct player_quest *pq;
+	struct req_data *task;
+	int status = NOTHING;
+	
+	if (IS_NPC(ch) || !IN_ROOM(ch)) {
+		return;
+	}
+	
+	LL_FOREACH(GET_QUESTS(ch), pq) {
+		LL_FOREACH(pq->tracker, task) {
+			if (task->type == REQ_DAYTIME) {
+				if (status == NOTHING) {
+					status = get_sun_status(IN_ROOM(ch));
+				}
+				task->current = (status == SUN_LIGHT ? TRUE : FALSE);
+			}
+			else if (task->type == REQ_NIGHTTIME) {
+				if (status == NOTHING) {
+					status = get_sun_status(IN_ROOM(ch));
+				}
+				task->current = (status != SUN_LIGHT ? TRUE : FALSE);
+			}
+		}
+	}
+}
+
+
+/**
 * Quest Tracker: ch drops (or otherwise loses) an item
 *
 * Note: Call this AFTER taking the obj away.
@@ -2541,7 +2674,7 @@ void qt_empire_cities(char_data *ch, any_vnum amount) {
 	
 	LL_FOREACH(GET_QUESTS(ch), pq) {
 		LL_FOREACH(pq->tracker, task) {
-			if (task->type == REQ_DIPLOMACY) {
+			if (task->type == REQ_HAVE_CITY) {
 				task->current = GET_LOYALTY(ch) ? count_cities(GET_LOYALTY(ch)) : 0;
 			}
 		}
@@ -2567,6 +2700,9 @@ void qt_empire_diplomacy(char_data *ch, any_vnum amount) {
 		LL_FOREACH(pq->tracker, task) {
 			if (task->type == REQ_DIPLOMACY) {
 				task->current = GET_LOYALTY(ch) ? count_diplomacy(GET_LOYALTY(ch), task->misc) : 0;
+			}
+			else if (task->type == REQ_DIPLOMACY_OVER) {
+				task->current = GET_LOYALTY(ch) ? count_diplomacy_over(GET_LOYALTY(ch), task->misc) : 0;
 			}
 		}
 	}
@@ -3186,6 +3322,9 @@ void qt_quest_completed(char_data *ch, any_vnum vnum) {
 			if (task->type == REQ_COMPLETED_QUEST && task->vnum == vnum) {
 				task->current = task->needed;
 			}
+			else if (task->type == REQ_COMPLETED_QUEST_EVER && task->vnum == vnum) {
+				task->current = task->needed;
+			}
 			else if (task->type == REQ_NOT_COMPLETED_QUEST && task->vnum == vnum) {
 				task->current = 0;
 			}
@@ -3249,12 +3388,13 @@ void qt_start_quest(char_data *ch, any_vnum vnum) {
 
 
 /**
-* Quest Tracker: mark a triggered condition for 1 quest
+* Quest Tracker: increase a triggered condition for a quest by 1
 *
 * @param char_data *ch The player.
 * @param any_vnum vnum The quest to mark.
+* @param int specific_val Optional: Sets it to this value (pass 0 to just add 1 instead).
 */
-void qt_triggered_task(char_data *ch, any_vnum vnum) {
+void qt_triggered_task(char_data *ch, any_vnum vnum, int specific_val) {
 	struct player_quest *pq;
 	struct req_data *task;
 	
@@ -3266,7 +3406,14 @@ void qt_triggered_task(char_data *ch, any_vnum vnum) {
 		if (pq->vnum == vnum) {
 			LL_FOREACH(pq->tracker, task) {
 				if (task->type == REQ_TRIGGERED) {
-					task->current = task->needed;
+					if (specific_val > 0) {
+						// specific value
+						task->current = MIN(specific_val, task->needed);
+					}
+					else {
+						// add instead
+						task->current = MIN(task->current+1, task->needed);
+					}
 				}
 			}
 		}
@@ -3275,12 +3422,13 @@ void qt_triggered_task(char_data *ch, any_vnum vnum) {
 
 
 /**
-* Quest Tracker: cancel a triggered condition for the quest
+* Quest Tracker: reduce a triggered condition for the quest by 1 (or all)
 *
 * @param char_data *ch The player.
 * @param any_vnum vnum The quest to un-mark.
+* @param bool remove_all If TRUE, removes ALL triggers.
 */
-void qt_untrigger_task(char_data *ch, any_vnum vnum) {
+void qt_untrigger_task(char_data *ch, any_vnum vnum, bool remove_all) {
 	struct player_quest *pq;
 	struct req_data *task;
 	
@@ -3292,7 +3440,13 @@ void qt_untrigger_task(char_data *ch, any_vnum vnum) {
 		if (pq->vnum == vnum) {
 			LL_FOREACH(pq->tracker, task) {
 				if (task->type == REQ_TRIGGERED) {
-					task->current = 0;
+					// remove all OR 1
+					if (remove_all) {
+						task->current = 0;
+					}
+					else {
+						task->current = MAX(task->current-1, 0);
+					}
 				}
 			}
 		}
@@ -3431,6 +3585,7 @@ void qt_wear_obj(char_data *ch, obj_data *obj) {
 * @return bool TRUE if any problems were reported; FALSE if all good.
 */
 bool audit_quest(quest_data *quest, char_data *ch) {
+	archetype_data *arch;
 	struct trig_proto_list *tpl;
 	struct quest_reward *rew;
 	progress_data *prog;
@@ -3537,6 +3692,17 @@ bool audit_quest(quest_data *quest, char_data *ch) {
 				}
 				else if (!PRG_FLAGGED(prog, PRG_NO_AUTOSTART)) {
 					olc_audit_msg(ch, QUEST_VNUM(quest), "Rewards progress goal without NO-AUTOSTART");
+					problem = TRUE;
+				}
+				break;
+			}
+			case QR_UNLOCK_ARCHETYPE: {
+				if (!(arch = archetype_proto(rew->vnum))) {
+					olc_audit_msg(ch, QUEST_VNUM(quest), "Rewards non-existent archetype unlock");
+					problem = TRUE;
+				}
+				else if (!ARCHETYPE_FLAGGED(arch, ARCH_LOCKED)) {
+					olc_audit_msg(ch, QUEST_VNUM(quest), "Rewards archetype without LOCKED flag: %d %s", rew->vnum, GET_ARCH_NAME(arch));
 					problem = TRUE;
 				}
 				break;
@@ -3666,7 +3832,12 @@ char *list_one_quest(quest_data *quest, bool detail) {
 	}
 	else {
 		if (IS_EVENT_DAILY(quest)) {
-			snprintf(typestr, sizeof(typestr), " (event daily)");
+			if (QUEST_DAILY_CYCLE(quest) == NOTHING) {
+				snprintf(typestr, sizeof(typestr), " (event daily)");
+			}
+			else {
+				snprintf(typestr, sizeof(typestr), " (event daily, %s)", QUEST_DAILY_ACTIVE(quest) ? "active" : "inactive");
+			}
 		}
 		else if (IS_DAILY_QUEST(quest) && QUEST_DAILY_CYCLE(quest) == NOTHING) {
 			snprintf(typestr, sizeof(typestr), " (daily)");
@@ -3688,6 +3859,203 @@ char *list_one_quest(quest_data *quest, bool detail) {
 	}
 		
 	return output;
+}
+
+
+/**
+* Searches properties of quests.
+*
+* @param char_data *ch The person searching.
+* @param char *argument The argument they entered.
+*/
+void olc_fullsearch_quest(char_data *ch, char *argument) {
+	bool any;
+	char buf[MAX_STRING_LENGTH * 2], line[MAX_STRING_LENGTH], type_arg[MAX_INPUT_LENGTH], val_arg[MAX_INPUT_LENGTH], find_keywords[MAX_INPUT_LENGTH];
+	int count;
+	struct quest_reward *qreward;
+	struct req_data *req;
+	
+	bitvector_t only_flags = NOBITS, not_flagged = NOBITS;
+	bool no_daily_cycle = FALSE, active_daily_cycle = FALSE, inactive_daily_cycle = FALSE;
+	int vmin = NOTHING, vmax = NOTHING, only_level = NOTHING, level_over = NOTHING, level_under = NOTHING;
+	int only_daily_cycle = NOTHING, only_repeat = NOTHING, repeat_over = NOTHING, repeat_under = NOTHING;
+	int only_reward = NOTHING, only_prereq = NOTHING, only_task = NOTHING;
+	
+	quest_data *quest, *next_quest;
+	size_t size;
+	
+	if (!*argument) {
+		msg_to_char(ch, "See HELP QEDIT FULLSEARCH for syntax.\r\n");
+		return;
+	}
+	
+	// process argument
+	*find_keywords = '\0';
+	while (*argument) {
+		// figure out a type
+		argument = any_one_arg(argument, type_arg);
+		
+		if (!strcmp(type_arg, "-")) {
+			continue;	// just skip stray dashes
+		}
+		
+		FULLSEARCH_FLAGS("flags", only_flags, quest_flags)
+		FULLSEARCH_FLAGS("flagged", only_flags, quest_flags)
+		FULLSEARCH_FLAGS("unflagged", not_flagged, quest_flags)
+		FULLSEARCH_INT("vmin", vmin, 0, INT_MAX)
+		FULLSEARCH_INT("vmax", vmax, 0, INT_MAX)
+		FULLSEARCH_INT("level", only_level, 0, INT_MAX)
+		FULLSEARCH_INT("levelover", level_over, 0, INT_MAX)
+		FULLSEARCH_INT("levelunder", level_under, 0, INT_MAX)
+		FULLSEARCH_INT("dailycycle", only_daily_cycle, 0, INT_MAX)
+		FULLSEARCH_BOOL("nodailycycle", no_daily_cycle)
+		FULLSEARCH_BOOL("activedailycycle", active_daily_cycle)
+		FULLSEARCH_BOOL("inactivedailycycle", inactive_daily_cycle)
+		FULLSEARCH_INT("repeat", only_repeat, 0, INT_MAX)
+		FULLSEARCH_INT("repeatover", repeat_over, 0, INT_MAX)
+		FULLSEARCH_INT("repeatunder", repeat_under, 0, INT_MAX)
+		FULLSEARCH_LIST("rewards", only_reward, quest_reward_types)
+		FULLSEARCH_LIST("prereqs", only_prereq, requirement_types)
+		FULLSEARCH_LIST("prerequisite", only_prereq, requirement_types)
+		FULLSEARCH_LIST("tasks", only_task, requirement_types)
+		
+		else {	// not sure what to do with it? treat it like a keyword
+			sprintf(find_keywords + strlen(find_keywords), "%s%s", *find_keywords ? " " : "", type_arg);
+		}
+		
+		// prepare for next loop
+		skip_spaces(&argument);
+	}
+	
+	size = snprintf(buf, sizeof(buf), "Quest fullsearch: %s\r\n", show_color_codes(find_keywords));
+	count = 0;
+	
+	// okay now look up quests
+	HASH_ITER(hh, quest_table, quest, next_quest) {
+		if ((vmin != NOTHING && QUEST_VNUM(quest) < vmin) || (vmax != NOTHING && QUEST_VNUM(quest) > vmax)) {
+			continue;	// vnum range
+		}
+		if (not_flagged != NOBITS && IS_SET(QUEST_FLAGS(quest), not_flagged)) {
+			continue;
+		}
+		if (only_flags != NOBITS && (QUEST_FLAGS(quest) & only_flags) != only_flags) {
+			continue;
+		}
+		if (only_level != NOTHING && (QUEST_MIN_LEVEL(quest) > only_level || QUEST_MAX_LEVEL(quest) < only_level)) {
+			continue;
+		}
+		if (level_over != NOTHING && QUEST_MAX_LEVEL(quest) < level_over && QUEST_MIN_LEVEL(quest) < level_over) {
+			continue;
+		}
+		if (level_under != NOTHING && QUEST_MAX_LEVEL(quest) > level_over && QUEST_MIN_LEVEL(quest) > level_over) {
+			continue;
+		}
+		if (only_daily_cycle != NOTHING && (!IS_DAILY_QUEST(quest) || QUEST_DAILY_CYCLE(quest) != only_daily_cycle)) {
+			continue;
+		}
+		if (no_daily_cycle && (!IS_DAILY_QUEST(quest) || QUEST_DAILY_CYCLE(quest) != NOTHING)) {
+			continue;
+		}
+		if (active_daily_cycle && (!IS_DAILY_QUEST(quest) || !QUEST_DAILY_ACTIVE(quest))) {
+			continue;
+		}
+		if (inactive_daily_cycle && (!IS_DAILY_QUEST(quest) || QUEST_DAILY_ACTIVE(quest))) {
+			continue;
+		}
+		if (only_repeat != NOTHING && QUEST_REPEATABLE_AFTER(quest) != only_repeat) {
+			continue;
+		}
+		if (repeat_over != NOTHING && QUEST_REPEATABLE_AFTER(quest) < only_repeat) {
+			continue;
+		}
+		if (repeat_under != NOTHING && (QUEST_REPEATABLE_AFTER(quest) == 0 || QUEST_REPEATABLE_AFTER(quest) > only_repeat)) {
+			continue;
+		}
+		if (only_reward != NOTHING) {
+			any = FALSE;
+			LL_FOREACH(QUEST_REWARDS(quest), qreward) {
+				if (qreward->type == only_reward) {
+					any = TRUE;
+					break;
+				}
+			}
+			if (!any) {
+				continue;	// reward type not found
+			}
+		}
+		if (only_prereq != NOTHING) {
+			any = FALSE;
+			LL_FOREACH(QUEST_PREREQS(quest), req) {
+				if (req->type == only_prereq) {
+					any = TRUE;
+					break;
+				}
+			}
+			if (!any) {
+				continue;	// prereq type not found
+			}
+		}
+		if (only_task != NOTHING) {
+			any = FALSE;
+			LL_FOREACH(QUEST_TASKS(quest), req) {
+				if (req->type == only_task) {
+					any = TRUE;
+					break;
+				}
+			}
+			if (!any) {
+				continue;	// task type not found
+			}
+		}
+		
+		// search strings
+		if (*find_keywords) {
+			any = FALSE;
+			if (multi_isname(find_keywords, QUEST_NAME(quest))) {
+				any = TRUE;
+			}
+			else if (multi_isname(find_keywords, QUEST_DESCRIPTION(quest))) {
+				any = TRUE;
+			}
+			else if (multi_isname(find_keywords, QUEST_COMPLETE_MSG(quest))) {
+				any = TRUE;
+			}
+			
+			// task customs text
+			LL_FOREACH(QUEST_TASKS(quest), req) {
+				if (!any && req->custom && multi_isname(find_keywords, req->custom)) {
+					any = TRUE;
+				}
+			}
+			
+			// did we find a match in any string
+			if (!any) {
+				continue;
+			}
+		}
+		
+		// show it
+		snprintf(line, sizeof(line), "[%5d] %s\r\n", QUEST_VNUM(quest), QUEST_NAME(quest));
+		if (strlen(line) + size < sizeof(buf)) {
+			size += snprintf(buf + size, sizeof(buf) - size, "%s", line);
+			++count;
+		}
+		else {
+			size += snprintf(buf + size, sizeof(buf) - size, "OVERFLOW\r\n");
+			break;
+		}
+	}
+	
+	if (count > 0 && (size + 16) < sizeof(buf)) {
+		size += snprintf(buf + size, sizeof(buf) - size, "(%d quests)\r\n", count);
+	}
+	else if (count == 0) {
+		size += snprintf(buf + size, sizeof(buf) - size, " none\r\n");
+	}
+	
+	if (ch->desc) {
+		page_string(ch->desc, buf, TRUE);
+	}
 }
 
 
@@ -3738,6 +4106,7 @@ void olc_search_quest(char_data *ch, any_vnum vnum) {
 		}
 		// REQ_x: requirement search
 		any = find_requirement_in_list(PRG_TASKS(prg), REQ_COMPLETED_QUEST, vnum);
+		any |= find_requirement_in_list(PRG_TASKS(prg), REQ_COMPLETED_QUEST_EVER, vnum);
 		any |= find_requirement_in_list(PRG_TASKS(prg), REQ_NOT_COMPLETED_QUEST, vnum);
 		any |= find_requirement_in_list(PRG_TASKS(prg), REQ_NOT_ON_QUEST, vnum);
 		
@@ -3754,7 +4123,9 @@ void olc_search_quest(char_data *ch, any_vnum vnum) {
 		}
 		// QR_x, REQ_x: quest types
 		any = find_requirement_in_list(QUEST_TASKS(qiter), REQ_COMPLETED_QUEST, vnum);
+		any |= find_requirement_in_list(QUEST_TASKS(qiter), REQ_COMPLETED_QUEST_EVER, vnum);
 		any |= find_requirement_in_list(QUEST_PREREQS(qiter), REQ_COMPLETED_QUEST, vnum);
+		any |= find_requirement_in_list(QUEST_PREREQS(qiter), REQ_COMPLETED_QUEST_EVER, vnum);
 		any |= find_requirement_in_list(QUEST_TASKS(qiter), REQ_NOT_COMPLETED_QUEST, vnum);
 		any |= find_requirement_in_list(QUEST_PREREQS(qiter), REQ_NOT_COMPLETED_QUEST, vnum);
 		any |= find_requirement_in_list(QUEST_TASKS(qiter), REQ_NOT_ON_QUEST, vnum);
@@ -3790,6 +4161,7 @@ void olc_search_quest(char_data *ch, any_vnum vnum) {
 		}
 		// REQ_x: quest types
 		any = find_requirement_in_list(SOC_REQUIREMENTS(soc), REQ_COMPLETED_QUEST, vnum);
+		any |= find_requirement_in_list(SOC_REQUIREMENTS(soc), REQ_COMPLETED_QUEST_EVER, vnum);
 		any |= find_requirement_in_list(SOC_REQUIREMENTS(soc), REQ_NOT_COMPLETED_QUEST, vnum);
 		any |= find_requirement_in_list(SOC_REQUIREMENTS(soc), REQ_NOT_ON_QUEST, vnum);
 		
@@ -3955,6 +4327,19 @@ any_vnum parse_quest_reward_vnum(char_data *ch, int type, char *vnum_arg, char *
 				return PARSE_QRV_FAILED;
 			}
 			if (real_progress(vnum)) {
+				ok = TRUE;
+			}
+			break;
+		}
+		case QR_UNLOCK_ARCHETYPE: {
+			if (!*vnum_arg) {
+				strcpy(vnum_arg, prev_arg);	// does not generally need 2 args
+			}
+			if (!*vnum_arg || !isdigit(*vnum_arg) || (vnum = atoi(vnum_arg)) < 0) {
+				msg_to_char(ch, "Invalid archetype vnum '%s'.\r\n", vnum_arg);
+				return PARSE_QRV_FAILED;
+			}
+			if (archetype_proto(vnum)) {
 				ok = TRUE;
 			}
 			break;
@@ -4953,6 +5338,7 @@ void olc_delete_quest(char_data *ch, any_vnum vnum) {
 	// update progress
 	HASH_ITER(hh, progress_table, prg, next_prg) {
 		found = delete_requirement_from_list(&PRG_TASKS(prg), REQ_COMPLETED_QUEST, vnum);
+		found |= delete_requirement_from_list(&PRG_TASKS(prg), REQ_COMPLETED_QUEST_EVER, vnum);
 		found |= delete_requirement_from_list(&PRG_TASKS(prg), REQ_NOT_COMPLETED_QUEST, vnum);
 		found |= delete_requirement_from_list(&PRG_TASKS(prg), REQ_NOT_ON_QUEST, vnum);
 		
@@ -4968,7 +5354,9 @@ void olc_delete_quest(char_data *ch, any_vnum vnum) {
 	HASH_ITER(hh, quest_table, qiter, next_qiter) {
 		// REQ_x, QR_x: quest types
 		found = delete_requirement_from_list(&QUEST_TASKS(qiter), REQ_COMPLETED_QUEST, vnum);
+		found |= delete_requirement_from_list(&QUEST_TASKS(qiter), REQ_COMPLETED_QUEST_EVER, vnum);
 		found |= delete_requirement_from_list(&QUEST_PREREQS(qiter), REQ_COMPLETED_QUEST, vnum);
+		found |= delete_requirement_from_list(&QUEST_PREREQS(qiter), REQ_COMPLETED_QUEST_EVER, vnum);
 		found |= delete_requirement_from_list(&QUEST_TASKS(qiter), REQ_NOT_COMPLETED_QUEST, vnum);
 		found |= delete_requirement_from_list(&QUEST_PREREQS(qiter), REQ_NOT_COMPLETED_QUEST, vnum);
 		found |= delete_requirement_from_list(&QUEST_TASKS(qiter), REQ_NOT_ON_QUEST, vnum);
@@ -5000,6 +5388,7 @@ void olc_delete_quest(char_data *ch, any_vnum vnum) {
 	HASH_ITER(hh, social_table, soc, next_soc) {
 		// REQ_x: quest types
 		found = delete_requirement_from_list(&SOC_REQUIREMENTS(soc), REQ_COMPLETED_QUEST, vnum);
+		found |= delete_requirement_from_list(&SOC_REQUIREMENTS(soc), REQ_COMPLETED_QUEST_EVER, vnum);
 		found |= delete_requirement_from_list(&SOC_REQUIREMENTS(soc), REQ_NOT_COMPLETED_QUEST, vnum);
 		found |= delete_requirement_from_list(&SOC_REQUIREMENTS(soc), REQ_NOT_ON_QUEST, vnum);
 		
@@ -5024,6 +5413,7 @@ void olc_delete_quest(char_data *ch, any_vnum vnum) {
 		}
 		if (GET_OLC_PROGRESS(desc)) {
 			found = delete_requirement_from_list(&PRG_TASKS(GET_OLC_PROGRESS(desc)), REQ_COMPLETED_QUEST, vnum);
+			found |= delete_requirement_from_list(&PRG_TASKS(GET_OLC_PROGRESS(desc)), REQ_COMPLETED_QUEST_EVER, vnum);
 			found |= delete_requirement_from_list(&PRG_TASKS(GET_OLC_PROGRESS(desc)), REQ_NOT_COMPLETED_QUEST, vnum);
 			found |= delete_requirement_from_list(&PRG_TASKS(GET_OLC_PROGRESS(desc)), REQ_NOT_ON_QUEST, vnum);
 		
@@ -5035,7 +5425,9 @@ void olc_delete_quest(char_data *ch, any_vnum vnum) {
 		if (GET_OLC_QUEST(desc)) {
 			// REQ_x, QR_x: quest types
 			found = delete_requirement_from_list(&QUEST_TASKS(GET_OLC_QUEST(desc)), REQ_COMPLETED_QUEST, vnum);
+			found |= delete_requirement_from_list(&QUEST_TASKS(GET_OLC_QUEST(desc)), REQ_COMPLETED_QUEST_EVER, vnum);
 			found |= delete_requirement_from_list(&QUEST_PREREQS(GET_OLC_QUEST(desc)), REQ_COMPLETED_QUEST, vnum);
+			found |= delete_requirement_from_list(&QUEST_PREREQS(GET_OLC_QUEST(desc)), REQ_COMPLETED_QUEST_EVER, vnum);
 			found |= delete_requirement_from_list(&QUEST_TASKS(GET_OLC_QUEST(desc)), REQ_NOT_COMPLETED_QUEST, vnum);
 			found |= delete_requirement_from_list(&QUEST_PREREQS(GET_OLC_QUEST(desc)), REQ_NOT_COMPLETED_QUEST, vnum);
 			found |= delete_requirement_from_list(&QUEST_TASKS(GET_OLC_QUEST(desc)), REQ_NOT_ON_QUEST, vnum);
@@ -5061,6 +5453,7 @@ void olc_delete_quest(char_data *ch, any_vnum vnum) {
 		if (GET_OLC_SOCIAL(desc)) {
 			// REQ_x: quest types
 			found = delete_requirement_from_list(&SOC_REQUIREMENTS(GET_OLC_SOCIAL(desc)), REQ_COMPLETED_QUEST, vnum);
+			found |= delete_requirement_from_list(&SOC_REQUIREMENTS(GET_OLC_SOCIAL(desc)), REQ_COMPLETED_QUEST_EVER, vnum);
 			found |= delete_requirement_from_list(&SOC_REQUIREMENTS(GET_OLC_SOCIAL(desc)), REQ_NOT_COMPLETED_QUEST, vnum);
 			found |= delete_requirement_from_list(&SOC_REQUIREMENTS(GET_OLC_SOCIAL(desc)), REQ_NOT_ON_QUEST, vnum);
 			
@@ -5162,11 +5555,16 @@ void save_olc_quest(descriptor_data *desc) {
 	}
 	
 	// update daily cycles
-	if (old_cycle != NOTHING) {
-		setup_daily_quest_cycles(old_cycle);
-	}
-	if (QUEST_DAILY_CYCLE(proto) != NOTHING && QUEST_DAILY_CYCLE(proto) != old_cycle) {
-		setup_daily_quest_cycles(QUEST_DAILY_CYCLE(proto));
+	if (QUEST_DAILY_CYCLE(proto) != old_cycle) {
+		if (old_cycle != NOTHING) {
+			setup_daily_quest_cycles(old_cycle);
+		}
+		if (QUEST_DAILY_CYCLE(proto) != NOTHING) {
+			setup_daily_quest_cycles(QUEST_DAILY_CYCLE(proto));
+		}
+		if (QUEST_DAILY_CYCLE(proto) == NOTHING) {
+			QUEST_DAILY_ACTIVE(proto) = TRUE;
+		}
 	}
 }
 
@@ -5303,7 +5701,7 @@ void do_stat_quest(char_data *ch, quest_data *quest) {
 		strcpy(part, "immediate");
 	}
 	else {
-		sprintf(part, "%d minutes (%d:%02d:%02d)", QUEST_REPEATABLE_AFTER(quest), (QUEST_REPEATABLE_AFTER(quest) / (60 * 24)), ((QUEST_REPEATABLE_AFTER(quest) % (60 * 24)) / 60), ((QUEST_REPEATABLE_AFTER(quest) % (60 * 24)) % 60));
+		sprintf(part, "%d minutes (%s)", QUEST_REPEATABLE_AFTER(quest), colon_time(QUEST_REPEATABLE_AFTER(quest), TRUE, NULL));
 	}
 	size += snprintf(buf + size, sizeof(buf) - size, "Level limits: [\tc%s\t0], Repeatable: [\tc%s\t0]\r\n", level_range_string(QUEST_MIN_LEVEL(quest), QUEST_MAX_LEVEL(quest), 0), part);
 		
@@ -5374,7 +5772,7 @@ void olc_show_quest(char_data *ch) {
 		sprintf(buf + strlen(buf), "<%srepeat\t0> never\r\n", OLC_LABEL_VAL(QUEST_REPEATABLE_AFTER(quest), 0));
 	}
 	else if (QUEST_REPEATABLE_AFTER(quest) > 0) {
-		sprintf(buf + strlen(buf), "<%srepeat\t0> %d minutes (%d:%02d:%02d)\r\n", OLC_LABEL_VAL(QUEST_REPEATABLE_AFTER(quest), 0), QUEST_REPEATABLE_AFTER(quest), (QUEST_REPEATABLE_AFTER(quest) / (60 * 24)), ((QUEST_REPEATABLE_AFTER(quest) % (60 * 24)) / 60), ((QUEST_REPEATABLE_AFTER(quest) % (60 * 24)) % 60));
+		sprintf(buf + strlen(buf), "<%srepeat\t0> %d minutes (%s)\r\n", OLC_LABEL_VAL(QUEST_REPEATABLE_AFTER(quest), 0), QUEST_REPEATABLE_AFTER(quest), colon_time(QUEST_REPEATABLE_AFTER(quest), TRUE, NULL));
 	}
 	else if (QUEST_REPEATABLE_AFTER(quest) == 0) {
 		sprintf(buf + strlen(buf), "<%srepeat\t0> immediately\r\n", OLC_LABEL_VAL(QUEST_REPEATABLE_AFTER(quest), 0));
@@ -5543,7 +5941,7 @@ OLC_MODULE(qedit_repeat) {
 	}
 	else if (isdigit(*argument)) {
 		QUEST_REPEATABLE_AFTER(quest) = olc_process_number(ch, argument, "repeatable after", "repeat", 0, MAX_INT, QUEST_REPEATABLE_AFTER(quest));
-		msg_to_char(ch, "It now repeats after %d minutes (%d:%02d:%02d).\r\n", QUEST_REPEATABLE_AFTER(quest), (QUEST_REPEATABLE_AFTER(quest) / (60 * 24)), ((QUEST_REPEATABLE_AFTER(quest) % (60 * 24)) / 60), ((QUEST_REPEATABLE_AFTER(quest) % (60 * 24)) % 60));
+		msg_to_char(ch, "It now repeats after %d minutes (%s).\r\n", QUEST_REPEATABLE_AFTER(quest), colon_time(QUEST_REPEATABLE_AFTER(quest), TRUE, NULL));
 	}
 	else {
 		msg_to_char(ch, "Invalid repeat interval.\r\n");

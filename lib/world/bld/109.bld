@@ -74,7 +74,7 @@ A Dragonstone Library~
 48 15 R 0
 0 0 0 -1
 C
-library, bookedit~
+browse, checkout, shelve, library, bookedit~
 D
    This magnificent library is built from red-stained stones and fabulously
 decorated with images of dragons and knights. Sturdy masonry shelves hold
@@ -88,6 +88,7 @@ I 29 5007 100.00 1 r  # RUINS-TO-BLD: Ruins
 R
 1002 1 5 0
 T 10926
+T 5149
 S
 #10927
 Butcher Tent~

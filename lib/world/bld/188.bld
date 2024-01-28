@@ -140,6 +140,9 @@ D
 have been striped with red until they nearly look plaid, and every instrument
 and work surface has taken on a deep reddish hue.
 ~
+I 29 5007 100.00 1  # RUINS-TO-BLD: Ruins
+I 31 3201 6.00 420 p  # PRODUCTION: slab of pork
+I 31 3203 6.00 420 p  # PRODUCTION: side of raw mutton
 M
 18876 100.00 0
 U
@@ -216,7 +219,7 @@ The Library~
 1 0 a 0
 0 0 0 -1
 C
-library, bookedit~
+browse, checkout, shelve, library, bookedit~
 D
    The east wing of the mansion is a rather impressive library, filled to the
 ceiling with books. However, each time you pick up a book, you find it written
@@ -241,6 +244,7 @@ F
 l
 M
 18895 100.00 0
+T 5149
 S
 #18896
 Gallery~

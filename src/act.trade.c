@@ -2,15 +2,13 @@
 *   File: act.trade.c                                     EmpireMUD 2.0b5 *
 *  Usage: code related to crafting and the trade skill                    *
 *                                                                         *
-*  EmpireMUD code base by Paul Clarke, (C) 2000-2015                      *
+*  EmpireMUD code base by Paul Clarke, (C) 2000-2024                      *
 *  All rights reserved.  See license.doc for complete information.        *
 *                                                                         *
 *  EmpireMUD based upon CircleMUD 3.0, bpl 17, by Jeremy Elson.           *
 *  CircleMUD (C) 1993, 94 by the Trustees of the Johns Hopkins University *
 *  CircleMUD is based on DikuMUD, Copyright (C) 1990, 1991.               *
 ************************************************************************ */
-
-#include <math.h>
 
 #include "conf.h"
 #include "sysdep.h"
@@ -30,14 +28,14 @@
 * Contents:
 *   Helpers
 *   Generic Craft (craft, forge, sew, cook)
-*   Reforge / Refashion
+*   Rework Helpers
 *   Commands
 */
 
 // locals
 ACMD(do_gen_craft);
 bool can_forge(char_data *ch);
-bool can_refashion(char_data *ch);
+bool can_rework(char_data *ch);
 craft_data *find_craft_for_obj_vnum(obj_vnum vnum);
 obj_data *find_water_container(char_data *ch, obj_data *list);
 
@@ -59,6 +57,7 @@ bool check_can_craft(char_data *ch, craft_data *type, bool continuing) {
 	vehicle_data *craft_veh;
 	bool wait, room_wait, makes_building;
 	bitvector_t fncs_minus_upgraded = (GET_CRAFT_REQUIRES_FUNCTION(type) & ~FNC_UPGRADED);
+	obj_data *tool = NULL;
 	
 	char *command = gen_craft_data[GET_CRAFT_TYPE(type)].command;
 	
@@ -70,7 +69,7 @@ bool check_can_craft(char_data *ch, craft_data *type, bool continuing) {
 	if (GET_CRAFT_MIN_LEVEL(type) > get_crafting_level(ch) && !continuing) {
 		msg_to_char(ch, "You need to have a crafting level of %d to %s that.\r\n", GET_CRAFT_MIN_LEVEL(type), command);
 	}
-	else if (!can_see_in_dark_room(ch, IN_ROOM(ch), TRUE)) {
+	else if (!CRAFT_FLAGGED(type, CRAFT_DARK_OK) && !can_see_in_dark_room(ch, IN_ROOM(ch), TRUE)) {
 		msg_to_char(ch, "It's too dark to %s anything.\r\n", command);
 	}
 	
@@ -121,7 +120,7 @@ bool check_can_craft(char_data *ch, craft_data *type, bool continuing) {
 	else if ((GET_CRAFT_TYPE(type) == CRAFT_TYPE_MILL || GET_CRAFT_TYPE(type) == CRAFT_TYPE_PRESS || GET_CRAFT_TYPE(type) == CRAFT_TYPE_FORGE || GET_CRAFT_TYPE(type) == CRAFT_TYPE_SMELT) && !check_in_city_requirement(IN_ROOM(ch), TRUE)) {
 		msg_to_char(ch, "You can't do that here because this building isn't in a city.\r\n");
 	}
-	else if (IS_SET(GET_CRAFT_FLAGS(type), CRAFT_POTTERY) && !has_cooking_fire(ch)) {
+	else if (IS_SET(GET_CRAFT_FLAGS(type), CRAFT_POTTERY) && !room_has_function_and_city_ok(GET_LOYALTY(ch), IN_ROOM(ch), FNC_POTTER) && !has_cooking_fire(ch)) {
 		msg_to_char(ch, "You need a fire to bake the clay.\r\n");
 	}
 	else if (IS_SET(GET_CRAFT_FLAGS(type), CRAFT_FIRE) && !has_cooking_fire(ch)) {
@@ -130,7 +129,19 @@ bool check_can_craft(char_data *ch, craft_data *type, bool continuing) {
 	else if (IS_SET(GET_CRAFT_FLAGS(type), CRAFT_SOUP) && !find_water_container(ch, ch->carrying) && !find_water_container(ch, ROOM_CONTENTS(IN_ROOM(ch)))) {
 		msg_to_char(ch, "You need a container of water to %s that.\r\n", command);
 	}
-	else if (fncs_minus_upgraded && !room_has_function_and_city_ok(GET_LOYALTY(ch), IN_ROOM(ch), fncs_minus_upgraded)) {
+	// end flag checks
+	
+	// tool and function checks
+	else if (GET_CRAFT_REQUIRES_TOOL(type) && !(tool = has_all_tools(ch, GET_CRAFT_REQUIRES_TOOL(type))) && !CRAFT_FLAGGED(type, CRAFT_TOOL_OR_FUNCTION)) {
+		prettier_sprintbit(GET_CRAFT_REQUIRES_TOOL(type), tool_flags, buf1);
+		if (count_bits(GET_CRAFT_REQUIRES_TOOL(type)) > 1) {
+			msg_to_char(ch, "You need the to equip following tools to %s that: %s\r\n", command, buf1);
+		}
+		else {
+			msg_to_char(ch, "You need to equip %s %s to %s that.\r\n", AN(buf1), buf1, command);
+		}
+	}
+	else if (fncs_minus_upgraded && (!CRAFT_FLAGGED(type, CRAFT_TOOL_OR_FUNCTION) || !tool) && !room_has_function_and_city_ok(GET_LOYALTY(ch), IN_ROOM(ch), fncs_minus_upgraded)) {
 		// this checks/shows without FNC_UPGRADED, which is handled separately after.
 		prettier_sprintbit(fncs_minus_upgraded, function_flags_long, buf1);
 		str = buf1;
@@ -141,20 +152,8 @@ bool check_can_craft(char_data *ch, craft_data *type, bool continuing) {
 			msg_to_char(ch, "You must be %s to %s that.\r\n", buf1, command);
 		}
 	}
-	else if (IS_SET(GET_CRAFT_REQUIRES_FUNCTION(type), FNC_UPGRADED) && !ROOM_IS_UPGRADED(IN_ROOM(ch))) {
+	else if (IS_SET(GET_CRAFT_REQUIRES_FUNCTION(type), FNC_UPGRADED) && (!CRAFT_FLAGGED(type, CRAFT_TOOL_OR_FUNCTION) || !tool) && !ROOM_IS_UPGRADED(IN_ROOM(ch))) {
 		msg_to_char(ch, "You need to be in an upgraded building to %s that!\r\n", command);
-	}
-	// end flag checks
-	
-	// tool checks
-	else if (GET_CRAFT_REQUIRES_TOOL(type) && !has_all_tools(ch, GET_CRAFT_REQUIRES_TOOL(type))) {
-		prettier_sprintbit(GET_CRAFT_REQUIRES_TOOL(type), tool_flags, buf1);
-		if (count_bits(GET_CRAFT_REQUIRES_TOOL(type)) > 1) {
-			msg_to_char(ch, "You need the to equip following tools to %s that: %s\r\n", command, buf1);
-		}
-		else {
-			msg_to_char(ch, "You need to equip %s %s to %s that.\r\n", AN(buf1), buf1, command);
-		}
 	}
 	
 	// types that require the building be complete
@@ -259,27 +258,35 @@ bool find_and_bind(char_data *ch, obj_vnum vnum) {
 
 /**
 * Looks for a craft the player knows, and falls back to ones they don't. It
-* always prefers an exact match over anything. Immortals can also hit in-dev
-* recipes.
+* always prefers an exact match over anything, and prefers crafts you have the
+* resources for. Immortals can also hit in-dev recipes.
 *
 * @param char_data *ch The person looking for a craft.
 * @param char *argument The typed-in name.
 * @param int craft_type Any CRAFT_TYPE_ to look up.
+* @param bool hide_dismantle_only If TRUE, skips crafts set dismantle-only.
+* @param int *found_wrong_cmd Optional: If a craft otherwise matched but was for a different command, will set this var to the correct craft command e.g. CRAFT_TYPE_BREW (but the function will still return NULL). A NOTHING on this variable, or a successful return on the function, indicates there was no mismatched type.
 * @return craft_data* The matching craft, if any.
 */
-craft_data *find_best_craft_by_name(char_data *ch, char *argument, int craft_type) {
+craft_data *find_best_craft_by_name(char_data *ch, char *argument, int craft_type, bool hide_dismantle_only, int *found_wrong_cmd) {
 	craft_data *unknown_abbrev = NULL;
-	craft_data *known_abbrev = NULL;
-	craft_data *known_multi = NULL, *unknown_multi = NULL;
+	craft_data *known_abbrev = NULL, *known_abbrev_no_res = NULL;
+	craft_data *unknown_multi = NULL;
+	craft_data *known_multi = NULL, *known_multi_no_res = NULL;
 	craft_data *craft, *next_craft;
+	bool use_room = can_use_room(ch, IN_ROOM(ch), GUESTS_ALLOWED);
+	
+	if (found_wrong_cmd) {
+		*found_wrong_cmd = NOTHING;
+	}
 	
 	skip_spaces(&argument);
 	
 	HASH_ITER(sorted_hh, sorted_crafts, craft, next_craft) {
-		if (GET_CRAFT_TYPE(craft) != craft_type) {
+		if (IS_SET(GET_CRAFT_FLAGS(craft), CRAFT_IN_DEVELOPMENT) && !IS_IMMORTAL(ch)) {
 			continue;
 		}
-		if (IS_SET(GET_CRAFT_FLAGS(craft), CRAFT_IN_DEVELOPMENT) && !IS_IMMORTAL(ch)) {
+		if (hide_dismantle_only && CRAFT_FLAGGED(craft, CRAFT_DISMANTLE_ONLY)) {
 			continue;
 		}
 		if (GET_CRAFT_REQUIRES_OBJ(craft) != NOTHING && !has_required_obj_for_craft(ch, GET_CRAFT_REQUIRES_OBJ(craft))) {
@@ -287,11 +294,26 @@ craft_data *find_best_craft_by_name(char_data *ch, char *argument, int craft_typ
 		}
 		
 		if (!str_cmp(argument, GET_CRAFT_NAME(craft))) {
+			if (GET_CRAFT_TYPE(craft) != craft_type) {
+				// check this late because we want to record a mismatch
+				if (found_wrong_cmd) {
+					*found_wrong_cmd = GET_CRAFT_TYPE(craft);
+				}
+				continue;
+			}
+			
 			// exact match!
 			return craft;
 		}
 		else if (!known_abbrev && is_abbrev(argument, GET_CRAFT_NAME(craft))) {
-			if (IS_SET(GET_CRAFT_FLAGS(craft), CRAFT_IN_DEVELOPMENT)) {
+			if (GET_CRAFT_TYPE(craft) != craft_type) {
+				// check this late because we want to record a mismatch
+				if (found_wrong_cmd) {
+					*found_wrong_cmd = GET_CRAFT_TYPE(craft);
+				}
+				continue;
+			}
+			else if (IS_SET(GET_CRAFT_FLAGS(craft), CRAFT_IN_DEVELOPMENT)) {
 				// only imms hit this block
 				if (!unknown_abbrev) {
 					unknown_abbrev = craft;
@@ -308,11 +330,23 @@ craft_data *find_best_craft_by_name(char_data *ch, char *argument, int craft_typ
 				}
 			}
 			else {	// they should have access to it
-				known_abbrev = craft;
+				if (has_resources(ch, GET_CRAFT_RESOURCES(craft), use_room, FALSE, NULL)) {
+					known_abbrev = craft;
+				}
+				else if (!known_abbrev_no_res) {
+					known_abbrev_no_res = craft;
+				}
 			}
 		}
 		else if (!known_multi && multi_isname(argument, GET_CRAFT_NAME(craft))) {
-			if (IS_SET(GET_CRAFT_FLAGS(craft), CRAFT_IN_DEVELOPMENT)) {
+			if (GET_CRAFT_TYPE(craft) != craft_type) {
+				// check this late because we want to record a mismatch
+				if (found_wrong_cmd) {
+					*found_wrong_cmd = GET_CRAFT_TYPE(craft);
+				}
+				continue;
+			}
+			else if (IS_SET(GET_CRAFT_FLAGS(craft), CRAFT_IN_DEVELOPMENT)) {
 				// only imms hit this block
 				if (!unknown_multi) {
 					unknown_multi = craft;
@@ -329,13 +363,60 @@ craft_data *find_best_craft_by_name(char_data *ch, char *argument, int craft_typ
 				}
 			}
 			else {	// they should have access to it
-				known_multi = craft;
+				if (has_resources(ch, GET_CRAFT_RESOURCES(craft), use_room, FALSE, NULL)) {
+					known_multi = craft;
+				}
+				else if (!known_multi_no_res) {
+					known_multi_no_res = craft;
+				}
 			}
 		}
 	}
 	
-	// if we got this far, it didn't return an exact match
-	return known_abbrev ? known_abbrev : (known_multi ? known_multi : (unknown_abbrev ? unknown_abbrev : unknown_multi));
+	// if we got this far, it didn't return an exact match with resources
+	if (known_abbrev) {
+		return known_abbrev;
+	}
+	else if (known_abbrev_no_res) {
+		return known_abbrev_no_res;
+	}
+	else if (known_multi) {
+		return known_multi;
+	}
+	else if (known_multi_no_res) {
+		return known_multi_no_res;
+	}
+	else if (unknown_abbrev) {
+		return unknown_abbrev;
+	}
+	else if (unknown_multi) {
+		return unknown_multi;
+	}
+	else {
+		// nooo
+		return NULL;
+	}
+}
+
+
+/**
+* Determines how many scaling points an augment (enchant) gets.
+*
+* @param char_data *ch The enchanter.
+* @param int max_scale Optional: The highest scale level it will use (0 = no max).
+* @return double The number of scale points available for an enchantment at that level.
+*/
+double get_augment_scale_for_char(char_data *ch, int max_scale) {
+	double points_available;
+	int level;
+
+	// enchant scale level is whichever is less: obj scale level, or player crafting level
+	level = MAX(get_crafting_level(ch), get_approximate_level(ch));
+	if (max_scale > 0) {
+		level = MIN(max_scale, level);
+	}
+	points_available = level / 100.0 * config_get_double("enchant_points_at_100");
+	return MAX(points_available, 1.0);
 }
 
 
@@ -428,7 +509,7 @@ obj_data *find_water_container(char_data *ch, obj_data *list) {
 	obj_data *obj, *found = NULL;
 	
 	DL_FOREACH2(list, obj, next_content) {
-		if (IS_DRINK_CONTAINER(obj) && CAN_SEE_OBJ(ch, obj) && GET_DRINK_CONTAINER_TYPE(obj) == LIQ_WATER && GET_DRINK_CONTAINER_CONTENTS(obj) >= (GET_DRINK_CONTAINER_CAPACITY(obj)/2)) {
+		if (IS_DRINK_CONTAINER(obj) && CAN_SEE_OBJ(ch, obj) && liquid_flagged(GET_DRINK_CONTAINER_TYPE(obj), LIQF_WATER) && GET_DRINK_CONTAINER_CONTENTS(obj) >= (GET_DRINK_CONTAINER_CAPACITY(obj)/2)) {
 			found = obj;
 			break;
 		}
@@ -464,7 +545,8 @@ int get_crafting_level(char_data *ch) {
 int get_craft_scale_level(char_data *ch, craft_data *craft) {
 	int level = 1, psr, craft_lev;
 	ability_data *abil;
-	obj_data *req;
+	obj_data *req, *obj;
+	vehicle_data *veh;
 	
 	if (IS_NPC(ch)) {
 		return 0;
@@ -484,10 +566,10 @@ int get_craft_scale_level(char_data *ch, craft_data *craft) {
 		}
 		else {
 			if (!(abil = find_ability_by_vnum(GET_CRAFT_ABILITY(craft)))) {
-				level = EMPIRE_CHORE_SKILL_CAP;	// considered the "default" level for unskilled things
+				level = craft_lev;	// no ability = use full level
 			}
 			else if (!ABIL_ASSIGNED_SKILL(abil)) {
-				// probably a class skill
+				// probably a synergy
 				level = craft_lev;
 			}
 			else if ((psr = ABIL_SKILL_LEVEL(abil)) != NOTHING) {
@@ -499,10 +581,10 @@ int get_craft_scale_level(char_data *ch, craft_data *craft) {
 				else if (psr < SPECIALTY_SKILL_CAP) {
 					level = MIN(SPECIALTY_SKILL_CAP, craft_lev);
 				}
-				else if (psr < CLASS_SKILL_CAP) {
-					level = MIN(CLASS_SKILL_CAP, craft_lev);
+				else if (psr < MAX_SKILL_CAP) {
+					level = MIN(MAX_SKILL_CAP, craft_lev);
 				}
-				else {	// is a skill ability but >= class skill level (100) -- don't restrict
+				else {	// is a skill ability but >= max skill level (100) -- don't restrict
 					level = craft_lev;
 				}
 			}
@@ -513,6 +595,28 @@ int get_craft_scale_level(char_data *ch, craft_data *craft) {
 			
 			// always bound by the crafting level
 			level = MIN(level, craft_lev);
+		}
+		
+		// and level bounds
+		if (CRAFT_IS_VEHICLE(craft)) {
+			if ((veh = vehicle_proto(GET_CRAFT_OBJECT(craft)))) {
+				if (VEH_MIN_SCALE_LEVEL(veh) > 0) {
+					level = MAX(level, VEH_MIN_SCALE_LEVEL(veh));
+				}
+				if (VEH_MAX_SCALE_LEVEL(veh) > 0) {
+					level = MIN(level, VEH_MAX_SCALE_LEVEL(veh));
+				}
+			}
+		}
+		else if (!IS_SET(GET_CRAFT_FLAGS(craft), CRAFT_SOUP)) {
+			if ((obj = obj_proto(GET_CRAFT_OBJECT(craft)))) {
+				if (GET_OBJ_MIN_SCALE_LEVEL(obj) > 0) {
+					level = MAX(level, GET_OBJ_MIN_SCALE_LEVEL(obj));
+				}
+				if (GET_OBJ_MAX_SCALE_LEVEL(obj) > 0) {
+					level = MIN(level, GET_OBJ_MAX_SCALE_LEVEL(obj));
+				}
+			}
 		}
 	}
 	else {
@@ -694,9 +798,9 @@ void resume_craft_vehicle(char_data *ch, vehicle_data *veh, craft_data *craft) {
 	GET_ACTION_VNUM(ch, 1) = VEH_CONSTRUCTION_ID(veh);
 	
 	snprintf(buf, sizeof(buf), "You resume %s $V.", gen_craft_data[GET_CRAFT_TYPE(craft)].verb);
-	act(buf, FALSE, ch, NULL, veh, TO_CHAR);
+	act(buf, FALSE, ch, NULL, veh, TO_CHAR | ACT_VEH_VICT);
 	snprintf(buf, sizeof(buf), "$n resumes %s $V.", gen_craft_data[GET_CRAFT_TYPE(craft)].verb);
-	act(buf, FALSE, ch, NULL, veh, TO_ROOM);
+	act(buf, FALSE, ch, NULL, veh, TO_ROOM | ACT_VEH_VICT);
 }
 
 
@@ -715,7 +819,7 @@ void show_craft_info(char_data *ch, char *argument, int craft_type) {
 	vehicle_data *veh;
 	obj_data *proto;
 	bld_data *bld;
-	int craft_level;
+	int craft_level, found_wrong_cmd = NOTHING;
 	
 	// these flags show on craft info
 	bitvector_t show_flags = OBJ_UNIQUE | OBJ_LARGE | OBJ_TWO_HANDED | OBJ_BIND_ON_EQUIP | OBJ_BIND_ON_PICKUP;
@@ -724,8 +828,13 @@ void show_craft_info(char_data *ch, char *argument, int craft_type) {
 		msg_to_char(ch, "Get %s info on what?\r\n", gen_craft_data[craft_type].command);
 		return;
 	}
-	if (!(craft = find_best_craft_by_name(ch, argument, craft_type))) {
-		msg_to_char(ch, "You don't know any such %s recipe.\r\n", gen_craft_data[craft_type].command);
+	if (!(craft = find_best_craft_by_name(ch, argument, craft_type, TRUE, &found_wrong_cmd))) {
+		if (found_wrong_cmd != NOTHING) {
+			msg_to_char(ch, "Unknown %s. Try '%s' instead.\r\n", gen_craft_data[craft_type].command, gen_craft_data[found_wrong_cmd].command);
+		}
+		else {
+			msg_to_char(ch, "You don't know any such %s recipe.\r\n", gen_craft_data[craft_type].command);
+		}
 		return;
 	}
 	
@@ -751,7 +860,12 @@ void show_craft_info(char_data *ch, char *argument, int craft_type) {
 		// build info string
 		sprintf(buf, " (%s", item_types[(int) GET_OBJ_TYPE(proto)]);
 		if (GET_OBJ_MIN_SCALE_LEVEL(proto) > 0 || GET_OBJ_MAX_SCALE_LEVEL(proto) > 0) {
-			sprintf(buf + strlen(buf), ", level %d (%s)", craft_level, level_range_string(GET_OBJ_MIN_SCALE_LEVEL(proto), GET_OBJ_MAX_SCALE_LEVEL(proto), 0));
+			if (GET_OBJ_MIN_SCALE_LEVEL(proto) != GET_OBJ_MAX_SCALE_LEVEL(proto)) {
+				sprintf(buf + strlen(buf), ", level %d (%s)", craft_level, level_range_string(GET_OBJ_MIN_SCALE_LEVEL(proto), GET_OBJ_MAX_SCALE_LEVEL(proto), 0));
+			}
+			else {	// same min/max
+				sprintf(buf + strlen(buf), ", level %d", craft_level);
+			}
 		}
 		else if (OBJ_FLAGGED(proto, OBJ_SCALABLE) && craft_level > 0) {
 			sprintf(buf + strlen(buf), ", level %d", craft_level);
@@ -763,7 +877,7 @@ void show_craft_info(char_data *ch, char *argument, int craft_type) {
 		LL_FOREACH(GET_OBJ_APPLIES(proto), apply) {
 			// don't show applies that can't come from crafting
 			if (apply->apply_type != APPLY_TYPE_HARD_DROP && apply->apply_type != APPLY_TYPE_GROUP_DROP && apply->apply_type != APPLY_TYPE_BOSS_DROP) {
-				sprintf(buf + strlen(buf), ", %s%s%s", (apply->modifier<0 ? "-" : "+"), apply_types[(int) apply->location], (apply->apply_type == APPLY_TYPE_SUPERIOR ? " if superior" : ""));
+				sprintf(buf + strlen(buf), ", %s%s%s", (apply->modifier < 0 ? (PRF_FLAGGED(ch, PRF_SCREEN_READER) ? "penalty to " : "-") : "+"), apply_types[(int) apply->location], (apply->apply_type == APPLY_TYPE_SUPERIOR ? " if superior" : ""));
 			}
 		}
 		if (GET_OBJ_AFF_FLAGS(proto)) {
@@ -774,7 +888,7 @@ void show_craft_info(char_data *ch, char *argument, int craft_type) {
 		// ITEM_x: type-based 'craft info'; must start with ", "
 		switch (GET_OBJ_TYPE(proto)) {
 			case ITEM_WEAPON: {
-				sprintf(buf + strlen(buf), ", %s attack, speed %.2f", attack_hit_info[GET_WEAPON_TYPE(proto)].name, get_weapon_speed(proto));
+				sprintf(buf + strlen(buf), ", %s attack, speed %.2f", get_attack_name_by_vnum(GET_WEAPON_TYPE(proto)), get_weapon_speed(proto));
 				break;
 			}
 			case ITEM_ARMOR: {
@@ -782,7 +896,7 @@ void show_craft_info(char_data *ch, char *argument, int craft_type) {
 				break;
 			}
 			case ITEM_MISSILE_WEAPON: {
-				sprintf(buf + strlen(buf), ", %s attack, speed %.2f", attack_hit_info[GET_MISSILE_WEAPON_TYPE(proto)].name, get_weapon_speed(proto));
+				sprintf(buf + strlen(buf), ", %s attack, speed %.2f", get_attack_name_by_vnum(GET_MISSILE_WEAPON_TYPE(proto)), get_weapon_speed(proto));
 				break;
 			}
 			case ITEM_AMMO: {
@@ -844,12 +958,15 @@ void show_craft_info(char_data *ch, char *argument, int craft_type) {
 	}
 	
 	if (GET_CRAFT_ABILITY(craft) != NO_ABIL) {
-		sprintf(buf, "%s", get_ability_name_by_vnum(GET_CRAFT_ABILITY(craft)));
+		sprintf(buf, "%s%s", (has_ability(ch, GET_CRAFT_ABILITY(craft)) ? "" : "\tr"), get_ability_name_by_vnum(GET_CRAFT_ABILITY(craft)));
 		if ((abil = find_ability_by_vnum(GET_CRAFT_ABILITY(craft))) && ABIL_ASSIGNED_SKILL(abil) != NULL) {
 			sprintf(buf + strlen(buf), " (%s %d)", SKILL_NAME(ABIL_ASSIGNED_SKILL(abil)), ABIL_SKILL_LEVEL(abil));
 		}
+		if (!has_ability(ch, GET_CRAFT_ABILITY(craft))) {
+			sprintf(buf + strlen(buf), " (not learned)\t0");
+		}
 		if (abil && ABIL_MASTERY_ABIL(abil) != NOTHING) {
-			sprintf(buf + strlen(buf), ", Mastery: %s", get_ability_name_by_vnum(ABIL_MASTERY_ABIL(abil)));
+			sprintf(buf + strlen(buf), ", Mastery: %s%s%s", (has_ability(ch, ABIL_MASTERY_ABIL(abil)) ? "" : "\tr"), get_ability_name_by_vnum(ABIL_MASTERY_ABIL(abil)), has_ability(ch, ABIL_MASTERY_ABIL(abil)) ? "" : " (not learned)\t0");
 		}
 		msg_to_char(ch, "Requires: %s\r\n", buf);
 	}
@@ -892,6 +1009,7 @@ void show_craft_info(char_data *ch, char *argument, int craft_type) {
 
 
 // for do_tame
+// INTERACTION_FUNC provides: ch, interaction, inter_room, inter_mob, inter_item, inter_veh
 INTERACTION_FUNC(tame_interact) {
 	char buf[MAX_STRING_LENGTH];
 	char_data *newmob;
@@ -956,7 +1074,7 @@ const struct gen_craft_data_t gen_craft_data[] = {
 	{ "brew", "brewing", NOBITS, { "You stir the potion and infuse it with mana...", "$n stirs the potion...", "$n stirs a potion." } },
 	{ "mix", "mixing", NOBITS, { "The poison bubbles as you stir it...", "$n stirs the bubbling poison...", "$n stirs a bubbling poison." } },
 									// note: build does not use the message strings
-	{ "build", "building", ACTF_HASTE | ACTF_FAST_CHORES, { "You work on building the %s...", "$n works on the building the %s...", "$n is building the %s." } },
+	{ "build", "building", ACTF_HASTE | ACTF_FAST_CHORES, { "You work on building the %s...", "$n works on the building the %s...", "$n is building %s." } },
 	{ "weave", "weaving", NOBITS, { "You carefully weave the %s...", "$n carefully weaves the %s...", "$n is weaving %s." } },
 	
 	{ "workforce", "making", NOBITS, { "You work on the %s...", "$n works on the %s...", "$n is working dilligently." } },	// not used by players
@@ -966,7 +1084,8 @@ const struct gen_craft_data_t gen_craft_data[] = {
 	{ "press", "pressing", NOBITS, { "You press the %s...", "$n presses the %s...", "$n is working the press." } },
 	
 	{ "bake", "baking", ACTF_FAST_CHORES, { "You wait for the %s to bake...", "$n waits for the %s to bake...", "$n is baking %s." } },
-	{ "make", "making", NOBITS, { "You work on the %s...", "$n works on the %s...", "$n is making a %s." } },
+	{ "make", "making", NOBITS, { "You work on the %s...", "$n works on the %s...", "$n is making %s." } },
+	{ "process", "processing", NOBITS, { "You process the %s...", "$n processes the %s...", "$n is processing %s." } },
 };
 
 
@@ -992,7 +1111,9 @@ void cancel_gen_craft(char_data *ch) {
 			else {
 				obj_to_room(obj, IN_ROOM(ch));
 			}
-			load_otrigger(obj);
+			if (load_otrigger(obj) && obj->carried_by) {
+				get_otrigger(obj, obj->carried_by, FALSE);
+			}
 		}
 		
 		if (CRAFT_FLAGGED(type, CRAFT_TAKE_REQUIRED_OBJ) && GET_CRAFT_REQUIRES_OBJ(type) != NOTHING && obj_proto(GET_CRAFT_REQUIRES_OBJ(type))) {
@@ -1013,11 +1134,13 @@ void cancel_gen_craft(char_data *ch) {
 					bind_obj_to_player(obj, ch);
 				}
 			}
-			load_otrigger(obj);
+			if (load_otrigger(obj) && obj->carried_by) {
+				get_otrigger(obj, obj->carried_by, FALSE);
+			}
 		}
 	}
 	
-	GET_ACTION(ch) = ACT_NONE;
+	end_action(ch);
 }
 
 
@@ -1042,6 +1165,7 @@ craft_data *find_craft_for_obj_vnum(obj_vnum vnum) {
 
 
 void finish_gen_craft(char_data *ch) {
+	any_vnum obj_vnum = GET_ACTION_VNUM(ch, 1);
 	craft_data *type = craft_proto(GET_ACTION_VNUM(ch, 0));
 	bool applied_master = FALSE, is_master = FALSE;
 	int num = GET_ACTION_VNUM(ch, 2);
@@ -1049,12 +1173,10 @@ void finish_gen_craft(char_data *ch) {
 	struct resource_data *res;
 	ability_data *cft_abil;
 	obj_data *proto, *temp_obj, *obj = NULL;
-	int iter, amt = 1;
+	int iter, amt = 1, obj_ok = 0;
 	
 	cft_abil = find_ability_by_vnum(GET_CRAFT_ABILITY(type));
 	is_master = (cft_abil && ABIL_MASTERY_ABIL(cft_abil) != NOTHING && has_ability(ch, ABIL_MASTERY_ABIL(cft_abil)));
-	
-	GET_ACTION(ch) = ACT_NONE;
 
 	// basic sanity checking (vehicles are finished elsewhere)
 	if (!type || CRAFT_IS_VEHICLE(type) || CRAFT_IS_BUILDING(type)) {
@@ -1064,7 +1186,7 @@ void finish_gen_craft(char_data *ch) {
 	// soup handling
 	if (IS_SET(GET_CRAFT_FLAGS(type), CRAFT_SOUP)) {
 		// load the drink container back
-		obj = read_object(GET_ACTION_VNUM(ch, 1), TRUE);
+		obj = read_object(obj_vnum, TRUE);
 	
 		set_obj_val(obj, VAL_DRINK_CONTAINER_CONTENTS, MIN(GET_CRAFT_QUANTITY(type), GET_DRINK_CONTAINER_CAPACITY(obj)));
 		set_obj_val(obj, VAL_DRINK_CONTAINER_TYPE, GET_CRAFT_OBJECT(type));
@@ -1079,7 +1201,10 @@ void finish_gen_craft(char_data *ch) {
 		}
 		scale_item_to_level(obj, get_craft_scale_level(ch, type));
 		
-		load_otrigger(obj);
+		obj_ok = load_otrigger(obj);
+		if (obj_ok && obj->carried_by) {
+			get_otrigger(obj, obj->carried_by, FALSE);
+		}
 	}
 	else if (GET_CRAFT_QUANTITY(type) > 0) {
 		// NON-SOUP (careful, soup uses quantity for maximum contents
@@ -1088,6 +1213,7 @@ void finish_gen_craft(char_data *ch) {
 	
 		if (GET_CRAFT_TYPE(type) == CRAFT_TYPE_MILL && has_player_tech(ch, PTECH_MILL_UPGRADE)) {
 			gain_player_tech_exp(ch, PTECH_MILL_UPGRADE, 10);
+			run_ability_hooks_by_player_tech(ch, PTECH_MILL_UPGRADE, NULL, NULL, NULL, NULL);
 			amt *= 2;
 		}
 
@@ -1109,7 +1235,10 @@ void finish_gen_craft(char_data *ch) {
 					obj_to_room(obj, IN_ROOM(ch));
 				}
 				
-				load_otrigger(obj);
+				obj_ok = load_otrigger(obj);
+				if (obj_ok && obj->carried_by) {
+					get_otrigger(obj, obj->carried_by, FALSE);
+				}
 			}
 			
 			// mark for the empire
@@ -1120,7 +1249,12 @@ void finish_gen_craft(char_data *ch) {
 	}
 
 	// send message -- soup uses quantity for amount of soup instead of multiple items
-	if (amt > 1 && !IS_SET(GET_CRAFT_FLAGS(type), CRAFT_SOUP)) {
+	if (!obj_ok) {
+		// object self-purged?
+		sprintf(buf, "You finish %s!", gen_craft_data[GET_CRAFT_TYPE(type)].verb);
+		act(buf, FALSE, ch, NULL, NULL, TO_CHAR);
+	}
+	else if (amt > 1 && !IS_SET(GET_CRAFT_FLAGS(type), CRAFT_SOUP)) {
 		sprintf(buf, "You finish %s $p (x%d)!", gen_craft_data[GET_CRAFT_TYPE(type)].verb, amt);
 		act(buf, FALSE, ch, obj, 0, TO_CHAR);
 	}
@@ -1128,17 +1262,26 @@ void finish_gen_craft(char_data *ch) {
 		sprintf(buf, "You finish %s $p!", gen_craft_data[GET_CRAFT_TYPE(type)].verb);
 		act(buf, FALSE, ch, obj, 0, TO_CHAR);
 	}
-
-	sprintf(buf, "$n finishes %s $p!", gen_craft_data[GET_CRAFT_TYPE(type)].verb);
-	act(buf, FALSE, ch, obj, 0, TO_ROOM);
+	
+	// to-room message
+	if (obj_ok) {
+		sprintf(buf, "$n finishes %s $p!", gen_craft_data[GET_CRAFT_TYPE(type)].verb);
+		act(buf, FALSE, ch, obj, NULL, TO_ROOM);
+	}
+	else {
+		sprintf(buf, "$n finishes %s!", gen_craft_data[GET_CRAFT_TYPE(type)].verb);
+		act(buf, FALSE, ch, NULL, NULL, TO_ROOM);
+	}
 	
 	if (GET_CRAFT_ABILITY(type) != NO_ABIL) {
 		gain_ability_exp(ch, GET_CRAFT_ABILITY(type), 33.4);
+		run_ability_hooks(ch, AHOOK_ABILITY, GET_CRAFT_ABILITY(type), 0, NULL, (obj_ok ? obj : NULL), NULL, NULL, NOBITS);
 	}
 	
 	// master?
 	if (is_master && applied_master) {
 		gain_ability_exp(ch, ABIL_MASTERY_ABIL(cft_abil), 33.4);
+		run_ability_hooks(ch, AHOOK_ABILITY, ABIL_MASTERY_ABIL(cft_abil), 0, NULL, (obj_ok ? obj : NULL), NULL, NULL, NOBITS);
 	}
 	
 	// remove 'produced' amounts from the empire now, if applicable
@@ -1162,9 +1305,8 @@ void finish_gen_craft(char_data *ch) {
 		}
 	}
 	
-	// free the stored action resources now -- we no longer risk refunding them
-	free_resource_list(GET_ACTION_RESOURCES(ch));
-	GET_ACTION_RESOURCES(ch) = NULL;
+	// end now, which frees up the resources
+	end_action(ch);
 
 	// repeat as desired
 	if (num > 1) {
@@ -1194,11 +1336,11 @@ void process_gen_craft_vehicle(char_data *ch, craft_data *type) {
 		return;
 	}
 	if (VEH_IS_DISMANTLING(veh)) {
-		act("You can't work on $V because it's being dismantled.", FALSE, ch, NULL, veh, TO_CHAR);
+		act("You can't work on $V because it's being dismantled.", FALSE, ch, NULL, veh, TO_CHAR | ACT_VEH_VICT);
 		cancel_gen_craft(ch);
 		return;
 	}
-	if (!can_see_in_dark_room(ch, IN_ROOM(ch), TRUE)) {
+	if (!CRAFT_FLAGGED(type, CRAFT_DARK_OK) && !can_see_in_dark_room(ch, IN_ROOM(ch), TRUE)) {
 		msg_to_char(ch, "It's too dark to finish %s.\r\n", gen_craft_data[GET_CRAFT_TYPE(type)].verb);
 		cancel_gen_craft(ch);
 		return;
@@ -1206,6 +1348,19 @@ void process_gen_craft_vehicle(char_data *ch, craft_data *type) {
 	
 	// find and apply something
 	if ((res = get_next_resource(ch, VEH_NEEDS_RESOURCES(veh), can_use_room(ch, IN_ROOM(ch), MEMBERS_ONLY), TRUE, &found_obj))) {
+		// check required tool
+		if (found_obj && GET_OBJ_REQUIRES_TOOL(found_obj) && !has_all_tools(ch, GET_OBJ_REQUIRES_TOOL(found_obj))) {
+			prettier_sprintbit(GET_OBJ_REQUIRES_TOOL(found_obj), tool_flags, buf);
+			if (count_bits(GET_OBJ_REQUIRES_TOOL(found_obj)) > 1) {
+				msg_to_char(ch, "You need the following tools to use %s: %s\r\n", GET_OBJ_DESC(found_obj, ch, OBJ_DESC_SHORT), buf);
+			}
+			else {
+				msg_to_char(ch, "You need %s %s to use %s.\r\n", AN(buf), buf, GET_OBJ_DESC(found_obj, ch, OBJ_DESC_SHORT));
+			}
+			cancel_action(ch);
+			return;
+		}
+		
 		// take the item; possibly free the res
 		apply_resource(ch, res, &VEH_NEEDS_RESOURCES(veh), found_obj, APPLY_RES_CRAFT, veh, VEH_FLAGGED(veh, VEH_NEVER_DISMANTLE) ? NULL : &VEH_BUILT_WITH(veh));
 		request_vehicle_save_in_world(veh);
@@ -1213,6 +1368,7 @@ void process_gen_craft_vehicle(char_data *ch, craft_data *type) {
 		// experience per resource
 		if (GET_CRAFT_ABILITY(type) != NO_ABIL) {
 			gain_ability_exp(ch, GET_CRAFT_ABILITY(type), 3);
+			run_ability_hooks(ch, AHOOK_ABILITY, GET_CRAFT_ABILITY(type), 0, NULL, NULL, veh, NULL, NOBITS);
 		}
 		
 		found = TRUE;
@@ -1220,7 +1376,7 @@ void process_gen_craft_vehicle(char_data *ch, craft_data *type) {
 	
 	// done?
 	if (!VEH_NEEDS_RESOURCES(veh)) {
-		act("$V is finished!", FALSE, ch, NULL, veh, TO_CHAR | TO_ROOM);
+		act("$V is finished!", FALSE, ch, NULL, veh, TO_CHAR | TO_ROOM | ACT_VEH_VICT);
 		
 		// WARNING: complete_vehicle runs triggers that could purge the vehicle
 		complete_vehicle(veh);
@@ -1228,7 +1384,7 @@ void process_gen_craft_vehicle(char_data *ch, craft_data *type) {
 		// stop all actors on this type
 		DL_FOREACH2(ROOM_PEOPLE(IN_ROOM(ch)), vict, next_in_room) {
 			if (!IS_NPC(vict) && GET_ACTION(vict) == ACT_GEN_CRAFT && GET_ACTION_VNUM(vict, 0) == GET_CRAFT_VNUM(type)) {
-				GET_ACTION(vict) = ACT_NONE;
+				end_action(vict);
 			}
 		}
 	}
@@ -1246,7 +1402,7 @@ void process_gen_craft_vehicle(char_data *ch, craft_data *type) {
 		}
 		snprintf(buf, sizeof(buf), "$n runs out of resources and stops %s.", gen_craft_data[GET_CRAFT_TYPE(type)].verb);
 		act(buf, FALSE, ch, NULL, NULL, TO_ROOM);
-		GET_ACTION(ch) = ACT_NONE;
+		end_action(ch);
 	}
 }
 
@@ -1278,7 +1434,7 @@ void process_gen_craft(char_data *ch) {
 	}
 	
 	// things that check for & set weapon
-	if (GET_CRAFT_TYPE(type) == CRAFT_TYPE_FORGE && !(weapon = has_tool(ch, TOOL_HAMMER)) && !can_forge(ch)) {
+	if (GET_CRAFT_TYPE(type) == CRAFT_TYPE_FORGE && (!(weapon = has_tool(ch, TOOL_HAMMER)) || !can_forge(ch))) {
 		// can_forge sends its own message
 		cancel_gen_craft(ch);
 	}
@@ -1294,15 +1450,15 @@ void process_gen_craft(char_data *ch) {
 		msg_to_char(ch, "You need to be in a mill or have a grinding stone to do keep milling.\r\n");
 		cancel_gen_craft(ch);
 	}
-	else if (!can_see_in_dark_room(ch, IN_ROOM(ch), TRUE)) {
+	else if (!CRAFT_FLAGGED(type, CRAFT_DARK_OK) && !can_see_in_dark_room(ch, IN_ROOM(ch), TRUE)) {
 		msg_to_char(ch, "It's too dark to finish %s.\r\n", gen_craft_data[GET_CRAFT_TYPE(type)].verb);
 		cancel_gen_craft(ch);
 	}
-	else if (GET_CRAFT_REQUIRES_TOOL(type) && !(tool = has_all_tools(ch, GET_CRAFT_REQUIRES_TOOL(type)))) {
+	else if (GET_CRAFT_REQUIRES_TOOL(type) && !(tool = has_all_tools(ch, GET_CRAFT_REQUIRES_TOOL(type))) && !CRAFT_FLAGGED(type, CRAFT_TOOL_OR_FUNCTION)) {
 		msg_to_char(ch, "You aren't using the right tool to finish %s.\r\n", gen_craft_data[GET_CRAFT_TYPE(type)].verb);
 		cancel_gen_craft(ch);
 	}
-	else if (GET_CRAFT_REQUIRES_FUNCTION(type) && !room_has_function_and_city_ok(GET_LOYALTY(ch), IN_ROOM(ch), GET_CRAFT_REQUIRES_FUNCTION(type))) {
+	else if (GET_CRAFT_REQUIRES_FUNCTION(type) && (!CRAFT_FLAGGED(type, CRAFT_TOOL_OR_FUNCTION) || !tool) && !room_has_function_and_city_ok(GET_LOYALTY(ch), IN_ROOM(ch), GET_CRAFT_REQUIRES_FUNCTION(type))) {
 		prettier_sprintbit(GET_CRAFT_REQUIRES_FUNCTION(type), function_flags_long, buf);
 		str = buf;
 		if ((ptr = strrchr(str, ','))) {
@@ -1365,65 +1521,11 @@ void process_gen_craft(char_data *ch) {
 
 
  //////////////////////////////////////////////////////////////////////////////
-//// REFORGE / REFASHION /////////////////////////////////////////////////////
-
-const struct {
-	char *command, *command_3rd;
-	any_vnum ability;	// required ability
-	bool (*validate_func)(char_data *ch);	// e.g. can_forge, func that returns TRUE if ok -- must send own errors if FALSE
-	int types[4];	// NOTHING-terminated list of valid obj types
-} reforge_data[] = {
-	{ "reforge", "reforges", ABIL_REFORGE, can_forge, { ITEM_WEAPON, ITEM_MISSILE_WEAPON, NOTHING } },	// SCMD_REFORGE
-	{ "refashion", "refashions", ABIL_REFASHION, can_refashion, { ITEM_ARMOR, ITEM_SHIELD, ITEM_WORN, NOTHING } }	// SCMD_REFASHION
-};
-
-
-/**
-* @param char_data *ch The person trying to refashion.
-* @return bool TRUE if they can, false if they can't.
-*/
-bool can_refashion(char_data *ch) {
-	bool ok = FALSE;
-	
-	if (!IS_IMMORTAL(ch) && !room_has_function_and_city_ok(GET_LOYALTY(ch), IN_ROOM(ch), FNC_TAILOR)) {
-		msg_to_char(ch, "You need to be at the tailor to do that.\r\n");
-	}
-	else if (!IS_IMMORTAL(ch) && !check_in_city_requirement(IN_ROOM(ch), TRUE)) {
-		msg_to_char(ch, "This tailor only works if it's in a city.\r\n");
-	}
-	else if (!check_in_city_requirement(IN_ROOM(ch), TRUE)) {
-		msg_to_char(ch, "This building must be in a city to use it.\r\n");
-	}
-	else {
-		ok = TRUE;
-	}
-	
-	return ok;
-}
-
-
-/**
-* @param obj_data *obj The object to test the type of.
-* @int subcmd Any pos in reforge_data[]
-* @return bool TRUE if the object matches any valid type, otherwise FALSE.
-*/
-bool match_reforge_type(obj_data *obj, int subcmd) {
-	int iter;
-	bool match = FALSE;
-	
-	for (iter = 0; reforge_data[subcmd].types[iter] != NOTHING && !match; ++iter) {
-		if (GET_OBJ_TYPE(obj) == reforge_data[subcmd].types[iter]) {
-			match = TRUE;
-		}
-	}
-	
-	return match;
-}
-
+//// REWORK HELPERS //////////////////////////////////////////////////////////
 
 /**
 * This function validates an attempted item rename by a mortal, e.g. using
-* reforge. It sends its own error messages.
+* rework. It sends its own error messages.
 *
 * @param char_data *ch The person doing the renaming.
 * @param obj_data *obj The item to be renamed.
@@ -1431,27 +1533,36 @@ bool match_reforge_type(obj_data *obj, int subcmd) {
 * @return bool TRUE if it's ok to rename, FALSE otherwise.
 */
 bool validate_item_rename(char_data *ch, obj_data *obj, char *name) {
-	char must_have[MAX_STRING_LENGTH];
+	char must_have[256];
 	bool ok = FALSE, has_cap = FALSE;
-	obj_data *proto;
-	int iter;
+	int iter, pos;
+	obj_data *proto = obj_proto(GET_OBJ_VNUM(obj));
 	
-	strcpy(must_have, fname(GET_OBJ_KEYWORDS(obj)));
-	
-	for (iter = 0; iter < strlen(GET_OBJ_SHORT_DESC(obj)) && !has_cap; ++iter) {
-		if (isupper(*(GET_OBJ_SHORT_DESC(obj) + iter))) {
-			has_cap = TRUE;
+	// determine what part of the name they must keep
+	if ((pos = search_block(fname(GET_OBJ_KEYWORDS(obj)), item_rename_keywords, TRUE)) != NOTHING) {
+		// allow the main keyword as the only kept word
+		strcpy(must_have, item_rename_keywords[pos]);
+	}
+	else {
+		// require whole name minus filler
+		strcpy(must_have, skip_filler(GET_OBJ_SHORT_DESC(proto ? proto : obj)));
+		
+		// a capital letter in this must_have will disallow the rename
+		for (iter = 0; iter < strlen(must_have) && !has_cap; ++iter) {
+			if (isupper(must_have[iter])) {
+				has_cap = TRUE;
+			}
 		}
 	}
 	
 	if (!*name) {
 		msg_to_char(ch, "What do you want to rename it?\r\n");
 	}
-	else if (has_cap || ((proto = obj_proto(GET_OBJ_VNUM(obj))) && GET_OBJ_SHORT_DESC(obj) != GET_OBJ_SHORT_DESC(proto))) {
+	else if (has_cap) {
 		act("You can't rename $p.", FALSE, ch, obj, NULL, TO_CHAR);
 	}
-	else if (strchr(name, COLOUR_CHAR) || strchr(name, '%')) {
-		msg_to_char(ch, "Item names cannot contain the \t%c or %% symbols.\r\n", COLOUR_CHAR);
+	else if (strchr(name, COLOUR_CHAR) || strchr(name, '%') || strchr(name, '$')) {
+		msg_to_char(ch, "Item names cannot contain the \t%c, $, or %% symbols.\r\n", COLOUR_CHAR);
 	}
 	else if (!str_str(name, must_have)) {
 		msg_to_char(ch, "The new name must contain '%s'.\r\n", must_have);
@@ -1523,7 +1634,7 @@ ACMD(do_gen_augment) {
 	else if (!has_resources(ch, GET_AUG_RESOURCES(aug), FALSE, TRUE, GET_AUG_NAME(aug))) {
 		// sends its own messages
 	}
-	else if (GET_AUG_ABILITY(aug) != NO_ABIL && ABILITY_TRIGGERS(ch, NULL, obj, GET_AUG_ABILITY(aug))) {
+	else if (GET_AUG_ABILITY(aug) != NO_ABIL && ABILITY_TRIGGERS(ch, NULL, obj, NULL, GET_AUG_ABILITY(aug))) {
 		return;
 	}
 	else {
@@ -1531,7 +1642,7 @@ ACMD(do_gen_augment) {
 		
 		// determine scale cap
 		scale = GET_OBJ_CURRENT_SCALE_LEVEL(obj);
-		if ((abil = find_ability_by_vnum(GET_AUG_ABILITY(aug))) && ABIL_ASSIGNED_SKILL(abil) != NULL && get_skill_level(ch, SKILL_VNUM(ABIL_ASSIGNED_SKILL(abil))) < CLASS_SKILL_CAP) {
+		if ((abil = find_ability_by_vnum(GET_AUG_ABILITY(aug))) && ABIL_ASSIGNED_SKILL(abil) != NULL && get_skill_level(ch, SKILL_VNUM(ABIL_ASSIGNED_SKILL(abil))) < MAX_SKILL_CAP) {
 			scale = MIN(scale, get_skill_level(ch, SKILL_VNUM(ABIL_ASSIGNED_SKILL(abil))));
 		}
 		
@@ -1539,7 +1650,7 @@ ACMD(do_gen_augment) {
 		is_master = (abil && ABIL_MASTERY_ABIL(abil) != NOTHING && has_ability(ch, ABIL_MASTERY_ABIL(abil)));
 		
 		// determine points
-		points_available = get_enchant_scale_for_char(ch, scale);
+		points_available = get_augment_scale_for_char(ch, scale);
 		if (is_master) {
 			points_available *= config_get_double("greater_enchantments_bonus");
 		}
@@ -1624,9 +1735,11 @@ ACMD(do_gen_augment) {
 		
 		if (GET_AUG_ABILITY(aug) != NO_ABIL) {
 			gain_ability_exp(ch, GET_AUG_ABILITY(aug), 50);
+			run_ability_hooks(ch, AHOOK_ABILITY, GET_AUG_ABILITY(aug), 0, NULL, obj, NULL, NULL, NOBITS);
 		}
 		if (abil && is_master) {
 			gain_ability_exp(ch, ABIL_MASTERY_ABIL(abil), 50);
+			run_ability_hooks(ch, AHOOK_ABILITY, ABIL_MASTERY_ABIL(abil), 0, NULL, obj, NULL, NULL, NOBITS);
 		}
 		
 		command_lag(ch, WAIT_ABILITY);
@@ -1819,9 +1932,9 @@ void do_gen_craft_vehicle(char_data *ch, craft_data *type, int dir) {
 	}
 	
 	snprintf(buf, sizeof(buf), "You begin %s $V.", gen_craft_data[GET_CRAFT_TYPE(type)].verb);
-	act(buf, FALSE, ch, NULL, veh, TO_CHAR);
+	act(buf, FALSE, ch, NULL, veh, TO_CHAR | ACT_VEH_VICT);
 	snprintf(buf, sizeof(buf), "$n begins %s $V.", gen_craft_data[GET_CRAFT_TYPE(type)].verb);
-	act(buf, FALSE, ch, NULL, veh, TO_ROOM);
+	act(buf, FALSE, ch, NULL, veh, TO_ROOM | ACT_VEH_VICT);
 	
 	process_gen_craft_vehicle(ch, type);
 	request_vehicle_save_in_world(veh);
@@ -1830,11 +1943,11 @@ void do_gen_craft_vehicle(char_data *ch, craft_data *type, int dir) {
 
 // subcmd must be CRAFT_TYPE_
 ACMD(do_gen_craft) {
-	char short_arg[MAX_INPUT_LENGTH], last_arg[MAX_INPUT_LENGTH], buf[MAX_STRING_LENGTH * 2], line[256];
-	int count, timer, num = 1, dir = NO_DIR;
-	craft_data *craft, *next_craft, *type = NULL, *find_type = NULL, *abbrev_match = NULL, *multi_match = NULL;
+	char temp_arg[MAX_INPUT_LENGTH], short_arg[MAX_INPUT_LENGTH], last_arg[MAX_INPUT_LENGTH], buf[MAX_STRING_LENGTH * 2], line[256];
+	int count, timer, num = 1, dir = NO_DIR, wrong_cmd = NOTHING;
+	craft_data *craft, *next_craft, *type = NULL, *find_type = NULL, *abbrev_match = NULL, *abbrev_no_res = NULL, *multi_match = NULL, *multi_no_res = NULL;
 	vehicle_data *veh;
-	bool is_master, list_only = FALSE;
+	bool is_master, use_room, list_only = FALSE;
 	obj_data *found_obj = NULL, *drinkcon = NULL;
 	any_vnum missing_abil = NO_ABIL;
 	ability_data *cft_abil;
@@ -1860,17 +1973,22 @@ ACMD(do_gen_craft) {
 	// optional leading info request
 	if (!strn_cmp(argument, "info ", 5)) {
 		argument = any_one_arg(argument, arg);
-		show_craft_info(ch, argument, subcmd);
+		quoted_arg_or_all(argument, temp_arg);
+		show_craft_info(ch, temp_arg, subcmd);
 		return;
 	}
 	
 	// optional 'list' arg to search craftables
 	if (!strn_cmp(argument, "list ", 5)) {
 		argument = any_one_arg(argument, arg);
-		skip_spaces(&argument);
 		list_only = TRUE;
 		// keep going
 	}
+	
+	// process what's left of argument to allow "quotes"
+	skip_spaces(&argument);
+	quoted_arg_or_all(argument, temp_arg);
+	argument = temp_arg;
 	
 	// all other functions require standing
 	if (*argument && !list_only && GET_POS(ch) < POS_STANDING) {
@@ -1895,6 +2013,8 @@ ACMD(do_gen_craft) {
 		strcpy(arg, argument);
 	}
 	
+	use_room = can_use_room(ch, IN_ROOM(ch), GUESTS_ALLOWED);
+	
 	// if there was an arg, find a matching craft_table entry (type)
 	if (*arg && !list_only) {
 		// attempt to split out a direction in case the craft makes a building
@@ -1905,9 +2025,6 @@ ACMD(do_gen_craft) {
 		}
 		
 		HASH_ITER(sorted_hh, sorted_crafts, craft, next_craft) {
-			if (GET_CRAFT_TYPE(craft) != subcmd) {
-				continue;	// wrong craft type
-			}
 			if (CRAFT_FLAGGED(craft, CRAFT_UPGRADE | CRAFT_DISMANTLE_ONLY)) {
 				continue;	// never allow these flags
 			}
@@ -1922,48 +2039,78 @@ ACMD(do_gen_craft) {
 			}
 			
 			// match so far...
-			if (!str_cmp(arg, GET_CRAFT_NAME(craft)) || (*short_arg && !str_cmp(short_arg, GET_CRAFT_NAME(craft)))) {
-				// do this last because it records if they are just missing an ability
+			if (!str_cmp(arg, GET_CRAFT_NAME(craft)) || (GET_CRAFT_BUILD_FACING(craft) && *short_arg && !str_cmp(short_arg, GET_CRAFT_NAME(craft)))) {
+				// do this last because it records if they are on the wrong command or just missing an ability
+				if (GET_CRAFT_TYPE(craft) != subcmd) {
+					wrong_cmd = GET_CRAFT_TYPE(craft);
+					continue;
+				}
 				if (GET_CRAFT_ABILITY(craft) != NO_ABIL && !has_ability(ch, GET_CRAFT_ABILITY(craft))) {
 					missing_abil = GET_CRAFT_ABILITY(craft);
 					continue;	// missing ability
 				}
 				
-				// exact match!
+				// exact match! (don't care about resources)
 				type = craft;
 				break;
 			}
-			else if (!abbrev_match && (is_abbrev(arg, GET_CRAFT_NAME(craft)) || (*short_arg && is_abbrev(short_arg, GET_CRAFT_NAME(craft))))) {
-				// do this last because it records if they are just missing an ability
+			else if (!abbrev_match && (is_abbrev(arg, GET_CRAFT_NAME(craft)) || (GET_CRAFT_BUILD_FACING(craft) && *short_arg && is_abbrev(short_arg, GET_CRAFT_NAME(craft))))) {
+				// do this last because it records if they are on the wrong command or just missing an ability
+				if (GET_CRAFT_TYPE(craft) != subcmd) {
+					wrong_cmd = GET_CRAFT_TYPE(craft);
+					continue;
+				}
 				if (GET_CRAFT_ABILITY(craft) != NO_ABIL && !has_ability(ch, GET_CRAFT_ABILITY(craft))) {
 					missing_abil = GET_CRAFT_ABILITY(craft);
 					continue;	// missing ability
 				}
 				
 				// found! maybe
-				abbrev_match = craft;
+				if (has_resources(ch, GET_CRAFT_RESOURCES(craft), use_room, FALSE, NULL)) {
+					abbrev_match = craft;
+				}
+				else if (!abbrev_no_res) {
+					abbrev_no_res = craft;
+				}
 			}
-			else if (!multi_match && (multi_isname(arg, GET_CRAFT_NAME(craft)) || (*short_arg && multi_isname(short_arg, GET_CRAFT_NAME(craft))))) {
-				// do this last because it records if they are just missing an ability
+			else if (!multi_match && (multi_isname(arg, GET_CRAFT_NAME(craft)) || (GET_CRAFT_BUILD_FACING(craft) && *short_arg && multi_isname(short_arg, GET_CRAFT_NAME(craft))))) {
+				// do this last because it records if they are on the wrong command or just missing an ability
+				if (GET_CRAFT_TYPE(craft) != subcmd) {
+					wrong_cmd = GET_CRAFT_TYPE(craft);
+					continue;
+				}
 				if (GET_CRAFT_ABILITY(craft) != NO_ABIL && !has_ability(ch, GET_CRAFT_ABILITY(craft))) {
 					missing_abil = GET_CRAFT_ABILITY(craft);
 					continue;	// missing ability
 				}
 				
 				// found! maybe
-				multi_match = craft;
+				if (has_resources(ch, GET_CRAFT_RESOURCES(craft), use_room, FALSE, NULL)) {
+					multi_match = craft;
+				}
+				else if (!multi_no_res) {
+					multi_no_res = craft;
+				}
 			}
 		}
 		
 		// maybe we didn't find an exact match, but did find an abbrev/multi match
+		// this also tries to prefer things they have the resources for
 		if (!type) {
-			type = abbrev_match ? abbrev_match : multi_match;	// if any
+			type = abbrev_match ? abbrev_match : abbrev_no_res;	// if any
+		}
+		if (!type) {
+			type = multi_match ? multi_match : multi_no_res;	// again, if any
 		}
 	}	// end arg-processing
 	
 	// preliminary checks
 	if (subcmd == CRAFT_TYPE_ERROR) {
 		msg_to_char(ch, "This command is not yet implemented.\r\n");
+	}
+	else if (*arg && !list_only && IS_INCOMPLETE(IN_ROOM(ch)) && get_room_extra_data(IN_ROOM(ch), ROOM_EXTRA_BUILD_RECIPE) > 0 && (find_type = craft_proto(get_room_extra_data(IN_ROOM(ch), ROOM_EXTRA_BUILD_RECIPE))) && subcmd == GET_CRAFT_TYPE(find_type) && multi_isname(arg, GET_CRAFT_NAME(find_type))) {
+		// attempting to resume the current building by something that's not exactly the name
+		resume_craft_building(ch, find_type);
 	}
 	else if (*arg && !list_only && (veh = find_vehicle_to_resume_by_name(ch, subcmd, arg, &find_type))) {
 		// attempting to resume a vehicle by name
@@ -1973,24 +2120,28 @@ ACMD(do_gen_craft) {
 		// attempting to resume a building by name
 		resume_craft_building(ch, type);
 	}
+	else if (*arg && !list_only && !type && wrong_cmd != NOTHING) {
+		// found no match but there was an almost-match with a different command (forge, sew, etc)
+		msg_to_char(ch, "Unknown %s. Try '%s' instead.\r\n", gen_craft_data[subcmd].command, gen_craft_data[wrong_cmd].command);
+	}
 	else if (*arg && !list_only && !type && missing_abil != NO_ABIL) {
 		// found no match but there was an almost-match with an ability requirement
 		msg_to_char(ch, "You need the %s ability to %s that.\r\n", get_ability_name_by_vnum(missing_abil), gen_craft_data[subcmd].command);
 	}
 	else if (*arg && !list_only && !type) {
 		// found no match
-		msg_to_char(ch, "Unknown %s. Type '%s' by itself to see a list of what you can %s.\r\n", gen_craft_data[subcmd].command, gen_craft_data[subcmd].command, gen_craft_data[subcmd].command);
+		msg_to_char(ch, "Unknown %s '%s'. Type '%s' by itself to see a list of what you can %s.\r\n", arg, gen_craft_data[subcmd].command, gen_craft_data[subcmd].command, gen_craft_data[subcmd].command);
 	}
 	else if (!*arg && !list_only && subcmd == CRAFT_TYPE_BUILD && IS_INCOMPLETE(IN_ROOM(ch))) {
 		// 'build' no-arg in an incomplete building: resume
 		if (IS_BURNING(IN_ROOM(ch))) {
 			msg_to_char(ch, "You can't work on a burning building!\r\n");
 		}
-		else if (!can_see_in_dark_room(ch, IN_ROOM(ch), TRUE)) {
-			msg_to_char(ch, "It's too dark to work on the building.\r\n");
-		}
 		else if (!(find_type = find_building_list_entry(IN_ROOM(ch), FIND_BUILD_NORMAL)) && !(find_type = find_building_list_entry(IN_ROOM(ch), FIND_BUILD_UPGRADE))) {
 			msg_to_char(ch, "It doesn't seem possible to continue the construction.\r\n");
+		}
+		else if (!CRAFT_FLAGGED(find_type, CRAFT_DARK_OK) && !can_see_in_dark_room(ch, IN_ROOM(ch), TRUE)) {
+			msg_to_char(ch, "It's too dark to work on the building.\r\n");
 		}
 		else {
 			resume_craft_building(ch, find_type);
@@ -2020,7 +2171,7 @@ ACMD(do_gen_craft) {
 			if (IS_SET(GET_CRAFT_FLAGS(craft), CRAFT_LEARNED) && !has_learned_craft(ch, GET_CRAFT_VNUM(craft))) {
 				continue;	// not learned
 			}
-			if (*arg && !multi_isname(arg, GET_CRAFT_NAME(craft)) && (!*short_arg || !multi_isname(short_arg, GET_CRAFT_NAME(craft)))) {
+			if (*arg && !multi_isname(arg, GET_CRAFT_NAME(craft)) && (!GET_CRAFT_BUILD_FACING(craft) || !*short_arg || !multi_isname(short_arg, GET_CRAFT_NAME(craft)))) {
 				continue;	// search exclusion
 			}
 			
@@ -2105,7 +2256,7 @@ ACMD(do_gen_craft) {
 	else if (IS_CARRYING_N(ch) > CAN_CARRY_N(ch)) {
 		msg_to_char(ch, "You can't %s anything while overburdened.\r\n", gen_craft_data[subcmd].command);
 	}
-	else if (!has_resources(ch, GET_CRAFT_RESOURCES(type), can_use_room(ch, IN_ROOM(ch), GUESTS_ALLOWED), TRUE, GET_CRAFT_NAME(type))) {
+	else if (!has_resources(ch, GET_CRAFT_RESOURCES(type), use_room, TRUE, GET_CRAFT_NAME(type))) {
 		// this sends its own message ("You need X more of ...")
 		//msg_to_char(ch, "You don't have the resources to %s that.\r\n", gen_craft_data[GET_CRAFT_TYPE(type)].command);
 	}
@@ -2151,10 +2302,13 @@ ACMD(do_gen_craft) {
 		}
 		
 		// must call this after start_action() because it stores resources
-		extract_resources(ch, GET_CRAFT_RESOURCES(type), can_use_room(ch, IN_ROOM(ch), GUESTS_ALLOWED), &GET_ACTION_RESOURCES(ch));
+		extract_resources(ch, GET_CRAFT_RESOURCES(type), use_room, &GET_ACTION_RESOURCES(ch));
 		
 		if (GET_CRAFT_NAME(type)[strlen(GET_CRAFT_NAME(type))-1] == 's') {
 			msg_to_char(ch, "You start %s %s.\r\n", gen_craft_data[GET_CRAFT_TYPE(type)].verb, GET_CRAFT_NAME(type));
+		}
+		else if (GET_CRAFT_QUANTITY(type) > 1) {
+			msg_to_char(ch, "You start %s some %s.\r\n", gen_craft_data[GET_CRAFT_TYPE(type)].verb, GET_CRAFT_NAME(type));
 		}
 		else {
 			msg_to_char(ch, "You start %s %s %s.\r\n", gen_craft_data[GET_CRAFT_TYPE(type)].verb, AN(GET_CRAFT_NAME(type)), GET_CRAFT_NAME(type));
@@ -2218,7 +2372,8 @@ ACMD(do_learn) {
 	// seems ok!
 	else {
 		add_learned_craft(ch, GET_RECIPE_VNUM(obj));
-		act("You commit $p to memory.", FALSE, ch, obj, NULL, TO_CHAR);
+		snprintf(buf, sizeof(buf), "You commit $p to memory (%s command).", gen_craft_data[GET_CRAFT_TYPE(recipe)].command);
+		act(buf, FALSE, ch, obj, NULL, TO_CHAR);
 		act("$n commits $p to memory.", TRUE, ch, obj, NULL, TO_ROOM);
 		extract_obj(obj);
 	}
@@ -2280,6 +2435,7 @@ ACMD(do_learned) {
 			
 			// ok:
 			++count;
+			l_size = 0;
 			
 			// check start of line
 			if (last_type == -1 || last_type != GET_CRAFT_TYPE(craft)) {
@@ -2479,79 +2635,51 @@ ACMD(do_recipes) {
 }
 
 
-// do_refashion / this handles both 'reforge' and 'refashion'
-ACMD(do_reforge) {
+// formerly reforge and refashion
+ACMD(do_rework) {
 	char arg2[MAX_INPUT_LENGTH], temp[MAX_INPUT_LENGTH];
-	struct resource_data *res = NULL;
-	time_t old_stolen_time;
-	ability_data *cft_abil;
-	craft_data *ctype;
-	int old_timer, iter, level, old_stolen_from;
-	bool found;
-	obj_data *obj, *new, *proto;
+	ability_data *craft_abil;
+	craft_data *craft;
+	obj_data *obj, *new_obj, *proto;
+	struct resource_data *cost_resources = NULL;
 	
-	bitvector_t preserve_flags = OBJ_PRESERVE_FLAGS;	// flags to copy over if obj is reloaded
-	
-	// reforge <item> name <name>
-	// reforge <item> renew
+	// rework <item> name <name>
+	// rework <item> renew
 	
 	argument = two_arguments(argument, arg, arg2);
 	skip_spaces(&argument);
 	
-	if (IS_NPC(ch)) {
-		msg_to_char(ch, "NPCs cannot reforge.\r\n");
-	}
-	else if (reforge_data[subcmd].ability != NOTHING && !has_ability(ch, reforge_data[subcmd].ability)) {
-		msg_to_char(ch, "You must buy the %s ability to do that.\r\n", reforge_data[subcmd].command);
+	if (IS_NPC(ch) || !has_player_tech(ch, PTECH_REWORK_COMMAND)) {
+		msg_to_char(ch, "You don't have the ability to rework items.\r\n");
 	}
 	else if (!*arg || !*arg2) {
-		msg_to_char(ch, "Usage: %s <item> name <name>\r\n", reforge_data[subcmd].command);
-		msg_to_char(ch, "       %s <item> <renew | superior>\r\n", reforge_data[subcmd].command);
-	}
-	else if (reforge_data[subcmd].validate_func && !(reforge_data[subcmd].validate_func)(ch)) {
-		// failed validate func -- sends own messages
+		msg_to_char(ch, "Usage: rework <item> name <name>\r\n");
+		msg_to_char(ch, "       rework <item> <renew | superior>\r\n");
 	}
 	else if (!(obj = get_obj_in_list_vis(ch, arg, NULL, ch->carrying)) && !(obj = get_obj_by_char_share(ch, arg))) {
 		msg_to_char(ch, "You don't seem to have %s %s.\r\n", AN(arg), arg);
 	}
-	else if (!match_reforge_type(obj, subcmd)) {
-		msg_to_char(ch, "You can only %s ", reforge_data[subcmd].command);
-		*buf = '\0';
-		for (iter = 0, found = FALSE; reforge_data[subcmd].types[iter] != NOTHING; ++iter) {
-			sprintf(buf + strlen(buf), "%s%ss", (found ? ", " : ""), item_types[reforge_data[subcmd].types[iter]]);
-			found = TRUE;
-		}
-		// make buf lowercase -- item_types is all upper
-		for (iter = 0; iter < strlen(buf); ++iter) {
-			buf[iter] = LOWER(buf[iter]);
-			if (buf[iter] == '_') {
-				buf[iter] = ' ';	// convert underscore to space
-			}
-		}
-		msg_to_char(ch, "%s.\r\n", buf);
+	else if (!(proto = obj_proto(GET_OBJ_VNUM(obj))) || (GET_OBJ_WEAR(obj) & ~ITEM_WEAR_TAKE) == NOBITS || GET_OBJ_VNUM(obj) == NOTHING) {
+		// not equippable or not real
+		msg_to_char(ch, "You can't rework that item.\r\n");
 	}
-	else if (GET_OBJ_VNUM(obj) == NOTHING || !obj_proto(GET_OBJ_VNUM(obj))) {
-		// since we compare to the prototype, this is not allowed
-		msg_to_char(ch, "You can't %s that item.\r\n", reforge_data[subcmd].command);
-	}
+	// "name": allowed on most items
 	else if (is_abbrev(arg2, "name")) {
 		// calculate gem cost based on the gear rating of the item
-		add_to_resource_list(&res, RES_OBJECT, o_IRIDESCENT_IRIS, MAX(1, rate_item(obj) / 3), 0);
+		add_to_resource_list(&cost_resources, RES_COMPONENT, COMP_MAGIC_GEM, MAX(1, rate_item(obj) / 3), 0);
 		
 		if (!validate_item_rename(ch, obj, argument)) {
 			// sends own message
 		}
-		else if (!has_resources(ch, res, can_use_room(ch, IN_ROOM(ch), GUESTS_ALLOWED), TRUE, NULL)) {
+		else if (!has_resources(ch, cost_resources, can_use_room(ch, IN_ROOM(ch), MEMBERS_ONLY), TRUE, NULL)) {
 			// sends own message
 		}
 		else {
-			extract_resources(ch, res, can_use_room(ch, IN_ROOM(ch), GUESTS_ALLOWED), NULL);
+			extract_resources(ch, cost_resources, can_use_room(ch, IN_ROOM(ch), MEMBERS_ONLY), NULL);
 			
 			// prepare
 			sprintf(buf1, "You name %s%s $p!", GET_OBJ_SHORT_DESC(obj), shared_by(obj, ch));
 			sprintf(buf2, "$n names %s%s $p!", GET_OBJ_SHORT_DESC(obj), shared_by(obj, ch));
-			
-			proto = obj_proto(GET_OBJ_VNUM(obj));
 			
 			// rename keywords
 			snprintf(temp, sizeof(temp), "%s %s", fname(GET_OBJ_KEYWORDS(proto)), skip_filler(argument));
@@ -2569,152 +2697,113 @@ ACMD(do_reforge) {
 			act(buf1, FALSE, ch, obj, obj->worn_by, TO_CHAR);
 			act(buf2, TRUE, ch, obj, obj->worn_by, TO_ROOM);
 			
-			if (reforge_data[subcmd].ability != NOTHING) {
-				gain_ability_exp(ch, reforge_data[subcmd].ability, 50);
-			}
+			gain_player_tech_exp(ch, PTECH_REWORK_COMMAND, 50);
+			run_ability_hooks_by_player_tech(ch, PTECH_REWORK_COMMAND, NULL, obj, NULL, NULL);
 		}
+	}
+	// further items require that you know the recipe for it
+	else if (!(craft = find_craft_for_obj_vnum(GET_OBJ_VNUM(obj)))) {
+		msg_to_char(ch, "You can only rework craftable items.\r\n");
+	}
+	else if (GET_CRAFT_ABILITY(craft) != NOTHING && !has_ability(ch, GET_CRAFT_ABILITY(craft))) {
+		// missing ability
+		act("You need the $T ability to rework $p.", FALSE, ch, obj, get_ability_name_by_vnum(GET_CRAFT_ABILITY(craft)), TO_CHAR | ACT_STR_VICT);
+	}
+	else if (CRAFT_FLAGGED(craft, CRAFT_LEARNED) && !has_learned_craft(ch, GET_CRAFT_VNUM(craft))) {
+		// missing learned recipe
+		act("You can't rework $p until you learn to $T it.", FALSE, ch, obj, gen_craft_data[GET_CRAFT_TYPE(craft)].command, TO_CHAR | ACT_STR_VICT);
+	}
+	else if (!check_can_craft(ch, craft, FALSE)) {
+		// checks crafting type and correct room/rools; sends own message on a fail
+	}
+	else if (get_crafting_level(ch) < GET_OBJ_CURRENT_SCALE_LEVEL(obj)) {
+		msg_to_char(ch, "Your crafting level is too low to rework that.\r\n");
 	}
 	else if (is_abbrev(arg2, "renew")) {
-		proto = obj_proto(GET_OBJ_VNUM(obj));
-		
 		// calculate gem cost based on the gear rating of the original item
-		add_to_resource_list(&res, RES_OBJECT, o_BLOODSTONE, MAX(1, (proto ? rate_item(proto) : rate_item(obj)) / 3), 0);
+		add_to_resource_list(&cost_resources, RES_COMPONENT, COMP_MAGIC_GEM, MAX(1, rate_item(obj) / 3), 0);
 		
-		if (!proto) {
-			msg_to_char(ch, "You can't renew that.\r\n");
-		}
-		else if (!has_resources(ch, res, can_use_room(ch, IN_ROOM(ch), GUESTS_ALLOWED), TRUE, NULL)) {
+		if (!has_resources(ch, cost_resources, can_use_room(ch, IN_ROOM(ch), MEMBERS_ONLY), TRUE, NULL)) {
 			// sends own message
+			return;
 		}
-		else {
-			extract_resources(ch, res, can_use_room(ch, IN_ROOM(ch), GUESTS_ALLOWED), NULL);
-			
-			// actual reforging: just junk it and load a new one
-			old_stolen_time = obj->stolen_timer;
-			old_stolen_from = GET_STOLEN_FROM(obj);
-			old_timer = GET_OBJ_TIMER(obj);
-			level = GET_OBJ_CURRENT_SCALE_LEVEL(obj);
-			
-			new = read_object(GET_OBJ_VNUM(proto), TRUE);
-			GET_OBJ_EXTRA(new) |= GET_OBJ_EXTRA(obj) & preserve_flags;
-			
-			// transfer bindings
-			OBJ_BOUND_TO(new) = OBJ_BOUND_TO(obj);
-			OBJ_BOUND_TO(obj) = NULL;
-			
-			// re-apply
-			new->stolen_timer = old_stolen_time;
-			GET_STOLEN_FROM(new) = old_stolen_from;
-			GET_OBJ_TIMER(new) = old_timer;
-			if (level > 0) {
-				scale_item_to_level(new, level);
-			}
-			
-			// junk the old one
-			swap_obj_for_obj(obj, new);
-			extract_obj(obj);
-			obj = new;
-			
-			// message
-			sprintf(buf, "You %s $p%s!", reforge_data[subcmd].command, shared_by(obj, ch));
-			act(buf, FALSE, ch, obj, obj->worn_by, TO_CHAR);
-			
-			sprintf(buf, "$n %ss $p%s!", reforge_data[subcmd].command_3rd, shared_by(obj, ch));
-			act(buf, TRUE, ch, obj, obj->worn_by, TO_ROOM);
-			
-			if (reforge_data[subcmd].ability != NO_ABIL) {
-				gain_ability_exp(ch, reforge_data[subcmd].ability, 50);
-			}
-			
-			// this seems like it should not be running a load trigger
-			// load_otrigger(obj);
-		}
-	}
+		
+		extract_resources(ch, cost_resources, can_use_room(ch, IN_ROOM(ch), MEMBERS_ONLY), NULL);
+		
+		// load a fresh one
+		new_obj = fresh_copy_obj(obj, GET_OBJ_CURRENT_SCALE_LEVEL(obj), FALSE, FALSE);
+		swap_obj_for_obj(obj, new_obj);
+		
+		// junk the old one
+		extract_obj(obj);
+		obj = new_obj;
+		
+		// message
+		sprintf(buf, "You rework $p%s!", shared_by(obj, ch));
+		act(buf, FALSE, ch, obj, obj->worn_by, TO_CHAR);
+		
+		sprintf(buf, "$n reworks $p%s!", shared_by(obj, ch));
+		act(buf, TRUE, ch, obj, obj->worn_by, TO_ROOM);
+		
+		gain_player_tech_exp(ch, PTECH_REWORK_COMMAND, 50);
+		run_ability_hooks_by_player_tech(ch, PTECH_REWORK_COMMAND, NULL, obj, NULL, NULL);
+	}	// end 'renew'
 	else if (is_abbrev(arg2, "superior")) {
 		// calculate gem cost based on the gear rating of the item
-		add_to_resource_list(&res, RES_OBJECT, o_GLOWING_SEASHELL, MAX(1, rate_item(obj) / 3), 0);
+		add_to_resource_list(&cost_resources, RES_COMPONENT, COMP_MAGIC_GEM, MAX(1, rate_item(obj) / 3), 0);
 		proto = obj_proto(GET_OBJ_VNUM(obj));
 		
 		if (OBJ_FLAGGED(obj, OBJ_SUPERIOR)) {
 			msg_to_char(ch, "It is already superior.\r\n");
+			return;
 		}
-		else if (!proto || !OBJ_FLAGGED(proto, OBJ_SCALABLE) || !(ctype = find_craft_for_obj_vnum(GET_OBJ_VNUM(obj)))) {
+		else if (!OBJ_FLAGGED(proto, OBJ_SCALABLE) || OBJ_FLAGGED(obj, OBJ_GENERIC_DROP)) {
 			msg_to_char(ch, "It can't be made superior.\r\n");
+			return;
 		}
-		else if (!(cft_abil = find_ability_by_vnum(GET_CRAFT_ABILITY(ctype))) || ABIL_MASTERY_ABIL(cft_abil) == NOTHING || !has_ability(ch, ABIL_MASTERY_ABIL(cft_abil))) {
+		else if (!(craft_abil = find_ability_by_vnum(GET_CRAFT_ABILITY(craft))) || ABIL_MASTERY_ABIL(craft_abil) == NOTHING || !has_ability(ch, ABIL_MASTERY_ABIL(craft_abil))) {
 			msg_to_char(ch, "You don't have the mastery to make that item superior.\r\n");
+			return;
 		}
-		else if (!has_resources(ch, res, can_use_room(ch, IN_ROOM(ch), GUESTS_ALLOWED), TRUE, NULL)) {
+		else if (!has_resources(ch, cost_resources, can_use_room(ch, IN_ROOM(ch), MEMBERS_ONLY), TRUE, NULL)) {
 			// sends own message
+			return;
 		}
-		else {
-			extract_resources(ch, res, can_use_room(ch, IN_ROOM(ch), GUESTS_ALLOWED), NULL);
-			
-			// actual reforging: just junk it and load a new one
-			old_stolen_time = obj->stolen_timer;
-			old_stolen_from = GET_STOLEN_FROM(obj);
-			old_timer = GET_OBJ_TIMER(obj);
-			level = GET_OBJ_CURRENT_SCALE_LEVEL(obj);
-			
-			new = read_object(GET_OBJ_VNUM(proto), TRUE);
-			GET_OBJ_EXTRA(new) |= GET_OBJ_EXTRA(obj) & preserve_flags;
-			
-			// ensure no hard/group
-			REMOVE_BIT(GET_OBJ_EXTRA(new), OBJ_HARD_DROP);
-			REMOVE_BIT(GET_OBJ_EXTRA(new), OBJ_GROUP_DROP);
-			
-			// transfer bindings
-			OBJ_BOUND_TO(new) = OBJ_BOUND_TO(obj);
-			OBJ_BOUND_TO(obj) = NULL;
-			
-			// set superior
-			SET_BIT(GET_OBJ_EXTRA(new), OBJ_SUPERIOR);
-			
-			// copy over strings?
-			if (GET_OBJ_KEYWORDS(obj) != GET_OBJ_KEYWORDS(proto)) {
-				set_obj_keywords(new, GET_OBJ_KEYWORDS(obj));
-			}
-			if (GET_OBJ_SHORT_DESC(obj) != GET_OBJ_SHORT_DESC(proto)) {
-				set_obj_short_desc(new, GET_OBJ_SHORT_DESC(obj));
-			}
-			if (GET_OBJ_LONG_DESC(obj) != GET_OBJ_LONG_DESC(proto)) {
-				set_obj_long_desc(new, GET_OBJ_LONG_DESC(obj));
-			}
-			if (GET_OBJ_ACTION_DESC(obj) != GET_OBJ_ACTION_DESC(proto)) {
-				set_obj_look_desc(new, GET_OBJ_ACTION_DESC(obj), FALSE);
-			}
-			
-			// re-apply values
-			new->stolen_timer = old_stolen_time;
-			GET_STOLEN_FROM(new) = old_stolen_from;
-			GET_OBJ_TIMER(new) = old_timer;
-			if (level > 0) {
-				scale_item_to_level(new, level);
-			}
-			
-			// junk the old one
-			swap_obj_for_obj(obj, new);
-			extract_obj(obj);
-			obj = new;
-			
-			sprintf(buf, "You %s $p%s into a masterwork!", reforge_data[subcmd].command, shared_by(obj, ch));
-			act(buf, FALSE, ch, obj, obj->worn_by, TO_CHAR);
-			
-			sprintf(buf, "$n %s $p%s into a masterwork!", reforge_data[subcmd].command_3rd, shared_by(obj, ch));
-			act(buf, TRUE, ch, obj, obj->worn_by, TO_ROOM);
-
-			if (reforge_data[subcmd].ability != NOTHING) {
-				gain_ability_exp(ch, reforge_data[subcmd].ability, 50);
-			}
-		}
+		
+		// ok
+		extract_resources(ch, cost_resources, can_use_room(ch, IN_ROOM(ch), MEMBERS_ONLY), NULL);
+		
+		// strip quality flags before copying
+		REMOVE_BIT(GET_OBJ_EXTRA(obj), OBJ_HARD_DROP | OBJ_GROUP_DROP);
+		
+		// load a fresh one (without scaling)
+		new_obj = fresh_copy_obj(obj, 0, TRUE, TRUE);
+		
+		// set superior and scale now
+		SET_BIT(GET_OBJ_EXTRA(new_obj), OBJ_SUPERIOR);
+		scale_item_to_level(new_obj, GET_OBJ_CURRENT_SCALE_LEVEL(obj));
+				
+		// swap it in and junk the old one
+		swap_obj_for_obj(obj, new_obj);
+		extract_obj(obj);
+		obj = new_obj;
+		
+		sprintf(buf, "You rework $p%s into a masterwork!", shared_by(obj, ch));
+		act(buf, FALSE, ch, obj, obj->worn_by, TO_CHAR);
+		
+		sprintf(buf, "$n reworks $p%s into a masterwork!", shared_by(obj, ch));
+		act(buf, TRUE, ch, obj, obj->worn_by, TO_ROOM);
+		
+		gain_player_tech_exp(ch, PTECH_REWORK_COMMAND, 50);
+		run_ability_hooks_by_player_tech(ch, PTECH_REWORK_COMMAND, NULL, obj, NULL, NULL);
 	}
 	else {
-		msg_to_char(ch, "That's not a valid %s option.\r\n", reforge_data[subcmd].command);
+		msg_to_char(ch, "That's not a valid rework option.\r\n");
 	}
 	
 	// no leaks
-	if (res) {
-		free_resource_list(res);
+	if (cost_resources) {
+		free_resource_list(cost_resources);
 	}
 }
 
@@ -2725,7 +2814,7 @@ ACMD(do_tame) {
 	
 	one_argument(argument, arg);
 
-	if (!has_player_tech(ch, PTECH_TAME)) {
+	if (!has_player_tech(ch, PTECH_TAME_ANIMALS)) {
 		msg_to_char(ch, "You don't have the correct ability to tame animals.\r\n");
 	}
 	else if (get_cooldown_time(ch, COOLDOWN_TAME) > 0) {
@@ -2746,6 +2835,9 @@ ACMD(do_tame) {
 	else if (GET_LED_BY(mob)) {
 		act("You can't tame $M right now.", FALSE, ch, NULL, mob, TO_CHAR);
 	}
+	else if (run_ability_triggers_by_player_tech(ch, PTECH_TAME_ANIMALS, mob, NULL, NULL)) {
+		// triggered
+	}
 	else {
 		act("You try to tame $N...", FALSE, ch, NULL, mob, TO_CHAR);
 		act("$n tries to tame you...", FALSE, ch, NULL, mob, TO_VICT);
@@ -2754,8 +2846,9 @@ ACMD(do_tame) {
 		any = run_interactions(ch, mob->interactions, INTERACT_TAME, IN_ROOM(ch), mob, NULL, NULL, tame_interact);
 		
 		if (any) {
-			gain_player_tech_exp(ch, PTECH_TAME, 50);
+			gain_player_tech_exp(ch, PTECH_TAME_ANIMALS, 50);
 			add_cooldown(ch, COOLDOWN_TAME, 3 * SECS_PER_REAL_MIN);
+			run_ability_hooks_by_player_tech(ch, PTECH_TAME_ANIMALS, NULL, NULL, NULL, NULL);
 			
 			// remove the original
 			extract_char(mob);

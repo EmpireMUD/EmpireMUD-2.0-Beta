@@ -36,6 +36,11 @@ A
 8 -1
 A
 26 1
+D
+   The wolf has a brown coat, though you recognize that it's actually a grey
+wolf. It keeps both eyes on you as it sniffs along the ground, looking for the
+scent of food.
+~
 S
 #102
 monstrosity horrid~
@@ -53,6 +58,11 @@ A
 16 -1
 A
 18 -1
+D
+   This deformed creature stands head and several shoulders above you, twisted
+like a demon, with hair coming out of all the wrong places. You instinctively
+recoil at it, wary of its jagged teeth and misshapen form.
+~
 S
 #103
 blood dread~
@@ -68,6 +78,9 @@ A
 23 -2
 A
 18 -2
+D
+The swirling mass of blood seems to have a human face!
+~
 S
 #104
 mist cloud swirling~
@@ -77,6 +90,9 @@ cdijl 15 30 0 jnL 3
 3 20 24 -1
 A
 26 1
+D
+The free-floating cloud of mist almost has a human face as it waves in the air.
+~
 S
 #105
 coyote lanky~
@@ -94,6 +110,10 @@ A
 8 -1
 A
 26 1
+D
+   The scrawny coyote looks like it hasn't eaten all season. It keeps its
+distance from you, but its eyes never stop following you.
+~
 S
 #106
 ocelot~
@@ -111,5 +131,9 @@ A
 8 -1
 A
 26 1
+D
+   The ocelot's fur is a beautiful mix of lines, spots, and rosettes that make
+it a prized catch for hunters.
+~
 S
 $

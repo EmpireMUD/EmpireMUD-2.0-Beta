@@ -453,6 +453,7 @@ wait 1
 %load% veh 11526
 set veh %self.room.vehicles%
 if %veh% && %veh.vnum% == 11526
+  nop %veh.unlink_instance%
   if %self.carried_by% && !%veh.empire_id%
     %own% %veh% %self.carried_by.empire%
   end

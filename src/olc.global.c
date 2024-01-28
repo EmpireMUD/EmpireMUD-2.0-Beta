@@ -2,7 +2,7 @@
 *   File: olc.global.c                                    EmpireMUD 2.0b5 *
 *  Usage: OLC for globals                                                 *
 *                                                                         *
-*  EmpireMUD code base by Paul Clarke, (C) 2000-2015                      *
+*  EmpireMUD code base by Paul Clarke, (C) 2000-2024                      *
 *  All rights reserved.  See license.doc for complete information.        *
 *                                                                         *
 *  EmpireMUD based upon CircleMUD 3.0, bpl 17, by Jeremy Elson.           *
@@ -57,7 +57,7 @@ bool audit_global(struct global_data *glb, char_data *ch) {
 		olc_audit_msg(ch, GET_GLOBAL_VNUM(glb), "Has both CUMULATIVE-PRC and CHOOSE-LAST");
 		problem = TRUE;
 	}
-	if (GET_GLOBAL_MIN_LEVEL(glb) > GET_GLOBAL_MAX_LEVEL(glb)) {
+	if (GET_GLOBAL_MIN_LEVEL(glb) > GET_GLOBAL_MAX_LEVEL(glb) && GET_GLOBAL_MAX_LEVEL(glb) > 0) {
 		olc_audit_msg(ch, GET_GLOBAL_VNUM(glb), "Min level is greater than max level");
 		problem = TRUE;
 	}
@@ -71,6 +71,13 @@ bool audit_global(struct global_data *glb, char_data *ch) {
 		switch (GET_GLOBAL_TYPE(glb)) {
 			case GLOBAL_MOB_INTERACTIONS: {
 				if (interact->type != INTERACT_SHEAR && interact->type != INTERACT_LOOT && interact->type != INTERACT_PICKPOCKET) {
+					olc_audit_msg(ch, GET_GLOBAL_VNUM(glb), "Unsupported interaction type");
+					problem = TRUE;
+				}
+				break;
+			}
+			case GLOBAL_OBJ_INTERACTIONS: {
+				if (interact->type != INTERACT_DISENCHANT) {
 					olc_audit_msg(ch, GET_GLOBAL_VNUM(glb), "Unsupported interaction type");
 					problem = TRUE;
 				}
@@ -161,6 +168,16 @@ char *list_one_global(struct global_data *glb, bool detail) {
 		case GLOBAL_MOB_INTERACTIONS: {
 			if (detail) {
 				sprintbit(GET_GLOBAL_TYPE_FLAGS(glb), action_bits, flags, TRUE);
+				snprintf(output, sizeof(output), "[%5d] %s (%s)%s %.2f%%%s %s (%s)", GET_GLOBAL_VNUM(glb), GET_GLOBAL_NAME(glb), level_range_string(GET_GLOBAL_MIN_LEVEL(glb), GET_GLOBAL_MAX_LEVEL(glb), 0), abil, GET_GLOBAL_PERCENT(glb), IS_SET(GET_GLOBAL_FLAGS(glb), GLB_FLAG_CUMULATIVE_PERCENT) ? "C" : "", flags, global_types[GET_GLOBAL_TYPE(glb)]);
+			}
+			else {
+				snprintf(output, sizeof(output), "[%5d] %s (%s)", GET_GLOBAL_VNUM(glb), GET_GLOBAL_NAME(glb), global_types[GET_GLOBAL_TYPE(glb)]);
+			}
+			break;
+		}
+		case GLOBAL_OBJ_INTERACTIONS: {
+			if (detail) {
+				sprintbit(GET_GLOBAL_TYPE_FLAGS(glb), extra_bits, flags, TRUE);
 				snprintf(output, sizeof(output), "[%5d] %s (%s)%s %.2f%%%s %s (%s)", GET_GLOBAL_VNUM(glb), GET_GLOBAL_NAME(glb), level_range_string(GET_GLOBAL_MIN_LEVEL(glb), GET_GLOBAL_MAX_LEVEL(glb), 0), abil, GET_GLOBAL_PERCENT(glb), IS_SET(GET_GLOBAL_FLAGS(glb), GLB_FLAG_CUMULATIVE_PERCENT) ? "C" : "", flags, global_types[GET_GLOBAL_TYPE(glb)]);
 			}
 			else {
@@ -444,6 +461,19 @@ void olc_show_global(char_data *ch) {
 			}
 			break;
 		}
+		case GLOBAL_OBJ_INTERACTIONS: {
+			sprintbit(GET_GLOBAL_TYPE_FLAGS(glb), extra_bits, lbuf, TRUE);
+			sprintf(buf + strlen(buf), "<%sobjflags\t0> %s\r\n", OLC_LABEL_VAL(GET_GLOBAL_TYPE_FLAGS(glb), NOBITS), lbuf);
+			sprintbit(GET_GLOBAL_TYPE_EXCLUDE(glb), extra_bits, lbuf, TRUE);
+			sprintf(buf + strlen(buf), "<%sobjexclude\t0> %s\r\n", OLC_LABEL_VAL(GET_GLOBAL_TYPE_EXCLUDE(glb), NOBITS), lbuf);
+
+			sprintf(buf + strlen(buf), "Interactions: <%sinteraction\t0>\r\n", OLC_LABEL_PTR(GET_GLOBAL_INTERACTIONS(glb)));
+			if (GET_GLOBAL_INTERACTIONS(glb)) {
+				get_interaction_display(GET_GLOBAL_INTERACTIONS(glb), buf1);
+				strcat(buf, buf1);
+			}
+			break;
+		}
 		case GLOBAL_MINE_DATA: {
 			sprintbit(GET_GLOBAL_TYPE_FLAGS(glb), sector_flags, lbuf, TRUE);
 			sprintf(buf + strlen(buf), "<%ssectorflags\t0> %s\r\n", OLC_LABEL_VAL(GET_GLOBAL_TYPE_FLAGS(glb), NOBITS), lbuf);
@@ -599,6 +629,10 @@ OLC_MODULE(gedit_interaction) {
 			itype = TYPE_MOB;
 			break;
 		}
+		case GLOBAL_OBJ_INTERACTIONS: {
+			itype = TYPE_OBJ;
+			break;
+		}
 		case GLOBAL_MINE_DATA: {
 			itype = TYPE_MINE_DATA;
 			break;
@@ -664,6 +698,30 @@ OLC_MODULE(gedit_mobflags) {
 OLC_MODULE(gedit_name) {
 	struct global_data *glb = GET_OLC_GLOBAL(ch->desc);
 	olc_process_string(ch, argument, "name", &GET_GLOBAL_NAME(glb));
+}
+
+
+OLC_MODULE(gedit_objexclude) {
+	struct global_data *glb = GET_OLC_GLOBAL(ch->desc);
+	
+	if (GET_GLOBAL_TYPE(glb) != GLOBAL_OBJ_INTERACTIONS) {
+		msg_to_char(ch, "You can't set objexclude on this type.\r\n");
+	}
+	else {
+		GET_GLOBAL_TYPE_EXCLUDE(glb) = olc_process_flag(ch, argument, "obj", "objexclude", extra_bits, GET_GLOBAL_TYPE_EXCLUDE(glb));
+	}
+}
+
+
+OLC_MODULE(gedit_objflags) {
+	struct global_data *glb = GET_OLC_GLOBAL(ch->desc);
+	
+	if (GET_GLOBAL_TYPE(glb) != GLOBAL_OBJ_INTERACTIONS) {
+		msg_to_char(ch, "You can't set objflags on this type.\r\n");
+	}
+	else {
+		GET_GLOBAL_TYPE_FLAGS(glb) = olc_process_flag(ch, argument, "obj", "objflags", extra_bits, GET_GLOBAL_TYPE_FLAGS(glb));
+	}
 }
 
 

@@ -29,9 +29,9 @@ Storage~
 build that surplus, you must first build storage buildings. Build one of each
 of the basic storage buildings, and be sure to claim them all to complete this
 goal. The basic storage buildings are: cannery, foundry, granary, gravel pit,
-lumber yard, smokehouse, tannery, seed silo, and utility shed.
+lumber yard, smokehouse, tannery, seed silo, utility shed, and root cellar.
 ~
-4 2 0 5 0
+6 2 0 5 0
 K 7 5
 W
 7 5114 0 1 a
@@ -51,6 +51,8 @@ W
 7 5210 0 1 a
 W
 7 5121 0 1 a
+W
+7 5215 0 1 a
 S
 #2011
 Foundations~
@@ -59,14 +61,13 @@ you'll need some basic resources first. Produce small stockpiles each of any
 type of rock, lumber, block, pillar, stick, and metal ingots. Completing this
 goal will allow your empire to build new artisan buildings.
 ~
-12 2 0 5 0
+14 2 0 5 0
 K 2 5130
 K 2 5132
 K 2 5134
 K 2 5135
 K 2 5136
 K 2 5137
-K 2 5138
 K 2 5139
 K 2 5192
 K 2 1401
@@ -81,7 +82,7 @@ W
 W
 35 6015 0 50 a
 W
-35 6025 0 50 a
+35 6035 0 50 a
 W
 35 6000 0 50 a
 S
@@ -111,15 +112,13 @@ Advanced Artisans~
 flourish. With the help of your artisans, you will be able to upgrade your
 cities to a larger size.
 ~
-7 2 0 15 0
+8 2 0 15 0
 K 3 1
 P 2012
 W
 7 1401 0 1 a
 W
 7 5134 0 1 a
-W
-7 5138 0 1 a
 W
 7 5130 0 1 a
 S
@@ -142,7 +141,7 @@ the basic component types: lumber, rock, block, pillar, sapling, and metal.
 You can mix and match different types of each component, such as tin and
 copper. Completing this goal earns you another city point.
 ~
-12 2 0 15 0
+13 2 0 15 0
 K 1 1
 P 2011
 W
@@ -154,7 +153,7 @@ W
 W
 35 6050 0 150 a
 W
-35 6025 0 150 a
+35 6035 0 150 a
 W
 35 6000 0 150 a
 S
@@ -211,8 +210,8 @@ W
 S
 #2018
 Collecting Herbs~
-   A good stockpile of herbs is necessary for the health and development of an
-empire. Produce 50 of each basic herb to complete this goal.
+   A good stockpile of mgaic herbs is necessary for the health and development
+of an empire. Produce 50 of each magic herb to complete this goal.
 ~
 4 1 0 25 0
 K 7 5
@@ -232,8 +231,8 @@ W
 S
 #2019
 Herbal Empire~
-   Ensure your empire never runs out of herbs by building up a stockpile of 250
-of each herb.
+   Ensure your empire never runs out of magic herbs by building up a stockpile
+of 250 of each herb.
 ~
 6 1 0 50 0
 K 7 5
@@ -250,6 +249,25 @@ W
 34 1204 0 250 a
 W
 34 1205 0 250 a
+S
+#2020
+Salt Bay~
+   Produce enough salt to season your burgeoning empire and show the world
+you've cornered the salt market. Dig salterns by the sea, mine the base of the
+mountains, build a silo to store it all in, and mill 1000 portions of salt. A
+pinch of progress will go a long way.
+~
+2 2 0 25 0
+K 7 15
+P 2915
+W
+7 5219 0 1 a
+W
+7 5221 0 1 a
+W
+7 5220 0 1 a
+W
+34 111 0 1000 a
 S
 #2030
 Early Harvest~

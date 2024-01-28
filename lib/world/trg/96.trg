@@ -1,5 +1,5 @@
 #9600
-SCF Script Fight: Setup dodge, interrupt, struggle~
+SCF Script Fight: Setup dodge, interrupt, struggle (needs 9601, 9604)~
 0 c 0
 scfight~
 * Also requires triggers 9601 and 9604 on the same mob
@@ -274,9 +274,13 @@ if !%actor.affect(9602)%
   else
     return 0
   end
+  rdelete scf_strug_char %actor.id%
+  rdelete scf_strug_room %actor.id%
+  rdelete scf_free_char %actor.id%
+  rdelete scf_free_room %actor.id%
   %purge% %self%
   halt
-elseif !(%cmd% /= struggle)
+elseif !(struggle /= %cmd%)
   return 0
   halt
 end
@@ -291,20 +295,24 @@ eval needed 4 + (4 * %self.var(diff,1)%)
 * I want to break free...
 if %struggle_counter% >= %needed%
   * free!
-  set char_msg %self.var(scf_free_char,You manage to break out!)%
+  set char_msg %actor.var(scf_free_char,You manage to break out!)%
   %send% %actor% %char_msg.process%
-  set room_msg %self.var(scf_free_room,~%actor% struggles and manages to break out!)%
+  set room_msg %actor.var(scf_free_room,~%actor% struggles and manages to break out!)%
   %echoaround% %actor% %room_msg.process%
   set did_skycleave_struggle 1
   remote did_skycleave_struggle %self.id%
   nop %actor.command_lag(COMBAT-ABILITY)%
   dg_affect #9602 %actor% off
+  rdelete scf_strug_char %actor.id%
+  rdelete scf_strug_room %actor.id%
+  rdelete scf_free_char %actor.id%
+  rdelete scf_free_room %actor.id%
   %purge% %self%
 else
   * the struggle continues
-  set char_msg %self.var(scf_strug_char,You struggle to break free...)%
+  set char_msg %actor.var(scf_strug_char,You struggle to break free...)%
   %send% %actor% %char_msg.process%
-  set room_msg %self.var(scf_strug_room,~%actor% struggles, trying to break free...)%
+  set room_msg %actor.var(scf_strug_room,~%actor% struggles, trying to break free...)%
   %echoaround% %actor% %room_msg.process%
   nop %actor.command_lag(COMBAT-ABILITY)%
   remote struggle_counter %self.id%
@@ -345,14 +353,146 @@ end
 if %self.var(wants_scfdodge,0)%
   scfight setup dodge %actor%
 else
-  rdelete did_scfdodge %ch.id%
-  rdelete needs_scfdodge %ch.id%
+  rdelete did_scfdodge %actor.id%
+  rdelete needs_scfdodge %actor.id%
 end
 if %self.var(wants_scfinterrupt,0)%
   scfight setup interrupt %actor%
 else
-  rdelete did_scfinterrupt %ch.id%
-  rdelete needs_scfinterrupt %ch.id%
+  rdelete did_scfinterrupt %actor.id%
+  rdelete needs_scfinterrupt %actor.id%
 end
+~
+#9620
+Storytime using script1-5~
+0 bw 100
+~
+* uses mob custom strings script1-script5 to tell short stories
+* usage: .custom add script# <command> <string>
+* valid commands: say, emote, do (execute command), echo (script), and skip
+* also: vforce <mob vnum in room> <command>
+* also: set <line_gap|story_gap> <time> sec
+* NOTE: waits for %line_gap% (9 sec) after all commands EXCEPT do/vforce/set
+set line_gap 9 sec
+set story_gap 180 sec
+* random wait to offset competing scripts slightly
+wait %random.30%
+* ensure not fighting
+if %self.disabled% || %self.fighting%
+  halt
+end
+* find story number
+if %self.varexists(story)%
+  eval story %self.story% + 1
+  if %story% > 5
+    set story 1
+  end
+else
+  set story 1
+end
+* determine valid story number
+set tries 0
+set ok 0
+while %tries% < 5 && !%ok%
+  if %self.custom(script%story%,0)%
+    set ok 1
+  else
+    eval story %story% + 1
+    if %story% > 5
+      set story 1
+    end
+  end
+  eval tries %tries% + 1
+done
+if !%ok%
+  wait %story_gap%
+  halt
+end
+* story detected: prepare (storing as variables prevents reboot issues)
+if !%self.mob_flagged(SENTINEL)%
+  set no_sentinel 1
+  remote no_sentinel %self.id%
+  nop %self.add_mob_flag(SENTINEL)%
+end
+if !%self.mob_flagged(SILENT)%
+  set no_silent 1
+  remote no_silent %self.id%
+  nop %self.add_mob_flag(SILENT)%
+end
+* tell story
+set pos 0
+set done 0
+while !%done%
+  set msg %self.custom(script%story%,%pos%)%
+  if %msg% && !%self.fighting% && !%self.disabled%
+    set mode %msg.car%
+    set msg %msg.cdr%
+    if %mode% == say
+      say %msg%
+      wait %line_gap%
+    elseif %mode% == do
+      %msg.process%
+      * no wait
+    elseif %mode% == echo
+      %echo% %msg.process%
+      wait %line_gap%
+    elseif %mode% == vforce
+      set vnum %msg.car%
+      set msg %msg.cdr%
+      set targ %self.room.people(%vnum%)%
+      if %targ%
+        %force% %targ% %msg.process%
+      end
+    elseif %mode% == emote
+      emote %msg%
+      wait %line_gap%
+    elseif %mode% == set
+      set subtype %msg.car%
+      set msg %msg.cdr%
+      if %subtype% == line_gap
+        set line_gap %msg%
+      elseif %subtype% == story_gap
+        set story_gap %msg%
+      else
+        %echo% ~%self%: Invalid set type '%subtype%' in storytime script.
+      end
+    elseif %mode% == skip
+      * nothing this round
+      wait %line_gap%
+    else
+      %echo% %self.name%: Invalid script message type '%mode%'.
+    end
+  else
+    set done 1
+  end
+  eval pos %pos% + 1
+done
+remote story %self.id%
+* cancel sentinel/silent
+if %self.var(no_sentinel,0)%
+  nop %self.remove_mob_flag(SENTINEL)%
+end
+if %self.var(no_silent,0)%
+  nop %self.remove_mob_flag(SILENT)%
+end
+* wait between stories
+wait %story_gap%
+~
+#9680
+Force look after wait~
+1 n 100
+~
+wait 1
+if %self.carried_by% && %self.carried_by.position% != Sleeping
+  %force% %self.carried_by% look
+end
+%purge% %self%
+~
+#9681
+Vehicle: Set load time on-load~
+5 n 100
+~
+set load_time %timestamp%
+remote load_time %self.id%
 ~
 $

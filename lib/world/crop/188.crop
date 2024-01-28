@@ -33,9 +33,9 @@ D0
 D0
 &to&?^^^~
 &Y~
-I 6 18843 100.00 1  # FORAGE: piece of caramel
+I 6 18843 100.00 25  # FORAGE: piece of caramel
 I 7 18842 100.00 14  # PICK: tray of candy apples
-I 9 121 100.00 1  # GATHER: sticks and leaves
+I 9 121 100.00 50  # GATHER: sticks and leaves
 I 20 18845 100.00 1  # CHOP: dead tree
 M
 18842 10.00 a
@@ -45,6 +45,9 @@ M
 18844 10.00 a
 M
 18845 5.00 a
+U
+0
+Candy-coated apples form from thin air as the orchard rises from the ground!~
 X
 apples candy orchard trees fruit crop~
    As you approach the orchard, the sweet aroma of caramelized sugar and fruity
@@ -110,7 +113,7 @@ D0
 D0
 w&ooo&?x~
 &g~
-I 6 18892 100.00 1  # FORAGE: pumpkin blossom
+I 6 18892 100.00 25  # FORAGE: pumpkin blossom
 I 8 18890 100.00 5  # HARVEST: large pumpkin
 M
 18890 2.00 a
@@ -122,6 +125,9 @@ M
 18844 10.00 a
 M
 18845 5.00 a
+U
+0
+Huge green leaves grow to cover the ground just as even larger orange pumpkins start to peak out!~
 X
 pumpkins patch plants vines crop~
    The patch is teeming with round, orange pumpkins of various sizes. They lay
