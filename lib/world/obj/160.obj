@@ -85,7 +85,7 @@ it looks like you can use the various tools in a lumber yard to render it down
 into useable pieces. Perhaps you should try to scrape or saw it and see what
 happens? And of course, you could always light it on fire.
 ~
-3 0 a 0 0 4
+3 0 a 0 0 6
 0 0 0
 14 0
 C
@@ -98,8 +98,6 @@ I 17 16006 100.00 2  # SAW: long bone
 I 17 16006 40.00 2  # SAW: long bone
 I 17 16006 5.00 2  # SAW: long bone
 I 17 16006 0.10 2  # SAW: long bone
-R
-4 5118 0
 S
 #16006
 bone long~
@@ -109,13 +107,13 @@ A single long bone rests here.~
 from the crushed skeleton someone left in the lumberyard. Seems it could make a
 reasonable replacement for a stick, if just a bit creepy.
 ~
-1 0 ano 0 0 7
+1 0 ano 0 0 8
 0 2 5
 14 0
 C
 1 1
 I 11 184 100.00 1  # LIGHT: torch
-O+ 1 6035
+O+ 1 16006
 R
 4 5118 0
 S

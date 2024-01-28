@@ -29,6 +29,136 @@ if !%room.down(room)%
 end
 detach 5138 %room.id%
 ~
+#5139
+Bartender: List drinks from empire inventory~
+0 c 0
+list~
+set empire %self.empire%
+set room %self.room%
+set cost %room.var(tavern_cost,50)%
+return 1
+*
+* basic checks
+if identify /= %arg%
+  %send% %actor% You can't use list-identify here.
+  halt
+elseif !%empire%
+  %send% %actor% There's nothing available here.
+  halt
+end
+*
+* otherwise show what's available
+%send% %actor% Available to buy by the barrel for %cost% %empire.adjective% coins:
+set any 0
+if %empire.has_storage(232,%room%)%
+  %send% %actor% &&0  ale
+  set any 1
+end
+if %empire.has_storage(233,%room%)%
+  %send% %actor% &&0  lager
+  set any 1
+end
+if %empire.has_storage(234,%room%)%
+  %send% %actor% &&0  wheat beer
+  set any 1
+end
+if %empire.has_storage(235,%room%)%
+  %send% %actor% &&0  cider
+  set any 1
+end
+if %empire.has_storage(236,%room%)%
+  %send% %actor% &&0  mead
+  set any 1
+end
+if !%any%
+  %send% %actor% &&0  nothing
+end
+~
+#5140
+Bartender: Buy drink from empire inventory~
+0 c 0
+buy~
+set empire %self.empire%
+set room %self.room%
+set cost %room.var(tavern_cost,50)%
+return 1
+*
+* basic checks
+if !%empire%
+  %send% %actor% There's nothing available here.
+  halt
+elseif !%arg%
+  return 0
+  halt
+elseif ale /= %arg%
+  set vnum 232
+elseif lager /= %arg%
+  set vnum 233
+elseif wheat beer /= %arg%
+  set vnum 234
+elseif cider /= %arg%
+  set vnum 235
+elseif mead /= %arg%
+  set vnum 236
+else
+  %send% %actor% They don't seem to have that on tap.
+  halt
+end
+*
+* found drink... now advanced checks
+if %empire.has_storage(%vnum%,%room%)% < 1
+  %send% %actor% They don't seem to have any.
+  halt
+elseif !%actor.can_afford(%cost%)%
+  %send% %actor% You can't afford the cost.
+  halt
+end
+*
+* charge and load
+set money %actor.charge_coins(%cost%)%
+nop %empire.give_coins(%cost%)%
+%load% einv %vnum% %empire% %actor% inv
+set obj %actor.inventory%
+if %obj.vnum% == %vnum%
+  %send% %actor% You buy @%obj% for %money%.
+  %echoaround% %actor% ~%actor% buys @%obj%.
+end
+~
+#5141
+Tavern: Charge a differnet price~
+2 c 0
+price~
+set empire %self.empire%
+set cost %room.var(tavern_cost,50)%
+eval val %arg% + 0
+return 1
+if !%arg%
+  if %cost% != 1
+    set coins coins
+  else
+    set coins coin
+  end
+  %send% %actor% The tavern charges %cost% %empire.adjective% %coins%.
+elseif %actor.is_npc%
+  %send% %actor% You can't do that.
+elseif !%empire%
+  %send% %actor% The tavern must be claimed for you to set the price.
+elseif %empire% != %actor.empire%
+  %send% %actor% You don't own the tavern; you can't set the price.
+elseif %arg% != 0 && %val% < 1
+  %send% %actor% You can't set the price to that.
+else
+  set tavern_cost %val%
+  remote tavern_cost %room.id%
+  if %val% != 1
+    set coins coins
+  else
+    set coins coin
+  end
+  %send% %actor% You set the price to %val% %empire.adjective% %coins%.
+  %echoaround% %actor% ~%actor% sets the price to %val% %empire.adjective% %coins%.
+end
+~
 #5142
 Chant of Magic (gain natural magic at a henge)~
 2 c 0
