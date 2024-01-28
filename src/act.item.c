@@ -3942,8 +3942,7 @@ void process_shipping_one(empire_data *emp) {
 
 
 /**
-* Runs a shipping cycle for all empires. This runs every 6 game hours -- at
-* 1am, 7am, 1pm, and 7pm (global time, not regional time).
+* Runs a shipping cycle for all empires. This runs every 10 minutes.
 */
 void process_shipping(void) {
 	empire_data *emp, *next_emp;
@@ -5581,12 +5580,12 @@ ACMD(do_drink) {
 	}
 
 	/*
-	if (GET_COND(ch, THIRST) < 10 && GET_COND(ch, THIRST) != UNLIMITED) {
+	if (GET_COND(ch, THIRST) < REAL_UPDATES_PER_MUD_HOUR && GET_COND(ch, THIRST) != UNLIMITED) {
 		msg_to_char(ch, "You're too full to drink anymore!\r\n");
 		return;
 	}
 
-	if (GET_COND(ch, FULL) < 75 && GET_COND(ch, FULL) != UNLIMITED && GET_COND(ch, THIRST) < 345 && GET_COND(ch, THIRST) != UNLIMITED) {
+	if (GET_COND(ch, FULL) < REAL_UPDATES_PER_MUD_HOUR && GET_COND(ch, FULL) != UNLIMITED && GET_COND(ch, THIRST) < 24 * REAL_UPDATES_PER_MUD_HOUR && GET_COND(ch, THIRST) != UNLIMITED) {
 		send_to_char("Your stomach can't contain anymore!\r\n", ch);
 		return;
 	}
@@ -5687,13 +5686,16 @@ ACMD(do_drink) {
 	}
 	
 	// messages based on what changed
-	if (GET_COND(ch, DRUNK) > 150 && LIQ_VAL(GVAL_LIQUID_DRUNK) != 0) {
+	if (GET_COND(ch, DRUNK) > 12 * REAL_UPDATES_PER_MUD_HOUR && LIQ_VAL(GVAL_LIQUID_DRUNK) != 0) {
 		send_to_char("You feel drunk.\r\n", ch);
 	}
-	if (GET_COND(ch, THIRST) < 75 && LIQ_VAL(GVAL_LIQUID_THIRST) != 0) {
+	else if (GET_COND(ch, DRUNK) > 2 * REAL_UPDATES_PER_MUD_HOUR && LIQ_VAL(GVAL_LIQUID_DRUNK) != 0) {
+		send_to_char("You feel tipsy.\r\n", ch);
+	}
+	if (GET_COND(ch, THIRST) < 3 * REAL_UPDATES_PER_MUD_HOUR && LIQ_VAL(GVAL_LIQUID_THIRST) != 0) {
 		send_to_char("You don't feel thirsty any more.\r\n", ch);
 	}
-	if (GET_COND(ch, FULL) < 75 && LIQ_VAL(GVAL_LIQUID_FULL) != 0) {
+	if (GET_COND(ch, FULL) < 3 * REAL_UPDATES_PER_MUD_HOUR && LIQ_VAL(GVAL_LIQUID_FULL) != 0) {
 		send_to_char("You are full.\r\n", ch);
 	}
 
@@ -6062,7 +6064,7 @@ ACMD(do_eat) {
 		
 		msg_to_char(ch, "You feel well-fed.\r\n");
 	}
-	else if (GET_COND(ch, FULL) < 75) {	// additional messages
+	else if (GET_COND(ch, FULL) < 3 * REAL_UPDATES_PER_MUD_HOUR) {	// additional messages
 		send_to_char("You are full.\r\n", ch);
 	}
 	

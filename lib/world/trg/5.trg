@@ -87,7 +87,7 @@ set arg1 %arg.car%
 set arg %arg.cdr%
 set arg2 %arg.car%
 * discard the rest
-if %actor.char_target(%arg1%)% != %self%
+if %actor.char_target(%arg1%)% != %self% && !(companion /= %arg1%)
   return 0
   halt
 end
@@ -203,7 +203,7 @@ set arg1 %arg.car%
 set arg %arg.cdr%
 set arg2 %arg.car%
 * discard the rest
-if %actor.char_target(%arg1%)% != %self%
+if %actor.char_target(%arg1%)% != %self% && !(companion /= %arg1%)
   return 0
   halt
 end
@@ -734,7 +734,7 @@ set arg1 %arg.car%
 set arg %arg.cdr%
 set arg2 %arg.car%
 * discard the rest
-if %actor.char_target(%arg1%)% != %self%
+if %actor.char_target(%arg1%)% != %self% && !(companion /= %arg1%)
   return 0
   halt
 end
@@ -796,7 +796,7 @@ set arg1 %arg.car%
 set arg %arg.cdr%
 set arg2 %arg.car%
 * discard the rest
-if %actor.char_target(%arg1%)% != %self%
+if %actor.char_target(%arg1%)% != %self% && !(companion /= %arg1%)
   return 0
   halt
 end
@@ -851,14 +851,14 @@ if %selected_ability%
 end
 ~
 #518
-Owl Shadow commmands~
+Owl Shadow commands~
 0 ct 0
 order~
 set arg1 %arg.car%
 set arg %arg.cdr%
 set arg2 %arg.car%
 * discard the rest
-if %actor.char_target(%arg1%)% != %self%
+if %actor.char_target(%arg1%)% != %self% && !(companion /= %arg1%)
   return 0
   halt
 end
@@ -920,7 +920,7 @@ set arg1 %arg.car%
 set arg %arg.cdr%
 set arg2 %arg.car%
 * discard the rest
-if %actor.char_target(%arg1%)% != %self%
+if %actor.char_target(%arg1%)% != %self% && !(companion /= %arg1%)
   return 0
   halt
 end
@@ -982,7 +982,7 @@ set arg1 %arg.car%
 set arg %arg.cdr%
 set arg2 %arg.car%
 * discard the rest
-if %actor.char_target(%arg1%)% != %self%
+if %actor.char_target(%arg1%)% != %self% && !(companion /= %arg1%)
   return 0
   halt
 end
@@ -1044,7 +1044,7 @@ set arg1 %arg.car%
 set arg %arg.cdr%
 set arg2 %arg.car%
 * discard the rest
-if %actor.char_target(%arg1%)% != %self%
+if %actor.char_target(%arg1%)% != %self% && !(companion /= %arg1%)
   return 0
   halt
 end

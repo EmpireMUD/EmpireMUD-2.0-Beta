@@ -251,7 +251,6 @@
 #define BOOK_AUTHOR(book)		((book)->author)
 #define BOOK_BYLINE(book)		((book)->byline)
 #define BOOK_FLAGS(book)		((book)->flags)
-#define BOOK_IN_LIBRARIES(book)	((book)->in_libraries)
 #define BOOK_ITEM_DESC(book)	((book)->item_description)
 #define BOOK_ITEM_NAME(book)	((book)->item_name)
 #define BOOK_PARAGRAPHS(book)	((book)->paragraphs)
@@ -288,7 +287,7 @@
 #define GET_BLD_QUEST_LOOKUPS(bld)  ((bld)->quest_lookups)
 #define GET_BLD_SHOP_LOOKUPS(bld)  ((bld)->shop_lookups)
 #define GET_BLD_TEMPERATURE_TYPE(bld)  ((bld)->temperature_type)
-#define GET_BLD_YEARLY_MAINTENANCE(bld)  ((bld)->yearly_maintenance)
+#define GET_BLD_REGULAR_MAINTENANCE(bld)  ((bld)->regular_maintenance)
 
 
  //////////////////////////////////////////////////////////////////////////////
@@ -589,9 +588,6 @@ int CAN_CARRY_N(char_data *ch);	// formerly a macro
 //// EMPIRE UTILS ////////////////////////////////////////////////////////////
 
 #define EMPIRE_VNUM(emp)  ((emp)->vnum)
-#define EMPIRE_LEADER(emp)  ((emp)->leader)
-#define EMPIRE_CREATE_TIME(emp)  ((emp)->create_time)
-#define EMPIRE_NAME(emp)  ((emp)->name)
 #define EMPIRE_ADJECTIVE(emp)  ((emp)->adjective)
 #define EMPIRE_ADMIN_FLAGS(emp)  ((emp)->admin_flags)
 #define EMPIRE_ATTRIBUTE(emp, att)  ((emp)->attributes[(att)])
@@ -599,63 +595,67 @@ int CAN_CARRY_N(char_data *ch);	// formerly a macro
 #define EMPIRE_BANNER_HAS_UNDERLINE(emp)  ((emp)->banner_has_underline)
 #define EMPIRE_BASE_TECH(emp, num)  ((emp)->base_tech[(num)])
 #define EMPIRE_CHAT_HISTORY(emp)  ((emp)->chat_history)
+#define EMPIRE_CITY_LIST(emp)  ((emp)->city_list)
 #define EMPIRE_CITY_OVERAGE_WARNING_TIME(emp)  ((emp)->city_overage_warning_time)
-#define EMPIRE_DELAYED_REFRESH(emp)  ((emp)->delayed_refresh)
-#define EMPIRE_DROPPED_ITEMS(emp)  ((emp)->dropped_items)
-#define EMPIRE_NUM_RANKS(emp)  ((emp)->num_ranks)
-#define EMPIRE_RANK(emp, num)  ((emp)->rank[(num)])
-#define EMPIRE_FRONTIER_TRAITS(emp)  ((emp)->frontier_traits)
-#define EMPIRE_HOMELESS_CITIZENS(emp)  ((emp)->homeless)
 #define EMPIRE_COINS(emp)  ((emp)->coins)
 #define EMPIRE_COMPLETED_GOALS(emp)  ((emp)->completed_goals)
-#define EMPIRE_PRIV(emp, num)  ((emp)->priv[(num)])
+#define EMPIRE_CREATE_TIME(emp)  ((emp)->create_time)
+#define EMPIRE_DELAYED_REFRESH(emp)  ((emp)->delayed_refresh)
 #define EMPIRE_DELAYS(emp)  ((emp)->delays)
 #define EMPIRE_DESCRIPTION(emp)  ((emp)->description)
 #define EMPIRE_DIPLOMACY(emp)  ((emp)->diplomacy)
+#define EMPIRE_DROPPED_ITEMS(emp)  ((emp)->dropped_items)
+#define EMPIRE_FAME(emp)  ((emp)->fame)
+#define EMPIRE_FRONTIER_TRAITS(emp)  ((emp)->frontier_traits)
 #define EMPIRE_GOALS(emp)  ((emp)->goals)
-#define EMPIRE_TRADE(emp)  ((emp)->trade)
-#define EMPIRE_LOGS(emp)  ((emp)->logs)
-#define EMPIRE_TERRITORY_LIST(emp)  ((emp)->territory_list)
-#define EMPIRE_CITY_LIST(emp)  ((emp)->city_list)
-#define EMPIRE_TERRITORY(emp, type)  ((emp)->territory[(type)])
-#define EMPIRE_WEALTH(emp)  ((emp)->wealth)
-#define EMPIRE_POPULATION(emp)  ((emp)->population)
+#define EMPIRE_GREATNESS(emp)  ((emp)->greatness)
+#define EMPIRE_HOMELESS_CITIZENS(emp)  ((emp)->homeless)
+#define EMPIRE_IMM_ONLY(emp)  ((emp)->imm_only)
+#define EMPIRE_ISLANDS(emp)  ((emp)->islands)
 #define EMPIRE_LANGUAGES(emp)  ((emp)->languages)
+#define EMPIRE_LAST_LOGON(emp)  ((emp)->last_logon)
+#define EMPIRE_LEADER(emp)  ((emp)->leader)
 #define EMPIRE_LEARNED_CRAFTS(emp)  ((emp)->learned_crafts)
+#define EMPIRE_LOGS(emp)  ((emp)->logs)
 #define EMPIRE_MAPOUT_TOKEN(emp)  ((emp)->mapout_token)
+#define EMPIRE_MAX_LEVEL(emp)  ((emp)->max_level)
+#define EMPIRE_MEMBERS(emp)  ((emp)->members)
 #define EMPIRE_MEMBER_ACCOUNTS(emp)  ((emp)->member_accounts)
 #define EMPIRE_MILITARY(emp)  ((emp)->military)
-#define EMPIRE_MAX_LEVEL(emp)  ((emp)->max_level)
 #define EMPIRE_MIN_LEVEL(emp)  ((emp)->min_level)
 #define EMPIRE_MOTD(emp)  ((emp)->motd)
-#define EMPIRE_NEEDS_SAVE(emp)  ((emp)->needs_save)
+#define EMPIRE_NAME(emp)  ((emp)->name)
 #define EMPIRE_NEEDS_LOGS_SAVE(emp)  ((emp)->needs_logs_save)
+#define EMPIRE_NEEDS_SAVE(emp)  ((emp)->needs_save)
 #define EMPIRE_NEEDS_STORAGE_SAVE(emp)  ((emp)->needs_storage_save)
 #define EMPIRE_NEXT_TIMEOUT(emp)  ((emp)->next_timeout)
+#define EMPIRE_NUM_RANKS(emp)  ((emp)->num_ranks)
+#define EMPIRE_OFFENSES(emp)  ((emp)->offenses)
 #define EMPIRE_PLAYTIME_TRACKER(emp)  ((emp)->playtime_tracker)
+#define EMPIRE_POPULATION(emp)  ((emp)->population)
+#define EMPIRE_PRIV(emp, num)  ((emp)->priv[(num)])
 #define EMPIRE_PRODUCTION_LIMITS(emp)  ((emp)->production_limits)
 #define EMPIRE_PRODUCTION_LOGS(emp)  ((emp)->production_logs)
 #define EMPIRE_PRODUCTION_TOTALS(emp)  ((emp)->production_totals)
 #define EMPIRE_PROGRESS_POINTS(emp, type)  ((emp)->progress_points[(type)])
 #define EMPIRE_PROGRESS_POOL(emp)  EMPIRE_ATTRIBUTE((emp), EATT_PROGRESS_POOL)
-#define EMPIRE_GREATNESS(emp)  ((emp)->greatness)
-#define EMPIRE_TECH(emp, num)  ((emp)->tech[(num)])
-#define EMPIRE_MEMBERS(emp)  ((emp)->members)
-#define EMPIRE_TOTAL_MEMBER_COUNT(emp)  ((emp)->total_member_count)
-#define EMPIRE_TOTAL_PLAYTIME(emp)  ((emp)->total_playtime)
-#define EMPIRE_IMM_ONLY(emp)  ((emp)->imm_only)
-#define EMPIRE_FAME(emp)  ((emp)->fame)
-#define EMPIRE_LAST_LOGON(emp)  ((emp)->last_logon)
+#define EMPIRE_RANK(emp, num)  ((emp)->rank[(num)])
 #define EMPIRE_SCORE(emp, num)  ((emp)->scores[(num)])
 #define EMPIRE_SHIPPING_LIST(emp)  ((emp)->shipping_list)
 #define EMPIRE_SORT_VALUE(emp)  ((emp)->sort_value)
+#define EMPIRE_TECH(emp, num)  ((emp)->tech[(num)])
+#define EMPIRE_TERRITORY(emp, type)  ((emp)->territory[(type)])
+#define EMPIRE_TERRITORY_LIST(emp)  ((emp)->territory_list)
 #define EMPIRE_THEFT_LOGS(emp)  ((emp)->theft_logs)
-#define EMPIRE_UNIQUE_STORAGE(emp)  ((emp)->unique_store)
-#define EMPIRE_WORKFORCE_TRACKER(emp)  ((emp)->ewt_tracker)
-#define EMPIRE_ISLANDS(emp)  ((emp)->islands)
 #define EMPIRE_TOP_SHIPPING_ID(emp)  ((emp)->top_shipping_id)
-#define EMPIRE_OFFENSES(emp)  ((emp)->offenses)
+#define EMPIRE_TOTAL_MEMBER_COUNT(emp)  ((emp)->total_member_count)
+#define EMPIRE_TOTAL_PLAYTIME(emp)  ((emp)->total_playtime)
+#define EMPIRE_TRADE(emp)  ((emp)->trade)
+#define EMPIRE_UNIQUE_STORAGE(emp)  ((emp)->unique_store)
+#define EMPIRE_WEALTH(emp)  ((emp)->wealth)
+#define EMPIRE_WORKFORCE_LAST_LOG_AND_NEEDS(emp)  ((emp)->wf_log_and_needs_time)
 #define EMPIRE_WORKFORCE_LOG(emp)  ((emp)->wf_log)
+#define EMPIRE_WORKFORCE_TRACKER(emp)  ((emp)->ewt_tracker)
 #define EMPIRE_WORKFORCE_WHERE_LOG(emp)  ((emp)->wf_where_log)
 
 // helpers
@@ -1783,7 +1783,7 @@ static inline int GET_SEASON(room_data *room) {
 #define VEH_MOVE_TYPE(veh)  ((veh)->attributes->move_type)
 #define VEH_RELATIONS(veh)  ((veh)->attributes->relations)
 #define VEH_REQUIRES_CLIMATE(veh)  ((veh)->attributes->requires_climate)
-#define VEH_YEARLY_MAINTENANCE(veh)  ((veh)->attributes->yearly_maintenance)
+#define VEH_REGULAR_MAINTENANCE(veh)  ((veh)->attributes->regular_maintenance)
 #define VEH_SIZE(veh)  ((veh)->attributes->size)
 #define VEH_SPAWNS(veh)  ((veh)->attributes->spawns)
 #define VEH_SPEED_BONUSES(veh)  ((veh)->attributes->veh_move_speed)
@@ -1901,7 +1901,6 @@ bool empire_can_claim(empire_data *emp);
 int get_total_score(empire_data *emp);
 bool ignore_distrustful_due_to_start_loc(room_data *loc);
 bool is_trading_with(empire_data *emp, empire_data *partner);
-void process_imports();
 void resort_empires(bool force);
 
 // empire diplomacy utils from utils.c
@@ -2006,7 +2005,7 @@ sector_data *get_sect_by_name(char *name);
 bool any_isname(const char *str, const char *namelist);
 bitvector_t asciiflag_conv(char *flag);
 char *bitv_to_alpha(bitvector_t flags);
-char *colon_time(int seconds, bool minutes_instead, char *unlimited_str);
+char *colon_time(long seconds, bool minutes_instead, char *unlimited_str);
 char *delete_doubledollar(char *string);
 char *double_map_ampersands(char *icon);;
 const char *double_percents(const char *string);
@@ -2159,7 +2158,6 @@ obj_data *find_lighter_in_list(obj_data *list, bool *had_keep);
 bool get_check_money(char_data *ch, obj_data *obj);
 void identify_obj_to_char(obj_data *obj, char_data *ch, bool simple);
 int obj_carry_size(obj_data *obj);
-void process_shipping();
 void remove_armor_by_type(char_data *ch, int armor_type);
 void remove_honed_gear(char_data *ch);
 void sail_shipment(empire_data *emp, vehicle_data *boat);
@@ -2330,6 +2328,7 @@ bool check_hit_vs_dodge(char_data *attacker, char_data *victim, bool off_hand);
 void death_log(char_data *ch, char_data *killer, int type);
 void death_restore(char_data *ch);
 double get_base_dps(obj_data *weapon);
+int get_burn_down_time_seconds(room_data *room);
 int get_block_rating(char_data *ch, bool can_gain_skill);
 double get_combat_speed(char_data *ch, int pos);
 int get_dodge_modifier(char_data *ch, char_data *attacker, bool can_gain_skill);

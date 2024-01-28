@@ -1,9 +1,9 @@
 #10550
 Polar Wind~
-   Venture into the Permafrost and defeat the mad ice druids within. Somewhere
-in that realm is the plans for the Polar Wind, a great exploratory ship capable
-of reaching the farthest parts of the world. Construct this magnificent vessel,
-for the glory of the empire!
+   Venture into the Permafrost and defeat the mad frostweavers within.
+Somewhere in that realm is the plans for the Polar Wind, a great exploratory
+ship capable of reaching the farthest parts of the world. Construct this
+magnificent vessel, for the glory of the empire!
 ~
 1 4 0 5 c
 K 7 5

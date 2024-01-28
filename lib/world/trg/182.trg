@@ -1557,7 +1557,7 @@ Give wildling net on quest start~
 %load% obj 18256 %actor% inv
 ~
 #18258
-Adventurer Guild, Monsoon Attunement: Speak to Druid~
+Adventurer Guild, Monsoon Attunement: Speak to Manaweaver~
 0 c 0
 speak~
 if %actor.inventory(18258)%
@@ -1588,10 +1588,10 @@ while %cycles_left% >= 0
   switch %cycles_left%
     case 5
       %echoaround% %actor% ~%actor% starts talking to ~%self%...
-      %send% %actor% You greet the druid and ask *%self% about the rift...
+      %send% %actor% You greet the manaweaver and ask *%self% about the rift...
     break
     case 4
-      say We druids open these rifts wherever the desert is oppressed by the advance of the cities of mankind.
+      say We weavers open these rifts wherever the desert is oppressed by the advance of the cities of mankind.
     break
     case 3
       say As we quench the desert with our magical rain, the plants themselves take up arms to defend their homes.
@@ -1619,7 +1619,7 @@ done
 Monsoon quest finish: trigger adventurer guild quest~
 2 v 100
 ~
-* Have we already talked to the druid?
+* Have we already talked to the manaweaver?
 if %actor.on_quest(18258)% && %actor.inventory(18258)%
   %quest% %actor% trigger 18258
 end

@@ -42,6 +42,7 @@ ACMD(do_weather);
 
 void mudstats_configs(char_data *ch, char *argument);
 void mudstats_empires(char_data *ch, char *argument);
+void mudstats_time(char_data *ch, char *argument);
 
 // local protos
 ACMD(do_affects);
@@ -3784,6 +3785,7 @@ ACMD(do_mudstats) {
 	} stat_list[] = {
 		{ "configs", mudstats_configs },
 		{ "empires", mudstats_empires },
+		{ "time", mudstats_time },
 		
 		// last
 		{ "\n", NULL }

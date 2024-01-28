@@ -3202,7 +3202,7 @@ bool check_ability_limitations(char_data *ch, ability_data *abil, char_data *vic
 	bool want_role = FALSE, have_role = FALSE;
 	bool want_room_permission = FALSE, have_room_permission = FALSE;
 	bool want_weapon = FALSE, have_weapon = FALSE;
-	char dot_error[256], item_type_error[256], role_error[256], room_permission_error[256], weapon_error[256];
+	char dot_error[1024], item_type_error[1024], role_error[1024], room_permission_error[1024], weapon_error[1024];
 	
 	#define _set_fatal_error(val)		if (fatal_error) { *fatal_error = (val); }
 	_set_fatal_error(FALSE);
@@ -6564,7 +6564,7 @@ void send_ability_per_vehicle_message(char_data *ch, vehicle_data *vvict, int qu
 */
 void send_ability_special_messages(char_data *ch, char_data *vict, obj_data *ovict, ability_data *abil, struct ability_exec *data, char **replace, int replace_count) {
 	bool invis;
-	char tok[4];
+	char tok[256];
 	char *msg, *repl;
 	int iter;
 	bitvector_t act_flags = NOBITS;
@@ -10372,7 +10372,7 @@ void olc_fullsearch_abil(char_data *ch, char *argument) {
 		}
 		
 		else {	// not sure what to do with it? treat it like a keyword
-			sprintf(find_keywords + strlen(find_keywords), "%s%s", *find_keywords ? " " : "", type_arg);
+			snprintf(find_keywords + strlen(find_keywords), sizeof(find_keywords) - strlen(find_keywords), "%s%s", *find_keywords ? " " : "", type_arg);
 		}
 		
 		// prepare for next loop
@@ -10807,7 +10807,7 @@ char *ability_data_display(struct ability_data_list *adl) {
 */
 char *ability_hook_display(struct ability_hook *ahook) {
 	static char output[MAX_STRING_LENGTH];
-	char type_str[256], label[256];
+	char type_str[256], label[1024];
 	
 	prettier_sprintbit(ahook->type, ability_hook_types, type_str);
 	snprintf(label, sizeof(label), "%s %.2f%%", type_str, ahook->percent);

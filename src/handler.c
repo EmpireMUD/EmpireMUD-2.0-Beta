@@ -2541,7 +2541,7 @@ bool can_afford_coins(char_data *ch, empire_data *type, int amount) {
 * @param char *build_string Optional: if not NULL, will build a string of exactly what was charged, e.g. "450 crown coins and 100 miscellaneous coins". This string should ideally be MAX_STRING_LENGTH, but in practice will be way shorter.
 */
 void charge_coins(char_data *ch, empire_data *type, int amount, struct resource_data **build_used_list, char *build_string) {
-	struct coin_data *coin;
+	struct coin_data *coin, *next_coin;
 	char temp[1024];
 	char *ptr;
 	int this, this_amount;
@@ -2589,14 +2589,15 @@ void charge_coins(char_data *ch, empire_data *type, int amount, struct resource_
 		}
 	}
 	
-	for (coin = GET_PLAYER_COINS(ch); coin && amount > 0; coin = coin->next) {
+	for (coin = GET_PLAYER_COINS(ch); coin && amount > 0; coin = next_coin) {
+		next_coin = coin->next;
+		
 		if ((type == REAL_OTHER_COIN || coin->empire_id != EMPIRE_VNUM(type)) && coin->empire_id != OTHER_COIN) {
 			emp = real_empire(coin->empire_id);
 			// inverse exchange rate to figure out how much we owe
 			inv = 1.0 / (rate = exchange_rate(emp, type));
 			this_amount = round(amount * inv);
 			this = MIN(coin->amount, this_amount);
-			decrease_coins(ch, emp, this);
 			// we know it was at least one -- prevent never-hits-zero errors
 			amount -= MAX(1, round(this * rate));
 			
@@ -2606,6 +2607,9 @@ void charge_coins(char_data *ch, empire_data *type, int amount, struct resource_
 			if (build_string) {
 				sprintf(build_string + strlen(build_string), "%s%s", (*build_string ? ", " : ""), money_amount(real_empire(coin->empire_id), this));
 			}
+			
+			// decrease last: may delete the entry if it was the last coin
+			decrease_coins(ch, emp, this);
 		}
 	}
 
@@ -11158,7 +11162,7 @@ void add_storage_timer(struct storage_timer **list, int timer, int amount) {
 	struct storage_timer *iter, *st;
 	bool done = FALSE;
 	
-	if (amount < 1 || timer < 1 || !config_get_bool("decay_in_storage")) {
+	if (amount < 1 || timer < 1) {
 		return;	// no work; does not bother if decay is off
 	}
 	

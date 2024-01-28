@@ -543,9 +543,9 @@ void b4_15_building_update(void) {
 		// convert maintenance
 		if (COMPLEX_DATA(room) && GET_BUILDING(room) && COMPLEX_DATA(room)->disrepair > 0) {
 			// add maintenance
-			if (GET_BLD_YEARLY_MAINTENANCE(GET_BUILDING(room))) {
+			if (GET_BLD_REGULAR_MAINTENANCE(GET_BUILDING(room))) {
 				// basic stuff
-				disrepair_res = copy_resource_list(GET_BLD_YEARLY_MAINTENANCE(GET_BUILDING(room)));
+				disrepair_res = copy_resource_list(GET_BLD_REGULAR_MAINTENANCE(GET_BUILDING(room)));
 
 				// multiply by years of disrepair
 				LL_FOREACH(disrepair_res, res) {
@@ -812,7 +812,7 @@ void b5_1_global_update(void) {
 	
 	// buildings
 	HASH_ITER(hh, building_table, bld, next_bld) {
-		LL_FOREACH(GET_BLD_YEARLY_MAINTENANCE(bld), res) {
+		LL_FOREACH(GET_BLD_REGULAR_MAINTENANCE(bld), res) {
 			if (res->type == RES_ACTION && res->vnum < 100) {
 				res->vnum += 1000;
 				save_library_file_for_vnum(DB_BOOT_BLD, GET_BLD_VNUM(bld));
@@ -822,7 +822,7 @@ void b5_1_global_update(void) {
 	
 	// vehicles
 	HASH_ITER(hh, vehicle_table, veh, next_veh) {
-		LL_FOREACH(VEH_YEARLY_MAINTENANCE(veh), res) {
+		LL_FOREACH(VEH_REGULAR_MAINTENANCE(veh), res) {
 			if (res->type == RES_ACTION && res->vnum < 100) {
 				res->vnum += 1000;
 				save_library_file_for_vnum(DB_BOOT_VEH, VEH_VNUM(veh));
@@ -2098,7 +2098,7 @@ void b5_88_resource_components_update(void) {
 	// buildings
 	HASH_ITER(hh, building_table, bld, next_bld) {
 		any = FALSE;
-		LL_FOREACH(GET_BLD_YEARLY_MAINTENANCE(bld), res) {
+		LL_FOREACH(GET_BLD_REGULAR_MAINTENANCE(bld), res) {
 			if (res->type == RES_COMPONENT && res->vnum < 100) {
 				if ((vn = b5_88_old_component_to_new_component(res->vnum, res->misc)) != NOTHING) {
 					log("- converting resource on building [%d] %s from (%d %s) to [%d] %s", GET_BLD_VNUM(bld), GET_BLD_NAME(bld), res->vnum, bitv_to_alpha(res->misc), vn, get_generic_name_by_vnum(vn));
@@ -2218,7 +2218,7 @@ void b5_88_resource_components_update(void) {
 	// vehicles
 	HASH_ITER(hh, vehicle_table, veh, next_veh) {
 		any = FALSE;
-		LL_FOREACH(VEH_YEARLY_MAINTENANCE(veh), res) {
+		LL_FOREACH(VEH_REGULAR_MAINTENANCE(veh), res) {
 			if (res->type == RES_COMPONENT && res->vnum < 100) {
 				if ((vn = b5_88_old_component_to_new_component(res->vnum, res->misc)) != NOTHING) {
 					log("- converting resource on vehicle [%d] %s from (%d %s) to [%d] %s", VEH_VNUM(veh), VEH_SHORT_DESC(veh), res->vnum, bitv_to_alpha(res->misc), vn, get_generic_name_by_vnum(vn));
@@ -2460,7 +2460,7 @@ void b5_94_terrain_heights(void) {
 }
 
 
-// b5.99 replaces chant of druids with a pair of triggers, which must be
+// b5.99 replaces chant of magic/druids with a pair of triggers, which must be
 // attached to all live buildings
 void b5_99_henge_triggers(void) {
 	const any_vnum main_trig = 5142, second_trig = 5143;
@@ -3598,7 +3598,7 @@ void b5_169_book_move(void) {
 	player_index_data *index, *next_index;
 	struct author_data *author, *next_author;
 	struct empire_unique_storage *eus;
-	struct library_data *libr, *next_libr;
+	struct library_info *library, *next_library;
 	struct trading_post_data *tpd;
 	
 	// list to keep as-is
@@ -3650,10 +3650,6 @@ void b5_169_book_move(void) {
 		copied = setup_olc_book(book);
 		BOOK_VNUM(copied) = new_vnum;
 		add_book_to_table(copied);
-		
-		// swap in-library data; this will be correct soon
-		BOOK_IN_LIBRARIES(copied) = BOOK_IN_LIBRARIES(book);
-		BOOK_IN_LIBRARIES(book) = NULL;
 		
 		// delete old book
 		remove_book_from_table(book);
@@ -3738,14 +3734,12 @@ void b5_169_book_move(void) {
 		}
 	}
 	
-	// and lastly, audit remaining books for invalid library locations
-	HASH_ITER(hh, book_table, book, next_book) {
-		HASH_ITER(hh, BOOK_IN_LIBRARIES(book), libr, next_libr) {
-			if (!(room = real_room(libr->location)) || !HAS_FUNCTION(room, FNC_LIBRARY)) {
-				// invalid location
-				HASH_DEL(BOOK_IN_LIBRARIES(book), libr);
-				free(libr);
-			}
+	// and lastly, audit libraries for invalid locations
+	HASH_ITER(hh, library_table, library, next_library) {
+		if (!(room = real_room(library->room)) || !HAS_FUNCTION(room, FNC_LIBRARY)) {
+			HASH_DEL(library_table, library);
+			free_library_info(library);
+			book_library_file_needs_save = TRUE;
 		}
 	}
 	
@@ -3955,6 +3949,139 @@ void b5_173_tavern_update(void) {
 }
 
 
+// b5.174: copy old config to new config
+void b5_174_config_change(void) {
+	struct config_type *get_config_by_key(char *key, bool exact);
+	struct config_type *config;
+	
+	if (strcmp(config_get_string("newyear_message"), "The ground under you shakes violently!")) {
+		// had a custom message -- copy it over
+		if ((config = get_config_by_key("world_reset_message", TRUE))) {
+			log("- copying message");
+			if (config->data.string_val) {
+				free(config->data.string_val);
+			}
+			config->data.string_val = str_dup(config_get_string("newyear_message"));
+			save_config_system();
+		}
+	}
+}
+
+
+// b5.174: converts stock books to author 0 and saves all book/library files
+void b5_174_library_and_author_update(void) {
+	void write_book_library_file();
+	bool found;
+	int iter;
+	book_data *book, *next_book;
+	struct author_data *author, *next_author;
+
+	// list to keep as-is
+	int core_book_list[] = { 1, 2, 3, 4, 5, 7, 8, 9, 10, 11, 13, 14, 15, 16, 17, 18, 19, 24, 5511, 11862, -1 };	// terminated by -1
+	
+	HASH_ITER(hh, book_table, book, next_book) {
+		// is it a core book?
+		for (iter = 0, found = FALSE; core_book_list[iter] != -1 && !found; ++iter) {
+			if (BOOK_VNUM(book) == core_book_list[iter]) {
+				found = TRUE;
+			}
+		}
+		if (!found) {
+			// skip books NOT on the core list
+			continue;
+		}
+		
+		// OK:
+		// ensure author is 0 (no author for core books)
+		BOOK_AUTHOR(book) = 0;
+	}
+	
+	// ensure author is in table, and save the index
+	add_book_author(0);
+	save_author_index();
+	
+	// save all books now
+	HASH_ITER(hh, author_table, author, next_author) {
+		save_author_books(author->idnum);
+	}
+	
+	// ensure library file is saved
+	write_book_library_file();
+}
+
+
+// b5.174: new triggers on libraries
+void b5_174_library_triggers(void) {
+	struct trig_proto_list *tpl;
+	room_data *room, *next_room;
+	int count = 0;
+	
+	// some vnums
+	any_vnum LIBRARY_BUILDING = 5149;
+	any_vnum DRAGON_LIBRARY_BUILDING = 10926;
+	any_vnum LIBRARY_ROOM = 18895;
+	
+	any_vnum LIBRARY_TRIG_1 = 5149;
+	
+	if (!real_trigger(LIBRARY_TRIG_1)) {
+		log("- library update skipped because trig %d doesn't exist", LIBRARY_TRIG_1);
+		return;
+	}
+	
+	HASH_ITER(hh, world_table, room, next_room) {
+		if (!GET_BUILDING(room)) {
+			continue;
+		}
+		
+		if (GET_BLD_VNUM(GET_BUILDING(room)) == LIBRARY_BUILDING || GET_BLD_VNUM(GET_BUILDING(room)) == DRAGON_LIBRARY_BUILDING || GET_BLD_VNUM(GET_BUILDING(room)) == LIBRARY_ROOM) {
+			CREATE(tpl, struct trig_proto_list, 1);
+			tpl->vnum = LIBRARY_TRIG_1;
+			LL_APPEND(room->proto_script, tpl);
+		
+			assign_triggers(room, WLD_TRIGGER);
+			++count;
+		}
+	}
+	
+	log("- updated %d libraries", count);
+}
+
+
+// b5.174: new triggers on taverns
+void b5_174_tavern_triggers(void) {
+	struct trig_proto_list *tpl;
+	room_data *room, *next_room;
+	int count = 0;
+	
+	// some vnums
+	any_vnum TAVERN_BUILDING = 5138;
+	
+	any_vnum TAVERN_TRIG_1 = 5141;
+	
+	if (!real_trigger(TAVERN_TRIG_1)) {
+		log("- tavern update skipped because trig %d doesn't exist", TAVERN_TRIG_1);
+		return;
+	}
+	
+	HASH_ITER(hh, world_table, room, next_room) {
+		if (!GET_BUILDING(room)) {
+			continue;
+		}
+		
+		if (GET_BLD_VNUM(GET_BUILDING(room)) == TAVERN_BUILDING) {
+			CREATE(tpl, struct trig_proto_list, 1);
+			tpl->vnum = TAVERN_TRIG_1;
+			LL_APPEND(room->proto_script, tpl);
+		
+			assign_triggers(room, WLD_TRIGGER);
+			++count;
+		}
+	}
+	
+	log("- updated %d taverns", count);
+}
+
+
 // ADD HERE, above: more beta 5 update functions
 
 
@@ -4062,6 +4189,10 @@ const struct {
 	{ "b5.171", b5_171_bath_triggers, NULL, "Assigning new triggers to baths" },
 	{ "b5.172", b5_169_city_centers, NULL, "Re-applying names to city centers to fix hide-real-name" },
 	{ "b5.172a", b5_173_tavern_update, NULL, "Applying the tavern update (moved to new progress reward)" },
+	{ "b5.174", b5_174_config_change, NULL, "Copying newyear_message to world_reset_message if needed" },
+	{ "b5.174a", b5_174_library_and_author_update, NULL, "Renumbering stock book authors and saving updated library and book files" },
+	{ "b5.174b", b5_174_library_triggers, NULL, "Updating libraries with new triggers" },
+	{ "b5.174c", b5_174_tavern_triggers, NULL, "Updating taverns with new triggers" },
 	
 	// ADD HERE, above: more beta 5 update lines
 	

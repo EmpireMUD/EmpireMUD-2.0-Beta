@@ -204,7 +204,7 @@ the thing belongs to no empire, this will be empty.
 
 When using field - The variable returns:
 &cadd_progress(vnum)&0 - Grants a progression goal (preferably set NO-AUTOSTART).
-&cadj&0 - Adjective form of the empire's name.
+&cadjective&0 - Adjective form of the empire's name.
 &cbanner&0 - Empire's banner (as a color code).
 &ccan_recognize_lang(lang,on|off)&0 - Whether the empire can at least recognize
    a language. Optional on/off 2nd arg grants/removes this from the empire but

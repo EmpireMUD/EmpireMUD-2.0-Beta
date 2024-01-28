@@ -658,8 +658,8 @@ void free_building(bld_data *bdg) {
 		free_proto_scripts(&GET_BLD_SCRIPTS(bdg));
 	}
 	
-	if (GET_BLD_YEARLY_MAINTENANCE(bdg) && (!proto || GET_BLD_YEARLY_MAINTENANCE(bdg) != GET_BLD_YEARLY_MAINTENANCE(proto))) {
-		free_resource_list(GET_BLD_YEARLY_MAINTENANCE(bdg));
+	if (GET_BLD_REGULAR_MAINTENANCE(bdg) && (!proto || GET_BLD_REGULAR_MAINTENANCE(bdg) != GET_BLD_REGULAR_MAINTENANCE(proto))) {
+		free_resource_list(GET_BLD_REGULAR_MAINTENANCE(bdg));
 	}
 	
 	if (GET_BLD_RELATIONS(bdg) && (!proto || GET_BLD_RELATIONS(bdg) != GET_BLD_RELATIONS(proto))) {
@@ -813,8 +813,8 @@ void parse_building(FILE *fl, bld_vnum vnum) {
 				break;
 			}
 			
-			case 'R': {	// resources/yearly maintenance
-				parse_resource(fl, &GET_BLD_YEARLY_MAINTENANCE(bld), buf2);
+			case 'R': {	// resources/regular maintenance
+				parse_resource(fl, &GET_BLD_REGULAR_MAINTENANCE(bld), buf2);
 				break;
 			}
 			
@@ -958,7 +958,7 @@ void write_building_to_file(FILE *fl, bld_data *bld) {
 	}
 	
 	// 'R': resources
-	write_resources_to_file(fl, 'R', GET_BLD_YEARLY_MAINTENANCE(bld));
+	write_resources_to_file(fl, 'R', GET_BLD_REGULAR_MAINTENANCE(bld));
 	
 	// T: triggers
 	write_trig_protos_to_file(fl, 'T', GET_BLD_SCRIPTS(bld));
@@ -1565,8 +1565,6 @@ void remove_empire_from_table(empire_data *emp) {
 * icon-locking is done.
 */
 void check_for_new_map(void) {
-	book_data *book, *next_book;
-	struct author_data *author, *next_author;
 	struct empire_storage_data *store, *next_store, *new_store;
 	struct empire_territory_data *ter, *next_ter;
 	struct empire_trade_data *trade, *next_trade;
@@ -1575,7 +1573,7 @@ void check_for_new_map(void) {
 	struct empire_island *isle, *next_isle;
 	struct instance_data *inst, *next_inst;
 	struct empire_unique_storage *eus;
-	struct library_data *libr, *next_libr;
+	struct library_info *library, *next_library;
 	empire_data *emp, *next_emp;
 	struct map_data *map;
 	room_data *room;
@@ -1715,7 +1713,7 @@ void check_for_new_map(void) {
 	// map checks:
 	LL_FOREACH(land_map, map) {
 		// check icon-locking:
-		if (!map->shared->icon && SECT_FLAGGED(map->sector_type, SECTF_LOCK_ICON)) {
+		if (!map->shared->icon && (SECT_FLAGGED(map->sector_type, SECTF_LOCK_ICON) || (SECT_FLAGGED(map->sector_type, SECTF_CROP) && map->crop_type && CROP_FLAGGED(map->crop_type, CROPF_LOCK_ICON)))) {
 			lock_icon(real_room(map->vnum), NULL);
 		}
 		
@@ -1726,14 +1724,9 @@ void check_for_new_map(void) {
 	}
 	
 	// clear libraries (they were lost in the map wipe)
-	HASH_ITER(hh, book_table, book, next_book) {
-		HASH_ITER(hh, BOOK_IN_LIBRARIES(book), libr, next_libr) {
-			HASH_DEL(BOOK_IN_LIBRARIES(book), libr);
-			free(libr);
-		}
-	}
-	HASH_ITER(hh, author_table, author, next_author) {
-		save_author_books(author->idnum);
+	HASH_ITER(hh, library_table, library, next_library) {
+		HASH_DEL(library_table, library);
+		free_library_info(library);
 	}
 	
 	setup_start_locations();
@@ -2461,6 +2454,17 @@ void load_empire_storage_one(FILE *fl, empire_data *emp) {
 			exit(1);
 		}
 		switch (*line) {
+			case 'A': {	// data: A # <value>
+				if (sscanf(line, "A 0 %ld", &l_in) == 1) {
+					EMPIRE_WORKFORCE_LAST_LOG_AND_NEEDS(emp) = l_in;
+				}
+				else {
+					log("SYSERR: Storage A data entry for %s was invalid", err_str);
+					exit(1);
+				}
+				
+				break;
+			}
 			case 'L': {	// production limit/logs
 				// uses a subtype
 				switch (*(line+1)) {
@@ -3510,6 +3514,11 @@ void write_empire_storage_to_file(FILE *fl, empire_data *emp) {
 
 	if (!emp) {
 		return;
+	}
+	
+	// A: data
+	if (EMPIRE_WORKFORCE_LAST_LOG_AND_NEEDS(emp)) {
+		fprintf(fl, "A 0 %ld\n", EMPIRE_WORKFORCE_LAST_LOG_AND_NEEDS(emp));
 	}
 	
 	// L: production limits
@@ -8540,6 +8549,7 @@ void free_whole_library(void) {
 	struct global_data *glb, *next_glb;
 	struct int_hash *int_iter, *next_int_iter;
 	struct island_info *island, *next_island;
+	struct library_info *library, *next_library;
 	attack_message_data *amd, *next_amd;
 	morph_data *morph, *next_morph;
 	obj_data *obj, *next_obj;
@@ -8636,6 +8646,12 @@ void free_whole_library(void) {
 		}
 		HASH_DEL(island_table, island);
 		free(island);
+	}
+	
+	// free libraries
+	HASH_ITER(hh, library_table, library, next_library) {
+		HASH_DEL(library_table, library);
+		free_library_info(library);
 	}
 	
 	// ensure these are gone

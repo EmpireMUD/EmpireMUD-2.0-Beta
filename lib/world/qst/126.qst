@@ -159,16 +159,16 @@ S
 #12650
 Grove: Tranquility of the Grove~
    This little orange fox looks up at you, with fire in its eyes. It explains
-that it is the avatar of the Grove Spirit, and that the druids inside have
-become corrupted by rage. The druids are preparing to invade your world through
+that it is the avatar of the Grove Spirit, and that the mages inside have
+become corrupted by rage. The mages are preparing to invade your world through
 the portal, and they must be stopped before someone gets hurt. The fox believes
-someone with your natural power can save the druids without violence. You
-receive a totem of tranquility. Explore the grove, find the four druid leads,
-and 'chant tranquility' to pacify them. The leaders are the Druid of the
-Badger, the Druid of the Crow, the Druid of the Turtle, and their leader, the
-Archdruid.
+someone with your natural power can save the mages without violence. You
+receive a totem of tranquility. Explore the grove, find the four manaweaver
+leaders, and 'chant tranquility' to pacify them. The leaders are the Weaver of
+the Badger, the Weaver of the Crow, the Weaver of the Turtle, and their leader,
+the Archweaver.
 ~
-   You have tranquilized the Grove and saved the druids! Hopefully they don't
+   You have tranquilized the Grove and saved the mages! Hopefully they don't
 get into this kind of trouble again... You receive some magical food, in
 addition to the wooden nickels you already earned.
 ~
@@ -189,21 +189,21 @@ T 12685
 T 12681
 W+
 11 0 0 4 -
-Tranquilize the druid leaders~
+Tranquilize the manaweaver leaders~
 Z
 1 12676
 S
 #12651
 Grove: Invasion of the Grove~
    The little orange fox looks up at you, with fire in its eyes. It explains
-that it is the avatar of the Grove Spirit, and that the druids inside have
-become corrupted by rage. The fox seems distraught that the Archdruid might be
+that it is the avatar of the Grove Spirit, and that the manaweavers inside have
+become corrupted by rage. The fox seems distraught that the Archweaver might be
 preparing to lead an invasion to spread the mystical forests of the Grove into
 your world, and they must be stopped before the Grove begins to spread. If you
-could sneak past the Archdruid's minions and assassinate the Grove's leaders,
+could sneak past the Archweaver's minions and assassinate the Grove's leaders,
 your world might be saved without too much bloodshed. Track down and kill the
-Druid of the Badger, the Druid of the Crow, the Druid of the Turtle, and their
-leader, the Archdruid.
+Weaver of the Badger, the Weaver of the Crow, the Weaver of the Turtle, and
+their nefarious leader, the Archweaver.
 ~
    The fox looks down, sad, but accepts that you did what you had to do. You
 receive some magical food, in addition to the wooden nickels you already
@@ -243,12 +243,13 @@ S
 #12652
 Grove: Invasion of the Grove~
    The little orange fox looks up at you, with fire in its eyes. It explains
-that it is the avatar of the Grove Spirit, and that the druids inside have
-become corrupted by rage. The fox seems distraught that the Archdruid might be
+that it is the avatar of the Grove Spirit, and that the manaweavers inside have
+become corrupted by rage. The fox seems distraught that the Archweaver might be
 preparing to lead an invasion to spread the mystical forests of the Grove into
 your world, and they must be stopped before the Grove begins to spread. Find
-and defeat the four leaders of the Grove: the Druid of the Badger, the Druid of
-the Crow, the Druid of the Turtle, and their leader, the Archdruid.
+and defeat the four leaders of the Grove: the Weaver of the Badger, the Weaver
+of the Crow, the Weaver of the Turtle, and their leader, the fiendish
+Archweaver.
 ~
    The fox thanks you for doing what must be done, but it looks despondent at
 what you were forced to do to save your world. You receive some magical food,

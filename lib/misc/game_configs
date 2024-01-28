@@ -70,8 +70,9 @@ mining_timer 45
 panning_timer 10
 pick_base_timer 4
 pick_depletion 14
-planting_base_timer 9000
-prospecting_workforce_hours 1440
+planting_base_timer 192
+planting_workforce_timer 24
+prospecting_workforce_hours 30
 shear_growth_time 6
 short_depletion 25
 tan_timer 12
@@ -81,6 +82,8 @@ trench_fill_time 43200
 trench_full_value 2000
 trench_gain_from_rain 5
 trench_initial_value -500
+world_reset_hours 180
+world_reset_message The ground under you shakes violently!
 *
 * City configs
 bonus_city_point_techs 10

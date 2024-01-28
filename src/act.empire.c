@@ -5154,7 +5154,7 @@ ACMD(do_empire_inventory) {
 	if (!*arg || (GET_ACCESS_LEVEL(ch) < LVL_CIMPL && !IS_GRANTED(ch, GRANT_EMPIRES))) {
 		emp = GET_LOYALTY(ch);
 		if (*arg2) {
-			sprintf(buf, "%s %s", arg, arg2);
+			snprintf(buf, sizeof(buf), "%s %s", arg, arg2);
 			strcpy(arg2, buf);
 		}
 		else {
@@ -5167,7 +5167,7 @@ ACMD(do_empire_inventory) {
 		if (!emp) {
 			emp = GET_LOYALTY(ch);
 			if (*arg2) {
-				sprintf(buf, "%s %s", arg, arg2);
+				snprintf(buf, sizeof(buf), "%s %s", arg, arg2);
 				strcpy(arg2, buf);
 			}
 			else {

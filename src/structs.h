@@ -1041,6 +1041,7 @@ typedef struct vehicle_data vehicle_data;
 #define CROPF_NO_NEWBIE  BIT(4)	// never spawns on newbie islands
 #define CROPF_ANY_LISTED_CLIMATE  BIT(5)	// climtes are "or" not "and"
 #define CROPF_NO_GLOBAL_SPAWNS  BIT(6)	// won't use global spawn lists
+#define CROPF_LOCK_ICON  BIT(7)	// similar to sectors; crop has a permanent random icon
 
 
 // CROP_CUSTOM_x: custom messages
@@ -1454,7 +1455,8 @@ typedef struct vehicle_data vehicle_data;
 #define DOT_INTERVAL  5	// seconds per tick for damage-over-time
 #define HISTORY_SIZE  5	// Keep last 5 commands.
 #define MOB_RESTORE_INTERVAL  60	// seconds between when a mob loses health and when it starts checking to restore itself
-#define WORKFORCE_CYCLE  76	// seconds between workforce chore updates
+#define WORKFORCE_CYCLE  75	// seconds between workforce chore updates
+#define WORKFORCE_LOG_AND_NEEDS_CYCLE  (30 * SECS_PER_REAL_MIN)	// how often it will update workforce logs and needs
 
 
 // System timing
@@ -2968,6 +2970,7 @@ typedef enum {
 #define ISLE_HAS_CUSTOM_DESC  BIT(4)	// e. ** island has a custom desc -- internal use only (not having this flag will get the desc replaced)
 #define ISLE_NO_CHART  BIT(5)	// f. island can't be targeted with the chart command
 #define ISLE_NO_TEMPERATURE_PENALTIES  BIT(6)	// g. players are not penalized for heat/cold here
+#define ISLE_ALWAYS_LIGHT  BIT(7)	// h. outdoor tiles are always light
 
 
 // ROOM_AFF_x: Room affects -- these are similar to room flags, but if you want to set them
@@ -4131,16 +4134,24 @@ struct book_data {
 	char *item_description;
 	
 	struct paragraph_data *paragraphs;	// linked list
-	struct library_data *in_libraries;	// hash of places this book is kept
 	
 	UT_hash_handle hh;	// book_table
 };
 
 
-// linked list of locations the book occurs
-struct library_data {
-	room_vnum location;
-	UT_hash_handle hh;	// in_libraries hash
+// single book in a library
+struct library_book {
+	any_vnum vnum;		// book vnum
+	UT_hash_handle hh;	// hashed by vnum in the library
+};
+
+
+// tracks where books are stored
+struct library_info {
+	room_vnum room;	// location (hash key)
+	struct library_book *books;	// hash of books (by vnum)
+	
+	UT_hash_handle hh;
 };
 
 
@@ -4177,7 +4188,7 @@ struct bld_data {
 	struct spawn_info *spawns;	// linked list of spawn data
 	struct interaction_item *interactions;	// interaction items
 	struct trig_proto_list *proto_script;	// list of default triggers
-	struct resource_data *yearly_maintenance;	// needed each year
+	struct resource_data *regular_maintenance;	// needed each reset cycle
 	struct bld_relation *relations;	// links to buildings/vehicles
 	
 	// live data (not saved, not freed)
@@ -5580,6 +5591,9 @@ struct empire_data {
 	struct empire_playtime_tracker *playtime_tracker;	// tracks real gameplay
 	struct channel_history_data *chat_history;
 	
+	// other saved data
+	time_t wf_log_and_needs_time;	// last time we updated wf logs and needs (saved to storage file)
+	
 	// unsaved data
 	struct empire_territory_data *territory_list;	// hash table by vnum
 	struct empire_city_data *city_list;	// linked list of cities
@@ -6309,7 +6323,7 @@ struct vehicle_attribute_data {
 	bld_vnum interior_room_vnum;	// Any ROOM-flagged bld to use as an interior
 	int max_rooms;	// 1 = can enter; >1 allows designate
 	bitvector_t designate_flags;	// DES_ flags
-	struct resource_data *yearly_maintenance;
+	struct resource_data *regular_maintenance;	// needed each reset cycle
 	int veh_move_speed;  // VSPEED_ for driving action speed
 	int size;	// vehicle size
 	struct extra_descr_data *ex_description;	// extra descriptions

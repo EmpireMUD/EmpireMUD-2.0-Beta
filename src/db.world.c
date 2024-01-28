@@ -28,7 +28,7 @@
 * Contents:
 *   World-Changers
 *   Management
-*   Annual Map Update
+*   World Reset Cycle
 *   Burning Buildings
 *   City Lib
 *   Room Resets
@@ -195,7 +195,7 @@ void change_terrain(room_data *room, sector_vnum sect, sector_vnum base_sect) {
 	}
 	
 	// do we need to lock the icon?
-	if (ROOM_SECT_FLAGGED(room, SECTF_LOCK_ICON)) {
+	if (ROOM_SECT_FLAGGED(room, SECTF_LOCK_ICON) || (ROOM_SECT_FLAGGED(room, SECTF_CROP) && ROOM_CROP(room) && CROP_FLAGGED(ROOM_CROP(room), CROPF_LOCK_ICON))) {
 		lock_icon(room, NULL);
 	}
 	
@@ -503,7 +503,7 @@ void delete_room(room_data *room, bool check_exits) {
 	}
 	
 	if (HAS_FUNCTION(room, FNC_LIBRARY)) {
-		remove_library_from_books(GET_ROOM_VNUM(room));
+		delete_library(room);
 	}
 	
 	// ensure not owned (and update empire stuff if so)
@@ -1123,6 +1123,12 @@ void set_crop_type(room_data *room, crop_data *cp) {
 	ROOM_CROP(room) = cp;
 	if (GET_ROOM_VNUM(room) < MAP_SIZE) {
 		world_map[FLAT_X_COORD(room)][FLAT_Y_COORD(room)].crop_type = cp;
+		
+		// check locking
+		if (cp && ROOM_SECT_FLAGGED(room, SECTF_CROP) && CROP_FLAGGED(cp, CROPF_LOCK_ICON)) {
+			lock_icon(room, NULL);
+		}
+		
 		request_world_save(GET_ROOM_VNUM(room), WSAVE_MAP);
 	}
 	else {
@@ -1176,10 +1182,11 @@ void schedule_map_unloads(void) {
 
 
  //////////////////////////////////////////////////////////////////////////////
-//// ANNUAL MAP UPDATE ///////////////////////////////////////////////////////
+//// WORLD RESET CYCLE ///////////////////////////////////////////////////////
 
 /**
-* Updates a set of depletions (halves them each year).
+* Updates a set of depletions (quarters them each cycle). This is part of the
+* world reset.
 *
 * @param struct depletion_data **list The list to update.
 */
@@ -1200,7 +1207,7 @@ void annual_update_depletions(struct depletion_data **list) {
 
 
 /**
-* Process map-only annual updates on one map tile.
+* Process map-only world resets on one map tile.
 * Note: This is not called on OCEAN tiles (ones that don't go in the land map).
 *
 * @param struct map_data *tile The map tile to update.
@@ -1251,9 +1258,9 @@ void annual_update_map_tile(struct map_data *tile) {
 			set_room_damage(room, BUILDING_DAMAGE(room) + dmg);
 		
 			// apply maintenance resources (if any, and if it's not being dismantled, and it's either complete or has had at least 1 resource added)
-			if (GET_BLD_YEARLY_MAINTENANCE(GET_BUILDING(room)) && !IS_DISMANTLING(room) && (IS_COMPLETE(room) || GET_BUILT_WITH(room))) {
+			if (GET_BLD_REGULAR_MAINTENANCE(GET_BUILDING(room)) && !IS_DISMANTLING(room) && (IS_COMPLETE(room) || GET_BUILT_WITH(room))) {
 				old_list = GET_BUILDING_RESOURCES(room);
-				GET_BUILDING_RESOURCES(room) = combine_resources(old_list, GET_BLD_YEARLY_MAINTENANCE(GET_BUILDING(room)));
+				GET_BUILDING_RESOURCES(room) = combine_resources(old_list, GET_BLD_REGULAR_MAINTENANCE(GET_BUILDING(room)));
 				free_resource_list(old_list);
 			}
 		
@@ -1348,7 +1355,7 @@ void annual_update_map_tile(struct map_data *tile) {
 
 
 /**
-* Runs an annual update (mainly, maintenance) on the vehicle.
+* Runs world reset (mainly maintenance) on the vehicle.
 */
 void annual_update_vehicle(vehicle_data *veh) {
 	char *msg;
@@ -1364,7 +1371,7 @@ void annual_update_vehicle(vehicle_data *veh) {
 	annual_update_depletions(&VEH_DEPLETION(veh));
 	
 	// does not take annual damage (unless incomplete)
-	if (!VEH_YEARLY_MAINTENANCE(veh) && VEH_IS_COMPLETE(veh)) {
+	if (!VEH_REGULAR_MAINTENANCE(veh) && VEH_IS_COMPLETE(veh)) {
 		// check if it's abandoned furniture: no owner, unowned room, no instance id, not in an adventure, no players here
 		if (!VEH_OWNER(veh) && VEH_INSTANCE_ID(veh) != NOTHING && IN_ROOM(veh) && !ROOM_OWNER(IN_ROOM(veh)) && !IS_ADVENTURE_ROOM(IN_ROOM(veh)) && !any_players_in_room(IN_ROOM(veh))) {
 			// random chance of decay
@@ -1391,12 +1398,13 @@ void annual_update_vehicle(vehicle_data *veh) {
 
 
 /**
-* This runs once a mud year to update the world.
+* World reset: runs every "world_reset_hours" (real hours) to update the world.
 */
 void annual_world_update(void) {
 	char message[MAX_STRING_LENGTH];
+	const char *str;
 	vehicle_data *veh;
-	descriptor_data *d;
+	descriptor_data *desc;
 	room_data *room, *next_room;
 	struct map_data *tile;
 	int newb_count = 0;
@@ -1404,23 +1412,14 @@ void annual_world_update(void) {
 	bool naturalize_newbie_islands = config_get_bool("naturalize_newbie_islands");
 	bool naturalize_unclaimable = config_get_bool("naturalize_unclaimable");
 	
-	snprintf(message, sizeof(message), "\r\n%s\r\n\r\n", config_get_string("newyear_message"));
-	
-	// MESSAGE TO ALL
-	for (d = descriptor_list; d; d = d->next) {
-		if (STATE(d) == CON_PLAYING && d->character) {
-			write_to_descriptor(d->descriptor, message);
-			d->has_prompt = FALSE;
-			
-			if (!IS_IMMORTAL(d->character)) {
-				if (GET_POS(d->character) > POS_SITTING && !number(0, GET_DEXTERITY(d->character))) {
-					if (IS_RIDING(d->character)) {
-						perform_dismount(d->character);
-					}
-					write_to_descriptor(d->descriptor, "You're knocked to the ground!\r\n\r\n");
-					act("$n is knocked to the ground!", TRUE, d->character, NULL, NULL, TO_ROOM);
-					GET_POS(d->character) = POS_SITTING;
-				}
+	// MESSAGE TO ALL ?
+	if ((str = config_get_string("world_reset_message")) && *str) {
+		snprintf(message, sizeof(message), "\r\n%s\r\n\r\n", str);
+		
+		LL_FOREACH(descriptor_list, desc) {
+			if (STATE(desc) == CON_PLAYING && desc->character) {
+				write_to_descriptor(desc->descriptor, message);
+				desc->has_prompt = FALSE;
 			}
 		}
 	}
@@ -1454,6 +1453,18 @@ void annual_world_update(void) {
 	
 	if (newb_count) {
 		log("New year: naturalized %d tile%s on newbie islands.", newb_count, PLURAL(newb_count));
+	}
+}
+
+
+/**
+* Checks periodically if it's time to reset maintenance and depletions.
+*
+* This is based on DATA_LAST_NEW_YEAR and the "world_reset_hours" config.
+*/
+void check_maintenance_and_depletion_reset(void) {
+	if (data_get_long(DATA_LAST_NEW_YEAR) + (config_get_int("world_reset_hours") * SECS_PER_REAL_HOUR) < time(0)) {
+		annual_world_update();
 	}
 }
 
@@ -1709,7 +1720,7 @@ void start_burning(room_data *room) {
 	}
 	
 	set_room_extra_data(room, ROOM_EXTRA_FIRE_REMAINING, config_get_int("fire_extinguish_value"));
-	set_burn_down_time(room, time(0) + config_get_int("burn_down_time"), TRUE);
+	set_burn_down_time(room, time(0) + get_burn_down_time_seconds(room), TRUE);
 	
 	// ensure no building or dismantling
 	stop_room_action(room, ACT_BUILDING);
@@ -2273,7 +2284,7 @@ void perform_change_sect(room_data *loc, struct map_data *map, sector_data *sect
 	}
 	
 	// check for icon locking
-	if (SECT_FLAGGED(sect, SECTF_LOCK_ICON)) {
+	if (SECT_FLAGGED(sect, SECTF_LOCK_ICON) || (SECT_FLAGGED(sect, SECTF_CROP) && map && map->crop_type && CROP_FLAGGED(map->crop_type, CROPF_LOCK_ICON)) || (SECT_FLAGGED(sect, SECTF_CROP) && loc && ROOM_CROP(loc) && CROP_FLAGGED(ROOM_CROP(loc), CROPF_LOCK_ICON))) {
 		if (map) {
 			lock_icon_map(map, NULL);
 		}

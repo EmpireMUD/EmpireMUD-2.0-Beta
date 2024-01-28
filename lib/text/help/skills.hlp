@@ -199,9 +199,9 @@ who originally built the building.
 You can use 'nodismantle' to keep yourself from accidentally dismantling a
 building.
 
-Note: Mountain tiles only refresh with new ore each year if the mines (or other
-buildings) have been dismantled and removed. However, all other resource
-buildings refresh each year without being dismantled.
+Note: Mountain tiles only refresh with new ore if the mines (or other
+buildings) have been dismantled and removed before the reset cycle. However,
+all other resource buildings refresh over time without being dismantled.
 
 See also: BUILD, BUILD INFO, HOMELESS CITIZENS, NODISMANTLE
 #
@@ -361,10 +361,11 @@ outside. To work a mine, you need a pick of some kind, although a simple
 handaxe will also work.
 
 Mines have a limited amount of ore, and do not replenish. However, if you fully
-dismantle a mine, its mountain will reset when the MUD celebrates a new year
-(every 7.5 real days). Once this reset happens, building a new mine on the
-tile will involve digging a new mine shaft and the mineral found there could be
-completely different.
+dismantle a mine, its mountain will reset at the end of the depletion cycle
+(usually every 7.5 real days). Once this reset happens, building a new mine on
+the tile will involve digging a new mine shaft and the mineral found there
+could be completely different. Type "mudstats time" to see how long until the
+next reset.
 
 Mines count as in-city territory as far away as 4x a city's normal radius.
 
