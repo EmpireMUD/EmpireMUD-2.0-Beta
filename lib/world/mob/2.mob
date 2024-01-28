@@ -226,14 +226,17 @@ S
 #220
 #n old barkeep #a~
 Old #n~
-Old #n the #a barkeep is standing here.
+Old #n the #a barkeep is standing here. (list)
 ~
 20 50 bdqvI 0 3
 1 0 0 15 -1
 D
    The barkeep leans against the bar, prepared to hear another pointless story
-from a drunken patron.
+from a drunken patron. You can type 'list' and 'buy' to check what's available
+and order a drink.
 ~
+T 5139
+T 5140
 S
 #221
 #n master shadow~

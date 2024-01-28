@@ -912,7 +912,7 @@ The Tavern~
 10 0 pR 0
 0 0 0 220
 C
-inventory, retrieve, store~
+buy, list, inventory, retrieve, store, price~
 D
    Business is roaring at all hours as serfs and nobles alike pull up stools
 to drink, play cards, laugh, and brawl. The building is wooden, but most of the
@@ -950,6 +950,7 @@ R
 R
 6790 1 1 0
 T 5138
+T 5141
 Z1 2
 S
 #5139
