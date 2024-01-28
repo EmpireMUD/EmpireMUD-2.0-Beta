@@ -94,7 +94,7 @@ elseif ale /= %arg%
   set vnum 232
 elseif lager /= %arg%
   set vnum 233
-elseif wheat beer /= %arg%
+elseif wheat beer /= %arg% || beer /= %arg%
   set vnum 234
 elseif cider /= %arg%
   set vnum 235
