@@ -201,6 +201,7 @@
 // easier to understand, for things that initialize to -1 or 0
 #define ANY_ISLAND  -1	// for finding an island in certain functions
 #define NO_ISLAND  -1	// error code for island lookups
+#define UNAPPLIED_ISLAND  -2	// distinct from NO_ISLAND to prevent re-applying a vehicle/building to NO_ISLAND
 #define NO_WEAR  -1	// bad wear location
 #define END_RESOURCE_LIST  { NOTHING, -1 }
 #define NOBITS  0	// lack of bitvector bits (for clarity in funky structs)
@@ -6449,6 +6450,9 @@ struct complex_room_data {
 	time_t burn_down_time;	// if >0, the timestamp when this building will burn down
 	
 	double damage;  // for catapulting
+	
+	// additional unsaved data
+	int applied_to_island;	// tracks which island its techs were applied to
 };
 
 

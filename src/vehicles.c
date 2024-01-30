@@ -44,8 +44,6 @@ const char *default_vehicle_keywords = "vehicle unnamed";
 const char *default_vehicle_short_desc = "an unnamed vehicle";
 const char *default_vehicle_long_desc = "An unnamed vehicle is parked here.";
 
-#define UNAPPLIED_ISLAND  -2	// distinct from NO_ISLAND to prevent re-applying a vehicle to NO_ISLAND
-
 // local protos
 void clear_vehicle(vehicle_data *veh);
 void store_one_vehicle_to_file(vehicle_data *veh, FILE *fl);

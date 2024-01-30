@@ -9473,6 +9473,8 @@ struct complex_room_data *init_complex_data() {
 	data->burn_down_time = 0;	// not-burning
 	data->damage = 0;	// no damage
 	
+	data->applied_to_island = UNAPPLIED_ISLAND;
+	
 	return data;
 }
 

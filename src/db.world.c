@@ -2356,6 +2356,7 @@ void perform_change_sect(room_data *loc, struct map_data *map, sector_data *sect
 */
 void adjust_building_tech(empire_data *emp, room_data *room, bool add) {
 	int amt = add ? 1 : -1;	// adding or removing 1
+	int island_id;
 	struct empire_island *e_isle = NULL;
 	struct empire_npc_data *npc;
 	struct empire_territory_data *ter;
@@ -2369,9 +2370,26 @@ void adjust_building_tech(empire_data *emp, room_data *room, bool add) {
 		return;
 	}
 	
-	// look up empire island
-	if (GET_ISLAND_ID(room) != NO_ISLAND) {
-		e_isle = get_empire_island(emp, GET_ISLAND_ID(room));
+	// island setup and checks
+	if (add) {
+		island_id = GET_ISLAND_ID(room);
+		if (COMPLEX_DATA(room) && COMPLEX_DATA(room)->applied_to_island == island_id) {
+			// already applied here -- nothing to do
+			return;
+		}
+	}
+	else {
+		// prefer to remove from the island it's applied to, if we can detect it
+		island_id = COMPLEX_DATA(room) ? COMPLEX_DATA(room)->applied_to_island : GET_ISLAND_ID(room);
+		if (island_id == UNAPPLIED_ISLAND) {
+			// not applied -- nothing to do
+			return;
+		}
+	}
+	
+	// ok... look up empire island
+	if (island_id != NO_ISLAND && island_id != UNAPPLIED_ISLAND) {
+		e_isle = get_empire_island(emp, island_id);
 	}
 	
 	// WARNING: do not check in-city status on these ... it can change at a time when territory is not re-scanned
@@ -2397,6 +2415,11 @@ void adjust_building_tech(empire_data *emp, room_data *room, bool add) {
 	
 	// re-send claim info in case it changed
 	TRIGGER_DELAYED_REFRESH(emp, DELAY_REFRESH_MSDP_UPDATE_CLAIMS);
+	
+	// store what island we're applied to
+	if (COMPLEX_DATA(room)) {
+		COMPLEX_DATA(room)->applied_to_island = add ? island_id : UNAPPLIED_ISLAND;
+	}
 }
 
 
