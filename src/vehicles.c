@@ -606,6 +606,7 @@ room_data *get_vehicle_interior(vehicle_data *veh) {
 	}
 	
 	// otherwise, create the interior
+	// NOTE: I don't think this can use add_room_to_building() because it's the first room -paul 1/30/2024
 	room = create_room(NULL);
 	attach_building_to_room(bld, room, TRUE);
 	COMPLEX_DATA(room)->home_room = NULL;
@@ -1559,7 +1560,6 @@ void add_room_to_vehicle(room_data *room, vehicle_data *veh) {
 */
 void apply_vehicle_to_island(vehicle_data *veh, int island_id) {
 	struct vehicle_room_list *vrl;
-	struct island_info *isle;
 	vehicle_data *iter;
 	
 	if (!veh || VEH_APPLIED_TO_ISLAND(veh) == island_id) {
@@ -1596,9 +1596,6 @@ void apply_vehicle_to_island(vehicle_data *veh, int island_id) {
 * @param room_data *room The room to apply it to.
 */
 void apply_vehicle_to_room(vehicle_data *veh, room_data *room) {
-	struct vehicle_room_list *vrl;
-	vehicle_data *iter;
-	
 	// apply to island first
 	apply_vehicle_to_island(veh, room ? GET_ISLAND_ID(room) : NO_ISLAND);
 	

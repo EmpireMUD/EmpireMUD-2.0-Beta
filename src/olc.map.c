@@ -658,19 +658,7 @@ OLC_MODULE(mapedit_exits) {
 		msg_to_char(ch, "An exit already exists in that direction in the target room.\r\n");
 	else {
 		if (new) {
-			to_room = create_room(HOME_ROOM(IN_ROOM(ch)));
-			attach_building_to_room(building_proto(config_get_int("default_interior")), to_room, TRUE);
-			
-			// TODO this is done in several different things that add rooms, and could be moved to a function -paul 7/14/2016
-			if (GET_ROOM_VEHICLE(IN_ROOM(ch))) {
-				add_room_to_vehicle(to_room, GET_ROOM_VEHICLE(IN_ROOM(ch)));
-			}
-			COMPLEX_DATA(HOME_ROOM(IN_ROOM(ch)))->inside_rooms++;
-			
-			if (ROOM_OWNER(HOME_ROOM(IN_ROOM(ch)))) {
-				perform_claim_room(to_room, ROOM_OWNER(HOME_ROOM(IN_ROOM(ch))));
-			}
-			complete_wtrigger(to_room);
+			to_room = add_room_to_building(HOME_ROOM(IN_ROOM(ch)), NOTHING);
 		}
 
 		create_exit(IN_ROOM(ch), to_room, dir, TRUE);

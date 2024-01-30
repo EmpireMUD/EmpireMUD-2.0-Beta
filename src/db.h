@@ -918,6 +918,7 @@ extern bool save_world_after_startup;
 extern bool converted_to_b5_116;
 extern bool block_world_save_requests;
 
+room_data *add_room_to_building(room_data *home_room, bld_vnum building_type);
 void add_room_to_world_tables(room_data *room);
 void add_trd_home_room(room_vnum vnum, room_vnum home_room);
 void add_trd_owner(room_vnum vnum, empire_vnum owner);

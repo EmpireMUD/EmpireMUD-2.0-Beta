@@ -2653,22 +2653,12 @@ ACMD(do_designate) {
 			
 			detach_building_from_room(new);
 			attach_building_to_room(type, new, TRUE);
+			complete_wtrigger(new);
 		}
 		else {
 			// create the new room
-			new = create_room(home);
+			new = add_room_to_building(home, GET_BLD_VNUM(type));
 			create_exit(IN_ROOM(ch), new, dir, TRUE);
-			attach_building_to_room(type, new, TRUE);
-
-			COMPLEX_DATA(home)->inside_rooms++;
-			
-			if (veh) {
-				add_room_to_vehicle(new, veh);
-			}
-			
-			if (ROOM_OWNER(home)) {
-				perform_claim_room(new, ROOM_OWNER(home));
-			}
 		}
 		
 		set_room_extra_data(new, ROOM_EXTRA_REDESIGNATE_TIME, time(0));
@@ -2689,8 +2679,6 @@ ACMD(do_designate) {
 				}
 			}
 		}
-		
-		complete_wtrigger(new);
 	}
 }
 

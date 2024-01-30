@@ -68,6 +68,50 @@ bool write_map_and_room_to_file(room_vnum vnum, bool force_obj_pack);
 //// WORLD-CHANGERS //////////////////////////////////////////////////////////
 
 /**
+* Creates and sets up an additional interior room. This runs completion
+* triggers. It does NOT add exits to or from the new room.
+*
+* @param room_data *home_room The home room for the building/vehicle that's gaining a new room.
+* @param bld_vnum building_type The room type (must be an interior ROOM-flagged building). May be NOTHING to use the default.
+* @return room_data *to_room The created room.
+*/
+room_data *add_room_to_building(room_data *home_room, bld_vnum building_type) {
+	room_data *to_room;
+	
+	// validate home_room
+	if (home_room) {
+		home_room = HOME_ROOM(home_room);
+	}
+	
+	// validate building type
+	if (building_type == NOTHING || !building_proto(building_type)) {
+		building_type = config_get_int("default_interior");
+	}
+	
+	// create it
+	to_room = create_room(home_room);
+	attach_building_to_room(building_proto(building_type), to_room, TRUE);
+	
+	// update interior count
+	if (home_room) {
+		COMPLEX_DATA(home_room)->inside_rooms++;
+	}
+	
+	// check in a vehicle?
+	if (home_room && GET_ROOM_VEHICLE(home_room)) {
+		add_room_to_vehicle(to_room, GET_ROOM_VEHICLE(home_room));
+	}
+	
+	if (home_room && ROOM_OWNER(home_room)) {
+		perform_claim_room(to_room, ROOM_OWNER(home_room));
+	}
+	complete_wtrigger(to_room);
+	
+	return to_room;
+}
+
+
+/**
 * Update the "base sector" of a room. This is the sector that underlies its
 * current sector (e.g. Plains under Building).
 *
