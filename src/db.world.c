@@ -2377,7 +2377,7 @@ void adjust_building_tech(empire_data *emp, room_data *room, bool add) {
 			// already applied here -- nothing to do
 			return;
 		}
-		else if (COMPLEX_DATA(room) && COMPLEX_DATA(room)->applied_to_island != NO_ISLAND) {
+		else if (COMPLEX_DATA(room) && COMPLEX_DATA(room)->applied_to_island != NO_ISLAND && COMPLEX_DATA(room)->applied_to_island != UNAPPLIED_ISLAND) {
 			// un-apply it first
 			adjust_building_tech(emp, room, FALSE);
 		}
