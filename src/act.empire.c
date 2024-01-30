@@ -268,6 +268,10 @@ void copy_workforce_limits_into_current_island(char_data *ch, struct island_info
 		msg_to_char(ch, "You are not currently on any island.\r\n");
 		return;
 	}
+	if (from_island->id == NO_ISLAND) {
+		msg_to_char(ch, "Invalid source island.\r\n");
+		return;
+	}
 	if ( !is_affiliated_island(emp,from_island->id) ) {
 		msg_to_char(ch, "Your empire has no affiliation with source island \"%s\".\r\n", get_island_name_for(from_island->id, ch));
 		return;
@@ -331,7 +335,7 @@ void do_customize_island(char_data *ch, char *argument) {
 	else if (!has_permission(ch, PRIV_CUSTOMIZE, IN_ROOM(ch))) {
 		msg_to_char(ch, "You don't have permission to customize anything.\r\n");
 	}
-	else if (!(island = GET_ISLAND(IN_ROOM(ch))) || !(eisle = get_empire_island(GET_LOYALTY(ch), island->id))) {
+	else if (GET_ISLAND_ID(IN_ROOM(ch)) == NO_ISLAND || !(island = GET_ISLAND(IN_ROOM(ch))) || !(eisle = get_empire_island(GET_LOYALTY(ch), island->id))) {
 		msg_to_char(ch, "You can't do that here.\r\n");
 	}
 	else if (IS_SET(island->flags, ISLE_NO_CUSTOMIZE)) {

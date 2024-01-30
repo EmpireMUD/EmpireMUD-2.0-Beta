@@ -2037,25 +2037,27 @@ bool show_local_einv(char_data *ch, room_data *room, bool thief_mode) {
 	// determines return val
 	found_any = FALSE;
 	
-	// iterate over empire list
-	HASH_ITER(hh, vhash, vhash_iter, vhash_next) {
-		if (!(emp = real_empire(vhash_iter->vnum))) {
-			continue;	// should be impossible
-		}
+	// iterate over empire list (only if on an island)
+	if (GET_ISLAND_ID(room) != NO_ISLAND) {
+		HASH_ITER(hh, vhash, vhash_iter, vhash_next) {
+			if (!(emp = real_empire(vhash_iter->vnum))) {
+				continue;	// should be impossible
+			}
 		
-		// look for storage here
-		found_one = FALSE;
-		eisle = get_empire_island(emp, GET_ISLAND_ID(room));
-		HASH_ITER(hh, eisle->store, store, next_store) {
-			if (store->amount > 0 && store->proto && obj_can_be_retrieved(store->proto, room, thief_mode ? NULL : own_empire)) {
-				if (!found_one) {
-					snprintf(buf, sizeof(buf), "%s inventory available here:\t0\r\n", EMPIRE_ADJECTIVE(emp));
-					CAP(buf);
-					msg_to_char(ch, "\r\n%s%s", EMPIRE_BANNER(emp), buf);
-				}
+			// look for storage here
+			found_one = FALSE;
+			eisle = get_empire_island(emp, GET_ISLAND_ID(room));
+			HASH_ITER(hh, eisle->store, store, next_store) {
+				if (store->amount > 0 && store->proto && obj_can_be_retrieved(store->proto, room, thief_mode ? NULL : own_empire)) {
+					if (!found_one) {
+						snprintf(buf, sizeof(buf), "%s inventory available here:\t0\r\n", EMPIRE_ADJECTIVE(emp));
+						CAP(buf);
+						msg_to_char(ch, "\r\n%s%s", EMPIRE_BANNER(emp), buf);
+					}
 			
-				show_one_stored_item_to_char(ch, emp, store, FALSE);
-				found_one = found_any = TRUE;
+					show_one_stored_item_to_char(ch, emp, store, FALSE);
+					found_one = found_any = TRUE;
+				}
 			}
 		}
 	}
@@ -2676,40 +2678,42 @@ ACMD(do_chart) {
 	else {
 		msg_to_char(ch, "Chart information for %s:\r\n", get_island_name_for(isle->id, ch));
 		
-		// alternat names
-		if (GET_LOYALTY(ch) && (e_isle = get_empire_island(GET_LOYALTY(ch), isle->id)) && e_isle->name && strcmp(e_isle->name, isle->name)) {
-			// show global name if different
-			msg_to_char(ch, "Also known as: %s", isle->name);
-			num = 1;
-		}
-		else {
-			num = 0;	// not shown yet
-		}
-		
 		// alternate names
-		num = 0;
-		HASH_ITER(hh, empire_table, emp, next_emp) {
-			if (EMPIRE_IS_TIMED_OUT(emp) || emp == GET_LOYALTY(ch)) {
-				continue;
-			}
-			if (!IS_IMMORTAL(ch) && !has_relationship(GET_LOYALTY(ch), emp, DIPL_NONAGGR | DIPL_ALLIED | DIPL_TRADE)) {
-				continue;
-			}
-			if (!(e_isle = get_empire_island(emp, isle->id)) || !e_isle->name || !str_cmp(e_isle->name, isle->name)) {
-				continue;
-			}
-			
-			// definitely has a name
-			if (num > 0) {
-				msg_to_char(ch, ", %s (%s)", e_isle->name, EMPIRE_NAME(emp));
+		if (isle->id != NO_ISLAND) {
+			if (GET_LOYALTY(ch) && (e_isle = get_empire_island(GET_LOYALTY(ch), isle->id)) && e_isle->name && strcmp(e_isle->name, isle->name)) {
+				// show global name if different
+				msg_to_char(ch, "Also known as: %s", isle->name);
+				num = 1;
 			}
 			else {
-				msg_to_char(ch, "Also known as: %s (%s)", e_isle->name, EMPIRE_NAME(emp));
+				num = 0;	// not shown yet
 			}
-			++num;
-		}
-		if (num > 0) {
-			msg_to_char(ch, "\r\n");
+		
+			// alternate names
+			num = 0;
+			HASH_ITER(hh, empire_table, emp, next_emp) {
+				if (EMPIRE_IS_TIMED_OUT(emp) || emp == GET_LOYALTY(ch)) {
+					continue;
+				}
+				if (!IS_IMMORTAL(ch) && !has_relationship(GET_LOYALTY(ch), emp, DIPL_NONAGGR | DIPL_ALLIED | DIPL_TRADE)) {
+					continue;
+				}
+				if (!(e_isle = get_empire_island(emp, isle->id)) || !e_isle->name || !str_cmp(e_isle->name, isle->name)) {
+					continue;
+				}
+			
+				// definitely has a name
+				if (num > 0) {
+					msg_to_char(ch, ", %s (%s)", e_isle->name, EMPIRE_NAME(emp));
+				}
+				else {
+					msg_to_char(ch, "Also known as: %s (%s)", e_isle->name, EMPIRE_NAME(emp));
+				}
+				++num;
+			}
+			if (num > 0) {
+				msg_to_char(ch, "\r\n");
+			}
 		}
 		
 		// desc
@@ -4233,7 +4237,7 @@ ACMD(do_survey) {
 	
 	if ((island = GET_ISLAND(IN_ROOM(ch)))) {
 		// find out if it has a local name
-		if (GET_LOYALTY(ch) && (eisle = get_empire_island(GET_LOYALTY(ch), island->id)) && eisle->name && str_cmp(eisle->name, island->name)) {
+		if (GET_LOYALTY(ch) && island->id != NO_ISLAND && (eisle = get_empire_island(GET_LOYALTY(ch), island->id)) && eisle->name && str_cmp(eisle->name, island->name)) {
 			msg_to_char(ch, "Location: %s (%s)%s%s\r\n", get_island_name_for(island->id, ch), island->name, IS_SET(island->flags, ISLE_NEWBIE) ? " (newbie island)" : "", IS_SET(island->flags, ISLE_CONTINENT) ? " (continent)" : "");
 		}
 		else {

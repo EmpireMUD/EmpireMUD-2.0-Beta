@@ -704,7 +704,7 @@ static bool can_gain_chore_resource(empire_data *emp, room_data *loc, int chore,
 	glob_max = max;	// does not change
 	
 	// check empire's own limit
-	if ((emp_isle = get_empire_island(emp, island_id))) {
+	if (island_id != NO_ISLAND && (emp_isle = get_empire_island(emp, island_id))) {
 		if (emp_isle->workforce_limit[chore] > 0 && emp_isle->workforce_limit[chore] < max) {
 			max = emp_isle->workforce_limit[chore];
 		}
@@ -2374,6 +2374,12 @@ void do_chore_einv_interaction(empire_data *emp, room_data *room, vehicle_data *
 	bool any_over_limit = FALSE;
 	int most_found = -1;
 	
+	if (islid == NO_ISLAND) {
+		// cannot process einv on no-island
+		// TODO should this log as a problem? It would be caused by a workable room on a ship in the ocean -paul 1/30/2024
+		return;
+	}
+	
 	// look for something to process
 	eisle = get_empire_island(emp, islid);
 	HASH_ITER(hh, eisle->store, store, next_store) {
@@ -2783,11 +2789,19 @@ void do_chore_minting(empire_data *emp, room_data *room, vehicle_data *veh) {
 	struct empire_storage_data *highest = NULL, *store, *next_store;
 	char_data *worker;
 	int amt, high_amt, limit, islid = GET_ISLAND_ID(room);
-	struct empire_island *eisle = get_empire_island(emp, islid);
+	struct empire_island *eisle;
 	char buf[MAX_STRING_LENGTH];
 	bool can_do = TRUE;
 	obj_data *orn;
 	obj_vnum vnum;
+	
+	if (islid == NO_ISLAND) {
+		// cannot process einv on no-island
+		// TODO should this log as a problem? It would be caused by a workable room on a ship in the ocean -paul 1/30/2024
+		return;
+	}
+	
+	eisle = get_empire_island(emp, islid);
 	
 	limit = empire_chore_limit(emp, islid, CHORE_MINTING);
 	if (EMPIRE_COINS(emp) >= MAX_COIN || (limit != WORKFORCE_UNLIMITED && EMPIRE_COINS(emp) >= limit)) {
