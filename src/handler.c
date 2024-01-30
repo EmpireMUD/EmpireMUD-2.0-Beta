@@ -11726,6 +11726,7 @@ void extract_vehicle(vehicle_data *veh) {
 	
 	if (!VEH_IS_EXTRACTED(veh)) {
 		unapply_vehicle_to_room(veh);
+		unapply_vehicle_to_island(veh);
 		check_dg_owner_purged_vehicle(veh);
 		set_vehicle_flags(veh, VEH_EXTRACTED);
 		++veh_extractions_pending;
@@ -11769,6 +11770,7 @@ void extract_vehicle_final(vehicle_data *veh) {
 	
 	// ownership stuff
 	unapply_vehicle_to_room(veh);
+	unapply_vehicle_to_island(veh);
 	if (VEH_IS_COMPLETE(veh) && VEH_OWNER(veh)) {
 		qt_empire_players_vehicle(VEH_OWNER(veh), qt_lose_vehicle, veh);
 		et_lose_vehicle(VEH_OWNER(veh), veh);

@@ -1607,9 +1607,6 @@ void apply_vehicle_to_island(vehicle_data *veh, int island_id) {
 * @param room_data *room The room to apply it to.
 */
 void apply_vehicle_to_room(vehicle_data *veh, room_data *room) {
-	// apply to island first
-	apply_vehicle_to_island(veh, room ? GET_ISLAND_ID(room) : NO_ISLAND);
-	
 	if (room == VEH_APPLIED_TO_ROOM(veh)) {
 		return;	// same room / no work
 	}
@@ -1618,13 +1615,16 @@ void apply_vehicle_to_room(vehicle_data *veh, room_data *room) {
 	unapply_vehicle_to_room(veh);
 	VEH_APPLIED_TO_ROOM(veh) = room;
 	
+	// update map/island pointers inside the vehicle
+	update_vehicle_island_and_loc(veh, room);
+	
+	// and apply to the island (unapply_vehicle_to_room may have removed it from the island)
+	apply_vehicle_to_island(veh, room ? GET_ISLAND_ID(room) : NO_ISLAND);
+	
 	// check lights
 	if (VEH_PROVIDES_LIGHT(veh)) {
 		++ROOM_LIGHTS(room);
 	}
-	
-	// update map/island pointers inside the vehicle
-	update_vehicle_island_and_loc(veh, room);
 }
 
 
@@ -2540,8 +2540,7 @@ void unapply_vehicle_to_island(vehicle_data *veh) {
 void unapply_vehicle_to_room(vehicle_data *veh) {
 	room_data *was_room;
 	
-	// island first
-	unapply_vehicle_to_island(veh);
+	// do not unapply_vehicle_to_island: it doesn't unapply until it gets a new one
 	
 	if (veh && (was_room = VEH_APPLIED_TO_ROOM(veh))) {
 		// NOTE: do not remove the map-loc on the interior rooms -- do this only when applying to a new room
