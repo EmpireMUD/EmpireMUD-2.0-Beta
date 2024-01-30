@@ -2627,6 +2627,10 @@ void read_empire_territory(empire_data *emp, bool check_tech) {
 			
 			// this is only done if we are re-reading techs (also updates island population)
 			if (check_tech) {
+				if (COMPLEX_DATA(iter)) {
+					// clear this data so it will re-apply (we zeroed it out)
+					COMPLEX_DATA(iter)->applied_to_island = UNAPPLIED_ISLAND;
+				}
 				adjust_building_tech(e, iter, TRUE);
 			}
 			
