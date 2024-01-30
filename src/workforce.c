@@ -280,7 +280,7 @@ void process_one_vehicle_chore(empire_data *emp, vehicle_data *veh) {
 	bool on_fire, starving;
 	int island;
 	
-	if (!room) {
+	if (!room || GET_ISLAND_ID(room) == NO_ISLAND) {
 		return;
 	}
 	
