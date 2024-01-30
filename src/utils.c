@@ -506,6 +506,12 @@ void run_delayed_refresh(void) {
 			if (IS_SET(EMPIRE_DELAYED_REFRESH(emp), DELAY_REFRESH_GREATNESS)) {
 				update_empire_members_and_greatness(emp);
 			}
+			if (IS_SET(EMPIRE_DELAYED_REFRESH(emp), DELAY_REFRESH_MSDP_UPDATE_CLAIMS)) {
+				update_MSDP_empire_data_all(emp, TRUE, TRUE);
+			}
+			if (IS_SET(EMPIRE_DELAYED_REFRESH(emp), DELAY_REFRESH_MSDP_UPDATE_ALL)) {
+				update_MSDP_empire_data_all(emp, FALSE, FALSE);
+			}
 			
 			// clear this
 			EMPIRE_DELAYED_REFRESH(emp) = NOBITS;

@@ -5482,7 +5482,7 @@ ACMD(do_enroll) {
 		refresh_empire_goals(e, NOTHING);
 		
 		save_empire(e, TRUE);
-		update_MSDP_empire_data_all(e, FALSE, FALSE);
+		TRIGGER_DELAYED_REFRESH(e, DELAY_REFRESH_MSDP_UPDATE_ALL);
 	}
 	
 	// clean up if still necessary

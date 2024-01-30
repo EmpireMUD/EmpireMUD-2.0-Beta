@@ -2396,7 +2396,7 @@ void adjust_building_tech(empire_data *emp, room_data *room, bool add) {
 	EMPIRE_FAME(emp) += GET_BLD_FAME(GET_BUILDING(room)) * amt;
 	
 	// re-send claim info in case it changed
-	update_MSDP_empire_data_all(emp, TRUE, TRUE);
+	TRIGGER_DELAYED_REFRESH(emp, DELAY_REFRESH_MSDP_UPDATE_CLAIMS);
 }
 
 
@@ -2445,7 +2445,7 @@ void adjust_vehicle_tech(vehicle_data *veh, int island_id, bool add) {
 	EMPIRE_FAME(emp) += VEH_FAME(veh) * amt;
 	
 	// re-send claim info in case it changed
-	update_MSDP_empire_data_all(emp, TRUE, TRUE);
+	TRIGGER_DELAYED_REFRESH(emp, DELAY_REFRESH_MSDP_UPDATE_CLAIMS);
 }
 
 
@@ -2701,7 +2701,7 @@ void reread_empire_tech(empire_data *emp) {
 	resort_empires(FALSE);
 	
 	// re-send MSDP claim data
-	update_MSDP_empire_data_all(emp, TRUE, TRUE);
+	TRIGGER_DELAYED_REFRESH(emp, DELAY_REFRESH_MSDP_UPDATE_CLAIMS);
 }
 
 

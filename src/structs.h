@@ -1056,6 +1056,8 @@ typedef struct vehicle_data vehicle_data;
 #define DELAY_REFRESH_GOAL_COMPLETE  BIT(1)	// checks for finished progress
 #define DELAY_REFRESH_MEMBERS  BIT(2)	// re-reads empire member data
 #define DELAY_REFRESH_GREATNESS  BIT(3)	// refreshes members-and-greatness
+#define DELAY_REFRESH_MSDP_UPDATE_CLAIMS  BIT(4)	// empire members needs an MSDP update for claims
+#define DELAY_REFRESH_MSDP_UPDATE_ALL  BIT(5)	// empire members needs an MSDP update for everything
 
 
 // EADM_x: empire admin flags

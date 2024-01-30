@@ -3654,7 +3654,7 @@ void perform_abandon_room(room_data *room) {
 	}
 	
 	affect_total_room(room);
-	update_MSDP_empire_data_all(emp, TRUE, TRUE);
+	TRIGGER_DELAYED_REFRESH(emp, DELAY_REFRESH_MSDP_UPDATE_CLAIMS);
 	request_mapout_update(GET_ROOM_VNUM(room));
 	request_world_save(GET_ROOM_VNUM(room), WSAVE_ROOM | WSAVE_MAP);
 }
@@ -3760,7 +3760,7 @@ void perform_claim_room(room_data *room, empire_data *emp) {
 	}
 	
 	add_dropped_item_list(emp, ROOM_CONTENTS(room));
-	update_MSDP_empire_data_all(emp, TRUE, TRUE);
+	TRIGGER_DELAYED_REFRESH(emp, DELAY_REFRESH_MSDP_UPDATE_CLAIMS);
 	request_mapout_update(GET_ROOM_VNUM(room));
 	request_world_save(GET_ROOM_VNUM(room), WSAVE_MAP | WSAVE_ROOM);
 }
