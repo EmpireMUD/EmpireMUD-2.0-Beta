@@ -1174,7 +1174,7 @@ void start_dismantle_vehicle(vehicle_data *veh, char_data *ch) {
 	if (VEH_OWNER(veh) && VEH_IS_COMPLETE(veh)) {
 		qt_empire_players_vehicle(VEH_OWNER(veh), qt_lose_vehicle, veh);
 		et_lose_vehicle(VEH_OWNER(veh), veh);
-		adjust_vehicle_tech(veh, IN_ROOM(veh), FALSE);
+		adjust_vehicle_tech(veh, GET_ISLAND_ID(IN_ROOM(veh)), FALSE);
 	}
 	
 	// clear it out
@@ -1551,64 +1551,6 @@ void add_room_to_vehicle(room_data *room, vehicle_data *veh) {
 
 
 /**
-* Applies a vehicle's techs and other numeric data to the island.
-*
-* WARNING: This is only to be called from apply/unapply-vehicle-to-room, and is
-* part of that process. Calling it separately risks getting this data out of
-* sync.
-*
-* @param vehicle_data *veh The vehicle to update.
-* @param int island_id Which island to apply it to.
-* @param bool add Adds the techs/data if TRUE, or removes them if FALSE.
-*/
-static void apply_vehicle_tech(vehicle_data *veh, int island_id, bool add) {
-	struct empire_territory_data *ter;
-	struct empire_npc_data *npc;
-	struct vehicle_room_list *vrl;
-	struct empire_island *e_isle;
-	empire_data *emp;
-	int amt = add ? 1 : -1;	// adding or removing 1
-	
-	// only care about
-	if (!veh || !(emp = VEH_OWNER(veh)) || !VEH_IS_COMPLETE(veh)) {
-		return;
-	}
-	
-	// for stuff that needs an island
-	e_isle = (island_id == NO_ISLAND) ? NULL : get_empire_island(emp, island_id);
-	
-	if (IS_SET(VEH_FUNCTIONS(veh), FNC_DOCKS)) {
-		EMPIRE_TECH(emp, TECH_SEAPORT) += amt;
-		if (e_isle) {
-			e_isle->tech[TECH_SEAPORT] += amt;
-		}
-	}
-	
-	// local traits
-	if (e_isle) {
-		// TODO: count vehicle artisan as population?
-		
-		// count population on interior rooms
-		LL_FOREACH(VEH_ROOM_LIST(veh), vrl) {
-			if ((ter = find_territory_entry(emp, vrl->room))) {
-				LL_FOREACH(ter->npcs, npc) {
-					e_isle->population += amt;
-				}
-			}
-		}
-	}
-	
-	// global traits
-	EMPIRE_MILITARY(emp) += VEH_MILITARY(veh) * amt;
-	EMPIRE_FAME(emp) += VEH_FAME(veh) * amt;
-	
-	// TODO: this should be moved to apply-to-island, probably
-	// re-send claim info in case it changed
-	update_MSDP_empire_data_all(emp, TRUE, TRUE);
-}
-
-
-/**
 * Applies a vehicle's traits/data to an island, including empire-island data if
 * it's claimed. This also sets up the inside of the vehicle.
 *
@@ -1630,26 +1572,18 @@ void apply_vehicle_to_island(vehicle_data *veh, int island_id) {
 	// update island id
 	VEH_APPLIED_TO_ISLAND(veh) = island_id;
 	
-	// update island pointers inside
+	// cascade to interior vehicles
 	if (VEH_ROOM_LIST(veh)) {
-		isle = (island_id != NO_ISLAND) ? get_island(island_id, TRUE) : NULL;
-		
 		LL_FOREACH(VEH_ROOM_LIST(veh), vrl) {
-			if (GET_ISLAND_ID(vrl->room) != island_id || GET_ISLAND(vrl->room) != isle) {
-				GET_ISLAND_ID(vrl->room) = island_id;
-				GET_ISLAND(vrl->room) = isle;
-				request_world_save(GET_ROOM_VNUM(vrl->room), WSAVE_ROOM);
-				
-				// check vehicles inside and cascade
-				DL_FOREACH2(ROOM_VEHICLES(vrl->room), iter, next_in_room) {
-					apply_vehicle_to_island(iter, island_id);
-				}
+			// check vehicles inside and cascade
+			DL_FOREACH2(ROOM_VEHICLES(vrl->room), iter, next_in_room) {
+				apply_vehicle_to_island(iter, island_id);
 			}
 		}
 	}
 	
 	// and apply tech
-	apply_vehicle_tech(veh, island_id, TRUE);
+	adjust_vehicle_tech(veh, island_id, TRUE);
 }
 
 
@@ -1676,15 +1610,13 @@ void apply_vehicle_to_room(vehicle_data *veh, room_data *room) {
 	unapply_vehicle_to_room(veh);
 	VEH_APPLIED_TO_ROOM(veh) = room;
 	
-	// update room pointers inside
-	LL_FOREACH(VEH_ROOM_LIST(veh), vrl) {
-		GET_MAP_LOC(vrl->room) = GET_MAP_LOC(room);
-		
-		// check vehicles inside and cascade
-		DL_FOREACH2(ROOM_VEHICLES(vrl->room), iter, next_in_room) {
-			apply_vehicle_to_room(iter, room);
-		}
+	// check lights
+	if (VEH_PROVIDES_LIGHT(veh)) {
+		++ROOM_LIGHTS(room);
 	}
+	
+	// update map/island pointers inside the vehicle
+	update_vehicle_island_and_loc(veh, room);
 }
 
 
@@ -1929,7 +1861,7 @@ void complete_vehicle(vehicle_data *veh) {
 		if (VEH_OWNER(veh)) {
 			qt_empire_players_vehicle(VEH_OWNER(veh), qt_gain_vehicle, veh);
 			et_gain_vehicle(VEH_OWNER(veh), veh);
-			adjust_vehicle_tech(veh, IN_ROOM(veh), TRUE);
+			adjust_vehicle_tech(veh, GET_ISLAND_ID(IN_ROOM(veh)), TRUE);
 		}
 		
 		finish_vehicle_setup(veh);
@@ -2568,7 +2500,7 @@ void unapply_vehicle_to_island(vehicle_data *veh) {
 			// NOTE: do not remove the island-id on the interior rooms -- do this only when applying to a new room
 			
 			// un-apply tech -- do it before removing from the island
-			apply_vehicle_tech(veh, VEH_APPLIED_TO_ISLAND(veh), FALSE);
+			adjust_vehicle_tech(veh, VEH_APPLIED_TO_ISLAND(veh), FALSE);
 			
 			// and clear the data
 			VEH_APPLIED_TO_ISLAND(veh) = UNAPPLIED_ISLAND;
@@ -2583,14 +2515,21 @@ void unapply_vehicle_to_island(vehicle_data *veh) {
 * @param vehicle_data *veh The vehicle.
 */
 void unapply_vehicle_to_room(vehicle_data *veh) {
+	room_data *was_room;
+	
 	// island first
 	unapply_vehicle_to_island(veh);
 	
-	if (veh && VEH_APPLIED_TO_ROOM(veh)) {
+	if (veh && (was_room = VEH_APPLIED_TO_ROOM(veh))) {
 		// NOTE: do not remove the map-loc on the interior rooms -- do this only when applying to a new room
 		
 		// and clear the data
 		VEH_APPLIED_TO_ROOM(veh) = NULL;
+		
+		// check lights
+		if (VEH_PROVIDES_LIGHT(veh)) {
+			--ROOM_LIGHTS(was_room);
+		}
 	}
 }
 

@@ -887,7 +887,7 @@ extern vehicle_data *vehicle_table;
 extern vehicle_data *global_next_vehicle;
 extern vehicle_data *next_pending_vehicle;
 
-void adjust_vehicle_tech(vehicle_data *veh, room_data *room, bool add);
+void adjust_vehicle_tech(vehicle_data *veh, int island_id, bool add);
 void free_vehicle(vehicle_data *veh);
 vehicle_data *read_vehicle(any_vnum vnum, bool with_triggers);
 void remove_vehicle_from_table(vehicle_data *veh);

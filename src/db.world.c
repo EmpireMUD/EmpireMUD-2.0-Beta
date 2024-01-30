@@ -2351,35 +2351,55 @@ void adjust_building_tech(empire_data *emp, room_data *room, bool add) {
 * Note: Vehicles inside of moving vehicles do not contribute tech or fame.
 *
 * @param vehicle_data *veh The vehicle to update.
-* @param room_data *room Which room to apply to (defaults to the vehicle's room)
+* @param int island_id Which island to apply to (optional; will detect from vehicle's room if NO_ISLAND is given).
 * @param bool add Adds the techs if TRUE, or removes them if FALSE.
 */
-void adjust_vehicle_tech(vehicle_data *veh, room_data *room, bool add) {
+void adjust_vehicle_tech(vehicle_data *veh, int island_id, bool add) {
 	int amt = add ? 1 : -1;	// adding or removing 1
-	struct empire_island *isle = NULL;
 	empire_data *emp = NULL;
-	int island = NO_ISLAND;
+	room_data *room = NULL;
+	struct empire_island *e_isle = NULL;
+	struct empire_npc_data *npc;
+	struct empire_territory_data *ter;
+	struct vehicle_room_list *vrl;
 	
 	if (veh) {
 		emp = VEH_OWNER(veh);
-		if (!room) {
-			room = IN_ROOM(veh);
-		}
-		island = room ? GET_ISLAND_ID(room) : NO_ISLAND;
+		room = IN_ROOM(veh);
+	}
+	if (room && island_id == NO_ISLAND) {
+		island_id = GET_ISLAND_ID(room);	// if any
 	}
 	
 	// only care about
-	if (!emp || !veh || !VEH_IS_COMPLETE(veh) || !room) {
+	if (!emp || !veh || !VEH_IS_COMPLETE(veh)) {
 		return;
 	}
-	if (GET_ROOM_VEHICLE(room) && VEH_FLAGGED(GET_ROOM_VEHICLE(room), MOVABLE_VEH_FLAGS)) {
+	if (room && GET_ROOM_VEHICLE(room) && VEH_FLAGGED(GET_ROOM_VEHICLE(room), MOVABLE_VEH_FLAGS)) {
 		return;	// do NOT adjust tech if inside a moving vehicle
 	}
 	
+	// for island stats
+	e_isle = (island_id == NO_ISLAND) ? NULL : get_empire_island(emp, island_id);
+	
+	// techs
 	if (IS_SET(VEH_FUNCTIONS(veh), FNC_DOCKS)) {
 		EMPIRE_TECH(emp, TECH_SEAPORT) += amt;
-		if (island != NO_ISLAND && (isle || (isle = get_empire_island(emp, island)))) {
-			isle->tech[TECH_SEAPORT] += amt;
+		if (e_isle) {
+			e_isle->tech[TECH_SEAPORT] += amt;
+		}
+	}
+	
+	// count population on interior rooms
+	if (e_isle) {
+		// TODO: count vehicle artisan as population?
+		
+		LL_FOREACH(VEH_ROOM_LIST(veh), vrl) {
+			if ((ter = find_territory_entry(emp, vrl->room))) {
+				LL_FOREACH(ter->npcs, npc) {
+					e_isle->population += amt;
+				}
+			}
 		}
 	}
 	
@@ -2611,7 +2631,7 @@ void reread_empire_tech(empire_data *emp) {
 			continue;	// skip unowned/unfinished
 		}
 		
-		adjust_vehicle_tech(veh, IN_ROOM(veh), TRUE);
+		adjust_vehicle_tech(veh, GET_ISLAND_ID(IN_ROOM(veh)), TRUE);
 	}
 	
 	// special-handling for imm-only empires: give them all techs

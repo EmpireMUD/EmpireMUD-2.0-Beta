@@ -3673,7 +3673,7 @@ void perform_abandon_vehicle(vehicle_data *veh) {
 			abandon_room(VEH_INTERIOR_HOME_ROOM(veh));
 		}
 		
-		adjust_vehicle_tech(veh, IN_ROOM(veh), FALSE);
+		adjust_vehicle_tech(veh, GET_ISLAND_ID(IN_ROOM(veh)), FALSE);
 		VEH_OWNER(veh) = NULL;
 		
 		if (VEH_IS_COMPLETE(veh) && emp) {
@@ -3787,7 +3787,7 @@ void perform_claim_vehicle(vehicle_data *veh, empire_data *emp) {
 			claim_room(VEH_INTERIOR_HOME_ROOM(veh), emp);
 		}
 		
-		adjust_vehicle_tech(veh, IN_ROOM(veh), TRUE);
+		adjust_vehicle_tech(veh, GET_ISLAND_ID(IN_ROOM(veh)), TRUE);
 		if (VEH_IS_COMPLETE(veh)) {
 			qt_empire_players_vehicle(emp, qt_gain_vehicle, veh);
 			et_gain_vehicle(emp, veh);
@@ -11882,22 +11882,18 @@ void vehicle_from_room(vehicle_data *veh) {
 	
 	// mark the room for save
 	request_vehicle_save_in_world(veh);
-	
-	// check lights
-	if (VEH_PROVIDES_LIGHT(veh)) {
-		--ROOM_LIGHTS(was_in);
-	}
+	unapply_vehicle_to_room(veh);
 	
 	DL_DELETE2(ROOM_VEHICLES(was_in), veh, prev_in_room, next_in_room);
 	veh->next_in_room = veh->prev_in_room = NULL;
 	IN_ROOM(veh) = NULL;
 	
-	affect_total_room(was_in);
-	
 	// update mapout if applicable
 	if (VEH_IS_VISIBLE_ON_MAPOUT(veh)) {
 		request_mapout_update(GET_ROOM_VNUM(was_in));
 	}
+	
+	affect_total_room(was_in);
 }
 
 
@@ -11923,11 +11919,6 @@ void vehicle_to_room(vehicle_data *veh, room_data *room) {
 	
 	// apply-vehicle: only sets traits if the vehicle has moved to a new island/region
 	apply_vehicle_to_room(veh, room);
-	
-	// check lights
-	if (VEH_PROVIDES_LIGHT(veh)) {
-		++ROOM_LIGHTS(room);
-	}
 	
 	// update mapout if applicable
 	if (VEH_IS_VISIBLE_ON_MAPOUT(veh)) {
