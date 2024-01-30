@@ -3787,7 +3787,9 @@ void perform_claim_vehicle(vehicle_data *veh, empire_data *emp) {
 			claim_room(VEH_INTERIOR_HOME_ROOM(veh), emp);
 		}
 		
-		adjust_vehicle_tech(veh, GET_ISLAND_ID(IN_ROOM(veh)), TRUE);
+		if (IN_ROOM(veh)) {
+			adjust_vehicle_tech(veh, GET_ISLAND_ID(IN_ROOM(veh)), TRUE);
+		}
 		if (VEH_IS_COMPLETE(veh)) {
 			qt_empire_players_vehicle(emp, qt_gain_vehicle, veh);
 			et_gain_vehicle(emp, veh);
