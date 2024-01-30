@@ -3777,9 +3777,16 @@ void perform_claim_vehicle(vehicle_data *veh, empire_data *emp) {
 	provided_light = VEH_PROVIDES_LIGHT(veh);
 	
 	if (emp) {
+		// basic owner"ship"
 		VEH_OWNER(veh) = emp;
 		VEH_SHIPPING_ID(veh) = -1;
-	
+		
+		// techs
+		if (IN_ROOM(veh)) {
+			adjust_vehicle_tech(veh, GET_ISLAND_ID(IN_ROOM(veh)), TRUE);
+		}
+		
+		// claim interior
 		if (VEH_INTERIOR_HOME_ROOM(veh)) {
 			if (ROOM_OWNER(VEH_INTERIOR_HOME_ROOM(veh)) && ROOM_OWNER(VEH_INTERIOR_HOME_ROOM(veh)) != emp) {
 				abandon_room(VEH_INTERIOR_HOME_ROOM(veh));
@@ -3787,14 +3794,13 @@ void perform_claim_vehicle(vehicle_data *veh, empire_data *emp) {
 			claim_room(VEH_INTERIOR_HOME_ROOM(veh), emp);
 		}
 		
-		if (IN_ROOM(veh)) {
-			adjust_vehicle_tech(veh, GET_ISLAND_ID(IN_ROOM(veh)), TRUE);
-		}
+		// mark empire stats
 		if (VEH_IS_COMPLETE(veh)) {
 			qt_empire_players_vehicle(emp, qt_gain_vehicle, veh);
 			et_gain_vehicle(emp, veh);
 		}
 		
+		// import dropped list
 		add_dropped_item_list(emp, VEH_CONTAINS(veh));
 		
 		// check if light changed
@@ -3807,6 +3813,7 @@ void perform_claim_vehicle(vehicle_data *veh, empire_data *emp) {
 			}
 		}
 		
+		// and save
 		request_vehicle_save_in_world(veh);
 	}
 }

@@ -1852,6 +1852,11 @@ bool start_upgrade(char_data *ch, craft_data *upgrade_craft, room_data *from_roo
 						continue;	// these are not the rooms you're looking for
 					}
 					
+					// turn tech off: vehicle will be incomplete
+					if (ROOM_OWNER(room_iter)) {
+						adjust_building_tech(ROOM_OWNER(room_iter), room_iter, FALSE);
+					}
+					
 					COMPLEX_DATA(room_iter)->home_room = interior;
 					add_room_to_vehicle(room_iter, new_veh);
 					request_world_save(GET_ROOM_VNUM(room_iter), WSAVE_ROOM);

@@ -1170,12 +1170,18 @@ void start_dismantle_vehicle(vehicle_data *veh, char_data *ch) {
 	struct resource_data *res, *next_res;
 	craft_data *craft = find_craft_for_vehicle(veh);
 	obj_data *proto;
+	struct vehicle_room_list *vrl;
 	
 	// remove from goals/tech
 	if (VEH_OWNER(veh) && VEH_IS_COMPLETE(veh)) {
 		qt_empire_players_vehicle(VEH_OWNER(veh), qt_lose_vehicle, veh);
 		et_lose_vehicle(VEH_OWNER(veh), veh);
 		adjust_vehicle_tech(veh, GET_ISLAND_ID(IN_ROOM(veh)), FALSE);
+		
+		// adjust tech on interior
+		LL_FOREACH(VEH_ROOM_LIST(veh), vrl) {
+			adjust_building_tech(VEH_OWNER(veh), vrl->room, FALSE);
+		}
 	}
 	
 	// clear it out
@@ -1572,9 +1578,14 @@ void apply_vehicle_to_island(vehicle_data *veh, int island_id) {
 	// update island id
 	VEH_APPLIED_TO_ISLAND(veh) = island_id;
 	
-	// cascade to interior vehicles
+	// cascade to interior rooms and vehicles
 	if (VEH_ROOM_LIST(veh)) {
 		LL_FOREACH(VEH_ROOM_LIST(veh), vrl) {
+			// adjust techs for this island
+			if (VEH_OWNER(veh)) {
+				adjust_building_tech(VEH_OWNER(veh), vrl->room, TRUE);
+			}
+			
 			// check vehicles inside and cascade
 			DL_FOREACH2(ROOM_VEHICLES(vrl->room), iter, next_in_room) {
 				apply_vehicle_to_island(iter, island_id);
@@ -1834,6 +1845,7 @@ bool audit_vehicle(vehicle_data *veh, char_data *ch) {
 */
 void complete_vehicle(vehicle_data *veh) {
 	room_data *room = IN_ROOM(veh);	// store room in case veh is purged during a trigger
+	struct vehicle_room_list *vrl;
 	
 	if (VEH_IS_DISMANTLING(veh)) {
 		// short-circuit out to dismantling
@@ -1859,11 +1871,16 @@ void complete_vehicle(vehicle_data *veh) {
 			qt_empire_players_vehicle(VEH_OWNER(veh), qt_gain_vehicle, veh);
 			et_gain_vehicle(VEH_OWNER(veh), veh);
 			adjust_vehicle_tech(veh, GET_ISLAND_ID(IN_ROOM(veh)), TRUE);
+			
+			// adjust tech on existing interior?
+			LL_FOREACH(VEH_ROOM_LIST(veh), vrl) {
+				adjust_building_tech(VEH_OWNER(veh), vrl->room, TRUE);
+			}
 		}
 		
 		finish_vehicle_setup(veh);
 		
-		// build the interior
+		// build the interior if not built?
 		get_vehicle_interior(veh);
 		
 		// run triggers
@@ -2492,12 +2509,21 @@ void store_one_vehicle_to_file(vehicle_data *veh, FILE *fl) {
 * @param vehicle_data *veh The vehicle.
 */
 void unapply_vehicle_to_island(vehicle_data *veh) {
+	struct vehicle_room_list *vrl;
+	
 	if (veh) {
 		if (VEH_APPLIED_TO_ISLAND(veh) != UNAPPLIED_ISLAND) {
 			// NOTE: do not remove the island-id on the interior rooms -- do this only when applying to a new room
 			
 			// un-apply tech -- do it before removing from the island
 			adjust_vehicle_tech(veh, VEH_APPLIED_TO_ISLAND(veh), FALSE);
+			
+			// un-apply interior techs too
+			if (VEH_OWNER(veh) && VEH_ROOM_LIST(veh)) {
+				LL_FOREACH(VEH_ROOM_LIST(veh), vrl) {
+					adjust_building_tech(VEH_OWNER(veh), vrl->room, FALSE);
+				}
+			}
 			
 			// and clear the data
 			VEH_APPLIED_TO_ISLAND(veh) = UNAPPLIED_ISLAND;

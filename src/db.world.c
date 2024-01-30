@@ -2356,26 +2356,39 @@ void perform_change_sect(room_data *loc, struct map_data *map, sector_data *sect
 * @param bool add Adds the techs if TRUE, or removes them if FALSE.
 */
 void adjust_building_tech(empire_data *emp, room_data *room, bool add) {
-	struct empire_island *isle = NULL;
 	int amt = add ? 1 : -1;	// adding or removing 1
-	int island;
+	struct empire_island *e_isle = NULL;
+	struct empire_npc_data *npc;
+	struct empire_territory_data *ter;
 	
 	// only care about buildings
-	if (!emp || !GET_BUILDING(room) || IS_INCOMPLETE(room) || IS_DISMANTLING(room)) {
+	if (!emp || !room || !GET_BUILDING(room) || IS_INCOMPLETE(room) || IS_DISMANTLING(room)) {
+		return;
+	}
+	// ensure we're in the world
+	if (GET_ROOM_VEHICLE(room) && (!IN_ROOM(GET_ROOM_VEHICLE(room)) || !VEH_IS_COMPLETE(GET_ROOM_VEHICLE(room)) || VEH_IS_DISMANTLING(GET_ROOM_VEHICLE(room)))) {
 		return;
 	}
 	
-	// must be on an island
-	if ((island = GET_ISLAND_ID(room)) == NO_ISLAND) {
-		return;
+	// look up empire island
+	if (GET_ISLAND_ID(room) != NO_ISLAND) {
+		e_isle = get_empire_island(emp, GET_ISLAND_ID(room));
 	}
 	
 	// WARNING: do not check in-city status on these ... it can change at a time when territory is not re-scanned
 	
+	// building techs
 	if (HAS_FUNCTION(room, FNC_DOCKS)) {
 		EMPIRE_TECH(emp, TECH_SEAPORT) += amt;
-		if (isle || (isle = get_empire_island(emp, island))) {
-			isle->tech[TECH_SEAPORT] += amt;
+		if (e_isle) {
+			e_isle->tech[TECH_SEAPORT] += amt;
+		}
+	}
+	
+	// island population
+	if (e_isle && (ter = find_territory_entry(emp, room))) {
+		LL_FOREACH(ter->npcs, npc) {
+			e_isle->population += amt;
 		}
 	}
 	
@@ -2401,26 +2414,18 @@ void adjust_building_tech(empire_data *emp, room_data *room, bool add) {
 void adjust_vehicle_tech(vehicle_data *veh, int island_id, bool add) {
 	int amt = add ? 1 : -1;	// adding or removing 1
 	empire_data *emp = NULL;
-	room_data *room = NULL;
 	struct empire_island *e_isle = NULL;
-	struct empire_npc_data *npc;
-	struct empire_territory_data *ter;
-	struct vehicle_room_list *vrl;
 	
 	if (veh) {
 		emp = VEH_OWNER(veh);
-		room = IN_ROOM(veh);
-	}
-	if (room && island_id == NO_ISLAND) {
-		island_id = GET_ISLAND_ID(room);	// if any
+		if (IN_ROOM(veh)) {
+			island_id = GET_ISLAND_ID(IN_ROOM(veh));	// if any
+		}
 	}
 	
 	// only care about
 	if (!emp || !veh || !VEH_IS_COMPLETE(veh)) {
 		return;
-	}
-	if (room && GET_ROOM_VEHICLE(room) && VEH_FLAGGED(GET_ROOM_VEHICLE(room), MOVABLE_VEH_FLAGS)) {
-		return;	// do NOT adjust tech if inside a moving vehicle
 	}
 	
 	// for island stats
@@ -2434,18 +2439,7 @@ void adjust_vehicle_tech(vehicle_data *veh, int island_id, bool add) {
 		}
 	}
 	
-	// count population on interior rooms
-	if (e_isle) {
-		// TODO: count vehicle artisan as population?
-		
-		LL_FOREACH(VEH_ROOM_LIST(veh), vrl) {
-			if ((ter = find_territory_entry(emp, vrl->room))) {
-				LL_FOREACH(ter->npcs, npc) {
-					e_isle->population += amt;
-				}
-			}
-		}
-	}
+	// TODO: count vehicle artisan as population?
 	
 	// other traits from buildings?
 	EMPIRE_MILITARY(emp) += VEH_MILITARY(veh) * amt;
