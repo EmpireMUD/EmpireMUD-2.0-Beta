@@ -2701,7 +2701,11 @@ void reread_empire_tech(empire_data *emp) {
 	resort_empires(FALSE);
 	
 	// re-send MSDP claim data
-	TRIGGER_DELAYED_REFRESH(emp, DELAY_REFRESH_MSDP_UPDATE_CLAIMS);
+	HASH_ITER(hh, empire_table, iter, next_iter) {
+		if (!emp || iter == emp) {
+			TRIGGER_DELAYED_REFRESH(emp, DELAY_REFRESH_MSDP_UPDATE_CLAIMS);
+		}
+	}
 }
 
 
