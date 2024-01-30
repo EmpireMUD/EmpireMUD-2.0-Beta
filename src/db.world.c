@@ -2703,7 +2703,7 @@ void reread_empire_tech(empire_data *emp) {
 	// re-send MSDP claim data
 	HASH_ITER(hh, empire_table, iter, next_iter) {
 		if (!emp || iter == emp) {
-			TRIGGER_DELAYED_REFRESH(emp, DELAY_REFRESH_MSDP_UPDATE_CLAIMS);
+			TRIGGER_DELAYED_REFRESH(iter, DELAY_REFRESH_MSDP_UPDATE_CLAIMS);
 		}
 	}
 }
