@@ -3375,13 +3375,15 @@ void write_empire_to_file(FILE *fl, empire_data *emp) {
 	
 	HASH_ITER(hh, EMPIRE_ISLANDS(emp), isle, next_isle) {
 		// I: island names
-		if (isle->name) {
+		if (isle->name && *(isle->name)) {
 			fprintf(fl, "I%d\n%s~\n", isle->island, isle->name);
 		}
 		
 		// J: island data
 		HASH_ITER(hh, isle->needs, need, next_need) {
-			fprintf(fl, "J %d %d %d %s\n", isle->island, need->type, need->needed, bitv_to_alpha(need->status));
+			if (need->needed || need->status) {
+				fprintf(fl, "J %d %d %d %s\n", isle->island, need->type, need->needed, bitv_to_alpha(need->status));
+			}
 		}
 	}
 	
