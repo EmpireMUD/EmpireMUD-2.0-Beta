@@ -2420,6 +2420,7 @@ ACMD(do_learned) {
 	for (l_pos = 0, is_emp = FALSE; l_pos < 2 && !overflow; ++l_pos, is_emp = TRUE) {
 		last_type = -1;	// reset each loop
 		*line = '\0';
+		l_size = 0;
 		comma = FALSE;
 		
 		HASH_ITER(hh, lists[l_pos], pcd, next_pcd) {
@@ -2435,7 +2436,6 @@ ACMD(do_learned) {
 			
 			// ok:
 			++count;
-			l_size = 0;
 			
 			// check start of line
 			if (last_type == -1 || last_type != GET_CRAFT_TYPE(craft)) {
