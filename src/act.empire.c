@@ -504,8 +504,13 @@ bool is_affiliated_island(empire_data *emp, int island_id) {
 	struct empire_storage_data *store, *next_store;
 	struct empire_unique_storage *eus;
 	
+	// shortcut when no-island
+	if (island_id == NO_ISLAND) {
+		return FALSE;
+	}
+	
 	//Grab the empire_isle information.
-	isle = get_empire_island(emp,island_id);
+	isle = get_empire_island(emp, island_id);
 	
 	//Check if the empire has claimed tiles in the island.
 	if (isle->territory[TER_TOTAL] > 0) {

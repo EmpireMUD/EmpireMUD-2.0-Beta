@@ -403,17 +403,19 @@ void construct_building(room_data *room, bld_vnum type) {
 	
 	// check for territory updates
 	if (ROOM_OWNER(room) && was_large != LARGE_CITY_RADIUS(room)) {
-		struct empire_island *eisle = get_empire_island(ROOM_OWNER(room), GET_ISLAND_ID(room));
 		is_ter = get_territory_type_for_empire(room, ROOM_OWNER(room), FALSE, &junk, NULL);
 		
 		if (was_ter != is_ter) {	// did territory type change?
 			SAFE_ADD(EMPIRE_TERRITORY(ROOM_OWNER(room), was_ter), -1, 0, UINT_MAX, FALSE);
-			SAFE_ADD(eisle->territory[was_ter], -1, 0, UINT_MAX, FALSE);
-			
 			SAFE_ADD(EMPIRE_TERRITORY(ROOM_OWNER(room), is_ter), 1, 0, UINT_MAX, FALSE);
-			SAFE_ADD(eisle->territory[is_ter], 1, 0, UINT_MAX, FALSE);
 			
 			// (total territory does not change)
+			
+			if (GET_ISLAND_ID(room) != NO_ISLAND) {
+				struct empire_island *eisle = get_empire_island(ROOM_OWNER(room), GET_ISLAND_ID(room));
+				SAFE_ADD(eisle->territory[was_ter], -1, 0, UINT_MAX, FALSE);
+				SAFE_ADD(eisle->territory[is_ter], 1, 0, UINT_MAX, FALSE);
+			}
 		}
 	}
 	
@@ -675,17 +677,19 @@ void disassociate_building(room_data *room) {
 	
 	// check for territory updates
 	if (ROOM_OWNER(room) && was_large != (ROOM_BLD_FLAGGED(room, BLD_LARGE_CITY_RADIUS) ? TRUE : FALSE)) {
-		struct empire_island *eisle = get_empire_island(ROOM_OWNER(room), GET_ISLAND_ID(room));
 		is_ter = get_territory_type_for_empire(room, ROOM_OWNER(room), FALSE, &junk, NULL);
 		
 		if (was_ter != is_ter) {
 			SAFE_ADD(EMPIRE_TERRITORY(ROOM_OWNER(room), was_ter), -1, 0, UINT_MAX, FALSE);
-			SAFE_ADD(eisle->territory[was_ter], -1, 0, UINT_MAX, FALSE);
-			
 			SAFE_ADD(EMPIRE_TERRITORY(ROOM_OWNER(room), is_ter), 1, 0, UINT_MAX, FALSE);
-			SAFE_ADD(eisle->territory[is_ter], 1, 0, UINT_MAX, FALSE);
 			
 			// (totals do not change)
+			
+			if (GET_ISLAND_ID(room) != NO_ISLAND) {
+				struct empire_island *eisle = get_empire_island(ROOM_OWNER(room), GET_ISLAND_ID(room));
+				SAFE_ADD(eisle->territory[was_ter], -1, 0, UINT_MAX, FALSE);
+				SAFE_ADD(eisle->territory[is_ter], 1, 0, UINT_MAX, FALSE);
+			}
 		}
 	}
 	

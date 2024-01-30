@@ -2290,17 +2290,19 @@ void perform_change_sect(room_data *loc, struct map_data *map, sector_data *sect
 	// check for territory updates
 	if (loc && ROOM_OWNER(loc)) {
 		if (was_large != LARGE_CITY_RADIUS(loc)) {
-			struct empire_island *eisle = get_empire_island(ROOM_OWNER(loc), GET_ISLAND_ID(loc));
 			is_ter = get_territory_type_for_empire(loc, ROOM_OWNER(loc), FALSE, &junk, NULL);
 			
 			if (was_ter != is_ter) {	// did territory type change?
 				SAFE_ADD(EMPIRE_TERRITORY(ROOM_OWNER(loc), was_ter), -1, 0, UINT_MAX, FALSE);
-				SAFE_ADD(eisle->territory[was_ter], -1, 0, UINT_MAX, FALSE);
-			
 				SAFE_ADD(EMPIRE_TERRITORY(ROOM_OWNER(loc), is_ter), 1, 0, UINT_MAX, FALSE);
-				SAFE_ADD(eisle->territory[is_ter], 1, 0, UINT_MAX, FALSE);
 				
 				// (total counts do not change)
+				
+				if (GET_ISLAND_ID(loc) != NO_ISLAND) {
+					struct empire_island *eisle = get_empire_island(ROOM_OWNER(loc), GET_ISLAND_ID(loc));
+					SAFE_ADD(eisle->territory[was_ter], -1, 0, UINT_MAX, FALSE);
+					SAFE_ADD(eisle->territory[is_ter], 1, 0, UINT_MAX, FALSE);
+				}
 			}
 		}
 		if (belongs != BELONGS_IN_TERRITORY_LIST(loc)) {	// do we need to add/remove the territory entry?

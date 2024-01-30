@@ -2733,13 +2733,13 @@ ACMD(do_chart) {
 		// collect empire data on the island
 		total_claims = 0;
 		HASH_ITER(hh, empire_table, emp, next_emp) {
-			if (!(e_isle = get_empire_island(emp, isle->id))) {
+			if (isle->id == NO_ISLAND || !(e_isle = get_empire_island(emp, isle->id))) {
 				continue;
 			}
 			
 			if (e_isle->territory[TER_TOTAL] > 0) {
 				chart_add_territory(&hash, emp, e_isle->territory[TER_TOTAL]);
-				total_claims += e_isle->territory[TER_TOTAL];
+				SAFE_ADD(total_claims, e_isle->territory[TER_TOTAL], 0, INT_MAX, FALSE);
 			}
 			
 			LL_FOREACH(EMPIRE_CITY_LIST(emp), city) {
