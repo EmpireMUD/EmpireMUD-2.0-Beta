@@ -2866,7 +2866,7 @@ void parse_empire(FILE *fl, empire_vnum vnum) {
 			}
 			case 'C': { // chore
 				if (sscanf(line, "C %d %d %d", &t[0], &t[1], &t[2]) == 3) {
-					if (t[1] >= 0 && t[1] < NUM_CHORES && (isle = get_empire_island(emp, t[0]))) {
+					if (t[1] >= 0 && t[1] < NUM_CHORES && t[0] != NO_ISLAND && (isle = get_empire_island(emp, t[0]))) {
 						isle->workforce_limit[t[1]] = t[2];
 					}
 				}
