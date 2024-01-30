@@ -1164,7 +1164,7 @@ home       Immort   Shows where a player's home is, if any.
 homeless   Immort   Shows the homeless citizen list for an empire.
 ignoring   Immort   Shows you who a player has on their ignore list.
 inventory  Immort   Shows how many players and empires have a certain item.
-islands    Immort   Shows you which island ids have empire storage (for MOVEEINV).
+islands    Immort   Shows you which island ids have empire storage/territory (for MOVEEINV).
 languages  Immort   Shows which languages a player knows and is speaking.
 lastnames  Immort   Shows target player's lastname list.
 learned    Immort   Shows you learned recipes.

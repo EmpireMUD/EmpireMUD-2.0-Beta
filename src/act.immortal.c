@@ -3640,7 +3640,9 @@ SHOW(show_inventory) {
 // for show_islands	
 struct show_island_data {
 	int island;
-	int count;
+	int items;
+	int population;
+	int territory;
 	struct show_island_data *next;
 };
 
@@ -3660,7 +3662,6 @@ struct show_island_data *find_or_make_show_island(int island, struct show_island
 	if (!cur) {
 		CREATE(cur, struct show_island_data, 1);
 		cur->island = island;
-		cur->count = 0;
 		LL_PREPEND(*list, cur);
 	}
 	
@@ -3670,6 +3671,7 @@ struct show_island_data *find_or_make_show_island(int island, struct show_island
 
 SHOW(show_islands) {
 	struct empire_unique_storage *uniq;
+	struct shipping_data *shipd;
 	struct empire_storage_data *store, *next_store;
 	struct empire_island *eisle, *next_eisle;
 	char arg[MAX_INPUT_LENGTH];
@@ -3681,27 +3683,35 @@ SHOW(show_islands) {
 	
 	one_word(argument, arg);
 	if (!*arg) {
-		msg_to_char(ch, "Show islands (storage) for which empire?\r\n");
+		msg_to_char(ch, "Show islands for which empire?\r\n");
 	}
 	else if (!(emp = get_empire_by_name(arg))) {
 		msg_to_char(ch, "Unknown empire '%s'.\r\n", arg);
 	}
 	else {
-		msg_to_char(ch, "Island storage counts for %s%s&0:\r\n", EMPIRE_BANNER(emp), EMPIRE_NAME(emp));
+		msg_to_char(ch, "Island counts for %s%s&0:\r\n", EMPIRE_BANNER(emp), EMPIRE_NAME(emp));
 		
-		// collate storage info
+		// collate storage info and territory
 		HASH_ITER(hh, EMPIRE_ISLANDS(emp), eisle, next_eisle) {
 			cur = find_or_make_show_island(eisle->island, &list);
+			SAFE_ADD(cur->population, eisle->population, 0, INT_MAX, FALSE);
+			SAFE_ADD(cur->territory, eisle->territory[TER_TOTAL], 0, INT_MAX, FALSE);
 			
 			HASH_ITER(hh, eisle->store, store, next_store) {
-				SAFE_ADD(cur->count, store->amount, 0, INT_MAX, FALSE);
+				SAFE_ADD(cur->items, store->amount, 0, INT_MAX, FALSE);
 			}
 		}
 		DL_FOREACH(EMPIRE_UNIQUE_STORAGE(emp), uniq) {
 			if (!cur || cur->island != uniq->island) {
 				cur = find_or_make_show_island(uniq->island, &list);
 			}
-			SAFE_ADD(cur->count, uniq->amount, 0, INT_MAX, FALSE);
+			SAFE_ADD(cur->items, uniq->amount, 0, INT_MAX, FALSE);
+		}
+		DL_FOREACH(EMPIRE_SHIPPING_LIST(emp), shipd) {
+			if (!cur || cur->island != shipd->from_island) {
+				cur = find_or_make_show_island(shipd->from_island, &list);
+			}
+			SAFE_ADD(cur->items, shipd->amount, 0, INT_MAX, FALSE);
 		}
 		
 		if (!list) {
@@ -3724,7 +3734,7 @@ SHOW(show_islands) {
 			}
 			
 			isle = get_island(cur->island, TRUE);
-			msg_to_char(ch, "%2d. %s: %d items\r\n", cur->island, get_island_name_for(isle->id, ch), cur->count);
+			msg_to_char(ch, "%2d. %s: %d items, %d population, %d territory\r\n", cur->island, get_island_name_for(isle->id, ch), cur->items, cur->population, cur->territory);
 			// pull it out of the list to prevent unlimited iteration
 			LL_DELETE(list, cur);
 			free(cur);
