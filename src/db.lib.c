@@ -2097,7 +2097,7 @@ void delete_territory_npc(struct empire_territory_data *ter, struct empire_npc_d
 	// reduce pop
 	if (emp) {
 		EMPIRE_POPULATION(emp) -= 1;
-		if (!GET_ROOM_VEHICLE(ter->room) && (isle = get_empire_island(emp, GET_ISLAND_ID(ter->room)))) {
+		if (GET_ISLAND_ID(ter->room) != NO_ISLAND && (isle = get_empire_island(emp, GET_ISLAND_ID(ter->room)))) {
 			isle->population -= 1;
 		}
 		EMPIRE_NEEDS_SAVE(emp) = TRUE;
@@ -3964,7 +3964,7 @@ void populate_npc(room_data *room, struct empire_territory_data *ter, bool force
 	
 	// update pop
 	EMPIRE_POPULATION(emp) += 1;
-	if (!GET_ROOM_VEHICLE(room) && (isle = get_empire_island(emp, GET_ISLAND_ID(room)))) {
+	if (GET_ISLAND_ID(room) != NO_ISLAND && (isle = get_empire_island(emp, GET_ISLAND_ID(room)))) {
 		isle->population += 1;
 	}
 	

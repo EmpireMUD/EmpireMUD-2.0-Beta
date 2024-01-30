@@ -5238,8 +5238,6 @@ struct empire_chore_type {
 struct empire_city_data {
 	char *name;
 	int type;
-	int population;
-	int military;
 	
 	room_data *location;
 	bitvector_t traits;	// ETRAIT_x

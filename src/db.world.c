@@ -1887,9 +1887,6 @@ struct empire_city_data *create_city_entry(empire_data *emp, char *name, room_da
 	city->name = str_dup(name);
 	city->location = location;
 	city->type = type;
-
-	city->population = 0;
-	city->military = 0;
 	
 	city->traits = EMPIRE_FRONTIER_TRAITS(emp);	// defaults
 	
@@ -2468,8 +2465,9 @@ void clear_empire_techs(empire_data *emp) {
 		
 		// zero out existing islands
 		HASH_ITER(hh, EMPIRE_ISLANDS(iter), isle, next_isle) {
+			isle->population = 0;
+			
 			for (sub = 0; sub < NUM_TECHS; ++sub) {
-				isle->population = 0;
 				isle->tech[sub] = EMPIRE_BASE_TECH(iter, sub);
 			}
 		}
@@ -2568,7 +2566,11 @@ void read_empire_territory(empire_data *emp, bool check_tech) {
 			
 			// reset counters
 			HASH_ITER(hh, EMPIRE_ISLANDS(e), isle, next_isle) {
-				isle->population = 0;
+				// island population only resets if we're calling tech funcs
+				if (check_tech) {
+					isle->population = 0;
+				}
+				
 				for (pos = 0; pos < NUM_TERRITORY_TYPES; ++pos) {
 					isle->territory[pos] = 0;
 				}
@@ -2581,17 +2583,20 @@ void read_empire_territory(empire_data *emp, bool check_tech) {
 		if ((e = ROOM_OWNER(iter)) && (!emp || e == emp)) {
 			// only count each building as 1
 			if (COUNTS_AS_TERRITORY(iter)) {
-				isle = get_empire_island(e, GET_ISLAND_ID(iter));
 				ter_type = get_territory_type_for_empire(iter, e, FALSE, &junk, NULL);
 				
 				SAFE_ADD(EMPIRE_TERRITORY(e, ter_type), 1, 0, UINT_MAX, FALSE);
-				SAFE_ADD(isle->territory[ter_type], 1, 0, UINT_MAX, FALSE);
 				
 				SAFE_ADD(EMPIRE_TERRITORY(e, TER_TOTAL), 1, 0, UINT_MAX, FALSE);
-				SAFE_ADD(isle->territory[TER_TOTAL], 1, 0, UINT_MAX, FALSE);
+				
+				if (GET_ISLAND_ID(iter) != NO_ISLAND) {
+					isle = get_empire_island(e, GET_ISLAND_ID(iter));
+					SAFE_ADD(isle->territory[ter_type], 1, 0, UINT_MAX, FALSE);
+					SAFE_ADD(isle->territory[TER_TOTAL], 1, 0, UINT_MAX, FALSE);
+				}
 			}
 			
-			// this is only done if we are re-reading techs
+			// this is only done if we are re-reading techs (also updates island population)
 			if (check_tech) {
 				adjust_building_tech(e, iter, TRUE);
 			}
@@ -2613,9 +2618,6 @@ void read_empire_territory(empire_data *emp, bool check_tech) {
 					}
 					for (npc = ter->npcs; npc; npc = npc->next) {
 						EMPIRE_POPULATION(e) += 1;
-						if (!GET_ROOM_VEHICLE(iter)) {
-							isle->population += 1;
-						}
 					}
 				}
 			}
