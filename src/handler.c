@@ -12121,6 +12121,30 @@ vehicle_data *get_vehicle_world(char *name, int *number) {
 
 
 /**
+* Finds a vehicle in the world by idnum.
+*
+* @param int idnum The idnum of the vehicle to find.
+* @return vehicle_data* The found ship, or NULL.
+*/
+vehicle_data *get_vehicle_world_by_idnum(int idnum) {
+	vehicle_data *veh;
+	
+	// shortcut
+	if (idnum <= 0) {
+		return NULL;
+	}
+	
+	DL_FOREACH(vehicle_list, veh) {
+		if (VEH_IDNUM(veh) == idnum) {
+			return veh;
+		}
+	}
+	
+	return NULL;
+}
+
+
+/**
 * Find a vehicle in the world that ch can see.
 *
 * @param char_data *ch The person looking for a vehicle.
