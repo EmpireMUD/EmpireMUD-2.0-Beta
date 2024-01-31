@@ -3643,6 +3643,7 @@ struct show_island_data {
 	int items;
 	int population;
 	int territory;
+	char *techs;
 	struct show_island_data *next;
 };
 
@@ -3674,10 +3675,10 @@ SHOW(show_islands) {
 	struct shipping_data *shipd;
 	struct empire_storage_data *store, *next_store;
 	struct empire_island *eisle, *next_eisle;
-	char arg[MAX_INPUT_LENGTH];
+	char arg[MAX_INPUT_LENGTH], tech_str[MAX_STRING_LENGTH];
 	struct island_info *isle;
 	empire_data *emp;
-	int iter;
+	int iter, tid;
 	
 	struct show_island_data *list = NULL, *sid, *cur = NULL;
 	
@@ -3699,6 +3700,20 @@ SHOW(show_islands) {
 			
 			HASH_ITER(hh, eisle->store, store, next_store) {
 				SAFE_ADD(cur->items, store->amount, 0, INT_MAX, FALSE);
+			}
+			
+			// techs?
+			*tech_str = '\0';
+			for (tid = 0; tid < NUM_TECHS; ++tid) {
+				if (eisle->tech[tid] > 0) {
+					snprintf(tech_str + strlen(tech_str), sizeof(tech_str) - strlen(tech_str), "%s%s", (*tech_str ? ", " : ""), techs[tid]);
+				}
+			}
+			if (*tech_str) {
+				if (cur->techs) {
+					free(cur->techs);
+				}
+				cur->techs = strdup(tech_str);
 			}
 		}
 		DL_FOREACH(EMPIRE_UNIQUE_STORAGE(emp), uniq) {
@@ -3734,9 +3749,12 @@ SHOW(show_islands) {
 			}
 			
 			isle = get_island(cur->island, TRUE);
-			msg_to_char(ch, "%2d. %s: %d items, %d population, %d territory\r\n", cur->island, get_island_name_for(isle->id, ch), cur->items, cur->population, cur->territory);
+			msg_to_char(ch, "%2d. %s: %d items, %d population, %d territory%s%s\r\n", cur->island, get_island_name_for(isle->id, ch), cur->items, cur->population, cur->territory, cur->techs ? ", " : "", NULLSAFE(cur->techs));
 			// pull it out of the list to prevent unlimited iteration
 			LL_DELETE(list, cur);
+			if (cur->techs) {
+				free(cur->techs);
+			}
 			free(cur);
 		}
 	}
