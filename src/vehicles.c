@@ -2343,8 +2343,8 @@ vehicle_data *read_vehicle(any_vnum vnum, bool with_triggers) {
 	remove_vehicle_flags(veh, VEH_INCOMPLETE | VEH_DISMANTLING);	// ensure not marked incomplete/dismantle
 	
 	// give it a new idnum
-	VEH_VNUM(veh) = data_get_int(DATA_TOP_VEHICLE_ID) + 1;
-	data_set_int(DATA_TOP_VEHICLE_ID, VEH_VNUM(veh));
+	VEH_IDNUM(veh) = data_get_int(DATA_TOP_VEHICLE_ID) + 1;
+	data_set_int(DATA_TOP_VEHICLE_ID, VEH_IDNUM(veh));
 	
 	// this will be initialized only if needed
 	veh->script_id = 0;
