@@ -3705,7 +3705,7 @@ SHOW(show_islands) {
 			// techs?
 			*tech_str = '\0';
 			for (tid = 0; tid < NUM_TECHS; ++tid) {
-				if (eisle->tech[tid] > 0) {
+				if (eisle->tech[tid] > 0 && search_block_int(tid, techs_requiring_same_island) != NOTHING) {
 					snprintf(tech_str + strlen(tech_str), sizeof(tech_str) - strlen(tech_str), "%s%s", (*tech_str ? ", " : ""), techs[tid]);
 				}
 			}
@@ -3750,6 +3750,7 @@ SHOW(show_islands) {
 			
 			isle = get_island(cur->island, TRUE);
 			msg_to_char(ch, "%2d. %s: %d items, %d population, %d territory%s%s\r\n", cur->island, get_island_name_for(isle->id, ch), cur->items, cur->population, cur->territory, cur->techs ? ", " : "", NULLSAFE(cur->techs));
+			
 			// pull it out of the list to prevent unlimited iteration
 			LL_DELETE(list, cur);
 			if (cur->techs) {

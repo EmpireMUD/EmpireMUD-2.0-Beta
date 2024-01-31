@@ -1501,19 +1501,14 @@ bool has_tech_available_room(room_data *room, int tech) {
 	empire_data *emp = ROOM_OWNER(room);
 	bool requires_island = FALSE;
 	struct empire_island *isle;
-	int id, iter;
+	int id;
 	
 	if (!emp) {
 		return FALSE;
 	}
 	
 	// see if it requires island
-	for (iter = 0; techs_requiring_same_island[iter] != NOTHING; ++iter) {
-		if (tech == techs_requiring_same_island[iter]) {
-			requires_island = TRUE;
-			break;
-		}
-	}
+	requires_island = (search_block_int(tech, techs_requiring_same_island) != NOTHING);
 	
 	// easy way out
 	if (!requires_island && EMPIRE_HAS_TECH(emp, tech)) {
@@ -2432,6 +2427,31 @@ int search_block_multi_isname(char *arg, const char **list) {
 	}
 	
 	return partial;	// if any
+}
+
+
+/**
+* Searches an array of ints for a target int.  Returns NOTHING if not found;
+* 0..n otherwise.  Array must be terminated with a NOTHING so it knows to stop
+* searching.
+*
+* @param int find The integer to look for.
+* @param const int *list A NOTHING-terminated int list.
+*/
+int search_block_int(int find, const int *list) {
+	register int iter;
+	
+	if (find == NOTHING) {
+		return NOTHING;	// shortcut
+	}
+	
+	for (iter = 0; *(list + iter) != NOTHING; ++iter) {
+		if (find == *(list + iter)) {
+			return iter;	// found
+		}
+	}
+
+	return NOTHING;	// nope
 }
 
 

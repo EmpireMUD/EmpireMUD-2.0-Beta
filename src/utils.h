@@ -1929,6 +1929,7 @@ char *quoted_arg_or_all(char *argument, char *found_arg);
 int reserved_word(char *argument);
 int search_block(char *arg, const char **list, int exact);
 int search_block_multi_isname(char *arg, const char **list);
+int search_block_int(int find, const int *list);
 void skip_spaces(char **string);
 char *two_arguments(char *argument, char *first_arg, char *second_arg);
 void ucwords(char *string);
