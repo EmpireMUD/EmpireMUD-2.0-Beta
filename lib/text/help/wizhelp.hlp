@@ -1144,68 +1144,70 @@ The SHOW command displays information. Some modes of show require additional
 information, such as a player name. 'show' without a mode gives a quick list of
 the options below. Valid Modes:
 
-Mode       Level    Description
-------     ------   -------------
-stats      God      Shows game stats including prototypes.
-ammotypes  Immort   Shows the 'ammo type' setting for all bows and ammo.
-author     Immort   Shows all books from a given author idnum.
-buildings  Immort   Shows occurrences of buildings (vnum/name optional).
-companions Immort   Shows a player's available companions.
-components Immort   Shows all items matching a generic component vnum.
-crops      Immort   Shows tile counts for all the crops (vnum/name optional).
-currency   Immort   Shows coins and adventure currencies for a player.
-dailycycle Immort   Shows daily quests with a given cycle id.
-dropped    Immort   Shows all items an empire has on the ground.
-editors    Immort   Shows what each player is editing, if anything.
-factions   Immort   Shows a player's faction levels.
-fmessages  Immort   Shows a player's fight message toggles.
-friends    Immort   Shows another player's friends list.
-home       Immort   Shows where a player's home is, if any.
-homeless   Immort   Shows the homeless citizen list for an empire.
-ignoring   Immort   Shows you who a player has on their ignore list.
-inventory  Immort   Shows how many players and empires have a certain item.
-islands    Immort   Shows you which island ids have empire storage/territory (for MOVEEINV).
-languages  Immort   Shows which languages a player knows and is speaking.
-lastnames  Immort   Shows target player's lastname list.
-learned    Immort   Shows you learned recipes.
-libraries  Immort   Shows where a book is shelved.
-lostbooks  Immort   Shows books that are not shelved in any libraries.
-minipets   Immort   Shows you minipets collected by a player.
-moons      Immort   Shows any moons and their current phases/positions.
-mounts     Immort   Shows you mounts owned by a player.
-notes      Immort   Show notes on a player.
-oceanmobs  Immort   Shows mobs lost in the ocean.
-olc        Immort   Shows all players with OLC access (vnum optional).
-player     Immort   Shows player summary information.
-players    Immort   Shows health and status for all current players.
-produced   Immort   Shows total produced items for an empire.
-progress   Immort   Shows how many empires have completed a progress goal.
-progression Immrt   Shows stats on progression goals in general.
-quests     Immort   Shows quests and quest trackers for players.
-rent       Immort   Shows a player's full equipment and inventory.
-resource   Immort   Shows stats on an item based on global empire storage.
-sectors    Immort   Shows tile counts for all sector types (vnum/name optional).
-shops      Immort   Shows any shops available in your current location.
-skills     Immort   Shows skill levels and abilities for a player.
-smessages  Immort   Shows a player's status message toggles.
-spawns     Immort   Shows where a mob spawns on the map, similar to ".mob search".
-startlocs  Immort   Shows the location of all starting location tiles.
-storage    Immort   Shows items that can be stored in a given building/room type.
-subzone    Immort   Shows room templates with a matching subzone id.
-technology Immort   Shows ability techs a player has.
-terrain    Immort   Same as 'sectors' (for historical reasons).
-tomb       Immort   Shows where a player's tomb is, if any.
-tools      Immort   Shows all objects with a given tool type.
-unlearnable Immrt   Shows stats on LEANRED crafts with no assignments.
-unlockedarchetypes Immrt  Shows unlocked archetypes for a player's account.
-uses       Immort   Shows crafts (and vehicles, etc.) that use a component type.
-workforce  Immort   Shows you an empire's workforce setup.
-variables  Immort   Shows script variables on a player character.
-commons    Asst     Shows players currently connected from duplicate sites.
-site       Asst     Shows all players with a specific site segment.
-account    Co-Impl  Shows all the alts associated with a given player.
-data       Co-Impl  Shows data stored in the global data system
-piles      Co-Impl  Shows rooms with too many items piled up.
+Mode         Level    Description
+------       ------   -------------
+&c ammotypes&0   Immort   The 'ammo type' setting for all bows and ammo.
+&c author&0      Immort   All books from a given author idnum.
+&c buildings&0   Immort   Locations of buildings (vnum/name optional).
+&c commons&0     Immort   Players currently connected from duplicate sites.
+&c companions&0  Immort   A player's available companions.
+&c components&0  Immort   All items matching a generic component vnum.
+&c crops&0       Immort   Tile counts for all the crops (vnum/name optional).
+&c currency&0    Immort   Coins and adventure currencies for a player.
+&c dailycycle&0  Immort   Daily quests with a given cycle id.
+&c dropped&0     Immort   All items an empire has on the ground.
+&c editors&0     Immort   What each player is editing, if anything.
+&c factions&0    Immort   Player's faction levels.
+&c fmessages&0   Immort   Player's fight message toggles.
+&c friends&0     Immort   Player's friends list.
+&c home&0        Immort   Where a player's home is, if any.
+&c homeless&0    Immort   The homeless citizen list for an empire.
+&c ignoring&0    Immort   Player's ignore list.
+&c inventory&0   Immort   How many players and empires have a certain item.
+&c islands&0     Immort   Which island ids have empire storage (for MOVEEINV).
+&c languages&0   Immort   Which languages a player knows and is speaking.
+&c lastnames&0   Immort   Player's lastname list.
+&c learned&0     Immort   Learned recipes for a player.
+&c libraries&0   Immort   Where a book is shelved.
+&c lostbooks&0   Immort   Books that are not shelved in any libraries.
+&c minipets&0    Immort   Minipets collected by a player.
+&c moons&0       Immort   Moons and their current phases/positions.
+&c mounts&0      Immort   Mounts owned by a player.
+&c notes&0       Immort   Notes on a player.
+&c oceanmobs&0   Immort   Mobs lost in the ocean.
+&c olc&0         Immort   All players with OLC access (vnum optional).
+&c player&0      Immort   Player summary information.
+&c players&0     Immort   Health and status for all current players.
+&c produced&0    Immort   Total produced items for an empire.
+&c progress&0    Immort   How many empires have completed a progress goal.
+&c progression&0 Immort   Stats on progression goals in general.
+&c quests&0      Immort   Quests and quest trackers for players.
+&c rent&0        Immort   Player's full equipment and inventory.
+&c resource&0    Immort   Stats on an item based on global empire storage.
+&c sectors&0     Immort   Tile counts for all sector types (vnum/name optional).
+&c shops&0       Immort   Any shops available in your current location.
+&c site&0        Immort   All players with a specific site/IP segment.
+&c skills&0      Immort   Skill levels and abilities for a player.
+&c smessages&0   Immort   Player's status message toggles.
+&c spawns&0      Immort   Where a mob spawns on the map, similar to ".mob search".
+&c startlocs&0   Immort   All starting location tiles.
+&c storage&0     Immort   Items that can be stored in a given building/room type.
+&c subzone&0     Immort   Room templates with a matching subzone id.
+&c technology&0  Immort   Ptechs a player has.
+&c terrain&0     Immort   Same as 'sectors' (for historical reasons).
+&c tomb&0        Immort   Where a player's tomb is, if any.
+&c tools&0       Immort   All objects with a given tool type.
+&c unlearnable&0 Immort   Stats on LEANRED crafts with no apparent assignments.
+&c unlockedarchetypes  Immort  Unlocked archetypes for a player's account.
+&c uses&0        Immort   Crafts (and vehicles, etc.) that use a component type.
+&c workforce&0   Immort   Empire's workforce setup.
+&c variables&0   Immort   Script variables on a player character.
+
+&y stats&0       God      Game stats including prototypes.
+
+&o account&0     Co-Impl  All the alts associated with a given player.
+&o data&0        Co-Impl  Data stored in the global data system.
+&o piles&0       Co-Impl  Rooms with too many items piled up.
 
 Each of these commands has its own help file (for example, HELP SHOW STATS)
 
@@ -1535,7 +1537,7 @@ See also: SMESSAGES
 
 Usage:  show spawns <mob vnum>
 
-Shows what sectors/crops a mob spawns on, percentile chance for it to spawn, and
+Shows what sectors/crops a mob spawns on, percent chance for it to spawn, and
 what conditions it has. Takes a mob's virtual number, not a name.
 #e
 "SHOW STARTLOCS"
