@@ -2865,7 +2865,7 @@ void write_player_primary_data_to_file(FILE *fl, char_data *ch) {
 		fprintf(fl, "Last Tip: %d\n", GET_LAST_TIP(ch));
 	}
 	if ((IN_ROOM(ch) && GET_SITTING_ON(ch)) || (!IN_ROOM(ch) && GET_LAST_VEHICLE(ch) != NOTHING)) {
-		fprintf(fl, "Last Vehicle: %d\n", IN_ROOM(ch) ? VEH_VNUM(GET_SITTING_ON(ch)) : GET_LAST_VEHICLE(ch));
+		fprintf(fl, "Last Vehicle: %d\n", IN_ROOM(ch) ? VEH_IDNUM(GET_SITTING_ON(ch)) : GET_LAST_VEHICLE(ch));
 	}
 	fprintf(fl, "Last Offense: %ld\n", GET_LAST_OFFENSE_SEEN(ch));
 	if (GET_PERSONAL_LASTNAME(ch)) {
@@ -4601,7 +4601,7 @@ void enter_player_game(descriptor_data *d, int dolog, bool fresh) {
 	// attempt to put them back in a vehicle
 	if (GET_LAST_VEHICLE(ch) != NOTHING) {
 		DL_FOREACH2(ROOM_VEHICLES(IN_ROOM(ch)), veh, next_in_room) {
-			if (VEH_VNUM(veh) == GET_LAST_VEHICLE(ch) && VEH_IS_COMPLETE(veh) && !VEH_SITTING_ON(veh) && validate_sit_on_vehicle(ch, veh, POS_SITTING, FALSE)) {
+			if (VEH_IDNUM(veh) == GET_LAST_VEHICLE(ch) && VEH_IS_COMPLETE(veh) && !VEH_SITTING_ON(veh) && validate_sit_on_vehicle(ch, veh, POS_SITTING, FALSE)) {
 				sit_on_vehicle(ch, veh);
 				GET_POS(ch) = POS_SITTING;
 				break;	// only need 1
