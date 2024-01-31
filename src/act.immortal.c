@@ -8893,7 +8893,15 @@ ACMD(do_vstat) {
 			msg_to_char(ch, "There is no vehicle with that vnum.\r\n");
 		}
 		else {
+			// load a temporary copy
 			veh = read_vehicle(number, TRUE);
+			
+			// do not waste an idnum here
+			if (VEH_IDNUM(veh) == data_get_int(DATA_TOP_VEHICLE_ID)) {
+				// give back the top id
+				data_set_int(DATA_TOP_VEHICLE_ID, data_get_int(DATA_TOP_VEHICLE_ID) - 1);
+			}
+			
 			do_stat_vehicle(ch, veh);
 			extract_vehicle(veh);
 		}
