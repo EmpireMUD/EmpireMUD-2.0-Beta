@@ -3439,14 +3439,15 @@ Affects that are SOMETIMES safe to use:
 
 See also: OLC BUILDINGS, OLC ROOM TEMPLATES
 #d
-"BEDIT ARTISAN"
+"BEDIT ARTISAN" "VEDIT ARTISAN"
 
 Usage:  .artisan <mob vnum>
         .artisan none
 
-Some buildings may have artisan mobs set. These mobs will always spawn in the
-building if the building is owned by an empire and has been populated. Only
-one artisan will ever spawn per building.
+Some buildings and vehicles may have artisan mobs set. These mobs will always
+spawn in the building -- or outside the vehicle -- if it is owned by an empire
+and has been populated. Only one artisan will ever spawn per building/vehicle.
+The artisan can also perform any workforce chore that takes place on its tile.
 
 This artisan is marked as an EMPIRE mob and you may use the following name
 tokens on the mob itself, if it is only loaded as an artisan:
@@ -3454,7 +3455,7 @@ tokens on the mob itself, if it is only loaded as an artisan:
  #e - name of the empire it belongs to
  #a - the adjective form of its empire's name
 
-You can use the "none" argument to this command in order to remove the artisan.
+Use ".artisan none" if you need to remove the artisan.
 
 See also: OLC BUILDINGS, OLC VEHICLES, MEDIT NAMESET, VNUM
 #d

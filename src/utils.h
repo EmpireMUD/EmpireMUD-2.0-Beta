@@ -1767,7 +1767,7 @@ static inline int GET_SEASON(room_data *room) {
 
 // attribute (non-instanced) data
 #define VEH_ANIMALS_REQUIRED(veh)  ((veh)->attributes->animals_required)
-#define VEH_ARTISAN(veh)  NOTHING	// for future use
+#define VEH_ARTISAN(veh)  ((veh)->attributes->artisan_vnum)
 #define VEH_CAPACITY(veh)  ((veh)->attributes->capacity)
 #define VEH_CUSTOM_MSGS(veh)  ((veh)->attributes->custom_msgs)
 #define VEH_DESIGNATE_FLAGS(veh)  ((veh)->attributes->designate_flags)

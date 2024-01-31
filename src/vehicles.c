@@ -3009,6 +3009,7 @@ void clear_vehicle(vehicle_data *veh) {
 	VEH_INSTANCE_ID(veh) = NOTHING;
 	VEH_SPEED_BONUSES(veh) = VSPEED_NORMAL;
 	VEH_APPLIED_TO_ISLAND(veh) = UNAPPLIED_ISLAND;
+	VEH_ARTISAN(veh) = NOTHING;
 }
 
 
@@ -3138,7 +3139,7 @@ void parse_vehicle(FILE *fl, any_vnum vnum) {
 	struct spawn_info *spawn;
 	vehicle_data *veh, *find;
 	double dbl_in;
-	int int_in[7];
+	int int_in[8];
 	
 	CREATE(veh, vehicle_data, 1);
 	clear_vehicle(veh);
@@ -3166,18 +3167,22 @@ void parse_vehicle(FILE *fl, any_vnum vnum) {
 		log("SYSERR: Missing line 6 of %s", error);
 		exit(1);
 	}
-	if (sscanf(line, "%s %d %d %d %d %s %d %d %d %s", str_in, &int_in[0], &int_in[1], &int_in[2], &int_in[3], str_in2, &int_in[4], &int_in[5], &int_in[6], str_in3) != 10) {
-		int_in[6] = 0;	// b5.104 backwards-compatible: size
-		strcpy(str_in3, "0");	// affects
+	if (sscanf(line, "%s %d %d %d %d %s %d %d %d %s %d", str_in, &int_in[0], &int_in[1], &int_in[2], &int_in[3], str_in2, &int_in[4], &int_in[5], &int_in[6], str_in3, &int_in[7]) != 11) {
+		int_in[7] = NOTHING;	// b5.175 backwards-compatible: artisan vnum
 		
-		if (sscanf(line, "%s %d %d %d %d %s %d %d", str_in, &int_in[0], &int_in[1], &int_in[2], &int_in[3], str_in2, &int_in[4], &int_in[5]) != 8) {
-			strcpy(str_in2, "0");	// backwards-compatible: functions
-			int_in[4] = 0;	// fame
-			int_in[5] = 0;	// military
+		if (sscanf(line, "%s %d %d %d %d %s %d %d %d %s", str_in, &int_in[0], &int_in[1], &int_in[2], &int_in[3], str_in2, &int_in[4], &int_in[5], &int_in[6], str_in3) != 10) {
+			int_in[6] = 0;	// b5.104 backwards-compatible: size
+			strcpy(str_in3, "0");	// affects
 		
-			if (sscanf(line, "%s %d %d %d %d", str_in, &int_in[0], &int_in[1], &int_in[2], &int_in[3]) != 5) {
-				log("SYSERR: Format error in line 6 of %s", error);
-				exit(1);
+			if (sscanf(line, "%s %d %d %d %d %s %d %d", str_in, &int_in[0], &int_in[1], &int_in[2], &int_in[3], str_in2, &int_in[4], &int_in[5]) != 8) {
+				strcpy(str_in2, "0");	// backwards-compatible: functions
+				int_in[4] = 0;	// fame
+				int_in[5] = 0;	// military
+		
+				if (sscanf(line, "%s %d %d %d %d", str_in, &int_in[0], &int_in[1], &int_in[2], &int_in[3]) != 5) {
+					log("SYSERR: Format error in line 6 of %s", error);
+					exit(1);
+				}
 			}
 		}
 	}
@@ -3192,6 +3197,7 @@ void parse_vehicle(FILE *fl, any_vnum vnum) {
 	VEH_MILITARY(veh) = int_in[5];
 	VEH_SIZE(veh) = int_in[6];
 	VEH_ROOM_AFFECTS(veh) = asciiflag_conv(str_in3);
+	VEH_ARTISAN(veh) = int_in[7];
 	
 	// optionals
 	for (;;) {
@@ -3363,11 +3369,11 @@ void write_vehicle_to_file(FILE *fl, vehicle_data *veh) {
 	fprintf(fl, "%s~\n", temp);
 	fprintf(fl, "%s~\n", NULLSAFE(VEH_ICON(veh)));
 	
-	// 6. flags move_type maxhealth capacity animals_required functions fame military size room-affects
+	// 6. flags move_type maxhealth capacity animals_required functions fame military size room-affects artisan
 	strcpy(temp, bitv_to_alpha(VEH_FLAGS(veh)));
 	strcpy(temp2, bitv_to_alpha(VEH_FUNCTIONS(veh)));
 	strcpy(temp3, bitv_to_alpha(VEH_ROOM_AFFECTS(veh)));
-	fprintf(fl, "%s %d %d %d %d %s %d %d %d %s\n", temp, VEH_MOVE_TYPE(veh), VEH_MAX_HEALTH(veh), VEH_CAPACITY(veh), VEH_ANIMALS_REQUIRED(veh), temp2, VEH_FAME(veh), VEH_MILITARY(veh), VEH_SIZE(veh), temp3);
+	fprintf(fl, "%s %d %d %d %d %s %d %d %d %s %d\n", temp, VEH_MOVE_TYPE(veh), VEH_MAX_HEALTH(veh), VEH_CAPACITY(veh), VEH_ANIMALS_REQUIRED(veh), temp2, VEH_FAME(veh), VEH_MILITARY(veh), VEH_SIZE(veh), temp3, VEH_ARTISAN(veh));
 	
 	// C: scaling
 	if (VEH_MIN_SCALE_LEVEL(veh) > 0 || VEH_MAX_SCALE_LEVEL(veh) > 0) {
@@ -4261,7 +4267,7 @@ void do_stat_vehicle(char_data *ch, vehicle_data *veh) {
 	// stats lines
 	size += snprintf(buf + size, sizeof(buf) - size, "Health: [\tc%d\t0/\tc%d\t0], Capacity: [\tc%d\t0/\tc%d\t0], Animals Req: [\tc%d\t0], Move Type: [\ty%s\t0]\r\n", (int) VEH_HEALTH(veh), VEH_MAX_HEALTH(veh), VEH_CARRYING_N(veh), VEH_CAPACITY(veh), VEH_ANIMALS_REQUIRED(veh), mob_move_types[VEH_MOVE_TYPE(veh)]);
 	size += snprintf(buf + size, sizeof(buf) - size, "Speed: [\ty%s\t0], Size: [\tc%d\t0], Height: [\tc%d\t0]\r\n", vehicle_speed_types[VEH_SPEED_BONUSES(veh)], VEH_SIZE(veh), VEH_HEIGHT(veh));
-	size += snprintf(buf + size, sizeof(buf) - size, "Fame: [\tc%d\t0], Military: [\tc%d\t0]\r\n", VEH_FAME(veh), VEH_MILITARY(veh));
+	size += snprintf(buf + size, sizeof(buf) - size, "Fame: [\tc%d\t0], Military: [\tc%d\t0], Artisan: [&c%d&0] &y%s&0\r\n", VEH_FAME(veh), VEH_MILITARY(veh), VEH_ARTISAN(veh), VEH_ARTISAN(veh) != NOTHING ? get_mob_name_by_proto(VEH_ARTISAN(veh), FALSE) : "none");
 	
 	if (VEH_INTERIOR_ROOM_VNUM(veh) != NOTHING || VEH_MAX_ROOMS(veh) || VEH_DESIGNATE_FLAGS(veh)) {
 		sprintbit(VEH_DESIGNATE_FLAGS(veh), designate_flags, part, TRUE);
@@ -4518,7 +4524,7 @@ void olc_show_vehicle(char_data *ch) {
 	sprintf(buf + strlen(buf), "<%sextrarooms\t0> %d, <%sinteriorroom\t0> %d - %s\r\n", OLC_LABEL_VAL(VEH_MAX_ROOMS(veh), 0), VEH_MAX_ROOMS(veh), OLC_LABEL_VAL(VEH_INTERIOR_ROOM_VNUM(veh), NOWHERE), VEH_INTERIOR_ROOM_VNUM(veh), building_proto(VEH_INTERIOR_ROOM_VNUM(veh)) ? GET_BLD_NAME(building_proto(VEH_INTERIOR_ROOM_VNUM(veh))) : "none");
 	sprintbit(VEH_DESIGNATE_FLAGS(veh), designate_flags, lbuf, TRUE);
 	sprintf(buf + strlen(buf), "<%sdesignate\t0> %s\r\n", OLC_LABEL_VAL(VEH_DESIGNATE_FLAGS(veh), NOBITS), lbuf);
-	sprintf(buf + strlen(buf), "<%sheight\t0> %d, <%sfame\t0> %d, <%smilitary\t0> %d\r\n", OLC_LABEL_VAL(VEH_HEIGHT(veh), 0), VEH_HEIGHT(veh), OLC_LABEL_VAL(VEH_FAME(veh), 0), VEH_FAME(veh), OLC_LABEL_VAL(VEH_MILITARY(veh), 0), VEH_MILITARY(veh));
+	sprintf(buf + strlen(buf), "<%sheight\t0> %d, <%sfame\t0> %d, <%smilitary\t0> %d, <%sartisan\t0> [%d] %s\r\n", OLC_LABEL_VAL(VEH_HEIGHT(veh), 0), VEH_HEIGHT(veh), OLC_LABEL_VAL(VEH_FAME(veh), 0), VEH_FAME(veh), OLC_LABEL_VAL(VEH_MILITARY(veh), 0), VEH_MILITARY(veh), OLC_LABEL_VAL(VEH_ARTISAN(veh), NOTHING), VEH_ARTISAN(veh), VEH_ARTISAN(veh) == NOTHING ? "none" : get_mob_name_by_proto(VEH_ARTISAN(veh), FALSE));
 	
 	sprintbit(VEH_ROOM_AFFECTS(veh), room_aff_bits, lbuf, TRUE);
 	sprintf(buf + strlen(buf), "<%saffects\t0> %s\r\n", OLC_LABEL_VAL(VEH_ROOM_AFFECTS(veh), NOBITS), lbuf);
@@ -4618,6 +4624,32 @@ OLC_MODULE(vedit_affects) {
 OLC_MODULE(vedit_animalsrequired) {
 	vehicle_data *veh = GET_OLC_VEHICLE(ch->desc);
 	VEH_ANIMALS_REQUIRED(veh) = olc_process_number(ch, argument, "animals required", "animalsrequired", 0, 100, VEH_ANIMALS_REQUIRED(veh));
+}
+
+
+OLC_MODULE(vedit_artisan) {
+	vehicle_data *veh = GET_OLC_VEHICLE(ch->desc);
+	mob_vnum old = VEH_ARTISAN(veh);
+	
+	if (!str_cmp(argument, "none")) {
+		VEH_ARTISAN(veh) = NOTHING;
+		if (PRF_FLAGGED(ch, PRF_NOREPEAT)) {
+			send_config_msg(ch, "ok_string");
+		}
+		else {
+			msg_to_char(ch, "It no longer has an artisan.\r\n");
+		}
+	}
+	else {
+		VEH_ARTISAN(veh) = olc_process_number(ch, argument, "artisan vnum", "artisanvnum", 0, MAX_VNUM, VEH_ARTISAN(veh));
+		if (!mob_proto(VEH_ARTISAN(veh))) {
+			VEH_ARTISAN(veh) = old;
+			msg_to_char(ch, "There is no mobile with that vnum. Old value restored.\r\n");
+		}
+		else if (!PRF_FLAGGED(ch, PRF_NOREPEAT)) {
+			msg_to_char(ch, "It now has artisan: %s\r\n", get_mob_name_by_proto(VEH_ARTISAN(veh), FALSE));
+		}
+	}
 }
 
 
