@@ -6232,7 +6232,7 @@ ACMD(do_islands) {
 			lsize += snprintf(line + lsize, sizeof(line) - lsize, "%d territory%s", item->territory, item->einv_size > 0 ? ", " : "");
 		}
 		if (item->einv_size > 0) {
-			lsize += snprintf(line + lsize, sizeof(line) - lsize, "%d einventory", item->einv_size);
+			lsize += snprintf(line + lsize, sizeof(line) - lsize, "%d einventory%s", item->einv_size, item->population > 0 ? ", " : "");
 		}
 		if (item->population > 0) {
 			lsize += snprintf(line + lsize, sizeof(line) - lsize, "%d citizen%s", item->population, PLURAL(item->population));
