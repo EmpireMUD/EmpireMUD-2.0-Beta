@@ -772,9 +772,10 @@ ISLANDS
 
 Usage:  islands
 
-This command lists the islands your empire has territory or EInventory on
-(including warehouse storage). You must have the Navigation ability. The
-coordinates for each island are the approximate center of the island.
+This command lists the islands your empire has citizens, territory, or
+EInventory on (including warehouse storage and shipping). You must have the
+Navigation ability. The coordinates for each island are the approximate center
+of the island.
 
 Empires can rename islands using the 'customize island' command. These names
 become global if the empire is the only one with cities on the island, or

@@ -3109,6 +3109,7 @@ struct do_islands_data {
 	int id;
 	int territory;
 	int einv_size;
+	int population;
 	UT_hash_handle hh;
 };
 
@@ -3130,6 +3131,26 @@ void do_islands_add_einv(struct do_islands_data **list, int island_id, int amoun
 		HASH_ADD_INT(*list, id, isle);
 	}
 	SAFE_ADD(isle->einv_size, amount, INT_MIN, INT_MAX, TRUE);
+}
+
+
+/**
+* Helper for do_islands: adds to population count.
+*
+* @param struct do_islands_data **list Pointer to a do_islands hash.
+* @param int island_id Which island.
+* @param int amount How much population to add.
+*/
+void do_islands_add_population(struct do_islands_data **list, int island_id, int amount) {
+	struct do_islands_data *isle;
+	
+	HASH_FIND_INT(*list, &island_id, isle);
+	if (!isle) {
+		CREATE(isle, struct do_islands_data, 1);
+		isle->id = island_id;
+		HASH_ADD_INT(*list, id, isle);
+	}
+	SAFE_ADD(isle->population, amount, INT_MIN, INT_MAX, TRUE);
 }
 
 
@@ -6132,6 +6153,7 @@ ACMD(do_islands) {
 	struct empire_unique_storage *eus;
 	struct empire_storage_data *store, *next_store;
 	struct island_info *isle;
+	struct shipping_data *shipd;
 	empire_data *emp;
 	room_data *room;
 	size_t size, lsize;
@@ -6175,11 +6197,19 @@ ACMD(do_islands) {
 				do_islands_add_einv(&list, eisle->island, store->amount);
 			}
 		}
+		
+		// mark citizens
+		do_islands_add_population(&list, eisle->island, eisle->population);
 	}
 	
 	// add unique storage
 	DL_FOREACH(EMPIRE_UNIQUE_STORAGE(emp), eus) {
 		do_islands_add_einv(&list, eus->island, eus->amount);
+	}
+	
+	// add shipping
+	DL_FOREACH(EMPIRE_SHIPPING_LIST(emp), shipd) {
+		do_islands_add_einv(&list, shipd->from_island, shipd->amount);
 	}
 	
 	// and then build the display while freeing it up
@@ -6203,6 +6233,9 @@ ACMD(do_islands) {
 		}
 		if (item->einv_size > 0) {
 			lsize += snprintf(line + lsize, sizeof(line) - lsize, "%d einventory", item->einv_size);
+		}
+		if (item->population > 0) {
+			lsize += snprintf(line + lsize, sizeof(line) - lsize, "%d citizen%s", item->population, PLURAL(item->population));
 		}
 		
 		if (size + lsize + 3 < sizeof(output)) {
