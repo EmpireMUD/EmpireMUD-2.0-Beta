@@ -562,6 +562,7 @@ OLC_MODULE(vedit_affects);
 OLC_MODULE(vedit_animalsrequired);
 OLC_MODULE(vedit_artisan);
 OLC_MODULE(vedit_capacity);
+OLC_MODULE(vedit_citizens);
 OLC_MODULE(vedit_custom);
 OLC_MODULE(vedit_designate);
 OLC_MODULE(vedit_extra_desc);
@@ -1138,6 +1139,7 @@ const struct olc_command_data olc_data[] = {
 	{ "animalsrequired", vedit_animalsrequired, OLC_VEHICLE, OLC_CF_EDITOR },
 	{ "artisan", vedit_artisan, OLC_VEHICLE, OLC_CF_EDITOR },
 	{ "capacity", vedit_capacity, OLC_VEHICLE, OLC_CF_EDITOR },
+	{ "citizens", vedit_citizens, OLC_VEHICLE, OLC_CF_EDITOR },
 	{ "custom", vedit_custom, OLC_VEHICLE, OLC_CF_EDITOR },
 	{ "designate", vedit_designate, OLC_VEHICLE, OLC_CF_EDITOR },
 	{ "extra", vedit_extra_desc, OLC_VEHICLE, OLC_CF_EDITOR },

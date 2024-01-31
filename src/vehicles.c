@@ -3139,7 +3139,7 @@ void parse_vehicle(FILE *fl, any_vnum vnum) {
 	struct spawn_info *spawn;
 	vehicle_data *veh, *find;
 	double dbl_in;
-	int int_in[8];
+	int int_in[10];
 	
 	CREATE(veh, vehicle_data, 1);
 	clear_vehicle(veh);
@@ -3167,8 +3167,9 @@ void parse_vehicle(FILE *fl, any_vnum vnum) {
 		log("SYSERR: Missing line 6 of %s", error);
 		exit(1);
 	}
-	if (sscanf(line, "%s %d %d %d %d %s %d %d %d %s %d", str_in, &int_in[0], &int_in[1], &int_in[2], &int_in[3], str_in2, &int_in[4], &int_in[5], &int_in[6], str_in3, &int_in[7]) != 11) {
+	if (sscanf(line, "%s %d %d %d %d %s %d %d %d %s %d %d", str_in, &int_in[0], &int_in[1], &int_in[2], &int_in[3], str_in2, &int_in[4], &int_in[5], &int_in[6], str_in3, &int_in[7], &int_in[8]) != 12) {
 		int_in[7] = NOTHING;	// b5.175 backwards-compatible: artisan vnum
+		int_in[8] = 0;					// and citizens
 		
 		if (sscanf(line, "%s %d %d %d %d %s %d %d %d %s", str_in, &int_in[0], &int_in[1], &int_in[2], &int_in[3], str_in2, &int_in[4], &int_in[5], &int_in[6], str_in3) != 10) {
 			int_in[6] = 0;	// b5.104 backwards-compatible: size
@@ -3198,6 +3199,7 @@ void parse_vehicle(FILE *fl, any_vnum vnum) {
 	VEH_SIZE(veh) = int_in[6];
 	VEH_ROOM_AFFECTS(veh) = asciiflag_conv(str_in3);
 	VEH_ARTISAN(veh) = int_in[7];
+	VEH_CITIZENS(veh) = int_in[8];
 	
 	// optionals
 	for (;;) {
@@ -3373,7 +3375,7 @@ void write_vehicle_to_file(FILE *fl, vehicle_data *veh) {
 	strcpy(temp, bitv_to_alpha(VEH_FLAGS(veh)));
 	strcpy(temp2, bitv_to_alpha(VEH_FUNCTIONS(veh)));
 	strcpy(temp3, bitv_to_alpha(VEH_ROOM_AFFECTS(veh)));
-	fprintf(fl, "%s %d %d %d %d %s %d %d %d %s %d\n", temp, VEH_MOVE_TYPE(veh), VEH_MAX_HEALTH(veh), VEH_CAPACITY(veh), VEH_ANIMALS_REQUIRED(veh), temp2, VEH_FAME(veh), VEH_MILITARY(veh), VEH_SIZE(veh), temp3, VEH_ARTISAN(veh));
+	fprintf(fl, "%s %d %d %d %d %s %d %d %d %s %d %d\n", temp, VEH_MOVE_TYPE(veh), VEH_MAX_HEALTH(veh), VEH_CAPACITY(veh), VEH_ANIMALS_REQUIRED(veh), temp2, VEH_FAME(veh), VEH_MILITARY(veh), VEH_SIZE(veh), temp3, VEH_ARTISAN(veh), VEH_CITIZENS(veh));
 	
 	// C: scaling
 	if (VEH_MIN_SCALE_LEVEL(veh) > 0 || VEH_MAX_SCALE_LEVEL(veh) > 0) {
@@ -4267,7 +4269,8 @@ void do_stat_vehicle(char_data *ch, vehicle_data *veh) {
 	// stats lines
 	size += snprintf(buf + size, sizeof(buf) - size, "Health: [\tc%d\t0/\tc%d\t0], Capacity: [\tc%d\t0/\tc%d\t0], Animals Req: [\tc%d\t0], Move Type: [\ty%s\t0]\r\n", (int) VEH_HEALTH(veh), VEH_MAX_HEALTH(veh), VEH_CARRYING_N(veh), VEH_CAPACITY(veh), VEH_ANIMALS_REQUIRED(veh), mob_move_types[VEH_MOVE_TYPE(veh)]);
 	size += snprintf(buf + size, sizeof(buf) - size, "Speed: [\ty%s\t0], Size: [\tc%d\t0], Height: [\tc%d\t0]\r\n", vehicle_speed_types[VEH_SPEED_BONUSES(veh)], VEH_SIZE(veh), VEH_HEIGHT(veh));
-	size += snprintf(buf + size, sizeof(buf) - size, "Fame: [\tc%d\t0], Military: [\tc%d\t0], Artisan: [&c%d&0] &y%s&0\r\n", VEH_FAME(veh), VEH_MILITARY(veh), VEH_ARTISAN(veh), VEH_ARTISAN(veh) != NOTHING ? get_mob_name_by_proto(VEH_ARTISAN(veh), FALSE) : "none");
+	size += snprintf(buf + size, sizeof(buf) - size, "Citizens: [\tc%d\t0], Artisan: [&c%d&0] &y%s&0\r\n", VEH_CITIZENS(veh), VEH_ARTISAN(veh), VEH_ARTISAN(veh) != NOTHING ? get_mob_name_by_proto(VEH_ARTISAN(veh), FALSE) : "none");
+	size += snprintf(buf + size, sizeof(buf) - size, "Fame: [\tc%d\t0], Military: [\tc%d\t0]\r\n", VEH_FAME(veh), VEH_MILITARY(veh));
 	
 	if (VEH_INTERIOR_ROOM_VNUM(veh) != NOTHING || VEH_MAX_ROOMS(veh) || VEH_DESIGNATE_FLAGS(veh)) {
 		sprintbit(VEH_DESIGNATE_FLAGS(veh), designate_flags, part, TRUE);
@@ -4524,7 +4527,8 @@ void olc_show_vehicle(char_data *ch) {
 	sprintf(buf + strlen(buf), "<%sextrarooms\t0> %d, <%sinteriorroom\t0> %d - %s\r\n", OLC_LABEL_VAL(VEH_MAX_ROOMS(veh), 0), VEH_MAX_ROOMS(veh), OLC_LABEL_VAL(VEH_INTERIOR_ROOM_VNUM(veh), NOWHERE), VEH_INTERIOR_ROOM_VNUM(veh), building_proto(VEH_INTERIOR_ROOM_VNUM(veh)) ? GET_BLD_NAME(building_proto(VEH_INTERIOR_ROOM_VNUM(veh))) : "none");
 	sprintbit(VEH_DESIGNATE_FLAGS(veh), designate_flags, lbuf, TRUE);
 	sprintf(buf + strlen(buf), "<%sdesignate\t0> %s\r\n", OLC_LABEL_VAL(VEH_DESIGNATE_FLAGS(veh), NOBITS), lbuf);
-	sprintf(buf + strlen(buf), "<%sheight\t0> %d, <%sfame\t0> %d, <%smilitary\t0> %d, <%sartisan\t0> [%d] %s\r\n", OLC_LABEL_VAL(VEH_HEIGHT(veh), 0), VEH_HEIGHT(veh), OLC_LABEL_VAL(VEH_FAME(veh), 0), VEH_FAME(veh), OLC_LABEL_VAL(VEH_MILITARY(veh), 0), VEH_MILITARY(veh), OLC_LABEL_VAL(VEH_ARTISAN(veh), NOTHING), VEH_ARTISAN(veh), VEH_ARTISAN(veh) == NOTHING ? "none" : get_mob_name_by_proto(VEH_ARTISAN(veh), FALSE));
+	sprintf(buf + strlen(buf), "<%scitizens\t0> %d, <%sartisan\t0> [%d] %s\r\n", OLC_LABEL_VAL(VEH_CITIZENS(veh), 0), VEH_CITIZENS(veh), OLC_LABEL_VAL(VEH_ARTISAN(veh), NOTHING), VEH_ARTISAN(veh), VEH_ARTISAN(veh) == NOTHING ? "none" : get_mob_name_by_proto(VEH_ARTISAN(veh), FALSE));
+	sprintf(buf + strlen(buf), "<%sheight\t0> %d, <%sfame\t0> %d, <%smilitary\t0> %d\r\n", OLC_LABEL_VAL(VEH_HEIGHT(veh), 0), VEH_HEIGHT(veh), OLC_LABEL_VAL(VEH_FAME(veh), 0), VEH_FAME(veh), OLC_LABEL_VAL(VEH_MILITARY(veh), 0), VEH_MILITARY(veh));
 	
 	sprintbit(VEH_ROOM_AFFECTS(veh), room_aff_bits, lbuf, TRUE);
 	sprintf(buf + strlen(buf), "<%saffects\t0> %s\r\n", OLC_LABEL_VAL(VEH_ROOM_AFFECTS(veh), NOBITS), lbuf);
@@ -4656,6 +4660,12 @@ OLC_MODULE(vedit_artisan) {
 OLC_MODULE(vedit_capacity) {
 	vehicle_data *veh = GET_OLC_VEHICLE(ch->desc);
 	VEH_CAPACITY(veh) = olc_process_number(ch, argument, "capacity", "capacity", 0, 10000, VEH_CAPACITY(veh));
+}
+
+
+OLC_MODULE(vedit_citizens) {
+	vehicle_data *veh = GET_OLC_VEHICLE(ch->desc);
+	VEH_CITIZENS(veh) = olc_process_number(ch, argument, "citizens", "citizens", 0, 10, VEH_CITIZENS(veh));
 }
 
 

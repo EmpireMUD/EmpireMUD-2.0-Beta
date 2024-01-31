@@ -6338,6 +6338,7 @@ struct vehicle_attribute_data {
 	bitvector_t requires_climate;	// CLIM_ flags required for this vehicle to enter a room
 	bitvector_t forbid_climate;	// CLIM_ flags that block this vehicle from entering
 	mob_vnum artisan_vnum;	// vnum of an artisan to load
+	int citizens;	// how many citizens can live here (outside)
 	int fame;	// how much fame it adds to the empire
 	int military;	// how much it adds to the military pool
 	struct custom_message *custom_msgs;	// any custom messages

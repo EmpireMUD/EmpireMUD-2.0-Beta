@@ -1769,6 +1769,7 @@ static inline int GET_SEASON(room_data *room) {
 #define VEH_ANIMALS_REQUIRED(veh)  ((veh)->attributes->animals_required)
 #define VEH_ARTISAN(veh)  ((veh)->attributes->artisan_vnum)
 #define VEH_CAPACITY(veh)  ((veh)->attributes->capacity)
+#define VEH_CITIZENS(veh)  ((veh)->attributes->citizens)
 #define VEH_CUSTOM_MSGS(veh)  ((veh)->attributes->custom_msgs)
 #define VEH_DESIGNATE_FLAGS(veh)  ((veh)->attributes->designate_flags)
 #define VEH_EX_DESCS(veh)  ((veh)->attributes->ex_description)

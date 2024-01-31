@@ -3459,23 +3459,24 @@ Use ".artisan none" if you need to remove the artisan.
 
 See also: OLC BUILDINGS, OLC VEHICLES, MEDIT NAMESET, VNUM
 #d
-"BEDIT CITIZENS"
+"BEDIT CITIZENS" "VEDIT CITIZENS"
 
 Usage:  .citizens <number>
 
-This sets how many citizens will move into the base room of the building. It
-does not affect any designated/extra rooms. Once populated, these citizens
-spawn in the building tile when players are nearby. They can also perform
-Workforce chores near their home building.
+This sets how many citizens will move into the base room of the building or the
+outside of a vehicle. Or, on an interior/designated room, the number of
+citizens who will move into that room. Once populated, these citizens spawn in
+the building (or just outisde the vehicle) when players are nearby. They can
+also perform Workforce chores near their home.
 
-You cannot control which citizen mobs actually spawn, only how many may live
-here total. If the building supports extra rooms, more citizens can be added
-in bedrooms.
+If citizens should live inside a vehicle, rather than outside, set the citizen
+count on one of the interior room building types.
 
-NOTE: Any building that allows at least 1 citizen may also be set as a player's
-private home.
+NOTE: Any building or vehicle that allows at least 1 citizen may also be set as
+a player's private home, including a vehicle whose main interior room has at
+least 1 citizen.
 
-See also: BEDIT ROOMS, HOME, OLC BUILDINGS, WORKFORCE
+See also: BEDIT ROOMS, HOME, OLC BUILDINGS, OLC VEHICLES, WORKFORCE
 #d
 "BEDIT COMMANDS"
 
