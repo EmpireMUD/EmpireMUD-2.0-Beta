@@ -2342,7 +2342,12 @@ vehicle_data *read_vehicle(any_vnum vnum, bool with_triggers) {
 	IN_ROOM(veh) = NULL;
 	remove_vehicle_flags(veh, VEH_INCOMPLETE | VEH_DISMANTLING);	// ensure not marked incomplete/dismantle
 	
-	veh->script_id = 0;	// initialize later
+	// give it a new idnum
+	VEH_VNUM(veh) = data_get_int(DATA_TOP_VEHICLE_ID) + 1;
+	data_set_int(DATA_TOP_VEHICLE_ID, VEH_VNUM(veh));
+	
+	// this will be initialized only if needed
+	veh->script_id = 0;
 	
 	if (with_triggers) {
 		veh->proto_script = copy_trig_protos(proto->proto_script);
@@ -2405,6 +2410,7 @@ void store_one_vehicle_to_file(vehicle_data *veh, FILE *fl) {
 	proto = vehicle_proto(VEH_VNUM(veh));
 	
 	fprintf(fl, "%%%d\n", VEH_VNUM(veh));
+	fprintf(fl, "Id: %d\n", VEH_IDNUM(veh));
 	fprintf(fl, "Flags: %s\n", bitv_to_alpha(VEH_FLAGS(veh)));
 
 	if (!proto || VEH_KEYWORDS(veh) != VEH_KEYWORDS(proto)) {
@@ -2453,9 +2459,6 @@ void store_one_vehicle_to_file(vehicle_data *veh, FILE *fl) {
 	}
 	if (VEH_LAST_MOVE_TIME(veh)) {
 		fprintf(fl, "Last-moved: %ld\n", VEH_LAST_MOVE_TIME(veh));
-	}
-	if (VEH_SHIPPING_ID(veh) >= 0) {
-		fprintf(fl, "Shipping-id: %d\n", VEH_SHIPPING_ID(veh));
 	}
 	LL_FOREACH(VEH_ANIMALS(veh), vam) {
 		fprintf(fl, "Animal: %d %d %s %d\n", vam->mob, vam->scale_level, bitv_to_alpha(vam->flags), vam->empire);
@@ -2574,6 +2577,7 @@ vehicle_data *unstore_vehicle_from_file(FILE *fl, any_vnum vnum, char *error_str
 	vehicle_data *veh;
 	long long_in[2];
 	double dbl_in;
+	struct shipping_data *shipd;
 	
 	#define LOG_BAD_TAG_WARNINGS  TRUE	// triggers syslogs for invalid vehicle tags
 	#define BAD_TAG_WARNING(src)  else if (LOG_BAD_TAG_WARNINGS) { \
@@ -2788,6 +2792,25 @@ vehicle_data *unstore_vehicle_from_file(FILE *fl, any_vnum vnum, char *error_str
 					}
 					VEH_ICON(veh) = fread_string(fl, error);
 				}
+				else if (!strn_cmp(line, "Id: ", 4)) {
+					if (sscanf(line + 4, "%d", &i_in[0])) {
+						// did we already have an idnum? (usually due to being assigned a new one)
+						if (VEH_IDNUM(veh) != 0) {
+							// check if we used a new one
+							if (VEH_IDNUM(veh) == data_get_int(DATA_TOP_VEHICLE_ID)) {
+								// give back the top id
+								data_set_int(DATA_TOP_VEHICLE_ID, data_get_int(DATA_TOP_VEHICLE_ID) - 1);
+							}
+						}
+					
+						VEH_IDNUM(veh) = i_in[0];
+						
+						// ensure it's not over the top known id
+						if (i_in[0] > data_get_int(DATA_TOP_VEHICLE_ID)) {
+							data_set_int(DATA_TOP_VEHICLE_ID, i_in[0]);
+						}
+					}
+				}
 				else if (!strn_cmp(line, "Instance-id: ", 13)) {
 					if (sscanf(line + 13, "%d", &i_in[0])) {
 						VEH_INSTANCE_ID(veh) = i_in[0];
@@ -2887,7 +2910,19 @@ vehicle_data *unstore_vehicle_from_file(FILE *fl, any_vnum vnum, char *error_str
 				}
 				else if (!strn_cmp(line, "Shipping-id: ", 13)) {
 					if (sscanf(line + 13, "%d", &i_in[0])) {
-						VEH_SHIPPING_ID(veh) = i_in[0];
+						// this was formerly is temporary id assigned to the vehicle
+						// convert it to use the ships idnum now (safe because both idnum and owner are saved before shipping id in the file).
+						if (VEH_OWNER(veh)) {
+							DL_FOREACH(EMPIRE_SHIPPING_LIST(VEH_OWNER(veh)), shipd) {
+								if (shipd->shipping_id == i_in[0]) {
+									shipd->shipping_id = VEH_IDNUM(veh);
+									EMPIRE_NEEDS_STORAGE_SAVE(VEH_OWNER(veh)) = TRUE;
+								}
+							}
+						}
+						
+						// no longer need this:
+						// VEH_SHIPPING_ID(veh) = i_in[0];
 					}
 				}
 				else if (!strn_cmp(line, "Short-desc:", 11)) {
@@ -2993,7 +3028,7 @@ void clear_vehicle(vehicle_data *veh) {
 	memset((char *) veh, 0, sizeof(vehicle_data));
 	
 	VEH_VNUM(veh) = NOTHING;
-	VEH_SHIPPING_ID(veh) = -1;
+	VEH_IDNUM(veh) = 0;
 	
 	veh->attributes = attr;	// stored from earlier
 	if (veh->attributes) {

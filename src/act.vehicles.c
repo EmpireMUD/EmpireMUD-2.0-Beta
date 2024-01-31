@@ -118,18 +118,15 @@ vehicle_data *find_ship_to_dispatch(char_data *ch, char *arg) {
 		if (VEH_FLAGGED(veh, VEH_ON_FIRE)) {
 			continue;
 		}
-		if (VEH_INTERIOR_HOME_ROOM(veh) && ROOM_AFF_FLAGGED(VEH_INTERIOR_HOME_ROOM(veh), ROOM_AFF_NO_WORK)) {
+		if (GET_ISLAND_ID(IN_ROOM(veh)) != island) {
 			continue;
 		}
-		if (VEH_SHIPPING_ID(veh) != -1) {
+		if (VEH_INTERIOR_HOME_ROOM(veh) && ROOM_AFF_FLAGGED(VEH_INTERIOR_HOME_ROOM(veh), ROOM_AFF_NO_WORK)) {
 			continue;
 		}
 		
 		// ensure in docks if we're finding it remotely
 		if (!IN_ROOM(veh) || !room_has_function_and_city_ok(GET_LOYALTY(ch), IN_ROOM(veh), FNC_DOCKS)) {
-			continue;
-		}
-		if (GET_ISLAND_ID(IN_ROOM(veh)) != island) {
 			continue;
 		}
 		
@@ -1447,9 +1444,6 @@ ACMD(do_dispatch) {
 	else if (VEH_FLAGGED(veh, VEH_ON_FIRE)) {
 		msg_to_char(ch, "You can't dispatch it while it's on fire!\r\n");
 	}
-	else if (VEH_SHIPPING_ID(veh) != -1) {
-		msg_to_char(ch, "It's already being used for shipping.\r\n");
-	}
 	else if (!ship_is_empty(veh)) {
 		msg_to_char(ch, "You can't dispatch a ship that has people inside it.\r\n");
 	}
@@ -1498,9 +1492,7 @@ ACMD(do_dispatch) {
 		shipd->status_time = time(0);
 		shipd->ship_origin = GET_ROOM_VNUM(IN_ROOM(veh));
 		
-		VEH_SHIPPING_ID(veh) = find_free_shipping_id(GET_LOYALTY(ch));
-		request_vehicle_save_in_world(veh);
-		shipd->shipping_id = VEH_SHIPPING_ID(veh);
+		shipd->shipping_id = VEH_IDNUM(veh);
 		
 		DL_APPEND(EMPIRE_SHIPPING_LIST(GET_LOYALTY(ch)), shipd);
 		sail_shipment(GET_LOYALTY(ch), veh);

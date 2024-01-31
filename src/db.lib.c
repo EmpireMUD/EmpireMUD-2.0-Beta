@@ -1577,6 +1577,7 @@ void check_for_new_map(void) {
 	empire_data *emp, *next_emp;
 	struct map_data *map;
 	room_data *room;
+	vehicle_data *veh, *next_veh;
 	FILE *fl;
 	
 	if (!(fl = fopen(NEW_WORLD_HINT_FILE, "r"))) {
@@ -1703,6 +1704,13 @@ void check_for_new_map(void) {
 	// do this last in case of error
 	save_all_empires();
 	unlink(NEW_WORLD_HINT_FILE);
+	
+	// delete any vehicles that are somehow left, and reset the top vehicle ID
+	DL_FOREACH_SAFE(vehicle_list, veh, next_veh) {
+		extract_vehicle(veh);
+	}
+	extract_pending_vehicles();
+	data_set_int(DATA_TOP_VEHICLE_ID, 0);
 	
 	// now move all player login locations to NOWHERE
 	update_all_players(NULL, send_all_players_to_nowhere);
@@ -2682,8 +2690,7 @@ void load_empire_storage_one(FILE *fl, empire_data *emp) {
 					shipd->shipping_id = t[5];
 					shipd->ship_origin = t[6];
 					shipd->to_room = t[7];
-				
-					EMPIRE_TOP_SHIPPING_ID(emp) = MAX(shipd->shipping_id, EMPIRE_TOP_SHIPPING_ID(emp));
+					
 					DL_APPEND(EMPIRE_SHIPPING_LIST(emp), shipd);
 					
 					last_ship = shipd;

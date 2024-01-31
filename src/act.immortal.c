@@ -7060,14 +7060,12 @@ ACMD(do_purge) {
 		}
 		else if ((veh = get_vehicle_in_room_vis(ch, arg, &number))) {
 			// finish the shipment before transferring or purging a vehicle
-			if (VEH_OWNER(veh) && VEH_SHIPPING_ID(veh) != -1) {
+			if (VEH_OWNER(veh)) {
 				DL_FOREACH_SAFE(EMPIRE_SHIPPING_LIST(VEH_OWNER(veh)), shipd, next_shipd) {
-					if (shipd->shipping_id == VEH_SHIPPING_ID(veh)) {
+					if (shipd->shipping_id == VEH_IDNUM(veh)) {
 						deliver_shipment(VEH_OWNER(veh), shipd);
 					}
 				}
-				VEH_SHIPPING_ID(veh) = -1;
-				request_vehicle_save_in_world(veh);
 			}
 			
 			act("$n destroys $V.", FALSE, ch, NULL, veh, TO_ROOM | DG_NO_TRIG | ACT_VEH_VICT);
@@ -8209,14 +8207,12 @@ ACMD(do_trans) {
 		syslog(SYS_GC, GET_INVIS_LEV(ch), TRUE, "GC: %s has transferred %s to %s", GET_REAL_NAME(ch), VEH_SHORT_DESC(veh), room_log_identifier(to_room));
 	
 		// finish the shipment before transferring
-		if (VEH_OWNER(veh) && VEH_SHIPPING_ID(veh) != -1) {
+		if (VEH_OWNER(veh)) {
 			DL_FOREACH_SAFE(EMPIRE_SHIPPING_LIST(VEH_OWNER(veh)), shipd, next_shipd) {
-				if (shipd->shipping_id == VEH_SHIPPING_ID(veh)) {
+				if (shipd->shipping_id == VEH_IDNUM(veh)) {
 					deliver_shipment(VEH_OWNER(veh), shipd);
 				}
 			}
-			VEH_SHIPPING_ID(veh) = -1;
-			request_vehicle_save_in_world(veh);
 		}
 		
 		if (ROOM_PEOPLE(IN_ROOM(veh))) {

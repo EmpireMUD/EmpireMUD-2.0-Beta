@@ -3785,7 +3785,6 @@ void perform_claim_vehicle(vehicle_data *veh, empire_data *emp) {
 	if (emp) {
 		// basic owner"ship"
 		VEH_OWNER(veh) = emp;
-		VEH_SHIPPING_ID(veh) = -1;
 		
 		// techs
 		if (IN_ROOM(veh)) {

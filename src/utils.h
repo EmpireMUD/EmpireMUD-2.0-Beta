@@ -647,7 +647,6 @@ int CAN_CARRY_N(char_data *ch);	// formerly a macro
 #define EMPIRE_TERRITORY(emp, type)  ((emp)->territory[(type)])
 #define EMPIRE_TERRITORY_LIST(emp)  ((emp)->territory_list)
 #define EMPIRE_THEFT_LOGS(emp)  ((emp)->theft_logs)
-#define EMPIRE_TOP_SHIPPING_ID(emp)  ((emp)->top_shipping_id)
 #define EMPIRE_TOTAL_MEMBER_COUNT(emp)  ((emp)->total_member_count)
 #define EMPIRE_TOTAL_PLAYTIME(emp)  ((emp)->total_playtime)
 #define EMPIRE_TRADE(emp)  ((emp)->trade)
@@ -1744,6 +1743,7 @@ static inline int GET_SEASON(room_data *room) {
 #define VEH_FLAGS(veh)  ((veh)->flags)
 #define VEH_HEALTH(veh)  ((veh)->health)
 #define VEH_ICON(veh)  ((veh)->icon)
+#define VEH_IDNUM(veh)  ((veh)->idnum)
 #define VEH_INSIDE_ROOMS(veh)  ((veh)->inside_rooms)
 #define VEH_INSTANCE_ID(veh)  ((veh)->instance_id)
 #define VEH_INTERIOR_HOME_ROOM(veh)  ((veh)->interior_home_room)
@@ -1759,7 +1759,6 @@ static inline int GET_SEASON(room_data *room) {
 #define VEH_ROOM_AFFECTS(veh)  ((veh)->room_affects)
 #define VEH_ROOM_LIST(veh)  ((veh)->room_list)
 #define VEH_SCALE_LEVEL(veh)  ((veh)->scale_level)
-#define VEH_SHIPPING_ID(veh)  ((veh)->shipping_id)
 #define VEH_SHOP_LOOKUPS(veh)  ((veh)->shop_lookups)
 #define VEH_SHORT_DESC(veh)  ((veh)->short_desc)
 #define VEH_SITTING_ON(veh)  ((veh)->sitting_on)
@@ -2158,7 +2157,6 @@ void deliver_shipment(empire_data *emp, struct shipping_data *shipd);
 bool douse_light(obj_data *obj);
 obj_data *get_obj_for_char_prefer_container(char_data *ch, char *name, int *number);
 room_data *find_docks(empire_data *emp, int island_id);
-int find_free_shipping_id(empire_data *emp);
 obj_data *find_lighter_in_list(obj_data *list, bool *had_keep);
 bool get_check_money(char_data *ch, obj_data *obj);
 void identify_obj_to_char(obj_data *obj, char_data *ch, bool simple);

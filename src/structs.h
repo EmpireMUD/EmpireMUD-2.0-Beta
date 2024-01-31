@@ -3551,7 +3551,7 @@ struct shipping_data {
 	int status;	// SHIPPING_
 	long status_time;	// when it gained that status
 	room_vnum ship_origin;	// where the ship is coming from (in case we have to send it back)
-	int shipping_id;	// VEH_SHIPPING_ID() of ship
+	int shipping_id;	// VEH_IDNUM() of ship, if any
 	struct storage_timer *timers;	// for items that decay
 	
 	struct shipping_data *prev, *next;	// DL: EMPIRE_SHIPPING_LIST()
@@ -5617,7 +5617,6 @@ struct empire_data {
 	time_t last_logon;	// time of last member's last logon
 	int scores[NUM_SCORES];	// empire score in each category
 	int sort_value;	// for score ties
-	int top_shipping_id;	// shipping system quick id for the empire
 	bool banner_has_underline;	// helper
 	struct workforce_log *wf_log;	// errors with workforce
 	struct workforce_where_log *wf_where_log;	// list of people working
@@ -6264,6 +6263,7 @@ struct trig_proto_list {
 
 struct vehicle_data {
 	any_vnum vnum;
+	int idnum;		// unique id for the vehicle
 	
 	char *keywords;	// targeting terms
 	char *short_desc;	// the sentence-building name ("a canoe")
@@ -6289,7 +6289,6 @@ struct vehicle_data {
 	int inside_rooms;	// how many rooms are inside
 	time_t last_fire_time;	// for vehicles with siege weapons
 	time_t last_move_time;	// for autostore
-	int shipping_id;	// id for the shipping system for the owner
 	room_data *in_room;	// where it is
 	char_data *led_by;	// person leading it
 	char_data *sitting_on;	// person sitting on it
@@ -6300,7 +6299,7 @@ struct vehicle_data {
 	bitvector_t room_affects;	// ROOM_AFF_ flags applied to the room while veh is here
 	
 	// scripting
-	int script_id;	// used by DG triggers - unique id
+	int script_id;	// used by DG triggers - unique id (only set if a script has referenced it)
 	struct trig_proto_list *proto_script;	// list of default triggers
 	struct script_data *script;	// script info for the object
 	

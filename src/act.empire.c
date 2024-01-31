@@ -220,26 +220,6 @@ bool can_reclaim(char_data *ch, room_data *room) {
 */
 void convert_empire_shipping(empire_data *old_emp, empire_data *new_emp) {
 	struct shipping_data *sd, *next_sd;
-	vehicle_data *veh;
-	int old_id, new_id;
-	
-	DL_FOREACH(vehicle_list, veh) {
-		if (VEH_OWNER(veh) != old_emp || VEH_SHIPPING_ID(veh) == -1) {
-			continue;
-		}
-		
-		old_id = VEH_SHIPPING_ID(veh);
-		new_id = find_free_shipping_id(new_emp);
-		
-		DL_FOREACH(EMPIRE_SHIPPING_LIST(old_emp), sd) {
-			if (sd->shipping_id == old_id) {
-				sd->shipping_id = new_id;
-			}
-		}
-		
-		VEH_SHIPPING_ID(veh) = new_id;
-		request_vehicle_save_in_world(veh);
-	}
 	
 	// move all shipping entries over
 	DL_FOREACH_SAFE(EMPIRE_SHIPPING_LIST(old_emp), sd , next_sd) {
