@@ -3739,7 +3739,7 @@ ACMD(do_show) {
 		strcpy(buf, "Show options:\r\n");
 		for (count = 0, iter = 1; show_command_fields[iter].level; ++iter) {
 			if (show_command_fields[iter].level <= GET_ACCESS_LEVEL(ch)) {
-				sprintf(buf + strlen(buf), "%-18.18s%s", show_command_fields[iter].cmd, ((!(++count % 4) || PRF_FLAGGED(ch, PRF_SCREEN_READER)) ? "\r\n" : ""));
+				sprintf(buf + strlen(buf), " %-18.18s%s", show_command_fields[iter].cmd, ((!(++count % 4) || PRF_FLAGGED(ch, PRF_SCREEN_READER)) ? "\r\n" : ""));
 			}
 		}
 		if (!PRF_FLAGGED(ch, PRF_SCREEN_READER) && (count % 4) != 0) {
