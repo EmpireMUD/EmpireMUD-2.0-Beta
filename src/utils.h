@@ -1491,6 +1491,7 @@ int Y_COORD(room_data *room);	// formerly #define Y_COORD(room)  FLAT_Y_COORD(ge
 #define HOME_ROOM(room)  ((COMPLEX_DATA(room) && COMPLEX_DATA(room)->home_room) ? COMPLEX_DATA(room)->home_room : (room))
 #define IS_BURNING(room)  (BUILDING_BURN_DOWN_TIME(room) > 0)
 #define IS_COMPLETE(room)  (!IS_INCOMPLETE(room) && !IS_DISMANTLING(room))
+#define ROOM_TECHS_APPLIED_TO_ISLAND(room)  (COMPLEX_DATA(room) ? COMPLEX_DATA(room)->applied_to_island : UNAPPLIED_ISLAND)
 #define ROOM_PAINT_COLOR(room)  get_room_extra_data((room), ROOM_EXTRA_PAINT_COLOR)
 #define ROOM_PATRON(room)  get_room_extra_data((room), ROOM_EXTRA_DEDICATE_ID)
 #define ROOM_PRIVATE_OWNER(room)  (COMPLEX_DATA(room) ? COMPLEX_DATA(room)->private_owner : NOBODY)

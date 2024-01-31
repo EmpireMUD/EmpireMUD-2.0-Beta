@@ -2373,18 +2373,18 @@ void adjust_building_tech(empire_data *emp, room_data *room, bool add) {
 	// island setup and checks
 	if (add) {
 		island_id = GET_ISLAND_ID(room);
-		if (COMPLEX_DATA(room) && COMPLEX_DATA(room)->applied_to_island == island_id) {
+		if (ROOM_TECHS_APPLIED_TO_ISLAND(room) == island_id) {
 			// already applied here -- nothing to do
 			return;
 		}
-		else if (COMPLEX_DATA(room) && COMPLEX_DATA(room)->applied_to_island != NO_ISLAND && COMPLEX_DATA(room)->applied_to_island != UNAPPLIED_ISLAND) {
+		else if (ROOM_TECHS_APPLIED_TO_ISLAND(room) != NO_ISLAND && ROOM_TECHS_APPLIED_TO_ISLAND(room) != UNAPPLIED_ISLAND) {
 			// un-apply it first
 			adjust_building_tech(emp, room, FALSE);
 		}
 	}
 	else {
 		// prefer to remove from the island it's applied to, if we can detect it
-		island_id = COMPLEX_DATA(room) ? COMPLEX_DATA(room)->applied_to_island : GET_ISLAND_ID(room);
+		island_id = COMPLEX_DATA(room) ? ROOM_TECHS_APPLIED_TO_ISLAND(room) : GET_ISLAND_ID(room);
 		if (island_id == UNAPPLIED_ISLAND) {
 			// not applied -- nothing to do
 			return;

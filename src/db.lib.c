@@ -2096,11 +2096,13 @@ void delete_territory_npc(struct empire_territory_data *ter, struct empire_npc_d
 	
 	// reduce pop
 	if (emp) {
+		EMPIRE_NEEDS_SAVE(emp) = TRUE;
 		EMPIRE_POPULATION(emp) -= 1;
-		if (GET_ISLAND_ID(ter->room) != NO_ISLAND && (isle = get_empire_island(emp, GET_ISLAND_ID(ter->room)))) {
+		
+		// remove island population ONLY if the room's techs are applied
+		if (ROOM_TECHS_APPLIED_TO_ISLAND(ter->room) >= 0 && GET_ISLAND_ID(ter->room) != NO_ISLAND && (isle = get_empire_island(emp, GET_ISLAND_ID(ter->room)))) {
 			isle->population -= 1;
 		}
-		EMPIRE_NEEDS_SAVE(emp) = TRUE;
 	}
 	
 	LL_DELETE(ter->npcs, npc);
