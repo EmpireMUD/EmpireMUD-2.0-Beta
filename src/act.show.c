@@ -119,7 +119,7 @@ SHOW(show_islands) {
 			*tech_str = '\0';
 			for (tid = 0; tid < NUM_TECHS; ++tid) {
 				if (eisle->tech[tid] > 0 && search_block_int(tid, techs_requiring_same_island) != NOTHING) {
-					snprintf(tech_str + strlen(tech_str), sizeof(tech_str) - strlen(tech_str), "%s%s", (*tech_str ? ", " : ""), techs[tid]);
+					snprintf(tech_str + strlen(tech_str), sizeof(tech_str) - strlen(tech_str), "%s%s", (*tech_str ? ", " : ""), empire_tech_types[tid]);
 				}
 			}
 			if (*tech_str) {

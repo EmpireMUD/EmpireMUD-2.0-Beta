@@ -2515,7 +2515,7 @@ const char *offense_flags[] = {
 
 
 // TECH_x: empire techs
-const char *techs[] = {
+const char *empire_tech_types[] = {
 	"*",	// 0
 	"City Lights",
 	"Locks",

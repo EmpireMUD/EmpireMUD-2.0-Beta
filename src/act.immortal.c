@@ -3752,13 +3752,13 @@ void do_stat_empire(char_data *ch, empire_data *emp) {
 	for (iter = 0, len = 0, any = FALSE; iter < NUM_TECHS; ++iter) {
 		if (EMPIRE_HAS_TECH(emp, iter)) {
 			any = TRUE;
-			if (len > 0 && len + strlen(techs[iter]) + 3 >= 80) {	// new line
-				msg_to_char(ch, ",\r\n%s", techs[iter]);
-				len = strlen(techs[iter]);
+			if (len > 0 && len + strlen(empire_tech_types[iter]) + 3 >= 80) {	// new line
+				msg_to_char(ch, ",\r\n%s", empire_tech_types[iter]);
+				len = strlen(empire_tech_types[iter]);
 			}
 			else {	// same line
-				msg_to_char(ch, "%s%s", (len > 0) ? ", " : "", techs[iter]);
-				len += strlen(techs[iter]) + 2;
+				msg_to_char(ch, "%s%s", (len > 0) ? ", " : "", empire_tech_types[iter]);
+				len += strlen(empire_tech_types[iter]) + 2;
 			}
 		}
 	}

@@ -765,7 +765,7 @@ static void show_detailed_empire(char_data *ch, empire_data *e) {
 		size += snprintf(output + size, sizeof(output) - size, "Technology: ");
 		for (iter = 0, comma = FALSE; iter < NUM_TECHS; ++iter) {
 			if (EMPIRE_HAS_TECH(e, iter)) {
-				size += snprintf(output + size, sizeof(output) - size, "%s%s", (comma ? ", " : ""), techs[iter]);
+				size += snprintf(output + size, sizeof(output) - size, "%s%s", (comma ? ", " : ""), empire_tech_types[iter]);
 				comma = TRUE;
 			}
 		}
@@ -8539,7 +8539,7 @@ ACMD(do_workforce) {
 		
 		// validate tech AFTER determining limit
 		if (limit != 0 && chore_data[type].requires_tech != NOTHING && !EMPIRE_HAS_TECH(emp, chore_data[type].requires_tech)) {
-			msg_to_char(ch, "You need the %s technology to use that chore.\r\n", techs[chore_data[type].requires_tech]);
+			msg_to_char(ch, "You need the %s technology to use that chore.\r\n", empire_tech_types[chore_data[type].requires_tech]);
 			return;
 		}
 		

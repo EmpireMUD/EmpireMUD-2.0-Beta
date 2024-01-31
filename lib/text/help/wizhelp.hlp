@@ -1198,7 +1198,7 @@ Mode         Level    Description
 &c tomb&0        Immort   Where a player's tomb is, if any.
 &c tools&0       Immort   All objects with a given tool type.
 &c unlearnable&0 Immort   Stats on LEANRED crafts with no apparent assignments.
-&c unlockedarchetypes  Immort  Unlocked archetypes for a player's account.
+&c unlockedarchetypes&0  Immort  Unlocked archetypes for a player's account.
 &c uses&0        Immort   Crafts (and vehicles, etc.) that use a component type.
 &c workforce&0   Immort   Empire's workforce setup.
 &c variables&0   Immort   Script variables on a player character.

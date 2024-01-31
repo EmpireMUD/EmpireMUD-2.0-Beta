@@ -4740,7 +4740,7 @@ char *get_interaction_restriction_display(struct interact_restriction *list, boo
 				break;
 			}
 			case INTERACT_RESTRICT_TECH: {
-				snprintf(line, sizeof(line), "Tech: %s", techs[res->vnum]);
+				snprintf(line, sizeof(line), "Tech: %s", empire_tech_types[res->vnum]);
 				break;
 			}
 			case INTERACT_RESTRICT_NORMAL: {
@@ -7658,7 +7658,7 @@ bool parse_interaction_restrictions(char_data *ch, char *argument, struct intera
 		}
 		else if (is_abbrev(arg, "-technology")) {
 			ptr = any_one_word(ptr, arg);
-			if ((num = search_block(arg, techs, FALSE)) != NOTHING) {	// valid restriction
+			if ((num = search_block(arg, empire_tech_types, FALSE)) != NOTHING) {	// valid restriction
 				CREATE(res, struct interact_restriction, 1);
 				res->type = INTERACT_RESTRICT_TECH;
 				res->vnum = num;

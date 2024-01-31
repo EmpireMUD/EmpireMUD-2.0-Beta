@@ -445,7 +445,7 @@ char *get_one_perk_display(struct progress_perk *perk, bool show_vnums) {
 	// PRG_PERK_x: displays for each type
 	switch (perk->type) {
 		case PRG_PERK_TECH: {
-			sprinttype(perk->value, techs, save_buffer, sizeof(save_buffer), "UNDEFINED");
+			sprinttype(perk->value, empire_tech_types, save_buffer, sizeof(save_buffer), "UNDEFINED");
 			strcat(save_buffer, " (tech)");
 			break;
 		}
@@ -3044,7 +3044,7 @@ OLC_MODULE(progedit_perks) {
 			// PRG_PERK_x: process value (argument) -- set 'vnum'
 			switch (ptype) {
 				case PRG_PERK_TECH: {
-					if ((vnum = search_block(argument, techs, FALSE)) == NOTHING) {
+					if ((vnum = search_block(argument, empire_tech_types, FALSE)) == NOTHING) {
 						msg_to_char(ch, "Unknown tech '%s'.\r\n", argument);
 						return;
 					}

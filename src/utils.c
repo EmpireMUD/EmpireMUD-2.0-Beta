@@ -1476,11 +1476,11 @@ bool has_permission(char_data *ch, int type, room_data *loc) {
 */
 bool has_tech_available(char_data *ch, int tech) {
 	if (!ROOM_OWNER(IN_ROOM(ch))) {
-		msg_to_char(ch, "In order to do that you need to be in the territory of an empire with %s.\r\n", techs[tech]);
+		msg_to_char(ch, "In order to do that you need to be in the territory of an empire with %s.\r\n", empire_tech_types[tech]);
 		return FALSE;
 	}
 	else if (!has_tech_available_room(IN_ROOM(ch), tech)) {
-		msg_to_char(ch, "In order to do that you need to be in the territory of an empire with %s on this island.\r\n", techs[tech]);
+		msg_to_char(ch, "In order to do that you need to be in the territory of an empire with %s on this island.\r\n", empire_tech_types[tech]);
 		return FALSE;
 	}
 	else {
