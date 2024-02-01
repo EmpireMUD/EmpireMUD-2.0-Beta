@@ -161,8 +161,11 @@ SHOW(show_islands) {
 				continue;
 			}
 			
-			isle = get_island(cur->island, TRUE);
-			msg_to_char(ch, "%2d. %s: %d items, %d population, %d territory%s%s\r\n", cur->island, get_island_name_for(isle->id, ch), cur->items, cur->population, cur->territory, cur->techs ? ", " : "", NULLSAFE(cur->techs));
+			// only show when there's something to show
+			if (cur->items > 0 || cur->population > 0 || cur->territory > 0 || cur->techs) {
+				isle = get_island(cur->island, TRUE);
+				msg_to_char(ch, "%2d. %s: %d items, %d population, %d territory%s%s\r\n", cur->island, get_island_name_for(isle->id, ch), cur->items, cur->population, cur->territory, cur->techs ? ", " : "", NULLSAFE(cur->techs));
+			}
 			
 			// pull it out of the list to prevent unlimited iteration
 			LL_DELETE(list, cur);

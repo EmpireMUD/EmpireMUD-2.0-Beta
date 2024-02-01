@@ -6204,25 +6204,28 @@ ACMD(do_islands) {
 			continue;	// skip
 		}
 		
-		isle = get_island(item->id, TRUE);
-		room = real_room(isle->center);
-		lsize = snprintf(line, sizeof(line), " %s%s - ", get_island_name_for(isle->id, ch), coord_display_room(ch, room, FALSE));
+		// only show if they have one of these
+		if (item->territory > 0 || item->einv_size > 0 || item->population > 0) {
+			isle = get_island(item->id, TRUE);
+			room = real_room(isle->center);
+			lsize = snprintf(line, sizeof(line), " %s%s - ", get_island_name_for(isle->id, ch), coord_display_room(ch, room, FALSE));
 		
-		if (item->territory > 0) {
-			lsize += snprintf(line + lsize, sizeof(line) - lsize, "%d territory%s", item->territory, item->einv_size > 0 ? ", " : "");
-		}
-		if (item->einv_size > 0) {
-			lsize += snprintf(line + lsize, sizeof(line) - lsize, "%d einventory%s", item->einv_size, item->population > 0 ? ", " : "");
-		}
-		if (item->population > 0) {
-			lsize += snprintf(line + lsize, sizeof(line) - lsize, "%d citizen%s", item->population, PLURAL(item->population));
-		}
+			if (item->territory > 0) {
+				lsize += snprintf(line + lsize, sizeof(line) - lsize, "%d territory%s", item->territory, item->einv_size > 0 ? ", " : "");
+			}
+			if (item->einv_size > 0) {
+				lsize += snprintf(line + lsize, sizeof(line) - lsize, "%d einventory%s", item->einv_size, item->population > 0 ? ", " : "");
+			}
+			if (item->population > 0) {
+				lsize += snprintf(line + lsize, sizeof(line) - lsize, "%d citizen%s", item->population, PLURAL(item->population));
+			}
 		
-		if (size + lsize + 3 < sizeof(output)) {
-			size += snprintf(output + size, sizeof(output) - size, "%s\r\n", line);
-		}
-		else {
-			overflow = TRUE;
+			if (size + lsize + 3 < sizeof(output)) {
+				size += snprintf(output + size, sizeof(output) - size, "%s\r\n", line);
+			}
+			else {
+				overflow = TRUE;
+			}
 		}
 		
 		HASH_DEL(list, item);
