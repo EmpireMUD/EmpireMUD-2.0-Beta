@@ -4601,10 +4601,19 @@ void enter_player_game(descriptor_data *d, int dolog, bool fresh) {
 	// attempt to put them back in a vehicle
 	if (GET_LAST_VEHICLE(ch) != NOTHING) {
 		DL_FOREACH2(ROOM_VEHICLES(IN_ROOM(ch)), veh, next_in_room) {
-			if (VEH_IDNUM(veh) == GET_LAST_VEHICLE(ch) && VEH_IS_COMPLETE(veh) && !VEH_SITTING_ON(veh) && validate_sit_on_vehicle(ch, veh, POS_SITTING, FALSE)) {
-				sit_on_vehicle(ch, veh);
-				GET_POS(ch) = POS_SITTING;
-				break;	// only need 1
+			if (VEH_IDNUM(veh) == GET_LAST_VEHICLE(ch) && VEH_IS_COMPLETE(veh) && !VEH_SITTING_ON(veh)) {
+				// sitting?
+				if (VEH_FLAGGED(veh, VEH_SIT) && validate_sit_on_vehicle(ch, veh, POS_SITTING, FALSE)) {
+					sit_on_vehicle(ch, veh);
+					GET_POS(ch) = POS_SITTING;
+					break;	// only need 1
+				}
+				// sleeping?
+				else if (VEH_FLAGGED(veh, VEH_SLEEP) && validate_sit_on_vehicle(ch, veh, POS_SLEEPING, FALSE)) {
+					sit_on_vehicle(ch, veh);
+					GET_POS(ch) = POS_SLEEPING;
+					break;	// only need 1
+				}
 			}
 		}
 	}
