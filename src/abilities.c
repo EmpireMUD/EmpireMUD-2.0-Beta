@@ -1647,7 +1647,6 @@ bool redetect_ability_targets(char_data *ch, ability_data *abil, char_data **vic
 */
 void redetect_ability_targets_on_login(char_data *ch) {
 	char_data *ch_iter;
-	vehicle_data *veh;
 	
 	if (!ch || !IN_ROOM(ch) || IS_NPC(ch)) {
 		return;	// no work
@@ -1666,13 +1665,7 @@ void redetect_ability_targets_on_login(char_data *ch) {
 		GET_ACTION_TEMPORARY_CHAR_ID(ch) = 0;
 	}
 	if (GET_ACTION_TEMPORARY_VEH_ID(ch) != NOTHING) {
-		DL_FOREACH2(ROOM_VEHICLES(IN_ROOM(ch)), veh, next_in_room) {
-			if (VEH_VNUM(veh) == GET_ACTION_TEMPORARY_VEH_ID(ch)) {
-				// probable match
-				GET_ACTION_VEH_TARG(ch) = veh;
-				break;
-			}
-		}
+		GET_ACTION_VEH_TARG(ch) = get_vehicle_world_by_idnum(GET_ACTION_TEMPORARY_VEH_ID(ch));
 		GET_ACTION_TEMPORARY_VEH_ID(ch) = NOTHING;
 	}
 }

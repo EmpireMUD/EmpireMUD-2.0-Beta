@@ -2706,7 +2706,7 @@ void write_player_primary_data_to_file(FILE *fl, char_data *ch) {
 		}
 		if (GET_ACTION_CHAR_TARG(ch) || GET_ACTION_MULTI_TARG(ch) || GET_ACTION_VEH_TARG(ch) || GET_ACTION_ROOM_TARG(ch) != NOWHERE || GET_ACTION_TEMPORARY_CHAR_ID(ch) != 0 || GET_ACTION_TEMPORARY_VEH_ID(ch) != NOTHING) {
 			// object targets are not quit-safe and are not saved
-			fprintf(fl, "Action-targets: %d %lld %d %d\n", GET_ACTION_CHAR_TARG(ch) ? CAST_BY_ID(GET_ACTION_CHAR_TARG(ch)) : GET_ACTION_TEMPORARY_CHAR_ID(ch), GET_ACTION_MULTI_TARG(ch), GET_ACTION_VEH_TARG(ch) ? VEH_VNUM(GET_ACTION_VEH_TARG(ch)) : GET_ACTION_TEMPORARY_VEH_ID(ch), GET_ACTION_ROOM_TARG(ch));
+			fprintf(fl, "Action-targets: %d %lld %d %d\n", GET_ACTION_CHAR_TARG(ch) ? CAST_BY_ID(GET_ACTION_CHAR_TARG(ch)) : GET_ACTION_TEMPORARY_CHAR_ID(ch), GET_ACTION_MULTI_TARG(ch), GET_ACTION_VEH_TARG(ch) ? VEH_IDNUM(GET_ACTION_VEH_TARG(ch)) : GET_ACTION_TEMPORARY_VEH_ID(ch), GET_ACTION_ROOM_TARG(ch));
 		}
 	}
 	if (GET_ACTION_STRING(ch)) {

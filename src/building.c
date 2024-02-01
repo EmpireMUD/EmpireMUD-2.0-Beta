@@ -1899,6 +1899,12 @@ bool start_upgrade(char_data *ch, craft_data *upgrade_craft, room_data *from_roo
 		else if (from_veh) {
 			// upgraded from vehicle
 			
+			// keep old idnum: first try to give back the new one
+			if (VEH_IDNUM(new_veh) == data_get_int(DATA_TOP_VEHICLE_ID)) {
+				data_set_int(DATA_TOP_VEHICLE_ID, data_get_int(DATA_TOP_VEHICLE_ID) - 1);
+			}
+			VEH_IDNUM(new_veh) = VEH_IDNUM(from_veh);
+			
 			// see if we need to abandon the old one
 			if (VEH_OWNER(from_veh) && VEH_FLAGGED(new_veh, VEH_NO_CLAIM)) {
 				perform_abandon_vehicle(from_veh);

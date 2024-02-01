@@ -12082,6 +12082,30 @@ vehicle_data *get_vehicle_room(room_data *room, char *name, int *number) {
 
 
 /**
+* Finds a vehicle in the room by idnum.
+*
+* @param int idnum The idnum of the vehicle to find.
+* @return vehicle_data* The found ship, or NULL.
+*/
+vehicle_data *get_vehicle_room_by_idnum(int idnum, room_data *room) {
+	vehicle_data *veh;
+	
+	// shortcut
+	if (idnum <= 0 || !room) {
+		return NULL;
+	}
+	
+	DL_FOREACH2(ROOM_VEHICLES(room), veh, next_in_room) {
+		if (VEH_IDNUM(veh) == idnum) {
+			return veh;
+		}
+	}
+	
+	return NULL;
+}
+
+
+/**
 * Find a vehicle in the world, without regard to visibility.
 *
 * @param char *name The string to search for.
