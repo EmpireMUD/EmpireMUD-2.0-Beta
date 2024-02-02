@@ -1761,7 +1761,7 @@ static void spawn_one_room(room_data *room, bool only_artisans) {
 					if (npc->mob) {
 						continue;	// check if the mob is already spawned
 					}
-					if (only_artisans && npc->vnum != artisan) {
+					if (only_artisans && npc->vnum != VEH_ARTISAN(veh)) {
 						continue;	// not spawning this now
 					}
 					
