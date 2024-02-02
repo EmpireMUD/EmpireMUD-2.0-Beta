@@ -2441,6 +2441,8 @@ void adjust_vehicle_tech(vehicle_data *veh, int island_id, bool add) {
 	int amt = add ? 1 : -1;	// adding or removing 1
 	empire_data *emp = NULL;
 	struct empire_island *e_isle = NULL;
+	struct empire_npc_data *npc;
+	struct empire_vehicle_data *vter;
 	
 	if (veh) {
 		emp = VEH_OWNER(veh);
@@ -2465,7 +2467,12 @@ void adjust_vehicle_tech(vehicle_data *veh, int island_id, bool add) {
 		}
 	}
 	
-	// TODO: count vehicle artisan as population?
+	// island population
+	if (e_isle && (vter = find_empire_vehicle_entry(emp, veh))) {
+		LL_FOREACH(vter->npcs, npc) {
+			e_isle->population += amt;
+		}
+	}
 	
 	// other traits from buildings?
 	EMPIRE_MILITARY(emp) += VEH_MILITARY(veh) * amt;
