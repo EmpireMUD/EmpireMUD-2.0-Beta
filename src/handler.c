@@ -3673,7 +3673,9 @@ void perform_abandon_room(room_data *room) {
 	}
 	
 	affect_total_room(room);
-	TRIGGER_DELAYED_REFRESH(emp, DELAY_REFRESH_MSDP_UPDATE_CLAIMS);
+	if (emp) {
+		TRIGGER_DELAYED_REFRESH(emp, DELAY_REFRESH_MSDP_UPDATE_CLAIMS);
+	}
 	request_mapout_update(GET_ROOM_VNUM(room));
 	request_world_save(GET_ROOM_VNUM(room), WSAVE_ROOM | WSAVE_MAP);
 }
