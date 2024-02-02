@@ -331,7 +331,6 @@ bool users_output(char_data *to, char_data *tch, descriptor_data *d, char *name_
 
 ADMIN_UTIL(util_approval);
 ADMIN_UTIL(util_bldconvert);
-ADMIN_UTIL(util_b318_buildings);
 ADMIN_UTIL(util_clear_roles);
 ADMIN_UTIL(util_diminish);
 ADMIN_UTIL(util_evolve);
@@ -357,7 +356,6 @@ struct {
 } admin_utils[] = {
 	{ "approval", LVL_CIMPL, util_approval },
 	{ "bldconvert", LVL_CIMPL, util_bldconvert },
-	{ "b318buildings", LVL_CIMPL, util_b318_buildings },
 	{ "clearroles", LVL_CIMPL, util_clear_roles },
 	{ "diminish", LVL_START_IMM, util_diminish },
 	{ "evolve", LVL_CIMPL, util_evolve },
@@ -979,32 +977,6 @@ ADMIN_UTIL(util_bldconvert) {
 		snprintf(buf + strlen(buf), sizeof(buf) - strlen(buf), ", and craft %d (with updates to craft %d)", to_vnum, from_vnum);
 	}
 	syslog(SYS_OLC, GET_INVIS_LEV(ch), TRUE, "%s", buf);
-}
-
-
-// looks up buildings with certain flags
-ADMIN_UTIL(util_b318_buildings) {	
-	char buf[MAX_STRING_LENGTH];
-	bld_data *bld, *next_bld;
-	bool any = FALSE;
-	
-	// these are flags that were used prior to b3.18
-	bitvector_t bad_flags = BIT(11) | BIT(13) | BIT(16) | BIT(18) | BIT(19) |
-		BIT(20) | BIT(21) | BIT(22) | BIT(23) | BIT(24) | BIT(25) | BIT(26) |
-		BIT(27) | BIT(28) | BIT(30) | BIT(31) | BIT(32) | BIT(35) | BIT(36) |
-		BIT(38) | BIT(39) | BIT(41) | BIT(45) | BIT(47) | BIT(8) | BIT(17);
-	
-	HASH_ITER(hh, building_table, bld, next_bld) {
-		if (IS_SET(GET_BLD_FLAGS(bld), bad_flags)) {
-			sprintbit(GET_BLD_FLAGS(bld) & bad_flags, bld_flags, buf, TRUE);
-			msg_to_char(ch, "[%5d] %s: %s\r\n", GET_BLD_VNUM(bld), GET_BLD_NAME(bld), buf);
-			any = TRUE;
-		}
-	}
-	
-	if (!any) {
-		msg_to_char(ch, "No buildings found with the deprecated b3.18 flags.\r\n");
-	}
 }
 
 

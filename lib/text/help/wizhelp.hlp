@@ -1880,7 +1880,6 @@ They generally have no game effect, but can help with testing.
 Available utilities:
  &capproval&0 - Change all player approvals to be "by account" or "by character".
  &cbldconvert&0 - See UTIL BLDCONVERT
- &cb318buildings&0 - Finds buildings using flags that were deprecated in 2.0b3.18.
  &cclearroles&0 - Clears the group roles and abilities of all players.
  &cdiminish <number> <scale>&0 - Applies the game's diminishing returns formula,
     and returns the result.
