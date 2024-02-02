@@ -85,6 +85,7 @@ vehicle_data *find_ship_to_dispatch(char_data *ch, char *arg) {
 	char tmpname[MAX_INPUT_LENGTH], *tmp = tmpname;
 	int island, found = 0, number = 1;
 	vehicle_data *veh;
+	struct empire_vehicle_data *vter, *next_vter;
 	
 	// prefer ones here
 	if ((veh = get_vehicle_in_room_vis(ch, arg, NULL))) {
@@ -108,11 +109,8 @@ vehicle_data *find_ship_to_dispatch(char_data *ch, char *arg) {
 	}
 	
 	// otherwise look for ones that match
-	DL_FOREACH(vehicle_list, veh) {
-		if (VEH_OWNER(veh) != GET_LOYALTY(ch)) {
-			continue;
-		}
-		if (!VEH_IS_COMPLETE(veh) || !VEH_FLAGGED(veh, VEH_SHIPPING)) {
+	HASH_ITER(hh, EMPIRE_VEHICLE_LIST(GET_LOYALTY(ch)), vter, next_vter) {
+		if (!(veh = vter->veh) || !VEH_IS_COMPLETE(veh) || !VEH_FLAGGED(veh, VEH_SHIPPING)) {
 			continue;
 		}
 		if (VEH_FLAGGED(veh, VEH_ON_FIRE)) {

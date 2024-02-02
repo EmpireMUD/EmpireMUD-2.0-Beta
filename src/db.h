@@ -443,11 +443,15 @@ extern empire_data *empire_table;
 extern struct trading_post_data *trading_list;
 extern bool check_empire_refresh;
 
+struct empire_vehicle_data *create_empire_vehicle_entry(empire_data *emp, vehicle_data *veh);
+struct empire_vehicle_data *create_empire_vehicle_entry_by_id(empire_data *emp, int idnum);
 struct empire_territory_data *create_territory_entry(empire_data *emp, room_data *room);
 void delete_empire(empire_data *emp);
 void delete_member_data(char_data *ch, empire_data *from_emp);
 void delete_territory_npc(struct empire_territory_data *ter, struct empire_npc_data *npc);
 void delete_room_npcs(room_data *room, struct empire_territory_data *ter, bool make_homeless);
+void delete_vehicle_npc(struct empire_vehicle_data *vter, struct empire_npc_data *npc);
+void delete_vehicle_npcs(vehicle_data *veh, struct empire_vehicle_data *vter, bool make_homeless);
 void free_dropped_items(struct empire_dropped_item **list);
 void free_empire(empire_data *emp);
 void free_member_data(empire_data *emp);
@@ -486,7 +490,9 @@ char_data *spawn_empire_npc_to_room(empire_data *emp, struct empire_npc_data *np
 
 // empire territory
 void delete_territory_entry(empire_data *emp, struct empire_territory_data *ter, bool make_npcs_homeless);
+void delete_empire_vehicle_entry(empire_data *emp, struct empire_vehicle_data *vter, bool make_npcs_homeless);
 void populate_npc(room_data *room, struct empire_territory_data *ter, bool force);
+void populate_vehicle_npc(vehicle_data *veh, struct empire_vehicle_data *vter, bool force);
 
 // extra descs
 void free_extra_descs(struct extra_descr_data **list);
@@ -1025,6 +1031,7 @@ extern struct text_file_data_type text_file_data[NUM_TEXT_FILE_STRINGS];
 
 // workforce.c
 extern struct empire_territory_data *global_next_territory_entry;
+extern struct empire_vehicle_data *global_next_empire_vehicle_entry;
 
 
 /* global buffering system */

@@ -5207,6 +5207,7 @@ ACMD(do_empire_inventory) {
 ACMD(do_enroll) {
 	struct empire_island *from_isle, *next_isle, *isle;
 	struct empire_territory_data *ter, *next_ter;
+	struct empire_vehicle_data *vter, *next_vter;
 	struct empire_npc_data *npc;
 	struct empire_storage_data *store, *next_store, *merged;
 	struct empire_city_data *city, *next_city;
@@ -5421,6 +5422,18 @@ ACMD(do_enroll) {
 				// move territory over
 				HASH_DEL(EMPIRE_TERRITORY_LIST(old), ter);
 				HASH_ADD_INT(EMPIRE_TERRITORY_LIST(e), vnum, ter);
+			}
+
+			// vehicle data
+			HASH_ITER(hh, EMPIRE_VEHICLE_LIST(old), vter, next_vter) {
+				// switch npc allegiance
+				LL_FOREACH(vter->npcs, npc) {
+					npc->empire_id = EMPIRE_VNUM(e);
+				}
+				
+				// move em over
+				HASH_DEL(EMPIRE_VEHICLE_LIST(old), vter);
+				HASH_ADD_INT(EMPIRE_VEHICLE_LIST(e), idnum, vter);
 			}
 			
 			// move territory over
@@ -5727,6 +5740,7 @@ ACMD(do_findmaintenance) {
 	struct island_info *find_island = NULL;
 	empire_data *emp = GET_LOYALTY(ch);
 	struct empire_territory_data *ter, *next_ter;
+	struct empire_vehicle_data *vter, *next_vter;
 	room_data *find_room = NULL;
 	vehicle_data *veh;
 	int bld_total = 0, veh_total = 0;
@@ -5836,9 +5850,9 @@ ACMD(do_findmaintenance) {
 	}
 	
 	// check all vehicles
-	DL_FOREACH(vehicle_list, veh) {
-		if (VEH_OWNER(veh) != emp) {
-			continue;	// wrong owner
+	HASH_ITER(hh, EMPIRE_VEHICLE_LIST(emp), vter, next_vter) {
+		if (!(veh = vter->veh)) {
+			continue;	// somehow missing data?
 		}
 		if (find_island && !VEH_NEEDS_RESOURCES(veh)) {
 			continue;	// only looking for resource lists
@@ -5959,6 +5973,7 @@ ACMD(do_home) {
 	bool found;
 	char command[MAX_INPUT_LENGTH];
 	struct empire_territory_data *ter;
+	struct empire_vehicle_data *vter;
 	char_data *targ;
 	player_index_data *index;
 	room_data *iter, *next_iter, *home = NULL, *real = HOME_ROOM(IN_ROOM(ch));
@@ -6030,6 +6045,12 @@ ACMD(do_home) {
 				while (ter->npcs) {
 					make_citizen_homeless(emp, ter->npcs);
 					delete_territory_npc(ter, ter->npcs);
+				}
+			}
+			if (GET_ROOM_VEHICLE(real) && VEH_OWNER(GET_ROOM_VEHICLE(real)) && (vter = find_empire_vehicle_entry(VEH_OWNER(GET_ROOM_VEHICLE(real)), GET_ROOM_VEHICLE(real)))) {
+				while (vter->npcs) {
+					make_citizen_homeless(emp, vter->npcs);
+					delete_vehicle_npc(vter, vter->npcs);
 				}
 			}
 			
@@ -8204,6 +8225,7 @@ void do_workforce_limit(char_data *ch, empire_data *emp, char *argument) {
 */
 void do_workforce_nearby(char_data *ch, empire_data *emp, char *argument) {
 	struct empire_territory_data *ter, *next_ter;
+	struct empire_vehicle_data *vter, *next_vter;
 	struct empire_npc_data *npc;
 	struct generic_name_data *nameset;
 	char_data *proto;
@@ -8263,6 +8285,65 @@ void do_workforce_nearby(char_data *ch, empire_data *emp, char *argument) {
 				// prepare name
 				lsize = snprintf(line, sizeof(line), "%s %s\r\n", coord_display_room(ch, ter->room, TRUE), name);
 			
+				// append
+				if (lsize + size + 110 < sizeof(buf)) {
+					size += lsize;
+					strcat(buf, line);
+				}
+				else {
+					// mark for count-only
+					full = TRUE;
+				}
+			}
+		}
+	}
+	
+	// vehicles
+	HASH_ITER(hh, EMPIRE_VEHICLE_LIST(emp), vter, next_vter) {
+		// distance?
+		if (!vter->veh || compute_distance(IN_ROOM(ch), IN_ROOM(vter->veh)) > chore_distance) {
+			continue;
+		}
+		
+		LL_FOREACH(vter->npcs, npc) {
+			// determine mob name
+			if (npc->mob) {
+				if (!full) {
+					snprintf(name, sizeof(name), "%s%s", GET_SHORT_DESC(npc->mob), (GET_MOB_VNUM(npc->mob) != npc->vnum) ? " (working)" : "");
+				}
+				if (GET_MOB_VNUM(npc->mob) != npc->vnum) {
+					++working;
+				}
+				else {
+					++avail;
+				}
+			}
+			else if ((proto = mob_proto(npc->vnum))) {
+				if (!full) {
+					nameset = get_best_name_list(MOB_NAME_SET(proto), npc->sex);
+					snprintf(name, sizeof(name), "%s", nameset->names[npc->name]);
+					
+					temp = str_replace("#n", name, GET_SHORT_DESC(proto));
+					strncpy(name, temp, sizeof(name));
+					name[sizeof(name)-1] = '\0';	// ensure terminator
+					free(temp);
+				}
+				++avail;
+			}
+			else {
+				if (!full) {
+					snprintf(name, sizeof(name), "UNKNOWN");
+				}
+				++avail;
+			}
+			
+			if (full) {
+				// just counting, no appending
+			}
+			else {
+				// prepare name
+				lsize = snprintf(line, sizeof(line), "%s %s\r\n", coord_display_room(ch, IN_ROOM(vter->veh), TRUE), name);
+				
 				// append
 				if (lsize + size + 110 < sizeof(buf)) {
 					size += lsize;

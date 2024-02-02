@@ -6158,6 +6158,9 @@ double compute_map_distance(int x1, int y1, int x2, int y2) {
 	if (x1 < 0 || x2 < 0 || y1 < 0 || y2 < 0) {
 		return MAP_SIZE;	// maximum distance
 	}
+	if (x1 >= MAP_WIDTH || x2 >= MAP_WIDTH || y1 >= MAP_HEIGHT || y2 >= MAP_HEIGHT) {
+		return MAP_SIZE;	// maximum distance
+	}
 
 	// adjust for edges
 	if (WRAP_X) {
@@ -6489,6 +6492,7 @@ int get_room_blocking_height(room_data *room, bool *blocking_vehicle) {
 */
 room_data *find_load_room(char_data *ch) {
 	struct empire_territory_data *ter, *next_ter;
+	struct empire_vehicle_data *vter, *next_vter;
 	room_data *rl, *rl_last_room, *found, *map;
 	int num_found = 0;
 	sh_int island;
@@ -6510,11 +6514,27 @@ room_data *find_load_room(char_data *ch) {
 	if (!IS_NPC(ch) && (rl = real_room(GET_LAST_ROOM(ch))) && GET_LOYALTY(ch)) {
 		island = GET_ISLAND_ID(rl);
 		found = NULL;
+		// room territory
 		HASH_ITER(hh, EMPIRE_TERRITORY_LIST(GET_LOYALTY(ch)), ter, next_ter) {
 			if (room_has_function_and_city_ok(GET_LOYALTY(ch), ter->room, FNC_TOMB) && IS_COMPLETE(ter->room) && GET_ISLAND_ID(ter->room) == island && !IS_BURNING(ter->room)) {
 				// pick at random if more than 1
 				if (!number(0, num_found++) || !found) {
 					found = ter->room;
+				}
+			}
+		}
+		// vehicle territory
+		HASH_ITER(hh, EMPIRE_VEHICLE_LIST(GET_LOYALTY(ch)), vter, next_vter) {
+			if (!IN_ROOM(vter->veh) || GET_ISLAND_ID(IN_ROOM(vter->veh)) != island) {
+				continue;	// wrong location
+			}
+			if (ROOM_OWNER(IN_ROOM(vter->veh)) == GET_LOYALTY(ch)) {
+				continue;	// already checked during territory check
+			}
+			if (VEH_IS_COMPLETE(vter->veh) && IS_SET(VEH_FUNCTIONS(vter->veh), FNC_TOMB) && !VEH_FLAGGED(vter->veh, VEH_ON_FIRE)) {
+				// pick at random if more than 1
+				if (!number(0, num_found++) || !found) {
+					found = IN_ROOM(vter->veh);
 				}
 			}
 		}

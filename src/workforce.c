@@ -851,6 +851,7 @@ void charge_workforce(empire_data *emp, int chore, room_data *room, char_data *w
 void chore_update(void) {
 	bool log_and_needs = FALSE;
 	struct empire_territory_data *ter, *next_ter;
+	struct empire_vehicle_data *vter, *next_vter;
 	struct empire_island *eisle, *next_eisle;
 	struct empire_needs *needs, *next_needs;
 	struct workforce_log *wf_log;
@@ -907,10 +908,13 @@ void chore_update(void) {
 				next_ter = global_next_territory_entry;
 			}
 			
-			DL_FOREACH_SAFE(vehicle_list, veh, global_next_vehicle) {
-				if (VEH_OWNER(veh) == emp && !VEH_IS_EXTRACTED(veh)) {
+			global_next_empire_vehicle_entry = NULL;
+			HASH_ITER(hh, EMPIRE_VEHICLE_LIST(emp), vter, next_vter) {
+				global_next_empire_vehicle_entry = next_vter;
+				if ((veh = vter->veh) && !VEH_IS_EXTRACTED(veh)) {
 					process_one_vehicle_chore(emp, veh);
 				}
+				next_vter = global_next_empire_vehicle_entry;
 			}
 			
 			read_vault(emp);
@@ -1128,6 +1132,7 @@ char_data *find_chore_worker_in_room(empire_data *emp, room_data *room, vehicle_
 */
 struct empire_npc_data *find_free_npc_for_chore(empire_data *emp, room_data *loc) {
 	struct empire_territory_data *ter_iter, *next_ter;
+	struct empire_vehicle_data *vter_iter, *next_vter;
 	struct empire_npc_data *backup = NULL, *npc_iter;
 	room_data *rm;
 
@@ -1137,7 +1142,7 @@ struct empire_npc_data *find_free_npc_for_chore(empire_data *emp, room_data *loc
 		return NULL;
 	}
 	
-	// massive iteration to try to find one
+	// part 1: massive iteration to try to find one
 	HASH_ITER(hh, EMPIRE_TERRITORY_LIST(emp), ter_iter, next_ter) {
 		// only bother checking anything if npcs live here
 		if (ter_iter->npcs) {			
@@ -1151,6 +1156,29 @@ struct empire_npc_data *find_free_npc_for_chore(empire_data *emp, room_data *loc
 							backup = npc_iter;
 						}
 						else if (!npc_iter->mob) {
+							// not spawned: use this one
+							return npc_iter;
+						}
+					}
+				}
+			}
+		}
+	}
+	
+	// part 2: try vehicles, too
+	HASH_ITER(hh, EMPIRE_VEHICLE_LIST(emp), vter_iter, next_vter) {
+		if (vter_iter->npcs) {			
+			if (vter_iter->veh && (rm = IN_ROOM(vter_iter->veh)) && GET_ISLAND_ID(loc) == GET_ISLAND_ID(rm) && compute_distance(loc, rm) <= chore_distance) {
+				// iterate over population
+				LL_FOREACH(vter_iter->npcs, npc_iter) {
+					// only use citizens for labor
+					if (npc_iter->vnum == CITIZEN_MALE || npc_iter->vnum == CITIZEN_FEMALE) {
+						if (!backup && npc_iter->mob && GET_MOB_VNUM(npc_iter->mob) == npc_iter->vnum && !FIGHTING(npc_iter->mob)) {
+							// already has a mob? save as backup (also making sure the npc's mob is just a citizen not a laborer)
+							backup = npc_iter;
+						}
+						else if (!npc_iter->mob) {
+							// not spawned: use this one
 							return npc_iter;
 						}
 					}

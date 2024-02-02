@@ -5372,7 +5372,8 @@ struct empire_npc_data {
 	mob_vnum vnum;	// npc type
 	int sex;	// SEX_x
 	int name;	// position in the name list
-	room_data *home;	// where it lives
+	room_data *home;	// where it lives (if a room)
+	vehicle_data *home_vehicle;	// where it lives (if a vehicle)
 	
 	empire_vnum empire_id;	// empire vnum
 	char_data *mob;
@@ -5407,13 +5408,27 @@ struct empire_storage_data {
 struct empire_territory_data {
 	room_vnum vnum;	// vnum of the room, for hashing
 	room_data *room;	// pointer to territory location
-	int population_timer;	// time to re-populate
 	
+	int population_timer;	// time to re-populate
 	struct empire_npc_data *npcs;	// list of empire mobs that live here
 	
 	bool marked;	// for checking that rooms still exist
 	
-	UT_hash_handle hh;	// emp->territory_list hash
+	UT_hash_handle hh;	// emp->territory_list hash (by room vnum)
+};
+
+
+// similar to territory: a hash of owned vehicles and their npcs
+struct empire_vehicle_data {
+	int idnum;	// vehicle's unique id, for hashing
+	vehicle_data *veh;	// pointer to the vehicle
+	
+	int population_timer;	// time to re-populate
+	struct empire_npc_data *npcs;	// list of empire mobs that live on the outside of the vehicle
+	
+	bool marked;	// for checking that entries still exist
+	
+	UT_hash_handle hh;	// emp->vehicle_list hash (by idnum)
 };
 
 
@@ -5597,6 +5612,7 @@ struct empire_data {
 	
 	// unsaved data
 	struct empire_territory_data *territory_list;	// hash table by vnum
+	struct empire_vehicle_data *vehicle_list;	// hash table by idnum
 	struct empire_city_data *city_list;	// linked list of cities
 	struct empire_workforce_tracker *ewt_tracker;	// workforce tracker
 	struct workforce_delay *delays;	// speeds up chore processing

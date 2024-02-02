@@ -90,7 +90,7 @@ void parse_vehicle(FILE *fl, any_vnum vnum);
 PLAYER_UPDATE_FUNC(send_all_players_to_nowhere);
 int check_object(obj_data *obj);
 int count_hash_records(FILE *fl);
-struct empire_npc_data *create_empire_npc(empire_data *emp, mob_vnum mob, int sex, int name, struct empire_territory_data *ter);
+struct empire_npc_data *create_empire_npc(empire_data *emp, mob_vnum mob, int sex, int name, struct empire_territory_data *ter, struct empire_vehicle_data *vter);
 empire_vnum find_free_empire_vnum(void);
 void free_theft_logs(struct theft_log *list);
 void log_offense_to_empire(empire_data *emp, struct offense_data *off, char_data *offender);
@@ -1567,6 +1567,7 @@ void remove_empire_from_table(empire_data *emp) {
 void check_for_new_map(void) {
 	struct empire_storage_data *store, *next_store, *new_store;
 	struct empire_territory_data *ter, *next_ter;
+	struct empire_vehicle_data *vter, *next_vter;
 	struct empire_trade_data *trade, *next_trade;
 	struct empire_city_data *city, *next_city;
 	struct shipping_data *shipd, *next_shipd;
@@ -1657,6 +1658,23 @@ void check_for_new_map(void) {
 			free(ter);
 		}
 		EMPIRE_TERRITORY_LIST(emp) = NULL;	// all entires freed
+		
+		// free vehicle list and clear numbers
+		HASH_ITER(hh, EMPIRE_VEHICLE_LIST(emp), vter, next_vter) {
+			if (vter == global_next_empire_vehicle_entry) {
+				global_next_empire_vehicle_entry = vter->hh.next;
+			}
+			
+			// free npcs
+			while (vter->npcs) {
+				make_citizen_homeless(emp, vter->npcs);
+				delete_vehicle_npc(vter, vter->npcs);
+			}
+			
+			HASH_DEL(EMPIRE_VEHICLE_LIST(emp), vter);
+			free(vter);
+		}
+		EMPIRE_VEHICLE_LIST(emp) = NULL;	// all entires freed
 		
 		HASH_ITER(hh, EMPIRE_ISLANDS(emp), isle, next_isle) {
 			if (isle->island == NO_ISLAND) {
@@ -2119,6 +2137,53 @@ void delete_territory_npc(struct empire_territory_data *ter, struct empire_npc_d
 
 
 /**
+* Removes a vehicle's NPC entry, and removes the citizen if it's spawned. This
+* will free the "npc" argument after removing it from the territory npc list.
+*
+* @param struct empire_vehicle_data *vter The empire's vehicle entry.
+* @param struct empire_npc_data *npc The npc data.
+*/
+void delete_vehicle_npc(struct empire_vehicle_data *vter, struct empire_npc_data *npc) {
+	struct empire_island *isle;
+	empire_data *emp;
+	
+	if (!vter || !npc) {
+		return;
+	}
+	
+	// this MAY not exist anymore
+	emp = vter->veh ? VEH_OWNER(vter->veh) : NULL;
+	
+	// remove mob if any
+	if (npc->mob) {
+		GET_EMPIRE_NPC_DATA(npc->mob) = NULL;	// un-link this npc data from the mob, or extract will corrupt memory
+		
+		if (!EXTRACTED(npc->mob) && !IS_DEAD(npc->mob)) {
+			if (!AFF_FLAGGED(npc->mob, AFF_HIDDEN | AFF_NO_SEE_IN_ROOM)) {
+				act("$n leaves.", TRUE, npc->mob, NULL, NULL, TO_ROOM);
+			}
+			extract_char(npc->mob);
+		}
+		npc->mob = NULL;
+	}
+	
+	// reduce pop
+	if (emp) {
+		EMPIRE_NEEDS_SAVE(emp) = TRUE;
+		EMPIRE_POPULATION(emp) -= 1;
+		
+		// remove island population ONLY if the room's techs are applied
+		if (vter->veh && VEH_APPLIED_TO_ISLAND(vter->veh) >= 0 && (isle = get_empire_island(emp, VEH_APPLIED_TO_ISLAND(vter->veh)))) {
+			isle->population -= 1;
+		}
+	}
+	
+	LL_DELETE(vter->npcs, npc);
+	free(npc);
+}
+
+
+/**
 * Frees a set of workforce trackers.
 *
 * @param struct empire_workforce_tracker **tracker A pointer to the hash table of trackers.
@@ -2157,6 +2222,7 @@ void free_empire(empire_data *emp) {
 	struct empire_storage_data *store, *next_store;
 	struct empire_unique_storage *eus;
 	struct empire_territory_data *ter, *next_ter;
+	struct empire_vehicle_data *vter, *next_vter;
 	struct player_craft_data *pcd, *next_pcd;
 	struct empire_needs *needs, *next_needs;
 	struct empire_city_data *city;
@@ -2268,6 +2334,21 @@ void free_empire(empire_data *emp) {
 		free(ter);
 	}
 	
+	// free vehicles
+	HASH_ITER(hh, EMPIRE_VEHICLE_LIST(emp), vter, next_vter) {
+		if (vter == global_next_empire_vehicle_entry) {
+			global_next_empire_vehicle_entry = vter->hh.next;
+		}
+		
+		// free npcs
+		while (vter->npcs) {
+			delete_vehicle_npc(vter, vter->npcs);
+		}
+		
+		HASH_DEL(EMPIRE_VEHICLE_LIST(emp), vter);
+		free(vter);
+	}
+	
 	// free diplomacy
 	while ((pol = emp->diplomacy)) {
 		emp->diplomacy = pol->next;
@@ -2290,7 +2371,7 @@ void free_empire(empire_data *emp) {
 	
 	// free homeless
 	LL_FOREACH_SAFE(EMPIRE_HOMELESS_CITIZENS(emp), ehc, next_ehc) {
-		free(ehc);
+		remove_homeless_citizen(emp, ehc);
 	}
 	
 	// free workforce logs
@@ -2777,6 +2858,7 @@ void parse_empire(FILE *fl, empire_vnum vnum) {
 	struct offense_data *off;
 	struct empire_city_data *city;
 	struct empire_island *isle;
+	struct empire_vehicle_data *vter;
 	struct req_data *task;
 	bitvector_t bit_in;
 	room_data *room;
@@ -2834,6 +2916,7 @@ void parse_empire(FILE *fl, empire_vnum vnum) {
 	emp->population = 0;
 	emp->military = 0;
 	emp->territory_list = NULL;
+	emp->vehicle_list = NULL;
 	emp->city_list = NULL;
 	
 	// initialize safely
@@ -3152,15 +3235,25 @@ void parse_empire(FILE *fl, empire_vnum vnum) {
 				}
 				break;
 			}
-			case 'N': {	// npc
-				if (sscanf(line, "N %d %d %d %d", t, t+1, t+2, t+3) == 4) {
+			case 'N': {	// npc for terrritory OR vehicle
+				if (*(line + 1) == 'V' && sscanf(line, "NV %d %d %d %d", &t[0], &t[1], &t[2], &t[3]) == 4) {
+					// vehicle npc: t[3] is the vehicle id
+					if (!(vter = find_empire_vehicle_entry_by_id(emp, t[3]))) {
+						vter = create_empire_vehicle_entry_by_id(emp, t[3]);
+					}
+					
+					// attach the npc
+					create_empire_npc(emp, t[0], t[1], t[2], NULL, vter);
+				}
+				else if (sscanf(line, "N %d %d %d %d", &t[0], &t[1], &t[2], &t[3]) == 4) {
+					// room npc
 					if ((room = real_room(t[3]))) {
 						if (!(ter = find_territory_entry(emp, room))) {
 							ter = create_territory_entry(emp, room);
 						}
 					
 						// this attaches itself to the room
-						create_empire_npc(emp, t[0], t[1], t[2], ter);
+						create_empire_npc(emp, t[0], t[1], t[2], ter, NULL);
 					}
 				}
 				else {
@@ -3168,8 +3261,15 @@ void parse_empire(FILE *fl, empire_vnum vnum) {
 				}
 				break;
 			}
-			case 'T': {	// territory
-				if (sscanf(line, "T %d %d", t, t + 1) == 2) {
+			case 'T': {	// territory OR vehicle territory
+				if (*(line+1) == 'V' && sscanf(line, "TV %d %d", &t[0], &t[1]) == 2) {
+					// vehicle entry
+					if (!(vter = find_empire_vehicle_entry_by_id(emp, t[0]))) {
+						vter = create_empire_vehicle_entry_by_id(emp, t[0]);
+					}
+					vter->population_timer = t[1];
+				}
+				else if (sscanf(line, "T %d %d", &t[0], &t[1]) == 2) {
 					if ((room = real_room(t[0]))) {
 						if (!(ter = find_territory_entry(emp, room))) {
 							ter = create_territory_entry(emp, room);
@@ -3294,6 +3394,7 @@ void write_empire_to_file(FILE *fl, empire_data *emp) {
 	struct empire_trade_data *trade;
 	struct empire_city_data *city;
 	struct empire_npc_data *npc;
+	struct empire_vehicle_data *vter, *next_vter;
 	struct req_data *task;
 	int iter;
 
@@ -3445,7 +3546,17 @@ void write_empire_to_file(FILE *fl, empire_data *emp) {
 	
 		// npcs who live there
 		for (npc = ter->npcs; npc; npc = npc->next) {
-			fprintf(fl, "N %d %d %d %d\n", npc->vnum, npc->sex, npc->name, GET_ROOM_VNUM(npc->home));
+			fprintf(fl, "N %d %d %d %d\n", npc->vnum, npc->sex, npc->name, npc->home ? GET_ROOM_VNUM(npc->home) : NOWHERE);
+		}
+	}
+	
+	// TV: territory vehicles
+	HASH_ITER(hh, EMPIRE_VEHICLE_LIST(emp), vter, next_vter) {
+		fprintf(fl, "TV %d %d\n", vter->idnum, vter->population_timer);
+	
+		// npcs who live there
+		LL_FOREACH(vter->npcs, npc) {
+			fprintf(fl, "NV %d %d %d %d\n", npc->vnum, npc->sex, npc->name, npc->home_vehicle ? VEH_IDNUM(npc->home_vehicle) : NOTHING);
 		}
 	}
 	
@@ -3741,23 +3852,32 @@ void save_marked_empires(void) {
 * @param mob_vnum mobv The vnum of the mob
 * @param int sex SEX_x
 * @param int name pos in the name list
-* @param struct empire_territory_data *ter Where the mob lives
+* @param struct empire_territory_data *ter Where the mob lives (if it's a room; may be NULL).
+* @param struct empire_vehicle_data *vter Where the mob lives (if it's a vehicle; may be NULL).
 * @return struct empire_npc_data* pointer to the npc obj
 */
-struct empire_npc_data *create_empire_npc(empire_data *emp, mob_vnum mobv, int sex, int name, struct empire_territory_data *ter) {
+struct empire_npc_data *create_empire_npc(empire_data *emp, mob_vnum mobv, int sex, int name, struct empire_territory_data *ter, struct empire_vehicle_data *vter) {
 	struct empire_npc_data *npc;
 	
 	CREATE(npc, struct empire_npc_data, 1);
 	npc->vnum = mobv;
 	npc->sex = sex;
 	npc->name = name;
-	npc->home = ter->room;
+	npc->home = ter ? ter->room : NULL;
+	npc->home_vehicle = vter ? vter->veh : NULL;
 	
 	npc->mob = NULL;
 	
 	npc->empire_id = EMPIRE_VNUM(emp);
 	
-	LL_PREPEND(ter->npcs, npc);
+	// which list
+	if (ter) {
+		LL_PREPEND(ter->npcs, npc);
+	}
+	else if (vter) {
+		LL_PREPEND(ter->npcs, npc);
+	}
+	
 	EMPIRE_NEEDS_SAVE(emp) = TRUE;
 	
 	return npc;
@@ -3796,6 +3916,38 @@ void delete_room_npcs(room_data *room, struct empire_territory_data *ter, bool m
 			}
 			delete_territory_npc(tt, tt->npcs);
 		}
+	}
+}
+
+
+/**
+* frees up the data for a vehicle that may have npcs.
+*
+* You only need to provide one argument or the other.
+*
+* @param vehicle_data *veh The vehicle to clean up (optional)
+* @param struct empire_vehicle_data *vter the vehicle-territory to clean up (optional)
+* @param bool make_homeless If TRUE, moves the citizens to the homeless list.
+*/
+void delete_vehicle_npcs(vehicle_data *veh, struct empire_vehicle_data *vter, bool make_homeless) {
+	// try to detect missing arg?
+	if (veh && !vter && VEH_OWNER(veh)) {
+		vter = find_empire_vehicle_entry(VEH_OWNER(veh), veh);
+	}
+	else if (vter && !veh) {
+		veh = vter->veh;
+	}
+	
+	// anything to work with?
+	if (!vter) {
+		return;
+	}
+	
+	while (vter->npcs) {
+		if (veh && VEH_OWNER(veh) && make_homeless) {
+			make_citizen_homeless(VEH_OWNER(veh), vter->npcs);
+		}
+		delete_vehicle_npc(vter, vter->npcs);
 	}
 }
 
@@ -3841,7 +3993,7 @@ struct empire_homeless_citizen *find_homeless_citizen(empire_data *emp, struct m
 			continue;	// doesn't match required vnum
 		}
 		if (ehc->loc) {
-			dist = (int)compute_map_distance(MAP_X_COORD(ehc->loc->vnum), MAP_Y_COORD(ehc->loc->vnum), MAP_X_COORD(loc->vnum), MAP_Y_COORD(loc->vnum));
+			dist = (int)compute_map_distance(ehc->loc ? MAP_X_COORD(ehc->loc->vnum) : -1, ehc->loc ? MAP_Y_COORD(ehc->loc->vnum) : -1, MAP_X_COORD(loc->vnum), MAP_Y_COORD(loc->vnum));
 			if ((((time(0) - ehc->when) / SECS_PER_REAL_MIN) + 1) < dist / homeless_citizen_speed) {
 				continue;	// too soon for this distance
 			}
@@ -3874,7 +4026,7 @@ struct empire_homeless_citizen *make_citizen_homeless(empire_data *emp, struct e
 	ehc->vnum = npc->vnum;
 	ehc->sex = npc->sex;
 	ehc->name = npc->name;
-	ehc->loc = npc->home ? GET_MAP_LOC(npc->home) : NULL;
+	ehc->loc = npc->home ? GET_MAP_LOC(npc->home) : ((npc->home_vehicle && IN_ROOM(npc->home_vehicle)) ? GET_MAP_LOC(IN_ROOM(npc->home_vehicle)) : NULL);
 	ehc->when = time(0);
 	
 	LL_PREPEND(EMPIRE_HOMELESS_CITIZENS(emp), ehc);
@@ -3884,43 +4036,41 @@ struct empire_homeless_citizen *make_citizen_homeless(empire_data *emp, struct e
 
 
 /**
-* Causes a room to populate (NPC moves in), if possible. It attempts to grab
-* a homeless NPC if possible, which is faster, or else will move in a new
-* citizen, which has a longer timer.
+* Performs the work for populate_npc and populate_vehicle_npc.
 *
-* @param room_data *room The location to populate.
-* @param struct empire_territory_data *ter The territory entry, if you already have it (will attempt to detect otherwise).
-* @param bool force If TRUE, will override the population timer.
+* @param room_data *room The location (required for room territory; optional for vehicle territory).
+* @param vehicle_data *veh The vehicle (required for vehicle territory; must be NULL for room territory).
+* @param struct empire_territory_data *ter Existing territory entry (may be NULL if using vehicle territory).
+* @param struct empire_vehicle_data *vter Existing empire vehicle entry (may be NULL if using room territory).
+* @param int max_citizens How many citizens are allowed (0 or more).
+* @param mob_vnum artisan The artisan vnum, if applicable; may be NOTHING.
+* @param bool force If TRUE, overrides the population timer.
 */
-void populate_npc(room_data *room, struct empire_territory_data *ter, bool force) {
-	struct empire_homeless_citizen *homeless;
-	struct empire_npc_data *npc = NULL;
-	mob_vnum artisan, citizen, backup;
-	struct empire_island *isle;
+void perform_populate_npc(room_data *room, vehicle_data *veh, struct empire_territory_data *ter, struct empire_vehicle_data *vter, int max_citizens, mob_vnum artisan, bool force) {
 	bool found_artisan = FALSE;
-	int count, max, sex;
-	empire_data *emp;
+	int count, sex, timer;
+	mob_vnum citizen, backup;
 	char_data *proto;
+	empire_data *emp;
+	struct empire_homeless_citizen *homeless;
+	struct empire_island *isle;
+	struct empire_npc_data *npc = NULL;
 	
-	if (!room || !GET_BUILDING(room) || !(emp = ROOM_OWNER(room)) || !EMPIRE_HAS_TECH(emp, TECH_CITIZENS) || (!ter && !(ter = find_territory_entry(emp, room)))) {
-		return;	// no work
-	}
-	if (!IS_COMPLETE(room) || ROOM_PRIVATE_OWNER(HOME_ROOM(room)) != NOBODY) {
-		return;	// nobody populates here
+	// detect if necessary:
+	emp = (veh ? VEH_OWNER(veh) : (room ? ROOM_OWNER(room) : NULL));
+	timer = (ter ? ter->population_timer : (vter ? vter->population_timer : 1));
+	if (veh && !room) {
+		room = IN_ROOM(veh);
 	}
 	
-	// check timer: exits early if there are no homeless and no 'force'
-	if (!force && --ter->population_timer > 0 && !EMPIRE_HOMELESS_CITIZENS(emp)) {
+	// everything should be validated but let's just be safe
+	if (!emp || !room || !veh || (!ter && !vter)) {
 		return;
 	}
 	
-	// detect max npcs
-	max = GET_BLD_CITIZENS(GET_BUILDING(room));
-	artisan = GET_BLD_ARTISAN(GET_BUILDING(room));
-	
 	// check npcs living here
 	count = 0;
-	LL_FOREACH(ter->npcs, npc) {
+	LL_FOREACH((ter ? ter->npcs : (vter ? vter->npcs : NULL)), npc) {
 		++count;
 		if (npc->vnum == artisan) {
 			found_artisan = TRUE;
@@ -3930,13 +4080,13 @@ void populate_npc(room_data *room, struct empire_territory_data *ter, bool force
 	// further processing only if we're short npcs here
 	if (artisan != NOTHING && !found_artisan) {
 		if ((homeless = find_homeless_citizen(emp, GET_MAP_LOC(room), artisan))) {
-			npc = create_empire_npc(emp, artisan, homeless->sex, homeless->name, ter);
+			npc = create_empire_npc(emp, artisan, homeless->sex, homeless->name, ter, vter);
 			remove_homeless_citizen(emp, homeless);
 		}
-		else if (force || ter->population_timer <= 0) {
+		else if (force || timer <= 0) {
 			sex = number(SEX_MALE, SEX_FEMALE);
 			proto = mob_proto(artisan);
-			npc = create_empire_npc(emp, artisan, sex, pick_generic_name(proto ? MOB_NAME_SET(proto) : 0, sex), ter);
+			npc = create_empire_npc(emp, artisan, sex, pick_generic_name(proto ? MOB_NAME_SET(proto) : 0, sex), ter, vter);
 		}
 		else {
 			// timer still running and cannot add an npc
@@ -3944,7 +4094,7 @@ void populate_npc(room_data *room, struct empire_territory_data *ter, bool force
 		}
 		// more at end of function...
 	}
-	else if (count < max) {	// ordinary citizen
+	else if (count < max_citizens) {	// ordinary citizen
 		// determine preferred sex/citizen
 		sex = number(SEX_MALE, SEX_FEMALE);
 		citizen = (sex == SEX_MALE) ? CITIZEN_MALE : CITIZEN_FEMALE;
@@ -3952,12 +4102,12 @@ void populate_npc(room_data *room, struct empire_territory_data *ter, bool force
 		
 		if ((homeless = find_homeless_citizen(emp, GET_MAP_LOC(room), citizen)) || (homeless = find_homeless_citizen(emp, GET_MAP_LOC(room), backup))) {
 			// (homeless citizen can be either male or female vnum)
-			npc = create_empire_npc(emp, homeless->vnum, homeless->sex, homeless->name, ter);
+			npc = create_empire_npc(emp, homeless->vnum, homeless->sex, homeless->name, ter, vter);
 			remove_homeless_citizen(emp, homeless);
 		}
-		else if (force || ter->population_timer <= 0) {
+		else if (force || timer <= 0) {
 			proto = mob_proto(citizen);
-			npc = create_empire_npc(emp, citizen, sex, pick_generic_name(MOB_NAME_SET(proto), sex), ter);
+			npc = create_empire_npc(emp, citizen, sex, pick_generic_name(MOB_NAME_SET(proto), sex), ter, vter);
 		}
 		else {
 			// timer still running and cannot add an npc
@@ -3971,7 +4121,12 @@ void populate_npc(room_data *room, struct empire_territory_data *ter, bool force
 	}
 	
 	// if we got here, we added an npc
-	ter->population_timer = config_get_int("building_population_timer");
+	if (ter) {
+		ter->population_timer = config_get_int("building_population_timer");
+	}
+	if (vter) {
+		vter->population_timer = config_get_int("building_population_timer");
+	}
 	
 	// update pop
 	EMPIRE_POPULATION(emp) += 1;
@@ -3989,24 +4144,88 @@ void populate_npc(room_data *room, struct empire_territory_data *ter, bool force
 
 
 /**
+* Causes a room to populate (NPC moves in), if possible. It attempts to grab
+* a homeless NPC if possible, which is faster, or else will move in a new
+* citizen, which has a longer timer.
+*
+* @param room_data *room The location to populate.
+* @param struct empire_territory_data *ter The territory entry, if you already have it (will attempt to detect otherwise).
+* @param bool force If TRUE, will override the population timer.
+*/
+void populate_npc(room_data *room, struct empire_territory_data *ter, bool force) {
+	empire_data *emp;
+	
+	if (!room || !GET_BUILDING(room) || !(emp = ROOM_OWNER(room)) || (!ter && !(ter = find_territory_entry(emp, room)))) {
+		return;	// no work
+	}
+	if (!IS_COMPLETE(room) || ROOM_PRIVATE_OWNER(HOME_ROOM(room)) != NOBODY) {
+		return;	// nobody populates here
+	}
+	
+	// check timer: exits early if there are no homeless and no 'force'
+	if (!force && --ter->population_timer > 0 && !EMPIRE_HOMELESS_CITIZENS(emp)) {
+		return;
+	}
+	
+	perform_populate_npc(room, NULL, ter, NULL, GET_BLD_CITIZENS(GET_BUILDING(room)), GET_BLD_ARTISAN(GET_BUILDING(room)), force);
+}
+
+
+/**
+* Causes a vehicle to populate (NPC moves in), if possible. It attempts to grab
+* a homeless NPC if possible, which is faster, or else will move in a new
+* citizen, which has a longer timer.
+*
+* @param vehicle_data *veh The vehicle to populate (must be owned).
+* @param struct empire_vehicle_data *vter The emp-veh entry, if you already have it (will attempt to detect otherwise).
+* @param bool force If TRUE, will override the population timer.
+*/
+void populate_vehicle_npc(vehicle_data *veh, struct empire_vehicle_data *vter, bool force) {
+	empire_data *emp;
+	
+	if (!veh || !IN_ROOM(veh) || !(emp = VEH_OWNER(veh)) || (!vter && !(vter = find_empire_vehicle_entry(emp, veh)))) {
+		return;	// no work
+	}
+	if (!VEH_IS_COMPLETE(veh) || (VEH_INTERIOR_HOME_ROOM(veh) && ROOM_PRIVATE_OWNER(VEH_INTERIOR_HOME_ROOM(veh)) != NOBODY)) {
+		return;	// nobody populates here
+	}
+	
+	// check timer: exits early if there are no homeless and no 'force'
+	if (!force && --vter->population_timer > 0 && !EMPIRE_HOMELESS_CITIZENS(emp)) {
+		return;
+	}
+	
+	perform_populate_npc(IN_ROOM(veh), veh, NULL, vter, VEH_CITIZENS(veh), VEH_ARTISAN(veh), force);
+}
+
+
+/**
 * This updates buildings and assigns new NPCs to them as-needed.
 */
 void update_empire_npc_data(void) {	
 	struct empire_territory_data *ter, *next_ter;
+	struct empire_vehicle_data *vter, *next_vter;
 	empire_data *emp, *next_emp;
 	
 	int time_to_empire_emptiness = config_get_int("time_to_empire_emptiness") * SECS_PER_REAL_WEEK;
 	
 	// each empire
 	HASH_ITER(hh, empire_table, emp, next_emp) {
-		// skip idle empires: TODO could macro this
+		if (!EMPIRE_HAS_TECH(emp, TECH_CITIZENS)) {
+			continue;	// skip no-citizens
+		}
 		if (EMPIRE_LAST_LOGON(emp) + time_to_empire_emptiness < time(0)) {
-			continue;
+			continue;	// skip idle empires: TODO could macro this
 		}
 		
 		// each territory spot
 		HASH_ITER(hh, EMPIRE_TERRITORY_LIST(emp), ter, next_ter) {
 			populate_npc(ter->room, ter, FALSE);
+		}
+		
+		// each vehicle
+		HASH_ITER(hh, EMPIRE_VEHICLE_LIST(emp), vter, next_vter) {
+			populate_vehicle_npc(vter->veh, vter, FALSE);
 		}
 	}
 }
@@ -4055,6 +4274,7 @@ char_data *spawn_empire_npc_to_room(empire_data *emp, struct empire_npc_data *np
 */
 void kill_empire_npc(char_data *ch) {
 	struct empire_territory_data *ter, *ter_next;
+	struct empire_vehicle_data *vter, *vter_next;
 	struct empire_npc_data *npc, *npc_next;
 	empire_data *emp;
 	bool found = FALSE;
@@ -4066,7 +4286,7 @@ void kill_empire_npc(char_data *ch) {
 		return;
 	}
 	
-	// find and remove the entry
+	// find and remove the entry: territory
 	HASH_ITER(hh, EMPIRE_TERRITORY_LIST(emp), ter, ter_next) {
 		for (npc = ter->npcs; npc && !found; npc = npc_next) {
 			npc_next = npc->next;
@@ -4076,6 +4296,25 @@ void kill_empire_npc(char_data *ch) {
 				
 				// reset the population timer
 				ter->population_timer = building_population_timer;
+				found = TRUE;
+			}
+		}
+		
+		if (found) {
+			break;
+		}
+	}
+	
+	// find and remove the entry: vehicle
+	HASH_ITER(hh, EMPIRE_VEHICLE_LIST(emp), vter, vter_next) {
+		for (npc = ter->npcs; npc && !found; npc = npc_next) {
+			npc_next = npc->next;
+			
+			if (npc == GET_EMPIRE_NPC_DATA(ch)) {
+				delete_vehicle_npc(vter, npc);
+				
+				// reset the population timer
+				vter->population_timer = building_population_timer;
 				found = TRUE;
 			}
 		}

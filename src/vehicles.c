@@ -1182,6 +1182,9 @@ void start_dismantle_vehicle(vehicle_data *veh, char_data *ch) {
 		}
 	}
 	
+	// any npcs living on it
+	delete_vehicle_npcs(veh, NULL, TRUE);
+	
 	// clear it out
 	vehicle_interior_dismantle_triggers(veh, ch);
 	fully_empty_vehicle(veh, IN_ROOM(veh));

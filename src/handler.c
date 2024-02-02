@@ -3467,6 +3467,25 @@ struct empire_political_data *create_relation(empire_data *a, empire_data *b) {
 
 
 /**
+* Finds the empire vehicle list entry for a vehicle, by id.
+*
+* @param empire_data *emp The empire.
+* @param int idnum The vehicle's idnum, to find.
+* @return struct empire_vehicle_data* The vehicle list data, or NULL if not found.
+*/
+struct empire_vehicle_data *find_empire_vehicle_entry_by_id(empire_data *emp, int idnum) {
+	struct empire_vehicle_data *vter;
+	
+	if (emp && idnum > 0) {
+		HASH_FIND_INT(EMPIRE_VEHICLE_LIST(emp), &idnum, vter);
+		return vter;	// if any
+	}
+	
+	return NULL;
+}
+
+
+/**
 * Looks up an empire rank by typed argument (ignoring color codes) -- this
 * may take a number or a rank name.
 *
@@ -3669,14 +3688,32 @@ void perform_abandon_vehicle(vehicle_data *veh) {
 	if (veh) {
 		empire_data *emp = VEH_OWNER(veh);
 		bool provided_light = VEH_PROVIDES_LIGHT(veh);
+		struct empire_vehicle_data *vter;
+		struct shipping_data *shipd, *next_shipd;
 		
 		remove_vehicle_flags(veh, VEH_PLAYER_NO_WORK | VEH_PLAYER_NO_DISMANTLE);
-	
+		
+		// finish the shipment before abandoning
+		if (emp) {
+			DL_FOREACH_SAFE(EMPIRE_SHIPPING_LIST(emp), shipd, next_shipd) {
+				if (shipd->shipping_id == VEH_IDNUM(veh)) {
+					deliver_shipment(VEH_OWNER(veh), shipd);
+				}
+			}
+		}
+		
 		if (VEH_INTERIOR_HOME_ROOM(veh)) {
 			abandon_room(VEH_INTERIOR_HOME_ROOM(veh));
 		}
 		
 		adjust_vehicle_tech(veh, GET_ISLAND_ID(IN_ROOM(veh)), FALSE);
+		
+		// remove territory entry?
+		if (emp && (vter = find_empire_vehicle_entry(emp, veh))) {
+			delete_empire_vehicle_entry(emp, vter, TRUE);
+		}
+		
+		// actual dropping of owner
 		VEH_OWNER(veh) = NULL;
 		
 		if (VEH_IS_COMPLETE(veh) && emp) {
@@ -3774,6 +3811,8 @@ void perform_claim_room(room_data *room, empire_data *emp) {
 */
 void perform_claim_vehicle(vehicle_data *veh, empire_data *emp) {
 	bool provided_light;
+	struct empire_npc_data *npc;
+	struct empire_vehicle_data *vter;
 	
 	if (VEH_OWNER(veh)) {
 		perform_abandon_vehicle(veh);
@@ -3785,6 +3824,18 @@ void perform_claim_vehicle(vehicle_data *veh, empire_data *emp) {
 	if (emp) {
 		// basic owner"ship"
 		VEH_OWNER(veh) = emp;
+		
+		// vehicle list
+		if ((vter = find_empire_vehicle_entry_by_id(emp, VEH_IDNUM(veh))) || (vter = create_empire_vehicle_entry(emp, veh))) {
+			// ensure pointer (sometimes not set during startup)
+			vter->veh = veh;
+			
+			// ensure npcs have proper pointer
+			LL_FOREACH(vter->npcs, npc) {
+				npc->home = NULL;
+				npc->home_vehicle = veh;
+			}
+		}
 		
 		// techs
 		if (IN_ROOM(veh)) {
@@ -10570,11 +10621,13 @@ struct empire_storage_data *find_island_storage_by_keywords(empire_data *emp, in
 */
 room_data *find_storage_location_for(empire_data *emp, int island, obj_data *proto) {
 	struct empire_territory_data *ter, *next_ter;
+	struct empire_vehicle_data *vter, *next_vter;
 	
 	if (!emp || island == NO_ISLAND || !proto || !GET_OBJ_STORAGE(proto)) {
 		return NULL;	// no work
 	}
-		
+	
+	// rooms
 	HASH_ITER(hh, EMPIRE_TERRITORY_LIST(emp), ter, next_ter) {
 		if (!ter->room || GET_ISLAND_ID(ter->room) != island) {
 			continue;	// wrong island
@@ -10587,6 +10640,19 @@ room_data *find_storage_location_for(empire_data *emp, int island, obj_data *pro
 		return ter->room;
 	}
 	
+	// vehicles
+	HASH_ITER(hh, EMPIRE_VEHICLE_LIST(emp), vter, next_vter) {
+		if (!vter->veh || !IN_ROOM(vter->veh) || ROOM_OWNER(IN_ROOM(vter->veh)) != emp || GET_ISLAND_ID(IN_ROOM(vter->veh)) != island) {
+			continue;	// wrong island
+		}
+		if (!obj_can_be_stored(proto, IN_ROOM(vter->veh), emp, TRUE)) {
+			continue;	// cannot store here
+		}
+		
+		// seems ok
+		return IN_ROOM(vter->veh);
+	}
+	
 	// we do not check vehicles separately: if they were on a claimed tile, this would already have found them
 	
 	return NULL;
@@ -10595,6 +10661,8 @@ room_data *find_storage_location_for(empire_data *emp, int island, obj_data *pro
 
 /**
 * Determines if the empire has a valid warehouse or vault on the given island.
+* For vehicle warehouses/vaults, this only returns them IF the room they're in
+* is claimed by the same empire (as they'd be unsafe to dump an item in).
 *
 * @param empire_data *emp Which empire.
 * @param int *island Which island.
@@ -10602,11 +10670,13 @@ room_data *find_storage_location_for(empire_data *emp, int island, obj_data *pro
 */
 room_data *find_warehouse_location_for(empire_data *emp, int island, bool vault) {
 	struct empire_territory_data *ter, *next_ter;
+	struct empire_vehicle_data *vter, *next_vter;
 	
 	if (!emp || island == NO_ISLAND) {
 		return NULL;	// no work
 	}
 	
+	// rooms
 	HASH_ITER(hh, EMPIRE_TERRITORY_LIST(emp), ter, next_ter) {
 		if (!ter->room || GET_ISLAND_ID(ter->room) != island) {
 			continue;	// wrong island
@@ -10620,6 +10690,22 @@ room_data *find_warehouse_location_for(empire_data *emp, int island, bool vault)
 		
 		// seems ok
 		return ter->room;
+	}
+	
+	// vehicles
+	HASH_ITER(hh, EMPIRE_VEHICLE_LIST(emp), vter, next_vter) {
+		if (!vter->veh || !IN_ROOM(vter->veh) || ROOM_OWNER(IN_ROOM(vter->veh)) != emp || GET_ISLAND_ID(IN_ROOM(vter->veh)) != island) {
+			continue;	// wrong island
+		}
+		if (vault && !IS_SET(VEH_FUNCTIONS(vter->veh), FNC_VAULT)) {
+			continue;	// not a vault
+		}
+		if (!vault && !IS_SET(VEH_FUNCTIONS(vter->veh), FNC_WAREHOUSE)) {
+			continue;	// not a warehouse
+		}
+		
+		// seems ok
+		return IN_ROOM(vter->veh);
 	}
 	
 	return NULL;
@@ -11722,6 +11808,19 @@ int get_number(char **name) {
 */
 void extract_vehicle(vehicle_data *veh) {
 	char_data *chiter;
+	struct shipping_data *shipd, *next_shipd;
+	
+	if (VEH_OWNER(veh)) {
+		// finish the shipment before extracting a vehicle, if it has one somehow
+		DL_FOREACH_SAFE(EMPIRE_SHIPPING_LIST(VEH_OWNER(veh)), shipd, next_shipd) {
+			if (shipd->shipping_id == VEH_IDNUM(veh)) {
+				deliver_shipment(VEH_OWNER(veh), shipd);
+			}
+		}
+		
+		// and ensure it's abandoned
+		perform_abandon_vehicle(veh);
+	}
 	
 	if (!VEH_IS_EXTRACTED(veh)) {
 		unapply_vehicle_to_room(veh);

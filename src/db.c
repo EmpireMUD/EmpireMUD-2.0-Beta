@@ -165,6 +165,7 @@ double empire_score_average[NUM_SCORES];
 struct trading_post_data *trading_list = NULL;	// global DLL of trading post stuff
 bool check_empire_refresh = FALSE;	// triggers empire refreshes
 struct empire_territory_data *global_next_territory_entry = NULL;	// for territory iteration
+struct empire_vehicle_data *global_next_empire_vehicle_entry = NULL;	// vehicle territory iteration
 
 // events
 event_data *event_table = NULL;	// global hash table (hh)

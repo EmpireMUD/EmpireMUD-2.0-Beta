@@ -305,6 +305,7 @@ char *list_one_mobile(char_data *mob, bool detail) {
 void olc_delete_mobile(char_data *ch, mob_vnum vnum) {
 	struct empire_homeless_citizen *ehc, *next_ehc;
 	struct empire_territory_data *ter, *next_ter;
+	struct empire_vehicle_data *vter, *next_vter;
 	char_data *proto, *mob_iter, *next_mob;
 	struct empire_npc_data *end, *next_end;
 	descriptor_data *desc;
@@ -366,11 +367,20 @@ void olc_delete_mobile(char_data *ch, mob_vnum vnum) {
 	
 	// remove empire npcs
 	HASH_ITER(hh, empire_table, emp, next_emp) {
-		// regular npcs
+		// room npcs
 		HASH_ITER(hh, EMPIRE_TERRITORY_LIST(emp), ter, next_ter) {
 			LL_FOREACH_SAFE(ter->npcs, end, next_end) {
 				if (end->vnum == vnum) {
 					delete_territory_npc(ter, end);
+				}
+			}
+		}
+		
+		// vehicle npcs
+		HASH_ITER(hh, EMPIRE_VEHICLE_LIST(emp), vter, next_vter) {
+			LL_FOREACH_SAFE(vter->npcs, end, next_end) {
+				if (end->vnum == vnum) {
+					delete_vehicle_npc(vter, end);
 				}
 			}
 		}

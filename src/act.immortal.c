@@ -7022,7 +7022,6 @@ ACMD(do_poofset) {
 
 
 ACMD(do_purge) {
-	struct shipping_data *shipd, *next_shipd;
 	char_data *vict, *next_v;
 	vehicle_data *veh;
 	obj_data *obj, *next_o;
@@ -7059,15 +7058,6 @@ ACMD(do_purge) {
 			extract_obj(obj);
 		}
 		else if ((veh = get_vehicle_in_room_vis(ch, arg, &number))) {
-			// finish the shipment before transferring or purging a vehicle
-			if (VEH_OWNER(veh)) {
-				DL_FOREACH_SAFE(EMPIRE_SHIPPING_LIST(VEH_OWNER(veh)), shipd, next_shipd) {
-					if (shipd->shipping_id == VEH_IDNUM(veh)) {
-						deliver_shipment(VEH_OWNER(veh), shipd);
-					}
-				}
-			}
-			
 			act("$n destroys $V.", FALSE, ch, NULL, veh, TO_ROOM | DG_NO_TRIG | ACT_VEH_VICT);
 			if (IN_ROOM(veh) != IN_ROOM(ch) && ROOM_PEOPLE(IN_ROOM(veh))) {
 				act("$V is destroyed!", FALSE, ROOM_PEOPLE(IN_ROOM(veh)), NULL, veh, TO_CHAR | TO_ROOM | DG_NO_TRIG | ACT_VEH_VICT);

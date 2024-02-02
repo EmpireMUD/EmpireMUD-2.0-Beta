@@ -2509,6 +2509,62 @@ void clear_empire_techs(empire_data *emp) {
 
 
 /**
+* Creates a fresh territory entry for a vehicle.
+*
+* @param empire_data *emp The empire.
+* @param vehicle_data *veh The vehicle to add a territory entry for.
+* @return struct empire_vehicle_data* The new entry.
+*/
+struct empire_vehicle_data *create_empire_vehicle_entry(empire_data *emp, vehicle_data *veh) {
+	int idnum = VEH_IDNUM(veh);
+	struct empire_vehicle_data *vter;
+	
+	// only add if not already in there
+	HASH_FIND_INT(EMPIRE_VEHICLE_LIST(emp), &idnum, vter);
+	if (!vter) {
+		CREATE(vter, struct empire_vehicle_data, 1);
+		vter->idnum = idnum;
+		vter->veh = veh;
+		vter->population_timer = config_get_int("building_population_timer");
+		vter->npcs = NULL;
+		vter->marked = FALSE;
+		
+		HASH_ADD_INT(EMPIRE_VEHICLE_LIST(emp), idnum, vter);
+	}
+	
+	return vter;
+}
+
+
+/**
+* Creates a fresh territory entry for a vehicle -- by idnum, without a pointer
+* (pointer will be set later).
+*
+* @param empire_data *emp The empire.
+* @param int idnum The idnum to create the entry for.
+* @return struct empire_vehicle_data* The new entry.
+*/
+struct empire_vehicle_data *create_empire_vehicle_entry_by_id(empire_data *emp, int idnum) {
+	struct empire_vehicle_data *vter;
+	
+	// only add if not already in there
+	HASH_FIND_INT(EMPIRE_VEHICLE_LIST(emp), &idnum, vter);
+	if (!vter) {
+		CREATE(vter, struct empire_vehicle_data, 1);
+		vter->idnum = idnum;
+		vter->veh = NULL;	// we don't have this at this time
+		vter->population_timer = config_get_int("building_population_timer");
+		vter->npcs = NULL;
+		vter->marked = FALSE;
+		
+		HASH_ADD_INT(EMPIRE_VEHICLE_LIST(emp), idnum, vter);
+	}
+	
+	return vter;
+}
+
+
+/**
 * Creates a fresh territory entry for room
 *
 * @param empire_data *emp The empire
@@ -2558,6 +2614,27 @@ void delete_territory_entry(empire_data *emp, struct empire_territory_data *ter,
 
 
 /**
+* Deletes one vehicle-territory entry from the empire.
+*
+* @param empire_data *emp Which empire.
+* @param struct empire_vehicle_data *vter Which entry to delete.
+* @param bool make_npcs_homeless If TRUE, any NPCs in the territory become homeless.
+*/
+void delete_empire_vehicle_entry(empire_data *emp, struct empire_vehicle_data *vter, bool make_npcs_homeless) {
+	// prevent loss
+	if (vter == global_next_empire_vehicle_entry) {
+		global_next_empire_vehicle_entry = vter->hh.next;
+	}
+
+	delete_vehicle_npcs(NULL, vter, make_npcs_homeless);
+	vter->npcs = NULL;
+	
+	HASH_DEL(EMPIRE_VEHICLE_LIST(emp), vter);
+	free(vter);
+}
+
+
+/**
 * This function sets up empire territory. It is called rarely after startup.
 * It can be called on one specific empire, or it can be used for ALL empires.
 *
@@ -2566,12 +2643,14 @@ void delete_territory_entry(empire_data *emp, struct empire_territory_data *ter,
 */
 void read_empire_territory(empire_data *emp, bool check_tech) {
 	struct empire_territory_data *ter, *next_ter;
+	struct empire_vehicle_data *vter, *next_vter;
 	struct empire_island *isle, *next_isle;
 	struct empire_npc_data *npc;
 	room_data *iter, *next_iter;
 	empire_data *e, *next_e;
 	int pos, ter_type;
 	bool junk;
+	vehicle_data *veh;
 
 	/* Init empires */
 	HASH_ITER(hh, empire_table, e, next_e) {
@@ -2588,9 +2667,12 @@ void read_empire_territory(empire_data *emp, bool check_tech) {
 		
 			read_vault(e);
 
-			// reset marks to check for dead territory
+			// reset marks to check for dead territory and vehicles
 			HASH_ITER(hh, EMPIRE_TERRITORY_LIST(e), ter, next_ter) {
 				ter->marked = FALSE;
+			}
+			HASH_ITER(hh, EMPIRE_VEHICLE_LIST(e), vter, next_vter) {
+				vter->marked = FALSE;
 			}
 			
 			// reset counters
@@ -2615,7 +2697,6 @@ void read_empire_territory(empire_data *emp, bool check_tech) {
 				ter_type = get_territory_type_for_empire(iter, e, FALSE, &junk, NULL);
 				
 				SAFE_ADD(EMPIRE_TERRITORY(e, ter_type), 1, 0, UINT_MAX, FALSE);
-				
 				SAFE_ADD(EMPIRE_TERRITORY(e, TER_TOTAL), 1, 0, UINT_MAX, FALSE);
 				
 				if (GET_ISLAND_ID(iter) != NO_ISLAND) {
@@ -2657,12 +2738,43 @@ void read_empire_territory(empire_data *emp, bool check_tech) {
 		}
 	}
 	
-	// remove any territory that wasn't marked ... in case there is any
+	// scan all vehicles
+	DL_FOREACH(vehicle_list, veh) {
+		if ((e = VEH_OWNER(veh)) && (!emp || e == emp)) {
+			if (!(vter = find_empire_vehicle_entry(e, veh))) {
+				vter = create_empire_vehicle_entry(e, veh);
+			}
+			
+			// mark it added/found
+			vter->marked = TRUE;
+			
+			// should go without saying but verify this pointer now
+			vter->veh = veh;
+			
+			// also ensure npcs inside have the right home pointers
+			LL_FOREACH(vter->npcs, npc) {
+				npc->home = NULL;
+				npc->home_vehicle = veh;
+			}
+			
+			// and apply tech if necessary
+			if (check_tech) {
+				adjust_vehicle_tech(veh, GET_ISLAND_ID(IN_ROOM(veh)), TRUE);
+			}
+		}
+	}
+	
+	// remove any territory/vehicles that weren't marked ... in case there is any
 	HASH_ITER(hh, empire_table, e, next_e) {
 		if (e == emp || !emp) {
 			HASH_ITER(hh, EMPIRE_TERRITORY_LIST(e), ter, next_ter) {
 				if (!ter->marked) {
 					delete_territory_entry(e, ter, TRUE);
+				}
+			}
+			HASH_ITER(hh, EMPIRE_VEHICLE_LIST(e), vter, next_vter) {
+				if (!vter->marked) {
+					delete_empire_vehicle_entry(e, vter, TRUE);
 				}
 			}
 		}
@@ -2679,7 +2791,6 @@ void read_empire_territory(empire_data *emp, bool check_tech) {
 void reread_empire_tech(empire_data *emp) {
 	struct empire_island *isle, *next_isle;
 	empire_data *iter, *next_iter;
-	vehicle_data *veh;
 	int sub;
 	
 	// nowork
@@ -2694,18 +2805,6 @@ void reread_empire_tech(empire_data *emp) {
 	// re-read both things
 	read_empire_members(emp, TRUE);
 	read_empire_territory(emp, TRUE);
-	
-	// also read vehicles for tech/etc
-	DL_FOREACH(vehicle_list, veh) {
-		if (emp && VEH_OWNER(veh) != emp) {
-			continue;	// only checking one
-		}
-		if (!VEH_OWNER(veh) || !VEH_IS_COMPLETE(veh)) {
-			continue;	// skip unowned/unfinished
-		}
-		
-		adjust_vehicle_tech(veh, GET_ISLAND_ID(IN_ROOM(veh)), TRUE);
-	}
 	
 	// special-handling for imm-only empires: give them all techs
 	HASH_ITER(hh, empire_table, iter, next_iter) {

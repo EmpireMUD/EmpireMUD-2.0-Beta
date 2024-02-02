@@ -177,6 +177,8 @@ void claim_room(room_data *room, empire_data *emp);
 int count_dropped_items(empire_data *emp, obj_vnum vnum);
 struct empire_political_data *create_relation(empire_data *a, empire_data *b);
 bool empire_has_learned_craft(empire_data *emp, any_vnum vnum);
+struct empire_vehicle_data *find_empire_vehicle_entry_by_id(empire_data *emp, int idnum);
+#define find_empire_vehicle_entry(emp, veh)  find_empire_vehicle_entry_by_id((emp), ((veh) ? VEH_IDNUM(veh) : NOTHING))
 int find_rank_by_name(empire_data *emp, char *name);
 struct empire_political_data *find_relation(empire_data *from, empire_data *to);
 struct empire_territory_data *find_territory_entry(empire_data *emp, room_data *room);

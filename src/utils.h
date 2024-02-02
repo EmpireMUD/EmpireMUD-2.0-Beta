@@ -651,6 +651,7 @@ int CAN_CARRY_N(char_data *ch);	// formerly a macro
 #define EMPIRE_TOTAL_PLAYTIME(emp)  ((emp)->total_playtime)
 #define EMPIRE_TRADE(emp)  ((emp)->trade)
 #define EMPIRE_UNIQUE_STORAGE(emp)  ((emp)->unique_store)
+#define EMPIRE_VEHICLE_LIST(emp)  ((emp)->vehicle_list)
 #define EMPIRE_WEALTH(emp)  ((emp)->wealth)
 #define EMPIRE_WORKFORCE_LAST_LOG_AND_NEEDS(emp)  ((emp)->wf_log_and_needs_time)
 #define EMPIRE_WORKFORCE_LOG(emp)  ((emp)->wf_log)

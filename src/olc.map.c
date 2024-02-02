@@ -829,8 +829,19 @@ OLC_MODULE(mapedit_naturalize) {
 
 OLC_MODULE(mapedit_populate) {
 	char_data *current = ROOM_PEOPLE(IN_ROOM(ch));
+	vehicle_data *veh;
 	
-	if (!GET_BUILDING(IN_ROOM(ch))) {
+	if (*argument && (veh = get_vehicle_in_room_vis(ch, argument, NULL))) {
+		populate_vehicle_npc(veh, NULL, TRUE);
+		
+		if (current == ROOM_PEOPLE(IN_ROOM(ch))) {
+			msg_to_char(ch, "Okay. But there didn't seem to be anything to populate.\r\n");
+		}
+	}
+	else if (*argument && !is_abbrev(argument, "room") && !is_abbrev(argument, "building")) {
+		msg_to_char(ch, "You don't see that here.\r\n");
+	}
+	else if (!GET_BUILDING(IN_ROOM(ch))) {
 		msg_to_char(ch, "You can only populate buildings.\r\n");
 	}
 	else if (!ROOM_OWNER(IN_ROOM(ch))) {
