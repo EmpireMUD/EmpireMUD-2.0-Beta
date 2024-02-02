@@ -2343,7 +2343,7 @@ void do_customize_room(char_data *ch, char *argument) {
 	}
 	else if (((veh = get_vehicle_in_room_vis(ch, arg, NULL)) || ((veh = GET_ROOM_VEHICLE(IN_ROOM(ch))) && isname(arg, VEH_KEYWORDS(veh)))) && VEH_FLAGGED(veh, VEH_BUILDING)) {
 		// pass through to customize-vehicle (probably a building vehicle)
-		do_customize_vehicle(ch, arg2);
+		do_customize_vehicle(ch, argument);
 	}
 	else if (!has_player_tech(ch, PTECH_CUSTOMIZE_BUILDING)) {
 		msg_to_char(ch, "You don't have the right ability to customize buildings.\r\n");
