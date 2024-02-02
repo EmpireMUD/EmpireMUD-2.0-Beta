@@ -3875,7 +3875,7 @@ struct empire_npc_data *create_empire_npc(empire_data *emp, mob_vnum mobv, int s
 		LL_PREPEND(ter->npcs, npc);
 	}
 	else if (vter) {
-		LL_PREPEND(ter->npcs, npc);
+		LL_PREPEND(vter->npcs, npc);
 	}
 	
 	EMPIRE_NEEDS_SAVE(emp) = TRUE;
