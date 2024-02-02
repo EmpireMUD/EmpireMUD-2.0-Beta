@@ -4064,7 +4064,7 @@ void perform_populate_npc(room_data *room, vehicle_data *veh, struct empire_terr
 	}
 	
 	// everything should be validated but let's just be safe
-	if (!emp || !room || !veh || (!ter && !vter)) {
+	if (!emp || !room || (!ter && !vter)) {
 		return;
 	}
 	
