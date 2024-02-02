@@ -5672,7 +5672,7 @@ The following commands are available:
  name - Customize the room title.
  naturalize - Returns this tile to its 'natural terrain'.
  passwalls - Able to move on the map unblocked by walls, interiors, etc.
- populate - Forces a building/room to populate an npc, if possible.
+ populate - Forces a building/vehicle to populate an npc, if possible.
  remember - Stores the current terrain as the 'natural terrain'.
  roomtype - Change the type of an interior room.
  ruin - Turn a building or vehicle to ruins.
