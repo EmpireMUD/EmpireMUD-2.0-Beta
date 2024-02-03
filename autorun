@@ -35,6 +35,11 @@ PORT=4000
 # of all flags).
 FLAGS='-q'
 
+# The directory where core files are located (EmpireMUD will keep the oldest
+# core and newest 4 cores, but delete the rest to avoid filling the entire
+# drive if it crashes repeatedly).
+core_directory="lib"
+
 #############################################################################
 
 while ( : ) do
@@ -67,11 +72,37 @@ while ( : ) do
   mv syslog log/syslog.old
   touch syslog
 
+  # check for .killscript file and exist if found
   if [ -r .killscript ]; then
     DATE=`date`;
     echo "autoscript killed $DATE"  >> syslog
     rm .killscript
     exit
+  fi
+
+  # check for multiple core files and delete all but the oldest 1 and newest 4
+  if ls $core_directory/core* > /dev/null 2>&1; then
+      # List core files, sort them by modification time (oldest to newest), and get the filenames
+      core_files=$(ls -t $core_directory/core*)
+
+      # Keep the oldest core file
+      oldest_core=$(echo "$core_files" | tail -n 1)
+
+      # Keep the 4 newest core files
+      newest_cores=$(echo "$core_files" | head -n 4)
+
+      # Remove any other core files
+      for file in $core_files; do
+          if [ "$file" != "$oldest_core" ] && [ "$(echo "$newest_cores" | grep -c "$file")" -eq 0 ]; then
+              rm "$file"
+              echo "Removed: $file" >> syslog
+          fi
+      done
+
+      echo "Oldest core file: $oldest_core" >> syslog
+      echo "Newest core files: $newest_cores" >> syslog
+  else
+      echo "No core files found in $core_directory" >> syslog
   fi
 
   sleep 1
