@@ -5436,6 +5436,7 @@ ACMD(do_drink) {
 	char *argptr = arg;
 	size_t size;
 	generic_data *liq_generic;
+	vehicle_data *veh;
 	
 	#define LIQ_VAL(val)  (liq_generic ? GEN_VALUE(liq_generic, (val)) : 0)
 
@@ -5506,7 +5507,16 @@ ACMD(do_drink) {
 	}
 
 	if (type == NOTHING && !(obj = get_obj_in_list_vis(ch, argptr, &number, ch->carrying)) && (!can_use_room(ch, IN_ROOM(ch), MEMBERS_AND_ALLIES) || !(obj = get_obj_in_list_vis(ch, argptr, &number, ROOM_CONTENTS(IN_ROOM(ch)))))) {
-		if (room_has_function_and_city_ok(GET_LOYALTY(ch), IN_ROOM(ch), FNC_DRINK_WATER) && (is_abbrev(argptr, "water") || isname(argptr, get_room_name(IN_ROOM(ch), FALSE)))) {
+		if ((veh = get_vehicle_in_room_vis(ch, argptr, NULL)) && vehicle_has_function_and_city_ok(veh, FNC_DRINK_WATER)) {
+			// try the vehicle
+			if (!VEH_IS_COMPLETE(veh)) {
+				act("You need to complete $V before drinking from it.", FALSE, ch, NULL, veh, TO_CHAR | ACT_VEH_VICT);
+				return;
+			}
+			// otherwise ok:
+			type = drink_ROOM;
+		}
+		else if (room_has_function_and_city_ok(GET_LOYALTY(ch), IN_ROOM(ch), FNC_DRINK_WATER) && (is_abbrev(argptr, "water") || isname(argptr, get_room_name(IN_ROOM(ch), FALSE)))) {
 			if (!can_drink_from_room(ch, (type = drink_ROOM))) {
 				return;
 			}
@@ -7249,6 +7259,10 @@ ACMD(do_pour) {
 			}
 			else if ((veh = get_vehicle_in_room_vis(ch, arg2, NULL)) && vehicle_has_function_and_city_ok(veh, FNC_DRINK_WATER)) {
 				// targeting a vehicle with a drink-water flag
+				if (!VEH_IS_COMPLETE(veh)) {
+					act("You need to complete $V before filling from it.", FALSE, ch, NULL, veh, TO_CHAR | ACT_VEH_VICT);
+					return;
+				}
 				fill_from_room(ch, to_obj);
 			}
 			else if (is_abbrev(arg2, "river") || is_abbrev(arg2, "water")) {
