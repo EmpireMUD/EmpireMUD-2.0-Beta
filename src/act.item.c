@@ -1174,6 +1174,7 @@ void identify_obj_to_char(obj_data *obj, char_data *ch, bool simple) {
 * @param char_data *ch The person to show the data to.
 */
 void identify_vehicle_to_char(vehicle_data *veh, char_data *ch) {
+	bitvector_t show_flags;
 	vehicle_data *proto = vehicle_proto(VEH_VNUM(veh));
 	char buf[MAX_STRING_LENGTH], buf1[256];
 	player_index_data *index;
@@ -1214,7 +1215,13 @@ void identify_vehicle_to_char(vehicle_data *veh, char_data *ch) {
 		msg_to_char(ch, "Paint color: %s%s%s&0\r\n", buf1, (VEH_FLAGGED(veh, VEH_BRIGHT_PAINT) ? "bright " : ""), buf);
 	}
 	
-	prettier_sprintbit(VEH_FLAGS(veh), identify_vehicle_flags, buf);
+	// flags as "notes":
+	show_flags = VEH_FLAGS(veh);
+	if (VEH_FLAGGED(veh, VEH_BUILDING)) {
+		// do not show these on 'building' vehicles as they are very common and don't make sense in context
+		REMOVE_BIT(show_flags, VEH_NO_BUILDING | VEH_NO_LOAD_ONTO_VEHICLE);
+	}
+	prettier_sprintbit(show_flags, identify_vehicle_flags, buf);
 	if (VEH_FLAGGED(veh, VEH_SIT)) {
 		sprintf(buf + strlen(buf), "%scan sit %s", *buf ? ", " : "", VEH_FLAGGED(veh, VEH_IN) ? "in" : "on");
 	}
