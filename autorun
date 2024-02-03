@@ -50,6 +50,35 @@ while ( : ) do
 
   bin/empire $FLAGS $PORT >> syslog 2>&1
 
+  # after shutdown/crash:
+  # check for multiple core files and delete all but the oldest 1 and newest 4
+  if [ -n "$core_directory" ] && ls $core_directory/core* > /dev/null 2>&1; then
+      # List core files, sort them by modification time (oldest to newest), and get the filenames
+      core_files=$(ls -t $core_directory/core*)
+
+      # Keep the oldest core file
+      oldest_core=$(echo "$core_files" | tail -n 1)
+
+      # Keep the 4 newest core files
+      newest_cores=$(echo "$core_files" | head -n 4)
+
+      # Remove any other core files
+      for file in $core_files; do
+          if [ "$file" != "$oldest_core" ] && [ "$(echo "$newest_cores" | grep -c "$file")" -eq 0 ]; then
+              rm "$file"
+              echo "Core cleanup deleted file: $file" >> syslog
+          fi
+      done
+
+      if [ -n "$oldest_core" ]; then
+        echo "Oldest core file: $oldest_core" >> syslog
+      fi
+      if [ -n "${newest_cores[0]}" ]; then
+        echo "Newest core file: ${newest_cores[0]}" >> syslog
+      fi
+  fi
+
+  # preserve the end of the syslog
   tail -30 syslog > syslog.CRASH
 
   # NOTE: If you update this list, also update comm.c
@@ -78,31 +107,6 @@ while ( : ) do
     echo "autoscript killed $DATE"  >> syslog
     rm .killscript
     exit
-  fi
-
-  # check for multiple core files and delete all but the oldest 1 and newest 4
-  if ls $core_directory/core* > /dev/null 2>&1; then
-      # List core files, sort them by modification time (oldest to newest), and get the filenames
-      core_files=$(ls -t $core_directory/core*)
-
-      # Keep the oldest core file
-      oldest_core=$(echo "$core_files" | tail -n 1)
-
-      # Keep the 4 newest core files
-      newest_cores=$(echo "$core_files" | head -n 4)
-
-      # Remove any other core files
-      for file in $core_files; do
-          if [ "$file" != "$oldest_core" ] && [ "$(echo "$newest_cores" | grep -c "$file")" -eq 0 ]; then
-              rm "$file"
-              echo "Removed: $file" >> syslog
-          fi
-      done
-
-      echo "Oldest core file: $oldest_core" >> syslog
-      echo "Newest core files: $newest_cores" >> syslog
-  else
-      echo "No core files found in $core_directory" >> syslog
   fi
 
   sleep 1
