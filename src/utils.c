@@ -6531,7 +6531,7 @@ room_data *find_load_room(char_data *ch) {
 			if (ROOM_OWNER(IN_ROOM(vter->veh)) == GET_LOYALTY(ch)) {
 				continue;	// already checked during territory check
 			}
-			if (VEH_IS_COMPLETE(vter->veh) && IS_SET(VEH_FUNCTIONS(vter->veh), FNC_TOMB) && !VEH_FLAGGED(vter->veh, VEH_ON_FIRE)) {
+			if (VEH_IS_COMPLETE(vter->veh) && !VEH_FLAGGED(vter->veh, VEH_ON_FIRE) && vehicle_has_function_and_city_ok(vter->veh, FNC_TOMB)) {
 				// pick at random if more than 1
 				if (!number(0, num_found++) || !found) {
 					found = IN_ROOM(vter->veh);

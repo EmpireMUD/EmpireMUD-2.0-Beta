@@ -3565,8 +3565,11 @@ room_data *find_docks(empire_data *emp, int island_id) {
 		if (!IN_ROOM(veh) || GET_ISLAND_ID(IN_ROOM(veh)) != island_id) {
 			continue;	// wrong island
 		}
-		if (!IS_SET(VEH_FUNCTIONS(veh), FNC_DOCKS) || !VEH_IS_COMPLETE(veh) || VEH_HEALTH(veh) < 1 || VEH_FLAGGED(veh, VEH_ON_FIRE)) {
+		if (!VEH_IS_COMPLETE(veh) || VEH_HEALTH(veh) < 1 || VEH_FLAGGED(veh, VEH_ON_FIRE)) {
 			continue;	// basic ship checks
+		}
+		if (!vehicle_has_function_and_city_ok(veh, FNC_DOCKS)) {
+			continue;	// not a dock
 		}
 		if (VEH_FLAGGED(veh, VEH_PLAYER_NO_WORK) || ROOM_AFF_FLAGGED(IN_ROOM(veh), ROOM_AFF_NO_WORK) || (VEH_INTERIOR_HOME_ROOM(veh) && ROOM_AFF_FLAGGED(VEH_INTERIOR_HOME_ROOM(veh), ROOM_AFF_NO_WORK))) {
 			continue;	// no-work
@@ -7179,6 +7182,7 @@ ACMD(do_pour) {
 	char arg1[MAX_INPUT_LENGTH], arg2[MAX_INPUT_LENGTH];
 	obj_data *from_obj = NULL, *to_obj = NULL;
 	int amount;
+	vehicle_data *veh;
 
 	two_arguments(argument, arg1, arg2);
 	
@@ -7241,6 +7245,10 @@ ACMD(do_pour) {
 		if (!(from_obj = get_obj_in_list_vis(ch, arg2, NULL, ROOM_CONTENTS(IN_ROOM(ch))))) {
 			// no matching obj
 			if ((is_abbrev(arg2, "water") || isname(arg2, get_room_name(IN_ROOM(ch), FALSE))) && room_has_function_and_city_ok(GET_LOYALTY(ch), IN_ROOM(ch), FNC_DRINK_WATER)) {
+				fill_from_room(ch, to_obj);
+			}
+			else if ((veh = get_vehicle_in_room_vis(ch, arg2, NULL)) && vehicle_has_function_and_city_ok(veh, FNC_DRINK_WATER)) {
+				// targeting a vehicle with a drink-water flag
 				fill_from_room(ch, to_obj);
 			}
 			else if (is_abbrev(arg2, "river") || is_abbrev(arg2, "water")) {
