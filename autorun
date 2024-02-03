@@ -64,7 +64,7 @@ while ( : ) do
 
       # Remove any other core files
       for file in $core_files; do
-          if [ ! "$file" -eq "$oldest_core" ] && [ "$(echo "$newest_cores" | grep -c "$file")" -eq 0 ]; then
+          if [ ! "$(echo "$file" | grep -Fx "$oldest_core")" ] && [ "$(echo "$newest_cores" | grep -c "$file")" -eq 0 ]; then
               rm "$file"
               echo "Core cleanup deleted file: $file" >> syslog
           fi
@@ -74,7 +74,7 @@ while ( : ) do
         echo "Oldest core file: $oldest_core" >> syslog
       fi
       if [ -n "${newest_cores[0]}" ]; then
-        echo "Newest core file: ${newest_cores[0]}" >> syslog
+        echo "Newest core file: ${newest_cores[0][0]}" >> syslog
       fi
   fi
 
