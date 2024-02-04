@@ -873,7 +873,7 @@ void show_craft_info(char_data *ch, char *argument, int craft_type) {
 				snprintf(buf + strlen(buf), sizeof(buf) - strlen(buf), "%s%d%% of tile", (*buf ? ", " : ""), VEH_SIZE(veh) * 100 / config_get_int("vehicle_size_per_tile"));
 			}
 			if (VEH_MAX_ROOMS(veh) > 0) {
-				snprintf(buf + strlen(buf), sizeof(buf) - strlen(buf), "%s%d room%s", (*buf ? ", " : ""), VEH_MAX_ROOMS(veh), PLURAL(VEH_MAX_ROOMS(veh)));
+				snprintf(buf + strlen(buf), sizeof(buf) - strlen(buf), "%s%d rooms", (*buf ? ", " : ""), VEH_MAX_ROOMS(veh) + 1);
 			}
 			if (VEH_ANIMALS_REQUIRED(veh) > 0) {
 				snprintf(buf + strlen(buf), sizeof(buf) - strlen(buf), "%srequires %d animal%s", (*buf ? ", " : ""), VEH_ANIMALS_REQUIRED(veh), PLURAL(VEH_ANIMALS_REQUIRED(veh)));
