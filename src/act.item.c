@@ -1193,6 +1193,10 @@ void identify_vehicle_to_char(vehicle_data *veh, char_data *ch) {
 	msg_to_char(ch, "Type: %s\r\n", skip_filler((proto && !strchr(VEH_SHORT_DESC(proto), '#')) ? VEH_SHORT_DESC(proto) : VEH_SHORT_DESC(veh)));
 	msg_to_char(ch, "Level: %d\r\n", VEH_SCALE_LEVEL(veh));
 	
+	if (VEH_SIZE(veh) > 0) {
+		msg_to_char(ch, "Size: Takes up %d%% of the tile", VEH_SIZE(veh) * 100 / config_get_int("vehicle_size_per_tile"));
+	}
+	
 	if (VEH_FLAGGED(veh, MOVABLE_VEH_FLAGS)) {
 		msg_to_char(ch, "Speed: %s\r\n", vehicle_speed_types[VEH_SPEED_BONUSES(veh)]);
 	}
