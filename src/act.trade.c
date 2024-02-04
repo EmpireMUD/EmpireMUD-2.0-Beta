@@ -841,8 +841,28 @@ void show_craft_info(char_data *ch, char *argument, int craft_type) {
 	msg_to_char(ch, "Information for %s:\r\n", GET_CRAFT_NAME(craft));
 	
 	if (CRAFT_IS_BUILDING(craft)) {
-		bld = building_proto(GET_CRAFT_BUILD_TYPE(craft));
-		msg_to_char(ch, "Builds: %s\r\n", bld ? GET_BLD_NAME(bld) : "UNKNOWN");
+		if ((bld = building_proto(GET_CRAFT_BUILD_TYPE(craft)))) {
+			// build building details
+			*buf = '\0';
+			
+			if (GET_BLD_EXTRA_ROOMS(bld) > 0) {
+				snprintf(buf + strlen(buf), sizeof(buf) - strlen(buf), "%s%d rooms", (*buf ? ", " : ""), GET_BLD_EXTRA_ROOMS(bld) + 1);
+			}
+			if (GET_BLD_FAME(bld) > 0) {
+				snprintf(buf + strlen(buf), sizeof(buf) - strlen(buf), "%sfame: %d", (*buf ? ", " : ""), GET_BLD_FAME(bld));
+			}
+			
+			// show building line
+			if (*buf) {
+				msg_to_char(ch, "Builds: %s (%s)\r\n", GET_BLD_NAME(bld), buf);
+			}
+			else {
+				msg_to_char(ch, "Builds: %s\r\n", GET_BLD_NAME(bld));
+			}
+		}
+		else {
+			msg_to_char(ch, "This craft appears to be broken\r\n");
+		}
 	}
 	else if (CRAFT_IS_VEHICLE(craft)) {
 		if ((veh = vehicle_proto(GET_CRAFT_OBJECT(craft)))) {
@@ -851,6 +871,18 @@ void show_craft_info(char_data *ch, char *argument, int craft_type) {
 			
 			if (VEH_SIZE(veh) > 0) {
 				snprintf(buf + strlen(buf), sizeof(buf) - strlen(buf), "%s%d%% of tile", (*buf ? ", " : ""), VEH_SIZE(veh) * 100 / config_get_int("vehicle_size_per_tile"));
+			}
+			if (VEH_MAX_ROOMS(veh) > 0) {
+				snprintf(buf + strlen(buf), sizeof(buf) - strlen(buf), "%s%d room%s", (*buf ? ", " : ""), VEH_MAX_ROOMS(veh), PLURAL(VEH_MAX_ROOMS(veh)));
+			}
+			if (VEH_ANIMALS_REQUIRED(veh) > 0) {
+				snprintf(buf + strlen(buf), sizeof(buf) - strlen(buf), "%srequires %d animal%s", (*buf ? ", " : ""), VEH_ANIMALS_REQUIRED(veh), PLURAL(VEH_ANIMALS_REQUIRED(veh)));
+			}
+			if (VEH_FAME(veh) > 0) {
+				snprintf(buf + strlen(buf), sizeof(buf) - strlen(buf), "%sfame: %d", (*buf ? ", " : ""), VEH_FAME(veh));
+			}
+			if (VEH_FLAGGED(veh, MOVABLE_VEH_FLAGS)) {
+				snprintf(buf + strlen(buf), sizeof(buf) - strlen(buf), "%sspeed: %s", (*buf ? ", " : ""), vehicle_speed_types[VEH_SPEED_BONUSES(veh)]);
 			}
 			
 			// show vehicle line
