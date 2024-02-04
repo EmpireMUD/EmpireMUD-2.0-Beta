@@ -5484,6 +5484,11 @@ ACMD(do_drink) {
 					}
 				}
 			}
+			DL_FOREACH2(ROOM_VEHICLES(IN_ROOM(ch)), veh, next_in_room) {
+				if (VEH_IS_COMPLETE(veh) && vehicle_has_function_and_city_ok(veh, FNC_DRINK_WATER)) {
+					add_string_hash(&str_hash, VEH_SHORT_DESC(veh), 1);
+				}
+			}
 		
 			if (str_hash) {
 				// show plantables
