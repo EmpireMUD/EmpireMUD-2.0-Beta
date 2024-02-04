@@ -211,12 +211,12 @@ R
 4 5619 0
 S
 #3313
-bread loaf~
-a loaf of bread~
+bread loaf good~
+a good loaf of bread~
 A loaf of bread has been dropped on the ground.~
 Bread is a good portable food.
 ~
-6 glm a 0 0 7
+6 glm a 0 0 8
 24 0 0
 7 336
 A
