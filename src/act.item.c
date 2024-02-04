@@ -1194,7 +1194,7 @@ void identify_vehicle_to_char(vehicle_data *veh, char_data *ch) {
 	msg_to_char(ch, "Level: %d\r\n", VEH_SCALE_LEVEL(veh));
 	
 	if (VEH_SIZE(veh) > 0) {
-		msg_to_char(ch, "Size: Takes up %d%% of the tile", VEH_SIZE(veh) * 100 / config_get_int("vehicle_size_per_tile"));
+		msg_to_char(ch, "Size: %d%% of tile\r\n", VEH_SIZE(veh) * 100 / config_get_int("vehicle_size_per_tile"));
 	}
 	
 	if (VEH_FLAGGED(veh, MOVABLE_VEH_FLAGS)) {

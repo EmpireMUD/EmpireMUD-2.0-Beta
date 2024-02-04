@@ -846,7 +846,20 @@ void show_craft_info(char_data *ch, char *argument, int craft_type) {
 	}
 	else if (CRAFT_IS_VEHICLE(craft)) {
 		if ((veh = vehicle_proto(GET_CRAFT_OBJECT(craft)))) {
-			msg_to_char(ch, "Creates %s: %s\r\n", VEH_OR_BLD(veh), VEH_SHORT_DESC(veh));
+			// build vehicle details
+			*buf = '\0';
+			
+			if (VEH_SIZE(veh) > 0) {
+				snprintf(buf + strlen(buf), sizeof(buf) - strlen(buf), "%s%d%% of tile", (*buf ? ", " : ""), VEH_SIZE(veh) * 100 / config_get_int("vehicle_size_per_tile"));
+			}
+			
+			// show vehicle line
+			if (*buf) {
+				msg_to_char(ch, "Creates %s: %s (%s)\r\n", VEH_OR_BLD(veh), VEH_SHORT_DESC(veh), buf);
+			}
+			else {
+				msg_to_char(ch, "Creates %s: %s\r\n", VEH_OR_BLD(veh), VEH_SHORT_DESC(veh));
+			}
 		}
 		else {
 			msg_to_char(ch, "This craft appears to be broken\r\n");
