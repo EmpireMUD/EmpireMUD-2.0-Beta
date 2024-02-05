@@ -8,7 +8,11 @@ heavy leather strap. The tortoise stops periodically to munch on the foliage,
 so you're not sure how it ever gets anywhere.
 ~
 &j,&t@@&jo&0~
-befkmtuxF 26 96 0 0 0 0 0 0 0
+befkmtuxF 26 96 0 0 0 0 0 0 0 -1 0
+B0
+&t@@~
+B1
+&t@~
 C
 250 250
 D

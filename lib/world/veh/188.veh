@@ -8,7 +8,7 @@ the piles of bodies inside of it. Piles of bodies that, every so often, seem to
 move. At the front of the wagon is a rope, allowing you to drag it about.
 ~
 ~
-hlmu 19 10 0 0 0 1 0 0 0
+hlmu 19 10 0 0 0 1 0 0 0 -1 0
 C
 1 400
 I 30 5006 100.00 1  # RUINS-TO-VEH: ruins of #n
@@ -31,7 +31,7 @@ a burnt husk, devoid of any corpses to animate. Some day, maybe a member of the
 empire will take the time to upgrade it back to its former glory.
 ~
 ~
-u 19 5 0 0 0 -1 0 0 0
+u 19 5 0 0 0 -1 0 0 0 -1 0
 C
 1 400
 I 30 5006 100.00 1  # RUINS-TO-VEH: ruins of #n
@@ -53,7 +53,11 @@ by a wooden framework as it's being constructed but it's hard to discern the
 final shape of the thing inside.
 ~
 &0(())~
-hmtv 19 1 0 0 0 0 0 0 0
+hmtv 19 1 0 0 0 0 0 0 0 -1 0
+B0
+&0()~
+B1
+&0O~
 C
 1 1
 P
@@ -71,7 +75,7 @@ a closer look, the portal is made up of two spirals each twisting the opposite
 directions. One spiral black, the other crimson.
 ~
 ~
-gquvwx 19 1 0 0 0 0 0 0 0
+gquvwx 19 1 0 0 0 0 0 0 0 -1 0
 C
 400 400
 D
@@ -91,7 +95,7 @@ A simple and hastely thrown together medical tent has been erected.~
 hide the latest victim of the headless centaur from sight.
 ~
 ~
-guwx 19 2 0 0 0 0 0 4 0
+guwx 19 2 0 0 0 0 0 4 0 -1 0
 C
 1 1
 D
@@ -110,7 +114,11 @@ the door is permanently stained red, as is the ground around the sides of the
 building.
 ~
 &0|SH\~
-ghmquw 19 10 0 0 0 0 0 1 0
+ghmquw 19 10 0 0 0 0 0 1 0 -1 0
+B0
+&0|\~
+B1
+&0H~
 D
 18876 0 0
 I 30 5007 100.00 1  # RUINS-TO-VEH: ruins of #n
@@ -130,7 +138,7 @@ people inside. To that, someone has affixed wheels and axles, creating an
 elegant coach the likes of which few have witnessed.
 ~
 ~
-bfx 19 24 0 2 0 0 0 0 0
+bfx 19 24 0 2 0 0 0 0 0 -1 0
 D
 18897 0 0
 P
@@ -150,7 +158,7 @@ A pumpkin coach hovers above you, slowly flapping giant bat wings.~
 flies effortlessly through the air on giant bat wings.
 ~
 ~
-dfx 2 24 0 2 0 0 0 0 0
+dfx 2 24 0 2 0 0 0 0 0 -1 0
 D
 18898 0 0
 P
@@ -172,7 +180,7 @@ You find yourself in front of a haunted mansion.~
 base seems to be dying.
 ~
 &w|^^|~
-gmuwCF 19 48 0 0 0 0 0 4 v
+gmuwCF 19 48 0 0 0 0 0 4 v -1 0
 C
 0 100
 D

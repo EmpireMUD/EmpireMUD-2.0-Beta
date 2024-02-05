@@ -8,7 +8,11 @@ to prevent the hull from being squeezed in icy waters. The rest of the hull has
 a blue tint, perhaps from longterm exposure to cold.
 ~
 &C<&u44&0&C>~
-cipqtuF 29 128 400 0 0 0 0 0 0
+cipqtuF 29 128 400 0 0 0 0 0 0 -1 0
+B0
+&C&u44&0~
+B1
+&C&u4&0~
 D
 10561 12 opq
 P

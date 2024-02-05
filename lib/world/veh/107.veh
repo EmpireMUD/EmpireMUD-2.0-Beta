@@ -6,7 +6,11 @@ A sleek red sleigh is parked here.~
 to hold a great deal.
 ~
 &r\--|~
-bfgiou 24 18 300 1 0 0 0 0 0
+bfgiou 24 18 300 1 0 0 0 0 0 -1 0
+B0
+&r\_~
+B1
+&r\~
 P
 2
 R
@@ -21,7 +25,7 @@ A shoddy raft is barely holding itself together.~
 <direction>'.
 ~
 ~
-cfhlnuxE 3 2 0 0 0 0 0 0 0
+cfhlnuxE 3 2 0 0 0 0 0 0 0 -1 0
 C
 1 1
 P

@@ -8,7 +8,7 @@ why someone would make a tent out of rat fur and then go to all the trouble of
 keeping it out of the effluent.
 ~
 ~
-guvwxF 19 3 0 0 0 0 0 0 0
+guvwxF 19 3 0 0 0 0 0 0 0 -1 0
 D
 10457 0 0
 P
@@ -23,7 +23,11 @@ made from hundreds of loosely stitched rat skins, and it smells no better than
 it looks.
 ~
 @.&0MM&?@.~
-ghmuwF 19 64 0 0 0 0 0 2 fw
+ghmuwF 19 64 0 0 0 0 0 2 fw -1 0
+B0
+&0MM~
+B1
+&0M~
 D
 10483 2 cm
 L kr 0
@@ -39,7 +43,11 @@ A rat-skin goblin lab tent is standing here.~
 The rat-skin tent is large, with a column of smoke rising from the ceiling.
 ~
 @.&0MM&?@.~
-ghmuwF 19 24 0 0 0 0 0 2 fw
+ghmuwF 19 24 0 0 0 0 0 2 fw -1 0
+B0
+&0MM~
+B1
+&0M~
 D
 10484 0 0
 L kr 0
