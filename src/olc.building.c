@@ -1669,7 +1669,7 @@ OLC_MODULE(bedit_quarter_icon) {
 		GET_BLD_QUARTER_ICON(bdg) = NULL;
 		msg_to_char(ch, "It no longer has a quarter icon.\r\n");
 	}
-	else if (!validate_icon(argument, 2)) {
+	else if (!validate_icon(argument, 1)) {
 		msg_to_char(ch, "You must specify a quarter icon that is 1 character long, not counting color codes.\r\n");
 	}
 	else {
