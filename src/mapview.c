@@ -1305,13 +1305,13 @@ void build_vehicle_icon(char_data *ch, room_data *room, vehicle_data *main_veh, 
 		// show 2 half icons
 		sprintf(outbuf, "%s%s", half[0], half[1]);
 	}
-	else if (half_size == 1 && (!main_veh || !VEH_ICON(main_veh))) {
+	else if (half_size == 1 && !whole) {
 		// show 1 half icon for some reason
 		sprintf(outbuf, "@.%s@.", half[0]);
 	}
-	else if (main_veh && VEH_ICON(main_veh)) {
-		// show 1 full icon
-		strcpy(outbuf, VEH_ICON(main_veh));
+	else if (whole) {
+		// show whole icon
+		strcpy(outbuf, whole);
 	}
 	else {
 		// this should not happen but we will return a 4-char icon anyway
