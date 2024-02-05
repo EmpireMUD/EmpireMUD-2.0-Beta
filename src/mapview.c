@@ -1240,7 +1240,7 @@ void build_vehicle_icon(char_data *ch, room_data *room, vehicle_data *main_veh, 
 				*showing_any_chameleon = TRUE;
 			}
 		}
-		if (VEH_QUARTER_ICON(veh) && quarter_size < 2) {
+		if (VEH_QUARTER_ICON(veh) && quarter_size < 4) {
 			quarter[quarter_size++] = VEH_QUARTER_ICON(veh);
 			
 			if (showing_any_chameleon && VEH_IS_COMPLETE(veh) && VEH_FLAGGED(veh, VEH_CHAMELEON)) {
@@ -1266,7 +1266,7 @@ void build_vehicle_icon(char_data *ch, room_data *room, vehicle_data *main_veh, 
 				*showing_any_chameleon = TRUE;
 			}
 		}
-		if (GET_BLD_QUARTER_ICON(GET_BUILDING(room)) && quarter_size < 2) {
+		if (GET_BLD_QUARTER_ICON(GET_BUILDING(room)) && quarter_size < 4) {
 			quarter[quarter_size++] = GET_BLD_QUARTER_ICON(GET_BUILDING(room));
 			
 			if (showing_any_chameleon && ROOM_AFF_FLAGGED(room, ROOM_AFF_CHAMELEON)) {
