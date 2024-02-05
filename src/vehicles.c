@@ -4689,7 +4689,9 @@ void olc_show_vehicle(char_data *ch) {
 	sprintf(buf + strlen(buf), "<%sshortdescription\t0> %s\r\n", OLC_LABEL_STR(VEH_SHORT_DESC(veh), default_vehicle_short_desc), NULLSAFE(VEH_SHORT_DESC(veh)));
 	sprintf(buf + strlen(buf), "<%slongdescription\t0>\r\n%s\r\n", OLC_LABEL_STR(VEH_LONG_DESC(veh), default_vehicle_long_desc), NULLSAFE(VEH_LONG_DESC(veh)));
 	sprintf(buf + strlen(buf), "<%slookdescription\t0>\r\n%s", OLC_LABEL_STR(VEH_LOOK_DESC(veh), ""), NULLSAFE(VEH_LOOK_DESC(veh)));
-	sprintf(buf + strlen(buf), "<%sicon\t0> %s\t0 %s, <%shalficon\t0> %s\t0 %s, <%squartericon\t0> %s\t0 %s\r\n", OLC_LABEL_STR(VEH_ICON(veh), ""), VEH_ICON(veh) ? VEH_ICON(veh) : "none", VEH_ICON(veh) ? show_color_codes(VEH_ICON(veh)) : "", OLC_LABEL_STR(VEH_HALF_ICON(veh), ""), VEH_HALF_ICON(veh) ? VEH_HALF_ICON(veh) : "none", VEH_HALF_ICON(veh) ? show_color_codes(VEH_HALF_ICON(veh)) : "", OLC_LABEL_STR(VEH_QUARTER_ICON(veh), ""), VEH_QUARTER_ICON(veh) ? VEH_QUARTER_ICON(veh) : "none", VEH_QUARTER_ICON(veh) ? show_color_codes(VEH_QUARTER_ICON(veh)) : "");
+	sprintf(buf + strlen(buf), "<%sicon\t0> %s\t0 %s, ", OLC_LABEL_STR(VEH_ICON(veh), ""), VEH_ICON(veh) ? VEH_ICON(veh) : "none", VEH_ICON(veh) ? show_color_codes(VEH_ICON(veh)) : "");
+	sprintf(buf + strlen(buf), "<%shalficon\t0> %s\t0 %s, ", OLC_LABEL_STR(VEH_HALF_ICON(veh), ""), VEH_HALF_ICON(veh) ? VEH_HALF_ICON(veh) : "none", VEH_HALF_ICON(veh) ? show_color_codes(VEH_HALF_ICON(veh)) : "");
+	sprintf(buf + strlen(buf), "<%squartericon\t0> %s\t0 %s\r\n", OLC_LABEL_STR(VEH_QUARTER_ICON(veh), ""), VEH_QUARTER_ICON(veh) ? VEH_QUARTER_ICON(veh) : "none", VEH_QUARTER_ICON(veh) ? show_color_codes(VEH_QUARTER_ICON(veh)) : "");
 	
 	sprintbit(VEH_FLAGS(veh), vehicle_flags, lbuf, TRUE);
 	sprintf(buf + strlen(buf), "<%sflags\t0> %s\r\n", OLC_LABEL_VAL(VEH_FLAGS(veh), NOBITS), lbuf);
