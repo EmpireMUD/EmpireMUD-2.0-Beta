@@ -3568,45 +3568,49 @@ on a designate-able room (a building where the ROOM flag is set), they only
 affect players in that room.
 
 Available flags:
- ROOM - this is a room that can be added with the designate command if it has
+ &cROOM&0 - this is a room that can be added with the designate command if it has
     matching designate flags with a building
- ALLOW-MOUNTS - players can ride inside without dismounting
- TWO-ENTRANCES - the building will have a rear entrance across from the main
+ &cALLOW-MOUNTS&0 - players can ride inside without dismounting
+ &cTWO-ENTRANCES&0 - the building will have a rear entrance across from the main
     entrance (does not apply to OPEN buildings)
- OPEN - never takes the player off the map, shows no room description, and
+ &cOPEN&0 - never takes the player off the map, shows no room description, and
     cannot have interior rooms
- CLOSED - always shows the room description and takes the player off the map,
+ &cCLOSED&0 - always shows the room description and takes the player off the map,
     even if the building is not complete
- INTERLINK - can be interlinked with other nearby INTERLINK buildings
- HERD - mobs can be herded into this building
- DEDICATE - can be dedicated to a patron god or player, which adds "of Name"
+ &cINTERLINK&0 - can be interlinked with other nearby INTERLINK buildings
+ &cHERD&0 - mobs can be herded into this building
+ &cDEDICATE&0 - can be dedicated to a patron god or player, which adds "of Name"
     to the room title
- IS-RUINS - counts as ruins (affects cities and decay)
- !NPC - mobs won't enter this building
- BARRIER - can only go back the way you came, unless flying
- IN-CITY-ONLY - can only be used if in an established city
- LARGE-CITY-RADIUS - counts as in-city even when built in the outskirts
- !PAINT - cannot be painted
- ATTACH-ROAD - on the ascii map, roads attach to this tile like it's a road
- BURNABLE - will catch fire if a fire is placed inside by a hostile empire
- EXIT - on interior rooms, players can 'exit' (or disembark) to leave from here
- OBSCURE-VISION - blocks tiles behind it on the map
- ROAD-ICON - replaces the building icon with generated road icons/dashes: --+-
- ROAD-ICON-WIDE - replaces the icon with wide road icons: ====
- ATTACH-BARRIER - icons with @u/@v will attach to this building like a barrier
- NO-CUSTOMIZE - cannot be customized by players
- NO-ABANDON-WHEN-RUINED - won't be abandoned when it turns to ruins; only
+ &cIS-RUINS&0 - counts as ruins (affects cities and decay)
+ &c!NPC&0 - mobs won't enter this building
+ &cBARRIER&0 - can only go back the way you came, unless flying
+ &cIN-CITY-ONLY&0 - can only be used if in an established city
+ &cLARGE-CITY-RADIUS&0 - counts as in-city even when built in the outskirts
+ &c!PAINT&0 - cannot be painted
+ &cATTACH-ROAD&0 - on the ascii map, roads attach to this tile like it's a road
+ &cBURNABLE&0 - will catch fire if a fire is placed inside by a hostile empire
+ &cEXIT&0 - on interior rooms, players can 'exit' (or disembark) to leave from here
+ &cOBSCURE-VISION&0 - blocks tiles behind it on the map
+ &cROAD-ICON&0 - replaces the building icon with generated road icons/dashes: --+-
+ &cROAD-ICON-WIDE&0 - replaces the icon with wide road icons: ====
+ &cATTACH-BARRIER&0 - icons with @u/@v will attach to this building like a barrier
+ &cNO-CUSTOMIZE&0 - cannot be customized by players
+ &cNO-ABANDON-WHEN-RUINED&0 - won't be abandoned when it turns to ruins; only
     normally used on buildings that are part of adventures like the Hamlet.
- SAIL - can enter this building with a boat
- ITEM-LIMIT - only a certain number of items can be dropped here
- LONG-AUTOSTORE - autostore takes 72 hours instead of 3 here
- HIGH-DEPLETION - has more resources than a normal tile; does not work with
+ &cSHOW-VEHICLES&0 - for open buildings, will show vehicles on the tile instead of
+    the building (or in addition to, they have half or quarter icons); ONLY if
+    the building is open or incomplete. Normally a building icon hides vehicle
+    icons on the tile.
+ &cSAIL&0 - can enter this building with a boat
+ &cITEM-LIMIT&0 - only a certain number of items can be dropped here
+ &cLONG-AUTOSTORE&0 - autostore takes 72 hours instead of 3 here
+ &cHIGH-DEPLETION&0 - has more resources than a normal tile; does not work with
     interactions that set their own depletion limit (ones that show #-max).
- !DELETE - will not be deleted for not having a homeroom
- NEED-BOAT - requires a boat, flying, waterwalking, or swimming to enter
- LOOK-OUT - can see the map using "look out"
- 2ND-TERRITORY - counts as territory off the map (e.g. in a ship)
- UPGRADED - modifies other building types like SHIPYARD
+ &c!DELETE&0 - will not be deleted for not having a homeroom
+ &cNEED-BOAT&0 - requires a boat, flying, waterwalking, or swimming to enter
+ &cLOOK-OUT&0 - can see the map using "look out"
+ &c2ND-TERRITORY&0 - counts as territory off the map (e.g. in a ship)
+ &cUPGRADED&0 - modifies other building types like SHIPYARD
 
 * Note: If you change the LARGE-CITY-RADIUS flag on existing buildings,
         territory counts will not update right away. Any empire can force a

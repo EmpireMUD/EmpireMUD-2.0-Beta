@@ -687,7 +687,7 @@ vehicle_data *find_vehicle_to_show(char_data *ch, room_data *room, int *total_ve
 	}
 	
 	// we don't show vehicles in buildings or closed tiles (unless the player is on a vehicle in that room, in which case we override)
-	if (!is_on_vehicle && (IS_ANY_BUILDING(room) || ROOM_IS_CLOSED(room))) {
+	if (!is_on_vehicle && ((IS_ANY_BUILDING(room) && !ROOM_BLD_FLAGGED(room, BLD_SHOW_VEHICLES)) || ROOM_IS_CLOSED(room))) {
 		return NULL;
 	}
 	

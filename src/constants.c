@@ -3791,7 +3791,7 @@ const char *bld_flags[] = {
 	"ATTACH-BARRIER",	// 20
 	"NO-CUSTOMIZE",
 	"NO-ABANDON-WHEN-RUINED",
-	"*",
+	"SHOW-VEHICLES",
 	"*",
 	"*",	// 25
 	"*",
