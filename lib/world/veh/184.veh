@@ -7,7 +7,7 @@ is stressed almost to the point of breaking. It's such a rough ride that your
 entire family is walking alongside, rather than sitting in the wagon.
 ~
 ~
-uvx 19 24 0 2 0 0 0 0 0
+uvx 19 24 0 2 0 0 0 0 0 -1 0
 P
 2
 S
@@ -21,7 +21,11 @@ seen. The doors raise vertically, held aloft like gulls' wings, revealing a
 plush and extravagant interior.
 ~
 &w/==>~
-guvxF 19 1000 0 0 0 0 0 0 0
+guvxF 19 1000 0 0 0 0 0 0 0 -1 0
+B0
+&w==~
+B1
+&w=~
 C
 3 3
 D
@@ -38,7 +42,11 @@ strange script appear to spell out 'Police Box'. The box is painted a deep
 shade of blue and though it has windows, you can't see in.
 ~
 @.&B[]&?@.~
-guvxF 2 1000 0 0 0 0 0 0 0
+guvxF 2 1000 0 0 0 0 0 0 0 -1 0
+B0
+&B[]~
+B1
+&BD~
 C
 900 900
 D

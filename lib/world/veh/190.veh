@@ -7,7 +7,11 @@ be wooden chicken legs. The hut itself is simple, almost crude, but that's a
 small price to pay for a home that can travel.
 ~
 &?.&w()&?.~
-bhmx 0 16 0 0 0 0 0
+bhmx 0 16 0 0 0 0 0 0 0 -1 0
+B0
+&w()~
+B1
+&wO~
 C
 100 175
 D

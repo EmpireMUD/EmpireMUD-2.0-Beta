@@ -5,7 +5,11 @@ A red dragonhide butcher tent is standing here.~
 The tent is made from red dragon hides.
 ~
 &r{BB}~
-gmquwF 19 48 0 0 0 1 0 2 fw
+gmquwF 19 48 0 0 0 1 0 2 fw -1 0
+B0
+&rBB~
+B1
+&rB~
 D
 10927 0 0
 L kmr 0
@@ -22,7 +26,7 @@ There is a flying magicycle here.~
 brimstone. It hovers in the air by sheer force of magic.
 ~
 ~
-dfnx 19 36 0 0 0 0 0 0 0
+dfnx 19 36 0 0 0 0 0 0 0 -1 0
 C
 100 200
 P
