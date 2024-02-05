@@ -1334,7 +1334,9 @@ void olc_show_building(char_data *ch) {
 	if (!is_room) {
 		replace_question_color(NULLSAFE(GET_BLD_ICON(bdg)), "\t0", lbuf);
 		if (BLD_FLAGGED(bdg, BLD_OPEN) || GET_BLD_HALF_ICON(bdg) || GET_BLD_QUARTER_ICON(bdg)) {
-			sprintf(buf + strlen(buf), "<%sicon\t0> %s\t0  %s, <%shalficon\t0> %s\t0  %s, <%squartericon\t0> %s\t0  %s\r\n", OLC_LABEL_STR(GET_BLD_ICON(bdg), default_building_icon), lbuf, show_color_codes(NULLSAFE(GET_BLD_ICON(bdg))), OLC_LABEL_STR(GET_BLD_HALF_ICON(bdg), default_building_icon), lbuf, show_color_codes(NULLSAFE(GET_BLD_HALF_ICON(bdg))), OLC_LABEL_STR(GET_BLD_QUARTER_ICON(bdg), default_building_icon), lbuf, show_color_codes(NULLSAFE(GET_BLD_QUARTER_ICON(bdg))));
+			sprintf(buf + strlen(buf), "<%sicon\t0> %s\t0  %s, ", OLC_LABEL_STR(GET_BLD_ICON(bdg), default_building_icon), lbuf, show_color_codes(NULLSAFE(GET_BLD_ICON(bdg))));
+			sprintf(buf + strlen(buf), "<%shalficon\t0> %s\t0  %s, ", OLC_LABEL_STR(GET_BLD_HALF_ICON(bdg), default_building_icon), lbuf, show_color_codes(NULLSAFE(GET_BLD_HALF_ICON(bdg))));
+			sprintf(buf + strlen(buf), "<%squartericon\t0> %s\t0  %s\r\n", OLC_LABEL_STR(GET_BLD_QUARTER_ICON(bdg), default_building_icon), lbuf, show_color_codes(NULLSAFE(GET_BLD_QUARTER_ICON(bdg))));
 		}
 		else {
 			sprintf(buf + strlen(buf), "<%sicon\t0> %s\t0  %s\r\n", OLC_LABEL_STR(GET_BLD_ICON(bdg), default_building_icon), lbuf, show_color_codes(NULLSAFE(GET_BLD_ICON(bdg))));
