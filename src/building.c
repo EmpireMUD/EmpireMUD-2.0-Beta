@@ -3007,7 +3007,7 @@ ACMD(do_paint) {
 		act("You don't have permission to paint $V.", FALSE, ch, NULL, paint_veh, TO_CHAR | ACT_VEH_VICT);
 		return;
 	}
-	if (paint_veh && (!VEH_ICON(paint_veh) || VEH_FLAGGED(paint_veh, VEH_NO_PAINT))) {
+	if (paint_veh && (!VEH_HAS_ANY_ICON(paint_veh) || VEH_FLAGGED(paint_veh, VEH_NO_PAINT))) {
 		act("You cannot paint $V.", FALSE, ch, NULL, paint_veh, TO_CHAR | ACT_VEH_VICT);
 		return;
 	}

@@ -503,7 +503,7 @@ ADMIN_UTIL(util_bldconvert) {
 	struct extra_descr_data *ex_descs = NULL;
 	struct bld_relation *relations = NULL;
 	struct spawn_info *spawns = NULL;
-	char *icon = NULL;
+	char *icon = NULL, *half_icon = NULL, *quarter_icon = NULL;
 	
 	// basic safety
 	if (!ch->desc) {
@@ -597,6 +597,10 @@ ADMIN_UTIL(util_bldconvert) {
 		// will move these to the vehicle
 		icon = GET_BLD_ICON(to_bld);
 		GET_BLD_ICON(to_bld) = NULL;
+		half_icon = GET_BLD_HALF_ICON(to_bld);
+		GET_BLD_HALF_ICON(to_bld) = NULL;
+		quarter_icon = GET_BLD_QUARTER_ICON(to_bld);
+		GET_BLD_QUARTER_ICON(to_bld) = NULL;
 		fame = GET_BLD_FAME(to_bld);
 		GET_BLD_FAME(to_bld) = 0;
 		military = GET_BLD_MILITARY(to_bld);
@@ -656,6 +660,8 @@ ADMIN_UTIL(util_bldconvert) {
 	else {
 		// open building: copy portions of it for the vehicle but don't create a new bld
 		icon = GET_BLD_ICON(from_bld) ? GET_BLD_ICON(from_bld) : NULL;
+		half_icon = GET_BLD_HALF_ICON(from_bld) ? GET_BLD_HALF_ICON(from_bld) : NULL;
+		quarter_icon = GET_BLD_QUARTER_ICON(from_bld) ? GET_BLD_QUARTER_ICON(from_bld) : NULL;
 		fame = GET_BLD_FAME(from_bld);
 		military = GET_BLD_MILITARY(from_bld);
 		functions = GET_BLD_FUNCTIONS(from_bld);
@@ -724,6 +730,12 @@ ADMIN_UTIL(util_bldconvert) {
 		
 		// icon?
 		set_vehicle_icon(to_veh, icon);
+		if (half_icon) {
+			set_vehicle_half_icon(to_veh, half_icon);
+		}
+		if (quarter_icon) {
+			set_vehicle_quarter_icon(to_veh, quarter_icon);
+		}
 		
 		// basic traits
 		VEH_SIZE(to_veh) = 1;
@@ -3201,8 +3213,20 @@ void do_stat_building(char_data *ch, bld_data *bdg) {
 	
 	msg_to_char(ch, "Building VNum: [&c%d&0], Name: '&c%s&0'\r\n", GET_BLD_VNUM(bdg), GET_BLD_NAME(bdg));
 	
+	msg_to_char(ch, "Room Title: %s\r\n", GET_BLD_TITLE(bdg));
+	
+	// icon line
 	replace_question_color(NULLSAFE(GET_BLD_ICON(bdg)), "&0", lbuf);
-	msg_to_char(ch, "Room Title: %s, Icon: %s&0 %s&0\r\n", GET_BLD_TITLE(bdg), lbuf, show_color_codes(NULLSAFE(GET_BLD_ICON(bdg))));
+	msg_to_char(ch, "Icon: %s&0 %s&0", lbuf, show_color_codes(NULLSAFE(GET_BLD_ICON(bdg))));
+	if (GET_BLD_HALF_ICON(bdg)) {
+		replace_question_color(NULLSAFE(GET_BLD_HALF_ICON(bdg)), "&0", lbuf);
+		msg_to_char(ch, ", Half Icon: %s&0 %s&0", lbuf, show_color_codes(NULLSAFE(GET_BLD_HALF_ICON(bdg))));
+	}
+	if (GET_BLD_QUARTER_ICON(bdg)) {
+		replace_question_color(NULLSAFE(GET_BLD_QUARTER_ICON(bdg)), "&0", lbuf);
+		msg_to_char(ch, ", Quarter Icon: %s&0 %s&0", lbuf, show_color_codes(NULLSAFE(GET_BLD_QUARTER_ICON(bdg))));
+	}
+	msg_to_char(ch, "\r\n");
 	
 	if (GET_BLD_DESC(bdg) && *GET_BLD_DESC(bdg)) {
 		msg_to_char(ch, "Description:\r\n%s", GET_BLD_DESC(bdg));

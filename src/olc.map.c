@@ -539,7 +539,7 @@ OLC_MODULE(mapedit_icon) {
 	}
 	else if (!*argument)
 		msg_to_char(ch, "What would you like to set the icon to (or \"none\")?\r\n");
-	else if (!validate_icon(argument))
+	else if (!validate_icon(argument, 4))
 		msg_to_char(ch, "Room icons must be exactly four characters.\r\n");
 	else if (argument[0] != COLOUR_CHAR)
 		msg_to_char(ch, "Icons must begin with a color code.\r\n");

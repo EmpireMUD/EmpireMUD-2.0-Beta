@@ -3632,7 +3632,8 @@ Fields:
   &c-fame -fameover -fameunder&0 - specific fame amount
   &c-flagged -unflagged&0 - see HELP BEDIT FLAGS
   &c-functions&0 - see HELP BEDIT FUNCTIONS
-  &c-icon&0 - match the text of the icon, if any
+  &c-icon -halficon -quartericon&0 - match the text of one of the icon fields;
+     use e.g. "-halficon any" to check if it has one at all.
   &c-interactions&0 - has a specific type, see HELP BEDIT INTERACTION
   &c-height -heightover -heightunder&0 - specific height amount
   &c-hitpoints -hitpointsover -hitpointsunder&0 - specific hitpoint amount
@@ -3747,19 +3748,31 @@ Common hitpoint levels:
 
 See also: BEDIT RESOURCE MAINTENANCE, FIRE, OLC BUILDINGS, SIEGE RITUAL
 #d
-"BEDIT ICON"
+"BEDIT ICON" "BEDIT HALFICON" "BEDIT HALF ICON" "BEDIT QUARTERICON" "BEDIT QUARTER ICON"
 
 Usage:  .icon <icon>
+        .halficon <icon | none>
+        .quartericon <icon | none>
 
-The icon is how a building appears on the world map. It must always be exactly
-4 characters long, not counting any color codes.
+The icon is how a building appears on the world map. The regular icon is
+mandatory for a building, unless it has the ROOM flag. Half and quarter icons
+are optional; see below.
+
+The regular icon must always be exactly 4 characters long, not counting any
+color codes. Half icons are 2 characters long (plus color codes) and quarter
+icons must be a single character (again, not counting any color codes).
+
+Buildings usually only show the regular icon, but can show the half or quarter
+icon if vehicles that also have half or quarter icons are present on the tile.
+This only applies to open buildings -- a closed building cannot generally show
+a half or quarter icon.
 
 Buildings usually use icons like: [  ], (  ), {  }
 Usually the symbols inside the parentheses or braces are a pair of letters that
 loosely indicate what building it is, but you should try not to duplicate
 existing buildings.
 
-If you don't start with a color code, the building will have a color based on
+Unless you start an icon with a color code, the icon will have a color based on
 the tile it was built upon (and the season). In addition to normal color codes, 
 you can use &&? to represent the base tile's color if you need to use it later
 in the color code. If you want to use the && symbol in the icon, you must
@@ -10514,7 +10527,8 @@ Fields:
   &c-fame -fameover -fameunder&0 - specific fame amount
   &c-flagged -unflagged&0 - see HELP VEDIT FLAGS
   &c-functions&0 - see HELP VEDIT FUNCTIONS
-  &c-icon [any]&0 - match the text of the icon (or "any" to just require an icon)
+  &c-icon -halficon -quartericon&0 - match the text of one of the icon fields;
+     use e.g. "-icon any" to check if it has one at all.
   &c-interactions&0 - has a specific type, see HELP VEDIT INTERACTION
   &c-height -heightover -heightunder&0 - specific height amount
   &c-hitpoints -hitpointsover -hitpointsunder&0 - specific hitpoint amount
@@ -10577,9 +10591,11 @@ Common hitpoint levels:
 
 See also: VEDIT RESOURCE MAINTENANCE, FIRE, OLC VEHICLES, REPAIR, SIEGE RITUAL
 #d
-"VEDIT ICON"
+"VEDIT ICON" "VEDIT HALFICON" "VEDIT HALF ICON" "VEDIT QUARTERICON" "VEDIT QUARTER ICON"
 
 Usage:  .icon <icon | none>
+        .halficon <icon | none>
+        .quartericon <icon | none>
 
 Vehicles usually don't appear on the world map, but they can be set to do so by
 giving them an icon. In general, vehicle icons can lead to map clutter and
@@ -10589,7 +10605,11 @@ next to the tile name, instead of its icon.
 
 If more than one vehicle is in the same room, only the first vehicle in the
 list is shown on the map (this is generally the last vehicle that entered the
-room).
+room) -- unless both vehicles have half or quarter icons.
+
+The regular icon is 4 characters long, the half icon must be 2 characters long,
+and the quarter icon should be just 1 character; however, you can include color
+codes in any of these icons.
 
 You should almost always start the icon with &&0 to clear the tile's base
 color. There is no need to put a &&0 at the end of the icon.

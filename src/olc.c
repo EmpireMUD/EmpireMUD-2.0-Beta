@@ -193,12 +193,14 @@ OLC_MODULE(bedit_extrarooms);
 OLC_MODULE(bedit_fame);
 OLC_MODULE(bedit_flags);
 OLC_MODULE(bedit_functions);
+OLC_MODULE(bedit_half_icon);
 OLC_MODULE(bedit_height);
 OLC_MODULE(bedit_hitpoints);
 OLC_MODULE(bedit_icon);
 OLC_MODULE(bedit_interaction);
 OLC_MODULE(bedit_military);
 OLC_MODULE(bedit_name);
+OLC_MODULE(bedit_quarter_icon);
 OLC_MODULE(bedit_relations);
 OLC_MODULE(bedit_resource);
 OLC_MODULE(bedit_script);
@@ -571,6 +573,7 @@ OLC_MODULE(vedit_fame);
 OLC_MODULE(vedit_flags);
 OLC_MODULE(vedit_forbidclimate);
 OLC_MODULE(vedit_functions);
+OLC_MODULE(vedit_half_icon);
 OLC_MODULE(vedit_height);
 OLC_MODULE(vedit_hitpoints);
 OLC_MODULE(vedit_icon);
@@ -583,6 +586,7 @@ OLC_MODULE(vedit_maxlevel);
 OLC_MODULE(vedit_military);
 OLC_MODULE(vedit_minlevel);
 OLC_MODULE(vedit_movetype);
+OLC_MODULE(vedit_quarter_icon);
 OLC_MODULE(vedit_relations);
 OLC_MODULE(vedit_requiresclimate);
 OLC_MODULE(vedit_resource);
@@ -759,12 +763,14 @@ const struct olc_command_data olc_data[] = {
 	{ "fame", bedit_fame, OLC_BUILDING, OLC_CF_EDITOR },
 	{ "flags", bedit_flags, OLC_BUILDING, OLC_CF_EDITOR },
 	{ "functions", bedit_functions, OLC_BUILDING, OLC_CF_EDITOR },
+	{ "halficon", bedit_half_icon, OLC_BUILDING, OLC_CF_EDITOR },
 	{ "height", bedit_height, OLC_BUILDING, OLC_CF_EDITOR },
 	{ "hitpoints", bedit_hitpoints, OLC_BUILDING, OLC_CF_EDITOR },
 	{ "icon", bedit_icon, OLC_BUILDING, OLC_CF_EDITOR },
 	{ "interaction", bedit_interaction, OLC_BUILDING, OLC_CF_EDITOR },
 	{ "military", bedit_military, OLC_BUILDING, OLC_CF_EDITOR },
 	{ "name", bedit_name, OLC_BUILDING, OLC_CF_EDITOR },
+	{ "quartericon", bedit_quarter_icon, OLC_BUILDING, OLC_CF_EDITOR },
 	{ "relations", bedit_relations, OLC_BUILDING, OLC_CF_EDITOR },
 	{ "resources", bedit_resource, OLC_BUILDING, OLC_CF_EDITOR },
 	{ "rooms", bedit_extrarooms, OLC_BUILDING, OLC_CF_EDITOR },
@@ -1148,6 +1154,7 @@ const struct olc_command_data olc_data[] = {
 	{ "flags", vedit_flags, OLC_VEHICLE, OLC_CF_EDITOR },
 	{ "forbidclimate", vedit_forbidclimate, OLC_VEHICLE, OLC_CF_EDITOR },
 	{ "functions", vedit_functions, OLC_VEHICLE, OLC_CF_EDITOR },
+	{ "halficon", vedit_half_icon, OLC_VEHICLE, OLC_CF_EDITOR },
 	{ "height", vedit_height, OLC_VEHICLE, OLC_CF_EDITOR },
 	{ "hitpoints", vedit_hitpoints, OLC_VEHICLE, OLC_CF_EDITOR },
 	{ "icon", vedit_icon, OLC_VEHICLE, OLC_CF_EDITOR },
@@ -1160,6 +1167,7 @@ const struct olc_command_data olc_data[] = {
 	{ "military", vedit_military, OLC_VEHICLE, OLC_CF_EDITOR },
 	{ "minlevel", vedit_minlevel, OLC_VEHICLE, OLC_CF_EDITOR },
 	{ "movetype", vedit_movetype, OLC_VEHICLE, OLC_CF_EDITOR },
+	{ "quartericon", vedit_quarter_icon, OLC_VEHICLE, OLC_CF_EDITOR },
 	{ "relations", vedit_relations, OLC_VEHICLE, OLC_CF_EDITOR },
 	{ "requiresclimate", vedit_requiresclimate, OLC_VEHICLE, OLC_CF_EDITOR },
 	{ "resource", vedit_resource, OLC_VEHICLE, OLC_CF_EDITOR },
@@ -7426,7 +7434,7 @@ void olc_process_icons(char_data *ch, char *argument, struct icon_data **list) {
 		else if (strlen(arg3) != 2 || !check_banner_color_string(arg3, TRUE, TRUE)) {
 			msg_to_char(ch, "You must specify a single color code, starting with \t&.\r\n");
 		}
-		else if (!validate_icon(arg4)) {
+		else if (!validate_icon(arg4, 4)) {
 			msg_to_char(ch, "You must specify an icon that is 4 characters long, not counting color codes.\r\n");
 		}
 		else {
@@ -7543,7 +7551,7 @@ void olc_process_icons(char_data *ch, char *argument, struct icon_data **list) {
 			}
 		}
 		else if (is_abbrev(type_arg, "icon")) {
-			if (!validate_icon(val_arg)) {
+			if (!validate_icon(val_arg, 4)) {
 				msg_to_char(ch, "You must specify an icon that is 4 characters long, not counting color codes.\r\n");
 			}
 			else {
@@ -9192,13 +9200,14 @@ void smart_copy_template_spawns(struct adventure_spawn **addto, struct adventure
 * Validates an icon (length).
 *
 * @param char *icon The input icon.
+* @param int width What size icon to check for (usually 4).
 * @return bool TRUE if the icon is ok; FALSE if not.
 */
-bool validate_icon(char *icon) {
+bool validate_icon(char *icon, int width) {
 	if (!*icon) {
 		return FALSE;
 	}
-	else if ((strlen(icon) - count_icon_codes(icon) - color_code_length(icon)) != 4) {
+	else if ((strlen(icon) - count_icon_codes(icon) - color_code_length(icon)) != width) {
 		return FALSE;
 	}
 	else {

@@ -898,12 +898,14 @@ void adjust_vehicle_tech(vehicle_data *veh, int island_id, bool add);
 void free_vehicle(vehicle_data *veh);
 vehicle_data *read_vehicle(any_vnum vnum, bool with_triggers);
 void remove_vehicle_from_table(vehicle_data *veh);
+void set_vehicle_half_icon(vehicle_data *veh, const char *str);
 void set_vehicle_icon(vehicle_data *veh, const char *str);
 void set_vehicle_keywords(vehicle_data *veh, const char *str);
 void set_vehicle_long_desc(vehicle_data *veh, const char *str);
 void set_vehicle_look_desc(vehicle_data *veh, const char *str, bool format);
-void set_vehicle_short_desc(vehicle_data *veh, const char *str);
 void set_vehicle_look_desc_append(vehicle_data *veh, const char *str, bool format);
+void set_vehicle_quarter_icon(vehicle_data *veh, const char *str);
+void set_vehicle_short_desc(vehicle_data *veh, const char *str);
 vehicle_data *vehicle_proto(any_vnum vnum);
 
 // wizlock system

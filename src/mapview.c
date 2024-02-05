@@ -1158,6 +1158,170 @@ void build_map_icon(char_data *ch, room_data *to_room, struct icon_data *base_ic
 
 
 /**
+* Creates a vehicle icon for a tile based on the vehicles and buildings on it.
+*
+* @param char_data *ch The viewer.
+* @param room_data *room The room being looked at -- the one we're building icons for.
+* @param vehicle_data *main_veh The primary vehicle chosen to show on the tile.
+* @param bool skip_chameleon If TRUE, ignores any vehicles (including main_veh) that are chameleon.
+* @param char *outbuf A string to build the output in. It MUST be big enough to hold a 4-character icon plus all the color codes and special icon codes.
+* @param bool *showing_any_chameleon Optional: Pointer to a bool that will be set to TRUE if we showed any chameleon buildings.
+*/
+void build_vehicle_icon(char_data *ch, room_data *room, vehicle_data *main_veh, bool skip_chameleon, char *outbuf, bool *showing_any_chameleon) {
+	char icon_color[256];
+	char *whole, *half[2], *quarter[4];
+	int iter, half_size, quarter_size, tileset, x;
+	vehicle_data *veh;
+	
+	// initialize
+	*outbuf = *icon_color = '\0';
+	whole = NULL;
+	half_size = quarter_size = 0;
+	for (iter = 0; iter < 2; ++iter) {
+		half[iter] = NULL;
+	}
+	for (iter = 0; iter < 4; ++iter) {
+		quarter[iter] = NULL;
+	}
+	if (showing_any_chameleon) {
+		*showing_any_chameleon = FALSE;
+	}
+	
+	// include main vehicle first
+	if (main_veh && VEH_ICON(main_veh) && (!skip_chameleon || !VEH_IS_COMPLETE(main_veh) || !VEH_FLAGGED(main_veh, VEH_CHAMELEON))) {
+		whole = VEH_ICON(main_veh);
+		
+		if (showing_any_chameleon && VEH_FLAGGED(main_veh, VEH_CHAMELEON)) {
+			*showing_any_chameleon = TRUE;
+		}
+	}
+	if (main_veh && VEH_HALF_ICON(main_veh) && (!skip_chameleon || !VEH_IS_COMPLETE(main_veh) || !VEH_FLAGGED(main_veh, VEH_CHAMELEON))) {
+		half[half_size++] = VEH_HALF_ICON(main_veh);
+		
+		if (showing_any_chameleon && VEH_FLAGGED(main_veh, VEH_CHAMELEON)) {
+			*showing_any_chameleon = TRUE;
+		}
+	}
+	if (main_veh && VEH_QUARTER_ICON(main_veh) && (!skip_chameleon || !VEH_IS_COMPLETE(main_veh) || !VEH_FLAGGED(main_veh, VEH_CHAMELEON))) {
+		quarter[quarter_size++] = VEH_QUARTER_ICON(main_veh);
+		
+		if (showing_any_chameleon && VEH_FLAGGED(main_veh, VEH_CHAMELEON)) {
+			*showing_any_chameleon = TRUE;
+		}
+	}
+	
+	// next find more vehicles
+	DL_FOREACH2(ROOM_VEHICLES(room), veh, next_in_room) {
+		if (half_size >= 2 && quarter_size >= 4) {
+			break;	// no room remains
+		}
+		if (veh == main_veh) {
+			continue;	// already shown
+		}
+		if (skip_chameleon && VEH_IS_COMPLETE(veh) && VEH_FLAGGED(veh, VEH_CHAMELEON)) {
+			continue;
+		}
+		if (vehicle_is_chameleon(veh, IN_ROOM(ch))) {
+			continue;	// hidden
+		}
+		
+		// ok to show it: grab pointers to the icons
+		if (VEH_ICON(veh) && !whole) {
+			whole = VEH_ICON(veh);
+			
+			if (showing_any_chameleon && VEH_IS_COMPLETE(veh) && VEH_FLAGGED(veh, VEH_CHAMELEON)) {
+				*showing_any_chameleon = TRUE;
+			}
+		}
+		if (VEH_HALF_ICON(veh) && half_size < 2) {
+			half[half_size++] = VEH_HALF_ICON(veh);
+			
+			if (showing_any_chameleon && VEH_IS_COMPLETE(veh) && VEH_FLAGGED(veh, VEH_CHAMELEON)) {
+				*showing_any_chameleon = TRUE;
+			}
+		}
+		if (VEH_QUARTER_ICON(veh) && quarter_size < 2) {
+			quarter[quarter_size++] = VEH_QUARTER_ICON(veh);
+			
+			if (showing_any_chameleon && VEH_IS_COMPLETE(veh) && VEH_FLAGGED(veh, VEH_CHAMELEON)) {
+				*showing_any_chameleon = TRUE;
+			}
+		}
+	}
+	
+	// check building icon itself if space is left
+	// TODO should the building be FIRST in some cases?
+	if (GET_BUILDING(room) && (!skip_chameleon || !ROOM_AFF_FLAGGED(room, ROOM_AFF_CHAMELEON)) && !CHECK_CHAMELEON(IN_ROOM(ch), room)) {
+		if (!whole) {
+			whole = GET_BLD_ICON(GET_BUILDING(room));
+			
+			if (showing_any_chameleon && ROOM_AFF_FLAGGED(room, ROOM_AFF_CHAMELEON)) {
+				*showing_any_chameleon = TRUE;
+			}
+		}
+		if (GET_BLD_HALF_ICON(GET_BUILDING(room)) && half_size < 2) {
+			half[half_size++] = GET_BLD_HALF_ICON(GET_BUILDING(room));
+			
+			if (showing_any_chameleon && ROOM_AFF_FLAGGED(room, ROOM_AFF_CHAMELEON)) {
+				*showing_any_chameleon = TRUE;
+			}
+		}
+		if (GET_BLD_QUARTER_ICON(GET_BUILDING(room)) && quarter_size < 2) {
+			quarter[quarter_size++] = GET_BLD_QUARTER_ICON(GET_BUILDING(room));
+			
+			if (showing_any_chameleon && ROOM_AFF_FLAGGED(room, ROOM_AFF_CHAMELEON)) {
+				*showing_any_chameleon = TRUE;
+			}
+		}
+	}
+	
+	// ok, build string: how many did we find to show
+	if (quarter_size > 2 || (quarter_size >= 2 && half_size == 0)) {
+		// show quarter
+		if (quarter_size == 4) {
+			sprintf(outbuf, "%s%s%s%s", quarter[0], quarter[1], quarter[2], quarter[3]);
+		}
+		else if (quarter_size == 3) {
+			// procedurally choose a spot for the gap
+			x = X_COORD(room);
+			x = MAX(0, x);
+			for (iter = 0; iter < 4; ++iter) {
+				if (iter < (x % 4)) {
+					strcat(outbuf, quarter[iter]);
+				}
+				else if (iter == (x % 4)) {
+					strcat(outbuf, "@.");
+				}
+				else {
+					strcat(outbuf, quarter[iter-1]);
+				}
+			}
+		}
+		else if (quarter_size == 2) {
+			sprintf(outbuf, "%s@.%s@.", quarter[0], quarter[1]);
+		}
+	}
+	else if (half_size == 2) {
+		// show 2 half icons
+		sprintf(outbuf, "%s%s", half[0], half[1]);
+	}
+	else if (half_size == 1 && (!main_veh || !VEH_ICON(main_veh))) {
+		// show 1 half icon for some reason
+		sprintf(outbuf, "@.%s@.", half[0]);
+	}
+	else if (main_veh && VEH_ICON(main_veh)) {
+		// show 1 full icon
+		strcpy(outbuf, VEH_ICON(main_veh));
+	}
+	else {
+		// this should not happen but we will return a 4-char icon anyway
+		tileset = GET_SEASON(room);
+		build_map_icon(ch, room, get_icon_from_set(GET_SECT_ICONS(BASE_SECT(room)), tileset), (ROOM_SECT_FLAGGED(room, SECTF_CROP) && ROOM_CROP(room)) ? get_icon_from_set(GET_CROP_ICONS(ROOM_CROP(room)), tileset) : NULL, tileset, outbuf, icon_color);
+	}
+}
+
+
+/**
 * Does a normal "look" at a room.
 *
 * @param char_data *ch The person doing the looking.
@@ -1949,7 +2113,7 @@ static void show_map_to_char(char_data *ch, struct mappc_data_container *mappc, 
 	int iter;
 	int tileset = GET_SEASON(to_room);
 	struct icon_data *base_icon, *crop_icon = NULL;
-	bool junk, painted, veh_is_shown = FALSE, person_is_shown = FALSE;
+	bool junk, painted, veh_is_shown = FALSE, person_is_shown = FALSE, chameleon_vehicle = FALSE;
 	char *base_color, *str;
 	vehicle_data *show_veh = NULL;
 	
@@ -1982,8 +2146,9 @@ static void show_map_to_char(char_data *ch, struct mappc_data_container *mappc, 
 	}
 	
 	// check for a vehicle with an icon: we do this even if it won't be displayed later (because it may be stored as the tile icon)
-	if (show_veh && VEH_ICON(show_veh)) {
-		strcpy(veh_icon, VEH_ICON(show_veh));
+	if (show_veh && VEH_HAS_ANY_ICON(show_veh)) {
+		// strcpy(veh_icon, VEH_ICON(show_veh));
+		build_vehicle_icon(ch, to_room, show_veh, FALSE, veh_icon, &chameleon_vehicle);
 	}
 	
 	// determine if we need to build a map icon:
@@ -2144,7 +2309,12 @@ static void show_map_to_char(char_data *ch, struct mappc_data_container *mappc, 
 	
 	// record uncolored version as memory
 	if (has_player_tech(ch, PTECH_MAP_MEMORY)) {
-		if (show_veh && VEH_FLAGGED(show_veh, VEH_BUILDING) && !VEH_FLAGGED(show_veh, VEH_CHAMELEON)) {
+		if (show_veh && VEH_FLAGGED(show_veh, VEH_BUILDING)) {
+			if (chameleon_vehicle) {
+				// rebuild without chameleon:
+				build_vehicle_icon(ch, to_room, show_veh, TRUE, veh_icon, NULL);
+			}
+			
 			// memorize building-vehicle icon
 			replace_icon_codes(ch, to_room, veh_icon, tileset);
 			add_player_map_memory(ch, GET_ROOM_VNUM(to_room), veh_icon, NULL, 0);

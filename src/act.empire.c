@@ -3431,7 +3431,7 @@ void scan_for_tile(char_data *ch, char *argument, int max_dist, bitvector_t only
 				vsize = 0;
 				if (!ROOM_IS_CLOSED(room)) {
 					DL_FOREACH2(ROOM_VEHICLES(room), veh, next_in_room) {
-						if (!VEH_ICON(veh)) {
+						if (!VEH_HAS_ANY_ICON(veh)) {
 							continue;	// no icon = no scan
 						}
 						if (!VEH_IS_COMPLETE(veh) && VEH_SIZE(veh) < 1) {

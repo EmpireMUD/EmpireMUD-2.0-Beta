@@ -265,6 +265,7 @@
 #define GET_BLD_VNUM(bld)  ((bld)->vnum)
 #define GET_BLD_NAME(bld)  ((bld)->name)
 #define GET_BLD_TITLE(bld)  ((bld)->title)
+#define GET_BLD_HALF_ICON(bld)  ((bld)->half_icon)
 #define GET_BLD_ICON(bld)  ((bld)->icon)
 #define GET_BLD_COMMANDS(bld)  ((bld)->commands)
 #define GET_BLD_DESC(bld)  ((bld)->description)
@@ -284,6 +285,7 @@
 #define GET_BLD_SCRIPTS(bld)  ((bld)->proto_script)
 #define GET_BLD_SPAWNS(bld)  ((bld)->spawns)
 #define GET_BLD_INTERACTIONS(bld)  ((bld)->interactions)
+#define GET_BLD_QUARTER_ICON(bld)  ((bld)->quarter_icon)
 #define GET_BLD_QUEST_LOOKUPS(bld)  ((bld)->quest_lookups)
 #define GET_BLD_SHOP_LOOKUPS(bld)  ((bld)->shop_lookups)
 #define GET_BLD_TEMPERATURE_TYPE(bld)  ((bld)->temperature_type)
@@ -1742,6 +1744,7 @@ static inline int GET_SEASON(room_data *room) {
 #define VEH_DRIVER(veh)  ((veh)->driver)
 #define VEH_EXTRA_DATA(veh)  ((veh)->extra_data)
 #define VEH_FLAGS(veh)  ((veh)->flags)
+#define VEH_HALF_ICON(veh)  ((veh)->half_icon)
 #define VEH_HEALTH(veh)  ((veh)->health)
 #define VEH_ICON(veh)  ((veh)->icon)
 #define VEH_IDNUM(veh)  ((veh)->idnum)
@@ -1756,6 +1759,7 @@ static inline int GET_SEASON(room_data *room) {
 #define VEH_LOOK_DESC(veh)  ((veh)->look_desc)
 #define VEH_NEEDS_RESOURCES(veh)  ((veh)->needs_resources)
 #define VEH_OWNER(veh)  ((veh)->owner)
+#define VEH_QUARTER_ICON(veh)  ((veh)->quarter_icon)
 #define VEH_QUEST_LOOKUPS(veh)  ((veh)->quest_lookups)
 #define VEH_ROOM_AFFECTS(veh)  ((veh)->room_affects)
 #define VEH_ROOM_LIST(veh)  ((veh)->room_list)
@@ -1795,8 +1799,9 @@ static inline int GET_SEASON(room_data *room) {
 // helpers
 #define IN_OR_ON(veh)		(VEH_FLAGGED((veh), VEH_IN) ? "in" : "on")
 #define VEH_CLAIMS_WITH_ROOM(veh)  (VEH_FLAGGED((veh), VEH_BUILDING) && !VEH_FLAGGED((veh), MOVABLE_VEH_FLAGS | VEH_NO_CLAIM))
+#define VEH_HAS_ANY_ICON(veh)  (VEH_ICON(veh) || VEH_HALF_ICON(veh) || VEH_QUARTER_ICON(veh))
 #define VEH_IS_EXTRACTED(veh)  VEH_FLAGGED((veh), VEH_EXTRACTED)
-#define VEH_IS_VISIBLE_ON_MAPOUT(veh)  (VEH_FLAGGED((veh), VEH_BUILDING) && VEH_ICON(veh) && VEH_SIZE(veh) > 0 && !VEH_FLAGGED((veh), VEH_CHAMELEON))
+#define VEH_IS_VISIBLE_ON_MAPOUT(veh)  (VEH_FLAGGED((veh), VEH_BUILDING) && VEH_HAS_ANY_ICON(veh) && VEH_SIZE(veh) > 0 && !VEH_FLAGGED((veh), VEH_CHAMELEON))
 #define VEH_FLAGGED(veh, flag)  IS_SET(VEH_FLAGS(veh), (flag))
 #define VEH_HAS_MINOR_DISREPAIR(veh)  (VEH_HEALTH(veh) < VEH_MAX_HEALTH(veh) && (VEH_HEALTH(veh) <= (VEH_MAX_HEALTH(veh) * config_get_int("disrepair_minor") / 100)))
 #define VEH_HAS_MAJOR_DISREPAIR(veh)  (VEH_HEALTH(veh) < VEH_MAX_HEALTH(veh) && (VEH_HEALTH(veh) <= (VEH_MAX_HEALTH(veh) * config_get_int("disrepair_major") / 100)))
@@ -2483,7 +2488,7 @@ void finish_morphing(char_data *ch, morph_data *morph);
 bool morph_affinity_ok(room_data *location, morph_data *morph);
 
 // olc.c
-bool validate_icon(char *icon);
+bool validate_icon(char *icon, int width);
 
 // olc.attack.c
 bool match_attack_type(any_vnum type, any_vnum match_to);

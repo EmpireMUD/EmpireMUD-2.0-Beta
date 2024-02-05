@@ -633,6 +633,12 @@ void free_building(bld_data *bdg) {
 	if (GET_BLD_ICON(bdg) && (!proto || GET_BLD_ICON(bdg) != GET_BLD_ICON(proto))) {
 		free(GET_BLD_ICON(bdg));
 	}
+	if (GET_BLD_HALF_ICON(bdg) && (!proto || GET_BLD_HALF_ICON(bdg) != GET_BLD_HALF_ICON(proto))) {
+		free(GET_BLD_HALF_ICON(bdg));
+	}
+	if (GET_BLD_QUARTER_ICON(bdg) && (!proto || GET_BLD_QUARTER_ICON(bdg) != GET_BLD_QUARTER_ICON(proto))) {
+		free(GET_BLD_QUARTER_ICON(bdg));
+	}
 	if (GET_BLD_COMMANDS(bdg) && (!proto || GET_BLD_COMMANDS(bdg) != GET_BLD_COMMANDS(proto))) {
 		free(GET_BLD_COMMANDS(bdg));
 	}
@@ -753,6 +759,30 @@ void parse_building(FILE *fl, bld_vnum vnum) {
 				}
 				
 				GET_BLD_BASE_AFFECTS(bld) = asciiflag_conv(line);
+				break;
+			}
+			
+			case 'B': {	// extra strings (or extra data
+				switch (*(line+1)) {
+					case '0': {	// B0: half icon
+						if (GET_BLD_HALF_ICON(bld)) {
+							free(GET_BLD_HALF_ICON(bld));
+						}
+						GET_BLD_HALF_ICON(bld) = fread_string(fl, buf2);
+						break;
+					}
+					case '1': {	// B1: quarter icon
+						if (GET_BLD_QUARTER_ICON(bld)) {
+							free(GET_BLD_QUARTER_ICON(bld));
+						}
+						GET_BLD_QUARTER_ICON(bld) = fread_string(fl, buf2);
+						break;
+					}
+					default: {
+						log("SYSERR: Unknown B line in %s: %s", buf2, line);
+						exit(1);
+					}
+				}
 				break;
 			}
 			
@@ -918,6 +948,14 @@ void write_building_to_file(FILE *fl, bld_data *bld) {
 	if (GET_BLD_BASE_AFFECTS(bld) != NOBITS) {
 		fprintf(fl, "A\n");
 		fprintf(fl, "%s\n", bitv_to_alpha(GET_BLD_BASE_AFFECTS(bld)));
+	}
+	
+	// B: extra strings
+	if (GET_BLD_HALF_ICON(bld) && *GET_BLD_HALF_ICON(bld)) {
+		fprintf(fl, "B0\n%s~\n", GET_BLD_HALF_ICON(bld));
+	}
+	if (GET_BLD_QUARTER_ICON(bld) && *GET_BLD_QUARTER_ICON(bld)) {
+		fprintf(fl, "B1\n%s~\n", GET_BLD_QUARTER_ICON(bld));
 	}
 	
 	// C: commands list

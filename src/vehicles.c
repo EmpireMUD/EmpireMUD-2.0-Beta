@@ -692,7 +692,7 @@ vehicle_data *find_vehicle_to_show(char_data *ch, room_data *room, int *total_ve
 	}
 	
 	DL_FOREACH2(ROOM_VEHICLES(room), iter, next_in_room) {
-		if (!VEH_ICON(iter) || !*VEH_ICON(iter)) {
+		if ((!VEH_ICON(iter) || !*VEH_ICON(iter)) && (!VEH_HALF_ICON(iter) || !*VEH_HALF_ICON(iter)) && (!VEH_QUARTER_ICON(iter) || !*VEH_QUARTER_ICON(iter))) {
 			continue;	// no icon
 		}
 		if (!VEH_IS_COMPLETE(iter) && VEH_SIZE(iter) < 1) {
@@ -1016,6 +1016,24 @@ void scale_vehicle_to_level(vehicle_data *veh, int level) {
 
 
 /**
+* Updates the vehicle's half icon. It does no validation, so you must
+* pre-validate the text as 2 visible characters wide.
+*
+* @param vehicle_data *veh The vehicle to change.
+* @param const char *str The new half icon (will be copied). Or, NULL to set it back to the prototype.
+*/
+void set_vehicle_half_icon(vehicle_data *veh, const char *str) {
+	vehicle_data *proto = vehicle_proto(VEH_VNUM(veh));
+	
+	if (VEH_HALF_ICON(veh) && (!proto || VEH_HALF_ICON(veh) != VEH_HALF_ICON(proto))) {
+		free(VEH_HALF_ICON(veh));
+	}
+	VEH_HALF_ICON(veh) = (str ? str_dup(str) : (proto ? VEH_HALF_ICON(proto) : NULL));
+	request_vehicle_save_in_world(veh);
+}
+
+
+/**
 * Updates the vehicle's icon. It does no validation, so you must
 * pre-validate the text as 4 visible characters wide.
 *
@@ -1154,6 +1172,24 @@ void set_vehicle_look_desc_append(vehicle_data *veh, const char *str, bool forma
 		
 		request_vehicle_save_in_world(veh);
 	}
+}
+
+
+/**
+* Updates the vehicle's quarter icon. It does no validation, so you must
+* pre-validate the text as 2 visible characters wide.
+*
+* @param vehicle_data *veh The vehicle to change.
+* @param const char *str The new quarter icon (will be copied). Or, NULL to set it back to the prototype.
+*/
+void set_vehicle_quarter_icon(vehicle_data *veh, const char *str) {
+	vehicle_data *proto = vehicle_proto(VEH_VNUM(veh));
+	
+	if (VEH_QUARTER_ICON(veh) && (!proto || VEH_QUARTER_ICON(veh) != VEH_QUARTER_ICON(proto))) {
+		free(VEH_QUARTER_ICON(veh));
+	}
+	VEH_QUARTER_ICON(veh) = (str ? str_dup(str) : (proto ? VEH_QUARTER_ICON(proto) : NULL));
+	request_vehicle_save_in_world(veh);
 }
 
 
@@ -1706,8 +1742,16 @@ bool audit_vehicle(vehicle_data *veh, char_data *ch) {
 		problem = TRUE;
 	}
 	
-	if (VEH_ICON(veh) && !validate_icon(VEH_ICON(veh))) {
+	if (VEH_ICON(veh) && !validate_icon(VEH_ICON(veh), 4)) {
 		olc_audit_msg(ch, VEH_VNUM(veh), "Bad icon set");
+		problem = TRUE;
+	}
+	if (VEH_HALF_ICON(veh) && !validate_icon(VEH_HALF_ICON(veh), 2)) {
+		olc_audit_msg(ch, VEH_VNUM(veh), "Bad half icon set");
+		problem = TRUE;
+	}
+	if (VEH_QUARTER_ICON(veh) && !validate_icon(VEH_QUARTER_ICON(veh), 1)) {
+		olc_audit_msg(ch, VEH_VNUM(veh), "Bad quarter icon set");
 		problem = TRUE;
 	}
 	
@@ -2430,8 +2474,14 @@ void store_one_vehicle_to_file(vehicle_data *veh, FILE *fl) {
 		strip_crlf(temp);
 		fprintf(fl, "Look-desc:\n%s~\n", temp);
 	}
-	if (!proto || VEH_ICON(veh) != VEH_ICON(proto)) {
+	if (VEH_ICON(veh) && (!proto || VEH_ICON(veh) != VEH_ICON(proto))) {
 		fprintf(fl, "Icon:\n%s~\n", NULLSAFE(VEH_ICON(veh)));
+	}
+	if (VEH_HALF_ICON(veh) && (!proto || VEH_HALF_ICON(veh) != VEH_HALF_ICON(proto))) {
+		fprintf(fl, "Icon-2:\n%s~\n", NULLSAFE(VEH_HALF_ICON(veh)));
+	}
+	if (VEH_QUARTER_ICON(veh) && (!proto || VEH_QUARTER_ICON(veh) != VEH_QUARTER_ICON(proto))) {
+		fprintf(fl, "Icon-1:\n%s~\n", NULLSAFE(VEH_QUARTER_ICON(veh)));
 	}
 
 	if (VEH_OWNER(veh)) {
@@ -2795,6 +2845,18 @@ vehicle_data *unstore_vehicle_from_file(FILE *fl, any_vnum vnum, char *error_str
 					}
 					VEH_ICON(veh) = fread_string(fl, error);
 				}
+				else if (!strn_cmp(line, "Icon-1:", 7)) {	// quarter icon
+					if (VEH_QUARTER_ICON(veh) && (!proto || VEH_QUARTER_ICON(veh) != VEH_QUARTER_ICON(proto))) {
+						free(VEH_QUARTER_ICON(veh));
+					}
+					VEH_QUARTER_ICON(veh) = fread_string(fl, error);
+				}
+				else if (!strn_cmp(line, "Icon-2:", 7)) {	// half icon
+					if (VEH_HALF_ICON(veh) && (!proto || VEH_HALF_ICON(veh) != VEH_HALF_ICON(proto))) {
+						free(VEH_HALF_ICON(veh));
+					}
+					VEH_HALF_ICON(veh) = fread_string(fl, error);
+				}
 				else if (!strn_cmp(line, "Id: ", 4)) {
 					if (sscanf(line + 4, "%d", &i_in[0])) {
 						// did we already have an idnum? (usually due to being assigned a new one)
@@ -3080,6 +3142,12 @@ void free_vehicle(vehicle_data *veh) {
 	if (VEH_ICON(veh) && (!proto || VEH_ICON(veh) != VEH_ICON(proto))) {
 		free(VEH_ICON(veh));
 	}
+	if (VEH_HALF_ICON(veh) && (!proto || VEH_HALF_ICON(veh) != VEH_HALF_ICON(proto))) {
+		free(VEH_HALF_ICON(veh));
+	}
+	if (VEH_QUARTER_ICON(veh) && (!proto || VEH_QUARTER_ICON(veh) != VEH_QUARTER_ICON(proto))) {
+		free(VEH_QUARTER_ICON(veh));
+	}
 	
 	// pointers
 	if (VEH_NEEDS_RESOURCES(veh)) {
@@ -3246,6 +3314,29 @@ void parse_vehicle(FILE *fl, any_vnum vnum) {
 			exit(1);
 		}
 		switch (*line) {
+			case 'B': {	// extra strings (or extra data
+				switch (*(line+1)) {
+					case '0': {	// B0: half icon
+						if (VEH_HALF_ICON(veh)) {
+							free(VEH_HALF_ICON(veh));
+						}
+						VEH_HALF_ICON(veh) = fread_string(fl, error);
+						break;
+					}
+					case '1': {	// B1: quarter icon
+						if (VEH_QUARTER_ICON(veh)) {
+							free(VEH_QUARTER_ICON(veh));
+						}
+						VEH_QUARTER_ICON(veh) = fread_string(fl, error);
+						break;
+					}
+					default: {
+						log("SYSERR: Unknown B line in %s: %s", error, line);
+						exit(1);
+					}
+				}
+				break;
+			}
 			case 'C': {	// scalable
 				if (!get_line(fl, line) || sscanf(line, "%d %d", &int_in[0], &int_in[1]) != 2) {
 					log("SYSERR: Format error in C line of %s", error);
@@ -3414,6 +3505,14 @@ void write_vehicle_to_file(FILE *fl, vehicle_data *veh) {
 	strcpy(temp2, bitv_to_alpha(VEH_FUNCTIONS(veh)));
 	strcpy(temp3, bitv_to_alpha(VEH_ROOM_AFFECTS(veh)));
 	fprintf(fl, "%s %d %d %d %d %s %d %d %d %s %d %d\n", temp, VEH_MOVE_TYPE(veh), VEH_MAX_HEALTH(veh), VEH_CAPACITY(veh), VEH_ANIMALS_REQUIRED(veh), temp2, VEH_FAME(veh), VEH_MILITARY(veh), VEH_SIZE(veh), temp3, VEH_ARTISAN(veh), VEH_CITIZENS(veh));
+	
+	// B#: extra strings
+	if (VEH_HALF_ICON(veh) && *VEH_HALF_ICON(veh)) {
+		fprintf(fl, "B0\n%s~\n", VEH_HALF_ICON(veh));
+	}
+	if (VEH_QUARTER_ICON(veh) && *VEH_QUARTER_ICON(veh)) {
+		fprintf(fl, "B1\n%s~\n", VEH_QUARTER_ICON(veh));
+	}
 	
 	// C: scaling
 	if (VEH_MIN_SCALE_LEVEL(veh) > 0 || VEH_MAX_SCALE_LEVEL(veh) > 0) {
@@ -3790,7 +3889,7 @@ void olc_fullsearch_vehicle(char_data *ch, char *argument) {
 	int count;
 	bool found_one;
 	
-	char only_icon[MAX_INPUT_LENGTH];
+	char only_icon[MAX_INPUT_LENGTH], only_half_icon[MAX_INPUT_LENGTH], only_quarter_icon[MAX_INPUT_LENGTH];
 	bitvector_t only_designate = NOBITS, only_flags = NOBITS, only_functions = NOBITS, only_affs = NOBITS;
 	bitvector_t find_interacts = NOBITS, not_flagged = NOBITS, found_interacts = NOBITS, find_custom = NOBITS, found_custom = NOBITS;
 	int only_animals = NOTHING, only_cap = NOTHING, cap_over = NOTHING, cap_under = NOTHING;
@@ -3809,6 +3908,8 @@ void olc_fullsearch_vehicle(char_data *ch, char *argument) {
 	size_t size;
 	
 	*only_icon = '\0';
+	*only_half_icon = '\0';
+	*only_quarter_icon = '\0';
 	
 	if (!*argument) {
 		msg_to_char(ch, "See HELP VEDIT FULLSEARCH for syntax.\r\n");
@@ -3845,6 +3946,8 @@ void olc_fullsearch_vehicle(char_data *ch, char *argument) {
 		FULLSEARCH_FLAGS("unflagged", not_flagged, vehicle_flags)
 		FULLSEARCH_FLAGS("functions", only_functions, function_flags)
 		FULLSEARCH_STRING("icon", only_icon)
+		FULLSEARCH_STRING("halficon", only_half_icon)
+		FULLSEARCH_STRING("quartericon", only_quarter_icon)
 		FULLSEARCH_FLAGS("interaction", find_interacts, interact_types)
 		FULLSEARCH_INT("height", only_height, 0, INT_MAX)
 		FULLSEARCH_INT("heightover", height_over, 0, INT_MAX)
@@ -3946,6 +4049,18 @@ void olc_fullsearch_vehicle(char_data *ch, char *argument) {
 			continue;
 		}
 		if (*only_icon && str_cmp(only_icon, "any") && !strstr(only_icon, VEH_ICON(veh)) && !strstr(only_icon, strip_color(VEH_ICON(veh)))) {
+			continue;
+		}
+		if (*only_half_icon && !VEH_HALF_ICON(veh)) {
+			continue;
+		}
+		if (*only_half_icon && str_cmp(only_half_icon, "any") && !strstr(only_half_icon, VEH_HALF_ICON(veh)) && !strstr(only_half_icon, strip_color(VEH_HALF_ICON(veh)))) {
+			continue;
+		}
+		if (*only_quarter_icon && !VEH_QUARTER_ICON(veh)) {
+			continue;
+		}
+		if (*only_quarter_icon && str_cmp(only_quarter_icon, "any") && !strstr(only_quarter_icon, VEH_QUARTER_ICON(veh)) && !strstr(only_quarter_icon, strip_color(VEH_QUARTER_ICON(veh)))) {
 			continue;
 		}
 		if (find_interacts) {	// look up its interactions
@@ -4090,6 +4205,14 @@ void save_olc_vehicle(descriptor_data *desc) {
 		free(VEH_ICON(veh));
 		VEH_ICON(veh) = NULL;
 	}
+	if (VEH_HALF_ICON(veh) && !*VEH_HALF_ICON(veh)) {
+		free(VEH_HALF_ICON(veh));
+		VEH_HALF_ICON(veh) = NULL;
+	}
+	if (VEH_QUARTER_ICON(veh) && !*VEH_QUARTER_ICON(veh)) {
+		free(VEH_QUARTER_ICON(veh));
+		VEH_QUARTER_ICON(veh) = NULL;
+	}
 	VEH_HEALTH(veh) = VEH_MAX_HEALTH(veh);
 	prune_extra_descs(&VEH_EX_DESCS(veh));
 	
@@ -4120,6 +4243,12 @@ void save_olc_vehicle(descriptor_data *desc) {
 		}
 		if (VEH_ICON(iter) == VEH_ICON(proto)) {
 			VEH_ICON(iter) = VEH_ICON(veh);
+		}
+		if (VEH_HALF_ICON(iter) == VEH_HALF_ICON(proto)) {
+			VEH_HALF_ICON(iter) = VEH_HALF_ICON(veh);
+		}
+		if (VEH_QUARTER_ICON(iter) == VEH_QUARTER_ICON(proto)) {
+			VEH_QUARTER_ICON(iter) = VEH_QUARTER_ICON(veh);
 		}
 		if (VEH_LONG_DESC(iter) == VEH_LONG_DESC(proto)) {
 			VEH_LONG_DESC(iter) = VEH_LONG_DESC(veh);
@@ -4161,6 +4290,12 @@ void save_olc_vehicle(descriptor_data *desc) {
 	}
 	if (VEH_ICON(proto)) {
 		free(VEH_ICON(proto));
+	}
+	if (VEH_HALF_ICON(proto)) {
+		free(VEH_HALF_ICON(proto));
+	}
+	if (VEH_QUARTER_ICON(proto)) {
+		free(VEH_QUARTER_ICON(proto));
 	}
 	if (VEH_LONG_DESC(proto)) {
 		free(VEH_LONG_DESC(proto));
@@ -4227,6 +4362,8 @@ vehicle_data *setup_olc_vehicle(vehicle_data *input) {
 		VEH_KEYWORDS(new) = VEH_KEYWORDS(input) ? str_dup(VEH_KEYWORDS(input)) : NULL;
 		VEH_SHORT_DESC(new) = VEH_SHORT_DESC(input) ? str_dup(VEH_SHORT_DESC(input)) : NULL;
 		VEH_ICON(new) = VEH_ICON(input) ? str_dup(VEH_ICON(input)) : NULL;
+		VEH_HALF_ICON(new) = VEH_HALF_ICON(input) ? str_dup(VEH_HALF_ICON(input)) : NULL;
+		VEH_QUARTER_ICON(new) = VEH_QUARTER_ICON(input) ? str_dup(VEH_QUARTER_ICON(input)) : NULL;
 		VEH_LONG_DESC(new) = VEH_LONG_DESC(input) ? str_dup(VEH_LONG_DESC(input)) : NULL;
 		VEH_LOOK_DESC(new) = VEH_LOOK_DESC(input) ? str_dup(VEH_LOOK_DESC(input)) : NULL;
 		
@@ -4300,8 +4437,21 @@ void do_stat_vehicle(char_data *ch, vehicle_data *veh) {
 		size += snprintf(buf + size, sizeof(buf) - size, "\t0\r\n");
 	}
 	
+	// icons:
 	if (VEH_ICON(veh)) {
-		size += snprintf(buf + size, sizeof(buf) - size, "Map Icon: %s\t0 %s\r\n", VEH_ICON(veh), show_color_codes(VEH_ICON(veh)));
+		replace_question_color(NULLSAFE(VEH_ICON(veh)), "&0", part);
+		size += snprintf(buf + size, sizeof(buf) - size, "Full Icon: %s\t0 %s", part, show_color_codes(VEH_ICON(veh)));
+	}
+	if (VEH_HALF_ICON(veh)) {
+		replace_question_color(NULLSAFE(VEH_HALF_ICON(veh)), "&0", part);
+		size += snprintf(buf + size, sizeof(buf) - size, "%sHalf Icon: %s\t0 %s", (VEH_ICON(veh) ? ", " : ""), part, show_color_codes(VEH_HALF_ICON(veh)));
+	}
+	if (VEH_QUARTER_ICON(veh)) {
+		replace_question_color(NULLSAFE(VEH_QUARTER_ICON(veh)), "&0", part);
+		size += snprintf(buf + size, sizeof(buf) - size, "%sQuarter Icon: %s\t0 %s", ((VEH_ICON(veh) || VEH_HALF_ICON(veh)) ? ", " : ""), part, show_color_codes(VEH_QUARTER_ICON(veh)));
+	}
+	if (VEH_ICON(veh) || VEH_HALF_ICON(veh) || VEH_QUARTER_ICON(veh)) {
+		size += snprintf(buf + size, sizeof(buf) - size, "\r\n");
 	}
 	
 	// stats lines
@@ -4539,7 +4689,7 @@ void olc_show_vehicle(char_data *ch) {
 	sprintf(buf + strlen(buf), "<%sshortdescription\t0> %s\r\n", OLC_LABEL_STR(VEH_SHORT_DESC(veh), default_vehicle_short_desc), NULLSAFE(VEH_SHORT_DESC(veh)));
 	sprintf(buf + strlen(buf), "<%slongdescription\t0>\r\n%s\r\n", OLC_LABEL_STR(VEH_LONG_DESC(veh), default_vehicle_long_desc), NULLSAFE(VEH_LONG_DESC(veh)));
 	sprintf(buf + strlen(buf), "<%slookdescription\t0>\r\n%s", OLC_LABEL_STR(VEH_LOOK_DESC(veh), ""), NULLSAFE(VEH_LOOK_DESC(veh)));
-	sprintf(buf + strlen(buf), "<%sicon\t0> %s\t0 %s\r\n", OLC_LABEL_STR(VEH_ICON(veh), ""), VEH_ICON(veh) ? VEH_ICON(veh) : "none", VEH_ICON(veh) ? show_color_codes(VEH_ICON(veh)) : "");
+	sprintf(buf + strlen(buf), "<%sicon\t0> %s\t0 %s, <%shalficon\t0> %s\t0 %s, <%squartericon\t0> %s\t0 %s\r\n", OLC_LABEL_STR(VEH_ICON(veh), ""), VEH_ICON(veh) ? VEH_ICON(veh) : "none", VEH_ICON(veh) ? show_color_codes(VEH_ICON(veh)) : "", OLC_LABEL_STR(VEH_HALF_ICON(veh), ""), VEH_HALF_ICON(veh) ? VEH_HALF_ICON(veh) : "none", VEH_HALF_ICON(veh) ? show_color_codes(VEH_HALF_ICON(veh)) : "", OLC_LABEL_STR(VEH_QUARTER_ICON(veh), ""), VEH_QUARTER_ICON(veh) ? VEH_QUARTER_ICON(veh) : "none", VEH_QUARTER_ICON(veh) ? show_color_codes(VEH_QUARTER_ICON(veh)) : "");
 	
 	sprintbit(VEH_FLAGS(veh), vehicle_flags, lbuf, TRUE);
 	sprintf(buf + strlen(buf), "<%sflags\t0> %s\r\n", OLC_LABEL_VAL(VEH_FLAGS(veh), NOBITS), lbuf);
@@ -4763,6 +4913,28 @@ OLC_MODULE(vedit_functions) {
 }
 
 
+OLC_MODULE(vedit_half_icon) {
+	vehicle_data *veh = GET_OLC_VEHICLE(ch->desc);
+	
+	delete_doubledollar(argument);
+	
+	if (!str_cmp(argument, "none")) {
+		if (VEH_HALF_ICON(veh)) {
+			free(VEH_HALF_ICON(veh));
+		}
+		VEH_HALF_ICON(veh) = NULL;
+		msg_to_char(ch, "The vehicle now has no half icon and will not appear on the map.\r\n");
+	}
+	else if (!validate_icon(argument, 2)) {
+		msg_to_char(ch, "You must specify a half icon that is 2 characters long, not counting color codes.\r\n");
+	}
+	else {
+		olc_process_string(ch, argument, "halficon", &VEH_HALF_ICON(veh));
+		msg_to_char(ch, "\t0");	// in case color is unterminated
+	}
+}
+
+
 OLC_MODULE(vedit_height) {
 	vehicle_data *veh = GET_OLC_VEHICLE(ch->desc);
 	VEH_HEIGHT(veh) = olc_process_number(ch, argument, "height", "height", -100, 100, VEH_HEIGHT(veh));
@@ -4787,7 +4959,7 @@ OLC_MODULE(vedit_icon) {
 		VEH_ICON(veh) = NULL;
 		msg_to_char(ch, "The vehicle now has no icon and will not appear on the map.\r\n");
 	}
-	else if (!validate_icon(argument)) {
+	else if (!validate_icon(argument, 4)) {
 		msg_to_char(ch, "You must specify an icon that is 4 characters long, not counting color codes.\r\n");
 	}
 	else {
@@ -4877,6 +5049,28 @@ OLC_MODULE(vedit_minlevel) {
 OLC_MODULE(vedit_movetype) {
 	vehicle_data *veh = GET_OLC_VEHICLE(ch->desc);
 	VEH_MOVE_TYPE(veh) = olc_process_type(ch, argument, "move type", "movetype", mob_move_types, VEH_MOVE_TYPE(veh));
+}
+
+
+OLC_MODULE(vedit_quarter_icon) {
+	vehicle_data *veh = GET_OLC_VEHICLE(ch->desc);
+	
+	delete_doubledollar(argument);
+	
+	if (!str_cmp(argument, "none")) {
+		if (VEH_QUARTER_ICON(veh)) {
+			free(VEH_QUARTER_ICON(veh));
+		}
+		VEH_QUARTER_ICON(veh) = NULL;
+		msg_to_char(ch, "The vehicle now has no quarter icon and will not appear on the map.\r\n");
+	}
+	else if (!validate_icon(argument, 1)) {
+		msg_to_char(ch, "You must specify a quarter icon that is 1 character long, not counting color codes.\r\n");
+	}
+	else {
+		olc_process_string(ch, argument, "quartericon", &VEH_QUARTER_ICON(veh));
+		msg_to_char(ch, "\t0");	// in case color is unterminated
+	}
 }
 
 

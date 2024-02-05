@@ -1353,7 +1353,7 @@ void script_modify(char *argument) {
 			script_log("%%mod%% called without value argument");
 		}
 		else if (is_abbrev(field_arg, "icon")) {
-			if (!clear && str_cmp(value, "none") && !validate_icon(value)) {
+			if (!clear && str_cmp(value, "none") && !validate_icon(value, 4)) {
 				script_log("%%mod%% called with invalid room icon '%s'", value);
 			}
 			else {
@@ -1411,12 +1411,28 @@ void script_modify(char *argument) {
 			// these all require a value
 			script_log("%%mod%% called without value argument");
 		}
+		else if (is_abbrev(field_arg, "halficon")) {
+			if (!clear && str_cmp(value, "none") && !validate_icon(value, 2)) {
+				script_log("%%mod%% called with invalid vehicle half icon '%s'", value);
+			}
+			else {
+				set_vehicle_half_icon(veh, (clear || !str_cmp(value, "none")) ? NULL : value);
+			}
+		}
 		else if (is_abbrev(field_arg, "icon")) {
-			if (!clear && str_cmp(value, "none") && !validate_icon(value)) {
+			if (!clear && str_cmp(value, "none") && !validate_icon(value, 4)) {
 				script_log("%%mod%% called with invalid vehicle icon '%s'", value);
 			}
 			else {
 				set_vehicle_icon(veh, (clear || !str_cmp(value, "none")) ? NULL : value);
+			}
+		}
+		else if (is_abbrev(field_arg, "quartericon")) {
+			if (!clear && str_cmp(value, "none") && !validate_icon(value, 2)) {
+				script_log("%%mod%% called with invalid vehicle quarter icon '%s'", value);
+			}
+			else {
+				set_vehicle_quarter_icon(veh, (clear || !str_cmp(value, "none")) ? NULL : value);
 			}
 		}
 		else if (is_abbrev(field_arg, "keywords")) {

@@ -4167,7 +4167,9 @@ struct bld_data {
 	
 	char *name;	// short name
 	char *title;	// shown on look
-	char *icon;	// map icon
+	char *icon;	// map icon, required unless ROOM flag present; 4 character visible width
+	char *half_icon;	// Optional: Half-tile icon (2 character visible width)
+	char *quarter_icon;	// Optional: Single-character icon (plus color codes)
 	char *commands;	// listed under the room desc/map
 	char *description;	// for non-map buildings
 	
@@ -6285,7 +6287,9 @@ struct vehicle_data {
 	char *short_desc;	// the sentence-building name ("a canoe")
 	char *long_desc;	// As described in the room.
 	char *look_desc;	// Description when looked at
-	char *icon;	// Optional: Shown on map if not null
+	char *icon;	// Optional: Shown on map if not null (4 character visible width)
+	char *half_icon;	// Optional: Half-tile icon (2 character visible width)
+	char *quarter_icon;	// Optional: Single-character icon (plus color codes)
 	
 	struct vehicle_attribute_data *attributes;	// non-instanced data
 	bitvector_t flags;	// VEH_ flags
