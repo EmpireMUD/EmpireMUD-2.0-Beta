@@ -1889,11 +1889,16 @@ You gain the 'unstuck' effect if you're inside a building and try to leave it,
 but the entrance is water and you have no ability to swim or fly. This short
 effect will get you past the water.
 #
-VEHICLE VEH
+VEHICLE VEHICLES VEH
 
 A vehicle (sometimes abbreviated "veh", especially in the code) is a type of
 "thing" that includes canoes, carts, ships, and even furniture. Vehicles can
-have many different properties -- some can be lead, dragged, boarded, or burnt.
+have many different properties -- some can be lead, dragged, or burnt. Identify
+a vehicle to see its details. For incomplete vehicles, looking at them shows
+which resources they still need.
+
+For ships and other large vehicles, use "board" and "disembark" to get in and
+out.
 
 Vehicles appear in the room when you look, colored &wgray&0, before objects and
 people.
@@ -1903,7 +1908,7 @@ like vehicles do. These are vehicle-style buildings, which sit on a map tile
 rather than replacing the tile.
 
 See also: BOARD, CUSTOMIZE, DESIGNATE, DISEMBARK, DRAG, DRIVE, HARNESS,
-LAND VEHICLES, LEAD, LIGHT, REPAIR, SCRAP, SHIPS, SIT
+LAND VEHICLES, LEAD, LIGHT, REPAIR, SCRAP, SHIPS, SIT, IDENTIFY
 #
 WATERWALK "WATER WALK" "WATER WALKING" "WALK ON WATER" "WALKING ON WATER" WATERWALKING
 
