@@ -1868,8 +1868,12 @@ A vehicle (sometimes abbreviated "veh", especially in the code) is a type of
 "thing" that includes canoes, carts, ships, and even furniture. Vehicles can
 have many different properties -- some can be lead, dragged, boarded, or burnt.
 
-Vehicles appear in the room when you look, colored &wgray&0, between objects and
+Vehicles appear in the room when you look, colored &wgray&0, before objects and
 people.
+
+Some buildings appear in gray in the list of things in your current location,
+like vehicles do. These are vehicle-style buildings, which sit on a map tile
+rather than replacing the tile.
 
 See also: BOARD, CUSTOMIZE, DESIGNATE, DISEMBARK, DRAG, DRIVE, HARNESS,
 LAND VEHICLES, LEAD, LIGHT, REPAIR, SCRAP, SHIPS, SIT
