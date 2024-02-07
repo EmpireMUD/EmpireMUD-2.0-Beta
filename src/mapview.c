@@ -555,22 +555,24 @@ char *get_room_name(room_data *room, bool color) {
 * @param char_data *ch The observing player.
 * @param room_data *room The room the character is looking at.
 * @param char *icon The incoming icon, which may be recolored.
+* @param int pos 0 is a building, 1 is the base tile.
+* @return char* The possibly-recolored icon.
 */
-char *partial_room_icon(char_data *ch, room_data *room, char *icon) {
-	static char storage[100];
+char *partial_room_icon(char_data *ch, room_data *room, char *icon, int pos) {
+	static char storage[2][100];
 	char temp[80];
 	
-	*storage = '\0';
+	*storage[pos] = '\0';
 	
 	if (PRF_FLAGGED(ch, PRF_POLITICAL)) {
 		strcpy(temp, strip_color(icon));
-		sprintf(storage, "%s%s", ROOM_OWNER(room) ? EMPIRE_BANNER(ROOM_OWNER(room)) : "&0", temp);
-		return storage;
+		sprintf(storage[pos], "%s%s", ROOM_OWNER(room) ? EMPIRE_BANNER(ROOM_OWNER(room)) : "&0", temp);
+		return storage[pos];
 	}
 	else if (PRF_FLAGGED(ch, PRF_INFORMATIVE)) {
 		strcpy(temp, strip_color(icon));
-		sprintf(storage, "%s%s", get_informative_color_room(ch, room), temp);
-		return storage;
+		sprintf(storage[pos], "%s%s", get_informative_color_room(ch, room), temp);
+		return storage[pos];
 	}
 	else {
 		// base icon -- just send it back
@@ -586,12 +588,12 @@ char *partial_room_icon(char_data *ch, room_data *room, char *icon) {
 * @param char_data *ch The observing player.
 * @param vehicle_data *veh The vehicle to show.
 * @param char *icon The incoming icon, which may be recolored.
-* @param int pos Which position the partial icon is in (0-4).
+* @param int pos Which position the partial icon is in (0-3 for quarters, 4 for whole, and 5-6 for halves).
 * @return char* The possibly-recolored icon.
 */
 char *partial_vehicle_icon(char_data *ch, vehicle_data *veh, char *icon, int pos) {
-	// storage for 4 icons so this can be called multiple times in 1 sprintf
-	static char storage[4][100];
+	// storage for multiple icons so this can be called multiple times in 1 sprintf
+	static char storage[7][100];
 	char temp[80];
 	
 	// init
@@ -1234,14 +1236,18 @@ void build_map_icon(char_data *ch, room_data *to_room, struct icon_data *base_ic
 * @param bool *showing_any_chameleon Optional: Pointer to a bool that will be set to TRUE if we showed any chameleon buildings.
 */
 void build_vehicle_icon(char_data *ch, room_data *room, vehicle_data *main_veh, bool skip_chameleon, char *outbuf, bool *showing_any_chameleon) {
-	bool chameleon_room;
-	char icon_color[256];
-	int iter, half_size, quarter_size, show_room, tileset;
-	vehicle_data *veh, *whole, *half[2], *quarter[4];
+	char icon_color[256], temp[60];
+	char *whole, *half[2], *quarter[4];
+	int iter, half_size, quarter_size, tileset, x;
+	vehicle_data *veh;
+	
+	// for partial vehicle icons:
+	const int WHOLE_ICON = 4;
+	const int HALF_1 = 5;
+	const int HALF_2 = 6;
+	// (quarters just use their own pos)
 	
 	// initialize
-	show_room = 0;	// this is set to 1 if able to show the room (used in math below)
-	chameleon_room = FALSE;
 	*outbuf = *icon_color = '\0';
 	whole = NULL;
 	half_size = quarter_size = 0;
@@ -1257,21 +1263,23 @@ void build_vehicle_icon(char_data *ch, room_data *room, vehicle_data *main_veh, 
 	
 	// include main vehicle first
 	if (main_veh && VEH_ICON(main_veh) && (!skip_chameleon || !VEH_IS_COMPLETE(main_veh) || !VEH_FLAGGED(main_veh, VEH_CHAMELEON))) {
-		whole = main_veh;
+		whole = partial_vehicle_icon(ch, main_veh, VEH_ICON(main_veh), WHOLE_ICON);
 		
 		if (showing_any_chameleon && VEH_FLAGGED(main_veh, VEH_CHAMELEON)) {
 			*showing_any_chameleon = TRUE;
 		}
 	}
 	if (main_veh && VEH_HALF_ICON(main_veh) && (!skip_chameleon || !VEH_IS_COMPLETE(main_veh) || !VEH_FLAGGED(main_veh, VEH_CHAMELEON))) {
-		half[half_size++] = main_veh;
+		half[half_size] = partial_vehicle_icon(ch, main_veh, VEH_HALF_ICON(main_veh), half_size == 0 ? HALF_1 : HALF_2);
+		++half_size;
 		
 		if (showing_any_chameleon && VEH_FLAGGED(main_veh, VEH_CHAMELEON)) {
 			*showing_any_chameleon = TRUE;
 		}
 	}
 	if (main_veh && VEH_QUARTER_ICON(main_veh) && (!skip_chameleon || !VEH_IS_COMPLETE(main_veh) || !VEH_FLAGGED(main_veh, VEH_CHAMELEON))) {
-		quarter[quarter_size++] = main_veh;
+		quarter[quarter_size] = partial_vehicle_icon(ch, main_veh, VEH_QUARTER_ICON(main_veh), quarter_size);
+		++quarter_size;
 		
 		if (showing_any_chameleon && VEH_FLAGGED(main_veh, VEH_CHAMELEON)) {
 			*showing_any_chameleon = TRUE;
@@ -1295,21 +1303,23 @@ void build_vehicle_icon(char_data *ch, room_data *room, vehicle_data *main_veh, 
 		
 		// ok to show it: grab pointers to the icons
 		if (VEH_ICON(veh) && !whole) {
-			whole = veh;
+			whole = partial_vehicle_icon(ch, veh, VEH_ICON(veh), WHOLE_ICON);
 			
 			if (showing_any_chameleon && VEH_IS_COMPLETE(veh) && VEH_FLAGGED(veh, VEH_CHAMELEON)) {
 				*showing_any_chameleon = TRUE;
 			}
 		}
 		if (VEH_HALF_ICON(veh) && half_size < 2) {
-			half[half_size++] = veh;
+			half[half_size] = partial_vehicle_icon(ch, veh, VEH_HALF_ICON(veh), half_size == 0 ? HALF_1 : HALF_2);
+			++half_size;
 			
 			if (showing_any_chameleon && VEH_IS_COMPLETE(veh) && VEH_FLAGGED(veh, VEH_CHAMELEON)) {
 				*showing_any_chameleon = TRUE;
 			}
 		}
 		if (VEH_QUARTER_ICON(veh) && quarter_size < 4) {
-			quarter[quarter_size++] = veh;
+			quarter[quarter_size] = partial_vehicle_icon(ch, veh, VEH_QUARTER_ICON(veh), quarter_size);
+			++quarter_size;
 			
 			if (showing_any_chameleon && VEH_IS_COMPLETE(veh) && VEH_FLAGGED(veh, VEH_CHAMELEON)) {
 				*showing_any_chameleon = TRUE;
@@ -1318,71 +1328,70 @@ void build_vehicle_icon(char_data *ch, room_data *room, vehicle_data *main_veh, 
 	}
 	
 	// check building icon itself if space is left
-	// TODO should the building be FIRST in some cases? might not matter -paul 2/7/2024
+	// TODO should the building be FIRST in some cases?
 	if (GET_BUILDING(room) && (!skip_chameleon || !ROOM_AFF_FLAGGED(room, ROOM_AFF_CHAMELEON)) && !CHECK_CHAMELEON(IN_ROOM(ch), room)) {
-		show_room = 1;	// used in math below
-		
-		if (ROOM_AFF_FLAGGED(room, ROOM_AFF_CHAMELEON)) {
-			chameleon_room = TRUE;
+		if (!whole) {
+			whole = partial_room_icon(ch, room, GET_BLD_ICON(GET_BUILDING(room)), 0);
+			
+			if (showing_any_chameleon && ROOM_AFF_FLAGGED(room, ROOM_AFF_CHAMELEON)) {
+				*showing_any_chameleon = TRUE;
+			}
+		}
+		if (GET_BLD_HALF_ICON(GET_BUILDING(room)) && half_size < 2) {
+			half[half_size++] = partial_room_icon(ch, room, GET_BLD_HALF_ICON(GET_BUILDING(room)), 0);
+			
+			if (showing_any_chameleon && ROOM_AFF_FLAGGED(room, ROOM_AFF_CHAMELEON)) {
+				*showing_any_chameleon = TRUE;
+			}
+		}
+		if (GET_BLD_QUARTER_ICON(GET_BUILDING(room)) && quarter_size < 4) {
+			quarter[quarter_size++] = partial_room_icon(ch, room, GET_BLD_QUARTER_ICON(GET_BUILDING(room)), 0);
+			
+			if (showing_any_chameleon && ROOM_AFF_FLAGGED(room, ROOM_AFF_CHAMELEON)) {
+				*showing_any_chameleon = TRUE;
+			}
 		}
 	}
 	
 	// ok, build string: how many did we find to show
-	if (quarter_size + show_room > 2 || (quarter_size + show_room >= 2 && half_size == 0)) {
+	if (quarter_size > 2 || (quarter_size >= 2 && half_size == 0)) {
 		// show quarter
 		if (quarter_size == 4) {
-			// all 4 are vehicles (not showing room)
-			sprintf(outbuf, "%s%s%s%s", partial_vehicle_icon(ch, veh, VEH_QUARTER_ICON(quarter[0]), 0), partial_vehicle_icon(ch, veh, VEH_QUARTER_ICON(quarter[1]), 1), partial_vehicle_icon(ch, veh, VEH_QUARTER_ICON(quarter[2]), 2), partial_vehicle_icon(ch, veh, VEH_QUARTER_ICON(quarter[3]), 3));
+			sprintf(outbuf, "%s%s%s%s", quarter[0], quarter[1], quarter[2], quarter[3]);
 		}
 		else if (quarter_size == 3) {
-			if (X_COORD(room) % 2) {
-				sprintf(outbuf, "%s%s%s%s", partial_vehicle_icon(ch, veh, VEH_QUARTER_ICON(quarter[0]), 0), partial_room_icon(ch, room, show_room ? GET_BLD_QUARTER_ICON(GET_BUILDING(room)) : "@."), partial_vehicle_icon(ch, veh, VEH_QUARTER_ICON(quarter[1]), 1), partial_vehicle_icon(ch, veh, VEH_QUARTER_ICON(quarter[2]), 2));
-			}
-			else {
-				sprintf(outbuf, "%s%s%s%s", partial_vehicle_icon(ch, veh, VEH_QUARTER_ICON(quarter[0]), 0), partial_vehicle_icon(ch, veh, VEH_QUARTER_ICON(quarter[1]), 1), partial_room_icon(ch, room, show_room ? GET_BLD_QUARTER_ICON(GET_BUILDING(room)) : "@."), partial_vehicle_icon(ch, veh, VEH_QUARTER_ICON(quarter[2]), 2));
-			}
-		}
-		else if (quarter_size == 2 && show_room) {
-			if (X_COORD(room) % 2) {
-				sprintf(outbuf, "%s%s@.%s", partial_vehicle_icon(ch, veh, VEH_QUARTER_ICON(quarter[0]), 0), partial_room_icon(ch, room, GET_BLD_QUARTER_ICON(GET_BUILDING(room))), partial_vehicle_icon(ch, veh, VEH_QUARTER_ICON(quarter[1]), 1));
-			}
-			else {
-				sprintf(outbuf, "%s@.%s%s", partial_vehicle_icon(ch, veh, VEH_QUARTER_ICON(quarter[0]), 0), partial_room_icon(ch, room, GET_BLD_QUARTER_ICON(GET_BUILDING(room))), partial_vehicle_icon(ch, veh, VEH_QUARTER_ICON(quarter[1]), 1));
+			// procedurally choose a spot for the gap
+			x = X_COORD(room);
+			x = MAX(0, x);
+			for (iter = 0; iter < 4; ++iter) {
+				if (iter < (x % 4)) {
+					strcat(outbuf, quarter[iter]);
+				}
+				else if (iter == (x % 4)) {
+					strcat(outbuf, partial_room_icon(ch, room, "@.", 1));
+				}
+				else {
+					strcat(outbuf, quarter[iter-1]);
+				}
 			}
 		}
 		else if (quarter_size == 2) {
-			sprintf(outbuf, "%s@.%s@.", VEH_QUARTER_ICON(quarter[0]), VEH_QUARTER_ICON(quarter[1]));
+			strcpy(temp, partial_room_icon(ch, room, "@.", 1));
+			sprintf(outbuf, "%s%s%s%s", quarter[0], temp, quarter[1], temp);
 		}
 	}
 	else if (half_size == 2) {
 		// show 2 half icons
-		sprintf(outbuf, "%s%s", VEH_HALF_ICON(half[0]), VEH_HALF_ICON(half[1]));
-	}
-	else if (half_size == 1 && show_room) {
-		if (X_COORD(room) % 2) {
-			sprintf(outbuf, "%s%s", VEH_HALF_ICON(half[0]), GET_BLD_HALF_ICON(GET_BUILDING(room)));
-		}
-		else {
-			sprintf(outbuf, "%s%s", GET_BLD_HALF_ICON(GET_BUILDING(room)), VEH_HALF_ICON(half[0]));
-		}
-		if (showing_any_chameleon && chameleon_room) {
-			*showing_any_chameleon = TRUE;
-		}
+		sprintf(outbuf, "%s%s", half[0], half[1]);
 	}
 	else if (half_size == 1 && !whole) {
 		// show 1 half icon for some reason
-		sprintf(outbuf, "@.%s@.", VEH_HALF_ICON(half[0]));
+		strcpy(temp, partial_room_icon(ch, room, "@.", 1));
+		sprintf(outbuf, "%s%s%s", temp, half[0], temp);
 	}
 	else if (whole) {
 		// show whole icon
-		strcpy(outbuf, VEH_ICON(whole));
-	}
-	else if (show_room) {
-		// show building instead (unlikely)
-		strcpy(outbuf, GET_BLD_ICON(GET_BUILDING(room)));
-		if (showing_any_chameleon && chameleon_room) {
-			*showing_any_chameleon = TRUE;
-		}
+		strcpy(outbuf, whole);
 	}
 	else {
 		// this should not happen but we will return a 4-char icon anyway
