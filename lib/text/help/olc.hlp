@@ -3818,10 +3818,10 @@ Room/vehicle interaction types:
  &cQUARRY&0 * - Things you can find by quarrying here.
  &cRUINS-TO-BLD&0 - What type of ruins building appears here when it's ruined.
    Only works on buildings, not vehicles. Quantity is ignored. Use #n in the
-   room title to indicate the name of the lost building.
+   room title to indicate the name of the lost building. See HELP RUINS LIST.
  &cRUINS-TO-VEH&0 - What type of ruins vehicle appears here when it's ruined.
    May use #n in the keywords and short/long desc to indicate the name of the
-   building/vehicle that was ruined. Quantity is ignored.
+   building/vehicle that was ruined. Quantity is ignored. See HELP RUINS LIST.
  &cPRODUCTION&0 * - Workforce will produce it (on a building or vehicle only).
    Production is 1 at a time; quantity is used as the depletion limit.
  &cSKILLED-LABOR&0 * - Workforce will produce it with Skilled Labor (bld/veh only).
@@ -10026,10 +10026,10 @@ Room/vehicle interaction types:
  &cQUARRY&0 * - Things you can find by quarrying here.
  &cRUINS-TO-BLD&0 - What type of ruins building appears here when it's ruined.
    Only works on buildings, not vehicles. Quantity is ignored. Use #n in the
-   room title to indicate the name of the lost building.
+   room title to indicate the name of the lost building. See HELP RUINS LIST.
  &cRUINS-TO-VEH&0 - What type of ruins vehicle appears here when it's ruined.
    May use #n in the keywords and short/long desc to indicate the name of the
-   building/vehicle that was ruined. Quantity is ignored.
+   building/vehicle that was ruined. Quantity is ignored. See HELP RUINS LIST.
  &cPRODUCTION&0 * - Workforce will produce it (on a building or vehicle only).
    Production is 1 at a time; quantity is used as the depletion limit.
  &cSKILLED-LABOR&0 * - Workforce will produce it with Skilled Labor (bld/veh only).
@@ -10313,6 +10313,34 @@ You can add resource actions using generics. Here are some common ones:
   1005 block water
 
 See also: BEDIT RESOURCE, CEDIT RESOURCES, VEDIT RESOURCE, OLC GENERICS
+#d
+RUIN RUINS "DECAYING RUINS" "RUINS BUILDING" "RUINS LIST" "RUIN LIST"
+
+List of available ruins for RUINS-TO-* interactions:
+
+Building types:
+ 5006 - open ruins
+ 5007 - closed ruins
+ 5010 - flooded ruins
+
+Vehicle types with no interior:
+ 5003 - size 1 open ruins
+ 5004 - size 2 open ruins
+ 5005 - size 3 open ruins
+ 5006 - size 4 open ruins
+
+Vehicle types with interiors:
+ 5002 - size 1 closed ruins
+ 5009 - size 2 closed ruins
+ 5008 - size 3 closed ruins
+ 5007 - size 4 closed ruins
+
+Other vehicle ruins:
+ 5010 - size 4 flooded ruins
+
+You can also create custom new ruins for buildings.
+
+There is also a mortal version of the ruins help file: HELP -m RUINS
 #d
 "SHIELD ITEM" "SHIELD OBJECT"
 
