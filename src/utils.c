@@ -1385,8 +1385,6 @@ bool emp_can_use_room(empire_data *emp, room_data *room, int mode) {
 * @return bool TRUE if emp can use veh, FALSE otherwise
 */
 bool emp_can_use_vehicle(empire_data *emp, vehicle_data *veh, int mode) {
-	room_data *interior = VEH_INTERIOR_HOME_ROOM(veh);	// if any
-	
 	if (mode == NOTHING) {
 		return TRUE;	// nothing asked, nothing checked
 	}
@@ -1398,12 +1396,8 @@ bool emp_can_use_vehicle(empire_data *emp, vehicle_data *veh, int mode) {
 	if (VEH_OWNER(veh) == emp) {
 		return TRUE;
 	}
-	// public + guests: use interior room to determine publicness
-	if (interior && ROOM_AFF_FLAGGED(interior, ROOM_AFF_PUBLIC) && mode == GUESTS_ALLOWED) {
-		return TRUE;
-	}
-	// no interior + guests: use the tile it's on, if the owner is the same as the vehicle
-	if (!interior && IN_ROOM(veh) && ROOM_OWNER(IN_ROOM(veh)) == VEH_OWNER(veh) && ROOM_AFF_FLAGGED(IN_ROOM(veh), ROOM_AFF_PUBLIC) && mode == GUESTS_ALLOWED) {
+	// public + guests:
+	if (VEH_IS_PUBLIC(veh) && (mode == GUESTS_ALLOWED || mode == MEMBERS_AND_ALLIES)) {
 		return TRUE;
 	}
 	// check allies
