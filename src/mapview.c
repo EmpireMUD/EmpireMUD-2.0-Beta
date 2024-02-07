@@ -569,17 +569,17 @@ char *partial_room_icon(char_data *ch, room_data *room, char *icon, int pos) {
 	
 	if (PRF_FLAGGED(ch, PRF_POLITICAL)) {
 		strcpy(temp, strip_color(icon));
-		if (!strcmp(temp, "@.")) {
-			sprintf(temp, "%c", GET_SECT_ROADSIDE_ICON(BASE_SECT(room)));
-		}
+//		if (!strcmp(temp, "@.")) {
+//			sprintf(temp, "%c", GET_SECT_ROADSIDE_ICON(BASE_SECT(room)));
+//		}
 		sprintf(storage[pos], "%s%s", ROOM_OWNER(room) ? EMPIRE_BANNER(ROOM_OWNER(room)) : "&0", temp);
 		return storage[pos];
 	}
 	else if (PRF_FLAGGED(ch, PRF_INFORMATIVE)) {
 		strcpy(temp, strip_color(icon));
-		if (!strcmp(temp, "@.")) {
-			sprintf(temp, "%c", GET_SECT_ROADSIDE_ICON(BASE_SECT(room)));
-		}
+//		if (!strcmp(temp, "@.")) {
+//			sprintf(temp, "%c", GET_SECT_ROADSIDE_ICON(BASE_SECT(room)));
+//		}
 		sprintf(storage[pos], "%s%s", get_informative_color_room(ch, room), temp);
 		return storage[pos];
 	}
