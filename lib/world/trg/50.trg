@@ -69,7 +69,8 @@ Ruins icons for vehicle-buildings~
 5 n 100
 ~
 * Random ruins icons
-if %self.vnum% == 5006
+set open_list 5003 5004 5005 5006
+if %open_list% ~= %self.vnum%
   * open-style ruins
   switch %random.7%
     case 1
