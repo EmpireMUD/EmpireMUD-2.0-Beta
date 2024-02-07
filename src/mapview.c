@@ -1262,7 +1262,7 @@ void build_vehicle_icon(char_data *ch, room_data *room, vehicle_data *main_veh, 
 		if (VEH_ICON(main_veh)) {
 			whole = partial_vehicle_icon(ch, main_veh, VEH_ICON(main_veh), WHOLE_ICON);
 		}
-		else if (VEH_HALF_ICON(main_veh)) {
+		if (VEH_HALF_ICON(main_veh)) {
 			half[half_size] = partial_vehicle_icon(ch, main_veh, VEH_HALF_ICON(main_veh), half_size == 0 ? HALF_1 : HALF_2);
 			++half_size;
 		}
