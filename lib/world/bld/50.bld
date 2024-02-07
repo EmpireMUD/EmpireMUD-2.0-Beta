@@ -2,8 +2,12 @@
 Grave~
 A Lone Grave~
 ..&0x&?.~
-4 0 dp 0
+4 0 dpx 0
 0 0 0 -1
+B0
+&0x&?.~
+B1
+&0x~
 C
 tomb~
 E
@@ -131,8 +135,12 @@ S
 Ruins~
 The Ruins of #n~
 @.&0(\&?@.~
-3 -1 dip 0
+3 -1 dipx 0
 0 0 0 -1
+B0
+&0(\~
+B1
+&0\~
 C
 dismantle~
 E
@@ -206,8 +214,12 @@ S
 Flooded Ruins~
 The Flooded Ruins of #n~
 &?~&0|\&?~~
-3 -1 dinDQ 0
+3 -1 dinxDQ 0
 0 0 0 -1
+B0
+&0|\~
+B1
+&0|~
 C
 dismantle~
 E
@@ -319,8 +331,12 @@ S
 Gatehouse Ruins~
 The Ruins of a Gatehouse~
 @.@.&0/]~
-3 -1 di 0
+3 -1 dix 0
 0 0 0 -1
+B0
+&0/]~
+B1
+&0/~
 C
 dismantle~
 E

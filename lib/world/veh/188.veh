@@ -11,7 +11,6 @@ move. At the front of the wagon is a rope, allowing you to drag it about.
 hlmu 19 10 0 0 0 1 0 0 0 -1 0
 C
 1 400
-I 30 5006 100.00 1  # RUINS-TO-VEH: ruins of #n
 M
 18803 20.00 ce
 P
@@ -34,7 +33,6 @@ empire will take the time to upgrade it back to its former glory.
 u 19 5 0 0 0 -1 0 0 0 -1 0
 C
 1 400
-I 30 5006 100.00 1  # RUINS-TO-VEH: ruins of #n
 P
 2
 R
@@ -121,7 +119,7 @@ B1
 &0H~
 D
 18876 0 0
-I 30 5007 100.00 1  # RUINS-TO-VEH: ruins of #n
+I 30 5002 100.00 1  # RUINS-TO-VEH: ruins of #n
 P
 2
 R

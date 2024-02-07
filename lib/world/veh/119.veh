@@ -25,7 +25,7 @@ legs~
    The mausoleum's legs are enormous columns of articulated stone. Though there
 are only four of them, they give the impression of a giant spider as they move.
 ~
-I 30 5006 100.00 1  # RUINS-TO-VEH: ruins of #n
+I 30 5005 100.00 1  # RUINS-TO-VEH: ruins of #n
 K
 3
 $n climbs up the legs of $V and goes inside.~
@@ -74,7 +74,7 @@ E
 windows~
 The windows of the tower are too high to see.
 ~
-I 30 5007 100.00 1  # RUINS-TO-VEH: ruins of #n
+I 30 5008 100.00 1  # RUINS-TO-VEH: ruins of #n
 K
 3
 $n climbs an invisible staircase up to $V.~

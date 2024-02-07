@@ -141,8 +141,12 @@ S
 Boardwalk~
 A Boardwalk Over the Shallows~
 &a~&0--&a~~
-16 0 dmnops 0
+16 0 dmnopsx 0
 0 0 0 -1
+B0
+&0--~
+B1
+&0-~
 E
 boardwalk boards walk shallows sea building around down~
    As you step onto the boardwalk, the gentle sound of waves echoes beneath
@@ -165,8 +169,12 @@ S
 River Fishery~
 A Fishery on the River~
 &0(&c~~&0)~
-8 0 dnpD 0
+8 0 dnpxD 0
 0 0 0 -1
+B0
+&0()~
+B1
+&0O~
 C
 fish~
 E
@@ -194,8 +202,12 @@ S
 Lake Fishery~
 A Fishery on the Lake~
 &0(&c~~&0)~
-8 0 dnpD 0
+8 0 dnpxD 0
 0 0 0 -1
+B0
+&0()~
+B1
+&0O~
 C
 fish~
 E
@@ -359,10 +371,14 @@ S
 Mountain Path~
 A Winding Mountain Path~
 @w--@e~
-32 0 dmnos 0
+32 0 dmnosx 0
 0 0 0 -1
 A
 d
+B0
+&0--~
+B1
+&0-~
 E
 mountains~
 From the winding path, you can see the towering mountains and jagged peaks reaching towards the sky.
@@ -422,7 +438,7 @@ coops building around~
 the chickens. There's a bit of a smell, but it's worth it for the eggs.
 ~
 I 29 5006 100.00 1 r  # RUINS-TO-BLD: Ruins
-I 31 3202 6.00 360 p  # PRODUCTION: egg
+I 31 3202 6.00 360 p  # PRODUCTION: white egg
 I 31 3200 6.00 180 p  # PRODUCTION: cut of poultry
 I+ 7 11  # Depletion: secondary
 M
