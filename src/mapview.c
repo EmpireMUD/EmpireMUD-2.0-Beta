@@ -549,6 +549,72 @@ char *get_room_name(room_data *room, bool color) {
 
 
 /**
+* Colors a partial room icon based on a character's political/informative
+* preferences. All arguments are pre-validated.
+*
+* @param char_data *ch The observing player.
+* @param room_data *room The room the character is looking at.
+* @param char *icon The incoming icon, which may be recolored.
+*/
+char *partial_room_icon(char_data *ch, room_data *room, char *icon) {
+	static char storage[100];
+	char temp[80];
+	
+	*storage = '\0';
+	
+	if (PRF_FLAGGED(ch, PRF_POLITICAL)) {
+		strcpy(temp, strip_color(icon));
+		sprintf(storage, "%s%s", ROOM_OWNER(room) ? EMPIRE_BANNER(ROOM_OWNER(room)) : "&0", temp);
+		return storage;
+	}
+	else if (PRF_FLAGGED(ch, PRF_INFORMATIVE)) {
+		strcpy(temp, strip_color(icon));
+		sprintf(storage, "%s%s", get_informative_color_room(ch, room), temp);
+		return storage;
+	}
+	else {
+		// base icon -- just send it back
+		return icon;
+	}
+}
+
+
+/**
+* Colors a partial icon based on a character's political/inforamtive
+* preferences. All arguments are pre-validated.
+*
+* @param char_data *ch The observing player.
+* @param vehicle_data *veh The vehicle to show.
+* @param char *icon The incoming icon, which may be recolored.
+* @param int pos Which position the partial icon is in (0-4).
+* @return char* The possibly-recolored icon.
+*/
+char *partial_vehicle_icon(char_data *ch, vehicle_data *veh, char *icon, int pos) {
+	// storage for 4 icons so this can be called multiple times in 1 sprintf
+	static char storage[4][100];
+	char temp[80];
+	
+	// init
+	*storage[pos] = '\0';
+	
+	if (PRF_FLAGGED(ch, PRF_POLITICAL)) {
+		strcpy(temp, strip_color(icon));
+		sprintf(storage[pos], "%s%s", VEH_OWNER(veh) ? EMPIRE_BANNER(VEH_OWNER(veh)) : "&0", temp);
+		return storage[pos];
+	}
+	else if (PRF_FLAGGED(ch, PRF_INFORMATIVE)) {
+		strcpy(temp, strip_color(icon));
+		sprintf(storage[pos], "%s%s", get_informative_color_veh(ch, veh), temp);
+		return storage[pos];
+	}
+	else {
+		// base icon -- just send it back
+		return icon;
+	}
+}
+
+
+/**
 * Replaces all color codes in 'string' (except &?) with 'new_color'. The new
 * string should be the same length so long as new_color is a valid single
 * color code.
@@ -1170,7 +1236,7 @@ void build_map_icon(char_data *ch, room_data *to_room, struct icon_data *base_ic
 void build_vehicle_icon(char_data *ch, room_data *room, vehicle_data *main_veh, bool skip_chameleon, char *outbuf, bool *showing_any_chameleon) {
 	bool chameleon_room;
 	char icon_color[256];
-	int iter, half_size, quarter_size, show_room, tileset, x;
+	int iter, half_size, quarter_size, show_room, tileset;
 	vehicle_data *veh, *whole, *half[2], *quarter[4];
 	
 	// initialize
@@ -1266,50 +1332,22 @@ void build_vehicle_icon(char_data *ch, room_data *room, vehicle_data *main_veh, 
 		// show quarter
 		if (quarter_size == 4) {
 			// all 4 are vehicles (not showing room)
-			sprintf(outbuf, "%s%s%s%s", VEH_QUARTER_ICON(quarter[0]), VEH_QUARTER_ICON(quarter[1]), VEH_QUARTER_ICON(quarter[2]), VEH_QUARTER_ICON(quarter[3]));
+			sprintf(outbuf, "%s%s%s%s", partial_vehicle_icon(ch, veh, VEH_QUARTER_ICON(quarter[0]), 0), partial_vehicle_icon(ch, veh, VEH_QUARTER_ICON(quarter[1]), 1), partial_vehicle_icon(ch, veh, VEH_QUARTER_ICON(quarter[2]), 2), partial_vehicle_icon(ch, veh, VEH_QUARTER_ICON(quarter[3]), 3));
 		}
 		else if (quarter_size == 3) {
 			if (X_COORD(room) % 2) {
-				sprintf(outbuf, "%s%s%s%s", VEH_QUARTER_ICON(quarter[0]), show_room ? GET_BLD_QUARTER_ICON(GET_BUILDING(room)) : "@.", VEH_QUARTER_ICON(quarter[1]), VEH_QUARTER_ICON(quarter[2]));
+				sprintf(outbuf, "%s%s%s%s", partial_vehicle_icon(ch, veh, VEH_QUARTER_ICON(quarter[0]), 0), partial_room_icon(ch, room, show_room ? GET_BLD_QUARTER_ICON(GET_BUILDING(room)) : "@."), partial_vehicle_icon(ch, veh, VEH_QUARTER_ICON(quarter[1]), 1), partial_vehicle_icon(ch, veh, VEH_QUARTER_ICON(quarter[2]), 2));
 			}
 			else {
-				sprintf(outbuf, "%s%s%s%s", VEH_QUARTER_ICON(quarter[0]), VEH_QUARTER_ICON(quarter[1]), show_room ? GET_BLD_QUARTER_ICON(GET_BUILDING(room)) : "@.", VEH_QUARTER_ICON(quarter[2]));
-			}
-			
-			// procedurally choose a spot for the gap
-			x = X_COORD(room);
-			x = MAX(0, x);
-			for (iter = 0; iter < 4; ++iter) {
-				if (iter < (x % 4)) {
-					// pre-gap
-					strcat(outbuf, VEH_QUARTER_ICON(quarter[iter]));
-				}
-				else if (iter == (x % 4)) {
-					// gap in vehicles
-					if (show_room) {
-						// show room
-						strcat(outbuf, GET_BLD_QUARTER_ICON(GET_BUILDING(room)));
-						if (showing_any_chameleon && chameleon_room) {
-							*showing_any_chameleon = TRUE;
-						}
-					}
-					else {
-						// show base tile
-						strcat(outbuf, "@.");
-					}
-				}
-				else {
-					// post-gap
-					strcat(outbuf, VEH_QUARTER_ICON(quarter[iter-1]));
-				}
+				sprintf(outbuf, "%s%s%s%s", partial_vehicle_icon(ch, veh, VEH_QUARTER_ICON(quarter[0]), 0), partial_vehicle_icon(ch, veh, VEH_QUARTER_ICON(quarter[1]), 1), partial_room_icon(ch, room, show_room ? GET_BLD_QUARTER_ICON(GET_BUILDING(room)) : "@."), partial_vehicle_icon(ch, veh, VEH_QUARTER_ICON(quarter[2]), 2));
 			}
 		}
 		else if (quarter_size == 2 && show_room) {
 			if (X_COORD(room) % 2) {
-				sprintf(outbuf, "%s%s@.%s", VEH_QUARTER_ICON(quarter[0]), GET_BLD_QUARTER_ICON(GET_BUILDING(room)), VEH_QUARTER_ICON(quarter[1]));
+				sprintf(outbuf, "%s%s@.%s", partial_vehicle_icon(ch, veh, VEH_QUARTER_ICON(quarter[0]), 0), partial_room_icon(ch, room, GET_BLD_QUARTER_ICON(GET_BUILDING(room))), partial_vehicle_icon(ch, veh, VEH_QUARTER_ICON(quarter[1]), 1));
 			}
 			else {
-				sprintf(outbuf, "%s@.%s%s", VEH_QUARTER_ICON(quarter[0]), GET_BLD_QUARTER_ICON(GET_BUILDING(room)), VEH_QUARTER_ICON(quarter[1]));
+				sprintf(outbuf, "%s@.%s%s", partial_vehicle_icon(ch, veh, VEH_QUARTER_ICON(quarter[0]), 0), partial_room_icon(ch, room, GET_BLD_QUARTER_ICON(GET_BUILDING(room))), partial_vehicle_icon(ch, veh, VEH_QUARTER_ICON(quarter[1]), 1));
 			}
 		}
 		else if (quarter_size == 2) {
