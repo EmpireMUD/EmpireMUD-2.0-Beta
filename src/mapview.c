@@ -552,6 +552,9 @@ char *get_room_name(room_data *room, bool color) {
 * Colors a partial room icon based on a character's political/informative
 * preferences. All arguments are pre-validated.
 *
+* If the icon is "@." and political or informative are on, this function also
+* converts to use the sector's roadside icon, which won't inherit color.
+*
 * @param char_data *ch The observing player.
 * @param room_data *room The room the character is looking at.
 * @param char *icon The incoming icon, which may be recolored.
@@ -566,11 +569,17 @@ char *partial_room_icon(char_data *ch, room_data *room, char *icon, int pos) {
 	
 	if (PRF_FLAGGED(ch, PRF_POLITICAL)) {
 		strcpy(temp, strip_color(icon));
+		if (!strcmp(temp, "@.")) {
+			sprintf(temp, "%c", GET_SECT_ROADSIDE_ICON(BASE_SECT(room)));
+		}
 		sprintf(storage[pos], "%s%s", ROOM_OWNER(room) ? EMPIRE_BANNER(ROOM_OWNER(room)) : "&0", temp);
 		return storage[pos];
 	}
 	else if (PRF_FLAGGED(ch, PRF_INFORMATIVE)) {
 		strcpy(temp, strip_color(icon));
+		if (!strcmp(temp, "@.")) {
+			sprintf(temp, "%c", GET_SECT_ROADSIDE_ICON(BASE_SECT(room)));
+		}
 		sprintf(storage[pos], "%s%s", get_informative_color_room(ch, room), temp);
 		return storage[pos];
 	}
