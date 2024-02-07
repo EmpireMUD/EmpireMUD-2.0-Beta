@@ -2271,8 +2271,11 @@ static void show_map_to_char(char_data *ch, struct mappc_data_container *mappc, 
 	}
 	else if (PRF_FLAGGED(ch, PRF_NOMAPCOL | PRF_POLITICAL | PRF_INFORMATIVE) || show_dark) {
 		strcpy(no_color, strip_color(show_icon));
-
-		if (PRF_FLAGGED(ch, PRF_POLITICAL) && !show_dark) {
+		
+		if (PRF_FLAGGED(ch, PRF_POLITICAL | PRF_INFORMATIVE) && !show_dark && veh_is_shown) {
+			// leave show_icon alone: it's colored for these already
+		}
+		else if (PRF_FLAGGED(ch, PRF_POLITICAL) && !show_dark) {
 			if (GET_LOYALTY(ch) && (GET_LOYALTY(ch) == ROOM_OWNER(to_room) || find_city(GET_LOYALTY(ch), to_room)) && is_in_city_for_empire(to_room, GET_LOYALTY(ch), FALSE, &junk)) {
 				strcpy(temp, get_banner_complement_color(ch, GET_LOYALTY(ch)));
 				need_color_terminator = TRUE;
