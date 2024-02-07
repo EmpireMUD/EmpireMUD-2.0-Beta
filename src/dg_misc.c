@@ -1428,7 +1428,7 @@ void script_modify(char *argument) {
 			}
 		}
 		else if (is_abbrev(field_arg, "quartericon")) {
-			if (!clear && str_cmp(value, "none") && !validate_icon(value, 2)) {
+			if (!clear && str_cmp(value, "none") && !validate_icon(value, 1)) {
 				script_log("%%mod%% called with invalid vehicle quarter icon '%s'", value);
 			}
 			else {
