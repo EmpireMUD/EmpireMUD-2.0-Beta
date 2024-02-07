@@ -683,7 +683,7 @@ void replace_icon_codes(char_data *ch, room_data *to_room, char *icon_buf, int t
 			icon = get_icon_from_set(GET_SECT_ICONS(BASE_SECT(to_room)), tileset);
 			sprintf(temp, "%s%c", icon ? icon->color : "&0", GET_SECT_ROADSIDE_ICON(BASE_SECT(to_room)));
 			str = str_replace("@.", temp, icon_buf);
-			strcpy(icon_buf, str);
+			strcpy(icon_buf, partial_room_icon(ch, to_room, str, 0));
 			free(str);
 		}
 		// east (@e) tile attachment
