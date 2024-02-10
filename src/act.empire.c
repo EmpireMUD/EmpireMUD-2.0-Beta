@@ -7817,6 +7817,7 @@ ACMD(do_territory) {
 	struct island_info *find_island;
 	room_data *room, *iter, *next_iter;
 	vehicle_data *veh;
+	struct empire_vehicle_data *vter, *next_vter;
 	
 	// imms can target an empire as the FIRST argument
 	remain = any_one_word(argument, arg);
@@ -7938,13 +7939,78 @@ ACMD(do_territory) {
 		}
 	}
 	
-	// ready? check world:
-	HASH_ITER(hh, world_table, iter, next_iter) {	
+	// ok: check vehicles (except under certain options):	
+	if (!no_abandon) {
+		HASH_ITER(hh, EMPIRE_VEHICLE_LIST(emp), vter, next_vter) {
+			if (!(veh = vter->veh) || !VEH_FLAGGED(veh, VEH_BUILDING)) {
+				continue;	// not a building
+			}
+			
+			// check options:
+			// territory type flags: only if any where requested
+			if (any_type_found) {
+				ttype = get_territory_type_for_empire(IN_ROOM(veh), emp, FALSE, &junk, NULL);
+				if (!check_city && ttype == TER_CITY) {
+					continue;
+				}
+				else if (!check_outskirts && ttype == TER_OUTSKIRTS) {
+					continue;
+				}
+				else if (!check_frontier && ttype == TER_FRONTIER) {
+					continue;
+				}
+			}
+			
+			// manage flags
+			if (no_dismantle && !VEH_FLAGGED(veh, VEH_PLAYER_NO_DISMANTLE) && (!VEH_INTERIOR_HOME_ROOM(veh) || !ROOM_AFF_FLAGGED(VEH_INTERIOR_HOME_ROOM(veh), ROOM_AFF_NO_DISMANTLE))) {
+				continue;
+			}
+			if (no_work && !VEH_FLAGGED(veh, VEH_PLAYER_NO_WORK) && (!VEH_INTERIOR_HOME_ROOM(veh) || !ROOM_AFF_FLAGGED(VEH_INTERIOR_HOME_ROOM(veh), ROOM_AFF_NO_WORK))) {
+				continue;
+			}
+			if (public_only && !VEH_IS_PUBLIC(veh)) {
+				continue;
+			}
+			
+			// distance?
+			if (dist_from_me >= 0 && compute_distance(IN_ROOM(ch), IN_ROOM(veh)) > dist_from_me) {
+				continue;
+			}
+			if (find_island && GET_ISLAND(IN_ROOM(veh)) != find_island) {
+				continue;
+			}
+			
+			// search requested text
+			ok = FALSE;
+			if (!*search_str) {
+				ok = TRUE;
+			}
+			else if (multi_isname(search_str, VEH_SHORT_DESC(veh))) {
+				ok = TRUE;
+			}
+			// check exclude text
+			if (ok && *exclude_str && any_isname(exclude_str, VEH_SHORT_DESC(veh))) {
+				ok = FALSE;
+			}
+		
+			// final ok: add to the list
+			if (ok && (node = find_territory_node_in_hash2(&node_hash, IN_ROOM(veh), TRUE))) {
+				++(node->count);
+				
+				// add notes
+				sprintf(buf, "%s%s%s", NULLSAFE(node->details), (node->details ? ", " : ""), skip_filler(VEH_SHORT_DESC(veh)));
+				if (node->details) {
+					free(node->details);
+				}
+				node->details = strdup(buf);
+			}
+		}
+	} // end vehicles
+	
+	// check world:
+	HASH_ITER(hh, world_table, iter, next_iter) {
 		if (!*search_str && GET_ROOM_VNUM(iter) >= MAP_SIZE) {
 			continue;	// not on map: ignore if no search terms given
-		}
-		if (ROOM_OWNER(iter) != emp) {
-			continue;	// not owned
 		}
 		
 		// territory type flags: only if any where requested
@@ -8021,7 +8087,7 @@ ACMD(do_territory) {
 			++(node->count);
 			
 			// mark as interior?
-			if (GET_ROOM_VNUM(iter) != node->vnum && !GET_ROOM_VEHICLE(iter) && (!node->details || !strstr(node->details, "interior"))) {
+			if (GET_ROOM_VNUM(iter) != node->vnum && (!node->details || !strstr(node->details, "interior"))) {
 				sprintf(buf, "%s%sinterior", NULLSAFE(node->details), (node->details ? ", " : ""));
 				if (node->details) {
 					free(node->details);
@@ -8030,71 +8096,6 @@ ACMD(do_territory) {
 			}
 		}
 	} // end territory
-	
-	// check vehicles (except under certain options):	
-	if (!no_abandon && !public_only) {
-		DL_FOREACH(vehicle_list, veh) {
-			if (VEH_OWNER(veh) != emp || !VEH_FLAGGED(veh, VEH_BUILDING)) {
-				continue;	// not a building or not owned by emp
-			}
-			
-			// check options:
-			// territory type flags: only if any where requested
-			if (any_type_found) {
-				ttype = get_territory_type_for_empire(IN_ROOM(veh), emp, FALSE, &junk, NULL);
-				if (!check_city && ttype == TER_CITY) {
-					continue;
-				}
-				else if (!check_outskirts && ttype == TER_OUTSKIRTS) {
-					continue;
-				}
-				else if (!check_frontier && ttype == TER_FRONTIER) {
-					continue;
-				}
-			}
-			
-			// manage flags
-			if (no_dismantle && !VEH_FLAGGED(veh, VEH_PLAYER_NO_DISMANTLE) && (!VEH_INTERIOR_HOME_ROOM(veh) || !ROOM_AFF_FLAGGED(VEH_INTERIOR_HOME_ROOM(veh), ROOM_AFF_NO_DISMANTLE))) {
-				continue;
-			}
-			if (no_work && !VEH_FLAGGED(veh, VEH_PLAYER_NO_WORK) && (!VEH_INTERIOR_HOME_ROOM(veh) || !ROOM_AFF_FLAGGED(VEH_INTERIOR_HOME_ROOM(veh), ROOM_AFF_NO_WORK))) {
-				continue;
-			}
-			
-			// distance?
-			if (dist_from_me >= 0 && compute_distance(IN_ROOM(ch), IN_ROOM(veh)) > dist_from_me) {
-				continue;
-			}
-			if (find_island && GET_ISLAND(IN_ROOM(veh)) != find_island) {
-				continue;
-			}
-			
-			// search requested text
-			ok = FALSE;
-			if (!*search_str) {
-				ok = TRUE;
-			}
-			else if (multi_isname(search_str, VEH_SHORT_DESC(veh))) {
-				ok = TRUE;
-			}
-			// check exclude text
-			if (ok && *exclude_str && any_isname(exclude_str, VEH_SHORT_DESC(veh))) {
-				ok = FALSE;
-			}
-		
-			// final ok: add to the list
-			if (ok && (node = find_territory_node_in_hash2(&node_hash, IN_ROOM(veh), TRUE))) {
-				++(node->count);
-				
-				// add notes
-				sprintf(buf, "%s%s%s", NULLSAFE(node->details), (node->details ? ", " : ""), skip_filler(VEH_SHORT_DESC(veh)));
-				if (node->details) {
-					free(node->details);
-				}
-				node->details = strdup(buf);
-			}
-		}
-	} // end vehicles
 	
 	// build option buf for output
 	*option_buf = '\0';
