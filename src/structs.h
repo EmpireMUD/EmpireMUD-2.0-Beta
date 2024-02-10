@@ -3265,6 +3265,16 @@ struct find_territory_node {
 };
 
 
+// for do_findmaintenance and do_territory
+struct find_territory_node2 {
+	room_vnum vnum;	// vnum of map location
+	char *details;	// optional string with vehicles, etc
+	int count;		// total collapsed nodes
+	
+	UT_hash_handle hh;	// hashed by map loc vnum
+};
+
+
 // for do_gen_interact_room, act.actions.c
 struct gen_interact_data_t {
 	int interact;	// INTERACT_ type

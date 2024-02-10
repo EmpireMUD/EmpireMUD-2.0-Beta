@@ -3225,6 +3225,78 @@ struct find_territory_node *find_nearby_territory_node(room_data *room, struct f
 
 
 /**
+* Sees if the room is within N spaces of any existing node.
+*
+* @param any_vnum vnum The map location vnum of another node.
+* @param struct find_territory_node2 **hash A pointer to the hash to search.
+* @param struct find_territory_node2 *start_node The first node to consider (skips any before this).
+* @param int distance The distance to count as "nearby".
+* @return struct find_territory_node2* A pointer to the nearby node, if any (may be NULL).
+*/
+struct find_territory_node2 *find_nearby_territory_node2(any_vnum vnum, struct find_territory_node2 **hash, struct find_territory_node2 *start_node, int distance) {
+	struct find_territory_node2 *node, *next;
+	bool found_start = FALSE;
+	
+	// don't try to merge nothing
+	if (vnum == NOTHING) {
+		return NULL;
+	}
+	
+	HASH_ITER(hh, *hash, node, next) {
+		// find starting point first -- due to how these nodes are combined
+	    if (!found_start && start_node) {
+	    	if (node != start_node) {
+				continue;
+			}
+			else {
+				found_start = TRUE;
+			}
+	    }
+	    
+	    if (compute_map_distance(MAP_X_COORD(vnum), MAP_Y_COORD(vnum), MAP_X_COORD(node->vnum), MAP_Y_COORD(node->vnum)) <= distance) {
+			return node;
+		}
+	}
+	
+	return NULL;
+}
+
+
+/**
+* Finds and/or adds a find-territry node in a hash.
+*
+* @param struct find_territory_node2 **hash A pointer to the hash to find/add the node in.
+* @param room_data *room The room to find a node for.
+* @param bool add_if_missing If TRUE, will add the node and guarantee its existence if missing.
+* @return struct find_territory_node2* The node from the hash (guaranteed if add_if_missing was TRUE; otherwise it may be NULL).
+*/
+struct find_territory_node2 *find_territory_node2(struct find_territory_node2 **hash, room_data *room, bool add_if_missing) {
+	any_vnum vnum;
+	struct find_territory_node2 *node;
+	struct map_data *map;
+	
+	// determine vnum
+	if (room && (map = GET_MAP_LOC(room))) {
+		vnum = map->vnum;
+	}
+	else {
+		vnum = NOTHING;
+	}
+	
+	// try to find
+	HASH_FIND_INT(*hash, &vnum, node);
+	
+	if (!node && add_if_missing) {
+		CREATE(node, struct find_territory_node2, 1);
+		node->vnum = vnum;
+		HASH_ADD_INT(*hash, vnum, node);
+	}
+	
+	return node;	// if any
+}
+
+
+/**
 * This reduces the territory node list to at most some pre-defined number, so
 * that there aren't too many to display.
 *
@@ -3263,6 +3335,44 @@ struct find_territory_node *reduce_territory_node_list(struct find_territory_nod
 	
 	// return the list (head of list may have changed)
 	return list;
+}
+
+
+/**
+* This reduces the territory node list to at most some pre-defined number, so
+* that there aren't too many to display.
+*
+* @param struct find_territory_node2 **hash A pointer to the hash to reduce.
+*/
+void reduce_territory_node_list2(struct find_territory_node2 **hash) {
+	struct find_territory_node2 *node, *next_node, *find;
+	int count, size = 5;
+	
+	// iterate until there are no more than N nodes
+	count = HASH_COUNT(*hash);
+	while (count > 120) {
+		HASH_ITER(hh, *hash, node, next_node) {
+			// is there a node later in the list that is within range?
+			if ((find = find_nearby_territory_node2(node->vnum, hash, next_node, size))) {
+				find->count += node->count;
+				HASH_DEL(*hash, node);
+				if (node->details) {
+					free(node->details);
+				}
+				free(node);
+			}
+		}
+		
+		// increase size on each pass
+		if (size < 25) {
+			size += 5;
+		}
+		else {
+			size += 10;
+		}
+		
+		count = HASH_COUNT(*hash);
+	}
 }
 
 
@@ -7703,9 +7813,9 @@ ACMD(do_territory) {
 	size_t size, lsize;
 	crop_data *crop = NULL;
 	empire_data *emp = GET_LOYALTY(ch);
-	struct find_territory_node *node_list = NULL, *node, *next_node;
+	struct find_territory_node2 *node_hash = NULL, *node, *next_node;
 	struct island_info *find_island;
-	room_data *iter, *next_iter;
+	room_data *room, *iter, *next_iter;
 	vehicle_data *veh;
 	
 	// imms can target an empire as the FIRST argument
@@ -7907,12 +8017,17 @@ ACMD(do_territory) {
 		}
 		
 		// final ok: add to the list
-		if (ok) {
-			CREATE(node, struct find_territory_node, 1);
-			node->loc = iter;
-			node->count = 1;
-			node->is_vehicle = FALSE;
-			DL_PREPEND(node_list, node);
+		if (ok && (node = find_territory_node2(&node_hash, iter, TRUE))) {
+			++(node->count);
+			
+			// mark as interior?
+			if (GET_ROOM_VNUM(iter) != node->vnum && (!node->details || !strstr(node->details, "interior"))) {
+				sprintf(buf, "%s%sinterior", NULLSAFE(node->details), (node->details ? ", " : ""));
+				if (node->details) {
+					free(node->details);
+				}
+				node->details = strdup(buf);
+			}
 		}
 	} // end territory
 	
@@ -7922,19 +8037,7 @@ ACMD(do_territory) {
 			if (VEH_OWNER(veh) != emp || !VEH_FLAGGED(veh, VEH_BUILDING)) {
 				continue;	// not a building or not owned by emp
 			}
-		
-			// do we already have this location?
-			ok = TRUE;
-			DL_FOREACH(node_list, node) {
-				if (node->loc == IN_ROOM(veh)) {
-					ok = FALSE;
-					break;
-				}
-			}
-			if (!ok) {
-				continue;	// already marked this room
-			}
-		
+			
 			// check options:
 			// territory type flags: only if any where requested
 			if (any_type_found) {
@@ -7949,7 +8052,7 @@ ACMD(do_territory) {
 					continue;
 				}
 			}
-		
+			
 			// manage flags
 			if (no_dismantle && !VEH_FLAGGED(veh, VEH_PLAYER_NO_DISMANTLE) && (!VEH_INTERIOR_HOME_ROOM(veh) || !ROOM_AFF_FLAGGED(VEH_INTERIOR_HOME_ROOM(veh), ROOM_AFF_NO_DISMANTLE))) {
 				continue;
@@ -7957,7 +8060,7 @@ ACMD(do_territory) {
 			if (no_work && !VEH_FLAGGED(veh, VEH_PLAYER_NO_WORK) && (!VEH_INTERIOR_HOME_ROOM(veh) || !ROOM_AFF_FLAGGED(VEH_INTERIOR_HOME_ROOM(veh), ROOM_AFF_NO_WORK))) {
 				continue;
 			}
-		
+			
 			// distance?
 			if (dist_from_me >= 0 && compute_distance(IN_ROOM(ch), IN_ROOM(veh)) > dist_from_me) {
 				continue;
@@ -7965,7 +8068,7 @@ ACMD(do_territory) {
 			if (find_island && GET_ISLAND(IN_ROOM(veh)) != find_island) {
 				continue;
 			}
-		
+			
 			// search requested text
 			ok = FALSE;
 			if (!*search_str) {
@@ -7980,12 +8083,17 @@ ACMD(do_territory) {
 			}
 		
 			// final ok: add to the list
-			if (ok) {
-				CREATE(node, struct find_territory_node, 1);
-				node->loc = IN_ROOM(veh);
-				node->count = 1;
-				node->is_vehicle = TRUE;
-				DL_PREPEND(node_list, node);
+			if (ok && (node = find_territory_node2(&node_hash, IN_ROOM(veh), TRUE))) {
+				++(node->count);
+				
+				// add notes?
+				if (GET_ROOM_VNUM(iter) != node->vnum) {
+					sprintf(buf, "%s%s%s", NULLSAFE(node->details), (node->details ? ", " : ""), skip_filler(VEH_SHORT_DESC(veh)));
+					if (node->details) {
+						free(node->details);
+					}
+					node->details = strdup(buf);
+				}
 			}
 		}
 	} // end vehicles
@@ -8028,8 +8136,8 @@ ACMD(do_territory) {
 		snprintf(option_buf + strlen(option_buf), sizeof(option_buf) - strlen(option_buf), "%sexcluding '%s'", (*option_buf ? ", " : ""), exclude_str);
 	}
 	
-	if (node_list) {
-		node_list = reduce_territory_node_list(node_list);
+	if (node_hash) {
+		reduce_territory_node_list2(&node_hash);
 		
 		// start buf
 		size = snprintf(buf, sizeof(buf), "%s%s&0 territory: %s\r\n", EMPIRE_BANNER(emp), EMPIRE_ADJECTIVE(emp), option_buf);
@@ -8037,15 +8145,16 @@ ACMD(do_territory) {
 		// display and free the nodes
 		total = 0;
 		full = FALSE;
-		DL_FOREACH_SAFE(node_list, node, next_node) {
+		HASH_ITER(hh, node_hash, node, next_node) {
 			total += node->count;
+			room = real_room(node->vnum);
 			
 			if (!full) {
 				if (node->count > 1) {
-					lsize = snprintf(line, sizeof(line), "%2d tiles near%s %s%s\r\n", node->count, coord_display_room(ch, node->loc, TRUE), get_room_name(node->loc, FALSE), (node->is_vehicle ? " (building on tile)" : ""));
+					lsize = snprintf(line, sizeof(line), "%2d tiles near%s %s%s%s\r\n", node->count, coord_display_room(ch, room, TRUE), (room ? get_screenreader_room_name(ch, IN_ROOM(ch), room, FALSE) : "Unknown"), (node->details ? ": " : ""), NULLSAFE(node->details));
 				}
 				else {
-					lsize = snprintf(line, sizeof(line), "%s %s%s\r\n", coord_display_room(ch, node->loc, TRUE), get_room_name(node->loc, FALSE), (node->is_vehicle ? " (building on tile)" : ""));
+					lsize = snprintf(line, sizeof(line), "%s %s%s%s\r\n", coord_display_room(ch, room, TRUE), (room ? get_screenreader_room_name(ch, IN_ROOM(ch), room, FALSE) : "Unknown"), (node->details ? ": " : ""), NULLSAFE(node->details));
 				}
 				
 				if (size + lsize < sizeof(buf)) {
@@ -8062,7 +8171,7 @@ ACMD(do_territory) {
 				free(node->details);
 			}
 			
-			DL_DELETE(node_list, node);
+			HASH_DEL(node_hash, node);
 			free(node);
 		}
 		

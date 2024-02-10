@@ -2428,6 +2428,7 @@ int get_map_radius(char_data *ch);
 char *get_mine_type_name(room_data *room);
 char *get_room_description(room_data *room);
 char *get_room_name(room_data *room, bool color);
+char *get_screenreader_room_name(char_data *ch, room_data *from_room, room_data *to_room, bool show_dark);
 void look_at_room_by_loc(char_data *ch, room_data *room, bitvector_t options);
 #define look_at_room(ch)  look_at_room_by_loc((ch), IN_ROOM(ch), NOBITS)
 void look_in_direction(char_data *ch, int dir);

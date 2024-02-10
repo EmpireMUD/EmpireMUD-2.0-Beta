@@ -42,7 +42,6 @@ vehicle_data *find_vehicle_to_show(char_data *ch, room_data *room, int *total_ve
 
 // locals
 ACMD(do_exits);
-char *get_screenreader_room_name(char_data *ch, room_data *from_room, room_data *to_room, bool show_dark);
 void show_screenreader_room(char_data *ch, room_data *room, bitvector_t options, int max_dist, bitvector_t only_in_dirs);
 
 
