@@ -3270,7 +3270,7 @@ struct find_territory_node2 *find_nearby_territory_node2(any_vnum vnum, struct f
 * @param bool add_if_missing If TRUE, will add the node and guarantee its existence if missing.
 * @return struct find_territory_node2* The node from the hash (guaranteed if add_if_missing was TRUE; otherwise it may be NULL).
 */
-struct find_territory_node2 *find_territory_node2(struct find_territory_node2 **hash, room_data *room, bool add_if_missing) {
+struct find_territory_node2 *find_territory_node_in_hash2(struct find_territory_node2 **hash, room_data *room, bool add_if_missing) {
 	any_vnum vnum;
 	struct find_territory_node2 *node;
 	struct map_data *map;
@@ -8017,7 +8017,7 @@ ACMD(do_territory) {
 		}
 		
 		// final ok: add to the list
-		if (ok && (node = find_territory_node2(&node_hash, iter, TRUE))) {
+		if (ok && (node = find_territory_node_in_hash2(&node_hash, iter, TRUE))) {
 			++(node->count);
 			
 			// mark as interior?
@@ -8083,17 +8083,15 @@ ACMD(do_territory) {
 			}
 		
 			// final ok: add to the list
-			if (ok && (node = find_territory_node2(&node_hash, IN_ROOM(veh), TRUE))) {
+			if (ok && (node = find_territory_node_in_hash2(&node_hash, IN_ROOM(veh), TRUE))) {
 				++(node->count);
 				
-				// add notes?
-				if (GET_ROOM_VNUM(iter) != node->vnum) {
-					sprintf(buf, "%s%s%s", NULLSAFE(node->details), (node->details ? ", " : ""), skip_filler(VEH_SHORT_DESC(veh)));
-					if (node->details) {
-						free(node->details);
-					}
-					node->details = strdup(buf);
+				// add notes
+				sprintf(buf, "%s%s%s", NULLSAFE(node->details), (node->details ? ", " : ""), skip_filler(VEH_SHORT_DESC(veh)));
+				if (node->details) {
+					free(node->details);
 				}
+				node->details = strdup(buf);
 			}
 		}
 	} // end vehicles
