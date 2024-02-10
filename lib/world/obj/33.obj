@@ -123,9 +123,9 @@ a sack of cornmeal~
 A sack of cornmeal is sitting here.~
 The cornmeal can be cooked into various foods.
 ~
-3 C a 0 0 5
+3 C a 0 0 6
 0 0 0
-7 8760
+7 0
 C
 1 1
 O+ 1 6300
@@ -182,9 +182,9 @@ a jar of olive oil~
 A jar of olive oil is sitting on the ground.~
 The olive oil looks rich.
 ~
-3 lC a 0 0 7
+3 lC a 0 0 8
 0 0 0
-6 12960
+6 0
 O+ 1 6322
 R
 4 5134 0
@@ -199,9 +199,9 @@ a sack of flour~
 A sack of flour is sitting on the ground.~
 Flour is used to bake bread.
 ~
-3 lC a 0 0 5
+3 lC a 0 0 6
 0 0 0
-7 8760
+7 0
 C
 1 1
 O+ 1 6300
@@ -1210,9 +1210,9 @@ There is a jar of lettuce seed oil here.~
 ceremonies (you can annoint someone with it). It is made from the pressed seeds
 of the lettuce plant.
 ~
-3 lC a 0 0 10
+3 lC a 0 0 11
 0 0 0
-6 12960
+6 0
 C
 1 1
 O+ 1 6321
@@ -1254,9 +1254,9 @@ a jar of coconut oil~
 A jar of coconut oil is sitting on the ground.~
 The coconut oil inside the jar is a rich yellow-orange color.
 ~
-3 C a 0 0 12
+3 C a 0 0 13
 0 0 0
-6 12960
+6 0
 C
 1 1
 O+ 1 6322
