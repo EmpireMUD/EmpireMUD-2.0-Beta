@@ -486,32 +486,29 @@ void survey_city(char_data *ch) {
 	
 	// report and free hash
 	HASH_ITER(hh, hash, sct, next_sct) {
-		// prepare dir
-		strcpy(buf, sct->dir);
-		if (PRF_FLAGGED(ch, PRF_SCREEN_READER)) {
-			CAP(buf);
-		}
-		else {
-			strtoupper(buf);
-		}
+		dist = max_radius;
 		
 		// prepare info
 		*buf1 = '\0';
+		if (sct->owned_count) {
+			dist = MIN(dist, sct->owned_dist);
+			sprintf(buf1 + strlen(buf1), "%s%d claimed (%d away)", (*buf1 ? ", " : ""), sct->owned_count, sct->owned_dist);
+		}
 		if (sct->rough_count) {
-			sprintf(buf1 + strlen(buf1), "%s%d rough tile%s %d away", (*buf1 ? ", " : ""), sct->rough_count, PLURAL(sct->rough_count), sct->rough_dist);
+			dist = MIN(dist, sct->rough_dist);
+			sprintf(buf1 + strlen(buf1), "%s%d rough (%d away)", (*buf1 ? ", " : ""), sct->rough_count, sct->rough_dist);
 		}
 		if (sct->ocean_count) {
-			sprintf(buf1 + strlen(buf1), "%s%d ocean tile%s %d away", (*buf1 ? ", " : ""), sct->ocean_count, PLURAL(sct->ocean_count), sct->ocean_dist);
+			dist = MIN(dist, sct->ocean_dist);
+			sprintf(buf1 + strlen(buf1), "%s%d ocean (%d away)", (*buf1 ? ", " : ""), sct->ocean_count, sct->ocean_dist);
 		}
 		if (sct->water_count) {
-			sprintf(buf1 + strlen(buf1), "%s%d fresh water tile%s %d away", (*buf1 ? ", " : ""), sct->water_count, PLURAL(sct->water_count), sct->water_dist);
-		}
-		if (sct->owned_count) {
-			sprintf(buf1 + strlen(buf1), "%s%d claimed tile%s %d away", (*buf1 ? ", " : ""), sct->owned_count, PLURAL(sct->owned_count), sct->owned_dist);
+			dist = MIN(dist, sct->water_dist);
+			sprintf(buf1 + strlen(buf1), "%s%d fresh water (%d away)", (*buf1 ? ", " : ""), sct->water_count, sct->water_dist);
 		}
 		
 		if (*buf1) {
-			msg_to_char(ch, "%s: %s\r\n", buf, buf1);
+			msg_to_char(ch, "%d %s: %s\r\n", dist, (*sct->dir ? sct->dir : "here"), buf1);
 		}
 		
 		HASH_DEL(hash, sct);
