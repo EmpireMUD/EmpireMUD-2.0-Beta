@@ -8052,6 +8052,11 @@ ACMD(do_territory) {
 			continue;
 		}
 		
+		// skip interiors of vehicles if the vehicle itself also matches?
+		if (GET_ROOM_VEHICLE(iter) && VEH_FLAGGED(GET_ROOM_VEHICLE(iter), VEH_BUILDING) && VEH_INTERIOR_HOME_ROOM(GET_ROOM_VEHICLE(iter)) == iter && multi_isname(search_str, VEH_KEYWORDS(GET_ROOM_VEHICLE(iter)))) {
+			continue;
+		}
+		
 		// search requested text
 		ok = FALSE;
 		if (!*search_str) {
