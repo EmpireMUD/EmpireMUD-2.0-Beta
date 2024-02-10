@@ -354,6 +354,172 @@ int sort_passives(struct affected_type *a, struct affected_type *b) {
 }
 
 
+/**
+* Checks viability of a city in the player's current room.
+*
+* @param char_data *ch The player performing the survey.
+*/
+void survey_city(char_data *ch) {
+	bool owned, rough, ocean, water;
+	const char *dir_str;
+	int dist, iter, max_radius, x, y;
+	empire_data *emp_iter, *next_emp;
+	room_data *room;
+	struct empire_city_data *city;
+	
+	// helper type
+	struct survey_city_t {
+		const char *dir;	// string (hash key)
+		
+		int owned_dist, owned_count;	// closest owned tile and total owned in that dir
+		int rough_dist, rough_count;		// ^ rough
+		int ocean_dist, ocean_count;		// ^ ocean
+		int water_dist, water_count;		// ^ fresh water
+		
+		UT_hash_handle hh;
+	} *sct, *next_sct, *hash = NULL;
+	
+	// configs
+	int min_distance_between_ally_cities = config_get_int("min_distance_between_ally_cities");
+	int min_distance_between_cities = config_get_int("min_distance_between_cities");
+	int min_distance_from_city_to_starting_location = config_get_int("min_distance_from_city_to_starting_location");
+	
+	// basic validation
+	if (!IS_OUTDOORS(ch) || GET_ROOM_VNUM(IN_ROOM(ch)) >= MAP_SIZE) {
+		msg_to_char(ch, "You can only survey for a city on the map.\r\n");
+		return;
+	}
+	if (ROOM_OWNER(IN_ROOM(ch)) && ROOM_OWNER(IN_ROOM(ch)) != GET_LOYALTY(ch)) {
+		msg_to_char(ch, "Someone else already owns this area.\r\n");
+		return;
+	}
+	
+	// check proximity: starting locations
+	for (iter = 0; iter <= highest_start_loc_index; ++iter) {
+		if (compute_distance(IN_ROOM(ch), real_room(start_locs[iter])) < min_distance_from_city_to_starting_location) {
+			msg_to_char(ch, "You can't found a city within %d tiles of a starting location.\r\n", min_distance_from_city_to_starting_location);
+			return;
+		}
+	}
+	
+	// check proximity: cities
+	HASH_ITER(hh, empire_table, emp_iter, next_emp) {
+		if (emp_iter != GET_LOYALTY(ch) && (city = find_closest_city(emp_iter, IN_ROOM(ch)))) {
+			dist = compute_distance(IN_ROOM(ch), city->location);
+
+			if (dist < min_distance_between_cities) {
+				// are they allied?
+				if (GET_LOYALTY(ch) && has_relationship(GET_LOYALTY(ch), emp_iter, DIPL_ALLIED)) {
+					// lower minimum
+					if (dist < min_distance_between_ally_cities) {
+						msg_to_char(ch, "You can't found a city within %d tiles of the center of %s.\r\n", min_distance_between_ally_cities, city->name);
+						return;
+					}
+				}
+				else {
+					msg_to_char(ch, "You can't found a city within %d tiles of the center of %s.\r\n", min_distance_between_cities, city->name);
+					return;
+				}
+			}
+		}
+	}
+	
+	// prepare to scan terrain: determine largest city radius
+	for (iter = 0, max_radius = 0; *city_type[iter].name != '\n'; ++iter) {
+		max_radius = MAX(max_radius, city_type[iter].radius);
+	}
+	
+	// build tile list
+	for (y = max_radius; y >= -max_radius; --y) {
+		for (x = -max_radius; x <= max_radius; ++x) {
+			if ((room = real_shift(IN_ROOM(ch), x, y)) && (dist = compute_distance(IN_ROOM(ch), room)) <= max_radius) {
+				owned = rough = ocean = water = FALSE;
+				
+				// analyze tile
+				owned = (ROOM_OWNER(room) && ROOM_OWNER(room) != GET_LOYALTY(ch));
+				rough = SECT_FLAGGED(BASE_SECT(room), SECTF_ROUGH) ? TRUE : FALSE;
+				ocean = SECT_FLAGGED(BASE_SECT(room), SECTF_OCEAN) ? TRUE : FALSE;
+				water = SECT_FLAGGED(BASE_SECT(room), SECTF_FRESH_WATER) ? TRUE : FALSE;
+				
+				if (owned || rough || ocean || water) {
+					// determine which way
+					dir_str = get_partial_direction_to(ch, IN_ROOM(ch), room, (PRF_FLAGGED(ch, PRF_SCREEN_READER) ? FALSE : TRUE));
+					
+					// find or add entry
+					HASH_FIND_STR(hash, dir_str, sct);
+					if (!sct) {
+						CREATE(sct, struct survey_city_t, 1);
+						sct->dir = dir_str;
+						sct->owned_dist = sct->rough_dist = sct->ocean_dist = sct->water_dist = -1;
+						HASH_ADD_STR(hash, dir, sct);
+					}
+					
+					// update entry
+					if (owned) {
+						++sct->owned_count;
+						sct->owned_dist = (sct->owned_dist == -1) ? dist : MIN(dist, sct->owned_dist);
+					}
+					if (rough) {
+						++sct->rough_count;
+						sct->rough_dist = (sct->rough_dist == -1) ? dist : MIN(dist, sct->rough_dist);
+					}
+					if (ocean) {
+						++sct->ocean_count;
+						sct->ocean_dist = (sct->ocean_dist == -1) ? dist : MIN(dist, sct->ocean_dist);
+					}
+					if (water) {
+						++sct->water_count;
+						sct->water_dist = (sct->water_dist == -1) ? dist : MIN(dist, sct->water_dist);
+					}
+				}
+			}
+		}
+	}
+	
+	// any at all?
+	if (!hash) {
+		msg_to_char(ch, "This looks like a wide open area for a city.\r\n");
+		return;
+	}
+	
+	msg_to_char(ch, "Survey for a city:\r\n");
+	
+	// report and free hash
+	HASH_ITER(hh, hash, sct, next_sct) {
+		// prepare dir
+		strcpy(buf, sct->dir);
+		if (PRF_FLAGGED(ch, PRF_SCREEN_READER)) {
+			CAP(buf);
+		}
+		else {
+			strtoupper(buf);
+		}
+		
+		// prepare info
+		*buf1 = '\0';
+		if (sct->rough_count) {
+			sprintf(buf1 + strlen(buf1), "%s%d rough tile%s %d away", (*buf1 ? ", " : ""), sct->rough_count, PLURAL(sct->rough_count), sct->rough_dist);
+		}
+		if (sct->ocean_count) {
+			sprintf(buf1 + strlen(buf1), "%s%d ocean tile%s %d away", (*buf1 ? ", " : ""), sct->ocean_count, PLURAL(sct->ocean_count), sct->ocean_dist);
+		}
+		if (sct->water_count) {
+			sprintf(buf1 + strlen(buf1), "%s%d fresh water tile%s %d away", (*buf1 ? ", " : ""), sct->water_count, PLURAL(sct->water_count), sct->water_dist);
+		}
+		if (sct->owned_count) {
+			sprintf(buf1 + strlen(buf1), "%s%d claimed tile%s %d away", (*buf1 ? ", " : ""), sct->owned_count, PLURAL(sct->owned_count), sct->owned_dist);
+		}
+		
+		if (*buf1) {
+			msg_to_char(ch, "%s: %s\r\n", buf, buf1);
+		}
+		
+		HASH_DEL(hash, sct);
+		free(sct);
+	}
+}
+
+
  //////////////////////////////////////////////////////////////////////////////
 //// CHART FUNCTIONS /////////////////////////////////////////////////////////
 
@@ -4232,6 +4398,14 @@ ACMD(do_survey) {
 	int max, prc, ter_type, base_height, mod_height;
 	bool junk, large_radius;
 	struct depletion_data *dep;
+	
+	one_argument(argument, arg);
+	
+	// survey for a city?
+	if (is_abbrev(arg, "city")) {
+		survey_city(ch);
+		return;
+	}
 	
 	msg_to_char(ch, "You survey the area:\r\n");
 	

@@ -119,6 +119,7 @@ Commands:
     un-claims all territory within the city border.
 - &ccity rename <number> <new name>&0: This allows you to rename a city.
 - &ccity traits <name> [add | remove] <trait(s)>&0: Change city traits.
+- &ccity survey&0: Check the surrounding area for viability to found a city.
 
 See also: CITY INFORMATION, CITY TRAITS, CLAIM, ESTABLISHING
 #

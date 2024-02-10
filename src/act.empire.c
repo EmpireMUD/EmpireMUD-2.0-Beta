@@ -4181,6 +4181,9 @@ ACMD(do_city) {
 	else if (is_abbrev(arg, "traits")) {
 		city_traits(ch, emp, arg1);
 	}
+	else if (is_abbrev(arg, "survey")) {
+		survey_city(ch);
+	}
 	else {
 		msg_to_char(ch, "Usage: city <list | found | upgrade | downgrade | claim | abandon | rename | traits>\r\n");
 	}

@@ -2753,11 +2753,14 @@ See also: ACCEPT, ASTRAL NEXUS, SUMMON
 #
 SURVEY
 
-Usage:  survey
+Usage:  survey [city]
 
 This command gets you basic information about the room you're currently in.
 
-See also: ADVENTURE, CHART, MANAGE
+If you type "survey city", it instead helps you determine whether or not the
+area around you might good for a city.
+
+See also: ADVENTURE, CHART, CITY, MANAGE
 #
 SWAP
 
