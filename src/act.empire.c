@@ -8021,7 +8021,7 @@ ACMD(do_territory) {
 			++(node->count);
 			
 			// mark as interior?
-			if (GET_ROOM_VNUM(iter) != node->vnum && (!node->details || !strstr(node->details, "interior"))) {
+			if (GET_ROOM_VNUM(iter) != node->vnum && !GET_ROOM_VEHICLE(iter) && (!node->details || !strstr(node->details, "interior"))) {
 				sprintf(buf, "%s%sinterior", NULLSAFE(node->details), (node->details ? ", " : ""));
 				if (node->details) {
 					free(node->details);
@@ -8135,7 +8135,7 @@ ACMD(do_territory) {
 	}
 	
 	if (node_hash) {
-		reduce_territory_node_list2(&node_hash);
+		// reduce_territory_node_list2(&node_hash);
 		
 		// start buf
 		size = snprintf(buf, sizeof(buf), "%s%s&0 territory: %s\r\n", EMPIRE_BANNER(emp), EMPIRE_ADJECTIVE(emp), option_buf);
