@@ -364,6 +364,7 @@ void survey_city(char_data *ch, char *argument) {
 	bool owned, rough, ocean, water, verbose;
 	const char *dir_str;
 	int dist, iter, max_radius, x, y;
+	int tot_owned, tot_rough, tot_ocean, tot_water;
 	empire_data *emp_iter, *next_emp;
 	room_data *room;
 	struct empire_city_data *city;
@@ -434,6 +435,8 @@ void survey_city(char_data *ch, char *argument) {
 		max_radius = MAX(max_radius, city_type[iter].radius);
 	}
 	
+	tot_owned = tot_rough = tot_ocean = tot_water = 0;
+	
 	// build tile list
 	for (y = max_radius; y >= -max_radius; --y) {
 		for (x = -max_radius; x <= max_radius; ++x) {
@@ -462,18 +465,22 @@ void survey_city(char_data *ch, char *argument) {
 					// update entry
 					if (owned) {
 						++sct->owned_count;
+						++tot_owned;
 						sct->owned_dist = (sct->owned_dist == -1) ? dist : MIN(dist, sct->owned_dist);
 					}
 					if (rough) {
 						++sct->rough_count;
+						++tot_rough;
 						sct->rough_dist = (sct->rough_dist == -1) ? dist : MIN(dist, sct->rough_dist);
 					}
 					if (ocean) {
 						++sct->ocean_count;
+						++tot_ocean;
 						sct->ocean_dist = (sct->ocean_dist == -1) ? dist : MIN(dist, sct->ocean_dist);
 					}
 					if (water) {
 						++sct->water_count;
+						++tot_water;
 						sct->water_dist = (sct->water_dist == -1) ? dist : MIN(dist, sct->water_dist);
 					}
 				}
@@ -539,6 +546,9 @@ void survey_city(char_data *ch, char *argument) {
 		HASH_DEL(hash, sct);
 		free(sct);
 	}
+	
+	// and totals?
+	msg_to_char(ch, "Total tiles: %d owned, %d rough, %d ocean, %d fresh water\r\n", tot_owned, tot_rough, tot_ocean, tot_water);
 }
 
 
