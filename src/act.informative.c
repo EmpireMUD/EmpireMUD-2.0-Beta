@@ -497,23 +497,43 @@ void survey_city(char_data *ch, char *argument) {
 		*buf1 = '\0';
 		if (sct->owned_count) {
 			dist = MIN(dist, sct->owned_dist);
-			sprintf(buf1 + strlen(buf1), "%s%d claimed (%d away)", (*buf1 ? ", " : ""), sct->owned_count, sct->owned_dist);
+			if (verbose) {
+				sprintf(buf1 + strlen(buf1), "%s%d claimed (%d away)", (*buf1 ? ", " : ""), sct->owned_count, sct->owned_dist);
+			}
+			else {
+				sprintf(buf1 + strlen(buf1), "%sclaimed", (*buf1 ? ", " : ""));
+			}
 		}
 		if (sct->rough_count) {
 			dist = MIN(dist, sct->rough_dist);
-			sprintf(buf1 + strlen(buf1), "%s%d rough (%d away)", (*buf1 ? ", " : ""), sct->rough_count, sct->rough_dist);
+			if (verbose) {
+				sprintf(buf1 + strlen(buf1), "%s%d rough (%d away)", (*buf1 ? ", " : ""), sct->rough_count, sct->rough_dist);
+			}
+			else {
+				sprintf(buf1 + strlen(buf1), "%srough", (*buf1 ? ", " : ""));
+			}
 		}
 		if (sct->ocean_count) {
 			dist = MIN(dist, sct->ocean_dist);
-			sprintf(buf1 + strlen(buf1), "%s%d ocean (%d away)", (*buf1 ? ", " : ""), sct->ocean_count, sct->ocean_dist);
+			if (verbose) {
+				sprintf(buf1 + strlen(buf1), "%s%d ocean (%d away)", (*buf1 ? ", " : ""), sct->ocean_count, sct->ocean_dist);
+			}
+			else {
+				sprintf(buf1 + strlen(buf1), "%socean", (*buf1 ? ", " : ""));
+			}
 		}
 		if (sct->water_count) {
 			dist = MIN(dist, sct->water_dist);
-			sprintf(buf1 + strlen(buf1), "%s%d fresh water (%d away)", (*buf1 ? ", " : ""), sct->water_count, sct->water_dist);
+			if (verbose) {
+				sprintf(buf1 + strlen(buf1), "%s%d fresh water (%d away)", (*buf1 ? ", " : ""), sct->water_count, sct->water_dist);
+			}
+			else {
+				sprintf(buf1 + strlen(buf1), "%sfresh water", (*buf1 ? ", " : ""));
+			}
 		}
 		
 		if (*buf1) {
-			msg_to_char(ch, "%d %s: %s\r\n", dist, (*sct->dir ? sct->dir : "here"), buf1);
+			msg_to_char(ch, "%d %s: %s\r\n", dist, (*sct->dir ? sct->dir : "away"), buf1);
 		}
 		
 		HASH_DEL(hash, sct);
