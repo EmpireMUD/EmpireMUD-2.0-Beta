@@ -358,9 +358,10 @@ int sort_passives(struct affected_type *a, struct affected_type *b) {
 * Checks viability of a city in the player's current room.
 *
 * @param char_data *ch The player performing the survey.
+* @param char *argument Any remaining args.
 */
-void survey_city(char_data *ch) {
-	bool owned, rough, ocean, water;
+void survey_city(char_data *ch, char *argument) {
+	bool owned, rough, ocean, water, verbose;
 	const char *dir_str;
 	int dist, iter, max_radius, x, y;
 	empire_data *emp_iter, *next_emp;
@@ -383,6 +384,10 @@ void survey_city(char_data *ch) {
 	int min_distance_between_ally_cities = config_get_int("min_distance_between_ally_cities");
 	int min_distance_between_cities = config_get_int("min_distance_between_cities");
 	int min_distance_from_city_to_starting_location = config_get_int("min_distance_from_city_to_starting_location");
+	
+	// optional arg
+	skip_spaces(&argument);
+	verbose = is_abbrev(argument, "-verbose");
 	
 	// basic validation
 	if (!IS_OUTDOORS(ch) || GET_ROOM_VNUM(IN_ROOM(ch)) >= MAP_SIZE) {
@@ -436,7 +441,7 @@ void survey_city(char_data *ch) {
 				owned = rough = ocean = water = FALSE;
 				
 				// analyze tile
-				owned = (ROOM_OWNER(room) && ROOM_OWNER(room) != GET_LOYALTY(ch));
+				owned = (ROOM_OWNER(room) && ROOM_OWNER(room) != GET_LOYALTY(ch) && !ROOM_AFF_FLAGGED(room, ROOM_AFF_CHAMELEON));
 				rough = SECT_FLAGGED(BASE_SECT(room), SECTF_ROUGH) ? TRUE : FALSE;
 				ocean = SECT_FLAGGED(BASE_SECT(room), SECTF_OCEAN) ? TRUE : FALSE;
 				water = SECT_FLAGGED(BASE_SECT(room), SECTF_FRESH_WATER) ? TRUE : FALSE;
@@ -4388,7 +4393,7 @@ ACMD(do_score) {
 
 ACMD(do_survey) {
 	char line[1024];
-	char *temp;
+	char *temp, *argptr;
 	struct empire_city_data *city;
 	struct empire_island *eisle;
 	struct island_info *island;
@@ -4396,11 +4401,11 @@ ACMD(do_survey) {
 	bool junk, large_radius;
 	struct depletion_data *dep;
 	
-	one_argument(argument, arg);
+	argptr = one_argument(argument, arg);
 	
 	// survey for a city?
 	if (is_abbrev(arg, "city")) {
-		survey_city(ch);
+		survey_city(ch, argptr);
 		return;
 	}
 	

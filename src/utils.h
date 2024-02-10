@@ -2156,7 +2156,7 @@ char *obj_desc_for_char(obj_data *obj, char_data *ch, int mode);
 struct custom_message *pick_custom_longdesc(char_data *ch);
 void show_character_affects(char_data *ch, char_data *to);
 bool show_local_einv(char_data *ch, room_data *room, bool thief_mode);
-void survey_city(char_data *ch);
+void survey_city(char_data *ch, char *argument);
 
 // act.item.c
 bool can_take_obj(char_data *ch, obj_data *obj);
