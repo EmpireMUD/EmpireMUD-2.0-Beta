@@ -7985,11 +7985,11 @@ ACMD(do_territory) {
 			if (!*search_str) {
 				ok = TRUE;
 			}
-			else if (multi_isname(search_str, VEH_SHORT_DESC(veh))) {
+			else if (multi_isname(search_str, VEH_KEYWORDS(veh))) {
 				ok = TRUE;
 			}
 			// check exclude text
-			if (ok && *exclude_str && any_isname(exclude_str, VEH_SHORT_DESC(veh))) {
+			if (ok && *exclude_str && any_isname(exclude_str, VEH_KEYWORDS(veh))) {
 				ok = FALSE;
 			}
 		
@@ -8009,6 +8009,9 @@ ACMD(do_territory) {
 	
 	// check world:
 	HASH_ITER(hh, world_table, iter, next_iter) {
+		if (ROOM_OWNER(iter) != emp) {
+			continue;	// not owned
+		}
 		if (!*search_str && GET_ROOM_VNUM(iter) >= MAP_SIZE) {
 			continue;	// not on map: ignore if no search terms given
 		}
