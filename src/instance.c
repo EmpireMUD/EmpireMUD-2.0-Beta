@@ -65,7 +65,7 @@ void build_instance_exterior(struct instance_data *inst) {
 	
 	// purge mobs in the room
 	DL_FOREACH_SAFE2(ROOM_PEOPLE(INST_LOCATION(inst)), mob, next_mob, next_in_room) {
-		if (IS_NPC(mob) && MOB_INSTANCE_ID(mob) != NOTHING) {
+		if (IS_NPC(mob) && MOB_INSTANCE_ID(mob) == NOTHING) {
 			extract_char(mob);
 		}
 	}
