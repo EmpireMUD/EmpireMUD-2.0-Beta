@@ -962,9 +962,12 @@ void do_customize_vehicle(char_data *ch, char *argument) {
 			// check if it needs the short desc
 			if (!str_str(argument, skip_filler(VEH_SHORT_DESC(veh)))) {
 				sprintf(buf, "%s (%s)", argument, skip_filler(VEH_SHORT_DESC(veh)));
+				set_vehicle_long_desc(veh, buf);
+			}
+			else {
+				set_vehicle_long_desc(veh, argument);
 			}
 			
-			set_vehicle_long_desc(veh, argument);
 			msg_to_char(ch, "It now has the long description:\r\n%s\r\n", argument);
 			act("$n renames $V.", FALSE, ch, NULL, veh, TO_ROOM | ACT_VEH_VICT);
 		}
