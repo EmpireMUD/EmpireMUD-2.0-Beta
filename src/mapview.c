@@ -559,7 +559,7 @@ char *get_room_name(room_data *room, bool color) {
 */
 char *partial_room_icon(char_data *ch, room_data *room, char *icon, int pos) {
 	static char storage[2][100];
-	char temp[80];
+	char temp[80], col_buf[80];
 	
 	*storage[pos] = '\0';
 	
@@ -571,6 +571,17 @@ char *partial_room_icon(char_data *ch, room_data *room, char *icon, int pos) {
 	else if (PRF_FLAGGED(ch, PRF_INFORMATIVE)) {
 		strcpy(temp, strip_color(icon));
 		sprintf(storage[pos], "%s%s", get_informative_color_room(ch, room), temp);
+		return storage[pos];
+	}
+	else if (ROOM_PAINT_COLOR(room)) {
+		strcpy(temp, strip_color(icon));
+		
+		sprinttype(ROOM_PAINT_COLOR(room), paint_colors, col_buf, sizeof(col_buf), "&0");
+		if (ROOM_AFF_FLAGGED(room, ROOM_AFF_BRIGHT_PAINT)) {
+			strtoupper(col_buf);
+		}
+		
+		sprintf(storage[pos], "%s%s", col_buf, temp);
 		return storage[pos];
 	}
 	else {
@@ -593,7 +604,7 @@ char *partial_room_icon(char_data *ch, room_data *room, char *icon, int pos) {
 char *partial_vehicle_icon(char_data *ch, vehicle_data *veh, char *icon, int pos) {
 	// storage for multiple icons so this can be called multiple times in 1 sprintf
 	static char storage[7][100];
-	char temp[80];
+	char temp[80], col_buf[80];
 	
 	// init
 	*storage[pos] = '\0';
@@ -606,6 +617,17 @@ char *partial_vehicle_icon(char_data *ch, vehicle_data *veh, char *icon, int pos
 	else if (PRF_FLAGGED(ch, PRF_INFORMATIVE)) {
 		strcpy(temp, strip_color(icon));
 		sprintf(storage[pos], "%s%s", get_informative_color_veh(ch, veh), temp);
+		return storage[pos];
+	}
+	else if (VEH_PAINT_COLOR(veh)) {
+		strcpy(temp, strip_color(icon));
+		
+		sprinttype(VEH_PAINT_COLOR(veh), paint_colors, col_buf, sizeof(col_buf), "&0");
+		if (VEH_FLAGGED(veh, VEH_BRIGHT_PAINT)) {
+			strtoupper(col_buf);
+		}
+		
+		sprintf(storage[pos], "%s%s", col_buf, temp);
 		return storage[pos];
 	}
 	else {
