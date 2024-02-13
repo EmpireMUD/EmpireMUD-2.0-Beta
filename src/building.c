@@ -1417,6 +1417,13 @@ void start_dismantle_building(room_data *loc) {
 		dump_library_to_room(loc);
 	}
 	
+	// interior must be done in 2 cycles: 1 to delete npcs, another to relocate them
+	DL_FOREACH_SAFE2(interior_room_list, room, next_room, next_interior) {
+		if (HOME_ROOM(room) == loc) {
+			delete_room_npcs(room, NULL, TRUE);
+		}
+	}
+	
 	// interior only
 	DL_FOREACH_SAFE2(interior_room_list, room, next_room, next_interior) {
 		if (HOME_ROOM(room) == loc) {
@@ -1424,7 +1431,6 @@ void start_dismantle_building(room_data *loc) {
 				dump_library_to_room(room);
 			}
 			dismantle_wtrigger(room, NULL, FALSE);
-			delete_room_npcs(room, NULL, TRUE);
 			
 			DL_FOREACH_SAFE2(ROOM_CONTENTS(room), obj, next_obj, next_content) {
 				obj_to_room(obj, loc);
