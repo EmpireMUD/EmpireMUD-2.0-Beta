@@ -1143,7 +1143,7 @@ void identify_obj_to_char(obj_data *obj, char_data *ch, bool simple) {
 		}
 		else {
 			// longer than 24 hours
-			msg_to_char(ch, "This item will expire within %d days.\r\n", (GET_OBJ_TIMER(obj) / 24));
+			msg_to_char(ch, "This item will expire within %d days.\r\n", (int) ceil(GET_OBJ_TIMER(obj) / 24.0));
 		}
 	}
 	
