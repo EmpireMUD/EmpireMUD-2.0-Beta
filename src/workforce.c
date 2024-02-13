@@ -2966,7 +2966,7 @@ void do_chore_production(empire_data *emp, room_data *room, vehicle_data *veh, i
 	
 	if (has_any_undepleted_interaction_for_chore(emp, CHORE_PRODUCTION, room, veh, interact_type, &over_limit)) {
 		if ((worker = find_chore_worker_in_room(emp, room, veh, chore_data[CHORE_PRODUCTION].mob))) {
-			charge_workforce(emp, CHORE_PRODUCTION, room, worker, 1, NOTHING, 0);
+			// charge_workforce(emp, CHORE_PRODUCTION, room, worker, 1, NOTHING, 0);
 		
 			if (veh && run_interactions(worker, VEH_INTERACTIONS(veh), interact_type, room, NULL, NULL, veh, one_production_chore)) {
 				// successful vehicle interact
