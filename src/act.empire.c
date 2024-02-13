@@ -3346,11 +3346,12 @@ struct find_territory_node *reduce_territory_node_list(struct find_territory_nod
 */
 void reduce_territory_node_list2(struct find_territory_node2 **hash) {
 	struct find_territory_node2 *node, *next_node, *find;
-	int count, size = 5;
+	int size = 5;
+	
+	const int max_rows = 250, max_size = 20;	// combines till it hits one of these
 	
 	// iterate until there are no more than N nodes
-	count = HASH_COUNT(*hash);
-	while (count > 120) {
+	while (HASH_COUNT(*hash) > max_rows && size < max_size) {
 		HASH_ITER(hh, *hash, node, next_node) {
 			// is there a node later in the list that is within range?
 			if ((find = find_nearby_territory_node2(node->vnum, hash, next_node, size))) {
@@ -3364,14 +3365,7 @@ void reduce_territory_node_list2(struct find_territory_node2 **hash) {
 		}
 		
 		// increase size on each pass
-		if (size < 25) {
-			size += 5;
-		}
-		else {
-			size += 10;
-		}
-		
-		count = HASH_COUNT(*hash);
+		size += 5;
 	}
 }
 
@@ -8144,7 +8138,7 @@ ACMD(do_territory) {
 	}
 	
 	if (node_hash) {
-		// reduce_territory_node_list2(&node_hash);
+		reduce_territory_node_list2(&node_hash);
 		
 		// start buf
 		size = snprintf(buf, sizeof(buf), "%s%s&0 territory: %s\r\n", EMPIRE_BANNER(emp), EMPIRE_ADJECTIVE(emp), option_buf);
