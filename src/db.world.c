@@ -2738,7 +2738,7 @@ void read_empire_territory(empire_data *emp, bool check_tech) {
 						isle = get_empire_island(e, GET_ISLAND_ID(iter));
 					}
 					for (npc = ter->npcs; npc; npc = npc->next) {
-						EMPIRE_POPULATION(e) += 1;
+						++EMPIRE_POPULATION(e);
 					}
 				}
 			}
@@ -2762,6 +2762,7 @@ void read_empire_territory(empire_data *emp, bool check_tech) {
 			LL_FOREACH(vter->npcs, npc) {
 				npc->home = NULL;
 				npc->home_vehicle = veh;
+				++EMPIRE_POPULATION(e);
 			}
 			
 			// and apply tech if necessary
