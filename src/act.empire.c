@@ -8152,7 +8152,7 @@ ACMD(do_territory) {
 			
 			if (!full) {
 				if (node->count > 1) {
-					lsize = snprintf(line, sizeof(line), "%s %s (%dx)%s%s\r\n", coord_display_room(ch, room, TRUE), (room ? get_screenreader_room_name(ch, IN_ROOM(ch), room, FALSE) : "Unknown"), node->count, (node->details ? ": " : ""), NULLSAFE(node->details));
+					lsize = snprintf(line, sizeof(line), "%s %s (x%d)%s%s\r\n", coord_display_room(ch, room, TRUE), (room ? get_screenreader_room_name(ch, IN_ROOM(ch), room, FALSE) : "Unknown"), node->count, (node->details ? ": " : ""), NULLSAFE(node->details));
 				}
 				else {
 					lsize = snprintf(line, sizeof(line), "%s %s%s%s\r\n", coord_display_room(ch, room, TRUE), (room ? get_screenreader_room_name(ch, IN_ROOM(ch), room, FALSE) : "Unknown"), (node->details ? ": " : ""), NULLSAFE(node->details));
