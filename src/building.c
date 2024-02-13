@@ -1424,7 +1424,7 @@ void start_dismantle_building(room_data *loc) {
 		}
 	}
 	
-	// interior only
+	// interior: second cycle (triggers, relocations)
 	DL_FOREACH_SAFE2(interior_room_list, room, next_room, next_interior) {
 		if (HOME_ROOM(room) == loc) {
 			if (HAS_FUNCTION(room, FNC_LIBRARY)) {
