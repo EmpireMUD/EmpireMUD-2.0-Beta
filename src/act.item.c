@@ -1134,11 +1134,11 @@ void identify_obj_to_char(obj_data *obj, char_data *ch, bool simple) {
 	}
 	
 	// expiry?
-	if (GET_OBJ_TIMER(obj) > 0 && OBJ_IS_IN_WORLD(obj)) {
-		if (GET_OBJ_TIMER(obj) <= 6) {
+	if (GET_OBJ_TIMER(obj) > 0) {
+		if (GET_OBJ_TIMER(obj) <= 12 && OBJ_IS_IN_WORLD(obj)) {
 			msg_to_char(ch, "Expires in %d hour%s.\r\n", GET_OBJ_TIMER(obj), PLURAL(GET_OBJ_TIMER(obj)));
 		}
-		if (GET_OBJ_TIMER(obj) <= 24) {
+		else if (GET_OBJ_TIMER(obj) <= 24) {
 			msg_to_char(ch, "Expires within a day.\r\n");
 		}
 		else {
