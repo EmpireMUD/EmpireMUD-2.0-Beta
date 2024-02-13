@@ -1218,8 +1218,11 @@ void start_dismantle_vehicle(vehicle_data *veh, char_data *ch) {
 		}
 	}
 	
-	// any npcs living on it
+	// any npcs living on/in it
 	delete_vehicle_npcs(veh, NULL, TRUE);
+	LL_FOREACH(VEH_ROOM_LIST(veh), vrl) {
+		delete_room_npcs(vrl->room, NULL, TRUE);
+	}
 	
 	// clear it out
 	vehicle_interior_dismantle_triggers(veh, ch);
