@@ -924,7 +924,12 @@ void do_customize_vehicle(char_data *ch, char *argument) {
 			
 			// optionally, change the longdesc too
 			if (proto && (VEH_LONG_DESC(veh) == VEH_LONG_DESC(proto) || strstr(VEH_LONG_DESC(veh), VEH_LONG_DESC(proto)))) {
-				sprintf(buf, "%s (%s)", VEH_LONG_DESC(proto), VEH_SHORT_DESC(veh));
+				sprintf(buf, "%s (%s)", VEH_LONG_DESC(proto), skip_filler(VEH_SHORT_DESC(veh)));
+				set_vehicle_long_desc(veh, buf);
+			}
+			else if (!str_str(VEH_LONG_DESC(veh), skip_filler(VEH_SHORT_DESC(veh)))) {
+				// with or without a proto, short desc is not in the long desc
+				sprintf(buf, "%s (%s)", proto ? VEH_LONG_DESC(proto) : VEH_LONG_DESC(veh), skip_filler(VEH_SHORT_DESC(veh)));
 				set_vehicle_long_desc(veh, buf);
 			}
 			
@@ -953,6 +958,11 @@ void do_customize_vehicle(char_data *ch, char *argument) {
 				gain_player_tech_exp(ch, PTECH_CUSTOMIZE_VEHICLE, 33.4);
 			}
 			run_ability_hooks_by_player_tech(ch, PTECH_CUSTOMIZE_VEHICLE, NULL, NULL, veh, NULL);
+			
+			// check if it needs the short desc
+			if (!str_str(argument, skip_filler(VEH_SHORT_DESC(veh)))) {
+				sprintf(buf, "%s (%s)", argument, skip_filler(VEH_SHORT_DESC(veh)));
+			}
 			
 			set_vehicle_long_desc(veh, argument);
 			msg_to_char(ch, "It now has the long description:\r\n%s\r\n", argument);
