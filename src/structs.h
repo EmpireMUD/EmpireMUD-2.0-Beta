@@ -3256,17 +3256,6 @@ struct file_lookup_struct {
 
 // for do_findmaintenance and do_territory
 struct find_territory_node {
-	room_data *loc;
-	char *details;	// optional string with vehicles, etc
-	int count;
-	bool is_vehicle;	// notes if the marked territory was from a vehicle
-	
-	struct find_territory_node *prev, *next;	// doubly-linked list
-};
-
-
-// for do_findmaintenance and do_territory
-struct find_territory_node2 {
 	room_vnum vnum;	// vnum of map location
 	char *details;	// optional string with vehicles, etc
 	int count;		// total collapsed nodes
