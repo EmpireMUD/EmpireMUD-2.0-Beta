@@ -11,7 +11,11 @@ it be hard to get it moving (lead mausoleum). The inside of the mausoleum can
 be used as a tomb.
 ~
 @.&0XX@.~
-bouw 83 16 0 0 0 2 0 3 0
+bouw 83 16 0 0 0 2 0 3 0 -1 0
+B0
+&0XX~
+B1
+&0X~
 C
 150 250
 D
@@ -21,7 +25,7 @@ legs~
    The mausoleum's legs are enormous columns of articulated stone. Though there
 are only four of them, they give the impression of a giant spider as they move.
 ~
-I 30 5006 100.00 1  # RUINS-TO-VEH: ruins of #n
+I 30 5005 100.00 1  # RUINS-TO-VEH: ruins of #n
 K
 3
 $n climbs up the legs of $V and goes inside.~
@@ -53,7 +57,11 @@ watching you.
 but you'll have to look out a window to see where you're going.
 ~
 @.&0||@.~
-beuw 26 128 0 0 0 10 0 3 0
+beuw 26 128 0 0 0 10 0 3 0 -1 0
+B0
+&0||~
+B1
+&0|~
 C
 150 250
 D
@@ -66,7 +74,7 @@ E
 windows~
 The windows of the tower are too high to see.
 ~
-I 30 5007 100.00 1  # RUINS-TO-VEH: ruins of #n
+I 30 5008 100.00 1  # RUINS-TO-VEH: ruins of #n
 K
 3
 $n climbs an invisible staircase up to $V.~
@@ -98,7 +106,7 @@ of Sennacherib, they are sure to inspire legends for many generations to come.
 A small pond next to the walkway reflects the beautiful gardens.
 ~
 &g[%%]~
-fhuwF 19 30 0 0 F 10 0 4 0
+fhuwF 19 30 0 0 F 10 0 4 0 -1 0
 E
 trees~
    Trees of all types hang over you from the raised terraces of the garden.

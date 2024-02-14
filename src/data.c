@@ -45,6 +45,7 @@ struct stored_data_type stored_data_info[] = {
 	{ "last_construction_id", DATYPE_INT },	// DATA_LAST_CONSTRUCTION_ID
 	{ "start_playtime_tracking", DATYPE_LONG },	// DATA_START_PLAYTIME_TRACKING
 	{ "top_idnum", DATYPE_INT },	// DATA_TOP_IDNUM
+	{ "top_vehicle_id", DATYPE_INT },	// DATA_TOP_VEHICLE_ID
 	
 	{ "\n", NOTHING }	// last
 };

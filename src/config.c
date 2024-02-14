@@ -1952,7 +1952,7 @@ void init_config_system(void) {
 
 /*	// this will take some testing to convert
 	init_config(CONFIG_EMPIRE, "techs_requiring_same_island", CONFTYPE_INT_ARRAY, "techs that only work if they're on the same island (these should not be techs that come from player abilities)");
-		init_config_custom("techs_requiring_same_island", config_show_typelist, config_edit_typelist, (void*)techs);
+		init_config_custom("techs_requiring_same_island", config_show_typelist, config_edit_typelist, (void*)empire_tech_types);
 
 */
 	// other

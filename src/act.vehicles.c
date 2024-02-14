@@ -85,6 +85,7 @@ vehicle_data *find_ship_to_dispatch(char_data *ch, char *arg) {
 	char tmpname[MAX_INPUT_LENGTH], *tmp = tmpname;
 	int island, found = 0, number = 1;
 	vehicle_data *veh;
+	struct empire_vehicle_data *vter, *next_vter;
 	
 	// prefer ones here
 	if ((veh = get_vehicle_in_room_vis(ch, arg, NULL))) {
@@ -108,28 +109,22 @@ vehicle_data *find_ship_to_dispatch(char_data *ch, char *arg) {
 	}
 	
 	// otherwise look for ones that match
-	DL_FOREACH(vehicle_list, veh) {
-		if (VEH_OWNER(veh) != GET_LOYALTY(ch)) {
-			continue;
-		}
-		if (!VEH_IS_COMPLETE(veh) || !VEH_FLAGGED(veh, VEH_SHIPPING)) {
+	HASH_ITER(hh, EMPIRE_VEHICLE_LIST(GET_LOYALTY(ch)), vter, next_vter) {
+		if (!(veh = vter->veh) || !VEH_IS_COMPLETE(veh) || !VEH_FLAGGED(veh, VEH_SHIPPING)) {
 			continue;
 		}
 		if (VEH_FLAGGED(veh, VEH_ON_FIRE)) {
 			continue;
 		}
-		if (VEH_INTERIOR_HOME_ROOM(veh) && ROOM_AFF_FLAGGED(VEH_INTERIOR_HOME_ROOM(veh), ROOM_AFF_NO_WORK)) {
+		if (GET_ISLAND_ID(IN_ROOM(veh)) != island) {
 			continue;
 		}
-		if (VEH_SHIPPING_ID(veh) != -1) {
+		if (VEH_INTERIOR_HOME_ROOM(veh) && ROOM_AFF_FLAGGED(VEH_INTERIOR_HOME_ROOM(veh), ROOM_AFF_NO_WORK)) {
 			continue;
 		}
 		
 		// ensure in docks if we're finding it remotely
 		if (!IN_ROOM(veh) || !room_has_function_and_city_ok(GET_LOYALTY(ch), IN_ROOM(veh), FNC_DOCKS)) {
-			continue;
-		}
-		if (GET_ISLAND_ID(IN_ROOM(veh)) != island) {
 			continue;
 		}
 		
@@ -929,7 +924,12 @@ void do_customize_vehicle(char_data *ch, char *argument) {
 			
 			// optionally, change the longdesc too
 			if (proto && (VEH_LONG_DESC(veh) == VEH_LONG_DESC(proto) || strstr(VEH_LONG_DESC(veh), VEH_LONG_DESC(proto)))) {
-				sprintf(buf, "%s (%s)", VEH_LONG_DESC(proto), VEH_SHORT_DESC(veh));
+				sprintf(buf, "%s (%s)", VEH_LONG_DESC(proto), skip_filler(VEH_SHORT_DESC(veh)));
+				set_vehicle_long_desc(veh, buf);
+			}
+			else if (!str_str(VEH_LONG_DESC(veh), skip_filler(VEH_SHORT_DESC(veh)))) {
+				// with or without a proto, short desc is not in the long desc
+				sprintf(buf, "%s (%s)", proto ? VEH_LONG_DESC(proto) : VEH_LONG_DESC(veh), skip_filler(VEH_SHORT_DESC(veh)));
 				set_vehicle_long_desc(veh, buf);
 			}
 			
@@ -959,7 +959,15 @@ void do_customize_vehicle(char_data *ch, char *argument) {
 			}
 			run_ability_hooks_by_player_tech(ch, PTECH_CUSTOMIZE_VEHICLE, NULL, NULL, veh, NULL);
 			
-			set_vehicle_long_desc(veh, argument);
+			// check if it needs the short desc
+			if (!str_str(argument, skip_filler(VEH_SHORT_DESC(veh)))) {
+				sprintf(buf, "%s (%s)", argument, skip_filler(VEH_SHORT_DESC(veh)));
+				set_vehicle_long_desc(veh, buf);
+			}
+			else {
+				set_vehicle_long_desc(veh, argument);
+			}
+			
 			msg_to_char(ch, "It now has the long description:\r\n%s\r\n", argument);
 			act("$n renames $V.", FALSE, ch, NULL, veh, TO_ROOM | ACT_VEH_VICT);
 		}
@@ -1447,9 +1455,6 @@ ACMD(do_dispatch) {
 	else if (VEH_FLAGGED(veh, VEH_ON_FIRE)) {
 		msg_to_char(ch, "You can't dispatch it while it's on fire!\r\n");
 	}
-	else if (VEH_SHIPPING_ID(veh) != -1) {
-		msg_to_char(ch, "It's already being used for shipping.\r\n");
-	}
 	else if (!ship_is_empty(veh)) {
 		msg_to_char(ch, "You can't dispatch a ship that has people inside it.\r\n");
 	}
@@ -1498,9 +1503,7 @@ ACMD(do_dispatch) {
 		shipd->status_time = time(0);
 		shipd->ship_origin = GET_ROOM_VNUM(IN_ROOM(veh));
 		
-		VEH_SHIPPING_ID(veh) = find_free_shipping_id(GET_LOYALTY(ch));
-		request_vehicle_save_in_world(veh);
-		shipd->shipping_id = VEH_SHIPPING_ID(veh);
+		shipd->shipping_id = VEH_IDNUM(veh);
 		
 		DL_APPEND(EMPIRE_SHIPPING_LIST(GET_LOYALTY(ch)), shipd);
 		sail_shipment(GET_LOYALTY(ch), veh);

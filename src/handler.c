@@ -3467,6 +3467,25 @@ struct empire_political_data *create_relation(empire_data *a, empire_data *b) {
 
 
 /**
+* Finds the empire vehicle list entry for a vehicle, by id.
+*
+* @param empire_data *emp The empire.
+* @param int idnum The vehicle's idnum, to find.
+* @return struct empire_vehicle_data* The vehicle list data, or NULL if not found.
+*/
+struct empire_vehicle_data *find_empire_vehicle_entry_by_id(empire_data *emp, int idnum) {
+	struct empire_vehicle_data *vter;
+	
+	if (emp && idnum > 0) {
+		HASH_FIND_INT(EMPIRE_VEHICLE_LIST(emp), &idnum, vter);
+		return vter;	// if any
+	}
+	
+	return NULL;
+}
+
+
+/**
 * Looks up an empire rank by typed argument (ignoring color codes) -- this
 * may take a number or a rank name.
 *
@@ -3588,6 +3607,7 @@ void perform_abandon_room(room_data *room) {
 	vehicle_data *veh;
 	int ter_type;
 	bool junk;
+	struct empire_island *eisle;
 	
 	// updates based on owner
 	if (emp) {
@@ -3603,14 +3623,16 @@ void perform_abandon_room(room_data *room) {
 		
 		// update territory counts
 		if (COUNTS_AS_TERRITORY(room)) {
-			struct empire_island *eisle = get_empire_island(emp, GET_ISLAND_ID(room));
 			ter_type = get_territory_type_for_empire(room, emp, FALSE, &junk, NULL);
 			
 			SAFE_ADD(EMPIRE_TERRITORY(emp, ter_type), -1, 0, UINT_MAX, FALSE);
-			SAFE_ADD(eisle->territory[ter_type], -1, 0, UINT_MAX, FALSE);
-			
 			SAFE_ADD(EMPIRE_TERRITORY(emp, TER_TOTAL), -1, 0, UINT_MAX, FALSE);
-			SAFE_ADD(eisle->territory[TER_TOTAL], -1, 0, UINT_MAX, FALSE);
+			
+			if (GET_ISLAND_ID(room) != NO_ISLAND) {
+				eisle = get_empire_island(emp, GET_ISLAND_ID(room));
+				SAFE_ADD(eisle->territory[ter_type], -1, 0, UINT_MAX, FALSE);
+				SAFE_ADD(eisle->territory[TER_TOTAL], -1, 0, UINT_MAX, FALSE);
+			}
 		}
 		// territory list
 		if ((ter = find_territory_entry(emp, room))) {
@@ -3651,7 +3673,9 @@ void perform_abandon_room(room_data *room) {
 	}
 	
 	affect_total_room(room);
-	update_MSDP_empire_data_all(emp, TRUE, TRUE);
+	if (emp) {
+		TRIGGER_DELAYED_REFRESH(emp, DELAY_REFRESH_MSDP_UPDATE_CLAIMS);
+	}
 	request_mapout_update(GET_ROOM_VNUM(room));
 	request_world_save(GET_ROOM_VNUM(room), WSAVE_ROOM | WSAVE_MAP);
 }
@@ -3666,14 +3690,32 @@ void perform_abandon_vehicle(vehicle_data *veh) {
 	if (veh) {
 		empire_data *emp = VEH_OWNER(veh);
 		bool provided_light = VEH_PROVIDES_LIGHT(veh);
+		struct empire_vehicle_data *vter;
+		struct shipping_data *shipd, *next_shipd;
 		
 		remove_vehicle_flags(veh, VEH_PLAYER_NO_WORK | VEH_PLAYER_NO_DISMANTLE);
-	
+		
+		// finish the shipment before abandoning
+		if (emp) {
+			DL_FOREACH_SAFE(EMPIRE_SHIPPING_LIST(emp), shipd, next_shipd) {
+				if (shipd->shipping_id == VEH_IDNUM(veh)) {
+					deliver_shipment(VEH_OWNER(veh), shipd);
+				}
+			}
+		}
+		
 		if (VEH_INTERIOR_HOME_ROOM(veh)) {
 			abandon_room(VEH_INTERIOR_HOME_ROOM(veh));
 		}
 		
-		adjust_vehicle_tech(veh, FALSE);
+		adjust_vehicle_tech(veh, GET_ISLAND_ID(IN_ROOM(veh)), FALSE);
+		
+		// remove territory entry?
+		if (emp && (vter = find_empire_vehicle_entry(emp, veh))) {
+			delete_empire_vehicle_entry(emp, vter, TRUE);
+		}
+		
+		// actual dropping of owner
 		VEH_OWNER(veh) = NULL;
 		
 		if (VEH_IS_COMPLETE(veh) && emp) {
@@ -3711,6 +3753,7 @@ void perform_claim_room(room_data *room, empire_data *emp) {
 	vehicle_data *veh;
 	int ter_type;
 	bool junk;
+	struct empire_island *eisle;
 	
 	ROOM_OWNER(room) = emp;
 	remove_room_extra_data(room, ROOM_EXTRA_CEDED);	// not ceded if just claimed
@@ -3719,14 +3762,16 @@ void perform_claim_room(room_data *room, empire_data *emp) {
 	
 	// update territory counts
 	if (COUNTS_AS_TERRITORY(room)) {
-		struct empire_island *eisle = get_empire_island(emp, GET_ISLAND_ID(room));
 		ter_type = get_territory_type_for_empire(room, emp, FALSE, &junk, NULL);
 		
 		SAFE_ADD(EMPIRE_TERRITORY(emp, ter_type), 1, 0, UINT_MAX, FALSE);
-		SAFE_ADD(eisle->territory[ter_type], 1, 0, UINT_MAX, FALSE);
-		
 		SAFE_ADD(EMPIRE_TERRITORY(emp, TER_TOTAL), 1, 0, UINT_MAX, FALSE);
-		SAFE_ADD(eisle->territory[TER_TOTAL], 1, 0, UINT_MAX, FALSE);
+		
+		if (GET_ISLAND_ID(room) != NO_ISLAND) {
+			eisle = get_empire_island(emp, GET_ISLAND_ID(room));
+			SAFE_ADD(eisle->territory[ter_type], 1, 0, UINT_MAX, FALSE);
+			SAFE_ADD(eisle->territory[TER_TOTAL], 1, 0, UINT_MAX, FALSE);
+		}
 	}
 	// territory list
 	if (BELONGS_IN_TERRITORY_LIST(room) && !(ter = find_territory_entry(emp, room))) {
@@ -3754,7 +3799,7 @@ void perform_claim_room(room_data *room, empire_data *emp) {
 	}
 	
 	add_dropped_item_list(emp, ROOM_CONTENTS(room));
-	update_MSDP_empire_data_all(emp, TRUE, TRUE);
+	TRIGGER_DELAYED_REFRESH(emp, DELAY_REFRESH_MSDP_UPDATE_CLAIMS);
 	request_mapout_update(GET_ROOM_VNUM(room));
 	request_world_save(GET_ROOM_VNUM(room), WSAVE_MAP | WSAVE_ROOM);
 }
@@ -3768,6 +3813,8 @@ void perform_claim_room(room_data *room, empire_data *emp) {
 */
 void perform_claim_vehicle(vehicle_data *veh, empire_data *emp) {
 	bool provided_light;
+	struct empire_npc_data *npc;
+	struct empire_vehicle_data *vter;
 	
 	if (VEH_OWNER(veh)) {
 		perform_abandon_vehicle(veh);
@@ -3777,9 +3824,27 @@ void perform_claim_vehicle(vehicle_data *veh, empire_data *emp) {
 	provided_light = VEH_PROVIDES_LIGHT(veh);
 	
 	if (emp) {
+		// basic owner"ship"
 		VEH_OWNER(veh) = emp;
-		VEH_SHIPPING_ID(veh) = -1;
-	
+		
+		// vehicle list
+		if ((vter = find_empire_vehicle_entry_by_id(emp, VEH_IDNUM(veh))) || (vter = create_empire_vehicle_entry(emp, veh))) {
+			// ensure pointer (sometimes not set during startup)
+			vter->veh = veh;
+			
+			// ensure npcs have proper pointer
+			LL_FOREACH(vter->npcs, npc) {
+				npc->home = NULL;
+				npc->home_vehicle = veh;
+			}
+		}
+		
+		// techs
+		if (IN_ROOM(veh)) {
+			adjust_vehicle_tech(veh, GET_ISLAND_ID(IN_ROOM(veh)), TRUE);
+		}
+		
+		// claim interior
 		if (VEH_INTERIOR_HOME_ROOM(veh)) {
 			if (ROOM_OWNER(VEH_INTERIOR_HOME_ROOM(veh)) && ROOM_OWNER(VEH_INTERIOR_HOME_ROOM(veh)) != emp) {
 				abandon_room(VEH_INTERIOR_HOME_ROOM(veh));
@@ -3787,12 +3852,13 @@ void perform_claim_vehicle(vehicle_data *veh, empire_data *emp) {
 			claim_room(VEH_INTERIOR_HOME_ROOM(veh), emp);
 		}
 		
-		adjust_vehicle_tech(veh, TRUE);
+		// mark empire stats
 		if (VEH_IS_COMPLETE(veh)) {
 			qt_empire_players_vehicle(emp, qt_gain_vehicle, veh);
 			et_gain_vehicle(emp, veh);
 		}
 		
+		// import dropped list
 		add_dropped_item_list(emp, VEH_CONTAINS(veh));
 		
 		// check if light changed
@@ -3805,6 +3871,7 @@ void perform_claim_vehicle(vehicle_data *veh, empire_data *emp) {
 			}
 		}
 		
+		// and save
 		request_vehicle_save_in_world(veh);
 	}
 }
@@ -10556,11 +10623,13 @@ struct empire_storage_data *find_island_storage_by_keywords(empire_data *emp, in
 */
 room_data *find_storage_location_for(empire_data *emp, int island, obj_data *proto) {
 	struct empire_territory_data *ter, *next_ter;
+	struct empire_vehicle_data *vter, *next_vter;
 	
 	if (!emp || island == NO_ISLAND || !proto || !GET_OBJ_STORAGE(proto)) {
 		return NULL;	// no work
 	}
-		
+	
+	// rooms
 	HASH_ITER(hh, EMPIRE_TERRITORY_LIST(emp), ter, next_ter) {
 		if (!ter->room || GET_ISLAND_ID(ter->room) != island) {
 			continue;	// wrong island
@@ -10573,6 +10642,19 @@ room_data *find_storage_location_for(empire_data *emp, int island, obj_data *pro
 		return ter->room;
 	}
 	
+	// vehicles
+	HASH_ITER(hh, EMPIRE_VEHICLE_LIST(emp), vter, next_vter) {
+		if (!vter->veh || !IN_ROOM(vter->veh) || ROOM_OWNER(IN_ROOM(vter->veh)) != emp || GET_ISLAND_ID(IN_ROOM(vter->veh)) != island) {
+			continue;	// wrong island
+		}
+		if (!obj_can_be_stored(proto, IN_ROOM(vter->veh), emp, TRUE)) {
+			continue;	// cannot store here
+		}
+		
+		// seems ok
+		return IN_ROOM(vter->veh);
+	}
+	
 	// we do not check vehicles separately: if they were on a claimed tile, this would already have found them
 	
 	return NULL;
@@ -10581,6 +10663,8 @@ room_data *find_storage_location_for(empire_data *emp, int island, obj_data *pro
 
 /**
 * Determines if the empire has a valid warehouse or vault on the given island.
+* For vehicle warehouses/vaults, this only returns them IF the room they're in
+* is claimed by the same empire (as they'd be unsafe to dump an item in).
 *
 * @param empire_data *emp Which empire.
 * @param int *island Which island.
@@ -10588,11 +10672,13 @@ room_data *find_storage_location_for(empire_data *emp, int island, obj_data *pro
 */
 room_data *find_warehouse_location_for(empire_data *emp, int island, bool vault) {
 	struct empire_territory_data *ter, *next_ter;
+	struct empire_vehicle_data *vter, *next_vter;
 	
 	if (!emp || island == NO_ISLAND) {
 		return NULL;	// no work
 	}
 	
+	// rooms
 	HASH_ITER(hh, EMPIRE_TERRITORY_LIST(emp), ter, next_ter) {
 		if (!ter->room || GET_ISLAND_ID(ter->room) != island) {
 			continue;	// wrong island
@@ -10606,6 +10692,22 @@ room_data *find_warehouse_location_for(empire_data *emp, int island, bool vault)
 		
 		// seems ok
 		return ter->room;
+	}
+	
+	// vehicles
+	HASH_ITER(hh, EMPIRE_VEHICLE_LIST(emp), vter, next_vter) {
+		if (!vter->veh || !IN_ROOM(vter->veh) || ROOM_OWNER(IN_ROOM(vter->veh)) != emp || GET_ISLAND_ID(IN_ROOM(vter->veh)) != island) {
+			continue;	// wrong island
+		}
+		if (vault && !IS_SET(VEH_FUNCTIONS(vter->veh), FNC_VAULT)) {
+			continue;	// not a vault
+		}
+		if (!vault && !IS_SET(VEH_FUNCTIONS(vter->veh), FNC_WAREHOUSE)) {
+			continue;	// not a warehouse
+		}
+		
+		// seems ok
+		return IN_ROOM(vter->veh);
 	}
 	
 	return NULL;
@@ -11708,8 +11810,23 @@ int get_number(char **name) {
 */
 void extract_vehicle(vehicle_data *veh) {
 	char_data *chiter;
+	struct shipping_data *shipd, *next_shipd;
+	
+	if (VEH_OWNER(veh)) {
+		// finish the shipment before extracting a vehicle, if it has one somehow
+		DL_FOREACH_SAFE(EMPIRE_SHIPPING_LIST(VEH_OWNER(veh)), shipd, next_shipd) {
+			if (shipd->shipping_id == VEH_IDNUM(veh)) {
+				deliver_shipment(VEH_OWNER(veh), shipd);
+			}
+		}
+		
+		// and ensure it's abandoned
+		perform_abandon_vehicle(veh);
+	}
 	
 	if (!VEH_IS_EXTRACTED(veh)) {
+		unapply_vehicle_to_room(veh);
+		unapply_vehicle_to_island(veh);
 		check_dg_owner_purged_vehicle(veh);
 		set_vehicle_flags(veh, VEH_EXTRACTED);
 		++veh_extractions_pending;
@@ -11752,7 +11869,8 @@ void extract_vehicle_final(vehicle_data *veh) {
 	delete_vehicle_interior(veh);
 	
 	// ownership stuff
-	adjust_vehicle_tech(veh, FALSE);
+	unapply_vehicle_to_room(veh);
+	unapply_vehicle_to_island(veh);
 	if (VEH_IS_COMPLETE(veh) && VEH_OWNER(veh)) {
 		qt_empire_players_vehicle(VEH_OWNER(veh), qt_lose_vehicle, veh);
 		et_lose_vehicle(VEH_OWNER(veh), veh);
@@ -11879,25 +11997,20 @@ void vehicle_from_room(vehicle_data *veh) {
 		return;
 	}
 	
-	// yank empire tech (which may be island-based)
-	adjust_vehicle_tech(veh, FALSE);
+	// mark the room for save
 	request_vehicle_save_in_world(veh);
-	
-	// check lights
-	if (VEH_PROVIDES_LIGHT(veh)) {
-		--ROOM_LIGHTS(was_in);
-	}
+	unapply_vehicle_to_room(veh);
 	
 	DL_DELETE2(ROOM_VEHICLES(was_in), veh, prev_in_room, next_in_room);
 	veh->next_in_room = veh->prev_in_room = NULL;
 	IN_ROOM(veh) = NULL;
 	
-	affect_total_room(was_in);
-	
 	// update mapout if applicable
 	if (VEH_IS_VISIBLE_ON_MAPOUT(veh)) {
 		request_mapout_update(GET_ROOM_VNUM(was_in));
 	}
+	
+	affect_total_room(was_in);
 }
 
 
@@ -11920,22 +12033,16 @@ void vehicle_to_room(vehicle_data *veh, room_data *room) {
 	DL_PREPEND2(ROOM_VEHICLES(room), veh, prev_in_room, next_in_room);
 	IN_ROOM(veh) = room;
 	VEH_LAST_MOVE_TIME(veh) = time(0);
-	update_vehicle_island_and_loc(veh, room);
-	affect_total_room(room);
 	
-	// check lights
-	if (VEH_PROVIDES_LIGHT(veh)) {
-		++ROOM_LIGHTS(room);
-	}
-	
-	// apply empire tech (which may be island-based)
-	adjust_vehicle_tech(veh, TRUE);
+	// apply-vehicle: only sets traits if the vehicle has moved to a new island/region
+	apply_vehicle_to_room(veh, room);
 	
 	// update mapout if applicable
 	if (VEH_IS_VISIBLE_ON_MAPOUT(veh)) {
 		request_mapout_update(GET_ROOM_VNUM(room));
 	}
 	
+	affect_total_room(room);
 	request_vehicle_save_in_world(veh);
 }
 
@@ -12076,6 +12183,30 @@ vehicle_data *get_vehicle_room(room_data *room, char *name, int *number) {
 
 
 /**
+* Finds a vehicle in the room by idnum.
+*
+* @param int idnum The idnum of the vehicle to find.
+* @return vehicle_data* The found ship, or NULL.
+*/
+vehicle_data *get_vehicle_room_by_idnum(int idnum, room_data *room) {
+	vehicle_data *veh;
+	
+	// shortcut
+	if (idnum <= 0 || !room) {
+		return NULL;
+	}
+	
+	DL_FOREACH2(ROOM_VEHICLES(room), veh, next_in_room) {
+		if (VEH_IDNUM(veh) == idnum) {
+			return veh;
+		}
+	}
+	
+	return NULL;
+}
+
+
+/**
 * Find a vehicle in the world, without regard to visibility.
 *
 * @param char *name The string to search for.
@@ -12110,6 +12241,30 @@ vehicle_data *get_vehicle_world(char *name, int *number) {
 		}
 	}
 
+	return NULL;
+}
+
+
+/**
+* Finds a vehicle in the world by idnum.
+*
+* @param int idnum The idnum of the vehicle to find.
+* @return vehicle_data* The found ship, or NULL.
+*/
+vehicle_data *get_vehicle_world_by_idnum(int idnum) {
+	vehicle_data *veh;
+	
+	// shortcut
+	if (idnum <= 0) {
+		return NULL;
+	}
+	
+	DL_FOREACH(vehicle_list, veh) {
+		if (VEH_IDNUM(veh) == idnum) {
+			return veh;
+		}
+	}
+	
 	return NULL;
 }
 

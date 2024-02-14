@@ -370,24 +370,22 @@ int obj_script_id(obj_data *obj) {
 
 
 /**
-* Fetches the vehicle's script id -- may also set it here if it's not set yet.
+* Fetches the vehicle's script idd -- may also set it here if it's not set yet.
 *
 * @param vehicle_data *veh The vehicle.
 * @return int The unique ID.
 */
 int veh_script_id(vehicle_data *veh) {
 	if (veh->script_id == 0) {
-		veh->script_id = top_script_uid++;
+		// the -1 here is because vehicle idnums start with 1
+		veh->script_id = VEHICLE_ID_BASE - 1 + VEH_IDNUM(veh);
 		add_to_lookup_table(veh->script_id, (void *)veh, TYPE_VEH);
 		
-		if (top_script_uid == INT_MAX && (!REBOOT_IS_SET() || reboot_control.time > config_get_int("reboot_warning_minutes") + 1)) {
-			reboot_control.time = config_get_int("reboot_warning_minutes") + 1;
-			if (reboot_control.type != REBOOT_SHUTDOWN) {
-				reboot_control.type = REBOOT_REBOOT;
-			}
-			syslog(SYS_ERROR, 0, TRUE, "SYSERR: Script IDs for vehicles has exceeded the limit, scheduling an auto-reboot");
-			top_script_uid = OTHER_ID_BASE;
+		if (veh->script_id >= ROOM_ID_BASE) {
+			// warn
+			log("SCRIPT ERR: Vehicle idnum for copy of vehicle [%d] %s is beyond maximum safe vnum for scripts", VEH_VNUM(veh), VEH_SHORT_DESC(veh));
 		}
 	}
+	
 	return veh->script_id;
 }

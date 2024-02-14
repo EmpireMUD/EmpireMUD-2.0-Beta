@@ -348,7 +348,7 @@ Examples:
   > idea more types of pottery: wedding vase, corded pot, terrible helmet
   > typo 'sence' should be spelled 'cense'
 #
-BUILD BUILDING "BUILD COMMAND"
+BUILD "BUILD COMMAND"
 
 (Disambiguation: see also BUILD ABILITY)
 
@@ -2753,11 +2753,14 @@ See also: ACCEPT, ASTRAL NEXUS, SUMMON
 #
 SURVEY
 
-Usage:  survey
+Usage:  survey [city]
 
 This command gets you basic information about the room you're currently in.
 
-See also: ADVENTURE, CHART, MANAGE
+If you type "survey city", it instead helps you determine whether or not the
+area around you might be good for a city. Use "survey city -v" for details.
+
+See also: ADVENTURE, CHART, CITY, MANAGE
 #
 SWAP
 

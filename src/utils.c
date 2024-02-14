@@ -506,6 +506,12 @@ void run_delayed_refresh(void) {
 			if (IS_SET(EMPIRE_DELAYED_REFRESH(emp), DELAY_REFRESH_GREATNESS)) {
 				update_empire_members_and_greatness(emp);
 			}
+			if (IS_SET(EMPIRE_DELAYED_REFRESH(emp), DELAY_REFRESH_MSDP_UPDATE_CLAIMS)) {
+				update_MSDP_empire_data_all(emp, TRUE, TRUE);
+			}
+			if (IS_SET(EMPIRE_DELAYED_REFRESH(emp), DELAY_REFRESH_MSDP_UPDATE_ALL)) {
+				update_MSDP_empire_data_all(emp, FALSE, FALSE);
+			}
 			
 			// clear this
 			EMPIRE_DELAYED_REFRESH(emp) = NOBITS;
@@ -1379,8 +1385,6 @@ bool emp_can_use_room(empire_data *emp, room_data *room, int mode) {
 * @return bool TRUE if emp can use veh, FALSE otherwise
 */
 bool emp_can_use_vehicle(empire_data *emp, vehicle_data *veh, int mode) {
-	room_data *interior = VEH_INTERIOR_HOME_ROOM(veh);	// if any
-	
 	if (mode == NOTHING) {
 		return TRUE;	// nothing asked, nothing checked
 	}
@@ -1392,12 +1396,8 @@ bool emp_can_use_vehicle(empire_data *emp, vehicle_data *veh, int mode) {
 	if (VEH_OWNER(veh) == emp) {
 		return TRUE;
 	}
-	// public + guests: use interior room to determine publicness
-	if (interior && ROOM_AFF_FLAGGED(interior, ROOM_AFF_PUBLIC) && mode == GUESTS_ALLOWED) {
-		return TRUE;
-	}
-	// no interior + guests: use the tile it's on, if the owner is the same as the vehicle
-	if (!interior && IN_ROOM(veh) && ROOM_OWNER(IN_ROOM(veh)) == VEH_OWNER(veh) && ROOM_AFF_FLAGGED(IN_ROOM(veh), ROOM_AFF_PUBLIC) && mode == GUESTS_ALLOWED) {
+	// public + guests:
+	if (VEH_IS_PUBLIC(veh) && (mode == GUESTS_ALLOWED || mode == MEMBERS_AND_ALLIES)) {
 		return TRUE;
 	}
 	// check allies
@@ -1470,11 +1470,11 @@ bool has_permission(char_data *ch, int type, room_data *loc) {
 */
 bool has_tech_available(char_data *ch, int tech) {
 	if (!ROOM_OWNER(IN_ROOM(ch))) {
-		msg_to_char(ch, "In order to do that you need to be in the territory of an empire with %s.\r\n", techs[tech]);
+		msg_to_char(ch, "In order to do that you need to be in the territory of an empire with %s.\r\n", empire_tech_types[tech]);
 		return FALSE;
 	}
 	else if (!has_tech_available_room(IN_ROOM(ch), tech)) {
-		msg_to_char(ch, "In order to do that you need to be in the territory of an empire with %s on this island.\r\n", techs[tech]);
+		msg_to_char(ch, "In order to do that you need to be in the territory of an empire with %s on this island.\r\n", empire_tech_types[tech]);
 		return FALSE;
 	}
 	else {
@@ -1495,19 +1495,14 @@ bool has_tech_available_room(room_data *room, int tech) {
 	empire_data *emp = ROOM_OWNER(room);
 	bool requires_island = FALSE;
 	struct empire_island *isle;
-	int id, iter;
+	int id;
 	
 	if (!emp) {
 		return FALSE;
 	}
 	
 	// see if it requires island
-	for (iter = 0; techs_requiring_same_island[iter] != NOTHING; ++iter) {
-		if (tech == techs_requiring_same_island[iter]) {
-			requires_island = TRUE;
-			break;
-		}
-	}
+	requires_island = (search_block_int(tech, techs_requiring_same_island) != NOTHING);
 	
 	// easy way out
 	if (!requires_island && EMPIRE_HAS_TECH(emp, tech)) {
@@ -2426,6 +2421,31 @@ int search_block_multi_isname(char *arg, const char **list) {
 	}
 	
 	return partial;	// if any
+}
+
+
+/**
+* Searches an array of ints for a target int.  Returns NOTHING if not found;
+* 0..n otherwise.  Array must be terminated with a NOTHING so it knows to stop
+* searching.
+*
+* @param int find The integer to look for.
+* @param const int *list A NOTHING-terminated int list.
+*/
+int search_block_int(int find, const int *list) {
+	register int iter;
+	
+	if (find == NOTHING) {
+		return NOTHING;	// shortcut
+	}
+	
+	for (iter = 0; *(list + iter) != NOTHING; ++iter) {
+		if (find == *(list + iter)) {
+			return iter;	// found
+		}
+	}
+
+	return NOTHING;	// nope
 }
 
 
@@ -6132,6 +6152,9 @@ double compute_map_distance(int x1, int y1, int x2, int y2) {
 	if (x1 < 0 || x2 < 0 || y1 < 0 || y2 < 0) {
 		return MAP_SIZE;	// maximum distance
 	}
+	if (x1 >= MAP_WIDTH || x2 >= MAP_WIDTH || y1 >= MAP_HEIGHT || y2 >= MAP_HEIGHT) {
+		return MAP_SIZE;	// maximum distance
+	}
 
 	// adjust for edges
 	if (WRAP_X) {
@@ -6463,6 +6486,7 @@ int get_room_blocking_height(room_data *room, bool *blocking_vehicle) {
 */
 room_data *find_load_room(char_data *ch) {
 	struct empire_territory_data *ter, *next_ter;
+	struct empire_vehicle_data *vter, *next_vter;
 	room_data *rl, *rl_last_room, *found, *map;
 	int num_found = 0;
 	sh_int island;
@@ -6484,11 +6508,27 @@ room_data *find_load_room(char_data *ch) {
 	if (!IS_NPC(ch) && (rl = real_room(GET_LAST_ROOM(ch))) && GET_LOYALTY(ch)) {
 		island = GET_ISLAND_ID(rl);
 		found = NULL;
+		// room territory
 		HASH_ITER(hh, EMPIRE_TERRITORY_LIST(GET_LOYALTY(ch)), ter, next_ter) {
 			if (room_has_function_and_city_ok(GET_LOYALTY(ch), ter->room, FNC_TOMB) && IS_COMPLETE(ter->room) && GET_ISLAND_ID(ter->room) == island && !IS_BURNING(ter->room)) {
 				// pick at random if more than 1
 				if (!number(0, num_found++) || !found) {
 					found = ter->room;
+				}
+			}
+		}
+		// vehicle territory
+		HASH_ITER(hh, EMPIRE_VEHICLE_LIST(GET_LOYALTY(ch)), vter, next_vter) {
+			if (!IN_ROOM(vter->veh) || GET_ISLAND_ID(IN_ROOM(vter->veh)) != island) {
+				continue;	// wrong location
+			}
+			if (ROOM_OWNER(IN_ROOM(vter->veh)) == GET_LOYALTY(ch)) {
+				continue;	// already checked during territory check
+			}
+			if (VEH_IS_COMPLETE(vter->veh) && !VEH_FLAGGED(vter->veh, VEH_ON_FIRE) && vehicle_has_function_and_city_ok(vter->veh, FNC_TOMB)) {
+				// pick at random if more than 1
+				if (!number(0, num_found++) || !found) {
+					found = IN_ROOM(vter->veh);
 				}
 			}
 		}

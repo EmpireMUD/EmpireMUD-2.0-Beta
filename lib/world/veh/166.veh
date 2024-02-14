@@ -7,7 +7,11 @@ to hold a great deal. This sleigh appears to be flying! Use the 'pilot' command
 to fly it.
 ~
 &r\--|~
-dfgiouxF 2 18 300 2 0 0 0 0 0
+dfgiouxF 2 18 300 2 0 0 0 0 0 -1 0
+B0
+&r\_~
+B1
+&r\~
 P
 2
 R
@@ -26,7 +30,7 @@ ribbon, which really brings the whole thing together.
 any suspicious figures approaching, be sure to 'protect' the goat.
 ~
 ~
-hmtvxH 19 1 0 0 0 0 0 0 0
+hmtvxH 19 1 0 0 0 0 0 0 0 -1 0
 C
 1 1
 P

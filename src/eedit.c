@@ -373,7 +373,7 @@ EEDIT(eedit_adjective) {
 			syslog(SYS_GC, GET_INVIS_LEV(ch), TRUE, "ABUSE: %s has changed %s's adjective form to %s", GET_NAME(ch), EMPIRE_NAME(emp), EMPIRE_ADJECTIVE(emp));
 		}
 		
-		update_MSDP_empire_data_all(emp, FALSE, FALSE);
+		TRIGGER_DELAYED_REFRESH(emp, DELAY_REFRESH_MSDP_UPDATE_ALL);
 	}
 }
 
@@ -421,7 +421,7 @@ EEDIT(eedit_banner) {
 			syslog(SYS_GC, GET_INVIS_LEV(ch), TRUE, "ABUSE: %s has changed %s's banner to %s%s&0", GET_NAME(ch), EMPIRE_NAME(emp), EMPIRE_BANNER(emp), show_color_codes(EMPIRE_BANNER(emp)));
 		}
 		
-		update_MSDP_empire_data_all(emp, FALSE, FALSE);
+		TRIGGER_DELAYED_REFRESH(emp, DELAY_REFRESH_MSDP_UPDATE_ALL);
 		
 		// graphical map update for all tiles I own 
 		HASH_ITER(hh, world_table, room, next_room) {
@@ -503,7 +503,7 @@ EEDIT(eedit_change_leader) {
 			}
 		}
 		
-		update_MSDP_empire_data_all(emp, FALSE, FALSE);
+		TRIGGER_DELAYED_REFRESH(emp, DELAY_REFRESH_MSDP_UPDATE_ALL);
 	}
 	
 	// clean up
@@ -673,7 +673,7 @@ EEDIT(eedit_name) {
 			}
 		}
 		
-		update_MSDP_empire_data_all(emp, FALSE, FALSE);
+		TRIGGER_DELAYED_REFRESH(emp, DELAY_REFRESH_MSDP_UPDATE_ALL);
 	}
 }
 
@@ -769,7 +769,7 @@ EEDIT(eedit_rank) {
 			}
 		}
 		
-		update_MSDP_empire_data_all(emp, FALSE, FALSE);
+		TRIGGER_DELAYED_REFRESH(emp, DELAY_REFRESH_MSDP_UPDATE_ALL);
 	}
 }
 
@@ -856,6 +856,6 @@ EEDIT(eedit_num_ranks) {
 			syslog(SYS_GC, GET_INVIS_LEV(ch), TRUE, "ABUSE: %s has changed %s's number of ranks to %d", GET_NAME(ch), EMPIRE_NAME(emp), EMPIRE_NUM_RANKS(emp));
 		}
 		
-		update_MSDP_empire_data_all(emp, FALSE, FALSE);
+		TRIGGER_DELAYED_REFRESH(emp, DELAY_REFRESH_MSDP_UPDATE_ALL);
 	}
 }

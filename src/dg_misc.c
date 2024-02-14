@@ -41,22 +41,8 @@
 room_data *do_dg_add_room_dir(room_data *from, int dir, bld_data *bld) {
 	room_data *home = HOME_ROOM(from), *new;
 	
-	// create the new room
-	new = create_room(home);
+	new = add_room_to_building(home, GET_BLD_VNUM(bld));
 	create_exit(from, new, dir, TRUE);
-	if (bld) {
-		attach_building_to_room(bld, new, TRUE);
-	}
-
-	COMPLEX_DATA(home)->inside_rooms++;
-	
-	if (GET_ROOM_VEHICLE(from)) {
-		add_room_to_vehicle(new, GET_ROOM_VEHICLE(from));
-	}
-	
-	if (ROOM_OWNER(home)) {
-		perform_claim_room(new, ROOM_OWNER(home));
-	}
 	
 	return new;
 }
@@ -1367,7 +1353,7 @@ void script_modify(char *argument) {
 			script_log("%%mod%% called without value argument");
 		}
 		else if (is_abbrev(field_arg, "icon")) {
-			if (!clear && str_cmp(value, "none") && !validate_icon(value)) {
+			if (!clear && str_cmp(value, "none") && !validate_icon(value, 4)) {
 				script_log("%%mod%% called with invalid room icon '%s'", value);
 			}
 			else {
@@ -1425,12 +1411,28 @@ void script_modify(char *argument) {
 			// these all require a value
 			script_log("%%mod%% called without value argument");
 		}
+		else if (is_abbrev(field_arg, "halficon")) {
+			if (!clear && str_cmp(value, "none") && !validate_icon(value, 2)) {
+				script_log("%%mod%% called with invalid vehicle half icon '%s'", value);
+			}
+			else {
+				set_vehicle_half_icon(veh, (clear || !str_cmp(value, "none")) ? NULL : value);
+			}
+		}
 		else if (is_abbrev(field_arg, "icon")) {
-			if (!clear && str_cmp(value, "none") && !validate_icon(value)) {
+			if (!clear && str_cmp(value, "none") && !validate_icon(value, 4)) {
 				script_log("%%mod%% called with invalid vehicle icon '%s'", value);
 			}
 			else {
 				set_vehicle_icon(veh, (clear || !str_cmp(value, "none")) ? NULL : value);
+			}
+		}
+		else if (is_abbrev(field_arg, "quartericon")) {
+			if (!clear && str_cmp(value, "none") && !validate_icon(value, 1)) {
+				script_log("%%mod%% called with invalid vehicle quarter icon '%s'", value);
+			}
+			else {
+				set_vehicle_quarter_icon(veh, (clear || !str_cmp(value, "none")) ? NULL : value);
 			}
 		}
 		else if (is_abbrev(field_arg, "keywords")) {

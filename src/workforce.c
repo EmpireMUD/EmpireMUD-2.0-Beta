@@ -136,12 +136,18 @@ int einv_interaction_chore_type = 0;
 * @param room_data *room
 */
 void process_one_chore(empire_data *emp, room_data *room) {
+	bool no_work, has_instance, starving;
 	int island = GET_ISLAND_ID(room);	// just look this up once
 	
+	// skip vehicles not currently on an island
+	if (island == NO_ISLAND) {
+		return;
+	}
+	
 	// basic vars that determine what we do:
-	bool no_work = ROOM_AFF_FLAGGED(room, ROOM_AFF_NO_WORK) ? TRUE : FALSE;
-	bool has_instance = ROOM_AFF_FLAGGED(room, ROOM_AFF_HAS_INSTANCE) ? TRUE : FALSE;
-	bool starving = empire_has_needs_status(emp, GET_ISLAND_ID(room), ENEED_WORKFORCE, ENEED_STATUS_UNSUPPLIED);
+	no_work = ROOM_AFF_FLAGGED(room, ROOM_AFF_NO_WORK) ? TRUE : FALSE;
+	has_instance = ROOM_AFF_FLAGGED(room, ROOM_AFF_HAS_INSTANCE) ? TRUE : FALSE;
+	starving = empire_has_needs_status(emp, GET_ISLAND_ID(room), ENEED_WORKFORCE, ENEED_STATUS_UNSUPPLIED);
 	
 	// THING 1: burning
 	if (IS_BURNING(room)) {
@@ -280,7 +286,7 @@ void process_one_vehicle_chore(empire_data *emp, vehicle_data *veh) {
 	bool on_fire, starving;
 	int island;
 	
-	if (!room) {
+	if (!room || GET_ISLAND_ID(room) == NO_ISLAND) {
 		return;
 	}
 	
@@ -704,7 +710,7 @@ static bool can_gain_chore_resource(empire_data *emp, room_data *loc, int chore,
 	glob_max = max;	// does not change
 	
 	// check empire's own limit
-	if ((emp_isle = get_empire_island(emp, island_id))) {
+	if (island_id != NO_ISLAND && (emp_isle = get_empire_island(emp, island_id))) {
 		if (emp_isle->workforce_limit[chore] > 0 && emp_isle->workforce_limit[chore] < max) {
 			max = emp_isle->workforce_limit[chore];
 		}
@@ -845,6 +851,7 @@ void charge_workforce(empire_data *emp, int chore, room_data *room, char_data *w
 void chore_update(void) {
 	bool log_and_needs = FALSE;
 	struct empire_territory_data *ter, *next_ter;
+	struct empire_vehicle_data *vter, *next_vter;
 	struct empire_island *eisle, *next_eisle;
 	struct empire_needs *needs, *next_needs;
 	struct workforce_log *wf_log;
@@ -901,10 +908,13 @@ void chore_update(void) {
 				next_ter = global_next_territory_entry;
 			}
 			
-			DL_FOREACH_SAFE(vehicle_list, veh, global_next_vehicle) {
-				if (VEH_OWNER(veh) == emp && !VEH_IS_EXTRACTED(veh)) {
+			global_next_empire_vehicle_entry = NULL;
+			HASH_ITER(hh, EMPIRE_VEHICLE_LIST(emp), vter, next_vter) {
+				global_next_empire_vehicle_entry = next_vter;
+				if ((veh = vter->veh) && !VEH_IS_EXTRACTED(veh)) {
 					process_one_vehicle_chore(emp, veh);
 				}
+				next_vter = global_next_empire_vehicle_entry;
 			}
 			
 			read_vault(emp);
@@ -1122,6 +1132,7 @@ char_data *find_chore_worker_in_room(empire_data *emp, room_data *room, vehicle_
 */
 struct empire_npc_data *find_free_npc_for_chore(empire_data *emp, room_data *loc) {
 	struct empire_territory_data *ter_iter, *next_ter;
+	struct empire_vehicle_data *vter_iter, *next_vter;
 	struct empire_npc_data *backup = NULL, *npc_iter;
 	room_data *rm;
 
@@ -1131,7 +1142,7 @@ struct empire_npc_data *find_free_npc_for_chore(empire_data *emp, room_data *loc
 		return NULL;
 	}
 	
-	// massive iteration to try to find one
+	// part 1: massive iteration to try to find one
 	HASH_ITER(hh, EMPIRE_TERRITORY_LIST(emp), ter_iter, next_ter) {
 		// only bother checking anything if npcs live here
 		if (ter_iter->npcs) {			
@@ -1145,6 +1156,29 @@ struct empire_npc_data *find_free_npc_for_chore(empire_data *emp, room_data *loc
 							backup = npc_iter;
 						}
 						else if (!npc_iter->mob) {
+							// not spawned: use this one
+							return npc_iter;
+						}
+					}
+				}
+			}
+		}
+	}
+	
+	// part 2: try vehicles, too
+	HASH_ITER(hh, EMPIRE_VEHICLE_LIST(emp), vter_iter, next_vter) {
+		if (vter_iter->npcs) {			
+			if (vter_iter->veh && (rm = IN_ROOM(vter_iter->veh)) && GET_ISLAND_ID(loc) == GET_ISLAND_ID(rm) && compute_distance(loc, rm) <= chore_distance) {
+				// iterate over population
+				LL_FOREACH(vter_iter->npcs, npc_iter) {
+					// only use citizens for labor
+					if (npc_iter->vnum == CITIZEN_MALE || npc_iter->vnum == CITIZEN_FEMALE) {
+						if (!backup && npc_iter->mob && GET_MOB_VNUM(npc_iter->mob) == npc_iter->vnum && !FIGHTING(npc_iter->mob)) {
+							// already has a mob? save as backup (also making sure the npc's mob is just a citizen not a laborer)
+							backup = npc_iter;
+						}
+						else if (!npc_iter->mob) {
+							// not spawned: use this one
 							return npc_iter;
 						}
 					}
@@ -2374,6 +2408,12 @@ void do_chore_einv_interaction(empire_data *emp, room_data *room, vehicle_data *
 	bool any_over_limit = FALSE;
 	int most_found = -1;
 	
+	if (islid == NO_ISLAND) {
+		// cannot process einv on no-island
+		// TODO should this log as a problem? It would be caused by a workable room on a ship in the ocean -paul 1/30/2024
+		return;
+	}
+	
 	// look for something to process
 	eisle = get_empire_island(emp, islid);
 	HASH_ITER(hh, eisle->store, store, next_store) {
@@ -2783,11 +2823,19 @@ void do_chore_minting(empire_data *emp, room_data *room, vehicle_data *veh) {
 	struct empire_storage_data *highest = NULL, *store, *next_store;
 	char_data *worker;
 	int amt, high_amt, limit, islid = GET_ISLAND_ID(room);
-	struct empire_island *eisle = get_empire_island(emp, islid);
+	struct empire_island *eisle;
 	char buf[MAX_STRING_LENGTH];
 	bool can_do = TRUE;
 	obj_data *orn;
 	obj_vnum vnum;
+	
+	if (islid == NO_ISLAND) {
+		// cannot process einv on no-island
+		// TODO should this log as a problem? It would be caused by a workable room on a ship in the ocean -paul 1/30/2024
+		return;
+	}
+	
+	eisle = get_empire_island(emp, islid);
 	
 	limit = empire_chore_limit(emp, islid, CHORE_MINTING);
 	if (EMPIRE_COINS(emp) >= MAX_COIN || (limit != WORKFORCE_UNLIMITED && EMPIRE_COINS(emp) >= limit)) {
@@ -2918,8 +2966,6 @@ void do_chore_production(empire_data *emp, room_data *room, vehicle_data *veh, i
 	
 	if (has_any_undepleted_interaction_for_chore(emp, CHORE_PRODUCTION, room, veh, interact_type, &over_limit)) {
 		if ((worker = find_chore_worker_in_room(emp, room, veh, chore_data[CHORE_PRODUCTION].mob))) {
-			charge_workforce(emp, CHORE_PRODUCTION, room, worker, 1, NOTHING, 0);
-		
 			if (veh && run_interactions(worker, VEH_INTERACTIONS(veh), interact_type, room, NULL, NULL, veh, one_production_chore)) {
 				// successful vehicle interact
 				success = TRUE;

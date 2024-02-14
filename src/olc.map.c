@@ -539,7 +539,7 @@ OLC_MODULE(mapedit_icon) {
 	}
 	else if (!*argument)
 		msg_to_char(ch, "What would you like to set the icon to (or \"none\")?\r\n");
-	else if (!validate_icon(argument))
+	else if (!validate_icon(argument, 4))
 		msg_to_char(ch, "Room icons must be exactly four characters.\r\n");
 	else if (argument[0] != COLOUR_CHAR)
 		msg_to_char(ch, "Icons must begin with a color code.\r\n");
@@ -658,19 +658,7 @@ OLC_MODULE(mapedit_exits) {
 		msg_to_char(ch, "An exit already exists in that direction in the target room.\r\n");
 	else {
 		if (new) {
-			to_room = create_room(HOME_ROOM(IN_ROOM(ch)));
-			attach_building_to_room(building_proto(config_get_int("default_interior")), to_room, TRUE);
-			
-			// TODO this is done in several different things that add rooms, and could be moved to a function -paul 7/14/2016
-			if (GET_ROOM_VEHICLE(IN_ROOM(ch))) {
-				add_room_to_vehicle(to_room, GET_ROOM_VEHICLE(IN_ROOM(ch)));
-			}
-			COMPLEX_DATA(HOME_ROOM(IN_ROOM(ch)))->inside_rooms++;
-			
-			if (ROOM_OWNER(HOME_ROOM(IN_ROOM(ch)))) {
-				perform_claim_room(to_room, ROOM_OWNER(HOME_ROOM(IN_ROOM(ch))));
-			}
-			complete_wtrigger(to_room);
+			to_room = add_room_to_building(HOME_ROOM(IN_ROOM(ch)), NOTHING);
 		}
 
 		create_exit(IN_ROOM(ch), to_room, dir, TRUE);
@@ -841,8 +829,19 @@ OLC_MODULE(mapedit_naturalize) {
 
 OLC_MODULE(mapedit_populate) {
 	char_data *current = ROOM_PEOPLE(IN_ROOM(ch));
+	vehicle_data *veh;
 	
-	if (!GET_BUILDING(IN_ROOM(ch))) {
+	if (*argument && (veh = get_vehicle_in_room_vis(ch, argument, NULL))) {
+		populate_vehicle_npc(veh, NULL, TRUE);
+		
+		if (current == ROOM_PEOPLE(IN_ROOM(ch))) {
+			msg_to_char(ch, "Okay. But there didn't seem to be anything to populate.\r\n");
+		}
+	}
+	else if (*argument && !is_abbrev(argument, "room") && !is_abbrev(argument, "building")) {
+		msg_to_char(ch, "You don't see that here.\r\n");
+	}
+	else if (!GET_BUILDING(IN_ROOM(ch))) {
 		msg_to_char(ch, "You can only populate buildings.\r\n");
 	}
 	else if (!ROOM_OWNER(IN_ROOM(ch))) {

@@ -3439,14 +3439,15 @@ Affects that are SOMETIMES safe to use:
 
 See also: OLC BUILDINGS, OLC ROOM TEMPLATES
 #d
-"BEDIT ARTISAN"
+"BEDIT ARTISAN" "VEDIT ARTISAN"
 
 Usage:  .artisan <mob vnum>
         .artisan none
 
-Some buildings may have artisan mobs set. These mobs will always spawn in the
-building if the building is owned by an empire and has been populated. Only
-one artisan will ever spawn per building.
+Some buildings and vehicles may have artisan mobs set. These mobs will always
+spawn in the building -- or outside the vehicle -- if it is owned by an empire
+and has been populated. Only one artisan will ever spawn per building/vehicle.
+The artisan can also perform any workforce chore that takes place on its tile.
 
 This artisan is marked as an EMPIRE mob and you may use the following name
 tokens on the mob itself, if it is only loaded as an artisan:
@@ -3454,27 +3455,28 @@ tokens on the mob itself, if it is only loaded as an artisan:
  #e - name of the empire it belongs to
  #a - the adjective form of its empire's name
 
-You can use the "none" argument to this command in order to remove the artisan.
+Use ".artisan none" if you need to remove the artisan.
 
 See also: OLC BUILDINGS, OLC VEHICLES, MEDIT NAMESET, VNUM
 #d
-"BEDIT CITIZENS"
+"BEDIT CITIZENS" "VEDIT CITIZENS"
 
 Usage:  .citizens <number>
 
-This sets how many citizens will move into the base room of the building. It
-does not affect any designated/extra rooms. Once populated, these citizens
-spawn in the building tile when players are nearby. They can also perform
-Workforce chores near their home building.
+This sets how many citizens will move into the base room of the building or the
+outside of a vehicle. Or, on an interior/designated room, the number of
+citizens who will move into that room. Once populated, these citizens spawn in
+the building (or just outisde the vehicle) when players are nearby. They can
+also perform Workforce chores near their home.
 
-You cannot control which citizen mobs actually spawn, only how many may live
-here total. If the building supports extra rooms, more citizens can be added
-in bedrooms.
+If citizens should live inside a vehicle, rather than outside, set the citizen
+count on one of the interior room building types.
 
-NOTE: Any building that allows at least 1 citizen may also be set as a player's
-private home.
+NOTE: Any building or vehicle that allows at least 1 citizen may also be set as
+a player's private home, including a vehicle whose main interior room has at
+least 1 citizen.
 
-See also: BEDIT ROOMS, HOME, OLC BUILDINGS, WORKFORCE
+See also: BEDIT ROOMS, HOME, OLC BUILDINGS, OLC VEHICLES, WORKFORCE
 #d
 "BEDIT COMMANDS"
 
@@ -3566,45 +3568,49 @@ on a designate-able room (a building where the ROOM flag is set), they only
 affect players in that room.
 
 Available flags:
- ROOM - this is a room that can be added with the designate command if it has
+ &cROOM&0 - this is a room that can be added with the designate command if it has
     matching designate flags with a building
- ALLOW-MOUNTS - players can ride inside without dismounting
- TWO-ENTRANCES - the building will have a rear entrance across from the main
+ &cALLOW-MOUNTS&0 - players can ride inside without dismounting
+ &cTWO-ENTRANCES&0 - the building will have a rear entrance across from the main
     entrance (does not apply to OPEN buildings)
- OPEN - never takes the player off the map, shows no room description, and
+ &cOPEN&0 - never takes the player off the map, shows no room description, and
     cannot have interior rooms
- CLOSED - always shows the room description and takes the player off the map,
+ &cCLOSED&0 - always shows the room description and takes the player off the map,
     even if the building is not complete
- INTERLINK - can be interlinked with other nearby INTERLINK buildings
- HERD - mobs can be herded into this building
- DEDICATE - can be dedicated to a patron god or player, which adds "of Name"
+ &cINTERLINK&0 - can be interlinked with other nearby INTERLINK buildings
+ &cHERD&0 - mobs can be herded into this building
+ &cDEDICATE&0 - can be dedicated to a patron god or player, which adds "of Name"
     to the room title
- IS-RUINS - counts as ruins (affects cities and decay)
- !NPC - mobs won't enter this building
- BARRIER - can only go back the way you came, unless flying
- IN-CITY-ONLY - can only be used if in an established city
- LARGE-CITY-RADIUS - counts as in-city even when built in the outskirts
- !PAINT - cannot be painted
- ATTACH-ROAD - on the ascii map, roads attach to this tile like it's a road
- BURNABLE - will catch fire if a fire is placed inside by a hostile empire
- EXIT - on interior rooms, players can 'exit' (or disembark) to leave from here
- OBSCURE-VISION - blocks tiles behind it on the map
- ROAD-ICON - replaces the building icon with generated road icons/dashes: --+-
- ROAD-ICON-WIDE - replaces the icon with wide road icons: ====
- ATTACH-BARRIER - icons with @u/@v will attach to this building like a barrier
- NO-CUSTOMIZE - cannot be customized by players
- NO-ABANDON-WHEN-RUINED - won't be abandoned when it turns to ruins; only
+ &cIS-RUINS&0 - counts as ruins (affects cities and decay)
+ &c!NPC&0 - mobs won't enter this building
+ &cBARRIER&0 - can only go back the way you came, unless flying
+ &cIN-CITY-ONLY&0 - can only be used if in an established city
+ &cLARGE-CITY-RADIUS&0 - counts as in-city even when built in the outskirts
+ &c!PAINT&0 - cannot be painted
+ &cATTACH-ROAD&0 - on the ascii map, roads attach to this tile like it's a road
+ &cBURNABLE&0 - will catch fire if a fire is placed inside by a hostile empire
+ &cEXIT&0 - on interior rooms, players can 'exit' (or disembark) to leave from here
+ &cOBSCURE-VISION&0 - blocks tiles behind it on the map
+ &cROAD-ICON&0 - replaces the building icon with generated road icons/dashes: --+-
+ &cROAD-ICON-WIDE&0 - replaces the icon with wide road icons: ====
+ &cATTACH-BARRIER&0 - icons with @u/@v will attach to this building like a barrier
+ &cNO-CUSTOMIZE&0 - cannot be customized by players
+ &cNO-ABANDON-WHEN-RUINED&0 - won't be abandoned when it turns to ruins; only
     normally used on buildings that are part of adventures like the Hamlet.
- SAIL - can enter this building with a boat
- ITEM-LIMIT - only a certain number of items can be dropped here
- LONG-AUTOSTORE - autostore takes 72 hours instead of 3 here
- HIGH-DEPLETION - has more resources than a normal tile; does not work with
+ &cSHOW-VEHICLES&0 - for open buildings, will show vehicles on the tile instead of
+    the building (or in addition to, they have half or quarter icons); ONLY if
+    the building is open or incomplete. Normally a building icon hides vehicle
+    icons on the tile.
+ &cSAIL&0 - can enter this building with a boat
+ &cITEM-LIMIT&0 - only a certain number of items can be dropped here
+ &cLONG-AUTOSTORE&0 - autostore takes 72 hours instead of 3 here
+ &cHIGH-DEPLETION&0 - has more resources than a normal tile; does not work with
     interactions that set their own depletion limit (ones that show #-max).
- !DELETE - will not be deleted for not having a homeroom
- NEED-BOAT - requires a boat, flying, waterwalking, or swimming to enter
- LOOK-OUT - can see the map using "look out"
- 2ND-TERRITORY - counts as territory off the map (e.g. in a ship)
- UPGRADED - modifies other building types like SHIPYARD
+ &c!DELETE&0 - will not be deleted for not having a homeroom
+ &cNEED-BOAT&0 - requires a boat, flying, waterwalking, or swimming to enter
+ &cLOOK-OUT&0 - can see the map using "look out"
+ &c2ND-TERRITORY&0 - counts as territory off the map (e.g. in a ship)
+ &cUPGRADED&0 - modifies other building types like SHIPYARD
 
 * Note: If you change the LARGE-CITY-RADIUS flag on existing buildings,
         territory counts will not update right away. Any empire can force a
@@ -3630,7 +3636,8 @@ Fields:
   &c-fame -fameover -fameunder&0 - specific fame amount
   &c-flagged -unflagged&0 - see HELP BEDIT FLAGS
   &c-functions&0 - see HELP BEDIT FUNCTIONS
-  &c-icon&0 - match the text of the icon, if any
+  &c-icon -halficon -quartericon&0 - match the text of one of the icon fields;
+     use e.g. "-halficon any" to check if it has one at all.
   &c-interactions&0 - has a specific type, see HELP BEDIT INTERACTION
   &c-height -heightover -heightunder&0 - specific height amount
   &c-hitpoints -hitpointsover -hitpointsunder&0 - specific hitpoint amount
@@ -3745,19 +3752,31 @@ Common hitpoint levels:
 
 See also: BEDIT RESOURCE MAINTENANCE, FIRE, OLC BUILDINGS, SIEGE RITUAL
 #d
-"BEDIT ICON"
+"BEDIT ICON" "BEDIT HALFICON" "BEDIT HALF ICON" "BEDIT QUARTERICON" "BEDIT QUARTER ICON"
 
 Usage:  .icon <icon>
+        .halficon <icon | none>
+        .quartericon <icon | none>
 
-The icon is how a building appears on the world map. It must always be exactly
-4 characters long, not counting any color codes.
+The icon is how a building appears on the world map. The regular icon is
+mandatory for a building, unless it has the ROOM flag. Half and quarter icons
+are optional; see below.
+
+The regular icon must always be exactly 4 characters long, not counting any
+color codes. Half icons are 2 characters long (plus color codes) and quarter
+icons must be a single character (again, not counting any color codes).
+
+Buildings usually only show the regular icon, but can show the half or quarter
+icon if vehicles that also have half or quarter icons are present on the tile.
+This only applies to open buildings -- a closed building cannot generally show
+a half or quarter icon.
 
 Buildings usually use icons like: [  ], (  ), {  }
 Usually the symbols inside the parentheses or braces are a pair of letters that
 loosely indicate what building it is, but you should try not to duplicate
 existing buildings.
 
-If you don't start with a color code, the building will have a color based on
+Unless you start an icon with a color code, the icon will have a color based on
 the tile it was built upon (and the season). In addition to normal color codes, 
 you can use &&? to represent the base tile's color if you need to use it later
 in the color code. If you want to use the && symbol in the icon, you must
@@ -3799,10 +3818,10 @@ Room/vehicle interaction types:
  &cQUARRY&0 * - Things you can find by quarrying here.
  &cRUINS-TO-BLD&0 - What type of ruins building appears here when it's ruined.
    Only works on buildings, not vehicles. Quantity is ignored. Use #n in the
-   room title to indicate the name of the lost building.
+   room title to indicate the name of the lost building. See HELP RUINS LIST.
  &cRUINS-TO-VEH&0 - What type of ruins vehicle appears here when it's ruined.
    May use #n in the keywords and short/long desc to indicate the name of the
-   building/vehicle that was ruined. Quantity is ignored.
+   building/vehicle that was ruined. Quantity is ignored. See HELP RUINS LIST.
  &cPRODUCTION&0 * - Workforce will produce it (on a building or vehicle only).
    Production is 1 at a time; quantity is used as the depletion limit.
  &cSKILLED-LABOR&0 * - Workforce will produce it with Skilled Labor (bld/veh only).
@@ -5670,7 +5689,7 @@ The following commands are available:
  name - Customize the room title.
  naturalize - Returns this tile to its 'natural terrain'.
  passwalls - Able to move on the map unblocked by walls, interiors, etc.
- populate - Forces a building/room to populate an npc, if possible.
+ populate - Forces a building/vehicle to populate an npc, if possible.
  remember - Stores the current terrain as the 'natural terrain'.
  roomtype - Change the type of an interior room.
  ruin - Turn a building or vehicle to ruins.
@@ -10007,10 +10026,10 @@ Room/vehicle interaction types:
  &cQUARRY&0 * - Things you can find by quarrying here.
  &cRUINS-TO-BLD&0 - What type of ruins building appears here when it's ruined.
    Only works on buildings, not vehicles. Quantity is ignored. Use #n in the
-   room title to indicate the name of the lost building.
+   room title to indicate the name of the lost building. See HELP RUINS LIST.
  &cRUINS-TO-VEH&0 - What type of ruins vehicle appears here when it's ruined.
    May use #n in the keywords and short/long desc to indicate the name of the
-   building/vehicle that was ruined. Quantity is ignored.
+   building/vehicle that was ruined. Quantity is ignored. See HELP RUINS LIST.
  &cPRODUCTION&0 * - Workforce will produce it (on a building or vehicle only).
    Production is 1 at a time; quantity is used as the depletion limit.
  &cSKILLED-LABOR&0 * - Workforce will produce it with Skilled Labor (bld/veh only).
@@ -10295,6 +10314,34 @@ You can add resource actions using generics. Here are some common ones:
 
 See also: BEDIT RESOURCE, CEDIT RESOURCES, VEDIT RESOURCE, OLC GENERICS
 #d
+RUIN RUINS "DECAYING RUINS" "RUINS BUILDING" "RUINS LIST" "RUIN LIST"
+
+List of available ruins for RUINS-TO-* interactions:
+
+Building types:
+ 5006 - open ruins
+ 5007 - closed ruins
+ 5010 - flooded ruins
+
+Vehicle types with no interior:
+ 5003 - size 1 open ruins
+ 5004 - size 2 open ruins
+ 5005 - size 3 open ruins
+ 5006 - size 4 open ruins
+
+Vehicle types with interiors:
+ 5002 - size 1 closed ruins
+ 5009 - size 2 closed ruins
+ 5008 - size 3 closed ruins
+ 5007 - size 4 closed ruins
+
+Other vehicle ruins:
+ 5010 - size 4 flooded ruins
+
+You can also create custom new ruins for buildings.
+
+There is also a mortal version of the ruins help file: HELP -m RUINS
+#d
 "SHIELD ITEM" "SHIELD OBJECT"
 
 The SHIELD item type always needs the HOLD wear location, and in most cases it
@@ -10512,7 +10559,8 @@ Fields:
   &c-fame -fameover -fameunder&0 - specific fame amount
   &c-flagged -unflagged&0 - see HELP VEDIT FLAGS
   &c-functions&0 - see HELP VEDIT FUNCTIONS
-  &c-icon [any]&0 - match the text of the icon (or "any" to just require an icon)
+  &c-icon -halficon -quartericon&0 - match the text of one of the icon fields;
+     use e.g. "-icon any" to check if it has one at all.
   &c-interactions&0 - has a specific type, see HELP VEDIT INTERACTION
   &c-height -heightover -heightunder&0 - specific height amount
   &c-hitpoints -hitpointsover -hitpointsunder&0 - specific hitpoint amount
@@ -10575,9 +10623,11 @@ Common hitpoint levels:
 
 See also: VEDIT RESOURCE MAINTENANCE, FIRE, OLC VEHICLES, REPAIR, SIEGE RITUAL
 #d
-"VEDIT ICON"
+"VEDIT ICON" "VEDIT HALFICON" "VEDIT HALF ICON" "VEDIT QUARTERICON" "VEDIT QUARTER ICON"
 
 Usage:  .icon <icon | none>
+        .halficon <icon | none>
+        .quartericon <icon | none>
 
 Vehicles usually don't appear on the world map, but they can be set to do so by
 giving them an icon. In general, vehicle icons can lead to map clutter and
@@ -10587,7 +10637,11 @@ next to the tile name, instead of its icon.
 
 If more than one vehicle is in the same room, only the first vehicle in the
 list is shown on the map (this is generally the last vehicle that entered the
-room).
+room) -- unless both vehicles have half or quarter icons.
+
+The regular icon is 4 characters long, the half icon must be 2 characters long,
+and the quarter icon should be just 1 character; however, you can include color
+codes in any of these icons.
 
 You should almost always start the icon with &&0 to clear the tile's base
 color. There is no need to put a &&0 at the end of the icon.

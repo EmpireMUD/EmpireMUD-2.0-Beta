@@ -2203,11 +2203,13 @@ void check_empire_storage_timers(void) {
 						
 						// remove
 						store->amount = MAX(0, store->amount - st->amount);
-						DL_DELETE(store->timers, st);
-						free(st);
 						
 						// progress loss
 						et_get_obj(emp, store->proto, -st->amount, store->amount);
+						
+						// free
+						DL_DELETE(store->timers, st);
+						free(st);
 						
 						// delete storage if needed
 						if (store->amount == 0 && !store->keep) {

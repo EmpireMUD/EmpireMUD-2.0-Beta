@@ -63,7 +63,7 @@ void tog_pvp(char_data *ch);
 //// EMPIREMUD CONSTANTS /////////////////////////////////////////////////////
 
 // Shown on the "version" command and sent over MSSP
-const char *version = "EmpireMUD 2.0 beta 5.174";
+const char *version = "EmpireMUD 2.0 beta 5.175";
 const char *DG_SCRIPT_VERSION = "DG Scripts 1.0.12 e5.1.2";
 
 
@@ -2515,7 +2515,7 @@ const char *offense_flags[] = {
 
 
 // TECH_x: empire techs
-const char *techs[] = {
+const char *empire_tech_types[] = {
 	"*",	// 0
 	"City Lights",
 	"Locks",
@@ -3791,7 +3791,7 @@ const char *bld_flags[] = {
 	"ATTACH-BARRIER",	// 20
 	"NO-CUSTOMIZE",
 	"NO-ABANDON-WHEN-RUINED",
-	"*",
+	"SHOW-VEHICLES",
 	"*",
 	"*",	// 25
 	"*",

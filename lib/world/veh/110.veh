@@ -8,7 +8,11 @@ Whatever engineer created this flying ship shall surely go down in history, if
 not in the mountains.
 ~
 &0~vv~~
-dtxF 25 96 0 0 0 0 0 0 0
+dtxF 25 96 0 0 0 0 0 0 0 -1 0
+B0
+&0vv~
+B1
+&0v~
 D
 11034 0 0
 P

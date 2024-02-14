@@ -659,7 +659,7 @@ void olc_fullsearch_building(char_data *ch, char *argument) {
 	int count;
 	bool found_one;
 	
-	char only_icon[MAX_INPUT_LENGTH], only_commands[MAX_INPUT_LENGTH];
+	char only_icon[MAX_INPUT_LENGTH], only_half_icon[MAX_INPUT_LENGTH], only_quarter_icon[MAX_INPUT_LENGTH], only_commands[MAX_INPUT_LENGTH];
 	bitvector_t only_designate = NOBITS, only_flags = NOBITS, only_functions = NOBITS;
 	bitvector_t find_interacts = NOBITS, not_flagged = NOBITS, found_interacts = NOBITS;
 	bitvector_t only_affs = NOBITS;
@@ -677,6 +677,8 @@ void olc_fullsearch_building(char_data *ch, char *argument) {
 	size_t size;
 	
 	*only_icon = '\0';
+	*only_half_icon = '\0';
+	*only_quarter_icon = '\0';
 	*only_commands = '\0';
 	
 	if (!*argument) {
@@ -711,6 +713,8 @@ void olc_fullsearch_building(char_data *ch, char *argument) {
 		FULLSEARCH_FLAGS("unflagged", not_flagged, bld_flags)
 		FULLSEARCH_FLAGS("functions", only_functions, function_flags)
 		FULLSEARCH_STRING("icon", only_icon)
+		FULLSEARCH_STRING("halficon", only_half_icon)
+		FULLSEARCH_STRING("quartericon", only_quarter_icon)
 		FULLSEARCH_FLAGS("interaction", find_interacts, interact_types)
 		FULLSEARCH_INT("height", only_height, 0, INT_MAX)
 		FULLSEARCH_INT("heightover", height_over, 0, INT_MAX)
@@ -801,6 +805,18 @@ void olc_fullsearch_building(char_data *ch, char *argument) {
 			continue;
 		}
 		if (*only_icon && !strstr(GET_BLD_ICON(bld), only_icon) && !strstr(strip_color(GET_BLD_ICON(bld)), only_icon)) {
+			continue;
+		}
+		if (*only_half_icon && !GET_BLD_HALF_ICON(bld)) {
+			continue;
+		}
+		if (*only_half_icon && str_cmp(only_half_icon, "any") && !strstr(GET_BLD_HALF_ICON(bld), only_half_icon) && !strstr(strip_color(GET_BLD_HALF_ICON(bld)), only_half_icon)) {
+			continue;
+		}
+		if (*only_quarter_icon && !GET_BLD_QUARTER_ICON(bld)) {
+			continue;
+		}
+		if (*only_quarter_icon && str_cmp(only_quarter_icon, "any") && !strstr(GET_BLD_QUARTER_ICON(bld), only_quarter_icon) && !strstr(strip_color(GET_BLD_QUARTER_ICON(bld)), only_quarter_icon)) {
 			continue;
 		}
 		if (*only_commands && !GET_BLD_COMMANDS(bld)) {
@@ -1112,6 +1128,12 @@ void save_olc_building(descriptor_data *desc) {
 	if (GET_BLD_ICON(proto)) {
 		free(GET_BLD_ICON(proto));
 	}
+	if (GET_BLD_HALF_ICON(proto)) {
+		free(GET_BLD_HALF_ICON(proto));
+	}
+	if (GET_BLD_QUARTER_ICON(proto)) {
+		free(GET_BLD_QUARTER_ICON(proto));
+	}
 	if (GET_BLD_COMMANDS(proto)) {
 		free(GET_BLD_COMMANDS(proto));
 	}
@@ -1199,6 +1221,8 @@ bld_data *setup_olc_building(bld_data *input) {
 		GET_BLD_NAME(new) = GET_BLD_NAME(input) ? str_dup(GET_BLD_NAME(input)) : NULL;
 		GET_BLD_TITLE(new) = GET_BLD_TITLE(input) ? str_dup(GET_BLD_TITLE(input)) : NULL;
 		GET_BLD_ICON(new) = GET_BLD_ICON(input) ? str_dup(GET_BLD_ICON(input)) : NULL;
+		GET_BLD_HALF_ICON(new) = GET_BLD_HALF_ICON(input) ? str_dup(GET_BLD_HALF_ICON(input)) : NULL;
+		GET_BLD_QUARTER_ICON(new) = GET_BLD_QUARTER_ICON(input) ? str_dup(GET_BLD_QUARTER_ICON(input)) : NULL;
 		GET_BLD_COMMANDS(new) = GET_BLD_COMMANDS(input) ? str_dup(GET_BLD_COMMANDS(input)) : NULL;
 		GET_BLD_DESC(new) = GET_BLD_DESC(input) ? str_dup(GET_BLD_DESC(input)) : NULL;
 		GET_BLD_RELATIONS(new) = GET_BLD_RELATIONS(input) ? copy_bld_relations(GET_BLD_RELATIONS(input)) : NULL;
@@ -1308,8 +1332,19 @@ void olc_show_building(char_data *ch) {
 	sprintf(buf + strlen(buf), "<%stitle\t0> %s\r\n", OLC_LABEL_STR(GET_BLD_TITLE(bdg), default_building_title), GET_BLD_TITLE(bdg));
 	
 	if (!is_room) {
-		replace_question_color(NULLSAFE(GET_BLD_ICON(bdg)), "\t0", lbuf);
-		sprintf(buf + strlen(buf), "<%sicon\t0> %s\t0  %s\r\n", OLC_LABEL_STR(GET_BLD_ICON(bdg), default_building_icon), lbuf, show_color_codes(NULLSAFE(GET_BLD_ICON(bdg))));
+		if (BLD_FLAGGED(bdg, BLD_OPEN) || GET_BLD_HALF_ICON(bdg) || GET_BLD_QUARTER_ICON(bdg)) {
+			replace_question_color(NULLSAFE(GET_BLD_ICON(bdg)), "\t0", lbuf);
+			sprintf(buf + strlen(buf), "<%sicon\t0> %s\t0  %s, ", OLC_LABEL_STR(GET_BLD_ICON(bdg), default_building_icon), lbuf, show_color_codes(NULLSAFE(GET_BLD_ICON(bdg))));
+
+			replace_question_color(NULLSAFE(GET_BLD_HALF_ICON(bdg)), "\t0", lbuf);
+			sprintf(buf + strlen(buf), "<%shalficon\t0> %s\t0  %s, ", OLC_LABEL_STR(GET_BLD_HALF_ICON(bdg), default_building_icon), lbuf, show_color_codes(NULLSAFE(GET_BLD_HALF_ICON(bdg))));
+
+			replace_question_color(NULLSAFE(GET_BLD_QUARTER_ICON(bdg)), "\t0", lbuf);
+			sprintf(buf + strlen(buf), "<%squartericon\t0> %s\t0  %s\r\n", OLC_LABEL_STR(GET_BLD_QUARTER_ICON(bdg), default_building_icon), lbuf, show_color_codes(NULLSAFE(GET_BLD_QUARTER_ICON(bdg))));
+		}
+		else {
+			sprintf(buf + strlen(buf), "<%sicon\t0> %s\t0  %s\r\n", OLC_LABEL_STR(GET_BLD_ICON(bdg), default_building_icon), lbuf, show_color_codes(NULLSAFE(GET_BLD_ICON(bdg))));
+		}
 	}
 	sprintf(buf + strlen(buf), "<%scommands\t0> %s\r\n", OLC_LABEL_STR(GET_BLD_COMMANDS(bdg), ""), GET_BLD_COMMANDS(bdg) ? GET_BLD_COMMANDS(bdg) : "");
 	sprintf(buf + strlen(buf), "<%sdescription\t0>\r\n%s", OLC_LABEL_STR(GET_BLD_DESC(bdg), ""), GET_BLD_DESC(bdg) ? GET_BLD_DESC(bdg) : "");
@@ -1539,6 +1574,30 @@ OLC_MODULE(bedit_functions) {
 }
 
 
+OLC_MODULE(bedit_half_icon) {
+	bld_data *bdg = GET_OLC_BUILDING(ch->desc);
+	
+	delete_doubledollar(argument);
+	
+	if (IS_SET(GET_BLD_FLAGS(bdg), BLD_ROOM)) {
+		msg_to_char(ch, "You can't set that on a ROOM.\r\n");
+	}
+	else if (!str_cmp(argument, "none")) {
+		if (GET_BLD_HALF_ICON(bdg)) {
+			free(GET_BLD_HALF_ICON(bdg));
+		}
+		GET_BLD_HALF_ICON(bdg) = NULL;
+		msg_to_char(ch, "It no longer has a half icon.\r\n");
+	}
+	else if (!validate_icon(argument, 2)) {
+		msg_to_char(ch, "You must specify a half icon that is 2 characters long, not counting color codes.\r\n");
+	}
+	else {
+		olc_process_string(ch, argument, "halficon", &GET_BLD_HALF_ICON(bdg));
+	}
+}
+
+
 OLC_MODULE(bedit_height) {
 	bld_data *bdg = GET_OLC_BUILDING(ch->desc);
 	
@@ -1571,7 +1630,7 @@ OLC_MODULE(bedit_icon) {
 	if (IS_SET(GET_BLD_FLAGS(bdg), BLD_ROOM)) {
 		msg_to_char(ch, "You can't set that on a ROOM.\r\n");
 	}
-	else if (!validate_icon(argument)) {
+	else if (!validate_icon(argument, 4)) {
 		msg_to_char(ch, "You must specify an icon that is 4 characters long, not counting color codes.\r\n");
 	}
 	else {
@@ -1596,6 +1655,30 @@ OLC_MODULE(bedit_name) {
 	bld_data *bdg = GET_OLC_BUILDING(ch->desc);
 	olc_process_string(ch, argument, "name", &GET_BLD_NAME(bdg));
 	CAP(GET_BLD_NAME(bdg));
+}
+
+
+OLC_MODULE(bedit_quarter_icon) {
+	bld_data *bdg = GET_OLC_BUILDING(ch->desc);
+	
+	delete_doubledollar(argument);
+	
+	if (IS_SET(GET_BLD_FLAGS(bdg), BLD_ROOM)) {
+		msg_to_char(ch, "You can't set that on a ROOM.\r\n");
+	}
+	else if (!str_cmp(argument, "none")) {
+		if (GET_BLD_QUARTER_ICON(bdg)) {
+			free(GET_BLD_QUARTER_ICON(bdg));
+		}
+		GET_BLD_QUARTER_ICON(bdg) = NULL;
+		msg_to_char(ch, "It no longer has a quarter icon.\r\n");
+	}
+	else if (!validate_icon(argument, 1)) {
+		msg_to_char(ch, "You must specify a quarter icon that is 1 character long, not counting color codes.\r\n");
+	}
+	else {
+		olc_process_string(ch, argument, "quartericon", &GET_BLD_QUARTER_ICON(bdg));
+	}
 }
 
 

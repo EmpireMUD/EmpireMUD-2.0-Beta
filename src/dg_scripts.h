@@ -214,11 +214,17 @@
 
 
 // SCRIPT IDS:
+// max id is:			2 147 483 647
 // player idnums are used as script ids up to EMPIRE_ID_BASE-1
 #define EMPIRE_ID_BASE	20000000	// reserve this many ids for players; empires use base+vnum
-#define ROOM_ID_BASE	(10000000 + EMPIRE_ID_BASE)	// reserve 10000000 ids for empires
+#define VEHICLE_ID_BASE	(10000000 + EMPIRE_ID_BASE)	// reserve 10000000 ids for empires; vehicles use base+idnum
+#define ROOM_ID_BASE	(80000000 + VEHICLE_ID_BASE)	// reserve 80000000 ids for vehicles
 #define OTHER_ID_BASE	((MAP_SIZE * 5) + ROOM_ID_BASE)	// reserve 5x mapsize for room ids
-// removed MOB_ID_BASE, OBJ_ID_BASE, VEHICLE_ID_BASE: these ids now share the OTHER_ID_BASE-space
+// removed MOB_ID_BASE, OBJ_ID_BASE: these ids now share the OTHER_ID_BASE-space
+
+// NOTE: There is no current plan for how to handle vehicle idnums exceeding
+// available vehicle script IDs. It seems unlikely to happen in a realistic
+// amount of time but, if so, it will require new functionality. -paul 1/31/2024
 
 
  //////////////////////////////////////////////////////////////////////////////

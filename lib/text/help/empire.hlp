@@ -119,6 +119,8 @@ Commands:
     un-claims all territory within the city border.
 - &ccity rename <number> <new name>&0: This allows you to rename a city.
 - &ccity traits <name> [add | remove] <trait(s)>&0: Change city traits.
+- &ccity survey [-v]&0: Check the surrounding area for viability to found a
+    city. Use the -v option for more detailed info.
 
 See also: CITY INFORMATION, CITY TRAITS, CLAIM, ESTABLISHING
 #
@@ -772,9 +774,10 @@ ISLANDS
 
 Usage:  islands
 
-This command lists the islands your empire has territory or EInventory on
-(including warehouse storage). You must have the Navigation ability. The
-coordinates for each island are the approximate center of the island.
+This command lists the islands your empire has citizens, territory, or
+EInventory on (including warehouse storage and shipping). You must have the
+Navigation ability. The coordinates for each island are the approximate center
+of the island.
 
 Empires can rename islands using the 'customize island' command. These names
 become global if the empire is the only one with cities on the island, or

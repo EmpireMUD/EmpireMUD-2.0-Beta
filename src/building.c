@@ -403,17 +403,19 @@ void construct_building(room_data *room, bld_vnum type) {
 	
 	// check for territory updates
 	if (ROOM_OWNER(room) && was_large != LARGE_CITY_RADIUS(room)) {
-		struct empire_island *eisle = get_empire_island(ROOM_OWNER(room), GET_ISLAND_ID(room));
 		is_ter = get_territory_type_for_empire(room, ROOM_OWNER(room), FALSE, &junk, NULL);
 		
 		if (was_ter != is_ter) {	// did territory type change?
 			SAFE_ADD(EMPIRE_TERRITORY(ROOM_OWNER(room), was_ter), -1, 0, UINT_MAX, FALSE);
-			SAFE_ADD(eisle->territory[was_ter], -1, 0, UINT_MAX, FALSE);
-			
 			SAFE_ADD(EMPIRE_TERRITORY(ROOM_OWNER(room), is_ter), 1, 0, UINT_MAX, FALSE);
-			SAFE_ADD(eisle->territory[is_ter], 1, 0, UINT_MAX, FALSE);
 			
 			// (total territory does not change)
+			
+			if (GET_ISLAND_ID(room) != NO_ISLAND) {
+				struct empire_island *eisle = get_empire_island(ROOM_OWNER(room), GET_ISLAND_ID(room));
+				SAFE_ADD(eisle->territory[was_ter], -1, 0, UINT_MAX, FALSE);
+				SAFE_ADD(eisle->territory[is_ter], 1, 0, UINT_MAX, FALSE);
+			}
 		}
 	}
 	
@@ -675,17 +677,19 @@ void disassociate_building(room_data *room) {
 	
 	// check for territory updates
 	if (ROOM_OWNER(room) && was_large != (ROOM_BLD_FLAGGED(room, BLD_LARGE_CITY_RADIUS) ? TRUE : FALSE)) {
-		struct empire_island *eisle = get_empire_island(ROOM_OWNER(room), GET_ISLAND_ID(room));
 		is_ter = get_territory_type_for_empire(room, ROOM_OWNER(room), FALSE, &junk, NULL);
 		
 		if (was_ter != is_ter) {
 			SAFE_ADD(EMPIRE_TERRITORY(ROOM_OWNER(room), was_ter), -1, 0, UINT_MAX, FALSE);
-			SAFE_ADD(eisle->territory[was_ter], -1, 0, UINT_MAX, FALSE);
-			
 			SAFE_ADD(EMPIRE_TERRITORY(ROOM_OWNER(room), is_ter), 1, 0, UINT_MAX, FALSE);
-			SAFE_ADD(eisle->territory[is_ter], 1, 0, UINT_MAX, FALSE);
 			
 			// (totals do not change)
+			
+			if (GET_ISLAND_ID(room) != NO_ISLAND) {
+				struct empire_island *eisle = get_empire_island(ROOM_OWNER(room), GET_ISLAND_ID(room));
+				SAFE_ADD(eisle->territory[was_ter], -1, 0, UINT_MAX, FALSE);
+				SAFE_ADD(eisle->territory[is_ter], 1, 0, UINT_MAX, FALSE);
+			}
 		}
 	}
 	
@@ -948,7 +952,7 @@ void herd_animals_out(room_data *location) {
 		found_any = FALSE;
 		
 		DL_FOREACH_SAFE2(ROOM_PEOPLE(location), ch_iter, next_ch, next_in_room) {
-			if (IS_NPC(ch_iter) && IN_ROOM(ch_iter) == location && !ch_iter->desc && !GET_LEADER(ch_iter) && !AFF_FLAGGED(ch_iter, AFF_CHARM) && MOB_FLAGGED(ch_iter, MOB_ANIMAL) && GET_POS(ch_iter) >= POS_STANDING && !MOB_FLAGGED(ch_iter, MOB_TIED)) {
+			if (IS_NPC(ch_iter) && IN_ROOM(ch_iter) == location && !ch_iter->desc && !GET_LEADER(ch_iter) && !AFF_FLAGGED(ch_iter, AFF_CHARM) && MOB_FLAGGED(ch_iter, MOB_ANIMAL) && !MOB_FLAGGED(ch_iter, MOB_AGGRESSIVE | MOB_SENTINEL) && GET_POS(ch_iter) >= POS_STANDING && !MOB_FLAGGED(ch_iter, MOB_TIED)) {
 				if (!herd_msg) {
 					act("The animals are herded out of the building...", FALSE, ROOM_PEOPLE(location), NULL, NULL, TO_CHAR | TO_ROOM);
 					herd_msg = TRUE;
@@ -1413,14 +1417,20 @@ void start_dismantle_building(room_data *loc) {
 		dump_library_to_room(loc);
 	}
 	
-	// interior only
+	// interior must be done in 2 cycles: 1 to delete npcs, another to relocate them
+	DL_FOREACH_SAFE2(interior_room_list, room, next_room, next_interior) {
+		if (HOME_ROOM(room) == loc) {
+			delete_room_npcs(room, NULL, TRUE);
+		}
+	}
+	
+	// interior: second cycle (triggers, relocations)
 	DL_FOREACH_SAFE2(interior_room_list, room, next_room, next_interior) {
 		if (HOME_ROOM(room) == loc) {
 			if (HAS_FUNCTION(room, FNC_LIBRARY)) {
 				dump_library_to_room(room);
 			}
 			dismantle_wtrigger(room, NULL, FALSE);
-			delete_room_npcs(room, NULL, TRUE);
 			
 			DL_FOREACH_SAFE2(ROOM_CONTENTS(room), obj, next_obj, next_content) {
 				obj_to_room(obj, loc);
@@ -1852,6 +1862,11 @@ bool start_upgrade(char_data *ch, craft_data *upgrade_craft, room_data *from_roo
 						continue;	// these are not the rooms you're looking for
 					}
 					
+					// turn tech off: vehicle will be incomplete
+					if (ROOM_OWNER(room_iter)) {
+						adjust_building_tech(ROOM_OWNER(room_iter), room_iter, FALSE);
+					}
+					
 					COMPLEX_DATA(room_iter)->home_room = interior;
 					add_room_to_vehicle(room_iter, new_veh);
 					request_world_save(GET_ROOM_VNUM(room_iter), WSAVE_ROOM);
@@ -1889,6 +1904,12 @@ bool start_upgrade(char_data *ch, craft_data *upgrade_craft, room_data *from_roo
 		}
 		else if (from_veh) {
 			// upgraded from vehicle
+			
+			// keep old idnum: first try to give back the new one
+			if (VEH_IDNUM(new_veh) == data_get_int(DATA_TOP_VEHICLE_ID)) {
+				data_set_int(DATA_TOP_VEHICLE_ID, data_get_int(DATA_TOP_VEHICLE_ID) - 1);
+			}
+			VEH_IDNUM(new_veh) = VEH_IDNUM(from_veh);
 			
 			// see if we need to abandon the old one
 			if (VEH_OWNER(from_veh) && VEH_FLAGGED(new_veh, VEH_NO_CLAIM)) {
@@ -2328,7 +2349,7 @@ void do_customize_room(char_data *ch, char *argument) {
 	}
 	else if (((veh = get_vehicle_in_room_vis(ch, arg, NULL)) || ((veh = GET_ROOM_VEHICLE(IN_ROOM(ch))) && isname(arg, VEH_KEYWORDS(veh)))) && VEH_FLAGGED(veh, VEH_BUILDING)) {
 		// pass through to customize-vehicle (probably a building vehicle)
-		do_customize_vehicle(ch, arg2);
+		do_customize_vehicle(ch, argument);
 	}
 	else if (!has_player_tech(ch, PTECH_CUSTOMIZE_BUILDING)) {
 		msg_to_char(ch, "You don't have the right ability to customize buildings.\r\n");
@@ -2653,22 +2674,12 @@ ACMD(do_designate) {
 			
 			detach_building_from_room(new);
 			attach_building_to_room(type, new, TRUE);
+			complete_wtrigger(new);
 		}
 		else {
 			// create the new room
-			new = create_room(home);
+			new = add_room_to_building(home, GET_BLD_VNUM(type));
 			create_exit(IN_ROOM(ch), new, dir, TRUE);
-			attach_building_to_room(type, new, TRUE);
-
-			COMPLEX_DATA(home)->inside_rooms++;
-			
-			if (veh) {
-				add_room_to_vehicle(new, veh);
-			}
-			
-			if (ROOM_OWNER(home)) {
-				perform_claim_room(new, ROOM_OWNER(home));
-			}
 		}
 		
 		set_room_extra_data(new, ROOM_EXTRA_REDESIGNATE_TIME, time(0));
@@ -2689,8 +2700,6 @@ ACMD(do_designate) {
 				}
 			}
 		}
-		
-		complete_wtrigger(new);
 	}
 }
 
@@ -3004,7 +3013,7 @@ ACMD(do_paint) {
 		act("You don't have permission to paint $V.", FALSE, ch, NULL, paint_veh, TO_CHAR | ACT_VEH_VICT);
 		return;
 	}
-	if (paint_veh && (!VEH_ICON(paint_veh) || VEH_FLAGGED(paint_veh, VEH_NO_PAINT))) {
+	if (paint_veh && (!VEH_HAS_ANY_ICON(paint_veh) || VEH_FLAGGED(paint_veh, VEH_NO_PAINT))) {
 		act("You cannot paint $V.", FALSE, ch, NULL, paint_veh, TO_CHAR | ACT_VEH_VICT);
 		return;
 	}

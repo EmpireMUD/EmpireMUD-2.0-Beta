@@ -2,8 +2,12 @@
 Beaver Lodge~
 A Beaver Lodge~
 &t#&y##&t#~
-60 0 d 0
+60 0 dx 0
 0 0 0 -1
+B0
+&y##~
+B1
+&y#~
 C
 adventure~
 E
@@ -21,8 +25,12 @@ S
 Beaver Dam~
 A Beaver Dam~
 &t####~
-1 0 dp 0
+1 0 dpx 0
 0 0 0 -1
+B0
+&t##~
+B1
+&t#~
 E
 dam sticks wood branches logs~
    Logs, branches, sticks, and any other stray bits of wood have been

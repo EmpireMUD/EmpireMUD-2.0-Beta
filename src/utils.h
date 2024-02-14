@@ -265,6 +265,7 @@
 #define GET_BLD_VNUM(bld)  ((bld)->vnum)
 #define GET_BLD_NAME(bld)  ((bld)->name)
 #define GET_BLD_TITLE(bld)  ((bld)->title)
+#define GET_BLD_HALF_ICON(bld)  ((bld)->half_icon)
 #define GET_BLD_ICON(bld)  ((bld)->icon)
 #define GET_BLD_COMMANDS(bld)  ((bld)->commands)
 #define GET_BLD_DESC(bld)  ((bld)->description)
@@ -284,6 +285,7 @@
 #define GET_BLD_SCRIPTS(bld)  ((bld)->proto_script)
 #define GET_BLD_SPAWNS(bld)  ((bld)->spawns)
 #define GET_BLD_INTERACTIONS(bld)  ((bld)->interactions)
+#define GET_BLD_QUARTER_ICON(bld)  ((bld)->quarter_icon)
 #define GET_BLD_QUEST_LOOKUPS(bld)  ((bld)->quest_lookups)
 #define GET_BLD_SHOP_LOOKUPS(bld)  ((bld)->shop_lookups)
 #define GET_BLD_TEMPERATURE_TYPE(bld)  ((bld)->temperature_type)
@@ -647,11 +649,11 @@ int CAN_CARRY_N(char_data *ch);	// formerly a macro
 #define EMPIRE_TERRITORY(emp, type)  ((emp)->territory[(type)])
 #define EMPIRE_TERRITORY_LIST(emp)  ((emp)->territory_list)
 #define EMPIRE_THEFT_LOGS(emp)  ((emp)->theft_logs)
-#define EMPIRE_TOP_SHIPPING_ID(emp)  ((emp)->top_shipping_id)
 #define EMPIRE_TOTAL_MEMBER_COUNT(emp)  ((emp)->total_member_count)
 #define EMPIRE_TOTAL_PLAYTIME(emp)  ((emp)->total_playtime)
 #define EMPIRE_TRADE(emp)  ((emp)->trade)
 #define EMPIRE_UNIQUE_STORAGE(emp)  ((emp)->unique_store)
+#define EMPIRE_VEHICLE_LIST(emp)  ((emp)->vehicle_list)
 #define EMPIRE_WEALTH(emp)  ((emp)->wealth)
 #define EMPIRE_WORKFORCE_LAST_LOG_AND_NEEDS(emp)  ((emp)->wf_log_and_needs_time)
 #define EMPIRE_WORKFORCE_LOG(emp)  ((emp)->wf_log)
@@ -1491,6 +1493,7 @@ int Y_COORD(room_data *room);	// formerly #define Y_COORD(room)  FLAT_Y_COORD(ge
 #define HOME_ROOM(room)  ((COMPLEX_DATA(room) && COMPLEX_DATA(room)->home_room) ? COMPLEX_DATA(room)->home_room : (room))
 #define IS_BURNING(room)  (BUILDING_BURN_DOWN_TIME(room) > 0)
 #define IS_COMPLETE(room)  (!IS_INCOMPLETE(room) && !IS_DISMANTLING(room))
+#define ROOM_TECHS_APPLIED_TO_ISLAND(room)  (COMPLEX_DATA(room) ? COMPLEX_DATA(room)->applied_to_island : UNAPPLIED_ISLAND)
 #define ROOM_PAINT_COLOR(room)  get_room_extra_data((room), ROOM_EXTRA_PAINT_COLOR)
 #define ROOM_PATRON(room)  get_room_extra_data((room), ROOM_EXTRA_DEDICATE_ID)
 #define ROOM_PRIVATE_OWNER(room)  (COMPLEX_DATA(room) ? COMPLEX_DATA(room)->private_owner : NOBODY)
@@ -1731,6 +1734,8 @@ static inline int GET_SEASON(room_data *room) {
 
 // basic data
 #define VEH_ANIMALS(veh)  ((veh)->animals)
+#define VEH_APPLIED_TO_ISLAND(veh)  ((veh)->applied_to_island)
+#define VEH_APPLIED_TO_ROOM(veh)  ((veh)->applied_to_room)
 #define VEH_BUILT_WITH(veh)  ((veh)->built_with)
 #define VEH_CARRYING_N(veh)  ((veh)->carrying_n)
 #define VEH_CONSTRUCTION_ID(veh)  ((veh)->construction_id)
@@ -1739,8 +1744,10 @@ static inline int GET_SEASON(room_data *room) {
 #define VEH_DRIVER(veh)  ((veh)->driver)
 #define VEH_EXTRA_DATA(veh)  ((veh)->extra_data)
 #define VEH_FLAGS(veh)  ((veh)->flags)
+#define VEH_HALF_ICON(veh)  ((veh)->half_icon)
 #define VEH_HEALTH(veh)  ((veh)->health)
 #define VEH_ICON(veh)  ((veh)->icon)
+#define VEH_IDNUM(veh)  ((veh)->idnum)
 #define VEH_INSIDE_ROOMS(veh)  ((veh)->inside_rooms)
 #define VEH_INSTANCE_ID(veh)  ((veh)->instance_id)
 #define VEH_INTERIOR_HOME_ROOM(veh)  ((veh)->interior_home_room)
@@ -1752,11 +1759,11 @@ static inline int GET_SEASON(room_data *room) {
 #define VEH_LOOK_DESC(veh)  ((veh)->look_desc)
 #define VEH_NEEDS_RESOURCES(veh)  ((veh)->needs_resources)
 #define VEH_OWNER(veh)  ((veh)->owner)
+#define VEH_QUARTER_ICON(veh)  ((veh)->quarter_icon)
 #define VEH_QUEST_LOOKUPS(veh)  ((veh)->quest_lookups)
 #define VEH_ROOM_AFFECTS(veh)  ((veh)->room_affects)
 #define VEH_ROOM_LIST(veh)  ((veh)->room_list)
 #define VEH_SCALE_LEVEL(veh)  ((veh)->scale_level)
-#define VEH_SHIPPING_ID(veh)  ((veh)->shipping_id)
 #define VEH_SHOP_LOOKUPS(veh)  ((veh)->shop_lookups)
 #define VEH_SHORT_DESC(veh)  ((veh)->short_desc)
 #define VEH_SITTING_ON(veh)  ((veh)->sitting_on)
@@ -1764,8 +1771,9 @@ static inline int GET_SEASON(room_data *room) {
 
 // attribute (non-instanced) data
 #define VEH_ANIMALS_REQUIRED(veh)  ((veh)->attributes->animals_required)
-#define VEH_ARTISAN(veh)  NOTHING	// for future use
+#define VEH_ARTISAN(veh)  ((veh)->attributes->artisan_vnum)
 #define VEH_CAPACITY(veh)  ((veh)->attributes->capacity)
+#define VEH_CITIZENS(veh)  ((veh)->attributes->citizens)
 #define VEH_CUSTOM_MSGS(veh)  ((veh)->attributes->custom_msgs)
 #define VEH_DESIGNATE_FLAGS(veh)  ((veh)->attributes->designate_flags)
 #define VEH_EX_DESCS(veh)  ((veh)->attributes->ex_description)
@@ -1791,11 +1799,13 @@ static inline int GET_SEASON(room_data *room) {
 // helpers
 #define IN_OR_ON(veh)		(VEH_FLAGGED((veh), VEH_IN) ? "in" : "on")
 #define VEH_CLAIMS_WITH_ROOM(veh)  (VEH_FLAGGED((veh), VEH_BUILDING) && !VEH_FLAGGED((veh), MOVABLE_VEH_FLAGS | VEH_NO_CLAIM))
+#define VEH_HAS_ANY_ICON(veh)  (VEH_ICON(veh) || VEH_HALF_ICON(veh) || VEH_QUARTER_ICON(veh))
 #define VEH_IS_EXTRACTED(veh)  VEH_FLAGGED((veh), VEH_EXTRACTED)
-#define VEH_IS_VISIBLE_ON_MAPOUT(veh)  (VEH_FLAGGED((veh), VEH_BUILDING) && VEH_ICON(veh) && VEH_SIZE(veh) > 0 && !VEH_FLAGGED((veh), VEH_CHAMELEON))
+#define VEH_IS_PUBLIC(veh)  (VEH_INTERIOR_HOME_ROOM(veh) ? ROOM_AFF_FLAGGED(VEH_INTERIOR_HOME_ROOM(veh), ROOM_AFF_PUBLIC) : (IN_ROOM(veh) && ROOM_OWNER(IN_ROOM(veh)) == VEH_OWNER(veh) && ROOM_AFF_FLAGGED(IN_ROOM(veh), ROOM_AFF_PUBLIC)))
+#define VEH_IS_VISIBLE_ON_MAPOUT(veh)  (VEH_FLAGGED((veh), VEH_BUILDING) && VEH_HAS_ANY_ICON(veh) && VEH_SIZE(veh) > 0 && !VEH_FLAGGED((veh), VEH_CHAMELEON))
 #define VEH_FLAGGED(veh, flag)  IS_SET(VEH_FLAGS(veh), (flag))
-#define VEH_HAS_MINOR_DISREPAIR(veh)  (VEH_HEALTH(veh) < VEH_MAX_HEALTH(veh) && (VEH_HEALTH(veh) <= (VEH_MAX_HEALTH(veh) * config_get_int("disrepair_minor") / 100)))
-#define VEH_HAS_MAJOR_DISREPAIR(veh)  (VEH_HEALTH(veh) < VEH_MAX_HEALTH(veh) && (VEH_HEALTH(veh) <= (VEH_MAX_HEALTH(veh) * config_get_int("disrepair_major") / 100)))
+#define VEH_HAS_MINOR_DISREPAIR(veh)  (VEH_HEALTH(veh) < VEH_MAX_HEALTH(veh) && (VEH_HEALTH(veh) * 100 / VEH_MAX_HEALTH(veh)) <= (100 - config_get_int("disrepair_minor")))
+#define VEH_HAS_MAJOR_DISREPAIR(veh)  (VEH_HEALTH(veh) < VEH_MAX_HEALTH(veh) && (VEH_HEALTH(veh) * 100 / VEH_MAX_HEALTH(veh)) <= (100 - config_get_int("disrepair_major")))
 #define VEH_IS_COMPLETE(veh)  (!VEH_NEEDS_RESOURCES(veh) || !VEH_FLAGGED((veh), VEH_INCOMPLETE | VEH_DISMANTLING | VEH_EXTRACTED))
 #define VEH_IS_DISMANTLING(veh)  (VEH_FLAGGED((veh), VEH_DISMANTLING) ? TRUE : FALSE)
 #define VEH_OR_BLD(veh)  (VEH_FLAGGED((veh), VEH_BUILDING) ? "building" : "vehicle")
@@ -1926,6 +1936,7 @@ char *quoted_arg_or_all(char *argument, char *found_arg);
 int reserved_word(char *argument);
 int search_block(char *arg, const char **list, int exact);
 int search_block_multi_isname(char *arg, const char **list);
+int search_block_int(int find, const int *list);
 void skip_spaces(char **string);
 char *two_arguments(char *argument, char *first_arg, char *second_arg);
 void ucwords(char *string);
@@ -2145,6 +2156,7 @@ char *obj_desc_for_char(obj_data *obj, char_data *ch, int mode);
 struct custom_message *pick_custom_longdesc(char_data *ch);
 void show_character_affects(char_data *ch, char_data *to);
 bool show_local_einv(char_data *ch, room_data *room, bool thief_mode);
+void survey_city(char_data *ch, char *argument);
 
 // act.item.c
 bool can_take_obj(char_data *ch, obj_data *obj);
@@ -2153,7 +2165,6 @@ void deliver_shipment(empire_data *emp, struct shipping_data *shipd);
 bool douse_light(obj_data *obj);
 obj_data *get_obj_for_char_prefer_container(char_data *ch, char *name, int *number);
 room_data *find_docks(empire_data *emp, int island_id);
-int find_free_shipping_id(empire_data *emp);
 obj_data *find_lighter_in_list(obj_data *list, bool *had_keep);
 bool get_check_money(char_data *ch, obj_data *obj);
 void identify_obj_to_char(obj_data *obj, char_data *ch, bool simple);
@@ -2417,6 +2428,7 @@ int get_map_radius(char_data *ch);
 char *get_mine_type_name(room_data *room);
 char *get_room_description(room_data *room);
 char *get_room_name(room_data *room, bool color);
+char *get_screenreader_room_name(char_data *ch, room_data *from_room, room_data *to_room, bool show_dark);
 void look_at_room_by_loc(char_data *ch, room_data *room, bitvector_t options);
 #define look_at_room(ch)  look_at_room_by_loc((ch), IN_ROOM(ch), NOBITS)
 void look_in_direction(char_data *ch, int dir);
@@ -2428,12 +2440,12 @@ char *screenread_one_tile(char_data *ch, room_data *origin, room_data *to_room, 
 void get_informative_string(char_data *ch, char *buffer, bool dismantling, bool unfinished, bool major_disrepair, bool minor_disrepair, int mine_view, bool public, bool no_work, bool no_abandon, bool no_dismantle, bool chameleon);
 #define INFORMATIVE_MINE_VALUE(ch, room)  ((get_room_extra_data((room), ROOM_EXTRA_MINE_GLB_VNUM) > 0) ? ((PRF_FLAGGED((ch), PRF_HOLYLIGHT) || room_has_function_and_city_ok(GET_LOYALTY(ch), (room), FNC_MINE) || (GET_LOYALTY(ch) && get_room_extra_data((room), ROOM_EXTRA_PROSPECT_EMPIRE) == EMPIRE_VNUM(GET_LOYALTY(ch)))) ? (get_room_extra_data((room), ROOM_EXTRA_MINE_AMOUNT) > 0 ? 1 : -1) : 0) : 0)
 #define get_informative_tile_string(ch, room, buffer)  get_informative_string((ch), (buffer), (HOLYLIGHT_OR_TILE_OWNER((ch), (room)) && IS_DISMANTLING(room)) ? TRUE : FALSE, HOLYLIGHT_OR_TILE_OWNER((ch), (room)) ? !IS_COMPLETE(room) : FALSE, HAS_MAJOR_DISREPAIR(room), HAS_MINOR_DISREPAIR(room), INFORMATIVE_MINE_VALUE(ch, room), ROOM_AFF_FLAGGED((room), ROOM_AFF_PUBLIC) ? TRUE : FALSE, (HOLYLIGHT_OR_TILE_OWNER((ch), (room)) && ROOM_AFF_FLAGGED((room), ROOM_AFF_NO_WORK)) ? TRUE : FALSE, (HOLYLIGHT_OR_TILE_OWNER((ch), (room)) && ROOM_AFF_FLAGGED((room), ROOM_AFF_NO_ABANDON)) ? TRUE : FALSE, (HOLYLIGHT_OR_TILE_OWNER((ch), (room)) && ROOM_AFF_FLAGGED((room), ROOM_AFF_NO_DISMANTLE)) ? TRUE : FALSE, ((ch) && IS_IMMORTAL(ch) && ROOM_AFF_FLAGGED((room), ROOM_AFF_CHAMELEON) && IS_COMPLETE(room)))
-#define get_informative_vehicle_string(ch, veh, buffer)  get_informative_string((ch), (buffer), (HOLYLIGHT_OR_VEH_OWNER((ch), (veh)) && VEH_IS_DISMANTLING(veh)) ? TRUE : FALSE, HOLYLIGHT_OR_VEH_OWNER((ch), (veh)) ? (!VEH_IS_COMPLETE(veh) && !VEH_IS_DISMANTLING(veh)) : FALSE, VEH_HAS_MAJOR_DISREPAIR(veh), VEH_HAS_MINOR_DISREPAIR(veh), INFORMATIVE_MINE_VALUE(ch, IN_ROOM(veh)), FALSE, (HOLYLIGHT_OR_VEH_OWNER((ch), (veh)) && VEH_FLAGGED((veh), VEH_PLAYER_NO_WORK)) || (VEH_CLAIMS_WITH_ROOM(veh) && HOLYLIGHT_OR_TILE_OWNER((ch), IN_ROOM(veh)) && ROOM_AFF_FLAGGED(IN_ROOM(veh), ROOM_AFF_NO_WORK)), FALSE /*HOLYLIGHT_OR_VEH_OWNER((ch), (veh)) && VEH_FLAGGED((veh), VEH_PLAYER_NO_ABANDON)*/, (HOLYLIGHT_OR_VEH_OWNER((ch), (veh)) && VEH_FLAGGED((veh), VEH_PLAYER_NO_DISMANTLE)) ? TRUE : FALSE, (ch) && IS_IMMORTAL(ch) && (ROOM_AFF_FLAGGED(IN_ROOM(veh), ROOM_AFF_CHAMELEON) || VEH_FLAGGED(veh, VEH_CHAMELEON)) && IS_COMPLETE(IN_ROOM(veh)))
+#define get_informative_vehicle_string(ch, veh, buffer)  get_informative_string((ch), (buffer), (HOLYLIGHT_OR_VEH_OWNER((ch), (veh)) && VEH_IS_DISMANTLING(veh)) ? TRUE : FALSE, HOLYLIGHT_OR_VEH_OWNER((ch), (veh)) ? (!VEH_IS_COMPLETE(veh) && !VEH_IS_DISMANTLING(veh)) : FALSE, VEH_HAS_MAJOR_DISREPAIR(veh), VEH_HAS_MINOR_DISREPAIR(veh), INFORMATIVE_MINE_VALUE(ch, IN_ROOM(veh)), VEH_IS_PUBLIC(veh), (HOLYLIGHT_OR_VEH_OWNER((ch), (veh)) && VEH_FLAGGED((veh), VEH_PLAYER_NO_WORK)) || (VEH_CLAIMS_WITH_ROOM(veh) && HOLYLIGHT_OR_TILE_OWNER((ch), IN_ROOM(veh)) && ROOM_AFF_FLAGGED(IN_ROOM(veh), ROOM_AFF_NO_WORK)), FALSE /*HOLYLIGHT_OR_VEH_OWNER((ch), (veh)) && VEH_FLAGGED((veh), VEH_PLAYER_NO_ABANDON)*/, (HOLYLIGHT_OR_VEH_OWNER((ch), (veh)) && VEH_FLAGGED((veh), VEH_PLAYER_NO_DISMANTLE)) ? TRUE : FALSE, (ch) && IS_IMMORTAL(ch) && (ROOM_AFF_FLAGGED(IN_ROOM(veh), ROOM_AFF_CHAMELEON) || VEH_FLAGGED(veh, VEH_CHAMELEON)) && IS_COMPLETE(IN_ROOM(veh)))
 
-char *get_informative_color(char_data *ch, bool dismantling, bool unfinished, bool major_disrepair, bool minor_disrepair, int mine_view, bool public, bool no_work, bool no_abandon, bool no_dismantle, bool chameleon);	
+char *get_informative_color(char_data *ch, bool dismantling, bool unfinished, bool major_disrepair, bool minor_disrepair, int mine_view, bool public, bool no_work, bool no_abandon, bool no_dismantle, bool chameleon);
 #define simple_distance(x, y, a, b)		((x - a) * (x - a) + (y - b) * (y - b))
 #define get_informative_color_room(ch, room)  get_informative_color((ch), (HOLYLIGHT_OR_TILE_OWNER((ch), (room)) && IS_DISMANTLING(room)) ? TRUE : FALSE, HOLYLIGHT_OR_TILE_OWNER((ch), (room)) ? !IS_COMPLETE(room) : FALSE, HAS_MAJOR_DISREPAIR(room), HAS_MINOR_DISREPAIR(room), INFORMATIVE_MINE_VALUE(ch, room), ROOM_AFF_FLAGGED(room, ROOM_AFF_PUBLIC) ? TRUE : FALSE, (HOLYLIGHT_OR_TILE_OWNER((ch), (room)) && ROOM_AFF_FLAGGED(room, ROOM_AFF_NO_WORK)) ? TRUE : FALSE, (HOLYLIGHT_OR_TILE_OWNER((ch), (room)) && ROOM_AFF_FLAGGED(room, ROOM_AFF_NO_ABANDON)) ? TRUE : FALSE, (HOLYLIGHT_OR_TILE_OWNER((ch), (room)) && ROOM_AFF_FLAGGED(room, ROOM_AFF_NO_DISMANTLE)) ? TRUE : FALSE, ch && IS_IMMORTAL(ch) && ROOM_AFF_FLAGGED(room, ROOM_AFF_CHAMELEON) && IS_COMPLETE(room) && simple_distance(X_COORD(IN_ROOM(ch)), Y_COORD(IN_ROOM(ch)), X_COORD(room), Y_COORD(room)) > 2)
-#define get_informative_color_veh(ch, veh)  get_informative_color((ch), (HOLYLIGHT_OR_VEH_OWNER((ch), (veh)) && VEH_IS_DISMANTLING(veh)) ? TRUE : FALSE, (HOLYLIGHT_OR_VEH_OWNER((ch), (veh)) && !VEH_IS_COMPLETE(veh) && !VEH_IS_DISMANTLING(veh)), VEH_HAS_MAJOR_DISREPAIR(veh), VEH_HAS_MINOR_DISREPAIR(veh), INFORMATIVE_MINE_VALUE(ch, IN_ROOM(veh)), FALSE /* public */, (HOLYLIGHT_OR_VEH_OWNER((ch), (veh)) && VEH_FLAGGED((veh), VEH_PLAYER_NO_WORK)) || (HOLYLIGHT_OR_TILE_OWNER((ch), IN_ROOM(veh)) && VEH_CLAIMS_WITH_ROOM(veh) && ROOM_AFF_FLAGGED(IN_ROOM(veh), ROOM_AFF_NO_WORK)), FALSE /* no-abandon */, (HOLYLIGHT_OR_VEH_OWNER((ch), (veh)) && VEH_FLAGGED((veh), VEH_PLAYER_NO_DISMANTLE)) ? TRUE : FALSE, (ch) && IS_IMMORTAL(ch) && (ROOM_AFF_FLAGGED(IN_ROOM(veh), ROOM_AFF_CHAMELEON) || VEH_FLAGGED(veh, VEH_CHAMELEON)) && IS_COMPLETE(IN_ROOM(veh)) && simple_distance(X_COORD(IN_ROOM(ch)), Y_COORD(IN_ROOM(ch)), X_COORD(IN_ROOM(veh)), Y_COORD(IN_ROOM(veh))) > 2)
+#define get_informative_color_veh(ch, veh)  get_informative_color((ch), (HOLYLIGHT_OR_VEH_OWNER((ch), (veh)) && VEH_IS_DISMANTLING(veh)) ? TRUE : FALSE, (HOLYLIGHT_OR_VEH_OWNER((ch), (veh)) && !VEH_IS_COMPLETE(veh) && !VEH_IS_DISMANTLING(veh)), VEH_HAS_MAJOR_DISREPAIR(veh), VEH_HAS_MINOR_DISREPAIR(veh), INFORMATIVE_MINE_VALUE(ch, IN_ROOM(veh)), VEH_IS_PUBLIC(veh), (HOLYLIGHT_OR_VEH_OWNER((ch), (veh)) && VEH_FLAGGED((veh), VEH_PLAYER_NO_WORK)) || (HOLYLIGHT_OR_TILE_OWNER((ch), IN_ROOM(veh)) && VEH_CLAIMS_WITH_ROOM(veh) && ROOM_AFF_FLAGGED(IN_ROOM(veh), ROOM_AFF_NO_WORK)), FALSE /* no-abandon */, (HOLYLIGHT_OR_VEH_OWNER((ch), (veh)) && VEH_FLAGGED((veh), VEH_PLAYER_NO_DISMANTLE)) ? TRUE : FALSE, (ch) && IS_IMMORTAL(ch) && (ROOM_AFF_FLAGGED(IN_ROOM(veh), ROOM_AFF_CHAMELEON) || VEH_FLAGGED(veh, VEH_CHAMELEON)) && IS_COMPLETE(IN_ROOM(veh)) && simple_distance(X_COORD(IN_ROOM(ch)), Y_COORD(IN_ROOM(ch)), X_COORD(IN_ROOM(veh)), Y_COORD(IN_ROOM(veh))) > 2)
 
 // mobact.c
 void add_pursuit(char_data *ch, char_data *target);
@@ -2479,7 +2491,7 @@ void finish_morphing(char_data *ch, morph_data *morph);
 bool morph_affinity_ok(room_data *location, morph_data *morph);
 
 // olc.c
-bool validate_icon(char *icon);
+bool validate_icon(char *icon, int width);
 
 // olc.attack.c
 bool match_attack_type(any_vnum type, any_vnum match_to);
@@ -2635,6 +2647,8 @@ void update_world_count();
 
 // vehicles.c
 void add_room_to_vehicle(room_data *room, vehicle_data *veh);
+void apply_vehicle_to_island(vehicle_data *veh, int island_id);
+void apply_vehicle_to_room(vehicle_data *veh, room_data *room);
 bool check_vehicle_climate_change(vehicle_data *veh, bool immediate_only);
 void complete_vehicle(vehicle_data *veh);
 int count_harnessed_animals(vehicle_data *veh);
@@ -2666,6 +2680,8 @@ void start_vehicle_burning(vehicle_data *veh);
 int total_small_vehicles_in_room(room_data *room, empire_data *for_empire);
 int total_vehicle_size_in_room(room_data *room, empire_data *exclude_hostile_to_empire);
 int total_vehicles_in_room_by_empire(room_data *room, empire_data *emp);
+void unapply_vehicle_to_island(vehicle_data *veh);
+void unapply_vehicle_to_room(vehicle_data *veh);
 char_data *unharness_mob_from_vehicle(struct vehicle_attached_mob *vam, vehicle_data *veh);
 vehicle_data *unstore_vehicle_from_file(FILE *fl, any_vnum vnum, char *error_str);
 void update_vehicle_island_and_loc(vehicle_data *veh, room_data *loc);

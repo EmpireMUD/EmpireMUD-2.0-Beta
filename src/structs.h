@@ -201,6 +201,7 @@
 // easier to understand, for things that initialize to -1 or 0
 #define ANY_ISLAND  -1	// for finding an island in certain functions
 #define NO_ISLAND  -1	// error code for island lookups
+#define UNAPPLIED_ISLAND  -2	// distinct from NO_ISLAND to prevent re-applying a vehicle/building to NO_ISLAND
 #define NO_WEAR  -1	// bad wear location
 #define END_RESOURCE_LIST  { NOTHING, -1 }
 #define NOBITS  0	// lack of bitvector bits (for clarity in funky structs)
@@ -696,7 +697,7 @@ typedef struct vehicle_data vehicle_data;
 #define BLD_ATTACH_BARRIER  BIT(20)	// icons with @u/@v will attach to this
 #define BLD_NO_CUSTOMIZE  BIT(21)	// cannot be customized
 #define BLD_NO_ABANDON_WHEN_RUINED  BIT(22)	// won't auto-abandon when it becomes ruins
-// #define BLD_UNUSED11  BIT(23)
+#define BLD_SHOW_VEHICLES  BIT(23)	// can show vehicle icons in the room rather than overriding the building icon (only if OPEN)
 // #define BLD_UNUSED12  BIT(24)
 // #define BLD_UNUSED13  BIT(25)
 // #define BLD_UNUSED14  BIT(26)
@@ -1056,6 +1057,8 @@ typedef struct vehicle_data vehicle_data;
 #define DELAY_REFRESH_GOAL_COMPLETE  BIT(1)	// checks for finished progress
 #define DELAY_REFRESH_MEMBERS  BIT(2)	// re-reads empire member data
 #define DELAY_REFRESH_GREATNESS  BIT(3)	// refreshes members-and-greatness
+#define DELAY_REFRESH_MSDP_UPDATE_CLAIMS  BIT(4)	// empire members needs an MSDP update for claims
+#define DELAY_REFRESH_MSDP_UPDATE_ALL  BIT(5)	// empire members needs an MSDP update for everything
 
 
 // EADM_x: empire admin flags
@@ -3253,12 +3256,11 @@ struct file_lookup_struct {
 
 // for do_findmaintenance and do_territory
 struct find_territory_node {
-	room_data *loc;
+	room_vnum vnum;	// vnum of map location
 	char *details;	// optional string with vehicles, etc
-	int count;
-	bool is_vehicle;	// notes if the marked territory was from a vehicle
+	int count;		// total collapsed nodes
 	
-	struct find_territory_node *prev, *next;	// doubly-linked list
+	UT_hash_handle hh;	// hashed by map loc vnum
 };
 
 
@@ -3548,7 +3550,7 @@ struct shipping_data {
 	int status;	// SHIPPING_
 	long status_time;	// when it gained that status
 	room_vnum ship_origin;	// where the ship is coming from (in case we have to send it back)
-	int shipping_id;	// VEH_SHIPPING_ID() of ship
+	int shipping_id;	// VEH_IDNUM() of ship, if any
 	struct storage_timer *timers;	// for items that decay
 	
 	struct shipping_data *prev, *next;	// DL: EMPIRE_SHIPPING_LIST()
@@ -4164,7 +4166,9 @@ struct bld_data {
 	
 	char *name;	// short name
 	char *title;	// shown on look
-	char *icon;	// map icon
+	char *icon;	// map icon, required unless ROOM flag present; 4 character visible width
+	char *half_icon;	// Optional: Half-tile icon (2 character visible width)
+	char *quarter_icon;	// Optional: Single-character icon (plus color codes)
 	char *commands;	// listed under the room desc/map
 	char *description;	// for non-map buildings
 	
@@ -5238,8 +5242,6 @@ struct empire_chore_type {
 struct empire_city_data {
 	char *name;
 	int type;
-	int population;
-	int military;
 	
 	room_data *location;
 	bitvector_t traits;	// ETRAIT_x
@@ -5371,7 +5373,8 @@ struct empire_npc_data {
 	mob_vnum vnum;	// npc type
 	int sex;	// SEX_x
 	int name;	// position in the name list
-	room_data *home;	// where it lives
+	room_data *home;	// where it lives (if a room)
+	vehicle_data *home_vehicle;	// where it lives (if a vehicle)
 	
 	empire_vnum empire_id;	// empire vnum
 	char_data *mob;
@@ -5406,13 +5409,27 @@ struct empire_storage_data {
 struct empire_territory_data {
 	room_vnum vnum;	// vnum of the room, for hashing
 	room_data *room;	// pointer to territory location
-	int population_timer;	// time to re-populate
 	
+	int population_timer;	// time to re-populate
 	struct empire_npc_data *npcs;	// list of empire mobs that live here
 	
 	bool marked;	// for checking that rooms still exist
 	
-	UT_hash_handle hh;	// emp->territory_list hash
+	UT_hash_handle hh;	// emp->territory_list hash (by room vnum)
+};
+
+
+// similar to territory: a hash of owned vehicles and their npcs
+struct empire_vehicle_data {
+	int idnum;	// vehicle's unique id, for hashing
+	vehicle_data *veh;	// pointer to the vehicle
+	
+	int population_timer;	// time to re-populate
+	struct empire_npc_data *npcs;	// list of empire mobs that live on the outside of the vehicle
+	
+	bool marked;	// for checking that entries still exist
+	
+	UT_hash_handle hh;	// emp->vehicle_list hash (by idnum)
 };
 
 
@@ -5596,6 +5613,7 @@ struct empire_data {
 	
 	// unsaved data
 	struct empire_territory_data *territory_list;	// hash table by vnum
+	struct empire_vehicle_data *vehicle_list;	// hash table by idnum
 	struct empire_city_data *city_list;	// linked list of cities
 	struct empire_workforce_tracker *ewt_tracker;	// workforce tracker
 	struct workforce_delay *delays;	// speeds up chore processing
@@ -5616,7 +5634,6 @@ struct empire_data {
 	time_t last_logon;	// time of last member's last logon
 	int scores[NUM_SCORES];	// empire score in each category
 	int sort_value;	// for score ties
-	int top_shipping_id;	// shipping system quick id for the empire
 	bool banner_has_underline;	// helper
 	struct workforce_log *wf_log;	// errors with workforce
 	struct workforce_where_log *wf_where_log;	// list of people working
@@ -6263,12 +6280,15 @@ struct trig_proto_list {
 
 struct vehicle_data {
 	any_vnum vnum;
+	int idnum;		// unique id for the vehicle
 	
 	char *keywords;	// targeting terms
 	char *short_desc;	// the sentence-building name ("a canoe")
 	char *long_desc;	// As described in the room.
 	char *look_desc;	// Description when looked at
-	char *icon;	// Optional: Shown on map if not null
+	char *icon;	// Optional: Shown on map if not null (4 character visible width)
+	char *half_icon;	// Optional: Half-tile icon (2 character visible width)
+	char *quarter_icon;	// Optional: Single-character icon (plus color codes)
 	
 	struct vehicle_attribute_data *attributes;	// non-instanced data
 	bitvector_t flags;	// VEH_ flags
@@ -6288,7 +6308,6 @@ struct vehicle_data {
 	int inside_rooms;	// how many rooms are inside
 	time_t last_fire_time;	// for vehicles with siege weapons
 	time_t last_move_time;	// for autostore
-	int shipping_id;	// id for the shipping system for the owner
 	room_data *in_room;	// where it is
 	char_data *led_by;	// person leading it
 	char_data *sitting_on;	// person sitting on it
@@ -6299,9 +6318,13 @@ struct vehicle_data {
 	bitvector_t room_affects;	// ROOM_AFF_ flags applied to the room while veh is here
 	
 	// scripting
-	int script_id;	// used by DG triggers - unique id
+	int script_id;	// used by DG triggers - unique id (only set if a script has referenced it)
 	struct trig_proto_list *proto_script;	// list of default triggers
 	struct script_data *script;	// script info for the object
+	
+	// this helps with updating vehicles when they change rooms/islands
+	room_data *applied_to_room;	// room its traits were applied to, if any
+	int applied_to_island;	// island its traits were applied to (by id), if any
 	
 	// lists
 	struct vehicle_data *prev, *next;	// vehicle_list (global) doubly-linked list
@@ -6332,6 +6355,8 @@ struct vehicle_attribute_data {
 	bitvector_t functions;	// FNC_ flags offered to the room the vehicle is in
 	bitvector_t requires_climate;	// CLIM_ flags required for this vehicle to enter a room
 	bitvector_t forbid_climate;	// CLIM_ flags that block this vehicle from entering
+	mob_vnum artisan_vnum;	// vnum of an artisan to load
+	int citizens;	// how many citizens can live here (outside)
 	int fame;	// how much fame it adds to the empire
 	int military;	// how much it adds to the military pool
 	struct custom_message *custom_msgs;	// any custom messages
@@ -6445,6 +6470,9 @@ struct complex_room_data {
 	time_t burn_down_time;	// if >0, the timestamp when this building will burn down
 	
 	double damage;  // for catapulting
+	
+	// additional unsaved data
+	int applied_to_island;	// tracks which island its techs were applied to
 };
 
 

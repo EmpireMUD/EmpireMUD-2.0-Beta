@@ -412,6 +412,33 @@ of your tomb is suffering inclement weather.
 
 See also: RESPAWN
 #
+BUILDING BUILDINGS
+
+(Disambiguation: Did you mean HELP BUILD)
+
+Buildings are structures, usually built by players, that offer a place to live,
+sleep, craft, store, or shop. There are several types of buildings:
+
+Open buildings: These buildings, such as city centers and walls, have no
+interior. You can generally enter their tile from any direction (except walls)
+and can enter the tile even if you don't own it. Many adventures use this type
+of building for their location on the map.
+
+Whole-tile buildings: Some buildings replace the entire map tile they're built
+upon, and are enclosed when complete. You can usually only enter this type of
+building from one adjacent tile (or two, in the case of a gatehouse). For
+example, if it says "the entrance is from the south", position yourself south
+of the building and type "north" to get in. The only way to get past these
+buildings without entering them is the "circle" command.
+
+Vehicle-style buildings: These are listed in &wgray&0 when you "look" at the
+room, after the map/description and before objects and people. These buildings
+don't block movement outside at all; you can enter and leave the tile from any
+direction. Use the "enter" and "exit" commands to get in and out of this type
+of building.
+
+See also: CIRCLE, ENTER, EXIT
+#
 "CAMPING FIRE" "COOKING FIRE" "CAMP FIRE"
 
 You can create a cooking fire by lighting a tree or log, using fire sticks.
@@ -1862,17 +1889,26 @@ You gain the 'unstuck' effect if you're inside a building and try to leave it,
 but the entrance is water and you have no ability to swim or fly. This short
 effect will get you past the water.
 #
-VEHICLE VEH
+VEHICLE VEHICLES VEH
 
 A vehicle (sometimes abbreviated "veh", especially in the code) is a type of
 "thing" that includes canoes, carts, ships, and even furniture. Vehicles can
-have many different properties -- some can be lead, dragged, boarded, or burnt.
+have many different properties -- some can be lead, dragged, or burnt. Identify
+a vehicle to see its details. For incomplete vehicles, looking at them shows
+which resources they still need.
 
-Vehicles appear in the room when you look, colored &wgray&0, between objects and
+For ships and other large vehicles, use "board" and "disembark" to get in and
+out.
+
+Vehicles appear in the room when you look, colored &wgray&0, before objects and
 people.
 
+Some buildings appear in gray in the list of things in your current location,
+like vehicles do. These are vehicle-style buildings, which sit on a map tile
+rather than replacing the tile.
+
 See also: BOARD, CUSTOMIZE, DESIGNATE, DISEMBARK, DRAG, DRIVE, HARNESS,
-LAND VEHICLES, LEAD, LIGHT, REPAIR, SCRAP, SHIPS, SIT
+LAND VEHICLES, LEAD, LIGHT, REPAIR, SCRAP, SHIPS, SIT, IDENTIFY
 #
 WATERWALK "WATER WALK" "WATER WALKING" "WALK ON WATER" "WALKING ON WATER" WATERWALKING
 

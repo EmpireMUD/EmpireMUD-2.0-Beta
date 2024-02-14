@@ -561,8 +561,8 @@ Supported fields are:
           append-lookdesc-noformat
  Objects: keywords, longdesc, shortdesc, lookdesc, append-lookdesc,
           append-lookdesc-noformat
- Vehicles: icon, keywords, longdesc, shortdesc, lookdesc, append-lookdesc,
-          append-lookdesc-noformat
+ Vehicles: icon, halficon, quartericon, keywords, longdesc, shortdesc,
+          lookdesc, append-lookdesc, append-lookdesc-noformat
  Rooms: icon, title, description, append-description, append-desc-noformat,
           magic-growth *
 

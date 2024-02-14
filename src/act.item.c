@@ -1134,16 +1134,16 @@ void identify_obj_to_char(obj_data *obj, char_data *ch, bool simple) {
 	}
 	
 	// expiry?
-	if (GET_OBJ_TIMER(obj) > 0 && OBJ_IS_IN_WORLD(obj)) {
-		if (GET_OBJ_TIMER(obj) <= 6) {
+	if (GET_OBJ_TIMER(obj) > 0) {
+		if (GET_OBJ_TIMER(obj) <= 12 && OBJ_IS_IN_WORLD(obj)) {
 			msg_to_char(ch, "Expires in %d hour%s.\r\n", GET_OBJ_TIMER(obj), PLURAL(GET_OBJ_TIMER(obj)));
 		}
-		if (GET_OBJ_TIMER(obj) <= 24) {
+		else if (GET_OBJ_TIMER(obj) <= 24) {
 			msg_to_char(ch, "Expires within a day.\r\n");
 		}
 		else {
 			// longer than 24 hours
-			msg_to_char(ch, "This item will expire.\r\n");
+			msg_to_char(ch, "This item will expire within %d days.\r\n", (int) ceil(GET_OBJ_TIMER(obj) / 24.0));
 		}
 	}
 	
@@ -1174,6 +1174,7 @@ void identify_obj_to_char(obj_data *obj, char_data *ch, bool simple) {
 * @param char_data *ch The person to show the data to.
 */
 void identify_vehicle_to_char(vehicle_data *veh, char_data *ch) {
+	bitvector_t show_flags;
 	vehicle_data *proto = vehicle_proto(VEH_VNUM(veh));
 	char buf[MAX_STRING_LENGTH], buf1[256];
 	player_index_data *index;
@@ -1191,6 +1192,10 @@ void identify_vehicle_to_char(vehicle_data *veh, char_data *ch) {
 	
 	msg_to_char(ch, "Type: %s\r\n", skip_filler((proto && !strchr(VEH_SHORT_DESC(proto), '#')) ? VEH_SHORT_DESC(proto) : VEH_SHORT_DESC(veh)));
 	msg_to_char(ch, "Level: %d\r\n", VEH_SCALE_LEVEL(veh));
+	
+	if (VEH_SIZE(veh) > 0) {
+		msg_to_char(ch, "Size: %d%% of tile\r\n", VEH_SIZE(veh) * 100 / config_get_int("vehicle_size_per_tile"));
+	}
 	
 	if (VEH_FLAGGED(veh, MOVABLE_VEH_FLAGS)) {
 		msg_to_char(ch, "Speed: %s\r\n", vehicle_speed_types[VEH_SPEED_BONUSES(veh)]);
@@ -1214,7 +1219,13 @@ void identify_vehicle_to_char(vehicle_data *veh, char_data *ch) {
 		msg_to_char(ch, "Paint color: %s%s%s&0\r\n", buf1, (VEH_FLAGGED(veh, VEH_BRIGHT_PAINT) ? "bright " : ""), buf);
 	}
 	
-	prettier_sprintbit(VEH_FLAGS(veh), identify_vehicle_flags, buf);
+	// flags as "notes":
+	show_flags = VEH_FLAGS(veh);
+	if (VEH_FLAGGED(veh, VEH_BUILDING)) {
+		// do not show these on 'building' vehicles as they are very common and don't make sense in context
+		REMOVE_BIT(show_flags, VEH_NO_BUILDING | VEH_NO_LOAD_ONTO_VEHICLE);
+	}
+	prettier_sprintbit(show_flags, identify_vehicle_flags, buf);
 	if (VEH_FLAGGED(veh, VEH_SIT)) {
 		sprintf(buf + strlen(buf), "%scan sit %s", *buf ? ", " : "", VEH_FLAGGED(veh, VEH_IN) ? "in" : "on");
 	}
@@ -3535,6 +3546,7 @@ void deliver_shipment(empire_data *emp, struct shipping_data *shipd) {
 */
 room_data *find_docks(empire_data *emp, int island_id) {
 	struct empire_territory_data *ter, *next_ter;
+	struct empire_vehicle_data *vter, *next_vter;
 	vehicle_data *veh;
 	
 	if (!emp || island_id == NO_ISLAND) {
@@ -3557,12 +3569,18 @@ room_data *find_docks(empire_data *emp, int island_id) {
 	}
 	
 	// if not, try vehicles
-	DL_FOREACH(vehicle_list, veh) {
+	HASH_ITER(hh, EMPIRE_VEHICLE_LIST(emp), vter, next_vter) {
+		if (!(veh = vter->veh)) {
+			continue;	// wrong vehicle somehow?
+		}
 		if (!IN_ROOM(veh) || GET_ISLAND_ID(IN_ROOM(veh)) != island_id) {
 			continue;	// wrong island
 		}
-		if (VEH_OWNER(veh) != emp || !IS_SET(VEH_FUNCTIONS(veh), FNC_DOCKS) || !VEH_IS_COMPLETE(veh) || VEH_HEALTH(veh) < 1 || VEH_FLAGGED(veh, VEH_ON_FIRE)) {
+		if (!VEH_IS_COMPLETE(veh) || VEH_HEALTH(veh) < 1 || VEH_FLAGGED(veh, VEH_ON_FIRE)) {
 			continue;	// basic ship checks
+		}
+		if (!vehicle_has_function_and_city_ok(veh, FNC_DOCKS)) {
+			continue;	// not a dock
 		}
 		if (VEH_FLAGGED(veh, VEH_PLAYER_NO_WORK) || ROOM_AFF_FLAGGED(IN_ROOM(veh), ROOM_AFF_NO_WORK) || (VEH_INTERIOR_HOME_ROOM(veh) && ROOM_AFF_FLAGGED(VEH_INTERIOR_HOME_ROOM(veh), ROOM_AFF_NO_WORK))) {
 			continue;	// no-work
@@ -3593,16 +3611,17 @@ vehicle_data *find_free_ship(empire_data *emp, struct shipping_data *shipd) {
 	bool already_used;
 	vehicle_data *veh;
 	int capacity;
+	struct empire_vehicle_data *vter, *next_vter;
 	
 	if (!emp || shipd->from_island == NO_ISLAND) {
 		return NULL;
 	}
 	
-	DL_FOREACH(vehicle_list, veh) {
-		if (!IN_ROOM(veh) || GET_ISLAND_ID(IN_ROOM(veh)) != shipd->from_island) {
+	HASH_ITER(hh, EMPIRE_VEHICLE_LIST(emp), vter, next_vter) {
+		if (!(veh = vter->veh) || !IN_ROOM(veh) || GET_ISLAND_ID(IN_ROOM(veh)) != shipd->from_island) {
 			continue;	// wrong island
 		}
-		if (VEH_OWNER(veh) != emp || !VEH_FLAGGED(veh, VEH_SHIPPING) || !VEH_IS_COMPLETE(veh) || VEH_HEALTH(veh) < 1 || VEH_FLAGGED(veh, VEH_ON_FIRE) || VEH_CARRYING_N(veh) >= VEH_CAPACITY(veh)) {
+		if (!VEH_FLAGGED(veh, VEH_SHIPPING) || !VEH_IS_COMPLETE(veh) || VEH_HEALTH(veh) < 1 || VEH_FLAGGED(veh, VEH_ON_FIRE) || VEH_CARRYING_N(veh) >= VEH_CAPACITY(veh)) {
 			continue;	// basic ship checks
 		}
 		if (VEH_FLAGGED(veh, VEH_PLAYER_NO_WORK) || ROOM_AFF_FLAGGED(IN_ROOM(veh), ROOM_AFF_NO_WORK) || (VEH_INTERIOR_HOME_ROOM(veh) && ROOM_AFF_FLAGGED(VEH_INTERIOR_HOME_ROOM(veh), ROOM_AFF_NO_WORK))) {
@@ -3615,22 +3634,20 @@ vehicle_data *find_free_ship(empire_data *emp, struct shipping_data *shipd) {
 		// viable vehicle:
 	
 		// calculate capacity to see if it's full, and check if it's already used for a different island
-		if (VEH_SHIPPING_ID(veh) != -1) {
-			capacity = VEH_CARRYING_N(veh);
-			already_used = FALSE;
-			DL_FOREACH(EMPIRE_SHIPPING_LIST(emp), iter) {
-				if (iter->shipping_id == VEH_SHIPPING_ID(veh)) {
-					capacity += iter->amount;
-					if (iter->from_island != shipd->from_island || iter->to_island != shipd->to_island || iter->to_room != shipd->to_room) {
-						already_used = TRUE;
-						break;
-					}
+		capacity = VEH_CARRYING_N(veh);
+		already_used = FALSE;
+		DL_FOREACH(EMPIRE_SHIPPING_LIST(emp), iter) {
+			if (iter->shipping_id == VEH_IDNUM(veh)) {
+				capacity += iter->amount;
+				if (iter->from_island != shipd->from_island || iter->to_island != shipd->to_island || iter->to_room != shipd->to_room) {
+					already_used = TRUE;
+					break;
 				}
 			}
-			if (already_used || capacity >= VEH_CAPACITY(veh)) {
-				// ship full or in use
-				continue;
-			}
+		}
+		if (already_used || capacity >= VEH_CAPACITY(veh)) {
+			// ship full or in use
+			continue;
 		}
 		
 		// ensure no players on board
@@ -3647,33 +3664,6 @@ vehicle_data *find_free_ship(empire_data *emp, struct shipping_data *shipd) {
 
 
 /**
-* @param empire_data *emp The empire that needs a new shipping id.
-* @return int The first free shipping id.
-*/
-int find_free_shipping_id(empire_data *emp) {
-	struct shipping_data *find;
-	int id;
-	
-	// shortcut
-	if (EMPIRE_TOP_SHIPPING_ID(emp) < INT_MAX) {
-		return ++EMPIRE_TOP_SHIPPING_ID(emp);
-	}
-	
-	// better look it up
-	for (id = 0; id < INT_MAX; ++id) {
-		DL_SEARCH_SCALAR(EMPIRE_SHIPPING_LIST(emp), find, shipping_id, id);
-		if (!find) {
-			return id;
-		}
-	}
-	
-	// this really shouldn't even be possible
-	syslog(SYS_ERROR, 0, TRUE, "SYSERR: find_free_shipping_id found no free id for empire [%d] %s", EMPIRE_VNUM(emp), EMPIRE_NAME(emp));
-	return -1;
-}
-
-
-/**
 * Finds a ship using its shipping id.
 *
 * @param empire_data *emp The purported owner of the ship.
@@ -3681,16 +3671,16 @@ int find_free_shipping_id(empire_data *emp) {
 * @return vehicle_data* The found ship, or NULL.
 */
 vehicle_data *find_ship_by_shipping_id(empire_data *emp, int shipping_id) {
-	vehicle_data *veh;
+	struct empire_vehicle_data *vter, *next_vter;
 	
 	// shortcut
 	if (!emp || shipping_id == -1) {
 		return NULL;
 	}
 	
-	DL_FOREACH(vehicle_list, veh) {
-		if (VEH_OWNER(veh) == emp && VEH_SHIPPING_ID(veh) == shipping_id) {
-			return veh;
+	HASH_ITER(hh, EMPIRE_VEHICLE_LIST(emp), vter, next_vter) {
+		if (VEH_IDNUM(vter->veh) == shipping_id) {
+			return vter->veh;
 		}
 	}
 	
@@ -3760,11 +3750,9 @@ void load_shipment(struct empire_data *emp, struct shipping_data *shipd, vehicle
 	
 	// calculate capacity
 	capacity = 0;
-	if (VEH_SHIPPING_ID(boat) != -1) {
-		DL_FOREACH(EMPIRE_SHIPPING_LIST(emp), iter) {
-			if (iter->shipping_id == VEH_SHIPPING_ID(boat)) {
-				capacity += iter->amount;
-			}
+	DL_FOREACH(EMPIRE_SHIPPING_LIST(emp), iter) {
+		if (iter->shipping_id == VEH_IDNUM(boat)) {
+			capacity += iter->amount;
 		}
 	}
 	
@@ -3800,11 +3788,7 @@ void load_shipment(struct empire_data *emp, struct shipping_data *shipd, vehicle
 	}
 	
 	// mark it as attached to this boat
-	if (VEH_SHIPPING_ID(boat) == -1) {
-		VEH_SHIPPING_ID(boat) = find_free_shipping_id(emp);
-		request_vehicle_save_in_world(boat);
-	}
-	shipd->shipping_id = VEH_SHIPPING_ID(boat);
+	shipd->shipping_id = VEH_IDNUM(boat);
 }
 
 
@@ -3846,9 +3830,6 @@ void move_ship_to_destination(empire_data *emp, struct shipping_data *shipd, roo
 		snprintf(buf, sizeof(buf), "$V %s in.", mob_move_types[VEH_MOVE_TYPE(boat)]);
 		act(buf, FALSE, ROOM_PEOPLE(IN_ROOM(boat)), NULL, boat, TO_CHAR | TO_ROOM | TO_QUEUE | ACT_VEH_VICT);
 	}
-	
-	VEH_SHIPPING_ID(boat) = -1;
-	request_vehicle_save_in_world(boat);
 	
 	// remove the shipping id from all shipments that were on this ship (including this one)
 	old = shipd->shipping_id;
@@ -3973,7 +3954,7 @@ void sail_shipment(empire_data *emp, vehicle_data *boat) {
 	
 	// verify contents
 	DL_FOREACH(EMPIRE_SHIPPING_LIST(emp), iter) {
-		if (iter->shipping_id == VEH_SHIPPING_ID(boat)) {
+		if (iter->shipping_id == VEH_IDNUM(boat)) {
 			iter->status = SHIPPING_EN_ROUTE;
 			iter->status_time = time(0);
 			iter->ship_origin = GET_ROOM_VNUM(IN_ROOM(boat));
@@ -5466,6 +5447,7 @@ ACMD(do_drink) {
 	char *argptr = arg;
 	size_t size;
 	generic_data *liq_generic;
+	vehicle_data *veh;
 	
 	#define LIQ_VAL(val)  (liq_generic ? GEN_VALUE(liq_generic, (val)) : 0)
 
@@ -5493,13 +5475,20 @@ ACMD(do_drink) {
 				if (check_list[iter]) {
 					DL_FOREACH2(check_list[iter], obj, next_content) {
 						if (IS_DRINK_CONTAINER(obj)) {
-							snprintf(line, sizeof(line), "%s - %d drink%s", GET_OBJ_DESC(obj, ch, OBJ_DESC_SHORT), GET_DRINK_CONTAINER_CONTENTS(obj), PLURAL(GET_DRINK_CONTAINER_CONTENTS(obj)));
 							if (GET_DRINK_CONTAINER_CONTENTS(obj) > 0) {
-								snprintf(line + strlen(line), sizeof(line) - strlen(line), " of %s", get_generic_string_by_vnum(GET_DRINK_CONTAINER_TYPE(obj), GENERIC_LIQUID, GSTR_LIQUID_NAME));
+								snprintf(line, sizeof(line), "%s - %d drink%s of %s", GET_OBJ_DESC(obj, ch, OBJ_DESC_SHORT), GET_DRINK_CONTAINER_CONTENTS(obj), PLURAL(GET_DRINK_CONTAINER_CONTENTS(obj)), get_generic_string_by_vnum(GET_DRINK_CONTAINER_TYPE(obj), GENERIC_LIQUID, GSTR_LIQUID_NAME));
+							}
+							else {
+								snprintf(line, sizeof(line), "%s - empty", GET_OBJ_DESC(obj, ch, OBJ_DESC_SHORT));
 							}
 							add_string_hash(&str_hash, line, 1);
 						}
 					}
+				}
+			}
+			DL_FOREACH2(ROOM_VEHICLES(IN_ROOM(ch)), veh, next_in_room) {
+				if (VEH_IS_COMPLETE(veh) && vehicle_has_function_and_city_ok(veh, FNC_DRINK_WATER)) {
+					add_string_hash(&str_hash, VEH_SHORT_DESC(veh), 1);
 				}
 			}
 		
@@ -5536,7 +5525,16 @@ ACMD(do_drink) {
 	}
 
 	if (type == NOTHING && !(obj = get_obj_in_list_vis(ch, argptr, &number, ch->carrying)) && (!can_use_room(ch, IN_ROOM(ch), MEMBERS_AND_ALLIES) || !(obj = get_obj_in_list_vis(ch, argptr, &number, ROOM_CONTENTS(IN_ROOM(ch)))))) {
-		if (room_has_function_and_city_ok(GET_LOYALTY(ch), IN_ROOM(ch), FNC_DRINK_WATER) && (is_abbrev(argptr, "water") || isname(argptr, get_room_name(IN_ROOM(ch), FALSE)))) {
+		if ((veh = get_vehicle_in_room_vis(ch, argptr, NULL)) && vehicle_has_function_and_city_ok(veh, FNC_DRINK_WATER)) {
+			// try the vehicle
+			if (!VEH_IS_COMPLETE(veh)) {
+				act("You need to complete $V before drinking from it.", FALSE, ch, NULL, veh, TO_CHAR | ACT_VEH_VICT);
+				return;
+			}
+			// otherwise ok:
+			type = drink_ROOM;
+		}
+		else if (room_has_function_and_city_ok(GET_LOYALTY(ch), IN_ROOM(ch), FNC_DRINK_WATER) && (is_abbrev(argptr, "water") || isname(argptr, get_room_name(IN_ROOM(ch), FALSE)))) {
 			if (!can_drink_from_room(ch, (type = drink_ROOM))) {
 				return;
 			}
@@ -7212,6 +7210,7 @@ ACMD(do_pour) {
 	char arg1[MAX_INPUT_LENGTH], arg2[MAX_INPUT_LENGTH];
 	obj_data *from_obj = NULL, *to_obj = NULL;
 	int amount;
+	vehicle_data *veh;
 
 	two_arguments(argument, arg1, arg2);
 	
@@ -7274,6 +7273,14 @@ ACMD(do_pour) {
 		if (!(from_obj = get_obj_in_list_vis(ch, arg2, NULL, ROOM_CONTENTS(IN_ROOM(ch))))) {
 			// no matching obj
 			if ((is_abbrev(arg2, "water") || isname(arg2, get_room_name(IN_ROOM(ch), FALSE))) && room_has_function_and_city_ok(GET_LOYALTY(ch), IN_ROOM(ch), FNC_DRINK_WATER)) {
+				fill_from_room(ch, to_obj);
+			}
+			else if ((veh = get_vehicle_in_room_vis(ch, arg2, NULL)) && vehicle_has_function_and_city_ok(veh, FNC_DRINK_WATER)) {
+				// targeting a vehicle with a drink-water flag
+				if (!VEH_IS_COMPLETE(veh)) {
+					act("You need to complete $V before filling from it.", FALSE, ch, NULL, veh, TO_CHAR | ACT_VEH_VICT);
+					return;
+				}
 				fill_from_room(ch, to_obj);
 			}
 			else if (is_abbrev(arg2, "river") || is_abbrev(arg2, "water")) {

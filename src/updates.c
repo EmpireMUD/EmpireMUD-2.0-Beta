@@ -385,6 +385,9 @@ void b3_6_einv_fix(void) {
 
 // removes shipping ids that got stuck and are not in the holding pen
 void b3_11_ship_fix(void) {
+	/*
+	// this is no longer needed since shipping ids were removed in b5.175
+	
 	vehicle_data *veh;
 
 	DL_FOREACH(vehicle_list, veh) {
@@ -392,6 +395,7 @@ void b3_11_ship_fix(void) {
 			VEH_SHIPPING_ID(veh) = -1;
 		}
 	}
+	*/
 }
 
 

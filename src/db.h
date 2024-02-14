@@ -207,7 +207,8 @@ typedef struct map_file_data_v1  map_file_data;	// the current version of the st
 #define DATA_LAST_CONSTRUCTION_ID  5	// for vehicle construct/dismantle
 #define DATA_START_PLAYTIME_TRACKING  6	// when we started tracking empire playtime (prevents accidental deletes)
 #define DATA_TOP_IDNUM  7	// highest player idnum to prevent re-use
-#define NUM_DATAS  8
+#define DATA_TOP_VEHICLE_ID  8	// highest vehicle idnum to prevent re-use
+#define NUM_DATAS  9
 
 
 // DATYPE_x: types of stored data
@@ -442,11 +443,15 @@ extern empire_data *empire_table;
 extern struct trading_post_data *trading_list;
 extern bool check_empire_refresh;
 
+struct empire_vehicle_data *create_empire_vehicle_entry(empire_data *emp, vehicle_data *veh);
+struct empire_vehicle_data *create_empire_vehicle_entry_by_id(empire_data *emp, int idnum);
 struct empire_territory_data *create_territory_entry(empire_data *emp, room_data *room);
 void delete_empire(empire_data *emp);
 void delete_member_data(char_data *ch, empire_data *from_emp);
 void delete_territory_npc(struct empire_territory_data *ter, struct empire_npc_data *npc);
 void delete_room_npcs(room_data *room, struct empire_territory_data *ter, bool make_homeless);
+void delete_vehicle_npc(struct empire_vehicle_data *vter, struct empire_npc_data *npc);
+void delete_vehicle_npcs(vehicle_data *veh, struct empire_vehicle_data *vter, bool make_homeless);
 void free_dropped_items(struct empire_dropped_item **list);
 void free_empire(empire_data *emp);
 void free_member_data(empire_data *emp);
@@ -485,7 +490,9 @@ char_data *spawn_empire_npc_to_room(empire_data *emp, struct empire_npc_data *np
 
 // empire territory
 void delete_territory_entry(empire_data *emp, struct empire_territory_data *ter, bool make_npcs_homeless);
+void delete_empire_vehicle_entry(empire_data *emp, struct empire_vehicle_data *vter, bool make_npcs_homeless);
 void populate_npc(room_data *room, struct empire_territory_data *ter, bool force);
+void populate_vehicle_npc(vehicle_data *veh, struct empire_vehicle_data *vter, bool force);
 
 // extra descs
 void free_extra_descs(struct extra_descr_data **list);
@@ -887,16 +894,18 @@ extern vehicle_data *vehicle_table;
 extern vehicle_data *global_next_vehicle;
 extern vehicle_data *next_pending_vehicle;
 
-void adjust_vehicle_tech(vehicle_data *veh, bool add);
+void adjust_vehicle_tech(vehicle_data *veh, int island_id, bool add);
 void free_vehicle(vehicle_data *veh);
 vehicle_data *read_vehicle(any_vnum vnum, bool with_triggers);
 void remove_vehicle_from_table(vehicle_data *veh);
+void set_vehicle_half_icon(vehicle_data *veh, const char *str);
 void set_vehicle_icon(vehicle_data *veh, const char *str);
 void set_vehicle_keywords(vehicle_data *veh, const char *str);
 void set_vehicle_long_desc(vehicle_data *veh, const char *str);
 void set_vehicle_look_desc(vehicle_data *veh, const char *str, bool format);
-void set_vehicle_short_desc(vehicle_data *veh, const char *str);
 void set_vehicle_look_desc_append(vehicle_data *veh, const char *str, bool format);
+void set_vehicle_quarter_icon(vehicle_data *veh, const char *str);
+void set_vehicle_short_desc(vehicle_data *veh, const char *str);
 vehicle_data *vehicle_proto(any_vnum vnum);
 
 // wizlock system
@@ -918,6 +927,7 @@ extern bool save_world_after_startup;
 extern bool converted_to_b5_116;
 extern bool block_world_save_requests;
 
+room_data *add_room_to_building(room_data *home_room, bld_vnum building_type);
 void add_room_to_world_tables(room_data *room);
 void add_trd_home_room(room_vnum vnum, room_vnum home_room);
 void add_trd_owner(room_vnum vnum, empire_vnum owner);
@@ -1023,6 +1033,7 @@ extern struct text_file_data_type text_file_data[NUM_TEXT_FILE_STRINGS];
 
 // workforce.c
 extern struct empire_territory_data *global_next_territory_entry;
+extern struct empire_vehicle_data *global_next_empire_vehicle_entry;
 
 
 /* global buffering system */

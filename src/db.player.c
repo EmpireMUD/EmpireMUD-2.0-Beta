@@ -2706,7 +2706,7 @@ void write_player_primary_data_to_file(FILE *fl, char_data *ch) {
 		}
 		if (GET_ACTION_CHAR_TARG(ch) || GET_ACTION_MULTI_TARG(ch) || GET_ACTION_VEH_TARG(ch) || GET_ACTION_ROOM_TARG(ch) != NOWHERE || GET_ACTION_TEMPORARY_CHAR_ID(ch) != 0 || GET_ACTION_TEMPORARY_VEH_ID(ch) != NOTHING) {
 			// object targets are not quit-safe and are not saved
-			fprintf(fl, "Action-targets: %d %lld %d %d\n", GET_ACTION_CHAR_TARG(ch) ? CAST_BY_ID(GET_ACTION_CHAR_TARG(ch)) : GET_ACTION_TEMPORARY_CHAR_ID(ch), GET_ACTION_MULTI_TARG(ch), GET_ACTION_VEH_TARG(ch) ? VEH_VNUM(GET_ACTION_VEH_TARG(ch)) : GET_ACTION_TEMPORARY_VEH_ID(ch), GET_ACTION_ROOM_TARG(ch));
+			fprintf(fl, "Action-targets: %d %lld %d %d\n", GET_ACTION_CHAR_TARG(ch) ? CAST_BY_ID(GET_ACTION_CHAR_TARG(ch)) : GET_ACTION_TEMPORARY_CHAR_ID(ch), GET_ACTION_MULTI_TARG(ch), GET_ACTION_VEH_TARG(ch) ? VEH_IDNUM(GET_ACTION_VEH_TARG(ch)) : GET_ACTION_TEMPORARY_VEH_ID(ch), GET_ACTION_ROOM_TARG(ch));
 		}
 	}
 	if (GET_ACTION_STRING(ch)) {
@@ -2865,7 +2865,7 @@ void write_player_primary_data_to_file(FILE *fl, char_data *ch) {
 		fprintf(fl, "Last Tip: %d\n", GET_LAST_TIP(ch));
 	}
 	if ((IN_ROOM(ch) && GET_SITTING_ON(ch)) || (!IN_ROOM(ch) && GET_LAST_VEHICLE(ch) != NOTHING)) {
-		fprintf(fl, "Last Vehicle: %d\n", IN_ROOM(ch) ? VEH_VNUM(GET_SITTING_ON(ch)) : GET_LAST_VEHICLE(ch));
+		fprintf(fl, "Last Vehicle: %d\n", IN_ROOM(ch) ? VEH_IDNUM(GET_SITTING_ON(ch)) : GET_LAST_VEHICLE(ch));
 	}
 	fprintf(fl, "Last Offense: %ld\n", GET_LAST_OFFENSE_SEEN(ch));
 	if (GET_PERSONAL_LASTNAME(ch)) {
@@ -4601,10 +4601,19 @@ void enter_player_game(descriptor_data *d, int dolog, bool fresh) {
 	// attempt to put them back in a vehicle
 	if (GET_LAST_VEHICLE(ch) != NOTHING) {
 		DL_FOREACH2(ROOM_VEHICLES(IN_ROOM(ch)), veh, next_in_room) {
-			if (VEH_VNUM(veh) == GET_LAST_VEHICLE(ch) && VEH_IS_COMPLETE(veh) && !VEH_SITTING_ON(veh) && validate_sit_on_vehicle(ch, veh, POS_SITTING, FALSE)) {
-				sit_on_vehicle(ch, veh);
-				GET_POS(ch) = POS_SITTING;
-				break;	// only need 1
+			if (VEH_IDNUM(veh) == GET_LAST_VEHICLE(ch) && VEH_IS_COMPLETE(veh) && !VEH_SITTING_ON(veh)) {
+				// sitting?
+				if (VEH_FLAGGED(veh, VEH_SIT) && validate_sit_on_vehicle(ch, veh, POS_SITTING, FALSE)) {
+					sit_on_vehicle(ch, veh);
+					GET_POS(ch) = POS_SITTING;
+					break;	// only need 1
+				}
+				// sleeping?
+				else if (VEH_FLAGGED(veh, VEH_SLEEP) && validate_sit_on_vehicle(ch, veh, POS_SLEEPING, FALSE)) {
+					sit_on_vehicle(ch, veh);
+					GET_POS(ch) = POS_SLEEPING;
+					break;	// only need 1
+				}
 			}
 		}
 	}
@@ -6010,7 +6019,7 @@ void update_empire_members_and_greatness(empire_data *emp) {
 	
 	if (greatness != old) {
 		et_change_greatness(emp);
-		update_MSDP_empire_data_all(emp, TRUE, TRUE);
+		TRIGGER_DELAYED_REFRESH(emp, DELAY_REFRESH_MSDP_UPDATE_CLAIMS);
 	}
 }
 

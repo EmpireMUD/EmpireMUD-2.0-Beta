@@ -604,6 +604,7 @@ room_data *get_vehicle_interior(vehicle_data *veh) {
 	}
 	
 	// otherwise, create the interior
+	// NOTE: I don't think this can use add_room_to_building() because it's the first room -paul 1/30/2024
 	room = create_room(NULL);
 	attach_building_to_room(bld, room, TRUE);
 	COMPLEX_DATA(room)->home_room = NULL;
@@ -686,12 +687,12 @@ vehicle_data *find_vehicle_to_show(char_data *ch, room_data *room, int *total_ve
 	}
 	
 	// we don't show vehicles in buildings or closed tiles (unless the player is on a vehicle in that room, in which case we override)
-	if (!is_on_vehicle && (IS_ANY_BUILDING(room) || ROOM_IS_CLOSED(room))) {
+	if (!is_on_vehicle && ((IS_ANY_BUILDING(room) && !ROOM_BLD_FLAGGED(room, BLD_SHOW_VEHICLES)) || ROOM_IS_CLOSED(room))) {
 		return NULL;
 	}
 	
 	DL_FOREACH2(ROOM_VEHICLES(room), iter, next_in_room) {
-		if (!VEH_ICON(iter) || !*VEH_ICON(iter)) {
+		if ((!VEH_ICON(iter) || !*VEH_ICON(iter)) && (!VEH_HALF_ICON(iter) || !*VEH_HALF_ICON(iter)) && (!VEH_QUARTER_ICON(iter) || !*VEH_QUARTER_ICON(iter))) {
 			continue;	// no icon
 		}
 		if (!VEH_IS_COMPLETE(iter) && VEH_SIZE(iter) < 1) {
@@ -1015,6 +1016,24 @@ void scale_vehicle_to_level(vehicle_data *veh, int level) {
 
 
 /**
+* Updates the vehicle's half icon. It does no validation, so you must
+* pre-validate the text as 2 visible characters wide.
+*
+* @param vehicle_data *veh The vehicle to change.
+* @param const char *str The new half icon (will be copied). Or, NULL to set it back to the prototype.
+*/
+void set_vehicle_half_icon(vehicle_data *veh, const char *str) {
+	vehicle_data *proto = vehicle_proto(VEH_VNUM(veh));
+	
+	if (VEH_HALF_ICON(veh) && (!proto || VEH_HALF_ICON(veh) != VEH_HALF_ICON(proto))) {
+		free(VEH_HALF_ICON(veh));
+	}
+	VEH_HALF_ICON(veh) = (str ? str_dup(str) : (proto ? VEH_HALF_ICON(proto) : NULL));
+	request_vehicle_save_in_world(veh);
+}
+
+
+/**
 * Updates the vehicle's icon. It does no validation, so you must
 * pre-validate the text as 4 visible characters wide.
 *
@@ -1157,6 +1176,24 @@ void set_vehicle_look_desc_append(vehicle_data *veh, const char *str, bool forma
 
 
 /**
+* Updates the vehicle's quarter icon. It does no validation, so you must
+* pre-validate the text as 2 visible characters wide.
+*
+* @param vehicle_data *veh The vehicle to change.
+* @param const char *str The new quarter icon (will be copied). Or, NULL to set it back to the prototype.
+*/
+void set_vehicle_quarter_icon(vehicle_data *veh, const char *str) {
+	vehicle_data *proto = vehicle_proto(VEH_VNUM(veh));
+	
+	if (VEH_QUARTER_ICON(veh) && (!proto || VEH_QUARTER_ICON(veh) != VEH_QUARTER_ICON(proto))) {
+		free(VEH_QUARTER_ICON(veh));
+	}
+	VEH_QUARTER_ICON(veh) = (str ? str_dup(str) : (proto ? VEH_QUARTER_ICON(proto) : NULL));
+	request_vehicle_save_in_world(veh);
+}
+
+
+/**
 * Begins the dismantle process on a vehicle including setting its
 * VEH_DISMANTLING flag and its VEH_CONSTRUCTION_ID().
 *
@@ -1167,12 +1204,24 @@ void start_dismantle_vehicle(vehicle_data *veh, char_data *ch) {
 	struct resource_data *res, *next_res;
 	craft_data *craft = find_craft_for_vehicle(veh);
 	obj_data *proto;
+	struct vehicle_room_list *vrl;
 	
 	// remove from goals/tech
 	if (VEH_OWNER(veh) && VEH_IS_COMPLETE(veh)) {
 		qt_empire_players_vehicle(VEH_OWNER(veh), qt_lose_vehicle, veh);
 		et_lose_vehicle(VEH_OWNER(veh), veh);
-		adjust_vehicle_tech(veh, FALSE);
+		adjust_vehicle_tech(veh, GET_ISLAND_ID(IN_ROOM(veh)), FALSE);
+		
+		// adjust tech on interior
+		LL_FOREACH(VEH_ROOM_LIST(veh), vrl) {
+			adjust_building_tech(VEH_OWNER(veh), vrl->room, FALSE);
+		}
+	}
+	
+	// any npcs living on/in it
+	delete_vehicle_npcs(veh, NULL, TRUE);
+	LL_FOREACH(VEH_ROOM_LIST(veh), vrl) {
+		delete_room_npcs(vrl->room, NULL, TRUE);
 	}
 	
 	// clear it out
@@ -1397,11 +1446,11 @@ void update_vehicle_island_and_loc(vehicle_data *veh, room_data *loc) {
 			GET_ISLAND_ID(vrl->room) = GET_ISLAND_ID(loc);
 			GET_ISLAND(vrl->room) = GET_ISLAND(loc);
 			request_world_save(GET_ROOM_VNUM(vrl->room), WSAVE_ROOM);
+		}
 		
-			// check vehicles inside and cascade
-			DL_FOREACH2(ROOM_VEHICLES(vrl->room), iter, next_in_room) {
-				update_vehicle_island_and_loc(iter, loc);
-			}
+		// check vehicles inside and cascade
+		DL_FOREACH2(ROOM_VEHICLES(vrl->room), iter, next_in_room) {
+			update_vehicle_island_and_loc(iter, loc);
 		}
 	}
 }
@@ -1549,6 +1598,77 @@ void add_room_to_vehicle(room_data *room, vehicle_data *veh) {
 
 
 /**
+* Applies a vehicle's traits/data to an island, including empire-island data if
+* it's claimed. This also sets up the inside of the vehicle.
+*
+* @param vehicle_data *veh The vehicle.
+* @param int island_id Which island to apply to, if any.
+*/
+void apply_vehicle_to_island(vehicle_data *veh, int island_id) {
+	struct vehicle_room_list *vrl;
+	vehicle_data *iter;
+	
+	if (!veh || VEH_APPLIED_TO_ISLAND(veh) == island_id) {
+		return;	// no change or no vehicle
+	}
+	
+	// remove first
+	unapply_vehicle_to_island(veh);
+	
+	// update island id
+	VEH_APPLIED_TO_ISLAND(veh) = island_id;
+	
+	// cascade to interior rooms and vehicles
+	if (VEH_ROOM_LIST(veh)) {
+		LL_FOREACH(VEH_ROOM_LIST(veh), vrl) {
+			// adjust techs for this island
+			if (VEH_OWNER(veh)) {
+				adjust_building_tech(VEH_OWNER(veh), vrl->room, TRUE);
+			}
+			
+			// check vehicles inside and cascade
+			DL_FOREACH2(ROOM_VEHICLES(vrl->room), iter, next_in_room) {
+				apply_vehicle_to_island(iter, island_id);
+			}
+		}
+	}
+	
+	// and apply tech
+	adjust_vehicle_tech(veh, island_id, TRUE);
+}
+
+
+/**
+* Applies a vehicle's traits to a room. If they were already applied to another
+* room, they will be removed from there first -- unless the two rooms are on
+* the same island, in which case the applied-to-room is merely updated.
+*
+* @param vehicle_data *veh The vehicle.
+* @param room_data *room The room to apply it to.
+*/
+void apply_vehicle_to_room(vehicle_data *veh, room_data *room) {
+	if (room == VEH_APPLIED_TO_ROOM(veh)) {
+		return;	// same room / no work
+	}
+	
+	// ok: remove from old room first
+	unapply_vehicle_to_room(veh);
+	VEH_APPLIED_TO_ROOM(veh) = room;
+	
+	// update map/island pointers inside the vehicle
+	update_vehicle_island_and_loc(veh, room);
+	
+	// and apply to the island (unapply_vehicle_to_room may have removed it from the island)
+	apply_vehicle_to_island(veh, room ? GET_ISLAND_ID(room) : NO_ISLAND);
+	
+	// check lights
+	if (VEH_PROVIDES_LIGHT(veh)) {
+		++ROOM_LIGHTS(room);
+	}
+}
+
+
+/**
 * Checks for common vehicle problems and reports them to ch.
 *
 * @param vehicle_data *veh The item to audit.
@@ -1625,8 +1745,16 @@ bool audit_vehicle(vehicle_data *veh, char_data *ch) {
 		problem = TRUE;
 	}
 	
-	if (VEH_ICON(veh) && !validate_icon(VEH_ICON(veh))) {
+	if (VEH_ICON(veh) && !validate_icon(VEH_ICON(veh), 4)) {
 		olc_audit_msg(ch, VEH_VNUM(veh), "Bad icon set");
+		problem = TRUE;
+	}
+	if (VEH_HALF_ICON(veh) && !validate_icon(VEH_HALF_ICON(veh), 2)) {
+		olc_audit_msg(ch, VEH_VNUM(veh), "Bad half icon set");
+		problem = TRUE;
+	}
+	if (VEH_QUARTER_ICON(veh) && !validate_icon(VEH_QUARTER_ICON(veh), 1)) {
+		olc_audit_msg(ch, VEH_VNUM(veh), "Bad quarter icon set");
 		problem = TRUE;
 	}
 	
@@ -1765,6 +1893,7 @@ bool audit_vehicle(vehicle_data *veh, char_data *ch) {
 */
 void complete_vehicle(vehicle_data *veh) {
 	room_data *room = IN_ROOM(veh);	// store room in case veh is purged during a trigger
+	struct vehicle_room_list *vrl;
 	
 	if (VEH_IS_DISMANTLING(veh)) {
 		// short-circuit out to dismantling
@@ -1789,12 +1918,17 @@ void complete_vehicle(vehicle_data *veh) {
 		if (VEH_OWNER(veh)) {
 			qt_empire_players_vehicle(VEH_OWNER(veh), qt_gain_vehicle, veh);
 			et_gain_vehicle(VEH_OWNER(veh), veh);
-			adjust_vehicle_tech(veh, TRUE);
+			adjust_vehicle_tech(veh, GET_ISLAND_ID(IN_ROOM(veh)), TRUE);
+			
+			// adjust tech on existing interior?
+			LL_FOREACH(VEH_ROOM_LIST(veh), vrl) {
+				adjust_building_tech(VEH_OWNER(veh), vrl->room, TRUE);
+			}
 		}
 		
 		finish_vehicle_setup(veh);
 		
-		// build the interior
+		// build the interior if not built?
 		get_vehicle_interior(veh);
 		
 		// run triggers
@@ -2258,7 +2392,12 @@ vehicle_data *read_vehicle(any_vnum vnum, bool with_triggers) {
 	IN_ROOM(veh) = NULL;
 	remove_vehicle_flags(veh, VEH_INCOMPLETE | VEH_DISMANTLING);	// ensure not marked incomplete/dismantle
 	
-	veh->script_id = 0;	// initialize later
+	// give it a new idnum
+	VEH_IDNUM(veh) = data_get_int(DATA_TOP_VEHICLE_ID) + 1;
+	data_set_int(DATA_TOP_VEHICLE_ID, VEH_IDNUM(veh));
+	
+	// this will be initialized only if needed
+	veh->script_id = 0;
 	
 	if (with_triggers) {
 		veh->proto_script = copy_trig_protos(proto->proto_script);
@@ -2321,6 +2460,7 @@ void store_one_vehicle_to_file(vehicle_data *veh, FILE *fl) {
 	proto = vehicle_proto(VEH_VNUM(veh));
 	
 	fprintf(fl, "%%%d\n", VEH_VNUM(veh));
+	fprintf(fl, "Id: %d\n", VEH_IDNUM(veh));
 	fprintf(fl, "Flags: %s\n", bitv_to_alpha(VEH_FLAGS(veh)));
 
 	if (!proto || VEH_KEYWORDS(veh) != VEH_KEYWORDS(proto)) {
@@ -2337,8 +2477,14 @@ void store_one_vehicle_to_file(vehicle_data *veh, FILE *fl) {
 		strip_crlf(temp);
 		fprintf(fl, "Look-desc:\n%s~\n", temp);
 	}
-	if (!proto || VEH_ICON(veh) != VEH_ICON(proto)) {
+	if (VEH_ICON(veh) && (!proto || VEH_ICON(veh) != VEH_ICON(proto))) {
 		fprintf(fl, "Icon:\n%s~\n", NULLSAFE(VEH_ICON(veh)));
+	}
+	if (VEH_HALF_ICON(veh) && (!proto || VEH_HALF_ICON(veh) != VEH_HALF_ICON(proto))) {
+		fprintf(fl, "Icon-2:\n%s~\n", NULLSAFE(VEH_HALF_ICON(veh)));
+	}
+	if (VEH_QUARTER_ICON(veh) && (!proto || VEH_QUARTER_ICON(veh) != VEH_QUARTER_ICON(proto))) {
+		fprintf(fl, "Icon-1:\n%s~\n", NULLSAFE(VEH_QUARTER_ICON(veh)));
 	}
 
 	if (VEH_OWNER(veh)) {
@@ -2369,9 +2515,6 @@ void store_one_vehicle_to_file(vehicle_data *veh, FILE *fl) {
 	}
 	if (VEH_LAST_MOVE_TIME(veh)) {
 		fprintf(fl, "Last-moved: %ld\n", VEH_LAST_MOVE_TIME(veh));
-	}
-	if (VEH_SHIPPING_ID(veh) >= 0) {
-		fprintf(fl, "Shipping-id: %d\n", VEH_SHIPPING_ID(veh));
 	}
 	LL_FOREACH(VEH_ANIMALS(veh), vam) {
 		fprintf(fl, "Animal: %d %d %s %d\n", vam->mob, vam->scale_level, bitv_to_alpha(vam->flags), vam->empire);
@@ -2418,6 +2561,59 @@ void store_one_vehicle_to_file(vehicle_data *veh, FILE *fl) {
 
 
 /**
+* Removes a vehicle's traits from an island.
+*
+* @param vehicle_data *veh The vehicle.
+*/
+void unapply_vehicle_to_island(vehicle_data *veh) {
+	struct vehicle_room_list *vrl;
+	
+	if (veh) {
+		if (VEH_APPLIED_TO_ISLAND(veh) != UNAPPLIED_ISLAND) {
+			// NOTE: do not remove the island-id on the interior rooms -- do this only when applying to a new room
+			
+			// un-apply tech -- do it before removing from the island
+			adjust_vehicle_tech(veh, VEH_APPLIED_TO_ISLAND(veh), FALSE);
+			
+			// un-apply interior techs too
+			if (VEH_OWNER(veh) && VEH_ROOM_LIST(veh)) {
+				LL_FOREACH(VEH_ROOM_LIST(veh), vrl) {
+					adjust_building_tech(VEH_OWNER(veh), vrl->room, FALSE);
+				}
+			}
+			
+			// and clear the data
+			VEH_APPLIED_TO_ISLAND(veh) = UNAPPLIED_ISLAND;
+		}
+	}
+}
+
+
+/**
+* Removes a vehicle's traits from a room.
+*
+* @param vehicle_data *veh The vehicle.
+*/
+void unapply_vehicle_to_room(vehicle_data *veh) {
+	room_data *was_room;
+	
+	// do not unapply_vehicle_to_island: it doesn't unapply until it gets a new one
+	
+	if (veh && (was_room = VEH_APPLIED_TO_ROOM(veh))) {
+		// NOTE: do not remove the map-loc on the interior rooms -- do this only when applying to a new room
+		
+		// and clear the data
+		VEH_APPLIED_TO_ROOM(veh) = NULL;
+		
+		// check lights
+		if (VEH_PROVIDES_LIGHT(veh)) {
+			--ROOM_LIGHTS(was_room);
+		}
+	}
+}
+
+
+/**
 * Reads a vehicle from a tagged data file.
 *
 * @param FILE *fl The file open for reading, just after the %VNUM line.
@@ -2437,6 +2633,7 @@ vehicle_data *unstore_vehicle_from_file(FILE *fl, any_vnum vnum, char *error_str
 	vehicle_data *veh;
 	long long_in[2];
 	double dbl_in;
+	struct shipping_data *shipd;
 	
 	#define LOG_BAD_TAG_WARNINGS  TRUE	// triggers syslogs for invalid vehicle tags
 	#define BAD_TAG_WARNING(src)  else if (LOG_BAD_TAG_WARNINGS) { \
@@ -2651,6 +2848,37 @@ vehicle_data *unstore_vehicle_from_file(FILE *fl, any_vnum vnum, char *error_str
 					}
 					VEH_ICON(veh) = fread_string(fl, error);
 				}
+				else if (!strn_cmp(line, "Icon-1:", 7)) {	// quarter icon
+					if (VEH_QUARTER_ICON(veh) && (!proto || VEH_QUARTER_ICON(veh) != VEH_QUARTER_ICON(proto))) {
+						free(VEH_QUARTER_ICON(veh));
+					}
+					VEH_QUARTER_ICON(veh) = fread_string(fl, error);
+				}
+				else if (!strn_cmp(line, "Icon-2:", 7)) {	// half icon
+					if (VEH_HALF_ICON(veh) && (!proto || VEH_HALF_ICON(veh) != VEH_HALF_ICON(proto))) {
+						free(VEH_HALF_ICON(veh));
+					}
+					VEH_HALF_ICON(veh) = fread_string(fl, error);
+				}
+				else if (!strn_cmp(line, "Id: ", 4)) {
+					if (sscanf(line + 4, "%d", &i_in[0])) {
+						// did we already have an idnum? (usually due to being assigned a new one)
+						if (VEH_IDNUM(veh) != 0) {
+							// check if we used a new one
+							if (VEH_IDNUM(veh) == data_get_int(DATA_TOP_VEHICLE_ID)) {
+								// give back the top id
+								data_set_int(DATA_TOP_VEHICLE_ID, data_get_int(DATA_TOP_VEHICLE_ID) - 1);
+							}
+						}
+					
+						VEH_IDNUM(veh) = i_in[0];
+						
+						// ensure it's not over the top known id
+						if (i_in[0] > data_get_int(DATA_TOP_VEHICLE_ID)) {
+							data_set_int(DATA_TOP_VEHICLE_ID, i_in[0]);
+						}
+					}
+				}
 				else if (!strn_cmp(line, "Instance-id: ", 13)) {
 					if (sscanf(line + 13, "%d", &i_in[0])) {
 						VEH_INSTANCE_ID(veh) = i_in[0];
@@ -2750,7 +2978,19 @@ vehicle_data *unstore_vehicle_from_file(FILE *fl, any_vnum vnum, char *error_str
 				}
 				else if (!strn_cmp(line, "Shipping-id: ", 13)) {
 					if (sscanf(line + 13, "%d", &i_in[0])) {
-						VEH_SHIPPING_ID(veh) = i_in[0];
+						// this was formerly is temporary id assigned to the vehicle
+						// convert it to use the ships idnum now (safe because both idnum and owner are saved before shipping id in the file).
+						if (VEH_OWNER(veh)) {
+							DL_FOREACH(EMPIRE_SHIPPING_LIST(VEH_OWNER(veh)), shipd) {
+								if (shipd->shipping_id == i_in[0]) {
+									shipd->shipping_id = VEH_IDNUM(veh);
+									EMPIRE_NEEDS_STORAGE_SAVE(VEH_OWNER(veh)) = TRUE;
+								}
+							}
+						}
+						
+						// no longer need this:
+						// VEH_SHIPPING_ID(veh) = i_in[0];
 					}
 				}
 				else if (!strn_cmp(line, "Short-desc:", 11)) {
@@ -2856,7 +3096,7 @@ void clear_vehicle(vehicle_data *veh) {
 	memset((char *) veh, 0, sizeof(vehicle_data));
 	
 	VEH_VNUM(veh) = NOTHING;
-	VEH_SHIPPING_ID(veh) = -1;
+	VEH_IDNUM(veh) = 0;
 	
 	veh->attributes = attr;	// stored from earlier
 	if (veh->attributes) {
@@ -2871,6 +3111,8 @@ void clear_vehicle(vehicle_data *veh) {
 	VEH_CONSTRUCTION_ID(veh) = NOTHING;
 	VEH_INSTANCE_ID(veh) = NOTHING;
 	VEH_SPEED_BONUSES(veh) = VSPEED_NORMAL;
+	VEH_APPLIED_TO_ISLAND(veh) = UNAPPLIED_ISLAND;
+	VEH_ARTISAN(veh) = NOTHING;
 }
 
 
@@ -2902,6 +3144,12 @@ void free_vehicle(vehicle_data *veh) {
 	}
 	if (VEH_ICON(veh) && (!proto || VEH_ICON(veh) != VEH_ICON(proto))) {
 		free(VEH_ICON(veh));
+	}
+	if (VEH_HALF_ICON(veh) && (!proto || VEH_HALF_ICON(veh) != VEH_HALF_ICON(proto))) {
+		free(VEH_HALF_ICON(veh));
+	}
+	if (VEH_QUARTER_ICON(veh) && (!proto || VEH_QUARTER_ICON(veh) != VEH_QUARTER_ICON(proto))) {
+		free(VEH_QUARTER_ICON(veh));
 	}
 	
 	// pointers
@@ -3000,7 +3248,7 @@ void parse_vehicle(FILE *fl, any_vnum vnum) {
 	struct spawn_info *spawn;
 	vehicle_data *veh, *find;
 	double dbl_in;
-	int int_in[7];
+	int int_in[10];
 	
 	CREATE(veh, vehicle_data, 1);
 	clear_vehicle(veh);
@@ -3028,18 +3276,23 @@ void parse_vehicle(FILE *fl, any_vnum vnum) {
 		log("SYSERR: Missing line 6 of %s", error);
 		exit(1);
 	}
-	if (sscanf(line, "%s %d %d %d %d %s %d %d %d %s", str_in, &int_in[0], &int_in[1], &int_in[2], &int_in[3], str_in2, &int_in[4], &int_in[5], &int_in[6], str_in3) != 10) {
-		int_in[6] = 0;	// b5.104 backwards-compatible: size
-		strcpy(str_in3, "0");	// affects
+	if (sscanf(line, "%s %d %d %d %d %s %d %d %d %s %d %d", str_in, &int_in[0], &int_in[1], &int_in[2], &int_in[3], str_in2, &int_in[4], &int_in[5], &int_in[6], str_in3, &int_in[7], &int_in[8]) != 12) {
+		int_in[7] = NOTHING;	// b5.175 backwards-compatible: artisan vnum
+		int_in[8] = 0;					// and citizens
 		
-		if (sscanf(line, "%s %d %d %d %d %s %d %d", str_in, &int_in[0], &int_in[1], &int_in[2], &int_in[3], str_in2, &int_in[4], &int_in[5]) != 8) {
-			strcpy(str_in2, "0");	// backwards-compatible: functions
-			int_in[4] = 0;	// fame
-			int_in[5] = 0;	// military
+		if (sscanf(line, "%s %d %d %d %d %s %d %d %d %s", str_in, &int_in[0], &int_in[1], &int_in[2], &int_in[3], str_in2, &int_in[4], &int_in[5], &int_in[6], str_in3) != 10) {
+			int_in[6] = 0;	// b5.104 backwards-compatible: size
+			strcpy(str_in3, "0");	// affects
 		
-			if (sscanf(line, "%s %d %d %d %d", str_in, &int_in[0], &int_in[1], &int_in[2], &int_in[3]) != 5) {
-				log("SYSERR: Format error in line 6 of %s", error);
-				exit(1);
+			if (sscanf(line, "%s %d %d %d %d %s %d %d", str_in, &int_in[0], &int_in[1], &int_in[2], &int_in[3], str_in2, &int_in[4], &int_in[5]) != 8) {
+				strcpy(str_in2, "0");	// backwards-compatible: functions
+				int_in[4] = 0;	// fame
+				int_in[5] = 0;	// military
+		
+				if (sscanf(line, "%s %d %d %d %d", str_in, &int_in[0], &int_in[1], &int_in[2], &int_in[3]) != 5) {
+					log("SYSERR: Format error in line 6 of %s", error);
+					exit(1);
+				}
 			}
 		}
 	}
@@ -3054,6 +3307,8 @@ void parse_vehicle(FILE *fl, any_vnum vnum) {
 	VEH_MILITARY(veh) = int_in[5];
 	VEH_SIZE(veh) = int_in[6];
 	VEH_ROOM_AFFECTS(veh) = asciiflag_conv(str_in3);
+	VEH_ARTISAN(veh) = int_in[7];
+	VEH_CITIZENS(veh) = int_in[8];
 	
 	// optionals
 	for (;;) {
@@ -3062,6 +3317,29 @@ void parse_vehicle(FILE *fl, any_vnum vnum) {
 			exit(1);
 		}
 		switch (*line) {
+			case 'B': {	// extra strings (or extra data
+				switch (*(line+1)) {
+					case '0': {	// B0: half icon
+						if (VEH_HALF_ICON(veh)) {
+							free(VEH_HALF_ICON(veh));
+						}
+						VEH_HALF_ICON(veh) = fread_string(fl, error);
+						break;
+					}
+					case '1': {	// B1: quarter icon
+						if (VEH_QUARTER_ICON(veh)) {
+							free(VEH_QUARTER_ICON(veh));
+						}
+						VEH_QUARTER_ICON(veh) = fread_string(fl, error);
+						break;
+					}
+					default: {
+						log("SYSERR: Unknown B line in %s: %s", error, line);
+						exit(1);
+					}
+				}
+				break;
+			}
 			case 'C': {	// scalable
 				if (!get_line(fl, line) || sscanf(line, "%d %d", &int_in[0], &int_in[1]) != 2) {
 					log("SYSERR: Format error in C line of %s", error);
@@ -3225,11 +3503,19 @@ void write_vehicle_to_file(FILE *fl, vehicle_data *veh) {
 	fprintf(fl, "%s~\n", temp);
 	fprintf(fl, "%s~\n", NULLSAFE(VEH_ICON(veh)));
 	
-	// 6. flags move_type maxhealth capacity animals_required functions fame military size room-affects
+	// 6. flags move_type maxhealth capacity animals_required functions fame military size room-affects artisan
 	strcpy(temp, bitv_to_alpha(VEH_FLAGS(veh)));
 	strcpy(temp2, bitv_to_alpha(VEH_FUNCTIONS(veh)));
 	strcpy(temp3, bitv_to_alpha(VEH_ROOM_AFFECTS(veh)));
-	fprintf(fl, "%s %d %d %d %d %s %d %d %d %s\n", temp, VEH_MOVE_TYPE(veh), VEH_MAX_HEALTH(veh), VEH_CAPACITY(veh), VEH_ANIMALS_REQUIRED(veh), temp2, VEH_FAME(veh), VEH_MILITARY(veh), VEH_SIZE(veh), temp3);
+	fprintf(fl, "%s %d %d %d %d %s %d %d %d %s %d %d\n", temp, VEH_MOVE_TYPE(veh), VEH_MAX_HEALTH(veh), VEH_CAPACITY(veh), VEH_ANIMALS_REQUIRED(veh), temp2, VEH_FAME(veh), VEH_MILITARY(veh), VEH_SIZE(veh), temp3, VEH_ARTISAN(veh), VEH_CITIZENS(veh));
+	
+	// B#: extra strings
+	if (VEH_HALF_ICON(veh) && *VEH_HALF_ICON(veh)) {
+		fprintf(fl, "B0\n%s~\n", VEH_HALF_ICON(veh));
+	}
+	if (VEH_QUARTER_ICON(veh) && *VEH_QUARTER_ICON(veh)) {
+		fprintf(fl, "B1\n%s~\n", VEH_QUARTER_ICON(veh));
+	}
 	
 	// C: scaling
 	if (VEH_MIN_SCALE_LEVEL(veh) > 0 || VEH_MAX_SCALE_LEVEL(veh) > 0) {
@@ -3606,7 +3892,7 @@ void olc_fullsearch_vehicle(char_data *ch, char *argument) {
 	int count;
 	bool found_one;
 	
-	char only_icon[MAX_INPUT_LENGTH];
+	char only_icon[MAX_INPUT_LENGTH], only_half_icon[MAX_INPUT_LENGTH], only_quarter_icon[MAX_INPUT_LENGTH];
 	bitvector_t only_designate = NOBITS, only_flags = NOBITS, only_functions = NOBITS, only_affs = NOBITS;
 	bitvector_t find_interacts = NOBITS, not_flagged = NOBITS, found_interacts = NOBITS, find_custom = NOBITS, found_custom = NOBITS;
 	int only_animals = NOTHING, only_cap = NOTHING, cap_over = NOTHING, cap_under = NOTHING;
@@ -3625,6 +3911,8 @@ void olc_fullsearch_vehicle(char_data *ch, char *argument) {
 	size_t size;
 	
 	*only_icon = '\0';
+	*only_half_icon = '\0';
+	*only_quarter_icon = '\0';
 	
 	if (!*argument) {
 		msg_to_char(ch, "See HELP VEDIT FULLSEARCH for syntax.\r\n");
@@ -3661,6 +3949,8 @@ void olc_fullsearch_vehicle(char_data *ch, char *argument) {
 		FULLSEARCH_FLAGS("unflagged", not_flagged, vehicle_flags)
 		FULLSEARCH_FLAGS("functions", only_functions, function_flags)
 		FULLSEARCH_STRING("icon", only_icon)
+		FULLSEARCH_STRING("halficon", only_half_icon)
+		FULLSEARCH_STRING("quartericon", only_quarter_icon)
 		FULLSEARCH_FLAGS("interaction", find_interacts, interact_types)
 		FULLSEARCH_INT("height", only_height, 0, INT_MAX)
 		FULLSEARCH_INT("heightover", height_over, 0, INT_MAX)
@@ -3762,6 +4052,18 @@ void olc_fullsearch_vehicle(char_data *ch, char *argument) {
 			continue;
 		}
 		if (*only_icon && str_cmp(only_icon, "any") && !strstr(only_icon, VEH_ICON(veh)) && !strstr(only_icon, strip_color(VEH_ICON(veh)))) {
+			continue;
+		}
+		if (*only_half_icon && !VEH_HALF_ICON(veh)) {
+			continue;
+		}
+		if (*only_half_icon && str_cmp(only_half_icon, "any") && !strstr(only_half_icon, VEH_HALF_ICON(veh)) && !strstr(only_half_icon, strip_color(VEH_HALF_ICON(veh)))) {
+			continue;
+		}
+		if (*only_quarter_icon && !VEH_QUARTER_ICON(veh)) {
+			continue;
+		}
+		if (*only_quarter_icon && str_cmp(only_quarter_icon, "any") && !strstr(only_quarter_icon, VEH_QUARTER_ICON(veh)) && !strstr(only_quarter_icon, strip_color(VEH_QUARTER_ICON(veh)))) {
 			continue;
 		}
 		if (find_interacts) {	// look up its interactions
@@ -3906,6 +4208,14 @@ void save_olc_vehicle(descriptor_data *desc) {
 		free(VEH_ICON(veh));
 		VEH_ICON(veh) = NULL;
 	}
+	if (VEH_HALF_ICON(veh) && !*VEH_HALF_ICON(veh)) {
+		free(VEH_HALF_ICON(veh));
+		VEH_HALF_ICON(veh) = NULL;
+	}
+	if (VEH_QUARTER_ICON(veh) && !*VEH_QUARTER_ICON(veh)) {
+		free(VEH_QUARTER_ICON(veh));
+		VEH_QUARTER_ICON(veh) = NULL;
+	}
 	VEH_HEALTH(veh) = VEH_MAX_HEALTH(veh);
 	prune_extra_descs(&VEH_EX_DESCS(veh));
 	
@@ -3936,6 +4246,12 @@ void save_olc_vehicle(descriptor_data *desc) {
 		}
 		if (VEH_ICON(iter) == VEH_ICON(proto)) {
 			VEH_ICON(iter) = VEH_ICON(veh);
+		}
+		if (VEH_HALF_ICON(iter) == VEH_HALF_ICON(proto)) {
+			VEH_HALF_ICON(iter) = VEH_HALF_ICON(veh);
+		}
+		if (VEH_QUARTER_ICON(iter) == VEH_QUARTER_ICON(proto)) {
+			VEH_QUARTER_ICON(iter) = VEH_QUARTER_ICON(veh);
 		}
 		if (VEH_LONG_DESC(iter) == VEH_LONG_DESC(proto)) {
 			VEH_LONG_DESC(iter) = VEH_LONG_DESC(veh);
@@ -3977,6 +4293,12 @@ void save_olc_vehicle(descriptor_data *desc) {
 	}
 	if (VEH_ICON(proto)) {
 		free(VEH_ICON(proto));
+	}
+	if (VEH_HALF_ICON(proto)) {
+		free(VEH_HALF_ICON(proto));
+	}
+	if (VEH_QUARTER_ICON(proto)) {
+		free(VEH_QUARTER_ICON(proto));
 	}
 	if (VEH_LONG_DESC(proto)) {
 		free(VEH_LONG_DESC(proto));
@@ -4043,6 +4365,8 @@ vehicle_data *setup_olc_vehicle(vehicle_data *input) {
 		VEH_KEYWORDS(new) = VEH_KEYWORDS(input) ? str_dup(VEH_KEYWORDS(input)) : NULL;
 		VEH_SHORT_DESC(new) = VEH_SHORT_DESC(input) ? str_dup(VEH_SHORT_DESC(input)) : NULL;
 		VEH_ICON(new) = VEH_ICON(input) ? str_dup(VEH_ICON(input)) : NULL;
+		VEH_HALF_ICON(new) = VEH_HALF_ICON(input) ? str_dup(VEH_HALF_ICON(input)) : NULL;
+		VEH_QUARTER_ICON(new) = VEH_QUARTER_ICON(input) ? str_dup(VEH_QUARTER_ICON(input)) : NULL;
 		VEH_LONG_DESC(new) = VEH_LONG_DESC(input) ? str_dup(VEH_LONG_DESC(input)) : NULL;
 		VEH_LOOK_DESC(new) = VEH_LOOK_DESC(input) ? str_dup(VEH_LOOK_DESC(input)) : NULL;
 		
@@ -4099,7 +4423,7 @@ void do_stat_vehicle(char_data *ch, vehicle_data *veh) {
 	}
 	
 	// first line
-	size = snprintf(buf, sizeof(buf), "VNum: [\tc%d\t0], S-Des: \tc%s\t0, Keywords: %s\r\n", VEH_VNUM(veh), VEH_SHORT_DESC(veh), VEH_KEYWORDS(veh));
+	size = snprintf(buf, sizeof(buf), "VNum: [\tc%d\t0], S-Des: \tc%s\t0, Keywords: \ty%s\t0, Idnum: [%5d]\r\n", VEH_VNUM(veh), VEH_SHORT_DESC(veh), VEH_KEYWORDS(veh), IN_ROOM(veh) ? VEH_IDNUM(veh) : 0);
 	
 	size += snprintf(buf + size, sizeof(buf) - size, "L-Des: %s\r\n", VEH_LONG_DESC(veh));
 	
@@ -4116,13 +4440,27 @@ void do_stat_vehicle(char_data *ch, vehicle_data *veh) {
 		size += snprintf(buf + size, sizeof(buf) - size, "\t0\r\n");
 	}
 	
+	// icons:
 	if (VEH_ICON(veh)) {
-		size += snprintf(buf + size, sizeof(buf) - size, "Map Icon: %s\t0 %s\r\n", VEH_ICON(veh), show_color_codes(VEH_ICON(veh)));
+		replace_question_color(NULLSAFE(VEH_ICON(veh)), "&0", part);
+		size += snprintf(buf + size, sizeof(buf) - size, "Full Icon: %s\t0 %s", part, show_color_codes(VEH_ICON(veh)));
+	}
+	if (VEH_HALF_ICON(veh)) {
+		replace_question_color(NULLSAFE(VEH_HALF_ICON(veh)), "&0", part);
+		size += snprintf(buf + size, sizeof(buf) - size, "%sHalf Icon: %s\t0 %s", (VEH_ICON(veh) ? ", " : ""), part, show_color_codes(VEH_HALF_ICON(veh)));
+	}
+	if (VEH_QUARTER_ICON(veh)) {
+		replace_question_color(NULLSAFE(VEH_QUARTER_ICON(veh)), "&0", part);
+		size += snprintf(buf + size, sizeof(buf) - size, "%sQuarter Icon: %s\t0 %s", ((VEH_ICON(veh) || VEH_HALF_ICON(veh)) ? ", " : ""), part, show_color_codes(VEH_QUARTER_ICON(veh)));
+	}
+	if (VEH_ICON(veh) || VEH_HALF_ICON(veh) || VEH_QUARTER_ICON(veh)) {
+		size += snprintf(buf + size, sizeof(buf) - size, "\r\n");
 	}
 	
 	// stats lines
 	size += snprintf(buf + size, sizeof(buf) - size, "Health: [\tc%d\t0/\tc%d\t0], Capacity: [\tc%d\t0/\tc%d\t0], Animals Req: [\tc%d\t0], Move Type: [\ty%s\t0]\r\n", (int) VEH_HEALTH(veh), VEH_MAX_HEALTH(veh), VEH_CARRYING_N(veh), VEH_CAPACITY(veh), VEH_ANIMALS_REQUIRED(veh), mob_move_types[VEH_MOVE_TYPE(veh)]);
 	size += snprintf(buf + size, sizeof(buf) - size, "Speed: [\ty%s\t0], Size: [\tc%d\t0], Height: [\tc%d\t0]\r\n", vehicle_speed_types[VEH_SPEED_BONUSES(veh)], VEH_SIZE(veh), VEH_HEIGHT(veh));
+	size += snprintf(buf + size, sizeof(buf) - size, "Citizens: [\tc%d\t0], Artisan: [&c%d&0] &y%s&0\r\n", VEH_CITIZENS(veh), VEH_ARTISAN(veh), VEH_ARTISAN(veh) != NOTHING ? get_mob_name_by_proto(VEH_ARTISAN(veh), FALSE) : "none");
 	size += snprintf(buf + size, sizeof(buf) - size, "Fame: [\tc%d\t0], Military: [\tc%d\t0]\r\n", VEH_FAME(veh), VEH_MILITARY(veh));
 	
 	if (VEH_INTERIOR_ROOM_VNUM(veh) != NOTHING || VEH_MAX_ROOMS(veh) || VEH_DESIGNATE_FLAGS(veh)) {
@@ -4286,7 +4624,12 @@ void look_at_vehicle(vehicle_data *veh, char_data *ch) {
 	}
 	
 	if (VEH_OWNER(veh)) {
-		msg_to_char(ch, "It is flying the flag of %s%s\t0", EMPIRE_BANNER(VEH_OWNER(veh)), EMPIRE_NAME(VEH_OWNER(veh)));
+		if (VEH_FLAGGED(veh, VEH_BUILDING)) {
+			msg_to_char(ch, "It is owned by %s%s\t0", EMPIRE_BANNER(VEH_OWNER(veh)), EMPIRE_NAME(VEH_OWNER(veh)));
+		}
+		else {
+			msg_to_char(ch, "It is flying the flag of %s%s\t0", EMPIRE_BANNER(VEH_OWNER(veh)), EMPIRE_NAME(VEH_OWNER(veh)));
+		}
 		
 		if (VEH_OWNER(veh) == GET_LOYALTY(ch)) {
 			if (VEH_FLAGGED(veh, VEH_PLAYER_NO_WORK)) {
@@ -4354,7 +4697,10 @@ void olc_show_vehicle(char_data *ch) {
 	sprintf(buf + strlen(buf), "<%sshortdescription\t0> %s\r\n", OLC_LABEL_STR(VEH_SHORT_DESC(veh), default_vehicle_short_desc), NULLSAFE(VEH_SHORT_DESC(veh)));
 	sprintf(buf + strlen(buf), "<%slongdescription\t0>\r\n%s\r\n", OLC_LABEL_STR(VEH_LONG_DESC(veh), default_vehicle_long_desc), NULLSAFE(VEH_LONG_DESC(veh)));
 	sprintf(buf + strlen(buf), "<%slookdescription\t0>\r\n%s", OLC_LABEL_STR(VEH_LOOK_DESC(veh), ""), NULLSAFE(VEH_LOOK_DESC(veh)));
-	sprintf(buf + strlen(buf), "<%sicon\t0> %s\t0 %s\r\n", OLC_LABEL_STR(VEH_ICON(veh), ""), VEH_ICON(veh) ? VEH_ICON(veh) : "none", VEH_ICON(veh) ? show_color_codes(VEH_ICON(veh)) : "");
+	
+	sprintf(buf + strlen(buf), "<%sicon\t0> %s\t0 %s, ", OLC_LABEL_STR(VEH_ICON(veh), ""), VEH_ICON(veh) ? VEH_ICON(veh) : "none", VEH_ICON(veh) ? show_color_codes(VEH_ICON(veh)) : "");
+	sprintf(buf + strlen(buf), "<%shalficon\t0> %s\t0 %s, ", OLC_LABEL_STR(VEH_HALF_ICON(veh), ""), VEH_HALF_ICON(veh) ? VEH_HALF_ICON(veh) : "none", VEH_HALF_ICON(veh) ? show_color_codes(VEH_HALF_ICON(veh)) : "");
+	sprintf(buf + strlen(buf), "<%squartericon\t0> %s\t0 %s\r\n", OLC_LABEL_STR(VEH_QUARTER_ICON(veh), ""), VEH_QUARTER_ICON(veh) ? VEH_QUARTER_ICON(veh) : "none", VEH_QUARTER_ICON(veh) ? show_color_codes(VEH_QUARTER_ICON(veh)) : "");
 	
 	sprintbit(VEH_FLAGS(veh), vehicle_flags, lbuf, TRUE);
 	sprintf(buf + strlen(buf), "<%sflags\t0> %s\r\n", OLC_LABEL_VAL(VEH_FLAGS(veh), NOBITS), lbuf);
@@ -4380,6 +4726,7 @@ void olc_show_vehicle(char_data *ch) {
 	sprintf(buf + strlen(buf), "<%sextrarooms\t0> %d, <%sinteriorroom\t0> %d - %s\r\n", OLC_LABEL_VAL(VEH_MAX_ROOMS(veh), 0), VEH_MAX_ROOMS(veh), OLC_LABEL_VAL(VEH_INTERIOR_ROOM_VNUM(veh), NOWHERE), VEH_INTERIOR_ROOM_VNUM(veh), building_proto(VEH_INTERIOR_ROOM_VNUM(veh)) ? GET_BLD_NAME(building_proto(VEH_INTERIOR_ROOM_VNUM(veh))) : "none");
 	sprintbit(VEH_DESIGNATE_FLAGS(veh), designate_flags, lbuf, TRUE);
 	sprintf(buf + strlen(buf), "<%sdesignate\t0> %s\r\n", OLC_LABEL_VAL(VEH_DESIGNATE_FLAGS(veh), NOBITS), lbuf);
+	sprintf(buf + strlen(buf), "<%scitizens\t0> %d, <%sartisan\t0> [%d] %s\r\n", OLC_LABEL_VAL(VEH_CITIZENS(veh), 0), VEH_CITIZENS(veh), OLC_LABEL_VAL(VEH_ARTISAN(veh), NOTHING), VEH_ARTISAN(veh), VEH_ARTISAN(veh) == NOTHING ? "none" : get_mob_name_by_proto(VEH_ARTISAN(veh), FALSE));
 	sprintf(buf + strlen(buf), "<%sheight\t0> %d, <%sfame\t0> %d, <%smilitary\t0> %d\r\n", OLC_LABEL_VAL(VEH_HEIGHT(veh), 0), VEH_HEIGHT(veh), OLC_LABEL_VAL(VEH_FAME(veh), 0), VEH_FAME(veh), OLC_LABEL_VAL(VEH_MILITARY(veh), 0), VEH_MILITARY(veh));
 	
 	sprintbit(VEH_ROOM_AFFECTS(veh), room_aff_bits, lbuf, TRUE);
@@ -4483,9 +4830,41 @@ OLC_MODULE(vedit_animalsrequired) {
 }
 
 
+OLC_MODULE(vedit_artisan) {
+	vehicle_data *veh = GET_OLC_VEHICLE(ch->desc);
+	mob_vnum old = VEH_ARTISAN(veh);
+	
+	if (!str_cmp(argument, "none")) {
+		VEH_ARTISAN(veh) = NOTHING;
+		if (PRF_FLAGGED(ch, PRF_NOREPEAT)) {
+			send_config_msg(ch, "ok_string");
+		}
+		else {
+			msg_to_char(ch, "It no longer has an artisan.\r\n");
+		}
+	}
+	else {
+		VEH_ARTISAN(veh) = olc_process_number(ch, argument, "artisan vnum", "artisanvnum", 0, MAX_VNUM, VEH_ARTISAN(veh));
+		if (!mob_proto(VEH_ARTISAN(veh))) {
+			VEH_ARTISAN(veh) = old;
+			msg_to_char(ch, "There is no mobile with that vnum. Old value restored.\r\n");
+		}
+		else if (!PRF_FLAGGED(ch, PRF_NOREPEAT)) {
+			msg_to_char(ch, "It now has artisan: %s\r\n", get_mob_name_by_proto(VEH_ARTISAN(veh), FALSE));
+		}
+	}
+}
+
+
 OLC_MODULE(vedit_capacity) {
 	vehicle_data *veh = GET_OLC_VEHICLE(ch->desc);
 	VEH_CAPACITY(veh) = olc_process_number(ch, argument, "capacity", "capacity", 0, 10000, VEH_CAPACITY(veh));
+}
+
+
+OLC_MODULE(vedit_citizens) {
+	vehicle_data *veh = GET_OLC_VEHICLE(ch->desc);
+	VEH_CITIZENS(veh) = olc_process_number(ch, argument, "citizens", "citizens", 0, 10, VEH_CITIZENS(veh));
 }
 
 
@@ -4545,6 +4924,28 @@ OLC_MODULE(vedit_functions) {
 }
 
 
+OLC_MODULE(vedit_half_icon) {
+	vehicle_data *veh = GET_OLC_VEHICLE(ch->desc);
+	
+	delete_doubledollar(argument);
+	
+	if (!str_cmp(argument, "none")) {
+		if (VEH_HALF_ICON(veh)) {
+			free(VEH_HALF_ICON(veh));
+		}
+		VEH_HALF_ICON(veh) = NULL;
+		msg_to_char(ch, "The vehicle now has no half icon and will not appear on the map.\r\n");
+	}
+	else if (!validate_icon(argument, 2)) {
+		msg_to_char(ch, "You must specify a half icon that is 2 characters long, not counting color codes.\r\n");
+	}
+	else {
+		olc_process_string(ch, argument, "halficon", &VEH_HALF_ICON(veh));
+		msg_to_char(ch, "\t0");	// in case color is unterminated
+	}
+}
+
+
 OLC_MODULE(vedit_height) {
 	vehicle_data *veh = GET_OLC_VEHICLE(ch->desc);
 	VEH_HEIGHT(veh) = olc_process_number(ch, argument, "height", "height", -100, 100, VEH_HEIGHT(veh));
@@ -4569,7 +4970,7 @@ OLC_MODULE(vedit_icon) {
 		VEH_ICON(veh) = NULL;
 		msg_to_char(ch, "The vehicle now has no icon and will not appear on the map.\r\n");
 	}
-	else if (!validate_icon(argument)) {
+	else if (!validate_icon(argument, 4)) {
 		msg_to_char(ch, "You must specify an icon that is 4 characters long, not counting color codes.\r\n");
 	}
 	else {
@@ -4659,6 +5060,28 @@ OLC_MODULE(vedit_minlevel) {
 OLC_MODULE(vedit_movetype) {
 	vehicle_data *veh = GET_OLC_VEHICLE(ch->desc);
 	VEH_MOVE_TYPE(veh) = olc_process_type(ch, argument, "move type", "movetype", mob_move_types, VEH_MOVE_TYPE(veh));
+}
+
+
+OLC_MODULE(vedit_quarter_icon) {
+	vehicle_data *veh = GET_OLC_VEHICLE(ch->desc);
+	
+	delete_doubledollar(argument);
+	
+	if (!str_cmp(argument, "none")) {
+		if (VEH_QUARTER_ICON(veh)) {
+			free(VEH_QUARTER_ICON(veh));
+		}
+		VEH_QUARTER_ICON(veh) = NULL;
+		msg_to_char(ch, "The vehicle now has no quarter icon and will not appear on the map.\r\n");
+	}
+	else if (!validate_icon(argument, 1)) {
+		msg_to_char(ch, "You must specify a quarter icon that is 1 character long, not counting color codes.\r\n");
+	}
+	else {
+		olc_process_string(ch, argument, "quartericon", &VEH_QUARTER_ICON(veh));
+		msg_to_char(ch, "\t0");	// in case color is unterminated
+	}
 }
 
 

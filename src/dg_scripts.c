@@ -6685,7 +6685,7 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 						if (subfield && *subfield) {
 							int pos;
 							
-							if ((pos = search_block(subfield, techs, FALSE)) != NOTHING) {
+							if ((pos = search_block(subfield, empire_tech_types, FALSE)) != NOTHING) {
 								snprintf(str, slen, "%d", EMPIRE_HAS_TECH(e, pos) ? 1 : 0);
 							}
 							else {

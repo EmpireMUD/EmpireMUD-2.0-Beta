@@ -69,53 +69,82 @@ Ruins icons for vehicle-buildings~
 5 n 100
 ~
 * Random ruins icons
-if %self.vnum% == 5006
+set open_list 5003 5004 5005 5006
+if %open_list% ~= %self.vnum%
   * open-style ruins
   switch %random.7%
     case 1
       %mod% %self% icon .&0_i&?.
+      %mod% %self% halficon &0_i
+      %mod% %self% quartericon &0i
     break
     case 2
       %mod% %self% icon .&0[.&?.
+      %mod% %self% halficon &0[.
+      %mod% %self% quartericon &0[
     break
     case 3
       %mod% %self% icon .&0.v&?.
+      %mod% %self% halficon &0.v
+      %mod% %self% quartericon &0v
     break
     case 4
       %mod% %self% icon .&0/]&?.
+      %mod% %self% halficon &0/]
+      %mod% %self% quartericon &0]
     break
     case 5
       %mod% %self% icon .&0(\&?.
+      %mod% %self% halficon &0(\
+      %mod% %self% quartericon &0\
     break
     case 6
       %mod% %self% icon .&0}\.
+      %mod% %self% halficon &0}\
+      %mod% %self% quartericon &0{
     break
     case 7
       %mod% %self% icon &0..}&?.
+      %mod% %self% halficon &0.}
+      %mod% %self% quartericon &0}
     break
   done
 else
   switch %random.7%
     case 1
       %mod% %self% icon ..&0/]
+      %mod% %self% halficon &0/]
+      %mod% %self% quartericon &0/
     break
     case 2
       %mod% %self% icon &0[\&?..
+      %mod% %self% halficon &0[\
+      %mod% %self% quartericon &0\
     break
     case 3
       %mod% %self% icon &0|\&?..
+      %mod% %self% halficon &0|\
+      %mod% %self% quartericon &0|
     break
     case 4
       %mod% %self% icon &0[&?__&0]
+      %mod% %self% halficon &0[&?_
+      %mod% %self% quartericon &0[
     break
     case 5
       %mod% %self% icon ..&0/]
+      %mod% %self% halficon &0/]
+      %mod% %self% quartericon &0]
     break
     case 6
       %mod% %self% icon .&0-&?.&0]
+      %mod% %self% halficon &0.]
+      %mod% %self% quartericon &0.
     break
     case 7
       %mod% %self% icon &0[&?.&0-&?.
+      %mod% %self% halficon &0[.
+      %mod% %self% quartericon &0[
     break
   done
 end

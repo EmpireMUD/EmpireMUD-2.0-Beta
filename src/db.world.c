@@ -68,6 +68,50 @@ bool write_map_and_room_to_file(room_vnum vnum, bool force_obj_pack);
 //// WORLD-CHANGERS //////////////////////////////////////////////////////////
 
 /**
+* Creates and sets up an additional interior room. This runs completion
+* triggers. It does NOT add exits to or from the new room.
+*
+* @param room_data *home_room The home room for the building/vehicle that's gaining a new room.
+* @param bld_vnum building_type The room type (must be an interior ROOM-flagged building). May be NOTHING to use the default.
+* @return room_data *to_room The created room.
+*/
+room_data *add_room_to_building(room_data *home_room, bld_vnum building_type) {
+	room_data *to_room;
+	
+	// validate home_room
+	if (home_room) {
+		home_room = HOME_ROOM(home_room);
+	}
+	
+	// validate building type
+	if (building_type == NOTHING || !building_proto(building_type)) {
+		building_type = config_get_int("default_interior");
+	}
+	
+	// create it
+	to_room = create_room(home_room);
+	attach_building_to_room(building_proto(building_type), to_room, TRUE);
+	
+	// update interior count
+	if (home_room) {
+		COMPLEX_DATA(home_room)->inside_rooms++;
+	}
+	
+	// check in a vehicle?
+	if (home_room && GET_ROOM_VEHICLE(home_room)) {
+		add_room_to_vehicle(to_room, GET_ROOM_VEHICLE(home_room));
+	}
+	
+	if (home_room && ROOM_OWNER(home_room)) {
+		perform_claim_room(to_room, ROOM_OWNER(home_room));
+	}
+	complete_wtrigger(to_room);
+	
+	return to_room;
+}
+
+
+/**
 * Update the "base sector" of a room. This is the sector that underlies its
 * current sector (e.g. Plains under Building).
 *
@@ -1843,9 +1887,6 @@ struct empire_city_data *create_city_entry(empire_data *emp, char *name, room_da
 	city->name = str_dup(name);
 	city->location = location;
 	city->type = type;
-
-	city->population = 0;
-	city->military = 0;
 	
 	city->traits = EMPIRE_FRONTIER_TRAITS(emp);	// defaults
 	
@@ -2249,17 +2290,19 @@ void perform_change_sect(room_data *loc, struct map_data *map, sector_data *sect
 	// check for territory updates
 	if (loc && ROOM_OWNER(loc)) {
 		if (was_large != LARGE_CITY_RADIUS(loc)) {
-			struct empire_island *eisle = get_empire_island(ROOM_OWNER(loc), GET_ISLAND_ID(loc));
 			is_ter = get_territory_type_for_empire(loc, ROOM_OWNER(loc), FALSE, &junk, NULL);
 			
 			if (was_ter != is_ter) {	// did territory type change?
 				SAFE_ADD(EMPIRE_TERRITORY(ROOM_OWNER(loc), was_ter), -1, 0, UINT_MAX, FALSE);
-				SAFE_ADD(eisle->territory[was_ter], -1, 0, UINT_MAX, FALSE);
-			
 				SAFE_ADD(EMPIRE_TERRITORY(ROOM_OWNER(loc), is_ter), 1, 0, UINT_MAX, FALSE);
-				SAFE_ADD(eisle->territory[is_ter], 1, 0, UINT_MAX, FALSE);
 				
 				// (total counts do not change)
+				
+				if (GET_ISLAND_ID(loc) != NO_ISLAND) {
+					struct empire_island *eisle = get_empire_island(ROOM_OWNER(loc), GET_ISLAND_ID(loc));
+					SAFE_ADD(eisle->territory[was_ter], -1, 0, UINT_MAX, FALSE);
+					SAFE_ADD(eisle->territory[is_ter], 1, 0, UINT_MAX, FALSE);
+				}
 			}
 		}
 		if (belongs != BELONGS_IN_TERRITORY_LIST(loc)) {	// do we need to add/remove the territory entry?
@@ -2312,26 +2355,61 @@ void perform_change_sect(room_data *loc, struct map_data *map, sector_data *sect
 * @param bool add Adds the techs if TRUE, or removes them if FALSE.
 */
 void adjust_building_tech(empire_data *emp, room_data *room, bool add) {
-	struct empire_island *isle = NULL;
 	int amt = add ? 1 : -1;	// adding or removing 1
-	int island;
+	int island_id;
+	struct empire_island *e_isle = NULL;
+	struct empire_npc_data *npc;
+	struct empire_territory_data *ter;
 	
 	// only care about buildings
-	if (!emp || !GET_BUILDING(room) || IS_INCOMPLETE(room) || IS_DISMANTLING(room)) {
+	if (!emp || !room || !GET_BUILDING(room) || IS_INCOMPLETE(room) || IS_DISMANTLING(room)) {
+		return;
+	}
+	// ensure we're in the world
+	if (GET_ROOM_VEHICLE(room) && (!IN_ROOM(GET_ROOM_VEHICLE(room)) || !VEH_IS_COMPLETE(GET_ROOM_VEHICLE(room)) || VEH_IS_DISMANTLING(GET_ROOM_VEHICLE(room)))) {
 		return;
 	}
 	
-	// must be on an island
-	if ((island = GET_ISLAND_ID(room)) == NO_ISLAND) {
-		return;
+	// island setup and checks
+	if (add) {
+		island_id = GET_ISLAND_ID(room);
+		if (ROOM_TECHS_APPLIED_TO_ISLAND(room) == island_id) {
+			// already applied here -- nothing to do
+			return;
+		}
+		else if (ROOM_TECHS_APPLIED_TO_ISLAND(room) != NO_ISLAND && ROOM_TECHS_APPLIED_TO_ISLAND(room) != UNAPPLIED_ISLAND) {
+			// un-apply it first
+			adjust_building_tech(emp, room, FALSE);
+		}
+	}
+	else {
+		// prefer to remove from the island it's applied to, if we can detect it
+		island_id = COMPLEX_DATA(room) ? ROOM_TECHS_APPLIED_TO_ISLAND(room) : GET_ISLAND_ID(room);
+		if (island_id == UNAPPLIED_ISLAND) {
+			// not applied -- nothing to do
+			return;
+		}
+	}
+	
+	// ok... look up empire island
+	if (island_id != NO_ISLAND && island_id != UNAPPLIED_ISLAND) {
+		e_isle = get_empire_island(emp, island_id);
 	}
 	
 	// WARNING: do not check in-city status on these ... it can change at a time when territory is not re-scanned
 	
+	// building techs
 	if (HAS_FUNCTION(room, FNC_DOCKS)) {
 		EMPIRE_TECH(emp, TECH_SEAPORT) += amt;
-		if (isle || (isle = get_empire_island(emp, island))) {
-			isle->tech[TECH_SEAPORT] += amt;
+		if (e_isle) {
+			e_isle->tech[TECH_SEAPORT] += amt;
+		}
+	}
+	
+	// island population
+	if (e_isle && (ter = find_territory_entry(emp, room))) {
+		LL_FOREACH(ter->npcs, npc) {
+			e_isle->population += amt;
 		}
 	}
 	
@@ -2340,7 +2418,12 @@ void adjust_building_tech(empire_data *emp, room_data *room, bool add) {
 	EMPIRE_FAME(emp) += GET_BLD_FAME(GET_BUILDING(room)) * amt;
 	
 	// re-send claim info in case it changed
-	update_MSDP_empire_data_all(emp, TRUE, TRUE);
+	TRIGGER_DELAYED_REFRESH(emp, DELAY_REFRESH_MSDP_UPDATE_CLAIMS);
+	
+	// store what island we're applied to
+	if (COMPLEX_DATA(room)) {
+		COMPLEX_DATA(room)->applied_to_island = add ? island_id : UNAPPLIED_ISLAND;
+	}
 }
 
 
@@ -2351,33 +2434,43 @@ void adjust_building_tech(empire_data *emp, room_data *room, bool add) {
 * Note: Vehicles inside of moving vehicles do not contribute tech or fame.
 *
 * @param vehicle_data *veh The vehicle to update.
+* @param int island_id Which island to apply to (optional; will detect from vehicle's room if NO_ISLAND is given).
 * @param bool add Adds the techs if TRUE, or removes them if FALSE.
 */
-void adjust_vehicle_tech(vehicle_data *veh, bool add) {
+void adjust_vehicle_tech(vehicle_data *veh, int island_id, bool add) {
 	int amt = add ? 1 : -1;	// adding or removing 1
-	struct empire_island *isle = NULL;
 	empire_data *emp = NULL;
-	room_data *room = NULL;
-	int island = NO_ISLAND;
+	struct empire_island *e_isle = NULL;
+	struct empire_npc_data *npc;
+	struct empire_vehicle_data *vter;
 	
 	if (veh) {
 		emp = VEH_OWNER(veh);
-		room = IN_ROOM(veh);
-		island = room ? GET_ISLAND_ID(room) : NO_ISLAND;
+		if (IN_ROOM(veh) && island_id == NO_ISLAND) {
+			island_id = GET_ISLAND_ID(IN_ROOM(veh));	// if any
+		}
 	}
 	
 	// only care about
-	if (!emp || !veh || !VEH_IS_COMPLETE(veh) || !room) {
+	if (!emp || !veh || !VEH_IS_COMPLETE(veh)) {
 		return;
 	}
-	if (GET_ROOM_VEHICLE(room) && VEH_FLAGGED(GET_ROOM_VEHICLE(room), MOVABLE_VEH_FLAGS)) {
-		return;	// do NOT adjust tech if inside a moving vehicle
-	}
 	
+	// for island stats
+	e_isle = (island_id == NO_ISLAND) ? NULL : get_empire_island(emp, island_id);
+	
+	// techs
 	if (IS_SET(VEH_FUNCTIONS(veh), FNC_DOCKS)) {
 		EMPIRE_TECH(emp, TECH_SEAPORT) += amt;
-		if (island != NO_ISLAND && (isle || (isle = get_empire_island(emp, island)))) {
-			isle->tech[TECH_SEAPORT] += amt;
+		if (e_isle) {
+			e_isle->tech[TECH_SEAPORT] += amt;
+		}
+	}
+	
+	// island population
+	if (e_isle && (vter = find_empire_vehicle_entry(emp, veh))) {
+		LL_FOREACH(vter->npcs, npc) {
+			e_isle->population += amt;
 		}
 	}
 	
@@ -2386,7 +2479,7 @@ void adjust_vehicle_tech(vehicle_data *veh, bool add) {
 	EMPIRE_FAME(emp) += VEH_FAME(veh) * amt;
 	
 	// re-send claim info in case it changed
-	update_MSDP_empire_data_all(emp, TRUE, TRUE);
+	TRIGGER_DELAYED_REFRESH(emp, DELAY_REFRESH_MSDP_UPDATE_CLAIMS);
 }
 
 
@@ -2408,8 +2501,9 @@ void clear_empire_techs(empire_data *emp) {
 		
 		// zero out existing islands
 		HASH_ITER(hh, EMPIRE_ISLANDS(iter), isle, next_isle) {
+			isle->population = 0;
+			
 			for (sub = 0; sub < NUM_TECHS; ++sub) {
-				isle->population = 0;
 				isle->tech[sub] = EMPIRE_BASE_TECH(iter, sub);
 			}
 		}
@@ -2418,6 +2512,62 @@ void clear_empire_techs(empire_data *emp) {
 			EMPIRE_TECH(iter, sub) = EMPIRE_BASE_TECH(iter, sub);
 		}
 	}
+}
+
+
+/**
+* Creates a fresh territory entry for a vehicle.
+*
+* @param empire_data *emp The empire.
+* @param vehicle_data *veh The vehicle to add a territory entry for.
+* @return struct empire_vehicle_data* The new entry.
+*/
+struct empire_vehicle_data *create_empire_vehicle_entry(empire_data *emp, vehicle_data *veh) {
+	int idnum = VEH_IDNUM(veh);
+	struct empire_vehicle_data *vter;
+	
+	// only add if not already in there
+	HASH_FIND_INT(EMPIRE_VEHICLE_LIST(emp), &idnum, vter);
+	if (!vter) {
+		CREATE(vter, struct empire_vehicle_data, 1);
+		vter->idnum = idnum;
+		vter->veh = veh;
+		vter->population_timer = config_get_int("building_population_timer");
+		vter->npcs = NULL;
+		vter->marked = FALSE;
+		
+		HASH_ADD_INT(EMPIRE_VEHICLE_LIST(emp), idnum, vter);
+	}
+	
+	return vter;
+}
+
+
+/**
+* Creates a fresh territory entry for a vehicle -- by idnum, without a pointer
+* (pointer will be set later).
+*
+* @param empire_data *emp The empire.
+* @param int idnum The idnum to create the entry for.
+* @return struct empire_vehicle_data* The new entry.
+*/
+struct empire_vehicle_data *create_empire_vehicle_entry_by_id(empire_data *emp, int idnum) {
+	struct empire_vehicle_data *vter;
+	
+	// only add if not already in there
+	HASH_FIND_INT(EMPIRE_VEHICLE_LIST(emp), &idnum, vter);
+	if (!vter) {
+		CREATE(vter, struct empire_vehicle_data, 1);
+		vter->idnum = idnum;
+		vter->veh = NULL;	// we don't have this at this time
+		vter->population_timer = config_get_int("building_population_timer");
+		vter->npcs = NULL;
+		vter->marked = FALSE;
+		
+		HASH_ADD_INT(EMPIRE_VEHICLE_LIST(emp), idnum, vter);
+	}
+	
+	return vter;
 }
 
 
@@ -2471,6 +2621,27 @@ void delete_territory_entry(empire_data *emp, struct empire_territory_data *ter,
 
 
 /**
+* Deletes one vehicle-territory entry from the empire.
+*
+* @param empire_data *emp Which empire.
+* @param struct empire_vehicle_data *vter Which entry to delete.
+* @param bool make_npcs_homeless If TRUE, any NPCs in the territory become homeless.
+*/
+void delete_empire_vehicle_entry(empire_data *emp, struct empire_vehicle_data *vter, bool make_npcs_homeless) {
+	// prevent loss
+	if (vter == global_next_empire_vehicle_entry) {
+		global_next_empire_vehicle_entry = vter->hh.next;
+	}
+
+	delete_vehicle_npcs(NULL, vter, make_npcs_homeless);
+	vter->npcs = NULL;
+	
+	HASH_DEL(EMPIRE_VEHICLE_LIST(emp), vter);
+	free(vter);
+}
+
+
+/**
 * This function sets up empire territory. It is called rarely after startup.
 * It can be called on one specific empire, or it can be used for ALL empires.
 *
@@ -2479,12 +2650,14 @@ void delete_territory_entry(empire_data *emp, struct empire_territory_data *ter,
 */
 void read_empire_territory(empire_data *emp, bool check_tech) {
 	struct empire_territory_data *ter, *next_ter;
+	struct empire_vehicle_data *vter, *next_vter;
 	struct empire_island *isle, *next_isle;
 	struct empire_npc_data *npc;
 	room_data *iter, *next_iter;
 	empire_data *e, *next_e;
 	int pos, ter_type;
 	bool junk;
+	vehicle_data *veh;
 
 	/* Init empires */
 	HASH_ITER(hh, empire_table, e, next_e) {
@@ -2501,14 +2674,21 @@ void read_empire_territory(empire_data *emp, bool check_tech) {
 		
 			read_vault(e);
 
-			// reset marks to check for dead territory
+			// reset marks to check for dead territory and vehicles
 			HASH_ITER(hh, EMPIRE_TERRITORY_LIST(e), ter, next_ter) {
 				ter->marked = FALSE;
+			}
+			HASH_ITER(hh, EMPIRE_VEHICLE_LIST(e), vter, next_vter) {
+				vter->marked = FALSE;
 			}
 			
 			// reset counters
 			HASH_ITER(hh, EMPIRE_ISLANDS(e), isle, next_isle) {
-				isle->population = 0;
+				// island population only resets if we're calling tech funcs
+				if (check_tech) {
+					isle->population = 0;
+				}
+				
 				for (pos = 0; pos < NUM_TERRITORY_TYPES; ++pos) {
 					isle->territory[pos] = 0;
 				}
@@ -2521,18 +2701,24 @@ void read_empire_territory(empire_data *emp, bool check_tech) {
 		if ((e = ROOM_OWNER(iter)) && (!emp || e == emp)) {
 			// only count each building as 1
 			if (COUNTS_AS_TERRITORY(iter)) {
-				isle = get_empire_island(e, GET_ISLAND_ID(iter));
 				ter_type = get_territory_type_for_empire(iter, e, FALSE, &junk, NULL);
 				
 				SAFE_ADD(EMPIRE_TERRITORY(e, ter_type), 1, 0, UINT_MAX, FALSE);
-				SAFE_ADD(isle->territory[ter_type], 1, 0, UINT_MAX, FALSE);
-				
 				SAFE_ADD(EMPIRE_TERRITORY(e, TER_TOTAL), 1, 0, UINT_MAX, FALSE);
-				SAFE_ADD(isle->territory[TER_TOTAL], 1, 0, UINT_MAX, FALSE);
+				
+				if (GET_ISLAND_ID(iter) != NO_ISLAND) {
+					isle = get_empire_island(e, GET_ISLAND_ID(iter));
+					SAFE_ADD(isle->territory[ter_type], 1, 0, UINT_MAX, FALSE);
+					SAFE_ADD(isle->territory[TER_TOTAL], 1, 0, UINT_MAX, FALSE);
+				}
 			}
 			
-			// this is only done if we are re-reading techs
+			// this is only done if we are re-reading techs (also updates island population)
 			if (check_tech) {
+				if (COMPLEX_DATA(iter)) {
+					// clear this data so it will re-apply (we zeroed it out)
+					COMPLEX_DATA(iter)->applied_to_island = UNAPPLIED_ISLAND;
+				}
 				adjust_building_tech(e, iter, TRUE);
 			}
 			
@@ -2552,22 +2738,51 @@ void read_empire_territory(empire_data *emp, bool check_tech) {
 						isle = get_empire_island(e, GET_ISLAND_ID(iter));
 					}
 					for (npc = ter->npcs; npc; npc = npc->next) {
-						EMPIRE_POPULATION(e) += 1;
-						if (!GET_ROOM_VEHICLE(iter)) {
-							isle->population += 1;
-						}
+						++EMPIRE_POPULATION(e);
 					}
 				}
 			}
 		}
 	}
 	
-	// remove any territory that wasn't marked ... in case there is any
+	// scan all vehicles
+	DL_FOREACH(vehicle_list, veh) {
+		if ((e = VEH_OWNER(veh)) && (!emp || e == emp)) {
+			if (!(vter = find_empire_vehicle_entry(e, veh))) {
+				vter = create_empire_vehicle_entry(e, veh);
+			}
+			
+			// mark it added/found
+			vter->marked = TRUE;
+			
+			// should go without saying but verify this pointer now
+			vter->veh = veh;
+			
+			// also ensure npcs inside have the right home pointers
+			LL_FOREACH(vter->npcs, npc) {
+				npc->home = NULL;
+				npc->home_vehicle = veh;
+				++EMPIRE_POPULATION(e);
+			}
+			
+			// and apply tech if necessary
+			if (check_tech) {
+				adjust_vehicle_tech(veh, GET_ISLAND_ID(IN_ROOM(veh)), TRUE);
+			}
+		}
+	}
+	
+	// remove any territory/vehicles that weren't marked ... in case there is any
 	HASH_ITER(hh, empire_table, e, next_e) {
 		if (e == emp || !emp) {
 			HASH_ITER(hh, EMPIRE_TERRITORY_LIST(e), ter, next_ter) {
 				if (!ter->marked) {
 					delete_territory_entry(e, ter, TRUE);
+				}
+			}
+			HASH_ITER(hh, EMPIRE_VEHICLE_LIST(e), vter, next_vter) {
+				if (!vter->marked) {
+					delete_empire_vehicle_entry(e, vter, TRUE);
 				}
 			}
 		}
@@ -2584,7 +2799,6 @@ void read_empire_territory(empire_data *emp, bool check_tech) {
 void reread_empire_tech(empire_data *emp) {
 	struct empire_island *isle, *next_isle;
 	empire_data *iter, *next_iter;
-	vehicle_data *veh;
 	int sub;
 	
 	// nowork
@@ -2599,18 +2813,6 @@ void reread_empire_tech(empire_data *emp) {
 	// re-read both things
 	read_empire_members(emp, TRUE);
 	read_empire_territory(emp, TRUE);
-	
-	// also read vehicles for tech/etc
-	DL_FOREACH(vehicle_list, veh) {
-		if (emp && VEH_OWNER(veh) != emp) {
-			continue;	// only checking one
-		}
-		if (!VEH_OWNER(veh) || !VEH_IS_COMPLETE(veh)) {
-			continue;	// skip unowned/unfinished
-		}
-		
-		adjust_vehicle_tech(veh, TRUE);
-	}
 	
 	// special-handling for imm-only empires: give them all techs
 	HASH_ITER(hh, empire_table, iter, next_iter) {
@@ -2637,7 +2839,11 @@ void reread_empire_tech(empire_data *emp) {
 	resort_empires(FALSE);
 	
 	// re-send MSDP claim data
-	update_MSDP_empire_data_all(emp, TRUE, TRUE);
+	HASH_ITER(hh, empire_table, iter, next_iter) {
+		if (!emp || iter == emp) {
+			TRIGGER_DELAYED_REFRESH(iter, DELAY_REFRESH_MSDP_UPDATE_CLAIMS);
+		}
+	}
 }
 
 

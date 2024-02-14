@@ -354,6 +354,204 @@ int sort_passives(struct affected_type *a, struct affected_type *b) {
 }
 
 
+/**
+* Checks viability of a city in the player's current room.
+*
+* @param char_data *ch The player performing the survey.
+* @param char *argument Any remaining args.
+*/
+void survey_city(char_data *ch, char *argument) {
+	bool owned, rough, ocean, water, verbose;
+	const char *dir_str;
+	int dist, iter, max_radius, x, y;
+	int tot_owned, tot_rough, tot_ocean, tot_water;
+	empire_data *emp_iter, *next_emp;
+	room_data *room;
+	struct empire_city_data *city;
+	
+	// helper type
+	struct survey_city_t {
+		const char *dir;	// string (hash key)
+		
+		int owned_dist, owned_count;	// closest owned tile and total owned in that dir
+		int rough_dist, rough_count;		// ^ rough
+		int ocean_dist, ocean_count;		// ^ ocean
+		int water_dist, water_count;		// ^ fresh water
+		
+		UT_hash_handle hh;
+	} *sct, *next_sct, *hash = NULL;
+	
+	// configs
+	int min_distance_between_ally_cities = config_get_int("min_distance_between_ally_cities");
+	int min_distance_between_cities = config_get_int("min_distance_between_cities");
+	int min_distance_from_city_to_starting_location = config_get_int("min_distance_from_city_to_starting_location");
+	
+	// optional arg
+	skip_spaces(&argument);
+	verbose = is_abbrev(argument, "-verbose");
+	
+	// basic validation
+	if (!IS_OUTDOORS(ch) || GET_ROOM_VNUM(IN_ROOM(ch)) >= MAP_SIZE) {
+		msg_to_char(ch, "You can only survey for a city on the map.\r\n");
+		return;
+	}
+	if (ROOM_OWNER(IN_ROOM(ch)) && ROOM_OWNER(IN_ROOM(ch)) != GET_LOYALTY(ch)) {
+		msg_to_char(ch, "Someone else already owns this area.\r\n");
+		return;
+	}
+	
+	// check proximity: starting locations
+	for (iter = 0; iter <= highest_start_loc_index; ++iter) {
+		if (compute_distance(IN_ROOM(ch), real_room(start_locs[iter])) < min_distance_from_city_to_starting_location) {
+			msg_to_char(ch, "You can't found a city within %d tiles of a starting location.\r\n", min_distance_from_city_to_starting_location);
+			return;
+		}
+	}
+	
+	// check proximity: cities
+	HASH_ITER(hh, empire_table, emp_iter, next_emp) {
+		if (emp_iter != GET_LOYALTY(ch) && (city = find_closest_city(emp_iter, IN_ROOM(ch)))) {
+			dist = compute_distance(IN_ROOM(ch), city->location);
+
+			if (dist < min_distance_between_cities) {
+				// are they allied?
+				if (GET_LOYALTY(ch) && has_relationship(GET_LOYALTY(ch), emp_iter, DIPL_ALLIED)) {
+					// lower minimum
+					if (dist < min_distance_between_ally_cities) {
+						msg_to_char(ch, "You can't found a city within %d tiles of the center of %s.\r\n", min_distance_between_ally_cities, city->name);
+						return;
+					}
+				}
+				else {
+					msg_to_char(ch, "You can't found a city within %d tiles of the center of %s.\r\n", min_distance_between_cities, city->name);
+					return;
+				}
+			}
+		}
+	}
+	
+	// prepare to scan terrain: determine largest city radius
+	for (iter = 0, max_radius = 0; *city_type[iter].name != '\n'; ++iter) {
+		max_radius = MAX(max_radius, city_type[iter].radius);
+	}
+	
+	tot_owned = tot_rough = tot_ocean = tot_water = 0;
+	
+	// build tile list
+	for (y = max_radius; y >= -max_radius; --y) {
+		for (x = -max_radius; x <= max_radius; ++x) {
+			if ((room = real_shift(IN_ROOM(ch), x, y)) && (dist = compute_distance(IN_ROOM(ch), room)) <= max_radius) {
+				owned = rough = ocean = water = FALSE;
+				
+				// analyze tile
+				owned = (ROOM_OWNER(room) && ROOM_OWNER(room) != GET_LOYALTY(ch) && !ROOM_AFF_FLAGGED(room, ROOM_AFF_CHAMELEON));
+				rough = SECT_FLAGGED(BASE_SECT(room), SECTF_ROUGH) ? TRUE : FALSE;
+				ocean = SECT_FLAGGED(BASE_SECT(room), SECTF_OCEAN) ? TRUE : FALSE;
+				water = SECT_FLAGGED(BASE_SECT(room), SECTF_FRESH_WATER) ? TRUE : FALSE;
+				
+				if (owned || rough || ocean || water) {
+					// determine which way
+					dir_str = get_partial_direction_to(ch, IN_ROOM(ch), room, (PRF_FLAGGED(ch, PRF_SCREEN_READER) ? FALSE : TRUE));
+					
+					// find or add entry
+					HASH_FIND_STR(hash, dir_str, sct);
+					if (!sct) {
+						CREATE(sct, struct survey_city_t, 1);
+						sct->dir = dir_str;
+						sct->owned_dist = sct->rough_dist = sct->ocean_dist = sct->water_dist = -1;
+						HASH_ADD_STR(hash, dir, sct);
+					}
+					
+					// update entry
+					if (owned) {
+						++sct->owned_count;
+						++tot_owned;
+						sct->owned_dist = (sct->owned_dist == -1) ? dist : MIN(dist, sct->owned_dist);
+					}
+					if (rough) {
+						++sct->rough_count;
+						++tot_rough;
+						sct->rough_dist = (sct->rough_dist == -1) ? dist : MIN(dist, sct->rough_dist);
+					}
+					if (ocean) {
+						++sct->ocean_count;
+						++tot_ocean;
+						sct->ocean_dist = (sct->ocean_dist == -1) ? dist : MIN(dist, sct->ocean_dist);
+					}
+					if (water) {
+						++sct->water_count;
+						++tot_water;
+						sct->water_dist = (sct->water_dist == -1) ? dist : MIN(dist, sct->water_dist);
+					}
+				}
+			}
+		}
+	}
+	
+	// any at all?
+	if (!hash) {
+		msg_to_char(ch, "This looks like a wide open area for a city.\r\n");
+		return;
+	}
+	
+	msg_to_char(ch, "Survey for a city:\r\n");
+	
+	// report and free hash
+	HASH_ITER(hh, hash, sct, next_sct) {
+		dist = max_radius;
+		
+		// prepare info
+		*buf1 = '\0';
+		if (sct->owned_count) {
+			dist = MIN(dist, sct->owned_dist);
+			if (verbose) {
+				sprintf(buf1 + strlen(buf1), "%s%d claimed (%d away)", (*buf1 ? ", " : ""), sct->owned_count, sct->owned_dist);
+			}
+			else {
+				sprintf(buf1 + strlen(buf1), "%sclaimed", (*buf1 ? ", " : ""));
+			}
+		}
+		if (sct->rough_count) {
+			dist = MIN(dist, sct->rough_dist);
+			if (verbose) {
+				sprintf(buf1 + strlen(buf1), "%s%d rough (%d away)", (*buf1 ? ", " : ""), sct->rough_count, sct->rough_dist);
+			}
+			else {
+				sprintf(buf1 + strlen(buf1), "%srough", (*buf1 ? ", " : ""));
+			}
+		}
+		if (sct->ocean_count) {
+			dist = MIN(dist, sct->ocean_dist);
+			if (verbose) {
+				sprintf(buf1 + strlen(buf1), "%s%d ocean (%d away)", (*buf1 ? ", " : ""), sct->ocean_count, sct->ocean_dist);
+			}
+			else {
+				sprintf(buf1 + strlen(buf1), "%socean", (*buf1 ? ", " : ""));
+			}
+		}
+		if (sct->water_count) {
+			dist = MIN(dist, sct->water_dist);
+			if (verbose) {
+				sprintf(buf1 + strlen(buf1), "%s%d fresh water (%d away)", (*buf1 ? ", " : ""), sct->water_count, sct->water_dist);
+			}
+			else {
+				sprintf(buf1 + strlen(buf1), "%sfresh water", (*buf1 ? ", " : ""));
+			}
+		}
+		
+		if (*buf1) {
+			msg_to_char(ch, "%d %s: %s\r\n", dist, (*sct->dir ? sct->dir : "away"), buf1);
+		}
+		
+		HASH_DEL(hash, sct);
+		free(sct);
+	}
+	
+	// and totals?
+	msg_to_char(ch, "Total tiles: %d owned, %d rough, %d ocean, %d fresh water\r\n", tot_owned, tot_rough, tot_ocean, tot_water);
+}
+
+
  //////////////////////////////////////////////////////////////////////////////
 //// CHART FUNCTIONS /////////////////////////////////////////////////////////
 
@@ -2037,25 +2235,27 @@ bool show_local_einv(char_data *ch, room_data *room, bool thief_mode) {
 	// determines return val
 	found_any = FALSE;
 	
-	// iterate over empire list
-	HASH_ITER(hh, vhash, vhash_iter, vhash_next) {
-		if (!(emp = real_empire(vhash_iter->vnum))) {
-			continue;	// should be impossible
-		}
+	// iterate over empire list (only if on an island)
+	if (GET_ISLAND_ID(room) != NO_ISLAND) {
+		HASH_ITER(hh, vhash, vhash_iter, vhash_next) {
+			if (!(emp = real_empire(vhash_iter->vnum))) {
+				continue;	// should be impossible
+			}
 		
-		// look for storage here
-		found_one = FALSE;
-		eisle = get_empire_island(emp, GET_ISLAND_ID(room));
-		HASH_ITER(hh, eisle->store, store, next_store) {
-			if (store->amount > 0 && store->proto && obj_can_be_retrieved(store->proto, room, thief_mode ? NULL : own_empire)) {
-				if (!found_one) {
-					snprintf(buf, sizeof(buf), "%s inventory available here:\t0\r\n", EMPIRE_ADJECTIVE(emp));
-					CAP(buf);
-					msg_to_char(ch, "\r\n%s%s", EMPIRE_BANNER(emp), buf);
-				}
+			// look for storage here
+			found_one = FALSE;
+			eisle = get_empire_island(emp, GET_ISLAND_ID(room));
+			HASH_ITER(hh, eisle->store, store, next_store) {
+				if (store->amount > 0 && store->proto && obj_can_be_retrieved(store->proto, room, thief_mode ? NULL : own_empire)) {
+					if (!found_one) {
+						snprintf(buf, sizeof(buf), "%s inventory available here:\t0\r\n", EMPIRE_ADJECTIVE(emp));
+						CAP(buf);
+						msg_to_char(ch, "\r\n%s%s", EMPIRE_BANNER(emp), buf);
+					}
 			
-				show_one_stored_item_to_char(ch, emp, store, FALSE);
-				found_one = found_any = TRUE;
+					show_one_stored_item_to_char(ch, emp, store, FALSE);
+					found_one = found_any = TRUE;
+				}
 			}
 		}
 	}
@@ -2676,40 +2876,42 @@ ACMD(do_chart) {
 	else {
 		msg_to_char(ch, "Chart information for %s:\r\n", get_island_name_for(isle->id, ch));
 		
-		// alternat names
-		if (GET_LOYALTY(ch) && (e_isle = get_empire_island(GET_LOYALTY(ch), isle->id)) && e_isle->name && strcmp(e_isle->name, isle->name)) {
-			// show global name if different
-			msg_to_char(ch, "Also known as: %s", isle->name);
-			num = 1;
-		}
-		else {
-			num = 0;	// not shown yet
-		}
-		
 		// alternate names
-		num = 0;
-		HASH_ITER(hh, empire_table, emp, next_emp) {
-			if (EMPIRE_IS_TIMED_OUT(emp) || emp == GET_LOYALTY(ch)) {
-				continue;
-			}
-			if (!IS_IMMORTAL(ch) && !has_relationship(GET_LOYALTY(ch), emp, DIPL_NONAGGR | DIPL_ALLIED | DIPL_TRADE)) {
-				continue;
-			}
-			if (!(e_isle = get_empire_island(emp, isle->id)) || !e_isle->name || !str_cmp(e_isle->name, isle->name)) {
-				continue;
-			}
-			
-			// definitely has a name
-			if (num > 0) {
-				msg_to_char(ch, ", %s (%s)", e_isle->name, EMPIRE_NAME(emp));
+		if (isle->id != NO_ISLAND) {
+			if (GET_LOYALTY(ch) && (e_isle = get_empire_island(GET_LOYALTY(ch), isle->id)) && e_isle->name && strcmp(e_isle->name, isle->name)) {
+				// show global name if different
+				msg_to_char(ch, "Also known as: %s", isle->name);
+				num = 1;
 			}
 			else {
-				msg_to_char(ch, "Also known as: %s (%s)", e_isle->name, EMPIRE_NAME(emp));
+				num = 0;	// not shown yet
 			}
-			++num;
-		}
-		if (num > 0) {
-			msg_to_char(ch, "\r\n");
+		
+			// alternate names
+			num = 0;
+			HASH_ITER(hh, empire_table, emp, next_emp) {
+				if (EMPIRE_IS_TIMED_OUT(emp) || emp == GET_LOYALTY(ch)) {
+					continue;
+				}
+				if (!IS_IMMORTAL(ch) && !has_relationship(GET_LOYALTY(ch), emp, DIPL_NONAGGR | DIPL_ALLIED | DIPL_TRADE)) {
+					continue;
+				}
+				if (!(e_isle = get_empire_island(emp, isle->id)) || !e_isle->name || !str_cmp(e_isle->name, isle->name)) {
+					continue;
+				}
+			
+				// definitely has a name
+				if (num > 0) {
+					msg_to_char(ch, ", %s (%s)", e_isle->name, EMPIRE_NAME(emp));
+				}
+				else {
+					msg_to_char(ch, "Also known as: %s (%s)", e_isle->name, EMPIRE_NAME(emp));
+				}
+				++num;
+			}
+			if (num > 0) {
+				msg_to_char(ch, "\r\n");
+			}
 		}
 		
 		// desc
@@ -2733,13 +2935,13 @@ ACMD(do_chart) {
 		// collect empire data on the island
 		total_claims = 0;
 		HASH_ITER(hh, empire_table, emp, next_emp) {
-			if (!(e_isle = get_empire_island(emp, isle->id))) {
+			if (isle->id == NO_ISLAND || !(e_isle = get_empire_island(emp, isle->id))) {
 				continue;
 			}
 			
 			if (e_isle->territory[TER_TOTAL] > 0) {
 				chart_add_territory(&hash, emp, e_isle->territory[TER_TOTAL]);
-				total_claims += e_isle->territory[TER_TOTAL];
+				SAFE_ADD(total_claims, e_isle->territory[TER_TOTAL], 0, INT_MAX, FALSE);
 			}
 			
 			LL_FOREACH(EMPIRE_CITY_LIST(emp), city) {
@@ -4221,7 +4423,7 @@ ACMD(do_score) {
 
 ACMD(do_survey) {
 	char line[1024];
-	char *temp;
+	char *temp, *argptr;
 	struct empire_city_data *city;
 	struct empire_island *eisle;
 	struct island_info *island;
@@ -4229,11 +4431,19 @@ ACMD(do_survey) {
 	bool junk, large_radius;
 	struct depletion_data *dep;
 	
+	argptr = one_argument(argument, arg);
+	
+	// survey for a city?
+	if (is_abbrev(arg, "city")) {
+		survey_city(ch, argptr);
+		return;
+	}
+	
 	msg_to_char(ch, "You survey the area:\r\n");
 	
 	if ((island = GET_ISLAND(IN_ROOM(ch)))) {
 		// find out if it has a local name
-		if (GET_LOYALTY(ch) && (eisle = get_empire_island(GET_LOYALTY(ch), island->id)) && eisle->name && str_cmp(eisle->name, island->name)) {
+		if (GET_LOYALTY(ch) && island->id != NO_ISLAND && (eisle = get_empire_island(GET_LOYALTY(ch), island->id)) && eisle->name && str_cmp(eisle->name, island->name)) {
 			msg_to_char(ch, "Location: %s (%s)%s%s\r\n", get_island_name_for(island->id, ch), island->name, IS_SET(island->flags, ISLE_NEWBIE) ? " (newbie island)" : "", IS_SET(island->flags, ISLE_CONTINENT) ? " (continent)" : "");
 		}
 		else {

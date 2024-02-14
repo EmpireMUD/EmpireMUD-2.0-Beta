@@ -165,6 +165,7 @@ double empire_score_average[NUM_SCORES];
 struct trading_post_data *trading_list = NULL;	// global DLL of trading post stuff
 bool check_empire_refresh = FALSE;	// triggers empire refreshes
 struct empire_territory_data *global_next_territory_entry = NULL;	// for territory iteration
+struct empire_vehicle_data *global_next_empire_vehicle_entry = NULL;	// vehicle territory iteration
 
 // events
 event_data *event_table = NULL;	// global hash table (hh)
@@ -292,7 +293,7 @@ trig_data *trigger_list = NULL;	// DLL of all attached triggers
 trig_data *random_triggers = NULL;	// DLL of live random triggers (next_in_random_triggers, prev_in_random_triggers)
 trig_data *stc_next_random_trig = NULL;	// helps with trigger iteration when multiple random triggers are deleted at once
 trig_data *free_trigger_list = NULL;	// LL of triggers to free (next_to_free)
-int top_script_uid = OTHER_ID_BASE;	// for unique mobs/objs/vehicles in the DG Scripts system
+int top_script_uid = OTHER_ID_BASE;	// for unique mobs/objs in the DG Scripts system
 
 // vehicles
 vehicle_data *vehicle_table = NULL;	// main vehicle hash table

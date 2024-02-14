@@ -287,7 +287,7 @@ extern const char *empire_needs_types[];
 extern const char *empire_needs_status[];
 extern const char *unique_storage_flags[];
 extern const char *offense_flags[];
-extern const char *techs[];
+extern const char *empire_tech_types[];
 extern const char *empire_trait_types[];
 extern const char *priv[];
 extern const char *score_type[];

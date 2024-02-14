@@ -4,9 +4,9 @@ a skin of oil~
 A skin of oil is lying here.~
 The oil can be used for crafts or cooking.
 ~
-3 C a 0 0 10
+3 C a 0 0 11
 0 0 0
-7 12960
+7 0
 C
 1 1
 O+ 1 6320
@@ -23,9 +23,9 @@ a skin of seed oil~
 A skin of seed oil is lying here.~
 The oil can be used for crafts or cooking.
 ~
-3 C a 0 0 12
+3 C a 0 0 13
 0 0 0
-7 12960
+7 0
 C
 1 1
 O+ 1 6321
@@ -42,9 +42,9 @@ a skin of vegetable oil~
 A skin of vegetable oil is lying here.~
 The oil can be used for crafts or cooking.
 ~
-3 C a 0 0 13
+3 C a 0 0 14
 0 0 0
-7 12960
+7 0
 C
 1 1
 O+ 1 6322

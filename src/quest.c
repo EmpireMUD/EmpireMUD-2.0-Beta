@@ -246,8 +246,8 @@ int count_owned_buildings(empire_data *emp, bld_vnum vnum) {
 */
 int count_owned_buildings_by_function(empire_data *emp, bitvector_t flags) {
 	struct empire_territory_data *ter, *next_ter;
+	struct empire_vehicle_data *vter, *next_vter;
 	int count = 0;	// ah ah ah
-	vehicle_data *veh;
 	
 	if (!emp || flags == NOBITS) {
 		return count;
@@ -266,14 +266,14 @@ int count_owned_buildings_by_function(empire_data *emp, bitvector_t flags) {
 	}
 
 	// also count building-vehicles
-	DL_FOREACH(vehicle_list, veh) {
-		if (!VEH_IS_COMPLETE(veh) || VEH_OWNER(veh) != emp) {
+	HASH_ITER(hh, EMPIRE_VEHICLE_LIST(emp), vter, next_vter) {
+		if (!vter->veh || !VEH_IS_COMPLETE(vter->veh)) {
 			continue;
 		}
-		if (!VEH_FLAGGED(veh, VEH_BUILDING)) {
+		if (!VEH_FLAGGED(vter->veh, VEH_BUILDING)) {
 			continue;	// only count buildings
 		}
-		if ((VEH_FUNCTIONS(veh) & flags) != flags) {
+		if ((VEH_FUNCTIONS(vter->veh) & flags) != flags) {
 			continue;
 		}
 		
@@ -293,8 +293,8 @@ int count_owned_buildings_by_function(empire_data *emp, bitvector_t flags) {
 */
 int count_owned_homes(empire_data *emp) {
 	struct empire_territory_data *ter, *next_ter;
+	struct empire_vehicle_data *vter, *next_vter;
 	int count = 0;	// ah ah ah
-	vehicle_data *veh;
 	
 	if (!emp) {
 		return count;
@@ -316,19 +316,23 @@ int count_owned_homes(empire_data *emp) {
 	}
 	
 	// check vehicles too
-	DL_FOREACH(vehicle_list, veh) {
-		if (!VEH_IS_COMPLETE(veh) || VEH_OWNER(veh) != emp) {
+	HASH_ITER(hh, EMPIRE_VEHICLE_LIST(emp), vter, next_vter) {
+		if (!vter->veh || !VEH_IS_COMPLETE(vter->veh)) {
 			continue;
 		}
-		if (!VEH_FLAGGED(veh, VEH_BUILDING) || !VEH_INTERIOR_HOME_ROOM(veh) || !GET_BUILDING(VEH_INTERIOR_HOME_ROOM(veh))) {
-			continue;	// only count buildings with interiors
-		}
-		if (GET_BLD_CITIZENS(GET_BUILDING(VEH_INTERIOR_HOME_ROOM(veh))) < 1) {
-			continue;	// must have a citizen
+		if (!VEH_FLAGGED(vter->veh, VEH_BUILDING)) {
+			continue;	// only count buildings
 		}
 		
-		// found
-		++count;
+		// two ways to count here:
+		if (VEH_CITIZENS(vter->veh) > 0) {
+			// direct citizens
+			++count;
+		}
+		else if (VEH_INTERIOR_HOME_ROOM(vter->veh) && GET_BUILDING(VEH_INTERIOR_HOME_ROOM(vter->veh)) && GET_BLD_CITIZENS(GET_BUILDING(VEH_INTERIOR_HOME_ROOM(vter->veh))) > 0) {
+			// citizen on immediate inside room
+			++count;
+		}
 	}
 	
 	return count;
@@ -370,18 +374,18 @@ int count_owned_sector(empire_data *emp, sector_vnum vnum) {
 * @return int The number of completed vehicles with that vnum, owned by emp.
 */
 int count_owned_vehicles(empire_data *emp, any_vnum vnum) {
-	vehicle_data *veh;
 	int count = 0;
+	struct empire_vehicle_data *vter, *next_vter;
 	
 	if (!emp || vnum == NOTHING) {
 		return count;
 	}
 	
-	DL_FOREACH(vehicle_list, veh) {
-		if (!VEH_IS_COMPLETE(veh) || VEH_OWNER(veh) != emp) {
+	HASH_ITER(hh, EMPIRE_VEHICLE_LIST(emp), vter, next_vter) {
+		if (!vter->veh || !VEH_IS_COMPLETE(vter->veh)) {
 			continue;
 		}
-		if (VEH_VNUM(veh) != vnum) {
+		if (VEH_VNUM(vter->veh) != vnum) {
 			continue;
 		}
 		
@@ -401,18 +405,18 @@ int count_owned_vehicles(empire_data *emp, any_vnum vnum) {
 * @return int The number of completed vehicles that match, owned by emp.
 */
 int count_owned_vehicles_by_flags(empire_data *emp, bitvector_t flags) {
-	vehicle_data *veh;
 	int count = 0;
+	struct empire_vehicle_data *vter, *next_vter;
 	
 	if (!emp || flags == NOBITS) {
 		return count;
 	}
 	
-	DL_FOREACH(vehicle_list, veh) {
-		if (!VEH_IS_COMPLETE(veh) || VEH_OWNER(veh) != emp) {
+	HASH_ITER(hh, EMPIRE_VEHICLE_LIST(emp), vter, next_vter) {
+		if (!vter->veh || !VEH_IS_COMPLETE(vter->veh)) {
 			continue;
 		}
-		if ((VEH_FLAGS(veh) & flags) != flags) {
+		if ((VEH_FLAGS(vter->veh) & flags) != flags) {
 			continue;
 		}
 		
@@ -433,21 +437,21 @@ int count_owned_vehicles_by_flags(empire_data *emp, bitvector_t flags) {
 * @return int The number of completed vehicles that match, owned by emp.
 */
 int count_owned_vehicles_by_function(empire_data *emp, bitvector_t funcs) {
-	vehicle_data *veh;
 	int count = 0;
+	struct empire_vehicle_data *vter, *next_vter;
 	
 	if (!emp || funcs == NOBITS) {
 		return count;
 	}
 	
-	DL_FOREACH(vehicle_list, veh) {
-		if (!VEH_IS_COMPLETE(veh) || VEH_OWNER(veh) != emp) {
+	HASH_ITER(hh, EMPIRE_VEHICLE_LIST(emp), vter, next_vter) {
+		if (!vter->veh || !VEH_IS_COMPLETE(vter->veh)) {
 			continue;
 		}
-		if (VEH_FLAGGED(veh, VEH_BUILDING)) {
+		if (VEH_FLAGGED(vter->veh, VEH_BUILDING)) {
 			continue;	// does not count buildings
 		}
-		if ((VEH_FUNCTIONS(veh) & funcs) != funcs) {
+		if ((VEH_FUNCTIONS(vter->veh) & funcs) != funcs) {
 			continue;
 		}
 		

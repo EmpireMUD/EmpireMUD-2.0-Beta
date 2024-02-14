@@ -608,7 +608,7 @@ char_data *find_char(int uid) {
 * @return empire_data* The found empire, or NULL.
 */
 empire_data *find_empire_by_uid(int uid) {
-	if (uid < EMPIRE_ID_BASE || uid >= ROOM_ID_BASE) {
+	if (uid < EMPIRE_ID_BASE || uid >= VEHICLE_ID_BASE) {
 		// see note in dg_scripts.h
 		return NULL;
 	}
@@ -673,7 +673,7 @@ room_data *find_room(int uid) {
 vehicle_data *find_vehicle(int uid) {
 	struct uid_lookup_table *find;
 	
-	if (uid < OTHER_ID_BASE) {
+	if (uid < VEHICLE_ID_BASE || uid >= ROOM_ID_BASE) {
 		return NULL;	// shortcut: see note in dg_scripts.h
 	}
 	

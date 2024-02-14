@@ -1735,6 +1735,7 @@ GLB_FUNCTION(run_global_map_spawns) {
 static void spawn_one_room(room_data *room, bool only_artisans) {
 	room_data *iter, *next_iter, *home;
 	struct empire_territory_data *ter;
+	struct empire_vehicle_data *vter;
 	struct vehicle_room_list *vrl;
 	vehicle_data *veh, *next_veh;
 	struct empire_npc_data *npc;
@@ -1751,9 +1752,24 @@ static void spawn_one_room(room_data *room, bool only_artisans) {
 		return;
 	}
 	
-	// start recursively inside vehicles
+	// start recursively with vehicles
 	DL_FOREACH_SAFE2(ROOM_VEHICLES(room), veh, next_veh, next_in_room) {
 		if (!VEH_IS_EXTRACTED(veh)) {
+			// vehicle's own npcs?
+			if (VEH_OWNER(veh) && (vter = find_empire_vehicle_entry(VEH_OWNER(veh), veh))) {
+				LL_FOREACH(vter->npcs, npc) {
+					if (npc->mob) {
+						continue;	// check if the mob is already spawned
+					}
+					if (only_artisans && npc->vnum != VEH_ARTISAN(veh)) {
+						continue;	// not spawning this now
+					}
+					
+					spawn_empire_npc_to_room(VEH_OWNER(veh), npc, room, NOTHING);
+				}
+			}
+			
+			// interior
 			LL_FOREACH(VEH_ROOM_LIST(veh), vrl) {
 				spawn_one_room(vrl->room, only_artisans);
 			}
@@ -1841,8 +1857,8 @@ static void spawn_one_room(room_data *room, bool only_artisans) {
 		}
 	}	// end repel-npcs block
 	
-	// spawn interior rooms: recursively
-	if (GET_INSIDE_ROOMS(room) > 0) {
+	// spawn interior rooms recursively (except inside vehicles, which are spawned above)
+	if (GET_INSIDE_ROOMS(room) > 0 && !GET_ROOM_VEHICLE(room)) {
 		DL_FOREACH_SAFE2(interior_room_list, iter, next_iter, next_interior) {
 			if (HOME_ROOM(iter) == room && iter != room) {
 				spawn_one_room(iter, only_artisans);
