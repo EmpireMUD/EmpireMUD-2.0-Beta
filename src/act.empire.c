@@ -8223,7 +8223,7 @@ void do_workforce_keep(char_data *ch, empire_data *emp, char *argument) {
 			
 			// check for room in the buffer
 			if (size + strlen(line) + 3 < sizeof(buf)) {
-				size += snprintf(buf + size, sizeof(buf) - size, " %s\r\n", line);
+				size += snprintf(buf + size, sizeof(buf) - size, "%s\r\n", line);
 			}
 			else {
 				size += snprintf(buf + size, sizeof(buf) - size, " OVERFLOW\r\n");
@@ -8231,7 +8231,7 @@ void do_workforce_keep(char_data *ch, empire_data *emp, char *argument) {
 			}
 		}
 		
-		if (found) {
+		if (!found) {
 			strcat(buf, " no keep settings found\r\n");	// always room for this
 		}
 		
