@@ -99,7 +99,7 @@ ACMD(do_tan);
 const struct action_data_struct action_data[] = {
 	{ "", "", NOBITS, NULL, NULL },	// ACT_NONE
 	{ "digging", "is digging at the ground.", ACTF_SHOVEL | ACTF_FINDER | ACTF_HASTE | ACTF_FAST_CHORES, process_gen_interact_room, NULL },	// ACT_DIGGING
-	{ "gathering", "is gathering material.", ACTF_FINDER | ACTF_HASTE | ACTF_FAST_CHORES, process_gen_interact_room, NULL },	// ACT_GATHERING
+	{ "gathering", "is gathering material.", ACTF_FINDER | ACTF_HASTE | ACTF_FAST_CHORES | ACTF_SITTING, process_gen_interact_room, NULL },	// ACT_GATHERING
 	{ "chopping", "is chopping down trees.", ACTF_HASTE | ACTF_FAST_CHORES, process_chop, NULL },	// ACT_CHOPPING
 	{ "building", "is hard at work building.", ACTF_HASTE | ACTF_FAST_CHORES, process_build_action, NULL },	//  ACT_BUILDING (for any type of craft)
 	{ "dismantling", "is dismantling the building.", ACTF_HASTE | ACTF_FAST_CHORES, process_dismantle_action, NULL },	// ACT_DISMANTLING
@@ -115,7 +115,7 @@ const struct action_data_struct action_data[] = {
 	{ "playing", "is playing soothing music.", ACTF_ANYWHERE | ACTF_HASTE | ACTF_IGNORE_COND, process_music, NULL },	// ACT_MUSIC
 	{ "excavating", "is excavating a trench.", ACTF_HASTE | ACTF_FAST_CHORES | ACTF_FAST_EXCAVATE, process_excavating, NULL },	// ACT_EXCAVATING
 	{ "siring", "is hunched over.", NOBITS, process_siring, cancel_siring },	// ACT_SIRING
-	{ "picking", "is looking around at the ground.", ACTF_FINDER | ACTF_HASTE | ACTF_FAST_CHORES, process_gen_interact_room, NULL },	// ACT_PICKING
+	{ "picking", "is looking around at the ground.", ACTF_FINDER | ACTF_HASTE | ACTF_FAST_CHORES | ACTF_SITTING, process_gen_interact_room, NULL },	// ACT_PICKING
 	{ "morphing", "is morphing and changing shape!", ACTF_ANYWHERE, process_morphing, cancel_morphing },	// ACT_MORPHING
 	{ "scraping", "is scraping something off.", ACTF_HASTE | ACTF_FAST_CHORES, process_scraping, cancel_resource_list },	// ACT_SCRAPING
 		{ "bathing", "is bathing in the water.", NOBITS, cancel_action, NULL },	// no longer used: replaced by a script
@@ -139,7 +139,7 @@ const struct action_data_struct action_data[] = {
 	{ "repairing", "is repairing the building.", ACTF_HASTE | ACTF_FAST_CHORES, process_maintenance, NULL },	// ACT_MAINTENANCE
 	{ "burning", "is preparing to burn the area.", ACTF_FAST_CHORES, process_burn_area, NULL },	// ACT_BURN_AREA
 	{ "hunting", "is low to the ground, hunting.", ACTF_FINDER, process_hunting, NULL },	// ACT_HUNTING
-	{ "foraging", "is looking around for food.", ACTF_ALWAYS_FAST | ACTF_FINDER | ACTF_HASTE, process_gen_interact_room, NULL },	// ACT_FORAGING
+	{ "foraging", "is looking around for food.", ACTF_ALWAYS_FAST | ACTF_FINDER | ACTF_HASTE | ACTF_SITTING, process_gen_interact_room, NULL },	// ACT_FORAGING
 	{ "dismantling", "is dismantling something.", ACTF_HASTE | ACTF_FAST_CHORES, process_dismantle_vehicle, NULL },	// ACT_DISMANTLING
 	{ "ability", "is doing something...", ACTF_SITTING | ACTF_RESTING | ACTF_FIGHTING, perform_over_time_ability, cancel_over_time_ability },	// ACT_OVER_TIME_ABILITY
 	
