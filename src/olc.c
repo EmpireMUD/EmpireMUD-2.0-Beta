@@ -4997,7 +4997,7 @@ void get_script_display(struct trig_proto_list *list, char *save_buffer) {
 * @return char* The text to show.
 */
 char *one_icon_display(char *icon, char *base_color) {
-	char ibuf[124];
+	char ibuf[124], cbuf[16];
 	char *tmp;
 	static char output[256];
 	
@@ -5049,7 +5049,8 @@ char *one_icon_display(char *icon, char *base_color) {
 	}
 	
 	if (base_color && *base_color) {
-		snprintf(output, sizeof(output), "%s%s  %s%s&0 %s", base_color, ibuf, base_color, show_color_codes(base_color), show_color_codes(icon));
+		strcpy(cbuf, show_color_codes(base_color));
+		snprintf(output, sizeof(output), "%s%s  %s%s&0 %s", base_color, ibuf, base_color, cbuf, show_color_codes(icon));
 	}
 	else {
 		snprintf(output, sizeof(output), "%s  %s", ibuf, show_color_codes(icon));
