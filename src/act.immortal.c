@@ -3216,15 +3216,12 @@ void do_stat_building(char_data *ch, bld_data *bdg) {
 	msg_to_char(ch, "Room Title: %s\r\n", GET_BLD_TITLE(bdg));
 	
 	// icon line
-	replace_question_color(NULLSAFE(GET_BLD_ICON(bdg)), "&0", lbuf);
-	msg_to_char(ch, "Icon: %s&0 %s&0", lbuf, show_color_codes(NULLSAFE(GET_BLD_ICON(bdg))));
+	msg_to_char(ch, "Icon: %s&0", GET_BLD_ICON(bdg) ? one_icon_display(GET_BLD_ICON(bdg), NULL) : "none");
 	if (GET_BLD_HALF_ICON(bdg)) {
-		replace_question_color(NULLSAFE(GET_BLD_HALF_ICON(bdg)), "&0", lbuf);
-		msg_to_char(ch, ", Half Icon: %s&0 %s&0", lbuf, show_color_codes(NULLSAFE(GET_BLD_HALF_ICON(bdg))));
+		msg_to_char(ch, "  Half Icon: %s&0", GET_BLD_HALF_ICON(bdg) ? one_icon_display(GET_BLD_HALF_ICON(bdg), NULL) : "none");
 	}
 	if (GET_BLD_QUARTER_ICON(bdg)) {
-		replace_question_color(NULLSAFE(GET_BLD_QUARTER_ICON(bdg)), "&0", lbuf);
-		msg_to_char(ch, ", Quarter Icon: %s&0 %s&0", lbuf, show_color_codes(NULLSAFE(GET_BLD_QUARTER_ICON(bdg))));
+		msg_to_char(ch, "  Quarter Icon: %s&0", GET_BLD_QUARTER_ICON(bdg) ? one_icon_display(GET_BLD_QUARTER_ICON(bdg), NULL) : "none");
 	}
 	msg_to_char(ch, "\r\n");
 	

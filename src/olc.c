@@ -4663,54 +4663,14 @@ void get_extra_desc_display(struct extra_descr_data *list, char *save_buffer, si
 * @param char *save_buffer A buffer to store the result to.
 */
 void get_icons_display(struct icon_data *list, char *save_buffer) {
-	char lbuf[MAX_INPUT_LENGTH], ibuf[MAX_INPUT_LENGTH], line[MAX_INPUT_LENGTH], *tmp;
+	char lbuf[MAX_INPUT_LENGTH], line[MAX_INPUT_LENGTH];
 	struct icon_data *icon;
 	int size, count = 0;
 
 	*save_buffer = '\0';
 	
 	for (icon = list; icon; icon = icon->next) {
-		// basic icon buffer
-		replace_question_color(icon->icon, icon->color, ibuf);
-		if (strstr(ibuf, "@w")) {
-			tmp = str_replace("@w", ".", ibuf);
-			strcpy(ibuf, tmp);
-			free(tmp);
-		}
-		if (strstr(ibuf, "@e")) {
-			tmp = str_replace("@e", ".", ibuf);
-			strcpy(ibuf, tmp);
-			free(tmp);
-		}
-		if (strstr(ibuf, "@.")) {
-			tmp = str_replace("@.", ".", ibuf);
-			strcpy(ibuf, tmp);
-			free(tmp);
-		}
-		if (strstr(ibuf, "@u")) {
-			tmp = str_replace("@u", "v", ibuf);
-			strcpy(ibuf, tmp);
-			free(tmp);
-		}
-		if (strstr(ibuf, "@U")) {
-			tmp = str_replace("@U", "V", ibuf);
-			strcpy(ibuf, tmp);
-			free(tmp);
-		}
-		if (strstr(ibuf, "@v")) {
-			tmp = str_replace("@v", "v", ibuf);
-			strcpy(ibuf, tmp);
-			free(tmp);
-		}
-		if (strstr(ibuf, "@V")) {
-			tmp = str_replace("@V", "V", ibuf);
-			strcpy(ibuf, tmp);
-			free(tmp);
-		}
-		
-		// have to copy one of the show_color_codes() because it won't work correctly if it appears twice in the same line
-		strcpy(lbuf, show_color_codes(icon->icon));
-		sprintf(line, " %2d. %s: %s%s&0  %s%s&0 %s", ++count, icon_types[icon->type], icon->color, ibuf, icon->color, show_color_codes(icon->color), lbuf);
+		sprintf(line, " %2d. %s: %s", ++count, icon_types[icon->type], one_icon_display(icon->icon, icon->color));
 		
 		// format column despite variable width of color codes
 		size = 34 + color_code_length(line);
@@ -5023,6 +4983,79 @@ void get_script_display(struct trig_proto_list *list, char *save_buffer) {
 	if (count == 0) {
 		strcat(save_buffer, " none\r\n");
 	}
+}
+
+
+/**
+* Formats 1 icon for display in an OLC editor or stat command.
+*
+* Example with base_color:    ^^^.  &G ^^^&g.
+* Example without base_color: .[].  @w&0[]@e
+*
+* @param char *icon The raw icon text.
+* @param char *base_color Optional: A color to display for the base on the icon (may be NULL).
+* @return char* The text to show.
+*/
+char *one_icon_display(char *icon, char *base_color) {
+	char ibuf[124];
+	char *tmp;
+	static char output[256];
+	
+	// init
+	*output = '\0';
+	
+	// safety first
+	if (!icon) {
+		return "&0???? ????";
+	}
+	
+	replace_question_color(icon, base_color ? base_color : "&0", ibuf);
+	
+	// various replacements
+	if (strstr(ibuf, "@w")) {
+		tmp = str_replace("@w", "&g.", ibuf);
+		strcpy(ibuf, tmp);
+		free(tmp);
+	}
+	if (strstr(ibuf, "@e")) {
+		tmp = str_replace("@e", "&g.", ibuf);
+		strcpy(ibuf, tmp);
+		free(tmp);
+	}
+	if (strstr(ibuf, "@.")) {
+		tmp = str_replace("@.", "&g.", ibuf);
+		strcpy(ibuf, tmp);
+		free(tmp);
+	}
+	if (strstr(ibuf, "@u")) {
+		tmp = str_replace("@u", "&0v", ibuf);
+		strcpy(ibuf, tmp);
+		free(tmp);
+	}
+	if (strstr(ibuf, "@U")) {
+		tmp = str_replace("@U", "&0V", ibuf);
+		strcpy(ibuf, tmp);
+		free(tmp);
+	}
+	if (strstr(ibuf, "@v")) {
+		tmp = str_replace("@v", "&0v", ibuf);
+		strcpy(ibuf, tmp);
+		free(tmp);
+	}
+	if (strstr(ibuf, "@V")) {
+		tmp = str_replace("@V", "&0V", ibuf);
+		strcpy(ibuf, tmp);
+		free(tmp);
+	}
+	
+	if (base_color && *base_color) {
+		snprintf(output, sizeof(output), "%s  %s%s&0 %s", ibuf, base_color, show_color_codes(base_color), show_color_codes(icon));
+	}
+	else {
+		snprintf(output, sizeof(output), "%s  %s", ibuf, show_color_codes(icon));
+	}
+	
+	return output;
 }
 
 

@@ -4442,16 +4442,13 @@ void do_stat_vehicle(char_data *ch, vehicle_data *veh) {
 	
 	// icons:
 	if (VEH_ICON(veh)) {
-		replace_question_color(NULLSAFE(VEH_ICON(veh)), "&0", part);
-		size += snprintf(buf + size, sizeof(buf) - size, "Full Icon: %s\t0 %s", part, show_color_codes(VEH_ICON(veh)));
+		size += snprintf(buf + size, sizeof(buf) - size, "Full Icon: %s\t0", one_icon_display(VEH_ICON(veh), NULL));
 	}
 	if (VEH_HALF_ICON(veh)) {
-		replace_question_color(NULLSAFE(VEH_HALF_ICON(veh)), "&0", part);
-		size += snprintf(buf + size, sizeof(buf) - size, "%sHalf Icon: %s\t0 %s", (VEH_ICON(veh) ? ", " : ""), part, show_color_codes(VEH_HALF_ICON(veh)));
+		size += snprintf(buf + size, sizeof(buf) - size, "%sHalf Icon: %s\t0", (VEH_ICON(veh) ? "  " : ""), one_icon_display(VEH_HALF_ICON(veh), NULL));
 	}
 	if (VEH_QUARTER_ICON(veh)) {
-		replace_question_color(NULLSAFE(VEH_QUARTER_ICON(veh)), "&0", part);
-		size += snprintf(buf + size, sizeof(buf) - size, "%sQuarter Icon: %s\t0 %s", ((VEH_ICON(veh) || VEH_HALF_ICON(veh)) ? ", " : ""), part, show_color_codes(VEH_QUARTER_ICON(veh)));
+		size += snprintf(buf + size, sizeof(buf) - size, "%sQuarter Icon: %s\t0", ((VEH_ICON(veh) || VEH_HALF_ICON(veh)) ? "  " : ""), one_icon_display(VEH_QUARTER_ICON(veh), NULL));
 	}
 	if (VEH_ICON(veh) || VEH_HALF_ICON(veh) || VEH_QUARTER_ICON(veh)) {
 		size += snprintf(buf + size, sizeof(buf) - size, "\r\n");
