@@ -1619,7 +1619,7 @@ SHOW(show_lastnames) {
 
 
 SHOW(show_learned) {
-	char arg[MAX_INPUT_LENGTH], output[MAX_STRING_LENGTH], line[MAX_STRING_LENGTH];
+	char arg[MAX_INPUT_LENGTH], output[MAX_STRING_LENGTH * 4], line[MAX_STRING_LENGTH];
 	struct player_craft_data *pcd, *next_pcd;
 	empire_data *emp = NULL;
 	char_data *plr = NULL;
@@ -1683,7 +1683,7 @@ SHOW(show_learned) {
 		}
 	
 		// show it
-		snprintf(line, sizeof(line), " [%5d] %s (%s)\r\n", GET_CRAFT_VNUM(craft), GET_CRAFT_NAME(craft), craft_types[GET_CRAFT_TYPE(craft)]);
+		snprintf(line, sizeof(line), " [%5d] %s\r\n", GET_CRAFT_VNUM(craft), GET_CRAFT_NAME(craft));
 		if (size + strlen(line) < sizeof(output)) {
 			strcat(output, line);
 			size += strlen(line);
