@@ -703,6 +703,10 @@ any two skills.
 You can type 'role' to see your current synergy abilities. Check the help files
 for the various skills for a list of synergy abilities.
 
+When you're in the solo role, your synergy abilities only work if you're truly
+solo -- as soon as another player is present, synergy abilities stop working.
+You should switch to another role when you're with other players.
+
 See also: ROLE, SKILLS
 #
 "TRAINING SKILLS" "SKILL POINTS" "SKILL EXPERIENCE" "SKILLUPS" EXPERIENCE
