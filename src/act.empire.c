@@ -8215,15 +8215,15 @@ void do_workforce_keep(char_data *ch, empire_data *emp, char *argument) {
 			}
 			
 			if (PRF_FLAGGED(ch, PRF_ROOMFLAGS)) {
-				snprintf(line, sizeof(line), "[%5d] %s: %s (%d stored)", store->vnum, GET_OBJ_SHORT_DESC(proto), kept, get_total_stored_count(emp, store->vnum, FALSE));
+				snprintf(line, sizeof(line), "%s [%5d] %s (%d stored)", kept, store->vnum, skip_filler(GET_OBJ_SHORT_DESC(proto)), store->amount);
 			}
 			else {
-				snprintf(line, sizeof(line), " %s: %s (%d stored)", GET_OBJ_SHORT_DESC(proto), kept, get_total_stored_count(emp, store->vnum, FALSE));
+				snprintf(line, sizeof(line), "%s %s (%d stored)", kept, skip_filler(GET_OBJ_SHORT_DESC(proto)), store->amount);
 			}
 			
 			// check for room in the buffer
 			if (size + strlen(line) + 3 < sizeof(buf)) {
-				size += snprintf(buf + size, sizeof(buf) - size, "%s\r\n", line);
+				size += snprintf(buf + size, sizeof(buf) - size, " %s\r\n", line);
 			}
 			else {
 				size += snprintf(buf + size, sizeof(buf) - size, " OVERFLOW\r\n");
