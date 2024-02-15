@@ -714,6 +714,11 @@ Buff abilities have the following properties:
  <&yapply&0> Trait modifiers to give.
  <&yaffectvnum&0> Which affect (generic) to use for the buff.
 
+Messaging notes:
+ &cself-one-at-a-time&0 and &ctarg-one-at-a-time&0 are shown if the
+ ONE-AT-A-TIME flag is set and the target is already affected by the ability's
+ affect type. The &y$t&0 placeholder is the affect name.
+
 Example buff abilities: 1 Fly, 97 Bash, 166 Foresight, 205 Master Survivalist
 
 See also: OLC ABILITIES, ABILEDIT TYPES
@@ -821,6 +826,8 @@ Messages:
    Using &y$p&0 for the item. These messages are also optional.
  Sent on failure only if no pre-messages were sent: &cfail-self-to-char&0 and
    &cfail-self-to-room&0
+ Sent when the ONE-AT-A-TIME flag is present and the player already has the
+   object: &cself-one-at-a-time&0 (&y$p&0 is the object already present).
 
 Example conjure-liquid abilities: 1019 Conjure Fruit
 
@@ -847,6 +854,8 @@ Messages:
    Using &y$V&0 for the item. These messages are also optional.
  Sent on failure only if no pre-messages were sent: &cfail-self-to-char&0 and
    &cfail-self-to-room&0
+ Sent when the ONE-AT-A-TIME flag is present and the vehicle is already
+   present: &cself-one-at-a-time&0 (&y$V&0 is the vehicle already present).
 
 Example conjure-vehicle abilities: 1018 Shimmering Anvil
 
@@ -1014,6 +1023,8 @@ Message types:
  &cimmune-self-to-char&0 - To actor when immune to their own ability.
  &cimmune-targ-to-char&0 - To actor when other target is immune to the ability.
  &cno-target&0 - Shown when the ability target is not found.
+ &cself-one-at-a-time&0 - Ability targeting self is blocked by one-at-a-time flag.
+ &ctarg-one-at-a-time&0 - Ability on others is blocked by one-at-a-time flag.
 
 For messages to help test abilities, see HELP ABILEDIT TESTING.
 
@@ -1100,6 +1111,11 @@ DoT abilities have the following properties:
  <&ylongduration&0> How long it lasts (at class level).
  <&ymaxstacks&0> How many times this DoT can stack.
  <&yaffectvnum&0> Which affect (generic) to use for the DoT.
+
+Message notes:
+ &cself-one-at-a-time&0 and &ctarg-one-at-a-time&0 are shown if the
+ ONE-AT-A-TIME flag is set and the target is already affected by the ability's
+ affect type. The &y$t&0 placeholder is the affect name.
 
 Example DoT abilities: 98 Cut Deep, 125 Skybrand, 155 Jab
 
@@ -1876,6 +1892,11 @@ Properties of room-affect abilities:
  <&yaffects&0> Room affect flags to set.
  <&yaffectvnum&0> Which affect (generic) to use for the affect.
 
+Messaging notes:
+ &cself-one-at-a-time&0 is shown if the ONE-AT-A-TIME flag is set and the room
+ is already affected by the ability's affect type. The &y$t&0 placeholder is
+ the affect name.
+
 Example room-affect abilities: 11 Darkness, 186 Ritual of Defense
 
 See also: OLC ABILITIES, ABILEDIT TYPES, ROOM AFFECTS
@@ -1948,6 +1969,8 @@ Messaging:
 - Displays &cfail-self-to-char&0 and &cfail-self-to-room&0 if it fails.
 - Successful summons each send &cper-char-to-char&0 and &cper-char-to-room&0
   messages.
+- Displays &cself-one-at-a-time&0 if the ONE-AT-A-TIME flag is set and a copy
+  of the mob is already present (&y$N&0 is the mob already present).
 
 When a mob is summoned, it automatically gets the SPAWNED, !LOOT, and !EXP
 flags.

@@ -3935,6 +3935,7 @@ bool check_ability_limitations(char_data *ch, ability_data *abil, char_data *vic
 PREP_ABIL(prep_buff_ability) {
 	any_vnum affect_vnum;
 	bool was_sleep_aff;
+	char *msg;
 	
 	bitvector_t SLEEP_AFFS = AFF_DEATHSHROUDED | AFF_MUMMIFIED | AFF_EARTHMELDED;
 	
@@ -3960,10 +3961,12 @@ PREP_ABIL(prep_buff_ability) {
 	
 	if (ABILITY_FLAGGED(abil, ABILF_ONE_AT_A_TIME) && affected_by_spell_from_caster(vict, affect_vnum, ch)) {
 		if (vict == ch) {
-			msg_to_char(ch, "You're already affected by %s.\r\n", get_generic_name_by_vnum(affect_vnum));
+			msg = abil_get_custom_message(abil, ABIL_CUSTOM_SELF_ONE_AT_AT_TIME);
+			act(msg ? msg : "You're already affected by '$t'.", FALSE, ch, get_generic_name_by_vnum(affect_vnum), NULL, TO_CHAR | TO_SLEEP | ACT_STR_OBJ);
 		}
 		else {
-			act("$N is already affected by $t.", FALSE, ch, get_generic_name_by_vnum(affect_vnum), vict, TO_CHAR | TO_SLEEP | ACT_STR_OBJ);
+			msg = abil_get_custom_message(abil, ABIL_CUSTOM_TARG_ONE_AT_AT_TIME);
+			act(msg ? msg : "$N is already affected by '$t'.", FALSE, ch, get_generic_name_by_vnum(affect_vnum), vict, TO_CHAR | TO_SLEEP | ACT_STR_OBJ);
 		}
 
 		data->stop = TRUE;
@@ -4064,6 +4067,7 @@ PREP_ABIL(prep_conjure_liquid_ability) {
 */
 PREP_ABIL(prep_conjure_object_ability) {
 	bool has_any, one_ata, any_inv, any_room;
+	char *msg;
 	int any_size, iter;
 	struct interaction_item *interact;
 	obj_data *proto;
@@ -4099,13 +4103,15 @@ PREP_ABIL(prep_conjure_object_ability) {
 			
 			// oops
 			if (one_ata && has_any) {
-				act("You can't use that ability because you already have $p.", FALSE, ch, proto, NULL, TO_CHAR | TO_SLEEP);
+				msg = abil_get_custom_message(abil, ABIL_CUSTOM_SELF_ONE_AT_AT_TIME);
+				act(msg ? msg : "You can't use that ability because you already have $p.", FALSE, ch, proto, NULL, TO_CHAR | TO_SLEEP);
 			}
 		}
 		else {	// no-take
 			any_room = TRUE;
 			if (one_ata && count_objs_by_vnum(interact->vnum, ROOM_CONTENTS(IN_ROOM(ch)))) {
-				act("You can't use that ability because $p is already here.", FALSE, ch, proto, NULL, TO_CHAR | TO_SLEEP);
+				msg = abil_get_custom_message(abil, ABIL_CUSTOM_SELF_ONE_AT_AT_TIME);
+				act(msg ? msg : "You can't use that ability because $p is already here.", FALSE, ch, proto, NULL, TO_CHAR | TO_SLEEP);
 				has_any = TRUE;
 			}
 		}
@@ -4135,6 +4141,7 @@ PREP_ABIL(prep_conjure_object_ability) {
 * PREP_ABIL provides: ch, abil, argument, level, vict, ovict, vvict, room_targ, data
 */
 PREP_ABIL(prep_conjure_vehicle_ability) {
+	char *msg;
 	struct interaction_item *interact;
 	vehicle_data *proto, *viter;
 	
@@ -4151,7 +4158,8 @@ PREP_ABIL(prep_conjure_vehicle_ability) {
 		if (ABILITY_FLAGGED(abil, ABILF_ONE_AT_A_TIME)) {
 			DL_FOREACH2(ROOM_VEHICLES(IN_ROOM(ch)), viter, next_in_room) {
 				if (VEH_VNUM(viter) == interact->vnum && (!VEH_OWNER(viter) || VEH_OWNER(viter) == GET_LOYALTY(ch))) {
-					act("You can't use that ability because $V is already here.", FALSE, ch, NULL, viter, TO_CHAR | TO_SLEEP | ACT_VEH_VICT);
+					msg = abil_get_custom_message(abil, ABIL_CUSTOM_SELF_ONE_AT_AT_TIME);
+					act(msg ? msg : "You can't use that ability because $V is already here.", FALSE, ch, NULL, viter, TO_CHAR | TO_SLEEP | ACT_VEH_VICT);
 					CANCEL_ABILITY(data);
 					return;
 				}
@@ -4186,15 +4194,18 @@ PREP_ABIL(prep_conjure_vehicle_ability) {
 // PREP_ABIL provides: ch, abil, argument, level, vict, ovict, vvict, room_targ, data
 PREP_ABIL(prep_dot_ability) {
 	any_vnum affect_vnum;
+	char *msg;
 	
 	affect_vnum = (ABIL_AFFECT_VNUM(abil) != NOTHING) ? ABIL_AFFECT_VNUM(abil) : ATYPE_DOT;
 	
 	if (ABILITY_FLAGGED(abil, ABILF_ONE_AT_A_TIME) && affected_by_dot_from_caster(vict, affect_vnum, ch) >= ABIL_MAX_STACKS(abil)) {
 		if (vict == ch) {
-			msg_to_char(ch, "You're already affected by %s.\r\n", get_generic_name_by_vnum(affect_vnum));
+			msg = abil_get_custom_message(abil, ABIL_CUSTOM_SELF_ONE_AT_AT_TIME);
+			act(msg ? msg : "You're already affected by '$t'.", FALSE, ch, get_generic_name_by_vnum(affect_vnum), NULL, TO_CHAR | TO_SLEEP | ACT_STR_OBJ);
 		}
 		else {
-			act("$N is already affected by $t.", FALSE, ch, get_generic_name_by_vnum(affect_vnum), vict, TO_CHAR | TO_SLEEP | ACT_STR_OBJ);
+			msg = abil_get_custom_message(abil, ABIL_CUSTOM_TARG_ONE_AT_AT_TIME);
+			act(msg ? msg : "$N is already affected by $t.", FALSE, ch, get_generic_name_by_vnum(affect_vnum), vict, TO_CHAR | TO_SLEEP | ACT_STR_OBJ);
 		}
 		
 		data->stop = TRUE;
@@ -4503,6 +4514,7 @@ PREP_ABIL(prep_resurrect_ability) {
 */
 PREP_ABIL(prep_room_affect_ability) {
 	any_vnum affect_vnum;
+	char *msg;
 	
 	affect_vnum = (ABIL_AFFECT_VNUM(abil) != NOTHING) ? ABIL_AFFECT_VNUM(abil) : ATYPE_BUFF;
 	
@@ -4518,7 +4530,8 @@ PREP_ABIL(prep_room_affect_ability) {
 	
 	// one-at-a-time?
 	if (ABILITY_FLAGGED(abil, ABILF_ONE_AT_A_TIME) && room_targ && room_affected_by_spell_from_caster(room_targ, affect_vnum, ch)) {
-		msg_to_char(ch, "The area is already affected by that ability.\r\n");
+		msg = abil_get_custom_message(abil, ABIL_CUSTOM_SELF_ONE_AT_AT_TIME);
+		act(msg ? msg : "The area is already affected by that ability.", FALSE, ch, get_generic_name_by_vnum(affect_vnum), NULL, TO_CHAR | TO_SLEEP | ACT_STR_OBJ);
 		CANCEL_ABILITY(data);
 		return;
 	}
@@ -4529,16 +4542,19 @@ PREP_ABIL(prep_room_affect_ability) {
 PREP_ABIL(prep_summon_any_ability) {
 	any_vnum found_name = NOTHING, found_one = NOTHING;
 	bool found_many = FALSE;
+	char *msg;
 	char_data *ch_iter, *proto = NULL;
 	struct ability_data_list *adl;
 	
 	// check this first
 	if (ABILITY_FLAGGED(abil, ABILF_ONE_AT_A_TIME)) {
+		msg = abil_get_custom_message(abil, ABIL_CUSTOM_SELF_ONE_AT_AT_TIME);
+		
 		LL_FOREACH(ABIL_DATA(abil), adl) {
 			if (adl->type == ADL_SUMMON_MOB) {
 				DL_FOREACH2(ROOM_PEOPLE(IN_ROOM(ch)), ch_iter, next_in_room) {
 					if (GET_MOB_VNUM(ch_iter) == adl->vnum && (!GET_LEADER(ch_iter) || GET_LEADER(ch_iter) == ch)) {
-						act("You can't do that with $N already here.", FALSE, ch, NULL, ch_iter, TO_CHAR | TO_SLEEP);
+						act(msg ? msg : "You can't do that with $N already here.", FALSE, ch, NULL, ch_iter, TO_CHAR | TO_SLEEP);
 						CANCEL_ABILITY(data);
 						return;
 					}
@@ -4604,15 +4620,18 @@ PREP_ABIL(prep_summon_any_ability) {
 
 // PREP_ABIL provides: ch, abil, argument, level, vict, ovict, vvict, room_targ, data
 PREP_ABIL(prep_summon_random_ability) {
+	char *msg;
 	char_data *ch_iter;
 	struct ability_data_list *adl;
 	
 	if (ABILITY_FLAGGED(abil, ABILF_ONE_AT_A_TIME)) {
+		msg = abil_get_custom_message(abil, ABIL_CUSTOM_SELF_ONE_AT_AT_TIME);
+		
 		LL_FOREACH(ABIL_DATA(abil), adl) {
 			if (adl->type == ADL_SUMMON_MOB) {
 				DL_FOREACH2(ROOM_PEOPLE(IN_ROOM(ch)), ch_iter, next_in_room) {
 					if (GET_MOB_VNUM(ch_iter) == adl->vnum && (!GET_LEADER(ch_iter) || GET_LEADER(ch_iter) == ch)) {
-						act("You can't do that with $N already here.", FALSE, ch, NULL, ch_iter, TO_CHAR | TO_SLEEP);
+						act(msg ? msg : "You can't do that with $N already here.", FALSE, ch, NULL, ch_iter, TO_CHAR | TO_SLEEP);
 						CANCEL_ABILITY(data);
 						return;
 					}
