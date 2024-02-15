@@ -8208,10 +8208,10 @@ void do_workforce_keep(char_data *ch, empire_data *emp, char *argument) {
 			
 			// build line
 			if (store->keep == UNLIMITED) {
-				strcpy(kept, "all");
+				strcpy(kept, "(all)");
 			}
 			else {
-				snprintf(kept, sizeof(kept), "%d", store->keep);
+				snprintf(kept, sizeof(kept), "(%dx)", store->keep);
 			}
 			
 			if (PRF_FLAGGED(ch, PRF_ROOMFLAGS)) {
