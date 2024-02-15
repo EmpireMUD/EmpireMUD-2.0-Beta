@@ -3869,7 +3869,7 @@ bool check_ability_limitations(char_data *ch, ability_data *abil, char_data *vic
 							msg_to_char(ch, "You are not human.\r\n");
 						}
 						else {
-							act("$n is not human.", FALSE, ch, NULL, vict, TO_CHAR | TO_SLEEP);
+							act("$N is not human.", FALSE, ch, NULL, vict, TO_CHAR | TO_SLEEP);
 						}
 					}
 					return FALSE;
