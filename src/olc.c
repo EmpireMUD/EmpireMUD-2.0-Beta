@@ -5049,7 +5049,7 @@ char *one_icon_display(char *icon, char *base_color) {
 	}
 	
 	if (base_color && *base_color) {
-		snprintf(output, sizeof(output), "%s  %s%s&0 %s", ibuf, base_color, show_color_codes(base_color), show_color_codes(icon));
+		snprintf(output, sizeof(output), "%s%s  %s%s&0 %s", base_color, ibuf, base_color, show_color_codes(base_color), show_color_codes(icon));
 	}
 	else {
 		snprintf(output, sizeof(output), "%s  %s", ibuf, show_color_codes(icon));
