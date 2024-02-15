@@ -744,10 +744,6 @@ void real_update_player(char_data *ch) {
 		if (GET_MOVE(ch) > 0) {
 			set_move(ch, GET_MOVE(ch) - (has_player_tech(ch, PTECH_SWIMMING) ? 1 : 5));
 			
-			// warn?
-			if (GET_MOVE(ch) <= 30 || !(GET_MOVE(ch) % 30) || (!has_player_tech(ch, PTECH_SWIMMING) && GET_MOVE(ch) <= 150)) {
-				msg_to_char(ch, "You're having trouble swimming. Better get back on land before you run out of movement points!\r\n");
-			}
 		}
 		if (GET_MOVE(ch) <= 0) {
 			msg_to_char(ch, "You sink beneath the water and die!\r\n");
@@ -755,6 +751,17 @@ void real_update_player(char_data *ch) {
 			death_log(ch, ch, ATTACK_SUFFERING);
 			die(ch, ch);
 			return;
+		}
+		else if (GET_MOVE(ch) <= 30 || (!has_player_tech(ch, PTECH_SWIMMING) && GET_MOVE(ch) <= 150)) {
+			msg_to_char(ch, "You're having trouble swimming. Better get back on land before you run out of movement points!\r\n");
+		}
+		else if (!(GET_MOVE(ch) % 30)) {
+			if (GET_MOVE(ch) > 150) {
+				msg_to_char(ch, "You are %s losing movement points from swimming.\r\n", has_player_tech(ch, PTECH_SWIMMING) ? "slowly" : "quickly");
+			}
+			else {
+				msg_to_char(ch, "You won't be able to swim forever; better head back to shore.\r\n");
+			}
 		}
 	}
 	else {	// normal move gain
