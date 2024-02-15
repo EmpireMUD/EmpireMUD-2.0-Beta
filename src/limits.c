@@ -745,7 +745,10 @@ void real_update_player(char_data *ch) {
 			set_move(ch, GET_MOVE(ch) - (has_player_tech(ch, PTECH_SWIMMING) ? 1 : 5));
 			
 		}
+		
+		// swimming messages
 		if (GET_MOVE(ch) <= 0) {
+			// death!
 			msg_to_char(ch, "You sink beneath the water and die!\r\n");
 			act("$n sinks beneath the water and dies!", FALSE, ch, NULL, NULL, TO_ROOM);
 			death_log(ch, ch, ATTACK_SUFFERING);
