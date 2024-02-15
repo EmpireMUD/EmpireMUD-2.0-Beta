@@ -5050,10 +5050,10 @@ char *one_icon_display(char *icon, char *base_color) {
 	
 	if (base_color && *base_color) {
 		strcpy(cbuf, show_color_codes(base_color));
-		snprintf(output, sizeof(output), "%s%s  %s%s&0 %s", base_color, ibuf, base_color, cbuf, show_color_codes(icon));
+		snprintf(output, sizeof(output), "%s%s  &0%s%s&0 %s", base_color, ibuf, base_color, cbuf, show_color_codes(icon));
 	}
 	else {
-		snprintf(output, sizeof(output), "%s  %s", ibuf, show_color_codes(icon));
+		snprintf(output, sizeof(output), "%s  &0%s", ibuf, show_color_codes(icon));
 	}
 	
 	return output;
