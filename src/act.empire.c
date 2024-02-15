@@ -8167,6 +8167,168 @@ ACMD(do_unpublicize) {
 
 
 /**
+* Handler for do_workforce when the args start: workforce keep ...
+*
+* @param char_data *ch The player.
+* @param empire_data *emp The empire.
+* @param char *argument Remaining args after "keep".
+*/
+void do_workforce_keep(char_data *ch, empire_data *emp, char *argument) {
+	bool found;
+	char lim_arg[MAX_INPUT_LENGTH], local_arg[MAX_INPUT_LENGTH], temp[MAX_INPUT_LENGTH];
+	char buf[MAX_STRING_LENGTH * 4], line[256], kept[24];
+	int limit = 0;
+	size_t size;
+	obj_data *proto;
+	struct empire_island *eisle;
+	struct empire_storage_data *store, *next_store;
+	
+	// check first
+	if (GET_ISLAND_ID(IN_ROOM(ch)) == NO_ISLAND || !(eisle = get_empire_island(emp, GET_ISLAND_ID(IN_ROOM(ch))))) {
+		msg_to_char(ch, "You need to be on an island to use workforce keep; there's no empire inventory here.\r\n");
+		return;
+	}
+	
+	skip_spaces(&argument);
+	
+	// no-arg? show keep settings here
+	if (!*argument) {
+		size = snprintf(buf, sizeof(buf), "Workforce keep settings for this island:\r\n");
+		
+		found = FALSE;
+		HASH_ITER(hh, eisle->store, store, next_store) {
+			if (!store->keep) {
+				continue;	// not keeping
+			}
+			if (!(proto = store->proto)) {
+				continue;	// no proto somehow?
+			}
+			
+			found = TRUE;
+			
+			// build line
+			if (store->keep == UNLIMITED) {
+				strcpy(kept, "all");
+			}
+			else {
+				snprintf(kept, sizeof(kept), "%d", store->keep);
+			}
+			
+			if (PRF_FLAGGED(ch, PRF_ROOMFLAGS)) {
+				snprintf(line, sizeof(line), "[%5d] %s: %s (%d stored)", store->vnum, GET_OBJ_SHORT_DESC(proto), kept, get_total_stored_count(emp, store->vnum, FALSE));
+			}
+			else {
+				snprintf(line, sizeof(line), " %s: %s (%d stored)", GET_OBJ_SHORT_DESC(proto), kept, get_total_stored_count(emp, store->vnum, FALSE));
+			}
+			
+			// check for room in the buffer
+			if (size + strlen(line) + 3 < sizeof(buf)) {
+				size += snprintf(buf + size, sizeof(buf) - size, "%s\r\n", line);
+			}
+			else {
+				size += snprintf(buf + size, sizeof(buf) - size, " OVERFLOW\r\n");
+				break;
+			}
+		}
+		
+		if (found) {
+			strcat(buf, " no keep settings found\r\n");	// always room for this
+		}
+		
+		if (ch->desc) {	// should be guaranteed
+			page_string(ch->desc, buf, TRUE);
+		}
+		
+		// end of no-arg
+		return;
+	}
+	
+	if (!strn_cmp(argument, "default", 7)) {
+		// special handling for: workforce keep default [amount]
+		half_chop(argument, local_arg, lim_arg);
+		
+		if (!*lim_arg) {
+			if (EMPIRE_ATTRIBUTE(emp, EATT_DEFAULT_KEEP) == UNLIMITED) {
+				msg_to_char(ch, "Default 'keep' is set to: all\r\n");
+			}
+			else {
+				msg_to_char(ch, "Default 'keep' amount is set to: %d\r\n", EMPIRE_ATTRIBUTE(emp, EATT_DEFAULT_KEEP));
+			}
+		}
+		else {
+			if (!str_cmp(lim_arg, "all")) {
+				EMPIRE_ATTRIBUTE(emp, EATT_DEFAULT_KEEP) = UNLIMITED;
+				msg_to_char(ch, "Default 'keep' is now set to: all\r\n");
+			}
+			else if (isdigit(*lim_arg) && (limit = atoi(lim_arg)) >= 0) {
+				EMPIRE_ATTRIBUTE(emp, EATT_DEFAULT_KEEP) = limit;
+				msg_to_char(ch, "Default 'keep' is now set to: %d\r\n", limit);
+			}
+			else if (!str_cmp(lim_arg, "none")) {
+				EMPIRE_ATTRIBUTE(emp, EATT_DEFAULT_KEEP) = 0;
+				msg_to_char(ch, "Default 'keep' is now set to: none\r\n");
+			}
+			else {
+				msg_to_char(ch, "Invalid default 'keep' value '%s'.\r\n", lim_arg);
+			}
+		}
+		
+		EMPIRE_NEEDS_SAVE(emp) = TRUE;
+		return;	// no further work for 'default'
+	}
+	else if (!strn_cmp(argument, "all ", 4)) {
+		limit = UNLIMITED;
+		half_chop(argument, lim_arg, temp);	// strip off the "all"
+		strcpy(argument, temp);
+	}
+	else if (isdigit(*argument)) {
+		half_chop(argument, lim_arg, temp);	// find a number
+		strcpy(argument, temp);
+		limit = atoi(lim_arg);
+		if (limit < 0) {
+			msg_to_char(ch, "Invalid number to keep.\r\n");
+			return;
+		}
+	}
+	
+	// now ensure there's (still) an argument
+	if (!*argument) {
+		msg_to_char(ch, "Keep (or unkeep) which stored item?\r\n");
+		return;
+	}
+	
+	// sort to ensure predictable order
+	sort_einv_for_empire(emp, EINV_SORT_AMOUNT);
+	
+	found = FALSE;
+	HASH_ITER(hh, eisle->store, store, next_store) {
+		if (!(proto = store->proto)) {
+			continue;
+		}
+		if (!multi_isname(argument, GET_OBJ_KEYWORDS(proto))) {
+			continue;
+		}
+		
+		found = TRUE;
+		if (limit == UNLIMITED || limit > 0) {
+			store->keep = limit;
+		}
+		else {	// toggle off/all
+			store->keep = store->keep ? 0 : UNLIMITED;
+		}
+		msg_to_char(ch, "Your workforce will %s keep %s of its '%s' on this island.\r\n", store->keep ? "now" : "no longer", limit ? lim_arg : (store->keep ? "all" : "any"), skip_filler(GET_OBJ_SHORT_DESC(proto)));
+		
+		EMPIRE_NEEDS_STORAGE_SAVE(emp) = TRUE;
+		break;
+	}
+	
+	if (!found) {
+		msg_to_char(ch, "You have nothing by that name stored on this island.\r\n");
+	}
+}
+
+
+/**
 * Handler for do_workforce when the args start: workforce limit ...
 *
 * @param char_data *ch The player.
@@ -8435,14 +8597,10 @@ void do_workforce_nearby(char_data *ch, empire_data *emp, char *argument) {
 
 ACMD(do_workforce) {
 	char arg[MAX_INPUT_LENGTH], lim_arg[MAX_INPUT_LENGTH], name[MAX_STRING_LENGTH], local_arg[MAX_INPUT_LENGTH], island_arg[MAX_INPUT_LENGTH];
-	char temp[MAX_INPUT_LENGTH];
-	struct empire_storage_data *store, *next_store;
 	struct island_info *island = NULL;
-	bool all = FALSE, here = FALSE, found;
-	struct empire_island *eisle;
+	bool all = FALSE, here = FALSE;
 	int iter, type, limit = 0;
 	empire_data *emp;
-	obj_data *proto;
 	
 	argument = any_one_arg(argument, arg);
 
@@ -8483,95 +8641,7 @@ ACMD(do_workforce) {
 		msg_to_char(ch, "You don't have permission to set up the workforce.\r\n");
 	}
 	else if (is_abbrev(arg, "keep")) {
-		skip_spaces(&argument);
-		
-		if (GET_ISLAND_ID(IN_ROOM(ch)) == NO_ISLAND || !(eisle = get_empire_island(emp, GET_ISLAND_ID(IN_ROOM(ch))))) {
-			msg_to_char(ch, "You can't tell workforce to keep items if you're not on any island.\r\n");
-			return;
-		}
-		
-		if (!strn_cmp(argument, "default", 7)) {
-			// special handling for: workforce keep default [amount]
-			half_chop(argument, local_arg, lim_arg);
-			
-			if (!*lim_arg) {
-				if (EMPIRE_ATTRIBUTE(emp, EATT_DEFAULT_KEEP) == UNLIMITED) {
-					msg_to_char(ch, "Default 'keep' is set to: all\r\n");
-				}
-				else {
-					msg_to_char(ch, "Default 'keep' amount is set to: %d\r\n", EMPIRE_ATTRIBUTE(emp, EATT_DEFAULT_KEEP));
-				}
-			}
-			else {
-				if (!str_cmp(lim_arg, "all")) {
-					EMPIRE_ATTRIBUTE(emp, EATT_DEFAULT_KEEP) = UNLIMITED;
-					msg_to_char(ch, "Default 'keep' is now set to: all\r\n");
-				}
-				else if (isdigit(*lim_arg) && (limit = atoi(lim_arg)) >= 0) {
-					EMPIRE_ATTRIBUTE(emp, EATT_DEFAULT_KEEP) = limit;
-					msg_to_char(ch, "Default 'keep' is now set to: %d\r\n", limit);
-				}
-				else if (!str_cmp(lim_arg, "none")) {
-					EMPIRE_ATTRIBUTE(emp, EATT_DEFAULT_KEEP) = 0;
-					msg_to_char(ch, "Default 'keep' is now set to: none\r\n");
-				}
-				else {
-					msg_to_char(ch, "Invalid default 'keep' value '%s'.\r\n", lim_arg);
-				}
-			}
-			
-			EMPIRE_NEEDS_SAVE(emp) = TRUE;
-			return;	// no further work for 'default'
-		}
-		else if (!strn_cmp(argument, "all ", 4)) {
-			limit = UNLIMITED;
-			half_chop(argument, lim_arg, temp);	// strip off the "all"
-			strcpy(argument, temp);
-		}
-		else if (isdigit(*argument)) {
-			half_chop(argument, lim_arg, temp);	// find a number
-			strcpy(argument, temp);
-			limit = atoi(lim_arg);
-			if (limit < 0) {
-				msg_to_char(ch, "Invalid number to keep.\r\n");
-				return;
-			}
-		}
-		
-		// now ensure there's (still) an argument
-		if (!*argument) {
-			msg_to_char(ch, "Keep (or unkeep) which stored item?\r\n");
-			return;
-		}
-		
-		// sort to ensure predictable order
-		sort_einv_for_empire(emp, EINV_SORT_AMOUNT);
-		
-		found = FALSE;
-		HASH_ITER(hh, eisle->store, store, next_store) {
-			if (!(proto = store->proto)) {
-				continue;
-			}
-			if (!multi_isname(argument, GET_OBJ_KEYWORDS(proto))) {
-				continue;
-			}
-			
-			found = TRUE;
-			if (limit == UNLIMITED || limit > 0) {
-				store->keep = limit;
-			}
-			else {	// toggle off/all
-				store->keep = store->keep ? 0 : UNLIMITED;
-			}
-			msg_to_char(ch, "Your workforce will %s keep %s of its '%s' on this island.\r\n", store->keep ? "now" : "no longer", limit ? lim_arg : (store->keep ? "all" : "any"), skip_filler(GET_OBJ_SHORT_DESC(proto)));
-			
-			EMPIRE_NEEDS_STORAGE_SAVE(emp) = TRUE;
-			break;
-		}
-		
-		if (!found) {
-			msg_to_char(ch, "You have nothing by that name stored on this island.\r\n");
-		}
+		do_workforce_keep(ch, emp, argument);
 	}
 	else if (!str_cmp(arg, "lim") || !str_cmp(arg, "limit")) {
 		do_workforce_limit(ch, emp, argument);
