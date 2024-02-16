@@ -277,6 +277,10 @@ I Dream of Weirdwood in the Desert Sand~
 10,000 empyreal magewood. Grow, chant, and tend your weirdwood forest to become
 the greatest producer of magewood the world has ever seen and achieve renown
 to last a thousand years.
+   To get an enchanted oasis, plant a weirdwood forest next to any oasis, claim
+the oasis, and let the weirdwood grow. When it spreads to the oasis, let it
+grow on the oasis until it becomes shady. And be sure to check the enchanted
+oasis from time to time -- there's no telling who will show up there.
 ~
 9 4 0 50 0
 K 7 50
