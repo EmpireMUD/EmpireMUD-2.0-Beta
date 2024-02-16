@@ -79,7 +79,7 @@ There is a wooden chair here.~
 You can sit on the chair.
 ~
 ~
-fghlnv 19 1 0 0 0 0 0 0 0 -1 0
+fghlnvO 19 1 0 0 0 0 0 0 0 -1 0
 P
 2
 S
@@ -90,7 +90,7 @@ There is a wooden bench here.~
 You can sit on the bench.
 ~
 ~
-fhlnvE 19 1 0 0 0 0 0 0 0 -1 0
+fhlnvEO 19 1 0 0 0 0 0 0 0 -1 0
 P
 2
 S
@@ -101,7 +101,7 @@ There is a long table here.~
 Tables are merely for decoration.
 ~
 ~
-hlnv 19 1 0 0 0 0 0 0 0 -1 0
+hlnvO 19 1 0 0 0 0 0 0 0 -1 0
 P
 2
 S
@@ -112,7 +112,7 @@ There is a wooden stool here.~
 You can sit on the stool.
 ~
 ~
-fhlnv 19 1 0 0 0 0 0 0 0 -1 0
+fhlnvO 19 1 0 0 0 0 0 0 0 -1 0
 P
 2
 S
@@ -126,7 +126,7 @@ Type 'check beehive' to see how much honeycomb is available.
 Type 'harvest beehive' to retrieve honeycomb.
 ~
 ~
-hln 19 2 0 0 0 0 0 0 0 -1 0
+hlnO 19 2 0 0 0 0 0 0 0 -1 0
 P
 2
 R
@@ -141,7 +141,7 @@ There is a throne at the head of the room.~
 You can sit on the throne.
 ~
 ~
-fhlnv 19 1 0 0 0 0 0 0 0 -1 0
+fhlnvO 19 1 0 0 0 0 0 0 0 -1 0
 P
 2
 S

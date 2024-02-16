@@ -504,7 +504,7 @@ can have one minipet out at a time; type 'minipets' to list, manage, and summon
 one of your minipets. This box gives you special reward minipets in a specific
 order and will never give you duplicates.
 ~
-3 0 a 0 0 2
+3 p a 0 0 3
 0 0 0
 0 0
 T 9999
