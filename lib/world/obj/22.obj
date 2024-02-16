@@ -340,11 +340,23 @@ A metal pole is lying here.~
    This heavy metal pole could be used to hole up a tent or create a handle, or
 lots of other things.
 ~
-1 0 an 0 0 6
+1 0 an 0 0 7
 0 2 5
 2 0
 C
 1 1
+M
+0
+You put a pole in place.~
+M
+1
+$n puts a pole in place.~
+M
+6
+You put a pole in place on $V.~
+M
+7
+$n puts a pole in place on $V.~
 O+ 1 6035
 R
 4 5121 0

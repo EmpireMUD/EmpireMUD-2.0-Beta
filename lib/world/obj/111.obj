@@ -627,7 +627,7 @@ grain. There is a small rune in the middle of the upturned face, and a
 different image branded into each of the four other visible sides: a mill, a
 garden, a stable, and an estate.
 ~
-3 jB 0 0 0 3
+3 jB 0 0 0 4
 0 0 0
 0 0
 C
@@ -646,6 +646,7 @@ T 11131
 T 11132
 T 11133
 T 11134
+T 11144
 S
 #11141
 box hex openhexbox~

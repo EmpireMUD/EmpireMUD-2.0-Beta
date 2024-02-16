@@ -952,9 +952,11 @@ Some seeds are scattered on the ground.~
    You can't tell exactly what kind of seeds these are, but they taste toxic so
 you certainly can't eat them. You could plant them, though.
 ~
-3 b a 0 0 7
+3 b a 0 0 8
 0 4 0
 0 1152
+R
+4 5210 0
 S
 #3062
 seeds handful~

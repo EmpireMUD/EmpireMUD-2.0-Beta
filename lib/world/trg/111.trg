@@ -1041,6 +1041,35 @@ Mill Manor: Delayed despawn~
 ~
 %adventurecomplete%
 ~
+#11144
+Mill Manor: Locked hex box interactions~
+1 c 4
+put get open~
+* Script improves the response to get, put, and open commands on the locked hex box
+return 0
+if !%arg%
+  halt
+end
+* detect last arg (which should be me)
+while %arg%
+  set last_arg %arg.car%
+  set arg %arg.cdr%
+done
+if !%last_arg% || %actor.obj_target(%last_arg%)% != %self%
+  halt
+end
+* ok, messaging:
+if open /= %cmd%
+  %send% %actor% You can't figure out how to open it.
+  return 1
+elseif put /= %cmd%
+  %send% %actor% The hex box is closed.
+  return 1
+elseif get /= %cmd%
+  %send% %actor% You can't get anything from it while it's closed.
+  return 1
+end
+~
 #11150
 Mill Manor: Difficulty selector~
 1 c 4

@@ -287,12 +287,24 @@ Some sticks and leaves are piled here.~
    It's a small pile of plant debris. It might be useful for crafting or
 building.
 ~
-3 l a 0 0 6
+3 l a 0 0 7
 0 0 0
 0 0
 C
 1 1
 I 11 184 100.00 1  # LIGHT: torch
+M
+0
+You place $p on the building.~
+M
+1
+$n places $p on the building.~
+M
+6
+You place $p on $V.~
+M
+7
+You place $p on $V.~
 O+ 1 6423
 R
 4 5118 0
@@ -558,12 +570,24 @@ Some thorny branches are piled here.~
    It's a small pile of plant debris. It might be useful for crafting or
 building.
 ~
-3 l a 0 0 6
+3 l a 0 0 7
 0 0 0
 0 0
 C
 1 1
 I 11 184 100.00 1  # LIGHT: torch
+M
+0
+You place $p on the building.~
+M
+1
+$n places $p on the building.~
+M
+6
+You place $p on $V.~
+M
+7
+You place $p on $V.~
 O+ 1 6422
 R
 4 5118 0
@@ -575,11 +599,23 @@ A tangle of vines is piled on the ground.~
    This tangle of vines must have come from an incredible jungle. It's a small
 pile of plant debris. It might be useful for crafting or building.
 ~
-3 l a 0 0 8
+3 l a 0 0 9
 0 0 0
 0 0
 C
 1 1
+M
+0
+You lash some vines onto the structure.~
+M
+1
+$n lashes some vines onto the structure.~
+M
+6
+You lash some vines onto $V.~
+M
+7
+$n lashes some vines onto $V.~
 O+ 1 6424
 R
 4 5118 0
@@ -766,12 +802,24 @@ A wooden pole is lying on the ground.~
    The pole is long and straight. It could be used to build a simple hut,
 fashioned into an arrow, or used for all manner of other buildings and crafts.
 ~
-1 l an 0 0 6
+1 l an 0 0 7
 0 2 5
 0 0
 C
 1 1
 I 11 184 100.00 1  # LIGHT: torch
+M
+0
+You put a pole in place.~
+M
+1
+$n puts a pole in place.~
+M
+6
+You put a pole in place on $V.~
+M
+7
+$n puts a pole in place on $V.~
 O+ 1 6035
 R
 4 5118 0

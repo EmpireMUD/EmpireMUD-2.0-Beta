@@ -201,11 +201,23 @@ a pole~
 A pole is stuck into the ground.~
 This wooden pole is long and straight, perfect for crafting or building.
 ~
-3 0 a 0 0 7
+3 0 a 0 0 8
 0 0 0
 0 0
 C
 1 1
+M
+0
+You put a pole in place.~
+M
+1
+$n puts a pole in place.~
+M
+6
+You put a pole in place on $V.~
+M
+7
+$n puts a pole in place on $V.~
 O+ 1 6035
 R
 4 5118 0

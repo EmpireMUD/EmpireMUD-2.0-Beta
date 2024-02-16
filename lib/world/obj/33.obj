@@ -829,12 +829,24 @@ A bale of straw sits on the ground.~
    Straw is the byproduct of growing grains like barley, oats, rice, rye, and
 wheat. It has been used since ancient times in crafting and construction.
 ~
-3 l a 0 0 2
+3 l a 0 0 3
 0 0 0
 0 0
 C
 1 1
 I 11 1002 100.00 1  # LIGHT: roaring fire
+M
+0
+You place some straw on the building.~
+M
+1
+$n places some straw on the building.~
+M
+6
+You put some straw on $V.~
+M
+7
+$n puts some straw on $V.~
 O+ 1 6422
 R
 4 5118 0
