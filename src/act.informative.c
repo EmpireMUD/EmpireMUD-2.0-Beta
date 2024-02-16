@@ -3330,13 +3330,13 @@ ACMD(do_help) {
 	if (!ch->desc)
 		return;
 
-	skip_spaces(&argument);
+	argument = trim(argument);
 	
 	// optional -m arg
 	if (!strn_cmp(argument, "-m ", 3)) {
 		level = LVL_MORTAL;
 		argument += 3;
-		skip_spaces(&argument);
+		argument = trim(argument);
 	}
 	
 	// no-arg: basic help screen
