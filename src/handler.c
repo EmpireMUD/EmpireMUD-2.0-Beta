@@ -1483,6 +1483,7 @@ bool room_affected_by_spell_from_caster(room_data *room, any_vnum type, char_dat
 */
 void schedule_affect_expire(char_data *ch, struct affected_type *af) {
 	struct affect_expire_event_data *expire_data;
+	long when;
 	
 	// check for and remove old event
 	if (af && af->expire_event) {
@@ -1509,7 +1510,12 @@ void schedule_affect_expire(char_data *ch, struct affected_type *af) {
 		expire_data->character = ch;
 		expire_data->affect = af;
 		
-		af->expire_event = dg_event_create(affect_expire_event, (void*)expire_data, (af->expire_time - time(0)) RL_SEC);
+		// safe math then ensure it's a valid time in the future
+		when = -time(0);
+		SAFE_ADD(when, af->expire_time, INT_MIN, INT_MAX, FALSE);
+		when = MAX(1, when);
+		
+		af->expire_event = dg_event_create(affect_expire_event, (void*)expire_data, when RL_SEC);
 	}
 }
 

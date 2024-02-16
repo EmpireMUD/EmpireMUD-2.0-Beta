@@ -2725,12 +2725,17 @@ void write_player_primary_data_to_file(FILE *fl, char_data *ch) {
 		}
 		else if (AFFECTS_CONVERTED(ch)) {
 			timer = af->expire_time - time(0);
+			timer = MAX(timer, 0);
 		}
 		else {
 			// still in seconds
 			timer = af->expire_time;
 		}
-		fprintf(fl, "Affect: %d %d %ld %d %d %s\n", af->type, af->cast_by, timer, af->modifier, af->location, bitv_to_alpha(af->bitvector));
+		
+		// only write affects with time left
+		if (timer == UNLIMITED || timer > 0) {
+			fprintf(fl, "Affect: %d %d %ld %d %d %s\n", af->type, af->cast_by, timer, af->modifier, af->location, bitv_to_alpha(af->bitvector));
+		}
 	}
 	fprintf(fl, "Affect Flags: %s\n", bitv_to_alpha(AFF_FLAGS(ch)));
 	if (GET_APPARENT_AGE(ch)) {
@@ -4142,6 +4147,7 @@ void clear_player(char_data *ch) {
 void convert_and_schedule_player_affects(char_data *ch) {
 	struct affected_type *af;
 	struct over_time_effect_type *dot;
+	time_t now = time(0);
 	
 	// convert timers first
 	if (!IS_NPC(ch) && !AFFECTS_CONVERTED(ch)) {
@@ -4149,7 +4155,7 @@ void convert_and_schedule_player_affects(char_data *ch) {
 		LL_FOREACH(ch->affected, af) {
 			if (af->expire_time != UNLIMITED) {
 				// convert from seconds
-				af->expire_time += time(0);
+				SAFE_ADD(af->expire_time, now, 0, INT_MAX, FALSE);
 			}
 		}
 	}
