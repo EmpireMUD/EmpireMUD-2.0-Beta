@@ -3422,6 +3422,107 @@ int get_view_height(char_data *ch, room_data *from_room) {
 
 
 /**
+* Shows blood starvation level to the character, e.g. for the 'affects'
+* command.
+*
+* @param char_data *ch The player who will be told how blood-starved they are (or may show nothing at all).
+* @return char* A string like "starving" or "sated", or an empty string.
+*/
+char *how_blood_starved(char_data *ch) {
+	if (!ch || IS_NPC(ch) || !IS_VAMPIRE(ch)) {
+		return "";	// no work
+	}
+	else if (IS_BLOOD_STARVED(ch)) {
+		return "starving";
+	}
+	else if (GET_BLOOD(ch) <= config_get_int("blood_starvation_level") + (GET_MAX_BLOOD(ch) / 20)) {
+		return "craving blood";
+	}
+	else if (GET_COND(ch, FULL) < REAL_UPDATES_PER_MUD_HOUR) {
+		return "sated";
+	}
+	else {
+		return "";	// nothing to report
+	}
+}
+
+
+/**
+* Shows drunkenness level to the character, e.g. for the 'affects' command.
+* May show nothing at all.
+*
+* @param char_data *ch The player who will be told how drunk they are (or may show nothing at all).
+* @return char* A string like "drunk", or an empty string.
+*/
+char *how_drunk(char_data *ch) {
+	if (!ch || IS_NPC(ch)) {
+		return "";	// no work
+	}
+	else if (IS_DRUNK(ch)) {
+		return "drunk";
+	}
+	else if (GET_COND(ch, DRUNK) >= (REAL_UPDATES_PER_MUD_HOUR * 12)) {
+		return "getting drunk";
+	}
+	else {
+		return "";	// no report when sober
+	}
+}
+
+
+/**
+* Shows hunger level to the character, e.g. for the 'eat' or 'affects'
+* commands.
+*
+* @param char_data *ch The player who will be told how hungry they are (or may show nothing at all).
+* @return char* A string like "hungry" or "full", or an empty string.
+*/
+char *how_hungry(char_data *ch) {
+	if (!ch || IS_NPC(ch) || HAS_BONUS_TRAIT(ch, BONUS_NO_HUNGER) || has_player_tech(ch, PTECH_NO_HUNGER)) {
+		return "";	// no work
+	}
+	else if (IS_HUNGRY(ch)) {
+		return "hungry";
+	}
+	else if (GET_COND(ch, FULL) >= (REAL_UPDATES_PER_MUD_HOUR * 18)) {
+		return "getting hungry";
+	}
+	else if (GET_COND(ch, FULL) < REAL_UPDATES_PER_MUD_HOUR) {
+		return "full";
+	}
+	else {
+		return "";	// nothing to report
+	}
+}
+
+
+/**
+* Shows thirst level to the character, e.g. for the 'drink' or 'affects'
+* commands. May show nothing at all.
+*
+* @param char_data *ch The player who will be told how thirsty they are (or may show nothing at all).
+* @return char* A string like "thirsty" or "getting thirsty", or an empty string.
+*/
+char *how_thirsty(char_data *ch) {
+	if (!ch || IS_NPC(ch) || HAS_BONUS_TRAIT(ch, BONUS_NO_THIRST) || has_player_tech(ch, PTECH_NO_THIRST)) {
+		return "";	// no work
+	}
+	else if (IS_THIRSTY(ch)) {
+		return "thirsty";
+	}
+	else if (GET_COND(ch, THIRST) >= (REAL_UPDATES_PER_MUD_HOUR * 18)) {
+		return "getting thirsty";
+	}
+	else if (GET_COND(ch, THIRST) < REAL_UPDATES_PER_MUD_HOUR) {
+		return "not thirsty";
+	}
+	else {
+		return "";	// nothing to report
+	}
+}
+
+
+/**
 * Determines if a character is missing a tool that's required for all
 * interactions of a given type in a list.
 *

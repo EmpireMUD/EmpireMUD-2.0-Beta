@@ -901,6 +901,7 @@ void display_attributes(char_data *ch, char_data *to) {
 */
 void display_score_to_char(char_data *ch, char_data *to) {
 	char lbuf[MAX_STRING_LENGTH], lbuf2[MAX_STRING_LENGTH], lbuf3[MAX_STRING_LENGTH];
+	char *str;
 	struct player_skill_data *skdata, *next_skill;
 	int i, j, count, pts, cols, val, temperature;
 	empire_data *emp;
@@ -959,17 +960,17 @@ void display_score_to_char(char_data *ch, char_data *to) {
 	
 	// row 2 col 1: conditions
 	*lbuf = '\0';
-	if (IS_HUNGRY(ch)) {
-		sprintf(lbuf + strlen(lbuf), "%s&yhungry&0", (strlen(lbuf) > 0 ? ", " : ""));
+	if (*(str = how_hungry(ch))) {
+		sprintf(lbuf + strlen(lbuf), "%s&y%s&0", (strlen(lbuf) > 0 ? ", " : ""), str);
 	}
-	if (IS_THIRSTY(ch)) {
-		sprintf(lbuf + strlen(lbuf), "%s&cthirsty&0", (strlen(lbuf) > 0 ? ", " : ""));
+	if (*(str = how_thirsty(ch))) {
+		sprintf(lbuf + strlen(lbuf), "%s&c%s&0", (strlen(lbuf) > 0 ? ", " : ""), str);
 	}
-	if (IS_DRUNK(ch)) {
-		sprintf(lbuf + strlen(lbuf), "%s&mdrunk&0", (strlen(lbuf) > 0 ? ", " : ""));
+	if (*(str = how_drunk(ch))) {
+		sprintf(lbuf + strlen(lbuf), "%s&m%s&0", (strlen(lbuf) > 0 ? ", " : ""), str);
 	}
-	if (IS_BLOOD_STARVED(ch)) {
-		sprintf(lbuf + strlen(lbuf), "%s&rstarving&0", (strlen(lbuf) > 0 ? ", " : ""));
+	if (*(str = how_blood_starved(ch))) {
+		sprintf(lbuf + strlen(lbuf), "%s&r%s&0", (strlen(lbuf) > 0 ? ", " : ""), str);
 	}
 	temperature = get_relative_temperature(ch);
 	if (temperature <= -1 * config_get_int("temperature_discomfort")) {
@@ -2623,6 +2624,7 @@ ACMD(do_adventure) {
 
 
 ACMD(do_affects) {
+	char *str;
 	char_data *vict;
 	int i;
 	
@@ -2654,17 +2656,17 @@ ACMD(do_affects) {
 	/* Conditions */
 	// This reports conditions all on one line -- end each one with a comma and a space
 	sprintf(buf1, "   You are ");
-	if (IS_HUNGRY(ch)) {
-		strcat(buf1, "hungry, ");
+	if (*(str = how_hungry(ch))) {
+		sprintf(buf1 + strlen(buf1), "%s, ", str);
 	}
-	if (IS_THIRSTY(ch)) {
-		strcat(buf1, "thirsty, ");
+	if (*(str = how_thirsty(ch))) {
+		sprintf(buf1 + strlen(buf1), "%s, ", str);
 	}
-	if (IS_DRUNK(ch)) {
-		strcat(buf1, "inebriated, ");
+	if (*(str = how_drunk(ch))) {
+		sprintf(buf1 + strlen(buf1), "%s, ", str);
 	}
-	if (IS_BLOOD_STARVED(ch)) {
-		strcat(buf1, "starving, ");
+	if (*(str = how_blood_starved(ch))) {
+		sprintf(buf1 + strlen(buf1), "%s, ", str);
 	}
 
 	if (strlen(buf1) > 13) {	/* We have a condition */
