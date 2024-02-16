@@ -1432,7 +1432,7 @@ char_data *read_player_from_file(FILE *fl, char *name, bool normal, char_data *c
 					af->bitvector = asciiflag_conv(str_in);
 					
 					// store for later
-					LL_APPEND(af_list, af);
+					LL_PREPEND(af_list, af);
 				}
 				else if (!strn_cmp(line, "Affect Flags: ", 14)) {
 					AFF_FLAGS(ch) = asciiflag_conv(line + 14);
