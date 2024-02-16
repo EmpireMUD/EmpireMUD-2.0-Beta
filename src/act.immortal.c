@@ -3533,7 +3533,7 @@ void do_stat_character(char_data *ch, char_data *k) {
 			if (aff->expire_time == UNLIMITED) {
 				strcpy(lbuf, "infinite");
 			}
-			else if (AFFECTS_CONVERTED(ch)) {
+			else if (AFFECTS_CONVERTED(k)) {
 				duration = aff->expire_time - time(0);
 				duration = MAX(duration, 0);
 				strcpy(lbuf, colon_time(duration, FALSE, NULL));
