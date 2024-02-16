@@ -244,7 +244,7 @@ bool can_enter_portal(char_data *ch, obj_data *portal, bool allow_infiltrate, bo
 			act("$V can't be led through a portal.", FALSE, ch, NULL, GET_LEADING_VEHICLE(ch), TO_CHAR | ACT_VEH_VICT);
 			return FALSE;
 		}
-		if (GET_ROOM_VEHICLE(to_room) && (VEH_FLAGGED(GET_LEADING_VEHICLE(ch), VEH_NO_LOAD_ONTO_VEHICLE) || !VEH_FLAGGED(GET_ROOM_VEHICLE(to_room), VEH_CARRY_VEHICLES))) {
+		if (GET_ROOM_VEHICLE(to_room) && (VEH_FLAGGED(GET_LEADING_VEHICLE(ch), VEH_NO_LOAD_ONTO_VEHICLE) || (!VEH_FLAGGED(GET_ROOM_VEHICLE(to_room), VEH_CARRY_VEHICLES) && !VEH_FLAGGED(GET_LEADING_VEHICLE(ch), VEH_TINY)))) {
 			act("$V can't be led into $v.", FALSE, ch, GET_ROOM_VEHICLE(to_room), GET_LEADING_VEHICLE(ch), TO_CHAR | ACT_VEH_OBJ | ACT_VEH_VICT);
 			return FALSE;
 		}
@@ -1326,8 +1326,8 @@ bool validate_vehicle_move(char_data *ch, vehicle_data *veh, room_data *to_room,
 	// closed building checks
 	if (!IS_ADVENTURE_ROOM(IN_ROOM(veh)) && IS_ANY_BUILDING(to_room) && ROOM_IS_CLOSED(to_room)) {
 		// vehicle allows a vehicle in if flagged for it; buildings require ALLOW-MOUNTS instead
-		veh_allows_veh = (GET_ROOM_VEHICLE(to_room) ? VEH_FLAGGED(GET_ROOM_VEHICLE(to_room), VEH_CARRY_VEHICLES) : BLD_ALLOWS_MOUNTS(to_room)) ? TRUE : FALSE;
-		veh_allows_veh_home = (GET_ROOM_VEHICLE(HOME_ROOM(to_room)) ? VEH_FLAGGED(GET_ROOM_VEHICLE(HOME_ROOM(to_room)), VEH_CARRY_VEHICLES) : BLD_ALLOWS_MOUNTS(HOME_ROOM(to_room))) ? TRUE : FALSE;
+		veh_allows_veh = (VEH_FLAGGED(veh, VEH_TINY) || (GET_ROOM_VEHICLE(to_room) ? VEH_FLAGGED(GET_ROOM_VEHICLE(to_room), VEH_CARRY_VEHICLES) : BLD_ALLOWS_MOUNTS(to_room))) ? TRUE : FALSE;
+		veh_allows_veh_home = (VEH_FLAGGED(veh, VEH_TINY) || (GET_ROOM_VEHICLE(HOME_ROOM(to_room)) ? VEH_FLAGGED(GET_ROOM_VEHICLE(HOME_ROOM(to_room)), VEH_CARRY_VEHICLES) : BLD_ALLOWS_MOUNTS(HOME_ROOM(to_room)))) ? TRUE : FALSE;
 		// based on where we're going, compares veh's own !BUILDING or !LOAD-IN-VEHICLE flags
 		veh_can_go_in = ((GET_ROOM_VEHICLE(to_room) && !VEH_FLAGGED(GET_ROOM_VEHICLE(to_room), VEH_BUILDING)) ? !VEH_FLAGGED(veh, VEH_NO_LOAD_ONTO_VEHICLE) : !VEH_FLAGGED(veh, VEH_NO_BUILDING)) ? TRUE : FALSE;
 		
@@ -1346,7 +1346,7 @@ bool validate_vehicle_move(char_data *ch, vehicle_data *veh, room_data *to_room,
 			return FALSE;
 		}
 		// prevent moving deeper into a building if part of it does not allow vehicles and you're in the entrance room
-		if (IS_MAP_BUILDING(IN_ROOM(veh)) && (VEH_FLAGGED(veh, VEH_NO_BUILDING) || !BLD_ALLOWS_MOUNTS(to_room))) {
+		if (IS_MAP_BUILDING(IN_ROOM(veh)) && (VEH_FLAGGED(veh, VEH_NO_BUILDING) || (!BLD_ALLOWS_MOUNTS(to_room) && !VEH_FLAGGED(veh, VEH_TINY)))) {
 			if (ch) {
 				act("$V can't go in there.", FALSE, ch, NULL, veh, TO_CHAR | ACT_VEH_VICT);
 			}

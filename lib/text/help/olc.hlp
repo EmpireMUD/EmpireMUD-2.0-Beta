@@ -10536,6 +10536,7 @@ Available flags:
  OBSCURE-VISION - blocks tiles behind it on the map
  *INSTANCE - vehicle has an instance attached
  *TEMPORARY - vehicle will be removed when the instance ends
+ TINY - like furniture, can go be made/moved places vehicles normally can't go
 
 ** The DRIVING/SAILING/FLYING flags each enable specific commands for moving
 the vehicle. If it has more than one of these, each command will work. Usually

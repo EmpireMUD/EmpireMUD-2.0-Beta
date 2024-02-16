@@ -5458,6 +5458,7 @@ const char *vehicle_flags[] = {
 	"OBSCURE-VISION",
 	"*INSTANCE",
 	"*TEMPORARY",
+	"TINY",	// 40
 	"\n"
 };
 
@@ -5504,6 +5505,7 @@ const char *identify_vehicle_flags[] = {
 	"",	// OBSCURE-VISION
 	"",	// *INSTANCE
 	"",	// *TEMPORARY
+	"",	// TINY
 	"\n"
 };
 

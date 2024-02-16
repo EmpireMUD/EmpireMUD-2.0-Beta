@@ -3778,8 +3778,8 @@ INTERACTION_FUNC(ruin_building_to_vehicle_interaction) {
 	// move contents
 	if ((inside = get_vehicle_interior(ruin))) {
 		// move applicable vehicles
-		if (VEH_FLAGGED(ruin, VEH_CARRY_VEHICLES)) {
-			DL_FOREACH_SAFE2(ROOM_VEHICLES(inter_room), veh_iter, next_veh, next_in_room) {
+		DL_FOREACH_SAFE2(ROOM_VEHICLES(inter_room), veh_iter, next_veh, next_in_room) {		
+			if (VEH_FLAGGED(ruin, VEH_CARRY_VEHICLES) || VEH_FLAGGED(veh_iter, VEH_TINY)) {
 				if (veh_iter != ruin && !VEH_FLAGGED(veh_iter, VEH_NO_LOAD_ONTO_VEHICLE)) {
 					vehicle_from_room(veh_iter);
 					vehicle_to_room(veh_iter, inside);

@@ -196,7 +196,7 @@ bool check_build_location_and_dir(char_data *ch, room_data *room, craft_data *ty
 		}
 		return FALSE;
 	}
-	if (!is_upgrade && make_veh && GET_ROOM_VEHICLE(room) && (VEH_FLAGGED(make_veh, VEH_NO_LOAD_ONTO_VEHICLE) || !VEH_FLAGGED(GET_ROOM_VEHICLE(room), VEH_CARRY_VEHICLES))) {
+	if (!is_upgrade && make_veh && GET_ROOM_VEHICLE(room) && (VEH_FLAGGED(make_veh, VEH_NO_LOAD_ONTO_VEHICLE) || (!VEH_FLAGGED(GET_ROOM_VEHICLE(room), VEH_CARRY_VEHICLES) && !VEH_FLAGGED(make_veh, VEH_TINY)))) {
 		if (ch) {
 			msg_to_char(ch, "You can't %s that in here.\r\n", command);
 		}

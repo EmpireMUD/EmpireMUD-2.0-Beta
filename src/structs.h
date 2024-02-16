@@ -2793,6 +2793,7 @@ typedef enum {
 #define VEH_OBSCURE_VISION  BIT(37)	// L. blocks tiles behind it on the map
 #define VEH_HAS_INSTANCE  BIT(38)	// M. instance is attached to vehicle
 #define VEH_TEMPORARY  BIT(39)	// N. vehicle will be removed when instance ends
+#define VEH_TINY  BIT(40)	// O. vehicle is small enough to ignore no-vehicle rooms (e.g. furniture)
 
 
 // VEH_CUSTOM_x: custom message types
