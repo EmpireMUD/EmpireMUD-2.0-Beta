@@ -960,16 +960,16 @@ void display_score_to_char(char_data *ch, char_data *to) {
 	
 	// row 2 col 1: conditions
 	*lbuf = '\0';
-	if (*(str = how_hungry(ch))) {
+	if ((str = how_hungry(ch))) {
 		sprintf(lbuf + strlen(lbuf), "%s&y%s&0", (strlen(lbuf) > 0 ? ", " : ""), str);
 	}
-	if (*(str = how_thirsty(ch))) {
+	if ((str = how_thirsty(ch))) {
 		sprintf(lbuf + strlen(lbuf), "%s&c%s&0", (strlen(lbuf) > 0 ? ", " : ""), str);
 	}
-	if (*(str = how_drunk(ch))) {
+	if ((str = how_drunk(ch))) {
 		sprintf(lbuf + strlen(lbuf), "%s&m%s&0", (strlen(lbuf) > 0 ? ", " : ""), str);
 	}
-	if (*(str = how_blood_starved(ch))) {
+	if ((str = how_blood_starved(ch))) {
 		sprintf(lbuf + strlen(lbuf), "%s&r%s&0", (strlen(lbuf) > 0 ? ", " : ""), str);
 	}
 	temperature = get_relative_temperature(ch);
@@ -2656,16 +2656,16 @@ ACMD(do_affects) {
 	/* Conditions */
 	// This reports conditions all on one line -- end each one with a comma and a space
 	sprintf(buf1, "   You are ");
-	if (*(str = how_hungry(ch))) {
+	if ((str = how_hungry(ch))) {
 		sprintf(buf1 + strlen(buf1), "%s, ", str);
 	}
-	if (*(str = how_thirsty(ch))) {
+	if ((str = how_thirsty(ch))) {
 		sprintf(buf1 + strlen(buf1), "%s, ", str);
 	}
-	if (*(str = how_drunk(ch))) {
+	if ((str = how_drunk(ch))) {
 		sprintf(buf1 + strlen(buf1), "%s, ", str);
 	}
-	if (*(str = how_blood_starved(ch))) {
+	if ((str = how_blood_starved(ch))) {
 		sprintf(buf1 + strlen(buf1), "%s, ", str);
 	}
 

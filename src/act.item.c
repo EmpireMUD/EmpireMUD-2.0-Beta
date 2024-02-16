@@ -5438,7 +5438,8 @@ ACMD(do_draw) {
 
 ACMD(do_drink) {
 	struct string_hash *str_iter, *next_str, *str_hash = NULL;
-	char buf[MAX_STRING_LENGTH], line[256];
+	char buf[MAX_STRING_LENGTH], line[256], part[256];
+	char *thirst_str;
 	obj_data *obj = NULL, *check_list[2];
 	int amount, i, liquid;
 	double thirst_amt, hunger_amt;
@@ -5493,8 +5494,16 @@ ACMD(do_drink) {
 			}
 		
 			if (str_hash) {
-				// show plantables
-				size = snprintf(buf, sizeof(buf), "What do you want to drink from:\r\n");
+				// show thirst?
+				if ((thirst_str = how_thirsty(ch))) {
+					snprintf(part, sizeof(part), " (you are %s)", thirst_str);
+				}
+				else {
+					*part = '\0';
+				}
+				
+				// show drinkables
+				size = snprintf(buf, sizeof(buf), "What do you want to drink from%s:\r\n", part);
 				HASH_ITER(hh, str_hash, str_iter, next_str) {
 					if (str_iter->count == 1) {
 						snprintf(line, sizeof(line), " %s\r\n", str_iter->str);
@@ -5876,6 +5885,7 @@ ACMD(do_eat) {
 	struct string_hash *str_iter, *next_str, *str_hash = NULL;
 	bool extract = FALSE, will_buff = FALSE;
 	char buf[MAX_STRING_LENGTH], some_part[256], line[256], *argptr = arg;
+	char *hungry_str;
 	struct affected_type *af;
 	struct obj_apply *apply;
 	obj_data *food, *check_list[2], *obj;
@@ -5905,8 +5915,16 @@ ACMD(do_eat) {
 		}
 		
 		if (str_hash) {
-			// show plantables
-			size = snprintf(buf, sizeof(buf), "What do you want to eat:\r\n");
+			// show hunger?
+			if ((hungry_str = how_hungry(ch))) {
+				snprintf(some_part, sizeof(some_part), " (you are %s)", hungry_str);
+			}
+			else {
+				*some_part = '\0';
+			}
+			
+			// show eatables
+			size = snprintf(buf, sizeof(buf), "What do you want to eat%s:\r\n", some_part);
 			HASH_ITER(hh, str_hash, str_iter, next_str) {
 				if (str_iter->count == 1) {
 					snprintf(line, sizeof(line), " %s\r\n", str_iter->str);

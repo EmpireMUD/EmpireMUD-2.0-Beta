@@ -3426,11 +3426,11 @@ int get_view_height(char_data *ch, room_data *from_room) {
 * command.
 *
 * @param char_data *ch The player who will be told how blood-starved they are (or may show nothing at all).
-* @return char* A string like "starving" or "sated", or an empty string.
+* @return char* Either a string like "starving" or "sated", or NULL if there's nothing to show.
 */
 char *how_blood_starved(char_data *ch) {
 	if (!ch || IS_NPC(ch) || !IS_VAMPIRE(ch)) {
-		return "";	// no work
+		return NULL;	// no work
 	}
 	else if (IS_BLOOD_STARVED(ch)) {
 		return "starving";
@@ -3442,7 +3442,7 @@ char *how_blood_starved(char_data *ch) {
 		return "sated";
 	}
 	else {
-		return "";	// nothing to report
+		return NULL;	// nothing to report
 	}
 }
 
@@ -3452,11 +3452,11 @@ char *how_blood_starved(char_data *ch) {
 * May show nothing at all.
 *
 * @param char_data *ch The player who will be told how drunk they are (or may show nothing at all).
-* @return char* A string like "drunk", or an empty string.
+* @return char* Either a string like "drunk", or NULL if there's nothing to show.
 */
 char *how_drunk(char_data *ch) {
 	if (!ch || IS_NPC(ch)) {
-		return "";	// no work
+		return NULL;	// no work
 	}
 	else if (IS_DRUNK(ch)) {
 		return "drunk";
@@ -3465,7 +3465,7 @@ char *how_drunk(char_data *ch) {
 		return "getting drunk";
 	}
 	else {
-		return "";	// no report when sober
+		return NULL;	// no report when sober
 	}
 }
 
@@ -3475,11 +3475,11 @@ char *how_drunk(char_data *ch) {
 * commands.
 *
 * @param char_data *ch The player who will be told how hungry they are (or may show nothing at all).
-* @return char* A string like "hungry" or "full", or an empty string.
+* @return char* Either astring like "hungry" or "full", or NULL if there's nothing to show.
 */
 char *how_hungry(char_data *ch) {
 	if (!ch || IS_NPC(ch) || HAS_BONUS_TRAIT(ch, BONUS_NO_HUNGER) || has_player_tech(ch, PTECH_NO_HUNGER)) {
-		return "";	// no work
+		return NULL;	// no work
 	}
 	else if (IS_HUNGRY(ch)) {
 		return "hungry";
@@ -3491,7 +3491,7 @@ char *how_hungry(char_data *ch) {
 		return "full";
 	}
 	else {
-		return "";	// nothing to report
+		return NULL;	// nothing to report
 	}
 }
 
@@ -3501,11 +3501,11 @@ char *how_hungry(char_data *ch) {
 * commands. May show nothing at all.
 *
 * @param char_data *ch The player who will be told how thirsty they are (or may show nothing at all).
-* @return char* A string like "thirsty" or "getting thirsty", or an empty string.
+* @return char* Either a string like "thirsty" or "getting thirsty", or NULL if there's nothing to show.
 */
 char *how_thirsty(char_data *ch) {
 	if (!ch || IS_NPC(ch) || HAS_BONUS_TRAIT(ch, BONUS_NO_THIRST) || has_player_tech(ch, PTECH_NO_THIRST)) {
-		return "";	// no work
+		return NULL;	// no work
 	}
 	else if (IS_THIRSTY(ch)) {
 		return "thirsty";
@@ -3517,7 +3517,7 @@ char *how_thirsty(char_data *ch) {
 		return "not thirsty";
 	}
 	else {
-		return "";	// nothing to report
+		return NULL;	// nothing to report
 	}
 }
 
