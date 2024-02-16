@@ -2622,9 +2622,15 @@ ACMD(do_designate) {
 	else if (subcmd == SCMD_DESIGNATE && hasrooms >= maxrooms) {
 		msg_to_char(ch, "There's no more free space.\r\n");
 	}
-	else if (subcmd == SCMD_DESIGNATE && ((dir = parse_direction(ch, arg)) == NO_DIR || !(veh_dirs ? can_designate_dir_vehicle[dir] : can_designate_dir[dir]))) {
+	else if (subcmd == SCMD_DESIGNATE && (dir = parse_direction(ch, arg)) == NO_DIR) {
 		msg_to_char(ch, "Invalid direction.\r\n");
 		msg_to_char(ch, "Usage: %s <room>\r\n", subcmd == SCMD_REDESIGNATE ? "redesignate" : "designate <direction>");
+	}
+	else if (subcmd == SCMD_DESIGNATE && !veh_dirs && !can_designate_dir[dir]) {
+		msg_to_char(ch, "You can't designate anything in that direction here (try a compass direction, up, or down).\r\n");
+	}
+	else if (subcmd == SCMD_DESIGNATE && veh_dirs && !can_designate_dir_vehicle[dir]) {
+		msg_to_char(ch, "You can't designate anything in that direction on a vehicle (try fore, aft, starboard, port, up, or down).\r\n");
 	}
 	else if (!has_permission(ch, PRIV_BUILD, IN_ROOM(ch)) || !can_use_room(ch, IN_ROOM(ch), MEMBERS_ONLY)) {
 		msg_to_char(ch, "You don't have permission to designate rooms here.\r\n");
