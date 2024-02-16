@@ -2159,14 +2159,8 @@ void process_scraping(char_data *ch) {
 	// skilled work
 	GET_ACTION_TIMER(ch) -= 1 + (has_player_tech(ch, PTECH_FAST_WOOD_PROCESSING) ? 1 : 0);
 	
-	// messaging -- to player only
-	if (!PRF_FLAGGED(ch, PRF_NOSPAM)) {
-		msg_to_char(ch, "You scrape at %s...\r\n", get_obj_name_by_proto(GET_ACTION_VNUM(ch, 0)));
-	}
-	
 	// done?
 	if (GET_ACTION_TIMER(ch) <= 0) {
-		
 		// will extract no matter what happens here
 		if ((proto = obj_proto(GET_ACTION_VNUM(ch, 0)))) {
 			act("You finish scraping off $p.", FALSE, ch, proto, NULL, TO_CHAR);
@@ -2191,6 +2185,10 @@ void process_scraping(char_data *ch) {
 			// lather, rinse, rescrape
 			do_scrape(ch, fname(GET_OBJ_KEYWORDS(proto)), 0, 0);
 		}
+	}
+	else if (!PRF_FLAGGED(ch, PRF_NOSPAM)) {
+		// periodic messaging -- to player only
+		msg_to_char(ch, "You scrape at %s...\r\n", get_obj_name_by_proto(GET_ACTION_VNUM(ch, 0)));
 	}
 }
 
