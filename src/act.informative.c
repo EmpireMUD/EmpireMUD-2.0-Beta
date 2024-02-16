@@ -1066,8 +1066,8 @@ void display_score_to_char(char_data *ch, char_data *to) {
 	
 	// affects last
 	if (ch == to) {
-		// show full effects, which is only formatted for the character
-		do_affects(to, "", 0, 0);
+		// show full effects, which is only formatted for the character (subcmd=1 to indicate it's being called from another function)
+		do_affects(to, "", 0, 1);
 	}
 	else {
 		// show summary effects
@@ -2624,6 +2624,7 @@ ACMD(do_adventure) {
 
 
 ACMD(do_affects) {
+	bool limited;
 	char *str;
 	char_data *vict;
 	int i;
@@ -2650,34 +2651,39 @@ ACMD(do_affects) {
 		}
 		return;
 	}
+	
+	// if a subcmd was passed, we remove some of the info
+	limited = (subcmd != 0);
 
 	msg_to_char(ch, "  Affects:\r\n");
 
-	/* Conditions */
-	// This reports conditions all on one line -- end each one with a comma and a space
-	sprintf(buf1, "   You are ");
-	if ((str = how_hungry(ch))) {
-		sprintf(buf1 + strlen(buf1), "%s, ", str);
-	}
-	if ((str = how_thirsty(ch))) {
-		sprintf(buf1 + strlen(buf1), "%s, ", str);
-	}
-	if ((str = how_drunk(ch))) {
-		sprintf(buf1 + strlen(buf1), "%s, ", str);
-	}
-	if ((str = how_blood_starved(ch))) {
-		sprintf(buf1 + strlen(buf1), "%s, ", str);
-	}
+	// Conditions: not shown on limited view because 'score' shows them separately
+	if (!limited) {
+		// This reports conditions all on one line -- end each one with a comma and a space
+		sprintf(buf1, "   You are ");
+		if ((str = how_hungry(ch))) {
+			sprintf(buf1 + strlen(buf1), "%s, ", str);
+		}
+		if ((str = how_thirsty(ch))) {
+			sprintf(buf1 + strlen(buf1), "%s, ", str);
+		}
+		if ((str = how_drunk(ch))) {
+			sprintf(buf1 + strlen(buf1), "%s, ", str);
+		}
+		if ((str = how_blood_starved(ch))) {
+			sprintf(buf1 + strlen(buf1), "%s, ", str);
+		}
 
-	if (strlen(buf1) > 13) {	/* We have a condition */
-		buf1[strlen(buf1)-2] = '\0';	/* This removes the final ", " */
-		for (i = strlen(buf1); i >= 0; i--)
-			if (buf1[i] == ',') {	/* Looking for that last ',' */
-				strcpy(buf2, buf1 + i + 1);
-				sprintf(buf1 + i, " and%s", buf2);
-				break;
-			}
-		msg_to_char(ch, "%s.\r\n", buf1);
+		if (strlen(buf1) > 13) {	/* We have a condition */
+			buf1[strlen(buf1)-2] = '\0';	/* This removes the final ", " */
+			for (i = strlen(buf1); i >= 0; i--)
+				if (buf1[i] == ',') {	/* Looking for that last ',' */
+					strcpy(buf2, buf1 + i + 1);
+					sprintf(buf1 + i, " and%s", buf2);
+					break;
+				}
+			msg_to_char(ch, "%s.\r\n", buf1);
+		}
 	}
 	
 	// mount
