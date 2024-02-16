@@ -3533,10 +3533,14 @@ void do_stat_character(char_data *ch, char_data *k) {
 			if (aff->expire_time == UNLIMITED) {
 				strcpy(lbuf, "infinite");
 			}
-			else {
+			else if (AFFECTS_CONVERTED(ch)) {
 				duration = aff->expire_time - time(0);
 				duration = MAX(duration, 0);
 				strcpy(lbuf, colon_time(duration, FALSE, NULL));
+			}
+			else {
+				// still in seconds
+				strcpy(lbuf, colon_time(aff->expire_time, FALSE, NULL));
 			}
 
 			sprintf(buf, "TYPE: (%s) &c%s&0 ", lbuf, get_generic_name_by_vnum(aff->type));

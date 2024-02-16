@@ -3404,8 +3404,13 @@ PLAYER_UPDATE_FUNC(b5_152_player_update) {
 		// these were saved in 5-second updates and are now in 1-second intervals instead
 		// log("%s: %d %ld", GET_PC_NAME(ch), af->type, af->expire_time);
 		if (af->expire_time != UNLIMITED) {
-			// note they are in SECONDS not TIMESTAMPS at this point
-			af->expire_time *= 5;
+			if (AFFECTS_CONVERTED(ch)) {
+				af->expire_time = (af->expire_time - time(0)) * 5 + time(0);
+			}
+			else {
+				// note they are in SECONDS not TIMESTAMPS at this point
+				af->expire_time *= 5;
+			}
 		}
 	}
 }

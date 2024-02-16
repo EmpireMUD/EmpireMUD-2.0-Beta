@@ -4504,6 +4504,7 @@ void enter_player_game(descriptor_data *d, int dolog, bool fresh) {
 	
 	// refresh and apply abilities, bonuses, etc
 	refresh_character_on_load(ch);
+	convert_and_schedule_player_affects(ch);
 	add_all_gain_hooks(ch);
 	
 	// update the index in case any of this changed
@@ -4894,7 +4895,6 @@ void refresh_character_on_load(char_data *ch) {
 	apply_all_ability_techs(ch);
 	apply_bonus_pools(ch, TRUE);
 	refresh_passive_buffs(ch);
-	convert_and_schedule_player_affects(ch);
 }
 
 
