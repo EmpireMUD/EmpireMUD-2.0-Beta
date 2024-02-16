@@ -1085,7 +1085,9 @@ Example:
 
 See also: POUR, DRINK
 #
-FIRE CATAPULT CANNONS
+FIRE CATAPULT CANNONS "FIRE COMMAND"
+
+(Disambiguation: This is the fire command: see also COOKING FIRE)
 
 Usage:  fire <vehicle> <direction | target vehicle> 
 
