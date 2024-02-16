@@ -1775,7 +1775,7 @@ SHOW(show_lost_books) {
 			continue;
 		}
 		
-		snprintf(line, sizeof(line), "[%7d] %s (%s)\r\n", BOOK_VNUM(book), BOOK_TITLE(book), (index = find_player_index_by_idnum(BOOK_AUTHOR(book))) ? index->name : "???");
+		snprintf(line, sizeof(line), "[%7d] %s (%s)\r\n", BOOK_VNUM(book), BOOK_TITLE(book), (index = find_player_index_by_idnum(BOOK_AUTHOR(book))) ? index->fullname : "???");
 		
 		if (size + strlen(line) < sizeof(output)) {
 			strcat(output, line);
