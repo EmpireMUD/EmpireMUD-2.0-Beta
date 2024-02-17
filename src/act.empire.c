@@ -4000,8 +4000,8 @@ ACMD(do_buildcheck) {
 		if (IS_SET(GET_CRAFT_FLAGS(craft), CRAFT_IN_DEVELOPMENT) && !IS_IMMORTAL(ch)) {
 			continue;	// not live
 		}
-		if (GET_CRAFT_TYPE(craft) == CRAFT_TYPE_WORKFORCE) {
-			continue;	// don't show workforce
+		if (GET_CRAFT_TYPE(craft) == CRAFT_TYPE_WORKFORCE || CRAFT_FLAGGED(craft, CRAFT_DISMANTLE_ONLY)) {
+			continue;	// don't show these
 		}
 		if (GET_CRAFT_ABILITY(craft) != NO_ABIL && !has_ability(ch, GET_CRAFT_ABILITY(craft))) {
 			continue;	// missing ability
