@@ -1463,7 +1463,7 @@ SHOW(show_inventory) {
 			}
 			
 			// build text
-			lsize = snprintf(line, sizeof(line), "%s%s\t0: %d\r\n", EMPIRE_BANNER(emp), EMPIRE_NAME(emp), count);
+			lsize = snprintf(line, sizeof(line), "%s%s\t0 (empire): %d\r\n", EMPIRE_BANNER(emp), EMPIRE_NAME(emp), count);
 			++empires;
 			
 			if (size + lsize + 10 < sizeof(buf)) {
