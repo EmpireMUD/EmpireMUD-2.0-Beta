@@ -1941,6 +1941,11 @@ void complete_vehicle(vehicle_data *veh) {
 		if (VEH_IS_VISIBLE_ON_MAPOUT(veh)) {
 			request_mapout_update(GET_ROOM_VNUM(room));	// in case
 		}
+		
+		// ensure mine data is set up
+		if (IS_SET(VEH_FUNCTIONS(veh), FNC_MINE)) {
+			init_mine(room, NULL, ROOM_OWNER(room) ? ROOM_OWNER(room) : VEH_OWNER(veh));
+		}
 	}
 }
 

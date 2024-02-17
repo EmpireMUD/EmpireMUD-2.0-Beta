@@ -366,6 +366,11 @@ void complete_building(room_data *room) {
 		}
 	}
 	
+	// ensure mine data is init (it can be reset in some cases)
+	if (room_has_function_and_city_ok(emp, room, FNC_MINE)) {
+		init_mine(room, NULL, emp);
+	}
+	
 	affect_total_room(room);
 	request_mapout_update(GET_ROOM_VNUM(room));
 	request_world_save(GET_ROOM_VNUM(room), WSAVE_ROOM);
