@@ -1108,6 +1108,17 @@ int get_player_level_for_ability(char_data *ch, any_vnum abil_vnum) {
 		// else we are >= skill's max level and will use player's full level
 	}
 	
+	// absolute cap when the player is below 100 in skill-level (max level from gear is limited to the next skill block)
+	if (GET_SKILL_LEVEL(ch) <= BASIC_SKILL_CAP) {
+		level = MIN(level, BASIC_SKILL_CAP);
+	}
+	else if (GET_SKILL_LEVEL(ch) <= SPECIALTY_SKILL_CAP) {
+		level = MIN(level, SPECIALTY_SKILL_CAP);
+	}
+	else if (GET_SKILL_LEVEL(ch) <= MAX_SKILL_CAP) {
+		level = MIN(level, MAX_SKILL_CAP);
+	}
+	
 	return level;
 }
 

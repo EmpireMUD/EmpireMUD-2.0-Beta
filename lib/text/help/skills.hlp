@@ -20,6 +20,10 @@ Abilities that come from skills activate at different levels depending upon
 your level in that skill. Abilities from other things, such as synergies,
 always use your full level.
 
+If your skill level (as shown on the "skills" command) is below 100, your
+abilities will scale to level 100 at most (even if your gear level would put
+you at a higher level); the same is true of being below skill level 75 or 50.
+
 When you use an ability from a skill tree that's below its maximum level, e.g.
 a skill you have at 50 or 75, it activates at that percent of your total level.
 For example, a level 50 ability will scale to 50% of your full level.
