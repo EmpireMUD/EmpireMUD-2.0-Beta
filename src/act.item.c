@@ -442,7 +442,8 @@ obj_data *find_lighter_in_list(obj_data *list, bool *had_keep) {
 					best = obj;	// new best
 				}
 			}
-			else if (!OBJ_FLAGGED(obj, OBJ_KEEP)) {	// not unlmited; don't use kept items if not unlimited
+			else if (TRUE || !OBJ_FLAGGED(obj, OBJ_KEEP)) {	// not unlmited; don't use kept items if not unlimited
+				// NOTE: as of b5.176 we ignore keep on lighters-- use it anyway
 				if (!best || (GET_LIGHTER_USES(best) != UNLIMITED && GET_LIGHTER_USES(best) > GET_LIGHTER_USES(obj))) {
 					best = obj;	// new best
 				}

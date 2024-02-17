@@ -410,8 +410,6 @@ burn crops and seeded fields. This only works on certain terrain, and only on
 the tile you're on (not on adjacent tiles).
 
 Some lighters have a limited number of uses and will be thrown away afterwards.
-If you have marked a lighter 'keep', it won't be used (unless it has unlimited
-uses).
 
 You can also burn down some vehicles. You cannot burn other players' property
 if you are not a member of an empire. Burning your own buildings and vehicles
