@@ -1538,8 +1538,11 @@ See also: SMESSAGES
 
 Usage:  show spawns <mob vnum>
 
-Shows what sectors/crops a mob spawns on, percent chance for it to spawn, and
-what conditions it has. Takes a mob's virtual number, not a name.
+Shows where a mob spawns, percent chance for it to spawn, and what conditions
+it has. Takes a mob's virtual number, not a name.
+
+This is similar to the OLC command ".mob search" but only checks regular spawn
+locations, and reports more information.
 #e
 "SHOW STARTLOCS"
 

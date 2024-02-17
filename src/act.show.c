@@ -2745,6 +2745,9 @@ SHOW(show_spawns) {
 	crop_data *crop, *next_crop;
 	bld_data *bld, *next_bld;
 	char_data *mob;
+	room_template *rmt, *next_rmt;
+	struct adventure_spawn *asp;
+	struct global_data *glb, *next_glb;
 	mob_vnum vnum;
 	
 	if (!*argument || !isdigit(*argument) || !(mob = mob_proto((vnum = atoi(argument))))) {
@@ -2759,7 +2762,7 @@ SHOW(show_spawns) {
 		for (sp = GET_SECT_SPAWNS(sect); sp; sp = sp->next) {
 			if (sp->vnum == vnum) {
 				sprintbit(sp->flags, spawn_flags, buf2, TRUE);
-				snprintf(buf1, sizeof(buf1), "%s: %.2f%% %s\r\n", GET_SECT_NAME(sect), sp->percent, buf2);
+				snprintf(buf1, sizeof(buf1), "SCT [%5d] %s: %.2f%% %s\r\n", GET_SECT_VNUM(sect), GET_SECT_NAME(sect), sp->percent, buf2);
 				if (strlen(buf) + strlen(buf1) < MAX_STRING_LENGTH) {
 					strcat(buf, buf1);
 				}
@@ -2772,7 +2775,7 @@ SHOW(show_spawns) {
 		for (sp = GET_CROP_SPAWNS(crop); sp; sp = sp->next) {
 			if (sp->vnum == vnum) {
 				sprintbit(sp->flags, spawn_flags, buf2, TRUE);
-				snprintf(buf1, sizeof(buf1), "%s: %.2f%% %s\r\n", GET_CROP_NAME(crop), sp->percent, buf2);
+				snprintf(buf1, sizeof(buf1), "CRP [%5d] %s: %.2f%% %s\r\n", GET_CROP_VNUM(crop), GET_CROP_NAME(crop), sp->percent, buf2);
 				CAP(buf1);	// crop names are lowercase
 				if (strlen(buf) + strlen(buf1) < MAX_STRING_LENGTH) {
 					strcat(buf, buf1);
@@ -2786,7 +2789,7 @@ SHOW(show_spawns) {
 		for (sp = GET_BLD_SPAWNS(bld); sp; sp = sp->next) {
 			if (sp->vnum == vnum) {
 				sprintbit(sp->flags, spawn_flags, buf2, TRUE);
-				snprintf(buf1, sizeof(buf1), "%s: %.2f%% %s\r\n", GET_BLD_NAME(bld), sp->percent, buf2);
+				snprintf(buf1, sizeof(buf1), "BLD [%5d] %s: %.2f%% %s\r\n", GET_BLD_VNUM(bld), GET_BLD_NAME(bld), sp->percent, buf2);
 				if (strlen(buf) + strlen(buf1) < MAX_STRING_LENGTH) {
 					strcat(buf, buf1);
 				}
@@ -2799,10 +2802,36 @@ SHOW(show_spawns) {
 		LL_FOREACH(VEH_SPAWNS(veh), sp) {
 			if (sp->vnum == vnum) {
 				sprintbit(sp->flags, spawn_flags, buf2, TRUE);
-				snprintf(buf1, sizeof(buf1), "%s: %.2f%% %s\r\n", VEH_SHORT_DESC(veh), sp->percent, buf2);
+				snprintf(buf1, sizeof(buf1), "VEH [%5d] %s: %.2f%% %s\r\n", VEH_VNUM(veh), VEH_SHORT_DESC(veh), sp->percent, buf2);
 				if (strlen(buf) + strlen(buf1) < MAX_STRING_LENGTH) {
 					strcat(buf, buf1);
 				}
+			}
+		}
+	}
+	
+	// globals
+	HASH_ITER(hh, globals_table, glb, next_glb) {
+		LL_FOREACH(GET_GLOBAL_SPAWNS(glb), sp) {
+			if (sp->vnum == vnum) {
+				sprintbit(sp->flags, spawn_flags, buf2, TRUE);
+				snprintf(buf1, sizeof(buf1), "GLB [%5d] %s: %.2f%% %s\r\n", GET_GLOBAL_VNUM(glb), GET_GLOBAL_NAME(glb), sp->percent, buf2);
+				if (strlen(buf) + strlen(buf1) < MAX_STRING_LENGTH) {
+					strcat(buf, buf1);
+				}
+			}
+		}
+	}
+	
+	// room templates
+	HASH_ITER(hh, room_template_table, rmt, next_rmt) {
+		for (asp = GET_RMT_SPAWNS(rmt); asp; asp = asp->next) {
+			if (asp->type == ADV_SPAWN_MOB && asp->vnum == vnum) {
+				snprintf(buf1, sizeof(buf1), "RMT [%5d] %s: %.2f%%, limit %d\r\n", GET_RMT_VNUM(rmt), GET_RMT_TITLE(rmt), asp->percent, asp->limit);
+				if (strlen(buf) + strlen(buf1) < MAX_STRING_LENGTH) {
+					strcat(buf, buf1);
+				}
+				break;
 			}
 		}
 	}
