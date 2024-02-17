@@ -289,8 +289,10 @@ Uninvited Guest: Coffin collapsed~
 %echo% The long box on the floor collapses into a pile of boards.
 wait 1 s
 set vampire %self.room.people(10370)%
-if %vampire% && !%vampire.aff_flagged(!SEE)%
-  %force% %vampire% say Well that isn't good. Guess it's time to move on.
+if %vampire%
+  if !%vampire.aff_flagged(!SEE)%
+    %force% %vampire% say Well that isn't good. Guess it's time to move on.
+  end
 end
 while %vampire%
   wait 300 s
