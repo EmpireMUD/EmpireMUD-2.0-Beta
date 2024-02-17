@@ -532,6 +532,7 @@ void do_mount_swap(char_data *ch, char *argument) {
 	}
 	
 	gain_player_tech_exp(ch, PTECH_RIDING_SWAP_ANYWHERE, 30);
+	command_lag(ch, WAIT_ABILITY);
 }
 
 
