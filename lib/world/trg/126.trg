@@ -106,9 +106,11 @@ nop %self.set_cooldown(12605, 20)%
 %send% %actor% (Type 'struggle' to break free.)
 dg_affect #12604 %actor% HARD-STUNNED on 20
 dg_affect #12607 %self% HARD-STUNNED on 20
-while %actor.affect(12604)%
+while 1
   wait 5 s
   if %actor.id% != %check_id% || %actor.room% != %self.room%
+    halt
+  elseif !%actor.affect(12604)%
     halt
   end
   %send% %actor% ~%self% pummels and crushes you!
