@@ -973,6 +973,11 @@ Grove Start Progression~
 if %actor.is_pc% && %actor.empire%
   nop %actor.empire.start_progress(12650)%
 end
+*
+* also clear breath variable if needed
+if %actor.varexists(breath)%
+  vdelete breath %actor.id%
+end
 ~
 #12673
 Grove 2.0: Tranquility Chant~
