@@ -2405,6 +2405,7 @@ void set_instance_fake_loc(struct instance_data *inst, room_data *loc);
 void unlink_instance_entrance(room_data *room, struct instance_data *inst, bool run_cleanup);
 
 // limits.c
+bool can_mount_in_room(char_data *ch, room_data *room);
 bool can_teleport_to(char_data *ch, room_data *loc, bool check_owner);
 bool check_autostore(obj_data *obj, bool force, empire_data *override_emp);
 void check_daily_cycle_reset(char_data *ch);

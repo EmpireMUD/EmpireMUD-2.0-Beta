@@ -60,6 +60,38 @@ bool run_timer_triggers_on_decaying_warehouse(empire_data *emp, struct empire_un
 //// CHARACTER LIMITS ////////////////////////////////////////////////////////
 
 /**
+* Determines if a character can be mounted in a given room. For example, trying
+* to enter a water tile from a land tile while mounted.
+*
+* @param char_data *ch The player to check.
+* @param room_data *room The location to check (e.g. for water flags).
+* @return bool TRUE if the player can be mounted there, FALSE if not.
+*/
+bool can_mount_in_room(char_data *ch, room_data *room) {
+	bool ok = TRUE;
+	
+	if (IS_NPC(ch)) {
+		return TRUE;	// no data to check
+	}
+	else if ((IS_COMPLETE(room) || ROOM_BLD_FLAGGED(room, BLD_CLOSED)) && !BLD_ALLOWS_MOUNTS(room)) {
+		ok = FALSE;
+	}
+	else if (DEEP_WATER_SECT(room) && !MOUNT_FLAGGED(ch, MOUNT_AQUATIC | MOUNT_WATERWALKING) && !EFFECTIVELY_FLYING(ch)) {
+		ok = FALSE;
+	}
+	else if (!CAN_RIDE_WATERWALK_MOUNT(ch) && DEEP_WATER_SECT(room) && MOUNT_FLAGGED(ch, MOUNT_WATERWALKING) && !EFFECTIVELY_FLYING(ch)) {
+		// has a waterwalking mount, in deep water, but is missing the riding upgrade
+		ok = FALSE;
+	}
+	else if (!has_player_tech(ch, PTECH_RIDING_UPGRADE) && WATER_SECT(room) && !MOUNT_FLAGGED(ch, MOUNT_AQUATIC) && !EFFECTIVELY_FLYING(ch)) {
+		ok = FALSE;
+	}
+	
+	return ok;
+}
+
+
+/**
 * This checks for players whose primary attributes have dropped below 1, and
 * unequips gear to compensate.
 *
@@ -344,23 +376,13 @@ void check_should_dismount(char_data *ch) {
 	else if (IS_MORPHED(ch)) {
 		ok = FALSE;
 	}
-	else if ((IS_COMPLETE(IN_ROOM(ch)) || ROOM_BLD_FLAGGED(IN_ROOM(ch), BLD_CLOSED)) && !BLD_ALLOWS_MOUNTS(IN_ROOM(ch))) {
-		ok = FALSE;
-	}
 	else if (GET_SITTING_ON(ch)) {
 		ok = FALSE;
 	}
 	else if (MOUNT_FLAGGED(ch, MOUNT_FLYING) && !CAN_RIDE_FLYING_MOUNT(ch)) {
 		ok = FALSE;
 	}
-	else if (DEEP_WATER_SECT(IN_ROOM(ch)) && !MOUNT_FLAGGED(ch, MOUNT_AQUATIC | MOUNT_WATERWALKING) && !EFFECTIVELY_FLYING(ch)) {
-		ok = FALSE;
-	}
-	else if (!CAN_RIDE_WATERWALK_MOUNT(ch) && DEEP_WATER_SECT(IN_ROOM(ch)) && MOUNT_FLAGGED(ch, MOUNT_WATERWALKING) && !EFFECTIVELY_FLYING(ch)) {
-		// has a waterwalking mount, in deep water, but is missing the riding upgrade
-		ok = FALSE;
-	}
-	else if (!has_player_tech(ch, PTECH_RIDING_UPGRADE) && WATER_SECT(IN_ROOM(ch)) && !MOUNT_FLAGGED(ch, MOUNT_AQUATIC) && !EFFECTIVELY_FLYING(ch)) {
+	else if (!can_mount_in_room(ch, IN_ROOM(ch))) {
 		ok = FALSE;
 	}
 	

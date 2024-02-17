@@ -1074,6 +1074,17 @@ bool player_can_move(char_data *ch, int dir, room_data *to_room, bitvector_t fla
 		return TRUE;
 	}
 	
+	// basic mount viability: do this first because it can affect swimming etc
+	if (IS_RIDING(ch) && !can_mount_in_room(ch, to_room)) {
+		if (PRF_FLAGGED(ch, PRF_AUTODISMOUNT)) {
+			do_dismount(ch, "", 0, 0);
+		}
+		else {
+			msg_to_char(ch, "You can't ride there.\r\n");
+			return FALSE;
+		}
+	}
+	
 	// checks that only matter if the move is directional (e.g. not a portal)
 	if (dir != NO_DIR) {
 		// to-water checks
