@@ -7783,6 +7783,9 @@ void call_ability_one(char_data *ch, ability_data *abil, char *argument, char_da
 		
 		// look for others that should gain here, too, based on supercedes
 		HASH_ITER(hh, GET_ABILITY_HASH(ch), plab, next_plab) {
+			if (plab->ptr == abil) {
+				continue;	// same ability
+			}
 			if (!plab->ptr || !plab->purchased[GET_CURRENT_SKILL_SET(ch)]) {
 				continue;	// don't have it
 			}
