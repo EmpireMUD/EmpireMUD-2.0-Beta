@@ -3964,6 +3964,155 @@ ACMD(do_barde) {
 }
 
 
+ACMD(do_buildcheck) {
+	bool imm_access = GET_ACCESS_LEVEL(ch) >= LVL_CIMPL || IS_GRANTED(ch, GRANT_EMPIRES);
+	char output[MAX_STRING_LENGTH * 4], line[256];
+	int count;
+	size_t size;
+	bld_data *bld;
+	craft_data *craft, *next_craft;
+	empire_data *emp = GET_LOYALTY(ch);
+	vehicle_data *veh;
+	struct empire_territory_data *ter, *next_ter;
+	struct empire_vehicle_data *vter, *next_vter;
+	struct vnum_hash *bld_hash = NULL, *veh_hash = NULL;
+	struct vnum_hash *iter, *next_iter, *vh;
+	
+	if (IS_NPC(ch) || !ch->desc) {
+		return;
+	}
+	
+	// optional arg (empire) for immortals only
+	if (imm_access) {
+		quoted_arg_or_all(argument, arg);
+		if (*arg && !(emp = get_empire_by_name(arg))) {
+			msg_to_char(ch, "Unknown empire '%s'.\r\n", arg);
+			return;
+		}
+	}
+	if (!emp) {
+		msg_to_char(ch, "You are not in an empire.\r\n");
+		return;
+	}
+	
+	// determine what the player can make
+	HASH_ITER(sorted_hh, sorted_crafts, craft, next_craft) {
+		if (IS_SET(GET_CRAFT_FLAGS(craft), CRAFT_IN_DEVELOPMENT) && !IS_IMMORTAL(ch)) {
+			continue;	// not live
+		}
+		if (GET_CRAFT_TYPE(craft) == CRAFT_TYPE_WORKFORCE) {
+			continue;	// don't show workforce
+		}
+		if (GET_CRAFT_ABILITY(craft) != NO_ABIL && !has_ability(ch, GET_CRAFT_ABILITY(craft))) {
+			continue;	// missing ability
+		}
+		if (IS_SET(GET_CRAFT_FLAGS(craft), CRAFT_LEARNED) && !has_learned_craft(ch, GET_CRAFT_VNUM(craft))) {
+			continue;	// not learned
+		}
+		if (GET_CRAFT_REQUIRES_OBJ(craft) != NOTHING && !has_required_obj_for_craft(ch, GET_CRAFT_REQUIRES_OBJ(craft))) {
+			continue;	// missing required object
+		}
+		
+		// ok: add to hash if it's a vehicle or building
+		if (CRAFT_FLAGGED(craft, CRAFT_VEHICLE)) {
+			// skip unclaimable vehicles (we can't detect them)
+			if ((veh = vehicle_proto(GET_CRAFT_OBJECT(craft))) && !VEH_FLAGGED(veh, VEH_NO_CLAIM)) {
+				add_vnum_hash(&veh_hash, GET_CRAFT_OBJECT(craft), 1);
+			}
+		}
+		else if (GET_CRAFT_TYPE(craft) == CRAFT_TYPE_BUILD || CRAFT_FLAGGED(craft, CRAFT_BUILDING)) {
+			add_vnum_hash(&bld_hash, GET_CRAFT_OBJECT(craft), 1);
+		}
+	}
+	
+	// do we even know any?
+	if (!bld_hash && !veh_hash) {
+		msg_to_char(ch, "You don't know how to make any buildings or vehicles.\r\n");
+		return;
+	}
+	
+	// next see what the empire has for vehicles
+	HASH_ITER(hh, EMPIRE_VEHICLE_LIST(emp), vter, next_vter) {
+		if (vter->veh) {
+			if ((vh = find_in_vnum_hash(veh_hash, VEH_VNUM(vter->veh)))) {
+				// found one: delete from hash
+				HASH_DEL(veh_hash, vh);
+				free(vh);
+			}
+		}
+	}
+	
+	// and buildings
+	HASH_ITER(hh, EMPIRE_TERRITORY_LIST(emp), ter, next_ter) {
+		if (ter->room && GET_BUILDING(ter->room)) {
+			if ((vh = find_in_vnum_hash(bld_hash, GET_BLD_VNUM(GET_BUILDING(ter->room))))) {
+				// found one: delete from hash
+				HASH_DEL(bld_hash, vh);
+				free(vh);
+			}
+		}
+	}
+	
+	// and see what's left!
+	if (!bld_hash && !veh_hash) {
+		msg_to_char(ch, "%s has all the buildings and vehicles you know how to make.\r\n", (emp == GET_LOYALTY(ch)) ? "Your empire" : EMPIRE_NAME(emp));
+		return;
+	}
+	
+	// otherwise build the list:
+	size = snprintf(output, sizeof(output), "Your empire is missing the following things you can make:\r\n");
+	count = 0;
+	
+	HASH_ITER(hh, veh_hash, iter, next_iter) {
+		if ((veh = vehicle_proto(iter->vnum))) {
+			++count;
+			if (PRF_FLAGGED(ch, PRF_ROOMFLAGS)) {
+				snprintf(line, sizeof(line), "[%5d] %s\r\n", VEH_VNUM(veh), VEH_SHORT_DESC(veh));
+			}
+			else {
+				snprintf(line, sizeof(line), " %s\r\n", VEH_SHORT_DESC(veh));
+			}
+			
+			if (size + strlen(line) + 15 < sizeof(output)) {
+				strcat(output, line);
+				size += strlen(line);
+			}
+			else {
+				// full
+				break;
+			}
+		}
+	}
+	
+	HASH_ITER(hh, bld_hash, iter, next_iter) {
+		if ((bld = building_proto(iter->vnum))) {
+			++count;
+			if (PRF_FLAGGED(ch, PRF_ROOMFLAGS)) {
+				snprintf(line, sizeof(line), "[%5d] %s\r\n", GET_BLD_VNUM(bld), GET_BLD_NAME(bld));
+			}
+			else {
+				snprintf(line, sizeof(line), " %s\r\n", GET_BLD_NAME(bld));
+			}
+			
+			if (size + strlen(line) + 15 < sizeof(output)) {
+				strcat(output, line);
+				size += strlen(line);
+			}
+			else {
+				// full
+				break;
+			}
+		}
+	}
+	
+	if (size + 15 < sizeof(output)) {
+		size += snprintf(output + size, sizeof(output) - size, "Total: %d\r\n", count);
+	}
+	
+	page_string(ch->desc, output, TRUE);
+}
+
+
 /**
 * Attempts to start burning a building, checking everything as it goes. This
 * can be called remotely; ch can be anywhere.

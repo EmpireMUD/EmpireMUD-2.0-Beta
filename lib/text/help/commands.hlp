@@ -379,7 +379,19 @@ to your empire won't be able to enter.
 For more information on building your first house, see HELP HOUSING GUIDE.
 
 See also: BUILD INFO, RESOURCES, KEEP, EMPIRE, DISMANTLE, DESIGNATE, RECIPES,
-  BUILD ABILITY, CRAFTING ABILITIES
+  BUILD ABILITY, CRAFTING ABILITIES, BUILDCHECK
+#
+BUILDCHECK
+
+Usage:  buildcheck
+
+This command checks your empire for any buildings or vehicles you know how to
+make, but don't own.
+
+Players can only use this command on their own empire, but privileged immortals
+can use this command on other empires.
+
+See also: BUILD, RECIPES
 #
 BURN
 
