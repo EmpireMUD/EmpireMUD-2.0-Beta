@@ -4021,7 +4021,7 @@ ACMD(do_buildcheck) {
 			}
 		}
 		else if (GET_CRAFT_TYPE(craft) == CRAFT_TYPE_BUILD || CRAFT_FLAGGED(craft, CRAFT_BUILDING)) {
-			add_vnum_hash(&bld_hash, GET_CRAFT_OBJECT(craft), 1);
+			add_vnum_hash(&bld_hash, GET_CRAFT_BUILD_TYPE(craft), 1);
 		}
 	}
 	
@@ -4108,6 +4108,9 @@ ACMD(do_buildcheck) {
 	if (size + 15 < sizeof(output)) {
 		size += snprintf(output + size, sizeof(output) - size, "Total: %d\r\n", count);
 	}
+	
+	free_vnum_hash(&bld_hash);
+	free_vnum_hash(&veh_hash);
 	
 	page_string(ch->desc, output, TRUE);
 }
