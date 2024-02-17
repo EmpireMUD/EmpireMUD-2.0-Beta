@@ -10374,7 +10374,8 @@ struct empire_storage_data *add_to_empire_storage_with_timer(empire_data *emp, i
 		}
 	}
 	
-	if (store->amount == 0 && !store->keep) {
+	// maybe free it
+	if (store->amount == 0 && store->keep != EMPIRE_ATTRIBUTE(emp, EATT_DEFAULT_KEEP)) {
 		HASH_DEL(isle->store, store);
 		free_empire_storage_data(store);
 		store = NULL;
