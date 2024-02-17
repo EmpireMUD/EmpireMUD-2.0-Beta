@@ -3966,7 +3966,9 @@ ACMD(do_barde) {
 
 ACMD(do_buildcheck) {
 	bool imm_access = GET_ACCESS_LEVEL(ch) >= LVL_CIMPL || IS_GRANTED(ch, GRANT_EMPIRES);
+	bool here = FALSE;
 	char output[MAX_STRING_LENGTH * 4], line[256];
+	char *argptr = argument;
 	int count;
 	size_t size;
 	bld_data *bld;
@@ -3984,16 +3986,25 @@ ACMD(do_buildcheck) {
 	
 	// optional arg (empire) for immortals only
 	if (imm_access) {
-		quoted_arg_or_all(argument, arg);
+		argptr = quoted_arg_or_all(argument, arg);
 		if (*arg && !(emp = get_empire_by_name(arg))) {
-			msg_to_char(ch, "Unknown empire '%s'.\r\n", arg);
-			return;
+			argptr = argument;
 		}
 	}
 	if (!emp) {
 		msg_to_char(ch, "You are not in an empire.\r\n");
 		return;
 	}
+	
+	// optional "here" arg
+	skip_spaces(&argptr);
+	if (!strn_cmp(argptr, "here", 4)) {
+		here = TRUE;
+		argptr = any_one_arg(argptr, arg);
+		skip_spaces(&argptr);
+	}
+	
+	// any remaining arg is a search string
 	
 	// determine what the player can make
 	HASH_ITER(sorted_hh, sorted_crafts, craft, next_craft) {
@@ -4033,7 +4044,7 @@ ACMD(do_buildcheck) {
 	
 	// next see what the empire has for vehicles
 	HASH_ITER(hh, EMPIRE_VEHICLE_LIST(emp), vter, next_vter) {
-		if (vter->veh) {
+		if (vter->veh && (!here || GET_ISLAND_ID(IN_ROOM(vter->veh)) == GET_ISLAND_ID(IN_ROOM(ch)))) {
 			if ((vh = find_in_vnum_hash(veh_hash, VEH_VNUM(vter->veh)))) {
 				// found one: delete from hash
 				HASH_DEL(veh_hash, vh);
@@ -4044,7 +4055,7 @@ ACMD(do_buildcheck) {
 	
 	// and buildings
 	HASH_ITER(hh, EMPIRE_TERRITORY_LIST(emp), ter, next_ter) {
-		if (ter->room && GET_BUILDING(ter->room)) {
+		if (ter->room && GET_BUILDING(ter->room) && (!here || GET_ISLAND_ID(ter->room) == GET_ISLAND_ID(IN_ROOM(ch)))) {
 			if ((vh = find_in_vnum_hash(bld_hash, GET_BLD_VNUM(GET_BUILDING(ter->room))))) {
 				// found one: delete from hash
 				HASH_DEL(bld_hash, vh);
@@ -4064,7 +4075,7 @@ ACMD(do_buildcheck) {
 	count = 0;
 	
 	HASH_ITER(hh, veh_hash, iter, next_iter) {
-		if ((veh = vehicle_proto(iter->vnum))) {
+		if ((veh = vehicle_proto(iter->vnum)) && (!*argptr || multi_isname(argptr, VEH_KEYWORDS(veh)))) {
 			++count;
 			if (PRF_FLAGGED(ch, PRF_ROOMFLAGS)) {
 				snprintf(line, sizeof(line), "[%5d] %s\r\n", VEH_VNUM(veh), VEH_SHORT_DESC(veh));
@@ -4085,7 +4096,7 @@ ACMD(do_buildcheck) {
 	}
 	
 	HASH_ITER(hh, bld_hash, iter, next_iter) {
-		if ((bld = building_proto(iter->vnum))) {
+		if ((bld = building_proto(iter->vnum)) && (!*argptr || multi_isname(argptr, GET_BLD_NAME(bld)))) {
 			++count;
 			if (PRF_FLAGGED(ch, PRF_ROOMFLAGS)) {
 				snprintf(line, sizeof(line), "[%5d] %s\r\n", GET_BLD_VNUM(bld), GET_BLD_NAME(bld));

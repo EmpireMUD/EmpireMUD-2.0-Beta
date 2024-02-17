@@ -383,10 +383,11 @@ See also: BUILD INFO, RESOURCES, KEEP, EMPIRE, DISMANTLE, DESIGNATE, RECIPES,
 #
 BUILDCHECK
 
-Usage:  buildcheck
+Usage:  buildcheck [here] [keywords]
 
 This command checks your empire for any buildings or vehicles you know how to
-make, but don't own.
+make, but don't own. You can specify "here" to check only the current island,
+or can give keywords to filter by.
 
 Players can only use this command on their own empire, but privileged immortals
 can use this command on other empires.
