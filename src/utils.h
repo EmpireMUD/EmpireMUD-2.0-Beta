@@ -468,7 +468,7 @@ int CAN_CARRY_N(char_data *ch);	// formerly a macro
 #define GET_NAME(ch)  (IS_NPC(ch) ? GET_SHORT_DESC(ch) : GET_PC_NAME(ch))
 #define GET_REAL_LEVEL(ch)  (ch->desc && ch->desc->original ? GET_ACCESS_LEVEL(ch->desc->original) : GET_ACCESS_LEVEL(ch))
 #define GET_SEX(ch)  (IS_DISGUISED(ch) ? GET_DISGUISED_SEX(ch) : GET_REAL_SEX(ch))
-#define GET_TRACK_ID(ch)  (!IS_NPC(ch) ? GET_IDNUM(ch) : (GET_MOB_VNUM(ch) >= 0 ? GET_MOB_VNUM(ch) : 0))
+#define GET_TRACK_ID(ch)  (!IS_NPC(ch) ? (-1 * GET_IDNUM(ch)) : (GET_MOB_VNUM(ch) >= 0 ? GET_MOB_VNUM(ch) : 0))
 #define IS_DEAD(ch)  (GET_POS(ch) == POS_DEAD)
 #define IS_INJURED(ch, flag)  (IS_SET(INJURY_FLAGS(ch), (flag)))
 #define IS_NPC(ch)  (IS_SET(MOB_FLAGS(ch), MOB_ISNPC))

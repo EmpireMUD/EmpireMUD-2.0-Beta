@@ -953,7 +953,8 @@ bool check_mob_pursuit(char_data *ch) {
 		// track to next room
 		HASH_ITER(hh, ROOM_TRACKS(IN_ROOM(ch)), track, next_track) {
 			// don't bother checking track lifespan here -- just let mobs follow it till it gets removed
-			if (track->id == purs->idnum) {
+			// (player idnum is negative)
+			if (track->id == -1 * purs->idnum) {
 				found = TRUE;
 				dir = track->dir;
 				track_to_room = track->to_room;
