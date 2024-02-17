@@ -4060,7 +4060,7 @@ ACMD(do_buildcheck) {
 	}
 	
 	// otherwise build the list:
-	size = snprintf(output, sizeof(output), "Your empire is missing the following things you can make:\r\n");
+	size = snprintf(output, sizeof(output), "%s is missing the following things you can make:\r\n", (emp == GET_LOYALTY(ch)) ? "Your empire" : EMPIRE_NAME(emp));
 	count = 0;
 	
 	HASH_ITER(hh, veh_hash, iter, next_iter) {
