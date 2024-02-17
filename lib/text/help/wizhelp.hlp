@@ -825,6 +825,7 @@ Commands with features for Co-Implementors:
 Empire commands that work differently for Co-Implementors, or for any immortal
 with the 'empire' grant:
 - empire: full detailed empire view
+- buildcheck: optional arg to check any empire
 - city: optional first arg to edit cities for any empire
 - eedit: optional first arg to specify which empire
 - einv: optional first arg to specify which empire
