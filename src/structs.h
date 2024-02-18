@@ -5622,6 +5622,8 @@ struct empire_data {
 	struct workforce_delay *delays;	// speeds up chore processing
 	
 	/* Unsaved data */
+	char *short_name;	// copy of the name without filler
+	char *short_adjective;	// copy of the adjective without filler
 	unsigned int territory[NUM_TERRITORY_TYPES];	// territory counts on this island
 	int wealth;	// computed by read_vault
 	int population;	// npc population who lives here

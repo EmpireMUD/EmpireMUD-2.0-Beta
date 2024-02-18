@@ -644,6 +644,8 @@ int CAN_CARRY_N(char_data *ch);	// formerly a macro
 #define EMPIRE_RANK(emp, num)  ((emp)->rank[(num)])
 #define EMPIRE_SCORE(emp, num)  ((emp)->scores[(num)])
 #define EMPIRE_SHIPPING_LIST(emp)  ((emp)->shipping_list)
+#define EMPIRE_SHORT_ADJECTIVE(emp)  ((emp)->short_adjective)
+#define EMPIRE_SHORT_NAME(emp)  ((emp)->short_name)
 #define EMPIRE_SORT_VALUE(emp)  ((emp)->sort_value)
 #define EMPIRE_TECH(emp, num)  ((emp)->tech[(num)])
 #define EMPIRE_TERRITORY(emp, type)  ((emp)->territory[(type)])
