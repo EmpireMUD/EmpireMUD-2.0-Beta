@@ -334,7 +334,8 @@ currently active on you and your group.
 
 You can create an alias to quickly buff yourself or a friend by putting each
 ability into an alias with $* as the target, separated by semi-colons, like:
-> alias mcbuff haste $*;foresight $*;eartharmor $*
+
+> alias mcbuff hasten $*;foresight $*;eartharmor $*
 
 See also: ALIAS, BUFF
 #
