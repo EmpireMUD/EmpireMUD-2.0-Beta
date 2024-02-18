@@ -104,20 +104,20 @@ quicker and easier to travel than the wild countryside. Use the 'lay' command
 to turn 20 rocks (or flints) into a road. Claim 5 road tiles to complete this
 goal.
 ~
-2 1 0 5 0
+3 1 0 5 0
 P 1009
 W
-25 9 0 5 -
+47 0 0 5 -
 S
 #1012
 Road to Prosperity~
    As your empire grows, it needs a strong network of roads. Lay a total of 50
 roads to complete this goal. Don't forget to claim them.
 ~
-3 1 0 15 0
+4 1 0 15 0
 P 1011
 W
-25 9 0 50 -
+47 0 0 50 -
 S
 #1013
 All Roads Lead to Home~
@@ -125,10 +125,10 @@ All Roads Lead to Home~
 between them. It also benefits from roads to its mines, to the sea, and to its
 allies. Lay (and claim) at least 250 roads to complete this goal.
 ~
-4 1 0 25 0
+5 1 0 25 0
 P 1012
 W
-25 9 0 250 -
+47 0 0 250 -
 S
 #1020
 Making a Friend~
