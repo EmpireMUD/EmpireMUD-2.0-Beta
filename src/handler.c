@@ -4503,13 +4503,20 @@ empire_data *get_empire_by_name(char *raw_name) {
 			full_exact = pos;
 			break;	// just need this one
 		}
-		if (!full_abbrev && is_abbrev(name, EMPIRE_NAME(pos))) {
+		else if (!full_abbrev && is_abbrev(name, EMPIRE_NAME(pos))) {
 			full_abbrev = pos;
 		}
+		else if (!full_abbrev && EMPIRE_SHORT_NAME(pos) && is_abbrev(name, EMPIRE_SHORT_NAME(pos))) {
+			full_abbrev = pos;
+		}
+		
 		if (!adj_exact && !str_cmp(name, EMPIRE_ADJECTIVE(pos))) {
 			adj_exact = pos;
 		}
-		if (!adj_abbrev && is_abbrev(name, EMPIRE_ADJECTIVE(pos))) {
+		else if (!adj_abbrev && is_abbrev(name, EMPIRE_ADJECTIVE(pos))) {
+			adj_abbrev = pos;
+		}
+		else if (!adj_abbrev && EMPIRE_SHORT_ADJECTIVE(pos) && is_abbrev(name, EMPIRE_SHORT_ADJECTIVE(pos))) {
 			adj_abbrev = pos;
 		}
 	}
