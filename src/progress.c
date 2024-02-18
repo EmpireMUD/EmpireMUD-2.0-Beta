@@ -1433,7 +1433,7 @@ void et_gain_building(empire_data *emp, any_vnum vnum) {
 				task->current += GET_BLD_MILITARY(bld);
 				TRIGGER_DELAYED_REFRESH(emp, DELAY_REFRESH_GOAL_COMPLETE);
 			}
-			else if (task->type == REQ_OWN_ROADS && BLD_FLAGGED(bld, BLD_ROAD_ICON)) {
+			else if (task->type == REQ_OWN_ROADS && BLD_FLAGGED(bld, BLD_ROAD_ICON | BLD_ROAD_ICON_WIDE)) {
 				++task->current;
 				TRIGGER_DELAYED_REFRESH(emp, DELAY_REFRESH_GOAL_COMPLETE);
 			}
@@ -1633,7 +1633,7 @@ void et_lose_building(empire_data *emp, any_vnum vnum) {
 			else if (task->type == REQ_EMPIRE_MILITARY && GET_BLD_MILITARY(bld) != 0) {
 				task->current -= GET_BLD_MILITARY(bld);
 			}
-			else if (task->type == REQ_OWN_ROADS && BLD_FLAGGED(bld, BLD_ROAD_ICON)) {
+			else if (task->type == REQ_OWN_ROADS && BLD_FLAGGED(bld, BLD_ROAD_ICON | BLD_ROAD_ICON_WIDE)) {
 				--task->current;
 				task->current = MAX(task->current, 0);
 			}

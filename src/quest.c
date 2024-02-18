@@ -359,7 +359,7 @@ int count_owned_roads(empire_data *emp) {
 				// road sect
 				++count;
 			}
-			else if (ROOM_BLD_FLAGGED(room, BLD_ROAD_ICON) && IS_COMPLETE(room)) {
+			else if (ROOM_BLD_FLAGGED(room, BLD_ROAD_ICON | BLD_ROAD_ICON_WIDE) && IS_COMPLETE(room)) {
 				// road-icon building
 				++count;
 			}
@@ -3018,7 +3018,7 @@ void qt_gain_building(char_data *ch, any_vnum vnum) {
 			else if (task->type == REQ_EMPIRE_MILITARY && GET_BLD_MILITARY(bld) != 0) {
 				task->current += GET_BLD_MILITARY(bld);
 			}
-			else if (task->type == REQ_OWN_ROADS && BLD_FLAGGED(bld, BLD_ROAD_ICON)) {
+			else if (task->type == REQ_OWN_ROADS && BLD_FLAGGED(bld, BLD_ROAD_ICON | BLD_ROAD_ICON_WIDE)) {
 				++task->current;
 			}
 		}
@@ -3249,7 +3249,7 @@ void qt_lose_building(char_data *ch, any_vnum vnum) {
 			else if (task->type == REQ_EMPIRE_MILITARY && GET_BLD_MILITARY(bld) != 0) {
 				task->current -= GET_BLD_MILITARY(bld);
 			}
-			else if (task->type == REQ_OWN_ROADS && BLD_FLAGGED(bld, BLD_ROAD_ICON)) {
+			else if (task->type == REQ_OWN_ROADS && BLD_FLAGGED(bld, BLD_ROAD_ICON | BLD_ROAD_ICON_WIDE)) {
 				--task->current;
 			}
 			
