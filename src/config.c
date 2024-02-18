@@ -2016,6 +2016,7 @@ void init_config_system(void) {
 
 	// system
 	init_config(CONFIG_SYSTEM, "autoreboot_minutes", CONFTYPE_INT, "minutes to schedule an automatic reboot at startup (0 if not using this)");
+	init_config(CONFIG_SYSTEM, "log_eof_on_socket_read", CONFTYPE_BOOL, "if enabled, logs a warning if perform_socket_read gets an EOF, in case of problems");
 	init_config(CONFIG_SYSTEM, "nameserver_is_slow", CONFTYPE_BOOL, "if enabled, system will not resolve numeric IPs");
 	init_config(CONFIG_SYSTEM, "max_filesize", CONFTYPE_INT, "maximum size of bug, typo and idea files in bytes (to prevent bombing)");
 	init_config(CONFIG_SYSTEM, "max_bad_pws", CONFTYPE_INT, "maximum number of password attempts before disconnection");

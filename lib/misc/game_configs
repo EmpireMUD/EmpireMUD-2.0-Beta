@@ -220,6 +220,7 @@ tracks_lifespan 60
 *
 * System configs
 autoreboot_minutes 0
+log_eof_on_socket_read 0
 log_losing_descriptor_without_char 0
 max_bad_pws 3
 max_filesize 50000
