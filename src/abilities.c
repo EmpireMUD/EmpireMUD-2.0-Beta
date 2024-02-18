@@ -8467,6 +8467,18 @@ bool audit_ability(ability_data *abil, char_data *ch) {
 		olc_audit_msg(ch, ABIL_VNUM(abil), "No fail messages");
 		problem = TRUE;
 	}
+	if (ABILITY_FLAGGED(abil, ABILF_BUFFS_COMMAND) && !IS_SET(ABIL_TYPES(abil), ABILT_BUFF)) {
+		olc_audit_msg(ch, ABIL_VNUM(abil), "BUFFS-COMMAND flag without BUFF type");
+		problem = TRUE;
+	}
+	if (ABILITY_FLAGGED(abil, ABILF_BUFFS_COMMAND) && ABIL_IS_VIOLENT(abil)) {
+		olc_audit_msg(ch, ABIL_VNUM(abil), "BUFFS-COMMAND flag on violent ability");
+		problem = TRUE;
+	}
+	if (ABILITY_FLAGGED(abil, ABILF_BUFFS_COMMAND) && !ABIL_COMMAND(abil)) {
+		olc_audit_msg(ch, ABIL_VNUM(abil), "BUFFS-COMMAND flag without command");
+		problem = TRUE;
+	}
 	
 	// immunities: relevant or no
 	if (ABIL_IMMUNITIES(abil)) {
