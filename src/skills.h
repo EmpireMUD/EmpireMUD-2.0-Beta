@@ -68,6 +68,7 @@
 #define ABILF_UNREMOVABLE_BUFF		BIT(30)	// E. buff/debuff cannot be cleansed (marks victim as the caster)
 #define ABILF_BUFF_SELF_NOT_TARGET	BIT(31)	// F. buff portion of the ability will go on the caster; everything else hits the victim
 #define ABILF_STAY_HIDDEN			BIT(32)	// G. will not automatically un-hide
+#define ABILF_BUFFS_COMMAND		    BIT(33)	// H. appears on the 'buffs' list
 
 #define ABILITY_ROLE_FLAGS	(ABILF_CASTER_ROLE | ABILF_HEALER_ROLE | ABILF_MELEE_ROLE | ABILF_TANK_ROLE)
 

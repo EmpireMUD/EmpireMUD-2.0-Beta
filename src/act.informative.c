@@ -2731,8 +2731,8 @@ ACMD(do_buffs) {
 		if (!plab->purchased[GET_CURRENT_SKILL_SET(ch)]) {
 			continue;	// not purchased on current set
 		}
-		if (!IS_SET(ABIL_TYPES(abil), ABILT_BUFF) || ABILITY_FLAGGED(abil, ABILF_VIOLENT)) {
-			continue;	// ability is not a buff, or is a debuff
+		if (!ABILITY_FLAGGED(abil, ABILF_BUFFS_COMMAND) || !IS_SET(ABIL_TYPES(abil), ABILT_BUFF) || ABILITY_FLAGGED(abil, ABILF_VIOLENT)) {
+			continue;	// don't show; ability is not a buff, or is a debuff
 		}
 		if (ABIL_AFFECT_VNUM(abil) == NOTHING) {
 			continue;	// no buff we can detect

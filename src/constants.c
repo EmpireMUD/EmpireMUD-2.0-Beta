@@ -196,6 +196,7 @@ const char *ability_flags[] = {
 	"UNREMOVABLE-BUFF",	// 30
 	"BUFF-SELF-NOT-TARGET",
 	"STAY-HIDDEN",
+	"BUFFS-COMMAND",
 	"\n"
 };
 
@@ -232,9 +233,10 @@ const char *ability_flag_notes[] = {
 	"",	// ABILF_STOP_ON_MISS
 	"reduced on extra targets",
 	"uses skill level if below max",
-	"unremovable",
+	"unremovable",	// 30
 	"buffs self not target",
 	"won't cancel hide",
+	"",	// ABILF_BUFFS_COMMAND
 	"\n"
 };
 
