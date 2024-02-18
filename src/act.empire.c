@@ -8340,12 +8340,13 @@ ACMD(do_unpublicize) {
 * @param char *argument Remaining args after "keep".
 */
 void do_workforce_keep(char_data *ch, empire_data *emp, char *argument) {
+	any_vnum vnum;
 	bool found;
 	char lim_arg[MAX_INPUT_LENGTH], local_arg[MAX_INPUT_LENGTH], temp[MAX_INPUT_LENGTH];
 	char buf[MAX_STRING_LENGTH * 4], line[256], kept[24];
-	int limit = 0;
+	int limit = 0, number;
 	size_t size;
-	obj_data *proto;
+	obj_data *proto, *obj;
 	struct empire_island *eisle;
 	struct empire_storage_data *store, *next_store;
 	
@@ -8459,7 +8460,7 @@ void do_workforce_keep(char_data *ch, empire_data *emp, char *argument) {
 	
 	// now ensure there's (still) an argument
 	if (!*argument) {
-		msg_to_char(ch, "Keep (or unkeep) which stored item?\r\n");
+		msg_to_char(ch, "Keep (or unkeep) which storable item?\r\n");
 		return;
 	}
 	
@@ -8489,7 +8490,32 @@ void do_workforce_keep(char_data *ch, empire_data *emp, char *argument) {
 	}
 	
 	if (!found) {
-		msg_to_char(ch, "You have nothing by that name stored on this island.\r\n");
+		// try by name
+		number = get_number(&argument);
+		proto = NULL;
+		
+		if (((obj = get_obj_in_list_vis(ch, argument, &number, ch->carrying)) || (obj = get_obj_in_list_vis(ch, argument, &number, ROOM_CONTENTS(IN_ROOM(ch))))) && GET_OBJ_VNUM(obj) != NOTHING && GET_OBJ_STORAGE(obj)) {
+			proto = obj_proto(GET_OBJ_VNUM(obj));
+		}
+		else if ((vnum = get_obj_vnum_by_name(argument, TRUE)) != NOTHING) {
+			proto = obj_proto(vnum);
+		}
+		else {
+			msg_to_char(ch, "You have nothing by that name stored on this island.\r\n");
+			return;
+		}
+		
+		// ok, find or add
+		if (!(store = find_stored_resource(emp, eisle->island, GET_OBJ_VNUM(proto)))) {
+			CREATE(store, struct empire_storage_data, 1);
+			store->vnum = GET_OBJ_VNUM(proto);
+			store->proto = proto;
+			HASH_ADD_INT(eisle->store, vnum, store);
+		}
+		
+		store->keep = (limit == UNLIMITED || limit > 0) ? limit : (store->keep ? 0 : UNLIMITED);
+		msg_to_char(ch, "Your workforce will %s keep %s of its '%s' on this island.\r\n", store->keep ? "now" : "no longer", limit ? lim_arg : (store->keep ? "all" : "any"), skip_filler(GET_OBJ_SHORT_DESC(proto)));
+		EMPIRE_NEEDS_STORAGE_SAVE(emp) = TRUE;
 	}
 }
 
