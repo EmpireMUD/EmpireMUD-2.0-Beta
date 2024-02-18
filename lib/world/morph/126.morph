@@ -2,7 +2,7 @@
 squirrels horde~
 a horde of squirrels~
 A horde of squirrels is milling about in confusion.~
-bj 9 0 0 G 3
+bjn 9 0 0 G 3
 0 0 -1 -1
 A
 21 -2
@@ -16,7 +16,7 @@ S
 badger giant~
 the giant badger~
 A giant badger glowers at you, human intelligence shining in its beady little eyes.~
-bj 10 0 0 0 3
+bjn 10 0 0 0 3
 0 0 -1 -1
 A
 1 1
@@ -28,7 +28,7 @@ S
 turtle snapping large~
 the snapping turtle~
 A large snapping turtle wallows peacefully in the water.~
-bj 9 6 0 0 3
+bjn 9 6 0 0 3
 0 0 -1 -1
 A
 12 1
@@ -40,7 +40,7 @@ S
 crow huge black-feathered feathered~
 the huge crow~
 A huge black-feathered crow is perched above you.~
-bj 26 2 0 m 3
+bjn 26 2 0 m 3
 0 0 -1 -1
 A
 18 1
