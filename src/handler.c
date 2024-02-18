@@ -1406,7 +1406,7 @@ void remove_first_aff_flag_from_char(char_data *ch, bitvector_t aff_flag, bool s
 	bool removed = FALSE;
 	
 	LL_FOREACH(ch->affected, aff) {
-		if (IS_SET(aff->bitvector, AFF_COUNTERSPELL)) {
+		if (IS_SET(aff->bitvector, aff_flag)) {
 			removed = TRUE;
 			
 			if (aff->type == ATYPE_BUFF || aff->type == ATYPE_DG_AFFECT) {
