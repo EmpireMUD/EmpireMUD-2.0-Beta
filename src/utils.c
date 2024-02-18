@@ -5679,7 +5679,7 @@ const char *skip_wordlist(const char *string, const char **wordlist, bool also_s
 			strncpy(temp, string, pos);
 		}
 		temp[pos] = '\0';
-	} while (search_block(temp, wordlist, TRUE) != NOTHING && (also_skip_filler || fill_word(temp) || reserved_word(temp)));
+	} while (search_block(temp, wordlist, TRUE) != NOTHING || (also_skip_filler && (fill_word(temp) || reserved_word(temp))));
 	
 	// when we get here, string is a pointer to the start of the real name
 	strcpy(remainder, string);
