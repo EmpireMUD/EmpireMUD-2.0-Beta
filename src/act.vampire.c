@@ -1104,10 +1104,10 @@ ACMD(do_boost) {
 		{ "strength", "strength", ROLE_NONE, STRENGTH, APPLY_STRENGTH, 1, 2, "You force blood into your muscles, boosting your strength!" },
 		{ "intelligence", "intelligence", ROLE_NONE, INTELLIGENCE, APPLY_INTELLIGENCE, 1, 2, "You focus your blood into your mind, increasing your intelligence!" },
 		
-		{ "bonus-physical", "physical", ROLE_MELEE, NOTHING, APPLY_BONUS_PHYSICAL, 1, 2, "You focus your blood into a blinding rage, increasing your physical damage!" },
-		{ "bonus-magical", "magical", ROLE_CASTER, NOTHING, APPLY_BONUS_MAGICAL, 1, 2, "You turn your blood into pure mental focus, increasing your magical damage!" },
-		{ "bonus-healing", "healing", ROLE_HEALER, NOTHING, APPLY_BONUS_HEALING, 1, 2, "You draw the magic from your blood, increasing your magical healing!" },
-		{ "dodge", "dodge", ROLE_TANK, NOTHING, APPLY_DODGE, 1, 2, "You focus your blood to increase your speed, boosting your ability to dodge!" },
+		{ "bonus-physical", "physical", ROLE_MELEE, NOTHING, APPLY_BONUS_PHYSICAL, 1, 3, "You focus your blood into a blinding rage, increasing your physical damage!" },
+		{ "bonus-magical", "magical", ROLE_CASTER, NOTHING, APPLY_BONUS_MAGICAL, 1, 3, "You turn your blood into pure mental focus, increasing your magical damage!" },
+		{ "bonus-healing", "healing", ROLE_HEALER, NOTHING, APPLY_BONUS_HEALING, 1, 3, "You draw the magic from your blood, increasing your magical healing!" },
+		{ "dodge", "dodge", ROLE_TANK, NOTHING, APPLY_DODGE, 10, 30, "You focus your blood to increase your speed, boosting your ability to dodge!" },
 		
 		{ "\n", "\n", ROLE_NONE, NOTHING, NOTHING, 0, 0, "\n" }	// must be last
 	};
