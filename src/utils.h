@@ -468,7 +468,7 @@ int CAN_CARRY_N(char_data *ch);	// formerly a macro
 #define GET_NAME(ch)  (IS_NPC(ch) ? GET_SHORT_DESC(ch) : GET_PC_NAME(ch))
 #define GET_REAL_LEVEL(ch)  (ch->desc && ch->desc->original ? GET_ACCESS_LEVEL(ch->desc->original) : GET_ACCESS_LEVEL(ch))
 #define GET_SEX(ch)  (IS_DISGUISED(ch) ? GET_DISGUISED_SEX(ch) : GET_REAL_SEX(ch))
-#define GET_TRACK_ID(ch)  (!IS_NPC(ch) ? GET_IDNUM(ch) : (GET_MOB_VNUM(ch) >= 0 ? GET_MOB_VNUM(ch) : 0))
+#define GET_TRACK_ID(ch)  (!IS_NPC(ch) ? (-1 * GET_IDNUM(ch)) : (GET_MOB_VNUM(ch) >= 0 ? GET_MOB_VNUM(ch) : 0))
 #define IS_DEAD(ch)  (GET_POS(ch) == POS_DEAD)
 #define IS_INJURED(ch, flag)  (IS_SET(INJURY_FLAGS(ch), (flag)))
 #define IS_NPC(ch)  (IS_SET(MOB_FLAGS(ch), MOB_ISNPC))
@@ -1989,6 +1989,10 @@ room_data *find_load_room(char_data *ch);
 room_data *find_starting_location(room_data *near_room);
 int get_view_height(char_data *ch, room_data *from_room);
 bool has_one_day_playtime(char_data *ch);
+char *how_blood_starved(char_data *ch);
+char *how_drunk(char_data *ch);
+char *how_hungry(char_data *ch);
+char *how_thirsty(char_data *ch);
 bitvector_t interaction_list_missing_tools(char_data *ch, struct interaction_item *list, int type);
 bitvector_t interaction_list_missing_tools_room(char_data *ch, room_data *room, int type);
 int num_earned_bonus_traits(char_data *ch);
@@ -2401,6 +2405,7 @@ void set_instance_fake_loc(struct instance_data *inst, room_data *loc);
 void unlink_instance_entrance(room_data *room, struct instance_data *inst, bool run_cleanup);
 
 // limits.c
+bool can_mount_in_room(char_data *ch, room_data *room);
 bool can_teleport_to(char_data *ch, room_data *loc, bool check_owner);
 bool check_autostore(obj_data *obj, bool force, empire_data *override_emp);
 void check_daily_cycle_reset(char_data *ch);

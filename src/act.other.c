@@ -2073,6 +2073,11 @@ ACMD(do_fightmessages) {
 	const char **type_strings = NULL;
 	bitvector_t *flagset = NULL;
 	
+	if (IS_NPC(ch)) {
+		msg_to_char(ch, "NPCs do not have %s message toggles.\r\n", message_type[subcmd]);
+		return;
+	}
+	
 	// verify type
 	if (subcmd == SCMD_FIGHT) {
 		flagset = &GET_FIGHT_MESSAGES(ch);
@@ -2112,10 +2117,7 @@ ACMD(do_fightmessages) {
 		}
 	}
 	
-	if (IS_NPC(ch)) {
-		msg_to_char(ch, "NPCs do not have %s message toggles.\r\n", message_type[subcmd]);
-	}
-	else if (!*argument) {
+	if (!*argument) {
 		snprintf(buf, sizeof(buf), "%s message toggles:\r\n", message_type[subcmd]);
 		send_to_char(CAP(buf), ch);
 		

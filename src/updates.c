@@ -3404,8 +3404,13 @@ PLAYER_UPDATE_FUNC(b5_152_player_update) {
 		// these were saved in 5-second updates and are now in 1-second intervals instead
 		// log("%s: %d %ld", GET_PC_NAME(ch), af->type, af->expire_time);
 		if (af->expire_time != UNLIMITED) {
-			// note they are in SECONDS not TIMESTAMPS at this point
-			af->expire_time *= 5;
+			if (AFFECTS_CONVERTED(ch)) {
+				af->expire_time = (af->expire_time - time(0)) * 5 + time(0);
+			}
+			else {
+				// note they are in SECONDS not TIMESTAMPS at this point
+				af->expire_time *= 5;
+			}
 		}
 	}
 }
@@ -4086,6 +4091,20 @@ void b5_174_tavern_triggers(void) {
 }
 
 
+PLAYER_UPDATE_FUNC(b5_176_affect_fix) {
+	generic_data *gen;
+	struct affected_type *af, *next_af;
+	
+	LL_FOREACH_SAFE(ch->affected, af, next_af) {
+		if (!AFFECTS_CONVERTED(ch) && af->expire_time > 86400) {
+			gen = real_generic(af->type);
+			log(" %s: removing %s (%d) with %ld second timer", GET_NAME(ch), (gen ? GEN_NAME(gen) : "unknown"), af->type, af->expire_time);
+			affect_remove(ch, af);
+		}
+	}
+}
+
+
 // ADD HERE, above: more beta 5 update functions
 
 
@@ -4197,6 +4216,7 @@ const struct {
 	{ "b5.174a", b5_174_library_and_author_update, NULL, "Renumbering stock book authors and saving updated library and book files" },
 	{ "b5.174b", b5_174_library_triggers, NULL, "Updating libraries with new triggers" },
 	{ "b5.174c", b5_174_tavern_triggers, NULL, "Updating taverns with new triggers" },
+	{ "b5.176", NULL, b5_176_affect_fix, "Checking for players with bad affect times" },
 	
 	// ADD HERE, above: more beta 5 update lines
 	

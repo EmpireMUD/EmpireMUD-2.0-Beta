@@ -173,13 +173,13 @@ C
 resurrect 8 bhijE 2 75 0.00 -1 0 0 5 0
 M
 2
-You begin channeling mana to resurrect $O...~
+You begin channeling the mana for resurrection...~
 M
 3
 *~
 M
 4
-$n glows with white light as $e begins to channel $s mana to resurrect $O...~
+$n glows with white light as $e begins to channel $s mana for resurrection...~
 M
 28
 A strange force lifts you up from the ground, and you seem to float back to your feet... You feel a rush of blood as your heart starts beating again.~
@@ -902,6 +902,9 @@ M
 M
 33
 As $n finishes the chant, the road is cloaked in illusion!~
+M
+40
+The chant has already been performed here.~
 R
 1119 1 0 0
 R

@@ -196,7 +196,7 @@ bool check_build_location_and_dir(char_data *ch, room_data *room, craft_data *ty
 		}
 		return FALSE;
 	}
-	if (!is_upgrade && make_veh && GET_ROOM_VEHICLE(room) && (VEH_FLAGGED(make_veh, VEH_NO_LOAD_ONTO_VEHICLE) || !VEH_FLAGGED(GET_ROOM_VEHICLE(room), VEH_CARRY_VEHICLES))) {
+	if (!is_upgrade && make_veh && GET_ROOM_VEHICLE(room) && (VEH_FLAGGED(make_veh, VEH_NO_LOAD_ONTO_VEHICLE) || (!VEH_FLAGGED(GET_ROOM_VEHICLE(room), VEH_CARRY_VEHICLES) && !VEH_FLAGGED(make_veh, VEH_TINY)))) {
 		if (ch) {
 			msg_to_char(ch, "You can't %s that in here.\r\n", command);
 		}
@@ -364,6 +364,11 @@ void complete_building(room_data *room) {
 			qt_empire_players(emp, qt_gain_building, GET_BLD_VNUM(GET_BUILDING(room)));
 			et_gain_building(emp, GET_BLD_VNUM(GET_BUILDING(room)));
 		}
+	}
+	
+	// ensure mine data is init (it can be reset in some cases)
+	if (room_has_function_and_city_ok(emp, room, FNC_MINE)) {
+		init_mine(room, NULL, emp);
 	}
 	
 	affect_total_room(room);
@@ -2622,9 +2627,15 @@ ACMD(do_designate) {
 	else if (subcmd == SCMD_DESIGNATE && hasrooms >= maxrooms) {
 		msg_to_char(ch, "There's no more free space.\r\n");
 	}
-	else if (subcmd == SCMD_DESIGNATE && ((dir = parse_direction(ch, arg)) == NO_DIR || !(veh_dirs ? can_designate_dir_vehicle[dir] : can_designate_dir[dir]))) {
+	else if (subcmd == SCMD_DESIGNATE && (dir = parse_direction(ch, arg)) == NO_DIR) {
 		msg_to_char(ch, "Invalid direction.\r\n");
 		msg_to_char(ch, "Usage: %s <room>\r\n", subcmd == SCMD_REDESIGNATE ? "redesignate" : "designate <direction>");
+	}
+	else if (subcmd == SCMD_DESIGNATE && !veh_dirs && !can_designate_dir[dir]) {
+		msg_to_char(ch, "You can't designate anything in that direction here (try a compass direction, up, or down).\r\n");
+	}
+	else if (subcmd == SCMD_DESIGNATE && veh_dirs && !can_designate_dir_vehicle[dir]) {
+		msg_to_char(ch, "You can't designate anything in that direction on a vehicle (try fore, aft, starboard, port, up, or down).\r\n");
 	}
 	else if (!has_permission(ch, PRIV_BUILD, IN_ROOM(ch)) || !can_use_room(ch, IN_ROOM(ch), MEMBERS_ONLY)) {
 		msg_to_char(ch, "You don't have permission to designate rooms here.\r\n");

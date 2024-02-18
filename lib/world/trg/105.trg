@@ -366,8 +366,8 @@ else
   %dot% #10551 %actor% 25 75 magical 5
 end
 wait 1 s
-if !%actor% || (%actor.vnum% == %self.vnum%)
-  * Actor died during the delay
+if !%actor% || (%actor.vnum% == %self.vnum%) || %actor.room% != %self.room%
+  * Actor died/left during the delay
   set actor %self.fighting%
   if !%actor%
     halt

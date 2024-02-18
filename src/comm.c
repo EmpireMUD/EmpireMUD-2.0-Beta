@@ -1472,6 +1472,9 @@ void perform_act(const char *orig, char_data *ch, const void *obj, const void *v
 					break;
 				}
 				case 'O': {
+					if (IAF(ACT_NON_MOB_VICT)) {
+						log("SYSERR: Using $O with a non-mob vict_obj flag: %s", orig);
+					}
 					CHECK_NULL(vict_obj, PERS((char_data*)vict_obj, (char_data*)to, TRUE));
 					dg_victim = (char_data*) vict_obj;
 					real_vict = TRUE;

@@ -213,6 +213,8 @@
 #define ABIL_CUSTOM_IMMUNE_SELF_TO_CHAR		37
 #define ABIL_CUSTOM_IMMUNE_TARG_TO_CHAR		38
 #define ABIL_CUSTOM_NO_TARGET				39
+#define ABIL_CUSTOM_SELF_ONE_AT_AT_TIME		40
+#define ABIL_CUSTOM_TARG_ONE_AT_AT_TIME		41
 
 
 // ABIL_EFFECT_x: things that happen when an ability is used

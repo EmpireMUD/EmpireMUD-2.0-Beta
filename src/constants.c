@@ -63,7 +63,7 @@ void tog_pvp(char_data *ch);
 //// EMPIREMUD CONSTANTS /////////////////////////////////////////////////////
 
 // Shown on the "version" command and sent over MSSP
-const char *version = "EmpireMUD 2.0 beta 5.175";
+const char *version = "EmpireMUD 2.0 beta 5.176";
 const char *DG_SCRIPT_VERSION = "DG Scripts 1.0.12 e5.1.2";
 
 
@@ -387,6 +387,8 @@ const char *ability_custom_types[] = {
 	"immune-self-to-char",
 	"immune-targ-to-char",
 	"no-target",
+	"self-one-at-a-time",	// 40
+	"targ-one-at-a-time",
 	"\n"
 };
 
@@ -410,7 +412,8 @@ const char *ability_custom_type_help =
 " Over time messages with no target: ot-self-to-char ot-self-to-room\r\n"
 "&w Over time messsages with target: ot-targ-to-char ot-targ-to-vict ot-targ-to-room&0\r\n"
 " Message shown to the user when the target is immune: immune-self-to-char, immune-targ-to-char\r\n"
-"&w Other messages: no-argument, no-target&0\r\n";
+"&w Shown when one-at-a-time flag prevents the ability: self-one-at-a-time, targ-one-at-a-time&0\r\n"
+" Other messages: no-argument, no-target\r\n";
 
 
 
@@ -5455,6 +5458,7 @@ const char *vehicle_flags[] = {
 	"OBSCURE-VISION",
 	"*INSTANCE",
 	"*TEMPORARY",
+	"TINY",	// 40
 	"\n"
 };
 
@@ -5501,6 +5505,7 @@ const char *identify_vehicle_flags[] = {
 	"",	// OBSCURE-VISION
 	"",	// *INSTANCE
 	"",	// *TEMPORARY
+	"",	// TINY
 	"\n"
 };
 

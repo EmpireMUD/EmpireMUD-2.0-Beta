@@ -241,6 +241,15 @@ You let loose a pulse of healing mana...~
 M
 14
 $n lets loose a pulse of healing mana...~
+M
+15
+You let loose a pulse of healing mana...~
+M
+16
+$n lets loose a pulse of healing mana...~
+M
+17
+$n lets loose a pulse of healing mana...~
 T y 1
 X+ 7 0.25
 S
@@ -431,6 +440,9 @@ You ready a counterspell.~
 M
 1
 $n flickers momentarily with a blue-white aura.~
+M
+40
+You already have a counterspell ready.~
 T b 1
 X+ 0 T
 X+ 1 3021
@@ -1500,6 +1512,12 @@ M
 M
 12
 *~
+M
+40
+You're still feeling the effects of that last vigor spell.~
+M
+41
+$N is still feeling the effects of the last vigor spell.~
 T y 1
 T b 2
 X+ 1 3031
@@ -1564,6 +1582,9 @@ $n says, 'And strong, withstand the ages!'~
 M
 33
 $n finishes the ritual and the walls take on a strange magenta glow!~
+M
+40
+The ritual has already been performed here.~
 R
 1114 1 0 0
 R

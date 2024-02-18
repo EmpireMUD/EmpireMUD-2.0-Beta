@@ -1588,7 +1588,8 @@ See also: BAKERY, EINVENTORY, WORKFORCE, WORKFORCE CRAFTS, WORKFORCE WHY
 #
 "WORKFORCE KEEP"
 
-Usage:  workforce keep [number | all] <item name>
+Usage:  workforce keep
+        workforce keep [number | all] <item name>
         workforce keep default [number | all | none]
 
 This command will prevent your workers from using/eating an item in your
@@ -1596,7 +1597,9 @@ empire's inventory. You can specify more than one keyword if you're having
 trouble targeting the right item.
 
 This command only affects the island you are currently on. Using this command
-without a number/all argument will toggle 'keep' on or off.
+with no argument will show current keep settings for the island; you can also
+see keep settings on the einventory command. When typed with an item name but
+no number/all argument, this command will toggle 'keep' on or off.
 
 When you run out of an item in your empire's inventory, it will lose its 'keep'
 information. You can use 'workforce keep default' to set a default number to

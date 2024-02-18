@@ -991,16 +991,18 @@ ACMD(do_library) {
 			msg_to_char(ch, "Invalid %s command.\r\n", types[subcmd]);
 		}
 		else if (IS_SET(library_command[pos].flags, LIBR_REQ_LIBRARY) && !room_has_function_and_city_ok(GET_LOYALTY(ch), IN_ROOM(ch), FNC_LIBRARY)) {
-			msg_to_char(ch, "You must be inside a library to do this.\r\n");
+			if (HAS_FUNCTION(IN_ROOM(ch), FNC_LIBRARY) && !can_use_room(ch, IN_ROOM(ch), GUESTS_ALLOWED)) {
+				msg_to_char(ch, "You don't have permission to use this library.\r\n");
+			}
+			else {
+				msg_to_char(ch, "You must be inside a library to do this.\r\n");
+			}
 		}
 		else if (IS_SET(library_command[pos].flags, LIBR_REQ_LIBRARY) && !check_in_city_requirement(IN_ROOM(ch), TRUE)) {
 			msg_to_char(ch, "This library must be in a city to do that.\r\n");
 		}
 		else if (!check_in_city_requirement(IN_ROOM(ch), TRUE)) {
 			msg_to_char(ch, "This building must be in a city to use it.\r\n");
-		}
-		else if (IS_SET(library_command[pos].flags, LIBR_REQ_LIBRARY) && !can_use_room(ch, IN_ROOM(ch), GUESTS_ALLOWED)) {
-			msg_to_char(ch, "You don't have permission to use this library.\r\n");
 		}
 		else if (IS_SET(library_command[pos].flags, LIBR_REQ_LIBRARY) && !IS_COMPLETE(IN_ROOM(ch))) {
 			msg_to_char(ch, "The library is unfinished and has no books.\r\n");

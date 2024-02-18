@@ -1929,7 +1929,10 @@ void do_chore_gen_craft(empire_data *emp, room_data *room, vehicle_data *veh, in
 	// now attempt to do the chore
 	if (do_craft) {
 		if ((worker = find_chore_worker_in_room(emp, room, veh, chore_data[chore].mob))) {
-			charge_workforce(emp, chore, room, worker, 1, GET_CRAFT_OBJECT(do_craft), GET_CRAFT_QUANTITY(do_craft));
+			proto = obj_proto(GET_CRAFT_OBJECT(do_craft));
+			
+			// charge food and mark a resource we're working: food is only charged if we aren't cooking food here
+			charge_workforce(emp, chore, room, worker, (proto && IS_FOOD(proto)) ? 0 : 1, GET_CRAFT_OBJECT(do_craft), GET_CRAFT_QUANTITY(do_craft));
 		
 			// charge resources (we pre-validated res->type and availability)
 			for (res = GET_CRAFT_RESOURCES(do_craft); res; res = res->next) {
@@ -1941,7 +1944,6 @@ void do_chore_gen_craft(empire_data *emp, room_data *room, vehicle_data *veh, in
 				}
 			}
 			
-			proto = obj_proto(GET_CRAFT_OBJECT(do_craft));
 			add_to_empire_storage(emp, islid, GET_CRAFT_OBJECT(do_craft), GET_CRAFT_QUANTITY(do_craft), proto ? GET_OBJ_TIMER(proto) : 0);
 			add_production_total(emp, GET_CRAFT_OBJECT(do_craft), GET_CRAFT_QUANTITY(do_craft));
 			add_workforce_production_log(emp, WPLOG_OBJECT, GET_CRAFT_OBJECT(do_craft), GET_CRAFT_QUANTITY(do_craft));
@@ -1955,8 +1957,9 @@ void do_chore_gen_craft(empire_data *emp, room_data *room, vehicle_data *veh, in
 			done_any = TRUE;
 		}
 		else if ((worker = place_chore_worker(emp, chore, room))) {
-			// fresh worker
-			charge_workforce(emp, chore, room, worker, 1, GET_CRAFT_OBJECT(do_craft), GET_CRAFT_QUANTITY(do_craft));
+			// fresh worker (charges food now EXCEPT when here to cook food)
+			proto = obj_proto(GET_CRAFT_OBJECT(do_craft));
+			charge_workforce(emp, chore, room, worker, (proto && IS_FOOD(proto)) ? 0 : 1, GET_CRAFT_OBJECT(do_craft), GET_CRAFT_QUANTITY(do_craft));
 		}
 	}
 	else {	// mark delays
@@ -2926,6 +2929,9 @@ INTERACTION_FUNC(one_production_chore) {
 		add_production_total(emp, interaction->vnum, amt);
 		add_workforce_production_log(emp, WPLOG_OBJECT, interaction->vnum, amt);
 		
+		// charge workforce: needs only charges food if it's producing something that isn't food 
+		charge_workforce(emp, CHORE_PRODUCTION, inter_room, ch, (proto && IS_FOOD(proto)) ? 0 : 1, NOTHING, 0);
+		
 		ADD_CHORE_DEPLETION(inter_room, inter_veh, depletion_type, TRUE);
 		
 		// only send message if someone else is present (don't bother verifying it's a player)
@@ -2938,10 +2944,10 @@ INTERACTION_FUNC(one_production_chore) {
 			}
 			
 			if (inter_veh) {
-				sprintf(buf, "$n produces %s%s from $V.", get_obj_name_by_proto(interaction->vnum), amtbuf);
+				sprintf(buf, "$n produces %s%s from $V.", proto ? GET_OBJ_SHORT_DESC(proto) : "something", amtbuf);
 			}
 			else {
-				sprintf(buf, "$n produces %s%s.", get_obj_name_by_proto(interaction->vnum), amtbuf);
+				sprintf(buf, "$n produces %s%s.", proto ? GET_OBJ_SHORT_DESC(proto) : "something", amtbuf);
 			}
 			act(buf, FALSE, ch, NULL, inter_veh, TO_ROOM | TO_SPAMMY | TO_QUEUE | ACT_VEH_VICT);
 		}
@@ -2976,14 +2982,16 @@ void do_chore_production(empire_data *emp, room_data *room, vehicle_data *veh, i
 			}
 			// no else: these interactions may fail due to low percentages
 			
-			// workforce needs:
-			if (interact_type == INTERACT_SKILLED_LABOR || success) {
-				// charging food needs
-				charge_workforce(emp, CHORE_PRODUCTION, room, worker, 1, NOTHING, 0);
-			}
-			else {
-				// basic production does not charge needs if it doesn't produce
-				charge_workforce(emp, CHORE_PRODUCTION, room, worker, 0, NOTHING, 0);
+			// workforce needs were charged inside one_production_chore IF it succeeded, so:
+			if (!success) {
+				if (interact_type == INTERACT_SKILLED_LABOR) {
+					// skilled labor charges food needs anyway
+					charge_workforce(emp, CHORE_PRODUCTION, room, worker, 1, NOTHING, 0);
+				}
+				else {
+					// basic production does not charge needs if it doesn't produce (just mark the chore)
+					charge_workforce(emp, CHORE_PRODUCTION, room, worker, 0, NOTHING, 0);
+				}
 			}
 		}
 		else if ((worker = place_chore_worker(emp, CHORE_PRODUCTION, room))) {

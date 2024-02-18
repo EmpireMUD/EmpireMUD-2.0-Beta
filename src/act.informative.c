@@ -901,6 +901,7 @@ void display_attributes(char_data *ch, char_data *to) {
 */
 void display_score_to_char(char_data *ch, char_data *to) {
 	char lbuf[MAX_STRING_LENGTH], lbuf2[MAX_STRING_LENGTH], lbuf3[MAX_STRING_LENGTH];
+	char *str;
 	struct player_skill_data *skdata, *next_skill;
 	int i, j, count, pts, cols, val, temperature;
 	empire_data *emp;
@@ -959,17 +960,17 @@ void display_score_to_char(char_data *ch, char_data *to) {
 	
 	// row 2 col 1: conditions
 	*lbuf = '\0';
-	if (IS_HUNGRY(ch)) {
-		sprintf(lbuf + strlen(lbuf), "%s&yhungry&0", (strlen(lbuf) > 0 ? ", " : ""));
+	if ((str = how_hungry(ch))) {
+		sprintf(lbuf + strlen(lbuf), "%s&y%s&0", (strlen(lbuf) > 0 ? ", " : ""), str);
 	}
-	if (IS_THIRSTY(ch)) {
-		sprintf(lbuf + strlen(lbuf), "%s&cthirsty&0", (strlen(lbuf) > 0 ? ", " : ""));
+	if ((str = how_thirsty(ch))) {
+		sprintf(lbuf + strlen(lbuf), "%s&c%s&0", (strlen(lbuf) > 0 ? ", " : ""), str);
 	}
-	if (IS_DRUNK(ch)) {
-		sprintf(lbuf + strlen(lbuf), "%s&mdrunk&0", (strlen(lbuf) > 0 ? ", " : ""));
+	if ((str = how_drunk(ch))) {
+		sprintf(lbuf + strlen(lbuf), "%s&m%s&0", (strlen(lbuf) > 0 ? ", " : ""), str);
 	}
-	if (IS_BLOOD_STARVED(ch)) {
-		sprintf(lbuf + strlen(lbuf), "%s&rstarving&0", (strlen(lbuf) > 0 ? ", " : ""));
+	if ((str = how_blood_starved(ch))) {
+		sprintf(lbuf + strlen(lbuf), "%s&r%s&0", (strlen(lbuf) > 0 ? ", " : ""), str);
 	}
 	temperature = get_relative_temperature(ch);
 	if (temperature <= -1 * config_get_int("temperature_discomfort")) {
@@ -1065,8 +1066,8 @@ void display_score_to_char(char_data *ch, char_data *to) {
 	
 	// affects last
 	if (ch == to) {
-		// show full effects, which is only formatted for the character
-		do_affects(to, "", 0, 0);
+		// show full effects, which is only formatted for the character (subcmd=1 to indicate it's being called from another function)
+		do_affects(to, "", 0, 1);
 	}
 	else {
 		// show summary effects
@@ -2623,6 +2624,8 @@ ACMD(do_adventure) {
 
 
 ACMD(do_affects) {
+	bool limited;
+	char *str;
 	char_data *vict;
 	int i;
 	
@@ -2648,34 +2651,39 @@ ACMD(do_affects) {
 		}
 		return;
 	}
+	
+	// if a subcmd was passed, we remove some of the info
+	limited = (subcmd != 0);
 
 	msg_to_char(ch, "  Affects:\r\n");
 
-	/* Conditions */
-	// This reports conditions all on one line -- end each one with a comma and a space
-	sprintf(buf1, "   You are ");
-	if (IS_HUNGRY(ch)) {
-		strcat(buf1, "hungry, ");
-	}
-	if (IS_THIRSTY(ch)) {
-		strcat(buf1, "thirsty, ");
-	}
-	if (IS_DRUNK(ch)) {
-		strcat(buf1, "inebriated, ");
-	}
-	if (IS_BLOOD_STARVED(ch)) {
-		strcat(buf1, "starving, ");
-	}
+	// Conditions: not shown on limited view because 'score' shows them separately
+	if (!limited) {
+		// This reports conditions all on one line -- end each one with a comma and a space
+		sprintf(buf1, "   You are ");
+		if ((str = how_hungry(ch))) {
+			sprintf(buf1 + strlen(buf1), "%s, ", str);
+		}
+		if ((str = how_thirsty(ch))) {
+			sprintf(buf1 + strlen(buf1), "%s, ", str);
+		}
+		if ((str = how_drunk(ch))) {
+			sprintf(buf1 + strlen(buf1), "%s, ", str);
+		}
+		if ((str = how_blood_starved(ch))) {
+			sprintf(buf1 + strlen(buf1), "%s, ", str);
+		}
 
-	if (strlen(buf1) > 13) {	/* We have a condition */
-		buf1[strlen(buf1)-2] = '\0';	/* This removes the final ", " */
-		for (i = strlen(buf1); i >= 0; i--)
-			if (buf1[i] == ',') {	/* Looking for that last ',' */
-				strcpy(buf2, buf1 + i + 1);
-				sprintf(buf1 + i, " and%s", buf2);
-				break;
-			}
-		msg_to_char(ch, "%s.\r\n", buf1);
+		if (strlen(buf1) > 13) {	/* We have a condition */
+			buf1[strlen(buf1)-2] = '\0';	/* This removes the final ", " */
+			for (i = strlen(buf1); i >= 0; i--)
+				if (buf1[i] == ',') {	/* Looking for that last ',' */
+					strcpy(buf2, buf1 + i + 1);
+					sprintf(buf1 + i, " and%s", buf2);
+					break;
+				}
+			msg_to_char(ch, "%s.\r\n", buf1);
+		}
 	}
 	
 	// mount
@@ -3322,13 +3330,13 @@ ACMD(do_help) {
 	if (!ch->desc)
 		return;
 
-	skip_spaces(&argument);
+	argument = trim(argument);
 	
 	// optional -m arg
 	if (!strn_cmp(argument, "-m ", 3)) {
 		level = LVL_MORTAL;
 		argument += 3;
-		skip_spaces(&argument);
+		argument = trim(argument);
 	}
 	
 	// no-arg: basic help screen

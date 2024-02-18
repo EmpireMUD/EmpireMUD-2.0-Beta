@@ -60,6 +60,38 @@ bool run_timer_triggers_on_decaying_warehouse(empire_data *emp, struct empire_un
 //// CHARACTER LIMITS ////////////////////////////////////////////////////////
 
 /**
+* Determines if a character can be mounted in a given room. For example, trying
+* to enter a water tile from a land tile while mounted.
+*
+* @param char_data *ch The player to check.
+* @param room_data *room The location to check (e.g. for water flags).
+* @return bool TRUE if the player can be mounted there, FALSE if not.
+*/
+bool can_mount_in_room(char_data *ch, room_data *room) {
+	bool ok = TRUE;
+	
+	if (IS_NPC(ch)) {
+		return TRUE;	// no data to check
+	}
+	else if ((IS_COMPLETE(room) || ROOM_BLD_FLAGGED(room, BLD_CLOSED)) && !BLD_ALLOWS_MOUNTS(room)) {
+		ok = FALSE;
+	}
+	else if (DEEP_WATER_SECT(room) && !MOUNT_FLAGGED(ch, MOUNT_AQUATIC | MOUNT_WATERWALKING) && !EFFECTIVELY_FLYING(ch)) {
+		ok = FALSE;
+	}
+	else if (!CAN_RIDE_WATERWALK_MOUNT(ch) && DEEP_WATER_SECT(room) && MOUNT_FLAGGED(ch, MOUNT_WATERWALKING) && !EFFECTIVELY_FLYING(ch)) {
+		// has a waterwalking mount, in deep water, but is missing the riding upgrade
+		ok = FALSE;
+	}
+	else if (!has_player_tech(ch, PTECH_RIDING_UPGRADE) && WATER_SECT(room) && !MOUNT_FLAGGED(ch, MOUNT_AQUATIC) && !EFFECTIVELY_FLYING(ch)) {
+		ok = FALSE;
+	}
+	
+	return ok;
+}
+
+
+/**
 * This checks for players whose primary attributes have dropped below 1, and
 * unequips gear to compensate.
 *
@@ -344,23 +376,13 @@ void check_should_dismount(char_data *ch) {
 	else if (IS_MORPHED(ch)) {
 		ok = FALSE;
 	}
-	else if ((IS_COMPLETE(IN_ROOM(ch)) || ROOM_BLD_FLAGGED(IN_ROOM(ch), BLD_CLOSED)) && !BLD_ALLOWS_MOUNTS(IN_ROOM(ch))) {
-		ok = FALSE;
-	}
 	else if (GET_SITTING_ON(ch)) {
 		ok = FALSE;
 	}
 	else if (MOUNT_FLAGGED(ch, MOUNT_FLYING) && !CAN_RIDE_FLYING_MOUNT(ch)) {
 		ok = FALSE;
 	}
-	else if (DEEP_WATER_SECT(IN_ROOM(ch)) && !MOUNT_FLAGGED(ch, MOUNT_AQUATIC | MOUNT_WATERWALKING) && !EFFECTIVELY_FLYING(ch)) {
-		ok = FALSE;
-	}
-	else if (!CAN_RIDE_WATERWALK_MOUNT(ch) && DEEP_WATER_SECT(IN_ROOM(ch)) && MOUNT_FLAGGED(ch, MOUNT_WATERWALKING) && !EFFECTIVELY_FLYING(ch)) {
-		// has a waterwalking mount, in deep water, but is missing the riding upgrade
-		ok = FALSE;
-	}
-	else if (!has_player_tech(ch, PTECH_RIDING_UPGRADE) && WATER_SECT(IN_ROOM(ch)) && !MOUNT_FLAGGED(ch, MOUNT_AQUATIC) && !EFFECTIVELY_FLYING(ch)) {
+	else if (!can_mount_in_room(ch, IN_ROOM(ch))) {
 		ok = FALSE;
 	}
 	
@@ -742,14 +764,29 @@ void real_update_player(char_data *ch) {
 	if (!IS_IMMORTAL(ch) && IS_SWIMMING(ch)) {
 		// swimming: costs moves
 		if (GET_MOVE(ch) > 0) {
-			set_move(ch, GET_MOVE(ch) - 1);
+			set_move(ch, GET_MOVE(ch) - (has_player_tech(ch, PTECH_SWIMMING) ? 1 : 5));
+			
 		}
+		
+		// swimming messages
 		if (GET_MOVE(ch) <= 0) {
+			// death!
 			msg_to_char(ch, "You sink beneath the water and die!\r\n");
 			act("$n sinks beneath the water and dies!", FALSE, ch, NULL, NULL, TO_ROOM);
 			death_log(ch, ch, ATTACK_SUFFERING);
 			die(ch, ch);
 			return;
+		}
+		else if (GET_MOVE(ch) <= 30 || (!has_player_tech(ch, PTECH_SWIMMING) && GET_MOVE(ch) <= 150)) {
+			msg_to_char(ch, "You're having trouble swimming. Better get back on land before you run out of movement points!\r\n");
+		}
+		else if (!(GET_MOVE(ch) % 30)) {
+			if (GET_MOVE(ch) > 150) {
+				msg_to_char(ch, "You are %s losing movement points from swimming.\r\n", has_player_tech(ch, PTECH_SWIMMING) ? "slowly" : "quickly");
+			}
+			else {
+				msg_to_char(ch, "You won't be able to swim forever; better head back to shore.\r\n");
+			}
 		}
 	}
 	else {	// normal move gain
@@ -2212,7 +2249,7 @@ void check_empire_storage_timers(void) {
 						free(st);
 						
 						// delete storage if needed
-						if (store->amount == 0 && !store->keep) {
+						if (store->amount == 0 && store->keep != EMPIRE_ATTRIBUTE(emp, EATT_DEFAULT_KEEP)) {
 							HASH_DEL(isle->store, store);
 							free_empire_storage_data(store);
 							store = NULL;

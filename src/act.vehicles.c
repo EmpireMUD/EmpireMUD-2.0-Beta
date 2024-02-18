@@ -1369,7 +1369,7 @@ ACMD(do_board) {
 	else if (GET_LEADING_MOB(ch) && IN_ROOM(GET_LEADING_MOB(ch)) == IN_ROOM(ch) && !VEH_FLAGGED(veh, VEH_CARRY_MOBS)) {
 		msg_to_char(ch, "You can't %s it while leading an animal.\r\n", command);
 	}
-	else if (GET_LEADING_VEHICLE(ch) && IN_ROOM(GET_LEADING_VEHICLE(ch)) == IN_ROOM(ch) && !VEH_FLAGGED(veh, VEH_CARRY_VEHICLES)) {
+	else if (GET_LEADING_VEHICLE(ch) && IN_ROOM(GET_LEADING_VEHICLE(ch)) == IN_ROOM(ch) && !VEH_FLAGGED(veh, VEH_CARRY_VEHICLES) && !VEH_FLAGGED(GET_LEADING_VEHICLE(ch), VEH_TINY)) {
 		msg_to_char(ch, "You can't %s it while leading a vehicle.\r\n", command);
 	}
 	else if (GET_LEADING_VEHICLE(ch) && VEH_FLAGGED(GET_LEADING_VEHICLE(ch), VEH_NO_LOAD_ONTO_VEHICLE)) {
@@ -1547,7 +1547,7 @@ void do_drag_portal(char_data *ch, vehicle_data *veh, char *arg) {
 	else if (ROOM_IS_CLOSED(to_room) && VEH_FLAGGED(veh, VEH_NO_BUILDING)) {
 		msg_to_char(ch, "You can't drag it in there.\r\n");
 	}
-	else if (GET_ROOM_VEHICLE(to_room) && (VEH_FLAGGED(veh, VEH_NO_LOAD_ONTO_VEHICLE) || !VEH_FLAGGED(GET_ROOM_VEHICLE(to_room), VEH_CARRY_VEHICLES))) {
+	else if (GET_ROOM_VEHICLE(to_room) && (VEH_FLAGGED(veh, VEH_NO_LOAD_ONTO_VEHICLE) || (!VEH_FLAGGED(GET_ROOM_VEHICLE(to_room), VEH_CARRY_VEHICLES) && !VEH_FLAGGED(veh, VEH_TINY)))) {
 		msg_to_char(ch, "You can't drag it in there.\r\n");
 	}
 	else if (!ROOM_IS_CLOSED(to_room) && !vehicle_allows_climate(veh, to_room, NULL)) {
@@ -2259,21 +2259,22 @@ ACMD(do_load_vehicle) {
 			}
 		}
 		
-		if (VEH_FLAGGED(cont, VEH_CARRY_VEHICLES)) {
-			DL_FOREACH_SAFE2(ROOM_VEHICLES(IN_ROOM(ch)), veh, next_veh, next_in_room) {
-				if (veh == cont || !VEH_IS_COMPLETE(veh) || VEH_FLAGGED(veh, VEH_ON_FIRE | VEH_NO_LOAD_ONTO_VEHICLE)) {
-					continue;
-				}
-				if (!can_use_vehicle(ch, veh, MEMBERS_ONLY)) {
-					continue;
-				}
-				if (VEH_SITTING_ON(veh) || VEH_LED_BY(veh) || VEH_DRIVER(veh)) {
-					continue;
-				}
-			
-				perform_load_vehicle(ch, veh, cont, to_room);
-				found = TRUE;
+		DL_FOREACH_SAFE2(ROOM_VEHICLES(IN_ROOM(ch)), veh, next_veh, next_in_room) {
+			if (!VEH_FLAGGED(cont, VEH_CARRY_VEHICLES) && !VEH_FLAGGED(veh, VEH_TINY)) {
+				continue;	// can't carry vehicles AND isn't tiny
 			}
+			if (veh == cont || !VEH_IS_COMPLETE(veh) || VEH_FLAGGED(veh, VEH_ON_FIRE | VEH_NO_LOAD_ONTO_VEHICLE)) {
+				continue;
+			}
+			if (!can_use_vehicle(ch, veh, MEMBERS_ONLY)) {
+				continue;
+			}
+			if (VEH_SITTING_ON(veh) || VEH_LED_BY(veh) || VEH_DRIVER(veh)) {
+				continue;
+			}
+		
+			perform_load_vehicle(ch, veh, cont, to_room);
+			found = TRUE;
 		}
 		
 		if (!found) {
@@ -2313,7 +2314,7 @@ ACMD(do_load_vehicle) {
 		else if (VEH_FLAGGED(veh, VEH_NO_LOAD_ONTO_VEHICLE)) {
 			msg_to_char(ch, "You can't load that %sto %ss.\r\n", IN_OR_ON(cont), VEH_OR_BLD(cont));
 		}
-		else if (!VEH_FLAGGED(cont, VEH_CARRY_VEHICLES)) {
+		else if (!VEH_FLAGGED(cont, VEH_CARRY_VEHICLES) && !VEH_FLAGGED(veh, VEH_TINY)) {
 			act("$v won't carry that.", FALSE, ch, cont, NULL, TO_CHAR | ACT_VEH_OBJ);
 		}
 		else if (VEH_FLAGGED(veh, VEH_NO_LOAD_ONTO_VEHICLE)) {
@@ -2492,21 +2493,22 @@ ACMD(do_unload_vehicle) {
 			}
 		}
 		
-		if (!GET_ROOM_VEHICLE(IN_ROOM(cont)) || VEH_FLAGGED(GET_ROOM_VEHICLE(IN_ROOM(cont)), VEH_CARRY_VEHICLES)) {
-			DL_FOREACH_SAFE2(ROOM_VEHICLES(IN_ROOM(ch)), veh, next_veh, next_in_room) {
-				if (veh == cont || !VEH_IS_COMPLETE(veh) || VEH_FLAGGED(veh, VEH_ON_FIRE | VEH_NO_LOAD_ONTO_VEHICLE)) {
-					continue;
-				}
-				if (!can_use_vehicle(ch, veh, MEMBERS_ONLY)) {
-					continue;
-				}
-				if (VEH_SITTING_ON(veh) || VEH_LED_BY(veh) || VEH_DRIVER(veh)) {
-					continue;
-				}
-			
-				perform_unload_vehicle(ch, veh, cont);
-				found = TRUE;
+		DL_FOREACH_SAFE2(ROOM_VEHICLES(IN_ROOM(ch)), veh, next_veh, next_in_room) {
+			if (GET_ROOM_VEHICLE(IN_ROOM(cont)) && !VEH_FLAGGED(GET_ROOM_VEHICLE(IN_ROOM(cont)), VEH_CARRY_VEHICLES) && !VEH_FLAGGED(veh, VEH_TINY)) {
+				continue;	// containing outer vehicle cannot hold this vehicle
 			}
+			if (veh == cont || !VEH_IS_COMPLETE(veh) || VEH_FLAGGED(veh, VEH_ON_FIRE | VEH_NO_LOAD_ONTO_VEHICLE)) {
+				continue;
+			}
+			if (!can_use_vehicle(ch, veh, MEMBERS_ONLY)) {
+				continue;
+			}
+			if (VEH_SITTING_ON(veh) || VEH_LED_BY(veh) || VEH_DRIVER(veh)) {
+				continue;
+			}
+		
+			perform_unload_vehicle(ch, veh, cont);
+			found = TRUE;
 		}
 		
 		if (!found) {
@@ -2546,7 +2548,7 @@ ACMD(do_unload_vehicle) {
 		else if (VEH_FLAGGED(veh, VEH_NO_LOAD_ONTO_VEHICLE)) {
 			msg_to_char(ch, "That cannot be unloaded from anything.\r\n");
 		}
-		else if (GET_ROOM_VEHICLE(IN_ROOM(cont)) && !VEH_FLAGGED(GET_ROOM_VEHICLE(IN_ROOM(cont)), VEH_CARRY_VEHICLES)) {
+		else if (GET_ROOM_VEHICLE(IN_ROOM(cont)) && !VEH_FLAGGED(GET_ROOM_VEHICLE(IN_ROOM(cont)), VEH_CARRY_VEHICLES) && !VEH_FLAGGED(veh, VEH_TINY)) {
 			msg_to_char(ch, "You can't unload %ss here.\r\n", VEH_OR_BLD(cont));
 		}
 		else if (VEH_IS_DISMANTLING(veh)) {

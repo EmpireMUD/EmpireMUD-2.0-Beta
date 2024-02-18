@@ -144,9 +144,12 @@ SOLO SOLOIST "SOLO ROLE" "SOLO GROUP ROLE"
 The "solo" group role is for people who are going it alone and need every ounce
 of strength their character can muster. This gives them access to a broader
 range of synergy abilities, but those abilities will only work if the player is
-actually solo.
+actually solo -- that is, no other players are in the same room (unless you're
+fighting them).
 
-If another player is present, solo role abilities will not work.
+If another player is present, synergy abilities will not work. You should
+switch to the tank, healer, melee, or caster role when you're with another
+player.
 #
 TANK TANKING "TANK ROLE" "TANKING ROLE" "TANK TRAITS" "TANKING ROLE"
 

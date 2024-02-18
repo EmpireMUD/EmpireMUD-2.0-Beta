@@ -99,18 +99,24 @@ Water Elemental: Envelop~
 if %self.cooldown(12605)%
   halt
 end
+set check_id %actor.id%
 nop %self.set_cooldown(12605, 20)%
 %send% %actor% ~%self% surges forward and envelops you!
 %echoaround% %actor% ~%self% surges forward and envelops ~%actor%!
 %send% %actor% (Type 'struggle' to break free.)
 dg_affect #12604 %actor% HARD-STUNNED on 20
 dg_affect #12607 %self% HARD-STUNNED on 20
-while %actor.affect(12604)%
+while 1
+  wait 5 s
+  if %actor.id% != %check_id% || %actor.room% != %self.room%
+    halt
+  elseif !%actor.affect(12604)%
+    halt
+  end
   %send% %actor% ~%self% pummels and crushes you!
   %echoaround% %actor% ~%self% pummels and crushes ~%actor%!
   %damage% %actor% 50 physical
   %send% %actor% (Type 'struggle' to break free.)
-  wait 5 sec
 done
 ~
 #12605
@@ -966,6 +972,11 @@ Grove Start Progression~
 ~
 if %actor.is_pc% && %actor.empire%
   nop %actor.empire.start_progress(12650)%
+end
+*
+* also clear breath variable if needed
+if %actor.varexists(breath)%
+  vdelete breath %actor.id%
 end
 ~
 #12673

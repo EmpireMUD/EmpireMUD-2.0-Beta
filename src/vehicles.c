@@ -1941,6 +1941,11 @@ void complete_vehicle(vehicle_data *veh) {
 		if (VEH_IS_VISIBLE_ON_MAPOUT(veh)) {
 			request_mapout_update(GET_ROOM_VNUM(room));	// in case
 		}
+		
+		// ensure mine data is set up
+		if (IS_SET(VEH_FUNCTIONS(veh), FNC_MINE)) {
+			init_mine(room, NULL, ROOM_OWNER(room) ? ROOM_OWNER(room) : VEH_OWNER(veh));
+		}
 	}
 }
 
@@ -4442,16 +4447,13 @@ void do_stat_vehicle(char_data *ch, vehicle_data *veh) {
 	
 	// icons:
 	if (VEH_ICON(veh)) {
-		replace_question_color(NULLSAFE(VEH_ICON(veh)), "&0", part);
-		size += snprintf(buf + size, sizeof(buf) - size, "Full Icon: %s\t0 %s", part, show_color_codes(VEH_ICON(veh)));
+		size += snprintf(buf + size, sizeof(buf) - size, "Full Icon: %s\t0", one_icon_display(VEH_ICON(veh), NULL));
 	}
 	if (VEH_HALF_ICON(veh)) {
-		replace_question_color(NULLSAFE(VEH_HALF_ICON(veh)), "&0", part);
-		size += snprintf(buf + size, sizeof(buf) - size, "%sHalf Icon: %s\t0 %s", (VEH_ICON(veh) ? ", " : ""), part, show_color_codes(VEH_HALF_ICON(veh)));
+		size += snprintf(buf + size, sizeof(buf) - size, "%sHalf Icon: %s\t0", (VEH_ICON(veh) ? "  " : ""), one_icon_display(VEH_HALF_ICON(veh), NULL));
 	}
 	if (VEH_QUARTER_ICON(veh)) {
-		replace_question_color(NULLSAFE(VEH_QUARTER_ICON(veh)), "&0", part);
-		size += snprintf(buf + size, sizeof(buf) - size, "%sQuarter Icon: %s\t0 %s", ((VEH_ICON(veh) || VEH_HALF_ICON(veh)) ? ", " : ""), part, show_color_codes(VEH_QUARTER_ICON(veh)));
+		size += snprintf(buf + size, sizeof(buf) - size, "%sQuarter Icon: %s\t0", ((VEH_ICON(veh) || VEH_HALF_ICON(veh)) ? "  " : ""), one_icon_display(VEH_QUARTER_ICON(veh), NULL));
 	}
 	if (VEH_ICON(veh) || VEH_HALF_ICON(veh) || VEH_QUARTER_ICON(veh)) {
 		size += snprintf(buf + size, sizeof(buf) - size, "\r\n");
@@ -4698,8 +4700,8 @@ void olc_show_vehicle(char_data *ch) {
 	sprintf(buf + strlen(buf), "<%slongdescription\t0>\r\n%s\r\n", OLC_LABEL_STR(VEH_LONG_DESC(veh), default_vehicle_long_desc), NULLSAFE(VEH_LONG_DESC(veh)));
 	sprintf(buf + strlen(buf), "<%slookdescription\t0>\r\n%s", OLC_LABEL_STR(VEH_LOOK_DESC(veh), ""), NULLSAFE(VEH_LOOK_DESC(veh)));
 	
-	sprintf(buf + strlen(buf), "<%sicon\t0> %s\t0 %s, ", OLC_LABEL_STR(VEH_ICON(veh), ""), VEH_ICON(veh) ? VEH_ICON(veh) : "none", VEH_ICON(veh) ? show_color_codes(VEH_ICON(veh)) : "");
-	sprintf(buf + strlen(buf), "<%shalficon\t0> %s\t0 %s, ", OLC_LABEL_STR(VEH_HALF_ICON(veh), ""), VEH_HALF_ICON(veh) ? VEH_HALF_ICON(veh) : "none", VEH_HALF_ICON(veh) ? show_color_codes(VEH_HALF_ICON(veh)) : "");
+	sprintf(buf + strlen(buf), "<%sicon\t0> %s\t0 %s  ", OLC_LABEL_STR(VEH_ICON(veh), ""), VEH_ICON(veh) ? VEH_ICON(veh) : "none", VEH_ICON(veh) ? show_color_codes(VEH_ICON(veh)) : "");
+	sprintf(buf + strlen(buf), "<%shalficon\t0> %s\t0 %s  ", OLC_LABEL_STR(VEH_HALF_ICON(veh), ""), VEH_HALF_ICON(veh) ? VEH_HALF_ICON(veh) : "none", VEH_HALF_ICON(veh) ? show_color_codes(VEH_HALF_ICON(veh)) : "");
 	sprintf(buf + strlen(buf), "<%squartericon\t0> %s\t0 %s\r\n", OLC_LABEL_STR(VEH_QUARTER_ICON(veh), ""), VEH_QUARTER_ICON(veh) ? VEH_QUARTER_ICON(veh) : "none", VEH_QUARTER_ICON(veh) ? show_color_codes(VEH_QUARTER_ICON(veh)) : "");
 	
 	sprintbit(VEH_FLAGS(veh), vehicle_flags, lbuf, TRUE);

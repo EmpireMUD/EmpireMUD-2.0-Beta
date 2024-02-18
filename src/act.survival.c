@@ -221,6 +221,9 @@ void do_mount_current(char_data *ch) {
 	else if (MOUNT_FLAGGED(ch, MOUNT_WATERWALKING) && !CAN_RIDE_WATERWALK_MOUNT(ch)) {
 		msg_to_char(ch, "You don't have the correct ability to ride %s! (see HELP RIDE)\r\n", get_mob_name_by_proto(GET_MOUNT_VNUM(ch), TRUE));
 	}
+	else if (!can_mount_in_room(ch, IN_ROOM(ch))) {
+		msg_to_char(ch, "You can't mount here.\r\n");
+	}
 	else if (run_ability_triggers_by_player_tech(ch, PTECH_RIDING, NULL, NULL, NULL)) {
 		return;
 	}
@@ -532,6 +535,7 @@ void do_mount_swap(char_data *ch, char *argument) {
 	}
 	
 	gain_player_tech_exp(ch, PTECH_RIDING_SWAP_ANYWHERE, 30);
+	command_lag(ch, WAIT_ABILITY);
 }
 
 

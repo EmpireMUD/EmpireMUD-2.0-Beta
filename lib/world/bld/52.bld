@@ -519,8 +519,8 @@ salterns salt pools building around~
 water. These salterns, worked all day by tireless salt farmers, form beds of
 salt crystals that can be dug up, milled into salt, and sold.
 ~
-I 5 110 60.00 125 p  # DIG: sea salt crystals
-I 31 110 5.00 125 p  # PRODUCTION: sea salt crystals
+I 5 110 60.00 250 p  # DIG: sea salt crystals
+I 31 110 5.00 250 p  # PRODUCTION: sea salt crystals
 I+ 7 0  # Depletion: dig
 R
 1001 1 5 0
@@ -559,8 +559,8 @@ pit mine salt building around down~
    The salt mine is little more than a giant pit dug near the mountain's base.
 Beneath the ground, there is a layer that's as salty as the edge of a sea.
 ~
-I 5 109 60.00 30 p  # DIG: chunk of rock salt
-I 31 109 5.00 30 p  # PRODUCTION: chunk of rock salt
+I 5 109 60.00 60 p  # DIG: chunk of rock salt
+I 31 109 5.00 60 p  # PRODUCTION: chunk of rock salt
 I+ 7 0  # Depletion: dig
 R
 1000 1 5 0

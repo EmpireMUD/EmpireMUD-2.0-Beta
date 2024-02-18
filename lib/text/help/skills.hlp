@@ -20,6 +20,10 @@ Abilities that come from skills activate at different levels depending upon
 your level in that skill. Abilities from other things, such as synergies,
 always use your full level.
 
+If your skill level (as shown on the "skills" command) is below 100, your
+abilities will scale to level 100 at most (even if your gear level would put
+you at a higher level); the same is true of being below skill level 75 or 50.
+
 When you use an ability from a skill tree that's below its maximum level, e.g.
 a skill you have at 50 or 75, it activates at that percent of your total level.
 For example, a level 50 ability will scale to 50% of your full level.
@@ -309,8 +313,6 @@ fires. Dropping a torch (or lighting a fire) may burn down the building it's
 in, if it's unowned or if you are at war with the owner.
 
 Some lighters have a limited number of uses and will be thrown away afterwards.
-If you have marked a lighter 'keep', it won't be used (unless it has unlimited
-uses).
 
 To light buildings, vehicles, or terrain, use 'burn'.
 
@@ -702,6 +704,10 @@ any two skills.
 
 You can type 'role' to see your current synergy abilities. Check the help files
 for the various skills for a list of synergy abilities.
+
+When you're in the solo role, your synergy abilities only work if you're truly
+solo -- as soon as another player is present, synergy abilities stop working.
+You should switch to another role when you're with other players.
 
 See also: ROLE, SKILLS
 #

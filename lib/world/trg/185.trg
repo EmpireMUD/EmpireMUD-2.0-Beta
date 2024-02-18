@@ -229,7 +229,7 @@ switch %random.4%
     %send% %actor% ~%self% lunges forward and grabs you!
     %echoaround% %actor% ~%self% lunges forward and grabs onto ~%actor%!
     wait 3 sec
-    if %verify_target% != %actor.id%
+    if %verify_target% != %actor.id% || %actor.room% != %self.room%
       halt
     end
     %send% %actor% ~%self% sinks ^%self% fangs deep into your neck!
@@ -254,7 +254,7 @@ switch %random.4%
     say I'll sssmash you to dussst!
     %echo% ~%self% raises all four of ^%self% blades overhead!
     wait 3 sec
-    if %verify_target% != %actor.id%
+    if %verify_target% != %actor.id% || %actor.room% != %self.room%
       halt
     end
     %send% %actor% &&rAll four of |%self% blades strike you with deadly force!
@@ -279,6 +279,9 @@ switch %random.4%
     say Behold my massstery of magic!
     %echo% ~%self% starts casting a spell!
     wait 3 sec
+    if %verify_target% != %actor.id% || %actor.room% != %self.room%
+      halt
+    end
     if %heroic_mode%
       %echo% ~%self% suddenly splits into three copies!
       set times 2
