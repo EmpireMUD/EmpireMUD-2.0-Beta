@@ -329,10 +329,14 @@ BUFFS
 
 Usage:  buffs
 
-This command lists your buff abilities and whether or not they are currently
-active on you and your group.
+This command lists many of your buff abilities and whether or not they are
+currently active on you and your group.
 
-See also: BUFF
+You can create an alias to quickly buff yourself or a friend by putting each
+ability into an alias with $* as the target, separated by semi-colons, like:
+> alias mcbuff haste $*;foresight $*;eartharmor $*
+
+See also: ALIAS, BUFF
 #
 BUG BUGS TYPO TYPOS IDEA IDEAS SUBMISSIONS
 
