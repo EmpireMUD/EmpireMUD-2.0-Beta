@@ -9229,6 +9229,10 @@ bool meets_requirements(char_data *ch, struct req_data *list, struct instance_da
 				ok = (IN_ROOM(ch) && get_sun_status(IN_ROOM(ch)) != SUN_LIGHT);
 				break;
 			}
+			case REQ_OWN_ROADS: {
+				ok = (GET_LOYALTY(ch) && count_owned_roads(GET_LOYALTY(ch)) >= req->needed);
+				break;
+			}
 			
 			// some types do not support pre-reqs
 			case REQ_KILL_MOB:
@@ -9499,6 +9503,10 @@ char *requirement_string(struct req_data *req, bool show_vnums, bool allow_custo
 		}
 		case REQ_NIGHTTIME: {
 			snprintf(output, sizeof(output), "Nighttime");
+			break;
+		}
+		case REQ_OWN_ROADS: {
+			snprintf(output, sizeof(output), "Own %dx tile%s of roads", req->needed, PLURAL(req->needed));
 			break;
 		}
 		default: {

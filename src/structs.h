@@ -497,6 +497,7 @@ typedef struct vehicle_data vehicle_data;
 #define REQ_DAYTIME  44
 #define REQ_NIGHTTIME  45
 #define REQ_DIPLOMACY_OVER  46
+#define REQ_OWN_ROADS  47
 
 
 // REQ_AMT_x: How numbers displayed for different REQ_ types

@@ -1112,6 +1112,10 @@ void refresh_one_goal_tracker(empire_data *emp, struct empire_goal *goal) {
 				task->current = find_running_event_by_vnum(task->vnum) ? 0 : task->needed;
 				break;
 			}
+			case REQ_OWN_ROADS: {
+				task->current = count_owned_roads(emp);
+				break;
+			}
 			
 			// ones that cannot be detected but are always true for progress goals
 			case REQ_DAYTIME:
@@ -1429,6 +1433,10 @@ void et_gain_building(empire_data *emp, any_vnum vnum) {
 				task->current += GET_BLD_MILITARY(bld);
 				TRIGGER_DELAYED_REFRESH(emp, DELAY_REFRESH_GOAL_COMPLETE);
 			}
+			else if (task->type == REQ_OWN_ROADS && BLD_FLAGGED(bld, BLD_ROAD_ICON)) {
+				++task->current;
+				TRIGGER_DELAYED_REFRESH(emp, DELAY_REFRESH_GOAL_COMPLETE);
+			}
 		}
 	}
 }
@@ -1441,12 +1449,17 @@ void et_gain_building(empire_data *emp, any_vnum vnum) {
 * @param sector_vnum vnum The sector vnum.
 */
 void et_gain_tile_sector(empire_data *emp, sector_vnum vnum) {
+	sector_data *sect = sector_proto(vnum);
 	struct empire_goal *goal, *next_goal;
 	struct req_data *task;
 	
 	HASH_ITER(hh, EMPIRE_GOALS(emp), goal, next_goal) {
 		LL_FOREACH(goal->tracker, task) {
 			if (task->type == REQ_OWN_SECTOR && task->vnum == vnum) {
+				++task->current;
+				TRIGGER_DELAYED_REFRESH(emp, DELAY_REFRESH_GOAL_COMPLETE);
+			}
+			else if (task->type == REQ_OWN_ROADS && SECT_FLAGGED(sect, SECTF_IS_ROAD)) {
 				++task->current;
 				TRIGGER_DELAYED_REFRESH(emp, DELAY_REFRESH_GOAL_COMPLETE);
 			}
@@ -1620,6 +1633,10 @@ void et_lose_building(empire_data *emp, any_vnum vnum) {
 			else if (task->type == REQ_EMPIRE_MILITARY && GET_BLD_MILITARY(bld) != 0) {
 				task->current -= GET_BLD_MILITARY(bld);
 			}
+			else if (task->type == REQ_OWN_ROADS && BLD_FLAGGED(bld, BLD_ROAD_ICON)) {
+				--task->current;
+				task->current = MAX(task->current, 0);
+			}
 		}
 	}
 }
@@ -1632,6 +1649,7 @@ void et_lose_building(empire_data *emp, any_vnum vnum) {
 * @param sector_vnum vnum The sector vnum.
 */
 void et_lose_tile_sector(empire_data *emp, sector_vnum vnum) {
+	sector_data *sect = sector_proto(vnum);
 	struct empire_goal *goal, *next_goal;
 	struct req_data *task;
 	
@@ -1642,6 +1660,10 @@ void et_lose_tile_sector(empire_data *emp, sector_vnum vnum) {
 				TRIGGER_DELAYED_REFRESH(emp, DELAY_REFRESH_GOAL_COMPLETE);
 				
 				// check min
+				task->current = MAX(task->current, 0);
+			}
+			else if (task->type == REQ_OWN_ROADS && SECT_FLAGGED(sect, SECTF_IS_ROAD)) {
+				--task->current;
 				task->current = MAX(task->current, 0);
 			}
 		}

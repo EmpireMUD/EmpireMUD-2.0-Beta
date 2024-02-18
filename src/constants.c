@@ -5262,6 +5262,7 @@ const char *requirement_types[] = {
 	"DAYTIME",
 	"NIGHTTIME",	// 45
 	"DIPLOMACY-OVER",
+	"OWN-ROADS",
 	"\n",
 };
 
@@ -5315,6 +5316,7 @@ const bool requirement_amt_type[] = {
 	REQ_AMT_NONE,	// daytime
 	REQ_AMT_NONE,	// 45, nighttime
 	REQ_AMT_NUMBER,	// diplomacy-over
+	REQ_AMT_NUMBER,	// own-roads
 };
 
 
@@ -5367,6 +5369,7 @@ const bool requirement_needs_tracker[] = {
 	FALSE,	// daytime
 	FALSE,	// 45, nighttime
 	FALSE,	// diplomacy-over
+	FALSE,	// own-roads
 };
 
 
