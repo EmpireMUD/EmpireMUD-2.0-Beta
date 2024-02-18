@@ -164,7 +164,7 @@ void set_empire_adjective(empire_data *emp, char *adjective) {
 		free(EMPIRE_SHORT_ADJECTIVE(emp));
 	}
 	strcpy(temp, skip_wordlist(NULLSAFE(adjective), empire_words, TRUE));
-	if (strcmp(NULLSAFE(adjective), temp)) {
+	if (*temp && strcmp(NULLSAFE(adjective), temp)) {
 		EMPIRE_SHORT_ADJECTIVE(emp) = str_dup(temp);
 	}
 	else {
@@ -194,7 +194,7 @@ void set_empire_name(empire_data *emp, char *name) {
 		free(EMPIRE_SHORT_NAME(emp));
 	}
 	strcpy(temp, skip_wordlist(NULLSAFE(name), empire_words, TRUE));
-	if (strcmp(NULLSAFE(name), temp)) {
+	if (*temp && strcmp(NULLSAFE(name), temp)) {
 		EMPIRE_SHORT_NAME(emp) = str_dup(temp);
 	}
 	else {
