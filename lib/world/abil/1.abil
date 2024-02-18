@@ -405,7 +405,7 @@ X+ 5 1
 S
 #119
 Hasten~
-d -1 1.00 0 abc 0
+dH -1 1.00 0 abc 0
 C
 hasten 5 be 2 15 0.00 -1 0 0 5 0
 M
@@ -431,7 +431,7 @@ X+ 3 1800
 S
 #120
 Counterspell~
-dr -1 1.00 0 0 0
+drH -1 1.00 0 0 0
 C
 counterspell 7 g 2 15 0.00 -1 0 0 3 0
 M
@@ -964,7 +964,7 @@ T k 1
 S
 #163
 Ritual of Burdens~
-gst -1 0.68 0 0 0
+gstH -1 0.68 0 0 0
 A
 19 1
 C
@@ -1002,7 +1002,7 @@ T a 0
 S
 #165
 Manashield~
-c -1 1.00 0 af 0
+cH -1 1.00 0 af 0
 A
 16 -1
 A
@@ -1030,7 +1030,7 @@ X+ 3 1800
 S
 #166
 Foresight~
-0 -1 0.50 0 adf 0
+H -1 0.50 0 adf 0
 A
 18 1
 C
@@ -1383,7 +1383,7 @@ X+ 5 1
 S
 #179
 Phoenix Rite~
-gs -1 1.00 0 aq 0
+gsH -1 1.00 0 aq 0
 C
 ritual 8 g 0 0 0.00 -1 0 0 5 0
 M
