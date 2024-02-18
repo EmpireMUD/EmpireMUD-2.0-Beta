@@ -4011,8 +4011,8 @@ ACMD(do_buildcheck) {
 		if (IS_SET(GET_CRAFT_FLAGS(craft), CRAFT_IN_DEVELOPMENT) && !IS_IMMORTAL(ch)) {
 			continue;	// not live
 		}
-		if (CRAFT_FLAGGED(craft, CRAFT_UPGRADE)) {
-			continue;	// for now, skip upgrades (TODO: a way to show them?)
+		if (CRAFT_FLAGGED(craft, CRAFT_NO_BUILDCHECK)) {
+			continue;	// ignored by this command
 		}
 		if (GET_CRAFT_TYPE(craft) == CRAFT_TYPE_WORKFORCE || CRAFT_FLAGGED(craft, CRAFT_DISMANTLE_ONLY)) {
 			continue;	// don't show these
