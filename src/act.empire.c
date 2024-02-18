@@ -3998,7 +3998,7 @@ ACMD(do_buildcheck) {
 	
 	// optional "here" arg
 	skip_spaces(&argptr);
-	if (!strn_cmp(argptr, "here", 4)) {
+	if (!str_cmp(argptr, "here") || !strn_cmp(argptr, "here ", 5)) {
 		here = TRUE;
 		argptr = any_one_arg(argptr, arg);
 		skip_spaces(&argptr);
@@ -4010,6 +4010,9 @@ ACMD(do_buildcheck) {
 	HASH_ITER(sorted_hh, sorted_crafts, craft, next_craft) {
 		if (IS_SET(GET_CRAFT_FLAGS(craft), CRAFT_IN_DEVELOPMENT) && !IS_IMMORTAL(ch)) {
 			continue;	// not live
+		}
+		if (CRAFT_FLAGGED(craft, CRAFT_UPGRADE)) {
+			continue;	// for now, skip upgrades (TODO: a way to show them?)
 		}
 		if (GET_CRAFT_TYPE(craft) == CRAFT_TYPE_WORKFORCE || CRAFT_FLAGGED(craft, CRAFT_DISMANTLE_ONLY)) {
 			continue;	// don't show these
