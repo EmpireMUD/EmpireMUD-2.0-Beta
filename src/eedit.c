@@ -151,6 +151,8 @@ char empire_banner_to_mapout_token(const char *banner) {
 * @param char *adjective The new adjective.
 */
 void set_empire_adjective(empire_data *emp, char *adjective) {
+	char temp[MAX_RANK_LENGTH * 2];
+	
 	// main adjective
 	if (EMPIRE_ADJECTIVE(emp)) {
 		free(EMPIRE_ADJECTIVE(emp));
@@ -161,8 +163,9 @@ void set_empire_adjective(empire_data *emp, char *adjective) {
 	if (EMPIRE_SHORT_ADJECTIVE(emp)) {
 		free(EMPIRE_SHORT_ADJECTIVE(emp));
 	}
-	if (strcmp(NULLSAFE(adjective), skip_filler(NULLSAFE(adjective)))) {
-		EMPIRE_SHORT_ADJECTIVE(emp) = str_dup(skip_filler(NULLSAFE(adjective)));
+	strcpy(temp, skip_wordlist(NULLSAFE(adjective), empire_words, TRUE));
+	if (strcmp(NULLSAFE(adjective), temp)) {
+		EMPIRE_SHORT_ADJECTIVE(emp) = str_dup(temp);
 	}
 	else {
 		EMPIRE_SHORT_ADJECTIVE(emp) = NULL;
@@ -178,6 +181,8 @@ void set_empire_adjective(empire_data *emp, char *adjective) {
 * @param char *name The new name.
 */
 void set_empire_name(empire_data *emp, char *name) {
+	char temp[MAX_RANK_LENGTH * 2];
+	
 	// main name
 	if (EMPIRE_NAME(emp)) {
 		free(EMPIRE_NAME(emp));
@@ -188,8 +193,9 @@ void set_empire_name(empire_data *emp, char *name) {
 	if (EMPIRE_SHORT_NAME(emp)) {
 		free(EMPIRE_SHORT_NAME(emp));
 	}
-	if (strcmp(NULLSAFE(name), skip_filler(NULLSAFE(name)))) {
-		EMPIRE_SHORT_NAME(emp) = str_dup(skip_filler(NULLSAFE(name)));
+	strcpy(temp, skip_wordlist(NULLSAFE(name), empire_words, TRUE));
+	if (strcmp(NULLSAFE(name), temp)) {
+		EMPIRE_SHORT_NAME(emp) = str_dup(temp);
 	}
 	else {
 		EMPIRE_SHORT_NAME(emp) = NULL;

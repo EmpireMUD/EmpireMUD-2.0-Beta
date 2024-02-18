@@ -2554,6 +2554,47 @@ const char *empire_trait_types[] = {
 };
 
 
+// words that can be filtered out of the beginning of empire names
+const char *empire_words[] = {
+	"alliance",
+	"association",
+	"coalition",
+	"commune",
+	"communes",
+	"community",
+	"communities",
+	"confederation",
+	"empire",
+	"empires",
+	"federation",
+	"fiefdom",
+	"fiefdoms",
+	"kingdom",
+	"kingdoms",
+	"nation",
+	"nations",
+	"people",
+	"peoples",
+	"province",
+	"provinces",
+	"republic",
+	"society",
+	"societies",
+	"state",
+	"states",
+	"territory",
+	"territories",
+	"tribe",
+	"tribes",
+	"union",
+	"unions",
+	"united",
+	"village",
+	"villages",
+	"\n"	// must have terminator
+};
+
+
 // PRIV_x
 const char *priv[] = {
 	"claim",	// 0
