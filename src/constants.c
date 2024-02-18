@@ -2584,6 +2584,7 @@ const char *empire_words[] = {
 	"states",
 	"territory",
 	"territories",
+	"tribal",
 	"tribe",
 	"tribes",
 	"union",
