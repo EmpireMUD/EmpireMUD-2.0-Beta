@@ -4488,12 +4488,8 @@ empire_data *get_empire_by_name(char *raw_name) {
 	// we'll take any of these if we don't find a perfect match
 	full_exact = full_abbrev = adj_exact = adj_abbrev = NULL;
 	
-	if (*raw_name == '"') {	// strip quotes if any
-		any_one_word(raw_name, name);
-	}
-	else {
-		strcpy(name, raw_name);
-	}
+	// strip quotes if any
+	quoted_arg_or_all(raw_name, name);
 
 	if (is_number(name))
 		num = atoi(name);
