@@ -1116,7 +1116,7 @@ int get_player_level_for_ability(char_data *ch, any_vnum abil_vnum) {
 		else if (GET_SKILL_LEVEL(ch) <= SPECIALTY_SKILL_CAP) {
 			level = MIN(level, SPECIALTY_SKILL_CAP);
 		}
-		else if (GET_SKILL_LEVEL(ch) <= MAX_SKILL_CAP) {
+		else if (GET_SKILL_LEVEL(ch) < MAX_SKILL_CAP) {
 			level = MIN(level, MAX_SKILL_CAP);
 		}
 	}
@@ -8465,6 +8465,18 @@ bool audit_ability(ability_data *abil, char_data *ch) {
 	}
 	if (!abil_has_custom_message(abil, ABIL_CUSTOM_FAIL_SELF_TO_CHAR) && !abil_has_custom_message(abil, ABIL_CUSTOM_FAIL_TARGETED_TO_CHAR) && ABIL_DIFFICULTY(abil) != DIFF_TRIVIAL && !IS_SET(ABIL_TYPES(abil), NO_DEFAULT_MESSAGES_TYPES)) {
 		olc_audit_msg(ch, ABIL_VNUM(abil), "No fail messages");
+		problem = TRUE;
+	}
+	if (ABILITY_FLAGGED(abil, ABILF_BUFFS_COMMAND) && !IS_SET(ABIL_TYPES(abil), ABILT_BUFF)) {
+		olc_audit_msg(ch, ABIL_VNUM(abil), "BUFFS-COMMAND flag without BUFF type");
+		problem = TRUE;
+	}
+	if (ABILITY_FLAGGED(abil, ABILF_BUFFS_COMMAND) && ABIL_IS_VIOLENT(abil)) {
+		olc_audit_msg(ch, ABIL_VNUM(abil), "BUFFS-COMMAND flag on violent ability");
+		problem = TRUE;
+	}
+	if (ABILITY_FLAGGED(abil, ABILF_BUFFS_COMMAND) && !ABIL_COMMAND(abil)) {
+		olc_audit_msg(ch, ABIL_VNUM(abil), "BUFFS-COMMAND flag without command");
 		problem = TRUE;
 	}
 	

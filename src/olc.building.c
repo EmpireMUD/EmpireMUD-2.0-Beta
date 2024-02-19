@@ -1107,6 +1107,9 @@ void olc_search_building(char_data *ch, bld_vnum vnum) {
 void save_olc_building(descriptor_data *desc) {
 	bld_data *proto, *bdg = GET_OLC_BUILDING(desc);
 	bld_vnum vnum = GET_OLC_VNUM(desc);
+	bool any_live = FALSE;
+	empire_data *emp;
+	room_data *room, *next_room;
 	struct trig_proto_list *trig;
 	struct spawn_info *spawn;
 	struct quest_lookup *ql;
@@ -1116,6 +1119,19 @@ void save_olc_building(descriptor_data *desc) {
 	// have a place to save it?
 	if (!(proto = building_proto(vnum))) {
 		proto = create_building_table_entry(vnum);
+	}
+	
+	// temporarily shut off all live copies
+	HASH_ITER(hh, world_table, room, next_room) {
+		if (GET_BUILDING(room) && GET_BLD_VNUM(GET_BUILDING(room)) == vnum && IS_COMPLETE(room) && (emp = ROOM_OWNER(room))) {
+			any_live = TRUE;
+			adjust_building_tech(emp, room, FALSE);
+		
+			if (GET_BUILDING(room)) {
+				qt_empire_players(emp, qt_lose_building, vnum);
+				et_lose_building(emp, vnum);
+			}
+		}
 	}
 	
 	// free prototype strings and pointers
@@ -1198,6 +1214,20 @@ void save_olc_building(descriptor_data *desc) {
 	
 	// and save to file
 	save_library_file_for_vnum(DB_BOOT_BLD, vnum);
+	
+	// lastly, reactivate live buildings, if any
+	if (any_live) {
+		HASH_ITER(hh, world_table, room, next_room) {
+			if (GET_BUILDING(room) && GET_BLD_VNUM(GET_BUILDING(room)) == vnum && IS_COMPLETE(room) && (emp = ROOM_OWNER(room))) {
+				adjust_building_tech(emp, room, TRUE);
+				
+				if (GET_BUILDING(room)) {
+					qt_empire_players(emp, qt_gain_building, vnum);
+					et_gain_building(emp, vnum);
+				}
+			}
+		}
+	}
 }
 
 

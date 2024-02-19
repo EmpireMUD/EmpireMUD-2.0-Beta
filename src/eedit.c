@@ -144,6 +144,66 @@ char empire_banner_to_mapout_token(const char *banner) {
 
 
 /**
+* Updates the empire's adjective and also sets (or removes) the short-adjective
+* field, as needed.
+*
+* @param empire_data *emp The empire.
+* @param char *adjective The new adjective.
+*/
+void set_empire_adjective(empire_data *emp, char *adjective) {
+	char temp[MAX_RANK_LENGTH * 2];
+	
+	// main adjective
+	if (EMPIRE_ADJECTIVE(emp)) {
+		free(EMPIRE_ADJECTIVE(emp));
+	}
+	EMPIRE_ADJECTIVE(emp) = str_dup(NULLSAFE(adjective));
+	
+	// short version adjective
+	if (EMPIRE_SHORT_ADJECTIVE(emp)) {
+		free(EMPIRE_SHORT_ADJECTIVE(emp));
+	}
+	strcpy(temp, skip_wordlist(NULLSAFE(adjective), empire_words, TRUE));
+	if (*temp && strcmp(NULLSAFE(adjective), temp)) {
+		EMPIRE_SHORT_ADJECTIVE(emp) = str_dup(temp);
+	}
+	else {
+		EMPIRE_SHORT_ADJECTIVE(emp) = NULL;
+	}
+}
+
+
+/**
+* Updates the empire's name and also sets (or removes) the short-name field
+* if needed.
+*
+* @param empire_data *emp The empire.
+* @param char *name The new name.
+*/
+void set_empire_name(empire_data *emp, char *name) {
+	char temp[MAX_RANK_LENGTH * 2];
+	
+	// main name
+	if (EMPIRE_NAME(emp)) {
+		free(EMPIRE_NAME(emp));
+	}
+	EMPIRE_NAME(emp) = str_dup(NULLSAFE(name));
+	
+	// short version of name
+	if (EMPIRE_SHORT_NAME(emp)) {
+		free(EMPIRE_SHORT_NAME(emp));
+	}
+	strcpy(temp, skip_wordlist(NULLSAFE(name), empire_words, TRUE));
+	if (*temp && strcmp(NULLSAFE(name), temp)) {
+		EMPIRE_SHORT_NAME(emp) = str_dup(temp);
+	}
+	else {
+		EMPIRE_SHORT_NAME(emp) = NULL;
+	}
+}
+
+
+/**
 * @param char *newname The proposed empire name.
 * @return bool TRUE if the name is ok.
 */
@@ -361,10 +421,7 @@ EEDIT(eedit_adjective) {
 		msg_to_char(ch, "Invalid empire adjective.\r\n");
 	}
 	else {
-		if (EMPIRE_ADJECTIVE(emp)) {
-			free(EMPIRE_ADJECTIVE(emp));
-		}
-		EMPIRE_ADJECTIVE(emp) = str_dup(argument);
+		set_empire_adjective(emp, argument);
 		
 		log_to_empire(emp, ELOG_ADMIN, "%s has changed the empire's adjective form to %s", PERS(ch, ch, TRUE), EMPIRE_ADJECTIVE(emp));
 		msg_to_char(ch, "The empire's adjective form is now: %s\r\n", EMPIRE_ADJECTIVE(emp));
@@ -636,18 +693,11 @@ EEDIT(eedit_name) {
 	}
 	else {
 		// full name
-		strcpy(buf, NULLSAFE(EMPIRE_NAME(emp)));
-		if (EMPIRE_NAME(emp)) {
-			free(EMPIRE_NAME(emp));
-		}
-		EMPIRE_NAME(emp) = str_dup(argument);
+		set_empire_name(emp, argument);
 		
 		// adjective
 		strcpy(buf, skip_filler(argument));
-		if (EMPIRE_ADJECTIVE(emp)) {
-			free(EMPIRE_ADJECTIVE(emp));
-		}
-		EMPIRE_ADJECTIVE(emp) = str_dup(*buf ? buf : argument);
+		set_empire_adjective(emp, *buf ? buf : argument);
 		
 		log_to_empire(emp, ELOG_ADMIN, "%s has changed the empire name to %s", PERS(ch, ch, TRUE), EMPIRE_NAME(emp));
 		msg_to_char(ch, "The empire's name is now: %s\r\n", EMPIRE_NAME(emp));

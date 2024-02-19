@@ -63,7 +63,7 @@ void tog_pvp(char_data *ch);
 //// EMPIREMUD CONSTANTS /////////////////////////////////////////////////////
 
 // Shown on the "version" command and sent over MSSP
-const char *version = "EmpireMUD 2.0 beta 5.176";
+const char *version = "EmpireMUD 2.0 beta 5.177";
 const char *DG_SCRIPT_VERSION = "DG Scripts 1.0.12 e5.1.2";
 
 
@@ -196,6 +196,7 @@ const char *ability_flags[] = {
 	"UNREMOVABLE-BUFF",	// 30
 	"BUFF-SELF-NOT-TARGET",
 	"STAY-HIDDEN",
+	"BUFFS-COMMAND",
 	"\n"
 };
 
@@ -232,9 +233,10 @@ const char *ability_flag_notes[] = {
 	"",	// ABILF_STOP_ON_MISS
 	"reduced on extra targets",
 	"uses skill level if below max",
-	"unremovable",
+	"unremovable",	// 30
 	"buffs self not target",
 	"won't cancel hide",
+	"",	// ABILF_BUFFS_COMMAND
 	"\n"
 };
 
@@ -2289,6 +2291,7 @@ const char *craft_flags[] = {
 	"TOOL-OR-FUNCTION",
 	"UNDAMAGED-DISMANTLE-REFUND",
 	"FULL-DISMANTLE-REFUND",
+	"NO-BUILDCHECK",
 	"\n"
 };
 
@@ -2319,6 +2322,7 @@ const char *craft_flag_for_info[] = {
 	"",	// tool-or-function
 	"",	// undamaged-dismantle-refund
 	"",	// full-dismantle-refund
+	"",	// no-buildcheck
 	"\n"
 };
 
@@ -2547,6 +2551,48 @@ const char *empire_tech_types[] = {
 const char *empire_trait_types[] = {
 	"Distrustful",
 	"\n"
+};
+
+
+// words that can be filtered out of the beginning of empire names
+const char *empire_words[] = {
+	"alliance",
+	"association",
+	"coalition",
+	"commune",
+	"communes",
+	"community",
+	"communities",
+	"confederation",
+	"empire",
+	"empires",
+	"federation",
+	"fiefdom",
+	"fiefdoms",
+	"kingdom",
+	"kingdoms",
+	"nation",
+	"nations",
+	"people",
+	"peoples",
+	"province",
+	"provinces",
+	"republic",
+	"society",
+	"societies",
+	"state",
+	"states",
+	"territory",
+	"territories",
+	"tribal",
+	"tribe",
+	"tribes",
+	"union",
+	"unions",
+	"united",
+	"village",
+	"villages",
+	"\n"	// must have terminator
 };
 
 
@@ -5258,6 +5304,7 @@ const char *requirement_types[] = {
 	"DAYTIME",
 	"NIGHTTIME",	// 45
 	"DIPLOMACY-OVER",
+	"OWN-ROADS",
 	"\n",
 };
 
@@ -5311,6 +5358,7 @@ const bool requirement_amt_type[] = {
 	REQ_AMT_NONE,	// daytime
 	REQ_AMT_NONE,	// 45, nighttime
 	REQ_AMT_NUMBER,	// diplomacy-over
+	REQ_AMT_NUMBER,	// own-roads
 };
 
 
@@ -5363,6 +5411,7 @@ const bool requirement_needs_tracker[] = {
 	FALSE,	// daytime
 	FALSE,	// 45, nighttime
 	FALSE,	// diplomacy-over
+	FALSE,	// own-roads
 };
 
 

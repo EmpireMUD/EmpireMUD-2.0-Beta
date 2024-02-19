@@ -1944,8 +1944,8 @@ empire_data *create_empire(char_data *ch) {
 	add_empire_to_table(emp);
 	
 	// starter data
-	EMPIRE_NAME(emp) = str_dup(name);
-	EMPIRE_ADJECTIVE(emp) = str_dup(name);
+	set_empire_name(emp, name);
+	set_empire_adjective(emp, name);
 	sprintf(colorcode, "&%c", colorlist[number(0, num_colors-1)]);	// pick random color
 	EMPIRE_BANNER(emp) = str_dup(colorcode);
 	EMPIRE_MAPOUT_TOKEN(emp) = empire_banner_to_mapout_token(EMPIRE_BANNER(emp));
@@ -2920,8 +2920,17 @@ void parse_empire(FILE *fl, empire_vnum vnum) {
 	emp->storage_loaded = FALSE;	// block accidental saves
 	emp->logs_loaded = FALSE;
 	
-	emp->name = fread_string(fl, buf2);
-	emp->adjective = fread_string(fl, buf2);
+	// read name
+	tmp = fread_string(fl, buf2);
+	set_empire_name(emp, tmp);
+	free(tmp);
+	
+	// read adjective
+	tmp = fread_string(fl, buf2);
+	set_empire_adjective(emp, tmp);
+	free(tmp);
+	
+	// read banner
 	emp->banner = fread_string(fl, buf2);
 	EMPIRE_BANNER_HAS_UNDERLINE(emp) = (strstr(EMPIRE_BANNER(emp), "&u") ? TRUE : FALSE);
 	EMPIRE_MAPOUT_TOKEN(emp) = empire_banner_to_mapout_token(EMPIRE_BANNER(emp));

@@ -1000,9 +1000,9 @@ I 14 3036 100.00 4  # COMBINE: sack of potatoes
 O+ 1 6142
 S
 #3065
-berries red berry~
-some red berries~
-There are some red berries on the ground.~
+berries red berry bright~
+some bright red berries~
+There are some bright red berries on the ground.~
    These red berries are strange, but they taste fresh and sweet, so they
 should make a good snack. You could also try planting them.
 ~

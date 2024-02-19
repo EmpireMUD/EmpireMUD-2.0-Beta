@@ -58,6 +58,14 @@ cord~
 T0
 cords~
 S
+#6871
+basic cord~
+6 a
+0 6871 0 0
+R 6870
+T0
+basic cords~
+S
 #6880
 rope~
 6 a

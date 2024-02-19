@@ -373,6 +373,7 @@ OLC_MODULE(mapedit_roomtype);
 OLC_MODULE(mapedit_ruin);
 OLC_MODULE(mapedit_terrain);
 OLC_MODULE(mapedit_unclaimable);
+OLC_MODULE(mapedit_undeplete);
 
 // morph modules
 OLC_MODULE(morphedit_ability);
@@ -952,6 +953,7 @@ const struct olc_command_data olc_data[] = {
 	{ "ruin", mapedit_ruin, OLC_MAP, OLC_CF_MAP_EDIT },
 	{ "terrain", mapedit_terrain, OLC_MAP, OLC_CF_MAP_EDIT },
 	{ "unclaimable", mapedit_unclaimable, OLC_MAP, OLC_CF_MAP_EDIT },
+	{ "undeplete", mapedit_undeplete, OLC_MAP, OLC_CF_MAP_EDIT },
 	
 	// morph commands
 	{ "apply", morphedit_apply, OLC_MORPH, OLC_CF_EDITOR },

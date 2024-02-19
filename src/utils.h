@@ -447,8 +447,10 @@ int CAN_CARRY_N(char_data *ch);	// formerly a macro
 #define CAN_SEE_IN_MAGIC_DARKNESS(ch)  (IS_NPC(ch) ? (get_approximate_level(ch) > 100) : (PRF_FLAGGED((ch), PRF_HOLYLIGHT) || has_player_tech((ch), PTECH_SEE_IN_MAGIC_DARKNESS)))
 #define CAN_SPEND_BLOOD(ch)  (!AFF_FLAGGED(ch, AFF_CANT_SPEND_BLOOD))
 #define CAST_BY_ID(ch)  (IS_NPC(ch) ? (-1 * GET_MOB_VNUM(ch)) : GET_IDNUM(ch))
-#define EFFECTIVELY_FLYING(ch)  (IS_RIDING(ch) ? MOUNT_FLAGGED(ch, MOUNT_FLYING) : AFF_FLAGGED(ch, AFF_FLYING))
-#define EFFECTIVELY_SWIMMING(ch)  (EFFECTIVELY_FLYING(ch) || HAS_WATERWALKING(ch) || (IS_RIDING(ch) && (MOUNT_FLAGGED((ch), MOUNT_AQUATIC) || has_player_tech((ch), PTECH_RIDING_UPGRADE))) || (IS_NPC(ch) ? MOB_FLAGGED((ch), MOB_AQUATIC) : has_player_tech((ch), PTECH_SWIMMING)))
+#define EFFECTIVELY_FLYING_WITHOUT_MOUNT(ch)  (AFF_FLAGGED(ch, AFF_FLYING))
+#define EFFECTIVELY_FLYING(ch)  (IS_RIDING(ch) ? MOUNT_FLAGGED(ch, MOUNT_FLYING) : EFFECTIVELY_FLYING_WITHOUT_MOUNT(ch))
+#define EFFECTIVELY_SWIMMING_WITHOUT_MOUNT(ch)  (EFFECTIVELY_FLYING_WITHOUT_MOUNT(ch) || HAS_WATERWALKING(ch) || (IS_NPC(ch) ? MOB_FLAGGED((ch), MOB_AQUATIC) : has_player_tech((ch), PTECH_SWIMMING)))
+#define EFFECTIVELY_SWIMMING(ch)  (EFFECTIVELY_SWIMMING_WITHOUT_MOUNT(ch) || EFFECTIVELY_FLYING(ch) || (IS_RIDING(ch) && (MOUNT_FLAGGED((ch), MOUNT_AQUATIC) || has_player_tech((ch), PTECH_RIDING_UPGRADE))))
 #define FREE_TO_CARRY(obj)  (IS_COINS(obj) || GET_OBJ_REQUIRES_QUEST(obj) != NOTHING)
 #define HAS_INFRA(ch)  AFF_FLAGGED(ch, AFF_INFRAVISION)
 #define HAS_WATERWALKING(ch)  (AFF_FLAGGED((ch), AFF_WATERWALKING) || MOUNT_FLAGGED((ch), MOUNT_WATERWALKING))
@@ -644,6 +646,8 @@ int CAN_CARRY_N(char_data *ch);	// formerly a macro
 #define EMPIRE_RANK(emp, num)  ((emp)->rank[(num)])
 #define EMPIRE_SCORE(emp, num)  ((emp)->scores[(num)])
 #define EMPIRE_SHIPPING_LIST(emp)  ((emp)->shipping_list)
+#define EMPIRE_SHORT_ADJECTIVE(emp)  ((emp)->short_adjective)
+#define EMPIRE_SHORT_NAME(emp)  ((emp)->short_name)
 #define EMPIRE_SORT_VALUE(emp)  ((emp)->sort_value)
 #define EMPIRE_TECH(emp, num)  ((emp)->tech[(num)])
 #define EMPIRE_TERRITORY(emp, type)  ((emp)->territory[(type)])
@@ -2551,6 +2555,7 @@ int count_crop_variety_in_list(obj_data *list);
 int count_owned_buildings(empire_data *emp, bld_vnum vnum);
 int count_owned_buildings_by_function(empire_data *emp, bitvector_t flags);
 int count_owned_homes(empire_data *emp);
+int count_owned_roads(empire_data *emp);
 int count_owned_sector(empire_data *emp, sector_vnum vnum);
 int count_owned_vehicles(empire_data *emp, any_vnum vnum);
 int count_owned_vehicles_by_flags(empire_data *emp, bitvector_t flags);

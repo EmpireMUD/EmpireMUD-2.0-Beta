@@ -6298,7 +6298,7 @@ ACMD(do_exchange) {
 	else if (!*arg) {
 		msg_to_char(ch, "Exchange what for coins?\r\n");
 	}
-	else if ((pos = find_coin_arg(argument, &coin_emp, &amount, TRUE, FALSE, NULL)) > argument && amount > 0) {
+	else if ((pos = find_coin_arg(argument, &coin_emp, &amount, TRUE, TRUE, NULL)) > argument && amount > 0) {
 		// exchanging coins
 		if (!(coin = find_coin_entry(GET_PLAYER_COINS(ch), coin_emp))) {
 			msg_to_char(ch, "You don't have any %s coins.\r\n", (coin_emp ? EMPIRE_ADJECTIVE(coin_emp) : "of those"));
@@ -6316,6 +6316,10 @@ ACMD(do_exchange) {
 			msg_to_char(ch, "This empire doesn't have enough coins to make that exchange.\r\n");
 		}
 		else if (new <= 0) {
+			msg_to_char(ch, "You wouldn't get anything for that at these exchange rates.\r\n");
+		}
+		else if ((amount = (int)round(new / rate)) <= 0) {
+			// prevent rounding errors e.g. 3 misc -> 1 empire coin
 			msg_to_char(ch, "You wouldn't get anything for that at these exchange rates.\r\n");
 		}
 		else {

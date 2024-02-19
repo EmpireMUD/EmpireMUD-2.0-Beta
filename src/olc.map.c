@@ -496,6 +496,67 @@ OLC_MODULE(mapedit_unclaimable) {
 }
 
 
+OLC_MODULE(mapedit_undeplete) {
+	bool any = FALSE;
+	char arg2[MAX_INPUT_LENGTH];
+	int which = NOTHING;
+	vehicle_data *veh = NULL;
+	struct depletion_data *dep, *next_dep;
+	
+	two_arguments(argument, arg, arg2);
+	
+	if (!*arg && !*arg2) {
+		msg_to_char(ch, "Usage: .map undeplete <type | all> [vehicle]\r\n");
+		return;
+	}
+	
+	// arg 1: depletion type
+	if (!str_cmp(arg, "all")) {
+		which = NOTHING;
+	}
+	else if ((which = search_block(arg, depletion_types, FALSE)) == NOTHING) {
+		msg_to_char(ch, "Unknown depletion type '%s'.\r\n", arg);
+		return;
+	}
+	
+	// arg 2: optional vehicle target
+	if (*arg2 && !(veh = get_vehicle_in_room_vis(ch, arg2, NULL))) {
+		msg_to_char(ch, "You don't see %s %s here.\r\n", AN(arg2), arg2);
+		return;
+	}
+	
+	if (veh) {
+		LL_FOREACH_SAFE(VEH_DEPLETION(veh), dep, next_dep) {
+			if (which == NOTHING || dep->type == which) {
+				LL_DELETE(VEH_DEPLETION(veh), dep);
+				any = TRUE;
+			}
+		}
+		if (any) {
+			request_vehicle_save_in_world(veh);
+		}
+	}
+	else {	// room
+		LL_FOREACH_SAFE(ROOM_DEPLETION(IN_ROOM(ch)), dep, next_dep) {
+			if (which == NOTHING || dep->type == which) {
+				LL_DELETE(ROOM_DEPLETION(IN_ROOM(ch)), dep);
+				any = TRUE;
+			}
+		}
+		if (any) {
+			request_world_save(GET_ROOM_VNUM(IN_ROOM(ch)), WSAVE_ROOM);
+		}
+	}
+	
+	if (any) {
+		msg_to_char(ch, "Depletion removed.\r\n");
+	}
+	else {
+		msg_to_char(ch, "No depletions found to remove.\r\n");
+	}
+}
+
+
 OLC_MODULE(mapedit_pass_walls) {
 	if (PLR_FLAGGED(ch, PLR_UNRESTRICT)) {
 		REMOVE_BIT(PLR_FLAGS(ch), PLR_UNRESTRICT);

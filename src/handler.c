@@ -1406,7 +1406,7 @@ void remove_first_aff_flag_from_char(char_data *ch, bitvector_t aff_flag, bool s
 	bool removed = FALSE;
 	
 	LL_FOREACH(ch->affected, aff) {
-		if (IS_SET(aff->bitvector, AFF_COUNTERSPELL)) {
+		if (IS_SET(aff->bitvector, aff_flag)) {
 			removed = TRUE;
 			
 			if (aff->type == ATYPE_BUFF || aff->type == ATYPE_DG_AFFECT) {
@@ -4488,12 +4488,8 @@ empire_data *get_empire_by_name(char *raw_name) {
 	// we'll take any of these if we don't find a perfect match
 	full_exact = full_abbrev = adj_exact = adj_abbrev = NULL;
 	
-	if (*raw_name == '"') {	// strip quotes if any
-		any_one_word(raw_name, name);
-	}
-	else {
-		strcpy(name, raw_name);
-	}
+	// strip quotes if any
+	quoted_arg_or_all(raw_name, name);
 
 	if (is_number(name))
 		num = atoi(name);
@@ -4507,13 +4503,20 @@ empire_data *get_empire_by_name(char *raw_name) {
 			full_exact = pos;
 			break;	// just need this one
 		}
-		if (!full_abbrev && is_abbrev(name, EMPIRE_NAME(pos))) {
+		else if (!full_abbrev && is_abbrev(name, EMPIRE_NAME(pos))) {
 			full_abbrev = pos;
 		}
+		else if (!full_abbrev && EMPIRE_SHORT_NAME(pos) && is_abbrev(name, EMPIRE_SHORT_NAME(pos))) {
+			full_abbrev = pos;
+		}
+		
 		if (!adj_exact && !str_cmp(name, EMPIRE_ADJECTIVE(pos))) {
 			adj_exact = pos;
 		}
-		if (!adj_abbrev && is_abbrev(name, EMPIRE_ADJECTIVE(pos))) {
+		else if (!adj_abbrev && is_abbrev(name, EMPIRE_ADJECTIVE(pos))) {
+			adj_abbrev = pos;
+		}
+		else if (!adj_abbrev && EMPIRE_SHORT_ADJECTIVE(pos) && is_abbrev(name, EMPIRE_SHORT_ADJECTIVE(pos))) {
 			adj_abbrev = pos;
 		}
 	}
@@ -9229,6 +9232,10 @@ bool meets_requirements(char_data *ch, struct req_data *list, struct instance_da
 				ok = (IN_ROOM(ch) && get_sun_status(IN_ROOM(ch)) != SUN_LIGHT);
 				break;
 			}
+			case REQ_OWN_ROADS: {
+				ok = (GET_LOYALTY(ch) && count_owned_roads(GET_LOYALTY(ch)) >= req->needed);
+				break;
+			}
 			
 			// some types do not support pre-reqs
 			case REQ_KILL_MOB:
@@ -9499,6 +9506,10 @@ char *requirement_string(struct req_data *req, bool show_vnums, bool allow_custo
 		}
 		case REQ_NIGHTTIME: {
 			snprintf(output, sizeof(output), "Nighttime");
+			break;
+		}
+		case REQ_OWN_ROADS: {
+			snprintf(output, sizeof(output), "Own %dx tile%s of roads", req->needed, PLURAL(req->needed));
 			break;
 		}
 		default: {
@@ -10811,7 +10822,7 @@ bool obj_can_be_stored(obj_data *obj, room_data *loc, empire_data *by_emp, bool 
 	vehicle_data *veh;
 	
 	bool use_room = (!by_emp || emp_can_use_room(by_emp, loc, GUESTS_ALLOWED));
-	bool bld_ok = use_room && (!by_emp || !ROOM_OWNER(loc) || by_emp == ROOM_OWNER(loc) || has_relationship(by_emp, ROOM_OWNER(loc), DIPL_TRADE));
+	bool bld_ok = use_room && IS_COMPLETE(loc) && (!by_emp || !ROOM_OWNER(loc) || by_emp == ROOM_OWNER(loc) || has_relationship(by_emp, ROOM_OWNER(loc), DIPL_TRADE));
 	
 	// We skip this check in retrieval mode, since STORE_ALL does not function for retrieval.
 	if (!retrieval_mode && GET_OBJ_STORAGE(obj) && room_has_function_and_city_ok(NULL, loc, FNC_STORE_ALL)) {

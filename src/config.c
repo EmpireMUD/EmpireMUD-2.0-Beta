@@ -1860,6 +1860,8 @@ void init_config_system(void) {
 	init_config(CONFIG_ACTIONS, "high_depletion", CONFTYPE_INT, "depletion in buildings with HIGH-DEPLETION");
 	init_config(CONFIG_ACTIONS, "pick_base_timer", CONFTYPE_INT, "ticks to do pick interactions");
 	init_config(CONFIG_ACTIONS, "prospecting_workforce_hours", CONFTYPE_INT, "real hours for workforce to prospect 1 tile (shorter than world reset)");
+	init_config(CONFIG_ACTIONS, "saw_timer", CONFTYPE_INT, "ticks to saw; cut in half up to two times from tools and ptech");
+	init_config(CONFIG_ACTIONS, "scrape_timer", CONFTYPE_INT, "ticks to scrape; cut in half with a ptech");
 	init_config(CONFIG_ACTIONS, "shear_growth_time", CONFTYPE_INT, "real hours to regrow wool");
 	init_config(CONFIG_ACTIONS, "trench_initial_value", CONFTYPE_INT, "negative starting value for excavate -- done when it counts up to 0");
 	init_config(CONFIG_ACTIONS, "trench_gain_from_rain", CONFTYPE_INT, "amount of rain water per room update added to a trench");
@@ -2016,6 +2018,7 @@ void init_config_system(void) {
 
 	// system
 	init_config(CONFIG_SYSTEM, "autoreboot_minutes", CONFTYPE_INT, "minutes to schedule an automatic reboot at startup (0 if not using this)");
+	init_config(CONFIG_SYSTEM, "log_eof_on_socket_read", CONFTYPE_BOOL, "if enabled, logs a warning if perform_socket_read gets an EOF, in case of problems");
 	init_config(CONFIG_SYSTEM, "nameserver_is_slow", CONFTYPE_BOOL, "if enabled, system will not resolve numeric IPs");
 	init_config(CONFIG_SYSTEM, "max_filesize", CONFTYPE_INT, "maximum size of bug, typo and idea files in bytes (to prevent bombing)");
 	init_config(CONFIG_SYSTEM, "max_bad_pws", CONFTYPE_INT, "maximum number of password attempts before disconnection");

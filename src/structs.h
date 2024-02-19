@@ -497,6 +497,7 @@ typedef struct vehicle_data vehicle_data;
 #define REQ_DAYTIME  44
 #define REQ_NIGHTTIME  45
 #define REQ_DIPLOMACY_OVER  46
+#define REQ_OWN_ROADS  47
 
 
 // REQ_AMT_x: How numbers displayed for different REQ_ types
@@ -1019,6 +1020,7 @@ typedef struct vehicle_data vehicle_data;
 #define CRAFT_TOOL_OR_FUNCTION  BIT(21)	// with this flag, only requires the tool OR the function
 #define CRAFT_UNDAMAGED_DISMANTLE_REFUND  BIT(22)	// refunds all materials when dismantled while undamaged (instead of 90%)
 #define CRAFT_FULL_DISMANTLE_REFUND  BIT(23)	// refunds all materials when dismantled no matter what the health (instead of 20%-90%)
+#define CRAFT_NO_BUILDCHECK  BIT(24)	// this craft is ignored by the buildcheck command
 
 
 // For find_building_list_entry
@@ -5620,6 +5622,8 @@ struct empire_data {
 	struct workforce_delay *delays;	// speeds up chore processing
 	
 	/* Unsaved data */
+	char *short_name;	// copy of the name without filler
+	char *short_adjective;	// copy of the adjective without filler
 	unsigned int territory[NUM_TERRITORY_TYPES];	// territory counts on this island
 	int wealth;	// computed by read_vault
 	int population;	// npc population who lives here

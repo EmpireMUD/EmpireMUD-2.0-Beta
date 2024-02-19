@@ -340,6 +340,37 @@ int count_owned_homes(empire_data *emp) {
 
 
 /**
+* Number of roads or road-like buildings owned by an empire.
+*
+* @param empire_data *emp Any empire.
+* @return int The number of tiles of roads owned by emp.
+*/
+int count_owned_roads(empire_data *emp) {
+	room_data *room, *next_room;
+	int count = 0;	// ah ah ah
+	
+	if (!emp) {
+		return count;
+	}
+	
+	HASH_ITER(hh, world_table, room, next_room) {
+		if (ROOM_OWNER(room) == emp) {
+			if (ROOM_SECT_FLAGGED(room, SECTF_IS_ROAD)) {
+				// road sect
+				++count;
+			}
+			else if (ROOM_BLD_FLAGGED(room, BLD_ROAD_ICON | BLD_ROAD_ICON_WIDE) && IS_COMPLETE(room)) {
+				// road-icon building
+				++count;
+			}
+		}
+	}
+	
+	return count;
+}
+
+
+/**
 * Number of sector tiles owned by an empire.
 *
 * @param empire_data *emp Any empire.
@@ -1258,6 +1289,10 @@ void refresh_one_quest_tracker(char_data *ch, struct player_quest *pq) {
 			}
 			case REQ_NIGHTTIME: {
 				task->current = (IN_ROOM(ch) && get_sun_status(IN_ROOM(ch)) != SUN_LIGHT) ? task->needed : 0;
+				break;
+			}
+			case REQ_OWN_ROADS: {
+				task->current = GET_LOYALTY(ch) ? count_owned_roads(GET_LOYALTY(ch)) : 0;
 				break;
 			}
 		}
@@ -2983,6 +3018,9 @@ void qt_gain_building(char_data *ch, any_vnum vnum) {
 			else if (task->type == REQ_EMPIRE_MILITARY && GET_BLD_MILITARY(bld) != 0) {
 				task->current += GET_BLD_MILITARY(bld);
 			}
+			else if (task->type == REQ_OWN_ROADS && BLD_FLAGGED(bld, BLD_ROAD_ICON | BLD_ROAD_ICON_WIDE)) {
+				++task->current;
+			}
 		}
 	}
 }
@@ -2995,6 +3033,7 @@ void qt_gain_building(char_data *ch, any_vnum vnum) {
 * @param sector_vnum vnum The sector vnum.
 */
 void qt_gain_tile_sector(char_data *ch, sector_vnum vnum) {
+	sector_data *sect = sector_proto(vnum);
 	struct player_quest *pq;
 	struct req_data *task;
 	
@@ -3005,6 +3044,9 @@ void qt_gain_tile_sector(char_data *ch, sector_vnum vnum) {
 	LL_FOREACH(GET_QUESTS(ch), pq) {
 		LL_FOREACH(pq->tracker, task) {
 			if (task->type == REQ_OWN_SECTOR && task->vnum == vnum) {
+				++task->current;
+			}
+			else if (task->type == REQ_OWN_ROADS && SECT_FLAGGED(sect, SECTF_IS_ROAD)) {
 				++task->current;
 			}
 		}
@@ -3207,6 +3249,9 @@ void qt_lose_building(char_data *ch, any_vnum vnum) {
 			else if (task->type == REQ_EMPIRE_MILITARY && GET_BLD_MILITARY(bld) != 0) {
 				task->current -= GET_BLD_MILITARY(bld);
 			}
+			else if (task->type == REQ_OWN_ROADS && BLD_FLAGGED(bld, BLD_ROAD_ICON | BLD_ROAD_ICON_WIDE)) {
+				--task->current;
+			}
 			
 			// check min
 			task->current = MAX(task->current, 0);
@@ -3246,6 +3291,7 @@ void qt_lose_quest(char_data *ch, any_vnum vnum) {
 * @param sector_vnum vnum The sector vnum.
 */
 void qt_lose_tile_sector(char_data *ch, sector_vnum vnum) {
+	sector_data *sect = sector_proto(vnum);
 	struct player_quest *pq;
 	struct req_data *task;
 	
@@ -3256,6 +3302,9 @@ void qt_lose_tile_sector(char_data *ch, sector_vnum vnum) {
 	LL_FOREACH(GET_QUESTS(ch), pq) {
 		LL_FOREACH(pq->tracker, task) {
 			if (task->type == REQ_OWN_SECTOR && task->vnum == vnum) {
+				--task->current;
+			}
+			else if (task->type == REQ_OWN_ROADS && SECT_FLAGGED(sect, SECTF_IS_ROAD)) {
 				--task->current;
 			}
 			

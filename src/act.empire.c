@@ -4011,8 +4011,8 @@ ACMD(do_buildcheck) {
 		if (IS_SET(GET_CRAFT_FLAGS(craft), CRAFT_IN_DEVELOPMENT) && !IS_IMMORTAL(ch)) {
 			continue;	// not live
 		}
-		if (CRAFT_FLAGGED(craft, CRAFT_UPGRADE)) {
-			continue;	// for now, skip upgrades (TODO: a way to show them?)
+		if (CRAFT_FLAGGED(craft, CRAFT_NO_BUILDCHECK)) {
+			continue;	// ignored by this command
 		}
 		if (GET_CRAFT_TYPE(craft) == CRAFT_TYPE_WORKFORCE || CRAFT_FLAGGED(craft, CRAFT_DISMANTLE_ONLY)) {
 			continue;	// don't show these
@@ -5427,6 +5427,7 @@ ACMD(do_empire_inventory) {
 
 
 ACMD(do_enroll) {
+	bool imm_access = GET_ACCESS_LEVEL(ch) >= LVL_CIMPL || IS_GRANTED(ch, GRANT_EMPIRES);
 	struct empire_island *from_isle, *next_isle, *isle;
 	struct empire_territory_data *ter, *next_ter;
 	struct empire_vehicle_data *vter, *next_vter;
@@ -5448,43 +5449,67 @@ ACMD(do_enroll) {
 		send_config_msg(ch, "need_approval_string");
 		return;
 	}
-	if (IS_NPC(ch) || !GET_LOYALTY(ch)) {
+	if (IS_NPC(ch)) {
 		msg_to_char(ch, "You don't belong to any empire.\r\n");
 		return;
 	}
 	
-	one_argument(argument, arg);
-	e = GET_LOYALTY(ch);
+	argument = any_one_word(argument, arg);
+	
+	// optional first arg as empire name
+	if (imm_access && *arg && (e = get_empire_by_name(arg))) {
+		argument = any_one_word(argument, arg);
+	}
+	else {
+		e = GET_LOYALTY(ch);
+	}
 
-	if (!e)
+	if (!e) {
 		msg_to_char(ch, "You don't belong to any empire.\r\n");
-	else if (GET_RANK(ch) < EMPIRE_PRIV(e, PRIV_ENROLL)) {
+	}
+	else if (!imm_access && GET_RANK(ch) < EMPIRE_PRIV(e, PRIV_ENROLL)) {
 		// could probably now use has_permission
 		msg_to_char(ch, "You don't have the authority to enroll followers.\r\n");
 	}
-	else if (!*arg)
+	else if (!*arg) {
 		msg_to_char(ch, "Whom did you want to enroll?\r\n");
+	}
 	else if (!(targ = find_or_load_player(arg, &file))) {
 		send_to_char("There is no such player.\r\n", ch);
 	}
-	else if (IS_NPC(targ))
-		msg_to_char(ch, "You can't enroll animals!\r\n");
-	else if (ch == targ)
-		msg_to_char(ch, "You're already in the empire!\r\n");
-	else if (GET_LOYALTY(targ) == e) {
-		act("$E is already a member of this empire.", FALSE, ch, NULL, targ, TO_CHAR | TO_SLEEP);
+	else if (IS_NPC(targ)) {
+		msg_to_char(ch, "You can't enroll NPCs!\r\n");
 	}
-	else if (GET_PLEDGE(targ) != EMPIRE_VNUM(e))
-		act("$E has not pledged $Mself to your empire.", FALSE, ch, 0, targ, TO_CHAR | TO_SLEEP);
-	else if ((old = GET_LOYALTY(targ)) && EMPIRE_LEADER(old) != GET_IDNUM(targ))
+	else if (GET_LOYALTY(targ) == e) {
+		if (ch == targ) {
+			msg_to_char(ch, "You're already in the empire!\r\n");
+		}
+		else {
+			act("$E is already a member of this empire.", FALSE, ch, NULL, targ, TO_CHAR | TO_SLEEP);
+		}
+	}
+	else if (GET_PLEDGE(targ) != EMPIRE_VNUM(e)) {
+		if (ch == targ) {
+			msg_to_char(ch, "You have not pledged yourself to the empire.\r\n");
+		}
+		else {
+			act("$E has not pledged $Mself to the empire.", FALSE, ch, 0, targ, TO_CHAR | TO_SLEEP);
+		}
+	}
+	else if ((old = GET_LOYALTY(targ)) && EMPIRE_LEADER(old) != GET_IDNUM(targ)) {
 		act("$E is already loyal to another empire.", FALSE, ch, 0, targ, TO_CHAR | TO_SLEEP);
+	}
 	else if (!IS_APPROVED(targ) && config_get_bool("join_empire_approval")) {
 		act("$E needs to be approved to play before $E can join your empire.", FALSE, ch, NULL, targ, TO_CHAR | TO_SLEEP);
 	}
 	else {
+		// ok: enroll
 		log_to_empire(e, ELOG_MEMBERS, "%s has been enrolled in the empire", PERS(targ, targ, 1));
 		msg_to_char(targ, "You have been enrolled in %s.\r\n", EMPIRE_NAME(e));
-		send_config_msg(ch, "ok_string");
+		msg_to_char(ch, "You enroll %s in the empire.\r\n", PERS(targ, targ, FALSE));
+		if (e != GET_LOYALTY(ch)) {
+			syslog(SYS_GC, GET_ACCESS_LEVEL(ch), TRUE, "ABUSE: %s enrolled %s in %s", GET_NAME(ch), GET_NAME(targ), EMPIRE_NAME(e));
+		}
 		
 		GET_LOYALTY(targ) = e;
 		GET_RANK(targ) = 1;
@@ -5889,36 +5914,51 @@ ACMD(do_estats) {
 
 
 ACMD(do_expel) {
+	bool imm_access = GET_ACCESS_LEVEL(ch) >= LVL_CIMPL || IS_GRANTED(ch, GRANT_EMPIRES);
 	empire_data *e;
 	char_data *targ = NULL;
 	bool file = FALSE;
 
-	if (IS_NPC(ch) || !(e = GET_LOYALTY(ch))) {
+	if (IS_NPC(ch)) {
 		msg_to_char(ch, "You don't belong to any empire.\r\n");
 		return;
 	}
-
-	one_argument(argument, arg);
-
+	
+	argument = any_one_word(argument, arg);
+	
+	// optional first arg as empire name
+	if (imm_access && *arg && (e = get_empire_by_name(arg))) {
+		argument = any_one_word(argument, arg);
+	}
+	else {
+		e = GET_LOYALTY(ch);
+	}
+	
 	// it's important not to RETURN from here, as the target may need to be freed later
 	if (!IS_APPROVED(ch) && config_get_bool("manage_empire_approval")) {
 		send_config_msg(ch, "need_approval_string");
 	}
-	else if (!e)
+	else if (!e) {
 		msg_to_char(ch, "You don't belong to any empire.\r\n");
-	else if (GET_RANK(ch) != EMPIRE_NUM_RANKS(e))
+	}
+	else if (!imm_access && GET_RANK(ch) != EMPIRE_NUM_RANKS(e)) {
 		msg_to_char(ch, "You don't have the authority to expel followers.\r\n");
-	else if (!*arg)
+	}
+	else if (!*arg) {
 		msg_to_char(ch, "Whom do you wish to expel?\r\n");
+	}
 	else if (!(targ = find_or_load_player(arg, &file))) {
 		send_to_char("There is no such player.\r\n", ch);
 	}
-	else if (IS_NPC(targ) || GET_LOYALTY(targ) != e)
-		msg_to_char(ch, "That person is not a member of this empire.\r\n");
-	else if (targ == ch)
+	else if (IS_NPC(targ) || GET_LOYALTY(targ) != e) {
+		msg_to_char(ch, "That person is not a member of %s.\r\n", (e == GET_LOYALTY(ch) ? "this empire" : EMPIRE_NAME(e)));
+	}
+	else if (targ == ch) {
 		msg_to_char(ch, "You can't expel yourself.\r\n");
-	else if (EMPIRE_LEADER(e) == GET_IDNUM(targ))
+	}
+	else if (EMPIRE_LEADER(e) == GET_IDNUM(targ)) {
 		msg_to_char(ch, "You can't expel the leader!\r\n");
+	}
 	else {
 		delete_member_data(targ, e);
 		GET_LOYALTY(targ) = NULL;
@@ -5926,12 +5966,18 @@ ACMD(do_expel) {
 		clear_private_owner(GET_IDNUM(targ));
 
 		log_to_empire(e, ELOG_MEMBERS, "%s has been expelled from the empire", PERS(targ, targ, 1));
-		send_config_msg(ch, "ok_string");
+		msg_to_char(ch, "You expel %s from %s.\r\n", PERS(targ, targ, TRUE), (e == GET_LOYALTY(ch) ? "the empire" : EMPIRE_NAME(e)));
 		msg_to_char(targ, "You have been expelled from the empire.\r\n");
 		
 		remove_lore(targ, LORE_PROMOTED);
 		remove_lore(targ, LORE_JOIN_EMPIRE);
-		add_lore(targ, LORE_KICKED_EMPIRE, "Dishonorably discharged from %s%s&0", EMPIRE_BANNER(e), EMPIRE_NAME(e));
+		if (e == GET_LOYALTY(ch)) {
+			add_lore(targ, LORE_KICKED_EMPIRE, "Dishonorably discharged from %s%s&0", EMPIRE_BANNER(e), EMPIRE_NAME(e));
+		}
+		else {
+			add_lore(targ, LORE_KICKED_EMPIRE, "Removed from %s%s&0", EMPIRE_BANNER(e), EMPIRE_NAME(e));
+			syslog(SYS_GC, GET_ACCESS_LEVEL(ch), TRUE, "ABUSE: %s expelled %s from %s", GET_NAME(ch), GET_NAME(targ), EMPIRE_NAME(e));
+		}
 
 		// save now
 		if (file) {
@@ -8340,12 +8386,13 @@ ACMD(do_unpublicize) {
 * @param char *argument Remaining args after "keep".
 */
 void do_workforce_keep(char_data *ch, empire_data *emp, char *argument) {
+	any_vnum vnum;
 	bool found;
 	char lim_arg[MAX_INPUT_LENGTH], local_arg[MAX_INPUT_LENGTH], temp[MAX_INPUT_LENGTH];
 	char buf[MAX_STRING_LENGTH * 4], line[256], kept[24];
-	int limit = 0;
+	int limit = 0, number;
 	size_t size;
-	obj_data *proto;
+	obj_data *proto, *obj;
 	struct empire_island *eisle;
 	struct empire_storage_data *store, *next_store;
 	
@@ -8374,10 +8421,10 @@ void do_workforce_keep(char_data *ch, empire_data *emp, char *argument) {
 			
 			// build line
 			if (store->keep == UNLIMITED) {
-				strcpy(kept, "(all)");
+				strcpy(kept, "( all)");
 			}
 			else {
-				snprintf(kept, sizeof(kept), "(%dx)", store->keep);
+				snprintf(kept, sizeof(kept), "(%3dx)", store->keep);
 			}
 			
 			if (PRF_FLAGGED(ch, PRF_ROOMFLAGS)) {
@@ -8459,7 +8506,7 @@ void do_workforce_keep(char_data *ch, empire_data *emp, char *argument) {
 	
 	// now ensure there's (still) an argument
 	if (!*argument) {
-		msg_to_char(ch, "Keep (or unkeep) which stored item?\r\n");
+		msg_to_char(ch, "Keep (or unkeep) which storable item?\r\n");
 		return;
 	}
 	
@@ -8489,7 +8536,32 @@ void do_workforce_keep(char_data *ch, empire_data *emp, char *argument) {
 	}
 	
 	if (!found) {
-		msg_to_char(ch, "You have nothing by that name stored on this island.\r\n");
+		// try by name
+		number = get_number(&argument);
+		proto = NULL;
+		
+		if (((obj = get_obj_in_list_vis(ch, argument, &number, ch->carrying)) || (obj = get_obj_in_list_vis(ch, argument, &number, ROOM_CONTENTS(IN_ROOM(ch))))) && GET_OBJ_VNUM(obj) != NOTHING && GET_OBJ_STORAGE(obj)) {
+			proto = obj_proto(GET_OBJ_VNUM(obj));
+		}
+		else if ((vnum = get_obj_vnum_by_name(argument, TRUE)) != NOTHING) {
+			proto = obj_proto(vnum);
+		}
+		else {
+			msg_to_char(ch, "You have nothing by that name stored on this island.\r\n");
+			return;
+		}
+		
+		// ok, find or add
+		if (!(store = find_stored_resource(emp, eisle->island, GET_OBJ_VNUM(proto)))) {
+			CREATE(store, struct empire_storage_data, 1);
+			store->vnum = GET_OBJ_VNUM(proto);
+			store->proto = proto;
+			HASH_ADD_INT(eisle->store, vnum, store);
+		}
+		
+		store->keep = (limit == UNLIMITED || limit > 0) ? limit : (store->keep ? 0 : UNLIMITED);
+		msg_to_char(ch, "Your workforce will %s keep %s of its '%s' on this island.\r\n", store->keep ? "now" : "no longer", limit ? lim_arg : (store->keep ? "all" : "any"), skip_filler(GET_OBJ_SHORT_DESC(proto)));
+		EMPIRE_NEEDS_STORAGE_SAVE(emp) = TRUE;
 	}
 }
 

@@ -3067,9 +3067,9 @@ ACMD(do_saw) {
 		// triggered
 	}
 	else {
-		// TODO: move the timer here to a config; timer is halved if there's a
-		// SAW function or TOOL_SAW, and halves again if there's a ptech
-		start_action(ch, ACT_SAWING, 16);
+		// timer is halved if there's a SAW function or TOOL_SAW,
+		// and halves again if there's a ptech
+		start_action(ch, ACT_SAWING, config_get_int("saw_timer"));
 		
 		// store the item that was used
 		add_to_resource_list(&GET_ACTION_RESOURCES(ch), RES_OBJECT, GET_OBJ_VNUM(obj), 1, GET_OBJ_CURRENT_SCALE_LEVEL(obj));
@@ -3126,7 +3126,8 @@ ACMD(do_scrape) {
 		// triggered
 	}
 	else {
-		start_action(ch, ACT_SCRAPING, 6);
+		// timer is cut in half with the fast-wood-processing ptech
+		start_action(ch, ACT_SCRAPING, config_get_int("scrape_timer"));
 		
 		// store the item that was used
 		add_to_resource_list(&GET_ACTION_RESOURCES(ch), RES_OBJECT, GET_OBJ_VNUM(obj), 1, GET_OBJ_CURRENT_SCALE_LEVEL(obj));

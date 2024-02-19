@@ -831,6 +831,8 @@ with the 'empire' grant:
 - einv: optional first arg to specify which empire
 - efind: optional first arg to specify which empire
 - elog: optional first arg to specify which empire
+- enroll: optional first arg to enroll players in other empires
+- expel: optional first arg to expel players from other empires
 - findmaint: optional first arg to specify which empire
 - islands: optional first arg to specify which empire
 - import/export: optional first arg to specify which empire

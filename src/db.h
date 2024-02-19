@@ -467,6 +467,8 @@ void reread_empire_tech(empire_data *emp);
 void save_empire(empire_data *e, bool save_all_parts);
 void save_all_empires();
 void save_marked_empires();
+void set_empire_adjective(empire_data *emp, char *adjective);
+void set_empire_name(empire_data *emp, char *name);
 int sort_empires(empire_data *a, empire_data *b);
 int sort_trade_data(struct empire_trade_data *a, struct empire_trade_data *b);
 void update_empire_members_and_greatness(empire_data *emp);

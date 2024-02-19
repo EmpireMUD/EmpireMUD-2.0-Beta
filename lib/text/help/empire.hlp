@@ -567,7 +567,7 @@ See also: CITY COMMAND
 EXCHANGE
 
 Usage:  exchange <item>
-        exchange <number> [empire] coins
+        exchange <number> [empire | misc] coins
 
 You can exchange valuable metals or foreign coins at any mint or vault. You
 will always receive coins in the local currency. Exchange rates may vary based
@@ -1586,7 +1586,7 @@ into additional things to eat.
 
 See also: BAKERY, EINVENTORY, WORKFORCE, WORKFORCE CRAFTS, WORKFORCE WHY
 #
-"WORKFORCE KEEP"
+"WORKFORCE KEEP" "WORKFORCE KEEP DEFAULT" "DEFAULT KEEP" "DEFAULT WORKFORCE KEEP"
 
 Usage:  workforce keep
         workforce keep [number | all] <item name>
@@ -1601,9 +1601,8 @@ with no argument will show current keep settings for the island; you can also
 see keep settings on the einventory command. When typed with an item name but
 no number/all argument, this command will toggle 'keep' on or off.
 
-When you run out of an item in your empire's inventory, it will lose its 'keep'
-information. You can use 'workforce keep default' to set a default number to
-keep for any new items your empire acquires.
+You can use 'workforce keep default' to set a default number to keep for any
+new items your empire acquires.
 
 Examples:
  > workforce keep stick

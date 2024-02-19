@@ -1165,6 +1165,7 @@ The following ability flags are available:
  &cBUFF-SELF-NOT-TARGET&0 - Buff portion of the ability targets the user while
    everything else hits the ability's target.
  &cSTAY-HIDDEN&0 - Won't cancel a hide effect when typed.
+ &cBUFFS-COMMAND&0 - Will appear on the buffs command (must be a BUFF).
 
 See also: OLC ABILITIES, ABILEDIT AFFECTVNUM
 #d
@@ -4153,6 +4154,7 @@ Available flags:
     undamaged (instead of 90%)
  &cFULL-DISMANTLE-REFUND&0 - refunds all materials when dismantled no matter
     what the health (instead of 20%-90%)
+ &cNO-BUILDCHECK&0 - craft does not appear on the buildcheck command
 
 Additional flags are available via the REQUIRESFUNCTION option.
 
@@ -5718,6 +5720,7 @@ The following commands are available:
  ruin - Turn a building or vehicle to ruins.
  terrain - Change the tile you're standing on.
  unclaimable - Make a tile or square of tiles unclaimable (or not).
+ undeplete - Remove depletion from a tile or vehicle.
 
 For notes on the mud's building rules, see HELP BUILDING GUIDE.
 
@@ -5982,6 +5985,16 @@ Example:
  > .map unclaimable 3
 
 See also: MAP OLC, MAPEDIT TERRAIN
+#d
+"MAPEDIT UNDEPLETE" UNDEPLETE "REMOVE DEPLETION"
+
+Usage:  .map undeplete <all | type> [vehicle]
+
+This command removes depletions from a room or vehicle. You can remove a single
+depletion, or all depletions. Stat a room or vehicle to see its current
+depletion counts.
+
+See also: OLC DEPLETIONS, STAT
 #d
 "MEDIT AFFECTS"
 
@@ -8929,6 +8942,7 @@ Available tasks:
  &cRECOGNIZE-LANGUAGE&0 - Player can recognize or speak a language.
  &cCOMPLETED-QUEST-EVER&0 - Must complete a certain quest (ignoring same-instance).
  &cDAYTIME&0, &cNIGHTTIME&0 - Only valid during certain times of day (quests only).
+ &cOWN-ROADS&0 - Empire owns enough road or road-icon tiles.
 
 &r*&0 Some types require a trackable quest, and cannot be used as prereqs.
 ^ If a type requires flags and you use more than one flag, you MUST put the

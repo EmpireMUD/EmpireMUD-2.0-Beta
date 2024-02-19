@@ -127,6 +127,36 @@ R
 R
 4 5610 0
 S
+#6871
+cord length basic~
+a length of basic cord~
+A length of basic cord is looped on the ground.~
+   This small cord could be used to bind things, though it isn't large enough
+or sturdy enough for heavy use.
+~
+3 0 a 0 0 11
+0 0 0
+0 0
+C
+1 1
+M
+6
+You attach $p to $V.~
+M
+7
+$n attaches $p to $V.~
+M
+0
+You tie things up with $p.~
+M
+1
+$n ties things up with $p.~
+O+ 1 6871
+R
+4 5121 0
+R
+4 5610 0
+S
 #6890
 paint~
 some paint~

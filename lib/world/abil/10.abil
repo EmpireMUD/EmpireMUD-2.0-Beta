@@ -1,6 +1,6 @@
 #1001
 Frenzy~
-c -1 1.33 0 abc 0
+cH -1 1.33 0 abc 0
 A
 17 3
 A
@@ -20,7 +20,7 @@ X+ 3 -1
 S
 #1002
 Defend~
-c -1 1.33 0 adf 0
+cH -1 1.33 0 adf 0
 A
 18 3
 A
@@ -360,6 +360,12 @@ $n speaks some words, but nothing seems to happen.~
 M
 40
 There's already a shimmering anvil here.~
+M
+0
+*~
+M
+1
+*~
 T p 1
 S
 #1019
