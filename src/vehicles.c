@@ -4234,9 +4234,13 @@ void save_olc_vehicle(descriptor_data *desc) {
 			continue;
 		}
 		
-		// remove from room/island
+		// remove from room/island/empire
 		unapply_vehicle_to_room(iter);
 		unapply_vehicle_to_island(iter);
+		if (VEH_IS_COMPLETE(iter) && VEH_OWNER(iter)) {
+			qt_empire_players_vehicle(VEH_OWNER(iter), qt_lose_vehicle, iter);
+			et_lose_vehicle(VEH_OWNER(iter), iter);
+		}
 		
 		// flags (preserve the state of the savable flags only)
 		old_flags = VEH_FLAGS(iter) & SAVABLE_VEH_FLAGS;
@@ -4356,6 +4360,10 @@ void save_olc_vehicle(descriptor_data *desc) {
 		
 		if (IN_ROOM(iter)) {
 			apply_vehicle_to_room(iter, IN_ROOM(iter));
+		}
+		if (VEH_IS_COMPLETE(iter) && VEH_OWNER(iter)) {
+			qt_empire_players_vehicle(VEH_OWNER(iter), qt_gain_vehicle, iter);
+			et_gain_vehicle(VEH_OWNER(iter), iter);
 		}
 	}
 }
