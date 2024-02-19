@@ -3126,7 +3126,8 @@ ACMD(do_scrape) {
 		// triggered
 	}
 	else {
-		start_action(ch, ACT_SCRAPING, 6);
+		// timer is cut in half with the fast-wood-processing ptech
+		start_action(ch, ACT_SCRAPING, config_get_int("scrape_timer"));
 		
 		// store the item that was used
 		add_to_resource_list(&GET_ACTION_RESOURCES(ch), RES_OBJECT, GET_OBJ_VNUM(obj), 1, GET_OBJ_CURRENT_SCALE_LEVEL(obj));
