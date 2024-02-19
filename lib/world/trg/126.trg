@@ -976,7 +976,7 @@ end
 *
 * also clear breath variable if needed
 if %actor.varexists(breath)%
-  vdelete breath %actor.id%
+  rdelete breath %actor.id%
 end
 ~
 #12673
