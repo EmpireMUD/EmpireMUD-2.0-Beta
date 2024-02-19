@@ -97,10 +97,10 @@ SHOW(show_islands) {
 	
 	one_word(argument, arg);
 	if (!*arg) {
-		msg_to_char(ch, "Show islands for which empire?\r\n");
+		msg_to_char(ch, "Show islands: Check which empire?\r\n");
 	}
 	else if (!(emp = get_empire_by_name(arg))) {
-		msg_to_char(ch, "Unknown empire '%s'.\r\n", arg);
+		msg_to_char(ch, "Show islands: Unknown empire '%s'.\r\n", arg);
 	}
 	else {
 		msg_to_char(ch, "Island counts for %s%s&0:\r\n", EMPIRE_BANNER(emp), EMPIRE_NAME(emp));
@@ -232,11 +232,11 @@ SHOW(show_resource) {
 	
 	// verify
 	if (!proto) {
-		msg_to_char(ch, "Unknown storable object '%s'.\r\n", argument);
+		msg_to_char(ch, "Show resource: Unknown storable object '%s'.\r\n", argument);
 		return;
 	}
 	if (!GET_OBJ_STORAGE(proto)) {
-		msg_to_char(ch, "You can only use 'show resource' on storable objects.\r\n");
+		msg_to_char(ch, "Show resource: You can only use this on storable objects.\r\n");
 		return;
 	}
 	vnum = GET_OBJ_VNUM(proto);
@@ -336,13 +336,13 @@ SHOW(show_account) {
 		acc_id = atoi(argument);
 	}
 	else if (!(plr = find_or_load_player(argument, &file))) {
-		send_to_char("There is no such player.\r\n", ch);
+		send_to_char("Show account: There is no such player.\r\n", ch);
 		return;
 	}
 	
 	// look up index if applicable
 	if (plr && !(plr_index = find_player_index_by_idnum(GET_IDNUM(plr)))) {
-		msg_to_char(ch, "Unknown error: player not in index.\r\n");
+		msg_to_char(ch, "Show account: Unknown error: player not in index.\r\n");
 		if (file) {
 			free_char(plr);
 		}
@@ -355,7 +355,7 @@ SHOW(show_account) {
 	}
 	
 	if (!(acc_ptr = find_account(acc_id))) {
-		msg_to_char(ch, "Unknown account: %d\r\n", acc_id);
+		msg_to_char(ch, "Show account: Unknown account: %d\r\n", acc_id);
 		if (plr && file) {
 			free_char(plr);
 		}
@@ -469,7 +469,7 @@ SHOW(show_author) {
 		msg_to_char(ch, "Usage: show author <author idnum>\r\n");
 	}
 	else if ((idnum = atoi(arg)) < 0) {
-		msg_to_char(ch, "Invalid author idnum.\r\n");
+		msg_to_char(ch, "Show author: Invalid author idnum.\r\n");
 	}
 	else {
 		size = snprintf(output, sizeof(output), "Books authored by [%d] %s:\r\n", idnum, (index = find_player_index_by_idnum(idnum)) ? index->fullname : "nobody");
@@ -543,13 +543,13 @@ SHOW(show_buildings) {
 	}
 	// argument usage: show building <vnum | name>
 	else if (!(isdigit(*argument) && (bld = building_proto(atoi(argument)))) && !(bld = get_building_by_name(argument, FALSE))) {
-		msg_to_char(ch, "Unknown building '%s'.\r\n", argument);
+		msg_to_char(ch, "Show buildings: Unknown building '%s'.\r\n", argument);
 	}
 	else if (IS_SET(GET_BLD_FLAGS(bld), BLD_ROOM)) {
-		msg_to_char(ch, "This function only works on map buildings, not interior rooms.\r\n");
+		msg_to_char(ch, "Show buildings: This function only works on map buildings, not interior rooms.\r\n");
 	}
 	else if (!(sect = sector_proto(config_get_int("default_building_sect"))) || !(idx = find_sector_index(GET_SECT_VNUM(sect)))) {
-		msg_to_char(ch, "Error looking up buildings: default sector not configured.\r\n");
+		msg_to_char(ch, "Show buildings: Error looking up buildings: default sector not configured.\r\n");
 	}
 	else {
 		size = snprintf(buf, sizeof(buf), "[%d] %s (%d in world):\r\n", GET_BLD_VNUM(bld), GET_BLD_NAME(bld), stats_get_building_count(bld));
@@ -631,7 +631,7 @@ SHOW(show_companions) {
 		msg_to_char(ch, "Usage: show companions <player> [keywords]\r\n");
 	}
 	else if (!(plr = find_or_load_player(arg, &file))) {
-		send_to_char("There is no such player.\r\n", ch);
+		send_to_char("Show companions: There is no such player.\r\n", ch);
 	}
 	else {
 		check_delayed_load(plr);
@@ -715,7 +715,7 @@ SHOW(show_components) {
 		msg_to_char(ch, "Usage: show components <name | vnum>\r\n");
 	}
 	else if (!(cmp = find_generic_component(argument))) {
-		msg_to_char(ch, "Unknown generic component type '%s'.\r\n", argument);
+		msg_to_char(ch, "Show components: Unknown generic component type '%s'.\r\n", argument);
 	}
 	else {
 		// preamble
@@ -776,7 +776,7 @@ SHOW(show_crops) {
 	}
 	// argument usage: show building <vnum | name>
 	else if (!(isdigit(*argument) && (crop = crop_proto(atoi(argument)))) && !(crop = get_crop_by_name(argument))) {
-		msg_to_char(ch, "Unknown crop '%s'.\r\n", argument);
+		msg_to_char(ch, "Show crops: Unknown crop '%s'.\r\n", argument);
 	}
 	else {
 		strcpy(part, GET_CROP_NAME(crop));
@@ -831,7 +831,7 @@ SHOW(show_currency) {
 		msg_to_char(ch, "Usage: show currency <player>\r\n");
 	}
 	else if (!(plr = find_or_load_player(arg, &file))) {
-		send_to_char("There is no such player.\r\n", ch);
+		send_to_char("Show currency: There is no such player.\r\n", ch);
 	}
 	else {
 	
@@ -877,7 +877,7 @@ SHOW(show_dailycycle) {
 		msg_to_char(ch, "Usage: show dailycycle <number>\r\n");
 	}
 	else if ((num = atoi(arg)) < 0) {
-		msg_to_char(ch, "Invalid cycle number.\r\n");
+		msg_to_char(ch, "Show dailycycle: Invalid cycle number.\r\n");
 	}
 	else {
 		// see if ANY quests have that cycle
@@ -963,7 +963,7 @@ SHOW(show_dropped_items) {
 		msg_to_char(ch, "Usage: show dropped <empire>\r\n");
 	}
 	else if (!(emp = get_empire_by_name(argument))) {
-		msg_to_char(ch, "Unknown empire '%s'.\r\n", argument);
+		msg_to_char(ch, "Show dropped: Unknown empire '%s'.\r\n", argument);
 	}
 	else {
 		size = snprintf(buf, sizeof(buf), "Dropped items for %s%s\t0:\r\n", EMPIRE_BANNER(emp), EMPIRE_NAME(emp));
@@ -1092,7 +1092,7 @@ SHOW(show_factions) {
 	skip_spaces(&arg2);
 	
 	if (!(vict = find_or_load_player(name, &file))) {
-		msg_to_char(ch, "No player by that name.\r\n");
+		msg_to_char(ch, "Show factions: No player by that name.\r\n");
 	}
 	else {
 		check_delayed_load(vict);
@@ -1140,7 +1140,7 @@ SHOW(show_fmessages) {
 		msg_to_char(ch, "Usage: show fmessages <player>\r\n");
 	}
 	else if (!(plr = find_or_load_player(arg, &file))) {
-		send_to_char("There is no such player.\r\n", ch);
+		send_to_char("Show fmessages: There is no such player.\r\n", ch);
 	}
 	else {
 		msg_to_char(ch, "Fight message toggles for %s:\r\n", GET_NAME(plr));
@@ -1179,13 +1179,13 @@ SHOW(show_friends) {
 	one_argument(argument, arg);
 	
 	if (!*arg) {
-		msg_to_char(ch, "Show friends for whom?\r\n");
+		msg_to_char(ch, "Show friends: List friends for whom?\r\n");
 	}
 	else if (!(plr = find_or_load_player(arg, &file))) {
-		msg_to_char(ch, "No player by that name.\r\n");
+		msg_to_char(ch, "Show friends: No player by that name.\r\n");
 	}
 	else if (get_highest_access_level(GET_ACCOUNT(plr)) > GET_ACCESS_LEVEL(ch)) {
-		msg_to_char(ch, "You can't do that.\r\n");
+		msg_to_char(ch, "Show friends: You can't do that.\r\n");
 	}
 	else {
 		size = snprintf(output, sizeof(output), "Friends list for %s%s:\r\n", GET_NAME(plr), PRF_FLAGGED(plr, PRF_NO_FRIENDS) ? " (no-friends toggled on)" : "");
@@ -1236,7 +1236,7 @@ SHOW(show_home) {
 	any_one_arg(argument, name);
 	
 	if (!(vict = find_or_load_player(name, &file))) {
-		msg_to_char(ch, "No player by that name.\r\n");
+		msg_to_char(ch, "Show home: No player by that name.\r\n");
 	}
 	else {
 		home = find_home(vict);
@@ -1270,11 +1270,11 @@ SHOW(show_homeless) {
 	
 	one_word(argument, arg);
 	if (!*arg) {
-		msg_to_char(ch, "Show homeless citizens for which empire?\r\n");
+		msg_to_char(ch, "Show homeless: View unhoused citizens for which empire?\r\n");
 		return;
 	}
 	if (!(emp = get_empire_by_name(arg))) {
-		msg_to_char(ch, "Unknown empire '%s'.\r\n", arg);
+		msg_to_char(ch, "Show homeless: Unknown empire '%s'.\r\n", arg);
 		return;
 	}
 	
@@ -1330,13 +1330,13 @@ SHOW(show_ignoring) {
 	one_argument(argument, arg);
 	
 	if (!*arg) {
-		msg_to_char(ch, "Show ignores for whom?\r\n");
+		msg_to_char(ch, "Show ignoring: View the ignore list for whom?\r\n");
 	}
 	else if (!(vict = find_or_load_player(arg, &file))) {
-		msg_to_char(ch, "There is no such player.\r\n");
+		msg_to_char(ch, "Show ignoring: There is no such player.\r\n");
 	}
 	else if (GET_ACCESS_LEVEL(vict) > GET_ACCESS_LEVEL(ch)) {
-		msg_to_char(ch, "You can't do that.\r\n");
+		msg_to_char(ch, "Show ignoring: You can't do that.\r\n");
 	}
 	else {
 		// just list ignores
@@ -1384,7 +1384,7 @@ SHOW(show_inventory) {
 		msg_to_char(ch, "Usage: show inventory <obj vnum> [all]\r\n");
 	}
 	else if ((vnum = atoi(arg1)) < 0 || !obj_proto(vnum)) {
-		msg_to_char(ch, "Unknown object vnum '%s'.\r\n", arg1);
+		msg_to_char(ch, "Show inventory: Unknown object vnum '%s'.\r\n", arg1);
 	}
 	else {
 		timer = microtime();
@@ -1501,7 +1501,7 @@ SHOW(show_languages) {
 		msg_to_char(ch, "Usage: show languages <player> [keywords]\r\n");
 	}
 	else if (!(plr = find_or_load_player(arg, &file))) {
-		send_to_char("There is no such player.\r\n", ch);
+		send_to_char("Show languages: There is no such player.\r\n", ch);
 	}
 	else {
 		if (*argument) {
@@ -1565,7 +1565,7 @@ SHOW(show_lastnames) {
 		msg_to_char(ch, "Usage: show lastnames <player> [keywords]\r\n");
 	}
 	else if (!(plr = find_or_load_player(arg, &file))) {
-		send_to_char("There is no such player.\r\n", ch);
+		send_to_char("Show lastnames: There is no such player.\r\n", ch);
 	}
 	else {
 		check_delayed_load(plr);
@@ -1638,27 +1638,27 @@ SHOW(show_learned) {
 	else if (is_abbrev(arg, "empire") && strlen(arg) >= 3) {
 		argument = one_word(argument, arg);
 		if (!*arg) {
-			msg_to_char(ch, "Show learned for what empire?\r\n");
+			msg_to_char(ch, "Show learned: View which empire's learned recipes?\r\n");
 			return;
 		}
 		else if (!(emp = get_empire_by_name(arg))) {
-			msg_to_char(ch, "No such empire '%s'.\r\n", arg);
+			msg_to_char(ch, "show learned: No such empire '%s'.\r\n", arg);
 			return;
 		}
 	}
 	else if (is_abbrev(arg, "player")) {
 		argument = one_word(argument, arg);
 		if (!*arg) {
-			msg_to_char(ch, "Show learned for what player?\r\n");
+			msg_to_char(ch, "Show learned: View which player's learned recipes?\r\n");
 			return;
 		}
 		else if (!(plr = find_or_load_player(arg, &file))) {
-			msg_to_char(ch, "No such player '%s'.\r\n", arg);
+			msg_to_char(ch, "Show learned: No such player '%s'.\r\n", arg);
 			return;
 		}
 	}
 	else if (!(plr = find_or_load_player(arg, &file)) && !(emp = get_empire_by_name(arg))) {
-		send_to_char("There is no such player or empire.\r\n", ch);
+		send_to_char("Show learned: There is no such player or empire.\r\n", ch);
 		return;
 	}
 	
@@ -1724,7 +1724,7 @@ SHOW(show_libraries) {
 		msg_to_char(ch, "Usage: show libraries <book vnum>\r\n");
 	}
 	else if (!(book = book_proto(atoi(arg)))) {
-		msg_to_char(ch, "No such book %d.\r\n", atoi(arg));
+		msg_to_char(ch, "Show libraries: No such book %d.\r\n", atoi(arg));
 	}
 	else {
 		size = snprintf(output, sizeof(output), "Library locations for [%d] %s:\r\n", BOOK_VNUM(book), BOOK_TITLE(book));
@@ -1814,7 +1814,7 @@ SHOW(show_minipets) {
 		msg_to_char(ch, "Usage: show minipets <player> [keywords]\r\n");
 	}
 	else if (!(plr = find_or_load_player(arg, &file))) {
-		send_to_char("There is no such player.\r\n", ch);
+		send_to_char("Show minipets: There is no such player.\r\n", ch);
 	}
 	else {
 		if (*argument) {
@@ -1909,7 +1909,7 @@ SHOW(show_mounts) {
 		msg_to_char(ch, "Usage: show mounts <player>\r\n");
 	}
 	else if (!(plr = find_or_load_player(arg, &file))) {
-		send_to_char("There is no such player.\r\n", ch);
+		send_to_char("Show mounts: There is no such player.\r\n", ch);
 	}
 	else {
 		if (*argument) {
@@ -1971,32 +1971,32 @@ SHOW(show_notes) {
 	// argument parsing
 	if (isdigit(*argument)) {
 		if (!(acct = find_account(atoi(argument)))) {
-			msg_to_char(ch, "Unknown account '%s'.\r\n", argument);
+			msg_to_char(ch, "Show notes: Unknown account '%s'.\r\n", argument);
 			return;
 		}
 		if (get_highest_access_level(acct) > GET_ACCESS_LEVEL(ch)) {
-			msg_to_char(ch, "You can't show notes for accounts of that level.\r\n");
+			msg_to_char(ch, "Show notes: You can't show notes for accounts of that level.\r\n");
 			return;
 		}
 	}
 	else {
 		if (!(index = find_player_index_by_name(argument))) {
-			msg_to_char(ch, "There is no such player.\r\n");
+			msg_to_char(ch, "Show notes: There is no such player.\r\n");
 			return;
 		}
 		if (!(acct = find_account(index->account_id))) {
-			msg_to_char(ch, "There are no notes for that player.\r\n");
+			msg_to_char(ch, "Show notes: There are no notes for that player.\r\n");
 			return;
 		}
 		if (get_highest_access_level(acct) > GET_ACCESS_LEVEL(ch)) {
-			msg_to_char(ch, "You can't show notes for accounts of that level.\r\n");
+			msg_to_char(ch, "Show notes: You can't show notes for accounts of that level.\r\n");
 			return;
 		}
 	}
 	
 	// final checks
 	if (!acct) {	// in case somehow
-		msg_to_char(ch, "Unknown account.\r\n");
+		msg_to_char(ch, "Show notes: Unknown account.\r\n");
 	}
 	else if (!acct->notes || !*acct->notes) {
 		msg_to_char(ch, "There are no notes for that account.\r\n");
@@ -2171,12 +2171,12 @@ SHOW(show_player) {
 	bool file = FALSE;
 	
 	if (!*argument) {
-		send_to_char("A name would help.\r\n", ch);
+		send_to_char("Show player: A name would help.\r\n", ch);
 		return;
 	}
 	
 	if (!(plr = find_or_load_player(argument, &file))) {
-		send_to_char("There is no such player.\r\n", ch);
+		send_to_char("Show player: There is no such player.\r\n", ch);
 		return;
 	}
 	sprintf(buf, "Player: %-12s (%s) [%d]\r\n", GET_PC_NAME(plr), genders[(int) GET_REAL_SEX(plr)], GET_ACCESS_LEVEL(plr));
@@ -2240,7 +2240,7 @@ SHOW(show_produced) {
 		msg_to_char(ch, "Usage: show produced <empire>\r\n");
 	}
 	else if (!(emp = get_empire_by_name(arg))) {
-		send_to_char("There is no such empire.\r\n", ch);
+		send_to_char("Show produced: There is no such empire.\r\n", ch);
 	}
 	else {
 		if (*argument) {
@@ -2304,10 +2304,10 @@ SHOW(show_progress) {
 	bool t_o;
 	
 	if (!*argument) {
-		msg_to_char(ch, "Show completion of which progression goal?\r\n");
+		msg_to_char(ch, "Show progress: Which progression goal?\r\n");
 	}
 	else if ((isdigit(*argument) && !(prg = real_progress(atoi(argument)))) || (!isdigit(*argument) && !(prg = find_progress_goal_by_name(argument)))) {
-		msg_to_char(ch, "Unknown goal '%s'.\r\n", argument);
+		msg_to_char(ch, "Show progress: Unknown goal '%s'.\r\n", argument);
 	}
 	else {
 		HASH_ITER(hh, empire_table, emp, next_emp) {
@@ -2395,8 +2395,11 @@ SHOW(show_quests) {
 	arg2 = any_one_arg(argument, name);
 	skip_spaces(&arg2);
 	
-	if (!(vict = find_or_load_player(name, &file))) {
-		msg_to_char(ch, "No player by that name.\r\n");
+	if (!*name) {
+		msg_to_char(ch, "Show quests: Which player?\r\n");
+	}
+	else if (!(vict = find_or_load_player(name, &file))) {
+		msg_to_char(ch, "Show quests: No player by that name.\r\n");
 	}
 	else if (!*arg2 || is_abbrev(arg2, "active")) {
 		// active quest list
@@ -2502,7 +2505,7 @@ SHOW(show_quests) {
 
 SHOW(show_rent) {
 	if (!*argument) {
-		send_to_char("A name would help.\r\n", ch);
+		send_to_char("Show rent: A name would help.\r\n", ch);
 		return;
 	}
 
@@ -2553,7 +2556,7 @@ SHOW(show_site) {
 	int k;
 	
 	if (!*argument) {
-		msg_to_char(ch, "Locate players from what site?\r\n");
+		msg_to_char(ch, "Show site: Locate players from what site?\r\n");
 		return;
 	}
 	
@@ -2602,12 +2605,12 @@ SHOW(show_skills) {
 	skip_spaces(&argument);
 	
 	if (!(vict = find_or_load_player(arg, &is_file))) {
-		send_config_msg(ch, "no_person");
+		msg_to_char(ch, "Show skills: Which player?\r\n");
 		return;
 	}
 		
 	if (REAL_NPC(vict)) {
-		msg_to_char(ch, "You can't show skills on an NPC.\r\n");
+		msg_to_char(ch, "Show skills: You can't show skills on an NPC.\r\n");
 		if (is_file) {
 			// unlikely to get here, but playing it safe
 			free_char(vict);
@@ -2710,7 +2713,7 @@ SHOW(show_smessages) {
 		msg_to_char(ch, "Usage: show smessages <player>\r\n");
 	}
 	else if (!(plr = find_or_load_player(arg, &file))) {
-		send_to_char("There is no such player.\r\n", ch);
+		send_to_char("Show smessages: There is no such player.\r\n", ch);
 	}
 	else {
 		msg_to_char(ch, "Status message toggles for %s:\r\n", GET_NAME(plr));
@@ -2751,7 +2754,7 @@ SHOW(show_spawns) {
 	mob_vnum vnum;
 	
 	if (!*argument || !isdigit(*argument) || !(mob = mob_proto((vnum = atoi(argument))))) {
-		msg_to_char(ch, "You must specify a valid mob vnum.\r\n");
+		msg_to_char(ch, "Show spawns: You must specify a valid mob vnum.\r\n");
 		return;
 	}
 	
@@ -2981,10 +2984,10 @@ SHOW(show_storage) {
 		msg_to_char(ch, "Usage: show storage <building | vehicle> <vnum>\r\n");
 	}
 	else if (is_abbrev(arg, "building") && !(find_bld = building_proto(atoi(arg2)))) {
-		msg_to_char(ch, "Unknown building '%s'.\r\n", arg2);
+		msg_to_char(ch, "Show storage: Unknown building '%s'.\r\n", arg2);
 	}
 	else if (is_abbrev(arg, "vehicle") && !(find_veh = vehicle_proto(atoi(arg2)))) {
-		msg_to_char(ch, "Unknown vehicle '%s'.\r\n", arg2);
+		msg_to_char(ch, "Show storage: Unknown vehicle '%s'.\r\n", arg2);
 	}
 	else if (!find_bld && !find_veh) {
 		msg_to_char(ch, "Usage: show storage <building | vehicle> <vnum>\r\n");
@@ -3052,7 +3055,7 @@ SHOW(show_subzone) {
 		return;
 	}
 	if ((find = atoi(argument)) < 0) {
-		msg_to_char(ch, "Subzone id must be positive.\r\n");
+		msg_to_char(ch, "Show subzone: Subzone id must be positive.\r\n");
 		return;
 	}
 	
@@ -3112,10 +3115,10 @@ SHOW(show_technology) {
 	size_t lsize;
 	
 	if (!*argument) {
-		msg_to_char(ch, "Show technology for which player?\r\n");
+		msg_to_char(ch, "Show technology: For which player?\r\n");
 	}
 	else if (!(vict = find_or_load_player(argument, &is_file))) {
-		send_config_msg(ch, "no_person");
+		msg_to_char(ch, "Show technology: No player by that name.\r\n");
 	}
 	else {
 		// techs (slightly complicated
@@ -3186,7 +3189,7 @@ SHOW(show_terrain) {
 	}
 	// argument usage: show building <vnum | name>
 	else if (!(isdigit(*argument) && (sect = sector_proto(atoi(argument)))) && !(sect = get_sect_by_name(argument))) {
-		msg_to_char(ch, "Unknown sector '%s'.\r\n", argument);
+		msg_to_char(ch, "Show sectors: Unknown sector '%s'.\r\n", argument);
 	}
 	else {
 		strcpy(part, GET_SECT_NAME(sect));
@@ -3237,7 +3240,7 @@ SHOW(show_tomb) {
 	any_one_arg(argument, name);
 	
 	if (!(vict = find_or_load_player(name, &file))) {
-		msg_to_char(ch, "No player by that name.\r\n");
+		msg_to_char(ch, "Show tomb: No player by that name.\r\n");
 	}
 	else {
 		tomb = real_room(GET_TOMB_ROOM(vict));
@@ -3269,7 +3272,7 @@ SHOW(show_tools) {
 		msg_to_char(ch, "See: HELP TOOL FLAGS\r\n");
 	}
 	else if ((type = search_block(argument, tool_flags, FALSE)) == NOTHING) {
-		msg_to_char(ch, "Unknown tool type '%s' (see HELP TOOL FLAGS).\r\n", argument);
+		msg_to_char(ch, "Show tools: Unknown tool type '%s' (see HELP TOOL FLAGS).\r\n", argument);
 	}
 	else {
 		// preamble
@@ -3365,7 +3368,7 @@ SHOW(show_unlocked_archetypes) {
 		msg_to_char(ch, "Usage: show unlockedarchetypes <player> [keywords]\r\n");
 	}
 	else if (!(plr = find_or_load_player(arg, &file))) {
-		send_to_char("There is no such player.\r\n", ch);
+		send_to_char("Show unlockedarchetypes: There is no such player.\r\n", ch);
 	}
 	else {
 		if (*argument) {
@@ -3435,7 +3438,7 @@ SHOW(show_uses) {
 		msg_to_char(ch, "Usage: show uses <name | vnum>\r\n");
 	}
 	else if (!(cmp = find_generic_component(argument))) {
-		msg_to_char(ch, "Unknown component type '%s'.\r\n", argument);
+		msg_to_char(ch, "Show uses: Unknown component type '%s'.\r\n", argument);
 	}
 	else {
 		// preamble
@@ -3629,7 +3632,7 @@ SHOW(show_variables) {
 		msg_to_char(ch, "Usage: show variables <player>\r\n");
 	}
 	else if (!(plr = find_or_load_player(argument, &file))) {
-		send_to_char("There is no such player.\r\n", ch);
+		send_to_char("Show variables: There is no such player.\r\n", ch);
 	}
 	else {
 		msg_to_char(ch, "Global Variables:\r\n");
@@ -3662,10 +3665,10 @@ SHOW(show_workforce) {
 	
 	one_word(argument, arg);
 	if (!*arg) {
-		msg_to_char(ch, "Show workforce for what empire?\r\n");
+		msg_to_char(ch, "Show workforce: For what empire?\r\n");
 	}
 	else if (!(emp = get_empire_by_name(arg))) {
-		msg_to_char(ch, "Unknown empire '%s'.\r\n", arg);
+		msg_to_char(ch, "Show workforce: Unknown empire '%s'.\r\n", arg);
 	}
 	else {
 		show_workforce_setup_to_char(emp, ch);
@@ -3798,7 +3801,7 @@ ACMD(do_show) {
 		send_to_char("You are not godly enough for that!\r\n", ch);
 	}
 	else if (!show_command_fields[pos].func) {
-		msg_to_char(ch, "That function is not implemented yet.\r\n");
+		msg_to_char(ch, "Show %s: That function is not implemented yet.\r\n", show_command_fields[iter].cmd);
 	}
 	else {
 		// SUCCESS -- pass to next function
