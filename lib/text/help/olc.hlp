@@ -5720,6 +5720,7 @@ The following commands are available:
  ruin - Turn a building or vehicle to ruins.
  terrain - Change the tile you're standing on.
  unclaimable - Make a tile or square of tiles unclaimable (or not).
+ undeplete - Remove depletion from a tile or vehicle.
 
 For notes on the mud's building rules, see HELP BUILDING GUIDE.
 
@@ -5984,6 +5985,16 @@ Example:
  > .map unclaimable 3
 
 See also: MAP OLC, MAPEDIT TERRAIN
+#d
+"MAPEDIT UNDEPLETE" UNDEPLETE "REMOVE DEPLETION"
+
+Usage:  .map undeplete <all | type> [vehicle]
+
+This command removes depletions from a room or vehicle. You can remove a single
+depletion, or all depletions. Stat a room or vehicle to see its current
+depletion counts.
+
+See also: OLC DEPLETIONS, STAT
 #d
 "MEDIT AFFECTS"
 
