@@ -5427,6 +5427,7 @@ ACMD(do_empire_inventory) {
 
 
 ACMD(do_enroll) {
+	bool imm_access = GET_ACCESS_LEVEL(ch) >= LVL_CIMPL || IS_GRANTED(ch, GRANT_EMPIRES);
 	struct empire_island *from_isle, *next_isle, *isle;
 	struct empire_territory_data *ter, *next_ter;
 	struct empire_vehicle_data *vter, *next_vter;
@@ -5448,43 +5449,67 @@ ACMD(do_enroll) {
 		send_config_msg(ch, "need_approval_string");
 		return;
 	}
-	if (IS_NPC(ch) || !GET_LOYALTY(ch)) {
+	if (IS_NPC(ch)) {
 		msg_to_char(ch, "You don't belong to any empire.\r\n");
 		return;
 	}
 	
-	one_argument(argument, arg);
-	e = GET_LOYALTY(ch);
+	argument = any_one_word(argument, arg);
+	
+	// optional first arg as empire name
+	if (imm_access && *arg && (e = get_empire_by_name(arg))) {
+		argument = any_one_word(argument, arg);
+	}
+	else {
+		e = GET_LOYALTY(ch);
+	}
 
-	if (!e)
+	if (!e) {
 		msg_to_char(ch, "You don't belong to any empire.\r\n");
-	else if (GET_RANK(ch) < EMPIRE_PRIV(e, PRIV_ENROLL)) {
+	}
+	else if (!imm_access && GET_RANK(ch) < EMPIRE_PRIV(e, PRIV_ENROLL)) {
 		// could probably now use has_permission
 		msg_to_char(ch, "You don't have the authority to enroll followers.\r\n");
 	}
-	else if (!*arg)
+	else if (!*arg) {
 		msg_to_char(ch, "Whom did you want to enroll?\r\n");
+	}
 	else if (!(targ = find_or_load_player(arg, &file))) {
 		send_to_char("There is no such player.\r\n", ch);
 	}
-	else if (IS_NPC(targ))
-		msg_to_char(ch, "You can't enroll animals!\r\n");
-	else if (ch == targ)
-		msg_to_char(ch, "You're already in the empire!\r\n");
-	else if (GET_LOYALTY(targ) == e) {
-		act("$E is already a member of this empire.", FALSE, ch, NULL, targ, TO_CHAR | TO_SLEEP);
+	else if (IS_NPC(targ)) {
+		msg_to_char(ch, "You can't enroll NPCs!\r\n");
 	}
-	else if (GET_PLEDGE(targ) != EMPIRE_VNUM(e))
-		act("$E has not pledged $Mself to your empire.", FALSE, ch, 0, targ, TO_CHAR | TO_SLEEP);
-	else if ((old = GET_LOYALTY(targ)) && EMPIRE_LEADER(old) != GET_IDNUM(targ))
+	else if (GET_LOYALTY(targ) == e) {
+		if (ch == targ) {
+			msg_to_char(ch, "You're already in the empire!\r\n");
+		}
+		else {
+			act("$E is already a member of this empire.", FALSE, ch, NULL, targ, TO_CHAR | TO_SLEEP);
+		}
+	}
+	else if (GET_PLEDGE(targ) != EMPIRE_VNUM(e)) {
+		if (ch == targ) {
+			msg_to_char(ch, "You have not pledged yourself to the empire.\r\n");
+		}
+		else {
+			act("$E has not pledged $Mself to the empire.", FALSE, ch, 0, targ, TO_CHAR | TO_SLEEP);
+		}
+	}
+	else if ((old = GET_LOYALTY(targ)) && EMPIRE_LEADER(old) != GET_IDNUM(targ)) {
 		act("$E is already loyal to another empire.", FALSE, ch, 0, targ, TO_CHAR | TO_SLEEP);
+	}
 	else if (!IS_APPROVED(targ) && config_get_bool("join_empire_approval")) {
 		act("$E needs to be approved to play before $E can join your empire.", FALSE, ch, NULL, targ, TO_CHAR | TO_SLEEP);
 	}
 	else {
+		// ok: enroll
 		log_to_empire(e, ELOG_MEMBERS, "%s has been enrolled in the empire", PERS(targ, targ, 1));
 		msg_to_char(targ, "You have been enrolled in %s.\r\n", EMPIRE_NAME(e));
-		send_config_msg(ch, "ok_string");
+		msg_to_char(ch, "You enroll %s in the empire.\r\n", PERS(targ, targ, FALSE));
+		if (e != GET_LOYALTY(ch)) {
+			syslog(SYS_GC, GET_ACCESS_LEVEL(ch), TRUE, "ABUSE: %s enrolled %s in %s", GET_NAME(ch), GET_NAME(targ), EMPIRE_NAME(e));
+		}
 		
 		GET_LOYALTY(targ) = e;
 		GET_RANK(targ) = 1;
