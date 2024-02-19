@@ -10822,7 +10822,7 @@ bool obj_can_be_stored(obj_data *obj, room_data *loc, empire_data *by_emp, bool 
 	vehicle_data *veh;
 	
 	bool use_room = (!by_emp || emp_can_use_room(by_emp, loc, GUESTS_ALLOWED));
-	bool bld_ok = use_room && (!by_emp || !ROOM_OWNER(loc) || by_emp == ROOM_OWNER(loc) || has_relationship(by_emp, ROOM_OWNER(loc), DIPL_TRADE));
+	bool bld_ok = use_room && IS_COMPLETE(loc) && (!by_emp || !ROOM_OWNER(loc) || by_emp == ROOM_OWNER(loc) || has_relationship(by_emp, ROOM_OWNER(loc), DIPL_TRADE));
 	
 	// We skip this check in retrieval mode, since STORE_ALL does not function for retrieval.
 	if (!retrieval_mode && GET_OBJ_STORAGE(obj) && room_has_function_and_city_ok(NULL, loc, FNC_STORE_ALL)) {
