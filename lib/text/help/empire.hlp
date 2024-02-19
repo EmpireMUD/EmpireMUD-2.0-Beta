@@ -567,7 +567,7 @@ See also: CITY COMMAND
 EXCHANGE
 
 Usage:  exchange <item>
-        exchange <number> [empire] coins
+        exchange <number> [empire | misc] coins
 
 You can exchange valuable metals or foreign coins at any mint or vault. You
 will always receive coins in the local currency. Exchange rates may vary based
