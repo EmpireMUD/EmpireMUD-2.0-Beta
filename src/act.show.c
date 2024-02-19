@@ -2389,7 +2389,7 @@ SHOW(show_quests) {
 	struct player_quest *pq;
 	int count, total, diff;
 	quest_data *qst;
-	char_data *vict;
+	char_data *vict = NULL;
 	size_t size;
 	
 	arg2 = any_one_arg(argument, name);
@@ -2497,7 +2497,7 @@ SHOW(show_quests) {
 		}
 	}
 	
-	if (file) {
+	if (file && vict) {
 		free_char(vict);
 	}
 }
