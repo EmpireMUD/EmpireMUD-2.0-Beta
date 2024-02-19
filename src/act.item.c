@@ -6318,6 +6318,10 @@ ACMD(do_exchange) {
 		else if (new <= 0) {
 			msg_to_char(ch, "You wouldn't get anything for that at these exchange rates.\r\n");
 		}
+		else if ((amount = (int)(new * exchange_rate(emp, coin_emp))) <= 0) {
+			// prevent rounding errors e.g. 3 misc -> 1 empire coin
+			msg_to_char(ch, "You wouldn't get anything for that at these exchange rates.\r\n");
+		}
 		else {
 			// success!
 			strcpy(buf, money_amount(coin_emp, amount));
