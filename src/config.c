@@ -1860,6 +1860,7 @@ void init_config_system(void) {
 	init_config(CONFIG_ACTIONS, "high_depletion", CONFTYPE_INT, "depletion in buildings with HIGH-DEPLETION");
 	init_config(CONFIG_ACTIONS, "pick_base_timer", CONFTYPE_INT, "ticks to do pick interactions");
 	init_config(CONFIG_ACTIONS, "prospecting_workforce_hours", CONFTYPE_INT, "real hours for workforce to prospect 1 tile (shorter than world reset)");
+	init_config(CONFIG_ACTIONS, "saw_timer", CONFTYPE_INT, "ticks to saw; cut in half up to two times from tools and ptech");
 	init_config(CONFIG_ACTIONS, "shear_growth_time", CONFTYPE_INT, "real hours to regrow wool");
 	init_config(CONFIG_ACTIONS, "trench_initial_value", CONFTYPE_INT, "negative starting value for excavate -- done when it counts up to 0");
 	init_config(CONFIG_ACTIONS, "trench_gain_from_rain", CONFTYPE_INT, "amount of rain water per room update added to a trench");

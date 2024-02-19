@@ -73,6 +73,7 @@ pick_depletion 14
 planting_base_timer 192
 planting_workforce_timer 24
 prospecting_workforce_hours 30
+saw_timer 8
 shear_growth_time 6
 short_depletion 25
 tan_timer 12
