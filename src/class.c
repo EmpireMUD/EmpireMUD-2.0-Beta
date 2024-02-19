@@ -104,8 +104,8 @@ void assign_class_and_extra_abilities(char_data *ch, class_data *cls, int role) 
 			HASH_ADD_INT(hash, vnum, aat);
 		}
 		
-		// STEP 1b: determine if the player's class/role has this abil -- only if they are at the max skill cap (100)
-		if (cls && !aat->can_have && GET_SKILL_LEVEL(ch) >= MAX_SKILL_CAP) {
+		// STEP 1b: determine if the player's class/role has this abil -- only if they are at the max skill cap (100); requires a role
+		if (cls && !aat->can_have && GET_SKILL_LEVEL(ch) >= MAX_SKILL_CAP && role != ROLE_NONE) {
 			LL_FOREACH(CLASS_ABILITIES(cls), clab) {
 				if (clab->role != NOTHING && clab->role != role) {
 					continue;	// wrong role
@@ -121,33 +121,35 @@ void assign_class_and_extra_abilities(char_data *ch, class_data *cls, int role) 
 		}
 	}
 	
-	// STEP 2: check which skill synergies the player qualifies for
-	HASH_ITER(hh, GET_SKILL_HASH(ch), plsk, next_plsk) {
-		skill = plsk->ptr;
+	// STEP 2: check which skill synergies the player qualifies for (requires a role)
+	if (role != ROLE_NONE) {
+		HASH_ITER(hh, GET_SKILL_HASH(ch), plsk, next_plsk) {
+			skill = plsk->ptr;
 		
-		if (plsk->level < SKILL_MAX_LEVEL(skill)) {
-			continue;	// only skills at their max
-		}
+			if (plsk->level < SKILL_MAX_LEVEL(skill)) {
+				continue;	// only skills at their max
+			}
 		
-		LL_FOREACH(SKILL_SYNERGIES(skill), syn) {
-			if (syn->role != NOTHING && syn->role != role) {
-				continue;	// wrong role
-			}
-			if (syn->level > get_skill_level(ch, syn->skill)) {
-				continue;	// level in other skill too low
-			}
+			LL_FOREACH(SKILL_SYNERGIES(skill), syn) {
+				if (syn->role != NOTHING && syn->role != role) {
+					continue;	// wrong role
+				}
+				if (syn->level > get_skill_level(ch, syn->skill)) {
+					continue;	// level in other skill too low
+				}
 			
-			// found!
-			vnum = syn->ability;
-			HASH_FIND_INT(hash, &vnum, aat);
-			if (aat) {
-				// ONLY add it if we already had an entry
-				aat->can_have = TRUE;
+				// found!
+				vnum = syn->ability;
+				HASH_FIND_INT(hash, &vnum, aat);
+				if (aat) {
+					// ONLY add it if we already had an entry
+					aat->can_have = TRUE;
+				}
 			}
 		}
 	}
 	
-	// STEP 3: check parent abilities
+	// STEP 3: check parent abilities (do not require a role set)
 	HASH_ITER(hh, ability_table, abil, next_abil) {
 		if (!has_ability_data_any(abil, ADL_PARENT)) {
 			continue;	// parentless
