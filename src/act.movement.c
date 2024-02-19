@@ -1074,22 +1074,11 @@ bool player_can_move(char_data *ch, int dir, room_data *to_room, bitvector_t fla
 		return TRUE;
 	}
 	
-	// basic mount viability: do this first because it can affect swimming etc
-	if (IS_RIDING(ch) && !can_mount_in_room(ch, to_room)) {
-		if (PRF_FLAGGED(ch, PRF_AUTODISMOUNT)) {
-			do_dismount(ch, "", 0, 0);
-		}
-		else {
-			msg_to_char(ch, "You can't ride there.\r\n");
-			return FALSE;
-		}
-	}
-	
 	// checks that only matter if the move is directional (e.g. not a portal)
 	if (dir != NO_DIR) {
 		// to-water checks
 		if (WATER_SECT(to_room)) {
-			if (!EFFECTIVELY_SWIMMING(ch)) {
+			if (!EFFECTIVELY_SWIMMING(ch) || (IS_RIDING(ch) && !can_mount_in_room(ch, to_room) && !EFFECTIVELY_SWIMMING_WITHOUT_MOUNT(ch))) {
 				if (ROOM_IS_CLOSED(IN_ROOM(ch)) && !ROOM_IS_CLOSED(to_room)) {
 					// player may be stuck
 					needs_help = TRUE;
@@ -1100,7 +1089,7 @@ bool player_can_move(char_data *ch, int dir, room_data *to_room, bitvector_t fla
 				}
 			}
 			// auto-swim ?
-			if (!PRF_FLAGGED(ch, PRF_AUTOSWIM) && !WATER_SECT(IN_ROOM(ch)) && !IS_SET(flags, MOVE_SWIM | MOVE_IGNORE) && !EFFECTIVELY_FLYING(ch) && !HAS_WATERWALKING(ch) && !IS_INSIDE(IN_ROOM(ch)) && !IS_ADVENTURE_ROOM(IN_ROOM(ch)) && (!IS_RIDING(ch) || !MOUNT_FLAGGED(ch, MOUNT_AQUATIC | MOUNT_WATERWALKING))) {
+			if (!PRF_FLAGGED(ch, PRF_AUTOSWIM) && !WATER_SECT(IN_ROOM(ch)) && !IS_SET(flags, MOVE_SWIM | MOVE_IGNORE) && !EFFECTIVELY_FLYING(ch) && !HAS_WATERWALKING(ch) && !IS_INSIDE(IN_ROOM(ch)) && !IS_ADVENTURE_ROOM(IN_ROOM(ch)) && (!IS_RIDING(ch) || !MOUNT_FLAGGED(ch, MOUNT_AQUATIC | MOUNT_WATERWALKING) || !can_mount_in_room(ch, to_room))) {
 				msg_to_char(ch, "You must type 'swim' to enter the water.\r\n");
 				return FALSE;
 			}
@@ -1117,7 +1106,7 @@ bool player_can_move(char_data *ch, int dir, room_data *to_room, bitvector_t fla
 			return FALSE;
 		}
 		// rough-to-rough without the ability
-		if (ROOM_SECT_FLAGGED(IN_ROOM(ch), SECTF_ROUGH) && ROOM_SECT_FLAGGED(to_room, SECTF_ROUGH) && ROOM_HEIGHT(to_room) >= ROOM_HEIGHT(IN_ROOM(ch)) && (!IS_RIDING(ch) || !has_player_tech(ch, PTECH_RIDING_UPGRADE)) && !has_player_tech(ch, PTECH_ROUGH_TERRAIN) && !EFFECTIVELY_FLYING(ch)) {
+		if (ROOM_SECT_FLAGGED(IN_ROOM(ch), SECTF_ROUGH) && ROOM_SECT_FLAGGED(to_room, SECTF_ROUGH) && ROOM_HEIGHT(to_room) >= ROOM_HEIGHT(IN_ROOM(ch)) && (!IS_RIDING(ch) || !has_player_tech(ch, PTECH_RIDING_UPGRADE) || !can_mount_in_room(ch, to_room)) && !has_player_tech(ch, PTECH_ROUGH_TERRAIN) && !EFFECTIVELY_FLYING(ch)) {
 			msg_to_char(ch, "You don't have the ability to cross such rough terrain.\r\n");
 			return FALSE;
 		}
@@ -1194,6 +1183,15 @@ bool player_can_move(char_data *ch, int dir, room_data *to_room, bitvector_t fla
 		}
 		else {
 			msg_to_char(ch, "Your mount won't go onto the land.\r\n");
+			return FALSE;
+		}
+	}
+	if (IS_RIDING(ch) && !can_mount_in_room(ch, to_room)) {
+		if (PRF_FLAGGED(ch, PRF_AUTODISMOUNT)) {
+			do_dismount(ch, "", 0, 0);
+		}
+		else {
+			msg_to_char(ch, "You can't ride there.\r\n");
 			return FALSE;
 		}
 	}
