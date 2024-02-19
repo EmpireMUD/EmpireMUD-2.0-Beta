@@ -5889,36 +5889,51 @@ ACMD(do_estats) {
 
 
 ACMD(do_expel) {
+	bool imm_access = GET_ACCESS_LEVEL(ch) >= LVL_CIMPL || IS_GRANTED(ch, GRANT_EMPIRES);
 	empire_data *e;
 	char_data *targ = NULL;
 	bool file = FALSE;
 
-	if (IS_NPC(ch) || !(e = GET_LOYALTY(ch))) {
+	if (IS_NPC(ch)) {
 		msg_to_char(ch, "You don't belong to any empire.\r\n");
 		return;
 	}
-
-	one_argument(argument, arg);
-
+	
+	argument = any_one_word(argument, arg);
+	
+	// optional first arg as empire name
+	if (imm_access && *arg && (e = get_empire_by_name(arg))) {
+		argument = any_one_word(argument, arg);
+	}
+	else {
+		e = GET_LOYALTY(ch);
+	}
+	
 	// it's important not to RETURN from here, as the target may need to be freed later
 	if (!IS_APPROVED(ch) && config_get_bool("manage_empire_approval")) {
 		send_config_msg(ch, "need_approval_string");
 	}
-	else if (!e)
+	else if (!e) {
 		msg_to_char(ch, "You don't belong to any empire.\r\n");
-	else if (GET_RANK(ch) != EMPIRE_NUM_RANKS(e))
+	}
+	else if (!imm_access && GET_RANK(ch) != EMPIRE_NUM_RANKS(e)) {
 		msg_to_char(ch, "You don't have the authority to expel followers.\r\n");
-	else if (!*arg)
+	}
+	else if (!*arg) {
 		msg_to_char(ch, "Whom do you wish to expel?\r\n");
+	}
 	else if (!(targ = find_or_load_player(arg, &file))) {
 		send_to_char("There is no such player.\r\n", ch);
 	}
-	else if (IS_NPC(targ) || GET_LOYALTY(targ) != e)
-		msg_to_char(ch, "That person is not a member of this empire.\r\n");
-	else if (targ == ch)
+	else if (IS_NPC(targ) || GET_LOYALTY(targ) != e) {
+		msg_to_char(ch, "That person is not a member of %s.\r\n", (e == GET_LOYALTY(ch) ? "this empire" : EMPIRE_NAME(e)));
+	}
+	else if (targ == ch) {
 		msg_to_char(ch, "You can't expel yourself.\r\n");
-	else if (EMPIRE_LEADER(e) == GET_IDNUM(targ))
+	}
+	else if (EMPIRE_LEADER(e) == GET_IDNUM(targ)) {
 		msg_to_char(ch, "You can't expel the leader!\r\n");
+	}
 	else {
 		delete_member_data(targ, e);
 		GET_LOYALTY(targ) = NULL;
@@ -5926,12 +5941,18 @@ ACMD(do_expel) {
 		clear_private_owner(GET_IDNUM(targ));
 
 		log_to_empire(e, ELOG_MEMBERS, "%s has been expelled from the empire", PERS(targ, targ, 1));
-		send_config_msg(ch, "ok_string");
+		msg_to_char(ch, "You expel %s from %s.\r\n", PERS(targ, targ, TRUE), (e == GET_LOYALTY(ch) ? "the empire" : EMPIRE_NAME(e)));
 		msg_to_char(targ, "You have been expelled from the empire.\r\n");
 		
 		remove_lore(targ, LORE_PROMOTED);
 		remove_lore(targ, LORE_JOIN_EMPIRE);
-		add_lore(targ, LORE_KICKED_EMPIRE, "Dishonorably discharged from %s%s&0", EMPIRE_BANNER(e), EMPIRE_NAME(e));
+		if (e == GET_LOYALTY(ch)) {
+			add_lore(targ, LORE_KICKED_EMPIRE, "Dishonorably discharged from %s%s&0", EMPIRE_BANNER(e), EMPIRE_NAME(e));
+		}
+		else {
+			add_lore(targ, LORE_KICKED_EMPIRE, "Removed from %s%s&0", EMPIRE_BANNER(e), EMPIRE_NAME(e));
+			syslog(SYS_GC, GET_ACCESS_LEVEL(ch), TRUE, "ABUSE: %s expelled %s from %s", GET_NAME(ch), GET_NAME(targ), EMPIRE_NAME(e));
+		}
 
 		// save now
 		if (file) {
