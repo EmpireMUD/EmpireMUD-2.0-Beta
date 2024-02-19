@@ -604,7 +604,7 @@ end
 set target %actor.id%
 remote target %self.id%
 wait 9 sec
-if %verify_target% != %actor.id%
+if %verify_target% != %actor.id% || %self.room% != %actor.room%
   %echo% ~%self% rises from the swampy ground with a splash!
   dg_affect #10959 %self% off
   halt
