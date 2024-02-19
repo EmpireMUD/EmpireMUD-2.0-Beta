@@ -499,7 +499,7 @@ OLC_MODULE(mapedit_unclaimable) {
 OLC_MODULE(mapedit_undeplete) {
 	bool any = FALSE;
 	char arg2[MAX_INPUT_LENGTH];
-	int type = NOTHING;
+	int which = NOTHING;
 	vehicle_data *veh = NULL;
 	struct depletion_data *dep, *next_dep;
 	
@@ -512,9 +512,9 @@ OLC_MODULE(mapedit_undeplete) {
 	
 	// arg 1: depletion type
 	if (!str_cmp(arg, "all")) {
-		type = NOTHING;
+		which = NOTHING;
 	}
-	else if ((type = search_block(arg, depletion_types, FALSE)) == NOTHING) {
+	else if ((which = search_block(arg, depletion_types, FALSE)) == NOTHING) {
 		msg_to_char(ch, "Unknown depletion type '%s'.\r\n", arg);
 		return;
 	}
@@ -527,7 +527,7 @@ OLC_MODULE(mapedit_undeplete) {
 	
 	if (veh) {
 		LL_FOREACH_SAFE(VEH_DEPLETION(veh), dep, next_dep) {
-			if (type == NOTHING || dep->type == type) {
+			if (which == NOTHING || dep->type == which) {
 				LL_DELETE(VEH_DEPLETION(veh), dep);
 				any = TRUE;
 			}
@@ -538,7 +538,7 @@ OLC_MODULE(mapedit_undeplete) {
 	}
 	else {	// room
 		LL_FOREACH_SAFE(ROOM_DEPLETION(IN_ROOM(ch)), dep, next_dep) {
-			if (type == NOTHING || dep->type == type) {
+			if (which == NOTHING || dep->type == which) {
 				LL_DELETE(ROOM_DEPLETION(IN_ROOM(ch)), dep);
 				any = TRUE;
 			}
