@@ -457,7 +457,7 @@ int CAN_CARRY_N(char_data *ch);	// formerly a macro
 #define IS_HASTENED(ch)  (AFF_FLAGGED((ch), AFF_HASTE) && !AFF_FLAGGED((ch), AFF_SLOW))
 #define IS_HUMAN(ch)  (!IS_VAMPIRE(ch))
 #define IS_MAGE(ch)  (IS_NPC(ch) ? MOB_FLAGGED((ch), MOB_CASTER) : (has_skill_flagged((ch), SKILLF_CASTER) > 0))
-#define IS_OUTDOORS(ch)  IS_OUTDOOR_TILE(IN_ROOM(ch))
+#define IS_OUTDOORS(ch)  is_outdoor_room(IN_ROOM(ch))
 #define IS_SLOWED(ch)  (AFF_FLAGGED((ch), AFF_SLOW) && !AFF_FLAGGED((ch), AFF_HASTE))
 #define IS_SWIMMING(ch)  (WATER_SECT(IN_ROOM(ch)) && (!GET_BUILDING(IN_ROOM(ch)) || !GET_BUILT_WITH(IN_ROOM(ch))) && !GET_SITTING_ON(ch) && !IS_RIDING(ch) && !EFFECTIVELY_FLYING(ch) && !HAS_WATERWALKING(ch))
 #define IS_VAMPIRE(ch)  (IS_NPC(ch) ? MOB_FLAGGED((ch), MOB_VAMPIRE) : (has_skill_flagged((ch), SKILLF_VAMPIRE) > 0))
@@ -1580,7 +1580,7 @@ int Y_COORD(room_data *room);	// formerly #define Y_COORD(room)  FLAT_Y_COORD(ge
 #define IS_INCOMPLETE(room)  (ROOM_AFF_FLAGGED((room), ROOM_AFF_INCOMPLETE))
 #define IS_INSIDE(room)  ROOM_SECT_FLAGGED((room), SECTF_INSIDE)
 #define IS_MAP_BUILDING(room)  ROOM_SECT_FLAGGED((room), SECTF_MAP_BUILDING)
-#define IS_OUTDOOR_TILE(room)  (RMT_FLAGGED((room), RMT_OUTDOOR) || (!IS_ADVENTURE_ROOM(room) && (!IS_ANY_BUILDING(room) || (IS_MAP_BUILDING(room) && !IS_COMPLETE(room) && !ROOM_BLD_FLAGGED(room, BLD_CLOSED)) || (IS_MAP_BUILDING(room) && ROOM_BLD_FLAGGED((room), BLD_OPEN)))) || (GET_ROOM_VEHICLE(room) && !VEH_FLAGGED(GET_ROOM_VEHICLE(room), VEH_BUILDING) && CAN_LOOK_OUT(room)))
+#define IS_OUTDOOR_TILE(room)  is_outdoor_room(room)	// formerly a macro
 #define IS_PUBLIC(room)  (ROOM_AFF_FLAGGED((room), ROOM_AFF_PUBLIC))
 #define IS_ROAD(room)  ROOM_SECT_FLAGGED((room), SECTF_IS_ROAD)
 #define IS_UNCLAIMABLE(room)  (ROOM_AFF_FLAGGED((room), ROOM_AFF_UNCLAIMABLE))
@@ -2088,6 +2088,7 @@ room_data *get_map_location_for(room_data *room);
 const char *get_partial_direction_to(char_data *ch, room_data *from, room_data *to, bool abbrev);
 int get_room_blocking_height(room_data *room, bool *blocking_vehicle);
 bool is_deep_mine(room_data *room);
+bool is_outdoor_room(room_data *room);
 void lock_icon(room_data *room, struct icon_data *use_icon);
 void lock_icon_map(struct map_data *loc, struct icon_data *use_icon);
 room_data *real_shift(room_data *origin, int x_shift, int y_shift);

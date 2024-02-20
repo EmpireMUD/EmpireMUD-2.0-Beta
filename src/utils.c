@@ -7050,6 +7050,29 @@ bool is_deep_mine(room_data *room) {
 
 
 /**
+* @param room_data *room Any room.
+* @return bool TRUE if the room counts as "outdoors"; FALSE if not.
+*/
+bool is_outdoor_room(room_data *room) {
+	if (!room) {
+		return FALSE;	// huh? no room
+	}
+	else if (RMT_FLAGGED(room, RMT_OUTDOOR)) {
+		return TRUE;	// "outdoor" interior
+	}
+	else if (!IS_ADVENTURE_ROOM(room) && (!IS_ANY_BUILDING(room) || (IS_MAP_BUILDING(room) && !IS_COMPLETE(room) && !ROOM_BLD_FLAGGED(room, BLD_CLOSED)) || (IS_MAP_BUILDING(room) && ROOM_BLD_FLAGGED((room), BLD_OPEN)))) {
+		return TRUE;	// outdoor tile
+	}
+	else if (GET_ROOM_VEHICLE(room) && !VEH_FLAGGED(GET_ROOM_VEHICLE(room), VEH_BUILDING) && CAN_LOOK_OUT(room) && is_outdoor_room(IN_ROOM(GET_ROOM_VEHICLE(room)))) {
+		return TRUE;	// on a vehicle which is outdoors
+	}
+	else {
+		return FALSE;	// all other cases
+	}
+}
+
+
+/**
 * Locks in a random tile icon by assigning it as a custom icon. This only works
 * if the room doesn't already have a custom icon.
 *
