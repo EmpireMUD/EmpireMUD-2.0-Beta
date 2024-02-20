@@ -227,9 +227,16 @@ wait 1
 Underwater cave mob block~
 0 s 100
 ~
-if (%actor.nohassle% || %direction% == south || %actor.on_quest(12406)% || %actor.on_quest(12407)% || %actor.on_quest(12408)% || %actor.on_quest(12409)%)
+if %direction% == south
+  halt
+elseif %actor.on_quest(12406)% || %actor.on_quest(12407)% || %actor.on_quest(12408)% || %actor.on_quest(12409)%
+  halt
+elseif %actor.is_npc% && %actor.leader%
+  halt
+elseif %actor.nohassle%
   halt
 end
+* oops -- blocked
 %send% %actor% ~%self% won't let you pass!
 return 0
 ~
