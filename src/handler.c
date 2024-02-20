@@ -4379,7 +4379,7 @@ struct empire_city_data *find_city(empire_data *emp, room_data *loc) {
 	}
 	
 	for (city = EMPIRE_CITY_LIST(emp); city; city = city->next) {
-		if ((dist = compute_distance(loc, city->location)) <= city_type[city->type].radius) {
+		if ((dist = compute_distance(loc, city->location)) <= city_type[city->type].radius * (LARGE_CITY_RADIUS(loc) ? config_get_double("outskirts_modifier") : 1)) {
 			if (!found || min == -1 || dist < min) {
 				found = city;
 				min = dist;
