@@ -8570,6 +8570,20 @@ trig_data *real_trigger(trig_vnum vnum) {
 }
 
 
+/**
+* Quick way to turn a vnum into a name, safely.
+*
+* @param trig_vnum vnum The vnum to look up.
+* @return char* A name for the vnum, or "UNKNOWN".
+*/
+char *get_trigger_name_by_proto(trig_vnum vnum) {
+	trig_data *proto = real_trigger(vnum);
+	char *unk = "UNKNOWN";
+	
+	return proto ? GET_TRIG_NAME(proto) : unk;
+}
+
+
 /*
 * scans for a case/default instance
 * returns the line containg the correct case instance, or the last

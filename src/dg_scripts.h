@@ -493,6 +493,7 @@ void assign_triggers(void *i, int type);
 void extract_trigger(trig_data *trig);
 void free_freeable_triggers();
 void free_varlist(struct trig_var_data *vd);
+char *get_trigger_name_by_proto(trig_vnum vnum);
 char *matching_quote(char *p);
 void parse_trigger(FILE *trig_f, int nr);
 void parse_trig_proto(char *line, struct trig_proto_list **list, char *error_str);
