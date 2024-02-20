@@ -1389,6 +1389,7 @@ OLC_MODULE(olc_refresh_companions) {
 	}
 	
 	// ready
+	syslog(SYS_OLC, GET_INVIS_LEV(ch), TRUE, "OLC: %s used .refreshcompanions: %s, %s", GET_NAME(ch), (mob == NOTHING ? "all mobs" : get_mob_name_by_proto(mob, FALSE)), (trigger == NOTHING ? "all triggers" : get_trigger_name_by_proto(trigger)));
 	msg_to_char(ch, "Refreshing companions: %s, %s...\r\n", (mob == NOTHING ? "all mobs" : get_mob_name_by_proto(mob, FALSE)), (trigger == NOTHING ? "all triggers" : get_trigger_name_by_proto(trigger)));
 	
 	// pass on through to the update func
