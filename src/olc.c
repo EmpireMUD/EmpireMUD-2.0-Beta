@@ -44,6 +44,7 @@ OLC_MODULE(olc_edit);
 OLC_MODULE(olc_fullsearch);
 OLC_MODULE(olc_free);
 OLC_MODULE(olc_list);
+OLC_MODULE(olc_refresh_companions);
 OLC_MODULE(olc_removeindev);
 OLC_MODULE(olc_save);
 OLC_MODULE(olc_search);
@@ -614,6 +615,7 @@ const struct olc_command_data olc_data[] = {
 	{ "wordcount", olc_wordcount, OLC_ABILITY | OLC_ARCHETYPE | OLC_ATTACK | OLC_AUGMENT | OLC_BOOK | OLC_BUILDING | OLC_CLASS | OLC_CRAFT | OLC_CROP | OLC_EVENT | OLC_FACTION | OLC_GENERIC | OLC_GLOBAL | OLC_MOBILE | OLC_MORPH | OLC_OBJECT | OLC_PROGRESS | OLC_QUEST | OLC_SECTOR | OLC_SHOP | OLC_SKILL | OLC_SOCIAL | OLC_TRIGGER | OLC_ADVENTURE | OLC_ROOM_TEMPLATE | OLC_VEHICLE, NOBITS },
 	
 	// admin
+	{ "refreshcompanions", olc_refresh_companions, NOBITS, NOBITS },
 	{ "removeindev", olc_removeindev, NOBITS, NOBITS },
 	{ "setflags", olc_set_flags, NOBITS, NOBITS },
 	{ "setminvnum", olc_set_min_vnum, NOBITS, NOBITS },

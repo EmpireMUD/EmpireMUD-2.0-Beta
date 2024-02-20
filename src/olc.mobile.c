@@ -26,6 +26,7 @@
 /**
 * Contents:
 *   Helpers
+*   Refresh Companions
 *   Displays
 *   Edit Modules
 */
@@ -1255,6 +1256,140 @@ int wordcount_mobile(char_data *ch) {
 	count += wordcount_custom_messages(MOB_CUSTOM_MSGS(ch));
 	
 	return count;
+}
+
+
+ //////////////////////////////////////////////////////////////////////////////
+//// REFRESH COMPANIONS //////////////////////////////////////////////////////
+
+// globals
+any_vnum refresh_companions_mob = NOTHING;
+any_vnum refresh_companions_trigger = NOTHING;
+
+
+PLAYER_UPDATE_FUNC(refresh_companions_player) {
+	char_data *proto = NULL;
+	trig_data *trig, *next_trig;
+	struct companion_data *cd, *next_cd;
+	struct trig_proto_list *tpl, *next_tpl, *find_tpl;
+	
+	// companions are in the delay file
+	check_delayed_load(ch);
+	
+	// check all companions
+	HASH_ITER(hh, GET_COMPANIONS(ch), cd, next_cd) {
+		if (refresh_companions_mob != NOTHING && refresh_companions_mob != cd->vnum) {
+			continue;	// not doing this mob
+		}
+		
+		// get mob proto if needed
+		if (!proto || (cd->vnum != GET_MOB_VNUM(proto))) {
+			proto = mob_proto(cd->vnum);
+			if (!proto) {
+				continue;	// shouldn't be possible, but just in case
+			}
+		}
+		
+		// check scripts for removal
+		LL_FOREACH_SAFE(cd->scripts, tpl, next_tpl) {
+			if (refresh_companions_trigger != NOTHING && refresh_companions_trigger != tpl->vnum) {
+				continue;	// not doing this trigger
+			}
+			
+			// check proto (are we removing it?)
+			LL_SEARCH_SCALAR(proto->proto_script, find_tpl, vnum, tpl->vnum);
+			
+			// if it's on here but not on the proto, remove it
+			if (!find_tpl) {
+				// check live companion
+				if (GET_COMPANION(ch) && GET_MOB_VNUM(GET_COMPANION(ch)) == cd->vnum && SCRIPT(GET_COMPANION(ch))) {
+					LL_FOREACH_SAFE(TRIGGERS(SCRIPT(GET_COMPANION(ch))), trig, next_trig) {
+						if (GET_TRIG_VNUM(trig) == tpl->vnum) {
+							// remove it
+							LL_DELETE(TRIGGERS(SCRIPT(GET_COMPANION(ch))), trig);
+							extract_trigger(trig);			
+							update_script_types(SCRIPT(GET_COMPANION(ch)));
+						}
+					}
+				}
+				
+				// and remove
+				LL_DELETE(cd->scripts, tpl);
+				free(tpl);
+			}
+		}
+		
+		// check scripts to add
+		LL_FOREACH(proto->proto_script, tpl) {
+			if (refresh_companions_trigger != NOTHING && refresh_companions_trigger != tpl->vnum) {
+				continue;	// not doing this trigger
+			}
+			
+			// check companion data (are we adding it?)
+			LL_SEARCH_SCALAR(cd->scripts, find_tpl, vnum, tpl->vnum);
+			
+			// if it's missing, add it
+			if (!find_tpl) {
+				// check live companion
+				if (GET_COMPANION(ch) && GET_MOB_VNUM(GET_COMPANION(ch)) == cd->vnum) {
+					if ((trig = read_trigger(tpl->vnum))) {
+						add_trigger(SCRIPT(GET_COMPANION(ch)), trig, -1);
+					}
+				}
+				
+				// and add to cd list
+				CREATE(find_tpl, struct trig_proto_list, 1);
+				find_tpl->vnum = tpl->vnum;
+				LL_APPEND(cd->scripts, find_tpl);
+			}
+		}
+	}
+}
+
+
+OLC_MODULE(olc_refresh_companions) {
+	any_vnum mob = NOTHING, trigger = NOTHING;
+	char arg2[MAX_INPUT_LENGTH];
+	
+	two_arguments(argument, arg, arg2);
+	
+	// first arg (mandatory): which mob
+	if (!*arg) {
+		msg_to_char(ch, "Usage: .refreshcompanions <mob vnum | all> [script vnum | all]\r\n");
+		return;
+	}
+	if (!str_cmp(arg, "all")) {
+		// ok: all
+		mob = NOTHING;
+	}
+	else if (isdigit(*arg) && (mob = atoi(arg)) && mob_proto(mob)) {
+		// ok: mob already set
+	}
+	else {
+		msg_to_char(ch, "Refresh companions: Invalid mob vnum '%s'.\r\n", arg);
+		return;
+	}
+	
+	// second arg (optional): which trigger
+	if (*arg2 && !str_cmp(arg2, "all")) {
+		// ok: all
+		trigger = NOTHING;
+	}
+	else if (*arg2 && isdigit(*arg2) && (trigger = atoi(arg2)) && real_trigger(trigger)) {
+		// ok: trigger vnum set
+	}
+	else if (*arg2) {
+		msg_to_char(ch, "Refresh companions: Invalid trigger vnum '%s'.\r\n", arg2);
+		return;
+	}
+	
+	// ready
+	msg_to_char(ch, "Refreshing companions: %s, %s...\r\n", (mob == NOTHING ? "all mobs" : get_mob_name_by_proto(mob, FALSE)), (trigger == NOTHING ? "all triggers" : get_trigger_name_by_proto(trigger)));
+	
+	// pass on through to the update func
+	refresh_companions_mob = mob;
+	refresh_companions_trigger = trigger;
+	update_all_players(ch, refresh_companions_player);
 }
 
 
