@@ -1858,7 +1858,7 @@ void look_at_room_by_loc(char_data *ch, room_data *room, bitvector_t options) {
 		msg_to_char(ch, "\r\n");
 	}
 	else if (emp) {
-		if ((ter_type = get_territory_type_for_empire(room, emp, FALSE, &junk, &large_radius)) == TER_CITY && (city = find_closest_city(emp, room))) {
+		if ((ter_type = get_territory_type_for_empire(room, emp, FALSE, &junk, &large_radius)) == TER_CITY && (city = find_city(emp, room))) {
 			msg_to_char(ch, "This is the %s%s&0 %s of %s%s.", EMPIRE_BANNER(emp), EMPIRE_ADJECTIVE(emp), city_type[city->type].name, city->name, large_radius ? " (extended radius)" : "");
 		}
 		else {
