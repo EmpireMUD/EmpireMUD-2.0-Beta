@@ -10181,6 +10181,14 @@ Do not confuse LIGHTER with LIGHT. A lighter lights a light.
 
 See also: LIGHT OBJECT, OEDIT USES
 #d
+LOOKUP LOOK-UP "OLC LOOKUP" "VNUM LOOKUP" "ADVENTURE LOOKUP"
+
+Usage:  .lookup <vnum>
+
+This command tells you what adventure a vnum belongs to.
+
+See also: VNUM
+#d
 "MAIL ITEM" "MAIL OBJECT"
 
 The MAIL item type is used internally and can't be set in builder-created items
