@@ -3599,6 +3599,7 @@ const char *olc_flag_bits[] = {
 	"!PROGRESS",	// 25
 	"!EVENTS",
 	"!ATTACKS",
+	"REFRESH-COMPANIONS",
 	"\n"
 };
 

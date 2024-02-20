@@ -7799,34 +7799,36 @@ Normally an immortal can edit any craft, mobile, or object in his/her vnum
 range. However, some flags allow you to prohibit the editing of any of these.
 
 Available flags:
- - ALL-VNUMS -- Not restrictded by setminvnum and setmaxvnum
- - MAP-EDIT -- Can edit the world map
- - CLEAR-IN-DEV -- Can remove the in-development flag on recipes
- - !CRAFT -- Cannot edit craft recipes even in the vnum range
- - !MOBILE -- Cannot edit mobiles
- - !OBJECT -- Cannot edit objects
- - !BUILDING -- Cannot edit buildings
- - !SECTORS -- Cannot edit map sectors
- - !CROP -- Cannot edit crops
- - !TRIGGER -- Cannot edit triggers
- - !ADVENTURE -- Cannot edit adventures
- - !ROOMTEMPLATE -- Cannot edit room templates
- - !GLOBAL -- Cannot edit globals
- - !AUGMENT -- Cannot edit augments
- - !ARCHETYPE -- Cannot edit archetypes
- - !ABILITIES -- Cannot edit abilities
- - !CLASSES -- Cannot edit classes
- - !SKILLS -- Cannot edit skills
- - !VEHICLES -- Cannot edit vehicles
- - !MORPHS -- Cannot edit morphs
- - !QUESTS -- Cannot edit quests
- - !SOCIALS -- Cannot edit socials
- - !FACITONS -- Cannot edit factions
- - !GENERICS - Cannot edit generics
- - !SHOPS - Cannot edit shops
- - !PROGRESS - Cannot edit progressions
- - !EVENTS - Cannot edit events
- - !ATTACKS - Cannot edit attack messages
+ &cALL-VNUMS&0 - Not restrictded by setminvnum and setmaxvnum
+ &cMAP-EDIT&0 - Can edit the world map
+ &cCLEAR-IN-DEV&0 - Can remove the in-development flag on recipes
+ &cREFRESH-COMPANIONS&0 - Can use the .refreshcompanions command
+
+ &c!CRAFT&0 - Cannot edit craft recipes even in the vnum range
+ &c!MOBILE&0 - Cannot edit mobiles
+ &c!OBJECT&0 - Cannot edit objects
+ &c!BUILDING&0 - Cannot edit buildings
+ &c!SECTORS&0 - Cannot edit map sectors
+ &c!CROP&0 - Cannot edit crops
+ &c!TRIGGER&0 - Cannot edit triggers
+ &c!ADVENTURE&0 - Cannot edit adventures
+ &c!ROOMTEMPLATE&0 - Cannot edit room templates
+ &c!GLOBAL&0 - Cannot edit globals
+ &c!AUGMENT&0 - Cannot edit augments
+ &c!ARCHETYPE&0 - Cannot edit archetypes
+ &c!ABILITIES&0 - Cannot edit abilities
+ &c!CLASSES&0 - Cannot edit classes
+ &c!SKILLS&0 - Cannot edit skills
+ &c!VEHICLES&0 - Cannot edit vehicles
+ &c!MORPHS&0 - Cannot edit morphs
+ &c!QUESTS&0 - Cannot edit quests
+ &c!SOCIALS&0 - Cannot edit socials
+ &c!FACITONS&0 - Cannot edit factions
+ &c!GENERICS&0 - Cannot edit generics
+ &c!SHOPS&0 - Cannot edit shops
+ &c!PROGRESS&0 - Cannot edit progressions
+ &c!EVENTS&0 - Cannot edit events
+ &c!ATTACKS&0 - Cannot edit attack messages
 
 For notes on the mud's building rules, see HELP BUILDING GUIDE.
 #d

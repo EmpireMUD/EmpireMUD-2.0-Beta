@@ -1351,6 +1351,11 @@ OLC_MODULE(olc_refresh_companions) {
 	any_vnum mob = NOTHING, trigger = NOTHING;
 	char arg2[MAX_INPUT_LENGTH];
 	
+	if (GET_ACCESS_LEVEL(ch) < LVL_UNRESTRICTED_BUILDER && !OLC_FLAGGED(ch, OLC_FLAG_REFRESH_COMPANIONS)) {
+		msg_to_char(ch, "You must be level %d to do that.\r\n", LVL_UNRESTRICTED_BUILDER);
+		return;
+	}
+	
 	two_arguments(argument, arg, arg2);
 	
 	// first arg (mandatory): which mob
