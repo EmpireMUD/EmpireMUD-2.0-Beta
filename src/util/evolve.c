@@ -27,6 +27,8 @@
 *  PROTOTYPES
 *  EVOLUTIONS
 *  MAIN
+*  I/O FUNCTIONS
+*  CROP I/O
 *  SECTOR I/O
 *  MAP I/O
 *  HELPER FUNCTIONS
@@ -42,6 +44,7 @@
 // global vars (these are changed by command line args)
 int nearby_distance = 2;	// for nearby evos
 int day_of_year = 180;	// for seasons
+int water_crop_distance = 4;	// for crops that require water
 
 
 // light version of map data for this program
@@ -49,6 +52,7 @@ struct map_t {
 	room_vnum vnum;	
 	int island_id;
 	sector_vnum sector_type, base_sector, natural_sector;
+	crop_vnum crop_type;
 	bitvector_t affects;
 	bitvector_t flags;	// EVOLVER_ flags
 	long sector_time;	// when it became this sector
@@ -58,6 +62,7 @@ struct map_t {
 
 struct map_t world[MAP_WIDTH][MAP_HEIGHT];	// world map grid
 struct map_t *land = NULL;	// linked list of land tiles
+crop_data *crop_table = NULL;	// crop hash table
 sector_data *sector_table = NULL;	// sector hash table
 FILE *outfl = NULL;	// file for saving data
 
@@ -90,8 +95,10 @@ bool check_near_evo_sector_flagged(struct map_t *tile, int type, struct evolutio
 int count_adjacent(struct map_t *tile, sector_vnum sect, bool count_original_sect);
 int count_adjacent_flagged(struct map_t *tile, sbitvector_t with_flags, bool count_original_sect);
 void empire_srandom(unsigned long initial_seed);
+crop_data *find_crop(any_vnum vnum);
 sector_data *find_sect(any_vnum vnum);
 struct evolution_data *get_evo_by_type(sector_vnum sect, int type);
+void index_boot_crops();
 void index_boot_sectors();
 void load_base_map();
 double map_distance(struct map_t *start, struct map_t *end);
@@ -330,8 +337,8 @@ int main(int argc, char **argv) {
 	struct map_t *tile;
 	int num, pid = 0;
 	
-	if (argc < 3 || argc > 4) {
-		printf("Format: %s <nearby distance> <day of year> [pid to signal]\n", argv[0]);
+	if (argc < 4 || argc > 5) {
+		printf("Format: %s <nearby distance> <day of year> <water crop distance> [pid to signal]\n", argv[0]);
 		exit(0);
 	}
 	
@@ -339,23 +346,27 @@ int main(int argc, char **argv) {
 	
 	nearby_distance = atoi(argv[1]);
 	day_of_year = atoi(argv[2]);
+	water_crop_distance = atoi(argv[3]);
 	
 	if (DEBUG_MODE) {
 		printf("Using nearby distance of: %d\n", nearby_distance);
 		printf("Using day of year: %d\n", day_of_year);
+		printf("Using water crop distance: %d\n", water_crop_distance);
 	}
 	
 	// determines if we will send a signal back to the mud
-	if (argc == 4) {
-		pid = atoi(argv[3]);
+	if (argc == 5) {
+		pid = atoi(argv[4]);
 		if (DEBUG_MODE) {
 			printf("Will signal pid: %d\n", pid);
 		}
 	}
 	
 	// load data
+	index_boot_crops();
 	index_boot_sectors();
 	if (DEBUG_MODE) {
+		printf("Loaded: %d crops\n", HASH_COUNT(crop_table));
 		printf("Loaded: %d sectors\n", HASH_COUNT(sector_table));
 	}
 	
@@ -389,7 +400,7 @@ int main(int argc, char **argv) {
 
 
  //////////////////////////////////////////////////////////////////////////////
-//// SECTOR I/O //////////////////////////////////////////////////////////////
+//// I/O FUNCTIONS ///////////////////////////////////////////////////////////
 
 /**
 * This converts data file entries into bitvectors, where they may be written
@@ -518,8 +529,197 @@ int get_line(FILE *fl, char *buf) {
 }
 
 
+ //////////////////////////////////////////////////////////////////////////////
+//// CROP I/O ////////////////////////////////////////////////////////////////
+
+/**
+* Read one crop from file.
+*
+* WARNING: This is a near-copy of the version in db.lib.c and all changes to
+* the crop format must be made in both places.
+*
+* @param FILE *fl The open .crop file
+* @param crop_vnum vnum The crop vnum
+*/
+void parse_crop(FILE *fl, crop_vnum vnum) {
+	crop_data *crop, *find;
+	int int_in[4];
+	char line[256], str_in[256], str_in2[256], error[256];
+	char *tmp;
+	
+	// create
+	CREATE(crop, crop_data, 1);
+	crop->vnum = vnum;
+
+	if ((find = find_crop(vnum))) {
+		log("WARNING: Duplicate crop vnum #%d", vnum);
+		// but have to load it anyway to advance the file
+	}
+	else {
+		HASH_ADD_INT(crop_table, vnum, crop);
+	}
+		
+	// for error messages
+	sprintf(error, "crop vnum %d", vnum);
+	
+	// lines 1-2
+	GET_CROP_NAME(crop) = fread_string(fl, error);
+	GET_CROP_TITLE(crop) = fread_string(fl, error);
+	
+	// line 3: mapout, climate, flags
+	if (!get_line(fl, line) || sscanf(line, "%d %s %s", &int_in[0], str_in, str_in2) != 3) {
+		log("SYSERR: Format error in line 3 of %s", error);
+		exit(1);
+	}
+	
+	GET_CROP_MAPOUT(crop) = int_in[0];
+	GET_CROP_CLIMATE(crop) = asciiflag_conv(str_in);
+	GET_CROP_FLAGS(crop) = asciiflag_conv(str_in2);
+			
+	// line 4: x_min, x_max, y_min, y_max
+	if (!get_line(fl, line) || sscanf(line, "%d %d %d %d", &int_in[0], &int_in[1], &int_in[2], &int_in[3]) != 4) {
+		log("SYSERR: Format error in line 4 of %s", error);
+		exit(1);
+	}
+	
+	GET_CROP_X_MIN(crop) = int_in[0];
+	GET_CROP_X_MAX(crop) = int_in[1];
+	GET_CROP_Y_MIN(crop) = int_in[2];
+	GET_CROP_Y_MAX(crop) = int_in[3];
+		
+	// optionals
+	for (;;) {
+		if (!get_line(fl, line)) {
+			log("SYSERR: Format error in %s, expecting alphabetic flags", error);
+			exit(1);
+		}
+		switch (*line) {
+			case 'D': {	// tile sets -- unneeded
+				tmp = fread_string(fl, error);
+				free(tmp);
+				tmp = fread_string(fl, error);
+				free(tmp);
+				break;
+			}
+			case 'I': {	// interaction item -- unneeded
+				// nothing to do -- these are 1-line types
+				break;
+			}
+			case 'M': {	// mob spawn -- unneeded
+				get_line(fl, line);	// 1 extra line
+				break;
+			}
+			case 'U': {	// custom messages -- unneeded
+				get_line(fl, line);	// message number line
+				tmp = fread_string(fl, error);	// message itself
+				free(tmp);
+				break;
+			}
+			case 'X': {	// extra desc -- unneeded
+				tmp = fread_string(fl, error);
+				free(tmp);
+				tmp = fread_string(fl, error);
+				free(tmp);
+				break;
+			}
+
+			// end
+			case 'S': {
+				return;
+			}
+			
+			default: {
+				log("SYSERR: Format error in %s, expecting alphabetic flags", error);
+				exit(1);
+			}
+		}
+	}
+}
+
+
+/**
+* Discrete load processes a data file, finds #VNUM records in it, and then
+* sends them to the parser.
+*
+* @param FILE *fl The file to read.
+* @param char *filename The name of the file, for error reporting.
+*/
+void discrete_load_crop(FILE *fl, char *filename) {
+	any_vnum nr = -1, last;
+	char line[256];
+	
+	for (;;) {
+		if (!get_line(fl, line)) {
+			if (nr == -1) {
+				printf("ERROR: crop file %s is empty!\n", filename);
+			}
+			else {
+				printf("ERROR: Format error in %s after crop #%d\n...expecting a new crop, but file ended!\n(maybe the file is not terminated with '$'?)\n", filename, nr);
+			}
+			exit(1);
+		}
+		
+		if (*line == '$') {
+			return;	// done
+		}
+
+		if (*line == '#') {	// new entry
+			last = nr;
+			if (sscanf(line, "#%d", &nr) != 1) {
+				printf("ERROR: Format error after crop #%d\n", last);
+				exit(1);
+			}
+
+			parse_crop(fl, nr);
+		}
+		else {
+			printf("ERROR: Format error in crop file %s near crop #%d\n", filename, nr);
+			printf("ERROR: ... offending line: '%s'\n", line);
+			exit(1);
+		}
+	}
+}
+
+
+/**
+* Loads all the crops into memory from the index file.
+*/
+void index_boot_crops(void) {
+	char buf[MAX_STRING_LENGTH], filename[256];
+	FILE *index, *db_file;
+	
+	sprintf(filename, "%s%s", CROP_PREFIX, INDEX_FILE);
+	
+	if (!(index = fopen(filename, "r"))) {
+		printf("ERROR: opening index file '%s': %s\n", filename, strerror(errno));
+		exit(1);
+	}
+	
+	fscanf(index, "%s\n", buf);
+	while (*buf != '$') {
+		snprintf(filename, sizeof(filename), "%s%s", CROP_PREFIX, buf);
+		if (!(db_file = fopen(filename, "r"))) {
+			printf("ERROR: %s: %s\n", filename, strerror(errno));
+			exit(1);
+		}
+		
+		discrete_load_crop(db_file, buf);
+		
+		fclose(db_file);
+		fscanf(index, "%s\n", buf);
+	}
+	fclose(index);
+}
+
+
+ //////////////////////////////////////////////////////////////////////////////
+//// SECTOR I/O //////////////////////////////////////////////////////////////
+
 /**
 * Read one sector from file.
+*
+* WARNING: This is a near-copy of the version in db.lib.c and all changes to
+* the sector format must be made in both places.
 *
 * @param FILE *fl The open sector file
 * @param sector_vnum vnum The sector vnum
@@ -773,6 +973,7 @@ void load_base_map(void) {
 			world[x][y].sector_type = BASIC_OCEAN;
 			world[x][y].base_sector = BASIC_OCEAN;
 			world[x][y].natural_sector = BASIC_OCEAN;
+			world[x][y].crop_type = NOTHING;
 			world[x][y].affects = NOBITS;
 			world[x][y].flags = NOBITS;
 			world[x][y].sector_time = 0;
@@ -806,6 +1007,7 @@ void load_base_map(void) {
 				world[x][y].affects = store.affects;
 				world[x][y].flags = store.misc;
 				world[x][y].sector_time = store.sector_time;
+				world[x][y].crop_type = store.crop_type;
 				
 				if (world[x][y].sector_type != BASIC_OCEAN) {
 					if (last_land) {
@@ -970,6 +1172,19 @@ int count_adjacent_flagged(struct map_t *tile, sbitvector_t with_flags, bool cou
 	}
 	
 	return count;
+}
+
+
+/**
+* Gets a crop from the table, by vnum.
+*
+* @param any_vnum vnum The crop vnum.
+* @return crop_data* The found crop, or NULL for none.
+*/
+crop_data *find_crop(any_vnum vnum) {
+	crop_data *crop;
+	HASH_FIND_INT(crop_table, &vnum, crop);
+	return crop;
 }
 
 

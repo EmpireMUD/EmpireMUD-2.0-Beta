@@ -1406,6 +1406,9 @@ void init_crop(crop_data *cp) {
 /**
 * Read one crop from file.
 *
+* WARNING: The evolve.c utility has a near-identical version of this and any
+* new changes here must also be readable by that utility.
+*
 * @param FILE *fl The open .crop file
 * @param crop_vnum vnum The crop vnum
 */

@@ -2999,7 +2999,7 @@ void run_external_evolutions(void) {
 	}
 	
 	evolutions_pending = TRUE;
-	snprintf(buf, sizeof(buf), "nice ../bin/evolve %d %d %d &", config_get_int("nearby_sector_distance"), DAY_OF_YEAR(main_time_info), (int) getpid());
+	snprintf(buf, sizeof(buf), "nice ../bin/evolve %d %d %d %d &", config_get_int("nearby_sector_distance"), DAY_OF_YEAR(main_time_info), config_get_int("water_crop_distance"), (int) getpid());
 	// syslog(SYS_INFO, LVL_START_IMM, TRUE, "Running map evolutions...");
 	system(buf);
 }
