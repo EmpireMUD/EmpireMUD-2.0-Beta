@@ -350,6 +350,7 @@ obj_vnum get_obj_vnum_by_name(char *name, bool storable_only);
 obj_data *get_obj_vis(char_data *ch, char *name, int *number);
 obj_data *get_obj_in_equip_vis(char_data *ch, char *arg, int *number, obj_data *equipment[], int *pos);
 obj_data *get_obj_world(char *name, int *number);
+obj_data *has_required_object(char_data *ch, obj_vnum vnum);
 
 // offer handlers
 struct offer_data *add_offer(char_data *ch, char_data *from, int type, int data);

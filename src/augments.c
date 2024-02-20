@@ -61,7 +61,7 @@ augment_data *find_augment_by_name(char_data *ch, char *name, int type) {
 		if (GET_AUG_ABILITY(aug) != NO_ABIL && !has_ability(ch, GET_AUG_ABILITY(aug))) {
 			continue;
 		}
-		if (GET_AUG_REQUIRES_OBJ(aug) != NOTHING && !get_obj_in_list_vnum(GET_AUG_REQUIRES_OBJ(aug), ch->carrying)) {
+		if (GET_AUG_REQUIRES_OBJ(aug) != NOTHING && !has_required_object(ch, GET_AUG_REQUIRES_OBJ(aug))) {
 			continue;
 		}
 		

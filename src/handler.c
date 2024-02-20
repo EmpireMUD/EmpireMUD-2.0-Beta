@@ -8498,6 +8498,32 @@ obj_data *get_obj_world(char *name, int *number) {
 }
 
 
+/**
+* Determines if the character has the required item in their gear or inventory.
+*
+* @param char_data *ch The person.
+* @param obj_vnum vnum The vnum to look for.
+* @return obj_data* If the character has the item, returns it. Otherwise, returns NULL.
+*/
+obj_data *has_required_object(char_data *ch, obj_vnum vnum) {
+	int pos;
+	
+	if (!ch || vnum == NOTHING) {
+		return NULL;
+	}
+	
+	// check eq
+	for (pos = 0; pos < NUM_WEARS; ++pos) {
+		if (GET_EQ(ch, pos) && GET_OBJ_VNUM(GET_EQ(ch, pos)) == vnum) {
+			return GET_EQ(ch, pos);	// found in eq
+		}
+	}
+	
+	// otherwise check inventory
+	return get_obj_in_list_vnum(vnum, ch->carrying);
+}
+
+
  //////////////////////////////////////////////////////////////////////////////
 //// OFFER HANDLERS //////////////////////////////////////////////////////////
 
