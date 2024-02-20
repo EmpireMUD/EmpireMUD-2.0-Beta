@@ -90,6 +90,7 @@ const int shift_dir[][2] = {
  //////////////////////////////////////////////////////////////////////////////
 //// PROTOTYPES //////////////////////////////////////////////////////////////
 
+bool check_crop_water(struct map_t *tile);
 bool check_near_evo_sector(struct map_t *tile, int type, struct evolution_data *for_evo);
 bool check_near_evo_sector_flagged(struct map_t *tile, int type, struct evolution_data *for_evo);
 int count_adjacent(struct map_t *tile, sector_vnum sect, bool count_original_sect);
@@ -228,6 +229,11 @@ void evolve_one(struct map_t *tile) {
 		}
 	}
 	
+	// if no other changes occurred, also check crop water (50% chance)
+	if (become == NOTHING && water_crop_distance > 0 && !check_crop_water(tile) && !number(0, 1)) {
+		become = tile->base_sector;
+	}
+	
 	// DONE: now change it
 	if (become != NOTHING && find_sect(become)) {
 		tile->sector_type = become;
@@ -346,7 +352,7 @@ int main(int argc, char **argv) {
 	
 	nearby_distance = atoi(argv[1]);
 	day_of_year = atoi(argv[2]);
-	water_crop_distance = atoi(argv[3]);
+	water_crop_distance = atoi(argv[3]);	// may be 0 to ignore unwatered crops
 	
 	if (DEBUG_MODE) {
 		printf("Using nearby distance of: %d\n", nearby_distance);
@@ -1046,6 +1052,35 @@ void write_tile(struct map_t *tile, sector_vnum old) {
 
  //////////////////////////////////////////////////////////////////////////////
 //// HELPER FUNCTIONS ////////////////////////////////////////////////////////
+
+/**
+* Checks if a crop tile needs and has water, and returns FALSE if it needs to
+* be removed.
+*
+* @param struct map_t *tile The tile to check.
+* @return bool TRUE if ok, FALSE if it's a crop tile that should be removed
+*/
+bool check_crop_water(struct map_t *tile) {
+	crop_data *crop;
+	
+	if (tile->crop_type == NOTHING) {
+		return TRUE;	// ok: not a crop
+	}
+	else if (!(crop = find_crop(tile->crop_type))) {
+		return TRUE;	// ok: no crop data
+	}
+	else if (!CROP_FLAGGED(crop, CROPF_REQUIRES_WATER)) {
+		return TRUE;	// ok: does not require water
+	}
+	else if (sect_flagged_within_distance(tile, SECTF_FRESH_WATER, water_crop_distance, TRUE)) {
+		return TRUE;	// ok: requires water, found water
+	}
+	else {
+		// FAIL: requires water, does not have water
+		return FALSE;
+	}
+}
+
 
 /**
 * Ensures the tile is not near ANY of the NOT-NEAR-SECTOR or NOT-ADJACENT tiles
