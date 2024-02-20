@@ -2234,7 +2234,7 @@ void do_eq_change(char_data *ch, char *argument) {
 	obj_data *obj, *next_obj;
 	struct eq_set_obj *oset;
 	bool any = FALSE;
-	int iter;
+	int iter, fail = 0;
 	
 	if (!(eq_set = get_eq_set_by_name(ch, argument))) {
 		msg_to_char(ch, "You don't have an equipment set named '%s' to switch to.\r\n", argument);
@@ -2264,17 +2264,35 @@ void do_eq_change(char_data *ch, char *argument) {
 			else {	// swap
 				if (GET_EQ(ch, oset->pos)) {
 					// remove old item
-					perform_eq_change_unequip(ch, oset->pos);
+					if (remove_otrigger(GET_EQ(ch, oset->pos), ch)) {
+						perform_eq_change_unequip(ch, oset->pos);
+					}
+					else {
+						++fail;
+						continue;	// remove trigger failed
+					}
 				}
 				// attempt to move this one
-				if ((obj = perform_eq_change_unequip(ch, iter))) {
-					perform_wear(ch, obj, oset->pos);
-					any = TRUE;
+				if (remove_otrigger(GET_EQ(ch, iter), ch)) {
+					if ((obj = perform_eq_change_unequip(ch, iter))) {
+						perform_wear(ch, obj, oset->pos);
+						any = TRUE;
+					}
+				}
+				else {
+					++fail;
+					continue;	// remove trigger failed
 				}
 			}
 		}
 		else { // not part of the set
-			perform_eq_change_unequip(ch, iter);
+			if (remove_otrigger(GET_EQ(ch, iter), ch)) {
+				perform_eq_change_unequip(ch, iter);
+			}
+			else {
+				++fail;
+				continue;	// remove trigger failed
+			}
 		}
 	}
 	
@@ -2287,7 +2305,13 @@ void do_eq_change(char_data *ch, char *argument) {
 		// attempt to equip it
 		if (GET_EQ(ch, oset->pos)) {
 			// remove old item
-			perform_eq_change_unequip(ch, oset->pos);
+			if (remove_otrigger(GET_EQ(ch, oset->pos), ch)) {
+				perform_eq_change_unequip(ch, oset->pos);
+			}
+			else {
+				++fail;
+				continue;	// could not remove due to trigger
+			}
 		}
 		// attempt to equip this one
 		perform_wear(ch, obj, oset->pos);
@@ -2297,6 +2321,10 @@ void do_eq_change(char_data *ch, char *argument) {
 	// if we didn't call perform_wear, we MUST determine gear level again at the end
 	if (!any) {
 		determine_gear_level(ch);
+	}
+	
+	if (fail > 0) {
+		msg_to_char(ch, "%s could not be swapped.\r\n", fail > 1 ? "Some items" : "One item");
 	}
 	
 	command_lag(ch, WAIT_OTHER);
