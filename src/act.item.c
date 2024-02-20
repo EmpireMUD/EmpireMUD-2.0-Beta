@@ -2517,11 +2517,11 @@ void do_eq_summary(char_data *ch, char *argument) {
 	
 	if (bits) {
 		prettier_sprintbit(bits, affected_bits, buf);
-		msg_to_char(ch, "Affects: %s\r\n", buf);
+		msg_to_char(ch, " %s\r\n", buf);
 	}
 	
 	HASH_ITER(hh, hash, vh, next_vh) {
-		msg_to_char(ch, "%s: %+d\r\n", apply_types[vh->vnum], vh->count);
+		msg_to_char(ch, " %s: %+d\r\n", apply_types[vh->vnum], vh->count);
 	}
 	
 	free_vnum_hash(&hash);
