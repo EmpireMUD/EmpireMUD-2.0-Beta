@@ -2482,6 +2482,53 @@ void do_eq_set(char_data *ch, char *argument) {
 
 
 /**
+* Shows a character total stats from gear.
+*
+* @param char_data *ch The character.
+* @param char *argument Any additional args after "eq summary"
+*/
+void do_eq_summary(char_data *ch, char *argument) {
+	bitvector_t bits = NOBITS;
+	int iter;
+	obj_data *obj;
+	struct obj_apply *apply;
+	struct vnum_hash *hash = NULL, *vh, *next_vh;
+	
+	// collect data
+	for (iter = 0; iter < NUM_WEARS; ++iter) {
+		if (wear_data[iter].count_stats && (obj = GET_EQ(ch, iter))) {
+			bits |= GET_OBJ_AFF_FLAGS(obj);
+			LL_FOREACH(GET_OBJ_APPLIES(obj), apply) {
+				if (apply->location) {
+					add_vnum_hash(&hash, apply->location, apply->modifier);
+				}
+			}
+		}
+	}
+	
+	// anything to show?
+	if (!hash && !bits) {
+		msg_to_char(ch, "You are not receiving any stats from your equipment.\r\n");
+		return;
+	}
+	
+	// otherwise:
+	msg_to_char(ch, "Stats summary from equipment:\r\n");
+	
+	if (bits) {
+		prettier_sprintbit(bits, affected_bits, buf);
+		msg_to_char(ch, "Affects: %s\r\n", buf);
+	}
+	
+	HASH_ITER(hh, hash, vh, next_vh) {
+		msg_to_char(ch, "%s: %+d\r\n", apply_types[vh->vnum], vh->count);
+	}
+	
+	free_vnum_hash(&hash);
+}
+
+
+/**
 * Unequips an object when it is removed via the "equip" command, as part of a
 * set. These items are placed at the END of the player's inventory, not the
 * start.
@@ -6307,6 +6354,9 @@ ACMD(do_equipment) {
 	}
 	else if (!str_cmp(arg, "set") || !str_cmp(arg, "-set") || !str_cmp(arg, "save") || !str_cmp(arg, "-save")) {
 		do_eq_set(ch, second);
+	}
+	else if (!str_cmp(arg, "summary") || !str_cmp(arg, "-sum") || !str_cmp(arg, "-summ")) {
+		do_eq_summary(ch, second);
 	}
 	else {
 		do_eq_change(ch, argument);	// full arg
