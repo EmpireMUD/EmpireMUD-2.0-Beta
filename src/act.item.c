@@ -1371,7 +1371,7 @@ static int perform_put(char_data *ch, obj_data *obj, obj_data *cont) {
 	}
 	
 	// don't let people drop bound items in other people's territory
-	if (IN_ROOM(cont) && OBJ_BOUND_TO(obj) && ROOM_OWNER(IN_ROOM(cont)) && ROOM_OWNER(IN_ROOM(cont)) != GET_LOYALTY(ch)) {
+	if (IN_ROOM(cont) && OBJ_BOUND_TO(obj) && ROOM_OWNER(IN_ROOM(cont)) && ROOM_OWNER(IN_ROOM(cont)) != GET_LOYALTY(ch) && !IS_IMMORTAL(ch)) {
 		msg_to_char(ch, "You can't put bound items in items here.\r\n");
 		return 0;
 	}
