@@ -10608,15 +10608,19 @@ bool empire_can_afford_component(empire_data *emp, int island, any_vnum cmp_vnum
 * @param empire_data *emp The empire whose storage to search.
 * @param int island_id Which island to look on.
 * @param char *keywords The keyword(s) to match using multi_isname().
+* @param bool ignore_empty If TRUE, skips entries with amounts of 0.
 * @return struct empire_storage_data* The storage entry, or NULL if no matches.
 */
-struct empire_storage_data *find_island_storage_by_keywords(empire_data *emp, int island_id, char *keywords) {
+struct empire_storage_data *find_island_storage_by_keywords(empire_data *emp, int island_id, char *keywords, bool ignore_empty) {
 	struct empire_storage_data *store, *next_store;
 	struct empire_island *isle = get_empire_island(emp, island_id);
 	obj_data *proto;
 	
 	HASH_ITER(hh, isle->store, store, next_store) {
 		if (!(proto = store->proto)) {
+			continue;
+		}
+		if (ignore_empty && store->amount < 1) {
 			continue;
 		}
 		if (!multi_isname(keywords, GET_OBJ_KEYWORDS(proto))) {
