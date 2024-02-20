@@ -2409,6 +2409,7 @@ void do_eq_set(char_data *ch, char *argument) {
 	}
 	else {
 		set_id = add_eq_set_to_char(ch, NOTHING, str_dup(argument));
+		eq_set = get_eq_set_by_name(ch, argument);
 	}
 	
 	// put all current gear on that set
@@ -2434,7 +2435,7 @@ void do_eq_set(char_data *ch, char *argument) {
 		remove_obj_from_eq_set(obj, set_id);
 	}
 	
-	msg_to_char(ch, "Your current equipment has been saved as '%s'.\r\n", argument);
+	msg_to_char(ch, "Your current equipment has been saved as '%s'.\r\n", eq_set ? eq_set->name : "UNKNOWN");
 	queue_delayed_update(ch, CDU_SAVE);
 	
 	command_lag(ch, WAIT_OTHER);
