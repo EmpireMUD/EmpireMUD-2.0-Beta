@@ -7749,30 +7749,41 @@ ACMD(do_set) {
 ACMD(do_slay) {
 	char_data *vict;
 
-	one_argument(argument, arg);
+	argument = one_argument(argument, arg);
+	skip_spaces(&argument);
 
 	if (!*arg)
 		send_to_char("Slay whom?\r\n", ch);
 	else {
-		if (!(vict = get_char_vis(ch, arg, NULL, FIND_CHAR_ROOM)))
+		if (!(vict = get_char_vis(ch, arg, NULL, FIND_CHAR_ROOM))) {
 			send_to_char("They aren't here.\r\n", ch);
-		else if (ch == vict)
-			send_to_char("Your mother would be so sad... :(\r\n", ch);
-		else if (!IS_NPC(vict) && GET_ACCESS_LEVEL(vict) >= GET_ACCESS_LEVEL(ch)) {
+		}
+		else if (ch == vict && str_cmp(argument, "confirm")) {
+			msg_to_char(ch, "You can't slay yourself (unless you type 'confirm' at the end).\r\n");
+		}
+		else if (!IS_NPC(vict) && vict != ch && GET_ACCESS_LEVEL(vict) >= GET_ACCESS_LEVEL(ch)) {
 			act("Surely you don't expect $N to let you slay $M, do you?", FALSE, ch, NULL, vict, TO_CHAR | DG_NO_TRIG);
 		}
 		else {
-			if (!IS_NPC(vict)) {
-				syslog(SYS_GC | SYS_DEATH, GET_INVIS_LEV(ch), TRUE, "ABUSE: %s has slain %s at %s", GET_REAL_NAME(ch), GET_REAL_NAME(vict), room_log_identifier(IN_ROOM(vict)));
+			if (ch == vict) {
+				syslog(SYS_GC | SYS_DEATH, GET_INVIS_LEV(ch), TRUE, "ABUSE: %s has slain %sself at %s", GET_REAL_NAME(ch), HMHR(ch), room_log_identifier(IN_ROOM(vict)));
 				log_to_slash_channel_by_name(DEATH_LOG_CHANNEL, NULL, "%s has been slain at (%d, %d)", PERS(vict, vict, TRUE), X_COORD(IN_ROOM(vict)), Y_COORD(IN_ROOM(vict)));
+				act("You slay yourself!", FALSE, ch, NULL, NULL, TO_CHAR | DG_NO_TRIG);
+				act("$n slays $mself!", FALSE, ch, NULL, NULL, TO_ROOM | DG_NO_TRIG);
 			}
-			
-			act("You chop $M to pieces! Ah! The blood!", FALSE, ch, NULL, vict, TO_CHAR | DG_NO_TRIG);
-			act("$N chops you to pieces!", FALSE, vict, NULL, ch, TO_CHAR | DG_NO_TRIG);
-			act("$n brutally slays $N!", FALSE, ch, NULL, vict, TO_NOTVICT | DG_NO_TRIG);
-
-			check_scaling(vict, ch);	// ensure scaling
-			tag_mob(vict, ch);	// ensures loot binding if applicable
+			else {
+				if (!IS_NPC(vict)) {
+					syslog(SYS_GC | SYS_DEATH, GET_INVIS_LEV(ch), TRUE, "ABUSE: %s has slain %s at %s", GET_REAL_NAME(ch), GET_REAL_NAME(vict), room_log_identifier(IN_ROOM(vict)));
+					log_to_slash_channel_by_name(DEATH_LOG_CHANNEL, NULL, "%s has been slain at (%d, %d)", PERS(vict, vict, TRUE), X_COORD(IN_ROOM(vict)), Y_COORD(IN_ROOM(vict)));
+				}
+				
+				act("You chop $M to pieces! Ah! The blood!", FALSE, ch, NULL, vict, TO_CHAR | DG_NO_TRIG);
+				act("$N chops you to pieces!", FALSE, vict, NULL, ch, TO_CHAR | DG_NO_TRIG);
+				act("$n brutally slays $N!", FALSE, ch, NULL, vict, TO_NOTVICT | DG_NO_TRIG);
+				
+				check_scaling(vict, ch);	// ensure scaling
+				tag_mob(vict, ch);	// ensures loot binding if applicable
+			}
 
 			// this would prevent the death
 			if (AFF_FLAGGED(vict, AFF_AUTO_RESURRECT)) {

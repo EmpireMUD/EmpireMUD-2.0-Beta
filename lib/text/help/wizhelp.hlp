@@ -1712,11 +1712,14 @@ See also: GRANT, REBOOT
 #d
 SLAY
 
-Usage:  slay
+Usage:  slay <target> [confirm]
 
 This is an instant-kill power for the Implementor which was originally part of
 CircleMUD's normal kill command. It has been filtered out because we found it
 to be easier to have it separate. This command is grantable.
+
+Normally, you can't use this command on yourself. However, for testing
+purposes, you can do this if you type 'confirm' at the end.
 
 See also: GRANT
 #d
