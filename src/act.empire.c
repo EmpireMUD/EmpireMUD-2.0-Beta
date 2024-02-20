@@ -6759,6 +6759,7 @@ ACMD(do_inspire) {
 
 
 void do_manage_vehicle(char_data *ch, vehicle_data *veh, char *argument) {
+	bool imm_access = GET_ACCESS_LEVEL(ch) >= LVL_CIMPL || IS_GRANTED(ch, GRANT_EMPIRES);
 	char buf[MAX_STRING_LENGTH], arg[MAX_INPUT_LENGTH];
 	int iter, type = NOTHING;
 	bool on;
@@ -6798,10 +6799,10 @@ void do_manage_vehicle(char_data *ch, vehicle_data *veh, char *argument) {
 	else if (type == NOTHING) {
 		msg_to_char(ch, "Unknown management option '%s'.\r\n", arg);
 	}
-	else if (manage_vehicle_data[type].owned_only && (!GET_LOYALTY(ch) || GET_LOYALTY(ch) != VEH_OWNER(veh))) {
+	else if (!imm_access && manage_vehicle_data[type].owned_only && (!GET_LOYALTY(ch) || GET_LOYALTY(ch) != VEH_OWNER(veh))) {
 		msg_to_char(ch, "You can only do that on a %s you own.\r\n", VEH_OR_BLD(veh));
 	}
-	else if (manage_vehicle_data[type].priv != NOTHING && GET_LOYALTY(ch) && GET_RANK(ch) < EMPIRE_PRIV(GET_LOYALTY(ch), manage_vehicle_data[type].priv)) {
+	else if (!imm_access && manage_vehicle_data[type].priv != NOTHING && GET_LOYALTY(ch) && GET_RANK(ch) < EMPIRE_PRIV(GET_LOYALTY(ch), manage_vehicle_data[type].priv)) {
 		msg_to_char(ch, "You require %s privileges to do that\r\n", priv[manage_vehicle_data[type].priv]);
 	}
 	else {
@@ -6841,6 +6842,10 @@ void do_manage_vehicle(char_data *ch, vehicle_data *veh, char *argument) {
 		snprintf(buf, sizeof(buf), "$n turns the %s management option %s for %s.", manage_vehicle_data[type].name, on ? "on" : "off", VEH_SHORT_DESC(veh));
 		act(buf, TRUE, ch, NULL, NULL, TO_ROOM | TO_NOT_IGNORING);
 		
+		if (imm_access && VEH_OWNER(veh) && VEH_OWNER(veh) != GET_LOYALTY(ch)) {
+			syslog(SYS_GC, GET_ACCESS_LEVEL(ch), TRUE, "ABUSE: %s turned %s manage '%s' tile owned by %s at %s", GET_NAME(ch), on ? "on" : "off", manage_data[type].name, EMPIRE_NAME(ROOM_OWNER(IN_ROOM(ch))), room_log_identifier(IN_ROOM(ch)));
+		}
+		
 		// callback func (optional)
 		if (manage_vehicle_data[type].func) {
 			(manage_vehicle_data[type].func)(ch, on);
@@ -6851,6 +6856,7 @@ void do_manage_vehicle(char_data *ch, vehicle_data *veh, char *argument) {
 
 // manage [option] [on/off] -- uses manage_data (above)
 ACMD(do_manage) {
+	bool imm_access = GET_ACCESS_LEVEL(ch) >= LVL_CIMPL || IS_GRANTED(ch, GRANT_EMPIRES);
 	char buf[MAX_STRING_LENGTH], arg[MAX_INPUT_LENGTH];
 	int iter, type = NOTHING;
 	room_data *flag_room;
@@ -6903,10 +6909,10 @@ ACMD(do_manage) {
 	else if (type == NOTHING) {
 		msg_to_char(ch, "Unknown land management option '%s'.\r\n", arg);
 	}
-	else if (manage_data[type].owned_only && (!GET_LOYALTY(ch) || GET_LOYALTY(ch) != ROOM_OWNER(IN_ROOM(ch)))) {
+	else if (!imm_access && manage_data[type].owned_only && (!GET_LOYALTY(ch) || GET_LOYALTY(ch) != ROOM_OWNER(IN_ROOM(ch)))) {
 		msg_to_char(ch, "You can only do that on a tile you own.\r\n");
 	}
-	else if (manage_data[type].priv != NOTHING && GET_LOYALTY(ch) && GET_RANK(ch) < EMPIRE_PRIV(GET_LOYALTY(ch), manage_data[type].priv)) {
+	else if (!imm_access && manage_data[type].priv != NOTHING && GET_LOYALTY(ch) && GET_RANK(ch) < EMPIRE_PRIV(GET_LOYALTY(ch), manage_data[type].priv)) {
 		msg_to_char(ch, "You require %s privileges to do that\r\n", priv[manage_data[type].priv]);
 	}
 	else {
@@ -6952,6 +6958,10 @@ ACMD(do_manage) {
 		msg_to_char(ch, "You turn the %s land management option %s.\r\n", manage_data[type].name, on ? "on" : "off");
 		snprintf(buf, sizeof(buf), "$n turns the %s land management option %s.", manage_data[type].name, on ? "on" : "off");
 		act(buf, TRUE, ch, NULL, NULL, TO_ROOM | TO_NOT_IGNORING);
+		
+		if (imm_access && ROOM_OWNER(IN_ROOM(ch)) && ROOM_OWNER(IN_ROOM(ch)) != GET_LOYALTY(ch)) {
+			syslog(SYS_GC, GET_ACCESS_LEVEL(ch), TRUE, "ABUSE: %s turned %s manage '%s' tile owned by %s at %s", GET_NAME(ch), on ? "on" : "off", manage_data[type].name, EMPIRE_NAME(ROOM_OWNER(IN_ROOM(ch))), room_log_identifier(IN_ROOM(ch)));
+		}
 		
 		// callback func (optional)
 		if (manage_data[type].func) {

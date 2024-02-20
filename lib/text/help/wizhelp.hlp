@@ -836,6 +836,7 @@ with the 'empire' grant:
 - findmaint: optional first arg to specify which empire
 - islands: optional first arg to specify which empire
 - import/export: optional first arg to specify which empire
+- manage: can use manage on tiles you don't own
 - offenses: optional first arg to specify which empire
 - progress: optional first arg to specify which empire
 - roster: optional first arg to specify which empire
