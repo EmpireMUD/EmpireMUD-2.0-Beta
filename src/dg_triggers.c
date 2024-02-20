@@ -2024,7 +2024,7 @@ int remove_otrigger(obj_data *obj, char_data *actor) {
 	char buf[MAX_INPUT_LENGTH];
 	int ret_val = 1;
 
-	if (!SCRIPT_CHECK(obj, OTRIG_REMOVE) || !NOHASSLE(actor)) {
+	if (!SCRIPT_CHECK(obj, OTRIG_REMOVE) || NOHASSLE(actor)) {
 		return 1;
 	}
 
@@ -2071,7 +2071,7 @@ int drop_otrigger(obj_data *obj, char_data *actor, int mode) {
 	char buf[MAX_INPUT_LENGTH];
 	int ret_val = 1;
 
-	if (!SCRIPT_CHECK(obj, OTRIG_DROP) || !NOHASSLE(actor)) {
+	if (!SCRIPT_CHECK(obj, OTRIG_DROP) || NOHASSLE(actor)) {
 		return 1;
 	}
 
@@ -2142,7 +2142,7 @@ int give_otrigger(obj_data *obj, char_data *actor, char_data *victim) {
 	char buf[MAX_INPUT_LENGTH];
 	int ret_val = 1;
 
-	if (!SCRIPT_CHECK(obj, OTRIG_GIVE) || !NOHASSLE(actor)) {
+	if (!SCRIPT_CHECK(obj, OTRIG_GIVE) || NOHASSLE(actor)) {
 		return 1;
 	}
 
