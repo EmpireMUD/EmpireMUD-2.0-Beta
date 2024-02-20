@@ -1220,6 +1220,12 @@ void identify_vehicle_to_char(vehicle_data *veh, char_data *ch) {
 		msg_to_char(ch, "Paint color: %s%s%s&0\r\n", buf1, (VEH_FLAGGED(veh, VEH_BRIGHT_PAINT) ? "bright " : ""), buf);
 	}
 	
+	// requires climate?
+	if (VEH_REQUIRES_CLIMATE(veh)) {
+		ordered_sprintbit(VEH_REQUIRES_CLIMATE(veh), climate_flags, climate_flags_order, FALSE, buf);
+		msg_to_char(ch, "Requires climate: %s\r\n", buf);
+	}
+	
 	// flags as "notes":
 	show_flags = VEH_FLAGS(veh);
 	if (VEH_FLAGGED(veh, VEH_BUILDING)) {
