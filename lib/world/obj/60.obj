@@ -55,7 +55,7 @@ R
 4 5118 0
 S
 #6011
-tree small~
+small-tree tree small~
 a small tree~
 A small tree has fallen here.~
    This tree is small and crooked, not as useful as a straight sapling, nor
@@ -74,7 +74,7 @@ R
 4 5118 0
 S
 #6012
-tree trees rare~
+rare-tree tree trees rare~
 a rare tree~
 A rare tree is lying here.~
    You can use a sharp tool to scrape a tree until it's a log, or craft it
@@ -163,7 +163,7 @@ R
 4 5118 0
 S
 #6025
-sapling saplings~
+basic-sapling sapling saplings~
 a sapling~
 A sapling is lying here.~
 This sapling is long and straight, perfect for scraping into a pole.
@@ -179,7 +179,7 @@ R
 4 5118 0
 S
 #6026
-sapling saplings fine~
+fine-sapling sapling saplings fine~
 a fine sapling~
 A fine sapling is lying here.~
    This high-quality sapling is perfect for scraping into a pole for building
