@@ -2233,8 +2233,8 @@ void do_eq_change(char_data *ch, char *argument) {
 	struct player_eq_set *eq_set;
 	obj_data *obj, *next_obj;
 	struct eq_set_obj *oset;
-	bool any = FALSE;
-	int iter, fail = 0;
+	bool any = FALSE, fail_pos[NUM_WEARS];
+	int iter, fails;
 	
 	if (!(eq_set = get_eq_set_by_name(ch, argument))) {
 		msg_to_char(ch, "You don't have an equipment set named '%s' to switch to.\r\n", argument);
@@ -2243,6 +2243,11 @@ void do_eq_change(char_data *ch, char *argument) {
 	if (GET_POS(ch) == POS_FIGHTING || GET_POS(ch) < POS_RESTING) {
 		msg_to_char(ch, "You can't change equipment sets right now.\r\n");
 		return;
+	}
+	
+	// init fail_pos: the prevents trying to remove the same piece twice
+	for (iter = 0; iter < NUM_WEARS; ++iter) {
+		fail_pos[iter] = FALSE;
 	}
 	
 	msg_to_char(ch, "You switch to your '%s' equipment set.\r\n", eq_set->name);
@@ -2264,33 +2269,33 @@ void do_eq_change(char_data *ch, char *argument) {
 			else {	// swap
 				if (GET_EQ(ch, oset->pos)) {
 					// remove old item
-					if (remove_otrigger(GET_EQ(ch, oset->pos), ch)) {
+					if (!fail_pos[oset->pos] && remove_otrigger(GET_EQ(ch, oset->pos), ch)) {
 						perform_eq_change_unequip(ch, oset->pos);
 					}
 					else {
-						++fail;
+						fail_pos[oset->pos] = TRUE;
 						continue;	// remove trigger failed
 					}
 				}
 				// attempt to move this one
-				if (remove_otrigger(GET_EQ(ch, iter), ch)) {
+				if (!fail_pos[iter] && remove_otrigger(GET_EQ(ch, iter), ch)) {
 					if ((obj = perform_eq_change_unequip(ch, iter))) {
 						perform_wear(ch, obj, oset->pos);
 						any = TRUE;
 					}
 				}
 				else {
-					++fail;
+					fail_pos[iter] = TRUE;
 					continue;	// remove trigger failed
 				}
 			}
 		}
 		else { // not part of the set
-			if (remove_otrigger(GET_EQ(ch, iter), ch)) {
+			if (!fail_pos[iter] && remove_otrigger(GET_EQ(ch, iter), ch)) {
 				perform_eq_change_unequip(ch, iter);
 			}
 			else {
-				++fail;
+				fail_pos[iter] = TRUE;
 				continue;	// remove trigger failed
 			}
 		}
@@ -2305,11 +2310,11 @@ void do_eq_change(char_data *ch, char *argument) {
 		// attempt to equip it
 		if (GET_EQ(ch, oset->pos)) {
 			// remove old item
-			if (remove_otrigger(GET_EQ(ch, oset->pos), ch)) {
+			if (!fail_pos[oset->pos] && remove_otrigger(GET_EQ(ch, oset->pos), ch)) {
 				perform_eq_change_unequip(ch, oset->pos);
 			}
 			else {
-				++fail;
+				fail_pos[oset->pos] = TRUE;
 				continue;	// could not remove due to trigger
 			}
 		}
@@ -2323,8 +2328,14 @@ void do_eq_change(char_data *ch, char *argument) {
 		determine_gear_level(ch);
 	}
 	
-	if (fail > 0) {
-		msg_to_char(ch, "%s could not be swapped.\r\n", fail > 1 ? "Some items" : "One item");
+	// check fails?
+	for (iter = 0, fails = 0; iter < NUM_WEARS; ++iter) {
+		if (fail_pos[iter]) {
+			++fails;
+		}
+	}
+	if (fails > 0) {
+		msg_to_char(ch, "%s could not be swapped.\r\n", fails > 1 ? "Some items" : "One item");
 	}
 	
 	command_lag(ch, WAIT_OTHER);
