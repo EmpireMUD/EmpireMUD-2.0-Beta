@@ -619,7 +619,7 @@ nynar goblin miner~
 Miner Nynar~
 Nynar the goblin stands here, looking into his boot ('buy potion').
 ~
-25 25 dL cn 2
+25 25 dLM cn 2
 1 0 0 15 -1
 D
    Nynar is frantically checking his boots, gloves, cuffs, and hat for any
@@ -648,7 +648,7 @@ meena miner goblin~
 Miner Meena~
 Meena the goblin is sitting here, filing her pick ('buy pick').
 ~
-25 25 dL cn 2
+25 25 dLM cn 2
 2 0 0 15 -1
 D
    Meena seems a little nervous, but she keeps sharpening her pick as if she
@@ -694,7 +694,7 @@ Blacklung, goblin foreman~
 Blacklung, Goblin Foreman~
 The goblin foreman is looking around nervously ('buy coffin').
 ~
-25 25 dL cn 2
+25 25 dLM cn 2
 1 0 0 15 -1
 D
    Blacklung looks like he's been mining his entire tiny life, and though he's
@@ -724,7 +724,7 @@ Hanx miner~
 Miner Hanx~
 Miner Hanx runs past you ('buy raft').
 ~
-25 25 dL cn 2
+25 25 dLM cn 2
 1 0 0 15 -1
 D
    Hanx never meant to end up on this island, and he only took the mining job
