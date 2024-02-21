@@ -10999,8 +10999,9 @@ bitvector_t ability_shows_fields(ability_data *abil) {
 *
 * @param char_data *ch The player requesting stats.
 * @param ability_data *abil The ability to display.
+* @param bool details If TRUE, shows full messages (due to -d option on vstat).
 */
-void do_stat_ability(char_data *ch, ability_data *abil) {
+void do_stat_ability(char_data *ch, ability_data *abil, bool details) {
 	char buf[MAX_STRING_LENGTH*4], part[MAX_STRING_LENGTH], part2[MAX_STRING_LENGTH];
 	struct ability_data_list *adl;
 	struct ability_hook *ahook;

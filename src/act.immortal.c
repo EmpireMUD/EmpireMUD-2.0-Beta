@@ -43,7 +43,7 @@ extern bool manual_evolutions;
 
 // external functions
 struct instance_data *build_instance_loc(adv_data *adv, struct adventure_link_rule *rule, room_data *loc, int dir);
-void do_stat_vehicle(char_data *ch, vehicle_data *veh);
+void do_stat_vehicle(char_data *ch, vehicle_data *veh, bool details);
 room_data *find_location_for_rule(adv_data *adv, struct adventure_link_rule *rule, int *which_dir);
 
 // locals
@@ -3207,8 +3207,9 @@ void do_stat_book(char_data *ch, book_data *book) {
 *
 * @param char_data *ch The player requesting stats.
 * @param bld_data *bdg The building to stat.
+* @param bool details If TRUE, shows full messages (due to -d option on vstat).
 */
-void do_stat_building(char_data *ch, bld_data *bdg) {
+void do_stat_building(char_data *ch, bld_data *bdg, bool details) {
 	char lbuf[MAX_STRING_LENGTH];
 	
 	msg_to_char(ch, "Building VNum: [&c%d&0], Name: '&c%s&0'\r\n", GET_BLD_VNUM(bdg), GET_BLD_NAME(bdg));
@@ -3283,8 +3284,14 @@ void do_stat_building(char_data *ch, bld_data *bdg) {
 }
 
 
-/* Sends ch information on the character or animal k */
-void do_stat_character(char_data *ch, char_data *k) {
+/**
+* Sends ch information on the character or mobile k.
+*
+* @param char_data *ch The person getting stats.
+* @param char_data *k The player or mob to view stats on.
+* @param bool details If TRUE, shows full messages (due to -d option on vstat).
+*/
+void do_stat_character(char_data *ch, char_data *k, bool details) {
 	char buf[MAX_STRING_LENGTH], lbuf[MAX_STRING_LENGTH], lbuf2[MAX_STRING_LENGTH], lbuf3[MAX_STRING_LENGTH];
 	struct script_memory *mem;
 	struct cooldown_data *cool;
@@ -3660,8 +3667,9 @@ void do_stat_craft(char_data *ch, craft_data *craft) {
 *
 * @param char_data *ch The player requesting stats.
 * @param crop_data *cp The crop to stat.
+* @param bool details If TRUE, shows full messages (due to -d option on vstat).
 */
-void do_stat_crop(char_data *ch, crop_data *cp) {
+void do_stat_crop(char_data *ch, crop_data *cp, bool details) {
 	struct custom_message *ocm;
 	
 	msg_to_char(ch, "Crop VNum: [&c%d&0], Name: '&c%s&0'\r\n", GET_CROP_VNUM(cp), GET_CROP_NAME(cp));
@@ -3879,8 +3887,14 @@ void do_stat_global(char_data *ch, struct global_data *glb) {
 }
 
 
-/* Gives detailed information on an object (j) to ch */
-void do_stat_object(char_data *ch, obj_data *j) {
+/**
+* Gives detailed information on an object (j) to ch
+*
+* @param char_data *ch The person viewing stats.
+* @param obj_data *j The object to view stats on.
+* @param bool details If TRUE, shows full messages (due to -d option on vstat).
+*/
+void do_stat_object(char_data *ch, obj_data *j, bool details) {
 	char buf[MAX_STRING_LENGTH], part[MAX_STRING_LENGTH];
 	int found, minutes;
 	struct obj_apply *apply;
@@ -4572,8 +4586,9 @@ void do_stat_room(char_data *ch) {
 /**
 * @param char_data *ch The player requesting stats.
 * @param room_template *rmt The room template to display.
+* @param bool details If TRUE, shows full messages (due to -d option on vstat).
 */
-void do_stat_room_template(char_data *ch, room_template *rmt) {
+void do_stat_room_template(char_data *ch, room_template *rmt, bool details) {
 	char lbuf[MAX_STRING_LENGTH];
 	adv_data *adv;
 	
@@ -4636,8 +4651,9 @@ void do_stat_room_template(char_data *ch, room_template *rmt) {
 *
 * @param char_data *ch The player requesting stats.
 * @param sector_data *st The sector to stat.
+* @param bool details If TRUE, shows full messages (due to -d option on vstat).
 */
-void do_stat_sector(char_data *ch, sector_data *st) {
+void do_stat_sector(char_data *ch, sector_data *st, bool details) {
 	struct sector_index_type *idx = find_sector_index(GET_SECT_VNUM(st));
 	char buf[MAX_STRING_LENGTH];
 	struct custom_message *ocm;
@@ -7842,25 +7858,34 @@ ACMD(do_snoop) {
 
 
 ACMD(do_stat) {
+	char arg1[MAX_INPUT_LENGTH], arg2[MAX_INPUT_LENGTH], some_arg[MAX_INPUT_LENGTH], last_arg[MAX_INPUT_LENGTH];
 	struct instance_data *inst;
 	char_data *victim = NULL;
 	vehicle_data *veh;
 	empire_data *emp;
 	crop_data *cp;
 	obj_data *obj;
-	bool file = FALSE;
+	bool details = FALSE, file = FALSE;
 	int tmp;
 
-	half_chop(argument, buf1, buf2);
+	// check for optional -d arg
+	chop_last_arg(argument, some_arg, last_arg);
+	if (*last_arg && is_abbrev(last_arg, "-details")) {
+		details = TRUE;
+		half_chop(some_arg, arg1, arg2);
+	}
+	else {
+		half_chop(argument, arg1, arg2);
+	}
 
-	if (!*buf1) {
+	if (!*arg1) {
 		send_to_char("Stats on who or what?\r\n", ch);
 		return;
 	}
-	else if (is_abbrev(buf1, "room")) {
+	else if (is_abbrev(arg1, "room")) {
 		do_stat_room(ch);
 	}
-	else if (!strn_cmp(buf1, "adventure", 3) && is_abbrev(buf1, "adventure")) {
+	else if (!strn_cmp(arg1, "adventure", 3) && is_abbrev(arg1, "adventure")) {
 		if ((inst = find_instance_by_room(IN_ROOM(ch), TRUE, TRUE))) {
 			do_stat_adventure(ch, INST_ADVENTURE(inst));
 		}
@@ -7868,101 +7893,101 @@ ACMD(do_stat) {
 			msg_to_char(ch, "You are not in an adventure zone.\r\n");
 		}
 	}
-	else if (!strn_cmp(buf1, "template", 4) && is_abbrev(buf1, "template")) {
+	else if (!strn_cmp(arg1, "template", 4) && is_abbrev(arg1, "template")) {
 		if (GET_ROOM_TEMPLATE(IN_ROOM(ch))) {
-			do_stat_room_template(ch, GET_ROOM_TEMPLATE(IN_ROOM(ch)));
+			do_stat_room_template(ch, GET_ROOM_TEMPLATE(IN_ROOM(ch)), details);
 		}
 		else {
 			msg_to_char(ch, "This is not a templated room.\r\n");
 		}
 	}
-	else if (!str_cmp(buf1, "building")) {
+	else if (!str_cmp(arg1, "building")) {
 		if (GET_BUILDING(IN_ROOM(ch))) {
-			do_stat_building(ch, GET_BUILDING(IN_ROOM(ch)));
+			do_stat_building(ch, GET_BUILDING(IN_ROOM(ch)), details);
 		}
 		else {
 			msg_to_char(ch, "You are not in a building.\r\n");
 		}
 	}
-	else if (!str_cmp(buf1, "crop")) {
+	else if (!str_cmp(arg1, "crop")) {
 		if (ROOM_SECT_FLAGGED(IN_ROOM(ch), SECTF_HAS_CROP_DATA) && (cp = ROOM_CROP(IN_ROOM(ch)))) {
-			do_stat_crop(ch, cp);
+			do_stat_crop(ch, cp, details);
 		}
 		else {
 			msg_to_char(ch, "You are not on a crop tile.\r\n");
 		}
 	}
-	else if (!strn_cmp(buf1, "emp", 3) && is_abbrev(buf1, "empire")) {
-		if ((emp = get_empire_by_name(buf2))) {
+	else if (!strn_cmp(arg1, "emp", 3) && is_abbrev(arg1, "empire")) {
+		if ((emp = get_empire_by_name(arg2))) {
 			do_stat_empire(ch, emp);
 		}
-		else if (!*buf2) {
+		else if (!*arg2) {
 			msg_to_char(ch, "Get stats on which empire?\r\n");
 		}
 		else {
 			msg_to_char(ch, "Unknown empire.\r\n");
 		}
 	}
-	else if (!strn_cmp(buf1, "sect", 4) && is_abbrev(buf1, "sector")) {
-		do_stat_sector(ch, SECT(IN_ROOM(ch)));
+	else if (!strn_cmp(arg1, "sect", 4) && is_abbrev(arg1, "sector")) {
+		do_stat_sector(ch, SECT(IN_ROOM(ch)), details);
 	}
-	else if (is_abbrev(buf1, "mob")) {
-		if (!*buf2)
+	else if (is_abbrev(arg1, "mob")) {
+		if (!*arg2)
 			send_to_char("Stats on which mobile?\r\n", ch);
 		else {
-			if ((victim = get_char_vis(ch, buf2, NULL, FIND_CHAR_WORLD | FIND_NPC_ONLY)) != NULL)
-				do_stat_character(ch, victim);
+			if ((victim = get_char_vis(ch, arg2, NULL, FIND_CHAR_WORLD | FIND_NPC_ONLY)) != NULL)
+				do_stat_character(ch, victim, details);
 			else
 				send_to_char("No such mobile around.\r\n", ch);
 		}
 	}
-	else if (is_abbrev(buf1, "vehicle")) {
-		if (!*buf2)
+	else if (is_abbrev(arg1, "vehicle")) {
+		if (!*arg2)
 			send_to_char("Stats on which vehicle?\r\n", ch);
 		else {
-			if ((veh = get_vehicle_vis(ch, buf2, NULL)) != NULL) {
-				do_stat_vehicle(ch, veh);
+			if ((veh = get_vehicle_vis(ch, arg2, NULL)) != NULL) {
+				do_stat_vehicle(ch, veh, details);
 			}
 			else {
 				send_to_char("No such vehicle around.\r\n", ch);
 			}
 		}
 	}
-	else if (is_abbrev(buf1, "player")) {
-		if (!*buf2) {
+	else if (is_abbrev(arg1, "player")) {
+		if (!*arg2) {
 			send_to_char("Stats on which player?\r\n", ch);
 		}
 		else {
-			if ((victim = get_player_vis(ch, buf2, FIND_CHAR_WORLD)) != NULL)
-				do_stat_character(ch, victim);
+			if ((victim = get_player_vis(ch, arg2, FIND_CHAR_WORLD)) != NULL)
+				do_stat_character(ch, victim, details);
 			else
 				send_to_char("No such player around.\r\n", ch);
 		}
 	}
-	else if (!str_cmp(buf1, "file")) {
-		if (!*buf2) {
+	else if (!str_cmp(arg1, "file")) {
+		if (!*arg2) {
 			send_to_char("Stats on which player?\r\n", ch);
 		}
-		else if (!(victim = find_or_load_player(buf2, &file))) {
+		else if (!(victim = find_or_load_player(arg2, &file))) {
 			send_to_char("There is no such player.\r\n", ch);
 		}
 		else if (GET_ACCESS_LEVEL(victim) > GET_ACCESS_LEVEL(ch)) {
 			send_to_char("Sorry, you can't do that.\r\n", ch);
 		}
 		else {
-			do_stat_character(ch, victim);
+			do_stat_character(ch, victim, details);
 		}
 		
 		if (victim && file) {
 			free_char(victim);
 		}
 	}
-	else if (is_abbrev(buf1, "object")) {
-		if (!*buf2)
+	else if (is_abbrev(arg1, "object")) {
+		if (!*arg2)
 			send_to_char("Stats on which object?\r\n", ch);
 		else {
-			if ((obj = get_obj_vis(ch, buf2, NULL)) != NULL)
-				do_stat_object(ch, obj);
+			if ((obj = get_obj_vis(ch, arg2, NULL)) != NULL)
+				do_stat_object(ch, obj, details);
 			else
 				send_to_char("No such object around.\r\n", ch);
 		}
@@ -7971,32 +7996,32 @@ ACMD(do_stat) {
 		int number;
 		char *arg;
 		
-		arg = buf1;
+		arg = arg1;
 		number = get_number(&arg);
 		
 		if ((obj = get_obj_in_equip_vis(ch, arg, &number, ch->equipment, &tmp)) != NULL) {
-			do_stat_object(ch, obj);
+			do_stat_object(ch, obj, details);
 		}
 		else if ((obj = get_obj_in_list_vis(ch, arg, &number, ch->carrying)) != NULL) {
-			do_stat_object(ch, obj);
+			do_stat_object(ch, obj, details);
 		}
 		else if ((victim = get_char_vis(ch, arg, &number, FIND_CHAR_ROOM)) != NULL) {
-			do_stat_character(ch, victim);
+			do_stat_character(ch, victim, details);
 		}
 		else if ((veh = get_vehicle_in_room_vis(ch, arg, &number))) {
-			do_stat_vehicle(ch, veh);
+			do_stat_vehicle(ch, veh, details);
 		}
 		else if ((obj = get_obj_in_list_vis(ch, arg, &number, ROOM_CONTENTS(IN_ROOM(ch)))) != NULL) {
-			do_stat_object(ch, obj);
+			do_stat_object(ch, obj, details);
 		}
 		else if ((victim = get_char_vis(ch, arg, &number, FIND_CHAR_WORLD)) != NULL) {
-			do_stat_character(ch, victim);
+			do_stat_character(ch, victim, details);
 		}
 		else if ((veh = get_vehicle_vis(ch, arg, &number))) {
-			do_stat_vehicle(ch, veh);
+			do_stat_vehicle(ch, veh, details);
 		}
 		else if ((obj = get_obj_vis(ch, arg, &number)) != NULL) {
-			do_stat_object(ch, obj);
+			do_stat_object(ch, obj, details);
 		}
 		else {
 			send_to_char("Nothing around by that name.\r\n", ch);
@@ -8638,23 +8663,27 @@ ACMD(do_vnum) {
 
 
 ACMD(do_vstat) {
+	bool details;
+	char arg1[MAX_INPUT_LENGTH], arg2[MAX_INPUT_LENGTH], arg3[MAX_INPUT_LENGTH];
 	empire_data *emp;
 	char_data *mob;
 	obj_data *obj;
 	any_vnum number;
 
-	half_chop(argument, buf, buf2);
+	half_chop(argument, arg1, arg);	// type
+	half_chop(arg, arg2, arg3);	// vnum, optional -d
+	details = (*arg3 && is_abbrev(arg3, "-details"));
 
-	if (!*buf || !*buf2 || !isdigit(*buf2)) {
+	if (!*arg1 || !*arg2 || !isdigit(*arg2)) {
 		send_to_char("Usage: vstat <type> <vnum>\r\n", ch);
 		return;
 	}
-	if ((number = atoi(buf2)) < 0) {
+	if ((number = atoi(arg2)) < 0) {
 		send_to_char("A NEGATIVE number??\r\n", ch);
 		return;
 	}
 	
-	if (is_abbrev(buf, "adventure")) {	// alphabetic precedence for "vstat a"
+	if (is_abbrev(arg1, "adventure")) {	// alphabetic precedence for "vstat a"
 		adv_data *adv = adventure_proto(number);
 		if (!adv) {
 			msg_to_char(ch, "There is no adventure zone with that number.\r\n");
@@ -8662,16 +8691,16 @@ ACMD(do_vstat) {
 		}
 		do_stat_adventure(ch, adv);
 	}
-	else if (is_abbrev(buf, "ability")) {
-		void do_stat_ability(char_data *ch, ability_data *abil);
+	else if (is_abbrev(arg1, "ability")) {
+		void do_stat_ability(char_data *ch, ability_data *abil, bool details);
 		ability_data *abil = find_ability_by_vnum(number);
 		if (!abil) {
 			msg_to_char(ch, "There is no ability with that number.\r\n");
 			return;
 		}
-		do_stat_ability(ch, abil);
+		do_stat_ability(ch, abil, details);
 	}
-	else if (is_abbrev(buf, "archetype")) {
+	else if (is_abbrev(arg1, "archetype")) {
 		void do_stat_archetype(char_data *ch, archetype_data *arch);
 		archetype_data *arch = archetype_proto(number);
 		if (!arch) {
@@ -8680,17 +8709,16 @@ ACMD(do_vstat) {
 		}
 		do_stat_archetype(ch, arch);
 	}
-	else if (is_abbrev(buf, "attack") || is_abbrev(buf, "attackmessage")) {
-		void do_stat_attack_message(char_data *ch, attack_message_data *amd, bool full);
+	else if (is_abbrev(arg1, "attack") || is_abbrev(arg1, "attackmessage")) {
+		void do_stat_attack_message(char_data *ch, attack_message_data *amd, bool details);
 		attack_message_data *amd = real_attack_message(number);
 		if (!amd) {
 			msg_to_char(ch, "There is no attack message with that number.\r\n");
 			return;
 		}
-		half_chop(buf2, buf1, arg);
-		do_stat_attack_message(ch, amd, !str_cmp(arg, "-d") ? TRUE : FALSE);
+		do_stat_attack_message(ch, amd, details);
 	}
-	else if (is_abbrev(buf, "augment")) {
+	else if (is_abbrev(arg1, "augment")) {
 		void do_stat_augment(char_data *ch, augment_data *aug);
 		augment_data *aug = augment_proto(number);
 		if (!aug) {
@@ -8699,15 +8727,15 @@ ACMD(do_vstat) {
 		}
 		do_stat_augment(ch, aug);
 	}
-	else if (is_abbrev(buf, "building")) {	// alphabetic precedence for "vstat b"
+	else if (is_abbrev(arg1, "building")) {	// alphabetic precedence for "vstat b"
 		bld_data *bld = building_proto(number);
 		if (!bld) {
 			msg_to_char(ch, "There is no building with that number.\r\n");
 			return;
 		}
-		do_stat_building(ch, bld);
+		do_stat_building(ch, bld, details);
 	}
-	else if (is_abbrev(buf, "book")) {
+	else if (is_abbrev(arg1, "book")) {
 		book_data *book = book_proto(number);
 		if (!book) {
 			msg_to_char(ch, "There is no book with that number.\r\n");
@@ -8715,7 +8743,7 @@ ACMD(do_vstat) {
 		}
 		do_stat_book(ch, book);
 	}
-	else if (is_abbrev(buf, "craft")) {	// alphabetic precedence for "vstat c"
+	else if (is_abbrev(arg1, "craft")) {	// alphabetic precedence for "vstat c"
 		craft_data *craft = craft_proto(number);
 		if (!craft) {
 			msg_to_char(ch, "There is no craft with that number.\r\n");
@@ -8723,7 +8751,7 @@ ACMD(do_vstat) {
 		}
 		do_stat_craft(ch, craft);
 	}
-	else if (is_abbrev(buf, "class")) {
+	else if (is_abbrev(arg1, "class")) {
 		void do_stat_class(char_data *ch, class_data *cls);
 		class_data *cls = find_class_by_vnum(number);
 		if (!cls) {
@@ -8732,26 +8760,22 @@ ACMD(do_vstat) {
 		}
 		do_stat_class(ch, cls);
 	}
-	else if (is_abbrev(buf, "crop")) {
+	else if (is_abbrev(arg1, "crop")) {
 		crop_data *crop = crop_proto(number);
 		if (!crop) {
 			msg_to_char(ch, "There is no crop with that number.\r\n");
 			return;
 		}
-		do_stat_crop(ch, crop);
+		do_stat_crop(ch, crop, details);
 	}
-	else if (!strn_cmp(buf, "emp", 3) && is_abbrev(buf, "empire")) {
-		if ((emp = real_empire(number))) {
-			do_stat_empire(ch, emp);
+	else if (!strn_cmp(arg1, "emp", 3) && is_abbrev(arg1, "empire")) {
+		if (!(emp = real_empire(number))) {
+			msg_to_char(ch, "There is no empire with that vnum.\r\n");
+			return;
 		}
-		else if (!*buf2) {
-			msg_to_char(ch, "Get stats on which empire?\r\n");
-		}
-		else {
-			msg_to_char(ch, "Unknown empire.\r\n");
-		}
+		do_stat_empire(ch, emp);
 	}
-	else if (is_abbrev(buf, "event")) {
+	else if (is_abbrev(arg1, "event")) {
 		void do_stat_event(char_data *ch, event_data *event);
 		event_data *event = find_event_by_vnum(number);
 		if (!event) {
@@ -8760,7 +8784,7 @@ ACMD(do_vstat) {
 		}
 		do_stat_event(ch, event);
 	}
-	else if (is_abbrev(buf, "faction")) {
+	else if (is_abbrev(arg1, "faction")) {
 		void do_stat_faction(char_data *ch, faction_data *fct);
 		faction_data *fct = find_faction_by_vnum(number);
 		if (!fct) {
@@ -8769,7 +8793,7 @@ ACMD(do_vstat) {
 		}
 		do_stat_faction(ch, fct);
 	}
-	else if (is_abbrev(buf, "global")) {	// precedence on 'g'
+	else if (is_abbrev(arg1, "global")) {	// precedence on 'g'
 		struct global_data *glb = global_proto(number);
 		if (!glb) {
 			msg_to_char(ch, "There is no global with that number.\r\n");
@@ -8777,7 +8801,7 @@ ACMD(do_vstat) {
 		}
 		do_stat_global(ch, glb);
 	}
-	else if (is_abbrev(buf, "generic")) {
+	else if (is_abbrev(arg1, "generic")) {
 		void do_stat_generic(char_data *ch, generic_data *gen);
 		generic_data *gen = real_generic(number);
 		if (!gen) {
@@ -8786,7 +8810,7 @@ ACMD(do_vstat) {
 		}
 		do_stat_generic(ch, gen);
 	}
-	else if (is_abbrev(buf, "mobile")) {
+	else if (is_abbrev(arg1, "mobile")) {
 		if (!mob_proto(number)) {
 			send_to_char("There is no monster with that number.\r\n", ch);
 			return;
@@ -8794,10 +8818,10 @@ ACMD(do_vstat) {
 		mob = read_mobile(number, TRUE);
 		// put it somewhere, briefly
 		char_to_room(mob, world_table);
-		do_stat_character(ch, mob);
+		do_stat_character(ch, mob, details);
 		extract_char(mob);
 	}
-	else if (is_abbrev(buf, "morph")) {
+	else if (is_abbrev(arg1, "morph")) {
 		void do_stat_morph(char_data *ch, morph_data *morph);
 		morph_data *morph = morph_proto(number);
 		if (!morph) {
@@ -8806,16 +8830,16 @@ ACMD(do_vstat) {
 		}
 		do_stat_morph(ch, morph);
 	}
-	else if (is_abbrev(buf, "object")) {
+	else if (is_abbrev(arg1, "object")) {
 		if (!obj_proto(number)) {
 			send_to_char("There is no object with that number.\r\n", ch);
 			return;
 		}
 		obj = read_object(number, TRUE);
-		do_stat_object(ch, obj);
+		do_stat_object(ch, obj, details);
 		extract_obj(obj);
 	}
-	else if (is_abbrev(buf, "progression")) {
+	else if (is_abbrev(arg1, "progression")) {
 		void do_stat_progress(char_data *ch, progress_data *prg);
 		progress_data *prg = real_progress(number);
 		if (!prg) {
@@ -8824,7 +8848,7 @@ ACMD(do_vstat) {
 		}
 		do_stat_progress(ch, prg);
 	}
-	else if (is_abbrev(buf, "quest")) {
+	else if (is_abbrev(arg1, "quest")) {
 		void do_stat_quest(char_data *ch, quest_data *quest);
 		quest_data *quest = quest_proto(number);
 		if (!quest) {
@@ -8833,23 +8857,23 @@ ACMD(do_vstat) {
 		}
 		do_stat_quest(ch, quest);
 	}
-	else if (is_abbrev(buf, "roomtemplate")) {
+	else if (is_abbrev(arg1, "roomtemplate")) {
 		room_template *rmt = room_template_proto(number);
 		if (!rmt) {
 			msg_to_char(ch, "There is no room template with that number.\r\n");
 			return;
 		}
-		do_stat_room_template(ch, rmt);
+		do_stat_room_template(ch, rmt, details);
 	}
-	else if (is_abbrev(buf, "sector")) {
+	else if (is_abbrev(arg1, "sector")) {
 		sector_data *sect = sector_proto(number);
 		if (!sect) {
 			msg_to_char(ch, "There is no sector with that number.\r\n");
 			return;
 		}
-		do_stat_sector(ch, sect);
+		do_stat_sector(ch, sect, details);
 	}
-	else if (is_abbrev(buf, "shop")) {
+	else if (is_abbrev(arg1, "shop")) {
 		void do_stat_shop(char_data *ch, shop_data *shop);
 		shop_data *shop = real_shop(number);
 		if (!shop) {
@@ -8858,7 +8882,7 @@ ACMD(do_vstat) {
 		}
 		do_stat_shop(ch, shop);
 	}
-	else if (is_abbrev(buf, "skill")) {
+	else if (is_abbrev(arg1, "skill")) {
 		void do_stat_skill(char_data *ch, skill_data *skill);
 		skill_data *skill = find_skill_by_vnum(number);
 		if (!skill) {
@@ -8867,7 +8891,7 @@ ACMD(do_vstat) {
 		}
 		do_stat_skill(ch, skill);
 	}
-	else if (is_abbrev(buf, "social")) {
+	else if (is_abbrev(arg1, "social")) {
 		void do_stat_social(char_data *ch, social_data *soc);
 		social_data *soc = social_proto(number);
 		if (!soc) {
@@ -8876,7 +8900,7 @@ ACMD(do_vstat) {
 		}
 		do_stat_social(ch, soc);
 	}
-	else if (is_abbrev(buf, "trigger")) {
+	else if (is_abbrev(arg1, "trigger")) {
 		trig_data *trig = real_trigger(number);
 		if (!trig) {
 			msg_to_char(ch, "That vnum does not exist.\r\n");
@@ -8885,7 +8909,7 @@ ACMD(do_vstat) {
 
 		do_stat_trigger(ch, trig);
 	}
-	else if (is_abbrev(buf, "vehicle")) {
+	else if (is_abbrev(arg1, "vehicle")) {
 		vehicle_data *veh;
 		if (!vehicle_proto(number)) {
 			msg_to_char(ch, "There is no vehicle with that vnum.\r\n");
@@ -8900,7 +8924,7 @@ ACMD(do_vstat) {
 				data_set_int(DATA_TOP_VEHICLE_ID, data_get_int(DATA_TOP_VEHICLE_ID) - 1);
 			}
 			
-			do_stat_vehicle(ch, veh);
+			do_stat_vehicle(ch, veh, details);
 			extract_vehicle(veh);
 		}
 	}
