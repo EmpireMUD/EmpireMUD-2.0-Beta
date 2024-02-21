@@ -2832,7 +2832,7 @@ int process_input(descriptor_data *t) {
 					SEND_TO_Q("\r\n", t);
 					
 					// and copy it to the next position in the command history:
-					if (cnt != t->history_pos) {
+					if (cnt != t->history_pos && cnt != t->history_pos-1) {
 						if (t->history[t->history_pos]) {
 							free(t->history[t->history_pos]);
 						}
