@@ -1063,6 +1063,9 @@ bool mob_can_move_to_sect(char_data *mob, room_data *to_room) {
 		// nope
 		ok = FALSE;
 	}
+	else if (ROOM_IS_CLOSED(to_room) && !ROOM_IS_CLOSED(IN_ROOM(mob)) && MOB_FLAGGED(mob, MOB_AVOID_BUILDINGS)) {
+		ok = FALSE;	// avoid buildings
+	}
 	else if (SECT_FLAGGED(sect, SECTF_IS_ROAD) && !MOB_FLAGGED(mob, MOB_AQUATIC) && move_type != MOB_MOVE_SWIM) {
 		ok = TRUE;
 	}
@@ -1259,7 +1262,7 @@ bool check_aggro(char_data *ch) {
 	bool is_hostile, is_enemy;
 	bool acted = FALSE, any = FALSE;
 	
-	#define CAN_AGGRO(mob, vict)  (!IS_IMMORTAL(vict) && !IS_DEAD(vict) && !NOHASSLE(vict) && (IS_NPC(vict) || !PRF_FLAGGED(vict, PRF_WIZHIDE)) && !IS_GOD(vict) && vict != GET_LEADER(mob) && !AFF_FLAGGED(vict, AFF_IMMUNE_PHYSICAL | AFF_NO_TARGET_IN_ROOM | AFF_NO_SEE_IN_ROOM | AFF_NO_ATTACK) && CAN_SEE(mob, vict) && can_fight((mob), (vict)))
+	#define CAN_AGGRO(mob, vict)  (!IS_DEAD(vict) && !NOHASSLE(vict) && (IS_NPC(vict) || !PRF_FLAGGED(vict, PRF_WIZHIDE)) && vict != GET_LEADER(mob) && !AFF_FLAGGED(vict, AFF_IMMUNE_PHYSICAL | AFF_NO_TARGET_IN_ROOM | AFF_NO_SEE_IN_ROOM | AFF_NO_ATTACK) && CAN_SEE(mob, vict) && can_fight((mob), (vict)))
 	
 	if (!acted && MOB_FLAGGED(ch, MOB_AGGRESSIVE) && (IS_ADVENTURE_ROOM(IN_ROOM(ch)) || !ISLAND_FLAGGED(IN_ROOM(ch), ISLE_NO_AGGRO))) {
 		DL_FOREACH2(ROOM_PEOPLE(IN_ROOM(ch)), vict, next_in_room) {

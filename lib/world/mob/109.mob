@@ -125,7 +125,7 @@ Bangles thief nervous~
 Bangles the thief~
 A nervous thief is hiding in the shadows.
 ~
-250 300 dkvIL nD 3
+250 300 dkvILM nD 3
 1 0 0 15 -1
 D
    True to his name, he's wearing a colossal number of bangles on his wrists.
@@ -193,7 +193,7 @@ dragon muck viscous vicious~
 a viscous muck dragon~
 A viscous muck dragon coils through the water.
 ~
-225 325 dghuBL choCDL 6
+225 325 dghuBLM choCDL 6
 0 0 5 27 -1
 D
    You can only see the fins and head of the dragon as it moves through the
@@ -271,7 +271,7 @@ giant hill~
 the hill giant~
 A hill giant towers over you, swinging a club the size of a tree!
 ~
-100 175 dkuvAIL cEG 6
+100 175 dkuvAILM cEG 6
 0 0 26 5 -1
 D
    The hill giant towers over you with an entire tree slung over its shoulder
@@ -314,7 +314,7 @@ giant river~
 the river giant~
 A river giant towers over you, barely missing you on its path across the countryside!
 ~
-100 175 dkuvAIL cEG 6
+100 175 dkuvAILM cEG 6
 0 0 26 5 -1
 D
    This giant is dressed mainly in gigantic nets, which appear to double as
@@ -357,7 +357,7 @@ giant dune~
 the dune giant~
 A dune giant towers above you, with a tree over its shoulder!
 ~
-100 175 dkuvAIL cEG 6
+100 175 dkuvAILM cEG 6
 0 0 26 5 -1
 D
    This gigantic desert nomad has a massive tree slung over its shoulder like a
@@ -451,7 +451,7 @@ S
 the rogue wizard #n~
 A rogue wizard is skulking here.
 ~
-100 175 dvxAIL c 3
+100 175 dvxAILM c 3
 1 0 0 20 -1
 D
    The black and gray robes immediately signify -- to those who are familiar
@@ -505,7 +505,7 @@ S
 the manaweaver #n~
 A rogue Magiterranean weaver is creeping through the shadows.
 ~
-100 175 dvxAIL c 3
+100 175 dvxAILM c 3
 1 3 9 21 -1
 D
    #n peers around nervously from beneath a brown hood, as if he
@@ -548,7 +548,7 @@ S
 #n the teenage witch~
 A teenage witch stands with her hands on her hips.
 ~
-100 175 dvxyDIL cD 3
+100 175 dvxyDILM cD 3
 2 0 0 16 -1
 D
    #n stands with her hands on her hips, frowning. Her black hair and pale

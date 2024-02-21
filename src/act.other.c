@@ -2937,7 +2937,7 @@ ACMD(do_morph) {
 			if (MORPH_ABILITY(morph) != NO_ABIL && !has_ability(ch, MORPH_ABILITY(morph))) {
 				continue;
 			}
-			if (MORPH_REQUIRES_OBJ(morph) != NOTHING && !get_obj_in_list_vnum(MORPH_REQUIRES_OBJ(morph), ch->carrying)) {
+			if (MORPH_REQUIRES_OBJ(morph) != NOTHING && !has_required_object(ch, MORPH_REQUIRES_OBJ(morph))) {
 				continue;
 			}
 			
@@ -3036,7 +3036,7 @@ ACMD(do_morph) {
 		}
 		
 		// required obj?
-		if (morph && MORPH_REQUIRES_OBJ(morph) != NOTHING && (obj = get_obj_in_list_vnum(MORPH_REQUIRES_OBJ(morph), ch->carrying))) {
+		if (morph && MORPH_REQUIRES_OBJ(morph) != NOTHING && (obj = has_required_object(ch, MORPH_REQUIRES_OBJ(morph)))) {
 			if (!IS_IMMORTAL(ch) && OBJ_FLAGGED(obj, OBJ_BIND_FLAGS)) {	// bind when used
 				bind_obj_to_player(obj, ch);
 				reduce_obj_binding(obj, ch);

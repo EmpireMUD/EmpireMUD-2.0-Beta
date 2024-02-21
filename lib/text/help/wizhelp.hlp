@@ -836,6 +836,7 @@ with the 'empire' grant:
 - findmaint: optional first arg to specify which empire
 - islands: optional first arg to specify which empire
 - import/export: optional first arg to specify which empire
+- manage: can use manage on tiles you don't own
 - offenses: optional first arg to specify which empire
 - progress: optional first arg to specify which empire
 - roster: optional first arg to specify which empire
@@ -1712,11 +1713,14 @@ See also: GRANT, REBOOT
 #d
 SLAY
 
-Usage:  slay
+Usage:  slay <target> [confirm]
 
 This is an instant-kill power for the Implementor which was originally part of
 CircleMUD's normal kill command. It has been filtered out because we found it
 to be easier to have it separate. This command is grantable.
+
+Normally, you can't use this command on yourself. However, for testing
+purposes, you can do this if you type 'confirm' at the end.
 
 See also: GRANT
 #d
@@ -1737,7 +1741,7 @@ See also: GRANT
 #d
 STAT
 
-Usage:  stat [type] [name]
+Usage:  stat [type] [name] [-d]
 
 Gives information about players, animals, and objects in the game. The type
 argument is optional.
@@ -1747,10 +1751,24 @@ names such as Wolf or Dolph.
 
 STAT OBJECT will search only for objects.
 
+STAT VEHICLE will search only for vehicles.
+
 STAT MOBILE will search only for animals.
 
 STAT FILE is used to stat players who are not logged in; the information
 displayed comes from the playerfile.
+
+STAT ROOM shows stats on the room you're in.
+
+Several STAT options are available for the room you're in:
+- STAT ADVENTURE
+- STAT TEMPLATE
+- STAT BUILDING
+- STAT CROP
+- STAT SECTOR
+
+The -d flag provides more information, such as extra descriptions and custom
+messages.
 
 Examples:
 
@@ -1760,6 +1778,8 @@ Examples:
   > stat file niandra
   > stat object shawl
   > stat empire 1
+  > stat crop
+  > stat building -d
 
 See also: VSTAT
 #d
@@ -1955,6 +1975,8 @@ Gives a list of the virtual numbers (vnums) of objects or mobiles which have
 the specified name. If you specify more than one keyword, it will find things
 that match ALL of those keywords.
 
+To find which adventure a vnum belongs to, use the .lookup command.
+
 Valid types are: adventure, ability, archetype, attack, augment, book,
                  building, craft, class, crop, event, faction, global, generic,
                  mob, morph, obj,  progress, quest, roomtemplate, sector, shop,
@@ -1971,6 +1993,8 @@ Examples:
   1. [    1] Puff
   2. [  908] the dragon turtle
   3. [ 2548] the Master of Illusions
+
+See also: LOOKUP
 #d
 VSTAT
 
@@ -1983,7 +2007,8 @@ Valid types are: adventure, ability, archetype, attack, augment, book,
                  generic, mob, morph, obj,  progress, quest, roomtemplate,
                  sector, shop, skill, social, trigger, vehicle
 
-For attack messages, this supports the -d option to see the full messages.
+Some vstat types support the -d option to see the full set of messages and
+descriptions.
 
 Examples:
 

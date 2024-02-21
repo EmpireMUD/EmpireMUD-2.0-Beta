@@ -63,8 +63,8 @@ void tog_pvp(char_data *ch);
 //// EMPIREMUD CONSTANTS /////////////////////////////////////////////////////
 
 // Shown on the "version" command and sent over MSSP
-const char *version = "EmpireMUD 2.0 beta 5.177";
-const char *DG_SCRIPT_VERSION = "DG Scripts 1.0.12 e5.1.2";
+const char *version = "EmpireMUD 2.0 beta 5.178";
+const char *DG_SCRIPT_VERSION = "DG Scripts 1.0.12 e5.1.3";
 
 
 // data for the built-in game levels -- this adapts itself if you reduce the number of immortal levels
@@ -2857,6 +2857,7 @@ const char *action_bits[] = {
 	"NO-COMMAND",	// 35
 	"NO-UNCONSCIOUS",
 	"IMPORTANT",
+	"AVOID-BUILDINGS",
 	"\n"
 };
 
@@ -3599,6 +3600,7 @@ const char *olc_flag_bits[] = {
 	"!PROGRESS",	// 25
 	"!EVENTS",
 	"!ATTACKS",
+	"REFRESH-COMPANIONS",
 	"\n"
 };
 

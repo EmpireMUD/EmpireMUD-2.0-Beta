@@ -3527,7 +3527,10 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 					break;
 				}
 				case 'd': {	// char.d*
-					if (!str_cmp(field, "dex") || !str_cmp(field, "dexterity")) {
+					if (!str_cmp(field, "dead")) {
+						snprintf(str, slen, "%d", IS_DEAD(c) ? 1 : 0);
+					}
+					else if (!str_cmp(field, "dex") || !str_cmp(field, "dexterity")) {
 						snprintf(str, slen, "%d", GET_DEXTERITY(c));
 					}
 					else if (!str_cmp(field, "dir")) {
@@ -8567,6 +8570,20 @@ trig_data *real_trigger(trig_vnum vnum) {
 	
 	HASH_FIND_INT(trigger_table, &vnum, trig);
 	return trig;
+}
+
+
+/**
+* Quick way to turn a vnum into a name, safely.
+*
+* @param trig_vnum vnum The vnum to look up.
+* @return char* A name for the vnum, or "UNKNOWN".
+*/
+char *get_trigger_name_by_proto(trig_vnum vnum) {
+	trig_data *proto = real_trigger(vnum);
+	char *unk = "UNKNOWN";
+	
+	return proto ? GET_TRIG_NAME(proto) : unk;
 }
 
 

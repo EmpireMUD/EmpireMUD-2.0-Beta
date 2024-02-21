@@ -4478,7 +4478,7 @@ ACMD(do_survey) {
 	
 	// empire
 	if (ROOM_OWNER(IN_ROOM(ch))) {
-		if ((ter_type = get_territory_type_for_empire(IN_ROOM(ch), ROOM_OWNER(IN_ROOM(ch)), FALSE, &junk, &large_radius)) == TER_CITY && (city = find_closest_city(ROOM_OWNER(IN_ROOM(ch)), IN_ROOM(ch)))) {
+		if ((ter_type = get_territory_type_for_empire(IN_ROOM(ch), ROOM_OWNER(IN_ROOM(ch)), FALSE, &junk, &large_radius)) == TER_CITY && (city = find_city(ROOM_OWNER(IN_ROOM(ch)), IN_ROOM(ch)))) {
 			msg_to_char(ch, "This is the %s%s&0 %s of %s%s.\r\n", EMPIRE_BANNER(ROOM_OWNER(IN_ROOM(ch))), EMPIRE_ADJECTIVE(ROOM_OWNER(IN_ROOM(ch))), city_type[city->type].name, city->name, large_radius ? " (extended radius)" : "");
 		}
 		else if (ter_type == TER_OUTSKIRTS) {

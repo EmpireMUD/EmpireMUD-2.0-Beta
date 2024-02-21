@@ -3,7 +3,7 @@ colossus clockwork enormous~
 the clockwork colossus~
 An enormous clockwork colossus towers over you (adventure).
 ~
-100 200 dkuyzABKL cG 6
+100 200 dkuyzABKLM cG 6
 0 0 26 14 -1
 D
    Looking up at this thing, you can scarcely comprehend what it is. It looks
@@ -30,7 +30,7 @@ colossus clockwork miniature~
 the clockwork colossus~
 A miniature clockwork colossus stomps toward you!
 ~
-100 200 dkuyzKL cG 3
+100 200 dkuyzKLM cG 3
 0 0 26 5 -1
 D
    This strange-looking metal man is made from bronze and iron. Exposed wheels
@@ -222,7 +222,7 @@ elephant clockwork great~
 a clockwork elephant~
 A great clockwork elephant towers over you.
 ~
-100 125 dey G 5
+100 125 deyM G 5
 0 0 26 27 -1
 D
    The elephant has a beautiful brass finish as it lumbers ponderously across

@@ -238,7 +238,7 @@ goat straw~
 a straw goat~
 A straw goat dashes past you!
 ~
-1 1 dq n 3
+1 1 dqM n 3
 0 0 11 15 -1
 D
    The little straw goat is smaller than a real goat, but it has all the
@@ -255,7 +255,7 @@ goat spawner straw~
 the straw goat spawner~
 The straw goat spawner is here.
 ~
-0 0 d cdln 3
+0 0 dM cdln 3
 0 0 0 15 -1
 D
 This invisible mob moves around randomly then spawns a goat object.

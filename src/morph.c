@@ -209,7 +209,7 @@ morph_data *find_morph_by_name(char_data *ch, char *name) {
 		if (MORPH_ABILITY(morph) != NO_ABIL && !has_ability(ch, MORPH_ABILITY(morph))) {
 			continue;
 		}
-		if (MORPH_REQUIRES_OBJ(morph) != NOTHING && !get_obj_in_list_vnum(MORPH_REQUIRES_OBJ(morph), ch->carrying)) {
+		if (MORPH_REQUIRES_OBJ(morph) != NOTHING && !has_required_object(ch, MORPH_REQUIRES_OBJ(morph))) {
 			continue;
 		}
 		

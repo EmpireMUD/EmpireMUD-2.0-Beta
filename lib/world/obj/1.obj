@@ -247,7 +247,7 @@ R
 4 5619 0
 S
 #120
-tree trees large~
+large-tree tree trees large~
 a large tree~
 A large tree has fallen here.~
    You can use a sharp tool to scrape a tree until it's a log, or craft it
@@ -345,7 +345,7 @@ It's a very pretty flower.
 7 64
 S
 #124
-log logs heavy pillars~
+heavy-log log logs heavy pillars~
 a heavy log~
 A heavy log has been left here.~
 Logs are used in construction.
@@ -458,7 +458,7 @@ R
 4 5118 0
 S
 #128
-tree trees massive jungle~
+jungle-tree tree trees massive jungle~
 a massive jungle tree~
 A massive tree is lying on its side.~
    You can use a sharp tool to shape this exotic tree into a pillar, or you can
@@ -482,7 +482,7 @@ R
 4 5118 0
 S
 #129
-pillar pillars wooden fine~
+fine-pillar pillar pillars wooden fine~
 a fine wooden pillar~
 A fine wooden pillar is lying here.~
 This pillar can be used in construction, or sawn into lumber.
@@ -545,7 +545,7 @@ R
 4 5134 0
 S
 #131
-sapling saplings green~
+green-sapling sapling saplings green~
 a green sapling~
 A green sapling has fallen here.~
    This sapling is young, straight, and taller than you are. You could scrape
@@ -621,7 +621,7 @@ R
 4 5118 0
 S
 #134
-sapling saplings thorny~
+thorny-sapling sapling saplings thorny~
 a thorny sapling~
 A thorny sapling has fallen here.~
    This small sapling is covered in thorns or spines -- the difference hardly
@@ -641,7 +641,7 @@ R
 4 5118 0
 S
 #135
-sapling saplings reaching~
+reaching-sapling sapling saplings reaching~
 a reaching sapling~
 A reaching sapling has fallen here.~
    This sapling is thin, but very strong. In its short life, it grew tall,
@@ -660,7 +660,7 @@ R
 4 5118 0
 S
 #136
-shoot shoots large~
+large-shoot shoot shoots large~
 a large shoot~
 A large shoot is lying here.~
    This shoot once grew out of a mighty tree. It is long and straight, and
@@ -717,7 +717,7 @@ R
 4 5118 0
 S
 #138
-mast enormous~
+enormous-mast mast enormous~
 an enormous mast~
 An enormous mast is lying here.~
    This mast is truly massive, made from an ancient tree and strong enough to

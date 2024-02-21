@@ -681,7 +681,7 @@ void list_available_augments(char_data *ch, int type, obj_data *matching_obj) {
 		if (GET_AUG_ABILITY(aug) != NO_ABIL && !has_ability(ch, GET_AUG_ABILITY(aug))) {
 			continue;
 		}
-		if (GET_AUG_REQUIRES_OBJ(aug) != NOTHING && !get_obj_in_list_vnum(GET_AUG_REQUIRES_OBJ(aug), ch->carrying)) {
+		if (GET_AUG_REQUIRES_OBJ(aug) != NOTHING && !has_required_object(ch, GET_AUG_REQUIRES_OBJ(aug))) {
 			continue;
 		}
 		if (matching_obj && !validate_augment_target(ch, matching_obj, aug, FALSE)) {
@@ -2635,7 +2635,7 @@ ACMD(do_recipes) {
 				continue;
 			}
 			
-			if (GET_AUG_REQUIRES_OBJ(aug) != NOTHING && !get_obj_in_list_vnum(GET_AUG_REQUIRES_OBJ(aug), ch->carrying)) {
+			if (GET_AUG_REQUIRES_OBJ(aug) != NOTHING && !has_required_object(ch, GET_AUG_REQUIRES_OBJ(aug))) {
 				continue;
 			}
 			

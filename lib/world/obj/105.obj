@@ -729,7 +729,7 @@ be automatically stored in your pouch when taken.
 7 0
 S
 #10558
-tree spruce fallen~
+spruce-tree tree spruce fallen~
 a spruce tree~
 A fallen spruce tree is lying here.~
    The spruce tree is covered in thin branches, and still has the fresh scent
@@ -786,7 +786,7 @@ R
 4 5134 0
 S
 #10560
-post spruce~
+spruce-post post spruce~
 a spruce post~
 A spruce post is lying here.~
 This post is made from fresh spruce wood, and can be used in construction.

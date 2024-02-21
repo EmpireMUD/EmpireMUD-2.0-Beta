@@ -3,7 +3,7 @@ tortoise atlasian giant inn turtle~
 an atlasian tortoise~
 A giant atlasian tortoise plods past, carrying an inn on its back.
 ~
-300 300 dkyL n 6
+300 300 dkyLM n 6
 0 0 16 9 -1
 D
    The tortoise is gigantic! It's no wonder they call it atlasian -- it looks
@@ -880,7 +880,7 @@ dragon fearsome~
 a fearsome dragon~
 A fearsome dragon coils through the halls and archways of the tower!
 ~
-0 200 dghnxAK choCDEG 5
+0 200 dghnxAKM choCDEG 5
 0 0 5 16 -1
 D
    This dragon might be more than meets the eye, but from your perspective,

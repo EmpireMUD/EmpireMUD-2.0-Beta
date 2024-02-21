@@ -4379,7 +4379,7 @@ struct empire_city_data *find_city(empire_data *emp, room_data *loc) {
 	}
 	
 	for (city = EMPIRE_CITY_LIST(emp); city; city = city->next) {
-		if ((dist = compute_distance(loc, city->location)) <= city_type[city->type].radius) {
+		if ((dist = compute_distance(loc, city->location)) <= city_type[city->type].radius * (LARGE_CITY_RADIUS(loc) ? config_get_double("outskirts_modifier") : 1)) {
 			if (!found || min == -1 || dist < min) {
 				found = city;
 				min = dist;
@@ -8498,6 +8498,32 @@ obj_data *get_obj_world(char *name, int *number) {
 }
 
 
+/**
+* Determines if the character has the required item in their gear or inventory.
+*
+* @param char_data *ch The person.
+* @param obj_vnum vnum The vnum to look for.
+* @return obj_data* If the character has the item, returns it. Otherwise, returns NULL.
+*/
+obj_data *has_required_object(char_data *ch, obj_vnum vnum) {
+	int pos;
+	
+	if (!ch || vnum == NOTHING) {
+		return NULL;
+	}
+	
+	// check eq
+	for (pos = 0; pos < NUM_WEARS; ++pos) {
+		if (GET_EQ(ch, pos) && GET_OBJ_VNUM(GET_EQ(ch, pos)) == vnum) {
+			return GET_EQ(ch, pos);	// found in eq
+		}
+	}
+	
+	// otherwise check inventory
+	return get_obj_in_list_vnum(vnum, ch->carrying);
+}
+
+
  //////////////////////////////////////////////////////////////////////////////
 //// OFFER HANDLERS //////////////////////////////////////////////////////////
 
@@ -10386,7 +10412,7 @@ struct empire_storage_data *add_to_empire_storage_with_timer(empire_data *emp, i
 	}
 	
 	// maybe free it
-	if (store->amount == 0 && store->keep != EMPIRE_ATTRIBUTE(emp, EATT_DEFAULT_KEEP)) {
+	if (store->amount == 0 && store->keep == EMPIRE_ATTRIBUTE(emp, EATT_DEFAULT_KEEP)) {
 		HASH_DEL(isle->store, store);
 		free_empire_storage_data(store);
 		store = NULL;
@@ -10608,15 +10634,19 @@ bool empire_can_afford_component(empire_data *emp, int island, any_vnum cmp_vnum
 * @param empire_data *emp The empire whose storage to search.
 * @param int island_id Which island to look on.
 * @param char *keywords The keyword(s) to match using multi_isname().
+* @param bool ignore_empty If TRUE, skips entries with amounts of 0.
 * @return struct empire_storage_data* The storage entry, or NULL if no matches.
 */
-struct empire_storage_data *find_island_storage_by_keywords(empire_data *emp, int island_id, char *keywords) {
+struct empire_storage_data *find_island_storage_by_keywords(empire_data *emp, int island_id, char *keywords, bool ignore_empty) {
 	struct empire_storage_data *store, *next_store;
 	struct empire_island *isle = get_empire_island(emp, island_id);
 	obj_data *proto;
 	
 	HASH_ITER(hh, isle->store, store, next_store) {
 		if (!(proto = store->proto)) {
+			continue;
+		}
+		if (ignore_empty && store->amount < 1) {
 			continue;
 		}
 		if (!multi_isname(keywords, GET_OBJ_KEYWORDS(proto))) {

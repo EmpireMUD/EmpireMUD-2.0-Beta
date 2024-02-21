@@ -1654,9 +1654,9 @@ attack_message_data *setup_olc_attack_message(attack_message_data *input) {
 *
 * @param char_data *ch The player requesting stats.
 * @param attack_message_data *amd The attack message to display.
-* @param bool full If TRUE, shows full messages (due to -d option on vstat).
+* @param bool details If TRUE, shows full messages (due to -d option on vstat).
 */
-void do_stat_attack_message(char_data *ch, attack_message_data *amd, bool full) {
+void do_stat_attack_message(char_data *ch, attack_message_data *amd, bool details) {
 	bool overflow = FALSE;
 	char buf[MAX_STRING_LENGTH * 6], lbuf[MAX_STRING_LENGTH];
 	char *to_show;
@@ -1695,7 +1695,7 @@ void do_stat_attack_message(char_data *ch, attack_message_data *amd, bool full) 
 	count = 0;
 	
 	// message section
-	if (full) {
+	if (details) {
 		// show entire message set (hopefully)
 		LL_FOREACH_SAFE(ATTACK_MSG_LIST(amd), ams, next_ams) {
 			++count;

@@ -1220,6 +1220,12 @@ void identify_vehicle_to_char(vehicle_data *veh, char_data *ch) {
 		msg_to_char(ch, "Paint color: %s%s%s&0\r\n", buf1, (VEH_FLAGGED(veh, VEH_BRIGHT_PAINT) ? "bright " : ""), buf);
 	}
 	
+	// requires climate?
+	if (VEH_REQUIRES_CLIMATE(veh)) {
+		ordered_sprintbit(VEH_REQUIRES_CLIMATE(veh), climate_flags, climate_flags_order, FALSE, buf);
+		msg_to_char(ch, "Requires climate: %s\r\n", buf);
+	}
+	
 	// flags as "notes":
 	show_flags = VEH_FLAGS(veh);
 	if (VEH_FLAGGED(veh, VEH_BUILDING)) {
@@ -1371,7 +1377,7 @@ static int perform_put(char_data *ch, obj_data *obj, obj_data *cont) {
 	}
 	
 	// don't let people drop bound items in other people's territory
-	if (IN_ROOM(cont) && OBJ_BOUND_TO(obj) && ROOM_OWNER(IN_ROOM(cont)) && ROOM_OWNER(IN_ROOM(cont)) != GET_LOYALTY(ch)) {
+	if (IN_ROOM(cont) && OBJ_BOUND_TO(obj) && ROOM_OWNER(IN_ROOM(cont)) && ROOM_OWNER(IN_ROOM(cont)) != GET_LOYALTY(ch) && !IS_IMMORTAL(ch)) {
 		msg_to_char(ch, "You can't put bound items in items here.\r\n");
 		return 0;
 	}
@@ -1937,7 +1943,7 @@ int perform_drop(char_data *ch, obj_data *obj, byte mode, const char *sname) {
 	}
 	
 	// don't let people drop bound items in other people's territory
-	if (mode != SCMD_JUNK && OBJ_BOUND_TO(obj) && ROOM_OWNER(IN_ROOM(ch)) && ROOM_OWNER(IN_ROOM(ch)) != GET_LOYALTY(ch)) {
+	if (mode != SCMD_JUNK && OBJ_BOUND_TO(obj) && ROOM_OWNER(IN_ROOM(ch)) && ROOM_OWNER(IN_ROOM(ch)) != GET_LOYALTY(ch) && !IS_IMMORTAL(ch)) {
 		act("$p: You can't drop bound items here.", FALSE, ch, obj, NULL, TO_CHAR | TO_QUEUE);
 		return 0;	// don't break a drop-all
 	}
@@ -2227,8 +2233,8 @@ void do_eq_change(char_data *ch, char *argument) {
 	struct player_eq_set *eq_set;
 	obj_data *obj, *next_obj;
 	struct eq_set_obj *oset;
-	bool any = FALSE;
-	int iter;
+	bool any = FALSE, fail_pos[NUM_WEARS];
+	int iter, fails;
 	
 	if (!(eq_set = get_eq_set_by_name(ch, argument))) {
 		msg_to_char(ch, "You don't have an equipment set named '%s' to switch to.\r\n", argument);
@@ -2237,6 +2243,11 @@ void do_eq_change(char_data *ch, char *argument) {
 	if (GET_POS(ch) == POS_FIGHTING || GET_POS(ch) < POS_RESTING) {
 		msg_to_char(ch, "You can't change equipment sets right now.\r\n");
 		return;
+	}
+	
+	// init fail_pos: the prevents trying to remove the same piece twice
+	for (iter = 0; iter < NUM_WEARS; ++iter) {
+		fail_pos[iter] = FALSE;
 	}
 	
 	msg_to_char(ch, "You switch to your '%s' equipment set.\r\n", eq_set->name);
@@ -2258,17 +2269,35 @@ void do_eq_change(char_data *ch, char *argument) {
 			else {	// swap
 				if (GET_EQ(ch, oset->pos)) {
 					// remove old item
-					perform_eq_change_unequip(ch, oset->pos);
+					if (!fail_pos[oset->pos] && remove_otrigger(GET_EQ(ch, oset->pos), ch)) {
+						perform_eq_change_unequip(ch, oset->pos);
+					}
+					else {
+						fail_pos[oset->pos] = TRUE;
+						continue;	// remove trigger failed
+					}
 				}
 				// attempt to move this one
-				if ((obj = perform_eq_change_unequip(ch, iter))) {
-					perform_wear(ch, obj, oset->pos);
-					any = TRUE;
+				if (!fail_pos[iter] && remove_otrigger(GET_EQ(ch, iter), ch)) {
+					if ((obj = perform_eq_change_unequip(ch, iter))) {
+						perform_wear(ch, obj, oset->pos);
+						any = TRUE;
+					}
+				}
+				else {
+					fail_pos[iter] = TRUE;
+					continue;	// remove trigger failed
 				}
 			}
 		}
 		else { // not part of the set
-			perform_eq_change_unequip(ch, iter);
+			if (!fail_pos[iter] && remove_otrigger(GET_EQ(ch, iter), ch)) {
+				perform_eq_change_unequip(ch, iter);
+			}
+			else {
+				fail_pos[iter] = TRUE;
+				continue;	// remove trigger failed
+			}
 		}
 	}
 	
@@ -2281,7 +2310,13 @@ void do_eq_change(char_data *ch, char *argument) {
 		// attempt to equip it
 		if (GET_EQ(ch, oset->pos)) {
 			// remove old item
-			perform_eq_change_unequip(ch, oset->pos);
+			if (!fail_pos[oset->pos] && remove_otrigger(GET_EQ(ch, oset->pos), ch)) {
+				perform_eq_change_unequip(ch, oset->pos);
+			}
+			else {
+				fail_pos[oset->pos] = TRUE;
+				continue;	// could not remove due to trigger
+			}
 		}
 		// attempt to equip this one
 		perform_wear(ch, obj, oset->pos);
@@ -2291,6 +2326,16 @@ void do_eq_change(char_data *ch, char *argument) {
 	// if we didn't call perform_wear, we MUST determine gear level again at the end
 	if (!any) {
 		determine_gear_level(ch);
+	}
+	
+	// check fails?
+	for (iter = 0, fails = 0; iter < NUM_WEARS; ++iter) {
+		if (fail_pos[iter]) {
+			++fails;
+		}
+	}
+	if (fails > 0) {
+		msg_to_char(ch, "%s could not be swapped.\r\n", fails > 1 ? "Some items" : "One item");
 	}
 	
 	command_lag(ch, WAIT_OTHER);
@@ -2361,7 +2406,7 @@ void do_eq_list(char_data *ch, char *argument) {
 * @param char *argument The name to set.
 */
 void do_eq_set(char_data *ch, char *argument) {
-	const char *invalids[] = { "all", "delete", "list", "save", "set", "\n" };
+	const char *invalids[] = { "all", "delete", "list", "save", "set", "summary", "\n" };
 	struct player_eq_set *eq_set;
 	int iter, set_id = NOTHING;
 	obj_data *obj;
@@ -2403,6 +2448,7 @@ void do_eq_set(char_data *ch, char *argument) {
 	}
 	else {
 		set_id = add_eq_set_to_char(ch, NOTHING, str_dup(argument));
+		eq_set = get_eq_set_by_name(ch, argument);
 	}
 	
 	// put all current gear on that set
@@ -2428,10 +2474,73 @@ void do_eq_set(char_data *ch, char *argument) {
 		remove_obj_from_eq_set(obj, set_id);
 	}
 	
-	msg_to_char(ch, "Your current equipment has been saved as '%s'.\r\n", argument);
+	msg_to_char(ch, "Your current equipment has been saved as '%s'.\r\n", eq_set ? eq_set->name : "UNKNOWN");
 	queue_delayed_update(ch, CDU_SAVE);
 	
 	command_lag(ch, WAIT_OTHER);
+}
+
+
+/**
+* Shows a character total stats from gear.
+*
+* @param char_data *ch The character.
+* @param char *argument Any additional args after "eq summary"
+*/
+void do_eq_summary(char_data *ch, char *argument) {
+	bitvector_t bits = NOBITS;
+	int iter;
+	obj_data *obj;
+	struct obj_apply *apply;
+	struct vnum_hash *hash = NULL, *vh, *next_vh;
+	
+	// collect data
+	for (iter = 0; iter < NUM_WEARS; ++iter) {
+		if (wear_data[iter].count_stats && (obj = GET_EQ(ch, iter))) {
+			// obj aff flags
+			bits |= GET_OBJ_AFF_FLAGS(obj);
+			
+			// applies
+			LL_FOREACH(GET_OBJ_APPLIES(obj), apply) {
+				if (apply->location) {
+					add_vnum_hash(&hash, apply->location, apply->modifier);
+				}
+			}
+			
+			// special-casing by type
+			switch (GET_OBJ_TYPE(obj)) {
+				case ITEM_PACK: {
+					if (iter == WEAR_PACK) {
+						add_vnum_hash(&hash, APPLY_INVENTORY, GET_PACK_CAPACITY(obj));
+					}
+					break;
+				}
+			}
+		}
+	}
+	
+	// anything to show?
+	if (!hash && !bits) {
+		msg_to_char(ch, "You are not receiving any stats from your equipment.\r\n");
+		return;
+	}
+	
+	// otherwise:
+	msg_to_char(ch, "Stats summary from equipment:\r\n");
+	
+	if (bits) {
+		prettier_sprintbit(bits, affected_bits, buf);
+		msg_to_char(ch, " %s\r\n", buf);
+	}
+	
+	HASH_ITER(hh, hash, vh, next_vh) {
+		// change caps (it starts out all-caps)
+		strcpy(buf, apply_types[vh->vnum]);
+		strtotitlecase(buf);
+		msg_to_char(ch, " %s: %+d\r\n", buf, vh->count);
+	}
+	
+	free_vnum_hash(&hash);
 }
 
 
@@ -6262,6 +6371,9 @@ ACMD(do_equipment) {
 	else if (!str_cmp(arg, "set") || !str_cmp(arg, "-set") || !str_cmp(arg, "save") || !str_cmp(arg, "-save")) {
 		do_eq_set(ch, second);
 	}
+	else if (!str_cmp(arg, "summary") || !str_cmp(arg, "-sum") || !str_cmp(arg, "-summ") || !str_cmp(arg, "-summary")) {
+		do_eq_summary(ch, second);
+	}
 	else {
 		do_eq_change(ch, argument);	// full arg
 	}
@@ -8253,7 +8365,7 @@ ACMD(do_ship) {
 		else if (targeted_island && GET_ISLAND_ID(to_room) == GET_ISLAND_ID(IN_ROOM(ch))) {
 			msg_to_char(ch, "You are already on that island.\r\n");
 		}
-		else if (!(store = find_island_storage_by_keywords(emp, GET_ISLAND_ID(IN_ROOM(ch)), keywords)) || store->amount < 1) {
+		else if (!(store = find_island_storage_by_keywords(emp, GET_ISLAND_ID(IN_ROOM(ch)), keywords, TRUE)) || store->amount < 1) {
 			msg_to_char(ch, "You don't seem to have any '%s' stored on this island to ship.\r\n", keywords);
 		}
 		else if (!all && store->amount < number) {

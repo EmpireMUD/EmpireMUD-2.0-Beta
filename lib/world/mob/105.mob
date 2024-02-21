@@ -146,7 +146,7 @@ guard skeletal~
 a skeletal guard~
 A skeletal guard marches silently past.
 ~
-100 125 dhqtuD cG 3
+100 125 dhqtuDM cG 3
 0 0 0 1 -1
 D
 No bones about it, this guard makes you uncomfortable.
@@ -286,7 +286,7 @@ vegetable vigilant~
 a vigilant vegetable~
 A vigilant vegetable stalks the fields.
 ~
-125 150 doqtuA cG 3
+125 150 doqtuAM cG 3
 0 0 13 36 -1
 D
 Freed from its roots, this plant seems to be patrolling.
@@ -297,7 +297,7 @@ vegetable vigilante masked~
 a vigilante vegetable~
 A masked vigilante vegetable is lurking in the shadows.
 ~
-50 75 cdo cG 3
+50 75 cdoM cG 3
 0 0 13 36 -1
 D
 This plant seems to have gone bad.

@@ -1406,6 +1406,9 @@ void init_crop(crop_data *cp) {
 /**
 * Read one crop from file.
 *
+* WARNING: The evolve.c utility has a near-identical version of this and any
+* new changes here must also be readable by that utility.
+*
 * @param FILE *fl The open .crop file
 * @param crop_vnum vnum The crop vnum
 */
@@ -2451,14 +2454,20 @@ void free_empire(empire_data *emp) {
 	EMPIRE_ISLANDS(emp) = NULL;
 	
 	// free strings
-	if (emp->name) {
-		free(emp->name);
+	if (EMPIRE_NAME(emp)) {
+		free(EMPIRE_NAME(emp));
 	}
-	if (emp->adjective) {
-		free(emp->adjective);
+	if (EMPIRE_SHORT_NAME(emp)) {
+		free(EMPIRE_SHORT_NAME(emp));
 	}
-	if (emp->banner) {
-		free(emp->banner);
+	if (EMPIRE_ADJECTIVE(emp)) {
+		free(EMPIRE_ADJECTIVE(emp));
+	}
+	if (EMPIRE_SHORT_ADJECTIVE(emp)) {
+		free(EMPIRE_SHORT_ADJECTIVE(emp));
+	}
+	if (EMPIRE_BANNER(emp)) {
+		free(EMPIRE_BANNER(emp));
 	}
 	if (EMPIRE_MOTD(emp)) {
 		free(EMPIRE_MOTD(emp));

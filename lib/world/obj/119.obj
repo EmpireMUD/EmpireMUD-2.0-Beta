@@ -2135,7 +2135,7 @@ R
 4 5118 0
 S
 #11995
-tree calamander huge~
+calamander-tree tree calamander huge~
 a calamander tree~
 A huge calamander tree is lying here.~
    The tree is relatively non-descript, with rough gray-brown bark of little
@@ -2235,7 +2235,7 @@ R
 4 5118 0
 S
 #11998
-sapling calamander fine~
+calamander-sapling sapling calamander fine~
 a fine calamander sapling~
 A calamander sapling has fallen here.~
    This sapling shows the elegant striped wood of the calamander tree, with

@@ -350,6 +350,7 @@ obj_vnum get_obj_vnum_by_name(char *name, bool storable_only);
 obj_data *get_obj_vis(char_data *ch, char *name, int *number);
 obj_data *get_obj_in_equip_vis(char_data *ch, char *arg, int *number, obj_data *equipment[], int *pos);
 obj_data *get_obj_world(char *name, int *number);
+obj_data *has_required_object(char_data *ch, obj_vnum vnum);
 
 // offer handlers
 struct offer_data *add_offer(char_data *ch, char_data *from, int type, int data);
@@ -457,7 +458,7 @@ bool charge_stored_resource(empire_data *emp, int island, obj_vnum vnum, int amo
 bool check_home_store_cap(char_data *ch, obj_data *obj, bool message, bool *capped);
 bool delete_stored_resource(empire_data *emp, obj_vnum vnum);
 bool empire_can_afford_component(empire_data *emp, int island, any_vnum cmp_vnum, int amount, bool include_kept, bool basic_only);
-struct empire_storage_data *find_island_storage_by_keywords(empire_data *emp, int island_id, char *keywords);
+struct empire_storage_data *find_island_storage_by_keywords(empire_data *emp, int island_id, char *keywords, bool ignore_empty);
 room_data *find_storage_location_for(empire_data *emp, int island, obj_data *proto);
 room_data *find_warehouse_location_for(empire_data *emp, int island, bool vault);
 struct empire_storage_data *find_stored_resource(empire_data *emp, int island, obj_vnum vnum);

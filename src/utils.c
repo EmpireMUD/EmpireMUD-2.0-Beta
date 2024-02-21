@@ -5982,6 +5982,29 @@ char *strtoupper(char *str) {
 }
 
 
+/**
+* Converts a string to title case, roughly. That is, the first letter of each
+* word will be capitalized and the rest will be lowercase.
+*/
+void strtotitlecase(char *str) {
+	bool cap = TRUE;
+	char *ptr;
+	
+	for (ptr = str; *ptr; ++ptr) {
+		if (cap) {
+			*ptr = UPPER(*ptr);
+			cap = FALSE;
+		}
+		else if (*ptr == '-' || isspace(*ptr)) {
+			cap = TRUE;
+		}
+		else {
+			*ptr = LOWER(*ptr);
+		}
+	}
+}
+
+
 /*
  * strn_cmp: a case-insensitive version of strncmp().
  * Returns: 0 if equal, > 0 if arg1 > arg2, or < 0 if arg1 < arg2.
@@ -7046,6 +7069,29 @@ const char *get_partial_direction_to(char_data *ch, room_data *from, room_data *
 bool is_deep_mine(room_data *room) {
 	struct global_data *glb = global_proto(get_room_extra_data(room, ROOM_EXTRA_MINE_GLB_VNUM));	
 	return glb ? (get_room_extra_data(room, ROOM_EXTRA_MINE_AMOUNT) > GET_GLOBAL_VAL(glb, GLB_VAL_MAX_MINE_SIZE)) : FALSE;
+}
+
+
+/**
+* @param room_data *room Any room.
+* @return bool TRUE if the room counts as "outdoors"; FALSE if not.
+*/
+bool is_outdoor_room(room_data *room) {
+	if (!room) {
+		return FALSE;	// huh? no room
+	}
+	else if (RMT_FLAGGED(room, RMT_OUTDOOR)) {
+		return TRUE;	// "outdoor" interior
+	}
+	else if (!IS_ADVENTURE_ROOM(room) && (!IS_ANY_BUILDING(room) || (IS_MAP_BUILDING(room) && !IS_COMPLETE(room) && !ROOM_BLD_FLAGGED(room, BLD_CLOSED)) || (IS_MAP_BUILDING(room) && ROOM_BLD_FLAGGED((room), BLD_OPEN)))) {
+		return TRUE;	// outdoor tile
+	}
+	else if (GET_ROOM_VEHICLE(room) && !VEH_FLAGGED(GET_ROOM_VEHICLE(room), VEH_BUILDING) && CAN_LOOK_OUT(room) && is_outdoor_room(IN_ROOM(GET_ROOM_VEHICLE(room)))) {
+		return TRUE;	// on a vehicle which is outdoors
+	}
+	else {
+		return FALSE;	// all other cases
+	}
 }
 
 

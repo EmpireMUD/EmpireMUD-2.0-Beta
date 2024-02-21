@@ -93,6 +93,7 @@
 #define OLC_FLAG_NO_PROGRESS  BIT(25)	// cannot edit progress
 #define OLC_FLAG_NO_EVENTS  BIT(26)	// cannot edit events
 #define OLC_FLAG_NO_ATTACKS  BIT(27)	// cannot edit attacks
+#define OLC_FLAG_REFRESH_COMPANIONS  BIT(28)	// can refreshcompanions
 
 
 // ABILEDIT_x: Which parts of the ability menu and stats to show
