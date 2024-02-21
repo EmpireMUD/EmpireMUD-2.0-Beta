@@ -485,12 +485,12 @@ void rearrange_command_history(descriptor_data *desc, int pos) {
 	
 		// rearrange
 		if (pos < desc->history_pos) {
-			for (iter = pos; iter < desc->history_pos; ++iter) {
+			for (iter = pos; iter < desc->history_pos - 1; ++iter) {
 				desc->history[iter] = desc->history[iter + 1];
 			}
 		}
 		else {
-			for (iter = pos; iter > desc->history_pos; --iter) {
+			for (iter = pos - 1; iter > desc->history_pos; --iter) {
 				desc->history[iter] = desc->history[iter - 1];
 			}
 		}
