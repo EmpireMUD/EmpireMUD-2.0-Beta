@@ -481,6 +481,26 @@ void rearrange_command_history(descriptor_data *desc, int pos) {
 	
 	if (pos != desc->history_pos) {
 		// save for later
+		temp = desc->history[desc->history_pos];
+		
+		if (desc->history_pos < pos) {
+			for (iter = desc->history_pos; iter < pos; ++iter) {
+				desc->history[iter] = desc->history[(iter + 1) % HISTORY_SIZE];
+			}
+		}
+		else {
+			for (iter = desc->history_pos; iter > pos; --iter) {
+				desc->history[iter] = desc->history[(iter - 1 + HISTORY_SIZE) % HISTORY_SIZE];
+			}
+		}
+		
+		// and put this back
+		desc->history[pos] = temp;
+
+		// set history_pos to pos
+		desc->history_pos = pos;
+		/*
+		// save for later
 		temp = desc->history[pos];
 	
 		// rearrange
@@ -497,13 +517,15 @@ void rearrange_command_history(descriptor_data *desc, int pos) {
 	
 		// and put this back
 		desc->history[desc->history_pos] = temp;
+		*/
 	}
-	
+	/*
 	// and advance command history 1
 	if (++desc->history_pos >= HISTORY_SIZE) {
 		// Wrap to top
 		desc->history_pos = 0;
 	}
+	*/
 }
 
 
