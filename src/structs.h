@@ -3263,6 +3263,7 @@ struct find_territory_node {
 	room_vnum vnum;	// vnum of map location
 	char *details;	// optional string with vehicles, etc
 	int count;		// total collapsed nodes
+	bool combined;	// if true, multiple tiles were merged
 	
 	UT_hash_handle hh;	// hashed by map loc vnum
 };

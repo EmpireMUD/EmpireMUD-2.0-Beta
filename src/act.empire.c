@@ -3288,6 +3288,7 @@ void reduce_territory_node_list(struct find_territory_node **hash) {
 			// is there a node later in the list that is within range?
 			if ((find = find_nearby_territory_node(node->vnum, next_node, size))) {
 				find->count += node->count;
+				find->combined = TRUE;
 				HASH_DEL(*hash, node);
 				if (node->details) {
 					free(node->details);
@@ -8317,7 +8318,10 @@ ACMD(do_territory) {
 			room = real_room(node->vnum);
 			
 			if (!full) {
-				if (node->count > 1) {
+				if (node->combined) {
+					lsize = snprintf(line, sizeof(line), "%s %d tiles near %s\r\n", coord_display_room(ch, room, TRUE), node->count, (room ? get_screenreader_room_name(ch, room, room, FALSE) : "Unknown"));
+				}
+				else if (node->count > 1) {
 					lsize = snprintf(line, sizeof(line), "%s %s (x%d)%s%s\r\n", coord_display_room(ch, room, TRUE), (room ? get_screenreader_room_name(ch, room, room, FALSE) : "Unknown"), node->count, (node->details ? ": " : ""), NULLSAFE(node->details));
 				}
 				else {
