@@ -3778,6 +3778,13 @@ void do_stat_empire(char_data *ch, empire_data *emp) {
 		msg_to_char(ch, "%s%s%s", (iter > 0 ? ", " : ""), simple_time_since(time(0) - ptime[iter]), (iter == (PLAYTIME_WEEKS_TO_TRACK-1) ? "\r\n" : ""));
 	}
 	
+	if (EMPIRE_NEXT_TIMEOUT(emp) > time(0)) {
+		msg_to_char(ch, "Next timeout check: [%s from now]\r\n", colon_time(EMPIRE_NEXT_TIMEOUT(emp) - time(0), FALSE, NULL));
+	}
+	else {
+		msg_to_char(ch, "Next timeout check: [%ld / not scheduled]\r\n", EMPIRE_NEXT_TIMEOUT(emp));
+	}
+	
 	sprintbit(EMPIRE_ADMIN_FLAGS(emp), empire_admin_flags, line, TRUE);
 	msg_to_char(ch, "Admin flags: \tg%s\t0\r\n", line);
 	
