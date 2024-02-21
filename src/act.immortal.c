@@ -3471,9 +3471,15 @@ void do_stat_character(char_data *ch, char_data *k, bool details) {
 	if (MOB_CUSTOM_MSGS(k)) {
 		struct custom_message *mcm;
 		
-		msg_to_char(ch, "Custom messages:\r\n");
-		LL_FOREACH(MOB_CUSTOM_MSGS(k), mcm) {
-			msg_to_char(ch, " %s: %s\r\n", mob_custom_types[mcm->type], mcm->msg);
+		if (details) {
+			msg_to_char(ch, "Custom messages:\r\n");
+			LL_FOREACH(MOB_CUSTOM_MSGS(k), mcm) {
+				msg_to_char(ch, " %s: %s\r\n", mob_custom_types[mcm->type], mcm->msg);
+			}
+		}
+		else {
+			LL_COUNT(MOB_CUSTOM_MSGS(k), mcm, count);
+			msg_to_char(ch, "Custom messages: %d\r\n", count);
 		}
 	}
 
@@ -3670,6 +3676,7 @@ void do_stat_craft(char_data *ch, craft_data *craft) {
 * @param bool details If TRUE, shows full messages (due to -d option on vstat).
 */
 void do_stat_crop(char_data *ch, crop_data *cp, bool details) {
+	int count;
 	struct custom_message *ocm;
 	
 	msg_to_char(ch, "Crop VNum: [&c%d&0], Name: '&c%s&0'\r\n", GET_CROP_VNUM(cp), GET_CROP_NAME(cp));
@@ -3691,18 +3698,33 @@ void do_stat_crop(char_data *ch, crop_data *cp, bool details) {
 	
 	if (GET_CROP_EX_DESCS(cp)) {
 		struct extra_descr_data *desc;
-		sprintf(buf, "Extra descs:&c");
-		LL_FOREACH(GET_CROP_EX_DESCS(cp), desc) {
-			strcat(buf, " ");
-			strcat(buf, desc->keyword);
+		
+		if (details) {
+			msg_to_char(ch, "Extra descs:\r\n");
+			LL_FOREACH(GET_CROP_EX_DESCS(cp), desc) {
+				msg_to_char(ch, "[ &c%s&0 ]\r\n%s", desc->keyword, desc->description);
+			}
 		}
-		msg_to_char(ch, "%s&0\r\n", buf);
+		else {
+			sprintf(buf, "Extra descs:&c");
+			LL_FOREACH(GET_CROP_EX_DESCS(cp), desc) {
+				strcat(buf, " ");
+				strcat(buf, desc->keyword);
+			}
+			msg_to_char(ch, "%s&0\r\n", buf);
+		}
 	}
 	
 	if (GET_CROP_CUSTOM_MSGS(cp)) {
-		msg_to_char(ch, "Custom messages:\r\n");
-		LL_FOREACH(GET_CROP_CUSTOM_MSGS(cp), ocm) {
-			msg_to_char(ch, " %s: %s\r\n", crop_custom_types[ocm->type], ocm->msg);
+		if (details) {
+			msg_to_char(ch, "Custom messages:\r\n");
+			LL_FOREACH(GET_CROP_CUSTOM_MSGS(cp), ocm) {
+				msg_to_char(ch, " %s: %s\r\n", crop_custom_types[ocm->type], ocm->msg);
+			}
+		}
+		else {
+			LL_COUNT(GET_CROP_CUSTOM_MSGS(cp), ocm, count);
+			msg_to_char(ch, "Custom messages: %d\r\n", count);
 		}
 	}
 	
