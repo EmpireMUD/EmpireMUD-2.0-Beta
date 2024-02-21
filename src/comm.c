@@ -464,6 +464,49 @@ int perform_subst(descriptor_data *t, char *orig, char *subst) {
 }
 
 
+/**
+* For use when the player types !abbrev to repeat a command from their history.
+* It rearranges the command history to follow logically.
+*
+* @param descriptor_data *desc The person whose command history we're rearranging.
+* @param int pos The position that will be moved to the last entry in the command queue.
+*/
+void rearrange_command_history(descriptor_data *desc, int pos) {
+	char *temp;
+	int iter;
+	
+	if (pos < 0 || pos >= HISTORY_SIZE) {
+		return;	// nothing to do -- already in that pos, or invalid input
+	}
+	
+	if (pos != desc->history_pos) {
+		// save for later
+		temp = desc->history[pos];
+	
+		// rearrange
+		if (pos < desc->history_pos) {
+			for (iter = pos; iter < desc->history_pos; ++iter) {
+				desc->history[iter] = desc->history[iter + 1];
+			}
+		}
+		else {
+			for (iter = pos; iter > desc->history_pos; --iter) {
+				desc->history[iter] = desc->history[iter - 1];
+			}
+		}
+	
+		// and put this back
+		desc->history[desc->history_pos] = temp;
+	}
+	
+	// and advance command history 1
+	if (++desc->history_pos >= HISTORY_SIZE) {
+		// Wrap to top
+		desc->history_pos = 0;
+	}
+}
+
+
 /*
  * This function is called every 30 seconds from heartbeat().  It checks
  * the four global buffers in EmpireMUD to ensure that no one has written
@@ -2820,42 +2863,26 @@ int process_input(descriptor_data *t) {
 		}
 		else if (*input == '!' && *(input + 1)) {
 			char *commandln = (input + 1);
-			int starting_pos = t->history_pos, cnt = (t->history_pos == 0 ? HISTORY_SIZE - 1 : t->history_pos - 1);
+			int cnt;
 
 			skip_spaces(&commandln);
-			if (t->history[t->history_pos] && is_abbrev(commandln, t->history[t->history_pos])) {
-				// repeat that history item
-				strcpy(input, t->history[t->history_pos]);
-				strncpy(t->last_input, input, sizeof(t->last_input)-1);
-				t->last_input[sizeof(t->last_input)-1] = '\0';
-				SEND_TO_Q(input, t);
-				SEND_TO_Q("\r\n", t);
-				
-				// roll the position over to avoid overwriting this with the very next command
-				if (++t->history_pos >= HISTORY_SIZE) {
-					// Wrap to top
-					t->history_pos = 0;
+			for (cnt = (t->history_pos == 0 ? HISTORY_SIZE : t->history_pos) - 1;; --cnt) {
+				if (t->history[cnt] && is_abbrev(commandln, t->history[cnt])) {
+					strcpy(input, t->history[cnt]);
+					strncpy(t->last_input, input, sizeof(t->last_input)-1);
+					t->last_input[sizeof(t->last_input)-1] = '\0';
+					SEND_TO_Q(input, t);
+					SEND_TO_Q("\r\n", t);
+					
+					// and ensure the command history is in a logical order
+					rearrange_command_history(t, cnt);
+					break;	// done
 				}
-			}
-			else {
-				for (; cnt != starting_pos; cnt--) {
-					if (t->history[cnt] && is_abbrev(commandln, t->history[cnt])) {
-						strcpy(input, t->history[cnt]);
-						strncpy(t->last_input, input, sizeof(t->last_input)-1);
-						t->last_input[sizeof(t->last_input)-1] = '\0';
-						SEND_TO_Q(input, t);
-						SEND_TO_Q("\r\n", t);
-						
-						// and update history pos
-						if ((t->history_pos = cnt + 1) >= HISTORY_SIZE) {
-							// Wrap to top
-							t->history_pos = 0;
-						}
-						break;
-					}
-					if (cnt == 0) {	/* At top, loop to bottom. */
-						cnt = HISTORY_SIZE;
-					}
+				if (cnt == t->history_pos) {
+					break;	// reached the beginning again
+				}
+				else if (cnt == 0) {
+					cnt = HISTORY_SIZE;		// loop back around
 				}
 			}
 		}
