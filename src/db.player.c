@@ -6207,7 +6207,12 @@ void read_empire_members(empire_data *only_empire, bool read_techs) {
 			
 			// update next timeout check
 			if (timeout > curtime) {
-				EMPIRE_NEXT_TIMEOUT(e) = MIN(EMPIRE_NEXT_TIMEOUT(e), timeout);
+				if (EMPIRE_NEXT_TIMEOUT(e) == 0) {
+					EMPIRE_NEXT_TIMEOUT(e) = timeout;
+				}
+				else {
+					EMPIRE_NEXT_TIMEOUT(e) = MIN(EMPIRE_NEXT_TIMEOUT(e), timeout);
+				}
 			}
 		}
 		
