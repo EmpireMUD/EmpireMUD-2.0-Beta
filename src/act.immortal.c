@@ -3779,7 +3779,7 @@ void do_stat_empire(char_data *ch, empire_data *emp) {
 	}
 	
 	if (EMPIRE_NEXT_TIMEOUT(emp) > time(0)) {
-		msg_to_char(ch, "Next timeout check: [%s from now]\r\n", colon_time(EMPIRE_NEXT_TIMEOUT(emp) - time(0), FALSE, NULL));
+		msg_to_char(ch, "Next timeout check: [%s %s]\r\n", colon_time(EMPIRE_NEXT_TIMEOUT(emp) - time(0), FALSE, NULL), (EMPIRE_NEXT_TIMEOUT(emp) >= time(0) ? "from now" : "ago"));
 	}
 	else {
 		msg_to_char(ch, "Next timeout check: [%ld / not scheduled]\r\n", EMPIRE_NEXT_TIMEOUT(emp));

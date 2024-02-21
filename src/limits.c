@@ -1272,11 +1272,6 @@ void reduce_stale_empires(void) {
 		if (EMPIRE_MEMBERS(iter) > 0 && EMPIRE_NEXT_TIMEOUT(iter) != 0 && EMPIRE_NEXT_TIMEOUT(iter) <= time(0)) {
 			// syslog(SYS_INFO, 0, TRUE, "Debug: Rescanning empire %s based on timeout", EMPIRE_NAME(iter));
 			reread_empire_tech(iter);
-			
-			// did we detect a viable timeout? If not, prevent it from running every time:
-			if (EMPIRE_NEXT_TIMEOUT(iter) <= time(0)) {
-				EMPIRE_NEXT_TIMEOUT(iter) = 0;
-			}
 		}
 		
 		// check overages
