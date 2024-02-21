@@ -5982,6 +5982,29 @@ char *strtoupper(char *str) {
 }
 
 
+/**
+* Converts a string to title case, roughly. That is, the first letter of each
+* word will be capitalized and the rest will be lowercase.
+*/
+void strtotitlecase(char *str) {
+	bool cap = TRUE;
+	char *ptr;
+	
+	for (ptr = str; *ptr; ++ptr) {
+		if (cap) {
+			*ptr = UPPER(*ptr);
+			cap = FALSE;
+		}
+		else if (*ptr == '-' || isspace(*ptr)) {
+			cap = TRUE;
+		}
+		else {
+			*ptr = LOWER(*ptr);
+		}
+	}
+}
+
+
 /*
  * strn_cmp: a case-insensitive version of strncmp().
  * Returns: 0 if equal, > 0 if arg1 > arg2, or < 0 if arg1 < arg2.

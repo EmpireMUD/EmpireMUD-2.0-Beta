@@ -2441,8 +2441,10 @@ char *get_screenreader_room_name(char_data *ch, room_data *from_room, room_data 
 	}
 	else if (ROOM_SECT_FLAGGED(to_room, SECTF_CROP) && (cp = ROOM_CROP(to_room))) {
 		strcpy(temp, GET_CROP_NAME(cp));
-		CAP(temp);
 		partial_dark = show_dark;
+	
+		// fix case issues on crops
+		strtotitlecase(temp);
 	}
 	else {
 		strcpy(temp, GET_SECT_NAME(SECT(to_room)));

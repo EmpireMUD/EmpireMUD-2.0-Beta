@@ -2489,7 +2489,6 @@ void do_eq_set(char_data *ch, char *argument) {
 */
 void do_eq_summary(char_data *ch, char *argument) {
 	bitvector_t bits = NOBITS;
-	bool cap;
 	int iter;
 	obj_data *obj;
 	struct obj_apply *apply;
@@ -2537,18 +2536,7 @@ void do_eq_summary(char_data *ch, char *argument) {
 	HASH_ITER(hh, hash, vh, next_vh) {
 		// change caps (it starts out all-caps)
 		strcpy(buf, apply_types[vh->vnum]);
-		for (iter = 0, cap = TRUE; iter < strlen(buf); ++iter) {
-			if (buf[iter] == '-') {
-				cap = TRUE;
-			}
-			else if (cap) {
-				cap = FALSE;
-			}
-			else {
-				buf[iter] = LOWER(buf[iter]);
-			}
-		}
-		
+		strtotitlecase(buf);
 		msg_to_char(ch, " %s: %+d\r\n", buf, vh->count);
 	}
 	
@@ -6383,7 +6371,7 @@ ACMD(do_equipment) {
 	else if (!str_cmp(arg, "set") || !str_cmp(arg, "-set") || !str_cmp(arg, "save") || !str_cmp(arg, "-save")) {
 		do_eq_set(ch, second);
 	}
-	else if (!str_cmp(arg, "summary") || !str_cmp(arg, "-sum") || !str_cmp(arg, "-summ")) {
+	else if (!str_cmp(arg, "summary") || !str_cmp(arg, "-sum") || !str_cmp(arg, "-summ") || !str_cmp(arg, "-summary")) {
 		do_eq_summary(ch, second);
 	}
 	else {

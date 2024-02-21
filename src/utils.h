@@ -2049,6 +2049,7 @@ char *stripcr(char *dest, const char *src);
 void strip_crlf(char *buffer);
 char *strtolower(char *str);
 char *strtoupper(char *str);
+void strtotitlecase(char *str);
 int color_code_length(const char *str);
 #define color_strlen(str)  (strlen(str) - color_code_length(str))
 int count_icon_codes(char *string);
