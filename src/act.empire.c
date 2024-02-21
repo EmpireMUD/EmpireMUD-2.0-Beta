@@ -3214,31 +3214,19 @@ MANAGE_FUNC(mng_nowork) {
 * Sees if the room is within N spaces of any existing node.
 *
 * @param any_vnum vnum The map location vnum of another node.
-* @param struct find_territory_node **hash A pointer to the hash to search.
-* @param struct find_territory_node *start_node The first node to consider (skips any before this).
+* @param struct find_territory_node *start_node The first node to consider in a node hash (skips any before this).
 * @param int distance The distance to count as "nearby".
 * @return struct find_territory_node* A pointer to the nearby node, if any (may be NULL).
 */
-struct find_territory_node *find_nearby_territory_node(any_vnum vnum, struct find_territory_node **hash, struct find_territory_node *start_node, int distance) {
+struct find_territory_node *find_nearby_territory_node(any_vnum vnum, struct find_territory_node *start_node, int distance) {
 	struct find_territory_node *node, *next;
-	bool found_start = FALSE;
 	
 	// don't try to merge nothing
 	if (vnum == NOTHING) {
 		return NULL;
 	}
 	
-	HASH_ITER(hh, *hash, node, next) {
-		// find starting point first -- due to how these nodes are combined
-	    if (!found_start && start_node) {
-	    	if (node != start_node) {
-				continue;
-			}
-			else {
-				found_start = TRUE;
-			}
-	    }
-	    
+	HASH_ITER(hh, start_node, node, next) {
 	    if (compute_map_distance(MAP_X_COORD(vnum), MAP_Y_COORD(vnum), MAP_X_COORD(node->vnum), MAP_Y_COORD(node->vnum)) <= distance) {
 			return node;
 		}
@@ -3298,7 +3286,7 @@ void reduce_territory_node_list(struct find_territory_node **hash) {
 	while (HASH_COUNT(*hash) > max_rows && size < max_size) {
 		HASH_ITER(hh, *hash, node, next_node) {
 			// is there a node later in the list that is within range?
-			if ((find = find_nearby_territory_node(node->vnum, hash, next_node, size))) {
+			if ((find = find_nearby_territory_node(node->vnum, next_node, size))) {
 				find->count += node->count;
 				HASH_DEL(*hash, node);
 				if (node->details) {
