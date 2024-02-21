@@ -2406,7 +2406,7 @@ void do_eq_list(char_data *ch, char *argument) {
 * @param char *argument The name to set.
 */
 void do_eq_set(char_data *ch, char *argument) {
-	const char *invalids[] = { "all", "delete", "list", "save", "set", "\n" };
+	const char *invalids[] = { "all", "delete", "list", "save", "set", "summary", "\n" };
 	struct player_eq_set *eq_set;
 	int iter, set_id = NOTHING;
 	obj_data *obj;
