@@ -2823,17 +2823,28 @@ int process_input(descriptor_data *t) {
 			int starting_pos = t->history_pos, cnt = (t->history_pos == 0 ? HISTORY_SIZE - 1 : t->history_pos - 1);
 
 			skip_spaces(&commandln);
-			for (; cnt != starting_pos; cnt--) {
-				if (t->history[cnt] && is_abbrev(commandln, t->history[cnt])) {
-					strcpy(input, t->history[cnt]);
-					strncpy(t->last_input, input, sizeof(t->last_input)-1);
-					t->last_input[sizeof(t->last_input)-1] = '\0';
-					SEND_TO_Q(input, t);
-					SEND_TO_Q("\r\n", t);
-					break;
+			if (t->history[t->history_pos] && is_abbrev(commandln, t->history[t->history_pos])) {
+				// repeat that history item
+				strcpy(input, t->history[t->history_pos]);
+				strncpy(t->last_input, input, sizeof(t->last_input)-1);
+				t->last_input[sizeof(t->last_input)-1] = '\0';
+				SEND_TO_Q(input, t);
+				SEND_TO_Q("\r\n", t);
+			}
+			else {
+				for (; cnt != starting_pos; cnt--) {
+					if (t->history[cnt] && is_abbrev(commandln, t->history[cnt])) {
+						strcpy(input, t->history[cnt]);
+						strncpy(t->last_input, input, sizeof(t->last_input)-1);
+						t->last_input[sizeof(t->last_input)-1] = '\0';
+						SEND_TO_Q(input, t);
+						SEND_TO_Q("\r\n", t);
+						break;
+					}
+					if (cnt == 0) {	/* At top, loop to bottom. */
+						cnt = HISTORY_SIZE;
+					}
 				}
-				if (cnt == 0)	/* At top, loop to bottom. */
-					cnt = HISTORY_SIZE;
 			}
 		}
 		else if (*input == '^') {
