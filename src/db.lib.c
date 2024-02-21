@@ -2454,14 +2454,20 @@ void free_empire(empire_data *emp) {
 	EMPIRE_ISLANDS(emp) = NULL;
 	
 	// free strings
-	if (emp->name) {
-		free(emp->name);
+	if (EMPIRE_NAME(emp)) {
+		free(EMPIRE_NAME(emp));
 	}
-	if (emp->adjective) {
-		free(emp->adjective);
+	if (EMPIRE_SHORT_NAME(emp)) {
+		free(EMPIRE_SHORT_NAME(emp));
 	}
-	if (emp->banner) {
-		free(emp->banner);
+	if (EMPIRE_ADJECTIVE(emp)) {
+		free(EMPIRE_ADJECTIVE(emp));
+	}
+	if (EMPIRE_SHORT_ADJECTIVE(emp)) {
+		free(EMPIRE_SHORT_ADJECTIVE(emp));
+	}
+	if (EMPIRE_BANNER(emp)) {
+		free(EMPIRE_BANNER(emp));
 	}
 	if (EMPIRE_MOTD(emp)) {
 		free(EMPIRE_MOTD(emp));
