@@ -2831,8 +2831,15 @@ int process_input(descriptor_data *t) {
 					SEND_TO_Q(input, t);
 					SEND_TO_Q("\r\n", t);
 					
-					// and copy it to the next position in the command history:
-					if (cnt != t->history_pos && cnt != t->history_pos-1 && (t->history_pos != 0 || cnt != HISTORY_SIZE-1)) {
+					// and copy it to the next position in the command history if needed:
+					if (cnt == t->history_pos) {
+						// just advance history pos
+						if (++t->history_pos >= HISTORY_SIZE) {
+							t->history_pos = 0;		// Wrap to top
+						}
+					}
+					else if (cnt != t->history_pos-1 && (t->history_pos != 0 || cnt != HISTORY_SIZE-1)) {
+						// copy it
 						if (t->history[t->history_pos]) {
 							free(t->history[t->history_pos]);
 						}
