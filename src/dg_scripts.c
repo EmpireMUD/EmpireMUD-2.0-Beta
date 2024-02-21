@@ -3527,7 +3527,10 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 					break;
 				}
 				case 'd': {	// char.d*
-					if (!str_cmp(field, "dex") || !str_cmp(field, "dexterity")) {
+					if (!str_cmp(field, "dead")) {
+						snprintf(str, slen, "%d", IS_DEAD(c) ? 1 : 0);
+					}
+					else if (!str_cmp(field, "dex") || !str_cmp(field, "dexterity")) {
 						snprintf(str, slen, "%d", GET_DEXTERITY(c));
 					}
 					else if (!str_cmp(field, "dir")) {
