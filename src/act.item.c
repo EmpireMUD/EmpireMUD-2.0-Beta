@@ -2498,10 +2498,23 @@ void do_eq_summary(char_data *ch, char *argument) {
 	// collect data
 	for (iter = 0; iter < NUM_WEARS; ++iter) {
 		if (wear_data[iter].count_stats && (obj = GET_EQ(ch, iter))) {
+			// obj aff flags
 			bits |= GET_OBJ_AFF_FLAGS(obj);
+			
+			// applies
 			LL_FOREACH(GET_OBJ_APPLIES(obj), apply) {
 				if (apply->location) {
 					add_vnum_hash(&hash, apply->location, apply->modifier);
+				}
+			}
+			
+			// special-casing by type
+			switch (GET_OBJ_TYPE(obj)) {
+				case ITEM_PACK: {
+					if (iter == WEAR_PACK) {
+						add_vnum_hash(&hash, APPLY_INVENTORY, GET_PACK_CAPACITY(obj));
+					}
+					break;
 				}
 			}
 		}
