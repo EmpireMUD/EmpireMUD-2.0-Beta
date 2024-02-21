@@ -2489,6 +2489,7 @@ void do_eq_set(char_data *ch, char *argument) {
 */
 void do_eq_summary(char_data *ch, char *argument) {
 	bitvector_t bits = NOBITS;
+	bool cap;
 	int iter;
 	obj_data *obj;
 	struct obj_apply *apply;
@@ -2521,7 +2522,21 @@ void do_eq_summary(char_data *ch, char *argument) {
 	}
 	
 	HASH_ITER(hh, hash, vh, next_vh) {
-		msg_to_char(ch, " %s: %+d\r\n", apply_types[vh->vnum], vh->count);
+		// change caps (it starts out all-caps)
+		strcpy(buf, apply_types[vh->vnum]);
+		for (iter = 0, cap = TRUE; iter < strlen(buf); ++iter) {
+			if (buf[iter] == '-') {
+				cap = TRUE;
+			}
+			else if (cap) {
+				cap = FALSE;
+			}
+			else {
+				buf[iter] = LOWER(buf[iter]);
+			}
+		}
+		
+		msg_to_char(ch, " %s: %+d\r\n", buf, vh->count);
 	}
 	
 	free_vnum_hash(&hash);
