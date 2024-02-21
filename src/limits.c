@@ -2249,7 +2249,7 @@ void check_empire_storage_timers(void) {
 						free(st);
 						
 						// delete storage if needed
-						if (store->amount == 0 && store->keep != EMPIRE_ATTRIBUTE(emp, EATT_DEFAULT_KEEP)) {
+						if (store->amount == 0 && store->keep == EMPIRE_ATTRIBUTE(emp, EATT_DEFAULT_KEEP)) {
 							HASH_DEL(isle->store, store);
 							free_empire_storage_data(store);
 							store = NULL;
