@@ -1063,6 +1063,9 @@ bool mob_can_move_to_sect(char_data *mob, room_data *to_room) {
 		// nope
 		ok = FALSE;
 	}
+	else if (ROOM_IS_CLOSED(to_room) && !ROOM_IS_CLOSED(IN_ROOM(mob)) && MOB_FLAGGED(mob, MOB_AVOID_BUILDINGS)) {
+		ok = FALSE;	// avoid buildings
+	}
 	else if (SECT_FLAGGED(sect, SECTF_IS_ROAD) && !MOB_FLAGGED(mob, MOB_AQUATIC) && move_type != MOB_MOVE_SWIM) {
 		ok = TRUE;
 	}

@@ -2857,6 +2857,7 @@ const char *action_bits[] = {
 	"NO-COMMAND",	// 35
 	"NO-UNCONSCIOUS",
 	"IMPORTANT",
+	"AVOID-BUILDINGS",
 	"\n"
 };
 

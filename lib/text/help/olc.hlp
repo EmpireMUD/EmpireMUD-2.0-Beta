@@ -6127,7 +6127,8 @@ Available mob flags:
  &cCOINS&0 - Mob will drop coins on death/pickpocket.
  &cNO-COMMAND&0 - Cannot be commanded/ordered.
  &cNO-UNCONSCIOUS&0 - Cannot be knocked unconscious (from toggle autokill).
- &cIMPORTANT&0 - won't be hit by an immortal "purge" with no args; can be used by scripts
+ &cIMPORTANT&0 - Won't be hit by an immortal "purge" with no args; can be used by scripts.
+ &cAVOID-BUILDINGS&0 - Mob won't enter buildings from the outside.
 
 See also: OLC MOBILES
 #d

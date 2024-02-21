@@ -1580,6 +1580,7 @@ typedef struct vehicle_data vehicle_data;
 #define MOB_NO_COMMAND  BIT(35)	// J. mob cannot be commanded/ordered
 #define MOB_NO_UNCONSCIOUS  BIT(36)	// K. mob cannot be knocked out; it's always killed instead
 #define MOB_IMPORTANT  BIT(37)	// L. won't be hit by no-arg "purge"; can be used by scripts
+#define MOB_AVOID_BUILDINGS  BIT(38)	// M. mob will not enter buildings from the outside
 
 
 // MOB_CUSTOM_x: custom message types
