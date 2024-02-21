@@ -1250,7 +1250,7 @@ static void reduce_stale_empires_one(empire_data *emp) {
 	
 	// did we find one?
 	if (found_room) {
-		// this is only called on VERY stale empires (no members), so there's no real need to log this abandon
+		log_to_empire(emp, ELOG_TERRITORY, "Abandoning %s (%d, %d) because all members are timed out", get_room_name(found_room, FALSE), X_COORD(found_room), Y_COORD(found_room));
 		abandon_room(found_room);
 	}
 }
