@@ -161,7 +161,7 @@ chimpanzee hairy~
 a chimpanzee~
 A hairy chimpanzee eyes you cautiously.
 ~
-75 100 doA 0 3
+75 100 doAM 0 3
 1 0 0 15 -1
 D
    The chimpanzee scratches its gray chin as it ponders you. It reminds you of
@@ -175,7 +175,7 @@ gorilla huge~
 a gorilla~
 A huge gorilla pounds its chest at you.
 ~
-75 100 doA 0 3
+75 100 doAM 0 3
 1 0 0 15 -1
 D
    The gorilla is twice your size. It's mostly black, but its back is pure

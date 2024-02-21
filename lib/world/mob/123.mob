@@ -3,7 +3,7 @@ dragon fur enormous~
 the fur dragon~
 An enormous fur dragon is stalking low to the ground.
 ~
-225 325 dghkL choCD 6
+225 325 dghkLM choCD 6
 0 0 9 10 -1
 D
    This tremendous brown creature is undoubtedly a dragon, but its scales are
@@ -103,7 +103,7 @@ drake furry familiar~
 a furry drake~
 A furry drake is stalking back and forth. (familiar)
 ~
-100 0 dozG cfmG 4
+100 0 dozGM cfmG 4
 0 0 2 9 -1
 D
    The drake is like a small dragon. Perhaps not as smart as a true dragon, it
@@ -130,7 +130,7 @@ serragon hoarfrost frost enormous~
 the hoarfrost serragon~
 An enormous serragon coils around the frozen landscape, baring its teeth.
 ~
-100 200 dhxyAJKL cEGL 6
+100 200 dhxyAJKLM cEGL 6
 0 0 51 25 -1
 D
    The serragon is so big it could be mistaken for a mountain of ice! Its long,
@@ -356,7 +356,7 @@ hatchling frostscale~
 a frostscale hatchling~
 A frostscale hatchling coils and raises its head above you.
 ~
-100 200 acdouxyJK cEGL 5
+100 200 acdouxyJKM cEGL 5
 0 0 51 25 -1
 D
    Though it's larger than a horse, the hatchling is miniscule in comparison to

@@ -401,7 +401,7 @@ Bylda bear~
 the Bylda~
 A Bylda is rampaging!
 ~
-25 400 dyz c 6
+25 400 dyzM c 6
 0 0 26 24 -1
 D
    The enormous bear looks cobbled together from leather and bad magic, and
@@ -652,7 +652,7 @@ t-rex zombie sue~
 a zombie t-rex~
 A dragon sized zombie stomps about.
 ~
-1 100 deghk c 5
+1 100 deghkM c 5
 2 0 26 9 -1
 D
    This former queen of the primeval world has a rough pebbled hide, colored
