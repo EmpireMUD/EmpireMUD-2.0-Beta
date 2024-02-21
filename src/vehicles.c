@@ -4437,14 +4437,14 @@ vehicle_data *setup_olc_vehicle(vehicle_data *input) {
 * @param bool details If TRUE, shows full messages (due to -d option on vstat).
 */
 void do_stat_vehicle(char_data *ch, vehicle_data *veh, bool details) {
-	char buf[MAX_STRING_LENGTH * 2], part[MAX_STRING_LENGTH];
+	char buf[MAX_STRING_LENGTH * 4], part[MAX_STRING_LENGTH];
 	struct room_extra_data *red, *next_red;
 	struct custom_message *custm;
 	struct depletion_data *dep;
 	obj_data *obj;
 	size_t size;
 	bool comma;
-	int found;
+	int count, found;
 	struct string_hash *str_iter, *next_str, *str_hash = NULL;
 	
 	if (!veh) {
@@ -4462,11 +4462,20 @@ void do_stat_vehicle(char_data *ch, vehicle_data *veh, bool details) {
 	
 	if (VEH_EX_DESCS(veh)) {
 		struct extra_descr_data *desc;
-		size += snprintf(buf + size, sizeof(buf) - size, "Extra descs:\tc");
-		LL_FOREACH(VEH_EX_DESCS(veh), desc) {
-			size += snprintf(buf + size, sizeof(buf) - size, " %s", desc->keyword);
+		
+		if (details) {
+			size += snprintf(buf + size, sizeof(buf) - size, "Extra descs:\r\n");
+			LL_FOREACH(VEH_EX_DESCS(veh), desc) {
+				size += snprintf(buf + size, sizeof(buf) - size, "[ &c%s&0 ]\r\n%s", desc->keyword, desc->description);
+			}
 		}
-		size += snprintf(buf + size, sizeof(buf) - size, "\t0\r\n");
+		else {
+			size += snprintf(buf + size, sizeof(buf) - size, "Extra descs:\tc");
+			LL_FOREACH(VEH_EX_DESCS(veh), desc) {
+				size += snprintf(buf + size, sizeof(buf) - size, " %s", desc->keyword);
+			}
+			size += snprintf(buf + size, sizeof(buf) - size, "\t0\r\n");
+		}
 	}
 	
 	// icons:
@@ -4591,10 +4600,16 @@ void do_stat_vehicle(char_data *ch, vehicle_data *veh, bool details) {
 	}
 	
 	if (VEH_CUSTOM_MSGS(veh)) {
-		size += snprintf(buf + size, sizeof(buf) - size, "Custom messages:\r\n");
+		if (details) {
+			size += snprintf(buf + size, sizeof(buf) - size, "Custom messages:\r\n");
 		
-		LL_FOREACH(VEH_CUSTOM_MSGS(veh), custm) {
-			size += snprintf(buf + size, sizeof(buf) - size, " %s: %s\r\n", veh_custom_types[custm->type], custm->msg);
+			LL_FOREACH(VEH_CUSTOM_MSGS(veh), custm) {
+				size += snprintf(buf + size, sizeof(buf) - size, " %s: %s\r\n", veh_custom_types[custm->type], custm->msg);
+			}
+		}
+		else {
+			LL_COUNT(VEH_CUSTOM_MSGS(veh), custm, count);
+			size += snprintf(buf + size, sizeof(buf) - size, "Custom messages: %d\r\n", count);
 		}
 	}
 	

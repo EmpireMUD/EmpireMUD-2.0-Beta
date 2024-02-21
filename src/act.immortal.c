@@ -3258,12 +3258,21 @@ void do_stat_building(char_data *ch, bld_data *bdg, bool details) {
 	
 	if (GET_BLD_EX_DESCS(bdg)) {
 		struct extra_descr_data *desc;
-		sprintf(buf, "Extra descs:&c");
-		LL_FOREACH(GET_BLD_EX_DESCS(bdg), desc) {
-			strcat(buf, " ");
-			strcat(buf, desc->keyword);
+		
+		if (details) {
+			msg_to_char(ch, "Extra descs:\r\n");
+			LL_FOREACH(GET_BLD_EX_DESCS(bdg), desc) {
+				msg_to_char(ch, "[ &c%s&0 ]\r\n%s", desc->keyword, desc->description);
+			}
 		}
-		msg_to_char(ch, "%s&0\r\n", buf);
+		else {
+			sprintf(buf, "Extra descs:&c");
+			LL_FOREACH(GET_BLD_EX_DESCS(bdg), desc) {
+				strcat(buf, " ");
+				strcat(buf, desc->keyword);
+			}
+			msg_to_char(ch, "%s&0\r\n", buf);
+		}
 	}
 	
 	if (GET_BLD_INTERACTIONS(bdg)) {
@@ -3918,7 +3927,7 @@ void do_stat_global(char_data *ch, struct global_data *glb) {
 */
 void do_stat_object(char_data *ch, obj_data *j, bool details) {
 	char buf[MAX_STRING_LENGTH], part[MAX_STRING_LENGTH];
-	int found, minutes;
+	int count, found, minutes;
 	struct obj_apply *apply;
 	room_data *room;
 	obj_vnum vnum = GET_OBJ_VNUM(j);
@@ -3951,12 +3960,21 @@ void do_stat_object(char_data *ch, obj_data *j, bool details) {
 	*buf = 0;
 	if (GET_OBJ_EX_DESCS(j)) {
 		struct extra_descr_data *desc;
-		sprintf(buf, "Extra descs:&c");
-		LL_FOREACH(GET_OBJ_EX_DESCS(j), desc) {
-			strcat(buf, " ");
-			strcat(buf, desc->keyword);
+		
+		if (details) {
+			msg_to_char(ch, "Extra descs:\r\n");
+			LL_FOREACH(GET_OBJ_EX_DESCS(j), desc) {
+				msg_to_char(ch, "[ &c%s&0 ]\r\n%s", desc->keyword, desc->description);
+			}
 		}
-		send_to_char(strcat(buf, "&0\r\n"), ch);
+		else {
+			sprintf(buf, "Extra descs:&c");
+			LL_FOREACH(GET_OBJ_EX_DESCS(j), desc) {
+				strcat(buf, " ");
+				strcat(buf, desc->keyword);
+			}
+			send_to_char(strcat(buf, "&0\r\n"), ch);
+		}
 	}
 	
 	sprintbit(GET_OBJ_WEAR(j), wear_bits, buf, TRUE);
@@ -4247,10 +4265,16 @@ void do_stat_object(char_data *ch, obj_data *j, bool details) {
 	}
 	
 	if (GET_OBJ_CUSTOM_MSGS(j)) {
-		msg_to_char(ch, "Custom messages:\r\n");
+		if (details) {
+			msg_to_char(ch, "Custom messages:\r\n");
 		
-		for (ocm = GET_OBJ_CUSTOM_MSGS(j); ocm; ocm = ocm->next) {
-			msg_to_char(ch, " %s: %s\r\n", obj_custom_types[ocm->type], ocm->msg);
+			LL_FOREACH(GET_OBJ_CUSTOM_MSGS(j), ocm) {
+				msg_to_char(ch, " %s: %s\r\n", obj_custom_types[ocm->type], ocm->msg);
+			}
+		}
+		else {
+			LL_COUNT(GET_OBJ_CUSTOM_MSGS(j), ocm, count);
+			msg_to_char(ch, "Custom messages: %d\r\n", count);
 		}
 	}
 
@@ -4643,12 +4667,21 @@ void do_stat_room_template(char_data *ch, room_template *rmt, bool details) {
 	
 	if (GET_RMT_EX_DESCS(rmt)) {
 		struct extra_descr_data *desc;
-		sprintf(buf, "Extra descs:&c");
-		LL_FOREACH(GET_RMT_EX_DESCS(rmt), desc) {
-			strcat(buf, " ");
-			strcat(buf, desc->keyword);
+		
+		if (details) {
+			msg_to_char(ch, "Extra descs:\r\n");
+			LL_FOREACH(GET_RMT_EX_DESCS(rmt), desc) {
+				msg_to_char(ch, "[ &c%s&0 ]\r\n%s", desc->keyword, desc->description);
+			}
 		}
-		msg_to_char(ch, "%s&0\r\n", buf);
+		else {
+			sprintf(buf, "Extra descs:&c");
+			LL_FOREACH(GET_RMT_EX_DESCS(rmt), desc) {
+				strcat(buf, " ");
+				strcat(buf, desc->keyword);
+			}
+			msg_to_char(ch, "%s&0\r\n", buf);
+		}
 	}
 
 	get_exit_template_display(GET_RMT_EXITS(rmt), lbuf);
@@ -4676,6 +4709,7 @@ void do_stat_room_template(char_data *ch, room_template *rmt, bool details) {
 * @param bool details If TRUE, shows full messages (due to -d option on vstat).
 */
 void do_stat_sector(char_data *ch, sector_data *st, bool details) {
+	int count;
 	struct sector_index_type *idx = find_sector_index(GET_SECT_VNUM(st));
 	char buf[MAX_STRING_LENGTH];
 	struct custom_message *ocm;
@@ -4712,18 +4746,33 @@ void do_stat_sector(char_data *ch, sector_data *st, bool details) {
 	
 	if (GET_SECT_EX_DESCS(st)) {
 		struct extra_descr_data *desc;
-		sprintf(buf, "Extra descs:&c");
-		LL_FOREACH(GET_SECT_EX_DESCS(st), desc) {
-			strcat(buf, " ");
-			strcat(buf, desc->keyword);
+		
+		if (details) {
+			msg_to_char(ch, "Extra descs:\r\n");
+			LL_FOREACH(GET_SECT_EX_DESCS(st), desc) {
+				msg_to_char(ch, "[ &c%s&0 ]\r\n%s", desc->keyword, desc->description);
+			}
 		}
-		msg_to_char(ch, "%s&0\r\n", buf);
+		else {
+			sprintf(buf, "Extra descs:&c");
+			LL_FOREACH(GET_SECT_EX_DESCS(st), desc) {
+				strcat(buf, " ");
+				strcat(buf, desc->keyword);
+			}
+			msg_to_char(ch, "%s&0\r\n", buf);
+		}
 	}
 	
 	if (GET_SECT_CUSTOM_MSGS(st)) {
-		msg_to_char(ch, "Custom messages:\r\n");
-		LL_FOREACH(GET_SECT_CUSTOM_MSGS(st), ocm) {
-			msg_to_char(ch, " %s: %s\r\n", sect_custom_types[ocm->type], ocm->msg);
+		if (details) {
+			msg_to_char(ch, "Custom messages:\r\n");
+			LL_FOREACH(GET_SECT_CUSTOM_MSGS(st), ocm) {
+				msg_to_char(ch, " %s: %s\r\n", sect_custom_types[ocm->type], ocm->msg);
+			}
+		}
+		else {
+			LL_COUNT(GET_SECT_CUSTOM_MSGS(st), ocm, count);
+			msg_to_char(ch, "Custom messages: %d\r\n", count);
 		}
 	}
 
