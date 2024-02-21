@@ -2845,6 +2845,12 @@ int process_input(descriptor_data *t) {
 						t->last_input[sizeof(t->last_input)-1] = '\0';
 						SEND_TO_Q(input, t);
 						SEND_TO_Q("\r\n", t);
+						
+						// and update history pos
+						if ((t->history_pos = cnt + 1) >= HISTORY_SIZE) {
+							// Wrap to top
+							t->history_pos = 0;
+						}
 						break;
 					}
 					if (cnt == 0) {	/* At top, loop to bottom. */
