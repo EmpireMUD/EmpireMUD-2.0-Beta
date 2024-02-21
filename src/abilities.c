@@ -11144,10 +11144,16 @@ void do_stat_ability(char_data *ch, ability_data *abil, bool details) {
 	
 	// custom messages
 	if (ABIL_CUSTOM_MSGS(abil)) {
-		size += snprintf(buf + size, sizeof(buf) - size, "Custom messages:\r\n");
+		if (details) {
+			size += snprintf(buf + size, sizeof(buf) - size, "Custom messages:\r\n");
 		
-		LL_FOREACH(ABIL_CUSTOM_MSGS(abil), custm) {
-			size += snprintf(buf + size, sizeof(buf) - size, " %s: %s\r\n", ability_custom_types[custm->type], custm->msg);
+			LL_FOREACH(ABIL_CUSTOM_MSGS(abil), custm) {
+				size += snprintf(buf + size, sizeof(buf) - size, " %s: %s\r\n", ability_custom_types[custm->type], custm->msg);
+			}
+		}
+		else {
+			LL_COUNT(ABIL_CUSTOM_MSGS(abil), custm, count);
+			size += snprintf(buf + size, sizeof(buf) - size, "Custom messages: %d\r\n", count);
 		}
 	}
 	
