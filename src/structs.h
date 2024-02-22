@@ -3477,6 +3477,14 @@ struct offer_data {
 };
 
 
+// for building page displays without overrunning the buffer
+struct page_display {
+	char *text;	// the line of text (without crlf, which is added automatically)
+	int length;	// length of the text
+	struct page_display *prev, *next;	// linked list
+};
+
+
 // simple structure for passing around a hash of number pairs { id, value }
 struct pair_hash {
 	int id;

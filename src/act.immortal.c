@@ -3063,49 +3063,6 @@ int perform_set(char_data *ch, char_data *vict, int mode, char *val_arg) {
  //////////////////////////////////////////////////////////////////////////////
 //// STAT / VSTAT ////////////////////////////////////////////////////////////
 
-
-/**
-* Shows summarized spawn info for any spawn_info list to the character, only
-* if there is something to show. No output is shown if there are no spawns.
-*
-* @param char_data *ch The person to show it to.
-* @param struct spawn_info *list Any list of spawn_info.
-*/
-void show_spawn_summary_to_char(char_data *ch, struct spawn_info *list) {
-	char output[MAX_STRING_LENGTH], line[MAX_STRING_LENGTH], entry[MAX_INPUT_LENGTH];
-	char flg[MAX_INPUT_LENGTH];
-	struct spawn_info *spawn;
-	
-	// spawns?
-	*output = '\0';
-	*line = '\0';
-	for (spawn = list; spawn; spawn = spawn->next) {
-		if (spawn->flags) {
-			sprintbit(spawn->flags, spawn_flags_short, flg, TRUE);
-			flg[strlen(flg) - 1] = '\0';	// removes the trailing space
-			sprintf(entry, " %s (%d) %.2f%% %s", skip_filler(get_mob_name_by_proto(spawn->vnum, FALSE)), spawn->vnum, spawn->percent, flg);
-		}
-		else {
-			// no flags
-			sprintf(entry, " %s (%d) %.2f%%", skip_filler(get_mob_name_by_proto(spawn->vnum, FALSE)), spawn->vnum, spawn->percent);
-		}
-		
-		if (*line || *output) {
-			strcat(line, ",");
-		}
-		if (strlen(line) + strlen(entry) > 78) {
-			strcat(line, "\r\n");
-			strcat(output, line);
-			*line = '\0';
-		}
-		strcat(line, entry);
-	}
-	if (*output || *line) {
-		msg_to_char(ch, "Spawn info:\r\n%s%s%s", output, line, (*line ? "\r\n" : ""));
-	}
-}
-
-
 /**
 * Shows summarized spawn info for any spawn_info list to the character, only
 * if there is something to show. No output is shown if there are no spawns.
@@ -3658,7 +3615,7 @@ void do_stat_character(char_data *ch, char_data *k, bool details) {
 
 	/* check mobiles for a script */
 	if (IS_NPC(k)) {
-		do_sstat_character(ch, k);
+		do_sstat_character(&display, k);
 		if (SCRIPT_MEM(k)) {
 			mem = SCRIPT_MEM(k);
 			add_page_display_str(&display, "Script memory:\r\n  Remember             Command");
@@ -3690,61 +3647,61 @@ void do_stat_craft(char_data *ch, craft_data *craft) {
 	ability_data *abil;
 	bld_data *bld;
 	int seconds;
+	struct page_display *display = NULL, *pd;
 	
-	msg_to_char(ch, "Name: '&y%s&0', Vnum: [&g%d&0], Type: &c%s&0\r\n", GET_CRAFT_NAME(craft), GET_CRAFT_VNUM(craft), craft_types[GET_CRAFT_TYPE(craft)]);
+	add_page_display(&display, "Name: '&y%s&0', Vnum: [&g%d&0], Type: &c%s&0", GET_CRAFT_NAME(craft), GET_CRAFT_VNUM(craft), craft_types[GET_CRAFT_TYPE(craft)]);
 	
 	if (CRAFT_IS_BUILDING(craft)) {
 		bld = building_proto(GET_CRAFT_BUILD_TYPE(craft));
-		msg_to_char(ch, "Builds: [&c%d&0] %s\r\n", GET_CRAFT_BUILD_TYPE(craft), bld ? GET_BLD_NAME(bld) : "UNKNOWN");
+		add_page_display(&display, "Builds: [&c%d&0] %s", GET_CRAFT_BUILD_TYPE(craft), bld ? GET_BLD_NAME(bld) : "UNKNOWN");
 	}
 	else if (CRAFT_IS_VEHICLE(craft)) {
-		msg_to_char(ch, "Creates Vehicle: [&c%d&0] %s\r\n", GET_CRAFT_OBJECT(craft), (GET_CRAFT_OBJECT(craft) == NOTHING ? "NOTHING" : get_vehicle_name_by_proto(GET_CRAFT_OBJECT(craft))));
+		add_page_display(&display, "Creates Vehicle: [&c%d&0] %s", GET_CRAFT_OBJECT(craft), (GET_CRAFT_OBJECT(craft) == NOTHING ? "NOTHING" : get_vehicle_name_by_proto(GET_CRAFT_OBJECT(craft))));
 	}
 	else if (CRAFT_FLAGGED(craft, CRAFT_SOUP)) {
-		msg_to_char(ch, "Creates Volume: [&g%d drink%s&0], Liquid: [&g%d&0] %s\r\n", GET_CRAFT_QUANTITY(craft), PLURAL(GET_CRAFT_QUANTITY(craft)), GET_CRAFT_OBJECT(craft), get_generic_string_by_vnum(GET_CRAFT_OBJECT(craft), GENERIC_LIQUID, GSTR_LIQUID_NAME));
+		add_page_display(&display, "Creates Volume: [&g%d drink%s&0], Liquid: [&g%d&0] %s", GET_CRAFT_QUANTITY(craft), PLURAL(GET_CRAFT_QUANTITY(craft)), GET_CRAFT_OBJECT(craft), get_generic_string_by_vnum(GET_CRAFT_OBJECT(craft), GENERIC_LIQUID, GSTR_LIQUID_NAME));
 	}
 	else {
-		msg_to_char(ch, "Creates Quantity: [&g%d&0], Item: [&c%d&0] %s\r\n", GET_CRAFT_QUANTITY(craft), GET_CRAFT_OBJECT(craft), get_obj_name_by_proto(GET_CRAFT_OBJECT(craft)));
+		add_page_display(&display, "Creates Quantity: [&g%d&0], Item: [&c%d&0] %s", GET_CRAFT_QUANTITY(craft), GET_CRAFT_OBJECT(craft), get_obj_name_by_proto(GET_CRAFT_OBJECT(craft)));
 	}
 	
 	sprintf(buf, "[%d] %s", GET_CRAFT_ABILITY(craft), (GET_CRAFT_ABILITY(craft) == NO_ABIL ? "none" : get_ability_name_by_vnum(GET_CRAFT_ABILITY(craft))));
 	if ((abil = find_ability_by_vnum(GET_CRAFT_ABILITY(craft))) && ABIL_ASSIGNED_SKILL(abil) != NULL) {
 		sprintf(buf + strlen(buf), " ([%d] %s %d)", SKILL_VNUM(ABIL_ASSIGNED_SKILL(abil)), SKILL_NAME(ABIL_ASSIGNED_SKILL(abil)), ABIL_SKILL_LEVEL(abil));
 	}
-	msg_to_char(ch, "Ability: &y%s&0, Level: &g%d&0", buf, GET_CRAFT_MIN_LEVEL(craft));
+	pd = add_page_display(&display, "Ability: &y%s&0, Level: &g%d&0", buf, GET_CRAFT_MIN_LEVEL(craft));
 	
 	if (!CRAFT_IS_BUILDING(craft) && !CRAFT_IS_VEHICLE(craft)) {
 		seconds = GET_CRAFT_TIME(craft) * ACTION_CYCLE_TIME;
-		msg_to_char(ch, ", Time: [&g%d action tick%s&0 | &g%s&0]\r\n", GET_CRAFT_TIME(craft), PLURAL(GET_CRAFT_TIME(craft)), colon_time(seconds, FALSE, NULL));
-	}
-	else {
-		msg_to_char(ch, "\r\n");
+		append_page_display_line(pd, ", Time: [&g%d action tick%s&0 | &g%s&0]", GET_CRAFT_TIME(craft), PLURAL(GET_CRAFT_TIME(craft)), colon_time(seconds, FALSE, NULL));
 	}
 
 	sprintbit(GET_CRAFT_FLAGS(craft), craft_flags, buf, TRUE);
-	msg_to_char(ch, "Flags: &c%s&0\r\n", buf);
+	add_page_display(&display, "Flags: &c%s&0", buf);
 	
 	prettier_sprintbit(GET_CRAFT_REQUIRES_TOOL(craft), tool_flags, buf);
-	msg_to_char(ch, "Requires tool: &y%s&0\r\n", buf);
+	add_page_display(&display, "Requires tool: &y%s&0", buf);
 	
 	sprintbit(GET_CRAFT_REQUIRES_FUNCTION(craft), function_flags, buf, TRUE);
-	msg_to_char(ch, "Requires Functions: \tg%s\t0\r\n", buf);
+	add_page_display(&display, "Requires Functions: \tg%s\t0", buf);
 	
 	if (CRAFT_IS_BUILDING(craft) || CRAFT_IS_VEHICLE(craft)) {
 		ordered_sprintbit(GET_CRAFT_BUILD_ON(craft), bld_on_flags, bld_on_flags_order, TRUE, buf);
-		msg_to_char(ch, "Build on: &g%s&0\r\n", buf);
+		add_page_display(&display, "Build on: &g%s&0", buf);
 		ordered_sprintbit(GET_CRAFT_BUILD_FACING(craft), bld_on_flags, bld_on_flags_order, TRUE, buf);
-		msg_to_char(ch, "Build facing: &c%s&0\r\n", buf);
+		add_page_display(&display, "Build facing: &c%s&0", buf);
 	}
 	
 	if (GET_CRAFT_REQUIRES_OBJ(craft) != NOTHING) {
-		msg_to_char(ch, "Requires item: [%d] &g%s&0\r\n", GET_CRAFT_REQUIRES_OBJ(craft), skip_filler(get_obj_name_by_proto(GET_CRAFT_REQUIRES_OBJ(craft))));
+		add_page_display(&display, "Requires item: [%d] &g%s&0", GET_CRAFT_REQUIRES_OBJ(craft), skip_filler(get_obj_name_by_proto(GET_CRAFT_REQUIRES_OBJ(craft))));
 	}
 
 	// resources
-	msg_to_char(ch, "Resources required:\r\n");
 	get_resource_display(ch, GET_CRAFT_RESOURCES(craft), buf);
-	send_to_char(buf, ch);
+	add_page_display(&display, "Resources required:\r\n%s", buf);
+	
+	page_display_to_char(ch, display);
+	free_page_display(&display);
 }
 
 
@@ -3758,31 +3715,31 @@ void do_stat_craft(char_data *ch, craft_data *craft) {
 void do_stat_crop(char_data *ch, crop_data *cp, bool details) {
 	int count;
 	struct custom_message *ocm;
+	struct page_display *display = NULL;
 	
-	msg_to_char(ch, "Crop VNum: [&c%d&0], Name: '&c%s&0'\r\n", GET_CROP_VNUM(cp), GET_CROP_NAME(cp));
-	msg_to_char(ch, "Room Title: %s, Mapout Color: %s\r\n", GET_CROP_TITLE(cp), mapout_color_names[GET_CROP_MAPOUT(cp)]);
+	add_page_display(&display, "Crop VNum: [&c%d&0], Name: '&c%s&0'", GET_CROP_VNUM(cp), GET_CROP_NAME(cp));
+	add_page_display(&display, "Room Title: %s, Mapout Color: %s", GET_CROP_TITLE(cp), mapout_color_names[GET_CROP_MAPOUT(cp)]);
 	
 	ordered_sprintbit(GET_CROP_CLIMATE(cp), climate_flags, climate_flags_order, (CROP_FLAGGED(cp, CROPF_ANY_LISTED_CLIMATE) ? TRUE : FALSE), buf);
-	msg_to_char(ch, "Climate: &c%s&0\r\n", GET_CROP_CLIMATE(cp) ? buf : "(none)");
+	add_page_display(&display, "Climate: &c%s&0", GET_CROP_CLIMATE(cp) ? buf : "(none)");
 	
 	sprintbit(GET_CROP_FLAGS(cp), crop_flags, buf, TRUE);
-	msg_to_char(ch, "Crop flags: &g%s&0\r\n", buf);
+	add_page_display(&display, "Crop flags: &g%s&0", buf);
 	
 	if (GET_CROP_ICONS(cp)) {
-		msg_to_char(ch, "Icons:\r\n");
 		get_icons_display(GET_CROP_ICONS(cp), buf1);
-		send_to_char(buf1, ch);
+		add_page_display(&display, "Icons:\r\n%s", buf1);
 	}
 	
-	msg_to_char(ch, "Location: X-Min: [&g%d&0], X-Max: [&g%d&0], Y-Min: [&g%d&0], Y-Max: [&g%d&0]\r\n", GET_CROP_X_MIN(cp), GET_CROP_X_MAX(cp), GET_CROP_Y_MIN(cp), GET_CROP_Y_MAX(cp));
+	add_page_display(&display, "Location: X-Min: [&g%d&0], X-Max: [&g%d&0], Y-Min: [&g%d&0], Y-Max: [&g%d&0]", GET_CROP_X_MIN(cp), GET_CROP_X_MAX(cp), GET_CROP_Y_MIN(cp), GET_CROP_Y_MAX(cp));
 	
 	if (GET_CROP_EX_DESCS(cp)) {
 		struct extra_descr_data *desc;
 		
 		if (details) {
-			msg_to_char(ch, "Extra descs:\r\n");
+			add_page_display(&display, "Extra descs:");
 			LL_FOREACH(GET_CROP_EX_DESCS(cp), desc) {
-				msg_to_char(ch, "[ &c%s&0 ]\r\n%s", desc->keyword, desc->description);
+				add_page_display(&display, "[ &c%s&0 ]\r\n%s", desc->keyword, desc->description);
 			}
 		}
 		else {
@@ -3791,30 +3748,32 @@ void do_stat_crop(char_data *ch, crop_data *cp, bool details) {
 				strcat(buf, " ");
 				strcat(buf, desc->keyword);
 			}
-			msg_to_char(ch, "%s&0\r\n", buf);
+			add_page_display(&display, "%s&0", buf);
 		}
 	}
 	
 	if (GET_CROP_CUSTOM_MSGS(cp)) {
 		if (details) {
-			msg_to_char(ch, "Custom messages:\r\n");
+			add_page_display(&display, "Custom messages:");
 			LL_FOREACH(GET_CROP_CUSTOM_MSGS(cp), ocm) {
-				msg_to_char(ch, " %s: %s\r\n", crop_custom_types[ocm->type], ocm->msg);
+				add_page_display(&display, " %s: %s", crop_custom_types[ocm->type], ocm->msg);
 			}
 		}
 		else {
 			LL_COUNT(GET_CROP_CUSTOM_MSGS(cp), ocm, count);
-			msg_to_char(ch, "Custom messages: %d\r\n", count);
+			add_page_display(&display, "Custom messages: %d", count);
 		}
 	}
 	
 	if (GET_CROP_INTERACTIONS(cp)) {
-		send_to_char("Interactions:\r\n", ch);
 		get_interaction_display(GET_CROP_INTERACTIONS(cp), buf);
-		send_to_char(buf, ch);
+		add_page_display(&display, "Interactions:\r\n%s", buf);
 	}
 	
-	show_spawn_summary_to_char(ch, GET_CROP_SPAWNS(cp));
+	show_spawn_summary_display(&display, GET_CROP_SPAWNS(cp));
+	
+	page_display_to_char(ch, display);
+	free_page_display(&display);
 }
 
 
@@ -3830,6 +3789,7 @@ void do_stat_empire(char_data *ch, empire_data *emp) {
 	player_index_data *index;
 	char line[256];
 	bool any;
+	struct page_display *display = NULL, *pd;
 	
 	// determine rank by iterating over the sorted empire list
 	found_rank = 0;
@@ -3840,62 +3800,64 @@ void do_stat_empire(char_data *ch, empire_data *emp) {
 		}
 	}
 	
-	msg_to_char(ch, "%s%s\t0, Adjective: [%s%s\t0], VNum: [\tc%5d\t0]\r\n", EMPIRE_BANNER(emp), EMPIRE_NAME(emp), EMPIRE_BANNER(emp), EMPIRE_ADJECTIVE(emp), EMPIRE_VNUM(emp));
-	msg_to_char(ch, "Leader: [\ty%s\t0], Created: [\ty%-24.24s\t0], Score/rank: [\tc%d #%d\t0]\r\n", (index = find_player_index_by_idnum(EMPIRE_LEADER(emp))) ? index->fullname : "UNKNOWN", ctime(&EMPIRE_CREATE_TIME(emp)), get_total_score(emp), found_rank);
+	add_page_display(&display, "%s%s\t0, Adjective: [%s%s\t0], VNum: [\tc%5d\t0]", EMPIRE_BANNER(emp), EMPIRE_NAME(emp), EMPIRE_BANNER(emp), EMPIRE_ADJECTIVE(emp), EMPIRE_VNUM(emp));
+	add_page_display(&display, "Leader: [\ty%s\t0], Created: [\ty%-24.24s\t0], Score/rank: [\tc%d #%d\t0]", (index = find_player_index_by_idnum(EMPIRE_LEADER(emp))) ? index->fullname : "UNKNOWN", ctime(&EMPIRE_CREATE_TIME(emp)), get_total_score(emp), found_rank);
 	
 	ptime = summarize_weekly_playtime(emp);
-	msg_to_char(ch, "Last %d weeks playtime: ", PLAYTIME_WEEKS_TO_TRACK);
+	pd = add_page_display(&display, "Last %d weeks playtime: ", PLAYTIME_WEEKS_TO_TRACK);
 	for (iter = 0; iter < PLAYTIME_WEEKS_TO_TRACK; ++iter) {
-		msg_to_char(ch, "%s%s%s", (iter > 0 ? ", " : ""), simple_time_since(time(0) - ptime[iter]), (iter == (PLAYTIME_WEEKS_TO_TRACK-1) ? "\r\n" : ""));
+		append_page_display_line(pd, "%s%s", (iter > 0 ? ", " : ""), simple_time_since(time(0) - ptime[iter]));
 	}
 	
 	if (EMPIRE_NEXT_TIMEOUT(emp) > time(0)) {
-		msg_to_char(ch, "Next timeout check: [%s %s]\r\n", colon_time(EMPIRE_NEXT_TIMEOUT(emp) - time(0), FALSE, NULL), (EMPIRE_NEXT_TIMEOUT(emp) >= time(0) ? "from now" : "ago"));
+		add_page_display(&display, "Next timeout check: [%s %s]", colon_time(EMPIRE_NEXT_TIMEOUT(emp) - time(0), FALSE, NULL), (EMPIRE_NEXT_TIMEOUT(emp) >= time(0) ? "from now" : "ago"));
 	}
 	else {
-		msg_to_char(ch, "Next timeout check: [%ld / not scheduled]\r\n", EMPIRE_NEXT_TIMEOUT(emp));
+		add_page_display(&display, "Next timeout check: [%ld / not scheduled]", EMPIRE_NEXT_TIMEOUT(emp));
 	}
 	
 	sprintbit(EMPIRE_ADMIN_FLAGS(emp), empire_admin_flags, line, TRUE);
-	msg_to_char(ch, "Admin flags: \tg%s\t0\r\n", line);
+	add_page_display(&display, "Admin flags: \tg%s\t0", line);
 	
 	sprintbit(EMPIRE_FRONTIER_TRAITS(emp), empire_trait_types, line, TRUE);
-	msg_to_char(ch, "Frontier traits: \tc%s\t0\r\n", line);
+	add_page_display(&display, "Frontier traits: \tc%s\t0", line);
 
-	msg_to_char(ch, "Technology: \tg");
+	pd = add_page_display(&display, "Technology: \tg");
 	for (iter = 0, len = 0, any = FALSE; iter < NUM_TECHS; ++iter) {
 		if (EMPIRE_HAS_TECH(emp, iter)) {
 			any = TRUE;
 			if (len > 0 && len + strlen(empire_tech_types[iter]) + 3 >= 80) {	// new line
-				msg_to_char(ch, ",\r\n%s", empire_tech_types[iter]);
+				append_page_display_line(pd, ",\r\n%s", empire_tech_types[iter]);
 				len = strlen(empire_tech_types[iter]);
 			}
 			else {	// same line
-				msg_to_char(ch, "%s%s", (len > 0) ? ", " : "", empire_tech_types[iter]);
+				append_page_display_line(pd, "%s%s", (len > 0) ? ", " : "", empire_tech_types[iter]);
 				len += strlen(empire_tech_types[iter]) + 2;
 			}
 		}
 	}
 	if (!any) {
-		msg_to_char(ch, "none");
+		append_page_display_line(pd, "none");
 	}
-	msg_to_char(ch, "\t0\r\n");	// end tech
+	append_page_display_line(pd, "\t0");	// end tech
 	
-	msg_to_char(ch, "Members: [\tc%d\t0/\tc%d\t0], Citizens: [\tc%d\t0], Military: [\tc%d\t0]\r\n", EMPIRE_MEMBERS(emp), EMPIRE_TOTAL_MEMBER_COUNT(emp), EMPIRE_POPULATION(emp), EMPIRE_MILITARY(emp));
-	msg_to_char(ch, "Territory: [\tc%d\t0/\tc%d\t0], In-City: [\tc%d\t0], Outskirts: [\tc%d\t0/\tc%d\t0], Frontier: [\tc%d\t0/\tc%d\t0]\r\n", EMPIRE_TERRITORY(emp, TER_TOTAL), land_can_claim(emp, TER_TOTAL), EMPIRE_TERRITORY(emp, TER_CITY), EMPIRE_TERRITORY(emp, TER_OUTSKIRTS), land_can_claim(emp, TER_OUTSKIRTS), EMPIRE_TERRITORY(emp, TER_FRONTIER), land_can_claim(emp, TER_FRONTIER));
+	add_page_display(&display, "Members: [\tc%d\t0/\tc%d\t0], Citizens: [\tc%d\t0], Military: [\tc%d\t0]", EMPIRE_MEMBERS(emp), EMPIRE_TOTAL_MEMBER_COUNT(emp), EMPIRE_POPULATION(emp), EMPIRE_MILITARY(emp));
+	add_page_display(&display, "Territory: [\tc%d\t0/\tc%d\t0], In-City: [\tc%d\t0], Outskirts: [\tc%d\t0/\tc%d\t0], Frontier: [\tc%d\t0/\tc%d\t0]", EMPIRE_TERRITORY(emp, TER_TOTAL), land_can_claim(emp, TER_TOTAL), EMPIRE_TERRITORY(emp, TER_CITY), EMPIRE_TERRITORY(emp, TER_OUTSKIRTS), land_can_claim(emp, TER_OUTSKIRTS), EMPIRE_TERRITORY(emp, TER_FRONTIER), land_can_claim(emp, TER_FRONTIER));
 
-	msg_to_char(ch, "Wealth: [\ty%d\t0], Treasure: [\ty%d\t0], Coins: [\ty%.1f\t0]\r\n", (int) GET_TOTAL_WEALTH(emp), EMPIRE_WEALTH(emp), EMPIRE_COINS(emp));
-	msg_to_char(ch, "Greatness: [\tc%d\t0], Fame: [\tc%d\t0]\r\n", EMPIRE_GREATNESS(emp), EMPIRE_FAME(emp));
+	add_page_display(&display, "Wealth: [\ty%d\t0], Treasure: [\ty%d\t0], Coins: [\ty%.1f\t0]", (int) GET_TOTAL_WEALTH(emp), EMPIRE_WEALTH(emp), EMPIRE_COINS(emp));
+	add_page_display(&display, "Greatness: [\tc%d\t0], Fame: [\tc%d\t0]", EMPIRE_GREATNESS(emp), EMPIRE_FAME(emp));
 	
 	// progress points by category
 	total = 0;
+	pd = add_page_display_str(&display, "");
 	for (iter = 1; iter < NUM_PROGRESS_TYPES; ++iter) {
 		total += EMPIRE_PROGRESS_POINTS(emp, iter);
-		msg_to_char(ch, "%s: [\ty%d\t0], ", progress_types[iter], EMPIRE_PROGRESS_POINTS(emp, iter));
+		append_page_display_line(pd, "%s: [\ty%d\t0], ", progress_types[iter], EMPIRE_PROGRESS_POINTS(emp, iter));
 	}
-	msg_to_char(ch, "Total: [\ty%d\t0]\r\n", total);
+	append_page_display_line(pd, "Total: [\ty%d\t0]", total);
 	
 	// attributes
+	pd = add_page_display_str(&display, "");
 	for (iter = 0, len = 0; iter < NUM_EMPIRE_ATTRIBUTES; ++iter) {
 		switch (iter) {
 			case EATT_TERRITORY_PER_GREATNESS: {
@@ -3909,25 +3871,25 @@ void do_stat_empire(char_data *ch, empire_data *emp) {
 		}
 		
 		if (len > 0 && len + strlen(line) + 2 >= 80) {	// start new line
-			msg_to_char(ch, "\r\n%s", line);
+			append_page_display_line(pd, "\r\n%s", line);
 			len = strlen(line);
 		}
 		else {	// same line
-			msg_to_char(ch, "%s%s", (len > 0) ? ", " : "", line);
+			append_page_display_line(pd, "%s%s", (len > 0) ? ", " : "", line);
 			len += strlen(line) + 2;
 		}
 	}
-	if (len > 0) {
-		msg_to_char(ch, "\r\n");
-	}
 	
-	msg_to_char(ch, "Script information:\r\n");
+	add_page_display_str(&display, "Script information:");
 	if (SCRIPT(emp)) {
-		script_stat(ch, SCRIPT(emp));
+		script_stat(&display, SCRIPT(emp));
 	}
 	else {
-		msg_to_char(ch, "  None.\r\n");
+		add_page_display_str(&display, "  None.");
 	}
+	
+	page_display_to_char(ch, display);
+	free_page_display(&display);
 }
 
 
@@ -3940,59 +3902,62 @@ void do_stat_empire(char_data *ch, empire_data *emp) {
 void do_stat_global(char_data *ch, struct global_data *glb) {
 	char buf[MAX_STRING_LENGTH], buf2[MAX_STRING_LENGTH];
 	ability_data *abil;
+	struct page_display *display = NULL;
 	
-	msg_to_char(ch, "Global VNum: [&c%d&0], Type: [&c%s&0], Name: '&c%s&0'\r\n", GET_GLOBAL_VNUM(glb), global_types[GET_GLOBAL_TYPE(glb)], GET_GLOBAL_NAME(glb));
+	add_page_display(&display, "Global VNum: [&c%d&0], Type: [&c%s&0], Name: '&c%s&0'", GET_GLOBAL_VNUM(glb), global_types[GET_GLOBAL_TYPE(glb)], GET_GLOBAL_NAME(glb));
 
 	sprintf(buf, "%s", (GET_GLOBAL_ABILITY(glb) == NO_ABIL ? "none" : get_ability_name_by_vnum(GET_GLOBAL_ABILITY(glb))));
 	if ((abil = find_ability_by_vnum(GET_GLOBAL_ABILITY(glb))) && ABIL_ASSIGNED_SKILL(abil) != NULL) {
 		sprintf(buf + strlen(buf), " (%s %d)", SKILL_ABBREV(ABIL_ASSIGNED_SKILL(abil)), ABIL_SKILL_LEVEL(abil));
 	}
-	msg_to_char(ch, "Requires ability: [&y%s&0], Percent: [&g%.2f&0]\r\n", buf, GET_GLOBAL_PERCENT(glb));
+	add_page_display(&display, "Requires ability: [&y%s&0], Percent: [&g%.2f&0]", buf, GET_GLOBAL_PERCENT(glb));
 	
 	sprintbit(GET_GLOBAL_FLAGS(glb), global_flags, buf, TRUE);
-	msg_to_char(ch, "Flags: &g%s&0\r\n", buf);
+	add_page_display(&display, "Flags: &g%s&0", buf);
 	
 	// GLOBAL_x
 	switch (GET_GLOBAL_TYPE(glb)) {
 		case GLOBAL_MOB_INTERACTIONS: {
 			sprintbit(GET_GLOBAL_TYPE_FLAGS(glb), action_bits, buf, TRUE);
 			sprintbit(GET_GLOBAL_TYPE_EXCLUDE(glb), action_bits, buf2, TRUE);
-			msg_to_char(ch, "Levels: [&g%s&0], Mob Flags: &c%s&0, Exclude: &c%s&0\r\n", level_range_string(GET_GLOBAL_MIN_LEVEL(glb), GET_GLOBAL_MAX_LEVEL(glb), 0), buf, buf2);
+			add_page_display(&display, "Levels: [&g%s&0], Mob Flags: &c%s&0, Exclude: &c%s&0", level_range_string(GET_GLOBAL_MIN_LEVEL(glb), GET_GLOBAL_MAX_LEVEL(glb), 0), buf, buf2);
 			break;
 		}
 		case GLOBAL_OBJ_INTERACTIONS: {
 			sprintbit(GET_GLOBAL_TYPE_FLAGS(glb), extra_bits, buf, TRUE);
 			sprintbit(GET_GLOBAL_TYPE_EXCLUDE(glb), extra_bits, buf2, TRUE);
-			msg_to_char(ch, "Levels: [&g%s&0], Obj Flags: &c%s&0, Exclude: &c%s&0\r\n", level_range_string(GET_GLOBAL_MIN_LEVEL(glb), GET_GLOBAL_MAX_LEVEL(glb), 0), buf, buf2);
+			add_page_display(&display, "Levels: [&g%s&0], Obj Flags: &c%s&0, Exclude: &c%s&0", level_range_string(GET_GLOBAL_MIN_LEVEL(glb), GET_GLOBAL_MAX_LEVEL(glb), 0), buf, buf2);
 			break;
 		}
 		case GLOBAL_MINE_DATA: {
 			sprintbit(GET_GLOBAL_TYPE_FLAGS(glb), sector_flags, buf, TRUE);
 			sprintbit(GET_GLOBAL_TYPE_EXCLUDE(glb), sector_flags, buf2, TRUE);
-			msg_to_char(ch, "Capacity: [&g%d-%d normal, %d-%d deep&0], Sector Flags: &c%s&0, Exclude: &c%s&0\r\n", GET_GLOBAL_VAL(glb, GLB_VAL_MAX_MINE_SIZE)/2, GET_GLOBAL_VAL(glb, GLB_VAL_MAX_MINE_SIZE), (int)(GET_GLOBAL_VAL(glb, GLB_VAL_MAX_MINE_SIZE) / 2.0 * 1.5), (int)(GET_GLOBAL_VAL(glb, GLB_VAL_MAX_MINE_SIZE) * 1.5), buf, buf2);
+			add_page_display(&display, "Capacity: [&g%d-%d normal, %d-%d deep&0], Sector Flags: &c%s&0, Exclude: &c%s&0", GET_GLOBAL_VAL(glb, GLB_VAL_MAX_MINE_SIZE)/2, GET_GLOBAL_VAL(glb, GLB_VAL_MAX_MINE_SIZE), (int)(GET_GLOBAL_VAL(glb, GLB_VAL_MAX_MINE_SIZE) / 2.0 * 1.5), (int)(GET_GLOBAL_VAL(glb, GLB_VAL_MAX_MINE_SIZE) * 1.5), buf, buf2);
 			break;
 		}
 		case GLOBAL_NEWBIE_GEAR: {
 			get_archetype_gear_display(GET_GLOBAL_GEAR(glb), buf2);
-			msg_to_char(ch, "Gear:\r\n%s", buf2);
+			add_page_display(&display, "Gear:\r\n%s", buf2);
 			break;
 		}
 		case GLOBAL_MAP_SPAWNS: {
 			ordered_sprintbit(GET_GLOBAL_TYPE_FLAGS(glb), climate_flags, climate_flags_order, TRUE, buf);
 			ordered_sprintbit(GET_GLOBAL_TYPE_EXCLUDE(glb), climate_flags, climate_flags_order, TRUE, buf2);
-			msg_to_char(ch, "Climate: &c%s&0 (Exclude: &c%s&0)\r\n", buf, buf2);
+			add_page_display(&display, "Climate: &c%s&0 (Exclude: &c%s&0)", buf, buf2);
 			sprintbit(GET_GLOBAL_SPARE_BITS(glb), spawn_flags, buf, TRUE);
-			msg_to_char(ch, "Spawn flags: &g%s&0\r\n", buf);
-			show_spawn_summary_to_char(ch, GET_GLOBAL_SPAWNS(glb));
+			add_page_display(&display, "Spawn flags: &g%s&0", buf);
+			show_spawn_summary_display(&display, GET_GLOBAL_SPAWNS(glb));
 			break;
 		}
 	}
 	
 	if (GET_GLOBAL_INTERACTIONS(glb)) {
-		send_to_char("Interactions:\r\n", ch);
 		get_interaction_display(GET_GLOBAL_INTERACTIONS(glb), buf);
-		send_to_char(buf, ch);
+		add_page_display(&display, "Interactions:\r\n%s", buf);
 	}
+	
+	page_display_to_char(ch, display);
+	free_page_display(&display);
 }
 
 
@@ -4015,8 +3980,9 @@ void do_stat_object(char_data *ch, obj_data *j, bool details) {
 	player_index_data *index;
 	crop_data *cp;
 	bool any;
+	struct page_display *display = NULL, *pd;
 
-	msg_to_char(ch, "Name: '&y%s&0', Keywords: %s\r\n", GET_OBJ_DESC(j, ch, OBJ_DESC_SHORT), GET_OBJ_KEYWORDS(j));
+	add_page_display(&display, "Name: '&y%s&0', Keywords: %s", GET_OBJ_DESC(j, ch, OBJ_DESC_SHORT), GET_OBJ_KEYWORDS(j));
 
 	if (GET_OBJ_CURRENT_SCALE_LEVEL(j) > 0) {
 		sprintf(buf, " (%d)", GET_OBJ_CURRENT_SCALE_LEVEL(j));
@@ -4028,11 +3994,11 @@ void do_stat_object(char_data *ch, obj_data *j, bool details) {
 		strcpy(buf, " (no scale limit)");
 	}
 	
-	msg_to_char(ch, "Gear rating: [&g%.2f%s&0], VNum: [&g%5d&0], Type: &c%s&0\r\n", rate_item(j), buf, vnum, item_types[(int) GET_OBJ_TYPE(j)]);
-	msg_to_char(ch, "L-Des: %s\r\n", GET_OBJ_DESC(j, ch, OBJ_DESC_LONG));
+	add_page_display(&display, "Gear rating: [&g%.2f%s&0], VNum: [&g%5d&0], Type: &c%s&0", rate_item(j), buf, vnum, item_types[(int) GET_OBJ_TYPE(j)]);
+	add_page_display(&display, "L-Des: %s", GET_OBJ_DESC(j, ch, OBJ_DESC_LONG));
 	
 	if (GET_OBJ_ACTION_DESC(j)) {
-		msg_to_char(ch, "%s", GET_OBJ_ACTION_DESC(j));
+		add_page_display_str(&display, NULLSAFE(GET_OBJ_ACTION_DESC(j)));
 	}
 
 	*buf = 0;
@@ -4040,9 +4006,9 @@ void do_stat_object(char_data *ch, obj_data *j, bool details) {
 		struct extra_descr_data *desc;
 		
 		if (details) {
-			msg_to_char(ch, "Extra descs:\r\n");
+			add_page_display(&display, "Extra descs:");
 			LL_FOREACH(GET_OBJ_EX_DESCS(j), desc) {
-				msg_to_char(ch, "[ &c%s&0 ]\r\n%s", desc->keyword, desc->description);
+				add_page_display(&display, "[ &c%s&0 ]\r\n%s", desc->keyword, desc->description);
 			}
 		}
 		else {
@@ -4051,24 +4017,24 @@ void do_stat_object(char_data *ch, obj_data *j, bool details) {
 				strcat(buf, " ");
 				strcat(buf, desc->keyword);
 			}
-			send_to_char(strcat(buf, "&0\r\n"), ch);
+			add_page_display(&display, "%s&0", buf);
 		}
 	}
 	
 	sprintbit(GET_OBJ_WEAR(j), wear_bits, buf, TRUE);
-	msg_to_char(ch, "Can be worn on: &g%s&0\r\n", buf);
+	add_page_display(&display, "Can be worn on: &g%s&0", buf);
 
 	sprintbit(GET_OBJ_AFF_FLAGS(j), affected_bits, buf, TRUE);
-	msg_to_char(ch, "Set char bits : &y%s&0\r\n", buf);
+	add_page_display(&display, "Set char bits : &y%s&0", buf);
 
 	sprintbit(GET_OBJ_EXTRA(j), extra_bits, buf, TRUE);
-	msg_to_char(ch, "Extra flags   : &g%s&0\r\n", buf);
+	add_page_display(&display, "Extra flags   : &g%s&0", buf);
 	
 	prettier_sprintbit(GET_OBJ_TOOL_FLAGS(j), tool_flags, buf);
-	msg_to_char(ch, "Tool types: &y%s&0\r\n", buf);
+	add_page_display(&display, "Tool types: &y%s&0", buf);
 	
 	prettier_sprintbit(GET_OBJ_REQUIRES_TOOL(j), tool_flags, buf);
-	msg_to_char(ch, "Requires tool to use when crafting: \tg%s\t0\r\n", buf);
+	add_page_display(&display, "Requires tool to use when crafting: \tg%s\t0", buf);
 	
 	if (GET_OBJ_TIMER(j) > 0) {
 		minutes = GET_OBJ_TIMER(j) * SECS_PER_MUD_HOUR / SECS_PER_REAL_MIN;
@@ -4078,10 +4044,10 @@ void do_stat_object(char_data *ch, obj_data *j, bool details) {
 		strcpy(part, "none");
 	}
 	
-	msg_to_char(ch, "Timer: &y%s&0, Material: &y%s&0, Component type: [&y%d&0] &y%s&0\r\n", part, materials[GET_OBJ_MATERIAL(j)].name, GET_OBJ_COMPONENT(j), GET_OBJ_COMPONENT(j) != NOTHING ? get_generic_name_by_vnum(GET_OBJ_COMPONENT(j)) : "none");
+	add_page_display(&display, "Timer: &y%s&0, Material: &y%s&0, Component type: [&y%d&0] &y%s&0", part, materials[GET_OBJ_MATERIAL(j)].name, GET_OBJ_COMPONENT(j), GET_OBJ_COMPONENT(j) != NOTHING ? get_generic_name_by_vnum(GET_OBJ_COMPONENT(j)) : "none");
 	
 	if (GET_OBJ_REQUIRES_QUEST(j) != NOTHING) {
-		msg_to_char(ch, "Requires quest: [%d] &c%s&0\r\n", GET_OBJ_REQUIRES_QUEST(j), get_quest_name_by_proto(GET_OBJ_REQUIRES_QUEST(j)));
+		add_page_display(&display, "Requires quest: [%d] &c%s&0", GET_OBJ_REQUIRES_QUEST(j), get_quest_name_by_proto(GET_OBJ_REQUIRES_QUEST(j)));
 	}
 	
 	strcpy(buf, "In room: ");
@@ -4105,147 +4071,146 @@ void do_stat_object(char_data *ch, obj_data *j, bool details) {
 	strcat(buf, ", Worn by: ");
 	strcat(buf, j->worn_by ? GET_NAME(j->worn_by) : "Nobody");
 	strcat(buf, "\r\n");
-	send_to_char(buf, ch);
+	add_page_display_str(&display, buf);
 	
 	// binding section
 	if (OBJ_BOUND_TO(j)) {
 		struct obj_binding *bind;
 		
-		msg_to_char(ch, "Bound to:");
+		pd = add_page_display(&display, "Bound to:");
 		any = FALSE;
 		for (bind = OBJ_BOUND_TO(j); bind; bind = bind->next) {
-			msg_to_char(ch, "%s %s", (any ? "," : ""), (index = find_player_index_by_idnum(bind->idnum)) ? index->fullname : "<unknown>");
+			append_page_display_line(pd, "%s %s", (any ? "," : ""), (index = find_player_index_by_idnum(bind->idnum)) ? index->fullname : "<unknown>");
 			any = TRUE;
 		}
-		msg_to_char(ch, "\r\n");
 	}
 	
 	// ITEM_X: stat obj
 	switch (GET_OBJ_TYPE(j)) {
 		case ITEM_BOOK: {
 			book_data *book = book_proto(GET_BOOK_ID(j));
-			msg_to_char(ch, "Book: %d - %s\r\n", GET_BOOK_ID(j), (book ? BOOK_TITLE(book) : "unknown"));
+			add_page_display(&display, "Book: %d - %s", GET_BOOK_ID(j), (book ? BOOK_TITLE(book) : "unknown"));
 			break;
 		}
 		case ITEM_POISON: {
-			msg_to_char(ch, "Poison affect type: [%d] %s\r\n", GET_POISON_AFFECT(j), GET_POISON_AFFECT(j) != NOTHING ? get_generic_name_by_vnum(GET_POISON_AFFECT(j)) : "not custom");
-			msg_to_char(ch, "Charges remaining: %d\r\n", GET_POISON_CHARGES(j));
+			add_page_display(&display, "Poison affect type: [%d] %s", GET_POISON_AFFECT(j), GET_POISON_AFFECT(j) != NOTHING ? get_generic_name_by_vnum(GET_POISON_AFFECT(j)) : "not custom");
+			add_page_display(&display, "Charges remaining: %d", GET_POISON_CHARGES(j));
 			break;
 		}
 		case ITEM_RECIPE: {
 			craft_data *cft = craft_proto(GET_RECIPE_VNUM(j));
-			msg_to_char(ch, "Teaches craft: %d %s (%s)\r\n", GET_RECIPE_VNUM(j), cft ? GET_CRAFT_NAME(cft) : "UNKNOWN", cft ? craft_types[GET_CRAFT_TYPE(cft)] : "?");
+			add_page_display(&display, "Teaches craft: %d %s (%s)", GET_RECIPE_VNUM(j), cft ? GET_CRAFT_NAME(cft) : "UNKNOWN", cft ? craft_types[GET_CRAFT_TYPE(cft)] : "?");
 			break;
 		}
 		case ITEM_WEAPON:
-			msg_to_char(ch, "Speed: %.2f, Damage: %d (%s+%.2f base dps)\r\n", get_weapon_speed(j), GET_WEAPON_DAMAGE_BONUS(j), (IS_MAGIC_ATTACK(GET_WEAPON_TYPE(j)) ? "Intelligence" : "Strength"), get_base_dps(j));
-			msg_to_char(ch, "Damage type: %d %s (%s/%s)\r\n", GET_WEAPON_TYPE(j), get_attack_name_by_vnum(GET_WEAPON_TYPE(j)), weapon_types[get_attack_weapon_type_by_vnum(GET_WEAPON_TYPE(j))], damage_types[get_attack_damage_type_by_vnum(GET_WEAPON_TYPE(j))]);
+			add_page_display(&display, "Speed: %.2f, Damage: %d (%s+%.2f base dps)", get_weapon_speed(j), GET_WEAPON_DAMAGE_BONUS(j), (IS_MAGIC_ATTACK(GET_WEAPON_TYPE(j)) ? "Intelligence" : "Strength"), get_base_dps(j));
+			add_page_display(&display, "Damage type: %d %s (%s/%s)", GET_WEAPON_TYPE(j), get_attack_name_by_vnum(GET_WEAPON_TYPE(j)), weapon_types[get_attack_weapon_type_by_vnum(GET_WEAPON_TYPE(j))], damage_types[get_attack_damage_type_by_vnum(GET_WEAPON_TYPE(j))]);
 			break;
 		case ITEM_ARMOR:
-			msg_to_char(ch, "Armor type: %s\r\n", armor_types[GET_ARMOR_TYPE(j)]);
+			add_page_display(&display, "Armor type: %s", armor_types[GET_ARMOR_TYPE(j)]);
 			break;
 		case ITEM_CONTAINER:
-			msg_to_char(ch, "Holds: %d items\r\n", GET_MAX_CONTAINER_CONTENTS(j));
+			add_page_display(&display, "Holds: %d items", GET_MAX_CONTAINER_CONTENTS(j));
 
 			sprintbit(GET_CONTAINER_FLAGS(j), container_bits, buf, TRUE);
-			msg_to_char(ch, "Flags: %s\r\n", buf);
+			add_page_display(&display, "Flags: %s", buf);
 			break;
 		case ITEM_DRINKCON:
-			msg_to_char(ch, "Contains: %d/%d drinks of %s\r\n", GET_DRINK_CONTAINER_CONTENTS(j), GET_DRINK_CONTAINER_CAPACITY(j), get_generic_string_by_vnum(GET_DRINK_CONTAINER_TYPE(j), GENERIC_LIQUID, GSTR_LIQUID_NAME));
+			add_page_display(&display, "Contains: %d/%d drinks of %s", GET_DRINK_CONTAINER_CONTENTS(j), GET_DRINK_CONTAINER_CAPACITY(j), get_generic_string_by_vnum(GET_DRINK_CONTAINER_TYPE(j), GENERIC_LIQUID, GSTR_LIQUID_NAME));
 			break;
 		case ITEM_FOOD:
-			msg_to_char(ch, "Fills for: %d hour%s\r\n", GET_FOOD_HOURS_OF_FULLNESS(j), PLURAL(GET_FOOD_HOURS_OF_FULLNESS(j)));
+			add_page_display(&display, "Fills for: %d hour%s", GET_FOOD_HOURS_OF_FULLNESS(j), PLURAL(GET_FOOD_HOURS_OF_FULLNESS(j)));
 			break;
 		case ITEM_CORPSE:
-			msg_to_char(ch, "Corpse of: ");
+			pd = add_page_display(&display, "Corpse of: ");
 
 			if (IS_NPC_CORPSE(j)) {
-				msg_to_char(ch, "[%d] %s\r\n", GET_CORPSE_NPC_VNUM(j), get_mob_name_by_proto(GET_CORPSE_NPC_VNUM(j), FALSE));
+				append_page_display_line(pd, "[%d] %s", GET_CORPSE_NPC_VNUM(j), get_mob_name_by_proto(GET_CORPSE_NPC_VNUM(j), FALSE));
 			}
 			else if (IS_PC_CORPSE(j)) {
-				msg_to_char(ch, "[%d] %s\r\n", GET_CORPSE_PC_ID(j), (index = find_player_index_by_idnum(GET_CORPSE_PC_ID(j))) ? index->fullname : "a player");
+				append_page_display_line(pd, "[%d] %s", GET_CORPSE_PC_ID(j), (index = find_player_index_by_idnum(GET_CORPSE_PC_ID(j))) ? index->fullname : "a player");
 			}
 			else {
-				msg_to_char(ch, "unknown\r\n");
+				append_page_display_line(pd, "unknown");
 			}
 			
 			sprintbit(GET_CORPSE_FLAGS(j), corpse_flags, buf, TRUE);
-			msg_to_char(ch, "Corpse flags: %s\r\n", buf);
-			msg_to_char(ch, "Corpse size: %s\r\n", size_types[GET_CORPSE_SIZE(j)]);
+			add_page_display(&display, "Corpse flags: %s", buf);
+			add_page_display(&display, "Corpse size: %s", size_types[GET_CORPSE_SIZE(j)]);
 			break;
 		case ITEM_COINS: {
-			msg_to_char(ch, "Amount: %s\r\n", money_amount(real_empire(GET_COINS_EMPIRE_ID(j)), GET_COINS_AMOUNT(j)));
+			add_page_display(&display, "Amount: %s", money_amount(real_empire(GET_COINS_EMPIRE_ID(j)), GET_COINS_AMOUNT(j)));
 			break;
 		}
 		case ITEM_CURRENCY: {
-			msg_to_char(ch, "Amount: %d %s\r\n", GET_CURRENCY_AMOUNT(j), get_generic_string_by_vnum(GET_CURRENCY_VNUM(j), GENERIC_CURRENCY, WHICH_CURRENCY(GET_CURRENCY_AMOUNT(j))));
+			add_page_display(&display, "Amount: %d %s", GET_CURRENCY_AMOUNT(j), get_generic_string_by_vnum(GET_CURRENCY_VNUM(j), GENERIC_CURRENCY, WHICH_CURRENCY(GET_CURRENCY_AMOUNT(j))));
 			break;
 		}
 		case ITEM_MISSILE_WEAPON:
-			msg_to_char(ch, "Speed: %.2f, Damage: %d (%s+%.2f base dps)\r\n", get_weapon_speed(j), GET_MISSILE_WEAPON_DAMAGE(j), (IS_MAGIC_ATTACK(GET_MISSILE_WEAPON_TYPE(j)) ? "Intelligence" : "Strength"), get_base_dps(j));
-			msg_to_char(ch, "Damage type: %s\r\n", get_attack_name_by_vnum(GET_MISSILE_WEAPON_TYPE(j)));
-			msg_to_char(ch, "Ammo type: %c\r\n", 'A' + GET_MISSILE_WEAPON_AMMO_TYPE(j));
+			add_page_display(&display, "Speed: %.2f, Damage: %d (%s+%.2f base dps)", get_weapon_speed(j), GET_MISSILE_WEAPON_DAMAGE(j), (IS_MAGIC_ATTACK(GET_MISSILE_WEAPON_TYPE(j)) ? "Intelligence" : "Strength"), get_base_dps(j));
+			add_page_display(&display, "Damage type: %s", get_attack_name_by_vnum(GET_MISSILE_WEAPON_TYPE(j)));
+			add_page_display(&display, "Ammo type: %c", 'A' + GET_MISSILE_WEAPON_AMMO_TYPE(j));
 			break;
 		case ITEM_AMMO:
 			if (GET_AMMO_QUANTITY(j) > 0) {
-				msg_to_char(ch, "Quantity: %d\r\n", GET_AMMO_QUANTITY(j));
+				add_page_display(&display, "Quantity: %d", GET_AMMO_QUANTITY(j));
 			}
 			if (GET_AMMO_DAMAGE_BONUS(j) > 0) {
-				msg_to_char(ch, "Damage: %+d\r\n", GET_AMMO_DAMAGE_BONUS(j));
+				add_page_display(&display, "Damage: %+d", GET_AMMO_DAMAGE_BONUS(j));
 			}
-			msg_to_char(ch, "Ammo type: %c\r\n", 'A' + GET_AMMO_TYPE(j));
+			add_page_display(&display, "Ammo type: %c", 'A' + GET_AMMO_TYPE(j));
 			if (GET_OBJ_AFF_FLAGS(j) || GET_OBJ_APPLIES(j)) {
 				generic_data *aftype = find_generic(GET_OBJ_VNUM(j), GENERIC_AFFECT);
-				msg_to_char(ch, "Debuff name: %s\r\n", aftype ? GEN_NAME(aftype) : get_generic_name_by_vnum(ATYPE_RANGED_WEAPON));
+				add_page_display(&display, "Debuff name: %s", aftype ? GEN_NAME(aftype) : get_generic_name_by_vnum(ATYPE_RANGED_WEAPON));
 			}
 			break;
 		case ITEM_PACK: {
-			msg_to_char(ch, "Adds inventory space: %d\r\n", GET_PACK_CAPACITY(j));
+			add_page_display(&display, "Adds inventory space: %d", GET_PACK_CAPACITY(j));
 			break;
 		}
 		case ITEM_PORTAL:
 			if (j != obj_proto(GET_OBJ_VNUM(j))) {
-				msg_to_char(ch, "Portal destination: ");
+				pd = add_page_display(&display, "Portal destination: ");
 				room = real_room(GET_PORTAL_TARGET_VNUM(j));
 				if (!room) {
-					msg_to_char(ch, "None\r\n");
+					append_page_display_line(pd, "None");
 				}
 				else {
-					msg_to_char(ch, "%d - %s\r\n", GET_PORTAL_TARGET_VNUM(j), get_room_name(room, FALSE));
+					append_page_display_line(pd, "%d - %s", GET_PORTAL_TARGET_VNUM(j), get_room_name(room, FALSE));
 				}
 			}
 			else {
 				// vstat -- just show target
-				msg_to_char(ch, "%d", GET_PORTAL_TARGET_VNUM(j));
+				add_page_display(&display, "Portal destination: %d", GET_PORTAL_TARGET_VNUM(j));
 			}
 			break;
 		case ITEM_PAINT: {
 			sprinttype(GET_PAINT_COLOR(j), paint_names, buf, sizeof(buf), "UNDEFINED");
 			sprinttype(GET_PAINT_COLOR(j), paint_colors, part, sizeof(part), "&0");
-			msg_to_char(ch, "Paint color: %s%s\t0\r\n", part, buf);
+			add_page_display(&display, "Paint color: %s%s\t0", part, buf);
 			break;
 		}
 		case ITEM_POTION: {
-			msg_to_char(ch, "Potion affect type: [%d] %s\r\n", GET_POTION_AFFECT(j), GET_POTION_AFFECT(j) != NOTHING ? get_generic_name_by_vnum(GET_POTION_AFFECT(j)) : "not custom");
-			msg_to_char(ch, "Potion cooldown: [%d] %s, %d second%s\r\n", GET_POTION_COOLDOWN_TYPE(j), GET_POTION_COOLDOWN_TYPE(j) != NOTHING ? get_generic_name_by_vnum(GET_POTION_COOLDOWN_TYPE(j)) : "no cooldown", GET_POTION_COOLDOWN_TIME(j), PLURAL(GET_POTION_COOLDOWN_TIME(j)));
+			add_page_display(&display, "Potion affect type: [%d] %s", GET_POTION_AFFECT(j), GET_POTION_AFFECT(j) != NOTHING ? get_generic_name_by_vnum(GET_POTION_AFFECT(j)) : "not custom");
+			add_page_display(&display, "Potion cooldown: [%d] %s, %d second%s", GET_POTION_COOLDOWN_TYPE(j), GET_POTION_COOLDOWN_TYPE(j) != NOTHING ? get_generic_name_by_vnum(GET_POTION_COOLDOWN_TYPE(j)) : "no cooldown", GET_POTION_COOLDOWN_TIME(j), PLURAL(GET_POTION_COOLDOWN_TIME(j)));
 			break;
 		}
 		case ITEM_WEALTH: {
 			sprintbit(GET_WEALTH_MINT_FLAGS(j), mint_flags, buf, TRUE);
-			msg_to_char(ch, "Wealth value: \ts%d\t0, flags: \tc%s\t0\r\n", GET_WEALTH_VALUE(j), buf);
+			add_page_display(&display, "Wealth value: \ts%d\t0, flags: \tc%s\t0", GET_WEALTH_VALUE(j), buf);
 			break;
 		}
 		case ITEM_LIGHTER: {
 			if (GET_LIGHTER_USES(j) == UNLIMITED) {
-				msg_to_char(ch, "Lighter uses: unlimited\r\n");
+				add_page_display(&display, "Lighter uses: unlimited");
 			}
 			else {
-				msg_to_char(ch, "Lighter uses: %d\r\n", GET_LIGHTER_USES(j));
+				add_page_display(&display, "Lighter uses: %d", GET_LIGHTER_USES(j));
 			}
 			break;
 		}
 		case ITEM_MINIPET: {
-			msg_to_char(ch, "Minipet: [%d] %s\r\n", GET_MINIPET_VNUM(j), get_mob_name_by_proto(GET_MINIPET_VNUM(j), FALSE));
+			add_page_display(&display, "Minipet: [%d] %s", GET_MINIPET_VNUM(j), get_mob_name_by_proto(GET_MINIPET_VNUM(j), FALSE));
 			break;
 		}
 		case ITEM_LIGHT: {
@@ -4256,18 +4221,18 @@ void do_stat_object(char_data *ch, obj_data *j, bool details) {
 				snprintf(part, sizeof(part), "%d hour%s remaining", GET_LIGHT_HOURS_REMAINING(j), PLURAL(GET_LIGHT_HOURS_REMAINING(j)));
 			}
 			sprintbit(GET_LIGHT_FLAGS(j), light_flags, buf, TRUE);
-			msg_to_char(ch, "Light: \tc%s\t0 (\tc%s\t0), flags: \tc%s\t0\r\n", part, (GET_LIGHT_IS_LIT(j) ? "lit" : "unlit"), buf);
+			add_page_display(&display, "Light: \tc%s\t0 (\tc%s\t0), flags: \tc%s\t0", part, (GET_LIGHT_IS_LIT(j) ? "lit" : "unlit"), buf);
 			break;
 		}
 		default:
-			msg_to_char(ch, "Values 0-2: [&g%d&0] [&g%d&0] [&g%d&0]\r\n", GET_OBJ_VAL(j, 0), GET_OBJ_VAL(j, 1), GET_OBJ_VAL(j, 2));
+			add_page_display(&display, "Values 0-2: [&g%d&0] [&g%d&0] [&g%d&0]", GET_OBJ_VAL(j, 0), GET_OBJ_VAL(j, 1), GET_OBJ_VAL(j, 2));
 			break;
 	}
 	
 	// data that isn't type-based:
 	if (OBJ_FLAGGED(j, OBJ_PLANTABLE) && (cp = crop_proto(GET_OBJ_VAL(j, VAL_FOOD_CROP_TYPE)))) {
 		ordered_sprintbit(GET_CROP_CLIMATE(cp), climate_flags, climate_flags_order, CROP_FLAGGED(cp, CROPF_ANY_LISTED_CLIMATE) ? TRUE : FALSE, buf);
-		msg_to_char(ch, "Plants [%d] %s (%s%s).\r\n", GET_OBJ_VAL(j, VAL_FOOD_CROP_TYPE), GET_CROP_NAME(cp), GET_CROP_CLIMATE(cp) ? buf : "any climate", (CROP_FLAGGED(cp, CROPF_REQUIRES_WATER) ? "; must be near water" : ""));
+		add_page_display(&display, "Plants [%d] %s (%s%s).", GET_OBJ_VAL(j, VAL_FOOD_CROP_TYPE), GET_CROP_NAME(cp), GET_CROP_CLIMATE(cp) ? buf : "any climate", (CROP_FLAGGED(cp, CROPF_REQUIRES_WATER) ? "; must be near water" : ""));
 	}
 
 	/*
@@ -4276,26 +4241,32 @@ void do_stat_object(char_data *ch, obj_data *j, bool details) {
 	 */
 
 	if (j->contains) {
+		pd = NULL;
 		sprintf(buf, "Contents:&g");
 		found = 0;
 		DL_FOREACH2(j->contains, j2, next_content) {
 			sprintf(buf2, "%s %s", found++ ? "," : "", GET_OBJ_DESC(j2, ch, OBJ_DESC_SHORT));
 			strcat(buf, buf2);
 			if (strlen(buf) >= 62) {
-				if (j2->next_content)
-					send_to_char(strcat(buf, ",\r\n"), ch);
-				else
-					send_to_char(strcat(buf, "\r\n"), ch);
+				if (j2->next_content) {
+					pd = add_page_display(&display, "%s,", buf);
+				}
+				else {
+					pd = add_page_display_str(&display, buf);
+				}
 				*buf = found = 0;
 			}
 		}
 
-		if (*buf)
-     		send_to_char(strcat(buf, "\r\n"), ch);
-		send_to_char("&0", ch);
+		if (*buf) {
+			pd = add_page_display_str(&display, buf);
+     	}
+     	if (pd) {
+     		append_page_display_line(pd, "&0");
+		}
 	}
 	found = 0;
-	send_to_char("Applies:", ch);
+	pd = add_page_display_str(&display, "Applies:");
 	for (apply = GET_OBJ_APPLIES(j); apply; apply = apply->next) {
 		if (apply->apply_type != APPLY_TYPE_NATURAL) {
 			sprintf(part, " (%s)", apply_type_names[(int)apply->apply_type]);
@@ -4303,24 +4274,23 @@ void do_stat_object(char_data *ch, obj_data *j, bool details) {
 		else {
 			*part = '\0';
 		}
-		msg_to_char(ch, "%s %+d to %s%s", found++ ? "," : "", apply->modifier, apply_types[(int) apply->location], part);
+		append_page_display_line(pd, "%s %+d to %s%s", found++ ? "," : "", apply->modifier, apply_types[(int) apply->location], part);
 	}
-	if (!found)
-		send_to_char(" None", ch);
-
-	send_to_char("\r\n", ch);
+	if (!found) {
+		append_page_display_line(pd, " None");
+	}
 	
 	if (GET_OBJ_STORAGE(j)) {
-		msg_to_char(ch, "Storage locations:");
+		pd = add_page_display(&display, "Storage locations:");
 		
 		found = 0;
 		LL_FOREACH(GET_OBJ_STORAGE(j), store) {
 			// TYPE_x: storage type
 			if (store->type == TYPE_BLD) {
-				msg_to_char(ch, "%s[B%d] %s", (found++ > 0 ? ", " : " "), store->vnum, get_bld_name_by_proto(store->vnum));
+				append_page_display_line(pd, "%s[B%d] %s", (found++ > 0 ? ", " : " "), store->vnum, get_bld_name_by_proto(store->vnum));
 			}
 			else if (store->type == TYPE_VEH) {
-				msg_to_char(ch, "%s[V%d] %s", (found++ > 0 ? ", " : " "), store->vnum, get_vehicle_name_by_proto(store->vnum));
+				append_page_display_line(pd, "%s[V%d] %s", (found++ > 0 ? ", " : " "), store->vnum, get_vehicle_name_by_proto(store->vnum));
 			}
 			else {
 				// none?
@@ -4329,35 +4299,35 @@ void do_stat_object(char_data *ch, obj_data *j, bool details) {
 			
 			if (store->flags) {
 				sprintbit(store->flags, storage_bits, buf2, TRUE);
-				msg_to_char(ch, " ( %s)", buf2);
+				append_page_display_line(pd, " ( %s)", buf2);
 			}
 		}
-		
-		msg_to_char(ch, "\r\n");
 	}
 	
 	if (GET_OBJ_INTERACTIONS(j)) {
-		send_to_char("Interactions:\r\n", ch);
 		get_interaction_display(GET_OBJ_INTERACTIONS(j), buf);
-		send_to_char(buf, ch);
+		add_page_display(&display, "Interactions:\r\n%s", buf);
 	}
 	
 	if (GET_OBJ_CUSTOM_MSGS(j)) {
 		if (details) {
-			msg_to_char(ch, "Custom messages:\r\n");
+			add_page_display(&display, "Custom messages:");
 		
 			LL_FOREACH(GET_OBJ_CUSTOM_MSGS(j), ocm) {
-				msg_to_char(ch, " %s: %s\r\n", obj_custom_types[ocm->type], ocm->msg);
+				add_page_display(&display, " %s: %s", obj_custom_types[ocm->type], ocm->msg);
 			}
 		}
 		else {
 			LL_COUNT(GET_OBJ_CUSTOM_MSGS(j), ocm, count);
-			msg_to_char(ch, "Custom messages: %d\r\n", count);
+			add_page_display(&display, "Custom messages: %d", count);
 		}
 	}
 
 	/* check the object for a script */
-	do_sstat_object(ch, j);
+	do_sstat_object(&display, j);
+	
+	page_display_to_char(ch, display);
+	free_page_display(&display);
 }
 
 
@@ -4388,6 +4358,7 @@ void do_stat_room(char_data *ch) {
 	vehicle_data *veh;
 	struct string_hash *str_iter, *next_str, *str_hash = NULL;
 	size_t size;
+	struct page_display *display = NULL, *pd;
 	
 	if (ROOM_SECT_FLAGGED(IN_ROOM(ch), SECTF_HAS_CROP_DATA) && (cp = ROOM_CROP(IN_ROOM(ch)))) {
 		strcpy(buf2, GET_CROP_NAME(cp));
@@ -4406,82 +4377,80 @@ void do_stat_room(char_data *ch) {
 	}
 	
 	// title
-	msg_to_char(ch, "(%d, %d) %s\r\n", X_COORD(IN_ROOM(ch)), Y_COORD(IN_ROOM(ch)), get_room_name(IN_ROOM(ch), FALSE));
+	add_page_display(&display, "(%d, %d) %s", X_COORD(IN_ROOM(ch)), Y_COORD(IN_ROOM(ch)), get_room_name(IN_ROOM(ch), FALSE));
 	
 	// sector data
+	pd = add_page_display_str(&display, "");
 	if (ROOM_SECT_FLAGGED(IN_ROOM(ch), SECTF_HAS_CROP_DATA) && (cp = ROOM_CROP(IN_ROOM(ch)))) {
-		msg_to_char(ch, "Crop: [\to%d\t0 - \to%s\t0], ", GET_CROP_VNUM(cp), GET_CROP_NAME(cp));
+		append_page_display_line(pd, "Crop: [\to%d\t0 - \to%s\t0], ", GET_CROP_VNUM(cp), GET_CROP_NAME(cp));
 	}
-	msg_to_char(ch, "Sector: [\tc%d\t0 - \tc%s\t0]", GET_SECT_VNUM(SECT(IN_ROOM(ch))), GET_SECT_NAME(SECT(IN_ROOM(ch))));
-	msg_to_char(ch, ", Base: [\ty%d\t0 - \ty%s\t0]", GET_SECT_VNUM(BASE_SECT(IN_ROOM(ch))), GET_SECT_NAME(BASE_SECT(IN_ROOM(ch))));
+	append_page_display_line(pd, "Sector: [\tc%d\t0 - \tc%s\t0]", GET_SECT_VNUM(SECT(IN_ROOM(ch))), GET_SECT_NAME(SECT(IN_ROOM(ch))));
+	append_page_display_line(pd, ", Base: [\ty%d\t0 - \ty%s\t0]", GET_SECT_VNUM(BASE_SECT(IN_ROOM(ch))), GET_SECT_NAME(BASE_SECT(IN_ROOM(ch))));
 	if (GET_ROOM_VNUM(IN_ROOM(ch)) < MAP_SIZE && (map = &world_map[X_COORD(IN_ROOM(ch))][Y_COORD(IN_ROOM(ch))])) {
-		msg_to_char(ch, ", Natural: [\tg%d\t0 - \tg%s\t0]", GET_SECT_VNUM(map->natural_sector), GET_SECT_NAME(map->natural_sector));
+		append_page_display_line(pd, ", Natural: [\tg%d\t0 - \tg%s\t0]", GET_SECT_VNUM(map->natural_sector), GET_SECT_NAME(map->natural_sector));
 	}
-	msg_to_char(ch, "\r\n");
 	
 	// building/room data
 	if (GET_ROOM_TEMPLATE(IN_ROOM(ch))) {
-		msg_to_char(ch, "Room template: [\to%d\t0 - \to%s\t0]\r\n", GET_RMT_VNUM(GET_ROOM_TEMPLATE(IN_ROOM(ch))), GET_RMT_TITLE(GET_ROOM_TEMPLATE(IN_ROOM(ch))));
+		add_page_display(&display, "Room template: [\to%d\t0 - \to%s\t0]", GET_RMT_VNUM(GET_ROOM_TEMPLATE(IN_ROOM(ch))), GET_RMT_TITLE(GET_ROOM_TEMPLATE(IN_ROOM(ch))));
 		if ((adv = get_adventure_for_vnum(GET_RMT_VNUM(GET_ROOM_TEMPLATE(IN_ROOM(ch)))))) {
-			msg_to_char(ch, "Adventure: [\to%d\t0 - \to%s\t0]\r\n", GET_ADV_VNUM(adv), GET_ADV_NAME(adv));
+			add_page_display(&display, "Adventure: [\to%d\t0 - \to%s\t0]", GET_ADV_VNUM(adv), GET_ADV_NAME(adv));
 		}
 	}
 	if (GET_BUILDING(IN_ROOM(ch))) {
-		msg_to_char(ch, "Building: [\to%d\t0 - \to%s\t0]\r\n", GET_BLD_VNUM(GET_BUILDING(IN_ROOM(ch))), GET_BLD_NAME(GET_BUILDING(IN_ROOM(ch))));
+		add_page_display(&display, "Building: [\to%d\t0 - \to%s\t0]", GET_BLD_VNUM(GET_BUILDING(IN_ROOM(ch))), GET_BLD_NAME(GET_BUILDING(IN_ROOM(ch))));
 	}
 	
-	msg_to_char(ch, "VNum: [\tg%d\t0], Lights: [\tg%d\t0], Island: [\tg%d\t0] %s, Height [\tg%d/%d\t0]\r\n", GET_ROOM_VNUM(IN_ROOM(ch)), ROOM_LIGHTS(IN_ROOM(ch)), GET_ISLAND_ID(IN_ROOM(ch)), GET_ISLAND(IN_ROOM(ch)) ? GET_ISLAND(IN_ROOM(ch))->name : "no island", ROOM_HEIGHT(IN_ROOM(ch)), get_room_blocking_height(IN_ROOM(ch), NULL));
+	add_page_display(&display, "VNum: [\tg%d\t0], Lights: [\tg%d\t0], Island: [\tg%d\t0] %s, Height [\tg%d/%d\t0]", GET_ROOM_VNUM(IN_ROOM(ch)), ROOM_LIGHTS(IN_ROOM(ch)), GET_ISLAND_ID(IN_ROOM(ch)), GET_ISLAND(IN_ROOM(ch)) ? GET_ISLAND(IN_ROOM(ch))->name : "no island", ROOM_HEIGHT(IN_ROOM(ch)), get_room_blocking_height(IN_ROOM(ch), NULL));
 	
 	// location/time data
 	if (X_COORD(IN_ROOM(ch)) != -1) {
 		tinfo = get_local_time(IN_ROOM(ch));
 		latitude = Y_TO_LATITUDE(Y_COORD(IN_ROOM(ch)));
 		longitude = X_TO_LONGITUDE(X_COORD(IN_ROOM(ch)));
-		msg_to_char(ch, "Globe: [\tc%.2f %s, %.2f %s\t0], Time: [\tc%d%s\t0], Sun: [\tc%s\t0], Hours of sun today: [\tc%.2f\t0]\r\n", ABSOLUTE(latitude), (latitude >= 0.0 ? "N" : "S"), ABSOLUTE(longitude), (longitude >= 0.0 ? "E" : "W"), TIME_TO_12H(tinfo.hours), AM_PM(tinfo.hours), sun_types[get_sun_status(IN_ROOM(ch))], get_hours_of_sun(IN_ROOM(ch)));
+		add_page_display(&display, "Globe: [\tc%.2f %s, %.2f %s\t0], Time: [\tc%d%s\t0], Sun: [\tc%s\t0], Hours of sun today: [\tc%.2f\t0]", ABSOLUTE(latitude), (latitude >= 0.0 ? "N" : "S"), ABSOLUTE(longitude), (longitude >= 0.0 ? "E" : "W"), TIME_TO_12H(tinfo.hours), AM_PM(tinfo.hours), sun_types[get_sun_status(IN_ROOM(ch))], get_hours_of_sun(IN_ROOM(ch)));
 		if ((zenith = get_zenith_days_from_solstice(IN_ROOM(ch))) != -1) {
-			msg_to_char(ch, "Zenith passage: [\tg%d day%s from the solstice\t0]\r\n", zenith, PLURAL(zenith));
+			add_page_display(&display, "Zenith passage: [\tg%d day%s from the solstice\t0]", zenith, PLURAL(zenith));
 		}
 	}
 	else {
-		msg_to_char(ch, "Globe: no data available (location is not on the map)\r\n");
+		add_page_display(&display, "Globe: no data available (location is not on the map)");
 	}
 	
 	// temperature info
-	msg_to_char(ch, "Temperature: \ty%d\t0 (\ty%s\t0), Season: \ty%s\t0\r\n", get_room_temperature(IN_ROOM(ch)), temperature_to_string(get_room_temperature(IN_ROOM(ch))), icon_types[GET_SEASON(IN_ROOM(ch))]);
+	add_page_display(&display, "Temperature: \ty%d\t0 (\ty%s\t0), Season: \ty%s\t0", get_room_temperature(IN_ROOM(ch)), temperature_to_string(get_room_temperature(IN_ROOM(ch))), icon_types[GET_SEASON(IN_ROOM(ch))]);
 	if (get_climate(IN_ROOM(ch)) != NOBITS) {
 		ordered_sprintbit(get_climate(IN_ROOM(ch)), climate_flags, climate_flags_order, FALSE, buf);
-		msg_to_char(ch, "Climate: \tc%s\t0\r\n", buf);
+		add_page_display(&display, "Climate: \tc%s\t0", buf);
 	}
 	
 	if (home != IN_ROOM(ch)) {
-		msg_to_char(ch, "Home room: &g%d&0 %s\r\n", GET_ROOM_VNUM(home), get_room_name(home, FALSE));
+		add_page_display(&display, "Home room: &g%d&0 %s", GET_ROOM_VNUM(home), get_room_name(home, FALSE));
 	}
 	
 	if (ROOM_CUSTOM_NAME(IN_ROOM(ch)) || ROOM_CUSTOM_ICON(IN_ROOM(ch)) || ROOM_CUSTOM_DESCRIPTION(IN_ROOM(ch))) {
-		msg_to_char(ch, "Custom:&y%s%s%s&0\r\n", ROOM_CUSTOM_NAME(IN_ROOM(ch)) ? " NAME" : "", ROOM_CUSTOM_ICON(IN_ROOM(ch)) ? " ICON" : "", ROOM_CUSTOM_DESCRIPTION(IN_ROOM(ch)) ? " DESCRIPTION" : "");
+		add_page_display(&display, "Custom:&y%s%s%s&0", ROOM_CUSTOM_NAME(IN_ROOM(ch)) ? " NAME" : "", ROOM_CUSTOM_ICON(IN_ROOM(ch)) ? " ICON" : "", ROOM_CUSTOM_DESCRIPTION(IN_ROOM(ch)) ? " DESCRIPTION" : "");
 	}
 
 	// ownership
 	if ((emp = ROOM_OWNER(home))) {
-		msg_to_char(ch, "Owner: %s%s&0", EMPIRE_BANNER(emp), EMPIRE_NAME(emp));
+		pd = add_page_display(&display, "Owner: %s%s&0", EMPIRE_BANNER(emp), EMPIRE_NAME(emp));
 		if ((city = find_city(emp, IN_ROOM(ch)))) {
-			msg_to_char(ch, ", City: %s", city->name);
+			append_page_display_line(pd, ", City: %s", city->name);
 		}
 		if (ROOM_PRIVATE_OWNER(home) != NOBODY) {
-			msg_to_char(ch, ", Home: %s", (index = find_player_index_by_idnum(ROOM_PRIVATE_OWNER(home))) ? index->fullname : "someone");
+			append_page_display_line(pd, ", Home: %s", (index = find_player_index_by_idnum(ROOM_PRIVATE_OWNER(home))) ? index->fullname : "someone");
 		}
-		
-		send_to_char("\r\n", ch);
 	}
 
 	if (ROOM_AFF_FLAGS(IN_ROOM(ch))) {	
 		sprintbit(ROOM_AFF_FLAGS(IN_ROOM(ch)), room_aff_bits, buf2, TRUE);
-		msg_to_char(ch, "Status: &c%s&0\r\n", buf2);
+		add_page_display(&display, "Status: &c%s&0", buf2);
 	}
 	
 	if (COMPLEX_DATA(IN_ROOM(ch))) {
 		if (GET_INSIDE_ROOMS(home) > 0) {
-			msg_to_char(ch, "Designated rooms: %d\r\n", GET_INSIDE_ROOMS(home));
+			add_page_display(&display, "Designated rooms: %d", GET_INSIDE_ROOMS(home));
 		}
 		
 		if (IS_BURNING(home)) {
@@ -4490,15 +4459,15 @@ void do_stat_room(char_data *ch) {
 		else {
 			strcpy(buf2, "Not on fire");
 		}
-		msg_to_char(ch, "%s, Damage: %d/%d\r\n", buf2, (int) BUILDING_DAMAGE(home), GET_BUILDING(home) ? GET_BLD_MAX_DAMAGE(GET_BUILDING(home)) : 0);
+		add_page_display(&display, "%s, Damage: %d/%d", buf2, (int) BUILDING_DAMAGE(home), GET_BUILDING(home) ? GET_BLD_MAX_DAMAGE(GET_BUILDING(home)) : 0);
 	}
 
 	if (ROOM_SECT_FLAGGED(IN_ROOM(ch), SECTF_CAN_MINE) || room_has_function_and_city_ok(GET_LOYALTY(ch), IN_ROOM(ch), FNC_MINE)) {
 		if (get_room_extra_data(IN_ROOM(ch), ROOM_EXTRA_MINE_GLB_VNUM) <= 0 || !(glb = global_proto(get_room_extra_data(IN_ROOM(ch), ROOM_EXTRA_MINE_GLB_VNUM))) || GET_GLOBAL_TYPE(glb) != GLOBAL_MINE_DATA) {
-			msg_to_char(ch, "This area is unmined.\r\n");
+			add_page_display(&display, "This area is unmined.");
 		}
 		else {
-			msg_to_char(ch, "Mine type: %s, Amount remaining: %d\r\n", GET_GLOBAL_NAME(glb), get_room_extra_data(IN_ROOM(ch), ROOM_EXTRA_MINE_AMOUNT));
+			add_page_display(&display, "Mine type: %s, Amount remaining: %d", GET_GLOBAL_NAME(glb), get_room_extra_data(IN_ROOM(ch), ROOM_EXTRA_MINE_AMOUNT));
 		}
 	}
 	
@@ -4511,11 +4480,12 @@ void do_stat_room(char_data *ch) {
 			}
 		}
 		sprintbit(INST_FLAGS(inst), instance_flags, buf2, TRUE);
-		msg_to_char(ch, "Instance \tc%d\t0: [\tg%d\t0] \ty%s\t0, Main Room: [\tg%d\t0], Flags: \tc%s\t0\r\n", num, GET_ADV_VNUM(INST_ADVENTURE(inst)), GET_ADV_NAME(INST_ADVENTURE(inst)), (INST_START(inst) ? GET_ROOM_VNUM(INST_START(inst)) : NOWHERE), buf2);
+		add_page_display(&display, "Instance \tc%d\t0: [\tg%d\t0] \ty%s\t0, Main Room: [\tg%d\t0], Flags: \tc%s\t0", num, GET_ADV_VNUM(INST_ADVENTURE(inst)), GET_ADV_NAME(INST_ADVENTURE(inst)), (INST_START(inst) ? GET_ROOM_VNUM(INST_START(inst)) : NOWHERE), buf2);
 	}
 
 	sprintf(buf, "Chars present:&y");
 	found = 0;
+	pd = NULL;
 	DL_FOREACH2(ROOM_PEOPLE(IN_ROOM(ch)), k, next_in_room) {
 		if (!CAN_SEE(ch, k))
 			continue;
@@ -4523,19 +4493,25 @@ void do_stat_room(char_data *ch) {
 		strcat(buf, buf2);
 		if (strlen(buf) >= 62) {
 			if (k->next_in_room) {
-				send_to_char(strcat(buf, ",\r\n"), ch);
+				pd = add_page_display(&display, "%s,", buf);
 			}
 			else {
-				send_to_char(strcat(buf, "\r\n"), ch);
+				pd = add_page_display_str(&display, buf);
 			}
 			*buf = found = 0;
 		}
 	}
-	msg_to_char(ch, "%s&0", (*buf ? strcat(buf, "\r\n") : ""));
+	if (*buf) {
+		pd = add_page_display_str(&display, buf);
+	}
+	if (pd) {
+		append_page_display_line(pd, "&0");
+	}
 	
 	if (ROOM_VEHICLES(IN_ROOM(ch))) {
 		sprintf(buf, "Vehicles:&w");
 		found = 0;
+		pd = NULL;
 		DL_FOREACH2(ROOM_VEHICLES(IN_ROOM(ch)), veh, next_in_room) {
 			if (!CAN_SEE_VEHICLE(ch, veh)) {
 				continue;
@@ -4544,19 +4520,20 @@ void do_stat_room(char_data *ch) {
 			strcat(buf, buf2);
 			if (strlen(buf) >= 62) {
 				if (veh->next_in_room) {
-					send_to_char(strcat(buf, ",\r\n"), ch);
+					pd = add_page_display(&display, "%s,", buf);
 				}
 				else {
-					send_to_char(strcat(buf, "\r\n"), ch);
+					pd = add_page_display_str(&display, buf);
 				}
 				*buf = found = 0;
 			}
 		}
-
 		if (*buf) {
-			send_to_char(strcat(buf, "\r\n"), ch);
+			pd = add_page_display_str(&display, buf);
 		}
-		send_to_char("&0", ch);
+		if (pd) {
+			append_page_display_line(pd, "&0");
+		}
 	}
 	
 	if (ROOM_CONTENTS(IN_ROOM(ch))) {
@@ -4571,6 +4548,7 @@ void do_stat_room(char_data *ch) {
 		if (str_hash) {
 			size = snprintf(buf, sizeof(buf), "Contents:\tg");
 			found = 0;
+			pd = NULL;
 			
 			HASH_ITER(hh, str_hash, str_iter, next_str) {
 				if (str_iter->count == 1) {
@@ -4581,7 +4559,7 @@ void do_stat_room(char_data *ch) {
 				}
 				if (size + strlen(buf2) > 79 && *buf) {
 					// end of line
-					msg_to_char(ch, "%s%s\r\n", buf, (found > 1) ? "," : "");
+					pd = add_page_display(&display, "%s%s", buf, (found > 1) ? "," : "");
 					found = 0;
 					size = 0;
 					*buf = '\0';
@@ -4596,9 +4574,11 @@ void do_stat_room(char_data *ch) {
 			
 			// anything left?
 			if (*buf) {
-				msg_to_char(ch, "%s\r\n", buf);
+				pd = add_page_display_str(&display, buf);
 			}
-			send_to_char("\t0", ch);
+			if (pd) {
+				append_page_display_line(pd, "\t0");
+			}
 		}
 	}
 	
@@ -4621,41 +4601,41 @@ void do_stat_room(char_data *ch) {
 		}
 		
 		if (*buf) {
-			msg_to_char(ch, "Citizens: %s\r\n", buf);
+			add_page_display(&display, "Citizens: %s", buf);
 		}
 	}
 	
 	if (COMPLEX_DATA(IN_ROOM(ch))) {
 		struct room_direction_data *ex;
 		for (ex = COMPLEX_DATA(IN_ROOM(ch))->exits; ex; ex = ex->next) {
-			if (ex->to_room == NOWHERE)
+			if (ex->to_room == NOWHERE) {
 				sprintf(buf1, " &cNONE&0");
-			else
+			}
+			else {
 				sprintf(buf1, "&c%5d&0", ex->to_room);
+			}
 			sprintbit(ex->exit_info, exit_bits, buf2, TRUE);
-			sprintf(buf, "Exit &c%-5s&0:  To: [%s], Keyword: %s, Type: %s\r\n", dirs[get_direction_for_char(ch, ex->dir)], buf1, ex->keyword ? ex->keyword : "None", buf2);
-			send_to_char(buf, ch);
+			add_page_display(&display, "Exit &c%-5s&0:  To: [%s], Keyword: %s, Type: %s", dirs[get_direction_for_char(ch, ex->dir)], buf1, ex->keyword ? ex->keyword : "None", buf2);
 		}
 	}
 	
 	if (ROOM_DEPLETION(IN_ROOM(ch))) {
-		send_to_char("Depletion: ", ch);
+		pd = add_page_display(&display, "Depletion: ");
 		
 		comma = FALSE;
 		for (dep = ROOM_DEPLETION(IN_ROOM(ch)); dep; dep = dep->next) {
 			if (dep->count > 0 && dep->type < NUM_DEPLETION_TYPES) {
 				max = get_depletion_max(IN_ROOM(ch), dep->type);
 				if (max > 0) {
-					msg_to_char(ch, "%s%s (%d, %d%%)", comma ? ", " : "", depletion_types[dep->type], dep->count, dep->count * 100 / max);
+					append_page_display_line(pd, "%s%s (%d, %d%%)", comma ? ", " : "", depletion_types[dep->type], dep->count, dep->count * 100 / max);
 				}
 				else {
 					// can't detect max
-					msg_to_char(ch, "%s%s (%d)", comma ? ", " : "", depletion_types[dep->type], dep->count);
+					append_page_display_line(pd, "%s%s (%d)", comma ? ", " : "", depletion_types[dep->type], dep->count);
 				}
 				comma = TRUE;
 			}
 		}
-		send_to_char("\r\n", ch);
 	}
 
 	/* Routine to show what spells a room is affected by */
@@ -4689,21 +4669,24 @@ void do_stat_room(char_data *ch) {
 				sprintbit(aff->bitvector, room_aff_bits, buf2, TRUE);
 				strcat(buf, buf2);
 			}
-			send_to_char(strcat(buf, "\r\n"), ch);
+			add_page_display_str(&display, buf);
 		}
 	}
 	
 	if (ROOM_EXTRA_DATA(IN_ROOM(ch))) {
-		msg_to_char(ch, "Extra data:\r\n");
+		add_page_display(&display, "Extra data:");
 		
 		HASH_ITER(hh, ROOM_EXTRA_DATA(IN_ROOM(ch)), red, next_red) {
 			sprinttype(red->type, room_extra_types, buf, sizeof(buf), "UNDEFINED");
-			msg_to_char(ch, " %s: %d\r\n", buf, red->value);
+			add_page_display(&display, " %s: %d", buf, red->value);
 		}
 	}
 
 	/* check the room for a script */
-	do_sstat_room(ch);
+	do_sstat_room(&display, ch);
+	
+	page_display_to_char(ch, display);
+	free_page_display(&display);
 }
 
 
@@ -4715,41 +4698,42 @@ void do_stat_room(char_data *ch) {
 void do_stat_room_template(char_data *ch, room_template *rmt, bool details) {
 	char lbuf[MAX_STRING_LENGTH];
 	adv_data *adv;
+	struct page_display *display = NULL, *pd;
 	
 	if (!rmt) {
 		return;
 	}
 	
-	msg_to_char(ch, "VNum: [&c%d&0], Title: %s\r\n", GET_RMT_VNUM(rmt), GET_RMT_TITLE(rmt));
-	msg_to_char(ch, "%s", NULLSAFE(GET_RMT_DESC(rmt)));
+	add_page_display(&display, "VNum: [&c%d&0], Title: %s", GET_RMT_VNUM(rmt), GET_RMT_TITLE(rmt));
+	add_page_display_str(&display, NULLSAFE(GET_RMT_DESC(rmt)));
 
 	adv = get_adventure_for_vnum(GET_RMT_VNUM(rmt));
-	msg_to_char(ch, "Adventure: [&c%d %s&0]", !adv ? NOTHING : GET_ADV_VNUM(adv), !adv ? "NONE" : GET_ADV_NAME(adv));
+	pd = add_page_display(&display, "Adventure: [&c%d %s&0]", !adv ? NOTHING : GET_ADV_VNUM(adv), !adv ? "NONE" : GET_ADV_NAME(adv));
 	if (GET_RMT_SUBZONE(rmt) != NOWHERE) {
-		msg_to_char(ch, ", Subzone: [\ty%d\t0]\r\n", GET_RMT_SUBZONE(rmt));
+		append_page_display_line(pd, ", Subzone: [\ty%d\t0]", GET_RMT_SUBZONE(rmt));
 	}
 	else {
-		msg_to_char(ch, ", Subzone: [\tynone\t0]\r\n");
+		append_page_display_line(pd, ", Subzone: [\tynone\t0]");
 	}
 	
 	sprintbit(GET_RMT_FLAGS(rmt), room_template_flags, lbuf, TRUE);
-	msg_to_char(ch, "Flags: &g%s&0\r\n", lbuf);
+	add_page_display(&display, "Flags: &g%s&0", lbuf);
 	
 	sprintbit(GET_RMT_FUNCTIONS(rmt), function_flags, lbuf, TRUE);
-	msg_to_char(ch, "Functions: &y%s&0\r\n", lbuf);
+	add_page_display(&display, "Functions: &y%s&0", lbuf);
 
 	sprintbit(GET_RMT_BASE_AFFECTS(rmt), room_aff_bits, lbuf, TRUE);
-	msg_to_char(ch, "Affects: &g%s&0\r\n", lbuf);
+	add_page_display(&display, "Affects: &g%s&0", lbuf);
 	
-	msg_to_char(ch, "Temperature: [\tc%s\t0]\r\n", temperature_types[GET_RMT_TEMPERATURE_TYPE(rmt)]);
+	add_page_display(&display, "Temperature: [\tc%s\t0]", temperature_types[GET_RMT_TEMPERATURE_TYPE(rmt)]);
 	
 	if (GET_RMT_EX_DESCS(rmt)) {
 		struct extra_descr_data *desc;
 		
 		if (details) {
-			msg_to_char(ch, "Extra descs:\r\n");
+			add_page_display(&display, "Extra descs:");
 			LL_FOREACH(GET_RMT_EX_DESCS(rmt), desc) {
-				msg_to_char(ch, "[ &c%s&0 ]\r\n%s", desc->keyword, desc->description);
+				add_page_display(&display, "[ &c%s&0 ]\r\n%s", desc->keyword, desc->description);
 			}
 		}
 		else {
@@ -4758,24 +4742,26 @@ void do_stat_room_template(char_data *ch, room_template *rmt, bool details) {
 				strcat(buf, " ");
 				strcat(buf, desc->keyword);
 			}
-			msg_to_char(ch, "%s&0\r\n", buf);
+			add_page_display(&display, "%s&0", buf);
 		}
 	}
 
 	get_exit_template_display(GET_RMT_EXITS(rmt), lbuf);
-	msg_to_char(ch, "Exits:\r\n%s", lbuf);
+	add_page_display(&display, "Exits:\r\n%s", lbuf);
 	
 	if (GET_RMT_INTERACTIONS(rmt)) {
-		send_to_char("Interactions:\r\n", ch);
 		get_interaction_display(GET_RMT_INTERACTIONS(rmt), buf);
-		send_to_char(buf, ch);
+		add_page_display(&display, "Interactions:\r\n%s", buf);
 	}
 	
 	get_template_spawns_display(GET_RMT_SPAWNS(rmt), lbuf);
-	msg_to_char(ch, "Spawns:\r\n%s", lbuf);
+	add_page_display(&display, "Spawns:\r\n%s", lbuf);
 
 	get_script_display(GET_RMT_SCRIPTS(rmt), lbuf);
-	msg_to_char(ch, "Scripts:\r\n%s", lbuf);
+	add_page_display(&display, "Scripts:\r\n%s", lbuf);
+	
+	page_display_to_char(ch, display);
+	free_page_display(&display);
 }
 
 
@@ -4791,44 +4777,43 @@ void do_stat_sector(char_data *ch, sector_data *st, bool details) {
 	struct sector_index_type *idx = find_sector_index(GET_SECT_VNUM(st));
 	char buf[MAX_STRING_LENGTH];
 	struct custom_message *ocm;
+	struct page_display *display = NULL;
 	
-	msg_to_char(ch, "Sector VNum: [&c%d&0], Name: '&c%s&0', Live Count [&c%d&0/&c%d&0]\r\n", st->vnum, st->name, idx->sect_count, idx->base_count);
-	msg_to_char(ch, "Room Title: %s\r\n", st->title);
+	add_page_display(&display, "Sector VNum: [&c%d&0], Name: '&c%s&0', Live Count [&c%d&0/&c%d&0]", GET_SECT_VNUM(st), GET_SECT_NAME(st), idx->sect_count, idx->base_count);
+	add_page_display(&display, "Room Title: %s", GET_SECT_TITLE(st));
 	
-	if (st->commands && *st->commands) {
-		msg_to_char(ch, "Command list: &c%s&0\r\n", st->commands);
+	if (GET_SECT_COMMANDS(st) && *GET_SECT_COMMANDS(st)) {
+		add_page_display(&display, "Command list: &c%s&0", GET_SECT_COMMANDS(st));
 	}
 	
-	msg_to_char(ch, "Movement cost: [&g%d&0]  Roadside Icon: %c  Mapout Color: %s\r\n", st->movement_loss, st->roadside_icon, mapout_color_names[GET_SECT_MAPOUT(st)]);
+	add_page_display(&display, "Movement cost: [&g%d&0]  Roadside Icon: %c  Mapout Color: %s", GET_SECT_MOVE_LOSS(st), GET_SECT_ROADSIDE_ICON(st), mapout_color_names[GET_SECT_MAPOUT(st)]);
 	
-	if (st->icons) {
-		msg_to_char(ch, "Icons:\r\n");
-		get_icons_display(st->icons, buf1);
-		send_to_char(buf1, ch);
+	if (GET_SECT_ICONS(st)) {
+		get_icons_display(GET_SECT_ICONS(st), buf1);
+		add_page_display(&display, "Icons:\r\n%s", buf1);
 	}
 	
-	sprintbit(st->flags, sector_flags, buf, TRUE);
-	msg_to_char(ch, "Sector flags: &g%s&0\r\n", buf);
+	sprintbit(GET_SECT_FLAGS(st), sector_flags, buf, TRUE);
+	add_page_display(&display, "Sector flags: &g%s&0", buf);
 	
 	ordered_sprintbit(GET_SECT_CLIMATE(st), climate_flags, climate_flags_order, FALSE, buf);
-	msg_to_char(ch, "Temperature: [\tc%s\t0], Climate: &c%s&0\r\n", temperature_types[GET_SECT_TEMPERATURE_TYPE(st)], buf);
+	add_page_display(&display, "Temperature: [\tc%s\t0], Climate: &c%s&0", temperature_types[GET_SECT_TEMPERATURE_TYPE(st)], buf);
 	
-	ordered_sprintbit(st->build_flags, bld_on_flags, bld_on_flags_order, TRUE, buf);
-	msg_to_char(ch, "Build flags: &g%s&0\r\n", buf);
+	ordered_sprintbit(GET_SECT_BUILD_FLAGS(st), bld_on_flags, bld_on_flags_order, TRUE, buf);
+	add_page_display(&display, "Build flags: &g%s&0", buf);
 	
-	if (st->evolution) {
-		msg_to_char(ch, "Evolution information:\r\n");
-		get_evolution_display(st->evolution, buf1);
-		send_to_char(buf1, ch);
+	if (GET_SECT_EVOS(st)) {
+		get_evolution_display(GET_SECT_EVOS(st), buf1);
+		add_page_display(&display, "Evolution information:\r\n%s", buf1);
 	}
 	
 	if (GET_SECT_EX_DESCS(st)) {
 		struct extra_descr_data *desc;
 		
 		if (details) {
-			msg_to_char(ch, "Extra descs:\r\n");
+			add_page_display(&display, "Extra descs:");
 			LL_FOREACH(GET_SECT_EX_DESCS(st), desc) {
-				msg_to_char(ch, "[ &c%s&0 ]\r\n%s", desc->keyword, desc->description);
+				add_page_display(&display, "[ &c%s&0 ]\r\n%s", desc->keyword, desc->description);
 			}
 		}
 		else {
@@ -4837,34 +4822,36 @@ void do_stat_sector(char_data *ch, sector_data *st, bool details) {
 				strcat(buf, " ");
 				strcat(buf, desc->keyword);
 			}
-			msg_to_char(ch, "%s&0\r\n", buf);
+			add_page_display(&display, "%s&0", buf);
 		}
 	}
 	
 	if (GET_SECT_CUSTOM_MSGS(st)) {
 		if (details) {
-			msg_to_char(ch, "Custom messages:\r\n");
+			add_page_display(&display, "Custom messages:");
 			LL_FOREACH(GET_SECT_CUSTOM_MSGS(st), ocm) {
-				msg_to_char(ch, " %s: %s\r\n", sect_custom_types[ocm->type], ocm->msg);
+				add_page_display(&display, " %s: %s", sect_custom_types[ocm->type], ocm->msg);
 			}
 		}
 		else {
 			LL_COUNT(GET_SECT_CUSTOM_MSGS(st), ocm, count);
-			msg_to_char(ch, "Custom messages: %d\r\n", count);
+			add_page_display(&display, "Custom messages: %d", count);
 		}
 	}
 
-	if (st->interactions) {
-		send_to_char("Interactions:\r\n", ch);
-		get_interaction_display(st->interactions, buf);
-		send_to_char(buf, ch);
+	if (GET_SECT_INTERACTIONS(st)) {
+		get_interaction_display(GET_SECT_INTERACTIONS(st), buf);
+		add_page_display(&display, "Interactions:\r\n%s", buf);
 	}
 	
-	show_spawn_summary_to_char(ch, st->spawns);
+	show_spawn_summary_display(&display, GET_SECT_SPAWNS(st));
 	
 	if (GET_SECT_NOTES(st) && *GET_SECT_NOTES(st)) {
-		msg_to_char(ch, "Notes:\r\n%s", GET_SECT_NOTES(st));
+		add_page_display(&display, "Notes:\r\n%s", GET_SECT_NOTES(st));
 	}
+	
+	page_display_to_char(ch, display);
+	free_page_display(&display);
 }
 
 
