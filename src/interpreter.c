@@ -1595,7 +1595,7 @@ ACMD(do_commands) {
 	if (subcmd == SCMD_WIZHELP)
 		wizhelp = 1;
 
-	sprintf(buf, "The following %s%s are available to %s:\r\n", wizhelp ? "privileged " : "", "commands", vict == ch ? "you" : PERS(vict, ch, 1));
+	add_page_display(&display, "The following %s%s are available to %s:", wizhelp ? "privileged " : "", "commands", vict == ch ? "you" : PERS(vict, ch, 1));
 
 	/* cmd_num starts at 1, not 0, to remove 'RESERVED' */
 	for (cmd_num = 1; cmd_num < num_of_cmds; cmd_num++) {
