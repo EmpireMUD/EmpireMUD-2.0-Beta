@@ -3118,10 +3118,10 @@ void do_stat_adventure(char_data *ch, adv_data *adv) {
 		return;
 	}
 	
-	add_page_display(&display, "VNum: [&c%d&0], Name: &c%s&0 (by &c%s&0)\r\n", GET_ADV_VNUM(adv), GET_ADV_NAME(adv), GET_ADV_AUTHOR(adv));
+	add_page_display(&display, "VNum: [&c%d&0], Name: &c%s&0 (by &c%s&0)", GET_ADV_VNUM(adv), GET_ADV_NAME(adv), GET_ADV_AUTHOR(adv));
 	add_page_display_str(&display, NULLSAFE(GET_ADV_DESCRIPTION(adv)));
 	
-	add_page_display(&display, "VNum range: [&c%d&0-&c%d&0], Level range: [&c%d&0-&c%d&0]\r\n", GET_ADV_START_VNUM(adv), GET_ADV_END_VNUM(adv), GET_ADV_MIN_LEVEL(adv), GET_ADV_MAX_LEVEL(adv));
+	add_page_display(&display, "VNum range: [&c%d&0-&c%d&0], Level range: [&c%d&0-&c%d&0]", GET_ADV_START_VNUM(adv), GET_ADV_END_VNUM(adv), GET_ADV_MIN_LEVEL(adv), GET_ADV_MAX_LEVEL(adv));
 
 	// reset time display helper
 	if (GET_ADV_RESET_TIME(adv) == 0) {
@@ -3134,22 +3134,22 @@ void do_stat_adventure(char_data *ch, adv_data *adv) {
 		sprintf(lbuf, "%d min", GET_ADV_RESET_TIME(adv));
 	}
 	
-	add_page_display(&display, "Instance limit: [&c%d&0/&c%d&0 (&c%d&0)], Player limit: [&c%d&0], Reset time: [&c%s&0]\r\n", count_instances(adventure_proto(GET_ADV_VNUM(adv))), adjusted_instance_limit(adv), GET_ADV_MAX_INSTANCES(adv), GET_ADV_PLAYER_LIMIT(adv), lbuf);
+	add_page_display(&display, "Instance limit: [&c%d&0/&c%d&0 (&c%d&0)], Player limit: [&c%d&0], Reset time: [&c%s&0]", count_instances(adventure_proto(GET_ADV_VNUM(adv))), adjusted_instance_limit(adv), GET_ADV_MAX_INSTANCES(adv), GET_ADV_PLAYER_LIMIT(adv), lbuf);
 	
 	sprintbit(GET_ADV_FLAGS(adv), adventure_flags, lbuf, TRUE);
-	add_page_display(&display, "Flags: &g%s&0\r\n", lbuf);
+	add_page_display(&display, "Flags: &g%s&0", lbuf);
 	
-	add_page_display(&display, "Temperature: [\tc%s\t0]\r\n", temperature_types[GET_ADV_TEMPERATURE_TYPE(adv)]);
+	add_page_display(&display, "Temperature: [\tc%s\t0]", temperature_types[GET_ADV_TEMPERATURE_TYPE(adv)]);
 	
 	get_adventure_linking_display(GET_ADV_LINKING(adv), lbuf);
-	add_page_display(&display, "Linking rules:\r\n%s", lbuf);
+	add_page_display(&display, "Linking rules:%s", lbuf);
 	
 	if (GET_ADV_SCRIPTS(adv)) {
 		get_script_display(GET_ADV_SCRIPTS(adv), lbuf);
-		add_page_display(&display, "Scripts:\r\n%s", lbuf);
+		add_page_display(&display, "Scripts:%s", lbuf);
 	}
 	else {
-		add_page_display_str(&display, "Scripts: none\r\n");
+		add_page_display_str(&display, "Scripts: none");
 	}
 	
 	page_display_to_char(ch, display);
