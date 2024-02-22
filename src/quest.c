@@ -5722,28 +5722,28 @@ void get_quest_reward_display(struct quest_reward *list, char *save_buffer, bool
 * @param quest_data *quest The quest to display.
 */
 void do_stat_quest(char_data *ch, quest_data *quest) {
-	char buf[MAX_STRING_LENGTH * 4], part[MAX_STRING_LENGTH];
-	size_t size;
+	char part[MAX_STRING_LENGTH];
+	struct page_display *display = NULL;
 	
 	if (!quest) {
 		return;
 	}
 	
 	// first line
-	size = snprintf(buf, sizeof(buf), "VNum: [\tc%d\t0], Name: \tc%s\t0\r\n", QUEST_VNUM(quest), QUEST_NAME(quest));
-	size += snprintf(buf + size, sizeof(buf) - size, "%s", QUEST_DESCRIPTION(quest));
-	size += snprintf(buf + size, sizeof(buf) - size, "-------------------------------------------------\r\n");
-	size += snprintf(buf + size, sizeof(buf) - size, "%s", QUEST_COMPLETE_MSG(quest));
+	add_page_display(&display, "VNum: [\tc%d\t0], Name: \tc%s\t0", QUEST_VNUM(quest), QUEST_NAME(quest));
+	add_page_display(&display, "%s", QUEST_DESCRIPTION(quest));
+	add_page_display(&display, "-------------------------------------------------");
+	add_page_display(&display, "%s", QUEST_COMPLETE_MSG(quest));
 	
 	sprintbit(QUEST_FLAGS(quest), quest_flags, part, TRUE);
-	size += snprintf(buf + size, sizeof(buf) - size, "Flags: \tg%s\t0\r\n", part);
+	add_page_display(&display, "Flags: \tg%s\t0", part);
 	
 	if (QUEST_FLAGGED(quest, QST_DAILY)) {
 		if (QUEST_DAILY_CYCLE(quest) != NOTHING) {
-			size += snprintf(buf + size, sizeof(buf) - size, "Daily cycle id: \tc%d\t0\r\n", QUEST_DAILY_CYCLE(quest));
+			add_page_display(&display, "Daily cycle id: \tc%d\t0", QUEST_DAILY_CYCLE(quest));
 		}
 		else {
-			size += snprintf(buf + size, sizeof(buf) - size, "Daily cycle id: \tcnone\t0\r\n");
+			add_page_display(&display, "Daily cycle id: \tcnone\t0");
 		}
 	}
 	
@@ -5756,28 +5756,29 @@ void do_stat_quest(char_data *ch, quest_data *quest) {
 	else {
 		sprintf(part, "%d minutes (%s)", QUEST_REPEATABLE_AFTER(quest), colon_time(QUEST_REPEATABLE_AFTER(quest), TRUE, NULL));
 	}
-	size += snprintf(buf + size, sizeof(buf) - size, "Level limits: [\tc%s\t0], Repeatable: [\tc%s\t0]\r\n", level_range_string(QUEST_MIN_LEVEL(quest), QUEST_MAX_LEVEL(quest), 0), part);
+	add_page_display(&display, "Level limits: [\tc%s\t0], Repeatable: [\tc%s\t0]", level_range_string(QUEST_MIN_LEVEL(quest), QUEST_MAX_LEVEL(quest), 0), part);
 		
 	get_requirement_display(QUEST_PREREQS(quest), part);
-	size += snprintf(buf + size, sizeof(buf) - size, "Pre-requisites:\r\n%s", *part ? part : " none\r\n");
+	add_page_display(&display, "Pre-requisites:\r\n%s", *part ? part : " none");
 	
 	get_quest_giver_display(QUEST_STARTS_AT(quest), part);
-	size += snprintf(buf + size, sizeof(buf) - size, "Starts at:\r\n%s", *part ? part : " nowhere\r\n");
+	add_page_display(&display, "Starts at:\r\n%s", *part ? part : " nowhere");
 	
 	get_quest_giver_display(QUEST_ENDS_AT(quest), part);
-	size += snprintf(buf + size, sizeof(buf) - size, "Ends at:\r\n%s", *part ? part : " nowhere\r\n");
+	add_page_display(&display, "Ends at:\r\n%s", *part ? part : " nowhere");
 	
 	get_requirement_display(QUEST_TASKS(quest), part);
-	size += snprintf(buf + size, sizeof(buf) - size, "Tasks:\r\n%s", *part ? part : " none\r\n");
+	add_page_display(&display, "Tasks:\r\n%s", *part ? part : " none");
 	
 	get_quest_reward_display(QUEST_REWARDS(quest), part, TRUE);
-	size += snprintf(buf + size, sizeof(buf) - size, "Rewards:\r\n%s", *part ? part : " none\r\n");
+	add_page_display(&display, "Rewards:\r\n%s", *part ? part : " none");
 	
 	// scripts
 	get_script_display(QUEST_SCRIPTS(quest), part);
-	size += snprintf(buf + size, sizeof(buf) - size, "Scripts:\r\n%s", QUEST_SCRIPTS(quest) ? part : " none\r\n");
+	add_page_display(&display, "Scripts:\r\n%s", QUEST_SCRIPTS(quest) ? part : " none");
 	
-	page_string(ch->desc, buf, TRUE);
+	page_display_to_char(ch, display);
+	free_page_display(&display);
 }
 
 
