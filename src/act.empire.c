@@ -5112,13 +5112,13 @@ ACMD(do_efind) {
 
 // syntax: elog [empire] [type] [lines]
 ACMD(do_elog) {
-	char *argptr, *tempptr, buf[MAX_STRING_LENGTH * 4], line[MAX_STRING_LENGTH];
+	char *argptr, *tempptr;
 	int iter, count, type = NOTHING, lines = -1;
 	struct empire_log_data *elog;
 	empire_data *emp = NULL;
-	size_t size;
 	bool found;
 	bool imm_access = GET_ACCESS_LEVEL(ch) >= LVL_CIMPL || IS_GRANTED(ch, GRANT_EMPIRES);
+	struct page_display *display = NULL;
 	
 	// in case none is provided
 	const int default_lines = 15;
@@ -5177,6 +5177,10 @@ ACMD(do_elog) {
 		msg_to_char(ch, "Invalid number of lines.\r\n");
 		return;
 	}
+	if (lines > 1500) {
+		msg_to_char(ch, "That's just too many lines.\r\n");
+		return;
+	}
 	
 	// did we find a line count?
 	if (lines == -1) {
@@ -5194,7 +5198,7 @@ ACMD(do_elog) {
 		}
 	}
 	
-	size = snprintf(buf, sizeof(buf), "%s logs for %s:\r\n", (type == NOTHING ? "All" : empire_log_types[type]), EMPIRE_NAME(emp));
+	add_page_display(&display, "%s logs for %s:", (type == NOTHING ? "All" : empire_log_types[type]), EMPIRE_NAME(emp));
 	
 	// now show the LAST [lines] log entries (show if remaining-lines<=0)
 	DL_FOREACH(EMPIRE_LOGS(emp), elog) {
@@ -5203,21 +5207,13 @@ ACMD(do_elog) {
 		}
 		if (type == NOTHING || elog->type == type) {
 			if (count-- - lines <= 0) {
-				snprintf(line, sizeof(line), "%3s: %s&0\r\n", simple_time_since(elog->timestamp), strip_color(elog->string));
-				
-				if (size + strlen(line) + 10 < sizeof(buf)) {
-					strcat(buf, line);
-					size += strlen(line);
-				}
-				else {
-					strcat(buf, "OVERFLOW\r\n");
-					break;
-				}
+				add_page_display(&display, "%3s: %s&0", simple_time_since(elog->timestamp), strip_color(elog->string));
 			}
 		}
 	}
 	
-	page_string(ch->desc, buf, TRUE);
+	page_display_to_char(ch, display);
+	free_page_display(&display);
 }
 
 
