@@ -1152,7 +1152,7 @@ EVENTFUNC(trig_wait_event) {
 
 void do_stat_trigger(char_data *ch, trig_data *trig) {
 	struct cmdlist_element *cmd_list;
-	char buf[MAX_STRING_LENGTH], temp[MAX_STRING_LENGTH];
+	char buf[MAX_STRING_LENGTH];
 	struct page_display *display = NULL;
 
 	if (!trig) {
@@ -1197,15 +1197,11 @@ void do_stat_trigger(char_data *ch, trig_data *trig) {
 	add_page_display(&display, "Trigger Type: %s, Numeric Arg: %d, Arg list: %s", buf, GET_TRIG_NARG(trig), ((GET_TRIG_ARG(trig) && *GET_TRIG_ARG(trig)) ? GET_TRIG_ARG(trig) : "None"));
 
 	add_page_display(&display, "Commands:"); 
-
-	cmd_list = trig->cmdlist;
-	while (cmd_list) {
+	
+	LL_FOREACH(trig->cmdlist, cmd_list) {
 		if (cmd_list->cmd) {
-			strcpy(temp, show_color_codes(cmd_list->cmd));
-			add_page_display(&display, "%s", temp);
+			add_page_display_str(&display, show_color_codes(cmd_list->cmd));
 		}
-		
-		cmd_list = cmd_list->next;
 	}
 
 	page_display_to_char(ch, display);

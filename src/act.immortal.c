@@ -3250,17 +3250,17 @@ void do_stat_building(char_data *ch, bld_data *bdg, bool details) {
 		add_page_display(&display, "Relations:\r\n%s", lbuf);
 	}
 	
-	sprintbit(GET_BLD_FLAGS(bdg), bld_flags, buf, TRUE);
-	add_page_display(&display, "Building flags: &c%s&0", buf);
+	sprintbit(GET_BLD_FLAGS(bdg), bld_flags, lbuf, TRUE);
+	add_page_display(&display, "Building flags: &c%s&0", lbuf);
 	
-	sprintbit(GET_BLD_FUNCTIONS(bdg), function_flags, buf, TRUE);
-	add_page_display(&display, "Functions: &g%s&0", buf);
+	sprintbit(GET_BLD_FUNCTIONS(bdg), function_flags, lbuf, TRUE);
+	add_page_display(&display, "Functions: &g%s&0", lbuf);
 	
-	sprintbit(GET_BLD_DESIGNATE_FLAGS(bdg), designate_flags, buf, TRUE);
-	add_page_display(&display, "Designate flags: &c%s&0", buf);
+	sprintbit(GET_BLD_DESIGNATE_FLAGS(bdg), designate_flags, lbuf, TRUE);
+	add_page_display(&display, "Designate flags: &c%s&0", lbuf);
 	
-	sprintbit(GET_BLD_BASE_AFFECTS(bdg), room_aff_bits, buf, TRUE);
-	add_page_display(&display, "Base affects: &g%s&0", buf);
+	sprintbit(GET_BLD_BASE_AFFECTS(bdg), room_aff_bits, lbuf, TRUE);
+	add_page_display(&display, "Base affects: &g%s&0", lbuf);
 	
 	add_page_display(&display, "Temperature: [\tc%s\t0]", temperature_types[GET_BLD_TEMPERATURE_TYPE(bdg)]);
 	
@@ -3274,25 +3274,25 @@ void do_stat_building(char_data *ch, bld_data *bdg, bool details) {
 			}
 		}
 		else {
-			sprintf(buf, "Extra descs:&c");
+			sprintf(lbuf, "Extra descs:&c");
 			LL_FOREACH(GET_BLD_EX_DESCS(bdg), desc) {
-				strcat(buf, " ");
-				strcat(buf, desc->keyword);
+				strcat(lbuf, " ");
+				strcat(lbuf, desc->keyword);
 			}
-			strcat(buf, "&0");
-			add_page_display_str(&display, buf);
+			strcat(lbuf, "&0");
+			add_page_display_str(&display, lbuf);
 		}
 	}
 	
 	if (GET_BLD_INTERACTIONS(bdg)) {
 		add_page_display_str(&display, "Interactions:");
-		get_interaction_display(GET_BLD_INTERACTIONS(bdg), buf);
-		add_page_display_str(&display, buf);
+		get_interaction_display(GET_BLD_INTERACTIONS(bdg), lbuf);
+		add_page_display_str(&display, lbuf);
 	}
 	
 	if (GET_BLD_REGULAR_MAINTENANCE(bdg)) {
-		get_resource_display(ch, GET_BLD_REGULAR_MAINTENANCE(bdg), buf);
-		add_page_display(&display, "Regular maintenance:\r\n%s", buf);
+		get_resource_display(ch, GET_BLD_REGULAR_MAINTENANCE(bdg), lbuf);
+		add_page_display(&display, "Regular maintenance:\r\n%s", lbuf);
 	}
 	
 	if (GET_BLD_SCRIPTS(bdg)) {
@@ -3334,23 +3334,23 @@ void do_stat_character(char_data *ch, char_data *k, bool details) {
 	// ensure fully loaded
 	check_delayed_load(k);
 
-	sprinttype(GET_REAL_SEX(k), genders, buf, sizeof(buf), "???");
-	CAP(buf);
+	sprinttype(GET_REAL_SEX(k), genders, lbuf, sizeof(lbuf), "???");
+	CAP(lbuf);
 	if (!IS_NPC(k)) {
-		add_page_display(&display, "%s PC '\ty%s\t0', Lastname '\ty%s\t0', IDNum: [%5d], In room [%5d]", buf, GET_NAME(k), GET_CURRENT_LASTNAME(k) ? GET_CURRENT_LASTNAME(k) : "none", GET_IDNUM(k), IN_ROOM(k) ? GET_ROOM_VNUM(IN_ROOM(k)) : NOWHERE);
+		add_page_display(&display, "%s PC '\ty%s\t0', Lastname '\ty%s\t0', IDNum: [%5d], In room [%5d]", lbuf, GET_NAME(k), GET_CURRENT_LASTNAME(k) ? GET_CURRENT_LASTNAME(k) : "none", GET_IDNUM(k), IN_ROOM(k) ? GET_ROOM_VNUM(IN_ROOM(k)) : NOWHERE);
 	}
 	else {	// mob
-		add_page_display(&display, "%s %s '\ty%s\t0', ID: [%5d], In room [%5d]", buf, (!IS_MOB(k) ? "NPC" : "MOB"), GET_NAME(k), k->script_id, IN_ROOM(k) ? GET_ROOM_VNUM(IN_ROOM(k)) : NOWHERE);
+		add_page_display(&display, "%s %s '\ty%s\t0', ID: [%5d], In room [%5d]", lbuf, (!IS_MOB(k) ? "NPC" : "MOB"), GET_NAME(k), k->script_id, IN_ROOM(k) ? GET_ROOM_VNUM(IN_ROOM(k)) : NOWHERE);
 	}
 	
 	if (!IS_NPC(k) && GET_ACCOUNT(k)) {
 		if (GET_ACCESS_LEVEL(ch) >= LVL_TO_SEE_ACCOUNTS) {
-			sprintbit(GET_ACCOUNT(k)->flags, account_flags, buf, TRUE);
-			add_page_display(&display, "Account: [%d], Flags: &g%s&0", GET_ACCOUNT(k)->id, buf);
+			sprintbit(GET_ACCOUNT(k)->flags, account_flags, lbuf, TRUE);
+			add_page_display(&display, "Account: [%d], Flags: &g%s&0", GET_ACCOUNT(k)->id, lbuf);
 		}
 		else {	// low-level imms only see certain account flags
-			sprintbit(GET_ACCOUNT(k)->flags & VISIBLE_ACCT_FLAGS, account_flags, buf, TRUE);
-			add_page_display(&display, "Account: &g%s&0", buf);
+			sprintbit(GET_ACCOUNT(k)->flags & VISIBLE_ACCT_FLAGS, account_flags, lbuf, TRUE);
+			add_page_display(&display, "Account: &g%s&0", lbuf);
 		}
 	}
 	
@@ -3389,8 +3389,8 @@ void do_stat_character(char_data *ch, char_data *k, bool details) {
 		}
 		append_page_display_line(pd, "%s", count ? "" : " none");
 		
-		coin_string(GET_PLAYER_COINS(k), buf);
-		add_page_display(&display, "Coins: %s", buf);
+		coin_string(GET_PLAYER_COINS(k), lbuf);
+		add_page_display(&display, "Coins: %s", lbuf);
 
 		strcpy(buf1, (char *) asctime(localtime(&(k->player.time.birth))));
 		strcpy(buf2, buf1 + 20);
@@ -3403,8 +3403,8 @@ void do_stat_character(char_data *ch, char_data *k, bool details) {
 		}
 		
 		if (GET_ACCESS_LEVEL(k) >= LVL_BUILDER) {
-			sprintbit(GET_OLC_FLAGS(k), olc_flag_bits, buf, TRUE);
-			add_page_display(&display, "OLC Vnums: [&c%d-%d&0], Flags: &g%s&0", GET_OLC_MIN_VNUM(k), GET_OLC_MAX_VNUM(k), buf);
+			sprintbit(GET_OLC_FLAGS(k), olc_flag_bits, lbuf, TRUE);
+			add_page_display(&display, "OLC Vnums: [&c%d-%d&0], Flags: &g%s&0", GET_OLC_MIN_VNUM(k), GET_OLC_MAX_VNUM(k), lbuf);
 		}
 	}
 
@@ -3494,8 +3494,8 @@ void do_stat_character(char_data *ch, char_data *k, bool details) {
 	}
 
 	if (IS_NPC(k) && k->interactions) {
-		get_interaction_display(k->interactions, buf);
-		add_page_display(&display, "Interactions:\r\n%s", buf);
+		get_interaction_display(k->interactions, lbuf);
+		add_page_display(&display, "Interactions:\r\n%s", lbuf);
 	}
 	
 	if (MOB_CUSTOM_MSGS(k)) {
@@ -3527,23 +3527,23 @@ void do_stat_character(char_data *ch, char_data *k, bool details) {
 	}
 
 	if (!is_proto) {
-		sprintf(buf, "Leader is: %s, Followers are:", ((GET_LEADER(k)) ? GET_NAME(GET_LEADER(k)) : "<none>"));
+		sprintf(lbuf, "Leader is: %s, Followers are:", ((GET_LEADER(k)) ? GET_NAME(GET_LEADER(k)) : "<none>"));
 		for (fol = k->followers; fol; fol = fol->next) {
 			sprintf(buf2, "%s %s", found++ ? "," : "", PERS(fol->follower, ch, 1));
-			strcat(buf, buf2);
-			if (strlen(buf) >= 62) {
+			strcat(lbuf, buf2);
+			if (strlen(lbuf) >= 62) {
 				if (fol->next) {
-					add_page_display(&display, "%s,", buf);
+					add_page_display(&display, "%s,", lbuf);
 				}
 				else {
-					add_page_display_str(&display, buf);
+					add_page_display_str(&display, lbuf);
 				}
-				*buf = found = 0;
+				*lbuf = found = 0;
 			}
 		}
 
-		if (*buf) {
-			add_page_display_str(&display, buf);
+		if (*lbuf) {
+			add_page_display_str(&display, lbuf);
 		}
 	}
 
@@ -3644,6 +3644,7 @@ void do_stat_character(char_data *ch, char_data *k, bool details) {
 
 
 void do_stat_craft(char_data *ch, craft_data *craft) {
+	char lbuf[MAX_STRING_LENGTH];
 	ability_data *abil;
 	bld_data *bld;
 	int seconds;
@@ -3665,31 +3666,31 @@ void do_stat_craft(char_data *ch, craft_data *craft) {
 		add_page_display(&display, "Creates Quantity: [&g%d&0], Item: [&c%d&0] %s", GET_CRAFT_QUANTITY(craft), GET_CRAFT_OBJECT(craft), get_obj_name_by_proto(GET_CRAFT_OBJECT(craft)));
 	}
 	
-	sprintf(buf, "[%d] %s", GET_CRAFT_ABILITY(craft), (GET_CRAFT_ABILITY(craft) == NO_ABIL ? "none" : get_ability_name_by_vnum(GET_CRAFT_ABILITY(craft))));
+	sprintf(lbuf, "[%d] %s", GET_CRAFT_ABILITY(craft), (GET_CRAFT_ABILITY(craft) == NO_ABIL ? "none" : get_ability_name_by_vnum(GET_CRAFT_ABILITY(craft))));
 	if ((abil = find_ability_by_vnum(GET_CRAFT_ABILITY(craft))) && ABIL_ASSIGNED_SKILL(abil) != NULL) {
-		sprintf(buf + strlen(buf), " ([%d] %s %d)", SKILL_VNUM(ABIL_ASSIGNED_SKILL(abil)), SKILL_NAME(ABIL_ASSIGNED_SKILL(abil)), ABIL_SKILL_LEVEL(abil));
+		sprintf(lbuf + strlen(lbuf), " ([%d] %s %d)", SKILL_VNUM(ABIL_ASSIGNED_SKILL(abil)), SKILL_NAME(ABIL_ASSIGNED_SKILL(abil)), ABIL_SKILL_LEVEL(abil));
 	}
-	pd = add_page_display(&display, "Ability: &y%s&0, Level: &g%d&0", buf, GET_CRAFT_MIN_LEVEL(craft));
+	pd = add_page_display(&display, "Ability: &y%s&0, Level: &g%d&0", lbuf, GET_CRAFT_MIN_LEVEL(craft));
 	
 	if (!CRAFT_IS_BUILDING(craft) && !CRAFT_IS_VEHICLE(craft)) {
 		seconds = GET_CRAFT_TIME(craft) * ACTION_CYCLE_TIME;
 		append_page_display_line(pd, ", Time: [&g%d action tick%s&0 | &g%s&0]", GET_CRAFT_TIME(craft), PLURAL(GET_CRAFT_TIME(craft)), colon_time(seconds, FALSE, NULL));
 	}
 
-	sprintbit(GET_CRAFT_FLAGS(craft), craft_flags, buf, TRUE);
-	add_page_display(&display, "Flags: &c%s&0", buf);
+	sprintbit(GET_CRAFT_FLAGS(craft), craft_flags, lbuf, TRUE);
+	add_page_display(&display, "Flags: &c%s&0", lbuf);
 	
-	prettier_sprintbit(GET_CRAFT_REQUIRES_TOOL(craft), tool_flags, buf);
-	add_page_display(&display, "Requires tool: &y%s&0", buf);
+	prettier_sprintbit(GET_CRAFT_REQUIRES_TOOL(craft), tool_flags, lbuf);
+	add_page_display(&display, "Requires tool: &y%s&0", lbuf);
 	
-	sprintbit(GET_CRAFT_REQUIRES_FUNCTION(craft), function_flags, buf, TRUE);
-	add_page_display(&display, "Requires Functions: \tg%s\t0", buf);
+	sprintbit(GET_CRAFT_REQUIRES_FUNCTION(craft), function_flags, lbuf, TRUE);
+	add_page_display(&display, "Requires Functions: \tg%s\t0", lbuf);
 	
 	if (CRAFT_IS_BUILDING(craft) || CRAFT_IS_VEHICLE(craft)) {
-		ordered_sprintbit(GET_CRAFT_BUILD_ON(craft), bld_on_flags, bld_on_flags_order, TRUE, buf);
-		add_page_display(&display, "Build on: &g%s&0", buf);
-		ordered_sprintbit(GET_CRAFT_BUILD_FACING(craft), bld_on_flags, bld_on_flags_order, TRUE, buf);
-		add_page_display(&display, "Build facing: &c%s&0", buf);
+		ordered_sprintbit(GET_CRAFT_BUILD_ON(craft), bld_on_flags, bld_on_flags_order, TRUE, lbuf);
+		add_page_display(&display, "Build on: &g%s&0", lbuf);
+		ordered_sprintbit(GET_CRAFT_BUILD_FACING(craft), bld_on_flags, bld_on_flags_order, TRUE, lbuf);
+		add_page_display(&display, "Build facing: &c%s&0", lbuf);
 	}
 	
 	if (GET_CRAFT_REQUIRES_OBJ(craft) != NOTHING) {
@@ -3697,8 +3698,8 @@ void do_stat_craft(char_data *ch, craft_data *craft) {
 	}
 
 	// resources
-	get_resource_display(ch, GET_CRAFT_RESOURCES(craft), buf);
-	add_page_display(&display, "Resources required:\r\n%s", buf);
+	get_resource_display(ch, GET_CRAFT_RESOURCES(craft), lbuf);
+	add_page_display(&display, "Resources required:\r\n%s", lbuf);
 	
 	page_display_to_char(ch, display);
 	free_page_display(&display);

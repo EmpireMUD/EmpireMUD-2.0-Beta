@@ -4618,8 +4618,8 @@ void do_stat_vehicle(char_data *ch, vehicle_data *veh, bool details) {
 	if (VEH_EXTRA_DATA(veh)) {
 		add_page_display(&display, "Extra data:");
 		HASH_ITER(hh, VEH_EXTRA_DATA(veh), red, next_red) {
-			sprinttype(red->type, room_extra_types, buf, sizeof(buf), "UNDEFINED");
-			add_page_display(&display, " %s: %d", buf, red->value);
+			sprinttype(red->type, room_extra_types, part, sizeof(part), "UNDEFINED");
+			add_page_display(&display, " %s: %d", part, red->value);
 		}
 	}
 	
