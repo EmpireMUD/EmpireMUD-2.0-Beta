@@ -1089,36 +1089,37 @@ void get_shop_items_display(shop_data *shop, char *save_buffer) {
 * @param shop_data *shop The shop to display.
 */
 void do_stat_shop(char_data *ch, shop_data *shop) {
-	char buf[MAX_STRING_LENGTH], part[MAX_STRING_LENGTH];
-	size_t size;
+	char part[MAX_STRING_LENGTH];
+	struct page_display *display = NULL, *pd;
 	
 	if (!shop) {
 		return;
 	}
 	
 	// first line
-	size = snprintf(buf, sizeof(buf), "VNum: [\tc%d\t0], Name: \ty%s\t0\r\n", SHOP_VNUM(shop), SHOP_NAME(shop));
+	add_page_display(&display, "VNum: [\tc%d\t0], Name: \ty%s\t0", SHOP_VNUM(shop), SHOP_NAME(shop));
 	
 	// 2nd line
 	if (SHOP_OPEN_TIME(shop) == SHOP_CLOSE_TIME(shop)) {
-		size += snprintf(buf + size, sizeof(buf) - size, "Times: [\tcalways open\t0]");
+		pd = add_page_display(&display, "Times: [\tcalways open\t0]");
 	}
 	else {
-		size += snprintf(buf + size, sizeof(buf) - size, "Times: [\tc%d%s\t0 - \tc%d%s\t0]", TIME_TO_12H(SHOP_OPEN_TIME(shop)), AM_PM(SHOP_OPEN_TIME(shop)), TIME_TO_12H(SHOP_CLOSE_TIME(shop)), AM_PM(SHOP_CLOSE_TIME(shop)));
+		pd = add_page_display(&display, "Times: [\tc%d%s\t0 - \tc%d%s\t0]", TIME_TO_12H(SHOP_OPEN_TIME(shop)), AM_PM(SHOP_OPEN_TIME(shop)), TIME_TO_12H(SHOP_CLOSE_TIME(shop)), AM_PM(SHOP_CLOSE_TIME(shop)));
 	}
 	// still 2nd line
-	size += snprintf(buf + size, sizeof(buf) - size, ", Faction allegiance: [\ty%s\t0]\r\n", SHOP_ALLEGIANCE(shop) ? FCT_NAME(SHOP_ALLEGIANCE(shop)) : "none");
+	append_page_display_line(pd, ", Faction allegiance: [\ty%s\t0]", SHOP_ALLEGIANCE(shop) ? FCT_NAME(SHOP_ALLEGIANCE(shop)) : "none");
 	
 	sprintbit(SHOP_FLAGS(shop), shop_flags, part, TRUE);
-	size += snprintf(buf + size, sizeof(buf) - size, "Flags: \tg%s\t0\r\n", part);
+	add_page_display(&display, "Flags: \tg%s\t0", part);
 	
 	get_quest_giver_display(SHOP_LOCATIONS(shop), part);
-	size += snprintf(buf + size, sizeof(buf) - size, "Locations:\r\n%s", part);
+	add_page_display(&display, "Locations:\r\n%s", part);
 	
 	get_shop_items_display(shop, part);
-	sprintf(buf + strlen(buf), "Items:\r\n%s", part);
+	add_page_display(&display, "Items:\r\n%s", part);
 	
-	page_string(ch->desc, buf, TRUE);
+	page_display_to_char(ch, display);
+	free_page_display(&display);
 }
 
 
