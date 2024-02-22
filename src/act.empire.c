@@ -1392,13 +1392,13 @@ void show_workforce_where(empire_data *emp, char_data *to, bool here, char *argu
 		int count;
 		UT_hash_handle hh;
 	};
-
+	
+	char line[256];
 	struct workforce_count_type *find, *wct, *next_wct, *counts = NULL;
-	char buf[MAX_STRING_LENGTH * 2], line[MAX_STRING_LENGTH];
 	struct workforce_where_log *wwl;
 	room_data *room;
 	int iter, total, requesters_island, only_chore = NOTHING;
-	size_t size, lsize;
+	struct page_display *display = NULL;
 	
 	if (!emp) {
 		msg_to_char(to, "No empire workforce found.\r\n");
@@ -1421,7 +1421,7 @@ void show_workforce_where(empire_data *emp, char_data *to, bool here, char *argu
 	requesters_island = GET_ISLAND_ID(IN_ROOM(to));
 	
 	if (only_chore != NOTHING) {	// SHOW DETAILS FOR 1 CHORE
-		size = snprintf(buf, sizeof(buf), "Citizens working the %s chore:\r\n", chore_data[only_chore].name);
+		add_page_display(&display, "Citizens working the %s chore:", chore_data[only_chore].name);
 		total = 0;
 		
 		DL_FOREACH(EMPIRE_WORKFORCE_WHERE_LOG(emp), wwl) {
@@ -1437,24 +1437,17 @@ void show_workforce_where(empire_data *emp, char_data *to, bool here, char *argu
 			
 			// found
 			++total;
-			lsize = snprintf(line, sizeof(line), "%s %s: %s\r\n", coord_display_room(to, room, TRUE), skip_filler(get_room_name(room, FALSE)), GET_SHORT_DESC(wwl->mob));
-			if (size + lsize < sizeof(buf)) {
-				strcat(buf, line);
-				size += lsize;
-			}
-			else {
-				size += snprintf(buf + size, sizeof(buf) - size, "OVERFLOW\r\n");
-				break;
-			}
+			add_page_display(&display, "%s %s: %s", coord_display_room(to, room, TRUE), skip_filler(get_room_name(room, FALSE)), GET_SHORT_DESC(wwl->mob));
 		}
-		if (total && size + 20 < sizeof(buf)) {
-			size += snprintf(buf + size, sizeof(buf) - size, " (%d total workers)\r\n", total);
+		if (total) {
+			add_page_display(&display, " (%d total workers)", total);
 		}
 		else if (!total) {
-			strcat(buf, " no workers\r\n");	// always room if !total
+			add_page_display_str(&display, " no workers");
 		}
 		
-		page_string(to->desc, buf, TRUE);
+		page_display_to_char(to, display);
+		free_page_display(&display);
 	}
 	else {	// SHOW ALL CHORES
 		// count up workforce mobs
@@ -1486,24 +1479,19 @@ void show_workforce_where(empire_data *emp, char_data *to, bool here, char *argu
 			return;
 		}
 	
-		size = snprintf(buf, sizeof(buf), "Working %s citizens:\r\n", EMPIRE_ADJECTIVE(emp));
+		add_page_display(&display, "Working %s citizens:", EMPIRE_ADJECTIVE(emp));
 	
 		HASH_ITER(hh, counts, wct, next_wct) {
-			// only bother adding if there's room in the buffer
-			if (size < sizeof(buf) - 5) {
-				snprintf(line, sizeof(line), "%s: %d worker%s\r\n", chore_data[wct->chore].name, wct->count, PLURAL(wct->count));
-				size += snprintf(buf + size, sizeof(buf) - size, "%s", CAP(line));
-			}
-			else {
-				size += snprintf(buf + size, sizeof(buf) - size, "...\r\n");
-			}
-		
+			snprintf(line, sizeof(line), "%s: %d worker%s\r\n", chore_data[wct->chore].name, wct->count, PLURAL(wct->count));
+			add_page_display_str(&display, CAP(line));
+			
 			// remove and free
 			HASH_DEL(counts, wct);
 			free(wct);
 		}
-	
-		page_string(to->desc, buf, TRUE);
+		
+		page_display_to_char(to, display);
+		free_page_display(&display);
 	}
 }
 
@@ -1516,14 +1504,14 @@ void show_workforce_where(empire_data *emp, char_data *to, bool here, char *argu
 * @param char *argument Any more args.
 */
 void show_workforce_why(empire_data *emp, char_data *ch, char *argument) {
-	char buf[MAX_STRING_LENGTH * 2], unsupplied[MAX_STRING_LENGTH], line[256], mult[256], rname[256];
+	char unsupplied[MAX_STRING_LENGTH], mult[256], rname[256];
 	int iter, only_chore = NOTHING, last_chore, last_problem, count;
 	struct empire_island *isle, *next_isle;
 	struct workforce_log *wf_log;
 	room_vnum only_loc = NOWHERE;
 	bool any = FALSE;
 	room_data *room, *only_room = NULL;
-	size_t size;
+	struct page_display *display = NULL;
 	
 	if (!ch->desc) {
 		return;	// nothing to show
@@ -1573,7 +1561,7 @@ void show_workforce_why(empire_data *emp, char_data *ch, char *argument) {
 	}
 	
 	// show all data
-	size = snprintf(buf, sizeof(buf), "Recent workforce problems:\r\n%s", unsupplied);
+	add_page_display(&display, "Recent workforce problems:\r\n%s", unsupplied);
 	
 	if (*argument) {	// normal display
 		LL_FOREACH(EMPIRE_WORKFORCE_LOG(emp), wf_log) {
@@ -1602,17 +1590,8 @@ void show_workforce_why(empire_data *emp, char_data *ch, char *argument) {
 				*rname = '\0';
 			}
 		
-			snprintf(line, sizeof(line), "%s %s%s: %s%s%s\r\n", coord_display(ch, X_COORD(room), Y_COORD(room), TRUE), rname, chore_data[wf_log->chore].name, wf_problem_types[wf_log->problem], mult, wf_log->delayed ? " (delayed)" : "");
+			add_page_display(&display, "%s %s%s: %s%s%s", coord_display(ch, X_COORD(room), Y_COORD(room), TRUE), rname, chore_data[wf_log->chore].name, wf_problem_types[wf_log->problem], mult, wf_log->delayed ? " (delayed)" : "");
 			any = TRUE;
-		
-			if (strlen(line) + size + 16 < sizeof(buf)) {	// reserve space for overflow
-				strcat(buf, line);
-				size += strlen(line);
-			}
-			else {
-				snprintf(buf + size, sizeof(buf) - size, "***OVERFLOW***\r\n");
-				break;
-			}
 		}
 	}
 	else {	// grouped display (no-arg)
@@ -1629,21 +1608,13 @@ void show_workforce_why(empire_data *emp, char_data *ch, char *argument) {
 				wf_log = wf_log->next;	// advance past identical entries
 			}
 			
-			snprintf(line, sizeof(line), " %s: %s (x%d)\r\n", chore_data[last_chore].name, wf_problem_types[last_problem], count);
-			
-			if (strlen(line) + size + 16 < sizeof(buf)) {	// reserve space for overflow
-				strcat(buf, line);
-				size += strlen(line);
-			}
-			else {
-				snprintf(buf + size, sizeof(buf) - size, "***OVERFLOW***\r\n");
-				break;
-			}
+			add_page_display(&display, " %s: %s (x%d)", chore_data[last_chore].name, wf_problem_types[last_problem], count);
 		}
 	}
 	
-	if (any || *unsupplied) {
-		page_string(ch->desc, buf, TRUE);
+	if (any || *unsupplied || display) {
+		page_display_to_char(ch, display);
+		free_page_display(&display);
 	}
 	else if (only_room && ROOM_OWNER(only_room) != GET_LOYALTY(ch)) {
 		msg_to_char(ch, "Workforce isn't working because your empire doesn't own %s location.\r\n", (only_room == IN_ROOM(ch)) ? "this" : "that");
@@ -8696,15 +8667,14 @@ void do_workforce_nearby(char_data *ch, empire_data *emp, char *argument) {
 	struct empire_npc_data *npc;
 	struct generic_name_data *nameset;
 	char_data *proto;
-	char buf[MAX_STRING_LENGTH], line[256], name[256], *temp;
-	size_t size, lsize;
+	char name[256], *temp;
 	int avail, working;
-	bool full = FALSE;
+	struct page_display *display = NULL;
 	
 	int chore_distance = config_get_int("chore_distance");
 	
 	avail = working = 0;
-	size = snprintf(buf, sizeof(buf), "Citizens living within %d tile%s of here:\r\n", chore_distance, PLURAL(chore_distance));
+	add_page_display(&display, "Citizens living within %d tile%s of here:", chore_distance, PLURAL(chore_distance));
 	
 	// try territory first
 	HASH_ITER(hh, EMPIRE_TERRITORY_LIST(emp), ter, next_ter) {
@@ -8716,9 +8686,7 @@ void do_workforce_nearby(char_data *ch, empire_data *emp, char *argument) {
 		LL_FOREACH(ter->npcs, npc) {
 			// determine mob name
 			if (npc->mob) {
-				if (!full) {
-					snprintf(name, sizeof(name), "%s%s", GET_SHORT_DESC(npc->mob), (GET_MOB_VNUM(npc->mob) != npc->vnum) ? " (working)" : "");
-				}
+				snprintf(name, sizeof(name), "%s%s", GET_SHORT_DESC(npc->mob), (GET_MOB_VNUM(npc->mob) != npc->vnum) ? " (working)" : "");
 				if (GET_MOB_VNUM(npc->mob) != npc->vnum) {
 					++working;
 				}
@@ -8727,41 +8695,22 @@ void do_workforce_nearby(char_data *ch, empire_data *emp, char *argument) {
 				}
 			}
 			else if ((proto = mob_proto(npc->vnum))) {
-				if (!full) {
-					nameset = get_best_name_list(MOB_NAME_SET(proto), npc->sex);
-					snprintf(name, sizeof(name), "%s", nameset->names[npc->name]);
-					
-					temp = str_replace("#n", name, GET_SHORT_DESC(proto));
-					strncpy(name, temp, sizeof(name));
-					name[sizeof(name)-1] = '\0';	// ensure terminator
-					free(temp);
-				}
+				nameset = get_best_name_list(MOB_NAME_SET(proto), npc->sex);
+				snprintf(name, sizeof(name), "%s", nameset->names[npc->name]);
+				
+				temp = str_replace("#n", name, GET_SHORT_DESC(proto));
+				strncpy(name, temp, sizeof(name));
+				name[sizeof(name)-1] = '\0';	// ensure terminator
+				free(temp);
 				++avail;
 			}
 			else {
-				if (!full) {
-					snprintf(name, sizeof(name), "UNKNOWN");
-				}
+				snprintf(name, sizeof(name), "UNKNOWN");
 				++avail;
 			}
 			
-			if (full) {
-				// just counting, no appending
-			}
-			else {
-				// prepare name
-				lsize = snprintf(line, sizeof(line), "%s %s\r\n", coord_display_room(ch, ter->room, TRUE), name);
-			
-				// append
-				if (lsize + size + 110 < sizeof(buf)) {
-					size += lsize;
-					strcat(buf, line);
-				}
-				else {
-					// mark for count-only
-					full = TRUE;
-				}
-			}
+			// and add
+			add_page_display(&display, "%s %s", coord_display_room(ch, ter->room, TRUE), name);
 		}
 	}
 	
@@ -8775,9 +8724,7 @@ void do_workforce_nearby(char_data *ch, empire_data *emp, char *argument) {
 		LL_FOREACH(vter->npcs, npc) {
 			// determine mob name
 			if (npc->mob) {
-				if (!full) {
-					snprintf(name, sizeof(name), "%s%s", GET_SHORT_DESC(npc->mob), (GET_MOB_VNUM(npc->mob) != npc->vnum) ? " (working)" : "");
-				}
+				snprintf(name, sizeof(name), "%s%s", GET_SHORT_DESC(npc->mob), (GET_MOB_VNUM(npc->mob) != npc->vnum) ? " (working)" : "");
 				if (GET_MOB_VNUM(npc->mob) != npc->vnum) {
 					++working;
 				}
@@ -8786,54 +8733,34 @@ void do_workforce_nearby(char_data *ch, empire_data *emp, char *argument) {
 				}
 			}
 			else if ((proto = mob_proto(npc->vnum))) {
-				if (!full) {
-					nameset = get_best_name_list(MOB_NAME_SET(proto), npc->sex);
-					snprintf(name, sizeof(name), "%s", nameset->names[npc->name]);
-					
-					temp = str_replace("#n", name, GET_SHORT_DESC(proto));
-					strncpy(name, temp, sizeof(name));
-					name[sizeof(name)-1] = '\0';	// ensure terminator
-					free(temp);
-				}
+				nameset = get_best_name_list(MOB_NAME_SET(proto), npc->sex);
+				snprintf(name, sizeof(name), "%s", nameset->names[npc->name]);
+			
+				temp = str_replace("#n", name, GET_SHORT_DESC(proto));
+				strncpy(name, temp, sizeof(name));
+				name[sizeof(name)-1] = '\0';	// ensure terminator
+				free(temp);
 				++avail;
 			}
 			else {
-				if (!full) {
-					snprintf(name, sizeof(name), "UNKNOWN");
-				}
+				snprintf(name, sizeof(name), "UNKNOWN");
 				++avail;
 			}
 			
-			if (full) {
-				// just counting, no appending
-			}
-			else {
-				// prepare name
-				lsize = snprintf(line, sizeof(line), "%s %s\r\n", coord_display_room(ch, IN_ROOM(vter->veh), TRUE), name);
-				
-				// append
-				if (lsize + size + 110 < sizeof(buf)) {
-					size += lsize;
-					strcat(buf, line);
-				}
-				else {
-					// mark for count-only
-					full = TRUE;
-				}
-			}
+			// and add
+			add_page_display(&display, "%s %s", coord_display_room(ch, IN_ROOM(vter->veh), TRUE), name);
 		}
 	}
 	
 	if (avail == 0 && working == 0) {
-		size += snprintf(buf + size, sizeof(buf) - size, " none\r\n");
+		add_page_display(&display, " none");
 	}
-	else if (size + 40 < sizeof(buf)) {
-		size += snprintf(buf + size, sizeof(buf) - size, "%s%d available, %d working, %d total\r\n", (full ? " ... and more\r\n" : ""), avail, working, avail + working);
+	else {
+		add_page_display(&display, "%d available, %d working, %d total", avail, working, avail + working);
 	}
 	
-	if (ch->desc) {
-		page_string(ch->desc, buf, TRUE);
-	}
+	page_display_to_char(ch, display);
+	free_page_display(&display);
 }
 
 
