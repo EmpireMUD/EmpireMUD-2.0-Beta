@@ -676,31 +676,32 @@ social_data *setup_olc_social(social_data *input) {
 * @param social_data *soc The social to display.
 */
 void do_stat_social(char_data *ch, social_data *soc) {
-	char buf[MAX_STRING_LENGTH], part[MAX_STRING_LENGTH];
-	size_t size;
+	char part[MAX_STRING_LENGTH];
 	int iter;
+	struct page_display *display = NULL;
 	
 	if (!soc) {
 		return;
 	}
 	
 	// first line
-	size = snprintf(buf, sizeof(buf), "VNum: [\tc%d\t0], Command: \tc%s\t0, Name: \tc%s\t0\r\n", SOC_VNUM(soc), SOC_COMMAND(soc), SOC_NAME(soc));
+	add_page_display(&display, "VNum: [\tc%d\t0], Command: \tc%s\t0, Name: \tc%s\t0", SOC_VNUM(soc), SOC_COMMAND(soc), SOC_NAME(soc));
 	
-	size += snprintf(buf + size, sizeof(buf) - size, "Min actor position: \ty%s\t0, Min victim position: \ty%s\t0\r\n", position_types[SOC_MIN_CHAR_POS(soc)], position_types[SOC_MIN_VICT_POS(soc)]);
+	add_page_display(&display, "Min actor position: \ty%s\t0, Min victim position: \ty%s\t0", position_types[SOC_MIN_CHAR_POS(soc)], position_types[SOC_MIN_VICT_POS(soc)]);
 	
 	sprintbit(SOC_FLAGS(soc), social_flags, part, TRUE);
-	size += snprintf(buf + size, sizeof(buf) - size, "Flags: \tg%s\t0\r\n", part);
+	add_page_display(&display, "Flags: \tg%s\t0", part);
 	
 	get_requirement_display(SOC_REQUIREMENTS(soc), part);
-	size += snprintf(buf + size, sizeof(buf) - size, "Requirements:\r\n%s", *part ? part : " none\r\n");
+	add_page_display(&display, "Requirements:\r\n%s", *part ? part : " none");
 	
-	size += snprintf(buf + size, sizeof(buf) - size, "Messages:\r\n");
+	add_page_display(&display, "Messages:");
 	for (iter = 0; iter < NUM_SOCM_MESSAGES; ++iter) {
-		size += snprintf(buf + size, sizeof(buf) - size, "\tc%s\t0: %s\r\n", social_message_types[iter][0], SOC_MESSAGE(soc, iter) ? SOC_MESSAGE(soc, iter) : "(none)");
+		add_page_display(&display, "\tc%s\t0: %s", social_message_types[iter][0], SOC_MESSAGE(soc, iter) ? SOC_MESSAGE(soc, iter) : "(none)");
 	}
 	
-	page_string(ch->desc, buf, TRUE);
+	page_display_to_char(ch, display);
+	free_page_display(&display);
 }
 
 
