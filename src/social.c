@@ -754,13 +754,16 @@ void olc_show_social(char_data *ch) {
 int vnum_social(char *searchname, char_data *ch) {
 	social_data *iter, *next_iter;
 	int found = 0;
+	struct page_display *display = NULL;
 	
 	HASH_ITER(hh, social_table, iter, next_iter) {
 		if (multi_isname(searchname, SOC_NAME(iter)) || multi_isname(searchname, SOC_COMMAND(iter))) {
-			msg_to_char(ch, "%3d. [%5d] %s (%s)\r\n", ++found, SOC_VNUM(iter), SOC_NAME(iter), SOC_COMMAND(iter));
+			add_page_display(&display, "%3d. [%5d] %s (%s)", ++found, SOC_VNUM(iter), SOC_NAME(iter), SOC_COMMAND(iter));
 		}
 	}
 	
+	page_display_to_char(ch, display);
+	free_page_display(&display);
 	return found;
 }
 

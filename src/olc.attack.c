@@ -1943,13 +1943,16 @@ void olc_show_attack_message(char_data *ch) {
 int vnum_attack_message(char *searchname, char_data *ch) {
 	attack_message_data *iter, *next_iter;
 	int found = 0;
+	struct page_display *display = NULL;
 	
 	HASH_ITER(hh, attack_message_table, iter, next_iter) {
 		if (multi_isname(searchname, ATTACK_NAME(iter))) {
-			msg_to_char(ch, "%3d. [%5d] %s\r\n", ++found, ATTACK_VNUM(iter), ATTACK_NAME(iter));
+			add_page_display(&display, "%3d. [%5d] %s", ++found, ATTACK_VNUM(iter), ATTACK_NAME(iter));
 		}
 	}
 	
+	page_display_to_char(ch, display);
+	free_page_display(&display);
 	return found;
 }
 

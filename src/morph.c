@@ -1166,13 +1166,16 @@ void olc_show_morph(char_data *ch) {
 int vnum_morph(char *searchname, char_data *ch) {
 	morph_data *iter, *next_iter;
 	int found = 0;
+	struct page_display *display = NULL;
 	
 	HASH_ITER(hh, morph_table, iter, next_iter) {
 		if (multi_isname(searchname, MORPH_KEYWORDS(iter))) {
-			msg_to_char(ch, "%3d. [%5d] %s\r\n", ++found, MORPH_VNUM(iter), MORPH_SHORT_DESC(iter));
+			add_page_display(&display, "%3d. [%5d] %s", ++found, MORPH_VNUM(iter), MORPH_SHORT_DESC(iter));
 		}
 	}
 	
+	page_display_to_char(ch, display);
+	free_page_display(&display);
 	return found;
 }
 

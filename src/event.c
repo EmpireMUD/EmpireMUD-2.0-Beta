@@ -2858,13 +2858,16 @@ void show_events_no_arg(char_data *ch) {
 int vnum_event(char *searchname, char_data *ch) {
 	event_data *iter, *next_iter;
 	int found = 0;
+	struct page_display *display = NULL;
 	
 	HASH_ITER(hh, event_table, iter, next_iter) {
 		if (multi_isname(searchname, EVT_NAME(iter))) {
-			msg_to_char(ch, "%3d. [%5d] %s\r\n", ++found, EVT_VNUM(iter), EVT_NAME(iter));
+			add_page_display(&display, "%3d. [%5d] %s", ++found, EVT_VNUM(iter), EVT_NAME(iter));
 		}
 	}
 	
+	page_display_to_char(ch, display);
+	free_page_display(&display);
 	return found;
 }
 

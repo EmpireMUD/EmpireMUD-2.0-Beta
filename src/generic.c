@@ -2171,13 +2171,16 @@ void olc_show_generic(char_data *ch) {
 int vnum_generic(char *searchname, char_data *ch) {
 	generic_data *iter, *next_iter;
 	int found = 0;
+	struct page_display *display = NULL;
 	
 	HASH_ITER(hh, generic_table, iter, next_iter) {
 		if (multi_isname(searchname, GEN_NAME(iter))) {
-			msg_to_char(ch, "%3d. [%5d] %s (%s)\r\n", ++found, GEN_VNUM(iter), GEN_NAME(iter), generic_types[GEN_TYPE(iter)]);
+			add_page_display(&display, "%3d. [%5d] %s (%s)", ++found, GEN_VNUM(iter), GEN_NAME(iter), generic_types[GEN_TYPE(iter)]);
 		}
 	}
 	
+	page_display_to_char(ch, display);
+	free_page_display(&display);
 	return found;
 }
 

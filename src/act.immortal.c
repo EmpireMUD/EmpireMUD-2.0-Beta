@@ -4869,13 +4869,16 @@ void do_stat_sector(char_data *ch, sector_data *st, bool details) {
 int vnum_adventure(char *searchname, char_data *ch) {
 	adv_data *iter, *next_iter;
 	int found = 0;
+	struct page_display *display = NULL;
 	
 	HASH_ITER(hh, adventure_table, iter, next_iter) {
 		if (multi_isname(searchname, GET_ADV_NAME(iter)) || multi_isname(searchname, GET_ADV_AUTHOR(iter))) {
-			msg_to_char(ch, "%3d. [%5d] %s (%d-%d)\r\n", ++found, GET_ADV_VNUM(iter), GET_ADV_NAME(iter), GET_ADV_START_VNUM(iter), GET_ADV_END_VNUM(iter));
+			add_page_display(&display, "%3d. [%5d] %s (%d-%d)", ++found, GET_ADV_VNUM(iter), GET_ADV_NAME(iter), GET_ADV_START_VNUM(iter), GET_ADV_END_VNUM(iter));
 		}
 	}
 	
+	page_display_to_char(ch, display);
+	free_page_display(&display);
 	return found;
 }
 
@@ -4890,13 +4893,16 @@ int vnum_adventure(char *searchname, char_data *ch) {
 int vnum_book(char *searchname, char_data *ch) {
 	book_data *book, *next_book;
 	int found = 0;
+	struct page_display *display = NULL;
 	
 	HASH_ITER(hh, book_table, book, next_book) {
 		if (multi_isname(searchname, BOOK_TITLE(book)) || multi_isname(searchname, BOOK_BYLINE(book))) {
-			msg_to_char(ch, "%3d. [%5d] %s\t0 (%s\t0)\r\n", ++found, BOOK_VNUM(book), BOOK_TITLE(book), BOOK_BYLINE(book));
+			add_page_display(&display, "%3d. [%5d] %s\t0 (%s\t0)", ++found, BOOK_VNUM(book), BOOK_TITLE(book), BOOK_BYLINE(book));
 		}
 	}
 
+	page_display_to_char(ch, display);
+	free_page_display(&display);
 	return (found);
 }
 
@@ -4911,13 +4917,16 @@ int vnum_book(char *searchname, char_data *ch) {
 int vnum_building(char *searchname, char_data *ch) {
 	bld_data *iter, *next_iter;
 	int found = 0;
+	struct page_display *display = NULL;
 	
 	HASH_ITER(hh, building_table, iter, next_iter) {
 		if (multi_isname(searchname, GET_BLD_NAME(iter))) {
-			msg_to_char(ch, "%3d. [%5d] %s\r\n", ++found, GET_BLD_VNUM(iter), GET_BLD_NAME(iter));
+			add_page_display(&display, "%3d. [%5d] %s", ++found, GET_BLD_VNUM(iter), GET_BLD_NAME(iter));
 		}
 	}
 	
+	page_display_to_char(ch, display);
+	free_page_display(&display);
 	return found;
 }
 
@@ -4932,13 +4941,16 @@ int vnum_building(char *searchname, char_data *ch) {
 int vnum_craft(char *searchname, char_data *ch) {
 	craft_data *iter, *next_iter;
 	int found = 0;
+	struct page_display *display = NULL;
 	
 	HASH_ITER(hh, craft_table, iter, next_iter) {
 		if (multi_isname(searchname, GET_CRAFT_NAME(iter))) {
-			msg_to_char(ch, "%3d. [%5d] %s (%s)\r\n", ++found, GET_CRAFT_VNUM(iter), GET_CRAFT_NAME(iter), craft_types[GET_CRAFT_TYPE(iter)]);
+			add_page_display(&display, "%3d. [%5d] %s (%s)", ++found, GET_CRAFT_VNUM(iter), GET_CRAFT_NAME(iter), craft_types[GET_CRAFT_TYPE(iter)]);
 		}
 	}
 	
+	page_display_to_char(ch, display);
+	free_page_display(&display);
 	return found;
 }
 
@@ -4953,13 +4965,16 @@ int vnum_craft(char *searchname, char_data *ch) {
 int vnum_crop(char *searchname, char_data *ch) {
 	crop_data *iter, *next_iter;
 	int found = 0;
+	struct page_display *display = NULL;
 	
 	HASH_ITER(hh, crop_table, iter, next_iter) {
 		if (multi_isname(searchname, GET_CROP_NAME(iter)) || multi_isname(searchname, GET_CROP_TITLE(iter))) {
-			msg_to_char(ch, "%3d. [%5d] %s\r\n", ++found, GET_CROP_VNUM(iter), GET_CROP_NAME(iter));
+			add_page_display(&display, "%3d. [%5d] %s", ++found, GET_CROP_VNUM(iter), GET_CROP_NAME(iter));
 		}
 	}
 	
+	page_display_to_char(ch, display);
+	free_page_display(&display);
 	return found;
 }
 
@@ -4975,6 +4990,7 @@ int vnum_global(char *searchname, char_data *ch) {
 	struct global_data *iter, *next_iter;
 	char flags[MAX_STRING_LENGTH], flags2[MAX_STRING_LENGTH];
 	int found = 0;
+	struct page_display *display = NULL;
 	
 	HASH_ITER(hh, globals_table, iter, next_iter) {
 		if (multi_isname(searchname, GET_GLOBAL_NAME(iter))) {
@@ -4982,33 +4998,35 @@ int vnum_global(char *searchname, char_data *ch) {
 			switch (GET_GLOBAL_TYPE(iter)) {
 				case GLOBAL_MOB_INTERACTIONS: {
 					sprintbit(GET_GLOBAL_TYPE_FLAGS(iter), action_bits, flags, TRUE);
-					msg_to_char(ch, "%3d. [%5d] %s (%s) %s (%s)\r\n", ++found, GET_GLOBAL_VNUM(iter), GET_GLOBAL_NAME(iter), level_range_string(GET_GLOBAL_MIN_LEVEL(iter), GET_GLOBAL_MAX_LEVEL(iter), 0), flags, global_types[GET_GLOBAL_TYPE(iter)]);
+					add_page_display(&display, "%3d. [%5d] %s (%s) %s (%s)", ++found, GET_GLOBAL_VNUM(iter), GET_GLOBAL_NAME(iter), level_range_string(GET_GLOBAL_MIN_LEVEL(iter), GET_GLOBAL_MAX_LEVEL(iter), 0), flags, global_types[GET_GLOBAL_TYPE(iter)]);
 					break;
 				}
 				case GLOBAL_OBJ_INTERACTIONS: {
 					sprintbit(GET_GLOBAL_TYPE_FLAGS(iter), extra_bits, flags, TRUE);
-					msg_to_char(ch, "%3d. [%5d] %s (%s) %s (%s)\r\n", ++found, GET_GLOBAL_VNUM(iter), GET_GLOBAL_NAME(iter), level_range_string(GET_GLOBAL_MIN_LEVEL(iter), GET_GLOBAL_MAX_LEVEL(iter), 0), flags, global_types[GET_GLOBAL_TYPE(iter)]);
+					add_page_display(&display, "%3d. [%5d] %s (%s) %s (%s)", ++found, GET_GLOBAL_VNUM(iter), GET_GLOBAL_NAME(iter), level_range_string(GET_GLOBAL_MIN_LEVEL(iter), GET_GLOBAL_MAX_LEVEL(iter), 0), flags, global_types[GET_GLOBAL_TYPE(iter)]);
 					break;
 				}
 				case GLOBAL_MINE_DATA: {
 					sprintbit(GET_GLOBAL_TYPE_FLAGS(iter), sector_flags, flags, TRUE);
-					msg_to_char(ch, "%3d. [%5d] %s - %s (%s)\r\n", ++found, GET_GLOBAL_VNUM(iter), GET_GLOBAL_NAME(iter), flags, global_types[GET_GLOBAL_TYPE(iter)]);
+					add_page_display(&display, "%3d. [%5d] %s - %s (%s)", ++found, GET_GLOBAL_VNUM(iter), GET_GLOBAL_NAME(iter), flags, global_types[GET_GLOBAL_TYPE(iter)]);
 					break;
 				}
 				case GLOBAL_MAP_SPAWNS: {
 					ordered_sprintbit(GET_GLOBAL_TYPE_FLAGS(iter), climate_flags, climate_flags_order, TRUE, flags);
 					sprintbit(GET_GLOBAL_SPARE_BITS(iter), spawn_flags_short, flags2, TRUE);
-					msg_to_char(ch, "%3d. [%5d] %s (%s | %s) (%s)\r\n", ++found, GET_GLOBAL_VNUM(iter), GET_GLOBAL_NAME(iter), flags, trim(flags2), global_types[GET_GLOBAL_TYPE(iter)]);
+					add_page_display(&display, "%3d. [%5d] %s (%s | %s) (%s)", ++found, GET_GLOBAL_VNUM(iter), GET_GLOBAL_NAME(iter), flags, trim(flags2), global_types[GET_GLOBAL_TYPE(iter)]);
 					break;
 				}
 				default: {
-					msg_to_char(ch, "%3d. [%5d] %s (%s)\r\n", ++found, GET_GLOBAL_VNUM(iter), GET_GLOBAL_NAME(iter), global_types[GET_GLOBAL_TYPE(iter)]);
+					add_page_display(&display, "%3d. [%5d] %s (%s)", ++found, GET_GLOBAL_VNUM(iter), GET_GLOBAL_NAME(iter), global_types[GET_GLOBAL_TYPE(iter)]);
 					break;
 				}
 			}
 		}
 	}
 	
+	page_display_to_char(ch, display);
+	free_page_display(&display);
 	return found;
 }
 
@@ -5016,13 +5034,16 @@ int vnum_global(char *searchname, char_data *ch) {
 int vnum_mobile(char *searchname, char_data *ch) {
 	char_data *mob, *next_mob;
 	int found = 0;
+	struct page_display *display = NULL;
 	
 	HASH_ITER(hh, mobile_table, mob, next_mob) {
 		if (multi_isname(searchname, mob->player.name)) {
-			msg_to_char(ch, "%3d. [%5d] %s%s\r\n", ++found, mob->vnum, mob->proto_script ? "[TRIG] " : "", mob->player.short_descr);
+			add_page_display(&display, "%3d. [%5d] %s%s", ++found, mob->vnum, mob->proto_script ? "[TRIG] " : "", mob->player.short_descr);
 		}
 	}
 
+	page_display_to_char(ch, display);
+	free_page_display(&display);
 	return (found);
 }
 
@@ -5030,12 +5051,16 @@ int vnum_mobile(char *searchname, char_data *ch) {
 int vnum_object(char *searchname, char_data *ch) {
 	obj_data *iter, *next_iter;
 	int found = 0;
+	struct page_display *display = NULL;
 	
 	HASH_ITER(hh, object_table, iter, next_iter) {
 		if (multi_isname(searchname, GET_OBJ_KEYWORDS(iter))) {
-			msg_to_char(ch, "%3d. [%5d] %s%s\r\n", ++found, GET_OBJ_VNUM(iter), iter->proto_script ? "[TRIG] " : "", GET_OBJ_SHORT_DESC(iter));
+			add_page_display(&display, "%3d. [%5d] %s%s", ++found, GET_OBJ_VNUM(iter), iter->proto_script ? "[TRIG] " : "", GET_OBJ_SHORT_DESC(iter));
 		}
 	}
+	
+	page_display_to_char(ch, display);
+	free_page_display(&display);
 	return (found);
 }
 
@@ -5050,13 +5075,16 @@ int vnum_object(char *searchname, char_data *ch) {
 int vnum_room_template(char *searchname, char_data *ch) {
 	room_template *iter, *next_iter;
 	int found = 0;
+	struct page_display *display = NULL;
 	
 	HASH_ITER(hh, room_template_table, iter, next_iter) {
 		if (multi_isname(searchname, GET_RMT_TITLE(iter))) {
-			msg_to_char(ch, "%3d. [%5d] %s%s\r\n", ++found, GET_RMT_VNUM(iter), iter->proto_script ? "[TRIG] " : "", GET_RMT_TITLE(iter));
+			add_page_display(&display, "%3d. [%5d] %s%s", ++found, GET_RMT_VNUM(iter), iter->proto_script ? "[TRIG] " : "", GET_RMT_TITLE(iter));
 		}
 	}
 	
+	page_display_to_char(ch, display);
+	free_page_display(&display);
 	return found;
 }
 
@@ -5071,13 +5099,16 @@ int vnum_room_template(char *searchname, char_data *ch) {
 int vnum_sector(char *searchname, char_data *ch) {
 	sector_data *sect, *next_sect;
 	int found = 0;
+	struct page_display *display = NULL;
 	
 	HASH_ITER(hh, sector_table, sect, next_sect) {
 		if (multi_isname(searchname, GET_SECT_NAME(sect)) || multi_isname(searchname, GET_SECT_TITLE(sect))) {
-			msg_to_char(ch, "%3d. [%5d] %s\r\n", ++found, GET_SECT_VNUM(sect), GET_SECT_NAME(sect));
+			add_page_display(&display, "%3d. [%5d] %s", ++found, GET_SECT_VNUM(sect), GET_SECT_NAME(sect));
 		}
 	}
 	
+	page_display_to_char(ch, display);
+	free_page_display(&display);
 	return found;
 }
 
@@ -5092,13 +5123,16 @@ int vnum_sector(char *searchname, char_data *ch) {
 int vnum_trigger(char *searchname, char_data *ch) {
 	trig_data *iter, *next_iter;
 	int found = 0;
+	struct page_display *display = NULL;
 	
 	HASH_ITER(hh, trigger_table, iter, next_iter) {
 		if (multi_isname(searchname, GET_TRIG_NAME(iter))) {
-			msg_to_char(ch, "%3d. [%5d] %s\r\n", ++found, GET_TRIG_VNUM(iter), GET_TRIG_NAME(iter));
+			add_page_display(&display, "%3d. [%5d] %s", ++found, GET_TRIG_VNUM(iter), GET_TRIG_NAME(iter));
 		}
 	}
 	
+	page_display_to_char(ch, display);
+	free_page_display(&display);
 	return found;
 }
 
