@@ -2818,6 +2818,27 @@ int process_input(descriptor_data *t) {
 			strncpy(input, t->last_input, MAX_INPUT_LENGTH-1);
 			input[MAX_INPUT_LENGTH-1] = '\0';
 		}
+		else if (*input == '!' && *(input + 1) == '!') {
+			// !!: show command queue
+			int cnt;
+			
+			do_not_add = 1;
+			msg_to_desc(t, "Command history:\r\n");
+			
+			for (cnt = (t->history_pos == 0 ? HISTORY_SIZE : t->history_pos) - 1; /* see below */; --cnt) {
+				if (t->history[cnt]) {
+					msg_to_desc(t, "%s\r\n", t->history[cnt]);
+				}	
+				
+				// check end
+				if (cnt == t->history_pos) {
+					break;	// reached the beginning again
+				}
+				else if (cnt == 0) {
+					cnt = HISTORY_SIZE;		// loop back around
+				}
+			}
+		}
 		else if (*input == '!' && *(input + 1)) {
 			char *commandln = (input + 1);
 			int cnt;
