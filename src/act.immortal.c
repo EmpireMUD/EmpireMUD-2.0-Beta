@@ -3142,11 +3142,11 @@ void do_stat_adventure(char_data *ch, adv_data *adv) {
 	add_page_display(&display, "Temperature: [\tc%s\t0]", temperature_types[GET_ADV_TEMPERATURE_TYPE(adv)]);
 	
 	get_adventure_linking_display(GET_ADV_LINKING(adv), lbuf);
-	add_page_display(&display, "Linking rules:%s", lbuf);
+	add_page_display(&display, "Linking rules:\r\n%s", lbuf);
 	
 	if (GET_ADV_SCRIPTS(adv)) {
 		get_script_display(GET_ADV_SCRIPTS(adv), lbuf);
-		add_page_display(&display, "Scripts:%s", lbuf);
+		add_page_display(&display, "Scripts:\r\n%s", lbuf);
 	}
 	else {
 		add_page_display_str(&display, "Scripts: none");
