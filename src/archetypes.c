@@ -1793,10 +1793,10 @@ archetype_data *setup_olc_archetype(archetype_data *input) {
 * @param archetype_data *arch The archetype to display.
 */
 void do_stat_archetype(char_data *ch, archetype_data *arch) {
-	char part[MAX_STRING_LENGTH];
+	char line[MAX_STRING_LENGTH], part[256];
 	struct archetype_skill *sk;
 	int iter, pos, total;
-	struct page_display *display = NULL, *pd;
+	struct page_display *display = NULL;
 	
 	if (!arch) {
 		return;
@@ -1826,16 +1826,13 @@ void do_stat_archetype(char_data *ch, archetype_data *arch) {
 	add_page_display(&display, "Flags: \tg%s\t0", part);
 		
 	// attributes
-	total = 0;
-	for (iter = 0; iter < NUM_ATTRIBUTES; ++iter) {
+	for (iter = 0, total = 0, *line = '\0'; iter < NUM_ATTRIBUTES; ++iter) {
 		total += GET_ARCH_ATTRIBUTE(arch, iter);
-	}
-	pd = add_page_display(&display, "Attributes: [\tc%d total attributes\t0]\r\n", total);
-	for (iter = 0; iter < NUM_ATTRIBUTES; ++iter) {
 		pos = attribute_display_order[iter];
 		snprintf(part, sizeof(part), "%s  [\tg%2d\t0]", attributes[pos].name, GET_ARCH_ATTRIBUTE(arch, pos));
-		append_page_display_line(pd, "  %-27.27s%s", part, !((iter + 1) % 3) ? "\r\n" : "");
+		snprintf(line + strlen(line), sizeof(line) - strlen(line), "  %-27.27s%s", part, !((iter + 1) % 3) ? "\r\n" : "");
 	}
+	add_page_display(&display, "Attributes: [\tc%d total attributes\t0]\r\n%s", total, line);
 	
 	// skills
 	total = 0;
