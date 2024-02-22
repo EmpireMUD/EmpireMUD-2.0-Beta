@@ -4249,41 +4249,42 @@ void get_skill_ability_display(struct skill_ability *list, char *save_buffer, si
 * @param skill_data *skill The skill to display.
 */
 void do_stat_skill(char_data *ch, skill_data *skill) {
-	char buf[MAX_STRING_LENGTH], part[MAX_STRING_LENGTH];
+	char part[MAX_STRING_LENGTH];
 	struct synergy_ability *syn;
 	struct skill_ability *skab;
-	size_t size;
 	int total;
+	struct page_display *display = NULL;
 	
 	if (!skill) {
 		return;
 	}
 	
 	// first line
-	size = snprintf(buf, sizeof(buf), "VNum: [\tc%d\t0], Name: \tc%s\t0, Abbrev: \tc%s\t0\r\n", SKILL_VNUM(skill), SKILL_NAME(skill), SKILL_ABBREV(skill));
+	add_page_display(&display, "VNum: [\tc%d\t0], Name: \tc%s\t0, Abbrev: \tc%s\t0", SKILL_VNUM(skill), SKILL_NAME(skill), SKILL_ABBREV(skill));
 	
-	size += snprintf(buf + size, sizeof(buf) - size, "Description: %s\r\n", SKILL_DESC(skill));
+	add_page_display(&display, "Description: %s", SKILL_DESC(skill));
 	
-	size += snprintf(buf + size, sizeof(buf) - size, "Minimum drop level: [\tc%d\t0], Maximum level: [\tc%d\t0]\r\n", SKILL_MIN_DROP_LEVEL(skill), SKILL_MAX_LEVEL(skill));
+	add_page_display(&display, "Minimum drop level: [\tc%d\t0], Maximum level: [\tc%d\t0]", SKILL_MIN_DROP_LEVEL(skill), SKILL_MAX_LEVEL(skill));
 	
 	sprintbit(SKILL_FLAGS(skill), skill_flags, part, TRUE);
-	size += snprintf(buf + size, sizeof(buf) - size, "Flags: \tg%s\t0\r\n", part);
+	add_page_display(&display, "Flags: \tg%s\t0", part);
 	
 	LL_COUNT(SKILL_ABILITIES(skill), skab, total);
-	size += snprintf(buf + size, sizeof(buf) - size, "Simplified skill tree: (%d total)\r\n", total);
+	add_page_display(&display, "Simplified skill tree: (%d total)", total);
 	get_skill_ability_display(SKILL_ABILITIES(skill), part, sizeof(part));
 	if (*part) {
-		size += snprintf(buf + size, sizeof(buf) - size, "%s", part);
+		add_page_display_str(&display, part);
 	}
 
 	LL_COUNT(SKILL_SYNERGIES(skill), syn, total);
-	size += snprintf(buf + size, sizeof(buf) - size, "Synergy abilities: (%d total)\r\n", total);
+	add_page_display(&display, "Synergy abilities: (%d total)", total);
 	get_skill_synergy_display(SKILL_SYNERGIES(skill), part, NULL);
 	if (*part) {
-		size += snprintf(buf + size, sizeof(buf) - size, "%s", part);
+		add_page_display_str(&display, part);
 	}
 	
-	page_string(ch->desc, buf, TRUE);
+	page_display_to_char(ch, display);
+	free_page_display(&display);
 }
 
 
