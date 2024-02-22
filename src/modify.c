@@ -854,6 +854,40 @@ void append_page_display_line(struct page_display *line, const char *fmt, ...) {
 
 
 /**
+* Determines how wide a column should be, based on character preferences and
+* number of columns requested.
+*
+* @param char_data *ch The player.
+* @param int cols How many columns will be shown.
+* @return int The character width of each column.
+*/
+int page_display_column_width(char_data *ch, int cols) {
+	int width;
+	
+	// detect screen width
+	if (!ch || !ch->desc || PRF_FLAGGED(ch, PRF_SCREEN_READER)) {
+		width = 80;	// default
+	}
+	else {
+		width = ch->desc->pProtocol->ScreenWidth;
+	}
+	
+	// constrain width
+	width = MIN(width, 101);
+	if (width < 1) {
+		// that can't be right; return to default
+		width = 80;
+	}
+	
+	// safety
+	cols = MAX(1, cols);
+	
+	// calculate width
+	return (width - 1) / cols;
+}
+
+
+/**
 * Builds the final display for a page_display and sends it to a player's
 * paginator.
 *
@@ -862,18 +896,34 @@ void append_page_display_line(struct page_display *line, const char *fmt, ...) {
 * @param bool free_display_after If TRUE, also frees the memory for the display afterwards.
 */
 void page_display_to_char(char_data *ch, struct page_display **display, bool free_display_after) {
-	char *output;
-	size_t size;
+	bool use_cols;
+	char *output, *ptr;
+	int iter, needs_cols;
+	int last_col = 0, fixed_width = 0, col_count = 0;
+	size_t size, one;
 	struct page_display *pd;
 	
 	if (!ch->desc || !display || !*display) {
 		return;	// nobody to page it to
 	}
 	
+	use_cols = PRF_FLAGGED(ch, PRF_SCREEN_READER) ? FALSE : TRUE;
+	
 	// compute size
 	size = 0;
 	DL_FOREACH(*display, pd) {
-		size += pd->length + 2;
+		if (pd->cols > 1 && use_cols) {
+			one = page_display_column_width(ch, pd->cols);
+			if (pd->length > one) {
+				// ensure room for wide columns
+				one *= ceil((double)pd->length / one);
+			}
+		}
+		else {
+			one = pd->length;
+		}
+		
+		size += one + 2;
 	}
 	
 	// allocate
@@ -882,7 +932,69 @@ void page_display_to_char(char_data *ch, struct page_display **display, bool fre
 	
 	// build string
 	DL_FOREACH(*display, pd) {
-		strcat(output, NULLSAFE(pd->text));
+		if (pd->cols <= 1 || !use_cols) {
+			// non-column display
+			if (last_col != 0 && col_count > 0) {
+				strcat(output, "\r\n");
+				col_count = 0;
+			}
+			last_col = 0;
+			strcat(output, NULLSAFE(pd->text));
+			strcat(output, "\r\n");
+		}
+		else {
+			// columned display:
+			
+			// new size? column setup
+			if (pd->cols != last_col) {
+				if (col_count > 0) {
+					// flush previous columns
+					strcat(output, "\r\n");
+				}
+				
+				last_col = pd->cols;
+				fixed_width = page_display_column_width(ch, pd->cols);
+				col_count = 0;
+			}
+			
+			if (fixed_width > 0) {
+				// check how width this entry is
+				needs_cols = ceil(pd->length / fixed_width);
+				
+				// check fit
+				if (needs_cols + col_count > pd->cols) {
+					// doesn't fit; newline
+					strcat(output, "\r\n");
+					col_count = 0;
+				}
+				
+				// append and pad
+				strcat(output, pd->text);
+				ptr = output + strlen(output);
+				for (iter = pd->length; iter < (fixed_width * needs_cols); ++iter) {
+					*(ptr++) = ' ';
+				}
+				*(ptr++) = '\0';
+				
+				// mark how many columns we used
+				col_count += needs_cols;
+				
+				// cap off columns if needed
+				if (col_count >= pd->cols) {
+					strcat(output, "\r\n");
+					col_count = 0;
+				}
+			}
+			else {
+				// don't bother
+				strcat(output, NULLSAFE(pd->text));
+				strcat(output, "\r\n");
+			}
+		}
+	}
+	
+	// check trailing columns?
+	if (last_col != 0 && col_count > 0) {
 		strcat(output, "\r\n");
 	}
 	
