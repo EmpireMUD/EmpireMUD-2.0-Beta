@@ -636,7 +636,7 @@ void show_string(descriptor_data *d, char *input) {
 //// PAGE DISPLAY SYSTEM /////////////////////////////////////////////////////
 
 /**
-* Adds a new line to the end of a page_display. Do not include a \r\n (crlf).
+* Adds a new line to the end of a page_display. Will trim trailing \r\n (crlf).
 *
 * @param struct page_display **display A pointer to the page_display list to add to.
 * @param const char *fmt, ... va_arg format for the line to add.
@@ -657,6 +657,11 @@ struct page_display *add_page_display(struct page_display **display, const char 
 	pd->length = vsprintf(text, fmt, tArgList);
 	va_end(tArgList);
 	
+	// check trailing crlf
+	while (pd->length > 0 && (text[pd->length-1] == '\r' || text[pd->length-1] == '\n')) {
+		text[--pd->length] = '\0';
+	}
+	
 	if (pd->length >= 0) {
 		pd->text = strdup(text);
 		DL_APPEND(*display, pd);
@@ -672,7 +677,7 @@ struct page_display *add_page_display(struct page_display **display, const char 
 
 
 /**
-* Adds a new line to the end of a page_display. Do not include a \r\n (crlf).
+* Adds a new line to the end of a page_display. Will trim trailing \r\n (crlf).
 *
 * @param struct page_display **display A pointer to the page_display list to add to.
 * @param const char *str The string to add as the new line (will be copied).
@@ -691,12 +696,17 @@ struct page_display *add_page_display_str(struct page_display **display, const c
 	pd->text = strdup(str);
 	DL_APPEND(*display, pd);
 	
+	// check trailing crlf
+	while (pd->length > 0 && (pd->text[pd->length-1] == '\r' || pd->text[pd->length-1] == '\n')) {
+		pd->text[--pd->length] = '\0';
+	}
+	
 	return pd;
 }
 
 
 /**
-* Appends text to an existing page_display line.
+* Appends text to an existing page_display line. Will trim trailing \r\n (crlf).
 *
 * @param struct page_display *line The line to append to.
 * @param const char *fmt, ... va_arg format for the text to add.
@@ -725,6 +735,11 @@ void append_page_display_line(struct page_display *line, const char *fmt, ...) {
 		free(line->text);
 	}
 	line->text = temp;
+	
+	// check trailing crlf
+	while (line->length > 0 && (line->text[line->length-1] == '\r' || line->text[line->length-1] == '\n')) {
+		line->text[--line->length] = '\0';
+	}
 }
 
 
