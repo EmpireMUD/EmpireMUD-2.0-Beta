@@ -2767,8 +2767,7 @@ void do_stat_progress(char_data *ch, progress_data *prg) {
 	get_progress_perks_display(PRG_PERKS(prg), part, TRUE);
 	add_page_display(&display, "Perks:\r\n%s", *part ? part : " none");
 	
-	page_display_to_char(ch, display);
-	free_page_display(&display);
+	page_display_to_char(ch, &display, TRUE);
 }
 
 
@@ -2837,8 +2836,7 @@ int vnum_progress(char *searchname, char_data *ch) {
 		}
 	}
 	
-	page_display_to_char(ch, display);
-	free_page_display(&display);
+	page_display_to_char(ch, &display, TRUE);
 	return found;
 }
 

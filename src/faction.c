@@ -1369,8 +1369,7 @@ void do_stat_faction(char_data *ch, faction_data *fct) {
 	get_faction_relation_display(FCT_RELATIONS(fct), part);
 	add_page_display(&display, "Relations:\r\n%s", part);
 	
-	page_display_to_char(ch, display);
-	free_page_display(&display);
+	page_display_to_char(ch, &display, TRUE);
 }
 
 
@@ -1448,8 +1447,7 @@ int vnum_faction(char *searchname, char_data *ch) {
 		}
 	}
 	
-	page_display_to_char(ch, display);
-	free_page_display(&display);
+	page_display_to_char(ch, &display, TRUE);
 	return found;
 }
 

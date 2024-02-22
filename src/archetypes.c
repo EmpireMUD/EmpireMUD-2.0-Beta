@@ -1848,8 +1848,7 @@ void do_stat_archetype(char_data *ch, archetype_data *arch) {
 	get_archetype_gear_display(GET_ARCH_GEAR(arch), part);
 	add_page_display(&display, "Gear:\r\n%s", part);
 	
-	page_display_to_char(ch, display);
-	free_page_display(&display);
+	page_display_to_char(ch, &display, TRUE);
 }
 
 
@@ -1959,8 +1958,7 @@ int vnum_archetype(char *searchname, char_data *ch) {
 		}
 	}
 	
-	page_display_to_char(ch, display);
-	free_page_display(&display);
+	page_display_to_char(ch, &display, TRUE);
 	return found;
 }
 

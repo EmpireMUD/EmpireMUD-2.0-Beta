@@ -1118,8 +1118,7 @@ void do_stat_shop(char_data *ch, shop_data *shop) {
 	get_shop_items_display(shop, part);
 	add_page_display(&display, "Items:\r\n%s", part);
 	
-	page_display_to_char(ch, display);
-	free_page_display(&display);
+	page_display_to_char(ch, &display, TRUE);
 }
 
 
@@ -1177,8 +1176,7 @@ int vnum_shop(char *searchname, char_data *ch) {
 		}
 	}
 	
-	page_display_to_char(ch, display);
-	free_page_display(&display);
+	page_display_to_char(ch, &display, TRUE);
 	return found;
 }
 

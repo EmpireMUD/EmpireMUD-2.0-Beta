@@ -584,11 +584,11 @@ bool trigger_counterspell(char_data *ch, char_data *triggered_by) {
 
 // also do_chant, do_ritual: handles SCMD_CAST, SCMD_RITUAL, SCMD_CHANT
 ACMD(do_cast) {
-	bool found, full;
+	bool found;
 	char *arg2;
-	size_t size, count;
 	ability_data *abil;
 	struct player_ability_data *plab, *next_plab;
+	struct page_display *display = NULL;
 	
 	const char *cast_noun[] = { "spell", "ritual", "chant" };
 	const char *cast_command[] = { "cast", "ritual", "chant" };
@@ -612,10 +612,9 @@ ACMD(do_cast) {
 			return;
 		}
 		
-		size = snprintf(buf, sizeof(buf), "You know the following %ss:\r\n", cast_noun[subcmd]);
+		add_page_display(&display, "You know the following %ss:", cast_noun[subcmd]);
 		
-		found = full = FALSE;
-		count = 0;
+		found = FALSE;
 		HASH_ITER(hh, GET_ABILITY_HASH(ch), plab, next_plab) {
 			abil = plab->ptr;
 			if (!VALID_CAST_ABIL(ch, plab)) {
@@ -623,34 +622,20 @@ ACMD(do_cast) {
 			}
 			
 			// append
-			if (size + strlen(ABIL_NAME(abil)) + 38 < sizeof(buf)) {
-				size += snprintf(buf + size, sizeof(buf) - size, " %-34.34s%s", ABIL_NAME(abil), ((count++ % 2 || PRF_FLAGGED(ch, PRF_SCREEN_READER)) ? "\r\n" : ""));
-			}
-			else {
-				full = TRUE;
-				break;
-			}
+			add_page_display_col(&display, 2, " %s", ABIL_NAME(abil));
 			
 			// found 1
 			found = TRUE;
 		}
 		
 		if (!found) {
-			strcat(buf, " nothing\r\n");	// always room for this if !found
+			add_page_display_str(&display, " nothing");
 			if (subcmd == SCMD_CAST) {
-				strcat(buf, "(Most magical abilities have their own commands rather than 'cast'.)\r\n");
+				add_page_display_str(&display, "(Most magical abilities have their own commands rather than 'cast'.)");
 			}
 		}
-		else if (count % 2 && !full && !PRF_FLAGGED(ch, PRF_SCREEN_READER)) {
-			strcat(buf, "\r\n");
-		}
 		
-		if (full) {
-			snprintf(buf + size, sizeof(buf) - size, "OVERFLOW\r\n");
-		}
-		if (ch->desc) {
-			page_string(ch->desc, buf, TRUE);
-		}
+		page_display_to_char(ch, &display, TRUE);
 		return;
 	}	// end no-arg
 	

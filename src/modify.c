@@ -636,6 +636,38 @@ void show_string(descriptor_data *d, char *input) {
 //// PAGE DISPLAY SYSTEM /////////////////////////////////////////////////////
 
 /**
+* Frees a page_display and any text inside.
+*
+* @param struct page_display *pd The thing to free.
+*/
+void free_page_display_one(struct page_display *pd) {
+	if (pd) {
+		if (pd->text) {
+			free(pd->text);
+		}
+		free(pd);
+	}
+}
+
+
+/**
+* Frees a whole page_display list.
+*
+* @param struct page_display **list The list of lines to free.
+*/
+void free_page_display(struct page_display **list) {
+	struct page_display *pd, *next;
+	
+	if (list) {
+		DL_FOREACH_SAFE(*list, pd, next) {
+			DL_DELETE(*list, pd);
+			free_page_display_one(pd);
+		}
+	}
+}
+
+
+/**
 * Adds a new line to the end of a page_display. Will trim trailing \r\n (crlf).
 *
 * @param struct page_display **display A pointer to the page_display list to add to.
@@ -678,6 +710,51 @@ struct page_display *add_page_display(struct page_display **display, const char 
 
 /**
 * Adds a new line to the end of a page_display. Will trim trailing \r\n (crlf).
+* This is intended for displays that will have multiple columns. Any sequential
+* entries with the same column count will attempt to display in columns.
+*
+* @param struct page_display **display A pointer to the page_display list to add to.
+* @param int cols The number of columns for the display (2, 3, etc).
+* @param const char *fmt, ... va_arg format for the line to add.
+* @return struct page_display* A pointer to the new line, if it was added. May return NULL if it failed to add.
+*/
+struct page_display *add_page_display_col(struct page_display **display, int cols, const char *fmt, ...) {
+	char text[MAX_STRING_LENGTH];
+	va_list tArgList;
+	struct page_display *pd;
+	
+	if (!display || !fmt) {
+		return NULL;
+	}
+	
+	CREATE(pd, struct page_display, 1);
+	
+	va_start(tArgList, fmt);
+	pd->length = vsprintf(text, fmt, tArgList);
+	va_end(tArgList);
+	
+	// check trailing crlf
+	while (pd->length > 0 && (text[pd->length-1] == '\r' || text[pd->length-1] == '\n')) {
+		text[--pd->length] = '\0';
+	}
+	
+	if (pd->length >= 0) {
+		pd->cols = cols;
+		pd->text = strdup(text);
+		DL_APPEND(*display, pd);
+	}
+	else {
+		// nevermind
+		free_page_display_one(pd);
+		pd = NULL;
+	}
+	
+	return pd;
+}
+
+
+/**
+* Adds a new line to the end of a page_display. Will trim trailing \r\n (crlf).
 *
 * @param struct page_display **display A pointer to the page_display list to add to.
 * @param const char *str The string to add as the new line (will be copied).
@@ -694,6 +771,39 @@ struct page_display *add_page_display_str(struct page_display **display, const c
 	
 	pd->length = strlen(str);
 	pd->text = strdup(str);
+	DL_APPEND(*display, pd);
+	
+	// check trailing crlf
+	while (pd->length > 0 && (pd->text[pd->length-1] == '\r' || pd->text[pd->length-1] == '\n')) {
+		pd->text[--pd->length] = '\0';
+	}
+	
+	return pd;
+}
+
+
+/**
+* Adds a new line to the end of a page_display. Will trim trailing \r\n (crlf).
+* This is intended for displays that will have multiple columns. Any sequential
+* entries with the same column count will attempt to display in columns.
+*
+* @param struct page_display **display A pointer to the page_display list to add to.
+* @param int cols The number of columns for the display (2, 3, etc).
+* @param const char *str The string to add as the new line (will be copied).
+* @return struct page_display* A pointer to the new line, if it was added. May return NULL if it failed to add.
+*/
+struct page_display *add_page_display_col_str(struct page_display **display, int cols, const char *str) {
+	struct page_display *pd;
+	
+	if (!display || !str) {
+		return NULL;
+	}
+	
+	CREATE(pd, struct page_display, 1);
+	
+	pd->length = strlen(str);
+	pd->text = strdup(str);
+	pd->cols = cols;
 	DL_APPEND(*display, pd);
 	
 	// check trailing crlf
@@ -744,56 +854,25 @@ void append_page_display_line(struct page_display *line, const char *fmt, ...) {
 
 
 /**
-* Frees a page_display and any text inside.
-*
-* @param struct page_display *pd The thing to free.
-*/
-void free_page_display_one(struct page_display *pd) {
-	if (pd) {
-		if (pd->text) {
-			free(pd->text);
-		}
-		free(pd);
-	}
-}
-
-
-/**
-* Frees a whole page_display list.
-*
-* @param struct page_display **list The list of lines to free.
-*/
-void free_page_display(struct page_display **list) {
-	struct page_display *pd, *next;
-	
-	if (list) {
-		DL_FOREACH_SAFE(*list, pd, next) {
-			DL_DELETE(*list, pd);
-			free_page_display_one(pd);
-		}
-	}
-}
-
-
-/**
 * Builds the final display for a page_display and sends it to a player's
 * paginator.
 *
 * @param char_data *ch The player to show it to.
-* @param struct page_display *display The list of lines to be shown.
+* @param struct page_display **display A pointer to the list of lines to be shown.
+* @param bool free_display_after If TRUE, also frees the memory for the display afterwards.
 */
-void page_display_to_char(char_data *ch, struct page_display *display) {
+void page_display_to_char(char_data *ch, struct page_display **display, bool free_display_after) {
 	char *output;
 	size_t size;
 	struct page_display *pd;
 	
-	if (!ch->desc) {
+	if (!ch->desc || !display || !*display) {
 		return;	// nobody to page it to
 	}
 	
 	// compute size
 	size = 0;
-	DL_FOREACH(display, pd) {
+	DL_FOREACH(*display, pd) {
 		size += pd->length + 2;
 	}
 	
@@ -802,13 +881,17 @@ void page_display_to_char(char_data *ch, struct page_display *display) {
 	*output = '\0';
 	
 	// build string
-	DL_FOREACH(display, pd) {
+	DL_FOREACH(*display, pd) {
 		strcat(output, NULLSAFE(pd->text));
 		strcat(output, "\r\n");
 	}
 	
 	page_string(ch->desc, output, TRUE);
 	free(output);
+	
+	if (free_display_after) {
+		free_page_display(display);
+	}
 }
 
 

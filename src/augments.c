@@ -731,8 +731,7 @@ void do_stat_augment(char_data *ch, augment_data *aug) {
 	get_resource_display(ch, GET_AUG_RESOURCES(aug), part);
 	add_page_display(&display, "Resource cost:\r\n%s", part);
 	
-	page_display_to_char(ch, display);
-	free_page_display(&display);
+	page_display_to_char(ch, &display, TRUE);
 }
 
 
@@ -815,8 +814,7 @@ int vnum_augment(char *searchname, char_data *ch) {
 		}
 	}
 	
-	page_display_to_char(ch, display);
-	free_page_display(&display);
+	page_display_to_char(ch, &display, TRUE);
 	return found;
 }
 

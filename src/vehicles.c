@@ -4632,8 +4632,7 @@ void do_stat_vehicle(char_data *ch, vehicle_data *veh, bool details) {
 		add_page_display(&display, "  None.");
 	}
 	
-	page_display_to_char(ch, display);
-	free_page_display(&display);
+	page_display_to_char(ch, &display, TRUE);
 }
 
 
@@ -4855,8 +4854,7 @@ int vnum_vehicle(char *searchname, char_data *ch) {
 		}
 	}
 	
-	page_display_to_char(ch, display);
-	free_page_display(&display);
+	page_display_to_char(ch, &display, TRUE);
 	return found;
 }
 

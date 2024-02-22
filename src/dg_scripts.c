@@ -1204,8 +1204,7 @@ void do_stat_trigger(char_data *ch, trig_data *trig) {
 		}
 	}
 
-	page_display_to_char(ch, display);
-	free_page_display(&display);
+	page_display_to_char(ch, &display, TRUE);
 }
 
 

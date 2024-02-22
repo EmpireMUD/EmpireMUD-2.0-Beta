@@ -4283,8 +4283,7 @@ void do_stat_skill(char_data *ch, skill_data *skill) {
 		add_page_display_str(&display, part);
 	}
 	
-	page_display_to_char(ch, display);
-	free_page_display(&display);
+	page_display_to_char(ch, &display, TRUE);
 }
 
 
@@ -4395,8 +4394,7 @@ int vnum_skill(char *searchname, char_data *ch) {
 		}
 	}
 	
-	page_display_to_char(ch, display);
-	free_page_display(&display);
+	page_display_to_char(ch, &display, TRUE);
 	return found;
 }
 

@@ -1446,8 +1446,7 @@ void show_workforce_where(empire_data *emp, char_data *to, bool here, char *argu
 			add_page_display_str(&display, " no workers");
 		}
 		
-		page_display_to_char(to, display);
-		free_page_display(&display);
+		page_display_to_char(to, &display, TRUE);
 	}
 	else {	// SHOW ALL CHORES
 		// count up workforce mobs
@@ -1490,8 +1489,7 @@ void show_workforce_where(empire_data *emp, char_data *to, bool here, char *argu
 			free(wct);
 		}
 		
-		page_display_to_char(to, display);
-		free_page_display(&display);
+		page_display_to_char(to, &display, TRUE);
 	}
 }
 
@@ -1613,8 +1611,7 @@ void show_workforce_why(empire_data *emp, char_data *ch, char *argument) {
 	}
 	
 	if (any || *unsupplied || display) {
-		page_display_to_char(ch, display);
-		free_page_display(&display);
+		page_display_to_char(ch, &display, TRUE);
 	}
 	else if (only_room && ROOM_OWNER(only_room) != GET_LOYALTY(ch)) {
 		msg_to_char(ch, "Workforce isn't working because your empire doesn't own %s location.\r\n", (only_room == IN_ROOM(ch)) ? "this" : "that");
@@ -5183,8 +5180,7 @@ ACMD(do_elog) {
 		}
 	}
 	
-	page_display_to_char(ch, display);
-	free_page_display(&display);
+	page_display_to_char(ch, &display, TRUE);
 }
 
 
@@ -8759,8 +8755,7 @@ void do_workforce_nearby(char_data *ch, empire_data *emp, char *argument) {
 		add_page_display(&display, "%d available, %d working, %d total", avail, working, avail + working);
 	}
 	
-	page_display_to_char(ch, display);
-	free_page_display(&display);
+	page_display_to_char(ch, &display, TRUE);
 }
 
 

@@ -2068,8 +2068,7 @@ void do_stat_generic(char_data *ch, generic_data *gen) {
 		}
 	}
 
-	page_display_to_char(ch, display);
-	free_page_display(&display);
+	page_display_to_char(ch, &display, TRUE);
 }
 
 
@@ -2179,8 +2178,7 @@ int vnum_generic(char *searchname, char_data *ch) {
 		}
 	}
 	
-	page_display_to_char(ch, display);
-	free_page_display(&display);
+	page_display_to_char(ch, &display, TRUE);
 	return found;
 }
 

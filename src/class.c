@@ -1267,8 +1267,7 @@ void do_stat_class(char_data *ch, class_data *cls) {
 	get_class_ability_display(CLASS_ABILITIES(cls), part, NULL);
 	add_page_display(&display, "Roles and abilities:\r\n%s%s", part, *part ? "\r\n" : " none\r\n");
 
-	page_display_to_char(ch, display);
-	free_page_display(&display);
+	page_display_to_char(ch, &display, TRUE);
 }
 
 
@@ -1388,8 +1387,7 @@ int vnum_class(char *searchname, char_data *ch) {
 		}
 	}
 	
-	page_display_to_char(ch, display);
-	free_page_display(&display);
+	page_display_to_char(ch, &display, TRUE);
 	return found;
 }
 

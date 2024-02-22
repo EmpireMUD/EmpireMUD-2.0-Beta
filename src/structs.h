@@ -3481,6 +3481,7 @@ struct offer_data {
 struct page_display {
 	char *text;	// the line of text (without crlf, which is added automatically)
 	int length;	// length of the text
+	int cols;	// if columns were requested, how many (usually 0 / no cols)
 	struct page_display *prev, *next;	// linked list
 };
 

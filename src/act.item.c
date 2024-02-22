@@ -4683,7 +4683,7 @@ void trade_post(char_data *ch, char *argument) {
 * @param int mode SCMD_WAREHOUSE or SCMD_HOME
 */
 void warehouse_inventory(char_data *ch, char *argument, int mode) {
-	char arg[MAX_INPUT_LENGTH], output[MAX_STRING_LENGTH*4], line[MAX_STRING_LENGTH], part[256], flags[256], quantity[256], *tmp;
+	char arg[MAX_INPUT_LENGTH], part[256], flags[256], quantity[256], *tmp;
 	bool imm_access = (GET_ACCESS_LEVEL(ch) >= LVL_CIMPL || IS_GRANTED(ch, GRANT_EMPIRES));
 	bool home_mode = (mode == SCMD_HOME);
 	struct empire_unique_storage *iter;
@@ -4692,7 +4692,8 @@ void warehouse_inventory(char_data *ch, char *argument, int mode) {
 	struct empire_unique_storage *eus;
 	char_data *targ_player = ch;
 	bool file = FALSE;
-	int num, size;
+	int num;
+	struct page_display *display = NULL;
 	
 	if (mode == SCMD_WAREHOUSE && imm_access) {
 		// if first word is 
@@ -4735,14 +4736,14 @@ void warehouse_inventory(char_data *ch, char *argument, int mode) {
 	if (home_mode) {
 		DL_COUNT(GET_HOME_STORAGE(targ_player), eus, num);
 		if (targ_player == ch) {
-			size = snprintf(output, sizeof(output), "%s items stored in your home (%d/%d):\r\n", part, num, config_get_int("max_home_store_uniques"));
+			add_page_display(&display, "%s items stored in your home (%d/%d):", part, num, config_get_int("max_home_store_uniques"));
 		}
 		else {
-			size = snprintf(output, sizeof(output), "%s items stored in %s's home (%d/%d):\r\n", part, GET_PC_NAME(targ_player), num, config_get_int("max_home_store_uniques"));
+			add_page_display(&display, "%s items stored in %s's home (%d/%d):", part, GET_PC_NAME(targ_player), num, config_get_int("max_home_store_uniques"));
 		}
 	}
 	else {
-		size = snprintf(output, sizeof(output), "%s items stored in %s%s&0:\r\n", part, EMPIRE_BANNER(emp), EMPIRE_NAME(emp));
+		add_page_display(&display, "%s items stored in %s%s&0:", part, EMPIRE_BANNER(emp), EMPIRE_NAME(emp));
 	}
 	num = 0;
 	
@@ -4770,22 +4771,14 @@ void warehouse_inventory(char_data *ch, char *argument, int mode) {
 		}
 		
 		// build line
-		snprintf(line, sizeof(line), "%3d. %s%s%s\t0\r\n", ++num, obj_desc_for_char(iter->obj, ch, OBJ_DESC_WAREHOUSE), part, quantity);
-		
-		if (size + strlen(line) < sizeof(output)) {
-			size += snprintf(output + size, sizeof(output) - size, "%s", line);
-		}
-		else {
-			size += snprintf(output + size, sizeof(output) - size, "... list too long\r\n");
-			break;
-		}
+		add_page_display(&display, "%3d. %s%s%s\t0", ++num, obj_desc_for_char(iter->obj, ch, OBJ_DESC_WAREHOUSE), part, quantity);
 	}
 	
 	if (num == 0) {
-		size += snprintf(output + size, sizeof(output) - size, " none\r\n");
+		add_page_display(&display, " none");
 	}
 	
-	page_string(ch->desc, output, TRUE);
+	page_display_to_char(ch, &display, TRUE);
 }
 
 

@@ -2473,8 +2473,7 @@ void do_stat_event(char_data *ch, event_data *event) {
 	get_event_reward_display(EVT_THRESHOLD_REWARDS(event), part);
 	add_page_display(&display, "Threshold Rewards:\r\n%s", *part ? part : " none");
 	
-	page_display_to_char(ch, display);
-	free_page_display(&display);
+	page_display_to_char(ch, &display, TRUE);
 }
 
 
@@ -2866,8 +2865,7 @@ int vnum_event(char *searchname, char_data *ch) {
 		}
 	}
 	
-	page_display_to_char(ch, display);
-	free_page_display(&display);
+	page_display_to_char(ch, &display, TRUE);
 	return found;
 }
 

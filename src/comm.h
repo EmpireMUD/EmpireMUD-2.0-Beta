@@ -102,11 +102,11 @@ extern FILE *logfile;
 
 // page display prototypes
 struct page_display *add_page_display(struct page_display **display, const char *fmt, ...);
+struct page_display *add_page_display_col(struct page_display **display, int cols, const char *fmt, ...);
 struct page_display *add_page_display_str(struct page_display **display, const char *str);
+struct page_display *add_page_display_col_str(struct page_display **display, int cols, const char *str);
 void append_page_display_line(struct page_display *line, const char *fmt, ...);
-void free_page_display(struct page_display **list);
-void free_page_display_one(struct page_display *pd);
-void page_display_to_char(char_data *ch, struct page_display *display);
+void page_display_to_char(char_data *ch, struct page_display **display, bool free_display_after);
 
 
 /* I/O functions */

@@ -5777,8 +5777,7 @@ void do_stat_quest(char_data *ch, quest_data *quest) {
 	get_script_display(QUEST_SCRIPTS(quest), part);
 	add_page_display(&display, "Scripts:\r\n%s", QUEST_SCRIPTS(quest) ? part : " none");
 	
-	page_display_to_char(ch, display);
-	free_page_display(&display);
+	page_display_to_char(ch, &display, TRUE);
 }
 
 
@@ -5882,8 +5881,7 @@ int vnum_quest(char *searchname, char_data *ch) {
 		}
 	}
 	
-	page_display_to_char(ch, display);
-	free_page_display(&display);
+	page_display_to_char(ch, &display, TRUE);
 	return found;
 }
 

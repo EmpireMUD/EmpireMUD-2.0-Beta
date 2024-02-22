@@ -3159,8 +3159,7 @@ void do_stat_adventure(char_data *ch, adv_data *adv) {
 		add_page_display_str(&display, "Scripts: none");
 	}
 	
-	page_display_to_char(ch, display);
-	free_page_display(&display);
+	page_display_to_char(ch, &display, TRUE);
 }
 
 
@@ -3205,8 +3204,7 @@ void do_stat_book(char_data *ch, book_data *book) {
 		add_page_display_str(&display, line);
 	}
 	
-	page_display_to_char(ch, display);
-	free_page_display(&display);
+	page_display_to_char(ch, &display, TRUE);
 }
 
 
@@ -3305,8 +3303,7 @@ void do_stat_building(char_data *ch, bld_data *bdg, bool details) {
 	
 	show_spawn_summary_display(&display, GET_BLD_SPAWNS(bdg));
 	
-	page_display_to_char(ch, display);
-	free_page_display(&display);
+	page_display_to_char(ch, &display, TRUE);
 }
 
 
@@ -3638,8 +3635,7 @@ void do_stat_character(char_data *ch, char_data *k, bool details) {
 		}
 	}
 	
-	page_display_to_char(ch, display);
-	free_page_display(&display);
+	page_display_to_char(ch, &display, TRUE);
 }
 
 
@@ -3701,8 +3697,7 @@ void do_stat_craft(char_data *ch, craft_data *craft) {
 	get_resource_display(ch, GET_CRAFT_RESOURCES(craft), lbuf);
 	add_page_display(&display, "Resources required:\r\n%s", lbuf);
 	
-	page_display_to_char(ch, display);
-	free_page_display(&display);
+	page_display_to_char(ch, &display, TRUE);
 }
 
 
@@ -3773,8 +3768,7 @@ void do_stat_crop(char_data *ch, crop_data *cp, bool details) {
 	
 	show_spawn_summary_display(&display, GET_CROP_SPAWNS(cp));
 	
-	page_display_to_char(ch, display);
-	free_page_display(&display);
+	page_display_to_char(ch, &display, TRUE);
 }
 
 
@@ -3889,8 +3883,7 @@ void do_stat_empire(char_data *ch, empire_data *emp) {
 		add_page_display_str(&display, "  None.");
 	}
 	
-	page_display_to_char(ch, display);
-	free_page_display(&display);
+	page_display_to_char(ch, &display, TRUE);
 }
 
 
@@ -3957,8 +3950,7 @@ void do_stat_global(char_data *ch, struct global_data *glb) {
 		add_page_display(&display, "Interactions:\r\n%s", buf);
 	}
 	
-	page_display_to_char(ch, display);
-	free_page_display(&display);
+	page_display_to_char(ch, &display, TRUE);
 }
 
 
@@ -4327,8 +4319,7 @@ void do_stat_object(char_data *ch, obj_data *j, bool details) {
 	/* check the object for a script */
 	do_sstat_object(&display, j);
 	
-	page_display_to_char(ch, display);
-	free_page_display(&display);
+	page_display_to_char(ch, &display, TRUE);
 }
 
 
@@ -4686,8 +4677,7 @@ void do_stat_room(char_data *ch) {
 	/* check the room for a script */
 	do_sstat_room(&display, ch);
 	
-	page_display_to_char(ch, display);
-	free_page_display(&display);
+	page_display_to_char(ch, &display, TRUE);
 }
 
 
@@ -4761,8 +4751,7 @@ void do_stat_room_template(char_data *ch, room_template *rmt, bool details) {
 	get_script_display(GET_RMT_SCRIPTS(rmt), lbuf);
 	add_page_display(&display, "Scripts:\r\n%s", lbuf);
 	
-	page_display_to_char(ch, display);
-	free_page_display(&display);
+	page_display_to_char(ch, &display, TRUE);
 }
 
 
@@ -4851,8 +4840,7 @@ void do_stat_sector(char_data *ch, sector_data *st, bool details) {
 		add_page_display(&display, "Notes:\r\n%s", GET_SECT_NOTES(st));
 	}
 	
-	page_display_to_char(ch, display);
-	free_page_display(&display);
+	page_display_to_char(ch, &display, TRUE);
 }
 
 
@@ -4877,8 +4865,7 @@ int vnum_adventure(char *searchname, char_data *ch) {
 		}
 	}
 	
-	page_display_to_char(ch, display);
-	free_page_display(&display);
+	page_display_to_char(ch, &display, TRUE);
 	return found;
 }
 
@@ -4901,8 +4888,7 @@ int vnum_book(char *searchname, char_data *ch) {
 		}
 	}
 
-	page_display_to_char(ch, display);
-	free_page_display(&display);
+	page_display_to_char(ch, &display, TRUE);
 	return (found);
 }
 
@@ -4925,8 +4911,7 @@ int vnum_building(char *searchname, char_data *ch) {
 		}
 	}
 	
-	page_display_to_char(ch, display);
-	free_page_display(&display);
+	page_display_to_char(ch, &display, TRUE);
 	return found;
 }
 
@@ -4949,8 +4934,7 @@ int vnum_craft(char *searchname, char_data *ch) {
 		}
 	}
 	
-	page_display_to_char(ch, display);
-	free_page_display(&display);
+	page_display_to_char(ch, &display, TRUE);
 	return found;
 }
 
@@ -4973,8 +4957,7 @@ int vnum_crop(char *searchname, char_data *ch) {
 		}
 	}
 	
-	page_display_to_char(ch, display);
-	free_page_display(&display);
+	page_display_to_char(ch, &display, TRUE);
 	return found;
 }
 
@@ -5025,8 +5008,7 @@ int vnum_global(char *searchname, char_data *ch) {
 		}
 	}
 	
-	page_display_to_char(ch, display);
-	free_page_display(&display);
+	page_display_to_char(ch, &display, TRUE);
 	return found;
 }
 
@@ -5042,8 +5024,7 @@ int vnum_mobile(char *searchname, char_data *ch) {
 		}
 	}
 
-	page_display_to_char(ch, display);
-	free_page_display(&display);
+	page_display_to_char(ch, &display, TRUE);
 	return (found);
 }
 
@@ -5059,8 +5040,7 @@ int vnum_object(char *searchname, char_data *ch) {
 		}
 	}
 	
-	page_display_to_char(ch, display);
-	free_page_display(&display);
+	page_display_to_char(ch, &display, TRUE);
 	return (found);
 }
 
@@ -5083,8 +5063,7 @@ int vnum_room_template(char *searchname, char_data *ch) {
 		}
 	}
 	
-	page_display_to_char(ch, display);
-	free_page_display(&display);
+	page_display_to_char(ch, &display, TRUE);
 	return found;
 }
 
@@ -5107,8 +5086,7 @@ int vnum_sector(char *searchname, char_data *ch) {
 		}
 	}
 	
-	page_display_to_char(ch, display);
-	free_page_display(&display);
+	page_display_to_char(ch, &display, TRUE);
 	return found;
 }
 
@@ -5131,8 +5109,7 @@ int vnum_trigger(char *searchname, char_data *ch) {
 		}
 	}
 	
-	page_display_to_char(ch, display);
-	free_page_display(&display);
+	page_display_to_char(ch, &display, TRUE);
 	return found;
 }
 

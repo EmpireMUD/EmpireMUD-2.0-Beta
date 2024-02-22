@@ -1767,8 +1767,7 @@ void do_stat_attack_message(char_data *ch, attack_message_data *amd, bool detail
 		add_page_display(&display, " none");
 	}
 	
-	page_display_to_char(ch, display);
-	free_page_display(&display);
+	page_display_to_char(ch, &display, TRUE);
 }
 
 
@@ -1951,8 +1950,7 @@ int vnum_attack_message(char *searchname, char_data *ch) {
 		}
 	}
 	
-	page_display_to_char(ch, display);
-	free_page_display(&display);
+	page_display_to_char(ch, &display, TRUE);
 	return found;
 }
 
