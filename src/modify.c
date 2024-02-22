@@ -959,7 +959,7 @@ void page_display_to_char(char_data *ch, struct page_display **display, bool fre
 			
 			if (fixed_width > 0) {
 				// check how width this entry is
-				needs_cols = ceil(pd->length / fixed_width);
+				needs_cols = ceil((double) pd->length / fixed_width);
 				
 				// check fit
 				if (needs_cols + col_count > pd->cols) {
