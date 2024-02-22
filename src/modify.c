@@ -26,6 +26,7 @@
 * Contents:
 *   Helpers
 *   Paginator
+*   Page Display System
 *   Editor
 *   Script Formatter
 *   Text Formatter
@@ -629,6 +630,171 @@ void show_string(descriptor_data *d, char *input) {
 
 
 /* End of code by Michael Buselli */
+
+
+ //////////////////////////////////////////////////////////////////////////////
+//// PAGE DISPLAY SYSTEM /////////////////////////////////////////////////////
+
+/**
+* Adds a new line to the end of a page_display. Do not include a \r\n (crlf).
+*
+* @param struct page_display **display A pointer to the page_display list to add to.
+* @param const char *fmt, ... va_arg format for the line to add.
+* @return struct page_display* A pointer to the new line, if it was added. May return NULL if it failed to add.
+*/
+struct page_display *add_page_display(struct page_display **display, const char *fmt, ...) {
+	char text[MAX_STRING_LENGTH];
+	va_list tArgList;
+	struct page_display *pd;
+	
+	if (!display || !fmt) {
+		return NULL;
+	}
+	
+	CREATE(pd, struct page_display, 1);
+	
+	va_start(tArgList, fmt);
+	pd->length = vsprintf(text, fmt, tArgList);
+	va_end(tArgList);
+	
+	if (pd->length >= 0) {
+		pd->text = strdup(text);
+		DL_APPEND(*display, pd);
+	}
+	else {
+		// nevermind
+		free_page_display_one(pd);
+		pd = NULL;
+	}
+	
+	return pd;
+}
+
+
+/**
+* Adds a new line to the end of a page_display. Do not include a \r\n (crlf).
+*
+* @param struct page_display **display A pointer to the page_display list to add to.
+* @param const char *str The string to add as the new line (will be copied).
+* @return struct page_display* A pointer to the new line, if it was added. May return NULL if it failed to add.
+*/
+struct page_display *add_page_display_str(struct page_display **display, const char *str) {
+	struct page_display *pd;
+	
+	if (!display || !str) {
+		return NULL;
+	}
+	
+	CREATE(pd, struct page_display, 1);
+	
+	pd->length = strlen(str);
+	pd->text = strdup(str);
+	DL_APPEND(*display, pd);
+	
+	return pd;
+}
+
+
+/**
+* Appends text to an existing page_display line.
+*
+* @param struct page_display *line The line to append to.
+* @param const char *fmt, ... va_arg format for the text to add.
+*/
+void append_page_display_line(struct page_display *line, const char *fmt, ...) {
+	char text[MAX_STRING_LENGTH];
+	char *temp;
+	int len;
+	va_list tArgList;
+	
+	if (!line || !fmt) {
+		return;
+	}
+	
+	va_start(tArgList, fmt);
+	len = vsprintf(text, fmt, tArgList);
+	va_end(tArgList);
+	
+	CREATE(temp, char, line->length + len + 1);
+	strcpy(temp, NULLSAFE(line->text));
+	strcat(temp, text);
+	
+	line->length += len;
+	
+	if (line->text) {
+		free(line->text);
+	}
+	line->text = temp;
+}
+
+
+/**
+* Frees a page_display and any text inside.
+*
+* @param struct page_display *pd The thing to free.
+*/
+void free_page_display_one(struct page_display *pd) {
+	if (pd) {
+		if (pd->text) {
+			free(pd->text);
+		}
+		free(pd);
+	}
+}
+
+
+/**
+* Frees a whole page_display list.
+*
+* @param struct page_display **list The list of lines to free.
+*/
+void free_page_display(struct page_display **list) {
+	struct page_display *pd, *next;
+	
+	if (list) {
+		DL_FOREACH_SAFE(*list, pd, next) {
+			DL_DELETE(*list, pd);
+			free_page_display_one(pd);
+		}
+	}
+}
+
+
+/**
+* Builds the final display for a page_display and sends it to a player's
+* paginator.
+*
+* @param char_data *ch The player to show it to.
+* @param struct page_display *display The list of lines to be shown.
+*/
+void page_display_to_char(char_data *ch, struct page_display *display) {
+	char *output;
+	size_t size;
+	struct page_display *pd;
+	
+	if (!ch->desc) {
+		return;	// nobody to page it to
+	}
+	
+	// compute size
+	size = 0;
+	DL_FOREACH(display, pd) {
+		size += pd->length + 2;
+	}
+	
+	// allocate
+	CREATE(output, char, size + 1);
+	*output = '\0';
+	
+	// build string
+	DL_FOREACH(display, pd) {
+		strcat(output, NULLSAFE(pd->text));
+		strcat(output, "\r\n");
+	}
+	
+	page_string(ch->desc, output, TRUE);
+	free(output);
+}
 
 
  //////////////////////////////////////////////////////////////////////////////

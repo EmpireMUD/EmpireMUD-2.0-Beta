@@ -100,6 +100,23 @@ void update_reboot();
 extern FILE *logfile;
 
 
+// for building page displays without overrunning the buffer
+struct page_display {
+	char *text;	// the line of text (without crlf, which is added automatically)
+	int length;	// length of the text
+	struct page_display *prev, *next;	// linked list
+};
+
+
+// page display prototypes
+struct page_display *add_page_display(struct page_display **display, const char *fmt, ...);
+struct page_display *add_page_display_str(struct page_display **display, const char *str);
+void append_page_display_line(struct page_display *line, const char *fmt, ...);
+void free_page_display(struct page_display **list);
+void free_page_display_one(struct page_display *pd);
+void page_display_to_char(char_data *ch, struct page_display *display);
+
+
 /* I/O functions */
 int write_to_descriptor(socket_t desc, const char *txt);
 void write_to_q(const char *txt, struct txt_q *queue, int aliased, bool add_to_head);
