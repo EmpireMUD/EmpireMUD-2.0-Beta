@@ -689,50 +689,50 @@ augment_data *setup_olc_augment(augment_data *input) {
 * @param augment_data *aug The augment to display.
 */
 void do_stat_augment(char_data *ch, augment_data *aug) {
-	char buf[MAX_STRING_LENGTH], part[MAX_STRING_LENGTH];
+	char part[MAX_STRING_LENGTH];
 	struct apply_data *app;
 	ability_data *abil;
-	size_t size;
 	int num;
+	struct page_display *display = NULL, *pd;
 	
 	if (!aug) {
 		return;
 	}
 	
 	// first line
-	size = snprintf(buf, sizeof(buf), "VNum: [\tc%d\t0], Name: \tc%s\t0\r\n", GET_AUG_VNUM(aug), GET_AUG_NAME(aug));
+	add_page_display(&display, "VNum: [\tc%d\t0], Name: \tc%s\t0", GET_AUG_VNUM(aug), GET_AUG_NAME(aug));
 	
 	snprintf(part, sizeof(part), "%s", (GET_AUG_ABILITY(aug) == NO_ABIL ? "none" : get_ability_name_by_vnum(GET_AUG_ABILITY(aug))));
 	if ((abil = find_ability_by_vnum(GET_AUG_ABILITY(aug))) && ABIL_ASSIGNED_SKILL(abil) != NULL) {
 		snprintf(part + strlen(part), sizeof(part) - strlen(part), " (%s %d)", SKILL_ABBREV(ABIL_ASSIGNED_SKILL(abil)), ABIL_SKILL_LEVEL(abil));
 	}
-	size += snprintf(buf + size, sizeof(buf) - size, "Type: [\ty%s\t0], Requires Ability: [\ty%s\t0]\r\n", augment_types[GET_AUG_TYPE(aug)], part);
+	add_page_display(&display, "Type: [\ty%s\t0], Requires Ability: [\ty%s\t0]", augment_types[GET_AUG_TYPE(aug)], part);
 	
 	if (GET_AUG_REQUIRES_OBJ(aug) != NOTHING) {
-		size += snprintf(buf + size, sizeof(buf) - size, "Requires item: [%d] \tg%s\t0\r\n", GET_AUG_REQUIRES_OBJ(aug), skip_filler(get_obj_name_by_proto(GET_AUG_REQUIRES_OBJ(aug))));
+		add_page_display(&display, "Requires item: [%d] \tg%s\t0", GET_AUG_REQUIRES_OBJ(aug), skip_filler(get_obj_name_by_proto(GET_AUG_REQUIRES_OBJ(aug))));
 	}
 	
 	sprintbit(GET_AUG_FLAGS(aug), augment_flags, part, TRUE);
-	size += snprintf(buf + size, sizeof(buf) - size, "Flags: \tg%s\t0\r\n", part);
+	add_page_display(&display, "Flags: \tg%s\t0", part);
 	
 	sprintbit(GET_AUG_WEAR_FLAGS(aug), wear_bits, part, TRUE);
-	size += snprintf(buf + size, sizeof(buf) - size, "Targets wear location: \ty%s\t0\r\n", part);
+	add_page_display(&display, "Targets wear location: \ty%s\t0", part);
 	
 	// applies
-	size += snprintf(buf + size, sizeof(buf) - size, "Applies: ");
+	pd = add_page_display(&display, "Applies: ");
 	for (app = GET_AUG_APPLIES(aug), num = 0; app; app = app->next, ++num) {
-		size += snprintf(buf + size, sizeof(buf) - size, "%s%d to %s", num ? ", " : "", app->weight, apply_types[app->location]);
+		append_page_display_line(pd, "%s%d to %s", num ? ", " : "", app->weight, apply_types[app->location]);
 	}
 	if (!GET_AUG_APPLIES(aug)) {
-		size += snprintf(buf + size, sizeof(buf) - size, "none");
+		append_page_display_line(pd, "none");
 	}
-	size += snprintf(buf + size, sizeof(buf) - size, "\r\n");
 	
 	// resources
 	get_resource_display(ch, GET_AUG_RESOURCES(aug), part);
-	size += snprintf(buf + size, sizeof(buf) - size, "Resource cost:\r\n%s", part);
+	add_page_display(&display, "Resource cost:\r\n%s", part);
 	
-	page_string(ch->desc, buf, TRUE);
+	page_display_to_char(ch, display);
+	free_page_display(&display);
 }
 
 
