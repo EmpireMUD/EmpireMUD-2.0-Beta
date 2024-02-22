@@ -2743,31 +2743,32 @@ progress_data *setup_olc_progress(progress_data *input) {
 * @param progress_data *prg The progress entry to display.
 */
 void do_stat_progress(char_data *ch, progress_data *prg) {
-	char buf[MAX_STRING_LENGTH], part[MAX_STRING_LENGTH];
-	size_t size;
+	char part[MAX_STRING_LENGTH];
+	struct page_display *display = NULL;
 	
 	if (!prg) {
 		return;
 	}
 	
-	size = snprintf(buf, sizeof(buf), "VNum: [\tc%d\t0], Name: \ty%s\t0, Type: \ty%s\t0\r\n", PRG_VNUM(prg), PRG_NAME(prg), progress_types[PRG_TYPE(prg)]);
-	size += snprintf(buf + size, sizeof(buf) - size, "%s", NULLSAFE(PRG_DESCRIPTION(prg)));
+	add_page_display(&display, "VNum: [\tc%d\t0], Name: \ty%s\t0, Type: \ty%s\t0", PRG_VNUM(prg), PRG_NAME(prg), progress_types[PRG_TYPE(prg)]);
+	add_page_display(&display, "%s", NULLSAFE(PRG_DESCRIPTION(prg)));
 	
-	size += snprintf(buf + size, sizeof(buf) - size, "Value: [\tc%d point%s\t0], Cost: [\tc%d point%s\t0]\r\n", PRG_VALUE(prg), PLURAL(PRG_VALUE(prg)), PRG_COST(prg), PLURAL(PRG_COST(prg)));
+	add_page_display(&display, "Value: [\tc%d point%s\t0], Cost: [\tc%d point%s\t0]", PRG_VALUE(prg), PLURAL(PRG_VALUE(prg)), PRG_COST(prg), PLURAL(PRG_COST(prg)));
 	
 	sprintbit(PRG_FLAGS(prg), progress_flags, part, TRUE);
-	size += snprintf(buf + size, sizeof(buf) - size, "Flags: \tg%s\t0\r\n", part);
+	add_page_display(&display, "Flags: \tg%s\t0", part);
 	
 	get_progress_list_display(PRG_PREREQS(prg), part);
-	size += snprintf(buf + size, sizeof(buf) - size, "Prerequisites:\r\n%s", *part ? part : " none\r\n");
+	add_page_display(&display, "Prerequisites:\r\n%s", *part ? part : " none");
 	
 	get_requirement_display(PRG_TASKS(prg), part);
-	size += snprintf(buf + size, sizeof(buf) - size, "Tasks:\r\n%s", *part ? part : " none\r\n");
+	add_page_display(&display, "Tasks:\r\n%s", *part ? part : " none");
 	
 	get_progress_perks_display(PRG_PERKS(prg), part, TRUE);
-	size += snprintf(buf + size, sizeof(buf) - size, "Perks:\r\n%s", *part ? part : " none\r\n");
+	add_page_display(&display, "Perks:\r\n%s", *part ? part : " none");
 	
-	page_string(ch->desc, buf, TRUE);
+	page_display_to_char(ch, display);
+	free_page_display(&display);
 }
 
 

@@ -1657,41 +1657,40 @@ attack_message_data *setup_olc_attack_message(attack_message_data *input) {
 * @param bool details If TRUE, shows full messages (due to -d option on vstat).
 */
 void do_stat_attack_message(char_data *ch, attack_message_data *amd, bool details) {
-	bool overflow = FALSE;
-	char buf[MAX_STRING_LENGTH * 6], lbuf[MAX_STRING_LENGTH];
+	char lbuf[MAX_STRING_LENGTH];
 	char *to_show;
 	int count, iter;
-	size_t size;
 	struct attack_message_set *ams, *next_ams;
+	struct page_display *display = NULL, *pd;
 	
 	if (!amd) {
 		return;
 	}
 	
 	// first line
-	size = snprintf(buf, sizeof(buf), "VNum: [\tc%d\t0], Name: \ty%s\t0, Message count: [\tc%d\t0]\r\n", ATTACK_VNUM(amd), ATTACK_NAME(amd), ATTACK_NUM_MSGS(amd));
+	add_page_display(&display, "VNum: [\tc%d\t0], Name: \ty%s\t0, Message count: [\tc%d\t0]", ATTACK_VNUM(amd), ATTACK_NAME(amd), ATTACK_NUM_MSGS(amd));
 	
 	if (ATTACK_COUNTS_AS(amd) > 0) {
-		size += snprintf(buf + size, sizeof(buf) - size, "Also counts as: [\tc%d\t0] \ty%s\t0\r\n", ATTACK_COUNTS_AS(amd), (ATTACK_COUNTS_AS(amd) > 0) ? get_attack_name_by_vnum(ATTACK_COUNTS_AS(amd)) : "(none)");
+		add_page_display(&display, "Also counts as: [\tc%d\t0] \ty%s\t0", ATTACK_COUNTS_AS(amd), (ATTACK_COUNTS_AS(amd) > 0) ? get_attack_name_by_vnum(ATTACK_COUNTS_AS(amd)) : "(none)");
 	}
 	
 	sprintbit(ATTACK_FLAGS(amd), attack_message_flags, lbuf, TRUE);
-	size += snprintf(buf + size, sizeof(buf) - size, "Flags: \tg%s\t0\r\n", lbuf);
+	add_page_display(&display, "Flags: \tg%s\t0", lbuf);
 	
 	if (ATTACK_HAS_EXTENDED_DATA(amd)) {
-		size += snprintf(buf + size, sizeof(buf) - size, "Strings: [\ty%s\t0, \ty%s\t0, \ty%s\t0]\r\n", NULLSAFE(ATTACK_FIRST_PERSON(amd)), NULLSAFE(ATTACK_THIRD_PERSON(amd)), NULLSAFE(ATTACK_NOUN(amd)));
+		add_page_display(&display, "Strings: [\ty%s\t0, \ty%s\t0, \ty%s\t0]", NULLSAFE(ATTACK_FIRST_PERSON(amd)), NULLSAFE(ATTACK_THIRD_PERSON(amd)), NULLSAFE(ATTACK_NOUN(amd)));
 		
 		// Damage, Weapon, Speeds (all same line)
-		size += snprintf(buf + size, sizeof(buf) - size, "Damage type: [\tg%s\t0], Weapon type: [\tg%s\t0], Speeds: [", damage_types[ATTACK_DAMAGE_TYPE(amd)], weapon_types[ATTACK_WEAPON_TYPE(amd)]);
+		pd = add_page_display(&display, "Damage type: [\tg%s\t0], Weapon type: [\tg%s\t0], Speeds: [", damage_types[ATTACK_DAMAGE_TYPE(amd)], weapon_types[ATTACK_WEAPON_TYPE(amd)]);
 		for (iter = 0; iter < NUM_ATTACK_SPEEDS; ++iter) {
-			size += snprintf(buf + size, sizeof(buf) - size, "%s\tc%.1f\t0", iter > 0 ? " | " : "", ATTACK_SPEED(amd, iter));
+			append_page_display_line(pd, "%s\tc%.1f\t0", iter > 0 ? " | " : "", ATTACK_SPEED(amd, iter));
 		}
-		size += snprintf(buf + size, sizeof(buf) - size, "]\r\n");
+		append_page_display_line(pd, "]");
 	}
 	
-	size += snprintf(buf + size, sizeof(buf) - size, "Death log: %s\r\n", ATTACK_DEATH_LOG(amd) ? ATTACK_DEATH_LOG(amd) : "(default)");
+	add_page_display(&display, "Death log: %s", ATTACK_DEATH_LOG(amd) ? ATTACK_DEATH_LOG(amd) : "(default)");
 	
-	size += snprintf(buf + size, sizeof(buf) - size, "Messages:\r\n");
+	add_page_display(&display, "Messages:");
 	count = 0;
 	
 	// message section
@@ -1699,66 +1698,34 @@ void do_stat_attack_message(char_data *ch, attack_message_data *amd, bool detail
 		// show entire message set (hopefully)
 		LL_FOREACH_SAFE(ATTACK_MSG_LIST(amd), ams, next_ams) {
 			++count;
-			if (overflow) {
-				continue;	// full
-			}
-			for (iter = 0; iter < NUM_MSG_TYPES && !overflow; ++iter) {
+			for (iter = 0; iter < NUM_MSG_TYPES; ++iter) {
 				if (ams->msg[iter].attacker_msg) {
-					if (size + strlen(ams->msg[iter].attacker_msg) + 14 < sizeof(buf)) {
-						size += snprintf(buf + size, sizeof(buf) - size, "%s\r\n", ams->msg[iter].attacker_msg);
-					}
-					else {
-						overflow = TRUE;
-					}
-				}
-				else if (size + 14 < sizeof(buf)) {
-					size += snprintf(buf + size, sizeof(buf) - size, "#\r\n");
+					add_page_display_str(&display, ams->msg[iter].attacker_msg);
 				}
 				else {
-					overflow = TRUE;
+					add_page_display_str(&display, "#");
 				}
 				if (ams->msg[iter].victim_msg) {
-					if (size + strlen(ams->msg[iter].victim_msg) + 14 < sizeof(buf)) {
-						size += snprintf(buf + size, sizeof(buf) - size, "%s\r\n", ams->msg[iter].victim_msg);
-					}
-					else {
-						overflow = TRUE;
-					}
-				}
-				else if (size + 14 < sizeof(buf)) {
-					size += snprintf(buf + size, sizeof(buf) - size, "#\r\n");
+					add_page_display_str(&display, ams->msg[iter].victim_msg);
 				}
 				else {
-					overflow = TRUE;
+					add_page_display_str(&display, "#");
 				}
 				if (ams->msg[iter].room_msg) {
-					if (size + strlen(ams->msg[iter].room_msg) + 14 < sizeof(buf)) {
-						size += snprintf(buf + size, sizeof(buf) - size, "%s\r\n", ams->msg[iter].room_msg);
-					}
-					else {
-						overflow = TRUE;
-					}
-				}
-				else if (size + 14 < sizeof(buf)) {
-					size += snprintf(buf + size, sizeof(buf) - size, "#\r\n");
+					add_page_display_str(&display, ams->msg[iter].room_msg);
 				}
 				else {
-					overflow = TRUE;
+					add_page_display_str(&display, "#");
 				}
 			}
 			
 			// separator
-			if (next_ams && !overflow) {
+			if (next_ams) {
 				for (iter = 0; iter < 79; ++iter) {
 					lbuf[iter] = '-';
 				}
 				lbuf[iter] = '\0';
-				if (size + strlen(lbuf) + 14 < sizeof(buf)) {
-					size += snprintf(buf + size, sizeof(buf) - size, "%s\r\n", lbuf);
-				}
-				else {
-					overflow = TRUE;
-				}
+				add_page_display_str(&display, lbuf);
 			}
 		}
 	}
@@ -1793,18 +1760,15 @@ void do_stat_attack_message(char_data *ch, attack_message_data *amd, bool detail
 			}
 		
 			// only show 1 line per message on stat
-			size += snprintf(buf + size, sizeof(buf) - size, "%d. %s\r\n", ++count, to_show ? to_show : "(blank)");
+			add_page_display(&display, "%d. %s", ++count, to_show ? to_show : "(blank)");
 		}
 	}
 	if (!count) {
-		size += snprintf(buf + size, sizeof(buf) - size, " none\r\n");
-	}
-	else if (overflow && size < sizeof(buf)) {
-		// should still be room for this as it was reserved
-		size += snprintf(buf + size, sizeof(buf) - size, "OVERFLOW\r\n");
+		add_page_display(&display, " none");
 	}
 	
-	page_string(ch->desc, buf, TRUE);
+	page_display_to_char(ch, display);
+	free_page_display(&display);
 }
 
 
