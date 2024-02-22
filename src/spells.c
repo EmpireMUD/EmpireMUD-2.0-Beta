@@ -663,13 +663,13 @@ ACMD(do_cast) {
 
 
 ACMD(do_conjure) {
-	bool found, full, needs_target;
+	bool found, needs_target;
 	char whole_arg[MAX_INPUT_LENGTH];
 	char *arg2;
 	const char *ptr;
-	size_t size, count;
 	ability_data *abil;
 	struct player_ability_data *plab, *next_plab;
+	struct page_display *display = NULL;
 	
 	bitvector_t my_types = ABILT_CONJURE_LIQUID | ABILT_CONJURE_OBJECT | ABILT_CONJURE_VEHICLE;
 	
@@ -693,10 +693,9 @@ ACMD(do_conjure) {
 			return;
 		}
 		
-		size = snprintf(buf, sizeof(buf), "You can conjure the following things:\r\n");
+		add_page_display(&display, "You can conjure the following things:");
 		
-		found = full = FALSE;
-		count = 0;
+		found = FALSE;
 		HASH_ITER(hh, GET_ABILITY_HASH(ch), plab, next_plab) {
 			abil = plab->ptr;
 			if (!VALID_CONJURE_ABIL(ch, plab)) {
@@ -706,41 +705,21 @@ ACMD(do_conjure) {
 			// show it
 			if (IS_SET(ABIL_TYPES(abil), my_types)) {
 				ptr = skip_wordlist(ABIL_NAME(abil), conjure_words, FALSE);
+				if (!*ptr) {
+					ptr = ABIL_NAME(abil);
+				}
 				
 				// append
-				if (size + strlen(ptr) + 38 < sizeof(buf)) {
-					size += snprintf(buf + size, sizeof(buf) - size, " %-34.34s%s", ptr, ((count++ % 2 || PRF_FLAGGED(ch, PRF_SCREEN_READER)) ? "\r\n" : ""));
-				}
-				else {
-					full = TRUE;
-					break;
-				}
-			}
-			else {
-				continue;
-			}
-			
-			// found 1
-			found = TRUE;
-			
-			if (full) {
-				break;
+				found = TRUE;
+				add_page_display_col_str(&display, 2, ptr);
 			}
 		}
 		
 		if (!found) {
-			strcat(buf, " nothing\r\n");	// always room for this if !found
-		}
-		else if (count % 2 && !full && !PRF_FLAGGED(ch, PRF_SCREEN_READER)) {
-			strcat(buf, "\r\n");
+			add_page_display(&display, " nothing");	// always room for this if !found
 		}
 		
-		if (full) {
-			snprintf(buf + size, sizeof(buf) - size, "OVERFLOW\r\n");
-		}
-		if (ch->desc) {
-			page_string(ch->desc, buf, TRUE);
-		}
+		page_display_to_char(ch, &display, TRUE);
 		return;
 	}	// end no-arg
 	
@@ -779,13 +758,14 @@ ACMD(do_conjure) {
 
 
 ACMD(do_ready) {
-	bool found, full;
-	char buf[MAX_STRING_LENGTH * 2], line[MAX_STRING_LENGTH];
-	size_t size, lsize;
+	bool found;
+	char line[MAX_STRING_LENGTH];
+	size_t lsize;
 	ability_data *abil, *found_abil;
 	obj_data *proto;
 	struct ability_data_list *adl;
 	struct player_ability_data *plab, *next_plab;
+	struct page_display *display = NULL;
 	
 	quoted_arg_or_all(argument, arg);
 	
@@ -797,9 +777,9 @@ ACMD(do_ready) {
 	#define VALID_READY_ABIL(ch, plab, abil)  ((abil) && (plab) && (plab)->purchased[GET_CURRENT_SKILL_SET(ch)] && IS_SET(ABIL_TYPES(abil), ABILT_READY_WEAPONS) && (!ABIL_COMMAND(abil) || !str_cmp(ABIL_COMMAND(abil), "ready")))
 	
 	if (!*arg) {
-		size = snprintf(buf, sizeof(buf), "You know how to ready the following weapons:\r\n");
+		add_page_display(&display, "You know how to ready the following weapons:");
 		
-		found = full = FALSE;
+		found = FALSE;
 		HASH_ITER(hh, GET_ABILITY_HASH(ch), plab, next_plab) {
 			abil = plab->ptr;
 			if (!VALID_READY_ABIL(ch, plab, abil)) {
@@ -815,35 +795,17 @@ ACMD(do_ready) {
 						lsize += snprintf(line + lsize, sizeof(line) - lsize, " (%d %s)", ABIL_COST(abil), pool_types[ABIL_COST_TYPE(abil)]);
 					}
 					
-					strcat(line, "\r\n");
-					lsize += 2;
+					add_page_display_col_str(&display, 2, line);
 					found = TRUE;
-					
-					if (size + lsize < sizeof(buf)) {
-						strcat(buf, line);
-						size += lsize;
-					}
-					else {
-						full = TRUE;
-						break;
-					}
 				}
-			}
-			
-			if (full) {
-				break;
 			}
 		}
 		
 		if (!found) {
-			strcat(buf, " none\r\n");	// always room for this if !found
+			add_page_display(&display, " none");
 		}
-		if (full) {
-			snprintf(buf + size, sizeof(buf) - size, "OVERFLOW\r\n");
-		}
-		if (ch->desc) {
-			page_string(ch->desc, buf, TRUE);
-		}
+		
+		page_display_to_char(ch, &display, TRUE);
 		return;
 	}
 	
@@ -883,14 +845,14 @@ ACMD(do_ready) {
 
 
 ACMD(do_summon) {
-	bool found, full;
-	char buf[MAX_STRING_LENGTH * 2], arg[MAX_INPUT_LENGTH], *arg2, *line;
+	bool found;
+	char arg[MAX_INPUT_LENGTH], *arg2;
 	int count, fol_count;
-	size_t size, lsize;
 	ability_data *abil;
 	char_data *mob, *proto = NULL;
 	struct ability_data_list *adl;
 	struct player_ability_data *plab, *next_plab;
+	struct page_display *display = NULL;
 	
 	// maximum npcs present when summoning
 	int max_npcs = config_get_int("summon_npc_limit");
@@ -926,9 +888,9 @@ ACMD(do_summon) {
 			return;
 		}
 		
-		size = snprintf(buf, sizeof(buf), "You can summon the following things:\r\n");
+		add_page_display(&display, "You can summon the following things:");
 		
-		found = full = FALSE;
+		found = FALSE;
 		HASH_ITER(hh, GET_ABILITY_HASH(ch), plab, next_plab) {
 			abil = plab->ptr;
 			if (!VALID_SUMMON_ABIL(ch, plab)) {
@@ -940,28 +902,13 @@ ACMD(do_summon) {
 				// summon-any lists the mobs themselves
 				LL_FOREACH(ABIL_DATA(abil), adl) {
 					if (adl->type == ADL_SUMMON_MOB && (proto = mob_proto(adl->vnum))) {
-						line = one_summon_entry(ch, skip_filler(GET_SHORT_DESC(proto)), GET_MIN_SCALE_LEVEL(proto), abil);
-						lsize = strlen(line);
-						if (size + lsize + 3 < sizeof(buf)) {
-							size += snprintf(buf + size, sizeof(buf) - size, " %s\r\n", line);
-						}
-						else {
-							full = TRUE;
-							break;
-						}
+						add_page_display_col_str(&display, 2, one_summon_entry(ch, skip_filler(GET_SHORT_DESC(proto)), GET_MIN_SCALE_LEVEL(proto), abil));
 					}
 				}
 			}
 			else if (IS_SET(ABIL_TYPES(abil), ABILT_SUMMON_RANDOM)) {
 				// summon-random just shows the ability name, minus the word 'summon'
-				line = one_summon_entry(ch, format_summon_name(ABIL_NAME(abil)), 0, abil);
-				lsize = strlen(line);
-				if (size + lsize + 3 < sizeof(buf)) {
-					size += snprintf(buf + size, sizeof(buf) - size, " %s\r\n", line);
-				}
-				else {
-					full = TRUE;
-				}
+				add_page_display_col_str(&display, 2, one_summon_entry(ch, format_summon_name(ABIL_NAME(abil)), 0, abil));
 			}
 			else {
 				continue;
@@ -969,21 +916,13 @@ ACMD(do_summon) {
 			
 			// if we got here, we did find one
 			found = TRUE;
-			
-			if (full) {
-				break;
-			}
 		}
 		
 		if (!found) {
-			strcat(buf, " nothing\r\n");	// always room for this if !found
+			add_page_display(&display, " nothing");
 		}
-		if (full) {
-			snprintf(buf + size, sizeof(buf) - size, "OVERFLOW\r\n");
-		}
-		if (ch->desc) {
-			page_string(ch->desc, buf, TRUE);
-		}
+		
+		page_display_to_char(ch, &display, TRUE);
 		return;
 	}
 	
