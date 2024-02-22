@@ -1793,51 +1793,48 @@ archetype_data *setup_olc_archetype(archetype_data *input) {
 * @param archetype_data *arch The archetype to display.
 */
 void do_stat_archetype(char_data *ch, archetype_data *arch) {
-	char buf[MAX_STRING_LENGTH], part[MAX_STRING_LENGTH];
+	char part[MAX_STRING_LENGTH];
 	struct archetype_skill *sk;
 	int iter, pos, total;
-	size_t size;
+	struct page_display *display = NULL, *pd;
 	
 	if (!arch) {
 		return;
 	}
 	
 	// first line
-	size = snprintf(buf, sizeof(buf), "VNum: [\tc%d\t0], Type: \ty%s\t0, Name: \tc%s\t0\r\n", GET_ARCH_VNUM(arch), archetype_types[GET_ARCH_TYPE(arch)], GET_ARCH_NAME(arch));
-	size += snprintf(buf + size, sizeof(buf) - size, "Ranks: [\ta%s\t0/\tp%s\t0]\r\n", GET_ARCH_MALE_RANK(arch), GET_ARCH_FEMALE_RANK(arch));
+	add_page_display(&display, "VNum: [\tc%d\t0], Type: \ty%s\t0, Name: \tc%s\t0", GET_ARCH_VNUM(arch), archetype_types[GET_ARCH_TYPE(arch)], GET_ARCH_NAME(arch));
+	add_page_display(&display, "Ranks: [\ta%s\t0/\tp%s\t0]", GET_ARCH_MALE_RANK(arch), GET_ARCH_FEMALE_RANK(arch));
 	
-	size += snprintf(buf + size, sizeof(buf) - size, "Description: %s\r\n", GET_ARCH_DESC(arch));
+	add_page_display(&display, "Description: %s", GET_ARCH_DESC(arch));
 	
 	if (GET_ARCH_LORE(arch) && *GET_ARCH_LORE(arch)) {
-		size += snprintf(buf + size, sizeof(buf) - size, "Lore: \tc%s\t0 [on Month Day, Year.]\r\n", GET_ARCH_LORE(arch));
+		add_page_display(&display, "Lore: \tc%s\t0 [on Month Day, Year.]", GET_ARCH_LORE(arch));
 	}
 	else {
-		size += snprintf(buf + size, sizeof(buf) - size, "Lore: \tcnone\t0\r\n");
+		add_page_display(&display, "Lore: \tcnone\t0");
 	}
 	
 	if (GET_ARCH_LANGUAGE(arch)) {
-		size += snprintf(buf + size, sizeof(buf) - size, "Language: [\ty%d\t0] \ty%s\t0\r\n", GEN_VNUM(GET_ARCH_LANGUAGE(arch)), GEN_NAME(GET_ARCH_LANGUAGE(arch)));
+		add_page_display(&display, "Language: [\ty%d\t0] \ty%s\t0", GEN_VNUM(GET_ARCH_LANGUAGE(arch)), GEN_NAME(GET_ARCH_LANGUAGE(arch)));
 	}
 	else {
-		size += snprintf(buf + size, sizeof(buf) - size, "Language: \tynone\t0\r\n");
+		add_page_display(&display, "Language: \tynone\t0");
 	}
 	
 	sprintbit(GET_ARCH_FLAGS(arch), archetype_flags, part, TRUE);
-	size += snprintf(buf + size, sizeof(buf) - size, "Flags: \tg%s\t0\r\n", part);
+	add_page_display(&display, "Flags: \tg%s\t0", part);
 		
 	// attributes
 	total = 0;
 	for (iter = 0; iter < NUM_ATTRIBUTES; ++iter) {
 		total += GET_ARCH_ATTRIBUTE(arch, iter);
 	}
-	size += snprintf(buf + size, sizeof(buf) - size, "Attributes: [\tc%d total attributes\t0]\r\n", total);
+	pd = add_page_display(&display, "Attributes: [\tc%d total attributes\t0]\r\n", total);
 	for (iter = 0; iter < NUM_ATTRIBUTES; ++iter) {
 		pos = attribute_display_order[iter];
 		snprintf(part, sizeof(part), "%s  [\tg%2d\t0]", attributes[pos].name, GET_ARCH_ATTRIBUTE(arch, pos));
-		size += snprintf(buf + size, sizeof(buf) - size, "  %-27.27s%s", part, !((iter + 1) % 3) ? "\r\n" : "");
-	}
-	if (iter % 3) {
-		strcat(buf, "\r\n");
+		append_page_display_line(pd, "  %-27.27s%s", part, !((iter + 1) % 3) ? "\r\n" : "");
 	}
 	
 	// skills
@@ -1845,17 +1842,17 @@ void do_stat_archetype(char_data *ch, archetype_data *arch) {
 	for (sk = GET_ARCH_SKILLS(arch); sk; sk = sk->next) {
 		total += sk->level;
 	}
-	size += snprintf(buf + size, sizeof(buf) - size, "Skills: [\tc%d total skill points\t0]\r\n", total);
+	add_page_display(&display, "Skills: [\tc%d total skill points\t0]", total);
 	for (sk = GET_ARCH_SKILLS(arch); sk; sk = sk->next) {
-		size += snprintf(buf + size, sizeof(buf) - size, "  %s: \tg%d\t0\r\n", get_skill_name_by_vnum(sk->skill), sk->level);
+		add_page_display(&display, "  %s: \tg%d\t0", get_skill_name_by_vnum(sk->skill), sk->level);
 	}
 	
 	// gear
-	size += snprintf(buf + size, sizeof(buf) - size, "Gear:\r\n");
 	get_archetype_gear_display(GET_ARCH_GEAR(arch), part);
-	size += snprintf(buf + size, sizeof(buf) - size, "%s", part);
+	add_page_display(&display, "Gear:\r\n%s", part);
 	
-	page_string(ch->desc, buf, TRUE);
+	page_display_to_char(ch, display);
+	free_page_display(&display);
 }
 
 
