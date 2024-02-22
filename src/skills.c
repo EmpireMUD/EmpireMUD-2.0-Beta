@@ -4253,37 +4253,36 @@ void do_stat_skill(char_data *ch, skill_data *skill) {
 	struct synergy_ability *syn;
 	struct skill_ability *skab;
 	int total;
-	struct page_display *display = NULL;
 	
 	if (!skill) {
 		return;
 	}
 	
 	// first line
-	add_page_display(&display, "VNum: [\tc%d\t0], Name: \tc%s\t0, Abbrev: \tc%s\t0", SKILL_VNUM(skill), SKILL_NAME(skill), SKILL_ABBREV(skill));
+	add_page_display(ch, "VNum: [\tc%d\t0], Name: \tc%s\t0, Abbrev: \tc%s\t0", SKILL_VNUM(skill), SKILL_NAME(skill), SKILL_ABBREV(skill));
 	
-	add_page_display(&display, "Description: %s", SKILL_DESC(skill));
+	add_page_display(ch, "Description: %s", SKILL_DESC(skill));
 	
-	add_page_display(&display, "Minimum drop level: [\tc%d\t0], Maximum level: [\tc%d\t0]", SKILL_MIN_DROP_LEVEL(skill), SKILL_MAX_LEVEL(skill));
+	add_page_display(ch, "Minimum drop level: [\tc%d\t0], Maximum level: [\tc%d\t0]", SKILL_MIN_DROP_LEVEL(skill), SKILL_MAX_LEVEL(skill));
 	
 	sprintbit(SKILL_FLAGS(skill), skill_flags, part, TRUE);
-	add_page_display(&display, "Flags: \tg%s\t0", part);
+	add_page_display(ch, "Flags: \tg%s\t0", part);
 	
 	LL_COUNT(SKILL_ABILITIES(skill), skab, total);
-	add_page_display(&display, "Simplified skill tree: (%d total)", total);
+	add_page_display(ch, "Simplified skill tree: (%d total)", total);
 	get_skill_ability_display(SKILL_ABILITIES(skill), part, sizeof(part));
 	if (*part) {
-		add_page_display_str(&display, part);
+		add_page_display_str(ch, part);
 	}
 
 	LL_COUNT(SKILL_SYNERGIES(skill), syn, total);
-	add_page_display(&display, "Synergy abilities: (%d total)", total);
+	add_page_display(ch, "Synergy abilities: (%d total)", total);
 	get_skill_synergy_display(SKILL_SYNERGIES(skill), part, NULL);
 	if (*part) {
-		add_page_display_str(&display, part);
+		add_page_display_str(ch, part);
 	}
 	
-	page_display_to_char(ch, &display, TRUE);
+	send_page_display(ch);
 }
 
 
@@ -4386,15 +4385,14 @@ void get_skill_synergy_display(struct synergy_ability *list, char *save_buffer, 
 int vnum_skill(char *searchname, char_data *ch) {
 	skill_data *iter, *next_iter;
 	int found = 0;
-	struct page_display *display = NULL;
 	
 	HASH_ITER(hh, skill_table, iter, next_iter) {
 		if (multi_isname(searchname, SKILL_NAME(iter)) || is_abbrev(searchname, SKILL_ABBREV(iter))) {
-			add_page_display(&display, "%3d. [%5d] %s", ++found, SKILL_VNUM(iter), SKILL_NAME(iter));
+			add_page_display(ch, "%3d. [%5d] %s", ++found, SKILL_VNUM(iter), SKILL_NAME(iter));
 		}
 	}
 	
-	page_display_to_char(ch, &display, TRUE);
+	send_page_display(ch);
 	return found;
 }
 

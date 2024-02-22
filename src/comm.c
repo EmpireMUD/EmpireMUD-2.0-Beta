@@ -1984,6 +1984,8 @@ void free_descriptor(descriptor_data *desc) {
 	}
 	// do NOT free desc->str_on_abort (is a pointer to something else)
 	
+	free_page_display(&desc->page_lines);
+	
 	// other strings
 	if (desc->host) {
 		free(desc->host);

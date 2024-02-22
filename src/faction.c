@@ -1353,23 +1353,22 @@ faction_data *setup_olc_faction(faction_data *input) {
 */
 void do_stat_faction(char_data *ch, faction_data *fct) {
 	char part[MAX_STRING_LENGTH];
-	struct page_display *display = NULL;
 	
 	if (!fct) {
 		return;
 	}
 	
 	// first line
-	add_page_display(&display, "VNum: [\tc%d\t0], Name: \tc%s\t0\r\n%s", FCT_VNUM(fct), FCT_NAME(fct), NULLSAFE(FCT_DESCRIPTION(fct)));
-	add_page_display(&display, "Min Reputation: \ty%s\t0, Max Reputation: \ty%s\t0, Starting Reputation: \ty%s\t0", get_reputation_name(FCT_MIN_REP(fct)), get_reputation_name(FCT_MAX_REP(fct)), get_reputation_name(FCT_STARTING_REP(fct)));
+	add_page_display(ch, "VNum: [\tc%d\t0], Name: \tc%s\t0\r\n%s", FCT_VNUM(fct), FCT_NAME(fct), NULLSAFE(FCT_DESCRIPTION(fct)));
+	add_page_display(ch, "Min Reputation: \ty%s\t0, Max Reputation: \ty%s\t0, Starting Reputation: \ty%s\t0", get_reputation_name(FCT_MIN_REP(fct)), get_reputation_name(FCT_MAX_REP(fct)), get_reputation_name(FCT_STARTING_REP(fct)));
 	
 	sprintbit(FCT_FLAGS(fct), faction_flags, part, TRUE);
-	add_page_display(&display, "Flags: \tg%s\t0", part);
+	add_page_display(ch, "Flags: \tg%s\t0", part);
 	
 	get_faction_relation_display(FCT_RELATIONS(fct), part);
-	add_page_display(&display, "Relations:\r\n%s", part);
+	add_page_display(ch, "Relations:\r\n%s", part);
 	
-	page_display_to_char(ch, &display, TRUE);
+	send_page_display(ch);
 }
 
 
@@ -1439,15 +1438,14 @@ void olc_show_faction(char_data *ch) {
 int vnum_faction(char *searchname, char_data *ch) {
 	faction_data *iter, *next_iter;
 	int found = 0;
-	struct page_display *display = NULL;
 	
 	HASH_ITER(hh, faction_table, iter, next_iter) {
 		if (multi_isname(searchname, FCT_NAME(iter))) {
-			add_page_display(&display, "%3d. [%5d] %s", ++found, FCT_VNUM(iter), FCT_NAME(iter));
+			add_page_display(ch, "%3d. [%5d] %s", ++found, FCT_VNUM(iter), FCT_NAME(iter));
 		}
 	}
 	
-	page_display_to_char(ch, &display, TRUE);
+	send_page_display(ch);
 	return found;
 }
 

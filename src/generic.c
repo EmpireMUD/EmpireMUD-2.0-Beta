@@ -1998,68 +1998,67 @@ void get_generic_relation_display(struct generic_relation *list, bool show_vnums
 */
 void do_stat_generic(char_data *ch, generic_data *gen) {
 	char part[MAX_STRING_LENGTH];
-	struct page_display *display = NULL;
 	
 	if (!gen) {
 		return;
 	}
 	
 	// first line
-	add_page_display(&display, "VNum: [\tc%d\t0], Name: \ty%s\t0, Type: \tc%s\t0", GEN_VNUM(gen), GEN_NAME(gen), generic_types[GEN_TYPE(gen)]);
+	add_page_display(ch, "VNum: [\tc%d\t0], Name: \ty%s\t0, Type: \tc%s\t0", GEN_VNUM(gen), GEN_NAME(gen), generic_types[GEN_TYPE(gen)]);
 	
 	sprintbit(GEN_FLAGS(gen), generic_flags, part, TRUE);
-	add_page_display(&display, "Flags: \tg%s\t0", part);
+	add_page_display(ch, "Flags: \tg%s\t0", part);
 	
 	// GENERIC_x
 	switch (GEN_TYPE(gen)) {
 		case GENERIC_LIQUID: {
-			add_page_display(&display, "Liquid: \ty%s\t0, Color: \ty%s\t0", NULLSAFE(GET_LIQUID_NAME(gen)), NULLSAFE(GET_LIQUID_COLOR(gen)));
-			add_page_display(&display, "Hunger: [\tc%d\t0], Thirst: [\tc%d\t0], Drunk: [\tc%d\t0]", GET_LIQUID_FULL(gen), GET_LIQUID_THIRST(gen), GET_LIQUID_DRUNK(gen));
+			add_page_display(ch, "Liquid: \ty%s\t0, Color: \ty%s\t0", NULLSAFE(GET_LIQUID_NAME(gen)), NULLSAFE(GET_LIQUID_COLOR(gen)));
+			add_page_display(ch, "Hunger: [\tc%d\t0], Thirst: [\tc%d\t0], Drunk: [\tc%d\t0]", GET_LIQUID_FULL(gen), GET_LIQUID_THIRST(gen), GET_LIQUID_DRUNK(gen));
 			
 			sprintbit(GET_LIQUID_FLAGS(gen), liquid_flags, part, TRUE);
-			add_page_display(&display, "Liquid flags: \tg%s\t0", part);
+			add_page_display(ch, "Liquid flags: \tg%s\t0", part);
 			break;
 		}
 		case GENERIC_ACTION: {
-			add_page_display(&display, "Build-to-Char: %s", NULLSAFE(GEN_STRING(gen, GSTR_ACTION_BUILD_TO_CHAR)));
-			add_page_display(&display, "Build-to-Room: %s", NULLSAFE(GEN_STRING(gen, GSTR_ACTION_BUILD_TO_ROOM)));
-			add_page_display(&display, "Craft-to-Char: %s", NULLSAFE(GEN_STRING(gen, GSTR_ACTION_CRAFT_TO_CHAR)));
-			add_page_display(&display, "Craft-to-Room: %s", NULLSAFE(GEN_STRING(gen, GSTR_ACTION_CRAFT_TO_ROOM)));
-			add_page_display(&display, "Repair-to-Char: %s", NULLSAFE(GEN_STRING(gen, GSTR_ACTION_REPAIR_TO_CHAR)));
-			add_page_display(&display, "Repair-to-Room: %s", NULLSAFE(GEN_STRING(gen, GSTR_ACTION_REPAIR_TO_ROOM)));
+			add_page_display(ch, "Build-to-Char: %s", NULLSAFE(GEN_STRING(gen, GSTR_ACTION_BUILD_TO_CHAR)));
+			add_page_display(ch, "Build-to-Room: %s", NULLSAFE(GEN_STRING(gen, GSTR_ACTION_BUILD_TO_ROOM)));
+			add_page_display(ch, "Craft-to-Char: %s", NULLSAFE(GEN_STRING(gen, GSTR_ACTION_CRAFT_TO_CHAR)));
+			add_page_display(ch, "Craft-to-Room: %s", NULLSAFE(GEN_STRING(gen, GSTR_ACTION_CRAFT_TO_ROOM)));
+			add_page_display(ch, "Repair-to-Char: %s", NULLSAFE(GEN_STRING(gen, GSTR_ACTION_REPAIR_TO_CHAR)));
+			add_page_display(ch, "Repair-to-Room: %s", NULLSAFE(GEN_STRING(gen, GSTR_ACTION_REPAIR_TO_ROOM)));
 			break;
 		}
 		case GENERIC_COOLDOWN: {
-			add_page_display(&display, "Wear-off: %s", GET_COOLDOWN_WEAR_OFF(gen) ? GET_COOLDOWN_WEAR_OFF(gen) : "(none)");
+			add_page_display(ch, "Wear-off: %s", GET_COOLDOWN_WEAR_OFF(gen) ? GET_COOLDOWN_WEAR_OFF(gen) : "(none)");
 			break;
 		}
 		case GENERIC_AFFECT: {
-			add_page_display(&display, "DoT attack type: %d %s", GET_AFFECT_DOT_ATTACK(gen), (GET_AFFECT_DOT_ATTACK(gen) > 0) ? get_attack_name_by_vnum(GET_AFFECT_DOT_ATTACK(gen)) : "(none)");
-			add_page_display(&display, "Apply to-char: %s", GET_AFFECT_APPLY_TO_CHAR(gen) ? GET_AFFECT_APPLY_TO_CHAR(gen) : "(none)");
-			add_page_display(&display, "Apply to-room: %s", GET_AFFECT_APPLY_TO_ROOM(gen) ? GET_AFFECT_APPLY_TO_ROOM(gen) : "(none)");
-			add_page_display(&display, "Wear-off: %s", GET_AFFECT_WEAR_OFF_TO_CHAR(gen) ? GET_AFFECT_WEAR_OFF_TO_CHAR(gen) : "(none)");
-			add_page_display(&display, "Wear-off to room: %s", GET_AFFECT_WEAR_OFF_TO_ROOM(gen) ? GET_AFFECT_WEAR_OFF_TO_ROOM(gen) : "(none)");
-			add_page_display(&display, "Look at char: %s", GET_AFFECT_LOOK_AT_CHAR(gen) ? GET_AFFECT_LOOK_AT_CHAR(gen) : "(none)");
-			add_page_display(&display, "Look at room: %s", GET_AFFECT_LOOK_AT_ROOM(gen) ? GET_AFFECT_LOOK_AT_ROOM(gen) : "(none)");
+			add_page_display(ch, "DoT attack type: %d %s", GET_AFFECT_DOT_ATTACK(gen), (GET_AFFECT_DOT_ATTACK(gen) > 0) ? get_attack_name_by_vnum(GET_AFFECT_DOT_ATTACK(gen)) : "(none)");
+			add_page_display(ch, "Apply to-char: %s", GET_AFFECT_APPLY_TO_CHAR(gen) ? GET_AFFECT_APPLY_TO_CHAR(gen) : "(none)");
+			add_page_display(ch, "Apply to-room: %s", GET_AFFECT_APPLY_TO_ROOM(gen) ? GET_AFFECT_APPLY_TO_ROOM(gen) : "(none)");
+			add_page_display(ch, "Wear-off: %s", GET_AFFECT_WEAR_OFF_TO_CHAR(gen) ? GET_AFFECT_WEAR_OFF_TO_CHAR(gen) : "(none)");
+			add_page_display(ch, "Wear-off to room: %s", GET_AFFECT_WEAR_OFF_TO_ROOM(gen) ? GET_AFFECT_WEAR_OFF_TO_ROOM(gen) : "(none)");
+			add_page_display(ch, "Look at char: %s", GET_AFFECT_LOOK_AT_CHAR(gen) ? GET_AFFECT_LOOK_AT_CHAR(gen) : "(none)");
+			add_page_display(ch, "Look at room: %s", GET_AFFECT_LOOK_AT_ROOM(gen) ? GET_AFFECT_LOOK_AT_ROOM(gen) : "(none)");
 			break;
 		}
 		case GENERIC_CURRENCY: {
-			add_page_display(&display, "Singular: %s", NULLSAFE(GEN_STRING(gen, GSTR_CURRENCY_SINGULAR)));
-			add_page_display(&display, "Plural: %s", NULLSAFE(GEN_STRING(gen, GSTR_CURRENCY_PLURAL)));
+			add_page_display(ch, "Singular: %s", NULLSAFE(GEN_STRING(gen, GSTR_CURRENCY_SINGULAR)));
+			add_page_display(ch, "Plural: %s", NULLSAFE(GEN_STRING(gen, GSTR_CURRENCY_PLURAL)));
 			break;
 		}
 		case GENERIC_COMPONENT: {
-			add_page_display(&display, "Plural: %s", NULLSAFE(GEN_STRING(gen, GSTR_COMPONENT_PLURAL)));
-			add_page_display(&display, "Item: [%d] %s", GET_COMPONENT_OBJ_VNUM(gen), get_obj_name_by_proto(GET_COMPONENT_OBJ_VNUM(gen)));
+			add_page_display(ch, "Plural: %s", NULLSAFE(GEN_STRING(gen, GSTR_COMPONENT_PLURAL)));
+			add_page_display(ch, "Item: [%d] %s", GET_COMPONENT_OBJ_VNUM(gen), get_obj_name_by_proto(GET_COMPONENT_OBJ_VNUM(gen)));
 			
 			get_generic_relation_display(GEN_RELATIONS(gen), TRUE, part, NULL);
-			add_page_display(&display, "Relations:\r\n%s", GEN_RELATIONS(gen) ? part : " none");
+			add_page_display(ch, "Relations:\r\n%s", GEN_RELATIONS(gen) ? part : " none");
 			get_generic_relation_display(GEN_COMPUTED_RELATIONS(gen), TRUE, part, NULL);
-			add_page_display(&display, "Extended Relations:\r\n%s", GEN_COMPUTED_RELATIONS(gen) ? part : " none");
+			add_page_display(ch, "Extended Relations:\r\n%s", GEN_COMPUTED_RELATIONS(gen) ? part : " none");
 			break;
 		}
 		case GENERIC_MOON: {
-			add_page_display(&display, "Cycle: \ty%.2f day%s\t0", GET_MOON_CYCLE_DAYS(gen), PLURAL(GET_MOON_CYCLE_DAYS(gen)));
+			add_page_display(ch, "Cycle: \ty%.2f day%s\t0", GET_MOON_CYCLE_DAYS(gen), PLURAL(GET_MOON_CYCLE_DAYS(gen)));
 			break;
 		}
 		case GENERIC_LANGUAGE: {
@@ -2068,7 +2067,7 @@ void do_stat_generic(char_data *ch, generic_data *gen) {
 		}
 	}
 
-	page_display_to_char(ch, &display, TRUE);
+	send_page_display(ch);
 }
 
 
@@ -2170,15 +2169,14 @@ void olc_show_generic(char_data *ch) {
 int vnum_generic(char *searchname, char_data *ch) {
 	generic_data *iter, *next_iter;
 	int found = 0;
-	struct page_display *display = NULL;
 	
 	HASH_ITER(hh, generic_table, iter, next_iter) {
 		if (multi_isname(searchname, GEN_NAME(iter))) {
-			add_page_display(&display, "%3d. [%5d] %s (%s)", ++found, GEN_VNUM(iter), GEN_NAME(iter), generic_types[GEN_TYPE(iter)]);
+			add_page_display(ch, "%3d. [%5d] %s (%s)", ++found, GEN_VNUM(iter), GEN_NAME(iter), generic_types[GEN_TYPE(iter)]);
 		}
 	}
 	
-	page_display_to_char(ch, &display, TRUE);
+	send_page_display(ch);
 	return found;
 }
 

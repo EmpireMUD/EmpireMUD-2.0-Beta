@@ -4445,32 +4445,32 @@ void do_stat_vehicle(char_data *ch, vehicle_data *veh, bool details) {
 	bool comma;
 	int count, found;
 	struct string_hash *str_iter, *next_str, *str_hash = NULL;
-	struct page_display *display = NULL, *pd;
+	struct page_display *pd;
 	
 	if (!veh) {
 		return;
 	}
 	
 	// first line
-	add_page_display(&display, "VNum: [\tc%d\t0], S-Des: \tc%s\t0, Keywords: \ty%s\t0, Idnum: [%5d]", VEH_VNUM(veh), VEH_SHORT_DESC(veh), VEH_KEYWORDS(veh), IN_ROOM(veh) ? VEH_IDNUM(veh) : 0);
+	add_page_display(ch, "VNum: [\tc%d\t0], S-Des: \tc%s\t0, Keywords: \ty%s\t0, Idnum: [%5d]", VEH_VNUM(veh), VEH_SHORT_DESC(veh), VEH_KEYWORDS(veh), IN_ROOM(veh) ? VEH_IDNUM(veh) : 0);
 	
-	add_page_display(&display, "L-Des: %s", VEH_LONG_DESC(veh));
+	add_page_display(ch, "L-Des: %s", VEH_LONG_DESC(veh));
 	
 	if (VEH_LOOK_DESC(veh) && *VEH_LOOK_DESC(veh)) {
-		add_page_display(&display, "%s", VEH_LOOK_DESC(veh));
+		add_page_display(ch, "%s", VEH_LOOK_DESC(veh));
 	}
 	
 	if (VEH_EX_DESCS(veh)) {
 		struct extra_descr_data *desc;
 		
 		if (details) {
-			add_page_display(&display, "Extra descs:");
+			add_page_display(ch, "Extra descs:");
 			LL_FOREACH(VEH_EX_DESCS(veh), desc) {
-				add_page_display(&display, "[ &c%s&0 ]\r\n%s", desc->keyword, desc->description);
+				add_page_display(ch, "[ &c%s&0 ]\r\n%s", desc->keyword, desc->description);
 			}
 		}
 		else {
-			pd = add_page_display(&display, "Extra descs:\tc");
+			pd = add_page_display(ch, "Extra descs:\tc");
 			LL_FOREACH(VEH_EX_DESCS(veh), desc) {
 				append_page_display_line(pd, " %s", desc->keyword);
 			}
@@ -4480,7 +4480,7 @@ void do_stat_vehicle(char_data *ch, vehicle_data *veh, bool details) {
 	
 	// icons:
 	if (VEH_ICON(veh) || VEH_HALF_ICON(veh) || VEH_QUARTER_ICON(veh)) {
-		pd = add_page_display_str(&display, "");
+		pd = add_page_display_str(ch, "");
 		if (VEH_ICON(veh)) {
 			append_page_display_line(pd, "Full Icon: %s\t0", one_icon_display(VEH_ICON(veh), NULL));
 		}
@@ -4493,62 +4493,62 @@ void do_stat_vehicle(char_data *ch, vehicle_data *veh, bool details) {
 	}
 	
 	// stats lines
-	add_page_display(&display, "Health: [\tc%d\t0/\tc%d\t0], Capacity: [\tc%d\t0/\tc%d\t0], Animals Req: [\tc%d\t0], Move Type: [\ty%s\t0]", (int) VEH_HEALTH(veh), VEH_MAX_HEALTH(veh), VEH_CARRYING_N(veh), VEH_CAPACITY(veh), VEH_ANIMALS_REQUIRED(veh), mob_move_types[VEH_MOVE_TYPE(veh)]);
-	add_page_display(&display, "Speed: [\ty%s\t0], Size: [\tc%d\t0], Height: [\tc%d\t0]", vehicle_speed_types[VEH_SPEED_BONUSES(veh)], VEH_SIZE(veh), VEH_HEIGHT(veh));
-	add_page_display(&display, "Citizens: [\tc%d\t0], Artisan: [&c%d&0] &y%s&0", VEH_CITIZENS(veh), VEH_ARTISAN(veh), VEH_ARTISAN(veh) != NOTHING ? get_mob_name_by_proto(VEH_ARTISAN(veh), FALSE) : "none");
-	add_page_display(&display, "Fame: [\tc%d\t0], Military: [\tc%d\t0]", VEH_FAME(veh), VEH_MILITARY(veh));
+	add_page_display(ch, "Health: [\tc%d\t0/\tc%d\t0], Capacity: [\tc%d\t0/\tc%d\t0], Animals Req: [\tc%d\t0], Move Type: [\ty%s\t0]", (int) VEH_HEALTH(veh), VEH_MAX_HEALTH(veh), VEH_CARRYING_N(veh), VEH_CAPACITY(veh), VEH_ANIMALS_REQUIRED(veh), mob_move_types[VEH_MOVE_TYPE(veh)]);
+	add_page_display(ch, "Speed: [\ty%s\t0], Size: [\tc%d\t0], Height: [\tc%d\t0]", vehicle_speed_types[VEH_SPEED_BONUSES(veh)], VEH_SIZE(veh), VEH_HEIGHT(veh));
+	add_page_display(ch, "Citizens: [\tc%d\t0], Artisan: [&c%d&0] &y%s&0", VEH_CITIZENS(veh), VEH_ARTISAN(veh), VEH_ARTISAN(veh) != NOTHING ? get_mob_name_by_proto(VEH_ARTISAN(veh), FALSE) : "none");
+	add_page_display(ch, "Fame: [\tc%d\t0], Military: [\tc%d\t0]", VEH_FAME(veh), VEH_MILITARY(veh));
 	
 	if (VEH_INTERIOR_ROOM_VNUM(veh) != NOTHING || VEH_MAX_ROOMS(veh) || VEH_DESIGNATE_FLAGS(veh)) {
 		sprintbit(VEH_DESIGNATE_FLAGS(veh), designate_flags, part, TRUE);
-		add_page_display(&display, "Interior: [\tc%d\t0 - \ty%s\t0], Rooms: [\tc%d\t0], Designate: \ty%s\t0", VEH_INTERIOR_ROOM_VNUM(veh), building_proto(VEH_INTERIOR_ROOM_VNUM(veh)) ? GET_BLD_NAME(building_proto(VEH_INTERIOR_ROOM_VNUM(veh))) : "none", VEH_MAX_ROOMS(veh), part);
+		add_page_display(ch, "Interior: [\tc%d\t0 - \ty%s\t0], Rooms: [\tc%d\t0], Designate: \ty%s\t0", VEH_INTERIOR_ROOM_VNUM(veh), building_proto(VEH_INTERIOR_ROOM_VNUM(veh)) ? GET_BLD_NAME(building_proto(VEH_INTERIOR_ROOM_VNUM(veh))) : "none", VEH_MAX_ROOMS(veh), part);
 	}
 	else {
-		add_page_display(&display, "Interior: [\tc-1\t0 - \tynone\t0], Rooms: [\tc0\t0]");
+		add_page_display(ch, "Interior: [\tc-1\t0 - \tynone\t0], Rooms: [\tc0\t0]");
 	}
 	
 	sprintbit(VEH_FLAGS(veh), vehicle_flags, part, TRUE);
-	add_page_display(&display, "Flags: \tg%s\t0", part);
+	add_page_display(ch, "Flags: \tg%s\t0", part);
 	
 	sprintbit(VEH_ROOM_AFFECTS(veh), room_aff_bits, part, TRUE);
-	add_page_display(&display, "Affects: \tc%s\t0", part);
+	add_page_display(ch, "Affects: \tc%s\t0", part);
 	
 	sprintbit(VEH_FUNCTIONS(veh), function_flags, part, TRUE);
-	add_page_display(&display, "Functions: \tg%s\t0", part);
+	add_page_display(ch, "Functions: \tg%s\t0", part);
 	
 	ordered_sprintbit(VEH_REQUIRES_CLIMATE(veh), climate_flags, climate_flags_order, FALSE, part);
-	add_page_display(&display, "Requires climate: \tc%s\t0", part);
+	add_page_display(ch, "Requires climate: \tc%s\t0", part);
 	ordered_sprintbit(VEH_FORBID_CLIMATE(veh), climate_flags, climate_flags_order, FALSE, part);
-	add_page_display(&display, "Forbid climate: \tg%s\t0", part);
+	add_page_display(ch, "Forbid climate: \tg%s\t0", part);
 	
 	if (VEH_INTERACTIONS(veh)) {
 		get_interaction_display(VEH_INTERACTIONS(veh), part);
-		add_page_display(&display, "Interactions:\r\n%s", part);
+		add_page_display(ch, "Interactions:\r\n%s", part);
 	}
 	
 	if (VEH_RELATIONS(veh)) {
 		get_bld_relations_display(VEH_RELATIONS(veh), part);
-		add_page_display(&display, "Relations:\r\n%s", part);
+		add_page_display(ch, "Relations:\r\n%s", part);
 	}
 	
 	if (VEH_REGULAR_MAINTENANCE(veh)) {
 		get_resource_display(ch, VEH_REGULAR_MAINTENANCE(veh), part);
-		add_page_display(&display, "Regular maintenance:\r\n%s", part);
+		add_page_display(ch, "Regular maintenance:\r\n%s", part);
 	}
 	
-	add_page_display(&display, "Scaled to level: [\tc%d (%d-%d)\t0], Owner: [%s%s\t0]", VEH_SCALE_LEVEL(veh), VEH_MIN_SCALE_LEVEL(veh), VEH_MAX_SCALE_LEVEL(veh), VEH_OWNER(veh) ? EMPIRE_BANNER(VEH_OWNER(veh)) : "", VEH_OWNER(veh) ? EMPIRE_NAME(VEH_OWNER(veh)) : "nobody");
+	add_page_display(ch, "Scaled to level: [\tc%d (%d-%d)\t0], Owner: [%s%s\t0]", VEH_SCALE_LEVEL(veh), VEH_MIN_SCALE_LEVEL(veh), VEH_MAX_SCALE_LEVEL(veh), VEH_OWNER(veh) ? EMPIRE_BANNER(VEH_OWNER(veh)) : "", VEH_OWNER(veh) ? EMPIRE_NAME(VEH_OWNER(veh)) : "nobody");
 	
 	if (VEH_INTERIOR_HOME_ROOM(veh) || VEH_INSIDE_ROOMS(veh) > 0) {
-		add_page_display(&display, "Interior location: [\ty%d\t0], Added rooms: [\tg%d\t0/\tg%d\t0]", VEH_INTERIOR_HOME_ROOM(veh) ? GET_ROOM_VNUM(VEH_INTERIOR_HOME_ROOM(veh)) : NOTHING, VEH_INSIDE_ROOMS(veh), VEH_MAX_ROOMS(veh));
+		add_page_display(ch, "Interior location: [\ty%d\t0], Added rooms: [\tg%d\t0/\tg%d\t0]", VEH_INTERIOR_HOME_ROOM(veh) ? GET_ROOM_VNUM(VEH_INTERIOR_HOME_ROOM(veh)) : NOTHING, VEH_INSIDE_ROOMS(veh), VEH_MAX_ROOMS(veh));
 	}
 	
 	if (IN_ROOM(veh)) {
-		pd = add_page_display(&display, "In room: [%d] %s, Led by: %s, ", GET_ROOM_VNUM(IN_ROOM(veh)), get_room_name(IN_ROOM(veh), FALSE), VEH_LED_BY(veh) ? PERS(VEH_LED_BY(veh), ch, TRUE) : "nobody");
+		pd = add_page_display(ch, "In room: [%d] %s, Led by: %s, ", GET_ROOM_VNUM(IN_ROOM(veh)), get_room_name(IN_ROOM(veh), FALSE), VEH_LED_BY(veh) ? PERS(VEH_LED_BY(veh), ch, TRUE) : "nobody");
 		append_page_display_line(pd, "Sitting on: %s, ", VEH_SITTING_ON(veh) ? PERS(VEH_SITTING_ON(veh), ch, TRUE) : "nobody");
 		append_page_display_line(pd, "Driven by: %s", VEH_DRIVER(veh) ? PERS(VEH_DRIVER(veh), ch, TRUE) : "nobody");
 	}
 	
 	if (VEH_DEPLETION(veh)) {
-		pd = add_page_display(&display, "Depletion: ");
+		pd = add_page_display(ch, "Depletion: ");
 		
 		comma = FALSE;
 		for (dep = VEH_DEPLETION(veh); dep; dep = dep->next) {
@@ -4579,13 +4579,13 @@ void do_stat_vehicle(char_data *ch, vehicle_data *veh, bool details) {
 				if (next_str) {
 					strcat(part, ",");
 				}
-				pd = add_page_display_str(&display, part);
+				pd = add_page_display_str(ch, part);
 				*part = '\0';
 				found = 0;
 			}
 		}
 		if (*part) {
-			pd = add_page_display_str(&display, part);
+			pd = add_page_display_str(ch, part);
 		}
 		if (pd) {
 			append_page_display_line(pd, "\t0");
@@ -4596,43 +4596,43 @@ void do_stat_vehicle(char_data *ch, vehicle_data *veh, bool details) {
 	
 	if (VEH_NEEDS_RESOURCES(veh)) {
 		get_resource_display(ch, VEH_NEEDS_RESOURCES(veh), part);
-		add_page_display(&display, "%s resources:\r\n%s", VEH_IS_DISMANTLING(veh) ? "Dismantle" : "Needs", part);
+		add_page_display(ch, "%s resources:\r\n%s", VEH_IS_DISMANTLING(veh) ? "Dismantle" : "Needs", part);
 	}
 	
 	if (VEH_CUSTOM_MSGS(veh)) {
 		if (details) {
-			add_page_display(&display, "Custom messages:");
+			add_page_display(ch, "Custom messages:");
 		
 			LL_FOREACH(VEH_CUSTOM_MSGS(veh), custm) {
-				add_page_display(&display, " %s: %s", veh_custom_types[custm->type], custm->msg);
+				add_page_display(ch, " %s: %s", veh_custom_types[custm->type], custm->msg);
 			}
 		}
 		else {
 			LL_COUNT(VEH_CUSTOM_MSGS(veh), custm, count);
-			add_page_display(&display, "Custom messages: %d", count);
+			add_page_display(ch, "Custom messages: %d", count);
 		}
 	}
 	
-	show_spawn_summary_display(&display, VEH_SPAWNS(veh));
+	show_spawn_summary_display(ch, TRUE, VEH_SPAWNS(veh));
 	
 	if (VEH_EXTRA_DATA(veh)) {
-		add_page_display(&display, "Extra data:");
+		add_page_display(ch, "Extra data:");
 		HASH_ITER(hh, VEH_EXTRA_DATA(veh), red, next_red) {
 			sprinttype(red->type, room_extra_types, part, sizeof(part), "UNDEFINED");
-			add_page_display(&display, " %s: %d", part, red->value);
+			add_page_display(ch, " %s: %d", part, red->value);
 		}
 	}
 	
 	// script info
-	add_page_display(&display, "Script information (id %d):", (SCRIPT(veh) && IN_ROOM(veh)) ? veh_script_id(veh) : veh->script_id);
+	add_page_display(ch, "Script information (id %d):", (SCRIPT(veh) && IN_ROOM(veh)) ? veh_script_id(veh) : veh->script_id);
 	if (SCRIPT(veh)) {
-		script_stat(&display, SCRIPT(veh));
+		script_stat(ch, SCRIPT(veh));
 	}
 	else {
-		add_page_display(&display, "  None.");
+		add_page_display(ch, "  None.");
 	}
 	
-	page_display_to_char(ch, &display, TRUE);
+	send_page_display(ch);
 }
 
 
@@ -4846,15 +4846,14 @@ void olc_show_vehicle(char_data *ch) {
 int vnum_vehicle(char *searchname, char_data *ch) {
 	vehicle_data *iter, *next_iter;
 	int found = 0;
-	struct page_display *display = NULL;
 	
 	HASH_ITER(hh, vehicle_table, iter, next_iter) {
 		if (multi_isname(searchname, VEH_KEYWORDS(iter))) {
-			add_page_display(&display, "%3d. [%5d] %s", ++found, VEH_VNUM(iter), VEH_SHORT_DESC(iter));
+			add_page_display(ch, "%3d. [%5d] %s", ++found, VEH_VNUM(iter), VEH_SHORT_DESC(iter));
 		}
 	}
 	
-	page_display_to_char(ch, &display, TRUE);
+	send_page_display(ch);
 	return found;
 }
 

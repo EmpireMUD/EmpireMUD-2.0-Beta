@@ -5723,27 +5723,26 @@ void get_quest_reward_display(struct quest_reward *list, char *save_buffer, bool
 */
 void do_stat_quest(char_data *ch, quest_data *quest) {
 	char part[MAX_STRING_LENGTH];
-	struct page_display *display = NULL;
 	
 	if (!quest) {
 		return;
 	}
 	
 	// first line
-	add_page_display(&display, "VNum: [\tc%d\t0], Name: \tc%s\t0", QUEST_VNUM(quest), QUEST_NAME(quest));
-	add_page_display(&display, "%s", QUEST_DESCRIPTION(quest));
-	add_page_display(&display, "-------------------------------------------------");
-	add_page_display(&display, "%s", QUEST_COMPLETE_MSG(quest));
+	add_page_display(ch, "VNum: [\tc%d\t0], Name: \tc%s\t0", QUEST_VNUM(quest), QUEST_NAME(quest));
+	add_page_display(ch, "%s", QUEST_DESCRIPTION(quest));
+	add_page_display(ch, "-------------------------------------------------");
+	add_page_display(ch, "%s", QUEST_COMPLETE_MSG(quest));
 	
 	sprintbit(QUEST_FLAGS(quest), quest_flags, part, TRUE);
-	add_page_display(&display, "Flags: \tg%s\t0", part);
+	add_page_display(ch, "Flags: \tg%s\t0", part);
 	
 	if (QUEST_FLAGGED(quest, QST_DAILY)) {
 		if (QUEST_DAILY_CYCLE(quest) != NOTHING) {
-			add_page_display(&display, "Daily cycle id: \tc%d\t0", QUEST_DAILY_CYCLE(quest));
+			add_page_display(ch, "Daily cycle id: \tc%d\t0", QUEST_DAILY_CYCLE(quest));
 		}
 		else {
-			add_page_display(&display, "Daily cycle id: \tcnone\t0");
+			add_page_display(ch, "Daily cycle id: \tcnone\t0");
 		}
 	}
 	
@@ -5756,28 +5755,28 @@ void do_stat_quest(char_data *ch, quest_data *quest) {
 	else {
 		sprintf(part, "%d minutes (%s)", QUEST_REPEATABLE_AFTER(quest), colon_time(QUEST_REPEATABLE_AFTER(quest), TRUE, NULL));
 	}
-	add_page_display(&display, "Level limits: [\tc%s\t0], Repeatable: [\tc%s\t0]", level_range_string(QUEST_MIN_LEVEL(quest), QUEST_MAX_LEVEL(quest), 0), part);
+	add_page_display(ch, "Level limits: [\tc%s\t0], Repeatable: [\tc%s\t0]", level_range_string(QUEST_MIN_LEVEL(quest), QUEST_MAX_LEVEL(quest), 0), part);
 		
 	get_requirement_display(QUEST_PREREQS(quest), part);
-	add_page_display(&display, "Pre-requisites:\r\n%s", *part ? part : " none");
+	add_page_display(ch, "Pre-requisites:\r\n%s", *part ? part : " none");
 	
 	get_quest_giver_display(QUEST_STARTS_AT(quest), part);
-	add_page_display(&display, "Starts at:\r\n%s", *part ? part : " nowhere");
+	add_page_display(ch, "Starts at:\r\n%s", *part ? part : " nowhere");
 	
 	get_quest_giver_display(QUEST_ENDS_AT(quest), part);
-	add_page_display(&display, "Ends at:\r\n%s", *part ? part : " nowhere");
+	add_page_display(ch, "Ends at:\r\n%s", *part ? part : " nowhere");
 	
 	get_requirement_display(QUEST_TASKS(quest), part);
-	add_page_display(&display, "Tasks:\r\n%s", *part ? part : " none");
+	add_page_display(ch, "Tasks:\r\n%s", *part ? part : " none");
 	
 	get_quest_reward_display(QUEST_REWARDS(quest), part, TRUE);
-	add_page_display(&display, "Rewards:\r\n%s", *part ? part : " none");
+	add_page_display(ch, "Rewards:\r\n%s", *part ? part : " none");
 	
 	// scripts
 	get_script_display(QUEST_SCRIPTS(quest), part);
-	add_page_display(&display, "Scripts:\r\n%s", QUEST_SCRIPTS(quest) ? part : " none");
+	add_page_display(ch, "Scripts:\r\n%s", QUEST_SCRIPTS(quest) ? part : " none");
 	
-	page_display_to_char(ch, &display, TRUE);
+	send_page_display(ch);
 }
 
 
@@ -5873,15 +5872,14 @@ void olc_show_quest(char_data *ch) {
 int vnum_quest(char *searchname, char_data *ch) {
 	quest_data *iter, *next_iter;
 	int found = 0;
-	struct page_display *display = NULL;
 	
 	HASH_ITER(hh, quest_table, iter, next_iter) {
 		if (multi_isname(searchname, QUEST_NAME(iter))) {
-			add_page_display(&display, "%3d. [%5d] %s", ++found, QUEST_VNUM(iter), QUEST_NAME(iter));
+			add_page_display(ch, "%3d. [%5d] %s", ++found, QUEST_VNUM(iter), QUEST_NAME(iter));
 		}
 	}
 	
-	page_display_to_char(ch, &display, TRUE);
+	send_page_display(ch);
 	return found;
 }
 

@@ -2148,7 +2148,7 @@ void show_workforce_setup_to_char(empire_data *emp, char_data *ch);
 // act.immortal.c
 void perform_autostore(obj_data *obj, empire_data *emp, int island);
 void perform_immort_vis(char_data *ch);
-void show_spawn_summary_display(struct page_display **display, struct spawn_info *list);
+void show_spawn_summary_display(char_data *ch, bool use_page_display, struct spawn_info *list);
 
 // act.informative.c
 void diag_char_to_char(char_data *i, char_data *ch);

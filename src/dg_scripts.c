@@ -1153,19 +1153,18 @@ EVENTFUNC(trig_wait_event) {
 void do_stat_trigger(char_data *ch, trig_data *trig) {
 	struct cmdlist_element *cmd_list;
 	char buf[MAX_STRING_LENGTH];
-	struct page_display *display = NULL;
 
 	if (!trig) {
 		log("SYSERR: NULL trigger passed to do_stat_trigger.");
 		return;
 	}
 
-	add_page_display(&display, "Name: '&y%s&0',  VNum: [&g%5d&0]", GET_TRIG_NAME(trig), GET_TRIG_VNUM(trig));
+	add_page_display(ch, "Name: '&y%s&0',  VNum: [&g%5d&0]", GET_TRIG_NAME(trig), GET_TRIG_VNUM(trig));
 	
 	// x_TRIGGER
 	switch (trig->attach_type) {
 		case OBJ_TRIGGER: {
-			add_page_display(&display, "Trigger Intended Assignment: Objects");
+			add_page_display(ch, "Trigger Intended Assignment: Objects");
 			sprintbit(GET_TRIG_TYPE(trig), otrig_types, buf, TRUE);
 			break;
 		}
@@ -1173,38 +1172,38 @@ void do_stat_trigger(char_data *ch, trig_data *trig) {
 		case RMT_TRIGGER:
 		case BLD_TRIGGER:
 		case ADV_TRIGGER: {
-			add_page_display(&display, "Trigger Intended Assignment: Rooms");
+			add_page_display(ch, "Trigger Intended Assignment: Rooms");
 			sprintbit(GET_TRIG_TYPE(trig), wtrig_types, buf, TRUE);
 			break;
 		}
 		case MOB_TRIGGER: {
-			add_page_display(&display, "Trigger Intended Assignment: Mobiles");
+			add_page_display(ch, "Trigger Intended Assignment: Mobiles");
 			sprintbit(GET_TRIG_TYPE(trig), trig_types, buf, TRUE);
 			break;
 		}
 		case VEH_TRIGGER: {
-			add_page_display(&display, "Trigger Intended Assignment: Vehicles");
+			add_page_display(ch, "Trigger Intended Assignment: Vehicles");
 			sprintbit(GET_TRIG_TYPE(trig), vtrig_types, buf, TRUE);
 			break;
 		}
 		case EMP_TRIGGER: {
-			add_page_display(&display, "Trigger Intended Assignment: Empires");
+			add_page_display(ch, "Trigger Intended Assignment: Empires");
 			sprintbit(GET_TRIG_TYPE(trig), wtrig_types, buf, TRUE);
 			break;
 		}
 	}
 
-	add_page_display(&display, "Trigger Type: %s, Numeric Arg: %d, Arg list: %s", buf, GET_TRIG_NARG(trig), ((GET_TRIG_ARG(trig) && *GET_TRIG_ARG(trig)) ? GET_TRIG_ARG(trig) : "None"));
+	add_page_display(ch, "Trigger Type: %s, Numeric Arg: %d, Arg list: %s", buf, GET_TRIG_NARG(trig), ((GET_TRIG_ARG(trig) && *GET_TRIG_ARG(trig)) ? GET_TRIG_ARG(trig) : "None"));
 
-	add_page_display(&display, "Commands:"); 
+	add_page_display(ch, "Commands:"); 
 	
 	LL_FOREACH(trig->cmdlist, cmd_list) {
 		if (cmd_list->cmd) {
-			add_page_display_str(&display, show_color_codes(cmd_list->cmd));
+			add_page_display_str(ch, show_color_codes(cmd_list->cmd));
 		}
 	}
 
-	page_display_to_char(ch, &display, TRUE);
+	send_page_display(ch);
 }
 
 
@@ -1229,71 +1228,71 @@ void find_uid_name(char *uid, char *name, size_t nlen) {
 /**
 * general function to display stats on script sc
 *
-* @param struct page_display **display The display to append to.
+* @param char_data *to The person who will see the script_data (goes to their page_display).
 * @param struct script_data *sc The script to stat.
 */
-void script_stat(struct page_display **display, struct script_data *sc) {
+void script_stat(char_data *to, struct script_data *sc) {
 	struct trig_var_data *tv;
 	trig_data *t;
 	char name[MAX_INPUT_LENGTH];
 	char namebuf[512];
 	char buf1[MAX_STRING_LENGTH];
 	
-	if (!display || !sc) {
+	if (!to || !sc) {
 		return;
 	}
 
-	add_page_display(display, "Global Variables: %s", sc->global_vars ? "" : "None");
-	add_page_display(display, "Global context: %ld", sc->context);
+	add_page_display(to, "Global Variables: %s", sc->global_vars ? "" : "None");
+	add_page_display(to, "Global context: %ld", sc->context);
 
 	for (tv = sc->global_vars; tv; tv = tv->next) {
 		snprintf(namebuf, sizeof(namebuf), "%s:%ld", tv->name, tv->context);
 		if (*(tv->value) == UID_CHAR) {
 			find_uid_name(tv->value, name, sizeof(name));
-			add_page_display(display, "    %15s:  %s", tv->context?namebuf:tv->name, name);
+			add_page_display(to, "    %15s:  %s", tv->context?namebuf:tv->name, name);
 		}
 		else {
-			add_page_display(display, "    %15s:  %s", tv->context?namebuf:tv->name, tv->value);
+			add_page_display(to, "    %15s:  %s", tv->context?namebuf:tv->name, tv->value);
 		}
 	}
 
 	for (t = TRIGGERS(sc); t; t = t->next) {
-		add_page_display(display, "\r\n  Trigger: &y%s&0, VNum: [&g%5d&0]", GET_TRIG_NAME(t), GET_TRIG_VNUM(t));
+		add_page_display(to, "\r\n  Trigger: &y%s&0, VNum: [&g%5d&0]", GET_TRIG_NAME(t), GET_TRIG_VNUM(t));
 
 		if (t->attach_type==OBJ_TRIGGER) {
-			add_page_display(display, "  Trigger Intended Assignment: Objects");
+			add_page_display(to, "  Trigger Intended Assignment: Objects");
 			sprintbit(GET_TRIG_TYPE(t), otrig_types, buf1, TRUE);
 		}
 		else if (t->attach_type == WLD_TRIGGER || t->attach_type == RMT_TRIGGER || t->attach_type == BLD_TRIGGER || t->attach_type == ADV_TRIGGER) {
-			add_page_display(display, "  Trigger Intended Assignment: Rooms");
+			add_page_display(to, "  Trigger Intended Assignment: Rooms");
 			sprintbit(GET_TRIG_TYPE(t), wtrig_types, buf1, TRUE);
 		}
 		else if (t->attach_type == VEH_TRIGGER) {
-			add_page_display(display, "  Trigger Intended Assignment: Vehicles");
+			add_page_display(to, "  Trigger Intended Assignment: Vehicles");
 			sprintbit(GET_TRIG_TYPE(t), vtrig_types, buf1, TRUE);
 		}
 		else if (t->attach_type == EMP_TRIGGER) {
-			add_page_display(display, "  Trigger Intended Assignment: Empires");
+			add_page_display(to, "  Trigger Intended Assignment: Empires");
 			sprintbit(GET_TRIG_TYPE(t), wtrig_types, buf1, TRUE);
 		}
 		else {
-			add_page_display(display, "  Trigger Intended Assignment: Mobiles");
+			add_page_display(to, "  Trigger Intended Assignment: Mobiles");
 			sprintbit(GET_TRIG_TYPE(t), trig_types, buf1, TRUE);
 		}
 
-		add_page_display(display, "  Trigger Type: %s, Numeric Arg: %d, Arg list: %s",  buf1, GET_TRIG_NARG(t), ((GET_TRIG_ARG(t) && *GET_TRIG_ARG(t)) ? GET_TRIG_ARG(t) : "None"));
+		add_page_display(to, "  Trigger Type: %s, Numeric Arg: %d, Arg list: %s",  buf1, GET_TRIG_NARG(t), ((GET_TRIG_ARG(t) && *GET_TRIG_ARG(t)) ? GET_TRIG_ARG(t) : "None"));
 
 		if (GET_TRIG_WAIT(t)) {
-			add_page_display(display, "    Wait: %ld, Current line: %s", dg_event_time(GET_TRIG_WAIT(t)), t->curr_state ? t->curr_state->cmd : "End of Script");
-			add_page_display(display, "  Variables: %s", GET_TRIG_VARS(t) ? "" : "None");
+			add_page_display(to, "    Wait: %ld, Current line: %s", dg_event_time(GET_TRIG_WAIT(t)), t->curr_state ? t->curr_state->cmd : "End of Script");
+			add_page_display(to, "  Variables: %s", GET_TRIG_VARS(t) ? "" : "None");
 
 			for (tv = GET_TRIG_VARS(t); tv; tv = tv->next) {
 				if (*(tv->value) == UID_CHAR) {
 					find_uid_name(tv->value, name, sizeof(name));
-					add_page_display(display, "    %15s:  %s", tv->name, name);
+					add_page_display(to, "    %15s:  %s", tv->name, name);
 				}
 				else {
-					add_page_display(display, "    %15s:  %s", tv->name, tv->value);
+					add_page_display(to, "    %15s:  %s", tv->name, tv->value);
 				}
 			}
 		}
@@ -1301,20 +1300,20 @@ void script_stat(struct page_display **display, struct script_data *sc) {
 }
 
 
-void do_sstat_room(struct page_display **display, char_data *ch) {
+void do_sstat_room(char_data *to, char_data *ch) {
 	room_data *rm = IN_ROOM(ch);
 
-	add_page_display(display, "Script information (id %d):", room_script_id(rm));
+	add_page_display(to, "Script information (id %d):", room_script_id(rm));
 	if (!SCRIPT(rm)) {
-		add_page_display(display, "  None.");
+		add_page_display(to, "  None.");
 		return;
 	}
 
-	script_stat(display, SCRIPT(rm));
+	script_stat(to, SCRIPT(rm));
 }
 
 
-void do_sstat_object(struct page_display **display, obj_data *j) {
+void do_sstat_object(char_data *to, obj_data *j) {
 	int id;
 	
 	if (OBJ_IS_IN_WORLD(j)) {
@@ -1324,24 +1323,24 @@ void do_sstat_object(struct page_display **display, obj_data *j) {
 		id = j->script_id;
 	}
 	
-	add_page_display(display, "Script information (id %d):", id);
+	add_page_display(to, "Script information (id %d):", id);
 	if (!SCRIPT(j)) {
-		add_page_display(display, "  None.");
+		add_page_display(to, "  None.");
 		return;
 	}
 
-	script_stat(display, SCRIPT(j));
+	script_stat(to, SCRIPT(j));
 }
 
 
-void do_sstat_character(struct page_display **display, char_data *k) {
-	add_page_display(display, "Script information (id %d):", (SCRIPT(k) && IN_ROOM(k)) ? char_script_id(k) : k->script_id);
+void do_sstat_character(char_data *to, char_data *k) {
+	add_page_display(to, "Script information (id %d):", (SCRIPT(k) && IN_ROOM(k)) ? char_script_id(k) : k->script_id);
 	if (!SCRIPT(k)) {
-		add_page_display(display, "  None.");
+		add_page_display(to, "  None.");
 		return;
 	}
 
-	script_stat(display, SCRIPT(k));
+	script_stat(to, SCRIPT(k));
 }
 
 

@@ -2429,25 +2429,24 @@ void get_event_reward_display(struct event_reward *list, char *save_buffer) {
 */
 void do_stat_event(char_data *ch, event_data *event) {
 	char part[MAX_STRING_LENGTH];
-	struct page_display *display = NULL;
 	
 	if (!event) {
 		return;
 	}
 	
 	// first line
-	add_page_display(&display, "VNum: [\tc%d\t0], Name: \tc%s\t0", EVT_VNUM(event), EVT_NAME(event));
-	add_page_display(&display, "%s", EVT_DESCRIPTION(event));
-	add_page_display(&display, "-------------------------------------------------");
-	add_page_display(&display, "%s", EVT_COMPLETE_MSG(event));
+	add_page_display(ch, "VNum: [\tc%d\t0], Name: \tc%s\t0", EVT_VNUM(event), EVT_NAME(event));
+	add_page_display(ch, "%s", EVT_DESCRIPTION(event));
+	add_page_display(ch, "-------------------------------------------------");
+	add_page_display(ch, "%s", EVT_COMPLETE_MSG(event));
 	
 	if (EVT_NOTES(event)) {
-		add_page_display(&display, "- Notes -----------------------------------------");
-		add_page_display(&display, "%s", EVT_NOTES(event));
+		add_page_display(ch, "- Notes -----------------------------------------");
+		add_page_display(ch, "%s", EVT_NOTES(event));
 	}
 	
 	sprintbit(EVT_FLAGS(event), event_flags, part, TRUE);
-	add_page_display(&display, "Flags: \tg%s\t0", part);	
+	add_page_display(ch, "Flags: \tg%s\t0", part);	
 	
 	if (EVT_REPEATS_AFTER(event) == NOT_REPEATABLE) {
 		strcpy(part, "never");
@@ -2458,22 +2457,22 @@ void do_stat_event(char_data *ch, event_data *event) {
 	else {
 		sprintf(part, "%d minutes (%s)", EVT_REPEATS_AFTER(event), colon_time(EVT_REPEATS_AFTER(event), TRUE, NULL));
 	}
-	add_page_display(&display, "Level limits: [\tc%s\t0], Duration: [\tc%d minutes (%s)\t0], Repeatable: [\tc%s\t0]", level_range_string(EVT_MIN_LEVEL(event), EVT_MAX_LEVEL(event), 0), EVT_DURATION(event), colon_time(EVT_DURATION(event), TRUE, NULL), part);
+	add_page_display(ch, "Level limits: [\tc%s\t0], Duration: [\tc%d minutes (%s)\t0], Repeatable: [\tc%s\t0]", level_range_string(EVT_MIN_LEVEL(event), EVT_MAX_LEVEL(event), 0), EVT_DURATION(event), colon_time(EVT_DURATION(event), TRUE, NULL), part);
 	
 	if (EVT_MAX_POINTS(event) > 0) {
-		add_page_display(&display, "Maximum points: [\tc%d\t0]", EVT_MAX_POINTS(event));
+		add_page_display(ch, "Maximum points: [\tc%d\t0]", EVT_MAX_POINTS(event));
 	}
 	else {
-		add_page_display(&display, "Maximum points: [\tcnone\t0]");
+		add_page_display(ch, "Maximum points: [\tcnone\t0]");
 	}
 	
 	get_event_reward_display(EVT_RANK_REWARDS(event), part);
-	add_page_display(&display, "Rank Rewards:\r\n%s", *part ? part : " none");
+	add_page_display(ch, "Rank Rewards:\r\n%s", *part ? part : " none");
 	
 	get_event_reward_display(EVT_THRESHOLD_REWARDS(event), part);
-	add_page_display(&display, "Threshold Rewards:\r\n%s", *part ? part : " none");
+	add_page_display(ch, "Threshold Rewards:\r\n%s", *part ? part : " none");
 	
-	page_display_to_char(ch, &display, TRUE);
+	send_page_display(ch);
 }
 
 
@@ -2857,15 +2856,14 @@ void show_events_no_arg(char_data *ch) {
 int vnum_event(char *searchname, char_data *ch) {
 	event_data *iter, *next_iter;
 	int found = 0;
-	struct page_display *display = NULL;
 	
 	HASH_ITER(hh, event_table, iter, next_iter) {
 		if (multi_isname(searchname, EVT_NAME(iter))) {
-			add_page_display(&display, "%3d. [%5d] %s", ++found, EVT_VNUM(iter), EVT_NAME(iter));
+			add_page_display(ch, "%3d. [%5d] %s", ++found, EVT_VNUM(iter), EVT_NAME(iter));
 		}
 	}
 	
-	page_display_to_char(ch, &display, TRUE);
+	send_page_display(ch);
 	return found;
 }
 

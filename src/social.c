@@ -678,29 +678,28 @@ social_data *setup_olc_social(social_data *input) {
 void do_stat_social(char_data *ch, social_data *soc) {
 	char part[MAX_STRING_LENGTH];
 	int iter;
-	struct page_display *display = NULL;
 	
 	if (!soc) {
 		return;
 	}
 	
 	// first line
-	add_page_display(&display, "VNum: [\tc%d\t0], Command: \tc%s\t0, Name: \tc%s\t0", SOC_VNUM(soc), SOC_COMMAND(soc), SOC_NAME(soc));
+	add_page_display(ch, "VNum: [\tc%d\t0], Command: \tc%s\t0, Name: \tc%s\t0", SOC_VNUM(soc), SOC_COMMAND(soc), SOC_NAME(soc));
 	
-	add_page_display(&display, "Min actor position: \ty%s\t0, Min victim position: \ty%s\t0", position_types[SOC_MIN_CHAR_POS(soc)], position_types[SOC_MIN_VICT_POS(soc)]);
+	add_page_display(ch, "Min actor position: \ty%s\t0, Min victim position: \ty%s\t0", position_types[SOC_MIN_CHAR_POS(soc)], position_types[SOC_MIN_VICT_POS(soc)]);
 	
 	sprintbit(SOC_FLAGS(soc), social_flags, part, TRUE);
-	add_page_display(&display, "Flags: \tg%s\t0", part);
+	add_page_display(ch, "Flags: \tg%s\t0", part);
 	
 	get_requirement_display(SOC_REQUIREMENTS(soc), part);
-	add_page_display(&display, "Requirements:\r\n%s", *part ? part : " none");
+	add_page_display(ch, "Requirements:\r\n%s", *part ? part : " none");
 	
-	add_page_display(&display, "Messages:");
+	add_page_display(ch, "Messages:");
 	for (iter = 0; iter < NUM_SOCM_MESSAGES; ++iter) {
-		add_page_display(&display, "\tc%s\t0: %s", social_message_types[iter][0], SOC_MESSAGE(soc, iter) ? SOC_MESSAGE(soc, iter) : "(none)");
+		add_page_display(ch, "\tc%s\t0: %s", social_message_types[iter][0], SOC_MESSAGE(soc, iter) ? SOC_MESSAGE(soc, iter) : "(none)");
 	}
 	
-	page_display_to_char(ch, &display, TRUE);
+	send_page_display(ch);
 }
 
 
@@ -753,15 +752,14 @@ void olc_show_social(char_data *ch) {
 int vnum_social(char *searchname, char_data *ch) {
 	social_data *iter, *next_iter;
 	int found = 0;
-	struct page_display *display = NULL;
 	
 	HASH_ITER(hh, social_table, iter, next_iter) {
 		if (multi_isname(searchname, SOC_NAME(iter)) || multi_isname(searchname, SOC_COMMAND(iter))) {
-			add_page_display(&display, "%3d. [%5d] %s (%s)", ++found, SOC_VNUM(iter), SOC_NAME(iter), SOC_COMMAND(iter));
+			add_page_display(ch, "%3d. [%5d] %s (%s)", ++found, SOC_VNUM(iter), SOC_NAME(iter), SOC_COMMAND(iter));
 		}
 	}
 	
-	page_display_to_char(ch, &display, TRUE);
+	send_page_display(ch);
 	return found;
 }
 

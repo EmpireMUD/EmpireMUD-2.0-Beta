@@ -2744,30 +2744,29 @@ progress_data *setup_olc_progress(progress_data *input) {
 */
 void do_stat_progress(char_data *ch, progress_data *prg) {
 	char part[MAX_STRING_LENGTH];
-	struct page_display *display = NULL;
 	
 	if (!prg) {
 		return;
 	}
 	
-	add_page_display(&display, "VNum: [\tc%d\t0], Name: \ty%s\t0, Type: \ty%s\t0", PRG_VNUM(prg), PRG_NAME(prg), progress_types[PRG_TYPE(prg)]);
-	add_page_display(&display, "%s", NULLSAFE(PRG_DESCRIPTION(prg)));
+	add_page_display(ch, "VNum: [\tc%d\t0], Name: \ty%s\t0, Type: \ty%s\t0", PRG_VNUM(prg), PRG_NAME(prg), progress_types[PRG_TYPE(prg)]);
+	add_page_display(ch, "%s", NULLSAFE(PRG_DESCRIPTION(prg)));
 	
-	add_page_display(&display, "Value: [\tc%d point%s\t0], Cost: [\tc%d point%s\t0]", PRG_VALUE(prg), PLURAL(PRG_VALUE(prg)), PRG_COST(prg), PLURAL(PRG_COST(prg)));
+	add_page_display(ch, "Value: [\tc%d point%s\t0], Cost: [\tc%d point%s\t0]", PRG_VALUE(prg), PLURAL(PRG_VALUE(prg)), PRG_COST(prg), PLURAL(PRG_COST(prg)));
 	
 	sprintbit(PRG_FLAGS(prg), progress_flags, part, TRUE);
-	add_page_display(&display, "Flags: \tg%s\t0", part);
+	add_page_display(ch, "Flags: \tg%s\t0", part);
 	
 	get_progress_list_display(PRG_PREREQS(prg), part);
-	add_page_display(&display, "Prerequisites:\r\n%s", *part ? part : " none");
+	add_page_display(ch, "Prerequisites:\r\n%s", *part ? part : " none");
 	
 	get_requirement_display(PRG_TASKS(prg), part);
-	add_page_display(&display, "Tasks:\r\n%s", *part ? part : " none");
+	add_page_display(ch, "Tasks:\r\n%s", *part ? part : " none");
 	
 	get_progress_perks_display(PRG_PERKS(prg), part, TRUE);
-	add_page_display(&display, "Perks:\r\n%s", *part ? part : " none");
+	add_page_display(ch, "Perks:\r\n%s", *part ? part : " none");
 	
-	page_display_to_char(ch, &display, TRUE);
+	send_page_display(ch);
 }
 
 
@@ -2828,15 +2827,14 @@ void olc_show_progress(char_data *ch) {
 int vnum_progress(char *searchname, char_data *ch) {
 	progress_data *iter, *next_iter;
 	int found = 0;
-	struct page_display *display = NULL;
 	
 	HASH_ITER(hh, progress_table, iter, next_iter) {
 		if (multi_isname(searchname, PRG_NAME(iter))) {
-			add_page_display(&display, "%3d. [%5d] %s", ++found, PRG_VNUM(iter), PRG_NAME(iter));
+			add_page_display(ch, "%3d. [%5d] %s", ++found, PRG_VNUM(iter), PRG_NAME(iter));
 		}
 	}
 	
-	page_display_to_char(ch, &display, TRUE);
+	send_page_display(ch);
 	return found;
 }
 

@@ -668,18 +668,52 @@ void free_page_display(struct page_display **list) {
 
 
 /**
+* Determines how wide a column should be, based on character preferences and
+* number of columns requested.
+*
+* @param char_data *ch The player.
+* @param int cols How many columns will be shown.
+* @return int The character width of each column.
+*/
+int page_display_column_width(char_data *ch, int cols) {
+	int width;
+	
+	// detect screen width
+	if (!ch || !ch->desc || PRF_FLAGGED(ch, PRF_SCREEN_READER)) {
+		width = 80;	// default
+	}
+	else {
+		width = ch->desc->pProtocol->ScreenWidth;
+	}
+	
+	// constrain width
+	width = MIN(width, 101);
+	if (width < 1) {
+		// that can't be right; return to default
+		width = 80;
+	}
+	
+	// safety
+	cols = MAX(1, cols);
+	
+	// calculate width
+	return (width - 1) / cols;
+}
+
+
+/**
 * Adds a new line to the end of a page_display. Will trim trailing \r\n (crlf).
 *
-* @param struct page_display **display A pointer to the page_display list to add to.
+* @param char_data *ch The person to add the display line to.
 * @param const char *fmt, ... va_arg format for the line to add.
 * @return struct page_display* A pointer to the new line, if it was added. May return NULL if it failed to add.
 */
-struct page_display *add_page_display(struct page_display **display, const char *fmt, ...) {
+struct page_display *add_page_display(char_data *ch, const char *fmt, ...) {
 	char text[MAX_STRING_LENGTH];
 	va_list tArgList;
 	struct page_display *pd;
 	
-	if (!display || !fmt) {
+	if (!ch || !ch->desc || !fmt) {
 		return NULL;
 	}
 	
@@ -696,7 +730,7 @@ struct page_display *add_page_display(struct page_display **display, const char 
 	
 	if (pd->length >= 0) {
 		pd->text = strdup(text);
-		DL_APPEND(*display, pd);
+		DL_APPEND(ch->desc->page_lines, pd);
 	}
 	else {
 		// nevermind
@@ -713,17 +747,19 @@ struct page_display *add_page_display(struct page_display **display, const char 
 * This is intended for displays that will have multiple columns. Any sequential
 * entries with the same column count will attempt to display in columns.
 *
-* @param struct page_display **display A pointer to the page_display list to add to.
+* @param char_data *ch The person to add the display line to.
 * @param int cols The number of columns for the display (2, 3, etc).
+* @param bool strict_cols If TRUE, the string may be truncated.
 * @param const char *fmt, ... va_arg format for the line to add.
 * @return struct page_display* A pointer to the new line, if it was added. May return NULL if it failed to add.
 */
-struct page_display *add_page_display_col(struct page_display **display, int cols, const char *fmt, ...) {
+struct page_display *add_page_display_col(char_data *ch, int cols, bool strict_cols, const char *fmt, ...) {
 	char text[MAX_STRING_LENGTH];
+	int max;
 	va_list tArgList;
 	struct page_display *pd;
 	
-	if (!display || !fmt) {
+	if (!ch || !ch->desc || !fmt) {
 		return NULL;
 	}
 	
@@ -738,10 +774,16 @@ struct page_display *add_page_display_col(struct page_display **display, int col
 		text[--pd->length] = '\0';
 	}
 	
+	// enforce strict cols
+	if (strict_cols && pd->length > (max = page_display_column_width(ch, cols))) {
+		pd->length = max;
+		text[pd->length - 1] = '\0';
+	}
+	
 	if (pd->length >= 0) {
 		pd->cols = cols;
 		pd->text = strdup(text);
-		DL_APPEND(*display, pd);
+		DL_APPEND(ch->desc->page_lines, pd);
 	}
 	else {
 		// nevermind
@@ -756,14 +798,14 @@ struct page_display *add_page_display_col(struct page_display **display, int col
 /**
 * Adds a new line to the end of a page_display. Will trim trailing \r\n (crlf).
 *
-* @param struct page_display **display A pointer to the page_display list to add to.
+* @param char_data *ch The person to add the display line to.
 * @param const char *str The string to add as the new line (will be copied).
 * @return struct page_display* A pointer to the new line, if it was added. May return NULL if it failed to add.
 */
-struct page_display *add_page_display_str(struct page_display **display, const char *str) {
+struct page_display *add_page_display_str(char_data *ch, const char *str) {
 	struct page_display *pd;
 	
-	if (!display || !str) {
+	if (!ch || !ch->desc || !str) {
 		return NULL;
 	}
 	
@@ -771,7 +813,7 @@ struct page_display *add_page_display_str(struct page_display **display, const c
 	
 	pd->length = strlen(str);
 	pd->text = strdup(str);
-	DL_APPEND(*display, pd);
+	DL_APPEND(ch->desc->page_lines, pd);
 	
 	// check trailing crlf
 	while (pd->length > 0 && (pd->text[pd->length-1] == '\r' || pd->text[pd->length-1] == '\n')) {
@@ -787,15 +829,17 @@ struct page_display *add_page_display_str(struct page_display **display, const c
 * This is intended for displays that will have multiple columns. Any sequential
 * entries with the same column count will attempt to display in columns.
 *
-* @param struct page_display **display A pointer to the page_display list to add to.
+* @param char_data *ch The person to add the display line to.
 * @param int cols The number of columns for the display (2, 3, etc).
+* @param bool strict_cols If TRUE, the string may be truncated.
 * @param const char *str The string to add as the new line (will be copied).
 * @return struct page_display* A pointer to the new line, if it was added. May return NULL if it failed to add.
 */
-struct page_display *add_page_display_col_str(struct page_display **display, int cols, const char *str) {
+struct page_display *add_page_display_col_str(char_data *ch, int cols, bool strict_cols, const char *str) {
+	int max;
 	struct page_display *pd;
 	
-	if (!display || !str) {
+	if (!ch || !ch->desc || !str) {
 		return NULL;
 	}
 	
@@ -804,11 +848,17 @@ struct page_display *add_page_display_col_str(struct page_display **display, int
 	pd->length = strlen(str);
 	pd->text = strdup(str);
 	pd->cols = cols;
-	DL_APPEND(*display, pd);
+	DL_APPEND(ch->desc->page_lines, pd);
 	
 	// check trailing crlf
 	while (pd->length > 0 && (pd->text[pd->length-1] == '\r' || pd->text[pd->length-1] == '\n')) {
 		pd->text[--pd->length] = '\0';
+	}
+	
+	// enforce strict cols
+	if (strict_cols && pd->length > (max = page_display_column_width(ch, cols))) {
+		pd->length = max;
+		pd->text[pd->length - 1] = '\0';
 	}
 	
 	return pd;
@@ -854,48 +904,12 @@ void append_page_display_line(struct page_display *line, const char *fmt, ...) {
 
 
 /**
-* Determines how wide a column should be, based on character preferences and
-* number of columns requested.
-*
-* @param char_data *ch The player.
-* @param int cols How many columns will be shown.
-* @return int The character width of each column.
-*/
-int page_display_column_width(char_data *ch, int cols) {
-	int width;
-	
-	// detect screen width
-	if (!ch || !ch->desc || PRF_FLAGGED(ch, PRF_SCREEN_READER)) {
-		width = 80;	// default
-	}
-	else {
-		width = ch->desc->pProtocol->ScreenWidth;
-	}
-	
-	// constrain width
-	width = MIN(width, 101);
-	if (width < 1) {
-		// that can't be right; return to default
-		width = 80;
-	}
-	
-	// safety
-	cols = MAX(1, cols);
-	
-	// calculate width
-	return (width - 1) / cols;
-}
-
-
-/**
-* Builds the final display for a page_display and sends it to a player's
-* paginator.
+* Builds the final display for a pending page_display and sends it to a
+* player's paginator.
 *
 * @param char_data *ch The player to show it to.
-* @param struct page_display **display A pointer to the list of lines to be shown.
-* @param bool free_display_after If TRUE, also frees the memory for the display afterwards.
 */
-void page_display_to_char(char_data *ch, struct page_display **display, bool free_display_after) {
+void send_page_display(char_data *ch) {
 	bool use_cols;
 	char *output, *ptr;
 	int iter, needs_cols;
@@ -903,7 +917,7 @@ void page_display_to_char(char_data *ch, struct page_display **display, bool fre
 	size_t size, one;
 	struct page_display *pd;
 	
-	if (!ch->desc || !display || !*display) {
+	if (!ch || !ch->desc || !ch->desc->page_lines) {
 		return;	// nobody to page it to
 	}
 	
@@ -911,7 +925,7 @@ void page_display_to_char(char_data *ch, struct page_display **display, bool fre
 	
 	// compute size
 	size = 0;
-	DL_FOREACH(*display, pd) {
+	DL_FOREACH(ch->desc->page_lines, pd) {
 		if (pd->cols > 1 && use_cols) {
 			one = page_display_column_width(ch, pd->cols);
 			if (pd->length > one) {
@@ -931,7 +945,7 @@ void page_display_to_char(char_data *ch, struct page_display **display, bool fre
 	*output = '\0';
 	
 	// build string
-	DL_FOREACH(*display, pd) {
+	DL_FOREACH(ch->desc->page_lines, pd) {
 		if (pd->cols <= 1 || !use_cols) {
 			// non-column display
 			if (last_col != 0 && col_count > 0) {
@@ -1001,9 +1015,7 @@ void page_display_to_char(char_data *ch, struct page_display **display, bool fre
 	page_string(ch->desc, output, TRUE);
 	free(output);
 	
-	if (free_display_after) {
-		free_page_display(display);
-	}
+	free_page_display(&ch->desc->page_lines);
 }
 
 

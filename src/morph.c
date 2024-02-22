@@ -1045,36 +1045,36 @@ void do_stat_morph(char_data *ch, morph_data *morph) {
 	struct apply_data *app;
 	ability_data *abil;
 	int num;
-	struct page_display *display = NULL, *pd;
+	struct page_display *pd;
 	
 	if (!morph) {
 		return;
 	}
 	
 	// first line
-	add_page_display(&display, "VNum: [\tc%d\t0], Keywords: \tc%s\t0, Short desc: \ty%s\t0", MORPH_VNUM(morph), MORPH_KEYWORDS(morph), MORPH_SHORT_DESC(morph));
-	add_page_display(&display, "L-Desc: \ty%s\t0\r\n%s", MORPH_LONG_DESC(morph), NULLSAFE(MORPH_LOOK_DESC(morph)));
+	add_page_display(ch, "VNum: [\tc%d\t0], Keywords: \tc%s\t0, Short desc: \ty%s\t0", MORPH_VNUM(morph), MORPH_KEYWORDS(morph), MORPH_SHORT_DESC(morph));
+	add_page_display(ch, "L-Desc: \ty%s\t0\r\n%s", MORPH_LONG_DESC(morph), NULLSAFE(MORPH_LOOK_DESC(morph)));
 	
 	snprintf(part, sizeof(part), "%s", (MORPH_ABILITY(morph) == NO_ABIL ? "none" : get_ability_name_by_vnum(MORPH_ABILITY(morph))));
 	if ((abil = find_ability_by_vnum(MORPH_ABILITY(morph))) && ABIL_ASSIGNED_SKILL(abil) != NULL) {
 		snprintf(part + strlen(part), sizeof(part) - strlen(part), " (%s %d)", SKILL_ABBREV(ABIL_ASSIGNED_SKILL(abil)), ABIL_SKILL_LEVEL(abil));
 	}
-	add_page_display(&display, "Cost: [\ty%d %s\t0], Max Level: [\ty%d%s\t0], Requires Ability: [\ty%s\t0]", MORPH_COST(morph), MORPH_COST(morph) > 0 ? pool_types[MORPH_COST_TYPE(morph)] : "/ none", MORPH_MAX_SCALE(morph), (MORPH_MAX_SCALE(morph) == 0 ? " none" : ""), part);
+	add_page_display(ch, "Cost: [\ty%d %s\t0], Max Level: [\ty%d%s\t0], Requires Ability: [\ty%s\t0]", MORPH_COST(morph), MORPH_COST(morph) > 0 ? pool_types[MORPH_COST_TYPE(morph)] : "/ none", MORPH_MAX_SCALE(morph), (MORPH_MAX_SCALE(morph) == 0 ? " none" : ""), part);
 	
 	if (MORPH_REQUIRES_OBJ(morph) != NOTHING) {
-		add_page_display(&display, "Requires item: [%d] \tg%s\t0", MORPH_REQUIRES_OBJ(morph), skip_filler(get_obj_name_by_proto(MORPH_REQUIRES_OBJ(morph))));
+		add_page_display(ch, "Requires item: [%d] \tg%s\t0", MORPH_REQUIRES_OBJ(morph), skip_filler(get_obj_name_by_proto(MORPH_REQUIRES_OBJ(morph))));
 	}
 	
-	add_page_display(&display, "Attack type: \ty%d %s\t0, Move type: \ty%s\t0, Size: \ty%s\t0", MORPH_ATTACK_TYPE(morph), get_attack_name_by_vnum(MORPH_ATTACK_TYPE(morph)), mob_move_types[MORPH_MOVE_TYPE(morph)], size_types[MORPH_SIZE(morph)]);
+	add_page_display(ch, "Attack type: \ty%d %s\t0, Move type: \ty%s\t0, Size: \ty%s\t0", MORPH_ATTACK_TYPE(morph), get_attack_name_by_vnum(MORPH_ATTACK_TYPE(morph)), mob_move_types[MORPH_MOVE_TYPE(morph)], size_types[MORPH_SIZE(morph)]);
 	
 	sprintbit(MORPH_FLAGS(morph), morph_flags, part, TRUE);
-	add_page_display(&display, "Flags: \tg%s\t0", part);
+	add_page_display(ch, "Flags: \tg%s\t0", part);
 	
 	sprintbit(MORPH_AFFECTS(morph), affected_bits, part, TRUE);
-	add_page_display(&display, "Affects: \tc%s\t0", part);
+	add_page_display(ch, "Affects: \tc%s\t0", part);
 	
 	// applies
-	pd = add_page_display(&display, "Applies: ");
+	pd = add_page_display(ch, "Applies: ");
 	for (app = MORPH_APPLIES(morph), num = 0; app; app = app->next, ++num) {
 		append_page_display_line(pd, "%s%d to %s", num ? ", " : "", app->weight, apply_types[app->location]);
 	}
@@ -1082,7 +1082,7 @@ void do_stat_morph(char_data *ch, morph_data *morph) {
 		append_page_display_line(pd, "none");
 	}
 	
-	page_display_to_char(ch, &display, TRUE);
+	send_page_display(ch);
 }
 
 
@@ -1165,15 +1165,14 @@ void olc_show_morph(char_data *ch) {
 int vnum_morph(char *searchname, char_data *ch) {
 	morph_data *iter, *next_iter;
 	int found = 0;
-	struct page_display *display = NULL;
 	
 	HASH_ITER(hh, morph_table, iter, next_iter) {
 		if (multi_isname(searchname, MORPH_KEYWORDS(iter))) {
-			add_page_display(&display, "%3d. [%5d] %s", ++found, MORPH_VNUM(iter), MORPH_SHORT_DESC(iter));
+			add_page_display(ch, "%3d. [%5d] %s", ++found, MORPH_VNUM(iter), MORPH_SHORT_DESC(iter));
 		}
 	}
 	
-	page_display_to_char(ch, &display, TRUE);
+	send_page_display(ch);
 	return found;
 }
 

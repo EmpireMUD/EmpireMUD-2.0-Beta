@@ -693,33 +693,33 @@ void do_stat_augment(char_data *ch, augment_data *aug) {
 	struct apply_data *app;
 	ability_data *abil;
 	int num;
-	struct page_display *display = NULL, *pd;
+	struct page_display *pd;
 	
 	if (!aug) {
 		return;
 	}
 	
 	// first line
-	add_page_display(&display, "VNum: [\tc%d\t0], Name: \tc%s\t0", GET_AUG_VNUM(aug), GET_AUG_NAME(aug));
+	add_page_display(ch, "VNum: [\tc%d\t0], Name: \tc%s\t0", GET_AUG_VNUM(aug), GET_AUG_NAME(aug));
 	
 	snprintf(part, sizeof(part), "%s", (GET_AUG_ABILITY(aug) == NO_ABIL ? "none" : get_ability_name_by_vnum(GET_AUG_ABILITY(aug))));
 	if ((abil = find_ability_by_vnum(GET_AUG_ABILITY(aug))) && ABIL_ASSIGNED_SKILL(abil) != NULL) {
 		snprintf(part + strlen(part), sizeof(part) - strlen(part), " (%s %d)", SKILL_ABBREV(ABIL_ASSIGNED_SKILL(abil)), ABIL_SKILL_LEVEL(abil));
 	}
-	add_page_display(&display, "Type: [\ty%s\t0], Requires Ability: [\ty%s\t0]", augment_types[GET_AUG_TYPE(aug)], part);
+	add_page_display(ch, "Type: [\ty%s\t0], Requires Ability: [\ty%s\t0]", augment_types[GET_AUG_TYPE(aug)], part);
 	
 	if (GET_AUG_REQUIRES_OBJ(aug) != NOTHING) {
-		add_page_display(&display, "Requires item: [%d] \tg%s\t0", GET_AUG_REQUIRES_OBJ(aug), skip_filler(get_obj_name_by_proto(GET_AUG_REQUIRES_OBJ(aug))));
+		add_page_display(ch, "Requires item: [%d] \tg%s\t0", GET_AUG_REQUIRES_OBJ(aug), skip_filler(get_obj_name_by_proto(GET_AUG_REQUIRES_OBJ(aug))));
 	}
 	
 	sprintbit(GET_AUG_FLAGS(aug), augment_flags, part, TRUE);
-	add_page_display(&display, "Flags: \tg%s\t0", part);
+	add_page_display(ch, "Flags: \tg%s\t0", part);
 	
 	sprintbit(GET_AUG_WEAR_FLAGS(aug), wear_bits, part, TRUE);
-	add_page_display(&display, "Targets wear location: \ty%s\t0", part);
+	add_page_display(ch, "Targets wear location: \ty%s\t0", part);
 	
 	// applies
-	pd = add_page_display(&display, "Applies: ");
+	pd = add_page_display(ch, "Applies: ");
 	for (app = GET_AUG_APPLIES(aug), num = 0; app; app = app->next, ++num) {
 		append_page_display_line(pd, "%s%d to %s", num ? ", " : "", app->weight, apply_types[app->location]);
 	}
@@ -729,9 +729,9 @@ void do_stat_augment(char_data *ch, augment_data *aug) {
 	
 	// resources
 	get_resource_display(ch, GET_AUG_RESOURCES(aug), part);
-	add_page_display(&display, "Resource cost:\r\n%s", part);
+	add_page_display(ch, "Resource cost:\r\n%s", part);
 	
-	page_display_to_char(ch, &display, TRUE);
+	send_page_display(ch);
 }
 
 
@@ -806,15 +806,14 @@ void olc_show_augment(char_data *ch) {
 int vnum_augment(char *searchname, char_data *ch) {
 	augment_data *iter, *next_iter;
 	int found = 0;
-	struct page_display *display = NULL;
 	
 	HASH_ITER(hh, augment_table, iter, next_iter) {
 		if (multi_isname(searchname, GET_AUG_NAME(iter))) {
-			add_page_display(&display, "%3d. [%5d] %s (%s)", ++found, GET_AUG_VNUM(iter), GET_AUG_NAME(iter), augment_types[GET_AUG_TYPE(iter)]);
+			add_page_display(ch, "%3d. [%5d] %s (%s)", ++found, GET_AUG_VNUM(iter), GET_AUG_NAME(iter), augment_types[GET_AUG_TYPE(iter)]);
 		}
 	}
 	
-	page_display_to_char(ch, &display, TRUE);
+	send_page_display(ch);
 	return found;
 }
 

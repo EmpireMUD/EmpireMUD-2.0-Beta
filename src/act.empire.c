@@ -1398,7 +1398,6 @@ void show_workforce_where(empire_data *emp, char_data *to, bool here, char *argu
 	struct workforce_where_log *wwl;
 	room_data *room;
 	int iter, total, requesters_island, only_chore = NOTHING;
-	struct page_display *display = NULL;
 	
 	if (!emp) {
 		msg_to_char(to, "No empire workforce found.\r\n");
@@ -1421,7 +1420,7 @@ void show_workforce_where(empire_data *emp, char_data *to, bool here, char *argu
 	requesters_island = GET_ISLAND_ID(IN_ROOM(to));
 	
 	if (only_chore != NOTHING) {	// SHOW DETAILS FOR 1 CHORE
-		add_page_display(&display, "Citizens working the %s chore:", chore_data[only_chore].name);
+		add_page_display(to, "Citizens working the %s chore:", chore_data[only_chore].name);
 		total = 0;
 		
 		DL_FOREACH(EMPIRE_WORKFORCE_WHERE_LOG(emp), wwl) {
@@ -1437,16 +1436,16 @@ void show_workforce_where(empire_data *emp, char_data *to, bool here, char *argu
 			
 			// found
 			++total;
-			add_page_display(&display, "%s %s: %s", coord_display_room(to, room, TRUE), skip_filler(get_room_name(room, FALSE)), GET_SHORT_DESC(wwl->mob));
+			add_page_display(to, "%s %s: %s", coord_display_room(to, room, TRUE), skip_filler(get_room_name(room, FALSE)), GET_SHORT_DESC(wwl->mob));
 		}
 		if (total) {
-			add_page_display(&display, " (%d total workers)", total);
+			add_page_display(to, " (%d total workers)", total);
 		}
 		else if (!total) {
-			add_page_display_str(&display, " no workers");
+			add_page_display_str(to, " no workers");
 		}
 		
-		page_display_to_char(to, &display, TRUE);
+		send_page_display(to);
 	}
 	else {	// SHOW ALL CHORES
 		// count up workforce mobs
@@ -1478,18 +1477,18 @@ void show_workforce_where(empire_data *emp, char_data *to, bool here, char *argu
 			return;
 		}
 	
-		add_page_display(&display, "Working %s citizens:", EMPIRE_ADJECTIVE(emp));
+		add_page_display(to, "Working %s citizens:", EMPIRE_ADJECTIVE(emp));
 	
 		HASH_ITER(hh, counts, wct, next_wct) {
 			snprintf(line, sizeof(line), "%s: %d worker%s\r\n", chore_data[wct->chore].name, wct->count, PLURAL(wct->count));
-			add_page_display_str(&display, CAP(line));
+			add_page_display_str(to, CAP(line));
 			
 			// remove and free
 			HASH_DEL(counts, wct);
 			free(wct);
 		}
 		
-		page_display_to_char(to, &display, TRUE);
+		send_page_display(to);
 	}
 }
 
@@ -1509,7 +1508,6 @@ void show_workforce_why(empire_data *emp, char_data *ch, char *argument) {
 	room_vnum only_loc = NOWHERE;
 	bool any = FALSE;
 	room_data *room, *only_room = NULL;
-	struct page_display *display = NULL;
 	
 	if (!ch->desc) {
 		return;	// nothing to show
@@ -1559,7 +1557,7 @@ void show_workforce_why(empire_data *emp, char_data *ch, char *argument) {
 	}
 	
 	// show all data
-	add_page_display(&display, "Recent workforce problems:\r\n%s", unsupplied);
+	add_page_display(ch, "Recent workforce problems:\r\n%s", unsupplied);
 	
 	if (*argument) {	// normal display
 		LL_FOREACH(EMPIRE_WORKFORCE_LOG(emp), wf_log) {
@@ -1588,7 +1586,7 @@ void show_workforce_why(empire_data *emp, char_data *ch, char *argument) {
 				*rname = '\0';
 			}
 		
-			add_page_display(&display, "%s %s%s: %s%s%s", coord_display(ch, X_COORD(room), Y_COORD(room), TRUE), rname, chore_data[wf_log->chore].name, wf_problem_types[wf_log->problem], mult, wf_log->delayed ? " (delayed)" : "");
+			add_page_display(ch, "%s %s%s: %s%s%s", coord_display(ch, X_COORD(room), Y_COORD(room), TRUE), rname, chore_data[wf_log->chore].name, wf_problem_types[wf_log->problem], mult, wf_log->delayed ? " (delayed)" : "");
 			any = TRUE;
 		}
 	}
@@ -1606,12 +1604,12 @@ void show_workforce_why(empire_data *emp, char_data *ch, char *argument) {
 				wf_log = wf_log->next;	// advance past identical entries
 			}
 			
-			add_page_display(&display, " %s: %s (x%d)", chore_data[last_chore].name, wf_problem_types[last_problem], count);
+			add_page_display(ch, " %s: %s (x%d)", chore_data[last_chore].name, wf_problem_types[last_problem], count);
 		}
 	}
 	
-	if (any || *unsupplied || display) {
-		page_display_to_char(ch, &display, TRUE);
+	if (any || *unsupplied) {
+		send_page_display(ch);
 	}
 	else if (only_room && ROOM_OWNER(only_room) != GET_LOYALTY(ch)) {
 		msg_to_char(ch, "Workforce isn't working because your empire doesn't own %s location.\r\n", (only_room == IN_ROOM(ch)) ? "this" : "that");
@@ -5086,7 +5084,6 @@ ACMD(do_elog) {
 	empire_data *emp = NULL;
 	bool found;
 	bool imm_access = GET_ACCESS_LEVEL(ch) >= LVL_CIMPL || IS_GRANTED(ch, GRANT_EMPIRES);
-	struct page_display *display = NULL;
 	
 	// in case none is provided
 	const int default_lines = 15;
@@ -5166,7 +5163,7 @@ ACMD(do_elog) {
 		}
 	}
 	
-	add_page_display(&display, "%s logs for %s:", (type == NOTHING ? "All" : empire_log_types[type]), EMPIRE_NAME(emp));
+	add_page_display(ch, "%s logs for %s:", (type == NOTHING ? "All" : empire_log_types[type]), EMPIRE_NAME(emp));
 	
 	// now show the LAST [lines] log entries (show if remaining-lines<=0)
 	DL_FOREACH(EMPIRE_LOGS(emp), elog) {
@@ -5175,12 +5172,12 @@ ACMD(do_elog) {
 		}
 		if (type == NOTHING || elog->type == type) {
 			if (count-- - lines <= 0) {
-				add_page_display(&display, "%3s: %s&0", simple_time_since(elog->timestamp), strip_color(elog->string));
+				add_page_display(ch, "%3s: %s&0", simple_time_since(elog->timestamp), strip_color(elog->string));
 			}
 		}
 	}
 	
-	page_display_to_char(ch, &display, TRUE);
+	send_page_display(ch);
 }
 
 
@@ -8665,12 +8662,11 @@ void do_workforce_nearby(char_data *ch, empire_data *emp, char *argument) {
 	char_data *proto;
 	char name[256], *temp;
 	int avail, working;
-	struct page_display *display = NULL;
 	
 	int chore_distance = config_get_int("chore_distance");
 	
 	avail = working = 0;
-	add_page_display(&display, "Citizens living within %d tile%s of here:", chore_distance, PLURAL(chore_distance));
+	add_page_display(ch, "Citizens living within %d tile%s of here:", chore_distance, PLURAL(chore_distance));
 	
 	// try territory first
 	HASH_ITER(hh, EMPIRE_TERRITORY_LIST(emp), ter, next_ter) {
@@ -8706,7 +8702,7 @@ void do_workforce_nearby(char_data *ch, empire_data *emp, char *argument) {
 			}
 			
 			// and add
-			add_page_display(&display, "%s %s", coord_display_room(ch, ter->room, TRUE), name);
+			add_page_display(ch, "%s %s", coord_display_room(ch, ter->room, TRUE), name);
 		}
 	}
 	
@@ -8744,18 +8740,18 @@ void do_workforce_nearby(char_data *ch, empire_data *emp, char *argument) {
 			}
 			
 			// and add
-			add_page_display(&display, "%s %s", coord_display_room(ch, IN_ROOM(vter->veh), TRUE), name);
+			add_page_display(ch, "%s %s", coord_display_room(ch, IN_ROOM(vter->veh), TRUE), name);
 		}
 	}
 	
 	if (avail == 0 && working == 0) {
-		add_page_display(&display, " none");
+		add_page_display(ch, " none");
 	}
 	else {
-		add_page_display(&display, "%d available, %d working, %d total", avail, working, avail + working);
+		add_page_display(ch, "%d available, %d working, %d total", avail, working, avail + working);
 	}
 	
-	page_display_to_char(ch, &display, TRUE);
+	send_page_display(ch);
 }
 
 

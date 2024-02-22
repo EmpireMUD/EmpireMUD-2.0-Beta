@@ -1090,35 +1090,35 @@ void get_shop_items_display(shop_data *shop, char *save_buffer) {
 */
 void do_stat_shop(char_data *ch, shop_data *shop) {
 	char part[MAX_STRING_LENGTH];
-	struct page_display *display = NULL, *pd;
+	struct page_display *pd;
 	
 	if (!shop) {
 		return;
 	}
 	
 	// first line
-	add_page_display(&display, "VNum: [\tc%d\t0], Name: \ty%s\t0", SHOP_VNUM(shop), SHOP_NAME(shop));
+	add_page_display(ch, "VNum: [\tc%d\t0], Name: \ty%s\t0", SHOP_VNUM(shop), SHOP_NAME(shop));
 	
 	// 2nd line
 	if (SHOP_OPEN_TIME(shop) == SHOP_CLOSE_TIME(shop)) {
-		pd = add_page_display(&display, "Times: [\tcalways open\t0]");
+		pd = add_page_display(ch, "Times: [\tcalways open\t0]");
 	}
 	else {
-		pd = add_page_display(&display, "Times: [\tc%d%s\t0 - \tc%d%s\t0]", TIME_TO_12H(SHOP_OPEN_TIME(shop)), AM_PM(SHOP_OPEN_TIME(shop)), TIME_TO_12H(SHOP_CLOSE_TIME(shop)), AM_PM(SHOP_CLOSE_TIME(shop)));
+		pd = add_page_display(ch, "Times: [\tc%d%s\t0 - \tc%d%s\t0]", TIME_TO_12H(SHOP_OPEN_TIME(shop)), AM_PM(SHOP_OPEN_TIME(shop)), TIME_TO_12H(SHOP_CLOSE_TIME(shop)), AM_PM(SHOP_CLOSE_TIME(shop)));
 	}
 	// still 2nd line
 	append_page_display_line(pd, ", Faction allegiance: [\ty%s\t0]", SHOP_ALLEGIANCE(shop) ? FCT_NAME(SHOP_ALLEGIANCE(shop)) : "none");
 	
 	sprintbit(SHOP_FLAGS(shop), shop_flags, part, TRUE);
-	add_page_display(&display, "Flags: \tg%s\t0", part);
+	add_page_display(ch, "Flags: \tg%s\t0", part);
 	
 	get_quest_giver_display(SHOP_LOCATIONS(shop), part);
-	add_page_display(&display, "Locations:\r\n%s", part);
+	add_page_display(ch, "Locations:\r\n%s", part);
 	
 	get_shop_items_display(shop, part);
-	add_page_display(&display, "Items:\r\n%s", part);
+	add_page_display(ch, "Items:\r\n%s", part);
 	
-	page_display_to_char(ch, &display, TRUE);
+	send_page_display(ch);
 }
 
 
@@ -1168,15 +1168,14 @@ void olc_show_shop(char_data *ch) {
 int vnum_shop(char *searchname, char_data *ch) {
 	shop_data *iter, *next_iter;
 	int found = 0;
-	struct page_display *display = NULL;
 	
 	HASH_ITER(hh, shop_table, iter, next_iter) {
 		if (multi_isname(searchname, SHOP_NAME(iter))) {
-			add_page_display(&display, "%3d. [%5d] %s", ++found, SHOP_VNUM(iter), SHOP_NAME(iter));
+			add_page_display(ch, "%3d. [%5d] %s", ++found, SHOP_VNUM(iter), SHOP_NAME(iter));
 		}
 	}
 	
-	page_display_to_char(ch, &display, TRUE);
+	send_page_display(ch);
 	return found;
 }
 

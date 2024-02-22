@@ -11009,7 +11009,7 @@ void do_stat_ability(char_data *ch, ability_data *abil, bool details) {
 	struct apply_data *app;
 	bitvector_t fields;
 	int count;
-	struct page_display *display = NULL, *pd;
+	struct page_display *pd;
 	
 	if (!abil) {
 		return;
@@ -11018,27 +11018,27 @@ void do_stat_ability(char_data *ch, ability_data *abil, bool details) {
 	fields = ability_shows_fields(abil);
 	
 	// first line
-	add_page_display(&display, "VNum: [\tc%d\t0], Name: \tc%s\t0", ABIL_VNUM(abil), ABIL_NAME(abil));
+	add_page_display(ch, "VNum: [\tc%d\t0], Name: \tc%s\t0", ABIL_VNUM(abil), ABIL_NAME(abil));
 
-	add_page_display(&display, "Scale: [\ty%d%%\t0], Mastery ability: [\ty%d\t0] \ty%s\t0", (int)(ABIL_SCALE(abil) * 100), ABIL_MASTERY_ABIL(abil), ABIL_MASTERY_ABIL(abil) == NOTHING ? "none" : get_ability_name_by_vnum(ABIL_MASTERY_ABIL(abil)));
+	add_page_display(ch, "Scale: [\ty%d%%\t0], Mastery ability: [\ty%d\t0] \ty%s\t0", (int)(ABIL_SCALE(abil) * 100), ABIL_MASTERY_ABIL(abil), ABIL_MASTERY_ABIL(abil) == NOTHING ? "none" : get_ability_name_by_vnum(ABIL_MASTERY_ABIL(abil)));
 	
 	get_ability_type_display(ABIL_TYPE_LIST(abil), part, FALSE);
-	add_page_display(&display, "Types: \tc%s\t0", part);
+	add_page_display(ch, "Types: \tc%s\t0", part);
 	
 	sprintbit(ABIL_FLAGS(abil), ability_flags, part, TRUE);
-	add_page_display(&display, "Flags: \tg%s\t0", part);
+	add_page_display(ch, "Flags: \tg%s\t0", part);
 	
 	if (IS_SET(fields, ABILEDIT_IMMUNITIES)) {
 		sprintbit(ABIL_IMMUNITIES(abil), affected_bits, part, TRUE);
-		add_page_display(&display, "Immunities: \tc%s\t0", part);
+		add_page_display(ch, "Immunities: \tc%s\t0", part);
 	}
 	
 	sprintbit(ABIL_GAIN_HOOKS(abil), ability_gain_hooks, part, TRUE);
-	add_page_display(&display, "Gain hooks: \tg%s\t0", part);
+	add_page_display(ch, "Gain hooks: \tg%s\t0", part);
 	
 	// Command, Targets line
 	if (IS_SET(fields, ABILEDIT_COMMAND | ABILEDIT_TARGETS)) {
-		pd = add_page_display(&display, "");
+		pd = add_page_display(ch, "");
 		if (IS_SET(fields, ABILEDIT_COMMAND)) {
 			if (!ABIL_COMMAND(abil)) {
 				append_page_display_line(pd, "Command info: [\tcnot a command\t0]");
@@ -11054,13 +11054,13 @@ void do_stat_ability(char_data *ch, ability_data *abil, bool details) {
 	}
 	
 	// Minpos, Linked trait line
-	pd = add_page_display(&display, "Linked trait: [\ty%s\t0]", apply_types[ABIL_LINKED_TRAIT(abil)]);
+	pd = add_page_display(ch, "Linked trait: [\ty%s\t0]", apply_types[ABIL_LINKED_TRAIT(abil)]);
 	if (IS_SET(fields, ABILEDIT_MIN_POS)) {
 		append_page_display_line(pd, ", Min position: [\tc%s\t0]", position_types[ABIL_MIN_POS(abil)]);
 	}
 	
 	if (IS_SET(fields, ABILEDIT_COST | ABILEDIT_COST_PER_AMOUNT | ABILEDIT_COST_PER_TARGET)) {
-		pd = add_page_display(&display, "Cost: [\tc%d %s (+%.2f/scale)", ABIL_COST(abil), pool_types[ABIL_COST_TYPE(abil)], ABIL_COST_PER_SCALE_POINT(abil));
+		pd = add_page_display(ch, "Cost: [\tc%d %s (+%.2f/scale)", ABIL_COST(abil), pool_types[ABIL_COST_TYPE(abil)], ABIL_COST_PER_SCALE_POINT(abil));
 		if (IS_SET(fields, ABILEDIT_COST_PER_AMOUNT)) {
 			append_page_display_line(pd, " (+%.2f/amount)", ABIL_COST_PER_AMOUNT(abil));
 		}
@@ -11071,24 +11071,24 @@ void do_stat_ability(char_data *ch, ability_data *abil, bool details) {
 	}
 	
 	if (IS_SET(fields, ABILEDIT_COOLDOWN)) {
-		add_page_display(&display, "Cooldown: [\tc%d %s\t0], Cooldown time: [\tc%s\t0]", ABIL_COOLDOWN(abil), get_generic_name_by_vnum(ABIL_COOLDOWN(abil)), colon_time(ABIL_COOLDOWN_SECS(abil), FALSE, NULL));
+		add_page_display(ch, "Cooldown: [\tc%d %s\t0], Cooldown time: [\tc%s\t0]", ABIL_COOLDOWN(abil), get_generic_name_by_vnum(ABIL_COOLDOWN(abil)), colon_time(ABIL_COOLDOWN_SECS(abil), FALSE, NULL));
 	}
 	if (IS_SET(fields, ABILEDIT_COST)) {
 		get_resource_display(ch, ABIL_RESOURCE_COST(abil), part);
-		add_page_display(&display, "Resource cost:%s\r\n%s", ABIL_RESOURCE_COST(abil) ? "" : " none", ABIL_RESOURCE_COST(abil) ? part : "");
+		add_page_display(ch, "Resource cost:%s\r\n%s", ABIL_RESOURCE_COST(abil) ? "" : " none", ABIL_RESOURCE_COST(abil) ? part : "");
 	}
 	
 	if (IS_SET(fields, ABILEDIT_TOOL)) {
 		prettier_sprintbit(ABIL_REQUIRES_TOOL(abil), tool_flags, part);
-		add_page_display(&display, "Requires tool: &g%s&0", part);
+		add_page_display(ch, "Requires tool: &g%s&0", part);
 	}
 	if (IS_SET(fields, ABILEDIT_DIFFICULTY | ABILEDIT_WAIT)) {
-		add_page_display(&display, "Difficulty: \ty%s\t0, Wait type: [\ty%s\t0]", skill_check_difficulty[ABIL_DIFFICULTY(abil)], wait_types[ABIL_WAIT_TYPE(abil)]);
+		add_page_display(ch, "Difficulty: \ty%s\t0, Wait type: [\ty%s\t0]", skill_check_difficulty[ABIL_DIFFICULTY(abil)], wait_types[ABIL_WAIT_TYPE(abil)]);
 	}
 	
 	// Custom affect, Duration line
 	if (IS_SET(fields, ABILEDIT_AFFECT_VNUM | ABILEDIT_DURATION)) {
-		pd = add_page_display(&display, "");
+		pd = add_page_display(ch, "");
 		if (IS_SET(fields, ABILEDIT_AFFECT_VNUM)) {
 			append_page_display_line(pd, "Custom affect: [\ty%d %s\t0]", ABIL_AFFECT_VNUM(abil), get_generic_name_by_vnum(ABIL_AFFECT_VNUM(abil)));
 		}
@@ -11101,7 +11101,7 @@ void do_stat_ability(char_data *ch, ability_data *abil, bool details) {
 	
 	// Attack Type, Damage Type, Max Stacks line
 	if (IS_SET(fields, ABILEDIT_ATTACK_TYPE | ABILEDIT_DAMAGE_TYPE | ABILEDIT_MAX_STACKS | ABILEDIT_POOL_TYPE | ABILEDIT_MOVE_TYPE)) {
-		pd = add_page_display(&display, "");
+		pd = add_page_display(ch, "");
 		if (IS_SET(fields, ABILEDIT_ATTACK_TYPE)) {
 			append_page_display_line(pd, "Attack type: [\tc%d %s\t0]", ABIL_ATTACK_TYPE(abil), get_attack_name_by_vnum(ABIL_ATTACK_TYPE(abil)));
 		}
@@ -11122,15 +11122,15 @@ void do_stat_ability(char_data *ch, ability_data *abil, bool details) {
 	if (IS_SET(fields, ABILEDIT_AFFECTS)) {
 		if (IS_SET(ABIL_TYPES(abil), ABILT_ROOM_AFFECT)) {
 			sprintbit(ABIL_AFFECTS(abil), room_aff_bits, part, TRUE);
-			add_page_display(&display, "Room affect flags: \tg%s\t0", part);
+			add_page_display(ch, "Room affect flags: \tg%s\t0", part);
 		}
 		else {
 			sprintbit(ABIL_AFFECTS(abil), affected_bits, part, TRUE);
-			add_page_display(&display, "Affect flags: \tg%s\t0", part);
+			add_page_display(ch, "Affect flags: \tg%s\t0", part);
 		}
 	}
 	if (IS_SET(fields, ABILEDIT_APPLIES)) {
-		pd = add_page_display(&display, "Applies: ");
+		pd = add_page_display(ch, "Applies: ");
 		count = 0;
 		LL_FOREACH(ABIL_APPLIES(abil), app) {
 			append_page_display_line(pd, "%s%d to %s", count++ ? ", " : "", app->weight, apply_types[app->location]);
@@ -11143,42 +11143,42 @@ void do_stat_ability(char_data *ch, ability_data *abil, bool details) {
 	// custom messages
 	if (ABIL_CUSTOM_MSGS(abil)) {
 		if (details) {
-			add_page_display(&display, "Custom messages:");
+			add_page_display(ch, "Custom messages:");
 		
 			LL_FOREACH(ABIL_CUSTOM_MSGS(abil), custm) {
-				add_page_display(&display, " %s: %s", ability_custom_types[custm->type], custm->msg);
+				add_page_display(ch, " %s: %s", ability_custom_types[custm->type], custm->msg);
 			}
 		}
 		else {
 			LL_COUNT(ABIL_CUSTOM_MSGS(abil), custm, count);
-			add_page_display(&display, "Custom messages: %d", count);
+			add_page_display(ch, "Custom messages: %d", count);
 		}
 	}
 	
 	// hooks
 	if (ABIL_HOOKS(abil)) {
-		add_page_display(&display, "Ability hooks:");
+		add_page_display(ch, "Ability hooks:");
 		count = 0;
 		LL_FOREACH(ABIL_HOOKS(abil), ahook) {
-			add_page_display(&display, " %d. %s", ++count, ability_hook_display(ahook));
+			add_page_display(ch, " %d. %s", ++count, ability_hook_display(ahook));
 		}
 	}
 	
 	if (IS_SET(fields, ABILEDIT_INTERACTIONS)) {
 		get_interaction_display(ABIL_INTERACTIONS(abil), part);
-		add_page_display(&display, "Interactions:\r\n%s", part);
+		add_page_display(ch, "Interactions:\r\n%s", part);
 	}
 	
 	// data
 	if (ABIL_DATA(abil)) {
-		add_page_display(&display, "Extra data:");
+		add_page_display(ch, "Extra data:");
 		count = 0;
 		LL_FOREACH(ABIL_DATA(abil), adl) {
-			add_page_display(&display, " %d. %s", ++count, ability_data_display(adl));
+			add_page_display(ch, " %d. %s", ++count, ability_data_display(adl));
 		}
 	}
 	
-	page_display_to_char(ch, &display, TRUE);
+	send_page_display(ch);
 }
 
 
@@ -11384,15 +11384,14 @@ void olc_show_ability(char_data *ch) {
 int vnum_ability(char *searchname, char_data *ch) {
 	ability_data *iter, *next_iter;
 	int found = 0;
-	struct page_display *display = NULL;
 	
 	HASH_ITER(hh, ability_table, iter, next_iter) {
 		if (multi_isname(searchname, ABIL_NAME(iter))) {
-			add_page_display(&display, "%3d. [%5d] %s", ++found, ABIL_VNUM(iter), ABIL_NAME(iter));
+			add_page_display(ch, "%3d. [%5d] %s", ++found, ABIL_VNUM(iter), ABIL_NAME(iter));
 		}
 	}
 	
-	page_display_to_char(ch, &display, TRUE);
+	send_page_display(ch);
 	return found;
 }
 

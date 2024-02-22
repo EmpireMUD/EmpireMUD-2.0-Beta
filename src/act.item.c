@@ -4693,7 +4693,6 @@ void warehouse_inventory(char_data *ch, char *argument, int mode) {
 	char_data *targ_player = ch;
 	bool file = FALSE;
 	int num;
-	struct page_display *display = NULL;
 	
 	if (mode == SCMD_WAREHOUSE && imm_access) {
 		// if first word is 
@@ -4736,14 +4735,14 @@ void warehouse_inventory(char_data *ch, char *argument, int mode) {
 	if (home_mode) {
 		DL_COUNT(GET_HOME_STORAGE(targ_player), eus, num);
 		if (targ_player == ch) {
-			add_page_display(&display, "%s items stored in your home (%d/%d):", part, num, config_get_int("max_home_store_uniques"));
+			add_page_display(ch, "%s items stored in your home (%d/%d):", part, num, config_get_int("max_home_store_uniques"));
 		}
 		else {
-			add_page_display(&display, "%s items stored in %s's home (%d/%d):", part, GET_PC_NAME(targ_player), num, config_get_int("max_home_store_uniques"));
+			add_page_display(ch, "%s items stored in %s's home (%d/%d):", part, GET_PC_NAME(targ_player), num, config_get_int("max_home_store_uniques"));
 		}
 	}
 	else {
-		add_page_display(&display, "%s items stored in %s%s&0:", part, EMPIRE_BANNER(emp), EMPIRE_NAME(emp));
+		add_page_display(ch, "%s items stored in %s%s&0:", part, EMPIRE_BANNER(emp), EMPIRE_NAME(emp));
 	}
 	num = 0;
 	
@@ -4771,14 +4770,14 @@ void warehouse_inventory(char_data *ch, char *argument, int mode) {
 		}
 		
 		// build line
-		add_page_display(&display, "%3d. %s%s%s\t0", ++num, obj_desc_for_char(iter->obj, ch, OBJ_DESC_WAREHOUSE), part, quantity);
+		add_page_display(ch, "%3d. %s%s%s\t0", ++num, obj_desc_for_char(iter->obj, ch, OBJ_DESC_WAREHOUSE), part, quantity);
 	}
 	
 	if (num == 0) {
-		add_page_display(&display, " none");
+		add_page_display(ch, " none");
 	}
 	
-	page_display_to_char(ch, &display, TRUE);
+	send_page_display(ch);
 }
 
 

@@ -4538,6 +4538,7 @@ struct descriptor_data {
 	int showstr_count;	// number of pages to page through
 	int showstr_page;	// which page are we currently showing?
 	struct stack_msg *stack_msg_list;	// queued stackable messages
+	struct page_display *page_lines;	// DLL of lines preparing to be sent
 	
 	protocol_t *pProtocol; // see protocol.c
 	struct color_reducer color;
