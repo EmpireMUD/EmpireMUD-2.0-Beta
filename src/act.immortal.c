@@ -3164,18 +3164,18 @@ void do_stat_adventure(char_data *ch, adv_data *adv) {
 * @param book_data *book The book to stat.
 */
 void do_stat_book(char_data *ch, book_data *book) {
-	char buf[MAX_STRING_LENGTH], line[MAX_STRING_LENGTH];
+	char line[MAX_STRING_LENGTH];
 	struct paragraph_data *para;
 	player_index_data *index;
-	size_t size = 0;
 	int count, len, num;
 	char *ptr, *txt;
+	struct page_display *display = NULL;
 	
-	size += snprintf(buf + size, sizeof(buf) - size, "Book VNum: [\tc%d\t0], Author: \ty%s\t0 (\tc%d\t0)\r\n", BOOK_VNUM(book), (index = find_player_index_by_idnum(BOOK_AUTHOR(book))) ? index->fullname : "nobody", BOOK_AUTHOR(book));
-	size += snprintf(buf + size, sizeof(buf) - size, "Title: %s\t0\r\n", BOOK_TITLE(book));
-	size += snprintf(buf + size, sizeof(buf) - size, "Byline: %s\t0\r\n", BOOK_BYLINE(book));
-	size += snprintf(buf + size, sizeof(buf) - size, "Item: [%s]\r\n", BOOK_ITEM_NAME(book));
-	size += snprintf(buf + size, sizeof(buf) - size, "%s", BOOK_ITEM_DESC(book));	// desc has its own crlf
+	add_page_display(&display, "Book VNum: [\tc%d\t0], Author: \ty%s\t0 (\tc%d\t0)", BOOK_VNUM(book), (index = find_player_index_by_idnum(BOOK_AUTHOR(book))) ? index->fullname : "nobody", BOOK_AUTHOR(book));
+	add_page_display(&display, "Title: %s\t0", BOOK_TITLE(book));
+	add_page_display(&display, "Byline: %s\t0", BOOK_BYLINE(book));
+	add_page_display(&display, "Item: [%s]", BOOK_ITEM_NAME(book));
+	add_page_display_str(&display, NULLSAFE(BOOK_ITEM_DESC(book)));	// desc has its own crlf
 	
 	// precompute number of paragraphs
 	num = 0;
@@ -3195,17 +3195,11 @@ void do_stat_book(char_data *ch, book_data *book) {
 			sprintf(ptr, "...");	// overwrite the crlf
 		}
 		
-		// too big?
-		if (size + strlen(line) + 2 >= sizeof(buf)) {
-			break;
-		}
-		
-		size += snprintf(buf + size, sizeof(buf) - size, "%s\r\n", line);
+		add_page_display_str(&display, line);
 	}
 	
-	if (ch->desc) {
-		page_string(ch->desc, buf, TRUE);
-	}
+	page_display_to_char(ch, display);
+	free_page_display(&display);
 }
 
 
