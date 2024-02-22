@@ -702,7 +702,8 @@ int page_display_column_width(char_data *ch, int cols) {
 
 
 /**
-* Adds a new line to the end of a page_display. Will trim trailing \r\n (crlf).
+* Adds a new line to the end of a player's page_display. Will trim trailing
+* \r\n (crlf).
 *
 * @param char_data *ch The person to add the display line to.
 * @param const char *fmt, ... va_arg format for the line to add.
@@ -743,7 +744,9 @@ struct page_display *add_page_display(char_data *ch, const char *fmt, ...) {
 
 
 /**
-* Adds a new line to the end of a page_display. Will trim trailing \r\n (crlf).
+* Adds a new line to the end of a player's page_display. Will trim trailing
+* \r\n (crlf).
+*
 * This is intended for displays that will have multiple columns. Any sequential
 * entries with the same column count will attempt to display in columns.
 *
@@ -796,7 +799,8 @@ struct page_display *add_page_display_col(char_data *ch, int cols, bool strict_c
 
 
 /**
-* Adds a new line to the end of a page_display. Will trim trailing \r\n (crlf).
+* Adds a new line to the end of a player's page_display. Will trim trailing
+* \r\n (crlf).
 *
 * @param char_data *ch The person to add the display line to.
 * @param const char *str The string to add as the new line (will be copied).
@@ -825,7 +829,9 @@ struct page_display *add_page_display_str(char_data *ch, const char *str) {
 
 
 /**
-* Adds a new line to the end of a page_display. Will trim trailing \r\n (crlf).
+* Adds a new line to the end of a player's page_display. Will trim trailing
+* \r\n (crlf).
+*
 * This is intended for displays that will have multiple columns. Any sequential
 * entries with the same column count will attempt to display in columns.
 *
@@ -866,7 +872,10 @@ struct page_display *add_page_display_col_str(char_data *ch, int cols, bool stri
 
 
 /**
-* Appends text to an existing page_display line. Will trim trailing \r\n (crlf).
+* Appends text to an existing page_display line.
+* Will trim trailing \r\n (crlf).
+*
+* Be cautious using this on lines that are part of column displays.
 *
 * @param struct page_display *line The line to append to.
 * @param const char *fmt, ... va_arg format for the text to add.
@@ -904,8 +913,8 @@ void append_page_display_line(struct page_display *line, const char *fmt, ...) {
 
 
 /**
-* Builds the final display for a pending page_display and sends it to a
-* player's paginator.
+* Builds the final display for a pending player's page_display and sends it to
+* their paginator. It also frees the page display afterwards.
 *
 * @param char_data *ch The player to show it to.
 */

@@ -2903,47 +2903,55 @@ void perform_mortal_where(char_data *ch, char *arg) {
 }
 
 
-void print_object_location(int num, obj_data *obj, char_data *ch, int recur) {
+/**
+* For the immortal 'where' function. This is called recursively when the obj
+* is inside another obj.
+*
+* As of b5.179, now puts the output of this function into the character's
+* page_display.
+*
+* @param int num Number to show for the 'where' display.
+* @param obj_data *obj The object to show.
+* @param char_data *ch The person viewing it (text goes to the page_display).
+* @param bool recur Whether or not to recursively show contents.
+*/
+void print_object_location(int num, obj_data *obj, char_data *ch, bool recur) {
+	struct page_display *pd;
+	
 	if (num > 0) {
-		sprintf(buf, "O%3d. %-25s - ", num, GET_OBJ_DESC(obj, ch, OBJ_DESC_SHORT));
+		pd = add_page_display(ch, "O%3d. %-25s - ", num, GET_OBJ_DESC(obj, ch, OBJ_DESC_SHORT));
 	}
 	else {
-		sprintf(buf, "%35s", " - ");
+		pd = add_page_display(ch, "%35s", " - ");
 	}
 	
 	if (HAS_TRIGGERS(obj)) {
-		strcat(buf, "[TRIG] ");
+		append_page_display_line(pd, "[TRIG] ");
 	}
 
 	if (IN_ROOM(obj)) {
-		sprintf(buf + strlen(buf), "[%d]%s %s\r\n",  GET_ROOM_VNUM(IN_ROOM(obj)), coord_display_room(ch, IN_ROOM(obj), TRUE), get_room_name(IN_ROOM(obj), FALSE));
-		send_to_char(buf, ch);
+		append_page_display_line(pd, "[%d]%s %s",  GET_ROOM_VNUM(IN_ROOM(obj)), coord_display_room(ch, IN_ROOM(obj), TRUE), get_room_name(IN_ROOM(obj), FALSE));
 	}
 	else if (obj->carried_by) {
-		sprintf(buf + strlen(buf), "carried by %s\r\n", PERS(obj->carried_by, ch, 1));
-		send_to_char(buf, ch);
+		append_page_display_line(pd, "carried by %s", PERS(obj->carried_by, ch, 1));
 	}
 	else if (obj->in_vehicle) {
-		sprintf(buf + strlen(buf), "inside %s%s\r\n", get_vehicle_short_desc(obj->in_vehicle, ch), recur ? ", which is" : " ");
+		append_page_display_line(pd, "inside %s%s", get_vehicle_short_desc(obj->in_vehicle, ch), recur ? ", which is" : " ");
 		if (recur) {
-			sprintf(buf + strlen(buf), "%35s[%d]%s %s\r\n", " - ", GET_ROOM_VNUM(IN_ROOM(obj->in_vehicle)), coord_display_room(ch, IN_ROOM(obj->in_vehicle), TRUE), get_room_name(IN_ROOM(obj->in_vehicle), FALSE));
+			add_page_display(ch, "%35s[%d]%s %s", " - ", GET_ROOM_VNUM(IN_ROOM(obj->in_vehicle)), coord_display_room(ch, IN_ROOM(obj->in_vehicle), TRUE), get_room_name(IN_ROOM(obj->in_vehicle), FALSE));
 		}
-		send_to_char(buf, ch);
 	}
 	else if (obj->worn_by) {
-		sprintf(buf + strlen(buf), "worn by %s\r\n", PERS(obj->worn_by, ch, 1));
-		send_to_char(buf, ch);
+		append_page_display_line(pd, "worn by %s", PERS(obj->worn_by, ch, 1));
 	}
 	else if (obj->in_obj) {
-		sprintf(buf + strlen(buf), "inside %s%s\r\n", GET_OBJ_DESC(obj->in_obj, ch, OBJ_DESC_SHORT), (recur ? ", which is" : " "));
-		send_to_char(buf, ch);
+		append_page_display_line(pd, "inside %s%s", GET_OBJ_DESC(obj->in_obj, ch, OBJ_DESC_SHORT), (recur ? ", which is" : " "));
 		if (recur) {
 			print_object_location(0, obj->in_obj, ch, recur);
 		}
 	}
 	else {
-		sprintf(buf + strlen(buf), "in an unknown location\r\n");
-		send_to_char(buf, ch);
+		append_page_display_line(pd, "in an unknown location\r\n");
 	}
 }
 
@@ -2954,6 +2962,7 @@ void perform_immort_where(char_data *ch, char *arg) {
 	vehicle_data *veh;
 	char_data *i;
 	obj_data *k;
+	struct page_display *pd;
 
 	if (!*arg) {
 		send_to_char("Players\r\n-------\r\n", ch);
@@ -2962,33 +2971,31 @@ void perform_immort_where(char_data *ch, char *arg) {
 				i = (d->original ? d->original : d->character);
 				if (i && CAN_SEE(ch, i) && IN_ROOM(i) && WIZHIDE_OK(ch, i)) {
 					if (d->original) {
-						msg_to_char(ch, "%-20s - [%7d]%s %s (in %s)", GET_NAME(i), GET_ROOM_VNUM(IN_ROOM(i)), coord_display(ch, X_COORD(IN_ROOM(d->character)), Y_COORD(IN_ROOM(d->character)), TRUE), get_room_name(IN_ROOM(d->character), FALSE), GET_NAME(d->character));
+						pd = add_page_display(ch, "%-20s - [%7d]%s %s (in %s)", GET_NAME(i), GET_ROOM_VNUM(IN_ROOM(i)), coord_display(ch, X_COORD(IN_ROOM(d->character)), Y_COORD(IN_ROOM(d->character)), TRUE), get_room_name(IN_ROOM(d->character), FALSE), GET_NAME(d->character));
 					}
 					else {
-						msg_to_char(ch, "%-20s - [%7d]%s %s", GET_NAME(i), GET_ROOM_VNUM(IN_ROOM(i)), coord_display(ch, X_COORD(IN_ROOM(i)), Y_COORD(IN_ROOM(i)), TRUE), get_room_name(IN_ROOM(i), FALSE));
+						pd = add_page_display(ch, "%-20s - [%7d]%s %s", GET_NAME(i), GET_ROOM_VNUM(IN_ROOM(i)), coord_display(ch, X_COORD(IN_ROOM(i)), Y_COORD(IN_ROOM(i)), TRUE), get_room_name(IN_ROOM(i), FALSE));
 					}
 					
 					if (ROOM_INSTANCE(IN_ROOM(d->character))) {
-						msg_to_char(ch, " (%s)\r\n", GET_ADV_NAME(INST_ADVENTURE(ROOM_INSTANCE(IN_ROOM(d->character)))));
-					}
-					else {
-						send_to_char("\r\n", ch);
+						append_page_display_line(pd, " (%s)", GET_ADV_NAME(INST_ADVENTURE(ROOM_INSTANCE(IN_ROOM(d->character)))));
 					}
 				}
 			}
 		}
+		send_page_display(ch);
 	}
 	else {
 		DL_FOREACH(character_list, i) {
 			if (CAN_SEE(ch, i) && IN_ROOM(i) && WIZHIDE_OK(ch, i) && (multi_isname(arg, GET_PC_NAME(i)) || match_char_name(ch, i, arg, MATCH_GLOBAL, NULL))) {
 				found = 1;
-				msg_to_char(ch, "M%3d. %-25s - %s[%7d]%s %s\r\n", ++num, GET_NAME(i), (IS_NPC(i) && HAS_TRIGGERS(i)) ? "[TRIG] " : "", GET_ROOM_VNUM(IN_ROOM(i)), coord_display(ch, X_COORD(IN_ROOM(i)), Y_COORD(IN_ROOM(i)), TRUE), get_room_name(IN_ROOM(i), FALSE));
+				add_page_display(ch, "M%3d. %-25s - %s[%7d]%s %s\r\n", ++num, GET_NAME(i), (IS_NPC(i) && HAS_TRIGGERS(i)) ? "[TRIG] " : "", GET_ROOM_VNUM(IN_ROOM(i)), coord_display(ch, X_COORD(IN_ROOM(i)), Y_COORD(IN_ROOM(i)), TRUE), get_room_name(IN_ROOM(i), FALSE));
 			}
 		}
 		DL_FOREACH(vehicle_list, veh) {
 			if (CAN_SEE_VEHICLE(ch, veh) && multi_isname(arg, VEH_KEYWORDS(veh))) {
 				found = 1;
-				msg_to_char(ch, "V%3d. %-25s - %s[%7d]%s %s\r\n", ++num, VEH_SHORT_DESC(veh), (HAS_TRIGGERS(veh) ? "[TRIG] " : ""), GET_ROOM_VNUM(IN_ROOM(veh)), coord_display(ch, X_COORD(IN_ROOM(veh)), Y_COORD(IN_ROOM(veh)), TRUE), get_room_name(IN_ROOM(veh), FALSE));
+				add_page_display(ch, "V%3d. %-25s - %s[%7d]%s %s\r\n", ++num, VEH_SHORT_DESC(veh), (HAS_TRIGGERS(veh) ? "[TRIG] " : ""), GET_ROOM_VNUM(IN_ROOM(veh)), coord_display(ch, X_COORD(IN_ROOM(veh)), Y_COORD(IN_ROOM(veh)), TRUE), get_room_name(IN_ROOM(veh), FALSE));
 			}
 		}
 		DL_FOREACH(object_list, k) {
@@ -2997,7 +3004,10 @@ void perform_immort_where(char_data *ch, char *arg) {
 				print_object_location(++num, k, ch, TRUE);
 			}
 		}
-		if (!found) {
+		if (found) {
+			send_page_display(ch);
+		}
+		else {
 			send_to_char("Couldn't find any such thing.\r\n", ch);
 		}
 	}
