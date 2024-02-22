@@ -1041,49 +1041,49 @@ morph_data *setup_olc_morph(morph_data *input) {
 * @param morph_data *morph The morph to display.
 */
 void do_stat_morph(char_data *ch, morph_data *morph) {
-	char buf[MAX_STRING_LENGTH], part[MAX_STRING_LENGTH];
+	char part[MAX_STRING_LENGTH];
 	struct apply_data *app;
 	ability_data *abil;
-	size_t size;
 	int num;
+	struct page_display *display = NULL, *pd;
 	
 	if (!morph) {
 		return;
 	}
 	
 	// first line
-	size = snprintf(buf, sizeof(buf), "VNum: [\tc%d\t0], Keywords: \tc%s\t0, Short desc: \ty%s\t0\r\n", MORPH_VNUM(morph), MORPH_KEYWORDS(morph), MORPH_SHORT_DESC(morph));
-	size += snprintf(buf + size, sizeof(buf) - size, "L-Desc: \ty%s\t0\r\n%s", MORPH_LONG_DESC(morph), NULLSAFE(MORPH_LOOK_DESC(morph)));
+	add_page_display(&display, "VNum: [\tc%d\t0], Keywords: \tc%s\t0, Short desc: \ty%s\t0", MORPH_VNUM(morph), MORPH_KEYWORDS(morph), MORPH_SHORT_DESC(morph));
+	add_page_display(&display, "L-Desc: \ty%s\t0\r\n%s", MORPH_LONG_DESC(morph), NULLSAFE(MORPH_LOOK_DESC(morph)));
 	
 	snprintf(part, sizeof(part), "%s", (MORPH_ABILITY(morph) == NO_ABIL ? "none" : get_ability_name_by_vnum(MORPH_ABILITY(morph))));
 	if ((abil = find_ability_by_vnum(MORPH_ABILITY(morph))) && ABIL_ASSIGNED_SKILL(abil) != NULL) {
 		snprintf(part + strlen(part), sizeof(part) - strlen(part), " (%s %d)", SKILL_ABBREV(ABIL_ASSIGNED_SKILL(abil)), ABIL_SKILL_LEVEL(abil));
 	}
-	size += snprintf(buf + size, sizeof(buf) - size, "Cost: [\ty%d %s\t0], Max Level: [\ty%d%s\t0], Requires Ability: [\ty%s\t0]\r\n", MORPH_COST(morph), MORPH_COST(morph) > 0 ? pool_types[MORPH_COST_TYPE(morph)] : "/ none", MORPH_MAX_SCALE(morph), (MORPH_MAX_SCALE(morph) == 0 ? " none" : ""), part);
+	add_page_display(&display, "Cost: [\ty%d %s\t0], Max Level: [\ty%d%s\t0], Requires Ability: [\ty%s\t0]", MORPH_COST(morph), MORPH_COST(morph) > 0 ? pool_types[MORPH_COST_TYPE(morph)] : "/ none", MORPH_MAX_SCALE(morph), (MORPH_MAX_SCALE(morph) == 0 ? " none" : ""), part);
 	
 	if (MORPH_REQUIRES_OBJ(morph) != NOTHING) {
-		size += snprintf(buf + size, sizeof(buf) - size, "Requires item: [%d] \tg%s\t0\r\n", MORPH_REQUIRES_OBJ(morph), skip_filler(get_obj_name_by_proto(MORPH_REQUIRES_OBJ(morph))));
+		add_page_display(&display, "Requires item: [%d] \tg%s\t0", MORPH_REQUIRES_OBJ(morph), skip_filler(get_obj_name_by_proto(MORPH_REQUIRES_OBJ(morph))));
 	}
 	
-	size += snprintf(buf + size, sizeof(buf) - size, "Attack type: \ty%d %s\t0, Move type: \ty%s\t0, Size: \ty%s\t0\r\n", MORPH_ATTACK_TYPE(morph), get_attack_name_by_vnum(MORPH_ATTACK_TYPE(morph)), mob_move_types[MORPH_MOVE_TYPE(morph)], size_types[MORPH_SIZE(morph)]);
+	add_page_display(&display, "Attack type: \ty%d %s\t0, Move type: \ty%s\t0, Size: \ty%s\t0", MORPH_ATTACK_TYPE(morph), get_attack_name_by_vnum(MORPH_ATTACK_TYPE(morph)), mob_move_types[MORPH_MOVE_TYPE(morph)], size_types[MORPH_SIZE(morph)]);
 	
 	sprintbit(MORPH_FLAGS(morph), morph_flags, part, TRUE);
-	size += snprintf(buf + size, sizeof(buf) - size, "Flags: \tg%s\t0\r\n", part);
+	add_page_display(&display, "Flags: \tg%s\t0", part);
 	
 	sprintbit(MORPH_AFFECTS(morph), affected_bits, part, TRUE);
-	size += snprintf(buf + size, sizeof(buf) - size, "Affects: \tc%s\t0\r\n", part);
+	add_page_display(&display, "Affects: \tc%s\t0", part);
 	
 	// applies
-	size += snprintf(buf + size, sizeof(buf) - size, "Applies: ");
+	pd = add_page_display(&display, "Applies: ");
 	for (app = MORPH_APPLIES(morph), num = 0; app; app = app->next, ++num) {
-		size += snprintf(buf + size, sizeof(buf) - size, "%s%d to %s", num ? ", " : "", app->weight, apply_types[app->location]);
+		append_page_display_line(pd, "%s%d to %s", num ? ", " : "", app->weight, apply_types[app->location]);
 	}
 	if (!MORPH_APPLIES(morph)) {
-		size += snprintf(buf + size, sizeof(buf) - size, "none");
+		append_page_display_line(pd, "none");
 	}
-	size += snprintf(buf + size, sizeof(buf) - size, "\r\n");
-		
-	page_string(ch->desc, buf, TRUE);
+	
+	page_display_to_char(ch, display);
+	free_page_display(&display);
 }
 
 
