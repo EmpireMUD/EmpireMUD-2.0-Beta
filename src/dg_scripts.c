@@ -1152,20 +1152,20 @@ EVENTFUNC(trig_wait_event) {
 
 void do_stat_trigger(char_data *ch, trig_data *trig) {
 	struct cmdlist_element *cmd_list;
-	char sb[MAX_STRING_LENGTH * 2], buf[MAX_STRING_LENGTH], temp[MAX_STRING_LENGTH];
-	int len = 0;
+	char buf[MAX_STRING_LENGTH], temp[MAX_STRING_LENGTH];
+	struct page_display *display = NULL;
 
 	if (!trig) {
 		log("SYSERR: NULL trigger passed to do_stat_trigger.");
 		return;
 	}
 
-	len += snprintf(sb, sizeof(sb), "Name: '&y%s&0',  VNum: [&g%5d&0]\r\n", GET_TRIG_NAME(trig), GET_TRIG_VNUM(trig));
+	add_page_display(&display, "Name: '&y%s&0',  VNum: [&g%5d&0]", GET_TRIG_NAME(trig), GET_TRIG_VNUM(trig));
 	
 	// x_TRIGGER
 	switch (trig->attach_type) {
 		case OBJ_TRIGGER: {
-			len += snprintf(sb + len, sizeof(sb)-len, "Trigger Intended Assignment: Objects\r\n");
+			add_page_display(&display, "Trigger Intended Assignment: Objects");
 			sprintbit(GET_TRIG_TYPE(trig), otrig_types, buf, TRUE);
 			break;
 		}
@@ -1173,48 +1173,43 @@ void do_stat_trigger(char_data *ch, trig_data *trig) {
 		case RMT_TRIGGER:
 		case BLD_TRIGGER:
 		case ADV_TRIGGER: {
-			len += snprintf(sb + len, sizeof(sb)-len, "Trigger Intended Assignment: Rooms\r\n");
+			add_page_display(&display, "Trigger Intended Assignment: Rooms");
 			sprintbit(GET_TRIG_TYPE(trig), wtrig_types, buf, TRUE);
 			break;
 		}
 		case MOB_TRIGGER: {
-			len += snprintf(sb + len, sizeof(sb)-len, "Trigger Intended Assignment: Mobiles\r\n");
+			add_page_display(&display, "Trigger Intended Assignment: Mobiles");
 			sprintbit(GET_TRIG_TYPE(trig), trig_types, buf, TRUE);
 			break;
 		}
 		case VEH_TRIGGER: {
-			len += snprintf(sb + len, sizeof(sb)-len, "Trigger Intended Assignment: Vehicles\r\n");
+			add_page_display(&display, "Trigger Intended Assignment: Vehicles");
 			sprintbit(GET_TRIG_TYPE(trig), vtrig_types, buf, TRUE);
 			break;
 		}
 		case EMP_TRIGGER: {
-			len += snprintf(sb + len, sizeof(sb)-len, "Trigger Intended Assignment: Empires\r\n");
+			add_page_display(&display, "Trigger Intended Assignment: Empires");
 			sprintbit(GET_TRIG_TYPE(trig), wtrig_types, buf, TRUE);
 			break;
 		}
 	}
 
-	len += snprintf(sb + len, sizeof(sb)-len, "Trigger Type: %s, Numeric Arg: %d, Arg list: %s\r\n", buf, GET_TRIG_NARG(trig), ((GET_TRIG_ARG(trig) && *GET_TRIG_ARG(trig)) ? GET_TRIG_ARG(trig) : "None"));
+	add_page_display(&display, "Trigger Type: %s, Numeric Arg: %d, Arg list: %s", buf, GET_TRIG_NARG(trig), ((GET_TRIG_ARG(trig) && *GET_TRIG_ARG(trig)) ? GET_TRIG_ARG(trig) : "None"));
 
-	len += snprintf(sb + len, sizeof(sb)-len, "Commands:\r\n"); 
+	add_page_display(&display, "Commands:"); 
 
 	cmd_list = trig->cmdlist;
 	while (cmd_list) {
 		if (cmd_list->cmd) {
 			strcpy(temp, show_color_codes(cmd_list->cmd));
-			if (len + strlen(temp) + 2 < sizeof(sb)) {
-				len += snprintf(sb + len, sizeof(sb)-len, "%s\r\n", temp);
-			}
-			else {
-				len += snprintf(sb + len, sizeof(sb)-len, "*** Overflow - script too long! ***\r\n");
-				break;
-			}
+			add_page_display(&display, "%s", temp);
 		}
 		
 		cmd_list = cmd_list->next;
 	}
 
-	page_string(ch->desc, sb, 1);
+	page_display_to_char(ch, display);
+	free_page_display(&display);
 }
 
 
