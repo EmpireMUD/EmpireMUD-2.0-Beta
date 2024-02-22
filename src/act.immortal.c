@@ -3146,6 +3146,7 @@ void show_spawn_summary_display(struct page_display **display, struct spawn_info
 			*line = '\0';
 		}
 		strcat(line, entry);
+		any = TRUE;
 	}
 	
 	// anything left in the line?
@@ -3369,6 +3370,7 @@ void do_stat_character(char_data *ch, char_data *k, bool details) {
 	struct over_time_effect_type *dot;
 	struct affected_type *aff;
 	archetype_data *arch;
+	struct page_display *display = NULL, *pd;
 	
 	bool is_proto = (IS_NPC(k) && k == mob_proto(GET_MOB_VNUM(k)));
 	
@@ -3378,81 +3380,81 @@ void do_stat_character(char_data *ch, char_data *k, bool details) {
 	sprinttype(GET_REAL_SEX(k), genders, buf, sizeof(buf), "???");
 	CAP(buf);
 	if (!IS_NPC(k)) {
-		msg_to_char(ch, "%s PC '\ty%s\t0', Lastname '\ty%s\t0', IDNum: [%5d], In room [%5d]\r\n", buf, GET_NAME(k), GET_CURRENT_LASTNAME(k) ? GET_CURRENT_LASTNAME(k) : "none", GET_IDNUM(k), IN_ROOM(k) ? GET_ROOM_VNUM(IN_ROOM(k)) : NOWHERE);
+		add_page_display(&display, "%s PC '\ty%s\t0', Lastname '\ty%s\t0', IDNum: [%5d], In room [%5d]", buf, GET_NAME(k), GET_CURRENT_LASTNAME(k) ? GET_CURRENT_LASTNAME(k) : "none", GET_IDNUM(k), IN_ROOM(k) ? GET_ROOM_VNUM(IN_ROOM(k)) : NOWHERE);
 	}
 	else {	// mob
-		msg_to_char(ch, "%s %s '\ty%s\t0', ID: [%5d], In room [%5d]\r\n", buf, (!IS_MOB(k) ? "NPC" : "MOB"), GET_NAME(k), k->script_id, IN_ROOM(k) ? GET_ROOM_VNUM(IN_ROOM(k)) : NOWHERE);
+		add_page_display(&display, "%s %s '\ty%s\t0', ID: [%5d], In room [%5d]", buf, (!IS_MOB(k) ? "NPC" : "MOB"), GET_NAME(k), k->script_id, IN_ROOM(k) ? GET_ROOM_VNUM(IN_ROOM(k)) : NOWHERE);
 	}
 	
 	if (!IS_NPC(k) && GET_ACCOUNT(k)) {
 		if (GET_ACCESS_LEVEL(ch) >= LVL_TO_SEE_ACCOUNTS) {
 			sprintbit(GET_ACCOUNT(k)->flags, account_flags, buf, TRUE);
-			msg_to_char(ch, "Account: [%d], Flags: &g%s&0\r\n", GET_ACCOUNT(k)->id, buf);
+			add_page_display(&display, "Account: [%d], Flags: &g%s&0", GET_ACCOUNT(k)->id, buf);
 		}
 		else {	// low-level imms only see certain account flags
 			sprintbit(GET_ACCOUNT(k)->flags & VISIBLE_ACCT_FLAGS, account_flags, buf, TRUE);
-			msg_to_char(ch, "Account: &g%s&0\r\n", buf);
+			add_page_display(&display, "Account: &g%s&0", buf);
 		}
 	}
 	
 	if (k->desc) {
 		// protocol info
-		msg_to_char(ch, "Connection info: Client: [%s], X-Colors: [%s\t0], MSDP: [%s\t0],\r\n", NULLSAFE(k->desc->pProtocol->pVariables[eMSDP_CLIENT_ID]->pValueString), ((k->desc->pProtocol->b256Support || k->desc->pProtocol->pVariables[eMSDP_XTERM_256_COLORS]->ValueInt) ? "\tgyes" : "\trno"), (k->desc->pProtocol->bMSDP ? "\tgyes" : "\trno"));
-		msg_to_char(ch, "   MSP: [%s\t0], MXP: [%s\t0], NAWS: [%s\t0], Screen: [%dx%d]\r\n", ((k->desc->pProtocol->bMSP || k->desc->pProtocol->pVariables[eMSDP_SOUND]->ValueInt) ? "\tgyes" : "\trno"), ((k->desc->pProtocol->bMXP || k->desc->pProtocol->pVariables[eMSDP_MXP]->ValueInt) ? "\tgyes" : "\trno"), (k->desc->pProtocol->bNAWS ? "\tgyes" : "\trno"), k->desc->pProtocol->ScreenWidth, k->desc->pProtocol->ScreenHeight);
+		add_page_display(&display, "Connection info: Client: [%s], X-Colors: [%s\t0], MSDP: [%s\t0],", NULLSAFE(k->desc->pProtocol->pVariables[eMSDP_CLIENT_ID]->pValueString), ((k->desc->pProtocol->b256Support || k->desc->pProtocol->pVariables[eMSDP_XTERM_256_COLORS]->ValueInt) ? "\tgyes" : "\trno"), (k->desc->pProtocol->bMSDP ? "\tgyes" : "\trno"));
+		add_page_display(&display, "   MSP: [%s\t0], MXP: [%s\t0], NAWS: [%s\t0], Screen: [%dx%d]", ((k->desc->pProtocol->bMSP || k->desc->pProtocol->pVariables[eMSDP_SOUND]->ValueInt) ? "\tgyes" : "\trno"), ((k->desc->pProtocol->bMXP || k->desc->pProtocol->pVariables[eMSDP_MXP]->ValueInt) ? "\tgyes" : "\trno"), (k->desc->pProtocol->bNAWS ? "\tgyes" : "\trno"), k->desc->pProtocol->ScreenWidth, k->desc->pProtocol->ScreenHeight);
 	}
 	
 	if (IS_MOB(k)) {
-		msg_to_char(ch, "Alias: &y%s&0, VNum: [&c%5d&0]\r\n", GET_PC_NAME(k), GET_MOB_VNUM(k));
-		msg_to_char(ch, "L-Des: &y%s&0%s", (GET_LONG_DESC(k) ? GET_LONG_DESC(k) : "<None>\r\n"), NULLSAFE(GET_LOOK_DESC(k)));
+		add_page_display(&display, "Alias: &y%s&0, VNum: [&c%5d&0]", GET_PC_NAME(k), GET_MOB_VNUM(k));
+		add_page_display(&display, "L-Des: &y%s&0%s", (GET_LONG_DESC(k) ? GET_LONG_DESC(k) : "<None>\r\n"), NULLSAFE(GET_LOOK_DESC(k)));
 	}
 
 	if (IS_NPC(k)) {
-		msg_to_char(ch, "Scaled level: [&c%d&0|&c%d&0-&c%d&0], Faction: [\tt%s\t0]\r\n", GET_CURRENT_SCALE_LEVEL(k), GET_MIN_SCALE_LEVEL(k), GET_MAX_SCALE_LEVEL(k), MOB_FACTION(k) ? FCT_NAME(MOB_FACTION(k)) : "none");
+		add_page_display(&display, "Scaled level: [&c%d&0|&c%d&0-&c%d&0], Faction: [\tt%s\t0]", GET_CURRENT_SCALE_LEVEL(k), GET_MIN_SCALE_LEVEL(k), GET_MAX_SCALE_LEVEL(k), MOB_FACTION(k) ? FCT_NAME(MOB_FACTION(k)) : "none");
 	}
 	else {	// not NPC
-		msg_to_char(ch, "Title: %s&0\r\n", (GET_TITLE(k) ? GET_TITLE(k) : "<None>"));
+		add_page_display(&display, "Title: %s&0", (GET_TITLE(k) ? GET_TITLE(k) : "<None>"));
 		
 		if (GET_REFERRED_BY(k) && *GET_REFERRED_BY(k)) {
-			msg_to_char(ch, "Referred by: %s\r\n", GET_REFERRED_BY(k));
+			add_page_display(&display, "Referred by: %s", GET_REFERRED_BY(k));
 		}
 		if (GET_PROMO_ID(k) > 0) {
-			msg_to_char(ch, "Promo code: %s\r\n", promo_codes[GET_PROMO_ID(k)].code);
+			add_page_display(&display, "Promo code: %s", promo_codes[GET_PROMO_ID(k)].code);
 		}
 
 		get_player_skill_string(k, lbuf, TRUE);
-		msg_to_char(ch, "Access Level: [&c%d&0], Class: [%s/&c%s&0], Skill Level: [&c%d&0], Gear Level: [&c%d&0], Total: [&c%d&0/&c%d&0]\r\n", GET_ACCESS_LEVEL(k), lbuf, class_role[(int) GET_CLASS_ROLE(k)], GET_SKILL_LEVEL(k), GET_GEAR_LEVEL(k), IN_ROOM(k) ? GET_COMPUTED_LEVEL(k) : GET_LAST_KNOWN_LEVEL(k), GET_HIGHEST_KNOWN_LEVEL(k));
+		add_page_display(&display, "Access Level: [&c%d&0], Class: [%s/&c%s&0], Skill Level: [&c%d&0], Gear Level: [&c%d&0], Total: [&c%d&0/&c%d&0]", GET_ACCESS_LEVEL(k), lbuf, class_role[(int) GET_CLASS_ROLE(k)], GET_SKILL_LEVEL(k), GET_GEAR_LEVEL(k), IN_ROOM(k) ? GET_COMPUTED_LEVEL(k) : GET_LAST_KNOWN_LEVEL(k), GET_HIGHEST_KNOWN_LEVEL(k));
 		
-		msg_to_char(ch, "Archetypes:");
+		pd = add_page_display(&display, "Archetypes:");
 		for (iter = 0, count = 0; iter < NUM_ARCHETYPE_TYPES; ++iter) {
 			if ((arch = archetype_proto(CREATION_ARCHETYPE(k, iter)))) {
-				msg_to_char(ch, "%s%s", (count++ > 0) ? ", " : " ", GET_ARCH_NAME(arch));
+				append_page_display_line(pd, "%s%s", (count++ > 0) ? ", " : " ", GET_ARCH_NAME(arch));
 			}
 		}
-		msg_to_char(ch, "%s\r\n", count ? "" : " none");
+		append_page_display_line(pd, "%s", count ? "" : " none");
 		
 		coin_string(GET_PLAYER_COINS(k), buf);
-		msg_to_char(ch, "Coins: %s\r\n", buf);
+		add_page_display(&display, "Coins: %s", buf);
 
 		strcpy(buf1, (char *) asctime(localtime(&(k->player.time.birth))));
 		strcpy(buf2, buf1 + 20);
 		buf1[10] = '\0';	// DoW Mon Day
 		buf2[4] = '\0';	// get only year
 
-		msg_to_char(ch, "Created: [%s, %s], Played [%dh %dm], Age [%d]\r\n", buf1, buf2, k->player.time.played / SECS_PER_REAL_HOUR, ((k->player.time.played % SECS_PER_REAL_HOUR) / SECS_PER_REAL_MIN), age(k)->year);
+		add_page_display(&display, "Created: [%s, %s], Played [%dh %dm], Age [%d]", buf1, buf2, k->player.time.played / SECS_PER_REAL_HOUR, ((k->player.time.played % SECS_PER_REAL_HOUR) / SECS_PER_REAL_MIN), age(k)->year);
 		if (get_highest_access_level(GET_ACCOUNT(k)) <= GET_ACCESS_LEVEL(ch) && GET_ACCESS_LEVEL(ch) >= LVL_TO_SEE_ACCOUNTS) {
-			msg_to_char(ch, "Created from host: [%s]\r\n", NULLSAFE(GET_CREATION_HOST(k)));
+			add_page_display(&display, "Created from host: [%s]", NULLSAFE(GET_CREATION_HOST(k)));
 		}
 		
 		if (GET_ACCESS_LEVEL(k) >= LVL_BUILDER) {
 			sprintbit(GET_OLC_FLAGS(k), olc_flag_bits, buf, TRUE);
-			msg_to_char(ch, "OLC Vnums: [&c%d-%d&0], Flags: &g%s&0\r\n", GET_OLC_MIN_VNUM(k), GET_OLC_MAX_VNUM(k), buf);
+			add_page_display(&display, "OLC Vnums: [&c%d-%d&0], Flags: &g%s&0", GET_OLC_MIN_VNUM(k), GET_OLC_MAX_VNUM(k), buf);
 		}
 	}
 
 	if (!IS_NPC(k) || GET_CURRENT_SCALE_LEVEL(k) > 0) {
-		msg_to_char(ch, "Health: [&g%d&0/&g%d&0]  Move: [&g%d&0/&g%d&0]  Mana: [&g%d&0/&g%d&0]  Blood: [&g%d&0/&g%d&0]\r\n", GET_HEALTH(k), GET_MAX_HEALTH(k), GET_MOVE(k), GET_MAX_MOVE(k), GET_MANA(k), GET_MAX_MANA(k), GET_BLOOD(k), GET_MAX_BLOOD(k));
+		add_page_display(&display, "Health: [&g%d&0/&g%d&0]  Move: [&g%d&0/&g%d&0]  Mana: [&g%d&0/&g%d&0]  Blood: [&g%d&0/&g%d&0]", GET_HEALTH(k), GET_MAX_HEALTH(k), GET_MOVE(k), GET_MAX_MOVE(k), GET_MANA(k), GET_MAX_MANA(k), GET_BLOOD(k), GET_MAX_BLOOD(k));
 
-		display_attributes(k, ch);
+		add_page_display_str(&display, display_attributes(k));
 
 		// dex is removed from dodge to make it easier to compare to caps
 		val = get_dodge_modifier(k, NULL, FALSE) - (hit_per_dex * GET_DEXTERITY(k));;
@@ -3462,106 +3464,109 @@ void do_stat_character(char_data *ch, char_data *k, bool details) {
 		sprintf(lbuf2, "Block  [%s%d&0]", HAPPY_COLOR(val, 0), val);
 		
 		sprintf(lbuf3, "Resist  [%d|%d]", GET_RESIST_PHYSICAL(k), GET_RESIST_MAGICAL(k));
-		msg_to_char(ch, "  %-28.28s %-28.28s %-28.28s\r\n", lbuf, lbuf2, lbuf3);
+		add_page_display(&display, "  %-28.28s %-28.28s %-28.28s", lbuf, lbuf2, lbuf3);
 	
 		sprintf(lbuf, "Physical  [%s%+d&0]", HAPPY_COLOR(GET_BONUS_PHYSICAL(k), 0), GET_BONUS_PHYSICAL(k));
 		sprintf(lbuf2, "Magical  [%s%+d&0]", HAPPY_COLOR(GET_BONUS_MAGICAL(k), 0), GET_BONUS_MAGICAL(k));
 		sprintf(lbuf3, "Healing  [%s%+d&0]", HAPPY_COLOR(GET_BONUS_HEALING(k), 0), GET_BONUS_HEALING(k));
-		msg_to_char(ch, "  %-28.28s %-28.28s %-28.28s\r\n", lbuf, lbuf2, lbuf3);
+		add_page_display(&display, "  %-28.28s %-28.28s %-28.28s", lbuf, lbuf2, lbuf3);
 
 		// dex is removed from to-hit to make it easier to compare to caps
 		val = get_to_hit(k, NULL, FALSE, FALSE) - (hit_per_dex * GET_DEXTERITY(k));;
 		sprintf(lbuf, "To-hit  [%s%d&0]", HAPPY_COLOR(val, base_hit_chance), val);
 		sprintf(lbuf2, "Speed  [&0%.2f&0]", get_combat_speed(k, WEAR_WIELD));
 		sprintf(lbuf3, "Crafting  [%s%d&0]", HAPPY_COLOR(get_crafting_level(k), IS_NPC(k) ? get_approximate_level(k) : GET_SKILL_LEVEL(k)), get_crafting_level(k));
-		msg_to_char(ch, "  %-28.28s %-28.28s %-28.28s\r\n", lbuf, lbuf2, lbuf3);
+		add_page_display(&display, "  %-28.28s %-28.28s %-28.28s", lbuf, lbuf2, lbuf3);
 		
 		if (IS_NPC(k)) {
 			sprintf(lbuf, "Mob-dmg  [%d]", MOB_DAMAGE(k));
 			sprintf(lbuf2, "Mob-hit  [%d]", MOB_TO_HIT(k));
 			sprintf(lbuf3, "Mob-dodge  [%d]", MOB_TO_DODGE(k));
-			msg_to_char(ch, "  %-24.24s %-24.24s %-24.24s\r\n", lbuf, lbuf2, lbuf3);
+			add_page_display(&display, "  %-24.24s %-24.24s %-24.24s", lbuf, lbuf2, lbuf3);
 			
-			msg_to_char(ch, "NPC Bare Hand Dam: %d\r\n", MOB_DAMAGE(k));
+			add_page_display(&display, "NPC Bare Hand Dam: %d", MOB_DAMAGE(k));
 		}
 	}
 
 	sprinttype(GET_POS(k), position_types, buf2, sizeof(buf2), "UNDEFINED");
-	sprintf(buf, "Pos: %s, Fighting: %s", buf2, (FIGHTING(k) ? GET_NAME(FIGHTING(k)) : "Nobody"));
+	pd = add_page_display(&display, "Pos: %s, Fighting: %s", buf2, (FIGHTING(k) ? GET_NAME(FIGHTING(k)) : "Nobody"));
 
 	if (IS_NPC(k)) {
-		sprintf(buf + strlen(buf), ", Attack: %d %s, Move: %s, Size: %s", MOB_ATTACK_TYPE(k), get_attack_name_by_vnum(MOB_ATTACK_TYPE(k)), mob_move_types[(int)MOB_MOVE_TYPE(k)], size_types[GET_SIZE(k)]);
+		append_page_display_line(pd, ", Attack: %d %s, Move: %s, Size: %s", MOB_ATTACK_TYPE(k), get_attack_name_by_vnum(MOB_ATTACK_TYPE(k)), mob_move_types[(int)MOB_MOVE_TYPE(k)], size_types[GET_SIZE(k)]);
 	}
 	if (k->desc) {
 		sprinttype(STATE(k->desc), connected_types, buf2, sizeof(buf2), "UNDEFINED");
-		strcat(buf, ", Connected: ");
-		strcat(buf, buf2);
+		append_page_display_line(pd, ", Connected: %s", buf2);
 	}
-	send_to_char(strcat(buf, "\r\n"), ch);
 
 	if (IS_NPC(k)) {
 		sprintbit(MOB_FLAGS(k), action_bits, buf2, TRUE);
-		msg_to_char(ch, "NPC flags: &c%s&0\r\n", buf2);
-		msg_to_char(ch, "Nameset: \ty%s\t0, Language: [\tc%d\t0] \ty%s\t0\r\n", name_sets[MOB_NAME_SET(k)], MOB_LANGUAGE(k), get_generic_name_by_vnum(MOB_LANGUAGE(k)));
+		add_page_display(&display, "NPC flags: &c%s&0", buf2);
+		add_page_display(&display, "Nameset: \ty%s\t0, Language: [\tc%d\t0] \ty%s\t0", name_sets[MOB_NAME_SET(k)], MOB_LANGUAGE(k), get_generic_name_by_vnum(MOB_LANGUAGE(k)));
 	}
 	else {
-		msg_to_char(ch, "Idle Timer (minutes) [\tg%.1f\t0], View Height: [\tg%d\t0]\r\n", GET_IDLE_SECONDS(k) / (double) SECS_PER_REAL_MIN, get_view_height(k, IN_ROOM(k)));
+		add_page_display(&display, "Idle Timer (minutes) [\tg%.1f\t0], View Height: [\tg%d\t0]", GET_IDLE_SECONDS(k) / (double) SECS_PER_REAL_MIN, get_view_height(k, IN_ROOM(k)));
+		
 		sprintbit(PLR_FLAGS(k), player_bits, buf2, TRUE);
-		msg_to_char(ch, "PLR: &c%s&0\r\n", buf2);
+		add_page_display(&display, "PLR: &c%s&0", buf2);
+		
 		sprintbit(PRF_FLAGS(k), preference_bits, buf2, TRUE);
-		msg_to_char(ch, "PRF: &g%s&0\r\n", buf2);
+		add_page_display(&display, "PRF: &g%s&0", buf2);
+		
 		sprintbit(GET_BONUS_TRAITS(k), bonus_bits, buf2, TRUE);
-		msg_to_char(ch, "BONUS: &c%s&0\r\n", buf2);
+		add_page_display(&display, "BONUS: &c%s&0", buf2);
+		
 		prettier_sprintbit(GET_GRANT_FLAGS(k), grant_bits, buf2);
-		msg_to_char(ch, "GRANTS: &g%s&0\r\n", buf2);
+		add_page_display(&display, "GRANTS: &g%s&0", buf2);
+		
 		sprintbit(SYSLOG_FLAGS(k), syslog_types, buf2, TRUE);
-		msg_to_char(ch, "SYSLOGS: &c%s&0\r\n", buf2);
+		add_page_display(&display, "SYSLOGS: &c%s&0", buf2);
 	}
 
 	if (!is_proto) {
-		sprintf(buf, "Carried items: %d/%d; ", IS_CARRYING_N(k), CAN_CARRY_N(k));
+		pd = add_page_display(&display, "Carried items: %d/%d; ", IS_CARRYING_N(k), CAN_CARRY_N(k));
 		DL_COUNT2(k->carrying, j, i, next_content);	// TODO these var names are absurd
-		sprintf(buf + strlen(buf), "Items in: inventory: %d, ", i);
+		append_page_display_line(pd, "Items in: inventory: %d, ", i);
 
-		for (i = 0, i2 = 0; i < NUM_WEARS; i++)
-			if (GET_EQ(k, i))
+		for (i = 0, i2 = 0; i < NUM_WEARS; i++) {
+			if (GET_EQ(k, i)) {
 				i2++;
-		sprintf(buf2, "eq: %d\r\n", i2);
-		send_to_char(strcat(buf, buf2), ch);
+			}
+		}
+		append_page_display_line(pd, "eq: %d", i2);
 	}
 
 	if (IS_NPC(k) && k->interactions) {
-		send_to_char("Interactions:\r\n", ch);
 		get_interaction_display(k->interactions, buf);
-		send_to_char(buf, ch);
+		add_page_display(&display, "Interactions:\r\n%s", buf);
 	}
 	
 	if (MOB_CUSTOM_MSGS(k)) {
 		struct custom_message *mcm;
 		
 		if (details) {
-			msg_to_char(ch, "Custom messages:\r\n");
+			add_page_display(&display, "Custom messages:");
 			LL_FOREACH(MOB_CUSTOM_MSGS(k), mcm) {
-				msg_to_char(ch, " %s: %s\r\n", mob_custom_types[mcm->type], mcm->msg);
+				add_page_display(&display, " %s: %s", mob_custom_types[mcm->type], mcm->msg);
 			}
 		}
 		else {
 			LL_COUNT(MOB_CUSTOM_MSGS(k), mcm, count);
-			msg_to_char(ch, "Custom messages: %d\r\n", count);
+			add_page_display(&display, "Custom messages: %d", count);
 		}
 	}
 
 	if (!IS_NPC(k)) {
-		msg_to_char(ch, "Hunger: %d, Thirst: %d, Drunk: %d\r\n", GET_COND(k, FULL), GET_COND(k, THIRST), GET_COND(k, DRUNK));
-		msg_to_char(ch, "Temperature: %d (%s), Warmth: %d, Cooling: %d\r\n", get_relative_temperature(k), temperature_to_string(get_relative_temperature(k)), GET_WARMTH(k), GET_COOLING(k));
-		msg_to_char(ch, "Speaking: %s, Recent deaths: %d\r\n", get_generic_name_by_vnum(GET_SPEAKING(k)), GET_RECENT_DEATH_COUNT(k));
+		add_page_display(&display, "Hunger: %d, Thirst: %d, Drunk: %d", GET_COND(k, FULL), GET_COND(k, THIRST), GET_COND(k, DRUNK));
+		add_page_display(&display, "Temperature: %d (%s), Warmth: %d, Cooling: %d", get_relative_temperature(k), temperature_to_string(get_relative_temperature(k)), GET_WARMTH(k), GET_COOLING(k));
+		add_page_display(&display, "Speaking: %s, Recent deaths: %d", get_generic_name_by_vnum(GET_SPEAKING(k)), GET_RECENT_DEATH_COUNT(k));
 	}
 	
 	if (IS_MORPHED(k)) {
-		msg_to_char(ch, "Morphed into: %d - %s\r\n", MORPH_VNUM(GET_MORPH(k)), get_morph_desc(k, FALSE));
+		add_page_display(&display, "Morphed into: %d - %s", MORPH_VNUM(GET_MORPH(k)), get_morph_desc(k, FALSE));
 	}
 	if (IS_DISGUISED(k)) {
-		msg_to_char(ch, "Disguised as: %s\r\n", GET_DISGUISED_NAME(k));
+		add_page_display(&display, "Disguised as: %s", GET_DISGUISED_NAME(k));
 	}
 
 	if (!is_proto) {
@@ -3570,40 +3575,44 @@ void do_stat_character(char_data *ch, char_data *k, bool details) {
 			sprintf(buf2, "%s %s", found++ ? "," : "", PERS(fol->follower, ch, 1));
 			strcat(buf, buf2);
 			if (strlen(buf) >= 62) {
-				if (fol->next)
-					send_to_char(strcat(buf, ",\r\n"), ch);
-				else
-					send_to_char(strcat(buf, "\r\n"), ch);
+				if (fol->next) {
+					add_page_display(&display, "%s,", buf);
+				}
+				else {
+					add_page_display_str(&display, buf);
+				}
 				*buf = found = 0;
 			}
 		}
 
 		if (*buf) {
-			send_to_char(strcat(buf, "\r\n"), ch);
+			add_page_display_str(&display, buf);
 		}
 	}
 
 	// cooldowns
 	if (k->cooldowns) {
 		found = FALSE;
-		msg_to_char(ch, "Cooldowns: ");
+		pd = add_page_display(&display, "Cooldowns: ");
 		
 		for (cool = k->cooldowns; cool; cool = cool->next) {
 			diff = cool->expire_time - time(0);
 			
 			if (diff > 0) {
-				msg_to_char(ch, "%s&c%s&0 %s", (found ? ", ": ""), get_generic_name_by_vnum(cool->type), colon_time(diff, FALSE, NULL));
+				append_page_display_line(pd, "%s&c%s&0 %s", (found ? ", ": ""), get_generic_name_by_vnum(cool->type), colon_time(diff, FALSE, NULL));
 				
 				found = TRUE;
 			}
 		}
 		
-		msg_to_char(ch, "%s\r\n", (found ? "" : "none"));
+		if (!found) {
+			append_page_display_line(pd, "none");
+		}
 	}
 
 	/* Showing the bitvector */
 	sprintbit(AFF_FLAGS(k), affected_bits, buf2, TRUE);
-	msg_to_char(ch, "AFF: &c%s&0\r\n", buf2);
+	add_page_display(&display, "AFF: &c%s&0", buf2);
 
 	/* Routine to show what spells a char is affected by */
 	if (k->affected) {
@@ -3638,13 +3647,13 @@ void do_stat_character(char_data *ch, char_data *k, bool details) {
 				sprintbit(aff->bitvector, affected_bits, buf2, TRUE);
 				strcat(buf, buf2);
 			}
-			send_to_char(strcat(buf, "\r\n"), ch);
+			add_page_display_str(&display, buf);
 		}
 	}
 	
 	// dots
 	for (dot = k->over_time_effects; dot; dot = dot->next) {
-		msg_to_char(ch, "TYPE: (%s) &r%s&0 %d %s damage (%d/%d)\r\n", colon_time(dot->time_remaining, FALSE, NULL), get_generic_name_by_vnum(dot->type), dot->damage * dot->stack, damage_types[dot->damage_type], dot->stack, dot->max_stack);
+		add_page_display(&display, "TYPE: (%s) &r%s&0 %d %s damage (%d/%d)", colon_time(dot->time_remaining, FALSE, NULL), get_generic_name_by_vnum(dot->type), dot->damage * dot->stack, damage_types[dot->damage_type], dot->stack, dot->max_stack);
 	}
 
 	/* check mobiles for a script */
@@ -3652,18 +3661,18 @@ void do_stat_character(char_data *ch, char_data *k, bool details) {
 		do_sstat_character(ch, k);
 		if (SCRIPT_MEM(k)) {
 			mem = SCRIPT_MEM(k);
-			msg_to_char(ch, "Script memory:\r\n  Remember             Command\r\n");
+			add_page_display_str(&display, "Script memory:\r\n  Remember             Command");
 			while (mem) {
 				char_data *mc = find_char(mem->id);
 				if (!mc) {
-					msg_to_char(ch, "  ** Corrupted!\r\n");
+					add_page_display(&display, "  ** Corrupted!");
 				}
 				else {
 					if (mem->cmd) {
-						msg_to_char(ch, "  %-20.20s%s\r\n", PERS(mc, mc, TRUE), mem->cmd);
+						add_page_display(&display, "  %-20.20s%s", PERS(mc, mc, TRUE), mem->cmd);
 					}
 					else {
-						msg_to_char(ch, "  %-20.20s <default>\r\n", PERS(mc, mc, TRUE));
+						add_page_display(&display, "  %-20.20s <default>", PERS(mc, mc, TRUE));
 					}
 				}
 				
@@ -3671,6 +3680,9 @@ void do_stat_character(char_data *ch, char_data *k, bool details) {
 			}
 		}
 	}
+	
+	page_display_to_char(ch, display);
+	free_page_display(&display);
 }
 
 

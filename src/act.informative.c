@@ -869,26 +869,30 @@ void diag_char_to_char(char_data *i, char_data *ch) {
 * Standard attributes display (used on score and stat).
 *
 * @param char_data *ch The person whose attributes to show.
-* @param char_data *to The person to show them to.
+* @return char* The attribute display.
 */
-void display_attributes(char_data *ch, char_data *to) {
+char *display_attributes(char_data *ch) {
+	static char output[MAX_STRING_LENGTH];
 	char buf[MAX_STRING_LENGTH];
 	int iter, pos;
+	size_t size;
 
-	if (!ch || !to || !to->desc) {
-		return;
+	if (!ch) {
+		return "";
 	}
 	
-	msg_to_char(to, "        Physical                   Social                      Mental\r\n");
+	size = snprintf(output, sizeof(output), "        Physical                   Social                      Mental\r\n");
 	
 	for (iter = 0; iter < NUM_ATTRIBUTES; ++iter) {
 		pos = attribute_display_order[iter];
 		snprintf(buf, sizeof(buf), "%s  [%s%2d\t0]", attributes[pos].name, HAPPY_COLOR(GET_ATT(ch, pos), GET_REAL_ATT(ch, pos)), GET_ATT(ch, pos));
-		msg_to_char(to, "  %-*.*s%s", 23 + color_code_length(buf), 23 + color_code_length(buf), buf, !((iter + 1) % 3) ? "\r\n" : "");
+		size += snprintf(output + size, sizeof(output) - size, "  %-*.*s%s", 23 + color_code_length(buf), 23 + color_code_length(buf), buf, !((iter + 1) % 3) ? "\r\n" : "");
 	}
-	if (iter % 3) {
-		msg_to_char(to, "\r\n");
+	if (iter % 3 && size + 2 < sizeof(output)) {
+		strcat(output, "\r\n");
 	}
+	
+	return output;
 }
 
 
@@ -994,7 +998,7 @@ void display_score_to_char(char_data *ch, char_data *to) {
 	}
 	
 	msg_to_char(to, " +------------------------------- Attributes --------------------------------+\r\n");
-	display_attributes(ch, to);
+	send_to_char(display_attributes(ch), to);
 
 	// secondary attributes
 	msg_to_char(to, " +---------------------------------------------------------------------------+\r\n");
