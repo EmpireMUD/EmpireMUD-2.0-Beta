@@ -3107,6 +3107,55 @@ void show_spawn_summary_to_char(char_data *ch, struct spawn_info *list) {
 
 
 /**
+* Shows summarized spawn info for any spawn_info list to the character, only
+* if there is something to show. No output is shown if there are no spawns.
+*
+* @param struct page_display **display The page display to append the spawn summary to.
+* @param struct spawn_info *list Any list of spawn_info.
+*/
+void show_spawn_summary_display(struct page_display **display, struct spawn_info *list) {
+	bool any;
+	char line[MAX_STRING_LENGTH], entry[MAX_INPUT_LENGTH], flg[MAX_INPUT_LENGTH];
+	struct spawn_info *spawn;
+	
+	if (!display || !list) {
+		return;	// nothing to show
+	}
+	
+	add_page_display_str(display, "Spawn info:");
+	
+	// spawns?
+	any = FALSE;
+	*line = '\0';
+	for (spawn = list; spawn; spawn = spawn->next) {
+		if (spawn->flags) {
+			sprintbit(spawn->flags, spawn_flags_short, flg, TRUE);
+			flg[strlen(flg) - 1] = '\0';	// removes the trailing space
+			sprintf(entry, " %s (%d) %.2f%% %s", skip_filler(get_mob_name_by_proto(spawn->vnum, FALSE)), spawn->vnum, spawn->percent, flg);
+		}
+		else {
+			// no flags
+			sprintf(entry, " %s (%d) %.2f%%", skip_filler(get_mob_name_by_proto(spawn->vnum, FALSE)), spawn->vnum, spawn->percent);
+		}
+		
+		if (any) {
+			strcat(line, ",");
+		}
+		if (strlen(line) + strlen(entry) > 78) {
+			add_page_display_str(display, line);
+			*line = '\0';
+		}
+		strcat(line, entry);
+	}
+	
+	// anything left in the line?
+	if (*line) {
+		add_page_display_str(display, line);
+	}
+}
+
+
+/**
 * @param char_data *ch The player requesting stats.
 * @param adv_data *adv The adventure to display.
 */
@@ -3212,58 +3261,58 @@ void do_stat_book(char_data *ch, book_data *book) {
 */
 void do_stat_building(char_data *ch, bld_data *bdg, bool details) {
 	char lbuf[MAX_STRING_LENGTH];
+	struct page_display *display = NULL, *pd;
 	
-	msg_to_char(ch, "Building VNum: [&c%d&0], Name: '&c%s&0'\r\n", GET_BLD_VNUM(bdg), GET_BLD_NAME(bdg));
+	add_page_display(&display, "Building VNum: [&c%d&0], Name: '&c%s&0'", GET_BLD_VNUM(bdg), GET_BLD_NAME(bdg));
 	
-	msg_to_char(ch, "Room Title: %s\r\n", GET_BLD_TITLE(bdg));
+	add_page_display(&display, "Room Title: %s", GET_BLD_TITLE(bdg));
 	
 	// icon line
-	msg_to_char(ch, "Icon: %s&0", GET_BLD_ICON(bdg) ? one_icon_display(GET_BLD_ICON(bdg), NULL) : "none");
+	pd = add_page_display(&display, "Icon: %s&0", GET_BLD_ICON(bdg) ? one_icon_display(GET_BLD_ICON(bdg), NULL) : "none");
 	if (GET_BLD_HALF_ICON(bdg)) {
-		msg_to_char(ch, "  Half Icon: %s&0", GET_BLD_HALF_ICON(bdg) ? one_icon_display(GET_BLD_HALF_ICON(bdg), NULL) : "none");
+		append_page_display_line(pd, "  Half Icon: %s&0", GET_BLD_HALF_ICON(bdg) ? one_icon_display(GET_BLD_HALF_ICON(bdg), NULL) : "none");
 	}
 	if (GET_BLD_QUARTER_ICON(bdg)) {
-		msg_to_char(ch, "  Quarter Icon: %s&0", GET_BLD_QUARTER_ICON(bdg) ? one_icon_display(GET_BLD_QUARTER_ICON(bdg), NULL) : "none");
+		append_page_display_line(pd, "  Quarter Icon: %s&0", GET_BLD_QUARTER_ICON(bdg) ? one_icon_display(GET_BLD_QUARTER_ICON(bdg), NULL) : "none");
 	}
-	msg_to_char(ch, "\r\n");
 	
 	if (GET_BLD_DESC(bdg) && *GET_BLD_DESC(bdg)) {
-		msg_to_char(ch, "Description:\r\n%s", GET_BLD_DESC(bdg));
+		add_page_display(&display, "Description:\r\n%s", GET_BLD_DESC(bdg));
 	}
 	
 	if (GET_BLD_COMMANDS(bdg) && *GET_BLD_COMMANDS(bdg)) {
-		msg_to_char(ch, "Command list: &c%s&0\r\n", GET_BLD_COMMANDS(bdg));
+		add_page_display(&display, "Command list: &c%s&0", GET_BLD_COMMANDS(bdg));
 	}
 	
-	msg_to_char(ch, "Hitpoints: [&g%d&0], Fame: [&g%d&0], Extra Rooms: [&g%d&0], Height: [&g%d&0]\r\n", GET_BLD_MAX_DAMAGE(bdg), GET_BLD_FAME(bdg), GET_BLD_EXTRA_ROOMS(bdg), GET_BLD_HEIGHT(bdg));
-	msg_to_char(ch, "Citizens: [&g%d&0], Military: [&g%d&0], Artisan: [&g%d&0] &c%s&0\r\n", GET_BLD_CITIZENS(bdg), GET_BLD_MILITARY(bdg), GET_BLD_ARTISAN(bdg), GET_BLD_ARTISAN(bdg) != NOTHING ? get_mob_name_by_proto(GET_BLD_ARTISAN(bdg), FALSE) : "none");
+	add_page_display(&display, "Hitpoints: [&g%d&0], Fame: [&g%d&0], Extra Rooms: [&g%d&0], Height: [&g%d&0]", GET_BLD_MAX_DAMAGE(bdg), GET_BLD_FAME(bdg), GET_BLD_EXTRA_ROOMS(bdg), GET_BLD_HEIGHT(bdg));
+	add_page_display(&display, "Citizens: [&g%d&0], Military: [&g%d&0], Artisan: [&g%d&0] &c%s&0", GET_BLD_CITIZENS(bdg), GET_BLD_MILITARY(bdg), GET_BLD_ARTISAN(bdg), GET_BLD_ARTISAN(bdg) != NOTHING ? get_mob_name_by_proto(GET_BLD_ARTISAN(bdg), FALSE) : "none");
 	
 	if (GET_BLD_RELATIONS(bdg)) {
 		get_bld_relations_display(GET_BLD_RELATIONS(bdg), lbuf);
-		msg_to_char(ch, "Relations:\r\n%s", lbuf);
+		add_page_display(&display, "Relations:\r\n%s", lbuf);
 	}
 	
 	sprintbit(GET_BLD_FLAGS(bdg), bld_flags, buf, TRUE);
-	msg_to_char(ch, "Building flags: &c%s&0\r\n", buf);
+	add_page_display(&display, "Building flags: &c%s&0", buf);
 	
 	sprintbit(GET_BLD_FUNCTIONS(bdg), function_flags, buf, TRUE);
-	msg_to_char(ch, "Functions: &g%s&0\r\n", buf);
+	add_page_display(&display, "Functions: &g%s&0", buf);
 	
 	sprintbit(GET_BLD_DESIGNATE_FLAGS(bdg), designate_flags, buf, TRUE);
-	msg_to_char(ch, "Designate flags: &c%s&0\r\n", buf);
+	add_page_display(&display, "Designate flags: &c%s&0", buf);
 	
 	sprintbit(GET_BLD_BASE_AFFECTS(bdg), room_aff_bits, buf, TRUE);
-	msg_to_char(ch, "Base affects: &g%s&0\r\n", buf);
+	add_page_display(&display, "Base affects: &g%s&0", buf);
 	
-	msg_to_char(ch, "Temperature: [\tc%s\t0]\r\n", temperature_types[GET_BLD_TEMPERATURE_TYPE(bdg)]);
+	add_page_display(&display, "Temperature: [\tc%s\t0]", temperature_types[GET_BLD_TEMPERATURE_TYPE(bdg)]);
 	
 	if (GET_BLD_EX_DESCS(bdg)) {
 		struct extra_descr_data *desc;
 		
 		if (details) {
-			msg_to_char(ch, "Extra descs:\r\n");
+			add_page_display_str(&display, "Extra descs:");
 			LL_FOREACH(GET_BLD_EX_DESCS(bdg), desc) {
-				msg_to_char(ch, "[ &c%s&0 ]\r\n%s", desc->keyword, desc->description);
+				add_page_display(&display, "[ &c%s&0 ]\r\n%s", desc->keyword, desc->description);
 			}
 		}
 		else {
@@ -3272,25 +3321,34 @@ void do_stat_building(char_data *ch, bld_data *bdg, bool details) {
 				strcat(buf, " ");
 				strcat(buf, desc->keyword);
 			}
-			msg_to_char(ch, "%s&0\r\n", buf);
+			strcat(buf, "&0");
+			add_page_display_str(&display, buf);
 		}
 	}
 	
 	if (GET_BLD_INTERACTIONS(bdg)) {
-		send_to_char("Interactions:\r\n", ch);
+		add_page_display_str(&display, "Interactions:");
 		get_interaction_display(GET_BLD_INTERACTIONS(bdg), buf);
-		send_to_char(buf, ch);
+		add_page_display_str(&display, buf);
 	}
 	
 	if (GET_BLD_REGULAR_MAINTENANCE(bdg)) {
 		get_resource_display(ch, GET_BLD_REGULAR_MAINTENANCE(bdg), buf);
-		msg_to_char(ch, "Regular maintenance:\r\n%s", buf);
+		add_page_display(&display, "Regular maintenance:\r\n%s", buf);
 	}
 	
-	get_script_display(GET_BLD_SCRIPTS(bdg), lbuf);
-	msg_to_char(ch, "Scripts:\r\n%s", lbuf);
+	if (GET_BLD_SCRIPTS(bdg)) {
+		get_script_display(GET_BLD_SCRIPTS(bdg), lbuf);
+		add_page_display(&display, "Scripts:\r\n%s", lbuf);
+	}
+	else {
+		add_page_display_str(&display, "Scripts: none");
+	}
 	
-	show_spawn_summary_to_char(ch, GET_BLD_SPAWNS(bdg));
+	show_spawn_summary_display(&display, GET_BLD_SPAWNS(bdg));
+	
+	page_display_to_char(ch, display);
+	free_page_display(&display);
 }
 
 
