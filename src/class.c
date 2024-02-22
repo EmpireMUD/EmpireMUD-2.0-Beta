@@ -1246,28 +1246,29 @@ class_data *setup_olc_class(class_data *input) {
 * @param class_data *cls The class to display.
 */
 void do_stat_class(char_data *ch, class_data *cls) {
-	char buf[MAX_STRING_LENGTH], part[MAX_STRING_LENGTH];
-	size_t size;
+	char part[MAX_STRING_LENGTH];
+	struct page_display *display = NULL;
 	
 	if (!cls) {
 		return;
 	}
 	
 	// first line
-	size = snprintf(buf, sizeof(buf), "VNum: [\tc%d\t0], Name: \tc%s\t0, Abbrev: [\tc%s\t0]\r\n", CLASS_VNUM(cls), CLASS_NAME(cls), CLASS_ABBREV(cls));
+	add_page_display(&display, "VNum: [\tc%d\t0], Name: \tc%s\t0, Abbrev: [\tc%s\t0]", CLASS_VNUM(cls), CLASS_NAME(cls), CLASS_ABBREV(cls));
 	
-	size += snprintf(buf + size, sizeof(buf) - size, "Health: [\tg%d\t0], Moves: [\tg%d\t0], Mana: [\tg%d\t0]\r\n", CLASS_POOL(cls, HEALTH), CLASS_POOL(cls, MOVE), CLASS_POOL(cls, MANA));
+	add_page_display(&display, "Health: [\tg%d\t0], Moves: [\tg%d\t0], Mana: [\tg%d\t0]", CLASS_POOL(cls, HEALTH), CLASS_POOL(cls, MOVE), CLASS_POOL(cls, MANA));
 	
 	sprintbit(CLASS_FLAGS(cls), class_flags, part, TRUE);
-	size += snprintf(buf + size, sizeof(buf) - size, "Flags: \tg%s\t0\r\n", part);
+	add_page_display(&display, "Flags: \tg%s\t0", part);
 	
 	get_class_skill_display(CLASS_SKILL_REQUIREMENTS(cls), part, FALSE);
-	size += snprintf(buf + size, sizeof(buf) - size, "Skills required:\r\n%s", part);
+	add_page_display(&display, "Skills required:\r\n%s", part);
 	
 	get_class_ability_display(CLASS_ABILITIES(cls), part, NULL);
-	size += snprintf(buf + size, sizeof(buf) - size, "Roles and abilities:\r\n%s%s", part, *part ? "\r\n" : " none\r\n");
+	add_page_display(&display, "Roles and abilities:\r\n%s%s", part, *part ? "\r\n" : " none\r\n");
 
-	page_string(ch->desc, buf, TRUE);
+	page_display_to_char(ch, display);
+	free_page_display(&display);
 }
 
 
