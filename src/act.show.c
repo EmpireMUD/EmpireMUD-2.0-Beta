@@ -756,6 +756,7 @@ SHOW(show_currency) {
 		send_to_char("Show currency: There is no such player.\r\n", ch);
 	}
 	else {
+		check_delayed_load(plr);
 		coin_string(GET_PLAYER_COINS(plr), line);
 		add_page_display(ch, "%s has %s.", GET_NAME(plr), line);
 	
