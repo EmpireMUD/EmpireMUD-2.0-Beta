@@ -992,7 +992,7 @@ void send_page_display(char_data *ch) {
 			one = page_display_column_width(ch, pd->cols);
 			clen = color_code_length(pd->text);
 			if (one <= 0) {
-				one = pd->length;
+				one = pd->length + clen;
 			}
 			else if (pd->length - clen > one) {
 				// ensure room for wide columns
@@ -1000,7 +1000,7 @@ void send_page_display(char_data *ch) {
 				one += clen;
 			}
 			else {
-				one = MAX(one, pd->length);
+				one = MAX(one, pd->length) + clen;
 			}
 		}
 		else {
