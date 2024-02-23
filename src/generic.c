@@ -2056,74 +2056,72 @@ void do_stat_generic(char_data *ch, generic_data *gen) {
 */
 void olc_show_generic(char_data *ch) {
 	generic_data *gen = GET_OLC_GENERIC(ch->desc);
-	char buf[MAX_STRING_LENGTH], lbuf[MAX_STRING_LENGTH];
+	char lbuf[MAX_STRING_LENGTH];
 	
 	if (!gen) {
 		return;
 	}
 	
-	*buf = '\0';
-	
-	sprintf(buf + strlen(buf), "[%s%d\t0] %s%s\t0\r\n", OLC_LABEL_CHANGED, GET_OLC_VNUM(ch->desc), OLC_LABEL_UNCHANGED, !real_generic(GEN_VNUM(gen)) ? "new generic" : GEN_NAME(real_generic(GEN_VNUM(gen))));
-	sprintf(buf + strlen(buf), "<%sname\t0> %s\r\n", OLC_LABEL_STR(GEN_NAME(gen), default_generic_name), NULLSAFE(GEN_NAME(gen)));
-	sprintf(buf + strlen(buf), "<%stype\t0> %s\r\n", OLC_LABEL_VAL(GEN_TYPE(gen), 0), generic_types[GEN_TYPE(gen)]);
+	add_page_display(ch, "[%s%d\t0] %s%s\t0", OLC_LABEL_CHANGED, GET_OLC_VNUM(ch->desc), OLC_LABEL_UNCHANGED, !real_generic(GEN_VNUM(gen)) ? "new generic" : GEN_NAME(real_generic(GEN_VNUM(gen))));
+	add_page_display(ch, "<%sname\t0> %s", OLC_LABEL_STR(GEN_NAME(gen), default_generic_name), NULLSAFE(GEN_NAME(gen)));
+	add_page_display(ch, "<%stype\t0> %s", OLC_LABEL_VAL(GEN_TYPE(gen), 0), generic_types[GEN_TYPE(gen)]);
 	
 	sprintbit(GEN_FLAGS(gen), generic_flags, lbuf, TRUE);
-	sprintf(buf + strlen(buf), "<%sflags\t0> %s\r\n", OLC_LABEL_VAL(GEN_FLAGS(gen), NOBITS), lbuf);
+	add_page_display(ch, "<%sflags\t0> %s", OLC_LABEL_VAL(GEN_FLAGS(gen), NOBITS), lbuf);
 	
 	// GENERIC_x
 	switch (GEN_TYPE(gen)) {
 		case GENERIC_LIQUID: {
-			sprintf(buf + strlen(buf), "<%sliquid\t0> %s\r\n", OLC_LABEL_STR(GET_LIQUID_NAME(gen), ""), GET_LIQUID_NAME(gen) ? GET_LIQUID_NAME(gen) : "(none)");
-			sprintf(buf + strlen(buf), "<%scolor\t0> %s\r\n", OLC_LABEL_STR(GET_LIQUID_COLOR(gen), ""), GET_LIQUID_COLOR(gen) ? GET_LIQUID_COLOR(gen) : "(none)");
-			sprintf(buf + strlen(buf), "<%shunger\t0> %d hour%s\r\n", OLC_LABEL_VAL(GET_LIQUID_FULL(gen), 0), GET_LIQUID_FULL(gen), PLURAL(GET_LIQUID_FULL(gen)));
-			sprintf(buf + strlen(buf), "<%sthirst\t0> %d hour%s\r\n", OLC_LABEL_VAL(GET_LIQUID_THIRST(gen), 0), GET_LIQUID_THIRST(gen), PLURAL(GET_LIQUID_THIRST(gen)));
-			sprintf(buf + strlen(buf), "<%sdrunk\t0> %d hour%s\r\n", OLC_LABEL_VAL(GET_LIQUID_DRUNK(gen), 0), GET_LIQUID_DRUNK(gen), PLURAL(GET_LIQUID_DRUNK(gen)));
+			add_page_display(ch, "<%sliquid\t0> %s", OLC_LABEL_STR(GET_LIQUID_NAME(gen), ""), GET_LIQUID_NAME(gen) ? GET_LIQUID_NAME(gen) : "(none)");
+			add_page_display(ch, "<%scolor\t0> %s", OLC_LABEL_STR(GET_LIQUID_COLOR(gen), ""), GET_LIQUID_COLOR(gen) ? GET_LIQUID_COLOR(gen) : "(none)");
+			add_page_display(ch, "<%shunger\t0> %d hour%s", OLC_LABEL_VAL(GET_LIQUID_FULL(gen), 0), GET_LIQUID_FULL(gen), PLURAL(GET_LIQUID_FULL(gen)));
+			add_page_display(ch, "<%sthirst\t0> %d hour%s", OLC_LABEL_VAL(GET_LIQUID_THIRST(gen), 0), GET_LIQUID_THIRST(gen), PLURAL(GET_LIQUID_THIRST(gen)));
+			add_page_display(ch, "<%sdrunk\t0> %d hour%s", OLC_LABEL_VAL(GET_LIQUID_DRUNK(gen), 0), GET_LIQUID_DRUNK(gen), PLURAL(GET_LIQUID_DRUNK(gen)));
 			
 			sprintbit(GET_LIQUID_FLAGS(gen), liquid_flags, lbuf, TRUE);
-			sprintf(buf + strlen(buf), "<%sliquidflags\t0> %s\r\n", OLC_LABEL_VAL(GET_LIQUID_FLAGS(gen), NOBITS), lbuf);
+			add_page_display(ch, "<%sliquidflags\t0> %s", OLC_LABEL_VAL(GET_LIQUID_FLAGS(gen), NOBITS), lbuf);
 			break;
 		}
 		case GENERIC_ACTION: {
-			sprintf(buf + strlen(buf), "<%sbuild2char\t0> %s\r\n", OLC_LABEL_STR(GEN_STRING(gen, GSTR_ACTION_BUILD_TO_CHAR), ""), GEN_STRING(gen, GSTR_ACTION_BUILD_TO_CHAR) ? GEN_STRING(gen, GSTR_ACTION_BUILD_TO_CHAR) : "(not set)");
-			sprintf(buf + strlen(buf), "<%sbuild2room\t0> %s\r\n", OLC_LABEL_STR(GEN_STRING(gen, GSTR_ACTION_BUILD_TO_ROOM), ""), GEN_STRING(gen, GSTR_ACTION_BUILD_TO_ROOM) ? GEN_STRING(gen, GSTR_ACTION_BUILD_TO_ROOM) : "(not set)");
-			sprintf(buf + strlen(buf), "<%scraft2char\t0> %s\r\n", OLC_LABEL_STR(GEN_STRING(gen, GSTR_ACTION_CRAFT_TO_CHAR), ""), GEN_STRING(gen, GSTR_ACTION_CRAFT_TO_CHAR) ? GEN_STRING(gen, GSTR_ACTION_CRAFT_TO_CHAR) : "(not set)");
-			sprintf(buf + strlen(buf), "<%scraft2room\t0> %s\r\n", OLC_LABEL_STR(GEN_STRING(gen, GSTR_ACTION_CRAFT_TO_ROOM), ""), GEN_STRING(gen, GSTR_ACTION_CRAFT_TO_ROOM) ? GEN_STRING(gen, GSTR_ACTION_CRAFT_TO_ROOM) : "(not set)");
-			sprintf(buf + strlen(buf), "<%srepair2char\t0> %s\r\n", OLC_LABEL_STR(GEN_STRING(gen, GSTR_ACTION_REPAIR_TO_CHAR), ""), GEN_STRING(gen, GSTR_ACTION_REPAIR_TO_CHAR) ? GEN_STRING(gen, GSTR_ACTION_REPAIR_TO_CHAR) : "(not set)");
-			sprintf(buf + strlen(buf), "<%srepair2room\t0> %s\r\n", OLC_LABEL_STR(GEN_STRING(gen, GSTR_ACTION_REPAIR_TO_ROOM), ""), GEN_STRING(gen, GSTR_ACTION_REPAIR_TO_ROOM) ? GEN_STRING(gen, GSTR_ACTION_REPAIR_TO_ROOM) : "(not set)");
+			add_page_display(ch, "<%sbuild2char\t0> %s", OLC_LABEL_STR(GEN_STRING(gen, GSTR_ACTION_BUILD_TO_CHAR), ""), GEN_STRING(gen, GSTR_ACTION_BUILD_TO_CHAR) ? GEN_STRING(gen, GSTR_ACTION_BUILD_TO_CHAR) : "(not set)");
+			add_page_display(ch, "<%sbuild2room\t0> %s", OLC_LABEL_STR(GEN_STRING(gen, GSTR_ACTION_BUILD_TO_ROOM), ""), GEN_STRING(gen, GSTR_ACTION_BUILD_TO_ROOM) ? GEN_STRING(gen, GSTR_ACTION_BUILD_TO_ROOM) : "(not set)");
+			add_page_display(ch, "<%scraft2char\t0> %s", OLC_LABEL_STR(GEN_STRING(gen, GSTR_ACTION_CRAFT_TO_CHAR), ""), GEN_STRING(gen, GSTR_ACTION_CRAFT_TO_CHAR) ? GEN_STRING(gen, GSTR_ACTION_CRAFT_TO_CHAR) : "(not set)");
+			add_page_display(ch, "<%scraft2room\t0> %s", OLC_LABEL_STR(GEN_STRING(gen, GSTR_ACTION_CRAFT_TO_ROOM), ""), GEN_STRING(gen, GSTR_ACTION_CRAFT_TO_ROOM) ? GEN_STRING(gen, GSTR_ACTION_CRAFT_TO_ROOM) : "(not set)");
+			add_page_display(ch, "<%srepair2char\t0> %s", OLC_LABEL_STR(GEN_STRING(gen, GSTR_ACTION_REPAIR_TO_CHAR), ""), GEN_STRING(gen, GSTR_ACTION_REPAIR_TO_CHAR) ? GEN_STRING(gen, GSTR_ACTION_REPAIR_TO_CHAR) : "(not set)");
+			add_page_display(ch, "<%srepair2room\t0> %s", OLC_LABEL_STR(GEN_STRING(gen, GSTR_ACTION_REPAIR_TO_ROOM), ""), GEN_STRING(gen, GSTR_ACTION_REPAIR_TO_ROOM) ? GEN_STRING(gen, GSTR_ACTION_REPAIR_TO_ROOM) : "(not set)");
 			break;
 		}
 		case GENERIC_COOLDOWN: {
-			sprintf(buf + strlen(buf), "<%swearoff\t0> %s\r\n", OLC_LABEL_STR(GEN_STRING(gen, GSTR_COOLDOWN_WEAR_OFF), ""), GET_COOLDOWN_WEAR_OFF(gen) ? GET_COOLDOWN_WEAR_OFF(gen) : "(none)");
-			sprintf(buf + strlen(buf), "<%sstandardwearoff\t0> (to add a basic wear-off message based on the name)\r\n", OLC_LABEL_STR(GEN_STRING(gen, GSTR_COOLDOWN_WEAR_OFF), ""));
+			add_page_display(ch, "<%swearoff\t0> %s", OLC_LABEL_STR(GEN_STRING(gen, GSTR_COOLDOWN_WEAR_OFF), ""), GET_COOLDOWN_WEAR_OFF(gen) ? GET_COOLDOWN_WEAR_OFF(gen) : "(none)");
+			add_page_display(ch, "<%sstandardwearoff\t0> (to add a basic wear-off message based on the name)", OLC_LABEL_STR(GEN_STRING(gen, GSTR_COOLDOWN_WEAR_OFF), ""));
 			break;
 		}
 		case GENERIC_AFFECT: {
-			sprintf(buf + strlen(buf), "<%sapply2char\t0> %s\r\n", OLC_LABEL_STR(GEN_STRING(gen, GSTR_AFFECT_APPLY_TO_CHAR), ""), GET_AFFECT_APPLY_TO_CHAR(gen) ? GET_AFFECT_APPLY_TO_CHAR(gen) : "(none)");
-			sprintf(buf + strlen(buf), "<%sapply2room\t0> %s\r\n", OLC_LABEL_STR(GEN_STRING(gen, GSTR_AFFECT_APPLY_TO_ROOM), ""), GET_AFFECT_APPLY_TO_ROOM(gen) ? GET_AFFECT_APPLY_TO_ROOM(gen) : "(none)");
-			sprintf(buf + strlen(buf), "<%swearoff\t0> %s\r\n", OLC_LABEL_STR(GEN_STRING(gen, GSTR_AFFECT_WEAR_OFF_TO_CHAR), ""), GET_AFFECT_WEAR_OFF_TO_CHAR(gen) ? GET_AFFECT_WEAR_OFF_TO_CHAR(gen) : "(none)");
-			sprintf(buf + strlen(buf), "<%sstandardwearoff\t0> (to add a basic wear-off message based on the name)\r\n", OLC_LABEL_STR(GEN_STRING(gen, GSTR_AFFECT_WEAR_OFF_TO_CHAR), ""));
-			sprintf(buf + strlen(buf), "<%swearoff2room\t0> %s\r\n", OLC_LABEL_STR(GEN_STRING(gen, GSTR_AFFECT_WEAR_OFF_TO_ROOM), ""), GET_AFFECT_WEAR_OFF_TO_ROOM(gen) ? GET_AFFECT_WEAR_OFF_TO_ROOM(gen) : "(none)");
-			sprintf(buf + strlen(buf), "<%slookatchar\t0> %s\r\n", OLC_LABEL_STR(GEN_STRING(gen, GSTR_AFFECT_LOOK_AT_CHAR), ""), GET_AFFECT_LOOK_AT_CHAR(gen) ? GET_AFFECT_LOOK_AT_CHAR(gen) : "(none)");
-			sprintf(buf + strlen(buf), "<%slookatroom\t0> %s\r\n", OLC_LABEL_STR(GEN_STRING(gen, GSTR_AFFECT_LOOK_AT_ROOM), ""), GET_AFFECT_LOOK_AT_ROOM(gen) ? GET_AFFECT_LOOK_AT_ROOM(gen) : "(none)");
-			sprintf(buf + strlen(buf), "<%sdotattack\t0> %d %s\r\n", OLC_LABEL_VAL(GET_AFFECT_DOT_ATTACK(gen), 0), GET_AFFECT_DOT_ATTACK(gen), (GET_AFFECT_DOT_ATTACK(gen) > 0) ? get_attack_name_by_vnum(GET_AFFECT_DOT_ATTACK(gen)) : "(none)");
+			add_page_display(ch, "<%sapply2char\t0> %s", OLC_LABEL_STR(GEN_STRING(gen, GSTR_AFFECT_APPLY_TO_CHAR), ""), GET_AFFECT_APPLY_TO_CHAR(gen) ? GET_AFFECT_APPLY_TO_CHAR(gen) : "(none)");
+			add_page_display(ch, "<%sapply2room\t0> %s", OLC_LABEL_STR(GEN_STRING(gen, GSTR_AFFECT_APPLY_TO_ROOM), ""), GET_AFFECT_APPLY_TO_ROOM(gen) ? GET_AFFECT_APPLY_TO_ROOM(gen) : "(none)");
+			add_page_display(ch, "<%swearoff\t0> %s", OLC_LABEL_STR(GEN_STRING(gen, GSTR_AFFECT_WEAR_OFF_TO_CHAR), ""), GET_AFFECT_WEAR_OFF_TO_CHAR(gen) ? GET_AFFECT_WEAR_OFF_TO_CHAR(gen) : "(none)");
+			add_page_display(ch, "<%sstandardwearoff\t0> (to add a basic wear-off message based on the name)", OLC_LABEL_STR(GEN_STRING(gen, GSTR_AFFECT_WEAR_OFF_TO_CHAR), ""));
+			add_page_display(ch, "<%swearoff2room\t0> %s", OLC_LABEL_STR(GEN_STRING(gen, GSTR_AFFECT_WEAR_OFF_TO_ROOM), ""), GET_AFFECT_WEAR_OFF_TO_ROOM(gen) ? GET_AFFECT_WEAR_OFF_TO_ROOM(gen) : "(none)");
+			add_page_display(ch, "<%slookatchar\t0> %s", OLC_LABEL_STR(GEN_STRING(gen, GSTR_AFFECT_LOOK_AT_CHAR), ""), GET_AFFECT_LOOK_AT_CHAR(gen) ? GET_AFFECT_LOOK_AT_CHAR(gen) : "(none)");
+			add_page_display(ch, "<%slookatroom\t0> %s", OLC_LABEL_STR(GEN_STRING(gen, GSTR_AFFECT_LOOK_AT_ROOM), ""), GET_AFFECT_LOOK_AT_ROOM(gen) ? GET_AFFECT_LOOK_AT_ROOM(gen) : "(none)");
+			add_page_display(ch, "<%sdotattack\t0> %d %s", OLC_LABEL_VAL(GET_AFFECT_DOT_ATTACK(gen), 0), GET_AFFECT_DOT_ATTACK(gen), (GET_AFFECT_DOT_ATTACK(gen) > 0) ? get_attack_name_by_vnum(GET_AFFECT_DOT_ATTACK(gen)) : "(none)");
 			break;
 		}
 		case GENERIC_CURRENCY: {
-			sprintf(buf + strlen(buf), "<%ssingular\t0> %s\r\n", OLC_LABEL_STR(GEN_STRING(gen, GSTR_CURRENCY_SINGULAR), ""), GEN_STRING(gen, GSTR_CURRENCY_SINGULAR) ? GEN_STRING(gen, GSTR_CURRENCY_SINGULAR) : "(not set)");
-			sprintf(buf + strlen(buf), "<%splural\t0> %s\r\n", OLC_LABEL_STR(GEN_STRING(gen, GSTR_CURRENCY_PLURAL), ""), GEN_STRING(gen, GSTR_CURRENCY_PLURAL) ? GEN_STRING(gen, GSTR_CURRENCY_PLURAL) : "(not set)");
+			add_page_display(ch, "<%ssingular\t0> %s", OLC_LABEL_STR(GEN_STRING(gen, GSTR_CURRENCY_SINGULAR), ""), GEN_STRING(gen, GSTR_CURRENCY_SINGULAR) ? GEN_STRING(gen, GSTR_CURRENCY_SINGULAR) : "(not set)");
+			add_page_display(ch, "<%splural\t0> %s", OLC_LABEL_STR(GEN_STRING(gen, GSTR_CURRENCY_PLURAL), ""), GEN_STRING(gen, GSTR_CURRENCY_PLURAL) ? GEN_STRING(gen, GSTR_CURRENCY_PLURAL) : "(not set)");
 			break;
 		}
 		case GENERIC_COMPONENT: {
-			sprintf(buf + strlen(buf), "<%splural\t0> %s\r\n", OLC_LABEL_STR(GEN_STRING(gen, GSTR_COMPONENT_PLURAL), ""), GEN_STRING(gen, GSTR_COMPONENT_PLURAL) ? GEN_STRING(gen, GSTR_COMPONENT_PLURAL) : "(not set)");
-			sprintf(buf + strlen(buf), "<%sitem\t0> [%d] %s\r\n", OLC_LABEL_VAL(GET_COMPONENT_OBJ_VNUM(gen), NOTHING), GET_COMPONENT_OBJ_VNUM(gen), get_obj_name_by_proto(GET_COMPONENT_OBJ_VNUM(gen)));
+			add_page_display(ch, "<%splural\t0> %s", OLC_LABEL_STR(GEN_STRING(gen, GSTR_COMPONENT_PLURAL), ""), GEN_STRING(gen, GSTR_COMPONENT_PLURAL) ? GEN_STRING(gen, GSTR_COMPONENT_PLURAL) : "(not set)");
+			add_page_display(ch, "<%sitem\t0> [%d] %s", OLC_LABEL_VAL(GET_COMPONENT_OBJ_VNUM(gen), NOTHING), GET_COMPONENT_OBJ_VNUM(gen), get_obj_name_by_proto(GET_COMPONENT_OBJ_VNUM(gen)));
 			
 			get_generic_relation_display(GEN_RELATIONS(gen), TRUE, lbuf, NULL);
-			sprintf(buf + strlen(buf), "<%srelations\t0>\r\n%s", OLC_LABEL_PTR(GEN_RELATIONS(gen)), lbuf);
+			add_page_display(ch, "<%srelations\t0>\r\n%s", OLC_LABEL_PTR(GEN_RELATIONS(gen)), lbuf);
 			break;
 		}
 		case GENERIC_MOON: {
-			sprintf(buf + strlen(buf), "<%scycle\t0> %.2f day%s\r\n", OLC_LABEL_VAL(GET_MOON_CYCLE(gen), 0), GET_MOON_CYCLE_DAYS(gen), PLURAL(GET_MOON_CYCLE_DAYS(gen)));
+			add_page_display(ch, "<%scycle\t0> %.2f day%s", OLC_LABEL_VAL(GET_MOON_CYCLE(gen), 0), GET_MOON_CYCLE_DAYS(gen), PLURAL(GET_MOON_CYCLE_DAYS(gen)));
 			break;
 		}
 		case GENERIC_LANGUAGE: {
@@ -2132,7 +2130,7 @@ void olc_show_generic(char_data *ch) {
 		}
 	}
 		
-	page_string(ch->desc, buf, TRUE);
+	send_page_display(ch);
 }
 
 

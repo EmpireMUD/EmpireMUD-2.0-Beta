@@ -1385,29 +1385,27 @@ void get_faction_relation_display(struct faction_relation *list, char *save_buff
 */
 void olc_show_faction(char_data *ch) {
 	faction_data *fct = GET_OLC_FACTION(ch->desc);
-	char buf[MAX_STRING_LENGTH], lbuf[MAX_STRING_LENGTH];
+	char lbuf[MAX_STRING_LENGTH];
 	
 	if (!fct) {
 		return;
 	}
 	
-	*buf = '\0';
-	
-	sprintf(buf + strlen(buf), "[%s%d\t0] %s%s\t0\r\n", OLC_LABEL_CHANGED, GET_OLC_VNUM(ch->desc), OLC_LABEL_UNCHANGED, !find_faction_by_vnum(FCT_VNUM(fct)) ? "new faction" : FCT_NAME(find_faction_by_vnum(FCT_VNUM(fct))));
-	sprintf(buf + strlen(buf), "<%sname\t0> %s\r\n", OLC_LABEL_STR(FCT_NAME(fct), default_faction_name), NULLSAFE(FCT_NAME(fct)));
-	sprintf(buf + strlen(buf), "<%sdescription\t0>\r\n%s", OLC_LABEL_STR(FCT_DESCRIPTION(fct), ""), NULLSAFE(FCT_DESCRIPTION(fct)));
+	add_page_display(ch, "[%s%d\t0] %s%s\t0", OLC_LABEL_CHANGED, GET_OLC_VNUM(ch->desc), OLC_LABEL_UNCHANGED, !find_faction_by_vnum(FCT_VNUM(fct)) ? "new faction" : FCT_NAME(find_faction_by_vnum(FCT_VNUM(fct))));
+	add_page_display(ch, "<%sname\t0> %s", OLC_LABEL_STR(FCT_NAME(fct), default_faction_name), NULLSAFE(FCT_NAME(fct)));
+	add_page_display(ch, "<%sdescription\t0>\r\n%s", OLC_LABEL_STR(FCT_DESCRIPTION(fct), ""), NULLSAFE(FCT_DESCRIPTION(fct)));
 	
 	sprintbit(FCT_FLAGS(fct), faction_flags, lbuf, TRUE);
-	sprintf(buf + strlen(buf), "<%sflags\t0> %s\r\n", OLC_LABEL_VAL(FCT_FLAGS(fct), FCT_IN_DEVELOPMENT), lbuf);
+	add_page_display(ch, "<%sflags\t0> %s", OLC_LABEL_VAL(FCT_FLAGS(fct), FCT_IN_DEVELOPMENT), lbuf);
 	
-	sprintf(buf + strlen(buf), "<%sminreputation\t0> %s\r\n", OLC_LABEL_VAL(FCT_MIN_REP(fct), default_min_rep), get_reputation_name(FCT_MIN_REP(fct)));
-	sprintf(buf + strlen(buf), "<%smaxreputation\t0> %s\r\n", OLC_LABEL_VAL(FCT_MAX_REP(fct), default_max_rep), get_reputation_name(FCT_MAX_REP(fct)));
-	sprintf(buf + strlen(buf), "<%sstartingreuptation\t0> %s\r\n", OLC_LABEL_VAL(FCT_STARTING_REP(fct), default_starting_rep), get_reputation_name(FCT_STARTING_REP(fct)));
+	add_page_display(ch, "<%sminreputation\t0> %s", OLC_LABEL_VAL(FCT_MIN_REP(fct), default_min_rep), get_reputation_name(FCT_MIN_REP(fct)));
+	add_page_display(ch, "<%smaxreputation\t0> %s", OLC_LABEL_VAL(FCT_MAX_REP(fct), default_max_rep), get_reputation_name(FCT_MAX_REP(fct)));
+	add_page_display(ch, "<%sstartingreuptation\t0> %s", OLC_LABEL_VAL(FCT_STARTING_REP(fct), default_starting_rep), get_reputation_name(FCT_STARTING_REP(fct)));
 	
 	get_faction_relation_display(FCT_RELATIONS(fct), lbuf);
-	sprintf(buf + strlen(buf), "Relationships: <%srelation\t0>, <%smatchrelations\t0>\r\n%s", OLC_LABEL_PTR(FCT_RELATIONS(fct)), OLC_LABEL_PTR(FCT_RELATIONS(fct)), FCT_RELATIONS(fct) ? lbuf : "");
+	add_page_display(ch, "Relationships: <%srelation\t0>, <%smatchrelations\t0>\r\n%s", OLC_LABEL_PTR(FCT_RELATIONS(fct)), OLC_LABEL_PTR(FCT_RELATIONS(fct)), FCT_RELATIONS(fct) ? lbuf : "");
 	
-	page_string(ch->desc, buf, TRUE);
+	send_page_display(ch);
 }
 
 

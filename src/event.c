@@ -2471,60 +2471,58 @@ void do_stat_event(char_data *ch, event_data *event) {
 */
 void olc_show_event(char_data *ch) {
 	event_data *event = GET_OLC_EVENT(ch->desc);
-	char buf[MAX_STRING_LENGTH], lbuf[MAX_STRING_LENGTH];
+	char lbuf[MAX_STRING_LENGTH];
 	
 	if (!event) {
 		return;
 	}
 	
-	*buf = '\0';
-	
-	sprintf(buf + strlen(buf), "[%s%d\t0] %s%s\t0\r\n", OLC_LABEL_CHANGED, GET_OLC_VNUM(ch->desc), OLC_LABEL_UNCHANGED, !find_event_by_vnum(EVT_VNUM(event)) ? "new event" : get_event_name_by_proto(EVT_VNUM(event)));
-	sprintf(buf + strlen(buf), "<%sname\t0> %s\r\n", OLC_LABEL_STR(EVT_NAME(event), default_event_name), NULLSAFE(EVT_NAME(event)));
-	sprintf(buf + strlen(buf), "<%sdescription\t0>\r\n%s", OLC_LABEL_STR(EVT_DESCRIPTION(event), default_event_description), NULLSAFE(EVT_DESCRIPTION(event)));
-	sprintf(buf + strlen(buf), "<%scompletemessage\t0>\r\n%s", OLC_LABEL_STR(EVT_COMPLETE_MSG(event), default_event_complete_msg), NULLSAFE(EVT_COMPLETE_MSG(event)));
+	add_page_display(ch, "[%s%d\t0] %s%s\t0", OLC_LABEL_CHANGED, GET_OLC_VNUM(ch->desc), OLC_LABEL_UNCHANGED, !find_event_by_vnum(EVT_VNUM(event)) ? "new event" : get_event_name_by_proto(EVT_VNUM(event)));
+	add_page_display(ch, "<%sname\t0> %s", OLC_LABEL_STR(EVT_NAME(event), default_event_name), NULLSAFE(EVT_NAME(event)));
+	add_page_display(ch, "<%sdescription\t0>\r\n%s", OLC_LABEL_STR(EVT_DESCRIPTION(event), default_event_description), NULLSAFE(EVT_DESCRIPTION(event)));
+	add_page_display(ch, "<%scompletemessage\t0>\r\n%s", OLC_LABEL_STR(EVT_COMPLETE_MSG(event), default_event_complete_msg), NULLSAFE(EVT_COMPLETE_MSG(event)));
 	
 	sprintbit(EVT_FLAGS(event), event_flags, lbuf, TRUE);
-	sprintf(buf + strlen(buf), "<%sflags\t0> %s\r\n", OLC_LABEL_VAL(EVT_FLAGS(event), EVTF_IN_DEVELOPMENT), lbuf);
+	add_page_display(ch, "<%sflags\t0> %s", OLC_LABEL_VAL(EVT_FLAGS(event), EVTF_IN_DEVELOPMENT), lbuf);
 	
 	if (EVT_MIN_LEVEL(event) > 0) {
-		sprintf(buf + strlen(buf), "<%sminlevel\t0> %d\r\n", OLC_LABEL_CHANGED, EVT_MIN_LEVEL(event));
+		add_page_display(ch, "<%sminlevel\t0> %d", OLC_LABEL_CHANGED, EVT_MIN_LEVEL(event));
 	}
 	else {
-		sprintf(buf + strlen(buf), "<%sminlevel\t0> none\r\n", OLC_LABEL_UNCHANGED);
+		add_page_display(ch, "<%sminlevel\t0> none", OLC_LABEL_UNCHANGED);
 	}
 	if (EVT_MAX_LEVEL(event) > 0) {
-		sprintf(buf + strlen(buf), "<%smaxlevel\t0> %d\r\n", OLC_LABEL_CHANGED, EVT_MAX_LEVEL(event));
+		add_page_display(ch, "<%smaxlevel\t0> %d", OLC_LABEL_CHANGED, EVT_MAX_LEVEL(event));
 	}
 	else {
-		sprintf(buf + strlen(buf), "<%smaxlevel\t0> none\r\n", OLC_LABEL_UNCHANGED);
+		add_page_display(ch, "<%smaxlevel\t0> none", OLC_LABEL_UNCHANGED);
 	}
 	
-	sprintf(buf + strlen(buf), "<%sduration\t0> %d minutes (%s)\r\n", OLC_LABEL_VAL(EVT_DURATION(event), 0), EVT_DURATION(event), colon_time(EVT_DURATION(event), TRUE, NULL));
+	add_page_display(ch, "<%sduration\t0> %d minutes (%s)", OLC_LABEL_VAL(EVT_DURATION(event), 0), EVT_DURATION(event), colon_time(EVT_DURATION(event), TRUE, NULL));
 	
 	if (EVT_REPEATS_AFTER(event) == NOT_REPEATABLE || EVT_REPEATS_AFTER(event) == 0) {
-		sprintf(buf + strlen(buf), "<%srepeat\t0> never\r\n", OLC_LABEL_VAL(EVT_REPEATS_AFTER(event), NOT_REPEATABLE));
+		add_page_display(ch, "<%srepeat\t0> never", OLC_LABEL_VAL(EVT_REPEATS_AFTER(event), NOT_REPEATABLE));
 	}
 	else if (EVT_REPEATS_AFTER(event) > 0) {
-		sprintf(buf + strlen(buf), "<%srepeat\t0> %d minutes (%s)\r\n", OLC_LABEL_VAL(EVT_REPEATS_AFTER(event), 0), EVT_REPEATS_AFTER(event), colon_time(EVT_REPEATS_AFTER(event), TRUE, NULL));
+		add_page_display(ch, "<%srepeat\t0> %d minutes (%s)", OLC_LABEL_VAL(EVT_REPEATS_AFTER(event), 0), EVT_REPEATS_AFTER(event), colon_time(EVT_REPEATS_AFTER(event), TRUE, NULL));
 	}
 	
 	if (EVT_MAX_POINTS(event) > 0) {
-		sprintf(buf + strlen(buf), "<%smaxpoints\t0> %d\r\n", OLC_LABEL_CHANGED, EVT_MAX_POINTS(event));
+		add_page_display(ch, "<%smaxpoints\t0> %d", OLC_LABEL_CHANGED, EVT_MAX_POINTS(event));
 	}
 	else {
-		sprintf(buf + strlen(buf), "<%smaxpoints\t0> none\r\n", OLC_LABEL_UNCHANGED);
+		add_page_display(ch, "<%smaxpoints\t0> none", OLC_LABEL_UNCHANGED);
 	}
 	
 	get_event_reward_display(EVT_RANK_REWARDS(event), lbuf);
-	sprintf(buf + strlen(buf), "Rank rewards: <%srank\t0>\r\n%s", OLC_LABEL_PTR(EVT_RANK_REWARDS(event)), lbuf);
+	add_page_display(ch, "Rank rewards: <%srank\t0>\r\n%s", OLC_LABEL_PTR(EVT_RANK_REWARDS(event)), lbuf);
 	
 	get_event_reward_display(EVT_THRESHOLD_REWARDS(event), lbuf);
-	sprintf(buf + strlen(buf), "Threshold rewards: <%sthreshold\t0>\r\n%s", OLC_LABEL_PTR(EVT_THRESHOLD_REWARDS(event)), lbuf);
+	add_page_display(ch, "Threshold rewards: <%sthreshold\t0>\r\n%s", OLC_LABEL_PTR(EVT_THRESHOLD_REWARDS(event)), lbuf);
 	
-	sprintf(buf + strlen(buf), "<%snotes\t0>\r\n%s", OLC_LABEL_PTR(EVT_NOTES(event)), NULLSAFE(EVT_NOTES(event)));
+	add_page_display(ch, "<%snotes\t0>\r\n%s", OLC_LABEL_PTR(EVT_NOTES(event)), NULLSAFE(EVT_NOTES(event)));
 	
-	page_string(ch->desc, buf, TRUE);
+	send_page_display(ch);
 }
 
 

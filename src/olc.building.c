@@ -1311,102 +1311,102 @@ int wordcount_building(bld_data *bld) {
 */
 void olc_show_building(char_data *ch) {
 	bld_data *bdg = GET_OLC_BUILDING(ch->desc);
-	char buf[MAX_STRING_LENGTH*4], lbuf[MAX_STRING_LENGTH*4];
+	char lbuf[MAX_STRING_LENGTH*4];
 	bool is_room = IS_SET(GET_BLD_FLAGS(bdg), BLD_ROOM) ? TRUE : FALSE;
 	struct spawn_info *spawn;
 	int count;
+	struct page_display *pd;
 	
 	if (!bdg) {
 		return;
 	}
 	
-	*buf = '\0';
-	sprintf(buf + strlen(buf), "[%s%d\t0] %s%s\t0\r\n", OLC_LABEL_CHANGED, GET_OLC_VNUM(ch->desc), OLC_LABEL_UNCHANGED, !building_proto(GET_BLD_VNUM(bdg)) ? "new building" : GET_BLD_NAME(building_proto(GET_BLD_VNUM(bdg))));
-	sprintf(buf + strlen(buf), "<%sname\t0> %s\r\n", OLC_LABEL_STR(GET_BLD_NAME(bdg), default_building_name), GET_BLD_NAME(bdg));
-	sprintf(buf + strlen(buf), "<%stitle\t0> %s\r\n", OLC_LABEL_STR(GET_BLD_TITLE(bdg), default_building_title), GET_BLD_TITLE(bdg));
+	add_page_display(ch, "[%s%d\t0] %s%s\t0", OLC_LABEL_CHANGED, GET_OLC_VNUM(ch->desc), OLC_LABEL_UNCHANGED, !building_proto(GET_BLD_VNUM(bdg)) ? "new building" : GET_BLD_NAME(building_proto(GET_BLD_VNUM(bdg))));
+	add_page_display(ch, "<%sname\t0> %s", OLC_LABEL_STR(GET_BLD_NAME(bdg), default_building_name), GET_BLD_NAME(bdg));
+	add_page_display(ch, "<%stitle\t0> %s", OLC_LABEL_STR(GET_BLD_TITLE(bdg), default_building_title), GET_BLD_TITLE(bdg));
 	
 	if (!is_room) {
 		if (BLD_FLAGGED(bdg, BLD_OPEN) || GET_BLD_HALF_ICON(bdg) || GET_BLD_QUARTER_ICON(bdg)) {
-			sprintf(buf + strlen(buf), "<%sicon\t0> %s\t0  ", OLC_LABEL_STR(GET_BLD_ICON(bdg), default_building_icon), GET_BLD_ICON(bdg) ? one_icon_display(GET_BLD_ICON(bdg), NULL) : "none");
-			sprintf(buf + strlen(buf), "<%shalficon\t0> %s\t0  ", OLC_LABEL_STR(GET_BLD_HALF_ICON(bdg), default_building_icon), GET_BLD_HALF_ICON(bdg) ? one_icon_display(GET_BLD_HALF_ICON(bdg), NULL) : "none");
-			sprintf(buf + strlen(buf), "<%squartericon\t0> %s\t0\r\n", OLC_LABEL_STR(GET_BLD_QUARTER_ICON(bdg), default_building_icon), GET_BLD_QUARTER_ICON(bdg) ? one_icon_display(GET_BLD_QUARTER_ICON(bdg), NULL) : "none");
+			pd = add_page_display(ch, "<%sicon\t0> %s\t0  ", OLC_LABEL_STR(GET_BLD_ICON(bdg), default_building_icon), GET_BLD_ICON(bdg) ? one_icon_display(GET_BLD_ICON(bdg), NULL) : "none");
+			append_page_display_line(pd, "<%shalficon\t0> %s\t0  ", OLC_LABEL_STR(GET_BLD_HALF_ICON(bdg), default_building_icon), GET_BLD_HALF_ICON(bdg) ? one_icon_display(GET_BLD_HALF_ICON(bdg), NULL) : "none");
+			append_page_display_line(pd, "<%squartericon\t0> %s\t0", OLC_LABEL_STR(GET_BLD_QUARTER_ICON(bdg), default_building_icon), GET_BLD_QUARTER_ICON(bdg) ? one_icon_display(GET_BLD_QUARTER_ICON(bdg), NULL) : "none");
 		}
 		else {
-			sprintf(buf + strlen(buf), "<%sicon\t0> %s\t0\r\n", OLC_LABEL_STR(GET_BLD_ICON(bdg), default_building_icon), GET_BLD_ICON(bdg) ? one_icon_display(GET_BLD_ICON(bdg), NULL) : "none");
+			add_page_display(ch, "<%sicon\t0> %s\t0", OLC_LABEL_STR(GET_BLD_ICON(bdg), default_building_icon), GET_BLD_ICON(bdg) ? one_icon_display(GET_BLD_ICON(bdg), NULL) : "none");
 		}
 	}
-	sprintf(buf + strlen(buf), "<%scommands\t0> %s\r\n", OLC_LABEL_STR(GET_BLD_COMMANDS(bdg), ""), GET_BLD_COMMANDS(bdg) ? GET_BLD_COMMANDS(bdg) : "");
-	sprintf(buf + strlen(buf), "<%sdescription\t0>\r\n%s", OLC_LABEL_STR(GET_BLD_DESC(bdg), ""), GET_BLD_DESC(bdg) ? GET_BLD_DESC(bdg) : "");
+	add_page_display(ch, "<%scommands\t0> %s", OLC_LABEL_STR(GET_BLD_COMMANDS(bdg), ""), GET_BLD_COMMANDS(bdg) ? GET_BLD_COMMANDS(bdg) : "");
+	add_page_display(ch, "<%sdescription\t0>\r\n%s", OLC_LABEL_STR(GET_BLD_DESC(bdg), ""), GET_BLD_DESC(bdg) ? GET_BLD_DESC(bdg) : "");
 
 	if (!is_room) {
-		sprintf(buf + strlen(buf), "<%shitpoints\t0> %d\r\n", OLC_LABEL_VAL(GET_BLD_MAX_DAMAGE(bdg), 1), GET_BLD_MAX_DAMAGE(bdg));
-		sprintf(buf + strlen(buf), "<%srooms\t0> %d\r\n", OLC_LABEL_VAL(GET_BLD_EXTRA_ROOMS(bdg), 0), GET_BLD_EXTRA_ROOMS(bdg));
-		sprintf(buf + strlen(buf), "<%sheight\t0> %d\r\n", OLC_LABEL_VAL(GET_BLD_HEIGHT(bdg), 0), GET_BLD_HEIGHT(bdg));
+		add_page_display(ch, "<%shitpoints\t0> %d", OLC_LABEL_VAL(GET_BLD_MAX_DAMAGE(bdg), 1), GET_BLD_MAX_DAMAGE(bdg));
+		add_page_display(ch, "<%srooms\t0> %d", OLC_LABEL_VAL(GET_BLD_EXTRA_ROOMS(bdg), 0), GET_BLD_EXTRA_ROOMS(bdg));
+		add_page_display(ch, "<%sheight\t0> %d", OLC_LABEL_VAL(GET_BLD_HEIGHT(bdg), 0), GET_BLD_HEIGHT(bdg));
 	}
 
-	sprintf(buf + strlen(buf), "<%sfame\t0> %d\r\n", OLC_LABEL_VAL(GET_BLD_FAME(bdg), 0), GET_BLD_FAME(bdg));	
-	sprintf(buf + strlen(buf), "<%scitizens\t0> %d\r\n", OLC_LABEL_VAL(GET_BLD_CITIZENS(bdg), 0), GET_BLD_CITIZENS(bdg));
-	sprintf(buf + strlen(buf), "<%smilitary\t0> %d\r\n", OLC_LABEL_VAL(GET_BLD_MILITARY(bdg), 0), GET_BLD_MILITARY(bdg));
+	add_page_display(ch, "<%sfame\t0> %d", OLC_LABEL_VAL(GET_BLD_FAME(bdg), 0), GET_BLD_FAME(bdg));	
+	add_page_display(ch, "<%scitizens\t0> %d", OLC_LABEL_VAL(GET_BLD_CITIZENS(bdg), 0), GET_BLD_CITIZENS(bdg));
+	add_page_display(ch, "<%smilitary\t0> %d", OLC_LABEL_VAL(GET_BLD_MILITARY(bdg), 0), GET_BLD_MILITARY(bdg));
 	
-	sprintf(buf + strlen(buf), "<%sartisan\t0> [%d] %s\r\n", OLC_LABEL_VAL(GET_BLD_ARTISAN(bdg), NOTHING), GET_BLD_ARTISAN(bdg), GET_BLD_ARTISAN(bdg) == NOTHING ? "none" : get_mob_name_by_proto(GET_BLD_ARTISAN(bdg), FALSE));
+	add_page_display(ch, "<%sartisan\t0> [%d] %s", OLC_LABEL_VAL(GET_BLD_ARTISAN(bdg), NOTHING), GET_BLD_ARTISAN(bdg), GET_BLD_ARTISAN(bdg) == NOTHING ? "none" : get_mob_name_by_proto(GET_BLD_ARTISAN(bdg), FALSE));
 	
 	sprintbit(GET_BLD_FLAGS(bdg), bld_flags, lbuf, TRUE);
-	sprintf(buf + strlen(buf), "<%sflags\t0> %s\r\n", OLC_LABEL_VAL(GET_BLD_FLAGS(bdg), NOBITS), lbuf);
+	add_page_display(ch, "<%sflags\t0> %s", OLC_LABEL_VAL(GET_BLD_FLAGS(bdg), NOBITS), lbuf);
 	
 	sprintbit(GET_BLD_FUNCTIONS(bdg), function_flags, lbuf, TRUE);
-	sprintf(buf + strlen(buf), "<%sfunctions\t0> %s\r\n", OLC_LABEL_VAL(GET_BLD_FUNCTIONS(bdg), NOBITS), lbuf);
+	add_page_display(ch, "<%sfunctions\t0> %s", OLC_LABEL_VAL(GET_BLD_FUNCTIONS(bdg), NOBITS), lbuf);
 	
 	sprintbit(GET_BLD_DESIGNATE_FLAGS(bdg), designate_flags, lbuf, TRUE);
-	sprintf(buf + strlen(buf), "<%sdesignate\t0> %s\r\n", OLC_LABEL_VAL(GET_BLD_DESIGNATE_FLAGS(bdg), NOBITS), lbuf);
+	add_page_display(ch, "<%sdesignate\t0> %s", OLC_LABEL_VAL(GET_BLD_DESIGNATE_FLAGS(bdg), NOBITS), lbuf);
 	
 	sprintbit(GET_BLD_BASE_AFFECTS(bdg), room_aff_bits, lbuf, TRUE);
-	sprintf(buf + strlen(buf), "<%saffects\t0> %s\r\n", OLC_LABEL_VAL(GET_BLD_BASE_AFFECTS(bdg), NOBITS), lbuf);
+	add_page_display(ch, "<%saffects\t0> %s", OLC_LABEL_VAL(GET_BLD_BASE_AFFECTS(bdg), NOBITS), lbuf);
 	
-	sprintf(buf + strlen(buf), "<%stemperature\t0> %s\r\n", OLC_LABEL_VAL(GET_BLD_TEMPERATURE_TYPE(bdg), 0), temperature_types[GET_BLD_TEMPERATURE_TYPE(bdg)]);
+	add_page_display(ch, "<%stemperature\t0> %s", OLC_LABEL_VAL(GET_BLD_TEMPERATURE_TYPE(bdg), 0), temperature_types[GET_BLD_TEMPERATURE_TYPE(bdg)]);
 	
-	sprintf(buf + strlen(buf), "Relationships: <%srelations\t0>\r\n", OLC_LABEL_PTR(GET_BLD_RELATIONS(bdg)));
+	add_page_display(ch, "Relationships: <%srelations\t0>", OLC_LABEL_PTR(GET_BLD_RELATIONS(bdg)));
 	if (GET_BLD_RELATIONS(bdg)) {
 		get_bld_relations_display(GET_BLD_RELATIONS(bdg), lbuf);
-		strcat(buf, lbuf);
+		add_page_display_str(ch, lbuf);
 	}
 
 	// exdesc
-	sprintf(buf + strlen(buf), "Extra descriptions: <%sextra\t0>\r\n", OLC_LABEL_PTR(GET_BLD_EX_DESCS(bdg)));
+	add_page_display(ch, "Extra descriptions: <%sextra\t0>", OLC_LABEL_PTR(GET_BLD_EX_DESCS(bdg)));
 	if (GET_BLD_EX_DESCS(bdg)) {
 		get_extra_desc_display(GET_BLD_EX_DESCS(bdg), lbuf, sizeof(lbuf));
-		strcat(buf, lbuf);
+		add_page_display_str(ch, lbuf);
 	}
 
-	sprintf(buf + strlen(buf), "Interactions: <%sinteraction\t0>\r\n", OLC_LABEL_PTR(GET_BLD_INTERACTIONS(bdg)));
+	add_page_display(ch, "Interactions: <%sinteraction\t0>", OLC_LABEL_PTR(GET_BLD_INTERACTIONS(bdg)));
 	if (GET_BLD_INTERACTIONS(bdg)) {
 		get_interaction_display(GET_BLD_INTERACTIONS(bdg), lbuf);
-		strcat(buf, lbuf);
+		add_page_display_str(ch, lbuf);
 	}
 	
 	// maintenance resources
-	sprintf(buf + strlen(buf), "Regular maintenance resources: <%sresource\t0>\r\n", OLC_LABEL_PTR(GET_BLD_REGULAR_MAINTENANCE(bdg)));
+	add_page_display(ch, "Regular maintenance resources: <%sresource\t0>", OLC_LABEL_PTR(GET_BLD_REGULAR_MAINTENANCE(bdg)));
 	if (GET_BLD_REGULAR_MAINTENANCE(bdg)) {
 		get_resource_display(ch, GET_BLD_REGULAR_MAINTENANCE(bdg), lbuf);
-		strcat(buf, lbuf);
+		add_page_display_str(ch, lbuf);
 	}
 
 	// scripts
-	sprintf(buf + strlen(buf), "Scripts: <%sscript\t0>\r\n", OLC_LABEL_PTR(GET_BLD_SCRIPTS(bdg)));
+	add_page_display(ch, "Scripts: <%sscript\t0>", OLC_LABEL_PTR(GET_BLD_SCRIPTS(bdg)));
 	if (GET_BLD_SCRIPTS(bdg)) {
 		get_script_display(GET_BLD_SCRIPTS(bdg), lbuf);
-		strcat(buf, lbuf);
+		add_page_display_str(ch, lbuf);
 	}
 	
-	sprintf(buf + strlen(buf), "<%sspawns\t0>\r\n", OLC_LABEL_PTR(GET_BLD_SPAWNS(bdg)));
+	add_page_display(ch, "<%sspawns\t0>", OLC_LABEL_PTR(GET_BLD_SPAWNS(bdg)));
 	if (GET_BLD_SPAWNS(bdg)) {
 		count = 0;
 		for (spawn = GET_BLD_SPAWNS(bdg); spawn; spawn = spawn->next) {
 			++count;
 		}
-		sprintf(buf + strlen(buf), " %d spawn%s set\r\n", count, PLURAL(count));
+		add_page_display(ch, " %d spawn%s set", count, PLURAL(count));
 	}
 		
-	page_string(ch->desc, buf, TRUE);
+	send_page_display(ch);
 }
 
 
