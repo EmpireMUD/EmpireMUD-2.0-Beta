@@ -2828,12 +2828,11 @@ ACMD(do_mint) {
 
 ACMD(do_plant) {
 	struct string_hash *str_iter, *next_str, *str_hash = NULL;
-	char buf[MAX_STRING_LENGTH], line[256], lbuf[256];
+	char line[256], lbuf[256];
 	struct evolution_data *evo;
 	sector_data *original;
 	obj_data *obj;
 	crop_data *cp;
-	size_t size;
 
 	one_argument(argument, arg);
 
@@ -2873,27 +2872,17 @@ ACMD(do_plant) {
 		
 		if (str_hash) {
 			// show plantables
-			size = snprintf(buf, sizeof(buf), "What do you want to plant:\r\n");
+			add_page_display(ch, "What do you want to plant:");
 			HASH_ITER(hh, str_hash, str_iter, next_str) {
 				if (str_iter->count == 1) {
-					snprintf(line, sizeof(line), " %s\r\n", str_iter->str);
+					add_page_display(ch, " %s", str_iter->str);
 				}
 				else {
-					snprintf(line, sizeof(line), " %s (x%d)\r\n", str_iter->str, str_iter->count);
-				}
-				if (size + strlen(line) + 16 < sizeof(buf)) {
-					strcat(buf, line);
-					size += strlen(line);
-				}
-				else {
-					size += snprintf(buf + size, sizeof(buf) - size, "OVERFLOW\r\n");
-					break;
+					add_page_display(ch, " %s (x%d)", str_iter->str, str_iter->count);
 				}
 			}
 			free_string_hash(&str_hash);
-			if (ch->desc) {
-				page_string(ch->desc, buf, TRUE);
-			}
+			send_page_display(ch);
 		}
 		else {
 			// nothing to plant
@@ -2921,12 +2910,12 @@ ACMD(do_plant) {
 	}
 	else if (!MATCH_CROP_SECTOR_CLIMATE(cp, get_climate(IN_ROOM(ch)))) {
 		if (CROP_FLAGGED(cp, CROPF_ANY_LISTED_CLIMATE)) {
-			ordered_sprintbit(GET_CROP_CLIMATE(cp), climate_flags, climate_flags_order, TRUE, buf);
-			msg_to_char(ch, "You can only plant that in areas that are: %s\r\n", buf);
+			ordered_sprintbit(GET_CROP_CLIMATE(cp), climate_flags, climate_flags_order, TRUE, lbuf);
+			msg_to_char(ch, "You can only plant that in areas that are: %s\r\n", lbuf);
 		}
 		else {
-			ordered_sprintbit(GET_CROP_CLIMATE(cp), climate_flags, climate_flags_order, FALSE, buf);
-			msg_to_char(ch, "You can only plant that in %s areas.\r\n", trim(buf));
+			ordered_sprintbit(GET_CROP_CLIMATE(cp), climate_flags, climate_flags_order, FALSE, lbuf);
+			msg_to_char(ch, "You can only plant that in %s areas.\r\n", trim(lbuf));
 		}
 	}
 	else if (run_ability_triggers_by_player_tech(ch, PTECH_PLANT_CROPS, NULL, NULL, NULL)) {
@@ -2950,8 +2939,8 @@ ACMD(do_plant) {
 		start_action(ch, ACT_PLANTING, 4);
 		
 		msg_to_char(ch, "You kneel and begin digging holes to plant %s here.\r\n", GET_CROP_NAME(cp));
-		sprintf(buf, "$n kneels and begins to plant %s here.", GET_CROP_NAME(cp));
-		act(buf, FALSE, ch, 0, 0, TO_ROOM);
+		sprintf(lbuf, "$n kneels and begins to plant %s here.", GET_CROP_NAME(cp));
+		act(lbuf, FALSE, ch, NULL, NULL, TO_ROOM);
 	}
 }
 

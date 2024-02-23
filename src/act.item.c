@@ -5540,7 +5540,7 @@ ACMD(do_draw) {
 
 ACMD(do_drink) {
 	struct string_hash *str_iter, *next_str, *str_hash = NULL;
-	char buf[MAX_STRING_LENGTH], line[256], part[256];
+	char line[256], part[256];
 	char *thirst_str;
 	obj_data *obj = NULL, *check_list[2];
 	int amount, i, liquid;
@@ -5548,7 +5548,6 @@ ACMD(do_drink) {
 	int type = drink_OBJ, number, iter, warmed;
 	room_data *to_room;
 	char *argptr = arg;
-	size_t size;
 	generic_data *liq_generic;
 	vehicle_data *veh;
 	
@@ -5605,27 +5604,17 @@ ACMD(do_drink) {
 				}
 				
 				// show drinkables
-				size = snprintf(buf, sizeof(buf), "What do you want to drink from%s:\r\n", part);
+				add_page_display(ch, "What do you want to drink from%s:", part);
 				HASH_ITER(hh, str_hash, str_iter, next_str) {
 					if (str_iter->count == 1) {
-						snprintf(line, sizeof(line), " %s\r\n", str_iter->str);
+						add_page_display(ch, " %s", str_iter->str);
 					}
 					else {
-						snprintf(line, sizeof(line), " %s (x%d)\r\n", str_iter->str, str_iter->count);
-					}
-					if (size + strlen(line) + 16 < sizeof(buf)) {
-						strcat(buf, line);
-						size += strlen(line);
-					}
-					else {
-						size += snprintf(buf + size, sizeof(buf) - size, "OVERFLOW\r\n");
-						break;
+						add_page_display(ch, " %s (x%d)", str_iter->str, str_iter->count);
 					}
 				}
 				free_string_hash(&str_hash);
-				if (ch->desc) {
-					page_string(ch->desc, buf, TRUE);
-				}
+				send_page_display(ch);
 			}
 			else {
 				// nothing to plant
@@ -5986,13 +5975,12 @@ ACMD(do_drop) {
 ACMD(do_eat) {
 	struct string_hash *str_iter, *next_str, *str_hash = NULL;
 	bool extract = FALSE, will_buff = FALSE;
-	char buf[MAX_STRING_LENGTH], some_part[256], line[256], *argptr = arg;
+	char some_part[256], line[256], *argptr = arg;
 	char *hungry_str;
 	struct affected_type *af;
 	struct obj_apply *apply;
 	obj_data *food, *check_list[2], *obj;
 	int eat_hours, number, iter;
-	size_t size;
 
 	one_argument(argument, arg);
 	number = get_number(&argptr);
@@ -6026,27 +6014,17 @@ ACMD(do_eat) {
 			}
 			
 			// show eatables
-			size = snprintf(buf, sizeof(buf), "What do you want to eat%s:\r\n", some_part);
+			add_page_display(ch, "What do you want to eat%s:", some_part);
 			HASH_ITER(hh, str_hash, str_iter, next_str) {
 				if (str_iter->count == 1) {
-					snprintf(line, sizeof(line), " %s\r\n", str_iter->str);
+					add_page_display(ch, " %s", str_iter->str);
 				}
 				else {
-					snprintf(line, sizeof(line), " %s (x%d)\r\n", str_iter->str, str_iter->count);
-				}
-				if (size + strlen(line) + 16 < sizeof(buf)) {
-					strcat(buf, line);
-					size += strlen(line);
-				}
-				else {
-					size += snprintf(buf + size, sizeof(buf) - size, "OVERFLOW\r\n");
-					break;
+					add_page_display(ch, " %s (x%d)", str_iter->str, str_iter->count);
 				}
 			}
 			free_string_hash(&str_hash);
-			if (ch->desc) {
-				page_string(ch->desc, buf, TRUE);
-			}
+			send_page_display(ch);
 		}
 		else {
 			// nothing to plant
@@ -6056,8 +6034,7 @@ ACMD(do_eat) {
 	}
 	if (!(food = get_obj_in_list_vis(ch, argptr, &number, ch->carrying))) {
 		if (!can_use_room(ch, IN_ROOM(ch), MEMBERS_AND_ALLIES) || !(food = get_obj_in_list_vis(ch, argptr, &number, ROOM_CONTENTS(IN_ROOM(ch))))) {
-			sprintf(buf, "You don't seem to have %s %s.\r\n", AN(arg), arg);
-			send_to_char(buf, ch);
+			msg_to_char(ch, "You don't seem to have %s %s.\r\n", AN(arg), arg);
 			return;
 		}
 	}
@@ -6139,8 +6116,8 @@ ACMD(do_eat) {
 			act(obj_get_custom_message(food, OBJ_CUSTOM_CONSUME_TO_CHAR), FALSE, ch, food, NULL, TO_CHAR);
 		}
 		else {
-			snprintf(buf, sizeof(buf), "You eat %s$p.", some_part);
-			act(buf, FALSE, ch, food, NULL, TO_CHAR);
+			snprintf(line, sizeof(line), "You eat %s$p.", some_part);
+			act(line, FALSE, ch, food, NULL, TO_CHAR);
 		}
 
 		// message to room
@@ -6148,8 +6125,8 @@ ACMD(do_eat) {
 			act(obj_get_custom_message(food, OBJ_CUSTOM_CONSUME_TO_ROOM), FALSE, ch, food, NULL, TO_ROOM);
 		}
 		else {
-			snprintf(buf, sizeof(buf), "$n eats %s$p.", some_part);
-			act(buf, TRUE, ch, food, NULL, TO_ROOM);
+			snprintf(line, sizeof(line), "$n eats %s$p.", some_part);
+			act(line, TRUE, ch, food, NULL, TO_ROOM);
 		}
 	}
 	else {

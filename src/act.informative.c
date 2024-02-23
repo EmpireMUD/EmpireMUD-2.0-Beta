@@ -2710,13 +2710,12 @@ ACMD(do_affects) {
 
 
 ACMD(do_buffs) {
-	char output[MAX_STRING_LENGTH], line[MAX_STRING_LENGTH];
-	size_t out_size, line_size;
 	bool any = FALSE, error, other, own;
 	ability_data *abil;
 	struct affected_type *aff;
 	char_data *caster;
 	struct group_member_data *mem;
+	struct page_display *pd;
 	struct player_ability_data *plab, *next_plab;
 	
 	if (IS_NPC(ch)) {
@@ -2725,7 +2724,7 @@ ACMD(do_buffs) {
 	}
 	
 	// start string
-	out_size = snprintf(output, sizeof(output), "Your buff abilities:\r\n");
+	add_page_display(ch, "Your buff abilities:");
 	
 	HASH_ITER(hh, GET_ABILITY_HASH(ch), plab, next_plab) {
 		if (!(abil = plab->ptr)) {
@@ -2747,7 +2746,7 @@ ACMD(do_buffs) {
 		// build output
 		any = TRUE;
 		error = FALSE;
-		line_size = snprintf(line, sizeof(line), " %s:", ABIL_NAME(abil));
+		pd = add_page_display(ch, " %s:", ABIL_NAME(abil));
 		
 		// check self?
 		if (!IS_SET(ABIL_TARGETS(abil), ATAR_NOT_SELF)) {
@@ -2767,11 +2766,11 @@ ACMD(do_buffs) {
 				}
 			}
 			if (!own && other) {
-				line_size += snprintf(line + line_size, sizeof(line) - line_size, " \tyon self from %s\t0", (caster ? GET_NAME(caster) : "other caster"));
+				append_page_display_line(pd, " \tyon self from %s\t0", (caster ? GET_NAME(caster) : "other caster"));
 				error = TRUE;
 			}
 			else if (!own) {
-				line_size += snprintf(line + line_size, sizeof(line) - line_size, " \trmissing on self\t0");
+				append_page_display_line(pd, " \trmissing on self\t0");
 				error = TRUE;
 			}
 		}
@@ -2794,11 +2793,11 @@ ACMD(do_buffs) {
 				}
 			}
 			if (!own && other) {
-				line_size += snprintf(line + line_size, sizeof(line) - line_size, "%s \tyon companion from %s\t0", (error ? "," : ""), (caster ? GET_NAME(caster) : "other caster"));
+				append_page_display_line(pd, "%s \tyon companion from %s\t0", (error ? "," : ""), (caster ? GET_NAME(caster) : "other caster"));
 				error = TRUE;
 			}
 			else if (!own) {
-				line_size += snprintf(line + line_size, sizeof(line) - line_size, "%s \trmissing on companion\t0", (error ? "," : ""));
+				append_page_display_line(pd, "%s \trmissing on companion\t0", (error ? "," : ""));
 				error = TRUE;
 			}
 		}
@@ -2826,11 +2825,11 @@ ACMD(do_buffs) {
 					}
 				}
 				if (!own && other) {
-					line_size += snprintf(line + line_size, sizeof(line) - line_size, "%s \tyon %s from %s\t0", (error ? "," : ""), GET_NAME(mem->member), (caster ? GET_NAME(caster) : "other caster"));
+					append_page_display_line(pd, "%s \tyon %s from %s\t0", (error ? "," : ""), GET_NAME(mem->member), (caster ? GET_NAME(caster) : "other caster"));
 					error = TRUE;
 				}
 				else if (!own) {
-					line_size += snprintf(line + line_size, sizeof(line) - line_size, "%s \trmissing on %s\t0", (error ? "," : ""), GET_NAME(mem->member));
+					append_page_display_line(pd, "%s \trmissing on %s\t0", (error ? "," : ""), GET_NAME(mem->member));
 					error = TRUE;
 				}
 			}
@@ -2838,28 +2837,15 @@ ACMD(do_buffs) {
 		
 		// ok?
 		if (!error) {
-			line_size += snprintf(line + line_size, sizeof(line) - line_size, " \tgok\t0");
-		}
-		
-		// append?
-		if (out_size + line_size + 20 < sizeof(output)) {
-			out_size += snprintf(output + out_size, sizeof(output) - out_size, "%s\r\n", line);
-		}
-		else {
-			// space is reserved for an OVERFLOW
-			out_size += snprintf(output + out_size, sizeof(output) - out_size, "OVERFLOW\r\n");
-			break;
+			append_page_display_line(pd, " \tgok\t0");
 		}
 	}
 	
 	if (!any) {
-		// always room left if none were found
-		out_size += snprintf(output + out_size, sizeof(output) - out_size, " none\r\n");
+		add_page_display_str(ch, " none");
 	}
 	
-	if (ch->desc) {
-		page_string(ch->desc, output, TRUE);
-	}
+	send_page_display(ch);
 }
 
 
@@ -3933,18 +3919,16 @@ ACMD(do_mark) {
 
 ACMD(do_messages) {
 	struct automessage *msg, *next_msg;
-	char buf[MAX_STRING_LENGTH * 2];
 	struct player_automessage *pam;
 	time_t now = time(0);
 	int id, count = 0;
-	size_t size;
 	
 	if (IS_NPC(ch) || !ch->desc) {
 		msg_to_char(ch, "You can't do that.\r\n");
 		return;
 	}
 	
-	size = snprintf(buf, sizeof(buf), "Recent messages:\r\n");
+	add_page_display_str(ch, "Recent messages:");
 	
 	HASH_ITER(hh, automessages_table, msg, next_msg) {
 		if (!msg->msg) {
@@ -3956,16 +3940,7 @@ ACMD(do_messages) {
 		HASH_FIND_INT(GET_AUTOMESSAGES(ch), &id, pam);
 	
 		if (msg->timing == AUTOMSG_ON_LOGIN || msg->timestamp > (now - (24 * SECS_PER_REAL_HOUR)) || (pam && pam->timestamp > (now - 24 * SECS_PER_REAL_HOUR))) {
-			if (size + strlen(msg->msg) + 2 < sizeof(buf)) {
-				++count;
-				strcat(buf, msg->msg);
-				strcat(buf, "\r\n");
-				size += strlen(msg->msg) + 2;
-			}
-			else {
-				size += snprintf(buf + size, sizeof(buf) - size, "OVERFLOW\r\n");
-				break;
-			}
+			add_page_display_str(ch, msg->msg);
 			
 			// mark seen
 			if (msg->timing != AUTOMSG_ON_LOGIN) {
@@ -3980,12 +3955,10 @@ ACMD(do_messages) {
 	}
 	
 	if (!count) {
-		size += snprintf(buf + size, sizeof(buf) - size, " none\r\n");
+		add_page_display_str(ch, " none");
 	}
 	
-	if (ch->desc) {
-		page_string(ch->desc, buf, TRUE);
-	}
+	send_page_display(ch);
 }
 
 

@@ -269,11 +269,10 @@ void do_mount_current(char_data *ch) {
 
 // list/search mounts
 void do_mount_list(char_data *ch, char *argument) {
-	char buf[MAX_STRING_LENGTH], part[MAX_STRING_LENGTH], temp[MAX_STRING_LENGTH];
+	char part[MAX_STRING_LENGTH], temp[MAX_STRING_LENGTH];
 	struct mount_data *mount, *next_mount;
 	bool any = FALSE, cur;
 	char_data *proto;
-	size_t size = 0;
 	int count = 0;
 	
 	if (!GET_MOUNT_LIST(ch)) {
@@ -283,16 +282,13 @@ void do_mount_list(char_data *ch, char *argument) {
 	
 	// header
 	if (!*argument) {
-		size = snprintf(buf, sizeof(buf), "Your mounts:\r\n");
+		add_page_display_str(ch, "Your mounts:");
 	}
 	else {
-		size = snprintf(buf, sizeof(buf), "Your mounts matching '%s':\r\n", argument);
+		add_page_display(ch, "Your mounts matching '%s':", argument);
 	}
 	
 	HASH_ITER(hh, GET_MOUNT_LIST(ch), mount, next_mount) {
-		if (size >= sizeof(buf)) {	// overflow
-			break;
-		}
 		if (!(proto = mob_proto(mount->vnum))) {
 			continue;
 		}
@@ -311,24 +307,18 @@ void do_mount_list(char_data *ch, char *argument) {
 		}
 		
 		++count;
-		size += snprintf(buf + size, sizeof(buf) - size, " %s%-38s%s%s", (cur ? "&l" : ""), part, (cur ? "&0" : ""), PRF_FLAGGED(ch, PRF_SCREEN_READER) ? "\r\n" : (!(count % 2) ? "\r\n" : " "));
+		add_page_display_col(ch, 2, FALSE, " %s%s%s", (cur ? "&l" : ""), part, (cur ? "&0" : ""));
 		any = TRUE;
 	}
 	
-	if (!PRF_FLAGGED(ch, PRF_SCREEN_READER) && (count % 2)) {
-		size += snprintf(buf + size, sizeof(buf) - size, "\r\n");
-	}
-	
 	if (!any) {
-		size += snprintf(buf + size, sizeof(buf) - size, " no matches\r\n");
+		add_page_display_str(ch, " no matches");
 	}
 	else {
-		size += snprintf(buf + size, sizeof(buf) - size, " (%d total mount%s)\r\n", count, PLURAL(count));
+		add_page_display(ch, " (%d total mount%s)", count, PLURAL(count));
 	}
 	
-	if (ch->desc) {
-		page_string(ch->desc, buf, TRUE);
-	}
+	send_page_display(ch);
 }
 
 

@@ -2321,10 +2321,9 @@ ACMD(do_say) {
 
 
 ACMD(do_speak) {
-	char buf[MAX_STRING_LENGTH], line[256], mods[256], adv_part[256];
+	char mods[256], adv_part[256];
 	struct player_language *lang, *next_lang;
 	generic_data *gen;
-	size_t size, lsize;
 	int count;
 	adv_data *adv;
 	
@@ -2337,7 +2336,7 @@ ACMD(do_speak) {
 	
 	// no-arg: Just show languages I speak
 	if (!*argument) {
-		size = snprintf(buf, sizeof(buf), "You speak the following languages:\r\n");
+		add_page_display(ch, "You speak the following languages:");
 		
 		count = 0;
 		HASH_ITER(hh, GET_LANGUAGES(ch), lang, next_lang) {
@@ -2373,30 +2372,17 @@ ACMD(do_speak) {
 			
 			// build line
 			if (*mods) {
-				lsize = snprintf(line, sizeof(line), " %s (%s)%s\r\n", GEN_NAME(gen), mods, adv_part);
+				add_page_display(ch, " %s (%s)%s", GEN_NAME(gen), mods, adv_part);
 			}
 			else {
-				lsize = snprintf(line, sizeof(line), " %s%s\r\n", GEN_NAME(gen), adv_part);
-			}
-			
-			// append
-			if (size + lsize + 17 < sizeof(buf)) {
-				strcat(buf, line);
-				size += lsize;
-			}
-			else {
-				// overflow somehow?
-				size += snprintf(buf + size, sizeof(buf) - size, "**OVERFLOW**\r\n");
-				break;
+				add_page_display(ch, " %s%s", GEN_NAME(gen), adv_part);
 			}
 		}
 		
 		if (!count) {
-			size += snprintf(buf + size, sizeof(buf) - size, " none\r\n");
+			add_page_display_str(ch, " none");
 		}
-		if (ch->desc) {
-			page_string(ch->desc, buf, TRUE);
-		}
+		send_page_display(ch);
 		return;
 	}
 	

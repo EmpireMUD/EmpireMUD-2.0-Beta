@@ -1731,14 +1731,13 @@ ACMD(do_changepass) {
 
 
 ACMD(do_companions) {
-	char buf[MAX_STRING_LENGTH * 2], line[MAX_STRING_LENGTH];
 	struct companion_data *cd, *next_cd, *found_cd;
 	char_data *mob, *proto = NULL;
 	struct companion_mod *cmod;
 	ability_data *abil;
-	size_t size, lsize;
-	bool found, full, low_in_skill = FALSE;
+	bool found, low_in_skill = FALSE;
 	int found_low_level = 0;
+	struct page_display *pd;
 	
 	skip_spaces(&argument);
 	
@@ -1750,9 +1749,9 @@ ACMD(do_companions) {
 	setup_ability_companions(ch);
 	
 	if (!*argument) {
-		size = snprintf(buf, sizeof(buf), "You can summon the following companions:\r\n");
+		add_page_display(ch, "You can summon the following companions:");
 		
-		found = full = FALSE;
+		found = FALSE;
 		HASH_ITER(hh, GET_COMPANIONS(ch), cd, next_cd) {
 			if (cd->from_abil != NOTHING && !has_ability(ch, cd->from_abil)) {
 				continue;	// missing ability: don't show
@@ -1763,43 +1762,23 @@ ACMD(do_companions) {
 			
 			// build display
 			cmod = get_companion_mod_by_type(cd, CMOD_SHORT_DESC);
-			lsize = snprintf(line, sizeof(line), " %s", skip_filler(cmod ? cmod->str : get_mob_name_by_proto(cd->vnum, TRUE)));
+			pd = add_page_display(ch, " %s", skip_filler(cmod ? cmod->str : get_mob_name_by_proto(cd->vnum, TRUE)));
 			
 			if (cd->from_abil != NOTHING && (abil = find_ability_by_vnum(cd->from_abil)) && ABIL_COST(abil) > 0) {
-				lsize += snprintf(line + lsize, sizeof(line) - lsize, " (%d %s)", ABIL_COST(abil), pool_types[ABIL_COST_TYPE(abil)]);
+				append_page_display_line(pd, " (%d %s)", ABIL_COST(abil), pool_types[ABIL_COST_TYPE(abil)]);
 			}
 			
 			if (GET_MIN_SCALE_LEVEL(proto) > 0 && (cd->from_abil ? get_player_level_for_ability(ch, cd->from_abil) : get_approximate_level(ch)) < GET_MIN_SCALE_LEVEL(proto)) {
-				lsize += snprintf(line + lsize, sizeof(line) - lsize, " \trrequires level %d\t0", GET_MIN_SCALE_LEVEL(proto));
+				append_page_display_line(pd, " \trrequires level %d\t0", GET_MIN_SCALE_LEVEL(proto));
 			}
 			
-			strcat(line, "\r\n");
-			lsize += 2;
 			found = TRUE;
-			
-			if (size + lsize < sizeof(buf)) {
-				strcat(buf, line);
-				size += lsize;
-			}
-			else {
-				full = TRUE;
-				break;
-			}
-			
-			if (full) {
-				break;
-			}
 		}
 		
 		if (!found) {
-			strcat(buf, " none\r\n");	// always room for this if !found
+			add_page_display_str(ch, " none");
 		}
-		if (full) {
-			snprintf(buf + size, sizeof(buf) - size, "OVERFLOW\r\n");
-		}
-		if (ch->desc) {
-			page_string(ch->desc, buf, TRUE);
-		}
+		send_page_display(ch);
 		return;
 	}
 	
@@ -2553,10 +2532,9 @@ ACMD(do_herd) {
 
 
 ACMD(do_lastname) {
-	char arg1[MAX_INPUT_LENGTH], new_name[MAX_INPUT_LENGTH], output[MAX_STRING_LENGTH], line[MAX_STRING_LENGTH];
+	char arg1[MAX_INPUT_LENGTH], new_name[MAX_INPUT_LENGTH];
 	char *arg2, *best, *exact;
 	struct player_lastname *lastn;
-	size_t size;
 	int count;
 	
 	// we assume 'lastname <change | set | list> <name>' but also keep 'argument' whole too
@@ -2633,15 +2611,15 @@ ACMD(do_lastname) {
 		else {	// list them all
 			count = 0;
 			if (*arg2) {
-				size = snprintf(output, sizeof(output), "Lastnames matching '%s':\r\n", arg2);
+				add_page_display(ch, "Lastnames matching '%s':", arg2);
 			}
 			else {
-				size = snprintf(output, sizeof(output), "Your lastnames:\r\n");
+				add_page_display_str(ch, "Your lastnames:");
 			}
 		
 			if (GET_PERSONAL_LASTNAME(ch)) {
 				++count;
-				size += snprintf(output + size, sizeof(output) - size, " %s (personal)\r\n", GET_PERSONAL_LASTNAME(ch));
+				add_page_display(ch, " %s (personal)", GET_PERSONAL_LASTNAME(ch));
 			}
 		
 			LL_FOREACH(GET_LASTNAME_LIST(ch), lastn) {
@@ -2651,26 +2629,14 @@ ACMD(do_lastname) {
 		
 				// show it
 				++count;
-				snprintf(line, sizeof(line), " %s\r\n", NULLSAFE(lastn->name));
-				if (size + strlen(line) < sizeof(output)) {
-					strcat(output, line);
-					size += strlen(line);
-				}
-				else {
-					if (size + 10 < sizeof(output)) {
-						strcat(output, "OVERFLOW\r\n");
-					}
-					break;
-				}
+				add_page_display(ch, " %s", NULLSAFE(lastn->name));
 			}
 	
 			if (!count) {
-				strcat(output, " none\r\n");	// space reserved for this for sure
+				add_page_display_str(ch, " none");
 			}
 	
-			if (ch->desc) {
-				page_string(ch->desc, output, TRUE);
-			}
+			send_page_display(ch);
 		}
 	}
 	else if (IS_SET(config_get_bitvector("lastname_mode"), LASTNAME_CHOOSE_FROM_LIST)) {
@@ -2783,10 +2749,8 @@ ACMD(do_milk) {
 
 
 ACMD(do_minipets) {
-	char output[MAX_STRING_LENGTH * 2], line[MAX_STRING_LENGTH];
 	struct minipet_data *mini, *next_mini;
 	char_data *mob, *to_summon;
-	size_t size;
 	int count, number;
 	
 	skip_spaces(&argument);
@@ -2800,7 +2764,7 @@ ACMD(do_minipets) {
 	}
 	
 	if (!*argument) {	// just list minipets
-		size = snprintf(output, sizeof(output), "Minipets in your collection:\r\n");
+		add_page_display_str(ch, "Minipets in your collection:");
 		count = 0;
 	
 		HASH_ITER(hh, GET_MINIPETS(ch), mini, next_mini) {
@@ -2810,42 +2774,17 @@ ACMD(do_minipets) {
 		
 			// ok:
 			++count;
-		
-			if (PRF_FLAGGED(ch, PRF_SCREEN_READER)) {
-				snprintf(line, sizeof(line), "%s\r\n", skip_filler(GET_SHORT_DESC(mob)));
-			}
-			else {	// non-screenreader
-				snprintf(line, sizeof(line), " %-36.36s%s", skip_filler(GET_SHORT_DESC(mob)), !(count % 2) ? "\r\n" : "");
-			}
-		
-			if (size + strlen(line) + 14 < sizeof(output)) {
-				strcat(output, line);
-				size += strlen(line);
-			}
-			else {
-				strcat(output, "OVERFLOW\r\n");	// 10 characters always reserved
-				break;
-			}
+			add_page_display_col(ch, 2, FALSE, " %s", skip_filler(GET_SHORT_DESC(mob)));
 		}
 	
 		if (count == 0) {
-			strcat(output, " none\r\n");	// space always reserved for this
+			add_page_display_str(ch, " none");
 		}
-		else if (!PRF_FLAGGED(ch, PRF_SCREEN_READER) && (count % 2)) {
-			strcat(output, "\r\n");	// space always reserved for this
-		}
-		
-		if (count) {
-			snprintf(line, sizeof(line), " (%d total)\r\n", count);
-			if (size + strlen(line) < sizeof(output)) {
-				strcat(output, line);
-				size += strlen(line);
-			}
+		else {
+			add_page_display(ch, " (%d total)", count);
 		}
 	
-		if (ch->desc) {
-			page_string(ch->desc, output, TRUE);
-		}
+		send_page_display(ch);
 	}	// end no-arg
 	else if (GET_POS(ch) < POS_STANDING) {
 		send_low_pos_msg(ch);	// must be standing to do the rest
@@ -2906,14 +2845,12 @@ ACMD(do_minipets) {
 
 
 ACMD(do_morph) {
-	char buf[MAX_STRING_LENGTH], line[256];
 	morph_data *morph, *next_morph;
-	bool full = FALSE;
+	char line[MAX_STRING_LENGTH];
 	double multiplier;
+	size_t lsize;
 	obj_data *obj;
 	bool normal, fast;
-	size_t size, lsize;
-	int count;
 	char *tmp;
 	
 	skip_spaces(&argument);
@@ -2927,8 +2864,15 @@ ACMD(do_morph) {
 	}
 	
 	if (!*argument) {
-		count = 1;	// counting 'normal'
-		size = snprintf(buf, sizeof(buf), "You know the following morphs:\r\n %-*.*s%s", (!GET_MORPH(ch) ? 42 : 38), (!GET_MORPH(ch) ? 42 : 38), (!GET_MORPH(ch) ? "\tgnormal (current)\t0" : "normal"), PRF_FLAGGED(ch, PRF_SCREEN_READER) ? "\r\n" : "");
+		add_page_display_str(ch, "You know the following morphs:");
+		
+		// normal first
+		if (GET_MORPH(ch)) {
+			add_page_display_col(ch, 3, FALSE, " normal");
+		}
+		else {
+			add_page_display_col(ch, 3, FALSE, " \tgnormal (current)\t0");
+		}
 		
 		HASH_ITER(hh, morph_table, morph, next_morph) {
 			if (MORPH_FLAGGED(morph, MORPHF_IN_DEVELOPMENT | MORPHF_SCRIPT_ONLY)) {
@@ -2942,7 +2886,6 @@ ACMD(do_morph) {
 			}
 			
 			// build info line
-			++count;
 			if (strstr(MORPH_SHORT_DESC(morph), "#n")) {
 				tmp = str_replace("#n", PERS(ch, ch, TRUE), MORPH_SHORT_DESC(morph));
 				lsize = snprintf(line, sizeof(line), "%s", tmp);
@@ -2958,34 +2901,10 @@ ACMD(do_morph) {
 			}
 			
 			// append
-			if (PRF_FLAGGED(ch, PRF_SCREEN_READER) || !(count % 2) || lsize > 38) {
-				if (size + lsize + 3 < sizeof(buf)) {
-					size += snprintf(buf + size, sizeof(buf) - size, " %s%s\t0\r\n", (GET_MORPH(ch) == morph ? "\tg" : ""), line);
-				}
-				else {
-					full = TRUE;
-				}
-			}
-			else {
-				if (size + 39 < sizeof(buf)) {
-					size += snprintf(buf + size, sizeof(buf) - size, " %s%-38.38s\t0", (GET_MORPH(ch) == morph ? "\tg" : ""), line);
-				}
-				else {
-					full = TRUE;
-				}
-			}
+			add_page_display_col(ch, 3, FALSE, " %s%s\t0", (GET_MORPH(ch) == morph ? "\tg" : ""), line);
 		}
 		
-		if (full) {
-			snprintf(buf + size, sizeof(buf) - size, "OVERFLOW\r\n");
-		}
-		else if (count % 2 && size + 2 < sizeof(buf) && !PRF_FLAGGED(ch, PRF_SCREEN_READER)) {
-			strcat(buf, "\r\n");
-		}
-		
-		if (ch->desc) {
-			page_string(ch->desc, buf, TRUE);
-		}
+		send_page_display(ch);
 		return;
 	} // end no-argument
 	

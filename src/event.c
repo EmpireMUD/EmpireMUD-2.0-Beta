@@ -2635,11 +2635,10 @@ void show_event_detail(char_data *ch, event_data *event) {
 * @param struct event_running_data *re The event.
 */
 void show_event_leaderboard(char_data *ch, struct event_running_data *re) {
-	char buf[MAX_STRING_LENGTH], line[MAX_STRING_LENGTH], part[256];
+	char part[256];
 	struct event_leaderboard *lb, *next_lb;
 	player_index_data *index;
 	int rank = 0, total_rank = 0, last_points = -1;
-	size_t size;
 	
 	bool need_approval = config_get_bool("event_approval");
 	
@@ -2649,7 +2648,7 @@ void show_event_leaderboard(char_data *ch, struct event_running_data *re) {
 		return;
 	}
 	
-	size = snprintf(buf, sizeof(buf), "Leaderboard for %s:\r\n", EVT_NAME(re->event));
+	add_page_display(ch, "Leaderboard for %s:", EVT_NAME(re->event));
 	HASH_ITER(hh, re->player_leaderboard, lb, next_lb) {
 		if (lb->ignore || (need_approval && !lb->approved)) {
 			strcpy(part, " *");
@@ -2666,24 +2665,14 @@ void show_event_leaderboard(char_data *ch, struct event_running_data *re) {
 		}
 		
 		index = find_player_index_by_idnum(lb->id);
-		snprintf(line, sizeof(line), "%s. %s (%d)\r\n", part, index ? index->fullname : "???", lb->points);
-		
-		if (size + strlen(line) < sizeof(buf)) {
-			strcat(buf, line);
-			size += strlen(line);
-		}
-		else {
-			snprintf(buf + size, sizeof(buf) - size, "OVERFLOW\r\n");
-			break;
-		}
+		add_page_display(ch, "%s. %s (%d)", part, index ? index->fullname : "???", lb->points);
 	}
 	
 	if (!re->player_leaderboard) {
-		// always room left in 'buf' in this case
-		size += snprintf(buf + size, sizeof(buf) - size, " no entries\r\n");
+		add_page_display_str(ch, " no entries");
 	}
 	
-	page_string(ch->desc, buf, TRUE);
+	send_page_display(ch);
 }
 
 
@@ -2696,11 +2685,9 @@ void show_event_leaderboard(char_data *ch, struct event_running_data *re) {
 * @param struct event_running_data *re The event.
 */
 void show_event_rewards(char_data *ch, struct event_running_data *re) {
-	char buf[MAX_STRING_LENGTH * 2], line[MAX_STRING_LENGTH];
 	struct player_event_data *ped;
 	struct event_reward *reward;
 	bool collect, done;
-	size_t size;
 	
 	// basic sanitation
 	if (!re || !re->event || !ch->desc) {
@@ -2709,50 +2696,30 @@ void show_event_rewards(char_data *ch, struct event_running_data *re) {
 	}
 	
 	ped = get_event_data(ch, re->id);
-	size = 0;
-	*buf = '\0';
 	
 	// THRESHOLD
-	size += snprintf(buf + size, sizeof(buf) - size, "Threshold rewards for %s:\r\n", EVT_NAME(re->event));
+	add_page_display(ch, "Threshold rewards for %s:", EVT_NAME(re->event));
 	LL_FOREACH(EVT_THRESHOLD_REWARDS(re->event), reward) {
 		collect = (ped && ped->points >= reward->min);
 		done = (ped && ped->collected_points >= reward->min);
-		snprintf(line, sizeof(line), "%s%*d pt%s: %s%s\t0\r\n", done ? "\tc" : (collect ? "\tg" : ""), reward->min == 1 ? 4 : 3, reward->min, PLURAL(reward->min), event_reward_string(reward, IS_IMMORTAL(ch)), done ? " (collected)" : (collect ? " (pending)" : ""));
-		
-		if (size + strlen(line) < sizeof(buf)) {
-			strcat(buf, line);
-			size += strlen(line);
-		}
-		else {
-			snprintf(buf + size, sizeof(buf) - size, "OVERFLOW\r\n");
-			break;
-		}
+		add_page_display(ch, "%s%*d pt%s: %s%s\t0", done ? "\tc" : (collect ? "\tg" : ""), reward->min == 1 ? 4 : 3, reward->min, PLURAL(reward->min), event_reward_string(reward, IS_IMMORTAL(ch)), done ? " (collected)" : (collect ? " (pending)" : ""));
 	}
 	if (!EVT_THRESHOLD_REWARDS(re->event)) {
-		size += snprintf(buf + size, sizeof(buf) - size, " no threshold rewards\r\n");
+		add_page_display_str(ch, " no threshold rewards");
 	}
 	
 	// RANK
-	size += snprintf(buf + size, sizeof(buf) - size, "\r\nRank rewards for %s:\r\n", EVT_NAME(re->event));
+	add_page_display(ch, "\r\nRank rewards for %s:", EVT_NAME(re->event));
 	LL_FOREACH(EVT_RANK_REWARDS(re->event), reward) {
 		collect = (ped && ped->rank >= reward->min && ped->rank <= reward->max);
 		done = (ped && ped->status == EVTS_COLLECTED);
-		snprintf(line, sizeof(line), "%s %d-%d: %s%s\t0\r\n", (collect && done) ? "\tc" : (collect ? "\tg" : ""), reward->min, reward->max, event_reward_string(reward, IS_IMMORTAL(ch)), (collect && done) ? " (collected)" : (collect ? " (pending)" : ""));
-		
-		if (size + strlen(line) < sizeof(buf)) {
-			strcat(buf, line);
-			size += strlen(line);
-		}
-		else {
-			snprintf(buf + size, sizeof(buf) - size, "OVERFLOW\r\n");
-			break;
-		}
+		add_page_display(ch, "%s %d-%d: %s%s\t0", (collect && done) ? "\tc" : (collect ? "\tg" : ""), reward->min, reward->max, event_reward_string(reward, IS_IMMORTAL(ch)), (collect && done) ? " (collected)" : (collect ? " (pending)" : ""));
 	}
 	if (!EVT_RANK_REWARDS(re->event)) {
-		size += snprintf(buf + size, sizeof(buf) - size, " no rank rewards\r\n");
+		add_page_display_str(ch, " no rank rewards");
 	}
 	
-	page_string(ch->desc, buf, TRUE);
+	send_page_display(ch);
 }
 
 
@@ -3297,14 +3264,14 @@ EVENT_CMD(evcmd_leaderboard) {
 
 // shows recent events
 EVENT_CMD(evcmd_recent) {
-	char buf[MAX_STRING_LENGTH * 2], line[MAX_STRING_LENGTH], part[MAX_STRING_LENGTH];
+	char line[MAX_STRING_LENGTH], part[MAX_STRING_LENGTH];
 	struct event_running_data *running;
 	struct player_event_data *ped;
 	int rank, when, count = 0;
-	size_t size, lsize;
+	size_t lsize;
 	char *ptr;
 	
-	size = snprintf(buf, sizeof(buf), "Recent events (see HELP EVENTS for more options):\r\n");
+	add_page_display(ch, "Recent events (see HELP EVENTS for more options):");
 	LL_FOREACH(running_events, running) {
 		if (!running->event) {
 			continue;	// can't show one with no event
@@ -3349,28 +3316,15 @@ EVENT_CMD(evcmd_recent) {
 			lsize += snprintf(line + lsize, sizeof(line) - lsize, ", ended %s ago", ptr);
 		}
 		
-		if (lsize < sizeof(line) - 2) {
-			strcat(line, "\r\n");
-			lsize += 2;
-		}
-		
 		// append
-		if (lsize + size < sizeof(buf)) {
-			strcat(buf, line);
-			size += lsize;
-		}
-		else {
-			size += snprintf(buf + size, sizeof(buf) - size, "**OVERFLOW**\r\n");
-		}
+		add_page_display_str(ch, line);
 	}
 	
 	if (!count) {
-		strcat(buf, " none\r\n");	// always room in buf if !count
+		add_page_display_str(ch, " none");
 	}
 	
-	if (ch->desc) {
-		page_string(ch->desc, buf, TRUE);
-	}
+	send_page_display(ch);
 }
 
 

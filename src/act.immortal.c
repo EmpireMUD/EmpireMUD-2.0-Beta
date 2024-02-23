@@ -5345,17 +5345,15 @@ ACMD(do_at) {
 
 
 ACMD(do_automessage) {
-	char buf[MAX_STRING_LENGTH * 2], line[MAX_STRING_LENGTH], part[MAX_STRING_LENGTH];
-	char cmd_arg[MAX_INPUT_LENGTH], type_arg[MAX_INPUT_LENGTH], id_arg[MAX_STRING_LENGTH];
+	char part[MAX_STRING_LENGTH], cmd_arg[MAX_INPUT_LENGTH], type_arg[MAX_INPUT_LENGTH], id_arg[MAX_STRING_LENGTH];
 	struct automessage *msg, *next_msg;
 	int id, iter, type, interval = 5;
 	player_index_data *plr;
-	size_t size;
 	
 	argument = any_one_arg(argument, cmd_arg);
 	
 	if (is_abbrev(cmd_arg, "list")) {
-		size = snprintf(buf, sizeof(buf), "Automessages:\r\n");
+		add_page_display_str(ch, "Automessages:");
 		
 		HASH_ITER(hh, automessages_table, msg, next_msg) {
 			switch (msg->timing) {
@@ -5370,24 +5368,13 @@ ACMD(do_automessage) {
 			}
 			
 			plr = find_player_index_by_idnum(msg->author);
-			snprintf(line, sizeof(line), "%d. %s (%s): %s\r\n", msg->id, part, plr->fullname, msg->msg);
-			
-			if (size + strlen(line) < sizeof(buf)) {
-				strcat(buf, line);
-				size += strlen(line);
-			}
-			else {
-				size += snprintf(buf + size, sizeof(buf) - size, "OVERFLOW\r\n");
-				break;
-			}
+			add_page_display(ch, "%d. %s (%s): %s", msg->id, part, plr->fullname, msg->msg);
 		}
 		
 		if (!automessages_table) {
-			size += snprintf(buf + size, sizeof(buf) - size, " none\r\n");
+			add_page_display_str(ch, " none");
 		}
-		if (ch->desc) {
-			page_string(ch->desc, buf, TRUE);
-		}
+		send_page_display(ch);
 	}
 	else if (is_abbrev(cmd_arg, "add")) {
 		argument = any_one_arg(argument, type_arg);
@@ -6562,11 +6549,11 @@ ACMD(do_invis) {
 
 
 ACMD(do_island) {
-	char arg1[MAX_INPUT_LENGTH], arg2[MAX_INPUT_LENGTH], output[MAX_STRING_LENGTH * 2], line[256], flags[256];
+	char arg1[MAX_INPUT_LENGTH], arg2[MAX_INPUT_LENGTH], flags[256];
 	struct island_info *isle, *next_isle;
 	room_data *center;
 	bitvector_t old;
-	size_t outsize;
+	struct page_display *pd;
 	
 	argument = any_one_arg(argument, arg1);	// command
 	skip_spaces(&argument);	// remainder
@@ -6576,7 +6563,7 @@ ACMD(do_island) {
 		return;
 	}
 	else if (is_abbrev(arg1, "list")) {
-		outsize = snprintf(output, sizeof(output), "Islands:\r\n");
+		add_page_display(ch, "Islands:");
 		
 		HASH_ITER(hh, island_table, isle, next_isle) {
 			if (*argument && !multi_isname(argument, isle->name)) {
@@ -6585,22 +6572,14 @@ ACMD(do_island) {
 			
 			center = real_room(isle->center);
 			
-			snprintf(line, sizeof(line), "%2d. %s (%d, %d), size %d, levels %d-%d", isle->id, isle->name, (center ? FLAT_X_COORD(center) : -1), (center ? FLAT_Y_COORD(center) : -1), isle->tile_size, isle->min_level, isle->max_level);
+			pd = add_page_display(ch, "%2d. %s (%d, %d), size %d, levels %d-%d", isle->id, isle->name, (center ? FLAT_X_COORD(center) : -1), (center ? FLAT_Y_COORD(center) : -1), isle->tile_size, isle->min_level, isle->max_level);
 			if (isle->flags) {
 				sprintbit(isle->flags, island_bits, flags, TRUE);
-				snprintf(line + strlen(line), sizeof(line) - strlen(line), ", %s", flags);
-			}
-			
-			if (strlen(line) + outsize < sizeof(output)) {
-				outsize += snprintf(output + outsize, sizeof(output) - outsize, "%s\r\n", line);
-			}
-			else {
-				outsize += snprintf(output + outsize, sizeof(output) - outsize, "OVERFLOW\r\n");
-				break;
+				append_page_display_line(pd, ", %s", flags);
 			}
 		}
 		
-		page_string(ch->desc, output, TRUE);
+		send_page_display(ch);
 	}
 	else if (is_abbrev(arg1, "rename")) {
 		argument = one_argument(argument, arg2);
