@@ -11208,18 +11208,19 @@ void olc_show_ability(char_data *ch) {
 	// Command, Targets line
 	if (IS_SET(fields, ABILEDIT_COMMAND | ABILEDIT_TARGETS)) {
 		pd = add_page_display_str(ch, "");	// prepare variable line
-	}
-	if (IS_SET(fields, ABILEDIT_COMMAND)) {
-		if (!ABIL_COMMAND(abil)) {
-			append_page_display_line(pd, "<%scommand\t0> (not a command)", OLC_LABEL_UNCHANGED);
+		
+		if (IS_SET(fields, ABILEDIT_COMMAND)) {
+			if (!ABIL_COMMAND(abil)) {
+				append_page_display_line(pd, "<%scommand\t0> (not a command)", OLC_LABEL_UNCHANGED);
+			}
+			else {
+				append_page_display_line(pd, "<%scommand\t0> %s", OLC_LABEL_CHANGED, ABIL_COMMAND(abil));
+			}
 		}
-		else {
-			append_page_display_line(pd, "<%scommand\t0> %s", OLC_LABEL_CHANGED, ABIL_COMMAND(abil));
+		if (IS_SET(fields, ABILEDIT_TARGETS)) {
+			sprintbit(ABIL_TARGETS(abil), ability_target_flags, lbuf, TRUE);
+			append_page_display_line(pd, "%s<%stargets\t0> %s", (IS_SET(fields, ABILEDIT_COMMAND) ? ", " : ""), OLC_LABEL_VAL(ABIL_TARGETS(abil), NOBITS), lbuf);
 		}
-	}
-	if (IS_SET(fields, ABILEDIT_TARGETS)) {
-		sprintbit(ABIL_TARGETS(abil), ability_target_flags, lbuf, TRUE);
-		append_page_display_line(pd, "%s<%stargets\t0> %s", (IS_SET(fields, ABILEDIT_COMMAND) ? ", " : ""), OLC_LABEL_VAL(ABIL_TARGETS(abil), NOBITS), lbuf);
 	}
 	
 	// Linked Traits, Min Pos line
@@ -11234,12 +11235,13 @@ void olc_show_ability(char_data *ch) {
 	}
 	if (IS_SET(fields, ABILEDIT_COST_PER_AMOUNT | ABILEDIT_COST_PER_TARGET)) {
 		pd = add_page_display(ch, "");	// prepare for 2-part line
-	}
-	if (IS_SET(fields, ABILEDIT_COST_PER_AMOUNT)) {
-		append_page_display_line(pd, "<%scostperamount\t0> %.2f", OLC_LABEL_VAL(ABIL_COST_PER_AMOUNT(abil), 0.0), ABIL_COST_PER_AMOUNT(abil));
-	}
-	if (IS_SET(fields, ABILEDIT_COST_PER_TARGET)) {
-		append_page_display_line(pd, "%s<%scostpertarget\t0> %.2f", (IS_SET(fields, ABILEDIT_COST_PER_AMOUNT) ? ", " : ""), OLC_LABEL_VAL(ABIL_COST_PER_TARGET(abil), 0.0), ABIL_COST_PER_TARGET(abil));
+		
+		if (IS_SET(fields, ABILEDIT_COST_PER_AMOUNT)) {
+			append_page_display_line(pd, "<%scostperamount\t0> %.2f", OLC_LABEL_VAL(ABIL_COST_PER_AMOUNT(abil), 0.0), ABIL_COST_PER_AMOUNT(abil));
+		}
+		if (IS_SET(fields, ABILEDIT_COST_PER_TARGET)) {
+			append_page_display_line(pd, "%s<%scostpertarget\t0> %.2f", (IS_SET(fields, ABILEDIT_COST_PER_AMOUNT) ? ", " : ""), OLC_LABEL_VAL(ABIL_COST_PER_TARGET(abil), 0.0), ABIL_COST_PER_TARGET(abil));
+		}
 	}
 	
 	if (IS_SET(fields, ABILEDIT_COST)) {
@@ -11303,21 +11305,22 @@ void olc_show_ability(char_data *ch) {
 	// Attack type, Damage type, Max Stacks line
 	if (IS_SET(fields, ABILEDIT_ATTACK_TYPE | ABILEDIT_DAMAGE_TYPE | ABILEDIT_MAX_STACKS | ABILEDIT_POOL_TYPE | ABILEDIT_MOVE_TYPE)) {
 		pd = add_page_display(ch, "");	// start new line with variable fields
-	}
-	if (IS_SET(fields, ABILEDIT_ATTACK_TYPE)) {
-		append_page_display_line(pd, "<%sattacktype\t0> %d %s", OLC_LABEL_VAL(ABIL_ATTACK_TYPE(abil), 0), ABIL_ATTACK_TYPE(abil), get_attack_name_by_vnum(ABIL_ATTACK_TYPE(abil)));
-	}
-	if (IS_SET(fields, ABILEDIT_DAMAGE_TYPE)) {
-		append_page_display_line(pd, "%s<%sdamagetype\t0> %s", (IS_SET(fields, ABILEDIT_ATTACK_TYPE) ? ", " : ""), OLC_LABEL_VAL(ABIL_DAMAGE_TYPE(abil), 0), damage_types[ABIL_DAMAGE_TYPE(abil)]);
-	}
-	if (IS_SET(fields, ABILEDIT_POOL_TYPE)) {
-		append_page_display_line(pd, "%s<%spooltype\t0> %s", (IS_SET(fields, ABILEDIT_ATTACK_TYPE | ABILEDIT_DAMAGE_TYPE) ? ", " : ""), OLC_LABEL_VAL(ABIL_POOL_TYPE(abil), 0), ABIL_POOL_TYPE(abil) == ANY_POOL ? "any" : pool_types[ABIL_POOL_TYPE(abil)]);
-	}
-	if (IS_SET(fields, ABILEDIT_MOVE_TYPE)) {
-		append_page_display_line(pd, "%s<%smovetype\t0> %s", (IS_SET(fields, ABILEDIT_ATTACK_TYPE | ABILEDIT_DAMAGE_TYPE | ABILEDIT_POOL_TYPE) ? ", " : ""), OLC_LABEL_VAL(ABIL_MOVE_TYPE(abil), 0), ability_move_types[ABIL_MOVE_TYPE(abil)]);
-	}
-	if (IS_SET(fields, ABILEDIT_MAX_STACKS)) {
-		append_page_display_line(pd, "%s<%smaxstacks\t0> %d", (IS_SET(fields, ABILEDIT_ATTACK_TYPE | ABILEDIT_DAMAGE_TYPE | ABILEDIT_POOL_TYPE | ABILEDIT_MOVE_TYPE) ? ", " : ""), OLC_LABEL_VAL(ABIL_MAX_STACKS(abil), 1), ABIL_MAX_STACKS(abil));
+		
+		if (IS_SET(fields, ABILEDIT_ATTACK_TYPE)) {
+			append_page_display_line(pd, "<%sattacktype\t0> %d %s", OLC_LABEL_VAL(ABIL_ATTACK_TYPE(abil), 0), ABIL_ATTACK_TYPE(abil), get_attack_name_by_vnum(ABIL_ATTACK_TYPE(abil)));
+		}
+		if (IS_SET(fields, ABILEDIT_DAMAGE_TYPE)) {
+			append_page_display_line(pd, "%s<%sdamagetype\t0> %s", (IS_SET(fields, ABILEDIT_ATTACK_TYPE) ? ", " : ""), OLC_LABEL_VAL(ABIL_DAMAGE_TYPE(abil), 0), damage_types[ABIL_DAMAGE_TYPE(abil)]);
+		}
+		if (IS_SET(fields, ABILEDIT_POOL_TYPE)) {
+			append_page_display_line(pd, "%s<%spooltype\t0> %s", (IS_SET(fields, ABILEDIT_ATTACK_TYPE | ABILEDIT_DAMAGE_TYPE) ? ", " : ""), OLC_LABEL_VAL(ABIL_POOL_TYPE(abil), 0), ABIL_POOL_TYPE(abil) == ANY_POOL ? "any" : pool_types[ABIL_POOL_TYPE(abil)]);
+		}
+		if (IS_SET(fields, ABILEDIT_MOVE_TYPE)) {
+			append_page_display_line(pd, "%s<%smovetype\t0> %s", (IS_SET(fields, ABILEDIT_ATTACK_TYPE | ABILEDIT_DAMAGE_TYPE | ABILEDIT_POOL_TYPE) ? ", " : ""), OLC_LABEL_VAL(ABIL_MOVE_TYPE(abil), 0), ability_move_types[ABIL_MOVE_TYPE(abil)]);
+		}
+		if (IS_SET(fields, ABILEDIT_MAX_STACKS)) {
+			append_page_display_line(pd, "%s<%smaxstacks\t0> %d", (IS_SET(fields, ABILEDIT_ATTACK_TYPE | ABILEDIT_DAMAGE_TYPE | ABILEDIT_POOL_TYPE | ABILEDIT_MOVE_TYPE) ? ", " : ""), OLC_LABEL_VAL(ABIL_MAX_STACKS(abil), 1), ABIL_MAX_STACKS(abil));
+		}
 	}
 	
 	// custom messages
