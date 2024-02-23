@@ -674,6 +674,23 @@ void free_page_display(struct page_display **list) {
 
 
 /**
+* Ensures nothing is left in the page_displays buffers on all connected
+* descriptors. These should have been flushed by either send_page_display() or
+* free_page_display() by the function that used them.
+*/
+void clear_leftover_page_displays(void) {
+	descriptor_data *desc;
+	
+	LL_FOREACH(descriptor_list, desc) {
+		if (desc && desc->page_lines) {
+			log("SYSERR: %s has leftover page_display lines starting with: %s", (desc->character ? GET_NAME(desc->character) : "Unknown player"), NULLSAFE(desc->page_lines->text));
+			free_page_display(&desc->page_lines);
+		}
+	}
+}
+
+
+/**
 * Determines how wide a column should be, based on character preferences and
 * number of columns requested.
 *

@@ -74,6 +74,7 @@ void check_maintenance_and_depletion_reset();
 void check_newbie_islands();
 void check_wars();
 void chore_update();
+void clear_leftover_page_displays();
 void display_automessages();
 void frequent_combat(unsigned long pulse);
 void perform_requested_world_saves();
@@ -998,6 +999,12 @@ void heartbeat(unsigned long heart_pulse) {
 	if (book_library_file_needs_save) {
 		write_book_library_file();
 		HEARTBEAT_LOG("33")
+	}
+	
+	// check text hasn't been left in the page_display system
+	if (HEARTBEAT(0.5)) {
+		clear_leftover_page_displays();
+		HEARTBEAT_LOG("33.5");
 	}
 	
 	// this goes roughly last -- update MSDP users etc
