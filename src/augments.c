@@ -742,7 +742,7 @@ void do_stat_augment(char_data *ch, augment_data *aug) {
 */
 void olc_show_augment(char_data *ch) {
 	augment_data *aug = GET_OLC_AUGMENT(ch->desc);
-	char buf[MAX_STRING_LENGTH], lbuf[MAX_STRING_LENGTH];
+	char lbuf[MAX_STRING_LENGTH];
 	struct apply_data *app;
 	ability_data *abil;
 	int num;
@@ -751,18 +751,16 @@ void olc_show_augment(char_data *ch) {
 		return;
 	}
 	
-	*buf = '\0';
+	add_page_display(ch, "[%s%d\t0] %s%s\t0", OLC_LABEL_CHANGED, GET_OLC_VNUM(ch->desc), OLC_LABEL_UNCHANGED, !augment_proto(GET_AUG_VNUM(aug)) ? "new augment" : GET_AUG_NAME(augment_proto(GET_AUG_VNUM(aug))));
+	add_page_display(ch, "<%sname\t0> %s", OLC_LABEL_STR(GET_AUG_NAME(aug), default_aug_name), NULLSAFE(GET_AUG_NAME(aug)));
 	
-	sprintf(buf + strlen(buf), "[%s%d\t0] %s%s\t0\r\n", OLC_LABEL_CHANGED, GET_OLC_VNUM(ch->desc), OLC_LABEL_UNCHANGED, !augment_proto(GET_AUG_VNUM(aug)) ? "new augment" : GET_AUG_NAME(augment_proto(GET_AUG_VNUM(aug))));
-	sprintf(buf + strlen(buf), "<%sname\t0> %s\r\n", OLC_LABEL_STR(GET_AUG_NAME(aug), default_aug_name), NULLSAFE(GET_AUG_NAME(aug)));
-	
-	sprintf(buf + strlen(buf), "<%stype\t0> %s\r\n", OLC_LABEL_VAL(GET_AUG_TYPE(aug), 0), augment_types[GET_AUG_TYPE(aug)]);
+	add_page_display(ch, "<%stype\t0> %s", OLC_LABEL_VAL(GET_AUG_TYPE(aug), 0), augment_types[GET_AUG_TYPE(aug)]);
 
 	sprintbit(GET_AUG_FLAGS(aug), augment_flags, lbuf, TRUE);
-	sprintf(buf + strlen(buf), "<%sflags\t0> %s\r\n", OLC_LABEL_VAL(GET_AUG_FLAGS(aug), AUG_IN_DEVELOPMENT), lbuf);
+	add_page_display(ch, "<%sflags\t0> %s", OLC_LABEL_VAL(GET_AUG_FLAGS(aug), AUG_IN_DEVELOPMENT), lbuf);
 	
 	sprintbit(GET_AUG_WEAR_FLAGS(aug), wear_bits, lbuf, TRUE);
-	sprintf(buf + strlen(buf), "<%swear\t0> %s\r\n", OLC_LABEL_VAL(GET_AUG_WEAR_FLAGS(aug), NOBITS), lbuf);
+	add_page_display(ch, "<%swear\t0> %s", OLC_LABEL_VAL(GET_AUG_WEAR_FLAGS(aug), NOBITS), lbuf);
 	
 	// ability required
 	if (GET_AUG_ABILITY(aug) == NO_ABIL || !(abil = find_ability_by_vnum(GET_AUG_ABILITY(aug)))) {
@@ -774,24 +772,24 @@ void olc_show_augment(char_data *ch) {
 			sprintf(buf1 + strlen(buf1), " (%s %d)", SKILL_NAME(ABIL_ASSIGNED_SKILL(abil)), ABIL_SKILL_LEVEL(abil));
 		}
 	}
-	sprintf(buf + strlen(buf), "<%srequiresability\t0> %s\r\n", OLC_LABEL_VAL(GET_AUG_ABILITY(aug), NO_ABIL), buf1);
+	add_page_display(ch, "<%srequiresability\t0> %s", OLC_LABEL_VAL(GET_AUG_ABILITY(aug), NO_ABIL), buf1);
 
-	sprintf(buf + strlen(buf), "<%srequiresobject\t0> %d - %s\r\n", OLC_LABEL_VAL(GET_AUG_REQUIRES_OBJ(aug), NOTHING), GET_AUG_REQUIRES_OBJ(aug), GET_AUG_REQUIRES_OBJ(aug) == NOTHING ? "none" : get_obj_name_by_proto(GET_AUG_REQUIRES_OBJ(aug)));
+	add_page_display(ch, "<%srequiresobject\t0> %d - %s", OLC_LABEL_VAL(GET_AUG_REQUIRES_OBJ(aug), NOTHING), GET_AUG_REQUIRES_OBJ(aug), GET_AUG_REQUIRES_OBJ(aug) == NOTHING ? "none" : get_obj_name_by_proto(GET_AUG_REQUIRES_OBJ(aug)));
 	
 	// applies
-	sprintf(buf + strlen(buf), "Attribute applies: <%sapply\t0>\r\n", OLC_LABEL_PTR(GET_AUG_APPLIES(aug)));
+	add_page_display(ch, "Attribute applies: <%sapply\t0>", OLC_LABEL_PTR(GET_AUG_APPLIES(aug)));
 	for (app = GET_AUG_APPLIES(aug), num = 1; app; app = app->next, ++num) {
-		sprintf(buf + strlen(buf), " %2d. %d to %s\r\n", num, app->weight, apply_types[app->location]);
+		add_page_display_col(ch, 2, FALSE, " %2d. %d to %s", num, app->weight, apply_types[app->location]);
 	}
 	
 	// resources
-	sprintf(buf + strlen(buf), "Resources required: <%sresource\t0>\r\n", OLC_LABEL_PTR(GET_AUG_RESOURCES(aug)));
+	add_page_display(ch, "Resources required: <%sresource\t0>", OLC_LABEL_PTR(GET_AUG_RESOURCES(aug)));
 	if (GET_AUG_RESOURCES(aug)) {
 		get_resource_display(ch, GET_AUG_RESOURCES(aug), lbuf);
-		strcat(buf, lbuf);
+		add_page_display_str(ch, lbuf);
 	}
 	
-	page_string(ch->desc, buf, TRUE);
+	send_page_display(ch);
 }
 
 
