@@ -6322,10 +6322,10 @@ ACMD(do_islands) {
 			pd = add_page_display(ch, " %s%s - ", get_island_name_for(isle->id, ch), coord_display_room(ch, room, FALSE));
 		
 			if (item->territory > 0) {
-				append_page_display_line(pd, "%d territory%s", item->territory, item->einv_size > 0 ? ", " : "");
+				append_page_display_line(pd, "%d territory%s", item->territory, (item->einv_size > 0 || item->population > 0) ? ", " : "");
 			}
 			if (item->einv_size > 0) {
-				append_page_display_line(pd, "%d einventory%s", item->einv_size, item->population > 0 ? ", " : "");
+				append_page_display_line(pd, "%d einventory%s", item->einv_size, (item->population > 0) ? ", " : "");
 			}
 			if (item->population > 0) {
 				append_page_display_line(pd, "%d citizen%s", item->population, PLURAL(item->population));
