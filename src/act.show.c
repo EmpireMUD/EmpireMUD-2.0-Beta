@@ -453,8 +453,7 @@ SHOW(show_ammotypes) {
 
 
 SHOW(show_author) {
-	int idnum;
-	size_t count;
+	int idnum, count;
 	book_data *book, *next_book;
 	player_index_data *index;
 	
@@ -1322,7 +1321,7 @@ SHOW(show_languages) {
 	struct player_language *lang, *next_lang;
 	generic_data *gen;
 	char_data *plr = NULL;
-	size_t count;
+	int count;
 	bool file = FALSE;
 	
 	argument = one_word(argument, arg);
@@ -1427,7 +1426,7 @@ SHOW(show_learned) {
 	struct player_craft_data *pcd, *next_pcd;
 	empire_data *emp = NULL;
 	char_data *plr = NULL;
-	size_t count;
+	int count;
 	craft_data *craft;
 	bool file = FALSE;
 	
@@ -1504,7 +1503,7 @@ SHOW(show_learned) {
 
 
 SHOW(show_libraries) {
-	size_t count;
+	int count;
 	book_data *book;
 	room_data *room;
 	struct library_info *libr, *next_libr;
@@ -1540,7 +1539,7 @@ SHOW(show_libraries) {
 
 
 SHOW(show_lost_books) {
-	size_t count;
+	int count;
 	book_data *book, *next_book;
 	player_index_data *index;
 	
