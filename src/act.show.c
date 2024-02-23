@@ -88,7 +88,7 @@ SHOW(show_islands) {
 	struct shipping_data *shipd;
 	struct empire_storage_data *store, *next_store;
 	struct empire_island *eisle, *next_eisle;
-	char arg[MAX_INPUT_LENGTH], tech_str[MAX_STRING_LENGTH];
+	char tech_str[MAX_STRING_LENGTH];
 	struct island_info *isle;
 	empire_data *emp;
 	int iter, tid;
@@ -453,7 +453,6 @@ SHOW(show_ammotypes) {
 
 
 SHOW(show_author) {
-	char arg[MAX_INPUT_LENGTH];
 	int idnum;
 	size_t count;
 	book_data *book, *next_book;
@@ -584,7 +583,6 @@ SHOW(show_commons) {
 
 
 SHOW(show_companions) {
-	char arg[MAX_INPUT_LENGTH];
 	char_data *proto = NULL, *plr = NULL;
 	struct companion_data *cd, *next_cd;
 	bool found, file = FALSE;
@@ -780,7 +778,6 @@ SHOW(show_currency) {
 
 
 SHOW(show_dailycycle) {
-	char arg[MAX_INPUT_LENGTH];
 	quest_data *qst, *next_qst;
 	int num, count;
 	
@@ -1005,7 +1002,6 @@ SHOW(show_factions) {
 
 
 SHOW(show_fmessages) {
-	char arg[MAX_INPUT_LENGTH];
 	int count, iter;
 	char_data *plr = NULL;
 	bool on, screenreader = (PRF_FLAGGED(ch, PRF_SCREEN_READER) ? TRUE : FALSE), file = FALSE;
@@ -1121,7 +1117,7 @@ SHOW(show_home) {
 
 
 SHOW(show_homeless) {
-	char arg[MAX_INPUT_LENGTH], line[MAX_STRING_LENGTH];
+	char line[MAX_STRING_LENGTH];
 	struct empire_homeless_citizen *ehc;
 	struct generic_name_data *nameset;
 	size_t lsize;
@@ -1179,7 +1175,6 @@ SHOW(show_homeless) {
 
 
 SHOW(show_ignoring) {
-	char arg[MAX_INPUT_LENGTH];
 	player_index_data *index;
 	bool found, file = FALSE;
 	char_data *vict = NULL;
@@ -1324,7 +1319,6 @@ SHOW(show_inventory) {
 
 
 SHOW(show_languages) {
-	char arg[MAX_INPUT_LENGTH];
 	struct player_language *lang, *next_lang;
 	generic_data *gen;
 	char_data *plr = NULL;
@@ -1376,7 +1370,6 @@ SHOW(show_languages) {
 
 
 SHOW(show_lastnames) {
-	char arg[MAX_INPUT_LENGTH];
 	struct player_lastname *lastn;
 	bool file = FALSE, cur;
 	char_data *plr = NULL;
@@ -1431,7 +1424,6 @@ SHOW(show_lastnames) {
 
 
 SHOW(show_learned) {
-	char arg[MAX_INPUT_LENGTH];
 	struct player_craft_data *pcd, *next_pcd;
 	empire_data *emp = NULL;
 	char_data *plr = NULL;
@@ -1511,7 +1503,6 @@ SHOW(show_learned) {
 
 
 SHOW(show_libraries) {
-	char arg[MAX_INPUT_LENGTH];
 	size_t count;
 	book_data *book;
 	room_data *room;
@@ -1573,7 +1564,6 @@ SHOW(show_lost_books) {
 
 
 SHOW(show_minipets) {
-	char arg[MAX_INPUT_LENGTH];
 	struct minipet_data *mini, *next_mini;
 	char_data *mob, *plr = NULL;
 	size_t count;
@@ -1658,7 +1648,6 @@ SHOW(show_moons) {
 
 
 SHOW(show_mounts) {
-	char arg[MAX_INPUT_LENGTH];
 	struct mount_data *mount, *next_mount;
 	char_data *mob, *plr = NULL;
 	size_t count;
@@ -1954,7 +1943,6 @@ SHOW(show_players) {
 
 
 SHOW(show_produced) {
-	char arg[MAX_INPUT_LENGTH];
 	struct empire_production_total *egt, *next_egt;
 	empire_data *emp = NULL;
 	obj_vnum vnum = NOTHING;
@@ -2377,7 +2365,6 @@ SHOW(show_skills) {
 
 
 SHOW(show_smessages) {
-	char arg[MAX_INPUT_LENGTH];
 	int count, iter;
 	char_data *plr = NULL;
 	bool on, screenreader = (PRF_FLAGGED(ch, PRF_SCREEN_READER) ? TRUE : FALSE), file = FALSE;
@@ -2979,7 +2966,6 @@ SHOW(show_unlearnable) {
 
 
 SHOW(show_unlocked_archetypes) {
-	char arg[MAX_INPUT_LENGTH];
 	archetype_data *arch;
 	struct unlocked_archetype *unarch, *next_unarch;
 	char_data *plr = NULL;
@@ -3244,7 +3230,6 @@ SHOW(show_variables) {
 
 
 SHOW(show_workforce) {
-	char arg[MAX_INPUT_LENGTH];
 	empire_data *emp;
 	
 	one_word(argument, arg);
