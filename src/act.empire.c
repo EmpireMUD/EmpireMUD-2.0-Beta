@@ -5089,13 +5089,11 @@ ACMD(do_emotd) {
 
 
 ACMD(do_empires) {
-	char output[MAX_STRING_LENGTH*2], line[MAX_STRING_LENGTH];
 	empire_data *e, *emp, *next_emp;
 	char_data *vict = NULL;
 	int min = 1, count;
 	bool more = FALSE, all = FALSE, file = FALSE;
 	char title[80];
-	size_t lsize, size;
 
 	skip_spaces(&argument);
 
@@ -5181,7 +5179,7 @@ ACMD(do_empires) {
 		strcpy(title, "Prominent empires:");
 	}
 
-	size = snprintf(output, sizeof(output), "%-35.35s  Sc  Mm  Grt  Territory\r\n", title);
+	add_page_display(ch, "%-35.35s  Sc  Mm  Grt  Territory", title);
 
 	count = 0;
 	HASH_ITER(hh, empire_table, emp, next_emp) {
@@ -5203,22 +5201,11 @@ ACMD(do_empires) {
 			continue;
 		}
 		
-		lsize = snprintf(line, sizeof(line), "%3d. %s%-30.30s&0  %2d  %2d  %3d  %d\r\n", count, EMPIRE_BANNER(emp), EMPIRE_NAME(emp), get_total_score(emp), EMPIRE_MEMBERS(emp), EMPIRE_GREATNESS(emp), EMPIRE_TERRITORY(emp, TER_TOTAL));
-		
-		// append if room
-		if (size + lsize < sizeof(output)) {
-			size += lsize;
-			strcat(output, line);
-		}
+		add_page_display(ch, "%3d. %s%-30.30s&0  %2d  %2d  %3d  %d", count, EMPIRE_BANNER(emp), EMPIRE_NAME(emp), get_total_score(emp), EMPIRE_MEMBERS(emp), EMPIRE_GREATNESS(emp), EMPIRE_TERRITORY(emp, TER_TOTAL));
 	}
 	
-	lsize = snprintf(line, sizeof(line), "List options: -m for more, -a for all, -## for minimum members\r\n");
-	if (size + lsize < sizeof(output)) {
-		size += lsize;
-		strcat(output, line);
-	}
-	
-	page_string(ch->desc, output, TRUE);
+	add_page_display(ch, "List options: -m for more, -a for all, -## for minimum members");
+	send_page_display(ch);
 }
 
 
@@ -7630,13 +7617,14 @@ ACMD(do_reclaim) {
 
 
 ACMD(do_roster) {
-	char buf[MAX_STRING_LENGTH * 2], buf1[MAX_STRING_LENGTH * 2], arg[MAX_INPUT_LENGTH], part[MAX_STRING_LENGTH];
+	char part[MAX_STRING_LENGTH];
 	player_index_data *index, *next_index;
 	empire_data *e = GET_LOYALTY(ch);
 	bool timed_out, is_file = FALSE;
-	int days, hours, size;
+	int days, hours;
 	char_data *member;
 	bool all = FALSE, imm_access = (GET_ACCESS_LEVEL(ch) >= LVL_CIMPL || IS_GRANTED(ch, GRANT_EMPIRES));
+	struct page_display *pd;
 	
 	skip_spaces(&argument);
 	
@@ -7672,8 +7660,8 @@ ACMD(do_roster) {
 		return;
 	}
 	
-	*buf = '\0';
-	size = 0;
+	// build roster:
+	add_page_display(ch, "Roster of %s%s&0:", EMPIRE_BANNER(e), EMPIRE_NAME(e));
 	
 	HASH_ITER(name_hh, player_table_by_name, index, next_index) {
 		if (index->loyalty != e) {
@@ -7698,34 +7686,31 @@ ACMD(do_roster) {
 		// display:
 		get_player_skill_string(member, part, TRUE);
 		if (PRF_FLAGGED(ch, PRF_SCREEN_READER)) {
-			size += snprintf(buf + size, sizeof(buf) - size, "[%d %s %s] <%s&0> %s%s&0", !is_file ? GET_COMPUTED_LEVEL(member) : GET_LAST_KNOWN_LEVEL(member), part, class_role[GET_CLASS_ROLE(member)], EMPIRE_RANK(e, GET_RANK(member) - 1), (timed_out ? "&r" : ""), PERS(member, member, TRUE));
+			pd = add_page_display(ch, "[%d %s %s] <%s&0> %s%s&0", !is_file ? GET_COMPUTED_LEVEL(member) : GET_LAST_KNOWN_LEVEL(member), part, class_role[GET_CLASS_ROLE(member)], EMPIRE_RANK(e, GET_RANK(member) - 1), (timed_out ? "&r" : ""), PERS(member, member, TRUE));
 		}
 		else {	// not screenreader
-			size += snprintf(buf + size, sizeof(buf) - size, "[%d %s%s\t0] <%s&0> %s%s&0", !is_file ? GET_COMPUTED_LEVEL(member) : GET_LAST_KNOWN_LEVEL(member), class_role_color[GET_CLASS_ROLE(member)], part, EMPIRE_RANK(e, GET_RANK(member) - 1), (timed_out ? "&r" : ""), PERS(member, member, TRUE));
+			pd = add_page_display(ch, "[%d %s%s\t0] <%s&0> %s%s&0", !is_file ? GET_COMPUTED_LEVEL(member) : GET_LAST_KNOWN_LEVEL(member), class_role_color[GET_CLASS_ROLE(member)], part, EMPIRE_RANK(e, GET_RANK(member) - 1), (timed_out ? "&r" : ""), PERS(member, member, TRUE));
 		}
 						
 		// online/not
 		if (!is_file) {
-			size += snprintf(buf + size, sizeof(buf) - size, "  - &conline&0%s", IS_AFK(member) ? " - &rafk&0" : "");
+			append_page_display_line(pd, "  - &conline&0%s", IS_AFK(member) ? " - &rafk&0" : "");
 		}
 		else if ((time(0) - member->prev_logon) < SECS_PER_REAL_DAY) {
 			hours = (time(0) - member->prev_logon) / SECS_PER_REAL_HOUR;
-			size += snprintf(buf + size, sizeof(buf) - size, "  - %d hour%s ago%s", hours, PLURAL(hours), (timed_out ? ", &rtimed-out&0" : ""));
+			append_page_display_line(pd, "  - %d hour%s ago%s", hours, PLURAL(hours), (timed_out ? ", &rtimed-out&0" : ""));
 		}
 		else {	// more than a day
 			days = (time(0) - member->prev_logon) / SECS_PER_REAL_DAY;
-			size += snprintf(buf + size, sizeof(buf) - size, "  - %d day%s ago%s", days, PLURAL(days), (timed_out ? ", &rtimed-out&0" : ""));
+			append_page_display_line(pd, "  - %d day%s ago%s", days, PLURAL(days), (timed_out ? ", &rtimed-out&0" : ""));
 		}
-		
-		size += snprintf(buf + size, sizeof(buf) - size, "\r\n");
 		
 		if (member && is_file) {
 			free_char(member);
 		}
 	}
 
-	snprintf(buf1, sizeof(buf1), "Roster of %s%s&0:\r\n%s", EMPIRE_BANNER(e), EMPIRE_NAME(e), buf);
-	page_string(ch->desc, buf1, TRUE);
+	send_page_display(ch);
 }
 
 
