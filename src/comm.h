@@ -108,6 +108,7 @@ struct page_display *add_page_display_col_str(char_data *ch, int cols, bool stri
 void append_page_display_line(struct page_display *line, const char *fmt, ...);
 void free_page_display(struct page_display **list);
 void free_page_display_one(struct page_display *pd);
+struct page_display *prepend_page_display_str(char_data *ch, const char *str);
 void send_page_display(char_data *ch);
 
 

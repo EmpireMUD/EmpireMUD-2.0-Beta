@@ -936,6 +936,36 @@ void append_page_display_line(struct page_display *line, const char *fmt, ...) {
 
 
 /**
+* Adds a new line to a player's page_display -- at the BEGINNING.
+* Will trim trailing \r\n (crlf).
+*
+* @param char_data *ch The person to add the display line to (at the beginning).
+* @param const char *str The string to add as the new line (will be copied).
+* @return struct page_display* A pointer to the new line, if it was added. May return NULL if it failed to add.
+*/
+struct page_display *prepend_page_display_str(char_data *ch, const char *str) {
+	struct page_display *pd;
+	
+	if (!ch || !ch->desc || !str) {
+		return NULL;
+	}
+	
+	CREATE(pd, struct page_display, 1);
+	
+	pd->length = strlen(str);
+	pd->text = strdup(str);
+	DL_PREPEND(ch->desc->page_lines, pd);
+	
+	// check trailing crlf
+	while (pd->length > 0 && (pd->text[pd->length-1] == '\r' || pd->text[pd->length-1] == '\n')) {
+		pd->text[--pd->length] = '\0';
+	}
+	
+	return pd;
+}
+
+
+/**
 * Builds the final display for a pending player's page_display and sends it to
 * their paginator. It also frees the page display afterwards.
 *
