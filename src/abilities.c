@@ -11018,7 +11018,7 @@ void do_stat_ability(char_data *ch, ability_data *abil, bool details) {
 	
 	// Command, Targets line
 	if (IS_SET(fields, ABILEDIT_COMMAND | ABILEDIT_TARGETS)) {
-		pd = add_page_display(ch, "");
+		pd = add_page_display_str(ch, "");
 		if (IS_SET(fields, ABILEDIT_COMMAND)) {
 			if (!ABIL_COMMAND(abil)) {
 				append_page_display_line(pd, "Command info: [\tcnot a command\t0]");
@@ -11068,7 +11068,7 @@ void do_stat_ability(char_data *ch, ability_data *abil, bool details) {
 	
 	// Custom affect, Duration line
 	if (IS_SET(fields, ABILEDIT_AFFECT_VNUM | ABILEDIT_DURATION)) {
-		pd = add_page_display(ch, "");
+		pd = add_page_display_str(ch, "");
 		if (IS_SET(fields, ABILEDIT_AFFECT_VNUM)) {
 			append_page_display_line(pd, "Custom affect: [\ty%d %s\t0]", ABIL_AFFECT_VNUM(abil), get_generic_name_by_vnum(ABIL_AFFECT_VNUM(abil)));
 		}
@@ -11081,7 +11081,7 @@ void do_stat_ability(char_data *ch, ability_data *abil, bool details) {
 	
 	// Attack Type, Damage Type, Max Stacks line
 	if (IS_SET(fields, ABILEDIT_ATTACK_TYPE | ABILEDIT_DAMAGE_TYPE | ABILEDIT_MAX_STACKS | ABILEDIT_POOL_TYPE | ABILEDIT_MOVE_TYPE)) {
-		pd = add_page_display(ch, "");
+		pd = add_page_display_str(ch, "");
 		if (IS_SET(fields, ABILEDIT_ATTACK_TYPE)) {
 			append_page_display_line(pd, "Attack type: [\tc%d %s\t0]", ABIL_ATTACK_TYPE(abil), get_attack_name_by_vnum(ABIL_ATTACK_TYPE(abil)));
 		}
@@ -11234,7 +11234,7 @@ void olc_show_ability(char_data *ch) {
 		add_page_display(ch, "<%scost\t0> %d, <%scostperscalepoint\t0> %.2f, <%scosttype\t0> %s", OLC_LABEL_VAL(ABIL_COST(abil), 0), ABIL_COST(abil), OLC_LABEL_VAL(ABIL_COST_PER_SCALE_POINT(abil), 0.0), ABIL_COST_PER_SCALE_POINT(abil), OLC_LABEL_VAL(ABIL_COST_TYPE(abil), 0), pool_types[ABIL_COST_TYPE(abil)]);
 	}
 	if (IS_SET(fields, ABILEDIT_COST_PER_AMOUNT | ABILEDIT_COST_PER_TARGET)) {
-		pd = add_page_display(ch, "");	// prepare for 2-part line
+		pd = add_page_display_str(ch, "");	// prepare for 2-part line
 		
 		if (IS_SET(fields, ABILEDIT_COST_PER_AMOUNT)) {
 			append_page_display_line(pd, "<%scostperamount\t0> %.2f", OLC_LABEL_VAL(ABIL_COST_PER_AMOUNT(abil), 0.0), ABIL_COST_PER_AMOUNT(abil));
@@ -11304,7 +11304,7 @@ void olc_show_ability(char_data *ch) {
 	
 	// Attack type, Damage type, Max Stacks line
 	if (IS_SET(fields, ABILEDIT_ATTACK_TYPE | ABILEDIT_DAMAGE_TYPE | ABILEDIT_MAX_STACKS | ABILEDIT_POOL_TYPE | ABILEDIT_MOVE_TYPE)) {
-		pd = add_page_display(ch, "");	// start new line with variable fields
+		pd = add_page_display_str(ch, "");	// start new line with variable fields
 		
 		if (IS_SET(fields, ABILEDIT_ATTACK_TYPE)) {
 			append_page_display_line(pd, "<%sattacktype\t0> %d %s", OLC_LABEL_VAL(ABIL_ATTACK_TYPE(abil), 0), ABIL_ATTACK_TYPE(abil), get_attack_name_by_vnum(ABIL_ATTACK_TYPE(abil)));

@@ -740,7 +740,7 @@ static void show_detailed_empire(char_data *ch, empire_data *e) {
 	
 	// progress points by category
 	total = 0;
-	pd = add_page_display(ch, "");
+	pd = add_page_display_str(ch, "");
 	for (iter = 1; iter < NUM_PROGRESS_TYPES; ++iter) {
 		total += EMPIRE_PROGRESS_POINTS(e, iter);
 		append_page_display_line(pd, "%s: %d, ", progress_types[iter], EMPIRE_PROGRESS_POINTS(e, iter));
