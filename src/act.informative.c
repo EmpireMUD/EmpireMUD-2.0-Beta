@@ -3940,6 +3940,7 @@ ACMD(do_messages) {
 		HASH_FIND_INT(GET_AUTOMESSAGES(ch), &id, pam);
 	
 		if (msg->timing == AUTOMSG_ON_LOGIN || msg->timestamp > (now - (24 * SECS_PER_REAL_HOUR)) || (pam && pam->timestamp > (now - 24 * SECS_PER_REAL_HOUR))) {
+			++count;
 			add_page_display_str(ch, msg->msg);
 			
 			// mark seen
