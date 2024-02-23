@@ -1053,16 +1053,18 @@ void send_page_display(char_data *ch) {
 					col_count = 0;
 				}
 				
-				// append and pad
-				strcat(output, pd->text);
-				ptr = output + strlen(output);
-				for (iter = pd->length; iter < (fixed_width * needs_cols) + clen; ++iter) {
-					*(ptr++) = ' ';
-				}
-				*(ptr++) = '\0';
-				
 				// mark how many columns we used
 				col_count += needs_cols;
+				
+				// append and pad (only pad if it's not the last col
+				strcat(output, pd->text);
+				if (col_count <= pd->cols) {
+					ptr = output + strlen(output);
+					for (iter = pd->length; iter < (fixed_width * needs_cols) + clen; ++iter) {
+						*(ptr++) = ' ';
+					}
+					*(ptr++) = '\0';
+				}
 				
 				// cap off columns if needed
 				if (col_count >= pd->cols) {
