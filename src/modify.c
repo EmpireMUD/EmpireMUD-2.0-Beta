@@ -991,10 +991,16 @@ void send_page_display(char_data *ch) {
 		if (pd->cols > 1 && use_cols) {
 			one = page_display_column_width(ch, pd->cols);
 			clen = color_code_length(pd->text);
-			if (pd->length - clen > one) {
+			if (one <= 0) {
+				one = pd->length;
+			}
+			else if (pd->length - clen > one) {
 				// ensure room for wide columns
-				one *= ceil((double)(pd->length - clen) / one);
+				one *= ceil((double)(pd->length - clen) / (double) one);
 				one += clen;
+			}
+			else {
+				one = MAX(one, pd->length);
 			}
 		}
 		else {
