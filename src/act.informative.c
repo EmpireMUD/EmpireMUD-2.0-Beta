@@ -1035,7 +1035,7 @@ void display_score_to_char(char_data *ch, char_data *to) {
 			
 			cols = 25 + color_code_length(lbuf);
 			if (!count) {
-				pd = add_page_display(to, "%-*.*s&0", cols, cols, lbuf);
+				pd = add_page_display(to, " %-*.*s&0", cols, cols, lbuf);
 			}
 			else {
 				append_page_display_line(pd, "%-*.*s&0", cols, cols, lbuf);
