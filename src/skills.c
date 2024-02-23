@@ -1807,7 +1807,7 @@ ACMD(do_noskill) {
 
 
 ACMD(do_skills) {
-	char arg[MAX_INPUT_LENGTH], arg2[MAX_INPUT_LENGTH], lbuf[MAX_STRING_LENGTH], outbuf[MAX_STRING_LENGTH * 2], *ptr;
+	char arg[MAX_INPUT_LENGTH], arg2[MAX_INPUT_LENGTH], lbuf[MAX_STRING_LENGTH], *ptr;
 	char new_arg[MAX_INPUT_LENGTH], whole_arg[MAX_INPUT_LENGTH];
 	struct skill_display_t *skdat_list = NULL, *skdat;
 	struct synergy_display_type *sdt_list = NULL, *sdt;
@@ -1822,7 +1822,6 @@ ACMD(do_skills) {
 	bool found, any, line;
 	bool sort_alpha = FALSE, sort_level = FALSE, want_min = FALSE, want_max = FALSE, want_all = FALSE, show_all_info = FALSE;
 	int min_level = -1, max_level = -1;
-	size_t size;
 	
 	// attempt to parse the args first, to get -l [range] or -a
 	if (*argument) {
@@ -1965,7 +1964,7 @@ ACMD(do_skills) {
 		}
 		
 		// start string
-		size = snprintf(outbuf, sizeof(outbuf), "You know the following skills %s:\r\n", lbuf);
+		add_page_display(ch, "You know the following skills %s:", lbuf);
 		
 		HASH_ITER(sorted_hh, sorted_skills, skill, next_skill) {
 			if (SKILL_FLAGGED(skill, SKILLF_IN_DEVELOPMENT)) {
@@ -2002,14 +2001,7 @@ ACMD(do_skills) {
 		any = FALSE;
 		DL_FOREACH(skdat_list, skdat) {
 			any = TRUE;
-			if (skdat->string && strlen(skdat->string) + size < sizeof(outbuf)) {
-				strcat(outbuf, skdat->string);
-				size += strlen(skdat->string);
-			}
-			else {
-				size += snprintf(outbuf + size, sizeof(outbuf) - size, "OVERFLOW\r\n");
-				break;
-			}
+			add_page_display_str(ch, skdat->string);
 		}
 		
 		free_skill_display_t(skdat_list);
@@ -2033,20 +2025,16 @@ ACMD(do_skills) {
 			
 			snprintf(lbuf + strlen(lbuf), sizeof(lbuf) - strlen(lbuf), "%s%s%s\t0", *lbuf ? ", ": "", ability_color(ch, abil), ABIL_NAME(abil));
 		}
-		if (*lbuf && size + strlen(lbuf) + 20 < sizeof(outbuf)) {
-			size += snprintf(outbuf + size, sizeof(outbuf) - size, "Other abilities: %s\r\n", lbuf);
+		if (*lbuf) {
+			add_page_display(ch, "Other abilities: %s\r\n", lbuf);
 		}
 		
 		// footer
 		if (!any) {
-			size += snprintf(outbuf + size, sizeof(outbuf) - size, " none\r\n");
+			add_page_display_str(ch, " none");
 		}
-		if (size < sizeof(outbuf)) {
-			size += snprintf(outbuf + size, sizeof(outbuf) - size, "%s", get_skill_gain_display(ch));
-		}
-		if (ch->desc) {
-			page_string(ch->desc, outbuf, TRUE);
-		}
+		add_page_display_str(ch, get_skill_gain_display(ch));
+		send_page_display(ch);
 	}
 	else if (!str_cmp(arg, "buy")) {
 		// purchase
@@ -2319,8 +2307,6 @@ ACMD(do_skills) {
 	}
 	else if (skill) {
 		// show 1 skill's details
-		*outbuf = '\0';
-		size = 0;
 		
 		// if no levels were requested, default to only showing up to the next cap
 		if (min_level == -1 && max_level == -1 && !want_all) {
@@ -2329,11 +2315,11 @@ ACMD(do_skills) {
 		}
 		
 		// header
-		size += snprintf(outbuf + size, sizeof(outbuf) - size, "%s", get_skill_row_display(ch, skill));
+		add_page_display_str(ch, get_skill_row_display(ch, skill));
 		
 		points = get_ability_points_available_for_char(ch, SKILL_VNUM(skill));
 		if (points > 0) {
-			size += snprintf(outbuf + size, sizeof(outbuf) - size, "You have %d ability point%s to spend. Type 'skill buy <ability>' to purchase a new ability.\r\n", points, (points != 1 ? "s" : ""));
+			add_page_display(ch, "You have %d ability point%s to spend. Type 'skill buy <ability>' to purchase a new ability.", points, (points != 1 ? "s" : ""));
 		}
 		
 		// list
@@ -2357,29 +2343,21 @@ ACMD(do_skills) {
 			}
 			
 			// show it
-			if (skdat->string && strlen(skdat->string) + size < sizeof(outbuf)) {
-				strcat(outbuf, skdat->string);
-				size += strlen(skdat->string);
-			}
-			else {
-				size += snprintf(outbuf + size, sizeof(outbuf) - size, "OVERFLOW\r\n");
-				break;
-			}
+			add_page_display(ch, skdat->string);
 		}
 		
 		free_skill_display_t(skdat_list);
 		skdat_list = NULL;
 		
-		if (show_all_info && !PRF_FLAGGED(ch, PRF_NO_TUTORIALS) && max_level < SKILL_MAX_LEVEL(skill) && size < sizeof(outbuf)) {
-			size += snprintf(outbuf + size, sizeof(outbuf) - size, "(For higher level abilities, use 'skill %s -all')\r\n", SKILL_NAME(skill));
+		if (show_all_info && !PRF_FLAGGED(ch, PRF_NO_TUTORIALS) && max_level < SKILL_MAX_LEVEL(skill)) {
+			add_page_display(ch, "(For higher level abilities, use 'skill %s -all')", SKILL_NAME(skill));
 		}
 		
-		if (ch->desc) {
-			page_string(ch->desc, outbuf, 1);
-		}
+		send_page_display(ch);
 	}
 	else if (abil) {
 		// ability details
+		char outbuf[MAX_STRING_LENGTH];
 		show_ability_info(ch, abil, NULL, outbuf, sizeof(outbuf));
 		if (ch->desc) {
 			page_string(ch->desc, outbuf, 1);
