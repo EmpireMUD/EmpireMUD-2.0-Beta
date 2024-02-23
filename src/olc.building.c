@@ -903,7 +903,6 @@ void olc_fullsearch_building(char_data *ch, char *argument) {
 * @param bld_vnum vnum The building vnum.
 */
 void olc_search_building(char_data *ch, bld_vnum vnum) {
-	char buf[MAX_STRING_LENGTH];
 	bld_data *proto = building_proto(vnum);
 	struct adventure_link_rule *link;
 	struct interaction_item *inter;
@@ -919,7 +918,7 @@ void olc_search_building(char_data *ch, bld_vnum vnum) {
 	bld_data *bld, *next_bld;
 	obj_data *obj, *next_obj;
 	bool any;
-	int size, found;
+	int found;
 	
 	if (!proto) {
 		msg_to_char(ch, "There is no building %d.\r\n", vnum);
@@ -927,18 +926,15 @@ void olc_search_building(char_data *ch, bld_vnum vnum) {
 	}
 	
 	found = 0;
-	size = snprintf(buf, sizeof(buf), "Occurrences of building %d (%s):\r\n", vnum, GET_BLD_NAME(proto));
+	add_page_display(ch, "Occurrences of building %d (%s):", vnum, GET_BLD_NAME(proto));
 	
 	// adventure rules
 	HASH_ITER(hh, adventure_table, adv, next_adv) {
-		if (size >= sizeof(buf)) {
-			break;
-		}
 		for (link = GET_ADV_LINKING(adv); link; link = link->next) {
 			if (link->type == ADV_LINK_BUILDING_EXISTING || link->type == ADV_LINK_BUILDING_NEW || link->type == ADV_LINK_PORTAL_BUILDING_EXISTING || link->type == ADV_LINK_PORTAL_BUILDING_NEW) {
 				if (link->value == vnum) {
 					++found;
-					size += snprintf(buf + size, sizeof(buf) - size, "ADV [%5d] %s\r\n", GET_ADV_VNUM(adv), GET_ADV_NAME(adv));
+					add_page_display(ch, "ADV [%5d] %s", GET_ADV_VNUM(adv), GET_ADV_NAME(adv));
 					// only report once per adventure
 					break;
 				}
@@ -948,9 +944,6 @@ void olc_search_building(char_data *ch, bld_vnum vnum) {
 	
 	// buildings
 	HASH_ITER(hh, building_table, bld, next_bld) {
-		if (size >= sizeof(buf)) {
-			break;
-		}
 		any = FALSE;
 		LL_FOREACH(GET_BLD_INTERACTIONS(bld), inter) {
 			if (interact_data[inter->type].vnum_type == TYPE_BLD && inter->vnum == vnum) {
@@ -970,57 +963,44 @@ void olc_search_building(char_data *ch, bld_vnum vnum) {
 		}
 		if (any) {
 			++found;
-			size += snprintf(buf + size, sizeof(buf) - size, "BLD [%5d] %s\r\n", GET_BLD_VNUM(bld), GET_BLD_NAME(bld));
+			add_page_display(ch, "BLD [%5d] %s", GET_BLD_VNUM(bld), GET_BLD_NAME(bld));
 		}
 	}
 	
 	// craft builds
 	HASH_ITER(hh, craft_table, craft, next_craft) {
-		if (size >= sizeof(buf)) {
-			break;
-		}
 		if (CRAFT_IS_BUILDING(craft) && GET_CRAFT_BUILD_TYPE(craft) == vnum) {
 			++found;
-			size += snprintf(buf + size, sizeof(buf) - size, "CFT [%5d] %s\r\n", GET_CRAFT_VNUM(craft), GET_CRAFT_NAME(craft));
+			add_page_display(ch, "CFT [%5d] %s", GET_CRAFT_VNUM(craft), GET_CRAFT_NAME(craft));
 		}
 	}
 	
 	// obj storage
 	HASH_ITER(hh, object_table, obj, next_obj) {
-		if (size >= sizeof(buf)) {
-			break;
-		}
 		any = FALSE;
 		for (store = GET_OBJ_STORAGE(obj); store && !any; store = store->next) {
 			if (store->type == TYPE_BLD && store->vnum == vnum) {
 				any = TRUE;
 				++found;
-				size += snprintf(buf + size, sizeof(buf) - size, "OBJ [%5d] %s\r\n", GET_OBJ_VNUM(obj), GET_OBJ_SHORT_DESC(obj));
+				add_page_display(ch, "OBJ [%5d] %s", GET_OBJ_VNUM(obj), GET_OBJ_SHORT_DESC(obj));
 			}
 		}
 	}
 	
 	// progress
 	HASH_ITER(hh, progress_table, prg, next_prg) {
-		if (size >= sizeof(buf)) {
-			break;
-		}
 		// REQ_x: requirement search
 		any = find_requirement_in_list(PRG_TASKS(prg), REQ_OWN_BUILDING, vnum);
 		any |= find_requirement_in_list(PRG_TASKS(prg), REQ_VISIT_BUILDING, vnum);
 		
 		if (any) {
 			++found;
-			size += snprintf(buf + size, sizeof(buf) - size, "PRG [%5d] %s\r\n", PRG_VNUM(prg), PRG_NAME(prg));
+			add_page_display(ch, "PRG [%5d] %s", PRG_VNUM(prg), PRG_NAME(prg));
 		}
 	}
 	
 	// quests
 	HASH_ITER(hh, quest_table, quest, next_quest) {
-		if (size >= sizeof(buf)) {
-			break;
-		}
-		
 		// QG_x:
 		any = find_quest_giver_in_list(QUEST_STARTS_AT(quest), QG_BUILDING, vnum);
 		any |= find_quest_giver_in_list(QUEST_ENDS_AT(quest), QG_BUILDING, vnum);
@@ -1033,29 +1013,23 @@ void olc_search_building(char_data *ch, bld_vnum vnum) {
 		
 		if (any) {
 			++found;
-			size += snprintf(buf + size, sizeof(buf) - size, "QST [%5d] %s\r\n", QUEST_VNUM(quest), QUEST_NAME(quest));
+			add_page_display(ch, "QST [%5d] %s", QUEST_VNUM(quest), QUEST_NAME(quest));
 		}
 	}
 	
 	// shops
 	HASH_ITER(hh, shop_table, shop, next_shop) {
-		if (size >= sizeof(buf)) {
-			break;
-		}
 		if (find_quest_giver_in_list(SHOP_LOCATIONS(shop), QG_BUILDING, vnum)) {
 			++found;
-			size += snprintf(buf + size, sizeof(buf) - size, "SHOP [%5d] %s\r\n", SHOP_VNUM(shop), SHOP_NAME(shop));
+			add_page_display(ch, "SHOP [%5d] %s", SHOP_VNUM(shop), SHOP_NAME(shop));
 		}
 	}
 	
 	// socials
 	HASH_ITER(hh, social_table, soc, next_soc) {
-		if (size >= sizeof(buf)) {
-			break;
-		}
 		if (find_requirement_in_list(SOC_REQUIREMENTS(soc), REQ_OWN_BUILDING, vnum) || find_requirement_in_list(SOC_REQUIREMENTS(soc), REQ_VISIT_BUILDING, vnum)) {
 			++found;
-			size += snprintf(buf + size, sizeof(buf) - size, "SOC [%5d] %s\r\n", SOC_VNUM(soc), SOC_NAME(soc));
+			add_page_display(ch, "SOC [%5d] %s", SOC_VNUM(soc), SOC_NAME(soc));
 		}
 	}
 	
@@ -1084,18 +1058,18 @@ void olc_search_building(char_data *ch, bld_vnum vnum) {
 		}
 		if (any) {
 			++found;
-			size += snprintf(buf + size, sizeof(buf) - size, "VEH [%5d] %s\r\n", VEH_VNUM(veh), VEH_SHORT_DESC(veh));
+			add_page_display(ch, "VEH [%5d] %s", VEH_VNUM(veh), VEH_SHORT_DESC(veh));
 		}
 	}
 	
 	if (found > 0) {
-		size += snprintf(buf + size, sizeof(buf) - size, "%d location%s shown\r\n", found, PLURAL(found));
+		add_page_display(ch, "%d location%s shown", found, PLURAL(found));
 	}
 	else {
-		size += snprintf(buf + size, sizeof(buf) - size, " none\r\n");
+		add_page_display_str(ch, " none");
 	}
 	
-	page_string(ch->desc, buf, TRUE);
+	send_page_display(ch);
 }
 
 

@@ -532,7 +532,6 @@ void olc_fullsearch_room_template(char_data *ch, char *argument) {
 * @param crop_vnum vnum The crop vnum.
 */
 void olc_search_room_template(char_data *ch, rmt_vnum vnum) {
-	char buf[MAX_STRING_LENGTH];
 	room_template *rmt = room_template_proto(vnum), *iter, *next_iter;
 	quest_data *quest, *next_quest;
 	progress_data *prg, *next_prg;
@@ -540,7 +539,7 @@ void olc_search_room_template(char_data *ch, rmt_vnum vnum) {
 	shop_data *shop, *next_shop;
 	struct exit_template *ex;
 	obj_data *obj, *next_obj;
-	int size, found;
+	int found;
 	bool any;
 	
 	if (!rmt) {
@@ -549,35 +548,29 @@ void olc_search_room_template(char_data *ch, rmt_vnum vnum) {
 	}
 	
 	found = 0;
-	size = snprintf(buf, sizeof(buf), "Occurrences of room template %d (%s):\r\n", vnum, GET_RMT_TITLE(rmt));
+	add_page_display(ch, "Occurrences of room template %d (%s):", vnum, GET_RMT_TITLE(rmt));
 	
 	// objects
 	HASH_ITER(hh, object_table, obj, next_obj) {
 		if (IS_PORTAL(obj) && GET_PORTAL_TARGET_VNUM(obj) == vnum) {
 			++found;
-			size += snprintf(buf + size, sizeof(buf) - size, "OBJ [%5d] %s\r\n", GET_OBJ_VNUM(obj), GET_OBJ_SHORT_DESC(obj));
+			add_page_display(ch, "OBJ [%5d] %s", GET_OBJ_VNUM(obj), GET_OBJ_SHORT_DESC(obj));
 		}
 	}
 	
 	// progress
 	HASH_ITER(hh, progress_table, prg, next_prg) {
-		if (size >= sizeof(buf)) {
-			break;
-		}
 		// REQ_x: requirement search
 		any = find_requirement_in_list(PRG_TASKS(prg), REQ_VISIT_ROOM_TEMPLATE, vnum);
 		
 		if (any) {
 			++found;
-			size += snprintf(buf + size, sizeof(buf) - size, "PRG [%5d] %s\r\n", PRG_VNUM(prg), PRG_NAME(prg));
+			add_page_display(ch, "PRG [%5d] %s", PRG_VNUM(prg), PRG_NAME(prg));
 		}
 	}
 	
 	// quests
 	HASH_ITER(hh, quest_table, quest, next_quest) {
-		if (size >= sizeof(buf)) {
-			break;
-		}
 		any = find_quest_giver_in_list(QUEST_STARTS_AT(quest), QG_ROOM_TEMPLATE, vnum);
 		any |= find_quest_giver_in_list(QUEST_ENDS_AT(quest), QG_ROOM_TEMPLATE, vnum);
 		any |= find_requirement_in_list(QUEST_TASKS(quest), REQ_VISIT_ROOM_TEMPLATE, vnum);
@@ -585,20 +578,17 @@ void olc_search_room_template(char_data *ch, rmt_vnum vnum) {
 		
 		if (any) {
 			++found;
-			size += snprintf(buf + size, sizeof(buf) - size, "QST [%5d] %s\r\n", QUEST_VNUM(quest), QUEST_NAME(quest));
+			add_page_display(ch, "QST [%5d] %s", QUEST_VNUM(quest), QUEST_NAME(quest));
 		}
 	}
 	
 	// shops
 	HASH_ITER(hh, shop_table, shop, next_shop) {
-		if (size >= sizeof(buf)) {
-			break;
-		}
 		any = find_quest_giver_in_list(SHOP_LOCATIONS(shop), QG_ROOM_TEMPLATE, vnum);
 		
 		if (any) {
 			++found;
-			size += snprintf(buf + size, sizeof(buf) - size, "SHOP [%5d] %s\r\n", SHOP_VNUM(shop), SHOP_NAME(shop));
+			add_page_display(ch, "SHOP [%5d] %s", SHOP_VNUM(shop), SHOP_NAME(shop));
 		}
 	}
 
@@ -609,32 +599,29 @@ void olc_search_room_template(char_data *ch, rmt_vnum vnum) {
 			if (ex->target_room == vnum) {
 				any = TRUE;
 				++found;
-				size += snprintf(buf + size, sizeof(buf) - size, "RMT [%5d] %s\r\n", GET_RMT_VNUM(iter), GET_RMT_TITLE(iter));
+				add_page_display(ch, "RMT [%5d] %s", GET_RMT_VNUM(iter), GET_RMT_TITLE(iter));
 			}
 		}
 	}
 	
 	// socials
 	HASH_ITER(hh, social_table, soc, next_soc) {
-		if (size >= sizeof(buf)) {
-			break;
-		}
 		any = find_requirement_in_list(SOC_REQUIREMENTS(soc), REQ_VISIT_ROOM_TEMPLATE, vnum);
 		
 		if (any) {
 			++found;
-			size += snprintf(buf + size, sizeof(buf) - size, "SOC [%5d] %s\r\n", SOC_VNUM(soc), SOC_NAME(soc));
+			add_page_display(ch, "SOC [%5d] %s", SOC_VNUM(soc), SOC_NAME(soc));
 		}
 	}
 	
 	if (found > 0) {
-		size += snprintf(buf + size, sizeof(buf) - size, "%d location%s shown\r\n", found, PLURAL(found));
+		add_page_display(ch, "%d location%s shown", found, PLURAL(found));
 	}
 	else {
-		size += snprintf(buf + size, sizeof(buf) - size, " none\r\n");
+		add_page_display_str(ch, " none");
 	}
 	
-	page_string(ch->desc, buf, TRUE);
+	send_page_display(ch);
 }
 
 

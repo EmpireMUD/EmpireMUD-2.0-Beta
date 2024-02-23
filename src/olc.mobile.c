@@ -820,7 +820,6 @@ void olc_fullsearch_mob(char_data *ch, char *argument) {
 */
 void olc_search_mob(char_data *ch, mob_vnum vnum) {
 	char_data *proto, *mob, *next_mob;
-	char buf[MAX_STRING_LENGTH];
 	struct spawn_info *spawn;
 	struct adventure_spawn *asp;
 	struct interaction_item *inter;
@@ -836,7 +835,7 @@ void olc_search_mob(char_data *ch, mob_vnum vnum) {
 	shop_data *shop, *next_shop;
 	social_data *soc, *next_soc;
 	bld_data *bld, *next_bld;
-	int size, found;
+	int found;
 	bool any;
 	
 	if (!(proto = mob_proto(vnum))) {
@@ -845,7 +844,7 @@ void olc_search_mob(char_data *ch, mob_vnum vnum) {
 	}
 	
 	found = 0;
-	size = snprintf(buf, sizeof(buf), "Occurrences of mobile %d (%s):\r\n", vnum, GET_SHORT_DESC(proto));
+	add_page_display(ch, "Occurrences of mobile %d (%s):", vnum, GET_SHORT_DESC(proto));
 	
 	// abilities
 	HASH_ITER(hh, ability_table, abil, next_abil) {
@@ -862,7 +861,7 @@ void olc_search_mob(char_data *ch, mob_vnum vnum) {
 		
 		if (any) {
 			++found;
-			size += snprintf(buf + size, sizeof(buf) - size, "ABIL [%5d] %s\r\n", ABIL_VNUM(abil), ABIL_NAME(abil));
+			add_page_display(ch, "ABIL [%5d] %s", ABIL_VNUM(abil), ABIL_NAME(abil));
 		}
 	}
 	
@@ -887,7 +886,7 @@ void olc_search_mob(char_data *ch, mob_vnum vnum) {
 		}
 		
 		if (any) {
-			size += snprintf(buf + size, sizeof(buf) - size, "BLD [%5d] %s\r\n", GET_BLD_VNUM(bld), GET_BLD_NAME(bld));
+			add_page_display(ch, "BLD [%5d] %s", GET_BLD_VNUM(bld), GET_BLD_NAME(bld));
 		}
 	}
 	
@@ -898,14 +897,14 @@ void olc_search_mob(char_data *ch, mob_vnum vnum) {
 			if (spawn->vnum == vnum) {
 				any = TRUE;
 				++found;
-				size += snprintf(buf + size, sizeof(buf) - size, "CRP [%5d] %s\r\n", GET_CROP_VNUM(crop), GET_CROP_NAME(crop));
+				add_page_display(ch, "CRP [%5d] %s", GET_CROP_VNUM(crop), GET_CROP_NAME(crop));
 			}
 		}
 		for (inter = GET_CROP_INTERACTIONS(crop); inter && !any; inter = inter->next) {
 			if (interact_data[inter->type].vnum_type == TYPE_MOB && inter->vnum == vnum) {
 				any = TRUE;
 				++found;
-				size += snprintf(buf + size, sizeof(buf) - size, "CRP [%5d] %s\r\n", GET_CROP_VNUM(crop), GET_CROP_NAME(crop));
+				add_page_display(ch, "CRP [%5d] %s", GET_CROP_VNUM(crop), GET_CROP_NAME(crop));
 			}
 		}
 	}
@@ -917,13 +916,13 @@ void olc_search_mob(char_data *ch, mob_vnum vnum) {
 			if (interact_data[inter->type].vnum_type == TYPE_MOB && inter->vnum == vnum) {
 				any = TRUE;
 				++found;
-				size += snprintf(buf + size, sizeof(buf) - size, "GLB [%5d] %s\r\n", GET_GLOBAL_VNUM(glb), GET_GLOBAL_NAME(glb));
+				add_page_display(ch, "GLB [%5d] %s", GET_GLOBAL_VNUM(glb), GET_GLOBAL_NAME(glb));
 			}
 		}
 		LL_FOREACH(GET_GLOBAL_SPAWNS(glb), spawn) {
 			if (spawn->vnum == vnum) {
 				++found;
-				size += snprintf(buf + size, sizeof(buf) - size, "GLB [%5d] %s\r\n", GET_GLOBAL_VNUM(glb), GET_GLOBAL_NAME(glb));
+				add_page_display(ch, "GLB [%5d] %s", GET_GLOBAL_VNUM(glb), GET_GLOBAL_NAME(glb));
 				break;
 			}
 		}
@@ -936,7 +935,7 @@ void olc_search_mob(char_data *ch, mob_vnum vnum) {
 			if (interact_data[inter->type].vnum_type == TYPE_MOB && inter->vnum == vnum) {
 				any = TRUE;
 				++found;
-				size += snprintf(buf + size, sizeof(buf) - size, "MOB [%5d] %s\r\n", GET_MOB_VNUM(mob), GET_SHORT_DESC(mob));
+				add_page_display(ch, "MOB [%5d] %s", GET_MOB_VNUM(mob), GET_SHORT_DESC(mob));
 			}
 		}
 	}
@@ -945,32 +944,26 @@ void olc_search_mob(char_data *ch, mob_vnum vnum) {
 	HASH_ITER(hh, object_table, obj, next_obj) {
 		if (IS_MINIPET(obj) && GET_MINIPET_VNUM(obj) == vnum) {
 			++found;
-			size += snprintf(buf + size, sizeof(buf) - size, "OBJ [%5d] %s\r\n", GET_OBJ_VNUM(obj), GET_OBJ_SHORT_DESC(obj));
+			add_page_display(ch, "OBJ [%5d] %s", GET_OBJ_VNUM(obj), GET_OBJ_SHORT_DESC(obj));
 		}
 	}
 	
 	// progress
 	HASH_ITER(hh, progress_table, prg, next_prg) {
-		if (size >= sizeof(buf)) {
-			break;
-		}
 		// REQ_x: requirement search
 		any = find_requirement_in_list(PRG_TASKS(prg), REQ_KILL_MOB, vnum);
 		
 		if (any) {
 			++found;
-			size += snprintf(buf + size, sizeof(buf) - size, "PRG [%5d] %s\r\n", PRG_VNUM(prg), PRG_NAME(prg));
+			add_page_display(ch, "PRG [%5d] %s", PRG_VNUM(prg), PRG_NAME(prg));
 		}
 	}
 	
 	// quests
 	HASH_ITER(hh, quest_table, quest, next_quest) {
-		if (size >= sizeof(buf)) {
-			break;
-		}
 		if (find_quest_giver_in_list(QUEST_STARTS_AT(quest), QG_MOBILE, vnum) || find_quest_giver_in_list(QUEST_ENDS_AT(quest), QG_MOBILE, vnum) || find_requirement_in_list(QUEST_TASKS(quest), REQ_KILL_MOB, vnum) || find_requirement_in_list(QUEST_PREREQS(quest), REQ_KILL_MOB, vnum)) {
 			++found;
-			size += snprintf(buf + size, sizeof(buf) - size, "QST [%5d] %s\r\n", QUEST_VNUM(quest), QUEST_NAME(quest));
+			add_page_display(ch, "QST [%5d] %s", QUEST_VNUM(quest), QUEST_NAME(quest));
 		}
 	}
 	
@@ -981,14 +974,14 @@ void olc_search_mob(char_data *ch, mob_vnum vnum) {
 			if (asp->type == ADV_SPAWN_MOB && asp->vnum == vnum) {
 				any = TRUE;
 				++found;
-				size += snprintf(buf + size, sizeof(buf) - size, "RMT [%5d] %s\r\n", GET_RMT_VNUM(rmt), GET_RMT_TITLE(rmt));
+				add_page_display(ch, "RMT [%5d] %s", GET_RMT_VNUM(rmt), GET_RMT_TITLE(rmt));
 			}
 		}
 		for (inter = GET_RMT_INTERACTIONS(rmt); inter && !any; inter = inter->next) {
 			if (interact_data[inter->type].vnum_type == TYPE_MOB && inter->vnum == vnum) {
 				any = TRUE;
 				++found;
-				size += snprintf(buf + size, sizeof(buf) - size, "RMT [%5d] %s\r\n", GET_RMT_VNUM(rmt), GET_RMT_TITLE(rmt));
+				add_page_display(ch, "RMT [%5d] %s", GET_RMT_VNUM(rmt), GET_RMT_TITLE(rmt));
 			}
 		}
 	}
@@ -1000,37 +993,31 @@ void olc_search_mob(char_data *ch, mob_vnum vnum) {
 			if (spawn->vnum == vnum) {
 				any = TRUE;
 				++found;
-				size += snprintf(buf + size, sizeof(buf) - size, "SCT [%5d] %s\r\n", GET_SECT_VNUM(sect), GET_SECT_NAME(sect));
+				add_page_display(ch, "SCT [%5d] %s", GET_SECT_VNUM(sect), GET_SECT_NAME(sect));
 			}
 		}
 		for (inter = GET_SECT_INTERACTIONS(sect); inter && !any; inter = inter->next) {
 			if (interact_data[inter->type].vnum_type == TYPE_MOB && inter->vnum == vnum) {
 				any = TRUE;
 				++found;
-				size += snprintf(buf + size, sizeof(buf) - size, "SCT [%5d] %s\r\n", GET_SECT_VNUM(sect), GET_SECT_NAME(sect));
+				add_page_display(ch, "SCT [%5d] %s", GET_SECT_VNUM(sect), GET_SECT_NAME(sect));
 			}
 		}
 	}
 	
 	// shops
 	HASH_ITER(hh, shop_table, shop, next_shop) {
-		if (size >= sizeof(buf)) {
-			break;
-		}
 		if (find_quest_giver_in_list(SHOP_LOCATIONS(shop), QG_MOBILE, vnum)) {
 			++found;
-			size += snprintf(buf + size, sizeof(buf) - size, "SHOP [%5d] %s\r\n", SHOP_VNUM(shop), SHOP_NAME(shop));
+			add_page_display(ch, "SHOP [%5d] %s", SHOP_VNUM(shop), SHOP_NAME(shop));
 		}
 	}
 	
 	// socials
 	HASH_ITER(hh, social_table, soc, next_soc) {
-		if (size >= sizeof(buf)) {
-			break;
-		}
 		if (find_requirement_in_list(SOC_REQUIREMENTS(soc), REQ_KILL_MOB, vnum)) {
 			++found;
-			size += snprintf(buf + size, sizeof(buf) - size, "SOC [%5d] %s\r\n", SOC_VNUM(soc), SOC_NAME(soc));
+			add_page_display(ch, "SOC [%5d] %s", SOC_VNUM(soc), SOC_NAME(soc));
 		}
 	}
 	
@@ -1051,18 +1038,18 @@ void olc_search_mob(char_data *ch, mob_vnum vnum) {
 		}
 		
 		if (any) {
-			size += snprintf(buf + size, sizeof(buf) - size, "VEH [%5d] %s\r\n", VEH_VNUM(veh), VEH_SHORT_DESC(veh));
+			add_page_display(ch, "VEH [%5d] %s", VEH_VNUM(veh), VEH_SHORT_DESC(veh));
 		}
 	}
 	
 	if (found > 0) {
-		size += snprintf(buf + size, sizeof(buf) - size, "%d location%s shown\r\n", found, PLURAL(found));
+		add_page_display(ch, "%d location%s shown", found, PLURAL(found));
 	}
 	else {
-		size += snprintf(buf + size, sizeof(buf) - size, " none\r\n");
+		add_page_display_str(ch, " none");
 	}
 	
-	page_string(ch->desc, buf, TRUE);
+	send_page_display(ch);
 }
 
 

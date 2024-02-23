@@ -796,8 +796,7 @@ void olc_fullsearch_attack_message(char_data *ch, char *argument) {
 */
 void olc_search_attack_message(char_data *ch, any_vnum vnum) {
 	bool any;
-	char buf[MAX_STRING_LENGTH * 4];
-	int size, found;
+	int found;
 	attack_message_data *amd = real_attack_message(vnum);
 	attack_message_data *amditer, *next_amd;
 	ability_data *abil, *next_abil;
@@ -812,7 +811,7 @@ void olc_search_attack_message(char_data *ch, any_vnum vnum) {
 	}
 	
 	found = 0;
-	size = snprintf(buf, sizeof(buf), "Occurrences of attack message %d (%s):\r\n", vnum, ATTACK_NAME(amd));
+	add_page_display(ch, "Occurrences of attack message %d (%s):", vnum, ATTACK_NAME(amd));
 	
 	// abilities
 	HASH_ITER(hh, ability_table, abil, next_abil) {
@@ -822,7 +821,7 @@ void olc_search_attack_message(char_data *ch, any_vnum vnum) {
 		
 		if (any) {
 			++found;
-			size += snprintf(buf + size, sizeof(buf) - size, "ABIL [%5d] %s\r\n", ABIL_VNUM(abil), ABIL_NAME(abil));
+			add_page_display(ch, "ABIL [%5d] %s", ABIL_VNUM(abil), ABIL_NAME(abil));
 		}
 	}
 	
@@ -830,7 +829,7 @@ void olc_search_attack_message(char_data *ch, any_vnum vnum) {
 	HASH_ITER(hh, attack_message_table, amditer, next_amd) {
 		if (ATTACK_COUNTS_AS(amditer) == vnum) {
 			++found;
-			size += snprintf(buf + size, sizeof(buf) - size, "ATTACK [%5d] %s\r\n", ATTACK_VNUM(amditer), ATTACK_NAME(amditer));
+			add_page_display(ch, "ATTACK [%5d] %s", ATTACK_VNUM(amditer), ATTACK_NAME(amditer));
 		}
 	}
 	
@@ -838,7 +837,7 @@ void olc_search_attack_message(char_data *ch, any_vnum vnum) {
 	HASH_ITER(hh, generic_table, gen, next_gen) {
 		if (GET_AFFECT_DOT_ATTACK(gen) > 0 && GET_AFFECT_DOT_ATTACK(gen) == vnum) {
 			++found;
-			size += snprintf(buf + size, sizeof(buf) - size, "GEN [%5d] %s\r\n", GEN_VNUM(gen), GEN_NAME(gen));
+			add_page_display(ch, "GEN [%5d] %s", GEN_VNUM(gen), GEN_NAME(gen));
 		}
 	}
 	
@@ -846,7 +845,7 @@ void olc_search_attack_message(char_data *ch, any_vnum vnum) {
 	HASH_ITER(hh, mobile_table, mob, next_mob) {
 		if (MOB_ATTACK_TYPE(mob) == vnum) {
 			++found;
-			size += snprintf(buf + size, sizeof(buf) - size, "MOB [%5d] %s\r\n", GET_MOB_VNUM(mob), GET_SHORT_DESC(mob));
+			add_page_display(ch, "MOB [%5d] %s", GET_MOB_VNUM(mob), GET_SHORT_DESC(mob));
 		}
 	}
 	
@@ -854,7 +853,7 @@ void olc_search_attack_message(char_data *ch, any_vnum vnum) {
 	HASH_ITER(hh, morph_table, morph, next_morph) {
 		if (MORPH_ATTACK_TYPE(morph) == vnum) {
 			++found;
-			size += snprintf(buf + size, sizeof(buf) - size, "MPH [%5d] %s\r\n", MORPH_VNUM(morph), MORPH_SHORT_DESC(morph));
+			add_page_display(ch, "MPH [%5d] %s", MORPH_VNUM(morph), MORPH_SHORT_DESC(morph));
 		}
 	}
 	
@@ -865,18 +864,18 @@ void olc_search_attack_message(char_data *ch, any_vnum vnum) {
 		
 		if (any) {
 			++found;
-			size += snprintf(buf + size, sizeof(buf) - size, "OBJ [%5d] %s\r\n", GET_OBJ_VNUM(obj), GET_OBJ_SHORT_DESC(obj));
+			add_page_display(ch, "OBJ [%5d] %s", GET_OBJ_VNUM(obj), GET_OBJ_SHORT_DESC(obj));
 		}
 	}
 	
 	if (found > 0) {
-		size += snprintf(buf + size, sizeof(buf) - size, "%d location%s shown\r\n", found, PLURAL(found));
+		add_page_display(ch, "%d location%s shown", found, PLURAL(found));
 	}
 	else {
-		size += snprintf(buf + size, sizeof(buf) - size, " none\r\n");
+		add_page_display_str(ch, " none");
 	}
 	
-	page_string(ch->desc, buf, TRUE);
+	send_page_display(ch);
 }
 
 

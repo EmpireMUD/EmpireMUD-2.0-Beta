@@ -611,9 +611,8 @@ char *list_one_shop(shop_data *shop, bool detail) {
 * @param any_vnum vnum The shop vnum.
 */
 void olc_search_shop(char_data *ch, any_vnum vnum) {
-	char buf[MAX_STRING_LENGTH];
 	shop_data *shop = real_shop(vnum);
-	int size, found;
+	int found;
 	
 	if (!shop) {
 		msg_to_char(ch, "There is no shop %d.\r\n", vnum);
@@ -621,18 +620,18 @@ void olc_search_shop(char_data *ch, any_vnum vnum) {
 	}
 	
 	found = 0;
-	size = snprintf(buf, sizeof(buf), "Occurrences of shop %d (%s):\r\n", vnum, SHOP_NAME(shop));
+	add_page_display(ch, "Occurrences of shop %d (%s):", vnum, SHOP_NAME(shop));
 	
 	// none yet
 	
 	if (found > 0) {
-		size += snprintf(buf + size, sizeof(buf) - size, "%d location%s shown\r\n", found, PLURAL(found));
+		add_page_display(ch, "%d location%s shown", found, PLURAL(found));
 	}
 	else {
-		size += snprintf(buf + size, sizeof(buf) - size, " none\r\n");
+		add_page_display_str(ch, " none");
 	}
 	
-	page_string(ch->desc, buf, TRUE);
+	send_page_display(ch);
 }
 
 

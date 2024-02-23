@@ -258,9 +258,8 @@ char *list_one_augment(augment_data *aug, bool detail) {
 * @param any_vnum vnum The augment vnum.
 */
 void olc_search_augment(char_data *ch, any_vnum vnum) {
-	char buf[MAX_STRING_LENGTH];
 	augment_data *aug = augment_proto(vnum);
-	int size, found;
+	int found;
 	
 	if (!aug) {
 		msg_to_char(ch, "There is no augment %d.\r\n", vnum);
@@ -268,18 +267,18 @@ void olc_search_augment(char_data *ch, any_vnum vnum) {
 	}
 	
 	found = 0;
-	size = snprintf(buf, sizeof(buf), "Occurrences of augment %d (%s):\r\n", vnum, GET_AUG_NAME(aug));
+	add_page_display(ch, "Occurrences of augment %d (%s):", vnum, GET_AUG_NAME(aug));
 	
 	// augments are not actually used anywhere else
 	
 	if (found > 0) {
-		size += snprintf(buf + size, sizeof(buf) - size, "%d location%s shown\r\n", found, PLURAL(found));
+		add_page_display(ch, "%d location%s shown", found, PLURAL(found));
 	}
 	else {
-		size += snprintf(buf + size, sizeof(buf) - size, " none\r\n");
+		add_page_display_str(ch, " none");
 	}
 	
-	page_string(ch->desc, buf, TRUE);
+	send_page_display(ch);
 }
 
 

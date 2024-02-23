@@ -598,14 +598,13 @@ void olc_fullsearch_sector(char_data *ch, char *argument) {
 * @param crop_vnum vnum The crop vnum.
 */
 void olc_search_sector(char_data *ch, sector_vnum vnum) {
-	char buf[MAX_STRING_LENGTH];
 	struct adventure_link_rule *link;
 	sector_data *real, *sect, *next_sect;
 	quest_data *quest, *next_quest;
 	progress_data *prg, *next_prg;
 	social_data *soc, *next_soc;
 	adv_data *adv, *next_adv;
-	int size, found;
+	int found;
 	bool any;
 	
 	real = sector_proto(vnum);
@@ -615,18 +614,15 @@ void olc_search_sector(char_data *ch, sector_vnum vnum) {
 	}
 	
 	found = 0;
-	size = snprintf(buf, sizeof(buf), "Occurrences of sector %d (%s):\r\n", vnum, GET_SECT_NAME(real));
+	add_page_display(ch, "Occurrences of sector %d (%s):", vnum, GET_SECT_NAME(real));
 	
 	// adventure rules
 	HASH_ITER(hh, adventure_table, adv, next_adv) {
-		if (size >= sizeof(buf)) {
-			break;
-		}
 		for (link = GET_ADV_LINKING(adv); link; link = link->next) {
 			if (link->type == ADV_LINK_PORTAL_WORLD) {
 				if (link->value == vnum) {
 					++found;
-					size += snprintf(buf + size, sizeof(buf) - size, "ADV [%5d] %s\r\n", GET_ADV_VNUM(adv), GET_ADV_NAME(adv));
+					add_page_display(ch, "ADV [%5d] %s", GET_ADV_VNUM(adv), GET_ADV_NAME(adv));
 					// only report once per adventure
 					break;
 				}
@@ -636,24 +632,18 @@ void olc_search_sector(char_data *ch, sector_vnum vnum) {
 	
 	// progress
 	HASH_ITER(hh, progress_table, prg, next_prg) {
-		if (size >= sizeof(buf)) {
-			break;
-		}
 		// REQ_x: requirement search
 		any = find_requirement_in_list(PRG_TASKS(prg), REQ_VISIT_SECTOR, vnum);
 		any |= find_requirement_in_list(PRG_TASKS(prg), REQ_OWN_SECTOR, vnum);
 		
 		if (any) {
 			++found;
-			size += snprintf(buf + size, sizeof(buf) - size, "PRG [%5d] %s\r\n", PRG_VNUM(prg), PRG_NAME(prg));
+			add_page_display(ch, "PRG [%5d] %s", PRG_VNUM(prg), PRG_NAME(prg));
 		}
 	}
 	
 	// quests
 	HASH_ITER(hh, quest_table, quest, next_quest) {
-		if (size >= sizeof(buf)) {
-			break;
-		}
 		any = find_requirement_in_list(QUEST_TASKS(quest), REQ_VISIT_SECTOR, vnum);
 		any |= find_requirement_in_list(QUEST_PREREQS(quest), REQ_VISIT_SECTOR, vnum);
 		any |= find_requirement_in_list(QUEST_TASKS(quest), REQ_OWN_SECTOR, vnum);
@@ -661,45 +651,39 @@ void olc_search_sector(char_data *ch, sector_vnum vnum) {
 		
 		if (any) {
 			++found;
-			size += snprintf(buf + size, sizeof(buf) - size, "QST [%5d] %s\r\n", QUEST_VNUM(quest), QUEST_NAME(quest));
+			add_page_display(ch, "QST [%5d] %s", QUEST_VNUM(quest), QUEST_NAME(quest));
 		}
 	}
 	
 	// sector evos
 	HASH_ITER(hh, sector_table, sect, next_sect) {
-		if (size >= sizeof(buf)) {
-			break;
-		}
 		any = has_evolution_to(sect, vnum);
 		any |= has_evolution_value(sect, EVO_VAL_SECTOR, vnum);
 		if (any) {
 			++found;
-			size += snprintf(buf + size, sizeof(buf) - size, "SCT [%5d] %s\r\n", GET_SECT_VNUM(sect), GET_SECT_NAME(sect));
+			add_page_display(ch, "SCT [%5d] %s", GET_SECT_VNUM(sect), GET_SECT_NAME(sect));
 		}
 	}
 	
 	// socials
 	HASH_ITER(hh, social_table, soc, next_soc) {
-		if (size >= sizeof(buf)) {
-			break;
-		}
 		any = find_requirement_in_list(SOC_REQUIREMENTS(soc), REQ_VISIT_SECTOR, vnum);
 		any |= find_requirement_in_list(SOC_REQUIREMENTS(soc), REQ_OWN_SECTOR, vnum);
 		
 		if (any) {
 			++found;
-			size += snprintf(buf + size, sizeof(buf) - size, "SOC [%5d] %s\r\n", SOC_VNUM(soc), SOC_NAME(soc));
+			add_page_display(ch, "SOC [%5d] %s", SOC_VNUM(soc), SOC_NAME(soc));
 		}
 	}
 	
 	if (found > 0) {
-		size += snprintf(buf + size, sizeof(buf) - size, "%d location%s shown\r\n", found, PLURAL(found));
+		add_page_display(ch, "%d location%s shown", found, PLURAL(found));
 	}
 	else {
-		size += snprintf(buf + size, sizeof(buf) - size, " none\r\n");
+		add_page_display_str(ch, " none");
 	}
 	
-	page_string(ch->desc, buf, TRUE);
+	send_page_display(ch);
 }
 
 

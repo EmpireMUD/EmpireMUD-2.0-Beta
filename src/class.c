@@ -640,9 +640,8 @@ char *list_one_class(class_data *cls, bool detail) {
 * @param any_vnum vnum The class vnum.
 */
 void olc_search_class(char_data *ch, any_vnum vnum) {
-	char buf[MAX_STRING_LENGTH];
 	class_data *cls = find_class_by_vnum(vnum);
-	int size, found;
+	int found;
 	
 	if (!cls) {
 		msg_to_char(ch, "There is no class %d.\r\n", vnum);
@@ -650,18 +649,18 @@ void olc_search_class(char_data *ch, any_vnum vnum) {
 	}
 	
 	found = 0;
-	size = snprintf(buf, sizeof(buf), "Occurrences of class %d (%s):\r\n", vnum, CLASS_NAME(cls));
+	add_page_display(ch, "Occurrences of class %d (%s):", vnum, CLASS_NAME(cls));
 	
 	// classes are not actually used anywhere else
 	
 	if (found > 0) {
-		size += snprintf(buf + size, sizeof(buf) - size, "%d location%s shown\r\n", found, PLURAL(found));
+		add_page_display(ch, "%d location%s shown", found, PLURAL(found));
 	}
 	else {
-		size += snprintf(buf + size, sizeof(buf) - size, " none\r\n");
+		add_page_display_str(ch, " none");
 	}
 	
-	page_string(ch->desc, buf, TRUE);
+	send_page_display(ch);
 }
 
 

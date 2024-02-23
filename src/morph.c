@@ -544,9 +544,8 @@ char *list_one_morph(morph_data *morph, bool detail) {
 * @param any_vnum vnum The morph vnum.
 */
 void olc_search_morph(char_data *ch, any_vnum vnum) {
-	char buf[MAX_STRING_LENGTH];
 	morph_data *morph = morph_proto(vnum);
-	int size, found;
+	int found;
 	
 	if (!morph) {
 		msg_to_char(ch, "There is no morph %d.\r\n", vnum);
@@ -554,18 +553,18 @@ void olc_search_morph(char_data *ch, any_vnum vnum) {
 	}
 	
 	found = 0;
-	size = snprintf(buf, sizeof(buf), "Occurrences of morph %d (%s):\r\n", vnum, MORPH_SHORT_DESC(morph));
+	add_page_display(ch, "Occurrences of morph %d (%s):", vnum, MORPH_SHORT_DESC(morph));
 	
 	// morphs are not actually used anywhere else
 	
 	if (found > 0) {
-		size += snprintf(buf + size, sizeof(buf) - size, "%d location%s shown\r\n", found, PLURAL(found));
+		add_page_display(ch, "%d location%s shown", found, PLURAL(found));
 	}
 	else {
-		size += snprintf(buf + size, sizeof(buf) - size, " none\r\n");
+		add_page_display_str(ch, " none");
 	}
 	
-	page_string(ch->desc, buf, TRUE);
+	send_page_display(ch);
 }
 
 

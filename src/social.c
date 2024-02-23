@@ -208,9 +208,8 @@ char *list_one_social(social_data *soc, bool detail) {
 * @param any_vnum vnum The social vnum.
 */
 void olc_search_social(char_data *ch, any_vnum vnum) {
-	char buf[MAX_STRING_LENGTH];
 	social_data *soc = social_proto(vnum);
-	int size, found;
+	int found;
 	
 	if (!soc) {
 		msg_to_char(ch, "There is no social %d.\r\n", vnum);
@@ -218,18 +217,18 @@ void olc_search_social(char_data *ch, any_vnum vnum) {
 	}
 	
 	found = 0;
-	size = snprintf(buf, sizeof(buf), "Occurrences of social %d (%s):\r\n", vnum, SOC_NAME(soc));
+	add_page_display(ch, "Occurrences of social %d (%s):", vnum, SOC_NAME(soc));
 	
 	// socials are not actually used anywhere else
 	
 	if (found > 0) {
-		size += snprintf(buf + size, sizeof(buf) - size, "%d location%s shown\r\n", found, PLURAL(found));
+		add_page_display(ch, "%d location%s shown", found, PLURAL(found));
 	}
 	else {
-		size += snprintf(buf + size, sizeof(buf) - size, " none\r\n");
+		add_page_display_str(ch, " none");
 	}
 	
-	page_string(ch->desc, buf, TRUE);
+	send_page_display(ch);
 }
 
 

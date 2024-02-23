@@ -437,12 +437,11 @@ void olc_fullsearch_crop(char_data *ch, char *argument) {
 * @param crop_vnum vnum The crop vnum.
 */
 void olc_search_crop(char_data *ch, crop_vnum vnum) {
-	char buf[MAX_STRING_LENGTH];
 	crop_data *crop = crop_proto(vnum);
 	struct adventure_link_rule *link;
 	adv_data *adv, *next_adv;
 	obj_data *obj, *next_obj;
-	int size, found;
+	int found;
 	
 	if (!crop) {
 		msg_to_char(ch, "There is no crop %d.\r\n", vnum);
@@ -450,18 +449,15 @@ void olc_search_crop(char_data *ch, crop_vnum vnum) {
 	}
 	
 	found = 0;
-	size = snprintf(buf, sizeof(buf), "Occurrences of crop %d (%s):\r\n", vnum, GET_CROP_NAME(crop));
+	add_page_display(ch, "Occurrences of crop %d (%s):", vnum, GET_CROP_NAME(crop));
 	
 	// adventure rules
 	HASH_ITER(hh, adventure_table, adv, next_adv) {
-		if (size >= sizeof(buf)) {
-			break;
-		}
 		for (link = GET_ADV_LINKING(adv); link; link = link->next) {
 			if (link->type == ADV_LINK_PORTAL_CROP) {
 				if (link->value == vnum) {
 					++found;
-					size += snprintf(buf + size, sizeof(buf) - size, "ADV [%5d] %s\r\n", GET_ADV_VNUM(adv), GET_ADV_NAME(adv));
+					add_page_display(ch, "ADV [%5d] %s", GET_ADV_VNUM(adv), GET_ADV_NAME(adv));
 					// only report once per adventure
 					break;
 				}
@@ -473,18 +469,18 @@ void olc_search_crop(char_data *ch, crop_vnum vnum) {
 	HASH_ITER(hh, object_table, obj, next_obj) {
 		if (OBJ_FLAGGED(obj, OBJ_PLANTABLE) && GET_OBJ_VAL(obj, VAL_FOOD_CROP_TYPE) == vnum) {
 			++found;
-			size += snprintf(buf + size, sizeof(buf) - size, "OBJ [%5d] %s\r\n", GET_OBJ_VNUM(obj), GET_OBJ_SHORT_DESC(obj));
+			add_page_display(ch, "OBJ [%5d] %s", GET_OBJ_VNUM(obj), GET_OBJ_SHORT_DESC(obj));
 		}
 	}
 	
 	if (found > 0) {
-		size += snprintf(buf + size, sizeof(buf) - size, "%d location%s shown\r\n", found, PLURAL(found));
+		add_page_display(ch, "%d location%s shown", found, PLURAL(found));
 	}
 	else {
-		size += snprintf(buf + size, sizeof(buf) - size, " none\r\n");
+		add_page_display_str(ch, " none");
 	}
 	
-	page_string(ch->desc, buf, TRUE);
+	send_page_display(ch);
 }
 
 

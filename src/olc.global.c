@@ -264,9 +264,8 @@ void olc_delete_global(char_data *ch, any_vnum vnum) {
 * @param any_vnum vnum The global vnum.
 */
 void olc_search_global(char_data *ch, any_vnum vnum) {
-	char buf[MAX_STRING_LENGTH];
 	struct global_data *glb = global_proto(vnum);
-	int size, found;
+	int found;
 	
 	if (!glb) {
 		msg_to_char(ch, "There is no global %d.\r\n", vnum);
@@ -274,18 +273,18 @@ void olc_search_global(char_data *ch, any_vnum vnum) {
 	}
 	
 	found = 0;
-	size = snprintf(buf, sizeof(buf), "Occurrences of global %d (%s):\r\n", vnum, GET_GLOBAL_NAME(glb));
+	add_page_display(ch, "Occurrences of global %d (%s):", vnum, GET_GLOBAL_NAME(glb));
 	
 	// globals are not actually used anywhere else
 	
 	if (found > 0) {
-		size += snprintf(buf + size, sizeof(buf) - size, "%d location%s shown\r\n", found, PLURAL(found));
+		add_page_display(ch, "%d location%s shown", found, PLURAL(found));
 	}
 	else {
-		size += snprintf(buf + size, sizeof(buf) - size, " none\r\n");
+		add_page_display(ch, " none");
 	}
 	
-	page_string(ch->desc, buf, TRUE);
+	send_page_display(ch);
 }
 
 

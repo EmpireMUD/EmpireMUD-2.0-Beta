@@ -647,7 +647,6 @@ void olc_fullsearch_trigger(char_data *ch, char *argument) {
 * @param crop_vnum vnum The crop vnum.
 */
 void olc_search_trigger(char_data *ch, trig_vnum vnum) {
-	char buf[MAX_STRING_LENGTH];
 	trig_data *proto = real_trigger(vnum);
 	quest_data *quest, *next_quest;
 	struct trig_proto_list *trig;
@@ -658,7 +657,7 @@ void olc_search_trigger(char_data *ch, trig_vnum vnum) {
 	adv_data *adv, *next_adv;
 	obj_data *obj, *next_obj;
 	bld_data *bld, *next_bld;
-	int size, found;
+	int found;
 	bool any;
 	
 	if (!proto) {
@@ -667,7 +666,7 @@ void olc_search_trigger(char_data *ch, trig_vnum vnum) {
 	}
 	
 	found = 0;
-	size = snprintf(buf, sizeof(buf), "Occurrences of trigger %d (%s):\r\n", vnum, GET_TRIG_NAME(proto));
+	add_page_display(ch, "Occurrences of trigger %d (%s):", vnum, GET_TRIG_NAME(proto));
 	
 	// adventure scripts
 	HASH_ITER(hh, adventure_table, adv, next_adv) {
@@ -676,7 +675,7 @@ void olc_search_trigger(char_data *ch, trig_vnum vnum) {
 			if (trig->vnum == vnum) {
 				any = TRUE;
 				++found;
-				size += snprintf(buf + size, sizeof(buf) - size, "ADV [%5d] %s\r\n", GET_ADV_VNUM(adv), GET_ADV_NAME(adv));
+				add_page_display(ch, "ADV [%5d] %s", GET_ADV_VNUM(adv), GET_ADV_NAME(adv));
 			}
 		}
 	}
@@ -688,7 +687,7 @@ void olc_search_trigger(char_data *ch, trig_vnum vnum) {
 			if (trig->vnum == vnum) {
 				any = TRUE;
 				++found;
-				size += snprintf(buf + size, sizeof(buf) - size, "BLD [%5d] %s\r\n", GET_BLD_VNUM(bld), GET_BLD_NAME(bld));
+				add_page_display(ch, "BLD [%5d] %s", GET_BLD_VNUM(bld), GET_BLD_NAME(bld));
 			}
 		}
 	}
@@ -700,7 +699,7 @@ void olc_search_trigger(char_data *ch, trig_vnum vnum) {
 			if (trig->vnum == vnum) {
 				any = TRUE;
 				++found;
-				size += snprintf(buf + size, sizeof(buf) - size, "MOB [%5d] %s\r\n", GET_MOB_VNUM(mob), GET_SHORT_DESC(mob));
+				add_page_display(ch, "MOB [%5d] %s", GET_MOB_VNUM(mob), GET_SHORT_DESC(mob));
 			}
 		}
 	}
@@ -712,16 +711,13 @@ void olc_search_trigger(char_data *ch, trig_vnum vnum) {
 			if (trig->vnum == vnum) {
 				any = TRUE;
 				++found;
-				size += snprintf(buf + size, sizeof(buf) - size, "OBJ [%5d] %s\r\n", GET_OBJ_VNUM(obj), GET_OBJ_SHORT_DESC(obj));
+				add_page_display(ch, "OBJ [%5d] %s", GET_OBJ_VNUM(obj), GET_OBJ_SHORT_DESC(obj));
 			}
 		}
 	}
 	
 	// quests
 	HASH_ITER(hh, quest_table, quest, next_quest) {
-		if (size >= sizeof(buf)) {
-			break;
-		}
 		any = find_quest_giver_in_list(QUEST_STARTS_AT(quest), QG_TRIGGER, vnum);
 		any |= find_quest_giver_in_list(QUEST_ENDS_AT(quest), QG_TRIGGER, vnum);
 		if (!any) {
@@ -735,7 +731,7 @@ void olc_search_trigger(char_data *ch, trig_vnum vnum) {
 		
 		if (any) {
 			++found;
-			size += snprintf(buf + size, sizeof(buf) - size, "QST [%5d] %s\r\n", QUEST_VNUM(quest), QUEST_NAME(quest));
+			add_page_display(ch, "QST [%5d] %s", QUEST_VNUM(quest), QUEST_NAME(quest));
 		}
 	}
 	
@@ -746,21 +742,18 @@ void olc_search_trigger(char_data *ch, trig_vnum vnum) {
 			if (trig->vnum == vnum) {
 				any = TRUE;
 				++found;
-				size += snprintf(buf + size, sizeof(buf) - size, "RMT [%5d] %s\r\n", GET_RMT_VNUM(rmt), GET_RMT_TITLE(rmt));
+				add_page_display(ch, "RMT [%5d] %s", GET_RMT_VNUM(rmt), GET_RMT_TITLE(rmt));
 			}
 		}
 	}
 	
 	// shops
 	HASH_ITER(hh, shop_table, shop, next_shop) {
-		if (size >= sizeof(buf)) {
-			break;
-		}
 		any = find_quest_giver_in_list(SHOP_LOCATIONS(shop), QG_TRIGGER, vnum);
 		
 		if (any) {
 			++found;
-			size += snprintf(buf + size, sizeof(buf) - size, "SHOP [%5d] %s\r\n", SHOP_VNUM(shop), SHOP_NAME(shop));
+			add_page_display(ch, "SHOP [%5d] %s", SHOP_VNUM(shop), SHOP_NAME(shop));
 		}
 	}
 	
@@ -771,19 +764,19 @@ void olc_search_trigger(char_data *ch, trig_vnum vnum) {
 			if (trig->vnum == vnum) {
 				any = TRUE;
 				++found;
-				size += snprintf(buf + size, sizeof(buf) - size, "VEH [%5d] %s\r\n", VEH_VNUM(veh), VEH_SHORT_DESC(veh));
+				add_page_display(ch, "VEH [%5d] %s", VEH_VNUM(veh), VEH_SHORT_DESC(veh));
 			}
 		}
 	}
 	
 	if (found > 0) {
-		size += snprintf(buf + size, sizeof(buf) - size, "%d location%s shown\r\n", found, PLURAL(found));
+		add_page_display(ch, "%d location%s shown", found, PLURAL(found));
 	}
 	else {
-		size += snprintf(buf + size, sizeof(buf) - size, " none\r\n");
+		add_page_display_str(ch, " none");
 	}
 	
-	page_string(ch->desc, buf, TRUE);
+	send_page_display(ch);
 }
 
 

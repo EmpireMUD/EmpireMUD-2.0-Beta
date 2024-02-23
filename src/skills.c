@@ -3165,7 +3165,6 @@ void olc_fullsearch_skill(char_data *ch, char *argument) {
 * @param any_vnum vnum The skill vnum.
 */
 void olc_search_skill(char_data *ch, any_vnum vnum) {
-	char buf[MAX_STRING_LENGTH];
 	skill_data *skill = find_skill_by_vnum(vnum), *sk, *next_sk;
 	archetype_data *arch, *next_arch;
 	quest_data *quest, *next_quest;
@@ -3175,7 +3174,7 @@ void olc_search_skill(char_data *ch, any_vnum vnum) {
 	struct synergy_ability *syn;
 	social_data *soc, *next_soc;
 	class_data *cls, *next_cls;
-	int size, found;
+	int found;
 	bool any;
 	
 	if (!skill) {
@@ -3184,14 +3183,14 @@ void olc_search_skill(char_data *ch, any_vnum vnum) {
 	}
 	
 	found = 0;
-	size = snprintf(buf, sizeof(buf), "Occurrences of skill %d (%s):\r\n", vnum, SKILL_NAME(skill));
+	add_page_display(ch, "Occurrences of skill %d (%s):", vnum, SKILL_NAME(skill));
 	
 	// archetypes
 	HASH_ITER(hh, archetype_table, arch, next_arch) {
 		LL_FOREACH(GET_ARCH_SKILLS(arch), arsk) {
 			if (arsk->skill == vnum) {
 				++found;
-				size += snprintf(buf + size, sizeof(buf) - size, "ARCH [%5d] %s\r\n", GET_ARCH_VNUM(arch), GET_ARCH_NAME(arch));
+				add_page_display(ch, "ARCH [%5d] %s", GET_ARCH_VNUM(arch), GET_ARCH_NAME(arch));
 				break;	// only need 1
 			}
 		}
@@ -3202,7 +3201,7 @@ void olc_search_skill(char_data *ch, any_vnum vnum) {
 		LL_FOREACH(CLASS_SKILL_REQUIREMENTS(cls), clsk) {
 			if (clsk->vnum == vnum) {
 				++found;
-				size += snprintf(buf + size, sizeof(buf) - size, "CLS [%5d] %s\r\n", CLASS_VNUM(cls), CLASS_NAME(cls));
+				add_page_display(ch, "CLS [%5d] %s", CLASS_VNUM(cls), CLASS_NAME(cls));
 				break;	// only need 1
 			}
 		}
@@ -3210,9 +3209,6 @@ void olc_search_skill(char_data *ch, any_vnum vnum) {
 	
 	// progress
 	HASH_ITER(hh, progress_table, prg, next_prg) {
-		if (size >= sizeof(buf)) {
-			break;
-		}
 		// REQ_x: requirement search
 		any = find_requirement_in_list(PRG_TASKS(prg), REQ_SKILL_LEVEL_OVER, vnum);
 		any |= find_requirement_in_list(PRG_TASKS(prg), REQ_SKILL_LEVEL_UNDER, vnum);
@@ -3220,15 +3216,12 @@ void olc_search_skill(char_data *ch, any_vnum vnum) {
 		
 		if (any) {
 			++found;
-			size += snprintf(buf + size, sizeof(buf) - size, "PRG [%5d] %s\r\n", PRG_VNUM(prg), PRG_NAME(prg));
+			add_page_display(ch, "PRG [%5d] %s", PRG_VNUM(prg), PRG_NAME(prg));
 		}
 	}
 	
 	// quests
 	HASH_ITER(hh, quest_table, quest, next_quest) {
-		if (size >= sizeof(buf)) {
-			break;
-		}
 		any = find_quest_reward_in_list(QUEST_REWARDS(quest), QR_SET_SKILL, vnum);
 		any |= find_quest_reward_in_list(QUEST_REWARDS(quest), QR_SKILL_EXP, vnum);
 		any |= find_quest_reward_in_list(QUEST_REWARDS(quest), QR_SKILL_LEVELS, vnum);
@@ -3241,7 +3234,7 @@ void olc_search_skill(char_data *ch, any_vnum vnum) {
 		
 		if (any) {
 			++found;
-			size += snprintf(buf + size, sizeof(buf) - size, "QST [%5d] %s\r\n", QUEST_VNUM(quest), QUEST_NAME(quest));
+			add_page_display(ch, "QST [%5d] %s", QUEST_VNUM(quest), QUEST_NAME(quest));
 		}
 	}
 	
@@ -3250,7 +3243,7 @@ void olc_search_skill(char_data *ch, any_vnum vnum) {
 		LL_FOREACH(SKILL_SYNERGIES(sk), syn) {
 			if (syn->skill == vnum) {
 				++found;
-				size += snprintf(buf + size, sizeof(buf) - size, "SKL [%5d] %s\r\n", SKILL_VNUM(sk), SKILL_NAME(sk));
+				add_page_display(ch, "SKL [%5d] %s", SKILL_VNUM(sk), SKILL_NAME(sk));
 				break;
 			}
 		}
@@ -3258,27 +3251,24 @@ void olc_search_skill(char_data *ch, any_vnum vnum) {
 	
 	// socials
 	HASH_ITER(hh, social_table, soc, next_soc) {
-		if (size >= sizeof(buf)) {
-			break;
-		}
 		any = find_requirement_in_list(SOC_REQUIREMENTS(soc), REQ_SKILL_LEVEL_OVER, vnum);
 		any |= find_requirement_in_list(SOC_REQUIREMENTS(soc), REQ_SKILL_LEVEL_UNDER, vnum);
 		any |= find_requirement_in_list(SOC_REQUIREMENTS(soc), REQ_CAN_GAIN_SKILL, vnum);
 		
 		if (any) {
 			++found;
-			size += snprintf(buf + size, sizeof(buf) - size, "SOC [%5d] %s\r\n", SOC_VNUM(soc), SOC_NAME(soc));
+			add_page_display(ch, "SOC [%5d] %s", SOC_VNUM(soc), SOC_NAME(soc));
 		}
 	}
 	
 	if (found > 0) {
-		size += snprintf(buf + size, sizeof(buf) - size, "%d location%s shown\r\n", found, PLURAL(found));
+		add_page_display(ch, "%d location%s shown", found, PLURAL(found));
 	}
 	else {
-		size += snprintf(buf + size, sizeof(buf) - size, " none\r\n");
+		add_page_display_str(ch, " none");
 	}
 	
-	page_string(ch->desc, buf, TRUE);
+	send_page_display(ch);
 }
 
 

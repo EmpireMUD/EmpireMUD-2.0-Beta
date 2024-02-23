@@ -492,11 +492,10 @@ void olc_fullsearch_craft(char_data *ch, char *argument) {
 * @param craft_vnum vnum The craft vnum.
 */
 void olc_search_craft(char_data *ch, craft_vnum vnum) {
-	char buf[MAX_STRING_LENGTH];
 	craft_data *craft = craft_proto(vnum);
 	progress_data *prg, *next_prg;
 	obj_data *obj, *next_obj;
-	int size, found;
+	int found;
 	
 	if (!craft) {
 		msg_to_char(ch, "There is no craft %d.\r\n", vnum);
@@ -504,13 +503,13 @@ void olc_search_craft(char_data *ch, craft_vnum vnum) {
 	}
 	
 	found = 0;
-	size = snprintf(buf, sizeof(buf), "Occurrences of craft %d (%s):\r\n", vnum, GET_CRAFT_NAME(craft));
+	add_page_display(ch, "Occurrences of craft %d (%s):", vnum, GET_CRAFT_NAME(craft));
 
 	// objects
 	HASH_ITER(hh, object_table, obj, next_obj) {
 		if (IS_RECIPE(obj) && GET_RECIPE_VNUM(obj) == vnum) {
 			++found;
-			size += snprintf(buf + size, sizeof(buf) - size, "OBJ [%5d] %s\r\n", GET_OBJ_VNUM(obj), GET_OBJ_SHORT_DESC(obj));
+			add_page_display(ch, "OBJ [%5d] %s", GET_OBJ_VNUM(obj), GET_OBJ_SHORT_DESC(obj));
 		}
 	}
 	
@@ -518,18 +517,18 @@ void olc_search_craft(char_data *ch, craft_vnum vnum) {
 	HASH_ITER(hh, progress_table, prg, next_prg) {
 		if (find_progress_perk_in_list(PRG_PERKS(prg), PRG_PERK_CRAFT, vnum)) {
 			++found;
-			size += snprintf(buf + size, sizeof(buf) - size, "PRG [%5d] %s\r\n", PRG_VNUM(prg), PRG_NAME(prg));
+			add_page_display(ch, "PRG [%5d] %s", PRG_VNUM(prg), PRG_NAME(prg));
 		}
 	}
 	
 	if (found > 0) {
-		size += snprintf(buf + size, sizeof(buf) - size, "%d location%s shown\r\n", found, PLURAL(found));
+		add_page_display(ch, "%d location%s shown", found, PLURAL(found));
 	}
 	else {
-		size += snprintf(buf + size, sizeof(buf) - size, " none\r\n");
+		add_page_display_str(ch, " none");
 	}
 	
-	page_string(ch->desc, buf, TRUE);
+	send_page_display(ch);
 }
 
 

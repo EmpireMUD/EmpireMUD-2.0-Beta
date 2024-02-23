@@ -1306,13 +1306,12 @@ char *list_one_event(event_data *event, bool detail) {
 * @param any_vnum vnum The event vnum.
 */
 void olc_search_event(char_data *ch, any_vnum vnum) {
-	char buf[MAX_STRING_LENGTH];
 	event_data *event = find_event_by_vnum(vnum);
 	quest_data *quest, *next_quest;
 	progress_data *prg, *next_prg;
 	social_data *soc, *next_soc;
 	event_data *ev, *next_ev;
-	int size, found;
+	int found;
 	bool any;
 	
 	if (!event) {
@@ -1321,43 +1320,34 @@ void olc_search_event(char_data *ch, any_vnum vnum) {
 	}
 	
 	found = 0;
-	size = snprintf(buf, sizeof(buf), "Occurrences of event %d (%s):\r\n", vnum, EVT_NAME(event));
+	add_page_display(ch, "Occurrences of event %d (%s):", vnum, EVT_NAME(event));
 	
 	// other events
 	HASH_ITER(hh, event_table, ev, next_ev) {
-		if (size >= sizeof(buf)) {
-			break;
-		}
 		// QR_x: event rewards
 		any = find_event_reward_in_list(EVT_RANK_REWARDS(ev), QR_EVENT_POINTS, vnum);
 		any |= find_event_reward_in_list(EVT_THRESHOLD_REWARDS(ev), QR_EVENT_POINTS, vnum);
 		
 		if (any) {
 			++found;
-			size += snprintf(buf + size, sizeof(buf) - size, "EVT [%5d] %s\r\n", EVT_VNUM(ev), EVT_NAME(ev));
+			add_page_display(ch, "EVT [%5d] %s", EVT_VNUM(ev), EVT_NAME(ev));
 		}
 	}
 	
 	// progress
 	HASH_ITER(hh, progress_table, prg, next_prg) {
-		if (size >= sizeof(buf)) {
-			break;
-		}
 		// REQ_x: requirement search
 		any = find_requirement_in_list(PRG_TASKS(prg), REQ_EVENT_RUNNING, vnum);
 		any |= find_requirement_in_list(PRG_TASKS(prg), REQ_EVENT_NOT_RUNNING, vnum);
 		
 		if (any) {
 			++found;
-			size += snprintf(buf + size, sizeof(buf) - size, "PRG [%5d] %s\r\n", PRG_VNUM(prg), PRG_NAME(prg));
+			add_page_display(ch, "PRG [%5d] %s", PRG_VNUM(prg), PRG_NAME(prg));
 		}
 	}
 	
 	// quests
 	HASH_ITER(hh, quest_table, quest, next_quest) {
-		if (size >= sizeof(buf)) {
-			break;
-		}
 		// QR_x, REQ_x: quest types
 		any = find_requirement_in_list(QUEST_TASKS(quest), REQ_EVENT_RUNNING, vnum);
 		any |= find_requirement_in_list(QUEST_PREREQS(quest), REQ_EVENT_RUNNING, vnum);
@@ -1368,33 +1358,30 @@ void olc_search_event(char_data *ch, any_vnum vnum) {
 		
 		if (any) {
 			++found;
-			size += snprintf(buf + size, sizeof(buf) - size, "QST [%5d] %s\r\n", QUEST_VNUM(quest), QUEST_NAME(quest));
+			add_page_display(ch, "QST [%5d] %s", QUEST_VNUM(quest), QUEST_NAME(quest));
 		}
 	}
 	
 	// on socials
 	HASH_ITER(hh, social_table, soc, next_soc) {
-		if (size >= sizeof(buf)) {
-			break;
-		}
 		// REQ_x: quest types
 		any = find_requirement_in_list(SOC_REQUIREMENTS(soc), REQ_EVENT_RUNNING, vnum);
 		any |= find_requirement_in_list(SOC_REQUIREMENTS(soc), REQ_EVENT_NOT_RUNNING, vnum);
 		
 		if (any) {
 			++found;
-			size += snprintf(buf + size, sizeof(buf) - size, "SOC [%5d] %s\r\n", SOC_VNUM(soc), SOC_NAME(soc));
+			add_page_display(ch, "SOC [%5d] %s", SOC_VNUM(soc), SOC_NAME(soc));
 		}
 	}
 	
 	if (found > 0) {
-		size += snprintf(buf + size, sizeof(buf) - size, "%d location%s shown\r\n", found, PLURAL(found));
+		add_page_display(ch, "%d location%s shown", found, PLURAL(found));
 	}
 	else {
-		size += snprintf(buf + size, sizeof(buf) - size, " none\r\n");
+		add_page_display_str(ch, " none");
 	}
 	
-	page_string(ch->desc, buf, TRUE);
+	send_page_display(ch);
 }
 
 

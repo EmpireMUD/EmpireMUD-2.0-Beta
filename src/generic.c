@@ -618,7 +618,6 @@ void olc_fullsearch_generic(char_data *ch, char *argument) {
 * @param any_vnum vnum The generic vnum.
 */
 void olc_search_generic(char_data *ch, any_vnum vnum) {
-	char buf[MAX_STRING_LENGTH];
 	generic_data *gen = real_generic(vnum), *gen_iter, *next_gen;
 	ability_data *abil, *next_abil;
 	craft_data *craft, *next_craft;
@@ -633,7 +632,7 @@ void olc_search_generic(char_data *ch, any_vnum vnum) {
 	struct resource_data *res;
 	bld_data *bld, *next_bld;
 	obj_data *obj, *next_obj;
-	int size, found;
+	int found;
 	bool any;
 	
 	if (!gen) {
@@ -642,7 +641,7 @@ void olc_search_generic(char_data *ch, any_vnum vnum) {
 	}
 	
 	found = 0;
-	size = snprintf(buf, sizeof(buf), "Occurrences of generic %d (%s):\r\n", vnum, GEN_NAME(gen));
+	add_page_display(ch, "Occurrences of generic %d (%s):", vnum, GEN_NAME(gen));
 	
 	// abilities
 	HASH_ITER(hh, ability_table, abil, next_abil) {
@@ -659,7 +658,7 @@ void olc_search_generic(char_data *ch, any_vnum vnum) {
 		
 		if (any) {
 			++found;
-			size += snprintf(buf + size, sizeof(buf) - size, "ABIL [%5d] %s\r\n", ABIL_VNUM(abil), ABIL_NAME(abil));
+			add_page_display(ch, "ABIL [%5d] %s", ABIL_VNUM(abil), ABIL_NAME(abil));
 		}
 	}
 	
@@ -670,7 +669,7 @@ void olc_search_generic(char_data *ch, any_vnum vnum) {
 			if (res->vnum == vnum && ((GEN_TYPE(gen) == GENERIC_ACTION && res->type == RES_ACTION) || (GEN_TYPE(gen) == GENERIC_LIQUID && res->type == RES_LIQUID) || (GEN_TYPE(gen) == GENERIC_COMPONENT && res->type == RES_COMPONENT))) {
 				any = TRUE;
 				++found;
-				size += snprintf(buf + size, sizeof(buf) - size, "AUG [%5d] %s\r\n", GET_AUG_VNUM(aug), GET_AUG_NAME(aug));
+				add_page_display(ch, "AUG [%5d] %s", GET_AUG_VNUM(aug), GET_AUG_NAME(aug));
 			}
 		}
 	}
@@ -682,7 +681,7 @@ void olc_search_generic(char_data *ch, any_vnum vnum) {
 			if (res->vnum == vnum && ((GEN_TYPE(gen) == GENERIC_ACTION && res->type == RES_ACTION) || (GEN_TYPE(gen) == GENERIC_LIQUID && res->type == RES_LIQUID) || (GEN_TYPE(gen) == GENERIC_COMPONENT && res->type == RES_COMPONENT))) {
 				any = TRUE;
 				++found;
-				size += snprintf(buf + size, sizeof(buf) - size, "BLD [%5d] %s\r\n", GET_BLD_VNUM(bld), GET_BLD_NAME(bld));
+				add_page_display(ch, "BLD [%5d] %s", GET_BLD_VNUM(bld), GET_BLD_NAME(bld));
 			}
 		}
 	}
@@ -693,22 +692,19 @@ void olc_search_generic(char_data *ch, any_vnum vnum) {
 		if (CRAFT_FLAGGED(craft, CRAFT_SOUP) && GET_CRAFT_OBJECT(craft) == vnum) {
 			any = TRUE;
 			++found;
-			size += snprintf(buf + size, sizeof(buf) - size, "CFT [%5d] %s\r\n", GET_CRAFT_VNUM(craft), GET_CRAFT_NAME(craft));
+			add_page_display(ch, "CFT [%5d] %s", GET_CRAFT_VNUM(craft), GET_CRAFT_NAME(craft));
 		}
 		for (res = GET_CRAFT_RESOURCES(craft); res && !any; res = res->next) {
 			if (res->vnum == vnum && ((GEN_TYPE(gen) == GENERIC_ACTION && res->type == RES_ACTION) || (GEN_TYPE(gen) == GENERIC_LIQUID && res->type == RES_LIQUID) || (GEN_TYPE(gen) == GENERIC_COMPONENT && res->type == RES_COMPONENT))) {
 				any = TRUE;
 				++found;
-				size += snprintf(buf + size, sizeof(buf) - size, "CFT [%5d] %s\r\n", GET_CRAFT_VNUM(craft), GET_CRAFT_NAME(craft));
+				add_page_display(ch, "CFT [%5d] %s", GET_CRAFT_VNUM(craft), GET_CRAFT_NAME(craft));
 			}
 		}
 	}
 	
 	// events
 	HASH_ITER(hh, event_table, event, next_event) {
-		if (size >= sizeof(buf)) {
-			break;
-		}
 		// QR_x: event rewards
 		any = find_event_reward_in_list(EVT_RANK_REWARDS(event), QR_CURRENCY, vnum);
 		any |= find_event_reward_in_list(EVT_THRESHOLD_REWARDS(event), QR_CURRENCY, vnum);
@@ -719,7 +715,7 @@ void olc_search_generic(char_data *ch, any_vnum vnum) {
 		
 		if (any) {
 			++found;
-			size += snprintf(buf + size, sizeof(buf) - size, "EVT [%5d] %s\r\n", EVT_VNUM(event), EVT_NAME(event));
+			add_page_display(ch, "EVT [%5d] %s", EVT_VNUM(event), EVT_NAME(event));
 		}
 	}
 	
@@ -727,7 +723,7 @@ void olc_search_generic(char_data *ch, any_vnum vnum) {
 	HASH_ITER(hh, generic_table, gen_iter, next_gen) {
 		if (has_generic_relation(GEN_RELATIONS(gen_iter), vnum)) {
 			++found;
-			size += snprintf(buf + size, sizeof(buf) - size, "GEN [%5d] %s\r\n", GEN_VNUM(gen_iter), GEN_NAME(gen_iter));
+			add_page_display(ch, "GEN [%5d] %s", GEN_VNUM(gen_iter), GEN_NAME(gen_iter));
 		}
 	}
 	
@@ -755,16 +751,13 @@ void olc_search_generic(char_data *ch, any_vnum vnum) {
 		
 		if (any) {
 			++found;
-			size += snprintf(buf + size, sizeof(buf) - size, "OBJ [%5d] %s\r\n", GET_OBJ_VNUM(obj), GET_OBJ_SHORT_DESC(obj));
+			add_page_display(ch, "OBJ [%5d] %s", GET_OBJ_VNUM(obj), GET_OBJ_SHORT_DESC(obj));
 		}
 	}
 	
 	
 	// progress
 	HASH_ITER(hh, progress_table, prg, next_prg) {
-		if (size >= sizeof(buf)) {
-			break;
-		}
 		// REQ_x: requirement search
 		any = find_requirement_in_list(PRG_TASKS(prg), REQ_GET_CURRENCY, vnum);
 		any |= find_requirement_in_list(PRG_TASKS(prg), REQ_GET_COMPONENT, vnum);
@@ -778,15 +771,12 @@ void olc_search_generic(char_data *ch, any_vnum vnum) {
 		
 		if (any) {
 			++found;
-			size += snprintf(buf + size, sizeof(buf) - size, "PRG [%5d] %s\r\n", PRG_VNUM(prg), PRG_NAME(prg));
+			add_page_display(ch, "PRG [%5d] %s", PRG_VNUM(prg), PRG_NAME(prg));
 		}
 	}
 	
 	// check quests
 	HASH_ITER(hh, quest_table, quest, next_quest) {
-		if (size >= sizeof(buf)) {
-			break;
-		}
 		// REQ_x: quest types
 		any = find_requirement_in_list(QUEST_TASKS(quest), REQ_GET_CURRENCY, vnum);
 		any |= find_requirement_in_list(QUEST_PREREQS(quest), REQ_GET_CURRENCY, vnum);
@@ -806,7 +796,7 @@ void olc_search_generic(char_data *ch, any_vnum vnum) {
 		
 		if (any) {
 			++found;
-			size += snprintf(buf + size, sizeof(buf) - size, "QST [%5d] %s\r\n", QUEST_VNUM(quest), QUEST_NAME(quest));
+			add_page_display(ch, "QST [%5d] %s", QUEST_VNUM(quest), QUEST_NAME(quest));
 		}
 	}
 	
@@ -816,15 +806,12 @@ void olc_search_generic(char_data *ch, any_vnum vnum) {
 		
 		if (any) {
 			++found;
-			size += snprintf(buf + size, sizeof(buf) - size, "SHOP [%5d] %s\r\n", SHOP_VNUM(shop), SHOP_NAME(shop));
+			add_page_display(ch, "SHOP [%5d] %s", SHOP_VNUM(shop), SHOP_NAME(shop));
 		}
 	}
 	
 	// socials
 	HASH_ITER(hh, social_table, soc, next_soc) {
-		if (size >= sizeof(buf)) {
-			break;
-		}
 		// REQ_x: social requirements
 		any = find_requirement_in_list(SOC_REQUIREMENTS(soc), REQ_GET_CURRENCY, vnum);
 		any |= find_requirement_in_list(SOC_REQUIREMENTS(soc), REQ_GET_COMPONENT, vnum);
@@ -834,7 +821,7 @@ void olc_search_generic(char_data *ch, any_vnum vnum) {
 		
 		if (any) {
 			++found;
-			size += snprintf(buf + size, sizeof(buf) - size, "SOC [%5d] %s\r\n", SOC_VNUM(soc), SOC_NAME(soc));
+			add_page_display(ch, "SOC [%5d] %s", SOC_VNUM(soc), SOC_NAME(soc));
 		}
 	}
 	
@@ -845,19 +832,19 @@ void olc_search_generic(char_data *ch, any_vnum vnum) {
 			if (res->vnum == vnum && ((GEN_TYPE(gen) == GENERIC_ACTION && res->type == RES_ACTION) || (GEN_TYPE(gen) == GENERIC_LIQUID && res->type == RES_LIQUID) || (GEN_TYPE(gen) == GENERIC_COMPONENT && res->type == RES_COMPONENT))) {
 				any = TRUE;
 				++found;
-				size += snprintf(buf + size, sizeof(buf) - size, "VEH [%5d] %s\r\n", VEH_VNUM(veh), VEH_SHORT_DESC(veh));
+				add_page_display(ch, "VEH [%5d] %s", VEH_VNUM(veh), VEH_SHORT_DESC(veh));
 			}
 		}
 	}
 	
 	if (found > 0) {
-		size += snprintf(buf + size, sizeof(buf) - size, "%d location%s shown\r\n", found, PLURAL(found));
+		add_page_display(ch, "%d location%s shown", found, PLURAL(found));
 	}
 	else {
-		size += snprintf(buf + size, sizeof(buf) - size, " none\r\n");
+		add_page_display_str(ch, " none");
 	}
 	
-	page_string(ch->desc, buf, TRUE);
+	send_page_display(ch);
 }
 
 

@@ -259,7 +259,6 @@ char *list_one_faction(faction_data *fct, bool detail) {
 * @param any_vnum vnum The faction vnum.
 */
 void olc_search_faction(char_data *ch, any_vnum vnum) {
-	char buf[MAX_STRING_LENGTH];
 	faction_data *fct = find_faction_by_vnum(vnum);
 	faction_data *iter, *next_iter, *find;
 	quest_data *qiter, *next_qiter;
@@ -268,7 +267,7 @@ void olc_search_faction(char_data *ch, any_vnum vnum) {
 	social_data *soc, *next_soc;
 	shop_data *shop, *next_shop;
 	char_data *mob, *next_mob;
-	int size, found;
+	int found;
 	bool any;
 	
 	if (!fct) {
@@ -277,20 +276,17 @@ void olc_search_faction(char_data *ch, any_vnum vnum) {
 	}
 	
 	found = 0;
-	size = snprintf(buf, sizeof(buf), "Occurrences of faction %d (%s):\r\n", vnum, FCT_NAME(fct));
+	add_page_display(ch, "Occurrences of faction %d (%s):", vnum, FCT_NAME(fct));
 	
 	// events
 	HASH_ITER(hh, event_table, event, next_event) {
-		if (size >= sizeof(buf)) {
-			break;
-		}
 		// QR_x: event rewards
 		any = find_event_reward_in_list(EVT_RANK_REWARDS(event), QR_REPUTATION, vnum);
 		any |= find_event_reward_in_list(EVT_THRESHOLD_REWARDS(event), QR_REPUTATION, vnum);
 		
 		if (any) {
 			++found;
-			size += snprintf(buf + size, sizeof(buf) - size, "EVT [%5d] %s\r\n", EVT_VNUM(event), EVT_NAME(event));
+			add_page_display(ch, "EVT [%5d] %s", EVT_VNUM(event), EVT_NAME(event));
 		}
 	}
 	
@@ -299,7 +295,7 @@ void olc_search_faction(char_data *ch, any_vnum vnum) {
 		HASH_FIND_INT(FCT_RELATIONS(iter), &FCT_VNUM(fct), find);
 		if (find) {
 			++found;
-			size += snprintf(buf + size, sizeof(buf) - size, "FCT [%5d] %s\r\n", FCT_VNUM(iter), FCT_NAME(iter));
+			add_page_display(ch, "FCT [%5d] %s", FCT_VNUM(iter), FCT_NAME(iter));
 		}
 	}
 	
@@ -307,30 +303,24 @@ void olc_search_faction(char_data *ch, any_vnum vnum) {
 	HASH_ITER(hh, mobile_table, mob, next_mob) {
 		if (MOB_FACTION(mob) == fct) {
 			++found;
-			size += snprintf(buf + size, sizeof(buf) - size, "MOB [%5d] %s\r\n", GET_MOB_VNUM(mob), GET_SHORT_DESC(mob));
+			add_page_display(ch, "MOB [%5d] %s", GET_MOB_VNUM(mob), GET_SHORT_DESC(mob));
 		}
 	}
 	
 	// progress
 	HASH_ITER(hh, progress_table, prg, next_prg) {
-		if (size >= sizeof(buf)) {
-			break;
-		}
 		// REQ_x: requirement search
 		any = find_requirement_in_list(PRG_TASKS(prg), REQ_REP_OVER, vnum);
 		any |= find_requirement_in_list(PRG_TASKS(prg), REQ_REP_UNDER, vnum);
 		
 		if (any) {
 			++found;
-			size += snprintf(buf + size, sizeof(buf) - size, "PRG [%5d] %s\r\n", PRG_VNUM(prg), PRG_NAME(prg));
+			add_page_display(ch, "PRG [%5d] %s", PRG_VNUM(prg), PRG_NAME(prg));
 		}
 	}
 	
 	// check quests
 	HASH_ITER(hh, quest_table, qiter, next_qiter) {
-		if (size >= sizeof(buf)) {
-			break;
-		}
 		// QR_x, REQ_x: quest types
 		any = find_requirement_in_list(QUEST_TASKS(qiter), REQ_REP_OVER, vnum);
 		any |= find_requirement_in_list(QUEST_PREREQS(qiter), REQ_REP_OVER, vnum);
@@ -340,45 +330,38 @@ void olc_search_faction(char_data *ch, any_vnum vnum) {
 		
 		if (any) {
 			++found;
-			size += snprintf(buf + size, sizeof(buf) - size, "QST [%5d] %s\r\n", QUEST_VNUM(qiter), QUEST_NAME(qiter));
+			add_page_display(ch, "QST [%5d] %s", QUEST_VNUM(qiter), QUEST_NAME(qiter));
 		}
 	}
 	
 	// check shops
 	HASH_ITER(hh, shop_table, shop, next_shop) {
-		if (size >= sizeof(buf)) {
-			break;
-		}
-		
 		if (SHOP_ALLEGIANCE(shop) == fct) {
 			++found;
-			size += snprintf(buf + size, sizeof(buf) - size, "SHOP [%5d] %s\r\n", SHOP_VNUM(shop), SHOP_NAME(shop));
+			add_page_display(ch, "SHOP [%5d] %s", SHOP_VNUM(shop), SHOP_NAME(shop));
 		}
 	}
 	
 	// check socials
 	HASH_ITER(hh, social_table, soc, next_soc) {
-		if (size >= sizeof(buf)) {
-			break;
-		}
 		// REQ_x: requirements
 		any = find_requirement_in_list(SOC_REQUIREMENTS(soc), REQ_REP_OVER, vnum);
 		any |= find_requirement_in_list(SOC_REQUIREMENTS(soc), REQ_REP_UNDER, vnum);
 		
 		if (any) {
 			++found;
-			size += snprintf(buf + size, sizeof(buf) - size, "SOC [%5d] %s\r\n", SOC_VNUM(soc), SOC_NAME(soc));
+			add_page_display(ch, "SOC [%5d] %s", SOC_VNUM(soc), SOC_NAME(soc));
 		}
 	}
 	
 	if (found > 0) {
-		size += snprintf(buf + size, sizeof(buf) - size, "%d location%s shown\r\n", found, PLURAL(found));
+		add_page_display(ch, "%d location%s shown", found, PLURAL(found));
 	}
 	else {
-		size += snprintf(buf + size, sizeof(buf) - size, " none\r\n");
+		add_page_display_str(ch, " none");
 	}
 	
-	page_string(ch->desc, buf, TRUE);
+	send_page_display(ch);
 }
 
 

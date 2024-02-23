@@ -714,10 +714,9 @@ char *list_one_archetype(archetype_data *arch, bool detail) {
 * @param any_vnum vnum The archetype vnum.
 */
 void olc_search_archetype(char_data *ch, any_vnum vnum) {
-	char buf[MAX_STRING_LENGTH];
 	archetype_data *arch = archetype_proto(vnum);
 	quest_data *qiter, *next_qiter;
-	int size, found;
+	int found;
 	bool any;
 	
 	if (!arch) {
@@ -726,30 +725,27 @@ void olc_search_archetype(char_data *ch, any_vnum vnum) {
 	}
 	
 	found = 0;
-	size = snprintf(buf, sizeof(buf), "Occurrences of archetype %d (%s):\r\n", vnum, GET_ARCH_NAME(arch));
+	add_page_display(ch, "Occurrences of archetype %d (%s):", vnum, GET_ARCH_NAME(arch));
 	
 	// check quests
 	HASH_ITER(hh, quest_table, qiter, next_qiter) {
-		if (size >= sizeof(buf)) {
-			break;
-		}
 		// QR_x, REQ_x: quest types
 		any = find_quest_reward_in_list(QUEST_REWARDS(qiter), QR_UNLOCK_ARCHETYPE, vnum);
 		
 		if (any) {
 			++found;
-			size += snprintf(buf + size, sizeof(buf) - size, "QST [%5d] %s\r\n", QUEST_VNUM(qiter), QUEST_NAME(qiter));
+			add_page_display(ch, "QST [%5d] %s", QUEST_VNUM(qiter), QUEST_NAME(qiter));
 		}
 	}
 	
 	if (found > 0) {
-		size += snprintf(buf + size, sizeof(buf) - size, "%d location%s shown\r\n", found, PLURAL(found));
+		add_page_display(ch, "%d location%s shown", found, PLURAL(found));
 	}
 	else {
-		size += snprintf(buf + size, sizeof(buf) - size, " none\r\n");
+		add_page_display_str(ch, " none");
 	}
 	
-	page_string(ch->desc, buf, TRUE);
+	send_page_display(ch);
 }
 
 
