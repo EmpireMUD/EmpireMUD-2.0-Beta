@@ -635,6 +635,12 @@ void show_string(descriptor_data *d, char *input) {
  //////////////////////////////////////////////////////////////////////////////
 //// PAGE DISPLAY SYSTEM /////////////////////////////////////////////////////
 
+// Usage: Build the player's page_display with the various add_page_display*
+// functions and then finalize it and send it to the player by calling
+// send_page_display(ch), which may or may not use the paginator depending on
+// the text length and settings. NPCs and dc'd players are ignored
+// automatically.
+
 /**
 * Frees a page_display and any text inside.
 *
