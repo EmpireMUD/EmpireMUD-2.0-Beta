@@ -11170,187 +11170,183 @@ void do_stat_ability(char_data *ch, ability_data *abil, bool details) {
 */
 void olc_show_ability(char_data *ch) {
 	ability_data *abil = GET_OLC_ABILITY(ch->desc);
-	char buf[MAX_STRING_LENGTH * 4], lbuf[MAX_STRING_LENGTH];
+	char lbuf[MAX_STRING_LENGTH];
 	struct ability_data_list *adl;
 	struct ability_hook *ahook;
 	struct custom_message *custm;
 	struct apply_data *apply;
 	bitvector_t fields;
 	int count;
+	struct page_display *pd;
 	
 	if (!abil) {
 		return;
 	}
 	
 	fields = ability_shows_fields(abil);
-	*buf = '\0';
 	
-	sprintf(buf + strlen(buf), "[%s%d\t0] %s%s\t0\r\n", OLC_LABEL_CHANGED, GET_OLC_VNUM(ch->desc), OLC_LABEL_UNCHANGED, !find_ability_by_vnum(ABIL_VNUM(abil)) ? "new ability" : get_ability_name_by_vnum(ABIL_VNUM(abil)));
-	sprintf(buf + strlen(buf), "<%sname\t0> %s\r\n", OLC_LABEL_STR(ABIL_NAME(abil), default_ability_name), NULLSAFE(ABIL_NAME(abil)));
+	add_page_display(ch, "[%s%d\t0] %s%s\t0", OLC_LABEL_CHANGED, GET_OLC_VNUM(ch->desc), OLC_LABEL_UNCHANGED, !find_ability_by_vnum(ABIL_VNUM(abil)) ? "new ability" : get_ability_name_by_vnum(ABIL_VNUM(abil)));
+	add_page_display(ch, "<%sname\t0> %s", OLC_LABEL_STR(ABIL_NAME(abil), default_ability_name), NULLSAFE(ABIL_NAME(abil)));
 	
 	get_ability_type_display(ABIL_TYPE_LIST(abil), lbuf, FALSE);
-	sprintf(buf + strlen(buf), "<%stypes\t0> %s\r\n", OLC_LABEL_PTR(ABIL_TYPE_LIST(abil)), lbuf);
+	add_page_display(ch, "<%stypes\t0> %s", OLC_LABEL_PTR(ABIL_TYPE_LIST(abil)), lbuf);
 	
-	sprintf(buf + strlen(buf), "<%smasteryability\t0> %d %s\r\n", OLC_LABEL_VAL(ABIL_MASTERY_ABIL(abil), NOTHING), ABIL_MASTERY_ABIL(abil), ABIL_MASTERY_ABIL(abil) == NOTHING ? "none" : get_ability_name_by_vnum(ABIL_MASTERY_ABIL(abil)));
-	sprintf(buf + strlen(buf), "<%sscale\t0> %d%%\r\n", OLC_LABEL_VAL(ABIL_SCALE(abil), 1.0), (int)(ABIL_SCALE(abil) * 100));
+	add_page_display(ch, "<%smasteryability\t0> %d %s", OLC_LABEL_VAL(ABIL_MASTERY_ABIL(abil), NOTHING), ABIL_MASTERY_ABIL(abil), ABIL_MASTERY_ABIL(abil) == NOTHING ? "none" : get_ability_name_by_vnum(ABIL_MASTERY_ABIL(abil)));
+	add_page_display(ch, "<%sscale\t0> %d%%", OLC_LABEL_VAL(ABIL_SCALE(abil), 1.0), (int)(ABIL_SCALE(abil) * 100));
 	
 	sprintbit(ABIL_FLAGS(abil), ability_flags, lbuf, TRUE);
-	sprintf(buf + strlen(buf), "<%sflags\t0> %s\r\n", OLC_LABEL_VAL(ABIL_FLAGS(abil), NOBITS), lbuf);
+	add_page_display(ch, "<%sflags\t0> %s", OLC_LABEL_VAL(ABIL_FLAGS(abil), NOBITS), lbuf);
 	
 	if (IS_SET(fields, ABILEDIT_IMMUNITIES)) {
 		sprintbit(ABIL_IMMUNITIES(abil), affected_bits, lbuf, TRUE);
-		sprintf(buf + strlen(buf), "<%simmunities\t0> %s\r\n", OLC_LABEL_VAL(ABIL_IMMUNITIES(abil), NOBITS), lbuf);
+		add_page_display(ch, "<%simmunities\t0> %s", OLC_LABEL_VAL(ABIL_IMMUNITIES(abil), NOBITS), lbuf);
 	}
 	
 	sprintbit(ABIL_GAIN_HOOKS(abil), ability_gain_hooks, lbuf, TRUE);
-	sprintf(buf + strlen(buf), "<%sgainhooks\t0> %s\r\n", OLC_LABEL_VAL(ABIL_GAIN_HOOKS(abil), NOBITS), lbuf);
+	add_page_display(ch, "<%sgainhooks\t0> %s", OLC_LABEL_VAL(ABIL_GAIN_HOOKS(abil), NOBITS), lbuf);
 	
-	// Command, Targets line
 	if (IS_SET(fields, ABILEDIT_COMMAND)) {
 		if (!ABIL_COMMAND(abil)) {
-			sprintf(buf + strlen(buf), "<%scommand\t0> (not a command)", OLC_LABEL_UNCHANGED);
+			add_page_display(ch, "<%scommand\t0> (not a command)", OLC_LABEL_UNCHANGED);
 		}
 		else {
-			sprintf(buf + strlen(buf), "<%scommand\t0> %s", OLC_LABEL_CHANGED, ABIL_COMMAND(abil));
+			add_page_display(ch, "<%scommand\t0> %s", OLC_LABEL_CHANGED, ABIL_COMMAND(abil));
 		}
 	}
 	if (IS_SET(fields, ABILEDIT_TARGETS)) {
 		sprintbit(ABIL_TARGETS(abil), ability_target_flags, lbuf, TRUE);
-		sprintf(buf + strlen(buf), "%s<%stargets\t0> %s", (IS_SET(fields, ABILEDIT_COMMAND) ? ", " : ""), OLC_LABEL_VAL(ABIL_TARGETS(abil), NOBITS), lbuf);
-	}
-	if (IS_SET(fields, ABILEDIT_COMMAND | ABILEDIT_TARGETS)) {
-		sprintf(buf + strlen(buf), "\r\n");
+		add_page_display(ch, "%s<%stargets\t0> %s", (IS_SET(fields, ABILEDIT_COMMAND) ? ", " : ""), OLC_LABEL_VAL(ABIL_TARGETS(abil), NOBITS), lbuf);
 	}
 	
 	// Linked Traits, Min Pos line
-	sprintf(buf + strlen(buf), "<%slinkedtrait\t0> %s", OLC_LABEL_VAL(ABIL_LINKED_TRAIT(abil), APPLY_NONE), apply_types[ABIL_LINKED_TRAIT(abil)]);
+	pd = add_page_display(ch, "<%slinkedtrait\t0> %s", OLC_LABEL_VAL(ABIL_LINKED_TRAIT(abil), APPLY_NONE), apply_types[ABIL_LINKED_TRAIT(abil)]);
 	if (IS_SET(fields, ABILEDIT_MIN_POS)) {
-		sprintf(buf + strlen(buf), ", <%sminposition\t0> %s (minimum)", OLC_LABEL_VAL(ABIL_MIN_POS(abil), POS_STANDING), position_types[ABIL_MIN_POS(abil)]);
+		append_page_display_line(pd, ", <%sminposition\t0> %s (minimum)", OLC_LABEL_VAL(ABIL_MIN_POS(abil), POS_STANDING), position_types[ABIL_MIN_POS(abil)]);
 	}
-	sprintf(buf + strlen(buf), "\r\n");
 	
 	// Costs line
 	if (IS_SET(fields, ABILEDIT_COST)) {
-		sprintf(buf + strlen(buf), "<%scost\t0> %d, <%scostperscalepoint\t0> %.2f, <%scosttype\t0> %s\r\n", OLC_LABEL_VAL(ABIL_COST(abil), 0), ABIL_COST(abil), OLC_LABEL_VAL(ABIL_COST_PER_SCALE_POINT(abil), 0.0), ABIL_COST_PER_SCALE_POINT(abil), OLC_LABEL_VAL(ABIL_COST_TYPE(abil), 0), pool_types[ABIL_COST_TYPE(abil)]);
-	}
-	if (IS_SET(fields, ABILEDIT_COST_PER_AMOUNT)) {
-		sprintf(buf + strlen(buf), "<%scostperamount\t0> %.2f", OLC_LABEL_VAL(ABIL_COST_PER_AMOUNT(abil), 0.0), ABIL_COST_PER_AMOUNT(abil));
-	}
-	if (IS_SET(fields, ABILEDIT_COST_PER_TARGET)) {
-		sprintf(buf + strlen(buf), "%s<%scostpertarget\t0> %.2f", (IS_SET(fields, ABILEDIT_COST_PER_AMOUNT) ? ", " : ""), OLC_LABEL_VAL(ABIL_COST_PER_TARGET(abil), 0.0), ABIL_COST_PER_TARGET(abil));
+		add_page_display(ch, "<%scost\t0> %d, <%scostperscalepoint\t0> %.2f, <%scosttype\t0> %s", OLC_LABEL_VAL(ABIL_COST(abil), 0), ABIL_COST(abil), OLC_LABEL_VAL(ABIL_COST_PER_SCALE_POINT(abil), 0.0), ABIL_COST_PER_SCALE_POINT(abil), OLC_LABEL_VAL(ABIL_COST_TYPE(abil), 0), pool_types[ABIL_COST_TYPE(abil)]);
 	}
 	if (IS_SET(fields, ABILEDIT_COST_PER_AMOUNT | ABILEDIT_COST_PER_TARGET)) {
-		sprintf(buf + strlen(buf), "\r\n");
+		pd = add_page_display(ch, "");	// prepare for 2-part line
 	}
+	if (IS_SET(fields, ABILEDIT_COST_PER_AMOUNT)) {
+		append_page_display_line(pd, "<%scostperamount\t0> %.2f", OLC_LABEL_VAL(ABIL_COST_PER_AMOUNT(abil), 0.0), ABIL_COST_PER_AMOUNT(abil));
+	}
+	if (IS_SET(fields, ABILEDIT_COST_PER_TARGET)) {
+		append_page_display_line(pd, "%s<%scostpertarget\t0> %.2f", (IS_SET(fields, ABILEDIT_COST_PER_AMOUNT) ? ", " : ""), OLC_LABEL_VAL(ABIL_COST_PER_TARGET(abil), 0.0), ABIL_COST_PER_TARGET(abil));
+	}
+	
 	if (IS_SET(fields, ABILEDIT_COST)) {
 		get_resource_display(ch, ABIL_RESOURCE_COST(abil), lbuf);
-		sprintf(buf + strlen(buf), "<%sresourcecost\t0>%s\r\n%s", OLC_LABEL_PTR(ABIL_RESOURCE_COST(abil)), ABIL_RESOURCE_COST(abil) ? "" : " none", ABIL_RESOURCE_COST(abil) ? lbuf : "");
+		add_page_display(ch, "<%sresourcecost\t0>%s\r\n%s", OLC_LABEL_PTR(ABIL_RESOURCE_COST(abil)), ABIL_RESOURCE_COST(abil) ? "" : " none", ABIL_RESOURCE_COST(abil) ? lbuf : "");
 	}
 	
 	// Cooldown line
 	if (IS_SET(fields, ABILEDIT_COOLDOWN)) {
-		sprintf(buf + strlen(buf), "<%scooldown\t0> [%d] %s, <%scdtime\t0> %d second%s\r\n", OLC_LABEL_VAL(ABIL_COOLDOWN(abil), NOTHING), ABIL_COOLDOWN(abil), get_generic_name_by_vnum(ABIL_COOLDOWN(abil)), OLC_LABEL_VAL(ABIL_COOLDOWN_SECS(abil), 0), ABIL_COOLDOWN_SECS(abil), PLURAL(ABIL_COOLDOWN_SECS(abil)));
+		add_page_display(ch, "<%scooldown\t0> [%d] %s, <%scdtime\t0> %d second%s", OLC_LABEL_VAL(ABIL_COOLDOWN(abil), NOTHING), ABIL_COOLDOWN(abil), get_generic_name_by_vnum(ABIL_COOLDOWN(abil)), OLC_LABEL_VAL(ABIL_COOLDOWN_SECS(abil), 0), ABIL_COOLDOWN_SECS(abil), PLURAL(ABIL_COOLDOWN_SECS(abil)));
 	}
 	
 	// Tool line
 	if (IS_SET(fields, ABILEDIT_TOOL)) {
 		sprintbit(ABIL_REQUIRES_TOOL(abil), tool_flags, lbuf, TRUE);
-		sprintf(buf + strlen(buf), "<%stools\t0> %s\r\n", OLC_LABEL_VAL(ABIL_REQUIRES_TOOL(abil), NOBITS), lbuf);
+		add_page_display(ch, "<%stools\t0> %s", OLC_LABEL_VAL(ABIL_REQUIRES_TOOL(abil), NOBITS), lbuf);
 	}
 	
 	if (IS_SET(fields, ABILEDIT_DIFFICULTY)) {
-		sprintf(buf + strlen(buf), "<%sdifficulty\t0> %s\r\n", OLC_LABEL_VAL(ABIL_DIFFICULTY(abil), 0), skill_check_difficulty[ABIL_DIFFICULTY(abil)]);
+		add_page_display(ch, "<%sdifficulty\t0> %s", OLC_LABEL_VAL(ABIL_DIFFICULTY(abil), 0), skill_check_difficulty[ABIL_DIFFICULTY(abil)]);
 	}
 	if (IS_SET(fields, ABILEDIT_WAIT)) {
-		sprintf(buf + strlen(buf), "<%swaittype\t0> %s\r\n", OLC_LABEL_VAL(ABIL_WAIT_TYPE(abil), WAIT_ABILITY), wait_types[ABIL_WAIT_TYPE(abil)]);
+		add_page_display(ch, "<%swaittype\t0> %s", OLC_LABEL_VAL(ABIL_WAIT_TYPE(abil), WAIT_ABILITY), wait_types[ABIL_WAIT_TYPE(abil)]);
 	}
 	if (IS_SET(fields, ABILEDIT_DURATION)) {
 		if (ABIL_SHORT_DURATION(abil) == UNLIMITED) {
-			sprintf(buf + strlen(buf), "<%sshortduration\t0> unlimited, ", OLC_LABEL_CHANGED);
+			pd = add_page_display(ch, "<%sshortduration\t0> unlimited, ", OLC_LABEL_CHANGED);
 		}
 		else {
-			sprintf(buf + strlen(buf), "<%sshortduration\t0> %d second%s, ", OLC_LABEL_VAL(ABIL_SHORT_DURATION(abil), 0), ABIL_SHORT_DURATION(abil), PLURAL(ABIL_SHORT_DURATION(abil)));
+			pd = add_page_display(ch, "<%sshortduration\t0> %d second%s, ", OLC_LABEL_VAL(ABIL_SHORT_DURATION(abil), 0), ABIL_SHORT_DURATION(abil), PLURAL(ABIL_SHORT_DURATION(abil)));
 		}
 		
 		if (ABIL_LONG_DURATION(abil) == UNLIMITED) {
-			sprintf(buf + strlen(buf), "<%slongduration\t0> unlimited\r\n", OLC_LABEL_CHANGED);
+			append_page_display_line(pd, "<%slongduration\t0> unlimited", OLC_LABEL_CHANGED);
 		}
 		else {
-			sprintf(buf + strlen(buf), "<%slongduration\t0> %d second%s\r\n", OLC_LABEL_VAL(ABIL_LONG_DURATION(abil), 0), ABIL_LONG_DURATION(abil), PLURAL(ABIL_LONG_DURATION(abil)));
+			append_page_display_line(pd, "<%slongduration\t0> %d second%s", OLC_LABEL_VAL(ABIL_LONG_DURATION(abil), 0), ABIL_LONG_DURATION(abil), PLURAL(ABIL_LONG_DURATION(abil)));
 		}
 	}
 	if (IS_SET(fields, ABILEDIT_AFFECT_VNUM)) {
-		sprintf(buf + strlen(buf), "<%saffectvnum\t0> %d %s\r\n", OLC_LABEL_VAL(ABIL_AFFECT_VNUM(abil), NOTHING), ABIL_AFFECT_VNUM(abil), get_generic_name_by_vnum(ABIL_AFFECT_VNUM(abil)));
+		add_page_display(ch, "<%saffectvnum\t0> %d %s", OLC_LABEL_VAL(ABIL_AFFECT_VNUM(abil), NOTHING), ABIL_AFFECT_VNUM(abil), get_generic_name_by_vnum(ABIL_AFFECT_VNUM(abil)));
 	}
 	if (IS_SET(fields, ABILEDIT_AFFECTS)) {
 		if (IS_SET(ABIL_TYPES(abil), ABILT_ROOM_AFFECT)) {
 			sprintbit(ABIL_AFFECTS(abil), room_aff_bits, lbuf, TRUE);
-			sprintf(buf + strlen(buf), "<%saffects\t0> %s\r\n", OLC_LABEL_VAL(ABIL_AFFECTS(abil), NOBITS), lbuf);
+			add_page_display(ch, "<%saffects\t0> %s", OLC_LABEL_VAL(ABIL_AFFECTS(abil), NOBITS), lbuf);
 		}
 		else {
 			sprintbit(ABIL_AFFECTS(abil), affected_bits, lbuf, TRUE);
-			sprintf(buf + strlen(buf), "<%saffects\t0> %s\r\n", OLC_LABEL_VAL(ABIL_AFFECTS(abil), NOBITS), lbuf);
+			add_page_display(ch, "<%saffects\t0> %s", OLC_LABEL_VAL(ABIL_AFFECTS(abil), NOBITS), lbuf);
 		}
 	}
 	if (IS_SET(fields, ABILEDIT_APPLIES)) {
-		sprintf(buf + strlen(buf), "Applies: <%sapply\t0>\r\n", OLC_LABEL_PTR(ABIL_APPLIES(abil)));
+		add_page_display(ch, "Applies: <%sapply\t0>", OLC_LABEL_PTR(ABIL_APPLIES(abil)));
 		count = 0;
 		LL_FOREACH(ABIL_APPLIES(abil), apply) {
-			sprintf(buf + strlen(buf), " %2d. %d to %s\r\n", ++count, apply->weight, apply_types[apply->location]);
+			add_page_display(ch, " %2d. %d to %s", ++count, apply->weight, apply_types[apply->location]);
 		}
 	}
 	
 	// Attack type, Damage type, Max Stacks line
+	if (IS_SET(fields, ABILEDIT_ATTACK_TYPE | ABILEDIT_DAMAGE_TYPE | ABILEDIT_MAX_STACKS | ABILEDIT_POOL_TYPE | ABILEDIT_MOVE_TYPE)) {
+		pd = add_page_display(ch, "");	// start new line with variable fields
+	}
 	if (IS_SET(fields, ABILEDIT_ATTACK_TYPE)) {
-		sprintf(buf + strlen(buf), "<%sattacktype\t0> %d %s", OLC_LABEL_VAL(ABIL_ATTACK_TYPE(abil), 0), ABIL_ATTACK_TYPE(abil), get_attack_name_by_vnum(ABIL_ATTACK_TYPE(abil)));
+		append_page_display_line(pd, "<%sattacktype\t0> %d %s", OLC_LABEL_VAL(ABIL_ATTACK_TYPE(abil), 0), ABIL_ATTACK_TYPE(abil), get_attack_name_by_vnum(ABIL_ATTACK_TYPE(abil)));
 	}
 	if (IS_SET(fields, ABILEDIT_DAMAGE_TYPE)) {
-		sprintf(buf + strlen(buf), "%s<%sdamagetype\t0> %s", (IS_SET(fields, ABILEDIT_ATTACK_TYPE) ? ", " : ""), OLC_LABEL_VAL(ABIL_DAMAGE_TYPE(abil), 0), damage_types[ABIL_DAMAGE_TYPE(abil)]);
+		append_page_display_line(pd, "%s<%sdamagetype\t0> %s", (IS_SET(fields, ABILEDIT_ATTACK_TYPE) ? ", " : ""), OLC_LABEL_VAL(ABIL_DAMAGE_TYPE(abil), 0), damage_types[ABIL_DAMAGE_TYPE(abil)]);
 	}
 	if (IS_SET(fields, ABILEDIT_POOL_TYPE)) {
-		sprintf(buf + strlen(buf), "%s<%spooltype\t0> %s", (IS_SET(fields, ABILEDIT_ATTACK_TYPE | ABILEDIT_DAMAGE_TYPE) ? ", " : ""), OLC_LABEL_VAL(ABIL_POOL_TYPE(abil), 0), ABIL_POOL_TYPE(abil) == ANY_POOL ? "any" : pool_types[ABIL_POOL_TYPE(abil)]);
+		append_page_display_line(pd, "%s<%spooltype\t0> %s", (IS_SET(fields, ABILEDIT_ATTACK_TYPE | ABILEDIT_DAMAGE_TYPE) ? ", " : ""), OLC_LABEL_VAL(ABIL_POOL_TYPE(abil), 0), ABIL_POOL_TYPE(abil) == ANY_POOL ? "any" : pool_types[ABIL_POOL_TYPE(abil)]);
 	}
 	if (IS_SET(fields, ABILEDIT_MOVE_TYPE)) {
-		sprintf(buf + strlen(buf), "%s<%smovetype\t0> %s", (IS_SET(fields, ABILEDIT_ATTACK_TYPE | ABILEDIT_DAMAGE_TYPE | ABILEDIT_POOL_TYPE) ? ", " : ""), OLC_LABEL_VAL(ABIL_MOVE_TYPE(abil), 0), ability_move_types[ABIL_MOVE_TYPE(abil)]);
+		append_page_display_line(pd, "%s<%smovetype\t0> %s", (IS_SET(fields, ABILEDIT_ATTACK_TYPE | ABILEDIT_DAMAGE_TYPE | ABILEDIT_POOL_TYPE) ? ", " : ""), OLC_LABEL_VAL(ABIL_MOVE_TYPE(abil), 0), ability_move_types[ABIL_MOVE_TYPE(abil)]);
 	}
 	if (IS_SET(fields, ABILEDIT_MAX_STACKS)) {
-		sprintf(buf + strlen(buf), "%s<%smaxstacks\t0> %d", (IS_SET(fields, ABILEDIT_ATTACK_TYPE | ABILEDIT_DAMAGE_TYPE | ABILEDIT_POOL_TYPE | ABILEDIT_MOVE_TYPE) ? ", " : ""), OLC_LABEL_VAL(ABIL_MAX_STACKS(abil), 1), ABIL_MAX_STACKS(abil));
-	}
-	if (IS_SET(fields, ABILEDIT_ATTACK_TYPE | ABILEDIT_DAMAGE_TYPE | ABILEDIT_MAX_STACKS | ABILEDIT_POOL_TYPE | ABILEDIT_MOVE_TYPE)) {
-		sprintf(buf + strlen(buf), "\r\n");
+		append_page_display_line(pd, "%s<%smaxstacks\t0> %d", (IS_SET(fields, ABILEDIT_ATTACK_TYPE | ABILEDIT_DAMAGE_TYPE | ABILEDIT_POOL_TYPE | ABILEDIT_MOVE_TYPE) ? ", " : ""), OLC_LABEL_VAL(ABIL_MAX_STACKS(abil), 1), ABIL_MAX_STACKS(abil));
 	}
 	
 	// custom messages
-	sprintf(buf + strlen(buf), "Custom messages: <%scustom\t0>\r\n", OLC_LABEL_PTR(ABIL_CUSTOM_MSGS(abil)));
+	add_page_display(ch, "Custom messages: <%scustom\t0>", OLC_LABEL_PTR(ABIL_CUSTOM_MSGS(abil)));
 	count = 0;
 	LL_FOREACH(ABIL_CUSTOM_MSGS(abil), custm) {
-		sprintf(buf + strlen(buf), " \ty%2d\t0. [%s] %s\r\n", ++count, ability_custom_types[custm->type], custm->msg);
+		add_page_display(ch, " \ty%2d\t0. [%s] %s", ++count, ability_custom_types[custm->type], custm->msg);
 	}
 	
 	// hooks
-	sprintf(buf + strlen(buf), "Ability Hooks: <%shook\t0>\r\n", OLC_LABEL_PTR(ABIL_HOOKS(abil)));
+	add_page_display(ch, "Ability Hooks: <%shook\t0>", OLC_LABEL_PTR(ABIL_HOOKS(abil)));
 	count = 0;
 	LL_FOREACH(ABIL_HOOKS(abil), ahook) {
-		sprintf(buf + strlen(buf), " \ty%d\t0. %s\r\n", ++count, ability_hook_display(ahook));
+		add_page_display(ch, " \ty%d\t0. %s", ++count, ability_hook_display(ahook));
 	}
 	
 	// interactions
 	if (IS_SET(fields, ABILEDIT_INTERACTIONS)) {
-		sprintf(buf + strlen(buf), "Interactions: <%sinteraction\t0>\r\n", OLC_LABEL_PTR(ABIL_INTERACTIONS(abil)));
+		add_page_display(ch, "Interactions: <%sinteraction\t0>", OLC_LABEL_PTR(ABIL_INTERACTIONS(abil)));
 		if (ABIL_INTERACTIONS(abil)) {
 			get_interaction_display(ABIL_INTERACTIONS(abil), lbuf);
-			strcat(buf, lbuf);
+			add_page_display_str(ch, lbuf);
 		}
 	}
 	
 	// data
-	sprintf(buf + strlen(buf), "Data: <%sdata\t0>\r\n", OLC_LABEL_PTR(ABIL_DATA(abil)));
+	add_page_display(ch, "Data: <%sdata\t0>", OLC_LABEL_PTR(ABIL_DATA(abil)));
 	count = 0;
 	LL_FOREACH(ABIL_DATA(abil), adl) {
-		sprintf(buf + strlen(buf), " \ty%d\t0. %s\r\n", ++count, ability_data_display(adl));
+		add_page_display(ch, " \ty%d\t0. %s", ++count, ability_data_display(adl));
 	}
 	
-	page_string(ch->desc, buf, TRUE);
+	send_page_display(ch);
 }
 
 
