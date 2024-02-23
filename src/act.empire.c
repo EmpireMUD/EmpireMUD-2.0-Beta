@@ -1039,7 +1039,7 @@ int sort_territory_nodes_by_distance(struct find_territory_node *a, struct find_
 * @param char *argument The requested inventory item, if any.
 */
 static void show_empire_inventory_to_char(char_data *ch, empire_data *emp, char *argument) {
-	char output[MAX_STRING_LENGTH*2], line[MAX_STRING_LENGTH], vstr[256], keepstr[256], totalstr[256];
+	char vstr[256], keepstr[256], totalstr[256];
 	struct einv_type *einv, *next_einv, *list = NULL;
 	obj_vnum vnum, last_vnum = NOTHING;
 	struct empire_dropped_item *edi, *next_edi;
@@ -1047,7 +1047,6 @@ static void show_empire_inventory_to_char(char_data *ch, empire_data *emp, char 
 	struct empire_island *isle, *next_isle;
 	struct shipping_data *shipd;
 	obj_data *proto = NULL;
-	size_t lsize, size;
 	bool all = FALSE, any = FALSE;
 	
 	if (!ch->desc) {
@@ -1168,7 +1167,7 @@ static void show_empire_inventory_to_char(char_data *ch, empire_data *emp, char 
 	HASH_SORT(list, sort_einv_list);
 	
 	// build output
-	size = snprintf(output, sizeof(output), "Inventory of %s%s&0 on this island:\r\n", EMPIRE_BANNER(emp), EMPIRE_NAME(emp));
+	add_page_display(ch, "Inventory of %s%s&0 on this island:", EMPIRE_BANNER(emp), EMPIRE_NAME(emp));
 	
 	HASH_ITER(hh, list, einv, next_einv) {
 		// only display it if it's on the requested island, or if they requested it by name, or all
@@ -1209,14 +1208,8 @@ static void show_empire_inventory_to_char(char_data *ch, empire_data *emp, char 
 			}
 			
 			// actual line
-			lsize = snprintf(line, sizeof(line), "(%4d) %s%s%s%s\r\n", einv->local, vstr, get_obj_name_by_proto(einv->vnum), keepstr, totalstr);
-			
-			// append if room
-			if (size + lsize < sizeof(output)) {
-				size += lsize;
-				strcat(output, line);
-				any = TRUE;
-			}
+			add_page_display(ch, "(%4d) %s%s%s%s", einv->local, vstr, get_obj_name_by_proto(einv->vnum), keepstr, totalstr);
+			any = TRUE;
 		}
 		
 		// clean up either way
@@ -1225,10 +1218,10 @@ static void show_empire_inventory_to_char(char_data *ch, empire_data *emp, char 
 	}
 	
 	if (!any) {
-		size += snprintf(output + size, sizeof(output) - size, " nothing\r\n");
+		add_page_display_str(ch, " nothing");
 	}
 	
-	page_string(ch->desc, output, TRUE);
+	send_page_display(ch);
 }
 
 
@@ -1292,10 +1285,8 @@ void show_new_goals(char_data *ch, empire_data *emp) {
 * @param int chore Which CHORE_ to show.
 */
 void show_detailed_workforce_setup_to_char(empire_data *emp, char_data *ch, int chore) {
-	char buf[MAX_STRING_LENGTH], part[MAX_STRING_LENGTH];
 	struct empire_island *isle, *next_isle;
 	struct island_info *island;
-	size_t size;
 	bool found;
 	
 	if (!emp) {
@@ -1307,8 +1298,7 @@ void show_detailed_workforce_setup_to_char(empire_data *emp, char_data *ch, int 
 		return;
 	}
 	
-	size = snprintf(buf, sizeof(buf), "%s workforce setup for %s%s&0:\r\n", chore_data[chore].name, EMPIRE_BANNER(emp), EMPIRE_NAME(emp));
-	CAP(buf);
+	add_page_display(ch, "&Z%s workforce setup for %s%s&0:", chore_data[chore].name, EMPIRE_BANNER(emp), EMPIRE_NAME(emp));
 	
 	found = FALSE;
 	HASH_ITER(hh, EMPIRE_ISLANDS(emp), isle, next_isle) {
@@ -1324,28 +1314,25 @@ void show_detailed_workforce_setup_to_char(empire_data *emp, char_data *ch, int 
 			continue;
 		}
 		
+		// add line
 		if (isle->workforce_limit[chore] == WORKFORCE_UNLIMITED) {
-			snprintf(part, sizeof(part), "%s: &con&0%s", get_island_name_for(island->id, ch), isle->population <= 0 ? " (no citizens)" : "");
+			add_page_display(ch, " %s: &con&0%s", get_island_name_for(island->id, ch), isle->population <= 0 ? " (no citizens)" : "");
 		}
 		else if (isle->workforce_limit[chore] == 0) {
-			snprintf(part, sizeof(part), "%s: &yoff&0%s", get_island_name_for(island->id, ch), isle->population <= 0 ? " (no citizens)" : "");
+			add_page_display(ch, " %s: &yoff&0%s", get_island_name_for(island->id, ch), isle->population <= 0 ? " (no citizens)" : "");
 		}
 		else {
-			snprintf(part, sizeof(part), "%s: &climit %d&0%s", get_island_name_for(island->id, ch), isle->workforce_limit[chore], isle->population <= 0 ? " (no citizens)" : "");
-		}
-		
-		if (size + strlen(part) + 3 < sizeof(buf)) {
-			size += snprintf(buf + size, sizeof(buf) - size, " %s\r\n", part);
+			add_page_display(ch, " %s: &climit %d&0%s", get_island_name_for(island->id, ch), isle->workforce_limit[chore], isle->population <= 0 ? " (no citizens)" : "");
 		}
 		
 		found = TRUE;
 	}
 	
 	if (!found) {
-		size += snprintf(buf + size, sizeof(buf) - size, " no islands found\r\n");
+		add_page_display_str(ch, " no islands found");
 	}
 	
-	page_string(ch->desc, buf, TRUE);
+	send_page_display(ch);
 }
 
 
@@ -2764,7 +2751,7 @@ void do_import_remove(char_data *ch, empire_data *emp, char *argument, int subcm
 
 // lists curent import/exports for do_import
 void do_import_list(char_data *ch, empire_data *emp, char *argument, int subcmd) {
-	char buf[MAX_STRING_LENGTH * 4], line[MAX_STRING_LENGTH], coin_conv[256], indicator[256], over_part[256];
+	char coin_conv[256], indicator[256], over_part[256];
 	empire_data *partner = NULL, *use_emp = emp;
 	struct empire_trade_data *trade;
 	int haveamt, count = 0, use_type = subcmd;
@@ -2780,13 +2767,12 @@ void do_import_list(char_data *ch, empire_data *emp, char *argument, int subcmd)
 	}
 	
 	// two different things we can show here:
-	*buf = '\0';
 	
 	if (!partner) {
 		// show our own imports/exports based on type
 		use_emp = emp;
 		use_type = subcmd;
-		sprintf(buf, "%s is %sing:\r\n", EMPIRE_NAME(use_emp), trade_type[subcmd]);
+		add_page_display(ch, "%s is %sing:", EMPIRE_NAME(use_emp), trade_type[subcmd]);
 	}
 	else {
 		// show what we can import/export from a partner based on type
@@ -2798,7 +2784,7 @@ void do_import_list(char_data *ch, empire_data *emp, char *argument, int subcmd)
 		else {
 			rate = exchange_rate(partner, emp);
 		}
-		sprintf(buf, "You can %s %s %s:\r\n", trade_type[subcmd] /* not use_type */, fromto[subcmd], EMPIRE_NAME(use_emp));
+		add_page_display(ch, "You can %s %s %s:", trade_type[subcmd] /* not use_type */, fromto[subcmd], EMPIRE_NAME(use_emp));
 	}
 	
 	// build actual list
@@ -2830,29 +2816,20 @@ void do_import_list(char_data *ch, empire_data *emp, char *argument, int subcmd)
 				sprintf(over_part, " when %s &g%d&0", trade_overunder[use_type], trade->limit);
 			}
 			
-			snprintf(line, sizeof(line), " &c%s&0 for %s&y%.1f%s&0 coin%s%s%s\r\n", GET_OBJ_SHORT_DESC(proto), trade_mostleast[use_type], trade->cost, coin_conv, (trade->cost != 1.0 ? "s" : ""), over_part, indicator);
-			if (strlen(buf) + strlen(line) < sizeof(buf) - 12) {
-				strcat(buf, line);
-			}
-			else {
-				strcat(buf, " and more\r\n");	// strcat: OK (-12 saved room)
-				break;
-			}
+			add_page_display(ch, " &c%s&0 for %s&y%.1f%s&0 coin%s%s%s", GET_OBJ_SHORT_DESC(proto), trade_mostleast[use_type], trade->cost, coin_conv, (trade->cost != 1.0 ? "s" : ""), over_part, indicator);
 		}
 	}
 	if (count == 0) {
-		strcat(buf, " nothing\r\n");
+		add_page_display(ch, " nothing");
 	}
 	
-	if (*buf) {
-		page_string(ch->desc, buf, TRUE);
-	}
+	send_page_display(ch);
 }
 
 
 // analysis of an item for import/export for do_import
 void do_import_analysis(char_data *ch, empire_data *emp, char *argument, int subcmd) {
-	char buf[MAX_STRING_LENGTH], line[MAX_STRING_LENGTH], coin_conv[256];
+	char coin_conv[256];
 	struct empire_trade_data *trade;
 	empire_data *iter, *next_iter;
 	int haveamt, number, find_type = (subcmd == TRADE_IMPORT ? TRADE_EXPORT : TRADE_IMPORT);
@@ -2874,7 +2851,7 @@ void do_import_analysis(char_data *ch, empire_data *emp, char *argument, int sub
 		msg_to_char(ch, "Unknown item '%s'.\r\n", argument);
 	}
 	else {
-		sprintf(buf, "Analysis of %s:\r\n", get_obj_name_by_proto(vnum));
+		add_page_display(ch, "Analysis of %s:", get_obj_name_by_proto(vnum));
 		
 		// vnum is valid (obj was a throwaway)
 		HASH_ITER(hh, empire_table, iter, next_iter) {
@@ -2901,23 +2878,15 @@ void do_import_analysis(char_data *ch, empire_data *emp, char *argument, int sub
 				*coin_conv = '\0';
 			}
 			
-			sprintf(line, " %s (%d%%) is %sing it at &y%.1f%s coin%s&0%s%s%s\r\n", EMPIRE_NAME(iter), (int)(100 * rate), trade_type[find_type], trade->cost, coin_conv, (trade->cost != 1.0 ? "s" : ""), ((find_type != TRADE_EXPORT || has_avail) ? "" : " (none available)"), ((find_type != TRADE_IMPORT || is_buying) ? "" : " (full)"), (emp == iter ? " (you)" : (is_trading_with(emp, iter) ? "" : " (not trading)")));
+			add_page_display(ch, " %s (%d%%) is %sing it at &y%.1f%s coin%s&0%s%s%s", EMPIRE_NAME(iter), (int)(100 * rate), trade_type[find_type], trade->cost, coin_conv, (trade->cost != 1.0 ? "s" : ""), ((find_type != TRADE_EXPORT || has_avail) ? "" : " (none available)"), ((find_type != TRADE_IMPORT || is_buying) ? "" : " (full)"), (emp == iter ? " (you)" : (is_trading_with(emp, iter) ? "" : " (not trading)")));
 			found = TRUE;
-			
-			if (strlen(buf) + strlen(line) < MAX_STRING_LENGTH + 15) {
-				strcat(buf, line);
-			}
-			else {
-				strcat(buf, " ...and more\r\n");
-				break;
-			}
 		}
 		
 		if (!found) {
-			sprintf(buf + strlen(buf), " Nobody is %sing it.\r\n", trade_type[find_type]);
+			add_page_display(ch, " Nobody is %sing it.", trade_type[find_type]);
 		}
 		
-		page_string(ch->desc, buf, TRUE);
+		send_page_display(ch);
 	}
 }
 
@@ -3261,15 +3230,15 @@ void scan_for_tile(char_data *ch, char *argument, int max_dist, bitvector_t only
 	struct find_territory_node *node_hash = NULL, *node, *next_node;
 	int dist, total, x, y, check_x, check_y, over_count, dark_distance;
 	int iter, top_height, r_height, view_height;
-	char output[MAX_STRING_LENGTH * 8], line[MAX_STRING_LENGTH], info[256], veh_string[MAX_STRING_LENGTH], temp[MAX_STRING_LENGTH], paint_str[256];
+	char line[MAX_STRING_LENGTH], info[256], veh_string[MAX_STRING_LENGTH], temp[MAX_STRING_LENGTH], paint_str[256];
 	const char *dir_str;
 	vehicle_data *veh, *scanned_veh;
 	struct map_data *map_loc;
 	room_data *loc, *map, *room, *block_room;
-	size_t size, lsize;
+	size_t lsize, vsize;
 	crop_data *crop;
 	bool ok, color, claimed, unclaimed, foreign, adventures, check_blocking, is_blocked, blocking_veh;
-	size_t vsize;
+	struct page_display *pd;
 	
 	static bitvector_t north_dirs = BIT(NORTH) | BIT(NORTHWEST) | BIT(NORTHEAST);
 	static bitvector_t east_dirs = BIT(EAST) | BIT(SOUTHEAST) | BIT(NORTHEAST);
@@ -3488,10 +3457,10 @@ void scan_for_tile(char_data *ch, char *argument, int max_dist, bitvector_t only
 	    HASH_SORT(node_hash, sort_territory_nodes_by_distance);
 		
 		if (*argument) {
-			size = snprintf(output, sizeof(output), "Nearby tiles matching '%s' within %d tile%s:\r\n", argument, max_dist, PLURAL(max_dist));
+			add_page_display(ch, "Nearby tiles matching '%s' within %d tile%s:", argument, max_dist, PLURAL(max_dist));
 		}
 		else {
-			size = snprintf(output, sizeof(output), "Nearby tiles within a range of %d:\r\n", max_dist);
+			add_page_display(ch, "Nearby tiles within a range of %d:", max_dist);
 		}
 		
 		// display and free the nodes
@@ -3511,38 +3480,31 @@ void scan_for_tile(char_data *ch, char *argument, int max_dist, bitvector_t only
 				dir_str = get_partial_direction_to(ch, IN_ROOM(ch), loc, PRF_FLAGGED(ch, PRF_SCREEN_READER) ? FALSE : TRUE);
 				
 				// distance and direction
-				lsize = snprintf(line, sizeof(line), "%2d %s: ", dist, (*dir_str ? dir_str : "away"));
+				pd = add_page_display(ch, "%2d %s: ", dist, (*dir_str ? dir_str : "away"));
 				
 				if (node->details) {
-					lsize += snprintf(line + lsize, sizeof(line) - lsize, "%s: %s", (GET_BUILDING(loc) ? GET_BLD_NAME(GET_BUILDING(loc)) : GET_SECT_NAME(SECT(loc))), node->details);
+					append_page_display_line(pd, "%s: %s", (GET_BUILDING(loc) ? GET_BLD_NAME(GET_BUILDING(loc)) : GET_SECT_NAME(SECT(loc))), node->details);
 				}
 				else {	// not a vehicle
-					lsize += snprintf(line + lsize, sizeof(line) - lsize, "%s", get_room_name(loc, FALSE));
+					append_page_display_line(pd, "%s", get_room_name(loc, FALSE));
 				}
 				
 				// coords
-				lsize += snprintf(line + lsize, sizeof(line) - lsize, "%s", coord_display(ch, check_x, check_y, FALSE));
+				append_page_display_line(pd, "%s", coord_display(ch, check_x, check_y, FALSE));
 				
 				// info
 				if ((PRF_FLAGGED(ch, PRF_POLITICAL) || claimed || foreign) && ROOM_OWNER(loc)) {
-					lsize += snprintf(line + lsize, sizeof(line) - lsize, " (%s%s\t0)", EMPIRE_BANNER(ROOM_OWNER(loc)), EMPIRE_ADJECTIVE(ROOM_OWNER(loc)));
+					append_page_display_line(pd, " (%s%s\t0)", EMPIRE_BANNER(ROOM_OWNER(loc)), EMPIRE_ADJECTIVE(ROOM_OWNER(loc)));
 				}
 				if (PRF_FLAGGED(ch, PRF_INFORMATIVE)) {
 					get_informative_tile_string(ch, loc, info);
 					if (*info) {
-						lsize += snprintf(line + lsize, sizeof(line) - lsize, " [%s]", info);
+						append_page_display_line(pd, " [%s]", info);
 					}
 				}
 			
 				if (node->count > 1) {
-					lsize += snprintf(line + lsize, sizeof(line) - lsize, " (and %d nearby tile%s)", node->count, PLURAL(node->count));
-				}
-			
-				if (size + lsize + 100 < sizeof(output)) {
-					size += snprintf(output + size, sizeof(output) - size, "%s\r\n", line);
-				}
-				else {
-					++over_count;
+					append_page_display_line(pd, " (and %d nearby tile%s)", node->count, PLURAL(node->count));
 				}
 			}
 			
@@ -3553,11 +3515,8 @@ void scan_for_tile(char_data *ch, char *argument, int max_dist, bitvector_t only
 			free(node);
 		}
 		
-		if (over_count) {
-			size += snprintf(output + size, sizeof(output) - size, "... and %d more tile%s\r\n", over_count, PLURAL(over_count));
-		}
-		size += snprintf(output + size, sizeof(output) - size, "Total: %d\r\n", total);
-		page_string(ch->desc, output, TRUE);
+		add_page_display(ch, "Total: %d", total);
+		send_page_display(ch);
 	}
 	else if (node_hash && organize_general_dirs) {
 		// optionally organize into general directions
@@ -3566,10 +3525,10 @@ void scan_for_tile(char_data *ch, char *argument, int max_dist, bitvector_t only
 	    HASH_SORT(node_hash, sort_territory_nodes_by_distance);
 		
 		if (*argument) {
-			size = snprintf(output, sizeof(output), "Nearby tiles matching '%s' within %d tile%s:\r\n", argument, max_dist, PLURAL(max_dist));
+			add_page_display(ch, "Nearby tiles matching '%s' within %d tile%s:", argument, max_dist, PLURAL(max_dist));
 		}
 		else {
-			size = snprintf(output, sizeof(output), "Nearby tiles within a range of %d:\r\n", max_dist);
+			add_page_display(ch, "Nearby tiles within a range of %d:", max_dist);
 		}
 		
 		// display and free the nodes
@@ -3615,23 +3574,15 @@ void scan_for_tile(char_data *ch, char *argument, int max_dist, bitvector_t only
 		HASH_SORT(ogd_hash, _sort_ogd);
 		
 		HASH_ITER(hh, ogd_hash, ogd, next_ogd) {
-			lsize = snprintf(line, sizeof(line), "%s: %s%s\r\n", (*ogd->dir ? CAP(ogd->dir) : "Here"), ogd->string, ogd->full ? "..." : "");
-			
-			if (lsize + size + 40 < sizeof(output)) {
-				strcat(output, line);
-				size += lsize;
-			}
+			add_page_display(ch, "%s: %s%s", (*ogd->dir ? CAP(ogd->dir) : "Here"), ogd->string, ogd->full ? "..." : "");
 			
 			// and free
 			HASH_DEL(ogd_hash, ogd);
 			free(ogd);
 		}
 		
-		// space reserved for this
-		if (size < sizeof(output)) {
-			size += snprintf(output + size, sizeof(output) - size, "Total: %d\r\n", total);
-		}
-		page_string(ch->desc, output, TRUE);
+		add_page_display(ch, "Total: %d", total);
+		send_page_display(ch);
 	}
 	else {
 		msg_to_char(ch, "No matching territory found.\r\n");
@@ -3895,10 +3846,8 @@ ACMD(do_barde) {
 ACMD(do_buildcheck) {
 	bool imm_access = GET_ACCESS_LEVEL(ch) >= LVL_CIMPL || IS_GRANTED(ch, GRANT_EMPIRES);
 	bool here = FALSE;
-	char output[MAX_STRING_LENGTH * 4], line[256];
 	char *argptr = argument;
 	int count;
-	size_t size;
 	bld_data *bld;
 	craft_data *craft, *next_craft;
 	empire_data *emp = GET_LOYALTY(ch);
@@ -4002,26 +3951,17 @@ ACMD(do_buildcheck) {
 	}
 	
 	// otherwise build the list:
-	size = snprintf(output, sizeof(output), "%s is missing the following things you can make:\r\n", (emp == GET_LOYALTY(ch)) ? "Your empire" : EMPIRE_NAME(emp));
+	add_page_display(ch, "%s is missing the following things you can make:", (emp == GET_LOYALTY(ch)) ? "Your empire" : EMPIRE_NAME(emp));
 	count = 0;
 	
 	HASH_ITER(hh, veh_hash, iter, next_iter) {
 		if ((veh = vehicle_proto(iter->vnum)) && (!*argptr || multi_isname(argptr, VEH_KEYWORDS(veh)))) {
 			++count;
 			if (PRF_FLAGGED(ch, PRF_ROOMFLAGS)) {
-				snprintf(line, sizeof(line), "[%5d] %s\r\n", VEH_VNUM(veh), VEH_SHORT_DESC(veh));
+				add_page_display_col(ch, 2, FALSE, "[%5d] %s", VEH_VNUM(veh), VEH_SHORT_DESC(veh));
 			}
 			else {
-				snprintf(line, sizeof(line), " %s\r\n", VEH_SHORT_DESC(veh));
-			}
-			
-			if (size + strlen(line) + 15 < sizeof(output)) {
-				strcat(output, line);
-				size += strlen(line);
-			}
-			else {
-				// full
-				break;
+				add_page_display_col(ch, 2, FALSE, " %s", VEH_SHORT_DESC(veh));
 			}
 		}
 	}
@@ -4030,31 +3970,20 @@ ACMD(do_buildcheck) {
 		if ((bld = building_proto(iter->vnum)) && (!*argptr || multi_isname(argptr, GET_BLD_NAME(bld)))) {
 			++count;
 			if (PRF_FLAGGED(ch, PRF_ROOMFLAGS)) {
-				snprintf(line, sizeof(line), "[%5d] %s\r\n", GET_BLD_VNUM(bld), GET_BLD_NAME(bld));
+				add_page_display_col(ch, 2, FALSE, "[%5d] %s", GET_BLD_VNUM(bld), GET_BLD_NAME(bld));
 			}
 			else {
-				snprintf(line, sizeof(line), " %s\r\n", GET_BLD_NAME(bld));
-			}
-			
-			if (size + strlen(line) + 15 < sizeof(output)) {
-				strcat(output, line);
-				size += strlen(line);
-			}
-			else {
-				// full
-				break;
+				add_page_display_col(ch, 2, FALSE, " %s", GET_BLD_NAME(bld));
 			}
 		}
 	}
 	
-	if (size + 15 < sizeof(output)) {
-		size += snprintf(output + size, sizeof(output) - size, "Total: %d\r\n", count);
-	}
+	add_page_display(ch, "Total: %d", count);
 	
 	free_vnum_hash(&bld_hash);
 	free_vnum_hash(&veh_hash);
 	
-	page_string(ch->desc, output, TRUE);
+	send_page_display(ch);
 }
 
 
@@ -6857,14 +6786,13 @@ ACMD(do_manage) {
 // command to view offenses: show recent up to screen height; allow search
 ACMD(do_offenses) {
 	bool imm_access = (GET_ACCESS_LEVEL(ch) >= LVL_CIMPL || IS_GRANTED(ch, GRANT_EMPIRES));
-	char output[MAX_STRING_LENGTH], arg[MAX_INPUT_LENGTH], line[MAX_STRING_LENGTH], epart[MAX_STRING_LENGTH], lpart[256], fpart[256], tpart[256], *argptr;
+	char arg[MAX_INPUT_LENGTH], epart[MAX_STRING_LENGTH], lpart[256], fpart[256], tpart[256], *argptr;
 	int diff, search_plr = NOTHING, to_show = 15;
 	empire_data *emp, *search_emp = NULL;
 	bool is_file = FALSE, any = FALSE;
 	struct offense_data *off;
 	player_index_data *index;
 	char_data *plr;
-	size_t size;
 	
 	bitvector_t show_flags = OFF_WAR | OFF_AVENGED;
 	
@@ -6921,7 +6849,7 @@ ACMD(do_offenses) {
 	}
 	
 	// start buffer
-	size = snprintf(output, sizeof(output), "Offenses for %s:\r\n", EMPIRE_NAME(emp));
+	add_page_display(ch, "Offenses for %s:", EMPIRE_NAME(emp));
 	
 	DL_FOREACH(EMPIRE_OFFENSES(emp), off) {
 		if (!IS_SET(off->flags, OFF_SEEN) && (search_emp || search_plr != NOTHING)) {
@@ -6982,25 +6910,15 @@ ACMD(do_offenses) {
 			strcat(tpart, " ago");
 		}
 		
-		snprintf(line, sizeof(line), "%s %s %s%s  %s\r\n", epart, offense_info[off->type].name, tpart, lpart, fpart);
+		add_page_display(ch, "%s %s %s%s  %s", epart, offense_info[off->type].name, tpart, lpart, fpart);
 		any = TRUE;
-		
-		if (size + strlen(line) < sizeof(output)) {
-			strcat(output, line);
-			size += strlen(line);
-		}
-		else {
-			// overflow
-			size += snprintf(output + size, sizeof(output) - size, "OVERFLOW\r\n");
-			break;
-		}
 	}
 	
 	if (!any) {
-		strcat(output, " none\r\n");
+		add_page_display_str(ch, " none");
 	}
 	
-	page_string(ch->desc, output, TRUE);
+	send_page_display(ch);
 	
 	// only if no filter and own-empire
 	if (emp == GET_LOYALTY(ch) && !search_emp && search_plr == NOTHING) {
@@ -7075,7 +6993,7 @@ ACMD(do_pledge) {
 
 ACMD(do_progress) {
 	bool imm_access = (GET_ACCESS_LEVEL(ch) >= LVL_CIMPL || IS_GRANTED(ch, GRANT_EMPIRES));
-	char buf[MAX_STRING_LENGTH * 2], line[MAX_STRING_LENGTH], arg[MAX_INPUT_LENGTH], vstr[256], fstr[256], temp[256], *arg2, *ptr;
+	char arg[MAX_INPUT_LENGTH], vstr[256], fstr[256], temp[256], *arg2, *ptr;
 	int counts[NUM_PROGRESS_TYPES], compl[NUM_PROGRESS_TYPES], buy[NUM_PROGRESS_TYPES];
 	empire_data *emp = GET_LOYALTY(ch);
 	struct empire_completed_goal *ecg, *next_ecg;
@@ -7083,9 +7001,9 @@ ACMD(do_progress) {
 	int cat, total, complete, bought, num;
 	progress_data *prg, *next_prg, *prg_iter;
 	struct progress_list *prereq;
-	size_t size;
 	time_t when;
 	bool any, found, new_goal;
+	struct page_display *pd;
 	
 	strcpy(buf, argument);
 	if (*argument && imm_access) {
@@ -7144,7 +7062,7 @@ ACMD(do_progress) {
 		// nothing to compute/show
 	}
 	else if (!*argument) {
-		size = snprintf(buf, sizeof(buf), "Empire progress for %s%s\t0 (%d total progress score):\r\n", EMPIRE_BANNER(emp), EMPIRE_NAME(emp), total);
+		add_page_display(ch, "Empire progress for %s%s\t0 (%d total progress score):", EMPIRE_BANNER(emp), EMPIRE_NAME(emp), total);
 		
 		// show current goals
 		any = 0;
@@ -7162,25 +7080,16 @@ ACMD(do_progress) {
 			
 			count_quest_tasks(goal->tracker, &complete, &total);
 			new_goal = (emp == GET_LOYALTY(ch) && goal->timestamp > GET_LAST_GOAL_CHECK(ch)) || (goal->timestamp + (24 * SECS_PER_REAL_HOUR) > time(0));
-			snprintf(line, sizeof(line), "- %s\ty%s\t0 (%s, %d point%s, %d/%d%s)\r\n", vstr, PRG_NAME(prg), progress_types[PRG_TYPE(prg)], PRG_VALUE(prg), PLURAL(PRG_VALUE(prg)), complete, total, new_goal ? ", new" : "");
+			add_page_display(ch, "- %s\ty%s\t0 (%s, %d point%s, %d/%d%s)", vstr, PRG_NAME(prg), progress_types[PRG_TYPE(prg)], PRG_VALUE(prg), PLURAL(PRG_VALUE(prg)), complete, total, new_goal ? ", new" : "");
 			any = TRUE;
-			
-			if (size + strlen(line) + 18 < sizeof(buf)) {
-				strcat(buf, line);
-				size += strlen(line);
-			}
-			else {
-				size += snprintf(buf + size, sizeof(buf) - size, "*** OVERFLOW ***\r\n");
-				break;
-			}
 		}
 		if (!any) {
-			size += snprintf(buf + size, sizeof(buf) - size, "- No active goals\r\n");
+			add_page_display(ch, "- No active goals");
 		}
 		
-		size += snprintf(buf + size, sizeof(buf) - size, "Progress point%s available to spend: %d\r\n", PLURAL(EMPIRE_PROGRESS_POOL(emp)), EMPIRE_PROGRESS_POOL(emp));
+		add_page_display(ch, "Progress point%s available to spend: %d", PLURAL(EMPIRE_PROGRESS_POOL(emp)), EMPIRE_PROGRESS_POOL(emp));
 		
-		page_string(ch->desc, buf, TRUE);
+		send_page_display(ch);
 	}
 	else if (((strlen(argument) >= 3 && (cat = search_block(argument, progress_types, FALSE)) != NOTHING) || ((strlen(arg) >= 3 && (cat = search_block(arg, progress_types, FALSE)) != NOTHING))) && cat != PROGRESS_UNDEFINED) {
 		// show completed goals instead?
@@ -7194,7 +7103,7 @@ ACMD(do_progress) {
 		}
 		
 		// show current progress in that category
-		size = snprintf(buf, sizeof(buf), "%s goals (%d points):\r\n", progress_types[cat], EMPIRE_PROGRESS_POINTS(emp, cat));
+		add_page_display(ch, "%s goals (%d points):", progress_types[cat], EMPIRE_PROGRESS_POINTS(emp, cat));
 		
 		// show current goals
 		any = 0;
@@ -7212,20 +7121,11 @@ ACMD(do_progress) {
 			
 			count_quest_tasks(goal->tracker, &complete, &total);
 			new_goal = (emp == GET_LOYALTY(ch) && goal->timestamp > GET_LAST_GOAL_CHECK(ch)) || (goal->timestamp + (24 * SECS_PER_REAL_HOUR) > time(0));
-			snprintf(line, sizeof(line), "- %s\ty%s\t0 (%s, %d point%s, %d/%d%s)\r\n", vstr, PRG_NAME(prg), progress_types[PRG_TYPE(prg)], PRG_VALUE(prg), PLURAL(PRG_VALUE(prg)), complete, total, new_goal ? ", new" : "");
+			add_page_display(ch, "- %s\ty%s\t0 (%s, %d point%s, %d/%d%s)", vstr, PRG_NAME(prg), progress_types[PRG_TYPE(prg)], PRG_VALUE(prg), PLURAL(PRG_VALUE(prg)), complete, total, new_goal ? ", new" : "");
 			any = TRUE;
-			
-			if (size + strlen(line) + 18 < sizeof(buf)) {
-				strcat(buf, line);
-				size += strlen(line);
-			}
-			else {
-				size += snprintf(buf + size, sizeof(buf) - size, "*** OVERFLOW ***\r\n");
-				break;
-			}
 		}
 		if (!any) {
-			size += snprintf(buf + size, sizeof(buf) - size, "- No active goals\r\n");
+			add_page_display(ch, "- No active goals");
 		}
 		
 		// purchasable
@@ -7251,17 +7151,8 @@ ACMD(do_progress) {
 				*vstr = '\0';
 			}
 			
-			snprintf(line, sizeof(line), "+ Available: %s\tc%s\t0 (for %d point%s)\r\n", vstr, PRG_NAME(prg), PRG_COST(prg), PLURAL(PRG_COST(prg)));
+			add_page_display(ch, "+ Available: %s\tc%s\t0 (for %d point%s)", vstr, PRG_NAME(prg), PRG_COST(prg), PLURAL(PRG_COST(prg)));
 			any = TRUE;
-		
-			if (size + strlen(line) + 18 < sizeof(buf)) {
-				strcat(buf, line);
-				size += strlen(line);
-			}
-			else {
-				size += snprintf(buf + size, sizeof(buf) - size, "*** OVERFLOW ***\r\n");
-				break;
-			}
 		}
 		
 		// number of completed goals
@@ -7276,9 +7167,9 @@ ACMD(do_progress) {
 				}
 			}
 		}
-		size += snprintf(buf + size, sizeof(buf) - size, "- %d completed goals, %d rewards bought\r\n", complete, bought);
+		add_page_display(ch, "- %d completed goals, %d rewards bought", complete, bought);
 		
-		page_string(ch->desc, buf, TRUE);
+		send_page_display(ch);
 	}
 	else if (strlen(arg) >= 3 && is_abbrev(arg, "completed")) {
 		// check category request
@@ -7302,28 +7193,19 @@ ACMD(do_progress) {
 		show_new_goals(ch, emp);
 	}
 	else if (is_abbrev(arg, "summary")) {
-		size = snprintf(buf, sizeof(buf), "Empire progress for %s%s\t0 (%d total progress score):\r\n", EMPIRE_BANNER(emp), EMPIRE_NAME(emp), total);
+		add_page_display(ch, "Empire progress for %s%s\t0 (%d total progress score):", EMPIRE_BANNER(emp), EMPIRE_NAME(emp), total);
 
 		for (cat = 1; cat < NUM_PROGRESS_TYPES; ++cat) {
-			snprintf(line, sizeof(line), " %s: %d active goal%s, %d completed, %d bought, %d point%s\r\n", progress_types[cat], counts[cat], PLURAL(counts[cat]), compl[cat], buy[cat], EMPIRE_PROGRESS_POINTS(emp, cat), PLURAL(EMPIRE_PROGRESS_POINTS(emp, cat)));
-
-			if (size + strlen(line) + 18 < sizeof(buf)) {
-				strcat(buf, line);
-				size += strlen(line);
-			}
-			else {
-				size += snprintf(buf + size, sizeof(buf) - size, "*** OVERFLOW ***\r\n");
-				break;
-			}
+			add_page_display(ch, " %s: %d active goal%s, %d completed, %d bought, %d point%s", progress_types[cat], counts[cat], PLURAL(counts[cat]), compl[cat], buy[cat], EMPIRE_PROGRESS_POINTS(emp, cat), PLURAL(EMPIRE_PROGRESS_POINTS(emp, cat)));
 		}
 
-		size += snprintf(buf + size, sizeof(buf) - size, " Progress point%s available to spend: %d\r\n", PLURAL(EMPIRE_PROGRESS_POOL(emp)), EMPIRE_PROGRESS_POOL(emp));
+		add_page_display(ch, " Progress point%s available to spend: %d", PLURAL(EMPIRE_PROGRESS_POOL(emp)), EMPIRE_PROGRESS_POOL(emp));
 
-		page_string(ch->desc, buf, TRUE);
+		send_page_display(ch);
 	}
 	else if (!str_cmp(arg, "buy")) {
 		if (!*arg2) {	// display all purchasable goals
-			size = snprintf(buf, sizeof(buf), "Available progression rewards (%d progress point%s):\r\n", EMPIRE_PROGRESS_POOL(emp), PLURAL(EMPIRE_PROGRESS_POOL(emp)));
+			add_page_display(ch, "Available progression rewards (%d progress point%s):", EMPIRE_PROGRESS_POOL(emp), PLURAL(EMPIRE_PROGRESS_POOL(emp)));
 			
 			any = FALSE;
 			HASH_ITER(sorted_hh, sorted_progress, prg, next_prg) {
@@ -7345,24 +7227,15 @@ ACMD(do_progress) {
 					*vstr = '\0';
 				}
 				
-				snprintf(line, sizeof(line), "+ %s\tc%s\t0 (%d point%s)\r\n", vstr, PRG_NAME(prg), PRG_COST(prg), PLURAL(PRG_COST(prg)));
+				add_page_display(ch, "+ %s\tc%s\t0 (%d point%s)", vstr, PRG_NAME(prg), PRG_COST(prg), PLURAL(PRG_COST(prg)));
 				any = TRUE;
-			
-				if (size + strlen(line) + 18 < sizeof(buf)) {
-					strcat(buf, line);
-					size += strlen(line);
-				}
-				else {
-					size += snprintf(buf + size, sizeof(buf) - size, "*** OVERFLOW ***\r\n");
-					break;
-				}
 			}
 			
 			if (!any) {
-				strcat(buf, " none\r\n");	// always room in the buffer if so
+				add_page_display(ch, " none");
 			}
 			
-			page_string(ch->desc, buf, TRUE);
+			send_page_display(ch);
 			return;
 		}
 		
@@ -7404,13 +7277,13 @@ ACMD(do_progress) {
 			*fstr = '\0';
 		}
 		
-		msg_to_char(ch, "%s%s%s\t0%s\r\n%s", vstr, empire_has_completed_goal(emp, PRG_VNUM(prg)) ? "\tg" : (PRG_FLAGGED(prg, PRG_PURCHASABLE) ? "\tc" : "\ty"), PRG_NAME(prg), fstr, NULLSAFE(PRG_DESCRIPTION(prg)));
+		add_page_display(ch, "%s%s%s\t0%s\r\n%s", vstr, empire_has_completed_goal(emp, PRG_VNUM(prg)) ? "\tg" : (PRG_FLAGGED(prg, PRG_PURCHASABLE) ? "\tc" : "\ty"), PRG_NAME(prg), fstr, NULLSAFE(PRG_DESCRIPTION(prg)));
 		
 		if (PRG_VALUE(prg) > 0) {
-			msg_to_char(ch, "Value: %d point%s\r\n", PRG_VALUE(prg), PLURAL(PRG_VALUE(prg)));
+			add_page_display(ch, "Value: %d point%s", PRG_VALUE(prg), PLURAL(PRG_VALUE(prg)));
 		}
 		if (PRG_COST(prg) > 0) {
-			msg_to_char(ch, "Cost: %d point%s\r\n", PRG_COST(prg), PLURAL(PRG_COST(prg)));
+			add_page_display(ch, "Cost: %d point%s", PRG_COST(prg), PLURAL(PRG_COST(prg)));
 		}
 		
 		if ((when = when_empire_completed_goal(emp, PRG_VNUM(prg))) > 0) {
@@ -7427,19 +7300,18 @@ ACMD(do_progress) {
 			else {
 				strcpy(buf, "recently");
 			}
-			msg_to_char(ch, "Completed %s.\r\n", buf);
+			add_page_display(ch, "Completed %s.", buf);
 		}
 		else if (!get_current_goal(emp, PRG_VNUM(prg)) && !empire_has_completed_goal(emp, PRG_VNUM(prg))) {
-			msg_to_char(ch, "\trYour empire has not %s this goal.\t0\r\n", (PRG_FLAGGED(prg, PRG_PURCHASABLE) ? "purchased" : "started"));
+			add_page_display(ch, "\trYour empire has not %s this goal.\t0", (PRG_FLAGGED(prg, PRG_PURCHASABLE) ? "purchased" : "started"));
 		}
 		
 		// Show prereqs:
 		if (PRG_PREREQS(prg)) {
-			msg_to_char(ch, "Requires:");
+			pd = add_page_display(ch, "Requires:");
 			LL_FOREACH(PRG_PREREQS(prg), prereq) {
-				msg_to_char(ch, "%s%s%s\t0", (prereq == PRG_PREREQS(prg)) ? " " : ", ", empire_has_completed_goal(emp, prereq->vnum) ? "" : "\tr", get_progress_name_by_proto(prereq->vnum));
+				append_page_display_line(pd, "%s%s%s\t0", (prereq == PRG_PREREQS(prg)) ? " " : ", ", empire_has_completed_goal(emp, prereq->vnum) ? "" : "\tr", get_progress_name_by_proto(prereq->vnum));
 			}
-			msg_to_char(ch, "\r\n");
 		}
 		
 		// Show descendents if any
@@ -7459,28 +7331,32 @@ ACMD(do_progress) {
 			}
 			
 			if (found) {
-				msg_to_char(ch, "%s%s", (any ? ", " : "Leads to: "), PRG_NAME(prg_iter));
-				any = TRUE;
+				if (!any) {
+					pd = add_page_display(ch, "Leads to: %s", PRG_NAME(prg_iter));
+				}
+				else {
+					append_page_display_line(pd, ", %s", PRG_NAME(prg_iter));
+					any = TRUE;
+				}
 			}
-		}
-		if (any) {	// needs a crlf
-			msg_to_char(ch, "\r\n");
 		}
 		
 		if (PRG_PERKS(prg)) {
 			get_progress_perks_display(PRG_PERKS(prg), buf, FALSE);
-			msg_to_char(ch, "Rewards:\r\n%s", buf);
+			add_page_display(ch, "Rewards:\r\n%s", buf);
 		}
 		if ((goal = get_current_goal(emp, PRG_VNUM(prg)))) {
 			if (PRG_FLAGGED(prg, PRG_NO_TRACKER) && !IS_IMMORTAL(ch)) {
 				count_quest_tasks(goal->tracker, &complete, &total);
-				msg_to_char(ch, "Progress: %d/%d\r\n", complete, total);
+				add_page_display(ch, "Progress: %d/%d", complete, total);
 			}
 			else {
 				get_tracker_display(goal->tracker, buf);
-				msg_to_char(ch, "Progress:\r\n%s", buf);
+				add_page_display(ch, "Progress:\r\n%s", buf);
 			}
 		}
+		
+		send_page_display(ch);
 	}
 	
 	else {
@@ -7854,12 +7730,11 @@ ACMD(do_roster) {
 
 
 ACMD(do_territory) {
-	char search_str[MAX_INPUT_LENGTH], exclude_str[MAX_INPUT_LENGTH], arg[MAX_INPUT_LENGTH], arg2[MAX_INPUT_LENGTH], buf[MAX_STRING_LENGTH*4], option_buf[1024], line[256], *remain;
-	bool ok, junk, full;
+	char search_str[MAX_INPUT_LENGTH], exclude_str[MAX_INPUT_LENGTH], arg[MAX_INPUT_LENGTH], arg2[MAX_INPUT_LENGTH], option_buf[1024], *remain;
+	bool ok, junk;
 	bool check_city, check_outskirts, check_frontier, any_type_found;
 	bool no_abandon, no_dismantle, no_work, public_only;
 	int dist_from_me, total, ttype;
-	size_t size, lsize;
 	crop_data *crop = NULL;
 	empire_data *emp = GET_LOYALTY(ch);
 	struct find_territory_node *node_hash = NULL, *node, *next_node;
@@ -8196,48 +8071,35 @@ ACMD(do_territory) {
 		reduce_territory_node_list(&node_hash);
 		
 		// start buf
-		size = snprintf(buf, sizeof(buf), "%s%s&0 territory: %s\r\n", EMPIRE_BANNER(emp), EMPIRE_ADJECTIVE(emp), option_buf);
+		add_page_display(ch, "%s%s&0 territory: %s", EMPIRE_BANNER(emp), EMPIRE_ADJECTIVE(emp), option_buf);
 		
 		// display and free the nodes
 		total = 0;
-		full = FALSE;
 		HASH_ITER(hh, node_hash, node, next_node) {
 			total += node->count;
 			room = real_room(node->vnum);
 			
-			if (!full) {
-				if (node->combined) {
-					lsize = snprintf(line, sizeof(line), "%s %d tiles near %s\r\n", coord_display_room(ch, room, TRUE), node->count, (room ? get_screenreader_room_name(ch, room, room, FALSE) : "Unknown"));
-				}
-				else if (node->count > 1) {
-					lsize = snprintf(line, sizeof(line), "%s %s (x%d)%s%s\r\n", coord_display_room(ch, room, TRUE), (room ? get_screenreader_room_name(ch, room, room, FALSE) : "Unknown"), node->count, (node->details ? ": " : ""), NULLSAFE(node->details));
-				}
-				else {
-					lsize = snprintf(line, sizeof(line), "%s %s%s%s\r\n", coord_display_room(ch, room, TRUE), (room ? get_screenreader_room_name(ch, room, room, FALSE) : "Unknown"), (node->details ? ": " : ""), NULLSAFE(node->details));
-				}
-				
-				if (size + lsize < sizeof(buf)) {
-					strcat(buf, line);
-					size += lsize;
-				}
-				else {
-					size += snprintf(buf + size, sizeof(buf) - size, "OVERFLOW\r\n");
-					full = TRUE;
-				}
+			// build line
+			if (node->combined) {
+				add_page_display(ch, "%s %d tiles near %s", coord_display_room(ch, room, TRUE), node->count, (room ? get_screenreader_room_name(ch, room, room, FALSE) : "Unknown"));
+			}
+			else if (node->count > 1) {
+				add_page_display(ch, "%s %s (x%d)%s%s", coord_display_room(ch, room, TRUE), (room ? get_screenreader_room_name(ch, room, room, FALSE) : "Unknown"), node->count, (node->details ? ": " : ""), NULLSAFE(node->details));
+			}
+			else {
+				add_page_display(ch, "%s %s%s%s", coord_display_room(ch, room, TRUE), (room ? get_screenreader_room_name(ch, room, room, FALSE) : "Unknown"), (node->details ? ": " : ""), NULLSAFE(node->details));
 			}
 			
+			// cleanup
 			if (node->details) {
 				free(node->details);
 			}
-			
 			HASH_DEL(node_hash, node);
 			free(node);
 		}
 		
-		if (!full) {
-			size += snprintf(buf +  size, sizeof(buf) - size, "Total: %d\r\n", total);
-		}
-		page_string(ch->desc, buf, TRUE);
+		add_page_display(ch, "Total: %d", total);
+		send_page_display(ch);
 	}
 	else {
 		// none found
@@ -8284,10 +8146,8 @@ ACMD(do_unpublicize) {
 void do_workforce_keep(char_data *ch, empire_data *emp, char *argument) {
 	any_vnum vnum;
 	bool found;
-	char lim_arg[MAX_INPUT_LENGTH], local_arg[MAX_INPUT_LENGTH], temp[MAX_INPUT_LENGTH];
-	char buf[MAX_STRING_LENGTH * 4], line[256], kept[24];
+	char lim_arg[MAX_INPUT_LENGTH], local_arg[MAX_INPUT_LENGTH], temp[MAX_INPUT_LENGTH], kept[24];
 	int limit = 0, number;
-	size_t size;
 	obj_data *proto, *obj;
 	struct empire_island *eisle;
 	struct empire_storage_data *store, *next_store;
@@ -8302,7 +8162,7 @@ void do_workforce_keep(char_data *ch, empire_data *emp, char *argument) {
 	
 	// no-arg? show keep settings here
 	if (!*argument) {
-		size = snprintf(buf, sizeof(buf), "Workforce keep settings for this island:\r\n");
+		add_page_display(ch, "Workforce keep settings for this island:");
 		
 		found = FALSE;
 		HASH_ITER(hh, eisle->store, store, next_store) {
@@ -8324,29 +8184,18 @@ void do_workforce_keep(char_data *ch, empire_data *emp, char *argument) {
 			}
 			
 			if (PRF_FLAGGED(ch, PRF_ROOMFLAGS)) {
-				snprintf(line, sizeof(line), "%s [%5d] %s (%d stored)", kept, store->vnum, skip_filler(GET_OBJ_SHORT_DESC(proto)), store->amount);
+				add_page_display(ch, "%s [%5d] %s (%d stored)", kept, store->vnum, skip_filler(GET_OBJ_SHORT_DESC(proto)), store->amount);
 			}
 			else {
-				snprintf(line, sizeof(line), "%s %s (%d stored)", kept, skip_filler(GET_OBJ_SHORT_DESC(proto)), store->amount);
-			}
-			
-			// check for room in the buffer
-			if (size + strlen(line) + 3 < sizeof(buf)) {
-				size += snprintf(buf + size, sizeof(buf) - size, "%s\r\n", line);
-			}
-			else {
-				size += snprintf(buf + size, sizeof(buf) - size, " OVERFLOW\r\n");
-				break;
+				add_page_display(ch, "%s %s (%d stored)", kept, skip_filler(GET_OBJ_SHORT_DESC(proto)), store->amount);
 			}
 		}
 		
 		if (!found) {
-			strcat(buf, " no keep settings found\r\n");	// always room for this
+			add_page_display(ch, " no keep settings found");
 		}
 		
-		if (ch->desc) {	// should be guaranteed
-			page_string(ch->desc, buf, TRUE);
-		}
+		send_page_display(ch);
 		
 		// end of no-arg
 		return;
@@ -8470,12 +8319,11 @@ void do_workforce_keep(char_data *ch, empire_data *emp, char *argument) {
 * @param char *argument Remaining args after "limit".
 */
 void do_workforce_limit(char_data *ch, empire_data *emp, char *argument) {
-	char amount_arg[MAX_INPUT_LENGTH], keywords_arg[MAX_INPUT_LENGTH], buf[MAX_STRING_LENGTH], line[256];
+	char amount_arg[MAX_INPUT_LENGTH], keywords_arg[MAX_INPUT_LENGTH];
 	struct workforce_production_limit *wpl, *next_wpl;
 	int amount, count;
 	obj_data *proto;
 	any_vnum vnum;
-	size_t size;
 	
 	skip_spaces(&argument);
 	
@@ -8518,10 +8366,10 @@ void do_workforce_limit(char_data *ch, empire_data *emp, char *argument) {
 	// optional usage: workforce limit [keywords]
 	count = 0;
 	if (*argument) {
-		size = snprintf(buf, sizeof(buf), "Workforce production limits for '%s':\r\n", argument);
+		add_page_display(ch, "Workforce production limits for '%s':", argument);
 	}
 	else {
-		size = snprintf(buf, sizeof(buf), "Workforce production limits:\r\n");
+		add_page_display_str(ch, "Workforce production limits:");
 	}
 	
 	// iterate...
@@ -8535,43 +8383,18 @@ void do_workforce_limit(char_data *ch, empire_data *emp, char *argument) {
 		
 		// build line
 		if (PRF_FLAGGED(ch, PRF_ROOMFLAGS)) {
-			snprintf(line, sizeof(line), "[%5d] %s: %d", wpl->vnum, skip_filler(get_obj_name_by_proto(wpl->vnum)), wpl->limit);
+			add_page_display_col(ch, 2, FALSE, "[%5d] %s: %d", wpl->vnum, skip_filler(get_obj_name_by_proto(wpl->vnum)), wpl->limit);
 		}
 		else {
-			snprintf(line, sizeof(line), "%s: %d", skip_filler(get_obj_name_by_proto(wpl->vnum)), wpl->limit);
-		}
-		
-		// check for room
-		if (PRF_FLAGGED(ch, PRF_SCREEN_READER)) {
-			if (size + strlen(line) + 3 < sizeof(buf)) {
-				size += snprintf(buf + size, sizeof(buf) - size, " %s\r\n", line);
-			}
-			else {
-				size += snprintf(buf + size, sizeof(buf) - size, " OVERFLOW\r\n");
-				break;
-			}
-		}
-		else {	// not screenreader
-			if (size + 40 < sizeof(buf)) {
-				size += snprintf(buf + size, sizeof(buf) - size, " %-38.38s%s", line, !(count % 2) ? "\r\n" : "");
-			}
-			else {
-				size += snprintf(buf + size, sizeof(buf) - size, " OVERFLOW\r\n");
-				break;
-			}
+			add_page_display_col(ch, 2, FALSE, "%s: %d", skip_filler(get_obj_name_by_proto(wpl->vnum)), wpl->limit);
 		}
 	}
 	
 	if (!count) {
-		strcat(buf, " no limits set\r\n");	// always room for this
-	}
-	else if (!PRF_FLAGGED(ch, PRF_SCREEN_READER) && (count % 2) && size + 2 < sizeof(buf)) {
-		strcat(buf, "\r\n");
+		add_page_display_str(ch, " no limits set");
 	}
 	
-	if (ch->desc) {	// should be guaranteed
-		page_string(ch->desc, buf, TRUE);
-	}
+	send_page_display(ch);
 }
 
 
