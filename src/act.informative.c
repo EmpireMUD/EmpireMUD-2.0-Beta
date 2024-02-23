@@ -907,7 +907,7 @@ void display_score_to_char(char_data *ch, char_data *to) {
 	char lbuf[MAX_STRING_LENGTH], lbuf2[MAX_STRING_LENGTH], lbuf3[MAX_STRING_LENGTH];
 	char *str;
 	struct player_skill_data *skdata, *next_skill;
-	int i, j, count, pts, val, temperature;
+	int i, count, pts, val, temperature;
 	empire_data *emp;
 	struct time_info_data playing_time;
 	struct page_display *pd;
@@ -1040,7 +1040,7 @@ void display_score_to_char(char_data *ch, char_data *to) {
 	/* Gods and Immortals: */
 	if (IS_GOD(ch) || IS_IMMORTAL(ch)) {
 		add_page_display(to, "+------------------------------- Resources ---------------------------------+");
-		for (i = 0, j = 0; i < NUM_MATERIALS; i++) {
+		for (i = 0; i < NUM_MATERIALS; i++) {
 			if (GET_RESOURCE(ch, i)) {
 				add_page_display_col(to, 3, TRUE, " %-14.14s %-6d", materials[i].name, GET_RESOURCE(ch, i));
 			}
