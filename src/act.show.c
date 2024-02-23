@@ -434,25 +434,21 @@ SHOW(show_ammotypes) {
 	obj_data *obj, *next_obj;
 	int total;
 	
-	strcpy(buf, "You find the following ammo types:\r\n");
+	add_page_display(ch, "You find the following ammo types:");
 	
 	total = 0;
 	HASH_ITER(hh, object_table, obj, next_obj) {
 		if (IS_MISSILE_WEAPON(obj) || IS_AMMO(obj)) {
-			sprintf(buf1, " %c: %s", 'A' + GET_OBJ_VAL(obj, IS_AMMO(obj) ? VAL_AMMO_TYPE : VAL_MISSILE_WEAPON_AMMO_TYPE), GET_OBJ_SHORT_DESC(obj));
-			sprintf(buf + strlen(buf), "%-32.32s%s", buf1, ((total++ % 2) ? "\r\n" : ""));
+			add_page_display_col(ch, 2, FALSE, " %c: [%5d] %s", 'A' + GET_OBJ_VAL(obj, IS_AMMO(obj) ? VAL_AMMO_TYPE : VAL_MISSILE_WEAPON_AMMO_TYPE), GET_OBJ_VNUM(obj), skip_filler(GET_OBJ_SHORT_DESC(obj)));
+			++total;
 		}
 	}
 	
 	if (total == 0) {
-		msg_to_char(ch, "You find no objects with ammo types.\r\n");
+		add_page_display_str(ch, " none");
 	}
-	else {
-		if ((total % 2) != 0) {
-			strcat(buf, "\r\n");
-		}
-		page_string(ch->desc, buf, TRUE);
-	}
+	
+	send_page_display(ch);
 }
 
 
@@ -1768,12 +1764,10 @@ SHOW(show_notes) {
 
 
 SHOW(show_oceanmobs) {
-	char buf[MAX_STRING_LENGTH], line[256];
-	size_t buf_size, line_size;
 	char_data *mob;
 	int count = 0;
 	
-	buf_size = snprintf(buf, sizeof(buf), "Mobs lost in the ocean:\r\n");
+	add_page_display_str(ch, "Mobs lost in the ocean:");
 	
 	DL_FOREACH(character_list, mob) {
 		if (!IS_NPC(mob)) {
@@ -1794,25 +1788,15 @@ SHOW(show_oceanmobs) {
 		
 		// ok show it:
 		++count;
-		line_size = snprintf(line, sizeof(line), "[%5d] %s - %s\r\n", GET_MOB_VNUM(mob), GET_SHORT_DESC(mob), room_log_identifier(IN_ROOM(mob)));
-		if (line_size + buf_size < sizeof(buf) - 16) {
-			strcat(buf, line);
-			buf_size += line_size;
-		}
-		else {
-			buf_size += snprintf(buf + buf_size, sizeof(buf) - buf_size, "**OVERFLOW**\r\n");
-			break;
-		}
+		add_page_display(ch, "[%5d] %s - %s", GET_MOB_VNUM(mob), GET_SHORT_DESC(mob), room_log_identifier(IN_ROOM(mob)));
 	}
 	
 	if (!count) {
-		buf_size += snprintf(buf + buf_size, sizeof(buf) - buf_size, " none\r\n");
+		add_page_display_str(ch, " none");
 	}
 	
 	// and send
-	if (ch->desc) {
-		page_string(ch->desc, buf, TRUE);
-	}
+	send_page_display(ch);
 }
 
 
@@ -2433,7 +2417,7 @@ SHOW(show_smessages) {
 
 
 SHOW(show_spawns) {
-	char buf[MAX_STRING_LENGTH];
+	bool any = FALSE;
 	struct spawn_info *sp;
 	vehicle_data *veh, *next_veh;
 	sector_data *sect, *next_sect;
@@ -2449,18 +2433,14 @@ SHOW(show_spawns) {
 		msg_to_char(ch, "Show spawns: You must specify a valid mob vnum.\r\n");
 		return;
 	}
-	
-	*buf = '\0';
 
 	// sectors:
 	HASH_ITER(hh, sector_table, sect, next_sect) {
 		for (sp = GET_SECT_SPAWNS(sect); sp; sp = sp->next) {
 			if (sp->vnum == vnum) {
 				sprintbit(sp->flags, spawn_flags, buf2, TRUE);
-				snprintf(buf1, sizeof(buf1), "SCT [%5d] %s: %.2f%% %s\r\n", GET_SECT_VNUM(sect), GET_SECT_NAME(sect), sp->percent, buf2);
-				if (strlen(buf) + strlen(buf1) < MAX_STRING_LENGTH) {
-					strcat(buf, buf1);
-				}
+				add_page_display(ch, "SCT [%5d] %s: %.2f%% %s", GET_SECT_VNUM(sect), GET_SECT_NAME(sect), sp->percent, buf2);
+				any = TRUE;
 			}
 		}
 	}
@@ -2470,11 +2450,8 @@ SHOW(show_spawns) {
 		for (sp = GET_CROP_SPAWNS(crop); sp; sp = sp->next) {
 			if (sp->vnum == vnum) {
 				sprintbit(sp->flags, spawn_flags, buf2, TRUE);
-				snprintf(buf1, sizeof(buf1), "CRP [%5d] %s: %.2f%% %s\r\n", GET_CROP_VNUM(crop), GET_CROP_NAME(crop), sp->percent, buf2);
-				CAP(buf1);	// crop names are lowercase
-				if (strlen(buf) + strlen(buf1) < MAX_STRING_LENGTH) {
-					strcat(buf, buf1);
-				}
+				add_page_display(ch, "CRP [%5d] &Z%s: %.2f%% %s", GET_CROP_VNUM(crop), GET_CROP_NAME(crop), sp->percent, buf2);
+				any = TRUE;
 			}
 		}
 	}
@@ -2484,10 +2461,8 @@ SHOW(show_spawns) {
 		for (sp = GET_BLD_SPAWNS(bld); sp; sp = sp->next) {
 			if (sp->vnum == vnum) {
 				sprintbit(sp->flags, spawn_flags, buf2, TRUE);
-				snprintf(buf1, sizeof(buf1), "BLD [%5d] %s: %.2f%% %s\r\n", GET_BLD_VNUM(bld), GET_BLD_NAME(bld), sp->percent, buf2);
-				if (strlen(buf) + strlen(buf1) < MAX_STRING_LENGTH) {
-					strcat(buf, buf1);
-				}
+				add_page_display(ch, "BLD [%5d] %s: %.2f%% %s", GET_BLD_VNUM(bld), GET_BLD_NAME(bld), sp->percent, buf2);
+				any = TRUE;
 			}
 		}
 	}
@@ -2497,10 +2472,8 @@ SHOW(show_spawns) {
 		LL_FOREACH(VEH_SPAWNS(veh), sp) {
 			if (sp->vnum == vnum) {
 				sprintbit(sp->flags, spawn_flags, buf2, TRUE);
-				snprintf(buf1, sizeof(buf1), "VEH [%5d] %s: %.2f%% %s\r\n", VEH_VNUM(veh), VEH_SHORT_DESC(veh), sp->percent, buf2);
-				if (strlen(buf) + strlen(buf1) < MAX_STRING_LENGTH) {
-					strcat(buf, buf1);
-				}
+				add_page_display(ch, "VEH [%5d] %s: %.2f%% %s", VEH_VNUM(veh), VEH_SHORT_DESC(veh), sp->percent, buf2);
+				any = TRUE;
 			}
 		}
 	}
@@ -2510,10 +2483,8 @@ SHOW(show_spawns) {
 		LL_FOREACH(GET_GLOBAL_SPAWNS(glb), sp) {
 			if (sp->vnum == vnum) {
 				sprintbit(sp->flags, spawn_flags, buf2, TRUE);
-				snprintf(buf1, sizeof(buf1), "GLB [%5d] %s: %.2f%% %s\r\n", GET_GLOBAL_VNUM(glb), GET_GLOBAL_NAME(glb), sp->percent, buf2);
-				if (strlen(buf) + strlen(buf1) < MAX_STRING_LENGTH) {
-					strcat(buf, buf1);
-				}
+				add_page_display(ch, "GLB [%5d] %s: %.2f%% %s", GET_GLOBAL_VNUM(glb), GET_GLOBAL_NAME(glb), sp->percent, buf2);
+				any = TRUE;
 			}
 		}
 	}
@@ -2522,17 +2493,15 @@ SHOW(show_spawns) {
 	HASH_ITER(hh, room_template_table, rmt, next_rmt) {
 		for (asp = GET_RMT_SPAWNS(rmt); asp; asp = asp->next) {
 			if (asp->type == ADV_SPAWN_MOB && asp->vnum == vnum) {
-				snprintf(buf1, sizeof(buf1), "RMT [%5d] %s: %.2f%%, limit %d\r\n", GET_RMT_VNUM(rmt), GET_RMT_TITLE(rmt), asp->percent, asp->limit);
-				if (strlen(buf) + strlen(buf1) < MAX_STRING_LENGTH) {
-					strcat(buf, buf1);
-				}
+				add_page_display(ch, "RMT [%5d] %s: %.2f%%, limit %d\r\n", GET_RMT_VNUM(rmt), GET_RMT_TITLE(rmt), asp->percent, asp->limit);
+				any = TRUE;
 				break;
 			}
 		}
 	}
 	
-	if (*buf) {
-		page_string(ch->desc, buf, TRUE);
+	if (any) {
+		send_page_display(ch);
 	}
 	else {
 		msg_to_char(ch, "No spawns found for mob %d.\r\n", vnum);
@@ -2543,15 +2512,15 @@ SHOW(show_spawns) {
 SHOW(show_startlocs) {
 	room_data *iter, *next_iter;
 	
-	strcpy(buf, "Starting locations:\r\n");
+	add_page_display_str(ch, "Starting locations:");
 	
 	HASH_ITER(hh, world_table, iter, next_iter) {
 		if (ROOM_SECT_FLAGGED(iter, SECTF_START_LOCATION)) {
-			sprintf(buf + strlen(buf), "%s (%d, %d)&0\r\n", get_room_name(iter, TRUE), X_COORD(iter), Y_COORD(iter));
+			add_page_display(ch, "%s (%d, %d)&0", get_room_name(iter, TRUE), X_COORD(iter), Y_COORD(iter));
 		}
 	}
 	
-	page_string(ch->desc, buf, TRUE);
+	send_page_display(ch);
 }
 
 
@@ -2727,10 +2696,10 @@ SHOW(show_storage) {
 
 
 SHOW(show_subzone) {
-	char buf[MAX_STRING_LENGTH], buf2[MAX_STRING_LENGTH + 80];
+	bool any;
+	char buf2[MAX_STRING_LENGTH];
 	room_template *iter, *next_iter, *match;
 	rmt_vnum find;
-	size_t size;
 	
 	if (!*argument || !isdigit(*argument)) {
 		msg_to_char(ch, "Usage: show subzone <id/room>\r\n");
@@ -2742,22 +2711,18 @@ SHOW(show_subzone) {
 	}
 	
 	// first try: exact match
-	size = 0;
-	*buf = '\0';
-	
+	any = FALSE;
 	HASH_ITER(hh, room_template_table, iter, next_iter) {
 		if (GET_RMT_SUBZONE(iter) == find) {
-			size += snprintf(buf + size, sizeof(buf) - size, "[%5d] %s\r\n", GET_RMT_VNUM(iter), GET_RMT_TITLE(iter));
-			if (size >= sizeof(buf)) {
-				break;
-			}
+			add_page_display(ch, "[%5d] %s", GET_RMT_VNUM(iter), GET_RMT_TITLE(iter));
+			any = TRUE;
 		}
 	}
-	
-	if (size > 0) {
+	if (any) {
 		// found exact match(es)
-		snprintf(buf2, sizeof(buf2), "Room templates with subzone %d:\r\n%s", find, buf);
-		page_string(ch->desc, buf2, TRUE);
+		snprintf(buf2, sizeof(buf2), "Room templates with subzone %d:", find);
+		prepend_page_display_str(ch, buf2);
+		send_page_display(ch);
 		return;
 	}
 	
@@ -2768,22 +2733,22 @@ SHOW(show_subzone) {
 	}
 	
 	// if we get here, we have a subzone to look for
+	any = FALSE;
 	HASH_ITER(hh, room_template_table, iter, next_iter) {
 		if (GET_RMT_SUBZONE(iter) == GET_RMT_SUBZONE(match)) {
-			size += snprintf(buf + size, sizeof(buf) - size, "[%5d] %s\r\n", GET_RMT_VNUM(iter), GET_RMT_TITLE(iter));
-			if (size >= sizeof(buf)) {
-				break;
-			}
+			add_page_display(ch, "[%5d] %s", GET_RMT_VNUM(iter), GET_RMT_TITLE(iter));
+			any = TRUE;
 		}
 	}
-	
-	if (size > 0) {
+	if (any) {
 		// found exact match(es)
-		snprintf(buf2, sizeof(buf2), "Room templates with subzone %d, matching room template %d:\r\n%s", GET_RMT_SUBZONE(match), GET_RMT_VNUM(match), buf);
-		page_string(ch->desc, buf2, TRUE);
+		snprintf(buf2, sizeof(buf2), "Room templates with subzone %d, matching room template %d:", GET_RMT_SUBZONE(match), GET_RMT_VNUM(match));
+		prepend_page_display_str(ch, buf2);
+		send_page_display(ch);
 		return;
 	}
 	
+	// otherwise
 	msg_to_char(ch, "There were no matches for that subzone id.\r\n");
 }
 
@@ -2842,16 +2807,14 @@ SHOW(show_technology) {
 
 
 SHOW(show_terrain) {
-	char buf[MAX_STRING_LENGTH * 2], line[256], part[256];
+	char part[256];
 	sector_data *sect, *next_sect;
 	int count, total, this;
 	struct map_data *map;
-	size_t size, l_size;
-	bool any, use_columns;
+	bool any;
 	
 	// fresh numbers
 	update_world_count();
-	use_columns = !PRF_FLAGGED(ch, PRF_SCREEN_READER);
 	
 	if (!*argument) {	// no-arg: show summary
 		// output
@@ -2859,15 +2822,12 @@ SHOW(show_terrain) {
 	
 		HASH_ITER(hh, sector_table, sect, next_sect) {
 			this = stats_get_sector_count(sect);
-			msg_to_char(ch, " %6d %-26.26s %s", this, GET_SECT_NAME(sect), (!((++count)%2) || !use_columns) ? "\r\n" : " ");
+			add_page_display_col(ch, 2, FALSE, " %6d %s", this, GET_SECT_NAME(sect));
 			total += this;
 		}
 	
-		if (count % 2 && use_columns) {
-			msg_to_char(ch, "\r\n");
-		}
-	
-		msg_to_char(ch, " Total: %d\r\n", total);
+		add_page_display(ch, " Total: %d", total);
+		send_page_display(ch);
 	}
 	// argument usage: show building <vnum | name>
 	else if (!(isdigit(*argument) && (sect = sector_proto(atoi(argument)))) && !(sect = get_sect_by_name(argument))) {
@@ -2875,7 +2835,7 @@ SHOW(show_terrain) {
 	}
 	else {
 		strcpy(part, GET_SECT_NAME(sect));
-		size = snprintf(buf, sizeof(buf), "[%d] %s (%d in world):\r\n", GET_SECT_VNUM(sect), CAP(part), stats_get_sector_count(sect));
+		add_page_display(ch, "[%d] %s (%d in world):", GET_SECT_VNUM(sect), CAP(part), stats_get_sector_count(sect));
 		
 		any = FALSE;
 		LL_FOREACH(land_map, map) {
@@ -2890,25 +2850,15 @@ SHOW(show_terrain) {
 			else {
 				*part = '\0';
 			}
-			l_size = snprintf(line, sizeof(line), "(%*d, %*d) %s%s\r\n", X_PRECISION, MAP_X_COORD(map->vnum), Y_PRECISION, MAP_Y_COORD(map->vnum), map->room ? get_room_name(map->room, FALSE) : GET_SECT_TITLE(sect), part);
+			add_page_display(ch, "(%*d, %*d) %s%s", X_PRECISION, MAP_X_COORD(map->vnum), Y_PRECISION, MAP_Y_COORD(map->vnum), map->room ? get_room_name(map->room, FALSE) : GET_SECT_TITLE(sect), part);
 			any = TRUE;
-			
-			if (size + l_size < sizeof(buf) + 40) {	// reserve a little extra space
-				strcat(buf, line);
-				size += l_size;
-			}
-			else {
-				// hit the end, but we reserved space
-				snprintf(buf + size, sizeof(buf) - size, "... and more\r\n");
-				break;
-			}
 		}
 		
 		if (!any) {
-			snprintf(buf + size, sizeof(buf) - size, " no matching tiles\r\n");
+			add_page_display_str(ch, " no matching tiles");
 		}
 		
-		page_string(ch->desc, buf, TRUE);
+		send_page_display(ch);
 	}
 }
 
@@ -2942,9 +2892,7 @@ SHOW(show_tomb) {
 
 
 SHOW(show_tools) {
-	char buf[MAX_STRING_LENGTH];
 	obj_data *obj, *next_obj;
-	size_t size;
 	int type;
 	
 	skip_spaces(&argument);
@@ -2958,22 +2906,17 @@ SHOW(show_tools) {
 	}
 	else {
 		// preamble
-		size = snprintf(buf, sizeof(buf), "Types of %s:\r\n", tool_flags[type]);
+		add_page_display(ch, "Types of %s:", tool_flags[type]);
 		
 		HASH_ITER(hh, object_table, obj, next_obj) {
-			if (size >= sizeof(buf)) {
-				break;	// overflow
-			}
 			if (!TOOL_FLAGGED(obj, BIT(type))) {
 				continue;	// wrong type
 			}
 			
-			size += snprintf(buf + size, sizeof(buf) - size, "[%5d] %s\r\n", GET_OBJ_VNUM(obj), GET_OBJ_SHORT_DESC(obj));
+			add_page_display(ch, "[%5d] %s", GET_OBJ_VNUM(obj), GET_OBJ_SHORT_DESC(obj));
 		}
 		
-		if (ch->desc) {
-			page_string(ch->desc, buf, TRUE);
-		}
+		send_page_display(ch);
 	}
 }
 
@@ -3036,11 +2979,11 @@ SHOW(show_unlearnable) {
 
 
 SHOW(show_unlocked_archetypes) {
-	char arg[MAX_INPUT_LENGTH], output[MAX_STRING_LENGTH], line[MAX_STRING_LENGTH];
+	char arg[MAX_INPUT_LENGTH];
 	archetype_data *arch;
 	struct unlocked_archetype *unarch, *next_unarch;
 	char_data *plr = NULL;
-	size_t size, count;
+	size_t count;
 	bool file = FALSE;
 	
 	argument = one_word(argument, arg);
@@ -3054,10 +2997,10 @@ SHOW(show_unlocked_archetypes) {
 	}
 	else {
 		if (*argument) {
-			size = snprintf(output, sizeof(output), "Unlocked archetypes matching '%s' for %s:\r\n", argument, GET_NAME(plr));
+			add_page_display(ch, "Unlocked archetypes matching '%s' for %s:", argument, GET_NAME(plr));
 		}
 		else {
-			size = snprintf(output, sizeof(output), "Unlocked archetypes for %s:\r\n", GET_NAME(plr));
+			add_page_display(ch, "Unlocked archetypes for %s:", GET_NAME(plr));
 		}
 		
 		count = 0;
@@ -3070,27 +3013,15 @@ SHOW(show_unlocked_archetypes) {
 			}
 		
 			// show it
-			snprintf(line, sizeof(line), " [%5d] %s\r\n", GET_ARCH_VNUM(arch), GET_ARCH_NAME(arch));
-			if (size + strlen(line) < sizeof(output)) {
-				strcat(output, line);
-				size += strlen(line);
-				++count;
-			}
-			else {
-				if (size + 10 < sizeof(output)) {
-					strcat(output, "OVERFLOW\r\n");
-				}
-				break;
-			}
+			add_page_display(ch, " [%5d] %s", GET_ARCH_VNUM(arch), GET_ARCH_NAME(arch));
+			++count;
 		}
 	
 		if (!count) {
-			strcat(output, "  none\r\n");	// space reserved for this for sure
+			add_page_display_str(ch, "  none");
 		}
 	
-		if (ch->desc) {
-			page_string(ch->desc, output, TRUE);
-		}
+		send_page_display(ch);
 	}
 	
 	if (plr && file) {
@@ -3100,7 +3031,7 @@ SHOW(show_unlocked_archetypes) {
 
 
 SHOW(show_uses) {
-	char buf[MAX_STRING_LENGTH * 3], part[MAX_STRING_LENGTH];
+	char part[MAX_STRING_LENGTH];
 	craft_data *craft, *next_craft;
 	quest_data *quest, *next_quest;
 	progress_data *prg, *next_prg;
@@ -3111,7 +3042,6 @@ SHOW(show_uses) {
 	bld_data *bld, *next_bld;
 	struct req_data *req, *req_list[2] = { NULL, NULL };
 	generic_data *cmp;
-	size_t size;
 	int iter;
 		
 	skip_spaces(&argument);	// optional flags
@@ -3124,13 +3054,9 @@ SHOW(show_uses) {
 	}
 	else {
 		// preamble
-		size = snprintf(buf, sizeof(buf), "Uses for [%d] (%s):\r\n", GEN_VNUM(cmp), GEN_NAME(cmp));
+		add_page_display(ch, "Uses for [%d] (%s):", GEN_VNUM(cmp), GEN_NAME(cmp));
 		
 		HASH_ITER(hh, augment_table, aug, next_aug) {
-			if (size >= sizeof(buf)) {
-				break;
-			}
-			
 			LL_FOREACH(GET_AUG_RESOURCES(aug), res) {
 				if (res->type != RES_COMPONENT) {
 					continue;
@@ -3146,15 +3072,11 @@ SHOW(show_uses) {
 				else {
 					snprintf(part, sizeof(part), " (%s)", get_generic_name_by_vnum(res->vnum));
 				}
-				size += snprintf(buf + size, sizeof(buf) - size, "AUG [%5d] %s%s\r\n", GET_AUG_VNUM(aug), GET_AUG_NAME(aug), part);
+				add_page_display(ch, "AUG [%5d] %s%s", GET_AUG_VNUM(aug), GET_AUG_NAME(aug), part);
 			}
 		}
 		
 		HASH_ITER(hh, building_table, bld, next_bld) {
-			if (size >= sizeof(buf)) {
-				break;
-			}
-			
 			LL_FOREACH(GET_BLD_REGULAR_MAINTENANCE(bld), res) {
 				if (res->type != RES_COMPONENT) {
 					continue;
@@ -3170,15 +3092,11 @@ SHOW(show_uses) {
 				else {
 					snprintf(part, sizeof(part), " (%s)", get_generic_name_by_vnum(res->vnum));
 				}
-				size += snprintf(buf + size, sizeof(buf) - size, "BLD [%5d] %s%s\r\n", GET_BLD_VNUM(bld), GET_BLD_NAME(bld), part);
+				add_page_display(ch, "BLD [%5d] %s%s", GET_BLD_VNUM(bld), GET_BLD_NAME(bld), part);
 			}
 		}
 		
 		HASH_ITER(hh, craft_table, craft, next_craft) {
-			if (size >= sizeof(buf)) {
-				break;
-			}
-			
 			LL_FOREACH(GET_CRAFT_RESOURCES(craft), res) {
 				if (res->type != RES_COMPONENT) {
 					continue;
@@ -3194,15 +3112,11 @@ SHOW(show_uses) {
 				else {
 					snprintf(part, sizeof(part), " (%s)", get_generic_name_by_vnum(res->vnum));
 				}
-				size += snprintf(buf + size, sizeof(buf) - size, "CFT [%5d] %s%s\r\n", GET_CRAFT_VNUM(craft), GET_CRAFT_NAME(craft), part);
+				add_page_display(ch, "CFT [%5d] %s%s", GET_CRAFT_VNUM(craft), GET_CRAFT_NAME(craft), part);
 			}
 		}
 		
 		HASH_ITER(hh, progress_table, prg, next_prg) {
-			if (size >= sizeof(buf)) {
-				break;
-			}
-			
 			LL_FOREACH(PRG_TASKS(prg), req) {
 				if (req->type != REQ_GET_COMPONENT && req->type != REQ_EMPIRE_PRODUCED_COMPONENT) {
 					continue;	// wrong type
@@ -3218,14 +3132,11 @@ SHOW(show_uses) {
 				else {
 					snprintf(part, sizeof(part), " (%s)", get_generic_name_by_vnum(req->vnum));
 				}
-				size += snprintf(buf + size, sizeof(buf) - size, "PRG [%5d] %s%s\r\n", PRG_VNUM(prg), PRG_NAME(prg), part);
+				add_page_display(ch, "PRG [%5d] %s%s", PRG_VNUM(prg), PRG_NAME(prg), part);
 			}
 		}
 		
 		HASH_ITER(hh, quest_table, quest, next_quest) {
-			if (size >= sizeof(buf)) {
-				break;
-			}
 			req_list[0] = QUEST_TASKS(quest);
 			req_list[1] = QUEST_PREREQS(quest);
 			
@@ -3245,15 +3156,12 @@ SHOW(show_uses) {
 					else {
 						snprintf(part, sizeof(part), " (%s)", get_generic_name_by_vnum(req->vnum));
 					}
-					size += snprintf(buf + size, sizeof(buf) - size, "QST [%5d] %s\r\n", QUEST_VNUM(quest), QUEST_NAME(quest));
+					add_page_display(ch, "QST [%5d] %s", QUEST_VNUM(quest), QUEST_NAME(quest));
 				}
 			}
 		}
 		
 		HASH_ITER(hh, social_table, soc, next_soc) {
-			if (size >= sizeof(buf)) {
-				break;
-			}
 			LL_FOREACH(SOC_REQUIREMENTS(soc), req) {
 				if (req->type != REQ_GET_COMPONENT && req->type != REQ_EMPIRE_PRODUCED_COMPONENT) {
 					continue;	// wrong type
@@ -3269,15 +3177,11 @@ SHOW(show_uses) {
 				else {
 					snprintf(part, sizeof(part), " (%s)", get_generic_name_by_vnum(req->vnum));
 				}
-				size += snprintf(buf + size, sizeof(buf) - size, "SOC [%5d] %s\r\n", SOC_VNUM(soc), SOC_NAME(soc));
+				add_page_display(ch, "SOC [%5d] %s", SOC_VNUM(soc), SOC_NAME(soc));
 			}
 		}
 		
 		HASH_ITER(hh, vehicle_table, veh, next_veh) {
-			if (size >= sizeof(buf)) {
-				break;
-			}
-			
 			LL_FOREACH(VEH_REGULAR_MAINTENANCE(veh), res) {
 				if (res->type != RES_COMPONENT) {
 					continue;
@@ -3293,13 +3197,11 @@ SHOW(show_uses) {
 				else {
 					snprintf(part, sizeof(part), " (%s)", get_generic_name_by_vnum(res->vnum));
 				}
-				size += snprintf(buf + size, sizeof(buf) - size, "VEH [%5d] %s%s\r\n", VEH_VNUM(veh), VEH_SHORT_DESC(veh), part);
+				add_page_display(ch, "VEH [%5d] %s%s", VEH_VNUM(veh), VEH_SHORT_DESC(veh), part);
 			}
 		}
 		
-		if (ch->desc) {
-			page_string(ch->desc, buf, TRUE);
-		}
+		send_page_display(ch);
 	}
 }
 
