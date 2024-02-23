@@ -2661,12 +2661,11 @@ SHOW(show_stats) {
 
 // show storage <building | vehicle> <vnum>
 SHOW(show_storage) {
-	char arg2[MAX_STRING_LENGTH], buf[MAX_STRING_LENGTH], line[MAX_STRING_LENGTH];
+	char arg2[MAX_STRING_LENGTH];
 	struct obj_storage_type *store;
 	vehicle_data *find_veh = NULL;
 	bld_data *find_bld = NULL;
 	obj_data *obj, *next_obj;
-	size_t size, lsize;
 	int count;
 	bool ok;
 	
@@ -2685,15 +2684,15 @@ SHOW(show_storage) {
 		msg_to_char(ch, "Usage: show storage <building | vehicle> <vnum>\r\n");
 	}
 	else {
-		// ok to show: init string/size
+		// ok to show:
 		if (find_bld) {
-			size = snprintf(buf, sizeof(buf), "Objects that can be stored in %s %s:\r\n", AN(GET_BLD_NAME(find_bld)), GET_BLD_NAME(find_bld));
+			add_page_display(ch, "Objects that can be stored in %s %s:", AN(GET_BLD_NAME(find_bld)), GET_BLD_NAME(find_bld));
 		}
 		else if (find_veh) {
-			size = snprintf(buf, sizeof(buf), "Objects that can be stored in %s:\r\n", VEH_SHORT_DESC(find_veh));
+			add_page_display(ch, "Objects that can be stored in %s:", VEH_SHORT_DESC(find_veh));
 		}
 		else {
-			size = snprintf(buf, sizeof(buf), "Objects that can be stored there:\r\n");
+			add_page_display_str(ch, "Objects that can be stored there:");
 		}
 		
 		count = 0;
@@ -2714,24 +2713,15 @@ SHOW(show_storage) {
 		
 			if (ok) {
 				++count;
-				lsize = snprintf(line, sizeof(line), "[%5d] %s\r\n", GET_OBJ_VNUM(obj), GET_OBJ_SHORT_DESC(obj));
-				
-				if (size + lsize < sizeof(buf)) {
-					strcat(buf, line);
-					size += lsize;
-				}
-				else {
-					snprintf(buf + size, sizeof(buf) - size, "OVERFLOW\r\n");
-					break;
-				}
+				add_page_display(ch, "[%5d] %s", GET_OBJ_VNUM(obj), GET_OBJ_SHORT_DESC(obj));
 			}
 		}
 		
 		if (count == 0) {
-			strcat(buf, " none\r\n");	// always room
+			add_page_display_str(ch, " none");
 		}
 		
-		page_string(ch->desc, buf, TRUE);
+		send_page_display(ch);
 	}
 }
 
