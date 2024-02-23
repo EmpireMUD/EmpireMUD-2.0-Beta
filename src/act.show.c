@@ -1488,6 +1488,7 @@ SHOW(show_learned) {
 	
 		// show it
 		add_page_display(ch, " [%5d] %s", GET_CRAFT_VNUM(craft), GET_CRAFT_NAME(craft));
+		++count;
 	}
 
 	if (!count) {

@@ -1058,7 +1058,7 @@ void send_page_display(char_data *ch) {
 				
 				// append and pad (only pad if it's not the last col
 				strcat(output, pd->text);
-				if (col_count <= pd->cols) {
+				if (col_count < pd->cols) {
 					ptr = output + strlen(output);
 					for (iter = pd->length; iter < (fixed_width * needs_cols) + clen; ++iter) {
 						*(ptr++) = ' ';
