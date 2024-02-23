@@ -2343,7 +2343,7 @@ ACMD(do_skills) {
 			}
 			
 			// show it
-			add_page_display(ch, skdat->string);
+			add_page_display_str(ch, skdat->string);
 		}
 		
 		free_skill_display_t(skdat_list);
