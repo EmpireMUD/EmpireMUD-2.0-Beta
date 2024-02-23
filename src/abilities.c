@@ -11205,17 +11205,21 @@ void olc_show_ability(char_data *ch) {
 	sprintbit(ABIL_GAIN_HOOKS(abil), ability_gain_hooks, lbuf, TRUE);
 	add_page_display(ch, "<%sgainhooks\t0> %s", OLC_LABEL_VAL(ABIL_GAIN_HOOKS(abil), NOBITS), lbuf);
 	
+	// Command, Targets line
+	if (IS_SET(fields, ABILEDIT_COMMAND | ABILEDIT_TARGETS)) {
+		pd = add_page_display_str(ch, "");	// prepare variable line
+	}
 	if (IS_SET(fields, ABILEDIT_COMMAND)) {
 		if (!ABIL_COMMAND(abil)) {
-			add_page_display(ch, "<%scommand\t0> (not a command)", OLC_LABEL_UNCHANGED);
+			append_page_display_line(pd, "<%scommand\t0> (not a command)", OLC_LABEL_UNCHANGED);
 		}
 		else {
-			add_page_display(ch, "<%scommand\t0> %s", OLC_LABEL_CHANGED, ABIL_COMMAND(abil));
+			append_page_display_line(pd, "<%scommand\t0> %s", OLC_LABEL_CHANGED, ABIL_COMMAND(abil));
 		}
 	}
 	if (IS_SET(fields, ABILEDIT_TARGETS)) {
 		sprintbit(ABIL_TARGETS(abil), ability_target_flags, lbuf, TRUE);
-		add_page_display(ch, "%s<%stargets\t0> %s", (IS_SET(fields, ABILEDIT_COMMAND) ? ", " : ""), OLC_LABEL_VAL(ABIL_TARGETS(abil), NOBITS), lbuf);
+		append_page_display_line(pd, "%s<%stargets\t0> %s", (IS_SET(fields, ABILEDIT_COMMAND) ? ", " : ""), OLC_LABEL_VAL(ABIL_TARGETS(abil), NOBITS), lbuf);
 	}
 	
 	// Linked Traits, Min Pos line
