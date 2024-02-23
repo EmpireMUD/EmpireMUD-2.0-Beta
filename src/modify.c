@@ -779,7 +779,7 @@ struct page_display *add_page_display_col(char_data *ch, int cols, bool strict_c
 	
 	// enforce strict cols
 	if (strict_cols && pd->length > (max = page_display_column_width(ch, cols))) {
-		pd->length = max;
+		pd->length = max + color_code_length(text);
 		text[pd->length - 1] = '\0';
 	}
 	
@@ -863,7 +863,7 @@ struct page_display *add_page_display_col_str(char_data *ch, int cols, bool stri
 	
 	// enforce strict cols
 	if (strict_cols && pd->length > (max = page_display_column_width(ch, cols))) {
-		pd->length = max;
+		pd->length = max + color_code_length(pd->text);
 		pd->text[pd->length - 1] = '\0';
 	}
 	
@@ -921,7 +921,7 @@ void append_page_display_line(struct page_display *line, const char *fmt, ...) {
 void send_page_display(char_data *ch) {
 	bool use_cols;
 	char *output, *ptr;
-	int iter, needs_cols;
+	int clen, iter, needs_cols;
 	int last_col = 0, fixed_width = 0, col_count = 0;
 	size_t size, one;
 	struct page_display *pd;
@@ -937,9 +937,11 @@ void send_page_display(char_data *ch) {
 	DL_FOREACH(ch->desc->page_lines, pd) {
 		if (pd->cols > 1 && use_cols) {
 			one = page_display_column_width(ch, pd->cols);
-			if (pd->length > one) {
+			clen = color_code_length(pd->text);
+			if (pd->length - clen > one) {
 				// ensure room for wide columns
-				one *= ceil((double)pd->length / one);
+				one *= ceil((double)(pd->length - clen) / one);
+				one += clen;
 			}
 		}
 		else {
@@ -982,7 +984,8 @@ void send_page_display(char_data *ch) {
 			
 			if (fixed_width > 0) {
 				// check how width this entry is
-				needs_cols = ceil((double) pd->length / fixed_width);
+				clen = color_code_length(pd->text);
+				needs_cols = ceil((double) (pd->length - clen) / fixed_width);
 				
 				// check fit
 				if (needs_cols + col_count > pd->cols) {
@@ -994,7 +997,7 @@ void send_page_display(char_data *ch) {
 				// append and pad
 				strcat(output, pd->text);
 				ptr = output + strlen(output);
-				for (iter = pd->length; iter < (fixed_width * needs_cols); ++iter) {
+				for (iter = pd->length; iter < (fixed_width * needs_cols) + clen; ++iter) {
 					*(ptr++) = ' ';
 				}
 				*(ptr++) = '\0';

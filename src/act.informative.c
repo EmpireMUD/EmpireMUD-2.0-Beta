@@ -907,20 +907,21 @@ void display_score_to_char(char_data *ch, char_data *to) {
 	char lbuf[MAX_STRING_LENGTH], lbuf2[MAX_STRING_LENGTH], lbuf3[MAX_STRING_LENGTH];
 	char *str;
 	struct player_skill_data *skdata, *next_skill;
-	int i, j, count, pts, cols, val, temperature;
+	int i, j, count, pts, val, temperature;
 	empire_data *emp;
 	struct time_info_data playing_time;
+	struct page_display *pd;
 
 
-	msg_to_char(to, " +----------------------------- EmpireMUD 2.0b5 -----------------------------+\r\n");
+	add_page_display(to, " +----------------------------- EmpireMUD 2.0b5 -----------------------------+");
 	
 	// row 1 col 1: name
-	msg_to_char(to, "  Name: %-18.18s", PERS(ch, ch, 1));
+	pd = add_page_display(to, "  Name: %-18.18s", PERS(ch, ch, 1));
 
 	// row 1 col 2: class
 	get_player_skill_string(ch, lbuf, TRUE);
-	msg_to_char(to, " Skill: %-17.17s", lbuf);
-	msg_to_char(to, " Level: %d (%d)\r\n", GET_COMPUTED_LEVEL(ch), GET_SKILL_LEVEL(ch));
+	append_page_display_line(pd, " Skill: %-17.17s", lbuf);
+	append_page_display_line(pd, " Level: %d (%d)", GET_COMPUTED_LEVEL(ch), GET_SKILL_LEVEL(ch));
 
 	// row 1 col 3: levels
 
@@ -933,34 +934,31 @@ void display_score_to_char(char_data *ch, char_data *to) {
 	}
 	playing_time = *real_time_passed((time(0) - ch->player.time.logon) + ch->player.time.played, 0);
 	sprintf(buf1, "%dd, %dh", playing_time.day, playing_time.hours);
-	msg_to_char(to, "  Age: %-19.19s Play Time: %-13.13s", buf, buf1);
+	pd = add_page_display(to, "  Age: %-19.19s Play Time: %-13.13s", buf, buf1);
 	
 	// row 2 col 3: rank
 	if ((emp = GET_LOYALTY(ch)) && !IS_NPC(ch)) {
-		msg_to_char(to, " Rank: %s&0\r\n", EMPIRE_RANK(emp, GET_RANK(ch)-1));
-	}
-	else {
-		msg_to_char(to, "\r\n");
+		append_page_display_line(pd, " Rank: %s&0", EMPIRE_RANK(emp, GET_RANK(ch)-1));
 	}
 	
 	if (GET_BONUS_TRAITS(ch)) {
 		prettier_sprintbit(GET_BONUS_TRAITS(ch), bonus_bit_descriptions, lbuf);
-		msg_to_char(to, "  Bonus traits: %s\r\n", lbuf);
+		add_page_display(to, "  Bonus traits: %s", lbuf);
 	}
 
-	msg_to_char(to, " +-------------------------------- Condition --------------------------------+\r\n");
+	add_page_display(to, " +-------------------------------- Condition --------------------------------+");
 	
 	// row 1 col 1: health, 6 color codes = 12 invisible characters
 	sprintf(lbuf, "&g%d&0/&g%d&0 &g%+d&0/%ds", GET_HEALTH(ch), GET_MAX_HEALTH(ch), health_gain(ch, TRUE), SECS_PER_REAL_UPDATE);
-	msg_to_char(to, "  Health: %-28.28s", lbuf);
+	pd = add_page_display(to, "  Health: %-28.28s", lbuf);
 
 	// row 1 col 2: move, 6 color codes = 12 invisible characters
 	sprintf(lbuf, "&y%d&0/&y%d&0 &y%+d&0/%ds", GET_MOVE(ch), GET_MAX_MOVE(ch), move_gain(ch, TRUE), SECS_PER_REAL_UPDATE);
-	msg_to_char(to, " Move: %-30.30s", lbuf);
+	append_page_display_line(pd, " Move: %-30.30s", lbuf);
 	
 	// row 1 col 3: mana, 6 color codes = 12 invisible characters
 	sprintf(lbuf, "&c%d&0/&c%d&0 &c%+d&0/%ds", GET_MANA(ch), GET_MAX_MANA(ch), mana_gain(ch, TRUE), SECS_PER_REAL_UPDATE);
-	msg_to_char(to, " Mana: %-30.30s\r\n", lbuf);
+	append_page_display_line(pd, " Mana: %-30.30s", lbuf);
 	
 	// row 2 col 1: conditions
 	*lbuf = '\0';
@@ -988,20 +986,17 @@ void display_score_to_char(char_data *ch, char_data *to) {
 	}
 	// gotta count the color codes to determine width
 	count = 37 + color_code_length(lbuf);
-	msg_to_char(to, "  Conditions: %-*.*s", count, count, lbuf);
+	pd = add_page_display(to, "  Conditions: %-*.*s", count, count, lbuf);
 	
 	if (IS_VAMPIRE(ch)) {
-		msg_to_char(to, " Blood: &r%d&0/&r%d&0-&r%d&0/hr\r\n", GET_BLOOD(ch), GET_MAX_BLOOD(ch), MAX(0, GET_BLOOD_UPKEEP(ch)));
-	}
-	else {
-		msg_to_char(to, "\r\n");
+		append_page_display_line(pd, " Blood: &r%d&0/&r%d&0-&r%d&0/hr", GET_BLOOD(ch), GET_MAX_BLOOD(ch), MAX(0, GET_BLOOD_UPKEEP(ch)));
 	}
 	
-	msg_to_char(to, " +------------------------------- Attributes --------------------------------+\r\n");
-	send_to_char(display_attributes(ch), to);
+	add_page_display(to, " +------------------------------- Attributes --------------------------------+");
+	add_page_display_str(to, display_attributes(ch));
 
 	// secondary attributes
-	msg_to_char(to, " +---------------------------------------------------------------------------+\r\n");
+	add_page_display(to, " +---------------------------------------------------------------------------+");
 
 	// row 1 (dex is removed from dodge to make the display easier to read)
 	val = get_dodge_modifier(ch, NULL, FALSE) - (hit_per_dex * GET_DEXTERITY(ch));
@@ -1011,13 +1006,13 @@ void display_score_to_char(char_data *ch, char_data *to) {
 	sprintf(lbuf2, "Block  [%s%d&0]", HAPPY_COLOR(val, 0), val);
 	
 	sprintf(lbuf3, "Resist  [%dp | %dm]", GET_RESIST_PHYSICAL(ch), GET_RESIST_MAGICAL(ch));
-	msg_to_char(to, "  %-28.28s %-28.28s %-24.24s\r\n", lbuf, lbuf2, lbuf3);
+	add_page_display(to, "  %-28.28s %-28.28s %-24.24s", lbuf, lbuf2, lbuf3);
 	
 	// row 2
 	sprintf(lbuf, "Physical  [%s%+d&0]", HAPPY_COLOR(GET_BONUS_PHYSICAL(ch), 0), GET_BONUS_PHYSICAL(ch));
 	sprintf(lbuf2, "Magical  [%s%+d&0]", HAPPY_COLOR(GET_BONUS_MAGICAL(ch), 0), GET_BONUS_MAGICAL(ch));
 	sprintf(lbuf3, "Healing  [%s%+d&0]", HAPPY_COLOR(GET_BONUS_HEALING(ch), 0), GET_BONUS_HEALING(ch));
-	msg_to_char(to, "  %-28.28s %-28.28s %-28.28s\r\n", lbuf, lbuf2, lbuf3);
+	add_page_display(to, "  %-28.28s %-28.28s %-28.28s", lbuf, lbuf2, lbuf3);
 	
 	// row 3 (dex is removed from to-hit to make the display easier to read)
 	val = get_to_hit(ch, NULL, FALSE, FALSE) - (hit_per_dex * GET_DEXTERITY(ch));
@@ -1025,9 +1020,9 @@ void display_score_to_char(char_data *ch, char_data *to) {
 	sprintf(lbuf2, "Speed  [%.2f]", get_combat_speed(ch, WEAR_WIELD));
 	sprintf(lbuf3, "Crafting  [%s%d&0]", HAPPY_COLOR(get_crafting_level(ch), GET_SKILL_LEVEL(ch)), get_crafting_level(ch));
 	// note: the "%-24.24s" for speed is lower because it contains no color codes
-	msg_to_char(to, "  %-28.28s %-24.24s %-28.28s\r\n", lbuf, lbuf2, lbuf3);
+	add_page_display(to, "  %-28.28s %-24.24s %-28.28s", lbuf, lbuf2, lbuf3);
 		
-	msg_to_char(to, " +--------------------------------- Skills ----------------------------------+\r\n ");
+	add_page_display(to, " +--------------------------------- Skills ----------------------------------+ ");
 
 	count = 0;
 	HASH_ITER(hh, GET_SKILL_HASH(ch), skdata, next_skill) {
@@ -1038,35 +1033,22 @@ void display_score_to_char(char_data *ch, char_data *to) {
 				sprintf(lbuf + strlen(lbuf), " &g(%d)", pts);
 			}
 			
-			cols = 25 + color_code_length(lbuf);
-			msg_to_char(to, "%-*.*s&0", cols, cols, lbuf);
-			
-			if (++count == 3) {
-				msg_to_char(to, "&0\r\n ");
-				count = 0;
-			}
+			add_page_display_col(to, 3, TRUE, "%s&0", lbuf);
 		}
-	}
-
-	// trailing \r\n on skills
-	if (count > 0) {
-		msg_to_char(to, "&0\r\n ");
 	}
 
 	/* Gods and Immortals: */
 	if (IS_GOD(ch) || IS_IMMORTAL(ch)) {
-		strcpy(buf, " ");
-		for (i = 0, j = 0; i < NUM_MATERIALS; i++)
-			if (GET_RESOURCE(ch, i))
-				sprintf(buf + strlen(buf), " %-14.14s %-6d %s", materials[i].name, GET_RESOURCE(ch, i), !(++j % 3) ? "\r\n " : "  ");
-		if (j % 3)
-			strcat(buf, "\r\n ");
-		if (*buf)
-			msg_to_char(to, "+------------------------------- Resources ---------------------------------+\r\n%s", buf);
+		add_page_display(to, "+------------------------------- Resources ---------------------------------+");
+		for (i = 0, j = 0; i < NUM_MATERIALS; i++) {
+			if (GET_RESOURCE(ch, i)) {
+				add_page_display_col(to, 3, TRUE, " %-14.14s %-6d", materials[i].name, GET_RESOURCE(ch, i));
+			}
+		}	
 	}
 
 	// everything leaves a starting space so this next line does not need it
-	msg_to_char(to, "+---------------------------------------------------------------------------+\r\n");
+	add_page_display(to, "+---------------------------------------------------------------------------+");
 	
 	// affects last
 	if (ch == to) {
@@ -1077,6 +1059,8 @@ void display_score_to_char(char_data *ch, char_data *to) {
 		// show summary effects
 		show_character_affects(ch, to);
 	}
+	
+	send_page_display(to);
 }
 
 
@@ -1712,7 +1696,7 @@ void show_character_affects(char_data *ch, char_data *to) {
 			prettier_sprintbit(aff->bitvector, affected_bits, buf2);
 			strcat(buf, buf2);
 		}
-		send_to_char(strcat(buf, "\r\n"), to);
+		add_page_display_str(to, buf);
 	}
 	
 	// show DoT affects too
@@ -1720,8 +1704,10 @@ void show_character_affects(char_data *ch, char_data *to) {
 		strcpy(lbuf, colon_time(dot->time_remaining, FALSE, NULL));
 		
 		// main body
-		msg_to_char(to, "   \tr%s\t0 (%s) %d %s damage (%d/%d)\r\n", get_generic_name_by_vnum(dot->type), lbuf, dot->damage * dot->stack, damage_types[dot->damage_type], dot->stack, dot->max_stack);
+		add_page_display(to, "   \tr%s\t0 (%s) %d %s damage (%d/%d)", get_generic_name_by_vnum(dot->type), lbuf, dot->damage * dot->stack, damage_types[dot->damage_type], dot->stack, dot->max_stack);
 	}
+	
+	send_page_display(to);
 }
 
 
@@ -2659,7 +2645,7 @@ ACMD(do_affects) {
 	// if a subcmd was passed, we remove some of the info
 	limited = (subcmd != 0);
 
-	msg_to_char(ch, "  Affects:\r\n");
+	add_page_display(ch, "  Affects:");
 
 	// Conditions: not shown on limited view because 'score' shows them separately
 	if (!limited) {
@@ -2686,27 +2672,28 @@ ACMD(do_affects) {
 					sprintf(buf1 + i, " and%s", buf2);
 					break;
 				}
-			msg_to_char(ch, "%s.\r\n", buf1);
+			add_page_display(ch, "%s.", buf1);
 		}
 	}
 	
 	// mount
 	if (IS_RIDING(ch)) {
-		msg_to_char(ch, "   You are riding %s.\r\n", get_mob_name_by_proto(GET_MOUNT_VNUM(ch), TRUE));
+		add_page_display(ch, "   You are riding %s.", get_mob_name_by_proto(GET_MOUNT_VNUM(ch), TRUE));
 	}
 	else if (has_player_tech(ch, PTECH_RIDING) && GET_MOUNT_VNUM(ch) != NOTHING && mob_proto(GET_MOUNT_VNUM(ch))) {
-		msg_to_char(ch, "   You have %s. Type 'mount' to ride it.\r\n", get_mob_name_by_proto(GET_MOUNT_VNUM(ch), TRUE));
+		add_page_display(ch, "   You have %s. Type 'mount' to ride it.", get_mob_name_by_proto(GET_MOUNT_VNUM(ch), TRUE));
 	}
 
 	/* Morph */
 	if (IS_MORPHED(ch)) {
-		msg_to_char(ch, "   You are in the form of %s!\r\n", get_morph_desc(ch, FALSE));
+		add_page_display(ch, "   You are in the form of %s!", get_morph_desc(ch, FALSE));
 	}
 	else if (IS_DISGUISED(ch)) {
-		msg_to_char(ch, "   You are disguised as %s!\r\n", PERS(ch, ch, 0));
+		add_page_display(ch, "   You are disguised as %s!", PERS(ch, ch, 0));
 	}
 
 	show_character_affects(ch, ch);
+	send_page_display(ch);
 }
 
 
