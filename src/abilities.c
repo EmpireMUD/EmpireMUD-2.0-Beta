@@ -8753,8 +8753,7 @@ char *list_one_ability(ability_data *abil, bool detail) {
 */
 void olc_search_ability(char_data *ch, any_vnum vnum) {
 	bool any;
-	char buf[MAX_STRING_LENGTH];
-	int size, found;
+	int found;
 	ability_data *abil = find_ability_by_vnum(vnum);
 	ability_data *abiter, *next_abiter;
 	augment_data *aug, *next_aug;
@@ -8783,7 +8782,7 @@ void olc_search_ability(char_data *ch, any_vnum vnum) {
 	}
 	
 	found = 0;
-	size = snprintf(buf, sizeof(buf), "Occurrences of ability %d (%s):\r\n", vnum, ABIL_NAME(abil));
+	add_page_display(ch, "Occurrences of ability %d (%s):", vnum, ABIL_NAME(abil));
 	
 	// abilities
 	HASH_ITER(hh, ability_table, abiter, next_abiter) {
@@ -8796,7 +8795,7 @@ void olc_search_ability(char_data *ch, any_vnum vnum) {
 		
 		if (any) {
 			++found;
-			size += snprintf(buf + size, sizeof(buf) - size, "ABIL [%5d] %s\r\n", ABIL_VNUM(abiter), ABIL_NAME(abiter));
+			add_page_display(ch, "ABIL [%5d] %s", ABIL_VNUM(abiter), ABIL_NAME(abiter));
 		}
 	}
 	
@@ -8804,7 +8803,7 @@ void olc_search_ability(char_data *ch, any_vnum vnum) {
 	HASH_ITER(hh, augment_table, aug, next_aug) {
 		if (GET_AUG_ABILITY(aug) == vnum) {
 			++found;
-			size += snprintf(buf + size, sizeof(buf) - size, "AUG [%5d] %s\r\n", GET_AUG_VNUM(aug), GET_AUG_NAME(aug));
+			add_page_display(ch, "AUG [%5d] %s", GET_AUG_VNUM(aug), GET_AUG_NAME(aug));
 		}
 	}
 	
@@ -8813,7 +8812,7 @@ void olc_search_ability(char_data *ch, any_vnum vnum) {
 		any = find_interaction_restriction_in_list(GET_BLD_INTERACTIONS(bld), INTERACT_RESTRICT_ABILITY, vnum);
 		if (any) {
 			++found;
-			size += snprintf(buf + size, sizeof(buf) - size, "BLD [%5d] %s\r\n", GET_BLD_VNUM(bld), GET_BLD_NAME(bld));
+			add_page_display(ch, "BLD [%5d] %s", GET_BLD_VNUM(bld), GET_BLD_NAME(bld));
 		}
 	}
 	
@@ -8822,7 +8821,7 @@ void olc_search_ability(char_data *ch, any_vnum vnum) {
 		LL_FOREACH(CLASS_ABILITIES(cls), clab) {
 			if (clab->vnum == vnum) {
 				++found;
-				size += snprintf(buf + size, sizeof(buf) - size, "CLS [%5d] %s\r\n", CLASS_VNUM(cls), CLASS_NAME(cls));
+				add_page_display(ch, "CLS [%5d] %s", CLASS_VNUM(cls), CLASS_NAME(cls));
 				break;	// only need 1
 			}
 		}
@@ -8832,7 +8831,7 @@ void olc_search_ability(char_data *ch, any_vnum vnum) {
 	HASH_ITER(hh, craft_table, craft, next_craft) {
 		if (GET_CRAFT_ABILITY(craft) == vnum) {
 			++found;
-			size += snprintf(buf + size, sizeof(buf) - size, "CFT [%5d] %s\r\n", GET_CRAFT_VNUM(craft), GET_CRAFT_NAME(craft));
+			add_page_display(ch, "CFT [%5d] %s", GET_CRAFT_VNUM(craft), GET_CRAFT_NAME(craft));
 		}
 	}
 	
@@ -8841,7 +8840,7 @@ void olc_search_ability(char_data *ch, any_vnum vnum) {
 		any = find_interaction_restriction_in_list(GET_CROP_INTERACTIONS(crop), INTERACT_RESTRICT_ABILITY, vnum);
 		if (any) {
 			++found;
-			size += snprintf(buf + size, sizeof(buf) - size, "CRP [%5d] %s\r\n", GET_CROP_VNUM(crop), GET_CROP_NAME(crop));
+			add_page_display(ch, "CRP [%5d] %s", GET_CROP_VNUM(crop), GET_CROP_NAME(crop));
 		}
 	}
 	
@@ -8852,7 +8851,7 @@ void olc_search_ability(char_data *ch, any_vnum vnum) {
 		
 		if (any) {
 			++found;
-			size += snprintf(buf + size, sizeof(buf) - size, "GLB [%5d] %s\r\n", GET_GLOBAL_VNUM(glb), GET_GLOBAL_NAME(glb));
+			add_page_display(ch, "GLB [%5d] %s", GET_GLOBAL_VNUM(glb), GET_GLOBAL_NAME(glb));
 		}
 	}
 	
@@ -8861,7 +8860,7 @@ void olc_search_ability(char_data *ch, any_vnum vnum) {
 		any = find_interaction_restriction_in_list(MOB_INTERACTIONS(mob), INTERACT_RESTRICT_ABILITY, vnum);
 		if (any) {
 			++found;
-			size += snprintf(buf + size, sizeof(buf) - size, "MOB [%5d] %s\r\n", GET_MOB_VNUM(mob), GET_SHORT_DESC(mob));
+			add_page_display(ch, "MOB [%5d] %s", GET_MOB_VNUM(mob), GET_SHORT_DESC(mob));
 		}
 	}
 	
@@ -8869,7 +8868,7 @@ void olc_search_ability(char_data *ch, any_vnum vnum) {
 	HASH_ITER(hh, morph_table, morph, next_morph) {
 		if (MORPH_ABILITY(morph) == vnum) {
 			++found;
-			size += snprintf(buf + size, sizeof(buf) - size, "MPH [%5d] %s\r\n", MORPH_VNUM(morph), MORPH_SHORT_DESC(morph));
+			add_page_display(ch, "MPH [%5d] %s", MORPH_VNUM(morph), MORPH_SHORT_DESC(morph));
 		}
 	}
 	
@@ -8878,36 +8877,30 @@ void olc_search_ability(char_data *ch, any_vnum vnum) {
 		any = find_interaction_restriction_in_list(GET_OBJ_INTERACTIONS(obj), INTERACT_RESTRICT_ABILITY, vnum);
 		if (any) {
 			++found;
-			size += snprintf(buf + size, sizeof(buf) - size, "OBJ [%5d] %s\r\n", GET_OBJ_VNUM(obj), GET_OBJ_SHORT_DESC(obj));
+			add_page_display(ch, "OBJ [%5d] %s", GET_OBJ_VNUM(obj), GET_OBJ_SHORT_DESC(obj));
 		}
 	}
 	
 	// progress
 	HASH_ITER(hh, progress_table, prg, next_prg) {
-		if (size >= sizeof(buf)) {
-			break;
-		}
 		// REQ_x: requirement search
 		any = find_requirement_in_list(PRG_TASKS(prg), REQ_HAVE_ABILITY, vnum);
 		
 		if (any) {
 			++found;
-			size += snprintf(buf + size, sizeof(buf) - size, "PRG [%5d] %s\r\n", PRG_VNUM(prg), PRG_NAME(prg));
+			add_page_display(ch, "PRG [%5d] %s", PRG_VNUM(prg), PRG_NAME(prg));
 		}
 	}
 	
 	// quests
 	HASH_ITER(hh, quest_table, quest, next_quest) {
-		if (size >= sizeof(buf)) {
-			break;
-		}
 		// REQ_x: requirement search
 		any = find_requirement_in_list(QUEST_TASKS(quest), REQ_HAVE_ABILITY, vnum);
 		any |= find_requirement_in_list(QUEST_PREREQS(quest), REQ_HAVE_ABILITY, vnum);
 		
 		if (any) {
 			++found;
-			size += snprintf(buf + size, sizeof(buf) - size, "QST [%5d] %s\r\n", QUEST_VNUM(quest), QUEST_NAME(quest));
+			add_page_display(ch, "QST [%5d] %s", QUEST_VNUM(quest), QUEST_NAME(quest));
 		}
 	}
 	
@@ -8916,7 +8909,7 @@ void olc_search_ability(char_data *ch, any_vnum vnum) {
 		any = find_interaction_restriction_in_list(GET_RMT_INTERACTIONS(rmt), INTERACT_RESTRICT_ABILITY, vnum);
 		if (any) {
 			++found;
-			size += snprintf(buf + size, sizeof(buf) - size, "RMT [%5d] %s\r\n", GET_RMT_VNUM(rmt), GET_RMT_TITLE(rmt));
+			add_page_display(ch, "RMT [%5d] %s", GET_RMT_VNUM(rmt), GET_RMT_TITLE(rmt));
 		}
 	}
 	
@@ -8925,7 +8918,7 @@ void olc_search_ability(char_data *ch, any_vnum vnum) {
 		any = find_interaction_restriction_in_list(GET_SECT_INTERACTIONS(sect), INTERACT_RESTRICT_ABILITY, vnum);
 		if (any) {
 			++found;
-			size += snprintf(buf + size, sizeof(buf) - size, "SCT [%5d] %s\r\n", GET_SECT_VNUM(sect), GET_SECT_NAME(sect));
+			add_page_display(ch, "SCT [%5d] %s", GET_SECT_VNUM(sect), GET_SECT_NAME(sect));
 		}
 	}
 	
@@ -8948,21 +8941,18 @@ void olc_search_ability(char_data *ch, any_vnum vnum) {
 		
 		if (any) {
 			++found;
-			size += snprintf(buf + size, sizeof(buf) - size, "SKL [%5d] %s\r\n", CLASS_VNUM(skill), CLASS_NAME(skill));
+			add_page_display(ch, "SKL [%5d] %s", CLASS_VNUM(skill), CLASS_NAME(skill));
 		}
 	}
 	
 	// socials
 	HASH_ITER(hh, social_table, soc, next_soc) {
-		if (size >= sizeof(buf)) {
-			break;
-		}
 		// REQ_x: requirement search
 		any = find_requirement_in_list(SOC_REQUIREMENTS(soc), REQ_HAVE_ABILITY, vnum);
 		
 		if (any) {
 			++found;
-			size += snprintf(buf + size, sizeof(buf) - size, "SOC [%5d] %s\r\n", SOC_VNUM(soc), SOC_NAME(soc));
+			add_page_display(ch, "SOC [%5d] %s", SOC_VNUM(soc), SOC_NAME(soc));
 		}
 	}
 	
@@ -8971,18 +8961,18 @@ void olc_search_ability(char_data *ch, any_vnum vnum) {
 		any = find_interaction_restriction_in_list(VEH_INTERACTIONS(veh), INTERACT_RESTRICT_ABILITY, vnum);
 		if (any) {
 			++found;
-			size += snprintf(buf + size, sizeof(buf) - size, "VEH [%5d] %s\r\n", VEH_VNUM(veh), VEH_SHORT_DESC(veh));
+			add_page_display(ch, "VEH [%5d] %s", VEH_VNUM(veh), VEH_SHORT_DESC(veh));
 		}
 	}
 	
 	if (found > 0) {
-		size += snprintf(buf + size, sizeof(buf) - size, "%d location%s shown\r\n", found, PLURAL(found));
+		add_page_display(ch, "%d location%s shown", found, PLURAL(found));
 	}
 	else {
-		size += snprintf(buf + size, sizeof(buf) - size, " none\r\n");
+		add_page_display_str(ch, " none");
 	}
 	
-	page_string(ch->desc, buf, TRUE);
+	send_page_display(ch);
 }
 
 
