@@ -10557,12 +10557,13 @@ void olc_fullsearch_abil(char_data *ch, char *argument) {
 		
 		// show it
 		add_page_display(ch, "[%5d] %s", ABIL_VNUM(abil), ABIL_NAME(abil));
+		++count;
 	}
 	
 	if (count > 0) {
 		add_page_display(ch, "(%d abilities)", count);
 	}
-	else if (count == 0) {
+	else {
 		add_page_display_str(ch, " none");
 	}
 	

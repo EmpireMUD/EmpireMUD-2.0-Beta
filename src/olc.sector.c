@@ -567,12 +567,13 @@ void olc_fullsearch_sector(char_data *ch, char *argument) {
 		
 		// show it
 		add_page_display(ch, "[%5d] %s", GET_SECT_VNUM(sect), GET_SECT_NAME(sect));
+		++count;
 	}
 	
 	if (count > 0) {
 		add_page_display(ch, "(%d sector%s)", count, PLURAL(count));
 	}
-	else if (count == 0) {
+	else {
 		add_page_display_str(ch, " none");
 	}
 	

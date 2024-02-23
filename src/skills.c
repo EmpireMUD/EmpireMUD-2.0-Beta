@@ -3112,12 +3112,13 @@ void olc_fullsearch_skill(char_data *ch, char *argument) {
 		
 		// show it
 		add_page_display(ch, "[%5d] %s", SKILL_VNUM(sk), SKILL_NAME(sk));
+		++count;
 	}
 	
 	if (count > 0) {
 		add_page_display(ch, "(%d skills)", count);
 	}
-	else if (count == 0) {
+	else {
 		add_page_display_str(ch, " none");
 	}
 	

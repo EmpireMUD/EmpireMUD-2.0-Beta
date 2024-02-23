@@ -616,12 +616,13 @@ void olc_fullsearch_trigger(char_data *ch, char *argument) {
 		
 		// show it
 		add_page_display(ch, "[%5d] %s", GET_TRIG_VNUM(trig), GET_TRIG_NAME(trig));
+		++count;
 	}
 	
 	if (count > 0) {
 		add_page_display(ch, "(%d triggers)", count);
 	}
-	else if (count == 0) {
+	else {
 		add_page_display_str(ch, " none");
 	}
 	

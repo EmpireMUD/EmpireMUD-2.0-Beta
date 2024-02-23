@@ -788,12 +788,13 @@ void olc_fullsearch_mob(char_data *ch, char *argument) {
 		
 		// show it
 		add_page_display(ch, "[%5d] %s", GET_MOB_VNUM(mob), GET_SHORT_DESC(mob));
+		++count;
 	}
 	
 	if (count > 0) {
 		add_page_display(ch, "(%d mobiles)", count);
 	}
-	else if (count == 0) {
+	else {
 		add_page_display_str(ch, " none");
 	}
 	

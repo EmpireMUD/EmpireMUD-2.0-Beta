@@ -406,12 +406,13 @@ void olc_fullsearch_crop(char_data *ch, char *argument) {
 		
 		// show it
 		add_page_display(ch, "[%5d] %s", GET_CROP_VNUM(crop), GET_CROP_NAME(crop));
+		++count;
 	}
 	
 	if (count > 0) {
 		add_page_display(ch, "(%d crop%s)", count, PLURAL(count));
 	}
-	else if (count == 0) {
+	else {
 		add_page_display_str(ch, " none");
 	}
 	

@@ -1292,12 +1292,13 @@ void olc_fullsearch_obj(char_data *ch, char *argument) {
 		
 		// show it
 		add_page_display(ch, "[%5d] %s", GET_OBJ_VNUM(obj), GET_OBJ_SHORT_DESC(obj));
+		++count;
 	}
 	
 	if (count > 0) {
 		add_page_display(ch, "(%d objects)", count);
 	}
-	else if (count == 0) {
+	else {
 		add_page_display_str(ch, " none");
 	}
 	

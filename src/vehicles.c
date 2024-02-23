@@ -4128,12 +4128,13 @@ void olc_fullsearch_vehicle(char_data *ch, char *argument) {
 		
 		// show it
 		add_page_display(ch, "[%5d] %s", VEH_VNUM(veh), VEH_SHORT_DESC(veh));
+		++count;
 	}
 	
 	if (count > 0) {
 		add_page_display(ch, "(%d vehicles)", count);
 	}
-	else if (count == 0) {
+	else {
 		add_page_display_str(ch, " none");
 	}
 	

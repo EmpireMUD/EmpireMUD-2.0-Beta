@@ -4088,12 +4088,13 @@ void olc_fullsearch_quest(char_data *ch, char *argument) {
 		
 		// show it
 		add_page_display(ch, "[%5d] %s", QUEST_VNUM(quest), QUEST_NAME(quest));
+		++count;
 	}
 	
 	if (count > 0) {
 		add_page_display(ch, "(%d quests)", count);
 	}
-	else if (count == 0) {
+	else {
 		add_page_display_str(ch, " none");
 	}
 	

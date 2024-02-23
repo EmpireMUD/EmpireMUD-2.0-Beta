@@ -587,12 +587,13 @@ void olc_fullsearch_generic(char_data *ch, char *argument) {
 		
 		// show it
 		add_page_display(ch, "[%5d] %s (%s)", GEN_VNUM(gen), GEN_NAME(gen), generic_types[GEN_TYPE(gen)]);
+		++count;
 	}
 	
 	if (count > 0) {
 		add_page_display(ch, "(%d generics)", count);
 	}
-	else if (count == 0) {
+	else {
 		add_page_display_str(ch, " none");
 	}
 	

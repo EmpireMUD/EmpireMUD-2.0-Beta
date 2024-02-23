@@ -872,12 +872,13 @@ void olc_fullsearch_building(char_data *ch, char *argument) {
 		
 		// show it
 		add_page_display(ch, "[%5d] %s", GET_BLD_VNUM(bld), GET_BLD_NAME(bld));
+		++count;
 	}
 	
 	if (count > 0) {
 		add_page_display(ch, "(%d buildings)", count);
 	}
-	else if (count == 0) {
+	else {
 		add_page_display_str(ch, " none");
 	}
 	
