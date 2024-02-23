@@ -907,7 +907,7 @@ void display_score_to_char(char_data *ch, char_data *to) {
 	char lbuf[MAX_STRING_LENGTH], lbuf2[MAX_STRING_LENGTH], lbuf3[MAX_STRING_LENGTH];
 	char *str;
 	struct player_skill_data *skdata, *next_skill;
-	int i, count, pts, val, temperature;
+	int i, j, cols, count, pts, val, temperature;
 	empire_data *emp;
 	struct time_info_data playing_time;
 	struct page_display *pd;
@@ -1022,7 +1022,7 @@ void display_score_to_char(char_data *ch, char_data *to) {
 	// note: the "%-24.24s" for speed is lower because it contains no color codes
 	add_page_display(to, "  %-28.28s %-24.24s %-28.28s", lbuf, lbuf2, lbuf3);
 		
-	add_page_display(to, " +--------------------------------- Skills ----------------------------------+ ");
+	add_page_display(to, " +--------------------------------- Skills ----------------------------------+\r\n");
 
 	count = 0;
 	HASH_ITER(hh, GET_SKILL_HASH(ch), skdata, next_skill) {
@@ -1033,24 +1033,36 @@ void display_score_to_char(char_data *ch, char_data *to) {
 				sprintf(lbuf + strlen(lbuf), " &g(%d)", pts);
 			}
 			
-			add_page_display_col(to, 3, TRUE, "%s&0", lbuf);
+			cols = 25 + color_code_length(lbuf);
+			if (!count) {
+				pd = add_page_display(to, "%-*.*s&0", cols, cols, lbuf);
+			}
+			else {
+				append_page_display_line(pd, "%-*.*s&0", cols, cols, lbuf);
+			}
+			
+			if (++count == 3) {
+				count = 0;
+			}
 		}
 	}
 
 	/* Gods and Immortals: */
 	if (IS_GOD(ch) || IS_IMMORTAL(ch)) {
-		add_page_display(to, "+------------------------------- Resources ---------------------------------+");
-		for (i = 0; i < NUM_MATERIALS; i++) {
+		add_page_display(to, " +------------------------------- Resources ---------------------------------+");
+		strcpy(buf, " ");
+		for (i = 0, j = 0; i < NUM_MATERIALS; i++) {
 			if (GET_RESOURCE(ch, i)) {
-				add_page_display_col(to, 3, TRUE, " %-14.14s %-6d", materials[i].name, GET_RESOURCE(ch, i));
+				sprintf(buf + strlen(buf), " %-14.14s %-6d %s", materials[i].name, GET_RESOURCE(ch, i), !(++j % 3) ? "\r\n " : "  ");
 			}
-		}	
+		}
+		add_page_display_str(to, buf);
 	}
 
 	// everything leaves a starting space so this next line does not need it
 	add_page_display(to, "+---------------------------------------------------------------------------+");
 	
-	// affects last
+	// affects last -- put nothing after these as they may also flush send_page_display()
 	if (ch == to) {
 		// show full effects, which is only formatted for the character (subcmd=1 to indicate it's being called from another function)
 		do_affects(to, "", 0, 1);
