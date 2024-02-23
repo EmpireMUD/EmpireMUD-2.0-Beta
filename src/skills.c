@@ -3038,13 +3038,12 @@ char *list_one_skill(skill_data *skill, bool detail) {
 */
 void olc_fullsearch_skill(char_data *ch, char *argument) {
 	bool any;
-	char buf[MAX_STRING_LENGTH * 2], line[MAX_STRING_LENGTH], type_arg[MAX_INPUT_LENGTH], val_arg[MAX_INPUT_LENGTH], find_keywords[MAX_INPUT_LENGTH];
+	char type_arg[MAX_INPUT_LENGTH], val_arg[MAX_INPUT_LENGTH], find_keywords[MAX_INPUT_LENGTH];
 	int count;
 	bitvector_t only_flags = NOBITS, not_flagged = NOBITS;
 	int vmin = NOTHING, vmax = NOTHING, only_level = NOTHING, level_over = NOTHING, level_under = NOTHING;
 	int only_mindrop = NOTHING, mindrop_over = NOTHING, mindrop_under = NOTHING;
 	skill_data *sk, *next_sk;
-	size_t size;
 	
 	if (!*argument) {
 		msg_to_char(ch, "See HELP QEDIT FULLSEARCH for syntax.\r\n");
@@ -3081,7 +3080,7 @@ void olc_fullsearch_skill(char_data *ch, char *argument) {
 		skip_spaces(&argument);
 	}
 	
-	size = snprintf(buf, sizeof(buf), "Skill fullsearch: %s\r\n", show_color_codes(find_keywords));
+	add_page_display(ch, "Skill fullsearch: %s", show_color_codes(find_keywords));
 	count = 0;
 	
 	// okay now look up skills
@@ -3134,27 +3133,17 @@ void olc_fullsearch_skill(char_data *ch, char *argument) {
 		}
 		
 		// show it
-		snprintf(line, sizeof(line), "[%5d] %s\r\n", SKILL_VNUM(sk), SKILL_NAME(sk));
-		if (strlen(line) + size < sizeof(buf)) {
-			size += snprintf(buf + size, sizeof(buf) - size, "%s", line);
-			++count;
-		}
-		else {
-			size += snprintf(buf + size, sizeof(buf) - size, "OVERFLOW\r\n");
-			break;
-		}
+		add_page_display(ch, "[%5d] %s", SKILL_VNUM(sk), SKILL_NAME(sk));
 	}
 	
-	if (count > 0 && (size + 18) < sizeof(buf)) {
-		size += snprintf(buf + size, sizeof(buf) - size, "(%d skills)\r\n", count);
+	if (count > 0) {
+		add_page_display(ch, "(%d skills)", count);
 	}
 	else if (count == 0) {
-		size += snprintf(buf + size, sizeof(buf) - size, " none\r\n");
+		add_page_display_str(ch, " none");
 	}
 	
-	if (ch->desc) {
-		page_string(ch->desc, buf, TRUE);
-	}
+	send_page_display(ch);
 }
 
 

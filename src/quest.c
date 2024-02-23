@@ -3923,7 +3923,7 @@ char *list_one_quest(quest_data *quest, bool detail) {
 */
 void olc_fullsearch_quest(char_data *ch, char *argument) {
 	bool any;
-	char buf[MAX_STRING_LENGTH * 2], line[MAX_STRING_LENGTH], type_arg[MAX_INPUT_LENGTH], val_arg[MAX_INPUT_LENGTH], find_keywords[MAX_INPUT_LENGTH];
+	char type_arg[MAX_INPUT_LENGTH], val_arg[MAX_INPUT_LENGTH], find_keywords[MAX_INPUT_LENGTH];
 	int count;
 	struct quest_reward *qreward;
 	struct req_data *req;
@@ -3935,7 +3935,6 @@ void olc_fullsearch_quest(char_data *ch, char *argument) {
 	int only_reward = NOTHING, only_prereq = NOTHING, only_task = NOTHING;
 	
 	quest_data *quest, *next_quest;
-	size_t size;
 	
 	if (!*argument) {
 		msg_to_char(ch, "See HELP QEDIT FULLSEARCH for syntax.\r\n");
@@ -3980,7 +3979,7 @@ void olc_fullsearch_quest(char_data *ch, char *argument) {
 		skip_spaces(&argument);
 	}
 	
-	size = snprintf(buf, sizeof(buf), "Quest fullsearch: %s\r\n", show_color_codes(find_keywords));
+	add_page_display(ch, "Quest fullsearch: %s", show_color_codes(find_keywords));
 	count = 0;
 	
 	// okay now look up quests
@@ -4088,27 +4087,17 @@ void olc_fullsearch_quest(char_data *ch, char *argument) {
 		}
 		
 		// show it
-		snprintf(line, sizeof(line), "[%5d] %s\r\n", QUEST_VNUM(quest), QUEST_NAME(quest));
-		if (strlen(line) + size < sizeof(buf)) {
-			size += snprintf(buf + size, sizeof(buf) - size, "%s", line);
-			++count;
-		}
-		else {
-			size += snprintf(buf + size, sizeof(buf) - size, "OVERFLOW\r\n");
-			break;
-		}
+		add_page_display(ch, "[%5d] %s", QUEST_VNUM(quest), QUEST_NAME(quest));
 	}
 	
-	if (count > 0 && (size + 16) < sizeof(buf)) {
-		size += snprintf(buf + size, sizeof(buf) - size, "(%d quests)\r\n", count);
+	if (count > 0) {
+		add_page_display(ch, "(%d quests)", count);
 	}
 	else if (count == 0) {
-		size += snprintf(buf + size, sizeof(buf) - size, " none\r\n");
+		add_page_display_str(ch, " none");
 	}
 	
-	if (ch->desc) {
-		page_string(ch->desc, buf, TRUE);
-	}
+	send_page_display(ch);
 }
 
 

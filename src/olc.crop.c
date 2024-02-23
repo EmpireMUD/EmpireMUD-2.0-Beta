@@ -281,14 +281,13 @@ void olc_delete_crop(char_data *ch, crop_vnum vnum) {
 * @param char *argument The argument they entered.
 */
 void olc_fullsearch_crop(char_data *ch, char *argument) {
-	char buf[MAX_STRING_LENGTH * 2], line[MAX_STRING_LENGTH], type_arg[MAX_INPUT_LENGTH], val_arg[MAX_INPUT_LENGTH], find_keywords[MAX_INPUT_LENGTH], extra_search[MAX_INPUT_LENGTH];
+	char type_arg[MAX_INPUT_LENGTH], val_arg[MAX_INPUT_LENGTH], find_keywords[MAX_INPUT_LENGTH], extra_search[MAX_INPUT_LENGTH];
 	bitvector_t  find_interacts = NOBITS, found_interacts, find_custom = NOBITS, found_custom;
 	bitvector_t not_flagged = NOBITS, only_flags = NOBITS, only_climate = NOBITS;
 	int count, only_mapout = NOTHING, only_x = NOTHING, only_y = NOTHING, vmin = NOTHING, vmax = NOTHING;
 	struct interaction_item *inter;
 	crop_data *crop, *next_crop;
 	struct icon_data *icon;
-	size_t size;
 	bool match;
 	struct custom_message *cust;
 	
@@ -329,7 +328,7 @@ void olc_fullsearch_crop(char_data *ch, char *argument) {
 		skip_spaces(&argument);
 	}
 	
-	size = snprintf(buf, sizeof(buf), "Crop fullsearch: %s\r\n", show_color_codes(find_keywords));
+	add_page_display(ch, "Crop fullsearch: %s", show_color_codes(find_keywords));
 	count = 0;
 	
 	// okay now look up crpos
@@ -406,27 +405,17 @@ void olc_fullsearch_crop(char_data *ch, char *argument) {
 		}
 		
 		// show it
-		snprintf(line, sizeof(line), "[%5d] %s\r\n", GET_CROP_VNUM(crop), GET_CROP_NAME(crop));
-		if (strlen(line) + size < sizeof(buf)) {
-			size += snprintf(buf + size, sizeof(buf) - size, "%s", line);
-			++count;
-		}
-		else {
-			size += snprintf(buf + size, sizeof(buf) - size, "OVERFLOW\r\n");
-			break;
-		}
+		add_page_display(ch, "[%5d] %s", GET_CROP_VNUM(crop), GET_CROP_NAME(crop));
 	}
 	
-	if (count > 0 && (size + 18) < sizeof(buf)) {
-		size += snprintf(buf + size, sizeof(buf) - size, "(%d crop%s)\r\n", count, PLURAL(count));
+	if (count > 0) {
+		add_page_display(ch, "(%d crop%s)", count, PLURAL(count));
 	}
 	else if (count == 0) {
-		size += snprintf(buf + size, sizeof(buf) - size, " none\r\n");
+		add_page_display_str(ch, " none");
 	}
 	
-	if (ch->desc) {
-		page_string(ch->desc, buf, TRUE);
-	}
+	send_page_display(ch);
 }
 
 

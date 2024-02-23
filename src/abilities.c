@@ -10301,7 +10301,7 @@ void olc_delete_ability(char_data *ch, any_vnum vnum) {
 void olc_fullsearch_abil(char_data *ch, char *argument) {
 	#define FAKE_DUR  -999	// arbitrary control number
 	
-	char buf[MAX_STRING_LENGTH * 2], line[MAX_STRING_LENGTH], type_arg[MAX_INPUT_LENGTH], val_arg[MAX_INPUT_LENGTH], find_keywords[MAX_INPUT_LENGTH];
+	char type_arg[MAX_INPUT_LENGTH], val_arg[MAX_INPUT_LENGTH], find_keywords[MAX_INPUT_LENGTH];
 	bitvector_t find_applies = NOBITS, found_applies, not_flagged = NOBITS, only_flags = NOBITS;
 	bitvector_t only_affs = NOBITS, only_immunities = NOBITS, only_gains = NOBITS, only_targets = NOBITS, find_custom = NOBITS, found_custom, only_tools = NOBITS, only_room_affs = NOBITS;
 	bitvector_t find_interacts = NOBITS, found_interacts;
@@ -10316,7 +10316,6 @@ void olc_fullsearch_abil(char_data *ch, char *argument) {
 	struct apply_data *app;
 	struct interaction_item *inter;
 	attack_message_data *only_attack = NULL;
-	size_t size;
 	
 	if (!*argument) {
 		msg_to_char(ch, "See HELP ABILEDIT FULLSEARCH for syntax.\r\n");
@@ -10409,7 +10408,7 @@ void olc_fullsearch_abil(char_data *ch, char *argument) {
 		skip_spaces(&argument);
 	}
 	
-	size = snprintf(buf, sizeof(buf), "Ability fullsearch: %s\r\n", show_color_codes(find_keywords));
+	add_page_display(ch, "Ability fullsearch: %s", show_color_codes(find_keywords));
 	count = 0;
 	
 	// okay now look up items
@@ -10557,27 +10556,17 @@ void olc_fullsearch_abil(char_data *ch, char *argument) {
 		}
 		
 		// show it
-		snprintf(line, sizeof(line), "[%5d] %s\r\n", ABIL_VNUM(abil), ABIL_NAME(abil));
-		if (strlen(line) + size < sizeof(buf)) {
-			size += snprintf(buf + size, sizeof(buf) - size, "%s", line);
-			++count;
-		}
-		else {
-			size += snprintf(buf + size, sizeof(buf) - size, "OVERFLOW\r\n");
-			break;
-		}
+		add_page_display(ch, "[%5d] %s", ABIL_VNUM(abil), ABIL_NAME(abil));
 	}
 	
-	if (count > 0 && (size + 20) < sizeof(buf)) {
-		size += snprintf(buf + size, sizeof(buf) - size, "(%d abilities)\r\n", count);
+	if (count > 0) {
+		add_page_display(ch, "(%d abilities)", count);
 	}
 	else if (count == 0) {
-		size += snprintf(buf + size, sizeof(buf) - size, " none\r\n");
+		add_page_display_str(ch, " none");
 	}
 	
-	if (ch->desc) {
-		page_string(ch->desc, buf, TRUE);
-	}
+	send_page_display(ch);
 }
 
 

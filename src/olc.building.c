@@ -655,7 +655,7 @@ void olc_delete_building(char_data *ch, bld_vnum vnum) {
 * @param char *argument The argument they entered.
 */
 void olc_fullsearch_building(char_data *ch, char *argument) {
-	char buf[MAX_STRING_LENGTH * 2], line[MAX_STRING_LENGTH], type_arg[MAX_INPUT_LENGTH], val_arg[MAX_INPUT_LENGTH], find_keywords[MAX_INPUT_LENGTH], extra_search[MAX_INPUT_LENGTH];
+	char type_arg[MAX_INPUT_LENGTH], val_arg[MAX_INPUT_LENGTH], find_keywords[MAX_INPUT_LENGTH], extra_search[MAX_INPUT_LENGTH];
 	int count;
 	bool found_one;
 	
@@ -674,7 +674,6 @@ void olc_fullsearch_building(char_data *ch, char *argument) {
 	struct interaction_item *inter;
 	struct interact_restriction *inter_res;
 	bld_data *bld, *next_bld;
-	size_t size;
 	
 	*only_icon = '\0';
 	*only_half_icon = '\0';
@@ -739,7 +738,7 @@ void olc_fullsearch_building(char_data *ch, char *argument) {
 		skip_spaces(&argument);
 	}
 	
-	size = snprintf(buf, sizeof(buf), "Building fullsearch: %s\r\n", show_color_codes(find_keywords));
+	add_page_display(ch, "Building fullsearch: %s", show_color_codes(find_keywords));
 	count = 0;
 	
 	// okay now look up items
@@ -872,27 +871,17 @@ void olc_fullsearch_building(char_data *ch, char *argument) {
 		}
 		
 		// show it
-		snprintf(line, sizeof(line), "[%5d] %s\r\n", GET_BLD_VNUM(bld), GET_BLD_NAME(bld));
-		if (strlen(line) + size < sizeof(buf)) {
-			size += snprintf(buf + size, sizeof(buf) - size, "%s", line);
-			++count;
-		}
-		else {
-			size += snprintf(buf + size, sizeof(buf) - size, "OVERFLOW\r\n");
-			break;
-		}
+		add_page_display(ch, "[%5d] %s", GET_BLD_VNUM(bld), GET_BLD_NAME(bld));
 	}
 	
-	if (count > 0 && (size + 20) < sizeof(buf)) {
-		size += snprintf(buf + size, sizeof(buf) - size, "(%d buildings)\r\n", count);
+	if (count > 0) {
+		add_page_display(ch, "(%d buildings)", count);
 	}
 	else if (count == 0) {
-		size += snprintf(buf + size, sizeof(buf) - size, " none\r\n");
+		add_page_display_str(ch, " none");
 	}
 	
-	if (ch->desc) {
-		page_string(ch->desc, buf, TRUE);
-	}
+	send_page_display(ch);
 }
 
 

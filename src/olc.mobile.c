@@ -669,7 +669,7 @@ void olc_delete_mobile(char_data *ch, mob_vnum vnum) {
 * @param char *argument The argument they entered.
 */
 void olc_fullsearch_mob(char_data *ch, char *argument) {
-	char buf[MAX_STRING_LENGTH * 2], line[MAX_STRING_LENGTH], type_arg[MAX_INPUT_LENGTH], val_arg[MAX_INPUT_LENGTH], find_keywords[MAX_INPUT_LENGTH];
+	char type_arg[MAX_INPUT_LENGTH], val_arg[MAX_INPUT_LENGTH], find_keywords[MAX_INPUT_LENGTH];
 	bitvector_t  find_interacts = NOBITS, found_interacts, find_custom = NOBITS, found_custom;
 	bitvector_t not_flagged = NOBITS, only_flags = NOBITS, only_affs = NOBITS;
 	int only_move = NOTHING, only_nameset = NOTHING;
@@ -679,7 +679,6 @@ void olc_fullsearch_mob(char_data *ch, char *argument) {
 	struct interaction_item *inter;
 	struct custom_message *cust;
 	char_data *mob, *next_mob;
-	size_t size;
 	
 	if (!*argument) {
 		msg_to_char(ch, "See HELP MEDIT FULLSEARCH for syntax.\r\n");
@@ -721,7 +720,7 @@ void olc_fullsearch_mob(char_data *ch, char *argument) {
 		skip_spaces(&argument);
 	}
 	
-	size = snprintf(buf, sizeof(buf), "Mobile fullsearch: %s\r\n", show_color_codes(find_keywords));
+	add_page_display(ch, "Mobile fullsearch: %s", show_color_codes(find_keywords));
 	count = 0;
 	
 	// okay now look up mobs
@@ -788,27 +787,17 @@ void olc_fullsearch_mob(char_data *ch, char *argument) {
 		}
 		
 		// show it
-		snprintf(line, sizeof(line), "[%5d] %s\r\n", GET_MOB_VNUM(mob), GET_SHORT_DESC(mob));
-		if (strlen(line) + size < sizeof(buf)) {
-			size += snprintf(buf + size, sizeof(buf) - size, "%s", line);
-			++count;
-		}
-		else {
-			size += snprintf(buf + size, sizeof(buf) - size, "OVERFLOW\r\n");
-			break;
-		}
+		add_page_display(ch, "[%5d] %s", GET_MOB_VNUM(mob), GET_SHORT_DESC(mob));
 	}
 	
-	if (count > 0 && (size + 18) < sizeof(buf)) {
-		size += snprintf(buf + size, sizeof(buf) - size, "(%d mobiles)\r\n", count);
+	if (count > 0) {
+		add_page_display(ch, "(%d mobiles)", count);
 	}
 	else if (count == 0) {
-		size += snprintf(buf + size, sizeof(buf) - size, " none\r\n");
+		add_page_display_str(ch, " none");
 	}
 	
-	if (ch->desc) {
-		page_string(ch->desc, buf, TRUE);
-	}
+	send_page_display(ch);
 }
 
 

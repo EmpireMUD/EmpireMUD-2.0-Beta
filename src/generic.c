@@ -447,7 +447,7 @@ char *list_one_generic(generic_data *gen, bool detail) {
 */
 void olc_fullsearch_generic(char_data *ch, char *argument) {
 	bool any;
-	char buf[MAX_STRING_LENGTH * 2], line[MAX_STRING_LENGTH], type_arg[MAX_INPUT_LENGTH], val_arg[MAX_INPUT_LENGTH], find_keywords[MAX_INPUT_LENGTH];
+	char type_arg[MAX_INPUT_LENGTH], val_arg[MAX_INPUT_LENGTH], find_keywords[MAX_INPUT_LENGTH];
 	int count, iter;
 	
 	bitvector_t only_flags = NOBITS, not_flagged = NOBITS, only_liquid_flags = NOBITS;
@@ -456,7 +456,6 @@ void olc_fullsearch_generic(char_data *ch, char *argument) {
 	int only_moon = NOTHING, moon_over = NOTHING, moon_under = NOTHING;
 	
 	generic_data *gen, *next_gen;
-	size_t size;
 	
 	if (!*argument) {
 		msg_to_char(ch, "See HELP GENEDIT FULLSEARCH for syntax.\r\n");
@@ -506,7 +505,7 @@ void olc_fullsearch_generic(char_data *ch, char *argument) {
 		skip_spaces(&argument);
 	}
 	
-	size = snprintf(buf, sizeof(buf), "Generic fullsearch: %s\r\n", show_color_codes(find_keywords));
+	add_page_display(ch, "Generic fullsearch: %s", show_color_codes(find_keywords));
 	count = 0;
 	
 	// okay now look up generics
@@ -587,27 +586,17 @@ void olc_fullsearch_generic(char_data *ch, char *argument) {
 		}
 		
 		// show it
-		snprintf(line, sizeof(line), "[%5d] %s (%s)\r\n", GEN_VNUM(gen), GEN_NAME(gen), generic_types[GEN_TYPE(gen)]);
-		if (strlen(line) + size < sizeof(buf)) {
-			size += snprintf(buf + size, sizeof(buf) - size, "%s", line);
-			++count;
-		}
-		else {
-			size += snprintf(buf + size, sizeof(buf) - size, "OVERFLOW\r\n");
-			break;
-		}
+		add_page_display(ch, "[%5d] %s (%s)", GEN_VNUM(gen), GEN_NAME(gen), generic_types[GEN_TYPE(gen)]);
 	}
 	
-	if (count > 0 && (size + 20) < sizeof(buf)) {
-		size += snprintf(buf + size, sizeof(buf) - size, "(%d generics)\r\n", count);
+	if (count > 0) {
+		add_page_display(ch, "(%d generics)", count);
 	}
 	else if (count == 0) {
-		size += snprintf(buf + size, sizeof(buf) - size, " none\r\n");
+		add_page_display_str(ch, " none");
 	}
 	
-	if (ch->desc) {
-		page_string(ch->desc, buf, TRUE);
-	}
+	send_page_display(ch);
 }
 
 

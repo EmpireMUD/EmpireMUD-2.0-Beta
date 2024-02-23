@@ -441,7 +441,7 @@ void olc_delete_sector(char_data *ch, sector_vnum vnum) {
 * @param char *argument The argument they entered.
 */
 void olc_fullsearch_sector(char_data *ch, char *argument) {
-	char buf[MAX_STRING_LENGTH * 2], line[MAX_STRING_LENGTH], type_arg[MAX_INPUT_LENGTH], val_arg[MAX_INPUT_LENGTH], find_keywords[MAX_INPUT_LENGTH], extra_search[MAX_INPUT_LENGTH];
+	char type_arg[MAX_INPUT_LENGTH], val_arg[MAX_INPUT_LENGTH], find_keywords[MAX_INPUT_LENGTH], extra_search[MAX_INPUT_LENGTH];
 	bitvector_t find_interacts = NOBITS, found_interacts, only_build = NOBITS, find_custom = NOBITS, found_custom;
 	bitvector_t find_evos = NOBITS, found_evos;
 	bitvector_t not_flagged = NOBITS, only_flags = NOBITS, only_climate = NOBITS;
@@ -451,7 +451,6 @@ void olc_fullsearch_sector(char_data *ch, char *argument) {
 	struct evolution_data *evo;
 	sector_data *sect, *next_sect;
 	struct icon_data *icon;
-	size_t size;
 	bool match;
 	struct custom_message *cust;
 	
@@ -494,7 +493,7 @@ void olc_fullsearch_sector(char_data *ch, char *argument) {
 		skip_spaces(&argument);
 	}
 	
-	size = snprintf(buf, sizeof(buf), "Sector fullsearch: %s\r\n", show_color_codes(find_keywords));
+	add_page_display(ch, "Sector fullsearch: %s", show_color_codes(find_keywords));
 	count = 0;
 	
 	// okay now look up sects
@@ -567,27 +566,17 @@ void olc_fullsearch_sector(char_data *ch, char *argument) {
 		}
 		
 		// show it
-		snprintf(line, sizeof(line), "[%5d] %s\r\n", GET_SECT_VNUM(sect), GET_SECT_NAME(sect));
-		if (strlen(line) + size < sizeof(buf)) {
-			size += snprintf(buf + size, sizeof(buf) - size, "%s", line);
-			++count;
-		}
-		else {
-			size += snprintf(buf + size, sizeof(buf) - size, "OVERFLOW\r\n");
-			break;
-		}
+		add_page_display(ch, "[%5d] %s", GET_SECT_VNUM(sect), GET_SECT_NAME(sect));
 	}
 	
-	if (count > 0 && (size + 20) < sizeof(buf)) {
-		size += snprintf(buf + size, sizeof(buf) - size, "(%d sector%s)\r\n", count, PLURAL(count));
+	if (count > 0) {
+		add_page_display(ch, "(%d sector%s)", count, PLURAL(count));
 	}
 	else if (count == 0) {
-		size += snprintf(buf + size, sizeof(buf) - size, " none\r\n");
+		add_page_display_str(ch, " none");
 	}
 	
-	if (ch->desc) {
-		page_string(ch->desc, buf, TRUE);
-	}
+	send_page_display(ch);
 }
 
 

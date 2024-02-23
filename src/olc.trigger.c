@@ -499,13 +499,12 @@ void olc_delete_trigger(char_data *ch, trig_vnum vnum) {
 * @param char *argument The argument they entered.
 */
 void olc_fullsearch_trigger(char_data *ch, char *argument) {
-	char buf[MAX_STRING_LENGTH * 2], line[MAX_STRING_LENGTH], type_arg[MAX_INPUT_LENGTH], val_arg[MAX_INPUT_LENGTH], find_keywords[MAX_INPUT_LENGTH];
+	char type_arg[MAX_INPUT_LENGTH], val_arg[MAX_INPUT_LENGTH], find_keywords[MAX_INPUT_LENGTH];
 	int count, lookup, only_attaches = NOTHING, vmin = NOTHING, vmax = NOTHING;
 	bitvector_t mob_types = NOBITS, obj_types = NOBITS, wld_types = NOBITS, veh_types = NOBITS;
 	trig_data *trig, *next_trig;
 	struct cmdlist_element *cmd;
 	bool any_types = FALSE, any;
-	size_t size;
 	
 	if (!*argument) {
 		msg_to_char(ch, "See HELP TEDIT FULLSEARCH for syntax.\r\n");
@@ -560,7 +559,7 @@ void olc_fullsearch_trigger(char_data *ch, char *argument) {
 		skip_spaces(&argument);
 	}
 	
-	size = snprintf(buf, sizeof(buf), "Trigger fullsearch: %s\r\n", show_color_codes(find_keywords));
+	add_page_display(ch, "Trigger fullsearch: %s", show_color_codes(find_keywords));
 	count = 0;
 	
 	// okay now look up items
@@ -616,27 +615,17 @@ void olc_fullsearch_trigger(char_data *ch, char *argument) {
 		}
 		
 		// show it
-		snprintf(line, sizeof(line), "[%5d] %s\r\n", GET_TRIG_VNUM(trig), GET_TRIG_NAME(trig));
-		if (strlen(line) + size < sizeof(buf)) {
-			size += snprintf(buf + size, sizeof(buf) - size, "%s", line);
-			++count;
-		}
-		else {
-			size += snprintf(buf + size, sizeof(buf) - size, "OVERFLOW\r\n");
-			break;
-		}
+		add_page_display(ch, "[%5d] %s", GET_TRIG_VNUM(trig), GET_TRIG_NAME(trig));
 	}
 	
-	if (count > 0 && (size + 20) < sizeof(buf)) {
-		size += snprintf(buf + size, sizeof(buf) - size, "(%d triggers)\r\n", count);
+	if (count > 0) {
+		add_page_display(ch, "(%d triggers)", count);
 	}
 	else if (count == 0) {
-		size += snprintf(buf + size, sizeof(buf) - size, " none\r\n");
+		add_page_display_str(ch, " none");
 	}
 	
-	if (ch->desc) {
-		page_string(ch->desc, buf, TRUE);
-	}
+	send_page_display(ch);
 }
 
 
