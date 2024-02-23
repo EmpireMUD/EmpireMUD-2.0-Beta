@@ -1060,7 +1060,7 @@ void display_score_to_char(char_data *ch, char_data *to) {
 	}
 
 	// everything leaves a starting space so this next line does not need it
-	add_page_display(to, "+---------------------------------------------------------------------------+");
+	add_page_display(to, " +---------------------------------------------------------------------------+");
 	
 	// affects last -- put nothing after these as they may also flush send_page_display()
 	if (ch == to) {
