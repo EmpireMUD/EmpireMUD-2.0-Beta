@@ -953,14 +953,12 @@ void olc_show_room_template(char_data *ch) {
 	// exdesc
 	add_page_display(ch, "Extra descriptions: <%sextra\t0>", OLC_LABEL_PTR(GET_RMT_EX_DESCS(rmt)));
 	if (GET_RMT_EX_DESCS(rmt)) {
-		get_extra_desc_display(GET_RMT_EX_DESCS(rmt), lbuf, sizeof(lbuf));
-		add_page_display_str(ch, lbuf);
+		show_extra_desc_display(ch, GET_RMT_EX_DESCS(rmt), FALSE);
 	}
 	
 	add_page_display(ch, "Interactions: <%sinteraction\t0>", OLC_LABEL_PTR(GET_RMT_INTERACTIONS(rmt)));
 	if (GET_RMT_INTERACTIONS(rmt)) {
-		get_interaction_display(GET_RMT_INTERACTIONS(rmt), lbuf);
-		add_page_display_str(ch, lbuf);
+		show_interaction_display(ch, GET_RMT_INTERACTIONS(rmt), FALSE);
 	}
 	
 	// spawns

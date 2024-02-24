@@ -866,8 +866,7 @@ void olc_show_sector(char_data *ch) {
 	add_page_display(ch, "<%smapout\t0> %s", OLC_LABEL_VAL(GET_SECT_MAPOUT(st), 0), mapout_color_names[GET_SECT_MAPOUT(st)]);
 
 	add_page_display(ch, "<%sicons\t0>", OLC_LABEL_PTR(GET_SECT_ICONS(st)));
-	get_icons_display(GET_SECT_ICONS(st), lbuf);
-	add_page_display_str(ch, lbuf);
+	show_icons_display(ch, GET_SECT_ICONS(st), FALSE);
 
 	ordered_sprintbit(GET_SECT_CLIMATE(st), climate_flags, climate_flags_order, FALSE, lbuf);
 	add_page_display(ch, "<%sclimate\t0> %s", OLC_LABEL_VAL(st->climate, NOBITS), lbuf);
@@ -888,8 +887,7 @@ void olc_show_sector(char_data *ch) {
 	// exdesc
 	add_page_display(ch, "Extra descriptions: <%sextra\t0>", OLC_LABEL_PTR(GET_SECT_EX_DESCS(st)));
 	if (GET_SECT_EX_DESCS(st)) {
-		get_extra_desc_display(GET_SECT_EX_DESCS(st), lbuf, sizeof(lbuf));
-		add_page_display_str(ch, lbuf);
+		show_extra_desc_display(ch, GET_SECT_EX_DESCS(st), FALSE);
 	}
 
 	// custom messages
@@ -901,8 +899,7 @@ void olc_show_sector(char_data *ch) {
 
 	add_page_display(ch, "Interactions: <%sinteraction\t0>", OLC_LABEL_PTR(GET_SECT_INTERACTIONS(st)));
 	if (GET_SECT_INTERACTIONS(st)) {
-		get_interaction_display(GET_SECT_INTERACTIONS(st), lbuf);
-		add_page_display_str(ch, lbuf);
+		show_interaction_display(ch, GET_SECT_INTERACTIONS(st), FALSE);
 	}
 	
 	add_page_display(ch, "<%sspawns\t0>", OLC_LABEL_PTR(GET_SECT_SPAWNS(st)));

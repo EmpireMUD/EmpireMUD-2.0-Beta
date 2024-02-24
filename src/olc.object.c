@@ -2379,14 +2379,12 @@ void olc_show_object(char_data *ch) {
 	// exdesc
 	add_page_display(ch, "Extra descriptions: <%sextra\t0>", OLC_LABEL_PTR(GET_OBJ_EX_DESCS(obj)));
 	if (GET_OBJ_EX_DESCS(obj)) {
-		get_extra_desc_display(GET_OBJ_EX_DESCS(obj), buf1, sizeof(buf1));
-		add_page_display_str(ch, buf1);
+		show_extra_desc_display(ch, GET_OBJ_EX_DESCS(obj), FALSE);
 	}
 
 	add_page_display(ch, "Interactions: <%sinteraction\t0>", OLC_LABEL_PTR(GET_OBJ_INTERACTIONS(obj)));
 	if (GET_OBJ_INTERACTIONS(obj)) {
-		get_interaction_display(GET_OBJ_INTERACTIONS(obj), buf1);
-		add_page_display_str(ch, buf1);
+		show_interaction_display(ch, GET_OBJ_INTERACTIONS(obj), FALSE);
 	}
 	
 	// storage

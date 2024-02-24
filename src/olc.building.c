@@ -1372,14 +1372,12 @@ void olc_show_building(char_data *ch) {
 	// exdesc
 	add_page_display(ch, "Extra descriptions: <%sextra\t0>", OLC_LABEL_PTR(GET_BLD_EX_DESCS(bdg)));
 	if (GET_BLD_EX_DESCS(bdg)) {
-		get_extra_desc_display(GET_BLD_EX_DESCS(bdg), lbuf, sizeof(lbuf));
-		add_page_display_str(ch, lbuf);
+		show_extra_desc_display(ch, GET_BLD_EX_DESCS(bdg), FALSE);
 	}
 
 	add_page_display(ch, "Interactions: <%sinteraction\t0>", OLC_LABEL_PTR(GET_BLD_INTERACTIONS(bdg)));
 	if (GET_BLD_INTERACTIONS(bdg)) {
-		get_interaction_display(GET_BLD_INTERACTIONS(bdg), lbuf);
-		add_page_display_str(ch, lbuf);
+		show_interaction_display(ch, GET_BLD_INTERACTIONS(bdg), FALSE);
 	}
 	
 	// maintenance resources

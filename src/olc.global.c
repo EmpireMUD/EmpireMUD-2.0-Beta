@@ -453,8 +453,7 @@ void olc_show_global(char_data *ch) {
 
 			add_page_display(ch, "Interactions: <%sinteraction\t0>", OLC_LABEL_PTR(GET_GLOBAL_INTERACTIONS(glb)));
 			if (GET_GLOBAL_INTERACTIONS(glb)) {
-				get_interaction_display(GET_GLOBAL_INTERACTIONS(glb), lbuf);
-				add_page_display_str(ch, lbuf);
+				show_interaction_display(ch, GET_GLOBAL_INTERACTIONS(glb), FALSE);
 			}
 			break;
 		}
@@ -466,8 +465,7 @@ void olc_show_global(char_data *ch) {
 
 			add_page_display(ch, "Interactions: <%sinteraction\t0>", OLC_LABEL_PTR(GET_GLOBAL_INTERACTIONS(glb)));
 			if (GET_GLOBAL_INTERACTIONS(glb)) {
-				get_interaction_display(GET_GLOBAL_INTERACTIONS(glb), lbuf);
-				add_page_display_str(ch, lbuf);
+				show_interaction_display(ch, GET_GLOBAL_INTERACTIONS(glb), FALSE);
 			}
 			break;
 		}
@@ -480,8 +478,7 @@ void olc_show_global(char_data *ch) {
 	
 			add_page_display(ch, "Interactions: <%sinteraction\t0>", OLC_LABEL_PTR(GET_GLOBAL_INTERACTIONS(glb)));
 			if (GET_GLOBAL_INTERACTIONS(glb)) {
-				get_interaction_display(GET_GLOBAL_INTERACTIONS(glb), lbuf);
-				add_page_display_str(ch, lbuf);
+				show_interaction_display(ch, GET_GLOBAL_INTERACTIONS(glb), FALSE);
 			}
 			break;
 		}

@@ -11145,8 +11145,8 @@ void do_stat_ability(char_data *ch, ability_data *abil, bool details) {
 	}
 	
 	if (IS_SET(fields, ABILEDIT_INTERACTIONS)) {
-		get_interaction_display(ABIL_INTERACTIONS(abil), part);
-		add_page_display(ch, "Interactions:\r\n%s", part);
+		add_page_display_str(ch, "Interactions:");
+		show_interaction_display(ch, ABIL_INTERACTIONS(abil), FALSE);
 	}
 	
 	// data
@@ -11341,8 +11341,7 @@ void olc_show_ability(char_data *ch) {
 	if (IS_SET(fields, ABILEDIT_INTERACTIONS)) {
 		add_page_display(ch, "Interactions: <%sinteraction\t0>", OLC_LABEL_PTR(ABIL_INTERACTIONS(abil)));
 		if (ABIL_INTERACTIONS(abil)) {
-			get_interaction_display(ABIL_INTERACTIONS(abil), lbuf);
-			add_page_display_str(ch, lbuf);
+			show_interaction_display(ch, ABIL_INTERACTIONS(abil), FALSE);
 		}
 	}
 	

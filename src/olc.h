@@ -150,8 +150,8 @@ struct olc_command_data {
 
 // olc.c helpers
 bool can_start_olc_edit(char_data *ch, int type, any_vnum vnum);
-void get_icons_display(struct icon_data *list, char *save_buffer);
-void get_interaction_display(struct interaction_item *list, char *save_buffer);
+void show_icons_display(char_data *ch, struct icon_data *list, bool send_page);
+void show_interaction_display(char_data *ch, struct interaction_item *list, bool send_page);
 void get_resource_display(char_data *ch, struct resource_data *list, char *save_buffer);
 void get_script_display(struct trig_proto_list *list, char *save_buffer);
 int find_olc_type(char *name);
@@ -305,7 +305,7 @@ void olc_show_vehicle(char_data *ch);
 void show_adventure_linking_display(char_data *ch, struct adventure_link_rule *list, bool send_page);
 void show_archetype_gear_display(char_data *ch, struct archetype_gear *list, bool send_page);
 void show_bld_relations_display(char_data *ch, struct bld_relation *list, bool send_page);
-void get_extra_desc_display(struct extra_descr_data *list, char *save_buffer, size_t buf_size);
+void show_extra_desc_display(char_data *ch, struct extra_descr_data *list, bool send_page);
 void get_generic_relation_display(struct generic_relation *list, bool show_vnums, char *save_buf, char *prefix);
 char *get_interaction_restriction_display(struct interact_restriction *list, bool whole_list);
 void show_evolution_display(char_data *ch, struct evolution_data *list, bool send_page);

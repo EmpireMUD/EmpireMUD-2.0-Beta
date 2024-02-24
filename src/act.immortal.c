@@ -3265,8 +3265,7 @@ void do_stat_building(char_data *ch, bld_data *bdg, bool details) {
 	
 	if (GET_BLD_INTERACTIONS(bdg)) {
 		add_page_display_str(ch, "Interactions:");
-		get_interaction_display(GET_BLD_INTERACTIONS(bdg), lbuf);
-		add_page_display_str(ch, lbuf);
+		show_interaction_display(ch, GET_BLD_INTERACTIONS(bdg), FALSE);
 	}
 	
 	if (GET_BLD_REGULAR_MAINTENANCE(bdg)) {
@@ -3472,8 +3471,8 @@ void do_stat_character(char_data *ch, char_data *k, bool details) {
 	}
 
 	if (IS_NPC(k) && k->interactions) {
-		get_interaction_display(k->interactions, lbuf);
-		add_page_display(ch, "Interactions:\r\n%s", lbuf);
+		add_page_display_str(ch, "Interactions:");
+		show_interaction_display(ch, k->interactions, FALSE);
 	}
 	
 	if (MOB_CUSTOM_MSGS(k)) {
@@ -3703,8 +3702,8 @@ void do_stat_crop(char_data *ch, crop_data *cp, bool details) {
 	add_page_display(ch, "Crop flags: &g%s&0", buf);
 	
 	if (GET_CROP_ICONS(cp)) {
-		get_icons_display(GET_CROP_ICONS(cp), buf1);
-		add_page_display(ch, "Icons:\r\n%s", buf1);
+		add_page_display_str(ch, "Icons:");
+		show_icons_display(ch, GET_CROP_ICONS(cp), FALSE);
 	}
 	
 	add_page_display(ch, "Location: X-Min: [&g%d&0], X-Max: [&g%d&0], Y-Min: [&g%d&0], Y-Max: [&g%d&0]", GET_CROP_X_MIN(cp), GET_CROP_X_MAX(cp), GET_CROP_Y_MIN(cp), GET_CROP_Y_MAX(cp));
@@ -3742,8 +3741,8 @@ void do_stat_crop(char_data *ch, crop_data *cp, bool details) {
 	}
 	
 	if (GET_CROP_INTERACTIONS(cp)) {
-		get_interaction_display(GET_CROP_INTERACTIONS(cp), buf);
-		add_page_display(ch, "Interactions:\r\n%s", buf);
+		add_page_display_str(ch, "Interactions:");
+		show_interaction_display(ch, GET_CROP_INTERACTIONS(cp), FALSE);
 	}
 	
 	show_spawn_summary_display(ch, TRUE, GET_CROP_SPAWNS(cp));
@@ -3925,8 +3924,8 @@ void do_stat_global(char_data *ch, struct global_data *glb) {
 	}
 	
 	if (GET_GLOBAL_INTERACTIONS(glb)) {
-		get_interaction_display(GET_GLOBAL_INTERACTIONS(glb), buf);
-		add_page_display(ch, "Interactions:\r\n%s", buf);
+		add_page_display_str(ch, "Interactions:");
+		show_interaction_display(ch, GET_GLOBAL_INTERACTIONS(glb), FALSE);
 	}
 	
 	send_page_display(ch);
@@ -4277,8 +4276,8 @@ void do_stat_object(char_data *ch, obj_data *j, bool details) {
 	}
 	
 	if (GET_OBJ_INTERACTIONS(j)) {
-		get_interaction_display(GET_OBJ_INTERACTIONS(j), buf);
-		add_page_display(ch, "Interactions:\r\n%s", buf);
+		add_page_display_str(ch, "Interactions:");
+		show_interaction_display(ch, GET_OBJ_INTERACTIONS(j), FALSE);
 	}
 	
 	if (GET_OBJ_CUSTOM_MSGS(j)) {
@@ -4720,8 +4719,8 @@ void do_stat_room_template(char_data *ch, room_template *rmt, bool details) {
 	show_exit_template_display(ch, GET_RMT_EXITS(rmt), FALSE);
 	
 	if (GET_RMT_INTERACTIONS(rmt)) {
-		get_interaction_display(GET_RMT_INTERACTIONS(rmt), buf);
-		add_page_display(ch, "Interactions:\r\n%s", buf);
+		add_page_display_str(ch, "Interactions:");
+		show_interaction_display(ch, GET_RMT_INTERACTIONS(rmt), FALSE);
 	}
 	
 	get_template_spawns_display(GET_RMT_SPAWNS(rmt), lbuf);
@@ -4757,8 +4756,8 @@ void do_stat_sector(char_data *ch, sector_data *st, bool details) {
 	add_page_display(ch, "Movement cost: [&g%d&0]  Roadside Icon: %c  Mapout Color: %s", GET_SECT_MOVE_LOSS(st), GET_SECT_ROADSIDE_ICON(st), mapout_color_names[GET_SECT_MAPOUT(st)]);
 	
 	if (GET_SECT_ICONS(st)) {
-		get_icons_display(GET_SECT_ICONS(st), buf1);
-		add_page_display(ch, "Icons:\r\n%s", buf1);
+		add_page_display_str(ch, "Icons:");
+		show_icons_display(ch, GET_SECT_ICONS(st), FALSE);
 	}
 	
 	sprintbit(GET_SECT_FLAGS(st), sector_flags, buf, TRUE);
@@ -4808,8 +4807,8 @@ void do_stat_sector(char_data *ch, sector_data *st, bool details) {
 	}
 
 	if (GET_SECT_INTERACTIONS(st)) {
-		get_interaction_display(GET_SECT_INTERACTIONS(st), buf);
-		add_page_display(ch, "Interactions:\r\n%s", buf);
+		add_page_display_str(ch, "Interactions:");
+		show_interaction_display(ch, GET_SECT_INTERACTIONS(st), FALSE);
 	}
 	
 	show_spawn_summary_display(ch, TRUE, GET_SECT_SPAWNS(st));

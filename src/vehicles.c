@@ -4492,8 +4492,8 @@ void do_stat_vehicle(char_data *ch, vehicle_data *veh, bool details) {
 	add_page_display(ch, "Forbid climate: \tg%s\t0", part);
 	
 	if (VEH_INTERACTIONS(veh)) {
-		get_interaction_display(VEH_INTERACTIONS(veh), part);
-		add_page_display(ch, "Interactions:\r\n%s", part);
+		add_page_display_str(ch, "Interactions:");
+		show_interaction_display(ch, VEH_INTERACTIONS(veh), FALSE);
 	}
 	
 	if (VEH_RELATIONS(veh)) {
@@ -4755,14 +4755,12 @@ void olc_show_vehicle(char_data *ch) {
 	// exdesc
 	add_page_display(ch, "Extra descriptions: <%sextra\t0>", OLC_LABEL_PTR(VEH_EX_DESCS(veh)));
 	if (VEH_EX_DESCS(veh)) {
-		get_extra_desc_display(VEH_EX_DESCS(veh), lbuf, sizeof(lbuf));
-		add_page_display_str(ch, lbuf);
+		show_extra_desc_display(ch, VEH_EX_DESCS(veh), FALSE);
 	}
 
 	add_page_display(ch, "Interactions: <%sinteraction\t0>", OLC_LABEL_PTR(VEH_INTERACTIONS(veh)));
 	if (VEH_INTERACTIONS(veh)) {
-		get_interaction_display(VEH_INTERACTIONS(veh), lbuf);
-		add_page_display_str(ch, lbuf);
+		show_interaction_display(ch, VEH_INTERACTIONS(veh), FALSE);
 	}
 	
 	add_page_display(ch, "Relationships: <%srelations\t0>", OLC_LABEL_PTR(VEH_RELATIONS(veh)));

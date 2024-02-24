@@ -4575,61 +4575,44 @@ void show_evolution_display(char_data *ch, struct evolution_data *list, bool sen
 /**
 * Displays the extra descs from a given list.
 *
+* @param char_data *ch The person viewing it.
 * @param struct extra_descr_data *list Pointer to the start of a list of decriptions.
-* @param char *save_buffer A buffer to store the result to.
-* @param size_t buf_size How large the save_buffer is.
+* @param bool send_page If TRUE, sends the page_display when done. Pass FALSE if you're building a larger page_display for the character.
 */
-void get_extra_desc_display(struct extra_descr_data *list, char *save_buffer, size_t buf_size) {
+void show_extra_desc_display(char_data *ch, struct extra_descr_data *list, bool send_page) {
 	struct extra_descr_data *ex;
-	char temp[MAX_STRING_LENGTH];
 	int count = 0;
-	size_t size, tsize;
-	
-	*save_buffer = '\0';
-	size = 0;
 	
 	for (ex = list; ex; ex = ex->next) {
-		tsize = snprintf(temp, sizeof(temp), " &y%d&0. %s\r\n%s", ++count, (ex->keyword ? ex->keyword : "(null)"), (ex->description ? ex->description : "(null)\r\n"));
-		
-		if (size + tsize < buf_size) {
-			strcat(save_buffer, temp);
-			size += tsize;
-		}
-		else {
-			size += snprintf(save_buffer + size, buf_size - size, "** OVERFLOW **\r\n");
-			break;
-		}
+		add_page_display(ch, " &y%d&0. %s\r\n%s", ++count, (ex->keyword ? ex->keyword : "(null)"), (ex->description ? ex->description : "(null)"));
 	}
 	if (count == 0) {
-		snprintf(save_buffer, buf_size, " none\r\n");
+		add_page_display_str(ch, " none");
+	}
+	
+	if (send_page) {
+		send_page_display(ch);
 	}
 }
 
 
 /**
-* Gets the display for a set of icons.
+* Display for a set of icons.
 *
+* @param char_data *ch The person viewing it.
 * @param struct icon_data *list Pointer to the start of a list of icons.
-* @param char *save_buffer A buffer to store the result to.
+* @param bool send_page If TRUE, sends the page_display when done. Pass FALSE if you're building a larger page_display for the character.
 */
-void get_icons_display(struct icon_data *list, char *save_buffer) {
-	char lbuf[MAX_INPUT_LENGTH], line[MAX_INPUT_LENGTH];
+void show_icons_display(char_data *ch, struct icon_data *list, bool send_page) {
 	struct icon_data *icon;
-	int size, count = 0;
-
-	*save_buffer = '\0';
+	int count = 0;
 	
 	for (icon = list; icon; icon = icon->next) {
-		sprintf(line, " %2d. %s: %s", ++count, icon_types[icon->type], one_icon_display(icon->icon, icon->color));
-		
-		// format column despite variable width of color codes
-		size = 34 + color_code_length(line);
-		sprintf(lbuf, "%%-%d.%ds%%s", size, size);
-		sprintf(save_buffer + strlen(save_buffer), lbuf, line, !(count % 2) ? "\r\n" : "");
+		add_page_display_col(ch, 2, FALSE, " %2d. %s: %s", ++count, icon_types[icon->type], one_icon_display(icon->icon, icon->color));
 	}
 	
-	if (count % 2) {
-		strcat(save_buffer, "\r\n");
+	if (send_page) {
+		send_page_display(ch);
 	}
 }
 
@@ -4752,15 +4735,15 @@ const char *get_interaction_target(int type, any_vnum vnum) {
 /**
 * Displays the interactions data from a given list.
 *
+* @param char_data *ch The person viewing it.
 * @param struct interaction_item *list Pointer to the start of a list of interactions.
-* @param char *save_buffer A buffer to store the result to.
+* @param bool send_page If TRUE, sends the page_display when done. Pass FALSE if you're building a larger page_display for the character.
 */
-void get_interaction_display(struct interaction_item *list, char *save_buffer) {
+void show_interaction_display(char_data *ch, struct interaction_item *list, bool send_page) {
 	struct interaction_item *interact;
 	char quant[16];
 	int count = 0;
-	
-	*save_buffer = '\0';
+	struct page_display *pd;
 	
 	for (interact = list; interact; interact = interact->next) {
 		if (interact_data[interact->type].one_at_a_time) {
@@ -4770,18 +4753,21 @@ void get_interaction_display(struct interaction_item *list, char *save_buffer) {
 			snprintf(quant, sizeof(quant), "%dx", interact->quantity);
 		}
 		
-		sprintf(save_buffer + strlen(save_buffer), "%2d. %s: %s %s (%d) %.2f%%", ++count, interact_types[interact->type], quant, get_interaction_target(interact->type, interact->vnum), interact->vnum, interact->percent);
+		pd = add_page_display(ch, "%2d. %s: %s %s (%d) %.2f%%", ++count, interact_types[interact->type], quant, get_interaction_target(interact->type, interact->vnum), interact->vnum, interact->percent);
 		if (isalpha(interact->exclusion_code)) {
-			sprintf(save_buffer + strlen(save_buffer), " (%c)", interact->exclusion_code);
+			append_page_display_line(pd, " (%c)", interact->exclusion_code);
 		}
 		if (interact->restrictions) {
-			sprintf(save_buffer + strlen(save_buffer), " (%s)", get_interaction_restriction_display(interact->restrictions, TRUE));
+			append_page_display_line(pd, " (%s)", get_interaction_restriction_display(interact->restrictions, TRUE));
 		}
-		strcat(save_buffer, "\r\n");
 	}
 	
 	if (count == 0) {
-		strcat(save_buffer, " none\r\n");
+		add_page_display_str(ch, " none");
+	}
+	
+	if (send_page) {
+		send_page_display(ch);
 	}
 }
 

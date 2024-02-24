@@ -41,7 +41,7 @@ const int default_max_rep = REP_REVERED;
 const int default_starting_rep = REP_NEUTRAL;
 
 // local protos
-void get_faction_relation_display(struct faction_relation *list, char *save_buffer);
+void show_faction_relation_display(char_data *ch, struct faction_relation *list, bool send_page);
 
 
  /////////////////////////////////////////////////////////////////////////////
@@ -1348,31 +1348,34 @@ void do_stat_faction(char_data *ch, faction_data *fct) {
 	sprintbit(FCT_FLAGS(fct), faction_flags, part, TRUE);
 	add_page_display(ch, "Flags: \tg%s\t0", part);
 	
-	get_faction_relation_display(FCT_RELATIONS(fct), part);
-	add_page_display(ch, "Relations:\r\n%s", part);
+	add_page_display_str(ch, "Relations:");
+	show_faction_relation_display(ch, FCT_RELATIONS(fct), FALSE);
 	
 	send_page_display(ch);
 }
 
 
 /**
-* Gets the faction relation display for olc, stat, or other uses.
+* Shows the faction relation display for olc, stat, or other uses.
 *
+* @param char_data *ch The person viewing it.
 * @param struct faction_relation *list The list of relations to display.
-* @param char *save_buffer A buffer to store the display to.
+* @param bool send_page If TRUE, sends the page_display when done. Pass FALSE if you're building a larger page_display for the character.
 */
-void get_faction_relation_display(struct faction_relation *list, char *save_buffer) {
+void show_faction_relation_display(char_data *ch, struct faction_relation *list, bool send_page) {
 	struct faction_relation *iter, *next_iter;
 	char lbuf[MAX_STRING_LENGTH];
 	
-	*save_buffer = '\0';
-	
 	HASH_ITER(hh, list, iter, next_iter) {
 		sprintbit(iter->flags, relationship_flags, lbuf, TRUE);
-		sprintf(save_buffer + strlen(save_buffer), " [%5d] %s - %s\r\n", iter->vnum, FCT_NAME(iter->ptr), lbuf);
+		add_page_display(ch, " [%5d] %s - %s", iter->vnum, FCT_NAME(iter->ptr), lbuf);
 	}
 	if (!list) {
-		strcpy(save_buffer, " none\r\n");
+		add_page_display_str(ch, " none");
+	}
+	
+	if (send_page) {
+		send_page_display(ch);
 	}
 }
 
@@ -1402,8 +1405,10 @@ void olc_show_faction(char_data *ch) {
 	add_page_display(ch, "<%smaxreputation\t0> %s", OLC_LABEL_VAL(FCT_MAX_REP(fct), default_max_rep), get_reputation_name(FCT_MAX_REP(fct)));
 	add_page_display(ch, "<%sstartingreuptation\t0> %s", OLC_LABEL_VAL(FCT_STARTING_REP(fct), default_starting_rep), get_reputation_name(FCT_STARTING_REP(fct)));
 	
-	get_faction_relation_display(FCT_RELATIONS(fct), lbuf);
-	add_page_display(ch, "Relationships: <%srelation\t0>, <%smatchrelations\t0>\r\n%s", OLC_LABEL_PTR(FCT_RELATIONS(fct)), OLC_LABEL_PTR(FCT_RELATIONS(fct)), FCT_RELATIONS(fct) ? lbuf : "");
+	add_page_display(ch, "Relationships: <%srelation\t0>, <%smatchrelations\t0>", OLC_LABEL_PTR(FCT_RELATIONS(fct)), OLC_LABEL_PTR(FCT_RELATIONS(fct)));
+	if (FCT_RELATIONS(fct)) {
+		show_faction_relation_display(ch, FCT_RELATIONS(fct), FALSE);
+	}
 	
 	send_page_display(ch);
 }

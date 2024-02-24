@@ -1430,8 +1430,7 @@ void olc_show_mobile(char_data *ch) {
 	
 	add_page_display(ch, "Interactions: <%sinteraction\t0>", OLC_LABEL_PTR(mob->interactions));
 	if (mob->interactions) {
-		get_interaction_display(mob->interactions, buf1);
-		add_page_display_str(ch, buf1);
+		show_interaction_display(ch, mob->interactions, FALSE);
 	}
 	
 	// custom messages

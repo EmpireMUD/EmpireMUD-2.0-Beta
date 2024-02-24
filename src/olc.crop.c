@@ -625,8 +625,7 @@ void olc_show_crop(char_data *ch) {
 	add_page_display(ch, "<%smapout\t0> %s", OLC_LABEL_VAL(GET_CROP_MAPOUT(cp), 0), mapout_color_names[GET_CROP_MAPOUT(cp)]);
 
 	add_page_display(ch, "<%sicons\t0>", OLC_LABEL_PTR(GET_CROP_ICONS(cp)));
-	get_icons_display(GET_CROP_ICONS(cp), lbuf);
-	add_page_display_str(ch, lbuf);
+	show_icons_display(ch, GET_CROP_ICONS(cp), FALSE);
 	
 	ordered_sprintbit(GET_CROP_CLIMATE(cp), climate_flags, climate_flags_order, FALSE, lbuf);
 	add_page_display(ch, "<%sclimate\t0> %s", OLC_LABEL_VAL(GET_CROP_CLIMATE(cp), NOBITS), lbuf);
@@ -641,8 +640,7 @@ void olc_show_crop(char_data *ch) {
 	// exdesc
 	add_page_display(ch, "Extra descriptions: <%sextra\t0>", OLC_LABEL_PTR(GET_CROP_EX_DESCS(cp)));
 	if (GET_CROP_EX_DESCS(cp)) {
-		get_extra_desc_display(GET_CROP_EX_DESCS(cp), lbuf, sizeof(lbuf));
-		add_page_display_str(ch, lbuf);
+		show_extra_desc_display(ch, GET_CROP_EX_DESCS(cp), FALSE);
 	}
 
 	// custom messages
@@ -654,8 +652,7 @@ void olc_show_crop(char_data *ch) {
 
 	add_page_display(ch, "Interactions: <%sinteraction\t0>", OLC_LABEL_PTR(GET_CROP_INTERACTIONS(cp)));
 	if (GET_CROP_INTERACTIONS(cp)) {
-		get_interaction_display(GET_CROP_INTERACTIONS(cp), lbuf);
-		add_page_display_str(ch, lbuf);
+		show_interaction_display(ch, GET_CROP_INTERACTIONS(cp), FALSE);
 	}
 
 	add_page_display(ch, "<%sspawns\t0>", OLC_LABEL_PTR(GET_CROP_SPAWNS(cp)));
