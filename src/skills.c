@@ -4252,7 +4252,7 @@ void do_stat_skill(char_data *ch, skill_data *skill) {
 */
 void olc_show_skill(char_data *ch) {
 	skill_data *skill = GET_OLC_SKILL(ch->desc);
-	char buf[MAX_STRING_LENGTH], lbuf[MAX_STRING_LENGTH];
+	char lbuf[MAX_STRING_LENGTH];
 	struct synergy_ability *syn;
 	struct skill_ability *skab;
 	int total;
@@ -4261,38 +4261,36 @@ void olc_show_skill(char_data *ch) {
 		return;
 	}
 	
-	*buf = '\0';
-	
-	sprintf(buf + strlen(buf), "[%s%d\t0] %s%s\t0\r\n", OLC_LABEL_CHANGED, GET_OLC_VNUM(ch->desc), OLC_LABEL_UNCHANGED, !find_skill_by_vnum(SKILL_VNUM(skill)) ? "new skill" : get_skill_name_by_vnum(SKILL_VNUM(skill)));
-	sprintf(buf + strlen(buf), "<%sname\t0> %s\r\n", OLC_LABEL_STR(SKILL_NAME(skill), default_skill_name), NULLSAFE(SKILL_NAME(skill)));
-	sprintf(buf + strlen(buf), "<%sabbrev\t0> %s\r\n", OLC_LABEL_STR(SKILL_ABBREV(skill), default_skill_abbrev), NULLSAFE(SKILL_ABBREV(skill)));
-	sprintf(buf + strlen(buf), "<%sdescription\t0> %s\r\n", OLC_LABEL_STR(SKILL_DESC(skill), default_skill_desc), NULLSAFE(SKILL_DESC(skill)));
+	add_page_display(ch, "[%s%d\t0] %s%s\t0", OLC_LABEL_CHANGED, GET_OLC_VNUM(ch->desc), OLC_LABEL_UNCHANGED, !find_skill_by_vnum(SKILL_VNUM(skill)) ? "new skill" : get_skill_name_by_vnum(SKILL_VNUM(skill)));
+	add_page_display(ch, "<%sname\t0> %s", OLC_LABEL_STR(SKILL_NAME(skill), default_skill_name), NULLSAFE(SKILL_NAME(skill)));
+	add_page_display(ch, "<%sabbrev\t0> %s", OLC_LABEL_STR(SKILL_ABBREV(skill), default_skill_abbrev), NULLSAFE(SKILL_ABBREV(skill)));
+	add_page_display(ch, "<%sdescription\t0> %s", OLC_LABEL_STR(SKILL_DESC(skill), default_skill_desc), NULLSAFE(SKILL_DESC(skill)));
 	
 	sprintbit(SKILL_FLAGS(skill), skill_flags, lbuf, TRUE);
-	sprintf(buf + strlen(buf), "<%sflags\t0> %s\r\n", OLC_LABEL_VAL(SKILL_FLAGS(skill), SKILLF_IN_DEVELOPMENT), lbuf);
+	add_page_display(ch, "<%sflags\t0> %s", OLC_LABEL_VAL(SKILL_FLAGS(skill), SKILLF_IN_DEVELOPMENT), lbuf);
 	
-	sprintf(buf + strlen(buf), "<%smaxlevel\t0> %d\r\n", OLC_LABEL_VAL(SKILL_MAX_LEVEL(skill), MAX_SKILL_CAP), SKILL_MAX_LEVEL(skill));
-	sprintf(buf + strlen(buf), "<%smindrop\t0> %d\r\n", OLC_LABEL_VAL(SKILL_MIN_DROP_LEVEL(skill), 0), SKILL_MIN_DROP_LEVEL(skill));
+	add_page_display(ch, "<%smaxlevel\t0> %d", OLC_LABEL_VAL(SKILL_MAX_LEVEL(skill), MAX_SKILL_CAP), SKILL_MAX_LEVEL(skill));
+	add_page_display(ch, "<%smindrop\t0> %d", OLC_LABEL_VAL(SKILL_MIN_DROP_LEVEL(skill), 0), SKILL_MIN_DROP_LEVEL(skill));
 	
 	LL_COUNT(SKILL_ABILITIES(skill), skab, total);
-	sprintf(buf + strlen(buf), "<%stree\t0> %d %s (.showtree to toggle display)\r\n", OLC_LABEL_PTR(SKILL_ABILITIES(skill)), total, total == 1 ? "ability" : "abilities");
+	add_page_display(ch, "<%stree\t0> %d %s (.showtree to toggle display)", OLC_LABEL_PTR(SKILL_ABILITIES(skill)), total, total == 1 ? "ability" : "abilities");
 	if (GET_OLC_SHOW_TREE(ch->desc)) {
 		get_skill_ability_display(SKILL_ABILITIES(skill), lbuf, sizeof(lbuf));
 		if (*lbuf) {
-			sprintf(buf + strlen(buf), "%s", lbuf);
+			add_page_display_str(ch, lbuf);
 		}
 	}
 	
 	LL_COUNT(SKILL_SYNERGIES(skill), syn, total);
-	sprintf(buf + strlen(buf), "<%ssynergy\t0> %d %s (.showsynergies to toggle display)\r\n", OLC_LABEL_PTR(SKILL_SYNERGIES(skill)), total, total == 1 ? "ability" : "abilities");
+	add_page_display(ch, "<%ssynergy\t0> %d %s (.showsynergies to toggle display)", OLC_LABEL_PTR(SKILL_SYNERGIES(skill)), total, total == 1 ? "ability" : "abilities");
 	if (GET_OLC_SHOW_SYNERGIES(ch->desc)) {
 		get_skill_synergy_display(SKILL_SYNERGIES(skill), lbuf, NULL);
 		if (*lbuf) {
-			sprintf(buf + strlen(buf), "%s", lbuf);
+			add_page_display_str(ch, lbuf);
 		}
 	}
 	
-	page_string(ch->desc, buf, TRUE);
+	send_page_display(ch);
 }
 
 

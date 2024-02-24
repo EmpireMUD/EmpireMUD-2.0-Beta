@@ -1129,31 +1129,29 @@ void do_stat_shop(char_data *ch, shop_data *shop) {
 */
 void olc_show_shop(char_data *ch) {
 	shop_data *shop = GET_OLC_SHOP(ch->desc);
-	char buf[MAX_STRING_LENGTH], lbuf[MAX_STRING_LENGTH];
+	char lbuf[MAX_STRING_LENGTH];
 	
 	if (!shop) {
 		return;
 	}
 	
-	*buf = '\0';
-	
-	sprintf(buf + strlen(buf), "[%s%d\t0] %s%s\t0\r\n", OLC_LABEL_CHANGED, GET_OLC_VNUM(ch->desc), OLC_LABEL_UNCHANGED, !real_shop(SHOP_VNUM(shop)) ? "new shop" : SHOP_NAME(real_shop(SHOP_VNUM(shop))));
-	sprintf(buf + strlen(buf), "<%sname\t0> %s\r\n", OLC_LABEL_STR(SHOP_NAME(shop), default_shop_name), NULLSAFE(SHOP_NAME(shop)));
+	add_page_display(ch, "[%s%d\t0] %s%s\t0", OLC_LABEL_CHANGED, GET_OLC_VNUM(ch->desc), OLC_LABEL_UNCHANGED, !real_shop(SHOP_VNUM(shop)) ? "new shop" : SHOP_NAME(real_shop(SHOP_VNUM(shop))));
+	add_page_display(ch, "<%sname\t0> %s", OLC_LABEL_STR(SHOP_NAME(shop), default_shop_name), NULLSAFE(SHOP_NAME(shop)));
 	
 	sprintbit(SHOP_FLAGS(shop), shop_flags, lbuf, TRUE);
-	sprintf(buf + strlen(buf), "<%sflags\t0> %s\r\n", OLC_LABEL_VAL(SHOP_FLAGS(shop), SHOP_IN_DEVELOPMENT), lbuf);
+	add_page_display(ch, "<%sflags\t0> %s", OLC_LABEL_VAL(SHOP_FLAGS(shop), SHOP_IN_DEVELOPMENT), lbuf);
 	
-	sprintf(buf + strlen(buf), "<%sopens\t0> %d%s%s\r\n", OLC_LABEL_VAL(SHOP_OPEN_TIME(shop), 0), TIME_TO_12H(SHOP_OPEN_TIME(shop)), AM_PM(SHOP_OPEN_TIME(shop)), (SHOP_OPEN_TIME(shop) == SHOP_CLOSE_TIME(shop)) ? " (always open)" : "");
-	sprintf(buf + strlen(buf), "<%scloses\t0> %d%s\r\n", OLC_LABEL_VAL(SHOP_CLOSE_TIME(shop), 0), TIME_TO_12H(SHOP_CLOSE_TIME(shop)), AM_PM(SHOP_CLOSE_TIME(shop)));
-	sprintf(buf + strlen(buf), "<%sallegiance\t0> %s\r\n", OLC_LABEL_PTR(SHOP_ALLEGIANCE(shop)), SHOP_ALLEGIANCE(shop) ? FCT_NAME(SHOP_ALLEGIANCE(shop)) : "none");
+	add_page_display(ch, "<%sopens\t0> %d%s%s", OLC_LABEL_VAL(SHOP_OPEN_TIME(shop), 0), TIME_TO_12H(SHOP_OPEN_TIME(shop)), AM_PM(SHOP_OPEN_TIME(shop)), (SHOP_OPEN_TIME(shop) == SHOP_CLOSE_TIME(shop)) ? " (always open)" : "");
+	add_page_display(ch, "<%scloses\t0> %d%s", OLC_LABEL_VAL(SHOP_CLOSE_TIME(shop), 0), TIME_TO_12H(SHOP_CLOSE_TIME(shop)), AM_PM(SHOP_CLOSE_TIME(shop)));
+	add_page_display(ch, "<%sallegiance\t0> %s", OLC_LABEL_PTR(SHOP_ALLEGIANCE(shop)), SHOP_ALLEGIANCE(shop) ? FCT_NAME(SHOP_ALLEGIANCE(shop)) : "none");
 	
 	get_quest_giver_display(SHOP_LOCATIONS(shop), lbuf);
-	sprintf(buf + strlen(buf), "Locations: <%slocation\t0>\r\n%s", OLC_LABEL_PTR(SHOP_LOCATIONS(shop)), lbuf);
+	add_page_display(ch, "Locations: <%slocation\t0>\r\n%s", OLC_LABEL_PTR(SHOP_LOCATIONS(shop)), lbuf);
 	
 	get_shop_items_display(shop, lbuf);
-	sprintf(buf + strlen(buf), "Items: <%sitem\t0>\r\n%s", OLC_LABEL_PTR(SHOP_ITEMS(shop)), lbuf);
+	add_page_display(ch, "Items: <%sitem\t0>\r\n%s", OLC_LABEL_PTR(SHOP_ITEMS(shop)), lbuf);
 	
-	page_string(ch->desc, buf, TRUE);
+	send_page_display(ch);
 }
 
 

@@ -909,7 +909,7 @@ void get_template_spawns_display(struct adventure_spawn *list, char *save_buffer
 */
 void olc_show_room_template(char_data *ch) {
 	room_template *rmt = GET_OLC_ROOM_TEMPLATE(ch->desc);
-	char buf[MAX_STRING_LENGTH*4], lbuf[MAX_STRING_LENGTH*4];
+	char lbuf[MAX_STRING_LENGTH*4];
 	
 	adv_data *adv = get_adventure_for_vnum(GET_OLC_VNUM(ch->desc));
 	
@@ -917,12 +917,10 @@ void olc_show_room_template(char_data *ch) {
 		return;
 	}
 	
-	*buf = '\0';
-	
-	sprintf(buf + strlen(buf), "[%s%d\t0] %s%s\t0\r\n", OLC_LABEL_CHANGED, GET_OLC_VNUM(ch->desc), OLC_LABEL_UNCHANGED, !room_template_proto(GET_RMT_VNUM(rmt)) ? "new room template" : GET_RMT_TITLE(room_template_proto(GET_RMT_VNUM(rmt))));
-	sprintf(buf + strlen(buf), "Adventure: %d %s%s\t0\r\n", adv ? GET_ADV_VNUM(adv) : NOTHING, OLC_LABEL_CHANGED, adv ? GET_ADV_NAME(adv) : "none");
-	sprintf(buf + strlen(buf), "<%stitle\t0> %s\r\n", OLC_LABEL_STR(GET_RMT_TITLE(rmt), default_rmt_title), NULLSAFE(GET_RMT_TITLE(rmt)));
-	sprintf(buf + strlen(buf), "<%sdescription\t0>\r\n%s", OLC_LABEL_STR(GET_RMT_DESC(rmt), ""), NULLSAFE(GET_RMT_DESC(rmt)));
+	add_page_display(ch, "[%s%d\t0] %s%s\t0", OLC_LABEL_CHANGED, GET_OLC_VNUM(ch->desc), OLC_LABEL_UNCHANGED, !room_template_proto(GET_RMT_VNUM(rmt)) ? "new room template" : GET_RMT_TITLE(room_template_proto(GET_RMT_VNUM(rmt))));
+	add_page_display(ch, "Adventure: %d %s%s\t0", adv ? GET_ADV_VNUM(adv) : NOTHING, OLC_LABEL_CHANGED, adv ? GET_ADV_NAME(adv) : "none");
+	add_page_display(ch, "<%stitle\t0> %s", OLC_LABEL_STR(GET_RMT_TITLE(rmt), default_rmt_title), NULLSAFE(GET_RMT_TITLE(rmt)));
+	add_page_display(ch, "<%sdescription\t0>%s", OLC_LABEL_STR(GET_RMT_DESC(rmt), ""), NULLSAFE(GET_RMT_DESC(rmt)));
 	
 	if (GET_RMT_SUBZONE(rmt) != NOWHERE) {
 		snprintf(lbuf, sizeof(lbuf), "%d", GET_RMT_SUBZONE(rmt));
@@ -930,54 +928,54 @@ void olc_show_room_template(char_data *ch) {
 	else {
 		strcpy(lbuf, "none");
 	}
-	sprintf(buf + strlen(buf), "<%ssubzone\t0> %s\r\n", OLC_LABEL_VAL(GET_RMT_SUBZONE(rmt), NOWHERE), lbuf);
+	add_page_display(ch, "<%ssubzone\t0> %s", OLC_LABEL_VAL(GET_RMT_SUBZONE(rmt), NOWHERE), lbuf);
 	
 	sprintbit(GET_RMT_FLAGS(rmt), room_template_flags, lbuf, TRUE);
-	sprintf(buf + strlen(buf), "<%sflags\t0> %s\r\n", OLC_LABEL_VAL(GET_RMT_FLAGS(rmt), NOBITS), lbuf);
+	add_page_display(ch, "<%sflags\t0> %s", OLC_LABEL_VAL(GET_RMT_FLAGS(rmt), NOBITS), lbuf);
 	
 	sprintbit(GET_RMT_FUNCTIONS(rmt), function_flags, lbuf, TRUE);
-	sprintf(buf + strlen(buf), "<%sfunctions\t0> %s\r\n", OLC_LABEL_VAL(GET_RMT_FUNCTIONS(rmt), NOBITS), lbuf);
+	add_page_display(ch, "<%sfunctions\t0> %s", OLC_LABEL_VAL(GET_RMT_FUNCTIONS(rmt), NOBITS), lbuf);
 	
 	sprintbit(GET_RMT_BASE_AFFECTS(rmt), room_aff_bits, lbuf, TRUE);
-	sprintf(buf + strlen(buf), "<%saffects\t0> %s\r\n", OLC_LABEL_VAL(GET_RMT_BASE_AFFECTS(rmt), NOBITS), lbuf);
+	add_page_display(ch, "<%saffects\t0> %s", OLC_LABEL_VAL(GET_RMT_BASE_AFFECTS(rmt), NOBITS), lbuf);
 	
-	sprintf(buf + strlen(buf), "<%stemperature\t0> %s\r\n", OLC_LABEL_VAL(GET_RMT_TEMPERATURE_TYPE(rmt), 0), temperature_types[GET_RMT_TEMPERATURE_TYPE(rmt)]);
+	add_page_display(ch, "<%stemperature\t0> %s", OLC_LABEL_VAL(GET_RMT_TEMPERATURE_TYPE(rmt), 0), temperature_types[GET_RMT_TEMPERATURE_TYPE(rmt)]);
 	
 	// exits
-	sprintf(buf + strlen(buf), "Exits: <%sexit\t0>, <%smatchexits\t0>\r\n", OLC_LABEL_PTR(GET_RMT_EXITS(rmt)), OLC_LABEL_PTR(GET_RMT_EXITS(rmt)));
+	add_page_display(ch, "Exits: <%sexit\t0>, <%smatchexits\t0>", OLC_LABEL_PTR(GET_RMT_EXITS(rmt)), OLC_LABEL_PTR(GET_RMT_EXITS(rmt)));
 	if (GET_RMT_EXITS(rmt)) {
 		get_exit_template_display(GET_RMT_EXITS(rmt), lbuf);
-		strcat(buf, lbuf);
+		add_page_display_str(ch, lbuf);
 	}
 	
 	// exdesc
-	sprintf(buf + strlen(buf), "Extra descriptions: <%sextra\t0>\r\n", OLC_LABEL_PTR(GET_RMT_EX_DESCS(rmt)));
+	add_page_display(ch, "Extra descriptions: <%sextra\t0>", OLC_LABEL_PTR(GET_RMT_EX_DESCS(rmt)));
 	if (GET_RMT_EX_DESCS(rmt)) {
 		get_extra_desc_display(GET_RMT_EX_DESCS(rmt), lbuf, sizeof(lbuf));
-		strcat(buf, lbuf);
+		add_page_display_str(ch, lbuf);
 	}
 	
-	sprintf(buf + strlen(buf), "Interactions: <%sinteraction\t0>\r\n", OLC_LABEL_PTR(GET_RMT_INTERACTIONS(rmt)));
+	add_page_display(ch, "Interactions: <%sinteraction\t0>", OLC_LABEL_PTR(GET_RMT_INTERACTIONS(rmt)));
 	if (GET_RMT_INTERACTIONS(rmt)) {
 		get_interaction_display(GET_RMT_INTERACTIONS(rmt), lbuf);
-		strcat(buf, lbuf);
+		add_page_display_str(ch, lbuf);
 	}
 	
 	// spawns
-	sprintf(buf + strlen(buf), "Spawns: <%sspawns\t0>\r\n", OLC_LABEL_PTR(GET_RMT_SPAWNS(rmt)));
+	add_page_display(ch, "Spawns: <%sspawns\t0>", OLC_LABEL_PTR(GET_RMT_SPAWNS(rmt)));
 	if (GET_RMT_SPAWNS(rmt)) {
 		get_template_spawns_display(GET_RMT_SPAWNS(rmt), lbuf);
-		strcat(buf, lbuf);
+		add_page_display_str(ch, lbuf);
 	}
 	
 	// scripts
-	sprintf(buf + strlen(buf), "Scripts: <%sscript\t0>\r\n", OLC_LABEL_PTR(GET_RMT_SCRIPTS(rmt)));
+	add_page_display(ch, "Scripts: <%sscript\t0>", OLC_LABEL_PTR(GET_RMT_SCRIPTS(rmt)));
 	if (GET_RMT_SCRIPTS(rmt)) {
 		get_script_display(GET_RMT_SCRIPTS(rmt), lbuf);
-		strcat(buf, lbuf);
+		add_page_display_str(ch, lbuf);
 	}
 	
-	page_string(ch->desc, buf, TRUE);
+	send_page_display(ch);
 }
 
 

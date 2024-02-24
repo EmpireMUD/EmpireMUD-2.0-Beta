@@ -710,34 +710,32 @@ void do_stat_social(char_data *ch, social_data *soc) {
 */
 void olc_show_social(char_data *ch) {
 	social_data *soc = GET_OLC_SOCIAL(ch->desc);
-	char buf[MAX_STRING_LENGTH], lbuf[MAX_STRING_LENGTH];
+	char lbuf[MAX_STRING_LENGTH];
 	int iter;
 	
 	if (!soc) {
 		return;
 	}
 	
-	*buf = '\0';
-	
-	sprintf(buf + strlen(buf), "[%s%d\t0] %s%s\t0\r\n", OLC_LABEL_CHANGED, GET_OLC_VNUM(ch->desc), OLC_LABEL_UNCHANGED, !social_proto(SOC_VNUM(soc)) ? "new social" : SOC_NAME(social_proto(SOC_VNUM(soc))));
-	sprintf(buf + strlen(buf), "<%sname\t0> %s\r\n", OLC_LABEL_STR(SOC_NAME(soc), default_social_name), NULLSAFE(SOC_NAME(soc)));
-	sprintf(buf + strlen(buf), "<%scommand\t0> %s\r\n", OLC_LABEL_STR(SOC_COMMAND(soc), default_social_command), NULLSAFE(SOC_COMMAND(soc)));
+	add_page_display(ch, "[%s%d\t0] %s%s\t0", OLC_LABEL_CHANGED, GET_OLC_VNUM(ch->desc), OLC_LABEL_UNCHANGED, !social_proto(SOC_VNUM(soc)) ? "new social" : SOC_NAME(social_proto(SOC_VNUM(soc))));
+	add_page_display(ch, "<%sname\t0> %s", OLC_LABEL_STR(SOC_NAME(soc), default_social_name), NULLSAFE(SOC_NAME(soc)));
+	add_page_display(ch, "<%scommand\t0> %s", OLC_LABEL_STR(SOC_COMMAND(soc), default_social_command), NULLSAFE(SOC_COMMAND(soc)));
 	
 	sprintbit(SOC_FLAGS(soc), social_flags, lbuf, TRUE);
-	sprintf(buf + strlen(buf), "<%sflags\t0> %s\r\n", OLC_LABEL_VAL(SOC_FLAGS(soc), SOC_IN_DEVELOPMENT), lbuf);
+	add_page_display(ch, "<%sflags\t0> %s", OLC_LABEL_VAL(SOC_FLAGS(soc), SOC_IN_DEVELOPMENT), lbuf);
 	
-	sprintf(buf + strlen(buf), "<%scharposition\t0> %s (minimum)\r\n", OLC_LABEL_VAL(SOC_MIN_CHAR_POS(soc), 0), position_types[SOC_MIN_CHAR_POS(soc)]);
-	sprintf(buf + strlen(buf), "<%stargetposition\t0> %s (minimum)\r\n", OLC_LABEL_VAL(SOC_MIN_VICT_POS(soc), 0), position_types[SOC_MIN_VICT_POS(soc)]);
+	add_page_display(ch, "<%scharposition\t0> %s (minimum)", OLC_LABEL_VAL(SOC_MIN_CHAR_POS(soc), 0), position_types[SOC_MIN_CHAR_POS(soc)]);
+	add_page_display(ch, "<%stargetposition\t0> %s (minimum)", OLC_LABEL_VAL(SOC_MIN_VICT_POS(soc), 0), position_types[SOC_MIN_VICT_POS(soc)]);
 	
 	get_requirement_display(SOC_REQUIREMENTS(soc), lbuf);
-	sprintf(buf + strlen(buf), "Requirements: <%srequirements\t0>\r\n%s", OLC_LABEL_PTR(SOC_REQUIREMENTS(soc)), lbuf);
+	add_page_display(ch, "Requirements: <%srequirements\t0>\r\n%s", OLC_LABEL_PTR(SOC_REQUIREMENTS(soc)), lbuf);
 	
-	sprintf(buf + strlen(buf), "Messages:\r\n");
+	add_page_display(ch, "Messages:");
 	for (iter = 0; iter < NUM_SOCM_MESSAGES; ++iter) {
-		sprintf(buf + strlen(buf), "%s <%s%s\t0>: %s\r\n", social_message_types[iter][0], OLC_LABEL_STR(SOC_MESSAGE(soc, iter), ""), social_message_types[iter][1], SOC_MESSAGE(soc, iter) ? SOC_MESSAGE(soc, iter) : "(none)");
+		add_page_display(ch, "%s <%s%s\t0>: %s", social_message_types[iter][0], OLC_LABEL_STR(SOC_MESSAGE(soc, iter), ""), social_message_types[iter][1], SOC_MESSAGE(soc, iter) ? SOC_MESSAGE(soc, iter) : "(none)");
 	}
 	
-	page_string(ch->desc, buf, TRUE);
+	send_page_display(ch);
 }
 
 

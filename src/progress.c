@@ -2764,42 +2764,40 @@ void do_stat_progress(char_data *ch, progress_data *prg) {
 */
 void olc_show_progress(char_data *ch) {
 	progress_data *prg = GET_OLC_PROGRESS(ch->desc);
-	char buf[MAX_STRING_LENGTH], lbuf[MAX_STRING_LENGTH];
+	char lbuf[MAX_STRING_LENGTH];
 	
 	if (!prg) {
 		return;
 	}
 	
-	*buf = '\0';
+	add_page_display(ch, "[%s%d\t0] %s%s\t0", OLC_LABEL_CHANGED, GET_OLC_VNUM(ch->desc), OLC_LABEL_UNCHANGED, !real_progress(PRG_VNUM(prg)) ? "new progression" : PRG_NAME(real_progress(PRG_VNUM(prg))));
+	add_page_display(ch, "<%sname\t0> %s", OLC_LABEL_STR(PRG_NAME(prg), default_progress_name), NULLSAFE(PRG_NAME(prg)));
+	add_page_display(ch, "<%sdescription\t0>\r\n%s", OLC_LABEL_STR(PRG_DESCRIPTION(prg), ""), NULLSAFE(PRG_DESCRIPTION(prg)));
 	
-	sprintf(buf + strlen(buf), "[%s%d\t0] %s%s\t0\r\n", OLC_LABEL_CHANGED, GET_OLC_VNUM(ch->desc), OLC_LABEL_UNCHANGED, !real_progress(PRG_VNUM(prg)) ? "new progression" : PRG_NAME(real_progress(PRG_VNUM(prg))));
-	sprintf(buf + strlen(buf), "<%sname\t0> %s\r\n", OLC_LABEL_STR(PRG_NAME(prg), default_progress_name), NULLSAFE(PRG_NAME(prg)));
-	sprintf(buf + strlen(buf), "<%sdescription\t0>\r\n%s", OLC_LABEL_STR(PRG_DESCRIPTION(prg), ""), NULLSAFE(PRG_DESCRIPTION(prg)));
-	
-	sprintf(buf + strlen(buf), "<%stype\t0> %s\r\n", OLC_LABEL_VAL(PRG_TYPE(prg), PROGRESS_UNDEFINED), progress_types[PRG_TYPE(prg)]);
+	add_page_display(ch, "<%stype\t0> %s", OLC_LABEL_VAL(PRG_TYPE(prg), PROGRESS_UNDEFINED), progress_types[PRG_TYPE(prg)]);
 	
 	sprintbit(PRG_FLAGS(prg), progress_flags, lbuf, TRUE);
-	sprintf(buf + strlen(buf), "<%sflags\t0> %s\r\n", OLC_LABEL_VAL(PRG_FLAGS(prg), PRG_IN_DEVELOPMENT), lbuf);
+	add_page_display(ch, "<%sflags\t0> %s", OLC_LABEL_VAL(PRG_FLAGS(prg), PRG_IN_DEVELOPMENT), lbuf);
 	
 	if (PRG_FLAGGED(prg, PRG_PURCHASABLE)) {
-		sprintf(buf + strlen(buf), "<%scost\t0> %d point%s\r\n", OLC_LABEL_VAL(PRG_COST(prg), 0), PRG_COST(prg), PLURAL(PRG_COST(prg)));
+		add_page_display(ch, "<%scost\t0> %d point%s", OLC_LABEL_VAL(PRG_COST(prg), 0), PRG_COST(prg), PLURAL(PRG_COST(prg)));
 	}
 	if (PRG_VALUE(prg) || !PRG_FLAGGED(prg, PRG_PURCHASABLE)) {
-		sprintf(buf + strlen(buf), "<%svalue\t0> %d point%s\r\n", PRG_FLAGGED(prg, PRG_PURCHASABLE) ? "\tr" : OLC_LABEL_VAL(PRG_VALUE(prg), 0), PRG_VALUE(prg), PLURAL(PRG_VALUE(prg)));
+		add_page_display(ch, "<%svalue\t0> %d point%s", PRG_FLAGGED(prg, PRG_PURCHASABLE) ? "\tr" : OLC_LABEL_VAL(PRG_VALUE(prg), 0), PRG_VALUE(prg), PLURAL(PRG_VALUE(prg)));
 	}
 	
 	get_progress_list_display(PRG_PREREQS(prg), lbuf);
-	sprintf(buf + strlen(buf), "Prerequisites: <%sprereqs\t0>\r\n%s", OLC_LABEL_PTR(PRG_PREREQS(prg)), lbuf);
+	add_page_display(ch, "Prerequisites: <%sprereqs\t0>\r\n%s", OLC_LABEL_PTR(PRG_PREREQS(prg)), lbuf);
 	
 	if (PRG_TASKS(prg) || !PRG_FLAGGED(prg, PRG_PURCHASABLE)) {
 		get_requirement_display(PRG_TASKS(prg), lbuf);
-		sprintf(buf + strlen(buf), "Tasks: <%stasks\t0>\r\n%s", PRG_FLAGGED(prg, PRG_PURCHASABLE) ? "\tr" : OLC_LABEL_PTR(PRG_TASKS(prg)), lbuf);
+		add_page_display(ch, "Tasks: <%stasks\t0>\r\n%s", PRG_FLAGGED(prg, PRG_PURCHASABLE) ? "\tr" : OLC_LABEL_PTR(PRG_TASKS(prg)), lbuf);
 	}
 	
 	get_progress_perks_display(PRG_PERKS(prg), lbuf, TRUE);
-	sprintf(buf + strlen(buf), "Perks: <%sperks\t0>\r\n%s", OLC_LABEL_PTR(PRG_PERKS(prg)), lbuf);
+	add_page_display(ch, "Perks: <%sperks\t0>\r\n%s", OLC_LABEL_PTR(PRG_PERKS(prg)), lbuf);
 	
-	page_string(ch->desc, buf, TRUE);
+	send_page_display(ch);
 }
 
 

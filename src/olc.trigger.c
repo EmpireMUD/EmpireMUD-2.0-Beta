@@ -976,41 +976,39 @@ int wordcount_trigger(trig_data *trig) {
 void olc_show_trigger(char_data *ch) {
 	trig_data *trig = GET_OLC_TRIGGER(ch->desc);
 	bitvector_t trig_arg_types = compile_argument_types_for_trigger(trig);
-	char trgtypes[256], buf[MAX_STRING_LENGTH * 4];	// that HAS to be long enough, right?
+	char trgtypes[256];
 	
 	if (!trig) {
 		return;
 	}
 	
-	*buf = '\0';
-	
-	sprintf(buf + strlen(buf), "[%s%d\t0] %s%s\t0\r\n", OLC_LABEL_CHANGED, GET_OLC_VNUM(ch->desc), OLC_LABEL_UNCHANGED, !real_trigger(GET_OLC_VNUM(ch->desc)) ? "new trigger" : GET_TRIG_NAME(real_trigger(GET_OLC_VNUM(ch->desc))));
-	sprintf(buf + strlen(buf), "<%sname\t0> %s\r\n", OLC_LABEL_STR(GET_TRIG_NAME(trig), default_trig_name), NULLSAFE(GET_TRIG_NAME(trig)));
-	sprintf(buf + strlen(buf), "<%sattaches\t0> %s\r\n", OLC_LABEL_VAL(trig->attach_type, 0), trig_attach_types[trig->attach_type]);
+	add_page_display(ch, "[%s%d\t0] %s%s\t0", OLC_LABEL_CHANGED, GET_OLC_VNUM(ch->desc), OLC_LABEL_UNCHANGED, !real_trigger(GET_OLC_VNUM(ch->desc)) ? "new trigger" : GET_TRIG_NAME(real_trigger(GET_OLC_VNUM(ch->desc))));
+	add_page_display(ch, "<%sname\t0> %s", OLC_LABEL_STR(GET_TRIG_NAME(trig), default_trig_name), NULLSAFE(GET_TRIG_NAME(trig)));
+	add_page_display(ch, "<%sattaches\t0> %s", OLC_LABEL_VAL(trig->attach_type, 0), trig_attach_types[trig->attach_type]);
 	
 	sprintbit(GET_TRIG_TYPE(trig), trig_attach_type_list[trig->attach_type], trgtypes, TRUE);
-	sprintf(buf + strlen(buf), "<%stypes\t0> %s\r\n", OLC_LABEL_VAL(GET_TRIG_TYPE(trig), NOBITS), trgtypes);
+	add_page_display(ch, "<%stypes\t0> %s", OLC_LABEL_VAL(GET_TRIG_TYPE(trig), NOBITS), trgtypes);
 	
 	if (IS_SET(trig_arg_types, TRIG_ARG_PERCENT)) {
-		sprintf(buf + strlen(buf), "<%spercent\t0> %d%%\r\n", OLC_LABEL_VAL(trig->narg, 0), trig->narg);
+		add_page_display(ch, "<%spercent\t0> %d%%", OLC_LABEL_VAL(trig->narg, 0), trig->narg);
 	}
 	if (IS_SET(trig_arg_types, TRIG_ARG_PHRASE_OR_WORDLIST)) {
-		sprintf(buf + strlen(buf), "<%sargtype\t0> %s\r\n", OLC_LABEL_VAL(trig->narg, 0), trig_arg_phrase_type[trig->narg]);
+		add_page_display(ch, "<%sargtype\t0> %s", OLC_LABEL_VAL(trig->narg, 0), trig_arg_phrase_type[trig->narg]);
 	}
 	if (IS_SET(trig_arg_types, TRIG_ARG_OBJ_WHERE)) {
 		sprintbit(trig->narg, trig_arg_obj_where, buf1, TRUE);
-		sprintf(buf + strlen(buf), "<%slocation\t0> %s\r\n", OLC_LABEL_VAL(trig->narg, 0), trig->narg ? buf1 : "none");
+		add_page_display(ch, "<%slocation\t0> %s", OLC_LABEL_VAL(trig->narg, 0), trig->narg ? buf1 : "none");
 	}
 	if (IS_SET(trig_arg_types, TRIG_ARG_COMMAND | TRIG_ARG_PHRASE_OR_WORDLIST)) {
-		sprintf(buf + strlen(buf), "<%sstring\t0> %s\r\n", OLC_LABEL_STR(trig->arglist, ""), NULLSAFE(trig->arglist));
+		add_page_display(ch, "<%sstring\t0> %s", OLC_LABEL_STR(trig->arglist, ""), NULLSAFE(trig->arglist));
 	}
 	if (IS_SET(trig_arg_types, TRIG_ARG_COST)) {
-		sprintf(buf + strlen(buf), "<%scosts\t0> %d misc coins\r\n", OLC_LABEL_VAL(trig->narg, 0), trig->narg);
+		add_page_display(ch, "<%scosts\t0> %d misc coins", OLC_LABEL_VAL(trig->narg, 0), trig->narg);
 	}
 	
-	sprintf(buf + strlen(buf), "<%scommands\t0>\r\n%s", OLC_LABEL_STR(GET_OLC_STORAGE(ch->desc), ""), show_color_codes(NULLSAFE(GET_OLC_STORAGE(ch->desc))));
+	add_page_display(ch, "<%scommands\t0>\r\n%s", OLC_LABEL_STR(GET_OLC_STORAGE(ch->desc), ""), show_color_codes(NULLSAFE(GET_OLC_STORAGE(ch->desc))));
 	
-	page_string(ch->desc, buf, TRUE);
+	send_page_display(ch);
 }
 
 

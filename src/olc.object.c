@@ -2304,7 +2304,7 @@ void olc_get_values_display(char_data *ch, char *storage) {
 */
 void olc_show_object(char_data *ch) {
 	obj_data *obj = GET_OLC_OBJECT(ch->desc);
-	char buf[MAX_STRING_LENGTH*4], buf1[MAX_STRING_LENGTH*4];
+	char buf1[MAX_STRING_LENGTH*4];
 	struct obj_storage_type *store;
 	struct custom_message *ocm;
 	struct obj_apply *apply;
@@ -2314,12 +2314,11 @@ void olc_show_object(char_data *ch) {
 		return;
 	}
 	
-	*buf = '\0';
-	sprintf(buf + strlen(buf), "[%s%d\t0] %s%s\t0 (Gear rating [%s%.2f\t0])\r\n", OLC_LABEL_CHANGED, GET_OLC_VNUM(ch->desc), OLC_LABEL_UNCHANGED, !obj_proto(GET_OLC_VNUM(ch->desc)) ? "new object" : get_obj_name_by_proto(GET_OLC_VNUM(ch->desc)), OLC_LABEL_CHANGED, rate_item(obj));
-	sprintf(buf + strlen(buf), "<%skeywords\t0> %s\r\n", OLC_LABEL_STR(GET_OBJ_KEYWORDS(obj), default_obj_keywords), GET_OBJ_KEYWORDS(obj));
-	sprintf(buf + strlen(buf), "<%sshortdescription\t0> %s\r\n", OLC_LABEL_STR(GET_OBJ_SHORT_DESC(obj), default_obj_short), GET_OBJ_SHORT_DESC(obj));
-	sprintf(buf + strlen(buf), "<%slongdescription\t0> %s\r\n", OLC_LABEL_STR(GET_OBJ_LONG_DESC(obj), default_obj_long), GET_OBJ_LONG_DESC(obj));
-	sprintf(buf + strlen(buf), "<%slookdescription\t0>\r\n%s", OLC_LABEL_STR(GET_OBJ_ACTION_DESC(obj), ""), NULLSAFE(GET_OBJ_ACTION_DESC(obj)));
+	add_page_display(ch, "[%s%d\t0] %s%s\t0 (Gear rating [%s%.2f\t0])", OLC_LABEL_CHANGED, GET_OLC_VNUM(ch->desc), OLC_LABEL_UNCHANGED, !obj_proto(GET_OLC_VNUM(ch->desc)) ? "new object" : get_obj_name_by_proto(GET_OLC_VNUM(ch->desc)), OLC_LABEL_CHANGED, rate_item(obj));
+	add_page_display(ch, "<%skeywords\t0> %s", OLC_LABEL_STR(GET_OBJ_KEYWORDS(obj), default_obj_keywords), GET_OBJ_KEYWORDS(obj));
+	add_page_display(ch, "<%sshortdescription\t0> %s", OLC_LABEL_STR(GET_OBJ_SHORT_DESC(obj), default_obj_short), GET_OBJ_SHORT_DESC(obj));
+	add_page_display(ch, "<%slongdescription\t0> %s", OLC_LABEL_STR(GET_OBJ_LONG_DESC(obj), default_obj_long), GET_OBJ_LONG_DESC(obj));
+	add_page_display(ch, "<%slookdescription\t0>\r\n%s", OLC_LABEL_STR(GET_OBJ_ACTION_DESC(obj), ""), NULLSAFE(GET_OBJ_ACTION_DESC(obj)));
 	
 	if (GET_OBJ_TIMER(obj) > 0) {
 		seconds = GET_OBJ_TIMER(obj) * SECS_PER_MUD_HOUR;
@@ -2328,98 +2327,98 @@ void olc_show_object(char_data *ch) {
 	else {
 		strcpy(buf1, "none");
 	}
-	sprintf(buf + strlen(buf), "<%stype\t0> %s, <%smaterial\t0> %s, <%stimer\t0> %s\r\n", OLC_LABEL_VAL(GET_OBJ_TYPE(obj), 0), item_types[(int) GET_OBJ_TYPE(obj)], OLC_LABEL_VAL(GET_OBJ_MATERIAL(obj), 0), materials[GET_OBJ_MATERIAL(obj)].name, OLC_LABEL_VAL(GET_OBJ_TIMER(obj), 0), buf1);
+	add_page_display(ch, "<%stype\t0> %s, <%smaterial\t0> %s, <%stimer\t0> %s", OLC_LABEL_VAL(GET_OBJ_TYPE(obj), 0), item_types[(int) GET_OBJ_TYPE(obj)], OLC_LABEL_VAL(GET_OBJ_MATERIAL(obj), 0), materials[GET_OBJ_MATERIAL(obj)].name, OLC_LABEL_VAL(GET_OBJ_TIMER(obj), 0), buf1);
 	
 	sprintbit(GET_OBJ_WEAR(obj), wear_bits, buf1, TRUE);
-	sprintf(buf + strlen(buf), "<%swear\t0> %s\r\n", OLC_LABEL_VAL(GET_OBJ_WEAR(obj), ITEM_WEAR_TAKE), buf1);
+	add_page_display(ch, "<%swear\t0> %s", OLC_LABEL_VAL(GET_OBJ_WEAR(obj), ITEM_WEAR_TAKE), buf1);
 	
 	sprintbit(GET_OBJ_EXTRA(obj), extra_bits, buf1, TRUE);
-	sprintf(buf + strlen(buf), "<%sflags\t0> %s\r\n", OLC_LABEL_VAL(GET_OBJ_EXTRA(obj), NOBITS), buf1);
+	add_page_display(ch, "<%sflags\t0> %s", OLC_LABEL_VAL(GET_OBJ_EXTRA(obj), NOBITS), buf1);
 	
 	sprintbit(GET_OBJ_TOOL_FLAGS(obj), tool_flags, buf1, TRUE);
-	sprintf(buf + strlen(buf), "<%stools\t0> %s\r\n", OLC_LABEL_VAL(GET_OBJ_TOOL_FLAGS(obj), NOBITS), buf1);
+	add_page_display(ch, "<%stools\t0> %s", OLC_LABEL_VAL(GET_OBJ_TOOL_FLAGS(obj), NOBITS), buf1);
 	
 	sprintbit(GET_OBJ_REQUIRES_TOOL(obj), tool_flags, buf1, TRUE);
-	sprintf(buf + strlen(buf), "<%srequirestools\t0> %s\r\n", OLC_LABEL_VAL(GET_OBJ_REQUIRES_TOOL(obj), NOBITS), buf1);
+	add_page_display(ch, "<%srequirestools\t0> %s", OLC_LABEL_VAL(GET_OBJ_REQUIRES_TOOL(obj), NOBITS), buf1);
 	
-	sprintf(buf + strlen(buf), "<%scomponent\t0> [%d] %s\r\n", OLC_LABEL_VAL(GET_OBJ_COMPONENT(obj), NOTHING), GET_OBJ_COMPONENT(obj), GET_OBJ_COMPONENT(obj) != NOTHING ? get_generic_name_by_vnum(GET_OBJ_COMPONENT(obj)) : "none");
+	add_page_display(ch, "<%scomponent\t0> [%d] %s", OLC_LABEL_VAL(GET_OBJ_COMPONENT(obj), NOTHING), GET_OBJ_COMPONENT(obj), GET_OBJ_COMPONENT(obj) != NOTHING ? get_generic_name_by_vnum(GET_OBJ_COMPONENT(obj)) : "none");
 	
 	if (GET_OBJ_MIN_SCALE_LEVEL(obj) > 0) {
-		sprintf(buf + strlen(buf), "<%sminlevel\t0> %d\r\n", OLC_LABEL_CHANGED, GET_OBJ_MIN_SCALE_LEVEL(obj));
+		add_page_display(ch, "<%sminlevel\t0> %d", OLC_LABEL_CHANGED, GET_OBJ_MIN_SCALE_LEVEL(obj));
 	}
 	else {
-		sprintf(buf + strlen(buf), "<%sminlevel\t0> none\r\n", OLC_LABEL_UNCHANGED);
+		add_page_display(ch, "<%sminlevel\t0> none", OLC_LABEL_UNCHANGED);
 	}
 	if (GET_OBJ_MAX_SCALE_LEVEL(obj) > 0) {
-		sprintf(buf + strlen(buf), "<%smaxlevel\t0> %d\r\n", OLC_LABEL_CHANGED, GET_OBJ_MAX_SCALE_LEVEL(obj));
+		add_page_display(ch, "<%smaxlevel\t0> %d", OLC_LABEL_CHANGED, GET_OBJ_MAX_SCALE_LEVEL(obj));
 	}
 	else {
-		sprintf(buf + strlen(buf), "<%smaxlevel\t0> none\r\n", OLC_LABEL_UNCHANGED);
+		add_page_display(ch, "<%smaxlevel\t0> none", OLC_LABEL_UNCHANGED);
 	}
 	
 	if (GET_OBJ_REQUIRES_QUEST(obj) != NOTHING) {
-		sprintf(buf + strlen(buf), "<%srequiresquest\t0> [%d] %s\r\n", OLC_LABEL_CHANGED, GET_OBJ_REQUIRES_QUEST(obj), get_quest_name_by_proto(GET_OBJ_REQUIRES_QUEST(obj)));
+		add_page_display(ch, "<%srequiresquest\t0> [%d] %s", OLC_LABEL_CHANGED, GET_OBJ_REQUIRES_QUEST(obj), get_quest_name_by_proto(GET_OBJ_REQUIRES_QUEST(obj)));
 	}
 	else {
-		sprintf(buf + strlen(buf), "<%srequiresquest\t0> none\r\n", OLC_LABEL_UNCHANGED);
+		add_page_display(ch, "<%srequiresquest\t0> none", OLC_LABEL_UNCHANGED);
 	}
 	
 	olc_get_values_display(ch, buf1);
-	strcat(buf, buf1);
+	add_page_display_str(ch, buf1);
 
 	sprintbit(GET_OBJ_AFF_FLAGS(obj), affected_bits, buf1, TRUE);
-	sprintf(buf + strlen(buf), "<%saffects\t0> %s\r\n", OLC_LABEL_VAL(GET_OBJ_AFF_FLAGS(obj), NOBITS), buf1);
+	add_page_display(ch, "<%saffects\t0> %s", OLC_LABEL_VAL(GET_OBJ_AFF_FLAGS(obj), NOBITS), buf1);
 	
 	// applies / affected[]
 	count = 0;
-	sprintf(buf + strlen(buf), "Attribute Applies: <%sapply\t0>%s\r\n", OLC_LABEL_PTR(GET_OBJ_APPLIES(obj)), OBJ_FLAGGED(obj, OBJ_SCALABLE) ? " (scalable)" : "");
+	add_page_display(ch, "Attribute Applies: <%sapply\t0>%s", OLC_LABEL_PTR(GET_OBJ_APPLIES(obj)), OBJ_FLAGGED(obj, OBJ_SCALABLE) ? " (scalable)" : "");
 	for (apply = GET_OBJ_APPLIES(obj); apply; apply = apply->next) {
-		sprintf(buf + strlen(buf), " \ty%2d\t0. %+d to %s (%s)\r\n", ++count, apply->modifier, apply_types[(int) apply->location], apply_type_names[(int)apply->apply_type]);
+		add_page_display_col(ch, 2, FALSE, " \ty%2d\t0. %+d to %s (%s)", ++count, apply->modifier, apply_types[(int) apply->location], apply_type_names[(int)apply->apply_type]);
 	}
 	
 	// exdesc
-	sprintf(buf + strlen(buf), "Extra descriptions: <%sextra\t0>\r\n", OLC_LABEL_PTR(GET_OBJ_EX_DESCS(obj)));
+	add_page_display(ch, "Extra descriptions: <%sextra\t0>", OLC_LABEL_PTR(GET_OBJ_EX_DESCS(obj)));
 	if (GET_OBJ_EX_DESCS(obj)) {
 		get_extra_desc_display(GET_OBJ_EX_DESCS(obj), buf1, sizeof(buf1));
-		strcat(buf, buf1);
+		add_page_display_str(ch, buf1);
 	}
 
-	sprintf(buf + strlen(buf), "Interactions: <%sinteraction\t0>\r\n", OLC_LABEL_PTR(GET_OBJ_INTERACTIONS(obj)));
+	add_page_display(ch, "Interactions: <%sinteraction\t0>", OLC_LABEL_PTR(GET_OBJ_INTERACTIONS(obj)));
 	if (GET_OBJ_INTERACTIONS(obj)) {
 		get_interaction_display(GET_OBJ_INTERACTIONS(obj), buf1);
-		strcat(buf, buf1);
+		add_page_display_str(ch, buf1);
 	}
 	
 	// storage
-	sprintf(buf + strlen(buf), "Storage: <%sstorage\t0>\r\n", OLC_LABEL_PTR(GET_OBJ_STORAGE(obj)));
+	add_page_display(ch, "Storage: <%sstorage\t0>", OLC_LABEL_PTR(GET_OBJ_STORAGE(obj)));
 	count = 0;
 	LL_FOREACH(GET_OBJ_STORAGE(obj), store) {
 		sprintbit(store->flags, storage_bits, buf2, TRUE);
 		
 		// TYPE_x: storage type
 		if (store->type == TYPE_BLD) {
-			sprintf(buf + strlen(buf), " \ty%d\t0. [B%d] %s ( %s)\r\n", ++count, store->vnum, get_bld_name_by_proto(store->vnum), buf2);
+			add_page_display_col(ch, 2, FALSE, " \ty%d\t0. [B%d] %s ( %s)", ++count, store->vnum, get_bld_name_by_proto(store->vnum), buf2);
 		}
 		else if (store->type == TYPE_VEH) {
-			sprintf(buf + strlen(buf), " \ty%d\t0. [V%d] %s ( %s)\r\n", ++count, store->vnum, get_vehicle_name_by_proto(store->vnum), buf2);
+			add_page_display_col(ch, 2, FALSE, " \ty%d\t0. [V%d] %s ( %s)", ++count, store->vnum, get_vehicle_name_by_proto(store->vnum), buf2);
 		}
 	}
 	
 	// custom messages
-	sprintf(buf + strlen(buf), "Custom messages: <%scustom\t0>\r\n", OLC_LABEL_PTR(GET_OBJ_CUSTOM_MSGS(obj)));
+	add_page_display(ch, "Custom messages: <%scustom\t0>", OLC_LABEL_PTR(GET_OBJ_CUSTOM_MSGS(obj)));
 	count = 0;
 	for (ocm = GET_OBJ_CUSTOM_MSGS(obj); ocm; ocm = ocm->next) {
-		sprintf(buf + strlen(buf), " \ty%2d\t0. [%s] %s\r\n", ++count, obj_custom_types[ocm->type], ocm->msg);
+		add_page_display(ch, " \ty%2d\t0. [%s] %s", ++count, obj_custom_types[ocm->type], ocm->msg);
 	}
 	
 	// scripts
-	sprintf(buf + strlen(buf), "Scripts: <%sscript\t0>\r\n", OLC_LABEL_PTR(GET_OBJ_SCRIPTS(obj)));
+	add_page_display(ch, "Scripts: <%sscript\t0>", OLC_LABEL_PTR(GET_OBJ_SCRIPTS(obj)));
 	if (GET_OBJ_SCRIPTS(obj)) {
 		get_script_display(GET_OBJ_SCRIPTS(obj), buf1);
-		strcat(buf, buf1);
+		add_page_display_str(ch, buf1);
 	}
 	
-	page_string(ch->desc, buf, TRUE);
+	send_page_display(ch);
 }
 
 

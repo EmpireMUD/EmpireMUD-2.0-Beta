@@ -1386,7 +1386,6 @@ OLC_MODULE(olc_refresh_companions) {
 * @param char_data *ch The person who is editing an mobile and will see its display.
 */
 void olc_show_mobile(char_data *ch) {
-	char buf[MAX_STRING_LENGTH * 4];	// these get long
 	char_data *mob = GET_OLC_MOBILE(ch->desc);
 	struct custom_message *mcm;
 	int count;
@@ -1395,61 +1394,60 @@ void olc_show_mobile(char_data *ch) {
 		return;
 	}
 	
-	*buf = '\0';
-	sprintf(buf + strlen(buf), "[%s%d\t0] %s%s\t0\r\n", OLC_LABEL_CHANGED, GET_OLC_VNUM(ch->desc), OLC_LABEL_UNCHANGED, !mob_proto(GET_OLC_VNUM(ch->desc)) ? "new mobile" : GET_SHORT_DESC(mob_proto(GET_OLC_VNUM(ch->desc))));
-	sprintf(buf + strlen(buf), "<%skeywords\t0> %s\r\n", OLC_LABEL_STR(GET_PC_NAME(mob), default_mob_keywords), GET_PC_NAME(mob));
-	sprintf(buf + strlen(buf), "<%sshortdescription\t0> %s\r\n", OLC_LABEL_STR(GET_SHORT_DESC(mob), default_mob_short), GET_SHORT_DESC(mob));
-	sprintf(buf + strlen(buf), "<%slongdescription\t0> %s", OLC_LABEL_STR(GET_LONG_DESC(mob), default_mob_long), GET_LONG_DESC(mob));
-	sprintf(buf + strlen(buf), "<%slookdescription\t0>\r\n%s", OLC_LABEL_PTR(GET_LOOK_DESC(mob)), NULLSAFE(GET_LOOK_DESC(mob)));
+	add_page_display(ch, "[%s%d\t0] %s%s\t0", OLC_LABEL_CHANGED, GET_OLC_VNUM(ch->desc), OLC_LABEL_UNCHANGED, !mob_proto(GET_OLC_VNUM(ch->desc)) ? "new mobile" : GET_SHORT_DESC(mob_proto(GET_OLC_VNUM(ch->desc))));
+	add_page_display(ch, "<%skeywords\t0> %s", OLC_LABEL_STR(GET_PC_NAME(mob), default_mob_keywords), GET_PC_NAME(mob));
+	add_page_display(ch, "<%sshortdescription\t0> %s", OLC_LABEL_STR(GET_SHORT_DESC(mob), default_mob_short), GET_SHORT_DESC(mob));
+	add_page_display(ch, "<%slongdescription\t0> %s", OLC_LABEL_STR(GET_LONG_DESC(mob), default_mob_long), GET_LONG_DESC(mob));
+	add_page_display(ch, "<%slookdescription\t0>\r\n%s", OLC_LABEL_PTR(GET_LOOK_DESC(mob)), NULLSAFE(GET_LOOK_DESC(mob)));
 	
-	sprintf(buf + strlen(buf), "<%ssex\t0> %s\r\n", OLC_LABEL_VAL(GET_SEX(mob), 0), genders[GET_SEX(mob)]);
+	add_page_display(ch, "<%ssex\t0> %s", OLC_LABEL_VAL(GET_SEX(mob), 0), genders[GET_SEX(mob)]);
 	
 	sprintbit(MOB_FLAGS(mob), action_bits, buf1, TRUE);
-	sprintf(buf + strlen(buf), "<%sflags\t0> %s\r\n", OLC_LABEL_VAL(MOB_FLAGS(mob), MOB_ISNPC), buf1);
+	add_page_display(ch, "<%sflags\t0> %s", OLC_LABEL_VAL(MOB_FLAGS(mob), MOB_ISNPC), buf1);
 	
 	sprintbit(AFF_FLAGS(mob), affected_bits, buf1, TRUE);
-	sprintf(buf + strlen(buf), "<%saffects\t0> %s\r\n", OLC_LABEL_VAL(AFF_FLAGS(mob), NOBITS), buf1);
+	add_page_display(ch, "<%saffects\t0> %s", OLC_LABEL_VAL(AFF_FLAGS(mob), NOBITS), buf1);
 
 	if (GET_MIN_SCALE_LEVEL(mob) > 0) {
-		sprintf(buf + strlen(buf), "<%sminlevel\t0> %d\r\n", OLC_LABEL_VAL(GET_MIN_SCALE_LEVEL(mob), 0), GET_MIN_SCALE_LEVEL(mob));
+		add_page_display(ch, "<%sminlevel\t0> %d", OLC_LABEL_VAL(GET_MIN_SCALE_LEVEL(mob), 0), GET_MIN_SCALE_LEVEL(mob));
 	}
 	else {
-		sprintf(buf + strlen(buf), "<%sminlevel\t0> none\r\n", OLC_LABEL_UNCHANGED);
+		add_page_display(ch, "<%sminlevel\t0> none", OLC_LABEL_UNCHANGED);
 	}
 	
 	if (GET_MAX_SCALE_LEVEL(mob) > 0) {	
-		sprintf(buf + strlen(buf), "<%smaxlevel\t0> %d\r\n", OLC_LABEL_VAL(GET_MAX_SCALE_LEVEL(mob), 0), GET_MAX_SCALE_LEVEL(mob));
+		add_page_display(ch, "<%smaxlevel\t0> %d", OLC_LABEL_VAL(GET_MAX_SCALE_LEVEL(mob), 0), GET_MAX_SCALE_LEVEL(mob));
 	}
 	else {
-		sprintf(buf + strlen(buf), "<%smaxlevel\t0> none\r\n", OLC_LABEL_UNCHANGED);
+		add_page_display(ch, "<%smaxlevel\t0> none", OLC_LABEL_UNCHANGED);
 	}
 	
-	sprintf(buf + strlen(buf), "<%sattack\t0> %d %s\r\n", OLC_LABEL_VAL(MOB_ATTACK_TYPE(mob), 0), MOB_ATTACK_TYPE(mob), get_attack_name_by_vnum(MOB_ATTACK_TYPE(mob)));
-	sprintf(buf + strlen(buf), "<%smovetype\t0> %s\r\n", OLC_LABEL_VAL(MOB_MOVE_TYPE(mob), 0), mob_move_types[(int) MOB_MOVE_TYPE(mob)]);
-	sprintf(buf + strlen(buf), "<%ssize\t0> %s\r\n", OLC_LABEL_VAL(SET_SIZE(mob), SIZE_NORMAL), size_types[(int)SET_SIZE(mob)]);
-	sprintf(buf + strlen(buf), "<%snameset\t0> %s, <%slanguage\t0> %d - %s\r\n", OLC_LABEL_VAL(MOB_NAME_SET(mob), 0), name_sets[MOB_NAME_SET(mob)], OLC_LABEL_VAL(MOB_LANGUAGE(mob), NOTHING), MOB_LANGUAGE(mob), (MOB_LANGUAGE(mob) == NOTHING ? "default" : get_generic_name_by_vnum(MOB_LANGUAGE(mob))));
-	sprintf(buf + strlen(buf), "<%sallegiance\t0> %s\r\n", OLC_LABEL_PTR(MOB_FACTION(mob)), MOB_FACTION(mob) ? FCT_NAME(MOB_FACTION(mob)) : "none");
+	add_page_display(ch, "<%sattack\t0> %d %s", OLC_LABEL_VAL(MOB_ATTACK_TYPE(mob), 0), MOB_ATTACK_TYPE(mob), get_attack_name_by_vnum(MOB_ATTACK_TYPE(mob)));
+	add_page_display(ch, "<%smovetype\t0> %s", OLC_LABEL_VAL(MOB_MOVE_TYPE(mob), 0), mob_move_types[(int) MOB_MOVE_TYPE(mob)]);
+	add_page_display(ch, "<%ssize\t0> %s", OLC_LABEL_VAL(SET_SIZE(mob), SIZE_NORMAL), size_types[(int)SET_SIZE(mob)]);
+	add_page_display(ch, "<%snameset\t0> %s, <%slanguage\t0> %d - %s", OLC_LABEL_VAL(MOB_NAME_SET(mob), 0), name_sets[MOB_NAME_SET(mob)], OLC_LABEL_VAL(MOB_LANGUAGE(mob), NOTHING), MOB_LANGUAGE(mob), (MOB_LANGUAGE(mob) == NOTHING ? "default" : get_generic_name_by_vnum(MOB_LANGUAGE(mob))));
+	add_page_display(ch, "<%sallegiance\t0> %s", OLC_LABEL_PTR(MOB_FACTION(mob)), MOB_FACTION(mob) ? FCT_NAME(MOB_FACTION(mob)) : "none");
 	
-	sprintf(buf + strlen(buf), "Interactions: <%sinteraction\t0>\r\n", OLC_LABEL_PTR(mob->interactions));
+	add_page_display(ch, "Interactions: <%sinteraction\t0>", OLC_LABEL_PTR(mob->interactions));
 	if (mob->interactions) {
 		get_interaction_display(mob->interactions, buf1);
-		strcat(buf, buf1);
+		add_page_display_str(ch, buf1);
 	}
 	
 	// custom messages
-	sprintf(buf + strlen(buf), "Custom messages: <%scustom\t0>\r\n", OLC_LABEL_PTR(MOB_CUSTOM_MSGS(mob)));
+	add_page_display(ch, "Custom messages: <%scustom\t0>", OLC_LABEL_PTR(MOB_CUSTOM_MSGS(mob)));
 	count = 0;
 	LL_FOREACH(MOB_CUSTOM_MSGS(mob), mcm) {
-		sprintf(buf + strlen(buf), " \ty%2d\t0. [%s] %s\r\n", ++count, mob_custom_types[mcm->type], mcm->msg);
+		add_page_display(ch, " \ty%2d\t0. [%s] %s", ++count, mob_custom_types[mcm->type], mcm->msg);
 	}
 	
-	sprintf(buf + strlen(buf), "Scripts: <%sscript\t0>\r\n", OLC_LABEL_PTR(mob->proto_script));
+	add_page_display(ch, "Scripts: <%sscript\t0>", OLC_LABEL_PTR(mob->proto_script));
 	if (mob->proto_script) {
 		get_script_display(mob->proto_script, buf1);
-		strcat(buf, buf1);
+		add_page_display_str(ch, buf1);
 	}
 	
-	page_string(ch->desc, buf, TRUE);
+	send_page_display(ch);
 }
 
 

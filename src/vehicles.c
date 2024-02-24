@@ -4693,35 +4693,34 @@ void look_at_vehicle(vehicle_data *veh, char_data *ch) {
 */
 void olc_show_vehicle(char_data *ch) {
 	vehicle_data *veh = GET_OLC_VEHICLE(ch->desc);
-	char buf[MAX_STRING_LENGTH*4], lbuf[MAX_STRING_LENGTH*4];
+	char lbuf[MAX_STRING_LENGTH*4];
 	struct custom_message *custm;
 	struct spawn_info *spawn;
 	int count;
+	struct page_display *pd;
 	
 	if (!veh) {
 		return;
 	}
 	
-	*buf = '\0';
-	
-	sprintf(buf + strlen(buf), "[%s%d\t0] %s%s\t0\r\n", OLC_LABEL_CHANGED, GET_OLC_VNUM(ch->desc), OLC_LABEL_UNCHANGED, !vehicle_proto(VEH_VNUM(veh)) ? "new vehicle" : VEH_SHORT_DESC(vehicle_proto(VEH_VNUM(veh))));
+	add_page_display(ch, "[%s%d\t0] %s%s\t0", OLC_LABEL_CHANGED, GET_OLC_VNUM(ch->desc), OLC_LABEL_UNCHANGED, !vehicle_proto(VEH_VNUM(veh)) ? "new vehicle" : VEH_SHORT_DESC(vehicle_proto(VEH_VNUM(veh))));
 
-	sprintf(buf + strlen(buf), "<%skeywords\t0> %s\r\n", OLC_LABEL_STR(VEH_KEYWORDS(veh), default_vehicle_keywords), NULLSAFE(VEH_KEYWORDS(veh)));
-	sprintf(buf + strlen(buf), "<%sshortdescription\t0> %s\r\n", OLC_LABEL_STR(VEH_SHORT_DESC(veh), default_vehicle_short_desc), NULLSAFE(VEH_SHORT_DESC(veh)));
-	sprintf(buf + strlen(buf), "<%slongdescription\t0>\r\n%s\r\n", OLC_LABEL_STR(VEH_LONG_DESC(veh), default_vehicle_long_desc), NULLSAFE(VEH_LONG_DESC(veh)));
-	sprintf(buf + strlen(buf), "<%slookdescription\t0>\r\n%s", OLC_LABEL_STR(VEH_LOOK_DESC(veh), ""), NULLSAFE(VEH_LOOK_DESC(veh)));
+	add_page_display(ch, "<%skeywords\t0> %s", OLC_LABEL_STR(VEH_KEYWORDS(veh), default_vehicle_keywords), NULLSAFE(VEH_KEYWORDS(veh)));
+	add_page_display(ch, "<%sshortdescription\t0> %s", OLC_LABEL_STR(VEH_SHORT_DESC(veh), default_vehicle_short_desc), NULLSAFE(VEH_SHORT_DESC(veh)));
+	add_page_display(ch, "<%slongdescription\t0>\r\n%s", OLC_LABEL_STR(VEH_LONG_DESC(veh), default_vehicle_long_desc), NULLSAFE(VEH_LONG_DESC(veh)));
+	add_page_display(ch, "<%slookdescription\t0>\r\n%s", OLC_LABEL_STR(VEH_LOOK_DESC(veh), ""), NULLSAFE(VEH_LOOK_DESC(veh)));
 	
-	sprintf(buf + strlen(buf), "<%sicon\t0> %s\t0 %s  ", OLC_LABEL_STR(VEH_ICON(veh), ""), VEH_ICON(veh) ? VEH_ICON(veh) : "none", VEH_ICON(veh) ? show_color_codes(VEH_ICON(veh)) : "");
-	sprintf(buf + strlen(buf), "<%shalficon\t0> %s\t0 %s  ", OLC_LABEL_STR(VEH_HALF_ICON(veh), ""), VEH_HALF_ICON(veh) ? VEH_HALF_ICON(veh) : "none", VEH_HALF_ICON(veh) ? show_color_codes(VEH_HALF_ICON(veh)) : "");
-	sprintf(buf + strlen(buf), "<%squartericon\t0> %s\t0 %s\r\n", OLC_LABEL_STR(VEH_QUARTER_ICON(veh), ""), VEH_QUARTER_ICON(veh) ? VEH_QUARTER_ICON(veh) : "none", VEH_QUARTER_ICON(veh) ? show_color_codes(VEH_QUARTER_ICON(veh)) : "");
+	pd = add_page_display(ch, "<%sicon\t0> %s\t0 %s  ", OLC_LABEL_STR(VEH_ICON(veh), ""), VEH_ICON(veh) ? VEH_ICON(veh) : "none", VEH_ICON(veh) ? show_color_codes(VEH_ICON(veh)) : "");
+	append_page_display_line(pd, "<%shalficon\t0> %s\t0 %s  ", OLC_LABEL_STR(VEH_HALF_ICON(veh), ""), VEH_HALF_ICON(veh) ? VEH_HALF_ICON(veh) : "none", VEH_HALF_ICON(veh) ? show_color_codes(VEH_HALF_ICON(veh)) : "");
+	append_page_display_line(pd, "<%squartericon\t0> %s\t0 %s", OLC_LABEL_STR(VEH_QUARTER_ICON(veh), ""), VEH_QUARTER_ICON(veh) ? VEH_QUARTER_ICON(veh) : "none", VEH_QUARTER_ICON(veh) ? show_color_codes(VEH_QUARTER_ICON(veh)) : "");
 	
 	sprintbit(VEH_FLAGS(veh), vehicle_flags, lbuf, TRUE);
-	sprintf(buf + strlen(buf), "<%sflags\t0> %s\r\n", OLC_LABEL_VAL(VEH_FLAGS(veh), NOBITS), lbuf);
+	add_page_display(ch, "<%sflags\t0> %s", OLC_LABEL_VAL(VEH_FLAGS(veh), NOBITS), lbuf);
 	
-	sprintf(buf + strlen(buf), "<%shitpoints\t0> %d\r\n", OLC_LABEL_VAL(VEH_MAX_HEALTH(veh), 1), VEH_MAX_HEALTH(veh));
-	sprintf(buf + strlen(buf), "<%smovetype\t0> %s\r\n", OLC_LABEL_VAL(VEH_MOVE_TYPE(veh), 0), mob_move_types[VEH_MOVE_TYPE(veh)]);
-	sprintf(buf + strlen(buf), "<%sspeed\t0> %s, <%ssize\t0> %d\r\n", OLC_LABEL_VAL(VEH_SPEED_BONUSES(veh), VSPEED_NORMAL), vehicle_speed_types[VEH_SPEED_BONUSES(veh)], OLC_LABEL_VAL(VEH_SIZE(veh), 0), VEH_SIZE(veh));
-	sprintf(buf + strlen(buf), "<%scapacity\t0> %d item%s, <%sanimalsrequired\t0> %d\r\n", OLC_LABEL_VAL(VEH_CAPACITY(veh), 0), VEH_CAPACITY(veh), PLURAL(VEH_CAPACITY(veh)), OLC_LABEL_VAL(VEH_ANIMALS_REQUIRED(veh), 0), VEH_ANIMALS_REQUIRED(veh));
+	add_page_display(ch, "<%shitpoints\t0> %d", OLC_LABEL_VAL(VEH_MAX_HEALTH(veh), 1), VEH_MAX_HEALTH(veh));
+	add_page_display(ch, "<%smovetype\t0> %s", OLC_LABEL_VAL(VEH_MOVE_TYPE(veh), 0), mob_move_types[VEH_MOVE_TYPE(veh)]);
+	add_page_display(ch, "<%sspeed\t0> %s, <%ssize\t0> %d", OLC_LABEL_VAL(VEH_SPEED_BONUSES(veh), VSPEED_NORMAL), vehicle_speed_types[VEH_SPEED_BONUSES(veh)], OLC_LABEL_VAL(VEH_SIZE(veh), 0), VEH_SIZE(veh));
+	add_page_display(ch, "<%scapacity\t0> %d item%s, <%sanimalsrequired\t0> %d", OLC_LABEL_VAL(VEH_CAPACITY(veh), 0), VEH_CAPACITY(veh), PLURAL(VEH_CAPACITY(veh)), OLC_LABEL_VAL(VEH_ANIMALS_REQUIRED(veh), 0), VEH_ANIMALS_REQUIRED(veh));
 	
 	if (VEH_MIN_SCALE_LEVEL(veh) > 0) {
 		sprintf(lbuf, "<%sminlevel\t0> %d", OLC_LABEL_CHANGED, VEH_MIN_SCALE_LEVEL(veh));
@@ -4730,80 +4729,80 @@ void olc_show_vehicle(char_data *ch) {
 		sprintf(lbuf, "<%sminlevel\t0> none", OLC_LABEL_UNCHANGED);
 	}
 	if (VEH_MAX_SCALE_LEVEL(veh) > 0) {
-		sprintf(buf + strlen(buf), "%s, <%smaxlevel\t0> %d\r\n", lbuf, OLC_LABEL_CHANGED, VEH_MAX_SCALE_LEVEL(veh));
+		add_page_display(ch, "%s, <%smaxlevel\t0> %d", lbuf, OLC_LABEL_CHANGED, VEH_MAX_SCALE_LEVEL(veh));
 	}
 	else {
-		sprintf(buf + strlen(buf), "%s, <%smaxlevel\t0> none\r\n", lbuf, OLC_LABEL_UNCHANGED);
+		add_page_display(ch, "%s, <%smaxlevel\t0> none", lbuf, OLC_LABEL_UNCHANGED);
 	}
 
-	sprintf(buf + strlen(buf), "<%sextrarooms\t0> %d, <%sinteriorroom\t0> %d - %s\r\n", OLC_LABEL_VAL(VEH_MAX_ROOMS(veh), 0), VEH_MAX_ROOMS(veh), OLC_LABEL_VAL(VEH_INTERIOR_ROOM_VNUM(veh), NOWHERE), VEH_INTERIOR_ROOM_VNUM(veh), building_proto(VEH_INTERIOR_ROOM_VNUM(veh)) ? GET_BLD_NAME(building_proto(VEH_INTERIOR_ROOM_VNUM(veh))) : "none");
+	add_page_display(ch, "<%sextrarooms\t0> %d, <%sinteriorroom\t0> %d - %s", OLC_LABEL_VAL(VEH_MAX_ROOMS(veh), 0), VEH_MAX_ROOMS(veh), OLC_LABEL_VAL(VEH_INTERIOR_ROOM_VNUM(veh), NOWHERE), VEH_INTERIOR_ROOM_VNUM(veh), building_proto(VEH_INTERIOR_ROOM_VNUM(veh)) ? GET_BLD_NAME(building_proto(VEH_INTERIOR_ROOM_VNUM(veh))) : "none");
 	sprintbit(VEH_DESIGNATE_FLAGS(veh), designate_flags, lbuf, TRUE);
-	sprintf(buf + strlen(buf), "<%sdesignate\t0> %s\r\n", OLC_LABEL_VAL(VEH_DESIGNATE_FLAGS(veh), NOBITS), lbuf);
-	sprintf(buf + strlen(buf), "<%scitizens\t0> %d, <%sartisan\t0> [%d] %s\r\n", OLC_LABEL_VAL(VEH_CITIZENS(veh), 0), VEH_CITIZENS(veh), OLC_LABEL_VAL(VEH_ARTISAN(veh), NOTHING), VEH_ARTISAN(veh), VEH_ARTISAN(veh) == NOTHING ? "none" : get_mob_name_by_proto(VEH_ARTISAN(veh), FALSE));
-	sprintf(buf + strlen(buf), "<%sheight\t0> %d, <%sfame\t0> %d, <%smilitary\t0> %d\r\n", OLC_LABEL_VAL(VEH_HEIGHT(veh), 0), VEH_HEIGHT(veh), OLC_LABEL_VAL(VEH_FAME(veh), 0), VEH_FAME(veh), OLC_LABEL_VAL(VEH_MILITARY(veh), 0), VEH_MILITARY(veh));
+	add_page_display(ch, "<%sdesignate\t0> %s", OLC_LABEL_VAL(VEH_DESIGNATE_FLAGS(veh), NOBITS), lbuf);
+	add_page_display(ch, "<%scitizens\t0> %d, <%sartisan\t0> [%d] %s", OLC_LABEL_VAL(VEH_CITIZENS(veh), 0), VEH_CITIZENS(veh), OLC_LABEL_VAL(VEH_ARTISAN(veh), NOTHING), VEH_ARTISAN(veh), VEH_ARTISAN(veh) == NOTHING ? "none" : get_mob_name_by_proto(VEH_ARTISAN(veh), FALSE));
+	add_page_display(ch, "<%sheight\t0> %d, <%sfame\t0> %d, <%smilitary\t0> %d", OLC_LABEL_VAL(VEH_HEIGHT(veh), 0), VEH_HEIGHT(veh), OLC_LABEL_VAL(VEH_FAME(veh), 0), VEH_FAME(veh), OLC_LABEL_VAL(VEH_MILITARY(veh), 0), VEH_MILITARY(veh));
 	
 	sprintbit(VEH_ROOM_AFFECTS(veh), room_aff_bits, lbuf, TRUE);
-	sprintf(buf + strlen(buf), "<%saffects\t0> %s\r\n", OLC_LABEL_VAL(VEH_ROOM_AFFECTS(veh), NOBITS), lbuf);
+	add_page_display(ch, "<%saffects\t0> %s", OLC_LABEL_VAL(VEH_ROOM_AFFECTS(veh), NOBITS), lbuf);
 	
 	sprintbit(VEH_FUNCTIONS(veh), function_flags, lbuf, TRUE);
-	sprintf(buf + strlen(buf), "<%sfunctions\t0> %s\r\n", OLC_LABEL_VAL(VEH_FUNCTIONS(veh), NOBITS), lbuf);
+	add_page_display(ch, "<%sfunctions\t0> %s", OLC_LABEL_VAL(VEH_FUNCTIONS(veh), NOBITS), lbuf);
 	
 	ordered_sprintbit(VEH_REQUIRES_CLIMATE(veh), climate_flags, climate_flags_order, FALSE, lbuf);
-	sprintf(buf + strlen(buf), "<%srequiresclimate\t0> %s\r\n", OLC_LABEL_VAL(VEH_REQUIRES_CLIMATE(veh), NOBITS), lbuf);
+	add_page_display(ch, "<%srequiresclimate\t0> %s", OLC_LABEL_VAL(VEH_REQUIRES_CLIMATE(veh), NOBITS), lbuf);
 	ordered_sprintbit(VEH_FORBID_CLIMATE(veh), climate_flags, climate_flags_order, FALSE, lbuf);
-	sprintf(buf + strlen(buf), "<%sforbidclimate\t0> %s\r\n", OLC_LABEL_VAL(VEH_FORBID_CLIMATE(veh), NOBITS), lbuf);
+	add_page_display(ch, "<%sforbidclimate\t0> %s", OLC_LABEL_VAL(VEH_FORBID_CLIMATE(veh), NOBITS), lbuf);
 	
 	// exdesc
-	sprintf(buf + strlen(buf), "Extra descriptions: <%sextra\t0>\r\n", OLC_LABEL_PTR(VEH_EX_DESCS(veh)));
+	add_page_display(ch, "Extra descriptions: <%sextra\t0>", OLC_LABEL_PTR(VEH_EX_DESCS(veh)));
 	if (VEH_EX_DESCS(veh)) {
 		get_extra_desc_display(VEH_EX_DESCS(veh), lbuf, sizeof(lbuf));
-		strcat(buf, lbuf);
+		add_page_display_str(ch, lbuf);
 	}
 
-	sprintf(buf + strlen(buf), "Interactions: <%sinteraction\t0>\r\n", OLC_LABEL_PTR(VEH_INTERACTIONS(veh)));
+	add_page_display(ch, "Interactions: <%sinteraction\t0>", OLC_LABEL_PTR(VEH_INTERACTIONS(veh)));
 	if (VEH_INTERACTIONS(veh)) {
 		get_interaction_display(VEH_INTERACTIONS(veh), lbuf);
-		strcat(buf, lbuf);
+		add_page_display_str(ch, lbuf);
 	}
 	
-	sprintf(buf + strlen(buf), "Relationships: <%srelations\t0>\r\n", OLC_LABEL_PTR(VEH_RELATIONS(veh)));
+	add_page_display(ch, "Relationships: <%srelations\t0>", OLC_LABEL_PTR(VEH_RELATIONS(veh)));
 	if (VEH_RELATIONS(veh)) {
 		get_bld_relations_display(VEH_RELATIONS(veh), lbuf);
-		strcat(buf, lbuf);
+		add_page_display_str(ch, lbuf);
 	}
 	
 	// maintenance resources
-	sprintf(buf + strlen(buf), "Regular maintenance resources: <%sresource\t0>\r\n", OLC_LABEL_PTR(VEH_REGULAR_MAINTENANCE(veh)));
+	add_page_display(ch, "Regular maintenance resources: <%sresource\t0>", OLC_LABEL_PTR(VEH_REGULAR_MAINTENANCE(veh)));
 	if (VEH_REGULAR_MAINTENANCE(veh)) {
 		get_resource_display(ch, VEH_REGULAR_MAINTENANCE(veh), lbuf);
-		strcat(buf, lbuf);
+		add_page_display_str(ch, lbuf);
 	}
 	
 	// custom messages
-	sprintf(buf + strlen(buf), "Custom messages: <%scustom\t0>\r\n", OLC_LABEL_PTR(VEH_CUSTOM_MSGS(veh)));
+	add_page_display(ch, "Custom messages: <%scustom\t0>", OLC_LABEL_PTR(VEH_CUSTOM_MSGS(veh)));
 	count = 0;
 	LL_FOREACH(VEH_CUSTOM_MSGS(veh), custm) {
-		sprintf(buf + strlen(buf), " \ty%2d\t0. [%s] %s\r\n", ++count, veh_custom_types[custm->type], custm->msg);
+		add_page_display(ch, " \ty%2d\t0. [%s] %s", ++count, veh_custom_types[custm->type], custm->msg);
 	}
 	
 	// scripts
-	sprintf(buf + strlen(buf), "Scripts: <%sscript\t0>\r\n", OLC_LABEL_PTR(veh->proto_script));
+	add_page_display(ch, "Scripts: <%sscript\t0>", OLC_LABEL_PTR(veh->proto_script));
 	if (veh->proto_script) {
 		get_script_display(veh->proto_script, lbuf);
-		strcat(buf, lbuf);
+		add_page_display_str(ch, lbuf);
 	}
 	
 	// spawns
-	sprintf(buf + strlen(buf), "<%sspawns\t0>\r\n", OLC_LABEL_PTR(VEH_SPAWNS(veh)));
+	add_page_display(ch, "<%sspawns\t0>", OLC_LABEL_PTR(VEH_SPAWNS(veh)));
 	if (VEH_SPAWNS(veh)) {
 		count = 0;
 		LL_FOREACH(VEH_SPAWNS(veh), spawn) {
 			++count;
 		}
-		sprintf(buf + strlen(buf), " %d spawn%s set\r\n", count, PLURAL(count));
+		add_page_display(ch, " %d spawn%s set", count, PLURAL(count));
 	}
 	
-	page_string(ch->desc, buf, TRUE);
+	send_page_display(ch);
 }
 
 

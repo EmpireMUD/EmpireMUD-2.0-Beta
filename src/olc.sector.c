@@ -849,7 +849,7 @@ int wordcount_sector(sector_data *sect) {
 */
 void olc_show_sector(char_data *ch) {
 	sector_data *st = GET_OLC_SECTOR(ch->desc);
-	char buf[MAX_STRING_LENGTH * 4], lbuf[MAX_STRING_LENGTH * 4];
+	char lbuf[MAX_STRING_LENGTH * 4];
 	struct spawn_info *spawn;
 	struct custom_message *ocm;
 	int count;
@@ -857,69 +857,67 @@ void olc_show_sector(char_data *ch) {
 	if (!st) {
 		return;
 	}
-	
-	*buf = '\0';
 
-	sprintf(buf + strlen(buf), "[%s%d\t0] %s%s\t0\r\n", OLC_LABEL_CHANGED, GET_OLC_VNUM(ch->desc), OLC_LABEL_UNCHANGED, sector_proto(st->vnum) ? GET_SECT_NAME(sector_proto(st->vnum)) : "new sector");
-	sprintf(buf + strlen(buf), "<%sname\t0> %s\r\n", OLC_LABEL_STR(GET_SECT_NAME(st), default_sect_name), NULLSAFE(GET_SECT_NAME(st)));
-	sprintf(buf + strlen(buf), "<%stitle\t0> %s\r\n", OLC_LABEL_STR(GET_SECT_TITLE(st), default_sect_title), NULLSAFE(GET_SECT_TITLE(st)));
-	sprintf(buf + strlen(buf), "<%scommands\t0> %s\r\n", OLC_LABEL_STR(GET_SECT_COMMANDS(st), ""), NULLSAFE(GET_SECT_COMMANDS(st)));
-	sprintf(buf + strlen(buf), "<%sroadsideicon\t0> %c\r\n", OLC_LABEL_VAL(st->roadside_icon, default_roadside_icon), st->roadside_icon);
-	sprintf(buf + strlen(buf), "<%smapout\t0> %s\r\n", OLC_LABEL_VAL(GET_SECT_MAPOUT(st), 0), mapout_color_names[GET_SECT_MAPOUT(st)]);
+	add_page_display(ch, "[%s%d\t0] %s%s\t0", OLC_LABEL_CHANGED, GET_OLC_VNUM(ch->desc), OLC_LABEL_UNCHANGED, sector_proto(st->vnum) ? GET_SECT_NAME(sector_proto(st->vnum)) : "new sector");
+	add_page_display(ch, "<%sname\t0> %s", OLC_LABEL_STR(GET_SECT_NAME(st), default_sect_name), NULLSAFE(GET_SECT_NAME(st)));
+	add_page_display(ch, "<%stitle\t0> %s", OLC_LABEL_STR(GET_SECT_TITLE(st), default_sect_title), NULLSAFE(GET_SECT_TITLE(st)));
+	add_page_display(ch, "<%scommands\t0> %s", OLC_LABEL_STR(GET_SECT_COMMANDS(st), ""), NULLSAFE(GET_SECT_COMMANDS(st)));
+	add_page_display(ch, "<%sroadsideicon\t0> %c", OLC_LABEL_VAL(st->roadside_icon, default_roadside_icon), st->roadside_icon);
+	add_page_display(ch, "<%smapout\t0> %s", OLC_LABEL_VAL(GET_SECT_MAPOUT(st), 0), mapout_color_names[GET_SECT_MAPOUT(st)]);
 
-	sprintf(buf + strlen(buf), "<%sicons\t0>\r\n", OLC_LABEL_PTR(GET_SECT_ICONS(st)));
-	get_icons_display(GET_SECT_ICONS(st), buf1);
-	strcat(buf, buf1);
+	add_page_display(ch, "<%sicons\t0>", OLC_LABEL_PTR(GET_SECT_ICONS(st)));
+	get_icons_display(GET_SECT_ICONS(st), lbuf);
+	add_page_display_str(ch, lbuf);
 
 	ordered_sprintbit(GET_SECT_CLIMATE(st), climate_flags, climate_flags_order, FALSE, lbuf);
-	sprintf(buf + strlen(buf), "<%sclimate\t0> %s\r\n", OLC_LABEL_VAL(st->climate, NOBITS), lbuf);
-	sprintf(buf + strlen(buf), "<%stemperature\t0> %s\r\n", OLC_LABEL_VAL(GET_SECT_TEMPERATURE_TYPE(st), 0), temperature_types[GET_SECT_TEMPERATURE_TYPE(st)]);
-	sprintf(buf + strlen(buf), "<%smovecost\t0> %d\r\n", OLC_LABEL_VAL(st->movement_loss, 0), st->movement_loss);
+	add_page_display(ch, "<%sclimate\t0> %s", OLC_LABEL_VAL(st->climate, NOBITS), lbuf);
+	add_page_display(ch, "<%stemperature\t0> %s", OLC_LABEL_VAL(GET_SECT_TEMPERATURE_TYPE(st), 0), temperature_types[GET_SECT_TEMPERATURE_TYPE(st)]);
+	add_page_display(ch, "<%smovecost\t0> %d", OLC_LABEL_VAL(st->movement_loss, 0), st->movement_loss);
 
 	sprintbit(GET_SECT_FLAGS(st), sector_flags, lbuf, TRUE);
-	sprintf(buf + strlen(buf), "<%sflags\t0> %s\r\n", OLC_LABEL_VAL(GET_SECT_FLAGS(st), NOBITS), lbuf);
+	add_page_display(ch, "<%sflags\t0> %s", OLC_LABEL_VAL(GET_SECT_FLAGS(st), NOBITS), lbuf);
 	
 	ordered_sprintbit(st->build_flags, bld_on_flags, bld_on_flags_order, TRUE, lbuf);
-	sprintf(buf + strlen(buf), "<%sbuildflags\t0> %s\r\n", OLC_LABEL_VAL(st->build_flags, NOBITS), lbuf);
+	add_page_display(ch, "<%sbuildflags\t0> %s", OLC_LABEL_VAL(st->build_flags, NOBITS), lbuf);
 	
-	sprintf(buf + strlen(buf), "<%sevolution\t0>\r\n", OLC_LABEL_PTR(st->evolution));
+	add_page_display(ch, "<%sevolution\t0>", OLC_LABEL_PTR(st->evolution));
 	if (st->evolution) {
-		get_evolution_display(st->evolution, buf1);
-		strcat(buf, buf1);
+		get_evolution_display(st->evolution, lbuf);
+		add_page_display_str(ch, lbuf);
 	}
 
 	// exdesc
-	sprintf(buf + strlen(buf), "Extra descriptions: <%sextra\t0>\r\n", OLC_LABEL_PTR(GET_SECT_EX_DESCS(st)));
+	add_page_display(ch, "Extra descriptions: <%sextra\t0>", OLC_LABEL_PTR(GET_SECT_EX_DESCS(st)));
 	if (GET_SECT_EX_DESCS(st)) {
 		get_extra_desc_display(GET_SECT_EX_DESCS(st), lbuf, sizeof(lbuf));
-		strcat(buf, lbuf);
+		add_page_display_str(ch, lbuf);
 	}
 
 	// custom messages
-	sprintf(buf + strlen(buf), "Custom messages: <%scustom\t0>\r\n", OLC_LABEL_PTR(GET_SECT_CUSTOM_MSGS(st)));
+	add_page_display(ch, "Custom messages: <%scustom\t0>", OLC_LABEL_PTR(GET_SECT_CUSTOM_MSGS(st)));
 	count = 0;
 	LL_FOREACH(GET_SECT_CUSTOM_MSGS(st), ocm) {
-		sprintf(buf + strlen(buf), " \ty%2d\t0. [%s] %s\r\n", ++count, sect_custom_types[ocm->type], ocm->msg);
+		add_page_display(ch, " \ty%2d\t0. [%s] %s", ++count, sect_custom_types[ocm->type], ocm->msg);
 	}
 
-	sprintf(buf + strlen(buf), "Interactions: <%sinteraction\t0>\r\n", OLC_LABEL_PTR(GET_SECT_INTERACTIONS(st)));
+	add_page_display(ch, "Interactions: <%sinteraction\t0>", OLC_LABEL_PTR(GET_SECT_INTERACTIONS(st)));
 	if (GET_SECT_INTERACTIONS(st)) {
-		get_interaction_display(GET_SECT_INTERACTIONS(st), buf1);
-		strcat(buf, buf1);
+		get_interaction_display(GET_SECT_INTERACTIONS(st), lbuf);
+		add_page_display_str(ch, lbuf);
 	}
 	
-	sprintf(buf + strlen(buf), "<%sspawns\t0>\r\n", OLC_LABEL_PTR(GET_SECT_SPAWNS(st)));
+	add_page_display(ch, "<%sspawns\t0>", OLC_LABEL_PTR(GET_SECT_SPAWNS(st)));
 	if (GET_SECT_SPAWNS(st)) {
 		count = 0;
 		for (spawn = GET_SECT_SPAWNS(st); spawn; spawn = spawn->next) {
 			++count;
 		}
-		sprintf(buf + strlen(buf), " %d spawn%s set\r\n", count, PLURAL(count));
+		add_page_display(ch, " %d spawn%s set", count, PLURAL(count));
 	}
 	
-	sprintf(buf + strlen(buf), "<%snotes\t0>\r\n%s", OLC_LABEL_PTR(GET_SECT_NOTES(st)), NULLSAFE(GET_SECT_NOTES(st)));
+	add_page_display(ch, "<%snotes\t0>\r\n%s", OLC_LABEL_PTR(GET_SECT_NOTES(st)), NULLSAFE(GET_SECT_NOTES(st)));
 	
-	page_string(ch->desc, buf, TRUE);
+	send_page_display(ch);
 }
 
 

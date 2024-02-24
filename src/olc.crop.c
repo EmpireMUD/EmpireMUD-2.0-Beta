@@ -610,7 +610,7 @@ int wordcount_crop(crop_data *crop) {
 */
 void olc_show_crop(char_data *ch) {
 	crop_data *cp = GET_OLC_CROP(ch->desc);
-	char buf[MAX_STRING_LENGTH*4], lbuf[MAX_STRING_LENGTH*4];
+	char lbuf[MAX_STRING_LENGTH*4];
 	struct custom_message *ocm;
 	struct spawn_info *spawn;
 	int count;
@@ -619,57 +619,55 @@ void olc_show_crop(char_data *ch) {
 		return;
 	}
 	
-	*buf = '\0';
-	
-	sprintf(buf + strlen(buf), "[%s%d\t0] %s%s\t0\r\n", OLC_LABEL_CHANGED, GET_OLC_VNUM(ch->desc), OLC_LABEL_UNCHANGED, !crop_proto(cp->vnum) ? "new crop" : GET_CROP_NAME(crop_proto(cp->vnum)));
-	sprintf(buf + strlen(buf), "<%sname\t0> %s\r\n", OLC_LABEL_STR(GET_CROP_NAME(cp), default_crop_name), NULLSAFE(GET_CROP_NAME(cp)));
-	sprintf(buf + strlen(buf), "<%stitle\t0> %s\r\n", OLC_LABEL_STR(GET_CROP_TITLE(cp), default_crop_title), NULLSAFE(GET_CROP_TITLE(cp)));
-	sprintf(buf + strlen(buf), "<%smapout\t0> %s\r\n", OLC_LABEL_VAL(GET_CROP_MAPOUT(cp), 0), mapout_color_names[GET_CROP_MAPOUT(cp)]);
+	add_page_display(ch, "[%s%d\t0] %s%s\t0", OLC_LABEL_CHANGED, GET_OLC_VNUM(ch->desc), OLC_LABEL_UNCHANGED, !crop_proto(cp->vnum) ? "new crop" : GET_CROP_NAME(crop_proto(cp->vnum)));
+	add_page_display(ch, "<%sname\t0> %s", OLC_LABEL_STR(GET_CROP_NAME(cp), default_crop_name), NULLSAFE(GET_CROP_NAME(cp)));
+	add_page_display(ch, "<%stitle\t0> %s", OLC_LABEL_STR(GET_CROP_TITLE(cp), default_crop_title), NULLSAFE(GET_CROP_TITLE(cp)));
+	add_page_display(ch, "<%smapout\t0> %s", OLC_LABEL_VAL(GET_CROP_MAPOUT(cp), 0), mapout_color_names[GET_CROP_MAPOUT(cp)]);
 
-	sprintf(buf + strlen(buf), "<%sicons\t0>\r\n", OLC_LABEL_PTR(GET_CROP_ICONS(cp)));
-	get_icons_display(GET_CROP_ICONS(cp), buf1);
-	strcat(buf, buf1);
+	add_page_display(ch, "<%sicons\t0>", OLC_LABEL_PTR(GET_CROP_ICONS(cp)));
+	get_icons_display(GET_CROP_ICONS(cp), lbuf);
+	add_page_display_str(ch, lbuf);
 	
 	ordered_sprintbit(GET_CROP_CLIMATE(cp), climate_flags, climate_flags_order, FALSE, lbuf);
-	sprintf(buf + strlen(buf), "<%sclimate\t0> %s\r\n", OLC_LABEL_VAL(GET_CROP_CLIMATE(cp), NOBITS), lbuf);
+	add_page_display(ch, "<%sclimate\t0> %s", OLC_LABEL_VAL(GET_CROP_CLIMATE(cp), NOBITS), lbuf);
 
 	sprintbit(GET_CROP_FLAGS(cp), crop_flags, lbuf, TRUE);
-	sprintf(buf + strlen(buf), "<%sflags\t0> %s\r\n", OLC_LABEL_VAL(GET_CROP_FLAGS(cp), NOBITS), lbuf);
+	add_page_display(ch, "<%sflags\t0> %s", OLC_LABEL_VAL(GET_CROP_FLAGS(cp), NOBITS), lbuf);
 	
-	sprintf(buf + strlen(buf), "Map region (percent of map size):\r\n");
-	sprintf(buf + strlen(buf), " <%sxmin\t0> %3d%%, <%sxmax\t0> %3d%%\r\n", OLC_LABEL_VAL(GET_CROP_X_MIN(cp), 0), GET_CROP_X_MIN(cp), OLC_LABEL_VAL(GET_CROP_X_MAX(cp), 100), GET_CROP_X_MAX(cp));
-	sprintf(buf + strlen(buf), " <%symin\t0> %3d%%, <%symax\t0> %3d%%\r\n", OLC_LABEL_VAL(GET_CROP_Y_MIN(cp), 0), GET_CROP_Y_MIN(cp), OLC_LABEL_VAL(GET_CROP_Y_MAX(cp), 100), GET_CROP_Y_MAX(cp));
+	add_page_display(ch, "Map region (percent of map size):");
+	add_page_display(ch, " <%sxmin\t0> %3d%%, <%sxmax\t0> %3d%%", OLC_LABEL_VAL(GET_CROP_X_MIN(cp), 0), GET_CROP_X_MIN(cp), OLC_LABEL_VAL(GET_CROP_X_MAX(cp), 100), GET_CROP_X_MAX(cp));
+	add_page_display(ch, " <%symin\t0> %3d%%, <%symax\t0> %3d%%", OLC_LABEL_VAL(GET_CROP_Y_MIN(cp), 0), GET_CROP_Y_MIN(cp), OLC_LABEL_VAL(GET_CROP_Y_MAX(cp), 100), GET_CROP_Y_MAX(cp));
 	
 	// exdesc
-	sprintf(buf + strlen(buf), "Extra descriptions: <%sextra\t0>\r\n", OLC_LABEL_PTR(GET_CROP_EX_DESCS(cp)));
+	add_page_display(ch, "Extra descriptions: <%sextra\t0>", OLC_LABEL_PTR(GET_CROP_EX_DESCS(cp)));
 	if (GET_CROP_EX_DESCS(cp)) {
 		get_extra_desc_display(GET_CROP_EX_DESCS(cp), lbuf, sizeof(lbuf));
-		strcat(buf, lbuf);
+		add_page_display_str(ch, lbuf);
 	}
 
 	// custom messages
-	sprintf(buf + strlen(buf), "Custom messages: <%scustom\t0>\r\n", OLC_LABEL_PTR(GET_CROP_CUSTOM_MSGS(cp)));
+	add_page_display(ch, "Custom messages: <%scustom\t0>", OLC_LABEL_PTR(GET_CROP_CUSTOM_MSGS(cp)));
 	count = 0;
 	LL_FOREACH(GET_CROP_CUSTOM_MSGS(cp), ocm) {
-		sprintf(buf + strlen(buf), " \ty%2d\t0. [%s] %s\r\n", ++count, crop_custom_types[ocm->type], ocm->msg);
+		add_page_display(ch, " \ty%2d\t0. [%s] %s", ++count, crop_custom_types[ocm->type], ocm->msg);
 	}
 
-	sprintf(buf + strlen(buf), "Interactions: <%sinteraction\t0>\r\n", OLC_LABEL_PTR(GET_CROP_INTERACTIONS(cp)));
+	add_page_display(ch, "Interactions: <%sinteraction\t0>", OLC_LABEL_PTR(GET_CROP_INTERACTIONS(cp)));
 	if (GET_CROP_INTERACTIONS(cp)) {
-		get_interaction_display(GET_CROP_INTERACTIONS(cp), buf1);
-		strcat(buf, buf1);
+		get_interaction_display(GET_CROP_INTERACTIONS(cp), lbuf);
+		add_page_display_str(ch, lbuf);
 	}
 
-	sprintf(buf + strlen(buf), "<%sspawns\t0>\r\n", OLC_LABEL_PTR(GET_CROP_SPAWNS(cp)));
+	add_page_display(ch, "<%sspawns\t0>", OLC_LABEL_PTR(GET_CROP_SPAWNS(cp)));
 	if (GET_CROP_SPAWNS(cp)) {
 		count = 0;
 		for (spawn = GET_CROP_SPAWNS(cp); spawn; spawn = spawn->next) {
 			++count;
 		}
-		sprintf(buf + strlen(buf), " %d spawn%s set\r\n", count, PLURAL(count));
+		add_page_display(ch, " %d spawn%s set", count, PLURAL(count));
 	}
 		
-	page_string(ch->desc, buf, TRUE);
+	send_page_display(ch);
 }
 
 
