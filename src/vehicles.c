@@ -4497,8 +4497,8 @@ void do_stat_vehicle(char_data *ch, vehicle_data *veh, bool details) {
 	}
 	
 	if (VEH_RELATIONS(veh)) {
-		get_bld_relations_display(VEH_RELATIONS(veh), part);
-		add_page_display(ch, "Relations:\r\n%s", part);
+		add_page_display_str(ch, "Relations:");
+		show_bld_relations_display(ch, VEH_RELATIONS(veh), FALSE);
 	}
 	
 	if (VEH_REGULAR_MAINTENANCE(veh)) {
@@ -4767,8 +4767,7 @@ void olc_show_vehicle(char_data *ch) {
 	
 	add_page_display(ch, "Relationships: <%srelations\t0>", OLC_LABEL_PTR(VEH_RELATIONS(veh)));
 	if (VEH_RELATIONS(veh)) {
-		get_bld_relations_display(VEH_RELATIONS(veh), lbuf);
-		add_page_display_str(ch, lbuf);
+		show_bld_relations_display(ch, VEH_RELATIONS(veh), FALSE);
 	}
 	
 	// maintenance resources

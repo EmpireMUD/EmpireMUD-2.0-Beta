@@ -802,16 +802,15 @@ int wordcount_room_template(room_template *rmt) {
 /**
 * Displays the exit templates from a given list.
 *
+* @param char_data *ch The person viewing it.
 * @param struct exit_template *list Pointer to the start of a list of exits.
-* @param char *save_buffer A buffer to store the result to.
+* @param bool send_page If TRUE, sends the page_display when done. Pass FALSE if you're building a larger page_display for the character.
 */
-void get_exit_template_display(struct exit_template *list, char *save_buffer) {
+void show_exit_template_display(char_data *ch, struct exit_template *list, bool send_page) {
 	struct exit_template *ex;
 	char lbuf[MAX_STRING_LENGTH], lbuf1[MAX_STRING_LENGTH], lbuf2[MAX_STRING_LENGTH];
 	int count = 0;
 	room_template *rmt;
-	
-	*save_buffer = '\0';
 	
 	for (ex = list; ex; ex = ex->next) {
 		// lbuf: kw
@@ -839,11 +838,15 @@ void get_exit_template_display(struct exit_template *list, char *save_buffer) {
 			strcpy(lbuf2, "UNKNOWN");
 		}
 		
-		sprintf(save_buffer + strlen(save_buffer), "%2d. %s: [%d] %s%s%s\r\n", ++count, dirs[ex->dir], ex->target_room, lbuf2, lbuf1, lbuf);
+		add_page_display(ch, "%2d. %s: [%d] %s%s%s", ++count, dirs[ex->dir], ex->target_room, lbuf2, lbuf1, lbuf);
 	}
 	
 	if (count == 0) {
-		strcat(save_buffer, " none\r\n");
+		add_page_display_str(ch, " none");
+	}
+	
+	if (send_page) {
+		send_page_display(ch);
 	}
 }
 
@@ -944,8 +947,7 @@ void olc_show_room_template(char_data *ch) {
 	// exits
 	add_page_display(ch, "Exits: <%sexit\t0>, <%smatchexits\t0>", OLC_LABEL_PTR(GET_RMT_EXITS(rmt)), OLC_LABEL_PTR(GET_RMT_EXITS(rmt)));
 	if (GET_RMT_EXITS(rmt)) {
-		get_exit_template_display(GET_RMT_EXITS(rmt), lbuf);
-		add_page_display_str(ch, lbuf);
+		show_exit_template_display(ch, GET_RMT_EXITS(rmt), FALSE);
 	}
 	
 	// exdesc

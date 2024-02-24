@@ -4531,15 +4531,14 @@ OLC_MODULE(olc_wordcount) {
 /**
 * Displays the evolution data from a given list.
 *
+* @param char_data *ch The person viewing it.
 * @param struct evolution_data *list Pointer to the start of a list of evos.
-* @param char *save_buffer A buffer to store the result to.
+* @param bool send_page If TRUE, sends the page_display when done. Pass FALSE if you're building a larger page_display for the character.
 */
-void get_evolution_display(struct evolution_data *list, char *save_buffer) {
+void show_evolution_display(char_data *ch, struct evolution_data *list, bool send_page) {
 	char lbuf[MAX_STRING_LENGTH], part[MAX_STRING_LENGTH];
 	struct evolution_data *evo;
 	int count = 0;
-	
-	*save_buffer = '\0';
 	
 	for (evo = list; evo; evo = evo->next) {
 		switch (evo_val_types[evo->type]) {
@@ -4561,10 +4560,14 @@ void get_evolution_display(struct evolution_data *list, char *save_buffer) {
 				break;
 			}
 		}
-		sprintf(save_buffer + strlen(save_buffer), " %d. %s%s %.2f%% becomes %s (%d)\r\n", ++count, evo_types[evo->type], lbuf, evo->percent, GET_SECT_NAME(sector_proto(evo->becomes)), evo->becomes);
+		add_page_display(ch, " %d. %s%s %.2f%% becomes %s (%d)", ++count, evo_types[evo->type], lbuf, evo->percent, GET_SECT_NAME(sector_proto(evo->becomes)), evo->becomes);
 	}
 	if (!list) {
-		sprintf(save_buffer + strlen(save_buffer), " none\r\n");
+		add_page_display_str(ch, " none");
+	}
+	
+	if (send_page) {
+		send_page_display(ch);
 	}
 }
 

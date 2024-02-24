@@ -2383,17 +2383,17 @@ event_data *setup_olc_event(event_data *input) {
 //// DISPLAYS ////////////////////////////////////////////////////////////////
 
 /**
-* Gets the display for a set of event rewards.
+* Displays a set of event rewards.
 *
+* @parma char_data *ch The person viewing it.
 * @param struct event_reward *list Pointer to the start of a list of event rewards.
-* @param char *save_buffer A buffer to store the result to.
+* @param bool send_page If TRUE, sends the page_display when done. Pass FALSE if you're building a larger page_display for the character.
 */
-void get_event_reward_display(struct event_reward *list, char *save_buffer) {
+void show_event_reward_display(char_data *ch, struct event_reward *list, bool send_page) {
 	char buf[MAX_STRING_LENGTH];
 	struct event_reward *reward;
 	int count = 0;
 	
-	*save_buffer = '\0';
 	LL_FOREACH(list, reward) {
 		if (reward->max > 0) {
 			sprintf(buf, "Ranks %d-%d", reward->min, reward->max);
@@ -2401,10 +2401,16 @@ void get_event_reward_display(struct event_reward *list, char *save_buffer) {
 		else {
 			sprintf(buf, "%d points", reward->min);
 		}
-		sprintf(save_buffer + strlen(save_buffer), "%2d. %s: %s: %s\r\n", ++count, buf, quest_reward_types[reward->type], event_reward_string(reward, TRUE));
+		add_page_display(ch, "%2d. %s: %s: %s", ++count, buf, quest_reward_types[reward->type], event_reward_string(reward, TRUE));
 	}
 	
-	// empty list not shown
+	if (!list) {
+		add_page_display_str(ch, " none");
+	}
+	
+	if (send_page) {
+		send_page_display(ch);
+	}
 }
 
 
@@ -2453,11 +2459,11 @@ void do_stat_event(char_data *ch, event_data *event) {
 		add_page_display(ch, "Maximum points: [\tcnone\t0]");
 	}
 	
-	get_event_reward_display(EVT_RANK_REWARDS(event), part);
-	add_page_display(ch, "Rank Rewards:\r\n%s", *part ? part : " none");
+	add_page_display_str(ch, "Rank Rewards:");
+	show_event_reward_display(ch, EVT_RANK_REWARDS(event), FALSE);
 	
-	get_event_reward_display(EVT_THRESHOLD_REWARDS(event), part);
-	add_page_display(ch, "Threshold Rewards:\r\n%s", *part ? part : " none");
+	add_page_display_str(ch, "Threshold Rewards:");
+	show_event_reward_display(ch, EVT_THRESHOLD_REWARDS(event), FALSE);
 	
 	send_page_display(ch);
 }
@@ -2514,11 +2520,15 @@ void olc_show_event(char_data *ch) {
 		add_page_display(ch, "<%smaxpoints\t0> none", OLC_LABEL_UNCHANGED);
 	}
 	
-	get_event_reward_display(EVT_RANK_REWARDS(event), lbuf);
-	add_page_display(ch, "Rank rewards: <%srank\t0>\r\n%s", OLC_LABEL_PTR(EVT_RANK_REWARDS(event)), lbuf);
+	add_page_display(ch, "Rank rewards: <%srank\t0>", OLC_LABEL_PTR(EVT_RANK_REWARDS(event)));
+	if (EVT_RANK_REWARDS(event)) {
+		show_event_reward_display(ch, EVT_RANK_REWARDS(event), FALSE);
+	}
 	
-	get_event_reward_display(EVT_THRESHOLD_REWARDS(event), lbuf);
-	add_page_display(ch, "Threshold rewards: <%sthreshold\t0>\r\n%s", OLC_LABEL_PTR(EVT_THRESHOLD_REWARDS(event)), lbuf);
+	add_page_display(ch, "Threshold rewards: <%sthreshold\t0>", OLC_LABEL_PTR(EVT_THRESHOLD_REWARDS(event)));
+	if (EVT_THRESHOLD_REWARDS(event)) {
+		show_event_reward_display(ch, EVT_THRESHOLD_REWARDS(event), FALSE);
+	}
 	
 	add_page_display(ch, "<%snotes\t0>\r\n%s", OLC_LABEL_PTR(EVT_NOTES(event)), NULLSAFE(EVT_NOTES(event)));
 	

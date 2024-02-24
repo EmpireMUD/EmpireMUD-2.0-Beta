@@ -1366,8 +1366,7 @@ void olc_show_building(char_data *ch) {
 	
 	add_page_display(ch, "Relationships: <%srelations\t0>", OLC_LABEL_PTR(GET_BLD_RELATIONS(bdg)));
 	if (GET_BLD_RELATIONS(bdg)) {
-		get_bld_relations_display(GET_BLD_RELATIONS(bdg), lbuf);
-		add_page_display_str(ch, lbuf);
+		show_bld_relations_display(ch, GET_BLD_RELATIONS(bdg), FALSE);
 	}
 
 	// exdesc
@@ -1413,35 +1412,39 @@ void olc_show_building(char_data *ch) {
 /**
 * Displays the relationship data from a given list.
 *
+* @param char_data *ch The person viewing it.
 * @param struct bld_relation *list Pointer to the start of a list of relations.
-* @param char *save_buffer A buffer to store the result to.
+* @param bool send_page If TRUE, sends the page_display when done. Pass FALSE if you're building a larger page_display for the character.
 */
-void get_bld_relations_display(struct bld_relation *list, char *save_buffer) {
+void show_bld_relations_display(char_data *ch, struct bld_relation *list, bool send_page) {
 	struct bld_relation *relat;
 	int count = 0;
 	
-	*save_buffer = '\0';
 	LL_FOREACH(list, relat) {
 		// BLD_REL_x
 		switch (relat->type) {
 			case BLD_REL_UPGRADES_TO_VEH:
 			case BLD_REL_FORCE_UPGRADE_VEH:
 			case BLD_REL_STORES_LIKE_VEH: {
-				sprintf(save_buffer + strlen(save_buffer), "%2d. %s: [%5d] %s\r\n", ++count, bld_relationship_types[relat->type], relat->vnum, get_vehicle_name_by_proto(relat->vnum));
+				add_page_display(ch, "%2d. %s: [%5d] %s", ++count, bld_relationship_types[relat->type], relat->vnum, get_vehicle_name_by_proto(relat->vnum));
 				break;
 			}
 			case BLD_REL_UPGRADES_TO_BLD:
 			case BLD_REL_FORCE_UPGRADE_BLD:
 			case BLD_REL_STORES_LIKE_BLD:
 			default: {
-				sprintf(save_buffer + strlen(save_buffer), "%2d. %s: [%5d] %s\r\n", ++count, bld_relationship_types[relat->type], relat->vnum, get_bld_name_by_proto(relat->vnum));
+				add_page_display(ch, "%2d. %s: [%5d] %s", ++count, bld_relationship_types[relat->type], relat->vnum, get_bld_name_by_proto(relat->vnum));
 				break;
 			}
 		}
 	}
 	
 	if (count == 0) {
-		strcat(save_buffer, " none\r\n");
+		add_page_display_str(ch, " none");
+	}
+	
+	if (send_page) {
+		send_page_display(ch);
 	}
 }
 

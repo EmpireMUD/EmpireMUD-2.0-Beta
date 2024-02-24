@@ -303,13 +303,13 @@ void olc_show_vehicle(char_data *ch);
 
 // olc display parts
 void show_adventure_linking_display(char_data *ch, struct adventure_link_rule *list, bool send_page);
-void get_archetype_gear_display(struct archetype_gear *list, char *save_buffer);
-void get_bld_relations_display(struct bld_relation *list, char *save_buffer);
+void show_archetype_gear_display(char_data *ch, struct archetype_gear *list, bool send_page);
+void show_bld_relations_display(char_data *ch, struct bld_relation *list, bool send_page);
 void get_extra_desc_display(struct extra_descr_data *list, char *save_buffer, size_t buf_size);
 void get_generic_relation_display(struct generic_relation *list, bool show_vnums, char *save_buf, char *prefix);
 char *get_interaction_restriction_display(struct interact_restriction *list, bool whole_list);
-void get_evolution_display(struct evolution_data *list, char *save_buffer);
-void get_exit_template_display(struct exit_template *list, char *save_buffer);
+void show_evolution_display(char_data *ch, struct evolution_data *list, bool send_page);
+void show_exit_template_display(char_data *ch, struct exit_template *list, bool send_page);
 void get_progress_perks_display(struct progress_perk *list, char *save_buffer, bool show_vnums);
 void get_quest_giver_display(struct quest_giver *list, char *save_buffer);
 void get_requirement_display(struct req_data *list, char *save_buffer);

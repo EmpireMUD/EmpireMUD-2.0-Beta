@@ -882,8 +882,7 @@ void olc_show_sector(char_data *ch) {
 	
 	add_page_display(ch, "<%sevolution\t0>", OLC_LABEL_PTR(st->evolution));
 	if (st->evolution) {
-		get_evolution_display(st->evolution, lbuf);
-		add_page_display_str(ch, lbuf);
+		show_evolution_display(ch, st->evolution, FALSE);
 	}
 
 	// exdesc

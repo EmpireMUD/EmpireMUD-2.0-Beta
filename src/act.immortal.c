@@ -3225,8 +3225,8 @@ void do_stat_building(char_data *ch, bld_data *bdg, bool details) {
 	add_page_display(ch, "Citizens: [&g%d&0], Military: [&g%d&0], Artisan: [&g%d&0] &c%s&0", GET_BLD_CITIZENS(bdg), GET_BLD_MILITARY(bdg), GET_BLD_ARTISAN(bdg), GET_BLD_ARTISAN(bdg) != NOTHING ? get_mob_name_by_proto(GET_BLD_ARTISAN(bdg), FALSE) : "none");
 	
 	if (GET_BLD_RELATIONS(bdg)) {
-		get_bld_relations_display(GET_BLD_RELATIONS(bdg), lbuf);
-		add_page_display(ch, "Relations:\r\n%s", lbuf);
+		add_page_display_str(ch, "Relations:");
+		show_bld_relations_display(ch, GET_BLD_RELATIONS(bdg), FALSE);
 	}
 	
 	sprintbit(GET_BLD_FLAGS(bdg), bld_flags, lbuf, TRUE);
@@ -3909,8 +3909,8 @@ void do_stat_global(char_data *ch, struct global_data *glb) {
 			break;
 		}
 		case GLOBAL_NEWBIE_GEAR: {
-			get_archetype_gear_display(GET_GLOBAL_GEAR(glb), buf2);
-			add_page_display(ch, "Gear:\r\n%s", buf2);
+			add_page_display_str(ch, "Gear:");
+			show_archetype_gear_display(ch, GET_GLOBAL_GEAR(glb), FALSE);
 			break;
 		}
 		case GLOBAL_MAP_SPAWNS: {
@@ -4716,8 +4716,8 @@ void do_stat_room_template(char_data *ch, room_template *rmt, bool details) {
 		}
 	}
 
-	get_exit_template_display(GET_RMT_EXITS(rmt), lbuf);
-	add_page_display(ch, "Exits:\r\n%s", lbuf);
+	add_page_display_str(ch, "Exits:");
+	show_exit_template_display(ch, GET_RMT_EXITS(rmt), FALSE);
 	
 	if (GET_RMT_INTERACTIONS(rmt)) {
 		get_interaction_display(GET_RMT_INTERACTIONS(rmt), buf);
@@ -4771,8 +4771,8 @@ void do_stat_sector(char_data *ch, sector_data *st, bool details) {
 	add_page_display(ch, "Build flags: &g%s&0", buf);
 	
 	if (GET_SECT_EVOS(st)) {
-		get_evolution_display(GET_SECT_EVOS(st), buf1);
-		add_page_display(ch, "Evolution information:\r\n%s", buf1);
+		add_page_display_str(ch, "Evolution information:");
+		show_evolution_display(ch, GET_SECT_EVOS(st), FALSE);
 	}
 	
 	if (GET_SECT_EX_DESCS(st)) {

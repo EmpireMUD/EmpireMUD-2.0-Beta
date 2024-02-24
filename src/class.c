@@ -40,7 +40,7 @@ const char *default_class_name = "Unnamed Class";
 const char *default_class_abbrev = "???";
 
 // local protos
-void get_class_ability_display(struct class_ability *list, char *save_buffer, char_data *info_ch);
+void show_class_ability_display(char_data *ch, struct class_ability *list, bool send_page, char_data *info_ch);
 void get_class_skill_display(struct class_skill_req *list, char *save_buffer, bool one_line);
 int sort_class_abilities(struct class_ability *a, struct class_ability *b);
 
@@ -1262,40 +1262,47 @@ void do_stat_class(char_data *ch, class_data *cls) {
 	get_class_skill_display(CLASS_SKILL_REQUIREMENTS(cls), part, FALSE);
 	add_page_display(ch, "Skills required:\r\n%s", part);
 	
-	get_class_ability_display(CLASS_ABILITIES(cls), part, NULL);
-	add_page_display(ch, "Roles and abilities:\r\n%s%s", part, *part ? "\r\n" : " none\r\n");
+	add_page_display_str(ch, "Roles and abilities:");
+	show_class_ability_display(ch, CLASS_ABILITIES(cls), FALSE, NULL);
 
 	send_page_display(ch);
 }
 
 
 /**
-* Gets the class role display for olc, stat, or other uses.
+* Displays the class role display for olc, stat, or other uses.
 *
+* @param char_data *ch The person viewing it.
 * @param struct class_ability *list The list of abilities to display.
-* @param char *save_buffer A buffer to store the display to.
+* @param bool send_page If TRUE, sends the page_display when done. Pass FALSE if you're building a larger page_display for the character.
 * @param char_data *info_ch Optional: highlights abilities this player has (or NULL).
 */
-void get_class_ability_display(struct class_ability *list, char *save_buffer, char_data *info_ch) {
+void show_class_ability_display(char_data *ch, struct class_ability *list, bool send_page, char_data *info_ch) {
 	int count = 0, last_role = -2;
 	struct class_ability *iter;
 	ability_data *abil;
-	
-	*save_buffer = '\0';
+	struct page_display *pd = NULL;
 
 	LL_FOREACH(list, iter) {
 		if (iter->role != last_role) {
-			sprintf(save_buffer + strlen(save_buffer), "%s %s%s\t0: ", last_role != -2 ? "\r\n" : "", iter->role == NOTHING ? "\t0" : class_role_color[iter->role], iter->role == NOTHING ? "All" : class_role[iter->role]);
+			pd = add_page_display(ch, "%s %s%s\t0: ", last_role != -2 ? "\r\n" : "", iter->role == NOTHING ? "\t0" : class_role_color[iter->role], iter->role == NOTHING ? "All" : class_role[iter->role]);
 			last_role = iter->role;
 			count = 0;
 		}
 		
 		if ((abil = find_ability_by_vnum(iter->vnum))) {
-			sprintf(save_buffer + strlen(save_buffer), "%s%s%s\t0", (count++ > 0) ? ", " : "", (info_ch && has_ability(info_ch, iter->vnum)) ? "\tg" : "", ABIL_NAME(abil));
+			append_page_display_line(pd, "%s%s%s\t0", (count++ > 0) ? ", " : "", (info_ch && has_ability(info_ch, iter->vnum)) ? "\tg" : "", ABIL_NAME(abil));
 		}
 		else {
-			sprintf(save_buffer + strlen(save_buffer), "%s%d Unknown\t0", (count++ > 0) ? ", " : "", iter->vnum);
+			append_page_display_line(pd, "%s%d Unknown\t0", (count++ > 0) ? ", " : "", iter->vnum);
 		}
+	}
+	if (!list) {
+		add_page_display_str(ch, " none");
+	}
+	
+	if (send_page) {
+		send_page_display(ch);
 	}
 }
 
@@ -1358,8 +1365,8 @@ void olc_show_class(char_data *ch) {
 	add_page_display(ch, "<%smaxmana\t0> %d", OLC_LABEL_VAL(CLASS_POOL(cls, MANA), base_player_pools[MANA]), CLASS_POOL(cls, MANA));
 	add_page_display(ch, "<%smaxmoves\t0> %d", OLC_LABEL_VAL(CLASS_POOL(cls, MOVE), base_player_pools[MOVE]), CLASS_POOL(cls, MOVE));
 	
-	get_class_ability_display(CLASS_ABILITIES(cls), lbuf, NULL);
-	add_page_display(ch, "Class roles and abilities: <%srole\t0>\r\n%s", OLC_LABEL_PTR(CLASS_ABILITIES(cls)), lbuf);
+	add_page_display(ch, "Class roles and abilities: <%srole\t0>", OLC_LABEL_PTR(CLASS_ABILITIES(cls)));
+	show_class_ability_display(ch, CLASS_ABILITIES(cls), FALSE, NULL);
 	
 	send_page_display(ch);
 }
@@ -1628,7 +1635,7 @@ OLC_MODULE(classedit_role) {
 //// COMMANDS ///////////////////////////////////////////////////////////////
 
 ACMD(do_class) {
-	char arg2[MAX_INPUT_LENGTH], buf[MAX_STRING_LENGTH];
+	char arg2[MAX_INPUT_LENGTH];
 	int found;
 	
 	two_arguments(argument, arg, arg2);
@@ -1674,10 +1681,10 @@ ACMD(do_class) {
 			msg_to_char(ch, "You don't have a class. You can earn your class by raising two skills to 76 or higher.\r\n");
 		}
 		else {
-			msg_to_char(ch, "%s\r\nClass: %s%s (%s)\t0 %d/%d/%d\r\n", PERS(ch, ch, TRUE), class_role_color[GET_CLASS_ROLE(ch)], SHOW_CLASS_NAME(ch), class_role[(int) GET_CLASS_ROLE(ch)], GET_SKILL_LEVEL(ch), GET_GEAR_LEVEL(ch), GET_COMPUTED_LEVEL(ch));
-			
-			get_class_ability_display(CLASS_ABILITIES(GET_CLASS(ch)), buf, ch);
-			msg_to_char(ch, " Available class abilities:\r\n%s%s", buf, *buf ? "\r\n" : "  none\r\n");
+			add_page_display(ch, "%s\r\nClass: %s%s (%s)\t0 %d/%d/%d", PERS(ch, ch, TRUE), class_role_color[GET_CLASS_ROLE(ch)], SHOW_CLASS_NAME(ch), class_role[(int) GET_CLASS_ROLE(ch)], GET_SKILL_LEVEL(ch), GET_GEAR_LEVEL(ch), GET_COMPUTED_LEVEL(ch));
+			add_page_display_str(ch, " Available class abilities:");
+			show_class_ability_display(ch, CLASS_ABILITIES(GET_CLASS(ch)), FALSE, ch);
+			send_page_display(ch);
 		}
 	}
 }

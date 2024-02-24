@@ -1840,8 +1840,8 @@ void do_stat_archetype(char_data *ch, archetype_data *arch) {
 	}
 	
 	// gear
-	get_archetype_gear_display(GET_ARCH_GEAR(arch), part);
-	add_page_display(ch, "Gear:\r\n%s", part);
+	add_page_display_str(ch, "Gear:");
+	show_archetype_gear_display(ch, GET_ARCH_GEAR(arch), FALSE);
 	
 	send_page_display(ch);
 }
@@ -1850,18 +1850,23 @@ void do_stat_archetype(char_data *ch, archetype_data *arch) {
 /**
 * Displays the archetype-gear data from a given list.
 *
+* @param char_data *ch The person viewing it.
 * @param struct archetype_gear *list Pointer to the start of a list of gear.
-* @param char *save_buffer A buffer to store the result to.
+* @param bool send_page If TRUE, sends the page_display when done. Pass FALSE if you're building a larger page_display for the character.
 */
-void get_archetype_gear_display(struct archetype_gear *list, char *save_buffer) {
+void show_archetype_gear_display(char_data *ch, struct archetype_gear *list, bool send_page) {
 	struct archetype_gear *gear;
 	int num;
-	*save_buffer = '\0';
+	
 	for (gear = list, num = 1; gear; gear = gear->next, ++num) {
-		sprintf(save_buffer + strlen(save_buffer), " %2d. %s: [%d] %s\r\n", num, gear->wear == NO_WEAR ? "inventory" : wear_data[gear->wear].name, gear->vnum, get_obj_name_by_proto(gear->vnum));
+		add_page_display(ch, " %2d. %s: [%d] %s\r\n", num, gear->wear == NO_WEAR ? "inventory" : wear_data[gear->wear].name, gear->vnum, get_obj_name_by_proto(gear->vnum));
 	}
 	if (!list) {
-		sprintf(save_buffer + strlen(save_buffer), "  none\r\n");
+		add_page_display_str(ch, "  none");
+	}
+	
+	if (send_page) {
+		send_page_display(ch);
 	}
 }
 
@@ -1920,8 +1925,7 @@ void olc_show_archetype(char_data *ch) {
 	// gear
 	add_page_display(ch, "Gear: <%sgear\t0>", OLC_LABEL_PTR(GET_ARCH_GEAR(arch)));
 	if (GET_ARCH_GEAR(arch)) {
-		get_archetype_gear_display(GET_ARCH_GEAR(arch), lbuf);
-		add_page_display_str(ch, lbuf);
+		show_archetype_gear_display(ch, GET_ARCH_GEAR(arch), FALSE);
 	}
 	
 	send_page_display(ch);

@@ -486,8 +486,10 @@ void olc_show_global(char_data *ch) {
 			break;
 		}
 		case GLOBAL_NEWBIE_GEAR: {
-			get_archetype_gear_display(GET_GLOBAL_GEAR(glb), lbuf);
-			add_page_display(ch, "Gear: <%sgear\t0>\r\n%s", OLC_LABEL_PTR(GET_GLOBAL_GEAR(glb)), GET_GLOBAL_GEAR(glb) ? lbuf : "");
+			add_page_display(ch, "Gear: <%sgear\t0>", OLC_LABEL_PTR(GET_GLOBAL_GEAR(glb)));
+			if (GET_GLOBAL_GEAR(glb)) {
+				show_archetype_gear_display(ch, GET_GLOBAL_GEAR(glb), FALSE);
+			}
 			break;
 		}
 		case GLOBAL_MAP_SPAWNS: {
