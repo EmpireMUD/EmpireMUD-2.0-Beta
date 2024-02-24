@@ -1352,7 +1352,7 @@ void olc_show_class(char_data *ch) {
 	add_page_display(ch, "<%sflags\t0> %s", OLC_LABEL_VAL(CLASS_FLAGS(cls), CLASSF_IN_DEVELOPMENT), lbuf);
 	
 	get_class_skill_display(CLASS_SKILL_REQUIREMENTS(cls), lbuf, FALSE);
-	add_page_display(ch, "Skills required: <%srequires\t0>%s", OLC_LABEL_PTR(CLASS_SKILL_REQUIREMENTS(cls)), CLASS_SKILL_REQUIREMENTS(cls) ? lbuf : "");
+	add_page_display(ch, "Skills required: <%srequires\t0>\r\n%s", OLC_LABEL_PTR(CLASS_SKILL_REQUIREMENTS(cls)), CLASS_SKILL_REQUIREMENTS(cls) ? lbuf : "");
 	
 	add_page_display(ch, "<%smaxhealth\t0> %d", OLC_LABEL_VAL(CLASS_POOL(cls, HEALTH), base_player_pools[HEALTH]), CLASS_POOL(cls, HEALTH));
 	add_page_display(ch, "<%smaxmana\t0> %d", OLC_LABEL_VAL(CLASS_POOL(cls, MANA), base_player_pools[MANA]), CLASS_POOL(cls, MANA));

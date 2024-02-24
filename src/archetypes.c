@@ -1904,7 +1904,7 @@ void olc_show_archetype(char_data *ch) {
 	add_page_display(ch, "Attributes: <%sattribute\t0> (%d total attributes)", OLC_LABEL_UNCHANGED, total);
 	for (iter = 0; iter < NUM_ATTRIBUTES; ++iter) {
 		pos = attribute_display_order[iter];
-		add_page_display_col(ch, 3, TRUE, "%s%s\t0  [%2d]", OLC_LABEL_VAL(GET_ARCH_ATTRIBUTE(arch, pos), 0), attributes[pos].name, GET_ARCH_ATTRIBUTE(arch, pos));
+		add_page_display_col(ch, 3, TRUE, "  %s%s\t0  [%2d]", OLC_LABEL_VAL(GET_ARCH_ATTRIBUTE(arch, pos), 0), attributes[pos].name, GET_ARCH_ATTRIBUTE(arch, pos));
 	}
 	
 	// skills

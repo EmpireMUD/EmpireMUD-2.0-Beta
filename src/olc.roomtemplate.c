@@ -920,7 +920,7 @@ void olc_show_room_template(char_data *ch) {
 	add_page_display(ch, "[%s%d\t0] %s%s\t0", OLC_LABEL_CHANGED, GET_OLC_VNUM(ch->desc), OLC_LABEL_UNCHANGED, !room_template_proto(GET_RMT_VNUM(rmt)) ? "new room template" : GET_RMT_TITLE(room_template_proto(GET_RMT_VNUM(rmt))));
 	add_page_display(ch, "Adventure: %d %s%s\t0", adv ? GET_ADV_VNUM(adv) : NOTHING, OLC_LABEL_CHANGED, adv ? GET_ADV_NAME(adv) : "none");
 	add_page_display(ch, "<%stitle\t0> %s", OLC_LABEL_STR(GET_RMT_TITLE(rmt), default_rmt_title), NULLSAFE(GET_RMT_TITLE(rmt)));
-	add_page_display(ch, "<%sdescription\t0>%s", OLC_LABEL_STR(GET_RMT_DESC(rmt), ""), NULLSAFE(GET_RMT_DESC(rmt)));
+	add_page_display(ch, "<%sdescription\t0>\r\n%s", OLC_LABEL_STR(GET_RMT_DESC(rmt), ""), NULLSAFE(GET_RMT_DESC(rmt)));
 	
 	if (GET_RMT_SUBZONE(rmt) != NOWHERE) {
 		snprintf(lbuf, sizeof(lbuf), "%d", GET_RMT_SUBZONE(rmt));
