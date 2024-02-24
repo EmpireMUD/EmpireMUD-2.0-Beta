@@ -7215,6 +7215,7 @@ ACMD(do_list) {
 			}
 			
 			add_page_display(ch, " - %s%s%s (%d %s%s)", vstr, GET_OBJ_SHORT_DESC(obj), drinkstr, item->cost, (item->currency == NOTHING ? "coins" : get_generic_string_by_vnum(item->currency, GENERIC_CURRENCY, WHICH_CURRENCY(item->cost))), rep);
+			any = TRUE;
 			
 			// store currency for listing later
 			if ((vnum = item->currency) != NOTHING) {
