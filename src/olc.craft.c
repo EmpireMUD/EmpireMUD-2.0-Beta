@@ -733,8 +733,7 @@ void olc_show_craft(char_data *ch) {
 
 	// resources
 	add_page_display(ch, "Resources required: <%sresource\t0>", OLC_LABEL_PTR(GET_CRAFT_RESOURCES(craft)));
-	get_resource_display(ch, GET_CRAFT_RESOURCES(craft), lbuf);
-	add_page_display_str(ch, lbuf);
+	show_resource_display(ch, GET_CRAFT_RESOURCES(craft), FALSE);
 		
 	send_page_display(ch);
 }

@@ -1383,8 +1383,7 @@ void olc_show_building(char_data *ch) {
 	// maintenance resources
 	add_page_display(ch, "Regular maintenance resources: <%sresource\t0>", OLC_LABEL_PTR(GET_BLD_REGULAR_MAINTENANCE(bdg)));
 	if (GET_BLD_REGULAR_MAINTENANCE(bdg)) {
-		get_resource_display(ch, GET_BLD_REGULAR_MAINTENANCE(bdg), lbuf);
-		add_page_display_str(ch, lbuf);
+		show_resource_display(ch, GET_BLD_REGULAR_MAINTENANCE(bdg), FALSE);
 	}
 
 	// scripts

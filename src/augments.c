@@ -727,8 +727,8 @@ void do_stat_augment(char_data *ch, augment_data *aug) {
 	}
 	
 	// resources
-	get_resource_display(ch, GET_AUG_RESOURCES(aug), part);
-	add_page_display(ch, "Resource cost:\r\n%s", part);
+	add_page_display_str(ch, "Resource cost:");
+	show_resource_display(ch, GET_AUG_RESOURCES(aug), FALSE);
 	
 	send_page_display(ch);
 }
@@ -785,8 +785,7 @@ void olc_show_augment(char_data *ch) {
 	// resources
 	add_page_display(ch, "Resources required: <%sresource\t0>", OLC_LABEL_PTR(GET_AUG_RESOURCES(aug)));
 	if (GET_AUG_RESOURCES(aug)) {
-		get_resource_display(ch, GET_AUG_RESOURCES(aug), lbuf);
-		add_page_display_str(ch, lbuf);
+		show_resource_display(ch, GET_AUG_RESOURCES(aug), FALSE);
 	}
 	
 	send_page_display(ch);

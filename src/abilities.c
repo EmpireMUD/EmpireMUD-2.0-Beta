@@ -11054,8 +11054,10 @@ void do_stat_ability(char_data *ch, ability_data *abil, bool details) {
 		add_page_display(ch, "Cooldown: [\tc%d %s\t0], Cooldown time: [\tc%s\t0]", ABIL_COOLDOWN(abil), get_generic_name_by_vnum(ABIL_COOLDOWN(abil)), colon_time(ABIL_COOLDOWN_SECS(abil), FALSE, NULL));
 	}
 	if (IS_SET(fields, ABILEDIT_COST)) {
-		get_resource_display(ch, ABIL_RESOURCE_COST(abil), part);
-		add_page_display(ch, "Resource cost:%s\r\n%s", ABIL_RESOURCE_COST(abil) ? "" : " none", ABIL_RESOURCE_COST(abil) ? part : "");
+		add_page_display(ch, "Resource cost:%s", ABIL_RESOURCE_COST(abil) ? "" : " none");
+		if (ABIL_RESOURCE_COST(abil)) {
+			show_resource_display(ch, ABIL_RESOURCE_COST(abil), FALSE);
+		}
 	}
 	
 	if (IS_SET(fields, ABILEDIT_TOOL)) {
@@ -11245,8 +11247,10 @@ void olc_show_ability(char_data *ch) {
 	}
 	
 	if (IS_SET(fields, ABILEDIT_COST)) {
-		get_resource_display(ch, ABIL_RESOURCE_COST(abil), lbuf);
-		add_page_display(ch, "<%sresourcecost\t0>%s\r\n%s", OLC_LABEL_PTR(ABIL_RESOURCE_COST(abil)), ABIL_RESOURCE_COST(abil) ? "" : " none", ABIL_RESOURCE_COST(abil) ? lbuf : "");
+		add_page_display(ch, "<%sresourcecost\t0>%s", OLC_LABEL_PTR(ABIL_RESOURCE_COST(abil)), ABIL_RESOURCE_COST(abil) ? "" : " none");
+		if (ABIL_RESOURCE_COST(abil)) {
+			show_resource_display(ch, ABIL_RESOURCE_COST(abil), FALSE);
+		}
 	}
 	
 	// Cooldown line

@@ -3269,8 +3269,8 @@ void do_stat_building(char_data *ch, bld_data *bdg, bool details) {
 	}
 	
 	if (GET_BLD_REGULAR_MAINTENANCE(bdg)) {
-		get_resource_display(ch, GET_BLD_REGULAR_MAINTENANCE(bdg), lbuf);
-		add_page_display(ch, "Regular maintenance:\r\n%s", lbuf);
+		add_page_display_str(ch, "Regular maintenance:");
+		show_resource_display(ch, GET_BLD_REGULAR_MAINTENANCE(bdg), FALSE);
 	}
 	
 	if (GET_BLD_SCRIPTS(bdg)) {
@@ -3674,8 +3674,8 @@ void do_stat_craft(char_data *ch, craft_data *craft) {
 	}
 
 	// resources
-	get_resource_display(ch, GET_CRAFT_RESOURCES(craft), lbuf);
-	add_page_display(ch, "Resources required:\r\n%s", lbuf);
+	add_page_display_str(ch, "Resources required:");
+	show_resource_display(ch, GET_CRAFT_RESOURCES(craft), FALSE);
 	
 	send_page_display(ch);
 }

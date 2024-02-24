@@ -152,7 +152,7 @@ struct olc_command_data {
 bool can_start_olc_edit(char_data *ch, int type, any_vnum vnum);
 void show_icons_display(char_data *ch, struct icon_data *list, bool send_page);
 void show_interaction_display(char_data *ch, struct interaction_item *list, bool send_page);
-void get_resource_display(char_data *ch, struct resource_data *list, char *save_buffer);
+void show_resource_display(char_data *ch, struct resource_data *list, bool send_page);
 void get_script_display(struct trig_proto_list *list, char *save_buffer);
 int find_olc_type(char *name);
 bool interactions_are_identical(struct interaction_item *a, struct interaction_item *b);

@@ -4502,8 +4502,8 @@ void do_stat_vehicle(char_data *ch, vehicle_data *veh, bool details) {
 	}
 	
 	if (VEH_REGULAR_MAINTENANCE(veh)) {
-		get_resource_display(ch, VEH_REGULAR_MAINTENANCE(veh), part);
-		add_page_display(ch, "Regular maintenance:\r\n%s", part);
+		add_page_display_str(ch, "Regular maintenance:");
+		show_resource_display(ch, VEH_REGULAR_MAINTENANCE(veh), FALSE);
 	}
 	
 	add_page_display(ch, "Scaled to level: [\tc%d (%d-%d)\t0], Owner: [%s%s\t0]", VEH_SCALE_LEVEL(veh), VEH_MIN_SCALE_LEVEL(veh), VEH_MAX_SCALE_LEVEL(veh), VEH_OWNER(veh) ? EMPIRE_BANNER(VEH_OWNER(veh)) : "", VEH_OWNER(veh) ? EMPIRE_NAME(VEH_OWNER(veh)) : "nobody");
@@ -4566,8 +4566,8 @@ void do_stat_vehicle(char_data *ch, vehicle_data *veh, bool details) {
 	}
 	
 	if (VEH_NEEDS_RESOURCES(veh)) {
-		get_resource_display(ch, VEH_NEEDS_RESOURCES(veh), part);
-		add_page_display(ch, "%s resources:\r\n%s", VEH_IS_DISMANTLING(veh) ? "Dismantle" : "Needs", part);
+		add_page_display(ch, "%s resources:", VEH_IS_DISMANTLING(veh) ? "Dismantle" : "Needs");
+		show_resource_display(ch, VEH_NEEDS_RESOURCES(veh), FALSE);
 	}
 	
 	if (VEH_CUSTOM_MSGS(veh)) {
@@ -4771,8 +4771,7 @@ void olc_show_vehicle(char_data *ch) {
 	// maintenance resources
 	add_page_display(ch, "Regular maintenance resources: <%sresource\t0>", OLC_LABEL_PTR(VEH_REGULAR_MAINTENANCE(veh)));
 	if (VEH_REGULAR_MAINTENANCE(veh)) {
-		get_resource_display(ch, VEH_REGULAR_MAINTENANCE(veh), lbuf);
-		add_page_display_str(ch, lbuf);
+		show_resource_display(ch, VEH_REGULAR_MAINTENANCE(veh), FALSE);
 	}
 	
 	// custom messages

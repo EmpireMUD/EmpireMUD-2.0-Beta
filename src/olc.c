@@ -4806,20 +4806,19 @@ void show_requirement_display(char_data *ch, struct req_data *list, bool send_pa
 
 
 /**
-* Gets the resource list for use in an editor or display.
+* Displays a resource list.
 *
-* @param char_data *ch Person viewing the list (for columns).
+* @param char_data *ch Person viewing the list.
 * @param struct resource_data *list The list to show.
-* @param char *save_buffer A string to write the output to.
+* @param bool send_page If TRUE, sends the page_display when done. Pass FALSE if you're building a larger page_display for the character.
 */
-void get_resource_display(char_data *ch, struct resource_data *list, char *save_buffer) {
-	bool vnum, screen_reader = (ch && PRF_FLAGGED(ch, PRF_SCREEN_READER));
+void show_resource_display(char_data *ch, struct resource_data *list, bool send_page) {
+	bool vnum;
 	char line[MAX_STRING_LENGTH], buf[MAX_STRING_LENGTH];
 	struct resource_data *res;
 	obj_data *obj;
 	int num;
 	
-	*save_buffer = '\0';
 	for (res = list, num = 1; res; res = res->next, ++num) {
 		// RES_x: resource type determines display
 		switch (res->type) {
@@ -4872,28 +4871,19 @@ void get_resource_display(char_data *ch, struct resource_data *list, char *save_
 		}
 		
 		// append
-		if (screen_reader) {
-			if (vnum) {
-				sprintf(save_buffer + strlen(save_buffer), " &y%2d&0. [%5d] %s\r\n", num, res->vnum, line);
-			}
-			else {
-				sprintf(save_buffer + strlen(save_buffer), " &y%2d&0. %s\r\n", num, line);
-			}
+		if (vnum) {
+			add_page_display_col(ch, 2, FALSE, " &y%2d&0. [%5d] %s", num, res->vnum, line);
 		}
-		else {	// not screen-reader
-			if (vnum) {
-				sprintf(save_buffer + strlen(save_buffer), " &y%2d&0. [%5d] %-26.26s%s", num, res->vnum, line, !(num % 2) ? "\r\n" : "");
-			}
-			else {
-				sprintf(save_buffer + strlen(save_buffer), " &y%2d&0. %-34.34s%s", num, line,  !(num % 2) ? "\r\n" : "");
-			}
+		else {
+			add_page_display_col(ch, 2, FALSE, " &y%2d&0. %s", num, line);
 		}
 	}
-	if (!*save_buffer) {
-		strcpy(save_buffer, "  none\r\n");
+	if (list) {
+		add_page_display_str(ch, "  none");
 	}
-	else if (!screen_reader && !(num % 2)) {
-		strcat(save_buffer, "\r\n");
+	
+	if (send_page) {
+		send_page_display(ch);
 	}
 }
 
