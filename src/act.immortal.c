@@ -3130,8 +3130,8 @@ void do_stat_adventure(char_data *ch, adv_data *adv) {
 	
 	add_page_display(ch, "Temperature: [\tc%s\t0]", temperature_types[GET_ADV_TEMPERATURE_TYPE(adv)]);
 	
-	get_adventure_linking_display(GET_ADV_LINKING(adv), lbuf);
-	add_page_display(ch, "Linking rules:\r\n%s", lbuf);
+	add_page_display_str(ch, "Linking rules:");
+	show_adventure_linking_display(ch, GET_ADV_LINKING(adv), FALSE);
 	
 	if (GET_ADV_SCRIPTS(adv)) {
 		get_script_display(GET_ADV_SCRIPTS(adv), lbuf);

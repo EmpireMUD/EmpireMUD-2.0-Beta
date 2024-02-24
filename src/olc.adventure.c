@@ -679,10 +679,11 @@ int wordcount_adventure(struct adventure_data *adv) {
 /**
 * Displays the linking rules from a given list.
 *
+* @param char_data *ch The person to display it to.
 * @param struct adventure_link_rule *list Pointer to the start of a list of links.
-* @param char *save_buffer A buffer to store the result to.
+* @param bool send_page If TRUE, sends the page_display when done. Pass FALSE if you're building a larger page_display for the character.
 */
-void get_adventure_linking_display(struct adventure_link_rule *list, char *save_buffer) {
+void show_adventure_linking_display(char_data *ch, struct adventure_link_rule *list, bool send_page) {
 	struct adventure_link_rule *rule;
 	char lbuf[MAX_STRING_LENGTH], flg[MAX_STRING_LENGTH], bon[MAX_STRING_LENGTH], bfac[MAX_STRING_LENGTH];
 	sector_data *sect;
@@ -690,8 +691,6 @@ void get_adventure_linking_display(struct adventure_link_rule *list, char *save_
 	bld_data *bld;
 	int count = 0;
 	size_t size;
-	
-	*save_buffer = '\0';
 	
 	for (rule = list; rule; rule = rule->next) {
 		// prepare build on/facing as several types use them
@@ -817,11 +816,15 @@ void get_adventure_linking_display(struct adventure_link_rule *list, char *save_
 		}
 		
 		sprintbit(rule->flags, adventure_link_flags, flg, TRUE);
-		sprintf(save_buffer + strlen(save_buffer), "%2d. %s: %s%s&g%s\t0\r\n", ++count, adventure_link_types[rule->type], lbuf, (rule->flags ? ", " : ""), (rule->flags ? flg : ""));
+		add_page_display(ch, "%2d. %s: %s%s&g%s\t0", ++count, adventure_link_types[rule->type], lbuf, (rule->flags ? ", " : ""), (rule->flags ? flg : ""));
 	}
 	
 	if (count == 0) {
-		strcat(save_buffer, " none\r\n");
+		add_page_display_str(ch, " none");
+	}
+	
+	if (send_page) {
+		send_page_display(ch);
 	}
 }
 
@@ -869,8 +872,7 @@ void olc_show_adventure(char_data *ch) {
 
 	add_page_display(ch, "Linking rules: <%slinking\t0>", OLC_LABEL_PTR(GET_ADV_LINKING(adv)));
 	if (GET_ADV_LINKING(adv)) {
-		get_adventure_linking_display(GET_ADV_LINKING(adv), lbuf);
-		add_page_display_str(ch, lbuf);
+		show_adventure_linking_display(ch, GET_ADV_LINKING(adv), FALSE);
 	}
 	
 	// scripts

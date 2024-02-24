@@ -302,7 +302,7 @@ void olc_show_trigger(char_data *ch);
 void olc_show_vehicle(char_data *ch);
 
 // olc display parts
-void get_adventure_linking_display(struct adventure_link_rule *list, char *save_buffer);
+void show_adventure_linking_display(char_data *ch, struct adventure_link_rule *list, bool send_page);
 void get_archetype_gear_display(struct archetype_gear *list, char *save_buffer);
 void get_bld_relations_display(struct bld_relation *list, char *save_buffer);
 void get_extra_desc_display(struct extra_descr_data *list, char *save_buffer, size_t buf_size);
