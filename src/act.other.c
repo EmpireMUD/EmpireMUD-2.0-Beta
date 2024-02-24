@@ -1480,13 +1480,13 @@ ACMD(do_accept) {
 
 
 ACMD(do_alternate) {
-	char arg[MAX_INPUT_LENGTH], buf[MAX_STRING_LENGTH], part[MAX_STRING_LENGTH];
+	char arg[MAX_INPUT_LENGTH], part[MAX_STRING_LENGTH];
 	struct account_player *plr;
 	player_index_data *index;
 	char_data *newch, *alt;
 	bool is_file = FALSE, timed_out;
 	int days, hours;
-	size_t size;
+	struct page_display *pd;
 	
 	argument = any_one_arg(argument, arg);
 	
@@ -1501,7 +1501,7 @@ ACMD(do_alternate) {
 		msg_to_char(ch, "Usage: alternate <character name | list | import>\r\n");
 	}
 	else if (!str_cmp(arg, "list")) {
-		size = snprintf(buf, sizeof(buf), "Account characters:\r\n");
+		add_page_display(ch, "Account characters:");
 		
 		for (plr = GET_ACCOUNT(ch)->players; plr; plr = plr->next) {
 			if (!plr->player) {
@@ -1518,26 +1518,24 @@ ACMD(do_alternate) {
 			timed_out = member_is_timed_out_ch(alt);
 			get_player_skill_string(alt, part, TRUE);
 			if (PRF_FLAGGED(ch, PRF_SCREEN_READER)) {
-				size += snprintf(buf + size, sizeof(buf) - size, "[%d %s %s] %s%s&0", !is_file ? GET_COMPUTED_LEVEL(alt) : GET_LAST_KNOWN_LEVEL(alt), part, class_role[GET_CLASS_ROLE(alt)], (timed_out ? "&r" : ""), PERS(alt, alt, TRUE));
+				pd = add_page_display(ch, "[%d %s %s] %s%s&0", !is_file ? GET_COMPUTED_LEVEL(alt) : GET_LAST_KNOWN_LEVEL(alt), part, class_role[GET_CLASS_ROLE(alt)], (timed_out ? "&r" : ""), PERS(alt, alt, TRUE));
 			}
 			else {	// not screenreader
-				size += snprintf(buf + size, sizeof(buf) - size, "[%d %s%s\t0] %s%s&0", !is_file ? GET_COMPUTED_LEVEL(alt) : GET_LAST_KNOWN_LEVEL(alt), class_role_color[GET_CLASS_ROLE(alt)], part, (timed_out ? "&r" : ""), PERS(alt, alt, TRUE));
+				pd = add_page_display(ch, "[%d %s%s\t0] %s%s&0", !is_file ? GET_COMPUTED_LEVEL(alt) : GET_LAST_KNOWN_LEVEL(alt), class_role_color[GET_CLASS_ROLE(alt)], part, (timed_out ? "&r" : ""), PERS(alt, alt, TRUE));
 			}
 						
 			// online/not
 			if (!is_file) {
-				size += snprintf(buf + size, sizeof(buf) - size, "  - &conline&0%s", IS_AFK(alt) ? " - &rafk&0" : "");
+				append_page_display_line(pd, "  - &conline&0%s", IS_AFK(alt) ? " - &rafk&0" : "");
 			}
 			else if ((time(0) - alt->prev_logon) < SECS_PER_REAL_DAY) {
 				hours = (time(0) - alt->prev_logon) / SECS_PER_REAL_HOUR;
-				size += snprintf(buf + size, sizeof(buf) - size, "  - %d hour%s ago%s", hours, PLURAL(hours), (timed_out ? ", &rtimed-out&0" : ""));
+				append_page_display_line(pd, "  - %d hour%s ago%s", hours, PLURAL(hours), (timed_out ? ", &rtimed-out&0" : ""));
 			}
 			else {	// more than a day
 				days = (time(0) - alt->prev_logon) / SECS_PER_REAL_DAY;
-				size += snprintf(buf + size, sizeof(buf) - size, "  - %d day%s ago%s", days, PLURAL(days), (timed_out ? ", &rtimed-out&0" : ""));
+				append_page_display_line(pd, "  - %d day%s ago%s", days, PLURAL(days), (timed_out ? ", &rtimed-out&0" : ""));
 			}
-		
-			size += snprintf(buf + size, sizeof(buf) - size, "\r\n");
 		
 			if (alt && is_file) {
 				free_char(alt);
@@ -1545,9 +1543,7 @@ ACMD(do_alternate) {
 		}
 		
 		// prevent rapid-use
-		if (ch->desc) {
-			page_string(ch->desc, buf, TRUE);
-		}
+		send_page_display(ch);
 		command_lag(ch, WAIT_OTHER);
 	}
 	else if (!str_cmp(arg, "import")) {

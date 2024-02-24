@@ -3023,10 +3023,9 @@ ACMD(do_chart) {
 
 // will show all currencies if the subcmd == TRUE
 ACMD(do_coins) {
-	char buf[MAX_STRING_LENGTH], line[MAX_STRING_LENGTH], vstr[64], adv_part[128];
+	char line[MAX_STRING_LENGTH], vstr[64], adv_part[128];
 	struct player_currency *cur, *next_cur;
 	bool any = FALSE;
-	size_t size = 0;
 	adv_data *adv;
 	generic_data *gen;
 	
@@ -3036,16 +3035,15 @@ ACMD(do_coins) {
 	}
 	
 	skip_spaces(&argument);
-	*buf = '\0';
 	
 	// basic coins -- only show if no-arg
 	if (!*argument) {
 		coin_string(GET_PLAYER_COINS(ch), line);
-		size = snprintf(buf, sizeof(buf), "You have %s.\r\n", line);
+		add_page_display(ch, "You have %s.", line);
 	}
 	
 	if (GET_CURRENCIES(ch) && subcmd) {
-		size += snprintf(buf + size, sizeof(buf) - size, "You%s have:\r\n", *argument ? "" : " also");
+		add_page_display(ch, "You%s have:", *argument ? "" : " also");
 		
 		HASH_ITER(hh, GET_CURRENCIES(ch), cur, next_cur) {
 			if (*argument && !multi_isname(argument, get_generic_string_by_vnum(cur->vnum, GENERIC_CURRENCY, WHICH_CURRENCY(cur->amount)))) {
@@ -3066,24 +3064,19 @@ ACMD(do_coins) {
 				*vstr = '\0';
 			}
 			
-			snprintf(line, sizeof(line), "%s%3d %s%s\r\n", vstr, cur->amount, get_generic_string_by_vnum(cur->vnum, GENERIC_CURRENCY, WHICH_CURRENCY(cur->amount)), adv_part);
+			add_page_display(ch, "%s%3d %s%s", vstr, cur->amount, get_generic_string_by_vnum(cur->vnum, GENERIC_CURRENCY, WHICH_CURRENCY(cur->amount)), adv_part);
 			any = TRUE;
-			
-			if (size + strlen(line) < sizeof(buf)) {
-				strcat(buf, line);
-				size += strlen(line);
-			}
-			else {
-				break;
-			}
 		}
 	}
 	
 	if (*argument && !any) {
-		msg_to_char(ch, "You have no special currency called '%s'.\r\n", argument);
+		add_page_display(ch, "You have no special currency called '%s'.", argument);
+		if (ch->desc && ch->desc->page_lines) {
+			free_page_display(&ch->desc->page_lines);
+		}
 	}
 	else if (ch->desc) {	// show currency
-		page_string(ch->desc, buf, TRUE);
+		send_page_display(ch);
 	}
 }
 

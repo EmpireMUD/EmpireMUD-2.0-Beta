@@ -2518,12 +2518,12 @@ ACMD(do_move) {
 // mortals have to portal from a certain building, immortals can do it anywhere
 ACMD(do_portal) {
 	bool all_access = ((IS_IMMORTAL(ch) && (GET_ACCESS_LEVEL(ch) >= LVL_CIMPL || IS_GRANTED(ch, GRANT_TRANSFER))) || (IS_NPC(ch) && !AFF_FLAGGED(ch, AFF_CHARM)));
-	char arg[MAX_INPUT_LENGTH], buf[MAX_STRING_LENGTH * 2], line[MAX_STRING_LENGTH];
+	char arg[MAX_INPUT_LENGTH], line[MAX_STRING_LENGTH];
 	const char *dir_str;
 	struct temp_portal_data *port, *next_port, *portal_list = NULL;
 	room_data *near = NULL, *target = NULL;
 	obj_data *portal, *end, *obj;
-	int bsize, lsize, count, num, dist;
+	int lsize, count, num, dist;
 	bool all = FALSE, wait_here = FALSE, wait_there = FALSE, ch_in_city;
 	
 	int max_out_of_city_portal = config_get_int("max_out_of_city_portal");
@@ -2583,19 +2583,14 @@ ACMD(do_portal) {
 		
 		// ready to show it
 		if (near) {
-			bsize = snprintf(buf, sizeof(buf), "Known portals near (%d, %d):\r\n", X_COORD(near), Y_COORD(near));
+			add_page_display(ch, "Known portals near (%d, %d):", X_COORD(near), Y_COORD(near));
 		}
 		else {
-			bsize = snprintf(buf, sizeof(buf), "Known portals:\r\n");
+			add_page_display_str(ch, "Known portals:");
 		}
 		
 		count = 0;
 		LL_FOREACH_SAFE(portal_list, port, next_port) {
-			// early exit
-			if (bsize >= sizeof(buf) - 1) {
-				break;
-			}
-			
 			++count;
 			*line = '\0';
 			lsize = 0;
@@ -2613,14 +2608,13 @@ ACMD(do_portal) {
 				lsize += snprintf(line + lsize, sizeof(line) - lsize, " &r(too far)&0");
 			}
 			
-			bsize += snprintf(buf + bsize, sizeof(buf) - bsize, "%s\r\n", line);
+			add_page_display_str(ch, line);
 			
 			// free RAM!
 			free(port);
 		}
 		
-		// page it in case it's long
-		page_string(ch->desc, buf, TRUE);
+		send_page_display(ch);
 		command_lag(ch, WAIT_OTHER);
 		return;
 	}

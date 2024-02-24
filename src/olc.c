@@ -8697,13 +8697,12 @@ void olc_process_spawns(char_data *ch, char *argument, struct spawn_info **list)
 	}
 	else if (is_abbrev(arg1, "list")) {
 		count = 0;
-		*buf = '\0';
 		for (spawn = *list; spawn; spawn = spawn->next) {
 			sprintbit(spawn->flags, spawn_flags, buf1, TRUE);
-			sprintf(buf + strlen(buf), " %d. %s (%d) %.2f%% %s\r\n", ++count, skip_filler(get_mob_name_by_proto(spawn->vnum, FALSE)), spawn->vnum, spawn->percent, buf1);
+			add_page_display(ch, " %d. %s (%d) %.2f%% %s\r\n", ++count, skip_filler(get_mob_name_by_proto(spawn->vnum, FALSE)), spawn->vnum, spawn->percent, buf1);
 		}
 		
-		page_string(ch->desc, buf, TRUE);
+		send_page_display(ch);
 	}
 	else {
 		msg_to_char(ch, "Usage: spawn add <vnum> <percent> [flags]\r\n");

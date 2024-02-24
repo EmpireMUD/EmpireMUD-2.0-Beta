@@ -202,105 +202,101 @@ void display_statistics_to_char(char_data *ch) {
 * @param char *argument In case some stats have sub-categories.
 */
 void mudstats_configs(char_data *ch, char *argument) {
-	char output[MAX_STRING_LENGTH * 2], part[256];
+	char part[256];
+	struct page_display *pd;
 	
 	// start output
-	snprintf(output, sizeof(output), "Game configuration for %s:\r\n", config_get_string("mud_name"));
+	add_page_display(ch, "Game configuration for %s:", config_get_string("mud_name"));
 	
 	// status/hiring
-	snprintf(output + strlen(output), sizeof(output) - strlen(output), "Status: %s", config_get_string("mud_status"));
+	pd = add_page_display(ch, "Status: %s", config_get_string("mud_status"));
 	if (config_get_bool("hiring_builders") || config_get_bool("hiring_coders")) {
-		snprintf(output + strlen(output), sizeof(output) - strlen(output), ", Hiring: %s", (config_get_bool("hiring_builders") && config_get_bool("hiring_coders")) ? "builders and coders" : (config_get_bool("hiring_builders") ? "builders" : "coders"));
+		append_page_display_line(pd, ", Hiring: %s", (config_get_bool("hiring_builders") && config_get_bool("hiring_coders")) ? "builders and coders" : (config_get_bool("hiring_builders") ? "builders" : "coders"));
 	}
-	snprintf(output + strlen(output), sizeof(output) - strlen(output), "\r\n");
 	
 	// time
-	snprintf(output + strlen(output), sizeof(output) - strlen(output), "Game time: %.2f minutes per game hour, %.2f hours per day, %.2f days per year\r\n", SECS_PER_MUD_HOUR / (double)SECS_PER_REAL_MIN, SECS_PER_MUD_DAY / (double) SECS_PER_REAL_HOUR, SECS_PER_MUD_YEAR / (double) SECS_PER_REAL_DAY);
+	add_page_display(ch, "Game time: %.2f minutes per game hour, %.2f hours per day, %.2f days per year", SECS_PER_MUD_HOUR / (double)SECS_PER_REAL_MIN, SECS_PER_MUD_DAY / (double) SECS_PER_REAL_HOUR, SECS_PER_MUD_YEAR / (double) SECS_PER_REAL_DAY);
 	
 	// skills
-	snprintf(output + strlen(output), sizeof(output) - strlen(output), "Skills: %d at %d, %d at %d, %d total\r\n", config_get_int("skills_at_max_level"), MAX_SKILL_CAP, config_get_int("skills_at_specialty_level"), SPECIALTY_SKILL_CAP, config_get_int("skills_per_char"));
+	add_page_display(ch, "Skills: %d at %d, %d at %d, %d total", config_get_int("skills_at_max_level"), MAX_SKILL_CAP, config_get_int("skills_at_specialty_level"), SPECIALTY_SKILL_CAP, config_get_int("skills_per_char"));
 	
 	// environment
-	snprintf(output + strlen(output), sizeof(output) - strlen(output), "Environment: %s\r\n", config_get_bool("temperature_penalties") ? "temperature penalties" : "no penalties from temperature");
+	add_page_display(ch, "Environment: %s", config_get_bool("temperature_penalties") ? "temperature penalties" : "no penalties from temperature");
 	
 	// pk
 	prettier_sprintbit(config_get_bitvector("pk_mode"), pk_modes, part);
-	snprintf(output + strlen(output), sizeof(output) - strlen(output), "Player-killing: %s\r\n", config_get_bitvector("pk_mode") ? part : "forbidden");
+	add_page_display(ch, "Player-killing: %s", config_get_bitvector("pk_mode") ? part : "forbidden");
 	
 	// war
-	snprintf(output + strlen(output), sizeof(output) - strlen(output), "War: %d offense%s required%s\r\n", config_get_int("offense_min_to_war"), PLURAL(config_get_int("offense_min_to_war")), config_get_bool("mutual_war_only") ? ", wars must be mutual" : "");
+	add_page_display(ch, "War: %d offense%s required%s", config_get_int("offense_min_to_war"), PLURAL(config_get_int("offense_min_to_war")), config_get_bool("mutual_war_only") ? ", wars must be mutual" : "");
 	
 	// city
-	snprintf(output + strlen(output), sizeof(output) - strlen(output), "Cities: %d minutes to establish, %d tiles apart (%d for allies)\r\n", config_get_int("minutes_to_full_city"), config_get_int("min_distance_between_cities"), config_get_int("min_distance_between_ally_cities"));
+	add_page_display(ch, "Cities: %d minutes to establish, %d tiles apart (%d for allies)", config_get_int("minutes_to_full_city"), config_get_int("min_distance_between_cities"), config_get_int("min_distance_between_ally_cities"));
 	
 	// storage
-	snprintf(output + strlen(output), sizeof(output) - strlen(output), "Storage: %s\r\n", config_get_bool("decay_in_storage") ? "items decay" : "no decay");
+	add_page_display(ch, "Storage: %s", config_get_bool("decay_in_storage") ? "items decay" : "no decay");
 	
 	// workforce
-	snprintf(output + strlen(output), sizeof(output) - strlen(output), "Workforce: %d cap per member, %d minimum cap per island, %d tile range\r\n", config_get_int("max_chore_resource_per_member"), config_get_int("max_chore_resource_over_total"), config_get_int("chore_distance"));
+	add_page_display(ch, "Workforce: %d cap per member, %d minimum cap per island, %d tile range", config_get_int("max_chore_resource_per_member"), config_get_int("max_chore_resource_over_total"), config_get_int("chore_distance"));
 	
 	// newbie island
-	snprintf(output + strlen(output), sizeof(output) - strlen(output), "Newbie islands: %s", config_get_bool("cities_on_newbie_islands") ? "allow cities" : "no cities allowed");
+	pd = add_page_display(ch, "Newbie islands: %s", config_get_bool("cities_on_newbie_islands") ? "allow cities" : "no cities allowed");
 	if (config_get_int("newbie_island_day_limit") > 0) {
-		snprintf(output + strlen(output), sizeof(output) - strlen(output), ", %d day limit", config_get_int("newbie_island_day_limit"));
+		append_page_display_line(pd, ", %d day limit", config_get_int("newbie_island_day_limit"));
 	}
 	if (config_get_bool("naturalize_newbie_islands")) {
-		snprintf(output + strlen(output), sizeof(output) - strlen(output), ", naturalized each year");
+		append_page_display_line(pd, ", naturalized each year");
 	}
-	snprintf(output + strlen(output), sizeof(output) - strlen(output), "\r\n");
 	
 	// approval
-	snprintf(output + strlen(output), sizeof(output) - strlen(output), "Approval: %s%s", config_get_bool("auto_approve") ? "automatic" : "required", config_get_bool("approve_per_character") ? " (per character)" : "");
+	pd = add_page_display(ch, "Approval: %s%s", config_get_bool("auto_approve") ? "automatic" : "required", config_get_bool("approve_per_character") ? " (per character)" : "");
 	if (!config_get_bool("auto_approve")) {
-		snprintf(output + strlen(output), sizeof(output) - strlen(output), ", needed for:");
+		append_page_display_line(pd, ", needed for:");
 		if (config_get_bool("build_approval")) {
-			snprintf(output + strlen(output), sizeof(output) - strlen(output), " building");
+			append_page_display_line(pd, " building");
 		}
 		if (config_get_bool("chat_approval")) {
-			snprintf(output + strlen(output), sizeof(output) - strlen(output), " chatting");
+			append_page_display_line(pd, " chatting");
 		}
 		if (config_get_bool("craft_approval")) {
-			snprintf(output + strlen(output), sizeof(output) - strlen(output), " crafting");
+			append_page_display_line(pd, " crafting");
 		}
 		if (config_get_bool("event_approval")) {
-			snprintf(output + strlen(output), sizeof(output) - strlen(output), " events");
+			append_page_display_line(pd, " events");
 		}
 		if (config_get_bool("gather_approval")) {
-			snprintf(output + strlen(output), sizeof(output) - strlen(output), " gathering");
+			append_page_display_line(pd, " gathering");
 		}
 		if (config_get_bool("join_empire_approval")) {
-			snprintf(output + strlen(output), sizeof(output) - strlen(output), " empires");
+			append_page_display_line(pd, " empires");
 		}
 		if (config_get_bool("quest_approval")) {
-			snprintf(output + strlen(output), sizeof(output) - strlen(output), " quests");
+			append_page_display_line(pd, " quests");
 		}
 		if (config_get_bool("skill_gain_approval")) {
-			snprintf(output + strlen(output), sizeof(output) - strlen(output), " skills");
+			append_page_display_line(pd, " skills");
 		}
 		if (config_get_bool("tell_approval")) {
-			snprintf(output + strlen(output), sizeof(output) - strlen(output), " tells");
+			append_page_display_line(pd, " tells");
 		}
 		if (config_get_bool("terraform_approval")) {
-			snprintf(output + strlen(output), sizeof(output) - strlen(output), " terraforming");
+			append_page_display_line(pd, " terraforming");
 		}
 		if (config_get_bool("title_approval")) {
-			snprintf(output + strlen(output), sizeof(output) - strlen(output), " title");
+			append_page_display_line(pd, " title");
 		}
 		if (config_get_bool("travel_approval")) {
-			snprintf(output + strlen(output), sizeof(output) - strlen(output), " travel");
+			append_page_display_line(pd, " travel");
 		}
 		if (config_get_bool("write_approval")) {
-			snprintf(output + strlen(output), sizeof(output) - strlen(output), " writing");
+			append_page_display_line(pd, " writing");
 		}
 	}
-	snprintf(output + strlen(output), sizeof(output) - strlen(output), "\r\n");
 	
 	// timeouts
-	snprintf(output + strlen(output), sizeof(output) - strlen(output), "Timeouts: %d days for newbies, up to %d days after %d hours of playtime\r\n", config_get_int("member_timeout_newbie"), config_get_int("member_timeout_full"), config_get_int("member_timeout_max_threshold"));
+	add_page_display(ch, "Timeouts: %d days for newbies, up to %d days after %d hours of playtime", config_get_int("member_timeout_newbie"), config_get_int("member_timeout_full"), config_get_int("member_timeout_max_threshold"));
 	
-	if (ch->desc) {
-		page_string(ch->desc, output, TRUE);
-	}
+	send_page_display(ch);
 }
 
 
@@ -328,33 +324,30 @@ void mudstats_empires(char_data *ch, char *argument) {
 * @param char *argument In case some stats have sub-categories.
 */
 void mudstats_time(char_data *ch, char *argument) {
-	char output[MAX_STRING_LENGTH * 2];
 	long when;
 	
 	// start output
-	snprintf(output, sizeof(output), "Time until:\r\n");
+	add_page_display(ch, "Time until:");
 	
 	// daily reset
 	when = (data_get_long(DATA_DAILY_CYCLE) + SECS_PER_REAL_DAY) - time(0);
 	if (when > 0) {
-		snprintf(output + strlen(output), sizeof(output) - strlen(output), "Daily quest and bonus cycle: %s%s\r\n", colon_time(when, FALSE, NULL), (when < 60 ? " seconds" : ""));
+		add_page_display(ch, "Daily quest and bonus cycle: %s%s", colon_time(when, FALSE, NULL), (when < 60 ? " seconds" : ""));
 	}
 	else {
-		snprintf(output + strlen(output), sizeof(output) - strlen(output), "Daily quest and bonus cycle: imminent\r\n");
+		add_page_display(ch, "Daily quest and bonus cycle: imminent");
 	}
 	
 	// maintenance cycle
 	when = (data_get_long(DATA_LAST_NEW_YEAR) + (config_get_int("world_reset_hours") * SECS_PER_REAL_HOUR)) - time(0);
 	if (when > 0) {
-		snprintf(output + strlen(output), sizeof(output) - strlen(output), "World reset (maintenance and depletion): %s%s\r\n", colon_time(when, FALSE, NULL), (when < 60 ? " seconds" : ""));
+		add_page_display(ch, "World reset (maintenance and depletion): %s%s", colon_time(when, FALSE, NULL), (when < 60 ? " seconds" : ""));
 	}
 	else {
-		snprintf(output + strlen(output), sizeof(output) - strlen(output), "World reset (maintenance and depletion): imminent\r\n");
+		add_page_display(ch, "World reset (maintenance and depletion): imminent");
 	}
 	
-	if (ch->desc) {
-		page_string(ch->desc, output, TRUE);
-	}
+	send_page_display(ch);
 }
 
 

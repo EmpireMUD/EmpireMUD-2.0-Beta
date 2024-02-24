@@ -569,18 +569,11 @@ ACMD(do_roll) {
 
 
 ACMD(do_socials) {
-	char buf[MAX_STRING_LENGTH];
 	social_data *soc, *next_soc, *last = NULL;
-	int count = 0;
-	size_t size;
 	
-	size = snprintf(buf, sizeof(buf), "The following social commands are available:\r\n");
+	add_page_display(ch, "The following social commands are available:");
 	
 	HASH_ITER(sorted_hh, sorted_socials, soc, next_soc) {
-		if (size + 11 > sizeof(buf)) {	// early exit for full buffer
-			break;
-		}
-		
 		if (SOCIAL_FLAGGED(soc, SOC_IN_DEVELOPMENT)) {
 			continue;
 		}
@@ -592,13 +585,8 @@ ACMD(do_socials) {
 		}
 		
 		last = soc;	// duplicate prevention
-		size += snprintf(buf + size, sizeof(buf) - size, "%-11.11s%s", SOC_COMMAND(soc), (!(++count % 7)) ? "\r\n" : "");
+		add_page_display_col_str(ch, 7, FALSE, SOC_COMMAND(soc));
 	}
 	
-	// terminating crlf if possible
-	if (count % 7 && (size + 2) < sizeof(buf)) {
-		strcat(buf, "\r\n");
-	}
-	
-	page_string(ch->desc, buf, TRUE);
+	send_page_display(ch);
 }

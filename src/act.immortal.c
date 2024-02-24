@@ -1129,9 +1129,7 @@ int sort_isf_list(struct isf_type *a, struct isf_type *b) {
 
 ADMIN_UTIL(util_islandsize) {
 	struct isf_type *isf, *next_isf, *list = NULL;
-	char buf[MAX_STRING_LENGTH];
 	room_data *room, *next_room;
-	size_t size;
 	int isle;
 	
 	HASH_ITER(hh, world_table, room, next_room) {
@@ -1151,20 +1149,16 @@ ADMIN_UTIL(util_islandsize) {
 	
 	HASH_SORT(list, sort_isf_list);
 	
-	size = snprintf(buf, sizeof(buf), "Island sizes:\r\n");
+	add_page_display_str(ch, "Island sizes:");
 	HASH_ITER(hh, list, isf, next_isf) {
-		if (size < sizeof(buf)) {
-			size += snprintf(buf + size, sizeof(buf) - size, "%2d: %d tile%s\r\n", isf->island, isf->count, PLURAL(isf->count));
-		}
+		add_page_display(ch, "%2d: %d tile%s", isf->island, isf->count, PLURAL(isf->count));
 		
 		// free as we go
 		HASH_DEL(list, isf);
 		free(isf);
 	}
 	
-	if (ch->desc) {
-		page_string(ch->desc, buf, TRUE);
-	}
+	send_page_display(ch);
 }
 
 
@@ -1803,37 +1797,29 @@ void do_instance_info(char_data *ch, char *argument) {
 
 // shows by adventure
 void do_instance_list_all(char_data *ch) {
-	char buf[MAX_STRING_LENGTH];
 	adv_data *adv, *next_adv;
 	int count = 0;
-	size_t size;
 	
-	size = snprintf(buf, sizeof(buf), "Instances by adventure:\r\n");
+	add_page_display_str(ch, "Instances by adventure:");
 	
 	// list by adventure
 	HASH_ITER(hh, adventure_table, adv, next_adv) {
-		if (size >= sizeof(buf)) {
-			break;
-		}
-		
 		// skip in-dev adventures with no count
 		count = count_instances(adv);
 		if (ADVENTURE_FLAGGED(adv, ADV_IN_DEVELOPMENT) && !count) {
 			continue;
 		}
 		
-		size += snprintf(buf + size, sizeof(buf) - size, "[%5d] %s (%d/%d)\r\n", GET_ADV_VNUM(adv), GET_ADV_NAME(adv), count, adjusted_instance_limit(adv));
+		add_page_display(ch, "[%5d] %s (%d/%d)", GET_ADV_VNUM(adv), GET_ADV_NAME(adv), count, adjusted_instance_limit(adv));
 	}
 	
-	if (ch->desc) {
-		page_string(ch->desc, buf, TRUE);
-	}
+	send_page_display(ch);
 }
 
 
 // list by name
 void do_instance_list(char_data *ch, char *argument) {
-	char buf[MAX_STRING_LENGTH], line[MAX_STRING_LENGTH];
+	char line[MAX_STRING_LENGTH];
 	struct instance_data *inst;
 	adv_data *adv = NULL;
 	adv_vnum vnum;
@@ -1854,8 +1840,6 @@ void do_instance_list(char_data *ch, char *argument) {
 		return;
 	}
 	
-	*buf = '\0';
-	
 	DL_FOREACH(instance_list, inst) {
 		// num is out of the total instances, not just ones shown
 		++num;
@@ -1863,22 +1847,19 @@ void do_instance_list(char_data *ch, char *argument) {
 		if (!adv || adv == INST_ADVENTURE(inst)) {
 			++count;
 			instance_list_row(inst, num, line, sizeof(line));
-			
-			if (snprintf(buf + strlen(buf), sizeof(buf) - strlen(buf), "%s", line) < strlen(line)) {
-				break;
-			}
+			add_page_display_str(ch, line);
 		}
 	}
 	
-	snprintf(buf + strlen(buf), sizeof(buf) - strlen(buf), "%d total instances shown\r\n", count);
-	page_string(ch->desc, buf, TRUE);
+	add_page_display(ch, "%d total instances shown", count);
+	send_page_display(ch);
 }
 
 
 void do_instance_nearby(char_data *ch, char *argument) {
-	char buf[MAX_STRING_LENGTH], line[MAX_STRING_LENGTH];
+	char line[MAX_STRING_LENGTH];
 	struct instance_data *inst;
-	int num = 0, count = 0, distance = 50, size;
+	int num = 0, count = 0, distance = 50;
 	room_data *inst_loc, *loc;
 	
 	loc = GET_MAP_LOC(IN_ROOM(ch)) ? real_room(GET_MAP_LOC(IN_ROOM(ch))->vnum) : NULL;
@@ -1888,7 +1869,7 @@ void do_instance_nearby(char_data *ch, char *argument) {
 		return;
 	}
 	
-	size = snprintf(buf, sizeof(buf), "Instances within %d tiles:\r\n", distance);
+	add_page_display(ch, "Instances within %d tiles:", distance);
 	
 	if (loc) {	// skip work if no map location found
 		DL_FOREACH(instance_list, inst) {
@@ -1898,16 +1879,13 @@ void do_instance_nearby(char_data *ch, char *argument) {
 			if (inst_loc && !INSTANCE_FLAGGED(inst, INST_COMPLETED) && compute_distance(loc, inst_loc) <= distance) {
 				++count;
 				instance_list_row(inst, num, line, sizeof(line));
-				size += snprintf(buf + size, sizeof(buf) - size, "%s", line);
-				if (size >= sizeof(buf)) {
-					break;
-				}
+				add_page_display_str(ch, line);
 			}
 		}
 	}
 	
-	snprintf(buf + size, sizeof(buf) - size, "%d total instances shown\r\n", count);
-	page_string(ch->desc, buf, TRUE);
+	add_page_display(ch, "%d total instances shown", count);
+	send_page_display(ch);
 }
 
 

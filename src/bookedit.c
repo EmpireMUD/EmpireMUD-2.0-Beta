@@ -567,10 +567,9 @@ OLC_MODULE(booked_license) {
 
 
 OLC_MODULE(booked_paragraphs) {
-	char arg1[MAX_INPUT_LENGTH], buf[MAX_STRING_LENGTH * 2], line[MAX_STRING_LENGTH];
+	char arg1[MAX_INPUT_LENGTH];
 	book_data *book = GET_OLC_BOOK(ch->desc);
 	struct paragraph_data *para, *new;
-	size_t size;
 	
 	argument = any_one_arg(argument, arg1);
 	skip_spaces(&argument);
@@ -592,27 +591,15 @@ OLC_MODULE(booked_paragraphs) {
 			to = atoi(arg3) ? atoi(arg3) : -1;
 		}
 		
-		*buf = '\0';
-		size = 0;
-		
 		count = 0;
 		LL_FOREACH(BOOK_PARAGRAPHS(book), para) {
 			++count;
 			if ((from == -1 || from <= count) && (to == -1 || to >= count)) {
-				snprintf(line, sizeof(line), "\r\n\tcParagraph %d\t0\r\n%s", count, NULLSAFE(para->text));
-				
-				if (size + strlen(line) < sizeof(buf)) {
-					size += snprintf(buf + size, sizeof(buf) - size, "%s", line);
-				}
-				else {
-					// too long!
-					size += snprintf(buf + size, sizeof(buf) - size, "\r\n...string too long!\r\n");
-					break;
-				}
+				add_page_display(ch, "\r\n\tcParagraph %d\t0\r\n%s", count, NULLSAFE(para->text));
 			}
 		}
 		
-		page_string(ch->desc, buf, TRUE);
+		send_page_display(ch);
 	}
 	else if (is_abbrev(arg1, "edit")) {
 		bool found = FALSE;
@@ -857,11 +844,10 @@ LIBRARY_SCMD(bookedit_license) {
 
 LIBRARY_SCMD(bookedit_list) {
 	book_data *book, *next_book;
-	char buf[MAX_STRING_LENGTH], buf1[MAX_STRING_LENGTH];
+	char buf1[MAX_STRING_LENGTH];
 	int count = 0;
-	size_t size;
 
-	size = snprintf(buf, sizeof(buf), "Books you have written:\r\n");
+	add_page_display(ch, "Books you have written:");
 	
 	HASH_ITER(hh, book_table, book, next_book) {
 		if (BOOK_AUTHOR(book) != GET_IDNUM(ch)) {
@@ -874,14 +860,14 @@ LIBRARY_SCMD(bookedit_list) {
 		else {
 			*buf1 = '\0';
 		}
-		size += snprintf(buf + size, sizeof(buf) - size, "%s%d. %s\t0 (%s\t0)\r\n", buf1, ++count, BOOK_TITLE(book), BOOK_BYLINE(book));
+		add_page_display(ch, "%s%d. %s\t0 (%s\t0)", buf1, ++count, BOOK_TITLE(book), BOOK_BYLINE(book));
 	}
 
 	if (count == 0) {
-		size += snprintf(buf + size, sizeof(buf) - size, "  none\r\n");
+		add_page_display_str(ch, "  none");
 	}
 	
-	page_string(ch->desc, buf, TRUE);
+	send_page_display(ch);
 }
 
 
