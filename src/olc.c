@@ -4878,7 +4878,7 @@ void show_resource_display(char_data *ch, struct resource_data *list, bool send_
 			add_page_display_col(ch, 2, FALSE, " &y%2d&0. %s", num, line);
 		}
 	}
-	if (list) {
+	if (!list) {
 		add_page_display_str(ch, "  none");
 	}
 	
