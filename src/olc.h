@@ -310,9 +310,9 @@ void get_generic_relation_display(struct generic_relation *list, bool show_vnums
 char *get_interaction_restriction_display(struct interact_restriction *list, bool whole_list);
 void show_evolution_display(char_data *ch, struct evolution_data *list, bool send_page);
 void show_exit_template_display(char_data *ch, struct exit_template *list, bool send_page);
-void get_progress_perks_display(struct progress_perk *list, char *save_buffer, bool show_vnums);
-void get_quest_giver_display(struct quest_giver *list, char *save_buffer);
-void get_requirement_display(struct req_data *list, char *save_buffer);
+void show_progress_perks_display(char_data *ch, struct progress_perk *list, bool show_vnums, bool send_page);
+void show_quest_giver_display(char_data *ch, struct quest_giver *list, bool send_page);
+void show_requirement_display(char_data *ch, struct req_data *list, bool send_page);
 void get_template_spawns_display(struct adventure_spawn *list, char *save_buffer);
 
 // olc helpers

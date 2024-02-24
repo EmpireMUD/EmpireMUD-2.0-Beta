@@ -1111,8 +1111,8 @@ void do_stat_shop(char_data *ch, shop_data *shop) {
 	sprintbit(SHOP_FLAGS(shop), shop_flags, part, TRUE);
 	add_page_display(ch, "Flags: \tg%s\t0", part);
 	
-	get_quest_giver_display(SHOP_LOCATIONS(shop), part);
-	add_page_display(ch, "Locations:\r\n%s", part);
+	add_page_display_str(ch, "Locations:");
+	show_quest_giver_display(ch, SHOP_LOCATIONS(shop), FALSE);
 	
 	get_shop_items_display(shop, part);
 	add_page_display(ch, "Items:\r\n%s", part);
@@ -1145,8 +1145,10 @@ void olc_show_shop(char_data *ch) {
 	add_page_display(ch, "<%scloses\t0> %d%s", OLC_LABEL_VAL(SHOP_CLOSE_TIME(shop), 0), TIME_TO_12H(SHOP_CLOSE_TIME(shop)), AM_PM(SHOP_CLOSE_TIME(shop)));
 	add_page_display(ch, "<%sallegiance\t0> %s", OLC_LABEL_PTR(SHOP_ALLEGIANCE(shop)), SHOP_ALLEGIANCE(shop) ? FCT_NAME(SHOP_ALLEGIANCE(shop)) : "none");
 	
-	get_quest_giver_display(SHOP_LOCATIONS(shop), lbuf);
-	add_page_display(ch, "Locations: <%slocation\t0>\r\n%s", OLC_LABEL_PTR(SHOP_LOCATIONS(shop)), lbuf);
+	add_page_display(ch, "Locations: <%slocation\t0>", OLC_LABEL_PTR(SHOP_LOCATIONS(shop)));
+	if (SHOP_LOCATIONS(shop)) {
+		show_quest_giver_display(ch, SHOP_LOCATIONS(shop), FALSE);
+	}
 	
 	get_shop_items_display(shop, lbuf);
 	add_page_display(ch, "Items: <%sitem\t0>\r\n%s", OLC_LABEL_PTR(SHOP_ITEMS(shop)), lbuf);

@@ -5645,21 +5645,27 @@ quest_data *setup_olc_quest(quest_data *input) {
 //// DISPLAYS ////////////////////////////////////////////////////////////////
 
 /**
-* Gets the display for a set of quest givers.
+* Display a set of quest givers.
 *
+* @param char_data *ch The person viewing it.
 * @param struct quest_giver *list Pointer to the start of a list of quest givers.
-* @param char *save_buffer A buffer to store the result to.
+* @param bool send_page If TRUE, sends the page_display when done. Pass FALSE if you're building a larger page_display for the character.
 */
-void get_quest_giver_display(struct quest_giver *list, char *save_buffer) {
+void show_quest_giver_display(char_data *ch, struct quest_giver *list, bool send_page) {
 	struct quest_giver *giver;
 	int count = 0;
 	
-	*save_buffer = '\0';
 	LL_FOREACH(list, giver) {		
-		sprintf(save_buffer + strlen(save_buffer), "%2d. %s\r\n", ++count, quest_giver_string(giver, TRUE));
+		add_page_display(ch, "%2d. %s", ++count, quest_giver_string(giver, TRUE));
 	}
 	
-	// empty list not shown
+	if (!list) {
+		add_page_display_str(ch, " nowhere");
+	}
+	
+	if (send_page) {
+		send_page_display(ch);
+	}
 }
 
 
@@ -5731,17 +5737,17 @@ void do_stat_quest(char_data *ch, quest_data *quest) {
 	}
 	add_page_display(ch, "Level limits: [\tc%s\t0], Repeatable: [\tc%s\t0]", level_range_string(QUEST_MIN_LEVEL(quest), QUEST_MAX_LEVEL(quest), 0), part);
 		
-	get_requirement_display(QUEST_PREREQS(quest), part);
-	add_page_display(ch, "Pre-requisites:\r\n%s", *part ? part : " none");
+	add_page_display_str(ch, "Pre-requisites:");
+	show_requirement_display(ch, QUEST_PREREQS(quest), FALSE);
 	
-	get_quest_giver_display(QUEST_STARTS_AT(quest), part);
-	add_page_display(ch, "Starts at:\r\n%s", *part ? part : " nowhere");
+	add_page_display_str(ch, "Starts at:");
+	show_quest_giver_display(ch, QUEST_STARTS_AT(quest), FALSE);
 	
-	get_quest_giver_display(QUEST_ENDS_AT(quest), part);
-	add_page_display(ch, "Ends at:\r\n%s", *part ? part : " nowhere");
+	add_page_display_str(ch, "Ends at:");
+	show_quest_giver_display(ch, QUEST_ENDS_AT(quest), FALSE);
 	
-	get_requirement_display(QUEST_TASKS(quest), part);
-	add_page_display(ch, "Tasks:\r\n%s", *part ? part : " none");
+	add_page_display_str(ch, "Tasks:");
+	show_requirement_display(ch, QUEST_TASKS(quest), FALSE);
 	
 	get_quest_reward_display(QUEST_REWARDS(quest), part, TRUE);
 	add_page_display(ch, "Rewards:\r\n%s", *part ? part : " none");
@@ -5789,8 +5795,10 @@ void olc_show_quest(char_data *ch) {
 		add_page_display(ch, "<%smaxlevel\t0> none", OLC_LABEL_UNCHANGED);
 	}
 	
-	get_requirement_display(QUEST_PREREQS(quest), lbuf);
-	add_page_display(ch, "Pre-requisites: <%sprereqs\t0>\r\n%s", OLC_LABEL_PTR(QUEST_PREREQS(quest)), lbuf);
+	add_page_display(ch, "Pre-requisites: <%sprereqs\t0>", OLC_LABEL_PTR(QUEST_PREREQS(quest)));
+	if (QUEST_PREREQS(quest)) {
+		show_requirement_display(ch, QUEST_PREREQS(quest), FALSE);
+	}
 	
 	if (QUEST_REPEATABLE_AFTER(quest) == NOT_REPEATABLE) {
 		add_page_display(ch, "<%srepeat\t0> never", OLC_LABEL_VAL(QUEST_REPEATABLE_AFTER(quest), 0));
@@ -5811,14 +5819,20 @@ void olc_show_quest(char_data *ch) {
 		}
 	}
 	
-	get_quest_giver_display(QUEST_STARTS_AT(quest), lbuf);
-	add_page_display(ch, "Starts at: <%sstarts\t0>\r\n%s", OLC_LABEL_PTR(QUEST_STARTS_AT(quest)), lbuf);
+	add_page_display(ch, "Starts at: <%sstarts\t0>", OLC_LABEL_PTR(QUEST_STARTS_AT(quest)));
+	if (QUEST_STARTS_AT(quest)) {
+		show_quest_giver_display(ch, QUEST_STARTS_AT(quest), FALSE);
+	}
 	
-	get_quest_giver_display(QUEST_ENDS_AT(quest), lbuf);
-	add_page_display(ch, "Ends at: <%sends\t0>\r\n%s", OLC_LABEL_PTR(QUEST_ENDS_AT(quest)), lbuf);
+	add_page_display(ch, "Ends at: <%sends\t0>", OLC_LABEL_PTR(QUEST_ENDS_AT(quest)));
+	if (QUEST_ENDS_AT(quest)) {
+		show_quest_giver_display(ch, QUEST_ENDS_AT(quest), FALSE);
+	}
 	
-	get_requirement_display(QUEST_TASKS(quest), lbuf);
-	add_page_display(ch, "Tasks: <%stasks\t0>\r\n%s", OLC_LABEL_PTR(QUEST_TASKS(quest)), lbuf);
+	add_page_display(ch, "Tasks: <%stasks\t0>", OLC_LABEL_PTR(QUEST_TASKS(quest)));
+	if (QUEST_TASKS(quest)) {
+		show_requirement_display(ch, QUEST_TASKS(quest), FALSE);
+	}
 	
 	get_quest_reward_display(QUEST_REWARDS(quest), lbuf, TRUE);
 	add_page_display(ch, "Rewards: <%srewards\t0>\r\n%s", OLC_LABEL_PTR(QUEST_REWARDS(quest)), lbuf);

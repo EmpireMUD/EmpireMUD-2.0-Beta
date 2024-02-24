@@ -690,8 +690,8 @@ void do_stat_social(char_data *ch, social_data *soc) {
 	sprintbit(SOC_FLAGS(soc), social_flags, part, TRUE);
 	add_page_display(ch, "Flags: \tg%s\t0", part);
 	
-	get_requirement_display(SOC_REQUIREMENTS(soc), part);
-	add_page_display(ch, "Requirements:\r\n%s", *part ? part : " none");
+	add_page_display_str(ch, "Requirements:");
+	show_requirement_display(ch, SOC_REQUIREMENTS(soc), FALSE);
 	
 	add_page_display(ch, "Messages:");
 	for (iter = 0; iter < NUM_SOCM_MESSAGES; ++iter) {
@@ -727,8 +727,10 @@ void olc_show_social(char_data *ch) {
 	add_page_display(ch, "<%scharposition\t0> %s (minimum)", OLC_LABEL_VAL(SOC_MIN_CHAR_POS(soc), 0), position_types[SOC_MIN_CHAR_POS(soc)]);
 	add_page_display(ch, "<%stargetposition\t0> %s (minimum)", OLC_LABEL_VAL(SOC_MIN_VICT_POS(soc), 0), position_types[SOC_MIN_VICT_POS(soc)]);
 	
-	get_requirement_display(SOC_REQUIREMENTS(soc), lbuf);
-	add_page_display(ch, "Requirements: <%srequirements\t0>\r\n%s", OLC_LABEL_PTR(SOC_REQUIREMENTS(soc)), lbuf);
+	add_page_display(ch, "Requirements: <%srequirements\t0>", OLC_LABEL_PTR(SOC_REQUIREMENTS(soc)));
+	if (SOC_REQUIREMENTS(soc)) {
+		show_requirement_display(ch, SOC_REQUIREMENTS(soc), FALSE);
+	}
 	
 	add_page_display(ch, "Messages:");
 	for (iter = 0; iter < NUM_SOCM_MESSAGES; ++iter) {

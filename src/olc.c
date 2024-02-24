@@ -4773,29 +4773,35 @@ void show_interaction_display(char_data *ch, struct interaction_item *list, bool
 
 
 /**
-* Gets the display for a set of requirments (e.g. quest tasks).
+* Display a set of requirments (e.g. quest tasks).
 *
+* @param char_data *ch The person viewing it.
 * @param struct req_data *list Pointer to the start of a list of reqs.
-* @param char *save_buffer A buffer to store the result to.
+* @param bool send_page If TRUE, sends the page_display when done. Pass FALSE if you're building a larger page_display for the character.
 */
-void get_requirement_display(struct req_data *list, char *save_buffer) {
+void show_requirement_display(char_data *ch, struct req_data *list, bool send_page) {
 	struct req_data *req;
-	char buf[MAX_INPUT_LENGTH];
+	char part[256];
 	int count = 0;
 	
-	*save_buffer = '\0';
 	LL_FOREACH(list, req) {
 		if (req->custom) {
-			snprintf(buf, sizeof(buf), ": %s", req->custom);
+			snprintf(part, sizeof(part), ": %s", req->custom);
 		}
 		else {
-			*buf = '\0';
+			*part = '\0';
 		}
 		
-		sprintf(save_buffer + strlen(save_buffer), "%2d. %s: %s%s\r\n", ++count, requirement_types[req->type], requirement_string(req, TRUE, FALSE), buf);
+		add_page_display(ch, "%2d. %s: %s%s", ++count, requirement_types[req->type], requirement_string(req, TRUE, FALSE), part);
 	}
 	
-	// empty list not shown
+	if (!list) {
+		add_page_display_str(ch, " none");
+	}
+	
+	if (send_page) {
+		send_page_display(ch);
+	}
 }
 
 

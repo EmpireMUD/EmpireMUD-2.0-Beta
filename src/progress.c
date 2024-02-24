@@ -403,21 +403,27 @@ char *get_progress_name_by_proto(any_vnum vnum) {
 
 
 /**
-* Gets the display for a progress list.
+* Display a progress list.
 *
+* @param char_data *ch The person viewing it.
 * @param struct progress_list *list Pointer to the start of a list.
-* @param char *save_buffer A buffer to store the result to.
+* @param bool send_page If TRUE, sends the page_display when done. Pass FALSE if you're building a larger page_display for the character.
 */
-void get_progress_list_display(struct progress_list *list, char *save_buffer) {
+void show_progress_list_display(char_data *ch, struct progress_list *list, bool send_page) {
 	struct progress_list *item;
 	int count = 0;
 	
-	*save_buffer = '\0';
 	LL_FOREACH(list, item) {
-		sprintf(save_buffer + strlen(save_buffer), "%2d. [%d] %s\r\n", ++count, item->vnum, get_progress_name_by_proto(item->vnum));
+		add_page_display(ch, "%2d. [%d] %s", ++count, item->vnum, get_progress_name_by_proto(item->vnum));
 	}
 	
-	// empty list not shown
+	if (!list) {
+		add_page_display_str(ch, " none");
+	}
+	
+	if (send_page) {
+		send_page_display(ch);
+	}
 }
 
 
@@ -505,22 +511,28 @@ char *get_one_perk_display(struct progress_perk *perk, bool show_vnums) {
 
 
 /**
-* Gets the display for perks on a progress goal.
+* Display perks on a progress goal.
 *
+* @param char_data *ch The person viewing it.
 * @param struct progress_perk *list Pointer to the start of a list of perks.
-* @param char *save_buffer A buffer to store the result to.
 * @param bool show_vnums If true, adds [ 1234] before the name.
+* @param bool send_page If TRUE, sends the page_display when done. Pass FALSE if you're building a larger page_display for the character.
 */
-void get_progress_perks_display(struct progress_perk *list, char *save_buffer, bool show_vnums) {
+void show_progress_perks_display(char_data *ch, struct progress_perk *list, bool show_vnums, bool send_page) {
 	struct progress_perk *item;
 	int count = 0;
 	
-	*save_buffer = '\0';
 	LL_FOREACH(list, item) {
-		sprintf(save_buffer + strlen(save_buffer), "%2d. %s\r\n", ++count, get_one_perk_display(item, show_vnums));
+		add_page_display(ch, "%2d. %s", ++count, get_one_perk_display(item, show_vnums));
 	}
 	
-	// empty list not shown
+	if (!list) {
+		add_page_display_str(ch, " none");
+	}
+	
+	if (send_page) {
+		send_page_display(ch);
+	}
 }
 
 
@@ -2743,14 +2755,14 @@ void do_stat_progress(char_data *ch, progress_data *prg) {
 	sprintbit(PRG_FLAGS(prg), progress_flags, part, TRUE);
 	add_page_display(ch, "Flags: \tg%s\t0", part);
 	
-	get_progress_list_display(PRG_PREREQS(prg), part);
-	add_page_display(ch, "Prerequisites:\r\n%s", *part ? part : " none");
+	add_page_display_str(ch, "Prerequisites:");
+	show_progress_list_display(ch, PRG_PREREQS(prg), FALSE);
 	
-	get_requirement_display(PRG_TASKS(prg), part);
-	add_page_display(ch, "Tasks:\r\n%s", *part ? part : " none");
+	add_page_display_str(ch, "Tasks:");
+	show_requirement_display(ch, PRG_TASKS(prg), FALSE);
 	
-	get_progress_perks_display(PRG_PERKS(prg), part, TRUE);
-	add_page_display(ch, "Perks:\r\n%s", *part ? part : " none");
+	add_page_display_str(ch, "Perks:");
+	show_progress_perks_display(ch, PRG_PERKS(prg), TRUE, FALSE);
 	
 	send_page_display(ch);
 }
@@ -2786,16 +2798,22 @@ void olc_show_progress(char_data *ch) {
 		add_page_display(ch, "<%svalue\t0> %d point%s", PRG_FLAGGED(prg, PRG_PURCHASABLE) ? "\tr" : OLC_LABEL_VAL(PRG_VALUE(prg), 0), PRG_VALUE(prg), PLURAL(PRG_VALUE(prg)));
 	}
 	
-	get_progress_list_display(PRG_PREREQS(prg), lbuf);
-	add_page_display(ch, "Prerequisites: <%sprereqs\t0>\r\n%s", OLC_LABEL_PTR(PRG_PREREQS(prg)), lbuf);
-	
-	if (PRG_TASKS(prg) || !PRG_FLAGGED(prg, PRG_PURCHASABLE)) {
-		get_requirement_display(PRG_TASKS(prg), lbuf);
-		add_page_display(ch, "Tasks: <%stasks\t0>\r\n%s", PRG_FLAGGED(prg, PRG_PURCHASABLE) ? "\tr" : OLC_LABEL_PTR(PRG_TASKS(prg)), lbuf);
+	add_page_display(ch, "Prerequisites: <%sprereqs\t0>", OLC_LABEL_PTR(PRG_PREREQS(prg)));
+	if (PRG_PREREQS(prg)) {
+		show_progress_list_display(ch, PRG_PREREQS(prg), FALSE);
 	}
 	
-	get_progress_perks_display(PRG_PERKS(prg), lbuf, TRUE);
-	add_page_display(ch, "Perks: <%sperks\t0>\r\n%s", OLC_LABEL_PTR(PRG_PERKS(prg)), lbuf);
+	if (PRG_TASKS(prg) || !PRG_FLAGGED(prg, PRG_PURCHASABLE)) {
+		add_page_display(ch, "Tasks: <%stasks\t0>", PRG_FLAGGED(prg, PRG_PURCHASABLE) ? "\tr" : OLC_LABEL_PTR(PRG_TASKS(prg)));
+		if (PRG_TASKS(prg)) {
+			show_requirement_display(ch, PRG_TASKS(prg), FALSE);
+		}
+	}
+	
+	add_page_display(ch, "Perks: <%sperks\t0>", OLC_LABEL_PTR(PRG_PERKS(prg)));
+	if (PRG_PERKS(prg)) {
+		show_progress_perks_display(ch, PRG_PERKS(prg), TRUE, FALSE);
+	}
 	
 	send_page_display(ch);
 }

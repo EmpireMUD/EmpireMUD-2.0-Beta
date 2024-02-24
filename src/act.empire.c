@@ -7329,8 +7329,8 @@ ACMD(do_progress) {
 		}
 		
 		if (PRG_PERKS(prg)) {
-			get_progress_perks_display(PRG_PERKS(prg), buf, FALSE);
-			add_page_display(ch, "Rewards:\r\n%s", buf);
+			add_page_display_str(ch, "Rewards:");
+			show_progress_perks_display(ch, PRG_PERKS(prg), FALSE, FALSE);
 		}
 		if ((goal = get_current_goal(emp, PRG_VNUM(prg)))) {
 			if (PRG_FLAGGED(prg, PRG_NO_TRACKER) && !IS_IMMORTAL(ch)) {
