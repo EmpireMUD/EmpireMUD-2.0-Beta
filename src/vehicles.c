@@ -4784,8 +4784,7 @@ void olc_show_vehicle(char_data *ch) {
 	// scripts
 	add_page_display(ch, "Scripts: <%sscript\t0>", OLC_LABEL_PTR(veh->proto_script));
 	if (veh->proto_script) {
-		get_script_display(veh->proto_script, lbuf);
-		add_page_display_str(ch, lbuf);
+		show_script_display(ch, veh->proto_script, FALSE);
 	}
 	
 	// spawns

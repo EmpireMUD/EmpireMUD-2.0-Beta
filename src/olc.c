@@ -4891,29 +4891,24 @@ void show_resource_display(char_data *ch, struct resource_data *list, bool send_
 /**
 * Displays the scripts from a given list.
 *
+* @param char_data *ch The person viewing it.
 * @param struct trig_proto_list *list The list (start) to show.
-* @param char *save_buffer A buffer to store the results in.
+* @param bool send_page If TRUE, sends the page_display when done. Pass FALSE if you're building a larger page_display for the character.
 */
-void get_script_display(struct trig_proto_list *list, char *save_buffer) {
-	char lbuf[MAX_STRING_LENGTH];
+void show_script_display(char_data *ch, struct trig_proto_list *list, bool send_page) {
 	struct trig_proto_list *iter;
-	trig_data *proto;
 	int count = 0;
 	
-	*save_buffer = '\0';
-	
 	for (iter = list; iter; iter = iter->next) {
-		if ((proto = real_trigger(iter->vnum)) != NULL) {
-			strcpy(lbuf, GET_TRIG_NAME(proto));
-		}
-		else {
-			strcpy(lbuf, "UNKNOWN");
-		}
-		sprintf(save_buffer + strlen(save_buffer), "%2d. [%5d] %s\r\n", ++count, iter->vnum, lbuf);
+		add_page_display(ch, "%2d. [%5d] %s", ++count, iter->vnum, get_trigger_name_by_proto(iter->vnum));
 	}
 	
 	if (count == 0) {
-		strcat(save_buffer, " none\r\n");
+		add_page_display_str(ch, " none");
+	}
+	
+	if (send_page) {
+		send_page_display(ch);
 	}
 }
 

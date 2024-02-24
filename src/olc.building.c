@@ -1389,8 +1389,7 @@ void olc_show_building(char_data *ch) {
 	// scripts
 	add_page_display(ch, "Scripts: <%sscript\t0>", OLC_LABEL_PTR(GET_BLD_SCRIPTS(bdg)));
 	if (GET_BLD_SCRIPTS(bdg)) {
-		get_script_display(GET_BLD_SCRIPTS(bdg), lbuf);
-		add_page_display_str(ch, lbuf);
+		show_script_display(ch, GET_BLD_SCRIPTS(bdg), FALSE);
 	}
 	
 	add_page_display(ch, "<%sspawns\t0>", OLC_LABEL_PTR(GET_BLD_SPAWNS(bdg)));

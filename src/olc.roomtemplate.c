@@ -883,23 +883,26 @@ void get_spawn_template_name(struct adventure_spawn *spawn, char *save_buffer) {
 /**
 * Displays the adventure spawn rules from a given list.
 *
+* @param char_data *ch The person viewing it.
 * @param struct adventure_spawn *list Pointer to the start of a list of spawns.
-* @param char *save_buffer A buffer to store the result to.
+* @param bool send_page If TRUE, sends the page_display when done. Pass FALSE if you're building a larger page_display for the character.
 */
-void get_template_spawns_display(struct adventure_spawn *list, char *save_buffer) {
+void show_template_spawns_display(char_data *ch, struct adventure_spawn *list, bool send_page) {
 	struct adventure_spawn *spawn;
 	char lbuf[MAX_STRING_LENGTH];
 	int count = 0;
 	
-	*save_buffer = '\0';
-	
 	for (spawn = list; spawn; spawn = spawn->next) {
 		get_spawn_template_name(spawn, lbuf);	
-		sprintf(save_buffer + strlen(save_buffer), "%2d. [%s] %d %s (%.2f%%, limit %d)\r\n", ++count, adventure_spawn_types[spawn->type], spawn->vnum, lbuf, spawn->percent, spawn->limit);
+		add_page_display(ch, "%2d. [%s] %d %s (%.2f%%, limit %d)", ++count, adventure_spawn_types[spawn->type], spawn->vnum, lbuf, spawn->percent, spawn->limit);
 	}
 	
 	if (count == 0) {
-		strcat(save_buffer, " none\r\n");
+		add_page_display(ch, " none");
+	}
+	
+	if (send_page) {
+		send_page_display(ch);
 	}
 }
 
@@ -964,15 +967,13 @@ void olc_show_room_template(char_data *ch) {
 	// spawns
 	add_page_display(ch, "Spawns: <%sspawns\t0>", OLC_LABEL_PTR(GET_RMT_SPAWNS(rmt)));
 	if (GET_RMT_SPAWNS(rmt)) {
-		get_template_spawns_display(GET_RMT_SPAWNS(rmt), lbuf);
-		add_page_display_str(ch, lbuf);
+		show_template_spawns_display(ch, GET_RMT_SPAWNS(rmt), FALSE);
 	}
 	
 	// scripts
 	add_page_display(ch, "Scripts: <%sscript\t0>", OLC_LABEL_PTR(GET_RMT_SCRIPTS(rmt)));
 	if (GET_RMT_SCRIPTS(rmt)) {
-		get_script_display(GET_RMT_SCRIPTS(rmt), lbuf);
-		add_page_display_str(ch, lbuf);
+		show_script_display(ch, GET_RMT_SCRIPTS(rmt), FALSE);
 	}
 	
 	send_page_display(ch);

@@ -5670,28 +5670,34 @@ void show_quest_giver_display(char_data *ch, struct quest_giver *list, bool send
 
 
 /**
-* Gets the display for a set of quest rewards.
+* Display a set of quest rewards.
 *
+* @param char_data *ch The person viewing it.
 * @param struct quest_reward *list Pointer to the start of a list of quest rewards.
-* @param char *save_buffer A buffer to store the result to.
 * @param bool show_vnums If TRUE, shows vnums with any applicable rewards. If FALSE, does not.
+* @param bool send_page If TRUE, sends the page_display when done. Pass FALSE if you're building a larger page_display for the character.
 */
-void get_quest_reward_display(struct quest_reward *list, char *save_buffer, bool show_vnums) {
+void show_quest_reward_display(char_data *ch, struct quest_reward *list, bool show_vnums, bool send_page) {
 	struct quest_reward *reward;
 	int count = 0;
 	
-	*save_buffer = '\0';
 	LL_FOREACH(list, reward) {
 		if (show_vnums) {
-			sprintf(save_buffer + strlen(save_buffer), "%2d. %s: %s\r\n", ++count, quest_reward_types[reward->type], quest_reward_string(reward, show_vnums));
+			add_page_display(ch, "%2d. %s: %s", ++count, quest_reward_types[reward->type], quest_reward_string(reward, show_vnums));
 		}
 		else {
 			++count;
-			sprintf(save_buffer + strlen(save_buffer), " %s\r\n", quest_reward_string(reward, show_vnums));
+			add_page_display(ch, " %s", quest_reward_string(reward, show_vnums));
 		}
 	}
 	
-	// empty list not shown
+	if (!list) {
+		add_page_display_str(ch, " none");
+	}
+	
+	if (send_page) {
+		send_page_display(ch);
+	}
 }
 
 
@@ -5749,12 +5755,12 @@ void do_stat_quest(char_data *ch, quest_data *quest) {
 	add_page_display_str(ch, "Tasks:");
 	show_requirement_display(ch, QUEST_TASKS(quest), FALSE);
 	
-	get_quest_reward_display(QUEST_REWARDS(quest), part, TRUE);
-	add_page_display(ch, "Rewards:\r\n%s", *part ? part : " none");
+	add_page_display_str(ch, "Rewards:");
+	show_quest_reward_display(ch, QUEST_REWARDS(quest), TRUE, FALSE);
 	
 	// scripts
-	get_script_display(QUEST_SCRIPTS(quest), part);
-	add_page_display(ch, "Scripts:\r\n%s", QUEST_SCRIPTS(quest) ? part : " none");
+	add_page_display_str(ch, "Scripts:");
+	show_script_display(ch, QUEST_SCRIPTS(quest), FALSE);
 	
 	send_page_display(ch);
 }
@@ -5834,14 +5840,15 @@ void olc_show_quest(char_data *ch) {
 		show_requirement_display(ch, QUEST_TASKS(quest), FALSE);
 	}
 	
-	get_quest_reward_display(QUEST_REWARDS(quest), lbuf, TRUE);
-	add_page_display(ch, "Rewards: <%srewards\t0>\r\n%s", OLC_LABEL_PTR(QUEST_REWARDS(quest)), lbuf);
+	add_page_display(ch, "Rewards: <%srewards\t0>", OLC_LABEL_PTR(QUEST_REWARDS(quest)));
+	if (QUEST_REWARDS(quest)) {
+		show_quest_reward_display(ch, QUEST_REWARDS(quest), TRUE, FALSE);
+	}
 	
 	// scripts
 	add_page_display(ch, "Scripts: <%sscript\t0>", OLC_LABEL_PTR(QUEST_SCRIPTS(quest)));
 	if (QUEST_SCRIPTS(quest)) {
-		get_script_display(QUEST_SCRIPTS(quest), lbuf);
-		add_page_display_str(ch, lbuf);
+		show_script_display(ch, QUEST_SCRIPTS(quest), FALSE);
 	}
 	
 	send_page_display(ch);

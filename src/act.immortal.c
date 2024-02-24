@@ -3134,8 +3134,8 @@ void do_stat_adventure(char_data *ch, adv_data *adv) {
 	show_adventure_linking_display(ch, GET_ADV_LINKING(adv), FALSE);
 	
 	if (GET_ADV_SCRIPTS(adv)) {
-		get_script_display(GET_ADV_SCRIPTS(adv), lbuf);
-		add_page_display(ch, "Scripts:\r\n%s", lbuf);
+		add_page_display(ch, "Scripts:");
+		show_script_display(ch, GET_ADV_SCRIPTS(adv), FALSE);
 	}
 	else {
 		add_page_display_str(ch, "Scripts: none");
@@ -3274,8 +3274,8 @@ void do_stat_building(char_data *ch, bld_data *bdg, bool details) {
 	}
 	
 	if (GET_BLD_SCRIPTS(bdg)) {
-		get_script_display(GET_BLD_SCRIPTS(bdg), lbuf);
-		add_page_display(ch, "Scripts:\r\n%s", lbuf);
+		add_page_display_str(ch, "Scripts:");
+		show_script_display(ch, GET_BLD_SCRIPTS(bdg), FALSE);
 	}
 	else {
 		add_page_display_str(ch, "Scripts: none");
@@ -4723,11 +4723,11 @@ void do_stat_room_template(char_data *ch, room_template *rmt, bool details) {
 		show_interaction_display(ch, GET_RMT_INTERACTIONS(rmt), FALSE);
 	}
 	
-	get_template_spawns_display(GET_RMT_SPAWNS(rmt), lbuf);
-	add_page_display(ch, "Spawns:\r\n%s", lbuf);
+	add_page_display_str(ch, "Spawns:");
+	show_template_spawns_display(ch, GET_RMT_SPAWNS(rmt), FALSE);
 
-	get_script_display(GET_RMT_SCRIPTS(rmt), lbuf);
-	add_page_display(ch, "Scripts:\r\n%s", lbuf);
+	add_page_display_str(ch, "Scripts:");
+	show_script_display(ch, GET_RMT_SCRIPTS(rmt), FALSE);
 	
 	send_page_display(ch);
 }

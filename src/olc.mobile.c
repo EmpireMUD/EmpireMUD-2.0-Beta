@@ -1442,8 +1442,7 @@ void olc_show_mobile(char_data *ch) {
 	
 	add_page_display(ch, "Scripts: <%sscript\t0>", OLC_LABEL_PTR(mob->proto_script));
 	if (mob->proto_script) {
-		get_script_display(mob->proto_script, buf1);
-		add_page_display_str(ch, buf1);
+		show_script_display(ch, mob->proto_script, FALSE);
 	}
 	
 	send_page_display(ch);

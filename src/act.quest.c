@@ -662,9 +662,9 @@ void show_quest_info(char_data *ch, quest_data *qst) {
 	// completed AND not on it again?
 	if (pcq && !pq) {
 		add_page_display(ch, "--\r\n%s", NULLSAFE(QUEST_COMPLETE_MSG(qst)));
-		get_quest_reward_display(QUEST_REWARDS(qst), buf, FALSE);
-		if (*buf) {
-			add_page_display(ch, "Quest Rewards:\r\n%s", buf);
+		if (QUEST_REWARDS(qst)) {
+			add_page_display_str(ch, "Quest Rewards:");
+			show_quest_reward_display(ch, QUEST_REWARDS(qst), FALSE, FALSE);
 		}
 	}
 	

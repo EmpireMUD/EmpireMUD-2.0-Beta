@@ -878,8 +878,7 @@ void olc_show_adventure(char_data *ch) {
 	// scripts
 	add_page_display(ch, "Adventure Cleanup Scripts: <%sscript\t0>", OLC_LABEL_PTR(GET_ADV_SCRIPTS(adv)));
 	if (GET_ADV_SCRIPTS(adv)) {
-		get_script_display(GET_ADV_SCRIPTS(adv), lbuf);
-		add_page_display_str(ch, lbuf);
+		show_script_display(ch, GET_ADV_SCRIPTS(adv), FALSE);
 	}
 		
 	send_page_display(ch);
