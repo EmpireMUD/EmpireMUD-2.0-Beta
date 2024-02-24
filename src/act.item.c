@@ -4147,18 +4147,18 @@ bool ship_is_empty(vehicle_data *ship) {
 * @param char *argument Any text after the subcommand.
 */
 void trade_check(char_data *ch, char *argument) {
-	char output[MAX_STRING_LENGTH*2], line[256], scale[256];
+	char scale[256];
 	struct trading_post_data *tpd;
-	int size = 0, count = 0;
+	int count = 0;
 	int to_collect = 0;
 	
 	double trading_post_fee = config_get_double("trading_post_fee");
 	
 	if (*argument) {
-		size = snprintf(output, sizeof(output), "Your \"%s\" items for trade:\r\n", argument);
+		add_page_display(ch, "Your \"%s\" items for trade:", argument);
 	}
 	else {
-		size = snprintf(output, sizeof(output), "Your items for trade:\r\n");
+		add_page_display_str(ch, "Your items for trade:");
 	}
 	
 	DL_FOREACH(trading_list, tpd) {
@@ -4196,26 +4196,17 @@ void trade_check(char_data *ch, char *argument) {
 			*scale = '\0';
 		}
 		
-		snprintf(line, sizeof(line), "%s%2d. %s: %d coin%s%s%s&0\r\n", IS_SET(tpd->state, TPD_EXPIRED) ? "&r" : "", ++count, GET_OBJ_SHORT_DESC(tpd->obj), tpd->buy_cost, PLURAL(tpd->buy_cost), scale, IS_SET(tpd->state, TPD_EXPIRED) ? " (expired)" : "");
-		
-		if (size + strlen(line) < sizeof(output)) {
-			size += snprintf(output + size, sizeof(output) - size, "%s", line);
-		}
-		else {
-			size += snprintf(output + size, sizeof(output) - size, "... and more\r\n");
-			break;
-		}
-		
+		add_page_display(ch, "%s%2d. %s: %d coin%s%s%s&0", IS_SET(tpd->state, TPD_EXPIRED) ? "&r" : "", ++count, GET_OBJ_SHORT_DESC(tpd->obj), tpd->buy_cost, PLURAL(tpd->buy_cost), scale, IS_SET(tpd->state, TPD_EXPIRED) ? " (expired)" : "");
 	}
 	
 	if (to_collect > 0) {
-		size += snprintf(output + size, sizeof(output) - size, " &y%s to collect&0\r\n", money_amount(GET_LOYALTY(ch), to_collect));
+		add_page_display(ch, " &y%s to collect&0", money_amount(GET_LOYALTY(ch), to_collect));
 	}
 	else if (count == 0) {
-		size += snprintf(output + size, sizeof(output) - size, " none\r\n");
+		add_page_display(ch, " none");
 	}
 	
-	page_string(ch->desc, output, TRUE);
+	send_page_display(ch);
 }
 
 
@@ -4226,9 +4217,9 @@ void trade_check(char_data *ch, char *argument) {
 * @param char *argument Any text after the subcommand.
 */
 void trade_list(char_data *ch, char *argument) {
-	char output[MAX_STRING_LENGTH*2], line[256], scale[256], exchange[256];
+	char scale[256], exchange[256];
 	struct trading_post_data *tpd;
-	int size = 0, count = 0;
+	int count = 0;
 	empire_data *coin_emp = NULL;
 	empire_vnum last_emp = NOTHING;
 	double rate = 0.5;
@@ -4236,10 +4227,10 @@ void trade_list(char_data *ch, char *argument) {
 	int my_cost;
 	
 	if (*argument) {
-		size = snprintf(output, sizeof(output), "\"%s\" items for trade:\r\n", argument);
+		add_page_display(ch, "\"%s\" items for trade:", argument);
 	}
 	else {
-		size = snprintf(output, sizeof(output), "Items for trade:\r\n");
+		add_page_display_str(ch, "Items for trade:");
 	}
 	
 	DL_FOREACH(trading_list, tpd) {
@@ -4277,22 +4268,14 @@ void trade_list(char_data *ch, char *argument) {
 			*exchange = '\0';
 		}
 		
-		snprintf(line, sizeof(line), "%s%2d. %s: %d%s %s%s%s%s%s%s&0\r\n", (tpd->player == GET_IDNUM(ch)) ? "&r" : (can_wear ? "" : "&R"), ++count, GET_OBJ_SHORT_DESC(tpd->obj), tpd->buy_cost, exchange, (coin_emp ? EMPIRE_ADJECTIVE(coin_emp) : "misc"), scale, (OBJ_FLAGGED(tpd->obj, OBJ_SUPERIOR) ? " (sup)" : ""), OBJ_FLAGGED(tpd->obj, OBJ_ENCHANTED) ? " (ench)" : "", (tpd->player == GET_IDNUM(ch)) ? " (your auction)" : "", can_wear ? "" : " (can't use)");
-		
-		if (size + strlen(line) < sizeof(output)) {
-			size += snprintf(output + size, sizeof(output) - size, "%s", line);
-		}
-		else {
-			size += snprintf(output + size, sizeof(output) - size, "... and more\r\n");
-			break;
-		}
+		add_page_display(ch, "%s%2d. %s: %d%s %s%s%s%s%s%s&0", (tpd->player == GET_IDNUM(ch)) ? "&r" : (can_wear ? "" : "&R"), ++count, GET_OBJ_SHORT_DESC(tpd->obj), tpd->buy_cost, exchange, (coin_emp ? EMPIRE_ADJECTIVE(coin_emp) : "misc"), scale, (OBJ_FLAGGED(tpd->obj, OBJ_SUPERIOR) ? " (sup)" : ""), OBJ_FLAGGED(tpd->obj, OBJ_ENCHANTED) ? " (ench)" : "", (tpd->player == GET_IDNUM(ch)) ? " (your auction)" : "", can_wear ? "" : " (can't use)");
 	}
 	
 	if (count == 0) {
-		size += snprintf(output + size, sizeof(output) - size, " none\r\n");
+		add_page_display_str(ch, " none");
 	}
 	
-	page_string(ch->desc, output, TRUE);
+	send_page_display(ch);
 }
 
 
@@ -7087,15 +7070,15 @@ ACMD(do_light) {
 
 
 ACMD(do_list) {
-	char buf[MAX_STRING_LENGTH * 2], line[MAX_STRING_LENGTH], rep[256], tmp[256], matching[MAX_INPUT_LENGTH], vstr[128], drinkstr[128], *ptr;
+	char line[MAX_STRING_LENGTH], rep[256], tmp[256], matching[MAX_INPUT_LENGTH], vstr[128], drinkstr[128], *ptr;
 	struct shop_temp_list *stl, *shop_list = NULL;
 	struct shop_item *item;
 	bool any, any_cur, this;
 	obj_data *obj;
 	any_vnum vnum;
-	size_t size;
 	bool ok, id, all, found_id = FALSE;
 	int amt, number;
+	struct page_display *pd;
 	
 	// helper type for displaying currencies at the end
 	struct cur_t {
@@ -7137,9 +7120,6 @@ ACMD(do_list) {
 	else {
 		*matching = '\0';
 	}
-	
-	size = 0;
-	*buf = '\0';
 
 	// now show any shops available
 	LL_FOREACH(shop_list, stl) {
@@ -7195,29 +7175,21 @@ ACMD(do_list) {
 					*vstr = '\0';
 				}
 				
+				// create line
 				if (stl->from_mob) {
 					strcpy(tmp, PERS(stl->from_mob, ch, FALSE));
-					snprintf(line, sizeof(line), "%s%s%s%s sells%s:\r\n", (*buf ? "\r\n" : ""), vstr, CAP(tmp), rep, matching);
+					add_page_display(ch, "%s%s%s%s sells%s:", (*buf ? "\r\n" : ""), vstr, CAP(tmp), rep, matching);
 				}
 				else if (stl->from_obj) {
 					strcpy(tmp, GET_OBJ_SHORT_DESC(stl->from_obj));
-					snprintf(line, sizeof(line), "%s%s%s%s sells%s:\r\n", (*buf ? "\r\n" : ""), vstr, CAP(tmp), rep, matching);
+					add_page_display(ch, "%s%s%s%s sells%s:", (*buf ? "\r\n" : ""), vstr, CAP(tmp), rep, matching);
 				}
 				else if (stl->from_veh) {
 					strcpy(tmp, get_vehicle_short_desc(stl->from_veh, ch));
-					snprintf(line, sizeof(line), "%s%s%s%s sells%s:\r\n", (*buf ? "\r\n" : ""), vstr, CAP(tmp), rep, matching);
+					add_page_display(ch, "%s%s%s%s sells%s:", (*buf ? "\r\n" : ""), vstr, CAP(tmp), rep, matching);
 				}
 				else {
-					snprintf(line, sizeof(line), "%s%sYou can %sbuy%s%s:\r\n", (*buf ? "\r\n" : ""), vstr, (*buf ? "also " : ""), rep, matching);
-				}
-				
-				if (size + strlen(line) < sizeof(buf)) {
-					strcat(buf, line);
-					size += strlen(line);
-					any = TRUE;
-				}
-				else {
-					break;
+					add_page_display(ch, "%s%sYou can %sbuy%s%s:", (*buf ? "\r\n" : ""), vstr, (*buf ? "also " : ""), rep, matching);
 				}
 			}
 			
@@ -7242,7 +7214,7 @@ ACMD(do_list) {
 				*drinkstr = '\0';
 			}
 			
-			snprintf(line, sizeof(line), " - %s%s%s (%d %s%s)\r\n", vstr, GET_OBJ_SHORT_DESC(obj), drinkstr, item->cost, (item->currency == NOTHING ? "coins" : get_generic_string_by_vnum(item->currency, GENERIC_CURRENCY, WHICH_CURRENCY(item->cost))), rep);
+			add_page_display(ch, " - %s%s%s (%d %s%s)", vstr, GET_OBJ_SHORT_DESC(obj), drinkstr, item->cost, (item->currency == NOTHING ? "coins" : get_generic_string_by_vnum(item->currency, GENERIC_CURRENCY, WHICH_CURRENCY(item->cost))), rep);
 			
 			// store currency for listing later
 			if ((vnum = item->currency) != NOTHING) {
@@ -7253,43 +7225,23 @@ ACMD(do_list) {
 					HASH_ADD_INT(curt_hash, vnum, curt);
 				}
 			}
-			
-			if (size + strlen(line) < sizeof(buf)) {
-				strcat(buf, line);
-				size += strlen(line);
-				any = TRUE;
-			}
-			else {
-				break;
-			}
 		}
 	}
 	
 	if (!id) {	// normal view
 		// append currencies if any
-		if (curt_hash && size < sizeof(buf)) {
-			size += snprintf(buf + size, sizeof(buf) - size, "You have:");
+		if (curt_hash) {
+			pd = add_page_display(ch, "You have:");
 			any_cur = FALSE;
 			HASH_ITER(hh, curt_hash, curt, next_curt) {
 				amt = get_currency(ch, curt->vnum);
-				snprintf(line, sizeof(line), "%s%d %s", any_cur ? ", " : " ", amt, get_generic_string_by_vnum(curt->vnum, GENERIC_CURRENCY, WHICH_CURRENCY(amt)));
-			
-				if (size + strlen(line) < sizeof(buf)) {
-					strcat(buf, line);
-					size += strlen(line);
-					any_cur = TRUE;
-				}
-			}
-			if (size + 2 < sizeof(buf)) {
-				strcat(buf, "\r\n");
-				size += 2;
+				append_page_display_line(pd, "%s%d %s", any_cur ? ", " : " ", amt, get_generic_string_by_vnum(curt->vnum, GENERIC_CURRENCY, WHICH_CURRENCY(amt)));
+				any_cur = TRUE;
 			}
 		}
 
 		if (any) {
-			if (ch->desc) {
-				page_string(ch->desc, buf, TRUE);
-			}
+			send_page_display(ch);
 		}
 		else {
 			msg_to_char(ch, "There's nothing for sale here%s.\r\n", (*argument ? " by that name" : ""));
@@ -7300,6 +7252,11 @@ ACMD(do_list) {
 	}
 
 	free_shop_temp_list(shop_list);
+	
+	if (ch->desc && ch->desc->page_lines) {
+		// in case
+		free_page_display(&ch->desc->page_lines);
+	}
 	
 	// clean up currency list
 	HASH_ITER(hh, curt_hash, curt, next_curt) {
@@ -8147,7 +8104,7 @@ ACMD(do_sheathe) {
 
 
 ACMD(do_ship) {
-	char arg1[MAX_INPUT_LENGTH], arg2[MAX_INPUT_LENGTH], buf[MAX_STRING_LENGTH * 3], line[1000], keywords[MAX_INPUT_LENGTH];
+	char arg1[MAX_INPUT_LENGTH], arg2[MAX_INPUT_LENGTH], keywords[MAX_INPUT_LENGTH];
 	char *strptr;
 	struct island_info *from_isle, *to_isle;
 	empire_data *emp = GET_LOYALTY(ch);
@@ -8159,7 +8116,6 @@ ACMD(do_ship) {
 	vehicle_data *veh;
 	obj_data *proto;
 	int number = 1;
-	size_t size;
 	
 	// SHIPPING_x
 	const char *status_type[] = { "preparing", "en route", "delivered", "waiting for ship", "\n" };
@@ -8210,7 +8166,7 @@ ACMD(do_ship) {
 		msg_to_char(ch, "Usage: ship <island> [number | all] <item>\r\n");
 	}
 	else if (!str_cmp(arg1, "status") || !str_cmp(arg1, "stat")) {
-		size = snprintf(buf, sizeof(buf), "Shipping queue for %s:\r\n", EMPIRE_NAME(emp));
+		add_page_display(ch, "Shipping queue for %s:", EMPIRE_NAME(emp));
 		
 		done = FALSE;
 		DL_FOREACH(EMPIRE_SHIPPING_LIST(emp), sd) {
@@ -8226,7 +8182,7 @@ ACMD(do_ship) {
 				from_isle = get_island(sd->from_island, TRUE);
 				to_isle = get_island(sd->to_island, TRUE);
 				to_room = sd->to_room == NOWHERE ? NULL : real_room(sd->to_room);
-				snprintf(line, sizeof(line), "    %s (%s to %s%s, %s)\r\n", skip_filler(VEH_SHORT_DESC(veh)), from_isle ? get_island_name_for(from_isle->id, ch) : "unknown", to_isle ? get_island_name_for(to_isle->id, ch) : "unknown", coord_display(ch, to_room ? X_COORD(to_room) : -1, to_room ? Y_COORD(to_room) : -1, FALSE), status_type[sd->status]);
+				add_page_display(ch, "    %s (%s to %s%s, %s)", skip_filler(VEH_SHORT_DESC(veh)), from_isle ? get_island_name_for(from_isle->id, ch) : "unknown", to_isle ? get_island_name_for(to_isle->id, ch) : "unknown", coord_display(ch, to_room ? X_COORD(to_room) : -1, to_room ? Y_COORD(to_room) : -1, FALSE), status_type[sd->status]);
 			}
 			else {
 				// normal object shipment
@@ -8241,25 +8197,17 @@ ACMD(do_ship) {
 				from_isle = get_island(sd->from_island, TRUE);
 				to_isle = get_island(sd->to_island, TRUE);
 				to_room = sd->to_room == NOWHERE ? NULL : real_room(sd->to_room);
-				snprintf(line, sizeof(line), " %dx %s (%s to %s%s, %s)\r\n", sd->amount, skip_filler(GET_OBJ_SHORT_DESC(proto)), from_isle ? get_island_name_for(from_isle->id, ch) : "unknown", to_isle ? get_island_name_for(to_isle->id, ch) : "unknown", coord_display(ch, to_room ? X_COORD(to_room) : -1, to_room ? Y_COORD(to_room) : -1, FALSE), status_type[sd->status]);
+				add_page_display(ch, " %dx %s (%s to %s%s, %s)", sd->amount, skip_filler(GET_OBJ_SHORT_DESC(proto)), from_isle ? get_island_name_for(from_isle->id, ch) : "unknown", to_isle ? get_island_name_for(to_isle->id, ch) : "unknown", coord_display(ch, to_room ? X_COORD(to_room) : -1, to_room ? Y_COORD(to_room) : -1, FALSE), status_type[sd->status]);
 			}
 			
 			done = TRUE;
-			if (size + strlen(line) >= sizeof(buf)) {
-				// too long
-				size += snprintf(buf + size, sizeof(buf) - size, " ...\r\n");
-				break;
-			}
-			else {
-				size += snprintf(buf + size, sizeof(buf) - size, "%s", line);
-			}
 		}
 		
 		if (!done) {
-			size += snprintf(buf + size, sizeof(buf) - size, " nothing\r\n");
+			add_page_display_str(ch, " nothing");
 		}
 		
-		page_string(ch->desc, buf, TRUE);
+		send_page_display(ch);
 	}
 	else if (emp != GET_LOYALTY(ch)) {
 		msg_to_char(ch, "You may only check the status of other empires' shipments.\r\n");

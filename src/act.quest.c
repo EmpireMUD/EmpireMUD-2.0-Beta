@@ -581,13 +581,12 @@ char *show_daily_quest_line(char_data *ch) {
 * @param quest_data *qst The quest to show.
 */
 void show_quest_info(char_data *ch, quest_data *qst) {
-	char buf[MAX_STRING_LENGTH], *buf2, vstr[128], output[MAX_STRING_LENGTH * 3];
+	char buf[MAX_STRING_LENGTH], *buf2, vstr[128];
 	struct quest_giver *giver;
 	struct player_quest *pq;
 	struct player_completed_quest *pcq;
 	int complete, total;
 	struct string_hash *str_iter, *next_str, *str_hash = NULL;
-	size_t size;
 
 	pcq = has_completed_quest(ch, QUEST_VNUM(qst), NOTHING);
 	
@@ -599,28 +598,26 @@ void show_quest_info(char_data *ch, quest_data *qst) {
 	}
 	
 	pq = is_on_quest(ch, QUEST_VNUM(qst));
-	size = 0;
-	*output = '\0';
 	
 	// title
 	if (pq) {
 		count_quest_tasks(pq->tracker, &complete, &total);
-		size += snprintf(output + size, sizeof(output) - size, "%s%s%s\t0 (%d/%d task%s)\r\n", vstr, QUEST_LEVEL_COLOR(ch, qst), QUEST_NAME(qst), complete, total, PLURAL(total));
+		add_page_display(ch, "%s%s%s\t0 (%d/%d task%s)", vstr, QUEST_LEVEL_COLOR(ch, qst), QUEST_NAME(qst), complete, total, PLURAL(total));
 	}
 	else if (pcq) {
-		size += snprintf(output + size, sizeof(output) - size, "%s%s%s\t0 (completed)\r\n", vstr, QUEST_LEVEL_COLOR(ch, qst), QUEST_NAME(qst));
+		add_page_display(ch, "%s%s%s\t0 (completed)", vstr, QUEST_LEVEL_COLOR(ch, qst), QUEST_NAME(qst));
 	}
 	else {
-		size += snprintf(output + size, sizeof(output) - size, "%s%s%s\t0 (not on quest)\r\n", vstr, QUEST_LEVEL_COLOR(ch, qst), QUEST_NAME(qst));
+		add_page_display(ch, "%s%s%s\t0 (not on quest)", vstr, QUEST_LEVEL_COLOR(ch, qst), QUEST_NAME(qst));
 	}
 	
-	size += snprintf(output + size, sizeof(output) - size, "%s", NULLSAFE(QUEST_DESCRIPTION(qst)));
+	add_page_display_str(ch, NULLSAFE(QUEST_DESCRIPTION(qst)));
 	
 	// tracker
 	if (pq) {
 		get_tracker_display(pq->tracker, buf);
 		if (*buf) {
-			size += snprintf(output + size, sizeof(output) - size, "Quest Tracker:\r\n%s", buf);
+			add_page_display(ch, "Quest Tracker:\r\n%s", buf);
 		}
 	}
 	
@@ -655,25 +652,23 @@ void show_quest_info(char_data *ch, quest_data *qst) {
 			free(buf2);
 		}
 		
-		size += snprintf(output + size, sizeof(output) - size, "Turn in at: %s%s\r\n", buf, QUEST_FLAGGED(qst, QST_IN_CITY_ONLY) ? " (in-city only)" : "");
+		add_page_display(ch, "Turn in at: %s%s", buf, QUEST_FLAGGED(qst, QST_IN_CITY_ONLY) ? " (in-city only)" : "");
 	}
 	
 	if (QUEST_FLAGGED(qst, QST_GROUP_COMPLETION)) {
-		size += snprintf(output + size, sizeof(output) - size, "Group completion: This quest will auto-complete if any member of your group completes it while you're present.\r\n");
+		add_page_display_str(ch, "Group completion: This quest will auto-complete if any member of your group completes it while you're present.");
 	}
 	
 	// completed AND not on it again?
 	if (pcq && !pq) {
-		size += snprintf(output + size, sizeof(output) - size, "--\r\n%s", NULLSAFE(QUEST_COMPLETE_MSG(qst)));
+		add_page_display(ch, "--\r\n%s", NULLSAFE(QUEST_COMPLETE_MSG(qst)));
 		get_quest_reward_display(QUEST_REWARDS(qst), buf, FALSE);
 		if (*buf) {
-			size += snprintf(output + size, sizeof(output) - size, "Quest Rewards:\r\n%s", buf);
+			add_page_display(ch, "Quest Rewards:\r\n%s", buf);
 		}
 	}
 	
-	if (ch->desc) {
-		page_string(ch->desc, output, TRUE);
-	}
+	send_page_display(ch);
 }
 
 
@@ -739,21 +734,17 @@ void start_quest(char_data *ch, quest_data *qst, struct instance_data *inst) {
 //// QUEST SUBCOMMANDS ///////////////////////////////////////////////////////
 
 QCMD(qcmd_completed) {
-	char buf[MAX_STRING_LENGTH];
 	struct player_completed_quest *pcq, *next_pcq;
-	size_t size;
 	
 	// sort now
 	HASH_SORT(GET_COMPLETED_QUESTS(ch), sort_completed_quests_by_timestamp);
 	
-	size = snprintf(buf, sizeof(buf), "Completed quests:\r\n");
+	add_page_display(ch, "Completed quests:");
 	HASH_ITER(hh, GET_COMPLETED_QUESTS(ch), pcq, next_pcq) {
-		size += snprintf(buf + size, sizeof(buf) - size, "  %s\r\n", get_quest_name_by_proto(pcq->vnum));
+		add_page_display(ch, " %s", get_quest_name_by_proto(pcq->vnum));
 	}
 	
-	if (ch->desc) {
-		page_string(ch->desc, buf, TRUE);
-	}
+	send_page_display(ch);
 }
 
 

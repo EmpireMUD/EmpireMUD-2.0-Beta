@@ -3194,11 +3194,9 @@ ACMD(do_examine) {
 ACMD(do_factions) {
 	struct player_faction_data *pfd, *next_pfd;
 	struct faction_relation *rel, *next_rel;
-	char buf[MAX_STRING_LENGTH];
 	faction_data *fct;
 	int idx = NOTHING;
 	int count = 0;
-	size_t size;
 	bool any;
 	
 	skip_spaces(&argument);
@@ -3213,17 +3211,18 @@ ACMD(do_factions) {
 		else {
 			idx = rep_const_to_index(pfd ? pfd->rep : FCT_STARTING_REP(fct));
 			
-			msg_to_char(ch, "%s%s\t0\r\n", (idx != NOTHING ? reputation_levels[idx].color : ""), FCT_NAME(fct));
+			// show 1 faction
+			add_page_display(ch, "%s%s\t0", (idx != NOTHING ? reputation_levels[idx].color : ""), FCT_NAME(fct));
 			if (pfd && idx != NOTHING) {
-				msg_to_char(ch, "Reputation: %s / %d\r\n", reputation_levels[idx].name, pfd->value);
+				add_page_display(ch, "Reputation: %s / %d", reputation_levels[idx].name, pfd->value);
 			}
 			else if (idx != NOTHING) {
-				msg_to_char(ch, "Reputation: %s\r\n", reputation_levels[idx].name);
+				add_page_display(ch, "Reputation: %s", reputation_levels[idx].name);
 			}
 			else {
-				msg_to_char(ch, "Reputation: none\r\n");
+				add_page_display(ch, "Reputation: none");
 			}
-			msg_to_char(ch, "%s", NULLSAFE(FCT_DESCRIPTION(fct)));
+			add_page_display_str(ch, NULLSAFE(FCT_DESCRIPTION(fct)));
 			
 			// relations?
 			any = FALSE;
@@ -3235,21 +3234,20 @@ ACMD(do_factions) {
 				// show it
 				if (!any) {	// header
 					any = TRUE;
-					msg_to_char(ch, "Relationships:\r\n");
+					add_page_display(ch, "Relationships:");
 				}
 				pfd = get_reputation(ch, rel->vnum, FALSE);
 				idx = (pfd ? rep_const_to_index(pfd->rep) : NOTHING);
 				prettier_sprintbit(rel->flags, relationship_descs, buf);
-				msg_to_char(ch, " %s%s\t0 - %s\r\n", (idx != NOTHING ? reputation_levels[idx].color : ""), FCT_NAME(rel->ptr), buf);
+				add_page_display(ch, " %s%s\t0 - %s", (idx != NOTHING ? reputation_levels[idx].color : ""), FCT_NAME(rel->ptr), buf);
 			}
+			
+			send_page_display(ch);
 		}
 	}
 	else {	// no arg, show all
-		size = snprintf(buf, sizeof(buf), "Your factions:\r\n");
+		add_page_display(ch, "Your factions:");
 		HASH_ITER(hh, GET_FACTIONS(ch), pfd, next_pfd) {
-			if (size + 10 >= sizeof(buf)) {
-				break;	// out of room
-			}
 			if (!(fct = find_faction_by_vnum(pfd->vnum))) {
 				continue;
 			}
@@ -3259,15 +3257,13 @@ ACMD(do_factions) {
 			
 			++count;
 			idx = rep_const_to_index(pfd->rep);
-			size += snprintf(buf + size, sizeof(buf) - size, " %s %s(%s / %d)\t0%s\r\n", FCT_NAME(fct), reputation_levels[idx].color, reputation_levels[idx].name, pfd->value, (FACTION_FLAGGED(fct, FCT_HIDE_IN_LIST) ? " (hidden)" : ""));
+			add_page_display(ch, " %s %s(%s / %d)\t0%s", FCT_NAME(fct), reputation_levels[idx].color, reputation_levels[idx].name, pfd->value, (FACTION_FLAGGED(fct, FCT_HIDE_IN_LIST) ? " (hidden)" : ""));
 		}
 		
 		if (!count) {
-			strcat(buf, " none\r\n");
+			add_page_display_str(ch, " none");
 		}
-		if (ch->desc) {
-			page_string(ch->desc, buf, TRUE);
-		}
+		send_page_display(ch);
 	}
 }
 
@@ -3349,12 +3345,11 @@ ACMD(do_help) {
 }
 
 
-ACMD(do_helpsearch) {	
-	char output[MAX_STRING_LENGTH], line[MAX_STRING_LENGTH];
+ACMD(do_helpsearch) {
 	char **words = NULL;
 	int iter, wrd;
 	bool found, fail;
-	size_t size, word_size;
+	size_t word_size;
 	
 	if (!ch->desc) {
 		// don't bother
@@ -3385,7 +3380,7 @@ ACMD(do_helpsearch) {
 		msg_to_char(ch, "No help available.r\n");
 	}
 	else {
-		size = snprintf(output, sizeof(output), "You find help on that in the following help entries:\r\n");
+		add_page_display(ch, "You find help on that in the following help entries:");
 		found = FALSE;
 		
 		for (iter = 0; iter <= top_of_helpt; ++iter) {
@@ -3410,25 +3405,14 @@ ACMD(do_helpsearch) {
 			
 			// FOUND!
 			found = TRUE;
-			snprintf(line, sizeof(line), " %s\r\n", help_table[iter].keyword);
-			
-			if (size + strlen(line) < sizeof(output)) {
-				strcat(output, line);
-				size += strlen(line);
-			}
-			else {
-				size += snprintf(output + size, sizeof(output) - size, "... and more\r\n");
-				break;
-			}
+			add_page_display(ch, " %s", help_table[iter].keyword);
 		}
 		
 		if (!found) {
-			msg_to_char(ch, "%s none\r\n", output);
+			add_page_display_str(ch, " none");
 		}
-		else {
-			// send it out
-			page_string(ch->desc, output, TRUE);
-		}
+		
+		send_page_display(ch);
 	}
 	
 	// free data
@@ -3480,12 +3464,11 @@ ACMD(do_inventory) {
 		}
 	}
 	else {	// advanced inventory
-		char word[MAX_INPUT_LENGTH], heading[MAX_STRING_LENGTH], buf[MAX_STRING_LENGTH], temp[MAX_INPUT_LENGTH];
+		char word[MAX_INPUT_LENGTH], heading[MAX_STRING_LENGTH], temp[MAX_INPUT_LENGTH];
 		int wear_type = NOTHING, type_type = NOTHING;
 		bool kept = FALSE, not_kept = FALSE, bound = FALSE, unbound = FALSE;
 		generic_data *cmp = NULL;
 		obj_data *obj;
-		size_t size;
 		int count, to_show = -1;
 		
 		*heading = '\0';
@@ -3602,27 +3585,21 @@ ACMD(do_inventory) {
 		skip_spaces(&argument);
 		count = 0;
 		
-		// start the string
+		// start the display
 		if (*argument && *heading) {
-			size = snprintf(buf, sizeof(buf), "%s items matching '%s':\r\n", CAP(heading), argument);
+			add_page_display(ch, "%s items matching '%s':", CAP(heading), argument);
 		}
 		else if (*argument) {
-			size = snprintf(buf, sizeof(buf), "Items matching '%s':\r\n", argument);
+			add_page_display(ch, "Items matching '%s':", argument);
 		}
 		else if (*heading) {
-			size = snprintf(buf, sizeof(buf), "%s items:\r\n", CAP(heading));
+			add_page_display(ch, "%s items:", CAP(heading));
 		}
 		else {
-			size = snprintf(buf, sizeof(buf), "Items:\r\n");
+			add_page_display_str(ch, "Items:");
 		}
 		
 		DL_FOREACH2(ch->carrying, obj, next_content) {
-			// break out early
-			if (size + 80 > sizeof(buf)) {
-				size += snprintf(buf + size, sizeof(buf) - size, "... and more\r\n");
-				break;
-			}
-			
 			// qualify it
 			if (*argument && !multi_isname(argument, GET_OBJ_KEYWORDS(obj))) {
 				continue;	// not matching keywords
@@ -3650,7 +3627,7 @@ ACMD(do_inventory) {
 			}
 			
 			// looks okay
-			size += snprintf(buf + size, sizeof(buf) - size, "%2d. %s", ++count, obj_desc_for_char(obj, ch, OBJ_DESC_INVENTORY));
+			add_page_display(ch, "%2d. %s", ++count, obj_desc_for_char(obj, ch, OBJ_DESC_INVENTORY));
 			
 			// shown enough?
 			if (to_show > 0 && count >= to_show) {
@@ -3658,9 +3635,7 @@ ACMD(do_inventory) {
 			}
 		}
 		
-		if (ch->desc) {
-			page_string(ch->desc, buf, TRUE);
-		}
+		send_page_display(ch);
 	}
 }
 
@@ -4004,12 +3979,12 @@ ACMD(do_mudstats) {
 
 ACMD(do_nearby) {
 	bool cities = TRUE, adventures = TRUE, starts = TRUE, check_arg = FALSE;
-	char buf[MAX_STRING_LENGTH], line[MAX_STRING_LENGTH], part[MAX_STRING_LENGTH], adv_color[256], dist_buf[256], trait_buf[256];
+	char line[MAX_STRING_LENGTH], part[MAX_STRING_LENGTH], adv_color[256], dist_buf[256], trait_buf[256];
 	const char *dir_str;
 	struct instance_data *inst;
 	struct empire_city_data *city, *in_city;
 	empire_data *emp, *next_emp;
-	int iter, dist, size, max_dist;
+	int iter, dist, max_dist;
 	bool found = FALSE, newbie_only;
 	room_data *loc;
 	any_vnum vnum;
@@ -4066,7 +4041,7 @@ ACMD(do_nearby) {
 	}
 	
 	// displaying:
-	size = snprintf(buf, sizeof(buf), "You find nearby (within %d tile%s):\r\n", max_dist, PLURAL(max_dist));
+	add_page_display(ch, "You find nearby (within %d tile%s):", max_dist, PLURAL(max_dist));
 	#define NEARBY_DIR  get_partial_direction_to(ch, IN_ROOM(ch), loc, (PRF_FLAGGED(ch, PRF_SCREEN_READER) ? FALSE : TRUE))
 			// was: (dir == NO_DIR ? "away" : (PRF_FLAGGED(ch, PRF_SCREEN_READER) ? dirs[dir] : alt_dirs[dir]))
 
@@ -4082,7 +4057,7 @@ ACMD(do_nearby) {
 				// dir = get_direction_for_char(ch, get_direction_to(IN_ROOM(ch), loc));
 				dir_str = NEARBY_DIR;
 				snprintf(dist_buf, sizeof(dist_buf), "%d %3s", dist, (dir_str && *dir_str) ? dir_str : "away");
-				snprintf(line, sizeof(line), "%8s: %s%s\r\n", dist_buf, get_room_name(loc, FALSE), coord_display_room(ch, loc, FALSE));
+				snprintf(line, sizeof(line), "%8s: %s%s", dist_buf, get_room_name(loc, FALSE), coord_display_room(ch, loc, FALSE));
 				
 				CREATE(nrb_item, struct nearby_item_t, 1);
 				nrb_item->text = str_dup(line);
@@ -4126,7 +4101,7 @@ ACMD(do_nearby) {
 						*trait_buf = '\0';
 					}
 					
-					snprintf(line, sizeof(line), "%8s: The %s of %s%s / %s%s&0%s\r\n", dist_buf, city_type[city->type].name, city->name, coord_display_room(ch, loc, FALSE), EMPIRE_BANNER(emp), EMPIRE_NAME(emp), trait_buf);
+					snprintf(line, sizeof(line), "%8s: The %s of %s%s / %s%s&0%s", dist_buf, city_type[city->type].name, city->name, coord_display_room(ch, loc, FALSE), EMPIRE_BANNER(emp), EMPIRE_NAME(emp), trait_buf);
 					
 					CREATE(nrb_item, struct nearby_item_t, 1);
 					nrb_item->text = str_dup(line);
@@ -4204,7 +4179,7 @@ ACMD(do_nearby) {
 			dir_str = NEARBY_DIR;
 			strcpy(adv_color, color_by_difficulty((ch), pick_level_from_range((INST_LEVEL(inst) > 0 ? INST_LEVEL(inst) : get_approximate_level(ch)), GET_ADV_MIN_LEVEL(INST_ADVENTURE(inst)), GET_ADV_MAX_LEVEL(INST_ADVENTURE(inst)))));
 			snprintf(dist_buf, sizeof(dist_buf), "%d %3s", dist, (dir_str && *dir_str) ? dir_str : "away");
-			snprintf(line, sizeof(line), "%8s: %s%s\t0%s / %s%s\r\n", dist_buf, adv_color, GET_ADV_NAME(INST_ADVENTURE(inst)), coord_display_room(ch, loc, FALSE), instance_level_string(inst), part);
+			snprintf(line, sizeof(line), "%8s: %s%s\t0%s / %s%s", dist_buf, adv_color, GET_ADV_NAME(INST_ADVENTURE(inst)), coord_display_room(ch, loc, FALSE), instance_level_string(inst), part);
 			
 			if (glb) {	// just add it to the global list
 				if (glb->str) {
@@ -4236,20 +4211,17 @@ ACMD(do_nearby) {
 	DL_SORT(nrb_list, nrb_sort_distance);
 	DL_FOREACH_SAFE(nrb_list, nrb_item, next_item) {
 		if (nrb_item->text) {
-			if (size + strlen(nrb_item->text) < sizeof(buf)) {
-				strcat(buf, nrb_item->text);
-				size += strlen(nrb_item->text);
-			}
+			add_page_display_str(ch, nrb_item->text);
 			free(nrb_item->text);
 		}
 		free(nrb_item);
 	}
 	
 	if (!found) {
-		size += snprintf(buf + size, sizeof(buf) - size, " nothing\r\n");
+		add_page_display_str(ch, " nothing");
 	}
 	
-	page_string(ch->desc, buf, TRUE);
+	send_page_display(ch);
 }
 
 
