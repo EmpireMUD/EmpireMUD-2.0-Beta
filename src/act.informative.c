@@ -1069,7 +1069,7 @@ void display_score_to_char(char_data *ch, char_data *to) {
 	}
 	else {
 		// show summary effects
-		show_character_affects(ch, to);
+		show_character_affects(ch, to, FALSE);
 	}
 	
 	send_page_display(to);
@@ -1668,10 +1668,11 @@ void look_at_char(char_data *i, char_data *ch, bool show_eq) {
 /**
 * Lists the affects on a character in a way that can be shown to players.
 * 
-* @param char_data *ch Whose effects
-* @param char_data *to Who to send to
+* @param char_data *ch Whose affects.
+* @param char_data *to Who is viewing it.
+* @param bool send_page If TRUE, sends the page_display to 'to' at the end. If FALSE, you must send it or free it separately.
 */
-void show_character_affects(char_data *ch, char_data *to) {
+void show_character_affects(char_data *ch, char_data *to, bool send_page) {
 	struct over_time_effect_type *dot;
 	struct affected_type *aff;
 	bool beneficial;
@@ -1719,7 +1720,9 @@ void show_character_affects(char_data *ch, char_data *to) {
 		add_page_display(to, "   \tr%s\t0 (%s) %d %s damage (%d/%d)", get_generic_name_by_vnum(dot->type), lbuf, dot->damage * dot->stack, damage_types[dot->damage_type], dot->stack, dot->max_stack);
 	}
 	
-	send_page_display(to);
+	if (send_page) {
+		send_page_display(to);
+	}
 }
 
 
@@ -2625,6 +2628,7 @@ ACMD(do_adventure) {
 }
 
 
+// this accepts a subcmd which, if non-zero, omits some things and does not do the final send_page_display() -- it leaves everything in ch's unsent page_display
 ACMD(do_affects) {
 	bool limited;
 	char *str;
@@ -2646,7 +2650,8 @@ ACMD(do_affects) {
 		}
 		else if (IS_IMMORTAL(ch)) {
 			add_page_display(ch, "Affects on %s:", PERS(vict, ch, FALSE));
-			show_character_affects(vict, ch);
+			show_character_affects(vict, ch, FALSE);
+			send_page_display(ch);
 		}
 		else {
 			show_character_affects_simple(vict, ch);
@@ -2704,8 +2709,11 @@ ACMD(do_affects) {
 		add_page_display(ch, "   You are disguised as %s!", PERS(ch, ch, 0));
 	}
 
-	show_character_affects(ch, ch);
-	send_page_display(ch);
+	show_character_affects(ch, ch, FALSE);
+	
+	if (!limited) {
+		send_page_display(ch);
+	}
 }
 
 

@@ -5915,7 +5915,7 @@ ACMD(do_findmaintenance) {
 				}
 			}
 		}
-		show_resource_list(total_list, partial);
+		show_resource_list(total_list, partial, sizeof(partial));
 		// note: shows coords regardless of navigation
 		msg_to_char(ch, "Maintenance needed for %s%s: %s\r\n", get_room_name(find_room, FALSE), coord_display_room(ch, find_room, FALSE), partial);
 		free_resource_list(total_list);
@@ -6002,7 +6002,7 @@ ACMD(do_findmaintenance) {
 			strcpy(temp, "buildings");
 		}
 		
-		show_resource_list(total_list, partial);
+		show_resource_list(total_list, partial, sizeof(partial));
 		msg_to_char(ch, "Maintenance needed for %s on %s: %s\r\n", temp, find_island->name, total_list ? partial : "none");
 		free_resource_list(total_list);
 	}

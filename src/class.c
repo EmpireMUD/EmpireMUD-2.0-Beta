@@ -41,7 +41,7 @@ const char *default_class_abbrev = "???";
 
 // local protos
 void show_class_ability_display(char_data *ch, struct class_ability *list, bool send_page, char_data *info_ch);
-void get_class_skill_display(struct class_skill_req *list, char *save_buffer, bool one_line);
+void get_class_skill_display(struct class_skill_req *list, char *save_buffer, size_t buf_size, bool one_line);
 int sort_class_abilities(struct class_ability *a, struct class_ability *b);
 
 
@@ -622,7 +622,7 @@ char *list_one_class(class_data *cls, bool detail) {
 	char lbuf[MAX_STRING_LENGTH];
 	
 	if (detail) {
-		get_class_skill_display(CLASS_SKILL_REQUIREMENTS(cls), lbuf, TRUE);
+		get_class_skill_display(CLASS_SKILL_REQUIREMENTS(cls), lbuf, sizeof(lbuf), TRUE);
 		snprintf(output, sizeof(output), "[%5d] %s - %s", CLASS_VNUM(cls), CLASS_NAME(cls), lbuf);
 	}
 	else {
@@ -1259,7 +1259,7 @@ void do_stat_class(char_data *ch, class_data *cls) {
 	sprintbit(CLASS_FLAGS(cls), class_flags, part, TRUE);
 	add_page_display(ch, "Flags: \tg%s\t0", part);
 	
-	get_class_skill_display(CLASS_SKILL_REQUIREMENTS(cls), part, FALSE);
+	get_class_skill_display(CLASS_SKILL_REQUIREMENTS(cls), part, sizeof(part), FALSE);
 	add_page_display(ch, "Skills required:\r\n%s", part);
 	
 	add_page_display_str(ch, "Roles and abilities:");
@@ -1312,27 +1312,44 @@ void show_class_ability_display(char_data *ch, struct class_ability *list, bool 
 *
 * @param struct class_skill_req *list The list to display.
 * @param char *save_buffer A string to save it in.
+* @param size_t buf_size The sizeof the save_buffer, to prevent overruns.
 * @param bool one_line If TRUE, is a comma-separated line. Otherwise, a numbered list.
 */
-void get_class_skill_display(struct class_skill_req *list, char *save_buffer, bool one_line) {
-	char lbuf[MAX_STRING_LENGTH];
+void get_class_skill_display(struct class_skill_req *list, char *save_buffer, size_t buf_size, bool one_line) {
+	char skill_part[256], line[512];
 	struct class_skill_req *iter;
 	int count = 0;
+	size_t l_size;
 	
 	*save_buffer = '\0';
 	
 	LL_FOREACH(list, iter) {
-		snprintf(lbuf, sizeof(lbuf), "%s %d", get_skill_name_by_vnum(iter->vnum), iter->level);
+		++count;
+		snprintf(skill_part, sizeof(skill_part), "%s %d", get_skill_name_by_vnum(iter->vnum), iter->level);
 		
+		// build line
 		if (one_line) {
-			sprintf(save_buffer + strlen(save_buffer), "%s%s", (*save_buffer ? ", " : ""), lbuf);
+			l_size = snprintf(line, sizeof(line), "%s%s", (count > 1 ? ", " : ""), skill_part);
 		}
 		else {
-			sprintf(save_buffer + strlen(save_buffer), "%2d. %s\r\n", ++count, lbuf);
+			l_size = snprintf(line, sizeof(line), "%2d. %s\r\n", ++count, skill_part);
+		}
+		
+		// size-check
+		if (l_size < buf_size - 5) {
+			strcat(save_buffer, line);
+			buf_size -= l_size;
+		}
+		else {
+			// overflow
+			if (buf_size > 5) {
+				sprintf(save_buffer + strlen(save_buffer), "...%s", (one_line ? "" : "\r\n"));
+			}
+			break;
 		}
 	}
 	if (!list) {
-		sprintf(save_buffer + strlen(save_buffer), "%snone%s", one_line ? "" : "  ", one_line ? "" : "\r\n");
+		snprintf(save_buffer, buf_size, "%snone%s", one_line ? "" : "  ", one_line ? "" : "\r\n");
 	}
 }
 
@@ -1358,7 +1375,7 @@ void olc_show_class(char_data *ch) {
 	sprintbit(CLASS_FLAGS(cls), class_flags, lbuf, TRUE);
 	add_page_display(ch, "<%sflags\t0> %s", OLC_LABEL_VAL(CLASS_FLAGS(cls), CLASSF_IN_DEVELOPMENT), lbuf);
 	
-	get_class_skill_display(CLASS_SKILL_REQUIREMENTS(cls), lbuf, FALSE);
+	get_class_skill_display(CLASS_SKILL_REQUIREMENTS(cls), lbuf, sizeof(lbuf), FALSE);
 	add_page_display(ch, "Skills required: <%srequires\t0>\r\n%s", OLC_LABEL_PTR(CLASS_SKILL_REQUIREMENTS(cls)), CLASS_SKILL_REQUIREMENTS(cls) ? lbuf : "");
 	
 	add_page_display(ch, "<%smaxhealth\t0> %d", OLC_LABEL_VAL(CLASS_POOL(cls, HEALTH), base_player_pools[HEALTH]), CLASS_POOL(cls, HEALTH));

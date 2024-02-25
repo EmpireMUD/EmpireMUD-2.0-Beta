@@ -4739,20 +4739,25 @@ bool has_resources(char_data *ch, struct resource_data *list, bool ground, bool 
 *
 * @param struct resource_data *list The list to show.
 * @param char *save_buffer A string to write the output to.
+* @param size_t buf_size The sizeof the variable sent as the save_buffer. Prevents buffer overrun.
 */
-void show_resource_list(struct resource_data *list, char *save_buffer) {
+void show_resource_list(struct resource_data *list, char *save_buffer, size_t buf_size) {
 	struct resource_data *res;
 	bool found = FALSE;
+	size_t size;
 	
 	*save_buffer = '\0';
+	size = 0;
 	
 	LL_FOREACH(list, res) {
-		sprintf(save_buffer + strlen(save_buffer), "%s%s", (found ? ", " : ""), get_resource_name(res));
-		found = TRUE;
+		if (size < buf_size) {
+			size += snprintf(save_buffer + size, buf_size - size, "%s%s", (found ? ", " : ""), get_resource_name(res));
+			found = TRUE;
+		}
 	}
 	
-	if (!*save_buffer) {
-		strcpy(save_buffer, "nothing");
+	if (!found && size < buf_size) {
+		size += snprintf(save_buffer + size, buf_size - size, "nothing");
 	}
 }
 

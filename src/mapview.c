@@ -1951,7 +1951,7 @@ void look_at_room_by_loc(char_data *ch, room_data *room, bitvector_t options) {
 	}
 
 	if (BUILDING_RESOURCES(room)) {
-		show_resource_list(BUILDING_RESOURCES(room), partialbuf);
+		show_resource_list(BUILDING_RESOURCES(room), partialbuf, sizeof(partialbuf));
 		msg_to_char(ch, "Remaining to %s: %s\r\n", (IS_DISMANTLING(room) ? "Dismantle" : (IS_INCOMPLETE(room) ? "Completion" : "Maintain")), partialbuf);
 	}
 	

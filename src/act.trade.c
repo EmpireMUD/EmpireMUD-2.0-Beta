@@ -1044,7 +1044,7 @@ void show_craft_info(char_data *ch, char *argument, int craft_type) {
 		msg_to_char(ch, "Build facing: %s\r\n", buf);
 	}
 	
-	show_resource_list(GET_CRAFT_RESOURCES(craft), buf);
+	show_resource_list(GET_CRAFT_RESOURCES(craft), buf, sizeof(buf));
 	msg_to_char(ch, "Resources: %s\r\n", buf);	
 	
 	if (IS_SET(GET_CRAFT_FLAGS(craft), CRAFT_LEARNED) && !has_learned_craft(ch, GET_CRAFT_VNUM(craft))) {
@@ -1439,7 +1439,7 @@ void process_gen_craft_vehicle(char_data *ch, craft_data *type) {
 			// copy this to display the next 1
 			temp_res = *VEH_NEEDS_RESOURCES(veh);
 			temp_res.next = NULL;
-			show_resource_list(&temp_res, buf);
+			show_resource_list(&temp_res, buf, sizeof(buf));
 			msg_to_char(ch, "You don't have %s and stop %s.\r\n", buf, gen_craft_data[GET_CRAFT_TYPE(type)].verb);
 		}
 		else {

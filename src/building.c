@@ -1163,7 +1163,7 @@ void process_build(char_data *ch, room_data *room, int act_type) {
 				// copy this to display the next 1
 				temp_res = *BUILDING_RESOURCES(room);
 				temp_res.next = NULL;
-				show_resource_list(&temp_res, buf);
+				show_resource_list(&temp_res, buf, sizeof(buf));
 				msg_to_char(ch, "You don't have %s and stop working.\r\n", buf);
 			}
 			else {

@@ -2119,7 +2119,7 @@ void process_repairing(char_data *ch) {
 			// copy this to display the next 1
 			temp_res = *VEH_NEEDS_RESOURCES(veh);
 			temp_res.next = NULL;
-			show_resource_list(&temp_res, buf);
+			show_resource_list(&temp_res, buf, sizeof(buf));
 			msg_to_char(ch, "You don't have %s and stop repairing.\r\n", buf);
 		}
 		else {

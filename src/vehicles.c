@@ -4670,7 +4670,7 @@ void look_at_vehicle(vehicle_data *veh, char_data *ch) {
 	}
 	
 	if (VEH_NEEDS_RESOURCES(veh)) {
-		show_resource_list(VEH_NEEDS_RESOURCES(veh), lbuf);
+		show_resource_list(VEH_NEEDS_RESOURCES(veh), lbuf, sizeof(lbuf));
 		
 		if (VEH_IS_COMPLETE(veh)) {
 			msg_to_char(ch, "Maintenance needed: %s\r\n", lbuf);

@@ -2015,7 +2015,7 @@ char *get_resource_name(struct resource_data *res);
 void give_resources(char_data *ch, struct resource_data *list, bool split);
 bool has_resources(char_data *ch, struct resource_data *list, bool ground, bool send_msgs, char *msg_prefix);
 void reduce_dismantle_resources(int damage, int max_health, struct resource_data **list);
-void show_resource_list(struct resource_data *list, char *save_buffer);
+void show_resource_list(struct resource_data *list, char *save_buffer, size_t buf_size);
 
 // sector functions from utils.c
 sector_data *get_sect_by_name(char *name);
@@ -2164,7 +2164,7 @@ void list_vehicles_to_char(vehicle_data *list, char_data *ch, bool large_only, v
 char *obj_color_by_quality(obj_data *obj, char_data *ch);
 char *obj_desc_for_char(obj_data *obj, char_data *ch, int mode);
 struct custom_message *pick_custom_longdesc(char_data *ch);
-void show_character_affects(char_data *ch, char_data *to);
+void show_character_affects(char_data *ch, char_data *to, bool send_page);
 bool show_local_einv(char_data *ch, room_data *room, bool thief_mode);
 void survey_city(char_data *ch, char *argument);
 
