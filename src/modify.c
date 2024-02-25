@@ -674,6 +674,18 @@ void free_page_display(struct page_display **list) {
 
 
 /**
+* Clears a player's page_display without sending it.
+*
+* @param char_data *ch The player.
+*/
+void clear_page_display(char_data *ch) {
+	if (ch && ch->desc) {
+		free_page_display(&ch->desc->page_lines);
+	}
+}
+
+
+/**
 * Ensures nothing is left in the page_displays buffers on all connected
 * descriptors. These should have been flushed by either send_page_display() or
 * free_page_display() by the function that used them.

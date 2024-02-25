@@ -7253,11 +7253,7 @@ ACMD(do_list) {
 	}
 
 	free_shop_temp_list(shop_list);
-	
-	if (ch->desc && ch->desc->page_lines) {
-		// in case
-		free_page_display(&ch->desc->page_lines);
-	}
+	clear_page_display(ch);
 	
 	// clean up currency list
 	HASH_ITER(hh, curt_hash, curt, next_curt) {

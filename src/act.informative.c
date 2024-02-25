@@ -3078,10 +3078,8 @@ ACMD(do_coins) {
 	}
 	
 	if (*argument && !any) {
-		build_page_display(ch, "You have no special currency called '%s'.", argument);
-		if (ch->desc && ch->desc->page_lines) {
-			free_page_display(&ch->desc->page_lines);
-		}
+		msg_to_char(ch, "You have no special currency called '%s'.", argument);
+		clear_page_display(ch);
 	}
 	else if (ch->desc) {	// show currency
 		send_page_display(ch);

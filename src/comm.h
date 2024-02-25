@@ -107,6 +107,7 @@ struct page_display *build_page_display_str(char_data *ch, const char *str);
 struct page_display *build_page_display_col_str(char_data *ch, int cols, bool strict_cols, const char *str);
 struct page_display *build_page_display_prepend(char_data *ch, const char *str);
 void append_page_display_line(struct page_display *line, const char *fmt, ...) __attribute__((format(printf, 2, 3)));
+void clear_page_display(char_data *ch);
 void free_page_display(struct page_display **list);
 void free_page_display_one(struct page_display *pd);
 void send_page_display(char_data *ch);
