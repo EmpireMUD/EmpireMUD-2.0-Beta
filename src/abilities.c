@@ -456,7 +456,7 @@ void show_ability_info(char_data *ch, ability_data *abil, ability_data *parent, 
 		}
 		
 		// build craft display:
-		snprintf(sbuf, sizeof(sbuf), "%s%s", GET_CRAFT_NAME(craft), CRAFT_FLAGGED(craft, CRAFT_LEARNED) ? " (learned)" : "");
+		snprintf(sbuf, sizeof(sbuf), " %s%s", GET_CRAFT_NAME(craft), CRAFT_FLAGGED(craft, CRAFT_LEARNED) ? " (learned)" : "");
 		
 		// needs header?
 		if (count == 0) {
