@@ -3176,7 +3176,7 @@ void do_stat_book(char_data *ch, book_data *book, bool details) {
 		++count;
 		
 		if (details) {
-			add_page_display(ch, "Paragraph %d:\r\n%s", count, para->text);
+			add_page_display(ch, "%sParagraph %d:\r\n%s", (count > 0 ? "\r\n" : ""), count, para->text);
 		}
 		else {
 			// just previews
