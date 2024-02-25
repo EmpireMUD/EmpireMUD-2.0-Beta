@@ -1089,7 +1089,7 @@ void get_shop_items_display(shop_data *shop, char *save_buffer) {
 */
 void do_stat_shop(char_data *ch, shop_data *shop) {
 	char part[MAX_STRING_LENGTH];
-	struct page_display *pd;
+	struct page_display *line;
 	
 	if (!shop) {
 		return;
@@ -1100,13 +1100,13 @@ void do_stat_shop(char_data *ch, shop_data *shop) {
 	
 	// 2nd line
 	if (SHOP_OPEN_TIME(shop) == SHOP_CLOSE_TIME(shop)) {
-		pd = build_page_display(ch, "Times: [\tcalways open\t0]");
+		line = build_page_display(ch, "Times: [\tcalways open\t0]");
 	}
 	else {
-		pd = build_page_display(ch, "Times: [\tc%d%s\t0 - \tc%d%s\t0]", TIME_TO_12H(SHOP_OPEN_TIME(shop)), AM_PM(SHOP_OPEN_TIME(shop)), TIME_TO_12H(SHOP_CLOSE_TIME(shop)), AM_PM(SHOP_CLOSE_TIME(shop)));
+		line = build_page_display(ch, "Times: [\tc%d%s\t0 - \tc%d%s\t0]", TIME_TO_12H(SHOP_OPEN_TIME(shop)), AM_PM(SHOP_OPEN_TIME(shop)), TIME_TO_12H(SHOP_CLOSE_TIME(shop)), AM_PM(SHOP_CLOSE_TIME(shop)));
 	}
 	// still 2nd line
-	append_page_display_line(pd, ", Faction allegiance: [\ty%s\t0]", SHOP_ALLEGIANCE(shop) ? FCT_NAME(SHOP_ALLEGIANCE(shop)) : "none");
+	append_page_display_line(line, ", Faction allegiance: [\ty%s\t0]", SHOP_ALLEGIANCE(shop) ? FCT_NAME(SHOP_ALLEGIANCE(shop)) : "none");
 	
 	sprintbit(SHOP_FLAGS(shop), shop_flags, part, TRUE);
 	build_page_display(ch, "Flags: \tg%s\t0", part);

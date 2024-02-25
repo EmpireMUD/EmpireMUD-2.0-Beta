@@ -4743,7 +4743,7 @@ void show_interaction_display(char_data *ch, struct interaction_item *list, bool
 	struct interaction_item *interact;
 	char quant[16];
 	int count = 0;
-	struct page_display *pd;
+	struct page_display *line;
 	
 	for (interact = list; interact; interact = interact->next) {
 		if (interact_data[interact->type].one_at_a_time) {
@@ -4753,12 +4753,12 @@ void show_interaction_display(char_data *ch, struct interaction_item *list, bool
 			snprintf(quant, sizeof(quant), "%dx", interact->quantity);
 		}
 		
-		pd = build_page_display(ch, "%2d. %s: %s %s (%d) %.2f%%", ++count, interact_types[interact->type], quant, get_interaction_target(interact->type, interact->vnum), interact->vnum, interact->percent);
+		line = build_page_display(ch, "%2d. %s: %s %s (%d) %.2f%%", ++count, interact_types[interact->type], quant, get_interaction_target(interact->type, interact->vnum), interact->vnum, interact->percent);
 		if (isalpha(interact->exclusion_code)) {
-			append_page_display_line(pd, " (%c)", interact->exclusion_code);
+			append_page_display_line(line, " (%c)", interact->exclusion_code);
 		}
 		if (interact->restrictions) {
-			append_page_display_line(pd, " (%s)", get_interaction_restriction_display(interact->restrictions, TRUE));
+			append_page_display_line(line, " (%s)", get_interaction_restriction_display(interact->restrictions, TRUE));
 		}
 	}
 	

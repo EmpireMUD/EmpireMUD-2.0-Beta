@@ -528,7 +528,7 @@ ACMD(do_friends_online) {
 	int count, status;
 	char_data *plr;
 	struct friend_data *friend;
-	struct page_display *pd;
+	struct page_display *line;
 	
 	build_page_display(ch, "Friends online:");
 	count = 0;
@@ -548,10 +548,10 @@ ACMD(do_friends_online) {
 		
 		// seems ok to show
 		++count;
-		pd = build_page_display(ch, " %s", GET_NAME(plr));
+		line = build_page_display(ch, " %s", GET_NAME(plr));
 		
 		if ((friend = find_account_friend(GET_ACCOUNT(ch), GET_ACCOUNT_ID(plr))) && friend->original_name && strcmp(GET_NAME(plr), friend->original_name)) {
-			append_page_display_line(pd, " (%s)", friend->original_name);
+			append_page_display_line(line, " (%s)", friend->original_name);
 		}
 	}
 	

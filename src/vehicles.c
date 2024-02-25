@@ -4416,7 +4416,7 @@ void do_stat_vehicle(char_data *ch, vehicle_data *veh, bool details) {
 	bool comma;
 	int count, found;
 	struct string_hash *str_iter, *next_str, *str_hash = NULL;
-	struct page_display *pd;
+	struct page_display *line;
 	
 	if (!veh) {
 		return;
@@ -4441,25 +4441,25 @@ void do_stat_vehicle(char_data *ch, vehicle_data *veh, bool details) {
 			}
 		}
 		else {
-			pd = build_page_display(ch, "Extra descs:\tc");
+			line = build_page_display(ch, "Extra descs:\tc");
 			LL_FOREACH(VEH_EX_DESCS(veh), desc) {
-				append_page_display_line(pd, " %s", desc->keyword);
+				append_page_display_line(line, " %s", desc->keyword);
 			}
-			append_page_display_line(pd, "\t0");
+			append_page_display_line(line, "\t0");
 		}
 	}
 	
 	// icons:
 	if (VEH_ICON(veh) || VEH_HALF_ICON(veh) || VEH_QUARTER_ICON(veh)) {
-		pd = build_page_display_str(ch, "");
+		line = build_page_display_str(ch, "");
 		if (VEH_ICON(veh)) {
-			append_page_display_line(pd, "Full Icon: %s\t0", one_icon_display(VEH_ICON(veh), NULL));
+			append_page_display_line(line, "Full Icon: %s\t0", one_icon_display(VEH_ICON(veh), NULL));
 		}
 		if (VEH_HALF_ICON(veh)) {
-			append_page_display_line(pd, "%sHalf Icon: %s\t0", (VEH_ICON(veh) ? "  " : ""), one_icon_display(VEH_HALF_ICON(veh), NULL));
+			append_page_display_line(line, "%sHalf Icon: %s\t0", (VEH_ICON(veh) ? "  " : ""), one_icon_display(VEH_HALF_ICON(veh), NULL));
 		}
 		if (VEH_QUARTER_ICON(veh)) {
-			append_page_display_line(pd, "%sQuarter Icon: %s\t0", ((VEH_ICON(veh) || VEH_HALF_ICON(veh)) ? "  " : ""), one_icon_display(VEH_QUARTER_ICON(veh), NULL));
+			append_page_display_line(line, "%sQuarter Icon: %s\t0", ((VEH_ICON(veh) || VEH_HALF_ICON(veh)) ? "  " : ""), one_icon_display(VEH_QUARTER_ICON(veh), NULL));
 		}
 	}
 	
@@ -4513,18 +4513,18 @@ void do_stat_vehicle(char_data *ch, vehicle_data *veh, bool details) {
 	}
 	
 	if (IN_ROOM(veh)) {
-		pd = build_page_display(ch, "In room: [%d] %s, Led by: %s, ", GET_ROOM_VNUM(IN_ROOM(veh)), get_room_name(IN_ROOM(veh), FALSE), VEH_LED_BY(veh) ? PERS(VEH_LED_BY(veh), ch, TRUE) : "nobody");
-		append_page_display_line(pd, "Sitting on: %s, ", VEH_SITTING_ON(veh) ? PERS(VEH_SITTING_ON(veh), ch, TRUE) : "nobody");
-		append_page_display_line(pd, "Driven by: %s", VEH_DRIVER(veh) ? PERS(VEH_DRIVER(veh), ch, TRUE) : "nobody");
+		line = build_page_display(ch, "In room: [%d] %s, Led by: %s, ", GET_ROOM_VNUM(IN_ROOM(veh)), get_room_name(IN_ROOM(veh), FALSE), VEH_LED_BY(veh) ? PERS(VEH_LED_BY(veh), ch, TRUE) : "nobody");
+		append_page_display_line(line, "Sitting on: %s, ", VEH_SITTING_ON(veh) ? PERS(VEH_SITTING_ON(veh), ch, TRUE) : "nobody");
+		append_page_display_line(line, "Driven by: %s", VEH_DRIVER(veh) ? PERS(VEH_DRIVER(veh), ch, TRUE) : "nobody");
 	}
 	
 	if (VEH_DEPLETION(veh)) {
-		pd = build_page_display(ch, "Depletion: ");
+		line = build_page_display(ch, "Depletion: ");
 		
 		comma = FALSE;
 		for (dep = VEH_DEPLETION(veh); dep; dep = dep->next) {
 			if (dep->type < NUM_DEPLETION_TYPES) {
-				append_page_display_line(pd, "%s%s (%d)", comma ? ", " : "", depletion_types[dep->type], dep->count);
+				append_page_display_line(line, "%s%s (%d)", comma ? ", " : "", depletion_types[dep->type], dep->count);
 				comma = TRUE;
 			}
 		}
@@ -4536,7 +4536,7 @@ void do_stat_vehicle(char_data *ch, vehicle_data *veh, bool details) {
 		}
 		
 		found = 0;
-		pd = NULL;
+		line = NULL;
 		sprintf(part, "Contents:\tg");
 		HASH_ITER(hh, str_hash, str_iter, next_str) {
 			if (str_iter->count == 1) {
@@ -4550,16 +4550,16 @@ void do_stat_vehicle(char_data *ch, vehicle_data *veh, bool details) {
 				if (next_str) {
 					strcat(part, ",");
 				}
-				pd = build_page_display_str(ch, part);
+				line = build_page_display_str(ch, part);
 				*part = '\0';
 				found = 0;
 			}
 		}
 		if (*part) {
-			pd = build_page_display_str(ch, part);
+			line = build_page_display_str(ch, part);
 		}
-		if (pd) {
-			append_page_display_line(pd, "\t0");
+		if (line) {
+			append_page_display_line(line, "\t0");
 		}
 		
 		free_string_hash(&str_hash);
@@ -4697,7 +4697,7 @@ void olc_show_vehicle(char_data *ch) {
 	struct custom_message *custm;
 	struct spawn_info *spawn;
 	int count;
-	struct page_display *pd;
+	struct page_display *line;
 	
 	if (!veh) {
 		return;
@@ -4710,9 +4710,9 @@ void olc_show_vehicle(char_data *ch) {
 	build_page_display(ch, "<%slongdescription\t0>\r\n%s", OLC_LABEL_STR(VEH_LONG_DESC(veh), default_vehicle_long_desc), NULLSAFE(VEH_LONG_DESC(veh)));
 	build_page_display(ch, "<%slookdescription\t0>\r\n%s", OLC_LABEL_STR(VEH_LOOK_DESC(veh), ""), NULLSAFE(VEH_LOOK_DESC(veh)));
 	
-	pd = build_page_display(ch, "<%sicon\t0> %s\t0 %s  ", OLC_LABEL_STR(VEH_ICON(veh), ""), VEH_ICON(veh) ? VEH_ICON(veh) : "none", VEH_ICON(veh) ? show_color_codes(VEH_ICON(veh)) : "");
-	append_page_display_line(pd, "<%shalficon\t0> %s\t0 %s  ", OLC_LABEL_STR(VEH_HALF_ICON(veh), ""), VEH_HALF_ICON(veh) ? VEH_HALF_ICON(veh) : "none", VEH_HALF_ICON(veh) ? show_color_codes(VEH_HALF_ICON(veh)) : "");
-	append_page_display_line(pd, "<%squartericon\t0> %s\t0 %s", OLC_LABEL_STR(VEH_QUARTER_ICON(veh), ""), VEH_QUARTER_ICON(veh) ? VEH_QUARTER_ICON(veh) : "none", VEH_QUARTER_ICON(veh) ? show_color_codes(VEH_QUARTER_ICON(veh)) : "");
+	line = build_page_display(ch, "<%sicon\t0> %s\t0 %s  ", OLC_LABEL_STR(VEH_ICON(veh), ""), VEH_ICON(veh) ? VEH_ICON(veh) : "none", VEH_ICON(veh) ? show_color_codes(VEH_ICON(veh)) : "");
+	append_page_display_line(line, "<%shalficon\t0> %s\t0 %s  ", OLC_LABEL_STR(VEH_HALF_ICON(veh), ""), VEH_HALF_ICON(veh) ? VEH_HALF_ICON(veh) : "none", VEH_HALF_ICON(veh) ? show_color_codes(VEH_HALF_ICON(veh)) : "");
+	append_page_display_line(line, "<%squartericon\t0> %s\t0 %s", OLC_LABEL_STR(VEH_QUARTER_ICON(veh), ""), VEH_QUARTER_ICON(veh) ? VEH_QUARTER_ICON(veh) : "none", VEH_QUARTER_ICON(veh) ? show_color_codes(VEH_QUARTER_ICON(veh)) : "");
 	
 	sprintbit(VEH_FLAGS(veh), vehicle_flags, lbuf, TRUE);
 	build_page_display(ch, "<%sflags\t0> %s", OLC_LABEL_VAL(VEH_FLAGS(veh), NOBITS), lbuf);

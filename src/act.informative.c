@@ -910,18 +910,18 @@ void display_score_to_char(char_data *ch, char_data *to) {
 	int i, j, cols, count, pts, val, temperature;
 	empire_data *emp;
 	struct time_info_data playing_time;
-	struct page_display *pd;
+	struct page_display *line;
 
 
 	build_page_display(to, " +----------------------------- EmpireMUD 2.0b5 -----------------------------+");
 	
 	// row 1 col 1: name
-	pd = build_page_display(to, "  Name: %-18.18s", PERS(ch, ch, 1));
+	line = build_page_display(to, "  Name: %-18.18s", PERS(ch, ch, 1));
 
 	// row 1 col 2: class
 	get_player_skill_string(ch, lbuf, TRUE);
-	append_page_display_line(pd, " Skill: %-17.17s", lbuf);
-	append_page_display_line(pd, " Level: %d (%d)", GET_COMPUTED_LEVEL(ch), GET_SKILL_LEVEL(ch));
+	append_page_display_line(line, " Skill: %-17.17s", lbuf);
+	append_page_display_line(line, " Level: %d (%d)", GET_COMPUTED_LEVEL(ch), GET_SKILL_LEVEL(ch));
 
 	// row 1 col 3: levels
 
@@ -934,11 +934,11 @@ void display_score_to_char(char_data *ch, char_data *to) {
 	}
 	playing_time = *real_time_passed((time(0) - ch->player.time.logon) + ch->player.time.played, 0);
 	sprintf(buf1, "%dd, %dh", playing_time.day, playing_time.hours);
-	pd = build_page_display(to, "  Age: %-19.19s Play Time: %-13.13s", buf, buf1);
+	line = build_page_display(to, "  Age: %-19.19s Play Time: %-13.13s", buf, buf1);
 	
 	// row 2 col 3: rank
 	if ((emp = GET_LOYALTY(ch)) && !IS_NPC(ch)) {
-		append_page_display_line(pd, " Rank: %s&0", EMPIRE_RANK(emp, GET_RANK(ch)-1));
+		append_page_display_line(line, " Rank: %s&0", EMPIRE_RANK(emp, GET_RANK(ch)-1));
 	}
 	
 	if (GET_BONUS_TRAITS(ch)) {
@@ -950,15 +950,15 @@ void display_score_to_char(char_data *ch, char_data *to) {
 	
 	// row 1 col 1: health, 6 color codes = 12 invisible characters
 	sprintf(lbuf, "&g%d&0/&g%d&0 &g%+d&0/%ds", GET_HEALTH(ch), GET_MAX_HEALTH(ch), health_gain(ch, TRUE), SECS_PER_REAL_UPDATE);
-	pd = build_page_display(to, "  Health: %-28.28s", lbuf);
+	line = build_page_display(to, "  Health: %-28.28s", lbuf);
 
 	// row 1 col 2: move, 6 color codes = 12 invisible characters
 	sprintf(lbuf, "&y%d&0/&y%d&0 &y%+d&0/%ds", GET_MOVE(ch), GET_MAX_MOVE(ch), move_gain(ch, TRUE), SECS_PER_REAL_UPDATE);
-	append_page_display_line(pd, " Move: %-30.30s", lbuf);
+	append_page_display_line(line, " Move: %-30.30s", lbuf);
 	
 	// row 1 col 3: mana, 6 color codes = 12 invisible characters
 	sprintf(lbuf, "&c%d&0/&c%d&0 &c%+d&0/%ds", GET_MANA(ch), GET_MAX_MANA(ch), mana_gain(ch, TRUE), SECS_PER_REAL_UPDATE);
-	append_page_display_line(pd, " Mana: %-30.30s", lbuf);
+	append_page_display_line(line, " Mana: %-30.30s", lbuf);
 	
 	// row 2 col 1: conditions
 	*lbuf = '\0';
@@ -986,10 +986,10 @@ void display_score_to_char(char_data *ch, char_data *to) {
 	}
 	// gotta count the color codes to determine width
 	count = 37 + color_code_length(lbuf);
-	pd = build_page_display(to, "  Conditions: %-*.*s", count, count, lbuf);
+	line = build_page_display(to, "  Conditions: %-*.*s", count, count, lbuf);
 	
 	if (IS_VAMPIRE(ch)) {
-		append_page_display_line(pd, " Blood: &r%d&0/&r%d&0-&r%d&0/hr", GET_BLOOD(ch), GET_MAX_BLOOD(ch), MAX(0, GET_BLOOD_UPKEEP(ch)));
+		append_page_display_line(line, " Blood: &r%d&0/&r%d&0-&r%d&0/hr", GET_BLOOD(ch), GET_MAX_BLOOD(ch), MAX(0, GET_BLOOD_UPKEEP(ch)));
 	}
 	
 	build_page_display(to, " +------------------------------- Attributes --------------------------------+");
@@ -1035,10 +1035,10 @@ void display_score_to_char(char_data *ch, char_data *to) {
 			
 			cols = 25 + color_code_length(lbuf);
 			if (!count) {
-				pd = build_page_display(to, " %-*.*s&0", cols, cols, lbuf);
+				line = build_page_display(to, " %-*.*s&0", cols, cols, lbuf);
 			}
 			else {
-				append_page_display_line(pd, "%-*.*s&0", cols, cols, lbuf);
+				append_page_display_line(line, "%-*.*s&0", cols, cols, lbuf);
 			}
 			
 			if (++count == 3) {
@@ -2723,7 +2723,7 @@ ACMD(do_buffs) {
 	struct affected_type *aff;
 	char_data *caster;
 	struct group_member_data *mem;
-	struct page_display *pd;
+	struct page_display *line;
 	struct player_ability_data *plab, *next_plab;
 	
 	if (IS_NPC(ch)) {
@@ -2754,7 +2754,7 @@ ACMD(do_buffs) {
 		// build output
 		any = TRUE;
 		error = FALSE;
-		pd = build_page_display(ch, " %s:", ABIL_NAME(abil));
+		line = build_page_display(ch, " %s:", ABIL_NAME(abil));
 		
 		// check self?
 		if (!IS_SET(ABIL_TARGETS(abil), ATAR_NOT_SELF)) {
@@ -2774,11 +2774,11 @@ ACMD(do_buffs) {
 				}
 			}
 			if (!own && other) {
-				append_page_display_line(pd, " \tyon self from %s\t0", (caster ? GET_NAME(caster) : "other caster"));
+				append_page_display_line(line, " \tyon self from %s\t0", (caster ? GET_NAME(caster) : "other caster"));
 				error = TRUE;
 			}
 			else if (!own) {
-				append_page_display_line(pd, " \trmissing on self\t0");
+				append_page_display_line(line, " \trmissing on self\t0");
 				error = TRUE;
 			}
 		}
@@ -2801,11 +2801,11 @@ ACMD(do_buffs) {
 				}
 			}
 			if (!own && other) {
-				append_page_display_line(pd, "%s \tyon companion from %s\t0", (error ? "," : ""), (caster ? GET_NAME(caster) : "other caster"));
+				append_page_display_line(line, "%s \tyon companion from %s\t0", (error ? "," : ""), (caster ? GET_NAME(caster) : "other caster"));
 				error = TRUE;
 			}
 			else if (!own) {
-				append_page_display_line(pd, "%s \trmissing on companion\t0", (error ? "," : ""));
+				append_page_display_line(line, "%s \trmissing on companion\t0", (error ? "," : ""));
 				error = TRUE;
 			}
 		}
@@ -2833,11 +2833,11 @@ ACMD(do_buffs) {
 					}
 				}
 				if (!own && other) {
-					append_page_display_line(pd, "%s \tyon %s from %s\t0", (error ? "," : ""), GET_NAME(mem->member), (caster ? GET_NAME(caster) : "other caster"));
+					append_page_display_line(line, "%s \tyon %s from %s\t0", (error ? "," : ""), GET_NAME(mem->member), (caster ? GET_NAME(caster) : "other caster"));
 					error = TRUE;
 				}
 				else if (!own) {
-					append_page_display_line(pd, "%s \trmissing on %s\t0", (error ? "," : ""), GET_NAME(mem->member));
+					append_page_display_line(line, "%s \trmissing on %s\t0", (error ? "," : ""), GET_NAME(mem->member));
 					error = TRUE;
 				}
 			}
@@ -2845,7 +2845,7 @@ ACMD(do_buffs) {
 		
 		// ok?
 		if (!error) {
-			append_page_display_line(pd, " \tgok\t0");
+			append_page_display_line(line, " \tgok\t0");
 		}
 	}
 	

@@ -1315,7 +1315,7 @@ void olc_show_building(char_data *ch) {
 	bool is_room = IS_SET(GET_BLD_FLAGS(bdg), BLD_ROOM) ? TRUE : FALSE;
 	struct spawn_info *spawn;
 	int count;
-	struct page_display *pd;
+	struct page_display *line;
 	
 	if (!bdg) {
 		return;
@@ -1327,9 +1327,9 @@ void olc_show_building(char_data *ch) {
 	
 	if (!is_room) {
 		if (BLD_FLAGGED(bdg, BLD_OPEN) || GET_BLD_HALF_ICON(bdg) || GET_BLD_QUARTER_ICON(bdg)) {
-			pd = build_page_display(ch, "<%sicon\t0> %s\t0  ", OLC_LABEL_STR(GET_BLD_ICON(bdg), default_building_icon), GET_BLD_ICON(bdg) ? one_icon_display(GET_BLD_ICON(bdg), NULL) : "none");
-			append_page_display_line(pd, "<%shalficon\t0> %s\t0  ", OLC_LABEL_STR(GET_BLD_HALF_ICON(bdg), default_building_icon), GET_BLD_HALF_ICON(bdg) ? one_icon_display(GET_BLD_HALF_ICON(bdg), NULL) : "none");
-			append_page_display_line(pd, "<%squartericon\t0> %s\t0", OLC_LABEL_STR(GET_BLD_QUARTER_ICON(bdg), default_building_icon), GET_BLD_QUARTER_ICON(bdg) ? one_icon_display(GET_BLD_QUARTER_ICON(bdg), NULL) : "none");
+			line = build_page_display(ch, "<%sicon\t0> %s\t0  ", OLC_LABEL_STR(GET_BLD_ICON(bdg), default_building_icon), GET_BLD_ICON(bdg) ? one_icon_display(GET_BLD_ICON(bdg), NULL) : "none");
+			append_page_display_line(line, "<%shalficon\t0> %s\t0  ", OLC_LABEL_STR(GET_BLD_HALF_ICON(bdg), default_building_icon), GET_BLD_HALF_ICON(bdg) ? one_icon_display(GET_BLD_HALF_ICON(bdg), NULL) : "none");
+			append_page_display_line(line, "<%squartericon\t0> %s\t0", OLC_LABEL_STR(GET_BLD_QUARTER_ICON(bdg), default_building_icon), GET_BLD_QUARTER_ICON(bdg) ? one_icon_display(GET_BLD_QUARTER_ICON(bdg), NULL) : "none");
 		}
 		else {
 			build_page_display(ch, "<%sicon\t0> %s\t0", OLC_LABEL_STR(GET_BLD_ICON(bdg), default_building_icon), GET_BLD_ICON(bdg) ? one_icon_display(GET_BLD_ICON(bdg), NULL) : "none");

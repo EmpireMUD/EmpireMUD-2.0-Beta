@@ -1650,7 +1650,7 @@ void do_stat_attack_message(char_data *ch, attack_message_data *amd, bool detail
 	char *to_show;
 	int count, iter;
 	struct attack_message_set *ams, *next_ams;
-	struct page_display *pd;
+	struct page_display *line;
 	
 	if (!amd) {
 		return;
@@ -1670,11 +1670,11 @@ void do_stat_attack_message(char_data *ch, attack_message_data *amd, bool detail
 		build_page_display(ch, "Strings: [\ty%s\t0, \ty%s\t0, \ty%s\t0]", NULLSAFE(ATTACK_FIRST_PERSON(amd)), NULLSAFE(ATTACK_THIRD_PERSON(amd)), NULLSAFE(ATTACK_NOUN(amd)));
 		
 		// Damage, Weapon, Speeds (all same line)
-		pd = build_page_display(ch, "Damage type: [\tg%s\t0], Weapon type: [\tg%s\t0], Speeds: [", damage_types[ATTACK_DAMAGE_TYPE(amd)], weapon_types[ATTACK_WEAPON_TYPE(amd)]);
+		line = build_page_display(ch, "Damage type: [\tg%s\t0], Weapon type: [\tg%s\t0], Speeds: [", damage_types[ATTACK_DAMAGE_TYPE(amd)], weapon_types[ATTACK_WEAPON_TYPE(amd)]);
 		for (iter = 0; iter < NUM_ATTACK_SPEEDS; ++iter) {
-			append_page_display_line(pd, "%s\tc%.1f\t0", iter > 0 ? " | " : "", ATTACK_SPEED(amd, iter));
+			append_page_display_line(line, "%s\tc%.1f\t0", iter > 0 ? " | " : "", ATTACK_SPEED(amd, iter));
 		}
-		append_page_display_line(pd, "]");
+		append_page_display_line(line, "]");
 	}
 	
 	build_page_display(ch, "Death log: %s", ATTACK_DEATH_LOG(amd) ? ATTACK_DEATH_LOG(amd) : "(default)");

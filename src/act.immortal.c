@@ -3206,19 +3206,19 @@ void do_stat_book(char_data *ch, book_data *book, bool details) {
 */
 void do_stat_building(char_data *ch, bld_data *bdg, bool details) {
 	char lbuf[MAX_STRING_LENGTH];
-	struct page_display *pd;
+	struct page_display *line;
 	
 	build_page_display(ch, "Building VNum: [&c%d&0], Name: '&c%s&0'", GET_BLD_VNUM(bdg), GET_BLD_NAME(bdg));
 	
 	build_page_display(ch, "Room Title: %s", GET_BLD_TITLE(bdg));
 	
 	// icon line
-	pd = build_page_display(ch, "Icon: %s&0", GET_BLD_ICON(bdg) ? one_icon_display(GET_BLD_ICON(bdg), NULL) : "none");
+	line = build_page_display(ch, "Icon: %s&0", GET_BLD_ICON(bdg) ? one_icon_display(GET_BLD_ICON(bdg), NULL) : "none");
 	if (GET_BLD_HALF_ICON(bdg)) {
-		append_page_display_line(pd, "  Half Icon: %s&0", GET_BLD_HALF_ICON(bdg) ? one_icon_display(GET_BLD_HALF_ICON(bdg), NULL) : "none");
+		append_page_display_line(line, "  Half Icon: %s&0", GET_BLD_HALF_ICON(bdg) ? one_icon_display(GET_BLD_HALF_ICON(bdg), NULL) : "none");
 	}
 	if (GET_BLD_QUARTER_ICON(bdg)) {
-		append_page_display_line(pd, "  Quarter Icon: %s&0", GET_BLD_QUARTER_ICON(bdg) ? one_icon_display(GET_BLD_QUARTER_ICON(bdg), NULL) : "none");
+		append_page_display_line(line, "  Quarter Icon: %s&0", GET_BLD_QUARTER_ICON(bdg) ? one_icon_display(GET_BLD_QUARTER_ICON(bdg), NULL) : "none");
 	}
 	
 	if (GET_BLD_DESC(bdg) && *GET_BLD_DESC(bdg)) {
@@ -3312,7 +3312,7 @@ void do_stat_character(char_data *ch, char_data *k, bool details) {
 	struct over_time_effect_type *dot;
 	struct affected_type *aff;
 	archetype_data *arch;
-	struct page_display *pd;
+	struct page_display *line;
 	
 	bool is_proto = (IS_NPC(k) && k == mob_proto(GET_MOB_VNUM(k)));
 	
@@ -3366,13 +3366,13 @@ void do_stat_character(char_data *ch, char_data *k, bool details) {
 		get_player_skill_string(k, lbuf, TRUE);
 		build_page_display(ch, "Access Level: [&c%d&0], Class: [%s/&c%s&0], Skill Level: [&c%d&0], Gear Level: [&c%d&0], Total: [&c%d&0/&c%d&0]", GET_ACCESS_LEVEL(k), lbuf, class_role[(int) GET_CLASS_ROLE(k)], GET_SKILL_LEVEL(k), GET_GEAR_LEVEL(k), IN_ROOM(k) ? GET_COMPUTED_LEVEL(k) : GET_LAST_KNOWN_LEVEL(k), GET_HIGHEST_KNOWN_LEVEL(k));
 		
-		pd = build_page_display(ch, "Archetypes:");
+		line = build_page_display(ch, "Archetypes:");
 		for (iter = 0, count = 0; iter < NUM_ARCHETYPE_TYPES; ++iter) {
 			if ((arch = archetype_proto(CREATION_ARCHETYPE(k, iter)))) {
-				append_page_display_line(pd, "%s%s", (count++ > 0) ? ", " : " ", GET_ARCH_NAME(arch));
+				append_page_display_line(line, "%s%s", (count++ > 0) ? ", " : " ", GET_ARCH_NAME(arch));
 			}
 		}
-		append_page_display_line(pd, "%s", count ? "" : " none");
+		append_page_display_line(line, "%s", count ? "" : " none");
 		
 		coin_string(GET_PLAYER_COINS(k), lbuf);
 		build_page_display(ch, "Coins: %s", lbuf);
@@ -3431,14 +3431,14 @@ void do_stat_character(char_data *ch, char_data *k, bool details) {
 	}
 
 	sprinttype(GET_POS(k), position_types, buf2, sizeof(buf2), "UNDEFINED");
-	pd = build_page_display(ch, "Pos: %s, Fighting: %s", buf2, (FIGHTING(k) ? GET_NAME(FIGHTING(k)) : "Nobody"));
+	line = build_page_display(ch, "Pos: %s, Fighting: %s", buf2, (FIGHTING(k) ? GET_NAME(FIGHTING(k)) : "Nobody"));
 
 	if (IS_NPC(k)) {
-		append_page_display_line(pd, ", Attack: %d %s, Move: %s, Size: %s", MOB_ATTACK_TYPE(k), get_attack_name_by_vnum(MOB_ATTACK_TYPE(k)), mob_move_types[(int)MOB_MOVE_TYPE(k)], size_types[GET_SIZE(k)]);
+		append_page_display_line(line, ", Attack: %d %s, Move: %s, Size: %s", MOB_ATTACK_TYPE(k), get_attack_name_by_vnum(MOB_ATTACK_TYPE(k)), mob_move_types[(int)MOB_MOVE_TYPE(k)], size_types[GET_SIZE(k)]);
 	}
 	if (k->desc) {
 		sprinttype(STATE(k->desc), connected_types, buf2, sizeof(buf2), "UNDEFINED");
-		append_page_display_line(pd, ", Connected: %s", buf2);
+		append_page_display_line(line, ", Connected: %s", buf2);
 	}
 
 	if (IS_NPC(k)) {
@@ -3466,16 +3466,16 @@ void do_stat_character(char_data *ch, char_data *k, bool details) {
 	}
 
 	if (!is_proto) {
-		pd = build_page_display(ch, "Carried items: %d/%d; ", IS_CARRYING_N(k), CAN_CARRY_N(k));
+		line = build_page_display(ch, "Carried items: %d/%d; ", IS_CARRYING_N(k), CAN_CARRY_N(k));
 		DL_COUNT2(k->carrying, j, i, next_content);	// TODO these var names are absurd
-		append_page_display_line(pd, "Items in: inventory: %d, ", i);
+		append_page_display_line(line, "Items in: inventory: %d, ", i);
 
 		for (i = 0, i2 = 0; i < NUM_WEARS; i++) {
 			if (GET_EQ(k, i)) {
 				i2++;
 			}
 		}
-		append_page_display_line(pd, "eq: %d", i2);
+		append_page_display_line(line, "eq: %d", i2);
 	}
 
 	if (IS_NPC(k) && k->interactions) {
@@ -3535,20 +3535,20 @@ void do_stat_character(char_data *ch, char_data *k, bool details) {
 	// cooldowns
 	if (k->cooldowns) {
 		found = FALSE;
-		pd = build_page_display(ch, "Cooldowns: ");
+		line = build_page_display(ch, "Cooldowns: ");
 		
 		for (cool = k->cooldowns; cool; cool = cool->next) {
 			diff = cool->expire_time - time(0);
 			
 			if (diff > 0) {
-				append_page_display_line(pd, "%s&c%s&0 %s", (found ? ", ": ""), get_generic_name_by_vnum(cool->type), colon_time(diff, FALSE, NULL));
+				append_page_display_line(line, "%s&c%s&0 %s", (found ? ", ": ""), get_generic_name_by_vnum(cool->type), colon_time(diff, FALSE, NULL));
 				
 				found = TRUE;
 			}
 		}
 		
 		if (!found) {
-			append_page_display_line(pd, "none");
+			append_page_display_line(line, "none");
 		}
 	}
 
@@ -3632,7 +3632,7 @@ void do_stat_craft(char_data *ch, craft_data *craft) {
 	ability_data *abil;
 	bld_data *bld;
 	int seconds;
-	struct page_display *pd;
+	struct page_display *line;
 	
 	build_page_display(ch, "Name: '&y%s&0', Vnum: [&g%d&0], Type: &c%s&0", GET_CRAFT_NAME(craft), GET_CRAFT_VNUM(craft), craft_types[GET_CRAFT_TYPE(craft)]);
 	
@@ -3654,11 +3654,11 @@ void do_stat_craft(char_data *ch, craft_data *craft) {
 	if ((abil = find_ability_by_vnum(GET_CRAFT_ABILITY(craft))) && ABIL_ASSIGNED_SKILL(abil) != NULL) {
 		sprintf(lbuf + strlen(lbuf), " ([%d] %s %d)", SKILL_VNUM(ABIL_ASSIGNED_SKILL(abil)), SKILL_NAME(ABIL_ASSIGNED_SKILL(abil)), ABIL_SKILL_LEVEL(abil));
 	}
-	pd = build_page_display(ch, "Ability: &y%s&0, Level: &g%d&0", lbuf, GET_CRAFT_MIN_LEVEL(craft));
+	line = build_page_display(ch, "Ability: &y%s&0, Level: &g%d&0", lbuf, GET_CRAFT_MIN_LEVEL(craft));
 	
 	if (!CRAFT_IS_BUILDING(craft) && !CRAFT_IS_VEHICLE(craft)) {
 		seconds = GET_CRAFT_TIME(craft) * ACTION_CYCLE_TIME;
-		append_page_display_line(pd, ", Time: [&g%d action tick%s&0 | &g%s&0]", GET_CRAFT_TIME(craft), PLURAL(GET_CRAFT_TIME(craft)), colon_time(seconds, FALSE, NULL));
+		append_page_display_line(line, ", Time: [&g%d action tick%s&0 | &g%s&0]", GET_CRAFT_TIME(craft), PLURAL(GET_CRAFT_TIME(craft)), colon_time(seconds, FALSE, NULL));
 	}
 
 	sprintbit(GET_CRAFT_FLAGS(craft), craft_flags, lbuf, TRUE);
@@ -3771,7 +3771,7 @@ void do_stat_empire(char_data *ch, empire_data *emp) {
 	player_index_data *index;
 	char line[256];
 	bool any;
-	struct page_display *pd;
+	struct page_display *pline;
 	
 	// determine rank by iterating over the sorted empire list
 	found_rank = 0;
@@ -3786,9 +3786,9 @@ void do_stat_empire(char_data *ch, empire_data *emp) {
 	build_page_display(ch, "Leader: [\ty%s\t0], Created: [\ty%-24.24s\t0], Score/rank: [\tc%d #%d\t0]", (index = find_player_index_by_idnum(EMPIRE_LEADER(emp))) ? index->fullname : "UNKNOWN", ctime(&EMPIRE_CREATE_TIME(emp)), get_total_score(emp), found_rank);
 	
 	ptime = summarize_weekly_playtime(emp);
-	pd = build_page_display(ch, "Last %d weeks playtime: ", PLAYTIME_WEEKS_TO_TRACK);
+	pline = build_page_display(ch, "Last %d weeks playtime: ", PLAYTIME_WEEKS_TO_TRACK);
 	for (iter = 0; iter < PLAYTIME_WEEKS_TO_TRACK; ++iter) {
-		append_page_display_line(pd, "%s%s", (iter > 0 ? ", " : ""), simple_time_since(time(0) - ptime[iter]));
+		append_page_display_line(pline, "%s%s", (iter > 0 ? ", " : ""), simple_time_since(time(0) - ptime[iter]));
 	}
 	
 	if (EMPIRE_NEXT_TIMEOUT(emp) > time(0)) {
@@ -3804,24 +3804,24 @@ void do_stat_empire(char_data *ch, empire_data *emp) {
 	sprintbit(EMPIRE_FRONTIER_TRAITS(emp), empire_trait_types, line, TRUE);
 	build_page_display(ch, "Frontier traits: \tc%s\t0", line);
 
-	pd = build_page_display(ch, "Technology: \tg");
+	pline = build_page_display(ch, "Technology: \tg");
 	for (iter = 0, len = 0, any = FALSE; iter < NUM_TECHS; ++iter) {
 		if (EMPIRE_HAS_TECH(emp, iter)) {
 			any = TRUE;
 			if (len > 0 && len + strlen(empire_tech_types[iter]) + 3 >= 80) {	// new line
-				append_page_display_line(pd, ",\r\n%s", empire_tech_types[iter]);
+				append_page_display_line(pline, ",\r\n%s", empire_tech_types[iter]);
 				len = strlen(empire_tech_types[iter]);
 			}
 			else {	// same line
-				append_page_display_line(pd, "%s%s", (len > 0) ? ", " : "", empire_tech_types[iter]);
+				append_page_display_line(pline, "%s%s", (len > 0) ? ", " : "", empire_tech_types[iter]);
 				len += strlen(empire_tech_types[iter]) + 2;
 			}
 		}
 	}
 	if (!any) {
-		append_page_display_line(pd, "none");
+		append_page_display_line(pline, "none");
 	}
-	append_page_display_line(pd, "\t0");	// end tech
+	append_page_display_line(pline, "\t0");	// end tech
 	
 	build_page_display(ch, "Members: [\tc%d\t0/\tc%d\t0], Citizens: [\tc%d\t0], Military: [\tc%d\t0]", EMPIRE_MEMBERS(emp), EMPIRE_TOTAL_MEMBER_COUNT(emp), EMPIRE_POPULATION(emp), EMPIRE_MILITARY(emp));
 	build_page_display(ch, "Territory: [\tc%d\t0/\tc%d\t0], In-City: [\tc%d\t0], Outskirts: [\tc%d\t0/\tc%d\t0], Frontier: [\tc%d\t0/\tc%d\t0]", EMPIRE_TERRITORY(emp, TER_TOTAL), land_can_claim(emp, TER_TOTAL), EMPIRE_TERRITORY(emp, TER_CITY), EMPIRE_TERRITORY(emp, TER_OUTSKIRTS), land_can_claim(emp, TER_OUTSKIRTS), EMPIRE_TERRITORY(emp, TER_FRONTIER), land_can_claim(emp, TER_FRONTIER));
@@ -3831,15 +3831,15 @@ void do_stat_empire(char_data *ch, empire_data *emp) {
 	
 	// progress points by category
 	total = 0;
-	pd = build_page_display_str(ch, "");
+	pline = build_page_display_str(ch, "");
 	for (iter = 1; iter < NUM_PROGRESS_TYPES; ++iter) {
 		total += EMPIRE_PROGRESS_POINTS(emp, iter);
-		append_page_display_line(pd, "%s: [\ty%d\t0], ", progress_types[iter], EMPIRE_PROGRESS_POINTS(emp, iter));
+		append_page_display_line(pline, "%s: [\ty%d\t0], ", progress_types[iter], EMPIRE_PROGRESS_POINTS(emp, iter));
 	}
-	append_page_display_line(pd, "Total: [\ty%d\t0]", total);
+	append_page_display_line(pline, "Total: [\ty%d\t0]", total);
 	
 	// attributes
-	pd = build_page_display_str(ch, "");
+	pline = build_page_display_str(ch, "");
 	for (iter = 0, len = 0; iter < NUM_EMPIRE_ATTRIBUTES; ++iter) {
 		switch (iter) {
 			case EATT_TERRITORY_PER_GREATNESS: {
@@ -3853,11 +3853,11 @@ void do_stat_empire(char_data *ch, empire_data *emp) {
 		}
 		
 		if (len > 0 && len + strlen(line) + 2 >= 80) {	// start new line
-			append_page_display_line(pd, "\r\n%s", line);
+			append_page_display_line(pline, "\r\n%s", line);
 			len = strlen(line);
 		}
 		else {	// same line
-			append_page_display_line(pd, "%s%s", (len > 0) ? ", " : "", line);
+			append_page_display_line(pline, "%s%s", (len > 0) ? ", " : "", line);
 			len += strlen(line) + 2;
 		}
 	}
@@ -3959,7 +3959,7 @@ void do_stat_object(char_data *ch, obj_data *j, bool details) {
 	player_index_data *index;
 	crop_data *cp;
 	bool any;
-	struct page_display *pd;
+	struct page_display *line;
 
 	build_page_display(ch, "Name: '&y%s&0', Keywords: %s", GET_OBJ_DESC(j, ch, OBJ_DESC_SHORT), GET_OBJ_KEYWORDS(j));
 
@@ -4056,10 +4056,10 @@ void do_stat_object(char_data *ch, obj_data *j, bool details) {
 	if (OBJ_BOUND_TO(j)) {
 		struct obj_binding *bind;
 		
-		pd = build_page_display(ch, "Bound to:");
+		line = build_page_display(ch, "Bound to:");
 		any = FALSE;
 		for (bind = OBJ_BOUND_TO(j); bind; bind = bind->next) {
-			append_page_display_line(pd, "%s %s", (any ? "," : ""), (index = find_player_index_by_idnum(bind->idnum)) ? index->fullname : "<unknown>");
+			append_page_display_line(line, "%s %s", (any ? "," : ""), (index = find_player_index_by_idnum(bind->idnum)) ? index->fullname : "<unknown>");
 			any = TRUE;
 		}
 	}
@@ -4101,16 +4101,16 @@ void do_stat_object(char_data *ch, obj_data *j, bool details) {
 			build_page_display(ch, "Fills for: %d hour%s", GET_FOOD_HOURS_OF_FULLNESS(j), PLURAL(GET_FOOD_HOURS_OF_FULLNESS(j)));
 			break;
 		case ITEM_CORPSE:
-			pd = build_page_display(ch, "Corpse of: ");
+			line = build_page_display(ch, "Corpse of: ");
 
 			if (IS_NPC_CORPSE(j)) {
-				append_page_display_line(pd, "[%d] %s", GET_CORPSE_NPC_VNUM(j), get_mob_name_by_proto(GET_CORPSE_NPC_VNUM(j), FALSE));
+				append_page_display_line(line, "[%d] %s", GET_CORPSE_NPC_VNUM(j), get_mob_name_by_proto(GET_CORPSE_NPC_VNUM(j), FALSE));
 			}
 			else if (IS_PC_CORPSE(j)) {
-				append_page_display_line(pd, "[%d] %s", GET_CORPSE_PC_ID(j), (index = find_player_index_by_idnum(GET_CORPSE_PC_ID(j))) ? index->fullname : "a player");
+				append_page_display_line(line, "[%d] %s", GET_CORPSE_PC_ID(j), (index = find_player_index_by_idnum(GET_CORPSE_PC_ID(j))) ? index->fullname : "a player");
 			}
 			else {
-				append_page_display_line(pd, "unknown");
+				append_page_display_line(line, "unknown");
 			}
 			
 			sprintbit(GET_CORPSE_FLAGS(j), corpse_flags, buf, TRUE);
@@ -4149,13 +4149,13 @@ void do_stat_object(char_data *ch, obj_data *j, bool details) {
 		}
 		case ITEM_PORTAL:
 			if (j != obj_proto(GET_OBJ_VNUM(j))) {
-				pd = build_page_display(ch, "Portal destination: ");
+				line = build_page_display(ch, "Portal destination: ");
 				room = real_room(GET_PORTAL_TARGET_VNUM(j));
 				if (!room) {
-					append_page_display_line(pd, "None");
+					append_page_display_line(line, "None");
 				}
 				else {
-					append_page_display_line(pd, "%d - %s", GET_PORTAL_TARGET_VNUM(j), get_room_name(room, FALSE));
+					append_page_display_line(line, "%d - %s", GET_PORTAL_TARGET_VNUM(j), get_room_name(room, FALSE));
 				}
 			}
 			else {
@@ -4220,7 +4220,7 @@ void do_stat_object(char_data *ch, obj_data *j, bool details) {
 	 */
 
 	if (j->contains) {
-		pd = NULL;
+		line = NULL;
 		sprintf(buf, "Contents:&g");
 		found = 0;
 		DL_FOREACH2(j->contains, j2, next_content) {
@@ -4228,24 +4228,24 @@ void do_stat_object(char_data *ch, obj_data *j, bool details) {
 			strcat(buf, buf2);
 			if (strlen(buf) >= 62) {
 				if (j2->next_content) {
-					pd = build_page_display(ch, "%s,", buf);
+					line = build_page_display(ch, "%s,", buf);
 				}
 				else {
-					pd = build_page_display_str(ch, buf);
+					line = build_page_display_str(ch, buf);
 				}
 				*buf = found = 0;
 			}
 		}
 
 		if (*buf) {
-			pd = build_page_display_str(ch, buf);
+			line = build_page_display_str(ch, buf);
      	}
-     	if (pd) {
-     		append_page_display_line(pd, "&0");
+     	if (line) {
+     		append_page_display_line(line, "&0");
 		}
 	}
 	found = 0;
-	pd = build_page_display_str(ch, "Applies:");
+	line = build_page_display_str(ch, "Applies:");
 	for (apply = GET_OBJ_APPLIES(j); apply; apply = apply->next) {
 		if (apply->apply_type != APPLY_TYPE_NATURAL) {
 			sprintf(part, " (%s)", apply_type_names[(int)apply->apply_type]);
@@ -4253,23 +4253,23 @@ void do_stat_object(char_data *ch, obj_data *j, bool details) {
 		else {
 			*part = '\0';
 		}
-		append_page_display_line(pd, "%s %+d to %s%s", found++ ? "," : "", apply->modifier, apply_types[(int) apply->location], part);
+		append_page_display_line(line, "%s %+d to %s%s", found++ ? "," : "", apply->modifier, apply_types[(int) apply->location], part);
 	}
 	if (!found) {
-		append_page_display_line(pd, " None");
+		append_page_display_line(line, " None");
 	}
 	
 	if (GET_OBJ_STORAGE(j)) {
-		pd = build_page_display(ch, "Storage locations:");
+		line = build_page_display(ch, "Storage locations:");
 		
 		found = 0;
 		LL_FOREACH(GET_OBJ_STORAGE(j), store) {
 			// TYPE_x: storage type
 			if (store->type == TYPE_BLD) {
-				append_page_display_line(pd, "%s[B%d] %s", (found++ > 0 ? ", " : " "), store->vnum, get_bld_name_by_proto(store->vnum));
+				append_page_display_line(line, "%s[B%d] %s", (found++ > 0 ? ", " : " "), store->vnum, get_bld_name_by_proto(store->vnum));
 			}
 			else if (store->type == TYPE_VEH) {
-				append_page_display_line(pd, "%s[V%d] %s", (found++ > 0 ? ", " : " "), store->vnum, get_vehicle_name_by_proto(store->vnum));
+				append_page_display_line(line, "%s[V%d] %s", (found++ > 0 ? ", " : " "), store->vnum, get_vehicle_name_by_proto(store->vnum));
 			}
 			else {
 				// none?
@@ -4278,7 +4278,7 @@ void do_stat_object(char_data *ch, obj_data *j, bool details) {
 			
 			if (store->flags) {
 				sprintbit(store->flags, storage_bits, buf2, TRUE);
-				append_page_display_line(pd, " ( %s)", buf2);
+				append_page_display_line(line, " ( %s)", buf2);
 			}
 		}
 	}
@@ -4336,7 +4336,7 @@ void do_stat_room(char_data *ch) {
 	vehicle_data *veh;
 	struct string_hash *str_iter, *next_str, *str_hash = NULL;
 	size_t size;
-	struct page_display *pd;
+	struct page_display *line;
 	
 	if (ROOM_SECT_FLAGGED(IN_ROOM(ch), SECTF_HAS_CROP_DATA) && (cp = ROOM_CROP(IN_ROOM(ch)))) {
 		strcpy(buf2, GET_CROP_NAME(cp));
@@ -4358,14 +4358,14 @@ void do_stat_room(char_data *ch) {
 	build_page_display(ch, "(%d, %d) %s", X_COORD(IN_ROOM(ch)), Y_COORD(IN_ROOM(ch)), get_room_name(IN_ROOM(ch), FALSE));
 	
 	// sector data
-	pd = build_page_display_str(ch, "");
+	line = build_page_display_str(ch, "");
 	if (ROOM_SECT_FLAGGED(IN_ROOM(ch), SECTF_HAS_CROP_DATA) && (cp = ROOM_CROP(IN_ROOM(ch)))) {
-		append_page_display_line(pd, "Crop: [\to%d\t0 - \to%s\t0], ", GET_CROP_VNUM(cp), GET_CROP_NAME(cp));
+		append_page_display_line(line, "Crop: [\to%d\t0 - \to%s\t0], ", GET_CROP_VNUM(cp), GET_CROP_NAME(cp));
 	}
-	append_page_display_line(pd, "Sector: [\tc%d\t0 - \tc%s\t0]", GET_SECT_VNUM(SECT(IN_ROOM(ch))), GET_SECT_NAME(SECT(IN_ROOM(ch))));
-	append_page_display_line(pd, ", Base: [\ty%d\t0 - \ty%s\t0]", GET_SECT_VNUM(BASE_SECT(IN_ROOM(ch))), GET_SECT_NAME(BASE_SECT(IN_ROOM(ch))));
+	append_page_display_line(line, "Sector: [\tc%d\t0 - \tc%s\t0]", GET_SECT_VNUM(SECT(IN_ROOM(ch))), GET_SECT_NAME(SECT(IN_ROOM(ch))));
+	append_page_display_line(line, ", Base: [\ty%d\t0 - \ty%s\t0]", GET_SECT_VNUM(BASE_SECT(IN_ROOM(ch))), GET_SECT_NAME(BASE_SECT(IN_ROOM(ch))));
 	if (GET_ROOM_VNUM(IN_ROOM(ch)) < MAP_SIZE && (map = &world_map[X_COORD(IN_ROOM(ch))][Y_COORD(IN_ROOM(ch))])) {
-		append_page_display_line(pd, ", Natural: [\tg%d\t0 - \tg%s\t0]", GET_SECT_VNUM(map->natural_sector), GET_SECT_NAME(map->natural_sector));
+		append_page_display_line(line, ", Natural: [\tg%d\t0 - \tg%s\t0]", GET_SECT_VNUM(map->natural_sector), GET_SECT_NAME(map->natural_sector));
 	}
 	
 	// building/room data
@@ -4412,12 +4412,12 @@ void do_stat_room(char_data *ch) {
 
 	// ownership
 	if ((emp = ROOM_OWNER(home))) {
-		pd = build_page_display(ch, "Owner: %s%s&0", EMPIRE_BANNER(emp), EMPIRE_NAME(emp));
+		line = build_page_display(ch, "Owner: %s%s&0", EMPIRE_BANNER(emp), EMPIRE_NAME(emp));
 		if ((city = find_city(emp, IN_ROOM(ch)))) {
-			append_page_display_line(pd, ", City: %s", city->name);
+			append_page_display_line(line, ", City: %s", city->name);
 		}
 		if (ROOM_PRIVATE_OWNER(home) != NOBODY) {
-			append_page_display_line(pd, ", Home: %s", (index = find_player_index_by_idnum(ROOM_PRIVATE_OWNER(home))) ? index->fullname : "someone");
+			append_page_display_line(line, ", Home: %s", (index = find_player_index_by_idnum(ROOM_PRIVATE_OWNER(home))) ? index->fullname : "someone");
 		}
 	}
 
@@ -4463,7 +4463,7 @@ void do_stat_room(char_data *ch) {
 
 	sprintf(buf, "Chars present:&y");
 	found = 0;
-	pd = NULL;
+	line = NULL;
 	DL_FOREACH2(ROOM_PEOPLE(IN_ROOM(ch)), k, next_in_room) {
 		if (!CAN_SEE(ch, k))
 			continue;
@@ -4471,25 +4471,25 @@ void do_stat_room(char_data *ch) {
 		strcat(buf, buf2);
 		if (strlen(buf) >= 62) {
 			if (k->next_in_room) {
-				pd = build_page_display(ch, "%s,", buf);
+				line = build_page_display(ch, "%s,", buf);
 			}
 			else {
-				pd = build_page_display_str(ch, buf);
+				line = build_page_display_str(ch, buf);
 			}
 			*buf = found = 0;
 		}
 	}
 	if (*buf) {
-		pd = build_page_display_str(ch, buf);
+		line = build_page_display_str(ch, buf);
 	}
-	if (pd) {
-		append_page_display_line(pd, "&0");
+	if (line) {
+		append_page_display_line(line, "&0");
 	}
 	
 	if (ROOM_VEHICLES(IN_ROOM(ch))) {
 		sprintf(buf, "Vehicles:&w");
 		found = 0;
-		pd = NULL;
+		line = NULL;
 		DL_FOREACH2(ROOM_VEHICLES(IN_ROOM(ch)), veh, next_in_room) {
 			if (!CAN_SEE_VEHICLE(ch, veh)) {
 				continue;
@@ -4498,19 +4498,19 @@ void do_stat_room(char_data *ch) {
 			strcat(buf, buf2);
 			if (strlen(buf) >= 62) {
 				if (veh->next_in_room) {
-					pd = build_page_display(ch, "%s,", buf);
+					line = build_page_display(ch, "%s,", buf);
 				}
 				else {
-					pd = build_page_display_str(ch, buf);
+					line = build_page_display_str(ch, buf);
 				}
 				*buf = found = 0;
 			}
 		}
 		if (*buf) {
-			pd = build_page_display_str(ch, buf);
+			line = build_page_display_str(ch, buf);
 		}
-		if (pd) {
-			append_page_display_line(pd, "&0");
+		if (line) {
+			append_page_display_line(line, "&0");
 		}
 	}
 	
@@ -4526,7 +4526,7 @@ void do_stat_room(char_data *ch) {
 		if (str_hash) {
 			size = snprintf(buf, sizeof(buf), "Contents:\tg");
 			found = 0;
-			pd = NULL;
+			line = NULL;
 			
 			HASH_ITER(hh, str_hash, str_iter, next_str) {
 				if (str_iter->count == 1) {
@@ -4537,7 +4537,7 @@ void do_stat_room(char_data *ch) {
 				}
 				if (size + strlen(buf2) > 79 && *buf) {
 					// end of line
-					pd = build_page_display(ch, "%s%s", buf, (found > 1) ? "," : "");
+					line = build_page_display(ch, "%s%s", buf, (found > 1) ? "," : "");
 					found = 0;
 					size = 0;
 					*buf = '\0';
@@ -4552,10 +4552,10 @@ void do_stat_room(char_data *ch) {
 			
 			// anything left?
 			if (*buf) {
-				pd = build_page_display_str(ch, buf);
+				line = build_page_display_str(ch, buf);
 			}
-			if (pd) {
-				append_page_display_line(pd, "\t0");
+			if (line) {
+				append_page_display_line(line, "\t0");
 			}
 		}
 	}
@@ -4598,18 +4598,18 @@ void do_stat_room(char_data *ch) {
 	}
 	
 	if (ROOM_DEPLETION(IN_ROOM(ch))) {
-		pd = build_page_display(ch, "Depletion: ");
+		line = build_page_display(ch, "Depletion: ");
 		
 		comma = FALSE;
 		for (dep = ROOM_DEPLETION(IN_ROOM(ch)); dep; dep = dep->next) {
 			if (dep->count > 0 && dep->type < NUM_DEPLETION_TYPES) {
 				max = get_depletion_max(IN_ROOM(ch), dep->type);
 				if (max > 0) {
-					append_page_display_line(pd, "%s%s (%d, %d%%)", comma ? ", " : "", depletion_types[dep->type], dep->count, dep->count * 100 / max);
+					append_page_display_line(line, "%s%s (%d, %d%%)", comma ? ", " : "", depletion_types[dep->type], dep->count, dep->count * 100 / max);
 				}
 				else {
 					// can't detect max
-					append_page_display_line(pd, "%s%s (%d)", comma ? ", " : "", depletion_types[dep->type], dep->count);
+					append_page_display_line(line, "%s%s (%d)", comma ? ", " : "", depletion_types[dep->type], dep->count);
 				}
 				comma = TRUE;
 			}
@@ -4675,7 +4675,7 @@ void do_stat_room(char_data *ch) {
 void do_stat_room_template(char_data *ch, room_template *rmt, bool details) {
 	char lbuf[MAX_STRING_LENGTH];
 	adv_data *adv;
-	struct page_display *pd;
+	struct page_display *line;
 	
 	if (!rmt) {
 		return;
@@ -4685,12 +4685,12 @@ void do_stat_room_template(char_data *ch, room_template *rmt, bool details) {
 	build_page_display_str(ch, NULLSAFE(GET_RMT_DESC(rmt)));
 
 	adv = get_adventure_for_vnum(GET_RMT_VNUM(rmt));
-	pd = build_page_display(ch, "Adventure: [&c%d %s&0]", !adv ? NOTHING : GET_ADV_VNUM(adv), !adv ? "NONE" : GET_ADV_NAME(adv));
+	line = build_page_display(ch, "Adventure: [&c%d %s&0]", !adv ? NOTHING : GET_ADV_VNUM(adv), !adv ? "NONE" : GET_ADV_NAME(adv));
 	if (GET_RMT_SUBZONE(rmt) != NOWHERE) {
-		append_page_display_line(pd, ", Subzone: [\ty%d\t0]", GET_RMT_SUBZONE(rmt));
+		append_page_display_line(line, ", Subzone: [\ty%d\t0]", GET_RMT_SUBZONE(rmt));
 	}
 	else {
-		append_page_display_line(pd, ", Subzone: [\tynone\t0]");
+		append_page_display_line(line, ", Subzone: [\tynone\t0]");
 	}
 	
 	sprintbit(GET_RMT_FLAGS(rmt), room_template_flags, lbuf, TRUE);
@@ -6538,7 +6538,7 @@ ACMD(do_island) {
 	struct island_info *isle, *next_isle;
 	room_data *center;
 	bitvector_t old;
-	struct page_display *pd;
+	struct page_display *line;
 	
 	argument = any_one_arg(argument, arg1);	// command
 	skip_spaces(&argument);	// remainder
@@ -6557,10 +6557,10 @@ ACMD(do_island) {
 			
 			center = real_room(isle->center);
 			
-			pd = build_page_display(ch, "%2d. %s (%d, %d), size %d, levels %d-%d", isle->id, isle->name, (center ? FLAT_X_COORD(center) : -1), (center ? FLAT_Y_COORD(center) : -1), isle->tile_size, isle->min_level, isle->max_level);
+			line = build_page_display(ch, "%2d. %s (%d, %d), size %d, levels %d-%d", isle->id, isle->name, (center ? FLAT_X_COORD(center) : -1), (center ? FLAT_Y_COORD(center) : -1), isle->tile_size, isle->min_level, isle->max_level);
 			if (isle->flags) {
 				sprintbit(isle->flags, island_bits, flags, TRUE);
-				append_page_display_line(pd, ", %s", flags);
+				append_page_display_line(line, ", %s", flags);
 			}
 		}
 		

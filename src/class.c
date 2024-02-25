@@ -1281,20 +1281,20 @@ void show_class_ability_display(char_data *ch, struct class_ability *list, bool 
 	int count = 0, last_role = -2;
 	struct class_ability *iter;
 	ability_data *abil;
-	struct page_display *pd = NULL;
+	struct page_display *line = NULL;
 
 	LL_FOREACH(list, iter) {
 		if (iter->role != last_role) {
-			pd = build_page_display(ch, "%s %s%s\t0: ", last_role != -2 ? "\r\n" : "", iter->role == NOTHING ? "\t0" : class_role_color[iter->role], iter->role == NOTHING ? "All" : class_role[iter->role]);
+			line = build_page_display(ch, "%s %s%s\t0: ", last_role != -2 ? "\r\n" : "", iter->role == NOTHING ? "\t0" : class_role_color[iter->role], iter->role == NOTHING ? "All" : class_role[iter->role]);
 			last_role = iter->role;
 			count = 0;
 		}
 		
 		if ((abil = find_ability_by_vnum(iter->vnum))) {
-			append_page_display_line(pd, "%s%s%s\t0", (count++ > 0) ? ", " : "", (info_ch && has_ability(info_ch, iter->vnum)) ? "\tg" : "", ABIL_NAME(abil));
+			append_page_display_line(line, "%s%s%s\t0", (count++ > 0) ? ", " : "", (info_ch && has_ability(info_ch, iter->vnum)) ? "\tg" : "", ABIL_NAME(abil));
 		}
 		else {
-			append_page_display_line(pd, "%s%d Unknown\t0", (count++ > 0) ? ", " : "", iter->vnum);
+			append_page_display_line(line, "%s%d Unknown\t0", (count++ > 0) ? ", " : "", iter->vnum);
 		}
 	}
 	if (!list) {

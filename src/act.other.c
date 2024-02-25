@@ -1486,7 +1486,7 @@ ACMD(do_alternate) {
 	char_data *newch, *alt;
 	bool is_file = FALSE, timed_out;
 	int days, hours;
-	struct page_display *pd;
+	struct page_display *line;
 	
 	argument = any_one_arg(argument, arg);
 	
@@ -1518,23 +1518,23 @@ ACMD(do_alternate) {
 			timed_out = member_is_timed_out_ch(alt);
 			get_player_skill_string(alt, part, TRUE);
 			if (PRF_FLAGGED(ch, PRF_SCREEN_READER)) {
-				pd = build_page_display(ch, "[%d %s %s] %s%s&0", !is_file ? GET_COMPUTED_LEVEL(alt) : GET_LAST_KNOWN_LEVEL(alt), part, class_role[GET_CLASS_ROLE(alt)], (timed_out ? "&r" : ""), PERS(alt, alt, TRUE));
+				line = build_page_display(ch, "[%d %s %s] %s%s&0", !is_file ? GET_COMPUTED_LEVEL(alt) : GET_LAST_KNOWN_LEVEL(alt), part, class_role[GET_CLASS_ROLE(alt)], (timed_out ? "&r" : ""), PERS(alt, alt, TRUE));
 			}
 			else {	// not screenreader
-				pd = build_page_display(ch, "[%d %s%s\t0] %s%s&0", !is_file ? GET_COMPUTED_LEVEL(alt) : GET_LAST_KNOWN_LEVEL(alt), class_role_color[GET_CLASS_ROLE(alt)], part, (timed_out ? "&r" : ""), PERS(alt, alt, TRUE));
+				line = build_page_display(ch, "[%d %s%s\t0] %s%s&0", !is_file ? GET_COMPUTED_LEVEL(alt) : GET_LAST_KNOWN_LEVEL(alt), class_role_color[GET_CLASS_ROLE(alt)], part, (timed_out ? "&r" : ""), PERS(alt, alt, TRUE));
 			}
 						
 			// online/not
 			if (!is_file) {
-				append_page_display_line(pd, "  - &conline&0%s", IS_AFK(alt) ? " - &rafk&0" : "");
+				append_page_display_line(line, "  - &conline&0%s", IS_AFK(alt) ? " - &rafk&0" : "");
 			}
 			else if ((time(0) - alt->prev_logon) < SECS_PER_REAL_DAY) {
 				hours = (time(0) - alt->prev_logon) / SECS_PER_REAL_HOUR;
-				append_page_display_line(pd, "  - %d hour%s ago%s", hours, PLURAL(hours), (timed_out ? ", &rtimed-out&0" : ""));
+				append_page_display_line(line, "  - %d hour%s ago%s", hours, PLURAL(hours), (timed_out ? ", &rtimed-out&0" : ""));
 			}
 			else {	// more than a day
 				days = (time(0) - alt->prev_logon) / SECS_PER_REAL_DAY;
-				append_page_display_line(pd, "  - %d day%s ago%s", days, PLURAL(days), (timed_out ? ", &rtimed-out&0" : ""));
+				append_page_display_line(line, "  - %d day%s ago%s", days, PLURAL(days), (timed_out ? ", &rtimed-out&0" : ""));
 			}
 		
 			if (alt && is_file) {
@@ -1733,7 +1733,7 @@ ACMD(do_companions) {
 	ability_data *abil;
 	bool found, low_in_skill = FALSE;
 	int found_low_level = 0;
-	struct page_display *pd;
+	struct page_display *line;
 	
 	skip_spaces(&argument);
 	
@@ -1758,14 +1758,14 @@ ACMD(do_companions) {
 			
 			// build display
 			cmod = get_companion_mod_by_type(cd, CMOD_SHORT_DESC);
-			pd = build_page_display(ch, " %s", skip_filler(cmod ? cmod->str : get_mob_name_by_proto(cd->vnum, TRUE)));
+			line = build_page_display(ch, " %s", skip_filler(cmod ? cmod->str : get_mob_name_by_proto(cd->vnum, TRUE)));
 			
 			if (cd->from_abil != NOTHING && (abil = find_ability_by_vnum(cd->from_abil)) && ABIL_COST(abil) > 0) {
-				append_page_display_line(pd, " (%d %s)", ABIL_COST(abil), pool_types[ABIL_COST_TYPE(abil)]);
+				append_page_display_line(line, " (%d %s)", ABIL_COST(abil), pool_types[ABIL_COST_TYPE(abil)]);
 			}
 			
 			if (GET_MIN_SCALE_LEVEL(proto) > 0 && (cd->from_abil ? get_player_level_for_ability(ch, cd->from_abil) : get_approximate_level(ch)) < GET_MIN_SCALE_LEVEL(proto)) {
-				append_page_display_line(pd, " \trrequires level %d\t0", GET_MIN_SCALE_LEVEL(proto));
+				append_page_display_line(line, " \trrequires level %d\t0", GET_MIN_SCALE_LEVEL(proto));
 			}
 			
 			found = TRUE;

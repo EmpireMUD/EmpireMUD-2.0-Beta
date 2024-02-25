@@ -7078,7 +7078,7 @@ ACMD(do_list) {
 	any_vnum vnum;
 	bool ok, id, all, found_id = FALSE;
 	int amt, number;
-	struct page_display *pd;
+	struct page_display *pline;
 	
 	// helper type for displaying currencies at the end
 	struct cur_t {
@@ -7232,11 +7232,11 @@ ACMD(do_list) {
 	if (!id) {	// normal view
 		// append currencies if any
 		if (curt_hash) {
-			pd = build_page_display(ch, "You have:");
+			pline = build_page_display(ch, "You have:");
 			any_cur = FALSE;
 			HASH_ITER(hh, curt_hash, curt, next_curt) {
 				amt = get_currency(ch, curt->vnum);
-				append_page_display_line(pd, "%s%d %s", any_cur ? ", " : " ", amt, get_generic_string_by_vnum(curt->vnum, GENERIC_CURRENCY, WHICH_CURRENCY(amt)));
+				append_page_display_line(pline, "%s%d %s", any_cur ? ", " : " ", amt, get_generic_string_by_vnum(curt->vnum, GENERIC_CURRENCY, WHICH_CURRENCY(amt)));
 				any_cur = TRUE;
 			}
 		}

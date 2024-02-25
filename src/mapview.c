@@ -2917,42 +2917,42 @@ void perform_mortal_where(char_data *ch, char *arg) {
 * @param bool recur Whether or not to recursively show contents.
 */
 void print_object_location(int num, obj_data *obj, char_data *ch, bool recur) {
-	struct page_display *pd;
+	struct page_display *line;
 	
 	if (num > 0) {
-		pd = build_page_display(ch, "O%3d. %-25s - ", num, GET_OBJ_DESC(obj, ch, OBJ_DESC_SHORT));
+		line = build_page_display(ch, "O%3d. %-25s - ", num, GET_OBJ_DESC(obj, ch, OBJ_DESC_SHORT));
 	}
 	else {
-		pd = build_page_display(ch, "%35s", " - ");
+		line = build_page_display(ch, "%35s", " - ");
 	}
 	
 	if (HAS_TRIGGERS(obj)) {
-		append_page_display_line(pd, "[TRIG] ");
+		append_page_display_line(line, "[TRIG] ");
 	}
 
 	if (IN_ROOM(obj)) {
-		append_page_display_line(pd, "[%d]%s %s",  GET_ROOM_VNUM(IN_ROOM(obj)), coord_display_room(ch, IN_ROOM(obj), TRUE), get_room_name(IN_ROOM(obj), FALSE));
+		append_page_display_line(line, "[%d]%s %s",  GET_ROOM_VNUM(IN_ROOM(obj)), coord_display_room(ch, IN_ROOM(obj), TRUE), get_room_name(IN_ROOM(obj), FALSE));
 	}
 	else if (obj->carried_by) {
-		append_page_display_line(pd, "carried by %s", PERS(obj->carried_by, ch, 1));
+		append_page_display_line(line, "carried by %s", PERS(obj->carried_by, ch, 1));
 	}
 	else if (obj->in_vehicle) {
-		append_page_display_line(pd, "inside %s%s", get_vehicle_short_desc(obj->in_vehicle, ch), recur ? ", which is" : " ");
+		append_page_display_line(line, "inside %s%s", get_vehicle_short_desc(obj->in_vehicle, ch), recur ? ", which is" : " ");
 		if (recur) {
 			build_page_display(ch, "%35s[%d]%s %s", " - ", GET_ROOM_VNUM(IN_ROOM(obj->in_vehicle)), coord_display_room(ch, IN_ROOM(obj->in_vehicle), TRUE), get_room_name(IN_ROOM(obj->in_vehicle), FALSE));
 		}
 	}
 	else if (obj->worn_by) {
-		append_page_display_line(pd, "worn by %s", PERS(obj->worn_by, ch, 1));
+		append_page_display_line(line, "worn by %s", PERS(obj->worn_by, ch, 1));
 	}
 	else if (obj->in_obj) {
-		append_page_display_line(pd, "inside %s%s", GET_OBJ_DESC(obj->in_obj, ch, OBJ_DESC_SHORT), (recur ? ", which is" : " "));
+		append_page_display_line(line, "inside %s%s", GET_OBJ_DESC(obj->in_obj, ch, OBJ_DESC_SHORT), (recur ? ", which is" : " "));
 		if (recur) {
 			print_object_location(0, obj->in_obj, ch, recur);
 		}
 	}
 	else {
-		append_page_display_line(pd, "in an unknown location\r\n");
+		append_page_display_line(line, "in an unknown location\r\n");
 	}
 }
 
@@ -2963,7 +2963,7 @@ void perform_immort_where(char_data *ch, char *arg) {
 	vehicle_data *veh;
 	char_data *i;
 	obj_data *k;
-	struct page_display *pd;
+	struct page_display *line;
 
 	if (!*arg) {
 		send_to_char("Players\r\n-------\r\n", ch);
@@ -2972,14 +2972,14 @@ void perform_immort_where(char_data *ch, char *arg) {
 				i = (d->original ? d->original : d->character);
 				if (i && CAN_SEE(ch, i) && IN_ROOM(i) && WIZHIDE_OK(ch, i)) {
 					if (d->original) {
-						pd = build_page_display(ch, "%-20s - [%7d]%s %s (in %s)", GET_NAME(i), GET_ROOM_VNUM(IN_ROOM(i)), coord_display(ch, X_COORD(IN_ROOM(d->character)), Y_COORD(IN_ROOM(d->character)), TRUE), get_room_name(IN_ROOM(d->character), FALSE), GET_NAME(d->character));
+						line = build_page_display(ch, "%-20s - [%7d]%s %s (in %s)", GET_NAME(i), GET_ROOM_VNUM(IN_ROOM(i)), coord_display(ch, X_COORD(IN_ROOM(d->character)), Y_COORD(IN_ROOM(d->character)), TRUE), get_room_name(IN_ROOM(d->character), FALSE), GET_NAME(d->character));
 					}
 					else {
-						pd = build_page_display(ch, "%-20s - [%7d]%s %s", GET_NAME(i), GET_ROOM_VNUM(IN_ROOM(i)), coord_display(ch, X_COORD(IN_ROOM(i)), Y_COORD(IN_ROOM(i)), TRUE), get_room_name(IN_ROOM(i), FALSE));
+						line = build_page_display(ch, "%-20s - [%7d]%s %s", GET_NAME(i), GET_ROOM_VNUM(IN_ROOM(i)), coord_display(ch, X_COORD(IN_ROOM(i)), Y_COORD(IN_ROOM(i)), TRUE), get_room_name(IN_ROOM(i), FALSE));
 					}
 					
 					if (ROOM_INSTANCE(IN_ROOM(d->character))) {
-						append_page_display_line(pd, " (%s)", GET_ADV_NAME(INST_ADVENTURE(ROOM_INSTANCE(IN_ROOM(d->character)))));
+						append_page_display_line(line, " (%s)", GET_ADV_NAME(INST_ADVENTURE(ROOM_INSTANCE(IN_ROOM(d->character)))));
 					}
 				}
 			}

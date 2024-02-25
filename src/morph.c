@@ -1044,7 +1044,7 @@ void do_stat_morph(char_data *ch, morph_data *morph) {
 	struct apply_data *app;
 	ability_data *abil;
 	int num;
-	struct page_display *pd;
+	struct page_display *line;
 	
 	if (!morph) {
 		return;
@@ -1073,12 +1073,12 @@ void do_stat_morph(char_data *ch, morph_data *morph) {
 	build_page_display(ch, "Affects: \tc%s\t0", part);
 	
 	// applies
-	pd = build_page_display(ch, "Applies: ");
+	line = build_page_display(ch, "Applies: ");
 	for (app = MORPH_APPLIES(morph), num = 0; app; app = app->next, ++num) {
-		append_page_display_line(pd, "%s%d to %s", num ? ", " : "", app->weight, apply_types[app->location]);
+		append_page_display_line(line, "%s%d to %s", num ? ", " : "", app->weight, apply_types[app->location]);
 	}
 	if (!MORPH_APPLIES(morph)) {
-		append_page_display_line(pd, "none");
+		append_page_display_line(line, "none");
 	}
 	
 	send_page_display(ch);

@@ -203,15 +203,15 @@ void display_statistics_to_char(char_data *ch) {
 */
 void mudstats_configs(char_data *ch, char *argument) {
 	char part[256];
-	struct page_display *pd;
+	struct page_display *line;
 	
 	// start output
 	build_page_display(ch, "Game configuration for %s:", config_get_string("mud_name"));
 	
 	// status/hiring
-	pd = build_page_display(ch, "Status: %s", config_get_string("mud_status"));
+	line = build_page_display(ch, "Status: %s", config_get_string("mud_status"));
 	if (config_get_bool("hiring_builders") || config_get_bool("hiring_coders")) {
-		append_page_display_line(pd, ", Hiring: %s", (config_get_bool("hiring_builders") && config_get_bool("hiring_coders")) ? "builders and coders" : (config_get_bool("hiring_builders") ? "builders" : "coders"));
+		append_page_display_line(line, ", Hiring: %s", (config_get_bool("hiring_builders") && config_get_bool("hiring_coders")) ? "builders and coders" : (config_get_bool("hiring_builders") ? "builders" : "coders"));
 	}
 	
 	// time
@@ -240,56 +240,56 @@ void mudstats_configs(char_data *ch, char *argument) {
 	build_page_display(ch, "Workforce: %d cap per member, %d minimum cap per island, %d tile range", config_get_int("max_chore_resource_per_member"), config_get_int("max_chore_resource_over_total"), config_get_int("chore_distance"));
 	
 	// newbie island
-	pd = build_page_display(ch, "Newbie islands: %s", config_get_bool("cities_on_newbie_islands") ? "allow cities" : "no cities allowed");
+	line = build_page_display(ch, "Newbie islands: %s", config_get_bool("cities_on_newbie_islands") ? "allow cities" : "no cities allowed");
 	if (config_get_int("newbie_island_day_limit") > 0) {
-		append_page_display_line(pd, ", %d day limit", config_get_int("newbie_island_day_limit"));
+		append_page_display_line(line, ", %d day limit", config_get_int("newbie_island_day_limit"));
 	}
 	if (config_get_bool("naturalize_newbie_islands")) {
-		append_page_display_line(pd, ", naturalized each year");
+		append_page_display_line(line, ", naturalized each year");
 	}
 	
 	// approval
-	pd = build_page_display(ch, "Approval: %s%s", config_get_bool("auto_approve") ? "automatic" : "required", config_get_bool("approve_per_character") ? " (per character)" : "");
+	line = build_page_display(ch, "Approval: %s%s", config_get_bool("auto_approve") ? "automatic" : "required", config_get_bool("approve_per_character") ? " (per character)" : "");
 	if (!config_get_bool("auto_approve")) {
-		append_page_display_line(pd, ", needed for:");
+		append_page_display_line(line, ", needed for:");
 		if (config_get_bool("build_approval")) {
-			append_page_display_line(pd, " building");
+			append_page_display_line(line, " building");
 		}
 		if (config_get_bool("chat_approval")) {
-			append_page_display_line(pd, " chatting");
+			append_page_display_line(line, " chatting");
 		}
 		if (config_get_bool("craft_approval")) {
-			append_page_display_line(pd, " crafting");
+			append_page_display_line(line, " crafting");
 		}
 		if (config_get_bool("event_approval")) {
-			append_page_display_line(pd, " events");
+			append_page_display_line(line, " events");
 		}
 		if (config_get_bool("gather_approval")) {
-			append_page_display_line(pd, " gathering");
+			append_page_display_line(line, " gathering");
 		}
 		if (config_get_bool("join_empire_approval")) {
-			append_page_display_line(pd, " empires");
+			append_page_display_line(line, " empires");
 		}
 		if (config_get_bool("quest_approval")) {
-			append_page_display_line(pd, " quests");
+			append_page_display_line(line, " quests");
 		}
 		if (config_get_bool("skill_gain_approval")) {
-			append_page_display_line(pd, " skills");
+			append_page_display_line(line, " skills");
 		}
 		if (config_get_bool("tell_approval")) {
-			append_page_display_line(pd, " tells");
+			append_page_display_line(line, " tells");
 		}
 		if (config_get_bool("terraform_approval")) {
-			append_page_display_line(pd, " terraforming");
+			append_page_display_line(line, " terraforming");
 		}
 		if (config_get_bool("title_approval")) {
-			append_page_display_line(pd, " title");
+			append_page_display_line(line, " title");
 		}
 		if (config_get_bool("travel_approval")) {
-			append_page_display_line(pd, " travel");
+			append_page_display_line(line, " travel");
 		}
 		if (config_get_bool("write_approval")) {
-			append_page_display_line(pd, " writing");
+			append_page_display_line(line, " writing");
 		}
 	}
 	

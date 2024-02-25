@@ -657,7 +657,7 @@ static void show_detailed_empire(char_data *ch, empire_data *e) {
 	bool found, is_own_empire, comma;
 	player_index_data *index;
 	char line[256];
-	struct page_display *pd;
+	struct page_display *pline;
 	
 	is_own_empire = (GET_LOYALTY(ch) == e) || GET_ACCESS_LEVEL(ch) >= LVL_CIMPL || IS_GRANTED(ch, GRANT_EMPIRES);
 
@@ -686,14 +686,14 @@ static void show_detailed_empire(char_data *ch, empire_data *e) {
 	build_page_display(ch, "Ranks%s:", (is_own_empire ? " and privileges" : ""));
 	for (iter = 1; iter <= EMPIRE_NUM_RANKS(e); ++iter) {
 		// rank name
-		pd = build_page_display(ch, " %2d. %s&0", iter, EMPIRE_RANK(e, iter-1));
+		pline = build_page_display(ch, " %2d. %s&0", iter, EMPIRE_RANK(e, iter-1));
 		
 		// privs -- only shown to own empire
 		if (is_own_empire) {
 			found = FALSE;
 			for (sub = 0; sub < NUM_PRIVILEGES; ++sub) {
 				if (EMPIRE_PRIV(e, sub) == iter) {
-					append_page_display_line(pd, "%s%s", (found ? ", " : " - "), priv[sub]);
+					append_page_display_line(pline, "%s%s", (found ? ", " : " - "), priv[sub]);
 					found = TRUE;
 				}
 			}
@@ -717,15 +717,15 @@ static void show_detailed_empire(char_data *ch, empire_data *e) {
 	}
 	
 	if (is_own_empire || !EMPIRE_HAS_TECH(e, TECH_HIDDEN_PROGRESS)) {
-		pd = build_page_display(ch, "Technology: ");
+		pline = build_page_display(ch, "Technology: ");
 		for (iter = 0, comma = FALSE; iter < NUM_TECHS; ++iter) {
 			if (EMPIRE_HAS_TECH(e, iter)) {
-				append_page_display_line(pd, "%s%s", (comma ? ", " : ""), empire_tech_types[iter]);
+				append_page_display_line(pline, "%s%s", (comma ? ", " : ""), empire_tech_types[iter]);
 				comma = TRUE;
 			}
 		}
 		if (!comma) {
-			append_page_display_line(pd, "none");
+			append_page_display_line(pline, "none");
 		}
 	}
 	
@@ -740,21 +740,21 @@ static void show_detailed_empire(char_data *ch, empire_data *e) {
 	
 	// progress points by category
 	total = 0;
-	pd = build_page_display_str(ch, "");
+	pline = build_page_display_str(ch, "");
 	for (iter = 1; iter < NUM_PROGRESS_TYPES; ++iter) {
 		total += EMPIRE_PROGRESS_POINTS(e, iter);
-		append_page_display_line(pd, "%s: %d, ", progress_types[iter], EMPIRE_PROGRESS_POINTS(e, iter));
+		append_page_display_line(pline, "%s: %d, ", progress_types[iter], EMPIRE_PROGRESS_POINTS(e, iter));
 	}
-	append_page_display_line(pd, "Total: %d", total);
+	append_page_display_line(pline, "Total: %d", total);
 	
 	// Score
-	pd = build_page_display(ch, "Score: %d, ranked #%d (", get_total_score(e), found_rank);
+	pline = build_page_display(ch, "Score: %d, ranked #%d (", get_total_score(e), found_rank);
 	for (iter = 0, comma = FALSE; iter < NUM_SCORES; ++iter) {
 		sprinttype(iter, score_type, buf, sizeof(buf), "UNDEFINED");
-		append_page_display_line(pd, "%s%s %d", (comma ? ", " : ""), buf, EMPIRE_SCORE(e, iter));
+		append_page_display_line(pline, "%s%s %d", (comma ? ", " : ""), buf, EMPIRE_SCORE(e, iter));
 		comma = TRUE;
 	}
-	append_page_display_line(pd, ")");
+	append_page_display_line(pline, ")");
 
 	// show war cost?
 	if (GET_LOYALTY(ch) && GET_LOYALTY(ch) != e && !EMPIRE_IMM_ONLY(e) && !EMPIRE_IMM_ONLY(GET_LOYALTY(ch)) && !has_relationship(GET_LOYALTY(ch), e, DIPL_NONAGGR | DIPL_ALLIED)) {
@@ -3238,7 +3238,7 @@ void scan_for_tile(char_data *ch, char *argument, int max_dist, bitvector_t only
 	size_t lsize, vsize;
 	crop_data *crop;
 	bool ok, color, claimed, unclaimed, foreign, adventures, check_blocking, is_blocked, blocking_veh;
-	struct page_display *pd;
+	struct page_display *pline;
 	
 	static bitvector_t north_dirs = BIT(NORTH) | BIT(NORTHWEST) | BIT(NORTHEAST);
 	static bitvector_t east_dirs = BIT(EAST) | BIT(SOUTHEAST) | BIT(NORTHEAST);
@@ -3480,31 +3480,31 @@ void scan_for_tile(char_data *ch, char *argument, int max_dist, bitvector_t only
 				dir_str = get_partial_direction_to(ch, IN_ROOM(ch), loc, PRF_FLAGGED(ch, PRF_SCREEN_READER) ? FALSE : TRUE);
 				
 				// distance and direction
-				pd = build_page_display(ch, "%2d %s: ", dist, (*dir_str ? dir_str : "away"));
+				pline = build_page_display(ch, "%2d %s: ", dist, (*dir_str ? dir_str : "away"));
 				
 				if (node->details) {
-					append_page_display_line(pd, "%s: %s", (GET_BUILDING(loc) ? GET_BLD_NAME(GET_BUILDING(loc)) : GET_SECT_NAME(SECT(loc))), node->details);
+					append_page_display_line(pline, "%s: %s", (GET_BUILDING(loc) ? GET_BLD_NAME(GET_BUILDING(loc)) : GET_SECT_NAME(SECT(loc))), node->details);
 				}
 				else {	// not a vehicle
-					append_page_display_line(pd, "%s", get_room_name(loc, FALSE));
+					append_page_display_line(pline, "%s", get_room_name(loc, FALSE));
 				}
 				
 				// coords
-				append_page_display_line(pd, "%s", coord_display(ch, check_x, check_y, FALSE));
+				append_page_display_line(pline, "%s", coord_display(ch, check_x, check_y, FALSE));
 				
 				// info
 				if ((PRF_FLAGGED(ch, PRF_POLITICAL) || claimed || foreign) && ROOM_OWNER(loc)) {
-					append_page_display_line(pd, " (%s%s\t0)", EMPIRE_BANNER(ROOM_OWNER(loc)), EMPIRE_ADJECTIVE(ROOM_OWNER(loc)));
+					append_page_display_line(pline, " (%s%s\t0)", EMPIRE_BANNER(ROOM_OWNER(loc)), EMPIRE_ADJECTIVE(ROOM_OWNER(loc)));
 				}
 				if (PRF_FLAGGED(ch, PRF_INFORMATIVE)) {
 					get_informative_tile_string(ch, loc, info);
 					if (*info) {
-						append_page_display_line(pd, " [%s]", info);
+						append_page_display_line(pline, " [%s]", info);
 					}
 				}
 			
 				if (node->count > 1) {
-					append_page_display_line(pd, " (and %d nearby tile%s)", node->count, PLURAL(node->count));
+					append_page_display_line(pline, " (and %d nearby tile%s)", node->count, PLURAL(node->count));
 				}
 			}
 			
@@ -4868,7 +4868,7 @@ ACMD(do_efind) {
 	room_data *last_rm, *iter, *next_iter;
 	struct efind_group *eg, *next_eg, *list = NULL;
 	vehicle_data *veh;
-	struct page_display *pd;
+	struct page_display *line;
 	
 	// optional first arg (empire) and empire detection
 	argptr = any_one_word(argument, arg);
@@ -4928,10 +4928,10 @@ ACMD(do_efind) {
 
 		if (total > 0) {
 			if (emp == GET_LOYALTY(ch)) {
-				pd = build_page_display(ch, "You discover:");
+				line = build_page_display(ch, "You discover:");
 			}
 			else {
-				pd = build_page_display(ch, "You discover in %s%s\t0:", EMPIRE_BANNER(emp), EMPIRE_NAME(emp));
+				line = build_page_display(ch, "You discover in %s%s\t0:", EMPIRE_BANNER(emp), EMPIRE_NAME(emp));
 			}
 			
 			last_rm = NULL;
@@ -4939,22 +4939,22 @@ ACMD(do_efind) {
 			DL_FOREACH_SAFE(list, eg, next_eg) {
 				// first item at this location?
 				if (eg->location != last_rm) {
-					pd = build_page_display(ch, "%s %s: ", coord_display_room(ch, eg->location, TRUE), get_room_name(eg->location, FALSE));
+					line = build_page_display(ch, "%s %s: ", coord_display_room(ch, eg->location, TRUE), get_room_name(eg->location, FALSE));
 					last_rm = eg->location;
 				}
 				else {
-					append_page_display_line(pd, ", ");
+					append_page_display_line(line, ", ");
 				}
 				
 				if (eg->count > 1) {
-					append_page_display_line(pd, "%dx ", eg->count);
+					append_page_display_line(line, "%dx ", eg->count);
 				}
 				
 				if (eg->obj) {
-					append_page_display_line(pd, "%s", skip_filler(get_obj_desc(eg->obj, ch, OBJ_DESC_SHORT)));
+					append_page_display_line(line, "%s", skip_filler(get_obj_desc(eg->obj, ch, OBJ_DESC_SHORT)));
 				}
 				else if (eg->veh) {
-					append_page_display_line(pd, "%s", skip_filler(VEH_SHORT_DESC(eg->veh)));
+					append_page_display_line(line, "%s", skip_filler(VEH_SHORT_DESC(eg->veh)));
 				}
 				
 				DL_DELETE(list, eg);
@@ -5848,7 +5848,7 @@ ACMD(do_findmaintenance) {
 	room_data *find_room = NULL, *loc;
 	vehicle_data *veh;
 	int bld_total = 0, veh_total = 0;
-	struct page_display *pd;
+	struct page_display *line;
 	
 	if (!ch->desc || IS_NPC(ch)) {
 		return;
@@ -6015,9 +6015,9 @@ ACMD(do_findmaintenance) {
 			loc = real_room(node->vnum);
 			
 			// append
-			pd = build_page_display(ch, "%s %s", coord_display_room(ch, loc, TRUE), node->details ? node->details : skip_filler(get_room_name(loc, FALSE)));
+			line = build_page_display(ch, "%s %s", coord_display_room(ch, loc, TRUE), node->details ? node->details : skip_filler(get_room_name(loc, FALSE)));
 			if (node->count > 1) {
-				append_page_display_line(pd, " (%+d nearby)", node->count);
+				append_page_display_line(line, " (%+d nearby)", node->count);
 			}
 			
 			// cleanup
@@ -6248,7 +6248,7 @@ ACMD(do_islands) {
 	struct shipping_data *shipd;
 	empire_data *emp;
 	room_data *room;
-	struct page_display *pd;
+	struct page_display *line;
 	
 	// imms can target empires
 	any_one_word(argument, emp_arg);
@@ -6319,16 +6319,16 @@ ACMD(do_islands) {
 		if (item->territory > 0 || item->einv_size > 0 || item->population > 0) {
 			isle = get_island(item->id, TRUE);
 			room = real_room(isle->center);
-			pd = build_page_display(ch, " %s%s - ", get_island_name_for(isle->id, ch), coord_display_room(ch, room, FALSE));
+			line = build_page_display(ch, " %s%s - ", get_island_name_for(isle->id, ch), coord_display_room(ch, room, FALSE));
 		
 			if (item->territory > 0) {
-				append_page_display_line(pd, "%d territory%s", item->territory, (item->einv_size > 0 || item->population > 0) ? ", " : "");
+				append_page_display_line(line, "%d territory%s", item->territory, (item->einv_size > 0 || item->population > 0) ? ", " : "");
 			}
 			if (item->einv_size > 0) {
-				append_page_display_line(pd, "%d einventory%s", item->einv_size, (item->population > 0) ? ", " : "");
+				append_page_display_line(line, "%d einventory%s", item->einv_size, (item->population > 0) ? ", " : "");
 			}
 			if (item->population > 0) {
-				append_page_display_line(pd, "%d citizen%s", item->population, PLURAL(item->population));
+				append_page_display_line(line, "%d citizen%s", item->population, PLURAL(item->population));
 			}
 		}
 		
@@ -6990,7 +6990,7 @@ ACMD(do_progress) {
 	struct progress_list *prereq;
 	time_t when;
 	bool any, found, new_goal;
-	struct page_display *pd;
+	struct page_display *line;
 	
 	strcpy(buf, argument);
 	if (*argument && imm_access) {
@@ -7295,9 +7295,9 @@ ACMD(do_progress) {
 		
 		// Show prereqs:
 		if (PRG_PREREQS(prg)) {
-			pd = build_page_display(ch, "Requires:");
+			line = build_page_display(ch, "Requires:");
 			LL_FOREACH(PRG_PREREQS(prg), prereq) {
-				append_page_display_line(pd, "%s%s%s\t0", (prereq == PRG_PREREQS(prg)) ? " " : ", ", empire_has_completed_goal(emp, prereq->vnum) ? "" : "\tr", get_progress_name_by_proto(prereq->vnum));
+				append_page_display_line(line, "%s%s%s\t0", (prereq == PRG_PREREQS(prg)) ? " " : ", ", empire_has_completed_goal(emp, prereq->vnum) ? "" : "\tr", get_progress_name_by_proto(prereq->vnum));
 			}
 		}
 		
@@ -7319,10 +7319,10 @@ ACMD(do_progress) {
 			
 			if (found) {
 				if (!any) {
-					pd = build_page_display(ch, "Leads to: %s", PRG_NAME(prg_iter));
+					line = build_page_display(ch, "Leads to: %s", PRG_NAME(prg_iter));
 				}
 				else {
-					append_page_display_line(pd, ", %s", PRG_NAME(prg_iter));
+					append_page_display_line(line, ", %s", PRG_NAME(prg_iter));
 					any = TRUE;
 				}
 			}
@@ -7624,7 +7624,7 @@ ACMD(do_roster) {
 	int days, hours;
 	char_data *member;
 	bool all = FALSE, imm_access = (GET_ACCESS_LEVEL(ch) >= LVL_CIMPL || IS_GRANTED(ch, GRANT_EMPIRES));
-	struct page_display *pd;
+	struct page_display *line;
 	
 	skip_spaces(&argument);
 	
@@ -7686,23 +7686,23 @@ ACMD(do_roster) {
 		// display:
 		get_player_skill_string(member, part, TRUE);
 		if (PRF_FLAGGED(ch, PRF_SCREEN_READER)) {
-			pd = build_page_display(ch, "[%d %s %s] <%s&0> %s%s&0", !is_file ? GET_COMPUTED_LEVEL(member) : GET_LAST_KNOWN_LEVEL(member), part, class_role[GET_CLASS_ROLE(member)], EMPIRE_RANK(e, GET_RANK(member) - 1), (timed_out ? "&r" : ""), PERS(member, member, TRUE));
+			line = build_page_display(ch, "[%d %s %s] <%s&0> %s%s&0", !is_file ? GET_COMPUTED_LEVEL(member) : GET_LAST_KNOWN_LEVEL(member), part, class_role[GET_CLASS_ROLE(member)], EMPIRE_RANK(e, GET_RANK(member) - 1), (timed_out ? "&r" : ""), PERS(member, member, TRUE));
 		}
 		else {	// not screenreader
-			pd = build_page_display(ch, "[%d %s%s\t0] <%s&0> %s%s&0", !is_file ? GET_COMPUTED_LEVEL(member) : GET_LAST_KNOWN_LEVEL(member), class_role_color[GET_CLASS_ROLE(member)], part, EMPIRE_RANK(e, GET_RANK(member) - 1), (timed_out ? "&r" : ""), PERS(member, member, TRUE));
+			line = build_page_display(ch, "[%d %s%s\t0] <%s&0> %s%s&0", !is_file ? GET_COMPUTED_LEVEL(member) : GET_LAST_KNOWN_LEVEL(member), class_role_color[GET_CLASS_ROLE(member)], part, EMPIRE_RANK(e, GET_RANK(member) - 1), (timed_out ? "&r" : ""), PERS(member, member, TRUE));
 		}
 						
 		// online/not
 		if (!is_file) {
-			append_page_display_line(pd, "  - &conline&0%s", IS_AFK(member) ? " - &rafk&0" : "");
+			append_page_display_line(line, "  - &conline&0%s", IS_AFK(member) ? " - &rafk&0" : "");
 		}
 		else if ((time(0) - member->prev_logon) < SECS_PER_REAL_DAY) {
 			hours = (time(0) - member->prev_logon) / SECS_PER_REAL_HOUR;
-			append_page_display_line(pd, "  - %d hour%s ago%s", hours, PLURAL(hours), (timed_out ? ", &rtimed-out&0" : ""));
+			append_page_display_line(line, "  - %d hour%s ago%s", hours, PLURAL(hours), (timed_out ? ", &rtimed-out&0" : ""));
 		}
 		else {	// more than a day
 			days = (time(0) - member->prev_logon) / SECS_PER_REAL_DAY;
-			append_page_display_line(pd, "  - %d day%s ago%s", days, PLURAL(days), (timed_out ? ", &rtimed-out&0" : ""));
+			append_page_display_line(line, "  - %d day%s ago%s", days, PLURAL(days), (timed_out ? ", &rtimed-out&0" : ""));
 		}
 		
 		if (member && is_file) {

@@ -587,7 +587,7 @@ SHOW(show_companions) {
 	bool found, file = FALSE;
 	struct companion_mod *cmod;
 	ability_data *abil;
-	struct page_display *pd;
+	struct page_display *line;
 	
 	argument = one_word(argument, arg);
 	skip_spaces(&argument);
@@ -627,10 +627,10 @@ SHOW(show_companions) {
 			
 			// build display
 			cmod = get_companion_mod_by_type(cd, CMOD_SHORT_DESC);
-			pd = build_page_display(ch, " [%5d] %s", cd->vnum, skip_filler(cmod ? cmod->str : get_mob_name_by_proto(cd->vnum, TRUE)));
+			line = build_page_display(ch, " [%5d] %s", cd->vnum, skip_filler(cmod ? cmod->str : get_mob_name_by_proto(cd->vnum, TRUE)));
 			
 			if (cd->from_abil != NOTHING && (abil = find_ability_by_vnum(cd->from_abil)) && ABIL_COST(abil) > 0) {
-				append_page_display_line(pd, " (%d %s)", ABIL_COST(abil), pool_types[ABIL_COST_TYPE(abil)]);
+				append_page_display_line(line, " (%d %s)", ABIL_COST(abil), pool_types[ABIL_COST_TYPE(abil)]);
 			}
 			
 			found = TRUE;
