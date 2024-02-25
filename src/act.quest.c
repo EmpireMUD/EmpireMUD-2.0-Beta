@@ -602,20 +602,20 @@ void show_quest_info(char_data *ch, quest_data *qst) {
 	// title
 	if (pq) {
 		count_quest_tasks(pq->tracker, &complete, &total);
-		add_page_display(ch, "%s%s%s\t0 (%d/%d task%s)", vstr, QUEST_LEVEL_COLOR(ch, qst), QUEST_NAME(qst), complete, total, PLURAL(total));
+		build_page_display(ch, "%s%s%s\t0 (%d/%d task%s)", vstr, QUEST_LEVEL_COLOR(ch, qst), QUEST_NAME(qst), complete, total, PLURAL(total));
 	}
 	else if (pcq) {
-		add_page_display(ch, "%s%s%s\t0 (completed)", vstr, QUEST_LEVEL_COLOR(ch, qst), QUEST_NAME(qst));
+		build_page_display(ch, "%s%s%s\t0 (completed)", vstr, QUEST_LEVEL_COLOR(ch, qst), QUEST_NAME(qst));
 	}
 	else {
-		add_page_display(ch, "%s%s%s\t0 (not on quest)", vstr, QUEST_LEVEL_COLOR(ch, qst), QUEST_NAME(qst));
+		build_page_display(ch, "%s%s%s\t0 (not on quest)", vstr, QUEST_LEVEL_COLOR(ch, qst), QUEST_NAME(qst));
 	}
 	
-	add_page_display_str(ch, NULLSAFE(QUEST_DESCRIPTION(qst)));
+	build_page_display_str(ch, NULLSAFE(QUEST_DESCRIPTION(qst)));
 	
 	// tracker
 	if (pq) {
-		add_page_display_str(ch, "Quest Tracker:");
+		build_page_display_str(ch, "Quest Tracker:");
 		show_tracker_display(ch, pq->tracker, FALSE);
 	}
 	
@@ -650,18 +650,18 @@ void show_quest_info(char_data *ch, quest_data *qst) {
 			free(buf2);
 		}
 		
-		add_page_display(ch, "Turn in at: %s%s", buf, QUEST_FLAGGED(qst, QST_IN_CITY_ONLY) ? " (in-city only)" : "");
+		build_page_display(ch, "Turn in at: %s%s", buf, QUEST_FLAGGED(qst, QST_IN_CITY_ONLY) ? " (in-city only)" : "");
 	}
 	
 	if (QUEST_FLAGGED(qst, QST_GROUP_COMPLETION)) {
-		add_page_display_str(ch, "Group completion: This quest will auto-complete if any member of your group completes it while you're present.");
+		build_page_display_str(ch, "Group completion: This quest will auto-complete if any member of your group completes it while you're present.");
 	}
 	
 	// completed AND not on it again?
 	if (pcq && !pq) {
-		add_page_display(ch, "--\r\n%s", NULLSAFE(QUEST_COMPLETE_MSG(qst)));
+		build_page_display(ch, "--\r\n%s", NULLSAFE(QUEST_COMPLETE_MSG(qst)));
 		if (QUEST_REWARDS(qst)) {
-			add_page_display_str(ch, "Quest Rewards:");
+			build_page_display_str(ch, "Quest Rewards:");
 			show_quest_reward_display(ch, QUEST_REWARDS(qst), FALSE, FALSE);
 		}
 	}
@@ -677,7 +677,7 @@ void show_quest_info(char_data *ch, quest_data *qst) {
 * @param bool send_page If TRUE, calls send_page_display after building it. If FALSE, leaves it in the player's page_display.
 */
 void show_quest_tracker(char_data *ch, struct player_quest *pq, char *header, bool send_page) {
-	add_page_display(ch, "%s Tracker:", (header && *header) ? header : "Quest");
+	build_page_display(ch, "%s Tracker:", (header && *header) ? header : "Quest");
 	show_tracker_display(ch, pq->tracker, send_page);
 }
 
@@ -737,9 +737,9 @@ QCMD(qcmd_completed) {
 	// sort now
 	HASH_SORT(GET_COMPLETED_QUESTS(ch), sort_completed_quests_by_timestamp);
 	
-	add_page_display(ch, "Completed quests:");
+	build_page_display(ch, "Completed quests:");
 	HASH_ITER(hh, GET_COMPLETED_QUESTS(ch), pcq, next_pcq) {
-		add_page_display(ch, " %s", get_quest_name_by_proto(pcq->vnum));
+		build_page_display(ch, " %s", get_quest_name_by_proto(pcq->vnum));
 	}
 	
 	send_page_display(ch);
@@ -910,7 +910,7 @@ QCMD(qcmd_group) {
 		return;
 	}
 	
-	add_page_display(ch, "Quests in common with your group:");
+	build_page_display(ch, "Quests in common with your group:");
 	have = FALSE;
 	LL_FOREACH(GET_QUESTS(ch), pq) {
 		any = FALSE;
@@ -930,13 +930,13 @@ QCMD(qcmd_group) {
 		if (any && *line) {
 			have = TRUE;
 			if ((proto = quest_proto(pq->vnum))) {
-				add_page_display(ch, " %s%s\t0: %s", QUEST_LEVEL_COLOR(ch, proto), QUEST_NAME(proto), line);
+				build_page_display(ch, " %s%s\t0: %s", QUEST_LEVEL_COLOR(ch, proto), QUEST_NAME(proto), line);
 			}
 		}
 	}
 	
 	if (!have) {
-		add_page_display_str(ch, " none");
+		build_page_display_str(ch, " none");
 	}
 	
 	send_page_display(ch);
@@ -980,7 +980,7 @@ QCMD(qcmd_list) {
 		return;
 	}
 	
-	add_page_display(ch, "Your quests:");
+	build_page_display(ch, "Your quests:");
 	LL_FOREACH(GET_QUESTS(ch), pq) {
 		count_quest_tasks(pq->tracker, &count, &total);
 		if ((proto = quest_proto(pq->vnum))) {
@@ -1004,19 +1004,19 @@ QCMD(qcmd_list) {
 				*typestr = '\0';
 			}
 			
-			add_page_display(ch, "  %s%s%s\t0 (%d/%d task%s%s)", vstr, QUEST_LEVEL_COLOR(ch, proto), QUEST_NAME(proto), count, total, PLURAL(total), typestr);
+			build_page_display(ch, "  %s%s%s\t0 (%d/%d task%s%s)", vstr, QUEST_LEVEL_COLOR(ch, proto), QUEST_NAME(proto), count, total, PLURAL(total), typestr);
 		}
 	}
 	
 	// show dailies status, too
-	add_page_display_str(ch, show_daily_quest_line(ch));
+	build_page_display_str(ch, show_daily_quest_line(ch));
 	
 	// any quests available here?
 	quest_list = build_available_quest_list(ch);
 	if (quest_list) {
 		count = 0;
 		LL_COUNT(quest_list, qtl, count);
-		add_page_display(ch, "There are %d quest%s available here%s.", count, PLURAL(count), PRF_FLAGGED(ch, PRF_NO_TUTORIALS) ? "" : " (type 'start' to see them)");
+		build_page_display(ch, "There are %d quest%s available here%s.", count, PLURAL(count), PRF_FLAGGED(ch, PRF_NO_TUTORIALS) ? "" : " (type 'start' to see them)");
 	}
 	free_quest_temp_list(quest_list);
 	

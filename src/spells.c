@@ -611,7 +611,7 @@ ACMD(do_cast) {
 			return;
 		}
 		
-		add_page_display(ch, "You know the following %ss:", cast_noun[subcmd]);
+		build_page_display(ch, "You know the following %ss:", cast_noun[subcmd]);
 		
 		found = FALSE;
 		HASH_ITER(hh, GET_ABILITY_HASH(ch), plab, next_plab) {
@@ -621,16 +621,16 @@ ACMD(do_cast) {
 			}
 			
 			// append
-			add_page_display_col(ch, 2, FALSE, " %s", ABIL_NAME(abil));
+			build_page_display_col(ch, 2, FALSE, " %s", ABIL_NAME(abil));
 			
 			// found 1
 			found = TRUE;
 		}
 		
 		if (!found) {
-			add_page_display_str(ch, " nothing");
+			build_page_display_str(ch, " nothing");
 			if (subcmd == SCMD_CAST) {
-				add_page_display_str(ch, "(Most magical abilities have their own commands rather than 'cast'.)");
+				build_page_display_str(ch, "(Most magical abilities have their own commands rather than 'cast'.)");
 			}
 		}
 		
@@ -691,7 +691,7 @@ ACMD(do_conjure) {
 			return;
 		}
 		
-		add_page_display(ch, "You can conjure the following things:");
+		build_page_display(ch, "You can conjure the following things:");
 		
 		found = FALSE;
 		HASH_ITER(hh, GET_ABILITY_HASH(ch), plab, next_plab) {
@@ -709,12 +709,12 @@ ACMD(do_conjure) {
 				
 				// append
 				found = TRUE;
-				add_page_display_col_str(ch, 2, FALSE, ptr);
+				build_page_display_col_str(ch, 2, FALSE, ptr);
 			}
 		}
 		
 		if (!found) {
-			add_page_display(ch, " nothing");	// always room for this if !found
+			build_page_display(ch, " nothing");	// always room for this if !found
 		}
 		
 		send_page_display(ch);
@@ -774,7 +774,7 @@ ACMD(do_ready) {
 	#define VALID_READY_ABIL(ch, plab, abil)  ((abil) && (plab) && (plab)->purchased[GET_CURRENT_SKILL_SET(ch)] && IS_SET(ABIL_TYPES(abil), ABILT_READY_WEAPONS) && (!ABIL_COMMAND(abil) || !str_cmp(ABIL_COMMAND(abil), "ready")))
 	
 	if (!*arg) {
-		add_page_display(ch, "You know how to ready the following weapons:");
+		build_page_display(ch, "You know how to ready the following weapons:");
 		
 		found = FALSE;
 		HASH_ITER(hh, GET_ABILITY_HASH(ch), plab, next_plab) {
@@ -792,14 +792,14 @@ ACMD(do_ready) {
 						lsize += snprintf(line + lsize, sizeof(line) - lsize, " (%d %s)", ABIL_COST(abil), pool_types[ABIL_COST_TYPE(abil)]);
 					}
 					
-					add_page_display_col_str(ch, 2, FALSE, line);
+					build_page_display_col_str(ch, 2, FALSE, line);
 					found = TRUE;
 				}
 			}
 		}
 		
 		if (!found) {
-			add_page_display(ch, " none");
+			build_page_display(ch, " none");
 		}
 		
 		send_page_display(ch);
@@ -884,7 +884,7 @@ ACMD(do_summon) {
 			return;
 		}
 		
-		add_page_display(ch, "You can summon the following things:");
+		build_page_display(ch, "You can summon the following things:");
 		
 		found = FALSE;
 		HASH_ITER(hh, GET_ABILITY_HASH(ch), plab, next_plab) {
@@ -898,13 +898,13 @@ ACMD(do_summon) {
 				// summon-any lists the mobs themselves
 				LL_FOREACH(ABIL_DATA(abil), adl) {
 					if (adl->type == ADL_SUMMON_MOB && (proto = mob_proto(adl->vnum))) {
-						add_page_display_col_str(ch, 2, FALSE, one_summon_entry(ch, skip_filler(GET_SHORT_DESC(proto)), GET_MIN_SCALE_LEVEL(proto), abil));
+						build_page_display_col_str(ch, 2, FALSE, one_summon_entry(ch, skip_filler(GET_SHORT_DESC(proto)), GET_MIN_SCALE_LEVEL(proto), abil));
 					}
 				}
 			}
 			else if (IS_SET(ABIL_TYPES(abil), ABILT_SUMMON_RANDOM)) {
 				// summon-random just shows the ability name, minus the word 'summon'
-				add_page_display_col_str(ch, 2, FALSE, one_summon_entry(ch, format_summon_name(ABIL_NAME(abil)), 0, abil));
+				build_page_display_col_str(ch, 2, FALSE, one_summon_entry(ch, format_summon_name(ABIL_NAME(abil)), 0, abil));
 			}
 			else {
 				continue;
@@ -915,7 +915,7 @@ ACMD(do_summon) {
 		}
 		
 		if (!found) {
-			add_page_display(ch, " nothing");
+			build_page_display(ch, " nothing");
 		}
 		
 		send_page_display(ch);

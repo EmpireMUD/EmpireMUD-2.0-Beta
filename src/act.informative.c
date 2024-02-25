@@ -913,10 +913,10 @@ void display_score_to_char(char_data *ch, char_data *to) {
 	struct page_display *pd;
 
 
-	add_page_display(to, " +----------------------------- EmpireMUD 2.0b5 -----------------------------+");
+	build_page_display(to, " +----------------------------- EmpireMUD 2.0b5 -----------------------------+");
 	
 	// row 1 col 1: name
-	pd = add_page_display(to, "  Name: %-18.18s", PERS(ch, ch, 1));
+	pd = build_page_display(to, "  Name: %-18.18s", PERS(ch, ch, 1));
 
 	// row 1 col 2: class
 	get_player_skill_string(ch, lbuf, TRUE);
@@ -934,7 +934,7 @@ void display_score_to_char(char_data *ch, char_data *to) {
 	}
 	playing_time = *real_time_passed((time(0) - ch->player.time.logon) + ch->player.time.played, 0);
 	sprintf(buf1, "%dd, %dh", playing_time.day, playing_time.hours);
-	pd = add_page_display(to, "  Age: %-19.19s Play Time: %-13.13s", buf, buf1);
+	pd = build_page_display(to, "  Age: %-19.19s Play Time: %-13.13s", buf, buf1);
 	
 	// row 2 col 3: rank
 	if ((emp = GET_LOYALTY(ch)) && !IS_NPC(ch)) {
@@ -943,14 +943,14 @@ void display_score_to_char(char_data *ch, char_data *to) {
 	
 	if (GET_BONUS_TRAITS(ch)) {
 		prettier_sprintbit(GET_BONUS_TRAITS(ch), bonus_bit_descriptions, lbuf);
-		add_page_display(to, "  Bonus traits: %s", lbuf);
+		build_page_display(to, "  Bonus traits: %s", lbuf);
 	}
 
-	add_page_display(to, " +-------------------------------- Condition --------------------------------+");
+	build_page_display(to, " +-------------------------------- Condition --------------------------------+");
 	
 	// row 1 col 1: health, 6 color codes = 12 invisible characters
 	sprintf(lbuf, "&g%d&0/&g%d&0 &g%+d&0/%ds", GET_HEALTH(ch), GET_MAX_HEALTH(ch), health_gain(ch, TRUE), SECS_PER_REAL_UPDATE);
-	pd = add_page_display(to, "  Health: %-28.28s", lbuf);
+	pd = build_page_display(to, "  Health: %-28.28s", lbuf);
 
 	// row 1 col 2: move, 6 color codes = 12 invisible characters
 	sprintf(lbuf, "&y%d&0/&y%d&0 &y%+d&0/%ds", GET_MOVE(ch), GET_MAX_MOVE(ch), move_gain(ch, TRUE), SECS_PER_REAL_UPDATE);
@@ -986,17 +986,17 @@ void display_score_to_char(char_data *ch, char_data *to) {
 	}
 	// gotta count the color codes to determine width
 	count = 37 + color_code_length(lbuf);
-	pd = add_page_display(to, "  Conditions: %-*.*s", count, count, lbuf);
+	pd = build_page_display(to, "  Conditions: %-*.*s", count, count, lbuf);
 	
 	if (IS_VAMPIRE(ch)) {
 		append_page_display_line(pd, " Blood: &r%d&0/&r%d&0-&r%d&0/hr", GET_BLOOD(ch), GET_MAX_BLOOD(ch), MAX(0, GET_BLOOD_UPKEEP(ch)));
 	}
 	
-	add_page_display(to, " +------------------------------- Attributes --------------------------------+");
-	add_page_display_str(to, display_attributes(ch));
+	build_page_display(to, " +------------------------------- Attributes --------------------------------+");
+	build_page_display_str(to, display_attributes(ch));
 
 	// secondary attributes
-	add_page_display(to, " +---------------------------------------------------------------------------+");
+	build_page_display(to, " +---------------------------------------------------------------------------+");
 
 	// row 1 (dex is removed from dodge to make the display easier to read)
 	val = get_dodge_modifier(ch, NULL, FALSE) - (hit_per_dex * GET_DEXTERITY(ch));
@@ -1006,13 +1006,13 @@ void display_score_to_char(char_data *ch, char_data *to) {
 	sprintf(lbuf2, "Block  [%s%d&0]", HAPPY_COLOR(val, 0), val);
 	
 	sprintf(lbuf3, "Resist  [%dp | %dm]", GET_RESIST_PHYSICAL(ch), GET_RESIST_MAGICAL(ch));
-	add_page_display(to, "  %-28.28s %-28.28s %-24.24s", lbuf, lbuf2, lbuf3);
+	build_page_display(to, "  %-28.28s %-28.28s %-24.24s", lbuf, lbuf2, lbuf3);
 	
 	// row 2
 	sprintf(lbuf, "Physical  [%s%+d&0]", HAPPY_COLOR(GET_BONUS_PHYSICAL(ch), 0), GET_BONUS_PHYSICAL(ch));
 	sprintf(lbuf2, "Magical  [%s%+d&0]", HAPPY_COLOR(GET_BONUS_MAGICAL(ch), 0), GET_BONUS_MAGICAL(ch));
 	sprintf(lbuf3, "Healing  [%s%+d&0]", HAPPY_COLOR(GET_BONUS_HEALING(ch), 0), GET_BONUS_HEALING(ch));
-	add_page_display(to, "  %-28.28s %-28.28s %-28.28s", lbuf, lbuf2, lbuf3);
+	build_page_display(to, "  %-28.28s %-28.28s %-28.28s", lbuf, lbuf2, lbuf3);
 	
 	// row 3 (dex is removed from to-hit to make the display easier to read)
 	val = get_to_hit(ch, NULL, FALSE, FALSE) - (hit_per_dex * GET_DEXTERITY(ch));
@@ -1020,9 +1020,9 @@ void display_score_to_char(char_data *ch, char_data *to) {
 	sprintf(lbuf2, "Speed  [%.2f]", get_combat_speed(ch, WEAR_WIELD));
 	sprintf(lbuf3, "Crafting  [%s%d&0]", HAPPY_COLOR(get_crafting_level(ch), GET_SKILL_LEVEL(ch)), get_crafting_level(ch));
 	// note: the "%-24.24s" for speed is lower because it contains no color codes
-	add_page_display(to, "  %-28.28s %-24.24s %-28.28s", lbuf, lbuf2, lbuf3);
+	build_page_display(to, "  %-28.28s %-24.24s %-28.28s", lbuf, lbuf2, lbuf3);
 		
-	add_page_display(to, " +--------------------------------- Skills ----------------------------------+\r\n");
+	build_page_display(to, " +--------------------------------- Skills ----------------------------------+\r\n");
 
 	count = 0;
 	HASH_ITER(hh, GET_SKILL_HASH(ch), skdata, next_skill) {
@@ -1035,7 +1035,7 @@ void display_score_to_char(char_data *ch, char_data *to) {
 			
 			cols = 25 + color_code_length(lbuf);
 			if (!count) {
-				pd = add_page_display(to, " %-*.*s&0", cols, cols, lbuf);
+				pd = build_page_display(to, " %-*.*s&0", cols, cols, lbuf);
 			}
 			else {
 				append_page_display_line(pd, "%-*.*s&0", cols, cols, lbuf);
@@ -1049,18 +1049,18 @@ void display_score_to_char(char_data *ch, char_data *to) {
 
 	/* Gods and Immortals: */
 	if (IS_GOD(ch) || IS_IMMORTAL(ch)) {
-		add_page_display(to, " +------------------------------- Resources ---------------------------------+");
+		build_page_display(to, " +------------------------------- Resources ---------------------------------+");
 		strcpy(buf, " ");
 		for (i = 0, j = 0; i < NUM_MATERIALS; i++) {
 			if (GET_RESOURCE(ch, i)) {
 				sprintf(buf + strlen(buf), " %-14.14s %-6d %s", materials[i].name, GET_RESOURCE(ch, i), !(++j % 3) ? "\r\n " : "  ");
 			}
 		}
-		add_page_display_str(to, buf);
+		build_page_display_str(to, buf);
 	}
 
 	// everything leaves a starting space so this next line does not need it
-	add_page_display(to, " +---------------------------------------------------------------------------+");
+	build_page_display(to, " +---------------------------------------------------------------------------+");
 	
 	// affects last -- put nothing after these as they may also flush send_page_display()
 	if (ch == to) {
@@ -1709,7 +1709,7 @@ void show_character_affects(char_data *ch, char_data *to, bool send_page) {
 			prettier_sprintbit(aff->bitvector, affected_bits, buf2);
 			strcat(buf, buf2);
 		}
-		add_page_display_str(to, buf);
+		build_page_display_str(to, buf);
 	}
 	
 	// show DoT affects too
@@ -1717,7 +1717,7 @@ void show_character_affects(char_data *ch, char_data *to, bool send_page) {
 		strcpy(lbuf, colon_time(dot->time_remaining, FALSE, NULL));
 		
 		// main body
-		add_page_display(to, "   \tr%s\t0 (%s) %d %s damage (%d/%d)", get_generic_name_by_vnum(dot->type), lbuf, dot->damage * dot->stack, damage_types[dot->damage_type], dot->stack, dot->max_stack);
+		build_page_display(to, "   \tr%s\t0 (%s) %d %s damage (%d/%d)", get_generic_name_by_vnum(dot->type), lbuf, dot->damage * dot->stack, damage_types[dot->damage_type], dot->stack, dot->max_stack);
 	}
 	
 	if (send_page) {
@@ -2649,7 +2649,7 @@ ACMD(do_affects) {
 			send_config_msg(ch, "no_person");
 		}
 		else if (IS_IMMORTAL(ch)) {
-			add_page_display(ch, "Affects on %s:", PERS(vict, ch, FALSE));
+			build_page_display(ch, "Affects on %s:", PERS(vict, ch, FALSE));
 			show_character_affects(vict, ch, FALSE);
 			send_page_display(ch);
 		}
@@ -2662,7 +2662,7 @@ ACMD(do_affects) {
 	// if a subcmd was passed, we remove some of the info
 	limited = (subcmd != 0);
 
-	add_page_display(ch, "  Affects:");
+	build_page_display(ch, "  Affects:");
 
 	// Conditions: not shown on limited view because 'score' shows them separately
 	if (!limited) {
@@ -2689,24 +2689,24 @@ ACMD(do_affects) {
 					sprintf(buf1 + i, " and%s", buf2);
 					break;
 				}
-			add_page_display(ch, "%s.", buf1);
+			build_page_display(ch, "%s.", buf1);
 		}
 	}
 	
 	// mount
 	if (IS_RIDING(ch)) {
-		add_page_display(ch, "   You are riding %s.", get_mob_name_by_proto(GET_MOUNT_VNUM(ch), TRUE));
+		build_page_display(ch, "   You are riding %s.", get_mob_name_by_proto(GET_MOUNT_VNUM(ch), TRUE));
 	}
 	else if (has_player_tech(ch, PTECH_RIDING) && GET_MOUNT_VNUM(ch) != NOTHING && mob_proto(GET_MOUNT_VNUM(ch))) {
-		add_page_display(ch, "   You have %s. Type 'mount' to ride it.", get_mob_name_by_proto(GET_MOUNT_VNUM(ch), TRUE));
+		build_page_display(ch, "   You have %s. Type 'mount' to ride it.", get_mob_name_by_proto(GET_MOUNT_VNUM(ch), TRUE));
 	}
 
 	/* Morph */
 	if (IS_MORPHED(ch)) {
-		add_page_display(ch, "   You are in the form of %s!", get_morph_desc(ch, FALSE));
+		build_page_display(ch, "   You are in the form of %s!", get_morph_desc(ch, FALSE));
 	}
 	else if (IS_DISGUISED(ch)) {
-		add_page_display(ch, "   You are disguised as %s!", PERS(ch, ch, 0));
+		build_page_display(ch, "   You are disguised as %s!", PERS(ch, ch, 0));
 	}
 
 	show_character_affects(ch, ch, FALSE);
@@ -2732,7 +2732,7 @@ ACMD(do_buffs) {
 	}
 	
 	// start string
-	add_page_display(ch, "Your buff abilities:");
+	build_page_display(ch, "Your buff abilities:");
 	
 	HASH_ITER(hh, GET_ABILITY_HASH(ch), plab, next_plab) {
 		if (!(abil = plab->ptr)) {
@@ -2754,7 +2754,7 @@ ACMD(do_buffs) {
 		// build output
 		any = TRUE;
 		error = FALSE;
-		pd = add_page_display(ch, " %s:", ABIL_NAME(abil));
+		pd = build_page_display(ch, " %s:", ABIL_NAME(abil));
 		
 		// check self?
 		if (!IS_SET(ABIL_TARGETS(abil), ATAR_NOT_SELF)) {
@@ -2850,7 +2850,7 @@ ACMD(do_buffs) {
 	}
 	
 	if (!any) {
-		add_page_display_str(ch, " none");
+		build_page_display_str(ch, " none");
 	}
 	
 	send_page_display(ch);
@@ -3047,11 +3047,11 @@ ACMD(do_coins) {
 	// basic coins -- only show if no-arg
 	if (!*argument) {
 		coin_string(GET_PLAYER_COINS(ch), line);
-		add_page_display(ch, "You have %s.", line);
+		build_page_display(ch, "You have %s.", line);
 	}
 	
 	if (GET_CURRENCIES(ch) && subcmd) {
-		add_page_display(ch, "You%s have:", *argument ? "" : " also");
+		build_page_display(ch, "You%s have:", *argument ? "" : " also");
 		
 		HASH_ITER(hh, GET_CURRENCIES(ch), cur, next_cur) {
 			if (*argument && !multi_isname(argument, get_generic_string_by_vnum(cur->vnum, GENERIC_CURRENCY, WHICH_CURRENCY(cur->amount)))) {
@@ -3072,13 +3072,13 @@ ACMD(do_coins) {
 				*vstr = '\0';
 			}
 			
-			add_page_display(ch, "%s%3d %s%s", vstr, cur->amount, get_generic_string_by_vnum(cur->vnum, GENERIC_CURRENCY, WHICH_CURRENCY(cur->amount)), adv_part);
+			build_page_display(ch, "%s%3d %s%s", vstr, cur->amount, get_generic_string_by_vnum(cur->vnum, GENERIC_CURRENCY, WHICH_CURRENCY(cur->amount)), adv_part);
 			any = TRUE;
 		}
 	}
 	
 	if (*argument && !any) {
-		add_page_display(ch, "You have no special currency called '%s'.", argument);
+		build_page_display(ch, "You have no special currency called '%s'.", argument);
 		if (ch->desc && ch->desc->page_lines) {
 			free_page_display(&ch->desc->page_lines);
 		}
@@ -3220,17 +3220,17 @@ ACMD(do_factions) {
 			idx = rep_const_to_index(pfd ? pfd->rep : FCT_STARTING_REP(fct));
 			
 			// show 1 faction
-			add_page_display(ch, "%s%s\t0", (idx != NOTHING ? reputation_levels[idx].color : ""), FCT_NAME(fct));
+			build_page_display(ch, "%s%s\t0", (idx != NOTHING ? reputation_levels[idx].color : ""), FCT_NAME(fct));
 			if (pfd && idx != NOTHING) {
-				add_page_display(ch, "Reputation: %s / %d", reputation_levels[idx].name, pfd->value);
+				build_page_display(ch, "Reputation: %s / %d", reputation_levels[idx].name, pfd->value);
 			}
 			else if (idx != NOTHING) {
-				add_page_display(ch, "Reputation: %s", reputation_levels[idx].name);
+				build_page_display(ch, "Reputation: %s", reputation_levels[idx].name);
 			}
 			else {
-				add_page_display(ch, "Reputation: none");
+				build_page_display(ch, "Reputation: none");
 			}
-			add_page_display_str(ch, NULLSAFE(FCT_DESCRIPTION(fct)));
+			build_page_display_str(ch, NULLSAFE(FCT_DESCRIPTION(fct)));
 			
 			// relations?
 			any = FALSE;
@@ -3242,19 +3242,19 @@ ACMD(do_factions) {
 				// show it
 				if (!any) {	// header
 					any = TRUE;
-					add_page_display(ch, "Relationships:");
+					build_page_display(ch, "Relationships:");
 				}
 				pfd = get_reputation(ch, rel->vnum, FALSE);
 				idx = (pfd ? rep_const_to_index(pfd->rep) : NOTHING);
 				prettier_sprintbit(rel->flags, relationship_descs, buf);
-				add_page_display(ch, " %s%s\t0 - %s", (idx != NOTHING ? reputation_levels[idx].color : ""), FCT_NAME(rel->ptr), buf);
+				build_page_display(ch, " %s%s\t0 - %s", (idx != NOTHING ? reputation_levels[idx].color : ""), FCT_NAME(rel->ptr), buf);
 			}
 			
 			send_page_display(ch);
 		}
 	}
 	else {	// no arg, show all
-		add_page_display(ch, "Your factions:");
+		build_page_display(ch, "Your factions:");
 		HASH_ITER(hh, GET_FACTIONS(ch), pfd, next_pfd) {
 			if (!(fct = find_faction_by_vnum(pfd->vnum))) {
 				continue;
@@ -3265,11 +3265,11 @@ ACMD(do_factions) {
 			
 			++count;
 			idx = rep_const_to_index(pfd->rep);
-			add_page_display(ch, " %s %s(%s / %d)\t0%s", FCT_NAME(fct), reputation_levels[idx].color, reputation_levels[idx].name, pfd->value, (FACTION_FLAGGED(fct, FCT_HIDE_IN_LIST) ? " (hidden)" : ""));
+			build_page_display(ch, " %s %s(%s / %d)\t0%s", FCT_NAME(fct), reputation_levels[idx].color, reputation_levels[idx].name, pfd->value, (FACTION_FLAGGED(fct, FCT_HIDE_IN_LIST) ? " (hidden)" : ""));
 		}
 		
 		if (!count) {
-			add_page_display_str(ch, " none");
+			build_page_display_str(ch, " none");
 		}
 		send_page_display(ch);
 	}
@@ -3388,7 +3388,7 @@ ACMD(do_helpsearch) {
 		msg_to_char(ch, "No help available.r\n");
 	}
 	else {
-		add_page_display(ch, "You find help on that in the following help entries:");
+		build_page_display(ch, "You find help on that in the following help entries:");
 		found = FALSE;
 		
 		for (iter = 0; iter <= top_of_helpt; ++iter) {
@@ -3413,11 +3413,11 @@ ACMD(do_helpsearch) {
 			
 			// FOUND!
 			found = TRUE;
-			add_page_display(ch, " %s", help_table[iter].keyword);
+			build_page_display(ch, " %s", help_table[iter].keyword);
 		}
 		
 		if (!found) {
-			add_page_display_str(ch, " none");
+			build_page_display_str(ch, " none");
 		}
 		
 		send_page_display(ch);
@@ -3595,16 +3595,16 @@ ACMD(do_inventory) {
 		
 		// start the display
 		if (*argument && *heading) {
-			add_page_display(ch, "%s items matching '%s':", CAP(heading), argument);
+			build_page_display(ch, "%s items matching '%s':", CAP(heading), argument);
 		}
 		else if (*argument) {
-			add_page_display(ch, "Items matching '%s':", argument);
+			build_page_display(ch, "Items matching '%s':", argument);
 		}
 		else if (*heading) {
-			add_page_display(ch, "%s items:", CAP(heading));
+			build_page_display(ch, "%s items:", CAP(heading));
 		}
 		else {
-			add_page_display_str(ch, "Items:");
+			build_page_display_str(ch, "Items:");
 		}
 		
 		DL_FOREACH2(ch->carrying, obj, next_content) {
@@ -3635,7 +3635,7 @@ ACMD(do_inventory) {
 			}
 			
 			// looks okay
-			add_page_display(ch, "%2d. %s", ++count, obj_desc_for_char(obj, ch, OBJ_DESC_INVENTORY));
+			build_page_display(ch, "%2d. %s", ++count, obj_desc_for_char(obj, ch, OBJ_DESC_INVENTORY));
 			
 			// shown enough?
 			if (to_show > 0 && count >= to_show) {
@@ -3904,7 +3904,7 @@ ACMD(do_messages) {
 		return;
 	}
 	
-	add_page_display_str(ch, "Recent messages:");
+	build_page_display_str(ch, "Recent messages:");
 	
 	HASH_ITER(hh, automessages_table, msg, next_msg) {
 		if (!msg->msg) {
@@ -3917,7 +3917,7 @@ ACMD(do_messages) {
 	
 		if (msg->timing == AUTOMSG_ON_LOGIN || msg->timestamp > (now - (24 * SECS_PER_REAL_HOUR)) || (pam && pam->timestamp > (now - 24 * SECS_PER_REAL_HOUR))) {
 			++count;
-			add_page_display_str(ch, msg->msg);
+			build_page_display_str(ch, msg->msg);
 			
 			// mark seen
 			if (msg->timing != AUTOMSG_ON_LOGIN) {
@@ -3932,7 +3932,7 @@ ACMD(do_messages) {
 	}
 	
 	if (!count) {
-		add_page_display_str(ch, " none");
+		build_page_display_str(ch, " none");
 	}
 	
 	send_page_display(ch);
@@ -4049,7 +4049,7 @@ ACMD(do_nearby) {
 	}
 	
 	// displaying:
-	add_page_display(ch, "You find nearby (within %d tile%s):", max_dist, PLURAL(max_dist));
+	build_page_display(ch, "You find nearby (within %d tile%s):", max_dist, PLURAL(max_dist));
 	#define NEARBY_DIR  get_partial_direction_to(ch, IN_ROOM(ch), loc, (PRF_FLAGGED(ch, PRF_SCREEN_READER) ? FALSE : TRUE))
 			// was: (dir == NO_DIR ? "away" : (PRF_FLAGGED(ch, PRF_SCREEN_READER) ? dirs[dir] : alt_dirs[dir]))
 
@@ -4219,14 +4219,14 @@ ACMD(do_nearby) {
 	DL_SORT(nrb_list, nrb_sort_distance);
 	DL_FOREACH_SAFE(nrb_list, nrb_item, next_item) {
 		if (nrb_item->text) {
-			add_page_display_str(ch, nrb_item->text);
+			build_page_display_str(ch, nrb_item->text);
 			free(nrb_item->text);
 		}
 		free(nrb_item);
 	}
 	
 	if (!found) {
-		add_page_display_str(ch, " nothing");
+		build_page_display_str(ch, " nothing");
 	}
 	
 	send_page_display(ch);

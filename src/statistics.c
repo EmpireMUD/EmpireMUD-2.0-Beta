@@ -206,41 +206,41 @@ void mudstats_configs(char_data *ch, char *argument) {
 	struct page_display *pd;
 	
 	// start output
-	add_page_display(ch, "Game configuration for %s:", config_get_string("mud_name"));
+	build_page_display(ch, "Game configuration for %s:", config_get_string("mud_name"));
 	
 	// status/hiring
-	pd = add_page_display(ch, "Status: %s", config_get_string("mud_status"));
+	pd = build_page_display(ch, "Status: %s", config_get_string("mud_status"));
 	if (config_get_bool("hiring_builders") || config_get_bool("hiring_coders")) {
 		append_page_display_line(pd, ", Hiring: %s", (config_get_bool("hiring_builders") && config_get_bool("hiring_coders")) ? "builders and coders" : (config_get_bool("hiring_builders") ? "builders" : "coders"));
 	}
 	
 	// time
-	add_page_display(ch, "Game time: %.2f minutes per game hour, %.2f hours per day, %.2f days per year", SECS_PER_MUD_HOUR / (double)SECS_PER_REAL_MIN, SECS_PER_MUD_DAY / (double) SECS_PER_REAL_HOUR, SECS_PER_MUD_YEAR / (double) SECS_PER_REAL_DAY);
+	build_page_display(ch, "Game time: %.2f minutes per game hour, %.2f hours per day, %.2f days per year", SECS_PER_MUD_HOUR / (double)SECS_PER_REAL_MIN, SECS_PER_MUD_DAY / (double) SECS_PER_REAL_HOUR, SECS_PER_MUD_YEAR / (double) SECS_PER_REAL_DAY);
 	
 	// skills
-	add_page_display(ch, "Skills: %d at %d, %d at %d, %d total", config_get_int("skills_at_max_level"), MAX_SKILL_CAP, config_get_int("skills_at_specialty_level"), SPECIALTY_SKILL_CAP, config_get_int("skills_per_char"));
+	build_page_display(ch, "Skills: %d at %d, %d at %d, %d total", config_get_int("skills_at_max_level"), MAX_SKILL_CAP, config_get_int("skills_at_specialty_level"), SPECIALTY_SKILL_CAP, config_get_int("skills_per_char"));
 	
 	// environment
-	add_page_display(ch, "Environment: %s", config_get_bool("temperature_penalties") ? "temperature penalties" : "no penalties from temperature");
+	build_page_display(ch, "Environment: %s", config_get_bool("temperature_penalties") ? "temperature penalties" : "no penalties from temperature");
 	
 	// pk
 	prettier_sprintbit(config_get_bitvector("pk_mode"), pk_modes, part);
-	add_page_display(ch, "Player-killing: %s", config_get_bitvector("pk_mode") ? part : "forbidden");
+	build_page_display(ch, "Player-killing: %s", config_get_bitvector("pk_mode") ? part : "forbidden");
 	
 	// war
-	add_page_display(ch, "War: %d offense%s required%s", config_get_int("offense_min_to_war"), PLURAL(config_get_int("offense_min_to_war")), config_get_bool("mutual_war_only") ? ", wars must be mutual" : "");
+	build_page_display(ch, "War: %d offense%s required%s", config_get_int("offense_min_to_war"), PLURAL(config_get_int("offense_min_to_war")), config_get_bool("mutual_war_only") ? ", wars must be mutual" : "");
 	
 	// city
-	add_page_display(ch, "Cities: %d minutes to establish, %d tiles apart (%d for allies)", config_get_int("minutes_to_full_city"), config_get_int("min_distance_between_cities"), config_get_int("min_distance_between_ally_cities"));
+	build_page_display(ch, "Cities: %d minutes to establish, %d tiles apart (%d for allies)", config_get_int("minutes_to_full_city"), config_get_int("min_distance_between_cities"), config_get_int("min_distance_between_ally_cities"));
 	
 	// storage
-	add_page_display(ch, "Storage: %s", config_get_bool("decay_in_storage") ? "items decay" : "no decay");
+	build_page_display(ch, "Storage: %s", config_get_bool("decay_in_storage") ? "items decay" : "no decay");
 	
 	// workforce
-	add_page_display(ch, "Workforce: %d cap per member, %d minimum cap per island, %d tile range", config_get_int("max_chore_resource_per_member"), config_get_int("max_chore_resource_over_total"), config_get_int("chore_distance"));
+	build_page_display(ch, "Workforce: %d cap per member, %d minimum cap per island, %d tile range", config_get_int("max_chore_resource_per_member"), config_get_int("max_chore_resource_over_total"), config_get_int("chore_distance"));
 	
 	// newbie island
-	pd = add_page_display(ch, "Newbie islands: %s", config_get_bool("cities_on_newbie_islands") ? "allow cities" : "no cities allowed");
+	pd = build_page_display(ch, "Newbie islands: %s", config_get_bool("cities_on_newbie_islands") ? "allow cities" : "no cities allowed");
 	if (config_get_int("newbie_island_day_limit") > 0) {
 		append_page_display_line(pd, ", %d day limit", config_get_int("newbie_island_day_limit"));
 	}
@@ -249,7 +249,7 @@ void mudstats_configs(char_data *ch, char *argument) {
 	}
 	
 	// approval
-	pd = add_page_display(ch, "Approval: %s%s", config_get_bool("auto_approve") ? "automatic" : "required", config_get_bool("approve_per_character") ? " (per character)" : "");
+	pd = build_page_display(ch, "Approval: %s%s", config_get_bool("auto_approve") ? "automatic" : "required", config_get_bool("approve_per_character") ? " (per character)" : "");
 	if (!config_get_bool("auto_approve")) {
 		append_page_display_line(pd, ", needed for:");
 		if (config_get_bool("build_approval")) {
@@ -294,7 +294,7 @@ void mudstats_configs(char_data *ch, char *argument) {
 	}
 	
 	// timeouts
-	add_page_display(ch, "Timeouts: %d days for newbies, up to %d days after %d hours of playtime", config_get_int("member_timeout_newbie"), config_get_int("member_timeout_full"), config_get_int("member_timeout_max_threshold"));
+	build_page_display(ch, "Timeouts: %d days for newbies, up to %d days after %d hours of playtime", config_get_int("member_timeout_newbie"), config_get_int("member_timeout_full"), config_get_int("member_timeout_max_threshold"));
 	
 	send_page_display(ch);
 }
@@ -327,24 +327,24 @@ void mudstats_time(char_data *ch, char *argument) {
 	long when;
 	
 	// start output
-	add_page_display(ch, "Time until:");
+	build_page_display(ch, "Time until:");
 	
 	// daily reset
 	when = (data_get_long(DATA_DAILY_CYCLE) + SECS_PER_REAL_DAY) - time(0);
 	if (when > 0) {
-		add_page_display(ch, "Daily quest and bonus cycle: %s%s", colon_time(when, FALSE, NULL), (when < 60 ? " seconds" : ""));
+		build_page_display(ch, "Daily quest and bonus cycle: %s%s", colon_time(when, FALSE, NULL), (when < 60 ? " seconds" : ""));
 	}
 	else {
-		add_page_display(ch, "Daily quest and bonus cycle: imminent");
+		build_page_display(ch, "Daily quest and bonus cycle: imminent");
 	}
 	
 	// maintenance cycle
 	when = (data_get_long(DATA_LAST_NEW_YEAR) + (config_get_int("world_reset_hours") * SECS_PER_REAL_HOUR)) - time(0);
 	if (when > 0) {
-		add_page_display(ch, "World reset (maintenance and depletion): %s%s", colon_time(when, FALSE, NULL), (when < 60 ? " seconds" : ""));
+		build_page_display(ch, "World reset (maintenance and depletion): %s%s", colon_time(when, FALSE, NULL), (when < 60 ? " seconds" : ""));
 	}
 	else {
-		add_page_display(ch, "World reset (maintenance and depletion): imminent");
+		build_page_display(ch, "World reset (maintenance and depletion): imminent");
 	}
 	
 	send_page_display(ch);

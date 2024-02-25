@@ -635,7 +635,7 @@ void show_string(descriptor_data *d, char *input) {
  //////////////////////////////////////////////////////////////////////////////
 //// PAGE DISPLAY SYSTEM /////////////////////////////////////////////////////
 
-// Usage: Build the player's page_display with the various add_page_display*
+// Usage: Build the player's page_display with the various build_page_display*
 // functions and then finalize it and send it to the player by calling
 // send_page_display(ch), which may or may not use the paginator depending on
 // the text length and settings. NPCs and dc'd players are ignored
@@ -732,7 +732,7 @@ int page_display_column_width(char_data *ch, int cols) {
 * @param const char *fmt, ... va_arg format for the line to add.
 * @return struct page_display* A pointer to the new line, if it was added. May return NULL if it failed to add.
 */
-struct page_display *add_page_display(char_data *ch, const char *fmt, ...) {
+struct page_display *build_page_display(char_data *ch, const char *fmt, ...) {
 	char text[MAX_STRING_LENGTH];
 	va_list tArgList;
 	struct page_display *pd;
@@ -779,7 +779,7 @@ struct page_display *add_page_display(char_data *ch, const char *fmt, ...) {
 * @param const char *fmt, ... va_arg format for the line to add.
 * @return struct page_display* A pointer to the new line, if it was added. May return NULL if it failed to add.
 */
-struct page_display *add_page_display_col(char_data *ch, int cols, bool strict_cols, const char *fmt, ...) {
+struct page_display *build_page_display_col(char_data *ch, int cols, bool strict_cols, const char *fmt, ...) {
 	char text[MAX_STRING_LENGTH];
 	int max;
 	va_list tArgList;
@@ -829,7 +829,7 @@ struct page_display *add_page_display_col(char_data *ch, int cols, bool strict_c
 * @param const char *str The string to add as the new line (will be copied).
 * @return struct page_display* A pointer to the new line, if it was added. May return NULL if it failed to add.
 */
-struct page_display *add_page_display_str(char_data *ch, const char *str) {
+struct page_display *build_page_display_str(char_data *ch, const char *str) {
 	struct page_display *pd;
 	
 	if (!ch || !ch->desc || !str) {
@@ -864,7 +864,7 @@ struct page_display *add_page_display_str(char_data *ch, const char *str) {
 * @param const char *str The string to add as the new line (will be copied).
 * @return struct page_display* A pointer to the new line, if it was added. May return NULL if it failed to add.
 */
-struct page_display *add_page_display_col_str(char_data *ch, int cols, bool strict_cols, const char *str) {
+struct page_display *build_page_display_col_str(char_data *ch, int cols, bool strict_cols, const char *str) {
 	int max;
 	struct page_display *pd;
 	
@@ -888,6 +888,36 @@ struct page_display *add_page_display_col_str(char_data *ch, int cols, bool stri
 	if (strict_cols && pd->length > (max = page_display_column_width(ch, cols))) {
 		pd->length = max + color_code_length(pd->text);
 		pd->text[pd->length - 1] = '\0';
+	}
+	
+	return pd;
+}
+
+
+/**
+* Adds a new line to a player's page_display -- at the BEGINNING.
+* Will trim trailing \r\n (crlf).
+*
+* @param char_data *ch The person to add the display line to (at the beginning).
+* @param const char *str The string to add as the new line (will be copied).
+* @return struct page_display* A pointer to the new line, if it was added. May return NULL if it failed to add.
+*/
+struct page_display *build_page_display_prepend(char_data *ch, const char *str) {
+	struct page_display *pd;
+	
+	if (!ch || !ch->desc || !str) {
+		return NULL;
+	}
+	
+	CREATE(pd, struct page_display, 1);
+	
+	pd->length = strlen(str);
+	pd->text = strdup(str);
+	DL_PREPEND(ch->desc->page_lines, pd);
+	
+	// check trailing crlf
+	while (pd->length > 0 && (pd->text[pd->length-1] == '\r' || pd->text[pd->length-1] == '\n')) {
+		pd->text[--pd->length] = '\0';
 	}
 	
 	return pd;
@@ -932,36 +962,6 @@ void append_page_display_line(struct page_display *line, const char *fmt, ...) {
 	while (line->length > 0 && (line->text[line->length-1] == '\r' || line->text[line->length-1] == '\n')) {
 		line->text[--line->length] = '\0';
 	}
-}
-
-
-/**
-* Adds a new line to a player's page_display -- at the BEGINNING.
-* Will trim trailing \r\n (crlf).
-*
-* @param char_data *ch The person to add the display line to (at the beginning).
-* @param const char *str The string to add as the new line (will be copied).
-* @return struct page_display* A pointer to the new line, if it was added. May return NULL if it failed to add.
-*/
-struct page_display *prepend_page_display_str(char_data *ch, const char *str) {
-	struct page_display *pd;
-	
-	if (!ch || !ch->desc || !str) {
-		return NULL;
-	}
-	
-	CREATE(pd, struct page_display, 1);
-	
-	pd->length = strlen(str);
-	pd->text = strdup(str);
-	DL_PREPEND(ch->desc->page_lines, pd);
-	
-	// check trailing crlf
-	while (pd->length > 0 && (pd->text[pd->length-1] == '\r' || pd->text[pd->length-1] == '\n')) {
-		pd->text[--pd->length] = '\0';
-	}
-	
-	return pd;
 }
 
 

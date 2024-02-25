@@ -2336,7 +2336,7 @@ ACMD(do_speak) {
 	
 	// no-arg: Just show languages I speak
 	if (!*argument) {
-		add_page_display(ch, "You speak the following languages:");
+		build_page_display(ch, "You speak the following languages:");
 		
 		count = 0;
 		HASH_ITER(hh, GET_LANGUAGES(ch), lang, next_lang) {
@@ -2372,15 +2372,15 @@ ACMD(do_speak) {
 			
 			// build line
 			if (*mods) {
-				add_page_display(ch, " %s (%s)%s", GEN_NAME(gen), mods, adv_part);
+				build_page_display(ch, " %s (%s)%s", GEN_NAME(gen), mods, adv_part);
 			}
 			else {
-				add_page_display(ch, " %s%s", GEN_NAME(gen), adv_part);
+				build_page_display(ch, " %s%s", GEN_NAME(gen), adv_part);
 			}
 		}
 		
 		if (!count) {
-			add_page_display_str(ch, " none");
+			build_page_display_str(ch, " none");
 		}
 		send_page_display(ch);
 		return;

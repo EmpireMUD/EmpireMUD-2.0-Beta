@@ -602,10 +602,10 @@ void show_completed_goals(char_data *ch, empire_data *emp, int only_type, bool p
 	int count = 0;
 	
 	if (only_type == NOTHING) {
-		add_page_display(ch, "%s%s\t0 has %s:", EMPIRE_BANNER(emp), EMPIRE_NAME(emp), purchased ? "purchased" : "completed");
+		build_page_display(ch, "%s%s\t0 has %s:", EMPIRE_BANNER(emp), EMPIRE_NAME(emp), purchased ? "purchased" : "completed");
 	}
 	else {
-		add_page_display(ch, "%s%s\t0 has %s the following %s %s:", EMPIRE_BANNER(emp), EMPIRE_NAME(emp), purchased ? "purchased" : "completed", progress_types[only_type], purchased ? "rewards" : "goals");
+		build_page_display(ch, "%s%s\t0 has %s the following %s %s:", EMPIRE_BANNER(emp), EMPIRE_NAME(emp), purchased ? "purchased" : "completed", progress_types[only_type], purchased ? "rewards" : "goals");
 	}
 	
 	HASH_ITER(sorted_hh, sorted_progress, prg, next_prg) {
@@ -634,11 +634,11 @@ void show_completed_goals(char_data *ch, empire_data *emp, int only_type, bool p
 		}
 		
 		++count;
-		add_page_display_col(ch, 2, FALSE, " %s%s", vstr, PRG_NAME(prg));
+		build_page_display_col(ch, 2, FALSE, " %s%s", vstr, PRG_NAME(prg));
 	}
 	
 	if (!count) {
-		add_page_display(ch, " no %s", purchased ? "rewards" : "goals");
+		build_page_display(ch, " no %s", purchased ? "rewards" : "goals");
 	}
 	
 	send_page_display(ch);
@@ -669,24 +669,24 @@ static void show_detailed_empire(char_data *ch, empire_data *e) {
 		*line = '\0';
 	}
 	
-	add_page_display(ch, "%s%s&0%s, led by %s", EMPIRE_BANNER(e), EMPIRE_NAME(e), line, (index = find_player_index_by_idnum(EMPIRE_LEADER(e))) ? index->fullname : "(Unknown)");
+	build_page_display(ch, "%s%s&0%s, led by %s", EMPIRE_BANNER(e), EMPIRE_NAME(e), line, (index = find_player_index_by_idnum(EMPIRE_LEADER(e))) ? index->fullname : "(Unknown)");
 	
 	if (IS_IMMORTAL(ch)) {
-		add_page_display(ch, "Created: %-24.24s", ctime(&EMPIRE_CREATE_TIME(e)));
+		build_page_display(ch, "Created: %-24.24s", ctime(&EMPIRE_CREATE_TIME(e)));
 		sprintbit(EMPIRE_ADMIN_FLAGS(e), empire_admin_flags, line, TRUE);
-		add_page_display(ch, "Admin flags: \tg%s\t0", line);
+		build_page_display(ch, "Admin flags: \tg%s\t0", line);
 	}
 	
 	if (EMPIRE_DESCRIPTION(e)) {
-		add_page_display(ch, "%s&0", EMPIRE_DESCRIPTION(e));
+		build_page_display(ch, "%s&0", EMPIRE_DESCRIPTION(e));
 	}
 	
-	add_page_display(ch, "Adjective form: %s", EMPIRE_ADJECTIVE(e));
+	build_page_display(ch, "Adjective form: %s", EMPIRE_ADJECTIVE(e));
 
-	add_page_display(ch, "Ranks%s:", (is_own_empire ? " and privileges" : ""));
+	build_page_display(ch, "Ranks%s:", (is_own_empire ? " and privileges" : ""));
 	for (iter = 1; iter <= EMPIRE_NUM_RANKS(e); ++iter) {
 		// rank name
-		pd = add_page_display(ch, " %2d. %s&0", iter, EMPIRE_RANK(e, iter-1));
+		pd = build_page_display(ch, " %2d. %s&0", iter, EMPIRE_RANK(e, iter-1));
 		
 		// privs -- only shown to own empire
 		if (is_own_empire) {
@@ -701,23 +701,23 @@ static void show_detailed_empire(char_data *ch, empire_data *e) {
 	}
 
 	prettier_sprintbit(EMPIRE_FRONTIER_TRAITS(e), empire_trait_types, buf);
-	add_page_display(ch, "Frontier traits: %s", buf);
-	add_page_display(ch, "Population: %d player%s, %d citizen%s, %d military", EMPIRE_MEMBERS(e), (EMPIRE_MEMBERS(e) != 1 ? "s" : ""), EMPIRE_POPULATION(e), (EMPIRE_POPULATION(e) != 1 ? "s" : ""), EMPIRE_MILITARY(e));
-	add_page_display(ch, "Territory: %d/%d (%d in-city, %d/%d outskirts, %d/%d frontier)", EMPIRE_TERRITORY(e, TER_TOTAL), land_can_claim(e, TER_TOTAL), EMPIRE_TERRITORY(e, TER_CITY), EMPIRE_TERRITORY(e, TER_OUTSKIRTS), land_can_claim(e, TER_OUTSKIRTS), EMPIRE_TERRITORY(e, TER_FRONTIER), land_can_claim(e, TER_FRONTIER));
-	add_page_display(ch, "(Land per greatness: %d, Land per 100 wealth: %d, Bonus territory: %d)", (config_get_int("land_per_greatness") + EMPIRE_ATTRIBUTE(e, EATT_TERRITORY_PER_GREATNESS)), EMPIRE_ATTRIBUTE(e, EATT_TERRITORY_PER_100_WEALTH), EMPIRE_ATTRIBUTE(e, EATT_BONUS_TERRITORY));
+	build_page_display(ch, "Frontier traits: %s", buf);
+	build_page_display(ch, "Population: %d player%s, %d citizen%s, %d military", EMPIRE_MEMBERS(e), (EMPIRE_MEMBERS(e) != 1 ? "s" : ""), EMPIRE_POPULATION(e), (EMPIRE_POPULATION(e) != 1 ? "s" : ""), EMPIRE_MILITARY(e));
+	build_page_display(ch, "Territory: %d/%d (%d in-city, %d/%d outskirts, %d/%d frontier)", EMPIRE_TERRITORY(e, TER_TOTAL), land_can_claim(e, TER_TOTAL), EMPIRE_TERRITORY(e, TER_CITY), EMPIRE_TERRITORY(e, TER_OUTSKIRTS), land_can_claim(e, TER_OUTSKIRTS), EMPIRE_TERRITORY(e, TER_FRONTIER), land_can_claim(e, TER_FRONTIER));
+	build_page_display(ch, "(Land per greatness: %d, Land per 100 wealth: %d, Bonus territory: %d)", (config_get_int("land_per_greatness") + EMPIRE_ATTRIBUTE(e, EATT_TERRITORY_PER_GREATNESS)), EMPIRE_ATTRIBUTE(e, EATT_TERRITORY_PER_100_WEALTH), EMPIRE_ATTRIBUTE(e, EATT_BONUS_TERRITORY));
 
-	add_page_display(ch, "Wealth: %d (%d treasure + %.1f coin%s at %d%%)", (int) GET_TOTAL_WEALTH(e), EMPIRE_WEALTH(e), EMPIRE_COINS(e), (EMPIRE_COINS(e) != 1.0 ? "s" : ""), (int)(COIN_VALUE * 100));
-	add_page_display(ch, "Greatness: %d, Fame: %d", EMPIRE_GREATNESS(e), EMPIRE_FAME(e));
+	build_page_display(ch, "Wealth: %d (%d treasure + %.1f coin%s at %d%%)", (int) GET_TOTAL_WEALTH(e), EMPIRE_WEALTH(e), EMPIRE_COINS(e), (EMPIRE_COINS(e) != 1.0 ? "s" : ""), (int)(COIN_VALUE * 100));
+	build_page_display(ch, "Greatness: %d, Fame: %d", EMPIRE_GREATNESS(e), EMPIRE_FAME(e));
 	
 	if (is_own_empire) {
 		total = config_get_int("max_chore_resource_per_member") * EMPIRE_MEMBERS(e) + EMPIRE_ATTRIBUTE(e, EATT_WORKFORCE_CAP);
 		for (iter = 0; *city_type[iter].name != '\n'; ++iter);
 		type = MIN(iter-1, EMPIRE_ATTRIBUTE(e, EATT_MAX_CITY_SIZE));
-		add_page_display(ch, "Workforce cap: %d item%s, Max city size: %s", total, PLURAL(total), city_type[type].name);
+		build_page_display(ch, "Workforce cap: %d item%s, Max city size: %s", total, PLURAL(total), city_type[type].name);
 	}
 	
 	if (is_own_empire || !EMPIRE_HAS_TECH(e, TECH_HIDDEN_PROGRESS)) {
-		pd = add_page_display(ch, "Technology: ");
+		pd = build_page_display(ch, "Technology: ");
 		for (iter = 0, comma = FALSE; iter < NUM_TECHS; ++iter) {
 			if (EMPIRE_HAS_TECH(e, iter)) {
 				append_page_display_line(pd, "%s%s", (comma ? ", " : ""), empire_tech_types[iter]);
@@ -740,7 +740,7 @@ static void show_detailed_empire(char_data *ch, empire_data *e) {
 	
 	// progress points by category
 	total = 0;
-	pd = add_page_display_str(ch, "");
+	pd = build_page_display_str(ch, "");
 	for (iter = 1; iter < NUM_PROGRESS_TYPES; ++iter) {
 		total += EMPIRE_PROGRESS_POINTS(e, iter);
 		append_page_display_line(pd, "%s: %d, ", progress_types[iter], EMPIRE_PROGRESS_POINTS(e, iter));
@@ -748,7 +748,7 @@ static void show_detailed_empire(char_data *ch, empire_data *e) {
 	append_page_display_line(pd, "Total: %d", total);
 	
 	// Score
-	pd = add_page_display(ch, "Score: %d, ranked #%d (", get_total_score(e), found_rank);
+	pd = build_page_display(ch, "Score: %d, ranked #%d (", get_total_score(e), found_rank);
 	for (iter = 0, comma = FALSE; iter < NUM_SCORES; ++iter) {
 		sprinttype(iter, score_type, buf, sizeof(buf), "UNDEFINED");
 		append_page_display_line(pd, "%s%s %d", (comma ? ", " : ""), buf, EMPIRE_SCORE(e, iter));
@@ -760,7 +760,7 @@ static void show_detailed_empire(char_data *ch, empire_data *e) {
 	if (GET_LOYALTY(ch) && GET_LOYALTY(ch) != e && !EMPIRE_IMM_ONLY(e) && !EMPIRE_IMM_ONLY(GET_LOYALTY(ch)) && !has_relationship(GET_LOYALTY(ch), e, DIPL_NONAGGR | DIPL_ALLIED)) {
 		int war_cost = get_war_cost(GET_LOYALTY(ch), e);
 		if (war_cost > 0) {
-			add_page_display(ch, "Cost to declare war or thievery on this empire: %d coin%s", war_cost, PLURAL(war_cost));
+			build_page_display(ch, "Cost to declare war or thievery on this empire: %d coin%s", war_cost, PLURAL(war_cost));
 		}
 	}
 	
@@ -1167,7 +1167,7 @@ static void show_empire_inventory_to_char(char_data *ch, empire_data *emp, char 
 	HASH_SORT(list, sort_einv_list);
 	
 	// build output
-	add_page_display(ch, "Inventory of %s%s&0 on this island:", EMPIRE_BANNER(emp), EMPIRE_NAME(emp));
+	build_page_display(ch, "Inventory of %s%s&0 on this island:", EMPIRE_BANNER(emp), EMPIRE_NAME(emp));
 	
 	HASH_ITER(hh, list, einv, next_einv) {
 		// only display it if it's on the requested island, or if they requested it by name, or all
@@ -1208,7 +1208,7 @@ static void show_empire_inventory_to_char(char_data *ch, empire_data *emp, char 
 			}
 			
 			// actual line
-			add_page_display(ch, "(%4d) %s%s%s%s", einv->local, vstr, get_obj_name_by_proto(einv->vnum), keepstr, totalstr);
+			build_page_display(ch, "(%4d) %s%s%s%s", einv->local, vstr, get_obj_name_by_proto(einv->vnum), keepstr, totalstr);
 			any = TRUE;
 		}
 		
@@ -1218,7 +1218,7 @@ static void show_empire_inventory_to_char(char_data *ch, empire_data *emp, char 
 	}
 	
 	if (!any) {
-		add_page_display_str(ch, " nothing");
+		build_page_display_str(ch, " nothing");
 	}
 	
 	send_page_display(ch);
@@ -1298,7 +1298,7 @@ void show_detailed_workforce_setup_to_char(empire_data *emp, char_data *ch, int 
 		return;
 	}
 	
-	add_page_display(ch, "&Z%s workforce setup for %s%s&0:", chore_data[chore].name, EMPIRE_BANNER(emp), EMPIRE_NAME(emp));
+	build_page_display(ch, "&Z%s workforce setup for %s%s&0:", chore_data[chore].name, EMPIRE_BANNER(emp), EMPIRE_NAME(emp));
 	
 	found = FALSE;
 	HASH_ITER(hh, EMPIRE_ISLANDS(emp), isle, next_isle) {
@@ -1316,20 +1316,20 @@ void show_detailed_workforce_setup_to_char(empire_data *emp, char_data *ch, int 
 		
 		// add line
 		if (isle->workforce_limit[chore] == WORKFORCE_UNLIMITED) {
-			add_page_display(ch, " %s: &con&0%s", get_island_name_for(island->id, ch), isle->population <= 0 ? " (no citizens)" : "");
+			build_page_display(ch, " %s: &con&0%s", get_island_name_for(island->id, ch), isle->population <= 0 ? " (no citizens)" : "");
 		}
 		else if (isle->workforce_limit[chore] == 0) {
-			add_page_display(ch, " %s: &yoff&0%s", get_island_name_for(island->id, ch), isle->population <= 0 ? " (no citizens)" : "");
+			build_page_display(ch, " %s: &yoff&0%s", get_island_name_for(island->id, ch), isle->population <= 0 ? " (no citizens)" : "");
 		}
 		else {
-			add_page_display(ch, " %s: &climit %d&0%s", get_island_name_for(island->id, ch), isle->workforce_limit[chore], isle->population <= 0 ? " (no citizens)" : "");
+			build_page_display(ch, " %s: &climit %d&0%s", get_island_name_for(island->id, ch), isle->workforce_limit[chore], isle->population <= 0 ? " (no citizens)" : "");
 		}
 		
 		found = TRUE;
 	}
 	
 	if (!found) {
-		add_page_display_str(ch, " no islands found");
+		build_page_display_str(ch, " no islands found");
 	}
 	
 	send_page_display(ch);
@@ -1380,7 +1380,7 @@ void show_workforce_where(empire_data *emp, char_data *to, bool here, char *argu
 	requesters_island = GET_ISLAND_ID(IN_ROOM(to));
 	
 	if (only_chore != NOTHING) {	// SHOW DETAILS FOR 1 CHORE
-		add_page_display(to, "Citizens working the %s chore:", chore_data[only_chore].name);
+		build_page_display(to, "Citizens working the %s chore:", chore_data[only_chore].name);
 		total = 0;
 		
 		DL_FOREACH(EMPIRE_WORKFORCE_WHERE_LOG(emp), wwl) {
@@ -1396,13 +1396,13 @@ void show_workforce_where(empire_data *emp, char_data *to, bool here, char *argu
 			
 			// found
 			++total;
-			add_page_display(to, "%s %s: %s", coord_display_room(to, room, TRUE), skip_filler(get_room_name(room, FALSE)), GET_SHORT_DESC(wwl->mob));
+			build_page_display(to, "%s %s: %s", coord_display_room(to, room, TRUE), skip_filler(get_room_name(room, FALSE)), GET_SHORT_DESC(wwl->mob));
 		}
 		if (total) {
-			add_page_display(to, " (%d total workers)", total);
+			build_page_display(to, " (%d total workers)", total);
 		}
 		else if (!total) {
-			add_page_display_str(to, " no workers");
+			build_page_display_str(to, " no workers");
 		}
 		
 		send_page_display(to);
@@ -1437,11 +1437,11 @@ void show_workforce_where(empire_data *emp, char_data *to, bool here, char *argu
 			return;
 		}
 	
-		add_page_display(to, "Working %s citizens:", EMPIRE_ADJECTIVE(emp));
+		build_page_display(to, "Working %s citizens:", EMPIRE_ADJECTIVE(emp));
 	
 		HASH_ITER(hh, counts, wct, next_wct) {
 			snprintf(line, sizeof(line), "%s: %d worker%s\r\n", chore_data[wct->chore].name, wct->count, PLURAL(wct->count));
-			add_page_display_str(to, CAP(line));
+			build_page_display_str(to, CAP(line));
 			
 			// remove and free
 			HASH_DEL(counts, wct);
@@ -1517,7 +1517,7 @@ void show_workforce_why(empire_data *emp, char_data *ch, char *argument) {
 	}
 	
 	// show all data
-	add_page_display(ch, "Recent workforce problems:\r\n%s", unsupplied);
+	build_page_display(ch, "Recent workforce problems:\r\n%s", unsupplied);
 	
 	if (*argument) {	// normal display
 		LL_FOREACH(EMPIRE_WORKFORCE_LOG(emp), wf_log) {
@@ -1546,7 +1546,7 @@ void show_workforce_why(empire_data *emp, char_data *ch, char *argument) {
 				*rname = '\0';
 			}
 		
-			add_page_display(ch, "%s %s%s: %s%s%s", coord_display(ch, X_COORD(room), Y_COORD(room), TRUE), rname, chore_data[wf_log->chore].name, wf_problem_types[wf_log->problem], mult, wf_log->delayed ? " (delayed)" : "");
+			build_page_display(ch, "%s %s%s: %s%s%s", coord_display(ch, X_COORD(room), Y_COORD(room), TRUE), rname, chore_data[wf_log->chore].name, wf_problem_types[wf_log->problem], mult, wf_log->delayed ? " (delayed)" : "");
 			any = TRUE;
 		}
 	}
@@ -1564,7 +1564,7 @@ void show_workforce_why(empire_data *emp, char_data *ch, char *argument) {
 				wf_log = wf_log->next;	// advance past identical entries
 			}
 			
-			add_page_display(ch, " %s: %s (x%d)", chore_data[last_chore].name, wf_problem_types[last_problem], count);
+			build_page_display(ch, " %s: %s (x%d)", chore_data[last_chore].name, wf_problem_types[last_problem], count);
 		}
 	}
 	
@@ -2772,7 +2772,7 @@ void do_import_list(char_data *ch, empire_data *emp, char *argument, int subcmd)
 		// show our own imports/exports based on type
 		use_emp = emp;
 		use_type = subcmd;
-		add_page_display(ch, "%s is %sing:", EMPIRE_NAME(use_emp), trade_type[subcmd]);
+		build_page_display(ch, "%s is %sing:", EMPIRE_NAME(use_emp), trade_type[subcmd]);
 	}
 	else {
 		// show what we can import/export from a partner based on type
@@ -2784,7 +2784,7 @@ void do_import_list(char_data *ch, empire_data *emp, char *argument, int subcmd)
 		else {
 			rate = exchange_rate(partner, emp);
 		}
-		add_page_display(ch, "You can %s %s %s:", trade_type[subcmd] /* not use_type */, fromto[subcmd], EMPIRE_NAME(use_emp));
+		build_page_display(ch, "You can %s %s %s:", trade_type[subcmd] /* not use_type */, fromto[subcmd], EMPIRE_NAME(use_emp));
 	}
 	
 	// build actual list
@@ -2816,11 +2816,11 @@ void do_import_list(char_data *ch, empire_data *emp, char *argument, int subcmd)
 				sprintf(over_part, " when %s &g%d&0", trade_overunder[use_type], trade->limit);
 			}
 			
-			add_page_display(ch, " &c%s&0 for %s&y%.1f%s&0 coin%s%s%s", GET_OBJ_SHORT_DESC(proto), trade_mostleast[use_type], trade->cost, coin_conv, (trade->cost != 1.0 ? "s" : ""), over_part, indicator);
+			build_page_display(ch, " &c%s&0 for %s&y%.1f%s&0 coin%s%s%s", GET_OBJ_SHORT_DESC(proto), trade_mostleast[use_type], trade->cost, coin_conv, (trade->cost != 1.0 ? "s" : ""), over_part, indicator);
 		}
 	}
 	if (count == 0) {
-		add_page_display(ch, " nothing");
+		build_page_display(ch, " nothing");
 	}
 	
 	send_page_display(ch);
@@ -2851,7 +2851,7 @@ void do_import_analysis(char_data *ch, empire_data *emp, char *argument, int sub
 		msg_to_char(ch, "Unknown item '%s'.\r\n", argument);
 	}
 	else {
-		add_page_display(ch, "Analysis of %s:", get_obj_name_by_proto(vnum));
+		build_page_display(ch, "Analysis of %s:", get_obj_name_by_proto(vnum));
 		
 		// vnum is valid (obj was a throwaway)
 		HASH_ITER(hh, empire_table, iter, next_iter) {
@@ -2878,12 +2878,12 @@ void do_import_analysis(char_data *ch, empire_data *emp, char *argument, int sub
 				*coin_conv = '\0';
 			}
 			
-			add_page_display(ch, " %s (%d%%) is %sing it at &y%.1f%s coin%s&0%s%s%s", EMPIRE_NAME(iter), (int)(100 * rate), trade_type[find_type], trade->cost, coin_conv, (trade->cost != 1.0 ? "s" : ""), ((find_type != TRADE_EXPORT || has_avail) ? "" : " (none available)"), ((find_type != TRADE_IMPORT || is_buying) ? "" : " (full)"), (emp == iter ? " (you)" : (is_trading_with(emp, iter) ? "" : " (not trading)")));
+			build_page_display(ch, " %s (%d%%) is %sing it at &y%.1f%s coin%s&0%s%s%s", EMPIRE_NAME(iter), (int)(100 * rate), trade_type[find_type], trade->cost, coin_conv, (trade->cost != 1.0 ? "s" : ""), ((find_type != TRADE_EXPORT || has_avail) ? "" : " (none available)"), ((find_type != TRADE_IMPORT || is_buying) ? "" : " (full)"), (emp == iter ? " (you)" : (is_trading_with(emp, iter) ? "" : " (not trading)")));
 			found = TRUE;
 		}
 		
 		if (!found) {
-			add_page_display(ch, " Nobody is %sing it.", trade_type[find_type]);
+			build_page_display(ch, " Nobody is %sing it.", trade_type[find_type]);
 		}
 		
 		send_page_display(ch);
@@ -3457,10 +3457,10 @@ void scan_for_tile(char_data *ch, char *argument, int max_dist, bitvector_t only
 	    HASH_SORT(node_hash, sort_territory_nodes_by_distance);
 		
 		if (*argument) {
-			add_page_display(ch, "Nearby tiles matching '%s' within %d tile%s:", argument, max_dist, PLURAL(max_dist));
+			build_page_display(ch, "Nearby tiles matching '%s' within %d tile%s:", argument, max_dist, PLURAL(max_dist));
 		}
 		else {
-			add_page_display(ch, "Nearby tiles within a range of %d:", max_dist);
+			build_page_display(ch, "Nearby tiles within a range of %d:", max_dist);
 		}
 		
 		// display and free the nodes
@@ -3480,7 +3480,7 @@ void scan_for_tile(char_data *ch, char *argument, int max_dist, bitvector_t only
 				dir_str = get_partial_direction_to(ch, IN_ROOM(ch), loc, PRF_FLAGGED(ch, PRF_SCREEN_READER) ? FALSE : TRUE);
 				
 				// distance and direction
-				pd = add_page_display(ch, "%2d %s: ", dist, (*dir_str ? dir_str : "away"));
+				pd = build_page_display(ch, "%2d %s: ", dist, (*dir_str ? dir_str : "away"));
 				
 				if (node->details) {
 					append_page_display_line(pd, "%s: %s", (GET_BUILDING(loc) ? GET_BLD_NAME(GET_BUILDING(loc)) : GET_SECT_NAME(SECT(loc))), node->details);
@@ -3515,7 +3515,7 @@ void scan_for_tile(char_data *ch, char *argument, int max_dist, bitvector_t only
 			free(node);
 		}
 		
-		add_page_display(ch, "Total: %d", total);
+		build_page_display(ch, "Total: %d", total);
 		send_page_display(ch);
 	}
 	else if (node_hash && organize_general_dirs) {
@@ -3525,10 +3525,10 @@ void scan_for_tile(char_data *ch, char *argument, int max_dist, bitvector_t only
 	    HASH_SORT(node_hash, sort_territory_nodes_by_distance);
 		
 		if (*argument) {
-			add_page_display(ch, "Nearby tiles matching '%s' within %d tile%s:", argument, max_dist, PLURAL(max_dist));
+			build_page_display(ch, "Nearby tiles matching '%s' within %d tile%s:", argument, max_dist, PLURAL(max_dist));
 		}
 		else {
-			add_page_display(ch, "Nearby tiles within a range of %d:", max_dist);
+			build_page_display(ch, "Nearby tiles within a range of %d:", max_dist);
 		}
 		
 		// display and free the nodes
@@ -3574,14 +3574,14 @@ void scan_for_tile(char_data *ch, char *argument, int max_dist, bitvector_t only
 		HASH_SORT(ogd_hash, _sort_ogd);
 		
 		HASH_ITER(hh, ogd_hash, ogd, next_ogd) {
-			add_page_display(ch, "%s: %s%s", (*ogd->dir ? CAP(ogd->dir) : "Here"), ogd->string, ogd->full ? "..." : "");
+			build_page_display(ch, "%s: %s%s", (*ogd->dir ? CAP(ogd->dir) : "Here"), ogd->string, ogd->full ? "..." : "");
 			
 			// and free
 			HASH_DEL(ogd_hash, ogd);
 			free(ogd);
 		}
 		
-		add_page_display(ch, "Total: %d", total);
+		build_page_display(ch, "Total: %d", total);
 		send_page_display(ch);
 	}
 	else {
@@ -3951,17 +3951,17 @@ ACMD(do_buildcheck) {
 	}
 	
 	// otherwise build the list:
-	add_page_display(ch, "%s is missing the following things you can make:", (emp == GET_LOYALTY(ch)) ? "Your empire" : EMPIRE_NAME(emp));
+	build_page_display(ch, "%s is missing the following things you can make:", (emp == GET_LOYALTY(ch)) ? "Your empire" : EMPIRE_NAME(emp));
 	count = 0;
 	
 	HASH_ITER(hh, veh_hash, iter, next_iter) {
 		if ((veh = vehicle_proto(iter->vnum)) && (!*argptr || multi_isname(argptr, VEH_KEYWORDS(veh)))) {
 			++count;
 			if (PRF_FLAGGED(ch, PRF_ROOMFLAGS)) {
-				add_page_display_col(ch, 2, FALSE, "[%5d] %s", VEH_VNUM(veh), VEH_SHORT_DESC(veh));
+				build_page_display_col(ch, 2, FALSE, "[%5d] %s", VEH_VNUM(veh), VEH_SHORT_DESC(veh));
 			}
 			else {
-				add_page_display_col(ch, 2, FALSE, " %s", VEH_SHORT_DESC(veh));
+				build_page_display_col(ch, 2, FALSE, " %s", VEH_SHORT_DESC(veh));
 			}
 		}
 	}
@@ -3970,15 +3970,15 @@ ACMD(do_buildcheck) {
 		if ((bld = building_proto(iter->vnum)) && (!*argptr || multi_isname(argptr, GET_BLD_NAME(bld)))) {
 			++count;
 			if (PRF_FLAGGED(ch, PRF_ROOMFLAGS)) {
-				add_page_display_col(ch, 2, FALSE, "[%5d] %s", GET_BLD_VNUM(bld), GET_BLD_NAME(bld));
+				build_page_display_col(ch, 2, FALSE, "[%5d] %s", GET_BLD_VNUM(bld), GET_BLD_NAME(bld));
 			}
 			else {
-				add_page_display_col(ch, 2, FALSE, " %s", GET_BLD_NAME(bld));
+				build_page_display_col(ch, 2, FALSE, " %s", GET_BLD_NAME(bld));
 			}
 		}
 	}
 	
-	add_page_display(ch, "Total: %d", count);
+	build_page_display(ch, "Total: %d", count);
 	
 	free_vnum_hash(&bld_hash);
 	free_vnum_hash(&veh_hash);
@@ -4928,10 +4928,10 @@ ACMD(do_efind) {
 
 		if (total > 0) {
 			if (emp == GET_LOYALTY(ch)) {
-				pd = add_page_display(ch, "You discover:");
+				pd = build_page_display(ch, "You discover:");
 			}
 			else {
-				pd = add_page_display(ch, "You discover in %s%s\t0:", EMPIRE_BANNER(emp), EMPIRE_NAME(emp));
+				pd = build_page_display(ch, "You discover in %s%s\t0:", EMPIRE_BANNER(emp), EMPIRE_NAME(emp));
 			}
 			
 			last_rm = NULL;
@@ -4939,7 +4939,7 @@ ACMD(do_efind) {
 			DL_FOREACH_SAFE(list, eg, next_eg) {
 				// first item at this location?
 				if (eg->location != last_rm) {
-					pd = add_page_display(ch, "%s %s: ", coord_display_room(ch, eg->location, TRUE), get_room_name(eg->location, FALSE));
+					pd = build_page_display(ch, "%s %s: ", coord_display_room(ch, eg->location, TRUE), get_room_name(eg->location, FALSE));
 					last_rm = eg->location;
 				}
 				else {
@@ -5057,7 +5057,7 @@ ACMD(do_elog) {
 		}
 	}
 	
-	add_page_display(ch, "%s logs for %s:", (type == NOTHING ? "All" : empire_log_types[type]), EMPIRE_NAME(emp));
+	build_page_display(ch, "%s logs for %s:", (type == NOTHING ? "All" : empire_log_types[type]), EMPIRE_NAME(emp));
 	
 	// now show the LAST [lines] log entries (show if remaining-lines<=0)
 	DL_FOREACH(EMPIRE_LOGS(emp), elog) {
@@ -5066,7 +5066,7 @@ ACMD(do_elog) {
 		}
 		if (type == NOTHING || elog->type == type) {
 			if (count-- - lines <= 0) {
-				add_page_display(ch, "%3s: %s&0", simple_time_since(elog->timestamp), strip_color(elog->string));
+				build_page_display(ch, "%3s: %s&0", simple_time_since(elog->timestamp), strip_color(elog->string));
 			}
 		}
 	}
@@ -5179,7 +5179,7 @@ ACMD(do_empires) {
 		strcpy(title, "Prominent empires:");
 	}
 
-	add_page_display(ch, "%-35.35s  Sc  Mm  Grt  Territory", title);
+	build_page_display(ch, "%-35.35s  Sc  Mm  Grt  Territory", title);
 
 	count = 0;
 	HASH_ITER(hh, empire_table, emp, next_emp) {
@@ -5201,10 +5201,10 @@ ACMD(do_empires) {
 			continue;
 		}
 		
-		add_page_display(ch, "%3d. %s%-30.30s&0  %2d  %2d  %3d  %d", count, EMPIRE_BANNER(emp), EMPIRE_NAME(emp), get_total_score(emp), EMPIRE_MEMBERS(emp), EMPIRE_GREATNESS(emp), EMPIRE_TERRITORY(emp, TER_TOTAL));
+		build_page_display(ch, "%3d. %s%-30.30s&0  %2d  %2d  %3d  %d", count, EMPIRE_BANNER(emp), EMPIRE_NAME(emp), get_total_score(emp), EMPIRE_MEMBERS(emp), EMPIRE_GREATNESS(emp), EMPIRE_TERRITORY(emp, TER_TOTAL));
 	}
 	
-	add_page_display(ch, "List options: -m for more, -a for all, -## for minimum members");
+	build_page_display(ch, "List options: -m for more, -a for all, -## for minimum members");
 	send_page_display(ch);
 }
 
@@ -6008,14 +6008,14 @@ ACMD(do_findmaintenance) {
 	}
 	else if (node_hash) {
 		reduce_territory_node_list(&node_hash);
-		add_page_display(ch, "%d location%s needing maintenance:", bld_total + veh_total, PLURAL(bld_total + veh_total));
+		build_page_display(ch, "%d location%s needing maintenance:", bld_total + veh_total, PLURAL(bld_total + veh_total));
 		
 		// display and free the nodes
 		HASH_ITER(hh, node_hash, node, next_node) {
 			loc = real_room(node->vnum);
 			
 			// append
-			pd = add_page_display(ch, "%s %s", coord_display_room(ch, loc, TRUE), node->details ? node->details : skip_filler(get_room_name(loc, FALSE)));
+			pd = build_page_display(ch, "%s %s", coord_display_room(ch, loc, TRUE), node->details ? node->details : skip_filler(get_room_name(loc, FALSE)));
 			if (node->count > 1) {
 				append_page_display_line(pd, " (%+d nearby)", node->count);
 			}
@@ -6304,10 +6304,10 @@ ACMD(do_islands) {
 	}
 	
 	// and then build the display while freeing it up
-	add_page_display(ch, "%s%s&0 is on the following islands:", EMPIRE_BANNER(emp), EMPIRE_NAME(emp));
+	build_page_display(ch, "%s%s&0 is on the following islands:", EMPIRE_BANNER(emp), EMPIRE_NAME(emp));
 	
 	if (!list) {
-		add_page_display_str(ch, " none");
+		build_page_display_str(ch, " none");
 	}
 	
 	HASH_ITER(hh, list, item, next_item) {
@@ -6319,7 +6319,7 @@ ACMD(do_islands) {
 		if (item->territory > 0 || item->einv_size > 0 || item->population > 0) {
 			isle = get_island(item->id, TRUE);
 			room = real_room(isle->center);
-			pd = add_page_display(ch, " %s%s - ", get_island_name_for(isle->id, ch), coord_display_room(ch, room, FALSE));
+			pd = build_page_display(ch, " %s%s - ", get_island_name_for(isle->id, ch), coord_display_room(ch, room, FALSE));
 		
 			if (item->territory > 0) {
 				append_page_display_line(pd, "%d territory%s", item->territory, (item->einv_size > 0 || item->population > 0) ? ", " : "");
@@ -6356,15 +6356,15 @@ ACMD(do_tomb) {
 	if (!*argument) {
 		// build page display:
 		if (!tomb) {
-			add_page_display(ch, "You have no tomb set.");
+			build_page_display(ch, "You have no tomb set.");
 		}
 		else {
-			add_page_display(ch, "Your tomb is at: %s%s%s", get_room_name(tomb, FALSE), coord_display_room(ch, tomb, FALSE), (GET_ISLAND_ID(tomb) == GET_ISLAND_ID(IN_ROOM(ch))) ? "" : " (different island)");
+			build_page_display(ch, "Your tomb is at: %s%s%s", get_room_name(tomb, FALSE), coord_display_room(ch, tomb, FALSE), (GET_ISLAND_ID(tomb) == GET_ISLAND_ID(IN_ROOM(ch))) ? "" : " (different island)");
 		}
 		
 		// additional info
 		if (tomb && !can_use_room(ch, tomb, GUESTS_ALLOWED)) {
-			add_page_display(ch, "You no longer have access to that tomb because it's owned by %s.", ROOM_OWNER(tomb) ? EMPIRE_NAME(ROOM_OWNER(tomb)) : "someone else");
+			build_page_display(ch, "You no longer have access to that tomb because it's owned by %s.", ROOM_OWNER(tomb) ? EMPIRE_NAME(ROOM_OWNER(tomb)) : "someone else");
 		}
 		
 		// list of valid tombs on this island?
@@ -6381,17 +6381,17 @@ ACMD(do_tomb) {
 				// ok: header?
 				if (any) {
 					any = TRUE;
-					add_page_display(ch, "Tombs on this island:");
+					build_page_display(ch, "Tombs on this island:");
 				}
 				
 				// ok:
-				add_page_display(ch, "%s %s%s", coord_display_room(ch, ter->room, TRUE), get_room_name(ter->room, FALSE), (ter->room == tomb) ? " (current)" : "");
+				build_page_display(ch, "%s %s%s", coord_display_room(ch, ter->room, TRUE), get_room_name(ter->room, FALSE), (ter->room == tomb) ? " (current)" : "");
 			}
 		}
 		
 		// can set here?
 		if (room_has_function_and_city_ok(GET_LOYALTY(ch), IN_ROOM(ch), FNC_TOMB)) {
-			add_page_display(ch, "Use 'tomb set' to change your tomb to this room.");
+			build_page_display(ch, "Use 'tomb set' to change your tomb to this room.");
 		}
 		
 		send_page_display(ch);
@@ -6836,7 +6836,7 @@ ACMD(do_offenses) {
 	}
 	
 	// start buffer
-	add_page_display(ch, "Offenses for %s:", EMPIRE_NAME(emp));
+	build_page_display(ch, "Offenses for %s:", EMPIRE_NAME(emp));
 	
 	DL_FOREACH(EMPIRE_OFFENSES(emp), off) {
 		if (!IS_SET(off->flags, OFF_SEEN) && (search_emp || search_plr != NOTHING)) {
@@ -6897,12 +6897,12 @@ ACMD(do_offenses) {
 			strcat(tpart, " ago");
 		}
 		
-		add_page_display(ch, "%s %s %s%s  %s", epart, offense_info[off->type].name, tpart, lpart, fpart);
+		build_page_display(ch, "%s %s %s%s  %s", epart, offense_info[off->type].name, tpart, lpart, fpart);
 		any = TRUE;
 	}
 	
 	if (!any) {
-		add_page_display_str(ch, " none");
+		build_page_display_str(ch, " none");
 	}
 	
 	send_page_display(ch);
@@ -7049,7 +7049,7 @@ ACMD(do_progress) {
 		// nothing to compute/show
 	}
 	else if (!*argument) {
-		add_page_display(ch, "Empire progress for %s%s\t0 (%d total progress score):", EMPIRE_BANNER(emp), EMPIRE_NAME(emp), total);
+		build_page_display(ch, "Empire progress for %s%s\t0 (%d total progress score):", EMPIRE_BANNER(emp), EMPIRE_NAME(emp), total);
 		
 		// show current goals
 		any = 0;
@@ -7067,14 +7067,14 @@ ACMD(do_progress) {
 			
 			count_quest_tasks(goal->tracker, &complete, &total);
 			new_goal = (emp == GET_LOYALTY(ch) && goal->timestamp > GET_LAST_GOAL_CHECK(ch)) || (goal->timestamp + (24 * SECS_PER_REAL_HOUR) > time(0));
-			add_page_display(ch, "- %s\ty%s\t0 (%s, %d point%s, %d/%d%s)", vstr, PRG_NAME(prg), progress_types[PRG_TYPE(prg)], PRG_VALUE(prg), PLURAL(PRG_VALUE(prg)), complete, total, new_goal ? ", new" : "");
+			build_page_display(ch, "- %s\ty%s\t0 (%s, %d point%s, %d/%d%s)", vstr, PRG_NAME(prg), progress_types[PRG_TYPE(prg)], PRG_VALUE(prg), PLURAL(PRG_VALUE(prg)), complete, total, new_goal ? ", new" : "");
 			any = TRUE;
 		}
 		if (!any) {
-			add_page_display(ch, "- No active goals");
+			build_page_display(ch, "- No active goals");
 		}
 		
-		add_page_display(ch, "Progress point%s available to spend: %d", PLURAL(EMPIRE_PROGRESS_POOL(emp)), EMPIRE_PROGRESS_POOL(emp));
+		build_page_display(ch, "Progress point%s available to spend: %d", PLURAL(EMPIRE_PROGRESS_POOL(emp)), EMPIRE_PROGRESS_POOL(emp));
 		
 		send_page_display(ch);
 	}
@@ -7090,7 +7090,7 @@ ACMD(do_progress) {
 		}
 		
 		// show current progress in that category
-		add_page_display(ch, "%s goals (%d points):", progress_types[cat], EMPIRE_PROGRESS_POINTS(emp, cat));
+		build_page_display(ch, "%s goals (%d points):", progress_types[cat], EMPIRE_PROGRESS_POINTS(emp, cat));
 		
 		// show current goals
 		any = 0;
@@ -7108,11 +7108,11 @@ ACMD(do_progress) {
 			
 			count_quest_tasks(goal->tracker, &complete, &total);
 			new_goal = (emp == GET_LOYALTY(ch) && goal->timestamp > GET_LAST_GOAL_CHECK(ch)) || (goal->timestamp + (24 * SECS_PER_REAL_HOUR) > time(0));
-			add_page_display(ch, "- %s\ty%s\t0 (%s, %d point%s, %d/%d%s)", vstr, PRG_NAME(prg), progress_types[PRG_TYPE(prg)], PRG_VALUE(prg), PLURAL(PRG_VALUE(prg)), complete, total, new_goal ? ", new" : "");
+			build_page_display(ch, "- %s\ty%s\t0 (%s, %d point%s, %d/%d%s)", vstr, PRG_NAME(prg), progress_types[PRG_TYPE(prg)], PRG_VALUE(prg), PLURAL(PRG_VALUE(prg)), complete, total, new_goal ? ", new" : "");
 			any = TRUE;
 		}
 		if (!any) {
-			add_page_display(ch, "- No active goals");
+			build_page_display(ch, "- No active goals");
 		}
 		
 		// purchasable
@@ -7138,7 +7138,7 @@ ACMD(do_progress) {
 				*vstr = '\0';
 			}
 			
-			add_page_display(ch, "+ Available: %s\tc%s\t0 (for %d point%s)", vstr, PRG_NAME(prg), PRG_COST(prg), PLURAL(PRG_COST(prg)));
+			build_page_display(ch, "+ Available: %s\tc%s\t0 (for %d point%s)", vstr, PRG_NAME(prg), PRG_COST(prg), PLURAL(PRG_COST(prg)));
 			any = TRUE;
 		}
 		
@@ -7154,7 +7154,7 @@ ACMD(do_progress) {
 				}
 			}
 		}
-		add_page_display(ch, "- %d completed goals, %d rewards bought", complete, bought);
+		build_page_display(ch, "- %d completed goals, %d rewards bought", complete, bought);
 		
 		send_page_display(ch);
 	}
@@ -7180,19 +7180,19 @@ ACMD(do_progress) {
 		show_new_goals(ch, emp);
 	}
 	else if (is_abbrev(arg, "summary")) {
-		add_page_display(ch, "Empire progress for %s%s\t0 (%d total progress score):", EMPIRE_BANNER(emp), EMPIRE_NAME(emp), total);
+		build_page_display(ch, "Empire progress for %s%s\t0 (%d total progress score):", EMPIRE_BANNER(emp), EMPIRE_NAME(emp), total);
 
 		for (cat = 1; cat < NUM_PROGRESS_TYPES; ++cat) {
-			add_page_display(ch, " %s: %d active goal%s, %d completed, %d bought, %d point%s", progress_types[cat], counts[cat], PLURAL(counts[cat]), compl[cat], buy[cat], EMPIRE_PROGRESS_POINTS(emp, cat), PLURAL(EMPIRE_PROGRESS_POINTS(emp, cat)));
+			build_page_display(ch, " %s: %d active goal%s, %d completed, %d bought, %d point%s", progress_types[cat], counts[cat], PLURAL(counts[cat]), compl[cat], buy[cat], EMPIRE_PROGRESS_POINTS(emp, cat), PLURAL(EMPIRE_PROGRESS_POINTS(emp, cat)));
 		}
 
-		add_page_display(ch, " Progress point%s available to spend: %d", PLURAL(EMPIRE_PROGRESS_POOL(emp)), EMPIRE_PROGRESS_POOL(emp));
+		build_page_display(ch, " Progress point%s available to spend: %d", PLURAL(EMPIRE_PROGRESS_POOL(emp)), EMPIRE_PROGRESS_POOL(emp));
 
 		send_page_display(ch);
 	}
 	else if (!str_cmp(arg, "buy")) {
 		if (!*arg2) {	// display all purchasable goals
-			add_page_display(ch, "Available progression rewards (%d progress point%s):", EMPIRE_PROGRESS_POOL(emp), PLURAL(EMPIRE_PROGRESS_POOL(emp)));
+			build_page_display(ch, "Available progression rewards (%d progress point%s):", EMPIRE_PROGRESS_POOL(emp), PLURAL(EMPIRE_PROGRESS_POOL(emp)));
 			
 			any = FALSE;
 			HASH_ITER(sorted_hh, sorted_progress, prg, next_prg) {
@@ -7214,12 +7214,12 @@ ACMD(do_progress) {
 					*vstr = '\0';
 				}
 				
-				add_page_display(ch, "+ %s\tc%s\t0 (%d point%s)", vstr, PRG_NAME(prg), PRG_COST(prg), PLURAL(PRG_COST(prg)));
+				build_page_display(ch, "+ %s\tc%s\t0 (%d point%s)", vstr, PRG_NAME(prg), PRG_COST(prg), PLURAL(PRG_COST(prg)));
 				any = TRUE;
 			}
 			
 			if (!any) {
-				add_page_display(ch, " none");
+				build_page_display(ch, " none");
 			}
 			
 			send_page_display(ch);
@@ -7264,13 +7264,13 @@ ACMD(do_progress) {
 			*fstr = '\0';
 		}
 		
-		add_page_display(ch, "%s%s%s\t0%s\r\n%s", vstr, empire_has_completed_goal(emp, PRG_VNUM(prg)) ? "\tg" : (PRG_FLAGGED(prg, PRG_PURCHASABLE) ? "\tc" : "\ty"), PRG_NAME(prg), fstr, NULLSAFE(PRG_DESCRIPTION(prg)));
+		build_page_display(ch, "%s%s%s\t0%s\r\n%s", vstr, empire_has_completed_goal(emp, PRG_VNUM(prg)) ? "\tg" : (PRG_FLAGGED(prg, PRG_PURCHASABLE) ? "\tc" : "\ty"), PRG_NAME(prg), fstr, NULLSAFE(PRG_DESCRIPTION(prg)));
 		
 		if (PRG_VALUE(prg) > 0) {
-			add_page_display(ch, "Value: %d point%s", PRG_VALUE(prg), PLURAL(PRG_VALUE(prg)));
+			build_page_display(ch, "Value: %d point%s", PRG_VALUE(prg), PLURAL(PRG_VALUE(prg)));
 		}
 		if (PRG_COST(prg) > 0) {
-			add_page_display(ch, "Cost: %d point%s", PRG_COST(prg), PLURAL(PRG_COST(prg)));
+			build_page_display(ch, "Cost: %d point%s", PRG_COST(prg), PLURAL(PRG_COST(prg)));
 		}
 		
 		if ((when = when_empire_completed_goal(emp, PRG_VNUM(prg))) > 0) {
@@ -7287,15 +7287,15 @@ ACMD(do_progress) {
 			else {
 				strcpy(buf, "recently");
 			}
-			add_page_display(ch, "Completed %s.", buf);
+			build_page_display(ch, "Completed %s.", buf);
 		}
 		else if (!get_current_goal(emp, PRG_VNUM(prg)) && !empire_has_completed_goal(emp, PRG_VNUM(prg))) {
-			add_page_display(ch, "\trYour empire has not %s this goal.\t0", (PRG_FLAGGED(prg, PRG_PURCHASABLE) ? "purchased" : "started"));
+			build_page_display(ch, "\trYour empire has not %s this goal.\t0", (PRG_FLAGGED(prg, PRG_PURCHASABLE) ? "purchased" : "started"));
 		}
 		
 		// Show prereqs:
 		if (PRG_PREREQS(prg)) {
-			pd = add_page_display(ch, "Requires:");
+			pd = build_page_display(ch, "Requires:");
 			LL_FOREACH(PRG_PREREQS(prg), prereq) {
 				append_page_display_line(pd, "%s%s%s\t0", (prereq == PRG_PREREQS(prg)) ? " " : ", ", empire_has_completed_goal(emp, prereq->vnum) ? "" : "\tr", get_progress_name_by_proto(prereq->vnum));
 			}
@@ -7319,7 +7319,7 @@ ACMD(do_progress) {
 			
 			if (found) {
 				if (!any) {
-					pd = add_page_display(ch, "Leads to: %s", PRG_NAME(prg_iter));
+					pd = build_page_display(ch, "Leads to: %s", PRG_NAME(prg_iter));
 				}
 				else {
 					append_page_display_line(pd, ", %s", PRG_NAME(prg_iter));
@@ -7329,16 +7329,16 @@ ACMD(do_progress) {
 		}
 		
 		if (PRG_PERKS(prg)) {
-			add_page_display_str(ch, "Rewards:");
+			build_page_display_str(ch, "Rewards:");
 			show_progress_perks_display(ch, PRG_PERKS(prg), FALSE, FALSE);
 		}
 		if ((goal = get_current_goal(emp, PRG_VNUM(prg)))) {
 			if (PRG_FLAGGED(prg, PRG_NO_TRACKER) && !IS_IMMORTAL(ch)) {
 				count_quest_tasks(goal->tracker, &complete, &total);
-				add_page_display(ch, "Progress: %d/%d", complete, total);
+				build_page_display(ch, "Progress: %d/%d", complete, total);
 			}
 			else {
-				add_page_display_str(ch, "Progress:");
+				build_page_display_str(ch, "Progress:");
 				show_tracker_display(ch, goal->tracker, FALSE);
 			}
 		}
@@ -7661,7 +7661,7 @@ ACMD(do_roster) {
 	}
 	
 	// build roster:
-	add_page_display(ch, "Roster of %s%s&0:", EMPIRE_BANNER(e), EMPIRE_NAME(e));
+	build_page_display(ch, "Roster of %s%s&0:", EMPIRE_BANNER(e), EMPIRE_NAME(e));
 	
 	HASH_ITER(name_hh, player_table_by_name, index, next_index) {
 		if (index->loyalty != e) {
@@ -7686,10 +7686,10 @@ ACMD(do_roster) {
 		// display:
 		get_player_skill_string(member, part, TRUE);
 		if (PRF_FLAGGED(ch, PRF_SCREEN_READER)) {
-			pd = add_page_display(ch, "[%d %s %s] <%s&0> %s%s&0", !is_file ? GET_COMPUTED_LEVEL(member) : GET_LAST_KNOWN_LEVEL(member), part, class_role[GET_CLASS_ROLE(member)], EMPIRE_RANK(e, GET_RANK(member) - 1), (timed_out ? "&r" : ""), PERS(member, member, TRUE));
+			pd = build_page_display(ch, "[%d %s %s] <%s&0> %s%s&0", !is_file ? GET_COMPUTED_LEVEL(member) : GET_LAST_KNOWN_LEVEL(member), part, class_role[GET_CLASS_ROLE(member)], EMPIRE_RANK(e, GET_RANK(member) - 1), (timed_out ? "&r" : ""), PERS(member, member, TRUE));
 		}
 		else {	// not screenreader
-			pd = add_page_display(ch, "[%d %s%s\t0] <%s&0> %s%s&0", !is_file ? GET_COMPUTED_LEVEL(member) : GET_LAST_KNOWN_LEVEL(member), class_role_color[GET_CLASS_ROLE(member)], part, EMPIRE_RANK(e, GET_RANK(member) - 1), (timed_out ? "&r" : ""), PERS(member, member, TRUE));
+			pd = build_page_display(ch, "[%d %s%s\t0] <%s&0> %s%s&0", !is_file ? GET_COMPUTED_LEVEL(member) : GET_LAST_KNOWN_LEVEL(member), class_role_color[GET_CLASS_ROLE(member)], part, EMPIRE_RANK(e, GET_RANK(member) - 1), (timed_out ? "&r" : ""), PERS(member, member, TRUE));
 		}
 						
 		// online/not
@@ -8056,7 +8056,7 @@ ACMD(do_territory) {
 		reduce_territory_node_list(&node_hash);
 		
 		// start buf
-		add_page_display(ch, "%s%s&0 territory: %s", EMPIRE_BANNER(emp), EMPIRE_ADJECTIVE(emp), option_buf);
+		build_page_display(ch, "%s%s&0 territory: %s", EMPIRE_BANNER(emp), EMPIRE_ADJECTIVE(emp), option_buf);
 		
 		// display and free the nodes
 		total = 0;
@@ -8066,13 +8066,13 @@ ACMD(do_territory) {
 			
 			// build line
 			if (node->combined) {
-				add_page_display(ch, "%s %d tiles near %s", coord_display_room(ch, room, TRUE), node->count, (room ? get_screenreader_room_name(ch, room, room, FALSE) : "Unknown"));
+				build_page_display(ch, "%s %d tiles near %s", coord_display_room(ch, room, TRUE), node->count, (room ? get_screenreader_room_name(ch, room, room, FALSE) : "Unknown"));
 			}
 			else if (node->count > 1) {
-				add_page_display(ch, "%s %s (x%d)%s%s", coord_display_room(ch, room, TRUE), (room ? get_screenreader_room_name(ch, room, room, FALSE) : "Unknown"), node->count, (node->details ? ": " : ""), NULLSAFE(node->details));
+				build_page_display(ch, "%s %s (x%d)%s%s", coord_display_room(ch, room, TRUE), (room ? get_screenreader_room_name(ch, room, room, FALSE) : "Unknown"), node->count, (node->details ? ": " : ""), NULLSAFE(node->details));
 			}
 			else {
-				add_page_display(ch, "%s %s%s%s", coord_display_room(ch, room, TRUE), (room ? get_screenreader_room_name(ch, room, room, FALSE) : "Unknown"), (node->details ? ": " : ""), NULLSAFE(node->details));
+				build_page_display(ch, "%s %s%s%s", coord_display_room(ch, room, TRUE), (room ? get_screenreader_room_name(ch, room, room, FALSE) : "Unknown"), (node->details ? ": " : ""), NULLSAFE(node->details));
 			}
 			
 			// cleanup
@@ -8083,7 +8083,7 @@ ACMD(do_territory) {
 			free(node);
 		}
 		
-		add_page_display(ch, "Total: %d", total);
+		build_page_display(ch, "Total: %d", total);
 		send_page_display(ch);
 	}
 	else {
@@ -8147,7 +8147,7 @@ void do_workforce_keep(char_data *ch, empire_data *emp, char *argument) {
 	
 	// no-arg? show keep settings here
 	if (!*argument) {
-		add_page_display(ch, "Workforce keep settings for this island:");
+		build_page_display(ch, "Workforce keep settings for this island:");
 		
 		found = FALSE;
 		HASH_ITER(hh, eisle->store, store, next_store) {
@@ -8169,15 +8169,15 @@ void do_workforce_keep(char_data *ch, empire_data *emp, char *argument) {
 			}
 			
 			if (PRF_FLAGGED(ch, PRF_ROOMFLAGS)) {
-				add_page_display(ch, "%s [%5d] %s (%d stored)", kept, store->vnum, skip_filler(GET_OBJ_SHORT_DESC(proto)), store->amount);
+				build_page_display(ch, "%s [%5d] %s (%d stored)", kept, store->vnum, skip_filler(GET_OBJ_SHORT_DESC(proto)), store->amount);
 			}
 			else {
-				add_page_display(ch, "%s %s (%d stored)", kept, skip_filler(GET_OBJ_SHORT_DESC(proto)), store->amount);
+				build_page_display(ch, "%s %s (%d stored)", kept, skip_filler(GET_OBJ_SHORT_DESC(proto)), store->amount);
 			}
 		}
 		
 		if (!found) {
-			add_page_display(ch, " no keep settings found");
+			build_page_display(ch, " no keep settings found");
 		}
 		
 		send_page_display(ch);
@@ -8351,10 +8351,10 @@ void do_workforce_limit(char_data *ch, empire_data *emp, char *argument) {
 	// optional usage: workforce limit [keywords]
 	count = 0;
 	if (*argument) {
-		add_page_display(ch, "Workforce production limits for '%s':", argument);
+		build_page_display(ch, "Workforce production limits for '%s':", argument);
 	}
 	else {
-		add_page_display_str(ch, "Workforce production limits:");
+		build_page_display_str(ch, "Workforce production limits:");
 	}
 	
 	// iterate...
@@ -8368,15 +8368,15 @@ void do_workforce_limit(char_data *ch, empire_data *emp, char *argument) {
 		
 		// build line
 		if (PRF_FLAGGED(ch, PRF_ROOMFLAGS)) {
-			add_page_display_col(ch, 2, FALSE, "[%5d] %s: %d", wpl->vnum, skip_filler(get_obj_name_by_proto(wpl->vnum)), wpl->limit);
+			build_page_display_col(ch, 2, FALSE, "[%5d] %s: %d", wpl->vnum, skip_filler(get_obj_name_by_proto(wpl->vnum)), wpl->limit);
 		}
 		else {
-			add_page_display_col(ch, 2, FALSE, "%s: %d", skip_filler(get_obj_name_by_proto(wpl->vnum)), wpl->limit);
+			build_page_display_col(ch, 2, FALSE, "%s: %d", skip_filler(get_obj_name_by_proto(wpl->vnum)), wpl->limit);
 		}
 	}
 	
 	if (!count) {
-		add_page_display_str(ch, " no limits set");
+		build_page_display_str(ch, " no limits set");
 	}
 	
 	send_page_display(ch);
@@ -8402,7 +8402,7 @@ void do_workforce_nearby(char_data *ch, empire_data *emp, char *argument) {
 	int chore_distance = config_get_int("chore_distance");
 	
 	avail = working = 0;
-	add_page_display(ch, "Citizens living within %d tile%s of here:", chore_distance, PLURAL(chore_distance));
+	build_page_display(ch, "Citizens living within %d tile%s of here:", chore_distance, PLURAL(chore_distance));
 	
 	// try territory first
 	HASH_ITER(hh, EMPIRE_TERRITORY_LIST(emp), ter, next_ter) {
@@ -8438,7 +8438,7 @@ void do_workforce_nearby(char_data *ch, empire_data *emp, char *argument) {
 			}
 			
 			// and add
-			add_page_display(ch, "%s %s", coord_display_room(ch, ter->room, TRUE), name);
+			build_page_display(ch, "%s %s", coord_display_room(ch, ter->room, TRUE), name);
 		}
 	}
 	
@@ -8476,15 +8476,15 @@ void do_workforce_nearby(char_data *ch, empire_data *emp, char *argument) {
 			}
 			
 			// and add
-			add_page_display(ch, "%s %s", coord_display_room(ch, IN_ROOM(vter->veh), TRUE), name);
+			build_page_display(ch, "%s %s", coord_display_room(ch, IN_ROOM(vter->veh), TRUE), name);
 		}
 	}
 	
 	if (avail == 0 && working == 0) {
-		add_page_display(ch, " none");
+		build_page_display(ch, " none");
 	}
 	else {
-		add_page_display(ch, "%d available, %d working, %d total", avail, working, avail + working);
+		build_page_display(ch, "%d available, %d working, %d total", avail, working, avail + working);
 	}
 	
 	send_page_display(ch);

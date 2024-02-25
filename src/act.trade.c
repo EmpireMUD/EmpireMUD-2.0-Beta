@@ -2193,7 +2193,7 @@ ACMD(do_gen_craft) {
 	}
 	else if (!*arg || list_only) {	// main no-arg (or list-only): master craft list
 		// master craft list
-		add_page_display(ch, "You know how to %s:", gen_craft_data[subcmd].command);
+		build_page_display(ch, "You know how to %s:", gen_craft_data[subcmd].command);
 		count = 0;
 		
 		HASH_ITER(sorted_hh, sorted_crafts, craft, next_craft) {
@@ -2222,14 +2222,14 @@ ACMD(do_gen_craft) {
 			// valid:
 			++count;
 			if (PRF_FLAGGED(ch, PRF_ROOMFLAGS)) {
-				add_page_display_col(ch, 2, FALSE, " [%5d] %s", GET_CRAFT_VNUM(craft), GET_CRAFT_NAME(craft));
+				build_page_display_col(ch, 2, FALSE, " [%5d] %s", GET_CRAFT_VNUM(craft), GET_CRAFT_NAME(craft));
 			}
 			else {
-				add_page_display_col(ch, 2, FALSE, " %s", GET_CRAFT_NAME(craft));
+				build_page_display_col(ch, 2, FALSE, " %s", GET_CRAFT_NAME(craft));
 			}
 		}	// end loop
 		if (!count) {
-			add_page_display_str(ch, " nothing");
+			build_page_display_str(ch, " nothing");
 		}
 		
 		// and show it
@@ -2408,10 +2408,10 @@ ACMD(do_learned) {
 	
 	skip_spaces(&argument);
 	if (*argument) {
-		add_page_display(ch, "Learned recipes matching '%s':", argument);
+		build_page_display(ch, "Learned recipes matching '%s':", argument);
 	}
 	else {
-		add_page_display_str(ch, "Learned recipes:");
+		build_page_display_str(ch, "Learned recipes:");
 	}
 	
 	// detect width for how wide the lists can go
@@ -2447,7 +2447,7 @@ ACMD(do_learned) {
 			if (last_type == -1 || last_type != GET_CRAFT_TYPE(craft)) {
 				// append line now?
 				if (*line) {
-					add_page_display_str(ch, line);
+					build_page_display_str(ch, line);
 				}
 				
 				// prepare new line
@@ -2461,7 +2461,7 @@ ACMD(do_learned) {
 			
 			// check line limit
 			if (l_size + strlen(GET_CRAFT_NAME(craft)) + 3 > width) {
-				add_page_display(ch, "%s,", line);
+				build_page_display(ch, "%s,", line);
 				l_size = snprintf(line, sizeof(line), "   %s", GET_CRAFT_NAME(craft));
 				comma = TRUE;
 			}
@@ -2473,12 +2473,12 @@ ACMD(do_learned) {
 		
 		// check for trailing text
 		if (*line) {
-			add_page_display_str(ch, line);
+			build_page_display_str(ch, line);
 		}
 	}
 	
 	if (!count) {
-		add_page_display_str(ch, "  none");
+		build_page_display_str(ch, "  none");
 	}
 	
 	send_page_display(ch);

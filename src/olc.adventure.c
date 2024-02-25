@@ -816,11 +816,11 @@ void show_adventure_linking_display(char_data *ch, struct adventure_link_rule *l
 		}
 		
 		sprintbit(rule->flags, adventure_link_flags, flg, TRUE);
-		add_page_display(ch, "%2d. %s: %s%s&g%s\t0", ++count, adventure_link_types[rule->type], lbuf, (rule->flags ? ", " : ""), (rule->flags ? flg : ""));
+		build_page_display(ch, "%2d. %s: %s%s&g%s\t0", ++count, adventure_link_types[rule->type], lbuf, (rule->flags ? ", " : ""), (rule->flags ? flg : ""));
 	}
 	
 	if (count == 0) {
-		add_page_display_str(ch, " none");
+		build_page_display_str(ch, " none");
 	}
 	
 	if (send_page) {
@@ -843,23 +843,23 @@ void olc_show_adventure(char_data *ch) {
 		return;
 	}
 
-	add_page_display(ch, "[%s%d\t0] %s%s\t0", OLC_LABEL_CHANGED, GET_OLC_VNUM(ch->desc), OLC_LABEL_UNCHANGED, !adventure_proto(GET_ADV_VNUM(adv)) ? "new adventure zone" : GET_ADV_NAME(adventure_proto(GET_ADV_VNUM(adv))));
-	add_page_display(ch, "<%sstartvnum\t0> %d", OLC_LABEL_VAL(GET_ADV_START_VNUM(adv), 0), GET_ADV_START_VNUM(adv));
-	add_page_display(ch, "<%sendvnum\t0> %d", OLC_LABEL_VAL(GET_ADV_END_VNUM(adv), 0), GET_ADV_END_VNUM(adv));
-	add_page_display(ch, "<%sname\t0> %s", OLC_LABEL_STR(GET_ADV_NAME(adv), default_adv_name), NULLSAFE(GET_ADV_NAME(adv)));
-	add_page_display(ch, "<%sauthor\t0> %s", OLC_LABEL_STR(GET_ADV_AUTHOR(adv), default_adv_author), NULLSAFE(GET_ADV_AUTHOR(adv)));
-	add_page_display(ch, "<%sdescription\t0>\r\n%s", OLC_LABEL_STR(GET_ADV_DESCRIPTION(adv), ""), NULLSAFE(GET_ADV_DESCRIPTION(adv)));
+	build_page_display(ch, "[%s%d\t0] %s%s\t0", OLC_LABEL_CHANGED, GET_OLC_VNUM(ch->desc), OLC_LABEL_UNCHANGED, !adventure_proto(GET_ADV_VNUM(adv)) ? "new adventure zone" : GET_ADV_NAME(adventure_proto(GET_ADV_VNUM(adv))));
+	build_page_display(ch, "<%sstartvnum\t0> %d", OLC_LABEL_VAL(GET_ADV_START_VNUM(adv), 0), GET_ADV_START_VNUM(adv));
+	build_page_display(ch, "<%sendvnum\t0> %d", OLC_LABEL_VAL(GET_ADV_END_VNUM(adv), 0), GET_ADV_END_VNUM(adv));
+	build_page_display(ch, "<%sname\t0> %s", OLC_LABEL_STR(GET_ADV_NAME(adv), default_adv_name), NULLSAFE(GET_ADV_NAME(adv)));
+	build_page_display(ch, "<%sauthor\t0> %s", OLC_LABEL_STR(GET_ADV_AUTHOR(adv), default_adv_author), NULLSAFE(GET_ADV_AUTHOR(adv)));
+	build_page_display(ch, "<%sdescription\t0>\r\n%s", OLC_LABEL_STR(GET_ADV_DESCRIPTION(adv), ""), NULLSAFE(GET_ADV_DESCRIPTION(adv)));
 	
 	sprintbit(GET_ADV_FLAGS(adv), adventure_flags, lbuf, TRUE);
-	add_page_display(ch, "<%sflags\t0> %s", OLC_LABEL_VAL(GET_ADV_FLAGS(adv), ADV_IN_DEVELOPMENT), lbuf);
+	build_page_display(ch, "<%sflags\t0> %s", OLC_LABEL_VAL(GET_ADV_FLAGS(adv), ADV_IN_DEVELOPMENT), lbuf);
 	
-	add_page_display(ch, "<%stemperature\t0> %s", OLC_LABEL_VAL(GET_ADV_TEMPERATURE_TYPE(adv), 0), temperature_types[GET_ADV_TEMPERATURE_TYPE(adv)]);
+	build_page_display(ch, "<%stemperature\t0> %s", OLC_LABEL_VAL(GET_ADV_TEMPERATURE_TYPE(adv), 0), temperature_types[GET_ADV_TEMPERATURE_TYPE(adv)]);
 	
-	add_page_display(ch, "<%sminlevel\t0> %d", OLC_LABEL_VAL(GET_ADV_MIN_LEVEL(adv), 0), GET_ADV_MIN_LEVEL(adv));
-	add_page_display(ch, "<%smaxlevel\t0> %d", OLC_LABEL_VAL(GET_ADV_MAX_LEVEL(adv), 0), GET_ADV_MAX_LEVEL(adv));
+	build_page_display(ch, "<%sminlevel\t0> %d", OLC_LABEL_VAL(GET_ADV_MIN_LEVEL(adv), 0), GET_ADV_MIN_LEVEL(adv));
+	build_page_display(ch, "<%smaxlevel\t0> %d", OLC_LABEL_VAL(GET_ADV_MAX_LEVEL(adv), 0), GET_ADV_MAX_LEVEL(adv));
 	
-	add_page_display(ch, "<%slimit\t0> %d instance%s (adjusts to %d)", OLC_LABEL_VAL(GET_ADV_MAX_INSTANCES(adv), 1), GET_ADV_MAX_INSTANCES(adv), (GET_ADV_MAX_INSTANCES(adv) != 1 ? "s" : ""), adjusted_instance_limit(adv));
-	add_page_display(ch, "<%splayerlimit\t0> %d", OLC_LABEL_VAL(GET_ADV_PLAYER_LIMIT(adv), 0), GET_ADV_PLAYER_LIMIT(adv));
+	build_page_display(ch, "<%slimit\t0> %d instance%s (adjusts to %d)", OLC_LABEL_VAL(GET_ADV_MAX_INSTANCES(adv), 1), GET_ADV_MAX_INSTANCES(adv), (GET_ADV_MAX_INSTANCES(adv) != 1 ? "s" : ""), adjusted_instance_limit(adv));
+	build_page_display(ch, "<%splayerlimit\t0> %d", OLC_LABEL_VAL(GET_ADV_PLAYER_LIMIT(adv), 0), GET_ADV_PLAYER_LIMIT(adv));
 	
 	// reset time display helper
 	if (GET_ADV_RESET_TIME(adv) <= 0) {
@@ -868,15 +868,15 @@ void olc_show_adventure(char_data *ch) {
 	else {
 		strcpy(lbuf, colon_time(GET_ADV_RESET_TIME(adv), TRUE, NULL));
 	}
-	add_page_display(ch, "<%sreset\t0> %d minutes %s", OLC_LABEL_VAL(GET_ADV_RESET_TIME(adv), default_adv_reset), GET_ADV_RESET_TIME(adv), lbuf);
+	build_page_display(ch, "<%sreset\t0> %d minutes %s", OLC_LABEL_VAL(GET_ADV_RESET_TIME(adv), default_adv_reset), GET_ADV_RESET_TIME(adv), lbuf);
 
-	add_page_display(ch, "Linking rules: <%slinking\t0>", OLC_LABEL_PTR(GET_ADV_LINKING(adv)));
+	build_page_display(ch, "Linking rules: <%slinking\t0>", OLC_LABEL_PTR(GET_ADV_LINKING(adv)));
 	if (GET_ADV_LINKING(adv)) {
 		show_adventure_linking_display(ch, GET_ADV_LINKING(adv), FALSE);
 	}
 	
 	// scripts
-	add_page_display(ch, "Adventure Cleanup Scripts: <%sscript\t0>", OLC_LABEL_PTR(GET_ADV_SCRIPTS(adv)));
+	build_page_display(ch, "Adventure Cleanup Scripts: <%sscript\t0>", OLC_LABEL_PTR(GET_ADV_SCRIPTS(adv)));
 	if (GET_ADV_SCRIPTS(adv)) {
 		show_script_display(ch, GET_ADV_SCRIPTS(adv), FALSE);
 	}

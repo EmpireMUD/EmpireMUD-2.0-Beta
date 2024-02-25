@@ -395,7 +395,7 @@ void olc_fullsearch_craft(char_data *ch, char *argument) {
 		skip_spaces(&argument);
 	}
 	
-	add_page_display(ch, "Craft fullsearch: %s", show_color_codes(find_keywords));
+	build_page_display(ch, "Craft fullsearch: %s", show_color_codes(find_keywords));
 	count = 0;
 	
 	// okay now look up crafts
@@ -460,15 +460,15 @@ void olc_fullsearch_craft(char_data *ch, char *argument) {
 		}
 		
 		// show it
-		add_page_display(ch, "[%5d] %s", GET_CRAFT_VNUM(craft), GET_CRAFT_NAME(craft));
+		build_page_display(ch, "[%5d] %s", GET_CRAFT_VNUM(craft), GET_CRAFT_NAME(craft));
 		++count;
 	}
 	
 	if (count > 0) {
-		add_page_display(ch, "(%d crafts)", count);
+		build_page_display(ch, "(%d crafts)", count);
 	}
 	else {
-		add_page_display_str(ch, " none");
+		build_page_display_str(ch, " none");
 	}
 	
 	send_page_display(ch);
@@ -493,13 +493,13 @@ void olc_search_craft(char_data *ch, craft_vnum vnum) {
 	}
 	
 	found = 0;
-	add_page_display(ch, "Occurrences of craft %d (%s):", vnum, GET_CRAFT_NAME(craft));
+	build_page_display(ch, "Occurrences of craft %d (%s):", vnum, GET_CRAFT_NAME(craft));
 
 	// objects
 	HASH_ITER(hh, object_table, obj, next_obj) {
 		if (IS_RECIPE(obj) && GET_RECIPE_VNUM(obj) == vnum) {
 			++found;
-			add_page_display(ch, "OBJ [%5d] %s", GET_OBJ_VNUM(obj), GET_OBJ_SHORT_DESC(obj));
+			build_page_display(ch, "OBJ [%5d] %s", GET_OBJ_VNUM(obj), GET_OBJ_SHORT_DESC(obj));
 		}
 	}
 	
@@ -507,15 +507,15 @@ void olc_search_craft(char_data *ch, craft_vnum vnum) {
 	HASH_ITER(hh, progress_table, prg, next_prg) {
 		if (find_progress_perk_in_list(PRG_PERKS(prg), PRG_PERK_CRAFT, vnum)) {
 			++found;
-			add_page_display(ch, "PRG [%5d] %s", PRG_VNUM(prg), PRG_NAME(prg));
+			build_page_display(ch, "PRG [%5d] %s", PRG_VNUM(prg), PRG_NAME(prg));
 		}
 	}
 	
 	if (found > 0) {
-		add_page_display(ch, "%d location%s shown", found, PLURAL(found));
+		build_page_display(ch, "%d location%s shown", found, PLURAL(found));
 	}
 	else {
-		add_page_display_str(ch, " none");
+		build_page_display_str(ch, " none");
 	}
 	
 	send_page_display(ch);
@@ -664,9 +664,9 @@ void olc_show_craft(char_data *ch) {
 		return;
 	}
 	
-	add_page_display(ch, "[%s%d\t0] %s%s\t0", OLC_LABEL_CHANGED, GET_OLC_VNUM(ch->desc), OLC_LABEL_UNCHANGED, !craft_proto(GET_CRAFT_VNUM(craft)) ? "new craft" : GET_CRAFT_NAME(craft_proto(GET_CRAFT_VNUM(craft))));
-	add_page_display(ch, "<%sname\t0> %s", OLC_LABEL_STR(GET_CRAFT_NAME(craft), default_craft_name), GET_CRAFT_NAME(craft));
-	add_page_display(ch, "<%stype\t0> %s", OLC_LABEL_VAL(GET_CRAFT_TYPE(craft), 0), craft_types[GET_CRAFT_TYPE(craft)]);
+	build_page_display(ch, "[%s%d\t0] %s%s\t0", OLC_LABEL_CHANGED, GET_OLC_VNUM(ch->desc), OLC_LABEL_UNCHANGED, !craft_proto(GET_CRAFT_VNUM(craft)) ? "new craft" : GET_CRAFT_NAME(craft_proto(GET_CRAFT_VNUM(craft))));
+	build_page_display(ch, "<%sname\t0> %s", OLC_LABEL_STR(GET_CRAFT_NAME(craft), default_craft_name), GET_CRAFT_NAME(craft));
+	build_page_display(ch, "<%stype\t0> %s", OLC_LABEL_VAL(GET_CRAFT_TYPE(craft), 0), craft_types[GET_CRAFT_TYPE(craft)]);
 	
 	if (CRAFT_IS_BUILDING(craft)) {
 		if (GET_CRAFT_BUILD_TYPE(craft) == NOTHING || !building_proto(GET_CRAFT_BUILD_TYPE(craft))) {
@@ -675,30 +675,30 @@ void olc_show_craft(char_data *ch) {
 		else {
 			strcpy(lbuf, GET_BLD_NAME(building_proto(GET_CRAFT_BUILD_TYPE(craft))));
 		}
-		add_page_display(ch, "<%sbuilds\t0> [%d] %s", OLC_LABEL_VAL(GET_CRAFT_BUILD_TYPE(craft), NOTHING), GET_CRAFT_BUILD_TYPE(craft), lbuf);
+		build_page_display(ch, "<%sbuilds\t0> [%d] %s", OLC_LABEL_VAL(GET_CRAFT_BUILD_TYPE(craft), NOTHING), GET_CRAFT_BUILD_TYPE(craft), lbuf);
 	}
 	else if (IS_SET(GET_CRAFT_FLAGS(craft), CRAFT_SOUP)) {
-		add_page_display(ch, "<%sliquid\t0> [%d] %s", OLC_LABEL_VAL(GET_CRAFT_OBJECT(craft), NOTHING), GET_CRAFT_OBJECT(craft), get_generic_name_by_vnum(GET_CRAFT_OBJECT(craft)));
-		add_page_display(ch, "<%svolume\t0> %d drink%s", OLC_LABEL_VAL(GET_CRAFT_QUANTITY(craft), 0), GET_CRAFT_QUANTITY(craft), (GET_CRAFT_QUANTITY(craft) != 1 ? "s" : ""));
+		build_page_display(ch, "<%sliquid\t0> [%d] %s", OLC_LABEL_VAL(GET_CRAFT_OBJECT(craft), NOTHING), GET_CRAFT_OBJECT(craft), get_generic_name_by_vnum(GET_CRAFT_OBJECT(craft)));
+		build_page_display(ch, "<%svolume\t0> %d drink%s", OLC_LABEL_VAL(GET_CRAFT_QUANTITY(craft), 0), GET_CRAFT_QUANTITY(craft), (GET_CRAFT_QUANTITY(craft) != 1 ? "s" : ""));
 	}
 	else if (CRAFT_IS_VEHICLE(craft)) {
 		vehicle_data *proto = vehicle_proto(GET_CRAFT_OBJECT(craft));
-		add_page_display(ch, "<%screates\t0> [%d] %s", OLC_LABEL_VAL(GET_CRAFT_OBJECT(craft), NOTHING), GET_CRAFT_OBJECT(craft), !proto ? "nothing" : VEH_SHORT_DESC(proto));
+		build_page_display(ch, "<%screates\t0> [%d] %s", OLC_LABEL_VAL(GET_CRAFT_OBJECT(craft), NOTHING), GET_CRAFT_OBJECT(craft), !proto ? "nothing" : VEH_SHORT_DESC(proto));
 	
 	}
 	else {
 		// non-soup, non-building, non-vehicle
 		obj_data *proto = obj_proto(GET_CRAFT_OBJECT(craft));
-		add_page_display(ch, "<%screates\t0> [%d] %s", OLC_LABEL_VAL(GET_CRAFT_OBJECT(craft), NOTHING), GET_CRAFT_OBJECT(craft), !proto ? "nothing" : GET_OBJ_SHORT_DESC(proto));
-		add_page_display(ch, "<%squantity\t0> x%d", OLC_LABEL_VAL(GET_CRAFT_QUANTITY(craft), 0), GET_CRAFT_QUANTITY(craft));
+		build_page_display(ch, "<%screates\t0> [%d] %s", OLC_LABEL_VAL(GET_CRAFT_OBJECT(craft), NOTHING), GET_CRAFT_OBJECT(craft), !proto ? "nothing" : GET_OBJ_SHORT_DESC(proto));
+		build_page_display(ch, "<%squantity\t0> x%d", OLC_LABEL_VAL(GET_CRAFT_QUANTITY(craft), 0), GET_CRAFT_QUANTITY(craft));
 	}
 	
 	if (CRAFT_IS_BUILDING(craft) || CRAFT_IS_VEHICLE(craft)) {
 		ordered_sprintbit(GET_CRAFT_BUILD_ON(craft), bld_on_flags, bld_on_flags_order, TRUE, lbuf);
-		add_page_display(ch, "<%sbuildon\t0> %s", OLC_LABEL_VAL(GET_CRAFT_BUILD_ON(craft), NOBITS), lbuf);
+		build_page_display(ch, "<%sbuildon\t0> %s", OLC_LABEL_VAL(GET_CRAFT_BUILD_ON(craft), NOBITS), lbuf);
 		
 		ordered_sprintbit(GET_CRAFT_BUILD_FACING(craft), bld_on_flags, bld_on_flags_order, TRUE, lbuf);
-		add_page_display(ch, "<%sbuildfacing\t0> %s", OLC_LABEL_VAL(GET_CRAFT_BUILD_FACING(craft), NOBITS), lbuf);
+		build_page_display(ch, "<%sbuildfacing\t0> %s", OLC_LABEL_VAL(GET_CRAFT_BUILD_FACING(craft), NOBITS), lbuf);
 	}
 	
 	// ability required
@@ -711,28 +711,28 @@ void olc_show_craft(char_data *ch) {
 			sprintf(lbuf + strlen(lbuf), " (%s %d)", SKILL_NAME(ABIL_ASSIGNED_SKILL(abil)), ABIL_SKILL_LEVEL(abil));
 		}
 	}
-	add_page_display(ch, "<%srequiresability\t0> %s", OLC_LABEL_VAL(GET_CRAFT_ABILITY(craft), NOTHING), lbuf);
+	build_page_display(ch, "<%srequiresability\t0> %s", OLC_LABEL_VAL(GET_CRAFT_ABILITY(craft), NOTHING), lbuf);
 	
-	add_page_display(ch, "<%slevelrequired\t0> %d", OLC_LABEL_VAL(GET_CRAFT_MIN_LEVEL(craft), 0), GET_CRAFT_MIN_LEVEL(craft));
+	build_page_display(ch, "<%slevelrequired\t0> %d", OLC_LABEL_VAL(GET_CRAFT_MIN_LEVEL(craft), 0), GET_CRAFT_MIN_LEVEL(craft));
 
 	if (!CRAFT_IS_BUILDING(craft) && !CRAFT_IS_VEHICLE(craft)) {
 		seconds = (GET_CRAFT_TIME(craft) * ACTION_CYCLE_TIME);
-		add_page_display(ch, "<%stime\t0> %d action tick%s (%s)", OLC_LABEL_VAL(GET_CRAFT_TIME(craft), 1), GET_CRAFT_TIME(craft), (GET_CRAFT_TIME(craft) != 1 ? "s" : ""), colon_time(seconds, FALSE, NULL));
+		build_page_display(ch, "<%stime\t0> %d action tick%s (%s)", OLC_LABEL_VAL(GET_CRAFT_TIME(craft), 1), GET_CRAFT_TIME(craft), (GET_CRAFT_TIME(craft) != 1 ? "s" : ""), colon_time(seconds, FALSE, NULL));
 	}
 
 	sprintbit(GET_CRAFT_FLAGS(craft), craft_flags, lbuf, TRUE);
-	add_page_display(ch, "<%sflags\t0> %s", OLC_LABEL_VAL(GET_CRAFT_FLAGS(craft), CRAFT_IN_DEVELOPMENT), lbuf);
+	build_page_display(ch, "<%sflags\t0> %s", OLC_LABEL_VAL(GET_CRAFT_FLAGS(craft), CRAFT_IN_DEVELOPMENT), lbuf);
 	
 	sprintbit(GET_CRAFT_REQUIRES_TOOL(craft), tool_flags, lbuf, TRUE);
-	add_page_display(ch, "<%stools\t0> %s", OLC_LABEL_VAL(GET_CRAFT_REQUIRES_TOOL(craft), NOBITS), lbuf);
+	build_page_display(ch, "<%stools\t0> %s", OLC_LABEL_VAL(GET_CRAFT_REQUIRES_TOOL(craft), NOBITS), lbuf);
 	
 	sprintbit(GET_CRAFT_REQUIRES_FUNCTION(craft), function_flags, lbuf, TRUE);
-	add_page_display(ch, "<%srequiresfunction\t0> %s", OLC_LABEL_VAL(GET_CRAFT_REQUIRES_FUNCTION(craft), NOBITS), lbuf);
+	build_page_display(ch, "<%srequiresfunction\t0> %s", OLC_LABEL_VAL(GET_CRAFT_REQUIRES_FUNCTION(craft), NOBITS), lbuf);
 	
-	add_page_display(ch, "<%srequiresobject\t0> %d - %s", OLC_LABEL_VAL(GET_CRAFT_REQUIRES_OBJ(craft), NOTHING), GET_CRAFT_REQUIRES_OBJ(craft), GET_CRAFT_REQUIRES_OBJ(craft) == NOTHING ? "none" : get_obj_name_by_proto(GET_CRAFT_REQUIRES_OBJ(craft)));
+	build_page_display(ch, "<%srequiresobject\t0> %d - %s", OLC_LABEL_VAL(GET_CRAFT_REQUIRES_OBJ(craft), NOTHING), GET_CRAFT_REQUIRES_OBJ(craft), GET_CRAFT_REQUIRES_OBJ(craft) == NOTHING ? "none" : get_obj_name_by_proto(GET_CRAFT_REQUIRES_OBJ(craft)));
 
 	// resources
-	add_page_display(ch, "Resources required: <%sresource\t0>", OLC_LABEL_PTR(GET_CRAFT_RESOURCES(craft)));
+	build_page_display(ch, "Resources required: <%sresource\t0>", OLC_LABEL_PTR(GET_CRAFT_RESOURCES(craft)));
 	show_resource_display(ch, GET_CRAFT_RESOURCES(craft), FALSE);
 		
 	send_page_display(ch);

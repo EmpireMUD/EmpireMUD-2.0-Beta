@@ -700,7 +700,7 @@ void olc_fullsearch_attack_message(char_data *ch, char *argument) {
 		skip_spaces(&argument);
 	}
 	
-	add_page_display(ch, "Attack message fullsearch: %s", show_color_codes(find_keywords));
+	build_page_display(ch, "Attack message fullsearch: %s", show_color_codes(find_keywords));
 	count = 0;
 	
 	// okay now look up messagess
@@ -763,15 +763,15 @@ void olc_fullsearch_attack_message(char_data *ch, char *argument) {
 		}
 		
 		// show it
-		add_page_display(ch, "[%5d] %s", ATTACK_VNUM(amd), ATTACK_NAME(amd));
+		build_page_display(ch, "[%5d] %s", ATTACK_VNUM(amd), ATTACK_NAME(amd));
 		++count;
 	}
 	
 	if (count > 0) {
-		add_page_display(ch, "(%d attacks)", count);
+		build_page_display(ch, "(%d attacks)", count);
 	}
 	else {
-		add_page_display_str(ch, " none");
+		build_page_display_str(ch, " none");
 	}
 	
 	send_page_display(ch);
@@ -801,7 +801,7 @@ void olc_search_attack_message(char_data *ch, any_vnum vnum) {
 	}
 	
 	found = 0;
-	add_page_display(ch, "Occurrences of attack message %d (%s):", vnum, ATTACK_NAME(amd));
+	build_page_display(ch, "Occurrences of attack message %d (%s):", vnum, ATTACK_NAME(amd));
 	
 	// abilities
 	HASH_ITER(hh, ability_table, abil, next_abil) {
@@ -811,7 +811,7 @@ void olc_search_attack_message(char_data *ch, any_vnum vnum) {
 		
 		if (any) {
 			++found;
-			add_page_display(ch, "ABIL [%5d] %s", ABIL_VNUM(abil), ABIL_NAME(abil));
+			build_page_display(ch, "ABIL [%5d] %s", ABIL_VNUM(abil), ABIL_NAME(abil));
 		}
 	}
 	
@@ -819,7 +819,7 @@ void olc_search_attack_message(char_data *ch, any_vnum vnum) {
 	HASH_ITER(hh, attack_message_table, amditer, next_amd) {
 		if (ATTACK_COUNTS_AS(amditer) == vnum) {
 			++found;
-			add_page_display(ch, "ATTACK [%5d] %s", ATTACK_VNUM(amditer), ATTACK_NAME(amditer));
+			build_page_display(ch, "ATTACK [%5d] %s", ATTACK_VNUM(amditer), ATTACK_NAME(amditer));
 		}
 	}
 	
@@ -827,7 +827,7 @@ void olc_search_attack_message(char_data *ch, any_vnum vnum) {
 	HASH_ITER(hh, generic_table, gen, next_gen) {
 		if (GET_AFFECT_DOT_ATTACK(gen) > 0 && GET_AFFECT_DOT_ATTACK(gen) == vnum) {
 			++found;
-			add_page_display(ch, "GEN [%5d] %s", GEN_VNUM(gen), GEN_NAME(gen));
+			build_page_display(ch, "GEN [%5d] %s", GEN_VNUM(gen), GEN_NAME(gen));
 		}
 	}
 	
@@ -835,7 +835,7 @@ void olc_search_attack_message(char_data *ch, any_vnum vnum) {
 	HASH_ITER(hh, mobile_table, mob, next_mob) {
 		if (MOB_ATTACK_TYPE(mob) == vnum) {
 			++found;
-			add_page_display(ch, "MOB [%5d] %s", GET_MOB_VNUM(mob), GET_SHORT_DESC(mob));
+			build_page_display(ch, "MOB [%5d] %s", GET_MOB_VNUM(mob), GET_SHORT_DESC(mob));
 		}
 	}
 	
@@ -843,7 +843,7 @@ void olc_search_attack_message(char_data *ch, any_vnum vnum) {
 	HASH_ITER(hh, morph_table, morph, next_morph) {
 		if (MORPH_ATTACK_TYPE(morph) == vnum) {
 			++found;
-			add_page_display(ch, "MPH [%5d] %s", MORPH_VNUM(morph), MORPH_SHORT_DESC(morph));
+			build_page_display(ch, "MPH [%5d] %s", MORPH_VNUM(morph), MORPH_SHORT_DESC(morph));
 		}
 	}
 	
@@ -854,15 +854,15 @@ void olc_search_attack_message(char_data *ch, any_vnum vnum) {
 		
 		if (any) {
 			++found;
-			add_page_display(ch, "OBJ [%5d] %s", GET_OBJ_VNUM(obj), GET_OBJ_SHORT_DESC(obj));
+			build_page_display(ch, "OBJ [%5d] %s", GET_OBJ_VNUM(obj), GET_OBJ_SHORT_DESC(obj));
 		}
 	}
 	
 	if (found > 0) {
-		add_page_display(ch, "%d location%s shown", found, PLURAL(found));
+		build_page_display(ch, "%d location%s shown", found, PLURAL(found));
 	}
 	else {
-		add_page_display_str(ch, " none");
+		build_page_display_str(ch, " none");
 	}
 	
 	send_page_display(ch);
@@ -1657,29 +1657,29 @@ void do_stat_attack_message(char_data *ch, attack_message_data *amd, bool detail
 	}
 	
 	// first line
-	add_page_display(ch, "VNum: [\tc%d\t0], Name: \ty%s\t0, Message count: [\tc%d\t0]", ATTACK_VNUM(amd), ATTACK_NAME(amd), ATTACK_NUM_MSGS(amd));
+	build_page_display(ch, "VNum: [\tc%d\t0], Name: \ty%s\t0, Message count: [\tc%d\t0]", ATTACK_VNUM(amd), ATTACK_NAME(amd), ATTACK_NUM_MSGS(amd));
 	
 	if (ATTACK_COUNTS_AS(amd) > 0) {
-		add_page_display(ch, "Also counts as: [\tc%d\t0] \ty%s\t0", ATTACK_COUNTS_AS(amd), (ATTACK_COUNTS_AS(amd) > 0) ? get_attack_name_by_vnum(ATTACK_COUNTS_AS(amd)) : "(none)");
+		build_page_display(ch, "Also counts as: [\tc%d\t0] \ty%s\t0", ATTACK_COUNTS_AS(amd), (ATTACK_COUNTS_AS(amd) > 0) ? get_attack_name_by_vnum(ATTACK_COUNTS_AS(amd)) : "(none)");
 	}
 	
 	sprintbit(ATTACK_FLAGS(amd), attack_message_flags, lbuf, TRUE);
-	add_page_display(ch, "Flags: \tg%s\t0", lbuf);
+	build_page_display(ch, "Flags: \tg%s\t0", lbuf);
 	
 	if (ATTACK_HAS_EXTENDED_DATA(amd)) {
-		add_page_display(ch, "Strings: [\ty%s\t0, \ty%s\t0, \ty%s\t0]", NULLSAFE(ATTACK_FIRST_PERSON(amd)), NULLSAFE(ATTACK_THIRD_PERSON(amd)), NULLSAFE(ATTACK_NOUN(amd)));
+		build_page_display(ch, "Strings: [\ty%s\t0, \ty%s\t0, \ty%s\t0]", NULLSAFE(ATTACK_FIRST_PERSON(amd)), NULLSAFE(ATTACK_THIRD_PERSON(amd)), NULLSAFE(ATTACK_NOUN(amd)));
 		
 		// Damage, Weapon, Speeds (all same line)
-		pd = add_page_display(ch, "Damage type: [\tg%s\t0], Weapon type: [\tg%s\t0], Speeds: [", damage_types[ATTACK_DAMAGE_TYPE(amd)], weapon_types[ATTACK_WEAPON_TYPE(amd)]);
+		pd = build_page_display(ch, "Damage type: [\tg%s\t0], Weapon type: [\tg%s\t0], Speeds: [", damage_types[ATTACK_DAMAGE_TYPE(amd)], weapon_types[ATTACK_WEAPON_TYPE(amd)]);
 		for (iter = 0; iter < NUM_ATTACK_SPEEDS; ++iter) {
 			append_page_display_line(pd, "%s\tc%.1f\t0", iter > 0 ? " | " : "", ATTACK_SPEED(amd, iter));
 		}
 		append_page_display_line(pd, "]");
 	}
 	
-	add_page_display(ch, "Death log: %s", ATTACK_DEATH_LOG(amd) ? ATTACK_DEATH_LOG(amd) : "(default)");
+	build_page_display(ch, "Death log: %s", ATTACK_DEATH_LOG(amd) ? ATTACK_DEATH_LOG(amd) : "(default)");
 	
-	add_page_display(ch, "Messages:");
+	build_page_display(ch, "Messages:");
 	count = 0;
 	
 	// message section
@@ -1689,22 +1689,22 @@ void do_stat_attack_message(char_data *ch, attack_message_data *amd, bool detail
 			++count;
 			for (iter = 0; iter < NUM_MSG_TYPES; ++iter) {
 				if (ams->msg[iter].attacker_msg) {
-					add_page_display_str(ch, ams->msg[iter].attacker_msg);
+					build_page_display_str(ch, ams->msg[iter].attacker_msg);
 				}
 				else {
-					add_page_display_str(ch, "#");
+					build_page_display_str(ch, "#");
 				}
 				if (ams->msg[iter].victim_msg) {
-					add_page_display_str(ch, ams->msg[iter].victim_msg);
+					build_page_display_str(ch, ams->msg[iter].victim_msg);
 				}
 				else {
-					add_page_display_str(ch, "#");
+					build_page_display_str(ch, "#");
 				}
 				if (ams->msg[iter].room_msg) {
-					add_page_display_str(ch, ams->msg[iter].room_msg);
+					build_page_display_str(ch, ams->msg[iter].room_msg);
 				}
 				else {
-					add_page_display_str(ch, "#");
+					build_page_display_str(ch, "#");
 				}
 			}
 			
@@ -1714,7 +1714,7 @@ void do_stat_attack_message(char_data *ch, attack_message_data *amd, bool detail
 					lbuf[iter] = '-';
 				}
 				lbuf[iter] = '\0';
-				add_page_display_str(ch, lbuf);
+				build_page_display_str(ch, lbuf);
 			}
 		}
 	}
@@ -1749,11 +1749,11 @@ void do_stat_attack_message(char_data *ch, attack_message_data *amd, bool detail
 			}
 		
 			// only show 1 line per message on stat
-			add_page_display(ch, "%d. %s", ++count, to_show ? to_show : "(blank)");
+			build_page_display(ch, "%d. %s", ++count, to_show ? to_show : "(blank)");
 		}
 	}
 	if (!count) {
-		add_page_display(ch, " none");
+		build_page_display(ch, " none");
 	}
 	
 	send_page_display(ch);
@@ -1780,36 +1780,36 @@ void olc_show_one_message(char_data *ch) {
 	}
 	
 	// one message view
-	add_page_display(ch, "[%s%d\t0] %s%s\t0: Message %s%d\t0", OLC_LABEL_CHANGED, GET_OLC_VNUM(ch->desc), OLC_LABEL_UNCHANGED, ATTACK_NAME(amd), OLC_LABEL_UNCHANGED, GET_OLC_ATTACK_NUM(ch->desc));
+	build_page_display(ch, "[%s%d\t0] %s%s\t0: Message %s%d\t0", OLC_LABEL_CHANGED, GET_OLC_VNUM(ch->desc), OLC_LABEL_UNCHANGED, ATTACK_NAME(amd), OLC_LABEL_UNCHANGED, GET_OLC_ATTACK_NUM(ch->desc));
 	
-	add_page_display_str(ch, divider);
+	build_page_display_str(ch, divider);
 	
 	// messages
-	add_page_display(ch, "<%sdie2char\t0> %s", OLC_LABEL_PTR(ams->msg[MSG_DIE].attacker_msg), ams->msg[MSG_DIE].attacker_msg ? ams->msg[MSG_DIE].attacker_msg : "(none)");
-	add_page_display(ch, "<%sdie2vict\t0> %s", OLC_LABEL_PTR(ams->msg[MSG_DIE].victim_msg), ams->msg[MSG_DIE].victim_msg ? ams->msg[MSG_DIE].victim_msg : "(none)");
-	add_page_display(ch, "<%sdie2room\t0> %s", OLC_LABEL_PTR(ams->msg[MSG_DIE].room_msg), ams->msg[MSG_DIE].room_msg ? ams->msg[MSG_DIE].room_msg : "(none)");
+	build_page_display(ch, "<%sdie2char\t0> %s", OLC_LABEL_PTR(ams->msg[MSG_DIE].attacker_msg), ams->msg[MSG_DIE].attacker_msg ? ams->msg[MSG_DIE].attacker_msg : "(none)");
+	build_page_display(ch, "<%sdie2vict\t0> %s", OLC_LABEL_PTR(ams->msg[MSG_DIE].victim_msg), ams->msg[MSG_DIE].victim_msg ? ams->msg[MSG_DIE].victim_msg : "(none)");
+	build_page_display(ch, "<%sdie2room\t0> %s", OLC_LABEL_PTR(ams->msg[MSG_DIE].room_msg), ams->msg[MSG_DIE].room_msg ? ams->msg[MSG_DIE].room_msg : "(none)");
 	
-	add_page_display_str(ch, divider);
+	build_page_display_str(ch, divider);
 	
-	add_page_display(ch, "<%smiss2char\t0> %s", OLC_LABEL_PTR(ams->msg[MSG_MISS].attacker_msg), ams->msg[MSG_MISS].attacker_msg ? ams->msg[MSG_MISS].attacker_msg : "(none)");
-	add_page_display(ch, "<%smiss2vict\t0> %s", OLC_LABEL_PTR(ams->msg[MSG_MISS].victim_msg), ams->msg[MSG_MISS].victim_msg ? ams->msg[MSG_MISS].victim_msg : "(none)");
-	add_page_display(ch, "<%smiss2room\t0> %s", OLC_LABEL_PTR(ams->msg[MSG_MISS].room_msg), ams->msg[MSG_MISS].room_msg ? ams->msg[MSG_MISS].room_msg : "(none)");
+	build_page_display(ch, "<%smiss2char\t0> %s", OLC_LABEL_PTR(ams->msg[MSG_MISS].attacker_msg), ams->msg[MSG_MISS].attacker_msg ? ams->msg[MSG_MISS].attacker_msg : "(none)");
+	build_page_display(ch, "<%smiss2vict\t0> %s", OLC_LABEL_PTR(ams->msg[MSG_MISS].victim_msg), ams->msg[MSG_MISS].victim_msg ? ams->msg[MSG_MISS].victim_msg : "(none)");
+	build_page_display(ch, "<%smiss2room\t0> %s", OLC_LABEL_PTR(ams->msg[MSG_MISS].room_msg), ams->msg[MSG_MISS].room_msg ? ams->msg[MSG_MISS].room_msg : "(none)");
 	
-	add_page_display_str(ch, divider);
+	build_page_display_str(ch, divider);
 	
-	add_page_display(ch, "<%shit2char\t0> %s", OLC_LABEL_PTR(ams->msg[MSG_HIT].attacker_msg), ams->msg[MSG_HIT].attacker_msg ? ams->msg[MSG_HIT].attacker_msg : "(none)");
-	add_page_display(ch, "<%shit2vict\t0> %s", OLC_LABEL_PTR(ams->msg[MSG_HIT].victim_msg), ams->msg[MSG_HIT].victim_msg ? ams->msg[MSG_HIT].victim_msg : "(none)");
-	add_page_display(ch, "<%shit2room\t0> %s", OLC_LABEL_PTR(ams->msg[MSG_HIT].room_msg), ams->msg[MSG_HIT].room_msg ? ams->msg[MSG_HIT].room_msg : "(none)");
+	build_page_display(ch, "<%shit2char\t0> %s", OLC_LABEL_PTR(ams->msg[MSG_HIT].attacker_msg), ams->msg[MSG_HIT].attacker_msg ? ams->msg[MSG_HIT].attacker_msg : "(none)");
+	build_page_display(ch, "<%shit2vict\t0> %s", OLC_LABEL_PTR(ams->msg[MSG_HIT].victim_msg), ams->msg[MSG_HIT].victim_msg ? ams->msg[MSG_HIT].victim_msg : "(none)");
+	build_page_display(ch, "<%shit2room\t0> %s", OLC_LABEL_PTR(ams->msg[MSG_HIT].room_msg), ams->msg[MSG_HIT].room_msg ? ams->msg[MSG_HIT].room_msg : "(none)");
 	
-	add_page_display_str(ch, divider);
+	build_page_display_str(ch, divider);
 	
-	add_page_display(ch, "<%sgod2char\t0> %s", OLC_LABEL_PTR(ams->msg[MSG_GOD].attacker_msg), ams->msg[MSG_GOD].attacker_msg ? ams->msg[MSG_GOD].attacker_msg : "(none)");
-	add_page_display(ch, "<%sgod2vict\t0> %s", OLC_LABEL_PTR(ams->msg[MSG_GOD].victim_msg), ams->msg[MSG_GOD].victim_msg ? ams->msg[MSG_GOD].victim_msg : "(none)");
-	add_page_display(ch, "<%sgod2room\t0> %s", OLC_LABEL_PTR(ams->msg[MSG_GOD].room_msg), ams->msg[MSG_GOD].room_msg ? ams->msg[MSG_GOD].room_msg : "(none)");
+	build_page_display(ch, "<%sgod2char\t0> %s", OLC_LABEL_PTR(ams->msg[MSG_GOD].attacker_msg), ams->msg[MSG_GOD].attacker_msg ? ams->msg[MSG_GOD].attacker_msg : "(none)");
+	build_page_display(ch, "<%sgod2vict\t0> %s", OLC_LABEL_PTR(ams->msg[MSG_GOD].victim_msg), ams->msg[MSG_GOD].victim_msg ? ams->msg[MSG_GOD].victim_msg : "(none)");
+	build_page_display(ch, "<%sgod2room\t0> %s", OLC_LABEL_PTR(ams->msg[MSG_GOD].room_msg), ams->msg[MSG_GOD].room_msg ? ams->msg[MSG_GOD].room_msg : "(none)");
 	
-	add_page_display_str(ch, divider);
+	build_page_display_str(ch, divider);
 	
-	add_page_display(ch, "Return to main menu: <%sback\t0>", OLC_LABEL_UNCHANGED);
+	build_page_display(ch, "Return to main menu: <%sback\t0>", OLC_LABEL_UNCHANGED);
 	
 	send_page_display(ch);
 }
@@ -1837,29 +1837,29 @@ void olc_show_attack_message(char_data *ch) {
 		return;
 	}
 	
-	add_page_display(ch, "[%s%d\t0] %s%s\t0", OLC_LABEL_CHANGED, GET_OLC_VNUM(ch->desc), OLC_LABEL_UNCHANGED, !real_attack_message(ATTACK_VNUM(amd)) ? "new attack message" : ATTACK_NAME(real_attack_message(ATTACK_VNUM(amd))));
-	add_page_display(ch, "<%sname\t0> %s", OLC_LABEL_STR(ATTACK_NAME(amd), default_attack_name), NULLSAFE(ATTACK_NAME(amd)));
-	add_page_display(ch, "<%scountsas\t0> %d %s", OLC_LABEL_VAL(ATTACK_COUNTS_AS(amd), 0), ATTACK_COUNTS_AS(amd), (ATTACK_COUNTS_AS(amd) > 0) ? get_attack_name_by_vnum(ATTACK_COUNTS_AS(amd)) : "(none)");
-	add_page_display(ch, "<%sdeathlog\t0> %s", OLC_LABEL_PTR(ATTACK_DEATH_LOG(amd)), ATTACK_DEATH_LOG(amd) ? ATTACK_DEATH_LOG(amd) : "(default)");
+	build_page_display(ch, "[%s%d\t0] %s%s\t0", OLC_LABEL_CHANGED, GET_OLC_VNUM(ch->desc), OLC_LABEL_UNCHANGED, !real_attack_message(ATTACK_VNUM(amd)) ? "new attack message" : ATTACK_NAME(real_attack_message(ATTACK_VNUM(amd))));
+	build_page_display(ch, "<%sname\t0> %s", OLC_LABEL_STR(ATTACK_NAME(amd), default_attack_name), NULLSAFE(ATTACK_NAME(amd)));
+	build_page_display(ch, "<%scountsas\t0> %d %s", OLC_LABEL_VAL(ATTACK_COUNTS_AS(amd), 0), ATTACK_COUNTS_AS(amd), (ATTACK_COUNTS_AS(amd) > 0) ? get_attack_name_by_vnum(ATTACK_COUNTS_AS(amd)) : "(none)");
+	build_page_display(ch, "<%sdeathlog\t0> %s", OLC_LABEL_PTR(ATTACK_DEATH_LOG(amd)), ATTACK_DEATH_LOG(amd) ? ATTACK_DEATH_LOG(amd) : "(default)");
 	
 	sprintbit(ATTACK_FLAGS(amd), attack_message_flags, lbuf, TRUE);
-	add_page_display(ch, "<%sflags\t0> %s", OLC_LABEL_VAL(ATTACK_FLAGS(amd), NOBITS), lbuf);
+	build_page_display(ch, "<%sflags\t0> %s", OLC_LABEL_VAL(ATTACK_FLAGS(amd), NOBITS), lbuf);
 	
 	if (ATTACK_HAS_EXTENDED_DATA(amd)) {
-		add_page_display(ch, "<%sfirstperson\t0> %s", OLC_LABEL_STR(ATTACK_FIRST_PERSON(amd), default_attack_first_person), ATTACK_FIRST_PERSON(amd) ? ATTACK_FIRST_PERSON(amd) : "(none)");
-		add_page_display(ch, "<%sthirdperson\t0> %s", OLC_LABEL_STR(ATTACK_THIRD_PERSON(amd), default_attack_third_person), ATTACK_THIRD_PERSON(amd) ? ATTACK_THIRD_PERSON(amd) : "(none)");
-		add_page_display(ch, "<%snoun\t0> %s", OLC_LABEL_STR(ATTACK_NOUN(amd), default_attack_noun), ATTACK_NOUN(amd) ? ATTACK_NOUN(amd) : "(none)");
+		build_page_display(ch, "<%sfirstperson\t0> %s", OLC_LABEL_STR(ATTACK_FIRST_PERSON(amd), default_attack_first_person), ATTACK_FIRST_PERSON(amd) ? ATTACK_FIRST_PERSON(amd) : "(none)");
+		build_page_display(ch, "<%sthirdperson\t0> %s", OLC_LABEL_STR(ATTACK_THIRD_PERSON(amd), default_attack_third_person), ATTACK_THIRD_PERSON(amd) ? ATTACK_THIRD_PERSON(amd) : "(none)");
+		build_page_display(ch, "<%snoun\t0> %s", OLC_LABEL_STR(ATTACK_NOUN(amd), default_attack_noun), ATTACK_NOUN(amd) ? ATTACK_NOUN(amd) : "(none)");
 		
-		add_page_display(ch, "<%sdamagetype\t0> %s", OLC_LABEL_VAL(ATTACK_DAMAGE_TYPE(amd), 0), damage_types[ATTACK_DAMAGE_TYPE(amd)]);
-		add_page_display(ch, "<%sweapontype\t0> %s", OLC_LABEL_VAL(ATTACK_WEAPON_TYPE(amd), 0), weapon_types[ATTACK_WEAPON_TYPE(amd)]);
+		build_page_display(ch, "<%sdamagetype\t0> %s", OLC_LABEL_VAL(ATTACK_DAMAGE_TYPE(amd), 0), damage_types[ATTACK_DAMAGE_TYPE(amd)]);
+		build_page_display(ch, "<%sweapontype\t0> %s", OLC_LABEL_VAL(ATTACK_WEAPON_TYPE(amd), 0), weapon_types[ATTACK_WEAPON_TYPE(amd)]);
 		
-		add_page_display(ch, "Speeds: <%sspeed\t0>", OLC_LABEL_CHANGED);
+		build_page_display(ch, "Speeds: <%sspeed\t0>", OLC_LABEL_CHANGED);
 		for (iter = 0; iter < NUM_ATTACK_SPEEDS; ++iter) {
-			add_page_display(ch, "   %s: %s%.1f\t0 seconds", attack_speed_types[iter], OLC_LABEL_VAL(ATTACK_SPEED(amd, iter), basic_speed), ATTACK_SPEED(amd, iter));
+			build_page_display(ch, "   %s: %s%.1f\t0 seconds", attack_speed_types[iter], OLC_LABEL_VAL(ATTACK_SPEED(amd, iter), basic_speed), ATTACK_SPEED(amd, iter));
 		}
 	}
 	
-	add_page_display(ch, "Messages: <%smessage\t0>", OLC_LABEL_PTR(ATTACK_MSG_LIST(amd)));
+	build_page_display(ch, "Messages: <%smessage\t0>", OLC_LABEL_PTR(ATTACK_MSG_LIST(amd)));
 	
 	// show list preview
 	count = 0;
@@ -1893,11 +1893,11 @@ void olc_show_attack_message(char_data *ch) {
 		}
 		
 		// only show 1 line per message on stat
-		add_page_display(ch, "%d. %s", ++count, to_show ? to_show : "(blank)");
+		build_page_display(ch, "%d. %s", ++count, to_show ? to_show : "(blank)");
 	}
 	
 	if (ATTACK_HAS_EXTENDED_DATA(amd) && !ATTACK_FLAGGED(amd, AMDF_FLAGS_REQUIRE_EXTENDED_DATA)) {
-		add_page_display(ch, "To clear extended data: <%sclearextended\t0>", OLC_LABEL_CHANGED);
+		build_page_display(ch, "To clear extended data: <%sclearextended\t0>", OLC_LABEL_CHANGED);
 	}
 	
 	send_page_display(ch);
@@ -1917,7 +1917,7 @@ int vnum_attack_message(char *searchname, char_data *ch) {
 	
 	HASH_ITER(hh, attack_message_table, iter, next_iter) {
 		if (multi_isname(searchname, ATTACK_NAME(iter))) {
-			add_page_display(ch, "%3d. [%5d] %s", ++found, ATTACK_VNUM(iter), ATTACK_NAME(iter));
+			build_page_display(ch, "%3d. [%5d] %s", ++found, ATTACK_VNUM(iter), ATTACK_NAME(iter));
 		}
 	}
 	

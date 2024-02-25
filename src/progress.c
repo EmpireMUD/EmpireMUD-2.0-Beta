@@ -414,11 +414,11 @@ void show_progress_list_display(char_data *ch, struct progress_list *list, bool 
 	int count = 0;
 	
 	LL_FOREACH(list, item) {
-		add_page_display(ch, "%2d. [%d] %s", ++count, item->vnum, get_progress_name_by_proto(item->vnum));
+		build_page_display(ch, "%2d. [%d] %s", ++count, item->vnum, get_progress_name_by_proto(item->vnum));
 	}
 	
 	if (!list) {
-		add_page_display_str(ch, " none");
+		build_page_display_str(ch, " none");
 	}
 	
 	if (send_page) {
@@ -523,11 +523,11 @@ void show_progress_perks_display(char_data *ch, struct progress_perk *list, bool
 	int count = 0;
 	
 	LL_FOREACH(list, item) {
-		add_page_display(ch, "%2d. %s", ++count, get_one_perk_display(item, show_vnums));
+		build_page_display(ch, "%2d. %s", ++count, get_one_perk_display(item, show_vnums));
 	}
 	
 	if (!list) {
-		add_page_display_str(ch, " none");
+		build_page_display_str(ch, " none");
 	}
 	
 	if (send_page) {
@@ -1924,14 +1924,14 @@ void olc_search_progress(char_data *ch, any_vnum vnum) {
 	}
 	
 	found = 0;
-	add_page_display(ch, "Occurrences of progression %d (%s):", vnum, PRG_NAME(prg));
+	build_page_display(ch, "Occurrences of progression %d (%s):", vnum, PRG_NAME(prg));
 	
 	// other progresses
 	HASH_ITER(hh, progress_table, iter, next_iter) {
 		LL_FOREACH(PRG_PREREQS(iter), pl) {
 			if (pl->vnum == vnum) {
 				++found;
-				add_page_display(ch, "PRG [%5d] %s", PRG_VNUM(iter), PRG_NAME(iter));
+				build_page_display(ch, "PRG [%5d] %s", PRG_VNUM(iter), PRG_NAME(iter));
 				break;
 			}
 		}
@@ -1945,15 +1945,15 @@ void olc_search_progress(char_data *ch, any_vnum vnum) {
 		
 		if (any) {
 			++found;
-			add_page_display(ch, "QST [%5d] %s", QUEST_VNUM(qiter), QUEST_NAME(qiter));
+			build_page_display(ch, "QST [%5d] %s", QUEST_VNUM(qiter), QUEST_NAME(qiter));
 		}
 	}
 	
 	if (found > 0) {
-		add_page_display(ch, "%d location%s shown", found, PLURAL(found));
+		build_page_display(ch, "%d location%s shown", found, PLURAL(found));
 	}
 	else {
-		add_page_display_str(ch, " none");
+		build_page_display_str(ch, " none");
 	}
 	
 	send_page_display(ch);
@@ -2561,7 +2561,7 @@ void olc_fullsearch_progress(char_data *ch, char *argument) {
 		skip_spaces(&argument);
 	}
 	
-	add_page_display(ch, "Progress goal fullsearch: %s", show_color_codes(find_keywords));
+	build_page_display(ch, "Progress goal fullsearch: %s", show_color_codes(find_keywords));
 	count = 0;
 	
 	// okay now look up items
@@ -2608,15 +2608,15 @@ void olc_fullsearch_progress(char_data *ch, char *argument) {
 		}
 		
 		// show it
-		add_page_display(ch, "[%5d] %s", PRG_VNUM(prg), PRG_NAME(prg));
+		build_page_display(ch, "[%5d] %s", PRG_VNUM(prg), PRG_NAME(prg));
 		++count;
 	}
 	
 	if (count > 0) {
-		add_page_display(ch, "(%d progress goals)", count);
+		build_page_display(ch, "(%d progress goals)", count);
 	}
 	else {
-		add_page_display_str(ch, " none");
+		build_page_display_str(ch, " none");
 	}
 	
 	send_page_display(ch);
@@ -2747,21 +2747,21 @@ void do_stat_progress(char_data *ch, progress_data *prg) {
 		return;
 	}
 	
-	add_page_display(ch, "VNum: [\tc%d\t0], Name: \ty%s\t0, Type: \ty%s\t0", PRG_VNUM(prg), PRG_NAME(prg), progress_types[PRG_TYPE(prg)]);
-	add_page_display(ch, "%s", NULLSAFE(PRG_DESCRIPTION(prg)));
+	build_page_display(ch, "VNum: [\tc%d\t0], Name: \ty%s\t0, Type: \ty%s\t0", PRG_VNUM(prg), PRG_NAME(prg), progress_types[PRG_TYPE(prg)]);
+	build_page_display(ch, "%s", NULLSAFE(PRG_DESCRIPTION(prg)));
 	
-	add_page_display(ch, "Value: [\tc%d point%s\t0], Cost: [\tc%d point%s\t0]", PRG_VALUE(prg), PLURAL(PRG_VALUE(prg)), PRG_COST(prg), PLURAL(PRG_COST(prg)));
+	build_page_display(ch, "Value: [\tc%d point%s\t0], Cost: [\tc%d point%s\t0]", PRG_VALUE(prg), PLURAL(PRG_VALUE(prg)), PRG_COST(prg), PLURAL(PRG_COST(prg)));
 	
 	sprintbit(PRG_FLAGS(prg), progress_flags, part, TRUE);
-	add_page_display(ch, "Flags: \tg%s\t0", part);
+	build_page_display(ch, "Flags: \tg%s\t0", part);
 	
-	add_page_display_str(ch, "Prerequisites:");
+	build_page_display_str(ch, "Prerequisites:");
 	show_progress_list_display(ch, PRG_PREREQS(prg), FALSE);
 	
-	add_page_display_str(ch, "Tasks:");
+	build_page_display_str(ch, "Tasks:");
 	show_requirement_display(ch, PRG_TASKS(prg), FALSE);
 	
-	add_page_display_str(ch, "Perks:");
+	build_page_display_str(ch, "Perks:");
 	show_progress_perks_display(ch, PRG_PERKS(prg), TRUE, FALSE);
 	
 	send_page_display(ch);
@@ -2782,35 +2782,35 @@ void olc_show_progress(char_data *ch) {
 		return;
 	}
 	
-	add_page_display(ch, "[%s%d\t0] %s%s\t0", OLC_LABEL_CHANGED, GET_OLC_VNUM(ch->desc), OLC_LABEL_UNCHANGED, !real_progress(PRG_VNUM(prg)) ? "new progression" : PRG_NAME(real_progress(PRG_VNUM(prg))));
-	add_page_display(ch, "<%sname\t0> %s", OLC_LABEL_STR(PRG_NAME(prg), default_progress_name), NULLSAFE(PRG_NAME(prg)));
-	add_page_display(ch, "<%sdescription\t0>\r\n%s", OLC_LABEL_STR(PRG_DESCRIPTION(prg), ""), NULLSAFE(PRG_DESCRIPTION(prg)));
+	build_page_display(ch, "[%s%d\t0] %s%s\t0", OLC_LABEL_CHANGED, GET_OLC_VNUM(ch->desc), OLC_LABEL_UNCHANGED, !real_progress(PRG_VNUM(prg)) ? "new progression" : PRG_NAME(real_progress(PRG_VNUM(prg))));
+	build_page_display(ch, "<%sname\t0> %s", OLC_LABEL_STR(PRG_NAME(prg), default_progress_name), NULLSAFE(PRG_NAME(prg)));
+	build_page_display(ch, "<%sdescription\t0>\r\n%s", OLC_LABEL_STR(PRG_DESCRIPTION(prg), ""), NULLSAFE(PRG_DESCRIPTION(prg)));
 	
-	add_page_display(ch, "<%stype\t0> %s", OLC_LABEL_VAL(PRG_TYPE(prg), PROGRESS_UNDEFINED), progress_types[PRG_TYPE(prg)]);
+	build_page_display(ch, "<%stype\t0> %s", OLC_LABEL_VAL(PRG_TYPE(prg), PROGRESS_UNDEFINED), progress_types[PRG_TYPE(prg)]);
 	
 	sprintbit(PRG_FLAGS(prg), progress_flags, lbuf, TRUE);
-	add_page_display(ch, "<%sflags\t0> %s", OLC_LABEL_VAL(PRG_FLAGS(prg), PRG_IN_DEVELOPMENT), lbuf);
+	build_page_display(ch, "<%sflags\t0> %s", OLC_LABEL_VAL(PRG_FLAGS(prg), PRG_IN_DEVELOPMENT), lbuf);
 	
 	if (PRG_FLAGGED(prg, PRG_PURCHASABLE)) {
-		add_page_display(ch, "<%scost\t0> %d point%s", OLC_LABEL_VAL(PRG_COST(prg), 0), PRG_COST(prg), PLURAL(PRG_COST(prg)));
+		build_page_display(ch, "<%scost\t0> %d point%s", OLC_LABEL_VAL(PRG_COST(prg), 0), PRG_COST(prg), PLURAL(PRG_COST(prg)));
 	}
 	if (PRG_VALUE(prg) || !PRG_FLAGGED(prg, PRG_PURCHASABLE)) {
-		add_page_display(ch, "<%svalue\t0> %d point%s", PRG_FLAGGED(prg, PRG_PURCHASABLE) ? "\tr" : OLC_LABEL_VAL(PRG_VALUE(prg), 0), PRG_VALUE(prg), PLURAL(PRG_VALUE(prg)));
+		build_page_display(ch, "<%svalue\t0> %d point%s", PRG_FLAGGED(prg, PRG_PURCHASABLE) ? "\tr" : OLC_LABEL_VAL(PRG_VALUE(prg), 0), PRG_VALUE(prg), PLURAL(PRG_VALUE(prg)));
 	}
 	
-	add_page_display(ch, "Prerequisites: <%sprereqs\t0>", OLC_LABEL_PTR(PRG_PREREQS(prg)));
+	build_page_display(ch, "Prerequisites: <%sprereqs\t0>", OLC_LABEL_PTR(PRG_PREREQS(prg)));
 	if (PRG_PREREQS(prg)) {
 		show_progress_list_display(ch, PRG_PREREQS(prg), FALSE);
 	}
 	
 	if (PRG_TASKS(prg) || !PRG_FLAGGED(prg, PRG_PURCHASABLE)) {
-		add_page_display(ch, "Tasks: <%stasks\t0>", PRG_FLAGGED(prg, PRG_PURCHASABLE) ? "\tr" : OLC_LABEL_PTR(PRG_TASKS(prg)));
+		build_page_display(ch, "Tasks: <%stasks\t0>", PRG_FLAGGED(prg, PRG_PURCHASABLE) ? "\tr" : OLC_LABEL_PTR(PRG_TASKS(prg)));
 		if (PRG_TASKS(prg)) {
 			show_requirement_display(ch, PRG_TASKS(prg), FALSE);
 		}
 	}
 	
-	add_page_display(ch, "Perks: <%sperks\t0>", OLC_LABEL_PTR(PRG_PERKS(prg)));
+	build_page_display(ch, "Perks: <%sperks\t0>", OLC_LABEL_PTR(PRG_PERKS(prg)));
 	if (PRG_PERKS(prg)) {
 		show_progress_perks_display(ch, PRG_PERKS(prg), TRUE, FALSE);
 	}
@@ -2832,7 +2832,7 @@ int vnum_progress(char *searchname, char_data *ch) {
 	
 	HASH_ITER(hh, progress_table, iter, next_iter) {
 		if (multi_isname(searchname, PRG_NAME(iter))) {
-			add_page_display(ch, "%3d. [%5d] %s", ++found, PRG_VNUM(iter), PRG_NAME(iter));
+			build_page_display(ch, "%3d. [%5d] %s", ++found, PRG_VNUM(iter), PRG_NAME(iter));
 		}
 	}
 	

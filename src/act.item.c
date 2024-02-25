@@ -4155,10 +4155,10 @@ void trade_check(char_data *ch, char *argument) {
 	double trading_post_fee = config_get_double("trading_post_fee");
 	
 	if (*argument) {
-		add_page_display(ch, "Your \"%s\" items for trade:", argument);
+		build_page_display(ch, "Your \"%s\" items for trade:", argument);
 	}
 	else {
-		add_page_display_str(ch, "Your items for trade:");
+		build_page_display_str(ch, "Your items for trade:");
 	}
 	
 	DL_FOREACH(trading_list, tpd) {
@@ -4196,14 +4196,14 @@ void trade_check(char_data *ch, char *argument) {
 			*scale = '\0';
 		}
 		
-		add_page_display(ch, "%s%2d. %s: %d coin%s%s%s&0", IS_SET(tpd->state, TPD_EXPIRED) ? "&r" : "", ++count, GET_OBJ_SHORT_DESC(tpd->obj), tpd->buy_cost, PLURAL(tpd->buy_cost), scale, IS_SET(tpd->state, TPD_EXPIRED) ? " (expired)" : "");
+		build_page_display(ch, "%s%2d. %s: %d coin%s%s%s&0", IS_SET(tpd->state, TPD_EXPIRED) ? "&r" : "", ++count, GET_OBJ_SHORT_DESC(tpd->obj), tpd->buy_cost, PLURAL(tpd->buy_cost), scale, IS_SET(tpd->state, TPD_EXPIRED) ? " (expired)" : "");
 	}
 	
 	if (to_collect > 0) {
-		add_page_display(ch, " &y%s to collect&0", money_amount(GET_LOYALTY(ch), to_collect));
+		build_page_display(ch, " &y%s to collect&0", money_amount(GET_LOYALTY(ch), to_collect));
 	}
 	else if (count == 0) {
-		add_page_display(ch, " none");
+		build_page_display(ch, " none");
 	}
 	
 	send_page_display(ch);
@@ -4227,10 +4227,10 @@ void trade_list(char_data *ch, char *argument) {
 	int my_cost;
 	
 	if (*argument) {
-		add_page_display(ch, "\"%s\" items for trade:", argument);
+		build_page_display(ch, "\"%s\" items for trade:", argument);
 	}
 	else {
-		add_page_display_str(ch, "Items for trade:");
+		build_page_display_str(ch, "Items for trade:");
 	}
 	
 	DL_FOREACH(trading_list, tpd) {
@@ -4268,11 +4268,11 @@ void trade_list(char_data *ch, char *argument) {
 			*exchange = '\0';
 		}
 		
-		add_page_display(ch, "%s%2d. %s: %d%s %s%s%s%s%s%s&0", (tpd->player == GET_IDNUM(ch)) ? "&r" : (can_wear ? "" : "&R"), ++count, GET_OBJ_SHORT_DESC(tpd->obj), tpd->buy_cost, exchange, (coin_emp ? EMPIRE_ADJECTIVE(coin_emp) : "misc"), scale, (OBJ_FLAGGED(tpd->obj, OBJ_SUPERIOR) ? " (sup)" : ""), OBJ_FLAGGED(tpd->obj, OBJ_ENCHANTED) ? " (ench)" : "", (tpd->player == GET_IDNUM(ch)) ? " (your auction)" : "", can_wear ? "" : " (can't use)");
+		build_page_display(ch, "%s%2d. %s: %d%s %s%s%s%s%s%s&0", (tpd->player == GET_IDNUM(ch)) ? "&r" : (can_wear ? "" : "&R"), ++count, GET_OBJ_SHORT_DESC(tpd->obj), tpd->buy_cost, exchange, (coin_emp ? EMPIRE_ADJECTIVE(coin_emp) : "misc"), scale, (OBJ_FLAGGED(tpd->obj, OBJ_SUPERIOR) ? " (sup)" : ""), OBJ_FLAGGED(tpd->obj, OBJ_ENCHANTED) ? " (ench)" : "", (tpd->player == GET_IDNUM(ch)) ? " (your auction)" : "", can_wear ? "" : " (can't use)");
 	}
 	
 	if (count == 0) {
-		add_page_display_str(ch, " none");
+		build_page_display_str(ch, " none");
 	}
 	
 	send_page_display(ch);
@@ -4718,14 +4718,14 @@ void warehouse_inventory(char_data *ch, char *argument, int mode) {
 	if (home_mode) {
 		DL_COUNT(GET_HOME_STORAGE(targ_player), eus, num);
 		if (targ_player == ch) {
-			add_page_display(ch, "%s items stored in your home (%d/%d):", part, num, config_get_int("max_home_store_uniques"));
+			build_page_display(ch, "%s items stored in your home (%d/%d):", part, num, config_get_int("max_home_store_uniques"));
 		}
 		else {
-			add_page_display(ch, "%s items stored in %s's home (%d/%d):", part, GET_PC_NAME(targ_player), num, config_get_int("max_home_store_uniques"));
+			build_page_display(ch, "%s items stored in %s's home (%d/%d):", part, GET_PC_NAME(targ_player), num, config_get_int("max_home_store_uniques"));
 		}
 	}
 	else {
-		add_page_display(ch, "%s items stored in %s%s&0:", part, EMPIRE_BANNER(emp), EMPIRE_NAME(emp));
+		build_page_display(ch, "%s items stored in %s%s&0:", part, EMPIRE_BANNER(emp), EMPIRE_NAME(emp));
 	}
 	num = 0;
 	
@@ -4753,11 +4753,11 @@ void warehouse_inventory(char_data *ch, char *argument, int mode) {
 		}
 		
 		// build line
-		add_page_display(ch, "%3d. %s%s%s\t0", ++num, obj_desc_for_char(iter->obj, ch, OBJ_DESC_WAREHOUSE), part, quantity);
+		build_page_display(ch, "%3d. %s%s%s\t0", ++num, obj_desc_for_char(iter->obj, ch, OBJ_DESC_WAREHOUSE), part, quantity);
 	}
 	
 	if (num == 0) {
-		add_page_display(ch, " none");
+		build_page_display(ch, " none");
 	}
 	
 	send_page_display(ch);
@@ -5587,13 +5587,13 @@ ACMD(do_drink) {
 				}
 				
 				// show drinkables
-				add_page_display(ch, "What do you want to drink from%s:", part);
+				build_page_display(ch, "What do you want to drink from%s:", part);
 				HASH_ITER(hh, str_hash, str_iter, next_str) {
 					if (str_iter->count == 1) {
-						add_page_display(ch, " %s", str_iter->str);
+						build_page_display(ch, " %s", str_iter->str);
 					}
 					else {
-						add_page_display(ch, " %s (x%d)", str_iter->str, str_iter->count);
+						build_page_display(ch, " %s (x%d)", str_iter->str, str_iter->count);
 					}
 				}
 				free_string_hash(&str_hash);
@@ -5997,13 +5997,13 @@ ACMD(do_eat) {
 			}
 			
 			// show eatables
-			add_page_display(ch, "What do you want to eat%s:", some_part);
+			build_page_display(ch, "What do you want to eat%s:", some_part);
 			HASH_ITER(hh, str_hash, str_iter, next_str) {
 				if (str_iter->count == 1) {
-					add_page_display(ch, " %s", str_iter->str);
+					build_page_display(ch, " %s", str_iter->str);
 				}
 				else {
-					add_page_display(ch, " %s (x%d)", str_iter->str, str_iter->count);
+					build_page_display(ch, " %s (x%d)", str_iter->str, str_iter->count);
 				}
 			}
 			free_string_hash(&str_hash);
@@ -7178,18 +7178,18 @@ ACMD(do_list) {
 				// create line
 				if (stl->from_mob) {
 					strcpy(tmp, PERS(stl->from_mob, ch, FALSE));
-					add_page_display(ch, "%s%s%s%s sells%s:", (*buf ? "\r\n" : ""), vstr, CAP(tmp), rep, matching);
+					build_page_display(ch, "%s%s%s%s sells%s:", (*buf ? "\r\n" : ""), vstr, CAP(tmp), rep, matching);
 				}
 				else if (stl->from_obj) {
 					strcpy(tmp, GET_OBJ_SHORT_DESC(stl->from_obj));
-					add_page_display(ch, "%s%s%s%s sells%s:", (*buf ? "\r\n" : ""), vstr, CAP(tmp), rep, matching);
+					build_page_display(ch, "%s%s%s%s sells%s:", (*buf ? "\r\n" : ""), vstr, CAP(tmp), rep, matching);
 				}
 				else if (stl->from_veh) {
 					strcpy(tmp, get_vehicle_short_desc(stl->from_veh, ch));
-					add_page_display(ch, "%s%s%s%s sells%s:", (*buf ? "\r\n" : ""), vstr, CAP(tmp), rep, matching);
+					build_page_display(ch, "%s%s%s%s sells%s:", (*buf ? "\r\n" : ""), vstr, CAP(tmp), rep, matching);
 				}
 				else {
-					add_page_display(ch, "%s%sYou can %sbuy%s%s:", (*buf ? "\r\n" : ""), vstr, (*buf ? "also " : ""), rep, matching);
+					build_page_display(ch, "%s%sYou can %sbuy%s%s:", (*buf ? "\r\n" : ""), vstr, (*buf ? "also " : ""), rep, matching);
 				}
 			}
 			
@@ -7214,7 +7214,7 @@ ACMD(do_list) {
 				*drinkstr = '\0';
 			}
 			
-			add_page_display(ch, " - %s%s%s (%d %s%s)", vstr, GET_OBJ_SHORT_DESC(obj), drinkstr, item->cost, (item->currency == NOTHING ? "coins" : get_generic_string_by_vnum(item->currency, GENERIC_CURRENCY, WHICH_CURRENCY(item->cost))), rep);
+			build_page_display(ch, " - %s%s%s (%d %s%s)", vstr, GET_OBJ_SHORT_DESC(obj), drinkstr, item->cost, (item->currency == NOTHING ? "coins" : get_generic_string_by_vnum(item->currency, GENERIC_CURRENCY, WHICH_CURRENCY(item->cost))), rep);
 			any = TRUE;
 			
 			// store currency for listing later
@@ -7232,7 +7232,7 @@ ACMD(do_list) {
 	if (!id) {	// normal view
 		// append currencies if any
 		if (curt_hash) {
-			pd = add_page_display(ch, "You have:");
+			pd = build_page_display(ch, "You have:");
 			any_cur = FALSE;
 			HASH_ITER(hh, curt_hash, curt, next_curt) {
 				amt = get_currency(ch, curt->vnum);
@@ -8167,7 +8167,7 @@ ACMD(do_ship) {
 		msg_to_char(ch, "Usage: ship <island> [number | all] <item>\r\n");
 	}
 	else if (!str_cmp(arg1, "status") || !str_cmp(arg1, "stat")) {
-		add_page_display(ch, "Shipping queue for %s:", EMPIRE_NAME(emp));
+		build_page_display(ch, "Shipping queue for %s:", EMPIRE_NAME(emp));
 		
 		done = FALSE;
 		DL_FOREACH(EMPIRE_SHIPPING_LIST(emp), sd) {
@@ -8183,7 +8183,7 @@ ACMD(do_ship) {
 				from_isle = get_island(sd->from_island, TRUE);
 				to_isle = get_island(sd->to_island, TRUE);
 				to_room = sd->to_room == NOWHERE ? NULL : real_room(sd->to_room);
-				add_page_display(ch, "    %s (%s to %s%s, %s)", skip_filler(VEH_SHORT_DESC(veh)), from_isle ? get_island_name_for(from_isle->id, ch) : "unknown", to_isle ? get_island_name_for(to_isle->id, ch) : "unknown", coord_display(ch, to_room ? X_COORD(to_room) : -1, to_room ? Y_COORD(to_room) : -1, FALSE), status_type[sd->status]);
+				build_page_display(ch, "    %s (%s to %s%s, %s)", skip_filler(VEH_SHORT_DESC(veh)), from_isle ? get_island_name_for(from_isle->id, ch) : "unknown", to_isle ? get_island_name_for(to_isle->id, ch) : "unknown", coord_display(ch, to_room ? X_COORD(to_room) : -1, to_room ? Y_COORD(to_room) : -1, FALSE), status_type[sd->status]);
 			}
 			else {
 				// normal object shipment
@@ -8198,14 +8198,14 @@ ACMD(do_ship) {
 				from_isle = get_island(sd->from_island, TRUE);
 				to_isle = get_island(sd->to_island, TRUE);
 				to_room = sd->to_room == NOWHERE ? NULL : real_room(sd->to_room);
-				add_page_display(ch, " %dx %s (%s to %s%s, %s)", sd->amount, skip_filler(GET_OBJ_SHORT_DESC(proto)), from_isle ? get_island_name_for(from_isle->id, ch) : "unknown", to_isle ? get_island_name_for(to_isle->id, ch) : "unknown", coord_display(ch, to_room ? X_COORD(to_room) : -1, to_room ? Y_COORD(to_room) : -1, FALSE), status_type[sd->status]);
+				build_page_display(ch, " %dx %s (%s to %s%s, %s)", sd->amount, skip_filler(GET_OBJ_SHORT_DESC(proto)), from_isle ? get_island_name_for(from_isle->id, ch) : "unknown", to_isle ? get_island_name_for(to_isle->id, ch) : "unknown", coord_display(ch, to_room ? X_COORD(to_room) : -1, to_room ? Y_COORD(to_room) : -1, FALSE), status_type[sd->status]);
 			}
 			
 			done = TRUE;
 		}
 		
 		if (!done) {
-			add_page_display_str(ch, " nothing");
+			build_page_display_str(ch, " nothing");
 		}
 		
 		send_page_display(ch);

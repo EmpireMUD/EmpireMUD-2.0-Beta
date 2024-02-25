@@ -434,18 +434,18 @@ SHOW(show_ammotypes) {
 	obj_data *obj, *next_obj;
 	int total;
 	
-	add_page_display(ch, "You find the following ammo types:");
+	build_page_display(ch, "You find the following ammo types:");
 	
 	total = 0;
 	HASH_ITER(hh, object_table, obj, next_obj) {
 		if (IS_MISSILE_WEAPON(obj) || IS_AMMO(obj)) {
-			add_page_display_col(ch, 2, FALSE, " %c: [%5d] %s", 'A' + GET_OBJ_VAL(obj, IS_AMMO(obj) ? VAL_AMMO_TYPE : VAL_MISSILE_WEAPON_AMMO_TYPE), GET_OBJ_VNUM(obj), skip_filler(GET_OBJ_SHORT_DESC(obj)));
+			build_page_display_col(ch, 2, FALSE, " %c: [%5d] %s", 'A' + GET_OBJ_VAL(obj, IS_AMMO(obj) ? VAL_AMMO_TYPE : VAL_MISSILE_WEAPON_AMMO_TYPE), GET_OBJ_VNUM(obj), skip_filler(GET_OBJ_SHORT_DESC(obj)));
 			++total;
 		}
 	}
 	
 	if (total == 0) {
-		add_page_display_str(ch, " none");
+		build_page_display_str(ch, " none");
 	}
 	
 	send_page_display(ch);
@@ -466,7 +466,7 @@ SHOW(show_author) {
 		msg_to_char(ch, "Show author: Invalid author idnum.\r\n");
 	}
 	else {
-		add_page_display(ch, "Books authored by [%d] %s:", idnum, (index = find_player_index_by_idnum(idnum)) ? index->fullname : "nobody");
+		build_page_display(ch, "Books authored by [%d] %s:", idnum, (index = find_player_index_by_idnum(idnum)) ? index->fullname : "nobody");
 		
 		count = 0;
 		HASH_ITER(hh, book_table, book, next_book) {
@@ -474,12 +474,12 @@ SHOW(show_author) {
 				continue;
 			}
 			
-			add_page_display(ch, "[%7d] %s", BOOK_VNUM(book), BOOK_TITLE(book));
+			build_page_display(ch, "[%7d] %s", BOOK_VNUM(book), BOOK_TITLE(book));
 			++count;
 		}
 		
 		if (!count) {
-			add_page_display_str(ch, "  none");
+			build_page_display_str(ch, "  none");
 		}
 		
 		send_page_display(ch);
@@ -510,11 +510,11 @@ SHOW(show_buildings) {
 			}
 			
 			this = stats_get_building_count(bld);
-			add_page_display_col(ch, 2, FALSE, " %6d &Z%s", this, GET_BLD_NAME(bld));
+			build_page_display_col(ch, 2, FALSE, " %6d &Z%s", this, GET_BLD_NAME(bld));
 			total += this;
 		}
 	
-		add_page_display(ch, " Total: %d", total);
+		build_page_display(ch, " Total: %d", total);
 		send_page_display(ch);
 	}
 	// argument usage: show building <vnum | name>
@@ -528,7 +528,7 @@ SHOW(show_buildings) {
 		msg_to_char(ch, "Show buildings: Error looking up buildings: default sector not configured.\r\n");
 	}
 	else {
-		add_page_display(ch, "[%d] %s (%d in world):", GET_BLD_VNUM(bld), GET_BLD_NAME(bld), stats_get_building_count(bld));
+		build_page_display(ch, "[%d] %s (%d in world):", GET_BLD_VNUM(bld), GET_BLD_NAME(bld), stats_get_building_count(bld));
 		
 		any = FALSE;
 		LL_FOREACH2(idx->sect_rooms, map, next_in_sect) {
@@ -545,12 +545,12 @@ SHOW(show_buildings) {
 			else {
 				*part = '\0';
 			}
-			add_page_display(ch, "(%*d, %*d) %s%s", X_PRECISION, MAP_X_COORD(map->vnum), Y_PRECISION, MAP_Y_COORD(map->vnum), get_room_name(room, FALSE), part);
+			build_page_display(ch, "(%*d, %*d) %s%s", X_PRECISION, MAP_X_COORD(map->vnum), Y_PRECISION, MAP_Y_COORD(map->vnum), get_room_name(room, FALSE), part);
 			any = TRUE;
 		}
 		
 		if (!any) {
-			add_page_display_str(ch, " no matching tiles");
+			build_page_display_str(ch, " no matching tiles");
 		}
 		
 		send_page_display(ch);
@@ -603,10 +603,10 @@ SHOW(show_companions) {
 		setup_ability_companions(plr);
 		
 		if (*argument) {
-			add_page_display(ch, "Companions matching '%s' for %s:", argument, GET_NAME(plr));
+			build_page_display(ch, "Companions matching '%s' for %s:", argument, GET_NAME(plr));
 		}
 		else {
-			add_page_display(ch, "Companions for %s:", GET_NAME(plr));
+			build_page_display(ch, "Companions for %s:", GET_NAME(plr));
 		}
 		
 		found = FALSE;
@@ -627,7 +627,7 @@ SHOW(show_companions) {
 			
 			// build display
 			cmod = get_companion_mod_by_type(cd, CMOD_SHORT_DESC);
-			pd = add_page_display(ch, " [%5d] %s", cd->vnum, skip_filler(cmod ? cmod->str : get_mob_name_by_proto(cd->vnum, TRUE)));
+			pd = build_page_display(ch, " [%5d] %s", cd->vnum, skip_filler(cmod ? cmod->str : get_mob_name_by_proto(cd->vnum, TRUE)));
 			
 			if (cd->from_abil != NOTHING && (abil = find_ability_by_vnum(cd->from_abil)) && ABIL_COST(abil) > 0) {
 				append_page_display_line(pd, " (%d %s)", ABIL_COST(abil), pool_types[ABIL_COST_TYPE(abil)]);
@@ -637,7 +637,7 @@ SHOW(show_companions) {
 		}
 		
 		if (!found) {
-			add_page_display_str(ch, " none");
+			build_page_display_str(ch, " none");
 		}
 		send_page_display(ch);
 	}
@@ -663,7 +663,7 @@ SHOW(show_components) {
 	}
 	else {
 		// preamble
-		add_page_display(ch, "Components for [%d] (%s):", GEN_VNUM(cmp), GEN_NAME(cmp));
+		build_page_display(ch, "Components for [%d] (%s):", GEN_VNUM(cmp), GEN_NAME(cmp));
 		
 		HASH_ITER(hh, object_table, obj, next_obj) {
 			if (!is_component(obj, cmp)) {
@@ -677,7 +677,7 @@ SHOW(show_components) {
 			else {
 				*part = '\0';
 			}
-			add_page_display(ch, "[%5d] %s%s", GET_OBJ_VNUM(obj), GET_OBJ_SHORT_DESC(obj), part);
+			build_page_display(ch, "[%5d] %s%s", GET_OBJ_VNUM(obj), GET_OBJ_SHORT_DESC(obj), part);
 		}
 		
 		send_page_display(ch);
@@ -701,11 +701,11 @@ SHOW(show_crops) {
 	
 		HASH_ITER(hh, crop_table, crop, next_crop) {
 			this = stats_get_crop_count(crop);
-			add_page_display_col(ch, 2, FALSE, " %6d &Z%s", this, GET_CROP_NAME(crop));
+			build_page_display_col(ch, 2, FALSE, " %6d &Z%s", this, GET_CROP_NAME(crop));
 			total += this;
 		}
 	
-		add_page_display(ch, " Total: %d", total);
+		build_page_display(ch, " Total: %d", total);
 		send_page_display(ch);
 	}
 	// argument usage: show building <vnum | name>
@@ -713,7 +713,7 @@ SHOW(show_crops) {
 		msg_to_char(ch, "Show crops: Unknown crop '%s'.\r\n", argument);
 	}
 	else {
-		add_page_display(ch, "[%d] &Z%s (%d in world):", GET_CROP_VNUM(crop), GET_CROP_NAME(crop), stats_get_crop_count(crop));
+		build_page_display(ch, "[%d] &Z%s (%d in world):", GET_CROP_VNUM(crop), GET_CROP_NAME(crop), stats_get_crop_count(crop));
 		
 		any = FALSE;
 		LL_FOREACH(land_map, map) {
@@ -728,12 +728,12 @@ SHOW(show_crops) {
 			else {
 				*part = '\0';
 			}
-			add_page_display(ch, "(%*d, %*d) %s%s", X_PRECISION, MAP_X_COORD(map->vnum), Y_PRECISION, MAP_Y_COORD(map->vnum), map->room ? get_room_name(map->room, FALSE) : GET_CROP_TITLE(crop), part);
+			build_page_display(ch, "(%*d, %*d) %s%s", X_PRECISION, MAP_X_COORD(map->vnum), Y_PRECISION, MAP_Y_COORD(map->vnum), map->room ? get_room_name(map->room, FALSE) : GET_CROP_TITLE(crop), part);
 			any = TRUE;
 		}
 		
 		if (!any) {
-			add_page_display_str(ch, " no matching tiles");
+			build_page_display_str(ch, " no matching tiles");
 		}
 		
 		send_page_display(ch);
@@ -758,13 +758,13 @@ SHOW(show_currency) {
 	else {
 		check_delayed_load(plr);
 		coin_string(GET_PLAYER_COINS(plr), line);
-		add_page_display(ch, "%s has %s.", GET_NAME(plr), line);
+		build_page_display(ch, "%s has %s.", GET_NAME(plr), line);
 	
 		if (GET_CURRENCIES(plr)) {
-			add_page_display_str(ch, "Currencies:");
+			build_page_display_str(ch, "Currencies:");
 		
 			HASH_ITER(hh, GET_CURRENCIES(plr), cur, next_cur) {
-				add_page_display(ch, "[%5d] %3d %s", cur->vnum, cur->amount, get_generic_string_by_vnum(cur->vnum, GENERIC_CURRENCY, WHICH_CURRENCY(cur->amount)));
+				build_page_display(ch, "[%5d] %3d %s", cur->vnum, cur->amount, get_generic_string_by_vnum(cur->vnum, GENERIC_CURRENCY, WHICH_CURRENCY(cur->amount)));
 			}
 		}
 		
@@ -803,13 +803,13 @@ SHOW(show_dailycycle) {
 			num = QUEST_DAILY_CYCLE(qst);
 		}
 		
-		add_page_display(ch, "Daily quests with cycle id %d:", num);
+		build_page_display(ch, "Daily quests with cycle id %d:", num);
 		HASH_ITER(hh, quest_table, qst, next_qst) {
 			if (!IS_DAILY_QUEST(qst) || QUEST_DAILY_CYCLE(qst) != num) {
 				continue;
 			}
 			
-			add_page_display(ch, "[%5d] %s%s%s", QUEST_VNUM(qst), QUEST_NAME(qst), QUEST_DAILY_ACTIVE(qst) ? " (active)" : "", IS_EVENT_QUEST(qst) ? " (event)" : "");
+			build_page_display(ch, "[%5d] %s%s%s", QUEST_VNUM(qst), QUEST_NAME(qst), QUEST_DAILY_ACTIVE(qst) ? " (active)" : "", IS_EVENT_QUEST(qst) ? " (event)" : "");
 		}
 		
 		send_page_display(ch);
@@ -820,25 +820,25 @@ SHOW(show_dailycycle) {
 SHOW(show_data) {
 	struct stored_data *data, *next_data;
 	
-	add_page_display_str(ch, "Stored data:");
+	build_page_display_str(ch, "Stored data:");
 	
 	HASH_ITER(hh, data_table, data, next_data) {
 		// DATYPE_x:
 		switch (data->keytype) {
 			case DATYPE_INT: {
-				add_page_display(ch, " %s: %d", stored_data_info[data->key].name, data_get_int(data->key));
+				build_page_display(ch, " %s: %d", stored_data_info[data->key].name, data_get_int(data->key));
 				break;
 			}
 			case DATYPE_LONG: {
-				add_page_display(ch, " %s: %ld", stored_data_info[data->key].name, data_get_long(data->key));
+				build_page_display(ch, " %s: %ld", stored_data_info[data->key].name, data_get_long(data->key));
 				break;
 			}
 			case DATYPE_DOUBLE: {
-				add_page_display(ch, " %s: %f", stored_data_info[data->key].name, data_get_double(data->key));
+				build_page_display(ch, " %s: %f", stored_data_info[data->key].name, data_get_double(data->key));
 				break;
 			}
 			default: {
-				add_page_display(ch, " %s: UNKNOWN", stored_data_info[data->key].name);
+				build_page_display(ch, " %s: UNKNOWN", stored_data_info[data->key].name);
 				break;
 			}
 		}
@@ -861,17 +861,17 @@ SHOW(show_dropped_items) {
 		msg_to_char(ch, "Show dropped: Unknown empire '%s'.\r\n", argument);
 	}
 	else {
-		add_page_display(ch, "Dropped items for %s%s\t0:", EMPIRE_BANNER(emp), EMPIRE_NAME(emp));
+		build_page_display(ch, "Dropped items for %s%s\t0:", EMPIRE_BANNER(emp), EMPIRE_NAME(emp));
 		count = 0;
 		HASH_ITER(hh, EMPIRE_DROPPED_ITEMS(emp), edi, next) {
-			add_page_display(ch, "(%d) [%d] %s", edi->count, edi->vnum, get_obj_name_by_proto(edi->vnum));
+			build_page_display(ch, "(%d) [%d] %s", edi->count, edi->vnum, get_obj_name_by_proto(edi->vnum));
 			SAFE_ADD(count, edi->count, 0, INT_MAX, FALSE);
 		}
 		if (!count) {
-			add_page_display_str(ch, " none");	// always room if !count
+			build_page_display_str(ch, " none");	// always room if !count
 		}
 		else {
-			add_page_display(ch, "(%d total)", count);
+			build_page_display(ch, "(%d total)", count);
 		}
 		
 		send_page_display(ch);
@@ -888,7 +888,7 @@ SHOW(show_editors) {
 	descriptor_data *desc;
 	player_index_data *index;
 	
-	add_page_display_str(ch, "Players using editors:");
+	build_page_display_str(ch, "Players using editors:");
 	
 	LL_FOREACH(descriptor_list, desc) {
 		if (STATE(desc) != CON_PLAYING || !(targ = desc->character)) {
@@ -943,13 +943,13 @@ SHOW(show_editors) {
 		}
 		
 		if (any) {
-			add_page_display_str(ch, line);
+			build_page_display_str(ch, line);
 			++count;
 		}
 	}
 	
 	if (!count) {
-		add_page_display_str(ch, " none");
+		build_page_display_str(ch, " none");
 	}
 	
 	send_page_display(ch);
@@ -974,7 +974,7 @@ SHOW(show_factions) {
 	}
 	else {
 		check_delayed_load(vict);
-		add_page_display(ch, "%s's factions:", GET_NAME(vict));
+		build_page_display(ch, "%s's factions:", GET_NAME(vict));
 		HASH_ITER(hh, GET_FACTIONS(vict), pfd, next_pfd) {
 			if (!(fct = find_faction_by_vnum(pfd->vnum))) {
 				continue;
@@ -985,11 +985,11 @@ SHOW(show_factions) {
 			
 			++count;
 			idx = rep_const_to_index(pfd->rep);
-			add_page_display(ch, "[%5d] %s %s(%s / %d)\t0%s", pfd->vnum, FCT_NAME(fct), reputation_levels[idx].color, reputation_levels[idx].name, pfd->value, (FACTION_FLAGGED(fct, FCT_HIDE_IN_LIST) ? " (hidden)" : ""));
+			build_page_display(ch, "[%5d] %s %s(%s / %d)\t0%s", pfd->vnum, FCT_NAME(fct), reputation_levels[idx].color, reputation_levels[idx].name, pfd->value, (FACTION_FLAGGED(fct, FCT_HIDE_IN_LIST) ? " (hidden)" : ""));
 		}
 		
 		if (!count) {
-			add_page_display_str(ch, " none");
+			build_page_display_str(ch, " none");
 		}
 		
 		send_page_display(ch);
@@ -1059,7 +1059,7 @@ SHOW(show_friends) {
 		msg_to_char(ch, "Show friends: You can't do that.\r\n");
 	}
 	else {
-		add_page_display(ch, "Friends list for %s%s:", GET_NAME(plr), PRF_FLAGGED(plr, PRF_NO_FRIENDS) ? " (no-friends toggled on)" : "");
+		build_page_display(ch, "Friends list for %s%s:", GET_NAME(plr), PRF_FLAGGED(plr, PRF_NO_FRIENDS) ? " (no-friends toggled on)" : "");
 		count = 0;
 		
 		HASH_ITER(hh, GET_ACCOUNT_FRIENDS(plr), friend, next_friend) {
@@ -1071,12 +1071,12 @@ SHOW(show_friends) {
 			}
 			
 			// actual line
-			add_page_display(ch, " %s - %s", (friend->name ? friend->name : "Unknown"), friend_status_types[friend->status]);
+			build_page_display(ch, " %s - %s", (friend->name ? friend->name : "Unknown"), friend_status_types[friend->status]);
 			++count;
 		}
 		
 		if (!count) {
-			add_page_display_str(ch, " none");
+			build_page_display_str(ch, " none");
 		}
 		
 		send_page_display(ch);
@@ -1139,7 +1139,7 @@ SHOW(show_homeless) {
 		return;
 	}
 	
-	add_page_display(ch, "Homeless citizens for %s%s\t0:", EMPIRE_BANNER(emp), EMPIRE_NAME(emp));
+	build_page_display(ch, "Homeless citizens for %s%s\t0:", EMPIRE_BANNER(emp), EMPIRE_NAME(emp));
 	
 	count = 0;
 	LL_FOREACH(EMPIRE_HOMELESS_CITIZENS(emp), ehc) {
@@ -1163,11 +1163,11 @@ SHOW(show_homeless) {
 		// mob portion of the display
 		lsize += snprintf(line + lsize, sizeof(line) - lsize, "[%5d] %s '%s'\r\n", ehc->vnum, get_mob_name_by_proto(ehc->vnum, FALSE), ehc->name < nameset->size ? nameset->names[ehc->name] : "unknown");
 		
-		add_page_display_str(ch, line);
+		build_page_display_str(ch, line);
 	}
 	
 	if (count == 0) {
-		add_page_display(ch, " none");
+		build_page_display(ch, " none");
 	}
 	
 	send_page_display(ch);
@@ -1193,18 +1193,18 @@ SHOW(show_ignoring) {
 	}
 	else {
 		// just list ignores
-		add_page_display(ch, "%s is ignoring:", GET_NAME(vict));
+		build_page_display(ch, "%s is ignoring:", GET_NAME(vict));
 		
 		found = FALSE;
 		for (iter = 0; iter < MAX_IGNORES; ++iter) {
 			if (GET_IGNORE_LIST(vict, iter) != 0 && (index = find_player_index_by_idnum(GET_IGNORE_LIST(vict, iter)))) {
-				add_page_display_col(ch, 4, FALSE, " %s", index->fullname);
+				build_page_display_col(ch, 4, FALSE, " %s", index->fullname);
 				found = TRUE;
 			}
 		}
 		
 		if (!found) {
-			add_page_display(ch, " nobody");
+			build_page_display(ch, " nobody");
 		}
 		
 		send_page_display(ch);
@@ -1241,7 +1241,7 @@ SHOW(show_inventory) {
 	}
 	else {
 		timer = microtime();
-		add_page_display(ch, "Searching%s inventories for %d %s:", (all ? " all" : ""), vnum, get_obj_name_by_proto(vnum));
+		build_page_display(ch, "Searching%s inventories for %d %s:", (all ? " all" : ""), vnum, get_obj_name_by_proto(vnum));
 		players = empires = 0;
 		
 		// players
@@ -1281,7 +1281,7 @@ SHOW(show_inventory) {
 			}
 			
 			// build text
-			add_page_display(ch, "%s: %d", index->fullname, count);
+			build_page_display(ch, "%s: %d", index->fullname, count);
 			++players;
 		}
 		
@@ -1307,11 +1307,11 @@ SHOW(show_inventory) {
 			}
 			
 			// build text
-			add_page_display(ch, "%s%s\t0 (empire): %d", EMPIRE_BANNER(emp), EMPIRE_NAME(emp), count);
+			build_page_display(ch, "%s%s\t0 (empire): %d", EMPIRE_BANNER(emp), EMPIRE_NAME(emp), count);
 			++empires;
 		}
 		
-		add_page_display(ch, "(%d player%s, %d empire%s, %.2f seconds for search)", players, PLURAL(players), empires, PLURAL(empires), (microtime() - timer) / 1000000.0);
+		build_page_display(ch, "(%d player%s, %d empire%s, %.2f seconds for search)", players, PLURAL(players), empires, PLURAL(empires), (microtime() - timer) / 1000000.0);
 		
 		send_page_display(ch);
 	}
@@ -1336,10 +1336,10 @@ SHOW(show_languages) {
 	}
 	else {
 		if (*argument) {
-			add_page_display(ch, "Languages matching '%s' for %s:", argument, GET_NAME(plr));
+			build_page_display(ch, "Languages matching '%s' for %s:", argument, GET_NAME(plr));
 		}
 		else {
-			add_page_display(ch, "Languages for %s:", GET_NAME(plr));
+			build_page_display(ch, "Languages for %s:", GET_NAME(plr));
 		}
 		
 		count = 0;
@@ -1352,12 +1352,12 @@ SHOW(show_languages) {
 			}
 		
 			// show it
-			add_page_display(ch, " [%5d] %s (%s)%s%s", GEN_VNUM(gen), GEN_NAME(gen), language_types[lang->level], (GET_SPEAKING(plr) == lang->vnum) ? " - \tgcurrently speaking\t0" : "", (GET_LOYALTY(plr) && speaks_language_empire(GET_LOYALTY(plr), lang->vnum) == lang->level) ? ", from empire" : "");
+			build_page_display(ch, " [%5d] %s (%s)%s%s", GEN_VNUM(gen), GEN_NAME(gen), language_types[lang->level], (GET_SPEAKING(plr) == lang->vnum) ? " - \tgcurrently speaking\t0" : "", (GET_LOYALTY(plr) && speaks_language_empire(GET_LOYALTY(plr), lang->vnum) == lang->level) ? ", from empire" : "");
 			++count;
 		}
 	
 		if (!count) {
-			add_page_display_str(ch, "  none");;
+			build_page_display_str(ch, "  none");;
 		}
 	
 		send_page_display(ch);
@@ -1389,15 +1389,15 @@ SHOW(show_lastnames) {
 		
 		count = 0;
 		if (*argument) {
-			add_page_display(ch, "Lastnames matching '%s' for %s:", argument, GET_NAME(plr));
+			build_page_display(ch, "Lastnames matching '%s' for %s:", argument, GET_NAME(plr));
 		}
 		else {
-			add_page_display(ch, "Lastnames for %s:", GET_NAME(plr));
+			build_page_display(ch, "Lastnames for %s:", GET_NAME(plr));
 		}
 		
 		if (GET_PERSONAL_LASTNAME(plr)) {
 			cur = GET_CURRENT_LASTNAME(plr) && !str_cmp(GET_PERSONAL_LASTNAME(plr), GET_CURRENT_LASTNAME(plr));
-			add_page_display(ch, "%s%2d. %s (personal)%s", (cur ? "\tg" : ""), ++count, GET_PERSONAL_LASTNAME(plr), (cur ? " (current)\t0" : ""));
+			build_page_display(ch, "%s%2d. %s (personal)%s", (cur ? "\tg" : ""), ++count, GET_PERSONAL_LASTNAME(plr), (cur ? " (current)\t0" : ""));
 		}
 		
 		LL_FOREACH(GET_LASTNAME_LIST(plr), lastn) {
@@ -1407,11 +1407,11 @@ SHOW(show_lastnames) {
 		
 			// show it
 			cur = GET_CURRENT_LASTNAME(plr) && !str_cmp(NULLSAFE(lastn->name), GET_CURRENT_LASTNAME(plr));
-			add_page_display(ch, "%s%2d. %s%s", (cur ? "\tg" : ""), ++count, NULLSAFE(lastn->name), (cur ? " (current)\t0" : ""));
+			build_page_display(ch, "%s%2d. %s%s", (cur ? "\tg" : ""), ++count, NULLSAFE(lastn->name), (cur ? " (current)\t0" : ""));
 		}
 	
 		if (!count) {
-			add_page_display_str(ch, " none");
+			build_page_display_str(ch, " none");
 		}
 	
 		send_page_display(ch);
@@ -1468,10 +1468,10 @@ SHOW(show_learned) {
 	
 	// must have plr or emp by now
 	if (*argument) {
-		add_page_display(ch, "Learned recipes matching '%s' for %s:", argument, plr ? GET_NAME(plr) : EMPIRE_NAME(emp));
+		build_page_display(ch, "Learned recipes matching '%s' for %s:", argument, plr ? GET_NAME(plr) : EMPIRE_NAME(emp));
 	}
 	else {
-		add_page_display(ch, "Learned recipes for %s:", plr ? GET_NAME(plr) : EMPIRE_NAME(emp));
+		build_page_display(ch, "Learned recipes for %s:", plr ? GET_NAME(plr) : EMPIRE_NAME(emp));
 	}
 	
 	count = 0;
@@ -1487,12 +1487,12 @@ SHOW(show_learned) {
 		}
 	
 		// show it
-		add_page_display(ch, " [%5d] %s", GET_CRAFT_VNUM(craft), GET_CRAFT_NAME(craft));
+		build_page_display(ch, " [%5d] %s", GET_CRAFT_VNUM(craft), GET_CRAFT_NAME(craft));
 		++count;
 	}
 
 	if (!count) {
-		add_page_display_str(ch, "  none");
+		build_page_display_str(ch, "  none");
 	}
 
 	send_page_display(ch);
@@ -1518,7 +1518,7 @@ SHOW(show_libraries) {
 		msg_to_char(ch, "Show libraries: No such book %d.\r\n", atoi(arg));
 	}
 	else {
-		add_page_display(ch, "Library locations for [%d] %s:", BOOK_VNUM(book), BOOK_TITLE(book));
+		build_page_display(ch, "Library locations for [%d] %s:", BOOK_VNUM(book), BOOK_TITLE(book));
 		
 		count = 0;
 		HASH_ITER(hh, library_table, libr, next_libr) {
@@ -1526,12 +1526,12 @@ SHOW(show_libraries) {
 				continue;
 			}
 			
-			add_page_display(ch, "[%7d] %s", GET_ROOM_VNUM(room), get_room_name(room, FALSE));
+			build_page_display(ch, "[%7d] %s", GET_ROOM_VNUM(room), get_room_name(room, FALSE));
 			++count;
 		}
 		
 		if (!count) {
-			add_page_display_str(ch, "  none");
+			build_page_display_str(ch, "  none");
 		}
 		
 		send_page_display(ch);
@@ -1544,7 +1544,7 @@ SHOW(show_lost_books) {
 	book_data *book, *next_book;
 	player_index_data *index;
 	
-	add_page_display_str(ch, "Books not in any libraries:");
+	build_page_display_str(ch, "Books not in any libraries:");
 	
 	count = 0;
 	HASH_ITER(hh, book_table, book, next_book) {
@@ -1552,12 +1552,12 @@ SHOW(show_lost_books) {
 			continue;
 		}
 		
-		add_page_display(ch, "[%7d] %s (%s)", BOOK_VNUM(book), BOOK_TITLE(book), (index = find_player_index_by_idnum(BOOK_AUTHOR(book))) ? index->fullname : "???");
+		build_page_display(ch, "[%7d] %s (%s)", BOOK_VNUM(book), BOOK_TITLE(book), (index = find_player_index_by_idnum(BOOK_AUTHOR(book))) ? index->fullname : "???");
 		++count;
 	}
 	
 	if (!count) {
-		add_page_display_str(ch, "  none");
+		build_page_display_str(ch, "  none");
 	}
 	
 	send_page_display(ch);
@@ -1581,10 +1581,10 @@ SHOW(show_minipets) {
 	}
 	else {
 		if (*argument) {
-			add_page_display(ch, "Minipets matching '%s' for %s:", argument, GET_NAME(plr));
+			build_page_display(ch, "Minipets matching '%s' for %s:", argument, GET_NAME(plr));
 		}
 		else {
-			add_page_display(ch, "Minipets for %s:", GET_NAME(plr));
+			build_page_display(ch, "Minipets for %s:", GET_NAME(plr));
 		}
 		
 		count = 0;
@@ -1597,12 +1597,12 @@ SHOW(show_minipets) {
 			}
 		
 			// show it
-			add_page_display_col(ch, 2, FALSE, " [%5d] %s", GET_MOB_VNUM(mob), skip_filler(GET_SHORT_DESC(mob)));
+			build_page_display_col(ch, 2, FALSE, " [%5d] %s", GET_MOB_VNUM(mob), skip_filler(GET_SHORT_DESC(mob)));
 			++count;
 		}
 	
 		if (!count) {
-			add_page_display_str(ch, "  none");
+			build_page_display_str(ch, "  none");
 		}
 		
 		send_page_display(ch);
@@ -1623,7 +1623,7 @@ SHOW(show_moons) {
 	
 	tinfo = get_local_time(IN_ROOM(ch));
 	
-	add_page_display_str(ch, "Moons:");
+	build_page_display_str(ch, "Moons:");
 	
 	count = 0;
 	HASH_ITER(hh, generic_table, moon, next_gen) {
@@ -1637,11 +1637,11 @@ SHOW(show_moons) {
 		
 		// ok: show it
 		++count;
-		add_page_display(ch, "[%5d] %s: %s, %s (%.2f day%s)%s", GEN_VNUM(moon), GEN_NAME(moon), moon_phases[phase], moon_positions[pos], GET_MOON_CYCLE_DAYS(moon), PLURAL(GET_MOON_CYCLE_DAYS(moon)), GEN_FLAGGED(moon, GEN_IN_DEVELOPMENT) ? " (in-development)" : "");
+		build_page_display(ch, "[%5d] %s: %s, %s (%.2f day%s)%s", GEN_VNUM(moon), GEN_NAME(moon), moon_phases[phase], moon_positions[pos], GET_MOON_CYCLE_DAYS(moon), PLURAL(GET_MOON_CYCLE_DAYS(moon)), GEN_FLAGGED(moon, GEN_IN_DEVELOPMENT) ? " (in-development)" : "");
 	}
 	
 	if (!count) {
-		add_page_display_str(ch, " none");
+		build_page_display_str(ch, " none");
 	}
 	
 	send_page_display(ch);
@@ -1665,10 +1665,10 @@ SHOW(show_mounts) {
 	}
 	else {
 		if (*argument) {
-			add_page_display(ch, "Mounts matching '%s' for %s:", argument, GET_NAME(plr));
+			build_page_display(ch, "Mounts matching '%s' for %s:", argument, GET_NAME(plr));
 		}
 		else {
-			add_page_display(ch, "Mounts for %s:", GET_NAME(plr));
+			build_page_display(ch, "Mounts for %s:", GET_NAME(plr));
 		}
 		
 		count = 0;
@@ -1681,12 +1681,12 @@ SHOW(show_mounts) {
 			}
 		
 			// show it
-			add_page_display_col(ch, 2, FALSE, " [%5d] %s", GET_MOB_VNUM(mob), skip_filler(GET_SHORT_DESC(mob)));
+			build_page_display_col(ch, 2, FALSE, " [%5d] %s", GET_MOB_VNUM(mob), skip_filler(GET_SHORT_DESC(mob)));
 			++count;
 		}
 	
 		if (!count) {
-			add_page_display_str(ch, "  none");
+			build_page_display_str(ch, "  none");
 		}
 		
 		send_page_display(ch);
@@ -1757,7 +1757,7 @@ SHOW(show_oceanmobs) {
 	char_data *mob;
 	int count = 0;
 	
-	add_page_display_str(ch, "Mobs lost in the ocean:");
+	build_page_display_str(ch, "Mobs lost in the ocean:");
 	
 	DL_FOREACH(character_list, mob) {
 		if (!IS_NPC(mob)) {
@@ -1778,11 +1778,11 @@ SHOW(show_oceanmobs) {
 		
 		// ok show it:
 		++count;
-		add_page_display(ch, "[%5d] %s - %s", GET_MOB_VNUM(mob), GET_SHORT_DESC(mob), room_log_identifier(IN_ROOM(mob)));
+		build_page_display(ch, "[%5d] %s - %s", GET_MOB_VNUM(mob), GET_SHORT_DESC(mob), room_log_identifier(IN_ROOM(mob)));
 	}
 	
 	if (!count) {
-		add_page_display_str(ch, " none");
+		build_page_display_str(ch, " none");
 	}
 	
 	// and send
@@ -1844,7 +1844,7 @@ SHOW(show_piles) {
 		max = atoi(argument);
 	}
 	
-	add_page_display(ch, "Piles of %d item%s or more:", max, PLURAL(max));
+	build_page_display(ch, "Piles of %d item%s or more:", max, PLURAL(max));
 	
 	any = FALSE;
 	HASH_ITER(hh, world_table, room, next_room) {
@@ -1869,13 +1869,13 @@ SHOW(show_piles) {
 			else {
 				*owner = '\0';
 			}
-			add_page_display(ch, "[%d] %s: %d item%s%s", GET_ROOM_VNUM(room), get_room_name(room, FALSE), count, PLURAL(count), owner);
+			build_page_display(ch, "[%d] %s: %d item%s%s", GET_ROOM_VNUM(room), get_room_name(room, FALSE), count, PLURAL(count), owner);
 			any = TRUE;
 		}
 	}
 	
 	if (!any) {
-		add_page_display_str(ch, " none");
+		build_page_display_str(ch, " none");
 	}
 	
 	send_page_display(ch);
@@ -1961,10 +1961,10 @@ SHOW(show_produced) {
 	}
 	else {
 		if (*argument) {
-			add_page_display(ch, "Produced items for matching '%s' for %s%s\t0:", argument, EMPIRE_BANNER(emp), EMPIRE_NAME(emp));
+			build_page_display(ch, "Produced items for matching '%s' for %s%s\t0:", argument, EMPIRE_BANNER(emp), EMPIRE_NAME(emp));
 		}
 		else {
-			add_page_display(ch, "Produced items for %s%s\t0:", EMPIRE_BANNER(emp), EMPIRE_NAME(emp));
+			build_page_display(ch, "Produced items for %s%s\t0:", EMPIRE_BANNER(emp), EMPIRE_NAME(emp));
 		}
 		
 		// check if argument is a vnum
@@ -1985,15 +1985,15 @@ SHOW(show_produced) {
 			// show it
 			++count;
 			if (egt->imported || egt->exported) {
-				add_page_display(ch, " [%5d] %s: %d (%d/%d)", GET_OBJ_VNUM(obj), skip_filler(GET_OBJ_SHORT_DESC(obj)), egt->amount, egt->imported, egt->exported);
+				build_page_display(ch, " [%5d] %s: %d (%d/%d)", GET_OBJ_VNUM(obj), skip_filler(GET_OBJ_SHORT_DESC(obj)), egt->amount, egt->imported, egt->exported);
 			}
 			else {
-				add_page_display(ch, " [%5d] %s: %d", GET_OBJ_VNUM(obj), skip_filler(GET_OBJ_SHORT_DESC(obj)), egt->amount);
+				build_page_display(ch, " [%5d] %s: %d", GET_OBJ_VNUM(obj), skip_filler(GET_OBJ_SHORT_DESC(obj)), egt->amount);
 			}
 		}
 	
 		if (!count) {
-			add_page_display_str(ch, "  none");
+			build_page_display_str(ch, "  none");
 		}
 	
 		send_page_display(ch);
@@ -2116,10 +2116,10 @@ SHOW(show_quests) {
 			return;
 		}
 		
-		add_page_display(ch, "%s's quests (%d/%d dailies, %d/%d event dailies):", GET_NAME(vict), GET_DAILY_QUESTS(vict), config_get_int("dailies_per_day"), GET_EVENT_DAILY_QUESTS(vict), config_get_int("dailies_per_day"));
+		build_page_display(ch, "%s's quests (%d/%d dailies, %d/%d event dailies):", GET_NAME(vict), GET_DAILY_QUESTS(vict), config_get_int("dailies_per_day"), GET_EVENT_DAILY_QUESTS(vict), config_get_int("dailies_per_day"));
 		LL_FOREACH(GET_QUESTS(vict), pq) {
 			count_quest_tasks(pq->tracker, &count, &total);
-			add_page_display(ch, "[%5d] %s (%d/%d tasks)", pq->vnum, get_quest_name_by_proto(pq->vnum), count, total);
+			build_page_display(ch, "[%5d] %s (%d/%d tasks)", pq->vnum, get_quest_name_by_proto(pq->vnum), count, total);
 		}
 		
 		send_page_display(ch);
@@ -2139,7 +2139,7 @@ SHOW(show_quests) {
 		// sort now
 		HASH_SORT(GET_COMPLETED_QUESTS(vict), sort_completed_quests_by_timestamp);
 		
-		add_page_display(ch, "%s's completed quests:", GET_NAME(vict));
+		build_page_display(ch, "%s's completed quests:", GET_NAME(vict));
 		HASH_ITER(hh, GET_COMPLETED_QUESTS(vict), pcq, next_pcq) {
 			if (time(0) - pcq->last_completed < SECS_PER_REAL_DAY) {
 				diff = (time(0) - pcq->last_completed) / SECS_PER_REAL_HOUR;
@@ -2150,7 +2150,7 @@ SHOW(show_quests) {
 				snprintf(when, sizeof(when), "(%d day%s ago)", diff, PLURAL(diff));
 			}
 			
-			add_page_display(ch, "[%5d] %s %s", pcq->vnum, get_quest_name_by_proto(pcq->vnum), when);
+			build_page_display(ch, "[%5d] %s %s", pcq->vnum, get_quest_name_by_proto(pcq->vnum), when);
 		}
 		
 		send_page_display(ch);
@@ -2236,19 +2236,19 @@ SHOW(show_site) {
 		return;
 	}
 	
-	add_page_display(ch, "Players from site %s:", argument);
+	build_page_display(ch, "Players from site %s:", argument);
 	
 	HASH_ITER(idnum_hh, player_table_by_idnum, index, next_index) {
 		if (get_highest_access_level(find_account(index->account_id)) > GET_ACCESS_LEVEL(ch)) {
 			continue;
 		}
 		if (str_str(index->last_host, argument)) {
-			add_page_display_col(ch, 4, FALSE, " &Z%s", index->name);
+			build_page_display_col(ch, 4, FALSE, " &Z%s", index->name);
 			any = TRUE;
 		}
 	}
 	if (!any) {
-		add_page_display_str(ch, " none");
+		build_page_display_str(ch, " none");
 	}
 	
 	send_page_display(ch);
@@ -2426,7 +2426,7 @@ SHOW(show_spawns) {
 		for (sp = GET_SECT_SPAWNS(sect); sp; sp = sp->next) {
 			if (sp->vnum == vnum) {
 				sprintbit(sp->flags, spawn_flags, buf2, TRUE);
-				add_page_display(ch, "SCT [%5d] %s: %.2f%% %s", GET_SECT_VNUM(sect), GET_SECT_NAME(sect), sp->percent, buf2);
+				build_page_display(ch, "SCT [%5d] %s: %.2f%% %s", GET_SECT_VNUM(sect), GET_SECT_NAME(sect), sp->percent, buf2);
 				any = TRUE;
 			}
 		}
@@ -2437,7 +2437,7 @@ SHOW(show_spawns) {
 		for (sp = GET_CROP_SPAWNS(crop); sp; sp = sp->next) {
 			if (sp->vnum == vnum) {
 				sprintbit(sp->flags, spawn_flags, buf2, TRUE);
-				add_page_display(ch, "CRP [%5d] &Z%s: %.2f%% %s", GET_CROP_VNUM(crop), GET_CROP_NAME(crop), sp->percent, buf2);
+				build_page_display(ch, "CRP [%5d] &Z%s: %.2f%% %s", GET_CROP_VNUM(crop), GET_CROP_NAME(crop), sp->percent, buf2);
 				any = TRUE;
 			}
 		}
@@ -2448,7 +2448,7 @@ SHOW(show_spawns) {
 		for (sp = GET_BLD_SPAWNS(bld); sp; sp = sp->next) {
 			if (sp->vnum == vnum) {
 				sprintbit(sp->flags, spawn_flags, buf2, TRUE);
-				add_page_display(ch, "BLD [%5d] %s: %.2f%% %s", GET_BLD_VNUM(bld), GET_BLD_NAME(bld), sp->percent, buf2);
+				build_page_display(ch, "BLD [%5d] %s: %.2f%% %s", GET_BLD_VNUM(bld), GET_BLD_NAME(bld), sp->percent, buf2);
 				any = TRUE;
 			}
 		}
@@ -2459,7 +2459,7 @@ SHOW(show_spawns) {
 		LL_FOREACH(VEH_SPAWNS(veh), sp) {
 			if (sp->vnum == vnum) {
 				sprintbit(sp->flags, spawn_flags, buf2, TRUE);
-				add_page_display(ch, "VEH [%5d] %s: %.2f%% %s", VEH_VNUM(veh), VEH_SHORT_DESC(veh), sp->percent, buf2);
+				build_page_display(ch, "VEH [%5d] %s: %.2f%% %s", VEH_VNUM(veh), VEH_SHORT_DESC(veh), sp->percent, buf2);
 				any = TRUE;
 			}
 		}
@@ -2470,7 +2470,7 @@ SHOW(show_spawns) {
 		LL_FOREACH(GET_GLOBAL_SPAWNS(glb), sp) {
 			if (sp->vnum == vnum) {
 				sprintbit(sp->flags, spawn_flags, buf2, TRUE);
-				add_page_display(ch, "GLB [%5d] %s: %.2f%% %s", GET_GLOBAL_VNUM(glb), GET_GLOBAL_NAME(glb), sp->percent, buf2);
+				build_page_display(ch, "GLB [%5d] %s: %.2f%% %s", GET_GLOBAL_VNUM(glb), GET_GLOBAL_NAME(glb), sp->percent, buf2);
 				any = TRUE;
 			}
 		}
@@ -2480,7 +2480,7 @@ SHOW(show_spawns) {
 	HASH_ITER(hh, room_template_table, rmt, next_rmt) {
 		for (asp = GET_RMT_SPAWNS(rmt); asp; asp = asp->next) {
 			if (asp->type == ADV_SPAWN_MOB && asp->vnum == vnum) {
-				add_page_display(ch, "RMT [%5d] %s: %.2f%%, limit %d\r\n", GET_RMT_VNUM(rmt), GET_RMT_TITLE(rmt), asp->percent, asp->limit);
+				build_page_display(ch, "RMT [%5d] %s: %.2f%%, limit %d\r\n", GET_RMT_VNUM(rmt), GET_RMT_TITLE(rmt), asp->percent, asp->limit);
 				any = TRUE;
 				break;
 			}
@@ -2499,11 +2499,11 @@ SHOW(show_spawns) {
 SHOW(show_startlocs) {
 	room_data *iter, *next_iter;
 	
-	add_page_display_str(ch, "Starting locations:");
+	build_page_display_str(ch, "Starting locations:");
 	
 	HASH_ITER(hh, world_table, iter, next_iter) {
 		if (ROOM_SECT_FLAGGED(iter, SECTF_START_LOCATION)) {
-			add_page_display(ch, "%s (%d, %d)&0", get_room_name(iter, TRUE), X_COORD(iter), Y_COORD(iter));
+			build_page_display(ch, "%s (%d, %d)&0", get_room_name(iter, TRUE), X_COORD(iter), Y_COORD(iter));
 		}
 	}
 	
@@ -2642,13 +2642,13 @@ SHOW(show_storage) {
 	else {
 		// ok to show:
 		if (find_bld) {
-			add_page_display(ch, "Objects that can be stored in %s %s:", AN(GET_BLD_NAME(find_bld)), GET_BLD_NAME(find_bld));
+			build_page_display(ch, "Objects that can be stored in %s %s:", AN(GET_BLD_NAME(find_bld)), GET_BLD_NAME(find_bld));
 		}
 		else if (find_veh) {
-			add_page_display(ch, "Objects that can be stored in %s:", VEH_SHORT_DESC(find_veh));
+			build_page_display(ch, "Objects that can be stored in %s:", VEH_SHORT_DESC(find_veh));
 		}
 		else {
-			add_page_display_str(ch, "Objects that can be stored there:");
+			build_page_display_str(ch, "Objects that can be stored there:");
 		}
 		
 		count = 0;
@@ -2669,12 +2669,12 @@ SHOW(show_storage) {
 		
 			if (ok) {
 				++count;
-				add_page_display(ch, "[%5d] %s", GET_OBJ_VNUM(obj), GET_OBJ_SHORT_DESC(obj));
+				build_page_display(ch, "[%5d] %s", GET_OBJ_VNUM(obj), GET_OBJ_SHORT_DESC(obj));
 			}
 		}
 		
 		if (count == 0) {
-			add_page_display_str(ch, " none");
+			build_page_display_str(ch, " none");
 		}
 		
 		send_page_display(ch);
@@ -2701,14 +2701,14 @@ SHOW(show_subzone) {
 	any = FALSE;
 	HASH_ITER(hh, room_template_table, iter, next_iter) {
 		if (GET_RMT_SUBZONE(iter) == find) {
-			add_page_display(ch, "[%5d] %s", GET_RMT_VNUM(iter), GET_RMT_TITLE(iter));
+			build_page_display(ch, "[%5d] %s", GET_RMT_VNUM(iter), GET_RMT_TITLE(iter));
 			any = TRUE;
 		}
 	}
 	if (any) {
 		// found exact match(es)
 		snprintf(buf2, sizeof(buf2), "Room templates with subzone %d:", find);
-		prepend_page_display_str(ch, buf2);
+		build_page_display_prepend(ch, buf2);
 		send_page_display(ch);
 		return;
 	}
@@ -2723,14 +2723,14 @@ SHOW(show_subzone) {
 	any = FALSE;
 	HASH_ITER(hh, room_template_table, iter, next_iter) {
 		if (GET_RMT_SUBZONE(iter) == GET_RMT_SUBZONE(match)) {
-			add_page_display(ch, "[%5d] %s", GET_RMT_VNUM(iter), GET_RMT_TITLE(iter));
+			build_page_display(ch, "[%5d] %s", GET_RMT_VNUM(iter), GET_RMT_TITLE(iter));
 			any = TRUE;
 		}
 	}
 	if (any) {
 		// found exact match(es)
 		snprintf(buf2, sizeof(buf2), "Room templates with subzone %d, matching room template %d:", GET_RMT_SUBZONE(match), GET_RMT_VNUM(match));
-		prepend_page_display_str(ch, buf2);
+		build_page_display_prepend(ch, buf2);
 		send_page_display(ch);
 		return;
 	}
@@ -2809,11 +2809,11 @@ SHOW(show_terrain) {
 	
 		HASH_ITER(hh, sector_table, sect, next_sect) {
 			this = stats_get_sector_count(sect);
-			add_page_display_col(ch, 2, FALSE, " %6d %s", this, GET_SECT_NAME(sect));
+			build_page_display_col(ch, 2, FALSE, " %6d %s", this, GET_SECT_NAME(sect));
 			total += this;
 		}
 	
-		add_page_display(ch, " Total: %d", total);
+		build_page_display(ch, " Total: %d", total);
 		send_page_display(ch);
 	}
 	// argument usage: show building <vnum | name>
@@ -2822,7 +2822,7 @@ SHOW(show_terrain) {
 	}
 	else {
 		strcpy(part, GET_SECT_NAME(sect));
-		add_page_display(ch, "[%d] %s (%d in world):", GET_SECT_VNUM(sect), CAP(part), stats_get_sector_count(sect));
+		build_page_display(ch, "[%d] %s (%d in world):", GET_SECT_VNUM(sect), CAP(part), stats_get_sector_count(sect));
 		
 		any = FALSE;
 		LL_FOREACH(land_map, map) {
@@ -2837,12 +2837,12 @@ SHOW(show_terrain) {
 			else {
 				*part = '\0';
 			}
-			add_page_display(ch, "(%*d, %*d) %s%s", X_PRECISION, MAP_X_COORD(map->vnum), Y_PRECISION, MAP_Y_COORD(map->vnum), map->room ? get_room_name(map->room, FALSE) : GET_SECT_TITLE(sect), part);
+			build_page_display(ch, "(%*d, %*d) %s%s", X_PRECISION, MAP_X_COORD(map->vnum), Y_PRECISION, MAP_Y_COORD(map->vnum), map->room ? get_room_name(map->room, FALSE) : GET_SECT_TITLE(sect), part);
 			any = TRUE;
 		}
 		
 		if (!any) {
-			add_page_display_str(ch, " no matching tiles");
+			build_page_display_str(ch, " no matching tiles");
 		}
 		
 		send_page_display(ch);
@@ -2893,14 +2893,14 @@ SHOW(show_tools) {
 	}
 	else {
 		// preamble
-		add_page_display(ch, "Types of %s:", tool_flags[type]);
+		build_page_display(ch, "Types of %s:", tool_flags[type]);
 		
 		HASH_ITER(hh, object_table, obj, next_obj) {
 			if (!TOOL_FLAGGED(obj, BIT(type))) {
 				continue;	// wrong type
 			}
 			
-			add_page_display(ch, "[%5d] %s", GET_OBJ_VNUM(obj), GET_OBJ_SHORT_DESC(obj));
+			build_page_display(ch, "[%5d] %s", GET_OBJ_VNUM(obj), GET_OBJ_SHORT_DESC(obj));
 		}
 		
 		send_page_display(ch);
@@ -2983,10 +2983,10 @@ SHOW(show_unlocked_archetypes) {
 	}
 	else {
 		if (*argument) {
-			add_page_display(ch, "Unlocked archetypes matching '%s' for %s:", argument, GET_NAME(plr));
+			build_page_display(ch, "Unlocked archetypes matching '%s' for %s:", argument, GET_NAME(plr));
 		}
 		else {
-			add_page_display(ch, "Unlocked archetypes for %s:", GET_NAME(plr));
+			build_page_display(ch, "Unlocked archetypes for %s:", GET_NAME(plr));
 		}
 		
 		count = 0;
@@ -2999,12 +2999,12 @@ SHOW(show_unlocked_archetypes) {
 			}
 		
 			// show it
-			add_page_display(ch, " [%5d] %s", GET_ARCH_VNUM(arch), GET_ARCH_NAME(arch));
+			build_page_display(ch, " [%5d] %s", GET_ARCH_VNUM(arch), GET_ARCH_NAME(arch));
 			++count;
 		}
 	
 		if (!count) {
-			add_page_display_str(ch, "  none");
+			build_page_display_str(ch, "  none");
 		}
 	
 		send_page_display(ch);
@@ -3040,7 +3040,7 @@ SHOW(show_uses) {
 	}
 	else {
 		// preamble
-		add_page_display(ch, "Uses for [%d] (%s):", GEN_VNUM(cmp), GEN_NAME(cmp));
+		build_page_display(ch, "Uses for [%d] (%s):", GEN_VNUM(cmp), GEN_NAME(cmp));
 		
 		HASH_ITER(hh, augment_table, aug, next_aug) {
 			LL_FOREACH(GET_AUG_RESOURCES(aug), res) {
@@ -3058,7 +3058,7 @@ SHOW(show_uses) {
 				else {
 					snprintf(part, sizeof(part), " (%s)", get_generic_name_by_vnum(res->vnum));
 				}
-				add_page_display(ch, "AUG [%5d] %s%s", GET_AUG_VNUM(aug), GET_AUG_NAME(aug), part);
+				build_page_display(ch, "AUG [%5d] %s%s", GET_AUG_VNUM(aug), GET_AUG_NAME(aug), part);
 			}
 		}
 		
@@ -3078,7 +3078,7 @@ SHOW(show_uses) {
 				else {
 					snprintf(part, sizeof(part), " (%s)", get_generic_name_by_vnum(res->vnum));
 				}
-				add_page_display(ch, "BLD [%5d] %s%s", GET_BLD_VNUM(bld), GET_BLD_NAME(bld), part);
+				build_page_display(ch, "BLD [%5d] %s%s", GET_BLD_VNUM(bld), GET_BLD_NAME(bld), part);
 			}
 		}
 		
@@ -3098,7 +3098,7 @@ SHOW(show_uses) {
 				else {
 					snprintf(part, sizeof(part), " (%s)", get_generic_name_by_vnum(res->vnum));
 				}
-				add_page_display(ch, "CFT [%5d] %s%s", GET_CRAFT_VNUM(craft), GET_CRAFT_NAME(craft), part);
+				build_page_display(ch, "CFT [%5d] %s%s", GET_CRAFT_VNUM(craft), GET_CRAFT_NAME(craft), part);
 			}
 		}
 		
@@ -3118,7 +3118,7 @@ SHOW(show_uses) {
 				else {
 					snprintf(part, sizeof(part), " (%s)", get_generic_name_by_vnum(req->vnum));
 				}
-				add_page_display(ch, "PRG [%5d] %s%s", PRG_VNUM(prg), PRG_NAME(prg), part);
+				build_page_display(ch, "PRG [%5d] %s%s", PRG_VNUM(prg), PRG_NAME(prg), part);
 			}
 		}
 		
@@ -3142,7 +3142,7 @@ SHOW(show_uses) {
 					else {
 						snprintf(part, sizeof(part), " (%s)", get_generic_name_by_vnum(req->vnum));
 					}
-					add_page_display(ch, "QST [%5d] %s", QUEST_VNUM(quest), QUEST_NAME(quest));
+					build_page_display(ch, "QST [%5d] %s", QUEST_VNUM(quest), QUEST_NAME(quest));
 				}
 			}
 		}
@@ -3163,7 +3163,7 @@ SHOW(show_uses) {
 				else {
 					snprintf(part, sizeof(part), " (%s)", get_generic_name_by_vnum(req->vnum));
 				}
-				add_page_display(ch, "SOC [%5d] %s", SOC_VNUM(soc), SOC_NAME(soc));
+				build_page_display(ch, "SOC [%5d] %s", SOC_VNUM(soc), SOC_NAME(soc));
 			}
 		}
 		
@@ -3183,7 +3183,7 @@ SHOW(show_uses) {
 				else {
 					snprintf(part, sizeof(part), " (%s)", get_generic_name_by_vnum(res->vnum));
 				}
-				add_page_display(ch, "VEH [%5d] %s%s", VEH_VNUM(veh), VEH_SHORT_DESC(veh), part);
+				build_page_display(ch, "VEH [%5d] %s%s", VEH_VNUM(veh), VEH_SHORT_DESC(veh), part);
 			}
 		}
 		

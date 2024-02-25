@@ -276,7 +276,7 @@ void olc_search_faction(char_data *ch, any_vnum vnum) {
 	}
 	
 	found = 0;
-	add_page_display(ch, "Occurrences of faction %d (%s):", vnum, FCT_NAME(fct));
+	build_page_display(ch, "Occurrences of faction %d (%s):", vnum, FCT_NAME(fct));
 	
 	// events
 	HASH_ITER(hh, event_table, event, next_event) {
@@ -286,7 +286,7 @@ void olc_search_faction(char_data *ch, any_vnum vnum) {
 		
 		if (any) {
 			++found;
-			add_page_display(ch, "EVT [%5d] %s", EVT_VNUM(event), EVT_NAME(event));
+			build_page_display(ch, "EVT [%5d] %s", EVT_VNUM(event), EVT_NAME(event));
 		}
 	}
 	
@@ -295,7 +295,7 @@ void olc_search_faction(char_data *ch, any_vnum vnum) {
 		HASH_FIND_INT(FCT_RELATIONS(iter), &FCT_VNUM(fct), find);
 		if (find) {
 			++found;
-			add_page_display(ch, "FCT [%5d] %s", FCT_VNUM(iter), FCT_NAME(iter));
+			build_page_display(ch, "FCT [%5d] %s", FCT_VNUM(iter), FCT_NAME(iter));
 		}
 	}
 	
@@ -303,7 +303,7 @@ void olc_search_faction(char_data *ch, any_vnum vnum) {
 	HASH_ITER(hh, mobile_table, mob, next_mob) {
 		if (MOB_FACTION(mob) == fct) {
 			++found;
-			add_page_display(ch, "MOB [%5d] %s", GET_MOB_VNUM(mob), GET_SHORT_DESC(mob));
+			build_page_display(ch, "MOB [%5d] %s", GET_MOB_VNUM(mob), GET_SHORT_DESC(mob));
 		}
 	}
 	
@@ -315,7 +315,7 @@ void olc_search_faction(char_data *ch, any_vnum vnum) {
 		
 		if (any) {
 			++found;
-			add_page_display(ch, "PRG [%5d] %s", PRG_VNUM(prg), PRG_NAME(prg));
+			build_page_display(ch, "PRG [%5d] %s", PRG_VNUM(prg), PRG_NAME(prg));
 		}
 	}
 	
@@ -330,7 +330,7 @@ void olc_search_faction(char_data *ch, any_vnum vnum) {
 		
 		if (any) {
 			++found;
-			add_page_display(ch, "QST [%5d] %s", QUEST_VNUM(qiter), QUEST_NAME(qiter));
+			build_page_display(ch, "QST [%5d] %s", QUEST_VNUM(qiter), QUEST_NAME(qiter));
 		}
 	}
 	
@@ -338,7 +338,7 @@ void olc_search_faction(char_data *ch, any_vnum vnum) {
 	HASH_ITER(hh, shop_table, shop, next_shop) {
 		if (SHOP_ALLEGIANCE(shop) == fct) {
 			++found;
-			add_page_display(ch, "SHOP [%5d] %s", SHOP_VNUM(shop), SHOP_NAME(shop));
+			build_page_display(ch, "SHOP [%5d] %s", SHOP_VNUM(shop), SHOP_NAME(shop));
 		}
 	}
 	
@@ -350,15 +350,15 @@ void olc_search_faction(char_data *ch, any_vnum vnum) {
 		
 		if (any) {
 			++found;
-			add_page_display(ch, "SOC [%5d] %s", SOC_VNUM(soc), SOC_NAME(soc));
+			build_page_display(ch, "SOC [%5d] %s", SOC_VNUM(soc), SOC_NAME(soc));
 		}
 	}
 	
 	if (found > 0) {
-		add_page_display(ch, "%d location%s shown", found, PLURAL(found));
+		build_page_display(ch, "%d location%s shown", found, PLURAL(found));
 	}
 	else {
-		add_page_display_str(ch, " none");
+		build_page_display_str(ch, " none");
 	}
 	
 	send_page_display(ch);
@@ -1342,13 +1342,13 @@ void do_stat_faction(char_data *ch, faction_data *fct) {
 	}
 	
 	// first line
-	add_page_display(ch, "VNum: [\tc%d\t0], Name: \tc%s\t0\r\n%s", FCT_VNUM(fct), FCT_NAME(fct), NULLSAFE(FCT_DESCRIPTION(fct)));
-	add_page_display(ch, "Min Reputation: \ty%s\t0, Max Reputation: \ty%s\t0, Starting Reputation: \ty%s\t0", get_reputation_name(FCT_MIN_REP(fct)), get_reputation_name(FCT_MAX_REP(fct)), get_reputation_name(FCT_STARTING_REP(fct)));
+	build_page_display(ch, "VNum: [\tc%d\t0], Name: \tc%s\t0\r\n%s", FCT_VNUM(fct), FCT_NAME(fct), NULLSAFE(FCT_DESCRIPTION(fct)));
+	build_page_display(ch, "Min Reputation: \ty%s\t0, Max Reputation: \ty%s\t0, Starting Reputation: \ty%s\t0", get_reputation_name(FCT_MIN_REP(fct)), get_reputation_name(FCT_MAX_REP(fct)), get_reputation_name(FCT_STARTING_REP(fct)));
 	
 	sprintbit(FCT_FLAGS(fct), faction_flags, part, TRUE);
-	add_page_display(ch, "Flags: \tg%s\t0", part);
+	build_page_display(ch, "Flags: \tg%s\t0", part);
 	
-	add_page_display_str(ch, "Relations:");
+	build_page_display_str(ch, "Relations:");
 	show_faction_relation_display(ch, FCT_RELATIONS(fct), FALSE);
 	
 	send_page_display(ch);
@@ -1368,10 +1368,10 @@ void show_faction_relation_display(char_data *ch, struct faction_relation *list,
 	
 	HASH_ITER(hh, list, iter, next_iter) {
 		sprintbit(iter->flags, relationship_flags, lbuf, TRUE);
-		add_page_display(ch, " [%5d] %s - %s", iter->vnum, FCT_NAME(iter->ptr), lbuf);
+		build_page_display(ch, " [%5d] %s - %s", iter->vnum, FCT_NAME(iter->ptr), lbuf);
 	}
 	if (!list) {
-		add_page_display_str(ch, " none");
+		build_page_display_str(ch, " none");
 	}
 	
 	if (send_page) {
@@ -1394,18 +1394,18 @@ void olc_show_faction(char_data *ch) {
 		return;
 	}
 	
-	add_page_display(ch, "[%s%d\t0] %s%s\t0", OLC_LABEL_CHANGED, GET_OLC_VNUM(ch->desc), OLC_LABEL_UNCHANGED, !find_faction_by_vnum(FCT_VNUM(fct)) ? "new faction" : FCT_NAME(find_faction_by_vnum(FCT_VNUM(fct))));
-	add_page_display(ch, "<%sname\t0> %s", OLC_LABEL_STR(FCT_NAME(fct), default_faction_name), NULLSAFE(FCT_NAME(fct)));
-	add_page_display(ch, "<%sdescription\t0>\r\n%s", OLC_LABEL_STR(FCT_DESCRIPTION(fct), ""), NULLSAFE(FCT_DESCRIPTION(fct)));
+	build_page_display(ch, "[%s%d\t0] %s%s\t0", OLC_LABEL_CHANGED, GET_OLC_VNUM(ch->desc), OLC_LABEL_UNCHANGED, !find_faction_by_vnum(FCT_VNUM(fct)) ? "new faction" : FCT_NAME(find_faction_by_vnum(FCT_VNUM(fct))));
+	build_page_display(ch, "<%sname\t0> %s", OLC_LABEL_STR(FCT_NAME(fct), default_faction_name), NULLSAFE(FCT_NAME(fct)));
+	build_page_display(ch, "<%sdescription\t0>\r\n%s", OLC_LABEL_STR(FCT_DESCRIPTION(fct), ""), NULLSAFE(FCT_DESCRIPTION(fct)));
 	
 	sprintbit(FCT_FLAGS(fct), faction_flags, lbuf, TRUE);
-	add_page_display(ch, "<%sflags\t0> %s", OLC_LABEL_VAL(FCT_FLAGS(fct), FCT_IN_DEVELOPMENT), lbuf);
+	build_page_display(ch, "<%sflags\t0> %s", OLC_LABEL_VAL(FCT_FLAGS(fct), FCT_IN_DEVELOPMENT), lbuf);
 	
-	add_page_display(ch, "<%sminreputation\t0> %s", OLC_LABEL_VAL(FCT_MIN_REP(fct), default_min_rep), get_reputation_name(FCT_MIN_REP(fct)));
-	add_page_display(ch, "<%smaxreputation\t0> %s", OLC_LABEL_VAL(FCT_MAX_REP(fct), default_max_rep), get_reputation_name(FCT_MAX_REP(fct)));
-	add_page_display(ch, "<%sstartingreuptation\t0> %s", OLC_LABEL_VAL(FCT_STARTING_REP(fct), default_starting_rep), get_reputation_name(FCT_STARTING_REP(fct)));
+	build_page_display(ch, "<%sminreputation\t0> %s", OLC_LABEL_VAL(FCT_MIN_REP(fct), default_min_rep), get_reputation_name(FCT_MIN_REP(fct)));
+	build_page_display(ch, "<%smaxreputation\t0> %s", OLC_LABEL_VAL(FCT_MAX_REP(fct), default_max_rep), get_reputation_name(FCT_MAX_REP(fct)));
+	build_page_display(ch, "<%sstartingreuptation\t0> %s", OLC_LABEL_VAL(FCT_STARTING_REP(fct), default_starting_rep), get_reputation_name(FCT_STARTING_REP(fct)));
 	
-	add_page_display(ch, "Relationships: <%srelation\t0>, <%smatchrelations\t0>", OLC_LABEL_PTR(FCT_RELATIONS(fct)), OLC_LABEL_PTR(FCT_RELATIONS(fct)));
+	build_page_display(ch, "Relationships: <%srelation\t0>, <%smatchrelations\t0>", OLC_LABEL_PTR(FCT_RELATIONS(fct)), OLC_LABEL_PTR(FCT_RELATIONS(fct)));
 	if (FCT_RELATIONS(fct)) {
 		show_faction_relation_display(ch, FCT_RELATIONS(fct), FALSE);
 	}
@@ -1427,7 +1427,7 @@ int vnum_faction(char *searchname, char_data *ch) {
 	
 	HASH_ITER(hh, faction_table, iter, next_iter) {
 		if (multi_isname(searchname, FCT_NAME(iter))) {
-			add_page_display(ch, "%3d. [%5d] %s", ++found, FCT_VNUM(iter), FCT_NAME(iter));
+			build_page_display(ch, "%3d. [%5d] %s", ++found, FCT_VNUM(iter), FCT_NAME(iter));
 		}
 	}
 	

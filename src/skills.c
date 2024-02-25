@@ -1960,7 +1960,7 @@ ACMD(do_skills) {
 		}
 		
 		// start string
-		add_page_display(ch, "You know the following skills %s:", lbuf);
+		build_page_display(ch, "You know the following skills %s:", lbuf);
 		
 		HASH_ITER(sorted_hh, sorted_skills, skill, next_skill) {
 			if (SKILL_FLAGGED(skill, SKILLF_IN_DEVELOPMENT)) {
@@ -1997,7 +1997,7 @@ ACMD(do_skills) {
 		any = FALSE;
 		DL_FOREACH(skdat_list, skdat) {
 			any = TRUE;
-			add_page_display_str(ch, skdat->string);
+			build_page_display_str(ch, skdat->string);
 		}
 		
 		free_skill_display_t(skdat_list);
@@ -2022,14 +2022,14 @@ ACMD(do_skills) {
 			snprintf(lbuf + strlen(lbuf), sizeof(lbuf) - strlen(lbuf), "%s%s%s\t0", *lbuf ? ", ": "", ability_color(ch, abil), ABIL_NAME(abil));
 		}
 		if (*lbuf) {
-			add_page_display(ch, "Other abilities: %s\r\n", lbuf);
+			build_page_display(ch, "Other abilities: %s\r\n", lbuf);
 		}
 		
 		// footer
 		if (!any) {
-			add_page_display_str(ch, " none");
+			build_page_display_str(ch, " none");
 		}
-		add_page_display_str(ch, get_skill_gain_display(ch));
+		build_page_display_str(ch, get_skill_gain_display(ch));
 		send_page_display(ch);
 	}
 	else if (!str_cmp(arg, "buy")) {
@@ -2311,11 +2311,11 @@ ACMD(do_skills) {
 		}
 		
 		// header
-		add_page_display_str(ch, get_skill_row_display(ch, skill));
+		build_page_display_str(ch, get_skill_row_display(ch, skill));
 		
 		points = get_ability_points_available_for_char(ch, SKILL_VNUM(skill));
 		if (points > 0) {
-			add_page_display(ch, "You have %d ability point%s to spend. Type 'skill buy <ability>' to purchase a new ability.", points, (points != 1 ? "s" : ""));
+			build_page_display(ch, "You have %d ability point%s to spend. Type 'skill buy <ability>' to purchase a new ability.", points, (points != 1 ? "s" : ""));
 		}
 		
 		// list
@@ -2339,14 +2339,14 @@ ACMD(do_skills) {
 			}
 			
 			// show it
-			add_page_display_str(ch, skdat->string);
+			build_page_display_str(ch, skdat->string);
 		}
 		
 		free_skill_display_t(skdat_list);
 		skdat_list = NULL;
 		
 		if (show_all_info && !PRF_FLAGGED(ch, PRF_NO_TUTORIALS) && max_level < SKILL_MAX_LEVEL(skill)) {
-			add_page_display(ch, "(For higher level abilities, use 'skill %s -all')", SKILL_NAME(skill));
+			build_page_display(ch, "(For higher level abilities, use 'skill %s -all')", SKILL_NAME(skill));
 		}
 		
 		send_page_display(ch);
@@ -3050,7 +3050,7 @@ void olc_fullsearch_skill(char_data *ch, char *argument) {
 		skip_spaces(&argument);
 	}
 	
-	add_page_display(ch, "Skill fullsearch: %s", show_color_codes(find_keywords));
+	build_page_display(ch, "Skill fullsearch: %s", show_color_codes(find_keywords));
 	count = 0;
 	
 	// okay now look up skills
@@ -3103,15 +3103,15 @@ void olc_fullsearch_skill(char_data *ch, char *argument) {
 		}
 		
 		// show it
-		add_page_display(ch, "[%5d] %s", SKILL_VNUM(sk), SKILL_NAME(sk));
+		build_page_display(ch, "[%5d] %s", SKILL_VNUM(sk), SKILL_NAME(sk));
 		++count;
 	}
 	
 	if (count > 0) {
-		add_page_display(ch, "(%d skills)", count);
+		build_page_display(ch, "(%d skills)", count);
 	}
 	else {
-		add_page_display_str(ch, " none");
+		build_page_display_str(ch, " none");
 	}
 	
 	send_page_display(ch);
@@ -3143,14 +3143,14 @@ void olc_search_skill(char_data *ch, any_vnum vnum) {
 	}
 	
 	found = 0;
-	add_page_display(ch, "Occurrences of skill %d (%s):", vnum, SKILL_NAME(skill));
+	build_page_display(ch, "Occurrences of skill %d (%s):", vnum, SKILL_NAME(skill));
 	
 	// archetypes
 	HASH_ITER(hh, archetype_table, arch, next_arch) {
 		LL_FOREACH(GET_ARCH_SKILLS(arch), arsk) {
 			if (arsk->skill == vnum) {
 				++found;
-				add_page_display(ch, "ARCH [%5d] %s", GET_ARCH_VNUM(arch), GET_ARCH_NAME(arch));
+				build_page_display(ch, "ARCH [%5d] %s", GET_ARCH_VNUM(arch), GET_ARCH_NAME(arch));
 				break;	// only need 1
 			}
 		}
@@ -3161,7 +3161,7 @@ void olc_search_skill(char_data *ch, any_vnum vnum) {
 		LL_FOREACH(CLASS_SKILL_REQUIREMENTS(cls), clsk) {
 			if (clsk->vnum == vnum) {
 				++found;
-				add_page_display(ch, "CLS [%5d] %s", CLASS_VNUM(cls), CLASS_NAME(cls));
+				build_page_display(ch, "CLS [%5d] %s", CLASS_VNUM(cls), CLASS_NAME(cls));
 				break;	// only need 1
 			}
 		}
@@ -3176,7 +3176,7 @@ void olc_search_skill(char_data *ch, any_vnum vnum) {
 		
 		if (any) {
 			++found;
-			add_page_display(ch, "PRG [%5d] %s", PRG_VNUM(prg), PRG_NAME(prg));
+			build_page_display(ch, "PRG [%5d] %s", PRG_VNUM(prg), PRG_NAME(prg));
 		}
 	}
 	
@@ -3194,7 +3194,7 @@ void olc_search_skill(char_data *ch, any_vnum vnum) {
 		
 		if (any) {
 			++found;
-			add_page_display(ch, "QST [%5d] %s", QUEST_VNUM(quest), QUEST_NAME(quest));
+			build_page_display(ch, "QST [%5d] %s", QUEST_VNUM(quest), QUEST_NAME(quest));
 		}
 	}
 	
@@ -3203,7 +3203,7 @@ void olc_search_skill(char_data *ch, any_vnum vnum) {
 		LL_FOREACH(SKILL_SYNERGIES(sk), syn) {
 			if (syn->skill == vnum) {
 				++found;
-				add_page_display(ch, "SKL [%5d] %s", SKILL_VNUM(sk), SKILL_NAME(sk));
+				build_page_display(ch, "SKL [%5d] %s", SKILL_VNUM(sk), SKILL_NAME(sk));
 				break;
 			}
 		}
@@ -3217,15 +3217,15 @@ void olc_search_skill(char_data *ch, any_vnum vnum) {
 		
 		if (any) {
 			++found;
-			add_page_display(ch, "SOC [%5d] %s", SOC_VNUM(soc), SOC_NAME(soc));
+			build_page_display(ch, "SOC [%5d] %s", SOC_VNUM(soc), SOC_NAME(soc));
 		}
 	}
 	
 	if (found > 0) {
-		add_page_display(ch, "%d location%s shown", found, PLURAL(found));
+		build_page_display(ch, "%d location%s shown", found, PLURAL(found));
 	}
 	else {
-		add_page_display_str(ch, " none");
+		build_page_display_str(ch, " none");
 	}
 	
 	send_page_display(ch);
@@ -4209,27 +4209,27 @@ void do_stat_skill(char_data *ch, skill_data *skill) {
 	}
 	
 	// first line
-	add_page_display(ch, "VNum: [\tc%d\t0], Name: \tc%s\t0, Abbrev: \tc%s\t0", SKILL_VNUM(skill), SKILL_NAME(skill), SKILL_ABBREV(skill));
+	build_page_display(ch, "VNum: [\tc%d\t0], Name: \tc%s\t0, Abbrev: \tc%s\t0", SKILL_VNUM(skill), SKILL_NAME(skill), SKILL_ABBREV(skill));
 	
-	add_page_display(ch, "Description: %s", SKILL_DESC(skill));
+	build_page_display(ch, "Description: %s", SKILL_DESC(skill));
 	
-	add_page_display(ch, "Minimum drop level: [\tc%d\t0], Maximum level: [\tc%d\t0]", SKILL_MIN_DROP_LEVEL(skill), SKILL_MAX_LEVEL(skill));
+	build_page_display(ch, "Minimum drop level: [\tc%d\t0], Maximum level: [\tc%d\t0]", SKILL_MIN_DROP_LEVEL(skill), SKILL_MAX_LEVEL(skill));
 	
 	sprintbit(SKILL_FLAGS(skill), skill_flags, part, TRUE);
-	add_page_display(ch, "Flags: \tg%s\t0", part);
+	build_page_display(ch, "Flags: \tg%s\t0", part);
 	
 	LL_COUNT(SKILL_ABILITIES(skill), skab, total);
-	add_page_display(ch, "Simplified skill tree: (%d total)", total);
+	build_page_display(ch, "Simplified skill tree: (%d total)", total);
 	get_skill_ability_display(SKILL_ABILITIES(skill), part, sizeof(part));
 	if (*part) {
-		add_page_display_str(ch, part);
+		build_page_display_str(ch, part);
 	}
 
 	LL_COUNT(SKILL_SYNERGIES(skill), syn, total);
-	add_page_display(ch, "Synergy abilities: (%d total)", total);
+	build_page_display(ch, "Synergy abilities: (%d total)", total);
 	get_skill_synergy_display(SKILL_SYNERGIES(skill), part, NULL);
 	if (*part) {
-		add_page_display_str(ch, part);
+		build_page_display_str(ch, part);
 	}
 	
 	send_page_display(ch);
@@ -4253,32 +4253,32 @@ void olc_show_skill(char_data *ch) {
 		return;
 	}
 	
-	add_page_display(ch, "[%s%d\t0] %s%s\t0", OLC_LABEL_CHANGED, GET_OLC_VNUM(ch->desc), OLC_LABEL_UNCHANGED, !find_skill_by_vnum(SKILL_VNUM(skill)) ? "new skill" : get_skill_name_by_vnum(SKILL_VNUM(skill)));
-	add_page_display(ch, "<%sname\t0> %s", OLC_LABEL_STR(SKILL_NAME(skill), default_skill_name), NULLSAFE(SKILL_NAME(skill)));
-	add_page_display(ch, "<%sabbrev\t0> %s", OLC_LABEL_STR(SKILL_ABBREV(skill), default_skill_abbrev), NULLSAFE(SKILL_ABBREV(skill)));
-	add_page_display(ch, "<%sdescription\t0> %s", OLC_LABEL_STR(SKILL_DESC(skill), default_skill_desc), NULLSAFE(SKILL_DESC(skill)));
+	build_page_display(ch, "[%s%d\t0] %s%s\t0", OLC_LABEL_CHANGED, GET_OLC_VNUM(ch->desc), OLC_LABEL_UNCHANGED, !find_skill_by_vnum(SKILL_VNUM(skill)) ? "new skill" : get_skill_name_by_vnum(SKILL_VNUM(skill)));
+	build_page_display(ch, "<%sname\t0> %s", OLC_LABEL_STR(SKILL_NAME(skill), default_skill_name), NULLSAFE(SKILL_NAME(skill)));
+	build_page_display(ch, "<%sabbrev\t0> %s", OLC_LABEL_STR(SKILL_ABBREV(skill), default_skill_abbrev), NULLSAFE(SKILL_ABBREV(skill)));
+	build_page_display(ch, "<%sdescription\t0> %s", OLC_LABEL_STR(SKILL_DESC(skill), default_skill_desc), NULLSAFE(SKILL_DESC(skill)));
 	
 	sprintbit(SKILL_FLAGS(skill), skill_flags, lbuf, TRUE);
-	add_page_display(ch, "<%sflags\t0> %s", OLC_LABEL_VAL(SKILL_FLAGS(skill), SKILLF_IN_DEVELOPMENT), lbuf);
+	build_page_display(ch, "<%sflags\t0> %s", OLC_LABEL_VAL(SKILL_FLAGS(skill), SKILLF_IN_DEVELOPMENT), lbuf);
 	
-	add_page_display(ch, "<%smaxlevel\t0> %d", OLC_LABEL_VAL(SKILL_MAX_LEVEL(skill), MAX_SKILL_CAP), SKILL_MAX_LEVEL(skill));
-	add_page_display(ch, "<%smindrop\t0> %d", OLC_LABEL_VAL(SKILL_MIN_DROP_LEVEL(skill), 0), SKILL_MIN_DROP_LEVEL(skill));
+	build_page_display(ch, "<%smaxlevel\t0> %d", OLC_LABEL_VAL(SKILL_MAX_LEVEL(skill), MAX_SKILL_CAP), SKILL_MAX_LEVEL(skill));
+	build_page_display(ch, "<%smindrop\t0> %d", OLC_LABEL_VAL(SKILL_MIN_DROP_LEVEL(skill), 0), SKILL_MIN_DROP_LEVEL(skill));
 	
 	LL_COUNT(SKILL_ABILITIES(skill), skab, total);
-	add_page_display(ch, "<%stree\t0> %d %s (.showtree to toggle display)", OLC_LABEL_PTR(SKILL_ABILITIES(skill)), total, total == 1 ? "ability" : "abilities");
+	build_page_display(ch, "<%stree\t0> %d %s (.showtree to toggle display)", OLC_LABEL_PTR(SKILL_ABILITIES(skill)), total, total == 1 ? "ability" : "abilities");
 	if (GET_OLC_SHOW_TREE(ch->desc)) {
 		get_skill_ability_display(SKILL_ABILITIES(skill), lbuf, sizeof(lbuf));
 		if (*lbuf) {
-			add_page_display_str(ch, lbuf);
+			build_page_display_str(ch, lbuf);
 		}
 	}
 	
 	LL_COUNT(SKILL_SYNERGIES(skill), syn, total);
-	add_page_display(ch, "<%ssynergy\t0> %d %s (.showsynergies to toggle display)", OLC_LABEL_PTR(SKILL_SYNERGIES(skill)), total, total == 1 ? "ability" : "abilities");
+	build_page_display(ch, "<%ssynergy\t0> %d %s (.showsynergies to toggle display)", OLC_LABEL_PTR(SKILL_SYNERGIES(skill)), total, total == 1 ? "ability" : "abilities");
 	if (GET_OLC_SHOW_SYNERGIES(ch->desc)) {
 		get_skill_synergy_display(SKILL_SYNERGIES(skill), lbuf, NULL);
 		if (*lbuf) {
-			add_page_display_str(ch, lbuf);
+			build_page_display_str(ch, lbuf);
 		}
 	}
 	
@@ -4336,7 +4336,7 @@ int vnum_skill(char *searchname, char_data *ch) {
 	
 	HASH_ITER(hh, skill_table, iter, next_iter) {
 		if (multi_isname(searchname, SKILL_NAME(iter)) || is_abbrev(searchname, SKILL_ABBREV(iter))) {
-			add_page_display(ch, "%3d. [%5d] %s", ++found, SKILL_VNUM(iter), SKILL_NAME(iter));
+			build_page_display(ch, "%3d. [%5d] %s", ++found, SKILL_VNUM(iter), SKILL_NAME(iter));
 		}
 	}
 	

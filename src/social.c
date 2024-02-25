@@ -217,15 +217,15 @@ void olc_search_social(char_data *ch, any_vnum vnum) {
 	}
 	
 	found = 0;
-	add_page_display(ch, "Occurrences of social %d (%s):", vnum, SOC_NAME(soc));
+	build_page_display(ch, "Occurrences of social %d (%s):", vnum, SOC_NAME(soc));
 	
 	// socials are not actually used anywhere else
 	
 	if (found > 0) {
-		add_page_display(ch, "%d location%s shown", found, PLURAL(found));
+		build_page_display(ch, "%d location%s shown", found, PLURAL(found));
 	}
 	else {
-		add_page_display_str(ch, " none");
+		build_page_display_str(ch, " none");
 	}
 	
 	send_page_display(ch);
@@ -683,19 +683,19 @@ void do_stat_social(char_data *ch, social_data *soc) {
 	}
 	
 	// first line
-	add_page_display(ch, "VNum: [\tc%d\t0], Command: \tc%s\t0, Name: \tc%s\t0", SOC_VNUM(soc), SOC_COMMAND(soc), SOC_NAME(soc));
+	build_page_display(ch, "VNum: [\tc%d\t0], Command: \tc%s\t0, Name: \tc%s\t0", SOC_VNUM(soc), SOC_COMMAND(soc), SOC_NAME(soc));
 	
-	add_page_display(ch, "Min actor position: \ty%s\t0, Min victim position: \ty%s\t0", position_types[SOC_MIN_CHAR_POS(soc)], position_types[SOC_MIN_VICT_POS(soc)]);
+	build_page_display(ch, "Min actor position: \ty%s\t0, Min victim position: \ty%s\t0", position_types[SOC_MIN_CHAR_POS(soc)], position_types[SOC_MIN_VICT_POS(soc)]);
 	
 	sprintbit(SOC_FLAGS(soc), social_flags, part, TRUE);
-	add_page_display(ch, "Flags: \tg%s\t0", part);
+	build_page_display(ch, "Flags: \tg%s\t0", part);
 	
-	add_page_display_str(ch, "Requirements:");
+	build_page_display_str(ch, "Requirements:");
 	show_requirement_display(ch, SOC_REQUIREMENTS(soc), FALSE);
 	
-	add_page_display(ch, "Messages:");
+	build_page_display(ch, "Messages:");
 	for (iter = 0; iter < NUM_SOCM_MESSAGES; ++iter) {
-		add_page_display(ch, "\tc%s\t0: %s", social_message_types[iter][0], SOC_MESSAGE(soc, iter) ? SOC_MESSAGE(soc, iter) : "(none)");
+		build_page_display(ch, "\tc%s\t0: %s", social_message_types[iter][0], SOC_MESSAGE(soc, iter) ? SOC_MESSAGE(soc, iter) : "(none)");
 	}
 	
 	send_page_display(ch);
@@ -717,24 +717,24 @@ void olc_show_social(char_data *ch) {
 		return;
 	}
 	
-	add_page_display(ch, "[%s%d\t0] %s%s\t0", OLC_LABEL_CHANGED, GET_OLC_VNUM(ch->desc), OLC_LABEL_UNCHANGED, !social_proto(SOC_VNUM(soc)) ? "new social" : SOC_NAME(social_proto(SOC_VNUM(soc))));
-	add_page_display(ch, "<%sname\t0> %s", OLC_LABEL_STR(SOC_NAME(soc), default_social_name), NULLSAFE(SOC_NAME(soc)));
-	add_page_display(ch, "<%scommand\t0> %s", OLC_LABEL_STR(SOC_COMMAND(soc), default_social_command), NULLSAFE(SOC_COMMAND(soc)));
+	build_page_display(ch, "[%s%d\t0] %s%s\t0", OLC_LABEL_CHANGED, GET_OLC_VNUM(ch->desc), OLC_LABEL_UNCHANGED, !social_proto(SOC_VNUM(soc)) ? "new social" : SOC_NAME(social_proto(SOC_VNUM(soc))));
+	build_page_display(ch, "<%sname\t0> %s", OLC_LABEL_STR(SOC_NAME(soc), default_social_name), NULLSAFE(SOC_NAME(soc)));
+	build_page_display(ch, "<%scommand\t0> %s", OLC_LABEL_STR(SOC_COMMAND(soc), default_social_command), NULLSAFE(SOC_COMMAND(soc)));
 	
 	sprintbit(SOC_FLAGS(soc), social_flags, lbuf, TRUE);
-	add_page_display(ch, "<%sflags\t0> %s", OLC_LABEL_VAL(SOC_FLAGS(soc), SOC_IN_DEVELOPMENT), lbuf);
+	build_page_display(ch, "<%sflags\t0> %s", OLC_LABEL_VAL(SOC_FLAGS(soc), SOC_IN_DEVELOPMENT), lbuf);
 	
-	add_page_display(ch, "<%scharposition\t0> %s (minimum)", OLC_LABEL_VAL(SOC_MIN_CHAR_POS(soc), 0), position_types[SOC_MIN_CHAR_POS(soc)]);
-	add_page_display(ch, "<%stargetposition\t0> %s (minimum)", OLC_LABEL_VAL(SOC_MIN_VICT_POS(soc), 0), position_types[SOC_MIN_VICT_POS(soc)]);
+	build_page_display(ch, "<%scharposition\t0> %s (minimum)", OLC_LABEL_VAL(SOC_MIN_CHAR_POS(soc), 0), position_types[SOC_MIN_CHAR_POS(soc)]);
+	build_page_display(ch, "<%stargetposition\t0> %s (minimum)", OLC_LABEL_VAL(SOC_MIN_VICT_POS(soc), 0), position_types[SOC_MIN_VICT_POS(soc)]);
 	
-	add_page_display(ch, "Requirements: <%srequirements\t0>", OLC_LABEL_PTR(SOC_REQUIREMENTS(soc)));
+	build_page_display(ch, "Requirements: <%srequirements\t0>", OLC_LABEL_PTR(SOC_REQUIREMENTS(soc)));
 	if (SOC_REQUIREMENTS(soc)) {
 		show_requirement_display(ch, SOC_REQUIREMENTS(soc), FALSE);
 	}
 	
-	add_page_display(ch, "Messages:");
+	build_page_display(ch, "Messages:");
 	for (iter = 0; iter < NUM_SOCM_MESSAGES; ++iter) {
-		add_page_display(ch, "%s <%s%s\t0>: %s", social_message_types[iter][0], OLC_LABEL_STR(SOC_MESSAGE(soc, iter), ""), social_message_types[iter][1], SOC_MESSAGE(soc, iter) ? SOC_MESSAGE(soc, iter) : "(none)");
+		build_page_display(ch, "%s <%s%s\t0>: %s", social_message_types[iter][0], OLC_LABEL_STR(SOC_MESSAGE(soc, iter), ""), social_message_types[iter][1], SOC_MESSAGE(soc, iter) ? SOC_MESSAGE(soc, iter) : "(none)");
 	}
 	
 	send_page_display(ch);
@@ -754,7 +754,7 @@ int vnum_social(char *searchname, char_data *ch) {
 	
 	HASH_ITER(hh, social_table, iter, next_iter) {
 		if (multi_isname(searchname, SOC_NAME(iter)) || multi_isname(searchname, SOC_COMMAND(iter))) {
-			add_page_display(ch, "%3d. [%5d] %s (%s)", ++found, SOC_VNUM(iter), SOC_NAME(iter), SOC_COMMAND(iter));
+			build_page_display(ch, "%3d. [%5d] %s (%s)", ++found, SOC_VNUM(iter), SOC_NAME(iter), SOC_COMMAND(iter));
 		}
 	}
 	

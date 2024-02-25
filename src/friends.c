@@ -461,7 +461,7 @@ ACMD(do_friends_all) {
 	
 	HASH_SORT(GET_ACCOUNT(ch)->friends, sort_friends_by_last_logon);
 	
-	add_page_display(ch, "Your friends list:");
+	build_page_display(ch, "Your friends list:");
 	count = 0;
 	
 	HASH_ITER(hh, GET_ACCOUNT_FRIENDS(ch), friend, next_friend) {
@@ -506,12 +506,12 @@ ACMD(do_friends_all) {
 		}
 		
 		// actual line
-		add_page_display(ch, " %s%s%s%s", color, name, status, *color ? "\t0" : "");
+		build_page_display(ch, " %s%s%s%s", color, name, status, *color ? "\t0" : "");
 		++count;
 	}
 	
 	if (!count) {
-		add_page_display(ch, " none");
+		build_page_display(ch, " none");
 	}
 	
 	send_page_display(ch);
@@ -530,7 +530,7 @@ ACMD(do_friends_online) {
 	struct friend_data *friend;
 	struct page_display *pd;
 	
-	add_page_display(ch, "Friends online:");
+	build_page_display(ch, "Friends online:");
 	count = 0;
 	
 	DL_FOREACH2(player_character_list, plr, next_plr) {
@@ -548,7 +548,7 @@ ACMD(do_friends_online) {
 		
 		// seems ok to show
 		++count;
-		pd = add_page_display(ch, " %s", GET_NAME(plr));
+		pd = build_page_display(ch, " %s", GET_NAME(plr));
 		
 		if ((friend = find_account_friend(GET_ACCOUNT(ch), GET_ACCOUNT_ID(plr))) && friend->original_name && strcmp(GET_NAME(plr), friend->original_name)) {
 			append_page_display_line(pd, " (%s)", friend->original_name);
@@ -556,7 +556,7 @@ ACMD(do_friends_online) {
 	}
 	
 	if (!count) {
-	    add_page_display(ch, " none");
+	    build_page_display(ch, " none");
 	}
 	
 	send_page_display(ch);
@@ -575,7 +575,7 @@ ACMD(do_friend_accept) {
 	}
 	else if (!*argument) {
 		// no-arg: show open requests
-		add_page_display(ch, "Open friend requests you've received:");
+		build_page_display(ch, "Open friend requests you've received:");
 		count = 0;
 		
 		HASH_ITER(hh, GET_ACCOUNT_FRIENDS(ch), friend, next_friend) {
@@ -584,12 +584,12 @@ ACMD(do_friend_accept) {
 			}
 			
 			// otherwise show it
-			add_page_display(ch, " %s", friend->original_name ? friend->original_name : "Unknown");
+			build_page_display(ch, " %s", friend->original_name ? friend->original_name : "Unknown");
 			++count;
 		}
 		
 		if (!count) {
-			add_page_display(ch, " none");
+			build_page_display(ch, " none");
 		}
 		
 		send_page_display(ch);
@@ -701,7 +701,7 @@ ACMD(do_friend_deny) {
 	}
 	else if (!*argument) {
 		// no-arg: show open requests
-		add_page_display(ch, "Open friend requests you've received:");
+		build_page_display(ch, "Open friend requests you've received:");
 		count = 0;
 		
 		HASH_ITER(hh, GET_ACCOUNT_FRIENDS(ch), friend, next_friend) {
@@ -710,12 +710,12 @@ ACMD(do_friend_deny) {
 			}
 			
 			// otherwise show it
-			add_page_display(ch, " %s", friend->original_name ? friend->original_name : "Unknown");
+			build_page_display(ch, " %s", friend->original_name ? friend->original_name : "Unknown");
 			++count;
 		}
 		
 		if (!count) {
-			add_page_display(ch, " none");
+			build_page_display(ch, " none");
 		}
 		
 		send_page_display(ch);
@@ -763,7 +763,7 @@ ACMD(do_friend_request) {
 	
 	if (!*argument) {
 		// no-arg: show open requests
-		add_page_display(ch, "Open friend requests you've sent:");
+		build_page_display(ch, "Open friend requests you've sent:");
 		count = 0;
 		
 		HASH_ITER(hh, GET_ACCOUNT_FRIENDS(ch), friend, next_friend) {
@@ -772,12 +772,12 @@ ACMD(do_friend_request) {
 			}
 			
 			// otherwise show it
-			add_page_display(ch, " %s", friend->original_name ? friend->original_name : "Unknown");
+			build_page_display(ch, " %s", friend->original_name ? friend->original_name : "Unknown");
 			++count;
 		}
 		
 		if (!count) {
-			add_page_display(ch, " none");
+			build_page_display(ch, " none");
 		}
 		
 		send_page_display(ch);

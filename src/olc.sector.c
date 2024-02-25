@@ -493,7 +493,7 @@ void olc_fullsearch_sector(char_data *ch, char *argument) {
 		skip_spaces(&argument);
 	}
 	
-	add_page_display(ch, "Sector fullsearch: %s", show_color_codes(find_keywords));
+	build_page_display(ch, "Sector fullsearch: %s", show_color_codes(find_keywords));
 	count = 0;
 	
 	// okay now look up sects
@@ -566,15 +566,15 @@ void olc_fullsearch_sector(char_data *ch, char *argument) {
 		}
 		
 		// show it
-		add_page_display(ch, "[%5d] %s", GET_SECT_VNUM(sect), GET_SECT_NAME(sect));
+		build_page_display(ch, "[%5d] %s", GET_SECT_VNUM(sect), GET_SECT_NAME(sect));
 		++count;
 	}
 	
 	if (count > 0) {
-		add_page_display(ch, "(%d sector%s)", count, PLURAL(count));
+		build_page_display(ch, "(%d sector%s)", count, PLURAL(count));
 	}
 	else {
-		add_page_display_str(ch, " none");
+		build_page_display_str(ch, " none");
 	}
 	
 	send_page_display(ch);
@@ -604,7 +604,7 @@ void olc_search_sector(char_data *ch, sector_vnum vnum) {
 	}
 	
 	found = 0;
-	add_page_display(ch, "Occurrences of sector %d (%s):", vnum, GET_SECT_NAME(real));
+	build_page_display(ch, "Occurrences of sector %d (%s):", vnum, GET_SECT_NAME(real));
 	
 	// adventure rules
 	HASH_ITER(hh, adventure_table, adv, next_adv) {
@@ -612,7 +612,7 @@ void olc_search_sector(char_data *ch, sector_vnum vnum) {
 			if (link->type == ADV_LINK_PORTAL_WORLD) {
 				if (link->value == vnum) {
 					++found;
-					add_page_display(ch, "ADV [%5d] %s", GET_ADV_VNUM(adv), GET_ADV_NAME(adv));
+					build_page_display(ch, "ADV [%5d] %s", GET_ADV_VNUM(adv), GET_ADV_NAME(adv));
 					// only report once per adventure
 					break;
 				}
@@ -628,7 +628,7 @@ void olc_search_sector(char_data *ch, sector_vnum vnum) {
 		
 		if (any) {
 			++found;
-			add_page_display(ch, "PRG [%5d] %s", PRG_VNUM(prg), PRG_NAME(prg));
+			build_page_display(ch, "PRG [%5d] %s", PRG_VNUM(prg), PRG_NAME(prg));
 		}
 	}
 	
@@ -641,7 +641,7 @@ void olc_search_sector(char_data *ch, sector_vnum vnum) {
 		
 		if (any) {
 			++found;
-			add_page_display(ch, "QST [%5d] %s", QUEST_VNUM(quest), QUEST_NAME(quest));
+			build_page_display(ch, "QST [%5d] %s", QUEST_VNUM(quest), QUEST_NAME(quest));
 		}
 	}
 	
@@ -651,7 +651,7 @@ void olc_search_sector(char_data *ch, sector_vnum vnum) {
 		any |= has_evolution_value(sect, EVO_VAL_SECTOR, vnum);
 		if (any) {
 			++found;
-			add_page_display(ch, "SCT [%5d] %s", GET_SECT_VNUM(sect), GET_SECT_NAME(sect));
+			build_page_display(ch, "SCT [%5d] %s", GET_SECT_VNUM(sect), GET_SECT_NAME(sect));
 		}
 	}
 	
@@ -662,15 +662,15 @@ void olc_search_sector(char_data *ch, sector_vnum vnum) {
 		
 		if (any) {
 			++found;
-			add_page_display(ch, "SOC [%5d] %s", SOC_VNUM(soc), SOC_NAME(soc));
+			build_page_display(ch, "SOC [%5d] %s", SOC_VNUM(soc), SOC_NAME(soc));
 		}
 	}
 	
 	if (found > 0) {
-		add_page_display(ch, "%d location%s shown", found, PLURAL(found));
+		build_page_display(ch, "%d location%s shown", found, PLURAL(found));
 	}
 	else {
-		add_page_display_str(ch, " none");
+		build_page_display_str(ch, " none");
 	}
 	
 	send_page_display(ch);
@@ -858,60 +858,60 @@ void olc_show_sector(char_data *ch) {
 		return;
 	}
 
-	add_page_display(ch, "[%s%d\t0] %s%s\t0", OLC_LABEL_CHANGED, GET_OLC_VNUM(ch->desc), OLC_LABEL_UNCHANGED, sector_proto(st->vnum) ? GET_SECT_NAME(sector_proto(st->vnum)) : "new sector");
-	add_page_display(ch, "<%sname\t0> %s", OLC_LABEL_STR(GET_SECT_NAME(st), default_sect_name), NULLSAFE(GET_SECT_NAME(st)));
-	add_page_display(ch, "<%stitle\t0> %s", OLC_LABEL_STR(GET_SECT_TITLE(st), default_sect_title), NULLSAFE(GET_SECT_TITLE(st)));
-	add_page_display(ch, "<%scommands\t0> %s", OLC_LABEL_STR(GET_SECT_COMMANDS(st), ""), NULLSAFE(GET_SECT_COMMANDS(st)));
-	add_page_display(ch, "<%sroadsideicon\t0> %c", OLC_LABEL_VAL(st->roadside_icon, default_roadside_icon), st->roadside_icon);
-	add_page_display(ch, "<%smapout\t0> %s", OLC_LABEL_VAL(GET_SECT_MAPOUT(st), 0), mapout_color_names[GET_SECT_MAPOUT(st)]);
+	build_page_display(ch, "[%s%d\t0] %s%s\t0", OLC_LABEL_CHANGED, GET_OLC_VNUM(ch->desc), OLC_LABEL_UNCHANGED, sector_proto(st->vnum) ? GET_SECT_NAME(sector_proto(st->vnum)) : "new sector");
+	build_page_display(ch, "<%sname\t0> %s", OLC_LABEL_STR(GET_SECT_NAME(st), default_sect_name), NULLSAFE(GET_SECT_NAME(st)));
+	build_page_display(ch, "<%stitle\t0> %s", OLC_LABEL_STR(GET_SECT_TITLE(st), default_sect_title), NULLSAFE(GET_SECT_TITLE(st)));
+	build_page_display(ch, "<%scommands\t0> %s", OLC_LABEL_STR(GET_SECT_COMMANDS(st), ""), NULLSAFE(GET_SECT_COMMANDS(st)));
+	build_page_display(ch, "<%sroadsideicon\t0> %c", OLC_LABEL_VAL(st->roadside_icon, default_roadside_icon), st->roadside_icon);
+	build_page_display(ch, "<%smapout\t0> %s", OLC_LABEL_VAL(GET_SECT_MAPOUT(st), 0), mapout_color_names[GET_SECT_MAPOUT(st)]);
 
-	add_page_display(ch, "<%sicons\t0>", OLC_LABEL_PTR(GET_SECT_ICONS(st)));
+	build_page_display(ch, "<%sicons\t0>", OLC_LABEL_PTR(GET_SECT_ICONS(st)));
 	show_icons_display(ch, GET_SECT_ICONS(st), FALSE);
 
 	ordered_sprintbit(GET_SECT_CLIMATE(st), climate_flags, climate_flags_order, FALSE, lbuf);
-	add_page_display(ch, "<%sclimate\t0> %s", OLC_LABEL_VAL(st->climate, NOBITS), lbuf);
-	add_page_display(ch, "<%stemperature\t0> %s", OLC_LABEL_VAL(GET_SECT_TEMPERATURE_TYPE(st), 0), temperature_types[GET_SECT_TEMPERATURE_TYPE(st)]);
-	add_page_display(ch, "<%smovecost\t0> %d", OLC_LABEL_VAL(st->movement_loss, 0), st->movement_loss);
+	build_page_display(ch, "<%sclimate\t0> %s", OLC_LABEL_VAL(st->climate, NOBITS), lbuf);
+	build_page_display(ch, "<%stemperature\t0> %s", OLC_LABEL_VAL(GET_SECT_TEMPERATURE_TYPE(st), 0), temperature_types[GET_SECT_TEMPERATURE_TYPE(st)]);
+	build_page_display(ch, "<%smovecost\t0> %d", OLC_LABEL_VAL(st->movement_loss, 0), st->movement_loss);
 
 	sprintbit(GET_SECT_FLAGS(st), sector_flags, lbuf, TRUE);
-	add_page_display(ch, "<%sflags\t0> %s", OLC_LABEL_VAL(GET_SECT_FLAGS(st), NOBITS), lbuf);
+	build_page_display(ch, "<%sflags\t0> %s", OLC_LABEL_VAL(GET_SECT_FLAGS(st), NOBITS), lbuf);
 	
 	ordered_sprintbit(st->build_flags, bld_on_flags, bld_on_flags_order, TRUE, lbuf);
-	add_page_display(ch, "<%sbuildflags\t0> %s", OLC_LABEL_VAL(st->build_flags, NOBITS), lbuf);
+	build_page_display(ch, "<%sbuildflags\t0> %s", OLC_LABEL_VAL(st->build_flags, NOBITS), lbuf);
 	
-	add_page_display(ch, "<%sevolution\t0>", OLC_LABEL_PTR(st->evolution));
+	build_page_display(ch, "<%sevolution\t0>", OLC_LABEL_PTR(st->evolution));
 	if (st->evolution) {
 		show_evolution_display(ch, st->evolution, FALSE);
 	}
 
 	// exdesc
-	add_page_display(ch, "Extra descriptions: <%sextra\t0>", OLC_LABEL_PTR(GET_SECT_EX_DESCS(st)));
+	build_page_display(ch, "Extra descriptions: <%sextra\t0>", OLC_LABEL_PTR(GET_SECT_EX_DESCS(st)));
 	if (GET_SECT_EX_DESCS(st)) {
 		show_extra_desc_display(ch, GET_SECT_EX_DESCS(st), FALSE);
 	}
 
 	// custom messages
-	add_page_display(ch, "Custom messages: <%scustom\t0>", OLC_LABEL_PTR(GET_SECT_CUSTOM_MSGS(st)));
+	build_page_display(ch, "Custom messages: <%scustom\t0>", OLC_LABEL_PTR(GET_SECT_CUSTOM_MSGS(st)));
 	count = 0;
 	LL_FOREACH(GET_SECT_CUSTOM_MSGS(st), ocm) {
-		add_page_display(ch, " \ty%2d\t0. [%s] %s", ++count, sect_custom_types[ocm->type], ocm->msg);
+		build_page_display(ch, " \ty%2d\t0. [%s] %s", ++count, sect_custom_types[ocm->type], ocm->msg);
 	}
 
-	add_page_display(ch, "Interactions: <%sinteraction\t0>", OLC_LABEL_PTR(GET_SECT_INTERACTIONS(st)));
+	build_page_display(ch, "Interactions: <%sinteraction\t0>", OLC_LABEL_PTR(GET_SECT_INTERACTIONS(st)));
 	if (GET_SECT_INTERACTIONS(st)) {
 		show_interaction_display(ch, GET_SECT_INTERACTIONS(st), FALSE);
 	}
 	
-	add_page_display(ch, "<%sspawns\t0>", OLC_LABEL_PTR(GET_SECT_SPAWNS(st)));
+	build_page_display(ch, "<%sspawns\t0>", OLC_LABEL_PTR(GET_SECT_SPAWNS(st)));
 	if (GET_SECT_SPAWNS(st)) {
 		count = 0;
 		for (spawn = GET_SECT_SPAWNS(st); spawn; spawn = spawn->next) {
 			++count;
 		}
-		add_page_display(ch, " %d spawn%s set", count, PLURAL(count));
+		build_page_display(ch, " %d spawn%s set", count, PLURAL(count));
 	}
 	
-	add_page_display(ch, "<%snotes\t0>\r\n%s", OLC_LABEL_PTR(GET_SECT_NOTES(st)), NULLSAFE(GET_SECT_NOTES(st)));
+	build_page_display(ch, "<%snotes\t0>\r\n%s", OLC_LABEL_PTR(GET_SECT_NOTES(st)), NULLSAFE(GET_SECT_NOTES(st)));
 	
 	send_page_display(ch);
 }

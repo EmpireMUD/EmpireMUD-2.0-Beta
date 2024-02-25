@@ -559,7 +559,7 @@ void olc_fullsearch_trigger(char_data *ch, char *argument) {
 		skip_spaces(&argument);
 	}
 	
-	add_page_display(ch, "Trigger fullsearch: %s", show_color_codes(find_keywords));
+	build_page_display(ch, "Trigger fullsearch: %s", show_color_codes(find_keywords));
 	count = 0;
 	
 	// okay now look up items
@@ -615,15 +615,15 @@ void olc_fullsearch_trigger(char_data *ch, char *argument) {
 		}
 		
 		// show it
-		add_page_display(ch, "[%5d] %s", GET_TRIG_VNUM(trig), GET_TRIG_NAME(trig));
+		build_page_display(ch, "[%5d] %s", GET_TRIG_VNUM(trig), GET_TRIG_NAME(trig));
 		++count;
 	}
 	
 	if (count > 0) {
-		add_page_display(ch, "(%d triggers)", count);
+		build_page_display(ch, "(%d triggers)", count);
 	}
 	else {
-		add_page_display_str(ch, " none");
+		build_page_display_str(ch, " none");
 	}
 	
 	send_page_display(ch);
@@ -656,7 +656,7 @@ void olc_search_trigger(char_data *ch, trig_vnum vnum) {
 	}
 	
 	found = 0;
-	add_page_display(ch, "Occurrences of trigger %d (%s):", vnum, GET_TRIG_NAME(proto));
+	build_page_display(ch, "Occurrences of trigger %d (%s):", vnum, GET_TRIG_NAME(proto));
 	
 	// adventure scripts
 	HASH_ITER(hh, adventure_table, adv, next_adv) {
@@ -665,7 +665,7 @@ void olc_search_trigger(char_data *ch, trig_vnum vnum) {
 			if (trig->vnum == vnum) {
 				any = TRUE;
 				++found;
-				add_page_display(ch, "ADV [%5d] %s", GET_ADV_VNUM(adv), GET_ADV_NAME(adv));
+				build_page_display(ch, "ADV [%5d] %s", GET_ADV_VNUM(adv), GET_ADV_NAME(adv));
 			}
 		}
 	}
@@ -677,7 +677,7 @@ void olc_search_trigger(char_data *ch, trig_vnum vnum) {
 			if (trig->vnum == vnum) {
 				any = TRUE;
 				++found;
-				add_page_display(ch, "BLD [%5d] %s", GET_BLD_VNUM(bld), GET_BLD_NAME(bld));
+				build_page_display(ch, "BLD [%5d] %s", GET_BLD_VNUM(bld), GET_BLD_NAME(bld));
 			}
 		}
 	}
@@ -689,7 +689,7 @@ void olc_search_trigger(char_data *ch, trig_vnum vnum) {
 			if (trig->vnum == vnum) {
 				any = TRUE;
 				++found;
-				add_page_display(ch, "MOB [%5d] %s", GET_MOB_VNUM(mob), GET_SHORT_DESC(mob));
+				build_page_display(ch, "MOB [%5d] %s", GET_MOB_VNUM(mob), GET_SHORT_DESC(mob));
 			}
 		}
 	}
@@ -701,7 +701,7 @@ void olc_search_trigger(char_data *ch, trig_vnum vnum) {
 			if (trig->vnum == vnum) {
 				any = TRUE;
 				++found;
-				add_page_display(ch, "OBJ [%5d] %s", GET_OBJ_VNUM(obj), GET_OBJ_SHORT_DESC(obj));
+				build_page_display(ch, "OBJ [%5d] %s", GET_OBJ_VNUM(obj), GET_OBJ_SHORT_DESC(obj));
 			}
 		}
 	}
@@ -721,7 +721,7 @@ void olc_search_trigger(char_data *ch, trig_vnum vnum) {
 		
 		if (any) {
 			++found;
-			add_page_display(ch, "QST [%5d] %s", QUEST_VNUM(quest), QUEST_NAME(quest));
+			build_page_display(ch, "QST [%5d] %s", QUEST_VNUM(quest), QUEST_NAME(quest));
 		}
 	}
 	
@@ -732,7 +732,7 @@ void olc_search_trigger(char_data *ch, trig_vnum vnum) {
 			if (trig->vnum == vnum) {
 				any = TRUE;
 				++found;
-				add_page_display(ch, "RMT [%5d] %s", GET_RMT_VNUM(rmt), GET_RMT_TITLE(rmt));
+				build_page_display(ch, "RMT [%5d] %s", GET_RMT_VNUM(rmt), GET_RMT_TITLE(rmt));
 			}
 		}
 	}
@@ -743,7 +743,7 @@ void olc_search_trigger(char_data *ch, trig_vnum vnum) {
 		
 		if (any) {
 			++found;
-			add_page_display(ch, "SHOP [%5d] %s", SHOP_VNUM(shop), SHOP_NAME(shop));
+			build_page_display(ch, "SHOP [%5d] %s", SHOP_VNUM(shop), SHOP_NAME(shop));
 		}
 	}
 	
@@ -754,16 +754,16 @@ void olc_search_trigger(char_data *ch, trig_vnum vnum) {
 			if (trig->vnum == vnum) {
 				any = TRUE;
 				++found;
-				add_page_display(ch, "VEH [%5d] %s", VEH_VNUM(veh), VEH_SHORT_DESC(veh));
+				build_page_display(ch, "VEH [%5d] %s", VEH_VNUM(veh), VEH_SHORT_DESC(veh));
 			}
 		}
 	}
 	
 	if (found > 0) {
-		add_page_display(ch, "%d location%s shown", found, PLURAL(found));
+		build_page_display(ch, "%d location%s shown", found, PLURAL(found));
 	}
 	else {
-		add_page_display_str(ch, " none");
+		build_page_display_str(ch, " none");
 	}
 	
 	send_page_display(ch);
@@ -982,31 +982,31 @@ void olc_show_trigger(char_data *ch) {
 		return;
 	}
 	
-	add_page_display(ch, "[%s%d\t0] %s%s\t0", OLC_LABEL_CHANGED, GET_OLC_VNUM(ch->desc), OLC_LABEL_UNCHANGED, !real_trigger(GET_OLC_VNUM(ch->desc)) ? "new trigger" : GET_TRIG_NAME(real_trigger(GET_OLC_VNUM(ch->desc))));
-	add_page_display(ch, "<%sname\t0> %s", OLC_LABEL_STR(GET_TRIG_NAME(trig), default_trig_name), NULLSAFE(GET_TRIG_NAME(trig)));
-	add_page_display(ch, "<%sattaches\t0> %s", OLC_LABEL_VAL(trig->attach_type, 0), trig_attach_types[trig->attach_type]);
+	build_page_display(ch, "[%s%d\t0] %s%s\t0", OLC_LABEL_CHANGED, GET_OLC_VNUM(ch->desc), OLC_LABEL_UNCHANGED, !real_trigger(GET_OLC_VNUM(ch->desc)) ? "new trigger" : GET_TRIG_NAME(real_trigger(GET_OLC_VNUM(ch->desc))));
+	build_page_display(ch, "<%sname\t0> %s", OLC_LABEL_STR(GET_TRIG_NAME(trig), default_trig_name), NULLSAFE(GET_TRIG_NAME(trig)));
+	build_page_display(ch, "<%sattaches\t0> %s", OLC_LABEL_VAL(trig->attach_type, 0), trig_attach_types[trig->attach_type]);
 	
 	sprintbit(GET_TRIG_TYPE(trig), trig_attach_type_list[trig->attach_type], trgtypes, TRUE);
-	add_page_display(ch, "<%stypes\t0> %s", OLC_LABEL_VAL(GET_TRIG_TYPE(trig), NOBITS), trgtypes);
+	build_page_display(ch, "<%stypes\t0> %s", OLC_LABEL_VAL(GET_TRIG_TYPE(trig), NOBITS), trgtypes);
 	
 	if (IS_SET(trig_arg_types, TRIG_ARG_PERCENT)) {
-		add_page_display(ch, "<%spercent\t0> %d%%", OLC_LABEL_VAL(trig->narg, 0), trig->narg);
+		build_page_display(ch, "<%spercent\t0> %d%%", OLC_LABEL_VAL(trig->narg, 0), trig->narg);
 	}
 	if (IS_SET(trig_arg_types, TRIG_ARG_PHRASE_OR_WORDLIST)) {
-		add_page_display(ch, "<%sargtype\t0> %s", OLC_LABEL_VAL(trig->narg, 0), trig_arg_phrase_type[trig->narg]);
+		build_page_display(ch, "<%sargtype\t0> %s", OLC_LABEL_VAL(trig->narg, 0), trig_arg_phrase_type[trig->narg]);
 	}
 	if (IS_SET(trig_arg_types, TRIG_ARG_OBJ_WHERE)) {
 		sprintbit(trig->narg, trig_arg_obj_where, buf1, TRUE);
-		add_page_display(ch, "<%slocation\t0> %s", OLC_LABEL_VAL(trig->narg, 0), trig->narg ? buf1 : "none");
+		build_page_display(ch, "<%slocation\t0> %s", OLC_LABEL_VAL(trig->narg, 0), trig->narg ? buf1 : "none");
 	}
 	if (IS_SET(trig_arg_types, TRIG_ARG_COMMAND | TRIG_ARG_PHRASE_OR_WORDLIST)) {
-		add_page_display(ch, "<%sstring\t0> %s", OLC_LABEL_STR(trig->arglist, ""), NULLSAFE(trig->arglist));
+		build_page_display(ch, "<%sstring\t0> %s", OLC_LABEL_STR(trig->arglist, ""), NULLSAFE(trig->arglist));
 	}
 	if (IS_SET(trig_arg_types, TRIG_ARG_COST)) {
-		add_page_display(ch, "<%scosts\t0> %d misc coins", OLC_LABEL_VAL(trig->narg, 0), trig->narg);
+		build_page_display(ch, "<%scosts\t0> %d misc coins", OLC_LABEL_VAL(trig->narg, 0), trig->narg);
 	}
 	
-	add_page_display(ch, "<%scommands\t0>\r\n%s", OLC_LABEL_STR(GET_OLC_STORAGE(ch->desc), ""), show_color_codes(NULLSAFE(GET_OLC_STORAGE(ch->desc))));
+	build_page_display(ch, "<%scommands\t0>\r\n%s", OLC_LABEL_STR(GET_OLC_STORAGE(ch->desc), ""), show_color_codes(NULLSAFE(GET_OLC_STORAGE(ch->desc))));
 	
 	send_page_display(ch);
 }

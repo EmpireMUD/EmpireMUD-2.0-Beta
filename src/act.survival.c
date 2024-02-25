@@ -282,10 +282,10 @@ void do_mount_list(char_data *ch, char *argument) {
 	
 	// header
 	if (!*argument) {
-		add_page_display_str(ch, "Your mounts:");
+		build_page_display_str(ch, "Your mounts:");
 	}
 	else {
-		add_page_display(ch, "Your mounts matching '%s':", argument);
+		build_page_display(ch, "Your mounts matching '%s':", argument);
 	}
 	
 	HASH_ITER(hh, GET_MOUNT_LIST(ch), mount, next_mount) {
@@ -307,15 +307,15 @@ void do_mount_list(char_data *ch, char *argument) {
 		}
 		
 		++count;
-		add_page_display_col(ch, 2, FALSE, " %s%s%s", (cur ? "&l" : ""), part, (cur ? "&0" : ""));
+		build_page_display_col(ch, 2, FALSE, " %s%s%s", (cur ? "&l" : ""), part, (cur ? "&0" : ""));
 		any = TRUE;
 	}
 	
 	if (!any) {
-		add_page_display_str(ch, " no matches");
+		build_page_display_str(ch, " no matches");
 	}
 	else {
-		add_page_display(ch, " (%d total mount%s)", count, PLURAL(count));
+		build_page_display(ch, " (%d total mount%s)", count, PLURAL(count));
 	}
 	
 	send_page_display(ch);

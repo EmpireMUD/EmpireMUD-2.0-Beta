@@ -1349,13 +1349,13 @@ ACMD(do_alias) {
 	repl = any_one_arg(argument, arg);
 
 	if (!*arg) {			/* no argument specified -- list currently defined aliases */
-		add_page_display(ch, "Currently defined aliases:");
+		build_page_display(ch, "Currently defined aliases:");
 		if (GET_ALIASES(ch) == NULL) {
-			add_page_display(ch, " None.");
+			build_page_display(ch, " None.");
 		}
 		else {
 			LL_FOREACH(GET_ALIASES(ch), a) {
-				add_page_display(ch, "%-15s %s", a->alias, show_color_codes(a->replacement));
+				build_page_display(ch, "%-15s %s", a->alias, show_color_codes(a->replacement));
 			}
 		}
 		send_page_display(ch);
@@ -1581,14 +1581,14 @@ ACMD(do_commands) {
 	if (subcmd == SCMD_WIZHELP)
 		wizhelp = 1;
 
-	add_page_display(ch, "The following %s%s are available to %s:", wizhelp ? "privileged " : "", "commands", vict == ch ? "you" : PERS(vict, ch, 1));
+	build_page_display(ch, "The following %s%s are available to %s:", wizhelp ? "privileged " : "", "commands", vict == ch ? "you" : PERS(vict, ch, 1));
 
 	/* cmd_num starts at 1, not 0, to remove 'RESERVED' */
 	for (cmd_num = 1; cmd_num < num_of_cmds; cmd_num++) {
 		i = cmd_sort_info[cmd_num].sort_pos;
 		if (cmd_info[i].minimum_level >= 0 && (cmd_info[i].ability == NO_ABIL || has_ability(vict, cmd_info[i].ability)) && (GET_ACCESS_LEVEL(vict) >= cmd_info[i].minimum_level || (cmd_info[i].grants != NO_GRANTS && IS_GRANTED(vict, cmd_info[i].grants))) && (cmd_info[i].minimum_level >= LVL_GOD) == wizhelp) {
 			if (!IS_SET(cmd_info[i].flags, CMD_IMM_OR_MOB_ONLY) || GET_ACCESS_LEVEL(vict) >= LVL_START_IMM || IS_NPC(vict)) {
-				add_page_display_col_str(ch, 5, FALSE, cmd_info[i].command);
+				build_page_display_col_str(ch, 5, FALSE, cmd_info[i].command);
 			}
 		}
 	}

@@ -2933,7 +2933,7 @@ OLC_MODULE(olc_list) {
 				HASH_ITER(hh, ability_table, abil, next_abil) {
 					if (ABIL_VNUM(abil) >= from_vnum && ABIL_VNUM(abil) <= to_vnum) {
 						++count;
-						add_page_display_str(ch, list_one_ability(abil, show_details));
+						build_page_display_str(ch, list_one_ability(abil, show_details));
 					}
 				}
 				break;
@@ -2944,7 +2944,7 @@ OLC_MODULE(olc_list) {
 				HASH_ITER(hh, adventure_table, adv, next_adv) {
 					if (GET_ADV_VNUM(adv) >= from_vnum && GET_ADV_VNUM(adv) <= to_vnum) {
 						++count;
-						add_page_display_str(ch, list_one_adventure(adv, show_details));
+						build_page_display_str(ch, list_one_adventure(adv, show_details));
 					}
 				}
 				break;
@@ -2955,7 +2955,7 @@ OLC_MODULE(olc_list) {
 				HASH_ITER(hh, archetype_table, arch, next_arch) {
 					if (GET_ARCH_VNUM(arch) >= from_vnum && GET_ARCH_VNUM(arch) <= to_vnum) {
 						++count;
-						add_page_display_str(ch, list_one_archetype(arch, show_details));
+						build_page_display_str(ch, list_one_archetype(arch, show_details));
 					}
 				}
 				break;
@@ -2966,7 +2966,7 @@ OLC_MODULE(olc_list) {
 				HASH_ITER(hh, attack_message_table, amd, next_amd) {
 					if (ATTACK_VNUM(amd) >= from_vnum && ATTACK_VNUM(amd) <= to_vnum) {
 						++count;
-						add_page_display_str(ch, list_one_attack_message(amd, show_details));
+						build_page_display_str(ch, list_one_attack_message(amd, show_details));
 					}
 				}
 				break;
@@ -2977,7 +2977,7 @@ OLC_MODULE(olc_list) {
 				HASH_ITER(hh, augment_table, aug, next_aug) {
 					if (GET_AUG_VNUM(aug) >= from_vnum && GET_AUG_VNUM(aug) <= to_vnum) {
 						++count;
-						add_page_display_str(ch, list_one_augment(aug, show_details));
+						build_page_display_str(ch, list_one_augment(aug, show_details));
 					}
 				}
 				break;
@@ -2988,7 +2988,7 @@ OLC_MODULE(olc_list) {
 				HASH_ITER(hh, book_table, book, next_book) {
 					if (BOOK_VNUM(book) >= from_vnum && BOOK_VNUM(book) <= to_vnum) {
 						++count;
-						add_page_display_str(ch, list_one_book(book, show_details));
+						build_page_display_str(ch, list_one_book(book, show_details));
 					}
 				}
 				break;
@@ -2999,7 +2999,7 @@ OLC_MODULE(olc_list) {
 				HASH_ITER(hh, building_table, bld, next_bld) {
 					if (GET_BLD_VNUM(bld) >= from_vnum && GET_BLD_VNUM(bld) <= to_vnum) {
 						++count;
-						add_page_display_str(ch, list_one_building(bld, show_details));
+						build_page_display_str(ch, list_one_building(bld, show_details));
 					}
 				}
 				break;
@@ -3010,7 +3010,7 @@ OLC_MODULE(olc_list) {
 				HASH_ITER(hh, class_table, cls, next_cls) {
 					if (CLASS_VNUM(cls) >= from_vnum && CLASS_VNUM(cls) <= to_vnum) {
 						++count;
-						add_page_display_str(ch, list_one_class(cls, show_details));
+						build_page_display_str(ch, list_one_class(cls, show_details));
 					}
 				}
 				break;
@@ -3021,7 +3021,7 @@ OLC_MODULE(olc_list) {
 				HASH_ITER(hh, craft_table, craft, next_craft) {
 					if (GET_CRAFT_VNUM(craft) >= from_vnum && GET_CRAFT_VNUM(craft) <= to_vnum) {
 						++count;
-						add_page_display_str(ch, list_one_craft(craft, show_details));
+						build_page_display_str(ch, list_one_craft(craft, show_details));
 					}
 				}
 				break;
@@ -3032,7 +3032,7 @@ OLC_MODULE(olc_list) {
 				HASH_ITER(hh, crop_table, crop, next_crop) {
 					if (GET_CROP_VNUM(crop) >= from_vnum && GET_CROP_VNUM(crop) <= to_vnum) {
 						++count;
-						add_page_display_str(ch, list_one_crop(crop, show_details));
+						build_page_display_str(ch, list_one_crop(crop, show_details));
 					}
 				}
 				break;
@@ -3043,7 +3043,7 @@ OLC_MODULE(olc_list) {
 				HASH_ITER(hh, event_table, event, next_event) {
 					if (EVT_VNUM(event) >= from_vnum && EVT_VNUM(event) <= to_vnum) {
 						++count;
-						add_page_display_str(ch, list_one_event(event, show_details));
+						build_page_display_str(ch, list_one_event(event, show_details));
 					}
 				}
 				break;
@@ -3054,7 +3054,7 @@ OLC_MODULE(olc_list) {
 				HASH_ITER(hh, faction_table, fct, next_fct) {
 					if (FCT_VNUM(fct) >= from_vnum && FCT_VNUM(fct) <= to_vnum) {
 						++count;
-						add_page_display_str(ch, list_one_faction(fct, show_details));
+						build_page_display_str(ch, list_one_faction(fct, show_details));
 					}
 				}
 				break;
@@ -3065,7 +3065,7 @@ OLC_MODULE(olc_list) {
 				HASH_ITER(hh, generic_table, gen, next_gen) {
 					if (GEN_VNUM(gen) >= from_vnum && GEN_VNUM(gen) <= to_vnum) {
 						++count;
-						add_page_display_str(ch, list_one_generic(gen, show_details));
+						build_page_display_str(ch, list_one_generic(gen, show_details));
 					}
 				}
 				break;
@@ -3076,7 +3076,7 @@ OLC_MODULE(olc_list) {
 				HASH_ITER(hh, globals_table, glb, next_glb) {
 					if (GET_GLOBAL_VNUM(glb) >= from_vnum && GET_GLOBAL_VNUM(glb) <= to_vnum) {
 						++count;
-						add_page_display_str(ch, list_one_global(glb, show_details));
+						build_page_display_str(ch, list_one_global(glb, show_details));
 					}
 				}
 				break;
@@ -3087,7 +3087,7 @@ OLC_MODULE(olc_list) {
 				HASH_ITER(hh, mobile_table, mob, next_mob) {
 					if (GET_MOB_VNUM(mob) >= from_vnum && GET_MOB_VNUM(mob) <= to_vnum) {
 						++count;
-						add_page_display_str(ch, list_one_mobile(mob, show_details));
+						build_page_display_str(ch, list_one_mobile(mob, show_details));
 					}
 				}
 				break;
@@ -3098,7 +3098,7 @@ OLC_MODULE(olc_list) {
 				HASH_ITER(hh, morph_table, morph, next_morph) {
 					if (MORPH_VNUM(morph) >= from_vnum && MORPH_VNUM(morph) <= to_vnum) {
 						++count;
-						add_page_display_str(ch, list_one_morph(morph, show_details));
+						build_page_display_str(ch, list_one_morph(morph, show_details));
 					}
 				}
 				break;
@@ -3109,7 +3109,7 @@ OLC_MODULE(olc_list) {
 				HASH_ITER(hh, object_table, obj, next_obj) {
 					if (GET_OBJ_VNUM(obj) >= from_vnum && GET_OBJ_VNUM(obj) <= to_vnum) {
 						++count;
-						add_page_display_str(ch, list_one_object(obj, show_details));
+						build_page_display_str(ch, list_one_object(obj, show_details));
 					}
 				}
 				break;
@@ -3120,7 +3120,7 @@ OLC_MODULE(olc_list) {
 				HASH_ITER(hh, progress_table, prg, next_prg) {
 					if (PRG_VNUM(prg) >= from_vnum && PRG_VNUM(prg) <= to_vnum) {
 						++count;
-						add_page_display_str(ch, list_one_progress(prg, show_details));
+						build_page_display_str(ch, list_one_progress(prg, show_details));
 					}
 				}
 				break;
@@ -3131,7 +3131,7 @@ OLC_MODULE(olc_list) {
 				HASH_ITER(hh, quest_table, quest, next_quest) {
 					if (QUEST_VNUM(quest) >= from_vnum && QUEST_VNUM(quest) <= to_vnum) {
 						++count;
-						add_page_display_str(ch, list_one_quest(quest, show_details));
+						build_page_display_str(ch, list_one_quest(quest, show_details));
 					}
 				}
 				break;
@@ -3142,7 +3142,7 @@ OLC_MODULE(olc_list) {
 				HASH_ITER(hh, room_template_table, rmt, next_rmt) {
 					if (GET_RMT_VNUM(rmt) >= from_vnum && GET_RMT_VNUM(rmt) <= to_vnum) {
 						++count;
-						add_page_display_str(ch, list_one_room_template(rmt, show_details));
+						build_page_display_str(ch, list_one_room_template(rmt, show_details));
 					}
 				}
 				break;
@@ -3153,7 +3153,7 @@ OLC_MODULE(olc_list) {
 				HASH_ITER(hh, sector_table, sect, next_sect) {
 					if (GET_SECT_VNUM(sect) >= from_vnum && GET_SECT_VNUM(sect) <= to_vnum) {
 						++count;
-						add_page_display_str(ch, list_one_sector(sect, show_details));
+						build_page_display_str(ch, list_one_sector(sect, show_details));
 					}
 				}
 				break;
@@ -3164,7 +3164,7 @@ OLC_MODULE(olc_list) {
 				HASH_ITER(hh, shop_table, shop, next_shop) {
 					if (SHOP_VNUM(shop) >= from_vnum && SHOP_VNUM(shop) <= to_vnum) {
 						++count;
-						add_page_display_str(ch, list_one_shop(shop, show_details));
+						build_page_display_str(ch, list_one_shop(shop, show_details));
 					}
 				}
 				break;
@@ -3175,7 +3175,7 @@ OLC_MODULE(olc_list) {
 				HASH_ITER(hh, skill_table, skill, next_skill) {
 					if (SKILL_VNUM(skill) >= from_vnum && SKILL_VNUM(skill) <= to_vnum) {
 						++count;
-						add_page_display_str(ch, list_one_skill(skill, show_details));
+						build_page_display_str(ch, list_one_skill(skill, show_details));
 					}
 				}
 				break;
@@ -3186,7 +3186,7 @@ OLC_MODULE(olc_list) {
 				HASH_ITER(hh, social_table, soc, next_soc) {
 					if (SOC_VNUM(soc) >= from_vnum && SOC_VNUM(soc) <= to_vnum) {
 						++count;
-						add_page_display_str(ch, list_one_social(soc, show_details));
+						build_page_display_str(ch, list_one_social(soc, show_details));
 					}
 				}
 				break;
@@ -3197,7 +3197,7 @@ OLC_MODULE(olc_list) {
 				HASH_ITER(hh, trigger_table, trig, next_trig) {
 					if (GET_TRIG_VNUM(trig) >= from_vnum && GET_TRIG_VNUM(trig) <= to_vnum) {
 						++count;
-						add_page_display_str(ch, list_one_trigger(trig, show_details));
+						build_page_display_str(ch, list_one_trigger(trig, show_details));
 					}
 				}
 				break;
@@ -3208,7 +3208,7 @@ OLC_MODULE(olc_list) {
 				HASH_ITER(hh, vehicle_table, veh, next_veh) {
 					if (VEH_VNUM(veh) >= from_vnum && VEH_VNUM(veh) <= to_vnum) {
 						++count;
-						add_page_display_str(ch, list_one_vehicle(veh, show_details));
+						build_page_display_str(ch, list_one_vehicle(veh, show_details));
 					}
 				}
 				break;
@@ -3218,7 +3218,7 @@ OLC_MODULE(olc_list) {
 		sprintbit(type, olc_type_bits, buf2, FALSE);
 		if (count > 0) {
 			snprintf(buf1, sizeof(buf1), "Found %d %s%s:", count, buf2, (count != 1 ? "s" : ""));
-			prepend_page_display_str(ch, buf1);
+			build_page_display_prepend(ch, buf1);
 			send_page_display(ch);
 		}
 		else {
@@ -4560,10 +4560,10 @@ void show_evolution_display(char_data *ch, struct evolution_data *list, bool sen
 				break;
 			}
 		}
-		add_page_display(ch, " %d. %s%s %.2f%% becomes %s (%d)", ++count, evo_types[evo->type], lbuf, evo->percent, GET_SECT_NAME(sector_proto(evo->becomes)), evo->becomes);
+		build_page_display(ch, " %d. %s%s %.2f%% becomes %s (%d)", ++count, evo_types[evo->type], lbuf, evo->percent, GET_SECT_NAME(sector_proto(evo->becomes)), evo->becomes);
 	}
 	if (!list) {
-		add_page_display_str(ch, " none");
+		build_page_display_str(ch, " none");
 	}
 	
 	if (send_page) {
@@ -4584,10 +4584,10 @@ void show_extra_desc_display(char_data *ch, struct extra_descr_data *list, bool 
 	int count = 0;
 	
 	for (ex = list; ex; ex = ex->next) {
-		add_page_display(ch, " &y%d&0. %s\r\n%s", ++count, (ex->keyword ? ex->keyword : "(null)"), (ex->description ? ex->description : "(null)"));
+		build_page_display(ch, " &y%d&0. %s\r\n%s", ++count, (ex->keyword ? ex->keyword : "(null)"), (ex->description ? ex->description : "(null)"));
 	}
 	if (count == 0) {
-		add_page_display_str(ch, " none");
+		build_page_display_str(ch, " none");
 	}
 	
 	if (send_page) {
@@ -4608,7 +4608,7 @@ void show_icons_display(char_data *ch, struct icon_data *list, bool send_page) {
 	int count = 0;
 	
 	for (icon = list; icon; icon = icon->next) {
-		add_page_display_col(ch, 2, FALSE, " %2d. %s: %s", ++count, icon_types[icon->type], one_icon_display(icon->icon, icon->color));
+		build_page_display_col(ch, 2, FALSE, " %2d. %s: %s", ++count, icon_types[icon->type], one_icon_display(icon->icon, icon->color));
 	}
 	
 	if (send_page) {
@@ -4753,7 +4753,7 @@ void show_interaction_display(char_data *ch, struct interaction_item *list, bool
 			snprintf(quant, sizeof(quant), "%dx", interact->quantity);
 		}
 		
-		pd = add_page_display(ch, "%2d. %s: %s %s (%d) %.2f%%", ++count, interact_types[interact->type], quant, get_interaction_target(interact->type, interact->vnum), interact->vnum, interact->percent);
+		pd = build_page_display(ch, "%2d. %s: %s %s (%d) %.2f%%", ++count, interact_types[interact->type], quant, get_interaction_target(interact->type, interact->vnum), interact->vnum, interact->percent);
 		if (isalpha(interact->exclusion_code)) {
 			append_page_display_line(pd, " (%c)", interact->exclusion_code);
 		}
@@ -4763,7 +4763,7 @@ void show_interaction_display(char_data *ch, struct interaction_item *list, bool
 	}
 	
 	if (count == 0) {
-		add_page_display_str(ch, " none");
+		build_page_display_str(ch, " none");
 	}
 	
 	if (send_page) {
@@ -4792,11 +4792,11 @@ void show_requirement_display(char_data *ch, struct req_data *list, bool send_pa
 			*part = '\0';
 		}
 		
-		add_page_display(ch, "%2d. %s: %s%s", ++count, requirement_types[req->type], requirement_string(req, TRUE, FALSE), part);
+		build_page_display(ch, "%2d. %s: %s%s", ++count, requirement_types[req->type], requirement_string(req, TRUE, FALSE), part);
 	}
 	
 	if (!list) {
-		add_page_display_str(ch, " none");
+		build_page_display_str(ch, " none");
 	}
 	
 	if (send_page) {
@@ -4872,14 +4872,14 @@ void show_resource_display(char_data *ch, struct resource_data *list, bool send_
 		
 		// append
 		if (vnum) {
-			add_page_display_col(ch, 2, FALSE, " &y%2d&0. [%5d] %s", num, res->vnum, line);
+			build_page_display_col(ch, 2, FALSE, " &y%2d&0. [%5d] %s", num, res->vnum, line);
 		}
 		else {
-			add_page_display_col(ch, 2, FALSE, " &y%2d&0. %s", num, line);
+			build_page_display_col(ch, 2, FALSE, " &y%2d&0. %s", num, line);
 		}
 	}
 	if (!list) {
-		add_page_display_str(ch, "  none");
+		build_page_display_str(ch, "  none");
 	}
 	
 	if (send_page) {
@@ -4900,11 +4900,11 @@ void show_script_display(char_data *ch, struct trig_proto_list *list, bool send_
 	int count = 0;
 	
 	for (iter = list; iter; iter = iter->next) {
-		add_page_display(ch, "%2d. [%5d] %s", ++count, iter->vnum, get_trigger_name_by_proto(iter->vnum));
+		build_page_display(ch, "%2d. [%5d] %s", ++count, iter->vnum, get_trigger_name_by_proto(iter->vnum));
 	}
 	
 	if (count == 0) {
-		add_page_display_str(ch, " none");
+		build_page_display_str(ch, " none");
 	}
 	
 	if (send_page) {
@@ -8679,7 +8679,7 @@ void olc_process_spawns(char_data *ch, char *argument, struct spawn_info **list)
 		count = 0;
 		for (spawn = *list; spawn; spawn = spawn->next) {
 			sprintbit(spawn->flags, spawn_flags, buf1, TRUE);
-			add_page_display(ch, " %d. %s (%d) %.2f%% %s\r\n", ++count, skip_filler(get_mob_name_by_proto(spawn->vnum, FALSE)), spawn->vnum, spawn->percent, buf1);
+			build_page_display(ch, " %d. %s (%d) %.2f%% %s\r\n", ++count, skip_filler(get_mob_name_by_proto(spawn->vnum, FALSE)), spawn->vnum, spawn->percent, buf1);
 		}
 		
 		send_page_display(ch);

@@ -462,7 +462,7 @@ void olc_fullsearch_room_template(char_data *ch, char *argument) {
 		skip_spaces(&argument);
 	}
 	
-	add_page_display(ch, "Room template fullsearch: %s", show_color_codes(find_keywords));
+	build_page_display(ch, "Room template fullsearch: %s", show_color_codes(find_keywords));
 	count = 0;
 	
 	// okay now look up templates
@@ -500,15 +500,15 @@ void olc_fullsearch_room_template(char_data *ch, char *argument) {
 		}
 		
 		// show it
-		add_page_display(ch, "[%5d] %s", GET_RMT_VNUM(rmt), GET_RMT_TITLE(rmt));
+		build_page_display(ch, "[%5d] %s", GET_RMT_VNUM(rmt), GET_RMT_TITLE(rmt));
 		++count;
 	}
 	
 	if (count > 0) {
-		add_page_display(ch, "(%d templates)", count);
+		build_page_display(ch, "(%d templates)", count);
 	}
 	else {
-		add_page_display_str(ch, " none");
+		build_page_display_str(ch, " none");
 	}
 	
 	send_page_display(ch);
@@ -538,13 +538,13 @@ void olc_search_room_template(char_data *ch, rmt_vnum vnum) {
 	}
 	
 	found = 0;
-	add_page_display(ch, "Occurrences of room template %d (%s):", vnum, GET_RMT_TITLE(rmt));
+	build_page_display(ch, "Occurrences of room template %d (%s):", vnum, GET_RMT_TITLE(rmt));
 	
 	// objects
 	HASH_ITER(hh, object_table, obj, next_obj) {
 		if (IS_PORTAL(obj) && GET_PORTAL_TARGET_VNUM(obj) == vnum) {
 			++found;
-			add_page_display(ch, "OBJ [%5d] %s", GET_OBJ_VNUM(obj), GET_OBJ_SHORT_DESC(obj));
+			build_page_display(ch, "OBJ [%5d] %s", GET_OBJ_VNUM(obj), GET_OBJ_SHORT_DESC(obj));
 		}
 	}
 	
@@ -555,7 +555,7 @@ void olc_search_room_template(char_data *ch, rmt_vnum vnum) {
 		
 		if (any) {
 			++found;
-			add_page_display(ch, "PRG [%5d] %s", PRG_VNUM(prg), PRG_NAME(prg));
+			build_page_display(ch, "PRG [%5d] %s", PRG_VNUM(prg), PRG_NAME(prg));
 		}
 	}
 	
@@ -568,7 +568,7 @@ void olc_search_room_template(char_data *ch, rmt_vnum vnum) {
 		
 		if (any) {
 			++found;
-			add_page_display(ch, "QST [%5d] %s", QUEST_VNUM(quest), QUEST_NAME(quest));
+			build_page_display(ch, "QST [%5d] %s", QUEST_VNUM(quest), QUEST_NAME(quest));
 		}
 	}
 	
@@ -578,7 +578,7 @@ void olc_search_room_template(char_data *ch, rmt_vnum vnum) {
 		
 		if (any) {
 			++found;
-			add_page_display(ch, "SHOP [%5d] %s", SHOP_VNUM(shop), SHOP_NAME(shop));
+			build_page_display(ch, "SHOP [%5d] %s", SHOP_VNUM(shop), SHOP_NAME(shop));
 		}
 	}
 
@@ -589,7 +589,7 @@ void olc_search_room_template(char_data *ch, rmt_vnum vnum) {
 			if (ex->target_room == vnum) {
 				any = TRUE;
 				++found;
-				add_page_display(ch, "RMT [%5d] %s", GET_RMT_VNUM(iter), GET_RMT_TITLE(iter));
+				build_page_display(ch, "RMT [%5d] %s", GET_RMT_VNUM(iter), GET_RMT_TITLE(iter));
 			}
 		}
 	}
@@ -600,15 +600,15 @@ void olc_search_room_template(char_data *ch, rmt_vnum vnum) {
 		
 		if (any) {
 			++found;
-			add_page_display(ch, "SOC [%5d] %s", SOC_VNUM(soc), SOC_NAME(soc));
+			build_page_display(ch, "SOC [%5d] %s", SOC_VNUM(soc), SOC_NAME(soc));
 		}
 	}
 	
 	if (found > 0) {
-		add_page_display(ch, "%d location%s shown", found, PLURAL(found));
+		build_page_display(ch, "%d location%s shown", found, PLURAL(found));
 	}
 	else {
-		add_page_display_str(ch, " none");
+		build_page_display_str(ch, " none");
 	}
 	
 	send_page_display(ch);
@@ -838,11 +838,11 @@ void show_exit_template_display(char_data *ch, struct exit_template *list, bool 
 			strcpy(lbuf2, "UNKNOWN");
 		}
 		
-		add_page_display(ch, "%2d. %s: [%d] %s%s%s", ++count, dirs[ex->dir], ex->target_room, lbuf2, lbuf1, lbuf);
+		build_page_display(ch, "%2d. %s: [%d] %s%s%s", ++count, dirs[ex->dir], ex->target_room, lbuf2, lbuf1, lbuf);
 	}
 	
 	if (count == 0) {
-		add_page_display_str(ch, " none");
+		build_page_display_str(ch, " none");
 	}
 	
 	if (send_page) {
@@ -894,11 +894,11 @@ void show_template_spawns_display(char_data *ch, struct adventure_spawn *list, b
 	
 	for (spawn = list; spawn; spawn = spawn->next) {
 		get_spawn_template_name(spawn, lbuf);	
-		add_page_display(ch, "%2d. [%s] %d %s (%.2f%%, limit %d)", ++count, adventure_spawn_types[spawn->type], spawn->vnum, lbuf, spawn->percent, spawn->limit);
+		build_page_display(ch, "%2d. [%s] %d %s (%.2f%%, limit %d)", ++count, adventure_spawn_types[spawn->type], spawn->vnum, lbuf, spawn->percent, spawn->limit);
 	}
 	
 	if (count == 0) {
-		add_page_display(ch, " none");
+		build_page_display(ch, " none");
 	}
 	
 	if (send_page) {
@@ -923,10 +923,10 @@ void olc_show_room_template(char_data *ch) {
 		return;
 	}
 	
-	add_page_display(ch, "[%s%d\t0] %s%s\t0", OLC_LABEL_CHANGED, GET_OLC_VNUM(ch->desc), OLC_LABEL_UNCHANGED, !room_template_proto(GET_RMT_VNUM(rmt)) ? "new room template" : GET_RMT_TITLE(room_template_proto(GET_RMT_VNUM(rmt))));
-	add_page_display(ch, "Adventure: %d %s%s\t0", adv ? GET_ADV_VNUM(adv) : NOTHING, OLC_LABEL_CHANGED, adv ? GET_ADV_NAME(adv) : "none");
-	add_page_display(ch, "<%stitle\t0> %s", OLC_LABEL_STR(GET_RMT_TITLE(rmt), default_rmt_title), NULLSAFE(GET_RMT_TITLE(rmt)));
-	add_page_display(ch, "<%sdescription\t0>\r\n%s", OLC_LABEL_STR(GET_RMT_DESC(rmt), ""), NULLSAFE(GET_RMT_DESC(rmt)));
+	build_page_display(ch, "[%s%d\t0] %s%s\t0", OLC_LABEL_CHANGED, GET_OLC_VNUM(ch->desc), OLC_LABEL_UNCHANGED, !room_template_proto(GET_RMT_VNUM(rmt)) ? "new room template" : GET_RMT_TITLE(room_template_proto(GET_RMT_VNUM(rmt))));
+	build_page_display(ch, "Adventure: %d %s%s\t0", adv ? GET_ADV_VNUM(adv) : NOTHING, OLC_LABEL_CHANGED, adv ? GET_ADV_NAME(adv) : "none");
+	build_page_display(ch, "<%stitle\t0> %s", OLC_LABEL_STR(GET_RMT_TITLE(rmt), default_rmt_title), NULLSAFE(GET_RMT_TITLE(rmt)));
+	build_page_display(ch, "<%sdescription\t0>\r\n%s", OLC_LABEL_STR(GET_RMT_DESC(rmt), ""), NULLSAFE(GET_RMT_DESC(rmt)));
 	
 	if (GET_RMT_SUBZONE(rmt) != NOWHERE) {
 		snprintf(lbuf, sizeof(lbuf), "%d", GET_RMT_SUBZONE(rmt));
@@ -934,44 +934,44 @@ void olc_show_room_template(char_data *ch) {
 	else {
 		strcpy(lbuf, "none");
 	}
-	add_page_display(ch, "<%ssubzone\t0> %s", OLC_LABEL_VAL(GET_RMT_SUBZONE(rmt), NOWHERE), lbuf);
+	build_page_display(ch, "<%ssubzone\t0> %s", OLC_LABEL_VAL(GET_RMT_SUBZONE(rmt), NOWHERE), lbuf);
 	
 	sprintbit(GET_RMT_FLAGS(rmt), room_template_flags, lbuf, TRUE);
-	add_page_display(ch, "<%sflags\t0> %s", OLC_LABEL_VAL(GET_RMT_FLAGS(rmt), NOBITS), lbuf);
+	build_page_display(ch, "<%sflags\t0> %s", OLC_LABEL_VAL(GET_RMT_FLAGS(rmt), NOBITS), lbuf);
 	
 	sprintbit(GET_RMT_FUNCTIONS(rmt), function_flags, lbuf, TRUE);
-	add_page_display(ch, "<%sfunctions\t0> %s", OLC_LABEL_VAL(GET_RMT_FUNCTIONS(rmt), NOBITS), lbuf);
+	build_page_display(ch, "<%sfunctions\t0> %s", OLC_LABEL_VAL(GET_RMT_FUNCTIONS(rmt), NOBITS), lbuf);
 	
 	sprintbit(GET_RMT_BASE_AFFECTS(rmt), room_aff_bits, lbuf, TRUE);
-	add_page_display(ch, "<%saffects\t0> %s", OLC_LABEL_VAL(GET_RMT_BASE_AFFECTS(rmt), NOBITS), lbuf);
+	build_page_display(ch, "<%saffects\t0> %s", OLC_LABEL_VAL(GET_RMT_BASE_AFFECTS(rmt), NOBITS), lbuf);
 	
-	add_page_display(ch, "<%stemperature\t0> %s", OLC_LABEL_VAL(GET_RMT_TEMPERATURE_TYPE(rmt), 0), temperature_types[GET_RMT_TEMPERATURE_TYPE(rmt)]);
+	build_page_display(ch, "<%stemperature\t0> %s", OLC_LABEL_VAL(GET_RMT_TEMPERATURE_TYPE(rmt), 0), temperature_types[GET_RMT_TEMPERATURE_TYPE(rmt)]);
 	
 	// exits
-	add_page_display(ch, "Exits: <%sexit\t0>, <%smatchexits\t0>", OLC_LABEL_PTR(GET_RMT_EXITS(rmt)), OLC_LABEL_PTR(GET_RMT_EXITS(rmt)));
+	build_page_display(ch, "Exits: <%sexit\t0>, <%smatchexits\t0>", OLC_LABEL_PTR(GET_RMT_EXITS(rmt)), OLC_LABEL_PTR(GET_RMT_EXITS(rmt)));
 	if (GET_RMT_EXITS(rmt)) {
 		show_exit_template_display(ch, GET_RMT_EXITS(rmt), FALSE);
 	}
 	
 	// exdesc
-	add_page_display(ch, "Extra descriptions: <%sextra\t0>", OLC_LABEL_PTR(GET_RMT_EX_DESCS(rmt)));
+	build_page_display(ch, "Extra descriptions: <%sextra\t0>", OLC_LABEL_PTR(GET_RMT_EX_DESCS(rmt)));
 	if (GET_RMT_EX_DESCS(rmt)) {
 		show_extra_desc_display(ch, GET_RMT_EX_DESCS(rmt), FALSE);
 	}
 	
-	add_page_display(ch, "Interactions: <%sinteraction\t0>", OLC_LABEL_PTR(GET_RMT_INTERACTIONS(rmt)));
+	build_page_display(ch, "Interactions: <%sinteraction\t0>", OLC_LABEL_PTR(GET_RMT_INTERACTIONS(rmt)));
 	if (GET_RMT_INTERACTIONS(rmt)) {
 		show_interaction_display(ch, GET_RMT_INTERACTIONS(rmt), FALSE);
 	}
 	
 	// spawns
-	add_page_display(ch, "Spawns: <%sspawns\t0>", OLC_LABEL_PTR(GET_RMT_SPAWNS(rmt)));
+	build_page_display(ch, "Spawns: <%sspawns\t0>", OLC_LABEL_PTR(GET_RMT_SPAWNS(rmt)));
 	if (GET_RMT_SPAWNS(rmt)) {
 		show_template_spawns_display(ch, GET_RMT_SPAWNS(rmt), FALSE);
 	}
 	
 	// scripts
-	add_page_display(ch, "Scripts: <%sscript\t0>", OLC_LABEL_PTR(GET_RMT_SCRIPTS(rmt)));
+	build_page_display(ch, "Scripts: <%sscript\t0>", OLC_LABEL_PTR(GET_RMT_SCRIPTS(rmt)));
 	if (GET_RMT_SCRIPTS(rmt)) {
 		show_script_display(ch, GET_RMT_SCRIPTS(rmt), FALSE);
 	}

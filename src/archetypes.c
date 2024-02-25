@@ -725,7 +725,7 @@ void olc_search_archetype(char_data *ch, any_vnum vnum) {
 	}
 	
 	found = 0;
-	add_page_display(ch, "Occurrences of archetype %d (%s):", vnum, GET_ARCH_NAME(arch));
+	build_page_display(ch, "Occurrences of archetype %d (%s):", vnum, GET_ARCH_NAME(arch));
 	
 	// check quests
 	HASH_ITER(hh, quest_table, qiter, next_qiter) {
@@ -734,15 +734,15 @@ void olc_search_archetype(char_data *ch, any_vnum vnum) {
 		
 		if (any) {
 			++found;
-			add_page_display(ch, "QST [%5d] %s", QUEST_VNUM(qiter), QUEST_NAME(qiter));
+			build_page_display(ch, "QST [%5d] %s", QUEST_VNUM(qiter), QUEST_NAME(qiter));
 		}
 	}
 	
 	if (found > 0) {
-		add_page_display(ch, "%d location%s shown", found, PLURAL(found));
+		build_page_display(ch, "%d location%s shown", found, PLURAL(found));
 	}
 	else {
-		add_page_display_str(ch, " none");
+		build_page_display_str(ch, " none");
 	}
 	
 	send_page_display(ch);
@@ -1798,27 +1798,27 @@ void do_stat_archetype(char_data *ch, archetype_data *arch) {
 	}
 	
 	// first line
-	add_page_display(ch, "VNum: [\tc%d\t0], Type: \ty%s\t0, Name: \tc%s\t0", GET_ARCH_VNUM(arch), archetype_types[GET_ARCH_TYPE(arch)], GET_ARCH_NAME(arch));
-	add_page_display(ch, "Ranks: [\ta%s\t0/\tp%s\t0]", GET_ARCH_MALE_RANK(arch), GET_ARCH_FEMALE_RANK(arch));
+	build_page_display(ch, "VNum: [\tc%d\t0], Type: \ty%s\t0, Name: \tc%s\t0", GET_ARCH_VNUM(arch), archetype_types[GET_ARCH_TYPE(arch)], GET_ARCH_NAME(arch));
+	build_page_display(ch, "Ranks: [\ta%s\t0/\tp%s\t0]", GET_ARCH_MALE_RANK(arch), GET_ARCH_FEMALE_RANK(arch));
 	
-	add_page_display(ch, "Description: %s", GET_ARCH_DESC(arch));
+	build_page_display(ch, "Description: %s", GET_ARCH_DESC(arch));
 	
 	if (GET_ARCH_LORE(arch) && *GET_ARCH_LORE(arch)) {
-		add_page_display(ch, "Lore: \tc%s\t0 [on Month Day, Year.]", GET_ARCH_LORE(arch));
+		build_page_display(ch, "Lore: \tc%s\t0 [on Month Day, Year.]", GET_ARCH_LORE(arch));
 	}
 	else {
-		add_page_display(ch, "Lore: \tcnone\t0");
+		build_page_display(ch, "Lore: \tcnone\t0");
 	}
 	
 	if (GET_ARCH_LANGUAGE(arch)) {
-		add_page_display(ch, "Language: [\ty%d\t0] \ty%s\t0", GEN_VNUM(GET_ARCH_LANGUAGE(arch)), GEN_NAME(GET_ARCH_LANGUAGE(arch)));
+		build_page_display(ch, "Language: [\ty%d\t0] \ty%s\t0", GEN_VNUM(GET_ARCH_LANGUAGE(arch)), GEN_NAME(GET_ARCH_LANGUAGE(arch)));
 	}
 	else {
-		add_page_display(ch, "Language: \tynone\t0");
+		build_page_display(ch, "Language: \tynone\t0");
 	}
 	
 	sprintbit(GET_ARCH_FLAGS(arch), archetype_flags, part, TRUE);
-	add_page_display(ch, "Flags: \tg%s\t0", part);
+	build_page_display(ch, "Flags: \tg%s\t0", part);
 		
 	// attributes
 	for (iter = 0, total = 0, *line = '\0'; iter < NUM_ATTRIBUTES; ++iter) {
@@ -1827,20 +1827,20 @@ void do_stat_archetype(char_data *ch, archetype_data *arch) {
 		snprintf(part, sizeof(part), "%s  [\tg%2d\t0]", attributes[pos].name, GET_ARCH_ATTRIBUTE(arch, pos));
 		snprintf(line + strlen(line), sizeof(line) - strlen(line), "  %-27.27s%s", part, !((iter + 1) % 3) ? "\r\n" : "");
 	}
-	add_page_display(ch, "Attributes: [\tc%d total attributes\t0]\r\n%s", total, line);
+	build_page_display(ch, "Attributes: [\tc%d total attributes\t0]\r\n%s", total, line);
 	
 	// skills
 	total = 0;
 	for (sk = GET_ARCH_SKILLS(arch); sk; sk = sk->next) {
 		total += sk->level;
 	}
-	add_page_display(ch, "Skills: [\tc%d total skill points\t0]", total);
+	build_page_display(ch, "Skills: [\tc%d total skill points\t0]", total);
 	for (sk = GET_ARCH_SKILLS(arch); sk; sk = sk->next) {
-		add_page_display(ch, "  %s: \tg%d\t0", get_skill_name_by_vnum(sk->skill), sk->level);
+		build_page_display(ch, "  %s: \tg%d\t0", get_skill_name_by_vnum(sk->skill), sk->level);
 	}
 	
 	// gear
-	add_page_display_str(ch, "Gear:");
+	build_page_display_str(ch, "Gear:");
 	show_archetype_gear_display(ch, GET_ARCH_GEAR(arch), FALSE);
 	
 	send_page_display(ch);
@@ -1859,10 +1859,10 @@ void show_archetype_gear_display(char_data *ch, struct archetype_gear *list, boo
 	int num;
 	
 	for (gear = list, num = 1; gear; gear = gear->next, ++num) {
-		add_page_display(ch, " %2d. %s: [%d] %s\r\n", num, gear->wear == NO_WEAR ? "inventory" : wear_data[gear->wear].name, gear->vnum, get_obj_name_by_proto(gear->vnum));
+		build_page_display(ch, " %2d. %s: [%d] %s\r\n", num, gear->wear == NO_WEAR ? "inventory" : wear_data[gear->wear].name, gear->vnum, get_obj_name_by_proto(gear->vnum));
 	}
 	if (!list) {
-		add_page_display_str(ch, "  none");
+		build_page_display_str(ch, "  none");
 	}
 	
 	if (send_page) {
@@ -1887,29 +1887,29 @@ void olc_show_archetype(char_data *ch) {
 		return;
 	}
 	
-	add_page_display(ch, "[%s%d\t0] %s%s\t0", OLC_LABEL_CHANGED, GET_OLC_VNUM(ch->desc), OLC_LABEL_UNCHANGED, !archetype_proto(GET_ARCH_VNUM(arch)) ? "new archetype" : GET_ARCH_NAME(archetype_proto(GET_ARCH_VNUM(arch))));
-	add_page_display(ch, "<%stype\t0> %s", OLC_LABEL_VAL(GET_ARCH_TYPE(arch), 0), archetype_types[GET_ARCH_TYPE(arch)]);
-	add_page_display(ch, "<%sname\t0> %s", OLC_LABEL_STR(GET_ARCH_NAME(arch), default_archetype_name), NULLSAFE(GET_ARCH_NAME(arch)));
-	add_page_display(ch, "<%sdescription\t0> %s", OLC_LABEL_STR(GET_ARCH_DESC(arch), default_archetype_desc), NULLSAFE(GET_ARCH_DESC(arch)));
-	add_page_display(ch, "<%slore\t0> %s [on Month Day, Year.]", OLC_LABEL_STR(GET_ARCH_LORE(arch), ""), (GET_ARCH_LORE(arch) && *GET_ARCH_LORE(arch)) ? GET_ARCH_LORE(arch) : "none");
+	build_page_display(ch, "[%s%d\t0] %s%s\t0", OLC_LABEL_CHANGED, GET_OLC_VNUM(ch->desc), OLC_LABEL_UNCHANGED, !archetype_proto(GET_ARCH_VNUM(arch)) ? "new archetype" : GET_ARCH_NAME(archetype_proto(GET_ARCH_VNUM(arch))));
+	build_page_display(ch, "<%stype\t0> %s", OLC_LABEL_VAL(GET_ARCH_TYPE(arch), 0), archetype_types[GET_ARCH_TYPE(arch)]);
+	build_page_display(ch, "<%sname\t0> %s", OLC_LABEL_STR(GET_ARCH_NAME(arch), default_archetype_name), NULLSAFE(GET_ARCH_NAME(arch)));
+	build_page_display(ch, "<%sdescription\t0> %s", OLC_LABEL_STR(GET_ARCH_DESC(arch), default_archetype_desc), NULLSAFE(GET_ARCH_DESC(arch)));
+	build_page_display(ch, "<%slore\t0> %s [on Month Day, Year.]", OLC_LABEL_STR(GET_ARCH_LORE(arch), ""), (GET_ARCH_LORE(arch) && *GET_ARCH_LORE(arch)) ? GET_ARCH_LORE(arch) : "none");
 	
-	add_page_display(ch, "<%slanguage\t0> [%d] %s", OLC_LABEL_PTR(GET_ARCH_LANGUAGE(arch)), GET_ARCH_LANGUAGE(arch) ? GEN_VNUM(GET_ARCH_LANGUAGE(arch)) : NOTHING, GET_ARCH_LANGUAGE(arch) ? GEN_NAME(GET_ARCH_LANGUAGE(arch)) : "none");
+	build_page_display(ch, "<%slanguage\t0> [%d] %s", OLC_LABEL_PTR(GET_ARCH_LANGUAGE(arch)), GET_ARCH_LANGUAGE(arch) ? GEN_VNUM(GET_ARCH_LANGUAGE(arch)) : NOTHING, GET_ARCH_LANGUAGE(arch) ? GEN_NAME(GET_ARCH_LANGUAGE(arch)) : "none");
 	
 	sprintbit(GET_ARCH_FLAGS(arch), archetype_flags, lbuf, TRUE);
-	add_page_display(ch, "<%sflags\t0> %s", OLC_LABEL_VAL(GET_ARCH_FLAGS(arch), ARCH_IN_DEVELOPMENT), lbuf);
+	build_page_display(ch, "<%sflags\t0> %s", OLC_LABEL_VAL(GET_ARCH_FLAGS(arch), ARCH_IN_DEVELOPMENT), lbuf);
 	
-	add_page_display(ch, "<%smalerank\t0> %s", OLC_LABEL_STR(GET_ARCH_MALE_RANK(arch), default_archetype_rank), NULLSAFE(GET_ARCH_MALE_RANK(arch)));
-	add_page_display(ch, "<%sfemalerank\t0> %s", OLC_LABEL_STR(GET_ARCH_FEMALE_RANK(arch), default_archetype_rank), NULLSAFE(GET_ARCH_FEMALE_RANK(arch)));
+	build_page_display(ch, "<%smalerank\t0> %s", OLC_LABEL_STR(GET_ARCH_MALE_RANK(arch), default_archetype_rank), NULLSAFE(GET_ARCH_MALE_RANK(arch)));
+	build_page_display(ch, "<%sfemalerank\t0> %s", OLC_LABEL_STR(GET_ARCH_FEMALE_RANK(arch), default_archetype_rank), NULLSAFE(GET_ARCH_FEMALE_RANK(arch)));
 	
 	// attributes
 	total = 0;
 	for (iter = 0; iter < NUM_ATTRIBUTES; ++iter) {
 		total += GET_ARCH_ATTRIBUTE(arch, iter);
 	}
-	add_page_display(ch, "Attributes: <%sattribute\t0> (%d total attributes)", OLC_LABEL_UNCHANGED, total);
+	build_page_display(ch, "Attributes: <%sattribute\t0> (%d total attributes)", OLC_LABEL_UNCHANGED, total);
 	for (iter = 0; iter < NUM_ATTRIBUTES; ++iter) {
 		pos = attribute_display_order[iter];
-		add_page_display_col(ch, 3, TRUE, "  %s%s\t0  [%2d]", OLC_LABEL_VAL(GET_ARCH_ATTRIBUTE(arch, pos), 0), attributes[pos].name, GET_ARCH_ATTRIBUTE(arch, pos));
+		build_page_display_col(ch, 3, TRUE, "  %s%s\t0  [%2d]", OLC_LABEL_VAL(GET_ARCH_ATTRIBUTE(arch, pos), 0), attributes[pos].name, GET_ARCH_ATTRIBUTE(arch, pos));
 	}
 	
 	// skills
@@ -1917,13 +1917,13 @@ void olc_show_archetype(char_data *ch) {
 	for (sk = GET_ARCH_SKILLS(arch); sk; sk = sk->next) {
 		total += sk->level;
 	}
-	add_page_display(ch, "Starting skills: <%sstartingskill\t0> (%d total skill points)", OLC_LABEL_PTR(GET_ARCH_SKILLS(arch)), total);
+	build_page_display(ch, "Starting skills: <%sstartingskill\t0> (%d total skill points)", OLC_LABEL_PTR(GET_ARCH_SKILLS(arch)), total);
 	for (sk = GET_ARCH_SKILLS(arch); sk; sk = sk->next) {
-		add_page_display(ch, "  %s: %d", get_skill_name_by_vnum(sk->skill), sk->level);
+		build_page_display(ch, "  %s: %d", get_skill_name_by_vnum(sk->skill), sk->level);
 	}
 	
 	// gear
-	add_page_display(ch, "Gear: <%sgear\t0>", OLC_LABEL_PTR(GET_ARCH_GEAR(arch)));
+	build_page_display(ch, "Gear: <%sgear\t0>", OLC_LABEL_PTR(GET_ARCH_GEAR(arch)));
 	if (GET_ARCH_GEAR(arch)) {
 		show_archetype_gear_display(ch, GET_ARCH_GEAR(arch), FALSE);
 	}
@@ -1946,7 +1946,7 @@ int vnum_archetype(char *searchname, char_data *ch) {
 	HASH_ITER(hh, archetype_table, iter, next_iter) {
 		if (multi_isname(searchname, GET_ARCH_NAME(iter)) || multi_isname(searchname, GET_ARCH_MALE_RANK(iter)) || multi_isname(searchname, GET_ARCH_FEMALE_RANK(iter)) || multi_isname(searchname, GET_ARCH_DESC(iter))) {
 			// TODO show skills/attrs?
-			add_page_display(ch, "%3d. [%5d] %s", ++found, GET_ARCH_VNUM(iter), GET_ARCH_NAME(iter));
+			build_page_display(ch, "%3d. [%5d] %s", ++found, GET_ARCH_VNUM(iter), GET_ARCH_NAME(iter));
 		}
 	}
 	

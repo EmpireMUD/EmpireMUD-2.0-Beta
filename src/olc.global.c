@@ -273,15 +273,15 @@ void olc_search_global(char_data *ch, any_vnum vnum) {
 	}
 	
 	found = 0;
-	add_page_display(ch, "Occurrences of global %d (%s):", vnum, GET_GLOBAL_NAME(glb));
+	build_page_display(ch, "Occurrences of global %d (%s):", vnum, GET_GLOBAL_NAME(glb));
 	
 	// globals are not actually used anywhere else
 	
 	if (found > 0) {
-		add_page_display(ch, "%d location%s shown", found, PLURAL(found));
+		build_page_display(ch, "%d location%s shown", found, PLURAL(found));
 	}
 	else {
-		add_page_display(ch, " none");
+		build_page_display(ch, " none");
 	}
 	
 	send_page_display(ch);
@@ -405,27 +405,27 @@ void olc_show_global(char_data *ch) {
 		return;
 	}
 	
-	add_page_display(ch, "[%s%d\t0] %s%s\t0", OLC_LABEL_CHANGED, GET_OLC_VNUM(ch->desc), OLC_LABEL_UNCHANGED, !global_proto(GET_GLOBAL_VNUM(glb)) ? "new global" : GET_GLOBAL_NAME(global_proto(GET_GLOBAL_VNUM(glb))));
-	add_page_display(ch, "<%sname\t0> %s", OLC_LABEL_STR(GET_GLOBAL_NAME(glb), default_glb_name), NULLSAFE(GET_GLOBAL_NAME(glb)));
+	build_page_display(ch, "[%s%d\t0] %s%s\t0", OLC_LABEL_CHANGED, GET_OLC_VNUM(ch->desc), OLC_LABEL_UNCHANGED, !global_proto(GET_GLOBAL_VNUM(glb)) ? "new global" : GET_GLOBAL_NAME(global_proto(GET_GLOBAL_VNUM(glb))));
+	build_page_display(ch, "<%sname\t0> %s", OLC_LABEL_STR(GET_GLOBAL_NAME(glb), default_glb_name), NULLSAFE(GET_GLOBAL_NAME(glb)));
 	
-	add_page_display(ch, "<%stype\t0> %s", OLC_LABEL_VAL(GET_GLOBAL_TYPE(glb), 0), global_types[GET_GLOBAL_TYPE(glb)]);
+	build_page_display(ch, "<%stype\t0> %s", OLC_LABEL_VAL(GET_GLOBAL_TYPE(glb), 0), global_types[GET_GLOBAL_TYPE(glb)]);
 
 	sprintbit(GET_GLOBAL_FLAGS(glb), global_flags, lbuf, TRUE);
-	add_page_display(ch, "<%sflags\t0> %s", OLC_LABEL_VAL(GET_GLOBAL_FLAGS(glb), GLB_FLAG_IN_DEVELOPMENT), lbuf);
+	build_page_display(ch, "<%sflags\t0> %s", OLC_LABEL_VAL(GET_GLOBAL_FLAGS(glb), GLB_FLAG_IN_DEVELOPMENT), lbuf);
 	
 	if (GET_GLOBAL_TYPE(glb) != GLOBAL_NEWBIE_GEAR && GET_GLOBAL_TYPE(glb) != GLOBAL_MAP_SPAWNS) {
 		if (GET_GLOBAL_MIN_LEVEL(glb) == 0) {
-			add_page_display(ch, "<%sminlevel\t0> none", OLC_LABEL_UNCHANGED);
+			build_page_display(ch, "<%sminlevel\t0> none", OLC_LABEL_UNCHANGED);
 		}
 		else {
-			add_page_display(ch, "<%sminlevel\t0> %d", OLC_LABEL_CHANGED, GET_GLOBAL_MIN_LEVEL(glb));
+			build_page_display(ch, "<%sminlevel\t0> %d", OLC_LABEL_CHANGED, GET_GLOBAL_MIN_LEVEL(glb));
 		}
 	
 		if (GET_GLOBAL_MAX_LEVEL(glb) == 0) {
-			add_page_display(ch, "<%smaxlevel\t0> none", OLC_LABEL_UNCHANGED);
+			build_page_display(ch, "<%smaxlevel\t0> none", OLC_LABEL_UNCHANGED);
 		}
 		else {
-			add_page_display(ch, "<%smaxlevel\t0> %d", OLC_LABEL_CHANGED, GET_GLOBAL_MAX_LEVEL(glb));
+			build_page_display(ch, "<%smaxlevel\t0> %d", OLC_LABEL_CHANGED, GET_GLOBAL_MAX_LEVEL(glb));
 		}
 	
 		// ability required
@@ -438,20 +438,20 @@ void olc_show_global(char_data *ch) {
 				sprintf(lbuf + strlen(lbuf), " (%s %d)", SKILL_NAME(ABIL_ASSIGNED_SKILL(abil)), ABIL_SKILL_LEVEL(abil));
 			}
 		}
-		add_page_display(ch, "<%srequiresability\t0> %s", OLC_LABEL_PTR(abil), lbuf);
+		build_page_display(ch, "<%srequiresability\t0> %s", OLC_LABEL_PTR(abil), lbuf);
 	}
 	
-	add_page_display(ch, "<%spercent\t0> %.2f%%", OLC_LABEL_VAL(GET_GLOBAL_PERCENT(glb), 100.0), GET_GLOBAL_PERCENT(glb));
+	build_page_display(ch, "<%spercent\t0> %.2f%%", OLC_LABEL_VAL(GET_GLOBAL_PERCENT(glb), 100.0), GET_GLOBAL_PERCENT(glb));
 	
 	// GLOBAL_x: type-based data
 	switch (GET_GLOBAL_TYPE(glb)) {
 		case GLOBAL_MOB_INTERACTIONS: {
 			sprintbit(GET_GLOBAL_TYPE_FLAGS(glb), action_bits, lbuf, TRUE);
-			add_page_display(ch, "<%smobflags\t0> %s", OLC_LABEL_VAL(GET_GLOBAL_TYPE_FLAGS(glb), NOBITS), lbuf);
+			build_page_display(ch, "<%smobflags\t0> %s", OLC_LABEL_VAL(GET_GLOBAL_TYPE_FLAGS(glb), NOBITS), lbuf);
 			sprintbit(GET_GLOBAL_TYPE_EXCLUDE(glb), action_bits, lbuf, TRUE);
-			add_page_display(ch, "<%smobexclude\t0> %s", OLC_LABEL_VAL(GET_GLOBAL_TYPE_EXCLUDE(glb), NOBITS), lbuf);
+			build_page_display(ch, "<%smobexclude\t0> %s", OLC_LABEL_VAL(GET_GLOBAL_TYPE_EXCLUDE(glb), NOBITS), lbuf);
 
-			add_page_display(ch, "Interactions: <%sinteraction\t0>", OLC_LABEL_PTR(GET_GLOBAL_INTERACTIONS(glb)));
+			build_page_display(ch, "Interactions: <%sinteraction\t0>", OLC_LABEL_PTR(GET_GLOBAL_INTERACTIONS(glb)));
 			if (GET_GLOBAL_INTERACTIONS(glb)) {
 				show_interaction_display(ch, GET_GLOBAL_INTERACTIONS(glb), FALSE);
 			}
@@ -459,11 +459,11 @@ void olc_show_global(char_data *ch) {
 		}
 		case GLOBAL_OBJ_INTERACTIONS: {
 			sprintbit(GET_GLOBAL_TYPE_FLAGS(glb), extra_bits, lbuf, TRUE);
-			add_page_display(ch, "<%sobjflags\t0> %s", OLC_LABEL_VAL(GET_GLOBAL_TYPE_FLAGS(glb), NOBITS), lbuf);
+			build_page_display(ch, "<%sobjflags\t0> %s", OLC_LABEL_VAL(GET_GLOBAL_TYPE_FLAGS(glb), NOBITS), lbuf);
 			sprintbit(GET_GLOBAL_TYPE_EXCLUDE(glb), extra_bits, lbuf, TRUE);
-			add_page_display(ch, "<%sobjexclude\t0> %s", OLC_LABEL_VAL(GET_GLOBAL_TYPE_EXCLUDE(glb), NOBITS), lbuf);
+			build_page_display(ch, "<%sobjexclude\t0> %s", OLC_LABEL_VAL(GET_GLOBAL_TYPE_EXCLUDE(glb), NOBITS), lbuf);
 
-			add_page_display(ch, "Interactions: <%sinteraction\t0>", OLC_LABEL_PTR(GET_GLOBAL_INTERACTIONS(glb)));
+			build_page_display(ch, "Interactions: <%sinteraction\t0>", OLC_LABEL_PTR(GET_GLOBAL_INTERACTIONS(glb)));
 			if (GET_GLOBAL_INTERACTIONS(glb)) {
 				show_interaction_display(ch, GET_GLOBAL_INTERACTIONS(glb), FALSE);
 			}
@@ -471,19 +471,19 @@ void olc_show_global(char_data *ch) {
 		}
 		case GLOBAL_MINE_DATA: {
 			sprintbit(GET_GLOBAL_TYPE_FLAGS(glb), sector_flags, lbuf, TRUE);
-			add_page_display(ch, "<%ssectorflags\t0> %s", OLC_LABEL_VAL(GET_GLOBAL_TYPE_FLAGS(glb), NOBITS), lbuf);
+			build_page_display(ch, "<%ssectorflags\t0> %s", OLC_LABEL_VAL(GET_GLOBAL_TYPE_FLAGS(glb), NOBITS), lbuf);
 			sprintbit(GET_GLOBAL_TYPE_EXCLUDE(glb), sector_flags, lbuf, TRUE);
-			add_page_display(ch, "<%ssectorexclude\t0> %s", OLC_LABEL_VAL(GET_GLOBAL_TYPE_EXCLUDE(glb), NOBITS), lbuf);
-			add_page_display(ch, "<%scapacity\t0> %d ore (%d-%d normal, %d-%d deep)", OLC_LABEL_VAL(GET_GLOBAL_VAL(glb, GLB_VAL_MAX_MINE_SIZE), 0), GET_GLOBAL_VAL(glb, GLB_VAL_MAX_MINE_SIZE), GET_GLOBAL_VAL(glb, GLB_VAL_MAX_MINE_SIZE)/2, GET_GLOBAL_VAL(glb, GLB_VAL_MAX_MINE_SIZE), (int)(GET_GLOBAL_VAL(glb, GLB_VAL_MAX_MINE_SIZE) / 2.0 * 1.5), (int)(GET_GLOBAL_VAL(glb, GLB_VAL_MAX_MINE_SIZE) * 1.5));
+			build_page_display(ch, "<%ssectorexclude\t0> %s", OLC_LABEL_VAL(GET_GLOBAL_TYPE_EXCLUDE(glb), NOBITS), lbuf);
+			build_page_display(ch, "<%scapacity\t0> %d ore (%d-%d normal, %d-%d deep)", OLC_LABEL_VAL(GET_GLOBAL_VAL(glb, GLB_VAL_MAX_MINE_SIZE), 0), GET_GLOBAL_VAL(glb, GLB_VAL_MAX_MINE_SIZE), GET_GLOBAL_VAL(glb, GLB_VAL_MAX_MINE_SIZE)/2, GET_GLOBAL_VAL(glb, GLB_VAL_MAX_MINE_SIZE), (int)(GET_GLOBAL_VAL(glb, GLB_VAL_MAX_MINE_SIZE) / 2.0 * 1.5), (int)(GET_GLOBAL_VAL(glb, GLB_VAL_MAX_MINE_SIZE) * 1.5));
 	
-			add_page_display(ch, "Interactions: <%sinteraction\t0>", OLC_LABEL_PTR(GET_GLOBAL_INTERACTIONS(glb)));
+			build_page_display(ch, "Interactions: <%sinteraction\t0>", OLC_LABEL_PTR(GET_GLOBAL_INTERACTIONS(glb)));
 			if (GET_GLOBAL_INTERACTIONS(glb)) {
 				show_interaction_display(ch, GET_GLOBAL_INTERACTIONS(glb), FALSE);
 			}
 			break;
 		}
 		case GLOBAL_NEWBIE_GEAR: {
-			add_page_display(ch, "Gear: <%sgear\t0>", OLC_LABEL_PTR(GET_GLOBAL_GEAR(glb)));
+			build_page_display(ch, "Gear: <%sgear\t0>", OLC_LABEL_PTR(GET_GLOBAL_GEAR(glb)));
 			if (GET_GLOBAL_GEAR(glb)) {
 				show_archetype_gear_display(ch, GET_GLOBAL_GEAR(glb), FALSE);
 			}
@@ -491,18 +491,18 @@ void olc_show_global(char_data *ch) {
 		}
 		case GLOBAL_MAP_SPAWNS: {
 			ordered_sprintbit(GET_GLOBAL_TYPE_FLAGS(glb), climate_flags, climate_flags_order, TRUE, lbuf);
-			add_page_display(ch, "<%sclimateflags\t0> %s", OLC_LABEL_VAL(GET_GLOBAL_TYPE_FLAGS(glb), NOBITS), lbuf);
+			build_page_display(ch, "<%sclimateflags\t0> %s", OLC_LABEL_VAL(GET_GLOBAL_TYPE_FLAGS(glb), NOBITS), lbuf);
 			ordered_sprintbit(GET_GLOBAL_TYPE_EXCLUDE(glb), climate_flags, climate_flags_order, TRUE, lbuf);
-			add_page_display(ch, "<%sclimateexclude\t0> %s", OLC_LABEL_VAL(GET_GLOBAL_TYPE_EXCLUDE(glb), NOBITS), lbuf);
+			build_page_display(ch, "<%sclimateexclude\t0> %s", OLC_LABEL_VAL(GET_GLOBAL_TYPE_EXCLUDE(glb), NOBITS), lbuf);
 			sprintbit(GET_GLOBAL_SPARE_BITS(glb), spawn_flags, lbuf, TRUE);
-			add_page_display(ch, "<%sspawnflags\t0> %s", OLC_LABEL_VAL(GET_GLOBAL_SPARE_BITS(glb), NOBITS), lbuf);
+			build_page_display(ch, "<%sspawnflags\t0> %s", OLC_LABEL_VAL(GET_GLOBAL_SPARE_BITS(glb), NOBITS), lbuf);
 	
-			add_page_display(ch, "<%sspawns\t0>", OLC_LABEL_PTR(GET_GLOBAL_SPAWNS(glb)));
+			build_page_display(ch, "<%sspawns\t0>", OLC_LABEL_PTR(GET_GLOBAL_SPAWNS(glb)));
 			if (GET_GLOBAL_SPAWNS(glb)) {
 				count = 0;
 				LL_FOREACH(GET_GLOBAL_SPAWNS(glb), spawn) {
 					sprintbit(spawn->flags, spawn_flags, lbuf, TRUE);
-					add_page_display(ch, " %d. %s (%d) %.2f%% %s", ++count, skip_filler(get_mob_name_by_proto(spawn->vnum, FALSE)), spawn->vnum, spawn->percent, lbuf);
+					build_page_display(ch, " %d. %s (%d) %.2f%% %s", ++count, skip_filler(get_mob_name_by_proto(spawn->vnum, FALSE)), spawn->vnum, spawn->percent, lbuf);
 				}
 			}
 			break;

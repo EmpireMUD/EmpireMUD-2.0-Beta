@@ -571,7 +571,7 @@ ACMD(do_roll) {
 ACMD(do_socials) {
 	social_data *soc, *next_soc, *last = NULL;
 	
-	add_page_display(ch, "The following social commands are available:");
+	build_page_display(ch, "The following social commands are available:");
 	
 	HASH_ITER(sorted_hh, sorted_socials, soc, next_soc) {
 		if (SOCIAL_FLAGGED(soc, SOC_IN_DEVELOPMENT)) {
@@ -585,7 +585,7 @@ ACMD(do_socials) {
 		}
 		
 		last = soc;	// duplicate prevention
-		add_page_display_col_str(ch, 7, FALSE, SOC_COMMAND(soc));
+		build_page_display_col_str(ch, 7, FALSE, SOC_COMMAND(soc));
 	}
 	
 	send_page_display(ch);

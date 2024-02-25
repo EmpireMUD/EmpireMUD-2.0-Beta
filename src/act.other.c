@@ -1501,7 +1501,7 @@ ACMD(do_alternate) {
 		msg_to_char(ch, "Usage: alternate <character name | list | import>\r\n");
 	}
 	else if (!str_cmp(arg, "list")) {
-		add_page_display(ch, "Account characters:");
+		build_page_display(ch, "Account characters:");
 		
 		for (plr = GET_ACCOUNT(ch)->players; plr; plr = plr->next) {
 			if (!plr->player) {
@@ -1518,10 +1518,10 @@ ACMD(do_alternate) {
 			timed_out = member_is_timed_out_ch(alt);
 			get_player_skill_string(alt, part, TRUE);
 			if (PRF_FLAGGED(ch, PRF_SCREEN_READER)) {
-				pd = add_page_display(ch, "[%d %s %s] %s%s&0", !is_file ? GET_COMPUTED_LEVEL(alt) : GET_LAST_KNOWN_LEVEL(alt), part, class_role[GET_CLASS_ROLE(alt)], (timed_out ? "&r" : ""), PERS(alt, alt, TRUE));
+				pd = build_page_display(ch, "[%d %s %s] %s%s&0", !is_file ? GET_COMPUTED_LEVEL(alt) : GET_LAST_KNOWN_LEVEL(alt), part, class_role[GET_CLASS_ROLE(alt)], (timed_out ? "&r" : ""), PERS(alt, alt, TRUE));
 			}
 			else {	// not screenreader
-				pd = add_page_display(ch, "[%d %s%s\t0] %s%s&0", !is_file ? GET_COMPUTED_LEVEL(alt) : GET_LAST_KNOWN_LEVEL(alt), class_role_color[GET_CLASS_ROLE(alt)], part, (timed_out ? "&r" : ""), PERS(alt, alt, TRUE));
+				pd = build_page_display(ch, "[%d %s%s\t0] %s%s&0", !is_file ? GET_COMPUTED_LEVEL(alt) : GET_LAST_KNOWN_LEVEL(alt), class_role_color[GET_CLASS_ROLE(alt)], part, (timed_out ? "&r" : ""), PERS(alt, alt, TRUE));
 			}
 						
 			// online/not
@@ -1745,7 +1745,7 @@ ACMD(do_companions) {
 	setup_ability_companions(ch);
 	
 	if (!*argument) {
-		add_page_display(ch, "You can summon the following companions:");
+		build_page_display(ch, "You can summon the following companions:");
 		
 		found = FALSE;
 		HASH_ITER(hh, GET_COMPANIONS(ch), cd, next_cd) {
@@ -1758,7 +1758,7 @@ ACMD(do_companions) {
 			
 			// build display
 			cmod = get_companion_mod_by_type(cd, CMOD_SHORT_DESC);
-			pd = add_page_display(ch, " %s", skip_filler(cmod ? cmod->str : get_mob_name_by_proto(cd->vnum, TRUE)));
+			pd = build_page_display(ch, " %s", skip_filler(cmod ? cmod->str : get_mob_name_by_proto(cd->vnum, TRUE)));
 			
 			if (cd->from_abil != NOTHING && (abil = find_ability_by_vnum(cd->from_abil)) && ABIL_COST(abil) > 0) {
 				append_page_display_line(pd, " (%d %s)", ABIL_COST(abil), pool_types[ABIL_COST_TYPE(abil)]);
@@ -1772,7 +1772,7 @@ ACMD(do_companions) {
 		}
 		
 		if (!found) {
-			add_page_display_str(ch, " none");
+			build_page_display_str(ch, " none");
 		}
 		send_page_display(ch);
 		return;
@@ -2607,15 +2607,15 @@ ACMD(do_lastname) {
 		else {	// list them all
 			count = 0;
 			if (*arg2) {
-				add_page_display(ch, "Lastnames matching '%s':", arg2);
+				build_page_display(ch, "Lastnames matching '%s':", arg2);
 			}
 			else {
-				add_page_display_str(ch, "Your lastnames:");
+				build_page_display_str(ch, "Your lastnames:");
 			}
 		
 			if (GET_PERSONAL_LASTNAME(ch)) {
 				++count;
-				add_page_display(ch, " %s (personal)", GET_PERSONAL_LASTNAME(ch));
+				build_page_display(ch, " %s (personal)", GET_PERSONAL_LASTNAME(ch));
 			}
 		
 			LL_FOREACH(GET_LASTNAME_LIST(ch), lastn) {
@@ -2625,11 +2625,11 @@ ACMD(do_lastname) {
 		
 				// show it
 				++count;
-				add_page_display(ch, " %s", NULLSAFE(lastn->name));
+				build_page_display(ch, " %s", NULLSAFE(lastn->name));
 			}
 	
 			if (!count) {
-				add_page_display_str(ch, " none");
+				build_page_display_str(ch, " none");
 			}
 	
 			send_page_display(ch);
@@ -2760,7 +2760,7 @@ ACMD(do_minipets) {
 	}
 	
 	if (!*argument) {	// just list minipets
-		add_page_display_str(ch, "Minipets in your collection:");
+		build_page_display_str(ch, "Minipets in your collection:");
 		count = 0;
 	
 		HASH_ITER(hh, GET_MINIPETS(ch), mini, next_mini) {
@@ -2770,14 +2770,14 @@ ACMD(do_minipets) {
 		
 			// ok:
 			++count;
-			add_page_display_col(ch, 2, FALSE, " %s", skip_filler(GET_SHORT_DESC(mob)));
+			build_page_display_col(ch, 2, FALSE, " %s", skip_filler(GET_SHORT_DESC(mob)));
 		}
 	
 		if (count == 0) {
-			add_page_display_str(ch, " none");
+			build_page_display_str(ch, " none");
 		}
 		else {
-			add_page_display(ch, " (%d total)", count);
+			build_page_display(ch, " (%d total)", count);
 		}
 	
 		send_page_display(ch);
@@ -2860,14 +2860,14 @@ ACMD(do_morph) {
 	}
 	
 	if (!*argument) {
-		add_page_display_str(ch, "You know the following morphs:");
+		build_page_display_str(ch, "You know the following morphs:");
 		
 		// normal first
 		if (GET_MORPH(ch)) {
-			add_page_display_col(ch, 3, FALSE, " normal");
+			build_page_display_col(ch, 3, FALSE, " normal");
 		}
 		else {
-			add_page_display_col(ch, 3, FALSE, " \tgnormal (current)\t0");
+			build_page_display_col(ch, 3, FALSE, " \tgnormal (current)\t0");
 		}
 		
 		HASH_ITER(hh, morph_table, morph, next_morph) {
@@ -2897,7 +2897,7 @@ ACMD(do_morph) {
 			}
 			
 			// append
-			add_page_display_col(ch, 3, FALSE, " %s%s\t0", (GET_MORPH(ch) == morph ? "\tg" : ""), line);
+			build_page_display_col(ch, 3, FALSE, " %s%s\t0", (GET_MORPH(ch) == morph ? "\tg" : ""), line);
 		}
 		
 		send_page_display(ch);

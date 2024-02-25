@@ -2172,7 +2172,7 @@ ACMD(do_config) {
 	// show whole set?
 	if (set != NOTHING && (verbose || !cnf)) {
 		// only set given: display that set
-		add_page_display(ch, "%s configs:", config_groups[set]);
+		build_page_display(ch, "%s configs:", config_groups[set]);
 		HASH_ITER(hh, config_table, cnf, next_cnf) {
 			if (cnf->set != set || IS_SET(cnf->config_flags, CONF_FLAG_DEPRECATED)) {
 				continue;
@@ -2242,7 +2242,7 @@ ACMD(do_config) {
 				lsize += snprintf(line + lsize, sizeof(line) - lsize, " &c%s&0", cnf->description);
 			}
 			
-			add_page_display(ch, "&y%s&0: %s", cnf->key, line);
+			build_page_display(ch, "&y%s&0: %s", cnf->key, line);
 		}
 		
 		send_page_display(ch);

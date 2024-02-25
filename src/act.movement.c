@@ -2583,10 +2583,10 @@ ACMD(do_portal) {
 		
 		// ready to show it
 		if (near) {
-			add_page_display(ch, "Known portals near (%d, %d):", X_COORD(near), Y_COORD(near));
+			build_page_display(ch, "Known portals near (%d, %d):", X_COORD(near), Y_COORD(near));
 		}
 		else {
-			add_page_display_str(ch, "Known portals:");
+			build_page_display_str(ch, "Known portals:");
 		}
 		
 		count = 0;
@@ -2608,7 +2608,7 @@ ACMD(do_portal) {
 				lsize += snprintf(line + lsize, sizeof(line) - lsize, " &r(too far)&0");
 			}
 			
-			add_page_display_str(ch, line);
+			build_page_display_str(ch, line);
 			
 			// free RAM!
 			free(port);

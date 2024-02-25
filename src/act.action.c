@@ -2872,13 +2872,13 @@ ACMD(do_plant) {
 		
 		if (str_hash) {
 			// show plantables
-			add_page_display(ch, "What do you want to plant:");
+			build_page_display(ch, "What do you want to plant:");
 			HASH_ITER(hh, str_hash, str_iter, next_str) {
 				if (str_iter->count == 1) {
-					add_page_display(ch, " %s", str_iter->str);
+					build_page_display(ch, " %s", str_iter->str);
 				}
 				else {
-					add_page_display(ch, " %s (x%d)", str_iter->str, str_iter->count);
+					build_page_display(ch, " %s (x%d)", str_iter->str, str_iter->count);
 				}
 			}
 			free_string_hash(&str_hash);

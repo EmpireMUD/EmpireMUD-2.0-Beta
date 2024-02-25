@@ -451,28 +451,28 @@ void olc_show_book(char_data *ch) {
 	}
 
 	if (imm) {
-		add_page_display(ch, "[%s%d\t0] %s%s\t0", OLC_LABEL_CHANGED, GET_OLC_VNUM(ch->desc), OLC_LABEL_UNCHANGED, !book_proto(BOOK_VNUM(book)) ? "new book" : BOOK_TITLE(book_proto(BOOK_VNUM(book))));
+		build_page_display(ch, "[%s%d\t0] %s%s\t0", OLC_LABEL_CHANGED, GET_OLC_VNUM(ch->desc), OLC_LABEL_UNCHANGED, !book_proto(BOOK_VNUM(book)) ? "new book" : BOOK_TITLE(book_proto(BOOK_VNUM(book))));
 	}
 	else {
-		add_page_display(ch, "\tcEmpireMUD Book Editor: %s\t0", !book_proto(BOOK_VNUM(book)) ? "new book" : BOOK_TITLE(book_proto(BOOK_VNUM(book))));
+		build_page_display(ch, "\tcEmpireMUD Book Editor: %s\t0", !book_proto(BOOK_VNUM(book)) ? "new book" : BOOK_TITLE(book_proto(BOOK_VNUM(book))));
 	}
 	
-	add_page_display(ch, "<%stitle\t0> %s", OLC_LABEL_STR(BOOK_TITLE(book), default_book_title), NULLSAFE(BOOK_TITLE(book)));
-	add_page_display(ch, "<%sbyline\t0> %s", OLC_LABEL_STR(BOOK_BYLINE(book), ""), NULLSAFE(BOOK_BYLINE(book)));
-	add_page_display(ch, "<%sitem\t0> %s", OLC_LABEL_STR(BOOK_ITEM_NAME(book), default_book_item), NULLSAFE(BOOK_ITEM_NAME(book)));
-	add_page_display(ch, "<%sdescription\t0>\r\n%s", OLC_LABEL_STR(BOOK_ITEM_DESC(book), default_book_desc), NULLSAFE(BOOK_ITEM_DESC(book)));
+	build_page_display(ch, "<%stitle\t0> %s", OLC_LABEL_STR(BOOK_TITLE(book), default_book_title), NULLSAFE(BOOK_TITLE(book)));
+	build_page_display(ch, "<%sbyline\t0> %s", OLC_LABEL_STR(BOOK_BYLINE(book), ""), NULLSAFE(BOOK_BYLINE(book)));
+	build_page_display(ch, "<%sitem\t0> %s", OLC_LABEL_STR(BOOK_ITEM_NAME(book), default_book_item), NULLSAFE(BOOK_ITEM_NAME(book)));
+	build_page_display(ch, "<%sdescription\t0>\r\n%s", OLC_LABEL_STR(BOOK_ITEM_DESC(book), default_book_desc), NULLSAFE(BOOK_ITEM_DESC(book)));
 	
 	count = 0;
 	LL_FOREACH(BOOK_PARAGRAPHS(book), para) {
 		++count;
 	}
-	add_page_display(ch, "<%sparagraphs\t0> %d (list, edit, new, delete)", OLC_LABEL_PTR(BOOK_PARAGRAPHS(book)), count);
+	build_page_display(ch, "<%sparagraphs\t0> %d (list, edit, new, delete)", OLC_LABEL_PTR(BOOK_PARAGRAPHS(book)), count);
 	
 	if (imm) {
-		add_page_display(ch, "<%sauthor\t0> %s", OLC_LABEL_VAL(BOOK_AUTHOR(book), 0), (BOOK_AUTHOR(book) != 0 && (index = find_player_index_by_idnum(BOOK_AUTHOR(book)))) ? index->fullname : "nobody");
+		build_page_display(ch, "<%sauthor\t0> %s", OLC_LABEL_VAL(BOOK_AUTHOR(book), 0), (BOOK_AUTHOR(book) != 0 && (index = find_player_index_by_idnum(BOOK_AUTHOR(book)))) ? index->fullname : "nobody");
 	}
 	else {
-		add_page_display(ch, "<%slicense\t0>, <%ssave\t0>, <%sabort\t0>", OLC_LABEL_UNCHANGED, OLC_LABEL_UNCHANGED, OLC_LABEL_UNCHANGED);
+		build_page_display(ch, "<%slicense\t0>, <%ssave\t0>, <%sabort\t0>", OLC_LABEL_UNCHANGED, OLC_LABEL_UNCHANGED, OLC_LABEL_UNCHANGED);
 	}
 	
 	send_page_display(ch);
@@ -595,7 +595,7 @@ OLC_MODULE(booked_paragraphs) {
 		LL_FOREACH(BOOK_PARAGRAPHS(book), para) {
 			++count;
 			if ((from == -1 || from <= count) && (to == -1 || to >= count)) {
-				add_page_display(ch, "\r\n\tcParagraph %d\t0\r\n%s", count, NULLSAFE(para->text));
+				build_page_display(ch, "\r\n\tcParagraph %d\t0\r\n%s", count, NULLSAFE(para->text));
 			}
 		}
 		
@@ -847,7 +847,7 @@ LIBRARY_SCMD(bookedit_list) {
 	char buf1[MAX_STRING_LENGTH];
 	int count = 0;
 
-	add_page_display(ch, "Books you have written:");
+	build_page_display(ch, "Books you have written:");
 	
 	HASH_ITER(hh, book_table, book, next_book) {
 		if (BOOK_AUTHOR(book) != GET_IDNUM(ch)) {
@@ -860,11 +860,11 @@ LIBRARY_SCMD(bookedit_list) {
 		else {
 			*buf1 = '\0';
 		}
-		add_page_display(ch, "%s%d. %s\t0 (%s\t0)", buf1, ++count, BOOK_TITLE(book), BOOK_BYLINE(book));
+		build_page_display(ch, "%s%d. %s\t0 (%s\t0)", buf1, ++count, BOOK_TITLE(book), BOOK_BYLINE(book));
 	}
 
 	if (count == 0) {
-		add_page_display_str(ch, "  none");
+		build_page_display_str(ch, "  none");
 	}
 	
 	send_page_display(ch);
