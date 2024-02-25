@@ -7338,8 +7338,8 @@ ACMD(do_progress) {
 				add_page_display(ch, "Progress: %d/%d", complete, total);
 			}
 			else {
-				get_tracker_display(goal->tracker, buf);
-				add_page_display(ch, "Progress:\r\n%s", buf);
+				add_page_display_str(ch, "Progress:");
+				show_tracker_display(ch, goal->tracker, FALSE);
 			}
 		}
 		

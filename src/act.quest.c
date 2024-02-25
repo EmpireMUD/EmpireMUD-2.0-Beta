@@ -615,10 +615,8 @@ void show_quest_info(char_data *ch, quest_data *qst) {
 	
 	// tracker
 	if (pq) {
-		get_tracker_display(pq->tracker, buf);
-		if (*buf) {
-			add_page_display(ch, "Quest Tracker:\r\n%s", buf);
-		}
+		add_page_display_str(ch, "Quest Tracker:");
+		show_tracker_display(ch, pq->tracker, FALSE);
 	}
 	
 	// show quest giver: use a string hash to remove duplicates
@@ -675,12 +673,12 @@ void show_quest_info(char_data *ch, quest_data *qst) {
 /**
 * @param char_data *ch The person to show to.
 * @param struct player_quest *pq The quest to show the tracker for.
+* @param char *header Text shown before "Tracker:" (default: "Quest ", if not provided).
+* @param bool send_page If TRUE, calls send_page_display after building it. If FALSE, leaves it in the player's page_display.
 */
-void show_quest_tracker(char_data *ch, struct player_quest *pq) {
-	char buf[MAX_STRING_LENGTH];
-	
-	get_tracker_display(pq->tracker, buf);
-	msg_to_char(ch, "Quest Tracker:\r\n%s", buf);
+void show_quest_tracker(char_data *ch, struct player_quest *pq, char *header, bool send_page) {
+	add_page_display(ch, "%s Tracker:", (header && *header) ? header : "Quest");
+	show_tracker_display(ch, pq->tracker, send_page);
 }
 
 
@@ -1224,7 +1222,7 @@ QCMD(qcmd_tracker) {
 		msg_to_char(ch, "You don't seem to be on a quest called '%s' here.\r\n", argument);
 	}
 	else {
-		show_quest_tracker(ch, pq);
+		show_quest_tracker(ch, pq, QUEST_NAME(qst), TRUE);
 	}
 }
 

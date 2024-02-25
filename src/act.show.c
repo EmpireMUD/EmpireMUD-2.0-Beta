@@ -2164,8 +2164,7 @@ SHOW(show_quests) {
 			}
 			
 			if (multi_isname(arg2, QUEST_NAME(qst))) {
-				msg_to_char(ch, "%s ", QUEST_NAME(qst));	// followed by "Quest Tracker:"
-				show_quest_tracker(ch, pq);
+				show_quest_tracker(ch, pq, QUEST_NAME(qst), TRUE);
 				found = TRUE;
 				break;	// show just one
 			}

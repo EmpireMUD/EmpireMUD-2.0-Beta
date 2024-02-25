@@ -649,23 +649,22 @@ char *get_quest_name_by_proto(any_vnum vnum) {
 
 
 /**
-* Builds the tracker display for requirements.
+* The tracker display for quest/progress requirements.
 *
+* @param char_data *ch The person viewing it.
 * @param struct req_data *tracker The tracker to show.
-* @param char *save_buffer The string to save it to.
+* @param bool send_page If TRUE, calls send_page_display() at the end; if FALSE, leaves it in the player's page_display.
 */
-void get_tracker_display(struct req_data *tracker, char *save_buffer) {
+void show_tracker_display(char_data *ch, struct req_data *tracker, bool send_page) {
 	int lefthand, count = 0, sub = 0;
-	char buf[MAX_STRING_LENGTH];
+	char buf[256];
 	struct req_data *task;
 	char last_group = 0;
-	
-	*save_buffer = '\0';
 	
 	LL_FOREACH(tracker, task) {
 		if (last_group != task->group) {
 			if (task->group) {
-				sprintf(save_buffer + strlen(save_buffer), "  %s:\r\n", (count > 0 ? "Or all of" : "All of"));
+				add_page_display(ch, "  %s:", (count > 0 ? "Or all of" : "All of"));
 			}
 			last_group = task->group;
 			sub = 0;
@@ -680,7 +679,7 @@ void get_tracker_display(struct req_data *tracker, char *save_buffer) {
 				lefthand = task->current;
 				lefthand = MIN(lefthand, task->needed);	// may be above the amount needed
 				lefthand = MAX(0, lefthand);	// in some cases, current may be negative
-				sprintf(buf, " (%d/%d)", lefthand, task->needed);
+				snprintf(buf, sizeof(buf), " (%d/%d)", lefthand, task->needed);
 				break;
 			}
 			case REQ_AMT_REPUTATION:
@@ -699,7 +698,11 @@ void get_tracker_display(struct req_data *tracker, char *save_buffer) {
 				break;
 			}
 		}
-		sprintf(save_buffer + strlen(save_buffer), "  %s%s%s%s\r\n", (task->group ? "  " : ""), ((sub > 1 && !task->group) ? "or " : ""), requirement_string(task, FALSE, TRUE), buf);
+		add_page_display(ch, "  %s%s%s%s", (task->group ? "  " : ""), ((sub > 1 && !task->group) ? "or " : ""), requirement_string(task, FALSE, TRUE), buf);
+	}
+	
+	if (send_page) {
+		send_page_display(ch);
 	}
 }
 
