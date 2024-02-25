@@ -1741,7 +1741,6 @@ bool player_tech_skill_check_by_ability_difficulty(char_data *ch, int tech) {
 //// CORE SKILL COMMANDS /////////////////////////////////////////////////////
 
 ACMD(do_ability) {
-	char outbuf[MAX_STRING_LENGTH * 2];
 	ability_data *abil;
 	
 	skip_spaces(&argument);
@@ -1766,10 +1765,7 @@ ACMD(do_ability) {
 	}
 	else {
 		// ability details
-		show_ability_info(ch, abil, NULL, outbuf, sizeof(outbuf));
-		if (ch->desc) {
-			page_string(ch->desc, outbuf, 1);
-		}
+		show_ability_info(ch, abil, NULL, TRUE);
 	}
 }
 
@@ -2357,11 +2353,7 @@ ACMD(do_skills) {
 	}
 	else if (abil) {
 		// ability details
-		char outbuf[MAX_STRING_LENGTH];
-		show_ability_info(ch, abil, NULL, outbuf, sizeof(outbuf));
-		if (ch->desc) {
-			page_string(ch->desc, outbuf, 1);
-		}
+		show_ability_info(ch, abil, NULL, TRUE);
 	}
 	else {	// this should be unreachable
 		msg_to_char(ch, "No such skill or ability.\r\n");

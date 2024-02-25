@@ -198,16 +198,15 @@ struct {
 * @param char_data *ch The player viewing the ability.
 * @param ability_data *abil Which ability.
 * @param ability_data *parent Which ability chained to this one, if any (usually NULL).
-* @param char *outbuf Buffer to save to.
-* @param int sizeof_outbuf Max size of the buffer.
+* @param bool send_page If TRUE, calls send_page_display() at the end and sends the output. If FALSE, just builds it into the person's page_display.
 */
-void show_ability_info(char_data *ch, ability_data *abil, ability_data *parent, char *outbuf, int sizeof_outbuf) {
+void show_ability_info(char_data *ch, ability_data *abil, ability_data *parent, bool send_page) {
 	bool any, more_learned, same, has_param_details = FALSE;
 	char lbuf[MAX_STRING_LENGTH], sbuf[MAX_STRING_LENGTH];
 	char *ptr;
 	double chain_prc = 100.0;
 	int count, iter;
-	size_t size, l_size;
+	size_t l_size;
 	ability_data *abiter, *next_abil, *supercede;
 	craft_data *craft, *next_craft;
 	skill_data *skill, *next_skill;
@@ -215,6 +214,7 @@ void show_ability_info(char_data *ch, ability_data *abil, ability_data *parent, 
 	struct ability_hook *ahook;
 	struct apply_data *apply;
 	struct synergy_ability *syn;
+	struct page_display *pd;
 	
 	// detect chain
 	if (parent) {
@@ -248,20 +248,17 @@ void show_ability_info(char_data *ch, ability_data *abil, ability_data *parent, 
 		}
 	}
 	
-	// start of outbuf
-	size = snprintf(outbuf, sizeof_outbuf, "%s\r\n", lbuf);
+	// start of display
+	add_page_display_str(ch, lbuf);
 	
 	if (ABIL_MASTERY_ABIL(abil) != NOTHING) {
-		size += snprintf(outbuf + size, sizeof_outbuf - size, "Mastery ability: %s%s\t0%s\r\n", ability_color(ch, abil), get_ability_name_by_vnum(ABIL_MASTERY_ABIL(abil)), (PRF_FLAGGED(ch, PRF_SCREEN_READER) && !has_ability(ch, ABIL_VNUM(abil))) ? " (not known)" : "");
+		add_page_display(ch, "Mastery ability: %s%s\t0%s", ability_color(ch, abil), get_ability_name_by_vnum(ABIL_MASTERY_ABIL(abil)), (PRF_FLAGGED(ch, PRF_SCREEN_READER) && !has_ability(ch, ABIL_VNUM(abil))) ? " (not known)" : "");
 	}
 	
 	if (ABIL_ASSIGNED_SKILL(abil) && !parent) {
-		size += snprintf(outbuf + size, sizeof_outbuf - size, "Skill: %s%s %d\t0", (get_skill_level(ch, SKILL_VNUM(ABIL_ASSIGNED_SKILL(abil))) >= ABIL_SKILL_LEVEL(abil)) ? "\t0" : "\tr", SKILL_NAME(ABIL_ASSIGNED_SKILL(abil)), ABIL_SKILL_LEVEL(abil));
+		pd = add_page_display(ch, "Skill: %s%s %d\t0", (get_skill_level(ch, SKILL_VNUM(ABIL_ASSIGNED_SKILL(abil))) >= ABIL_SKILL_LEVEL(abil)) ? "\t0" : "\tr", SKILL_NAME(ABIL_ASSIGNED_SKILL(abil)), ABIL_SKILL_LEVEL(abil));
 		if (has_ability(ch, ABIL_VNUM(abil)) && !IS_ANY_SKILL_CAP(ch, SKILL_VNUM(ABIL_ASSIGNED_SKILL(abil))) && can_gain_skill_from(ch, abil)) {
-			size += snprintf(outbuf + size, sizeof_outbuf - size, " (%d/%d levels gained)\r\n", levels_gained_from_ability(ch, abil), GAINS_PER_ABILITY);
-		}
-		else {
-			size += snprintf(outbuf + size, sizeof_outbuf - size, "\r\n");
+			append_page_display_line(pd, " (%d/%d levels gained)", levels_gained_from_ability(ch, abil), GAINS_PER_ABILITY);
 		}
 		
 		// check purchased
@@ -274,40 +271,31 @@ void show_ability_info(char_data *ch, ability_data *abil, ability_data *parent, 
 				}
 			}
 		}
-		size += snprintf(outbuf + size, sizeof_outbuf - size, "Purchased: %s\r\n", (same ? "yes" : (any ? "other skill set" : "no")));
+		add_page_display(ch, "Purchased: %s", (same ? "yes" : (any ? "other skill set" : "no")));
 		
 		// prerequisite ability (chain?) -- maybe?
 	}
 	
 	// assigned roles/synergies
 	if (!parent) {
-		count = 0;
-		l_size = 0;
-		*lbuf = '\0';
+		any = FALSE;
 		HASH_ITER(hh, skill_table, skill, next_skill) {
 			LL_FOREACH(SKILL_SYNERGIES(skill), syn) {
 				if (syn->ability == ABIL_VNUM(abil)) {
+					if (!any) {
+						// header:
+						add_page_display_str(ch, "Synergies:");
+						any = TRUE;
+					}
+					
 					if (PRF_FLAGGED(ch, PRF_SCREEN_READER)) {
-						snprintf(sbuf, sizeof(sbuf), "%s%s %d + %s %d (%s)\t0", syn->role == NOTHING ? "\tW" : class_role_color[syn->role], SKILL_NAME(skill), SKILL_MAX_LEVEL(skill), get_skill_name_by_vnum(syn->skill), syn->level, syn->role == NOTHING ? "All" : class_role[syn->role]);
+						add_page_display_col(ch, 2, FALSE, "%s%s %d + %s %d (%s)\t0", syn->role == NOTHING ? "\tW" : class_role_color[syn->role], SKILL_NAME(skill), SKILL_MAX_LEVEL(skill), get_skill_name_by_vnum(syn->skill), syn->level, syn->role == NOTHING ? "All" : class_role[syn->role]);
 					}
 					else {
-						snprintf(sbuf, sizeof(sbuf), "%s%s %d + %s %d (%c)\t0", syn->role == NOTHING ? "\tW" : class_role_color[syn->role], SKILL_ABBREV(skill), SKILL_MAX_LEVEL(skill), get_skill_abbrev_by_vnum(syn->skill), syn->level, syn->role == NOTHING ? 'A' : *class_role[syn->role]);
-					}
-					if (strlen(sbuf) > 41) {
-						// too long for half a line
-						l_size += snprintf(lbuf + l_size, sizeof(lbuf) - l_size, "%s %s\r\n", (!(++count % 2) && !PRF_FLAGGED(ch, PRF_SCREEN_READER) ? "\r\n" : ""), sbuf);
-						if (count % 2) {
-							++count;	// fix columns for the next line, if any
-						}
-					}
-					else {
-						l_size += snprintf(lbuf + l_size, sizeof(lbuf) - l_size, " %-41.41s%s", sbuf, (!(++count % 2) || PRF_FLAGGED(ch, PRF_SCREEN_READER) ? "\r\n" : " "));
+						add_page_display_col(ch, 2, FALSE, "%s%s %d + %s %d (%c)\t0", syn->role == NOTHING ? "\tW" : class_role_color[syn->role], SKILL_ABBREV(skill), SKILL_MAX_LEVEL(skill), get_skill_abbrev_by_vnum(syn->skill), syn->level, syn->role == NOTHING ? 'A' : *class_role[syn->role]);
 					}
 				}
 			}
-		}
-		if (*lbuf) {
-			size += snprintf(outbuf + size, sizeof_outbuf - size, "Synergies:\r\n%s%s", lbuf, (!(++count % 2) && !PRF_FLAGGED(ch, PRF_SCREEN_READER) ? "\r\n" : ""));
 		}
 	}
 	
@@ -337,7 +325,7 @@ void show_ability_info(char_data *ch, ability_data *abil, ability_data *parent, 
 				}
 			}
 			has_param_details = TRUE;
-			size += snprintf(outbuf + size, sizeof_outbuf - size, "Type%s: %s\r\n", (strchr(lbuf, ',') ? "s" : ""), lbuf);
+			add_page_display(ch, "Type%s: %s", (strchr(lbuf, ',') ? "s" : ""), lbuf);
 		}
 	}
 	
@@ -346,31 +334,30 @@ void show_ability_info(char_data *ch, ability_data *abil, ability_data *parent, 
 		has_param_details = TRUE;
 		strcpy(lbuf, apply_types[ABIL_LINKED_TRAIT(abil)]);
 		strtolower(lbuf);
-		size += snprintf(outbuf + size, sizeof_outbuf - size, "Linked trait: %s (%d)\r\n", lbuf, get_attribute_by_apply(ch, ABIL_LINKED_TRAIT(abil)));
+		add_page_display(ch, "Linked trait: %s (%d)", lbuf, get_attribute_by_apply(ch, ABIL_LINKED_TRAIT(abil)));
 	}
 	
 	if (ABIL_REQUIRES_TOOL(abil)) {
 		has_param_details = TRUE;
 		prettier_sprintbit(ABIL_REQUIRES_TOOL(abil), tool_flags, lbuf);
-		size += snprintf(outbuf + size, sizeof_outbuf - size, "Requires tool%s: %s\r\n", (count_bits(ABIL_REQUIRES_TOOL(abil)) != 1) ? "s" : "", lbuf);
+		add_page_display(ch, "Requires tool%s: %s", (count_bits(ABIL_REQUIRES_TOOL(abil)) != 1) ? "s" : "", lbuf);
 	}
 	
 	if (ABIL_COST(abil) > 0 || ABIL_COST_PER_AMOUNT(abil) != 0.0 || ABIL_COST_PER_SCALE_POINT(abil) != 0.0 || ABIL_COST_PER_TARGET(abil) != 0.0) {
 		has_param_details = TRUE;
-		size += snprintf(outbuf + size, sizeof_outbuf - size, "Cost: %s %s", estimate_ability_cost(ch, abil), pool_types[ABIL_COST_TYPE(abil)]);
+		pd = add_page_display(ch, "Cost: %s %s", estimate_ability_cost(ch, abil), pool_types[ABIL_COST_TYPE(abil)]);
 		if (ABIL_COST_PER_AMOUNT(abil) != 0.0) {
-			size += snprintf(outbuf + size, sizeof_outbuf - size, " +%.2f/amount", ABIL_COST_PER_AMOUNT(abil));
+			append_page_display_line(pd, " +%.2f/amount", ABIL_COST_PER_AMOUNT(abil));
 		}
 		if (ABIL_COST_PER_TARGET(abil) != 0.0) {
-			size += snprintf(outbuf + size, sizeof_outbuf - size, " +%.2f/target", ABIL_COST_PER_TARGET(abil));
+			append_page_display_line(pd, " +%.2f/target", ABIL_COST_PER_TARGET(abil));
 		}
-		size += snprintf(outbuf + size, sizeof_outbuf - size, "\r\n");
 	}
 	
 	// Cooldown?
 	if (ABIL_COOLDOWN_SECS(abil) > 0 && (!parent || ABIL_COOLDOWN_SECS(abil) != ABIL_COOLDOWN_SECS(parent))) {
 		has_param_details = TRUE;
-		size += snprintf(outbuf + size, sizeof_outbuf - size, "Cooldown: %s%s\r\n", colon_time(ABIL_COOLDOWN_SECS(abil), FALSE, NULL), ABIL_COOLDOWN_SECS(abil) < 60 ? " seconds" : "");
+		add_page_display(ch, "Cooldown: %s%s", colon_time(ABIL_COOLDOWN_SECS(abil), FALSE, NULL), ABIL_COOLDOWN_SECS(abil) < 60 ? " seconds" : "");
 	}
 	
 	// data, if parameterized
@@ -379,7 +366,7 @@ void show_ability_info(char_data *ch, ability_data *abil, ability_data *parent, 
 		*lbuf = '\0';
 		l_size = 0;
 		LL_FOREACH(ABIL_DATA(abil), adl) {
-			if (adl->type == ADL_PLAYER_TECH) {
+			if (adl->type == ADL_PLAYER_TECH && (l_size + strlen(player_tech_types[adl->vnum]) + 2) < sizeof(lbuf)) {
 				l_size += snprintf(lbuf + l_size, sizeof(lbuf) - l_size, "%s%s", (*lbuf ? ", " : ""), player_tech_types[adl->vnum]);
 			}
 		}
@@ -391,60 +378,63 @@ void show_ability_info(char_data *ch, ability_data *abil, ability_data *parent, 
 					lbuf[iter] = ' ';
 				}
 			}
-			size += snprintf(outbuf + size, sizeof_outbuf - size, "Grants: %s\r\n", lbuf);
+			add_page_display(ch, "Grants: %s", lbuf);
 		}
 	}
 	
 	// applies
 	*lbuf = '\0';
+	l_size = 0;
 	LL_FOREACH(ABIL_APPLIES(abil), apply) {
-		sprintf(lbuf + strlen(lbuf), "%s%s", *lbuf ? ", " : "", apply_types[apply->location]);
+		if ((l_size + strlen(apply_types[apply->location]) + 2) < sizeof(lbuf)) {
+			l_size += snprintf(lbuf + l_size, sizeof(lbuf) - l_size, "%s%s", *lbuf ? ", " : "", apply_types[apply->location]);
+		}
 	}
 	if (*lbuf) {
 		has_param_details = TRUE;
-		size += snprintf(outbuf + size, sizeof_outbuf - size, "Modifies: %s\r\n", lbuf);
+		add_page_display(ch, "Modifies: %s", lbuf);
 	}
 	
 	// affects
 	if (ABIL_AFFECTS(abil)) {
 		has_param_details = TRUE;
 		sprintbit(ABIL_AFFECTS(abil), affected_bits, lbuf, TRUE);
-		size += snprintf(outbuf + size, sizeof_outbuf - size, "Affects: %s\r\n", lbuf);
+		add_page_display(ch, "Affects: %s", lbuf);
 	}
 	
 	// build duration
 	if (ABIL_SHORT_DURATION(abil) == UNLIMITED || ABIL_SHORT_DURATION(abil) > 0) {
-		sprintf(lbuf, "%s%s", colon_time(ABIL_SHORT_DURATION(abil), FALSE, "unlimited"), (ABIL_SHORT_DURATION(abil) < 60 && ABIL_SHORT_DURATION(abil) != UNLIMITED) ? " seconds" : "");
+		l_size = snprintf(lbuf, sizeof(lbuf), "%s%s", colon_time(ABIL_SHORT_DURATION(abil), FALSE, "unlimited"), (ABIL_SHORT_DURATION(abil) < 60 && ABIL_SHORT_DURATION(abil) != UNLIMITED) ? " seconds" : "");
 	}
 	else {
 		*lbuf = '\0';
+		l_size = 0;
 	}
-	
 	if (ABIL_LONG_DURATION(abil) != ABIL_SHORT_DURATION(abil) && ABIL_LONG_DURATION(abil) > 0) {
-		sprintf(lbuf + strlen(lbuf), "%s%s%s", *lbuf ? "/" : "", colon_time(ABIL_LONG_DURATION(abil), FALSE, "unlimited"), (ABIL_LONG_DURATION(abil) < 60 && ABIL_LONG_DURATION(abil) != UNLIMITED) ? " seconds" : "");
+		l_size += snprintf(lbuf + l_size, sizeof(lbuf) - l_size, "%s%s%s", *lbuf ? "/" : "", colon_time(ABIL_LONG_DURATION(abil), FALSE, "unlimited"), (ABIL_LONG_DURATION(abil) < 60 && ABIL_LONG_DURATION(abil) != UNLIMITED) ? " seconds" : "");
 	}
 	
 	// show duration?
 	if (*lbuf && (!parent || ABIL_SHORT_DURATION(abil) != ABIL_LONG_DURATION(parent) || ABIL_SHORT_DURATION(abil) != ABIL_LONG_DURATION(parent))) {
 		has_param_details = TRUE;
-		size += snprintf(outbuf + size, sizeof_outbuf - size, "Duration: %s\r\n", lbuf);
+		add_page_display(ch, "Duration: %s", lbuf);
 	}
 	
 	if (ABIL_DIFFICULTY(abil) != DIFF_TRIVIAL) {
 		has_param_details = TRUE;
-		size += snprintf(outbuf + size, sizeof_outbuf - size, "Difficulty: %s\r\n", skill_check_difficulty[ABIL_DIFFICULTY(abil)]);
+		add_page_display(ch, "Difficulty: %s", skill_check_difficulty[ABIL_DIFFICULTY(abil)]);
 	}
 	
 	if (IS_SET(ABIL_TYPES(abil), ABILT_DOT) && ABIL_MAX_STACKS(abil) > 1) {
 		has_param_details = TRUE;
-		size += snprintf(outbuf + size, sizeof_outbuf - size, "DoT stacks to: %dx\r\n", ABIL_MAX_STACKS(abil));
+		add_page_display(ch, "DoT stacks to: %dx damage", ABIL_MAX_STACKS(abil));
 	}
 	
 	// notes (flags), if parameterized -- LAST
 	prettier_sprintbit(ABIL_FLAGS(abil), ability_flag_notes, lbuf);
 	if (*lbuf && str_cmp(lbuf, "none")) {
 		has_param_details = TRUE;
-		size += snprintf(outbuf + size, sizeof_outbuf - size, "Notes: %s\r\n", lbuf);
+		add_page_display(ch, "Notes: %s", lbuf);
 	}
 
 	// crafting ability?
@@ -470,40 +460,19 @@ void show_ability_info(char_data *ch, ability_data *abil, ability_data *parent, 
 		
 		// needs header?
 		if (count == 0) {
-			size += snprintf(outbuf + size, sizeof_outbuf - size, "Makes:\r\n");
+			add_page_display_str(ch, "Makes:");
 		}
 		
 		// increment now
 		++count;
-		
-		if (PRF_FLAGGED(ch, PRF_SCREEN_READER)) {
-			if (size + strlen(sbuf) + 3 < sizeof_outbuf) {
-				size += snprintf(outbuf + size, sizeof_outbuf - size, "%s\r\n", sbuf);
-			}
-			else {
-				break;	// overflow?
-			}
-		}
-		else {	// not screenreader
-			snprintf(lbuf, sizeof(lbuf), " %-35.35s%s", sbuf, (count % 2 ? "" : "\r\n"));
-			if (size + strlen(lbuf) + 3 < sizeof_outbuf) {
-				strcat(outbuf, lbuf);
-				size += strlen(lbuf);
-			}
-			else {
-				break;	// overflow?
-			}
-		}
+		add_page_display_col_str(ch, 2, FALSE, sbuf);
 	}
-	if (count > 0 && count % 2 && !PRF_FLAGGED(ch, PRF_SCREEN_READER)) {
-		size += snprintf(outbuf + size, sizeof_outbuf - size, "\r\n");	// missing crlf
-	}
-	if (more_learned && size + 25 < sizeof_outbuf) {
+	if (more_learned) {
 		if (count > 0) {
-			size += snprintf(outbuf + size, sizeof_outbuf - size, " (with more to learn)\r\n");
+			add_page_display_str(ch, " (with more to learn)");
 		}
 		else {
-			size += snprintf(outbuf + size, sizeof_outbuf - size, "Makes recipes you have not learned.\r\n");
+			add_page_display_str(ch, "Makes recipes you have not learned.");
 		}
 	}
 	if (count > 0 || more_learned) {
@@ -512,11 +481,11 @@ void show_ability_info(char_data *ch, ability_data *abil, ability_data *parent, 
 	
 	// supercede?
 	if ((supercede = check_superceded_by(ch, abil)) != abil) {
-		size += snprintf(outbuf + size, sizeof_outbuf - size, "Superceded by: %s\r\n", ABIL_NAME(supercede));
+		add_page_display(ch, "Superceded by: %s", ABIL_NAME(supercede));
 	}
 	
 	if (!has_param_details) {
-		size += snprintf(outbuf + size, sizeof_outbuf - size, "(Not all abilities have additional details available to show here)\r\n");
+		add_page_display_str(ch, "(Not all abilities have additional details available to show here)");
 	}
 	
 	// hookers?
@@ -529,12 +498,13 @@ void show_ability_info(char_data *ch, ability_data *abil, ability_data *parent, 
 		}
 		
 		// seems ok
-		show_ability_info(ch, abiter, abil, lbuf, sizeof(lbuf));
-		if (*lbuf && size + strlen(lbuf) < sizeof_outbuf) {
-			has_param_details = TRUE;
-			strcat(outbuf, lbuf);
-			size += strlen(lbuf);
-		}
+		show_ability_info(ch, abiter, abil, FALSE);
+		has_param_details = TRUE;
+	}
+	
+	// and send if requested
+	if (send_page) {
+		send_page_display(ch);
 	}
 }
 
