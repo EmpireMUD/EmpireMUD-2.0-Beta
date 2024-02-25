@@ -3150,8 +3150,9 @@ void do_stat_adventure(char_data *ch, adv_data *adv) {
 *
 * @param char_data *ch The player requesting stats.
 * @param book_data *book The book to stat.
+* @param bool details If TRUE, sends whole paragraphs. FALSE just sends previews.
 */
-void do_stat_book(char_data *ch, book_data *book) {
+void do_stat_book(char_data *ch, book_data *book, bool details) {
 	char line[MAX_STRING_LENGTH];
 	struct paragraph_data *para;
 	player_index_data *index;
@@ -3173,16 +3174,23 @@ void do_stat_book(char_data *ch, book_data *book) {
 	count = 0;
 	LL_FOREACH(BOOK_PARAGRAPHS(book), para) {
 		++count;
-		txt = para->text;
-		skip_spaces(&txt);
-		len = strlen(txt);
-		len = MIN(len, 62);	// aiming for full page width then a ...
-		snprintf(line, sizeof(line), "Paragraph %*d: %-*.*s...", (num >= 10 ? 2 : 1), count, len, len, txt);
-		if ((ptr = strstr(line, "\r\n"))) {	// line ended early?
-			sprintf(ptr, "...");	// overwrite the crlf
-		}
 		
-		add_page_display_str(ch, line);
+		if (details) {
+			add_page_display(ch, "Paragraph %d:\r\n%s", count, para->text);
+		}
+		else {
+			// just previews
+			txt = para->text;
+			skip_spaces(&txt);
+			len = strlen(txt);
+			len = MIN(len, 62);	// aiming for full page width then a ...
+			snprintf(line, sizeof(line), "Paragraph %*d: %-*.*s...", (num >= 10 ? 2 : 1), count, len, len, txt);
+			if ((ptr = strstr(line, "\r\n"))) {	// line ended early?
+				sprintf(ptr, "...");	// overwrite the crlf
+			}
+			
+			add_page_display_str(ch, line);
+		}
 	}
 	
 	send_page_display(ch);
@@ -8834,7 +8842,7 @@ ACMD(do_vstat) {
 			msg_to_char(ch, "There is no book with that number.\r\n");
 			return;
 		}
-		do_stat_book(ch, book);
+		do_stat_book(ch, book, details);
 	}
 	else if (is_abbrev(arg1, "craft")) {	// alphabetic precedence for "vstat c"
 		craft_data *craft = craft_proto(number);
