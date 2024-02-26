@@ -2362,9 +2362,10 @@ WHO_SORTER(sort_who_role_level) {
 */
 char *one_who_line(char_data *ch, bool shortlist, bool screenreader) {
 	static char out[MAX_STRING_LENGTH];
-	char buf1[MAX_STRING_LENGTH], show_role[24], part[MAX_STRING_LENGTH];
-	int num, size = 0;
+	char show_role[24], part[MAX_STRING_LENGTH];
+	size_t size;
 	
+	size = 0;
 	*out = '\0';
 	
 	if (screenreader && GET_CLASS_ROLE(ch) != ROLE_NONE) {
@@ -2403,12 +2404,6 @@ char *one_who_line(char_data *ch, bool shortlist, bool screenreader) {
 			size += snprintf(out + size, sizeof(out) - size, " (inc)");
 		}
 		
-		// determine length to show
-		if (!screenreader) {
-			num = color_code_length(out);
-			strcpy(buf1, out);
-			size = snprintf(out, sizeof(out), "%-*.*s", 35 + num, 35 + num, buf1);
-		}
 		return out;
 	}
 	
@@ -2454,7 +2449,7 @@ char *one_who_line(char_data *ch, bool shortlist, bool screenreader) {
 
 
 /**
-* Builds part of the WHO list.
+* Builds part of the WHO list directly in the ch's page_display.
 *
 * @param char_data *ch The person performing the who command.
 * @param char *name_search If filtering names, the filter string.
@@ -2464,15 +2459,16 @@ char *one_who_line(char_data *ch, bool shortlist, bool screenreader) {
 * @param bool rp If TRUE, only shows RP players.
 * @param bool shortlist If TRUE, gets the columnar short form.
 * @param int type WHO_MORTALS, WHO_GODS, or WHO_IMMORTALS
-* @return char* The who output for imms.
+* @return int Number of players displayed in ch's page_display (or 0).
 */
-char *partial_who(char_data *ch, char *name_search, int low, int high, empire_data *empire_who, bool rp, bool shortlist, int type) {
-	static char who_output[MAX_STRING_LENGTH];
+int partial_who(char_data *ch, char *name_search, int low, int high, empire_data *empire_who, bool rp, bool shortlist, int type) {
+	bool header = FALSE;
 	struct who_entry *list = NULL, *entry, *next_entry;
-	char whobuf[MAX_STRING_LENGTH], buf[MAX_STRING_LENGTH], online[MAX_STRING_LENGTH];
+	char part[256];
 	descriptor_data *d;
 	char_data *tch;
-	int iter, count = 0, size, max_pl;
+	int iter, count = 0, max_pl;
+	struct page_display *line;
 	
 	// WHO_x
 	const char *who_titles[] = { "Mortals", "Gods", "Immortals" };
@@ -2490,42 +2486,51 @@ char *partial_who(char_data *ch, char *name_search, int low, int high, empire_da
 			break;
 		}
 	}
-
-	*whobuf = '\0';	// lines of chars
-	size = 0;	// whobuf size
-
-	for (d = descriptor_list; d; d = d->next) {
-		if (STATE(d) != CON_PLAYING)
-			continue;
-
-		if (d->original)
+	
+	// detect matching players
+	LL_FOREACH(descriptor_list, d) {
+		if (STATE(d) != CON_PLAYING) {
+			continue;	// wrong state
+		}
+		
+		// detect char
+		if (d->original) {
 			tch = d->original;
-		else if (!(tch = d->character))
-			continue;
-
-		if (*name_search && !is_abbrev(name_search, PERS(tch, tch, 1)) && !strstr(NULLSAFE(GET_TITLE(tch)), name_search))
-			continue;
+		}
+		else if (!(tch = d->character)) {
+			continue;	// no char
+		}
+		
+		if (*name_search && !is_abbrev(name_search, PERS(tch, tch, 1)) && !strstr(NULLSAFE(GET_TITLE(tch)), name_search)) {
+			continue;	// no name match
+		}
 		if (!CAN_SEE_GLOBAL(ch, tch)) {
-			continue;
+			continue;	// can't see them
 		}
 		if (low != 0 && GET_COMPUTED_LEVEL(tch) < low) {
-			continue;
+			continue;	// level request
 		}
 		if (high != 0 && GET_COMPUTED_LEVEL(tch) > high) {
-			continue;
+			continue;	// level request
 		}
-		if (type == WHO_MORTALS && (IS_GOD(tch) || IS_IMMORTAL(tch)))
-			continue;
-		if (type == WHO_GODS && !IS_GOD(tch))
-			continue;
-		if (type == WHO_IMMORTALS && !IS_IMMORTAL(tch))
-			continue;
-		if (empire_who && GET_LOYALTY(tch) != empire_who)
-			continue;
-		if (rp && !PRF_FLAGGED(tch, PRF_RP))
-			continue;
-		if (!INCOGNITO_OK(ch, tch))
-			continue;
+		if (type == WHO_MORTALS && (IS_GOD(tch) || IS_IMMORTAL(tch))) {
+			continue;	// must be mortal
+		}
+		if (type == WHO_GODS && !IS_GOD(tch)) {
+			continue;	// must be god
+		}
+		if (type == WHO_IMMORTALS && !IS_IMMORTAL(tch)) {
+			continue;	// must be immortal
+		}
+		if (empire_who && GET_LOYALTY(tch) != empire_who) {
+			continue;	// empire requested
+		}
+		if (rp && !PRF_FLAGGED(tch, PRF_RP)) {
+			continue;	// RP flag requested
+		}
+		if (!INCOGNITO_OK(ch, tch)) {
+			continue;	// incognito mode
+		}
 
 		// show one char
 		CREATE(entry, struct who_entry, 1);
@@ -2536,62 +2541,54 @@ char *partial_who(char_data *ch, char *name_search, int low, int high, empire_da
 		LL_PREPEND(list, entry);
 	}
 	
+	// sort entries
 	LL_SORT(list, who_sorters[type]);
-
-	for (entry = list; entry; entry = next_entry) {
-		next_entry = entry->next;
-		
+	
+	// iterate over entries
+	LL_FOREACH_SAFE(list, entry, next_entry) {
 		++count;
-		size += snprintf(whobuf + size, sizeof(whobuf) - size, "%s", entry->string);
 		
-		// columnar spacing
-		if (shortlist) {
-			size += snprintf(whobuf + size, sizeof(whobuf) - size, "%s", (!(count % 2) || PRF_FLAGGED(ch, PRF_SCREEN_READER)) ? "\r\n" : " ");
+		// found a player: ensure header
+		if (!header) {
+			// title line
+			if (type == WHO_MORTALS) {
+				// update counts in case
+				max_pl = data_get_int(DATA_MAX_PLAYERS_TODAY);
+				if (count > max_pl) {
+					max_pl = count;
+					data_set_int(DATA_MAX_PLAYERS_TODAY, max_pl);
+				}
+				max_players_this_uptime = MAX(max_players_this_uptime, count);
+				line = build_page_display(ch, "%s: %d online (max today %d, this uptime %d)", who_titles[type], count, max_pl, max_players_this_uptime);
+			}
+			else {
+				line = build_page_display(ch, "%s: %d online", who_titles[type], count);
+			}
+			
+			// divider
+			for (iter = 0; iter < sizeof(part) && iter < strlen(line->text); ++iter) {
+				part[iter] = '-';
+			}
+			part[iter] = '\0';
+			build_page_display_str(ch, part);
+			
+			header = TRUE;
 		}
 		
+		// 1 entry: columnar spacing or regular
+		if (shortlist) {
+			build_page_display_col_str(ch, 2, FALSE, entry->string);
+		}
+		else {
+			build_page_display_str(ch, entry->string);
+		}
+		
+		LL_DELETE(list, entry);
 		free(entry->string);
 		free(entry);
 	}
-	list = NULL;
-
-	if (*whobuf) {
-		// repurposing size
-		size = 0;
-		
-		if (type == WHO_MORTALS) {
-			// update counts in case
-			max_pl = data_get_int(DATA_MAX_PLAYERS_TODAY);
-			if (count > max_pl) {
-				max_pl = count;
-				data_set_int(DATA_MAX_PLAYERS_TODAY, max_pl);
-			}
-			max_players_this_uptime = MAX(max_players_this_uptime, count);
-			snprintf(online, sizeof(online), "%d online (max today %d, this uptime %d)", count, max_pl, max_players_this_uptime);
-		}
-		else {
-			snprintf(online, sizeof(online), "%d online", count);
-		}
-		
-		size += snprintf(who_output + size, sizeof(who_output) - size, "%s: %s", who_titles[type], online);
-
-		// divider
-		*buf = '\0';
-		for (iter = 0; iter < strlen(who_output); ++iter) {
-			buf[iter] = '-';
-		}
-		buf[iter] = '\0';
-		
-		size += snprintf(who_output + size, sizeof(who_output) - size, "\r\n%s\r\n%s", buf, whobuf);
-		
-		if (shortlist && (count % 2) && !PRF_FLAGGED(ch, PRF_SCREEN_READER)) {
-			size += snprintf(who_output + size, sizeof(who_output) - size, "\r\n");
-		}
-	}
-	else {
-		*who_output = '\0';
-	}
 	
-	return who_output;
+	return count;
 }
 
 
@@ -4842,10 +4839,10 @@ ACMD(do_whereami) {
 
 
 ACMD(do_who) {
-	char name_search[MAX_INPUT_LENGTH], output[MAX_STRING_LENGTH*2], empname[MAX_INPUT_LENGTH];
-	char mode, *part, *ptr;
-	int outsize = 0;
+	char name_search[MAX_INPUT_LENGTH], empname[MAX_INPUT_LENGTH];
+	char mode, *ptr;
 	int low = 0, high = 0;
+	int imms = 0, gods = 0, morts = 0;
 	bool rp = FALSE;
 	bool shortlist = FALSE;
 	empire_data *show_emp = NULL;
@@ -4911,28 +4908,25 @@ ACMD(do_who) {
 		}
 	}
 	
-	*output = '\0';
-
 	/* Immortals first */
-	part = partial_who(ch, name_search, low, high, show_emp, rp, shortlist, WHO_IMMORTALS);
-	if (*part) {
-		outsize += snprintf(output + outsize, sizeof(output) - outsize, "%s%s", (*output ? "\r\n" : ""), part);
+	imms = partial_who(ch, name_search, low, high, show_emp, rp, shortlist, WHO_IMMORTALS);
+	if (imms) {
+		build_page_display_str(ch, "");
 	}
 
 	/* Gods second */
-	part = partial_who(ch, name_search, low, high, show_emp, rp, shortlist, WHO_GODS);
-	if (*part) {
-		outsize += snprintf(output + outsize, sizeof(output) - outsize, "%s%s", (*output ? "\r\n" : ""), part);
+	gods = partial_who(ch, name_search, low, high, show_emp, rp, shortlist, WHO_GODS);
+	if (gods) {
+		build_page_display_str(ch, "");
 	}
 
 	/* Then mortals */
-	part = partial_who(ch, name_search, low, high, show_emp, rp, shortlist, WHO_MORTALS);
-	if (*part) {
-		outsize += snprintf(output + outsize, sizeof(output) - outsize, "%s%s", (*output ? "\r\n" : ""), part);
-	}
-
-	if (*output) {
-		page_string(ch->desc, output, TRUE);
+	morts = partial_who(ch, name_search, low, high, show_emp, rp, shortlist, WHO_MORTALS);
+	
+	// TODO: delete trailing empty line?
+	
+	if (imms || gods || morts) {
+		send_page_display(ch);
 	}
 	else {
 		/* Didn't find a match to set parameters */
