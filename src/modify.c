@@ -1104,6 +1104,51 @@ void send_page_display(char_data *ch) {
 }
 
 
+/**
+* Trims blank lines from the start and end of ch's buffered page_display.
+*
+* @param char_data *ch The person with the page_display to trim.
+* @return bool TRUE if anything is left in the page_display, FALSE if it's empty now.
+*/
+bool trim_page_display(char_data *ch) {
+	struct page_display *pd, *next;
+	
+	if (ch && ch->desc) {
+		// trim start
+		DL_FOREACH_SAFE(ch->desc->page_lines, pd, next) {
+			if (!pd->text || !*pd->text || color_code_length(pd->text) == strlen(pd->text)) {
+				// contains nothing visible
+				DL_DELETE(ch->desc->page_lines, pd);
+				free_page_display_one(pd);
+			}
+			else {
+				// found a non-empty entry at start
+				break;
+			}
+		}
+		
+		// trim end (iterate backwards)
+		for (pd = ch->desc->page_lines ? ch->desc->page_lines->prev : NULL; pd; pd = next) {
+			next = (pd == ch->desc->page_lines ? NULL : pd->prev);
+			
+			if (!pd->text || !*pd->text || color_code_length(pd->text) == strlen(pd->text)) {
+				// contains nothing visible
+				DL_DELETE(ch->desc->page_lines, pd);
+				free_page_display_one(pd);
+			}
+			else {
+				// found a non-empty entry at end
+				break;
+			}
+		}
+		
+		return ch->desc->page_lines ? TRUE : FALSE;
+	}
+	
+	return FALSE;
+}
+
+
  //////////////////////////////////////////////////////////////////////////////
 //// EDITOR //////////////////////////////////////////////////////////////////
 

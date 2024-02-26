@@ -111,6 +111,7 @@ void clear_page_display(char_data *ch);
 void free_page_display(struct page_display **list);
 void free_page_display_one(struct page_display *pd);
 void send_page_display(char_data *ch);
+bool trim_page_display(char_data *ch);
 
 
 /* I/O functions */

@@ -4842,7 +4842,8 @@ ACMD(do_who) {
 	char name_search[MAX_INPUT_LENGTH], empname[MAX_INPUT_LENGTH];
 	char mode, *ptr;
 	int low = 0, high = 0;
-	int imms = 0, gods = 0, morts = 0;
+	int imms = 0, gods = 0;
+	bool any = FALSE;
 	bool rp = FALSE;
 	bool shortlist = FALSE;
 	empire_data *show_emp = NULL;
@@ -4921,11 +4922,12 @@ ACMD(do_who) {
 	}
 
 	/* Then mortals */
-	morts = partial_who(ch, name_search, low, high, show_emp, rp, shortlist, WHO_MORTALS);
+	partial_who(ch, name_search, low, high, show_emp, rp, shortlist, WHO_MORTALS);
 	
-	// TODO: delete trailing empty line?
+	// delete trailing empty line
+	any = trim_page_display(ch);
 	
-	if (imms || gods || morts) {
+	if (any) {
 		send_page_display(ch);
 	}
 	else {
