@@ -164,7 +164,7 @@ void start_string_editor(descriptor_data *d, char *prompt, char **writeto, size_
 
 /* Add user input to the 'current' string (as defined by d->str) */
 void string_add(descriptor_data *d, char *str) {
-	char buf1[MAX_STRING_LENGTH];
+	char *temp;
 	player_index_data *index;
 	struct mail_data *mail;
 	account_data *acct;
@@ -360,8 +360,11 @@ void string_add(descriptor_data *d, char *str) {
 		else if (d->file_storage) {
 			if (action != STRINGADD_ABORT) {
 				if ((fl = fopen((char *)d->file_storage, "w"))){
-					if (*d->str)
-						fputs(stripcr(buf1, *d->str), fl);
+					if (*d->str) {
+						CREATE(temp, char, strlen(*d->str) + 1);
+						fputs(stripcr(temp, *d->str), fl);
+						free(temp);
+					}
 					fclose(fl);
 
 					syslog(SYS_GC, GET_INVIS_LEV(d->character), TRUE, "GC: %s saves '%s'", GET_NAME(d->character), d->file_storage);

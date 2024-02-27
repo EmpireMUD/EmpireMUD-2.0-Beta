@@ -3514,11 +3514,7 @@ void add_shipping_queue(char_data *ch, empire_data *emp, int from_island, int to
 		DL_APPEND(EMPIRE_SHIPPING_LIST(emp), sd);
 	}
 	
-	// charge resources -- we pass FALSE at the end because we already split out the timers
-	charge_stored_resource(emp, from_island, store->vnum, number, FALSE);
-	EMPIRE_NEEDS_STORAGE_SAVE(emp) = TRUE;
-	
-	// messaging
+	// messaging: before storing resources because data can be lost here
 	isle = get_island(to_island, TRUE);
 	if (to_room) {
 		msg_to_char(ch, "You set %d '%s' to ship to %s%s.\r\n", number, skip_filler(GET_OBJ_SHORT_DESC(store->proto)), get_room_name(to_room, FALSE), coord_display(ch, X_COORD(to_room), Y_COORD(to_room), FALSE));
@@ -3526,6 +3522,10 @@ void add_shipping_queue(char_data *ch, empire_data *emp, int from_island, int to
 	else {
 		msg_to_char(ch, "You set %d '%s' to ship to %s.\r\n", number, skip_filler(GET_OBJ_SHORT_DESC(store->proto)), isle ? get_island_name_for(isle->id, ch) : "an unknown island");
 	}
+	
+	// charge resources -- we pass FALSE at the end because we already split out the timers
+	charge_stored_resource(emp, from_island, store->vnum, number, FALSE);
+	EMPIRE_NEEDS_STORAGE_SAVE(emp) = TRUE;
 }
 
 

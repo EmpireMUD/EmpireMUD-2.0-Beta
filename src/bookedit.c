@@ -674,6 +674,7 @@ OLC_MODULE(booked_paragraphs) {
 		}
 		else {
 			msg_to_char(ch, "Invalid paragraph position.\r\n");
+			free(new);
 		}
 	}
 	else if (is_abbrev(arg1, "delete") || is_abbrev(arg1, "remove")) {
