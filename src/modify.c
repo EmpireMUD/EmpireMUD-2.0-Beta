@@ -986,9 +986,10 @@ void append_page_display_line(struct page_display *line, const char *fmt, ...) {
 *
 * @param const struct page_display *list The list of page_display lines to convert.
 * @param char_data *ch Optional: The viewier. If NULL, default settings will be used for building the string.
+* @param bool add_crlfs If TRUE, adds line breaks between page_display lines. If FALSE, doesn't.
 * @return char* An allocated string representing the full page. (Must be free'd when done.)
 */
-char *get_page_display_as_string(const struct page_display *list, char_data *ch) {
+char *get_page_display_as_string(const struct page_display *list, char_data *ch, bool add_crlfs) {
 	bool use_cols;
 	char *output, *ptr;
 	int clen, iter, needs_cols;
@@ -1024,7 +1025,7 @@ char *get_page_display_as_string(const struct page_display *list, char_data *ch)
 			one = pd->length;
 		}
 		
-		size += one + 2;
+		size += one + ((add_crlfs || pd->cols > 1) ? 2 : 0);
 	}
 	
 	// allocate
@@ -1041,7 +1042,9 @@ char *get_page_display_as_string(const struct page_display *list, char_data *ch)
 			}
 			last_col = 0;
 			strcat(output, NULLSAFE(pd->text));
-			strcat(output, "\r\n");
+			if (add_crlfs) {
+				strcat(output, "\r\n");
+			}
 		}
 		else {
 			// columned display:
@@ -1127,7 +1130,7 @@ void send_page_display_as(char_data *ch, bitvector_t options) {
 	}
 	
 	// build string version
-	str = get_page_display_as_string(ch->desc->page_lines, ch);
+	str = get_page_display_as_string(ch->desc->page_lines, ch, IS_SET(options, PD_FORMAT_NORMAL | PD_FORMAT_INDENT) ? FALSE : TRUE);
 	
 	// optional formatting
 	if (IS_SET(options, PD_FORMAT_NORMAL | PD_FORMAT_INDENT)) {

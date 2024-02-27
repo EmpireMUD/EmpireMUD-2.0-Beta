@@ -117,7 +117,7 @@ void append_page_display_line(struct page_display *line, const char *fmt, ...) _
 void clear_page_display(char_data *ch);
 void free_page_display(struct page_display **list);
 void free_page_display_one(struct page_display *pd);
-char *get_page_display_as_string(const struct page_display *list, char_data *ch);
+char *get_page_display_as_string(const struct page_display *list, char_data *ch, bool add_crlfs);
 void send_page_display_as(char_data *ch, bitvector_t options);
 #define send_page_display(ch)	send_page_display_as(ch, PD_FREE_DISPLAY_AFTER)
 bool trim_page_display(char_data *ch);
