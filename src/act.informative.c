@@ -1730,15 +1730,13 @@ void show_character_affects(char_data *ch, char_data *to, bool send_page) {
 * Mortal view of other people's affects. This shows very little; it shows a
 * little more if you have the right ptech.
 * 
-* @param char_data *ch Whose effects
-* @param char_data *to Who to send to
+* @param char_data *ch Whose effects.
+* @param char_data *to Who to send to (using page_display, which is sent at the end).
 */
 void show_character_affects_simple(char_data *ch, char_data *to) {
 	bool good, is_ally, details;
-	char line[MAX_STRING_LENGTH], lbuf[MAX_STRING_LENGTH], output[MAX_STRING_LENGTH];
-	char *temp;
+	char line[MAX_STRING_LENGTH], lbuf[MAX_STRING_LENGTH];
 	int duration;
-	size_t size;
 	struct affected_type *aff;
 	struct over_time_effect_type *dot;
 	struct string_hash *str_iter, *next_str, *str_hash = NULL;
@@ -1829,38 +1827,29 @@ void show_character_affects_simple(char_data *ch, char_data *to) {
 	}
 	
 	// build display
-	size = snprintf(output, sizeof(output), "Affects on %s:%s%s", PERS(ch, to, FALSE), details ? "\r\n" : "", (str_hash ? "" : " none"));
+	build_page_display(to, "Affects on %s:", PERS(ch, to, FALSE));
 	HASH_ITER(hh, str_hash, str_iter, next_str) {
 		if (details) {
-			if (size + strlen(str_iter->str) + 3 < sizeof(output)) {
-				size += snprintf(output + size, sizeof(output) - size, " %s\r\n", str_iter->str);
-			}
+			build_page_display(to, " %s", str_iter->str);
 		}
 		else {	// simple version
-			if (size + strlen(str_iter->str) + 4 < sizeof(output)) {
-				size += snprintf(output + size, sizeof(output) - size, "%s %s", (str_iter != str_hash ? "," : ""), str_iter->str);
-			}
-			else {
-				// full
-				break;
-			}
+			build_page_display(to, "%s %s", (str_iter != str_hash ? "," : ""), str_iter->str);
 		}
 	}
+	if (!str_hash) {
+		build_page_display_str(to, " none");
+	}
 	
+	// free temporary data
 	free_string_hash(&str_hash);
 	
 	if (details) {
 		// just show it
-		page_string(to->desc, output, TRUE);
+		send_page_display(to);
 	}
 	else {
 		// formatting for simple view:
-		strcat(output, "\r\n");	// space reserved
-		
-		temp = strdup(output);
-		format_text(&temp, 0, to->desc, MAX_STRING_LENGTH);
-		page_string(to->desc, temp, TRUE);
-		free(temp);
+		send_page_display_as(to, PD_FREE_DISPLAY_AFTER | PD_NO_PAGINATION | PD_FORMAT_NORMAL);
 	}
 	
 	gain_player_tech_exp(to, PTECH_ENEMY_BUFF_DETAILS, 15);
