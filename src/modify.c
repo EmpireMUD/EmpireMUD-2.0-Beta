@@ -978,28 +978,30 @@ void append_page_display_line(struct page_display *line, const char *fmt, ...) {
 
 
 /**
-* Builds the final display for a pending player's page_display and sends it to
-* their paginator. It also frees the page display afterwards.
+* Builds a page_display list into a string. This allocates memory for the
+* string so you must free it when you're done. The original list is left alone.
 *
-* @param char_data *ch The player to show it to.
+* @param const struct page_display *list The list of page_display lines to convert.
+* @param char_data *ch Optional: The viewier. If NULL, default settings will be used for building the string.
+* @return char* An allocated string representing the full page. (Must be free'd when done.)
 */
-void send_page_display(char_data *ch) {
+char *get_page_display_as_string(const struct page_display *list, char_data *ch) {
 	bool use_cols;
 	char *output, *ptr;
 	int clen, iter, needs_cols;
 	int last_col = 0, fixed_width = 0, col_count = 0;
 	size_t size, one;
-	struct page_display *pd;
+	const struct page_display *pd;
 	
-	if (!ch || !ch->desc || !ch->desc->page_lines) {
-		return;	// nobody to page it to
+	if (!list) {
+		strdup("");	// shortcut
 	}
 	
-	use_cols = PRF_FLAGGED(ch, PRF_SCREEN_READER) ? FALSE : TRUE;
+	use_cols = (ch && PRF_FLAGGED(ch, PRF_SCREEN_READER)) ? FALSE : TRUE;
 	
 	// compute size
 	size = 0;
-	DL_FOREACH(ch->desc->page_lines, pd) {
+	DL_FOREACH(list, pd) {
 		if (pd->cols > 1 && use_cols) {
 			one = page_display_column_width(ch, pd->cols);
 			clen = color_code_length(pd->text);
@@ -1027,7 +1029,7 @@ void send_page_display(char_data *ch) {
 	*output = '\0';
 	
 	// build string
-	DL_FOREACH(ch->desc->page_lines, pd) {
+	DL_FOREACH(list, pd) {
 		if (pd->cols <= 1 || !use_cols) {
 			// non-column display
 			if (last_col != 0 && col_count > 0) {
@@ -1097,10 +1099,53 @@ void send_page_display(char_data *ch) {
 		strcat(output, "\r\n");
 	}
 	
-	page_string(ch->desc, output, TRUE);
-	free(output);
+	return output;
+}
+
+
+/**
+* Builds the final display for a pending player's page_display and sends it to
+* the player. By default, it sends the string, unformatted, to the paginator.
+*
+* Options:
+*  PD_FREE_DISPLAY_AFTER - will free the player's page_display after sending
+*  PD_NO_PAGINATION - skips the paginator
+*  PD_FORMAT_NORMAL - will format without indent
+*  PD_FORMAT_INDENT - will format with indent
+*
+* @param char_data *ch The player to show it to.
+* @param bitvector_t options Any PD_ flags.
+*/
+void send_page_display_as(char_data *ch, bitvector_t options) {
+	char *str;
 	
-	free_page_display(&ch->desc->page_lines);
+	if (!ch || !ch->desc || !ch->desc->page_lines) {
+		return;	// nobody to page it to
+	}
+	
+	// build string version
+	str = get_page_display_as_string(ch->desc->page_lines, ch);
+	
+	// optional formatting
+	if (IS_SET(options, PD_FORMAT_NORMAL | PD_FORMAT_INDENT)) {
+		format_text(&str, IS_SET(options, PD_FORMAT_INDENT) ? 1 : 0, ch->desc, MAX_STRING_LENGTH);
+	}
+	
+	// send (via the requested method)
+	if (IS_SET(options, PD_NO_PAGINATION)) {
+		send_to_char(str, ch);
+	}
+	else {
+		page_string(ch->desc, str, TRUE);
+	}
+	
+	// free string version
+	free(str);
+	
+	// free page_display lines (by request)
+	if (IS_SET(options, PD_FREE_DISPLAY_AFTER)) {
+		free_page_display(&ch->desc->page_lines);
+	}
 }
 
 

@@ -96,6 +96,13 @@ void update_reboot();
 #define ACT_NON_MOB_VICT	(ACT_OBJ_VICT | ACT_STR_VICT | ACT_VEH_VICT)
 
 
+// PD_x: Options for send_page_display_as
+#define PD_FREE_DISPLAY_AFTER	BIT(0)	// will free the player's page_display after sending
+#define PD_NO_PAGINATION		BIT(1)	// skips the paginator
+#define PD_FORMAT_NORMAL		BIT(2)  // will format without indent
+#define PD_FORMAT_INDENT		BIT(3)	// will format with indent
+
+
 // consts
 extern FILE *logfile;
 
@@ -110,7 +117,9 @@ void append_page_display_line(struct page_display *line, const char *fmt, ...) _
 void clear_page_display(char_data *ch);
 void free_page_display(struct page_display **list);
 void free_page_display_one(struct page_display *pd);
-void send_page_display(char_data *ch);
+char *get_page_display_as_string(const struct page_display *list, char_data *ch);
+void send_page_display_as(char_data *ch, bitvector_t options);
+#define send_page_display(ch)	send_page_display_as(ch, PD_FREE_DISPLAY_AFTER)
 bool trim_page_display(char_data *ch);
 
 
