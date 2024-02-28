@@ -679,9 +679,9 @@ void free_page_display(struct page_display **list) {
 /**
 * Clears a player's page_display without sending it.
 *
-* @param char_data *ch The player.
+* @param const char_data *ch The player.
 */
-void clear_page_display(char_data *ch) {
+void clear_page_display(const char_data *ch) {
 	if (ch && ch->desc) {
 		free_page_display(&ch->desc->page_lines);
 	}
@@ -709,11 +709,11 @@ void clear_leftover_page_displays(void) {
 * Determines how wide a column should be, based on character preferences and
 * number of columns requested.
 *
-* @param char_data *ch The player.
+* @param const char_data *ch The player.
 * @param int cols How many columns will be shown.
 * @return int The character width of each column.
 */
-int page_display_column_width(char_data *ch, int cols) {
+int page_display_column_width(const char_data *ch, int cols) {
 	int width;
 	
 	// detect screen width
@@ -743,11 +743,11 @@ int page_display_column_width(char_data *ch, int cols) {
 * Adds a new line to the end of a player's page_display. Will trim trailing
 * \r\n (crlf).
 *
-* @param char_data *ch The person to add the display line to.
+* @param const char_data *ch The person to add the display line to.
 * @param const char *fmt, ... va_arg format for the line to add.
 * @return struct page_display* A pointer to the new line, if it was added. May return NULL if it failed to add.
 */
-struct page_display *build_page_display(char_data *ch, const char *fmt, ...) {
+struct page_display *build_page_display(const char_data *ch, const char *fmt, ...) {
 	char text[MAX_STRING_LENGTH];
 	va_list tArgList;
 	struct page_display *pd;
@@ -788,13 +788,13 @@ struct page_display *build_page_display(char_data *ch, const char *fmt, ...) {
 * This is intended for displays that will have multiple columns. Any sequential
 * entries with the same column count will attempt to display in columns.
 *
-* @param char_data *ch The person to add the display line to.
+* @param const char_data *ch The person to add the display line to.
 * @param int cols The number of columns for the display (2, 3, etc).
 * @param bool strict_cols If TRUE, the string may be truncated.
 * @param const char *fmt, ... va_arg format for the line to add.
 * @return struct page_display* A pointer to the new line, if it was added. May return NULL if it failed to add.
 */
-struct page_display *build_page_display_col(char_data *ch, int cols, bool strict_cols, const char *fmt, ...) {
+struct page_display *build_page_display_col(const char_data *ch, int cols, bool strict_cols, const char *fmt, ...) {
 	char text[MAX_STRING_LENGTH];
 	int max;
 	va_list tArgList;
@@ -840,11 +840,11 @@ struct page_display *build_page_display_col(char_data *ch, int cols, bool strict
 * Adds a new line to the end of a player's page_display. Will trim trailing
 * \r\n (crlf).
 *
-* @param char_data *ch The person to add the display line to.
+* @param const char_data *ch The person to add the display line to.
 * @param const char *str The string to add as the new line (will be copied).
 * @return struct page_display* A pointer to the new line, if it was added. May return NULL if it failed to add.
 */
-struct page_display *build_page_display_str(char_data *ch, const char *str) {
+struct page_display *build_page_display_str(const char_data *ch, const char *str) {
 	struct page_display *pd;
 	
 	if (!ch || !ch->desc || !str) {
@@ -873,13 +873,13 @@ struct page_display *build_page_display_str(char_data *ch, const char *str) {
 * This is intended for displays that will have multiple columns. Any sequential
 * entries with the same column count will attempt to display in columns.
 *
-* @param char_data *ch The person to add the display line to.
+* @param const char_data *ch The person to add the display line to.
 * @param int cols The number of columns for the display (2, 3, etc).
 * @param bool strict_cols If TRUE, the string may be truncated.
 * @param const char *str The string to add as the new line (will be copied).
 * @return struct page_display* A pointer to the new line, if it was added. May return NULL if it failed to add.
 */
-struct page_display *build_page_display_col_str(char_data *ch, int cols, bool strict_cols, const char *str) {
+struct page_display *build_page_display_col_str(const char_data *ch, int cols, bool strict_cols, const char *str) {
 	int max;
 	struct page_display *pd;
 	
@@ -913,11 +913,11 @@ struct page_display *build_page_display_col_str(char_data *ch, int cols, bool st
 * Adds a new line to a player's page_display -- at the BEGINNING.
 * Will trim trailing \r\n (crlf).
 *
-* @param char_data *ch The person to add the display line to (at the beginning).
+* @param const char_data *ch The person to add the display line to (at the beginning).
 * @param const char *str The string to add as the new line (will be copied).
 * @return struct page_display* A pointer to the new line, if it was added. May return NULL if it failed to add.
 */
-struct page_display *build_page_display_prepend(char_data *ch, const char *str) {
+struct page_display *build_page_display_prepend(const char_data *ch, const char *str) {
 	struct page_display *pd;
 	
 	if (!ch || !ch->desc || !str) {
@@ -985,11 +985,11 @@ void append_page_display_line(struct page_display *line, const char *fmt, ...) {
 * string so you must free it when you're done. The original list is left alone.
 *
 * @param const struct page_display *list The list of page_display lines to convert.
-* @param char_data *ch Optional: The viewier. If NULL, default settings will be used for building the string.
+* @param const char_data *ch Optional: The viewier. If NULL, default settings will be used for building the string.
 * @param bool add_crlfs If TRUE, adds line breaks between page_display lines. If FALSE, doesn't.
 * @return char* An allocated string representing the full page. (Must be free'd when done.)
 */
-char *get_page_display_as_string(const struct page_display *list, char_data *ch, bool add_crlfs) {
+char *get_page_display_as_string(const struct page_display *list, const char_data *ch, bool add_crlfs) {
 	bool use_cols;
 	char *output, *ptr;
 	int clen, iter, needs_cols;
@@ -1120,10 +1120,10 @@ char *get_page_display_as_string(const struct page_display *list, char_data *ch,
 *  PD_FORMAT_INDENT - will format with indent
 *  PD_FORMAT_WIDE - will use the wide formatter
 *
-* @param char_data *ch The player to show it to.
+* @param const char_data *ch The player to show it to.
 * @param bitvector_t options Any PD_ flags.
 */
-void send_page_display_as(char_data *ch, bitvector_t options) {
+void send_page_display_as(const char_data *ch, bitvector_t options) {
 	bitvector_t opts;
 	char *str;
 	
@@ -1163,10 +1163,10 @@ void send_page_display_as(char_data *ch, bitvector_t options) {
 /**
 * Trims blank lines from the start and end of ch's buffered page_display.
 *
-* @param char_data *ch The person with the page_display to trim.
+* @param const char_data *ch The person with the page_display to trim.
 * @return bool TRUE if anything is left in the page_display, FALSE if it's empty now.
 */
-bool trim_page_display(char_data *ch) {
+bool trim_page_display(const char_data *ch) {
 	struct page_display *pd, *next;
 	
 	if (ch && ch->desc) {

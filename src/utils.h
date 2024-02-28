@@ -2220,7 +2220,6 @@ void count_quest_tasks(struct req_data *list, int *complete, int *total);
 void drop_quest(char_data *ch, struct player_quest *pq);
 bool fail_daily_quests(char_data *ch, bool event);
 struct instance_data *find_matching_instance_for_shared_quest(char_data *ch, any_vnum quest_vnum);
-void show_quest_tracker(char_data *ch, struct player_quest *pq, char *header, bool send_output);
 void start_quest(char_data *ch, quest_data *qst, struct instance_data *inst);
 
 // act.social.c

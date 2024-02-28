@@ -1152,7 +1152,7 @@ void msg_to_desc(descriptor_data *d, const char *messg, ...) {
 * @param char_data *ch The player.
 * @param const char *messg... va_arg format.
 */
-void msg_to_char(char_data *ch, const char *messg, ...) {
+void msg_to_char(const char_data *ch, const char *messg, ...) {
 	char output[MAX_STRING_LENGTH];
 	va_list tArgList;
 	
@@ -1710,7 +1710,7 @@ void perform_act(const char *orig, char_data *ch, const void *obj, const void *v
 
 
 // this is the pre-circle3.1 send_to_char that doesn't have va_args
-void send_to_char(const char *messg, char_data *ch) {
+void send_to_char(const char *messg, const char_data *ch) {
 	if (ch->desc && messg)
 		SEND_TO_Q(messg, ch->desc);
 }

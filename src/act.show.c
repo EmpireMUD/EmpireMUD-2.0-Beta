@@ -2164,7 +2164,9 @@ SHOW(show_quests) {
 			}
 			
 			if (multi_isname(arg2, QUEST_NAME(qst))) {
-				show_quest_tracker(ch, pq, QUEST_NAME(qst), TRUE);
+				build_page_display(ch, "%s Tracker:", QUEST_NAME(qst));
+				show_tracker_display(ch, pq->tracker, FALSE);
+				send_page_display(ch);
 				found = TRUE;
 				break;	// show just one
 			}

@@ -19,9 +19,9 @@
 void clear_last_act_message(descriptor_data *desc);
 void flush_queues(descriptor_data *d);
 void send_to_all(const char *messg, ...) __attribute__((format(printf, 1, 2)));
-void send_to_char(const char *messg, char_data *ch);
+void send_to_char(const char *messg, const char_data *ch);
 void msdp_update_room(char_data *ch);
-void msg_to_char(char_data *ch, const char *messg, ...) __attribute__((format(printf, 2, 3)));
+void msg_to_char(const char_data *ch, const char *messg, ...) __attribute__((format(printf, 2, 3)));
 void msg_to_desc(descriptor_data *d, const char *messg, ...) __attribute__((format(printf, 2, 3)));
 void msg_to_vehicle(vehicle_data *veh, bool awake_only, const char *messg, ...) __attribute__((format(printf, 3, 4)));
 void olc_audit_msg(char_data *ch, any_vnum vnum, const char *messg, ...);
@@ -110,19 +110,19 @@ extern FILE *logfile;
 
 
 // page display prototypes
-struct page_display *build_page_display(char_data *ch, const char *fmt, ...) __attribute__((format(printf, 2, 3)));
-struct page_display *build_page_display_col(char_data *ch, int cols, bool strict_cols, const char *fmt, ...) __attribute__((format(printf, 4, 5)));
-struct page_display *build_page_display_str(char_data *ch, const char *str);
-struct page_display *build_page_display_col_str(char_data *ch, int cols, bool strict_cols, const char *str);
-struct page_display *build_page_display_prepend(char_data *ch, const char *str);
+struct page_display *build_page_display(const char_data *ch, const char *fmt, ...) __attribute__((format(printf, 2, 3)));
+struct page_display *build_page_display_col(const char_data *ch, int cols, bool strict_cols, const char *fmt, ...) __attribute__((format(printf, 4, 5)));
+struct page_display *build_page_display_str(const char_data *ch, const char *str);
+struct page_display *build_page_display_col_str(const char_data *ch, int cols, bool strict_cols, const char *str);
+struct page_display *build_page_display_prepend(const char_data *ch, const char *str);
 void append_page_display_line(struct page_display *line, const char *fmt, ...) __attribute__((format(printf, 2, 3)));
-void clear_page_display(char_data *ch);
+void clear_page_display(const char_data *ch);
 void free_page_display(struct page_display **list);
 void free_page_display_one(struct page_display *pd);
-char *get_page_display_as_string(const struct page_display *list, char_data *ch, bool add_crlfs);
-void send_page_display_as(char_data *ch, bitvector_t options);
+char *get_page_display_as_string(const struct page_display *list, const char_data *ch, bool add_crlfs);
+void send_page_display_as(const char_data *ch, bitvector_t options);
 #define send_page_display(ch)	send_page_display_as(ch, PD_FREE_DISPLAY_AFTER)
-bool trim_page_display(char_data *ch);
+bool trim_page_display(const char_data *ch);
 
 
 /* I/O functions */

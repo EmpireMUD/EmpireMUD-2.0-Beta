@@ -671,18 +671,6 @@ void show_quest_info(char_data *ch, quest_data *qst) {
 
 
 /**
-* @param char_data *ch The person to show to.
-* @param struct player_quest *pq The quest to show the tracker for.
-* @param char *header Text shown before "Tracker:" (default: "Quest ", if not provided).
-* @param bool send_output If TRUE, sends the page_display as text when done. Pass FALSE if you're building a larger page_display for the character.
-*/
-void show_quest_tracker(char_data *ch, struct player_quest *pq, char *header, bool send_output) {
-	build_page_display(ch, "%s Tracker:", (header && *header) ? header : "Quest");
-	show_tracker_display(ch, pq->tracker, send_output);
-}
-
-
-/**
 * Begins a quest for a player, and sends the start messages.
 *
 * @param char_data *ch The person starting a quest.
@@ -1222,7 +1210,9 @@ QCMD(qcmd_tracker) {
 		msg_to_char(ch, "You don't seem to be on a quest called '%s' here.\r\n", argument);
 	}
 	else {
-		show_quest_tracker(ch, pq, QUEST_NAME(qst), TRUE);
+		build_page_display(ch, "%s Tracker:", QUEST_NAME(qst));
+		show_tracker_display(ch, pq->tracker, FALSE);
+		send_page_display(ch);
 	}
 }
 
