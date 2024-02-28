@@ -1522,7 +1522,10 @@ SHOW(show_libraries) {
 			}
 		}
 		
-		if (!count) {
+		if (count) {
+			build_page_display(ch, "Total: %d", count);
+		}
+		else {
 			build_page_display_str(ch, "  none");
 		}
 		
