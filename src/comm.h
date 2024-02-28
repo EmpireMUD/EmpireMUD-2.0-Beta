@@ -101,6 +101,7 @@ void update_reboot();
 #define PD_NO_PAGINATION		BIT(1)	// skips the paginator
 #define PD_FORMAT_NORMAL		BIT(2)  // will format without indent
 #define PD_FORMAT_INDENT		BIT(3)	// will format with indent
+#define PD_FORMAT_WIDE			BIT(4)	// use wide formatter
 
 
 // consts

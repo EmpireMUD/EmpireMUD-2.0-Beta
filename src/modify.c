@@ -1118,11 +1118,13 @@ char *get_page_display_as_string(const struct page_display *list, char_data *ch,
 *  PD_NO_PAGINATION - skips the paginator
 *  PD_FORMAT_NORMAL - will format without indent
 *  PD_FORMAT_INDENT - will format with indent
+*  PD_FORMAT_WIDE - will use the wide formatter
 *
 * @param char_data *ch The player to show it to.
 * @param bitvector_t options Any PD_ flags.
 */
 void send_page_display_as(char_data *ch, bitvector_t options) {
+	bitvector_t opts;
 	char *str;
 	
 	if (!ch || !ch->desc || !ch->desc->page_lines) {
@@ -1133,8 +1135,11 @@ void send_page_display_as(char_data *ch, bitvector_t options) {
 	str = get_page_display_as_string(ch->desc->page_lines, ch, IS_SET(options, PD_FORMAT_NORMAL | PD_FORMAT_INDENT) ? FALSE : TRUE);
 	
 	// optional formatting
-	if (IS_SET(options, PD_FORMAT_NORMAL | PD_FORMAT_INDENT)) {
-		format_text(&str, IS_SET(options, PD_FORMAT_INDENT) ? 1 : 0, ch->desc, MAX_STRING_LENGTH);
+	if (IS_SET(options, PD_FORMAT_NORMAL | PD_FORMAT_INDENT | PD_FORMAT_WIDE)) {
+		opts = NOBITS;
+		opts |= (IS_SET(options, PD_FORMAT_INDENT) ? FORMAT_INDENT : NOBITS);
+		opts |= (IS_SET(options, PD_FORMAT_WIDE) ? FORMAT_WIDE : NOBITS);
+		format_text(&str, opts, ch->desc, MAX_STRING_LENGTH);
 	}
 	
 	// send (via the requested method)

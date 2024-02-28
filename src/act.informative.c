@@ -1849,7 +1849,7 @@ void show_character_affects_simple(char_data *ch, char_data *to) {
 	}
 	else {
 		// formatting for simple view:
-		send_page_display_as(to, PD_FREE_DISPLAY_AFTER | PD_NO_PAGINATION | PD_FORMAT_NORMAL);
+		send_page_display_as(to, PD_FREE_DISPLAY_AFTER | PD_NO_PAGINATION | PD_FORMAT_NORMAL | PD_FORMAT_WIDE);
 	}
 	
 	gain_player_tech_exp(to, PTECH_ENEMY_BUFF_DETAILS, 15);
