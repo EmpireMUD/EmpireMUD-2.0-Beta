@@ -2682,7 +2682,7 @@ char *get_vehicle_name_by_proto(obj_vnum vnum);
 char *get_vehicle_short_desc(vehicle_data *veh, char_data *to);
 void harness_mob_to_vehicle(char_data *mob, vehicle_data *veh);
 char *list_harnessed_mobs(vehicle_data *veh);
-void look_at_vehicle(vehicle_data *veh, char_data *ch);
+void look_at_vehicle(vehicle_data *veh, char_data *ch, bool send_page);
 void process_dismantle_vehicle(char_data *ch);
 void remove_room_from_vehicle(room_data *room, vehicle_data *veh);
 void ruin_vehicle(vehicle_data *veh, char *message);

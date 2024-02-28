@@ -4612,11 +4612,13 @@ void do_stat_vehicle(char_data *ch, vehicle_data *veh, bool details) {
 *
 * @param vehicle_data *veh The vehicle to look at.
 * @param char_data *ch The person to show the output to.
+* @param bool send_page If TRUE, sends the display right away. If FALSE, leaves it in ch's page_display instead.
 */
-void look_at_vehicle(vehicle_data *veh, char_data *ch) {
+void look_at_vehicle(vehicle_data *veh, char_data *ch, bool send_page) {
 	char lbuf[MAX_STRING_LENGTH], colbuf[256];
 	player_index_data *index;
 	vehicle_data *proto;
+	struct page_display *line;
 	
 	if (!veh || !ch || !ch->desc) {
 		return;
@@ -4625,38 +4627,38 @@ void look_at_vehicle(vehicle_data *veh, char_data *ch) {
 	proto = vehicle_proto(VEH_VNUM(veh));
 	
 	if (VEH_LOOK_DESC(veh) && *VEH_LOOK_DESC(veh)) {
-		msg_to_char(ch, "You look at %s:\r\n%s", VEH_SHORT_DESC(veh), VEH_LOOK_DESC(veh));
+		build_page_display(ch, "You look at %s:\r\n%s", VEH_SHORT_DESC(veh), VEH_LOOK_DESC(veh));
 	}
 	else {
-		act("You look at $V but see nothing special.", FALSE, ch, NULL, veh, TO_CHAR | ACT_VEH_VICT);
+		act("You look at $V but see nothing special.", FALSE, ch, NULL, veh, TO_CHAR | ACT_VEH_VICT | TO_PAGE_DISPLAY);
 	}
 	
 	if (proto && VEH_SHORT_DESC(veh) != VEH_SHORT_DESC(proto) && !strchr(VEH_SHORT_DESC(proto), '#')) {
 		strcpy(lbuf, skip_filler(VEH_SHORT_DESC(proto)));
-		msg_to_char(ch, "It appears to be %s %s.\r\n", AN(lbuf), lbuf);
+		build_page_display(ch, "It appears to be %s %s.", AN(lbuf), lbuf);
 	}
 	
 	if (VEH_OWNER(veh)) {
 		if (VEH_FLAGGED(veh, VEH_BUILDING)) {
-			msg_to_char(ch, "It is owned by %s%s\t0", EMPIRE_BANNER(VEH_OWNER(veh)), EMPIRE_NAME(VEH_OWNER(veh)));
+			line = build_page_display(ch, "It is owned by %s%s\t0", EMPIRE_BANNER(VEH_OWNER(veh)), EMPIRE_NAME(VEH_OWNER(veh)));
 		}
 		else {
-			msg_to_char(ch, "It is flying the flag of %s%s\t0", EMPIRE_BANNER(VEH_OWNER(veh)), EMPIRE_NAME(VEH_OWNER(veh)));
+			line = build_page_display(ch, "It is flying the flag of %s%s\t0", EMPIRE_BANNER(VEH_OWNER(veh)), EMPIRE_NAME(VEH_OWNER(veh)));
 		}
 		
 		if (VEH_OWNER(veh) == GET_LOYALTY(ch)) {
 			if (VEH_FLAGGED(veh, VEH_PLAYER_NO_WORK)) {
-				send_to_char(" (no-work)", ch);
+				append_page_display_line(line, " (no-work)");
 			}
 			if (VEH_FLAGGED(veh, VEH_PLAYER_NO_DISMANTLE)) {
-				send_to_char(" (no-dismantle)", ch);
+				append_page_display_line(line, " (no-dismantle)");
 			}
 		}
-		send_to_char(".\r\n", ch);
+		append_page_display_line(line, ".");
 	}
 	
 	if (VEH_PATRON(veh) && (index = find_player_index_by_idnum(VEH_PATRON(veh)))) {
-		msg_to_char(ch, "It is dedicated to %s.\r\n", index->fullname);
+		build_page_display(ch, "It is dedicated to %s.", index->fullname);
 	}
 	
 	if (VEH_PAINT_COLOR(veh)) {
@@ -4666,21 +4668,25 @@ void look_at_vehicle(vehicle_data *veh, char_data *ch) {
 		if (VEH_FLAGGED(veh, VEH_BRIGHT_PAINT)) {
 			strtoupper(buf1);
 		}
-		msg_to_char(ch, "It has been painted %s%s%s&0.\r\n", colbuf, (VEH_FLAGGED(veh, VEH_BRIGHT_PAINT) ? "bright " : ""), lbuf);
+		build_page_display(ch, "It has been painted %s%s%s&0.", colbuf, (VEH_FLAGGED(veh, VEH_BRIGHT_PAINT) ? "bright " : ""), lbuf);
 	}
 	
 	if (VEH_NEEDS_RESOURCES(veh)) {
 		show_resource_list(VEH_NEEDS_RESOURCES(veh), lbuf, sizeof(lbuf));
 		
 		if (VEH_IS_COMPLETE(veh)) {
-			msg_to_char(ch, "Maintenance needed: %s\r\n", lbuf);
+			build_page_display(ch, "Maintenance needed: %s", lbuf);
 		}
 		else if (VEH_IS_DISMANTLING(veh)) {
-			msg_to_char(ch, "Remaining to dismantle: %s\r\n", lbuf);
+			build_page_display(ch, "Remaining to dismantle: %s", lbuf);
 		}
 		else {
-			msg_to_char(ch, "Resources to completion: %s\r\n", lbuf);
+			build_page_display(ch, "Resources to completion: %s", lbuf);
 		}
+	}
+	
+	if (send_page) {
+		send_page_display(ch);
 	}
 }
 

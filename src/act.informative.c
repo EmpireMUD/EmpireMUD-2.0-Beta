@@ -48,7 +48,7 @@ void mudstats_time(char_data *ch, char *argument);
 ACMD(do_affects);
 void list_one_char(char_data *i, char_data *ch, int num);
 void look_at_char(char_data *i, char_data *ch, bool show_eq);
-void look_in_obj(char_data *ch, char *arg, obj_data *obj, vehicle_data *veh);
+void look_in_obj(char_data *ch, char *arg, obj_data *obj, vehicle_data *veh, bool send_page);
 void show_one_stored_item_to_char(char_data *ch, empire_data *emp, struct empire_storage_data *store, bool show_zero, bool use_page_display);
 
 
@@ -773,11 +773,13 @@ void look_at_target(char_data *ch, char *arg, char *more_args, bool look_inside)
 	
 	// was the target a vehicle?
 	if (found_veh != NULL) {
-		look_at_vehicle(found_veh, ch);
-		act("$n looks at $V.", TRUE, ch, NULL, found_veh, TO_ROOM | ACT_VEH_VICT);
+		look_at_vehicle(found_veh, ch, FALSE);
 		if (look_inside && VEH_FLAGGED(found_veh, VEH_CONTAINER)) {
-			look_in_obj(ch, NULL, NULL, found_veh);
+			look_in_obj(ch, NULL, NULL, found_veh, FALSE);
 		}
+		
+		send_page_display(ch);
+		act("$n looks at $V.", TRUE, ch, NULL, found_veh, TO_ROOM | ACT_VEH_VICT);
 		return;
 	}
 
@@ -795,7 +797,8 @@ void look_at_target(char_data *ch, char *arg, char *more_args, bool look_inside)
 		if (ex_veh) {
 			act("$n looks at $V.", TRUE, ch, NULL, ex_veh, TO_ROOM | ACT_VEH_VICT);
 		}
-		send_to_char(exdesc, ch);
+		build_page_display_str(ch, exdesc);
+		send_page_display(ch);
 		found = TRUE;
 	}
 	
@@ -808,25 +811,26 @@ void look_at_target(char_data *ch, char *arg, char *more_args, bool look_inside)
 	if (bits) {
 		if (!found) {
 			if (found_obj->worn_by) {
-				act("You look at $p (worn):", FALSE, ch, found_obj, NULL, TO_CHAR);
+				act("You look at $p (worn):", FALSE, ch, found_obj, NULL, TO_CHAR | TO_PAGE_DISPLAY);
 			}
 			else if (found_obj->carried_by) {
-				act("You look at $p (inventory):", FALSE, ch, found_obj, NULL, TO_CHAR);
+				act("You look at $p (inventory):", FALSE, ch, found_obj, NULL, TO_CHAR | TO_PAGE_DISPLAY);
 			}
 			else if (IN_ROOM(found_obj)) {
-				act("You look at $p (in room):", FALSE, ch, found_obj, NULL, TO_CHAR);
+				act("You look at $p (in room):", FALSE, ch, found_obj, NULL, TO_CHAR | TO_PAGE_DISPLAY);
 			}
 			else {
-				act("You look at $p:", FALSE, ch, found_obj, NULL, TO_CHAR);
+				act("You look at $p:", FALSE, ch, found_obj, NULL, TO_CHAR | TO_PAGE_DISPLAY);
 			}
-			if (ch->desc) {
-				page_string(ch->desc, obj_desc_for_char(found_obj, ch, OBJ_DESC_LOOK_AT), TRUE);	/* Show no-description */
-			}
-			act("$n looks at $p.", TRUE, ch, found_obj, NULL, TO_ROOM);
+			build_page_display_str(ch, obj_desc_for_char(found_obj, ch, OBJ_DESC_LOOK_AT));	/* Show no-description */
+			
 			found = TRUE;
 			if (look_inside && (IS_CONTAINER(found_obj) || IS_CORPSE(found_obj) || IS_DRINK_CONTAINER(found_obj))) {
-				look_in_obj(ch, NULL, found_obj, NULL);
+				look_in_obj(ch, NULL, found_obj, NULL, FALSE);
 			}
+			
+			send_page_display(ch);
+			act("$n looks at $p.", TRUE, ch, found_obj, NULL, TO_ROOM);
 		}
 	}
 	
@@ -855,8 +859,9 @@ void look_at_target(char_data *ch, char *arg, char *more_args, bool look_inside)
 * @param char *arg The typed argument (usually obj name) -- only if obj/veh are NULL.
 * @param obj_data *obj Optional: A pre-validated object to look in (may be NULL).
 * @param vehicle_data *veh Optional: A pre-validated vehicle to look in (may be NULL).
+* @param bool send_page If TRUE, sends the display right away. If FALSE, leaves it in ch's page_display instead.
 */
-void look_in_obj(char_data *ch, char *arg, obj_data *obj, vehicle_data *veh) {
+void look_in_obj(char_data *ch, char *arg, obj_data *obj, vehicle_data *veh, bool send_page) {
 	char buf[MAX_STRING_LENGTH];
 	const char *gstr;
 	char_data *dummy = NULL;
@@ -881,7 +886,10 @@ void look_in_obj(char_data *ch, char *arg, obj_data *obj, vehicle_data *veh) {
 			sprintf(buf, "You look inside $V (%d/%d):", VEH_CARRYING_N(veh), VEH_CAPACITY(veh));
 			act(buf, FALSE, ch, NULL, veh, TO_CHAR | TO_PAGE_DISPLAY | ACT_VEH_VICT);
 			list_obj_to_char(VEH_CONTAINS(veh), ch, OBJ_DESC_CONTENTS, TRUE, TRUE);
-			send_page_display(ch);
+			
+			if (send_page) {
+				send_page_display(ch);
+			}
 		}
 	}
 	// the rest is objects:
@@ -895,7 +903,10 @@ void look_in_obj(char_data *ch, char *arg, obj_data *obj, vehicle_data *veh) {
 			else {
 				build_page_display(ch, "You look inside %s (%s):", get_obj_desc(obj, ch, OBJ_DESC_SHORT), (obj->worn_by ? "worn" : (obj->carried_by ? "inventory" : "in room")));
 				list_obj_to_char(obj->contains, ch, OBJ_DESC_CONTENTS, TRUE, TRUE);
-				send_page_display(ch);
+				
+				if (send_page) {
+					send_page_display(ch);
+				}
 			}
 		}
 		else if (IS_DRINK_CONTAINER(obj)) {		/* item must be a fountain or drink container */
@@ -3771,11 +3782,13 @@ ACMD(do_look) {
 				look_at_room_by_loc(ch, map, LRR_LOOK_OUT);
 			}
 		}
-		else if (is_abbrev(arg, "in"))
-			look_in_obj(ch, arg2, NULL, NULL);
+		else if (is_abbrev(arg, "in")) {
+			look_in_obj(ch, arg2, NULL, NULL, TRUE);
+		}
 		/* did the char type 'look <direction>?' */
-		else if ((look_type = parse_direction(ch, arg)) != NO_DIR)
+		else if ((look_type = parse_direction(ch, arg)) != NO_DIR) {
 			look_in_direction(ch, look_type);
+		}
 		else if (is_abbrev(arg, "at")) {
 			half_chop(arg2, arg, arg3);
 			look_at_target(ch, arg, arg3, FALSE);
