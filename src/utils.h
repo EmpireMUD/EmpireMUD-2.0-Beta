@@ -2490,7 +2490,7 @@ bool try_mobile_movement(char_data *ch);
 bool validate_spawn_location(room_data *room, bitvector_t spawn_flags, int x_coord, int y_coord, bool in_city);
 
 // modify.c
-void format_text(char **ptr_string, int mode, descriptor_data *d, unsigned int maxlen);
+void format_text(char **ptr_string, bitvector_t mode, descriptor_data *desc, unsigned int maxlen);
 void show_string(descriptor_data *d, char *input);
 
 // morph.c

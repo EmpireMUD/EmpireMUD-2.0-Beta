@@ -364,8 +364,9 @@ typedef struct vehicle_data vehicle_data;
 #define EVOLVER_OWNED  BIT(0)	// tile is owned
 
 
-// for modify.c
+// FORMAT_x: for modify.c's string formatter
 #define FORMAT_INDENT	BIT(0)
+#define FORMAT_WIDE		BIT(1)
 
 
 // GLOBAL_x types for global_data

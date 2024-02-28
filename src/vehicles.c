@@ -1117,7 +1117,7 @@ void set_vehicle_look_desc(vehicle_data *veh, const char *str, bool format) {
 	
 	// format if requested
 	if (val && format) {
-		format_text(&VEH_LOOK_DESC(veh), (strlen(VEH_LOOK_DESC(veh)) > 80 ? FORMAT_INDENT : 0), NULL, MAX_STRING_LENGTH);
+		format_text(&VEH_LOOK_DESC(veh), (strlen(VEH_LOOK_DESC(veh)) >= 80 ? FORMAT_INDENT : NOBITS), NULL, MAX_STRING_LENGTH);
 	}
 	
 	request_vehicle_save_in_world(veh);
@@ -1167,7 +1167,7 @@ void set_vehicle_look_desc_append(vehicle_data *veh, const char *str, bool forma
 		}
 		VEH_LOOK_DESC(veh) = str_dup(temp);
 		if (format) {
-			format_text(&VEH_LOOK_DESC(veh), (strlen(VEH_LOOK_DESC(veh)) > 80 ? FORMAT_INDENT : 0), NULL, MAX_STRING_LENGTH);
+			format_text(&VEH_LOOK_DESC(veh), (strlen(VEH_LOOK_DESC(veh)) >= 80 ? FORMAT_INDENT : NOBITS), NULL, MAX_STRING_LENGTH);
 		}
 		
 		request_vehicle_save_in_world(veh);

@@ -1367,7 +1367,7 @@ void script_modify(char *argument) {
 			strcat(value, "\r\n");
 			set_room_custom_description(room, (clear ? NULL : value));
 			if (ROOM_CUSTOM_DESCRIPTION(room)) {
-				format_text(&ROOM_CUSTOM_DESCRIPTION(room), (strlen(ROOM_CUSTOM_DESCRIPTION(room)) > 80 ? FORMAT_INDENT : 0), NULL, MAX_STRING_LENGTH);
+				format_text(&ROOM_CUSTOM_DESCRIPTION(room), (strlen(ROOM_CUSTOM_DESCRIPTION(room)) >= 80 ? FORMAT_INDENT : NOBITS), NULL, MAX_STRING_LENGTH);
 			}
 		}
 		else if (is_abbrev(field_arg, "append-description")) {	// ADDS TO THE END OF the description
@@ -1377,7 +1377,7 @@ void script_modify(char *argument) {
 			else {
 				snprintf(temp, sizeof(temp), "%s%s\r\n", ROOM_CUSTOM_DESCRIPTION(room) ? ROOM_CUSTOM_DESCRIPTION(room) : get_room_description(room), value);
 				set_room_custom_description(room, temp);
-				format_text(&ROOM_CUSTOM_DESCRIPTION(room), (strlen(ROOM_CUSTOM_DESCRIPTION(room)) > 80 ? FORMAT_INDENT : 0), NULL, MAX_STRING_LENGTH);
+				format_text(&ROOM_CUSTOM_DESCRIPTION(room), (strlen(ROOM_CUSTOM_DESCRIPTION(room)) >= 80 ? FORMAT_INDENT : NOBITS), NULL, MAX_STRING_LENGTH);
 			}
 		}
 		else if (is_abbrev(field_arg, "append-desc-noformat")) {	// ADDS TO THE END OF the description

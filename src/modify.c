@@ -1315,6 +1315,7 @@ void parse_action(int command, char *string, descriptor_data *d) {
 				"/e# <text> - changes line # to <text>\r\n"
 				"/f         - formats text\r\n"
 				"/fi        - formats text and indents\r\n"
+				"/fw        - formats wide (may combine with indent)\r\n"
 				"/i# <text> - inserts <text> before line #\r\n"
 				"/l         - lists the buffer\r\n"
 				"/m         - lists the buffer with color\r\n"
@@ -1333,11 +1334,16 @@ void parse_action(int command, char *string, descriptor_data *d) {
 				msg_to_desc(d, "Script %sformatted.\r\n", format_script(d) ? "": "not ");
 				return;
 			}
-
+			
+			// check for /fw, /fi, or /fwi
 			while (isalpha(string[j]) && j < 2) {
-				if (string[j++] == 'i' && !indent) {
+				if (string[j++] == 'i') {
 					indent = TRUE;
 					flags |= FORMAT_INDENT;
+				}
+				else if (string[j] == 'w') {
+					indent = TRUE;
+					flags |= FORMAT_WIDE;
 				}
 			}
 			format_text(d->str, flags, d, d->max_str);
@@ -1345,9 +1351,13 @@ void parse_action(int command, char *string, descriptor_data *d) {
 			SEND_TO_Q(buf, d);
 			break;
 		case PARSE_REPLACE:
-			while (isalpha(string[j]) && j < 2)
-				if (string[j++] == 'a' && !indent)
+			// check for /ra
+			while (isalpha(string[j]) && j < 2) {
+				if (string[j++] == 'a') {
 					rep_all = 1;
+				}
+			}
+			
 			if (!*d->str) {
 				SEND_TO_Q("Nothing to replace.\r\n", d);
 				return;
@@ -1683,11 +1693,11 @@ void parse_action(int command, char *string, descriptor_data *d) {
  //////////////////////////////////////////////////////////////////////////////
 //// SCRIPT FORMATTER ////////////////////////////////////////////////////////
 
-// FORMAT_IN_x: Used for formatting scripts
-#define FORMAT_IN_IF  0
-#define FORMAT_IN_SWITCH  1
-#define FORMAT_IN_WHILE  2
-#define FORMAT_IN_CASE  3
+// SCR_FORM_IN_x: Used for formatting scripts
+#define SCR_FORM_IN_IF  0
+#define SCR_FORM_IN_SWITCH  1
+#define SCR_FORM_IN_WHILE  2
+#define SCR_FORM_IN_CASE  3
 
 // formatting helper: handles nested structures
 struct script_format_stack {
@@ -1787,18 +1797,18 @@ int format_script(struct descriptor_data *d) {
 		skip_spaces(&t);
 		if (!strncasecmp(t, "if ", 3)) {
 			indent_next = TRUE;
-			add_script_format_stack(&stack, FORMAT_IN_IF);
+			add_script_format_stack(&stack, SCR_FORM_IN_IF);
 		}
 		else if (!strncasecmp(t, "switch ", 7)) {
 			indent_next = TRUE;
-			add_script_format_stack(&stack, FORMAT_IN_SWITCH);
+			add_script_format_stack(&stack, SCR_FORM_IN_SWITCH);
 		}
 		else if (!strncasecmp(t, "while ", 6)) {
 			indent_next = TRUE;
-			add_script_format_stack(&stack, FORMAT_IN_WHILE);
+			add_script_format_stack(&stack, SCR_FORM_IN_WHILE);
 		}
 		else if (!strncasecmp(t, "done", 4)) {
-			if (!indent || (stack->type != FORMAT_IN_SWITCH && stack->type != FORMAT_IN_WHILE)) {
+			if (!indent || (stack->type != SCR_FORM_IN_SWITCH && stack->type != SCR_FORM_IN_WHILE)) {
 				msg_to_desc(d, "Unmatched 'done' (line %d)!\r\n", line_num);
 				free(sc);
 				free_script_format_stack(&stack);
@@ -1808,7 +1818,7 @@ int format_script(struct descriptor_data *d) {
 			pop_script_format_stack(&stack);	// remove switch or while
 		}
 		else if (!strncasecmp(t, "end", 3)) {
-			if (!indent || stack->type != FORMAT_IN_IF) {
+			if (!indent || stack->type != SCR_FORM_IN_IF) {
 				msg_to_desc(d, "Unmatched 'end' (line %d)!\r\n", line_num);
 				free(sc);
 				free_script_format_stack(&stack);
@@ -1818,7 +1828,7 @@ int format_script(struct descriptor_data *d) {
 			pop_script_format_stack(&stack);	// remove if
 		}
 		else if (!strncasecmp(t, "else", 4)) {
-			if (!indent || stack->type != FORMAT_IN_IF) {
+			if (!indent || stack->type != SCR_FORM_IN_IF) {
 				msg_to_desc(d, "Unmatched 'else' (line %d)!\r\n", line_num);
 				free(sc);
 				free_script_format_stack(&stack);
@@ -1829,12 +1839,12 @@ int format_script(struct descriptor_data *d) {
 			// no need to modify stack: we're going from IF to IF (ish)
 		}
 		else if (!strncasecmp(t, "case", 4) || !strncasecmp(t, "default", 7)) {
-			if (indent && stack->type == FORMAT_IN_SWITCH) {
+			if (indent && stack->type == SCR_FORM_IN_SWITCH) {
 				// case in a switch (normal)
 				indent_next = TRUE;
-				add_script_format_stack(&stack, FORMAT_IN_CASE);
+				add_script_format_stack(&stack, SCR_FORM_IN_CASE);
 			}
-			else if (indent && stack->type == FORMAT_IN_CASE) {
+			else if (indent && stack->type == SCR_FORM_IN_CASE) {
 				// chained cases
 				--indent;
 				indent_next = TRUE;
@@ -1848,12 +1858,12 @@ int format_script(struct descriptor_data *d) {
 			}
 		}
 		else if (!strncasecmp(t, "break", 5)) {
-			if (indent && stack->type == FORMAT_IN_CASE) {
+			if (indent && stack->type == SCR_FORM_IN_CASE) {
 				// breaks only cancel indent when directly in a case
 				--indent;
 				pop_script_format_stack(&stack);	// remove the case
 			}
-			else if (find_script_format_stack(stack, FORMAT_IN_WHILE) || find_script_format_stack(stack, FORMAT_IN_CASE)) {
+			else if (find_script_format_stack(stack, SCR_FORM_IN_WHILE) || find_script_format_stack(stack, SCR_FORM_IN_CASE)) {
 				// does not cancel indent in a while or something nested in a case
 			}
 			else {
@@ -1901,9 +1911,22 @@ int format_script(struct descriptor_data *d) {
  //////////////////////////////////////////////////////////////////////////////
 //// TEXT FORMATTER //////////////////////////////////////////////////////////
 
-// "d" is unused and appears to be optional, so I'm treating it as optional -paul
-void format_text(char **ptr_string, int mode, descriptor_data *d, unsigned int maxlen) {
-	int line_chars, startlen, len, cap_next = TRUE, cap_next_next = FALSE;
+
+/**
+* Formats a string (which may be reallocated) to a standard width.
+*
+* Mode options:
+*   FORMAT_INDENT - will add leading spaces
+*   FORMAT_WIDE - will use the player's screen width instead of 79 chars.
+*
+* @param char **ptr_string Pointer to the string to format (which may be reallocated).
+* @param bitvector_t mode FORMAT_ flags
+* @param descriptor_data *desc Descriptor who will be viewing this text (Optional; may be NULL; used for wide format size only).
+* @param unsigned int maxlen Maximum length of storage for the string.
+*/
+void format_text(char **ptr_string, bitvector_t mode, descriptor_data *desc, unsigned int maxlen) {
+	bool  cap_next = TRUE, cap_next_next = FALSE;
+	int line_chars, startlen, len, max_width;
 	char *flow, *start = NULL, temp;
 	char formatted[MAX_STRING_LENGTH];
 
@@ -1911,6 +1934,8 @@ void format_text(char **ptr_string, int mode, descriptor_data *d, unsigned int m
 		log("SYSERR: format_text: maxlen is greater than buffer size.");
 		return;
 	}
+	
+	max_width = (IS_SET(mode, FORMAT_WIDE) && desc && desc->pProtocol->ScreenWidth > 1) ? (desc->pProtocol->ScreenWidth - 1) : 79;
 	
 	// ensure the original string ends with a \r\n -- the formatter requires it
 	if (*ptr_string && (*ptr_string)[strlen(*ptr_string) - 1] != '\n' && strlen(*ptr_string) < maxlen + 2) {
@@ -1950,7 +1975,7 @@ void format_text(char **ptr_string, int mode, descriptor_data *d, unsigned int m
 			*flow = '\0';
 
 			startlen = color_strlen(start);
-			if (line_chars + startlen + 1 > 79) {
+			if (line_chars + startlen + 1 > max_width) {
 				strcat(formatted, "\r\n");
 				line_chars = 0;
 			}
@@ -1969,7 +1994,7 @@ void format_text(char **ptr_string, int mode, descriptor_data *d, unsigned int m
 			*flow = temp;
 		}
 		if (cap_next_next) {
-			if (line_chars + 3 > 79) {
+			if (line_chars + 3 > max_width) {
 				strcat(formatted, "\r\n");
 				line_chars = 0;
 			}

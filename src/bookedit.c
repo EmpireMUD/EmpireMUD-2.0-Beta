@@ -690,6 +690,10 @@ OLC_MODULE(booked_paragraphs) {
 		else {
 			LL_FOREACH(BOOK_PARAGRAPHS(book), para) {
 				if (--pos == 0) {
+					if (ch->desc && ch->desc->str == &para->text) {
+						msg_to_char(ch, "You cannot delete the paragraph you're editing.\r\n");
+						return;
+					}
 					LL_DELETE(BOOK_PARAGRAPHS(book), para);
 					if (para->text) {
 						free(para->text);

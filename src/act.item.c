@@ -758,7 +758,7 @@ void identify_obj_to_char(obj_data *obj, char_data *ch, bool simple) {
 			strcat(lbuf, "\r\n");
 		}
 		temp = str_dup(lbuf);
-		format_text(&temp, 0, NULL, MAX_STRING_LENGTH);
+		format_text(&temp, FORMAT_WIDE, ch->desc, MAX_STRING_LENGTH);
 		send_to_char(temp, ch);
 		free(temp);
 	}

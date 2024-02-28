@@ -2601,7 +2601,7 @@ void change_look_desc(char_data *ch, char *str, bool format) {
 		}
 		
 		if (format) {
-			format_text(&GET_LOOK_DESC(ch), (strlen(GET_LOOK_DESC(ch)) > 80 ? FORMAT_INDENT : 0), NULL, MAX_STRING_LENGTH);
+			format_text(&GET_LOOK_DESC(ch), (strlen(GET_LOOK_DESC(ch)) >= 80 ? FORMAT_INDENT : NOBITS), NULL, MAX_STRING_LENGTH);
 		}
 		
 		// update companion data
@@ -2658,7 +2658,7 @@ void change_look_desc_append(char_data *ch, char *str, bool format) {
 		GET_LOOK_DESC(ch) = str_dup(temp);
 		
 		if (format) {
-			format_text(&GET_LOOK_DESC(ch), (strlen(GET_LOOK_DESC(ch)) > 80 ? FORMAT_INDENT : 0), NULL, MAX_STRING_LENGTH);
+			format_text(&GET_LOOK_DESC(ch), (strlen(GET_LOOK_DESC(ch)) >= 80 ? FORMAT_INDENT : NOBITS), NULL, MAX_STRING_LENGTH);
 		}
 		
 		// update companion data
