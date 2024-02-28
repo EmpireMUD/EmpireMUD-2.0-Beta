@@ -1733,6 +1733,18 @@ static inline int GET_SEASON(room_data *room) {
 #define ONOFF(a) ((a) ? "ON" : "OFF")
 
 
+// version of snprintf that checks output and logs
+#define safe_snprintf(buffer, bsize, args...)	{		\
+		int _safe_snprintf_res = snprintf((buffer), (bsize), args);		\
+		if (_safe_snprintf_res < 0) {		\
+			log("Warning: snprintf got error result %d when writing to a buffer of size %d in %s:%d", _safe_snprintf_res + 1, (int) bsize, __FILE__, __LINE__);		\
+		}		\
+		else if (_safe_snprintf_res >= (bsize)) {		\
+			log("Warning: snprintf tried to write %d to a buffer of size %d in %s:%d", _safe_snprintf_res + 1, (int) bsize, __FILE__, __LINE__);		\
+		}		\
+	}
+
+
  //////////////////////////////////////////////////////////////////////////////
 //// VEHICLE UTILS ///////////////////////////////////////////////////////////
 
