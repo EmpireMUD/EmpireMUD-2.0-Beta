@@ -1124,11 +1124,11 @@ void parse_action(int command, char *string, descriptor_data *d) {
  //////////////////////////////////////////////////////////////////////////////
 //// SCRIPT FORMATTER ////////////////////////////////////////////////////////
 
-// FORMAT_IN_x: Used for formatting scripts
-#define FORMAT_IN_IF  0
-#define FORMAT_IN_SWITCH  1
-#define FORMAT_IN_WHILE  2
-#define FORMAT_IN_CASE  3
+// SCR_FORM_IN_x: Used for formatting scripts
+#define SCR_FORM_IN_IF  0
+#define SCR_FORM_IN_SWITCH  1
+#define SCR_FORM_IN_WHILE  2
+#define SCR_FORM_IN_CASE  3
 
 // formatting helper: handles nested structures
 struct script_format_stack {
@@ -1228,18 +1228,18 @@ int format_script(struct descriptor_data *d) {
 		skip_spaces(&t);
 		if (!strncasecmp(t, "if ", 3)) {
 			indent_next = TRUE;
-			add_script_format_stack(&stack, FORMAT_IN_IF);
+			add_script_format_stack(&stack, SCR_FORM_IN_IF);
 		}
 		else if (!strncasecmp(t, "switch ", 7)) {
 			indent_next = TRUE;
-			add_script_format_stack(&stack, FORMAT_IN_SWITCH);
+			add_script_format_stack(&stack, SCR_FORM_IN_SWITCH);
 		}
 		else if (!strncasecmp(t, "while ", 6)) {
 			indent_next = TRUE;
-			add_script_format_stack(&stack, FORMAT_IN_WHILE);
+			add_script_format_stack(&stack, SCR_FORM_IN_WHILE);
 		}
 		else if (!strncasecmp(t, "done", 4)) {
-			if (!indent || (stack->type != FORMAT_IN_SWITCH && stack->type != FORMAT_IN_WHILE)) {
+			if (!indent || (stack->type != SCR_FORM_IN_SWITCH && stack->type != SCR_FORM_IN_WHILE)) {
 				msg_to_desc(d, "Unmatched 'done' (line %d)!\r\n", line_num);
 				free(sc);
 				free_script_format_stack(&stack);
@@ -1249,7 +1249,7 @@ int format_script(struct descriptor_data *d) {
 			pop_script_format_stack(&stack);	// remove switch or while
 		}
 		else if (!strncasecmp(t, "end", 3)) {
-			if (!indent || stack->type != FORMAT_IN_IF) {
+			if (!indent || stack->type != SCR_FORM_IN_IF) {
 				msg_to_desc(d, "Unmatched 'end' (line %d)!\r\n", line_num);
 				free(sc);
 				free_script_format_stack(&stack);
@@ -1259,7 +1259,7 @@ int format_script(struct descriptor_data *d) {
 			pop_script_format_stack(&stack);	// remove if
 		}
 		else if (!strncasecmp(t, "else", 4)) {
-			if (!indent || stack->type != FORMAT_IN_IF) {
+			if (!indent || stack->type != SCR_FORM_IN_IF) {
 				msg_to_desc(d, "Unmatched 'else' (line %d)!\r\n", line_num);
 				free(sc);
 				free_script_format_stack(&stack);
@@ -1270,12 +1270,12 @@ int format_script(struct descriptor_data *d) {
 			// no need to modify stack: we're going from IF to IF (ish)
 		}
 		else if (!strncasecmp(t, "case", 4) || !strncasecmp(t, "default", 7)) {
-			if (indent && stack->type == FORMAT_IN_SWITCH) {
+			if (indent && stack->type == SCR_FORM_IN_SWITCH) {
 				// case in a switch (normal)
 				indent_next = TRUE;
-				add_script_format_stack(&stack, FORMAT_IN_CASE);
+				add_script_format_stack(&stack, SCR_FORM_IN_CASE);
 			}
-			else if (indent && stack->type == FORMAT_IN_CASE) {
+			else if (indent && stack->type == SCR_FORM_IN_CASE) {
 				// chained cases
 				--indent;
 				indent_next = TRUE;
@@ -1289,12 +1289,12 @@ int format_script(struct descriptor_data *d) {
 			}
 		}
 		else if (!strncasecmp(t, "break", 5)) {
-			if (indent && stack->type == FORMAT_IN_CASE) {
+			if (indent && stack->type == SCR_FORM_IN_CASE) {
 				// breaks only cancel indent when directly in a case
 				--indent;
 				pop_script_format_stack(&stack);	// remove the case
 			}
-			else if (find_script_format_stack(stack, FORMAT_IN_WHILE) || find_script_format_stack(stack, FORMAT_IN_CASE)) {
+			else if (find_script_format_stack(stack, SCR_FORM_IN_WHILE) || find_script_format_stack(stack, SCR_FORM_IN_CASE)) {
 				// does not cancel indent in a while or something nested in a case
 			}
 			else {
