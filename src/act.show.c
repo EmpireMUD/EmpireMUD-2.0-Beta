@@ -1495,6 +1495,7 @@ SHOW(show_libraries) {
 	book_data *book;
 	room_data *room;
 	struct library_info *libr, *next_libr;
+	struct page_display *line;
 	
 	one_word(argument, arg);
 	
@@ -1513,8 +1514,12 @@ SHOW(show_libraries) {
 				continue;
 			}
 			
-			build_page_display(ch, "[%7d] %s", GET_ROOM_VNUM(room), get_room_name(room, FALSE));
 			++count;
+			line = build_page_display(ch, "[%7d] %s", GET_ROOM_VNUM(room), get_room_name(room, FALSE));
+			
+			if (ROOM_OWNER(room)) {
+				append_page_display_line(line, " - %s%s\t0", EMPIRE_BANNER(ROOM_OWNER(room)), EMPIRE_ADJECTIVE(ROOM_OWNER(room)));
+			}
 		}
 		
 		if (!count) {
