@@ -150,10 +150,10 @@ struct olc_command_data {
 
 // olc.c helpers
 bool can_start_olc_edit(char_data *ch, int type, any_vnum vnum);
-void show_icons_display(char_data *ch, struct icon_data *list, bool send_page);
-void show_interaction_display(char_data *ch, struct interaction_item *list, bool send_page);
-void show_resource_display(char_data *ch, struct resource_data *list, bool send_page);
-void show_script_display(char_data *ch, struct trig_proto_list *list, bool send_page);
+void show_icons_display(char_data *ch, struct icon_data *list, bool send_output);
+void show_interaction_display(char_data *ch, struct interaction_item *list, bool send_output);
+void show_resource_display(char_data *ch, struct resource_data *list, bool send_output);
+void show_script_display(char_data *ch, struct trig_proto_list *list, bool send_output);
 int find_olc_type(char *name);
 bool interactions_are_identical(struct interaction_item *a, struct interaction_item *b);
 char *one_icon_display(char *icon, char *base_color);
@@ -304,16 +304,16 @@ void olc_show_vehicle(char_data *ch);
 // olc display parts
 void get_generic_relation_display(struct generic_relation *list, bool show_vnums, char *save_buf, char *prefix);
 char *get_interaction_restriction_display(struct interact_restriction *list, bool whole_list);
-void show_adventure_linking_display(char_data *ch, struct adventure_link_rule *list, bool send_page);
-void show_archetype_gear_display(char_data *ch, struct archetype_gear *list, bool send_page);
-void show_bld_relations_display(char_data *ch, struct bld_relation *list, bool send_page);
-void show_extra_desc_display(char_data *ch, struct extra_descr_data *list, bool send_page);
-void show_evolution_display(char_data *ch, struct evolution_data *list, bool send_page);
-void show_exit_template_display(char_data *ch, struct exit_template *list, bool send_page);
-void show_progress_perks_display(char_data *ch, struct progress_perk *list, bool show_vnums, bool send_page);
-void show_quest_giver_display(char_data *ch, struct quest_giver *list, bool send_page);
-void show_requirement_display(char_data *ch, struct req_data *list, bool send_page);
-void show_template_spawns_display(char_data *ch, struct adventure_spawn *list, bool send_page);
+void show_adventure_linking_display(char_data *ch, struct adventure_link_rule *list, bool send_output);
+void show_archetype_gear_display(char_data *ch, struct archetype_gear *list, bool send_output);
+void show_bld_relations_display(char_data *ch, struct bld_relation *list, bool send_output);
+void show_extra_desc_display(char_data *ch, struct extra_descr_data *list, bool send_output);
+void show_evolution_display(char_data *ch, struct evolution_data *list, bool send_output);
+void show_exit_template_display(char_data *ch, struct exit_template *list, bool send_output);
+void show_progress_perks_display(char_data *ch, struct progress_perk *list, bool show_vnums, bool send_output);
+void show_quest_giver_display(char_data *ch, struct quest_giver *list, bool send_output);
+void show_requirement_display(char_data *ch, struct req_data *list, bool send_output);
+void show_template_spawns_display(char_data *ch, struct adventure_spawn *list, bool send_output);
 
 // olc helpers
 const char *get_interaction_target(int type, any_vnum vnum);

@@ -1410,9 +1410,9 @@ void olc_show_building(char_data *ch) {
 *
 * @param char_data *ch The person viewing it.
 * @param struct bld_relation *list Pointer to the start of a list of relations.
-* @param bool send_page If TRUE, sends the page_display when done. Pass FALSE if you're building a larger page_display for the character.
+* @param bool send_output If TRUE, sends the page_display as text when done. Pass FALSE if you're building a larger page_display for the character.
 */
-void show_bld_relations_display(char_data *ch, struct bld_relation *list, bool send_page) {
+void show_bld_relations_display(char_data *ch, struct bld_relation *list, bool send_output) {
 	struct bld_relation *relat;
 	int count = 0;
 	
@@ -1439,8 +1439,8 @@ void show_bld_relations_display(char_data *ch, struct bld_relation *list, bool s
 		build_page_display_str(ch, " none");
 	}
 	
-	if (send_page) {
-		send_page_display(ch);
+	if (send_output) {
+		send_page_display_as(ch, PD_NO_PAGINATION | PD_FREE_DISPLAY_AFTER);
 	}
 }
 

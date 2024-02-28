@@ -40,7 +40,7 @@ const char *default_class_name = "Unnamed Class";
 const char *default_class_abbrev = "???";
 
 // local protos
-void show_class_ability_display(char_data *ch, struct class_ability *list, bool send_page, char_data *info_ch);
+void show_class_ability_display(char_data *ch, struct class_ability *list, bool send_output, char_data *info_ch);
 void get_class_skill_display(struct class_skill_req *list, char *save_buffer, size_t buf_size, bool one_line);
 int sort_class_abilities(struct class_ability *a, struct class_ability *b);
 
@@ -1274,10 +1274,10 @@ void do_stat_class(char_data *ch, class_data *cls) {
 *
 * @param char_data *ch The person viewing it.
 * @param struct class_ability *list The list of abilities to display.
-* @param bool send_page If TRUE, sends the page_display when done. Pass FALSE if you're building a larger page_display for the character.
+* @param bool send_output If TRUE, sends the page_display as text when done. Pass FALSE if you're building a larger page_display for the character.
 * @param char_data *info_ch Optional: highlights abilities this player has (or NULL).
 */
-void show_class_ability_display(char_data *ch, struct class_ability *list, bool send_page, char_data *info_ch) {
+void show_class_ability_display(char_data *ch, struct class_ability *list, bool send_output, char_data *info_ch) {
 	int count = 0, last_role = -2;
 	struct class_ability *iter;
 	ability_data *abil;
@@ -1301,8 +1301,8 @@ void show_class_ability_display(char_data *ch, struct class_ability *list, bool 
 		build_page_display_str(ch, " none");
 	}
 	
-	if (send_page) {
-		send_page_display(ch);
+	if (send_output) {
+		send_page_display_as(ch, PD_NO_PAGINATION | PD_FREE_DISPLAY_AFTER);
 	}
 }
 

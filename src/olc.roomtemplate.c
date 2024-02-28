@@ -804,9 +804,9 @@ int wordcount_room_template(room_template *rmt) {
 *
 * @param char_data *ch The person viewing it.
 * @param struct exit_template *list Pointer to the start of a list of exits.
-* @param bool send_page If TRUE, sends the page_display when done. Pass FALSE if you're building a larger page_display for the character.
+* @param bool send_output If TRUE, sends the page_display as text when done. Pass FALSE if you're building a larger page_display for the character.
 */
-void show_exit_template_display(char_data *ch, struct exit_template *list, bool send_page) {
+void show_exit_template_display(char_data *ch, struct exit_template *list, bool send_output) {
 	struct exit_template *ex;
 	char lbuf[MAX_STRING_LENGTH], lbuf1[MAX_STRING_LENGTH], lbuf2[MAX_STRING_LENGTH];
 	int count = 0;
@@ -845,8 +845,8 @@ void show_exit_template_display(char_data *ch, struct exit_template *list, bool 
 		build_page_display_str(ch, " none");
 	}
 	
-	if (send_page) {
-		send_page_display(ch);
+	if (send_output) {
+		send_page_display_as(ch, PD_NO_PAGINATION | PD_FREE_DISPLAY_AFTER);
 	}
 }
 
@@ -885,9 +885,9 @@ void get_spawn_template_name(struct adventure_spawn *spawn, char *save_buffer) {
 *
 * @param char_data *ch The person viewing it.
 * @param struct adventure_spawn *list Pointer to the start of a list of spawns.
-* @param bool send_page If TRUE, sends the page_display when done. Pass FALSE if you're building a larger page_display for the character.
+* @param bool send_output If TRUE, sends the page_display as text when done. Pass FALSE if you're building a larger page_display for the character.
 */
-void show_template_spawns_display(char_data *ch, struct adventure_spawn *list, bool send_page) {
+void show_template_spawns_display(char_data *ch, struct adventure_spawn *list, bool send_output) {
 	struct adventure_spawn *spawn;
 	char lbuf[MAX_STRING_LENGTH];
 	int count = 0;
@@ -901,8 +901,8 @@ void show_template_spawns_display(char_data *ch, struct adventure_spawn *list, b
 		build_page_display(ch, " none");
 	}
 	
-	if (send_page) {
-		send_page_display(ch);
+	if (send_output) {
+		send_page_display_as(ch, PD_NO_PAGINATION | PD_FREE_DISPLAY_AFTER);
 	}
 }
 

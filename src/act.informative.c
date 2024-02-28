@@ -1670,9 +1670,9 @@ void look_at_char(char_data *i, char_data *ch, bool show_eq) {
 * 
 * @param char_data *ch Whose affects.
 * @param char_data *to Who is viewing it.
-* @param bool send_page If TRUE, sends the page_display to 'to' at the end. If FALSE, you must send it or free it separately.
+* @param bool send_output If TRUE, sends the page_display as text when done. Pass FALSE if you're building a larger page_display for the viewer.
 */
-void show_character_affects(char_data *ch, char_data *to, bool send_page) {
+void show_character_affects(char_data *ch, char_data *to, bool send_output) {
 	struct over_time_effect_type *dot;
 	struct affected_type *aff;
 	bool beneficial;
@@ -1720,8 +1720,8 @@ void show_character_affects(char_data *ch, char_data *to, bool send_page) {
 		build_page_display(to, "   \tr%s\t0 (%s) %d %s damage (%d/%d)", get_generic_name_by_vnum(dot->type), lbuf, dot->damage * dot->stack, damage_types[dot->damage_type], dot->stack, dot->max_stack);
 	}
 	
-	if (send_page) {
-		send_page_display(to);
+	if (send_output) {
+		send_page_display_as(to, PD_NO_PAGINATION | PD_FREE_DISPLAY_AFTER);
 	}
 }
 

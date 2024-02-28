@@ -681,9 +681,9 @@ int wordcount_adventure(struct adventure_data *adv) {
 *
 * @param char_data *ch The person to display it to.
 * @param struct adventure_link_rule *list Pointer to the start of a list of links.
-* @param bool send_page If TRUE, sends the page_display when done. Pass FALSE if you're building a larger page_display for the character.
+* @param bool send_output If TRUE, sends the page_display as text when done. Pass FALSE if you're building a larger page_display for the character.
 */
-void show_adventure_linking_display(char_data *ch, struct adventure_link_rule *list, bool send_page) {
+void show_adventure_linking_display(char_data *ch, struct adventure_link_rule *list, bool send_output) {
 	struct adventure_link_rule *rule;
 	char lbuf[MAX_STRING_LENGTH], flg[MAX_STRING_LENGTH], bon[MAX_STRING_LENGTH], bfac[MAX_STRING_LENGTH];
 	sector_data *sect;
@@ -823,8 +823,8 @@ void show_adventure_linking_display(char_data *ch, struct adventure_link_rule *l
 		build_page_display_str(ch, " none");
 	}
 	
-	if (send_page) {
-		send_page_display(ch);
+	if (send_output) {
+		send_page_display_as(ch, PD_NO_PAGINATION | PD_FREE_DISPLAY_AFTER);
 	}
 }
 

@@ -653,9 +653,9 @@ char *get_quest_name_by_proto(any_vnum vnum) {
 *
 * @param char_data *ch The person viewing it.
 * @param struct req_data *tracker The tracker to show.
-* @param bool send_page If TRUE, calls send_page_display() at the end; if FALSE, leaves it in the player's page_display.
+* @param bool send_output If TRUE, sends the page_display as text when done. Pass FALSE if you're building a larger page_display for the character.
 */
-void show_tracker_display(char_data *ch, struct req_data *tracker, bool send_page) {
+void show_tracker_display(char_data *ch, struct req_data *tracker, bool send_output) {
 	int lefthand, count = 0, sub = 0;
 	char buf[256];
 	struct req_data *task;
@@ -701,8 +701,8 @@ void show_tracker_display(char_data *ch, struct req_data *tracker, bool send_pag
 		build_page_display(ch, "  %s%s%s%s", (task->group ? "  " : ""), ((sub > 1 && !task->group) ? "or " : ""), requirement_string(task, FALSE, TRUE), buf);
 	}
 	
-	if (send_page) {
-		send_page_display(ch);
+	if (send_output) {
+		send_page_display_as(ch, PD_NO_PAGINATION | PD_FREE_DISPLAY_AFTER);
 	}
 }
 
@@ -5652,9 +5652,9 @@ quest_data *setup_olc_quest(quest_data *input) {
 *
 * @param char_data *ch The person viewing it.
 * @param struct quest_giver *list Pointer to the start of a list of quest givers.
-* @param bool send_page If TRUE, sends the page_display when done. Pass FALSE if you're building a larger page_display for the character.
+* @param bool send_output If TRUE, sends the page_display as text when done. Pass FALSE if you're building a larger page_display for the character.
 */
-void show_quest_giver_display(char_data *ch, struct quest_giver *list, bool send_page) {
+void show_quest_giver_display(char_data *ch, struct quest_giver *list, bool send_output) {
 	struct quest_giver *giver;
 	int count = 0;
 	
@@ -5666,8 +5666,8 @@ void show_quest_giver_display(char_data *ch, struct quest_giver *list, bool send
 		build_page_display_str(ch, " nowhere");
 	}
 	
-	if (send_page) {
-		send_page_display(ch);
+	if (send_output) {
+		send_page_display_as(ch, PD_NO_PAGINATION | PD_FREE_DISPLAY_AFTER);
 	}
 }
 
@@ -5678,9 +5678,9 @@ void show_quest_giver_display(char_data *ch, struct quest_giver *list, bool send
 * @param char_data *ch The person viewing it.
 * @param struct quest_reward *list Pointer to the start of a list of quest rewards.
 * @param bool show_vnums If TRUE, shows vnums with any applicable rewards. If FALSE, does not.
-* @param bool send_page If TRUE, sends the page_display when done. Pass FALSE if you're building a larger page_display for the character.
+* @param bool send_output If TRUE, sends the page_display as text when done. Pass FALSE if you're building a larger page_display for the character.
 */
-void show_quest_reward_display(char_data *ch, struct quest_reward *list, bool show_vnums, bool send_page) {
+void show_quest_reward_display(char_data *ch, struct quest_reward *list, bool show_vnums, bool send_output) {
 	struct quest_reward *reward;
 	int count = 0;
 	
@@ -5698,8 +5698,8 @@ void show_quest_reward_display(char_data *ch, struct quest_reward *list, bool sh
 		build_page_display_str(ch, " none");
 	}
 	
-	if (send_page) {
-		send_page_display(ch);
+	if (send_output) {
+		send_page_display_as(ch, PD_NO_PAGINATION | PD_FREE_DISPLAY_AFTER);
 	}
 }
 

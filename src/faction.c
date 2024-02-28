@@ -41,7 +41,7 @@ const int default_max_rep = REP_REVERED;
 const int default_starting_rep = REP_NEUTRAL;
 
 // local protos
-void show_faction_relation_display(char_data *ch, struct faction_relation *list, bool send_page);
+void show_faction_relation_display(char_data *ch, struct faction_relation *list, bool send_output);
 
 
  /////////////////////////////////////////////////////////////////////////////
@@ -1360,9 +1360,9 @@ void do_stat_faction(char_data *ch, faction_data *fct) {
 *
 * @param char_data *ch The person viewing it.
 * @param struct faction_relation *list The list of relations to display.
-* @param bool send_page If TRUE, sends the page_display when done. Pass FALSE if you're building a larger page_display for the character.
+* @param bool send_output If TRUE, sends the page_display as text when done. Pass FALSE if you're building a larger page_display for the character.
 */
-void show_faction_relation_display(char_data *ch, struct faction_relation *list, bool send_page) {
+void show_faction_relation_display(char_data *ch, struct faction_relation *list, bool send_output) {
 	struct faction_relation *iter, *next_iter;
 	char lbuf[MAX_STRING_LENGTH];
 	
@@ -1374,8 +1374,8 @@ void show_faction_relation_display(char_data *ch, struct faction_relation *list,
 		build_page_display_str(ch, " none");
 	}
 	
-	if (send_page) {
-		send_page_display(ch);
+	if (send_output) {
+		send_page_display_as(ch, PD_NO_PAGINATION | PD_FREE_DISPLAY_AFTER);
 	}
 }
 

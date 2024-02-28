@@ -407,9 +407,9 @@ char *get_progress_name_by_proto(any_vnum vnum) {
 *
 * @param char_data *ch The person viewing it.
 * @param struct progress_list *list Pointer to the start of a list.
-* @param bool send_page If TRUE, sends the page_display when done. Pass FALSE if you're building a larger page_display for the character.
+* @param bool send_output If TRUE, sends the page_display as text when done. Pass FALSE if you're building a larger page_display for the character.
 */
-void show_progress_list_display(char_data *ch, struct progress_list *list, bool send_page) {
+void show_progress_list_display(char_data *ch, struct progress_list *list, bool send_output) {
 	struct progress_list *item;
 	int count = 0;
 	
@@ -421,8 +421,8 @@ void show_progress_list_display(char_data *ch, struct progress_list *list, bool 
 		build_page_display_str(ch, " none");
 	}
 	
-	if (send_page) {
-		send_page_display(ch);
+	if (send_output) {
+		send_page_display_as(ch, PD_NO_PAGINATION | PD_FREE_DISPLAY_AFTER);
 	}
 }
 
@@ -516,9 +516,9 @@ char *get_one_perk_display(struct progress_perk *perk, bool show_vnums) {
 * @param char_data *ch The person viewing it.
 * @param struct progress_perk *list Pointer to the start of a list of perks.
 * @param bool show_vnums If true, adds [ 1234] before the name.
-* @param bool send_page If TRUE, sends the page_display when done. Pass FALSE if you're building a larger page_display for the character.
+* @param bool send_output If TRUE, sends the page_display as text when done. Pass FALSE if you're building a larger page_display for the character.
 */
-void show_progress_perks_display(char_data *ch, struct progress_perk *list, bool show_vnums, bool send_page) {
+void show_progress_perks_display(char_data *ch, struct progress_perk *list, bool show_vnums, bool send_output) {
 	struct progress_perk *item;
 	int count = 0;
 	
@@ -530,8 +530,8 @@ void show_progress_perks_display(char_data *ch, struct progress_perk *list, bool
 		build_page_display_str(ch, " none");
 	}
 	
-	if (send_page) {
-		send_page_display(ch);
+	if (send_output) {
+		send_page_display_as(ch, PD_NO_PAGINATION | PD_FREE_DISPLAY_AFTER);
 	}
 }
 

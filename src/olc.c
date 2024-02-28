@@ -4533,9 +4533,9 @@ OLC_MODULE(olc_wordcount) {
 *
 * @param char_data *ch The person viewing it.
 * @param struct evolution_data *list Pointer to the start of a list of evos.
-* @param bool send_page If TRUE, sends the page_display when done. Pass FALSE if you're building a larger page_display for the character.
+* @param bool send_output If TRUE, sends the page_display as text when done. Pass FALSE if you're building a larger page_display for the character.
 */
-void show_evolution_display(char_data *ch, struct evolution_data *list, bool send_page) {
+void show_evolution_display(char_data *ch, struct evolution_data *list, bool send_output) {
 	char lbuf[MAX_STRING_LENGTH], part[MAX_STRING_LENGTH];
 	struct evolution_data *evo;
 	int count = 0;
@@ -4566,8 +4566,8 @@ void show_evolution_display(char_data *ch, struct evolution_data *list, bool sen
 		build_page_display_str(ch, " none");
 	}
 	
-	if (send_page) {
-		send_page_display(ch);
+	if (send_output) {
+		send_page_display_as(ch, PD_NO_PAGINATION | PD_FREE_DISPLAY_AFTER);
 	}
 }
 
@@ -4577,9 +4577,9 @@ void show_evolution_display(char_data *ch, struct evolution_data *list, bool sen
 *
 * @param char_data *ch The person viewing it.
 * @param struct extra_descr_data *list Pointer to the start of a list of decriptions.
-* @param bool send_page If TRUE, sends the page_display when done. Pass FALSE if you're building a larger page_display for the character.
+* @param bool send_output If TRUE, sends the page_display as text when done. Pass FALSE if you're building a larger page_display for the character.
 */
-void show_extra_desc_display(char_data *ch, struct extra_descr_data *list, bool send_page) {
+void show_extra_desc_display(char_data *ch, struct extra_descr_data *list, bool send_output) {
 	struct extra_descr_data *ex;
 	int count = 0;
 	
@@ -4590,8 +4590,8 @@ void show_extra_desc_display(char_data *ch, struct extra_descr_data *list, bool 
 		build_page_display_str(ch, " none");
 	}
 	
-	if (send_page) {
-		send_page_display(ch);
+	if (send_output) {
+		send_page_display_as(ch, PD_NO_PAGINATION | PD_FREE_DISPLAY_AFTER);
 	}
 }
 
@@ -4601,9 +4601,9 @@ void show_extra_desc_display(char_data *ch, struct extra_descr_data *list, bool 
 *
 * @param char_data *ch The person viewing it.
 * @param struct icon_data *list Pointer to the start of a list of icons.
-* @param bool send_page If TRUE, sends the page_display when done. Pass FALSE if you're building a larger page_display for the character.
+* @param bool send_output If TRUE, sends the page_display as text when done. Pass FALSE if you're building a larger page_display for the character.
 */
-void show_icons_display(char_data *ch, struct icon_data *list, bool send_page) {
+void show_icons_display(char_data *ch, struct icon_data *list, bool send_output) {
 	struct icon_data *icon;
 	int count = 0;
 	
@@ -4611,8 +4611,8 @@ void show_icons_display(char_data *ch, struct icon_data *list, bool send_page) {
 		build_page_display_col(ch, 2, FALSE, " %2d. %s: %s", ++count, icon_types[icon->type], one_icon_display(icon->icon, icon->color));
 	}
 	
-	if (send_page) {
-		send_page_display(ch);
+	if (send_output) {
+		send_page_display_as(ch, PD_NO_PAGINATION | PD_FREE_DISPLAY_AFTER);
 	}
 }
 
@@ -4737,9 +4737,9 @@ const char *get_interaction_target(int type, any_vnum vnum) {
 *
 * @param char_data *ch The person viewing it.
 * @param struct interaction_item *list Pointer to the start of a list of interactions.
-* @param bool send_page If TRUE, sends the page_display when done. Pass FALSE if you're building a larger page_display for the character.
+* @param bool send_output If TRUE, sends the page_display as text when done. Pass FALSE if you're building a larger page_display for the character.
 */
-void show_interaction_display(char_data *ch, struct interaction_item *list, bool send_page) {
+void show_interaction_display(char_data *ch, struct interaction_item *list, bool send_output) {
 	struct interaction_item *interact;
 	char quant[16];
 	int count = 0;
@@ -4766,8 +4766,8 @@ void show_interaction_display(char_data *ch, struct interaction_item *list, bool
 		build_page_display_str(ch, " none");
 	}
 	
-	if (send_page) {
-		send_page_display(ch);
+	if (send_output) {
+		send_page_display_as(ch, PD_NO_PAGINATION | PD_FREE_DISPLAY_AFTER);
 	}
 }
 
@@ -4777,9 +4777,9 @@ void show_interaction_display(char_data *ch, struct interaction_item *list, bool
 *
 * @param char_data *ch The person viewing it.
 * @param struct req_data *list Pointer to the start of a list of reqs.
-* @param bool send_page If TRUE, sends the page_display when done. Pass FALSE if you're building a larger page_display for the character.
+* @param bool send_output If TRUE, sends the page_display as text when done. Pass FALSE if you're building a larger page_display for the character.
 */
-void show_requirement_display(char_data *ch, struct req_data *list, bool send_page) {
+void show_requirement_display(char_data *ch, struct req_data *list, bool send_output) {
 	struct req_data *req;
 	char part[256];
 	int count = 0;
@@ -4799,8 +4799,8 @@ void show_requirement_display(char_data *ch, struct req_data *list, bool send_pa
 		build_page_display_str(ch, " none");
 	}
 	
-	if (send_page) {
-		send_page_display(ch);
+	if (send_output) {
+		send_page_display_as(ch, PD_NO_PAGINATION | PD_FREE_DISPLAY_AFTER);
 	}
 }
 
@@ -4810,9 +4810,9 @@ void show_requirement_display(char_data *ch, struct req_data *list, bool send_pa
 *
 * @param char_data *ch Person viewing the list.
 * @param struct resource_data *list The list to show.
-* @param bool send_page If TRUE, sends the page_display when done. Pass FALSE if you're building a larger page_display for the character.
+* @param bool send_output If TRUE, sends the page_display as text when done. Pass FALSE if you're building a larger page_display for the character.
 */
-void show_resource_display(char_data *ch, struct resource_data *list, bool send_page) {
+void show_resource_display(char_data *ch, struct resource_data *list, bool send_output) {
 	bool vnum;
 	char line[MAX_STRING_LENGTH], buf[MAX_STRING_LENGTH];
 	struct resource_data *res;
@@ -4882,8 +4882,8 @@ void show_resource_display(char_data *ch, struct resource_data *list, bool send_
 		build_page_display_str(ch, "  none");
 	}
 	
-	if (send_page) {
-		send_page_display(ch);
+	if (send_output) {
+		send_page_display_as(ch, PD_NO_PAGINATION | PD_FREE_DISPLAY_AFTER);
 	}
 }
 
@@ -4893,9 +4893,9 @@ void show_resource_display(char_data *ch, struct resource_data *list, bool send_
 *
 * @param char_data *ch The person viewing it.
 * @param struct trig_proto_list *list The list (start) to show.
-* @param bool send_page If TRUE, sends the page_display when done. Pass FALSE if you're building a larger page_display for the character.
+* @param bool send_output If TRUE, sends the page_display as text when done. Pass FALSE if you're building a larger page_display for the character.
 */
-void show_script_display(char_data *ch, struct trig_proto_list *list, bool send_page) {
+void show_script_display(char_data *ch, struct trig_proto_list *list, bool send_output) {
 	struct trig_proto_list *iter;
 	int count = 0;
 	
@@ -4907,8 +4907,8 @@ void show_script_display(char_data *ch, struct trig_proto_list *list, bool send_
 		build_page_display_str(ch, " none");
 	}
 	
-	if (send_page) {
-		send_page_display(ch);
+	if (send_output) {
+		send_page_display_as(ch, PD_NO_PAGINATION | PD_FREE_DISPLAY_AFTER);
 	}
 }
 

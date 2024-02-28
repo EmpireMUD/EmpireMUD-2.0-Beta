@@ -2164,7 +2164,7 @@ void list_vehicles_to_char(vehicle_data *list, char_data *ch, bool large_only, v
 char *obj_color_by_quality(obj_data *obj, char_data *ch);
 char *obj_desc_for_char(obj_data *obj, char_data *ch, int mode);
 struct custom_message *pick_custom_longdesc(char_data *ch);
-void show_character_affects(char_data *ch, char_data *to, bool send_page);
+void show_character_affects(char_data *ch, char_data *to, bool send_output);
 bool show_local_einv(char_data *ch, room_data *room, bool thief_mode);
 void survey_city(char_data *ch, char *argument);
 
@@ -2220,7 +2220,7 @@ void count_quest_tasks(struct req_data *list, int *complete, int *total);
 void drop_quest(char_data *ch, struct player_quest *pq);
 bool fail_daily_quests(char_data *ch, bool event);
 struct instance_data *find_matching_instance_for_shared_quest(char_data *ch, any_vnum quest_vnum);
-void show_quest_tracker(char_data *ch, struct player_quest *pq, char *header, bool send_page);
+void show_quest_tracker(char_data *ch, struct player_quest *pq, char *header, bool send_output);
 void start_quest(char_data *ch, quest_data *qst, struct instance_data *inst);
 
 // act.social.c
@@ -2569,8 +2569,8 @@ void extract_crop_variety(char_data *ch, int amount);
 bool find_quest_giver_in_list(struct quest_giver *list, int type, any_vnum vnum);
 bool find_quest_reward_in_list(struct quest_reward *list, int type, any_vnum vnum);
 char *get_quest_name_by_proto(any_vnum vnum);
-void show_quest_reward_display(char_data *ch, struct quest_reward *list, bool show_vnums, bool send_page);
-void show_tracker_display(char_data *ch, struct req_data *tracker, bool send_page);
+void show_quest_reward_display(char_data *ch, struct quest_reward *list, bool show_vnums, bool send_output);
+void show_tracker_display(char_data *ch, struct req_data *tracker, bool send_output);
 void give_quest_rewards(char_data *ch, struct quest_reward *list, int reward_level, empire_data *quest_giver_emp, int instance_id);
 struct player_completed_quest *has_completed_quest(char_data *ch, any_vnum quest, int instance_id);
 struct player_completed_quest *has_completed_quest_any(char_data *ch, any_vnum quest);
