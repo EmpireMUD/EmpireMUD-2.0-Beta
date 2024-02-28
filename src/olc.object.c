@@ -2055,7 +2055,7 @@ void set_obj_look_desc(obj_data *obj, const char *str, bool format) {
 	
 	// format if requested
 	if (val && format) {
-		format_text(&GET_OBJ_ACTION_DESC(obj), (strlen(GET_OBJ_ACTION_DESC(obj)) > 80 ? FORMAT_INDENT : 0), NULL, MAX_STRING_LENGTH);
+		format_text(&GET_OBJ_ACTION_DESC(obj), (strlen(GET_OBJ_ACTION_DESC(obj)) >= 80 ? FORMAT_INDENT : NOBITS), NULL, MAX_STRING_LENGTH);
 	}
 	
 	request_obj_save_in_world(obj);
@@ -2086,7 +2086,7 @@ void set_obj_look_desc_append(obj_data *obj, const char *str, bool format) {
 		}
 		GET_OBJ_ACTION_DESC(obj) = str_dup(temp);
 		if (format) {
-			format_text(&GET_OBJ_ACTION_DESC(obj), (strlen(GET_OBJ_ACTION_DESC(obj)) > 80 ? FORMAT_INDENT : 0), NULL, MAX_STRING_LENGTH);
+			format_text(&GET_OBJ_ACTION_DESC(obj), (strlen(GET_OBJ_ACTION_DESC(obj)) >= 80 ? FORMAT_INDENT : NOBITS), NULL, MAX_STRING_LENGTH);
 		}
 		
 		request_obj_save_in_world(obj);

@@ -3114,7 +3114,7 @@ void generate_island_descriptions(void) {
 		}
 		isliter->desc = str_dup(buf);
 		
-		format_text(&isliter->desc, (strlen(isliter->desc) > 80 ? FORMAT_INDENT : 0), NULL, MAX_STRING_LENGTH);
+		format_text(&isliter->desc, (strlen(isliter->desc) >= 80 ? FORMAT_INDENT : NOBITS), NULL, MAX_STRING_LENGTH);
 		any = TRUE;
 	}
 	

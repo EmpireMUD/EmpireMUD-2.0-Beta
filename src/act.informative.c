@@ -1853,7 +1853,7 @@ void show_character_affects_simple(char_data *ch, char_data *to) {
 		strcat(output, "\r\n");	// space reserved
 		
 		temp = strdup(output);
-		format_text(&temp, 0, to->desc, MAX_STRING_LENGTH);
+		format_text(&temp, FORMAT_WIDE, to->desc, MAX_STRING_LENGTH);
 		page_string(to->desc, temp, TRUE);
 		free(temp);
 	}
