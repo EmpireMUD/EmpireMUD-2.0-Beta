@@ -5584,11 +5584,7 @@ void write_city_data_file(void) {
 	}
 	
 	HASH_ITER(hh, empire_table, emp, next_emp) {
-		if (EMPIRE_IMM_ONLY(emp)) {
-			continue;
-		}
-		
-		for (city = EMPIRE_CITY_LIST(emp); city; city = city->next) {
+		LL_FOREACH(EMPIRE_CITY_LIST(emp), city) {
 			fprintf(cit_fl, "%d %d %d \"%s\" \"%s\"\n", X_COORD(city->location), Y_COORD(city->location), city_type[city->type].radius, city->name, EMPIRE_NAME(emp));
 		}
 	}
