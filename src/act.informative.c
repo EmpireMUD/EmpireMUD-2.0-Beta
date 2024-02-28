@@ -348,6 +348,83 @@ struct custom_message *pick_custom_longdesc(char_data *ch) {
 }
 
 
+/**
+* Builds the coin and currency display for a character.
+*
+* @param char_data *ch The person whose coins and currencies to show.
+* @param char_data *to The person viewing them.
+* @param char *argument Optional filter arguments (will only show matching currencies).
+* @param bool coins_only If TRUE, skips currencies.
+* @param bool send_page If TRUE, calls send_page_display(). If FALSE, leaves all output in to's page_display.
+*/
+void show_coins_and_currency(char_data *ch, char_data *to, char *argument, bool coins_only, bool send_page) {
+	bool any = FALSE;
+	char line[MAX_STRING_LENGTH], vstr[64], adv_part[128];
+	adv_data *adv;
+	generic_data *gen;
+	struct player_currency *cur, *next_cur;
+	
+	skip_spaces(&argument);
+	
+	// basic coins -- only show if no-arg
+	if (!*argument || coins_only) {
+		coin_string(GET_PLAYER_COINS(ch), line);
+		
+		if (to == ch) {
+			build_page_display(to, "You have %s.", line);
+		}
+		else {
+			build_page_display(to, "&Z%s has %s.", PERS(ch, to, FALSE), line);
+		}
+	}
+	
+	if (GET_CURRENCIES(ch) && !coins_only) {
+		if (to == ch) {
+			build_page_display(to, "You%s have:", *argument ? "" : " also");
+		}
+		else {
+			build_page_display(to, "&Z%s%s has:", PERS(ch, to, FALSE), *argument ? "" : " also");
+		}
+		
+		HASH_ITER(hh, GET_CURRENCIES(ch), cur, next_cur) {
+			if (*argument && !multi_isname(argument, get_generic_string_by_vnum(cur->vnum, GENERIC_CURRENCY, WHICH_CURRENCY(cur->amount)))) {
+				continue; // no keyword match
+			}
+			
+			if ((gen = real_generic(cur->vnum)) && GEN_FLAGGED(gen, GEN_SHOW_ADVENTURE) && (adv = get_adventure_for_vnum(cur->vnum))) {
+				snprintf(adv_part, sizeof(adv_part), " (%s)", GET_ADV_NAME(adv));
+			}
+			else {
+				*adv_part = '\0';
+			}
+			
+			if (PRF_FLAGGED(to, PRF_ROOMFLAGS)) {
+				sprintf(vstr, "[%5d] ", cur->vnum);
+			}
+			else {
+				*vstr = '\0';
+			}
+			
+			build_page_display(to, "%s%3d %s%s", vstr, cur->amount, get_generic_string_by_vnum(cur->vnum, GENERIC_CURRENCY, WHICH_CURRENCY(cur->amount)), adv_part);
+			any = TRUE;
+		}
+	}
+	
+	if (*argument && !any) {
+		if (to == ch) {
+			build_page_display(to, "You have no special currency called '%s'.", argument);
+		}
+		else {
+			build_page_display(to, "&Z%s has no special currency called '%s'.", PERS(ch, to, FALSE), argument);
+		}
+	}
+	
+	if (send_page) {
+		send_page_display(to);
+	}
+}
+
+
 // quick alpha sorter for the passives command
 int sort_passives(struct affected_type *a, struct affected_type *b) {
 	return strcmp(get_ability_name_by_vnum(a->type), get_ability_name_by_vnum(b->type));
@@ -3067,59 +3144,12 @@ ACMD(do_chart) {
 
 // will show all currencies if the subcmd == TRUE
 ACMD(do_coins) {
-	char line[MAX_STRING_LENGTH], vstr[64], adv_part[128];
-	struct player_currency *cur, *next_cur;
-	bool any = FALSE;
-	adv_data *adv;
-	generic_data *gen;
-	
 	if (IS_NPC(ch)) {
 		msg_to_char(ch, "NPCs don't carry coins.\r\n");
 		return;
 	}
 	
-	skip_spaces(&argument);
-	
-	// basic coins -- only show if no-arg
-	if (!*argument) {
-		coin_string(GET_PLAYER_COINS(ch), line);
-		build_page_display(ch, "You have %s.", line);
-	}
-	
-	if (GET_CURRENCIES(ch) && subcmd) {
-		build_page_display(ch, "You%s have:", *argument ? "" : " also");
-		
-		HASH_ITER(hh, GET_CURRENCIES(ch), cur, next_cur) {
-			if (*argument && !multi_isname(argument, get_generic_string_by_vnum(cur->vnum, GENERIC_CURRENCY, WHICH_CURRENCY(cur->amount)))) {
-				continue; // no keyword match
-			}
-			
-			if ((gen = real_generic(cur->vnum)) && GEN_FLAGGED(gen, GEN_SHOW_ADVENTURE) && (adv = get_adventure_for_vnum(cur->vnum))) {
-				snprintf(adv_part, sizeof(adv_part), " (%s)", GET_ADV_NAME(adv));
-			}
-			else {
-				*adv_part = '\0';
-			}
-			
-			if (PRF_FLAGGED(ch, PRF_ROOMFLAGS)) {
-				sprintf(vstr, "[%5d] ", cur->vnum);
-			}
-			else {
-				*vstr = '\0';
-			}
-			
-			build_page_display(ch, "%s%3d %s%s", vstr, cur->amount, get_generic_string_by_vnum(cur->vnum, GENERIC_CURRENCY, WHICH_CURRENCY(cur->amount)), adv_part);
-			any = TRUE;
-		}
-	}
-	
-	if (*argument && !any) {
-		msg_to_char(ch, "You have no special currency called '%s'.", argument);
-		clear_page_display(ch);
-	}
-	else if (ch->desc) {	// show currency
-		send_page_display(ch);
-	}
+	show_coins_and_currency(ch, ch, argument, FALSE, TRUE);
 }
 
 
@@ -3499,7 +3529,7 @@ ACMD(do_inventory) {
 	
 	if (!*argument) {	// no-arg: traditional inventory
 		if (!IS_NPC(ch)) {
-			do_coins(ch, "", 0, FALSE);
+			show_coins_and_currency(ch, ch, "", TRUE, FALSE);
 		}
 
 		build_page_display(ch, "You are carrying %d/%d items:", IS_CARRYING_N(ch), CAN_CARRY_N(ch));

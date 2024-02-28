@@ -2165,6 +2165,7 @@ char *obj_color_by_quality(obj_data *obj, char_data *ch);
 char *obj_desc_for_char(obj_data *obj, char_data *ch, int mode);
 struct custom_message *pick_custom_longdesc(char_data *ch);
 void show_character_affects(char_data *ch, char_data *to, bool send_output);
+void show_coins_and_currency(char_data *ch, char_data *to, char *argument, bool coins_only, bool send_page);
 bool show_local_einv(char_data *ch, room_data *room, bool thief_mode, bool use_page_display);
 void survey_city(char_data *ch, char *argument);
 

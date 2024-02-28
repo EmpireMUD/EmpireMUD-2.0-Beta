@@ -742,12 +742,10 @@ SHOW(show_crops) {
 
 
 SHOW(show_currency) {
-	char line[MAX_STRING_LENGTH];	
-	struct player_currency *cur, *next_cur;
 	char_data *plr = NULL;
 	bool file = FALSE;
 	
-	one_argument(argument, arg);
+	argument = one_argument(argument, arg);
 	
 	if (!*arg) {
 		msg_to_char(ch, "Usage: show currency <player>\r\n");
@@ -757,18 +755,7 @@ SHOW(show_currency) {
 	}
 	else {
 		check_delayed_load(plr);
-		coin_string(GET_PLAYER_COINS(plr), line);
-		build_page_display(ch, "%s has %s.", GET_NAME(plr), line);
-	
-		if (GET_CURRENCIES(plr)) {
-			build_page_display_str(ch, "Currencies:");
-		
-			HASH_ITER(hh, GET_CURRENCIES(plr), cur, next_cur) {
-				build_page_display(ch, "[%5d] %3d %s", cur->vnum, cur->amount, get_generic_string_by_vnum(cur->vnum, GENERIC_CURRENCY, WHICH_CURRENCY(cur->amount)));
-			}
-		}
-		
-		send_page_display(ch);
+		show_coins_and_currency(plr, ch, argument, FALSE, TRUE);
 	}
 	
 	if (plr && file) {
