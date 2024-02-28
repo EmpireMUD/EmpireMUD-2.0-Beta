@@ -49,7 +49,7 @@ ACMD(do_affects);
 void list_one_char(char_data *i, char_data *ch, int num);
 void look_at_char(char_data *i, char_data *ch, bool show_eq);
 void look_in_obj(char_data *ch, char *arg, obj_data *obj, vehicle_data *veh);
-void show_one_stored_item_to_char(char_data *ch, empire_data *emp, struct empire_storage_data *store, bool show_zero);
+void show_one_stored_item_to_char(char_data *ch, empire_data *emp, struct empire_storage_data *store, bool show_zero, bool use_page_display);
 
 
  //////////////////////////////////////////////////////////////////////////////
@@ -802,8 +802,9 @@ void look_in_obj(char_data *ch, char *arg, obj_data *obj, vehicle_data *veh) {
 		}
 		else {
 			sprintf(buf, "You look inside $V (%d/%d):", VEH_CARRYING_N(veh), VEH_CAPACITY(veh));
-			act(buf, FALSE, ch, NULL, veh, TO_CHAR | ACT_VEH_VICT);
-			list_obj_to_char(VEH_CONTAINS(veh), ch, OBJ_DESC_CONTENTS, TRUE);
+			act(buf, FALSE, ch, NULL, veh, TO_CHAR | TO_PAGE_DISPLAY | ACT_VEH_VICT);
+			list_obj_to_char(VEH_CONTAINS(veh), ch, OBJ_DESC_CONTENTS, TRUE, TRUE);
+			send_page_display(ch);
 		}
 	}
 	// the rest is objects:
@@ -815,8 +816,9 @@ void look_in_obj(char_data *ch, char *arg, obj_data *obj, vehicle_data *veh) {
 			if (OBJVAL_FLAGGED(obj, CONT_CLOSED) && GET_OBJ_TYPE(obj) != ITEM_CORPSE)
 				send_to_char("It is closed.\r\n", ch);
 			else {
-				msg_to_char(ch, "You look inside %s (%s):\r\n", get_obj_desc(obj, ch, OBJ_DESC_SHORT), (obj->worn_by ? "worn" : (obj->carried_by ? "inventory" : "in room")));
-				list_obj_to_char(obj->contains, ch, OBJ_DESC_CONTENTS, TRUE);
+				build_page_display(ch, "You look inside %s (%s):", get_obj_desc(obj, ch, OBJ_DESC_SHORT), (obj->worn_by ? "worn" : (obj->carried_by ? "inventory" : "in room")));
+				list_obj_to_char(obj->contains, ch, OBJ_DESC_CONTENTS, TRUE, TRUE);
+				send_page_display(ch);
 			}
 		}
 		else if (IS_DRINK_CONTAINER(obj)) {		/* item must be a fountain or drink container */
@@ -854,14 +856,15 @@ void look_in_obj(char_data *ch, char *arg, obj_data *obj, vehicle_data *veh) {
 *
 * @param char_data *i Person to diagnose.
 * @param char_data *ch Person to show the output to.
+* @param bool use_page_display If TRUE, sends the text to ch's page_display. If FALSE, just sends the message directly.
 */
-void diag_char_to_char(char_data *i, char_data *ch) {
+void diag_char_to_char(char_data *i, char_data *ch, bool use_page_display) {
 	if (!ch || !i || IS_DEAD(i) || EXTRACTED(i) || !ch->desc) {
 		return;
 	}
 	
 	sprintf(buf, "$n is %s.", health_levels[(MAX(0, GET_HEALTH(i)) * 10 / MAX(1, GET_MAX_HEALTH(i)))]);
-	act(buf, FALSE, i, 0, ch, TO_VICT);
+	act(buf, FALSE, i, NULL, ch, TO_VICT | (use_page_display ? TO_PAGE_DISPLAY : NOBITS));
 }
 
 
@@ -1538,6 +1541,7 @@ void look_at_char(char_data *i, char_data *ch, bool show_eq) {
 	struct affected_type *aff;
 	generic_data *gen;
 	struct over_time_effect_type *dot;
+	struct page_display *line;
 	struct string_hash *str_iter, *next_str, *str_hash = NULL;
 	
 	if (!i || !ch || !ch->desc)
@@ -1558,43 +1562,45 @@ void look_at_char(char_data *i, char_data *ch, bool show_eq) {
 	}
 
 	if (ch != i) {
-		act("You look at $N:", FALSE, ch, FALSE, i, TO_CHAR);
+		act("You look at $N:", FALSE, ch, FALSE, i, TO_CHAR | TO_PAGE_DISPLAY);
 	}
 	else {
-		msg_to_char(ch, "You take a look at yourself:\r\n");
+		build_page_display_str(ch, "You take a look at yourself:");
 	}
 	
 	// look decs
 	if (IS_MORPHED(i)) {
-		msg_to_char(ch, "%s&0", NULLSAFE(MORPH_LOOK_DESC(GET_MORPH(i))));
+		line = build_page_display_str(ch, NULLSAFE(MORPH_LOOK_DESC(GET_MORPH(i))));
+		append_page_display_line(line, "\t0");
 	}
 	else if (GET_LOOK_DESC(i)) {
-		msg_to_char(ch, "%s&0", GET_LOOK_DESC(i));
+		line = build_page_display_str(ch, GET_LOOK_DESC(i));
+		append_page_display_line(line, "\t0");
 	}
 	
 	// diagnose at the end
 	if (GET_HEALTH(i) < GET_MAX_HEALTH(i)) {
-		diag_char_to_char(i, ch);
+		diag_char_to_char(i, ch, TRUE);
 	}
 	
 	// membership info
 	if (GET_LOYALTY(i) && !disguise) {
 		sprintf(buf, "$E is a member of %s%s\t0.", EMPIRE_BANNER(GET_LOYALTY(i)), EMPIRE_NAME(GET_LOYALTY(i)));
-		act(buf, FALSE, ch, NULL, i, TO_CHAR);
+		act(buf, FALSE, ch, NULL, i, TO_CHAR | TO_PAGE_DISPLAY);
 	}
 	if (ROOM_OWNER(IN_ROOM(i)) && disguise) {
 		sprintf(buf, "$E is a member of %s%s\t0.", EMPIRE_BANNER(ROOM_OWNER(IN_ROOM(i))), EMPIRE_NAME(ROOM_OWNER(IN_ROOM(i))));
-		act(buf, FALSE, ch, NULL, i, TO_CHAR);
+		act(buf, FALSE, ch, NULL, i, TO_CHAR | TO_PAGE_DISPLAY);
 	}
 	if (IS_NPC(i) && MOB_FACTION(i) && !FACTION_FLAGGED(MOB_FACTION(i), FCT_HIDE_ON_MOB)) {
 		struct player_faction_data *pfd = get_reputation(ch, FCT_VNUM(MOB_FACTION(i)), FALSE);
 		int idx = rep_const_to_index(pfd ? pfd->rep : FCT_STARTING_REP(MOB_FACTION(i)));
 		sprintf(buf, "$E is a member of %s%s\t0.", (idx != NOTHING ? reputation_levels[idx].color : ""), FCT_NAME(MOB_FACTION(i)));
-		act(buf, FALSE, ch, NULL, i, TO_CHAR);
+		act(buf, FALSE, ch, NULL, i, TO_CHAR | TO_PAGE_DISPLAY);
 	}
 	
 	if (size_data[GET_SIZE(i)].show_on_look && (IS_MORPHED(i) ? !MORPH_LOOK_DESC(GET_MORPH(i)) : !GET_LOOK_DESC(i))) {
-		act(size_data[GET_SIZE(i)].show_on_look, FALSE, ch, NULL, i, TO_CHAR);
+		act(size_data[GET_SIZE(i)].show_on_look, FALSE, ch, NULL, i, TO_CHAR | TO_PAGE_DISPLAY);
 	}
 	
 	// generic affs -- npc or disguise do not affect this
@@ -1609,12 +1615,12 @@ void look_at_char(char_data *i, char_data *ch, bool show_eq) {
 		}
 	}
 	HASH_ITER(hh, str_hash, str_iter, next_str) {
-		act(str_iter->str, FALSE, i, NULL, ch, TO_VICT);
+		act(str_iter->str, FALSE, i, NULL, ch, TO_VICT | TO_PAGE_DISPLAY);
 	}
 	free_string_hash(&str_hash);
 	
 	if (IS_NPC(i) && !disguise && MOB_FLAGGED(i, MOB_MOUNTABLE) && CAN_RIDE_MOUNT(ch, i)) {
-		act("You can ride on $M.", FALSE, ch, NULL, i, TO_CHAR);
+		act("You can ride on $M.", FALSE, ch, NULL, i, TO_CHAR | TO_PAGE_DISPLAY);
 	}
 	
 	if (show_eq && !disguise) {
@@ -1628,11 +1634,10 @@ void look_at_char(char_data *i, char_data *ch, bool show_eq) {
 		
 		// show eq
 		if (found) {
-			msg_to_char(ch, "\r\n");	/* act() does capitalization. */
-			act("$n is using:", FALSE, i, 0, ch, TO_VICT);
+			act("\r\n&Z$n is using:", FALSE, i, NULL, ch, TO_VICT | TO_PAGE_DISPLAY);
 			for (j = 0; j < NUM_WEARS; j++) {
 				if (GET_EQ(i, j) && CAN_SEE_OBJ(ch, GET_EQ(i, j))) {
-					msg_to_char(ch, "%s%s", wear_data[j].eq_prompt, obj_desc_for_char(GET_EQ(i, j), ch, OBJ_DESC_EQUIPMENT));
+					build_page_display(ch, "%s%s", wear_data[j].eq_prompt, obj_desc_for_char(GET_EQ(i, j), ch, OBJ_DESC_EQUIPMENT));
 				}
 			}
 		}
@@ -1640,8 +1645,8 @@ void look_at_char(char_data *i, char_data *ch, bool show_eq) {
 	if (show_inv && !disguise) {
 		// show inventory
 		if (ch != i && has_player_tech(ch, PTECH_SEE_INVENTORY) && i->carrying && !run_ability_triggers_by_player_tech(ch, PTECH_SEE_INVENTORY, i, NULL, NULL)) {
-			act("\r\nYou appraise $s inventory:", FALSE, i, 0, ch, TO_VICT);
-			list_obj_to_char(i->carrying, ch, OBJ_DESC_INVENTORY, TRUE);
+			act("\r\nYou appraise $s inventory:", FALSE, i, NULL, ch, TO_VICT | TO_PAGE_DISPLAY);
+			list_obj_to_char(i->carrying, ch, OBJ_DESC_INVENTORY, TRUE, FALSE);
 
 			if (ch != i && i->carrying) {
 				if (can_gain_exp_from(ch, i)) {
@@ -1662,6 +1667,8 @@ void look_at_char(char_data *i, char_data *ch, bool show_eq) {
 		gain_player_tech_exp(i, PTECH_CONCEAL_INVENTORY, 5);
 		run_ability_hooks_by_player_tech(i, PTECH_CONCEAL_INVENTORY, ch, NULL, NULL, NULL);
 	}
+	
+	send_page_display(ch);
 }
 
 
@@ -1968,12 +1975,23 @@ char *get_obj_desc(obj_data *obj, char_data *ch, int mode) {
 
 
 /**
+* Used for displaying an object:
+*
+* OBJ_DESC_LONG - When listed in the room.
+* OBJ_DESC_SHORT - When used in a sentence.
+* OBJ_DESC_CONTENTS - When listed inside an object or vehicle.
+* OBJ_DESC_INVENTORY - When listed in a player's inventory.
+* OBJ_DESC_WAREHOUSE - When listed in the warehouse or home storage.
+* OBJ_DESC_LOOK_AT- When the player looks at or examines the object.
+*
 * @param obj_data *list the objects to show
 * @param char_data *ch the person to show it to
 * @param int mode OBJ_DESC_x
-* @param int show if TRUE, shows " Nothing." if nothing
+* @param bool show_empty if TRUE, shows " Nothing." if there are no items; if FALSE it's blank.
+* @param bool use_page_display if TRUE, all output goes to ch's page_display; if FALSE it's sent directly to them instead.
 */
-void list_obj_to_char(obj_data *list, char_data *ch, int mode, int show) {
+void list_obj_to_char(obj_data *list, char_data *ch, int mode, bool show_empty, bool use_page_display) {
+	char buf[MAX_STRING_LENGTH];
 	obj_data *i, *j = NULL;
 	bool found = FALSE;
 	int num;
@@ -2016,19 +2034,32 @@ void list_obj_to_char(obj_data *list, char_data *ch, int mode, int show) {
 		}
 
 		if (CAN_SEE_OBJ(ch, i)) {
-			if (mode == OBJ_DESC_LONG) {
-				send_to_char("&g", ch);
-			}
+			// build string
 			if (num > 1) {
-				msg_to_char(ch, "(%2i) ", num);
+				snprintf(buf, sizeof(buf), "%s(%2i) %s", (mode == OBJ_DESC_LONG) ? "\tg" : "", num, obj_desc_for_char(i, ch, mode));
+			}
+			else {
+				snprintf(buf, sizeof(buf), "%s%s", (mode == OBJ_DESC_LONG) ? "\tg" : "", obj_desc_for_char(i, ch, mode));
 			}
 			
-			send_to_char(obj_desc_for_char(i, ch, mode), ch);
+			// send
+			if (use_page_display) {
+				build_page_display_str(ch, buf);
+			}
+			else {
+				send_to_char(buf, ch);
+			}
 			found = TRUE;
 		}
 	}
-	if (!found && show)
-		msg_to_char(ch, " Nothing.\r\n");
+	if (!found && show_empty) {
+		if (use_page_display) {
+			build_page_display_str(ch, " Nothing.");
+		}
+		else {
+			send_to_char(" Nothing.\r\n", ch);
+		}
+	}
 }
 
 
@@ -2193,9 +2224,11 @@ char *obj_desc_for_char(obj_data *obj, char_data *ch, int mode) {
 * @param char_data *ch The person looking at storage.
 * @param room_data *room The location (will include vehicles in the room too).
 * @param bool thief_mode If TRUE, indicates ownership and shows other empires' things.
+* @param bool use_page_display If TRUE, sends text to ch's page_display. If FALSE, sends it directly to ch instead.
 * @return bool TRUE if any items were shown at all; otherwise FALSE.
 */
-bool show_local_einv(char_data *ch, room_data *room, bool thief_mode) {
+bool show_local_einv(char_data *ch, room_data *room, bool thief_mode, bool use_page_display) {
+	char buf[MAX_STRING_LENGTH];
 	struct vnum_hash *vhash = NULL, *vhash_iter, *vhash_next;
 	empire_data *own_empire = GET_LOYALTY(ch), *emp;
 	struct empire_storage_data *store, *next_store;
@@ -2209,7 +2242,13 @@ bool show_local_einv(char_data *ch, room_data *room, bool thief_mode) {
 	
 	// show vault info first (own empire only; ignores thief mode)
 	if (own_empire == ROOM_OWNER(room) && room_has_function_and_city_ok(GET_LOYALTY(ch), room, FNC_VAULT)) {
-		msg_to_char(ch, "\r\nVault: %.1f coin%s, %d treasure (%d total)\r\n", EMPIRE_COINS(own_empire), (EMPIRE_COINS(own_empire) != 1.0 ? "s" : ""), EMPIRE_WEALTH(own_empire), (int) GET_TOTAL_WEALTH(own_empire));
+		snprintf(buf, sizeof(buf), "\r\nVault: %.1f coin%s, %d treasure (%d total)\r\n", EMPIRE_COINS(own_empire), (EMPIRE_COINS(own_empire) != 1.0 ? "s" : ""), EMPIRE_WEALTH(own_empire), (int) GET_TOTAL_WEALTH(own_empire));
+		if (use_page_display) {
+			build_page_display_str(ch, buf);
+		}
+		else {
+			send_to_char(buf, ch);
+		}
 	}
 	
 	// build a list of empires to check here
@@ -2243,12 +2282,17 @@ bool show_local_einv(char_data *ch, room_data *room, bool thief_mode) {
 			HASH_ITER(hh, eisle->store, store, next_store) {
 				if (store->amount > 0 && store->proto && obj_can_be_retrieved(store->proto, room, thief_mode ? NULL : own_empire)) {
 					if (!found_one) {
-						snprintf(buf, sizeof(buf), "%s inventory available here:\t0\r\n", EMPIRE_ADJECTIVE(emp));
-						CAP(buf);
-						msg_to_char(ch, "\r\n%s%s", EMPIRE_BANNER(emp), buf);
+						snprintf(buf, sizeof(buf), "\r\n%s&Z%s inventory available here:\t0\r\n", EMPIRE_BANNER(emp), EMPIRE_ADJECTIVE(emp));
+						
+						if (use_page_display) {
+							build_page_display_str(ch, buf);
+						}
+						else {
+							send_to_char(buf, ch);
+						}
 					}
 			
-					show_one_stored_item_to_char(ch, emp, store, FALSE);
+					show_one_stored_item_to_char(ch, emp, store, FALSE, use_page_display);
 					found_one = found_any = TRUE;
 				}
 			}
@@ -2267,8 +2311,9 @@ bool show_local_einv(char_data *ch, room_data *room, bool thief_mode) {
 * @param empire_data *emp The empire who owns it.
 * @param struct empire_storage_data *store The storage entry to show.
 * @param bool show_zero Forces an amount of 0, in case this is only being shown for the "total" reference and there are actually 0 here.
+* @param use_page_display If TRUE, builds the text into the character's page_display. If FALSE, just sends it.
 */
-void show_one_stored_item_to_char(char_data *ch, empire_data *emp, struct empire_storage_data *store, bool show_zero) {
+void show_one_stored_item_to_char(char_data *ch, empire_data *emp, struct empire_storage_data *store, bool show_zero, bool use_page_display) {
 	bool show_own_data = (GET_LOYALTY(ch) == emp || GET_ACCESS_LEVEL(ch) >= LVL_CIMPL || IS_GRANTED(ch, GRANT_EMPIRES));
 	int total = get_total_stored_count(emp, store->vnum, TRUE);
 	char lbuf[MAX_INPUT_LENGTH], keepstr[256];
@@ -2290,7 +2335,12 @@ void show_one_stored_item_to_char(char_data *ch, empire_data *emp, struct empire
 		*keepstr = '\0';
 	}
 	
-	msg_to_char(ch, "(%4d) %s%s%s\r\n", (show_zero ? 0 : store->amount), store->proto ? GET_OBJ_SHORT_DESC(store->proto) : get_obj_name_by_proto(store->vnum), keepstr, lbuf);
+	if (use_page_display) {
+		build_page_display(ch, "(%4d) %s%s%s", (show_zero ? 0 : store->amount), store->proto ? GET_OBJ_SHORT_DESC(store->proto) : get_obj_name_by_proto(store->vnum), keepstr, lbuf);
+	}
+	else {
+		msg_to_char(ch, "(%4d) %s%s%s\r\n", (show_zero ? 0 : store->amount), store->proto ? GET_OBJ_SHORT_DESC(store->proto) : get_obj_name_by_proto(store->vnum), keepstr, lbuf);
+	}
 }
 
 
@@ -3108,7 +3158,7 @@ ACMD(do_contents) {
 		send_to_char("\tw", ch);
 		list_vehicles_to_char(ROOM_VEHICLES(IN_ROOM(ch)), ch, FALSE, NULL);
 		send_to_char("\tg", ch);
-		list_obj_to_char(ROOM_CONTENTS(IN_ROOM(ch)), ch, OBJ_DESC_LONG, FALSE);
+		list_obj_to_char(ROOM_CONTENTS(IN_ROOM(ch)), ch, OBJ_DESC_LONG, FALSE, FALSE);
 		send_to_char("\t0", ch);
 	}
 	else {	// can see nothing
@@ -3145,16 +3195,20 @@ ACMD(do_diagnose) {
 	one_argument(argument, buf);
 
 	if (*buf) {
-		if (!(vict = get_char_vis(ch, buf, NULL, FIND_CHAR_ROOM)))
+		if (!(vict = get_char_vis(ch, buf, NULL, FIND_CHAR_ROOM))) {
 			send_config_msg(ch, "no_person");
-		else
-			diag_char_to_char(vict, ch);
+		}
+		else {
+			diag_char_to_char(vict, ch, FALSE);
+		}
 	}
 	else {
-		if (FIGHTING(ch))
-			diag_char_to_char(FIGHTING(ch), ch);
-		else
+		if (FIGHTING(ch)) {
+			diag_char_to_char(FIGHTING(ch), ch, FALSE);
+		}
+		else {
 			send_to_char("Diagnose whom?\r\n", ch);
+		}
 	}
 }
 
@@ -3448,12 +3502,14 @@ ACMD(do_inventory) {
 			do_coins(ch, "", 0, FALSE);
 		}
 
-		msg_to_char(ch, "You are carrying %d/%d items:\r\n", IS_CARRYING_N(ch), CAN_CARRY_N(ch));
-		list_obj_to_char(ch->carrying, ch, OBJ_DESC_INVENTORY, TRUE);
+		build_page_display(ch, "You are carrying %d/%d items:", IS_CARRYING_N(ch), CAN_CARRY_N(ch));
+		list_obj_to_char(ch->carrying, ch, OBJ_DESC_INVENTORY, TRUE, TRUE);
 
 		if (GET_LOYALTY(ch)) {
-			show_local_einv(ch, IN_ROOM(ch), FALSE);
+			show_local_einv(ch, IN_ROOM(ch), FALSE, TRUE);
 		}
+		
+		send_page_display(ch);
 	}
 	else {	// advanced inventory
 		char word[MAX_INPUT_LENGTH], heading[MAX_STRING_LENGTH], temp[MAX_INPUT_LENGTH];

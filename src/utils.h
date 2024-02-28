@@ -2151,7 +2151,7 @@ void perform_immort_vis(char_data *ch);
 void show_spawn_summary_display(char_data *ch, bool use_page_display, struct spawn_info *list);
 
 // act.informative.c
-void diag_char_to_char(char_data *i, char_data *ch);
+void diag_char_to_char(char_data *i, char_data *ch, bool use_page_display);
 char *display_attributes(char_data *ch);
 void display_tip_to_char(char_data *ch);
 char *find_exdesc(char *word, struct extra_descr_data *list, int *number);
@@ -2159,13 +2159,13 @@ char *find_exdesc_for_char(char_data *ch, char *word, int *number, obj_data **fo
 char *get_obj_desc(obj_data *obj, char_data *ch, int mode);
 void get_player_skill_string(char_data *ch, char *buffer, bool abbrev);
 void list_char_to_char(char_data *list, char_data *ch);
-void list_obj_to_char(obj_data *list, char_data *ch, int mode, int show);
+void list_obj_to_char(obj_data *list, char_data *ch, int mode, bool show_empty, bool use_page_display);
 void list_vehicles_to_char(vehicle_data *list, char_data *ch, bool large_only, vehicle_data *exclude);
 char *obj_color_by_quality(obj_data *obj, char_data *ch);
 char *obj_desc_for_char(obj_data *obj, char_data *ch, int mode);
 struct custom_message *pick_custom_longdesc(char_data *ch);
 void show_character_affects(char_data *ch, char_data *to, bool send_output);
-bool show_local_einv(char_data *ch, room_data *room, bool thief_mode);
+bool show_local_einv(char_data *ch, room_data *room, bool thief_mode, bool use_page_display);
 void survey_city(char_data *ch, char *argument);
 
 // act.item.c

@@ -2189,37 +2189,39 @@ void do_eq_show_current(char_data *ch, bool show_all) {
 	int pos;
 	
 	if (!IS_NPC(ch)) {
-		msg_to_char(ch, "You are using (gear level %d):\r\n", GET_GEAR_LEVEL(ch));
+		build_page_display(ch, "You are using (gear level %d):", GET_GEAR_LEVEL(ch));
 	}
 	else {
-		send_to_char("You are using:\r\n", ch);
+		build_page_display_str(ch, "You are using:");
 	}
 	
 	for (pos = 0; pos < NUM_WEARS; ++pos) {
 		if (GET_EQ(ch, pos)) {
+			found = TRUE;
+			
 			if (CAN_SEE_OBJ(ch, GET_EQ(ch, pos))) {
-				msg_to_char(ch, "%s%s", wear_data[pos].eq_prompt, obj_desc_for_char(GET_EQ(ch, pos), ch, OBJ_DESC_EQUIPMENT));
-				found = TRUE;
+				build_page_display(ch, "%s%s", wear_data[pos].eq_prompt, obj_desc_for_char(GET_EQ(ch, pos), ch, OBJ_DESC_EQUIPMENT));
 			}
 			else {
-				send_to_char(wear_data[pos].eq_prompt, ch);
-				send_to_char("Something.\r\n", ch);
-				found = TRUE;
+				build_page_display(ch, "%sSomething.", wear_data[pos].eq_prompt);
 			}
 		}
 		else if (show_all) {
+			found = TRUE;
+			
 			if (PRF_FLAGGED(ch, PRF_SCREEN_READER)) {
-				msg_to_char(ch, "%s(nothing)\r\n", wear_data[pos].eq_prompt);
+				build_page_display(ch, "%s(nothing)", wear_data[pos].eq_prompt);
 			}
 			else {
-				msg_to_char(ch, "%s\r\n", wear_data[pos].eq_prompt);
+				build_page_display_str(ch, wear_data[pos].eq_prompt);
 			}
-			found = TRUE;
 		}
 	}
 	if (!found) {
-		send_to_char(" Nothing.\r\n", ch);
+		build_page_display_str(ch, " Nothing.");
 	}
+	
+	send_page_display(ch);
 }
 
 
@@ -2387,15 +2389,17 @@ void do_eq_list(char_data *ch, char *argument) {
 	struct player_eq_set *eq_set;
 	int count = 0;
 	
-	msg_to_char(ch, "Saved equipment sets:\r\n");
+	build_page_display_str(ch, "Saved equipment sets:");
 	LL_FOREACH(GET_EQ_SETS(ch), eq_set) {
 		++count;
-		msg_to_char(ch, " %s\r\n", eq_set->name);
+		build_page_display_col(ch, 3, FALSE, " %s", eq_set->name);
 	}
 	
 	if (!count) {
-		msg_to_char(ch, " none\r\n");
+		build_page_display_str(ch, " none");
 	}
+	
+	send_page_display(ch);
 }
 
 
@@ -2526,21 +2530,22 @@ void do_eq_summary(char_data *ch, char *argument) {
 	}
 	
 	// otherwise:
-	msg_to_char(ch, "Stats summary from equipment:\r\n");
+	build_page_display_str(ch, "Stats summary from equipment:");
 	
 	if (bits) {
 		prettier_sprintbit(bits, affected_bits, buf);
-		msg_to_char(ch, " %s\r\n", buf);
+		build_page_display(ch, " %s", buf);
 	}
 	
 	HASH_ITER(hh, hash, vh, next_vh) {
 		// change caps (it starts out all-caps)
 		strcpy(buf, apply_types[vh->vnum]);
 		strtotitlecase(buf);
-		msg_to_char(ch, " %s: %+d\r\n", buf, vh->count);
+		build_page_display(ch, " %s: %+d", buf, vh->count);
 	}
 	
 	free_vnum_hash(&hash);
+	send_page_display(ch);
 }
 
 

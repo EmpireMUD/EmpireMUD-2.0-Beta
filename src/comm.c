@@ -1692,7 +1692,10 @@ void perform_act(const char *orig, char_data *ch, const void *obj, const void *v
 		}
 		to->desc->last_act_message = strdup(lbuf);
 		
-		if (IAF(TO_QUEUE)) {
+		if (IAF(TO_PAGE_DISPLAY)) {
+			build_page_display_str(to, lbuf);
+		}
+		else if (IAF(TO_QUEUE)) {
 			stack_simple_msg_to_desc(to->desc, lbuf);
 		}
 		else {	// send normally

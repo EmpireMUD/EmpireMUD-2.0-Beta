@@ -1080,17 +1080,19 @@ void Crash_listrent(char_data *ch, char *name) {
 	
 	check_delayed_load(victim);
 	
-	msg_to_char(ch, "%s is using:\r\n", GET_NAME(victim));
+	build_page_display(ch, "%s is using:", GET_NAME(victim));
 	for (iter = 0; iter < NUM_WEARS; ++iter) {
 		if (GET_EQ(victim, iter)) {
-			msg_to_char(ch, "%s%s", wear_data[iter].eq_prompt, obj_desc_for_char(GET_EQ(victim, iter), ch, OBJ_DESC_EQUIPMENT));
+			build_page_display(ch, "%s%s", wear_data[iter].eq_prompt, obj_desc_for_char(GET_EQ(victim, iter), ch, OBJ_DESC_EQUIPMENT));
 		}
 	}
 	
-	msg_to_char(ch, "Inventory:\r\n");
-	list_obj_to_char(victim->carrying, ch, OBJ_DESC_INVENTORY, TRUE);
+	build_page_display(ch, "Inventory:");
+	list_obj_to_char(victim->carrying, ch, OBJ_DESC_INVENTORY, TRUE, TRUE);
 	
 	if (file) {
 		free_char(victim);
 	}
+	
+	send_page_display(ch);
 }

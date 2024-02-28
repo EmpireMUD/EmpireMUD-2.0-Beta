@@ -891,7 +891,12 @@ ACMD(do_steal) {
 		msg_to_char(ch, "You can't steal from a building which was ceded to an empire but never used by that empire.\r\n");
 	}
 	else if (!*arg) {
-		if (!(show_local_einv(ch, IN_ROOM(ch), TRUE))) {
+		found = show_local_einv(ch, IN_ROOM(ch), TRUE, TRUE);
+		if (found) {
+			send_page_display(ch);
+		}
+		else {
+			clear_page_display(ch);	// in case
 			msg_to_char(ch, "Nothing is stored here.\r\n");
 		}
 	}

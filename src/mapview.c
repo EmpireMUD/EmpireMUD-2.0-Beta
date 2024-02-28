@@ -1980,7 +1980,7 @@ void look_at_room_by_loc(char_data *ch, room_data *room, bitvector_t options) {
 		
 		if (!IS_SET(options, LRR_LOOK_OUT_INSIDE)) {
 			send_to_char("\tg", ch);
-			list_obj_to_char(ROOM_CONTENTS(room), ch, OBJ_DESC_LONG, FALSE);
+			list_obj_to_char(ROOM_CONTENTS(room), ch, OBJ_DESC_LONG, FALSE, FALSE);
 		}
 		
 		if (!IS_SET(options, LRR_LOOK_OUT_INSIDE)) {

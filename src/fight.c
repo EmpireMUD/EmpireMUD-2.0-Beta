@@ -4244,7 +4244,7 @@ void one_combat_round(char_data *ch, double speed, obj_data *weapon) {
 
 	// still fighting?
 	if (FIGHTING(ch) && IN_ROOM(ch) == IN_ROOM(FIGHTING(ch)) && SHOW_FIGHT_MESSAGES(ch, FM_AUTO_DIAGNOSE)) {
-		diag_char_to_char(FIGHTING(ch), ch);
+		diag_char_to_char(FIGHTING(ch), ch, FALSE);
 	}
 	
 	if (!FIGHTING(ch)) {

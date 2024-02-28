@@ -67,29 +67,30 @@ void update_reboot();
 #define TO_SLEEP		BIT(4)	// to char, even if sleeping
 #define TO_NODARK		BIT(5)	// ignore darkness for CAN_SEE
 #define TO_SPAMMY		BIT(6)	// check PRF_NOSPAM
-#define TO_QUEUE		BIT(7)	// message goes into the stackable queue
-#define TO_GROUP_ONLY	BIT(8)	// only shows to members of ch's group
-#define TO_NOT_IGNORING	BIT(9)	// doesn't send to people who are ignoring the main actor
-#define TO_IGNORE_BAD_CODE	BIT(10)	// ignores bad $ codes
-#define DG_NO_TRIG		BIT(11)	// don't check act trigger
+#define TO_PAGE_DISPLAY	BIT(7)	// message goes into the person's page_display (must be sent later with send_page_display)
+#define TO_QUEUE		BIT(8)	// message goes into the stackable queue
+#define TO_GROUP_ONLY	BIT(9)	// only shows to members of ch's group
+#define TO_NOT_IGNORING	BIT(10)	// doesn't send to people who are ignoring the main actor
+#define TO_IGNORE_BAD_CODE	BIT(11)	// ignores bad $ codes
+#define DG_NO_TRIG		BIT(12)	// don't check act trigger
 
 // act(): things other than objects in the 'obj' slot (required)
-#define ACT_STR_OBJ		BIT(12)	// 'obj' param is a string
-#define ACT_VEH_OBJ		BIT(13)	// 'obj' param is a vehicle
+#define ACT_STR_OBJ		BIT(13)	// 'obj' param is a string
+#define ACT_VEH_OBJ		BIT(14)	// 'obj' param is a vehicle
 
 // act(): things other than mobs in the 'vict_obj' slot (required
-#define ACT_OBJ_VICT	BIT(14)	// 'vict_obj' is an object
-#define ACT_STR_VICT	BIT(15)	// 'vict_obj' is a string
-#define ACT_VEH_VICT	BIT(16)	// 'vict_obj' is a vehicle
+#define ACT_OBJ_VICT	BIT(15)	// 'vict_obj' is an object
+#define ACT_STR_VICT	BIT(16)	// 'vict_obj' is a string
+#define ACT_VEH_VICT	BIT(17)	// 'vict_obj' is a vehicle
 
 // act(): fmessage flags
-#define ACT_COMBAT_HIT	BIT(17)	// is a hit (fightmessages)
-#define ACT_COMBAT_MISS	BIT(18)	// is a miss (fightmessages)
-#define ACT_ANIMAL_MOVE	BIT(19)	// allows SM_ANIMAL_MOVEMENT to ignore the message
-#define ACT_BUFF		BIT(20)	// is a non-violent buff ability for FM_MY_BUFFS_IN_COMBAT, etc
-#define ACT_AFFECT		BIT(21)	// indicates it's an affect apply/wear-off for FM_*_AFFECTS_IN_COMBAT
-#define ACT_ABILITY		BIT(22)	// indicates it's an ability, for FM_ ability flags
-#define ACT_HEAL		BIT(23)	// is a heal, for FM_ flags
+#define ACT_COMBAT_HIT	BIT(18)	// is a hit (fightmessages)
+#define ACT_COMBAT_MISS	BIT(19)	// is a miss (fightmessages)
+#define ACT_ANIMAL_MOVE	BIT(20)	// allows SM_ANIMAL_MOVEMENT to ignore the message
+#define ACT_BUFF		BIT(21)	// is a non-violent buff ability for FM_MY_BUFFS_IN_COMBAT, etc
+#define ACT_AFFECT		BIT(22)	// indicates it's an affect apply/wear-off for FM_*_AFFECTS_IN_COMBAT
+#define ACT_ABILITY		BIT(23)	// indicates it's an ability, for FM_ ability flags
+#define ACT_HEAL		BIT(24)	// is a heal, for FM_ flags
 
 // shorthand flags
 #define ACT_NON_OBJ_OBJ		(ACT_STR_OBJ | ACT_VEH_OBJ)
