@@ -858,30 +858,30 @@ void olc_show_sector(char_data *ch) {
 		return;
 	}
 
-	build_page_display(ch, "[%s%d\t0] %s%s\t0", OLC_LABEL_CHANGED, GET_OLC_VNUM(ch->desc), OLC_LABEL_UNCHANGED, sector_proto(st->vnum) ? GET_SECT_NAME(sector_proto(st->vnum)) : "new sector");
+	build_page_display(ch, "[%s%d\t0] %s%s\t0", OLC_LABEL_CHANGED, GET_OLC_VNUM(ch->desc), OLC_LABEL_UNCHANGED, sector_proto(GET_SECT_VNUM(st)) ? GET_SECT_NAME(sector_proto(GET_SECT_VNUM(st))) : "new sector");
 	build_page_display(ch, "<%sname\t0> %s", OLC_LABEL_STR(GET_SECT_NAME(st), default_sect_name), NULLSAFE(GET_SECT_NAME(st)));
 	build_page_display(ch, "<%stitle\t0> %s", OLC_LABEL_STR(GET_SECT_TITLE(st), default_sect_title), NULLSAFE(GET_SECT_TITLE(st)));
 	build_page_display(ch, "<%scommands\t0> %s", OLC_LABEL_STR(GET_SECT_COMMANDS(st), ""), NULLSAFE(GET_SECT_COMMANDS(st)));
-	build_page_display(ch, "<%sroadsideicon\t0> %c", OLC_LABEL_VAL(st->roadside_icon, default_roadside_icon), st->roadside_icon);
+	build_page_display(ch, "<%sroadsideicon\t0> %c", OLC_LABEL_VAL(GET_SECT_ROADSIDE_ICON(st), default_roadside_icon), GET_SECT_ROADSIDE_ICON(st));
 	build_page_display(ch, "<%smapout\t0> %s", OLC_LABEL_VAL(GET_SECT_MAPOUT(st), 0), mapout_color_names[GET_SECT_MAPOUT(st)]);
 
 	build_page_display(ch, "<%sicons\t0>", OLC_LABEL_PTR(GET_SECT_ICONS(st)));
 	show_icons_display(ch, GET_SECT_ICONS(st), FALSE);
 
 	ordered_sprintbit(GET_SECT_CLIMATE(st), climate_flags, climate_flags_order, FALSE, lbuf);
-	build_page_display(ch, "<%sclimate\t0> %s", OLC_LABEL_VAL(st->climate, NOBITS), lbuf);
+	build_page_display(ch, "<%sclimate\t0> %s", OLC_LABEL_VAL(GET_SECT_CLIMATE(st), NOBITS), lbuf);
 	build_page_display(ch, "<%stemperature\t0> %s", OLC_LABEL_VAL(GET_SECT_TEMPERATURE_TYPE(st), 0), temperature_types[GET_SECT_TEMPERATURE_TYPE(st)]);
-	build_page_display(ch, "<%smovecost\t0> %d", OLC_LABEL_VAL(st->movement_loss, 0), st->movement_loss);
+	build_page_display(ch, "<%smovecost\t0> %d", OLC_LABEL_VAL(GET_SECT_MOVE_LOSS(st), 0), GET_SECT_MOVE_LOSS(st));
 
 	sprintbit(GET_SECT_FLAGS(st), sector_flags, lbuf, TRUE);
 	build_page_display(ch, "<%sflags\t0> %s", OLC_LABEL_VAL(GET_SECT_FLAGS(st), NOBITS), lbuf);
 	
-	ordered_sprintbit(st->build_flags, bld_on_flags, bld_on_flags_order, TRUE, lbuf);
-	build_page_display(ch, "<%sbuildflags\t0> %s", OLC_LABEL_VAL(st->build_flags, NOBITS), lbuf);
+	ordered_sprintbit(GET_SECT_BUILD_FLAGS(st), bld_on_flags, bld_on_flags_order, TRUE, lbuf);
+	build_page_display(ch, "<%sbuildflags\t0> %s", OLC_LABEL_VAL(GET_SECT_BUILD_FLAGS(st), NOBITS), lbuf);
 	
-	build_page_display(ch, "<%sevolution\t0>", OLC_LABEL_PTR(st->evolution));
-	if (st->evolution) {
-		show_evolution_display(ch, st->evolution, FALSE);
+	build_page_display(ch, "<%sevolution\t0>", OLC_LABEL_PTR(GET_SECT_EVOS(st)));
+	if (GET_SECT_EVOS(st)) {
+		show_evolution_display(ch, GET_SECT_EVOS(st), FALSE);
 	}
 
 	// exdesc
@@ -922,7 +922,7 @@ void olc_show_sector(char_data *ch) {
 
 OLC_MODULE(sectedit_buildflags) {
 	sector_data *st = GET_OLC_SECTOR(ch->desc);
-	st->build_flags = olc_process_flag(ch, argument, "build", "buildflags", bld_on_flags, st->build_flags);
+	GET_SECT_BUILD_FLAGS(st) = olc_process_flag(ch, argument, "build", "buildflags", bld_on_flags, GET_SECT_BUILD_FLAGS(st));
 }
 
 
@@ -998,8 +998,8 @@ OLC_MODULE(sectedit_evolution) {
 			msg_to_char(ch, "Remove which evolution (number)?\r\n");
 		}
 		else if (!str_cmp(arg2, "all")) {
-			while ((evo = st->evolution)) {
-				st->evolution = evo->next;
+			while ((evo = GET_SECT_EVOS(st))) {
+				GET_SECT_EVOS(st) = evo->next;
 				free(evo);
 			}
 			msg_to_char(ch, "You remove all evolutions.\r\n");
@@ -1009,13 +1009,13 @@ OLC_MODULE(sectedit_evolution) {
 		}
 		else {
 			found = FALSE;
-			for (evo = st->evolution; evo && !found; evo = evo->next) {
+			for (evo = GET_SECT_EVOS(st); evo && !found; evo = evo->next) {
 				if (--num == 0) {
 					found = TRUE;
 					
 					msg_to_char(ch, "You remove evolution #%d.\r\n", atoi(arg2));
 					
-					LL_DELETE(st->evolution, evo);
+					LL_DELETE(GET_SECT_EVOS(st), evo);
 					free(evo);
 				}
 			}
@@ -1136,7 +1136,7 @@ OLC_MODULE(sectedit_evolution) {
 		// find which one to change
 		num = atoi(num_arg);
 		change = NULL;
-		for (evo = st->evolution; evo && !change; evo = evo->next) {
+		for (evo = GET_SECT_EVOS(st); evo && !change; evo = evo->next) {
 			if (--num == 0) {
 				change = evo;
 				break;
@@ -1288,7 +1288,7 @@ OLC_MODULE(sectedit_mapout) {
 
 OLC_MODULE(sectedit_movecost) {
 	sector_data *st = GET_OLC_SECTOR(ch->desc);
-	st->movement_loss = olc_process_number(ch, argument, "movement cost", "movecost", 0, 1000, st->movement_loss);
+	GET_SECT_MOVE_LOSS(st) = olc_process_number(ch, argument, "movement cost", "movecost", 0, 1000, GET_SECT_MOVE_LOSS(st));
 }
 
 
@@ -1322,13 +1322,13 @@ OLC_MODULE(sectedit_roadsideicon) {
 		msg_to_char(ch, "Invalid roadside icon '%c'.\r\n", *argument);
 	}
 	else {
-		st->roadside_icon = *argument;
+		GET_SECT_ROADSIDE_ICON(st) = *argument;
 		
 		if (PRF_FLAGGED(ch, PRF_NOREPEAT)) {
 			send_config_msg(ch, "ok_string");
 		}
 		else {
-			msg_to_char(ch, "The roadside icon is now '%c'.\r\n", st->roadside_icon);
+			msg_to_char(ch, "The roadside icon is now '%c'.\r\n", GET_SECT_ROADSIDE_ICON(st));
 		}
 	}
 }
