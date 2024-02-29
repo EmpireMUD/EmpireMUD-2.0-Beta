@@ -46,7 +46,7 @@ P 1003
 S
 #4905
 Astral Cartography~
-   Your sorcerers have studied the torrential courses of the portals the
+   Your sorcerers have studied the torrential courses of the portals that
 crisscross the world and mapped them according to the stars. Now, thanks to
 their study, your empire extends its reach across the sea. Your city portals
 are no longer limited by distance; the world is at your fingertips!
