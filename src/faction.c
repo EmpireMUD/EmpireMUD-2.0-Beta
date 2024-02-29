@@ -242,10 +242,10 @@ char *list_one_faction(faction_data *fct, bool detail) {
 	static char output[MAX_STRING_LENGTH];
 	
 	if (detail) {
-		snprintf(output, sizeof(output), "[%5d] %s", FCT_VNUM(fct), FCT_NAME(fct));
+		safe_snprintf(output, sizeof(output), "[%5d] %s", FCT_VNUM(fct), FCT_NAME(fct));
 	}
 	else {
-		snprintf(output, sizeof(output), "[%5d] %s", FCT_VNUM(fct), FCT_NAME(fct));
+		safe_snprintf(output, sizeof(output), "[%5d] %s", FCT_VNUM(fct), FCT_NAME(fct));
 	}
 		
 	return output;
@@ -1055,7 +1055,7 @@ void olc_delete_faction(char_data *ch, any_vnum vnum) {
 		return;
 	}
 	
-	snprintf(name, sizeof(name), "%s", NULLSAFE(FCT_NAME(fct)));
+	safe_snprintf(name, sizeof(name), "%s", NULLSAFE(FCT_NAME(fct)));
 	
 	// remove it from the hash table first
 	remove_faction_from_table(fct);

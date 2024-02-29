@@ -1459,7 +1459,7 @@ void annual_world_update(void) {
 	
 	// MESSAGE TO ALL ?
 	if ((str = config_get_string("world_reset_message")) && *str) {
-		snprintf(message, sizeof(message), "\r\n%s\r\n\r\n", str);
+		safe_snprintf(message, sizeof(message), "\r\n%s\r\n\r\n", str);
 		
 		LL_FOREACH(descriptor_list, desc) {
 			if (STATE(desc) == CON_PLAYING && desc->character) {
@@ -1901,7 +1901,7 @@ struct empire_city_data *create_city_entry(empire_data *emp, char *name, room_da
 	}
 	
 	// rename
-	snprintf(buf, sizeof(buf), "The Center of %s", name);
+	safe_snprintf(buf, sizeof(buf), "The Center of %s", name);
 	set_room_custom_name(location, buf);
 	
 	// verify ownership
@@ -2999,7 +2999,7 @@ void run_external_evolutions(void) {
 	}
 	
 	evolutions_pending = TRUE;
-	snprintf(buf, sizeof(buf), "nice ../bin/evolve %d %d %d %d &", config_get_int("nearby_sector_distance"), DAY_OF_YEAR(main_time_info), config_get_int("water_crop_distance"), (int) getpid());
+	safe_snprintf(buf, sizeof(buf), "nice ../bin/evolve %d %d %d %d &", config_get_int("nearby_sector_distance"), DAY_OF_YEAR(main_time_info), config_get_int("water_crop_distance"), (int) getpid());
 	// syslog(SYS_INFO, LVL_START_IMM, TRUE, "Running map evolutions...");
 	system(buf);
 }
@@ -5565,7 +5565,7 @@ void store_to_map_v1(struct map_file_data_v1 *store, struct map_data *map) {
 */
 char *get_mapout_header(void) {
 	static char output[256];
-	snprintf(output, sizeof(output), "%dx%d\n", MAP_WIDTH, MAP_HEIGHT);
+	safe_snprintf(output, sizeof(output), "%dx%d\n", MAP_WIDTH, MAP_HEIGHT);
 	return output;
 }
 

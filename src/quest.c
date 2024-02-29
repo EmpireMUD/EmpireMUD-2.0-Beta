@@ -679,7 +679,7 @@ void show_tracker_display(char_data *ch, struct req_data *tracker, bool send_out
 				lefthand = task->current;
 				lefthand = MIN(lefthand, task->needed);	// may be above the amount needed
 				lefthand = MAX(0, lefthand);	// in some cases, current may be negative
-				snprintf(buf, sizeof(buf), " (%d/%d)", lefthand, task->needed);
+				safe_snprintf(buf, sizeof(buf), " (%d/%d)", lefthand, task->needed);
 				break;
 			}
 			case REQ_AMT_REPUTATION:
@@ -779,10 +779,10 @@ void give_quest_rewards(char_data *ch, struct quest_reward *list, int reward_lev
 				}
 				
 				if (reward->amount > 1) {
-					snprintf(buf, sizeof(buf), "\tyYou receive $p (x%d)!\t0", reward->amount);
+					safe_snprintf(buf, sizeof(buf), "\tyYou receive $p (x%d)!\t0", reward->amount);
 				}
 				else {
-					snprintf(buf, sizeof(buf), "\tyYou receive $p!\t0");
+					safe_snprintf(buf, sizeof(buf), "\tyYou receive $p!\t0");
 				}
 				
 				if (obj_ok && obj) {
@@ -915,7 +915,7 @@ char *quest_giver_string(struct quest_giver *giver, bool show_vnums) {
 	}
 	
 	if (show_vnums) {
-		snprintf(vnum, sizeof(vnum), "%s [%d] ", quest_giver_types[giver->type], giver->vnum);
+		safe_snprintf(vnum, sizeof(vnum), "%s [%d] ", quest_giver_types[giver->type], giver->vnum);
 	}
 	else {
 		*vnum = '\0';
@@ -925,38 +925,38 @@ char *quest_giver_string(struct quest_giver *giver, bool show_vnums) {
 	switch (giver->type) {
 		case QG_BUILDING: {
 			bld_data *bld = building_proto(giver->vnum);
-			snprintf(output, sizeof(output), "%s%s", vnum, bld ? GET_BLD_NAME(bld) : "UNKNOWN");
+			safe_snprintf(output, sizeof(output), "%s%s", vnum, bld ? GET_BLD_NAME(bld) : "UNKNOWN");
 			break;
 		}
 		case QG_MOBILE: {
-			snprintf(output, sizeof(output), "%s%s", vnum, skip_filler(get_mob_name_by_proto(giver->vnum, FALSE)));
+			safe_snprintf(output, sizeof(output), "%s%s", vnum, skip_filler(get_mob_name_by_proto(giver->vnum, FALSE)));
 			break;
 		}
 		case QG_OBJECT: {
-			snprintf(output, sizeof(output), "%s%s", vnum, skip_filler(get_obj_name_by_proto(giver->vnum)));
+			safe_snprintf(output, sizeof(output), "%s%s", vnum, skip_filler(get_obj_name_by_proto(giver->vnum)));
 			break;
 		}
 		case QG_ROOM_TEMPLATE: {
 			room_template *rmt = room_template_proto(giver->vnum);
-			snprintf(output, sizeof(output), "%s%s", vnum, rmt ? skip_filler(GET_RMT_TITLE(rmt)) : "UNKNOWN");
+			safe_snprintf(output, sizeof(output), "%s%s", vnum, rmt ? skip_filler(GET_RMT_TITLE(rmt)) : "UNKNOWN");
 			break;
 		}
 		case QG_TRIGGER: {
 			trig_data *trig = real_trigger(giver->vnum);
-			snprintf(output, sizeof(output), "%s%s", vnum, trig ? skip_filler(GET_TRIG_NAME(trig)) : "UNKNOWN");
+			safe_snprintf(output, sizeof(output), "%s%s", vnum, trig ? skip_filler(GET_TRIG_NAME(trig)) : "UNKNOWN");
 			break;
 		}
 		case QG_QUEST: {
 			quest_data *qq = quest_proto(giver->vnum);
-			snprintf(output, sizeof(output), "%s%s", vnum, qq ? skip_filler(QUEST_NAME(qq)) : "UNKNOWN");
+			safe_snprintf(output, sizeof(output), "%s%s", vnum, qq ? skip_filler(QUEST_NAME(qq)) : "UNKNOWN");
 			break;
 		}
 		case QG_VEHICLE: {
-			snprintf(output, sizeof(output), "%s%s", vnum, skip_filler(get_vehicle_name_by_proto(giver->vnum)));
+			safe_snprintf(output, sizeof(output), "%s%s", vnum, skip_filler(get_vehicle_name_by_proto(giver->vnum)));
 			break;
 		}
 		default: {
-			snprintf(output, sizeof(output), "%d %sUNKNOWN", giver->type, vnum);
+			safe_snprintf(output, sizeof(output), "%d %sUNKNOWN", giver->type, vnum);
 			break;
 		}
 	}
@@ -982,7 +982,7 @@ char *quest_reward_string(struct quest_reward *reward, bool show_vnums) {
 	}
 	
 	if (show_vnums) {
-		snprintf(vnum, sizeof(vnum), "[%d] ", reward->vnum);
+		safe_snprintf(vnum, sizeof(vnum), "[%d] ", reward->vnum);
 	}
 	else {
 		*vnum = '\0';
@@ -992,71 +992,71 @@ char *quest_reward_string(struct quest_reward *reward, bool show_vnums) {
 	switch (reward->type) {
 		case QR_BONUS_EXP: {
 			// has no vnum
-			snprintf(output, sizeof(output), "%d bonus experience", reward->amount);
+			safe_snprintf(output, sizeof(output), "%d bonus experience", reward->amount);
 			break;
 		}
 		case QR_COINS: {
 			// vnum not relevant
-			snprintf(output, sizeof(output), "%d %s coin%s", reward->amount, reward->vnum == OTHER_COIN ? "misc" : "empire", PLURAL(reward->amount));
+			safe_snprintf(output, sizeof(output), "%d %s coin%s", reward->amount, reward->vnum == OTHER_COIN ? "misc" : "empire", PLURAL(reward->amount));
 			break;
 		}
 		case QR_CURRENCY: {
-			snprintf(output, sizeof(output), "%s%d %s", vnum, reward->amount, get_generic_string_by_vnum(reward->vnum, GENERIC_CURRENCY, WHICH_CURRENCY(reward->amount)));
+			safe_snprintf(output, sizeof(output), "%s%d %s", vnum, reward->amount, get_generic_string_by_vnum(reward->vnum, GENERIC_CURRENCY, WHICH_CURRENCY(reward->amount)));
 			break;
 		}
 		case QR_OBJECT: {
-			snprintf(output, sizeof(output), "%s%dx %s", vnum, reward->amount, skip_filler(get_obj_name_by_proto(reward->vnum)));
+			safe_snprintf(output, sizeof(output), "%s%dx %s", vnum, reward->amount, skip_filler(get_obj_name_by_proto(reward->vnum)));
 			break;
 		}
 		case QR_SET_SKILL: {
-			snprintf(output, sizeof(output), "%sGives level %d %s", vnum, reward->amount, get_skill_name_by_vnum(reward->vnum));
+			safe_snprintf(output, sizeof(output), "%sGives level %d %s", vnum, reward->amount, get_skill_name_by_vnum(reward->vnum));
 			break;
 		}
 		case QR_SKILL_EXP: {
-			snprintf(output, sizeof(output), "%s%+d%% %s", vnum, reward->amount, get_skill_name_by_vnum(reward->vnum));
+			safe_snprintf(output, sizeof(output), "%s%+d%% %s", vnum, reward->amount, get_skill_name_by_vnum(reward->vnum));
 			break;
 		}
 		case QR_SKILL_LEVELS: {
-			snprintf(output, sizeof(output), "%s%+d %s", vnum, reward->amount, get_skill_name_by_vnum(reward->vnum));
+			safe_snprintf(output, sizeof(output), "%s%+d %s", vnum, reward->amount, get_skill_name_by_vnum(reward->vnum));
 			break;
 		}
 		case QR_QUEST_CHAIN: {
-			snprintf(output, sizeof(output), "%sLeads to %s", vnum, get_quest_name_by_proto(reward->vnum));
+			safe_snprintf(output, sizeof(output), "%sLeads to %s", vnum, get_quest_name_by_proto(reward->vnum));
 			break;
 		}
 		case QR_REPUTATION: {
 			faction_data *fct = find_faction_by_vnum(reward->vnum);
-			snprintf(output, sizeof(output), "%s%+d reputation to %s", vnum, reward->amount, (fct ? FCT_NAME(fct) : "UNKNOWN"));
+			safe_snprintf(output, sizeof(output), "%s%+d reputation to %s", vnum, reward->amount, (fct ? FCT_NAME(fct) : "UNKNOWN"));
 			break;
 		}
 		case QR_EVENT_POINTS: {
 			event_data *event = find_event_by_vnum(reward->vnum);
-			snprintf(output, sizeof(output), "%+d event point%s to %s%s", reward->amount, PLURAL(reward->amount), vnum, (event ? EVT_NAME(event) : "UNKNOWN"));
+			safe_snprintf(output, sizeof(output), "%+d event point%s to %s%s", reward->amount, PLURAL(reward->amount), vnum, (event ? EVT_NAME(event) : "UNKNOWN"));
 			break;
 		}
 		case QR_SPEAK_LANGUAGE: {
-			snprintf(output, sizeof(output), "%sSpeak %s", vnum, get_generic_name_by_vnum(reward->vnum));
+			safe_snprintf(output, sizeof(output), "%sSpeak %s", vnum, get_generic_name_by_vnum(reward->vnum));
 			break;
 		}
 		case QR_RECOGNIZE_LANGUAGE: {
-			snprintf(output, sizeof(output), "%sRecognize %s", vnum, get_generic_name_by_vnum(reward->vnum));
+			safe_snprintf(output, sizeof(output), "%sRecognize %s", vnum, get_generic_name_by_vnum(reward->vnum));
 			break;
 		}
 		case QR_GRANT_PROGRESS: {
-			snprintf(output, sizeof(output), "Grants progress: %s%s", vnum, get_progress_name_by_proto(reward->vnum));
+			safe_snprintf(output, sizeof(output), "Grants progress: %s%s", vnum, get_progress_name_by_proto(reward->vnum));
 			break;
 		}
 		case QR_START_PROGRESS: {
-			snprintf(output, sizeof(output), "Starts progress: %s%s", vnum, get_progress_name_by_proto(reward->vnum));
+			safe_snprintf(output, sizeof(output), "Starts progress: %s%s", vnum, get_progress_name_by_proto(reward->vnum));
 			break;
 		}
 		case QR_UNLOCK_ARCHETYPE: {
 			archetype_data *arch = archetype_proto(reward->vnum);
-			snprintf(output, sizeof(output), "Unlocks archetype: %s%s", vnum, (arch ? GET_ARCH_NAME(arch) : "UNKNOWN"));
+			safe_snprintf(output, sizeof(output), "Unlocks archetype: %s%s", vnum, (arch ? GET_ARCH_NAME(arch) : "UNKNOWN"));
 			break;
 		}
 		default: {
-			snprintf(output, sizeof(output), "%s%dx Unknown", vnum, reward->amount);
+			safe_snprintf(output, sizeof(output), "%s%dx Unknown", vnum, reward->amount);
 			break;
 		}
 	}
@@ -3872,7 +3872,7 @@ char *list_one_quest(quest_data *quest, bool detail) {
 	
 	if (detail) {
 		if (QUEST_MIN_LEVEL(quest) > 0 || QUEST_MAX_LEVEL(quest) > 0) {
-			snprintf(levels, sizeof(levels), " [%d-%d]", QUEST_MIN_LEVEL(quest), QUEST_MAX_LEVEL(quest));
+			safe_snprintf(levels, sizeof(levels), " [%d-%d]", QUEST_MIN_LEVEL(quest), QUEST_MAX_LEVEL(quest));
 		}
 		else {
 			*levels = '\0';
@@ -3884,34 +3884,34 @@ char *list_one_quest(quest_data *quest, bool detail) {
 		else {
 			*typestr = '\0';
 		}
-		snprintf(output, sizeof(output), "[%5d] %s%s %s", QUEST_VNUM(quest), QUEST_NAME(quest), levels, typestr);
+		safe_snprintf(output, sizeof(output), "[%5d] %s%s %s", QUEST_VNUM(quest), QUEST_NAME(quest), levels, typestr);
 	}
 	else {
 		if (IS_EVENT_DAILY(quest)) {
 			if (QUEST_DAILY_CYCLE(quest) == NOTHING) {
-				snprintf(typestr, sizeof(typestr), " (event daily)");
+				safe_snprintf(typestr, sizeof(typestr), " (event daily)");
 			}
 			else {
-				snprintf(typestr, sizeof(typestr), " (event daily, %s)", QUEST_DAILY_ACTIVE(quest) ? "active" : "inactive");
+				safe_snprintf(typestr, sizeof(typestr), " (event daily, %s)", QUEST_DAILY_ACTIVE(quest) ? "active" : "inactive");
 			}
 		}
 		else if (IS_DAILY_QUEST(quest) && QUEST_DAILY_CYCLE(quest) == NOTHING) {
-			snprintf(typestr, sizeof(typestr), " (daily)");
+			safe_snprintf(typestr, sizeof(typestr), " (daily)");
 		}
 		else if (IS_DAILY_QUEST(quest) && QUEST_DAILY_ACTIVE(quest)) {
-			snprintf(typestr, sizeof(typestr), " (daily, active)");
+			safe_snprintf(typestr, sizeof(typestr), " (daily, active)");
 		}
 		else if (IS_DAILY_QUEST(quest)) {
-			snprintf(typestr, sizeof(typestr), " (daily, inactive)");
+			safe_snprintf(typestr, sizeof(typestr), " (daily, inactive)");
 		}
 		else if (IS_EVENT_QUEST(quest)) {
-			snprintf(typestr, sizeof(typestr), " (event)");
+			safe_snprintf(typestr, sizeof(typestr), " (event)");
 		}
 		else {
 			*typestr = '\0';
 		}
 		
-		snprintf(output, sizeof(output), "[%5d] %s%s", QUEST_VNUM(quest), QUEST_NAME(quest), typestr);
+		safe_snprintf(output, sizeof(output), "[%5d] %s%s", QUEST_VNUM(quest), QUEST_NAME(quest), typestr);
 	}
 		
 	return output;
@@ -5332,7 +5332,7 @@ void olc_delete_quest(char_data *ch, any_vnum vnum) {
 		return;
 	}
 	
-	snprintf(name, sizeof(name), "%s", NULLSAFE(QUEST_NAME(quest)));
+	safe_snprintf(name, sizeof(name), "%s", NULLSAFE(QUEST_NAME(quest)));
 	
 	// remove it from the hash table first
 	remove_quest_from_table(quest);

@@ -190,7 +190,7 @@ ACMD(do_mail) {
 				tmstr = asctime(localtime(&mail->timestamp));
 				*(tmstr + strlen(tmstr) - 1) = '\0';
 
-				snprintf(mail_buf, sizeof(mail_buf),
+				safe_snprintf(mail_buf, sizeof(mail_buf),
 					" * * * * Empire Mail System * * * *\r\n"
 					"Date: %s\r\n"
 					"  To: %s\r\n"
@@ -205,7 +205,7 @@ ACMD(do_mail) {
 			}
 			
 			// pre-messaging
-			snprintf(part, sizeof(part), "%d letter%s", count, PLURAL(count));
+			safe_snprintf(part, sizeof(part), "%d letter%s", count, PLURAL(count));
 			
 			// message to player
 			msg = config_get_string("mail_receive_message_to_char") ? config_get_string("mail_receive_message_to_char") : "You receive ##.";

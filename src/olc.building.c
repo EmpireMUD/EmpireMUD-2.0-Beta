@@ -341,10 +341,10 @@ char *list_one_building(bld_data *bld, bool detail) {
 	static char output[MAX_STRING_LENGTH];
 	
 	if (detail) {
-		snprintf(output, sizeof(output), "[%5d] %s", GET_BLD_VNUM(bld), GET_BLD_NAME(bld));
+		safe_snprintf(output, sizeof(output), "[%5d] %s", GET_BLD_VNUM(bld), GET_BLD_NAME(bld));
 	}
 	else {
-		snprintf(output, sizeof(output), "[%5d] %s", GET_BLD_VNUM(bld), GET_BLD_NAME(bld));
+		safe_snprintf(output, sizeof(output), "[%5d] %s", GET_BLD_VNUM(bld), GET_BLD_NAME(bld));
 	}
 	
 	return output;
@@ -379,7 +379,7 @@ void olc_delete_building(char_data *ch, bld_vnum vnum) {
 		return;
 	}
 	
-	snprintf(name, sizeof(name), "%s", NULLSAFE(GET_BLD_NAME(bld)));
+	safe_snprintf(name, sizeof(name), "%s", NULLSAFE(GET_BLD_NAME(bld)));
 	
 	if (HASH_COUNT(building_table) <= 1) {
 		msg_to_char(ch, "You can't delete the last building.\r\n");

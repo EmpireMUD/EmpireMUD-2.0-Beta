@@ -1558,13 +1558,13 @@ obj_data *make_corpse(char_data *ch) {
 	if (human) {
 		sprintf(kws, "%s %s %s", GET_OBJ_KEYWORDS(corpse), skip_filler(PERS(ch, ch, FALSE)), size_data[size].corpse_keywords);
 		sprintf(shortdesc, "%s's body", PERS(ch, ch, FALSE));
-		snprintf(longdesc, sizeof(longdesc), size_data[size].body_long_desc, PERS(ch, ch, FALSE));
+		safe_snprintf(longdesc, sizeof(longdesc), size_data[size].body_long_desc, PERS(ch, ch, FALSE));
 		CAP(longdesc);
 	}
 	else {
 		sprintf(kws, "%s %s %s", GET_OBJ_KEYWORDS(corpse), skip_filler(PERS(ch, ch, FALSE)), size_data[size].corpse_keywords);
 		sprintf(shortdesc, "the corpse of %s", PERS(ch, ch, FALSE));
-		snprintf(longdesc, sizeof(longdesc), size_data[size].corpse_long_desc, PERS(ch, ch, FALSE));
+		safe_snprintf(longdesc, sizeof(longdesc), size_data[size].corpse_long_desc, PERS(ch, ch, FALSE));
 		CAP(longdesc);
 	}
 	
@@ -2101,13 +2101,13 @@ void block_missile_attack(char_data *ch, char_data *victim, int type) {
 	char buf[MAX_STRING_LENGTH];
 	attack_message_data *amd = real_attack_message(type);
 	
-	snprintf(buf, sizeof(buf), "You %s at $N, but $E blocks.", ATTACK_MSG(amd, ATTACK_FIRST_PERSON(amd), "attack"));
+	safe_snprintf(buf, sizeof(buf), "You %s at $N, but $E blocks.", ATTACK_MSG(amd, ATTACK_FIRST_PERSON(amd), "attack"));
 	act(buf, FALSE, ch, NULL, victim, TO_CHAR | ACT_COMBAT_MISS);
 	
-	snprintf(buf, sizeof(buf), "$n %s at $N, who blocks.", ATTACK_MSG(amd, ATTACK_THIRD_PERSON(amd), "attacks"));
+	safe_snprintf(buf, sizeof(buf), "$n %s at $N, who blocks.", ATTACK_MSG(amd, ATTACK_THIRD_PERSON(amd), "attacks"));
 	act(buf, FALSE, ch, NULL, victim, TO_NOTVICT | ACT_COMBAT_MISS);
 	
-	snprintf(buf, sizeof(buf), "$n %s at you, but you block.", ATTACK_MSG(amd, ATTACK_THIRD_PERSON(amd), "attacks"));
+	safe_snprintf(buf, sizeof(buf), "$n %s at you, but you block.", ATTACK_MSG(amd, ATTACK_THIRD_PERSON(amd), "attacks"));
 	act(buf, FALSE, ch, NULL, victim, TO_VICT | ACT_COMBAT_MISS);
 }
 
@@ -2358,10 +2358,10 @@ void dam_message(int dam, char_data *ch, char_data *victim, int w_type) {
 	/* damage message to damager */
 	if (ch->desc && ch != victim && !AFF_FLAGGED(victim, AFF_NO_SEE_IN_ROOM)) {
 		if (SHOW_FIGHT_MESSAGES(ch, FM_DAMAGE_NUMBERS)) {
-			snprintf(message, sizeof(message), "\ty%s (%d)\t0", replace_fight_string(dam_weapons[msgnum].to_char, ATTACK_MSG(amd, ATTACK_FIRST_PERSON(amd), "attack"), ATTACK_MSG(amd, ATTACK_THIRD_PERSON(amd), "attacks"),ATTACK_MSG(amd, ATTACK_NOUN(amd), "attack")), dam);
+			safe_snprintf(message, sizeof(message), "\ty%s (%d)\t0", replace_fight_string(dam_weapons[msgnum].to_char, ATTACK_MSG(amd, ATTACK_FIRST_PERSON(amd), "attack"), ATTACK_MSG(amd, ATTACK_THIRD_PERSON(amd), "attacks"),ATTACK_MSG(amd, ATTACK_NOUN(amd), "attack")), dam);
 		}
 		else { // no damage numbers
-			snprintf(message, sizeof(message), "\ty%s\t0", replace_fight_string(dam_weapons[msgnum].to_char, ATTACK_MSG(amd, ATTACK_FIRST_PERSON(amd), "attack"), ATTACK_MSG(amd, ATTACK_THIRD_PERSON(amd), "attacks"),ATTACK_MSG(amd, ATTACK_NOUN(amd), "attack")));
+			safe_snprintf(message, sizeof(message), "\ty%s\t0", replace_fight_string(dam_weapons[msgnum].to_char, ATTACK_MSG(amd, ATTACK_FIRST_PERSON(amd), "attack"), ATTACK_MSG(amd, ATTACK_THIRD_PERSON(amd), "attacks"),ATTACK_MSG(amd, ATTACK_NOUN(amd), "attack")));
 		}
 		act(message, FALSE, ch, NULL, victim, TO_CHAR | fmsg_type);
 	}
@@ -2369,10 +2369,10 @@ void dam_message(int dam, char_data *ch, char_data *victim, int w_type) {
 	/* damage message to damagee */
 	if (victim->desc) {
 		if (SHOW_FIGHT_MESSAGES(victim, FM_DAMAGE_NUMBERS)) {
-			snprintf(message, sizeof(message), "\tr%s (%+d)\t0", replace_fight_string(dam_weapons[msgnum].to_victim, ATTACK_MSG(amd, ATTACK_FIRST_PERSON(amd), "attack"), ATTACK_MSG(amd, ATTACK_THIRD_PERSON(amd), "attacks"),ATTACK_MSG(amd, ATTACK_NOUN(amd), "attack")), -1 * dam);
+			safe_snprintf(message, sizeof(message), "\tr%s (%+d)\t0", replace_fight_string(dam_weapons[msgnum].to_victim, ATTACK_MSG(amd, ATTACK_FIRST_PERSON(amd), "attack"), ATTACK_MSG(amd, ATTACK_THIRD_PERSON(amd), "attacks"),ATTACK_MSG(amd, ATTACK_NOUN(amd), "attack")), -1 * dam);
 		}
 		else { // no damage numbers
-			snprintf(message, sizeof(message), "\tr%s\t0", replace_fight_string(dam_weapons[msgnum].to_victim, ATTACK_MSG(amd, ATTACK_FIRST_PERSON(amd), "attack"), ATTACK_MSG(amd, ATTACK_THIRD_PERSON(amd), "attacks"),ATTACK_MSG(amd, ATTACK_NOUN(amd), "attack")));
+			safe_snprintf(message, sizeof(message), "\tr%s\t0", replace_fight_string(dam_weapons[msgnum].to_victim, ATTACK_MSG(amd, ATTACK_FIRST_PERSON(amd), "attack"), ATTACK_MSG(amd, ATTACK_THIRD_PERSON(amd), "attacks"),ATTACK_MSG(amd, ATTACK_NOUN(amd), "attack")));
 		}
 		act(message, FALSE, ch, NULL, victim, TO_VICT | TO_SLEEP | fmsg_type);
 	}
@@ -2427,10 +2427,10 @@ int skill_message(int dam, char_data *ch, char_data *vict, int attacktype, attac
 		if (!AFF_FLAGGED(vict, AFF_NO_SEE_IN_ROOM)) {
 			if (ch != vict && IN_ROOM(ch) == IN_ROOM(vict) && msg->msg[MSG_GOD].attacker_msg) {
 				if (SHOW_FIGHT_MESSAGES(ch, FM_DAMAGE_NUMBERS)) {
-					snprintf(message, sizeof(message), "\ty%s (0)\t0", msg->msg[MSG_GOD].attacker_msg);
+					safe_snprintf(message, sizeof(message), "\ty%s (0)\t0", msg->msg[MSG_GOD].attacker_msg);
 				}
 				else {	// no damage numbers
-					snprintf(message, sizeof(message), "\ty%s\t0", msg->msg[MSG_GOD].attacker_msg);
+					safe_snprintf(message, sizeof(message), "\ty%s\t0", msg->msg[MSG_GOD].attacker_msg);
 				}
 				act(message, FALSE, ch, weap, vict, TO_CHAR | miss_flags);
 			}
@@ -2442,11 +2442,11 @@ int skill_message(int dam, char_data *ch, char_data *vict, int attacktype, attac
 		// victim message
 		if (msg->msg[MSG_GOD].victim_msg) {
 			if (SHOW_FIGHT_MESSAGES(vict, FM_DAMAGE_NUMBERS)) {
-				snprintf(message, sizeof(message), "%s (0)", msg->msg[MSG_GOD].victim_msg);
+				safe_snprintf(message, sizeof(message), "%s (0)", msg->msg[MSG_GOD].victim_msg);
 			}
 			else {	// no damage numbers
 				// normally this would be red, but it's basically a miss against a god
-				snprintf(message, sizeof(message), "%s", msg->msg[MSG_GOD].victim_msg);
+				safe_snprintf(message, sizeof(message), "%s", msg->msg[MSG_GOD].victim_msg);
 			}
 			act(message, FALSE, ch, weap, vict, TO_VICT | miss_flags);
 		}
@@ -2456,10 +2456,10 @@ int skill_message(int dam, char_data *ch, char_data *vict, int attacktype, attac
 			if (!AFF_FLAGGED(vict, AFF_NO_SEE_IN_ROOM)) {
 				if (ch != vict && IN_ROOM(ch) == IN_ROOM(vict) && msg->msg[MSG_DIE].attacker_msg) {
 					if (SHOW_FIGHT_MESSAGES(ch, FM_DAMAGE_NUMBERS)) {
-						snprintf(message, sizeof(message), "\ty%s (%d)\t0", msg->msg[MSG_DIE].attacker_msg, dam);
+						safe_snprintf(message, sizeof(message), "\ty%s (%d)\t0", msg->msg[MSG_DIE].attacker_msg, dam);
 					}
 					else {	// no damage numbers
-						snprintf(message, sizeof(message), "\ty%s\t0", msg->msg[MSG_DIE].attacker_msg);
+						safe_snprintf(message, sizeof(message), "\ty%s\t0", msg->msg[MSG_DIE].attacker_msg);
 					}
 					act(message, FALSE, ch, weap, vict, TO_CHAR | hit_flags);
 				}
@@ -2472,10 +2472,10 @@ int skill_message(int dam, char_data *ch, char_data *vict, int attacktype, attac
 			// victim death message
 			if (msg->msg[MSG_DIE].victim_msg) {
 				if (SHOW_FIGHT_MESSAGES(vict, FM_DAMAGE_NUMBERS)) {
-					snprintf(message, sizeof(message), "\tr%s (%+d)\t0", msg->msg[MSG_DIE].victim_msg, -1 * dam);
+					safe_snprintf(message, sizeof(message), "\tr%s (%+d)\t0", msg->msg[MSG_DIE].victim_msg, -1 * dam);
 				}
 				else {	// no damage numbers
-					snprintf(message, sizeof(message), "\tr%s\t0", msg->msg[MSG_DIE].victim_msg);
+					safe_snprintf(message, sizeof(message), "\tr%s\t0", msg->msg[MSG_DIE].victim_msg);
 				}
 				act(message, FALSE, ch, weap, vict, TO_VICT | TO_SLEEP | hit_flags);
 			}
@@ -2484,10 +2484,10 @@ int skill_message(int dam, char_data *ch, char_data *vict, int attacktype, attac
 			if (!AFF_FLAGGED(vict, AFF_NO_SEE_IN_ROOM)) {
 				if (ch != vict && IN_ROOM(ch) == IN_ROOM(vict) && msg->msg[MSG_HIT].attacker_msg) {
 					if (SHOW_FIGHT_MESSAGES(ch, FM_DAMAGE_NUMBERS)) {
-						snprintf(message, sizeof(message), "\ty%s (%d)\t0", msg->msg[MSG_HIT].attacker_msg, dam);
+						safe_snprintf(message, sizeof(message), "\ty%s (%d)\t0", msg->msg[MSG_HIT].attacker_msg, dam);
 					}
 					else {	// no damage numbers
-						snprintf(message, sizeof(message), "\ty%s\t0", msg->msg[MSG_HIT].attacker_msg);
+						safe_snprintf(message, sizeof(message), "\ty%s\t0", msg->msg[MSG_HIT].attacker_msg);
 					}
 					act(message, FALSE, ch, weap, vict, TO_CHAR | hit_flags);
 				}
@@ -2500,10 +2500,10 @@ int skill_message(int dam, char_data *ch, char_data *vict, int attacktype, attac
 			// victim hit message
 			if (msg->msg[MSG_HIT].victim_msg) {
 				if (SHOW_FIGHT_MESSAGES(vict, FM_DAMAGE_NUMBERS)) {
-					snprintf(message, sizeof(message), "\tr%s (%+d)\t0", msg->msg[MSG_HIT].victim_msg, -1 * dam);
+					safe_snprintf(message, sizeof(message), "\tr%s (%+d)\t0", msg->msg[MSG_HIT].victim_msg, -1 * dam);
 				}
 				else {	// no damage numbers
-					snprintf(message, sizeof(message), "\tr%s\t0", msg->msg[MSG_HIT].victim_msg);
+					safe_snprintf(message, sizeof(message), "\tr%s\t0", msg->msg[MSG_HIT].victim_msg);
 				}
 				act(message, FALSE, ch, weap, vict, TO_VICT | TO_SLEEP | hit_flags);
 			}
@@ -2513,10 +2513,10 @@ int skill_message(int dam, char_data *ch, char_data *vict, int attacktype, attac
 		if (!AFF_FLAGGED(vict, AFF_NO_SEE_IN_ROOM)) {
 			if (ch != vict && IN_ROOM(ch) == IN_ROOM(vict) && msg->msg[MSG_MISS].attacker_msg) {
 				if (SHOW_FIGHT_MESSAGES(ch, FM_DAMAGE_NUMBERS)) {
-					snprintf(message, sizeof(message), "\ty%s (0)\t0", msg->msg[MSG_MISS].attacker_msg);
+					safe_snprintf(message, sizeof(message), "\ty%s (0)\t0", msg->msg[MSG_MISS].attacker_msg);
 				}
 				else {	// no damage numbers
-					snprintf(message, sizeof(message), "\ty%s\t0", msg->msg[MSG_MISS].attacker_msg);
+					safe_snprintf(message, sizeof(message), "\ty%s\t0", msg->msg[MSG_MISS].attacker_msg);
 				}
 				act(message, FALSE, ch, weap, vict, TO_CHAR | miss_flags);
 			}
@@ -2529,10 +2529,10 @@ int skill_message(int dam, char_data *ch, char_data *vict, int attacktype, attac
 		// victim miss message
 		if (msg->msg[MSG_MISS].victim_msg) {
 			if (SHOW_FIGHT_MESSAGES(vict, FM_DAMAGE_NUMBERS)) {
-				snprintf(message, sizeof(message), "\tr%s (0)\t0", msg->msg[MSG_MISS].victim_msg);
+				safe_snprintf(message, sizeof(message), "\tr%s (0)\t0", msg->msg[MSG_MISS].victim_msg);
 			}
 			else {	// no damage numbers
-				snprintf(message, sizeof(message), "\tr%s\t0", msg->msg[MSG_MISS].victim_msg);
+				safe_snprintf(message, sizeof(message), "\tr%s\t0", msg->msg[MSG_MISS].victim_msg);
 			}
 			act(message, FALSE, ch, weap, vict, TO_VICT | TO_SLEEP | miss_flags);
 		}
@@ -3411,7 +3411,7 @@ void death_log(char_data *ch, char_data *killer, int type) {
 	if (ch != killer && type == ATTACK_EXECUTE) {
 		// there is 1 special override here: ATTACK_EXECUTE
 		strcpy(name, PERS(killer, killer, TRUE));
-		snprintf(output, sizeof(output), "%s has been killed by %s at", PERS(ch, ch, TRUE), name);
+		safe_snprintf(output, sizeof(output), "%s has been killed by %s at", PERS(ch, ch, TRUE), name);
 	}
 	else {
 		// normal

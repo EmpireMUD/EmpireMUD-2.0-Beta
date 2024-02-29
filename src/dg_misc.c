@@ -1069,7 +1069,7 @@ void script_heal(void *thing, int type, char *argument) {
 				victim = get_char_room_vis((char_data*)thing, targ_arg, NULL);
 			}
 			
-			snprintf(log_root, sizeof(log_root), "Mob (%s, VNum %d)::", GET_SHORT_DESC((char_data*)thing), GET_MOB_VNUM((char_data*)thing));
+			safe_snprintf(log_root, sizeof(log_root), "Mob (%s, VNum %d)::", GET_SHORT_DESC((char_data*)thing), GET_MOB_VNUM((char_data*)thing));
 			break;
 		}
 		case OBJ_TRIGGER: {
@@ -1078,7 +1078,7 @@ void script_heal(void *thing, int type, char *argument) {
 				victim = get_char_by_obj((obj_data*)thing, targ_arg);
 			}
 			
-			snprintf(log_root, sizeof(log_root), "Obj (%s, VNum %d)::", GET_OBJ_SHORT_DESC((obj_data*)thing), GET_OBJ_VNUM((obj_data*)thing));
+			safe_snprintf(log_root, sizeof(log_root), "Obj (%s, VNum %d)::", GET_OBJ_SHORT_DESC((obj_data*)thing), GET_OBJ_VNUM((obj_data*)thing));
 			break;
 		}
 		case VEH_TRIGGER: {
@@ -1087,7 +1087,7 @@ void script_heal(void *thing, int type, char *argument) {
 				victim = get_char_by_vehicle((vehicle_data*)thing, targ_arg);
 			}
 			
-			snprintf(log_root, sizeof(log_root), "Veh (%s, VNum %d)::", VEH_SHORT_DESC((vehicle_data*)thing), VEH_VNUM((vehicle_data*)thing));
+			safe_snprintf(log_root, sizeof(log_root), "Veh (%s, VNum %d)::", VEH_SHORT_DESC((vehicle_data*)thing), VEH_VNUM((vehicle_data*)thing));
 			break;
 		}
 		case EMP_TRIGGER: {
@@ -1101,7 +1101,7 @@ void script_heal(void *thing, int type, char *argument) {
 				victim = get_char_by_room((room_data*)thing, targ_arg);
 			}
 			
-			snprintf(log_root, sizeof(log_root), "Room %d ::", GET_ROOM_VNUM((room_data*)thing));
+			safe_snprintf(log_root, sizeof(log_root), "Room %d ::", GET_ROOM_VNUM((room_data*)thing));
 			break;
 		}
 	}
@@ -1323,7 +1323,7 @@ void script_modify(char *argument) {
 				script_log("%%mod%% append-description: obj lookdescription length is too long (%d max)", MAX_ITEM_DESCRIPTION);
 			}
 			else {
-				snprintf(temp, sizeof(temp), "%s%s\r\n", NULLSAFE(GET_OBJ_ACTION_DESC(obj)), value);
+				safe_snprintf(temp, sizeof(temp), "%s%s\r\n", NULLSAFE(GET_OBJ_ACTION_DESC(obj)), value);
 				set_obj_look_desc(obj, temp, TRUE);
 			}
 		}
@@ -1332,7 +1332,7 @@ void script_modify(char *argument) {
 				script_log("%%mod%% append-description: obj lookdescription length is too long (%d max)", MAX_ITEM_DESCRIPTION);
 			}
 			else {
-				snprintf(temp, sizeof(temp), "%s%s\r\n", NULLSAFE(GET_OBJ_ACTION_DESC(obj)), value);
+				safe_snprintf(temp, sizeof(temp), "%s%s\r\n", NULLSAFE(GET_OBJ_ACTION_DESC(obj)), value);
 				set_obj_look_desc(obj, temp, FALSE);
 			}
 		}
@@ -1375,7 +1375,7 @@ void script_modify(char *argument) {
 				script_log("%%mod%% append-description: description length is too long (%d max)", MAX_ROOM_DESCRIPTION);
 			}
 			else {
-				snprintf(temp, sizeof(temp), "%s%s\r\n", ROOM_CUSTOM_DESCRIPTION(room) ? ROOM_CUSTOM_DESCRIPTION(room) : get_room_description(room), value);
+				safe_snprintf(temp, sizeof(temp), "%s%s\r\n", ROOM_CUSTOM_DESCRIPTION(room) ? ROOM_CUSTOM_DESCRIPTION(room) : get_room_description(room), value);
 				set_room_custom_description(room, temp);
 				format_text(&ROOM_CUSTOM_DESCRIPTION(room), (strlen(ROOM_CUSTOM_DESCRIPTION(room)) >= 80 ? FORMAT_INDENT : NOBITS), NULL, MAX_STRING_LENGTH);
 			}
@@ -1385,7 +1385,7 @@ void script_modify(char *argument) {
 				script_log("%%mod%% append-description: description length is too long (%d max)", MAX_ROOM_DESCRIPTION);
 			}
 			else {
-				snprintf(temp, sizeof(temp), "%s%s\r\n", ROOM_CUSTOM_DESCRIPTION(room) ? ROOM_CUSTOM_DESCRIPTION(room) : get_room_description(room), value);
+				safe_snprintf(temp, sizeof(temp), "%s%s\r\n", ROOM_CUSTOM_DESCRIPTION(room) ? ROOM_CUSTOM_DESCRIPTION(room) : get_room_description(room), value);
 				set_room_custom_description(room, temp);
 			}
 		}
@@ -1450,7 +1450,7 @@ void script_modify(char *argument) {
 				script_log("%%mod%% append-description: vehicle lookdescription length is too long (%d max)", MAX_ITEM_DESCRIPTION);
 			}
 			else {
-				snprintf(temp, sizeof(temp), "%s%s\r\n", NULLSAFE(VEH_LOOK_DESC(veh)), value);
+				safe_snprintf(temp, sizeof(temp), "%s%s\r\n", NULLSAFE(VEH_LOOK_DESC(veh)), value);
 				set_vehicle_look_desc_append(veh, temp, TRUE);
 			}
 		}
@@ -1459,7 +1459,7 @@ void script_modify(char *argument) {
 				script_log("%%mod%% append-description: vehicle lookdescription length is too long (%d max)", MAX_ITEM_DESCRIPTION);
 			}
 			else {
-				snprintf(temp, sizeof(temp), "%s%s\r\n", NULLSAFE(VEH_LOOK_DESC(veh)), value);
+				safe_snprintf(temp, sizeof(temp), "%s%s\r\n", NULLSAFE(VEH_LOOK_DESC(veh)), value);
 				set_vehicle_look_desc_append(veh, temp, FALSE);
 			}
 		}

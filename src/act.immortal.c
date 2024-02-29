@@ -716,12 +716,12 @@ ADMIN_UTIL(util_bldconvert) {
 		strtolower(VEH_KEYWORDS(to_veh));
 		
 		// build short desc
-		snprintf(buf, sizeof(buf), "%s %s", AN(GET_BLD_NAME(from_bld)), GET_BLD_NAME(from_bld));
+		safe_snprintf(buf, sizeof(buf), "%s %s", AN(GET_BLD_NAME(from_bld)), GET_BLD_NAME(from_bld));
 		strtolower(buf);
 		set_vehicle_short_desc(to_veh, buf);
 		
 		// build long desc
-		snprintf(buf, sizeof(buf), "%s %s is here.", AN(GET_BLD_NAME(from_bld)), GET_BLD_NAME(from_bld));
+		safe_snprintf(buf, sizeof(buf), "%s %s is here.", AN(GET_BLD_NAME(from_bld)), GET_BLD_NAME(from_bld));
 		strtolower(buf);
 		set_vehicle_long_desc(to_veh, CAP(buf));
 		
@@ -847,7 +847,7 @@ ADMIN_UTIL(util_bldconvert) {
 		GET_OLC_CRAFT(ch->desc) = setup_olc_craft(from_craft);
 		GET_OLC_VNUM(ch->desc) = from_vnum;
 		
-		snprintf(buf, sizeof(buf), "dismantle %s", GET_CRAFT_NAME(GET_OLC_CRAFT(ch->desc)));
+		safe_snprintf(buf, sizeof(buf), "dismantle %s", GET_CRAFT_NAME(GET_OLC_CRAFT(ch->desc)));
 		free(GET_CRAFT_NAME(GET_OLC_CRAFT(ch->desc)));
 		GET_CRAFT_NAME(GET_OLC_CRAFT(ch->desc)) = str_dup(buf);
 		
@@ -947,7 +947,7 @@ ADMIN_UTIL(util_bldconvert) {
 			msg_to_char(ch, "- Building %d %s in requirements for SOC [%d %s].\r\n", to_vnum, GET_BLD_NAME(from_bld), SOC_VNUM(soc), SOC_NAME(soc));
 		}
 	}
-	snprintf(buf, sizeof(buf), "%d", from_vnum);
+	safe_snprintf(buf, sizeof(buf), "%d", from_vnum);
 	HASH_ITER(hh, trigger_table, trig, next_trig) {
 		LL_FOREACH(trig->cmdlist, cmd) {
 			if (strstr(cmd->cmd, buf)) {
@@ -981,12 +981,12 @@ ADMIN_UTIL(util_bldconvert) {
 		}
 	}
 	
-	snprintf(buf, sizeof(buf), "OLC: %s has cloned building %d %s to vehicle %d", GET_NAME(ch), from_vnum, GET_BLD_NAME(from_bld), to_vnum);
+	safe_snprintf(buf, sizeof(buf), "OLC: %s has cloned building %d %s to vehicle %d", GET_NAME(ch), from_vnum, GET_BLD_NAME(from_bld), to_vnum);
 	if (!BLD_FLAGGED(from_bld, BLD_OPEN)) {
-		snprintf(buf + strlen(buf), sizeof(buf) - strlen(buf), ", interior room bld %d", to_vnum);
+		safe_snprintf(buf + strlen(buf), sizeof(buf) - strlen(buf), ", interior room bld %d", to_vnum);
 	}
 	if (from_craft) {
-		snprintf(buf + strlen(buf), sizeof(buf) - strlen(buf), ", and craft %d (with updates to craft %d)", to_vnum, from_vnum);
+		safe_snprintf(buf + strlen(buf), sizeof(buf) - strlen(buf), ", and craft %d (with updates to craft %d)", to_vnum, from_vnum);
 	}
 	syslog(SYS_OLC, GET_INVIS_LEV(ch), TRUE, "%s", buf);
 }
@@ -1445,7 +1445,7 @@ ADMIN_UTIL(util_temperature) {
 			if (climate_temperature[bit].season_weight != NO_TEMP_MOD) {
 				season_mod += climate_temperature[bit].season_weight;
 				++season_count;
-				snprintf(season_part, sizeof(season_part), "%.1f%%", 100.0 * climate_temperature[bit].season_weight);
+				safe_snprintf(season_part, sizeof(season_part), "%.1f%%", 100.0 * climate_temperature[bit].season_weight);
 			}
 			else {
 				strcpy(season_part, "no mod for");
@@ -1453,7 +1453,7 @@ ADMIN_UTIL(util_temperature) {
 			if (climate_temperature[bit].sun_weight != NO_TEMP_MOD) {
 				sun_mod += climate_temperature[bit].sun_weight;
 				++sun_count;
-				snprintf(sun_part, sizeof(sun_part), "%.1f%%", 100.0 * climate_temperature[bit].sun_weight);
+				safe_snprintf(sun_part, sizeof(sun_part), "%.1f%%", 100.0 * climate_temperature[bit].sun_weight);
 			}
 			else {
 				strcpy(sun_part, "no mod for");
@@ -1461,14 +1461,14 @@ ADMIN_UTIL(util_temperature) {
 			
 			if (climate_temperature[bit].cold_modifier != NO_TEMP_MOD && climate_temperature[bit].cold_modifier != 1.0) {
 				cold_mod *= climate_temperature[bit].cold_modifier;
-				snprintf(cold_mod_part, sizeof(cold_mod_part), ", %.2f cold modifier", climate_temperature[bit].cold_modifier);
+				safe_snprintf(cold_mod_part, sizeof(cold_mod_part), ", %.2f cold modifier", climate_temperature[bit].cold_modifier);
 			}
 			else {
 				*cold_mod_part = '\0';
 			}
 			if (climate_temperature[bit].heat_modifier != NO_TEMP_MOD && climate_temperature[bit].heat_modifier != 1.0) {
 				heat_mod *= climate_temperature[bit].heat_modifier;
-				snprintf(heat_mod_part, sizeof(heat_mod_part), ", %.2f heat modifier", climate_temperature[bit].heat_modifier);
+				safe_snprintf(heat_mod_part, sizeof(heat_mod_part), ", %.2f heat modifier", climate_temperature[bit].heat_modifier);
 			}
 			else {
 				*heat_mod_part = '\0';
@@ -1954,14 +1954,14 @@ void instance_list_row(struct instance_data *inst, int number, char *save_buffer
 	}
 	
 	if (INST_FAKE_LOC(inst) && ROOM_OWNER(INST_FAKE_LOC(inst))) {
-		snprintf(owner, sizeof(owner), "(%s%s\t0)", EMPIRE_BANNER(ROOM_OWNER(INST_FAKE_LOC(inst))), EMPIRE_NAME(ROOM_OWNER(INST_FAKE_LOC(inst))));
+		safe_snprintf(owner, sizeof(owner), "(%s%s\t0)", EMPIRE_BANNER(ROOM_OWNER(INST_FAKE_LOC(inst))), EMPIRE_NAME(ROOM_OWNER(INST_FAKE_LOC(inst))));
 	}
 	else {
 		*owner = '\0';
 	}
 
 	sprintbit(INST_FLAGS(inst), instance_flags, flg, TRUE);
-	snprintf(save_buffer, size, "%3d. [%5d] %s [%d] (%d, %d)%s %s%s\r\n", number, GET_ADV_VNUM(INST_ADVENTURE(inst)), GET_ADV_NAME(INST_ADVENTURE(inst)), INST_FAKE_LOC(inst) ? GET_ROOM_VNUM(INST_FAKE_LOC(inst)) : NOWHERE, INST_FAKE_LOC(inst) ? X_COORD(INST_FAKE_LOC(inst)) : NOWHERE, INST_FAKE_LOC(inst) ? Y_COORD(INST_FAKE_LOC(inst)) : NOWHERE, info, INST_FLAGS(inst) != NOBITS ? flg : "", owner);
+	safe_snprintf(save_buffer, size, "%3d. [%5d] %s [%d] (%d, %d)%s %s%s\r\n", number, GET_ADV_VNUM(INST_ADVENTURE(inst)), GET_ADV_NAME(INST_ADVENTURE(inst)), INST_FAKE_LOC(inst) ? GET_ROOM_VNUM(INST_FAKE_LOC(inst)) : NOWHERE, INST_FAKE_LOC(inst) ? X_COORD(INST_FAKE_LOC(inst)) : NOWHERE, INST_FAKE_LOC(inst) ? Y_COORD(INST_FAKE_LOC(inst)) : NOWHERE, info, INST_FLAGS(inst) != NOBITS ? flg : "", owner);
 }
 
 
@@ -3184,7 +3184,7 @@ void do_stat_book(char_data *ch, book_data *book, bool details) {
 			skip_spaces(&txt);
 			len = strlen(txt);
 			len = MIN(len, 62);	// aiming for full page width then a ...
-			snprintf(line, sizeof(line), "Paragraph %*d: %-*.*s...", (num >= 10 ? 2 : 1), count, len, len, txt);
+			safe_snprintf(line, sizeof(line), "Paragraph %*d: %-*.*s...", (num >= 10 ? 2 : 1), count, len, len, txt);
 			if ((ptr = strstr(line, "\r\n"))) {	// line ended early?
 				sprintf(ptr, "...");	// overwrite the crlf
 			}
@@ -4017,7 +4017,7 @@ void do_stat_object(char_data *ch, obj_data *j, bool details) {
 	
 	if (GET_OBJ_TIMER(j) > 0) {
 		minutes = GET_OBJ_TIMER(j) * SECS_PER_MUD_HOUR / SECS_PER_REAL_MIN;
-		snprintf(part, sizeof(part), "%d tick%s (%s%s)", GET_OBJ_TIMER(j), PLURAL(GET_OBJ_TIMER(j)), colon_time(minutes, TRUE, NULL), GET_OBJ_TIMER(j) < 60 ? " minutes" : "");
+		safe_snprintf(part, sizeof(part), "%d tick%s (%s%s)", GET_OBJ_TIMER(j), PLURAL(GET_OBJ_TIMER(j)), colon_time(minutes, TRUE, NULL), GET_OBJ_TIMER(j) < 60 ? " minutes" : "");
 	}
 	else {
 		strcpy(part, "none");
@@ -4194,10 +4194,10 @@ void do_stat_object(char_data *ch, obj_data *j, bool details) {
 		}
 		case ITEM_LIGHT: {
 			if (GET_LIGHT_HOURS_REMAINING(j) == UNLIMITED) {
-				snprintf(part, sizeof(part), "unlimited light");
+				safe_snprintf(part, sizeof(part), "unlimited light");
 			}
 			else {
-				snprintf(part, sizeof(part), "%d hour%s remaining", GET_LIGHT_HOURS_REMAINING(j), PLURAL(GET_LIGHT_HOURS_REMAINING(j)));
+				safe_snprintf(part, sizeof(part), "%d hour%s remaining", GET_LIGHT_HOURS_REMAINING(j), PLURAL(GET_LIGHT_HOURS_REMAINING(j)));
 			}
 			sprintbit(GET_LIGHT_FLAGS(j), light_flags, buf, TRUE);
 			build_page_display(ch, "Light: \tc%s\t0 (\tc%s\t0), flags: \tc%s\t0", part, (GET_LIGHT_IS_LIT(j) ? "lit" : "unlit"), buf);
@@ -4530,10 +4530,10 @@ void do_stat_room(char_data *ch) {
 			
 			HASH_ITER(hh, str_hash, str_iter, next_str) {
 				if (str_iter->count == 1) {
-					snprintf(buf2, sizeof(buf2), "%s %s", (found++ ? "," : ""), str_iter->str);
+					safe_snprintf(buf2, sizeof(buf2), "%s %s", (found++ ? "," : ""), str_iter->str);
 				}
 				else {
-					snprintf(buf2, sizeof(buf2), "%s %s (x%d)", (found++ ? "," : ""), str_iter->str, str_iter->count);
+					safe_snprintf(buf2, sizeof(buf2), "%s %s (x%d)", (found++ ? "," : ""), str_iter->str, str_iter->count);
 				}
 				if (size + strlen(buf2) > 79 && *buf) {
 					// end of line
@@ -5138,7 +5138,7 @@ ACMD(do_addnotes) {
 		msg_to_char(ch, "Notes too long, unable to add text. Use editnotes instead.\r\n");
 	}
 	else {
-		snprintf(notes, sizeof(notes), "%s%s\r\n", NULLSAFE(acct->notes), argument);
+		safe_snprintf(notes, sizeof(notes), "%s%s\r\n", NULLSAFE(acct->notes), argument);
 		if (acct->notes) {
 			free(acct->notes);
 		}
@@ -5343,7 +5343,7 @@ ACMD(do_automessage) {
 		HASH_ITER(hh, automessages_table, msg, next_msg) {
 			switch (msg->timing) {
 				case AUTOMSG_REPEATING: {
-					snprintf(part, sizeof(part), "%s (%dm)", automessage_types[msg->timing], msg->interval);
+					safe_snprintf(part, sizeof(part), "%s (%dm)", automessage_types[msg->timing], msg->interval);
 					break;
 				}
 				default: {

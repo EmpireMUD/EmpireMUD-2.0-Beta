@@ -286,7 +286,7 @@ const char *get_morph_desc(char_data *ch, bool long_desc_if_true) {
 		strcpy(realname, GET_SHORT_DESC(ch));
 	}
 	else {
-		snprintf(realname, sizeof(realname), "%s%s%s", GET_PC_NAME(ch), GET_CURRENT_LASTNAME(ch) ? " " : "", NULLSAFE(GET_CURRENT_LASTNAME(ch)));
+		safe_snprintf(realname, sizeof(realname), "%s%s%s", GET_PC_NAME(ch), GET_CURRENT_LASTNAME(ch) ? " " : "", NULLSAFE(GET_CURRENT_LASTNAME(ch)));
 	}
 	
 	if (GET_MORPH(ch)) {
@@ -308,7 +308,7 @@ const char *get_morph_desc(char_data *ch, bool long_desc_if_true) {
 		}
 	}
 	else {	// not morphed
-		snprintf(output, sizeof(output), "%s%s", realname, long_desc_if_true ? " is standing here." : "");
+		safe_snprintf(output, sizeof(output), "%s%s", realname, long_desc_if_true ? " is standing here." : "");
 		return output;
 	}
 }
@@ -527,10 +527,10 @@ char *list_one_morph(morph_data *morph, bool detail) {
 			strcat(part, ")");
 		}
 		
-		snprintf(output, sizeof(output), "[%5d] %s%s", MORPH_VNUM(morph), MORPH_SHORT_DESC(morph), part);
+		safe_snprintf(output, sizeof(output), "[%5d] %s%s", MORPH_VNUM(morph), MORPH_SHORT_DESC(morph), part);
 	}
 	else {
-		snprintf(output, sizeof(output), "[%5d] %s", MORPH_VNUM(morph), MORPH_SHORT_DESC(morph));
+		safe_snprintf(output, sizeof(output), "[%5d] %s", MORPH_VNUM(morph), MORPH_SHORT_DESC(morph));
 	}
 		
 	return output;
@@ -899,7 +899,7 @@ void olc_delete_morph(char_data *ch, any_vnum vnum) {
 		return;
 	}
 	
-	snprintf(name, sizeof(name), "%s", NULLSAFE(MORPH_SHORT_DESC(morph)));
+	safe_snprintf(name, sizeof(name), "%s", NULLSAFE(MORPH_SHORT_DESC(morph)));
 	
 	// un-morph everyone
 	DL_FOREACH_SAFE(character_list, chiter, next_ch) {
@@ -1054,9 +1054,9 @@ void do_stat_morph(char_data *ch, morph_data *morph) {
 	build_page_display(ch, "VNum: [\tc%d\t0], Keywords: \tc%s\t0, Short desc: \ty%s\t0", MORPH_VNUM(morph), MORPH_KEYWORDS(morph), MORPH_SHORT_DESC(morph));
 	build_page_display(ch, "L-Desc: \ty%s\t0\r\n%s", MORPH_LONG_DESC(morph), NULLSAFE(MORPH_LOOK_DESC(morph)));
 	
-	snprintf(part, sizeof(part), "%s", (MORPH_ABILITY(morph) == NO_ABIL ? "none" : get_ability_name_by_vnum(MORPH_ABILITY(morph))));
+	safe_snprintf(part, sizeof(part), "%s", (MORPH_ABILITY(morph) == NO_ABIL ? "none" : get_ability_name_by_vnum(MORPH_ABILITY(morph))));
 	if ((abil = find_ability_by_vnum(MORPH_ABILITY(morph))) && ABIL_ASSIGNED_SKILL(abil) != NULL) {
-		snprintf(part + strlen(part), sizeof(part) - strlen(part), " (%s %d)", SKILL_ABBREV(ABIL_ASSIGNED_SKILL(abil)), ABIL_SKILL_LEVEL(abil));
+		safe_snprintf(part + strlen(part), sizeof(part) - strlen(part), " (%s %d)", SKILL_ABBREV(ABIL_ASSIGNED_SKILL(abil)), ABIL_SKILL_LEVEL(abil));
 	}
 	build_page_display(ch, "Cost: [\ty%d %s\t0], Max Level: [\ty%d%s\t0], Requires Ability: [\ty%s\t0]", MORPH_COST(morph), MORPH_COST(morph) > 0 ? pool_types[MORPH_COST_TYPE(morph)] : "/ none", MORPH_MAX_SCALE(morph), (MORPH_MAX_SCALE(morph) == 0 ? " none" : ""), part);
 	

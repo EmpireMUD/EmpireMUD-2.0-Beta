@@ -202,10 +202,10 @@ char *list_one_room_template(room_template *rmt, bool detail) {
 			*funcs = '\0';
 		}
 		
-		snprintf(output, sizeof(output), "[%5d] %s%s%s", GET_RMT_VNUM(rmt), GET_RMT_TITLE(rmt), flags, funcs);
+		safe_snprintf(output, sizeof(output), "[%5d] %s%s%s", GET_RMT_VNUM(rmt), GET_RMT_TITLE(rmt), flags, funcs);
 	}
 	else {
-		snprintf(output, sizeof(output), "[%5d] %s", GET_RMT_VNUM(rmt), GET_RMT_TITLE(rmt));
+		safe_snprintf(output, sizeof(output), "[%5d] %s", GET_RMT_VNUM(rmt), GET_RMT_TITLE(rmt));
 	}
 	
 	return output;
@@ -286,7 +286,7 @@ void olc_delete_room_template(char_data *ch, rmt_vnum vnum) {
 		return;
 	}
 	
-	snprintf(name, sizeof(name), "%s", NULLSAFE(GET_RMT_TITLE(rmt)));
+	safe_snprintf(name, sizeof(name), "%s", NULLSAFE(GET_RMT_TITLE(rmt)));
 	
 	if (HASH_COUNT(room_template_table) <= 1) {
 		msg_to_char(ch, "You can't delete the last room template.\r\n");
@@ -929,7 +929,7 @@ void olc_show_room_template(char_data *ch) {
 	build_page_display(ch, "<%sdescription\t0>\r\n%s", OLC_LABEL_STR(GET_RMT_DESC(rmt), ""), NULLSAFE(GET_RMT_DESC(rmt)));
 	
 	if (GET_RMT_SUBZONE(rmt) != NOWHERE) {
-		snprintf(lbuf, sizeof(lbuf), "%d", GET_RMT_SUBZONE(rmt));
+		safe_snprintf(lbuf, sizeof(lbuf), "%d", GET_RMT_SUBZONE(rmt));
 	}
 	else {
 		strcpy(lbuf, "none");

@@ -119,7 +119,7 @@ SHOW(show_islands) {
 			*tech_str = '\0';
 			for (tid = 0; tid < NUM_TECHS; ++tid) {
 				if (eisle->tech[tid] > 0 && search_block_int(tid, techs_requiring_same_island) != NOTHING) {
-					snprintf(tech_str + strlen(tech_str), sizeof(tech_str) - strlen(tech_str), "%s%s", (*tech_str ? ", " : ""), empire_tech_types[tid]);
+					safe_snprintf(tech_str + strlen(tech_str), sizeof(tech_str) - strlen(tech_str), "%s%s", (*tech_str ? ", " : ""), empire_tech_types[tid]);
 				}
 			}
 			if (*tech_str) {
@@ -540,7 +540,7 @@ SHOW(show_buildings) {
 			
 			// found
 			if (ROOM_OWNER(room)) {
-				snprintf(part, sizeof(part), " - %s%s\t0", EMPIRE_BANNER(ROOM_OWNER(room)), EMPIRE_ADJECTIVE(ROOM_OWNER(room)));
+				safe_snprintf(part, sizeof(part), " - %s%s\t0", EMPIRE_BANNER(ROOM_OWNER(room)), EMPIRE_ADJECTIVE(ROOM_OWNER(room)));
 			}
 			else {
 				*part = '\0';
@@ -672,7 +672,7 @@ SHOW(show_components) {
 			
 			// show component name if it's not an exact match
 			if (GET_OBJ_COMPONENT(obj) != GEN_VNUM(cmp)) {
-				snprintf(part, sizeof(part), " (%s)", get_generic_name_by_vnum(GET_OBJ_COMPONENT(obj)));
+				safe_snprintf(part, sizeof(part), " (%s)", get_generic_name_by_vnum(GET_OBJ_COMPONENT(obj)));
 			}
 			else {
 				*part = '\0';
@@ -723,7 +723,7 @@ SHOW(show_crops) {
 			
 			// room info if possible
 			if (map->room && ROOM_OWNER(map->room)) {
-				snprintf(part, sizeof(part), " - %s%s\t0", EMPIRE_BANNER(ROOM_OWNER(map->room)), EMPIRE_ADJECTIVE(ROOM_OWNER(map->room)));
+				safe_snprintf(part, sizeof(part), " - %s%s\t0", EMPIRE_BANNER(ROOM_OWNER(map->room)), EMPIRE_ADJECTIVE(ROOM_OWNER(map->room)));
 			}
 			else {
 				*part = '\0';
@@ -1859,7 +1859,7 @@ SHOW(show_piles) {
 		
 		if (count >= max) {
 			if (ROOM_OWNER(room)) {
-				snprintf(owner, sizeof(owner), " (%s%s\t0)", EMPIRE_BANNER(ROOM_OWNER(room)), EMPIRE_ADJECTIVE(ROOM_OWNER(room)));
+				safe_snprintf(owner, sizeof(owner), " (%s%s\t0)", EMPIRE_BANNER(ROOM_OWNER(room)), EMPIRE_ADJECTIVE(ROOM_OWNER(room)));
 			}
 			else {
 				*owner = '\0';
@@ -2138,11 +2138,11 @@ SHOW(show_quests) {
 		HASH_ITER(hh, GET_COMPLETED_QUESTS(vict), pcq, next_pcq) {
 			if (time(0) - pcq->last_completed < SECS_PER_REAL_DAY) {
 				diff = (time(0) - pcq->last_completed) / SECS_PER_REAL_HOUR;
-				snprintf(when, sizeof(when), "(%d hour%s ago)", diff, PLURAL(diff));
+				safe_snprintf(when, sizeof(when), "(%d hour%s ago)", diff, PLURAL(diff));
 			}
 			else {
 				diff = (time(0) - pcq->last_completed) / SECS_PER_REAL_DAY;
-				snprintf(when, sizeof(when), "(%d day%s ago)", diff, PLURAL(diff));
+				safe_snprintf(when, sizeof(when), "(%d day%s ago)", diff, PLURAL(diff));
 			}
 			
 			build_page_display(ch, "[%5d] %s %s", pcq->vnum, get_quest_name_by_proto(pcq->vnum), when);
@@ -2198,13 +2198,13 @@ SHOW(show_shops) {
 	LL_FOREACH(shop_list, stl) {
 		// determine shopkeeper
 		if (stl->from_mob) {
-			snprintf(buf, sizeof(buf), " (%s)", PERS(stl->from_mob, ch, FALSE));
+			safe_snprintf(buf, sizeof(buf), " (%s)", PERS(stl->from_mob, ch, FALSE));
 		}
 		else if (stl->from_obj) {
-			snprintf(buf, sizeof(buf), " (%s)", GET_OBJ_SHORT_DESC(stl->from_obj));
+			safe_snprintf(buf, sizeof(buf), " (%s)", GET_OBJ_SHORT_DESC(stl->from_obj));
 		}
 		else if (stl->from_veh) {
-			snprintf(buf, sizeof(buf), " (%s)", VEH_SHORT_DESC(stl->from_veh));
+			safe_snprintf(buf, sizeof(buf), " (%s)", VEH_SHORT_DESC(stl->from_veh));
 		}
 		else if (stl->from_room) {
 			strcpy(buf, " (room)");
@@ -2292,10 +2292,10 @@ SHOW(show_skills) {
 		skill = plsk->ptr;
 		
 		if (plsk->noskill) {
-			snprintf(exp_part, sizeof(exp_part), "noskill");
+			safe_snprintf(exp_part, sizeof(exp_part), "noskill");
 		}
 		else {
-			snprintf(exp_part, sizeof(exp_part), "%.1f%%", get_skill_exp(vict, SKILL_VNUM(skill)));
+			safe_snprintf(exp_part, sizeof(exp_part), "%.1f%%", get_skill_exp(vict, SKILL_VNUM(skill)));
 		}
 		
 		msg_to_char(ch, "&y%s&0 [%d, %s, %d%s]: ", SKILL_NAME(skill), get_skill_level(vict, SKILL_VNUM(skill)), exp_part, get_ability_points_available_for_char(vict, SKILL_VNUM(skill)), plsk->resets ? "*" : "");
@@ -2704,7 +2704,7 @@ SHOW(show_subzone) {
 	}
 	if (any) {
 		// found exact match(es)
-		snprintf(buf2, sizeof(buf2), "Room templates with subzone %d:", find);
+		safe_snprintf(buf2, sizeof(buf2), "Room templates with subzone %d:", find);
 		build_page_display_prepend(ch, buf2);
 		send_page_display(ch);
 		return;
@@ -2726,7 +2726,7 @@ SHOW(show_subzone) {
 	}
 	if (any) {
 		// found exact match(es)
-		snprintf(buf2, sizeof(buf2), "Room templates with subzone %d, matching room template %d:", GET_RMT_SUBZONE(match), GET_RMT_VNUM(match));
+		safe_snprintf(buf2, sizeof(buf2), "Room templates with subzone %d, matching room template %d:", GET_RMT_SUBZONE(match), GET_RMT_VNUM(match));
 		build_page_display_prepend(ch, buf2);
 		send_page_display(ch);
 		return;
@@ -2764,7 +2764,7 @@ SHOW(show_technology) {
 				continue;
 			}
 			
-			snprintf(one, sizeof(one), "\t%c%s%s, ", (++count % 2) ? 'W' : 'w', player_tech_types[ptech->id], ptech->check_solo ? " (synergy)" : "");
+			safe_snprintf(one, sizeof(one), "\t%c%s%s, ", (++count % 2) ? 'W' : 'w', player_tech_types[ptech->id], ptech->check_solo ? " (synergy)" : "");
 			
 			if (color_strlen(one) + lsize >= 79) {
 				// send line
@@ -2829,7 +2829,7 @@ SHOW(show_terrain) {
 			
 			// found
 			if (map->room && ROOM_OWNER(map->room)) {
-				snprintf(part, sizeof(part), " - %s%s\t0", EMPIRE_BANNER(ROOM_OWNER(map->room)), EMPIRE_ADJECTIVE(ROOM_OWNER(map->room)));
+				safe_snprintf(part, sizeof(part), " - %s%s\t0", EMPIRE_BANNER(ROOM_OWNER(map->room)), EMPIRE_ADJECTIVE(ROOM_OWNER(map->room)));
 			}
 			else {
 				*part = '\0';
@@ -3053,7 +3053,7 @@ SHOW(show_uses) {
 					*part = '\0';
 				}
 				else {
-					snprintf(part, sizeof(part), " (%s)", get_generic_name_by_vnum(res->vnum));
+					safe_snprintf(part, sizeof(part), " (%s)", get_generic_name_by_vnum(res->vnum));
 				}
 				build_page_display(ch, "AUG [%5d] %s%s", GET_AUG_VNUM(aug), GET_AUG_NAME(aug), part);
 			}
@@ -3073,7 +3073,7 @@ SHOW(show_uses) {
 					*part = '\0';
 				}
 				else {
-					snprintf(part, sizeof(part), " (%s)", get_generic_name_by_vnum(res->vnum));
+					safe_snprintf(part, sizeof(part), " (%s)", get_generic_name_by_vnum(res->vnum));
 				}
 				build_page_display(ch, "BLD [%5d] %s%s", GET_BLD_VNUM(bld), GET_BLD_NAME(bld), part);
 			}
@@ -3093,7 +3093,7 @@ SHOW(show_uses) {
 					*part = '\0';
 				}
 				else {
-					snprintf(part, sizeof(part), " (%s)", get_generic_name_by_vnum(res->vnum));
+					safe_snprintf(part, sizeof(part), " (%s)", get_generic_name_by_vnum(res->vnum));
 				}
 				build_page_display(ch, "CFT [%5d] %s%s", GET_CRAFT_VNUM(craft), GET_CRAFT_NAME(craft), part);
 			}
@@ -3113,7 +3113,7 @@ SHOW(show_uses) {
 					*part = '\0';
 				}
 				else {
-					snprintf(part, sizeof(part), " (%s)", get_generic_name_by_vnum(req->vnum));
+					safe_snprintf(part, sizeof(part), " (%s)", get_generic_name_by_vnum(req->vnum));
 				}
 				build_page_display(ch, "PRG [%5d] %s%s", PRG_VNUM(prg), PRG_NAME(prg), part);
 			}
@@ -3137,7 +3137,7 @@ SHOW(show_uses) {
 						*part = '\0';
 					}
 					else {
-						snprintf(part, sizeof(part), " (%s)", get_generic_name_by_vnum(req->vnum));
+						safe_snprintf(part, sizeof(part), " (%s)", get_generic_name_by_vnum(req->vnum));
 					}
 					build_page_display(ch, "QST [%5d] %s", QUEST_VNUM(quest), QUEST_NAME(quest));
 				}
@@ -3158,7 +3158,7 @@ SHOW(show_uses) {
 					*part = '\0';
 				}
 				else {
-					snprintf(part, sizeof(part), " (%s)", get_generic_name_by_vnum(req->vnum));
+					safe_snprintf(part, sizeof(part), " (%s)", get_generic_name_by_vnum(req->vnum));
 				}
 				build_page_display(ch, "SOC [%5d] %s", SOC_VNUM(soc), SOC_NAME(soc));
 			}
@@ -3178,7 +3178,7 @@ SHOW(show_uses) {
 					*part = '\0';
 				}
 				else {
-					snprintf(part, sizeof(part), " (%s)", get_generic_name_by_vnum(res->vnum));
+					safe_snprintf(part, sizeof(part), " (%s)", get_generic_name_by_vnum(res->vnum));
 				}
 				build_page_display(ch, "VEH [%5d] %s%s", VEH_VNUM(veh), VEH_SHORT_DESC(veh), part);
 			}

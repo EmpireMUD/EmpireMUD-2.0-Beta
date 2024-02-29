@@ -444,10 +444,10 @@ char *list_one_object(obj_data *obj, bool detail) {
 		else {
 			*flags = '\0';
 		}
-		snprintf(output, sizeof(output), "[%5d] %s (%s) %s", GET_OBJ_VNUM(obj), GET_OBJ_SHORT_DESC(obj), level_range_string(GET_OBJ_MIN_SCALE_LEVEL(obj), GET_OBJ_MAX_SCALE_LEVEL(obj), 0), flags);
+		safe_snprintf(output, sizeof(output), "[%5d] %s (%s) %s", GET_OBJ_VNUM(obj), GET_OBJ_SHORT_DESC(obj), level_range_string(GET_OBJ_MIN_SCALE_LEVEL(obj), GET_OBJ_MAX_SCALE_LEVEL(obj), 0), flags);
 	}
 	else {
-		snprintf(output, sizeof(output), "[%5d] %s", GET_OBJ_VNUM(obj), GET_OBJ_SHORT_DESC(obj));
+		safe_snprintf(output, sizeof(output), "[%5d] %s", GET_OBJ_VNUM(obj), GET_OBJ_SHORT_DESC(obj));
 	}
 	
 	return output;
@@ -496,7 +496,7 @@ void olc_delete_object(char_data *ch, obj_vnum vnum) {
 		return;
 	}
 	
-	snprintf(name, sizeof(name), "%s", NULLSAFE(GET_OBJ_SHORT_DESC(proto)));
+	safe_snprintf(name, sizeof(name), "%s", NULLSAFE(GET_OBJ_SHORT_DESC(proto)));
 	
 	if (HASH_COUNT(object_table) <= 1) {
 		msg_to_char(ch, "You can't delete the last object.\r\n");
@@ -2049,7 +2049,7 @@ void set_obj_look_desc_append(obj_data *obj, const char *str, bool format) {
 	char temp[MAX_STRING_LENGTH];
 	
 	if (str && *str) {
-		snprintf(temp, sizeof(temp), "%s%s", NULLSAFE(GET_OBJ_ACTION_DESC(obj)), str);
+		safe_snprintf(temp, sizeof(temp), "%s%s", NULLSAFE(GET_OBJ_ACTION_DESC(obj)), str);
 		
 		// check trailing crlf
 		if (str[strlen(str)-1] != '\r' && str[strlen(str)-1] != '\n') {
@@ -3197,21 +3197,21 @@ OLC_MODULE(oedit_quick_recipe) {
 	set_obj_val(obj, VAL_RECIPE_VNUM, GET_CRAFT_VNUM(cft));
 	
 	// keywords
-	snprintf(buf, sizeof(buf), "%s %s", (*argument ? argument : "recipe"), GET_CRAFT_NAME(cft));
+	safe_snprintf(buf, sizeof(buf), "%s %s", (*argument ? argument : "recipe"), GET_CRAFT_NAME(cft));
 	if (GET_OBJ_KEYWORDS(obj)) {
 		free(GET_OBJ_KEYWORDS(obj));
 	}
 	GET_OBJ_KEYWORDS(obj) = str_dup(buf);
 	
 	// short desc
-	snprintf(buf, sizeof(buf), "the %s %s", GET_CRAFT_NAME(cft), *argument ? argument : "recipe");
+	safe_snprintf(buf, sizeof(buf), "the %s %s", GET_CRAFT_NAME(cft), *argument ? argument : "recipe");
 	if (GET_OBJ_SHORT_DESC(obj)) {
 		free(GET_OBJ_SHORT_DESC(obj));
 	}
 	GET_OBJ_SHORT_DESC(obj) = str_dup(buf);
 	
 	// long desc
-	snprintf(buf, sizeof(buf), "The %s %s is on the ground.", GET_CRAFT_NAME(cft), *argument ? argument : "recipe");
+	safe_snprintf(buf, sizeof(buf), "The %s %s is on the ground.", GET_CRAFT_NAME(cft), *argument ? argument : "recipe");
 	if (GET_OBJ_LONG_DESC(obj)) {
 		free(GET_OBJ_LONG_DESC(obj));
 	}
@@ -3219,7 +3219,7 @@ OLC_MODULE(oedit_quick_recipe) {
 	
 	// look desc
 	strcpy(cmd, craft_types[GET_CRAFT_TYPE(cft)]);
-	snprintf(buf, sizeof(buf), "This %s will teach you to %s: %s.\r\n", (*argument ? argument : "recipe"), strtolower(cmd), GET_CRAFT_NAME(cft));
+	safe_snprintf(buf, sizeof(buf), "This %s will teach you to %s: %s.\r\n", (*argument ? argument : "recipe"), strtolower(cmd), GET_CRAFT_NAME(cft));
 	if (GET_OBJ_ACTION_DESC(obj)) {
 		free(GET_OBJ_ACTION_DESC(obj));
 	}

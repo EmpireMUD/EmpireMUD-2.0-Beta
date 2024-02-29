@@ -71,7 +71,7 @@ void parse_trigger(FILE *trig_f, int nr) {
 	trig->vnum = nr;
 	add_trigger_to_table(trig);
 
-	snprintf(errors, sizeof(errors), "trig vnum %d", nr);
+	safe_snprintf(errors, sizeof(errors), "trig vnum %d", nr);
 
 	trig->name = fread_string(trig_f, errors);
 

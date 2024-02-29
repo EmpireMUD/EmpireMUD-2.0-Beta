@@ -998,7 +998,7 @@ static void show_empire_identify_to_char(char_data *ch, empire_data *emp, char *
 			strcpy(keepstr, " (keep)");
 		}
 		else if (eid_pi->keep > 0) {
-			snprintf(keepstr, sizeof(keepstr), " (keep %d)", eid_pi->keep);
+			safe_snprintf(keepstr, sizeof(keepstr), " (keep %d)", eid_pi->keep);
 		}
 		else {
 			*keepstr = '\0';
@@ -1185,7 +1185,7 @@ static void show_empire_inventory_to_char(char_data *ch, empire_data *emp, char 
 				strcpy(keepstr, " (keep)");
 			}
 			else if (einv->keep > 0) {
-				snprintf(keepstr, sizeof(keepstr), " (keep %d)", einv->keep);
+				safe_snprintf(keepstr, sizeof(keepstr), " (keep %d)", einv->keep);
 			}
 			else {
 				*keepstr = '\0';
@@ -1194,13 +1194,13 @@ static void show_empire_inventory_to_char(char_data *ch, empire_data *emp, char 
 			// total?
 			if (einv->total > einv->local) {
 				if (einv->total_keep == 0 || einv->total_keep == einv->keep) {
-					snprintf(totalstr, sizeof(totalstr), " (%d total)", einv->total);
+					safe_snprintf(totalstr, sizeof(totalstr), " (%d total)", einv->total);
 				}
 				else if (einv->total_keep == UNLIMITED) {
-					snprintf(totalstr, sizeof(totalstr), " (%d total, keep)", einv->total);
+					safe_snprintf(totalstr, sizeof(totalstr), " (%d total, keep)", einv->total);
 				}
 				else if (einv->total_keep > 0) {
-					snprintf(totalstr, sizeof(totalstr), " (%d total, keep %d)", einv->total, einv->total_keep);
+					safe_snprintf(totalstr, sizeof(totalstr), " (%d total, keep %d)", einv->total, einv->total_keep);
 				}
 			}
 			else {
@@ -1440,7 +1440,7 @@ void show_workforce_where(empire_data *emp, char_data *to, bool here, char *argu
 		build_page_display(to, "Working %s citizens:", EMPIRE_ADJECTIVE(emp));
 	
 		HASH_ITER(hh, counts, wct, next_wct) {
-			snprintf(line, sizeof(line), "%s: %d worker%s\r\n", chore_data[wct->chore].name, wct->count, PLURAL(wct->count));
+			safe_snprintf(line, sizeof(line), "%s: %d worker%s\r\n", chore_data[wct->chore].name, wct->count, PLURAL(wct->count));
 			build_page_display_str(to, CAP(line));
 			
 			// remove and free
@@ -1533,7 +1533,7 @@ void show_workforce_why(empire_data *emp, char_data *ch, char *argument) {
 			
 			// ok, show it:
 			if (wf_log->count > 1) {
-				snprintf(mult, sizeof(mult), " (x%d)", wf_log->count);
+				safe_snprintf(mult, sizeof(mult), " (x%d)", wf_log->count);
 			}
 			else {
 				*mult = '\0';
@@ -1628,7 +1628,7 @@ void show_workforce_setup_to_char(empire_data *emp, char_data *ch) {
 		}
 		here = (this_isle ? (this_isle->workforce_limit[chore] != 0) : FALSE);
 		
-		snprintf(part, sizeof(part), "%s: %s%s", chore_data[chore].name, here ? "&con&0" : "&yoff&0", ((on && !here) || (off && here)) ? (PRF_FLAGGED(ch, PRF_SCREEN_READER) ? (on > 1 ? " (some islands)" : " (one island)") : "*") : "");
+		safe_snprintf(part, sizeof(part), "%s: %s%s", chore_data[chore].name, here ? "&con&0" : "&yoff&0", ((on && !here) || (off && here)) ? (PRF_FLAGGED(ch, PRF_SCREEN_READER) ? (on > 1 ? " (some islands)" : " (one island)") : "*") : "");
 		size = 24 + color_code_length(part) + (PRF_FLAGGED(ch, PRF_SCREEN_READER) ? 24 : 0);
 		msg_to_char(ch, " %-*.*s%s", size, size, part, (PRF_FLAGGED(ch, PRF_SCREEN_READER) || !(count % 3)) ? "\r\n" : " ");
 	}
@@ -1663,7 +1663,7 @@ int sort_workforce_log(struct workforce_log *a, struct workforce_log *b) {
 */
 char *empire_history_filename(empire_data *emp) {
 	static char fname[256];
-	snprintf(fname, sizeof(fname), "%s%d%s", EMPIRE_HISTORY_PREFIX, EMPIRE_VNUM(emp), EMPIRE_SUFFIX);
+	safe_snprintf(fname, sizeof(fname), "%s%d%s", EMPIRE_HISTORY_PREFIX, EMPIRE_VNUM(emp), EMPIRE_SUFFIX);
 	return fname;
 }
 
@@ -1778,7 +1778,7 @@ void load_empire_chat_history(empire_data *emp) {
 	}
 	
 	// file open..
-	snprintf(error, sizeof(error), "empire history file for %d %s", EMPIRE_VNUM(emp), EMPIRE_NAME(emp));
+	safe_snprintf(error, sizeof(error), "empire history file for %d %s", EMPIRE_VNUM(emp), EMPIRE_NAME(emp));
 	
 	for (;;) {
 		if (!get_line(fl, line)) {
@@ -2171,7 +2171,7 @@ void found_city(char_data *ch, empire_data *emp, char *argument) {
 	
 	send_config_msg(ch, "ok_string");
 	
-	snprintf(buf, sizeof(buf), "$n has founded %s here!", city->name);
+	safe_snprintf(buf, sizeof(buf), "$n has founded %s here!", city->name);
 	act(buf, FALSE, ch, NULL, NULL, TO_ROOM);
 	
 	stop_room_action(IN_ROOM(ch), ACT_CHOPPING);
@@ -2184,7 +2184,7 @@ void found_city(char_data *ch, empire_data *emp, char *argument) {
 	stop_room_action(IN_ROOM(ch), ACT_PLANTING);
 	
 	// customize name
-	snprintf(buf, sizeof(buf), "The Center of %s", city->name);
+	safe_snprintf(buf, sizeof(buf), "The Center of %s", city->name);
 	set_room_custom_name(city->location, buf);
 	SET_BIT(ROOM_BASE_FLAGS(city->location), ROOM_AFF_HIDE_REAL_NAME);
 	affect_total_room(city->location);
@@ -2325,7 +2325,7 @@ void list_cities(char_data *ch, empire_data *emp, char *argument) {
 	if (is_own) {
 		used = count_city_points_used(emp);
 		points = city_points_available(emp);
-		snprintf(buf, sizeof(buf), "%s cities (%d/%d city point%s):\r\n", EMPIRE_ADJECTIVE(emp), used, (points + used), ((points + used) != 1 ? "s" : ""));
+		safe_snprintf(buf, sizeof(buf), "%s cities (%d/%d city point%s):\r\n", EMPIRE_ADJECTIVE(emp), used, (points + used), ((points + used) != 1 ? "s" : ""));
 		msg_to_char(ch, "%s", CAP(buf));
 	}
 	else {
@@ -2342,7 +2342,7 @@ void list_cities(char_data *ch, empire_data *emp, char *argument) {
 		rl = city->location;
 		if (city->traits) {
 			prettier_sprintbit(city->traits, empire_trait_types, buf);
-			snprintf(traits, sizeof(traits), "%s%s", is_own ? ", " : "", buf);
+			safe_snprintf(traits, sizeof(traits), "%s%s", is_own ? ", " : "", buf);
 		}
 		else {
 			*traits = '\0';
@@ -2469,7 +2469,7 @@ void rename_city(char_data *ch, empire_data *emp, char *argument) {
 	write_city_data_file();
 	
 	// and rename the center
-	snprintf(buf, sizeof(buf), "The Center of %s", newname);
+	safe_snprintf(buf, sizeof(buf), "The Center of %s", newname);
 	set_room_custom_name(city->location, buf);
 	SET_BIT(ROOM_BASE_FLAGS(city->location), ROOM_AFF_HIDE_REAL_NAME);
 	affect_total_room(city->location);
@@ -2797,7 +2797,7 @@ void do_import_list(char_data *ch, empire_data *emp, char *argument, int subcmd)
 			
 			// figure out actual cost
 			if (rate != 1.0) {
-				snprintf(coin_conv, sizeof(coin_conv), " (%.1f)", trade->cost * rate);
+				safe_snprintf(coin_conv, sizeof(coin_conv), " (%.1f)", trade->cost * rate);
 			}
 			
 			// figure out indicator
@@ -2872,7 +2872,7 @@ void do_import_analysis(char_data *ch, empire_data *emp, char *argument, int sub
 			
 			// figure out actual cost
 			if (rate != 1.0) {
-				snprintf(coin_conv, sizeof(coin_conv), " (%.1f)", trade->cost * rate);
+				safe_snprintf(coin_conv, sizeof(coin_conv), " (%.1f)", trade->cost * rate);
 			}
 			else {
 				*coin_conv = '\0';
@@ -3428,10 +3428,10 @@ void scan_for_tile(char_data *ch, char *argument, int max_dist, bitvector_t only
 					if (vsize == 0 && scanned_veh) {
 						// found a vehicle to show
 						if (!VEH_OWNER(scanned_veh) || VEH_CLAIMS_WITH_ROOM(scanned_veh) || !PRF_FLAGGED(ch, PRF_POLITICAL)) {
-							snprintf(veh_string, sizeof(veh_string), "%s", skip_filler(VEH_SHORT_DESC(scanned_veh)));
+							safe_snprintf(veh_string, sizeof(veh_string), "%s", skip_filler(VEH_SHORT_DESC(scanned_veh)));
 						}
 						else {
-							snprintf(veh_string, sizeof(veh_string), "%s%s %s\t0", EMPIRE_BANNER(VEH_OWNER(scanned_veh)), EMPIRE_ADJECTIVE(VEH_OWNER(scanned_veh)), skip_filler(VEH_SHORT_DESC(scanned_veh)));
+							safe_snprintf(veh_string, sizeof(veh_string), "%s%s %s\t0", EMPIRE_BANNER(VEH_OWNER(scanned_veh)), EMPIRE_ADJECTIVE(VEH_OWNER(scanned_veh)), skip_filler(VEH_SHORT_DESC(scanned_veh)));
 						}
 					}
 				}
@@ -3556,7 +3556,7 @@ void scan_for_tile(char_data *ch, char *argument, int max_dist, bitvector_t only
 			lsize = snprintf(line, sizeof(line), "%s%s%s%s", color ? "\tw" : "", screenread_one_tile(ch, IN_ROOM(ch), loc, FALSE), coord_display(ch, check_x, check_y, FALSE), color ? "\t0" : "");
 			
 			if (lsize + strlen(ogd->string) + 3 < sizeof(ogd->string)) {
-				snprintf(ogd->string + strlen(ogd->string), sizeof(ogd->string) - strlen(ogd->string), "%s%s", *ogd->string ? ", " : "", line);
+				safe_snprintf(ogd->string + strlen(ogd->string), sizeof(ogd->string) - strlen(ogd->string), "%s%s", *ogd->string ? ", " : "", line);
 			}
 			else {
 				ogd->full = TRUE;
@@ -4029,13 +4029,13 @@ void do_burn_building(char_data *ch, room_data *room, obj_data *lighter) {
 	else {
 		// message here
 		if (lighter) {
-			snprintf(to_char, sizeof(to_char), "You use $p to light the building on fire!");
-			snprintf(to_room, sizeof(to_room), "$n uses $p to light %s building on fire!", (room == HOME_ROOM(IN_ROOM(ch))) ? "the" : "a");
+			safe_snprintf(to_char, sizeof(to_char), "You use $p to light the building on fire!");
+			safe_snprintf(to_room, sizeof(to_room), "$n uses $p to light %s building on fire!", (room == HOME_ROOM(IN_ROOM(ch))) ? "the" : "a");
 		}
 		else {
 			// no lighter?
-			snprintf(to_char, sizeof(to_char), "You light the building on fire!");
-			snprintf(to_room, sizeof(to_room), "$n lights %s building on fire!", (room == HOME_ROOM(IN_ROOM(ch))) ? "the" : "a");
+			safe_snprintf(to_char, sizeof(to_char), "You light the building on fire!");
+			safe_snprintf(to_room, sizeof(to_room), "$n lights %s building on fire!", (room == HOME_ROOM(IN_ROOM(ch))) ? "the" : "a");
 		}
 	
 		act(to_char, FALSE, ch, lighter, NULL, TO_CHAR);
@@ -4787,8 +4787,8 @@ ACMD(do_diplomacy) {
 				SET_BIT(vict_pol->type, diplo_option[type].add_bits);
 			}
 			
-			snprintf(ch_log, sizeof(ch_log), "%s has been declared with %s", fname(diplo_option[type].keywords), EMPIRE_NAME(vict_emp));
-			snprintf(vict_log, sizeof(vict_log), "%s has declared %s!", EMPIRE_NAME(ch_emp), fname(diplo_option[type].keywords));
+			safe_snprintf(ch_log, sizeof(ch_log), "%s has been declared with %s", fname(diplo_option[type].keywords), EMPIRE_NAME(vict_emp));
+			safe_snprintf(vict_log, sizeof(vict_log), "%s has declared %s!", EMPIRE_NAME(ch_emp), fname(diplo_option[type].keywords));
 			syslog(SYS_EMPIRE, 0, TRUE, "DIPL: %s (%s) has declared %s with %s", EMPIRE_NAME(ch_emp), GET_NAME(ch), fname(diplo_option[type].keywords), EMPIRE_NAME(vict_emp));
 			msg_to_char(ch, "You have declared %s with %s!\r\n", fname(diplo_option[type].keywords), EMPIRE_NAME(vict_emp));
 			
@@ -4810,8 +4810,8 @@ ACMD(do_diplomacy) {
 				SET_BIT(vict_pol->type, diplo_option[type].add_bits);
 			}
 			
-			snprintf(ch_log, sizeof(ch_log), "%s has been accepted with %s", fname(diplo_option[type].keywords), EMPIRE_NAME(vict_emp));
-			snprintf(vict_log, sizeof(vict_log), "%s has accepted %s!", EMPIRE_NAME(ch_emp), fname(diplo_option[type].keywords));
+			safe_snprintf(ch_log, sizeof(ch_log), "%s has been accepted with %s", fname(diplo_option[type].keywords), EMPIRE_NAME(vict_emp));
+			safe_snprintf(vict_log, sizeof(vict_log), "%s has accepted %s!", EMPIRE_NAME(ch_emp), fname(diplo_option[type].keywords));
 			syslog(SYS_EMPIRE, 0, TRUE, "DIPL: %s (%s) has accepted %s with %s", EMPIRE_NAME(ch_emp), GET_NAME(ch), fname(diplo_option[type].keywords), EMPIRE_NAME(vict_emp));
 			msg_to_char(ch, "You have accepted %s with %s!\r\n", fname(diplo_option[type].keywords), EMPIRE_NAME(vict_emp));
 			
@@ -4829,8 +4829,8 @@ ACMD(do_diplomacy) {
 				REMOVE_BIT(vict_pol->offer, diplo_option[type].remove_bits);
 			}
 			
-			snprintf(ch_log, sizeof(ch_log), "The empire has offered %s to %s", fname(diplo_option[type].keywords), EMPIRE_NAME(vict_emp));
-			snprintf(vict_log, sizeof(vict_log), "%s offers %s to the empire", EMPIRE_NAME(ch_emp), fname(diplo_option[type].keywords));
+			safe_snprintf(ch_log, sizeof(ch_log), "The empire has offered %s to %s", fname(diplo_option[type].keywords), EMPIRE_NAME(vict_emp));
+			safe_snprintf(vict_log, sizeof(vict_log), "%s offers %s to the empire", EMPIRE_NAME(ch_emp), fname(diplo_option[type].keywords));
 			msg_to_char(ch, "You have offered %s to %s!\r\n", fname(diplo_option[type].keywords), EMPIRE_NAME(vict_emp));	
 		}
 		
@@ -5222,7 +5222,7 @@ ACMD(do_empire_inventory) {
 	if (!*arg || (GET_ACCESS_LEVEL(ch) < LVL_CIMPL && !IS_GRANTED(ch, GRANT_EMPIRES))) {
 		emp = GET_LOYALTY(ch);
 		if (*arg2) {
-			snprintf(buf, sizeof(buf), "%s %s", arg, arg2);
+			safe_snprintf(buf, sizeof(buf), "%s %s", arg, arg2);
 			strcpy(arg2, buf);
 		}
 		else {
@@ -5235,7 +5235,7 @@ ACMD(do_empire_inventory) {
 		if (!emp) {
 			emp = GET_LOYALTY(ch);
 			if (*arg2) {
-				snprintf(buf, sizeof(buf), "%s %s", arg, arg2);
+				safe_snprintf(buf, sizeof(buf), "%s %s", arg, arg2);
 				strcpy(arg2, buf);
 			}
 			else {
@@ -5993,10 +5993,10 @@ ACMD(do_findmaintenance) {
 	if (find_island) {
 		*temp = '\0';
 		if (bld_total > 0) {
-			snprintf(temp, sizeof(temp), "%d building%s", bld_total, PLURAL(bld_total));
+			safe_snprintf(temp, sizeof(temp), "%d building%s", bld_total, PLURAL(bld_total));
 		}
 		if (veh_total > 0) {
-			snprintf(temp + strlen(temp), sizeof(temp) - strlen(temp), "%s%d vehicle%s", (*temp ? " and " : ""), veh_total, PLURAL(veh_total));
+			safe_snprintf(temp + strlen(temp), sizeof(temp) - strlen(temp), "%s%d vehicle%s", (*temp ? " and " : ""), veh_total, PLURAL(veh_total));
 		}
 		if (!*temp) {
 			strcpy(temp, "buildings");
@@ -6591,7 +6591,7 @@ void do_manage_vehicle(char_data *ch, vehicle_data *veh, char *argument) {
 			}
 			
 			on = (manage_vehicle_data[iter].flag && VEH_FLAGGED(veh, manage_vehicle_data[iter].flag)) ? TRUE : FALSE;
-			snprintf(buf, sizeof(buf), "%s: %s\t0", manage_vehicle_data[iter].name, on ? "\tgon" : "\troff");
+			safe_snprintf(buf, sizeof(buf), "%s: %s\t0", manage_vehicle_data[iter].name, on ? "\tgon" : "\troff");
 			msg_to_char(ch, " %s\r\n", CAP(buf));
 		}
 	}
@@ -6638,7 +6638,7 @@ void do_manage_vehicle(char_data *ch, vehicle_data *veh, char *argument) {
 		}
 		
 		msg_to_char(ch, "You turn the %s management option %s for %s.\r\n", manage_vehicle_data[type].name, on ? "on" : "off", get_vehicle_short_desc(veh, ch));
-		snprintf(buf, sizeof(buf), "$n turns the %s management option %s for %s.", manage_vehicle_data[type].name, on ? "on" : "off", VEH_SHORT_DESC(veh));
+		safe_snprintf(buf, sizeof(buf), "$n turns the %s management option %s for %s.", manage_vehicle_data[type].name, on ? "on" : "off", VEH_SHORT_DESC(veh));
 		act(buf, TRUE, ch, NULL, NULL, TO_ROOM | TO_NOT_IGNORING);
 		
 		if (imm_access && VEH_OWNER(veh) && VEH_OWNER(veh) != GET_LOYALTY(ch)) {
@@ -6701,7 +6701,7 @@ ACMD(do_manage) {
 			}
 			
 			on = (manage_data[iter].flag && ROOM_AFF_FLAGGED(IN_ROOM(ch), manage_data[iter].flag)) ? TRUE : FALSE;
-			snprintf(buf, sizeof(buf), "%s: %s\t0", manage_data[iter].name, on ? "\tgon" : "\troff");
+			safe_snprintf(buf, sizeof(buf), "%s: %s\t0", manage_data[iter].name, on ? "\tgon" : "\troff");
 			msg_to_char(ch, " %s\r\n", CAP(buf));
 		}
 	}
@@ -6755,7 +6755,7 @@ ACMD(do_manage) {
 		}
 		
 		msg_to_char(ch, "You turn the %s land management option %s.\r\n", manage_data[type].name, on ? "on" : "off");
-		snprintf(buf, sizeof(buf), "$n turns the %s land management option %s.", manage_data[type].name, on ? "on" : "off");
+		safe_snprintf(buf, sizeof(buf), "$n turns the %s land management option %s.", manage_data[type].name, on ? "on" : "off");
 		act(buf, TRUE, ch, NULL, NULL, TO_ROOM | TO_NOT_IGNORING);
 		
 		if (imm_access && ROOM_OWNER(IN_ROOM(ch)) && ROOM_OWNER(IN_ROOM(ch)) != GET_LOYALTY(ch)) {
@@ -7257,7 +7257,7 @@ ACMD(do_progress) {
 		if (PRF_FLAGGED(ch, PRF_ROOMFLAGS)) {
 			sprintf(vstr, "[%d] ", PRG_VNUM(prg));
 			sprintbit(PRG_FLAGS(prg), progress_flags, temp, TRUE);
-			snprintf(fstr, sizeof(fstr), " [ %s]", temp);
+			safe_snprintf(fstr, sizeof(fstr), " [ %s]", temp);
 		}
 		else {
 			*vstr = '\0';
@@ -7486,7 +7486,7 @@ void process_reclaim(char_data *ch) {
 	
 	// message prep
 	if (target != IN_ROOM(ch)) {
-		snprintf(from_str, sizeof(from_str), " from (%d, %d)", X_COORD(IN_ROOM(ch)), Y_COORD(IN_ROOM(ch)));
+		safe_snprintf(from_str, sizeof(from_str), " from (%d, %d)", X_COORD(IN_ROOM(ch)), Y_COORD(IN_ROOM(ch)));
 	}
 	else {
 	    *from_str = '\0';
@@ -7599,7 +7599,7 @@ ACMD(do_reclaim) {
 		}
 		else {
 			if (target != IN_ROOM(ch)) {
-				snprintf(from_str, sizeof(from_str), " from (%d, %d)", X_COORD(IN_ROOM(ch)), Y_COORD(IN_ROOM(ch)));
+				safe_snprintf(from_str, sizeof(from_str), " from (%d, %d)", X_COORD(IN_ROOM(ch)), Y_COORD(IN_ROOM(ch)));
 			}
 			else {
 				*from_str = '\0';
@@ -7832,18 +7832,18 @@ ACMD(do_territory) {
 			// unknown arg: treat as search
 			if (*arg != '-') {
 				// positive search term
-				snprintf(search_str + strlen(search_str), sizeof(search_str) - strlen(search_str), "%s%s", *search_str ? " " : "", arg);
+				safe_snprintf(search_str + strlen(search_str), sizeof(search_str) - strlen(search_str), "%s%s", *search_str ? " " : "", arg);
 			}
 			else if (*(arg+1) == '-') {
 				// double dash: negative term
 				if (*arg+2) {
-					snprintf(exclude_str + strlen(exclude_str), sizeof(exclude_str) - strlen(exclude_str), "%s%s", *exclude_str ? " " : "", arg+2);
+					safe_snprintf(exclude_str + strlen(exclude_str), sizeof(exclude_str) - strlen(exclude_str), "%s%s", *exclude_str ? " " : "", arg+2);
 				}
 				// else: empty/ignore
 			}
 			else if (*(arg+1)) {
 				// single dash: also a negative term
-				snprintf(exclude_str + strlen(exclude_str), sizeof(exclude_str) - strlen(exclude_str), "%s%s", *exclude_str ? " " : "", arg+1);
+				safe_snprintf(exclude_str + strlen(exclude_str), sizeof(exclude_str) - strlen(exclude_str), "%s%s", *exclude_str ? " " : "", arg+1);
 			}
 		}
 	}
@@ -8017,39 +8017,39 @@ ACMD(do_territory) {
 	// build option buf for output
 	*option_buf = '\0';
 	if (find_island) {
-		snprintf(option_buf + strlen(option_buf), sizeof(option_buf) - strlen(option_buf), "%s%s", (*option_buf ? ", " : ""), get_island_name_for(find_island->id, ch));
+		safe_snprintf(option_buf + strlen(option_buf), sizeof(option_buf) - strlen(option_buf), "%s%s", (*option_buf ? ", " : ""), get_island_name_for(find_island->id, ch));
 	}
 	if (dist_from_me >= 0) {
-		snprintf(option_buf + strlen(option_buf), sizeof(option_buf) - strlen(option_buf), "%swithin %d tile%s", (*option_buf ? ", " : ""), dist_from_me, PLURAL(dist_from_me));
+		safe_snprintf(option_buf + strlen(option_buf), sizeof(option_buf) - strlen(option_buf), "%swithin %d tile%s", (*option_buf ? ", " : ""), dist_from_me, PLURAL(dist_from_me));
 	}
 	if (any_type_found) {
 		if (check_city) {
-			snprintf(option_buf + strlen(option_buf), sizeof(option_buf) - strlen(option_buf), "%sin cities", (*option_buf ? ", " : ""));
+			safe_snprintf(option_buf + strlen(option_buf), sizeof(option_buf) - strlen(option_buf), "%sin cities", (*option_buf ? ", " : ""));
 		}
 		if (check_outskirts) {
-			snprintf(option_buf + strlen(option_buf), sizeof(option_buf) - strlen(option_buf), "%sin the outskirts", (*option_buf ? ", " : ""));
+			safe_snprintf(option_buf + strlen(option_buf), sizeof(option_buf) - strlen(option_buf), "%sin the outskirts", (*option_buf ? ", " : ""));
 		}
 		if (check_frontier) {
-			snprintf(option_buf + strlen(option_buf), sizeof(option_buf) - strlen(option_buf), "%son the frontier", (*option_buf ? ", " : ""));
+			safe_snprintf(option_buf + strlen(option_buf), sizeof(option_buf) - strlen(option_buf), "%son the frontier", (*option_buf ? ", " : ""));
 		}
 	}
 	if (no_abandon) {
-		snprintf(option_buf + strlen(option_buf), sizeof(option_buf) - strlen(option_buf), "%sno-abandon", (*option_buf ? ", " : ""));
+		safe_snprintf(option_buf + strlen(option_buf), sizeof(option_buf) - strlen(option_buf), "%sno-abandon", (*option_buf ? ", " : ""));
 	}
 	if (no_dismantle) {
-		snprintf(option_buf + strlen(option_buf), sizeof(option_buf) - strlen(option_buf), "%sno-dismantle", (*option_buf ? ", " : ""));
+		safe_snprintf(option_buf + strlen(option_buf), sizeof(option_buf) - strlen(option_buf), "%sno-dismantle", (*option_buf ? ", " : ""));
 	}
 	if (no_work) {
-		snprintf(option_buf + strlen(option_buf), sizeof(option_buf) - strlen(option_buf), "%sno-work", (*option_buf ? ", " : ""));
+		safe_snprintf(option_buf + strlen(option_buf), sizeof(option_buf) - strlen(option_buf), "%sno-work", (*option_buf ? ", " : ""));
 	}
 	if (public_only) {
-		snprintf(option_buf + strlen(option_buf), sizeof(option_buf) - strlen(option_buf), "%sis public", (*option_buf ? ", " : ""));
+		safe_snprintf(option_buf + strlen(option_buf), sizeof(option_buf) - strlen(option_buf), "%sis public", (*option_buf ? ", " : ""));
 	}
 	if (*search_str) {
-		snprintf(option_buf + strlen(option_buf), sizeof(option_buf) - strlen(option_buf), "%scontaining '%s'", (*option_buf ? ", " : ""), search_str);
+		safe_snprintf(option_buf + strlen(option_buf), sizeof(option_buf) - strlen(option_buf), "%scontaining '%s'", (*option_buf ? ", " : ""), search_str);
 	}
 	if (*exclude_str) {
-		snprintf(option_buf + strlen(option_buf), sizeof(option_buf) - strlen(option_buf), "%sexcluding '%s'", (*option_buf ? ", " : ""), exclude_str);
+		safe_snprintf(option_buf + strlen(option_buf), sizeof(option_buf) - strlen(option_buf), "%sexcluding '%s'", (*option_buf ? ", " : ""), exclude_str);
 	}
 	
 	if (node_hash) {
@@ -8165,7 +8165,7 @@ void do_workforce_keep(char_data *ch, empire_data *emp, char *argument) {
 				strcpy(kept, "( all)");
 			}
 			else {
-				snprintf(kept, sizeof(kept), "(%3dx)", store->keep);
+				safe_snprintf(kept, sizeof(kept), "(%3dx)", store->keep);
 			}
 			
 			if (PRF_FLAGGED(ch, PRF_ROOMFLAGS)) {
@@ -8414,7 +8414,7 @@ void do_workforce_nearby(char_data *ch, empire_data *emp, char *argument) {
 		LL_FOREACH(ter->npcs, npc) {
 			// determine mob name
 			if (npc->mob) {
-				snprintf(name, sizeof(name), "%s%s", GET_SHORT_DESC(npc->mob), (GET_MOB_VNUM(npc->mob) != npc->vnum) ? " (working)" : "");
+				safe_snprintf(name, sizeof(name), "%s%s", GET_SHORT_DESC(npc->mob), (GET_MOB_VNUM(npc->mob) != npc->vnum) ? " (working)" : "");
 				if (GET_MOB_VNUM(npc->mob) != npc->vnum) {
 					++working;
 				}
@@ -8424,7 +8424,7 @@ void do_workforce_nearby(char_data *ch, empire_data *emp, char *argument) {
 			}
 			else if ((proto = mob_proto(npc->vnum))) {
 				nameset = get_best_name_list(MOB_NAME_SET(proto), npc->sex);
-				snprintf(name, sizeof(name), "%s", nameset->names[npc->name]);
+				safe_snprintf(name, sizeof(name), "%s", nameset->names[npc->name]);
 				
 				temp = str_replace("#n", name, GET_SHORT_DESC(proto));
 				strncpy(name, temp, sizeof(name));
@@ -8433,7 +8433,7 @@ void do_workforce_nearby(char_data *ch, empire_data *emp, char *argument) {
 				++avail;
 			}
 			else {
-				snprintf(name, sizeof(name), "UNKNOWN");
+				safe_snprintf(name, sizeof(name), "UNKNOWN");
 				++avail;
 			}
 			
@@ -8452,7 +8452,7 @@ void do_workforce_nearby(char_data *ch, empire_data *emp, char *argument) {
 		LL_FOREACH(vter->npcs, npc) {
 			// determine mob name
 			if (npc->mob) {
-				snprintf(name, sizeof(name), "%s%s", GET_SHORT_DESC(npc->mob), (GET_MOB_VNUM(npc->mob) != npc->vnum) ? " (working)" : "");
+				safe_snprintf(name, sizeof(name), "%s%s", GET_SHORT_DESC(npc->mob), (GET_MOB_VNUM(npc->mob) != npc->vnum) ? " (working)" : "");
 				if (GET_MOB_VNUM(npc->mob) != npc->vnum) {
 					++working;
 				}
@@ -8462,7 +8462,7 @@ void do_workforce_nearby(char_data *ch, empire_data *emp, char *argument) {
 			}
 			else if ((proto = mob_proto(npc->vnum))) {
 				nameset = get_best_name_list(MOB_NAME_SET(proto), npc->sex);
-				snprintf(name, sizeof(name), "%s", nameset->names[npc->name]);
+				safe_snprintf(name, sizeof(name), "%s", nameset->names[npc->name]);
 			
 				temp = str_replace("#n", name, GET_SHORT_DESC(proto));
 				strncpy(name, temp, sizeof(name));
@@ -8471,7 +8471,7 @@ void do_workforce_nearby(char_data *ch, empire_data *emp, char *argument) {
 				++avail;
 			}
 			else {
-				snprintf(name, sizeof(name), "UNKNOWN");
+				safe_snprintf(name, sizeof(name), "UNKNOWN");
 				++avail;
 			}
 			
@@ -8666,7 +8666,7 @@ ACMD(do_workforce) {
 		}
 		else if (island) {
 			set_workforce_limit(emp, island->id, type, limit);
-			snprintf(name, sizeof(name), "%s", get_island_name_for(island->id, ch));
+			safe_snprintf(name, sizeof(name), "%s", get_island_name_for(island->id, ch));
 		}
 		else {
 			msg_to_char(ch, "No workforce to set for that.\r\n");

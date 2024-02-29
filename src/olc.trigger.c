@@ -154,10 +154,10 @@ char *list_one_trigger(trig_data *trig, bool detail) {
 	static char output[MAX_STRING_LENGTH];
 	
 	if (detail) {
-		snprintf(output, sizeof(output), "[%5d] %s", GET_TRIG_VNUM(trig), GET_TRIG_NAME(trig));
+		safe_snprintf(output, sizeof(output), "[%5d] %s", GET_TRIG_VNUM(trig), GET_TRIG_NAME(trig));
 	}
 	else {
-		snprintf(output, sizeof(output), "[%5d] %s", GET_TRIG_VNUM(trig), GET_TRIG_NAME(trig));
+		safe_snprintf(output, sizeof(output), "[%5d] %s", GET_TRIG_VNUM(trig), GET_TRIG_NAME(trig));
 	}
 	
 	return output;
@@ -323,7 +323,7 @@ void olc_delete_trigger(char_data *ch, trig_vnum vnum) {
 		return;
 	}
 	
-	snprintf(name, sizeof(name), "%s", NULLSAFE(GET_TRIG_NAME(trig)));
+	safe_snprintf(name, sizeof(name), "%s", NULLSAFE(GET_TRIG_NAME(trig)));
 	
 	if (HASH_COUNT(trigger_table) <= 1) {
 		msg_to_char(ch, "You can't delete the last trigger.\r\n");

@@ -616,7 +616,7 @@ int gain_event_points(char_data *ch, any_vnum event_vnum, int points) {
 	
 	// cap?
 	if (EVT_MAX_POINTS(running->event) > 0) {
-		snprintf(capstr, sizeof(capstr), "/%d", EVT_MAX_POINTS(running->event));
+		safe_snprintf(capstr, sizeof(capstr), "/%d", EVT_MAX_POINTS(running->event));
 	}
 	else {
 		*capstr = '\0';
@@ -925,7 +925,7 @@ struct event_running_data *load_one_running_event(FILE *fl, int id) {
 	int int_in[4];
 	long long_in;
 	
-	snprintf(errstr, sizeof(errstr), "running event %d", id);
+	safe_snprintf(errstr, sizeof(errstr), "running event %d", id);
 	
 	// find or create/add
 	if ((re = find_running_event_by_id(id))) {
@@ -1289,10 +1289,10 @@ char *list_one_event(event_data *event, bool detail) {
 	static char output[MAX_STRING_LENGTH];
 	
 	if (detail) {
-		snprintf(output, sizeof(output), "[%5d] %s", EVT_VNUM(event), EVT_NAME(event));
+		safe_snprintf(output, sizeof(output), "[%5d] %s", EVT_VNUM(event), EVT_NAME(event));
 	}
 	else {
-		snprintf(output, sizeof(output), "[%5d] %s", EVT_VNUM(event), EVT_NAME(event));
+		safe_snprintf(output, sizeof(output), "[%5d] %s", EVT_VNUM(event), EVT_NAME(event));
 	}
 		
 	return output;
@@ -2107,7 +2107,7 @@ void olc_delete_event(char_data *ch, any_vnum vnum) {
 		return;
 	}
 	
-	snprintf(name, sizeof(name), "%s", NULLSAFE(EVT_NAME(event)));
+	safe_snprintf(name, sizeof(name), "%s", NULLSAFE(EVT_NAME(event)));
 	
 	// end the event, if running -- BEFORE removing from the hash table
 	while ((running = find_running_event_by_vnum(vnum))) {
@@ -2558,7 +2558,7 @@ void show_event_detail(char_data *ch, event_data *event) {
 	
 	// vnum portion
 	if (IS_IMMORTAL(ch)) {
-		snprintf(vnum, sizeof(vnum), "[%d] ", EVT_VNUM(event));
+		safe_snprintf(vnum, sizeof(vnum), "[%d] ", EVT_VNUM(event));
 	}
 	else {
 		*vnum = '\0';
@@ -2566,10 +2566,10 @@ void show_event_detail(char_data *ch, event_data *event) {
 	
 	// level portion
 	if (EVT_MIN_LEVEL(event) == EVT_MAX_LEVEL(event) && EVT_MIN_LEVEL(event) == 0) {
-		snprintf(part, sizeof(part), " (all levels)");
+		safe_snprintf(part, sizeof(part), " (all levels)");
 	}
 	else {
-		snprintf(part, sizeof(part), " (level %s)", level_range_string(EVT_MIN_LEVEL(event), EVT_MAX_LEVEL(event), 0));
+		safe_snprintf(part, sizeof(part), " (level %s)", level_range_string(EVT_MIN_LEVEL(event), EVT_MAX_LEVEL(event), 0));
 	}
 	
 	// header
@@ -2614,10 +2614,10 @@ void show_event_detail(char_data *ch, event_data *event) {
 		
 		// determine cap and point amount
 		if (EVT_MAX_POINTS(event) > 0) {
-			snprintf(point_str, sizeof(point_str), "/%d points", EVT_MAX_POINTS(event));
+			safe_snprintf(point_str, sizeof(point_str), "/%d points", EVT_MAX_POINTS(event));
 		}
 		else {
-			snprintf(point_str, sizeof(point_str), " point%s", (!ped || ped->points != 1) ? "s" : "");
+			safe_snprintf(point_str, sizeof(point_str), " point%s", (!ped || ped->points != 1) ? "s" : "");
 		}
 		
 		// show points
@@ -2767,10 +2767,10 @@ void show_events_no_arg(char_data *ch) {
 			
 			// level portion
 			if (EVT_MIN_LEVEL(running->event) == EVT_MAX_LEVEL(running->event) && EVT_MIN_LEVEL(running->event) == 0) {
-				snprintf(part, sizeof(part), " (all levels)");
+				safe_snprintf(part, sizeof(part), " (all levels)");
 			}
 			else {
-				snprintf(part, sizeof(part), " (level %s)", level_range_string(EVT_MIN_LEVEL(running->event), EVT_MAX_LEVEL(running->event), 0));
+				safe_snprintf(part, sizeof(part), " (level %s)", level_range_string(EVT_MIN_LEVEL(running->event), EVT_MAX_LEVEL(running->event), 0));
 			}
 			
 			if (IS_IMMORTAL(ch)) {	// imms see id prefix
@@ -2782,10 +2782,10 @@ void show_events_no_arg(char_data *ch) {
 			if ((ped = get_event_data(ch, running->id))) {
 				// determine cap and point amount
 				if (EVT_MAX_POINTS(running->event) > 0) {
-					snprintf(point_str, sizeof(point_str), "/%d points", EVT_MAX_POINTS(running->event));
+					safe_snprintf(point_str, sizeof(point_str), "/%d points", EVT_MAX_POINTS(running->event));
 				}
 				else {
-					snprintf(point_str, sizeof(point_str), " point%s", PLURAL(ped->points));
+					safe_snprintf(point_str, sizeof(point_str), " point%s", PLURAL(ped->points));
 				}
 				
 				if ((rank = get_event_rank(ch, running)) > 0) {
@@ -3292,10 +3292,10 @@ EVENT_CMD(evcmd_recent) {
 		
 		// level portion
 		if (EVT_MIN_LEVEL(running->event) == EVT_MAX_LEVEL(running->event) && EVT_MIN_LEVEL(running->event) == 0) {
-			snprintf(part, sizeof(part), " (all levels)");
+			safe_snprintf(part, sizeof(part), " (all levels)");
 		}
 		else {
-			snprintf(part, sizeof(part), " (level %s)", level_range_string(EVT_MIN_LEVEL(running->event), EVT_MAX_LEVEL(running->event), 0));
+			safe_snprintf(part, sizeof(part), " (level %s)", level_range_string(EVT_MIN_LEVEL(running->event), EVT_MAX_LEVEL(running->event), 0));
 		}
 		
 		lsize = 0;

@@ -165,10 +165,10 @@ char *list_one_crop(crop_data *crop, bool detail) {
 	static char output[MAX_STRING_LENGTH];
 	
 	if (detail) {
-		snprintf(output, sizeof(output), "[%5d] %s", GET_CROP_VNUM(crop), GET_CROP_NAME(crop));
+		safe_snprintf(output, sizeof(output), "[%5d] %s", GET_CROP_VNUM(crop), GET_CROP_NAME(crop));
 	}
 	else {
-		snprintf(output, sizeof(output), "[%5d] %s", GET_CROP_VNUM(crop), GET_CROP_NAME(crop));
+		safe_snprintf(output, sizeof(output), "[%5d] %s", GET_CROP_VNUM(crop), GET_CROP_NAME(crop));
 	}
 	
 	return output;
@@ -197,7 +197,7 @@ void olc_delete_crop(char_data *ch, crop_vnum vnum) {
 		return;
 	}
 	
-	snprintf(name, sizeof(name), "%s", NULLSAFE(GET_CROP_NAME(crop)));
+	safe_snprintf(name, sizeof(name), "%s", NULLSAFE(GET_CROP_NAME(crop)));
 	
 	if (HASH_COUNT(crop_table) <= 1) {
 		msg_to_char(ch, "You can't delete the last crop.\r\n");

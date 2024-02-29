@@ -185,16 +185,16 @@ char *list_one_social(social_data *soc, bool detail) {
 	if (detail) {
 		if (SOC_REQUIREMENTS(soc)) {
 			LL_COUNT(SOC_REQUIREMENTS(soc), req, count);
-			snprintf(buf, sizeof(buf), " [%d requirements]", count);
+			safe_snprintf(buf, sizeof(buf), " [%d requirements]", count);
 		}
 		else {
 			*buf = '\0';
 		}
 		
-		snprintf(output, sizeof(output), "[%5d] %s (%s)%s%s", SOC_VNUM(soc), SOC_NAME(soc), SOC_COMMAND(soc), buf, (SOCIAL_FLAGGED(soc, SOC_IN_DEVELOPMENT) ? " IN-DEV" : ""));
+		safe_snprintf(output, sizeof(output), "[%5d] %s (%s)%s%s", SOC_VNUM(soc), SOC_NAME(soc), SOC_COMMAND(soc), buf, (SOCIAL_FLAGGED(soc, SOC_IN_DEVELOPMENT) ? " IN-DEV" : ""));
 	}
 	else {
-		snprintf(output, sizeof(output), "[%5d] %s (%s)", SOC_VNUM(soc), SOC_NAME(soc), SOC_COMMAND(soc));
+		safe_snprintf(output, sizeof(output), "[%5d] %s (%s)", SOC_VNUM(soc), SOC_NAME(soc), SOC_COMMAND(soc));
 	}
 		
 	return output;
@@ -549,7 +549,7 @@ void olc_delete_social(char_data *ch, any_vnum vnum) {
 		return;
 	}
 	
-	snprintf(name, sizeof(name), "%s", NULLSAFE(SOC_NAME(soc)));
+	safe_snprintf(name, sizeof(name), "%s", NULLSAFE(SOC_NAME(soc)));
 	
 	// remove it from the hash table first
 	remove_social_from_table(soc);

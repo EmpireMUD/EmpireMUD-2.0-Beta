@@ -191,16 +191,16 @@ char *exit_description(char_data *ch, room_data *room, const char *prefix) {
 		check_x = X_COORD(room);
 		check_y = Y_COORD(room);
 		if (CHECK_MAP_BOUNDS(check_x, check_y)) {
-			snprintf(coords, sizeof(coords), " (%d, %d)", check_x, check_y);
+			safe_snprintf(coords, sizeof(coords), " (%d, %d)", check_x, check_y);
 		}
 		else {
-			snprintf(coords, sizeof(coords), " (unknown)");
+			safe_snprintf(coords, sizeof(coords), " (unknown)");
 		}
 	}
 	
 	*rlbuf = '\0';
 	if (ROOM_CUSTOM_NAME(room) && !ROOM_AFF_FLAGGED(room, ROOM_AFF_HIDE_REAL_NAME)) {
-		snprintf(rlbuf, sizeof(rlbuf), " (%s)", GET_BUILDING(room) ? GET_BLD_NAME(GET_BUILDING(room)) : GET_SECT_NAME(SECT(room)));
+		safe_snprintf(rlbuf, sizeof(rlbuf), " (%s)", GET_BUILDING(room) ? GET_BLD_NAME(GET_BUILDING(room)) : GET_SECT_NAME(SECT(room)));
 	}
 	
 	if (IS_IMMORTAL(ch) && PRF_FLAGGED(ch, PRF_ROOMFLAGS)) {
@@ -1469,7 +1469,7 @@ void look_at_room_by_loc(char_data *ch, room_data *room, bitvector_t options) {
 	if (ship_partial && GET_ROOM_VEHICLE(IN_ROOM(ch))) {
 		strcpy(tmpbuf, skip_filler(VEH_SHORT_DESC(GET_ROOM_VEHICLE(IN_ROOM(ch)))));
 		ucwords(tmpbuf);
-		snprintf(veh_buf, sizeof(veh_buf), ", %s the %s", VEH_FLAGGED(GET_ROOM_VEHICLE(IN_ROOM(ch)), VEH_IN) ? "Inside" : "Aboard", tmpbuf);
+		safe_snprintf(veh_buf, sizeof(veh_buf), ", %s the %s", VEH_FLAGGED(GET_ROOM_VEHICLE(IN_ROOM(ch)), VEH_IN) ? "Inside" : "Aboard", tmpbuf);
 	}
 	else {
 		*veh_buf = '\0';
@@ -1479,10 +1479,10 @@ void look_at_room_by_loc(char_data *ch, room_data *room, bitvector_t options) {
 	check_x = X_COORD(room);
 	check_y = Y_COORD(room);
 	if (CHECK_MAP_BOUNDS(check_x, check_y)) {
-		snprintf(locbuf, sizeof(locbuf), "(%d, %d)", check_x, check_y);
+		safe_snprintf(locbuf, sizeof(locbuf), "(%d, %d)", check_x, check_y);
 	}
 	else {
-		snprintf(locbuf, sizeof(locbuf), "(unknown)");
+		safe_snprintf(locbuf, sizeof(locbuf), "(unknown)");
 	}
 	
 	// append (Real Name) of a room if the name has been customized and DOESN'T appear in the custom name
@@ -1502,11 +1502,11 @@ void look_at_room_by_loc(char_data *ch, room_data *room, bitvector_t options) {
 		sprintbit(ROOM_AFF_FLAGS(IN_ROOM(ch)), room_aff_bits, flagbuf, TRUE);
 		if (GET_BUILDING(IN_ROOM(ch))) {
 			sprintbit(GET_BLD_FLAGS(GET_BUILDING(IN_ROOM(ch))), bld_flags, partialbuf, TRUE);
-			snprintf(flagbuf + strlen(flagbuf), sizeof(flagbuf) - strlen(flagbuf), "| %s", partialbuf);
+			safe_snprintf(flagbuf + strlen(flagbuf), sizeof(flagbuf) - strlen(flagbuf), "| %s", partialbuf);
 		}
 		if (GET_ROOM_TEMPLATE(IN_ROOM(ch))) {
 			sprintbit(GET_RMT_FLAGS(GET_ROOM_TEMPLATE(IN_ROOM(ch))), room_template_flags, partialbuf, TRUE);
-			snprintf(flagbuf + strlen(flagbuf), sizeof(flagbuf) - strlen(flagbuf), "| %s", partialbuf);
+			safe_snprintf(flagbuf + strlen(flagbuf), sizeof(flagbuf) - strlen(flagbuf), "| %s", partialbuf);
 		}
 		
 		sprintf(output, "[%d] %s%s%s%s %s&0 %s[ %s]\r\n", GET_ROOM_VNUM(room), advcolbuf, room_name_color, veh_buf, rlbuf, locbuf, (HAS_TRIGGERS(room) ? "[TRIG] " : ""), flagbuf);
@@ -2018,7 +2018,7 @@ void look_in_direction(char_data *ch, int dir) {
 	struct string_hash *str_hash = NULL;
 	
 	// check first for an extra description that covers the direction
-	snprintf(buf, sizeof(buf), "%s", dirs[dir]);
+	safe_snprintf(buf, sizeof(buf), "%s", dirs[dir]);
 	if ((exdesc = find_exdesc_for_char(ch, buf, NULL, NULL, NULL, NULL))) {
 		send_to_char(exdesc, ch);
 		return;
@@ -2312,14 +2312,14 @@ static void show_map_to_char(char_data *ch, struct mappc_data_container *mappc, 
 		}
 		// need a leading color? This is ignored if the icon appears to start with a color code other than &u or &&
 		if (*show_icon != COLOUR_CHAR || *(show_icon+1) == COLOUR_CHAR || *(show_icon+1) == 'u') {
-			snprintf(lbuf, sizeof(lbuf), "%s%s", icon_color, show_icon);
+			safe_snprintf(lbuf, sizeof(lbuf), "%s%s", icon_color, show_icon);
 			strcpy(show_icon, lbuf);
 		}
 	}
 	else {
 		// need a leading color? This is ignored if the icon appears to start with a color code other than &u or &&
 		if (*show_icon != COLOUR_CHAR || *(show_icon+1) == COLOUR_CHAR || *(show_icon+1) == 'u') {
-			snprintf(lbuf, sizeof(lbuf), "%s%s", icon_color, show_icon);
+			safe_snprintf(lbuf, sizeof(lbuf), "%s%s", icon_color, show_icon);
 			strcpy(show_icon, lbuf);
 		}
 		
@@ -2556,7 +2556,7 @@ void screenread_one_dir(char_data *ch, room_data *origin, int dir, int max_dist)
 		if (is_blocked && r_height <= top_height && (!ROOM_OWNER(to_room) || ROOM_OWNER(to_room) != GET_LOYALTY(ch))) {
 			// blocked by closer tile
 			if ((memory = get_player_map_memory(ch, GET_ROOM_VNUM(to_room), MAP_MEM_NAME))) {
-				snprintf(roombuf, sizeof(roombuf), "Blocked %s", memory);
+				safe_snprintf(roombuf, sizeof(roombuf), "Blocked %s", memory);
 			}
 			else {
 				strcpy(roombuf, "Blocked");
@@ -2585,7 +2585,7 @@ void screenread_one_dir(char_data *ch, room_data *origin, int dir, int max_dist)
 			else {
 				// too far: show only darkness
 				if ((memory = get_player_map_memory(ch, GET_ROOM_VNUM(to_room), MAP_MEM_NAME))) {
-					snprintf(roombuf, sizeof(roombuf), "Dark %s", memory);
+					safe_snprintf(roombuf, sizeof(roombuf), "Dark %s", memory);
 				}
 				else {
 					strcpy(roombuf, "Dark");
@@ -2604,12 +2604,12 @@ void screenread_one_dir(char_data *ch, room_data *origin, int dir, int max_dist)
 		else {
 			// different
 			if (*lastroom) {
-				snprintf(color, sizeof(color), "\t%c", (++count % 2) ? 'w' : '0');
+				safe_snprintf(color, sizeof(color), "\t%c", (++count % 2) ? 'w' : '0');
 				if (repeats > 0) {
-					snprintf(dirbuf + strlen(dirbuf), sizeof(dirbuf) - strlen(dirbuf), "%s%s%dx %s", *dirbuf ? ", " : "", color, repeats+1, lastroom);
+					safe_snprintf(dirbuf + strlen(dirbuf), sizeof(dirbuf) - strlen(dirbuf), "%s%s%dx %s", *dirbuf ? ", " : "", color, repeats+1, lastroom);
 				}
 				else {
-					snprintf(dirbuf + strlen(dirbuf), sizeof(dirbuf) - strlen(dirbuf), "%s%s%s", *dirbuf ? ", " : "", color, lastroom);
+					safe_snprintf(dirbuf + strlen(dirbuf), sizeof(dirbuf) - strlen(dirbuf), "%s%s%s", *dirbuf ? ", " : "", color, lastroom);
 				}
 			}
 			
@@ -2629,16 +2629,16 @@ void screenread_one_dir(char_data *ch, room_data *origin, int dir, int max_dist)
 	
 	// check for lingering data to append
 	if (*lastroom) {
-		snprintf(color, sizeof(color), "\t%c", (++count % 2) ? 'w' : '0');
+		safe_snprintf(color, sizeof(color), "\t%c", (++count % 2) ? 'w' : '0');
 		if (repeats > 0) {
-			snprintf(dirbuf + strlen(dirbuf), sizeof(dirbuf) - strlen(dirbuf), "%s%s%dx %s", *dirbuf ? ", " : "", color, repeats+1, lastroom);
+			safe_snprintf(dirbuf + strlen(dirbuf), sizeof(dirbuf) - strlen(dirbuf), "%s%s%dx %s", *dirbuf ? ", " : "", color, repeats+1, lastroom);
 		}
 		else {
-			snprintf(dirbuf + strlen(dirbuf), sizeof(dirbuf) - strlen(dirbuf), "%s%s%s", *dirbuf ? ", " : "", color, lastroom);
+			safe_snprintf(dirbuf + strlen(dirbuf), sizeof(dirbuf) - strlen(dirbuf), "%s%s%s", *dirbuf ? ", " : "", color, lastroom);
 		}
 	}
 
-	snprintf(buf, sizeof(buf), "%s: %s\t0\r\n", dirs[get_direction_for_char(ch, dir)], dirbuf);
+	safe_snprintf(buf, sizeof(buf), "%s: %s\t0\r\n", dirs[get_direction_for_char(ch, dir)], dirbuf);
 	CAP(buf);
 	msg_to_char(ch, "%s", buf);
 }
@@ -2694,7 +2694,7 @@ char *screenread_one_tile(char_data *ch, room_data *origin, room_data *to_room, 
 		
 		// indicate if more vehicles can be seen
 		if (total_vehicles > 1) {
-			snprintf(multi_str, sizeof(multi_str), ", %+d", total_vehicles - 1);
+			safe_snprintf(multi_str, sizeof(multi_str), ", %+d", total_vehicles - 1);
 		}
 		else {
 			*multi_str = '\0';
@@ -3047,7 +3047,7 @@ ACMD(do_exits) {
 	if (COMPLEX_DATA(room) && ROOM_IS_CLOSED(room)) {
 		for (ex = COMPLEX_DATA(room)->exits; ex; ex = ex->next) {
 			if ((to_room = ex->room_ptr) && !EXIT_FLAGGED(ex, EX_CLOSED)) {
-				snprintf(buf2, sizeof(buf2), "%s%s\r\n", (cmd != -1 ? " " : ""), CAP(exit_description(ch, to_room, dirs[get_direction_for_char(ch, ex->dir)])));
+				safe_snprintf(buf2, sizeof(buf2), "%s%s\r\n", (cmd != -1 ? " " : ""), CAP(exit_description(ch, to_room, dirs[get_direction_for_char(ch, ex->dir)])));
 				if (size + strlen(buf2) < sizeof(buf)) {
 					strcat(buf, buf2);
 					size += strlen(buf2);
@@ -3077,7 +3077,7 @@ ACMD(do_exits) {
 			}
 			
 			// append
-			snprintf(buf2, sizeof(buf2), "%s%s\r\n", (cmd != -1 ? " " : ""), CAP(exit_description(ch, to_room, dirs[get_direction_for_char(ch, dir)])));
+			safe_snprintf(buf2, sizeof(buf2), "%s%s\r\n", (cmd != -1 ? " " : ""), CAP(exit_description(ch, to_room, dirs[get_direction_for_char(ch, dir)])));
 			if (size + strlen(buf2) < sizeof(buf)) {
 				strcat(buf, buf2);
 				size += strlen(buf2);
@@ -3219,7 +3219,7 @@ ACMD(do_scan) {
 		}
 		else {
 			// anything else, we keep
-			snprintf(new_arg + strlen(new_arg), sizeof(new_arg) - strlen(new_arg), "%s%s", *new_arg ? " " : "", arg);
+			safe_snprintf(new_arg + strlen(new_arg), sizeof(new_arg) - strlen(new_arg), "%s%s", *new_arg ? " " : "", arg);
 		}
 	}
 	

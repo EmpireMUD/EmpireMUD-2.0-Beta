@@ -1734,15 +1734,15 @@ static inline int GET_SEASON(room_data *room) {
 
 
 // version of snprintf that checks output and logs
-#define safe_snprintf(buffer, bsize, args...)	{		\
+#define safe_snprintf(buffer, bsize, args...)	do {		\
 		int _safe_snprintf_res = snprintf((buffer), (bsize), args);		\
 		if (_safe_snprintf_res < 0) {		\
-			log("Warning: snprintf got error result %d when writing to a buffer of size %d in %s:%d", _safe_snprintf_res + 1, (int) bsize, __FILE__, __LINE__);		\
+			log("Warning: snprintf got error result %d when writing to a buffer of size %lu in %s:%d", _safe_snprintf_res + 1, (unsigned long) bsize, __FILE__, __LINE__);		\
 		}		\
 		else if (_safe_snprintf_res >= (bsize)) {		\
-			log("Warning: snprintf tried to write %d to a buffer of size %d in %s:%d", _safe_snprintf_res + 1, (int) bsize, __FILE__, __LINE__);		\
+			log("Warning: snprintf tried to write %d to a buffer of size %lu in %s:%d", _safe_snprintf_res + 1, (unsigned long) bsize, __FILE__, __LINE__);		\
 		}		\
-	}
+	} while (0)
 
 
  //////////////////////////////////////////////////////////////////////////////

@@ -90,9 +90,9 @@ obj_data *create_book_obj(book_data *book) {
 	obj = create_obj();
 	
 	set_obj_short_desc(obj, NULLSAFE(BOOK_ITEM_NAME(book)));
-	snprintf(buf, sizeof(buf), "book %s", skip_filler(NULLSAFE(BOOK_ITEM_NAME(book))));
+	safe_snprintf(buf, sizeof(buf), "book %s", skip_filler(NULLSAFE(BOOK_ITEM_NAME(book))));
 	set_obj_keywords(obj, buf);
-	snprintf(buf, sizeof(buf), "Someone has left %s here.", NULLSAFE(BOOK_ITEM_NAME(book)));
+	safe_snprintf(buf, sizeof(buf), "Someone has left %s here.", NULLSAFE(BOOK_ITEM_NAME(book)));
 	set_obj_long_desc(obj, buf);
 	set_obj_look_desc(obj, NULLSAFE(BOOK_ITEM_DESC(book)), FALSE);
 	
@@ -185,10 +185,10 @@ char *list_one_book(book_data *book, bool detail) {
 	static char output[MAX_STRING_LENGTH];
 	
 	if (detail) {
-		snprintf(output, sizeof(output), "[%5d] %s\t0 (%s\t0)", BOOK_VNUM(book), BOOK_TITLE(book), BOOK_BYLINE(book));
+		safe_snprintf(output, sizeof(output), "[%5d] %s\t0 (%s\t0)", BOOK_VNUM(book), BOOK_TITLE(book), BOOK_BYLINE(book));
 	}
 	else {
-		snprintf(output, sizeof(output), "[%5d] %s\t0", BOOK_VNUM(book), BOOK_TITLE(book));
+		safe_snprintf(output, sizeof(output), "[%5d] %s\t0", BOOK_VNUM(book), BOOK_TITLE(book));
 	}
 	
 	return output;
@@ -213,7 +213,7 @@ void olc_delete_book(char_data *ch, book_vnum vnum) {
 		return;
 	}
 	
-	snprintf(name, sizeof(name), "%s", NULLSAFE(BOOK_TITLE(book)));
+	safe_snprintf(name, sizeof(name), "%s", NULLSAFE(BOOK_TITLE(book)));
 	
 	// pull it from the world
 	remove_book_from_all_libraries(vnum);

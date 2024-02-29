@@ -682,7 +682,7 @@ CONFIG_HANDLER(config_edit_bitvector) {
 		
 	// process (olc processor sends all messages)
 	old = config->data.bitvector_val;
-	snprintf(buf, sizeof(buf), "config %s", config->key);
+	safe_snprintf(buf, sizeof(buf), "config %s", config->key);
 	new = olc_process_flag(ch, argument, config->key, buf, (const char **)config->custom_data, old);
 	
 	// no change
@@ -972,7 +972,7 @@ CONFIG_HANDLER(config_edit_type) {
 		
 	// process (olc processor sends all messages)
 	old = config->data.int_val;
-	snprintf(buf, sizeof(buf), "config %s", config->key);
+	safe_snprintf(buf, sizeof(buf), "config %s", config->key);
 	new = olc_process_type(ch, argument, config->key, buf, (const char **)config->custom_data, old);
 	
 	// no change
@@ -1086,7 +1086,7 @@ CONFIG_HANDLER(config_show_bitvector) {
 	}
 
 	// send it through the olc processor, which will display it all
-	snprintf(buf, sizeof(buf), "config %s", config->key);
+	safe_snprintf(buf, sizeof(buf), "config %s", config->key);
 	olc_process_flag(ch, "", config->key, buf, (const char **)config->custom_data, config->data.bitvector_val);
 }
 
@@ -1212,7 +1212,7 @@ CONFIG_HANDLER(config_show_type) {
 	}
 
 	// send it through the olc processor, which will display it all
-	snprintf(buf, sizeof(buf), "config %s", config->key);
+	safe_snprintf(buf, sizeof(buf), "config %s", config->key);
 	olc_process_type(ch, "", config->key, buf, (const char **)config->custom_data, config->data.int_val);
 }
 

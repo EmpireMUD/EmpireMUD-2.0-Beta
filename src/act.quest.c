@@ -544,10 +544,10 @@ char *show_daily_quest_line(char_data *ch) {
 	if (event_count > 0) {
 		event_amount = IS_NPC(ch) ? 0 : (config_get_int("dailies_per_day") - GET_EVENT_DAILY_QUESTS(ch));
 		if (event_amount > 0) {
-			snprintf(event_part, sizeof(event_part), " and %d more event %s", event_amount, event_amount != 1 ? "dailies" : "daily");
+			safe_snprintf(event_part, sizeof(event_part), " and %d more event %s", event_amount, event_amount != 1 ? "dailies" : "daily");
 		}
 		else {
-			snprintf(event_part, sizeof(event_part), " and no more event dailies");
+			safe_snprintf(event_part, sizeof(event_part), " and no more event dailies");
 		}
 	}
 	else {
@@ -693,7 +693,7 @@ void start_quest(char_data *ch, quest_data *qst, struct instance_data *inst) {
 	
 	// pre-reqs are already checked for us
 	msg_to_char(ch, "You start %s%s\t0:\r\n%s", QUEST_LEVEL_COLOR(ch, qst), QUEST_NAME(qst), NULLSAFE(QUEST_DESCRIPTION(qst)));
-	snprintf(buf, sizeof(buf), "$n starts %s.", QUEST_NAME(qst));
+	safe_snprintf(buf, sizeof(buf), "$n starts %s.", QUEST_NAME(qst));
 	act(buf, TRUE, ch, NULL, NULL, TO_ROOM);
 	
 	// set up data
@@ -910,7 +910,7 @@ QCMD(qcmd_group) {
 			
 			if (!IS_NPC(friend) && friend != ch && (fq = is_on_quest(friend, pq->vnum))) {
 				count_quest_tasks(fq->tracker, &count, &total);
-				snprintf(line + strlen(line), sizeof(line) - strlen(line), "%s%s (%d/%d)", (any ? ", " : ""), GET_NAME(friend), count, total);
+				safe_snprintf(line + strlen(line), sizeof(line) - strlen(line), "%s%s (%d/%d)", (any ? ", " : ""), GET_NAME(friend), count, total);
 				any = TRUE;
 			}
 		}
@@ -980,13 +980,13 @@ QCMD(qcmd_list) {
 			}
 			
 			if (IS_EVENT_DAILY(proto)) {
-				snprintf(typestr, sizeof(typestr), "; event daily");
+				safe_snprintf(typestr, sizeof(typestr), "; event daily");
 			}
 			else if (IS_DAILY_QUEST(proto)) {
-				snprintf(typestr, sizeof(typestr), "; daily");
+				safe_snprintf(typestr, sizeof(typestr), "; daily");
 			}
 			else if (IS_EVENT_QUEST(proto)) {
-				snprintf(typestr, sizeof(typestr), "; event");
+				safe_snprintf(typestr, sizeof(typestr), "; event");
 			}
 			else {
 				*typestr = '\0';
@@ -1059,7 +1059,7 @@ QCMD(qcmd_share) {
 		any = TRUE;
 		add_offer(friend, ch, OFFER_QUEST, pq->vnum);
 		act("You offer to share '$t' with $N.", FALSE, ch, QUEST_NAME(qst), friend, TO_CHAR | ACT_STR_OBJ);
-		snprintf(buf, sizeof(buf), "$o offers to share the quest %s%s\t0 with you (use 'accept/reject quest').", QUEST_LEVEL_COLOR(friend, qst), QUEST_NAME(qst));
+		safe_snprintf(buf, sizeof(buf), "$o offers to share the quest %s%s\t0 with you (use 'accept/reject quest').", QUEST_LEVEL_COLOR(friend, qst), QUEST_NAME(qst));
 		act(buf, FALSE, ch, QUEST_NAME(qst), friend, TO_VICT | ACT_STR_OBJ);
 	}
 	
@@ -1107,13 +1107,13 @@ QCMD(qcmd_start) {
 			}
 			
 			if (IS_EVENT_DAILY(qtl->quest)) {
-				snprintf(typestr, sizeof(typestr), " (event daily)");
+				safe_snprintf(typestr, sizeof(typestr), " (event daily)");
 			}
 			else if (IS_DAILY_QUEST(qtl->quest)) {
-				snprintf(typestr, sizeof(typestr), " (daily)");
+				safe_snprintf(typestr, sizeof(typestr), " (daily)");
 			}
 			else if (IS_EVENT_QUEST(qtl->quest)) {
-				snprintf(typestr, sizeof(typestr), " (event)");
+				safe_snprintf(typestr, sizeof(typestr), " (event)");
 			}
 			else {
 				*typestr = '\0';
@@ -1323,7 +1323,7 @@ ACMD(do_finish) {
 	// pass-thru to "quest finish <args>"
 	char temp[MAX_INPUT_LENGTH];
 	skip_spaces(&argument);
-	snprintf(temp, sizeof(temp), "finish %s", argument);
+	safe_snprintf(temp, sizeof(temp), "finish %s", argument);
 	do_quest(ch, temp, 0, 0);
 }
 
@@ -1332,6 +1332,6 @@ ACMD(do_start) {
 	// pass-thru to "quest start <args>"
 	char temp[MAX_INPUT_LENGTH];
 	skip_spaces(&argument);
-	snprintf(temp, sizeof(temp), "start %s", argument);
+	safe_snprintf(temp, sizeof(temp), "start %s", argument);
 	do_quest(ch, temp, 0, 0);
 }

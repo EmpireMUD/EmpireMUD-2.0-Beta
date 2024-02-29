@@ -594,10 +594,10 @@ char *list_one_shop(shop_data *shop, bool detail) {
 	static char output[MAX_STRING_LENGTH];
 	
 	if (detail) {
-		snprintf(output, sizeof(output), "[%5d] %s%s", SHOP_VNUM(shop), SHOP_NAME(shop), SHOP_FLAGGED(shop, SHOP_IN_DEVELOPMENT) ? " (IN-DEV)" : "");
+		safe_snprintf(output, sizeof(output), "[%5d] %s%s", SHOP_VNUM(shop), SHOP_NAME(shop), SHOP_FLAGGED(shop, SHOP_IN_DEVELOPMENT) ? " (IN-DEV)" : "");
 	}
 	else {
-		snprintf(output, sizeof(output), "[%5d] %s%s", SHOP_VNUM(shop), SHOP_NAME(shop), SHOP_FLAGGED(shop, SHOP_IN_DEVELOPMENT) ? " (IN-DEV)" : "");
+		safe_snprintf(output, sizeof(output), "[%5d] %s%s", SHOP_VNUM(shop), SHOP_NAME(shop), SHOP_FLAGGED(shop, SHOP_IN_DEVELOPMENT) ? " (IN-DEV)" : "");
 	}
 		
 	return output;
@@ -943,7 +943,7 @@ void olc_delete_shop(char_data *ch, any_vnum vnum) {
 		return;
 	}
 	
-	snprintf(name, sizeof(name), "%s", NULLSAFE(SHOP_NAME(shop)));
+	safe_snprintf(name, sizeof(name), "%s", NULLSAFE(SHOP_NAME(shop)));
 	
 	// removing live instances goes here
 	
@@ -1063,7 +1063,7 @@ void get_shop_items_display(shop_data *shop, char *save_buffer) {
 	*save_buffer = '\0';
 	LL_FOREACH(SHOP_ITEMS(shop), item) {
 		if (SHOP_ALLEGIANCE(shop) && item->min_rep != REP_NONE) {
-			snprintf(buf, sizeof(buf), " (%s)", reputation_levels[rep_const_to_index(item->min_rep)].name);
+			safe_snprintf(buf, sizeof(buf), " (%s)", reputation_levels[rep_const_to_index(item->min_rep)].name);
 		}
 		else {
 			*buf = '\0';

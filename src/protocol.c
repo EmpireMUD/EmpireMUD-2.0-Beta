@@ -350,7 +350,7 @@ static void want_reduced_color_codes(descriptor_data *desc, const char *fg, cons
 		}
 		// this happens even if the last one triggered
 		if (strcmp(fg, desc->color.want_fg) && (*desc->color.want_fg || strcmp(fg, desc->color.last_fg) || desc->color.want_clean)) {
-			snprintf(desc->color.want_fg, COLREDUC_SIZE, "%s", fg);
+			safe_snprintf(desc->color.want_fg, COLREDUC_SIZE, "%s", fg);
 		}
 	}
 	if (bg && *bg) {
@@ -361,7 +361,7 @@ static void want_reduced_color_codes(descriptor_data *desc, const char *fg, cons
 		}
 		// this happens even if the last one triggered
 		if (strcmp(bg, desc->color.want_bg) && (*desc->color.want_bg || strcmp(bg, desc->color.last_bg) || desc->color.want_clean || (*desc->color.want_fg && strstr(desc->color.want_fg, "[0;")))) {
-			snprintf(desc->color.want_bg, COLREDUC_SIZE, "%s", bg);
+			safe_snprintf(desc->color.want_bg, COLREDUC_SIZE, "%s", bg);
 		}
 	}
 }
@@ -2622,7 +2622,7 @@ static const char *GetMSSP_Areas() {
 	// map areas:
 	count += HASH_COUNT(island_table);
 	
-	snprintf(buf, sizeof(buf), "%d", count);
+	safe_snprintf(buf, sizeof(buf), "%d", count);
 	return buf;
 }
 
@@ -2680,7 +2680,7 @@ static const char *GetMSSP_DB_Size() {
 	
 	// size += HASH_COUNT(world_table);
 	
-	snprintf(buf, sizeof(buf), "%d", size);
+	safe_snprintf(buf, sizeof(buf), "%d", size);
 	return buf;
 }
 
@@ -2723,7 +2723,7 @@ static const char *GetMSSP_Extra_Descs() {
 		}
 	}
 	
-	snprintf(buf, sizeof(buf), "%d", count);
+	safe_snprintf(buf, sizeof(buf), "%d", count);
 	return buf;
 }
 
@@ -2737,19 +2737,19 @@ static const char *GetMSSP_Helpfiles() {
 		}
 	}
 	
-	snprintf(buf, sizeof(buf), "%d", count);
+	safe_snprintf(buf, sizeof(buf), "%d", count);
 	return buf;
 }
 
 static const char *GetMSSP_Hiring_Builders() {
 	static char buf[256];	
-	snprintf(buf, sizeof(buf), "%d", config_get_bool("hiring_builders") ? 1 : 0);
+	safe_snprintf(buf, sizeof(buf), "%d", config_get_bool("hiring_builders") ? 1 : 0);
 	return buf;
 }
 
 static const char *GetMSSP_Hiring_Coders() {
 	static char buf[256];	
-	snprintf(buf, sizeof(buf), "%d", config_get_bool("hiring_coders") ? 1 : 0);
+	safe_snprintf(buf, sizeof(buf), "%d", config_get_bool("hiring_coders") ? 1 : 0);
 	return buf;
 }
 
@@ -2777,7 +2777,7 @@ static const char *GetMSSP_Levels() {
 		}
 	}
 	
-	snprintf(buf, sizeof(buf), "%d", max);
+	safe_snprintf(buf, sizeof(buf), "%d", max);
 	return buf;
 }
 
@@ -2791,7 +2791,7 @@ static const char *GetMSSP_Minimum_Age() {
 
 static const char *GetMSSP_Mobiles() {
 	static char buf[256];
-	snprintf(buf, sizeof(buf), "%d", HASH_COUNT(mobile_table));
+	safe_snprintf(buf, sizeof(buf), "%d", HASH_COUNT(mobile_table));
 	return buf;
 }
 
@@ -2801,7 +2801,7 @@ static const char *GetMSSP_MudName() {
 
 static const char *GetMSSP_Objects() {
 	static char buf[256];
-	snprintf(buf, sizeof(buf), "%d", HASH_COUNT(object_table));
+	safe_snprintf(buf, sizeof(buf), "%d", HASH_COUNT(object_table));
 	return buf;
 }
 
@@ -2814,13 +2814,13 @@ static const char *GetMSSP_Players() {
 static const char *GetMSSP_Port() {
 	extern ush_int port;	// comm.c
 	static char buf[32];
-	snprintf(buf, sizeof(buf), "%d", port);
+	safe_snprintf(buf, sizeof(buf), "%d", port);
 	return buf;
 }
 
 static const char *GetMSSP_Rooms() {
 	static char buf[256];
-	snprintf(buf, sizeof(buf), "%d", HASH_COUNT(world_table));
+	safe_snprintf(buf, sizeof(buf), "%d", HASH_COUNT(world_table));
 	return buf;
 }
 
@@ -2828,7 +2828,7 @@ static const char *GetMSSP_Skills() {
 	static char buf[256];
 	
 	// we think this refers more to our concept of "abilities" than "skills"
-	snprintf(buf, sizeof(buf), "%d", HASH_COUNT(ability_table));
+	safe_snprintf(buf, sizeof(buf), "%d", HASH_COUNT(ability_table));
 	return buf;
 }
 
@@ -2838,7 +2838,7 @@ static const char *GetMSSP_Status() {
 
 static const char *GetMSSP_Triggers() {
 	static char buf[256];
-	snprintf(buf, sizeof(buf), "%d", HASH_COUNT(trigger_table));
+	safe_snprintf(buf, sizeof(buf), "%d", HASH_COUNT(trigger_table));
 	return buf;
 }
 
@@ -3247,7 +3247,7 @@ void update_MSDP_attributes(char_data *ch, int send_update) {
 		MSDPSetNumber(ch->desc, eMSDP_BLOCK, get_block_rating(ch, FALSE));
 		MSDPSetNumber(ch->desc, eMSDP_DODGE, get_dodge_modifier(ch, NULL, FALSE) - (hit_per_dex * GET_DEXTERITY(ch)));	// same change made to it in score
 		MSDPSetNumber(ch->desc, eMSDP_TO_HIT, get_to_hit(ch, NULL, FALSE, FALSE) - (hit_per_dex * GET_DEXTERITY(ch)));	// same change as in score
-		snprintf(buf, sizeof(buf), "%.2f", get_combat_speed(ch, WEAR_WIELD));
+		safe_snprintf(buf, sizeof(buf), "%.2f", get_combat_speed(ch, WEAR_WIELD));
 		MSDPSetString(ch->desc, eMSDP_SPEED, buf);
 		MSDPSetNumber(ch->desc, eMSDP_RESIST_PHYSICAL, GET_RESIST_PHYSICAL(ch));
 		MSDPSetNumber(ch->desc, eMSDP_RESIST_MAGICAL, GET_RESIST_MAGICAL(ch));

@@ -318,12 +318,12 @@ void perform_alternate(char_data *old, char_data *new) {
 	old_emp = GET_LOYALTY(old);
 	
 	// prepare logs
-	snprintf(sys, sizeof(sys), "%s used alternate at %s to switch to %s", GET_NAME(old), (IN_ROOM(old) ? room_log_identifier(IN_ROOM(old)) : "an unknown location"), GET_NAME(new));
+	safe_snprintf(sys, sizeof(sys), "%s used alternate at %s to switch to %s", GET_NAME(old), (IN_ROOM(old) ? room_log_identifier(IN_ROOM(old)) : "an unknown location"), GET_NAME(new));
 
 	strcpy(temp, PERS(new, new, TRUE));
-	snprintf(mort_alt, sizeof(mort_alt), "%s has switched to %s", PERS(old, old, TRUE), temp);
-	snprintf(mort_in, sizeof(mort_in), "%s has entered the game", temp);
-	snprintf(mort_out, sizeof(mort_in), "%s has left the game", PERS(old, old, TRUE));
+	safe_snprintf(mort_alt, sizeof(mort_alt), "%s has switched to %s", PERS(old, old, TRUE), temp);
+	safe_snprintf(mort_in, sizeof(mort_in), "%s has entered the game", temp);
+	safe_snprintf(mort_out, sizeof(mort_in), "%s has left the game", PERS(old, old, TRUE));
 	
 	// peace out
 	if (!GET_INVIS_LEV(old)) {
@@ -563,11 +563,11 @@ static void print_group(char_data *ch) {
 			// show class section if they have one
 			if (!IS_NPC(k)) {
 				get_player_skill_string(k, skills, TRUE);
-				snprintf(class, sizeof(class), "/%s", skills);
+				safe_snprintf(class, sizeof(class), "/%s", skills);
 				
 				// screenreader sees role here; otherwise the name is highlighted
 				if (PRF_FLAGGED(ch, PRF_SCREEN_READER)) {
-					snprintf(class + strlen(class), sizeof(class) - strlen(class), "/%s", class_role[(int) GET_CLASS_ROLE(k)]);
+					safe_snprintf(class + strlen(class), sizeof(class) - strlen(class), "/%s", class_role[(int) GET_CLASS_ROLE(k)]);
 				}
 			}
 			else {
@@ -577,16 +577,16 @@ static void print_group(char_data *ch) {
 			// warnings
 			*alerts = '\0';
 			if (IS_DEAD(k)) {
-				snprintf(alerts, sizeof(alerts), " &r(dead)&0");
+				safe_snprintf(alerts, sizeof(alerts), " &r(dead)&0");
 			}
 			
 			// show location if different
 			if (IN_ROOM(k) != IN_ROOM(ch)) {
 				if (HAS_NAVIGATION(ch) && (IS_NPC(k) || HAS_NAVIGATION(k))) {
-					snprintf(loc, sizeof(loc), " - %s%s", get_room_name(IN_ROOM(k), FALSE), coord_display_room(ch, IN_ROOM(k), FALSE));
+					safe_snprintf(loc, sizeof(loc), " - %s%s", get_room_name(IN_ROOM(k), FALSE), coord_display_room(ch, IN_ROOM(k), FALSE));
 				}
 				else {
-					snprintf(loc, sizeof(loc), " - %s", get_room_name(IN_ROOM(k), FALSE));
+					safe_snprintf(loc, sizeof(loc), " - %s", get_room_name(IN_ROOM(k), FALSE));
 				}
 			}
 			else {
@@ -1104,7 +1104,7 @@ void alt_import_slash_channels(char_data *ch, char_data *alt) {
 	// if not in the game, slash channels are here
 	LL_FOREACH(LOAD_SLASH_CHANNELS(alt), load_slash) {
 		if ((chan = find_slash_channel_by_name(load_slash->name, TRUE)) && !find_on_slash_channel(ch, chan->id)) {
-			snprintf(buf, sizeof(buf), "join %s", chan->name);
+			safe_snprintf(buf, sizeof(buf), "join %s", chan->name);
 			do_slash_channel(ch, buf, 0, 0);
 			imported = TRUE;
 		}
@@ -1113,7 +1113,7 @@ void alt_import_slash_channels(char_data *ch, char_data *alt) {
 	// if in-game, slash channels are here
 	LL_FOREACH(GET_SLASH_CHANNELS(alt), iter) {
 		if (!find_on_slash_channel(ch, iter->id) && (chan = find_slash_channel_by_id(iter->id))) {
-			snprintf(buf, sizeof(buf), "join %s", chan->name);
+			safe_snprintf(buf, sizeof(buf), "join %s", chan->name);
 			do_slash_channel(ch, buf, 0, 0);
 			imported = TRUE;
 		}
@@ -1465,7 +1465,7 @@ ACMD(do_accept) {
 	else {
 		msg_to_char(ch, "You reject the offer for %s.\r\n", offer_types[type].name);
 		if ((from = is_playing(offer->from))) {
-			snprintf(buf, sizeof(buf), "$N has rejected your offer for %s.", offer_types[type].name);
+			safe_snprintf(buf, sizeof(buf), "$N has rejected your offer for %s.", offer_types[type].name);
 			act(buf, FALSE, from, NULL, ch, TO_CHAR);
 		}
 		delete = TRUE;
@@ -2093,7 +2093,7 @@ ACMD(do_fightmessages) {
 	}
 	
 	if (!*argument) {
-		snprintf(buf, sizeof(buf), "%s message toggles:\r\n", message_type[subcmd]);
+		safe_snprintf(buf, sizeof(buf), "%s message toggles:\r\n", message_type[subcmd]);
 		send_to_char(CAP(buf), ch);
 		
 		count = 0;
@@ -2208,16 +2208,16 @@ ACMD(do_gen_write) {
 	}
 	
 	if (GET_ROOM_TEMPLATE(IN_ROOM(ch))) {
-		snprintf(locpart, sizeof(locpart), " [RMT%d]", GET_RMT_VNUM(GET_ROOM_TEMPLATE(IN_ROOM(ch))));
+		safe_snprintf(locpart, sizeof(locpart), " [RMT%d]", GET_RMT_VNUM(GET_ROOM_TEMPLATE(IN_ROOM(ch))));
 	}
 	else if (GET_BUILDING(IN_ROOM(ch))) {
-		snprintf(locpart, sizeof(locpart), " [BLD%d]", GET_BLD_VNUM(GET_BUILDING(IN_ROOM(ch))));
+		safe_snprintf(locpart, sizeof(locpart), " [BLD%d]", GET_BLD_VNUM(GET_BUILDING(IN_ROOM(ch))));
 	}
 	else if ((cp = ROOM_CROP(IN_ROOM(ch)))) {
-		snprintf(locpart, sizeof(locpart), " [CRP%d]", GET_CROP_VNUM(cp));
+		safe_snprintf(locpart, sizeof(locpart), " [CRP%d]", GET_CROP_VNUM(cp));
 	}
 	else {
-		snprintf(locpart, sizeof(locpart), " [%d]", GET_ROOM_VNUM(IN_ROOM(ch)));
+		safe_snprintf(locpart, sizeof(locpart), " [%d]", GET_ROOM_VNUM(IN_ROOM(ch)));
 	}
 	
 	fprintf(fl, "%-8s (%6.6s)%s %s\n", GET_NAME(ch), (tmp + 4), locpart, argument);

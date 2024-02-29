@@ -152,8 +152,8 @@ INTERACTION_FUNC(combine_obj_interact) {
 		return TRUE;
 	}
 	
-	snprintf(to_char, sizeof(to_char), "You combine %dx %s into $p!", interaction->quantity, skip_filler(GET_OBJ_SHORT_DESC(inter_item)));
-	snprintf(to_room, sizeof(to_room), "$n combines %dx %s into $p!", interaction->quantity, skip_filler(GET_OBJ_SHORT_DESC(inter_item)));
+	safe_snprintf(to_char, sizeof(to_char), "You combine %dx %s into $p!", interaction->quantity, skip_filler(GET_OBJ_SHORT_DESC(inter_item)));
+	safe_snprintf(to_room, sizeof(to_room), "$n combines %dx %s into $p!", interaction->quantity, skip_filler(GET_OBJ_SHORT_DESC(inter_item)));
 	
 	new_obj = read_object(interaction->vnum, TRUE);
 	scale_item_to_level(new_obj, GET_OBJ_CURRENT_SCALE_LEVEL(inter_item));
@@ -534,10 +534,10 @@ INTERACTION_FUNC(identifies_to_interact) {
 	bitvector_t preserve_flags = OBJ_SEEDED | OBJ_CREATED | OBJ_KEEP;
 	
 	if (interaction->quantity > 1) {
-		snprintf(to_char, sizeof(to_char), "%s turns out to be %s (x%d)!", GET_OBJ_SHORT_DESC(inter_item), get_obj_name_by_proto(interaction->vnum), interaction->quantity);
+		safe_snprintf(to_char, sizeof(to_char), "%s turns out to be %s (x%d)!", GET_OBJ_SHORT_DESC(inter_item), get_obj_name_by_proto(interaction->vnum), interaction->quantity);
 	}
 	else {	// only 1
-		snprintf(to_char, sizeof(to_char), "%s turns out to be %s!", GET_OBJ_SHORT_DESC(inter_item), get_obj_name_by_proto(interaction->vnum));
+		safe_snprintf(to_char, sizeof(to_char), "%s turns out to be %s!", GET_OBJ_SHORT_DESC(inter_item), get_obj_name_by_proto(interaction->vnum));
 	}
 	act(to_char, FALSE, ch, NULL, NULL, TO_CHAR | TO_QUEUE);
 	
@@ -671,23 +671,23 @@ void identify_obj_to_char(obj_data *obj, char_data *ch, bool simple) {
 		strcpy(location, " (in room)");
 	}
 	else if (obj->carried_by) {
-		snprintf(location, sizeof(location), ", carried by %s,", PERS(obj->carried_by, obj->carried_by, FALSE));
+		safe_snprintf(location, sizeof(location), ", carried by %s,", PERS(obj->carried_by, obj->carried_by, FALSE));
 	}
 	else if (obj->in_vehicle) {
-		snprintf(location, sizeof(location), ", in %s,", get_vehicle_short_desc(obj->in_vehicle, ch));
+		safe_snprintf(location, sizeof(location), ", in %s,", get_vehicle_short_desc(obj->in_vehicle, ch));
 	}
 	else if (obj->in_obj) {
-		snprintf(location, sizeof(location), ", in %s,", GET_OBJ_DESC(obj->in_obj, ch, OBJ_DESC_SHORT));
+		safe_snprintf(location, sizeof(location), ", in %s,", GET_OBJ_DESC(obj->in_obj, ch, OBJ_DESC_SHORT));
 	}
 	else if (obj->worn_by) {
-		snprintf(location, sizeof(location), ", worn by %s,", PERS(obj->worn_by, obj->worn_by, FALSE));
+		safe_snprintf(location, sizeof(location), ", worn by %s,", PERS(obj->worn_by, obj->worn_by, FALSE));
 	}
 	else {
 		*location = '\0';
 	}
 	
 	// basic info
-	snprintf(lbuf, sizeof(lbuf), "Your analysis of %s$p\t0%s reveals:", obj_color_by_quality(obj, ch), location);
+	safe_snprintf(lbuf, sizeof(lbuf), "Your analysis of %s$p\t0%s reveals:", obj_color_by_quality(obj, ch), location);
 	act(lbuf, FALSE, ch, obj, NULL, TO_CHAR);
 	
 	if (!simple && GET_OBJ_REQUIRES_QUEST(obj) != NOTHING) {
@@ -744,14 +744,14 @@ void identify_obj_to_char(obj_data *obj, char_data *ch, bool simple) {
 			}
 		}
 		
-		snprintf(lbuf, sizeof(lbuf), "Storage locations:");
+		safe_snprintf(lbuf, sizeof(lbuf), "Storage locations:");
 		found = 0;
 		HASH_SORT(str_hash, sort_string_hash);
 		HASH_ITER(hh, str_hash, str_iter, next_str) {
 			if (next_str && !str_cmp(str_iter->str, next_str->str)) {
 				continue;	// avoid case-sensitive dupes
 			}
-			snprintf(lbuf + strlen(lbuf), sizeof(lbuf) - strlen(lbuf), "%s%s", (found++ > 0 ? ", " : " "), str_iter->str);
+			safe_snprintf(lbuf + strlen(lbuf), sizeof(lbuf) - strlen(lbuf), "%s%s", (found++ > 0 ? ", " : " "), str_iter->str);
 		}
 		free_string_hash(&str_hash);
 		if (strlen(lbuf) < sizeof(lbuf) + 2) {
@@ -884,7 +884,7 @@ void identify_obj_to_char(obj_data *obj, char_data *ch, bool simple) {
 		case ITEM_DRINKCON:
 			if (GET_DRINK_CONTAINER_CONTENTS(obj) > 0) {
 				if (liquid_flagged(GET_DRINK_CONTAINER_TYPE(obj), LIQF_WATER) && !str_str(get_generic_string_by_vnum(GET_DRINK_CONTAINER_TYPE(obj), GENERIC_LIQUID, GSTR_LIQUID_NAME), "water")) {
-					snprintf(part, sizeof(part), " (water)");
+					safe_snprintf(part, sizeof(part), " (water)");
 				}
 				else {
 					*part = '\0';
@@ -995,10 +995,10 @@ void identify_obj_to_char(obj_data *obj, char_data *ch, bool simple) {
 		}
 		case ITEM_LIGHT: {
 			if (GET_LIGHT_HOURS_REMAINING(obj) == UNLIMITED) {
-				snprintf(part, sizeof(part), "does not burn out");
+				safe_snprintf(part, sizeof(part), "does not burn out");
 			}
 			else {
-				snprintf(part, sizeof(part), "has %d hour%s of light remaining", GET_LIGHT_HOURS_REMAINING(obj), PLURAL(GET_LIGHT_HOURS_REMAINING(obj)));
+				safe_snprintf(part, sizeof(part), "has %d hour%s of light remaining", GET_LIGHT_HOURS_REMAINING(obj), PLURAL(GET_LIGHT_HOURS_REMAINING(obj)));
 			}
 			msg_to_char(ch, "It %s (%s).\r\n", part, (GET_LIGHT_IS_LIT(obj) ? "lit" : "unlit"));
 			prettier_sprintbit(GET_LIGHT_FLAGS(obj), light_flags_for_identify, part);
@@ -1019,28 +1019,28 @@ void identify_obj_to_char(obj_data *obj, char_data *ch, bool simple) {
 	if (!simple) {
 		*lbuf = '\0';
 		if (has_interaction(GET_OBJ_INTERACTIONS(obj), INTERACT_COMBINE)) {
-			snprintf(lbuf + strlen(lbuf), sizeof(lbuf) - strlen(lbuf), "%s combined", *lbuf ? "," : "");
+			safe_snprintf(lbuf + strlen(lbuf), sizeof(lbuf) - strlen(lbuf), "%s combined", *lbuf ? "," : "");
 		}
 		if (has_interaction(GET_OBJ_INTERACTIONS(obj), INTERACT_SEPARATE)) {
-			snprintf(lbuf + strlen(lbuf), sizeof(lbuf) - strlen(lbuf), "%s separated", *lbuf ? "," : "");
+			safe_snprintf(lbuf + strlen(lbuf), sizeof(lbuf) - strlen(lbuf), "%s separated", *lbuf ? "," : "");
 		}
 		if (CAN_LIGHT_OBJ(obj)) {
-			snprintf(lbuf + strlen(lbuf), sizeof(lbuf) - strlen(lbuf), "%s lit", *lbuf ? "," : "");
+			safe_snprintf(lbuf + strlen(lbuf), sizeof(lbuf) - strlen(lbuf), "%s lit", *lbuf ? "," : "");
 		}
 		if (has_interaction(GET_OBJ_INTERACTIONS(obj), INTERACT_SCRAPE)) {
-			snprintf(lbuf + strlen(lbuf), sizeof(lbuf) - strlen(lbuf), "%s scraped", *lbuf ? "," : "");
+			safe_snprintf(lbuf + strlen(lbuf), sizeof(lbuf) - strlen(lbuf), "%s scraped", *lbuf ? "," : "");
 		}
 		if (has_interaction(GET_OBJ_INTERACTIONS(obj), INTERACT_SAW)) {
-			snprintf(lbuf + strlen(lbuf), sizeof(lbuf) - strlen(lbuf), "%s sawed", *lbuf ? "," : "");
+			safe_snprintf(lbuf + strlen(lbuf), sizeof(lbuf) - strlen(lbuf), "%s sawed", *lbuf ? "," : "");
 		}
 		if (has_interaction(GET_OBJ_INTERACTIONS(obj), INTERACT_TAN)) {
-			snprintf(lbuf + strlen(lbuf), sizeof(lbuf) - strlen(lbuf), "%s tanned", *lbuf ? "," : "");
+			safe_snprintf(lbuf + strlen(lbuf), sizeof(lbuf) - strlen(lbuf), "%s tanned", *lbuf ? "," : "");
 		}
 		if (has_interaction(GET_OBJ_INTERACTIONS(obj), INTERACT_CHIP)) {
-			snprintf(lbuf + strlen(lbuf), sizeof(lbuf) - strlen(lbuf), "%s chipped", *lbuf ? "," : "");
+			safe_snprintf(lbuf + strlen(lbuf), sizeof(lbuf) - strlen(lbuf), "%s chipped", *lbuf ? "," : "");
 		}
 		if (has_interaction(GET_OBJ_INTERACTIONS(obj), INTERACT_SEED) && !OBJ_FLAGGED(obj, OBJ_SEEDED)) {
-			snprintf(lbuf + strlen(lbuf), sizeof(lbuf) - strlen(lbuf), "%s seeded", *lbuf ? "," : "");
+			safe_snprintf(lbuf + strlen(lbuf), sizeof(lbuf) - strlen(lbuf), "%s seeded", *lbuf ? "," : "");
 		}
 		
 		// show it
@@ -1606,15 +1606,15 @@ INTERACTION_FUNC(seed_obj_interact) {
 	int iter;
 	
 	if (interaction->quantity) {
-		snprintf(to_char, sizeof(to_char), "You seed %s and get %s (x%d)!", GET_OBJ_SHORT_DESC(inter_item), get_obj_name_by_proto(interaction->vnum), interaction->quantity);
+		safe_snprintf(to_char, sizeof(to_char), "You seed %s and get %s (x%d)!", GET_OBJ_SHORT_DESC(inter_item), get_obj_name_by_proto(interaction->vnum), interaction->quantity);
 		act(to_char, FALSE, ch, NULL, NULL, TO_CHAR);
-		snprintf(to_room, sizeof(to_room), "$n seeds %s and gets %s (x%d)!", GET_OBJ_SHORT_DESC(inter_item), get_obj_name_by_proto(interaction->vnum), interaction->quantity);
+		safe_snprintf(to_room, sizeof(to_room), "$n seeds %s and gets %s (x%d)!", GET_OBJ_SHORT_DESC(inter_item), get_obj_name_by_proto(interaction->vnum), interaction->quantity);
 		act(to_room, TRUE, ch, NULL, NULL, TO_ROOM);
 	}
 	else {
-		snprintf(to_char, sizeof(to_char), "You seed %s and get %s!", GET_OBJ_SHORT_DESC(inter_item), get_obj_name_by_proto(interaction->vnum));
+		safe_snprintf(to_char, sizeof(to_char), "You seed %s and get %s!", GET_OBJ_SHORT_DESC(inter_item), get_obj_name_by_proto(interaction->vnum));
 		act(to_char, FALSE, ch, NULL, NULL, TO_CHAR);
-		snprintf(to_room, sizeof(to_room), "$n seeds %s and gets %s!", GET_OBJ_SHORT_DESC(inter_item), get_obj_name_by_proto(interaction->vnum));
+		safe_snprintf(to_room, sizeof(to_room), "$n seeds %s and gets %s!", GET_OBJ_SHORT_DESC(inter_item), get_obj_name_by_proto(interaction->vnum));
 		act(to_room, TRUE, ch, NULL, NULL, TO_ROOM);
 	}
 	
@@ -1660,9 +1660,9 @@ INTERACTION_FUNC(separate_obj_interact) {
 	// flags to keep on separate
 	bitvector_t preserve_flags = OBJ_SEEDED | OBJ_NO_BASIC_STORAGE | OBJ_NO_WAREHOUSE | OBJ_CREATED;
 	
-	snprintf(to_char, sizeof(to_char), "You separate %s into %s (x%d)!", GET_OBJ_SHORT_DESC(inter_item), get_obj_name_by_proto(interaction->vnum), interaction->quantity);
+	safe_snprintf(to_char, sizeof(to_char), "You separate %s into %s (x%d)!", GET_OBJ_SHORT_DESC(inter_item), get_obj_name_by_proto(interaction->vnum), interaction->quantity);
 	act(to_char, FALSE, ch, NULL, NULL, TO_CHAR);
-	snprintf(to_room, sizeof(to_room), "$n separates %s into %s (x%d)!", GET_OBJ_SHORT_DESC(inter_item), get_obj_name_by_proto(interaction->vnum), interaction->quantity);
+	safe_snprintf(to_room, sizeof(to_room), "$n separates %s into %s (x%d)!", GET_OBJ_SHORT_DESC(inter_item), get_obj_name_by_proto(interaction->vnum), interaction->quantity);
 	act(to_room, TRUE, ch, NULL, NULL, TO_ROOM);
 	
 	if (GET_LOYALTY(ch)) {
@@ -2052,7 +2052,7 @@ static void perform_drop_coins(char_data *ch, empire_data *type, int amount, byt
 			}
 		}
 		else {
-			snprintf(buf, sizeof(buf), "$n drops %s which disappear%s in a puff of smoke!", money_desc(type, amount), (amount == 1 ? "s" : ""));
+			safe_snprintf(buf, sizeof(buf), "$n drops %s which disappear%s in a puff of smoke!", money_desc(type, amount), (amount == 1 ? "s" : ""));
 			act(buf, FALSE, ch, 0, 0, TO_ROOM | TO_QUEUE);
 
 			stack_msg_to_desc(ch->desc, "You drop %s which disappear%s in a puff of smoke!\r\n", (amount != 1 ? "some coins" : "a coin"), (amount == 1 ? "s" : ""));
@@ -2996,7 +2996,7 @@ static void perform_give_coins(char_data *ch, char_data *vict, empire_data *type
 			}
 		}
 
-		snprintf(buf, sizeof(buf), "$n gives you %d in various coin%s.", amount, amount == 1 ? "" : "s");
+		safe_snprintf(buf, sizeof(buf), "$n gives you %d in various coin%s.", amount, amount == 1 ? "" : "s");
 		act(buf, FALSE, ch, NULL, vict, TO_VICT | TO_QUEUE);
 		// to-room/char messages below
 	}
@@ -3014,7 +3014,7 @@ static void perform_give_coins(char_data *ch, char_data *vict, empire_data *type
 		decrease_coins(ch, type, amount);
 		increase_coins(vict, type, amount);
 		
-		snprintf(buf, sizeof(buf), "$n gives you %s.", money_amount(type, amount));
+		safe_snprintf(buf, sizeof(buf), "$n gives you %s.", money_amount(type, amount));
 		act(buf, FALSE, ch, NULL, vict, TO_VICT | TO_QUEUE);
 		// to-room/char messages below
 	}
@@ -3024,11 +3024,11 @@ static void perform_give_coins(char_data *ch, char_data *vict, empire_data *type
 	}
 	
 	// msg to char
-	snprintf(buf, sizeof(buf), "You give %s to $N.", money_desc(type, amount));
+	safe_snprintf(buf, sizeof(buf), "You give %s to $N.", money_desc(type, amount));
 	act(buf, FALSE, ch, NULL, vict, TO_CHAR | TO_QUEUE);
 
 	// msg to room
-	snprintf(buf, sizeof(buf), "$n gives %s to $N.", money_desc(type, amount));
+	safe_snprintf(buf, sizeof(buf), "$n gives %s to $N.", money_desc(type, amount));
 	act(buf, TRUE, ch, NULL, vict, TO_NOTVICT | TO_QUEUE);
 }
 
@@ -3058,7 +3058,7 @@ static void drink_message(char_data *ch, obj_data *obj, byte type, int subcmd, i
 		case drink_OBJ: {
 			// message to char
 			if (subcmd == SCMD_SIP) {
-				snprintf(buf, sizeof(buf), "You sip the %s liquid from $p.", get_generic_string_by_vnum(GET_DRINK_CONTAINER_TYPE(obj), GENERIC_LIQUID, GSTR_LIQUID_COLOR));
+				safe_snprintf(buf, sizeof(buf), "You sip the %s liquid from $p.", get_generic_string_by_vnum(GET_DRINK_CONTAINER_TYPE(obj), GENERIC_LIQUID, GSTR_LIQUID_COLOR));
 				act(buf, FALSE, ch, obj, NULL, TO_CHAR);
 			}
 			else if (obj_has_custom_message(obj, OBJ_CUSTOM_CONSUME_TO_CHAR)) {
@@ -3934,7 +3934,7 @@ void move_ship_to_destination(empire_data *emp, struct shipping_data *shipd, roo
 	}
 	
 	if (ROOM_PEOPLE(IN_ROOM(boat))) {
-		snprintf(buf, sizeof(buf), "$V %s away.", mob_move_types[VEH_MOVE_TYPE(boat)]);
+		safe_snprintf(buf, sizeof(buf), "$V %s away.", mob_move_types[VEH_MOVE_TYPE(boat)]);
 		act(buf, FALSE, ROOM_PEOPLE(IN_ROOM(boat)), NULL, boat, TO_CHAR | TO_ROOM | TO_QUEUE | ACT_VEH_VICT);
 	}
 	
@@ -3942,7 +3942,7 @@ void move_ship_to_destination(empire_data *emp, struct shipping_data *shipd, roo
 	vehicle_to_room(boat, to_room);
 	
 	if (ROOM_PEOPLE(IN_ROOM(boat))) {
-		snprintf(buf, sizeof(buf), "$V %s in.", mob_move_types[VEH_MOVE_TYPE(boat)]);
+		safe_snprintf(buf, sizeof(buf), "$V %s in.", mob_move_types[VEH_MOVE_TYPE(boat)]);
 		act(buf, FALSE, ROOM_PEOPLE(IN_ROOM(boat)), NULL, boat, TO_CHAR | TO_ROOM | TO_QUEUE | ACT_VEH_VICT);
 	}
 	
@@ -4077,7 +4077,7 @@ void sail_shipment(empire_data *emp, vehicle_data *boat) {
 	}
 	
 	if (ROOM_PEOPLE(IN_ROOM(boat))) {
-		snprintf(buf, sizeof(buf), "$V %s away.", mob_move_types[VEH_MOVE_TYPE(boat)]);
+		safe_snprintf(buf, sizeof(buf), "$V %s away.", mob_move_types[VEH_MOVE_TYPE(boat)]);
 		act(buf, FALSE, ROOM_PEOPLE(IN_ROOM(boat)), NULL, boat, TO_CHAR | TO_ROOM | TO_QUEUE | ACT_VEH_VICT);
 	}
 	
@@ -4085,7 +4085,7 @@ void sail_shipment(empire_data *emp, vehicle_data *boat) {
 	vehicle_to_room(boat, get_ship_pen());
 	
 	if (ROOM_PEOPLE(IN_ROOM(boat))) {
-		snprintf(buf, sizeof(buf), "$V %s in.", mob_move_types[VEH_MOVE_TYPE(boat)]);
+		safe_snprintf(buf, sizeof(buf), "$V %s in.", mob_move_types[VEH_MOVE_TYPE(boat)]);
 		act(buf, FALSE, ROOM_PEOPLE(IN_ROOM(boat)), NULL, boat, TO_CHAR | TO_ROOM | TO_QUEUE | ACT_VEH_VICT);
 	}
 	
@@ -4195,7 +4195,7 @@ void trade_check(char_data *ch, char *argument) {
 		
 		// parts
 		if (GET_OBJ_CURRENT_SCALE_LEVEL(tpd->obj)) {
-			snprintf(scale, sizeof(scale), " (lvl %d)", GET_OBJ_CURRENT_SCALE_LEVEL(tpd->obj));
+			safe_snprintf(scale, sizeof(scale), " (lvl %d)", GET_OBJ_CURRENT_SCALE_LEVEL(tpd->obj));
 		}
 		else {
 			*scale = '\0';
@@ -4252,7 +4252,7 @@ void trade_list(char_data *ch, char *argument) {
 		
 		// parts
 		if (GET_OBJ_CURRENT_SCALE_LEVEL(tpd->obj)) {
-			snprintf(scale, sizeof(scale), " (lvl %d)", GET_OBJ_CURRENT_SCALE_LEVEL(tpd->obj));
+			safe_snprintf(scale, sizeof(scale), " (lvl %d)", GET_OBJ_CURRENT_SCALE_LEVEL(tpd->obj));
 		}
 		else {
 			*scale = '\0';
@@ -4267,7 +4267,7 @@ void trade_list(char_data *ch, char *argument) {
 		
 		if (rate != 1.0) {
 			my_cost = ceil(tpd->buy_cost * 1.0/rate);
-			snprintf(exchange, sizeof(exchange), " (%d)", my_cost);
+			safe_snprintf(exchange, sizeof(exchange), " (%d)", my_cost);
 		}
 		else {
 			*exchange = '\0';
@@ -4622,9 +4622,9 @@ void trade_post(char_data *ch, char *argument) {
 	}
 	else {
 		// success!
-		snprintf(buf, sizeof(buf), "You post $p for %s, for %d hour%s.", money_amount(GET_LOYALTY(ch), cost), length, PLURAL(length));
+		safe_snprintf(buf, sizeof(buf), "You post $p for %s, for %d hour%s.", money_amount(GET_LOYALTY(ch), cost), length, PLURAL(length));
 		act(buf, FALSE, ch, obj, NULL, TO_CHAR);
-		snprintf(buf, sizeof(buf), "$n posts $p for %s, for %d hour%s.", money_amount(GET_LOYALTY(ch), cost), length, PLURAL(length));
+		safe_snprintf(buf, sizeof(buf), "$n posts $p for %s, for %d hour%s.", money_amount(GET_LOYALTY(ch), cost), length, PLURAL(length));
 		act(buf, FALSE, ch, obj, NULL, TO_ROOM | TO_SPAMMY);
 		
 		charge_coins(ch, GET_LOYALTY(ch), post_cost, NULL, NULL);
@@ -4714,7 +4714,7 @@ void warehouse_inventory(char_data *ch, char *argument, int mode) {
 	}
 
 	if (*argument) {
-		snprintf(part, sizeof(part), "\"%s\"", argument);
+		safe_snprintf(part, sizeof(part), "\"%s\"", argument);
 	}
 	else {
 		strcpy(part, "Unique");	// size ok
@@ -4744,14 +4744,14 @@ void warehouse_inventory(char_data *ch, char *argument, int mode) {
 		
 		if (iter->flags) {
 			prettier_sprintbit(iter->flags, unique_storage_flags, flags);
-			snprintf(part, sizeof(part), " [%s]", flags);
+			safe_snprintf(part, sizeof(part), " [%s]", flags);
 		}
 		else {
 			*part = '\0';
 		}
 		
 		if (iter->amount != 1) {
-			snprintf(quantity, sizeof(quantity), " (x%d)", iter->amount);
+			safe_snprintf(quantity, sizeof(quantity), " (x%d)", iter->amount);
 		}
 		else {
 			*quantity = '\0';
@@ -5566,10 +5566,10 @@ ACMD(do_drink) {
 					DL_FOREACH2(check_list[iter], obj, next_content) {
 						if (IS_DRINK_CONTAINER(obj)) {
 							if (GET_DRINK_CONTAINER_CONTENTS(obj) > 0) {
-								snprintf(line, sizeof(line), "%s - %d drink%s of %s", GET_OBJ_DESC(obj, ch, OBJ_DESC_SHORT), GET_DRINK_CONTAINER_CONTENTS(obj), PLURAL(GET_DRINK_CONTAINER_CONTENTS(obj)), get_generic_string_by_vnum(GET_DRINK_CONTAINER_TYPE(obj), GENERIC_LIQUID, GSTR_LIQUID_NAME));
+								safe_snprintf(line, sizeof(line), "%s - %d drink%s of %s", GET_OBJ_DESC(obj, ch, OBJ_DESC_SHORT), GET_DRINK_CONTAINER_CONTENTS(obj), PLURAL(GET_DRINK_CONTAINER_CONTENTS(obj)), get_generic_string_by_vnum(GET_DRINK_CONTAINER_TYPE(obj), GENERIC_LIQUID, GSTR_LIQUID_NAME));
 							}
 							else {
-								snprintf(line, sizeof(line), "%s - empty", GET_OBJ_DESC(obj, ch, OBJ_DESC_SHORT));
+								safe_snprintf(line, sizeof(line), "%s - empty", GET_OBJ_DESC(obj, ch, OBJ_DESC_SHORT));
 							}
 							add_string_hash(&str_hash, line, 1);
 						}
@@ -5585,7 +5585,7 @@ ACMD(do_drink) {
 			if (str_hash) {
 				// show thirst?
 				if ((thirst_str = how_thirsty(ch))) {
-					snprintf(part, sizeof(part), " (you are %s)", thirst_str);
+					safe_snprintf(part, sizeof(part), " (you are %s)", thirst_str);
 				}
 				else {
 					*part = '\0';
@@ -5985,7 +5985,7 @@ ACMD(do_eat) {
 			if (check_list[iter]) {
 				DL_FOREACH2(check_list[iter], obj, next_content) {
 					if (IS_FOOD(obj)) {
-						snprintf(line, sizeof(line), "%s - %d hour%s%s", GET_OBJ_DESC(obj, ch, OBJ_DESC_SHORT), GET_FOOD_HOURS_OF_FULLNESS(obj), PLURAL(GET_FOOD_HOURS_OF_FULLNESS(obj)), (GET_OBJ_APPLIES(obj) || GET_OBJ_AFF_FLAGS(obj)) ? ", buff" : "");
+						safe_snprintf(line, sizeof(line), "%s - %d hour%s%s", GET_OBJ_DESC(obj, ch, OBJ_DESC_SHORT), GET_FOOD_HOURS_OF_FULLNESS(obj), PLURAL(GET_FOOD_HOURS_OF_FULLNESS(obj)), (GET_OBJ_APPLIES(obj) || GET_OBJ_AFF_FLAGS(obj)) ? ", buff" : "");
 						add_string_hash(&str_hash, line, 1);
 					}
 				}
@@ -5995,7 +5995,7 @@ ACMD(do_eat) {
 		if (str_hash) {
 			// show hunger?
 			if ((hungry_str = how_hungry(ch))) {
-				snprintf(some_part, sizeof(some_part), " (you are %s)", hungry_str);
+				safe_snprintf(some_part, sizeof(some_part), " (you are %s)", hungry_str);
 			}
 			else {
 				*some_part = '\0';
@@ -6104,7 +6104,7 @@ ACMD(do_eat) {
 			act(obj_get_custom_message(food, OBJ_CUSTOM_CONSUME_TO_CHAR), FALSE, ch, food, NULL, TO_CHAR);
 		}
 		else {
-			snprintf(line, sizeof(line), "You eat %s$p.", some_part);
+			safe_snprintf(line, sizeof(line), "You eat %s$p.", some_part);
 			act(line, FALSE, ch, food, NULL, TO_CHAR);
 		}
 
@@ -6113,7 +6113,7 @@ ACMD(do_eat) {
 			act(obj_get_custom_message(food, OBJ_CUSTOM_CONSUME_TO_ROOM), FALSE, ch, food, NULL, TO_ROOM);
 		}
 		else {
-			snprintf(line, sizeof(line), "$n eats %s$p.", some_part);
+			safe_snprintf(line, sizeof(line), "$n eats %s$p.", some_part);
 			act(line, TRUE, ch, food, NULL, TO_ROOM);
 		}
 	}
@@ -6235,7 +6235,7 @@ ACMD(do_empty) {
 	else if (found_obj) {
 		if (IS_DRINK_CONTAINER(found_obj)) {
 			// pass through to "pour <item> out"
-			snprintf(buf, sizeof(buf), " %s out", arg);
+			safe_snprintf(buf, sizeof(buf), " %s out", arg);
 			do_pour(ch, buf, 0, 0);
 		}
 		else if (IS_CONTAINER(found_obj)) {
@@ -7120,7 +7120,7 @@ ACMD(do_list) {
 	any = FALSE;
 	
 	if (*argument) {
-		snprintf(matching, sizeof(matching), " items matching '%s'", argument);
+		safe_snprintf(matching, sizeof(matching), " items matching '%s'", argument);
 	}
 	else {
 		*matching = '\0';
@@ -7167,7 +7167,7 @@ ACMD(do_list) {
 				this = TRUE;
 				
 				if (SHOP_ALLEGIANCE(stl->shop)) {
-					snprintf(rep, sizeof(rep), " (%s)", FCT_NAME(SHOP_ALLEGIANCE(stl->shop)));
+					safe_snprintf(rep, sizeof(rep), " (%s)", FCT_NAME(SHOP_ALLEGIANCE(stl->shop)));
 				}
 				else {
 					*rep = '\0';
@@ -7199,7 +7199,7 @@ ACMD(do_list) {
 			}
 			
 			if (SHOP_ALLEGIANCE(stl->shop) && item->min_rep != REP_NONE) {
-				snprintf(rep, sizeof(rep), ", %s reputation", reputation_levels[rep_const_to_index(item->min_rep)].name);
+				safe_snprintf(rep, sizeof(rep), ", %s reputation", reputation_levels[rep_const_to_index(item->min_rep)].name);
 			}
 			else {
 				*rep = '\0';
@@ -7213,7 +7213,7 @@ ACMD(do_list) {
 			}
 			
 			if (IS_DRINK_CONTAINER(obj) && GET_DRINK_CONTAINER_CONTENTS(obj) > 0) {
-				snprintf(drinkstr, sizeof(drinkstr), " (of %s)", get_generic_string_by_vnum(GET_DRINK_CONTAINER_TYPE(obj), GENERIC_LIQUID, GSTR_LIQUID_NAME));
+				safe_snprintf(drinkstr, sizeof(drinkstr), " (of %s)", get_generic_string_by_vnum(GET_DRINK_CONTAINER_TYPE(obj), GENERIC_LIQUID, GSTR_LIQUID_NAME));
 			}
 			else {
 				*drinkstr = '\0';
@@ -8142,15 +8142,15 @@ ACMD(do_ship) {
 	if (isdigit(*arg2)) {
 		number = atoi(arg2);
 		gave_number = TRUE;
-		snprintf(keywords, sizeof(keywords), "%s", argument);
+		safe_snprintf(keywords, sizeof(keywords), "%s", argument);
 	}
 	else if (!str_cmp(arg2, "all")) {
 		all = TRUE;
-		snprintf(keywords, sizeof(keywords), "%s", argument);
+		safe_snprintf(keywords, sizeof(keywords), "%s", argument);
 	}
 	else {
 		// concatenate arg2 and argument back together, it's just keywords
-		snprintf(keywords, sizeof(keywords), "%s%s%s", arg2, *argument ? " " : "", argument);
+		safe_snprintf(keywords, sizeof(keywords), "%s%s%s", arg2, *argument ? " " : "", argument);
 	}
 	
 	if (!IS_APPROVED(ch) && config_get_bool("manage_empire_approval")) {

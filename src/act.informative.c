@@ -274,24 +274,24 @@ char *instance_level_string(struct instance_data *inst) {
 	}
 	
 	if (INST_LEVEL(inst)) {
-		snprintf(output, sizeof(output), "level %d", INST_LEVEL(inst));
+		safe_snprintf(output, sizeof(output), "level %d", INST_LEVEL(inst));
 	}
 	else if (GET_ADV_MIN_LEVEL(INST_ADVENTURE(inst)) > 0 && GET_ADV_MAX_LEVEL(INST_ADVENTURE(inst)) == 0) {
-		snprintf(output, sizeof(output), "levels %d+", GET_ADV_MIN_LEVEL(INST_ADVENTURE(inst)));
+		safe_snprintf(output, sizeof(output), "levels %d+", GET_ADV_MIN_LEVEL(INST_ADVENTURE(inst)));
 	}
 	else if (GET_ADV_MIN_LEVEL(INST_ADVENTURE(inst)) == 0 && GET_ADV_MAX_LEVEL(INST_ADVENTURE(inst)) > 0) {
-		snprintf(output, sizeof(output), "levels 1-%d", GET_ADV_MAX_LEVEL(INST_ADVENTURE(inst)));
+		safe_snprintf(output, sizeof(output), "levels 1-%d", GET_ADV_MAX_LEVEL(INST_ADVENTURE(inst)));
 	}
 	else if (GET_ADV_MIN_LEVEL(INST_ADVENTURE(inst)) == GET_ADV_MAX_LEVEL(INST_ADVENTURE(inst))) {
 		if (GET_ADV_MIN_LEVEL(INST_ADVENTURE(inst)) == 0) {
-			snprintf(output, sizeof(output), "any level");
+			safe_snprintf(output, sizeof(output), "any level");
 		}
 		else {
-			snprintf(output, sizeof(output), "level %d", GET_ADV_MAX_LEVEL(INST_ADVENTURE(inst)));
+			safe_snprintf(output, sizeof(output), "level %d", GET_ADV_MAX_LEVEL(INST_ADVENTURE(inst)));
 		}
 	}
 	else {
-		snprintf(output, sizeof(output), "levels %d-%d", GET_ADV_MIN_LEVEL(INST_ADVENTURE(inst)), GET_ADV_MAX_LEVEL(INST_ADVENTURE(inst)));
+		safe_snprintf(output, sizeof(output), "levels %d-%d", GET_ADV_MIN_LEVEL(INST_ADVENTURE(inst)), GET_ADV_MAX_LEVEL(INST_ADVENTURE(inst)));
 	}
 	
 	return output;
@@ -392,7 +392,7 @@ void show_coins_and_currency(char_data *ch, char_data *to, char *argument, bool 
 			}
 			
 			if ((gen = real_generic(cur->vnum)) && GEN_FLAGGED(gen, GEN_SHOW_ADVENTURE) && (adv = get_adventure_for_vnum(cur->vnum))) {
-				snprintf(adv_part, sizeof(adv_part), " (%s)", GET_ADV_NAME(adv));
+				safe_snprintf(adv_part, sizeof(adv_part), " (%s)", GET_ADV_NAME(adv));
 			}
 			else {
 				*adv_part = '\0';
@@ -976,7 +976,7 @@ char *display_attributes(char_data *ch) {
 	
 	for (iter = 0; iter < NUM_ATTRIBUTES; ++iter) {
 		pos = attribute_display_order[iter];
-		snprintf(buf, sizeof(buf), "%s  [%s%2d\t0]", attributes[pos].name, HAPPY_COLOR(GET_ATT(ch, pos), GET_REAL_ATT(ch, pos)), GET_ATT(ch, pos));
+		safe_snprintf(buf, sizeof(buf), "%s  [%s%2d\t0]", attributes[pos].name, HAPPY_COLOR(GET_ATT(ch, pos), GET_REAL_ATT(ch, pos)), GET_ATT(ch, pos));
 		size += snprintf(output + size, sizeof(output) - size, "  %-*.*s%s", 23 + color_code_length(buf), 23 + color_code_length(buf), buf, !((iter + 1) % 3) ? "\r\n" : "");
 	}
 	if (iter % 3 && size + 2 < sizeof(output)) {
@@ -1246,7 +1246,7 @@ void list_lore_to_char(char_data *ch, char_data *to) {
 			else
 				strcpy(buf1, buf);
 
-			snprintf(daystring, sizeof(daystring), "%d %s, Year %d", t.day + 1, buf1, t.year);
+			safe_snprintf(daystring, sizeof(daystring), "%d %s, Year %d", t.day + 1, buf1, t.year);
 			msg_to_char(to, " %s on %s.\r\n", NULLSAFE(lore->text), daystring);
 		}
 		else {
@@ -1353,7 +1353,7 @@ void list_one_char(char_data *i, char_data *ch, int num) {
 		
 		if (GET_POS(i) != POS_FIGHTING) {
 			if (GET_SITTING_ON(i)) {
-				snprintf(part, sizeof(part), "%s", position_types[GET_POS(i)]);
+				safe_snprintf(part, sizeof(part), "%s", position_types[GET_POS(i)]);
 				*part = LOWER(*part);
 				sprintf(buf, "$n is %s %s %s%s%s.", part, IN_OR_ON(GET_SITTING_ON(i)), get_vehicle_short_desc(GET_SITTING_ON(i), ch), (VEH_ANIMALS(GET_SITTING_ON(i)) ? ", being pulled by " : ""), (VEH_ANIMALS(GET_SITTING_ON(i)) ? list_harnessed_mobs(GET_SITTING_ON(i)) : ""));
 			}
@@ -1532,13 +1532,13 @@ char *list_one_vehicle_to_char(vehicle_data *veh, char_data *ch) {
 	}
 	
 	if (VEH_SITTING_ON(veh) == ch) {
-		snprintf(part, sizeof(part), "%s", position_types[GET_POS(VEH_SITTING_ON(veh))]);
+		safe_snprintf(part, sizeof(part), "%s", position_types[GET_POS(VEH_SITTING_ON(veh))]);
 		*part = LOWER(*part);
 		size += snprintf(buf + size, sizeof(buf) - size, "...you are %s %s it.\r\n", part, IN_OR_ON(veh));
 	}
 	else if (VEH_SITTING_ON(veh)) {
 		// only shown to players when it's a building
-		snprintf(part, sizeof(part), "%s", position_types[GET_POS(VEH_SITTING_ON(veh))]);
+		safe_snprintf(part, sizeof(part), "%s", position_types[GET_POS(VEH_SITTING_ON(veh))]);
 		*part = LOWER(*part);
 		size += snprintf(buf + size, sizeof(buf) - size, "...%s is %s %s it.\r\n", PERS(VEH_SITTING_ON(veh), ch, FALSE), part, IN_OR_ON(veh));
 	}
@@ -1859,19 +1859,19 @@ void show_character_affects_simple(char_data *ch, char_data *to) {
 			}
 			
 			// main entry
-			snprintf(line, sizeof(line), "%s%s&0%s (%s)", (good ? "&c" : "&r"), get_generic_name_by_vnum(aff->type), (!good && PRF_FLAGGED(to, PRF_SCREEN_READER)) ? " (debuff)" : "", lbuf);
+			safe_snprintf(line, sizeof(line), "%s%s&0%s (%s)", (good ? "&c" : "&r"), get_generic_name_by_vnum(aff->type), (!good && PRF_FLAGGED(to, PRF_SCREEN_READER)) ? " (debuff)" : "", lbuf);
 			
 			if (aff->modifier) {
-				snprintf(line + strlen(line), sizeof(line) - strlen(line), " - %+d to %s", aff->modifier, apply_types[(int) aff->location]);
+				safe_snprintf(line + strlen(line), sizeof(line) - strlen(line), " - %+d to %s", aff->modifier, apply_types[(int) aff->location]);
 			}
 			if (aff->bitvector) {
 				prettier_sprintbit(aff->bitvector, affected_bits, lbuf);
-				snprintf(line + strlen(line), sizeof(line) - strlen(line), "%s %s", (aff->modifier ? "," : " -"), lbuf);
+				safe_snprintf(line + strlen(line), sizeof(line) - strlen(line), "%s %s", (aff->modifier ? "," : " -"), lbuf);
 			}
 			
 			// caster?
 			if (aff->cast_by == CAST_BY_ID(to)) {
-				snprintf(line + strlen(line), sizeof(line) - strlen(line), " (you)");
+				safe_snprintf(line + strlen(line), sizeof(line) - strlen(line), " (you)");
 			}
 			
 			// add to hash
@@ -1879,7 +1879,7 @@ void show_character_affects_simple(char_data *ch, char_data *to) {
 		}
 		else {
 			// simple version
-			snprintf(line, sizeof(line), "%s%s&0%s%s", (good ? "&c" : "&r"), get_generic_name_by_vnum(aff->type), (!good && PRF_FLAGGED(to, PRF_SCREEN_READER)) ? " (debuff)" : "", (aff->cast_by == CAST_BY_ID(to) ? " (you)" : ""));
+			safe_snprintf(line, sizeof(line), "%s%s&0%s%s", (good ? "&c" : "&r"), get_generic_name_by_vnum(aff->type), (!good && PRF_FLAGGED(to, PRF_SCREEN_READER)) ? " (debuff)" : "", (aff->cast_by == CAST_BY_ID(to) ? " (you)" : ""));
 			add_string_hash(&str_hash, line, 1);
 		}
 	}
@@ -1887,22 +1887,22 @@ void show_character_affects_simple(char_data *ch, char_data *to) {
 	// build DoTs
 	LL_FOREACH(ch->over_time_effects, dot) {
 		if (dot->max_stack > 1) {
-			snprintf(lbuf, sizeof(lbuf), " (%d/%d)", dot->stack, dot->max_stack);
+			safe_snprintf(lbuf, sizeof(lbuf), " (%d/%d)", dot->stack, dot->max_stack);
 		}
 		else {
 			*lbuf = '\0';
 		}
 		
 		if (details) {
-			snprintf(line, sizeof(line), "&r%s&0%s (%s)%s", get_generic_name_by_vnum(dot->type), (PRF_FLAGGED(to, PRF_SCREEN_READER) ? " (DoT)" : ""), colon_time(dot->time_remaining, FALSE, "infinite"), lbuf);
+			safe_snprintf(line, sizeof(line), "&r%s&0%s (%s)%s", get_generic_name_by_vnum(dot->type), (PRF_FLAGGED(to, PRF_SCREEN_READER) ? " (DoT)" : ""), colon_time(dot->time_remaining, FALSE, "infinite"), lbuf);
 		}
 		else {	// simple version
-			snprintf(line, sizeof(line), "&r%s&0%s%s", get_generic_name_by_vnum(dot->type), (PRF_FLAGGED(to, PRF_SCREEN_READER) ? " (DoT)" : ""), lbuf);
+			safe_snprintf(line, sizeof(line), "&r%s&0%s%s", get_generic_name_by_vnum(dot->type), (PRF_FLAGGED(to, PRF_SCREEN_READER) ? " (DoT)" : ""), lbuf);
 		}
 		
 		// caster?
 		if (aff->cast_by == CAST_BY_ID(to) ? " (you)" : "") {
-			snprintf(line + strlen(line), sizeof(line) - strlen(line), " (you)");
+			safe_snprintf(line + strlen(line), sizeof(line) - strlen(line), " (you)");
 		}
 		
 		add_string_hash(&str_hash, line, 1);
@@ -2124,10 +2124,10 @@ void list_obj_to_char(obj_data *list, char_data *ch, int mode, bool show_empty, 
 		if (CAN_SEE_OBJ(ch, i)) {
 			// build string
 			if (num > 1) {
-				snprintf(buf, sizeof(buf), "%s(%2i) %s", (mode == OBJ_DESC_LONG) ? "\tg" : "", num, obj_desc_for_char(i, ch, mode));
+				safe_snprintf(buf, sizeof(buf), "%s(%2i) %s", (mode == OBJ_DESC_LONG) ? "\tg" : "", num, obj_desc_for_char(i, ch, mode));
 			}
 			else {
-				snprintf(buf, sizeof(buf), "%s%s", (mode == OBJ_DESC_LONG) ? "\tg" : "", obj_desc_for_char(i, ch, mode));
+				safe_snprintf(buf, sizeof(buf), "%s%s", (mode == OBJ_DESC_LONG) ? "\tg" : "", obj_desc_for_char(i, ch, mode));
 			}
 			
 			// send
@@ -2330,7 +2330,7 @@ bool show_local_einv(char_data *ch, room_data *room, bool thief_mode, bool use_p
 	
 	// show vault info first (own empire only; ignores thief mode)
 	if (own_empire == ROOM_OWNER(room) && room_has_function_and_city_ok(GET_LOYALTY(ch), room, FNC_VAULT)) {
-		snprintf(buf, sizeof(buf), "\r\nVault: %.1f coin%s, %d treasure (%d total)\r\n", EMPIRE_COINS(own_empire), (EMPIRE_COINS(own_empire) != 1.0 ? "s" : ""), EMPIRE_WEALTH(own_empire), (int) GET_TOTAL_WEALTH(own_empire));
+		safe_snprintf(buf, sizeof(buf), "\r\nVault: %.1f coin%s, %d treasure (%d total)\r\n", EMPIRE_COINS(own_empire), (EMPIRE_COINS(own_empire) != 1.0 ? "s" : ""), EMPIRE_WEALTH(own_empire), (int) GET_TOTAL_WEALTH(own_empire));
 		if (use_page_display) {
 			build_page_display_str(ch, buf);
 		}
@@ -2370,7 +2370,7 @@ bool show_local_einv(char_data *ch, room_data *room, bool thief_mode, bool use_p
 			HASH_ITER(hh, eisle->store, store, next_store) {
 				if (store->amount > 0 && store->proto && obj_can_be_retrieved(store->proto, room, thief_mode ? NULL : own_empire)) {
 					if (!found_one) {
-						snprintf(buf, sizeof(buf), "\r\n%s&Z%s inventory available here:\t0\r\n", EMPIRE_BANNER(emp), EMPIRE_ADJECTIVE(emp));
+						safe_snprintf(buf, sizeof(buf), "\r\n%s&Z%s inventory available here:\t0\r\n", EMPIRE_BANNER(emp), EMPIRE_ADJECTIVE(emp));
 						
 						if (use_page_display) {
 							build_page_display_str(ch, buf);
@@ -2417,7 +2417,7 @@ void show_one_stored_item_to_char(char_data *ch, empire_data *emp, struct empire
 		strcpy(keepstr, " (keep)");
 	}
 	else if (show_own_data && store->keep > 0) {
-		snprintf(keepstr, sizeof(keepstr), " (keep %d)", store->keep);
+		safe_snprintf(keepstr, sizeof(keepstr), " (keep %d)", store->keep);
 	}
 	else {
 		*keepstr = '\0';
@@ -2496,7 +2496,7 @@ char *one_who_line(char_data *ch, bool shortlist, bool screenreader) {
 	*out = '\0';
 	
 	if (screenreader && GET_CLASS_ROLE(ch) != ROLE_NONE) {
-		snprintf(show_role, sizeof(show_role), " %s", class_role[GET_CLASS_ROLE(ch)]);
+		safe_snprintf(show_role, sizeof(show_role), " %s", class_role[GET_CLASS_ROLE(ch)]);
 	}
 	else {
 		*show_role = '\0';
@@ -3128,7 +3128,7 @@ ACMD(do_chart) {
 			}
 			
 			// found
-			snprintf(buf + strlen(buf), sizeof(buf) - strlen(buf), "%s%s", (*buf ? ", " : ""), isle_iter->name);
+			safe_snprintf(buf + strlen(buf), sizeof(buf) - strlen(buf), "%s%s", (*buf ? ", " : ""), isle_iter->name);
 		}
 		if (GET_LOYALTY(ch)) {
 			HASH_ITER(hh, EMPIRE_ISLANDS(GET_LOYALTY(ch)), eiter, next_eiter) {
@@ -3143,7 +3143,7 @@ ACMD(do_chart) {
 				}
 				
 				// found
-				snprintf(buf + strlen(buf), sizeof(buf) - strlen(buf), "%s%s", (*buf ? ", " : ""), eiter->name);
+				safe_snprintf(buf + strlen(buf), sizeof(buf) - strlen(buf), "%s%s", (*buf ? ", " : ""), eiter->name);
 			}
 		}
 		if (*buf) {
@@ -3580,7 +3580,7 @@ ACMD(do_inventory) {
 						return;
 					}
 					
-					snprintf(heading + strlen(heading), sizeof(heading) - strlen(heading), "%s'%s':", (*heading ? ", " : ""), GEN_NAME(cmp));
+					safe_snprintf(heading + strlen(heading), sizeof(heading) - strlen(heading), "%s'%s':", (*heading ? ", " : ""), GEN_NAME(cmp));
 					break;
 				}
 				case 'w': {
@@ -3595,7 +3595,7 @@ ACMD(do_inventory) {
 						return;
 					}
 					
-					snprintf(heading + strlen(heading), sizeof(heading) - strlen(heading), "%sworn on %s:", (*heading ? ", " : ""), wear_bits[wear_type]);
+					safe_snprintf(heading + strlen(heading), sizeof(heading) - strlen(heading), "%sworn on %s:", (*heading ? ", " : ""), wear_bits[wear_type]);
 					break;
 				}
 				case 't': {
@@ -3610,35 +3610,35 @@ ACMD(do_inventory) {
 						return;
 					}
 					
-					snprintf(heading + strlen(heading), sizeof(heading) - strlen(heading), "%s%s", (*heading ? ", " : ""), item_types[type_type]);
+					safe_snprintf(heading + strlen(heading), sizeof(heading) - strlen(heading), "%s%s", (*heading ? ", " : ""), item_types[type_type]);
 					break;
 				}
 				case 'k': {
 					strcpy(word, argument+2);
 					strcpy(argument, word);
 					kept = TRUE;
-					snprintf(heading + strlen(heading), sizeof(heading) - strlen(heading), "%skept", (*heading ? ", " : ""));
+					safe_snprintf(heading + strlen(heading), sizeof(heading) - strlen(heading), "%skept", (*heading ? ", " : ""));
 					break;
 				}
 				case 'n': {
 					strcpy(word, argument+2);
 					strcpy(argument, word);
 					not_kept = TRUE;
-					snprintf(heading + strlen(heading), sizeof(heading) - strlen(heading), "%snot kept", (*heading ? ", " : ""));
+					safe_snprintf(heading + strlen(heading), sizeof(heading) - strlen(heading), "%snot kept", (*heading ? ", " : ""));
 					break;
 				}
 				case 'b': {
 					strcpy(word, argument+2);
 					strcpy(argument, word);
 					bound = TRUE;
-					snprintf(heading + strlen(heading), sizeof(heading) - strlen(heading), "%sbound", (*heading ? ", " : ""));
+					safe_snprintf(heading + strlen(heading), sizeof(heading) - strlen(heading), "%sbound", (*heading ? ", " : ""));
 					break;
 				}
 				case 'u': {
 					strcpy(word, argument+2);
 					strcpy(argument, word);
 					unbound = TRUE;
-					snprintf(heading + strlen(heading), sizeof(heading) - strlen(heading), "%sunbound BoE", (*heading ? ", " : ""));
+					safe_snprintf(heading + strlen(heading), sizeof(heading) - strlen(heading), "%sunbound BoE", (*heading ? ", " : ""));
 					break;
 				}
 				case 'i': {
@@ -3653,7 +3653,7 @@ ACMD(do_inventory) {
 						to_show = atoi(argument+1);
 						to_show = MAX(1, to_show);
 						
-						snprintf(heading + strlen(heading), sizeof(heading) - strlen(heading), "%sfirst %d", (*heading ? ", " : ""), to_show);
+						safe_snprintf(heading + strlen(heading), sizeof(heading) - strlen(heading), "%sfirst %d", (*heading ? ", " : ""), to_show);
 						
 						// peel off the first arg
 						argument = one_argument(argument, arg);
@@ -4147,8 +4147,8 @@ ACMD(do_nearby) {
 
 				// dir = get_direction_for_char(ch, get_direction_to(IN_ROOM(ch), loc));
 				dir_str = NEARBY_DIR;
-				snprintf(dist_buf, sizeof(dist_buf), "%d %3s", dist, (dir_str && *dir_str) ? dir_str : "away");
-				snprintf(line, sizeof(line), "%8s: %s%s", dist_buf, get_room_name(loc, FALSE), coord_display_room(ch, loc, FALSE));
+				safe_snprintf(dist_buf, sizeof(dist_buf), "%d %3s", dist, (dir_str && *dir_str) ? dir_str : "away");
+				safe_snprintf(line, sizeof(line), "%8s: %s%s", dist_buf, get_room_name(loc, FALSE), coord_display_room(ch, loc, FALSE));
 				
 				CREATE(nrb_item, struct nearby_item_t, 1);
 				nrb_item->text = str_dup(line);
@@ -4182,17 +4182,17 @@ ACMD(do_nearby) {
 				
 					// dir = get_direction_for_char(ch, get_direction_to(IN_ROOM(ch), loc));
 					dir_str = NEARBY_DIR;
-					snprintf(dist_buf, sizeof(dist_buf), "%d %3s", dist, (dir_str && *dir_str) ? dir_str : "away");
+					safe_snprintf(dist_buf, sizeof(dist_buf), "%d %3s", dist, (dir_str && *dir_str) ? dir_str : "away");
 					
 					if (city->traits & show_city_traits) {
 						prettier_sprintbit(city->traits & show_city_traits, empire_trait_types, part);
-						snprintf(trait_buf, sizeof(trait_buf), " (%s)", part);
+						safe_snprintf(trait_buf, sizeof(trait_buf), " (%s)", part);
 					}
 					else {
 						*trait_buf = '\0';
 					}
 					
-					snprintf(line, sizeof(line), "%8s: The %s of %s%s / %s%s&0%s", dist_buf, city_type[city->type].name, city->name, coord_display_room(ch, loc, FALSE), EMPIRE_BANNER(emp), EMPIRE_NAME(emp), trait_buf);
+					safe_snprintf(line, sizeof(line), "%8s: The %s of %s%s / %s%s&0%s", dist_buf, city_type[city->type].name, city->name, coord_display_room(ch, loc, FALSE), EMPIRE_BANNER(emp), EMPIRE_NAME(emp), trait_buf);
 					
 					CREATE(nrb_item, struct nearby_item_t, 1);
 					nrb_item->text = str_dup(line);
@@ -4258,7 +4258,7 @@ ACMD(do_nearby) {
 			
 			// owner part
 			if (ROOM_OWNER(loc)) {
-				snprintf(part, sizeof(part), " / %s%s&0", EMPIRE_BANNER(ROOM_OWNER(loc)), EMPIRE_NAME(ROOM_OWNER(loc)));
+				safe_snprintf(part, sizeof(part), " / %s%s&0", EMPIRE_BANNER(ROOM_OWNER(loc)), EMPIRE_NAME(ROOM_OWNER(loc)));
 			}
 			else {
 				*part = '\0';
@@ -4269,8 +4269,8 @@ ACMD(do_nearby) {
 			// dir = get_direction_for_char(ch, get_direction_to(IN_ROOM(ch), loc));
 			dir_str = NEARBY_DIR;
 			strcpy(adv_color, color_by_difficulty((ch), pick_level_from_range((INST_LEVEL(inst) > 0 ? INST_LEVEL(inst) : get_approximate_level(ch)), GET_ADV_MIN_LEVEL(INST_ADVENTURE(inst)), GET_ADV_MAX_LEVEL(INST_ADVENTURE(inst)))));
-			snprintf(dist_buf, sizeof(dist_buf), "%d %3s", dist, (dir_str && *dir_str) ? dir_str : "away");
-			snprintf(line, sizeof(line), "%8s: %s%s\t0%s / %s%s", dist_buf, adv_color, GET_ADV_NAME(INST_ADVENTURE(inst)), coord_display_room(ch, loc, FALSE), instance_level_string(inst), part);
+			safe_snprintf(dist_buf, sizeof(dist_buf), "%d %3s", dist, (dir_str && *dir_str) ? dir_str : "away");
+			safe_snprintf(line, sizeof(line), "%8s: %s%s\t0%s / %s%s", dist_buf, adv_color, GET_ADV_NAME(INST_ADVENTURE(inst)), coord_display_room(ch, loc, FALSE), instance_level_string(inst), part);
 			
 			if (glb) {	// just add it to the global list
 				if (glb->str) {
@@ -4545,7 +4545,7 @@ ACMD(do_survey) {
 			prc = MIN(100, MAX(1, prc)) / 25;
 			temp = str_replace("$$", depletion_levels[prc], line);
 			
-			snprintf(buf + strlen(buf), sizeof(buf) - strlen(buf), "%s%s", *buf ? ", " : "", temp);
+			safe_snprintf(buf + strlen(buf), sizeof(buf) - strlen(buf), "%s%s", *buf ? ", " : "", temp);
 			free(temp);
 		}
 	}
@@ -4582,7 +4582,7 @@ ACMD(do_temperature) {
 	
 	// imm part for room
 	if (IS_IMMORTAL(ch)) {
-		snprintf(imm_part, sizeof(imm_part), " (%d)", room_temp);
+		safe_snprintf(imm_part, sizeof(imm_part), " (%d)", room_temp);
 	}
 	else {
 		*imm_part = '\0';
@@ -4596,7 +4596,7 @@ ACMD(do_temperature) {
 	// imm part for character
 	*imm_part = '\0';
 	if (IS_IMMORTAL(ch)) {
-		snprintf(imm_part, sizeof(imm_part), " (%d)", ch_temp);
+		safe_snprintf(imm_part, sizeof(imm_part), " (%d)", ch_temp);
 	}
 	
 	// change part?
@@ -4605,31 +4605,31 @@ ACMD(do_temperature) {
 	if (GET_TEMPERATURE(ch) != room_temp && get_temperature_type(IN_ROOM(ch)) != TEMPERATURE_ALWAYS_COMFORTABLE) {
 		if (GET_TEMPERATURE(ch) > room_temp) {
 			if (room_temp > 0) {
-				snprintf(change_part, sizeof(change_part), " and cooling down");
+				safe_snprintf(change_part, sizeof(change_part), " and cooling down");
 			}
 			else {
-				snprintf(change_part, sizeof(change_part), " %s getting colder", (ch_temp > (-1 * temp_limit) ? "but" : "and"));
+				safe_snprintf(change_part, sizeof(change_part), " %s getting colder", (ch_temp > (-1 * temp_limit) ? "but" : "and"));
 			}
 		
 			// dire part? (warning that it won't get better
 			if (room_temp >= temp_limit) {
-				snprintf(dire_part, sizeof(dire_part), ", but it's still too %s", (room_temp >= config_get_int("temperature_extreme") ? "hot" : "warm"));
+				safe_snprintf(dire_part, sizeof(dire_part), ", but it's still too %s", (room_temp >= config_get_int("temperature_extreme") ? "hot" : "warm"));
 			}
 		}
 		else {
 			if (room_temp < 0) {
-				snprintf(change_part, sizeof(change_part), " and warming up");
+				safe_snprintf(change_part, sizeof(change_part), " and warming up");
 			}
 			else if (GET_TEMPERATURE(ch) < temp_limit) {
-				snprintf(change_part, sizeof(change_part), " %s getting warmer", (ch_temp > (-1 * temp_limit) ? "but" : "and"));
+				safe_snprintf(change_part, sizeof(change_part), " %s getting warmer", (ch_temp > (-1 * temp_limit) ? "but" : "and"));
 			}
 			else {
-				snprintf(change_part, sizeof(change_part), " and getting hotter");
+				safe_snprintf(change_part, sizeof(change_part), " and getting hotter");
 			}
 		
 			// dire part? (warning that it won't get better
 			if (room_temp <= -1 * temp_limit) {
-				snprintf(dire_part, sizeof(dire_part), ", but it's still %stoo cold", (room_temp <= -1 * config_get_int("temperature_extreme") ? "way " : ""));
+				safe_snprintf(dire_part, sizeof(dire_part), ", but it's still %stoo cold", (room_temp <= -1 * config_get_int("temperature_extreme") ? "way " : ""));
 			}
 		}
 	}
@@ -4677,26 +4677,26 @@ ACMD(do_time) {
 	// prepare the start of a string for time-of-day (used below)
 	sun = get_sun_status(IN_ROOM(ch));
 	if (sun == SUN_DARK) {
-		snprintf(time_of_day, sizeof(time_of_day), "It's nighttime");
+		safe_snprintf(time_of_day, sizeof(time_of_day), "It's nighttime");
 	}
 	else if (sun == SUN_RISE) {
-		snprintf(time_of_day, sizeof(time_of_day), "It's almost dawn");
+		safe_snprintf(time_of_day, sizeof(time_of_day), "It's almost dawn");
 	}
 	else if (sun == SUN_SET) {
-		snprintf(time_of_day, sizeof(time_of_day), "It's sunset");
+		safe_snprintf(time_of_day, sizeof(time_of_day), "It's sunset");
 	}
 	else if (HAS_CLOCK(ch)) {
-		snprintf(time_of_day, sizeof(time_of_day), "It's daytime");
+		safe_snprintf(time_of_day, sizeof(time_of_day), "It's daytime");
 	}
 	// all other time options are only shown without clocks:
 	else if (tinfo.hours == 12) {
-		snprintf(time_of_day, sizeof(time_of_day), "It's midday");
+		safe_snprintf(time_of_day, sizeof(time_of_day), "It's midday");
 	}
 	else if (tinfo.hours < 12) {
-		snprintf(time_of_day, sizeof(time_of_day), "It's %smorning", tinfo.hours <= 8 ? "early " : "");
+		safe_snprintf(time_of_day, sizeof(time_of_day), "It's %smorning", tinfo.hours <= 8 ? "early " : "");
 	}
 	else {	// afternoon is all that's left
-		snprintf(time_of_day, sizeof(time_of_day), "It's %safternoon", tinfo.hours >= 17 ? "late " : "");
+		safe_snprintf(time_of_day, sizeof(time_of_day), "It's %safternoon", tinfo.hours >= 17 ? "late " : "");
 	}
 
 	if (has_player_tech(ch, PTECH_CALENDAR)) {
@@ -5064,10 +5064,10 @@ ACMD(do_whois) {
 	// friend portion
 	if (!PRF_FLAGGED(victim, PRF_NO_FRIENDS) && (friend = find_account_friend(GET_ACCOUNT(ch), GET_ACCOUNT_ID(victim))) && friend->status == FRIEND_FRIENDSHIP) {
 		if (strcmp(friend->original_name, GET_NAME(victim))) {
-			snprintf(friend_part, sizeof(friend_part), " (friends, alt of %s)", friend->original_name);
+			safe_snprintf(friend_part, sizeof(friend_part), " (friends, alt of %s)", friend->original_name);
 		}
 		else {
-			snprintf(friend_part, sizeof(friend_part), " (friends)");
+			safe_snprintf(friend_part, sizeof(friend_part), " (friends)");
 		}
 	}
 	else {

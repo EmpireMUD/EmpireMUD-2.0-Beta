@@ -1312,7 +1312,7 @@ bool validate_vehicle_move(char_data *ch, vehicle_data *veh, room_data *to_room,
 	// required number of mounts
 	if (!dragging && count_harnessed_animals(veh) < VEH_ANIMALS_REQUIRED(veh)) {
 		if (ch) {
-			snprintf(buf, sizeof(buf), "You need to harness %d animal%s to $V before it can move.", VEH_ANIMALS_REQUIRED(veh), PLURAL(VEH_ANIMALS_REQUIRED(veh)));
+			safe_snprintf(buf, sizeof(buf), "You need to harness %d animal%s to $V before it can move.", VEH_ANIMALS_REQUIRED(veh), PLURAL(VEH_ANIMALS_REQUIRED(veh)));
 			act(buf, FALSE, ch, NULL, veh, TO_CHAR | ACT_VEH_VICT);
 		}
 		return FALSE;
@@ -1487,14 +1487,14 @@ void char_through_portal(char_data *ch, obj_data *portal, bool following) {
 	// leading vehicle (movement validated by player_can_move in do_simple_move)
 	if (GET_LEADING_VEHICLE(ch) && IN_ROOM(GET_LEADING_VEHICLE(ch)) == was_in) {
 		if (ROOM_PEOPLE(was_in)) {
-			snprintf(buf, sizeof(buf), "$V %s through $p.", mob_move_types[VEH_MOVE_TYPE(GET_LEADING_VEHICLE(ch))]);
+			safe_snprintf(buf, sizeof(buf), "$V %s through $p.", mob_move_types[VEH_MOVE_TYPE(GET_LEADING_VEHICLE(ch))]);
 			act(buf, FALSE, ROOM_PEOPLE(was_in), portal, GET_LEADING_VEHICLE(ch), TO_CHAR | TO_ROOM | ACT_VEH_VICT);
 		}
 		
 		vehicle_from_room(GET_LEADING_VEHICLE(ch));
 		vehicle_to_room(GET_LEADING_VEHICLE(ch), IN_ROOM(ch));
 		
-		snprintf(buf, sizeof(buf), "$V %s in through $p.", mob_move_types[VEH_MOVE_TYPE(GET_LEADING_VEHICLE(ch))]);
+		safe_snprintf(buf, sizeof(buf), "$V %s in through $p.", mob_move_types[VEH_MOVE_TYPE(GET_LEADING_VEHICLE(ch))]);
 		act(buf, FALSE, ch, use_portal, GET_LEADING_VEHICLE(ch), TO_CHAR | TO_ROOM | ACT_VEH_VICT);
 	}
 	
@@ -1691,16 +1691,16 @@ int perform_move(char_data *ch, int dir, room_data *to_room, bitvector_t flags) 
 	// leading vehicle (movement validated by player_can_move in do_simple_move)
 	if (GET_LEADING_VEHICLE(ch) && IN_ROOM(GET_LEADING_VEHICLE(ch)) == was_in) {
 		if (ROOM_PEOPLE(was_in)) {
-			snprintf(buf, sizeof(buf), "$v %s behind $N.", mob_move_types[VEH_MOVE_TYPE(GET_LEADING_VEHICLE(ch))]);
+			safe_snprintf(buf, sizeof(buf), "$v %s behind $N.", mob_move_types[VEH_MOVE_TYPE(GET_LEADING_VEHICLE(ch))]);
 			act(buf, FALSE, ROOM_PEOPLE(was_in), GET_LEADING_VEHICLE(ch), ch, TO_CHAR | TO_ROOM | ACT_VEH_OBJ);
 		}
 		
 		vehicle_from_room(GET_LEADING_VEHICLE(ch));
 		vehicle_to_room(GET_LEADING_VEHICLE(ch), IN_ROOM(ch));
 		
-		snprintf(buf, sizeof(buf), "$V %s in behind you.", mob_move_types[VEH_MOVE_TYPE(GET_LEADING_VEHICLE(ch))]);
+		safe_snprintf(buf, sizeof(buf), "$V %s in behind you.", mob_move_types[VEH_MOVE_TYPE(GET_LEADING_VEHICLE(ch))]);
 		act(buf, FALSE, ch, NULL, GET_LEADING_VEHICLE(ch), TO_CHAR | ACT_VEH_VICT);
-		snprintf(buf, sizeof(buf), "$V %s in behind $n.", mob_move_types[VEH_MOVE_TYPE(GET_LEADING_VEHICLE(ch))]);
+		safe_snprintf(buf, sizeof(buf), "$V %s in behind $n.", mob_move_types[VEH_MOVE_TYPE(GET_LEADING_VEHICLE(ch))]);
 		act(buf, FALSE, ch, NULL, GET_LEADING_VEHICLE(ch), TO_ROOM | ACT_VEH_VICT);
 	}
 	// leading mob (attempt move)
@@ -1796,7 +1796,7 @@ void send_arrive_message(char_data *ch, room_data *from_room, room_data *to_room
 			act("$n boards $V.", TRUE, ch, NULL, veh, TO_ROOM | ACT_VEH_VICT);
 		}
 		else if (GET_BUILDING(HOME_ROOM(to_room))) {
-			snprintf(msg, sizeof(msg), "$n enters the %s.", GET_BLD_NAME(GET_BUILDING(HOME_ROOM(to_room))));
+			safe_snprintf(msg, sizeof(msg), "$n enters the %s.", GET_BLD_NAME(GET_BUILDING(HOME_ROOM(to_room))));
 			is_animal_move = NOBITS;	// prevent this flag
 		}
 		else {
@@ -1816,7 +1816,7 @@ void send_arrive_message(char_data *ch, room_data *from_room, room_data *to_room
 			act("$n disembarks from $V.", TRUE, ch, NULL, veh, TO_ROOM | ACT_VEH_VICT);
 		}
 		else if (GET_BUILDING(HOME_ROOM(from_room))) {
-			snprintf(msg, sizeof(msg), "$n exits the %s.", GET_BLD_NAME(GET_BUILDING(HOME_ROOM(from_room))));
+			safe_snprintf(msg, sizeof(msg), "$n exits the %s.", GET_BLD_NAME(GET_BUILDING(HOME_ROOM(from_room))));
 			is_animal_move = NOBITS;	// prevent this flag
 		}
 		else {
@@ -1824,13 +1824,13 @@ void send_arrive_message(char_data *ch, room_data *from_room, room_data *to_room
 		}
 	}
 	else if ((dir == UP || dir == DOWN) && move_type == MOB_MOVE_WALK) {	// override for walking in from up/down
-		snprintf(msg, sizeof(msg), "$n comes in from %%s.");
+		safe_snprintf(msg, sizeof(msg), "$n comes in from %%s.");
 	}
 	else if (dir != NO_DIR) {	// normal move message
-		snprintf(msg, sizeof(msg), "$n %s %s from %%s.", mob_move_types[move_type], (ROOM_IS_CLOSED(IN_ROOM(ch)) ? "in" : "up"));
+		safe_snprintf(msg, sizeof(msg), "$n %s %s from %%s.", mob_move_types[move_type], (ROOM_IS_CLOSED(IN_ROOM(ch)) ? "in" : "up"));
 	}
 	else {	// move message with no direction?
-		snprintf(msg, sizeof(msg), "$n %s %s.", mob_move_types[move_type], (ROOM_IS_CLOSED(IN_ROOM(ch)) ? "in" : "up"));
+		safe_snprintf(msg, sizeof(msg), "$n %s %s.", mob_move_types[move_type], (ROOM_IS_CLOSED(IN_ROOM(ch)) ? "in" : "up"));
 	}
 	
 	// process/send the message, if one was set
@@ -1842,7 +1842,7 @@ void send_arrive_message(char_data *ch, room_data *from_room, room_data *to_room
 			
 			if (strstr(msg, "%s") != NULL) {
 				// needs direction
-				snprintf(temp, sizeof(temp), msg, from_dir[get_direction_for_char(targ, dir)]);
+				safe_snprintf(temp, sizeof(temp), msg, from_dir[get_direction_for_char(targ, dir)]);
 				act(temp, TRUE, ch, NULL, targ, TO_VICT | is_animal_move);
 			}
 			else {
@@ -1904,10 +1904,10 @@ void send_leave_message(char_data *ch, room_data *from_room, room_data *to_room,
 		*msg = '\0';	// earthmeld hides all move msgs
 	}
 	else if (IS_SET(flags, MOVE_LEAD) && GET_LED_BY(ch)) {
-		snprintf(msg, sizeof(msg), "%s leads $n with %s.", HSSH(GET_LED_BY(ch)), HMHR(GET_LED_BY(ch)));
+		safe_snprintf(msg, sizeof(msg), "%s leads $n with %s.", HSSH(GET_LED_BY(ch)), HMHR(GET_LED_BY(ch)));
 	}
 	else if (IS_SET(flags, MOVE_FOLLOW) && GET_LEADER(ch) && dir != NO_DIR) {
-		snprintf(msg, sizeof(msg), "$n follows %s %%s.", HMHR(GET_LEADER(ch)));
+		safe_snprintf(msg, sizeof(msg), "$n follows %s %%s.", HMHR(GET_LEADER(ch)));
 	}
 	else if (IS_SET(flags, MOVE_FOLLOW) && GET_LEADER(ch)) {
 		act("$n follows $M.", TRUE, ch, NULL, GET_LEADER(ch), TO_NOTVICT);
@@ -1937,7 +1937,7 @@ void send_leave_message(char_data *ch, room_data *from_room, room_data *to_room,
 			act("$n boards $V.", TRUE, ch, NULL, veh, TO_ROOM | ACT_VEH_VICT);
 		}
 		else if (GET_BUILDING(HOME_ROOM(to_room))) {
-			snprintf(msg, sizeof(msg), "$n enters the %s.", GET_BLD_NAME(GET_BUILDING(HOME_ROOM(to_room))));
+			safe_snprintf(msg, sizeof(msg), "$n enters the %s.", GET_BLD_NAME(GET_BUILDING(HOME_ROOM(to_room))));
 			is_animal_move = NOBITS;	// prevent this flag
 		}
 		else {
@@ -1957,7 +1957,7 @@ void send_leave_message(char_data *ch, room_data *from_room, room_data *to_room,
 			act("$n disembarks from $V.", TRUE, ch, NULL, veh, TO_ROOM | ACT_VEH_VICT);
 		}
 		else if (GET_BUILDING(HOME_ROOM(from_room))) {
-			snprintf(msg, sizeof(msg), "$n exits the %s.", GET_BLD_NAME(GET_BUILDING(HOME_ROOM(from_room))));
+			safe_snprintf(msg, sizeof(msg), "$n exits the %s.", GET_BLD_NAME(GET_BUILDING(HOME_ROOM(from_room))));
 			is_animal_move = NOBITS;	// prevent this flag
 		}
 		else {
@@ -1965,13 +1965,13 @@ void send_leave_message(char_data *ch, room_data *from_room, room_data *to_room,
 		}
 	}
 	else if ((dir == UP || dir == DOWN) && move_type == MOB_MOVE_WALK) {	// override for up/down walk
-		snprintf(msg, sizeof(msg), "$n goes %%s.");
+		safe_snprintf(msg, sizeof(msg), "$n goes %%s.");
 	}
 	else if (dir != NO_DIR) {	// normal move message
-		snprintf(msg, sizeof(msg), "$n %s %%s.", mob_move_types[move_type]);
+		safe_snprintf(msg, sizeof(msg), "$n %s %%s.", mob_move_types[move_type]);
 	}
 	else {	// move message with no direction?
-		snprintf(msg, sizeof(msg), "$n %s away.", mob_move_types[move_type]);
+		safe_snprintf(msg, sizeof(msg), "$n %s away.", mob_move_types[move_type]);
 	}
 	
 	// process/send the message
@@ -1983,7 +1983,7 @@ void send_leave_message(char_data *ch, room_data *from_room, room_data *to_room,
 			
 			if (strstr(msg, "%s") != NULL) {
 				// needs direction
-				snprintf(temp, sizeof(temp), msg, dirs[get_direction_for_char(targ, dir)]);
+				safe_snprintf(temp, sizeof(temp), msg, dirs[get_direction_for_char(targ, dir)]);
 				act(temp, TRUE, ch, NULL, targ, TO_VICT | is_animal_move);
 			}
 			else {

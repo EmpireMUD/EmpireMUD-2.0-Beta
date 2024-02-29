@@ -231,10 +231,10 @@ char *list_one_craft(craft_data *craft, bool detail) {
 	static char output[MAX_STRING_LENGTH];
 	
 	if (detail) {
-		snprintf(output, sizeof(output), "[%5d] %s (%s)", GET_CRAFT_VNUM(craft), GET_CRAFT_NAME(craft), craft_types[GET_CRAFT_TYPE(craft)]);
+		safe_snprintf(output, sizeof(output), "[%5d] %s (%s)", GET_CRAFT_VNUM(craft), GET_CRAFT_NAME(craft), craft_types[GET_CRAFT_TYPE(craft)]);
 	}
 	else {
-		snprintf(output, sizeof(output), "[%5d] %s", GET_CRAFT_VNUM(craft), GET_CRAFT_NAME(craft));
+		safe_snprintf(output, sizeof(output), "[%5d] %s", GET_CRAFT_VNUM(craft), GET_CRAFT_NAME(craft));
 	}
 	
 	return output;
@@ -261,7 +261,7 @@ void olc_delete_craft(char_data *ch, craft_vnum vnum) {
 		return;
 	}
 	
-	snprintf(name, sizeof(name), "%s", NULLSAFE(GET_CRAFT_NAME(craft)));
+	safe_snprintf(name, sizeof(name), "%s", NULLSAFE(GET_CRAFT_NAME(craft)));
 	
 	if (HASH_COUNT(craft_table) <= 1) {
 		msg_to_char(ch, "You can't delete the last craft.\r\n");

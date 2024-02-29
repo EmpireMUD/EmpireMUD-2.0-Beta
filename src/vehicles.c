@@ -173,7 +173,7 @@ bool check_vehicle_climate_change(vehicle_data *veh, bool immediate_only) {
 		
 		if (res && VEH_OWNER(veh)) {
 			// log AFTER because it probably logged on its own if it auto-abandoned
-			snprintf(buf, sizeof(buf), "%s%s is falling into ruin due to changing terrain", get_vehicle_short_desc(veh, NULL), coord_display_room(NULL, IN_ROOM(veh), FALSE));
+			safe_snprintf(buf, sizeof(buf), "%s%s is falling into ruin due to changing terrain", get_vehicle_short_desc(veh, NULL), coord_display_room(NULL, IN_ROOM(veh), FALSE));
 			log_to_empire(VEH_OWNER(veh), ELOG_TERRITORY, "%s", CAP(buf));
 		}
 		
@@ -182,7 +182,7 @@ bool check_vehicle_climate_change(vehicle_data *veh, bool immediate_only) {
 	else if (!slow_ruin) {
 		if (VEH_OWNER(veh)) {
 			// log before ruining (it'll be gone)
-			snprintf(buf, sizeof(buf), "%s%s has crumbled to ruin", get_vehicle_short_desc(veh, NULL), coord_display_room(NULL, IN_ROOM(veh), FALSE));
+			safe_snprintf(buf, sizeof(buf), "%s%s has crumbled to ruin", get_vehicle_short_desc(veh, NULL), coord_display_room(NULL, IN_ROOM(veh), FALSE));
 			log_to_empire(VEH_OWNER(veh), ELOG_TERRITORY, "%s", CAP(buf));
 		}
 		// this will extract it (usually)
@@ -297,7 +297,7 @@ bool decay_one_vehicle(vehicle_data *veh, char *message) {
 		// 50% of the time we just abandon, the rest we also decay to ruins
 		if (!number(0, 1) || VEH_IS_DISMANTLING(veh)) {
 			if (emp) {
-				snprintf(buf, sizeof(buf), "%s%s has crumbled to ruin", get_vehicle_short_desc(veh, NULL), coord_display_room(NULL, IN_ROOM(veh), FALSE));
+				safe_snprintf(buf, sizeof(buf), "%s%s has crumbled to ruin", get_vehicle_short_desc(veh, NULL), coord_display_room(NULL, IN_ROOM(veh), FALSE));
 				log_to_empire(emp, ELOG_TERRITORY, "%s", CAP(buf));
 			}
 			msg = veh_get_custom_message(veh, VEH_CUSTOM_RUINS_TO_ROOM);
@@ -305,7 +305,7 @@ bool decay_one_vehicle(vehicle_data *veh, char *message) {
 			return FALSE;	// returns only if ruined
 		}
 		else if (emp && !VEH_OWNER(veh)) {
-			snprintf(buf, sizeof(buf), "%s%s has been abandoned due to decay", get_vehicle_short_desc(veh, NULL), coord_display_room(NULL, IN_ROOM(veh), FALSE));
+			safe_snprintf(buf, sizeof(buf), "%s%s has been abandoned due to decay", get_vehicle_short_desc(veh, NULL), coord_display_room(NULL, IN_ROOM(veh), FALSE));
 			log_to_empire(emp, ELOG_TERRITORY, "%s", CAP(buf));
 		}
 	}
@@ -810,7 +810,7 @@ char *list_harnessed_mobs(vehicle_data *veh) {
 		}
 		
 		if (count > 1) {
-			snprintf(mult, sizeof(mult), " (x%d)", count);
+			safe_snprintf(mult, sizeof(mult), " (x%d)", count);
 		}
 		else {
 			*mult = '\0';
@@ -1156,7 +1156,7 @@ void set_vehicle_look_desc_append(vehicle_data *veh, const char *str, bool forma
 	char temp[MAX_STRING_LENGTH];
 	
 	if (str && *str) {
-		snprintf(temp, sizeof(temp), "%s%s", NULLSAFE(VEH_LOOK_DESC(veh)), str);
+		safe_snprintf(temp, sizeof(temp), "%s%s", NULLSAFE(VEH_LOOK_DESC(veh)), str);
 		
 		// check trailing crlf
 		if (str[strlen(str)-1] != '\r' && str[strlen(str)-1] != '\n') {
@@ -2029,10 +2029,10 @@ char *list_one_vehicle(vehicle_data *veh, bool detail) {
 	// char part[MAX_STRING_LENGTH], applies[MAX_STRING_LENGTH];
 	
 	if (detail) {
-		snprintf(output, sizeof(output), "[%5d] %s", VEH_VNUM(veh), VEH_SHORT_DESC(veh));
+		safe_snprintf(output, sizeof(output), "[%5d] %s", VEH_VNUM(veh), VEH_SHORT_DESC(veh));
 	}
 	else {
-		snprintf(output, sizeof(output), "[%5d] %s", VEH_VNUM(veh), VEH_SHORT_DESC(veh));
+		safe_snprintf(output, sizeof(output), "[%5d] %s", VEH_VNUM(veh), VEH_SHORT_DESC(veh));
 	}
 		
 	return output;
@@ -2270,37 +2270,37 @@ void process_dismantle_vehicle(char_data *ch) {
 		switch (res->type) {
 			// RES_COMPONENT (stored as obj), RES_ACTION, RES_TOOL (stored as obj), and RES_CURRENCY aren't possible here
 			case RES_OBJECT: {
-				snprintf(buf, sizeof(buf), "You carefully remove %s from $V.", get_obj_name_by_proto(res->vnum));
+				safe_snprintf(buf, sizeof(buf), "You carefully remove %s from $V.", get_obj_name_by_proto(res->vnum));
 				act(buf, FALSE, ch, NULL, veh, TO_CHAR | TO_SPAMMY | ACT_VEH_VICT);
-				snprintf(buf, sizeof(buf), "$n removes %s from $V.", get_obj_name_by_proto(res->vnum));
+				safe_snprintf(buf, sizeof(buf), "$n removes %s from $V.", get_obj_name_by_proto(res->vnum));
 				act(buf, FALSE, ch, NULL, veh, TO_ROOM | TO_SPAMMY | ACT_VEH_VICT);
 				break;
 			}
 			case RES_LIQUID: {
-				snprintf(buf, sizeof(buf), "You carefully retrieve %d unit%s of %s from $V.", res->amount, PLURAL(res->amount), get_generic_string_by_vnum(res->vnum, GENERIC_LIQUID, GSTR_LIQUID_NAME));
+				safe_snprintf(buf, sizeof(buf), "You carefully retrieve %d unit%s of %s from $V.", res->amount, PLURAL(res->amount), get_generic_string_by_vnum(res->vnum, GENERIC_LIQUID, GSTR_LIQUID_NAME));
 				act(buf, FALSE, ch, NULL, veh, TO_CHAR | TO_SPAMMY | ACT_VEH_VICT);
-				snprintf(buf, sizeof(buf), "$n retrieves some %s from $V.", get_generic_string_by_vnum(res->vnum, GENERIC_LIQUID, GSTR_LIQUID_NAME));
+				safe_snprintf(buf, sizeof(buf), "$n retrieves some %s from $V.", get_generic_string_by_vnum(res->vnum, GENERIC_LIQUID, GSTR_LIQUID_NAME));
 				act(buf, FALSE, ch, NULL, veh, TO_ROOM | TO_SPAMMY | ACT_VEH_VICT);
 				break;
 			}
 			case RES_COINS: {
-				snprintf(buf, sizeof(buf), "You retrieve %s from $V.", money_amount(real_empire(res->vnum), res->amount));
+				safe_snprintf(buf, sizeof(buf), "You retrieve %s from $V.", money_amount(real_empire(res->vnum), res->amount));
 				act(buf, FALSE, ch, NULL, veh, TO_CHAR | TO_SPAMMY | ACT_VEH_VICT);
-				snprintf(buf, sizeof(buf), "$n retrieves %s from $V.", res->amount == 1 ? "a coin" : "some coins");
+				safe_snprintf(buf, sizeof(buf), "$n retrieves %s from $V.", res->amount == 1 ? "a coin" : "some coins");
 				act(buf, FALSE, ch, NULL, veh, TO_ROOM | TO_SPAMMY | ACT_VEH_VICT);
 				break;
 			}
 			case RES_POOL: {
-				snprintf(buf, sizeof(buf), "You regain %d %s point%s from $V.", res->amount, pool_types[res->vnum], PLURAL(res->amount));
+				safe_snprintf(buf, sizeof(buf), "You regain %d %s point%s from $V.", res->amount, pool_types[res->vnum], PLURAL(res->amount));
 				act(buf, FALSE, ch, NULL, veh, TO_CHAR | TO_SPAMMY | ACT_VEH_VICT);
-				snprintf(buf, sizeof(buf), "$n retrieves %s from $V.", pool_types[res->vnum]);
+				safe_snprintf(buf, sizeof(buf), "$n retrieves %s from $V.", pool_types[res->vnum]);
 				act(buf, FALSE, ch, NULL, veh, TO_ROOM | TO_SPAMMY | ACT_VEH_VICT);
 				break;
 			}
 			case RES_CURRENCY: {
-				snprintf(buf, sizeof(buf), "You retrieve %d %s from $V.", res->amount, get_generic_string_by_vnum(res->vnum, GENERIC_CURRENCY, WHICH_CURRENCY(res->amount)));
+				safe_snprintf(buf, sizeof(buf), "You retrieve %d %s from $V.", res->amount, get_generic_string_by_vnum(res->vnum, GENERIC_CURRENCY, WHICH_CURRENCY(res->amount)));
 				act(buf, FALSE, ch, NULL, veh, TO_CHAR | TO_SPAMMY | ACT_VEH_VICT);
-				snprintf(buf, sizeof(buf), "$n retrieves %d %s from $V.", res->amount, get_generic_string_by_vnum(res->vnum, GENERIC_CURRENCY, WHICH_CURRENCY(res->amount)));
+				safe_snprintf(buf, sizeof(buf), "$n retrieves %d %s from $V.", res->amount, get_generic_string_by_vnum(res->vnum, GENERIC_CURRENCY, WHICH_CURRENCY(res->amount)));
 				act(buf, FALSE, ch, NULL, veh, TO_ROOM | TO_SPAMMY | ACT_VEH_VICT);
 				break;
 			}
@@ -3622,7 +3622,7 @@ void olc_delete_vehicle(char_data *ch, any_vnum vnum) {
 		return;
 	}
 	
-	snprintf(name, sizeof(name), "%s", NULLSAFE(VEH_SHORT_DESC(veh)));
+	safe_snprintf(name, sizeof(name), "%s", NULLSAFE(VEH_SHORT_DESC(veh)));
 	
 	// remove live vehicles
 	DL_FOREACH_SAFE(vehicle_list, iter, next_iter) {

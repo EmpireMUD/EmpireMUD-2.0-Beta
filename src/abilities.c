@@ -456,7 +456,7 @@ void show_ability_info(char_data *ch, ability_data *abil, ability_data *parent, 
 		}
 		
 		// build craft display:
-		snprintf(sbuf, sizeof(sbuf), " %s%s", GET_CRAFT_NAME(craft), CRAFT_FLAGGED(craft, CRAFT_LEARNED) ? " (learned)" : "");
+		safe_snprintf(sbuf, sizeof(sbuf), " %s%s", GET_CRAFT_NAME(craft), CRAFT_FLAGGED(craft, CRAFT_LEARNED) ? " (learned)" : "");
 		
 		// needs header?
 		if (count == 0) {
@@ -753,7 +753,7 @@ char *estimate_ability_cost(char_data *ch, ability_data *abil) {
 		estimate = TRUE;
 	}
 	
-	snprintf(output, sizeof(output), "%d%s", cost, (estimate ? " (estimated)" : ""));
+	safe_snprintf(output, sizeof(output), "%d%s", cost, (estimate ? " (estimated)" : ""));
 	return output;
 }
 
@@ -2297,7 +2297,7 @@ INTERACTION_FUNC(devastate_crop) {
 	}
 	
 	if (newobj && obj_ok) {
-		snprintf(type, sizeof(type), "%s", GET_CROP_NAME(cp));
+		safe_snprintf(type, sizeof(type), "%s", GET_CROP_NAME(cp));
 		strtolower(type);
 		
 		send_ability_per_item_messages(ch, newobj, interaction->quantity, abil, data, type);
@@ -2341,7 +2341,7 @@ INTERACTION_FUNC(devastate_trees) {
 	add_depletion(inter_room, DPLTN_CHOP, FALSE);
 	
 	if (newobj && obj_ok) {
-		snprintf(type, sizeof(type), "%s", GET_SECT_NAME(SECT(inter_room)));
+		safe_snprintf(type, sizeof(type), "%s", GET_SECT_NAME(SECT(inter_room)));
 		strtolower(type);
 		
 		send_ability_per_item_messages(ch, newobj, amount, abil, data, type);
@@ -2480,7 +2480,7 @@ DO_ABIL(abil_action_detect_adventures_around) {
 		// show instance
 		data->success = TRUE;
 		dir_str = get_partial_direction_to(ch, IN_ROOM(ch), loc, (PRF_FLAGGED(ch, PRF_SCREEN_READER) ? FALSE : TRUE));
-		snprintf(where_str, sizeof(where_str), "%s%s - %d %s", get_room_name(loc, FALSE), coord_display_room(ch, loc, FALSE), compute_distance(IN_ROOM(ch), loc), (dir_str && *dir_str) ? dir_str : "away");
+		safe_snprintf(where_str, sizeof(where_str), "%s%s - %d %s", get_room_name(loc, FALSE), coord_display_room(ch, loc, FALSE), compute_distance(IN_ROOM(ch), loc), (dir_str && *dir_str) ? dir_str : "away");
 		
 		repl_array[0] = where_str;
 		repl_array[1] = GET_ADV_NAME(INST_ADVENTURE(inst));
@@ -2579,7 +2579,7 @@ DO_ABIL(abil_action_detect_players_around) {
 		// ok:
 		data->success = TRUE;
 		dir_str = get_partial_direction_to(ch, IN_ROOM(ch), IN_ROOM(ch_iter), (PRF_FLAGGED(ch, PRF_SCREEN_READER) ? FALSE : TRUE));
-		snprintf(where_str, sizeof(where_str), "%s%s - %d %s", get_room_name(IN_ROOM(ch_iter), FALSE), coord_display_room(ch, IN_ROOM(ch_iter), FALSE), compute_distance(IN_ROOM(ch), IN_ROOM(ch_iter)), (dir_str && *dir_str) ? dir_str : "away");
+		safe_snprintf(where_str, sizeof(where_str), "%s%s - %d %s", get_room_name(IN_ROOM(ch_iter), FALSE), coord_display_room(ch, IN_ROOM(ch_iter), FALSE), compute_distance(IN_ROOM(ch), IN_ROOM(ch_iter)), (dir_str && *dir_str) ? dir_str : "away");
 		send_ability_per_char_messages(ch, ch_iter, 1, abil, data, where_str);
 	}
 }
@@ -2719,7 +2719,7 @@ DO_ABIL(abil_action_magic_growth) {
 	// percentage is checked in the evolution data
 	if (room_targ && (evo = get_evolution_by_type(SECT(room_targ), EVO_MAGIC_GROWTH)) && !ROOM_AFF_FLAGGED(room_targ, ROOM_AFF_NO_EVOLVE)) {
 		preserve = (BASE_SECT(room_targ) != SECT(room_targ)) ? BASE_SECT(room_targ) : NULL;
-		snprintf(was_name, sizeof(was_name), "%s", GET_SECT_NAME(SECT(room_targ)));
+		safe_snprintf(was_name, sizeof(was_name), "%s", GET_SECT_NAME(SECT(room_targ)));
 		
 		change_terrain(room_targ, evo->becomes, preserve ? GET_SECT_VNUM(preserve) : NOTHING);
 		
@@ -3235,7 +3235,7 @@ bool check_ability_limitations(char_data *ch, ability_data *abil, char_data *vic
 					have_room_permission = TRUE;
 				}
 				else if (!*room_permission_error) {
-					snprintf(room_permission_error, sizeof(room_permission_error), "You don't have permission to do that here.\r\n");
+					safe_snprintf(room_permission_error, sizeof(room_permission_error), "You don't have permission to do that here.\r\n");
 				}
 				break;
 			}
@@ -3246,7 +3246,7 @@ bool check_ability_limitations(char_data *ch, ability_data *abil, char_data *vic
 					have_room_permission = TRUE;
 				}
 				else if (!*room_permission_error) {
-					snprintf(room_permission_error, sizeof(room_permission_error), "You don't have permission to do that here.\r\n");
+					safe_snprintf(room_permission_error, sizeof(room_permission_error), "You don't have permission to do that here.\r\n");
 				}
 				break;
 			}
@@ -3257,7 +3257,7 @@ bool check_ability_limitations(char_data *ch, ability_data *abil, char_data *vic
 					have_room_permission = TRUE;
 				}
 				else if (!*room_permission_error) {
-					snprintf(room_permission_error, sizeof(room_permission_error), "You don't have permission to do that here.\r\n");
+					safe_snprintf(room_permission_error, sizeof(room_permission_error), "You don't have permission to do that here.\r\n");
 				}
 				break;
 			}
@@ -3461,7 +3461,7 @@ bool check_ability_limitations(char_data *ch, ability_data *abil, char_data *vic
 				}
 				else if (!*item_type_error) {
 					sprinttype(adl->misc, item_types, part, sizeof(part), "UNKNOWN");
-					snprintf(item_type_error, sizeof(item_type_error), "You must target %s %s item.\r\n", AN(part), part);
+					safe_snprintf(item_type_error, sizeof(item_type_error), "You must target %s %s item.\r\n", AN(part), part);
 				}
 				break;
 			}
@@ -3472,7 +3472,7 @@ bool check_ability_limitations(char_data *ch, ability_data *abil, char_data *vic
 					have_weapon = TRUE;
 				}
 				else if (!*weapon_error) {
-					snprintf(weapon_error, sizeof(weapon_error), "You can't do that while your weapon is disarmed!\r\n");
+					safe_snprintf(weapon_error, sizeof(weapon_error), "You can't do that while your weapon is disarmed!\r\n");
 				}
 				break;
 			}
@@ -3483,7 +3483,7 @@ bool check_ability_limitations(char_data *ch, ability_data *abil, char_data *vic
 					have_weapon = TRUE;
 				}
 				else if (!*weapon_error) {
-					snprintf(weapon_error, sizeof(weapon_error), "You need to wield a '%s' weapon to do that.\r\n", get_attack_name_by_vnum(adl->misc));
+					safe_snprintf(weapon_error, sizeof(weapon_error), "You need to wield a '%s' weapon to do that.\r\n", get_attack_name_by_vnum(adl->misc));
 				}
 				break;
 			}
@@ -3494,7 +3494,7 @@ bool check_ability_limitations(char_data *ch, ability_data *abil, char_data *vic
 					have_weapon = TRUE;
 				}
 				else if (!*weapon_error) {
-					snprintf(weapon_error, sizeof(weapon_error), "You need to be wielding a %s weapon to do that.\r\n", weapon_types[adl->misc]);
+					safe_snprintf(weapon_error, sizeof(weapon_error), "You need to be wielding a %s weapon to do that.\r\n", weapon_types[adl->misc]);
 				}
 				break;
 			}
@@ -4002,7 +4002,7 @@ PREP_ABIL(prep_conjure_liquid_ability) {
 			// ok, both are different liquids... is it a problem?
 			if (!GEN_FLAGGED(existing, GEN_BASIC) || !IS_SET(GET_LIQUID_FLAGS(gen), LIQF_WATER) || !IS_SET(GET_LIQUID_FLAGS(existing), LIQF_WATER)) {
 				// 1 is not water, or existing is not basic water
-				snprintf(buf, sizeof(buf), "$p already contains %s.", GET_LIQUID_NAME(existing));
+				safe_snprintf(buf, sizeof(buf), "$p already contains %s.", GET_LIQUID_NAME(existing));
 				act(buf, FALSE, ch, ovict, NULL, TO_CHAR | TO_SLEEP);
 				CANCEL_ABILITY(data);
 				return;
@@ -5860,7 +5860,7 @@ void send_ability_activation_messages(char_data *ch, char_data *vict, obj_data *
 			if ((msg = get_custom_message_pos(ABIL_CUSTOM_MSGS(abil), ABIL_CUSTOM_SELF_TO_CHAR, pos))) {
 				if (*msg != '*') {
 					if (*healing) {
-						snprintf(buf, sizeof(buf), "%s%s", msg, healing);
+						safe_snprintf(buf, sizeof(buf), "%s%s", msg, healing);
 						act(buf, FALSE, ch, ovict, vict, TO_CHAR | TO_SLEEP | act_flags);
 					}
 					else {
@@ -5871,7 +5871,7 @@ void send_ability_activation_messages(char_data *ch, char_data *vict, obj_data *
 			}
 			else if (!_AAM_NO_DEFAULT(abil)) {
 				// no default if it's damage/attack
-				snprintf(buf, sizeof(buf), "You use %s!%s", SAFE_ABIL_COMMAND(abil), healing);
+				safe_snprintf(buf, sizeof(buf), "You use %s!%s", SAFE_ABIL_COMMAND(abil), healing);
 				act(buf, FALSE, ch, ovict, vict, TO_CHAR | TO_SLEEP | act_flags);
 			}
 		
@@ -5883,7 +5883,7 @@ void send_ability_activation_messages(char_data *ch, char_data *vict, obj_data *
 			}
 			else if (!_AAM_NO_DEFAULT(abil)) {
 				// no default if it's damage/attack
-				snprintf(buf, sizeof(buf), "$n uses %s!", SAFE_ABIL_COMMAND(abil));
+				safe_snprintf(buf, sizeof(buf), "$n uses %s!", SAFE_ABIL_COMMAND(abil));
 				act(buf, invis, ch, ovict, vict, TO_ROOM | act_flags);
 			}
 		}
@@ -5896,7 +5896,7 @@ void send_ability_activation_messages(char_data *ch, char_data *vict, obj_data *
 			if ((msg = get_custom_message_pos(ABIL_CUSTOM_MSGS(abil), ABIL_CUSTOM_TARGETED_TO_CHAR, pos))) {
 				if (*msg != '*') {
 					if (*healing) {
-						snprintf(buf, sizeof(buf), "%s%s", msg, healing);
+						safe_snprintf(buf, sizeof(buf), "%s%s", msg, healing);
 						act(buf, FALSE, ch, ovict, vict, TO_CHAR | TO_SLEEP | act_flags);
 					}
 					else {
@@ -5907,7 +5907,7 @@ void send_ability_activation_messages(char_data *ch, char_data *vict, obj_data *
 			}
 			else if (!_AAM_NO_DEFAULT(abil)) {
 				// no default if it's damage/attack
-				snprintf(buf, sizeof(buf), "You use %s on $N!%s", SAFE_ABIL_COMMAND(abil), healing);
+				safe_snprintf(buf, sizeof(buf), "You use %s on $N!%s", SAFE_ABIL_COMMAND(abil), healing);
 				act(buf, FALSE, ch, ovict, vict, TO_CHAR | TO_SLEEP | act_flags);
 			}
 		
@@ -5915,7 +5915,7 @@ void send_ability_activation_messages(char_data *ch, char_data *vict, obj_data *
 			if ((msg = _ABIL_MATCHING_MESSAGE(ABIL_CUSTOM_MSGS(abil), ABIL_CUSTOM_TARGETED_TO_VICT))) {
 				if (*msg != '*') {
 					if (*healing) {
-						snprintf(buf, sizeof(buf), "%s%s", msg, healing);
+						safe_snprintf(buf, sizeof(buf), "%s%s", msg, healing);
 						act(buf, invis, ch, ovict, vict, TO_VICT | act_flags);
 					}
 					else {
@@ -5926,7 +5926,7 @@ void send_ability_activation_messages(char_data *ch, char_data *vict, obj_data *
 			}
 			else if (!_AAM_NO_DEFAULT(abil)) {
 				// no default if it's damage/attack
-				snprintf(buf, sizeof(buf), "$n uses %s on you!%s", SAFE_ABIL_COMMAND(abil), healing);
+				safe_snprintf(buf, sizeof(buf), "$n uses %s on you!%s", SAFE_ABIL_COMMAND(abil), healing);
 				act(buf, invis, ch, ovict, vict, TO_VICT | act_flags);
 			}
 		
@@ -5938,7 +5938,7 @@ void send_ability_activation_messages(char_data *ch, char_data *vict, obj_data *
 			}
 			else if (!_AAM_NO_DEFAULT(abil)) {
 				// no default if it's damage/attack
-				snprintf(buf, sizeof(buf), "$n uses %s on $N!", SAFE_ABIL_COMMAND(abil));
+				safe_snprintf(buf, sizeof(buf), "$n uses %s on $N!", SAFE_ABIL_COMMAND(abil));
 				act(buf, invis, ch, ovict, vict, TO_NOTVICT | act_flags);
 			}
 		}
@@ -5956,7 +5956,7 @@ void send_ability_activation_messages(char_data *ch, char_data *vict, obj_data *
 		}
 		else if (!_AAM_NO_DEFAULT(abil)) {
 			// no default if it's damage/attack
-			snprintf(buf, sizeof(buf), "You use %s on $p!", SAFE_ABIL_COMMAND(abil));
+			safe_snprintf(buf, sizeof(buf), "You use %s on $p!", SAFE_ABIL_COMMAND(abil));
 			act(buf, FALSE, ch, ovict, NULL, TO_CHAR | TO_SLEEP | act_flags);
 		}
 	
@@ -5968,7 +5968,7 @@ void send_ability_activation_messages(char_data *ch, char_data *vict, obj_data *
 		}
 		else if (!_AAM_NO_DEFAULT(abil)) {
 			// no default if it's damage/attack
-			snprintf(buf, sizeof(buf), "$n uses %s on $p!", SAFE_ABIL_COMMAND(abil));
+			safe_snprintf(buf, sizeof(buf), "$n uses %s on $p!", SAFE_ABIL_COMMAND(abil));
 			act(buf, invis, ch, ovict, NULL, TO_ROOM | act_flags);
 		}
 	}
@@ -5985,7 +5985,7 @@ void send_ability_activation_messages(char_data *ch, char_data *vict, obj_data *
 		}
 		else if (!_AAM_NO_DEFAULT(abil)) {
 			// no default if it's damage/attack
-			snprintf(buf, sizeof(buf), "You use %s on $V!", SAFE_ABIL_COMMAND(abil));
+			safe_snprintf(buf, sizeof(buf), "You use %s on $V!", SAFE_ABIL_COMMAND(abil));
 			act(buf, FALSE, ch, NULL, vvict, TO_CHAR | TO_SLEEP | ACT_VEH_VICT | act_flags);
 		}
 	
@@ -5997,7 +5997,7 @@ void send_ability_activation_messages(char_data *ch, char_data *vict, obj_data *
 		}
 		else if (!_AAM_NO_DEFAULT(abil)) {
 			// no default if it's damage/attack
-			snprintf(buf, sizeof(buf), "$n uses %s on $V!", SAFE_ABIL_COMMAND(abil));
+			safe_snprintf(buf, sizeof(buf), "$n uses %s on $V!", SAFE_ABIL_COMMAND(abil));
 			act(buf, invis, ch, NULL, vvict, TO_ROOM | ACT_VEH_VICT | act_flags);
 		}
 	}
@@ -6043,7 +6043,7 @@ void send_ability_counterspell_messages(char_data *ch, char_data *vict, ability_
 		}
 	}
 	else {
-		snprintf(buf, sizeof(buf), "You %s $N, but $E counterspells it!", SAFE_ABIL_COMMAND(abil));
+		safe_snprintf(buf, sizeof(buf), "You %s $N, but $E counterspells it!", SAFE_ABIL_COMMAND(abil));
 		act(buf, FALSE, ch, NULL, vict, TO_CHAR | TO_SLEEP | ACT_ABILITY);
 	}
 	
@@ -6054,7 +6054,7 @@ void send_ability_counterspell_messages(char_data *ch, char_data *vict, ability_
 		}
 	}
 	else {
-		snprintf(buf, sizeof(buf), "$n tries to %s you, but you counterspell it!", SAFE_ABIL_COMMAND(abil));
+		safe_snprintf(buf, sizeof(buf), "$n tries to %s you, but you counterspell it!", SAFE_ABIL_COMMAND(abil));
 		act(buf, FALSE, ch, NULL, vict, TO_VICT | ACT_ABILITY);
 	}
 	
@@ -6065,7 +6065,7 @@ void send_ability_counterspell_messages(char_data *ch, char_data *vict, ability_
 		}
 	}
 	else {
-		snprintf(buf, sizeof(buf), "$n tries to %s $N, but $E counterspells it!", SAFE_ABIL_COMMAND(abil));
+		safe_snprintf(buf, sizeof(buf), "$n tries to %s $N, but $E counterspells it!", SAFE_ABIL_COMMAND(abil));
 		act(buf, FALSE, ch, NULL, vict, TO_NOTVICT | ACT_ABILITY);
 	}
 }
@@ -6115,7 +6115,7 @@ void send_ability_fail_messages(char_data *ch, char_data *vict, obj_data *ovict,
 		}
 		else if (!IS_SET(ABIL_TYPES(abil), NO_DEFAULT_MESSAGES_TYPES)) {
 			// attack/damage suppress fails; everthing else gets a default:
-			snprintf(buf, sizeof(buf), "You fail to use %s!", SAFE_ABIL_COMMAND(abil));
+			safe_snprintf(buf, sizeof(buf), "You fail to use %s!", SAFE_ABIL_COMMAND(abil));
 			act(buf, FALSE, ch, ovict, vict, TO_CHAR | TO_SLEEP | act_flags);
 		}
 	
@@ -6127,7 +6127,7 @@ void send_ability_fail_messages(char_data *ch, char_data *vict, obj_data *ovict,
 		}
 		else if (!IS_SET(ABIL_TYPES(abil), NO_DEFAULT_MESSAGES_TYPES)) {
 			// attack/damage suppress fails; everthing else gets a default:
-			snprintf(buf, sizeof(buf), "$n fails to use %s!", SAFE_ABIL_COMMAND(abil));
+			safe_snprintf(buf, sizeof(buf), "$n fails to use %s!", SAFE_ABIL_COMMAND(abil));
 			act(buf, invis, ch, ovict, vict, TO_ROOM | act_flags);
 		}
 	}
@@ -6143,7 +6143,7 @@ void send_ability_fail_messages(char_data *ch, char_data *vict, obj_data *ovict,
 		}
 		else if (!IS_SET(ABIL_TYPES(abil), NO_DEFAULT_MESSAGES_TYPES)) {
 			// attack/damage suppress fails; everthing else gets a default:
-			snprintf(buf, sizeof(buf), "You try to use %s on $N, but fail!", SAFE_ABIL_COMMAND(abil));
+			safe_snprintf(buf, sizeof(buf), "You try to use %s on $N, but fail!", SAFE_ABIL_COMMAND(abil));
 			act(buf, FALSE, ch, ovict, vict, TO_CHAR | TO_SLEEP | act_flags);
 		}
 	
@@ -6155,7 +6155,7 @@ void send_ability_fail_messages(char_data *ch, char_data *vict, obj_data *ovict,
 		}
 		else if (!IS_SET(ABIL_TYPES(abil), NO_DEFAULT_MESSAGES_TYPES)) {
 			// attack/damage suppress fails; everthing else gets a default:
-			snprintf(buf, sizeof(buf), "$n tries to use %s on you, but fails!", SAFE_ABIL_COMMAND(abil));
+			safe_snprintf(buf, sizeof(buf), "$n tries to use %s on you, but fails!", SAFE_ABIL_COMMAND(abil));
 			act(buf, invis, ch, ovict, vict, TO_VICT | act_flags);
 		}
 	
@@ -6167,7 +6167,7 @@ void send_ability_fail_messages(char_data *ch, char_data *vict, obj_data *ovict,
 		}
 		else if (!IS_SET(ABIL_TYPES(abil), NO_DEFAULT_MESSAGES_TYPES)) {
 			// attack/damage suppress fails; everthing else gets a default:
-			snprintf(buf, sizeof(buf), "$n tries to use %s on $N, but fails!", SAFE_ABIL_COMMAND(abil));
+			safe_snprintf(buf, sizeof(buf), "$n tries to use %s on $N, but fails!", SAFE_ABIL_COMMAND(abil));
 			act(buf, invis, ch, ovict, vict, TO_NOTVICT | act_flags);
 		}
 	}
@@ -6182,7 +6182,7 @@ void send_ability_fail_messages(char_data *ch, char_data *vict, obj_data *ovict,
 			}
 		}
 		else {
-			snprintf(buf, sizeof(buf), "You try to use %s on $p, but fail!", SAFE_ABIL_COMMAND(abil));
+			safe_snprintf(buf, sizeof(buf), "You try to use %s on $p, but fail!", SAFE_ABIL_COMMAND(abil));
 			act(buf, FALSE, ch, ovict, NULL, TO_CHAR | TO_SLEEP | act_flags);
 		}
 		
@@ -6193,7 +6193,7 @@ void send_ability_fail_messages(char_data *ch, char_data *vict, obj_data *ovict,
 			}
 		}
 		else {
-			snprintf(buf, sizeof(buf), "$n tries to use %s on $p, but fails!", SAFE_ABIL_COMMAND(abil));
+			safe_snprintf(buf, sizeof(buf), "$n tries to use %s on $p, but fails!", SAFE_ABIL_COMMAND(abil));
 			act(buf, invis, ch, ovict, NULL, TO_ROOM | act_flags);
 		}
 	}
@@ -6373,7 +6373,7 @@ void send_ability_per_char_messages(char_data *ch, char_data *vict, int quantity
 	act_flags |= IS_SET(ABIL_TYPES(abil), ABILT_RESTORE) ? ACT_HEAL : ACT_ABILITY;
 	
 	if (quantity > 1) {
-		snprintf(multi, sizeof(multi), " (x%d)", quantity);
+		safe_snprintf(multi, sizeof(multi), " (x%d)", quantity);
 	}
 	else {
 		*multi = '\0';
@@ -6384,7 +6384,7 @@ void send_ability_per_char_messages(char_data *ch, char_data *vict, int quantity
 	
 	// to-char ONLY if there's a custom message
 	if ((msg = get_custom_message_pos(ABIL_CUSTOM_MSGS(abil), ABIL_CUSTOM_PER_CHAR_TO_CHAR, pos)) && *msg != '*') {
-		snprintf(buf, sizeof(buf), "%s%s", msg, multi);
+		safe_snprintf(buf, sizeof(buf), "%s%s", msg, multi);
 		repl = str_replace("$1", NULLSAFE(replace_1), buf);
 		act(repl, FALSE, ch, NULL, vict, TO_CHAR | TO_SLEEP | act_flags);
 		free(repl);
@@ -6397,7 +6397,7 @@ void send_ability_per_char_messages(char_data *ch, char_data *vict, int quantity
 	
 	// to vict ONLY if there's a custom message
 	if ((msg = _ABIL_MATCHING_MESSAGE(ABIL_CUSTOM_MSGS(abil), ABIL_CUSTOM_PER_CHAR_TO_VICT)) && *msg != '*') {
-		snprintf(buf, sizeof(buf), "%s%s", msg, multi);
+		safe_snprintf(buf, sizeof(buf), "%s%s", msg, multi);
 		repl = str_replace("$1", NULLSAFE(replace_1), buf);
 		act(repl, invis, ch, NULL, vict, TO_VICT | act_flags);
 		free(repl);
@@ -6405,7 +6405,7 @@ void send_ability_per_char_messages(char_data *ch, char_data *vict, int quantity
 	
 	// to room ONLY if there's a custom message
 	if ((msg = _ABIL_MATCHING_MESSAGE(ABIL_CUSTOM_MSGS(abil), ABIL_CUSTOM_PER_CHAR_TO_ROOM)) && *msg != '*') {
-		snprintf(buf, sizeof(buf), "%s%s", msg, multi);
+		safe_snprintf(buf, sizeof(buf), "%s%s", msg, multi);
 		repl = str_replace("$1", NULLSAFE(replace_1), buf);
 		act(repl, invis, ch, NULL, vict, TO_NOTVICT | act_flags);
 		free(repl);
@@ -6444,7 +6444,7 @@ void send_ability_per_item_messages(char_data *ch, obj_data *ovict, int quantity
 	act_flags |= IS_SET(ABIL_TYPES(abil), ABILT_RESTORE) ? ACT_HEAL : ACT_ABILITY;
 	
 	if (quantity > 1) {
-		snprintf(multi, sizeof(multi), " (x%d)", quantity);
+		safe_snprintf(multi, sizeof(multi), " (x%d)", quantity);
 	}
 	else {
 		*multi = '\0';
@@ -6455,7 +6455,7 @@ void send_ability_per_item_messages(char_data *ch, obj_data *ovict, int quantity
 	
 	// to-char ONLY if there's a custom message
 	if ((msg = get_custom_message_pos(ABIL_CUSTOM_MSGS(abil), ABIL_CUSTOM_PER_ITEM_TO_CHAR, pos)) && *msg != '*') {
-		snprintf(buf, sizeof(buf), "%s%s", msg, multi);
+		safe_snprintf(buf, sizeof(buf), "%s%s", msg, multi);
 		repl = str_replace("$1", NULLSAFE(replace_1), buf);
 		act(repl, FALSE, ch, ovict, NULL, TO_CHAR | TO_SLEEP | act_flags);
 		free(repl);
@@ -6468,7 +6468,7 @@ void send_ability_per_item_messages(char_data *ch, obj_data *ovict, int quantity
 	
 	// to room ONLY if there's a custom message
 	if ((msg = _ABIL_MATCHING_MESSAGE(ABIL_CUSTOM_MSGS(abil), ABIL_CUSTOM_PER_ITEM_TO_ROOM)) && *msg != '*') {
-		snprintf(buf, sizeof(buf), "%s%s", msg, multi);
+		safe_snprintf(buf, sizeof(buf), "%s%s", msg, multi);
 		repl = str_replace("$1", NULLSAFE(replace_1), buf);
 		act(repl, invis, ch, ovict, NULL, TO_ROOM | act_flags);
 		free(repl);
@@ -6507,7 +6507,7 @@ void send_ability_per_vehicle_message(char_data *ch, vehicle_data *vvict, int qu
 	act_flags |= IS_SET(ABIL_TYPES(abil), ABILT_RESTORE) ? ACT_HEAL : ACT_ABILITY;
 	
 	if (quantity > 1) {
-		snprintf(multi, sizeof(multi), " (x%d)", quantity);
+		safe_snprintf(multi, sizeof(multi), " (x%d)", quantity);
 	}
 	else {
 		*multi = '\0';
@@ -6518,7 +6518,7 @@ void send_ability_per_vehicle_message(char_data *ch, vehicle_data *vvict, int qu
 	
 	// to-char ONLY if there's a custom message
 	if ((msg = get_custom_message_pos(ABIL_CUSTOM_MSGS(abil), ABIL_CUSTOM_PER_VEH_TO_CHAR, pos)) && *msg != '*') {
-		snprintf(buf, sizeof(buf), "%s%s", msg, multi);
+		safe_snprintf(buf, sizeof(buf), "%s%s", msg, multi);
 		repl = str_replace("$1", NULLSAFE(replace_1), buf);
 		act(repl, FALSE, ch, NULL, vvict, TO_CHAR | TO_SLEEP | ACT_VEH_VICT | act_flags);
 		free(repl);
@@ -6531,7 +6531,7 @@ void send_ability_per_vehicle_message(char_data *ch, vehicle_data *vvict, int qu
 	
 	// to room ONLY if there's a custom message
 	if ((msg = _ABIL_MATCHING_MESSAGE(ABIL_CUSTOM_MSGS(abil), ABIL_CUSTOM_PER_VEH_TO_ROOM)) && *msg != '*') {
-		snprintf(buf, sizeof(buf), "%s%s", msg, multi);
+		safe_snprintf(buf, sizeof(buf), "%s%s", msg, multi);
 		repl = str_replace("$1", NULLSAFE(replace_1), buf);
 		act(repl, invis, ch, NULL, vvict, TO_ROOM | ACT_VEH_VICT | act_flags);
 		free(repl);
@@ -6582,7 +6582,7 @@ void send_ability_special_messages(char_data *ch, char_data *vict, obj_data *ovi
 	// to-char ONLY if there's a custom message
 	if ((msg = get_custom_message_pos(ABIL_CUSTOM_MSGS(abil), ABIL_CUSTOM_SPEC_TO_CHAR, pos)) && *msg != '*') {
 		for (iter = 0; iter < replace_count && replace && replace[iter]; ++iter) {
-			snprintf(tok, sizeof(tok), "$%d", iter+1);
+			safe_snprintf(tok, sizeof(tok), "$%d", iter+1);
 			repl = str_replace(tok, replace[iter], msg);
 			if (iter > 0) {
 				free(msg);
@@ -6601,7 +6601,7 @@ void send_ability_special_messages(char_data *ch, char_data *vict, obj_data *ovi
 	// to vict ONLY if there's a custom message
 	if ((msg = _ABIL_MATCHING_MESSAGE(ABIL_CUSTOM_MSGS(abil), ABIL_CUSTOM_SPEC_TO_VICT)) && *msg != '*') {
 		for (iter = 0; iter < replace_count && replace && replace[iter]; ++iter) {
-			snprintf(tok, sizeof(tok), "$%d", iter+1);
+			safe_snprintf(tok, sizeof(tok), "$%d", iter+1);
 			repl = str_replace(tok, replace[iter], msg);
 			if (iter > 0) {
 				free(msg);
@@ -6615,7 +6615,7 @@ void send_ability_special_messages(char_data *ch, char_data *vict, obj_data *ovi
 	// to room ONLY if there's a custom message
 	if ((msg = _ABIL_MATCHING_MESSAGE(ABIL_CUSTOM_MSGS(abil), ABIL_CUSTOM_SPEC_TO_ROOM)) && *msg != '*') {
 		for (iter = 0; iter < replace_count && replace && replace[iter]; ++iter) {
-			snprintf(tok, sizeof(tok), "$%d", iter+1);
+			safe_snprintf(tok, sizeof(tok), "$%d", iter+1);
 			repl = str_replace(tok, replace[iter], msg);
 			if (iter > 0) {
 				free(msg);
@@ -8698,17 +8698,17 @@ char *list_one_ability(ability_data *abil, bool detail) {
 	
 	if (detail) {
 		if ((mabil = find_ability_by_vnum(ABIL_MASTERY_ABIL(abil)))) {
-			snprintf(mastery, sizeof(mastery), " (%s)", ABIL_NAME(mabil));
+			safe_snprintf(mastery, sizeof(mastery), " (%s)", ABIL_NAME(mabil));
 		}
 		else {
 			*mastery = '\0';
 		}
 		get_ability_type_display(ABIL_TYPE_LIST(abil), types, FALSE);
 		
-		snprintf(output, sizeof(output), "[%5d] %s%s - %s", ABIL_VNUM(abil), ABIL_NAME(abil), mastery, types);
+		safe_snprintf(output, sizeof(output), "[%5d] %s%s - %s", ABIL_VNUM(abil), ABIL_NAME(abil), mastery, types);
 	}
 	else {
-		snprintf(output, sizeof(output), "[%5d] %s", ABIL_VNUM(abil), ABIL_NAME(abil));
+		safe_snprintf(output, sizeof(output), "[%5d] %s", ABIL_VNUM(abil), ABIL_NAME(abil));
 	}
 		
 	return output;
@@ -9915,7 +9915,7 @@ void olc_delete_ability(char_data *ch, any_vnum vnum) {
 		return;
 	}
 	
-	snprintf(name, sizeof(name), "%s", NULLSAFE(ABIL_NAME(abil)));
+	safe_snprintf(name, sizeof(name), "%s", NULLSAFE(ABIL_NAME(abil)));
 		
 	// remove it from the hash table first
 	remove_ability_from_table(abil);
@@ -10371,7 +10371,7 @@ void olc_fullsearch_abil(char_data *ch, char *argument) {
 		}
 		
 		else {	// not sure what to do with it? treat it like a keyword
-			snprintf(find_keywords + strlen(find_keywords), sizeof(find_keywords) - strlen(find_keywords), "%s%s", *find_keywords ? " " : "", type_arg);
+			safe_snprintf(find_keywords + strlen(find_keywords), sizeof(find_keywords) - strlen(find_keywords), "%s%s", *find_keywords ? " " : "", type_arg);
 		}
 		
 		// prepare for next loop
@@ -10699,19 +10699,19 @@ char *ability_data_display(struct ability_data_list *adl) {
 	// ADL_x: display by type
 	switch (adl->type) {
 		case ADL_PLAYER_TECH: {
-			snprintf(output, sizeof(output), "%s: %s", type_str, player_tech_types[adl->vnum]);
+			safe_snprintf(output, sizeof(output), "%s: %s", type_str, player_tech_types[adl->vnum]);
 			break;
 		}
 		case ADL_EFFECT: {
-			snprintf(output, sizeof(output), "%s: %s", type_str, ability_effects[adl->vnum]);
+			safe_snprintf(output, sizeof(output), "%s: %s", type_str, ability_effects[adl->vnum]);
 			break;
 		}
 		case ADL_READY_WEAPON: {
-			snprintf(output, sizeof(output), "%s: [%d] %s", type_str, adl->vnum, get_obj_name_by_proto(adl->vnum));
+			safe_snprintf(output, sizeof(output), "%s: [%d] %s", type_str, adl->vnum, get_obj_name_by_proto(adl->vnum));
 			break;
 		}
 		case ADL_SUMMON_MOB: {
-			snprintf(output, sizeof(output), "%s: [%d] %s", type_str, adl->vnum, get_mob_name_by_proto(adl->vnum, FALSE));
+			safe_snprintf(output, sizeof(output), "%s: [%d] %s", type_str, adl->vnum, get_mob_name_by_proto(adl->vnum, FALSE));
 			break;
 		}
 		case ADL_LIMITATION: {
@@ -10719,68 +10719,68 @@ char *ability_data_display(struct ability_data_list *adl) {
 			switch (ability_limitation_misc[adl->vnum]) {
 				case ABLIM_ITEM_TYPE: {
 					sprinttype(adl->misc, item_types, part, sizeof(part), "UNKNOWN");
-					snprintf(output, sizeof(output), "%s: %s %s", type_str, ability_limitations[adl->vnum], part);
+					safe_snprintf(output, sizeof(output), "%s: %s %s", type_str, ability_limitations[adl->vnum], part);
 					break;
 				}
 				case ABLIM_ATTACK_TYPE: {
-					snprintf(output, sizeof(output), "%s: %s %s", type_str, ability_limitations[adl->vnum], get_attack_name_by_vnum(adl->misc));
+					safe_snprintf(output, sizeof(output), "%s: %s %s", type_str, ability_limitations[adl->vnum], get_attack_name_by_vnum(adl->misc));
 					break;
 				}
 				case ABLIM_WEAPON_TYPE: {
 					sprinttype(adl->misc, weapon_types, part, sizeof(part), "UNKNOWN");
-					snprintf(output, sizeof(output), "%s: %s %s", type_str, ability_limitations[adl->vnum], part);
+					safe_snprintf(output, sizeof(output), "%s: %s %s", type_str, ability_limitations[adl->vnum], part);
 					break;
 				}
 				case ABLIM_DAMAGE_TYPE: {
 					sprinttype(adl->misc, damage_types, part, sizeof(part), "UNKNOWN");
-					snprintf(output, sizeof(output), "%s: %s %s", type_str, ability_limitations[adl->vnum], part);
+					safe_snprintf(output, sizeof(output), "%s: %s %s", type_str, ability_limitations[adl->vnum], part);
 					break;
 				}
 				case ABLIM_ROLE: {
 					sprinttype(adl->misc, class_role, part, sizeof(part), "UNKNOWN");
-					snprintf(output, sizeof(output), "%s: %s %s", type_str, ability_limitations[adl->vnum], part);
+					safe_snprintf(output, sizeof(output), "%s: %s %s", type_str, ability_limitations[adl->vnum], part);
 					break;
 				}
 				case ABLIM_OBJ_FLAG: {
 					sprintbit(adl->misc, extra_bits, part, FALSE);
-					snprintf(output, sizeof(output), "%s: %s %s", type_str, ability_limitations[adl->vnum], part);
+					safe_snprintf(output, sizeof(output), "%s: %s %s", type_str, ability_limitations[adl->vnum], part);
 					break;
 				}
 				case ABLIM_AFF_FLAG: {
 					sprintbit(adl->misc, affected_bits, part, FALSE);
-					snprintf(output, sizeof(output), "%s: %s %s", type_str, ability_limitations[adl->vnum], part);
+					safe_snprintf(output, sizeof(output), "%s: %s %s", type_str, ability_limitations[adl->vnum], part);
 					break;
 				}
 				case ABLIM_NOTHING:
 				default: {
-					snprintf(output, sizeof(output), "%s: %s", type_str, ability_limitations[adl->vnum]);
+					safe_snprintf(output, sizeof(output), "%s: %s", type_str, ability_limitations[adl->vnum]);
 					break;
 				}
 			}
 			break;
 		}
 		case ADL_PAINT_COLOR: {
-			snprintf(output, sizeof(output), "%s: %s%s", type_str, paint_colors[adl->vnum], paint_names[adl->vnum]);
+			safe_snprintf(output, sizeof(output), "%s: %s%s", type_str, paint_colors[adl->vnum], paint_names[adl->vnum]);
 			break;
 		}
 		case ADL_ACTION: {
-			snprintf(output, sizeof(output), "%s: %s", type_str, ability_actions[adl->vnum]);
+			safe_snprintf(output, sizeof(output), "%s: %s", type_str, ability_actions[adl->vnum]);
 			break;
 		}
 		case ADL_RANGE: {
-			snprintf(output, sizeof(output), "%s: %d", type_str, adl->vnum);
+			safe_snprintf(output, sizeof(output), "%s: %d", type_str, adl->vnum);
 			break;
 		}
 		case ADL_PARENT: {
-			snprintf(output, sizeof(output), "%s: %d %s", type_str, adl->vnum, get_ability_name_by_vnum(adl->vnum));
+			safe_snprintf(output, sizeof(output), "%s: %d %s", type_str, adl->vnum, get_ability_name_by_vnum(adl->vnum));
 			break;
 		}
 		case ADL_SUPERCEDED_BY: {
-			snprintf(output, sizeof(output), "%s: %d %s", type_str, adl->vnum, get_ability_name_by_vnum(adl->vnum));
+			safe_snprintf(output, sizeof(output), "%s: %d %s", type_str, adl->vnum, get_ability_name_by_vnum(adl->vnum));
 			break;
 		}
 		default: {
-			snprintf(output, sizeof(output), "%s: ???", type_str);
+			safe_snprintf(output, sizeof(output), "%s: ???", type_str);
 			break;
 		}
 	}
@@ -10800,24 +10800,24 @@ char *ability_hook_display(struct ability_hook *ahook) {
 	char type_str[256], label[1024];
 	
 	prettier_sprintbit(ahook->type, ability_hook_types, type_str);
-	snprintf(label, sizeof(label), "%s %.2f%%", type_str, ahook->percent);
+	safe_snprintf(label, sizeof(label), "%s %.2f%%", type_str, ahook->percent);
 	
 	// AHOOK_x: display by type
 	switch (ahook->type) {
 		case AHOOK_ABILITY: {
-			snprintf(output, sizeof(output), "%s: [%d] %s", label, ahook->value, get_ability_name_by_vnum(ahook->value));
+			safe_snprintf(output, sizeof(output), "%s: [%d] %s", label, ahook->value, get_ability_name_by_vnum(ahook->value));
 			break;
 		}
 		case AHOOK_ATTACK_TYPE: {
-			snprintf(output, sizeof(output), "%s: %s", label, get_attack_name_by_vnum(ahook->value));
+			safe_snprintf(output, sizeof(output), "%s: %s", label, get_attack_name_by_vnum(ahook->value));
 			break;
 		}
 		case AHOOK_WEAPON_TYPE: {
-			snprintf(output, sizeof(output), "%s: %s", label, weapon_types[ahook->value]);
+			safe_snprintf(output, sizeof(output), "%s: %s", label, weapon_types[ahook->value]);
 			break;
 		}
 		case AHOOK_DAMAGE_TYPE: {
-			snprintf(output, sizeof(output), "%s: %s", label, damage_types[ahook->value]);
+			safe_snprintf(output, sizeof(output), "%s: %s", label, damage_types[ahook->value]);
 			break;
 		}
 		
@@ -10832,11 +10832,11 @@ char *ability_hook_display(struct ability_hook *ahook) {
 		case AHOOK_DYING:
 		case AHOOK_RESPAWN:
 		case AHOOK_RESURRECT: {
-			snprintf(output, sizeof(output), "%s", label);
+			safe_snprintf(output, sizeof(output), "%s", label);
 			break;
 		}
 		default: {
-			snprintf(output, sizeof(output), "%s: Unknown type %llu %d %d", label, ahook->type, ahook->value, ahook->misc);
+			safe_snprintf(output, sizeof(output), "%s: Unknown type %llu %d %d", label, ahook->type, ahook->value, ahook->misc);
 			break;
 		}
 	}
@@ -11360,10 +11360,10 @@ OLC_MODULE(abiledit_ptech) {
 	char arg[MAX_INPUT_LENGTH], arg1[MAX_INPUT_LENGTH], arg2[MAX_INPUT_LENGTH];
 	half_chop(argument, arg1, arg2);
 	if (is_abbrev(arg1, "add")) {
-		snprintf(arg, sizeof(arg), "%s ptech %s", arg1, arg2);
+		safe_snprintf(arg, sizeof(arg), "%s ptech %s", arg1, arg2);
 	}
 	else {
-		snprintf(arg, sizeof(arg), "%s %s", arg1, arg2);
+		safe_snprintf(arg, sizeof(arg), "%s %s", arg1, arg2);
 	}
 	abiledit_data(ch, type, arg);
 }
@@ -11374,10 +11374,10 @@ OLC_MODULE(abiledit_effect) {
 	char arg[MAX_INPUT_LENGTH], arg1[MAX_INPUT_LENGTH], arg2[MAX_INPUT_LENGTH];
 	half_chop(argument, arg1, arg2);
 	if (is_abbrev(arg1, "add")) {
-		snprintf(arg, sizeof(arg), "%s effect %s", arg1, arg2);
+		safe_snprintf(arg, sizeof(arg), "%s effect %s", arg1, arg2);
 	}
 	else {
-		snprintf(arg, sizeof(arg), "%s %s", arg1, arg2);
+		safe_snprintf(arg, sizeof(arg), "%s %s", arg1, arg2);
 	}
 	abiledit_data(ch, type, arg);
 }
@@ -11388,10 +11388,10 @@ OLC_MODULE(abiledit_ready_weapon) {
 	char arg[MAX_INPUT_LENGTH], arg1[MAX_INPUT_LENGTH], arg2[MAX_INPUT_LENGTH];
 	half_chop(argument, arg1, arg2);
 	if (is_abbrev(arg1, "add")) {
-		snprintf(arg, sizeof(arg), "%s ready-weapon %s", arg1, arg2);
+		safe_snprintf(arg, sizeof(arg), "%s ready-weapon %s", arg1, arg2);
 	}
 	else {
-		snprintf(arg, sizeof(arg), "%s %s", arg1, arg2);
+		safe_snprintf(arg, sizeof(arg), "%s %s", arg1, arg2);
 	}
 	abiledit_data(ch, type, arg);
 }
@@ -11402,10 +11402,10 @@ OLC_MODULE(abiledit_summon_mob) {
 	char arg[MAX_INPUT_LENGTH], arg1[MAX_INPUT_LENGTH], arg2[MAX_INPUT_LENGTH];
 	half_chop(argument, arg1, arg2);
 	if (is_abbrev(arg1, "add")) {
-		snprintf(arg, sizeof(arg), "%s summon-mob %s", arg1, arg2);
+		safe_snprintf(arg, sizeof(arg), "%s summon-mob %s", arg1, arg2);
 	}
 	else {
-		snprintf(arg, sizeof(arg), "%s %s", arg1, arg2);
+		safe_snprintf(arg, sizeof(arg), "%s %s", arg1, arg2);
 	}
 	abiledit_data(ch, type, arg);
 }
@@ -11416,10 +11416,10 @@ OLC_MODULE(abiledit_supercededby) {
 	char arg[MAX_INPUT_LENGTH], arg1[MAX_INPUT_LENGTH], arg2[MAX_INPUT_LENGTH];
 	half_chop(argument, arg1, arg2);
 	if (is_abbrev(arg1, "add")) {
-		snprintf(arg, sizeof(arg), "%s superceded-by %s", arg1, arg2);
+		safe_snprintf(arg, sizeof(arg), "%s superceded-by %s", arg1, arg2);
 	}
 	else {
-		snprintf(arg, sizeof(arg), "%s %s", arg1, arg2);
+		safe_snprintf(arg, sizeof(arg), "%s %s", arg1, arg2);
 	}
 	abiledit_data(ch, type, arg);
 }
@@ -11430,10 +11430,10 @@ OLC_MODULE(abiledit_limitation) {
 	char arg[MAX_INPUT_LENGTH], arg1[MAX_INPUT_LENGTH], arg2[MAX_INPUT_LENGTH];
 	half_chop(argument, arg1, arg2);
 	if (is_abbrev(arg1, "add")) {
-		snprintf(arg, sizeof(arg), "%s limitation %s", arg1, arg2);
+		safe_snprintf(arg, sizeof(arg), "%s limitation %s", arg1, arg2);
 	}
 	else {
-		snprintf(arg, sizeof(arg), "%s %s", arg1, arg2);
+		safe_snprintf(arg, sizeof(arg), "%s %s", arg1, arg2);
 	}
 	abiledit_data(ch, type, arg);
 }
@@ -11444,10 +11444,10 @@ OLC_MODULE(abiledit_paint_color) {
 	char arg[MAX_INPUT_LENGTH], arg1[MAX_INPUT_LENGTH], arg2[MAX_INPUT_LENGTH];
 	half_chop(argument, arg1, arg2);
 	if (is_abbrev(arg1, "add")) {
-		snprintf(arg, sizeof(arg), "%s paint-color %s", arg1, arg2);
+		safe_snprintf(arg, sizeof(arg), "%s paint-color %s", arg1, arg2);
 	}
 	else {
-		snprintf(arg, sizeof(arg), "%s %s", arg1, arg2);
+		safe_snprintf(arg, sizeof(arg), "%s %s", arg1, arg2);
 	}
 	abiledit_data(ch, type, arg);
 }
@@ -11458,10 +11458,10 @@ OLC_MODULE(abiledit_action) {
 	char arg[MAX_INPUT_LENGTH], arg1[MAX_INPUT_LENGTH], arg2[MAX_INPUT_LENGTH];
 	half_chop(argument, arg1, arg2);
 	if (is_abbrev(arg1, "add")) {
-		snprintf(arg, sizeof(arg), "%s action %s", arg1, arg2);
+		safe_snprintf(arg, sizeof(arg), "%s action %s", arg1, arg2);
 	}
 	else {
-		snprintf(arg, sizeof(arg), "%s %s", arg1, arg2);
+		safe_snprintf(arg, sizeof(arg), "%s %s", arg1, arg2);
 	}
 	abiledit_data(ch, type, arg);
 }
@@ -11472,13 +11472,13 @@ OLC_MODULE(abiledit_range) {
 	char arg[MAX_INPUT_LENGTH], arg1[MAX_INPUT_LENGTH], arg2[MAX_INPUT_LENGTH];
 	half_chop(argument, arg1, arg2);
 	if (is_abbrev(arg1, "add")) {
-		snprintf(arg, sizeof(arg), "%s range %s", arg1, arg2);
+		safe_snprintf(arg, sizeof(arg), "%s range %s", arg1, arg2);
 	}
 	else if (isdigit(*argument)) {
-		snprintf(arg, sizeof(arg), "add range %s", argument);
+		safe_snprintf(arg, sizeof(arg), "add range %s", argument);
 	}
 	else {
-		snprintf(arg, sizeof(arg), "%s %s", arg1, arg2);
+		safe_snprintf(arg, sizeof(arg), "%s %s", arg1, arg2);
 	}
 	abiledit_data(ch, type, arg);
 }
@@ -11489,10 +11489,10 @@ OLC_MODULE(abiledit_parent) {
 	char arg[MAX_INPUT_LENGTH], arg1[MAX_INPUT_LENGTH], arg2[MAX_INPUT_LENGTH];
 	half_chop(argument, arg1, arg2);
 	if (is_abbrev(arg1, "add")) {
-		snprintf(arg, sizeof(arg), "%s parent %s", arg1, arg2);
+		safe_snprintf(arg, sizeof(arg), "%s parent %s", arg1, arg2);
 	}
 	else {
-		snprintf(arg, sizeof(arg), "%s %s", arg1, arg2);
+		safe_snprintf(arg, sizeof(arg), "%s %s", arg1, arg2);
 	}
 	abiledit_data(ch, type, arg);
 }

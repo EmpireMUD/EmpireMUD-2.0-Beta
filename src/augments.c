@@ -102,7 +102,7 @@ bool validate_augment_target(char_data *ch, obj_data *obj, augment_data *aug, bo
 	if (partial_wear != NOBITS && !CAN_WEAR(obj, partial_wear)) {
 		if (send_messages) {
 			prettier_sprintbit(partial_wear, wear_bits, part);
-			snprintf(buf, sizeof(buf), "You can only use that %s on items that are worn on: %s.\r\n", augment_info[GET_AUG_TYPE(aug)].noun, part);
+			safe_snprintf(buf, sizeof(buf), "You can only use that %s on items that are worn on: %s.\r\n", augment_info[GET_AUG_TYPE(aug)].noun, part);
 			for (iter = 1; iter < strlen(buf); ++iter) {
 				buf[iter] = LOWER(buf[iter]);	// lowercase both parts of the string
 			}
@@ -241,10 +241,10 @@ char *list_one_augment(augment_data *aug, bool detail) {
 			sprintf(applies + strlen(applies), "%s%d to %s", (app == GET_AUG_APPLIES(aug)) ? " " : ", ", app->weight, apply_types[app->location]);
 		}
 		
-		snprintf(output, sizeof(output), "[%5d] %s%s%s", GET_AUG_VNUM(aug), GET_AUG_NAME(aug), part, applies);
+		safe_snprintf(output, sizeof(output), "[%5d] %s%s%s", GET_AUG_VNUM(aug), GET_AUG_NAME(aug), part, applies);
 	}
 	else {
-		snprintf(output, sizeof(output), "[%5d] %s", GET_AUG_VNUM(aug), GET_AUG_NAME(aug));
+		safe_snprintf(output, sizeof(output), "[%5d] %s", GET_AUG_VNUM(aug), GET_AUG_NAME(aug));
 	}
 		
 	return output;
@@ -582,7 +582,7 @@ void olc_delete_augment(char_data *ch, any_vnum vnum) {
 		return;
 	}
 	
-	snprintf(name, sizeof(name), "%s", NULLSAFE(GET_AUG_NAME(aug)));
+	safe_snprintf(name, sizeof(name), "%s", NULLSAFE(GET_AUG_NAME(aug)));
 	
 	// remove it from the hash table first
 	remove_augment_from_table(aug);
@@ -701,9 +701,9 @@ void do_stat_augment(char_data *ch, augment_data *aug) {
 	// first line
 	build_page_display(ch, "VNum: [\tc%d\t0], Name: \tc%s\t0", GET_AUG_VNUM(aug), GET_AUG_NAME(aug));
 	
-	snprintf(part, sizeof(part), "%s", (GET_AUG_ABILITY(aug) == NO_ABIL ? "none" : get_ability_name_by_vnum(GET_AUG_ABILITY(aug))));
+	safe_snprintf(part, sizeof(part), "%s", (GET_AUG_ABILITY(aug) == NO_ABIL ? "none" : get_ability_name_by_vnum(GET_AUG_ABILITY(aug))));
 	if ((abil = find_ability_by_vnum(GET_AUG_ABILITY(aug))) && ABIL_ASSIGNED_SKILL(abil) != NULL) {
-		snprintf(part + strlen(part), sizeof(part) - strlen(part), " (%s %d)", SKILL_ABBREV(ABIL_ASSIGNED_SKILL(abil)), ABIL_SKILL_LEVEL(abil));
+		safe_snprintf(part + strlen(part), sizeof(part) - strlen(part), " (%s %d)", SKILL_ABBREV(ABIL_ASSIGNED_SKILL(abil)), ABIL_SKILL_LEVEL(abil));
 	}
 	build_page_display(ch, "Type: [\ty%s\t0], Requires Ability: [\ty%s\t0]", augment_types[GET_AUG_TYPE(aug)], part);
 	

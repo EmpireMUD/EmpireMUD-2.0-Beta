@@ -640,10 +640,10 @@ char *list_one_attack_message(attack_message_data *amd, bool detail) {
 	
 	if (detail) {
 		sprintbit(ATTACK_FLAGS(amd), attack_message_flags, lbuf, TRUE);
-		snprintf(output, sizeof(output), "[%5d] %s (%d) %s", ATTACK_VNUM(amd), ATTACK_NAME(amd), ATTACK_NUM_MSGS(amd), lbuf);
+		safe_snprintf(output, sizeof(output), "[%5d] %s (%d) %s", ATTACK_VNUM(amd), ATTACK_NAME(amd), ATTACK_NUM_MSGS(amd), lbuf);
 	}
 	else {
-		snprintf(output, sizeof(output), "[%5d] %s", ATTACK_VNUM(amd), ATTACK_NAME(amd));
+		safe_snprintf(output, sizeof(output), "[%5d] %s", ATTACK_VNUM(amd), ATTACK_NAME(amd));
 	}
 		
 	return output;
@@ -1144,7 +1144,7 @@ void load_fight_messages(void) {
 		
 		// find or create message entry
 		amd = find_attack_message(type, TRUE);
-		snprintf(error, sizeof(error), "attack message %d:%d", type, ATTACK_NUM_MSGS(amd));
+		safe_snprintf(error, sizeof(error), "attack message %d:%d", type, ATTACK_NUM_MSGS(amd));
 		
 		// header info?
 		ATTACK_FLAGS(amd) = asciiflag_conv(str_in);
@@ -1376,7 +1376,7 @@ void olc_delete_attack_message(char_data *ch, any_vnum vnum) {
 		return;
 	}
 	
-	snprintf(name, sizeof(name), "%s", NULLSAFE(ATTACK_NAME(amd)));
+	safe_snprintf(name, sizeof(name), "%s", NULLSAFE(ATTACK_NAME(amd)));
 	
 	// remove it from the hash table first
 	remove_attack_message_from_table(amd);
@@ -2140,7 +2140,7 @@ OLC_MODULE(attackedit_deathlog) {
 
 OLC_MODULE(attackedit_fast) {
 	char arg[MAX_INPUT_LENGTH];
-	snprintf(arg, sizeof(arg), "fast %s", argument);
+	safe_snprintf(arg, sizeof(arg), "fast %s", argument);
 	attackedit_speed(ch, type, arg);
 }
 
@@ -2325,7 +2325,7 @@ OLC_MODULE(attackedit_name) {
 
 OLC_MODULE(attackedit_normal) {
 	char arg[MAX_INPUT_LENGTH];
-	snprintf(arg, sizeof(arg), "normal %s", argument);
+	safe_snprintf(arg, sizeof(arg), "normal %s", argument);
 	attackedit_speed(ch, type, arg);
 }
 
@@ -2359,7 +2359,7 @@ OLC_MODULE(attackedit_noun) {
 
 OLC_MODULE(attackedit_slow) {
 	char arg[MAX_INPUT_LENGTH];
-	snprintf(arg, sizeof(arg), "slow %s", argument);
+	safe_snprintf(arg, sizeof(arg), "slow %s", argument);
 	attackedit_speed(ch, type, arg);
 }
 

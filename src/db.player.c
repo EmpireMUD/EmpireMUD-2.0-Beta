@@ -394,7 +394,7 @@ void parse_account(FILE *fl, int nr) {
 	}
 	add_account_to_table(acct);
 	
-	snprintf(err_buf, sizeof(err_buf), "account #%d", nr);
+	safe_snprintf(err_buf, sizeof(err_buf), "account #%d", nr);
 	
 	// line 1: last login, flags
 	if (get_line(fl, line) && sscanf(line, "%ld %s", &l_in, str_in) == 2) {
@@ -410,7 +410,7 @@ void parse_account(FILE *fl, int nr) {
 	acct->notes = fread_string(fl, err_buf);
 	
 	// alphabetic flag section
-	snprintf(err_buf, sizeof(err_buf), "account #%d, in alphabetic flags", nr);
+	safe_snprintf(err_buf, sizeof(err_buf), "account #%d, in alphabetic flags", nr);
 	for (;;) {
 		if (!get_line(fl, line)) {
 			log("SYSERR: Format error in %s", err_buf);
@@ -2435,7 +2435,7 @@ void save_char(char_data *ch, room_data *load_room) {
 	}
 	
 	// store to a temp name in order to avoid problems from crashes during save
-	snprintf(tempname, sizeof(tempname), "%s%s", filename, TEMP_SUFFIX);
+	safe_snprintf(tempname, sizeof(tempname), "%s%s", filename, TEMP_SUFFIX);
 	if (!(fl = fopen(tempname, "w"))) {
 		log("SYSERR: save_char: Unable to open '%s' for writing", tempname);
 		return;
@@ -2455,7 +2455,7 @@ void save_char(char_data *ch, room_data *load_room) {
 		}
 	
 		// store to a temp name in order to avoid problems from crashes during save
-		snprintf(tempname, sizeof(tempname), "%s%s", filename, TEMP_SUFFIX);
+		safe_snprintf(tempname, sizeof(tempname), "%s%s", filename, TEMP_SUFFIX);
 		if (!(fl = fopen(tempname, "w"))) {
 			log("SYSERR: save_char: Unable to open '%s' for writing", tempname);
 			return;
@@ -3902,7 +3902,7 @@ void announce_login(char_data *ch) {
 			}
 			
 			// header divider
-			snprintf(buf, sizeof(buf), "(%s account notes)", GET_NAME(ch));
+			safe_snprintf(buf, sizeof(buf), "(%s account notes)", GET_NAME(ch));
 			msg_to_char(desc->character, "- %s ", buf);
 			
 			// rest of the divider
@@ -4223,15 +4223,15 @@ void delete_old_players(void) {
 		// reasons to delete
 		if (delete_invalid > 0 && (max_access_level <= 0 || max_char_level <= 0) && inactive_days >= delete_invalid) {
 			will_delete = TRUE;
-			snprintf(reason, sizeof(reason), "no characters over level 0");
+			safe_snprintf(reason, sizeof(reason), "no characters over level 0");
 		}
 		else if (delete_inactive > 0 && inactive_days >= delete_inactive) {
 			will_delete = TRUE;
-			snprintf(reason, sizeof(reason), "inactive too long");
+			safe_snprintf(reason, sizeof(reason), "inactive too long");
 		}
 		else if (delete_abandoned > 0 && max_char_level < 100 && best_mins_per_day <= 3 && inactive_days >= delete_abandoned) {
 			will_delete = TRUE;	// low-level and long-gone
-			snprintf(reason, sizeof(reason), "abandoned low-level account");
+			safe_snprintf(reason, sizeof(reason), "abandoned low-level account");
 		}
 		
 		if (will_delete) {
@@ -5716,7 +5716,7 @@ void write_map_memory(char_data *ch) {
 		log("SYSERR: write_map_memory: Unable to get memory filename for '%s'", GET_PC_NAME(ch));
 		return;
 	}
-	snprintf(tempname, sizeof(tempname), "%s%s", filename, TEMP_SUFFIX);
+	safe_snprintf(tempname, sizeof(tempname), "%s%s", filename, TEMP_SUFFIX);
 	if (!(fl = fopen(tempname, "w"))) {
 		log("SYSERR: write_map_memory: Unable to get open file for writing: %s", tempname);
 		return;

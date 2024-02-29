@@ -558,7 +558,7 @@ bool can_use_ability(char_data *ch, any_vnum ability, int cost_pool, int cost_am
 	}
 
 	if (cooldown_type != NOTHING && (time = get_cooldown_time(ch, cooldown_type)) > 0) {
-		snprintf(buf, sizeof(buf), "Your %s cooldown still has %d second%s.\r\n", get_generic_name_by_vnum(cooldown_type), time, (time != 1 ? "s" : ""));
+		safe_snprintf(buf, sizeof(buf), "Your %s cooldown still has %d second%s.\r\n", get_generic_name_by_vnum(cooldown_type), time, (time != 1 ? "s" : ""));
 		CAP(buf);
 		send_to_char(buf, ch);
 		return FALSE;
@@ -930,7 +930,7 @@ bool gain_skill(char_data *ch, skill_data *skill, int amount, ability_data *from
 	if (any) {
 		if (from_abil) {
 			// reports 1 gain higher than currently-recorded because it's only incremented after the gain is successful
-			snprintf(abil_buf, sizeof(abil_buf), " using %s (%d/%d)", ABIL_NAME(from_abil), levels_gained_from_ability(ch, from_abil) + 1, GAINS_PER_ABILITY);
+			safe_snprintf(abil_buf, sizeof(abil_buf), " using %s (%d/%d)", ABIL_NAME(from_abil), levels_gained_from_ability(ch, from_abil) + 1, GAINS_PER_ABILITY);
 		}
 		else {
 			*abil_buf = '\0';
@@ -1374,13 +1374,13 @@ char *get_skill_row_display(char_data *ch, skill_data *skill) {
 	}
 	
 	if (IS_ANY_SKILL_CAP(ch, SKILL_VNUM(skill))) {
-		snprintf(gain_part, sizeof(gain_part), "\tymax\t0%s", (skdata && skdata->noskill) ? ", \trnoskill\t0" : "");
+		safe_snprintf(gain_part, sizeof(gain_part), "\tymax\t0%s", (skdata && skdata->noskill) ? ", \trnoskill\t0" : "");
 	}
 	else if (skdata && skdata->noskill) {
-		snprintf(gain_part, sizeof(gain_part), "\trnoskill\t0");
+		safe_snprintf(gain_part, sizeof(gain_part), "\trnoskill\t0");
 	}
 	else {
-		snprintf(gain_part, sizeof(gain_part), "\tcgaining\t0");
+		safe_snprintf(gain_part, sizeof(gain_part), "\tcgaining\t0");
 	}
 	
 	sprintf(out, "[%3d] %s%s\t0 (%s%s%s) - %s\r\n", (skdata ? skdata->level : 0), IS_ANY_SKILL_CAP(ch, SKILL_VNUM(skill)) ? "\tg" : "\ty", SKILL_NAME(skill), gain_part, experience, (points > 0 ? ", points available" : ""), SKILL_DESC(skill));
@@ -2019,7 +2019,7 @@ ACMD(do_skills) {
 				continue;	// only looking for abilities with parents
 			}
 			
-			snprintf(lbuf + strlen(lbuf), sizeof(lbuf) - strlen(lbuf), "%s%s%s\t0", *lbuf ? ", ": "", ability_color(ch, abil), ABIL_NAME(abil));
+			safe_snprintf(lbuf + strlen(lbuf), sizeof(lbuf) - strlen(lbuf), "%s%s%s\t0", *lbuf ? ", ": "", ability_color(ch, abil), ABIL_NAME(abil));
 		}
 		if (*lbuf) {
 			build_page_display(ch, "Other abilities: %s\r\n", lbuf);
@@ -2508,7 +2508,7 @@ bool can_wear_item(char_data *ch, obj_data *item, bool send_messages) {
 	
 	if (abil != NO_ABIL && !has_ability(ch, abil)) {
 		if (send_messages) {
-			snprintf(buf, sizeof(buf), "You require the %s ability to use $p.", get_ability_name_by_vnum(abil));
+			safe_snprintf(buf, sizeof(buf), "You require the %s ability to use $p.", get_ability_name_by_vnum(abil));
 			act(buf, FALSE, ch, item, NULL, TO_CHAR);
 		}
 		return FALSE;
@@ -2540,7 +2540,7 @@ bool can_wear_item(char_data *ch, obj_data *item, bool send_messages) {
 			for (iter = 0; skill_level_ranges[iter] != -1; ++iter) {
 				if (GET_OBJ_CURRENT_SCALE_LEVEL(item) > skill_level_ranges[iter] && GET_SKILL_LEVEL(ch) < skill_level_ranges[iter]) {
 					if (send_messages) {
-						snprintf(buf, sizeof(buf), "You need to be skill level %d to use $p.", skill_level_ranges[iter]);
+						safe_snprintf(buf, sizeof(buf), "You need to be skill level %d to use $p.", skill_level_ranges[iter]);
 						act(buf, FALSE, ch, item, NULL, TO_CHAR);
 					}
 					return FALSE;
@@ -2557,14 +2557,14 @@ bool can_wear_item(char_data *ch, obj_data *item, bool send_messages) {
 			level_min = MAX(level_min, MAX_SKILL_CAP);
 			if (GET_SKILL_LEVEL(ch) < MAX_SKILL_CAP) {
 				if (send_messages) {
-					snprintf(buf, sizeof(buf), "You need to be skill level %d and total level %d to use $p.", MAX_SKILL_CAP, level_min);
+					safe_snprintf(buf, sizeof(buf), "You need to be skill level %d and total level %d to use $p.", MAX_SKILL_CAP, level_min);
 					act(buf, FALSE, ch, item, NULL, TO_CHAR);
 				}
 				return FALSE;
 			}
 			if (GET_HIGHEST_KNOWN_LEVEL(ch) < level_min) {
 				if (send_messages) {
-					snprintf(buf, sizeof(buf), "You need to be level %d to use $p.", level_min);
+					safe_snprintf(buf, sizeof(buf), "You need to be level %d to use $p.", level_min);
 					act(buf, FALSE, ch, item, NULL, TO_CHAR);
 				}
 				return FALSE;
@@ -2990,10 +2990,10 @@ char *list_one_skill(skill_data *skill, bool detail) {
 	static char output[MAX_STRING_LENGTH];
 	
 	if (detail) {
-		snprintf(output, sizeof(output), "[%5d] %s - %s", SKILL_VNUM(skill), SKILL_NAME(skill), SKILL_DESC(skill));
+		safe_snprintf(output, sizeof(output), "[%5d] %s - %s", SKILL_VNUM(skill), SKILL_NAME(skill), SKILL_DESC(skill));
 	}
 	else {
-		snprintf(output, sizeof(output), "[%5d] %s", SKILL_VNUM(skill), SKILL_NAME(skill));
+		safe_snprintf(output, sizeof(output), "[%5d] %s", SKILL_VNUM(skill), SKILL_NAME(skill));
 	}
 		
 	return output;
@@ -3736,7 +3736,7 @@ void olc_delete_skill(char_data *ch, any_vnum vnum) {
 		return;
 	}
 	
-	snprintf(name, sizeof(name), "%s", NULLSAFE(SKILL_NAME(skill)));
+	safe_snprintf(name, sizeof(name), "%s", NULLSAFE(SKILL_NAME(skill)));
 	
 	// remove it from the hash table first
 	remove_skill_from_table(skill);
@@ -4069,7 +4069,7 @@ void get_skad_partial(struct skill_ability *list, struct skill_ability *parent, 
 			LL_APPEND(*display, skad);
 		}
 		
-		snprintf(buf, sizeof(buf), "%*s%s[%d] %-.17s @ %d", (2 * indent), " ", (parent ? "+ " : ""), abil->vnum, get_ability_name_by_vnum(abil->vnum), abil->level);
+		safe_snprintf(buf, sizeof(buf), "%*s%s[%d] %-.17s @ %d", (2 * indent), " ", (parent ? "+ " : ""), abil->vnum, get_ability_name_by_vnum(abil->vnum), abil->level);
 		
 		// append line
 		if (skad->lines > 0) {

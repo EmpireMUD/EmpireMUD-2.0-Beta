@@ -86,7 +86,7 @@ void wld_log(room_data *room, const char *format, ...) {
 	va_list args;
 	char output[MAX_STRING_LENGTH];
 
-	snprintf(output, sizeof(output), "Room %d :: %s", GET_ROOM_VNUM(room), format);
+	safe_snprintf(output, sizeof(output), "Room %d :: %s", GET_ROOM_VNUM(room), format);
 
 	va_start(args, format);
 	script_vlog(output, args);

@@ -797,9 +797,9 @@ void resume_craft_vehicle(char_data *ch, vehicle_data *veh, craft_data *craft) {
 	GET_ACTION_VNUM(ch, 0) = GET_CRAFT_VNUM(craft);
 	GET_ACTION_VNUM(ch, 1) = VEH_CONSTRUCTION_ID(veh);
 	
-	snprintf(buf, sizeof(buf), "You resume %s $V.", gen_craft_data[GET_CRAFT_TYPE(craft)].verb);
+	safe_snprintf(buf, sizeof(buf), "You resume %s $V.", gen_craft_data[GET_CRAFT_TYPE(craft)].verb);
 	act(buf, FALSE, ch, NULL, veh, TO_CHAR | ACT_VEH_VICT);
-	snprintf(buf, sizeof(buf), "$n resumes %s $V.", gen_craft_data[GET_CRAFT_TYPE(craft)].verb);
+	safe_snprintf(buf, sizeof(buf), "$n resumes %s $V.", gen_craft_data[GET_CRAFT_TYPE(craft)].verb);
 	act(buf, FALSE, ch, NULL, veh, TO_ROOM | ACT_VEH_VICT);
 }
 
@@ -846,10 +846,10 @@ void show_craft_info(char_data *ch, char *argument, int craft_type) {
 			*buf = '\0';
 			
 			if (GET_BLD_EXTRA_ROOMS(bld) > 0) {
-				snprintf(buf + strlen(buf), sizeof(buf) - strlen(buf), "%s%d rooms", (*buf ? ", " : ""), GET_BLD_EXTRA_ROOMS(bld) + 1);
+				safe_snprintf(buf + strlen(buf), sizeof(buf) - strlen(buf), "%s%d rooms", (*buf ? ", " : ""), GET_BLD_EXTRA_ROOMS(bld) + 1);
 			}
 			if (GET_BLD_FAME(bld) > 0) {
-				snprintf(buf + strlen(buf), sizeof(buf) - strlen(buf), "%sfame: %d", (*buf ? ", " : ""), GET_BLD_FAME(bld));
+				safe_snprintf(buf + strlen(buf), sizeof(buf) - strlen(buf), "%sfame: %d", (*buf ? ", " : ""), GET_BLD_FAME(bld));
 			}
 			
 			// show building line
@@ -870,19 +870,19 @@ void show_craft_info(char_data *ch, char *argument, int craft_type) {
 			*buf = '\0';
 			
 			if (VEH_SIZE(veh) > 0) {
-				snprintf(buf + strlen(buf), sizeof(buf) - strlen(buf), "%s%d%% of tile", (*buf ? ", " : ""), VEH_SIZE(veh) * 100 / config_get_int("vehicle_size_per_tile"));
+				safe_snprintf(buf + strlen(buf), sizeof(buf) - strlen(buf), "%s%d%% of tile", (*buf ? ", " : ""), VEH_SIZE(veh) * 100 / config_get_int("vehicle_size_per_tile"));
 			}
 			if (VEH_MAX_ROOMS(veh) > 0) {
-				snprintf(buf + strlen(buf), sizeof(buf) - strlen(buf), "%s%d rooms", (*buf ? ", " : ""), VEH_MAX_ROOMS(veh) + 1);
+				safe_snprintf(buf + strlen(buf), sizeof(buf) - strlen(buf), "%s%d rooms", (*buf ? ", " : ""), VEH_MAX_ROOMS(veh) + 1);
 			}
 			if (VEH_ANIMALS_REQUIRED(veh) > 0) {
-				snprintf(buf + strlen(buf), sizeof(buf) - strlen(buf), "%srequires %d animal%s", (*buf ? ", " : ""), VEH_ANIMALS_REQUIRED(veh), PLURAL(VEH_ANIMALS_REQUIRED(veh)));
+				safe_snprintf(buf + strlen(buf), sizeof(buf) - strlen(buf), "%srequires %d animal%s", (*buf ? ", " : ""), VEH_ANIMALS_REQUIRED(veh), PLURAL(VEH_ANIMALS_REQUIRED(veh)));
 			}
 			if (VEH_FAME(veh) > 0) {
-				snprintf(buf + strlen(buf), sizeof(buf) - strlen(buf), "%sfame: %d", (*buf ? ", " : ""), VEH_FAME(veh));
+				safe_snprintf(buf + strlen(buf), sizeof(buf) - strlen(buf), "%sfame: %d", (*buf ? ", " : ""), VEH_FAME(veh));
 			}
 			if (VEH_FLAGGED(veh, MOVABLE_VEH_FLAGS)) {
-				snprintf(buf + strlen(buf), sizeof(buf) - strlen(buf), "%sspeed: %s", (*buf ? ", " : ""), vehicle_speed_types[VEH_SPEED_BONUSES(veh)]);
+				safe_snprintf(buf + strlen(buf), sizeof(buf) - strlen(buf), "%sspeed: %s", (*buf ? ", " : ""), vehicle_speed_types[VEH_SPEED_BONUSES(veh)]);
 			}
 			
 			// show vehicle line
@@ -1445,7 +1445,7 @@ void process_gen_craft_vehicle(char_data *ch, craft_data *type) {
 		else {
 			msg_to_char(ch, "You run out of resources and stop %s.\r\n", gen_craft_data[GET_CRAFT_TYPE(type)].verb);
 		}
-		snprintf(buf, sizeof(buf), "$n runs out of resources and stops %s.", gen_craft_data[GET_CRAFT_TYPE(type)].verb);
+		safe_snprintf(buf, sizeof(buf), "$n runs out of resources and stops %s.", gen_craft_data[GET_CRAFT_TYPE(type)].verb);
 		act(buf, FALSE, ch, NULL, NULL, TO_ROOM);
 		end_action(ch);
 	}
@@ -1976,9 +1976,9 @@ void do_gen_craft_vehicle(char_data *ch, craft_data *type, int dir) {
 		}
 	}
 	
-	snprintf(buf, sizeof(buf), "You begin %s $V.", gen_craft_data[GET_CRAFT_TYPE(type)].verb);
+	safe_snprintf(buf, sizeof(buf), "You begin %s $V.", gen_craft_data[GET_CRAFT_TYPE(type)].verb);
 	act(buf, FALSE, ch, NULL, veh, TO_CHAR | ACT_VEH_VICT);
-	snprintf(buf, sizeof(buf), "$n begins %s $V.", gen_craft_data[GET_CRAFT_TYPE(type)].verb);
+	safe_snprintf(buf, sizeof(buf), "$n begins %s $V.", gen_craft_data[GET_CRAFT_TYPE(type)].verb);
 	act(buf, FALSE, ch, NULL, veh, TO_ROOM | ACT_VEH_VICT);
 	
 	process_gen_craft_vehicle(ch, type);
@@ -2382,7 +2382,7 @@ ACMD(do_learn) {
 	// seems ok!
 	else {
 		add_learned_craft(ch, GET_RECIPE_VNUM(obj));
-		snprintf(buf, sizeof(buf), "You commit $p to memory (%s command).", gen_craft_data[GET_CRAFT_TYPE(recipe)].command);
+		safe_snprintf(buf, sizeof(buf), "You commit $p to memory (%s command).", gen_craft_data[GET_CRAFT_TYPE(recipe)].command);
 		act(buf, FALSE, ch, obj, NULL, TO_CHAR);
 		act("$n commits $p to memory.", TRUE, ch, obj, NULL, TO_ROOM);
 		extract_obj(obj);
@@ -2661,7 +2661,7 @@ ACMD(do_rework) {
 			sprintf(buf2, "$n names %s%s $p!", GET_OBJ_SHORT_DESC(obj), shared_by(obj, ch));
 			
 			// rename keywords
-			snprintf(temp, sizeof(temp), "%s %s", fname(GET_OBJ_KEYWORDS(proto)), skip_filler(argument));
+			safe_snprintf(temp, sizeof(temp), "%s %s", fname(GET_OBJ_KEYWORDS(proto)), skip_filler(argument));
 			set_obj_keywords(obj, temp);
 			
 			// rename short desc

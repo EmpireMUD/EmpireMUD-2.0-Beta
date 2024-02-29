@@ -260,16 +260,16 @@ void msdp_update_room(char_data *ch) {
 
 	// determine area name: we'll use it twice
 	if ((inst = find_instance_by_room(IN_ROOM(ch), FALSE, FALSE))) {
-		snprintf(area_name, sizeof(area_name), "%s", GET_ADV_NAME(INST_ADVENTURE(inst)));
+		safe_snprintf(area_name, sizeof(area_name), "%s", GET_ADV_NAME(INST_ADVENTURE(inst)));
 	}
 	else if ((city = find_city(ROOM_OWNER(IN_ROOM(ch)), IN_ROOM(ch)))) {
-		snprintf(area_name, sizeof(area_name), "%s", city->name);
+		safe_snprintf(area_name, sizeof(area_name), "%s", city->name);
 	}
 	else if ((island = GET_ISLAND(IN_ROOM(ch)))) {
-		snprintf(area_name, sizeof(area_name), "%s", island->name);
+		safe_snprintf(area_name, sizeof(area_name), "%s", island->name);
 	}
 	else {
-		snprintf(area_name, sizeof(area_name), "Unknown");
+		safe_snprintf(area_name, sizeof(area_name), "Unknown");
 	}
 	MSDPSetString(desc, eMSDP_AREA_NAME, area_name);
 	
@@ -1489,7 +1489,7 @@ void perform_act(const char *orig, char_data *ch, const void *obj, const void *v
 				}
 				case 'k': {	// loyalty/empire adjective of $n
 					if (GET_LOYALTY(ch)) {
-						snprintf(temp, sizeof(temp), "%s", EMPIRE_ADJECTIVE(GET_LOYALTY(ch)));
+						safe_snprintf(temp, sizeof(temp), "%s", EMPIRE_ADJECTIVE(GET_LOYALTY(ch)));
 						i = temp;
 					}
 					else {
@@ -1503,7 +1503,7 @@ void perform_act(const char *orig, char_data *ch, const void *obj, const void *v
 					}
 					dg_victim = (char_data*) vict_obj;
 					if (dg_victim && GET_LOYALTY(dg_victim)) {
-						snprintf(temp, sizeof(temp), "%s", EMPIRE_ADJECTIVE(GET_LOYALTY(dg_victim)));
+						safe_snprintf(temp, sizeof(temp), "%s", EMPIRE_ADJECTIVE(GET_LOYALTY(dg_victim)));
 						i = temp;
 					}
 					else {
@@ -1513,7 +1513,7 @@ void perform_act(const char *orig, char_data *ch, const void *obj, const void *v
 				}
 				case 'l': {	// loyalty/empire name of $n
 					if (GET_LOYALTY(ch)) {
-						snprintf(temp, sizeof(temp), "%s", EMPIRE_NAME(GET_LOYALTY(ch)));
+						safe_snprintf(temp, sizeof(temp), "%s", EMPIRE_NAME(GET_LOYALTY(ch)));
 						i = temp;
 					}
 					else {
@@ -1527,7 +1527,7 @@ void perform_act(const char *orig, char_data *ch, const void *obj, const void *v
 					}
 					dg_victim = (char_data*) vict_obj;
 					if (dg_victim && GET_LOYALTY(dg_victim)) {
-						snprintf(temp, sizeof(temp), "%s", EMPIRE_NAME(GET_LOYALTY(dg_victim)));
+						safe_snprintf(temp, sizeof(temp), "%s", EMPIRE_NAME(GET_LOYALTY(dg_victim)));
 						i = temp;
 					}
 					else {
@@ -1818,7 +1818,7 @@ void send_stacked_msgs(descriptor_data *desc) {
 			rem = (len > 1 && ISNEWL(iter->string[len-1])) ? 1 : 0;
 			rem += (len > 2 && ISNEWL(iter->string[len-2])) ? 1 : 0;
 			// rebuild
-			snprintf(output, sizeof(output), "%*.*s (x%d)%s", (len-rem), (len-rem), iter->string, iter->count, (rem > 0 ? "\r\n" : ""));
+			safe_snprintf(output, sizeof(output), "%*.*s (x%d)%s", (len-rem), (len-rem), iter->string, iter->count, (rem > 0 ? "\r\n" : ""));
 			SEND_TO_Q(output, desc);
 		}
 		else {
@@ -2484,7 +2484,7 @@ int new_descriptor(int s) {
 		/* resolution failed */
 		if (!slow_ip) {
 			char buf[MAX_STRING_LENGTH];
-			snprintf(buf, sizeof(buf), "Warning: gethostbyaddr [%s]", inet_ntoa(peer.sin_addr));
+			safe_snprintf(buf, sizeof(buf), "Warning: gethostbyaddr [%s]", inet_ntoa(peer.sin_addr));
 			perror(buf);
 			
 			// did it take longer than 3 seconds to look up?
@@ -2524,7 +2524,7 @@ int new_descriptor(int s) {
 	LL_PREPEND(descriptor_list, newd);
 	
 	ProtocolNegotiate(newd);
-	snprintf(buf, sizeof(buf), "%s%s", intro_screens[number(0, num_intro_screens-1)], telnet_go_ahead(newd));
+	safe_snprintf(buf, sizeof(buf), "%s%s", intro_screens[number(0, num_intro_screens-1)], telnet_go_ahead(newd));
 	SEND_TO_Q(buf, newd);
 
 	return (0);
@@ -2706,7 +2706,7 @@ int process_input(descriptor_data *t) {
 				t->inbuf[MAX_INPUT_LENGTH-2] = '\0';
 			}
 			
-			snprintf(buffer, sizeof(buffer), "Line too long. Truncated to:\r\n%s\r\n", t->inbuf);
+			safe_snprintf(buffer, sizeof(buffer), "Line too long. Truncated to:\r\n%s\r\n", t->inbuf);
 			if (write_to_descriptor(t->descriptor, buffer) < 0) {
 				return (-1);
 			}
@@ -2983,7 +2983,7 @@ static int process_output(descriptor_data *t) {
 		prompt[MAX_STRING_LENGTH-1] = '\0';
 				
 		// force a color code flush
-		snprintf(prompt + strlen(prompt), sizeof(prompt) - strlen(prompt), "%s", flush_reduced_color_codes(t));
+		safe_snprintf(prompt + strlen(prompt), sizeof(prompt) - strlen(prompt), "%s", flush_reduced_color_codes(t));
 
 		strncat(i, prompt, MAX_PROMPT_LENGTH);
 	}
@@ -3264,7 +3264,7 @@ char *make_prompt(descriptor_data *d) {
 		}
 
 		// append rendered prompt
-		snprintf(prompt + strlen(prompt), sizeof(prompt) - strlen(prompt), "%s%s", prompt_str(d->character), telnet_go_ahead(d));
+		safe_snprintf(prompt + strlen(prompt), sizeof(prompt) - strlen(prompt), "%s%s", prompt_str(d->character), telnet_go_ahead(d));
 	}
 	else {
 		*prompt = '\0';
@@ -4132,7 +4132,7 @@ void game_loop(socket_t mother_desc) {
 				prompt[MAX_STRING_LENGTH-1] = '\0';
 				
 				// force a color code flush
-				snprintf(prompt + strlen(prompt), sizeof(prompt) - strlen(prompt), "%s", flush_reduced_color_codes(d));
+				safe_snprintf(prompt + strlen(prompt), sizeof(prompt) - strlen(prompt), "%s", flush_reduced_color_codes(d));
 				
 				if (write_to_descriptor(d->descriptor, prompt) >= 0) {
 					d->has_prompt = 1;

@@ -623,10 +623,10 @@ char *list_one_class(class_data *cls, bool detail) {
 	
 	if (detail) {
 		get_class_skill_display(CLASS_SKILL_REQUIREMENTS(cls), lbuf, sizeof(lbuf), TRUE);
-		snprintf(output, sizeof(output), "[%5d] %s - %s", CLASS_VNUM(cls), CLASS_NAME(cls), lbuf);
+		safe_snprintf(output, sizeof(output), "[%5d] %s - %s", CLASS_VNUM(cls), CLASS_NAME(cls), lbuf);
 	}
 	else {
-		snprintf(output, sizeof(output), "[%5d] %s", CLASS_VNUM(cls), CLASS_NAME(cls));
+		safe_snprintf(output, sizeof(output), "[%5d] %s", CLASS_VNUM(cls), CLASS_NAME(cls));
 	}
 		
 	return output;
@@ -1109,7 +1109,7 @@ void olc_delete_class(char_data *ch, any_vnum vnum) {
 		return;
 	}
 	
-	snprintf(name, sizeof(name), "%s", NULLSAFE(CLASS_NAME(cls)));
+	safe_snprintf(name, sizeof(name), "%s", NULLSAFE(CLASS_NAME(cls)));
 	
 	// remove it from the hash table first
 	remove_class_from_table(cls);
@@ -1325,7 +1325,7 @@ void get_class_skill_display(struct class_skill_req *list, char *save_buffer, si
 	
 	LL_FOREACH(list, iter) {
 		++count;
-		snprintf(skill_part, sizeof(skill_part), "%s %d", get_skill_name_by_vnum(iter->vnum), iter->level);
+		safe_snprintf(skill_part, sizeof(skill_part), "%s %d", get_skill_name_by_vnum(iter->vnum), iter->level);
 		
 		// build line
 		if (one_line) {
@@ -1349,7 +1349,7 @@ void get_class_skill_display(struct class_skill_req *list, char *save_buffer, si
 		}
 	}
 	if (!list) {
-		snprintf(save_buffer, buf_size, "%snone%s", one_line ? "" : "  ", one_line ? "" : "\r\n");
+		safe_snprintf(save_buffer, buf_size, "%snone%s", one_line ? "" : "  ", one_line ? "" : "\r\n");
 	}
 }
 

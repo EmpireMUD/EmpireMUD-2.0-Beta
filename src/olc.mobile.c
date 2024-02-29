@@ -287,10 +287,10 @@ char *list_one_mobile(char_data *mob, bool detail) {
 			*flags = '\0';
 		}
 		
-		snprintf(output, sizeof(output), "[%5d] %s (%s) %s", GET_MOB_VNUM(mob), GET_SHORT_DESC(mob), level_range_string(GET_MIN_SCALE_LEVEL(mob), GET_MAX_SCALE_LEVEL(mob), 0), flags);
+		safe_snprintf(output, sizeof(output), "[%5d] %s (%s) %s", GET_MOB_VNUM(mob), GET_SHORT_DESC(mob), level_range_string(GET_MIN_SCALE_LEVEL(mob), GET_MAX_SCALE_LEVEL(mob), 0), flags);
 	}
 	else {
-		snprintf(output, sizeof(output), "[%5d] %s", GET_MOB_VNUM(mob), GET_SHORT_DESC(mob));
+		safe_snprintf(output, sizeof(output), "[%5d] %s", GET_MOB_VNUM(mob), GET_SHORT_DESC(mob));
 	}
 	
 	return output;
@@ -332,7 +332,7 @@ void olc_delete_mobile(char_data *ch, mob_vnum vnum) {
 		return;
 	}
 	
-	snprintf(name, sizeof(name), "%s", NULLSAFE(GET_SHORT_DESC(proto)));
+	safe_snprintf(name, sizeof(name), "%s", NULLSAFE(GET_SHORT_DESC(proto)));
 	
 	if (HASH_COUNT(mobile_table) <= 1) {
 		msg_to_char(ch, "You can't delete the last mob.\r\n");

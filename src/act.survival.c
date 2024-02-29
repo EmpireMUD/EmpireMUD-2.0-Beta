@@ -300,10 +300,10 @@ void do_mount_list(char_data *ch, char *argument) {
 		cur = (GET_MOUNT_VNUM(ch) == mount->vnum);
 		if (mount->flags) {
 			prettier_sprintbit(mount->flags, mount_flags, temp);
-			snprintf(part, sizeof(part), "%s (%s)%s", skip_filler(GET_SHORT_DESC(proto)), temp, (cur && PRF_FLAGGED(ch, PRF_SCREEN_READER) ? " [current]" : ""));
+			safe_snprintf(part, sizeof(part), "%s (%s)%s", skip_filler(GET_SHORT_DESC(proto)), temp, (cur && PRF_FLAGGED(ch, PRF_SCREEN_READER) ? " [current]" : ""));
 		}
 		else {
-			snprintf(part, sizeof(part), "%s%s", skip_filler(GET_SHORT_DESC(proto)), (cur && PRF_FLAGGED(ch, PRF_SCREEN_READER) ? " [current]" : ""));
+			safe_snprintf(part, sizeof(part), "%s%s", skip_filler(GET_SHORT_DESC(proto)), (cur && PRF_FLAGGED(ch, PRF_SCREEN_READER) ? " [current]" : ""));
 		}
 		
 		++count;
@@ -887,11 +887,11 @@ ACMD(do_track) {
 			act("You find a trail heading into $p!", FALSE, ch, portal, NULL, TO_CHAR);
 		}
 		else if ((veh = find_vehicle_in_room_with_interior(IN_ROOM(ch), track_to_room))) {
-			snprintf(buf, sizeof(buf), "You find a trail heading %sto $V!", IN_OR_ON(veh));
+			safe_snprintf(buf, sizeof(buf), "You find a trail heading %sto $V!", IN_OR_ON(veh));
 			act(buf, FALSE, ch, NULL, veh, TO_CHAR | ACT_VEH_VICT);
 		}
 		else if ((veh = GET_ROOM_VEHICLE(IN_ROOM(ch))) && IN_ROOM(veh) && GET_ROOM_VNUM(IN_ROOM(veh)) == track_to_room) {
-			snprintf(buf, sizeof(buf), "You find a trail heading %s of $V!", VEH_FLAGGED(veh, VEH_IN) ? "out" : "off");
+			safe_snprintf(buf, sizeof(buf), "You find a trail heading %s of $V!", VEH_FLAGGED(veh, VEH_IN) ? "out" : "off");
 			act(buf, FALSE, ch, NULL, veh, TO_CHAR | ACT_VEH_VICT);
 		}
 		

@@ -827,10 +827,10 @@ void start_chopping(char_data *ch) {
 			strcpy(weapon, "your axe");
 		}
 		
-		snprintf(buf, sizeof(buf), "You swing back %s and prepare to chop...", weapon);
+		safe_snprintf(buf, sizeof(buf), "You swing back %s and prepare to chop...", weapon);
 		act(buf, FALSE, ch, NULL, NULL, TO_CHAR);
 		
-		snprintf(buf, sizeof(buf), "$n swings %s over $s shoulder...", weapon);
+		safe_snprintf(buf, sizeof(buf), "$n swings %s over $s shoulder...", weapon);
 		act(buf, TRUE, ch, NULL, NULL, TO_ROOM);
 	}
 }
@@ -1114,9 +1114,9 @@ void perform_saw(char_data *ch) {
 		}
 		
 		if (!success && !proto) {
-			snprintf(buf, sizeof(buf), "You finish sawing %s but get nothing.", get_obj_name_by_proto(GET_ACTION_VNUM(ch, 0)));
+			safe_snprintf(buf, sizeof(buf), "You finish sawing %s but get nothing.", get_obj_name_by_proto(GET_ACTION_VNUM(ch, 0)));
 			act(buf, FALSE, ch, NULL, NULL, TO_CHAR);
-			snprintf(buf, sizeof(buf), "$n finishes sawing off %s.", get_obj_name_by_proto(GET_ACTION_VNUM(ch, 0)));
+			safe_snprintf(buf, sizeof(buf), "$n finishes sawing off %s.", get_obj_name_by_proto(GET_ACTION_VNUM(ch, 0)));
 			act(buf, TRUE, ch, NULL, NULL, TO_ROOM);
 		}
 		
@@ -2170,9 +2170,9 @@ void process_scraping(char_data *ch) {
 		}
 		
 		if (!success && !proto) {
-			snprintf(buf, sizeof(buf), "You finish scraping off %s but get nothing.", get_obj_name_by_proto(GET_ACTION_VNUM(ch, 0)));
+			safe_snprintf(buf, sizeof(buf), "You finish scraping off %s but get nothing.", get_obj_name_by_proto(GET_ACTION_VNUM(ch, 0)));
 			act(buf, FALSE, ch, NULL, NULL, TO_CHAR);
-			snprintf(buf, sizeof(buf), "$n finishes scraping off %s.", get_obj_name_by_proto(GET_ACTION_VNUM(ch, 0)));
+			safe_snprintf(buf, sizeof(buf), "$n finishes scraping off %s.", get_obj_name_by_proto(GET_ACTION_VNUM(ch, 0)));
 			act(buf, TRUE, ch, NULL, NULL, TO_ROOM);
 		}
 		
@@ -2865,7 +2865,7 @@ ACMD(do_plant) {
 		DL_FOREACH2(ch->carrying, obj, next_content) {
 			if (OBJ_FLAGGED(obj, OBJ_PLANTABLE) && (cp = crop_proto(GET_OBJ_VAL(obj, VAL_FOOD_CROP_TYPE)))) {
 				ordered_sprintbit(GET_CROP_CLIMATE(cp), climate_flags, climate_flags_order, CROP_FLAGGED(cp, CROPF_ANY_LISTED_CLIMATE) ? TRUE : FALSE, lbuf);
-				snprintf(line, sizeof(line), "%s - %s%s", GET_OBJ_DESC(obj, ch, OBJ_DESC_SHORT), lbuf, (CROP_FLAGGED(cp, CROPF_REQUIRES_WATER) ? ", requires water" : ""));
+				safe_snprintf(line, sizeof(line), "%s - %s%s", GET_OBJ_DESC(obj, ch, OBJ_DESC_SHORT), lbuf, (CROP_FLAGGED(cp, CROPF_REQUIRES_WATER) ? ", requires water" : ""));
 				add_string_hash(&str_hash, line, 1);
 			}
 		}
@@ -3331,11 +3331,11 @@ bool can_gen_interact_room(char_data *ch, room_data *room, const struct gen_inte
 		msg_to_char(ch, "You don't have permission to %s %s.\r\n", data->command, (room == IN_ROOM(ch) ? "here" : "there"));
 	}
 	else if (can_veh_but_no_permit && no_guest_room) {
-		snprintf(buf, sizeof(buf), "You can't %s $V because someone else owns %s area.", data->command, (room == IN_ROOM(ch) ? "this" : "that"));
+		safe_snprintf(buf, sizeof(buf), "You can't %s $V because someone else owns %s area.", data->command, (room == IN_ROOM(ch) ? "this" : "that"));
 		act(buf, FALSE, ch, NULL, can_veh_but_no_permit, TO_CHAR | ACT_VEH_VICT);
 	}
 	else if (can_veh_but_no_permit) {
-		snprintf(buf, sizeof(buf), "You don't have permission to %s $V.", data->command);
+		safe_snprintf(buf, sizeof(buf), "You don't have permission to %s $V.", data->command);
 		act(buf, FALSE, ch, NULL, can_veh_but_no_permit, TO_CHAR | ACT_VEH_VICT);
 	}
 	else if ((can_room_but_depleted || can_veh_but_depleted) && IS_SET(data->flags, GI_CONTINUE_WHEN_DEPLETED)) {
@@ -3698,7 +3698,7 @@ ACMD(do_gen_interact_room) {
 	}
 	else if (GET_ACTION(ch) == data->action && (!IS_SET(data->flags, GI_ALLOW_DIRECTION) || !*arg)) {
 		msg_to_char(ch, "You stop %s.\r\n", data->verb);
-		snprintf(buf, sizeof(buf), "$n stops %s.", data->verb);
+		safe_snprintf(buf, sizeof(buf), "$n stops %s.", data->verb);
 		act(buf, FALSE, ch, 0, 0, TO_ROOM);
 		cancel_action(ch);
 	}

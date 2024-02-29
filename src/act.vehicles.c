@@ -64,7 +64,7 @@ void cancel_driving(char_data *ch) {
 		return;
 	}
 	
-	snprintf(buf, sizeof(buf), "%s stops moving.\r\n", VEH_SHORT_DESC(veh));
+	safe_snprintf(buf, sizeof(buf), "%s stops moving.\r\n", VEH_SHORT_DESC(veh));
 	msg_to_vehicle(veh, FALSE, "%s", CAP(buf));
 	
 	GET_DRIVING(ch) = NULL;
@@ -272,7 +272,7 @@ bool move_vehicle(char_data *ch, vehicle_data *veh, int dir, int subcmd) {
 	// targeting
 	if (!(to_room = dir_to_room(IN_ROOM(veh), dir, FALSE))) {
 		if (ch) {
-			snprintf(buf, sizeof(buf), "$V can't %s any further %s.", drive_data[subcmd].command, dirs[get_direction_for_char(ch, dir)]);
+			safe_snprintf(buf, sizeof(buf), "$V can't %s any further %s.", drive_data[subcmd].command, dirs[get_direction_for_char(ch, dir)]);
 			act(buf, FALSE, ch, NULL, veh, TO_CHAR | ACT_VEH_VICT);
 		}
 		return FALSE;
@@ -335,7 +335,7 @@ bool move_vehicle(char_data *ch, vehicle_data *veh, int dir, int subcmd) {
 	// message driver and update MSDP
 	if (VEH_DRIVER(veh)) {
 		if (SHOW_STATUS_MESSAGES(VEH_DRIVER(veh), SM_VEHICLE_MOVEMENT)) {
-			snprintf(buf, sizeof(buf), "You %s $V %s%s.", drive_data[subcmd].command, dirs[get_direction_for_char(VEH_DRIVER(veh), dir)], coord_display_room(VEH_DRIVER(veh), IN_ROOM(veh), FALSE));
+			safe_snprintf(buf, sizeof(buf), "You %s $V %s%s.", drive_data[subcmd].command, dirs[get_direction_for_char(VEH_DRIVER(veh), dir)], coord_display_room(VEH_DRIVER(veh), IN_ROOM(veh), FALSE));
 			act(buf, FALSE, VEH_DRIVER(veh), NULL, veh, TO_CHAR | ACT_VEH_VICT);
 		}
 		msdp_update_room(VEH_DRIVER(veh));
@@ -348,7 +348,7 @@ bool move_vehicle(char_data *ch, vehicle_data *veh, int dir, int subcmd) {
 		GET_LAST_DIR(VEH_SITTING_ON(veh)) = dir;
 		
 		if (VEH_SITTING_ON(veh) != VEH_DRIVER(veh)) {
-			snprintf(buf, sizeof(buf), "$V %s %s%s.", mob_move_types[VEH_MOVE_TYPE(veh)], dirs[get_direction_for_char(ch_iter, dir)], coord_display_room(VEH_SITTING_ON(veh), IN_ROOM(veh), FALSE));
+			safe_snprintf(buf, sizeof(buf), "$V %s %s%s.", mob_move_types[VEH_MOVE_TYPE(veh)], dirs[get_direction_for_char(ch_iter, dir)], coord_display_room(VEH_SITTING_ON(veh), IN_ROOM(veh), FALSE));
 			act(buf, FALSE, VEH_SITTING_ON(veh), NULL, veh, TO_CHAR | ACT_VEH_VICT);
 		}
 		
@@ -372,7 +372,7 @@ bool move_vehicle(char_data *ch, vehicle_data *veh, int dir, int subcmd) {
 				if (ch_iter->desc && ch_iter != VEH_DRIVER(veh)) {
 					// message if desired
 					if (SHOW_STATUS_MESSAGES(ch_iter, SM_VEHICLE_MOVEMENT)) {
-						snprintf(buf, sizeof(buf), "$V %s %s%s.", mob_move_types[VEH_MOVE_TYPE(veh)], dirs[get_direction_for_char(ch_iter, dir)], coord_display_room(ch_iter, IN_ROOM(veh), FALSE));
+						safe_snprintf(buf, sizeof(buf), "$V %s %s%s.", mob_move_types[VEH_MOVE_TYPE(veh)], dirs[get_direction_for_char(ch_iter, dir)], coord_display_room(ch_iter, IN_ROOM(veh), FALSE));
 						act(buf, FALSE, ch_iter, NULL, veh, TO_CHAR | TO_SPAMMY | ACT_VEH_VICT);
 					}
 					
@@ -526,11 +526,11 @@ bool perform_put_obj_in_vehicle(char_data *ch, obj_data *obj, vehicle_data *veh)
 * @param room_data *to_room Where to put the item in cont.
 */
 void perform_load_mob(char_data *ch, char_data *mob, vehicle_data *cont, room_data *to_room) {
-	snprintf(buf, sizeof(buf), "You load $N %sto $v.", IN_OR_ON(cont));
+	safe_snprintf(buf, sizeof(buf), "You load $N %sto $v.", IN_OR_ON(cont));
 	act(buf, FALSE, ch, cont, mob, TO_CHAR | ACT_VEH_OBJ);
-	snprintf(buf, sizeof(buf), "$n loads you %sto $v.", IN_OR_ON(cont));
+	safe_snprintf(buf, sizeof(buf), "$n loads you %sto $v.", IN_OR_ON(cont));
 	act(buf, FALSE, ch, cont, mob, TO_VICT | ACT_VEH_OBJ);
-	snprintf(buf, sizeof(buf), "$n loads $N %sto $v.", IN_OR_ON(cont));
+	safe_snprintf(buf, sizeof(buf), "$n loads $N %sto $v.", IN_OR_ON(cont));
 	act(buf, FALSE, ch, cont, mob, TO_NOTVICT | ACT_VEH_OBJ);
 	
 	char_to_room(mob, to_room);
@@ -544,7 +544,7 @@ void perform_load_mob(char_data *ch, char_data *mob, vehicle_data *cont, room_da
 		set_mob_spawn_time(mob, time(0));
 	}
 	
-	snprintf(buf, sizeof(buf), "$n is loaded %sto $V.", IN_OR_ON(cont));
+	safe_snprintf(buf, sizeof(buf), "$n is loaded %sto $V.", IN_OR_ON(cont));
 	act(buf, FALSE, mob, NULL, cont, TO_ROOM | ACT_VEH_VICT);
 	
 	enter_triggers(mob, NO_DIR, "enter", FALSE);
@@ -564,16 +564,16 @@ void perform_load_mob(char_data *ch, char_data *mob, vehicle_data *cont, room_da
 void perform_load_vehicle(char_data *ch, vehicle_data *veh, vehicle_data *cont, room_data *to_room) {
 	char buf[256];
 	
-	snprintf(buf, sizeof(buf), "You load $V %sto $v.", IN_OR_ON(cont));
+	safe_snprintf(buf, sizeof(buf), "You load $V %sto $v.", IN_OR_ON(cont));
 	act(buf, FALSE, ch, cont, veh, TO_CHAR | ACT_VEH_OBJ | ACT_VEH_VICT);
-	snprintf(buf, sizeof(buf), "$n loads $V %sto $v.", IN_OR_ON(cont));
+	safe_snprintf(buf, sizeof(buf), "$n loads $V %sto $v.", IN_OR_ON(cont));
 	act(buf, FALSE, ch, cont, veh, TO_ROOM | ACT_VEH_OBJ | ACT_VEH_VICT);
 	
 	// probably do not need to adjust-tech -- this can't change islands, can it?
 	vehicle_to_room(veh, to_room);
 	
 	if (ROOM_PEOPLE(to_room)) {
-		snprintf(buf, sizeof(buf), "$V is loaded %sto $v.", IN_OR_ON(cont));
+		safe_snprintf(buf, sizeof(buf), "$V is loaded %sto $v.", IN_OR_ON(cont));
 		act(buf, FALSE, ROOM_PEOPLE(to_room), cont, veh, TO_CHAR | TO_ROOM | ACT_VEH_OBJ | ACT_VEH_VICT);
 	}
 }
@@ -716,7 +716,7 @@ void process_driving(char_data *ch) {
 						LL_FOREACH(VEH_ROOM_LIST(veh), vrl) {
 							DL_FOREACH2(ROOM_PEOPLE(vrl->room), ch_iter, next_in_room) {
 								if (ch_iter != ch && ch_iter->desc) {
-									snprintf(buf, sizeof(buf), "$V %s %s.", "turns to the", dirs[get_direction_for_char(ch_iter, new_dir)]);
+									safe_snprintf(buf, sizeof(buf), "$V %s %s.", "turns to the", dirs[get_direction_for_char(ch_iter, new_dir)]);
 									act(buf, FALSE, ch_iter, NULL, veh, TO_CHAR | ACT_VEH_VICT);
 								}
 							}
@@ -801,7 +801,7 @@ bool validate_sit_on_vehicle(char_data *ch, vehicle_data *veh, int pos, bool mes
 	// person checks
 	else if (VEH_SITTING_ON(veh) && (VEH_SITTING_ON(veh) != ch || pos == GET_POS(ch))) {
 		if (message) {
-			snprintf(buf, sizeof(buf), "%s", position_types[GET_POS(VEH_SITTING_ON(veh))]);
+			safe_snprintf(buf, sizeof(buf), "%s", position_types[GET_POS(VEH_SITTING_ON(veh))]);
 			*buf = LOWER(*buf);
 			msg_to_char(ch, "%s already %s %s it.\r\n", (VEH_SITTING_ON(veh) != ch ? "Someone else is" : "You are"), buf, IN_OR_ON(veh));
 		}
@@ -1141,9 +1141,9 @@ void do_light_vehicle(char_data *ch, vehicle_data *veh, obj_data *lighter) {
 		msg_to_char(ch, "You don't have permission to burn the empire's %ss (it requires the dismantle privilege).\r\n", VEH_OR_BLD(veh));
 	}
 	else {
-		snprintf(buf, sizeof(buf), "You %s $V on fire!", (lighter ? "use $p to light" : "light"));
+		safe_snprintf(buf, sizeof(buf), "You %s $V on fire!", (lighter ? "use $p to light" : "light"));
 		act(buf, FALSE, ch, lighter, veh, TO_CHAR | ACT_VEH_VICT);
-		snprintf(buf, sizeof(buf), "$n %s $V on fire!", (lighter ? "uses $p to light" : "lights"));
+		safe_snprintf(buf, sizeof(buf), "$n %s $V on fire!", (lighter ? "uses $p to light" : "lights"));
 		act(buf, FALSE, ch, lighter, veh, TO_ROOM | ACT_VEH_VICT);
 		start_vehicle_burning(veh);
 		
@@ -1203,10 +1203,10 @@ void do_sit_on_vehicle(char_data *ch, char *argument, int pos) {
 			do_unseat_from_vehicle(ch);
 		}
 		
-		snprintf(buf, sizeof(buf), "You %s %s $V.", position_commands[pos], IN_OR_ON(veh));
+		safe_snprintf(buf, sizeof(buf), "You %s %s $V.", position_commands[pos], IN_OR_ON(veh));
 		act(buf, FALSE, ch, NULL, veh, TO_CHAR | ACT_VEH_VICT);
 		
-		snprintf(buf, sizeof(buf), "$n %ss %s $V.", position_commands[pos], IN_OR_ON(veh));
+		safe_snprintf(buf, sizeof(buf), "$n %ss %s $V.", position_commands[pos], IN_OR_ON(veh));
 		act(buf, FALSE, ch, NULL, veh, TO_ROOM | ACT_VEH_VICT);
 		
 		sit_on_vehicle(ch, veh);
@@ -1302,10 +1302,10 @@ void do_unseat_from_vehicle(char_data *ch) {
 		return;
 	}
 	
-	snprintf(buf, sizeof(buf), "You get up %s of $V.", VEH_FLAGGED(GET_SITTING_ON(ch), VEH_IN) ? "out" : "off");
+	safe_snprintf(buf, sizeof(buf), "You get up %s of $V.", VEH_FLAGGED(GET_SITTING_ON(ch), VEH_IN) ? "out" : "off");
 	act(buf, FALSE, ch, NULL, GET_SITTING_ON(ch), TO_CHAR | ACT_VEH_VICT);
 
-	snprintf(buf, sizeof(buf), "$n gets up %s of $V.", VEH_FLAGGED(GET_SITTING_ON(ch), VEH_IN) ? "out" : "off");
+	safe_snprintf(buf, sizeof(buf), "$n gets up %s of $V.", VEH_FLAGGED(GET_SITTING_ON(ch), VEH_IN) ? "out" : "off");
 	act(buf, TRUE, ch, NULL, GET_SITTING_ON(ch), TO_ROOM | ACT_VEH_VICT);
 
 	unseat_char_from_vehicle(ch);
@@ -1336,7 +1336,7 @@ ACMD(do_board) {
 		msg_to_char(ch, "You are overburdened and cannot move.\r\n");
 	}
 	else if (!*arg) {
-		snprintf(buf, sizeof(buf), "%s what?\r\n", command);
+		safe_snprintf(buf, sizeof(buf), "%s what?\r\n", command);
 		send_to_char(CAP(buf), ch);
 	}
 	else if (!(veh = get_vehicle_in_room_vis(ch, arg, NULL))) {
@@ -1691,7 +1691,7 @@ void do_drive_through_portal(char_data *ch, vehicle_data *veh, obj_data *portal,
 		act("You don't have permission to use $V.", FALSE, ch, NULL, veh, TO_CHAR | ACT_VEH_VICT);
 	}
 	else if (IN_ROOM(veh) != IN_ROOM(portal)) {
-		snprintf(buf, sizeof(buf), "You can't %s through $p because it's not in the same room as $V.", drive_data[subcmd].command);
+		safe_snprintf(buf, sizeof(buf), "You can't %s through $p because it's not in the same room as $V.", drive_data[subcmd].command);
 		act(buf, FALSE, ch, portal, veh, TO_CHAR | ACT_VEH_VICT);
 	}
 	else if (!can_enter_portal(ch, portal, FALSE, FALSE)) {
@@ -1702,7 +1702,7 @@ void do_drive_through_portal(char_data *ch, vehicle_data *veh, obj_data *portal,
 	}
 	else {
 		if (ROOM_PEOPLE(IN_ROOM(veh))) {
-			snprintf(buf, sizeof(buf), "$V %s through $p.", mob_move_types[VEH_MOVE_TYPE(veh)]);
+			safe_snprintf(buf, sizeof(buf), "$V %s through $p.", mob_move_types[VEH_MOVE_TYPE(veh)]);
 			act(buf, FALSE, ROOM_PEOPLE(IN_ROOM(veh)), portal, veh, TO_CHAR | TO_ROOM | ACT_VEH_VICT);
 		}
 		
@@ -1710,7 +1710,7 @@ void do_drive_through_portal(char_data *ch, vehicle_data *veh, obj_data *portal,
 		vehicle_to_room(veh, to_room);
 		
 		if (ROOM_PEOPLE(IN_ROOM(veh))) {
-			snprintf(buf, sizeof(buf), "$V %s out of $p.", mob_move_types[VEH_MOVE_TYPE(veh)]);
+			safe_snprintf(buf, sizeof(buf), "$V %s out of $p.", mob_move_types[VEH_MOVE_TYPE(veh)]);
 			act(buf, FALSE, ROOM_PEOPLE(IN_ROOM(veh)), find_back_portal(to_room, was_in, portal), veh, TO_CHAR | TO_ROOM | ACT_VEH_VICT);
 		}
 		
@@ -1730,7 +1730,7 @@ void do_drive_through_portal(char_data *ch, vehicle_data *veh, obj_data *portal,
 			give_portal_sickness(VEH_SITTING_ON(veh), portal, was_in, to_room);
 		}
 		if (VEH_ROOM_LIST(veh)) {
-			snprintf(buf, sizeof(buf), "$V %s through $p.", mob_move_types[VEH_MOVE_TYPE(veh)]);
+			safe_snprintf(buf, sizeof(buf), "$V %s through $p.", mob_move_types[VEH_MOVE_TYPE(veh)]);
 			LL_FOREACH(VEH_ROOM_LIST(veh), vrl) {
 				DL_FOREACH_SAFE2(ROOM_PEOPLE(vrl->room), ch_iter, next_ch, next_in_room) {
 					give_portal_sickness(ch_iter, portal, was_in, to_room);
@@ -1783,7 +1783,7 @@ ACMD(do_drive) {
 		msg_to_char(ch, "You can't %s anything here.\r\n", drive_data[subcmd].command);
 	}
 	else if (!VEH_FLAGGED(veh, drive_data[subcmd].flag)) {
-		snprintf(buf, sizeof(buf), "You can't %s $V!", drive_data[subcmd].command);
+		safe_snprintf(buf, sizeof(buf), "You can't %s $V!", drive_data[subcmd].command);
 		act(buf, FALSE, ch, NULL, veh, TO_CHAR | ACT_VEH_VICT);
 		
 		// helpful hint
@@ -1914,7 +1914,7 @@ ACMD(do_drive) {
 			LL_FOREACH(VEH_ROOM_LIST(veh), vrl) {
 				DL_FOREACH2(ROOM_PEOPLE(vrl->room), ch_iter, next_in_room) {
 					if (ch_iter != ch && ch_iter->desc) {
-						snprintf(buf, sizeof(buf), "$V %s %s.", (was_driving ? "turns to the" : "begins to move"), dirs[get_direction_for_char(ch_iter, dir)]);
+						safe_snprintf(buf, sizeof(buf), "$V %s %s.", (was_driving ? "turns to the" : "begins to move"), dirs[get_direction_for_char(ch_iter, dir)]);
 						act(buf, FALSE, ch_iter, NULL, veh, TO_CHAR | ACT_VEH_VICT);
 					}
 				}
@@ -2188,7 +2188,7 @@ ACMD(do_lead) {
 			msg_to_char(ch, "You can't lead it while it's on fire!\r\n");
 		}
 		else if (VEH_SITTING_ON(veh)) {
-			snprintf(part, sizeof(part), "%s", position_types[GET_POS(VEH_SITTING_ON(veh))]);
+			safe_snprintf(part, sizeof(part), "%s", position_types[GET_POS(VEH_SITTING_ON(veh))]);
 			*part = LOWER(*part);
 			msg_to_char(ch, "You can't lead it while %s %s on it.\r\n", (VEH_SITTING_ON(veh) == ch) ? "you are" : "someone else is", part);
 		}
@@ -2299,7 +2299,7 @@ ACMD(do_load_vehicle) {
 			act("You can't load $M right now.", FALSE, ch, NULL, mob, TO_CHAR);
 		}
 		else if (GET_LED_BY(mob)) {
-			snprintf(buf, sizeof(buf), "You can't load $N while %s leading $M.", GET_LED_BY(mob) == ch ? "you're" : "someone else is");
+			safe_snprintf(buf, sizeof(buf), "You can't load $N while %s leading $M.", GET_LED_BY(mob) == ch ? "you're" : "someone else is");
 			act(buf, FALSE, ch, NULL, mob, TO_CHAR);
 		}
 		else {
@@ -2318,7 +2318,7 @@ ACMD(do_load_vehicle) {
 			act("$v won't carry that.", FALSE, ch, cont, NULL, TO_CHAR | ACT_VEH_OBJ);
 		}
 		else if (VEH_FLAGGED(veh, VEH_NO_LOAD_ONTO_VEHICLE)) {
-			snprintf(buf, sizeof(buf), "You can't load $v %sto anything.", IN_OR_ON(cont));
+			safe_snprintf(buf, sizeof(buf), "You can't load $v %sto anything.", IN_OR_ON(cont));
 			act(buf, FALSE, ch, veh, NULL, TO_CHAR | ACT_VEH_OBJ);
 		}
 		else if (VEH_IS_DISMANTLING(veh)) {
@@ -2340,7 +2340,7 @@ ACMD(do_load_vehicle) {
 			msg_to_char(ch, "You can't load %s while %s leading it.\r\n", get_vehicle_short_desc(veh, ch), VEH_LED_BY(veh) == ch ? "you're" : "someone else is");
 		}
 		else if (VEH_SITTING_ON(veh)) {
-			snprintf(buf, sizeof(buf), "%s", position_types[GET_POS(VEH_SITTING_ON(veh))]);
+			safe_snprintf(buf, sizeof(buf), "%s", position_types[GET_POS(VEH_SITTING_ON(veh))]);
 			*buf = LOWER(*buf);
 			msg_to_char(ch, "You can't load %s while %s %s %s it.\r\n", get_vehicle_short_desc(veh, ch), VEH_SITTING_ON(veh) == ch ? "you're" : "someone else is", buf, IN_OR_ON(veh));
 		}
@@ -2533,7 +2533,7 @@ ACMD(do_unload_vehicle) {
 			act("You can't unload $M right now.", FALSE, ch, NULL, mob, TO_CHAR);
 		}
 		else if (GET_LED_BY(mob)) {
-			snprintf(buf, sizeof(buf), "You can't unload $N while %s leading $M.", GET_LED_BY(mob) == ch ? "you're" : "someone else is");
+			safe_snprintf(buf, sizeof(buf), "You can't unload $N while %s leading $M.", GET_LED_BY(mob) == ch ? "you're" : "someone else is");
 			act(buf, FALSE, ch, NULL, mob, TO_CHAR);
 		}
 		else {
@@ -2570,7 +2570,7 @@ ACMD(do_unload_vehicle) {
 			msg_to_char(ch, "You can't unload %s while %s leading it.\r\n", get_vehicle_short_desc(veh, ch), VEH_LED_BY(veh) == ch ? "you're" : "someone else is");
 		}
 		else if (VEH_SITTING_ON(veh)) {
-			snprintf(buf, sizeof(buf), "%s", position_types[GET_POS(VEH_SITTING_ON(veh))]);
+			safe_snprintf(buf, sizeof(buf), "%s", position_types[GET_POS(VEH_SITTING_ON(veh))]);
 			*buf = LOWER(*buf);
 			msg_to_char(ch, "You can't unload %s while %s %s %s it.\r\n", get_vehicle_short_desc(veh, ch), VEH_SITTING_ON(veh) == ch ? "you're" : "someone else is", buf, IN_OR_ON(veh));
 		}

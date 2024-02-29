@@ -366,7 +366,7 @@ bool audit_generic(generic_data *gen, char_data *ch) {
 		}
 		case GENERIC_AFFECT: {
 			if (GET_AFFECT_LOOK_AT_ROOM(gen)) {
-				snprintf(temp, sizeof(temp), "%s", NULLSAFE(GET_AFFECT_LOOK_AT_ROOM(gen)));
+				safe_snprintf(temp, sizeof(temp), "%s", NULLSAFE(GET_AFFECT_LOOK_AT_ROOM(gen)));
 				// only if present...
 				if (strncmp(temp, "...", 3)) {
 					olc_audit_msg(ch, GEN_VNUM(gen), "Look-at-room string does not begin with '...'");
@@ -418,21 +418,21 @@ char *list_one_generic(generic_data *gen, bool detail) {
 	if (detail) {
 		switch (GEN_TYPE(gen)) {
 			case GENERIC_COOLDOWN: {
-				snprintf(output, sizeof(output), "[%5d] %s (%s): %s", GEN_VNUM(gen), GEN_NAME(gen), generic_types[GEN_TYPE(gen)], NULLSAFE(GET_COOLDOWN_WEAR_OFF(gen)));
+				safe_snprintf(output, sizeof(output), "[%5d] %s (%s): %s", GEN_VNUM(gen), GEN_NAME(gen), generic_types[GEN_TYPE(gen)], NULLSAFE(GET_COOLDOWN_WEAR_OFF(gen)));
 				break;
 			}
 			case GENERIC_COMPONENT: {
-				snprintf(output, sizeof(output), "[%5d] %s%s (%s), obj: [%d] %s", GEN_VNUM(gen), GEN_NAME(gen), GEN_FLAGGED(gen, GEN_BASIC) ? " (basic)" : "", generic_types[GEN_TYPE(gen)], GET_COMPONENT_OBJ_VNUM(gen), get_obj_name_by_proto(GET_COMPONENT_OBJ_VNUM(gen)));
+				safe_snprintf(output, sizeof(output), "[%5d] %s%s (%s), obj: [%d] %s", GEN_VNUM(gen), GEN_NAME(gen), GEN_FLAGGED(gen, GEN_BASIC) ? " (basic)" : "", generic_types[GEN_TYPE(gen)], GET_COMPONENT_OBJ_VNUM(gen), get_obj_name_by_proto(GET_COMPONENT_OBJ_VNUM(gen)));
 				break;
 			}
 			default: {
-				snprintf(output, sizeof(output), "[%5d] %s (%s)", GEN_VNUM(gen), GEN_NAME(gen), generic_types[GEN_TYPE(gen)]);
+				safe_snprintf(output, sizeof(output), "[%5d] %s (%s)", GEN_VNUM(gen), GEN_NAME(gen), generic_types[GEN_TYPE(gen)]);
 				break;
 			}
 		}
 	}
 	else {
-		snprintf(output, sizeof(output), "[%5d] %s (%s)", GEN_VNUM(gen), GEN_NAME(gen), generic_types[GEN_TYPE(gen)]);
+		safe_snprintf(output, sizeof(output), "[%5d] %s (%s)", GEN_VNUM(gen), GEN_NAME(gen), generic_types[GEN_TYPE(gen)]);
 	}
 		
 	return output;
@@ -1311,7 +1311,7 @@ void olc_delete_generic(char_data *ch, any_vnum vnum) {
 		return;
 	}
 	
-	snprintf(name, sizeof(name), "%s", NULLSAFE(GEN_NAME(gen)));
+	safe_snprintf(name, sizeof(name), "%s", NULLSAFE(GEN_NAME(gen)));
 	
 	switch (GEN_TYPE(gen)) {
 		case GENERIC_ACTION: {
@@ -2722,7 +2722,7 @@ OLC_MODULE(genedit_quick_cooldown) {
 	// ensure some data
 	GEN_VNUM(GET_OLC_GENERIC(ch->desc)) = vnum;
 	GEN_TYPE(GET_OLC_GENERIC(ch->desc)) = GENERIC_COOLDOWN;
-	snprintf(buf, sizeof(buf), "Your %s cooldown has ended.", GEN_NAME(GET_OLC_GENERIC(ch->desc)));
+	safe_snprintf(buf, sizeof(buf), "Your %s cooldown has ended.", GEN_NAME(GET_OLC_GENERIC(ch->desc)));
 	if (GEN_STRING(GET_OLC_GENERIC(ch->desc), GSTR_COOLDOWN_WEAR_OFF)) {
 		free(GEN_STRING(GET_OLC_GENERIC(ch->desc), GSTR_COOLDOWN_WEAR_OFF));
 	}
@@ -2739,12 +2739,12 @@ OLC_MODULE(genedit_standardwearoff) {
 	
 	switch (GEN_TYPE(gen)) {
 		case GENERIC_COOLDOWN: {
-			snprintf(buf, sizeof(buf), "Your %s cooldown has ended.", GEN_NAME(gen));
+			safe_snprintf(buf, sizeof(buf), "Your %s cooldown has ended.", GEN_NAME(gen));
 			pos = GSTR_COOLDOWN_WEAR_OFF;
 			break;
 		}
 		case GENERIC_AFFECT: {
-			snprintf(buf, sizeof(buf), "Your %s wears off.", GEN_NAME(gen));
+			safe_snprintf(buf, sizeof(buf), "Your %s wears off.", GEN_NAME(gen));
 			pos = GSTR_AFFECT_WEAR_OFF_TO_CHAR;
 			break;
 		}

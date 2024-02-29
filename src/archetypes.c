@@ -697,10 +697,10 @@ char *list_one_archetype(archetype_data *arch, bool detail) {
 		}
 		strcat(buf, ")");
 		
-		snprintf(output, sizeof(output), "[%5d] %s: %s%s [%d/%d]", GET_ARCH_VNUM(arch), archetype_types[GET_ARCH_TYPE(arch)], GET_ARCH_NAME(arch), GET_ARCH_SKILLS(arch) ? buf : "", atts, skills);
+		safe_snprintf(output, sizeof(output), "[%5d] %s: %s%s [%d/%d]", GET_ARCH_VNUM(arch), archetype_types[GET_ARCH_TYPE(arch)], GET_ARCH_NAME(arch), GET_ARCH_SKILLS(arch) ? buf : "", atts, skills);
 	}
 	else {
-		snprintf(output, sizeof(output), "[%5d] %s: %s", GET_ARCH_VNUM(arch), archetype_types[GET_ARCH_TYPE(arch)], GET_ARCH_NAME(arch));
+		safe_snprintf(output, sizeof(output), "[%5d] %s: %s", GET_ARCH_VNUM(arch), archetype_types[GET_ARCH_TYPE(arch)], GET_ARCH_NAME(arch));
 	}
 		
 	return output;
@@ -1301,7 +1301,7 @@ void display_archetype_list(descriptor_data *desc, int type, char *argument) {
 			strcpy(color, "\ty");
 		}
 		
-		snprintf(line, sizeof(line), " %s%s\t0 - %s", color, GET_ARCH_NAME(arch), GET_ARCH_DESC(arch));
+		safe_snprintf(line, sizeof(line), " %s%s\t0 - %s", color, GET_ARCH_NAME(arch), GET_ARCH_DESC(arch));
 		any = TRUE;
 		
 		if (size + strlen(line) + 40 < sizeof(buf)) {
@@ -1625,7 +1625,7 @@ void olc_delete_archetype(char_data *ch, any_vnum vnum) {
 		return;
 	}
 	
-	snprintf(name, sizeof(name), "%s", NULLSAFE(GET_ARCH_NAME(arch)));
+	safe_snprintf(name, sizeof(name), "%s", NULLSAFE(GET_ARCH_NAME(arch)));
 	
 	// remove it from the hash table first
 	remove_archetype_from_table(arch);
@@ -1824,8 +1824,8 @@ void do_stat_archetype(char_data *ch, archetype_data *arch) {
 	for (iter = 0, total = 0, *line = '\0'; iter < NUM_ATTRIBUTES; ++iter) {
 		total += GET_ARCH_ATTRIBUTE(arch, iter);
 		pos = attribute_display_order[iter];
-		snprintf(part, sizeof(part), "%s  [\tg%2d\t0]", attributes[pos].name, GET_ARCH_ATTRIBUTE(arch, pos));
-		snprintf(line + strlen(line), sizeof(line) - strlen(line), "  %-27.27s%s", part, !((iter + 1) % 3) ? "\r\n" : "");
+		safe_snprintf(part, sizeof(part), "%s  [\tg%2d\t0]", attributes[pos].name, GET_ARCH_ATTRIBUTE(arch, pos));
+		safe_snprintf(line + strlen(line), sizeof(line) - strlen(line), "  %-27.27s%s", part, !((iter + 1) % 3) ? "\r\n" : "");
 	}
 	build_page_display(ch, "Attributes: [\tc%d total attributes\t0]\r\n%s", total, line);
 	

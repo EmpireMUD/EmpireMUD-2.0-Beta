@@ -2802,7 +2802,7 @@ obj_data *create_money(empire_data *type, int amount) {
 	// strings
 	set_obj_keywords(obj, skip_filler(buf));
 	set_obj_short_desc(obj, buf);
-	snprintf(buf2, sizeof(buf2), "%s is lying here.", CAP(buf));
+	safe_snprintf(buf2, sizeof(buf2), "%s is lying here.", CAP(buf));
 	set_obj_long_desc(obj, buf2);
 
 	// description
@@ -2811,13 +2811,13 @@ obj_data *create_money(empire_data *type, int amount) {
 	}
 	else {
 		if (amount < 10)
-			snprintf(buf, sizeof(buf), "There are %d coins.", amount);
+			safe_snprintf(buf, sizeof(buf), "There are %d coins.", amount);
 		else if (amount < 100)
-			snprintf(buf, sizeof(buf), "There are about %d coins.", 10 * (amount / 10));
+			safe_snprintf(buf, sizeof(buf), "There are about %d coins.", 10 * (amount / 10));
 		else if (amount < 1000)
-			snprintf(buf, sizeof(buf), "It looks to be about %d coins.", 100 * (amount / 100));
+			safe_snprintf(buf, sizeof(buf), "It looks to be about %d coins.", 100 * (amount / 100));
 		else if (amount < 100000)
-			snprintf(buf, sizeof(buf), "You guess there are, maybe, %d coins.", 1000 * ((amount / 1000) + number(0, (amount / 1000))));
+			safe_snprintf(buf, sizeof(buf), "You guess there are, maybe, %d coins.", 1000 * ((amount / 1000) + number(0, (amount / 1000))));
 		else
 			strcpy(buf, "There are a LOT of coins.");	/* strcpy: OK (is < MAX_STRING_LENGTH) */
 
@@ -3086,7 +3086,7 @@ int increase_coins(char_data *ch, empire_data *emp, int amount) {
 */
 const char *money_amount(empire_data *type, int amount) {
 	static char desc[MAX_STRING_LENGTH];
-	snprintf(desc, sizeof(desc), "%d %s coin%s", amount, (type != REAL_OTHER_COIN ? EMPIRE_ADJECTIVE(type) : (amount == 1 ? "simple" : "miscellaneous")), PLURAL(amount));
+	safe_snprintf(desc, sizeof(desc), "%d %s coin%s", amount, (type != REAL_OTHER_COIN ? EMPIRE_ADJECTIVE(type) : (amount == 1 ? "simple" : "miscellaneous")), PLURAL(amount));
 	return (const char*)desc;
 }
 
@@ -9319,7 +9319,7 @@ char *requirement_string(struct req_data *req, bool show_vnums, bool allow_custo
 	}
 	
 	if (show_vnums) {
-		snprintf(vnum, sizeof(vnum), "[%d] ", req->vnum);
+		safe_snprintf(vnum, sizeof(vnum), "[%d] ", req->vnum);
 	}
 	else {
 		*vnum = '\0';
@@ -9329,149 +9329,149 @@ char *requirement_string(struct req_data *req, bool show_vnums, bool allow_custo
 	switch (req->type) {
 		case REQ_COMPLETED_QUEST:	// both the same
 		case REQ_COMPLETED_QUEST_EVER: {
-			snprintf(output, sizeof(output), "Complete quest: %s%s", vnum, get_quest_name_by_proto(req->vnum));
+			safe_snprintf(output, sizeof(output), "Complete quest: %s%s", vnum, get_quest_name_by_proto(req->vnum));
 			break;
 		}
 		case REQ_GET_COMPONENT: {
-			snprintf(output, sizeof(output), "Get component%s: %dx (%s)", PLURAL(req->needed), req->needed, req->needed == 1 ? get_generic_name_by_vnum(req->vnum) : get_generic_string_by_vnum(req->vnum, GENERIC_COMPONENT, GSTR_COMPONENT_PLURAL));
+			safe_snprintf(output, sizeof(output), "Get component%s: %dx (%s)", PLURAL(req->needed), req->needed, req->needed == 1 ? get_generic_name_by_vnum(req->vnum) : get_generic_string_by_vnum(req->vnum, GENERIC_COMPONENT, GSTR_COMPONENT_PLURAL));
 			break;
 		}
 		case REQ_GET_OBJECT: {
-			snprintf(output, sizeof(output), "Get object%s: %dx %s%s", PLURAL(req->needed), req->needed, vnum, get_obj_name_by_proto(req->vnum));
+			safe_snprintf(output, sizeof(output), "Get object%s: %dx %s%s", PLURAL(req->needed), req->needed, vnum, get_obj_name_by_proto(req->vnum));
 			break;
 		}
 		case REQ_GET_CURRENCY: {
-			snprintf(output, sizeof(output), "Get currency: %d %s%s", req->needed, vnum, get_generic_string_by_vnum(req->vnum, GENERIC_CURRENCY, WHICH_CURRENCY(req->needed)));
+			safe_snprintf(output, sizeof(output), "Get currency: %d %s%s", req->needed, vnum, get_generic_string_by_vnum(req->vnum, GENERIC_CURRENCY, WHICH_CURRENCY(req->needed)));
 			break;
 		}
 		case REQ_GET_COINS: {
-			snprintf(output, sizeof(output), "Get coins: %d coins", req->needed);
+			safe_snprintf(output, sizeof(output), "Get coins: %d coins", req->needed);
 			break;
 		}
 		case REQ_KILL_MOB: {
-			snprintf(output, sizeof(output), "Kill %dx mob%s: %s%s", req->needed, PLURAL(req->needed), vnum, get_mob_name_by_proto(req->vnum, TRUE));
+			safe_snprintf(output, sizeof(output), "Kill %dx mob%s: %s%s", req->needed, PLURAL(req->needed), vnum, get_mob_name_by_proto(req->vnum, TRUE));
 			break;
 		}
 		case REQ_KILL_MOB_FLAGGED: {
 			sprintbit(req->misc, action_bits, lbuf, TRUE);
 			// does not show vnum
-			snprintf(output, sizeof(output), "Kill %dx mob%s flagged: %s", req->needed, PLURAL(req->needed), lbuf);
+			safe_snprintf(output, sizeof(output), "Kill %dx mob%s flagged: %s", req->needed, PLURAL(req->needed), lbuf);
 			break;
 		}
 		case REQ_NOT_COMPLETED_QUEST: {
-			snprintf(output, sizeof(output), "Not completed quest %s%s", vnum, get_quest_name_by_proto(req->vnum));
+			safe_snprintf(output, sizeof(output), "Not completed quest %s%s", vnum, get_quest_name_by_proto(req->vnum));
 			break;
 		}
 		case REQ_NOT_ON_QUEST: {
-			snprintf(output, sizeof(output), "Not on quest %s%s", vnum, get_quest_name_by_proto(req->vnum));
+			safe_snprintf(output, sizeof(output), "Not on quest %s%s", vnum, get_quest_name_by_proto(req->vnum));
 			break;
 		}
 		case REQ_OWN_BUILDING: {
 			bld_data *bld = building_proto(req->vnum);
-			snprintf(output, sizeof(output), "Own %dx building%s: %s%s", req->needed, PLURAL(req->needed), vnum, bld ? GET_BLD_NAME(bld) : "UNKNOWN");
+			safe_snprintf(output, sizeof(output), "Own %dx building%s: %s%s", req->needed, PLURAL(req->needed), vnum, bld ? GET_BLD_NAME(bld) : "UNKNOWN");
 			break;
 		}
 		case REQ_OWN_BUILDING_FUNCTION: {
 			sprintbit(req->misc, function_flags, lbuf, TRUE);
 			// does not show vnum
-			snprintf(output, sizeof(output), "Own %dx building%s with: %s", req->needed, PLURAL(req->needed), lbuf);
+			safe_snprintf(output, sizeof(output), "Own %dx building%s with: %s", req->needed, PLURAL(req->needed), lbuf);
 			break;
 		}
 		case REQ_OWN_VEHICLE: {
 			vproto = vehicle_proto(req->vnum);
-			snprintf(output, sizeof(output), "Own %dx %s%s: %s%s", req->needed, vproto ? VEH_OR_BLD(vproto) : "vehicle", PLURAL(req->needed), vnum, vproto ? VEH_SHORT_DESC(vproto) : "unknown");
+			safe_snprintf(output, sizeof(output), "Own %dx %s%s: %s%s", req->needed, vproto ? VEH_OR_BLD(vproto) : "vehicle", PLURAL(req->needed), vnum, vproto ? VEH_SHORT_DESC(vproto) : "unknown");
 			break;
 		}
 		case REQ_OWN_VEHICLE_FLAGGED: {
 			sprintbit(req->misc, vehicle_flags, lbuf, TRUE);
 			// does not show vnum
-			snprintf(output, sizeof(output), "Own %dx vehicle%s flagged: %s", req->needed, PLURAL(req->needed), lbuf);
+			safe_snprintf(output, sizeof(output), "Own %dx vehicle%s flagged: %s", req->needed, PLURAL(req->needed), lbuf);
 			break;
 		}
 		case REQ_OWN_VEHICLE_FUNCTION: {
 			sprintbit(req->misc, function_flags, lbuf, TRUE);
 			// does not show vnum
-			snprintf(output, sizeof(output), "Own %dx vehicle%s with: %s", req->needed, PLURAL(req->needed), lbuf);
+			safe_snprintf(output, sizeof(output), "Own %dx vehicle%s with: %s", req->needed, PLURAL(req->needed), lbuf);
 			break;
 		}
 		case REQ_SKILL_LEVEL_OVER: {
-			snprintf(output, sizeof(output), "%s%s at least %d", vnum, get_skill_name_by_vnum(req->vnum), req->needed);
+			safe_snprintf(output, sizeof(output), "%s%s at least %d", vnum, get_skill_name_by_vnum(req->vnum), req->needed);
 			break;
 		}
 		case REQ_SKILL_LEVEL_UNDER: {
-			snprintf(output, sizeof(output), "%s%s not over %d", vnum, get_skill_name_by_vnum(req->vnum), req->needed);
+			safe_snprintf(output, sizeof(output), "%s%s not over %d", vnum, get_skill_name_by_vnum(req->vnum), req->needed);
 			break;
 		}
 		case REQ_TRIGGERED: {
-			snprintf(output, sizeof(output), "Scripted condition %dx", req->needed);
+			safe_snprintf(output, sizeof(output), "Scripted condition %dx", req->needed);
 			break;
 		}
 		case REQ_VISIT_BUILDING: {
 			bld_data *bld = building_proto(req->vnum);
-			snprintf(output, sizeof(output), "Visit building: %s%s", vnum, bld ? GET_BLD_NAME(bld) : "UNKNOWN");
+			safe_snprintf(output, sizeof(output), "Visit building: %s%s", vnum, bld ? GET_BLD_NAME(bld) : "UNKNOWN");
 			break;
 		}
 		case REQ_VISIT_ROOM_TEMPLATE: {
 			room_template *rmt = room_template_proto(req->vnum);
-			snprintf(output, sizeof(output), "Visit location: %s%s", vnum, rmt ? GET_RMT_TITLE(rmt) : "UNKNOWN");
+			safe_snprintf(output, sizeof(output), "Visit location: %s%s", vnum, rmt ? GET_RMT_TITLE(rmt) : "UNKNOWN");
 			break;
 		}
 		case REQ_VISIT_SECTOR: {
 			sector_data *sect = sector_proto(req->vnum);
-			snprintf(output, sizeof(output), "Visit terrain: %s%s", vnum, sect ? GET_SECT_NAME(sect) : "UNKNOWN");
+			safe_snprintf(output, sizeof(output), "Visit terrain: %s%s", vnum, sect ? GET_SECT_NAME(sect) : "UNKNOWN");
 			break;
 		}
 		case REQ_HAVE_ABILITY: {
-			snprintf(output, sizeof(output), "Have ability: %s%s", vnum, get_ability_name_by_vnum(req->vnum));
+			safe_snprintf(output, sizeof(output), "Have ability: %s%s", vnum, get_ability_name_by_vnum(req->vnum));
 			break;
 		}
 		case REQ_REP_OVER: {
-			snprintf(output, sizeof(output), "%s%s at least %s", vnum, get_faction_name_by_vnum(req->vnum), get_reputation_name(req->needed));
+			safe_snprintf(output, sizeof(output), "%s%s at least %s", vnum, get_faction_name_by_vnum(req->vnum), get_reputation_name(req->needed));
 			break;
 		}
 		case REQ_REP_UNDER: {
-			snprintf(output, sizeof(output), "%s%s not over %s", vnum, get_faction_name_by_vnum(req->vnum), get_reputation_name(req->needed));
+			safe_snprintf(output, sizeof(output), "%s%s not over %s", vnum, get_faction_name_by_vnum(req->vnum), get_reputation_name(req->needed));
 			break;
 		}
 		case REQ_WEARING: {
-			snprintf(output, sizeof(output), "Wearing object: %s%s", vnum, get_obj_name_by_proto(req->vnum));
+			safe_snprintf(output, sizeof(output), "Wearing object: %s%s", vnum, get_obj_name_by_proto(req->vnum));
 			break;
 		}
 		case REQ_WEARING_OR_HAS: {
-			snprintf(output, sizeof(output), "Wearing or has object: %s%s", vnum, get_obj_name_by_proto(req->vnum));
+			safe_snprintf(output, sizeof(output), "Wearing or has object: %s%s", vnum, get_obj_name_by_proto(req->vnum));
 			break;
 		}
 		case REQ_CAN_GAIN_SKILL: {
-			snprintf(output, sizeof(output), "Able to gain skill: %s%s", vnum, get_skill_name_by_vnum(req->vnum));
+			safe_snprintf(output, sizeof(output), "Able to gain skill: %s%s", vnum, get_skill_name_by_vnum(req->vnum));
 			break;
 		}
 		case REQ_CROP_VARIETY: {
-			snprintf(output, sizeof(output), "Have produce from %d%s crop%s", req->needed, req->needed > 1 ? " different" : "", PLURAL(req->needed));
+			safe_snprintf(output, sizeof(output), "Have produce from %d%s crop%s", req->needed, req->needed > 1 ? " different" : "", PLURAL(req->needed));
 			break;
 		}
 		case REQ_OWN_HOMES: {
-			snprintf(output, sizeof(output), "Own %dx home%s for citizens", req->needed, PLURAL(req->needed));
+			safe_snprintf(output, sizeof(output), "Own %dx home%s for citizens", req->needed, PLURAL(req->needed));
 			break;
 		}
 		case REQ_OWN_SECTOR: {
 			sector_data *sect = sector_proto(req->vnum);
-			snprintf(output, sizeof(output), "Own %dx tile%s of: %s%s", req->needed, PLURAL(req->needed), vnum, sect ? GET_SECT_NAME(sect) : "UNKNOWN");
+			safe_snprintf(output, sizeof(output), "Own %dx tile%s of: %s%s", req->needed, PLURAL(req->needed), vnum, sect ? GET_SECT_NAME(sect) : "UNKNOWN");
 			break;
 		}
 		case REQ_EMPIRE_WEALTH: {
-			snprintf(output, sizeof(output), "Have empire wealth over: %d", req->needed);
+			safe_snprintf(output, sizeof(output), "Have empire wealth over: %d", req->needed);
 			break;
 		}
 		case REQ_EMPIRE_FAME: {
-			snprintf(output, sizeof(output), "Have empire fame over: %d", req->needed);
+			safe_snprintf(output, sizeof(output), "Have empire fame over: %d", req->needed);
 			break;
 		}
 		case REQ_EMPIRE_MILITARY: {
-			snprintf(output, sizeof(output), "Have empire military over: %d", req->needed);
+			safe_snprintf(output, sizeof(output), "Have empire military over: %d", req->needed);
 			break;
 		}
 		case REQ_EMPIRE_GREATNESS: {
-			snprintf(output, sizeof(output), "Have empire greatness over: %d", req->needed);
+			safe_snprintf(output, sizeof(output), "Have empire greatness over: %d", req->needed);
 			break;
 		}
 		case REQ_DIPLOMACY: {
@@ -9479,7 +9479,7 @@ char *requirement_string(struct req_data *req, bool show_vnums, bool allow_custo
 			if (lbuf[strlen(lbuf)-1] == ' ') {
 				lbuf[strlen(lbuf)-1] = '\0';	// strip training space
 			}
-			snprintf(output, sizeof(output), "Have diplomatic relations: %dx %s", req->needed, lbuf);
+			safe_snprintf(output, sizeof(output), "Have diplomatic relations: %dx %s", req->needed, lbuf);
 			break;
 		}
 		case REQ_DIPLOMACY_OVER: {
@@ -9487,55 +9487,55 @@ char *requirement_string(struct req_data *req, bool show_vnums, bool allow_custo
 			if (lbuf[strlen(lbuf)-1] == ' ') {
 				lbuf[strlen(lbuf)-1] = '\0';	// strip training space
 			}
-			snprintf(output, sizeof(output), "Have diplomatic relations of at least: %dx %s", req->needed, lbuf);
+			safe_snprintf(output, sizeof(output), "Have diplomatic relations of at least: %dx %s", req->needed, lbuf);
 			break;
 		}
 		case REQ_HAVE_CITY: {
-			snprintf(output, sizeof(output), "Have %d cit%s", req->needed, req->needed == 1 ? "y" : "ies");
+			safe_snprintf(output, sizeof(output), "Have %d cit%s", req->needed, req->needed == 1 ? "y" : "ies");
 			break;
 		}
 		case REQ_EMPIRE_PRODUCED_OBJECT: {
-			snprintf(output, sizeof(output), "Empire has produced: %dx %s%s", req->needed, vnum, get_obj_name_by_proto(req->vnum));
+			safe_snprintf(output, sizeof(output), "Empire has produced: %dx %s%s", req->needed, vnum, get_obj_name_by_proto(req->vnum));
 			break;
 		}
 		case REQ_EMPIRE_PRODUCED_COMPONENT: {
-			snprintf(output, sizeof(output), "Empire has produced: %dx (%s)", req->needed, req->needed == 1 ? get_generic_name_by_vnum(req->vnum) : get_generic_string_by_vnum(req->vnum, GENERIC_COMPONENT, GSTR_COMPONENT_PLURAL));
+			safe_snprintf(output, sizeof(output), "Empire has produced: %dx (%s)", req->needed, req->needed == 1 ? get_generic_name_by_vnum(req->vnum) : get_generic_string_by_vnum(req->vnum, GENERIC_COMPONENT, GSTR_COMPONENT_PLURAL));
 			break;
 		}
 		case REQ_EVENT_RUNNING: {
-			snprintf(output, sizeof(output), "Event is running: %s%s", vnum, get_event_name_by_proto(req->vnum));
+			safe_snprintf(output, sizeof(output), "Event is running: %s%s", vnum, get_event_name_by_proto(req->vnum));
 			break;
 		}
 		case REQ_EVENT_NOT_RUNNING: {
-			snprintf(output, sizeof(output), "Event is not running: %s%s", vnum, get_event_name_by_proto(req->vnum));
+			safe_snprintf(output, sizeof(output), "Event is not running: %s%s", vnum, get_event_name_by_proto(req->vnum));
 			break;
 		}
 		case REQ_LEVEL_UNDER: {
-			snprintf(output, sizeof(output), "Level under %d", req->needed);
+			safe_snprintf(output, sizeof(output), "Level under %d", req->needed);
 			break;
 		}
 		case REQ_LEVEL_OVER: {
-			snprintf(output, sizeof(output), "Level over %d", req->needed);
+			safe_snprintf(output, sizeof(output), "Level over %d", req->needed);
 			break;
 		}
 		case REQ_SPEAK_LANGUAGE: {
-			snprintf(output, sizeof(output), "Able to speak %s%s", vnum, get_generic_name_by_vnum(req->vnum));
+			safe_snprintf(output, sizeof(output), "Able to speak %s%s", vnum, get_generic_name_by_vnum(req->vnum));
 			break;
 		}
 		case REQ_RECOGNIZE_LANGUAGE: {
-			snprintf(output, sizeof(output), "Able to recognize or speak %s%s", vnum, get_generic_name_by_vnum(req->vnum));
+			safe_snprintf(output, sizeof(output), "Able to recognize or speak %s%s", vnum, get_generic_name_by_vnum(req->vnum));
 			break;
 		}
 		case REQ_DAYTIME: {
-			snprintf(output, sizeof(output), "Daytime");
+			safe_snprintf(output, sizeof(output), "Daytime");
 			break;
 		}
 		case REQ_NIGHTTIME: {
-			snprintf(output, sizeof(output), "Nighttime");
+			safe_snprintf(output, sizeof(output), "Nighttime");
 			break;
 		}
 		case REQ_OWN_ROADS: {
-			snprintf(output, sizeof(output), "Own %dx tile%s of roads", req->needed, PLURAL(req->needed));
+			safe_snprintf(output, sizeof(output), "Own %dx tile%s of roads", req->needed, PLURAL(req->needed));
 			break;
 		}
 		default: {
@@ -9546,11 +9546,11 @@ char *requirement_string(struct req_data *req, bool show_vnums, bool allow_custo
 	
 	// override with custom?
 	if (allow_custom && req->custom && *req->custom) {
-		snprintf(output, sizeof(output), "%s", req->custom);
+		safe_snprintf(output, sizeof(output), "%s", req->custom);
 	}
 	
 	if (show_vnums && req->group) {
-		snprintf(output + strlen(output), sizeof(output) - strlen(output), " (%c)", req->group);
+		safe_snprintf(output + strlen(output), sizeof(output) - strlen(output), " (%c)", req->group);
 	}
 	
 	return output;
