@@ -8204,25 +8204,20 @@ ACMD(do_tedit) {
 	half_chop(argument, field, buf);
 
 	if (!*field) {
-		strcpy(buf, "Files available to be edited:\r\n");
+		build_page_display(ch, "Files available to be edited:");
 		count = 1;
 		for (iter = 0; iter < NUM_TEXT_FILE_STRINGS; ++iter) {
 			if (text_file_data[iter].can_edit && GET_ACCESS_LEVEL(ch) >= text_file_data[iter].level) {
-				sprintf(buf, "%s%-15.15s", buf, text_file_data[iter].name);
-				if (!(count++ % 5)) {
-					strcat(buf, "\r\n");
-				}
+				++count;
+				build_page_display_col_str(ch, 4, FALSE, text_file_data[iter].name);
 			}
 		}
-
-		if (--count % 5) {
-			strcat(buf, "\r\n");
-		}
+		
 		if (count == 0) {
-			strcat(buf, "None.\r\n");
+			build_page_display(ch, " None.");
 		}
 
-		send_to_char(buf, ch);
+		send_page_display(ch);
 		return;
 	}
 	for (type = 0; type < NUM_TEXT_FILE_STRINGS; type++) {

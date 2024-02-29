@@ -1593,7 +1593,7 @@ int main(int argc, char *argv[]) {
 		this_zone = (int)(acct->id / 100);
 		
 		if (last_zone != this_zone) {
-			if (last_zone != -1) {
+			if (fl && last_zone != -1) {
 				fprintf(fl, "$\n");
 				fclose(fl);
 			}
@@ -1605,9 +1605,11 @@ int main(int argc, char *argv[]) {
 			last_zone = this_zone;
 		}
 		
-		write_account_to_file(fl, acct);
+		if (fl) {
+			write_account_to_file(fl, acct);
+		}
 	}
-	if (last_zone != -1) {
+	if (fl && last_zone != -1) {
 		fprintf(fl, "$\n");
 		fclose(fl);
 	}

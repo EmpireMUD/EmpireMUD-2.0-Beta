@@ -691,7 +691,7 @@ void discrete_load_crop(FILE *fl, char *filename) {
 * Loads all the crops into memory from the index file.
 */
 void index_boot_crops(void) {
-	char buf[MAX_STRING_LENGTH], filename[256];
+	char buf[512], filename[1024];
 	FILE *index, *db_file;
 	
 	sprintf(filename, "%s%s", CROP_PREFIX, INDEX_FILE);
@@ -928,7 +928,7 @@ void discrete_load_sector(FILE *fl, char *filename) {
 * Loads all the sectors into memory from the index file.
 */
 void index_boot_sectors(void) {
-	char buf[MAX_STRING_LENGTH], filename[256];
+	char buf[512], filename[1024];
 	FILE *index, *db_file;
 	
 	sprintf(filename, "%s%s", SECTOR_PREFIX, INDEX_FILE);
