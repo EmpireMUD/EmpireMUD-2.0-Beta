@@ -1586,6 +1586,7 @@ int main(int argc, char *argv[]) {
 	write_account_index(fl);
 	fprintf(fl, "$\n");
 	fclose(fl);
+	fl = NULL;
 	
 	// write account files
 	last_zone = -1;
@@ -1596,6 +1597,7 @@ int main(int argc, char *argv[]) {
 			if (fl && last_zone != -1) {
 				fprintf(fl, "$\n");
 				fclose(fl);
+				fl = NULL;
 			}
 			sprintf(fname, "lib/players/accounts/%d.acct", this_zone);
 			if (!(fl = fopen(fname, "w"))) {
@@ -1612,6 +1614,7 @@ int main(int argc, char *argv[]) {
 	if (fl && last_zone != -1) {
 		fprintf(fl, "$\n");
 		fclose(fl);
+		fl = NULL;
 	}
 	
 	// remove old-style files
