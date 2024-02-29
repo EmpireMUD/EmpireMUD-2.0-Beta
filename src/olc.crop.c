@@ -165,10 +165,10 @@ char *list_one_crop(crop_data *crop, bool detail) {
 	static char output[MAX_STRING_LENGTH];
 	
 	if (detail) {
-		snprintf(output, sizeof(output), "[%5d] %s", GET_CROP_VNUM(crop), GET_CROP_NAME(crop));
+		safe_snprintf(output, sizeof(output), "[%5d] %s", GET_CROP_VNUM(crop), GET_CROP_NAME(crop));
 	}
 	else {
-		snprintf(output, sizeof(output), "[%5d] %s", GET_CROP_VNUM(crop), GET_CROP_NAME(crop));
+		safe_snprintf(output, sizeof(output), "[%5d] %s", GET_CROP_VNUM(crop), GET_CROP_NAME(crop));
 	}
 	
 	return output;
@@ -197,7 +197,7 @@ void olc_delete_crop(char_data *ch, crop_vnum vnum) {
 		return;
 	}
 	
-	snprintf(name, sizeof(name), "%s", NULLSAFE(GET_CROP_NAME(crop)));
+	safe_snprintf(name, sizeof(name), "%s", NULLSAFE(GET_CROP_NAME(crop)));
 	
 	if (HASH_COUNT(crop_table) <= 1) {
 		msg_to_char(ch, "You can't delete the last crop.\r\n");
@@ -281,14 +281,13 @@ void olc_delete_crop(char_data *ch, crop_vnum vnum) {
 * @param char *argument The argument they entered.
 */
 void olc_fullsearch_crop(char_data *ch, char *argument) {
-	char buf[MAX_STRING_LENGTH * 2], line[MAX_STRING_LENGTH], type_arg[MAX_INPUT_LENGTH], val_arg[MAX_INPUT_LENGTH], find_keywords[MAX_INPUT_LENGTH], extra_search[MAX_INPUT_LENGTH];
+	char type_arg[MAX_INPUT_LENGTH], val_arg[MAX_INPUT_LENGTH], find_keywords[MAX_INPUT_LENGTH], extra_search[MAX_INPUT_LENGTH];
 	bitvector_t  find_interacts = NOBITS, found_interacts, find_custom = NOBITS, found_custom;
 	bitvector_t not_flagged = NOBITS, only_flags = NOBITS, only_climate = NOBITS;
 	int count, only_mapout = NOTHING, only_x = NOTHING, only_y = NOTHING, vmin = NOTHING, vmax = NOTHING;
 	struct interaction_item *inter;
 	crop_data *crop, *next_crop;
 	struct icon_data *icon;
-	size_t size;
 	bool match;
 	struct custom_message *cust;
 	
@@ -329,7 +328,7 @@ void olc_fullsearch_crop(char_data *ch, char *argument) {
 		skip_spaces(&argument);
 	}
 	
-	size = snprintf(buf, sizeof(buf), "Crop fullsearch: %s\r\n", show_color_codes(find_keywords));
+	build_page_display(ch, "Crop fullsearch: %s", show_color_codes(find_keywords));
 	count = 0;
 	
 	// okay now look up crpos
@@ -406,27 +405,18 @@ void olc_fullsearch_crop(char_data *ch, char *argument) {
 		}
 		
 		// show it
-		snprintf(line, sizeof(line), "[%5d] %s\r\n", GET_CROP_VNUM(crop), GET_CROP_NAME(crop));
-		if (strlen(line) + size < sizeof(buf)) {
-			size += snprintf(buf + size, sizeof(buf) - size, "%s", line);
-			++count;
-		}
-		else {
-			size += snprintf(buf + size, sizeof(buf) - size, "OVERFLOW\r\n");
-			break;
-		}
+		build_page_display(ch, "[%5d] %s", GET_CROP_VNUM(crop), GET_CROP_NAME(crop));
+		++count;
 	}
 	
-	if (count > 0 && (size + 18) < sizeof(buf)) {
-		size += snprintf(buf + size, sizeof(buf) - size, "(%d crop%s)\r\n", count, PLURAL(count));
+	if (count > 0) {
+		build_page_display(ch, "(%d crop%s)", count, PLURAL(count));
 	}
-	else if (count == 0) {
-		size += snprintf(buf + size, sizeof(buf) - size, " none\r\n");
+	else {
+		build_page_display_str(ch, " none");
 	}
 	
-	if (ch->desc) {
-		page_string(ch->desc, buf, TRUE);
-	}
+	send_page_display(ch);
 }
 
 
@@ -437,12 +427,11 @@ void olc_fullsearch_crop(char_data *ch, char *argument) {
 * @param crop_vnum vnum The crop vnum.
 */
 void olc_search_crop(char_data *ch, crop_vnum vnum) {
-	char buf[MAX_STRING_LENGTH];
 	crop_data *crop = crop_proto(vnum);
 	struct adventure_link_rule *link;
 	adv_data *adv, *next_adv;
 	obj_data *obj, *next_obj;
-	int size, found;
+	int found;
 	
 	if (!crop) {
 		msg_to_char(ch, "There is no crop %d.\r\n", vnum);
@@ -450,18 +439,15 @@ void olc_search_crop(char_data *ch, crop_vnum vnum) {
 	}
 	
 	found = 0;
-	size = snprintf(buf, sizeof(buf), "Occurrences of crop %d (%s):\r\n", vnum, GET_CROP_NAME(crop));
+	build_page_display(ch, "Occurrences of crop %d (%s):", vnum, GET_CROP_NAME(crop));
 	
 	// adventure rules
 	HASH_ITER(hh, adventure_table, adv, next_adv) {
-		if (size >= sizeof(buf)) {
-			break;
-		}
 		for (link = GET_ADV_LINKING(adv); link; link = link->next) {
 			if (link->type == ADV_LINK_PORTAL_CROP) {
 				if (link->value == vnum) {
 					++found;
-					size += snprintf(buf + size, sizeof(buf) - size, "ADV [%5d] %s\r\n", GET_ADV_VNUM(adv), GET_ADV_NAME(adv));
+					build_page_display(ch, "ADV [%5d] %s", GET_ADV_VNUM(adv), GET_ADV_NAME(adv));
 					// only report once per adventure
 					break;
 				}
@@ -473,18 +459,18 @@ void olc_search_crop(char_data *ch, crop_vnum vnum) {
 	HASH_ITER(hh, object_table, obj, next_obj) {
 		if (OBJ_FLAGGED(obj, OBJ_PLANTABLE) && GET_OBJ_VAL(obj, VAL_FOOD_CROP_TYPE) == vnum) {
 			++found;
-			size += snprintf(buf + size, sizeof(buf) - size, "OBJ [%5d] %s\r\n", GET_OBJ_VNUM(obj), GET_OBJ_SHORT_DESC(obj));
+			build_page_display(ch, "OBJ [%5d] %s", GET_OBJ_VNUM(obj), GET_OBJ_SHORT_DESC(obj));
 		}
 	}
 	
 	if (found > 0) {
-		size += snprintf(buf + size, sizeof(buf) - size, "%d location%s shown\r\n", found, PLURAL(found));
+		build_page_display(ch, "%d location%s shown", found, PLURAL(found));
 	}
 	else {
-		size += snprintf(buf + size, sizeof(buf) - size, " none\r\n");
+		build_page_display_str(ch, " none");
 	}
 	
-	page_string(ch->desc, buf, TRUE);
+	send_page_display(ch);
 }
 
 
@@ -624,7 +610,7 @@ int wordcount_crop(crop_data *crop) {
 */
 void olc_show_crop(char_data *ch) {
 	crop_data *cp = GET_OLC_CROP(ch->desc);
-	char buf[MAX_STRING_LENGTH*4], lbuf[MAX_STRING_LENGTH*4];
+	char lbuf[MAX_STRING_LENGTH*4];
 	struct custom_message *ocm;
 	struct spawn_info *spawn;
 	int count;
@@ -633,57 +619,52 @@ void olc_show_crop(char_data *ch) {
 		return;
 	}
 	
-	*buf = '\0';
-	
-	sprintf(buf + strlen(buf), "[%s%d\t0] %s%s\t0\r\n", OLC_LABEL_CHANGED, GET_OLC_VNUM(ch->desc), OLC_LABEL_UNCHANGED, !crop_proto(cp->vnum) ? "new crop" : GET_CROP_NAME(crop_proto(cp->vnum)));
-	sprintf(buf + strlen(buf), "<%sname\t0> %s\r\n", OLC_LABEL_STR(GET_CROP_NAME(cp), default_crop_name), NULLSAFE(GET_CROP_NAME(cp)));
-	sprintf(buf + strlen(buf), "<%stitle\t0> %s\r\n", OLC_LABEL_STR(GET_CROP_TITLE(cp), default_crop_title), NULLSAFE(GET_CROP_TITLE(cp)));
-	sprintf(buf + strlen(buf), "<%smapout\t0> %s\r\n", OLC_LABEL_VAL(GET_CROP_MAPOUT(cp), 0), mapout_color_names[GET_CROP_MAPOUT(cp)]);
+	build_page_display(ch, "[%s%d\t0] %s%s\t0", OLC_LABEL_CHANGED, GET_OLC_VNUM(ch->desc), OLC_LABEL_UNCHANGED, !crop_proto(cp->vnum) ? "new crop" : GET_CROP_NAME(crop_proto(cp->vnum)));
+	build_page_display(ch, "<%sname\t0> %s", OLC_LABEL_STR(GET_CROP_NAME(cp), default_crop_name), NULLSAFE(GET_CROP_NAME(cp)));
+	build_page_display(ch, "<%stitle\t0> %s", OLC_LABEL_STR(GET_CROP_TITLE(cp), default_crop_title), NULLSAFE(GET_CROP_TITLE(cp)));
+	build_page_display(ch, "<%smapout\t0> %s", OLC_LABEL_VAL(GET_CROP_MAPOUT(cp), 0), mapout_color_names[GET_CROP_MAPOUT(cp)]);
 
-	sprintf(buf + strlen(buf), "<%sicons\t0>\r\n", OLC_LABEL_PTR(GET_CROP_ICONS(cp)));
-	get_icons_display(GET_CROP_ICONS(cp), buf1);
-	strcat(buf, buf1);
+	build_page_display(ch, "<%sicons\t0>", OLC_LABEL_PTR(GET_CROP_ICONS(cp)));
+	show_icons_display(ch, GET_CROP_ICONS(cp), FALSE);
 	
 	ordered_sprintbit(GET_CROP_CLIMATE(cp), climate_flags, climate_flags_order, FALSE, lbuf);
-	sprintf(buf + strlen(buf), "<%sclimate\t0> %s\r\n", OLC_LABEL_VAL(GET_CROP_CLIMATE(cp), NOBITS), lbuf);
+	build_page_display(ch, "<%sclimate\t0> %s", OLC_LABEL_VAL(GET_CROP_CLIMATE(cp), NOBITS), lbuf);
 
 	sprintbit(GET_CROP_FLAGS(cp), crop_flags, lbuf, TRUE);
-	sprintf(buf + strlen(buf), "<%sflags\t0> %s\r\n", OLC_LABEL_VAL(GET_CROP_FLAGS(cp), NOBITS), lbuf);
+	build_page_display(ch, "<%sflags\t0> %s", OLC_LABEL_VAL(GET_CROP_FLAGS(cp), NOBITS), lbuf);
 	
-	sprintf(buf + strlen(buf), "Map region (percent of map size):\r\n");
-	sprintf(buf + strlen(buf), " <%sxmin\t0> %3d%%, <%sxmax\t0> %3d%%\r\n", OLC_LABEL_VAL(GET_CROP_X_MIN(cp), 0), GET_CROP_X_MIN(cp), OLC_LABEL_VAL(GET_CROP_X_MAX(cp), 100), GET_CROP_X_MAX(cp));
-	sprintf(buf + strlen(buf), " <%symin\t0> %3d%%, <%symax\t0> %3d%%\r\n", OLC_LABEL_VAL(GET_CROP_Y_MIN(cp), 0), GET_CROP_Y_MIN(cp), OLC_LABEL_VAL(GET_CROP_Y_MAX(cp), 100), GET_CROP_Y_MAX(cp));
+	build_page_display(ch, "Map region (percent of map size):");
+	build_page_display(ch, " <%sxmin\t0> %3d%%, <%sxmax\t0> %3d%%", OLC_LABEL_VAL(GET_CROP_X_MIN(cp), 0), GET_CROP_X_MIN(cp), OLC_LABEL_VAL(GET_CROP_X_MAX(cp), 100), GET_CROP_X_MAX(cp));
+	build_page_display(ch, " <%symin\t0> %3d%%, <%symax\t0> %3d%%", OLC_LABEL_VAL(GET_CROP_Y_MIN(cp), 0), GET_CROP_Y_MIN(cp), OLC_LABEL_VAL(GET_CROP_Y_MAX(cp), 100), GET_CROP_Y_MAX(cp));
 	
 	// exdesc
-	sprintf(buf + strlen(buf), "Extra descriptions: <%sextra\t0>\r\n", OLC_LABEL_PTR(GET_CROP_EX_DESCS(cp)));
+	build_page_display(ch, "Extra descriptions: <%sextra\t0>", OLC_LABEL_PTR(GET_CROP_EX_DESCS(cp)));
 	if (GET_CROP_EX_DESCS(cp)) {
-		get_extra_desc_display(GET_CROP_EX_DESCS(cp), lbuf, sizeof(lbuf));
-		strcat(buf, lbuf);
+		show_extra_desc_display(ch, GET_CROP_EX_DESCS(cp), FALSE);
 	}
 
 	// custom messages
-	sprintf(buf + strlen(buf), "Custom messages: <%scustom\t0>\r\n", OLC_LABEL_PTR(GET_CROP_CUSTOM_MSGS(cp)));
+	build_page_display(ch, "Custom messages: <%scustom\t0>", OLC_LABEL_PTR(GET_CROP_CUSTOM_MSGS(cp)));
 	count = 0;
 	LL_FOREACH(GET_CROP_CUSTOM_MSGS(cp), ocm) {
-		sprintf(buf + strlen(buf), " \ty%2d\t0. [%s] %s\r\n", ++count, crop_custom_types[ocm->type], ocm->msg);
+		build_page_display(ch, " \ty%2d\t0. [%s] %s", ++count, crop_custom_types[ocm->type], ocm->msg);
 	}
 
-	sprintf(buf + strlen(buf), "Interactions: <%sinteraction\t0>\r\n", OLC_LABEL_PTR(GET_CROP_INTERACTIONS(cp)));
+	build_page_display(ch, "Interactions: <%sinteraction\t0>", OLC_LABEL_PTR(GET_CROP_INTERACTIONS(cp)));
 	if (GET_CROP_INTERACTIONS(cp)) {
-		get_interaction_display(GET_CROP_INTERACTIONS(cp), buf1);
-		strcat(buf, buf1);
+		show_interaction_display(ch, GET_CROP_INTERACTIONS(cp), FALSE);
 	}
 
-	sprintf(buf + strlen(buf), "<%sspawns\t0>\r\n", OLC_LABEL_PTR(GET_CROP_SPAWNS(cp)));
+	build_page_display(ch, "<%sspawns\t0>", OLC_LABEL_PTR(GET_CROP_SPAWNS(cp)));
 	if (GET_CROP_SPAWNS(cp)) {
 		count = 0;
 		for (spawn = GET_CROP_SPAWNS(cp); spawn; spawn = spawn->next) {
 			++count;
 		}
-		sprintf(buf + strlen(buf), " %d spawn%s set\r\n", count, PLURAL(count));
+		build_page_display(ch, " %d spawn%s set", count, PLURAL(count));
 	}
 		
-	page_string(ch->desc, buf, TRUE);
+	send_page_display(ch);
 }
 
 

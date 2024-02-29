@@ -409,11 +409,11 @@ ACMD(do_point) {
 		color = CUSTOM_COLOR_CHAR(ch, CUSTOM_COLOR_EMOTE);
 		
 		if (obj) {
-			snprintf(to_char, sizeof(to_char), "\t%cYou point at $p.\t0", color);
+			safe_snprintf(to_char, sizeof(to_char), "\t%cYou point at $p.\t0", color);
 			to_room = "$n points at $p.\t0";
 		}
 		else if (veh) {
-			snprintf(to_char, sizeof(to_char), "\t%cYou point at $v.\t0", color);
+			safe_snprintf(to_char, sizeof(to_char), "\t%cYou point at $v.\t0", color);
 			to_room = "$n points at $v.";
 		}
 		else {
@@ -507,13 +507,13 @@ ACMD(do_roll) {
 	}
 	
 	if (num == 1) {
-		snprintf(buf, sizeof(buf), "You roll a %d-sided die and get: %d\r\n", size, total);
+		safe_snprintf(buf, sizeof(buf), "You roll a %d-sided die and get: %d\r\n", size, total);
 		send_to_char(buf, ch);
 		if (ch->desc) {
 			add_to_channel_history(ch, CHANNEL_HISTORY_ROLL, ch, buf, FALSE, 0, NOTHING);
 		}
 		
-		snprintf(buf, sizeof(buf), "$n rolls a %d-sided die and gets: %d", size, total);
+		safe_snprintf(buf, sizeof(buf), "$n rolls a %d-sided die and gets: %d", size, total);
 		act(buf, FALSE, ch, NULL, NULL, TO_ROOM);
 		
 		if (GROUP(ch)) {
@@ -533,13 +533,13 @@ ACMD(do_roll) {
 		}
 	}
 	else {
-		snprintf(buf, sizeof(buf), "You roll %dd%d and get: %d\r\n", num, size, total);
+		safe_snprintf(buf, sizeof(buf), "You roll %dd%d and get: %d\r\n", num, size, total);
 		send_to_char(buf, ch);
 		if (ch->desc) {
 			add_to_channel_history(ch, CHANNEL_HISTORY_ROLL, ch, buf, FALSE, 0, NOTHING);
 		}
 		
-		snprintf(buf, sizeof(buf), "$n rolls %dd%d and gets: %d", num, size, total);
+		safe_snprintf(buf, sizeof(buf), "$n rolls %dd%d and gets: %d", num, size, total);
 		act(buf, FALSE, ch, NULL, NULL, TO_ROOM);
 		
 		if (GROUP(ch)) {
@@ -569,18 +569,11 @@ ACMD(do_roll) {
 
 
 ACMD(do_socials) {
-	char buf[MAX_STRING_LENGTH];
 	social_data *soc, *next_soc, *last = NULL;
-	int count = 0;
-	size_t size;
 	
-	size = snprintf(buf, sizeof(buf), "The following social commands are available:\r\n");
+	build_page_display(ch, "The following social commands are available:");
 	
 	HASH_ITER(sorted_hh, sorted_socials, soc, next_soc) {
-		if (size + 11 > sizeof(buf)) {	// early exit for full buffer
-			break;
-		}
-		
 		if (SOCIAL_FLAGGED(soc, SOC_IN_DEVELOPMENT)) {
 			continue;
 		}
@@ -592,13 +585,8 @@ ACMD(do_socials) {
 		}
 		
 		last = soc;	// duplicate prevention
-		size += snprintf(buf + size, sizeof(buf) - size, "%-11.11s%s", SOC_COMMAND(soc), (!(++count % 7)) ? "\r\n" : "");
+		build_page_display_col_str(ch, 7, FALSE, SOC_COMMAND(soc));
 	}
 	
-	// terminating crlf if possible
-	if (count % 7 && (size + 2) < sizeof(buf)) {
-		strcat(buf, "\r\n");
-	}
-	
-	page_string(ch->desc, buf, TRUE);
+	send_page_display(ch);
 }

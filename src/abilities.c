@@ -198,16 +198,15 @@ struct {
 * @param char_data *ch The player viewing the ability.
 * @param ability_data *abil Which ability.
 * @param ability_data *parent Which ability chained to this one, if any (usually NULL).
-* @param char *outbuf Buffer to save to.
-* @param int sizeof_outbuf Max size of the buffer.
+* @param bool send_page If TRUE, calls send_page_display() at the end and sends the output. If FALSE, just builds it into the person's page_display.
 */
-void show_ability_info(char_data *ch, ability_data *abil, ability_data *parent, char *outbuf, int sizeof_outbuf) {
+void show_ability_info(char_data *ch, ability_data *abil, ability_data *parent, bool send_page) {
 	bool any, more_learned, same, has_param_details = FALSE;
 	char lbuf[MAX_STRING_LENGTH], sbuf[MAX_STRING_LENGTH];
 	char *ptr;
 	double chain_prc = 100.0;
 	int count, iter;
-	size_t size, l_size;
+	size_t l_size;
 	ability_data *abiter, *next_abil, *supercede;
 	craft_data *craft, *next_craft;
 	skill_data *skill, *next_skill;
@@ -215,6 +214,7 @@ void show_ability_info(char_data *ch, ability_data *abil, ability_data *parent, 
 	struct ability_hook *ahook;
 	struct apply_data *apply;
 	struct synergy_ability *syn;
+	struct page_display *line;
 	
 	// detect chain
 	if (parent) {
@@ -248,20 +248,17 @@ void show_ability_info(char_data *ch, ability_data *abil, ability_data *parent, 
 		}
 	}
 	
-	// start of outbuf
-	size = snprintf(outbuf, sizeof_outbuf, "%s\r\n", lbuf);
+	// start of display
+	build_page_display_str(ch, lbuf);
 	
 	if (ABIL_MASTERY_ABIL(abil) != NOTHING) {
-		size += snprintf(outbuf + size, sizeof_outbuf - size, "Mastery ability: %s%s\t0%s\r\n", ability_color(ch, abil), get_ability_name_by_vnum(ABIL_MASTERY_ABIL(abil)), (PRF_FLAGGED(ch, PRF_SCREEN_READER) && !has_ability(ch, ABIL_VNUM(abil))) ? " (not known)" : "");
+		build_page_display(ch, "Mastery ability: %s%s\t0%s", ability_color(ch, abil), get_ability_name_by_vnum(ABIL_MASTERY_ABIL(abil)), (PRF_FLAGGED(ch, PRF_SCREEN_READER) && !has_ability(ch, ABIL_VNUM(abil))) ? " (not known)" : "");
 	}
 	
 	if (ABIL_ASSIGNED_SKILL(abil) && !parent) {
-		size += snprintf(outbuf + size, sizeof_outbuf - size, "Skill: %s%s %d\t0", (get_skill_level(ch, SKILL_VNUM(ABIL_ASSIGNED_SKILL(abil))) >= ABIL_SKILL_LEVEL(abil)) ? "\t0" : "\tr", SKILL_NAME(ABIL_ASSIGNED_SKILL(abil)), ABIL_SKILL_LEVEL(abil));
+		line = build_page_display(ch, "Skill: %s%s %d\t0", (get_skill_level(ch, SKILL_VNUM(ABIL_ASSIGNED_SKILL(abil))) >= ABIL_SKILL_LEVEL(abil)) ? "\t0" : "\tr", SKILL_NAME(ABIL_ASSIGNED_SKILL(abil)), ABIL_SKILL_LEVEL(abil));
 		if (has_ability(ch, ABIL_VNUM(abil)) && !IS_ANY_SKILL_CAP(ch, SKILL_VNUM(ABIL_ASSIGNED_SKILL(abil))) && can_gain_skill_from(ch, abil)) {
-			size += snprintf(outbuf + size, sizeof_outbuf - size, " (%d/%d levels gained)\r\n", levels_gained_from_ability(ch, abil), GAINS_PER_ABILITY);
-		}
-		else {
-			size += snprintf(outbuf + size, sizeof_outbuf - size, "\r\n");
+			append_page_display_line(line, " (%d/%d levels gained)", levels_gained_from_ability(ch, abil), GAINS_PER_ABILITY);
 		}
 		
 		// check purchased
@@ -274,40 +271,31 @@ void show_ability_info(char_data *ch, ability_data *abil, ability_data *parent, 
 				}
 			}
 		}
-		size += snprintf(outbuf + size, sizeof_outbuf - size, "Purchased: %s\r\n", (same ? "yes" : (any ? "other skill set" : "no")));
+		build_page_display(ch, "Purchased: %s", (same ? "yes" : (any ? "other skill set" : "no")));
 		
 		// prerequisite ability (chain?) -- maybe?
 	}
 	
 	// assigned roles/synergies
 	if (!parent) {
-		count = 0;
-		l_size = 0;
-		*lbuf = '\0';
+		any = FALSE;
 		HASH_ITER(hh, skill_table, skill, next_skill) {
 			LL_FOREACH(SKILL_SYNERGIES(skill), syn) {
 				if (syn->ability == ABIL_VNUM(abil)) {
+					if (!any) {
+						// header:
+						build_page_display_str(ch, "Synergies:");
+						any = TRUE;
+					}
+					
 					if (PRF_FLAGGED(ch, PRF_SCREEN_READER)) {
-						snprintf(sbuf, sizeof(sbuf), "%s%s %d + %s %d (%s)\t0", syn->role == NOTHING ? "\tW" : class_role_color[syn->role], SKILL_NAME(skill), SKILL_MAX_LEVEL(skill), get_skill_name_by_vnum(syn->skill), syn->level, syn->role == NOTHING ? "All" : class_role[syn->role]);
+						build_page_display_col(ch, 2, FALSE, "%s%s %d + %s %d (%s)\t0", syn->role == NOTHING ? "\tW" : class_role_color[syn->role], SKILL_NAME(skill), SKILL_MAX_LEVEL(skill), get_skill_name_by_vnum(syn->skill), syn->level, syn->role == NOTHING ? "All" : class_role[syn->role]);
 					}
 					else {
-						snprintf(sbuf, sizeof(sbuf), "%s%s %d + %s %d (%c)\t0", syn->role == NOTHING ? "\tW" : class_role_color[syn->role], SKILL_ABBREV(skill), SKILL_MAX_LEVEL(skill), get_skill_abbrev_by_vnum(syn->skill), syn->level, syn->role == NOTHING ? 'A' : *class_role[syn->role]);
-					}
-					if (strlen(sbuf) > 41) {
-						// too long for half a line
-						l_size += snprintf(lbuf + l_size, sizeof(lbuf) - l_size, "%s %s\r\n", (!(++count % 2) && !PRF_FLAGGED(ch, PRF_SCREEN_READER) ? "\r\n" : ""), sbuf);
-						if (count % 2) {
-							++count;	// fix columns for the next line, if any
-						}
-					}
-					else {
-						l_size += snprintf(lbuf + l_size, sizeof(lbuf) - l_size, " %-41.41s%s", sbuf, (!(++count % 2) || PRF_FLAGGED(ch, PRF_SCREEN_READER) ? "\r\n" : " "));
+						build_page_display_col(ch, 2, FALSE, "%s%s %d + %s %d (%c)\t0", syn->role == NOTHING ? "\tW" : class_role_color[syn->role], SKILL_ABBREV(skill), SKILL_MAX_LEVEL(skill), get_skill_abbrev_by_vnum(syn->skill), syn->level, syn->role == NOTHING ? 'A' : *class_role[syn->role]);
 					}
 				}
 			}
-		}
-		if (*lbuf) {
-			size += snprintf(outbuf + size, sizeof_outbuf - size, "Synergies:\r\n%s%s", lbuf, (!(++count % 2) && !PRF_FLAGGED(ch, PRF_SCREEN_READER) ? "\r\n" : ""));
 		}
 	}
 	
@@ -337,7 +325,7 @@ void show_ability_info(char_data *ch, ability_data *abil, ability_data *parent, 
 				}
 			}
 			has_param_details = TRUE;
-			size += snprintf(outbuf + size, sizeof_outbuf - size, "Type%s: %s\r\n", (strchr(lbuf, ',') ? "s" : ""), lbuf);
+			build_page_display(ch, "Type%s: %s", (strchr(lbuf, ',') ? "s" : ""), lbuf);
 		}
 	}
 	
@@ -346,31 +334,30 @@ void show_ability_info(char_data *ch, ability_data *abil, ability_data *parent, 
 		has_param_details = TRUE;
 		strcpy(lbuf, apply_types[ABIL_LINKED_TRAIT(abil)]);
 		strtolower(lbuf);
-		size += snprintf(outbuf + size, sizeof_outbuf - size, "Linked trait: %s (%d)\r\n", lbuf, get_attribute_by_apply(ch, ABIL_LINKED_TRAIT(abil)));
+		build_page_display(ch, "Linked trait: %s (%d)", lbuf, get_attribute_by_apply(ch, ABIL_LINKED_TRAIT(abil)));
 	}
 	
 	if (ABIL_REQUIRES_TOOL(abil)) {
 		has_param_details = TRUE;
 		prettier_sprintbit(ABIL_REQUIRES_TOOL(abil), tool_flags, lbuf);
-		size += snprintf(outbuf + size, sizeof_outbuf - size, "Requires tool%s: %s\r\n", (count_bits(ABIL_REQUIRES_TOOL(abil)) != 1) ? "s" : "", lbuf);
+		build_page_display(ch, "Requires tool%s: %s", (count_bits(ABIL_REQUIRES_TOOL(abil)) != 1) ? "s" : "", lbuf);
 	}
 	
 	if (ABIL_COST(abil) > 0 || ABIL_COST_PER_AMOUNT(abil) != 0.0 || ABIL_COST_PER_SCALE_POINT(abil) != 0.0 || ABIL_COST_PER_TARGET(abil) != 0.0) {
 		has_param_details = TRUE;
-		size += snprintf(outbuf + size, sizeof_outbuf - size, "Cost: %s %s", estimate_ability_cost(ch, abil), pool_types[ABIL_COST_TYPE(abil)]);
+		line = build_page_display(ch, "Cost: %s %s", estimate_ability_cost(ch, abil), pool_types[ABIL_COST_TYPE(abil)]);
 		if (ABIL_COST_PER_AMOUNT(abil) != 0.0) {
-			size += snprintf(outbuf + size, sizeof_outbuf - size, " +%.2f/amount", ABIL_COST_PER_AMOUNT(abil));
+			append_page_display_line(line, " +%.2f/amount", ABIL_COST_PER_AMOUNT(abil));
 		}
 		if (ABIL_COST_PER_TARGET(abil) != 0.0) {
-			size += snprintf(outbuf + size, sizeof_outbuf - size, " +%.2f/target", ABIL_COST_PER_TARGET(abil));
+			append_page_display_line(line, " +%.2f/target", ABIL_COST_PER_TARGET(abil));
 		}
-		size += snprintf(outbuf + size, sizeof_outbuf - size, "\r\n");
 	}
 	
 	// Cooldown?
 	if (ABIL_COOLDOWN_SECS(abil) > 0 && (!parent || ABIL_COOLDOWN_SECS(abil) != ABIL_COOLDOWN_SECS(parent))) {
 		has_param_details = TRUE;
-		size += snprintf(outbuf + size, sizeof_outbuf - size, "Cooldown: %s%s\r\n", colon_time(ABIL_COOLDOWN_SECS(abil), FALSE, NULL), ABIL_COOLDOWN_SECS(abil) < 60 ? " seconds" : "");
+		build_page_display(ch, "Cooldown: %s%s", colon_time(ABIL_COOLDOWN_SECS(abil), FALSE, NULL), ABIL_COOLDOWN_SECS(abil) < 60 ? " seconds" : "");
 	}
 	
 	// data, if parameterized
@@ -379,7 +366,7 @@ void show_ability_info(char_data *ch, ability_data *abil, ability_data *parent, 
 		*lbuf = '\0';
 		l_size = 0;
 		LL_FOREACH(ABIL_DATA(abil), adl) {
-			if (adl->type == ADL_PLAYER_TECH) {
+			if (adl->type == ADL_PLAYER_TECH && (l_size + strlen(player_tech_types[adl->vnum]) + 2) < sizeof(lbuf)) {
 				l_size += snprintf(lbuf + l_size, sizeof(lbuf) - l_size, "%s%s", (*lbuf ? ", " : ""), player_tech_types[adl->vnum]);
 			}
 		}
@@ -391,60 +378,63 @@ void show_ability_info(char_data *ch, ability_data *abil, ability_data *parent, 
 					lbuf[iter] = ' ';
 				}
 			}
-			size += snprintf(outbuf + size, sizeof_outbuf - size, "Grants: %s\r\n", lbuf);
+			build_page_display(ch, "Grants: %s", lbuf);
 		}
 	}
 	
 	// applies
 	*lbuf = '\0';
+	l_size = 0;
 	LL_FOREACH(ABIL_APPLIES(abil), apply) {
-		sprintf(lbuf + strlen(lbuf), "%s%s", *lbuf ? ", " : "", apply_types[apply->location]);
+		if ((l_size + strlen(apply_types[apply->location]) + 2) < sizeof(lbuf)) {
+			l_size += snprintf(lbuf + l_size, sizeof(lbuf) - l_size, "%s%s", *lbuf ? ", " : "", apply_types[apply->location]);
+		}
 	}
 	if (*lbuf) {
 		has_param_details = TRUE;
-		size += snprintf(outbuf + size, sizeof_outbuf - size, "Modifies: %s\r\n", lbuf);
+		build_page_display(ch, "Modifies: %s", lbuf);
 	}
 	
 	// affects
 	if (ABIL_AFFECTS(abil)) {
 		has_param_details = TRUE;
 		sprintbit(ABIL_AFFECTS(abil), affected_bits, lbuf, TRUE);
-		size += snprintf(outbuf + size, sizeof_outbuf - size, "Affects: %s\r\n", lbuf);
+		build_page_display(ch, "Affects: %s", lbuf);
 	}
 	
 	// build duration
 	if (ABIL_SHORT_DURATION(abil) == UNLIMITED || ABIL_SHORT_DURATION(abil) > 0) {
-		sprintf(lbuf, "%s%s", colon_time(ABIL_SHORT_DURATION(abil), FALSE, "unlimited"), (ABIL_SHORT_DURATION(abil) < 60 && ABIL_SHORT_DURATION(abil) != UNLIMITED) ? " seconds" : "");
+		l_size = snprintf(lbuf, sizeof(lbuf), "%s%s", colon_time(ABIL_SHORT_DURATION(abil), FALSE, "unlimited"), (ABIL_SHORT_DURATION(abil) < 60 && ABIL_SHORT_DURATION(abil) != UNLIMITED) ? " seconds" : "");
 	}
 	else {
 		*lbuf = '\0';
+		l_size = 0;
 	}
-	
 	if (ABIL_LONG_DURATION(abil) != ABIL_SHORT_DURATION(abil) && ABIL_LONG_DURATION(abil) > 0) {
-		sprintf(lbuf + strlen(lbuf), "%s%s%s", *lbuf ? "/" : "", colon_time(ABIL_LONG_DURATION(abil), FALSE, "unlimited"), (ABIL_LONG_DURATION(abil) < 60 && ABIL_LONG_DURATION(abil) != UNLIMITED) ? " seconds" : "");
+		l_size += snprintf(lbuf + l_size, sizeof(lbuf) - l_size, "%s%s%s", *lbuf ? "/" : "", colon_time(ABIL_LONG_DURATION(abil), FALSE, "unlimited"), (ABIL_LONG_DURATION(abil) < 60 && ABIL_LONG_DURATION(abil) != UNLIMITED) ? " seconds" : "");
 	}
 	
 	// show duration?
 	if (*lbuf && (!parent || ABIL_SHORT_DURATION(abil) != ABIL_LONG_DURATION(parent) || ABIL_SHORT_DURATION(abil) != ABIL_LONG_DURATION(parent))) {
 		has_param_details = TRUE;
-		size += snprintf(outbuf + size, sizeof_outbuf - size, "Duration: %s\r\n", lbuf);
+		build_page_display(ch, "Duration: %s", lbuf);
 	}
 	
 	if (ABIL_DIFFICULTY(abil) != DIFF_TRIVIAL) {
 		has_param_details = TRUE;
-		size += snprintf(outbuf + size, sizeof_outbuf - size, "Difficulty: %s\r\n", skill_check_difficulty[ABIL_DIFFICULTY(abil)]);
+		build_page_display(ch, "Difficulty: %s", skill_check_difficulty[ABIL_DIFFICULTY(abil)]);
 	}
 	
 	if (IS_SET(ABIL_TYPES(abil), ABILT_DOT) && ABIL_MAX_STACKS(abil) > 1) {
 		has_param_details = TRUE;
-		size += snprintf(outbuf + size, sizeof_outbuf - size, "DoT stacks to: %dx\r\n", ABIL_MAX_STACKS(abil));
+		build_page_display(ch, "DoT stacks to: %dx damage", ABIL_MAX_STACKS(abil));
 	}
 	
 	// notes (flags), if parameterized -- LAST
 	prettier_sprintbit(ABIL_FLAGS(abil), ability_flag_notes, lbuf);
 	if (*lbuf && str_cmp(lbuf, "none")) {
 		has_param_details = TRUE;
-		size += snprintf(outbuf + size, sizeof_outbuf - size, "Notes: %s\r\n", lbuf);
+		build_page_display(ch, "Notes: %s", lbuf);
 	}
 
 	// crafting ability?
@@ -466,44 +456,23 @@ void show_ability_info(char_data *ch, ability_data *abil, ability_data *parent, 
 		}
 		
 		// build craft display:
-		snprintf(sbuf, sizeof(sbuf), "%s%s", GET_CRAFT_NAME(craft), CRAFT_FLAGGED(craft, CRAFT_LEARNED) ? " (learned)" : "");
+		safe_snprintf(sbuf, sizeof(sbuf), " %s%s", GET_CRAFT_NAME(craft), CRAFT_FLAGGED(craft, CRAFT_LEARNED) ? " (learned)" : "");
 		
 		// needs header?
 		if (count == 0) {
-			size += snprintf(outbuf + size, sizeof_outbuf - size, "Makes:\r\n");
+			build_page_display_str(ch, "Makes:");
 		}
 		
 		// increment now
 		++count;
-		
-		if (PRF_FLAGGED(ch, PRF_SCREEN_READER)) {
-			if (size + strlen(sbuf) + 3 < sizeof_outbuf) {
-				size += snprintf(outbuf + size, sizeof_outbuf - size, "%s\r\n", sbuf);
-			}
-			else {
-				break;	// overflow?
-			}
-		}
-		else {	// not screenreader
-			snprintf(lbuf, sizeof(lbuf), " %-35.35s%s", sbuf, (count % 2 ? "" : "\r\n"));
-			if (size + strlen(lbuf) + 3 < sizeof_outbuf) {
-				strcat(outbuf, lbuf);
-				size += strlen(lbuf);
-			}
-			else {
-				break;	// overflow?
-			}
-		}
+		build_page_display_col_str(ch, 2, FALSE, sbuf);
 	}
-	if (count > 0 && count % 2 && !PRF_FLAGGED(ch, PRF_SCREEN_READER)) {
-		size += snprintf(outbuf + size, sizeof_outbuf - size, "\r\n");	// missing crlf
-	}
-	if (more_learned && size + 25 < sizeof_outbuf) {
+	if (more_learned) {
 		if (count > 0) {
-			size += snprintf(outbuf + size, sizeof_outbuf - size, " (with more to learn)\r\n");
+			build_page_display_str(ch, " (with more to learn)");
 		}
 		else {
-			size += snprintf(outbuf + size, sizeof_outbuf - size, "Makes recipes you have not learned.\r\n");
+			build_page_display_str(ch, "Makes recipes you have not learned.");
 		}
 	}
 	if (count > 0 || more_learned) {
@@ -512,11 +481,11 @@ void show_ability_info(char_data *ch, ability_data *abil, ability_data *parent, 
 	
 	// supercede?
 	if ((supercede = check_superceded_by(ch, abil)) != abil) {
-		size += snprintf(outbuf + size, sizeof_outbuf - size, "Superceded by: %s\r\n", ABIL_NAME(supercede));
+		build_page_display(ch, "Superceded by: %s", ABIL_NAME(supercede));
 	}
 	
 	if (!has_param_details) {
-		size += snprintf(outbuf + size, sizeof_outbuf - size, "(Not all abilities have additional details available to show here)\r\n");
+		build_page_display_str(ch, "(Not all abilities have additional details available to show here)");
 	}
 	
 	// hookers?
@@ -529,12 +498,13 @@ void show_ability_info(char_data *ch, ability_data *abil, ability_data *parent, 
 		}
 		
 		// seems ok
-		show_ability_info(ch, abiter, abil, lbuf, sizeof(lbuf));
-		if (*lbuf && size + strlen(lbuf) < sizeof_outbuf) {
-			has_param_details = TRUE;
-			strcat(outbuf, lbuf);
-			size += strlen(lbuf);
-		}
+		show_ability_info(ch, abiter, abil, FALSE);
+		has_param_details = TRUE;
+	}
+	
+	// and send if requested
+	if (send_page) {
+		send_page_display(ch);
 	}
 }
 
@@ -783,7 +753,7 @@ char *estimate_ability_cost(char_data *ch, ability_data *abil) {
 		estimate = TRUE;
 	}
 	
-	snprintf(output, sizeof(output), "%d%s", cost, (estimate ? " (estimated)" : ""));
+	safe_snprintf(output, sizeof(output), "%d%s", cost, (estimate ? " (estimated)" : ""));
 	return output;
 }
 
@@ -2327,7 +2297,7 @@ INTERACTION_FUNC(devastate_crop) {
 	}
 	
 	if (newobj && obj_ok) {
-		snprintf(type, sizeof(type), "%s", GET_CROP_NAME(cp));
+		safe_snprintf(type, sizeof(type), "%s", GET_CROP_NAME(cp));
 		strtolower(type);
 		
 		send_ability_per_item_messages(ch, newobj, interaction->quantity, abil, data, type);
@@ -2371,7 +2341,7 @@ INTERACTION_FUNC(devastate_trees) {
 	add_depletion(inter_room, DPLTN_CHOP, FALSE);
 	
 	if (newobj && obj_ok) {
-		snprintf(type, sizeof(type), "%s", GET_SECT_NAME(SECT(inter_room)));
+		safe_snprintf(type, sizeof(type), "%s", GET_SECT_NAME(SECT(inter_room)));
 		strtolower(type);
 		
 		send_ability_per_item_messages(ch, newobj, amount, abil, data, type);
@@ -2510,7 +2480,7 @@ DO_ABIL(abil_action_detect_adventures_around) {
 		// show instance
 		data->success = TRUE;
 		dir_str = get_partial_direction_to(ch, IN_ROOM(ch), loc, (PRF_FLAGGED(ch, PRF_SCREEN_READER) ? FALSE : TRUE));
-		snprintf(where_str, sizeof(where_str), "%s%s - %d %s", get_room_name(loc, FALSE), coord_display_room(ch, loc, FALSE), compute_distance(IN_ROOM(ch), loc), (dir_str && *dir_str) ? dir_str : "away");
+		safe_snprintf(where_str, sizeof(where_str), "%s%s - %d %s", get_room_name(loc, FALSE), coord_display_room(ch, loc, FALSE), compute_distance(IN_ROOM(ch), loc), (dir_str && *dir_str) ? dir_str : "away");
 		
 		repl_array[0] = where_str;
 		repl_array[1] = GET_ADV_NAME(INST_ADVENTURE(inst));
@@ -2609,7 +2579,7 @@ DO_ABIL(abil_action_detect_players_around) {
 		// ok:
 		data->success = TRUE;
 		dir_str = get_partial_direction_to(ch, IN_ROOM(ch), IN_ROOM(ch_iter), (PRF_FLAGGED(ch, PRF_SCREEN_READER) ? FALSE : TRUE));
-		snprintf(where_str, sizeof(where_str), "%s%s - %d %s", get_room_name(IN_ROOM(ch_iter), FALSE), coord_display_room(ch, IN_ROOM(ch_iter), FALSE), compute_distance(IN_ROOM(ch), IN_ROOM(ch_iter)), (dir_str && *dir_str) ? dir_str : "away");
+		safe_snprintf(where_str, sizeof(where_str), "%s%s - %d %s", get_room_name(IN_ROOM(ch_iter), FALSE), coord_display_room(ch, IN_ROOM(ch_iter), FALSE), compute_distance(IN_ROOM(ch), IN_ROOM(ch_iter)), (dir_str && *dir_str) ? dir_str : "away");
 		send_ability_per_char_messages(ch, ch_iter, 1, abil, data, where_str);
 	}
 }
@@ -2749,7 +2719,7 @@ DO_ABIL(abil_action_magic_growth) {
 	// percentage is checked in the evolution data
 	if (room_targ && (evo = get_evolution_by_type(SECT(room_targ), EVO_MAGIC_GROWTH)) && !ROOM_AFF_FLAGGED(room_targ, ROOM_AFF_NO_EVOLVE)) {
 		preserve = (BASE_SECT(room_targ) != SECT(room_targ)) ? BASE_SECT(room_targ) : NULL;
-		snprintf(was_name, sizeof(was_name), "%s", GET_SECT_NAME(SECT(room_targ)));
+		safe_snprintf(was_name, sizeof(was_name), "%s", GET_SECT_NAME(SECT(room_targ)));
 		
 		change_terrain(room_targ, evo->becomes, preserve ? GET_SECT_VNUM(preserve) : NOTHING);
 		
@@ -3265,7 +3235,7 @@ bool check_ability_limitations(char_data *ch, ability_data *abil, char_data *vic
 					have_room_permission = TRUE;
 				}
 				else if (!*room_permission_error) {
-					snprintf(room_permission_error, sizeof(room_permission_error), "You don't have permission to do that here.\r\n");
+					safe_snprintf(room_permission_error, sizeof(room_permission_error), "You don't have permission to do that here.\r\n");
 				}
 				break;
 			}
@@ -3276,7 +3246,7 @@ bool check_ability_limitations(char_data *ch, ability_data *abil, char_data *vic
 					have_room_permission = TRUE;
 				}
 				else if (!*room_permission_error) {
-					snprintf(room_permission_error, sizeof(room_permission_error), "You don't have permission to do that here.\r\n");
+					safe_snprintf(room_permission_error, sizeof(room_permission_error), "You don't have permission to do that here.\r\n");
 				}
 				break;
 			}
@@ -3287,7 +3257,7 @@ bool check_ability_limitations(char_data *ch, ability_data *abil, char_data *vic
 					have_room_permission = TRUE;
 				}
 				else if (!*room_permission_error) {
-					snprintf(room_permission_error, sizeof(room_permission_error), "You don't have permission to do that here.\r\n");
+					safe_snprintf(room_permission_error, sizeof(room_permission_error), "You don't have permission to do that here.\r\n");
 				}
 				break;
 			}
@@ -3491,7 +3461,7 @@ bool check_ability_limitations(char_data *ch, ability_data *abil, char_data *vic
 				}
 				else if (!*item_type_error) {
 					sprinttype(adl->misc, item_types, part, sizeof(part), "UNKNOWN");
-					snprintf(item_type_error, sizeof(item_type_error), "You must target %s %s item.\r\n", AN(part), part);
+					safe_snprintf(item_type_error, sizeof(item_type_error), "You must target %s %s item.\r\n", AN(part), part);
 				}
 				break;
 			}
@@ -3502,7 +3472,7 @@ bool check_ability_limitations(char_data *ch, ability_data *abil, char_data *vic
 					have_weapon = TRUE;
 				}
 				else if (!*weapon_error) {
-					snprintf(weapon_error, sizeof(weapon_error), "You can't do that while your weapon is disarmed!\r\n");
+					safe_snprintf(weapon_error, sizeof(weapon_error), "You can't do that while your weapon is disarmed!\r\n");
 				}
 				break;
 			}
@@ -3513,7 +3483,7 @@ bool check_ability_limitations(char_data *ch, ability_data *abil, char_data *vic
 					have_weapon = TRUE;
 				}
 				else if (!*weapon_error) {
-					snprintf(weapon_error, sizeof(weapon_error), "You need to wield a '%s' weapon to do that.\r\n", get_attack_name_by_vnum(adl->misc));
+					safe_snprintf(weapon_error, sizeof(weapon_error), "You need to wield a '%s' weapon to do that.\r\n", get_attack_name_by_vnum(adl->misc));
 				}
 				break;
 			}
@@ -3524,7 +3494,7 @@ bool check_ability_limitations(char_data *ch, ability_data *abil, char_data *vic
 					have_weapon = TRUE;
 				}
 				else if (!*weapon_error) {
-					snprintf(weapon_error, sizeof(weapon_error), "You need to be wielding a %s weapon to do that.\r\n", weapon_types[adl->misc]);
+					safe_snprintf(weapon_error, sizeof(weapon_error), "You need to be wielding a %s weapon to do that.\r\n", weapon_types[adl->misc]);
 				}
 				break;
 			}
@@ -4032,7 +4002,7 @@ PREP_ABIL(prep_conjure_liquid_ability) {
 			// ok, both are different liquids... is it a problem?
 			if (!GEN_FLAGGED(existing, GEN_BASIC) || !IS_SET(GET_LIQUID_FLAGS(gen), LIQF_WATER) || !IS_SET(GET_LIQUID_FLAGS(existing), LIQF_WATER)) {
 				// 1 is not water, or existing is not basic water
-				snprintf(buf, sizeof(buf), "$p already contains %s.", GET_LIQUID_NAME(existing));
+				safe_snprintf(buf, sizeof(buf), "$p already contains %s.", GET_LIQUID_NAME(existing));
 				act(buf, FALSE, ch, ovict, NULL, TO_CHAR | TO_SLEEP);
 				CANCEL_ABILITY(data);
 				return;
@@ -5890,7 +5860,7 @@ void send_ability_activation_messages(char_data *ch, char_data *vict, obj_data *
 			if ((msg = get_custom_message_pos(ABIL_CUSTOM_MSGS(abil), ABIL_CUSTOM_SELF_TO_CHAR, pos))) {
 				if (*msg != '*') {
 					if (*healing) {
-						snprintf(buf, sizeof(buf), "%s%s", msg, healing);
+						safe_snprintf(buf, sizeof(buf), "%s%s", msg, healing);
 						act(buf, FALSE, ch, ovict, vict, TO_CHAR | TO_SLEEP | act_flags);
 					}
 					else {
@@ -5901,7 +5871,7 @@ void send_ability_activation_messages(char_data *ch, char_data *vict, obj_data *
 			}
 			else if (!_AAM_NO_DEFAULT(abil)) {
 				// no default if it's damage/attack
-				snprintf(buf, sizeof(buf), "You use %s!%s", SAFE_ABIL_COMMAND(abil), healing);
+				safe_snprintf(buf, sizeof(buf), "You use %s!%s", SAFE_ABIL_COMMAND(abil), healing);
 				act(buf, FALSE, ch, ovict, vict, TO_CHAR | TO_SLEEP | act_flags);
 			}
 		
@@ -5913,7 +5883,7 @@ void send_ability_activation_messages(char_data *ch, char_data *vict, obj_data *
 			}
 			else if (!_AAM_NO_DEFAULT(abil)) {
 				// no default if it's damage/attack
-				snprintf(buf, sizeof(buf), "$n uses %s!", SAFE_ABIL_COMMAND(abil));
+				safe_snprintf(buf, sizeof(buf), "$n uses %s!", SAFE_ABIL_COMMAND(abil));
 				act(buf, invis, ch, ovict, vict, TO_ROOM | act_flags);
 			}
 		}
@@ -5926,7 +5896,7 @@ void send_ability_activation_messages(char_data *ch, char_data *vict, obj_data *
 			if ((msg = get_custom_message_pos(ABIL_CUSTOM_MSGS(abil), ABIL_CUSTOM_TARGETED_TO_CHAR, pos))) {
 				if (*msg != '*') {
 					if (*healing) {
-						snprintf(buf, sizeof(buf), "%s%s", msg, healing);
+						safe_snprintf(buf, sizeof(buf), "%s%s", msg, healing);
 						act(buf, FALSE, ch, ovict, vict, TO_CHAR | TO_SLEEP | act_flags);
 					}
 					else {
@@ -5937,7 +5907,7 @@ void send_ability_activation_messages(char_data *ch, char_data *vict, obj_data *
 			}
 			else if (!_AAM_NO_DEFAULT(abil)) {
 				// no default if it's damage/attack
-				snprintf(buf, sizeof(buf), "You use %s on $N!%s", SAFE_ABIL_COMMAND(abil), healing);
+				safe_snprintf(buf, sizeof(buf), "You use %s on $N!%s", SAFE_ABIL_COMMAND(abil), healing);
 				act(buf, FALSE, ch, ovict, vict, TO_CHAR | TO_SLEEP | act_flags);
 			}
 		
@@ -5945,7 +5915,7 @@ void send_ability_activation_messages(char_data *ch, char_data *vict, obj_data *
 			if ((msg = _ABIL_MATCHING_MESSAGE(ABIL_CUSTOM_MSGS(abil), ABIL_CUSTOM_TARGETED_TO_VICT))) {
 				if (*msg != '*') {
 					if (*healing) {
-						snprintf(buf, sizeof(buf), "%s%s", msg, healing);
+						safe_snprintf(buf, sizeof(buf), "%s%s", msg, healing);
 						act(buf, invis, ch, ovict, vict, TO_VICT | act_flags);
 					}
 					else {
@@ -5956,7 +5926,7 @@ void send_ability_activation_messages(char_data *ch, char_data *vict, obj_data *
 			}
 			else if (!_AAM_NO_DEFAULT(abil)) {
 				// no default if it's damage/attack
-				snprintf(buf, sizeof(buf), "$n uses %s on you!%s", SAFE_ABIL_COMMAND(abil), healing);
+				safe_snprintf(buf, sizeof(buf), "$n uses %s on you!%s", SAFE_ABIL_COMMAND(abil), healing);
 				act(buf, invis, ch, ovict, vict, TO_VICT | act_flags);
 			}
 		
@@ -5968,7 +5938,7 @@ void send_ability_activation_messages(char_data *ch, char_data *vict, obj_data *
 			}
 			else if (!_AAM_NO_DEFAULT(abil)) {
 				// no default if it's damage/attack
-				snprintf(buf, sizeof(buf), "$n uses %s on $N!", SAFE_ABIL_COMMAND(abil));
+				safe_snprintf(buf, sizeof(buf), "$n uses %s on $N!", SAFE_ABIL_COMMAND(abil));
 				act(buf, invis, ch, ovict, vict, TO_NOTVICT | act_flags);
 			}
 		}
@@ -5986,7 +5956,7 @@ void send_ability_activation_messages(char_data *ch, char_data *vict, obj_data *
 		}
 		else if (!_AAM_NO_DEFAULT(abil)) {
 			// no default if it's damage/attack
-			snprintf(buf, sizeof(buf), "You use %s on $p!", SAFE_ABIL_COMMAND(abil));
+			safe_snprintf(buf, sizeof(buf), "You use %s on $p!", SAFE_ABIL_COMMAND(abil));
 			act(buf, FALSE, ch, ovict, NULL, TO_CHAR | TO_SLEEP | act_flags);
 		}
 	
@@ -5998,7 +5968,7 @@ void send_ability_activation_messages(char_data *ch, char_data *vict, obj_data *
 		}
 		else if (!_AAM_NO_DEFAULT(abil)) {
 			// no default if it's damage/attack
-			snprintf(buf, sizeof(buf), "$n uses %s on $p!", SAFE_ABIL_COMMAND(abil));
+			safe_snprintf(buf, sizeof(buf), "$n uses %s on $p!", SAFE_ABIL_COMMAND(abil));
 			act(buf, invis, ch, ovict, NULL, TO_ROOM | act_flags);
 		}
 	}
@@ -6015,7 +5985,7 @@ void send_ability_activation_messages(char_data *ch, char_data *vict, obj_data *
 		}
 		else if (!_AAM_NO_DEFAULT(abil)) {
 			// no default if it's damage/attack
-			snprintf(buf, sizeof(buf), "You use %s on $V!", SAFE_ABIL_COMMAND(abil));
+			safe_snprintf(buf, sizeof(buf), "You use %s on $V!", SAFE_ABIL_COMMAND(abil));
 			act(buf, FALSE, ch, NULL, vvict, TO_CHAR | TO_SLEEP | ACT_VEH_VICT | act_flags);
 		}
 	
@@ -6027,7 +5997,7 @@ void send_ability_activation_messages(char_data *ch, char_data *vict, obj_data *
 		}
 		else if (!_AAM_NO_DEFAULT(abil)) {
 			// no default if it's damage/attack
-			snprintf(buf, sizeof(buf), "$n uses %s on $V!", SAFE_ABIL_COMMAND(abil));
+			safe_snprintf(buf, sizeof(buf), "$n uses %s on $V!", SAFE_ABIL_COMMAND(abil));
 			act(buf, invis, ch, NULL, vvict, TO_ROOM | ACT_VEH_VICT | act_flags);
 		}
 	}
@@ -6073,7 +6043,7 @@ void send_ability_counterspell_messages(char_data *ch, char_data *vict, ability_
 		}
 	}
 	else {
-		snprintf(buf, sizeof(buf), "You %s $N, but $E counterspells it!", SAFE_ABIL_COMMAND(abil));
+		safe_snprintf(buf, sizeof(buf), "You %s $N, but $E counterspells it!", SAFE_ABIL_COMMAND(abil));
 		act(buf, FALSE, ch, NULL, vict, TO_CHAR | TO_SLEEP | ACT_ABILITY);
 	}
 	
@@ -6084,7 +6054,7 @@ void send_ability_counterspell_messages(char_data *ch, char_data *vict, ability_
 		}
 	}
 	else {
-		snprintf(buf, sizeof(buf), "$n tries to %s you, but you counterspell it!", SAFE_ABIL_COMMAND(abil));
+		safe_snprintf(buf, sizeof(buf), "$n tries to %s you, but you counterspell it!", SAFE_ABIL_COMMAND(abil));
 		act(buf, FALSE, ch, NULL, vict, TO_VICT | ACT_ABILITY);
 	}
 	
@@ -6095,7 +6065,7 @@ void send_ability_counterspell_messages(char_data *ch, char_data *vict, ability_
 		}
 	}
 	else {
-		snprintf(buf, sizeof(buf), "$n tries to %s $N, but $E counterspells it!", SAFE_ABIL_COMMAND(abil));
+		safe_snprintf(buf, sizeof(buf), "$n tries to %s $N, but $E counterspells it!", SAFE_ABIL_COMMAND(abil));
 		act(buf, FALSE, ch, NULL, vict, TO_NOTVICT | ACT_ABILITY);
 	}
 }
@@ -6145,7 +6115,7 @@ void send_ability_fail_messages(char_data *ch, char_data *vict, obj_data *ovict,
 		}
 		else if (!IS_SET(ABIL_TYPES(abil), NO_DEFAULT_MESSAGES_TYPES)) {
 			// attack/damage suppress fails; everthing else gets a default:
-			snprintf(buf, sizeof(buf), "You fail to use %s!", SAFE_ABIL_COMMAND(abil));
+			safe_snprintf(buf, sizeof(buf), "You fail to use %s!", SAFE_ABIL_COMMAND(abil));
 			act(buf, FALSE, ch, ovict, vict, TO_CHAR | TO_SLEEP | act_flags);
 		}
 	
@@ -6157,7 +6127,7 @@ void send_ability_fail_messages(char_data *ch, char_data *vict, obj_data *ovict,
 		}
 		else if (!IS_SET(ABIL_TYPES(abil), NO_DEFAULT_MESSAGES_TYPES)) {
 			// attack/damage suppress fails; everthing else gets a default:
-			snprintf(buf, sizeof(buf), "$n fails to use %s!", SAFE_ABIL_COMMAND(abil));
+			safe_snprintf(buf, sizeof(buf), "$n fails to use %s!", SAFE_ABIL_COMMAND(abil));
 			act(buf, invis, ch, ovict, vict, TO_ROOM | act_flags);
 		}
 	}
@@ -6173,7 +6143,7 @@ void send_ability_fail_messages(char_data *ch, char_data *vict, obj_data *ovict,
 		}
 		else if (!IS_SET(ABIL_TYPES(abil), NO_DEFAULT_MESSAGES_TYPES)) {
 			// attack/damage suppress fails; everthing else gets a default:
-			snprintf(buf, sizeof(buf), "You try to use %s on $N, but fail!", SAFE_ABIL_COMMAND(abil));
+			safe_snprintf(buf, sizeof(buf), "You try to use %s on $N, but fail!", SAFE_ABIL_COMMAND(abil));
 			act(buf, FALSE, ch, ovict, vict, TO_CHAR | TO_SLEEP | act_flags);
 		}
 	
@@ -6185,7 +6155,7 @@ void send_ability_fail_messages(char_data *ch, char_data *vict, obj_data *ovict,
 		}
 		else if (!IS_SET(ABIL_TYPES(abil), NO_DEFAULT_MESSAGES_TYPES)) {
 			// attack/damage suppress fails; everthing else gets a default:
-			snprintf(buf, sizeof(buf), "$n tries to use %s on you, but fails!", SAFE_ABIL_COMMAND(abil));
+			safe_snprintf(buf, sizeof(buf), "$n tries to use %s on you, but fails!", SAFE_ABIL_COMMAND(abil));
 			act(buf, invis, ch, ovict, vict, TO_VICT | act_flags);
 		}
 	
@@ -6197,7 +6167,7 @@ void send_ability_fail_messages(char_data *ch, char_data *vict, obj_data *ovict,
 		}
 		else if (!IS_SET(ABIL_TYPES(abil), NO_DEFAULT_MESSAGES_TYPES)) {
 			// attack/damage suppress fails; everthing else gets a default:
-			snprintf(buf, sizeof(buf), "$n tries to use %s on $N, but fails!", SAFE_ABIL_COMMAND(abil));
+			safe_snprintf(buf, sizeof(buf), "$n tries to use %s on $N, but fails!", SAFE_ABIL_COMMAND(abil));
 			act(buf, invis, ch, ovict, vict, TO_NOTVICT | act_flags);
 		}
 	}
@@ -6212,7 +6182,7 @@ void send_ability_fail_messages(char_data *ch, char_data *vict, obj_data *ovict,
 			}
 		}
 		else {
-			snprintf(buf, sizeof(buf), "You try to use %s on $p, but fail!", SAFE_ABIL_COMMAND(abil));
+			safe_snprintf(buf, sizeof(buf), "You try to use %s on $p, but fail!", SAFE_ABIL_COMMAND(abil));
 			act(buf, FALSE, ch, ovict, NULL, TO_CHAR | TO_SLEEP | act_flags);
 		}
 		
@@ -6223,7 +6193,7 @@ void send_ability_fail_messages(char_data *ch, char_data *vict, obj_data *ovict,
 			}
 		}
 		else {
-			snprintf(buf, sizeof(buf), "$n tries to use %s on $p, but fails!", SAFE_ABIL_COMMAND(abil));
+			safe_snprintf(buf, sizeof(buf), "$n tries to use %s on $p, but fails!", SAFE_ABIL_COMMAND(abil));
 			act(buf, invis, ch, ovict, NULL, TO_ROOM | act_flags);
 		}
 	}
@@ -6403,7 +6373,7 @@ void send_ability_per_char_messages(char_data *ch, char_data *vict, int quantity
 	act_flags |= IS_SET(ABIL_TYPES(abil), ABILT_RESTORE) ? ACT_HEAL : ACT_ABILITY;
 	
 	if (quantity > 1) {
-		snprintf(multi, sizeof(multi), " (x%d)", quantity);
+		safe_snprintf(multi, sizeof(multi), " (x%d)", quantity);
 	}
 	else {
 		*multi = '\0';
@@ -6414,7 +6384,7 @@ void send_ability_per_char_messages(char_data *ch, char_data *vict, int quantity
 	
 	// to-char ONLY if there's a custom message
 	if ((msg = get_custom_message_pos(ABIL_CUSTOM_MSGS(abil), ABIL_CUSTOM_PER_CHAR_TO_CHAR, pos)) && *msg != '*') {
-		snprintf(buf, sizeof(buf), "%s%s", msg, multi);
+		safe_snprintf(buf, sizeof(buf), "%s%s", msg, multi);
 		repl = str_replace("$1", NULLSAFE(replace_1), buf);
 		act(repl, FALSE, ch, NULL, vict, TO_CHAR | TO_SLEEP | act_flags);
 		free(repl);
@@ -6427,7 +6397,7 @@ void send_ability_per_char_messages(char_data *ch, char_data *vict, int quantity
 	
 	// to vict ONLY if there's a custom message
 	if ((msg = _ABIL_MATCHING_MESSAGE(ABIL_CUSTOM_MSGS(abil), ABIL_CUSTOM_PER_CHAR_TO_VICT)) && *msg != '*') {
-		snprintf(buf, sizeof(buf), "%s%s", msg, multi);
+		safe_snprintf(buf, sizeof(buf), "%s%s", msg, multi);
 		repl = str_replace("$1", NULLSAFE(replace_1), buf);
 		act(repl, invis, ch, NULL, vict, TO_VICT | act_flags);
 		free(repl);
@@ -6435,7 +6405,7 @@ void send_ability_per_char_messages(char_data *ch, char_data *vict, int quantity
 	
 	// to room ONLY if there's a custom message
 	if ((msg = _ABIL_MATCHING_MESSAGE(ABIL_CUSTOM_MSGS(abil), ABIL_CUSTOM_PER_CHAR_TO_ROOM)) && *msg != '*') {
-		snprintf(buf, sizeof(buf), "%s%s", msg, multi);
+		safe_snprintf(buf, sizeof(buf), "%s%s", msg, multi);
 		repl = str_replace("$1", NULLSAFE(replace_1), buf);
 		act(repl, invis, ch, NULL, vict, TO_NOTVICT | act_flags);
 		free(repl);
@@ -6474,7 +6444,7 @@ void send_ability_per_item_messages(char_data *ch, obj_data *ovict, int quantity
 	act_flags |= IS_SET(ABIL_TYPES(abil), ABILT_RESTORE) ? ACT_HEAL : ACT_ABILITY;
 	
 	if (quantity > 1) {
-		snprintf(multi, sizeof(multi), " (x%d)", quantity);
+		safe_snprintf(multi, sizeof(multi), " (x%d)", quantity);
 	}
 	else {
 		*multi = '\0';
@@ -6485,7 +6455,7 @@ void send_ability_per_item_messages(char_data *ch, obj_data *ovict, int quantity
 	
 	// to-char ONLY if there's a custom message
 	if ((msg = get_custom_message_pos(ABIL_CUSTOM_MSGS(abil), ABIL_CUSTOM_PER_ITEM_TO_CHAR, pos)) && *msg != '*') {
-		snprintf(buf, sizeof(buf), "%s%s", msg, multi);
+		safe_snprintf(buf, sizeof(buf), "%s%s", msg, multi);
 		repl = str_replace("$1", NULLSAFE(replace_1), buf);
 		act(repl, FALSE, ch, ovict, NULL, TO_CHAR | TO_SLEEP | act_flags);
 		free(repl);
@@ -6498,7 +6468,7 @@ void send_ability_per_item_messages(char_data *ch, obj_data *ovict, int quantity
 	
 	// to room ONLY if there's a custom message
 	if ((msg = _ABIL_MATCHING_MESSAGE(ABIL_CUSTOM_MSGS(abil), ABIL_CUSTOM_PER_ITEM_TO_ROOM)) && *msg != '*') {
-		snprintf(buf, sizeof(buf), "%s%s", msg, multi);
+		safe_snprintf(buf, sizeof(buf), "%s%s", msg, multi);
 		repl = str_replace("$1", NULLSAFE(replace_1), buf);
 		act(repl, invis, ch, ovict, NULL, TO_ROOM | act_flags);
 		free(repl);
@@ -6537,7 +6507,7 @@ void send_ability_per_vehicle_message(char_data *ch, vehicle_data *vvict, int qu
 	act_flags |= IS_SET(ABIL_TYPES(abil), ABILT_RESTORE) ? ACT_HEAL : ACT_ABILITY;
 	
 	if (quantity > 1) {
-		snprintf(multi, sizeof(multi), " (x%d)", quantity);
+		safe_snprintf(multi, sizeof(multi), " (x%d)", quantity);
 	}
 	else {
 		*multi = '\0';
@@ -6548,7 +6518,7 @@ void send_ability_per_vehicle_message(char_data *ch, vehicle_data *vvict, int qu
 	
 	// to-char ONLY if there's a custom message
 	if ((msg = get_custom_message_pos(ABIL_CUSTOM_MSGS(abil), ABIL_CUSTOM_PER_VEH_TO_CHAR, pos)) && *msg != '*') {
-		snprintf(buf, sizeof(buf), "%s%s", msg, multi);
+		safe_snprintf(buf, sizeof(buf), "%s%s", msg, multi);
 		repl = str_replace("$1", NULLSAFE(replace_1), buf);
 		act(repl, FALSE, ch, NULL, vvict, TO_CHAR | TO_SLEEP | ACT_VEH_VICT | act_flags);
 		free(repl);
@@ -6561,7 +6531,7 @@ void send_ability_per_vehicle_message(char_data *ch, vehicle_data *vvict, int qu
 	
 	// to room ONLY if there's a custom message
 	if ((msg = _ABIL_MATCHING_MESSAGE(ABIL_CUSTOM_MSGS(abil), ABIL_CUSTOM_PER_VEH_TO_ROOM)) && *msg != '*') {
-		snprintf(buf, sizeof(buf), "%s%s", msg, multi);
+		safe_snprintf(buf, sizeof(buf), "%s%s", msg, multi);
 		repl = str_replace("$1", NULLSAFE(replace_1), buf);
 		act(repl, invis, ch, NULL, vvict, TO_ROOM | ACT_VEH_VICT | act_flags);
 		free(repl);
@@ -6612,7 +6582,7 @@ void send_ability_special_messages(char_data *ch, char_data *vict, obj_data *ovi
 	// to-char ONLY if there's a custom message
 	if ((msg = get_custom_message_pos(ABIL_CUSTOM_MSGS(abil), ABIL_CUSTOM_SPEC_TO_CHAR, pos)) && *msg != '*') {
 		for (iter = 0; iter < replace_count && replace && replace[iter]; ++iter) {
-			snprintf(tok, sizeof(tok), "$%d", iter+1);
+			safe_snprintf(tok, sizeof(tok), "$%d", iter+1);
 			repl = str_replace(tok, replace[iter], msg);
 			if (iter > 0) {
 				free(msg);
@@ -6631,7 +6601,7 @@ void send_ability_special_messages(char_data *ch, char_data *vict, obj_data *ovi
 	// to vict ONLY if there's a custom message
 	if ((msg = _ABIL_MATCHING_MESSAGE(ABIL_CUSTOM_MSGS(abil), ABIL_CUSTOM_SPEC_TO_VICT)) && *msg != '*') {
 		for (iter = 0; iter < replace_count && replace && replace[iter]; ++iter) {
-			snprintf(tok, sizeof(tok), "$%d", iter+1);
+			safe_snprintf(tok, sizeof(tok), "$%d", iter+1);
 			repl = str_replace(tok, replace[iter], msg);
 			if (iter > 0) {
 				free(msg);
@@ -6645,7 +6615,7 @@ void send_ability_special_messages(char_data *ch, char_data *vict, obj_data *ovi
 	// to room ONLY if there's a custom message
 	if ((msg = _ABIL_MATCHING_MESSAGE(ABIL_CUSTOM_MSGS(abil), ABIL_CUSTOM_SPEC_TO_ROOM)) && *msg != '*') {
 		for (iter = 0; iter < replace_count && replace && replace[iter]; ++iter) {
-			snprintf(tok, sizeof(tok), "$%d", iter+1);
+			safe_snprintf(tok, sizeof(tok), "$%d", iter+1);
 			repl = str_replace(tok, replace[iter], msg);
 			if (iter > 0) {
 				free(msg);
@@ -8728,17 +8698,17 @@ char *list_one_ability(ability_data *abil, bool detail) {
 	
 	if (detail) {
 		if ((mabil = find_ability_by_vnum(ABIL_MASTERY_ABIL(abil)))) {
-			snprintf(mastery, sizeof(mastery), " (%s)", ABIL_NAME(mabil));
+			safe_snprintf(mastery, sizeof(mastery), " (%s)", ABIL_NAME(mabil));
 		}
 		else {
 			*mastery = '\0';
 		}
 		get_ability_type_display(ABIL_TYPE_LIST(abil), types, FALSE);
 		
-		snprintf(output, sizeof(output), "[%5d] %s%s - %s", ABIL_VNUM(abil), ABIL_NAME(abil), mastery, types);
+		safe_snprintf(output, sizeof(output), "[%5d] %s%s - %s", ABIL_VNUM(abil), ABIL_NAME(abil), mastery, types);
 	}
 	else {
-		snprintf(output, sizeof(output), "[%5d] %s", ABIL_VNUM(abil), ABIL_NAME(abil));
+		safe_snprintf(output, sizeof(output), "[%5d] %s", ABIL_VNUM(abil), ABIL_NAME(abil));
 	}
 		
 	return output;
@@ -8753,8 +8723,7 @@ char *list_one_ability(ability_data *abil, bool detail) {
 */
 void olc_search_ability(char_data *ch, any_vnum vnum) {
 	bool any;
-	char buf[MAX_STRING_LENGTH];
-	int size, found;
+	int found;
 	ability_data *abil = find_ability_by_vnum(vnum);
 	ability_data *abiter, *next_abiter;
 	augment_data *aug, *next_aug;
@@ -8783,7 +8752,7 @@ void olc_search_ability(char_data *ch, any_vnum vnum) {
 	}
 	
 	found = 0;
-	size = snprintf(buf, sizeof(buf), "Occurrences of ability %d (%s):\r\n", vnum, ABIL_NAME(abil));
+	build_page_display(ch, "Occurrences of ability %d (%s):", vnum, ABIL_NAME(abil));
 	
 	// abilities
 	HASH_ITER(hh, ability_table, abiter, next_abiter) {
@@ -8796,7 +8765,7 @@ void olc_search_ability(char_data *ch, any_vnum vnum) {
 		
 		if (any) {
 			++found;
-			size += snprintf(buf + size, sizeof(buf) - size, "ABIL [%5d] %s\r\n", ABIL_VNUM(abiter), ABIL_NAME(abiter));
+			build_page_display(ch, "ABIL [%5d] %s", ABIL_VNUM(abiter), ABIL_NAME(abiter));
 		}
 	}
 	
@@ -8804,7 +8773,7 @@ void olc_search_ability(char_data *ch, any_vnum vnum) {
 	HASH_ITER(hh, augment_table, aug, next_aug) {
 		if (GET_AUG_ABILITY(aug) == vnum) {
 			++found;
-			size += snprintf(buf + size, sizeof(buf) - size, "AUG [%5d] %s\r\n", GET_AUG_VNUM(aug), GET_AUG_NAME(aug));
+			build_page_display(ch, "AUG [%5d] %s", GET_AUG_VNUM(aug), GET_AUG_NAME(aug));
 		}
 	}
 	
@@ -8813,7 +8782,7 @@ void olc_search_ability(char_data *ch, any_vnum vnum) {
 		any = find_interaction_restriction_in_list(GET_BLD_INTERACTIONS(bld), INTERACT_RESTRICT_ABILITY, vnum);
 		if (any) {
 			++found;
-			size += snprintf(buf + size, sizeof(buf) - size, "BLD [%5d] %s\r\n", GET_BLD_VNUM(bld), GET_BLD_NAME(bld));
+			build_page_display(ch, "BLD [%5d] %s", GET_BLD_VNUM(bld), GET_BLD_NAME(bld));
 		}
 	}
 	
@@ -8822,7 +8791,7 @@ void olc_search_ability(char_data *ch, any_vnum vnum) {
 		LL_FOREACH(CLASS_ABILITIES(cls), clab) {
 			if (clab->vnum == vnum) {
 				++found;
-				size += snprintf(buf + size, sizeof(buf) - size, "CLS [%5d] %s\r\n", CLASS_VNUM(cls), CLASS_NAME(cls));
+				build_page_display(ch, "CLS [%5d] %s", CLASS_VNUM(cls), CLASS_NAME(cls));
 				break;	// only need 1
 			}
 		}
@@ -8832,7 +8801,7 @@ void olc_search_ability(char_data *ch, any_vnum vnum) {
 	HASH_ITER(hh, craft_table, craft, next_craft) {
 		if (GET_CRAFT_ABILITY(craft) == vnum) {
 			++found;
-			size += snprintf(buf + size, sizeof(buf) - size, "CFT [%5d] %s\r\n", GET_CRAFT_VNUM(craft), GET_CRAFT_NAME(craft));
+			build_page_display(ch, "CFT [%5d] %s", GET_CRAFT_VNUM(craft), GET_CRAFT_NAME(craft));
 		}
 	}
 	
@@ -8841,7 +8810,7 @@ void olc_search_ability(char_data *ch, any_vnum vnum) {
 		any = find_interaction_restriction_in_list(GET_CROP_INTERACTIONS(crop), INTERACT_RESTRICT_ABILITY, vnum);
 		if (any) {
 			++found;
-			size += snprintf(buf + size, sizeof(buf) - size, "CRP [%5d] %s\r\n", GET_CROP_VNUM(crop), GET_CROP_NAME(crop));
+			build_page_display(ch, "CRP [%5d] %s", GET_CROP_VNUM(crop), GET_CROP_NAME(crop));
 		}
 	}
 	
@@ -8852,7 +8821,7 @@ void olc_search_ability(char_data *ch, any_vnum vnum) {
 		
 		if (any) {
 			++found;
-			size += snprintf(buf + size, sizeof(buf) - size, "GLB [%5d] %s\r\n", GET_GLOBAL_VNUM(glb), GET_GLOBAL_NAME(glb));
+			build_page_display(ch, "GLB [%5d] %s", GET_GLOBAL_VNUM(glb), GET_GLOBAL_NAME(glb));
 		}
 	}
 	
@@ -8861,7 +8830,7 @@ void olc_search_ability(char_data *ch, any_vnum vnum) {
 		any = find_interaction_restriction_in_list(MOB_INTERACTIONS(mob), INTERACT_RESTRICT_ABILITY, vnum);
 		if (any) {
 			++found;
-			size += snprintf(buf + size, sizeof(buf) - size, "MOB [%5d] %s\r\n", GET_MOB_VNUM(mob), GET_SHORT_DESC(mob));
+			build_page_display(ch, "MOB [%5d] %s", GET_MOB_VNUM(mob), GET_SHORT_DESC(mob));
 		}
 	}
 	
@@ -8869,7 +8838,7 @@ void olc_search_ability(char_data *ch, any_vnum vnum) {
 	HASH_ITER(hh, morph_table, morph, next_morph) {
 		if (MORPH_ABILITY(morph) == vnum) {
 			++found;
-			size += snprintf(buf + size, sizeof(buf) - size, "MPH [%5d] %s\r\n", MORPH_VNUM(morph), MORPH_SHORT_DESC(morph));
+			build_page_display(ch, "MPH [%5d] %s", MORPH_VNUM(morph), MORPH_SHORT_DESC(morph));
 		}
 	}
 	
@@ -8878,36 +8847,30 @@ void olc_search_ability(char_data *ch, any_vnum vnum) {
 		any = find_interaction_restriction_in_list(GET_OBJ_INTERACTIONS(obj), INTERACT_RESTRICT_ABILITY, vnum);
 		if (any) {
 			++found;
-			size += snprintf(buf + size, sizeof(buf) - size, "OBJ [%5d] %s\r\n", GET_OBJ_VNUM(obj), GET_OBJ_SHORT_DESC(obj));
+			build_page_display(ch, "OBJ [%5d] %s", GET_OBJ_VNUM(obj), GET_OBJ_SHORT_DESC(obj));
 		}
 	}
 	
 	// progress
 	HASH_ITER(hh, progress_table, prg, next_prg) {
-		if (size >= sizeof(buf)) {
-			break;
-		}
 		// REQ_x: requirement search
 		any = find_requirement_in_list(PRG_TASKS(prg), REQ_HAVE_ABILITY, vnum);
 		
 		if (any) {
 			++found;
-			size += snprintf(buf + size, sizeof(buf) - size, "PRG [%5d] %s\r\n", PRG_VNUM(prg), PRG_NAME(prg));
+			build_page_display(ch, "PRG [%5d] %s", PRG_VNUM(prg), PRG_NAME(prg));
 		}
 	}
 	
 	// quests
 	HASH_ITER(hh, quest_table, quest, next_quest) {
-		if (size >= sizeof(buf)) {
-			break;
-		}
 		// REQ_x: requirement search
 		any = find_requirement_in_list(QUEST_TASKS(quest), REQ_HAVE_ABILITY, vnum);
 		any |= find_requirement_in_list(QUEST_PREREQS(quest), REQ_HAVE_ABILITY, vnum);
 		
 		if (any) {
 			++found;
-			size += snprintf(buf + size, sizeof(buf) - size, "QST [%5d] %s\r\n", QUEST_VNUM(quest), QUEST_NAME(quest));
+			build_page_display(ch, "QST [%5d] %s", QUEST_VNUM(quest), QUEST_NAME(quest));
 		}
 	}
 	
@@ -8916,7 +8879,7 @@ void olc_search_ability(char_data *ch, any_vnum vnum) {
 		any = find_interaction_restriction_in_list(GET_RMT_INTERACTIONS(rmt), INTERACT_RESTRICT_ABILITY, vnum);
 		if (any) {
 			++found;
-			size += snprintf(buf + size, sizeof(buf) - size, "RMT [%5d] %s\r\n", GET_RMT_VNUM(rmt), GET_RMT_TITLE(rmt));
+			build_page_display(ch, "RMT [%5d] %s", GET_RMT_VNUM(rmt), GET_RMT_TITLE(rmt));
 		}
 	}
 	
@@ -8925,7 +8888,7 @@ void olc_search_ability(char_data *ch, any_vnum vnum) {
 		any = find_interaction_restriction_in_list(GET_SECT_INTERACTIONS(sect), INTERACT_RESTRICT_ABILITY, vnum);
 		if (any) {
 			++found;
-			size += snprintf(buf + size, sizeof(buf) - size, "SCT [%5d] %s\r\n", GET_SECT_VNUM(sect), GET_SECT_NAME(sect));
+			build_page_display(ch, "SCT [%5d] %s", GET_SECT_VNUM(sect), GET_SECT_NAME(sect));
 		}
 	}
 	
@@ -8948,21 +8911,18 @@ void olc_search_ability(char_data *ch, any_vnum vnum) {
 		
 		if (any) {
 			++found;
-			size += snprintf(buf + size, sizeof(buf) - size, "SKL [%5d] %s\r\n", CLASS_VNUM(skill), CLASS_NAME(skill));
+			build_page_display(ch, "SKL [%5d] %s", CLASS_VNUM(skill), CLASS_NAME(skill));
 		}
 	}
 	
 	// socials
 	HASH_ITER(hh, social_table, soc, next_soc) {
-		if (size >= sizeof(buf)) {
-			break;
-		}
 		// REQ_x: requirement search
 		any = find_requirement_in_list(SOC_REQUIREMENTS(soc), REQ_HAVE_ABILITY, vnum);
 		
 		if (any) {
 			++found;
-			size += snprintf(buf + size, sizeof(buf) - size, "SOC [%5d] %s\r\n", SOC_VNUM(soc), SOC_NAME(soc));
+			build_page_display(ch, "SOC [%5d] %s", SOC_VNUM(soc), SOC_NAME(soc));
 		}
 	}
 	
@@ -8971,18 +8931,18 @@ void olc_search_ability(char_data *ch, any_vnum vnum) {
 		any = find_interaction_restriction_in_list(VEH_INTERACTIONS(veh), INTERACT_RESTRICT_ABILITY, vnum);
 		if (any) {
 			++found;
-			size += snprintf(buf + size, sizeof(buf) - size, "VEH [%5d] %s\r\n", VEH_VNUM(veh), VEH_SHORT_DESC(veh));
+			build_page_display(ch, "VEH [%5d] %s", VEH_VNUM(veh), VEH_SHORT_DESC(veh));
 		}
 	}
 	
 	if (found > 0) {
-		size += snprintf(buf + size, sizeof(buf) - size, "%d location%s shown\r\n", found, PLURAL(found));
+		build_page_display(ch, "%d location%s shown", found, PLURAL(found));
 	}
 	else {
-		size += snprintf(buf + size, sizeof(buf) - size, " none\r\n");
+		build_page_display_str(ch, " none");
 	}
 	
-	page_string(ch->desc, buf, TRUE);
+	send_page_display(ch);
 }
 
 
@@ -9955,7 +9915,7 @@ void olc_delete_ability(char_data *ch, any_vnum vnum) {
 		return;
 	}
 	
-	snprintf(name, sizeof(name), "%s", NULLSAFE(ABIL_NAME(abil)));
+	safe_snprintf(name, sizeof(name), "%s", NULLSAFE(ABIL_NAME(abil)));
 		
 	// remove it from the hash table first
 	remove_ability_from_table(abil);
@@ -10311,7 +10271,7 @@ void olc_delete_ability(char_data *ch, any_vnum vnum) {
 void olc_fullsearch_abil(char_data *ch, char *argument) {
 	#define FAKE_DUR  -999	// arbitrary control number
 	
-	char buf[MAX_STRING_LENGTH * 2], line[MAX_STRING_LENGTH], type_arg[MAX_INPUT_LENGTH], val_arg[MAX_INPUT_LENGTH], find_keywords[MAX_INPUT_LENGTH];
+	char type_arg[MAX_INPUT_LENGTH], val_arg[MAX_INPUT_LENGTH], find_keywords[MAX_INPUT_LENGTH];
 	bitvector_t find_applies = NOBITS, found_applies, not_flagged = NOBITS, only_flags = NOBITS;
 	bitvector_t only_affs = NOBITS, only_immunities = NOBITS, only_gains = NOBITS, only_targets = NOBITS, find_custom = NOBITS, found_custom, only_tools = NOBITS, only_room_affs = NOBITS;
 	bitvector_t find_interacts = NOBITS, found_interacts;
@@ -10326,7 +10286,6 @@ void olc_fullsearch_abil(char_data *ch, char *argument) {
 	struct apply_data *app;
 	struct interaction_item *inter;
 	attack_message_data *only_attack = NULL;
-	size_t size;
 	
 	if (!*argument) {
 		msg_to_char(ch, "See HELP ABILEDIT FULLSEARCH for syntax.\r\n");
@@ -10412,14 +10371,14 @@ void olc_fullsearch_abil(char_data *ch, char *argument) {
 		}
 		
 		else {	// not sure what to do with it? treat it like a keyword
-			snprintf(find_keywords + strlen(find_keywords), sizeof(find_keywords) - strlen(find_keywords), "%s%s", *find_keywords ? " " : "", type_arg);
+			safe_snprintf(find_keywords + strlen(find_keywords), sizeof(find_keywords) - strlen(find_keywords), "%s%s", *find_keywords ? " " : "", type_arg);
 		}
 		
 		// prepare for next loop
 		skip_spaces(&argument);
 	}
 	
-	size = snprintf(buf, sizeof(buf), "Ability fullsearch: %s\r\n", show_color_codes(find_keywords));
+	build_page_display(ch, "Ability fullsearch: %s", show_color_codes(find_keywords));
 	count = 0;
 	
 	// okay now look up items
@@ -10567,27 +10526,18 @@ void olc_fullsearch_abil(char_data *ch, char *argument) {
 		}
 		
 		// show it
-		snprintf(line, sizeof(line), "[%5d] %s\r\n", ABIL_VNUM(abil), ABIL_NAME(abil));
-		if (strlen(line) + size < sizeof(buf)) {
-			size += snprintf(buf + size, sizeof(buf) - size, "%s", line);
-			++count;
-		}
-		else {
-			size += snprintf(buf + size, sizeof(buf) - size, "OVERFLOW\r\n");
-			break;
-		}
+		build_page_display(ch, "[%5d] %s", ABIL_VNUM(abil), ABIL_NAME(abil));
+		++count;
 	}
 	
-	if (count > 0 && (size + 20) < sizeof(buf)) {
-		size += snprintf(buf + size, sizeof(buf) - size, "(%d abilities)\r\n", count);
+	if (count > 0) {
+		build_page_display(ch, "(%d abilities)", count);
 	}
-	else if (count == 0) {
-		size += snprintf(buf + size, sizeof(buf) - size, " none\r\n");
+	else {
+		build_page_display_str(ch, " none");
 	}
 	
-	if (ch->desc) {
-		page_string(ch->desc, buf, TRUE);
-	}
+	send_page_display(ch);
 }
 
 
@@ -10749,19 +10699,19 @@ char *ability_data_display(struct ability_data_list *adl) {
 	// ADL_x: display by type
 	switch (adl->type) {
 		case ADL_PLAYER_TECH: {
-			snprintf(output, sizeof(output), "%s: %s", type_str, player_tech_types[adl->vnum]);
+			safe_snprintf(output, sizeof(output), "%s: %s", type_str, player_tech_types[adl->vnum]);
 			break;
 		}
 		case ADL_EFFECT: {
-			snprintf(output, sizeof(output), "%s: %s", type_str, ability_effects[adl->vnum]);
+			safe_snprintf(output, sizeof(output), "%s: %s", type_str, ability_effects[adl->vnum]);
 			break;
 		}
 		case ADL_READY_WEAPON: {
-			snprintf(output, sizeof(output), "%s: [%d] %s", type_str, adl->vnum, get_obj_name_by_proto(adl->vnum));
+			safe_snprintf(output, sizeof(output), "%s: [%d] %s", type_str, adl->vnum, get_obj_name_by_proto(adl->vnum));
 			break;
 		}
 		case ADL_SUMMON_MOB: {
-			snprintf(output, sizeof(output), "%s: [%d] %s", type_str, adl->vnum, get_mob_name_by_proto(adl->vnum, FALSE));
+			safe_snprintf(output, sizeof(output), "%s: [%d] %s", type_str, adl->vnum, get_mob_name_by_proto(adl->vnum, FALSE));
 			break;
 		}
 		case ADL_LIMITATION: {
@@ -10769,68 +10719,68 @@ char *ability_data_display(struct ability_data_list *adl) {
 			switch (ability_limitation_misc[adl->vnum]) {
 				case ABLIM_ITEM_TYPE: {
 					sprinttype(adl->misc, item_types, part, sizeof(part), "UNKNOWN");
-					snprintf(output, sizeof(output), "%s: %s %s", type_str, ability_limitations[adl->vnum], part);
+					safe_snprintf(output, sizeof(output), "%s: %s %s", type_str, ability_limitations[adl->vnum], part);
 					break;
 				}
 				case ABLIM_ATTACK_TYPE: {
-					snprintf(output, sizeof(output), "%s: %s %s", type_str, ability_limitations[adl->vnum], get_attack_name_by_vnum(adl->misc));
+					safe_snprintf(output, sizeof(output), "%s: %s %s", type_str, ability_limitations[adl->vnum], get_attack_name_by_vnum(adl->misc));
 					break;
 				}
 				case ABLIM_WEAPON_TYPE: {
 					sprinttype(adl->misc, weapon_types, part, sizeof(part), "UNKNOWN");
-					snprintf(output, sizeof(output), "%s: %s %s", type_str, ability_limitations[adl->vnum], part);
+					safe_snprintf(output, sizeof(output), "%s: %s %s", type_str, ability_limitations[adl->vnum], part);
 					break;
 				}
 				case ABLIM_DAMAGE_TYPE: {
 					sprinttype(adl->misc, damage_types, part, sizeof(part), "UNKNOWN");
-					snprintf(output, sizeof(output), "%s: %s %s", type_str, ability_limitations[adl->vnum], part);
+					safe_snprintf(output, sizeof(output), "%s: %s %s", type_str, ability_limitations[adl->vnum], part);
 					break;
 				}
 				case ABLIM_ROLE: {
 					sprinttype(adl->misc, class_role, part, sizeof(part), "UNKNOWN");
-					snprintf(output, sizeof(output), "%s: %s %s", type_str, ability_limitations[adl->vnum], part);
+					safe_snprintf(output, sizeof(output), "%s: %s %s", type_str, ability_limitations[adl->vnum], part);
 					break;
 				}
 				case ABLIM_OBJ_FLAG: {
 					sprintbit(adl->misc, extra_bits, part, FALSE);
-					snprintf(output, sizeof(output), "%s: %s %s", type_str, ability_limitations[adl->vnum], part);
+					safe_snprintf(output, sizeof(output), "%s: %s %s", type_str, ability_limitations[adl->vnum], part);
 					break;
 				}
 				case ABLIM_AFF_FLAG: {
 					sprintbit(adl->misc, affected_bits, part, FALSE);
-					snprintf(output, sizeof(output), "%s: %s %s", type_str, ability_limitations[adl->vnum], part);
+					safe_snprintf(output, sizeof(output), "%s: %s %s", type_str, ability_limitations[adl->vnum], part);
 					break;
 				}
 				case ABLIM_NOTHING:
 				default: {
-					snprintf(output, sizeof(output), "%s: %s", type_str, ability_limitations[adl->vnum]);
+					safe_snprintf(output, sizeof(output), "%s: %s", type_str, ability_limitations[adl->vnum]);
 					break;
 				}
 			}
 			break;
 		}
 		case ADL_PAINT_COLOR: {
-			snprintf(output, sizeof(output), "%s: %s%s", type_str, paint_colors[adl->vnum], paint_names[adl->vnum]);
+			safe_snprintf(output, sizeof(output), "%s: %s%s", type_str, paint_colors[adl->vnum], paint_names[adl->vnum]);
 			break;
 		}
 		case ADL_ACTION: {
-			snprintf(output, sizeof(output), "%s: %s", type_str, ability_actions[adl->vnum]);
+			safe_snprintf(output, sizeof(output), "%s: %s", type_str, ability_actions[adl->vnum]);
 			break;
 		}
 		case ADL_RANGE: {
-			snprintf(output, sizeof(output), "%s: %d", type_str, adl->vnum);
+			safe_snprintf(output, sizeof(output), "%s: %d", type_str, adl->vnum);
 			break;
 		}
 		case ADL_PARENT: {
-			snprintf(output, sizeof(output), "%s: %d %s", type_str, adl->vnum, get_ability_name_by_vnum(adl->vnum));
+			safe_snprintf(output, sizeof(output), "%s: %d %s", type_str, adl->vnum, get_ability_name_by_vnum(adl->vnum));
 			break;
 		}
 		case ADL_SUPERCEDED_BY: {
-			snprintf(output, sizeof(output), "%s: %d %s", type_str, adl->vnum, get_ability_name_by_vnum(adl->vnum));
+			safe_snprintf(output, sizeof(output), "%s: %d %s", type_str, adl->vnum, get_ability_name_by_vnum(adl->vnum));
 			break;
 		}
 		default: {
-			snprintf(output, sizeof(output), "%s: ???", type_str);
+			safe_snprintf(output, sizeof(output), "%s: ???", type_str);
 			break;
 		}
 	}
@@ -10850,24 +10800,24 @@ char *ability_hook_display(struct ability_hook *ahook) {
 	char type_str[256], label[1024];
 	
 	prettier_sprintbit(ahook->type, ability_hook_types, type_str);
-	snprintf(label, sizeof(label), "%s %.2f%%", type_str, ahook->percent);
+	safe_snprintf(label, sizeof(label), "%s %.2f%%", type_str, ahook->percent);
 	
 	// AHOOK_x: display by type
 	switch (ahook->type) {
 		case AHOOK_ABILITY: {
-			snprintf(output, sizeof(output), "%s: [%d] %s", label, ahook->value, get_ability_name_by_vnum(ahook->value));
+			safe_snprintf(output, sizeof(output), "%s: [%d] %s", label, ahook->value, get_ability_name_by_vnum(ahook->value));
 			break;
 		}
 		case AHOOK_ATTACK_TYPE: {
-			snprintf(output, sizeof(output), "%s: %s", label, get_attack_name_by_vnum(ahook->value));
+			safe_snprintf(output, sizeof(output), "%s: %s", label, get_attack_name_by_vnum(ahook->value));
 			break;
 		}
 		case AHOOK_WEAPON_TYPE: {
-			snprintf(output, sizeof(output), "%s: %s", label, weapon_types[ahook->value]);
+			safe_snprintf(output, sizeof(output), "%s: %s", label, weapon_types[ahook->value]);
 			break;
 		}
 		case AHOOK_DAMAGE_TYPE: {
-			snprintf(output, sizeof(output), "%s: %s", label, damage_types[ahook->value]);
+			safe_snprintf(output, sizeof(output), "%s: %s", label, damage_types[ahook->value]);
 			break;
 		}
 		
@@ -10882,11 +10832,11 @@ char *ability_hook_display(struct ability_hook *ahook) {
 		case AHOOK_DYING:
 		case AHOOK_RESPAWN:
 		case AHOOK_RESURRECT: {
-			snprintf(output, sizeof(output), "%s", label);
+			safe_snprintf(output, sizeof(output), "%s", label);
 			break;
 		}
 		default: {
-			snprintf(output, sizeof(output), "%s: Unknown type %llu %d %d", label, ahook->type, ahook->value, ahook->misc);
+			safe_snprintf(output, sizeof(output), "%s: Unknown type %llu %d %d", label, ahook->type, ahook->value, ahook->misc);
 			break;
 		}
 	}
@@ -11002,14 +10952,14 @@ bitvector_t ability_shows_fields(ability_data *abil) {
 * @param bool details If TRUE, shows full messages (due to -d option on vstat).
 */
 void do_stat_ability(char_data *ch, ability_data *abil, bool details) {
-	char buf[MAX_STRING_LENGTH*4], part[MAX_STRING_LENGTH], part2[MAX_STRING_LENGTH];
+	char part[MAX_STRING_LENGTH], part2[MAX_STRING_LENGTH];
 	struct ability_data_list *adl;
 	struct ability_hook *ahook;
 	struct custom_message *custm;
 	struct apply_data *app;
 	bitvector_t fields;
-	size_t size;
 	int count;
+	struct page_display *line;
 	
 	if (!abil) {
 		return;
@@ -11018,169 +10968,169 @@ void do_stat_ability(char_data *ch, ability_data *abil, bool details) {
 	fields = ability_shows_fields(abil);
 	
 	// first line
-	size = snprintf(buf, sizeof(buf), "VNum: [\tc%d\t0], Name: \tc%s\t0\r\n", ABIL_VNUM(abil), ABIL_NAME(abil));
+	build_page_display(ch, "VNum: [\tc%d\t0], Name: \tc%s\t0", ABIL_VNUM(abil), ABIL_NAME(abil));
 
-	size += snprintf(buf + size, sizeof(buf) - size, "Scale: [\ty%d%%\t0], Mastery ability: [\ty%d\t0] \ty%s\t0\r\n", (int)(ABIL_SCALE(abil) * 100), ABIL_MASTERY_ABIL(abil), ABIL_MASTERY_ABIL(abil) == NOTHING ? "none" : get_ability_name_by_vnum(ABIL_MASTERY_ABIL(abil)));
+	build_page_display(ch, "Scale: [\ty%d%%\t0], Mastery ability: [\ty%d\t0] \ty%s\t0", (int)(ABIL_SCALE(abil) * 100), ABIL_MASTERY_ABIL(abil), ABIL_MASTERY_ABIL(abil) == NOTHING ? "none" : get_ability_name_by_vnum(ABIL_MASTERY_ABIL(abil)));
 	
 	get_ability_type_display(ABIL_TYPE_LIST(abil), part, FALSE);
-	size += snprintf(buf + size, sizeof(buf) - size, "Types: \tc%s\t0\r\n", part);
+	build_page_display(ch, "Types: \tc%s\t0", part);
 	
 	sprintbit(ABIL_FLAGS(abil), ability_flags, part, TRUE);
-	size += snprintf(buf + size, sizeof(buf) - size, "Flags: \tg%s\t0\r\n", part);
+	build_page_display(ch, "Flags: \tg%s\t0", part);
 	
 	if (IS_SET(fields, ABILEDIT_IMMUNITIES)) {
 		sprintbit(ABIL_IMMUNITIES(abil), affected_bits, part, TRUE);
-		size += snprintf(buf + size, sizeof(buf) - size, "Immunities: \tc%s\t0\r\n", part);
+		build_page_display(ch, "Immunities: \tc%s\t0", part);
 	}
 	
 	sprintbit(ABIL_GAIN_HOOKS(abil), ability_gain_hooks, part, TRUE);
-	size += snprintf(buf + size, sizeof(buf) - size, "Gain hooks: \tg%s\t0\r\n", part);
+	build_page_display(ch, "Gain hooks: \tg%s\t0", part);
 	
 	// Command, Targets line
-	if (IS_SET(fields, ABILEDIT_COMMAND)) {
-		if (!ABIL_COMMAND(abil)) {
-			size += snprintf(buf + size, sizeof(buf) - size, "Command info: [\tcnot a command\t0]");
-		}
-		else {
-			size += snprintf(buf + size, sizeof(buf) - size, "Command info: [\ty%s\t0]", ABIL_COMMAND(abil));
-		}
-	}
-	if (IS_SET(fields, ABILEDIT_TARGETS)) {
-		sprintbit(ABIL_TARGETS(abil), ability_target_flags, part, TRUE);
-		size += snprintf(buf + size, sizeof(buf) - size, "%sTargets: \tg%s\t0", (IS_SET(fields, ABILEDIT_COMMAND) ? ", " : ""), part);
-	}
 	if (IS_SET(fields, ABILEDIT_COMMAND | ABILEDIT_TARGETS)) {
-		size += snprintf(buf + size, sizeof(buf) - size, "\r\n");
+		line = build_page_display_str(ch, "");
+		if (IS_SET(fields, ABILEDIT_COMMAND)) {
+			if (!ABIL_COMMAND(abil)) {
+				append_page_display_line(line, "Command info: [\tcnot a command\t0]");
+			}
+			else {
+				append_page_display_line(line, "Command info: [\ty%s\t0]", ABIL_COMMAND(abil));
+			}
+		}
+		if (IS_SET(fields, ABILEDIT_TARGETS)) {
+			sprintbit(ABIL_TARGETS(abil), ability_target_flags, part, TRUE);
+			append_page_display_line(line, "%sTargets: \tg%s\t0", (IS_SET(fields, ABILEDIT_COMMAND) ? ", " : ""), part);
+		}
 	}
 	
 	// Minpos, Linked trait line
-	size += snprintf(buf + size, sizeof(buf) - size, "Linked trait: [\ty%s\t0]", apply_types[ABIL_LINKED_TRAIT(abil)]);
+	line = build_page_display(ch, "Linked trait: [\ty%s\t0]", apply_types[ABIL_LINKED_TRAIT(abil)]);
 	if (IS_SET(fields, ABILEDIT_MIN_POS)) {
-		size += snprintf(buf + size, sizeof(buf) - size, ", Min position: [\tc%s\t0]", position_types[ABIL_MIN_POS(abil)]);
+		append_page_display_line(line, ", Min position: [\tc%s\t0]", position_types[ABIL_MIN_POS(abil)]);
 	}
-	size += snprintf(buf + size, sizeof(buf) - size, "\r\n");
 	
 	if (IS_SET(fields, ABILEDIT_COST | ABILEDIT_COST_PER_AMOUNT | ABILEDIT_COST_PER_TARGET)) {
-		size += snprintf(buf + size, sizeof(buf) - size, "Cost: [\tc%d %s (+%.2f/scale)", ABIL_COST(abil), pool_types[ABIL_COST_TYPE(abil)], ABIL_COST_PER_SCALE_POINT(abil));
+		line = build_page_display(ch, "Cost: [\tc%d %s (+%.2f/scale)", ABIL_COST(abil), pool_types[ABIL_COST_TYPE(abil)], ABIL_COST_PER_SCALE_POINT(abil));
 		if (IS_SET(fields, ABILEDIT_COST_PER_AMOUNT)) {
-			size += snprintf(buf + size, sizeof(buf) - size, " (+%.2f/amount)", ABIL_COST_PER_AMOUNT(abil));
+			append_page_display_line(line, " (+%.2f/amount)", ABIL_COST_PER_AMOUNT(abil));
 		}
 		if (IS_SET(fields, ABILEDIT_COST_PER_TARGET)) {
-			size += snprintf(buf + size, sizeof(buf) - size, " (+%.2f/target)", ABIL_COST_PER_TARGET(abil));
+			append_page_display_line(line, " (+%.2f/target)", ABIL_COST_PER_TARGET(abil));
 		}
-		size += snprintf(buf + size, sizeof(buf) - size, "\t0]\r\n");
+		append_page_display_line(line, "\t0]");
 	}
 	
 	if (IS_SET(fields, ABILEDIT_COOLDOWN)) {
-		size += snprintf(buf + size, sizeof(buf) - size, "Cooldown: [\tc%d %s\t0], Cooldown time: [\tc%s\t0]\r\n", ABIL_COOLDOWN(abil), get_generic_name_by_vnum(ABIL_COOLDOWN(abil)), colon_time(ABIL_COOLDOWN_SECS(abil), FALSE, NULL));
+		build_page_display(ch, "Cooldown: [\tc%d %s\t0], Cooldown time: [\tc%s\t0]", ABIL_COOLDOWN(abil), get_generic_name_by_vnum(ABIL_COOLDOWN(abil)), colon_time(ABIL_COOLDOWN_SECS(abil), FALSE, NULL));
 	}
 	if (IS_SET(fields, ABILEDIT_COST)) {
-		get_resource_display(ch, ABIL_RESOURCE_COST(abil), part);
-		size += snprintf(buf + size, sizeof(buf) - size, "Resource cost:%s\r\n%s", ABIL_RESOURCE_COST(abil) ? "" : " none", ABIL_RESOURCE_COST(abil) ? part : "");
+		build_page_display(ch, "Resource cost:%s", ABIL_RESOURCE_COST(abil) ? "" : " none");
+		if (ABIL_RESOURCE_COST(abil)) {
+			show_resource_display(ch, ABIL_RESOURCE_COST(abil), FALSE);
+		}
 	}
 	
 	if (IS_SET(fields, ABILEDIT_TOOL)) {
 		prettier_sprintbit(ABIL_REQUIRES_TOOL(abil), tool_flags, part);
-		size += snprintf(buf + size, sizeof(buf) - size, "Requires tool: &g%s&0\r\n", part);
+		build_page_display(ch, "Requires tool: &g%s&0", part);
 	}
 	if (IS_SET(fields, ABILEDIT_DIFFICULTY | ABILEDIT_WAIT)) {
-		size += snprintf(buf + size, sizeof(buf) - size, "Difficulty: \ty%s\t0, Wait type: [\ty%s\t0]\r\n", skill_check_difficulty[ABIL_DIFFICULTY(abil)], wait_types[ABIL_WAIT_TYPE(abil)]);
+		build_page_display(ch, "Difficulty: \ty%s\t0, Wait type: [\ty%s\t0]", skill_check_difficulty[ABIL_DIFFICULTY(abil)], wait_types[ABIL_WAIT_TYPE(abil)]);
 	}
 	
 	// Custom affect, Duration line
-	if (IS_SET(fields, ABILEDIT_AFFECT_VNUM)) {
-		size += snprintf(buf + size, sizeof(buf) - size, "Custom affect: [\ty%d %s\t0]", ABIL_AFFECT_VNUM(abil), get_generic_name_by_vnum(ABIL_AFFECT_VNUM(abil)));
-	}
-	if (IS_SET(fields, ABILEDIT_DURATION)) {
-		strcpy(part, colon_time(ABIL_SHORT_DURATION(abil), FALSE, "unlimited"));
-		strcpy(part2, colon_time(ABIL_LONG_DURATION(abil), FALSE, "unlimited"));
-		size += snprintf(buf + size, sizeof(buf) - size, "%sDurations: [\tc%s/%s\t0]", (IS_SET(fields, ABILEDIT_AFFECT_VNUM) ? ", " : ""), part, part2);
-	}
 	if (IS_SET(fields, ABILEDIT_AFFECT_VNUM | ABILEDIT_DURATION)) {
-		size += snprintf(buf + size, sizeof(buf) - size, "\r\n");
+		line = build_page_display_str(ch, "");
+		if (IS_SET(fields, ABILEDIT_AFFECT_VNUM)) {
+			append_page_display_line(line, "Custom affect: [\ty%d %s\t0]", ABIL_AFFECT_VNUM(abil), get_generic_name_by_vnum(ABIL_AFFECT_VNUM(abil)));
+		}
+		if (IS_SET(fields, ABILEDIT_DURATION)) {
+			strcpy(part, colon_time(ABIL_SHORT_DURATION(abil), FALSE, "unlimited"));
+			strcpy(part2, colon_time(ABIL_LONG_DURATION(abil), FALSE, "unlimited"));
+			append_page_display_line(line, "%sDurations: [\tc%s/%s\t0]", (IS_SET(fields, ABILEDIT_AFFECT_VNUM) ? ", " : ""), part, part2);
+		}
 	}
 	
 	// Attack Type, Damage Type, Max Stacks line
-	if (IS_SET(fields, ABILEDIT_ATTACK_TYPE)) {
-		size += snprintf(buf + size, sizeof(buf) - size, "Attack type: [\tc%d %s\t0]", ABIL_ATTACK_TYPE(abil), get_attack_name_by_vnum(ABIL_ATTACK_TYPE(abil)));
-	}
-	if (IS_SET(fields, ABILEDIT_DAMAGE_TYPE)) {
-		size += snprintf(buf + size, sizeof(buf) - size, "%sDamage type: [\tc%s\t0]", (IS_SET(fields, ABILEDIT_ATTACK_TYPE) ? ", " : ""), damage_types[ABIL_DAMAGE_TYPE(abil)]);
-	}
-	if (IS_SET(fields, ABILEDIT_POOL_TYPE)) {
-		size += snprintf(buf + size, sizeof(buf) - size, "%sPool type: [\tc%s\t0]", (IS_SET(fields, ABILEDIT_ATTACK_TYPE | ABILEDIT_DAMAGE_TYPE) ? ", " : ""), ABIL_POOL_TYPE(abil) == ANY_POOL ? "any" : pool_types[ABIL_POOL_TYPE(abil)]);
-	}
-	if (IS_SET(fields, ABILEDIT_MOVE_TYPE)) {
-		size += snprintf(buf + size, sizeof(buf) - size, "%sMove type: [\tc%s\t0]", (IS_SET(fields, ABILEDIT_ATTACK_TYPE | ABILEDIT_DAMAGE_TYPE | ABILEDIT_POOL_TYPE) ? ", " : ""), ability_move_types[ABIL_MOVE_TYPE(abil)]);
-	}
-	if (IS_SET(fields, ABILEDIT_MAX_STACKS)) {
-		size += snprintf(buf + size, sizeof(buf) - size, "%sMax stacks: [\tc%d\t0]", (IS_SET(fields, ABILEDIT_ATTACK_TYPE | ABILEDIT_DAMAGE_TYPE | ABILEDIT_POOL_TYPE | ABILEDIT_MOVE_TYPE) ? ", " : ""), ABIL_MAX_STACKS(abil));
-	}
 	if (IS_SET(fields, ABILEDIT_ATTACK_TYPE | ABILEDIT_DAMAGE_TYPE | ABILEDIT_MAX_STACKS | ABILEDIT_POOL_TYPE | ABILEDIT_MOVE_TYPE)) {
-		size += snprintf(buf + size, sizeof(buf) - size, "\r\n");
+		line = build_page_display_str(ch, "");
+		if (IS_SET(fields, ABILEDIT_ATTACK_TYPE)) {
+			append_page_display_line(line, "Attack type: [\tc%d %s\t0]", ABIL_ATTACK_TYPE(abil), get_attack_name_by_vnum(ABIL_ATTACK_TYPE(abil)));
+		}
+		if (IS_SET(fields, ABILEDIT_DAMAGE_TYPE)) {
+			append_page_display_line(line, "%sDamage type: [\tc%s\t0]", (IS_SET(fields, ABILEDIT_ATTACK_TYPE) ? ", " : ""), damage_types[ABIL_DAMAGE_TYPE(abil)]);
+		}
+		if (IS_SET(fields, ABILEDIT_POOL_TYPE)) {
+			append_page_display_line(line, "%sPool type: [\tc%s\t0]", (IS_SET(fields, ABILEDIT_ATTACK_TYPE | ABILEDIT_DAMAGE_TYPE) ? ", " : ""), ABIL_POOL_TYPE(abil) == ANY_POOL ? "any" : pool_types[ABIL_POOL_TYPE(abil)]);
+		}
+		if (IS_SET(fields, ABILEDIT_MOVE_TYPE)) {
+			append_page_display_line(line, "%sMove type: [\tc%s\t0]", (IS_SET(fields, ABILEDIT_ATTACK_TYPE | ABILEDIT_DAMAGE_TYPE | ABILEDIT_POOL_TYPE) ? ", " : ""), ability_move_types[ABIL_MOVE_TYPE(abil)]);
+		}
+		if (IS_SET(fields, ABILEDIT_MAX_STACKS)) {
+			append_page_display_line(line, "%sMax stacks: [\tc%d\t0]", (IS_SET(fields, ABILEDIT_ATTACK_TYPE | ABILEDIT_DAMAGE_TYPE | ABILEDIT_POOL_TYPE | ABILEDIT_MOVE_TYPE) ? ", " : ""), ABIL_MAX_STACKS(abil));
+		}
 	}
 	
 	if (IS_SET(fields, ABILEDIT_AFFECTS)) {
 		if (IS_SET(ABIL_TYPES(abil), ABILT_ROOM_AFFECT)) {
 			sprintbit(ABIL_AFFECTS(abil), room_aff_bits, part, TRUE);
-			size += snprintf(buf + size, sizeof(buf) - size, "Room affect flags: \tg%s\t0\r\n", part);
+			build_page_display(ch, "Room affect flags: \tg%s\t0", part);
 		}
 		else {
 			sprintbit(ABIL_AFFECTS(abil), affected_bits, part, TRUE);
-			size += snprintf(buf + size, sizeof(buf) - size, "Affect flags: \tg%s\t0\r\n", part);
+			build_page_display(ch, "Affect flags: \tg%s\t0", part);
 		}
 	}
 	if (IS_SET(fields, ABILEDIT_APPLIES)) {
-		size += snprintf(buf + size, sizeof(buf) - size, "Applies: ");
+		line = build_page_display(ch, "Applies: ");
 		count = 0;
 		LL_FOREACH(ABIL_APPLIES(abil), app) {
-			size += snprintf(buf + size, sizeof(buf) - size, "%s%d to %s", count++ ? ", " : "", app->weight, apply_types[app->location]);
+			append_page_display_line(line, "%s%d to %s", count++ ? ", " : "", app->weight, apply_types[app->location]);
 		}
 		if (!ABIL_APPLIES(abil)) {
-			size += snprintf(buf + size, sizeof(buf) - size, "none");
+			append_page_display_line(line, "none");
 		}
-		size += snprintf(buf + size, sizeof(buf) - size, "\r\n");
 	}
 	
 	// custom messages
 	if (ABIL_CUSTOM_MSGS(abil)) {
 		if (details) {
-			size += snprintf(buf + size, sizeof(buf) - size, "Custom messages:\r\n");
+			build_page_display(ch, "Custom messages:");
 		
 			LL_FOREACH(ABIL_CUSTOM_MSGS(abil), custm) {
-				size += snprintf(buf + size, sizeof(buf) - size, " %s: %s\r\n", ability_custom_types[custm->type], custm->msg);
+				build_page_display(ch, " %s: %s", ability_custom_types[custm->type], custm->msg);
 			}
 		}
 		else {
 			LL_COUNT(ABIL_CUSTOM_MSGS(abil), custm, count);
-			size += snprintf(buf + size, sizeof(buf) - size, "Custom messages: %d\r\n", count);
+			build_page_display(ch, "Custom messages: %d", count);
 		}
 	}
 	
 	// hooks
 	if (ABIL_HOOKS(abil)) {
-		size += snprintf(buf + size, sizeof(buf) - size, "Ability hooks:\r\n");
+		build_page_display(ch, "Ability hooks:");
 		count = 0;
 		LL_FOREACH(ABIL_HOOKS(abil), ahook) {
-			size += snprintf(buf + size, sizeof(buf) - size, " %d. %s\r\n", ++count, ability_hook_display(ahook));
+			build_page_display(ch, " %d. %s", ++count, ability_hook_display(ahook));
 		}
 	}
 	
 	if (IS_SET(fields, ABILEDIT_INTERACTIONS)) {
-		get_interaction_display(ABIL_INTERACTIONS(abil), part);
-		size += snprintf(buf + size, sizeof(buf) - size, "Interactions:\r\n%s", part);
+		build_page_display_str(ch, "Interactions:");
+		show_interaction_display(ch, ABIL_INTERACTIONS(abil), FALSE);
 	}
 	
 	// data
 	if (ABIL_DATA(abil)) {
-		size += snprintf(buf + size, sizeof(buf) - size, "Extra data:\r\n");
+		build_page_display(ch, "Extra data:");
 		count = 0;
 		LL_FOREACH(ABIL_DATA(abil), adl) {
-			size += snprintf(buf + size, sizeof(buf) - size, " %d. %s\r\n", ++count, ability_data_display(adl));
+			build_page_display(ch, " %d. %s", ++count, ability_data_display(adl));
 		}
 	}
 	
-	page_string(ch->desc, buf, TRUE);
+	send_page_display(ch);
 }
 
 
@@ -11192,187 +11142,191 @@ void do_stat_ability(char_data *ch, ability_data *abil, bool details) {
 */
 void olc_show_ability(char_data *ch) {
 	ability_data *abil = GET_OLC_ABILITY(ch->desc);
-	char buf[MAX_STRING_LENGTH * 4], lbuf[MAX_STRING_LENGTH];
+	char lbuf[MAX_STRING_LENGTH];
 	struct ability_data_list *adl;
 	struct ability_hook *ahook;
 	struct custom_message *custm;
 	struct apply_data *apply;
 	bitvector_t fields;
 	int count;
+	struct page_display *line;
 	
 	if (!abil) {
 		return;
 	}
 	
 	fields = ability_shows_fields(abil);
-	*buf = '\0';
 	
-	sprintf(buf + strlen(buf), "[%s%d\t0] %s%s\t0\r\n", OLC_LABEL_CHANGED, GET_OLC_VNUM(ch->desc), OLC_LABEL_UNCHANGED, !find_ability_by_vnum(ABIL_VNUM(abil)) ? "new ability" : get_ability_name_by_vnum(ABIL_VNUM(abil)));
-	sprintf(buf + strlen(buf), "<%sname\t0> %s\r\n", OLC_LABEL_STR(ABIL_NAME(abil), default_ability_name), NULLSAFE(ABIL_NAME(abil)));
+	build_page_display(ch, "[%s%d\t0] %s%s\t0", OLC_LABEL_CHANGED, GET_OLC_VNUM(ch->desc), OLC_LABEL_UNCHANGED, !find_ability_by_vnum(ABIL_VNUM(abil)) ? "new ability" : get_ability_name_by_vnum(ABIL_VNUM(abil)));
+	build_page_display(ch, "<%sname\t0> %s", OLC_LABEL_STR(ABIL_NAME(abil), default_ability_name), NULLSAFE(ABIL_NAME(abil)));
 	
 	get_ability_type_display(ABIL_TYPE_LIST(abil), lbuf, FALSE);
-	sprintf(buf + strlen(buf), "<%stypes\t0> %s\r\n", OLC_LABEL_PTR(ABIL_TYPE_LIST(abil)), lbuf);
+	build_page_display(ch, "<%stypes\t0> %s", OLC_LABEL_PTR(ABIL_TYPE_LIST(abil)), lbuf);
 	
-	sprintf(buf + strlen(buf), "<%smasteryability\t0> %d %s\r\n", OLC_LABEL_VAL(ABIL_MASTERY_ABIL(abil), NOTHING), ABIL_MASTERY_ABIL(abil), ABIL_MASTERY_ABIL(abil) == NOTHING ? "none" : get_ability_name_by_vnum(ABIL_MASTERY_ABIL(abil)));
-	sprintf(buf + strlen(buf), "<%sscale\t0> %d%%\r\n", OLC_LABEL_VAL(ABIL_SCALE(abil), 1.0), (int)(ABIL_SCALE(abil) * 100));
+	build_page_display(ch, "<%smasteryability\t0> %d %s", OLC_LABEL_VAL(ABIL_MASTERY_ABIL(abil), NOTHING), ABIL_MASTERY_ABIL(abil), ABIL_MASTERY_ABIL(abil) == NOTHING ? "none" : get_ability_name_by_vnum(ABIL_MASTERY_ABIL(abil)));
+	build_page_display(ch, "<%sscale\t0> %d%%", OLC_LABEL_VAL(ABIL_SCALE(abil), 1.0), (int)(ABIL_SCALE(abil) * 100));
 	
 	sprintbit(ABIL_FLAGS(abil), ability_flags, lbuf, TRUE);
-	sprintf(buf + strlen(buf), "<%sflags\t0> %s\r\n", OLC_LABEL_VAL(ABIL_FLAGS(abil), NOBITS), lbuf);
+	build_page_display(ch, "<%sflags\t0> %s", OLC_LABEL_VAL(ABIL_FLAGS(abil), NOBITS), lbuf);
 	
 	if (IS_SET(fields, ABILEDIT_IMMUNITIES)) {
 		sprintbit(ABIL_IMMUNITIES(abil), affected_bits, lbuf, TRUE);
-		sprintf(buf + strlen(buf), "<%simmunities\t0> %s\r\n", OLC_LABEL_VAL(ABIL_IMMUNITIES(abil), NOBITS), lbuf);
+		build_page_display(ch, "<%simmunities\t0> %s", OLC_LABEL_VAL(ABIL_IMMUNITIES(abil), NOBITS), lbuf);
 	}
 	
 	sprintbit(ABIL_GAIN_HOOKS(abil), ability_gain_hooks, lbuf, TRUE);
-	sprintf(buf + strlen(buf), "<%sgainhooks\t0> %s\r\n", OLC_LABEL_VAL(ABIL_GAIN_HOOKS(abil), NOBITS), lbuf);
+	build_page_display(ch, "<%sgainhooks\t0> %s", OLC_LABEL_VAL(ABIL_GAIN_HOOKS(abil), NOBITS), lbuf);
 	
 	// Command, Targets line
-	if (IS_SET(fields, ABILEDIT_COMMAND)) {
-		if (!ABIL_COMMAND(abil)) {
-			sprintf(buf + strlen(buf), "<%scommand\t0> (not a command)", OLC_LABEL_UNCHANGED);
-		}
-		else {
-			sprintf(buf + strlen(buf), "<%scommand\t0> %s", OLC_LABEL_CHANGED, ABIL_COMMAND(abil));
-		}
-	}
-	if (IS_SET(fields, ABILEDIT_TARGETS)) {
-		sprintbit(ABIL_TARGETS(abil), ability_target_flags, lbuf, TRUE);
-		sprintf(buf + strlen(buf), "%s<%stargets\t0> %s", (IS_SET(fields, ABILEDIT_COMMAND) ? ", " : ""), OLC_LABEL_VAL(ABIL_TARGETS(abil), NOBITS), lbuf);
-	}
 	if (IS_SET(fields, ABILEDIT_COMMAND | ABILEDIT_TARGETS)) {
-		sprintf(buf + strlen(buf), "\r\n");
+		line = build_page_display_str(ch, "");	// prepare variable line
+		
+		if (IS_SET(fields, ABILEDIT_COMMAND)) {
+			if (!ABIL_COMMAND(abil)) {
+				append_page_display_line(line, "<%scommand\t0> (not a command)", OLC_LABEL_UNCHANGED);
+			}
+			else {
+				append_page_display_line(line, "<%scommand\t0> %s", OLC_LABEL_CHANGED, ABIL_COMMAND(abil));
+			}
+		}
+		if (IS_SET(fields, ABILEDIT_TARGETS)) {
+			sprintbit(ABIL_TARGETS(abil), ability_target_flags, lbuf, TRUE);
+			append_page_display_line(line, "%s<%stargets\t0> %s", (IS_SET(fields, ABILEDIT_COMMAND) ? ", " : ""), OLC_LABEL_VAL(ABIL_TARGETS(abil), NOBITS), lbuf);
+		}
 	}
 	
 	// Linked Traits, Min Pos line
-	sprintf(buf + strlen(buf), "<%slinkedtrait\t0> %s", OLC_LABEL_VAL(ABIL_LINKED_TRAIT(abil), APPLY_NONE), apply_types[ABIL_LINKED_TRAIT(abil)]);
+	line = build_page_display(ch, "<%slinkedtrait\t0> %s", OLC_LABEL_VAL(ABIL_LINKED_TRAIT(abil), APPLY_NONE), apply_types[ABIL_LINKED_TRAIT(abil)]);
 	if (IS_SET(fields, ABILEDIT_MIN_POS)) {
-		sprintf(buf + strlen(buf), ", <%sminposition\t0> %s (minimum)", OLC_LABEL_VAL(ABIL_MIN_POS(abil), POS_STANDING), position_types[ABIL_MIN_POS(abil)]);
+		append_page_display_line(line, ", <%sminposition\t0> %s (minimum)", OLC_LABEL_VAL(ABIL_MIN_POS(abil), POS_STANDING), position_types[ABIL_MIN_POS(abil)]);
 	}
-	sprintf(buf + strlen(buf), "\r\n");
 	
 	// Costs line
 	if (IS_SET(fields, ABILEDIT_COST)) {
-		sprintf(buf + strlen(buf), "<%scost\t0> %d, <%scostperscalepoint\t0> %.2f, <%scosttype\t0> %s\r\n", OLC_LABEL_VAL(ABIL_COST(abil), 0), ABIL_COST(abil), OLC_LABEL_VAL(ABIL_COST_PER_SCALE_POINT(abil), 0.0), ABIL_COST_PER_SCALE_POINT(abil), OLC_LABEL_VAL(ABIL_COST_TYPE(abil), 0), pool_types[ABIL_COST_TYPE(abil)]);
-	}
-	if (IS_SET(fields, ABILEDIT_COST_PER_AMOUNT)) {
-		sprintf(buf + strlen(buf), "<%scostperamount\t0> %.2f", OLC_LABEL_VAL(ABIL_COST_PER_AMOUNT(abil), 0.0), ABIL_COST_PER_AMOUNT(abil));
-	}
-	if (IS_SET(fields, ABILEDIT_COST_PER_TARGET)) {
-		sprintf(buf + strlen(buf), "%s<%scostpertarget\t0> %.2f", (IS_SET(fields, ABILEDIT_COST_PER_AMOUNT) ? ", " : ""), OLC_LABEL_VAL(ABIL_COST_PER_TARGET(abil), 0.0), ABIL_COST_PER_TARGET(abil));
+		build_page_display(ch, "<%scost\t0> %d, <%scostperscalepoint\t0> %.2f, <%scosttype\t0> %s", OLC_LABEL_VAL(ABIL_COST(abil), 0), ABIL_COST(abil), OLC_LABEL_VAL(ABIL_COST_PER_SCALE_POINT(abil), 0.0), ABIL_COST_PER_SCALE_POINT(abil), OLC_LABEL_VAL(ABIL_COST_TYPE(abil), 0), pool_types[ABIL_COST_TYPE(abil)]);
 	}
 	if (IS_SET(fields, ABILEDIT_COST_PER_AMOUNT | ABILEDIT_COST_PER_TARGET)) {
-		sprintf(buf + strlen(buf), "\r\n");
+		line = build_page_display_str(ch, "");	// prepare for 2-part line
+		
+		if (IS_SET(fields, ABILEDIT_COST_PER_AMOUNT)) {
+			append_page_display_line(line, "<%scostperamount\t0> %.2f", OLC_LABEL_VAL(ABIL_COST_PER_AMOUNT(abil), 0.0), ABIL_COST_PER_AMOUNT(abil));
+		}
+		if (IS_SET(fields, ABILEDIT_COST_PER_TARGET)) {
+			append_page_display_line(line, "%s<%scostpertarget\t0> %.2f", (IS_SET(fields, ABILEDIT_COST_PER_AMOUNT) ? ", " : ""), OLC_LABEL_VAL(ABIL_COST_PER_TARGET(abil), 0.0), ABIL_COST_PER_TARGET(abil));
+		}
 	}
+	
 	if (IS_SET(fields, ABILEDIT_COST)) {
-		get_resource_display(ch, ABIL_RESOURCE_COST(abil), lbuf);
-		sprintf(buf + strlen(buf), "<%sresourcecost\t0>%s\r\n%s", OLC_LABEL_PTR(ABIL_RESOURCE_COST(abil)), ABIL_RESOURCE_COST(abil) ? "" : " none", ABIL_RESOURCE_COST(abil) ? lbuf : "");
+		build_page_display(ch, "<%sresourcecost\t0>%s", OLC_LABEL_PTR(ABIL_RESOURCE_COST(abil)), ABIL_RESOURCE_COST(abil) ? "" : " none");
+		if (ABIL_RESOURCE_COST(abil)) {
+			show_resource_display(ch, ABIL_RESOURCE_COST(abil), FALSE);
+		}
 	}
 	
 	// Cooldown line
 	if (IS_SET(fields, ABILEDIT_COOLDOWN)) {
-		sprintf(buf + strlen(buf), "<%scooldown\t0> [%d] %s, <%scdtime\t0> %d second%s\r\n", OLC_LABEL_VAL(ABIL_COOLDOWN(abil), NOTHING), ABIL_COOLDOWN(abil), get_generic_name_by_vnum(ABIL_COOLDOWN(abil)), OLC_LABEL_VAL(ABIL_COOLDOWN_SECS(abil), 0), ABIL_COOLDOWN_SECS(abil), PLURAL(ABIL_COOLDOWN_SECS(abil)));
+		build_page_display(ch, "<%scooldown\t0> [%d] %s, <%scdtime\t0> %d second%s", OLC_LABEL_VAL(ABIL_COOLDOWN(abil), NOTHING), ABIL_COOLDOWN(abil), get_generic_name_by_vnum(ABIL_COOLDOWN(abil)), OLC_LABEL_VAL(ABIL_COOLDOWN_SECS(abil), 0), ABIL_COOLDOWN_SECS(abil), PLURAL(ABIL_COOLDOWN_SECS(abil)));
 	}
 	
 	// Tool line
 	if (IS_SET(fields, ABILEDIT_TOOL)) {
 		sprintbit(ABIL_REQUIRES_TOOL(abil), tool_flags, lbuf, TRUE);
-		sprintf(buf + strlen(buf), "<%stools\t0> %s\r\n", OLC_LABEL_VAL(ABIL_REQUIRES_TOOL(abil), NOBITS), lbuf);
+		build_page_display(ch, "<%stools\t0> %s", OLC_LABEL_VAL(ABIL_REQUIRES_TOOL(abil), NOBITS), lbuf);
 	}
 	
 	if (IS_SET(fields, ABILEDIT_DIFFICULTY)) {
-		sprintf(buf + strlen(buf), "<%sdifficulty\t0> %s\r\n", OLC_LABEL_VAL(ABIL_DIFFICULTY(abil), 0), skill_check_difficulty[ABIL_DIFFICULTY(abil)]);
+		build_page_display(ch, "<%sdifficulty\t0> %s", OLC_LABEL_VAL(ABIL_DIFFICULTY(abil), 0), skill_check_difficulty[ABIL_DIFFICULTY(abil)]);
 	}
 	if (IS_SET(fields, ABILEDIT_WAIT)) {
-		sprintf(buf + strlen(buf), "<%swaittype\t0> %s\r\n", OLC_LABEL_VAL(ABIL_WAIT_TYPE(abil), WAIT_ABILITY), wait_types[ABIL_WAIT_TYPE(abil)]);
+		build_page_display(ch, "<%swaittype\t0> %s", OLC_LABEL_VAL(ABIL_WAIT_TYPE(abil), WAIT_ABILITY), wait_types[ABIL_WAIT_TYPE(abil)]);
 	}
 	if (IS_SET(fields, ABILEDIT_DURATION)) {
 		if (ABIL_SHORT_DURATION(abil) == UNLIMITED) {
-			sprintf(buf + strlen(buf), "<%sshortduration\t0> unlimited, ", OLC_LABEL_CHANGED);
+			line = build_page_display(ch, "<%sshortduration\t0> unlimited, ", OLC_LABEL_CHANGED);
 		}
 		else {
-			sprintf(buf + strlen(buf), "<%sshortduration\t0> %d second%s, ", OLC_LABEL_VAL(ABIL_SHORT_DURATION(abil), 0), ABIL_SHORT_DURATION(abil), PLURAL(ABIL_SHORT_DURATION(abil)));
+			line = build_page_display(ch, "<%sshortduration\t0> %d second%s, ", OLC_LABEL_VAL(ABIL_SHORT_DURATION(abil), 0), ABIL_SHORT_DURATION(abil), PLURAL(ABIL_SHORT_DURATION(abil)));
 		}
 		
 		if (ABIL_LONG_DURATION(abil) == UNLIMITED) {
-			sprintf(buf + strlen(buf), "<%slongduration\t0> unlimited\r\n", OLC_LABEL_CHANGED);
+			append_page_display_line(line, "<%slongduration\t0> unlimited", OLC_LABEL_CHANGED);
 		}
 		else {
-			sprintf(buf + strlen(buf), "<%slongduration\t0> %d second%s\r\n", OLC_LABEL_VAL(ABIL_LONG_DURATION(abil), 0), ABIL_LONG_DURATION(abil), PLURAL(ABIL_LONG_DURATION(abil)));
+			append_page_display_line(line, "<%slongduration\t0> %d second%s", OLC_LABEL_VAL(ABIL_LONG_DURATION(abil), 0), ABIL_LONG_DURATION(abil), PLURAL(ABIL_LONG_DURATION(abil)));
 		}
 	}
 	if (IS_SET(fields, ABILEDIT_AFFECT_VNUM)) {
-		sprintf(buf + strlen(buf), "<%saffectvnum\t0> %d %s\r\n", OLC_LABEL_VAL(ABIL_AFFECT_VNUM(abil), NOTHING), ABIL_AFFECT_VNUM(abil), get_generic_name_by_vnum(ABIL_AFFECT_VNUM(abil)));
+		build_page_display(ch, "<%saffectvnum\t0> %d %s", OLC_LABEL_VAL(ABIL_AFFECT_VNUM(abil), NOTHING), ABIL_AFFECT_VNUM(abil), get_generic_name_by_vnum(ABIL_AFFECT_VNUM(abil)));
 	}
 	if (IS_SET(fields, ABILEDIT_AFFECTS)) {
 		if (IS_SET(ABIL_TYPES(abil), ABILT_ROOM_AFFECT)) {
 			sprintbit(ABIL_AFFECTS(abil), room_aff_bits, lbuf, TRUE);
-			sprintf(buf + strlen(buf), "<%saffects\t0> %s\r\n", OLC_LABEL_VAL(ABIL_AFFECTS(abil), NOBITS), lbuf);
+			build_page_display(ch, "<%saffects\t0> %s", OLC_LABEL_VAL(ABIL_AFFECTS(abil), NOBITS), lbuf);
 		}
 		else {
 			sprintbit(ABIL_AFFECTS(abil), affected_bits, lbuf, TRUE);
-			sprintf(buf + strlen(buf), "<%saffects\t0> %s\r\n", OLC_LABEL_VAL(ABIL_AFFECTS(abil), NOBITS), lbuf);
+			build_page_display(ch, "<%saffects\t0> %s", OLC_LABEL_VAL(ABIL_AFFECTS(abil), NOBITS), lbuf);
 		}
 	}
 	if (IS_SET(fields, ABILEDIT_APPLIES)) {
-		sprintf(buf + strlen(buf), "Applies: <%sapply\t0>\r\n", OLC_LABEL_PTR(ABIL_APPLIES(abil)));
+		build_page_display(ch, "Applies: <%sapply\t0>", OLC_LABEL_PTR(ABIL_APPLIES(abil)));
 		count = 0;
 		LL_FOREACH(ABIL_APPLIES(abil), apply) {
-			sprintf(buf + strlen(buf), " %2d. %d to %s\r\n", ++count, apply->weight, apply_types[apply->location]);
+			build_page_display(ch, " %2d. %d to %s", ++count, apply->weight, apply_types[apply->location]);
 		}
 	}
 	
 	// Attack type, Damage type, Max Stacks line
-	if (IS_SET(fields, ABILEDIT_ATTACK_TYPE)) {
-		sprintf(buf + strlen(buf), "<%sattacktype\t0> %d %s", OLC_LABEL_VAL(ABIL_ATTACK_TYPE(abil), 0), ABIL_ATTACK_TYPE(abil), get_attack_name_by_vnum(ABIL_ATTACK_TYPE(abil)));
-	}
-	if (IS_SET(fields, ABILEDIT_DAMAGE_TYPE)) {
-		sprintf(buf + strlen(buf), "%s<%sdamagetype\t0> %s", (IS_SET(fields, ABILEDIT_ATTACK_TYPE) ? ", " : ""), OLC_LABEL_VAL(ABIL_DAMAGE_TYPE(abil), 0), damage_types[ABIL_DAMAGE_TYPE(abil)]);
-	}
-	if (IS_SET(fields, ABILEDIT_POOL_TYPE)) {
-		sprintf(buf + strlen(buf), "%s<%spooltype\t0> %s", (IS_SET(fields, ABILEDIT_ATTACK_TYPE | ABILEDIT_DAMAGE_TYPE) ? ", " : ""), OLC_LABEL_VAL(ABIL_POOL_TYPE(abil), 0), ABIL_POOL_TYPE(abil) == ANY_POOL ? "any" : pool_types[ABIL_POOL_TYPE(abil)]);
-	}
-	if (IS_SET(fields, ABILEDIT_MOVE_TYPE)) {
-		sprintf(buf + strlen(buf), "%s<%smovetype\t0> %s", (IS_SET(fields, ABILEDIT_ATTACK_TYPE | ABILEDIT_DAMAGE_TYPE | ABILEDIT_POOL_TYPE) ? ", " : ""), OLC_LABEL_VAL(ABIL_MOVE_TYPE(abil), 0), ability_move_types[ABIL_MOVE_TYPE(abil)]);
-	}
-	if (IS_SET(fields, ABILEDIT_MAX_STACKS)) {
-		sprintf(buf + strlen(buf), "%s<%smaxstacks\t0> %d", (IS_SET(fields, ABILEDIT_ATTACK_TYPE | ABILEDIT_DAMAGE_TYPE | ABILEDIT_POOL_TYPE | ABILEDIT_MOVE_TYPE) ? ", " : ""), OLC_LABEL_VAL(ABIL_MAX_STACKS(abil), 1), ABIL_MAX_STACKS(abil));
-	}
 	if (IS_SET(fields, ABILEDIT_ATTACK_TYPE | ABILEDIT_DAMAGE_TYPE | ABILEDIT_MAX_STACKS | ABILEDIT_POOL_TYPE | ABILEDIT_MOVE_TYPE)) {
-		sprintf(buf + strlen(buf), "\r\n");
+		line = build_page_display_str(ch, "");	// start new line with variable fields
+		
+		if (IS_SET(fields, ABILEDIT_ATTACK_TYPE)) {
+			append_page_display_line(line, "<%sattacktype\t0> %d %s", OLC_LABEL_VAL(ABIL_ATTACK_TYPE(abil), 0), ABIL_ATTACK_TYPE(abil), get_attack_name_by_vnum(ABIL_ATTACK_TYPE(abil)));
+		}
+		if (IS_SET(fields, ABILEDIT_DAMAGE_TYPE)) {
+			append_page_display_line(line, "%s<%sdamagetype\t0> %s", (IS_SET(fields, ABILEDIT_ATTACK_TYPE) ? ", " : ""), OLC_LABEL_VAL(ABIL_DAMAGE_TYPE(abil), 0), damage_types[ABIL_DAMAGE_TYPE(abil)]);
+		}
+		if (IS_SET(fields, ABILEDIT_POOL_TYPE)) {
+			append_page_display_line(line, "%s<%spooltype\t0> %s", (IS_SET(fields, ABILEDIT_ATTACK_TYPE | ABILEDIT_DAMAGE_TYPE) ? ", " : ""), OLC_LABEL_VAL(ABIL_POOL_TYPE(abil), 0), ABIL_POOL_TYPE(abil) == ANY_POOL ? "any" : pool_types[ABIL_POOL_TYPE(abil)]);
+		}
+		if (IS_SET(fields, ABILEDIT_MOVE_TYPE)) {
+			append_page_display_line(line, "%s<%smovetype\t0> %s", (IS_SET(fields, ABILEDIT_ATTACK_TYPE | ABILEDIT_DAMAGE_TYPE | ABILEDIT_POOL_TYPE) ? ", " : ""), OLC_LABEL_VAL(ABIL_MOVE_TYPE(abil), 0), ability_move_types[ABIL_MOVE_TYPE(abil)]);
+		}
+		if (IS_SET(fields, ABILEDIT_MAX_STACKS)) {
+			append_page_display_line(line, "%s<%smaxstacks\t0> %d", (IS_SET(fields, ABILEDIT_ATTACK_TYPE | ABILEDIT_DAMAGE_TYPE | ABILEDIT_POOL_TYPE | ABILEDIT_MOVE_TYPE) ? ", " : ""), OLC_LABEL_VAL(ABIL_MAX_STACKS(abil), 1), ABIL_MAX_STACKS(abil));
+		}
 	}
 	
 	// custom messages
-	sprintf(buf + strlen(buf), "Custom messages: <%scustom\t0>\r\n", OLC_LABEL_PTR(ABIL_CUSTOM_MSGS(abil)));
+	build_page_display(ch, "Custom messages: <%scustom\t0>", OLC_LABEL_PTR(ABIL_CUSTOM_MSGS(abil)));
 	count = 0;
 	LL_FOREACH(ABIL_CUSTOM_MSGS(abil), custm) {
-		sprintf(buf + strlen(buf), " \ty%2d\t0. [%s] %s\r\n", ++count, ability_custom_types[custm->type], custm->msg);
+		build_page_display(ch, " \ty%2d\t0. [%s] %s", ++count, ability_custom_types[custm->type], custm->msg);
 	}
 	
 	// hooks
-	sprintf(buf + strlen(buf), "Ability Hooks: <%shook\t0>\r\n", OLC_LABEL_PTR(ABIL_HOOKS(abil)));
+	build_page_display(ch, "Ability Hooks: <%shook\t0>", OLC_LABEL_PTR(ABIL_HOOKS(abil)));
 	count = 0;
 	LL_FOREACH(ABIL_HOOKS(abil), ahook) {
-		sprintf(buf + strlen(buf), " \ty%d\t0. %s\r\n", ++count, ability_hook_display(ahook));
+		build_page_display(ch, " \ty%d\t0. %s", ++count, ability_hook_display(ahook));
 	}
 	
 	// interactions
 	if (IS_SET(fields, ABILEDIT_INTERACTIONS)) {
-		sprintf(buf + strlen(buf), "Interactions: <%sinteraction\t0>\r\n", OLC_LABEL_PTR(ABIL_INTERACTIONS(abil)));
+		build_page_display(ch, "Interactions: <%sinteraction\t0>", OLC_LABEL_PTR(ABIL_INTERACTIONS(abil)));
 		if (ABIL_INTERACTIONS(abil)) {
-			get_interaction_display(ABIL_INTERACTIONS(abil), lbuf);
-			strcat(buf, lbuf);
+			show_interaction_display(ch, ABIL_INTERACTIONS(abil), FALSE);
 		}
 	}
 	
 	// data
-	sprintf(buf + strlen(buf), "Data: <%sdata\t0>\r\n", OLC_LABEL_PTR(ABIL_DATA(abil)));
+	build_page_display(ch, "Data: <%sdata\t0>", OLC_LABEL_PTR(ABIL_DATA(abil)));
 	count = 0;
 	LL_FOREACH(ABIL_DATA(abil), adl) {
-		sprintf(buf + strlen(buf), " \ty%d\t0. %s\r\n", ++count, ability_data_display(adl));
+		build_page_display(ch, " \ty%d\t0. %s", ++count, ability_data_display(adl));
 	}
 	
-	page_string(ch->desc, buf, TRUE);
+	send_page_display(ch);
 }
 
 
@@ -11389,10 +11343,11 @@ int vnum_ability(char *searchname, char_data *ch) {
 	
 	HASH_ITER(hh, ability_table, iter, next_iter) {
 		if (multi_isname(searchname, ABIL_NAME(iter))) {
-			msg_to_char(ch, "%3d. [%5d] %s\r\n", ++found, ABIL_VNUM(iter), ABIL_NAME(iter));
+			build_page_display(ch, "%3d. [%5d] %s", ++found, ABIL_VNUM(iter), ABIL_NAME(iter));
 		}
 	}
 	
+	send_page_display(ch);
 	return found;
 }
 
@@ -11405,10 +11360,10 @@ OLC_MODULE(abiledit_ptech) {
 	char arg[MAX_INPUT_LENGTH], arg1[MAX_INPUT_LENGTH], arg2[MAX_INPUT_LENGTH];
 	half_chop(argument, arg1, arg2);
 	if (is_abbrev(arg1, "add")) {
-		snprintf(arg, sizeof(arg), "%s ptech %s", arg1, arg2);
+		safe_snprintf(arg, sizeof(arg), "%s ptech %s", arg1, arg2);
 	}
 	else {
-		snprintf(arg, sizeof(arg), "%s %s", arg1, arg2);
+		safe_snprintf(arg, sizeof(arg), "%s %s", arg1, arg2);
 	}
 	abiledit_data(ch, type, arg);
 }
@@ -11419,10 +11374,10 @@ OLC_MODULE(abiledit_effect) {
 	char arg[MAX_INPUT_LENGTH], arg1[MAX_INPUT_LENGTH], arg2[MAX_INPUT_LENGTH];
 	half_chop(argument, arg1, arg2);
 	if (is_abbrev(arg1, "add")) {
-		snprintf(arg, sizeof(arg), "%s effect %s", arg1, arg2);
+		safe_snprintf(arg, sizeof(arg), "%s effect %s", arg1, arg2);
 	}
 	else {
-		snprintf(arg, sizeof(arg), "%s %s", arg1, arg2);
+		safe_snprintf(arg, sizeof(arg), "%s %s", arg1, arg2);
 	}
 	abiledit_data(ch, type, arg);
 }
@@ -11433,10 +11388,10 @@ OLC_MODULE(abiledit_ready_weapon) {
 	char arg[MAX_INPUT_LENGTH], arg1[MAX_INPUT_LENGTH], arg2[MAX_INPUT_LENGTH];
 	half_chop(argument, arg1, arg2);
 	if (is_abbrev(arg1, "add")) {
-		snprintf(arg, sizeof(arg), "%s ready-weapon %s", arg1, arg2);
+		safe_snprintf(arg, sizeof(arg), "%s ready-weapon %s", arg1, arg2);
 	}
 	else {
-		snprintf(arg, sizeof(arg), "%s %s", arg1, arg2);
+		safe_snprintf(arg, sizeof(arg), "%s %s", arg1, arg2);
 	}
 	abiledit_data(ch, type, arg);
 }
@@ -11447,10 +11402,10 @@ OLC_MODULE(abiledit_summon_mob) {
 	char arg[MAX_INPUT_LENGTH], arg1[MAX_INPUT_LENGTH], arg2[MAX_INPUT_LENGTH];
 	half_chop(argument, arg1, arg2);
 	if (is_abbrev(arg1, "add")) {
-		snprintf(arg, sizeof(arg), "%s summon-mob %s", arg1, arg2);
+		safe_snprintf(arg, sizeof(arg), "%s summon-mob %s", arg1, arg2);
 	}
 	else {
-		snprintf(arg, sizeof(arg), "%s %s", arg1, arg2);
+		safe_snprintf(arg, sizeof(arg), "%s %s", arg1, arg2);
 	}
 	abiledit_data(ch, type, arg);
 }
@@ -11461,10 +11416,10 @@ OLC_MODULE(abiledit_supercededby) {
 	char arg[MAX_INPUT_LENGTH], arg1[MAX_INPUT_LENGTH], arg2[MAX_INPUT_LENGTH];
 	half_chop(argument, arg1, arg2);
 	if (is_abbrev(arg1, "add")) {
-		snprintf(arg, sizeof(arg), "%s superceded-by %s", arg1, arg2);
+		safe_snprintf(arg, sizeof(arg), "%s superceded-by %s", arg1, arg2);
 	}
 	else {
-		snprintf(arg, sizeof(arg), "%s %s", arg1, arg2);
+		safe_snprintf(arg, sizeof(arg), "%s %s", arg1, arg2);
 	}
 	abiledit_data(ch, type, arg);
 }
@@ -11475,10 +11430,10 @@ OLC_MODULE(abiledit_limitation) {
 	char arg[MAX_INPUT_LENGTH], arg1[MAX_INPUT_LENGTH], arg2[MAX_INPUT_LENGTH];
 	half_chop(argument, arg1, arg2);
 	if (is_abbrev(arg1, "add")) {
-		snprintf(arg, sizeof(arg), "%s limitation %s", arg1, arg2);
+		safe_snprintf(arg, sizeof(arg), "%s limitation %s", arg1, arg2);
 	}
 	else {
-		snprintf(arg, sizeof(arg), "%s %s", arg1, arg2);
+		safe_snprintf(arg, sizeof(arg), "%s %s", arg1, arg2);
 	}
 	abiledit_data(ch, type, arg);
 }
@@ -11489,10 +11444,10 @@ OLC_MODULE(abiledit_paint_color) {
 	char arg[MAX_INPUT_LENGTH], arg1[MAX_INPUT_LENGTH], arg2[MAX_INPUT_LENGTH];
 	half_chop(argument, arg1, arg2);
 	if (is_abbrev(arg1, "add")) {
-		snprintf(arg, sizeof(arg), "%s paint-color %s", arg1, arg2);
+		safe_snprintf(arg, sizeof(arg), "%s paint-color %s", arg1, arg2);
 	}
 	else {
-		snprintf(arg, sizeof(arg), "%s %s", arg1, arg2);
+		safe_snprintf(arg, sizeof(arg), "%s %s", arg1, arg2);
 	}
 	abiledit_data(ch, type, arg);
 }
@@ -11503,10 +11458,10 @@ OLC_MODULE(abiledit_action) {
 	char arg[MAX_INPUT_LENGTH], arg1[MAX_INPUT_LENGTH], arg2[MAX_INPUT_LENGTH];
 	half_chop(argument, arg1, arg2);
 	if (is_abbrev(arg1, "add")) {
-		snprintf(arg, sizeof(arg), "%s action %s", arg1, arg2);
+		safe_snprintf(arg, sizeof(arg), "%s action %s", arg1, arg2);
 	}
 	else {
-		snprintf(arg, sizeof(arg), "%s %s", arg1, arg2);
+		safe_snprintf(arg, sizeof(arg), "%s %s", arg1, arg2);
 	}
 	abiledit_data(ch, type, arg);
 }
@@ -11517,13 +11472,13 @@ OLC_MODULE(abiledit_range) {
 	char arg[MAX_INPUT_LENGTH], arg1[MAX_INPUT_LENGTH], arg2[MAX_INPUT_LENGTH];
 	half_chop(argument, arg1, arg2);
 	if (is_abbrev(arg1, "add")) {
-		snprintf(arg, sizeof(arg), "%s range %s", arg1, arg2);
+		safe_snprintf(arg, sizeof(arg), "%s range %s", arg1, arg2);
 	}
 	else if (isdigit(*argument)) {
-		snprintf(arg, sizeof(arg), "add range %s", argument);
+		safe_snprintf(arg, sizeof(arg), "add range %s", argument);
 	}
 	else {
-		snprintf(arg, sizeof(arg), "%s %s", arg1, arg2);
+		safe_snprintf(arg, sizeof(arg), "%s %s", arg1, arg2);
 	}
 	abiledit_data(ch, type, arg);
 }
@@ -11534,10 +11489,10 @@ OLC_MODULE(abiledit_parent) {
 	char arg[MAX_INPUT_LENGTH], arg1[MAX_INPUT_LENGTH], arg2[MAX_INPUT_LENGTH];
 	half_chop(argument, arg1, arg2);
 	if (is_abbrev(arg1, "add")) {
-		snprintf(arg, sizeof(arg), "%s parent %s", arg1, arg2);
+		safe_snprintf(arg, sizeof(arg), "%s parent %s", arg1, arg2);
 	}
 	else {
-		snprintf(arg, sizeof(arg), "%s %s", arg1, arg2);
+		safe_snprintf(arg, sizeof(arg), "%s %s", arg1, arg2);
 	}
 	abiledit_data(ch, type, arg);
 }

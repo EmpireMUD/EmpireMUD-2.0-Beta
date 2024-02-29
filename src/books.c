@@ -716,21 +716,21 @@ LIBRARY_SCMD(library_browse) {
 	int count = 0;
 
 	if (ch->desc) {
-		sprintf(buf, "Books shelved here:\r\n");
+		build_page_display(ch, "Books shelved here:");
 		
 		if ((library = find_library(GET_ROOM_VNUM(IN_ROOM(ch)), FALSE))) {
 			HASH_ITER(hh, library->books, libbook, next) {
 				if ((book = book_proto(libbook->vnum))) {
-					sprintf(buf + strlen(buf), "%d. %s\t0 (%s\t0)\r\n", ++count, BOOK_TITLE(book), BOOK_BYLINE(book));
+					build_page_display(ch, "%d. %s\t0 (%s\t0)", ++count, BOOK_TITLE(book), BOOK_BYLINE(book));
 				}
 			}
 		}
 	
 		if (count == 0) {
-			strcat(buf, "  none\r\n");
+			build_page_display_str(ch, "  none");
 		}
 		
-		page_string(ch->desc, buf, TRUE);
+		send_page_display(ch);
 	}	
 	else {
 		// no desc?

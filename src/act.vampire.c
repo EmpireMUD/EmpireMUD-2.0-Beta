@@ -114,7 +114,7 @@ void cancel_blood_upkeeps(char_data *ch, bool send_msgs) {
 				}
 				
 				msg_to_char(ch, "Your %s effect fades.\r\n", get_generic_name_by_vnum(aff->type));
-				snprintf(buf, sizeof(buf), "$n's %s effect fades.", get_generic_name_by_vnum(aff->type));
+				safe_snprintf(buf, sizeof(buf), "$n's %s effect fades.", get_generic_name_by_vnum(aff->type));
 				act(buf, TRUE, ch, NULL, NULL, TO_ROOM);
 				
 				affect_from_char(ch, aff->type, FALSE);
@@ -478,7 +478,7 @@ bool starving_vampire_aggro(char_data *ch) {
 		}
 		
 		// going to try to drink from it
-		snprintf(arg, sizeof(arg), "%d.%s", count, fname(GET_OBJ_KEYWORDS(obj)));
+		safe_snprintf(arg, sizeof(arg), "%d.%s", count, fname(GET_OBJ_KEYWORDS(obj)));
 		do_drink(ch, arg, 0, 0);
 	}
 	

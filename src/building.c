@@ -1163,7 +1163,7 @@ void process_build(char_data *ch, room_data *room, int act_type) {
 				// copy this to display the next 1
 				temp_res = *BUILDING_RESOURCES(room);
 				temp_res.next = NULL;
-				show_resource_list(&temp_res, buf);
+				show_resource_list(&temp_res, buf, sizeof(buf));
 				msg_to_char(ch, "You don't have %s and stop working.\r\n", buf);
 			}
 			else {
@@ -1217,37 +1217,37 @@ void process_dismantling(char_data *ch, room_data *room) {
 		switch (res->type) {
 			// RES_COMPONENT (stored as obj), RES_ACTION, RES_TOOL (stored as obj), and RES_CURRENCY aren't possible here
 			case RES_OBJECT: {
-				snprintf(buf, sizeof(buf), "You carefully remove %s from the structure.", get_obj_name_by_proto(res->vnum));
+				safe_snprintf(buf, sizeof(buf), "You carefully remove %s from the structure.", get_obj_name_by_proto(res->vnum));
 				act(buf, FALSE, ch, NULL, NULL, TO_CHAR | TO_SPAMMY);
-				snprintf(buf, sizeof(buf), "$n removes %s from the structure.", get_obj_name_by_proto(res->vnum));
+				safe_snprintf(buf, sizeof(buf), "$n removes %s from the structure.", get_obj_name_by_proto(res->vnum));
 				act(buf, FALSE, ch, NULL, NULL, TO_ROOM | TO_SPAMMY);
 				break;
 			}
 			case RES_LIQUID: {
-				snprintf(buf, sizeof(buf), "You carefully retrieve %d unit%s of %s from the structure.", res->amount, PLURAL(res->amount), get_generic_string_by_vnum(res->vnum, GENERIC_LIQUID, GSTR_LIQUID_NAME));
+				safe_snprintf(buf, sizeof(buf), "You carefully retrieve %d unit%s of %s from the structure.", res->amount, PLURAL(res->amount), get_generic_string_by_vnum(res->vnum, GENERIC_LIQUID, GSTR_LIQUID_NAME));
 				act(buf, FALSE, ch, NULL, NULL, TO_CHAR | TO_SPAMMY);
-				snprintf(buf, sizeof(buf), "$n retrieves some %s from the structure.", get_generic_string_by_vnum(res->vnum, GENERIC_LIQUID, GSTR_LIQUID_NAME));
+				safe_snprintf(buf, sizeof(buf), "$n retrieves some %s from the structure.", get_generic_string_by_vnum(res->vnum, GENERIC_LIQUID, GSTR_LIQUID_NAME));
 				act(buf, FALSE, ch, NULL, NULL, TO_ROOM | TO_SPAMMY);
 				break;
 			}
 			case RES_COINS: {
-				snprintf(buf, sizeof(buf), "You retrieve %s from the structure.", money_amount(real_empire(res->vnum), res->amount));
+				safe_snprintf(buf, sizeof(buf), "You retrieve %s from the structure.", money_amount(real_empire(res->vnum), res->amount));
 				act(buf, FALSE, ch, NULL, NULL, TO_CHAR | TO_SPAMMY);
-				snprintf(buf, sizeof(buf), "$n retrieves %s from the structure.", res->amount == 1 ? "a coin" : "some coins");
+				safe_snprintf(buf, sizeof(buf), "$n retrieves %s from the structure.", res->amount == 1 ? "a coin" : "some coins");
 				act(buf, FALSE, ch, NULL, NULL, TO_ROOM | TO_SPAMMY);
 				break;
 			}
 			case RES_POOL: {
-				snprintf(buf, sizeof(buf), "You regain %d %s point%s from the structure.", res->amount, pool_types[res->vnum], PLURAL(res->amount));
+				safe_snprintf(buf, sizeof(buf), "You regain %d %s point%s from the structure.", res->amount, pool_types[res->vnum], PLURAL(res->amount));
 				act(buf, FALSE, ch, NULL, NULL, TO_CHAR | TO_SPAMMY);
-				snprintf(buf, sizeof(buf), "$n retrieves %s from the structure.", pool_types[res->vnum]);
+				safe_snprintf(buf, sizeof(buf), "$n retrieves %s from the structure.", pool_types[res->vnum]);
 				act(buf, FALSE, ch, NULL, NULL, TO_ROOM | TO_SPAMMY);
 				break;
 			}
 			case RES_CURRENCY: {
-				snprintf(buf, sizeof(buf), "You retrieve %d %s from the structure.", res->amount, get_generic_string_by_vnum(res->vnum, GENERIC_CURRENCY, WHICH_CURRENCY(res->amount)));
+				safe_snprintf(buf, sizeof(buf), "You retrieve %d %s from the structure.", res->amount, get_generic_string_by_vnum(res->vnum, GENERIC_CURRENCY, WHICH_CURRENCY(res->amount)));
 				act(buf, FALSE, ch, NULL, NULL, TO_CHAR | TO_SPAMMY);
-				snprintf(buf, sizeof(buf), "$n retrieves %d %s from the structure.", res->amount, get_generic_string_by_vnum(res->vnum, GENERIC_CURRENCY, WHICH_CURRENCY(res->amount)));
+				safe_snprintf(buf, sizeof(buf), "$n retrieves %d %s from the structure.", res->amount, get_generic_string_by_vnum(res->vnum, GENERIC_CURRENCY, WHICH_CURRENCY(res->amount)));
 				act(buf, FALSE, ch, NULL, NULL, TO_ROOM | TO_SPAMMY);
 				break;
 			}
@@ -2526,7 +2526,7 @@ ACMD(do_dedicate) {
 		sprintf(buf, "$n dedicates the building to %s!", index->fullname);
 		set_room_extra_data(ded_room, ROOM_EXTRA_DEDICATE_ID, index->idnum);
 		
-		snprintf(buf, sizeof(buf), "%s of %s", get_room_name(ded_room, FALSE), index->fullname);
+		safe_snprintf(buf, sizeof(buf), "%s of %s", get_room_name(ded_room, FALSE), index->fullname);
 		
 		was_custom = ROOM_CUSTOM_NAME(ded_room) ? FALSE : TRUE;
 		set_room_custom_name(ded_room, buf);
@@ -2538,20 +2538,20 @@ ACMD(do_dedicate) {
 		affect_total_room(ded_room);
 	}
 	if (ded_veh) {
-		snprintf(buf, sizeof(buf), "You dedicate $V to %s!", index->fullname);
+		safe_snprintf(buf, sizeof(buf), "You dedicate $V to %s!", index->fullname);
 		act(buf, FALSE, ch, NULL, ded_veh, TO_CHAR | ACT_VEH_VICT);
-		snprintf(buf, sizeof(buf), "$n dedicates $V to %s!", index->fullname);
+		safe_snprintf(buf, sizeof(buf), "$n dedicates $V to %s!", index->fullname);
 		act(buf, FALSE, ch, NULL, ded_veh, TO_ROOM | ACT_VEH_VICT);
 		set_vehicle_extra_data(ded_veh, ROOM_EXTRA_DEDICATE_ID, index->idnum);
 		
 		// update strs:
 		
 		// keywords
-		snprintf(buf, sizeof(buf), "%s %s", VEH_KEYWORDS(ded_veh), index->fullname);
+		safe_snprintf(buf, sizeof(buf), "%s %s", VEH_KEYWORDS(ded_veh), index->fullname);
 		set_vehicle_keywords(ded_veh, buf);
 		
 		// short desc
-		snprintf(buf, sizeof(buf), "%s of %s", VEH_SHORT_DESC(ded_veh), index->fullname);
+		safe_snprintf(buf, sizeof(buf), "%s of %s", VEH_SHORT_DESC(ded_veh), index->fullname);
 		set_vehicle_short_desc(ded_veh, buf);
 	}
 }

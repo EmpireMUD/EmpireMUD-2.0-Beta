@@ -703,7 +703,7 @@ void index_boot_crops(void) {
 	
 	fscanf(index, "%s\n", buf);
 	while (*buf != '$') {
-		snprintf(filename, sizeof(filename), "%s%s", CROP_PREFIX, buf);
+		safe_snprintf(filename, sizeof(filename), "%s%s", CROP_PREFIX, buf);
 		if (!(db_file = fopen(filename, "r"))) {
 			printf("ERROR: %s: %s\n", filename, strerror(errno));
 			exit(1);
@@ -940,7 +940,7 @@ void index_boot_sectors(void) {
 	
 	fscanf(index, "%s\n", buf);
 	while (*buf != '$') {
-		snprintf(filename, sizeof(filename), "%s%s", SECTOR_PREFIX, buf);
+		safe_snprintf(filename, sizeof(filename), "%s%s", SECTOR_PREFIX, buf);
 		if (!(db_file = fopen(filename, "r"))) {
 			printf("ERROR: %s: %s\n", filename, strerror(errno));
 			exit(1);

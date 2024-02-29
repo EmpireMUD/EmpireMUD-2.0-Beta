@@ -1459,7 +1459,7 @@ typedef struct vehicle_data vehicle_data;
 #define ACTION_CYCLE_SECOND  2	// how many action cycles is 1 second
 #define ACTION_CYCLE_HALF_SEC  1	// how many action cycles is half a second
 #define DOT_INTERVAL  5	// seconds per tick for damage-over-time
-#define HISTORY_SIZE  5	// Keep last 5 commands.
+#define HISTORY_SIZE  20	// Keep last 20 commands.
 #define MOB_RESTORE_INTERVAL  60	// seconds between when a mob loses health and when it starts checking to restore itself
 #define WORKFORCE_CYCLE  75	// seconds between workforce chore updates
 #define WORKFORCE_LOG_AND_NEEDS_CYCLE  (30 * SECS_PER_REAL_MIN)	// how often it will update workforce logs and needs
@@ -3478,6 +3478,15 @@ struct offer_data {
 };
 
 
+// for building page displays without overrunning the buffer
+struct page_display {
+	char *text;	// the line of text (without crlf, which is added automatically)
+	int length;	// length of the text
+	int cols;	// if columns were requested, how many (usually 0 / no cols)
+	struct page_display *prev, *next;	// linked list
+};
+
+
 // simple structure for passing around a hash of number pairs { id, value }
 struct pair_hash {
 	int id;
@@ -4530,6 +4539,7 @@ struct descriptor_data {
 	int showstr_count;	// number of pages to page through
 	int showstr_page;	// which page are we currently showing?
 	struct stack_msg *stack_msg_list;	// queued stackable messages
+	struct page_display *page_lines;	// DLL of lines preparing to be sent
 	
 	protocol_t *pProtocol; // see protocol.c
 	struct color_reducer color;

@@ -1733,6 +1733,18 @@ static inline int GET_SEASON(room_data *room) {
 #define ONOFF(a) ((a) ? "ON" : "OFF")
 
 
+// version of snprintf that checks output and logs
+#define safe_snprintf(buffer, bsize, args...)	do {		\
+		int _safe_snprintf_res = snprintf((buffer), (bsize), args);		\
+		if (_safe_snprintf_res < 0) {		\
+			log("Warning: snprintf got error result %d when writing to a buffer of size %lu in %s:%d", _safe_snprintf_res + 1, (unsigned long) bsize, __FILE__, __LINE__);		\
+		}		\
+		else if (_safe_snprintf_res >= (bsize)) {		\
+			log("Warning: snprintf tried to write %d to a buffer of size %lu in %s:%d", _safe_snprintf_res + 1, (unsigned long) bsize, __FILE__, __LINE__);		\
+		}		\
+	} while (0)
+
+
  //////////////////////////////////////////////////////////////////////////////
 //// VEHICLE UTILS ///////////////////////////////////////////////////////////
 
@@ -2015,7 +2027,7 @@ char *get_resource_name(struct resource_data *res);
 void give_resources(char_data *ch, struct resource_data *list, bool split);
 bool has_resources(char_data *ch, struct resource_data *list, bool ground, bool send_msgs, char *msg_prefix);
 void reduce_dismantle_resources(int damage, int max_health, struct resource_data **list);
-void show_resource_list(struct resource_data *list, char *save_buffer);
+void show_resource_list(struct resource_data *list, char *save_buffer, size_t buf_size);
 
 // sector functions from utils.c
 sector_data *get_sect_by_name(char *name);
@@ -2148,24 +2160,25 @@ void show_workforce_setup_to_char(empire_data *emp, char_data *ch);
 // act.immortal.c
 void perform_autostore(obj_data *obj, empire_data *emp, int island);
 void perform_immort_vis(char_data *ch);
-void show_spawn_summary_to_char(char_data *ch, struct spawn_info *list);
+void show_spawn_summary_display(char_data *ch, bool use_page_display, struct spawn_info *list);
 
 // act.informative.c
-void diag_char_to_char(char_data *i, char_data *ch);
-void display_attributes(char_data *ch, char_data *to);
+void diag_char_to_char(char_data *i, char_data *ch, bool use_page_display);
+char *display_attributes(char_data *ch);
 void display_tip_to_char(char_data *ch);
 char *find_exdesc(char *word, struct extra_descr_data *list, int *number);
 char *find_exdesc_for_char(char_data *ch, char *word, int *number, obj_data **found_obj, vehicle_data **found_veh, room_data **found_room);
 char *get_obj_desc(obj_data *obj, char_data *ch, int mode);
 void get_player_skill_string(char_data *ch, char *buffer, bool abbrev);
 void list_char_to_char(char_data *list, char_data *ch);
-void list_obj_to_char(obj_data *list, char_data *ch, int mode, int show);
+void list_obj_to_char(obj_data *list, char_data *ch, int mode, bool show_empty, bool use_page_display);
 void list_vehicles_to_char(vehicle_data *list, char_data *ch, bool large_only, vehicle_data *exclude);
 char *obj_color_by_quality(obj_data *obj, char_data *ch);
 char *obj_desc_for_char(obj_data *obj, char_data *ch, int mode);
 struct custom_message *pick_custom_longdesc(char_data *ch);
-void show_character_affects(char_data *ch, char_data *to);
-bool show_local_einv(char_data *ch, room_data *room, bool thief_mode);
+void show_character_affects(char_data *ch, char_data *to, bool send_output);
+void show_coins_and_currency(char_data *ch, char_data *to, char *argument, bool coins_only, bool send_page);
+bool show_local_einv(char_data *ch, room_data *room, bool thief_mode, bool use_page_display);
 void survey_city(char_data *ch, char *argument);
 
 // act.item.c
@@ -2220,7 +2233,6 @@ void count_quest_tasks(struct req_data *list, int *complete, int *total);
 void drop_quest(char_data *ch, struct player_quest *pq);
 bool fail_daily_quests(char_data *ch, bool event);
 struct instance_data *find_matching_instance_for_shared_quest(char_data *ch, any_vnum quest_vnum);
-void show_quest_tracker(char_data *ch, struct player_quest *pq);
 void start_quest(char_data *ch, quest_data *qst, struct instance_data *inst);
 
 // act.social.c
@@ -2569,8 +2581,8 @@ void extract_crop_variety(char_data *ch, int amount);
 bool find_quest_giver_in_list(struct quest_giver *list, int type, any_vnum vnum);
 bool find_quest_reward_in_list(struct quest_reward *list, int type, any_vnum vnum);
 char *get_quest_name_by_proto(any_vnum vnum);
-void get_quest_reward_display(struct quest_reward *list, char *save_buffer, bool show_vnums);
-void get_tracker_display(struct req_data *tracker, char *save_buffer);
+void show_quest_reward_display(char_data *ch, struct quest_reward *list, bool show_vnums, bool send_output);
+void show_tracker_display(char_data *ch, struct req_data *tracker, bool send_output);
 void give_quest_rewards(char_data *ch, struct quest_reward *list, int reward_level, empire_data *quest_giver_emp, int instance_id);
 struct player_completed_quest *has_completed_quest(char_data *ch, any_vnum quest, int instance_id);
 struct player_completed_quest *has_completed_quest_any(char_data *ch, any_vnum quest);
@@ -2682,7 +2694,7 @@ char *get_vehicle_name_by_proto(obj_vnum vnum);
 char *get_vehicle_short_desc(vehicle_data *veh, char_data *to);
 void harness_mob_to_vehicle(char_data *mob, vehicle_data *veh);
 char *list_harnessed_mobs(vehicle_data *veh);
-void look_at_vehicle(vehicle_data *veh, char_data *ch);
+void look_at_vehicle(vehicle_data *veh, char_data *ch, bool send_page);
 void process_dismantle_vehicle(char_data *ch);
 void remove_room_from_vehicle(room_data *room, vehicle_data *veh);
 void ruin_vehicle(vehicle_data *veh, char *message);

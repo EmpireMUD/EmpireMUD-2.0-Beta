@@ -41,7 +41,7 @@ const int default_max_rep = REP_REVERED;
 const int default_starting_rep = REP_NEUTRAL;
 
 // local protos
-void get_faction_relation_display(struct faction_relation *list, char *save_buffer);
+void show_faction_relation_display(char_data *ch, struct faction_relation *list, bool send_output);
 
 
  /////////////////////////////////////////////////////////////////////////////
@@ -242,10 +242,10 @@ char *list_one_faction(faction_data *fct, bool detail) {
 	static char output[MAX_STRING_LENGTH];
 	
 	if (detail) {
-		snprintf(output, sizeof(output), "[%5d] %s", FCT_VNUM(fct), FCT_NAME(fct));
+		safe_snprintf(output, sizeof(output), "[%5d] %s", FCT_VNUM(fct), FCT_NAME(fct));
 	}
 	else {
-		snprintf(output, sizeof(output), "[%5d] %s", FCT_VNUM(fct), FCT_NAME(fct));
+		safe_snprintf(output, sizeof(output), "[%5d] %s", FCT_VNUM(fct), FCT_NAME(fct));
 	}
 		
 	return output;
@@ -259,7 +259,6 @@ char *list_one_faction(faction_data *fct, bool detail) {
 * @param any_vnum vnum The faction vnum.
 */
 void olc_search_faction(char_data *ch, any_vnum vnum) {
-	char buf[MAX_STRING_LENGTH];
 	faction_data *fct = find_faction_by_vnum(vnum);
 	faction_data *iter, *next_iter, *find;
 	quest_data *qiter, *next_qiter;
@@ -268,7 +267,7 @@ void olc_search_faction(char_data *ch, any_vnum vnum) {
 	social_data *soc, *next_soc;
 	shop_data *shop, *next_shop;
 	char_data *mob, *next_mob;
-	int size, found;
+	int found;
 	bool any;
 	
 	if (!fct) {
@@ -277,20 +276,17 @@ void olc_search_faction(char_data *ch, any_vnum vnum) {
 	}
 	
 	found = 0;
-	size = snprintf(buf, sizeof(buf), "Occurrences of faction %d (%s):\r\n", vnum, FCT_NAME(fct));
+	build_page_display(ch, "Occurrences of faction %d (%s):", vnum, FCT_NAME(fct));
 	
 	// events
 	HASH_ITER(hh, event_table, event, next_event) {
-		if (size >= sizeof(buf)) {
-			break;
-		}
 		// QR_x: event rewards
 		any = find_event_reward_in_list(EVT_RANK_REWARDS(event), QR_REPUTATION, vnum);
 		any |= find_event_reward_in_list(EVT_THRESHOLD_REWARDS(event), QR_REPUTATION, vnum);
 		
 		if (any) {
 			++found;
-			size += snprintf(buf + size, sizeof(buf) - size, "EVT [%5d] %s\r\n", EVT_VNUM(event), EVT_NAME(event));
+			build_page_display(ch, "EVT [%5d] %s", EVT_VNUM(event), EVT_NAME(event));
 		}
 	}
 	
@@ -299,7 +295,7 @@ void olc_search_faction(char_data *ch, any_vnum vnum) {
 		HASH_FIND_INT(FCT_RELATIONS(iter), &FCT_VNUM(fct), find);
 		if (find) {
 			++found;
-			size += snprintf(buf + size, sizeof(buf) - size, "FCT [%5d] %s\r\n", FCT_VNUM(iter), FCT_NAME(iter));
+			build_page_display(ch, "FCT [%5d] %s", FCT_VNUM(iter), FCT_NAME(iter));
 		}
 	}
 	
@@ -307,30 +303,24 @@ void olc_search_faction(char_data *ch, any_vnum vnum) {
 	HASH_ITER(hh, mobile_table, mob, next_mob) {
 		if (MOB_FACTION(mob) == fct) {
 			++found;
-			size += snprintf(buf + size, sizeof(buf) - size, "MOB [%5d] %s\r\n", GET_MOB_VNUM(mob), GET_SHORT_DESC(mob));
+			build_page_display(ch, "MOB [%5d] %s", GET_MOB_VNUM(mob), GET_SHORT_DESC(mob));
 		}
 	}
 	
 	// progress
 	HASH_ITER(hh, progress_table, prg, next_prg) {
-		if (size >= sizeof(buf)) {
-			break;
-		}
 		// REQ_x: requirement search
 		any = find_requirement_in_list(PRG_TASKS(prg), REQ_REP_OVER, vnum);
 		any |= find_requirement_in_list(PRG_TASKS(prg), REQ_REP_UNDER, vnum);
 		
 		if (any) {
 			++found;
-			size += snprintf(buf + size, sizeof(buf) - size, "PRG [%5d] %s\r\n", PRG_VNUM(prg), PRG_NAME(prg));
+			build_page_display(ch, "PRG [%5d] %s", PRG_VNUM(prg), PRG_NAME(prg));
 		}
 	}
 	
 	// check quests
 	HASH_ITER(hh, quest_table, qiter, next_qiter) {
-		if (size >= sizeof(buf)) {
-			break;
-		}
 		// QR_x, REQ_x: quest types
 		any = find_requirement_in_list(QUEST_TASKS(qiter), REQ_REP_OVER, vnum);
 		any |= find_requirement_in_list(QUEST_PREREQS(qiter), REQ_REP_OVER, vnum);
@@ -340,45 +330,38 @@ void olc_search_faction(char_data *ch, any_vnum vnum) {
 		
 		if (any) {
 			++found;
-			size += snprintf(buf + size, sizeof(buf) - size, "QST [%5d] %s\r\n", QUEST_VNUM(qiter), QUEST_NAME(qiter));
+			build_page_display(ch, "QST [%5d] %s", QUEST_VNUM(qiter), QUEST_NAME(qiter));
 		}
 	}
 	
 	// check shops
 	HASH_ITER(hh, shop_table, shop, next_shop) {
-		if (size >= sizeof(buf)) {
-			break;
-		}
-		
 		if (SHOP_ALLEGIANCE(shop) == fct) {
 			++found;
-			size += snprintf(buf + size, sizeof(buf) - size, "SHOP [%5d] %s\r\n", SHOP_VNUM(shop), SHOP_NAME(shop));
+			build_page_display(ch, "SHOP [%5d] %s", SHOP_VNUM(shop), SHOP_NAME(shop));
 		}
 	}
 	
 	// check socials
 	HASH_ITER(hh, social_table, soc, next_soc) {
-		if (size >= sizeof(buf)) {
-			break;
-		}
 		// REQ_x: requirements
 		any = find_requirement_in_list(SOC_REQUIREMENTS(soc), REQ_REP_OVER, vnum);
 		any |= find_requirement_in_list(SOC_REQUIREMENTS(soc), REQ_REP_UNDER, vnum);
 		
 		if (any) {
 			++found;
-			size += snprintf(buf + size, sizeof(buf) - size, "SOC [%5d] %s\r\n", SOC_VNUM(soc), SOC_NAME(soc));
+			build_page_display(ch, "SOC [%5d] %s", SOC_VNUM(soc), SOC_NAME(soc));
 		}
 	}
 	
 	if (found > 0) {
-		size += snprintf(buf + size, sizeof(buf) - size, "%d location%s shown\r\n", found, PLURAL(found));
+		build_page_display(ch, "%d location%s shown", found, PLURAL(found));
 	}
 	else {
-		size += snprintf(buf + size, sizeof(buf) - size, " none\r\n");
+		build_page_display_str(ch, " none");
 	}
 	
-	page_string(ch->desc, buf, TRUE);
+	send_page_display(ch);
 }
 
 
@@ -1072,7 +1055,7 @@ void olc_delete_faction(char_data *ch, any_vnum vnum) {
 		return;
 	}
 	
-	snprintf(name, sizeof(name), "%s", NULLSAFE(FCT_NAME(fct)));
+	safe_snprintf(name, sizeof(name), "%s", NULLSAFE(FCT_NAME(fct)));
 	
 	// remove it from the hash table first
 	remove_faction_from_table(fct);
@@ -1352,45 +1335,47 @@ faction_data *setup_olc_faction(faction_data *input) {
 * @param faction_data *fct The faction to display.
 */
 void do_stat_faction(char_data *ch, faction_data *fct) {
-	char buf[MAX_STRING_LENGTH], part[MAX_STRING_LENGTH];
-	size_t size;
+	char part[MAX_STRING_LENGTH];
 	
 	if (!fct) {
 		return;
 	}
 	
 	// first line
-	size = snprintf(buf, sizeof(buf), "VNum: [\tc%d\t0], Name: \tc%s\t0\r\n%s", FCT_VNUM(fct), FCT_NAME(fct), NULLSAFE(FCT_DESCRIPTION(fct)));
-	size += snprintf(buf + size, sizeof(buf) - size, "Min Reputation: \ty%s\t0, Max Reputation: \ty%s\t0, Starting Reputation: \ty%s\t0\r\n", get_reputation_name(FCT_MIN_REP(fct)), get_reputation_name(FCT_MAX_REP(fct)), get_reputation_name(FCT_STARTING_REP(fct)));
+	build_page_display(ch, "VNum: [\tc%d\t0], Name: \tc%s\t0\r\n%s", FCT_VNUM(fct), FCT_NAME(fct), NULLSAFE(FCT_DESCRIPTION(fct)));
+	build_page_display(ch, "Min Reputation: \ty%s\t0, Max Reputation: \ty%s\t0, Starting Reputation: \ty%s\t0", get_reputation_name(FCT_MIN_REP(fct)), get_reputation_name(FCT_MAX_REP(fct)), get_reputation_name(FCT_STARTING_REP(fct)));
 	
 	sprintbit(FCT_FLAGS(fct), faction_flags, part, TRUE);
-	size += snprintf(buf + size, sizeof(buf) - size, "Flags: \tg%s\t0\r\n", part);
+	build_page_display(ch, "Flags: \tg%s\t0", part);
 	
-	get_faction_relation_display(FCT_RELATIONS(fct), part);
-	size += snprintf(buf + size, sizeof(buf) - size, "Relations:\r\n%s", part);
+	build_page_display_str(ch, "Relations:");
+	show_faction_relation_display(ch, FCT_RELATIONS(fct), FALSE);
 	
-	page_string(ch->desc, buf, TRUE);
+	send_page_display(ch);
 }
 
 
 /**
-* Gets the faction relation display for olc, stat, or other uses.
+* Shows the faction relation display for olc, stat, or other uses.
 *
+* @param char_data *ch The person viewing it.
 * @param struct faction_relation *list The list of relations to display.
-* @param char *save_buffer A buffer to store the display to.
+* @param bool send_output If TRUE, sends the page_display as text when done. Pass FALSE if you're building a larger page_display for the character.
 */
-void get_faction_relation_display(struct faction_relation *list, char *save_buffer) {
+void show_faction_relation_display(char_data *ch, struct faction_relation *list, bool send_output) {
 	struct faction_relation *iter, *next_iter;
 	char lbuf[MAX_STRING_LENGTH];
 	
-	*save_buffer = '\0';
-	
 	HASH_ITER(hh, list, iter, next_iter) {
 		sprintbit(iter->flags, relationship_flags, lbuf, TRUE);
-		sprintf(save_buffer + strlen(save_buffer), " [%5d] %s - %s\r\n", iter->vnum, FCT_NAME(iter->ptr), lbuf);
+		build_page_display(ch, " [%5d] %s - %s", iter->vnum, FCT_NAME(iter->ptr), lbuf);
 	}
 	if (!list) {
-		strcpy(save_buffer, " none\r\n");
+		build_page_display_str(ch, " none");
+	}
+	
+	if (send_output) {
+		send_page_display_as(ch, PD_NO_PAGINATION | PD_FREE_DISPLAY_AFTER);
 	}
 }
 
@@ -1403,29 +1388,29 @@ void get_faction_relation_display(struct faction_relation *list, char *save_buff
 */
 void olc_show_faction(char_data *ch) {
 	faction_data *fct = GET_OLC_FACTION(ch->desc);
-	char buf[MAX_STRING_LENGTH], lbuf[MAX_STRING_LENGTH];
+	char lbuf[MAX_STRING_LENGTH];
 	
 	if (!fct) {
 		return;
 	}
 	
-	*buf = '\0';
-	
-	sprintf(buf + strlen(buf), "[%s%d\t0] %s%s\t0\r\n", OLC_LABEL_CHANGED, GET_OLC_VNUM(ch->desc), OLC_LABEL_UNCHANGED, !find_faction_by_vnum(FCT_VNUM(fct)) ? "new faction" : FCT_NAME(find_faction_by_vnum(FCT_VNUM(fct))));
-	sprintf(buf + strlen(buf), "<%sname\t0> %s\r\n", OLC_LABEL_STR(FCT_NAME(fct), default_faction_name), NULLSAFE(FCT_NAME(fct)));
-	sprintf(buf + strlen(buf), "<%sdescription\t0>\r\n%s", OLC_LABEL_STR(FCT_DESCRIPTION(fct), ""), NULLSAFE(FCT_DESCRIPTION(fct)));
+	build_page_display(ch, "[%s%d\t0] %s%s\t0", OLC_LABEL_CHANGED, GET_OLC_VNUM(ch->desc), OLC_LABEL_UNCHANGED, !find_faction_by_vnum(FCT_VNUM(fct)) ? "new faction" : FCT_NAME(find_faction_by_vnum(FCT_VNUM(fct))));
+	build_page_display(ch, "<%sname\t0> %s", OLC_LABEL_STR(FCT_NAME(fct), default_faction_name), NULLSAFE(FCT_NAME(fct)));
+	build_page_display(ch, "<%sdescription\t0>\r\n%s", OLC_LABEL_STR(FCT_DESCRIPTION(fct), ""), NULLSAFE(FCT_DESCRIPTION(fct)));
 	
 	sprintbit(FCT_FLAGS(fct), faction_flags, lbuf, TRUE);
-	sprintf(buf + strlen(buf), "<%sflags\t0> %s\r\n", OLC_LABEL_VAL(FCT_FLAGS(fct), FCT_IN_DEVELOPMENT), lbuf);
+	build_page_display(ch, "<%sflags\t0> %s", OLC_LABEL_VAL(FCT_FLAGS(fct), FCT_IN_DEVELOPMENT), lbuf);
 	
-	sprintf(buf + strlen(buf), "<%sminreputation\t0> %s\r\n", OLC_LABEL_VAL(FCT_MIN_REP(fct), default_min_rep), get_reputation_name(FCT_MIN_REP(fct)));
-	sprintf(buf + strlen(buf), "<%smaxreputation\t0> %s\r\n", OLC_LABEL_VAL(FCT_MAX_REP(fct), default_max_rep), get_reputation_name(FCT_MAX_REP(fct)));
-	sprintf(buf + strlen(buf), "<%sstartingreuptation\t0> %s\r\n", OLC_LABEL_VAL(FCT_STARTING_REP(fct), default_starting_rep), get_reputation_name(FCT_STARTING_REP(fct)));
+	build_page_display(ch, "<%sminreputation\t0> %s", OLC_LABEL_VAL(FCT_MIN_REP(fct), default_min_rep), get_reputation_name(FCT_MIN_REP(fct)));
+	build_page_display(ch, "<%smaxreputation\t0> %s", OLC_LABEL_VAL(FCT_MAX_REP(fct), default_max_rep), get_reputation_name(FCT_MAX_REP(fct)));
+	build_page_display(ch, "<%sstartingreuptation\t0> %s", OLC_LABEL_VAL(FCT_STARTING_REP(fct), default_starting_rep), get_reputation_name(FCT_STARTING_REP(fct)));
 	
-	get_faction_relation_display(FCT_RELATIONS(fct), lbuf);
-	sprintf(buf + strlen(buf), "Relationships: <%srelation\t0>, <%smatchrelations\t0>\r\n%s", OLC_LABEL_PTR(FCT_RELATIONS(fct)), OLC_LABEL_PTR(FCT_RELATIONS(fct)), FCT_RELATIONS(fct) ? lbuf : "");
+	build_page_display(ch, "Relationships: <%srelation\t0>, <%smatchrelations\t0>", OLC_LABEL_PTR(FCT_RELATIONS(fct)), OLC_LABEL_PTR(FCT_RELATIONS(fct)));
+	if (FCT_RELATIONS(fct)) {
+		show_faction_relation_display(ch, FCT_RELATIONS(fct), FALSE);
+	}
 	
-	page_string(ch->desc, buf, TRUE);
+	send_page_display(ch);
 }
 
 
@@ -1442,10 +1427,11 @@ int vnum_faction(char *searchname, char_data *ch) {
 	
 	HASH_ITER(hh, faction_table, iter, next_iter) {
 		if (multi_isname(searchname, FCT_NAME(iter))) {
-			msg_to_char(ch, "%3d. [%5d] %s\r\n", ++found, FCT_VNUM(iter), FCT_NAME(iter));
+			build_page_display(ch, "%3d. [%5d] %s", ++found, FCT_VNUM(iter), FCT_NAME(iter));
 		}
 	}
 	
+	send_page_display(ch);
 	return found;
 }
 

@@ -341,10 +341,10 @@ char *list_one_building(bld_data *bld, bool detail) {
 	static char output[MAX_STRING_LENGTH];
 	
 	if (detail) {
-		snprintf(output, sizeof(output), "[%5d] %s", GET_BLD_VNUM(bld), GET_BLD_NAME(bld));
+		safe_snprintf(output, sizeof(output), "[%5d] %s", GET_BLD_VNUM(bld), GET_BLD_NAME(bld));
 	}
 	else {
-		snprintf(output, sizeof(output), "[%5d] %s", GET_BLD_VNUM(bld), GET_BLD_NAME(bld));
+		safe_snprintf(output, sizeof(output), "[%5d] %s", GET_BLD_VNUM(bld), GET_BLD_NAME(bld));
 	}
 	
 	return output;
@@ -379,7 +379,7 @@ void olc_delete_building(char_data *ch, bld_vnum vnum) {
 		return;
 	}
 	
-	snprintf(name, sizeof(name), "%s", NULLSAFE(GET_BLD_NAME(bld)));
+	safe_snprintf(name, sizeof(name), "%s", NULLSAFE(GET_BLD_NAME(bld)));
 	
 	if (HASH_COUNT(building_table) <= 1) {
 		msg_to_char(ch, "You can't delete the last building.\r\n");
@@ -655,7 +655,7 @@ void olc_delete_building(char_data *ch, bld_vnum vnum) {
 * @param char *argument The argument they entered.
 */
 void olc_fullsearch_building(char_data *ch, char *argument) {
-	char buf[MAX_STRING_LENGTH * 2], line[MAX_STRING_LENGTH], type_arg[MAX_INPUT_LENGTH], val_arg[MAX_INPUT_LENGTH], find_keywords[MAX_INPUT_LENGTH], extra_search[MAX_INPUT_LENGTH];
+	char type_arg[MAX_INPUT_LENGTH], val_arg[MAX_INPUT_LENGTH], find_keywords[MAX_INPUT_LENGTH], extra_search[MAX_INPUT_LENGTH];
 	int count;
 	bool found_one;
 	
@@ -674,7 +674,6 @@ void olc_fullsearch_building(char_data *ch, char *argument) {
 	struct interaction_item *inter;
 	struct interact_restriction *inter_res;
 	bld_data *bld, *next_bld;
-	size_t size;
 	
 	*only_icon = '\0';
 	*only_half_icon = '\0';
@@ -739,7 +738,7 @@ void olc_fullsearch_building(char_data *ch, char *argument) {
 		skip_spaces(&argument);
 	}
 	
-	size = snprintf(buf, sizeof(buf), "Building fullsearch: %s\r\n", show_color_codes(find_keywords));
+	build_page_display(ch, "Building fullsearch: %s", show_color_codes(find_keywords));
 	count = 0;
 	
 	// okay now look up items
@@ -872,27 +871,18 @@ void olc_fullsearch_building(char_data *ch, char *argument) {
 		}
 		
 		// show it
-		snprintf(line, sizeof(line), "[%5d] %s\r\n", GET_BLD_VNUM(bld), GET_BLD_NAME(bld));
-		if (strlen(line) + size < sizeof(buf)) {
-			size += snprintf(buf + size, sizeof(buf) - size, "%s", line);
-			++count;
-		}
-		else {
-			size += snprintf(buf + size, sizeof(buf) - size, "OVERFLOW\r\n");
-			break;
-		}
+		build_page_display(ch, "[%5d] %s", GET_BLD_VNUM(bld), GET_BLD_NAME(bld));
+		++count;
 	}
 	
-	if (count > 0 && (size + 20) < sizeof(buf)) {
-		size += snprintf(buf + size, sizeof(buf) - size, "(%d buildings)\r\n", count);
+	if (count > 0) {
+		build_page_display(ch, "(%d buildings)", count);
 	}
-	else if (count == 0) {
-		size += snprintf(buf + size, sizeof(buf) - size, " none\r\n");
+	else {
+		build_page_display_str(ch, " none");
 	}
 	
-	if (ch->desc) {
-		page_string(ch->desc, buf, TRUE);
-	}
+	send_page_display(ch);
 }
 
 
@@ -903,7 +893,6 @@ void olc_fullsearch_building(char_data *ch, char *argument) {
 * @param bld_vnum vnum The building vnum.
 */
 void olc_search_building(char_data *ch, bld_vnum vnum) {
-	char buf[MAX_STRING_LENGTH];
 	bld_data *proto = building_proto(vnum);
 	struct adventure_link_rule *link;
 	struct interaction_item *inter;
@@ -919,7 +908,7 @@ void olc_search_building(char_data *ch, bld_vnum vnum) {
 	bld_data *bld, *next_bld;
 	obj_data *obj, *next_obj;
 	bool any;
-	int size, found;
+	int found;
 	
 	if (!proto) {
 		msg_to_char(ch, "There is no building %d.\r\n", vnum);
@@ -927,18 +916,15 @@ void olc_search_building(char_data *ch, bld_vnum vnum) {
 	}
 	
 	found = 0;
-	size = snprintf(buf, sizeof(buf), "Occurrences of building %d (%s):\r\n", vnum, GET_BLD_NAME(proto));
+	build_page_display(ch, "Occurrences of building %d (%s):", vnum, GET_BLD_NAME(proto));
 	
 	// adventure rules
 	HASH_ITER(hh, adventure_table, adv, next_adv) {
-		if (size >= sizeof(buf)) {
-			break;
-		}
 		for (link = GET_ADV_LINKING(adv); link; link = link->next) {
 			if (link->type == ADV_LINK_BUILDING_EXISTING || link->type == ADV_LINK_BUILDING_NEW || link->type == ADV_LINK_PORTAL_BUILDING_EXISTING || link->type == ADV_LINK_PORTAL_BUILDING_NEW) {
 				if (link->value == vnum) {
 					++found;
-					size += snprintf(buf + size, sizeof(buf) - size, "ADV [%5d] %s\r\n", GET_ADV_VNUM(adv), GET_ADV_NAME(adv));
+					build_page_display(ch, "ADV [%5d] %s", GET_ADV_VNUM(adv), GET_ADV_NAME(adv));
 					// only report once per adventure
 					break;
 				}
@@ -948,9 +934,6 @@ void olc_search_building(char_data *ch, bld_vnum vnum) {
 	
 	// buildings
 	HASH_ITER(hh, building_table, bld, next_bld) {
-		if (size >= sizeof(buf)) {
-			break;
-		}
 		any = FALSE;
 		LL_FOREACH(GET_BLD_INTERACTIONS(bld), inter) {
 			if (interact_data[inter->type].vnum_type == TYPE_BLD && inter->vnum == vnum) {
@@ -970,57 +953,44 @@ void olc_search_building(char_data *ch, bld_vnum vnum) {
 		}
 		if (any) {
 			++found;
-			size += snprintf(buf + size, sizeof(buf) - size, "BLD [%5d] %s\r\n", GET_BLD_VNUM(bld), GET_BLD_NAME(bld));
+			build_page_display(ch, "BLD [%5d] %s", GET_BLD_VNUM(bld), GET_BLD_NAME(bld));
 		}
 	}
 	
 	// craft builds
 	HASH_ITER(hh, craft_table, craft, next_craft) {
-		if (size >= sizeof(buf)) {
-			break;
-		}
 		if (CRAFT_IS_BUILDING(craft) && GET_CRAFT_BUILD_TYPE(craft) == vnum) {
 			++found;
-			size += snprintf(buf + size, sizeof(buf) - size, "CFT [%5d] %s\r\n", GET_CRAFT_VNUM(craft), GET_CRAFT_NAME(craft));
+			build_page_display(ch, "CFT [%5d] %s", GET_CRAFT_VNUM(craft), GET_CRAFT_NAME(craft));
 		}
 	}
 	
 	// obj storage
 	HASH_ITER(hh, object_table, obj, next_obj) {
-		if (size >= sizeof(buf)) {
-			break;
-		}
 		any = FALSE;
 		for (store = GET_OBJ_STORAGE(obj); store && !any; store = store->next) {
 			if (store->type == TYPE_BLD && store->vnum == vnum) {
 				any = TRUE;
 				++found;
-				size += snprintf(buf + size, sizeof(buf) - size, "OBJ [%5d] %s\r\n", GET_OBJ_VNUM(obj), GET_OBJ_SHORT_DESC(obj));
+				build_page_display(ch, "OBJ [%5d] %s", GET_OBJ_VNUM(obj), GET_OBJ_SHORT_DESC(obj));
 			}
 		}
 	}
 	
 	// progress
 	HASH_ITER(hh, progress_table, prg, next_prg) {
-		if (size >= sizeof(buf)) {
-			break;
-		}
 		// REQ_x: requirement search
 		any = find_requirement_in_list(PRG_TASKS(prg), REQ_OWN_BUILDING, vnum);
 		any |= find_requirement_in_list(PRG_TASKS(prg), REQ_VISIT_BUILDING, vnum);
 		
 		if (any) {
 			++found;
-			size += snprintf(buf + size, sizeof(buf) - size, "PRG [%5d] %s\r\n", PRG_VNUM(prg), PRG_NAME(prg));
+			build_page_display(ch, "PRG [%5d] %s", PRG_VNUM(prg), PRG_NAME(prg));
 		}
 	}
 	
 	// quests
 	HASH_ITER(hh, quest_table, quest, next_quest) {
-		if (size >= sizeof(buf)) {
-			break;
-		}
-		
 		// QG_x:
 		any = find_quest_giver_in_list(QUEST_STARTS_AT(quest), QG_BUILDING, vnum);
 		any |= find_quest_giver_in_list(QUEST_ENDS_AT(quest), QG_BUILDING, vnum);
@@ -1033,29 +1003,23 @@ void olc_search_building(char_data *ch, bld_vnum vnum) {
 		
 		if (any) {
 			++found;
-			size += snprintf(buf + size, sizeof(buf) - size, "QST [%5d] %s\r\n", QUEST_VNUM(quest), QUEST_NAME(quest));
+			build_page_display(ch, "QST [%5d] %s", QUEST_VNUM(quest), QUEST_NAME(quest));
 		}
 	}
 	
 	// shops
 	HASH_ITER(hh, shop_table, shop, next_shop) {
-		if (size >= sizeof(buf)) {
-			break;
-		}
 		if (find_quest_giver_in_list(SHOP_LOCATIONS(shop), QG_BUILDING, vnum)) {
 			++found;
-			size += snprintf(buf + size, sizeof(buf) - size, "SHOP [%5d] %s\r\n", SHOP_VNUM(shop), SHOP_NAME(shop));
+			build_page_display(ch, "SHOP [%5d] %s", SHOP_VNUM(shop), SHOP_NAME(shop));
 		}
 	}
 	
 	// socials
 	HASH_ITER(hh, social_table, soc, next_soc) {
-		if (size >= sizeof(buf)) {
-			break;
-		}
 		if (find_requirement_in_list(SOC_REQUIREMENTS(soc), REQ_OWN_BUILDING, vnum) || find_requirement_in_list(SOC_REQUIREMENTS(soc), REQ_VISIT_BUILDING, vnum)) {
 			++found;
-			size += snprintf(buf + size, sizeof(buf) - size, "SOC [%5d] %s\r\n", SOC_VNUM(soc), SOC_NAME(soc));
+			build_page_display(ch, "SOC [%5d] %s", SOC_VNUM(soc), SOC_NAME(soc));
 		}
 	}
 	
@@ -1084,18 +1048,18 @@ void olc_search_building(char_data *ch, bld_vnum vnum) {
 		}
 		if (any) {
 			++found;
-			size += snprintf(buf + size, sizeof(buf) - size, "VEH [%5d] %s\r\n", VEH_VNUM(veh), VEH_SHORT_DESC(veh));
+			build_page_display(ch, "VEH [%5d] %s", VEH_VNUM(veh), VEH_SHORT_DESC(veh));
 		}
 	}
 	
 	if (found > 0) {
-		size += snprintf(buf + size, sizeof(buf) - size, "%d location%s shown\r\n", found, PLURAL(found));
+		build_page_display(ch, "%d location%s shown", found, PLURAL(found));
 	}
 	else {
-		size += snprintf(buf + size, sizeof(buf) - size, " none\r\n");
+		build_page_display_str(ch, " none");
 	}
 	
-	page_string(ch->desc, buf, TRUE);
+	send_page_display(ch);
 }
 
 
@@ -1347,137 +1311,136 @@ int wordcount_building(bld_data *bld) {
 */
 void olc_show_building(char_data *ch) {
 	bld_data *bdg = GET_OLC_BUILDING(ch->desc);
-	char buf[MAX_STRING_LENGTH*4], lbuf[MAX_STRING_LENGTH*4];
+	char lbuf[MAX_STRING_LENGTH*4];
 	bool is_room = IS_SET(GET_BLD_FLAGS(bdg), BLD_ROOM) ? TRUE : FALSE;
 	struct spawn_info *spawn;
 	int count;
+	struct page_display *line;
 	
 	if (!bdg) {
 		return;
 	}
 	
-	*buf = '\0';
-	sprintf(buf + strlen(buf), "[%s%d\t0] %s%s\t0\r\n", OLC_LABEL_CHANGED, GET_OLC_VNUM(ch->desc), OLC_LABEL_UNCHANGED, !building_proto(GET_BLD_VNUM(bdg)) ? "new building" : GET_BLD_NAME(building_proto(GET_BLD_VNUM(bdg))));
-	sprintf(buf + strlen(buf), "<%sname\t0> %s\r\n", OLC_LABEL_STR(GET_BLD_NAME(bdg), default_building_name), GET_BLD_NAME(bdg));
-	sprintf(buf + strlen(buf), "<%stitle\t0> %s\r\n", OLC_LABEL_STR(GET_BLD_TITLE(bdg), default_building_title), GET_BLD_TITLE(bdg));
+	build_page_display(ch, "[%s%d\t0] %s%s\t0", OLC_LABEL_CHANGED, GET_OLC_VNUM(ch->desc), OLC_LABEL_UNCHANGED, !building_proto(GET_BLD_VNUM(bdg)) ? "new building" : GET_BLD_NAME(building_proto(GET_BLD_VNUM(bdg))));
+	build_page_display(ch, "<%sname\t0> %s", OLC_LABEL_STR(GET_BLD_NAME(bdg), default_building_name), GET_BLD_NAME(bdg));
+	build_page_display(ch, "<%stitle\t0> %s", OLC_LABEL_STR(GET_BLD_TITLE(bdg), default_building_title), GET_BLD_TITLE(bdg));
 	
 	if (!is_room) {
 		if (BLD_FLAGGED(bdg, BLD_OPEN) || GET_BLD_HALF_ICON(bdg) || GET_BLD_QUARTER_ICON(bdg)) {
-			sprintf(buf + strlen(buf), "<%sicon\t0> %s\t0  ", OLC_LABEL_STR(GET_BLD_ICON(bdg), default_building_icon), GET_BLD_ICON(bdg) ? one_icon_display(GET_BLD_ICON(bdg), NULL) : "none");
-			sprintf(buf + strlen(buf), "<%shalficon\t0> %s\t0  ", OLC_LABEL_STR(GET_BLD_HALF_ICON(bdg), default_building_icon), GET_BLD_HALF_ICON(bdg) ? one_icon_display(GET_BLD_HALF_ICON(bdg), NULL) : "none");
-			sprintf(buf + strlen(buf), "<%squartericon\t0> %s\t0\r\n", OLC_LABEL_STR(GET_BLD_QUARTER_ICON(bdg), default_building_icon), GET_BLD_QUARTER_ICON(bdg) ? one_icon_display(GET_BLD_QUARTER_ICON(bdg), NULL) : "none");
+			line = build_page_display(ch, "<%sicon\t0> %s\t0  ", OLC_LABEL_STR(GET_BLD_ICON(bdg), default_building_icon), GET_BLD_ICON(bdg) ? one_icon_display(GET_BLD_ICON(bdg), NULL) : "none");
+			append_page_display_line(line, "<%shalficon\t0> %s\t0  ", OLC_LABEL_STR(GET_BLD_HALF_ICON(bdg), default_building_icon), GET_BLD_HALF_ICON(bdg) ? one_icon_display(GET_BLD_HALF_ICON(bdg), NULL) : "none");
+			append_page_display_line(line, "<%squartericon\t0> %s\t0", OLC_LABEL_STR(GET_BLD_QUARTER_ICON(bdg), default_building_icon), GET_BLD_QUARTER_ICON(bdg) ? one_icon_display(GET_BLD_QUARTER_ICON(bdg), NULL) : "none");
 		}
 		else {
-			sprintf(buf + strlen(buf), "<%sicon\t0> %s\t0\r\n", OLC_LABEL_STR(GET_BLD_ICON(bdg), default_building_icon), GET_BLD_ICON(bdg) ? one_icon_display(GET_BLD_ICON(bdg), NULL) : "none");
+			build_page_display(ch, "<%sicon\t0> %s\t0", OLC_LABEL_STR(GET_BLD_ICON(bdg), default_building_icon), GET_BLD_ICON(bdg) ? one_icon_display(GET_BLD_ICON(bdg), NULL) : "none");
 		}
 	}
-	sprintf(buf + strlen(buf), "<%scommands\t0> %s\r\n", OLC_LABEL_STR(GET_BLD_COMMANDS(bdg), ""), GET_BLD_COMMANDS(bdg) ? GET_BLD_COMMANDS(bdg) : "");
-	sprintf(buf + strlen(buf), "<%sdescription\t0>\r\n%s", OLC_LABEL_STR(GET_BLD_DESC(bdg), ""), GET_BLD_DESC(bdg) ? GET_BLD_DESC(bdg) : "");
+	build_page_display(ch, "<%scommands\t0> %s", OLC_LABEL_STR(GET_BLD_COMMANDS(bdg), ""), GET_BLD_COMMANDS(bdg) ? GET_BLD_COMMANDS(bdg) : "");
+	build_page_display(ch, "<%sdescription\t0>\r\n%s", OLC_LABEL_STR(GET_BLD_DESC(bdg), ""), GET_BLD_DESC(bdg) ? GET_BLD_DESC(bdg) : "");
 
 	if (!is_room) {
-		sprintf(buf + strlen(buf), "<%shitpoints\t0> %d\r\n", OLC_LABEL_VAL(GET_BLD_MAX_DAMAGE(bdg), 1), GET_BLD_MAX_DAMAGE(bdg));
-		sprintf(buf + strlen(buf), "<%srooms\t0> %d\r\n", OLC_LABEL_VAL(GET_BLD_EXTRA_ROOMS(bdg), 0), GET_BLD_EXTRA_ROOMS(bdg));
-		sprintf(buf + strlen(buf), "<%sheight\t0> %d\r\n", OLC_LABEL_VAL(GET_BLD_HEIGHT(bdg), 0), GET_BLD_HEIGHT(bdg));
+		build_page_display(ch, "<%shitpoints\t0> %d", OLC_LABEL_VAL(GET_BLD_MAX_DAMAGE(bdg), 1), GET_BLD_MAX_DAMAGE(bdg));
+		build_page_display(ch, "<%srooms\t0> %d", OLC_LABEL_VAL(GET_BLD_EXTRA_ROOMS(bdg), 0), GET_BLD_EXTRA_ROOMS(bdg));
+		build_page_display(ch, "<%sheight\t0> %d", OLC_LABEL_VAL(GET_BLD_HEIGHT(bdg), 0), GET_BLD_HEIGHT(bdg));
 	}
 
-	sprintf(buf + strlen(buf), "<%sfame\t0> %d\r\n", OLC_LABEL_VAL(GET_BLD_FAME(bdg), 0), GET_BLD_FAME(bdg));	
-	sprintf(buf + strlen(buf), "<%scitizens\t0> %d\r\n", OLC_LABEL_VAL(GET_BLD_CITIZENS(bdg), 0), GET_BLD_CITIZENS(bdg));
-	sprintf(buf + strlen(buf), "<%smilitary\t0> %d\r\n", OLC_LABEL_VAL(GET_BLD_MILITARY(bdg), 0), GET_BLD_MILITARY(bdg));
+	build_page_display(ch, "<%sfame\t0> %d", OLC_LABEL_VAL(GET_BLD_FAME(bdg), 0), GET_BLD_FAME(bdg));	
+	build_page_display(ch, "<%scitizens\t0> %d", OLC_LABEL_VAL(GET_BLD_CITIZENS(bdg), 0), GET_BLD_CITIZENS(bdg));
+	build_page_display(ch, "<%smilitary\t0> %d", OLC_LABEL_VAL(GET_BLD_MILITARY(bdg), 0), GET_BLD_MILITARY(bdg));
 	
-	sprintf(buf + strlen(buf), "<%sartisan\t0> [%d] %s\r\n", OLC_LABEL_VAL(GET_BLD_ARTISAN(bdg), NOTHING), GET_BLD_ARTISAN(bdg), GET_BLD_ARTISAN(bdg) == NOTHING ? "none" : get_mob_name_by_proto(GET_BLD_ARTISAN(bdg), FALSE));
+	build_page_display(ch, "<%sartisan\t0> [%d] %s", OLC_LABEL_VAL(GET_BLD_ARTISAN(bdg), NOTHING), GET_BLD_ARTISAN(bdg), GET_BLD_ARTISAN(bdg) == NOTHING ? "none" : get_mob_name_by_proto(GET_BLD_ARTISAN(bdg), FALSE));
 	
 	sprintbit(GET_BLD_FLAGS(bdg), bld_flags, lbuf, TRUE);
-	sprintf(buf + strlen(buf), "<%sflags\t0> %s\r\n", OLC_LABEL_VAL(GET_BLD_FLAGS(bdg), NOBITS), lbuf);
+	build_page_display(ch, "<%sflags\t0> %s", OLC_LABEL_VAL(GET_BLD_FLAGS(bdg), NOBITS), lbuf);
 	
 	sprintbit(GET_BLD_FUNCTIONS(bdg), function_flags, lbuf, TRUE);
-	sprintf(buf + strlen(buf), "<%sfunctions\t0> %s\r\n", OLC_LABEL_VAL(GET_BLD_FUNCTIONS(bdg), NOBITS), lbuf);
+	build_page_display(ch, "<%sfunctions\t0> %s", OLC_LABEL_VAL(GET_BLD_FUNCTIONS(bdg), NOBITS), lbuf);
 	
 	sprintbit(GET_BLD_DESIGNATE_FLAGS(bdg), designate_flags, lbuf, TRUE);
-	sprintf(buf + strlen(buf), "<%sdesignate\t0> %s\r\n", OLC_LABEL_VAL(GET_BLD_DESIGNATE_FLAGS(bdg), NOBITS), lbuf);
+	build_page_display(ch, "<%sdesignate\t0> %s", OLC_LABEL_VAL(GET_BLD_DESIGNATE_FLAGS(bdg), NOBITS), lbuf);
 	
 	sprintbit(GET_BLD_BASE_AFFECTS(bdg), room_aff_bits, lbuf, TRUE);
-	sprintf(buf + strlen(buf), "<%saffects\t0> %s\r\n", OLC_LABEL_VAL(GET_BLD_BASE_AFFECTS(bdg), NOBITS), lbuf);
+	build_page_display(ch, "<%saffects\t0> %s", OLC_LABEL_VAL(GET_BLD_BASE_AFFECTS(bdg), NOBITS), lbuf);
 	
-	sprintf(buf + strlen(buf), "<%stemperature\t0> %s\r\n", OLC_LABEL_VAL(GET_BLD_TEMPERATURE_TYPE(bdg), 0), temperature_types[GET_BLD_TEMPERATURE_TYPE(bdg)]);
+	build_page_display(ch, "<%stemperature\t0> %s", OLC_LABEL_VAL(GET_BLD_TEMPERATURE_TYPE(bdg), 0), temperature_types[GET_BLD_TEMPERATURE_TYPE(bdg)]);
 	
-	sprintf(buf + strlen(buf), "Relationships: <%srelations\t0>\r\n", OLC_LABEL_PTR(GET_BLD_RELATIONS(bdg)));
+	build_page_display(ch, "Relationships: <%srelations\t0>", OLC_LABEL_PTR(GET_BLD_RELATIONS(bdg)));
 	if (GET_BLD_RELATIONS(bdg)) {
-		get_bld_relations_display(GET_BLD_RELATIONS(bdg), lbuf);
-		strcat(buf, lbuf);
+		show_bld_relations_display(ch, GET_BLD_RELATIONS(bdg), FALSE);
 	}
 
 	// exdesc
-	sprintf(buf + strlen(buf), "Extra descriptions: <%sextra\t0>\r\n", OLC_LABEL_PTR(GET_BLD_EX_DESCS(bdg)));
+	build_page_display(ch, "Extra descriptions: <%sextra\t0>", OLC_LABEL_PTR(GET_BLD_EX_DESCS(bdg)));
 	if (GET_BLD_EX_DESCS(bdg)) {
-		get_extra_desc_display(GET_BLD_EX_DESCS(bdg), lbuf, sizeof(lbuf));
-		strcat(buf, lbuf);
+		show_extra_desc_display(ch, GET_BLD_EX_DESCS(bdg), FALSE);
 	}
 
-	sprintf(buf + strlen(buf), "Interactions: <%sinteraction\t0>\r\n", OLC_LABEL_PTR(GET_BLD_INTERACTIONS(bdg)));
+	build_page_display(ch, "Interactions: <%sinteraction\t0>", OLC_LABEL_PTR(GET_BLD_INTERACTIONS(bdg)));
 	if (GET_BLD_INTERACTIONS(bdg)) {
-		get_interaction_display(GET_BLD_INTERACTIONS(bdg), lbuf);
-		strcat(buf, lbuf);
+		show_interaction_display(ch, GET_BLD_INTERACTIONS(bdg), FALSE);
 	}
 	
 	// maintenance resources
-	sprintf(buf + strlen(buf), "Regular maintenance resources: <%sresource\t0>\r\n", OLC_LABEL_PTR(GET_BLD_REGULAR_MAINTENANCE(bdg)));
+	build_page_display(ch, "Regular maintenance resources: <%sresource\t0>", OLC_LABEL_PTR(GET_BLD_REGULAR_MAINTENANCE(bdg)));
 	if (GET_BLD_REGULAR_MAINTENANCE(bdg)) {
-		get_resource_display(ch, GET_BLD_REGULAR_MAINTENANCE(bdg), lbuf);
-		strcat(buf, lbuf);
+		show_resource_display(ch, GET_BLD_REGULAR_MAINTENANCE(bdg), FALSE);
 	}
 
 	// scripts
-	sprintf(buf + strlen(buf), "Scripts: <%sscript\t0>\r\n", OLC_LABEL_PTR(GET_BLD_SCRIPTS(bdg)));
+	build_page_display(ch, "Scripts: <%sscript\t0>", OLC_LABEL_PTR(GET_BLD_SCRIPTS(bdg)));
 	if (GET_BLD_SCRIPTS(bdg)) {
-		get_script_display(GET_BLD_SCRIPTS(bdg), lbuf);
-		strcat(buf, lbuf);
+		show_script_display(ch, GET_BLD_SCRIPTS(bdg), FALSE);
 	}
 	
-	sprintf(buf + strlen(buf), "<%sspawns\t0>\r\n", OLC_LABEL_PTR(GET_BLD_SPAWNS(bdg)));
+	build_page_display(ch, "<%sspawns\t0>", OLC_LABEL_PTR(GET_BLD_SPAWNS(bdg)));
 	if (GET_BLD_SPAWNS(bdg)) {
 		count = 0;
 		for (spawn = GET_BLD_SPAWNS(bdg); spawn; spawn = spawn->next) {
 			++count;
 		}
-		sprintf(buf + strlen(buf), " %d spawn%s set\r\n", count, PLURAL(count));
+		build_page_display(ch, " %d spawn%s set", count, PLURAL(count));
 	}
 		
-	page_string(ch->desc, buf, TRUE);
+	send_page_display(ch);
 }
 
 
 /**
 * Displays the relationship data from a given list.
 *
+* @param char_data *ch The person viewing it.
 * @param struct bld_relation *list Pointer to the start of a list of relations.
-* @param char *save_buffer A buffer to store the result to.
+* @param bool send_output If TRUE, sends the page_display as text when done. Pass FALSE if you're building a larger page_display for the character.
 */
-void get_bld_relations_display(struct bld_relation *list, char *save_buffer) {
+void show_bld_relations_display(char_data *ch, struct bld_relation *list, bool send_output) {
 	struct bld_relation *relat;
 	int count = 0;
 	
-	*save_buffer = '\0';
 	LL_FOREACH(list, relat) {
 		// BLD_REL_x
 		switch (relat->type) {
 			case BLD_REL_UPGRADES_TO_VEH:
 			case BLD_REL_FORCE_UPGRADE_VEH:
 			case BLD_REL_STORES_LIKE_VEH: {
-				sprintf(save_buffer + strlen(save_buffer), "%2d. %s: [%5d] %s\r\n", ++count, bld_relationship_types[relat->type], relat->vnum, get_vehicle_name_by_proto(relat->vnum));
+				build_page_display(ch, "%2d. %s: [%5d] %s", ++count, bld_relationship_types[relat->type], relat->vnum, get_vehicle_name_by_proto(relat->vnum));
 				break;
 			}
 			case BLD_REL_UPGRADES_TO_BLD:
 			case BLD_REL_FORCE_UPGRADE_BLD:
 			case BLD_REL_STORES_LIKE_BLD:
 			default: {
-				sprintf(save_buffer + strlen(save_buffer), "%2d. %s: [%5d] %s\r\n", ++count, bld_relationship_types[relat->type], relat->vnum, get_bld_name_by_proto(relat->vnum));
+				build_page_display(ch, "%2d. %s: [%5d] %s", ++count, bld_relationship_types[relat->type], relat->vnum, get_bld_name_by_proto(relat->vnum));
 				break;
 			}
 		}
 	}
 	
 	if (count == 0) {
-		strcat(save_buffer, " none\r\n");
+		build_page_display_str(ch, " none");
+	}
+	
+	if (send_output) {
+		send_page_display_as(ch, PD_NO_PAGINATION | PD_FREE_DISPLAY_AFTER);
 	}
 }
 

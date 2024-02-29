@@ -74,6 +74,7 @@ void check_maintenance_and_depletion_reset();
 void check_newbie_islands();
 void check_wars();
 void chore_update();
+void clear_leftover_page_displays();
 void display_automessages();
 void frequent_combat(unsigned long pulse);
 void perform_requested_world_saves();
@@ -259,16 +260,16 @@ void msdp_update_room(char_data *ch) {
 
 	// determine area name: we'll use it twice
 	if ((inst = find_instance_by_room(IN_ROOM(ch), FALSE, FALSE))) {
-		snprintf(area_name, sizeof(area_name), "%s", GET_ADV_NAME(INST_ADVENTURE(inst)));
+		safe_snprintf(area_name, sizeof(area_name), "%s", GET_ADV_NAME(INST_ADVENTURE(inst)));
 	}
 	else if ((city = find_city(ROOM_OWNER(IN_ROOM(ch)), IN_ROOM(ch)))) {
-		snprintf(area_name, sizeof(area_name), "%s", city->name);
+		safe_snprintf(area_name, sizeof(area_name), "%s", city->name);
 	}
 	else if ((island = GET_ISLAND(IN_ROOM(ch)))) {
-		snprintf(area_name, sizeof(area_name), "%s", island->name);
+		safe_snprintf(area_name, sizeof(area_name), "%s", island->name);
 	}
 	else {
-		snprintf(area_name, sizeof(area_name), "Unknown");
+		safe_snprintf(area_name, sizeof(area_name), "Unknown");
 	}
 	MSDPSetString(desc, eMSDP_AREA_NAME, area_name);
 	
@@ -1000,6 +1001,12 @@ void heartbeat(unsigned long heart_pulse) {
 		HEARTBEAT_LOG("33")
 	}
 	
+	// check text hasn't been left in the page_display system
+	if (HEARTBEAT(0.5)) {
+		clear_leftover_page_displays();
+		HEARTBEAT_LOG("33.5");
+	}
+	
 	// this goes roughly last -- update MSDP users etc
 	if (HEARTBEAT(1)) {
 		msdp_update();
@@ -1145,7 +1152,7 @@ void msg_to_desc(descriptor_data *d, const char *messg, ...) {
 * @param char_data *ch The player.
 * @param const char *messg... va_arg format.
 */
-void msg_to_char(char_data *ch, const char *messg, ...) {
+void msg_to_char(const char_data *ch, const char *messg, ...) {
 	char output[MAX_STRING_LENGTH];
 	va_list tArgList;
 	
@@ -1482,7 +1489,7 @@ void perform_act(const char *orig, char_data *ch, const void *obj, const void *v
 				}
 				case 'k': {	// loyalty/empire adjective of $n
 					if (GET_LOYALTY(ch)) {
-						snprintf(temp, sizeof(temp), "%s", EMPIRE_ADJECTIVE(GET_LOYALTY(ch)));
+						safe_snprintf(temp, sizeof(temp), "%s", EMPIRE_ADJECTIVE(GET_LOYALTY(ch)));
 						i = temp;
 					}
 					else {
@@ -1496,7 +1503,7 @@ void perform_act(const char *orig, char_data *ch, const void *obj, const void *v
 					}
 					dg_victim = (char_data*) vict_obj;
 					if (dg_victim && GET_LOYALTY(dg_victim)) {
-						snprintf(temp, sizeof(temp), "%s", EMPIRE_ADJECTIVE(GET_LOYALTY(dg_victim)));
+						safe_snprintf(temp, sizeof(temp), "%s", EMPIRE_ADJECTIVE(GET_LOYALTY(dg_victim)));
 						i = temp;
 					}
 					else {
@@ -1506,7 +1513,7 @@ void perform_act(const char *orig, char_data *ch, const void *obj, const void *v
 				}
 				case 'l': {	// loyalty/empire name of $n
 					if (GET_LOYALTY(ch)) {
-						snprintf(temp, sizeof(temp), "%s", EMPIRE_NAME(GET_LOYALTY(ch)));
+						safe_snprintf(temp, sizeof(temp), "%s", EMPIRE_NAME(GET_LOYALTY(ch)));
 						i = temp;
 					}
 					else {
@@ -1520,7 +1527,7 @@ void perform_act(const char *orig, char_data *ch, const void *obj, const void *v
 					}
 					dg_victim = (char_data*) vict_obj;
 					if (dg_victim && GET_LOYALTY(dg_victim)) {
-						snprintf(temp, sizeof(temp), "%s", EMPIRE_NAME(GET_LOYALTY(dg_victim)));
+						safe_snprintf(temp, sizeof(temp), "%s", EMPIRE_NAME(GET_LOYALTY(dg_victim)));
 						i = temp;
 					}
 					else {
@@ -1685,7 +1692,10 @@ void perform_act(const char *orig, char_data *ch, const void *obj, const void *v
 		}
 		to->desc->last_act_message = strdup(lbuf);
 		
-		if (IAF(TO_QUEUE)) {
+		if (IAF(TO_PAGE_DISPLAY)) {
+			build_page_display_str(to, lbuf);
+		}
+		else if (IAF(TO_QUEUE)) {
 			stack_simple_msg_to_desc(to->desc, lbuf);
 		}
 		else {	// send normally
@@ -1700,7 +1710,7 @@ void perform_act(const char *orig, char_data *ch, const void *obj, const void *v
 
 
 // this is the pre-circle3.1 send_to_char that doesn't have va_args
-void send_to_char(const char *messg, char_data *ch) {
+void send_to_char(const char *messg, const char_data *ch) {
 	if (ch->desc && messg)
 		SEND_TO_Q(messg, ch->desc);
 }
@@ -1808,7 +1818,7 @@ void send_stacked_msgs(descriptor_data *desc) {
 			rem = (len > 1 && ISNEWL(iter->string[len-1])) ? 1 : 0;
 			rem += (len > 2 && ISNEWL(iter->string[len-2])) ? 1 : 0;
 			// rebuild
-			snprintf(output, sizeof(output), "%*.*s (x%d)%s", (len-rem), (len-rem), iter->string, iter->count, (rem > 0 ? "\r\n" : ""));
+			safe_snprintf(output, sizeof(output), "%*.*s (x%d)%s", (len-rem), (len-rem), iter->string, iter->count, (rem > 0 ? "\r\n" : ""));
 			SEND_TO_Q(output, desc);
 		}
 		else {
@@ -1983,6 +1993,8 @@ void free_descriptor(descriptor_data *desc) {
 		free(desc->backstr);
 	}
 	// do NOT free desc->str_on_abort (is a pointer to something else)
+	
+	free_page_display(&desc->page_lines);
 	
 	// other strings
 	if (desc->host) {
@@ -2472,7 +2484,7 @@ int new_descriptor(int s) {
 		/* resolution failed */
 		if (!slow_ip) {
 			char buf[MAX_STRING_LENGTH];
-			snprintf(buf, sizeof(buf), "Warning: gethostbyaddr [%s]", inet_ntoa(peer.sin_addr));
+			safe_snprintf(buf, sizeof(buf), "Warning: gethostbyaddr [%s]", inet_ntoa(peer.sin_addr));
 			perror(buf);
 			
 			// did it take longer than 3 seconds to look up?
@@ -2512,7 +2524,7 @@ int new_descriptor(int s) {
 	LL_PREPEND(descriptor_list, newd);
 	
 	ProtocolNegotiate(newd);
-	snprintf(buf, sizeof(buf), "%s%s", intro_screens[number(0, num_intro_screens-1)], telnet_go_ahead(newd));
+	safe_snprintf(buf, sizeof(buf), "%s%s", intro_screens[number(0, num_intro_screens-1)], telnet_go_ahead(newd));
 	SEND_TO_Q(buf, newd);
 
 	return (0);
@@ -2694,7 +2706,7 @@ int process_input(descriptor_data *t) {
 				t->inbuf[MAX_INPUT_LENGTH-2] = '\0';
 			}
 			
-			snprintf(buffer, sizeof(buffer), "Line too long. Truncated to:\r\n%s\r\n", t->inbuf);
+			safe_snprintf(buffer, sizeof(buffer), "Line too long. Truncated to:\r\n%s\r\n", t->inbuf);
 			if (write_to_descriptor(t->descriptor, buffer) < 0) {
 				return (-1);
 			}
@@ -2818,22 +2830,69 @@ int process_input(descriptor_data *t) {
 			strncpy(input, t->last_input, MAX_INPUT_LENGTH-1);
 			input[MAX_INPUT_LENGTH-1] = '\0';
 		}
+		else if (*input == '!' && *(input + 1) == '!') {
+			// !!: show command queue
+			int cnt;
+			
+			do_not_add = 1;
+			msg_to_desc(t, "Command history:\r\n");
+			
+			for (cnt = (t->history_pos == 0 ? HISTORY_SIZE : t->history_pos) - 1; /* see below */; --cnt) {
+				if (t->history[cnt]) {
+					msg_to_desc(t, "%s\r\n", t->history[cnt]);
+				}	
+				
+				// check end
+				if (cnt == t->history_pos) {
+					break;	// reached the beginning again
+				}
+				else if (cnt == 0) {
+					cnt = HISTORY_SIZE;		// loop back around
+				}
+			}
+		}
 		else if (*input == '!' && *(input + 1)) {
 			char *commandln = (input + 1);
-			int starting_pos = t->history_pos, cnt = (t->history_pos == 0 ? HISTORY_SIZE - 1 : t->history_pos - 1);
+			int cnt;
 
 			skip_spaces(&commandln);
-			for (; cnt != starting_pos; cnt--) {
+			for (cnt = (t->history_pos == 0 ? HISTORY_SIZE : t->history_pos) - 1; /* see below */; --cnt) {
 				if (t->history[cnt] && is_abbrev(commandln, t->history[cnt])) {
 					strcpy(input, t->history[cnt]);
 					strncpy(t->last_input, input, sizeof(t->last_input)-1);
 					t->last_input[sizeof(t->last_input)-1] = '\0';
 					SEND_TO_Q(input, t);
 					SEND_TO_Q("\r\n", t);
-					break;
+					
+					// and copy it to the next position in the command history if needed:
+					if (cnt == t->history_pos) {
+						// just advance history pos
+						if (++t->history_pos >= HISTORY_SIZE) {
+							t->history_pos = 0;		// Wrap to top
+						}
+					}
+					else if (cnt != t->history_pos-1 && (t->history_pos != 0 || cnt != HISTORY_SIZE-1)) {
+						// copy it
+						if (t->history[t->history_pos]) {
+							free(t->history[t->history_pos]);
+						}
+						t->history[t->history_pos] = strdup(t->history[cnt]);
+						
+						// and advance the history position
+						if (++t->history_pos >= HISTORY_SIZE) {
+							t->history_pos = 0;		// Wrap to top
+						}
+					}
+					break;	// done
 				}
-				if (cnt == 0)	/* At top, loop to bottom. */
-					cnt = HISTORY_SIZE;
+				
+				// check end
+				if (cnt == t->history_pos) {
+					break;	// reached the beginning again
+				}
+				else if (cnt == 0) {
+					cnt = HISTORY_SIZE;		// loop back around
+				}
 			}
 		}
 		else if (*input == '^') {
@@ -2924,7 +2983,7 @@ static int process_output(descriptor_data *t) {
 		prompt[MAX_STRING_LENGTH-1] = '\0';
 				
 		// force a color code flush
-		snprintf(prompt + strlen(prompt), sizeof(prompt) - strlen(prompt), "%s", flush_reduced_color_codes(t));
+		safe_snprintf(prompt + strlen(prompt), sizeof(prompt) - strlen(prompt), "%s", flush_reduced_color_codes(t));
 
 		strncat(i, prompt, MAX_PROMPT_LENGTH);
 	}
@@ -3205,7 +3264,7 @@ char *make_prompt(descriptor_data *d) {
 		}
 
 		// append rendered prompt
-		snprintf(prompt + strlen(prompt), sizeof(prompt) - strlen(prompt), "%s%s", prompt_str(d->character), telnet_go_ahead(d));
+		safe_snprintf(prompt + strlen(prompt), sizeof(prompt) - strlen(prompt), "%s%s", prompt_str(d->character), telnet_go_ahead(d));
 	}
 	else {
 		*prompt = '\0';
@@ -4073,7 +4132,7 @@ void game_loop(socket_t mother_desc) {
 				prompt[MAX_STRING_LENGTH-1] = '\0';
 				
 				// force a color code flush
-				snprintf(prompt + strlen(prompt), sizeof(prompt) - strlen(prompt), "%s", flush_reduced_color_codes(d));
+				safe_snprintf(prompt + strlen(prompt), sizeof(prompt) - strlen(prompt), "%s", flush_reduced_color_codes(d));
 				
 				if (write_to_descriptor(d->descriptor, prompt) >= 0) {
 					d->has_prompt = 1;

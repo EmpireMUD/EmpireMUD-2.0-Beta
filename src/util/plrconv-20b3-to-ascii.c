@@ -1128,7 +1128,7 @@ void convert_char(struct b3_char_file_u *cfu) {
 	REMOVE_BIT(cfu->char_specials_saved.act, b3_PLR_MULTIOK | b3_PLR_DELETED | b3_PLR_NOTITLE | b3_PLR_MUTED | b3_PLR_SITEOK | b3_PLR_FROZEN);
 	// account: notes -- merge from each character
 	if (*cfu->player_specials_saved.admin_notes) {
-		snprintf(temp, sizeof(temp), "%s%s%s", acct->notes ? acct->notes : "", acct->notes ? "\r\n" : "", cfu->player_specials_saved.admin_notes);
+		safe_snprintf(temp, sizeof(temp), "%s%s%s", acct->notes ? acct->notes : "", acct->notes ? "\r\n" : "", cfu->player_specials_saved.admin_notes);
 		acct->notes = strdup(temp);
 	}
 	

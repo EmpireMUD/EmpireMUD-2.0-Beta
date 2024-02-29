@@ -594,10 +594,10 @@ char *list_one_shop(shop_data *shop, bool detail) {
 	static char output[MAX_STRING_LENGTH];
 	
 	if (detail) {
-		snprintf(output, sizeof(output), "[%5d] %s%s", SHOP_VNUM(shop), SHOP_NAME(shop), SHOP_FLAGGED(shop, SHOP_IN_DEVELOPMENT) ? " (IN-DEV)" : "");
+		safe_snprintf(output, sizeof(output), "[%5d] %s%s", SHOP_VNUM(shop), SHOP_NAME(shop), SHOP_FLAGGED(shop, SHOP_IN_DEVELOPMENT) ? " (IN-DEV)" : "");
 	}
 	else {
-		snprintf(output, sizeof(output), "[%5d] %s%s", SHOP_VNUM(shop), SHOP_NAME(shop), SHOP_FLAGGED(shop, SHOP_IN_DEVELOPMENT) ? " (IN-DEV)" : "");
+		safe_snprintf(output, sizeof(output), "[%5d] %s%s", SHOP_VNUM(shop), SHOP_NAME(shop), SHOP_FLAGGED(shop, SHOP_IN_DEVELOPMENT) ? " (IN-DEV)" : "");
 	}
 		
 	return output;
@@ -611,9 +611,8 @@ char *list_one_shop(shop_data *shop, bool detail) {
 * @param any_vnum vnum The shop vnum.
 */
 void olc_search_shop(char_data *ch, any_vnum vnum) {
-	char buf[MAX_STRING_LENGTH];
 	shop_data *shop = real_shop(vnum);
-	int size, found;
+	int found;
 	
 	if (!shop) {
 		msg_to_char(ch, "There is no shop %d.\r\n", vnum);
@@ -621,18 +620,18 @@ void olc_search_shop(char_data *ch, any_vnum vnum) {
 	}
 	
 	found = 0;
-	size = snprintf(buf, sizeof(buf), "Occurrences of shop %d (%s):\r\n", vnum, SHOP_NAME(shop));
+	build_page_display(ch, "Occurrences of shop %d (%s):", vnum, SHOP_NAME(shop));
 	
 	// none yet
 	
 	if (found > 0) {
-		size += snprintf(buf + size, sizeof(buf) - size, "%d location%s shown\r\n", found, PLURAL(found));
+		build_page_display(ch, "%d location%s shown", found, PLURAL(found));
 	}
 	else {
-		size += snprintf(buf + size, sizeof(buf) - size, " none\r\n");
+		build_page_display_str(ch, " none");
 	}
 	
-	page_string(ch->desc, buf, TRUE);
+	send_page_display(ch);
 }
 
 
@@ -944,7 +943,7 @@ void olc_delete_shop(char_data *ch, any_vnum vnum) {
 		return;
 	}
 	
-	snprintf(name, sizeof(name), "%s", NULLSAFE(SHOP_NAME(shop)));
+	safe_snprintf(name, sizeof(name), "%s", NULLSAFE(SHOP_NAME(shop)));
 	
 	// removing live instances goes here
 	
@@ -1064,7 +1063,7 @@ void get_shop_items_display(shop_data *shop, char *save_buffer) {
 	*save_buffer = '\0';
 	LL_FOREACH(SHOP_ITEMS(shop), item) {
 		if (SHOP_ALLEGIANCE(shop) && item->min_rep != REP_NONE) {
-			snprintf(buf, sizeof(buf), " (%s)", reputation_levels[rep_const_to_index(item->min_rep)].name);
+			safe_snprintf(buf, sizeof(buf), " (%s)", reputation_levels[rep_const_to_index(item->min_rep)].name);
 		}
 		else {
 			*buf = '\0';
@@ -1089,36 +1088,36 @@ void get_shop_items_display(shop_data *shop, char *save_buffer) {
 * @param shop_data *shop The shop to display.
 */
 void do_stat_shop(char_data *ch, shop_data *shop) {
-	char buf[MAX_STRING_LENGTH], part[MAX_STRING_LENGTH];
-	size_t size;
+	char part[MAX_STRING_LENGTH];
+	struct page_display *line;
 	
 	if (!shop) {
 		return;
 	}
 	
 	// first line
-	size = snprintf(buf, sizeof(buf), "VNum: [\tc%d\t0], Name: \ty%s\t0\r\n", SHOP_VNUM(shop), SHOP_NAME(shop));
+	build_page_display(ch, "VNum: [\tc%d\t0], Name: \ty%s\t0", SHOP_VNUM(shop), SHOP_NAME(shop));
 	
 	// 2nd line
 	if (SHOP_OPEN_TIME(shop) == SHOP_CLOSE_TIME(shop)) {
-		size += snprintf(buf + size, sizeof(buf) - size, "Times: [\tcalways open\t0]");
+		line = build_page_display(ch, "Times: [\tcalways open\t0]");
 	}
 	else {
-		size += snprintf(buf + size, sizeof(buf) - size, "Times: [\tc%d%s\t0 - \tc%d%s\t0]", TIME_TO_12H(SHOP_OPEN_TIME(shop)), AM_PM(SHOP_OPEN_TIME(shop)), TIME_TO_12H(SHOP_CLOSE_TIME(shop)), AM_PM(SHOP_CLOSE_TIME(shop)));
+		line = build_page_display(ch, "Times: [\tc%d%s\t0 - \tc%d%s\t0]", TIME_TO_12H(SHOP_OPEN_TIME(shop)), AM_PM(SHOP_OPEN_TIME(shop)), TIME_TO_12H(SHOP_CLOSE_TIME(shop)), AM_PM(SHOP_CLOSE_TIME(shop)));
 	}
 	// still 2nd line
-	size += snprintf(buf + size, sizeof(buf) - size, ", Faction allegiance: [\ty%s\t0]\r\n", SHOP_ALLEGIANCE(shop) ? FCT_NAME(SHOP_ALLEGIANCE(shop)) : "none");
+	append_page_display_line(line, ", Faction allegiance: [\ty%s\t0]", SHOP_ALLEGIANCE(shop) ? FCT_NAME(SHOP_ALLEGIANCE(shop)) : "none");
 	
 	sprintbit(SHOP_FLAGS(shop), shop_flags, part, TRUE);
-	size += snprintf(buf + size, sizeof(buf) - size, "Flags: \tg%s\t0\r\n", part);
+	build_page_display(ch, "Flags: \tg%s\t0", part);
 	
-	get_quest_giver_display(SHOP_LOCATIONS(shop), part);
-	size += snprintf(buf + size, sizeof(buf) - size, "Locations:\r\n%s", part);
+	build_page_display_str(ch, "Locations:");
+	show_quest_giver_display(ch, SHOP_LOCATIONS(shop), FALSE);
 	
 	get_shop_items_display(shop, part);
-	sprintf(buf + strlen(buf), "Items:\r\n%s", part);
+	build_page_display(ch, "Items:\r\n%s", part);
 	
-	page_string(ch->desc, buf, TRUE);
+	send_page_display(ch);
 }
 
 
@@ -1130,31 +1129,31 @@ void do_stat_shop(char_data *ch, shop_data *shop) {
 */
 void olc_show_shop(char_data *ch) {
 	shop_data *shop = GET_OLC_SHOP(ch->desc);
-	char buf[MAX_STRING_LENGTH], lbuf[MAX_STRING_LENGTH];
+	char lbuf[MAX_STRING_LENGTH];
 	
 	if (!shop) {
 		return;
 	}
 	
-	*buf = '\0';
-	
-	sprintf(buf + strlen(buf), "[%s%d\t0] %s%s\t0\r\n", OLC_LABEL_CHANGED, GET_OLC_VNUM(ch->desc), OLC_LABEL_UNCHANGED, !real_shop(SHOP_VNUM(shop)) ? "new shop" : SHOP_NAME(real_shop(SHOP_VNUM(shop))));
-	sprintf(buf + strlen(buf), "<%sname\t0> %s\r\n", OLC_LABEL_STR(SHOP_NAME(shop), default_shop_name), NULLSAFE(SHOP_NAME(shop)));
+	build_page_display(ch, "[%s%d\t0] %s%s\t0", OLC_LABEL_CHANGED, GET_OLC_VNUM(ch->desc), OLC_LABEL_UNCHANGED, !real_shop(SHOP_VNUM(shop)) ? "new shop" : SHOP_NAME(real_shop(SHOP_VNUM(shop))));
+	build_page_display(ch, "<%sname\t0> %s", OLC_LABEL_STR(SHOP_NAME(shop), default_shop_name), NULLSAFE(SHOP_NAME(shop)));
 	
 	sprintbit(SHOP_FLAGS(shop), shop_flags, lbuf, TRUE);
-	sprintf(buf + strlen(buf), "<%sflags\t0> %s\r\n", OLC_LABEL_VAL(SHOP_FLAGS(shop), SHOP_IN_DEVELOPMENT), lbuf);
+	build_page_display(ch, "<%sflags\t0> %s", OLC_LABEL_VAL(SHOP_FLAGS(shop), SHOP_IN_DEVELOPMENT), lbuf);
 	
-	sprintf(buf + strlen(buf), "<%sopens\t0> %d%s%s\r\n", OLC_LABEL_VAL(SHOP_OPEN_TIME(shop), 0), TIME_TO_12H(SHOP_OPEN_TIME(shop)), AM_PM(SHOP_OPEN_TIME(shop)), (SHOP_OPEN_TIME(shop) == SHOP_CLOSE_TIME(shop)) ? " (always open)" : "");
-	sprintf(buf + strlen(buf), "<%scloses\t0> %d%s\r\n", OLC_LABEL_VAL(SHOP_CLOSE_TIME(shop), 0), TIME_TO_12H(SHOP_CLOSE_TIME(shop)), AM_PM(SHOP_CLOSE_TIME(shop)));
-	sprintf(buf + strlen(buf), "<%sallegiance\t0> %s\r\n", OLC_LABEL_PTR(SHOP_ALLEGIANCE(shop)), SHOP_ALLEGIANCE(shop) ? FCT_NAME(SHOP_ALLEGIANCE(shop)) : "none");
+	build_page_display(ch, "<%sopens\t0> %d%s%s", OLC_LABEL_VAL(SHOP_OPEN_TIME(shop), 0), TIME_TO_12H(SHOP_OPEN_TIME(shop)), AM_PM(SHOP_OPEN_TIME(shop)), (SHOP_OPEN_TIME(shop) == SHOP_CLOSE_TIME(shop)) ? " (always open)" : "");
+	build_page_display(ch, "<%scloses\t0> %d%s", OLC_LABEL_VAL(SHOP_CLOSE_TIME(shop), 0), TIME_TO_12H(SHOP_CLOSE_TIME(shop)), AM_PM(SHOP_CLOSE_TIME(shop)));
+	build_page_display(ch, "<%sallegiance\t0> %s", OLC_LABEL_PTR(SHOP_ALLEGIANCE(shop)), SHOP_ALLEGIANCE(shop) ? FCT_NAME(SHOP_ALLEGIANCE(shop)) : "none");
 	
-	get_quest_giver_display(SHOP_LOCATIONS(shop), lbuf);
-	sprintf(buf + strlen(buf), "Locations: <%slocation\t0>\r\n%s", OLC_LABEL_PTR(SHOP_LOCATIONS(shop)), lbuf);
+	build_page_display(ch, "Locations: <%slocation\t0>", OLC_LABEL_PTR(SHOP_LOCATIONS(shop)));
+	if (SHOP_LOCATIONS(shop)) {
+		show_quest_giver_display(ch, SHOP_LOCATIONS(shop), FALSE);
+	}
 	
 	get_shop_items_display(shop, lbuf);
-	sprintf(buf + strlen(buf), "Items: <%sitem\t0>\r\n%s", OLC_LABEL_PTR(SHOP_ITEMS(shop)), lbuf);
+	build_page_display(ch, "Items: <%sitem\t0>\r\n%s", OLC_LABEL_PTR(SHOP_ITEMS(shop)), lbuf);
 	
-	page_string(ch->desc, buf, TRUE);
+	send_page_display(ch);
 }
 
 
@@ -1171,10 +1170,11 @@ int vnum_shop(char *searchname, char_data *ch) {
 	
 	HASH_ITER(hh, shop_table, iter, next_iter) {
 		if (multi_isname(searchname, SHOP_NAME(iter))) {
-			msg_to_char(ch, "%3d. [%5d] %s\r\n", ++found, SHOP_VNUM(iter), SHOP_NAME(iter));
+			build_page_display(ch, "%3d. [%5d] %s", ++found, SHOP_VNUM(iter), SHOP_NAME(iter));
 		}
 	}
 	
+	send_page_display(ch);
 	return found;
 }
 

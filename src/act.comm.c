@@ -570,7 +570,7 @@ void load_global_history(void) {
 		}
 		
 		// file open..
-		snprintf(error, sizeof(error), "global history file %s", global_history_files[iter]);
+		safe_snprintf(error, sizeof(error), "global history file %s", global_history_files[iter]);
 			
 		for (;;) {
 			if (!get_line(fl, line)) {
@@ -884,7 +884,7 @@ void announce_to_slash_channel(struct slash_channel *chan, char_data *person, co
 	if (messg) {
 		va_start(tArgList, messg);
 		vsprintf(output, messg, tArgList);
-		snprintf(lbuf, sizeof(lbuf), "[\t%c/%s\tn] %s\tn\r\n", chan->color, chan->name, output);
+		safe_snprintf(lbuf, sizeof(lbuf), "[\t%c/%s\tn] %s\tn\r\n", chan->color, chan->name, output);
 
 		for (d = descriptor_list; d; d = d->next) {
 			if (!d->character || STATE(d) != CON_PLAYING) {
@@ -1125,10 +1125,10 @@ void load_slash_channels(void) {
 		}
 		
 		// now try to load from file
-		snprintf(filename, sizeof(filename), "%s%s", LIB_CHANNELS, name);
+		safe_snprintf(filename, sizeof(filename), "%s%s", LIB_CHANNELS, name);
 		if ((fl = fopen(filename, "r"))) {
 			// file open..
-			snprintf(error, sizeof(error), "slash-channel %s", name);
+			safe_snprintf(error, sizeof(error), "slash-channel %s", name);
 			
 			for (;;) {
 				if (!get_line(fl, line)) {
@@ -1203,7 +1203,7 @@ void log_to_slash_channel_by_name(char *chan_name, char_data *ignorable_person, 
 	if (messg) {
 		va_start(tArgList, messg);
 		vsprintf(output, messg, tArgList);
-		snprintf(lbuf, sizeof(lbuf), "[\t%c/%s\tn]: %s\tn\r\n", chan->color, chan->name, output);
+		safe_snprintf(lbuf, sizeof(lbuf), "[\t%c/%s\tn]: %s\tn\r\n", chan->color, chan->name, output);
 
 		for (d = descriptor_list; d; d = d->next) {
 			if (!d->character || STATE(d) != CON_PLAYING) {
@@ -1245,7 +1245,7 @@ FILE *open_slash_channel_file(struct slash_channel *chan) {
 		return NULL;
 	}
 	
-	snprintf(fname, sizeof(fname), "%s%s", LIB_CHANNELS, chan->lc_name);
+	safe_snprintf(fname, sizeof(fname), "%s%s", LIB_CHANNELS, chan->lc_name);
 	if (!(fl = fopen(fname, "a"))) {
 		log("SYSERR: Unable to open slash-channel file '%s' for appending", fname);
 	}
@@ -1702,7 +1702,7 @@ ACMD(do_slash_channel) {
 				strncpy(message, hist->message, MAX_INPUT_LENGTH-1);
 				message[MAX_INPUT_LENGTH-1] = '\0';
 				delete_doubledollar(message);
-				snprintf(output, sizeof(output), "%3s:%s %s%s", simple_time_since(hist->timestamp), buf, message, (message[strlen(message) - 1] != '\n') ? "\r\n" : "");
+				safe_snprintf(output, sizeof(output), "%3s:%s %s%s", simple_time_since(hist->timestamp), buf, message, (message[strlen(message) - 1] != '\n') ? "\r\n" : "");
 				
 				// put in buffer
 				CREATE(htt, struct hist_temp_t, 1);
@@ -1903,7 +1903,7 @@ ACMD(do_history) {
 	else if (subcmd == SCMD_HISTORY && *arg == '/') {
 		// forward to /history
 		char buf[MAX_STRING_LENGTH];
-		snprintf(buf, sizeof(buf), "history %s", arg);
+		safe_snprintf(buf, sizeof(buf), "history %s", arg);
 		do_slash_channel(ch, buf, 0, 0);
 		return;
 	}
@@ -1972,7 +1972,7 @@ ACMD(do_history) {
 		
 		// realname section
 		if ((chd_iter->invis_level <= GET_ACCESS_LEVEL(ch) && chd_iter->invis_level > 0) || (IS_IMMORTAL(ch) && chd_iter->is_disguised && chd_iter->invis_level == 0)) {
-			snprintf(realname, sizeof(realname), " (%s)", (plr_index = find_player_index_by_idnum(chd_iter->idnum)) ? plr_index->fullname : "<unknown>");
+			safe_snprintf(realname, sizeof(realname), " (%s)", (plr_index = find_player_index_by_idnum(chd_iter->idnum)) ? plr_index->fullname : "<unknown>");
 		}
 		else {
 			*realname = '\0';
@@ -1980,13 +1980,13 @@ ACMD(do_history) {
 		
 		// build message
 		if (chd_iter->language == NOTHING || speaks_language(ch, chd_iter->language) == LANG_SPEAK) {
-			snprintf(output, sizeof(output), "%3s:%s %s\tn%s", simple_time_since(chd_iter->timestamp), realname, chd_iter->message, (found_crlf ? "" : "\r\n"));
+			safe_snprintf(output, sizeof(output), "%3s:%s %s\tn%s", simple_time_since(chd_iter->timestamp), realname, chd_iter->message, (found_crlf ? "" : "\r\n"));
 		}
 		else if (speaks_language(ch, chd_iter->language) == LANG_RECOGNIZE) {
-			snprintf(output, sizeof(output), "%3s:%s Unknown %s speech\r\n", simple_time_since(chd_iter->timestamp), realname, get_generic_name_by_vnum(chd_iter->language));
+			safe_snprintf(output, sizeof(output), "%3s:%s Unknown %s speech\r\n", simple_time_since(chd_iter->timestamp), realname, get_generic_name_by_vnum(chd_iter->language));
 		}
 		else {
-			snprintf(output, sizeof(output), "%3s:%s Unknown language\r\n", simple_time_since(chd_iter->timestamp), realname);
+			safe_snprintf(output, sizeof(output), "%3s:%s Unknown language\r\n", simple_time_since(chd_iter->timestamp), realname);
 		}
 		
 		// put in buffer
@@ -2092,7 +2092,7 @@ ACMD(do_page) {
 	else if (!*arg)
 		msg_to_char(ch, "Whom do you wish to page?\r\n");
 	else {
-		snprintf(buf, sizeof(buf), "\007*$n* %s", buf2);
+		safe_snprintf(buf, sizeof(buf), "\007*$n* %s", buf2);
 		if (!str_cmp(arg, "all")) {
 			if (GET_ACCESS_LEVEL(ch) >= LVL_IMPL) {
 				for (d = descriptor_list; d; d = d->next) {
@@ -2321,10 +2321,9 @@ ACMD(do_say) {
 
 
 ACMD(do_speak) {
-	char buf[MAX_STRING_LENGTH], line[256], mods[256], adv_part[256];
+	char mods[256], adv_part[256];
 	struct player_language *lang, *next_lang;
 	generic_data *gen;
-	size_t size, lsize;
 	int count;
 	adv_data *adv;
 	
@@ -2337,7 +2336,7 @@ ACMD(do_speak) {
 	
 	// no-arg: Just show languages I speak
 	if (!*argument) {
-		size = snprintf(buf, sizeof(buf), "You speak the following languages:\r\n");
+		build_page_display(ch, "You speak the following languages:");
 		
 		count = 0;
 		HASH_ITER(hh, GET_LANGUAGES(ch), lang, next_lang) {
@@ -2365,7 +2364,7 @@ ACMD(do_speak) {
 			
 			// show from adventure?
 			if (GEN_FLAGGED(gen, GEN_SHOW_ADVENTURE) && (adv = get_adventure_for_vnum(lang->vnum))) {
-				snprintf(adv_part, sizeof(adv_part), " (%s)", GET_ADV_NAME(adv));
+				safe_snprintf(adv_part, sizeof(adv_part), " (%s)", GET_ADV_NAME(adv));
 			}
 			else {
 				*adv_part = '\0';
@@ -2373,30 +2372,17 @@ ACMD(do_speak) {
 			
 			// build line
 			if (*mods) {
-				lsize = snprintf(line, sizeof(line), " %s (%s)%s\r\n", GEN_NAME(gen), mods, adv_part);
+				build_page_display(ch, " %s (%s)%s", GEN_NAME(gen), mods, adv_part);
 			}
 			else {
-				lsize = snprintf(line, sizeof(line), " %s%s\r\n", GEN_NAME(gen), adv_part);
-			}
-			
-			// append
-			if (size + lsize + 17 < sizeof(buf)) {
-				strcat(buf, line);
-				size += lsize;
-			}
-			else {
-				// overflow somehow?
-				size += snprintf(buf + size, sizeof(buf) - size, "**OVERFLOW**\r\n");
-				break;
+				build_page_display(ch, " %s%s", GEN_NAME(gen), adv_part);
 			}
 		}
 		
 		if (!count) {
-			size += snprintf(buf + size, sizeof(buf) - size, " none\r\n");
+			build_page_display_str(ch, " none");
 		}
-		if (ch->desc) {
-			page_string(ch->desc, buf, TRUE);
-		}
+		send_page_display(ch);
 		return;
 	}
 	

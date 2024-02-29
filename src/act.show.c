@@ -88,7 +88,7 @@ SHOW(show_islands) {
 	struct shipping_data *shipd;
 	struct empire_storage_data *store, *next_store;
 	struct empire_island *eisle, *next_eisle;
-	char arg[MAX_INPUT_LENGTH], tech_str[MAX_STRING_LENGTH];
+	char tech_str[MAX_STRING_LENGTH];
 	struct island_info *isle;
 	empire_data *emp;
 	int iter, tid;
@@ -119,7 +119,7 @@ SHOW(show_islands) {
 			*tech_str = '\0';
 			for (tid = 0; tid < NUM_TECHS; ++tid) {
 				if (eisle->tech[tid] > 0 && search_block_int(tid, techs_requiring_same_island) != NOTHING) {
-					snprintf(tech_str + strlen(tech_str), sizeof(tech_str) - strlen(tech_str), "%s%s", (*tech_str ? ", " : ""), empire_tech_types[tid]);
+					safe_snprintf(tech_str + strlen(tech_str), sizeof(tech_str) - strlen(tech_str), "%s%s", (*tech_str ? ", " : ""), empire_tech_types[tid]);
 				}
 			}
 			if (*tech_str) {
@@ -434,32 +434,26 @@ SHOW(show_ammotypes) {
 	obj_data *obj, *next_obj;
 	int total;
 	
-	strcpy(buf, "You find the following ammo types:\r\n");
+	build_page_display(ch, "You find the following ammo types:");
 	
 	total = 0;
 	HASH_ITER(hh, object_table, obj, next_obj) {
 		if (IS_MISSILE_WEAPON(obj) || IS_AMMO(obj)) {
-			sprintf(buf1, " %c: %s", 'A' + GET_OBJ_VAL(obj, IS_AMMO(obj) ? VAL_AMMO_TYPE : VAL_MISSILE_WEAPON_AMMO_TYPE), GET_OBJ_SHORT_DESC(obj));
-			sprintf(buf + strlen(buf), "%-32.32s%s", buf1, ((total++ % 2) ? "\r\n" : ""));
+			build_page_display_col(ch, 2, FALSE, " %c: [%5d] %s", 'A' + GET_OBJ_VAL(obj, IS_AMMO(obj) ? VAL_AMMO_TYPE : VAL_MISSILE_WEAPON_AMMO_TYPE), GET_OBJ_VNUM(obj), skip_filler(GET_OBJ_SHORT_DESC(obj)));
+			++total;
 		}
 	}
 	
 	if (total == 0) {
-		msg_to_char(ch, "You find no objects with ammo types.\r\n");
+		build_page_display_str(ch, " none");
 	}
-	else {
-		if ((total % 2) != 0) {
-			strcat(buf, "\r\n");
-		}
-		page_string(ch->desc, buf, TRUE);
-	}
+	
+	send_page_display(ch);
 }
 
 
 SHOW(show_author) {
-	char arg[MAX_INPUT_LENGTH], output[MAX_STRING_LENGTH], line[MAX_STRING_LENGTH];
-	int idnum;
-	size_t size, count;
+	int idnum, count;
 	book_data *book, *next_book;
 	player_index_data *index;
 	
@@ -472,7 +466,7 @@ SHOW(show_author) {
 		msg_to_char(ch, "Show author: Invalid author idnum.\r\n");
 	}
 	else {
-		size = snprintf(output, sizeof(output), "Books authored by [%d] %s:\r\n", idnum, (index = find_player_index_by_idnum(idnum)) ? index->fullname : "nobody");
+		build_page_display(ch, "Books authored by [%d] %s:", idnum, (index = find_player_index_by_idnum(idnum)) ? index->fullname : "nobody");
 		
 		count = 0;
 		HASH_ITER(hh, book_table, book, next_book) {
@@ -480,46 +474,31 @@ SHOW(show_author) {
 				continue;
 			}
 			
-			snprintf(line, sizeof(line), "[%7d] %s\r\n", BOOK_VNUM(book), BOOK_TITLE(book));
-			
-			if (size + strlen(line) < sizeof(output)) {
-				strcat(output, line);
-				size += strlen(line);
-				++count;
-			}
-			else {
-				if (size + 10 < sizeof(output)) {
-					strcat(output, "OVERFLOW\r\n");
-				}
-				break;
-			}
+			build_page_display(ch, "[%7d] %s", BOOK_VNUM(book), BOOK_TITLE(book));
+			++count;
 		}
 		
 		if (!count) {
-			strcat(output, "  none\r\n");	// space reserved for this for sure
+			build_page_display_str(ch, "  none");
 		}
 		
-		if (ch->desc) {
-			page_string(ch->desc, output, TRUE);
-		}
+		send_page_display(ch);
 	}
 }
 
 
 SHOW(show_buildings) {
-	char buf[MAX_STRING_LENGTH * 2], line[256], part[256];
+	char part[256];
 	struct sector_index_type *idx;
 	bld_data *bld, *next_bld;
 	int count, total, this;
 	struct map_data *map;
-	size_t size, l_size;
 	sector_data *sect;
 	room_data *room;
-	bool any, use_columns;
+	bool any;
 	
 	// fresh numbers
 	update_world_count();
-	use_columns = !PRF_FLAGGED(ch, PRF_SCREEN_READER);
 	
 	if (!*argument) {	// no-arg: show summary
 		// output
@@ -531,15 +510,12 @@ SHOW(show_buildings) {
 			}
 			
 			this = stats_get_building_count(bld);
-			strcpy(buf, GET_BLD_NAME(bld));
-			msg_to_char(ch, " %6d %-26.26s %s", this, CAP(buf), (!((++count)%2) || !use_columns) ? "\r\n" : " ");
+			build_page_display_col(ch, 2, FALSE, " %6d &Z%s", this, GET_BLD_NAME(bld));
 			total += this;
 		}
-		if (count % 2 && use_columns) {
-			msg_to_char(ch, "\r\n");
-		}
 	
-		msg_to_char(ch, " Total: %d\r\n", total);
+		build_page_display(ch, " Total: %d", total);
+		send_page_display(ch);
 	}
 	// argument usage: show building <vnum | name>
 	else if (!(isdigit(*argument) && (bld = building_proto(atoi(argument)))) && !(bld = get_building_by_name(argument, FALSE))) {
@@ -552,7 +528,7 @@ SHOW(show_buildings) {
 		msg_to_char(ch, "Show buildings: Error looking up buildings: default sector not configured.\r\n");
 	}
 	else {
-		size = snprintf(buf, sizeof(buf), "[%d] %s (%d in world):\r\n", GET_BLD_VNUM(bld), GET_BLD_NAME(bld), stats_get_building_count(bld));
+		build_page_display(ch, "[%d] %s (%d in world):", GET_BLD_VNUM(bld), GET_BLD_NAME(bld), stats_get_building_count(bld));
 		
 		any = FALSE;
 		LL_FOREACH2(idx->sect_rooms, map, next_in_sect) {
@@ -564,30 +540,20 @@ SHOW(show_buildings) {
 			
 			// found
 			if (ROOM_OWNER(room)) {
-				snprintf(part, sizeof(part), " - %s%s\t0", EMPIRE_BANNER(ROOM_OWNER(room)), EMPIRE_ADJECTIVE(ROOM_OWNER(room)));
+				safe_snprintf(part, sizeof(part), " - %s%s\t0", EMPIRE_BANNER(ROOM_OWNER(room)), EMPIRE_ADJECTIVE(ROOM_OWNER(room)));
 			}
 			else {
 				*part = '\0';
 			}
-			l_size = snprintf(line, sizeof(line), "(%*d, %*d) %s%s\r\n", X_PRECISION, MAP_X_COORD(map->vnum), Y_PRECISION, MAP_Y_COORD(map->vnum), get_room_name(room, FALSE), part);
+			build_page_display(ch, "(%*d, %*d) %s%s", X_PRECISION, MAP_X_COORD(map->vnum), Y_PRECISION, MAP_Y_COORD(map->vnum), get_room_name(room, FALSE), part);
 			any = TRUE;
-			
-			if (size + l_size < sizeof(buf) + 40) {	// reserve a little extra space
-				strcat(buf, line);
-				size += l_size;
-			}
-			else {
-				// hit the end, but we reserved space
-				snprintf(buf + size, sizeof(buf) - size, "... and more\r\n");
-				break;
-			}
 		}
 		
 		if (!any) {
-			snprintf(buf + size, sizeof(buf) - size, " no matching tiles\r\n");
+			build_page_display_str(ch, " no matching tiles");
 		}
 		
-		page_string(ch->desc, buf, TRUE);
+		send_page_display(ch);
 	}
 }
 
@@ -616,13 +582,12 @@ SHOW(show_commons) {
 
 
 SHOW(show_companions) {
-	char arg[MAX_INPUT_LENGTH], buf[MAX_STRING_LENGTH * 2], line[MAX_STRING_LENGTH];
 	char_data *proto = NULL, *plr = NULL;
 	struct companion_data *cd, *next_cd;
-	bool full, found, file = FALSE;
+	bool found, file = FALSE;
 	struct companion_mod *cmod;
 	ability_data *abil;
-	size_t size, lsize;
+	struct page_display *line;
 	
 	argument = one_word(argument, arg);
 	skip_spaces(&argument);
@@ -638,13 +603,13 @@ SHOW(show_companions) {
 		setup_ability_companions(plr);
 		
 		if (*argument) {
-			size = snprintf(buf, sizeof(buf), "Companions matching '%s' for %s:\r\n", argument, GET_NAME(plr));
+			build_page_display(ch, "Companions matching '%s' for %s:", argument, GET_NAME(plr));
 		}
 		else {
-			size = snprintf(buf, sizeof(buf), "Companions for %s:\r\n", GET_NAME(plr));
+			build_page_display(ch, "Companions for %s:", GET_NAME(plr));
 		}
 		
-		found = full = FALSE;
+		found = FALSE;
 		HASH_ITER(hh, GET_COMPANIONS(plr), cd, next_cd) {
 			if (cd->from_abil != NOTHING && !has_ability(plr, cd->from_abil)) {
 				continue;	// missing ability: don't show
@@ -662,39 +627,19 @@ SHOW(show_companions) {
 			
 			// build display
 			cmod = get_companion_mod_by_type(cd, CMOD_SHORT_DESC);
-			lsize = snprintf(line, sizeof(line), " [%5d] %s", cd->vnum, skip_filler(cmod ? cmod->str : get_mob_name_by_proto(cd->vnum, TRUE)));
+			line = build_page_display(ch, " [%5d] %s", cd->vnum, skip_filler(cmod ? cmod->str : get_mob_name_by_proto(cd->vnum, TRUE)));
 			
 			if (cd->from_abil != NOTHING && (abil = find_ability_by_vnum(cd->from_abil)) && ABIL_COST(abil) > 0) {
-				lsize += snprintf(line + lsize, sizeof(line) - lsize, " (%d %s)", ABIL_COST(abil), pool_types[ABIL_COST_TYPE(abil)]);
+				append_page_display_line(line, " (%d %s)", ABIL_COST(abil), pool_types[ABIL_COST_TYPE(abil)]);
 			}
 			
-			strcat(line, "\r\n");
-			lsize += 2;
 			found = TRUE;
-			
-			if (size + lsize < sizeof(buf)) {
-				strcat(buf, line);
-				size += lsize;
-			}
-			else {
-				full = TRUE;
-				break;
-			}
-			
-			if (full) {
-				break;
-			}
 		}
 		
 		if (!found) {
-			strcat(buf, " none\r\n");	// always room for this if !found
+			build_page_display_str(ch, " none");
 		}
-		if (full) {
-			snprintf(buf + size, sizeof(buf) - size, "OVERFLOW\r\n");
-		}
-		if (ch->desc) {
-			page_string(ch->desc, buf, TRUE);
-		}
+		send_page_display(ch);
 	}
 	
 	if (plr && file) {
@@ -704,10 +649,9 @@ SHOW(show_companions) {
 
 
 SHOW(show_components) {
-	char buf[MAX_STRING_LENGTH], part[MAX_STRING_LENGTH];
+	char part[MAX_STRING_LENGTH];
 	obj_data *obj, *next_obj;
 	generic_data *cmp;
-	size_t size;
 	
 	skip_spaces(&argument);	// component name/vnum
 	
@@ -719,44 +663,37 @@ SHOW(show_components) {
 	}
 	else {
 		// preamble
-		size = snprintf(buf, sizeof(buf), "Components for [%d] (%s):\r\n", GEN_VNUM(cmp), GEN_NAME(cmp));
+		build_page_display(ch, "Components for [%d] (%s):", GEN_VNUM(cmp), GEN_NAME(cmp));
 		
 		HASH_ITER(hh, object_table, obj, next_obj) {
-			if (size >= sizeof(buf)) {
-				break;
-			}
 			if (!is_component(obj, cmp)) {
 				continue;	// wrong type
 			}
 			
 			// show component name if it's not an exact match
 			if (GET_OBJ_COMPONENT(obj) != GEN_VNUM(cmp)) {
-				snprintf(part, sizeof(part), " (%s)", get_generic_name_by_vnum(GET_OBJ_COMPONENT(obj)));
+				safe_snprintf(part, sizeof(part), " (%s)", get_generic_name_by_vnum(GET_OBJ_COMPONENT(obj)));
 			}
 			else {
 				*part = '\0';
 			}
-			size += snprintf(buf + size, sizeof(buf) - size, "[%5d] %s%s\r\n", GET_OBJ_VNUM(obj), GET_OBJ_SHORT_DESC(obj), part);
+			build_page_display(ch, "[%5d] %s%s", GET_OBJ_VNUM(obj), GET_OBJ_SHORT_DESC(obj), part);
 		}
 		
-		if (ch->desc) {
-			page_string(ch->desc, buf, TRUE);
-		}
+		send_page_display(ch);
 	}
 }
 
 
 SHOW(show_crops) {
-	char buf[MAX_STRING_LENGTH * 2], line[256], part[256];
+	char part[256];
 	crop_data *crop, *next_crop;
 	int count, total, this;
 	struct map_data *map;
-	size_t size, l_size;
-	bool any, use_columns;
+	bool any;
 	
 	// fresh numbers
 	update_world_count();
-	use_columns = !PRF_FLAGGED(ch, PRF_SCREEN_READER);
 	
 	if (!*argument) {	// no-arg: show summary
 		// output
@@ -764,23 +701,19 @@ SHOW(show_crops) {
 	
 		HASH_ITER(hh, crop_table, crop, next_crop) {
 			this = stats_get_crop_count(crop);
-			strcpy(buf, GET_CROP_NAME(crop));
-			msg_to_char(ch, " %6d %-26.26s %s", this, CAP(buf), (!((++count)%2) || !use_columns) ? "\r\n" : " ");
+			build_page_display_col(ch, 2, FALSE, " %6d &Z%s", this, GET_CROP_NAME(crop));
 			total += this;
 		}
-		if (count % 2 && use_columns) {
-			msg_to_char(ch, "\r\n");
-		}
 	
-		msg_to_char(ch, " Total: %d\r\n", total);
+		build_page_display(ch, " Total: %d", total);
+		send_page_display(ch);
 	}
 	// argument usage: show building <vnum | name>
 	else if (!(isdigit(*argument) && (crop = crop_proto(atoi(argument)))) && !(crop = get_crop_by_name(argument))) {
 		msg_to_char(ch, "Show crops: Unknown crop '%s'.\r\n", argument);
 	}
 	else {
-		strcpy(part, GET_CROP_NAME(crop));
-		size = snprintf(buf, sizeof(buf), "[%d] %s (%d in world):\r\n", GET_CROP_VNUM(crop), CAP(part), stats_get_crop_count(crop));
+		build_page_display(ch, "[%d] &Z%s (%d in world):", GET_CROP_VNUM(crop), GET_CROP_NAME(crop), stats_get_crop_count(crop));
 		
 		any = FALSE;
 		LL_FOREACH(land_map, map) {
@@ -790,42 +723,29 @@ SHOW(show_crops) {
 			
 			// room info if possible
 			if (map->room && ROOM_OWNER(map->room)) {
-				snprintf(part, sizeof(part), " - %s%s\t0", EMPIRE_BANNER(ROOM_OWNER(map->room)), EMPIRE_ADJECTIVE(ROOM_OWNER(map->room)));
+				safe_snprintf(part, sizeof(part), " - %s%s\t0", EMPIRE_BANNER(ROOM_OWNER(map->room)), EMPIRE_ADJECTIVE(ROOM_OWNER(map->room)));
 			}
 			else {
 				*part = '\0';
 			}
-			l_size = snprintf(line, sizeof(line), "(%*d, %*d) %s%s\r\n", X_PRECISION, MAP_X_COORD(map->vnum), Y_PRECISION, MAP_Y_COORD(map->vnum), map->room ? get_room_name(map->room, FALSE) : GET_CROP_TITLE(crop), part);
+			build_page_display(ch, "(%*d, %*d) %s%s", X_PRECISION, MAP_X_COORD(map->vnum), Y_PRECISION, MAP_Y_COORD(map->vnum), map->room ? get_room_name(map->room, FALSE) : GET_CROP_TITLE(crop), part);
 			any = TRUE;
-			
-			if (size + l_size < sizeof(buf) + 40) {	// reserve a little extra space
-				strcat(buf, line);
-				size += l_size;
-			}
-			else {
-				// hit the end, but we reserved space
-				snprintf(buf + size, sizeof(buf) - size, "... and more\r\n");
-				break;
-			}
 		}
 		
 		if (!any) {
-			snprintf(buf + size, sizeof(buf) - size, " no matching tiles\r\n");
+			build_page_display_str(ch, " no matching tiles");
 		}
 		
-		page_string(ch->desc, buf, TRUE);
+		send_page_display(ch);
 	}
 }
 
 
 SHOW(show_currency) {
-	char buf[MAX_STRING_LENGTH], line[MAX_STRING_LENGTH];
-	struct player_currency *cur, *next_cur;
 	char_data *plr = NULL;
 	bool file = FALSE;
-	size_t size;
 	
-	one_argument(argument, arg);
+	argument = one_argument(argument, arg);
 	
 	if (!*arg) {
 		msg_to_char(ch, "Usage: show currency <player>\r\n");
@@ -834,29 +754,8 @@ SHOW(show_currency) {
 		send_to_char("Show currency: There is no such player.\r\n", ch);
 	}
 	else {
-	
-		coin_string(GET_PLAYER_COINS(plr), line);
-		size = snprintf(buf, sizeof(buf), "%s has %s.\r\n", GET_NAME(plr), line);
-	
-		if (GET_CURRENCIES(plr)) {
-			size += snprintf(buf + size, sizeof(buf) - size, "Currencies:\r\n");
-		
-			HASH_ITER(hh, GET_CURRENCIES(plr), cur, next_cur) {
-				snprintf(line, sizeof(line), "[%5d] %3d %s\r\n", cur->vnum, cur->amount, get_generic_string_by_vnum(cur->vnum, GENERIC_CURRENCY, WHICH_CURRENCY(cur->amount)));
-			
-				if (size + strlen(line) < sizeof(buf)) {
-					strcat(buf, line);
-					size += strlen(line);
-				}
-				else {
-					break;
-				}
-			}
-		}
-	
-		if (ch->desc) {
-			page_string(ch->desc, buf, TRUE);
-		}
+		check_delayed_load(plr);
+		show_coins_and_currency(plr, ch, argument, FALSE, TRUE);
 	}
 	
 	if (plr && file) {
@@ -866,9 +765,7 @@ SHOW(show_currency) {
 
 
 SHOW(show_dailycycle) {
-	char arg[MAX_INPUT_LENGTH], buf[MAX_STRING_LENGTH];
 	quest_data *qst, *next_qst;
-	size_t size;
 	int num, count;
 	
 	one_argument(argument, arg);
@@ -893,69 +790,54 @@ SHOW(show_dailycycle) {
 			num = QUEST_DAILY_CYCLE(qst);
 		}
 		
-		size = snprintf(buf, sizeof(buf), "Daily quests with cycle id %d:\r\n", num);
+		build_page_display(ch, "Daily quests with cycle id %d:", num);
 		HASH_ITER(hh, quest_table, qst, next_qst) {
 			if (!IS_DAILY_QUEST(qst) || QUEST_DAILY_CYCLE(qst) != num) {
 				continue;
 			}
 			
-			size += snprintf(buf + size, sizeof(buf) - size, "[%5d] %s%s%s\r\n", QUEST_VNUM(qst), QUEST_NAME(qst), QUEST_DAILY_ACTIVE(qst) ? " (active)" : "", IS_EVENT_QUEST(qst) ? " (event)" : "");
+			build_page_display(ch, "[%5d] %s%s%s", QUEST_VNUM(qst), QUEST_NAME(qst), QUEST_DAILY_ACTIVE(qst) ? " (active)" : "", IS_EVENT_QUEST(qst) ? " (event)" : "");
 		}
 		
-		if (ch->desc) {
-			page_string(ch->desc, buf, TRUE);
-		}
+		send_page_display(ch);
 	}
 }
 
 
 SHOW(show_data) {
-	char output[MAX_STRING_LENGTH * 2], line[MAX_STRING_LENGTH];
 	struct stored_data *data, *next_data;
-	size_t size;
 	
-	size = snprintf(output, sizeof(output), "Stored data:\r\n");
+	build_page_display_str(ch, "Stored data:");
 	
 	HASH_ITER(hh, data_table, data, next_data) {
 		// DATYPE_x:
 		switch (data->keytype) {
 			case DATYPE_INT: {
-				snprintf(line, sizeof(line), " %s: %d\r\n", stored_data_info[data->key].name, data_get_int(data->key));
+				build_page_display(ch, " %s: %d", stored_data_info[data->key].name, data_get_int(data->key));
 				break;
 			}
 			case DATYPE_LONG: {
-				snprintf(line, sizeof(line), " %s: %ld\r\n", stored_data_info[data->key].name, data_get_long(data->key));
+				build_page_display(ch, " %s: %ld", stored_data_info[data->key].name, data_get_long(data->key));
 				break;
 			}
 			case DATYPE_DOUBLE: {
-				snprintf(line, sizeof(line), " %s: %f\r\n", stored_data_info[data->key].name, data_get_double(data->key));
+				build_page_display(ch, " %s: %f", stored_data_info[data->key].name, data_get_double(data->key));
 				break;
 			}
 			default: {
-				snprintf(line, sizeof(line), " %s: UNKNOWN\r\n", stored_data_info[data->key].name);
+				build_page_display(ch, " %s: UNKNOWN", stored_data_info[data->key].name);
 				break;
 			}
 		}
-		
-		if ((size += strlen(line)) < sizeof(output)) {
-			strcat(output, line);
-		}
-		else {
-			break;
-		}
 	}
 	
-	if (ch->desc) {
-		page_string(ch->desc, output, TRUE);
-	}
+	send_page_display(ch);
 }
 
 
 SHOW(show_dropped_items) {
 	struct empire_dropped_item *edi, *next;
-	char buf[MAX_STRING_LENGTH], line[256];
 	empire_data *emp;
-	size_t size, lsize;
 	int count;
 	
 	skip_spaces(&argument);
@@ -966,45 +848,34 @@ SHOW(show_dropped_items) {
 		msg_to_char(ch, "Show dropped: Unknown empire '%s'.\r\n", argument);
 	}
 	else {
-		size = snprintf(buf, sizeof(buf), "Dropped items for %s%s\t0:\r\n", EMPIRE_BANNER(emp), EMPIRE_NAME(emp));
+		build_page_display(ch, "Dropped items for %s%s\t0:", EMPIRE_BANNER(emp), EMPIRE_NAME(emp));
 		count = 0;
 		HASH_ITER(hh, EMPIRE_DROPPED_ITEMS(emp), edi, next) {
-			lsize = snprintf(line, sizeof(line), "(%d) [%d] %s\r\n", edi->count, edi->vnum, get_obj_name_by_proto(edi->vnum));
+			build_page_display(ch, "(%d) [%d] %s", edi->count, edi->vnum, get_obj_name_by_proto(edi->vnum));
 			SAFE_ADD(count, edi->count, 0, INT_MAX, FALSE);
-			
-			if (size + lsize < sizeof(buf)) {
-				strcat(buf, line);
-				size += lsize;
-			}
-			else {
-				size += snprintf(buf + size, sizeof(buf) - size, "OVERFLOW\r\n");
-				break;
-			}
 		}
 		if (!count) {
-			strcat(buf, " none\r\n");	// always room if !count
+			build_page_display_str(ch, " none");	// always room if !count
 		}
-		else if (size + 15 < sizeof(buf)) {
-			size += snprintf(buf + size, sizeof(buf) - size, "(%d total)\r\n", count);
+		else {
+			build_page_display(ch, "(%d total)", count);
 		}
 		
-		if (ch->desc) {
-			page_string(ch->desc, buf, TRUE);
-		}
+		send_page_display(ch);
 	}
 }
 
 
 SHOW(show_editors) {
 	bool any;
-	char output[MAX_STRING_LENGTH], line[256], part[256];
+	char line[256], part[256];
 	int count = 0;
-	size_t size, lsize;
+	size_t lsize;
 	char_data *targ;
 	descriptor_data *desc;
 	player_index_data *index;
 	
-	size = snprintf(output, sizeof(output), "Players using editors:\r\n");
+	build_page_display_str(ch, "Players using editors:");
 	
 	LL_FOREACH(descriptor_list, desc) {
 		if (STATE(desc) != CON_PLAYING || !(targ = desc->character)) {
@@ -1058,34 +929,28 @@ SHOW(show_editors) {
 			}
 		}
 		
-		if (any && size + lsize + 20 < sizeof(output)) {
+		if (any) {
+			build_page_display_str(ch, line);
 			++count;
-			size += snprintf(output + size, sizeof(output) - size, "%s\r\n", line);
-		}
-		else if (any) {
-			size += snprintf(output + size, sizeof(output) - size, "OVERFLOW\r\n");
-			break;
 		}
 	}
 	
 	if (!count) {
-		size += snprintf(output + size, sizeof(output) - size, " none\r\n");
+		build_page_display_str(ch, " none");
 	}
 	
-	if (ch->desc) {
-		page_string(ch->desc, output, TRUE);
-	}
+	send_page_display(ch);
 }
 
 
 SHOW(show_factions) {
-	char name[MAX_INPUT_LENGTH], *arg2, buf[MAX_STRING_LENGTH];
+	char name[MAX_INPUT_LENGTH];
+	char *arg2;
 	struct player_faction_data *pfd, *next_pfd;
 	faction_data *fct;
 	bool file = FALSE;
 	char_data *vict;
 	int count = 0;
-	size_t size;
 	int idx;
 	
 	arg2 = any_one_arg(argument, name);
@@ -1096,11 +961,8 @@ SHOW(show_factions) {
 	}
 	else {
 		check_delayed_load(vict);
-		size = snprintf(buf, sizeof(buf), "%s's factions:\r\n", GET_NAME(vict));
+		build_page_display(ch, "%s's factions:", GET_NAME(vict));
 		HASH_ITER(hh, GET_FACTIONS(vict), pfd, next_pfd) {
-			if (size + 10 >= sizeof(buf)) {
-				break;	// out of room
-			}
 			if (!(fct = find_faction_by_vnum(pfd->vnum))) {
 				continue;
 			}
@@ -1110,15 +972,14 @@ SHOW(show_factions) {
 			
 			++count;
 			idx = rep_const_to_index(pfd->rep);
-			size += snprintf(buf + size, sizeof(buf) - size, "[%5d] %s %s(%s / %d)\t0%s\r\n", pfd->vnum, FCT_NAME(fct), reputation_levels[idx].color, reputation_levels[idx].name, pfd->value, (FACTION_FLAGGED(fct, FCT_HIDE_IN_LIST) ? " (hidden)" : ""));
+			build_page_display(ch, "[%5d] %s %s(%s / %d)\t0%s", pfd->vnum, FCT_NAME(fct), reputation_levels[idx].color, reputation_levels[idx].name, pfd->value, (FACTION_FLAGGED(fct, FCT_HIDE_IN_LIST) ? " (hidden)" : ""));
 		}
 		
 		if (!count) {
-			strcat(buf, " none\r\n");
+			build_page_display_str(ch, " none");
 		}
-		if (ch->desc) {
-			page_string(ch->desc, buf, TRUE);
-		}
+		
+		send_page_display(ch);
 	}
 	
 	if (file) {
@@ -1128,7 +989,6 @@ SHOW(show_factions) {
 
 
 SHOW(show_fmessages) {
-	char arg[MAX_INPUT_LENGTH];
 	int count, iter;
 	char_data *plr = NULL;
 	bool on, screenreader = (PRF_FLAGGED(ch, PRF_SCREEN_READER) ? TRUE : FALSE), file = FALSE;
@@ -1169,9 +1029,7 @@ SHOW(show_fmessages) {
 
 SHOW(show_friends) {
 	bool file = FALSE;
-	char output[MAX_STRING_LENGTH * 2], line[256];
 	int count;
-	size_t size, lsize;
 	char_data *plr = NULL;
 	account_data *acct;
 	struct friend_data *friend, *next_friend;
@@ -1188,7 +1046,7 @@ SHOW(show_friends) {
 		msg_to_char(ch, "Show friends: You can't do that.\r\n");
 	}
 	else {
-		size = snprintf(output, sizeof(output), "Friends list for %s%s:\r\n", GET_NAME(plr), PRF_FLAGGED(plr, PRF_NO_FRIENDS) ? " (no-friends toggled on)" : "");
+		build_page_display(ch, "Friends list for %s%s:", GET_NAME(plr), PRF_FLAGGED(plr, PRF_NO_FRIENDS) ? " (no-friends toggled on)" : "");
 		count = 0;
 		
 		HASH_ITER(hh, GET_ACCOUNT_FRIENDS(plr), friend, next_friend) {
@@ -1200,25 +1058,15 @@ SHOW(show_friends) {
 			}
 			
 			// actual line
-			lsize = snprintf(line, sizeof(line), " %s - %s\r\n", (friend->name ? friend->name : "Unknown"), friend_status_types[friend->status]);
+			build_page_display(ch, " %s - %s", (friend->name ? friend->name : "Unknown"), friend_status_types[friend->status]);
 			++count;
-			
-			if (size + lsize + 80 < sizeof(output)) {
-				strcat(output, line);
-				size += lsize;
-			}
-			else {
-				// space reserved for this
-				strcat(output, "... and more\r\n");
-				break;
-			}
 		}
 		
 		if (!count) {
-			strcat(output, " none\r\n");
+			build_page_display_str(ch, " none");
 		}
 		
-		page_string(ch->desc, output, TRUE);
+		send_page_display(ch);
 	}
 	
 	if (plr && file) {
@@ -1256,10 +1104,10 @@ SHOW(show_home) {
 
 
 SHOW(show_homeless) {
-	char arg[MAX_INPUT_LENGTH], buf[MAX_STRING_LENGTH * 2], line[MAX_STRING_LENGTH];
+	char line[MAX_STRING_LENGTH];
 	struct empire_homeless_citizen *ehc;
 	struct generic_name_data *nameset;
-	size_t size, lsize;
+	size_t lsize;
 	empire_data *emp;
 	char_data *proto;
 	int count;
@@ -1278,7 +1126,7 @@ SHOW(show_homeless) {
 		return;
 	}
 	
-	size = snprintf(buf, sizeof(buf), "Homeless citizens for %s%s\t0:\r\n", EMPIRE_BANNER(emp), EMPIRE_NAME(emp));
+	build_page_display(ch, "Homeless citizens for %s%s\t0:", EMPIRE_BANNER(emp), EMPIRE_NAME(emp));
 	
 	count = 0;
 	LL_FOREACH(EMPIRE_HOMELESS_CITIZENS(emp), ehc) {
@@ -1302,26 +1150,18 @@ SHOW(show_homeless) {
 		// mob portion of the display
 		lsize += snprintf(line + lsize, sizeof(line) - lsize, "[%5d] %s '%s'\r\n", ehc->vnum, get_mob_name_by_proto(ehc->vnum, FALSE), ehc->name < nameset->size ? nameset->names[ehc->name] : "unknown");
 		
-		if (size + lsize < sizeof(buf)) {
-			strcat(buf, line);
-			size += lsize;
-		}
-		else {
-			snprintf(buf + size, sizeof(buf) - size, "**OVERFLOW**\r\n");
-			break;
-		}
+		build_page_display_str(ch, line);
 	}
 	
 	if (count == 0) {
-		strcat(buf, " none\r\n");	// always room if count == 0
+		build_page_display(ch, " none");
 	}
 	
-	page_string(ch->desc, buf, TRUE);
+	send_page_display(ch);
 }
 
 
 SHOW(show_ignoring) {
-	char arg[MAX_INPUT_LENGTH];
 	player_index_data *index;
 	bool found, file = FALSE;
 	char_data *vict = NULL;
@@ -1340,20 +1180,21 @@ SHOW(show_ignoring) {
 	}
 	else {
 		// just list ignores
-		msg_to_char(ch, "%s is ignoring: \r\n", GET_NAME(vict));
+		build_page_display(ch, "%s is ignoring:", GET_NAME(vict));
 		
 		found = FALSE;
 		for (iter = 0; iter < MAX_IGNORES; ++iter) {
 			if (GET_IGNORE_LIST(vict, iter) != 0 && (index = find_player_index_by_idnum(GET_IGNORE_LIST(vict, iter)))) {
-				msg_to_char(ch, " %s\r\n", index->fullname);
+				build_page_display_col(ch, 4, FALSE, " %s", index->fullname);
 				found = TRUE;
 			}
 		}
 		
 		if (!found) {
-			msg_to_char(ch, " nobody\r\n");
+			build_page_display(ch, " nobody");
 		}
-	
+		
+		send_page_display(ch);
 	}
 	
 	if (vict && file) {
@@ -1363,14 +1204,13 @@ SHOW(show_ignoring) {
 
 
 SHOW(show_inventory) {
-	char arg1[MAX_INPUT_LENGTH], arg2[MAX_INPUT_LENGTH], buf[MAX_STRING_LENGTH], line[256];
+	char arg1[MAX_INPUT_LENGTH], arg2[MAX_INPUT_LENGTH];
 	player_index_data *index, *next_index;
 	struct empire_unique_storage *eus;
 	unsigned long long timer;
 	obj_vnum vnum;
 	bool all = FALSE, loaded;
 	char_data *load;
-	size_t size, lsize;
 	int count, pos, players, empires;
 	empire_data *emp, *next_emp;
 	
@@ -1388,7 +1228,7 @@ SHOW(show_inventory) {
 	}
 	else {
 		timer = microtime();
-		size = snprintf(buf, sizeof(buf), "Searching%s inventories for %d %s:\r\n", (all ? " all" : ""), vnum, get_obj_name_by_proto(vnum));
+		build_page_display(ch, "Searching%s inventories for %d %s:", (all ? " all" : ""), vnum, get_obj_name_by_proto(vnum));
 		players = empires = 0;
 		
 		// players
@@ -1428,17 +1268,8 @@ SHOW(show_inventory) {
 			}
 			
 			// build text
-			lsize = snprintf(line, sizeof(line), "%s: %d\r\n", index->fullname, count);
+			build_page_display(ch, "%s: %d", index->fullname, count);
 			++players;
-			
-			if (size + lsize + 10 < sizeof(buf)) {
-				strcat(buf, line);
-				size += lsize;
-			}
-			else {	// full
-				size += snprintf(buf + size, sizeof(buf) - size, "OVERFLOW\r\n");
-				break;
-			}
 		}
 		
 		// empires
@@ -1463,35 +1294,22 @@ SHOW(show_inventory) {
 			}
 			
 			// build text
-			lsize = snprintf(line, sizeof(line), "%s%s\t0 (empire): %d\r\n", EMPIRE_BANNER(emp), EMPIRE_NAME(emp), count);
+			build_page_display(ch, "%s%s\t0 (empire): %d", EMPIRE_BANNER(emp), EMPIRE_NAME(emp), count);
 			++empires;
-			
-			if (size + lsize + 10 < sizeof(buf)) {
-				strcat(buf, line);
-				size += lsize;
-			}
-			else {	// full
-				size += snprintf(buf + size, sizeof(buf) - size, "OVERFLOW\r\n");
-				break;
-			}
 		}
 		
-		lsize = snprintf(line, sizeof(line), "(%d player%s, %d empire%s, %.2f seconds for search)\r\n", players, PLURAL(players), empires, PLURAL(empires), (microtime() - timer) / 1000000.0);
-		if (size + lsize < sizeof(buf)) {
-			strcat(buf, line);
-		}
+		build_page_display(ch, "(%d player%s, %d empire%s, %.2f seconds for search)", players, PLURAL(players), empires, PLURAL(empires), (microtime() - timer) / 1000000.0);
 		
-		page_string(ch->desc, buf, TRUE);
+		send_page_display(ch);
 	}
 }
 
 
 SHOW(show_languages) {
-	char arg[MAX_INPUT_LENGTH], output[MAX_STRING_LENGTH], line[MAX_STRING_LENGTH];
 	struct player_language *lang, *next_lang;
 	generic_data *gen;
 	char_data *plr = NULL;
-	size_t size, count;
+	int count;
 	bool file = FALSE;
 	
 	argument = one_word(argument, arg);
@@ -1505,10 +1323,10 @@ SHOW(show_languages) {
 	}
 	else {
 		if (*argument) {
-			size = snprintf(output, sizeof(output), "Languages matching '%s' for %s:\r\n", argument, GET_NAME(plr));
+			build_page_display(ch, "Languages matching '%s' for %s:", argument, GET_NAME(plr));
 		}
 		else {
-			size = snprintf(output, sizeof(output), "Languages for %s:\r\n", GET_NAME(plr));
+			build_page_display(ch, "Languages for %s:", GET_NAME(plr));
 		}
 		
 		count = 0;
@@ -1521,27 +1339,15 @@ SHOW(show_languages) {
 			}
 		
 			// show it
-			snprintf(line, sizeof(line), " [%5d] %s (%s)%s%s\r\n", GEN_VNUM(gen), GEN_NAME(gen), language_types[lang->level], (GET_SPEAKING(plr) == lang->vnum) ? " - \tgcurrently speaking\t0" : "", (GET_LOYALTY(plr) && speaks_language_empire(GET_LOYALTY(plr), lang->vnum) == lang->level) ? ", from empire" : "");
-			if (size + strlen(line) < sizeof(output)) {
-				strcat(output, line);
-				size += strlen(line);
-				++count;
-			}
-			else {
-				if (size + 10 < sizeof(output)) {
-					strcat(output, "OVERFLOW\r\n");
-				}
-				break;
-			}
+			build_page_display(ch, " [%5d] %s (%s)%s%s", GEN_VNUM(gen), GEN_NAME(gen), language_types[lang->level], (GET_SPEAKING(plr) == lang->vnum) ? " - \tgcurrently speaking\t0" : "", (GET_LOYALTY(plr) && speaks_language_empire(GET_LOYALTY(plr), lang->vnum) == lang->level) ? ", from empire" : "");
+			++count;
 		}
 	
 		if (!count) {
-			strcat(output, "  none\r\n");	// space reserved for this for sure
+			build_page_display_str(ch, "  none");;
 		}
 	
-		if (ch->desc) {
-			page_string(ch->desc, output, TRUE);
-		}
+		send_page_display(ch);
 	}
 	
 	if (plr && file) {
@@ -1551,11 +1357,9 @@ SHOW(show_languages) {
 
 
 SHOW(show_lastnames) {
-	char arg[MAX_INPUT_LENGTH], output[MAX_STRING_LENGTH], line[MAX_STRING_LENGTH];
 	struct player_lastname *lastn;
 	bool file = FALSE, cur;
 	char_data *plr = NULL;
-	size_t size;
 	int count;
 	
 	argument = one_word(argument, arg);
@@ -1572,15 +1376,15 @@ SHOW(show_lastnames) {
 		
 		count = 0;
 		if (*argument) {
-			size = snprintf(output, sizeof(output), "Lastnames matching '%s' for %s:\r\n", argument, GET_NAME(plr));
+			build_page_display(ch, "Lastnames matching '%s' for %s:", argument, GET_NAME(plr));
 		}
 		else {
-			size = snprintf(output, sizeof(output), "Lastnames for %s:\r\n", GET_NAME(plr));
+			build_page_display(ch, "Lastnames for %s:", GET_NAME(plr));
 		}
 		
 		if (GET_PERSONAL_LASTNAME(plr)) {
 			cur = GET_CURRENT_LASTNAME(plr) && !str_cmp(GET_PERSONAL_LASTNAME(plr), GET_CURRENT_LASTNAME(plr));
-			size += snprintf(output + size, sizeof(output) - size, "%s%2d. %s (personal)%s\r\n", (cur ? "\tg" : ""), ++count, GET_PERSONAL_LASTNAME(plr), (cur ? " (current)\t0" : ""));
+			build_page_display(ch, "%s%2d. %s (personal)%s", (cur ? "\tg" : ""), ++count, GET_PERSONAL_LASTNAME(plr), (cur ? " (current)\t0" : ""));
 		}
 		
 		LL_FOREACH(GET_LASTNAME_LIST(plr), lastn) {
@@ -1590,26 +1394,14 @@ SHOW(show_lastnames) {
 		
 			// show it
 			cur = GET_CURRENT_LASTNAME(plr) && !str_cmp(NULLSAFE(lastn->name), GET_CURRENT_LASTNAME(plr));
-			snprintf(line, sizeof(line), "%s%2d. %s%s\r\n", (cur ? "\tg" : ""), ++count, NULLSAFE(lastn->name), (cur ? " (current)\t0" : ""));
-			if (size + strlen(line) < sizeof(output)) {
-				strcat(output, line);
-				size += strlen(line);
-			}
-			else {
-				if (size + 10 < sizeof(output)) {
-					strcat(output, "OVERFLOW\r\n");
-				}
-				break;
-			}
+			build_page_display(ch, "%s%2d. %s%s", (cur ? "\tg" : ""), ++count, NULLSAFE(lastn->name), (cur ? " (current)\t0" : ""));
 		}
 	
 		if (!count) {
-			strcat(output, " none\r\n");	// space reserved for this for sure
+			build_page_display_str(ch, " none");
 		}
 	
-		if (ch->desc) {
-			page_string(ch->desc, output, TRUE);
-		}
+		send_page_display(ch);
 	}
 	
 	if (plr && file) {
@@ -1619,11 +1411,10 @@ SHOW(show_lastnames) {
 
 
 SHOW(show_learned) {
-	char arg[MAX_INPUT_LENGTH], output[MAX_STRING_LENGTH * 4], line[MAX_STRING_LENGTH];
 	struct player_craft_data *pcd, *next_pcd;
 	empire_data *emp = NULL;
 	char_data *plr = NULL;
-	size_t size, count;
+	int count;
 	craft_data *craft;
 	bool file = FALSE;
 	
@@ -1664,10 +1455,10 @@ SHOW(show_learned) {
 	
 	// must have plr or emp by now
 	if (*argument) {
-		size = snprintf(output, sizeof(output), "Learned recipes matching '%s' for %s:\r\n", argument, plr ? GET_NAME(plr) : EMPIRE_NAME(emp));
+		build_page_display(ch, "Learned recipes matching '%s' for %s:", argument, plr ? GET_NAME(plr) : EMPIRE_NAME(emp));
 	}
 	else {
-		size = snprintf(output, sizeof(output), "Learned recipes for %s:\r\n", plr ? GET_NAME(plr) : EMPIRE_NAME(emp));
+		build_page_display(ch, "Learned recipes for %s:", plr ? GET_NAME(plr) : EMPIRE_NAME(emp));
 	}
 	
 	count = 0;
@@ -1683,27 +1474,15 @@ SHOW(show_learned) {
 		}
 	
 		// show it
-		snprintf(line, sizeof(line), " [%5d] %s\r\n", GET_CRAFT_VNUM(craft), GET_CRAFT_NAME(craft));
-		if (size + strlen(line) < sizeof(output)) {
-			strcat(output, line);
-			size += strlen(line);
-			++count;
-		}
-		else {
-			if (size + 10 < sizeof(output)) {
-				strcat(output, "OVERFLOW\r\n");
-			}
-			break;
-		}
+		build_page_display(ch, " [%5d] %s", GET_CRAFT_VNUM(craft), GET_CRAFT_NAME(craft));
+		++count;
 	}
 
 	if (!count) {
-		strcat(output, "  none\r\n");	// space reserved for this for sure
+		build_page_display_str(ch, "  none");
 	}
 
-	if (ch->desc) {
-		page_string(ch->desc, output, TRUE);
-	}
+	send_page_display(ch);
 	
 	if (plr && file) {
 		free_char(plr);
@@ -1712,11 +1491,11 @@ SHOW(show_learned) {
 
 
 SHOW(show_libraries) {
-	char arg[MAX_INPUT_LENGTH], output[MAX_STRING_LENGTH], line[MAX_STRING_LENGTH];
-	size_t size, count;
+	int count;
 	book_data *book;
 	room_data *room;
 	struct library_info *libr, *next_libr;
+	struct page_display *line;
 	
 	one_word(argument, arg);
 	
@@ -1727,7 +1506,7 @@ SHOW(show_libraries) {
 		msg_to_char(ch, "Show libraries: No such book %d.\r\n", atoi(arg));
 	}
 	else {
-		size = snprintf(output, sizeof(output), "Library locations for [%d] %s:\r\n", BOOK_VNUM(book), BOOK_TITLE(book));
+		build_page_display(ch, "Library locations for [%d] %s:", BOOK_VNUM(book), BOOK_TITLE(book));
 		
 		count = 0;
 		HASH_ITER(hh, library_table, libr, next_libr) {
@@ -1735,39 +1514,32 @@ SHOW(show_libraries) {
 				continue;
 			}
 			
-			snprintf(line, sizeof(line), "[%7d] %s\r\n", GET_ROOM_VNUM(room), get_room_name(room, FALSE));
+			++count;
+			line = build_page_display(ch, "[%7d] %s", GET_ROOM_VNUM(room), get_room_name(room, FALSE));
 			
-			if (size + strlen(line) < sizeof(output)) {
-				strcat(output, line);
-				size += strlen(line);
-				++count;
-			}
-			else {
-				if (size + 10 < sizeof(output)) {
-					strcat(output, "OVERFLOW\r\n");
-				}
-				break;
+			if (ROOM_OWNER(room)) {
+				append_page_display_line(line, " - %s%s\t0", EMPIRE_BANNER(ROOM_OWNER(room)), EMPIRE_ADJECTIVE(ROOM_OWNER(room)));
 			}
 		}
 		
-		if (!count) {
-			strcat(output, "  none\r\n");	// space reserved for this for sure
+		if (count) {
+			build_page_display(ch, "Total: %d", count);
+		}
+		else {
+			build_page_display_str(ch, "  none");
 		}
 		
-		if (ch->desc) {
-			page_string(ch->desc, output, TRUE);
-		}
+		send_page_display(ch);
 	}
 }
 
 
 SHOW(show_lost_books) {
-	char output[MAX_STRING_LENGTH], line[MAX_STRING_LENGTH];
-	size_t size, count;
+	int count;
 	book_data *book, *next_book;
 	player_index_data *index;
 	
-	size = snprintf(output, sizeof(output), "Books not in any libraries:\r\n");
+	build_page_display_str(ch, "Books not in any libraries:");
 	
 	count = 0;
 	HASH_ITER(hh, book_table, book, next_book) {
@@ -1775,36 +1547,22 @@ SHOW(show_lost_books) {
 			continue;
 		}
 		
-		snprintf(line, sizeof(line), "[%7d] %s (%s)\r\n", BOOK_VNUM(book), BOOK_TITLE(book), (index = find_player_index_by_idnum(BOOK_AUTHOR(book))) ? index->fullname : "???");
-		
-		if (size + strlen(line) < sizeof(output)) {
-			strcat(output, line);
-			size += strlen(line);
-			++count;
-		}
-		else {
-			if (size + 10 < sizeof(output)) {
-				strcat(output, "OVERFLOW\r\n");
-			}
-			break;
-		}
+		build_page_display(ch, "[%7d] %s (%s)", BOOK_VNUM(book), BOOK_TITLE(book), (index = find_player_index_by_idnum(BOOK_AUTHOR(book))) ? index->fullname : "???");
+		++count;
 	}
 	
 	if (!count) {
-		strcat(output, "  none\r\n");	// space reserved for this for sure
+		build_page_display_str(ch, "  none");
 	}
 	
-	if (ch->desc) {
-		page_string(ch->desc, output, TRUE);
-	}
+	send_page_display(ch);
 }
 
 
 SHOW(show_minipets) {
-	char arg[MAX_INPUT_LENGTH], output[MAX_STRING_LENGTH], line[MAX_STRING_LENGTH];
 	struct minipet_data *mini, *next_mini;
 	char_data *mob, *plr = NULL;
-	size_t size, count;
+	size_t count;
 	bool file = FALSE;
 	
 	argument = one_word(argument, arg);
@@ -1818,10 +1576,10 @@ SHOW(show_minipets) {
 	}
 	else {
 		if (*argument) {
-			size = snprintf(output, sizeof(output), "Minipets matching '%s' for %s:\r\n", argument, GET_NAME(plr));
+			build_page_display(ch, "Minipets matching '%s' for %s:", argument, GET_NAME(plr));
 		}
 		else {
-			size = snprintf(output, sizeof(output), "Minipets for %s:\r\n", GET_NAME(plr));
+			build_page_display(ch, "Minipets for %s:", GET_NAME(plr));
 		}
 		
 		count = 0;
@@ -1834,27 +1592,15 @@ SHOW(show_minipets) {
 			}
 		
 			// show it
-			snprintf(line, sizeof(line), " [%5d] %s\r\n", GET_MOB_VNUM(mob), skip_filler(GET_SHORT_DESC(mob)));
-			if (size + strlen(line) < sizeof(output)) {
-				strcat(output, line);
-				size += strlen(line);
-				++count;
-			}
-			else {
-				if (size + 10 < sizeof(output)) {
-					strcat(output, "OVERFLOW\r\n");
-				}
-				break;
-			}
+			build_page_display_col(ch, 2, FALSE, " [%5d] %s", GET_MOB_VNUM(mob), skip_filler(GET_SHORT_DESC(mob)));
+			++count;
 		}
 	
 		if (!count) {
-			strcat(output, "  none\r\n");	// space reserved for this for sure
+			build_page_display_str(ch, "  none");
 		}
-	
-		if (ch->desc) {
-			page_string(ch->desc, output, TRUE);
-		}
+		
+		send_page_display(ch);
 	}
 	
 	if (plr && file) {
@@ -1872,7 +1618,7 @@ SHOW(show_moons) {
 	
 	tinfo = get_local_time(IN_ROOM(ch));
 	
-	msg_to_char(ch, "Moons:\r\n");
+	build_page_display_str(ch, "Moons:");
 	
 	count = 0;
 	HASH_ITER(hh, generic_table, moon, next_gen) {
@@ -1886,20 +1632,21 @@ SHOW(show_moons) {
 		
 		// ok: show it
 		++count;
-		msg_to_char(ch, "[%5d] %s: %s, %s (%.2f day%s)%s\r\n", GEN_VNUM(moon), GEN_NAME(moon), moon_phases[phase], moon_positions[pos], GET_MOON_CYCLE_DAYS(moon), PLURAL(GET_MOON_CYCLE_DAYS(moon)), GEN_FLAGGED(moon, GEN_IN_DEVELOPMENT) ? " (in-development)" : "");
+		build_page_display(ch, "[%5d] %s: %s, %s (%.2f day%s)%s", GEN_VNUM(moon), GEN_NAME(moon), moon_phases[phase], moon_positions[pos], GET_MOON_CYCLE_DAYS(moon), PLURAL(GET_MOON_CYCLE_DAYS(moon)), GEN_FLAGGED(moon, GEN_IN_DEVELOPMENT) ? " (in-development)" : "");
 	}
 	
 	if (!count) {
-		msg_to_char(ch, " none\r\n");
+		build_page_display_str(ch, " none");
 	}
+	
+	send_page_display(ch);
 }
 
 
 SHOW(show_mounts) {
-	char arg[MAX_INPUT_LENGTH], output[MAX_STRING_LENGTH], line[MAX_STRING_LENGTH];
 	struct mount_data *mount, *next_mount;
 	char_data *mob, *plr = NULL;
-	size_t size, count;
+	size_t count;
 	bool file = FALSE;
 	
 	argument = one_word(argument, arg);
@@ -1913,10 +1660,10 @@ SHOW(show_mounts) {
 	}
 	else {
 		if (*argument) {
-			size = snprintf(output, sizeof(output), "Mounts matching '%s' for %s:\r\n", argument, GET_NAME(plr));
+			build_page_display(ch, "Mounts matching '%s' for %s:", argument, GET_NAME(plr));
 		}
 		else {
-			size = snprintf(output, sizeof(output), "Mounts for %s:\r\n", GET_NAME(plr));
+			build_page_display(ch, "Mounts for %s:", GET_NAME(plr));
 		}
 		
 		count = 0;
@@ -1929,27 +1676,15 @@ SHOW(show_mounts) {
 			}
 		
 			// show it
-			snprintf(line, sizeof(line), " [%5d] %s\r\n", GET_MOB_VNUM(mob), skip_filler(GET_SHORT_DESC(mob)));
-			if (size + strlen(line) < sizeof(output)) {
-				strcat(output, line);
-				size += strlen(line);
-				++count;
-			}
-			else {
-				if (size + 10 < sizeof(output)) {
-					strcat(output, "OVERFLOW\r\n");
-				}
-				break;
-			}
+			build_page_display_col(ch, 2, FALSE, " [%5d] %s", GET_MOB_VNUM(mob), skip_filler(GET_SHORT_DESC(mob)));
+			++count;
 		}
 	
 		if (!count) {
-			strcat(output, "  none\r\n");	// space reserved for this for sure
+			build_page_display_str(ch, "  none");
 		}
-	
-		if (ch->desc) {
-			page_string(ch->desc, output, TRUE);
-		}
+		
+		send_page_display(ch);
 	}
 	
 	if (plr && file) {
@@ -2014,12 +1749,10 @@ SHOW(show_notes) {
 
 
 SHOW(show_oceanmobs) {
-	char buf[MAX_STRING_LENGTH], line[256];
-	size_t buf_size, line_size;
 	char_data *mob;
 	int count = 0;
 	
-	buf_size = snprintf(buf, sizeof(buf), "Mobs lost in the ocean:\r\n");
+	build_page_display_str(ch, "Mobs lost in the ocean:");
 	
 	DL_FOREACH(character_list, mob) {
 		if (!IS_NPC(mob)) {
@@ -2040,25 +1773,15 @@ SHOW(show_oceanmobs) {
 		
 		// ok show it:
 		++count;
-		line_size = snprintf(line, sizeof(line), "[%5d] %s - %s\r\n", GET_MOB_VNUM(mob), GET_SHORT_DESC(mob), room_log_identifier(IN_ROOM(mob)));
-		if (line_size + buf_size < sizeof(buf) - 16) {
-			strcat(buf, line);
-			buf_size += line_size;
-		}
-		else {
-			buf_size += snprintf(buf + buf_size, sizeof(buf) - buf_size, "**OVERFLOW**\r\n");
-			break;
-		}
+		build_page_display(ch, "[%5d] %s - %s", GET_MOB_VNUM(mob), GET_SHORT_DESC(mob), room_log_identifier(IN_ROOM(mob)));
 	}
 	
 	if (!count) {
-		buf_size += snprintf(buf + buf_size, sizeof(buf) - buf_size, " none\r\n");
+		build_page_display_str(ch, " none");
 	}
 	
 	// and send
-	if (ch->desc) {
-		page_string(ch->desc, buf, TRUE);
-	}
+	send_page_display(ch);
 }
 
 
@@ -2105,19 +1828,18 @@ SHOW(show_olc) {
 
 
 SHOW(show_piles) {
-	char buf[MAX_STRING_LENGTH], line[MAX_STRING_LENGTH], owner[256];
+	char owner[256];
 	room_data *room, *next_room;
 	int count, max = 100;
 	obj_data *obj, *sub;
 	vehicle_data *veh;
-	size_t size;
 	bool any;
 	
 	if (*argument && isdigit(*argument)) {
 		max = atoi(argument);
 	}
 	
-	size = snprintf(buf, sizeof(buf), "Piles of %d item%s or more:\r\n", max, PLURAL(max));
+	build_page_display(ch, "Piles of %d item%s or more:", max, PLURAL(max));
 	
 	any = FALSE;
 	HASH_ITER(hh, world_table, room, next_room) {
@@ -2137,30 +1859,21 @@ SHOW(show_piles) {
 		
 		if (count >= max) {
 			if (ROOM_OWNER(room)) {
-				snprintf(owner, sizeof(owner), " (%s%s\t0)", EMPIRE_BANNER(ROOM_OWNER(room)), EMPIRE_ADJECTIVE(ROOM_OWNER(room)));
+				safe_snprintf(owner, sizeof(owner), " (%s%s\t0)", EMPIRE_BANNER(ROOM_OWNER(room)), EMPIRE_ADJECTIVE(ROOM_OWNER(room)));
 			}
 			else {
 				*owner = '\0';
 			}
-			snprintf(line, sizeof(line), "[%d] %s: %d item%s%s\r\n", GET_ROOM_VNUM(room), get_room_name(room, FALSE), count, PLURAL(count), owner);
+			build_page_display(ch, "[%d] %s: %d item%s%s", GET_ROOM_VNUM(room), get_room_name(room, FALSE), count, PLURAL(count), owner);
 			any = TRUE;
-			
-			if (size + strlen(line) + 18 < sizeof(buf)) {
-				strcat(buf, line);
-				size += strlen(line);
-			}
-			else {
-				size += snprintf(buf + size, sizeof(buf) - size, "*** OVERFLOW ***\r\n");
-				break;
-			}
 		}
 	}
 	
 	if (!any) {
-		strcat(buf, " none\r\n");
+		build_page_display_str(ch, " none");
 	}
 	
-	page_string(ch->desc, buf, TRUE);
+	send_page_display(ch);
 }
 
 
@@ -2226,11 +1939,10 @@ SHOW(show_players) {
 
 
 SHOW(show_produced) {
-	char arg[MAX_INPUT_LENGTH], output[MAX_STRING_LENGTH], line[MAX_STRING_LENGTH];
 	struct empire_production_total *egt, *next_egt;
 	empire_data *emp = NULL;
 	obj_vnum vnum = NOTHING;
-	size_t size, count;
+	size_t count;
 	obj_data *obj;
 	
 	argument = any_one_word(argument, arg);
@@ -2244,10 +1956,10 @@ SHOW(show_produced) {
 	}
 	else {
 		if (*argument) {
-			size = snprintf(output, sizeof(output), "Produced items for matching '%s' for %s%s\t0:\r\n", argument, EMPIRE_BANNER(emp), EMPIRE_NAME(emp));
+			build_page_display(ch, "Produced items for matching '%s' for %s%s\t0:", argument, EMPIRE_BANNER(emp), EMPIRE_NAME(emp));
 		}
 		else {
-			size = snprintf(output, sizeof(output), "Produced items for %s%s\t0:\r\n", EMPIRE_BANNER(emp), EMPIRE_NAME(emp));
+			build_page_display(ch, "Produced items for %s%s\t0:", EMPIRE_BANNER(emp), EMPIRE_NAME(emp));
 		}
 		
 		// check if argument is a vnum
@@ -2266,33 +1978,20 @@ SHOW(show_produced) {
 			}
 		
 			// show it
+			++count;
 			if (egt->imported || egt->exported) {
-				snprintf(line, sizeof(line), " [%5d] %s: %d (%d/%d)\r\n", GET_OBJ_VNUM(obj), skip_filler(GET_OBJ_SHORT_DESC(obj)), egt->amount, egt->imported, egt->exported);
+				build_page_display(ch, " [%5d] %s: %d (%d/%d)", GET_OBJ_VNUM(obj), skip_filler(GET_OBJ_SHORT_DESC(obj)), egt->amount, egt->imported, egt->exported);
 			}
 			else {
-				snprintf(line, sizeof(line), " [%5d] %s: %d\r\n", GET_OBJ_VNUM(obj), skip_filler(GET_OBJ_SHORT_DESC(obj)), egt->amount);
-			}
-			
-			if (size + strlen(line) < sizeof(output)) {
-				strcat(output, line);
-				size += strlen(line);
-				++count;
-			}
-			else {
-				if (size + 10 < sizeof(output)) {
-					strcat(output, "OVERFLOW\r\n");
-				}
-				break;
+				build_page_display(ch, " [%5d] %s: %d", GET_OBJ_VNUM(obj), skip_filler(GET_OBJ_SHORT_DESC(obj)), egt->amount);
 			}
 		}
 	
 		if (!count) {
-			strcat(output, "  none\r\n");	// space reserved for this for sure
+			build_page_display_str(ch, "  none");
 		}
 	
-		if (ch->desc) {
-			page_string(ch->desc, output, TRUE);
-		}
+		send_page_display(ch);
 	}
 }
 
@@ -2383,14 +2082,13 @@ SHOW(show_progression) {
 
 
 SHOW(show_quests) {
-	char name[MAX_INPUT_LENGTH], *arg2, buf[MAX_STRING_LENGTH * 3], when[256], line[256];
+	char name[MAX_INPUT_LENGTH], *arg2, when[256];
 	struct player_completed_quest *pcq, *next_pcq;
 	bool file = FALSE, found = FALSE;
 	struct player_quest *pq;
 	int count, total, diff;
 	quest_data *qst;
 	char_data *vict = NULL;
-	size_t size;
 	
 	arg2 = any_one_arg(argument, name);
 	skip_spaces(&arg2);
@@ -2413,23 +2111,13 @@ SHOW(show_quests) {
 			return;
 		}
 		
-		size = snprintf(buf, sizeof(buf), "%s's quests (%d/%d dailies, %d/%d event dailies):\r\n", GET_NAME(vict), GET_DAILY_QUESTS(vict), config_get_int("dailies_per_day"), GET_EVENT_DAILY_QUESTS(vict), config_get_int("dailies_per_day"));
+		build_page_display(ch, "%s's quests (%d/%d dailies, %d/%d event dailies):", GET_NAME(vict), GET_DAILY_QUESTS(vict), config_get_int("dailies_per_day"), GET_EVENT_DAILY_QUESTS(vict), config_get_int("dailies_per_day"));
 		LL_FOREACH(GET_QUESTS(vict), pq) {
 			count_quest_tasks(pq->tracker, &count, &total);
-			snprintf(line, sizeof(line), "[%5d] %s (%d/%d tasks)\r\n", pq->vnum, get_quest_name_by_proto(pq->vnum), count, total);
-			
-			if (size + strlen(line) < sizeof(buf)) {
-				size += strlen(line);
-				strcat(buf, line);
-			}
-			else {
-				break;
-			}
+			build_page_display(ch, "[%5d] %s (%d/%d tasks)", pq->vnum, get_quest_name_by_proto(pq->vnum), count, total);
 		}
-	
-		if (ch->desc) {
-			page_string(ch->desc, buf, TRUE);
-		}
+		
+		send_page_display(ch);
 	}	// end "active"
 	else if (is_abbrev(arg2, "completed")) {
 		// completed quest list
@@ -2446,35 +2134,21 @@ SHOW(show_quests) {
 		// sort now
 		HASH_SORT(GET_COMPLETED_QUESTS(vict), sort_completed_quests_by_timestamp);
 		
-		size = snprintf(buf, sizeof(buf), "%s's completed quests:\r\n", GET_NAME(vict));
+		build_page_display(ch, "%s's completed quests:", GET_NAME(vict));
 		HASH_ITER(hh, GET_COMPLETED_QUESTS(vict), pcq, next_pcq) {
-			if (size >= sizeof(buf)) {
-				break;
-			}
-			
 			if (time(0) - pcq->last_completed < SECS_PER_REAL_DAY) {
 				diff = (time(0) - pcq->last_completed) / SECS_PER_REAL_HOUR;
-				snprintf(when, sizeof(when), "(%d hour%s ago)", diff, PLURAL(diff));
+				safe_snprintf(when, sizeof(when), "(%d hour%s ago)", diff, PLURAL(diff));
 			}
 			else {
 				diff = (time(0) - pcq->last_completed) / SECS_PER_REAL_DAY;
-				snprintf(when, sizeof(when), "(%d day%s ago)", diff, PLURAL(diff));
+				safe_snprintf(when, sizeof(when), "(%d day%s ago)", diff, PLURAL(diff));
 			}
 			
-			snprintf(line, sizeof(line), "[%5d] %s %s\r\n", pcq->vnum, get_quest_name_by_proto(pcq->vnum), when);
-			
-			if (size + strlen(line) < sizeof(buf)) {
-				size += strlen(line);
-				strcat(buf, line);
-			}
-			else {
-				break;
-			}
+			build_page_display(ch, "[%5d] %s %s", pcq->vnum, get_quest_name_by_proto(pcq->vnum), when);
 		}
-	
-		if (ch->desc) {
-			page_string(ch->desc, buf, TRUE);
-		}
+		
+		send_page_display(ch);
 	}
 	else {
 		// show one active quest's tracker
@@ -2485,8 +2159,9 @@ SHOW(show_quests) {
 			}
 			
 			if (multi_isname(arg2, QUEST_NAME(qst))) {
-				msg_to_char(ch, "%s ", QUEST_NAME(qst));	// followed by "Quest Tracker:"
-				show_quest_tracker(ch, pq);
+				build_page_display(ch, "%s Tracker:", QUEST_NAME(qst));
+				show_tracker_display(ch, pq->tracker, FALSE);
+				send_page_display(ch);
 				found = TRUE;
 				break;	// show just one
 			}
@@ -2523,13 +2198,13 @@ SHOW(show_shops) {
 	LL_FOREACH(shop_list, stl) {
 		// determine shopkeeper
 		if (stl->from_mob) {
-			snprintf(buf, sizeof(buf), " (%s)", PERS(stl->from_mob, ch, FALSE));
+			safe_snprintf(buf, sizeof(buf), " (%s)", PERS(stl->from_mob, ch, FALSE));
 		}
 		else if (stl->from_obj) {
-			snprintf(buf, sizeof(buf), " (%s)", GET_OBJ_SHORT_DESC(stl->from_obj));
+			safe_snprintf(buf, sizeof(buf), " (%s)", GET_OBJ_SHORT_DESC(stl->from_obj));
 		}
 		else if (stl->from_veh) {
-			snprintf(buf, sizeof(buf), " (%s)", VEH_SHORT_DESC(stl->from_veh));
+			safe_snprintf(buf, sizeof(buf), " (%s)", VEH_SHORT_DESC(stl->from_veh));
 		}
 		else if (stl->from_room) {
 			strcpy(buf, " (room)");
@@ -2550,44 +2225,30 @@ SHOW(show_shops) {
 
 
 SHOW(show_site) {
-	char buf[MAX_STRING_LENGTH], line[256];
 	player_index_data *index, *next_index;
-	size_t size;
-	int k;
+	bool any = FALSE;
 	
 	if (!*argument) {
 		msg_to_char(ch, "Show site: Locate players from what site?\r\n");
 		return;
 	}
 	
-	*buf = '\0';
-	size = 0;
-	k = 0;
+	build_page_display(ch, "Players from site %s:", argument);
+	
 	HASH_ITER(idnum_hh, player_table_by_idnum, index, next_index) {
 		if (get_highest_access_level(find_account(index->account_id)) > GET_ACCESS_LEVEL(ch)) {
 			continue;
 		}
 		if (str_str(index->last_host, argument)) {
-			snprintf(line, sizeof(line), " %-15.15s %s", index->name, ((++k % 3)) ? "|" : "\r\n");
-			line[1] = UPPER(line[1]);	// cap name
-			
-			if (size + strlen(line) < sizeof(buf)) {
-				size += snprintf(buf + size, sizeof(buf) - size, "%s", line);
-			}
+			build_page_display_col(ch, 4, FALSE, " &Z%s", index->name);
+			any = TRUE;
 		}
 	}
-	msg_to_char(ch, "Players from site %s:\r\n", argument);
-	if (*buf) {
-		send_to_char(buf, ch);
-		
-		// trailing crlf
-		if (k % 3) {
-			msg_to_char(ch, "\r\n");
-		}
+	if (!any) {
+		build_page_display_str(ch, " none");
 	}
-	else {
-		msg_to_char(ch, " none\r\n");
-	}
+	
+	send_page_display(ch);
 }
 
 
@@ -2631,10 +2292,10 @@ SHOW(show_skills) {
 		skill = plsk->ptr;
 		
 		if (plsk->noskill) {
-			snprintf(exp_part, sizeof(exp_part), "noskill");
+			safe_snprintf(exp_part, sizeof(exp_part), "noskill");
 		}
 		else {
-			snprintf(exp_part, sizeof(exp_part), "%.1f%%", get_skill_exp(vict, SKILL_VNUM(skill)));
+			safe_snprintf(exp_part, sizeof(exp_part), "%.1f%%", get_skill_exp(vict, SKILL_VNUM(skill)));
 		}
 		
 		msg_to_char(ch, "&y%s&0 [%d, %s, %d%s]: ", SKILL_NAME(skill), get_skill_level(vict, SKILL_VNUM(skill)), exp_part, get_ability_points_available_for_char(vict, SKILL_VNUM(skill)), plsk->resets ? "*" : "");
@@ -2701,7 +2362,6 @@ SHOW(show_skills) {
 
 
 SHOW(show_smessages) {
-	char arg[MAX_INPUT_LENGTH];
 	int count, iter;
 	char_data *plr = NULL;
 	bool on, screenreader = (PRF_FLAGGED(ch, PRF_SCREEN_READER) ? TRUE : FALSE), file = FALSE;
@@ -2741,7 +2401,7 @@ SHOW(show_smessages) {
 
 
 SHOW(show_spawns) {
-	char buf[MAX_STRING_LENGTH];
+	bool any = FALSE;
 	struct spawn_info *sp;
 	vehicle_data *veh, *next_veh;
 	sector_data *sect, *next_sect;
@@ -2757,18 +2417,14 @@ SHOW(show_spawns) {
 		msg_to_char(ch, "Show spawns: You must specify a valid mob vnum.\r\n");
 		return;
 	}
-	
-	*buf = '\0';
 
 	// sectors:
 	HASH_ITER(hh, sector_table, sect, next_sect) {
 		for (sp = GET_SECT_SPAWNS(sect); sp; sp = sp->next) {
 			if (sp->vnum == vnum) {
 				sprintbit(sp->flags, spawn_flags, buf2, TRUE);
-				snprintf(buf1, sizeof(buf1), "SCT [%5d] %s: %.2f%% %s\r\n", GET_SECT_VNUM(sect), GET_SECT_NAME(sect), sp->percent, buf2);
-				if (strlen(buf) + strlen(buf1) < MAX_STRING_LENGTH) {
-					strcat(buf, buf1);
-				}
+				build_page_display(ch, "SCT [%5d] %s: %.2f%% %s", GET_SECT_VNUM(sect), GET_SECT_NAME(sect), sp->percent, buf2);
+				any = TRUE;
 			}
 		}
 	}
@@ -2778,11 +2434,8 @@ SHOW(show_spawns) {
 		for (sp = GET_CROP_SPAWNS(crop); sp; sp = sp->next) {
 			if (sp->vnum == vnum) {
 				sprintbit(sp->flags, spawn_flags, buf2, TRUE);
-				snprintf(buf1, sizeof(buf1), "CRP [%5d] %s: %.2f%% %s\r\n", GET_CROP_VNUM(crop), GET_CROP_NAME(crop), sp->percent, buf2);
-				CAP(buf1);	// crop names are lowercase
-				if (strlen(buf) + strlen(buf1) < MAX_STRING_LENGTH) {
-					strcat(buf, buf1);
-				}
+				build_page_display(ch, "CRP [%5d] &Z%s: %.2f%% %s", GET_CROP_VNUM(crop), GET_CROP_NAME(crop), sp->percent, buf2);
+				any = TRUE;
 			}
 		}
 	}
@@ -2792,10 +2445,8 @@ SHOW(show_spawns) {
 		for (sp = GET_BLD_SPAWNS(bld); sp; sp = sp->next) {
 			if (sp->vnum == vnum) {
 				sprintbit(sp->flags, spawn_flags, buf2, TRUE);
-				snprintf(buf1, sizeof(buf1), "BLD [%5d] %s: %.2f%% %s\r\n", GET_BLD_VNUM(bld), GET_BLD_NAME(bld), sp->percent, buf2);
-				if (strlen(buf) + strlen(buf1) < MAX_STRING_LENGTH) {
-					strcat(buf, buf1);
-				}
+				build_page_display(ch, "BLD [%5d] %s: %.2f%% %s", GET_BLD_VNUM(bld), GET_BLD_NAME(bld), sp->percent, buf2);
+				any = TRUE;
 			}
 		}
 	}
@@ -2805,10 +2456,8 @@ SHOW(show_spawns) {
 		LL_FOREACH(VEH_SPAWNS(veh), sp) {
 			if (sp->vnum == vnum) {
 				sprintbit(sp->flags, spawn_flags, buf2, TRUE);
-				snprintf(buf1, sizeof(buf1), "VEH [%5d] %s: %.2f%% %s\r\n", VEH_VNUM(veh), VEH_SHORT_DESC(veh), sp->percent, buf2);
-				if (strlen(buf) + strlen(buf1) < MAX_STRING_LENGTH) {
-					strcat(buf, buf1);
-				}
+				build_page_display(ch, "VEH [%5d] %s: %.2f%% %s", VEH_VNUM(veh), VEH_SHORT_DESC(veh), sp->percent, buf2);
+				any = TRUE;
 			}
 		}
 	}
@@ -2818,10 +2467,8 @@ SHOW(show_spawns) {
 		LL_FOREACH(GET_GLOBAL_SPAWNS(glb), sp) {
 			if (sp->vnum == vnum) {
 				sprintbit(sp->flags, spawn_flags, buf2, TRUE);
-				snprintf(buf1, sizeof(buf1), "GLB [%5d] %s: %.2f%% %s\r\n", GET_GLOBAL_VNUM(glb), GET_GLOBAL_NAME(glb), sp->percent, buf2);
-				if (strlen(buf) + strlen(buf1) < MAX_STRING_LENGTH) {
-					strcat(buf, buf1);
-				}
+				build_page_display(ch, "GLB [%5d] %s: %.2f%% %s", GET_GLOBAL_VNUM(glb), GET_GLOBAL_NAME(glb), sp->percent, buf2);
+				any = TRUE;
 			}
 		}
 	}
@@ -2830,17 +2477,15 @@ SHOW(show_spawns) {
 	HASH_ITER(hh, room_template_table, rmt, next_rmt) {
 		for (asp = GET_RMT_SPAWNS(rmt); asp; asp = asp->next) {
 			if (asp->type == ADV_SPAWN_MOB && asp->vnum == vnum) {
-				snprintf(buf1, sizeof(buf1), "RMT [%5d] %s: %.2f%%, limit %d\r\n", GET_RMT_VNUM(rmt), GET_RMT_TITLE(rmt), asp->percent, asp->limit);
-				if (strlen(buf) + strlen(buf1) < MAX_STRING_LENGTH) {
-					strcat(buf, buf1);
-				}
+				build_page_display(ch, "RMT [%5d] %s: %.2f%%, limit %d\r\n", GET_RMT_VNUM(rmt), GET_RMT_TITLE(rmt), asp->percent, asp->limit);
+				any = TRUE;
 				break;
 			}
 		}
 	}
 	
-	if (*buf) {
-		page_string(ch->desc, buf, TRUE);
+	if (any) {
+		send_page_display(ch);
 	}
 	else {
 		msg_to_char(ch, "No spawns found for mob %d.\r\n", vnum);
@@ -2851,15 +2496,15 @@ SHOW(show_spawns) {
 SHOW(show_startlocs) {
 	room_data *iter, *next_iter;
 	
-	strcpy(buf, "Starting locations:\r\n");
+	build_page_display_str(ch, "Starting locations:");
 	
 	HASH_ITER(hh, world_table, iter, next_iter) {
 		if (ROOM_SECT_FLAGGED(iter, SECTF_START_LOCATION)) {
-			sprintf(buf + strlen(buf), "%s (%d, %d)&0\r\n", get_room_name(iter, TRUE), X_COORD(iter), Y_COORD(iter));
+			build_page_display(ch, "%s (%d, %d)&0", get_room_name(iter, TRUE), X_COORD(iter), Y_COORD(iter));
 		}
 	}
 	
-	page_string(ch->desc, buf, TRUE);
+	send_page_display(ch);
 }
 
 
@@ -2969,12 +2614,11 @@ SHOW(show_stats) {
 
 // show storage <building | vehicle> <vnum>
 SHOW(show_storage) {
-	char arg2[MAX_STRING_LENGTH], buf[MAX_STRING_LENGTH], line[MAX_STRING_LENGTH];
+	char arg2[MAX_STRING_LENGTH];
 	struct obj_storage_type *store;
 	vehicle_data *find_veh = NULL;
 	bld_data *find_bld = NULL;
 	obj_data *obj, *next_obj;
-	size_t size, lsize;
 	int count;
 	bool ok;
 	
@@ -2993,15 +2637,15 @@ SHOW(show_storage) {
 		msg_to_char(ch, "Usage: show storage <building | vehicle> <vnum>\r\n");
 	}
 	else {
-		// ok to show: init string/size
+		// ok to show:
 		if (find_bld) {
-			size = snprintf(buf, sizeof(buf), "Objects that can be stored in %s %s:\r\n", AN(GET_BLD_NAME(find_bld)), GET_BLD_NAME(find_bld));
+			build_page_display(ch, "Objects that can be stored in %s %s:", AN(GET_BLD_NAME(find_bld)), GET_BLD_NAME(find_bld));
 		}
 		else if (find_veh) {
-			size = snprintf(buf, sizeof(buf), "Objects that can be stored in %s:\r\n", VEH_SHORT_DESC(find_veh));
+			build_page_display(ch, "Objects that can be stored in %s:", VEH_SHORT_DESC(find_veh));
 		}
 		else {
-			size = snprintf(buf, sizeof(buf), "Objects that can be stored there:\r\n");
+			build_page_display_str(ch, "Objects that can be stored there:");
 		}
 		
 		count = 0;
@@ -3022,33 +2666,24 @@ SHOW(show_storage) {
 		
 			if (ok) {
 				++count;
-				lsize = snprintf(line, sizeof(line), "[%5d] %s\r\n", GET_OBJ_VNUM(obj), GET_OBJ_SHORT_DESC(obj));
-				
-				if (size + lsize < sizeof(buf)) {
-					strcat(buf, line);
-					size += lsize;
-				}
-				else {
-					snprintf(buf + size, sizeof(buf) - size, "OVERFLOW\r\n");
-					break;
-				}
+				build_page_display(ch, "[%5d] %s", GET_OBJ_VNUM(obj), GET_OBJ_SHORT_DESC(obj));
 			}
 		}
 		
 		if (count == 0) {
-			strcat(buf, " none\r\n");	// always room
+			build_page_display_str(ch, " none");
 		}
 		
-		page_string(ch->desc, buf, TRUE);
+		send_page_display(ch);
 	}
 }
 
 
 SHOW(show_subzone) {
-	char buf[MAX_STRING_LENGTH], buf2[MAX_STRING_LENGTH + 80];
+	bool any;
+	char buf2[MAX_STRING_LENGTH];
 	room_template *iter, *next_iter, *match;
 	rmt_vnum find;
-	size_t size;
 	
 	if (!*argument || !isdigit(*argument)) {
 		msg_to_char(ch, "Usage: show subzone <id/room>\r\n");
@@ -3060,22 +2695,18 @@ SHOW(show_subzone) {
 	}
 	
 	// first try: exact match
-	size = 0;
-	*buf = '\0';
-	
+	any = FALSE;
 	HASH_ITER(hh, room_template_table, iter, next_iter) {
 		if (GET_RMT_SUBZONE(iter) == find) {
-			size += snprintf(buf + size, sizeof(buf) - size, "[%5d] %s\r\n", GET_RMT_VNUM(iter), GET_RMT_TITLE(iter));
-			if (size >= sizeof(buf)) {
-				break;
-			}
+			build_page_display(ch, "[%5d] %s", GET_RMT_VNUM(iter), GET_RMT_TITLE(iter));
+			any = TRUE;
 		}
 	}
-	
-	if (size > 0) {
+	if (any) {
 		// found exact match(es)
-		snprintf(buf2, sizeof(buf2), "Room templates with subzone %d:\r\n%s", find, buf);
-		page_string(ch->desc, buf2, TRUE);
+		safe_snprintf(buf2, sizeof(buf2), "Room templates with subzone %d:", find);
+		build_page_display_prepend(ch, buf2);
+		send_page_display(ch);
 		return;
 	}
 	
@@ -3086,22 +2717,22 @@ SHOW(show_subzone) {
 	}
 	
 	// if we get here, we have a subzone to look for
+	any = FALSE;
 	HASH_ITER(hh, room_template_table, iter, next_iter) {
 		if (GET_RMT_SUBZONE(iter) == GET_RMT_SUBZONE(match)) {
-			size += snprintf(buf + size, sizeof(buf) - size, "[%5d] %s\r\n", GET_RMT_VNUM(iter), GET_RMT_TITLE(iter));
-			if (size >= sizeof(buf)) {
-				break;
-			}
+			build_page_display(ch, "[%5d] %s", GET_RMT_VNUM(iter), GET_RMT_TITLE(iter));
+			any = TRUE;
 		}
 	}
-	
-	if (size > 0) {
+	if (any) {
 		// found exact match(es)
-		snprintf(buf2, sizeof(buf2), "Room templates with subzone %d, matching room template %d:\r\n%s", GET_RMT_SUBZONE(match), GET_RMT_VNUM(match), buf);
-		page_string(ch->desc, buf2, TRUE);
+		safe_snprintf(buf2, sizeof(buf2), "Room templates with subzone %d, matching room template %d:", GET_RMT_SUBZONE(match), GET_RMT_VNUM(match));
+		build_page_display_prepend(ch, buf2);
+		send_page_display(ch);
 		return;
 	}
 	
+	// otherwise
 	msg_to_char(ch, "There were no matches for that subzone id.\r\n");
 }
 
@@ -3133,7 +2764,7 @@ SHOW(show_technology) {
 				continue;
 			}
 			
-			snprintf(one, sizeof(one), "\t%c%s%s, ", (++count % 2) ? 'W' : 'w', player_tech_types[ptech->id], ptech->check_solo ? " (synergy)" : "");
+			safe_snprintf(one, sizeof(one), "\t%c%s%s, ", (++count % 2) ? 'W' : 'w', player_tech_types[ptech->id], ptech->check_solo ? " (synergy)" : "");
 			
 			if (color_strlen(one) + lsize >= 79) {
 				// send line
@@ -3160,16 +2791,14 @@ SHOW(show_technology) {
 
 
 SHOW(show_terrain) {
-	char buf[MAX_STRING_LENGTH * 2], line[256], part[256];
+	char part[256];
 	sector_data *sect, *next_sect;
 	int count, total, this;
 	struct map_data *map;
-	size_t size, l_size;
-	bool any, use_columns;
+	bool any;
 	
 	// fresh numbers
 	update_world_count();
-	use_columns = !PRF_FLAGGED(ch, PRF_SCREEN_READER);
 	
 	if (!*argument) {	// no-arg: show summary
 		// output
@@ -3177,15 +2806,12 @@ SHOW(show_terrain) {
 	
 		HASH_ITER(hh, sector_table, sect, next_sect) {
 			this = stats_get_sector_count(sect);
-			msg_to_char(ch, " %6d %-26.26s %s", this, GET_SECT_NAME(sect), (!((++count)%2) || !use_columns) ? "\r\n" : " ");
+			build_page_display_col(ch, 2, FALSE, " %6d %s", this, GET_SECT_NAME(sect));
 			total += this;
 		}
 	
-		if (count % 2 && use_columns) {
-			msg_to_char(ch, "\r\n");
-		}
-	
-		msg_to_char(ch, " Total: %d\r\n", total);
+		build_page_display(ch, " Total: %d", total);
+		send_page_display(ch);
 	}
 	// argument usage: show building <vnum | name>
 	else if (!(isdigit(*argument) && (sect = sector_proto(atoi(argument)))) && !(sect = get_sect_by_name(argument))) {
@@ -3193,7 +2819,7 @@ SHOW(show_terrain) {
 	}
 	else {
 		strcpy(part, GET_SECT_NAME(sect));
-		size = snprintf(buf, sizeof(buf), "[%d] %s (%d in world):\r\n", GET_SECT_VNUM(sect), CAP(part), stats_get_sector_count(sect));
+		build_page_display(ch, "[%d] %s (%d in world):", GET_SECT_VNUM(sect), CAP(part), stats_get_sector_count(sect));
 		
 		any = FALSE;
 		LL_FOREACH(land_map, map) {
@@ -3203,30 +2829,20 @@ SHOW(show_terrain) {
 			
 			// found
 			if (map->room && ROOM_OWNER(map->room)) {
-				snprintf(part, sizeof(part), " - %s%s\t0", EMPIRE_BANNER(ROOM_OWNER(map->room)), EMPIRE_ADJECTIVE(ROOM_OWNER(map->room)));
+				safe_snprintf(part, sizeof(part), " - %s%s\t0", EMPIRE_BANNER(ROOM_OWNER(map->room)), EMPIRE_ADJECTIVE(ROOM_OWNER(map->room)));
 			}
 			else {
 				*part = '\0';
 			}
-			l_size = snprintf(line, sizeof(line), "(%*d, %*d) %s%s\r\n", X_PRECISION, MAP_X_COORD(map->vnum), Y_PRECISION, MAP_Y_COORD(map->vnum), map->room ? get_room_name(map->room, FALSE) : GET_SECT_TITLE(sect), part);
+			build_page_display(ch, "(%*d, %*d) %s%s", X_PRECISION, MAP_X_COORD(map->vnum), Y_PRECISION, MAP_Y_COORD(map->vnum), map->room ? get_room_name(map->room, FALSE) : GET_SECT_TITLE(sect), part);
 			any = TRUE;
-			
-			if (size + l_size < sizeof(buf) + 40) {	// reserve a little extra space
-				strcat(buf, line);
-				size += l_size;
-			}
-			else {
-				// hit the end, but we reserved space
-				snprintf(buf + size, sizeof(buf) - size, "... and more\r\n");
-				break;
-			}
 		}
 		
 		if (!any) {
-			snprintf(buf + size, sizeof(buf) - size, " no matching tiles\r\n");
+			build_page_display_str(ch, " no matching tiles");
 		}
 		
-		page_string(ch->desc, buf, TRUE);
+		send_page_display(ch);
 	}
 }
 
@@ -3260,9 +2876,7 @@ SHOW(show_tomb) {
 
 
 SHOW(show_tools) {
-	char buf[MAX_STRING_LENGTH];
 	obj_data *obj, *next_obj;
-	size_t size;
 	int type;
 	
 	skip_spaces(&argument);
@@ -3276,22 +2890,17 @@ SHOW(show_tools) {
 	}
 	else {
 		// preamble
-		size = snprintf(buf, sizeof(buf), "Types of %s:\r\n", tool_flags[type]);
+		build_page_display(ch, "Types of %s:", tool_flags[type]);
 		
 		HASH_ITER(hh, object_table, obj, next_obj) {
-			if (size >= sizeof(buf)) {
-				break;	// overflow
-			}
 			if (!TOOL_FLAGGED(obj, BIT(type))) {
 				continue;	// wrong type
 			}
 			
-			size += snprintf(buf + size, sizeof(buf) - size, "[%5d] %s\r\n", GET_OBJ_VNUM(obj), GET_OBJ_SHORT_DESC(obj));
+			build_page_display(ch, "[%5d] %s", GET_OBJ_VNUM(obj), GET_OBJ_SHORT_DESC(obj));
 		}
 		
-		if (ch->desc) {
-			page_string(ch->desc, buf, TRUE);
-		}
+		send_page_display(ch);
 	}
 }
 
@@ -3354,11 +2963,10 @@ SHOW(show_unlearnable) {
 
 
 SHOW(show_unlocked_archetypes) {
-	char arg[MAX_INPUT_LENGTH], output[MAX_STRING_LENGTH], line[MAX_STRING_LENGTH];
 	archetype_data *arch;
 	struct unlocked_archetype *unarch, *next_unarch;
 	char_data *plr = NULL;
-	size_t size, count;
+	size_t count;
 	bool file = FALSE;
 	
 	argument = one_word(argument, arg);
@@ -3372,10 +2980,10 @@ SHOW(show_unlocked_archetypes) {
 	}
 	else {
 		if (*argument) {
-			size = snprintf(output, sizeof(output), "Unlocked archetypes matching '%s' for %s:\r\n", argument, GET_NAME(plr));
+			build_page_display(ch, "Unlocked archetypes matching '%s' for %s:", argument, GET_NAME(plr));
 		}
 		else {
-			size = snprintf(output, sizeof(output), "Unlocked archetypes for %s:\r\n", GET_NAME(plr));
+			build_page_display(ch, "Unlocked archetypes for %s:", GET_NAME(plr));
 		}
 		
 		count = 0;
@@ -3388,27 +2996,15 @@ SHOW(show_unlocked_archetypes) {
 			}
 		
 			// show it
-			snprintf(line, sizeof(line), " [%5d] %s\r\n", GET_ARCH_VNUM(arch), GET_ARCH_NAME(arch));
-			if (size + strlen(line) < sizeof(output)) {
-				strcat(output, line);
-				size += strlen(line);
-				++count;
-			}
-			else {
-				if (size + 10 < sizeof(output)) {
-					strcat(output, "OVERFLOW\r\n");
-				}
-				break;
-			}
+			build_page_display(ch, " [%5d] %s", GET_ARCH_VNUM(arch), GET_ARCH_NAME(arch));
+			++count;
 		}
 	
 		if (!count) {
-			strcat(output, "  none\r\n");	// space reserved for this for sure
+			build_page_display_str(ch, "  none");
 		}
 	
-		if (ch->desc) {
-			page_string(ch->desc, output, TRUE);
-		}
+		send_page_display(ch);
 	}
 	
 	if (plr && file) {
@@ -3418,7 +3014,7 @@ SHOW(show_unlocked_archetypes) {
 
 
 SHOW(show_uses) {
-	char buf[MAX_STRING_LENGTH * 3], part[MAX_STRING_LENGTH];
+	char part[MAX_STRING_LENGTH];
 	craft_data *craft, *next_craft;
 	quest_data *quest, *next_quest;
 	progress_data *prg, *next_prg;
@@ -3429,7 +3025,6 @@ SHOW(show_uses) {
 	bld_data *bld, *next_bld;
 	struct req_data *req, *req_list[2] = { NULL, NULL };
 	generic_data *cmp;
-	size_t size;
 	int iter;
 		
 	skip_spaces(&argument);	// optional flags
@@ -3442,13 +3037,9 @@ SHOW(show_uses) {
 	}
 	else {
 		// preamble
-		size = snprintf(buf, sizeof(buf), "Uses for [%d] (%s):\r\n", GEN_VNUM(cmp), GEN_NAME(cmp));
+		build_page_display(ch, "Uses for [%d] (%s):", GEN_VNUM(cmp), GEN_NAME(cmp));
 		
 		HASH_ITER(hh, augment_table, aug, next_aug) {
-			if (size >= sizeof(buf)) {
-				break;
-			}
-			
 			LL_FOREACH(GET_AUG_RESOURCES(aug), res) {
 				if (res->type != RES_COMPONENT) {
 					continue;
@@ -3462,17 +3053,13 @@ SHOW(show_uses) {
 					*part = '\0';
 				}
 				else {
-					snprintf(part, sizeof(part), " (%s)", get_generic_name_by_vnum(res->vnum));
+					safe_snprintf(part, sizeof(part), " (%s)", get_generic_name_by_vnum(res->vnum));
 				}
-				size += snprintf(buf + size, sizeof(buf) - size, "AUG [%5d] %s%s\r\n", GET_AUG_VNUM(aug), GET_AUG_NAME(aug), part);
+				build_page_display(ch, "AUG [%5d] %s%s", GET_AUG_VNUM(aug), GET_AUG_NAME(aug), part);
 			}
 		}
 		
 		HASH_ITER(hh, building_table, bld, next_bld) {
-			if (size >= sizeof(buf)) {
-				break;
-			}
-			
 			LL_FOREACH(GET_BLD_REGULAR_MAINTENANCE(bld), res) {
 				if (res->type != RES_COMPONENT) {
 					continue;
@@ -3486,17 +3073,13 @@ SHOW(show_uses) {
 					*part = '\0';
 				}
 				else {
-					snprintf(part, sizeof(part), " (%s)", get_generic_name_by_vnum(res->vnum));
+					safe_snprintf(part, sizeof(part), " (%s)", get_generic_name_by_vnum(res->vnum));
 				}
-				size += snprintf(buf + size, sizeof(buf) - size, "BLD [%5d] %s%s\r\n", GET_BLD_VNUM(bld), GET_BLD_NAME(bld), part);
+				build_page_display(ch, "BLD [%5d] %s%s", GET_BLD_VNUM(bld), GET_BLD_NAME(bld), part);
 			}
 		}
 		
 		HASH_ITER(hh, craft_table, craft, next_craft) {
-			if (size >= sizeof(buf)) {
-				break;
-			}
-			
 			LL_FOREACH(GET_CRAFT_RESOURCES(craft), res) {
 				if (res->type != RES_COMPONENT) {
 					continue;
@@ -3510,17 +3093,13 @@ SHOW(show_uses) {
 					*part = '\0';
 				}
 				else {
-					snprintf(part, sizeof(part), " (%s)", get_generic_name_by_vnum(res->vnum));
+					safe_snprintf(part, sizeof(part), " (%s)", get_generic_name_by_vnum(res->vnum));
 				}
-				size += snprintf(buf + size, sizeof(buf) - size, "CFT [%5d] %s%s\r\n", GET_CRAFT_VNUM(craft), GET_CRAFT_NAME(craft), part);
+				build_page_display(ch, "CFT [%5d] %s%s", GET_CRAFT_VNUM(craft), GET_CRAFT_NAME(craft), part);
 			}
 		}
 		
 		HASH_ITER(hh, progress_table, prg, next_prg) {
-			if (size >= sizeof(buf)) {
-				break;
-			}
-			
 			LL_FOREACH(PRG_TASKS(prg), req) {
 				if (req->type != REQ_GET_COMPONENT && req->type != REQ_EMPIRE_PRODUCED_COMPONENT) {
 					continue;	// wrong type
@@ -3534,16 +3113,13 @@ SHOW(show_uses) {
 					*part = '\0';
 				}
 				else {
-					snprintf(part, sizeof(part), " (%s)", get_generic_name_by_vnum(req->vnum));
+					safe_snprintf(part, sizeof(part), " (%s)", get_generic_name_by_vnum(req->vnum));
 				}
-				size += snprintf(buf + size, sizeof(buf) - size, "PRG [%5d] %s%s\r\n", PRG_VNUM(prg), PRG_NAME(prg), part);
+				build_page_display(ch, "PRG [%5d] %s%s", PRG_VNUM(prg), PRG_NAME(prg), part);
 			}
 		}
 		
 		HASH_ITER(hh, quest_table, quest, next_quest) {
-			if (size >= sizeof(buf)) {
-				break;
-			}
 			req_list[0] = QUEST_TASKS(quest);
 			req_list[1] = QUEST_PREREQS(quest);
 			
@@ -3561,17 +3137,14 @@ SHOW(show_uses) {
 						*part = '\0';
 					}
 					else {
-						snprintf(part, sizeof(part), " (%s)", get_generic_name_by_vnum(req->vnum));
+						safe_snprintf(part, sizeof(part), " (%s)", get_generic_name_by_vnum(req->vnum));
 					}
-					size += snprintf(buf + size, sizeof(buf) - size, "QST [%5d] %s\r\n", QUEST_VNUM(quest), QUEST_NAME(quest));
+					build_page_display(ch, "QST [%5d] %s", QUEST_VNUM(quest), QUEST_NAME(quest));
 				}
 			}
 		}
 		
 		HASH_ITER(hh, social_table, soc, next_soc) {
-			if (size >= sizeof(buf)) {
-				break;
-			}
 			LL_FOREACH(SOC_REQUIREMENTS(soc), req) {
 				if (req->type != REQ_GET_COMPONENT && req->type != REQ_EMPIRE_PRODUCED_COMPONENT) {
 					continue;	// wrong type
@@ -3585,17 +3158,13 @@ SHOW(show_uses) {
 					*part = '\0';
 				}
 				else {
-					snprintf(part, sizeof(part), " (%s)", get_generic_name_by_vnum(req->vnum));
+					safe_snprintf(part, sizeof(part), " (%s)", get_generic_name_by_vnum(req->vnum));
 				}
-				size += snprintf(buf + size, sizeof(buf) - size, "SOC [%5d] %s\r\n", SOC_VNUM(soc), SOC_NAME(soc));
+				build_page_display(ch, "SOC [%5d] %s", SOC_VNUM(soc), SOC_NAME(soc));
 			}
 		}
 		
 		HASH_ITER(hh, vehicle_table, veh, next_veh) {
-			if (size >= sizeof(buf)) {
-				break;
-			}
-			
 			LL_FOREACH(VEH_REGULAR_MAINTENANCE(veh), res) {
 				if (res->type != RES_COMPONENT) {
 					continue;
@@ -3609,15 +3178,13 @@ SHOW(show_uses) {
 					*part = '\0';
 				}
 				else {
-					snprintf(part, sizeof(part), " (%s)", get_generic_name_by_vnum(res->vnum));
+					safe_snprintf(part, sizeof(part), " (%s)", get_generic_name_by_vnum(res->vnum));
 				}
-				size += snprintf(buf + size, sizeof(buf) - size, "VEH [%5d] %s%s\r\n", VEH_VNUM(veh), VEH_SHORT_DESC(veh), part);
+				build_page_display(ch, "VEH [%5d] %s%s", VEH_VNUM(veh), VEH_SHORT_DESC(veh), part);
 			}
 		}
 		
-		if (ch->desc) {
-			page_string(ch->desc, buf, TRUE);
-		}
+		send_page_display(ch);
 	}
 }
 
@@ -3660,7 +3227,6 @@ SHOW(show_variables) {
 
 
 SHOW(show_workforce) {
-	char arg[MAX_INPUT_LENGTH];
 	empire_data *emp;
 	
 	one_word(argument, arg);

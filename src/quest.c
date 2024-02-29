@@ -649,23 +649,22 @@ char *get_quest_name_by_proto(any_vnum vnum) {
 
 
 /**
-* Builds the tracker display for requirements.
+* The tracker display for quest/progress requirements.
 *
+* @param char_data *ch The person viewing it.
 * @param struct req_data *tracker The tracker to show.
-* @param char *save_buffer The string to save it to.
+* @param bool send_output If TRUE, sends the page_display as text when done. Pass FALSE if you're building a larger page_display for the character.
 */
-void get_tracker_display(struct req_data *tracker, char *save_buffer) {
+void show_tracker_display(char_data *ch, struct req_data *tracker, bool send_output) {
 	int lefthand, count = 0, sub = 0;
-	char buf[MAX_STRING_LENGTH];
+	char buf[256];
 	struct req_data *task;
 	char last_group = 0;
-	
-	*save_buffer = '\0';
 	
 	LL_FOREACH(tracker, task) {
 		if (last_group != task->group) {
 			if (task->group) {
-				sprintf(save_buffer + strlen(save_buffer), "  %s:\r\n", (count > 0 ? "Or all of" : "All of"));
+				build_page_display(ch, "  %s:", (count > 0 ? "Or all of" : "All of"));
 			}
 			last_group = task->group;
 			sub = 0;
@@ -680,7 +679,7 @@ void get_tracker_display(struct req_data *tracker, char *save_buffer) {
 				lefthand = task->current;
 				lefthand = MIN(lefthand, task->needed);	// may be above the amount needed
 				lefthand = MAX(0, lefthand);	// in some cases, current may be negative
-				sprintf(buf, " (%d/%d)", lefthand, task->needed);
+				safe_snprintf(buf, sizeof(buf), " (%d/%d)", lefthand, task->needed);
 				break;
 			}
 			case REQ_AMT_REPUTATION:
@@ -699,7 +698,11 @@ void get_tracker_display(struct req_data *tracker, char *save_buffer) {
 				break;
 			}
 		}
-		sprintf(save_buffer + strlen(save_buffer), "  %s%s%s%s\r\n", (task->group ? "  " : ""), ((sub > 1 && !task->group) ? "or " : ""), requirement_string(task, FALSE, TRUE), buf);
+		build_page_display(ch, "  %s%s%s%s", (task->group ? "  " : ""), ((sub > 1 && !task->group) ? "or " : ""), requirement_string(task, FALSE, TRUE), buf);
+	}
+	
+	if (send_output) {
+		send_page_display_as(ch, PD_NO_PAGINATION | PD_FREE_DISPLAY_AFTER);
 	}
 }
 
@@ -776,10 +779,10 @@ void give_quest_rewards(char_data *ch, struct quest_reward *list, int reward_lev
 				}
 				
 				if (reward->amount > 1) {
-					snprintf(buf, sizeof(buf), "\tyYou receive $p (x%d)!\t0", reward->amount);
+					safe_snprintf(buf, sizeof(buf), "\tyYou receive $p (x%d)!\t0", reward->amount);
 				}
 				else {
-					snprintf(buf, sizeof(buf), "\tyYou receive $p!\t0");
+					safe_snprintf(buf, sizeof(buf), "\tyYou receive $p!\t0");
 				}
 				
 				if (obj_ok && obj) {
@@ -912,7 +915,7 @@ char *quest_giver_string(struct quest_giver *giver, bool show_vnums) {
 	}
 	
 	if (show_vnums) {
-		snprintf(vnum, sizeof(vnum), "%s [%d] ", quest_giver_types[giver->type], giver->vnum);
+		safe_snprintf(vnum, sizeof(vnum), "%s [%d] ", quest_giver_types[giver->type], giver->vnum);
 	}
 	else {
 		*vnum = '\0';
@@ -922,38 +925,38 @@ char *quest_giver_string(struct quest_giver *giver, bool show_vnums) {
 	switch (giver->type) {
 		case QG_BUILDING: {
 			bld_data *bld = building_proto(giver->vnum);
-			snprintf(output, sizeof(output), "%s%s", vnum, bld ? GET_BLD_NAME(bld) : "UNKNOWN");
+			safe_snprintf(output, sizeof(output), "%s%s", vnum, bld ? GET_BLD_NAME(bld) : "UNKNOWN");
 			break;
 		}
 		case QG_MOBILE: {
-			snprintf(output, sizeof(output), "%s%s", vnum, skip_filler(get_mob_name_by_proto(giver->vnum, FALSE)));
+			safe_snprintf(output, sizeof(output), "%s%s", vnum, skip_filler(get_mob_name_by_proto(giver->vnum, FALSE)));
 			break;
 		}
 		case QG_OBJECT: {
-			snprintf(output, sizeof(output), "%s%s", vnum, skip_filler(get_obj_name_by_proto(giver->vnum)));
+			safe_snprintf(output, sizeof(output), "%s%s", vnum, skip_filler(get_obj_name_by_proto(giver->vnum)));
 			break;
 		}
 		case QG_ROOM_TEMPLATE: {
 			room_template *rmt = room_template_proto(giver->vnum);
-			snprintf(output, sizeof(output), "%s%s", vnum, rmt ? skip_filler(GET_RMT_TITLE(rmt)) : "UNKNOWN");
+			safe_snprintf(output, sizeof(output), "%s%s", vnum, rmt ? skip_filler(GET_RMT_TITLE(rmt)) : "UNKNOWN");
 			break;
 		}
 		case QG_TRIGGER: {
 			trig_data *trig = real_trigger(giver->vnum);
-			snprintf(output, sizeof(output), "%s%s", vnum, trig ? skip_filler(GET_TRIG_NAME(trig)) : "UNKNOWN");
+			safe_snprintf(output, sizeof(output), "%s%s", vnum, trig ? skip_filler(GET_TRIG_NAME(trig)) : "UNKNOWN");
 			break;
 		}
 		case QG_QUEST: {
 			quest_data *qq = quest_proto(giver->vnum);
-			snprintf(output, sizeof(output), "%s%s", vnum, qq ? skip_filler(QUEST_NAME(qq)) : "UNKNOWN");
+			safe_snprintf(output, sizeof(output), "%s%s", vnum, qq ? skip_filler(QUEST_NAME(qq)) : "UNKNOWN");
 			break;
 		}
 		case QG_VEHICLE: {
-			snprintf(output, sizeof(output), "%s%s", vnum, skip_filler(get_vehicle_name_by_proto(giver->vnum)));
+			safe_snprintf(output, sizeof(output), "%s%s", vnum, skip_filler(get_vehicle_name_by_proto(giver->vnum)));
 			break;
 		}
 		default: {
-			snprintf(output, sizeof(output), "%d %sUNKNOWN", giver->type, vnum);
+			safe_snprintf(output, sizeof(output), "%d %sUNKNOWN", giver->type, vnum);
 			break;
 		}
 	}
@@ -979,7 +982,7 @@ char *quest_reward_string(struct quest_reward *reward, bool show_vnums) {
 	}
 	
 	if (show_vnums) {
-		snprintf(vnum, sizeof(vnum), "[%d] ", reward->vnum);
+		safe_snprintf(vnum, sizeof(vnum), "[%d] ", reward->vnum);
 	}
 	else {
 		*vnum = '\0';
@@ -989,71 +992,71 @@ char *quest_reward_string(struct quest_reward *reward, bool show_vnums) {
 	switch (reward->type) {
 		case QR_BONUS_EXP: {
 			// has no vnum
-			snprintf(output, sizeof(output), "%d bonus experience", reward->amount);
+			safe_snprintf(output, sizeof(output), "%d bonus experience", reward->amount);
 			break;
 		}
 		case QR_COINS: {
 			// vnum not relevant
-			snprintf(output, sizeof(output), "%d %s coin%s", reward->amount, reward->vnum == OTHER_COIN ? "misc" : "empire", PLURAL(reward->amount));
+			safe_snprintf(output, sizeof(output), "%d %s coin%s", reward->amount, reward->vnum == OTHER_COIN ? "misc" : "empire", PLURAL(reward->amount));
 			break;
 		}
 		case QR_CURRENCY: {
-			snprintf(output, sizeof(output), "%s%d %s", vnum, reward->amount, get_generic_string_by_vnum(reward->vnum, GENERIC_CURRENCY, WHICH_CURRENCY(reward->amount)));
+			safe_snprintf(output, sizeof(output), "%s%d %s", vnum, reward->amount, get_generic_string_by_vnum(reward->vnum, GENERIC_CURRENCY, WHICH_CURRENCY(reward->amount)));
 			break;
 		}
 		case QR_OBJECT: {
-			snprintf(output, sizeof(output), "%s%dx %s", vnum, reward->amount, skip_filler(get_obj_name_by_proto(reward->vnum)));
+			safe_snprintf(output, sizeof(output), "%s%dx %s", vnum, reward->amount, skip_filler(get_obj_name_by_proto(reward->vnum)));
 			break;
 		}
 		case QR_SET_SKILL: {
-			snprintf(output, sizeof(output), "%sGives level %d %s", vnum, reward->amount, get_skill_name_by_vnum(reward->vnum));
+			safe_snprintf(output, sizeof(output), "%sGives level %d %s", vnum, reward->amount, get_skill_name_by_vnum(reward->vnum));
 			break;
 		}
 		case QR_SKILL_EXP: {
-			snprintf(output, sizeof(output), "%s%+d%% %s", vnum, reward->amount, get_skill_name_by_vnum(reward->vnum));
+			safe_snprintf(output, sizeof(output), "%s%+d%% %s", vnum, reward->amount, get_skill_name_by_vnum(reward->vnum));
 			break;
 		}
 		case QR_SKILL_LEVELS: {
-			snprintf(output, sizeof(output), "%s%+d %s", vnum, reward->amount, get_skill_name_by_vnum(reward->vnum));
+			safe_snprintf(output, sizeof(output), "%s%+d %s", vnum, reward->amount, get_skill_name_by_vnum(reward->vnum));
 			break;
 		}
 		case QR_QUEST_CHAIN: {
-			snprintf(output, sizeof(output), "%sLeads to %s", vnum, get_quest_name_by_proto(reward->vnum));
+			safe_snprintf(output, sizeof(output), "%sLeads to %s", vnum, get_quest_name_by_proto(reward->vnum));
 			break;
 		}
 		case QR_REPUTATION: {
 			faction_data *fct = find_faction_by_vnum(reward->vnum);
-			snprintf(output, sizeof(output), "%s%+d reputation to %s", vnum, reward->amount, (fct ? FCT_NAME(fct) : "UNKNOWN"));
+			safe_snprintf(output, sizeof(output), "%s%+d reputation to %s", vnum, reward->amount, (fct ? FCT_NAME(fct) : "UNKNOWN"));
 			break;
 		}
 		case QR_EVENT_POINTS: {
 			event_data *event = find_event_by_vnum(reward->vnum);
-			snprintf(output, sizeof(output), "%+d event point%s to %s%s", reward->amount, PLURAL(reward->amount), vnum, (event ? EVT_NAME(event) : "UNKNOWN"));
+			safe_snprintf(output, sizeof(output), "%+d event point%s to %s%s", reward->amount, PLURAL(reward->amount), vnum, (event ? EVT_NAME(event) : "UNKNOWN"));
 			break;
 		}
 		case QR_SPEAK_LANGUAGE: {
-			snprintf(output, sizeof(output), "%sSpeak %s", vnum, get_generic_name_by_vnum(reward->vnum));
+			safe_snprintf(output, sizeof(output), "%sSpeak %s", vnum, get_generic_name_by_vnum(reward->vnum));
 			break;
 		}
 		case QR_RECOGNIZE_LANGUAGE: {
-			snprintf(output, sizeof(output), "%sRecognize %s", vnum, get_generic_name_by_vnum(reward->vnum));
+			safe_snprintf(output, sizeof(output), "%sRecognize %s", vnum, get_generic_name_by_vnum(reward->vnum));
 			break;
 		}
 		case QR_GRANT_PROGRESS: {
-			snprintf(output, sizeof(output), "Grants progress: %s%s", vnum, get_progress_name_by_proto(reward->vnum));
+			safe_snprintf(output, sizeof(output), "Grants progress: %s%s", vnum, get_progress_name_by_proto(reward->vnum));
 			break;
 		}
 		case QR_START_PROGRESS: {
-			snprintf(output, sizeof(output), "Starts progress: %s%s", vnum, get_progress_name_by_proto(reward->vnum));
+			safe_snprintf(output, sizeof(output), "Starts progress: %s%s", vnum, get_progress_name_by_proto(reward->vnum));
 			break;
 		}
 		case QR_UNLOCK_ARCHETYPE: {
 			archetype_data *arch = archetype_proto(reward->vnum);
-			snprintf(output, sizeof(output), "Unlocks archetype: %s%s", vnum, (arch ? GET_ARCH_NAME(arch) : "UNKNOWN"));
+			safe_snprintf(output, sizeof(output), "Unlocks archetype: %s%s", vnum, (arch ? GET_ARCH_NAME(arch) : "UNKNOWN"));
 			break;
 		}
 		default: {
-			snprintf(output, sizeof(output), "%s%dx Unknown", vnum, reward->amount);
+			safe_snprintf(output, sizeof(output), "%s%dx Unknown", vnum, reward->amount);
 			break;
 		}
 	}
@@ -3869,7 +3872,7 @@ char *list_one_quest(quest_data *quest, bool detail) {
 	
 	if (detail) {
 		if (QUEST_MIN_LEVEL(quest) > 0 || QUEST_MAX_LEVEL(quest) > 0) {
-			snprintf(levels, sizeof(levels), " [%d-%d]", QUEST_MIN_LEVEL(quest), QUEST_MAX_LEVEL(quest));
+			safe_snprintf(levels, sizeof(levels), " [%d-%d]", QUEST_MIN_LEVEL(quest), QUEST_MAX_LEVEL(quest));
 		}
 		else {
 			*levels = '\0';
@@ -3881,34 +3884,34 @@ char *list_one_quest(quest_data *quest, bool detail) {
 		else {
 			*typestr = '\0';
 		}
-		snprintf(output, sizeof(output), "[%5d] %s%s %s", QUEST_VNUM(quest), QUEST_NAME(quest), levels, typestr);
+		safe_snprintf(output, sizeof(output), "[%5d] %s%s %s", QUEST_VNUM(quest), QUEST_NAME(quest), levels, typestr);
 	}
 	else {
 		if (IS_EVENT_DAILY(quest)) {
 			if (QUEST_DAILY_CYCLE(quest) == NOTHING) {
-				snprintf(typestr, sizeof(typestr), " (event daily)");
+				safe_snprintf(typestr, sizeof(typestr), " (event daily)");
 			}
 			else {
-				snprintf(typestr, sizeof(typestr), " (event daily, %s)", QUEST_DAILY_ACTIVE(quest) ? "active" : "inactive");
+				safe_snprintf(typestr, sizeof(typestr), " (event daily, %s)", QUEST_DAILY_ACTIVE(quest) ? "active" : "inactive");
 			}
 		}
 		else if (IS_DAILY_QUEST(quest) && QUEST_DAILY_CYCLE(quest) == NOTHING) {
-			snprintf(typestr, sizeof(typestr), " (daily)");
+			safe_snprintf(typestr, sizeof(typestr), " (daily)");
 		}
 		else if (IS_DAILY_QUEST(quest) && QUEST_DAILY_ACTIVE(quest)) {
-			snprintf(typestr, sizeof(typestr), " (daily, active)");
+			safe_snprintf(typestr, sizeof(typestr), " (daily, active)");
 		}
 		else if (IS_DAILY_QUEST(quest)) {
-			snprintf(typestr, sizeof(typestr), " (daily, inactive)");
+			safe_snprintf(typestr, sizeof(typestr), " (daily, inactive)");
 		}
 		else if (IS_EVENT_QUEST(quest)) {
-			snprintf(typestr, sizeof(typestr), " (event)");
+			safe_snprintf(typestr, sizeof(typestr), " (event)");
 		}
 		else {
 			*typestr = '\0';
 		}
 		
-		snprintf(output, sizeof(output), "[%5d] %s%s", QUEST_VNUM(quest), QUEST_NAME(quest), typestr);
+		safe_snprintf(output, sizeof(output), "[%5d] %s%s", QUEST_VNUM(quest), QUEST_NAME(quest), typestr);
 	}
 		
 	return output;
@@ -3923,7 +3926,7 @@ char *list_one_quest(quest_data *quest, bool detail) {
 */
 void olc_fullsearch_quest(char_data *ch, char *argument) {
 	bool any;
-	char buf[MAX_STRING_LENGTH * 2], line[MAX_STRING_LENGTH], type_arg[MAX_INPUT_LENGTH], val_arg[MAX_INPUT_LENGTH], find_keywords[MAX_INPUT_LENGTH];
+	char type_arg[MAX_INPUT_LENGTH], val_arg[MAX_INPUT_LENGTH], find_keywords[MAX_INPUT_LENGTH];
 	int count;
 	struct quest_reward *qreward;
 	struct req_data *req;
@@ -3935,7 +3938,6 @@ void olc_fullsearch_quest(char_data *ch, char *argument) {
 	int only_reward = NOTHING, only_prereq = NOTHING, only_task = NOTHING;
 	
 	quest_data *quest, *next_quest;
-	size_t size;
 	
 	if (!*argument) {
 		msg_to_char(ch, "See HELP QEDIT FULLSEARCH for syntax.\r\n");
@@ -3980,7 +3982,7 @@ void olc_fullsearch_quest(char_data *ch, char *argument) {
 		skip_spaces(&argument);
 	}
 	
-	size = snprintf(buf, sizeof(buf), "Quest fullsearch: %s\r\n", show_color_codes(find_keywords));
+	build_page_display(ch, "Quest fullsearch: %s", show_color_codes(find_keywords));
 	count = 0;
 	
 	// okay now look up quests
@@ -4088,27 +4090,18 @@ void olc_fullsearch_quest(char_data *ch, char *argument) {
 		}
 		
 		// show it
-		snprintf(line, sizeof(line), "[%5d] %s\r\n", QUEST_VNUM(quest), QUEST_NAME(quest));
-		if (strlen(line) + size < sizeof(buf)) {
-			size += snprintf(buf + size, sizeof(buf) - size, "%s", line);
-			++count;
-		}
-		else {
-			size += snprintf(buf + size, sizeof(buf) - size, "OVERFLOW\r\n");
-			break;
-		}
+		build_page_display(ch, "[%5d] %s", QUEST_VNUM(quest), QUEST_NAME(quest));
+		++count;
 	}
 	
-	if (count > 0 && (size + 16) < sizeof(buf)) {
-		size += snprintf(buf + size, sizeof(buf) - size, "(%d quests)\r\n", count);
+	if (count > 0) {
+		build_page_display(ch, "(%d quests)", count);
 	}
-	else if (count == 0) {
-		size += snprintf(buf + size, sizeof(buf) - size, " none\r\n");
+	else {
+		build_page_display_str(ch, " none");
 	}
 	
-	if (ch->desc) {
-		page_string(ch->desc, buf, TRUE);
-	}
+	send_page_display(ch);
 }
 
 
@@ -4119,14 +4112,13 @@ void olc_fullsearch_quest(char_data *ch, char *argument) {
 * @param any_vnum vnum The quest vnum.
 */
 void olc_search_quest(char_data *ch, any_vnum vnum) {
-	char buf[MAX_STRING_LENGTH];
 	quest_data *quest = quest_proto(vnum);
 	event_data *event, *next_event;
 	quest_data *qiter, *next_qiter;
 	progress_data *prg, *next_prg;
 	social_data *soc, *next_soc;
 	shop_data *shop, *next_shop;
-	int size, found;
+	int found;
 	bool any;
 	
 	if (!quest) {
@@ -4135,28 +4127,22 @@ void olc_search_quest(char_data *ch, any_vnum vnum) {
 	}
 	
 	found = 0;
-	size = snprintf(buf, sizeof(buf), "Occurrences of quest %d (%s):\r\n", vnum, QUEST_NAME(quest));
+	build_page_display(ch, "Occurrences of quest %d (%s):", vnum, QUEST_NAME(quest));
 	
 	// events
 	HASH_ITER(hh, event_table, event, next_event) {
-		if (size >= sizeof(buf)) {
-			break;
-		}
 		// QR_x: event rewards
 		any = find_event_reward_in_list(EVT_RANK_REWARDS(event), QR_QUEST_CHAIN, vnum);
 		any |= find_event_reward_in_list(EVT_THRESHOLD_REWARDS(event), QR_QUEST_CHAIN, vnum);
 		
 		if (any) {
 			++found;
-			size += snprintf(buf + size, sizeof(buf) - size, "EVT [%5d] %s\r\n", EVT_VNUM(event), EVT_NAME(event));
+			build_page_display(ch, "EVT [%5d] %s", EVT_VNUM(event), EVT_NAME(event));
 		}
 	}
 	
 	// progress
 	HASH_ITER(hh, progress_table, prg, next_prg) {
-		if (size >= sizeof(buf)) {
-			break;
-		}
 		// REQ_x: requirement search
 		any = find_requirement_in_list(PRG_TASKS(prg), REQ_COMPLETED_QUEST, vnum);
 		any |= find_requirement_in_list(PRG_TASKS(prg), REQ_COMPLETED_QUEST_EVER, vnum);
@@ -4165,15 +4151,12 @@ void olc_search_quest(char_data *ch, any_vnum vnum) {
 		
 		if (any) {
 			++found;
-			size += snprintf(buf + size, sizeof(buf) - size, "PRG [%5d] %s\r\n", PRG_VNUM(prg), PRG_NAME(prg));
+			build_page_display(ch, "PRG [%5d] %s", PRG_VNUM(prg), PRG_NAME(prg));
 		}
 	}
 	
 	// on other quests
 	HASH_ITER(hh, quest_table, qiter, next_qiter) {
-		if (size >= sizeof(buf)) {
-			break;
-		}
 		// QR_x, REQ_x: quest types
 		any = find_requirement_in_list(QUEST_TASKS(qiter), REQ_COMPLETED_QUEST, vnum);
 		any |= find_requirement_in_list(QUEST_TASKS(qiter), REQ_COMPLETED_QUEST_EVER, vnum);
@@ -4189,29 +4172,23 @@ void olc_search_quest(char_data *ch, any_vnum vnum) {
 		
 		if (any) {
 			++found;
-			size += snprintf(buf + size, sizeof(buf) - size, "QST [%5d] %s\r\n", QUEST_VNUM(qiter), QUEST_NAME(qiter));
+			build_page_display(ch, "QST [%5d] %s", QUEST_VNUM(qiter), QUEST_NAME(qiter));
 		}
 	}
 	
 	// on shops
 	HASH_ITER(hh, shop_table, shop, next_shop) {
-		if (size >= sizeof(buf)) {
-			break;
-		}
 		// QG_x: shop types
 		any = find_quest_giver_in_list(SHOP_LOCATIONS(shop), QG_QUEST, vnum);
 		
 		if (any) {
 			++found;
-			size += snprintf(buf + size, sizeof(buf) - size, "SHOP [%5d] %s\r\n", SHOP_VNUM(shop), SHOP_NAME(shop));
+			build_page_display(ch, "SHOP [%5d] %s", SHOP_VNUM(shop), SHOP_NAME(shop));
 		}
 	}
 	
 	// on socials
 	HASH_ITER(hh, social_table, soc, next_soc) {
-		if (size >= sizeof(buf)) {
-			break;
-		}
 		// REQ_x: quest types
 		any = find_requirement_in_list(SOC_REQUIREMENTS(soc), REQ_COMPLETED_QUEST, vnum);
 		any |= find_requirement_in_list(SOC_REQUIREMENTS(soc), REQ_COMPLETED_QUEST_EVER, vnum);
@@ -4220,18 +4197,18 @@ void olc_search_quest(char_data *ch, any_vnum vnum) {
 		
 		if (any) {
 			++found;
-			size += snprintf(buf + size, sizeof(buf) - size, "SOC [%5d] %s\r\n", SOC_VNUM(soc), SOC_NAME(soc));
+			build_page_display(ch, "SOC [%5d] %s", SOC_VNUM(soc), SOC_NAME(soc));
 		}
 	}
 	
 	if (found > 0) {
-		size += snprintf(buf + size, sizeof(buf) - size, "%d location%s shown\r\n", found, PLURAL(found));
+		build_page_display(ch, "%d location%s shown", found, PLURAL(found));
 	}
 	else {
-		size += snprintf(buf + size, sizeof(buf) - size, " none\r\n");
+		build_page_display_str(ch, " none");
 	}
 	
-	page_string(ch->desc, buf, TRUE);
+	send_page_display(ch);
 }
 
 
@@ -5355,7 +5332,7 @@ void olc_delete_quest(char_data *ch, any_vnum vnum) {
 		return;
 	}
 	
-	snprintf(name, sizeof(name), "%s", NULLSAFE(QUEST_NAME(quest)));
+	safe_snprintf(name, sizeof(name), "%s", NULLSAFE(QUEST_NAME(quest)));
 	
 	// remove it from the hash table first
 	remove_quest_from_table(quest);
@@ -5671,47 +5648,59 @@ quest_data *setup_olc_quest(quest_data *input) {
 //// DISPLAYS ////////////////////////////////////////////////////////////////
 
 /**
-* Gets the display for a set of quest givers.
+* Display a set of quest givers.
 *
+* @param char_data *ch The person viewing it.
 * @param struct quest_giver *list Pointer to the start of a list of quest givers.
-* @param char *save_buffer A buffer to store the result to.
+* @param bool send_output If TRUE, sends the page_display as text when done. Pass FALSE if you're building a larger page_display for the character.
 */
-void get_quest_giver_display(struct quest_giver *list, char *save_buffer) {
+void show_quest_giver_display(char_data *ch, struct quest_giver *list, bool send_output) {
 	struct quest_giver *giver;
 	int count = 0;
 	
-	*save_buffer = '\0';
 	LL_FOREACH(list, giver) {		
-		sprintf(save_buffer + strlen(save_buffer), "%2d. %s\r\n", ++count, quest_giver_string(giver, TRUE));
+		build_page_display(ch, "%2d. %s", ++count, quest_giver_string(giver, TRUE));
 	}
 	
-	// empty list not shown
+	if (!list) {
+		build_page_display_str(ch, " nowhere");
+	}
+	
+	if (send_output) {
+		send_page_display_as(ch, PD_NO_PAGINATION | PD_FREE_DISPLAY_AFTER);
+	}
 }
 
 
 /**
-* Gets the display for a set of quest rewards.
+* Display a set of quest rewards.
 *
+* @param char_data *ch The person viewing it.
 * @param struct quest_reward *list Pointer to the start of a list of quest rewards.
-* @param char *save_buffer A buffer to store the result to.
 * @param bool show_vnums If TRUE, shows vnums with any applicable rewards. If FALSE, does not.
+* @param bool send_output If TRUE, sends the page_display as text when done. Pass FALSE if you're building a larger page_display for the character.
 */
-void get_quest_reward_display(struct quest_reward *list, char *save_buffer, bool show_vnums) {
+void show_quest_reward_display(char_data *ch, struct quest_reward *list, bool show_vnums, bool send_output) {
 	struct quest_reward *reward;
 	int count = 0;
 	
-	*save_buffer = '\0';
 	LL_FOREACH(list, reward) {
 		if (show_vnums) {
-			sprintf(save_buffer + strlen(save_buffer), "%2d. %s: %s\r\n", ++count, quest_reward_types[reward->type], quest_reward_string(reward, show_vnums));
+			build_page_display(ch, "%2d. %s: %s", ++count, quest_reward_types[reward->type], quest_reward_string(reward, show_vnums));
 		}
 		else {
 			++count;
-			sprintf(save_buffer + strlen(save_buffer), " %s\r\n", quest_reward_string(reward, show_vnums));
+			build_page_display(ch, " %s", quest_reward_string(reward, show_vnums));
 		}
 	}
 	
-	// empty list not shown
+	if (!list) {
+		build_page_display_str(ch, " none");
+	}
+	
+	if (send_output) {
+		send_page_display_as(ch, PD_NO_PAGINATION | PD_FREE_DISPLAY_AFTER);
+	}
 }
 
 
@@ -5722,28 +5711,27 @@ void get_quest_reward_display(struct quest_reward *list, char *save_buffer, bool
 * @param quest_data *quest The quest to display.
 */
 void do_stat_quest(char_data *ch, quest_data *quest) {
-	char buf[MAX_STRING_LENGTH * 4], part[MAX_STRING_LENGTH];
-	size_t size;
+	char part[MAX_STRING_LENGTH];
 	
 	if (!quest) {
 		return;
 	}
 	
 	// first line
-	size = snprintf(buf, sizeof(buf), "VNum: [\tc%d\t0], Name: \tc%s\t0\r\n", QUEST_VNUM(quest), QUEST_NAME(quest));
-	size += snprintf(buf + size, sizeof(buf) - size, "%s", QUEST_DESCRIPTION(quest));
-	size += snprintf(buf + size, sizeof(buf) - size, "-------------------------------------------------\r\n");
-	size += snprintf(buf + size, sizeof(buf) - size, "%s", QUEST_COMPLETE_MSG(quest));
+	build_page_display(ch, "VNum: [\tc%d\t0], Name: \tc%s\t0", QUEST_VNUM(quest), QUEST_NAME(quest));
+	build_page_display(ch, "%s", QUEST_DESCRIPTION(quest));
+	build_page_display(ch, "-------------------------------------------------");
+	build_page_display(ch, "%s", QUEST_COMPLETE_MSG(quest));
 	
 	sprintbit(QUEST_FLAGS(quest), quest_flags, part, TRUE);
-	size += snprintf(buf + size, sizeof(buf) - size, "Flags: \tg%s\t0\r\n", part);
+	build_page_display(ch, "Flags: \tg%s\t0", part);
 	
 	if (QUEST_FLAGGED(quest, QST_DAILY)) {
 		if (QUEST_DAILY_CYCLE(quest) != NOTHING) {
-			size += snprintf(buf + size, sizeof(buf) - size, "Daily cycle id: \tc%d\t0\r\n", QUEST_DAILY_CYCLE(quest));
+			build_page_display(ch, "Daily cycle id: \tc%d\t0", QUEST_DAILY_CYCLE(quest));
 		}
 		else {
-			size += snprintf(buf + size, sizeof(buf) - size, "Daily cycle id: \tcnone\t0\r\n");
+			build_page_display(ch, "Daily cycle id: \tcnone\t0");
 		}
 	}
 	
@@ -5756,28 +5744,28 @@ void do_stat_quest(char_data *ch, quest_data *quest) {
 	else {
 		sprintf(part, "%d minutes (%s)", QUEST_REPEATABLE_AFTER(quest), colon_time(QUEST_REPEATABLE_AFTER(quest), TRUE, NULL));
 	}
-	size += snprintf(buf + size, sizeof(buf) - size, "Level limits: [\tc%s\t0], Repeatable: [\tc%s\t0]\r\n", level_range_string(QUEST_MIN_LEVEL(quest), QUEST_MAX_LEVEL(quest), 0), part);
+	build_page_display(ch, "Level limits: [\tc%s\t0], Repeatable: [\tc%s\t0]", level_range_string(QUEST_MIN_LEVEL(quest), QUEST_MAX_LEVEL(quest), 0), part);
 		
-	get_requirement_display(QUEST_PREREQS(quest), part);
-	size += snprintf(buf + size, sizeof(buf) - size, "Pre-requisites:\r\n%s", *part ? part : " none\r\n");
+	build_page_display_str(ch, "Pre-requisites:");
+	show_requirement_display(ch, QUEST_PREREQS(quest), FALSE);
 	
-	get_quest_giver_display(QUEST_STARTS_AT(quest), part);
-	size += snprintf(buf + size, sizeof(buf) - size, "Starts at:\r\n%s", *part ? part : " nowhere\r\n");
+	build_page_display_str(ch, "Starts at:");
+	show_quest_giver_display(ch, QUEST_STARTS_AT(quest), FALSE);
 	
-	get_quest_giver_display(QUEST_ENDS_AT(quest), part);
-	size += snprintf(buf + size, sizeof(buf) - size, "Ends at:\r\n%s", *part ? part : " nowhere\r\n");
+	build_page_display_str(ch, "Ends at:");
+	show_quest_giver_display(ch, QUEST_ENDS_AT(quest), FALSE);
 	
-	get_requirement_display(QUEST_TASKS(quest), part);
-	size += snprintf(buf + size, sizeof(buf) - size, "Tasks:\r\n%s", *part ? part : " none\r\n");
+	build_page_display_str(ch, "Tasks:");
+	show_requirement_display(ch, QUEST_TASKS(quest), FALSE);
 	
-	get_quest_reward_display(QUEST_REWARDS(quest), part, TRUE);
-	size += snprintf(buf + size, sizeof(buf) - size, "Rewards:\r\n%s", *part ? part : " none\r\n");
+	build_page_display_str(ch, "Rewards:");
+	show_quest_reward_display(ch, QUEST_REWARDS(quest), TRUE, FALSE);
 	
 	// scripts
-	get_script_display(QUEST_SCRIPTS(quest), part);
-	size += snprintf(buf + size, sizeof(buf) - size, "Scripts:\r\n%s", QUEST_SCRIPTS(quest) ? part : " none\r\n");
+	build_page_display_str(ch, "Scripts:");
+	show_script_display(ch, QUEST_SCRIPTS(quest), FALSE);
 	
-	page_string(ch->desc, buf, TRUE);
+	send_page_display(ch);
 }
 
 
@@ -5789,77 +5777,84 @@ void do_stat_quest(char_data *ch, quest_data *quest) {
 */
 void olc_show_quest(char_data *ch) {
 	quest_data *quest = GET_OLC_QUEST(ch->desc);
-	char buf[MAX_STRING_LENGTH * 4], lbuf[MAX_STRING_LENGTH];
+	char lbuf[MAX_STRING_LENGTH];
 	
 	if (!quest) {
 		return;
 	}
 	
-	*buf = '\0';
-	
-	sprintf(buf + strlen(buf), "[%s%d\t0] %s%s\t0\r\n", OLC_LABEL_CHANGED, GET_OLC_VNUM(ch->desc), OLC_LABEL_UNCHANGED, !quest_proto(QUEST_VNUM(quest)) ? "new quest" : get_quest_name_by_proto(QUEST_VNUM(quest)));
-	sprintf(buf + strlen(buf), "<%sname\t0> %s\r\n", OLC_LABEL_STR(QUEST_NAME(quest), default_quest_name), NULLSAFE(QUEST_NAME(quest)));
-	sprintf(buf + strlen(buf), "<%sdescription\t0>\r\n%s", OLC_LABEL_STR(QUEST_DESCRIPTION(quest), default_quest_description), NULLSAFE(QUEST_DESCRIPTION(quest)));
-	sprintf(buf + strlen(buf), "<%scompletemessage\t0>\r\n%s", OLC_LABEL_STR(QUEST_COMPLETE_MSG(quest), default_quest_complete_msg), NULLSAFE(QUEST_COMPLETE_MSG(quest)));
+	build_page_display(ch, "[%s%d\t0] %s%s\t0", OLC_LABEL_CHANGED, GET_OLC_VNUM(ch->desc), OLC_LABEL_UNCHANGED, !quest_proto(QUEST_VNUM(quest)) ? "new quest" : get_quest_name_by_proto(QUEST_VNUM(quest)));
+	build_page_display(ch, "<%sname\t0> %s", OLC_LABEL_STR(QUEST_NAME(quest), default_quest_name), NULLSAFE(QUEST_NAME(quest)));
+	build_page_display(ch, "<%sdescription\t0>\r\n%s", OLC_LABEL_STR(QUEST_DESCRIPTION(quest), default_quest_description), NULLSAFE(QUEST_DESCRIPTION(quest)));
+	build_page_display(ch, "<%scompletemessage\t0>\r\n%s", OLC_LABEL_STR(QUEST_COMPLETE_MSG(quest), default_quest_complete_msg), NULLSAFE(QUEST_COMPLETE_MSG(quest)));
 	
 	sprintbit(QUEST_FLAGS(quest), quest_flags, lbuf, TRUE);
-	sprintf(buf + strlen(buf), "<%sflags\t0> %s\r\n", OLC_LABEL_VAL(QUEST_FLAGS(quest), QST_IN_DEVELOPMENT), lbuf);
+	build_page_display(ch, "<%sflags\t0> %s", OLC_LABEL_VAL(QUEST_FLAGS(quest), QST_IN_DEVELOPMENT), lbuf);
 	
 	if (QUEST_MIN_LEVEL(quest) > 0) {
-		sprintf(buf + strlen(buf), "<%sminlevel\t0> %d\r\n", OLC_LABEL_CHANGED, QUEST_MIN_LEVEL(quest));
+		build_page_display(ch, "<%sminlevel\t0> %d", OLC_LABEL_CHANGED, QUEST_MIN_LEVEL(quest));
 	}
 	else {
-		sprintf(buf + strlen(buf), "<%sminlevel\t0> none\r\n", OLC_LABEL_UNCHANGED);
+		build_page_display(ch, "<%sminlevel\t0> none", OLC_LABEL_UNCHANGED);
 	}
 	if (QUEST_MAX_LEVEL(quest) > 0) {
-		sprintf(buf + strlen(buf), "<%smaxlevel\t0> %d\r\n", OLC_LABEL_CHANGED, QUEST_MAX_LEVEL(quest));
+		build_page_display(ch, "<%smaxlevel\t0> %d", OLC_LABEL_CHANGED, QUEST_MAX_LEVEL(quest));
 	}
 	else {
-		sprintf(buf + strlen(buf), "<%smaxlevel\t0> none\r\n", OLC_LABEL_UNCHANGED);
+		build_page_display(ch, "<%smaxlevel\t0> none", OLC_LABEL_UNCHANGED);
 	}
 	
-	get_requirement_display(QUEST_PREREQS(quest), lbuf);
-	sprintf(buf + strlen(buf), "Pre-requisites: <%sprereqs\t0>\r\n%s", OLC_LABEL_PTR(QUEST_PREREQS(quest)), lbuf);
+	build_page_display(ch, "Pre-requisites: <%sprereqs\t0>", OLC_LABEL_PTR(QUEST_PREREQS(quest)));
+	if (QUEST_PREREQS(quest)) {
+		show_requirement_display(ch, QUEST_PREREQS(quest), FALSE);
+	}
 	
 	if (QUEST_REPEATABLE_AFTER(quest) == NOT_REPEATABLE) {
-		sprintf(buf + strlen(buf), "<%srepeat\t0> never\r\n", OLC_LABEL_VAL(QUEST_REPEATABLE_AFTER(quest), 0));
+		build_page_display(ch, "<%srepeat\t0> never", OLC_LABEL_VAL(QUEST_REPEATABLE_AFTER(quest), 0));
 	}
 	else if (QUEST_REPEATABLE_AFTER(quest) > 0) {
-		sprintf(buf + strlen(buf), "<%srepeat\t0> %d minutes (%s)\r\n", OLC_LABEL_VAL(QUEST_REPEATABLE_AFTER(quest), 0), QUEST_REPEATABLE_AFTER(quest), colon_time(QUEST_REPEATABLE_AFTER(quest), TRUE, NULL));
+		build_page_display(ch, "<%srepeat\t0> %d minutes (%s)", OLC_LABEL_VAL(QUEST_REPEATABLE_AFTER(quest), 0), QUEST_REPEATABLE_AFTER(quest), colon_time(QUEST_REPEATABLE_AFTER(quest), TRUE, NULL));
 	}
 	else if (QUEST_REPEATABLE_AFTER(quest) == 0) {
-		sprintf(buf + strlen(buf), "<%srepeat\t0> immediately\r\n", OLC_LABEL_VAL(QUEST_REPEATABLE_AFTER(quest), 0));
+		build_page_display(ch, "<%srepeat\t0> immediately", OLC_LABEL_VAL(QUEST_REPEATABLE_AFTER(quest), 0));
 	}
 	
 	if (QUEST_FLAGGED(quest, QST_DAILY)) {
 		if (QUEST_DAILY_CYCLE(quest) != NOTHING) {
-			sprintf(buf + strlen(buf), "<%sdailycycle\t0> %d\r\n", OLC_LABEL_CHANGED, QUEST_DAILY_CYCLE(quest));
+			build_page_display(ch, "<%sdailycycle\t0> %d", OLC_LABEL_CHANGED, QUEST_DAILY_CYCLE(quest));
 		}
 		else {
-			sprintf(buf + strlen(buf), "<%sdailycycle\t0> none\r\n", OLC_LABEL_UNCHANGED);
+			build_page_display(ch, "<%sdailycycle\t0> none", OLC_LABEL_UNCHANGED);
 		}
 	}
 	
-	get_quest_giver_display(QUEST_STARTS_AT(quest), lbuf);
-	sprintf(buf + strlen(buf), "Starts at: <%sstarts\t0>\r\n%s", OLC_LABEL_PTR(QUEST_STARTS_AT(quest)), lbuf);
-	
-	get_quest_giver_display(QUEST_ENDS_AT(quest), lbuf);
-	sprintf(buf + strlen(buf), "Ends at: <%sends\t0>\r\n%s", OLC_LABEL_PTR(QUEST_ENDS_AT(quest)), lbuf);
-	
-	get_requirement_display(QUEST_TASKS(quest), lbuf);
-	sprintf(buf + strlen(buf), "Tasks: <%stasks\t0>\r\n%s", OLC_LABEL_PTR(QUEST_TASKS(quest)), lbuf);
-	
-	get_quest_reward_display(QUEST_REWARDS(quest), lbuf, TRUE);
-	sprintf(buf + strlen(buf), "Rewards: <%srewards\t0>\r\n%s", OLC_LABEL_PTR(QUEST_REWARDS(quest)), lbuf);
-	
-	// scripts
-	sprintf(buf + strlen(buf), "Scripts: <%sscript\t0>\r\n", OLC_LABEL_PTR(QUEST_SCRIPTS(quest)));
-	if (QUEST_SCRIPTS(quest)) {
-		get_script_display(QUEST_SCRIPTS(quest), lbuf);
-		strcat(buf, lbuf);
+	build_page_display(ch, "Starts at: <%sstarts\t0>", OLC_LABEL_PTR(QUEST_STARTS_AT(quest)));
+	if (QUEST_STARTS_AT(quest)) {
+		show_quest_giver_display(ch, QUEST_STARTS_AT(quest), FALSE);
 	}
 	
-	page_string(ch->desc, buf, TRUE);
+	build_page_display(ch, "Ends at: <%sends\t0>", OLC_LABEL_PTR(QUEST_ENDS_AT(quest)));
+	if (QUEST_ENDS_AT(quest)) {
+		show_quest_giver_display(ch, QUEST_ENDS_AT(quest), FALSE);
+	}
+	
+	build_page_display(ch, "Tasks: <%stasks\t0>", OLC_LABEL_PTR(QUEST_TASKS(quest)));
+	if (QUEST_TASKS(quest)) {
+		show_requirement_display(ch, QUEST_TASKS(quest), FALSE);
+	}
+	
+	build_page_display(ch, "Rewards: <%srewards\t0>", OLC_LABEL_PTR(QUEST_REWARDS(quest)));
+	if (QUEST_REWARDS(quest)) {
+		show_quest_reward_display(ch, QUEST_REWARDS(quest), TRUE, FALSE);
+	}
+	
+	// scripts
+	build_page_display(ch, "Scripts: <%sscript\t0>", OLC_LABEL_PTR(QUEST_SCRIPTS(quest)));
+	if (QUEST_SCRIPTS(quest)) {
+		show_script_display(ch, QUEST_SCRIPTS(quest), FALSE);
+	}
+	
+	send_page_display(ch);
 }
 
 
@@ -5876,10 +5871,11 @@ int vnum_quest(char *searchname, char_data *ch) {
 	
 	HASH_ITER(hh, quest_table, iter, next_iter) {
 		if (multi_isname(searchname, QUEST_NAME(iter))) {
-			msg_to_char(ch, "%3d. [%5d] %s\r\n", ++found, QUEST_VNUM(iter), QUEST_NAME(iter));
+			build_page_display(ch, "%3d. [%5d] %s", ++found, QUEST_VNUM(iter), QUEST_NAME(iter));
 		}
 	}
 	
+	send_page_display(ch);
 	return found;
 }
 

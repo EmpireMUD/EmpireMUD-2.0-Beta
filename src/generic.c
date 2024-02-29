@@ -366,7 +366,7 @@ bool audit_generic(generic_data *gen, char_data *ch) {
 		}
 		case GENERIC_AFFECT: {
 			if (GET_AFFECT_LOOK_AT_ROOM(gen)) {
-				snprintf(temp, sizeof(temp), "%s", NULLSAFE(GET_AFFECT_LOOK_AT_ROOM(gen)));
+				safe_snprintf(temp, sizeof(temp), "%s", NULLSAFE(GET_AFFECT_LOOK_AT_ROOM(gen)));
 				// only if present...
 				if (strncmp(temp, "...", 3)) {
 					olc_audit_msg(ch, GEN_VNUM(gen), "Look-at-room string does not begin with '...'");
@@ -418,21 +418,21 @@ char *list_one_generic(generic_data *gen, bool detail) {
 	if (detail) {
 		switch (GEN_TYPE(gen)) {
 			case GENERIC_COOLDOWN: {
-				snprintf(output, sizeof(output), "[%5d] %s (%s): %s", GEN_VNUM(gen), GEN_NAME(gen), generic_types[GEN_TYPE(gen)], NULLSAFE(GET_COOLDOWN_WEAR_OFF(gen)));
+				safe_snprintf(output, sizeof(output), "[%5d] %s (%s): %s", GEN_VNUM(gen), GEN_NAME(gen), generic_types[GEN_TYPE(gen)], NULLSAFE(GET_COOLDOWN_WEAR_OFF(gen)));
 				break;
 			}
 			case GENERIC_COMPONENT: {
-				snprintf(output, sizeof(output), "[%5d] %s%s (%s), obj: [%d] %s", GEN_VNUM(gen), GEN_NAME(gen), GEN_FLAGGED(gen, GEN_BASIC) ? " (basic)" : "", generic_types[GEN_TYPE(gen)], GET_COMPONENT_OBJ_VNUM(gen), get_obj_name_by_proto(GET_COMPONENT_OBJ_VNUM(gen)));
+				safe_snprintf(output, sizeof(output), "[%5d] %s%s (%s), obj: [%d] %s", GEN_VNUM(gen), GEN_NAME(gen), GEN_FLAGGED(gen, GEN_BASIC) ? " (basic)" : "", generic_types[GEN_TYPE(gen)], GET_COMPONENT_OBJ_VNUM(gen), get_obj_name_by_proto(GET_COMPONENT_OBJ_VNUM(gen)));
 				break;
 			}
 			default: {
-				snprintf(output, sizeof(output), "[%5d] %s (%s)", GEN_VNUM(gen), GEN_NAME(gen), generic_types[GEN_TYPE(gen)]);
+				safe_snprintf(output, sizeof(output), "[%5d] %s (%s)", GEN_VNUM(gen), GEN_NAME(gen), generic_types[GEN_TYPE(gen)]);
 				break;
 			}
 		}
 	}
 	else {
-		snprintf(output, sizeof(output), "[%5d] %s (%s)", GEN_VNUM(gen), GEN_NAME(gen), generic_types[GEN_TYPE(gen)]);
+		safe_snprintf(output, sizeof(output), "[%5d] %s (%s)", GEN_VNUM(gen), GEN_NAME(gen), generic_types[GEN_TYPE(gen)]);
 	}
 		
 	return output;
@@ -447,7 +447,7 @@ char *list_one_generic(generic_data *gen, bool detail) {
 */
 void olc_fullsearch_generic(char_data *ch, char *argument) {
 	bool any;
-	char buf[MAX_STRING_LENGTH * 2], line[MAX_STRING_LENGTH], type_arg[MAX_INPUT_LENGTH], val_arg[MAX_INPUT_LENGTH], find_keywords[MAX_INPUT_LENGTH];
+	char type_arg[MAX_INPUT_LENGTH], val_arg[MAX_INPUT_LENGTH], find_keywords[MAX_INPUT_LENGTH];
 	int count, iter;
 	
 	bitvector_t only_flags = NOBITS, not_flagged = NOBITS, only_liquid_flags = NOBITS;
@@ -456,7 +456,6 @@ void olc_fullsearch_generic(char_data *ch, char *argument) {
 	int only_moon = NOTHING, moon_over = NOTHING, moon_under = NOTHING;
 	
 	generic_data *gen, *next_gen;
-	size_t size;
 	
 	if (!*argument) {
 		msg_to_char(ch, "See HELP GENEDIT FULLSEARCH for syntax.\r\n");
@@ -506,7 +505,7 @@ void olc_fullsearch_generic(char_data *ch, char *argument) {
 		skip_spaces(&argument);
 	}
 	
-	size = snprintf(buf, sizeof(buf), "Generic fullsearch: %s\r\n", show_color_codes(find_keywords));
+	build_page_display(ch, "Generic fullsearch: %s", show_color_codes(find_keywords));
 	count = 0;
 	
 	// okay now look up generics
@@ -587,27 +586,18 @@ void olc_fullsearch_generic(char_data *ch, char *argument) {
 		}
 		
 		// show it
-		snprintf(line, sizeof(line), "[%5d] %s (%s)\r\n", GEN_VNUM(gen), GEN_NAME(gen), generic_types[GEN_TYPE(gen)]);
-		if (strlen(line) + size < sizeof(buf)) {
-			size += snprintf(buf + size, sizeof(buf) - size, "%s", line);
-			++count;
-		}
-		else {
-			size += snprintf(buf + size, sizeof(buf) - size, "OVERFLOW\r\n");
-			break;
-		}
+		build_page_display(ch, "[%5d] %s (%s)", GEN_VNUM(gen), GEN_NAME(gen), generic_types[GEN_TYPE(gen)]);
+		++count;
 	}
 	
-	if (count > 0 && (size + 20) < sizeof(buf)) {
-		size += snprintf(buf + size, sizeof(buf) - size, "(%d generics)\r\n", count);
+	if (count > 0) {
+		build_page_display(ch, "(%d generics)", count);
 	}
-	else if (count == 0) {
-		size += snprintf(buf + size, sizeof(buf) - size, " none\r\n");
+	else {
+		build_page_display_str(ch, " none");
 	}
 	
-	if (ch->desc) {
-		page_string(ch->desc, buf, TRUE);
-	}
+	send_page_display(ch);
 }
 
 
@@ -618,7 +608,6 @@ void olc_fullsearch_generic(char_data *ch, char *argument) {
 * @param any_vnum vnum The generic vnum.
 */
 void olc_search_generic(char_data *ch, any_vnum vnum) {
-	char buf[MAX_STRING_LENGTH];
 	generic_data *gen = real_generic(vnum), *gen_iter, *next_gen;
 	ability_data *abil, *next_abil;
 	craft_data *craft, *next_craft;
@@ -633,7 +622,7 @@ void olc_search_generic(char_data *ch, any_vnum vnum) {
 	struct resource_data *res;
 	bld_data *bld, *next_bld;
 	obj_data *obj, *next_obj;
-	int size, found;
+	int found;
 	bool any;
 	
 	if (!gen) {
@@ -642,7 +631,7 @@ void olc_search_generic(char_data *ch, any_vnum vnum) {
 	}
 	
 	found = 0;
-	size = snprintf(buf, sizeof(buf), "Occurrences of generic %d (%s):\r\n", vnum, GEN_NAME(gen));
+	build_page_display(ch, "Occurrences of generic %d (%s):", vnum, GEN_NAME(gen));
 	
 	// abilities
 	HASH_ITER(hh, ability_table, abil, next_abil) {
@@ -659,7 +648,7 @@ void olc_search_generic(char_data *ch, any_vnum vnum) {
 		
 		if (any) {
 			++found;
-			size += snprintf(buf + size, sizeof(buf) - size, "ABIL [%5d] %s\r\n", ABIL_VNUM(abil), ABIL_NAME(abil));
+			build_page_display(ch, "ABIL [%5d] %s", ABIL_VNUM(abil), ABIL_NAME(abil));
 		}
 	}
 	
@@ -670,7 +659,7 @@ void olc_search_generic(char_data *ch, any_vnum vnum) {
 			if (res->vnum == vnum && ((GEN_TYPE(gen) == GENERIC_ACTION && res->type == RES_ACTION) || (GEN_TYPE(gen) == GENERIC_LIQUID && res->type == RES_LIQUID) || (GEN_TYPE(gen) == GENERIC_COMPONENT && res->type == RES_COMPONENT))) {
 				any = TRUE;
 				++found;
-				size += snprintf(buf + size, sizeof(buf) - size, "AUG [%5d] %s\r\n", GET_AUG_VNUM(aug), GET_AUG_NAME(aug));
+				build_page_display(ch, "AUG [%5d] %s", GET_AUG_VNUM(aug), GET_AUG_NAME(aug));
 			}
 		}
 	}
@@ -682,7 +671,7 @@ void olc_search_generic(char_data *ch, any_vnum vnum) {
 			if (res->vnum == vnum && ((GEN_TYPE(gen) == GENERIC_ACTION && res->type == RES_ACTION) || (GEN_TYPE(gen) == GENERIC_LIQUID && res->type == RES_LIQUID) || (GEN_TYPE(gen) == GENERIC_COMPONENT && res->type == RES_COMPONENT))) {
 				any = TRUE;
 				++found;
-				size += snprintf(buf + size, sizeof(buf) - size, "BLD [%5d] %s\r\n", GET_BLD_VNUM(bld), GET_BLD_NAME(bld));
+				build_page_display(ch, "BLD [%5d] %s", GET_BLD_VNUM(bld), GET_BLD_NAME(bld));
 			}
 		}
 	}
@@ -693,22 +682,19 @@ void olc_search_generic(char_data *ch, any_vnum vnum) {
 		if (CRAFT_FLAGGED(craft, CRAFT_SOUP) && GET_CRAFT_OBJECT(craft) == vnum) {
 			any = TRUE;
 			++found;
-			size += snprintf(buf + size, sizeof(buf) - size, "CFT [%5d] %s\r\n", GET_CRAFT_VNUM(craft), GET_CRAFT_NAME(craft));
+			build_page_display(ch, "CFT [%5d] %s", GET_CRAFT_VNUM(craft), GET_CRAFT_NAME(craft));
 		}
 		for (res = GET_CRAFT_RESOURCES(craft); res && !any; res = res->next) {
 			if (res->vnum == vnum && ((GEN_TYPE(gen) == GENERIC_ACTION && res->type == RES_ACTION) || (GEN_TYPE(gen) == GENERIC_LIQUID && res->type == RES_LIQUID) || (GEN_TYPE(gen) == GENERIC_COMPONENT && res->type == RES_COMPONENT))) {
 				any = TRUE;
 				++found;
-				size += snprintf(buf + size, sizeof(buf) - size, "CFT [%5d] %s\r\n", GET_CRAFT_VNUM(craft), GET_CRAFT_NAME(craft));
+				build_page_display(ch, "CFT [%5d] %s", GET_CRAFT_VNUM(craft), GET_CRAFT_NAME(craft));
 			}
 		}
 	}
 	
 	// events
 	HASH_ITER(hh, event_table, event, next_event) {
-		if (size >= sizeof(buf)) {
-			break;
-		}
 		// QR_x: event rewards
 		any = find_event_reward_in_list(EVT_RANK_REWARDS(event), QR_CURRENCY, vnum);
 		any |= find_event_reward_in_list(EVT_THRESHOLD_REWARDS(event), QR_CURRENCY, vnum);
@@ -719,7 +705,7 @@ void olc_search_generic(char_data *ch, any_vnum vnum) {
 		
 		if (any) {
 			++found;
-			size += snprintf(buf + size, sizeof(buf) - size, "EVT [%5d] %s\r\n", EVT_VNUM(event), EVT_NAME(event));
+			build_page_display(ch, "EVT [%5d] %s", EVT_VNUM(event), EVT_NAME(event));
 		}
 	}
 	
@@ -727,7 +713,7 @@ void olc_search_generic(char_data *ch, any_vnum vnum) {
 	HASH_ITER(hh, generic_table, gen_iter, next_gen) {
 		if (has_generic_relation(GEN_RELATIONS(gen_iter), vnum)) {
 			++found;
-			size += snprintf(buf + size, sizeof(buf) - size, "GEN [%5d] %s\r\n", GEN_VNUM(gen_iter), GEN_NAME(gen_iter));
+			build_page_display(ch, "GEN [%5d] %s", GEN_VNUM(gen_iter), GEN_NAME(gen_iter));
 		}
 	}
 	
@@ -755,16 +741,13 @@ void olc_search_generic(char_data *ch, any_vnum vnum) {
 		
 		if (any) {
 			++found;
-			size += snprintf(buf + size, sizeof(buf) - size, "OBJ [%5d] %s\r\n", GET_OBJ_VNUM(obj), GET_OBJ_SHORT_DESC(obj));
+			build_page_display(ch, "OBJ [%5d] %s", GET_OBJ_VNUM(obj), GET_OBJ_SHORT_DESC(obj));
 		}
 	}
 	
 	
 	// progress
 	HASH_ITER(hh, progress_table, prg, next_prg) {
-		if (size >= sizeof(buf)) {
-			break;
-		}
 		// REQ_x: requirement search
 		any = find_requirement_in_list(PRG_TASKS(prg), REQ_GET_CURRENCY, vnum);
 		any |= find_requirement_in_list(PRG_TASKS(prg), REQ_GET_COMPONENT, vnum);
@@ -778,15 +761,12 @@ void olc_search_generic(char_data *ch, any_vnum vnum) {
 		
 		if (any) {
 			++found;
-			size += snprintf(buf + size, sizeof(buf) - size, "PRG [%5d] %s\r\n", PRG_VNUM(prg), PRG_NAME(prg));
+			build_page_display(ch, "PRG [%5d] %s", PRG_VNUM(prg), PRG_NAME(prg));
 		}
 	}
 	
 	// check quests
 	HASH_ITER(hh, quest_table, quest, next_quest) {
-		if (size >= sizeof(buf)) {
-			break;
-		}
 		// REQ_x: quest types
 		any = find_requirement_in_list(QUEST_TASKS(quest), REQ_GET_CURRENCY, vnum);
 		any |= find_requirement_in_list(QUEST_PREREQS(quest), REQ_GET_CURRENCY, vnum);
@@ -806,7 +786,7 @@ void olc_search_generic(char_data *ch, any_vnum vnum) {
 		
 		if (any) {
 			++found;
-			size += snprintf(buf + size, sizeof(buf) - size, "QST [%5d] %s\r\n", QUEST_VNUM(quest), QUEST_NAME(quest));
+			build_page_display(ch, "QST [%5d] %s", QUEST_VNUM(quest), QUEST_NAME(quest));
 		}
 	}
 	
@@ -816,15 +796,12 @@ void olc_search_generic(char_data *ch, any_vnum vnum) {
 		
 		if (any) {
 			++found;
-			size += snprintf(buf + size, sizeof(buf) - size, "SHOP [%5d] %s\r\n", SHOP_VNUM(shop), SHOP_NAME(shop));
+			build_page_display(ch, "SHOP [%5d] %s", SHOP_VNUM(shop), SHOP_NAME(shop));
 		}
 	}
 	
 	// socials
 	HASH_ITER(hh, social_table, soc, next_soc) {
-		if (size >= sizeof(buf)) {
-			break;
-		}
 		// REQ_x: social requirements
 		any = find_requirement_in_list(SOC_REQUIREMENTS(soc), REQ_GET_CURRENCY, vnum);
 		any |= find_requirement_in_list(SOC_REQUIREMENTS(soc), REQ_GET_COMPONENT, vnum);
@@ -834,7 +811,7 @@ void olc_search_generic(char_data *ch, any_vnum vnum) {
 		
 		if (any) {
 			++found;
-			size += snprintf(buf + size, sizeof(buf) - size, "SOC [%5d] %s\r\n", SOC_VNUM(soc), SOC_NAME(soc));
+			build_page_display(ch, "SOC [%5d] %s", SOC_VNUM(soc), SOC_NAME(soc));
 		}
 	}
 	
@@ -845,19 +822,19 @@ void olc_search_generic(char_data *ch, any_vnum vnum) {
 			if (res->vnum == vnum && ((GEN_TYPE(gen) == GENERIC_ACTION && res->type == RES_ACTION) || (GEN_TYPE(gen) == GENERIC_LIQUID && res->type == RES_LIQUID) || (GEN_TYPE(gen) == GENERIC_COMPONENT && res->type == RES_COMPONENT))) {
 				any = TRUE;
 				++found;
-				size += snprintf(buf + size, sizeof(buf) - size, "VEH [%5d] %s\r\n", VEH_VNUM(veh), VEH_SHORT_DESC(veh));
+				build_page_display(ch, "VEH [%5d] %s", VEH_VNUM(veh), VEH_SHORT_DESC(veh));
 			}
 		}
 	}
 	
 	if (found > 0) {
-		size += snprintf(buf + size, sizeof(buf) - size, "%d location%s shown\r\n", found, PLURAL(found));
+		build_page_display(ch, "%d location%s shown", found, PLURAL(found));
 	}
 	else {
-		size += snprintf(buf + size, sizeof(buf) - size, " none\r\n");
+		build_page_display_str(ch, " none");
 	}
 	
-	page_string(ch->desc, buf, TRUE);
+	send_page_display(ch);
 }
 
 
@@ -1334,7 +1311,7 @@ void olc_delete_generic(char_data *ch, any_vnum vnum) {
 		return;
 	}
 	
-	snprintf(name, sizeof(name), "%s", NULLSAFE(GEN_NAME(gen)));
+	safe_snprintf(name, sizeof(name), "%s", NULLSAFE(GEN_NAME(gen)));
 	
 	switch (GEN_TYPE(gen)) {
 		case GENERIC_ACTION: {
@@ -1997,69 +1974,68 @@ void get_generic_relation_display(struct generic_relation *list, bool show_vnums
 * @param generic_data *gen The generic to display.
 */
 void do_stat_generic(char_data *ch, generic_data *gen) {
-	char buf[MAX_STRING_LENGTH], part[MAX_STRING_LENGTH * 2];
-	size_t size;
+	char part[MAX_STRING_LENGTH];
 	
 	if (!gen) {
 		return;
 	}
 	
 	// first line
-	size = snprintf(buf, sizeof(buf), "VNum: [\tc%d\t0], Name: \ty%s\t0, Type: \tc%s\t0\r\n", GEN_VNUM(gen), GEN_NAME(gen), generic_types[GEN_TYPE(gen)]);
+	build_page_display(ch, "VNum: [\tc%d\t0], Name: \ty%s\t0, Type: \tc%s\t0", GEN_VNUM(gen), GEN_NAME(gen), generic_types[GEN_TYPE(gen)]);
 	
 	sprintbit(GEN_FLAGS(gen), generic_flags, part, TRUE);
-	size += snprintf(buf + size, sizeof(buf) - size, "Flags: \tg%s\t0\r\n", part);
+	build_page_display(ch, "Flags: \tg%s\t0", part);
 	
 	// GENERIC_x
 	switch (GEN_TYPE(gen)) {
 		case GENERIC_LIQUID: {
-			size += snprintf(buf + size, sizeof(buf) - size, "Liquid: \ty%s\t0, Color: \ty%s\t0\r\n", NULLSAFE(GET_LIQUID_NAME(gen)), NULLSAFE(GET_LIQUID_COLOR(gen)));
-			size += snprintf(buf + size, sizeof(buf) - size, "Hunger: [\tc%d\t0], Thirst: [\tc%d\t0], Drunk: [\tc%d\t0]\r\n", GET_LIQUID_FULL(gen), GET_LIQUID_THIRST(gen), GET_LIQUID_DRUNK(gen));
+			build_page_display(ch, "Liquid: \ty%s\t0, Color: \ty%s\t0", NULLSAFE(GET_LIQUID_NAME(gen)), NULLSAFE(GET_LIQUID_COLOR(gen)));
+			build_page_display(ch, "Hunger: [\tc%d\t0], Thirst: [\tc%d\t0], Drunk: [\tc%d\t0]", GET_LIQUID_FULL(gen), GET_LIQUID_THIRST(gen), GET_LIQUID_DRUNK(gen));
 			
 			sprintbit(GET_LIQUID_FLAGS(gen), liquid_flags, part, TRUE);
-			size += snprintf(buf + size, sizeof(buf) - size, "Liquid flags: \tg%s\t0\r\n", part);
+			build_page_display(ch, "Liquid flags: \tg%s\t0", part);
 			break;
 		}
 		case GENERIC_ACTION: {
-			size += snprintf(buf + size, sizeof(buf) - size, "Build-to-Char: %s\r\n", NULLSAFE(GEN_STRING(gen, GSTR_ACTION_BUILD_TO_CHAR)));
-			size += snprintf(buf + size, sizeof(buf) - size, "Build-to-Room: %s\r\n", NULLSAFE(GEN_STRING(gen, GSTR_ACTION_BUILD_TO_ROOM)));
-			size += snprintf(buf + size, sizeof(buf) - size, "Craft-to-Char: %s\r\n", NULLSAFE(GEN_STRING(gen, GSTR_ACTION_CRAFT_TO_CHAR)));
-			size += snprintf(buf + size, sizeof(buf) - size, "Craft-to-Room: %s\r\n", NULLSAFE(GEN_STRING(gen, GSTR_ACTION_CRAFT_TO_ROOM)));
-			size += snprintf(buf + size, sizeof(buf) - size, "Repair-to-Char: %s\r\n", NULLSAFE(GEN_STRING(gen, GSTR_ACTION_REPAIR_TO_CHAR)));
-			size += snprintf(buf + size, sizeof(buf) - size, "Repair-to-Room: %s\r\n", NULLSAFE(GEN_STRING(gen, GSTR_ACTION_REPAIR_TO_ROOM)));
+			build_page_display(ch, "Build-to-Char: %s", NULLSAFE(GEN_STRING(gen, GSTR_ACTION_BUILD_TO_CHAR)));
+			build_page_display(ch, "Build-to-Room: %s", NULLSAFE(GEN_STRING(gen, GSTR_ACTION_BUILD_TO_ROOM)));
+			build_page_display(ch, "Craft-to-Char: %s", NULLSAFE(GEN_STRING(gen, GSTR_ACTION_CRAFT_TO_CHAR)));
+			build_page_display(ch, "Craft-to-Room: %s", NULLSAFE(GEN_STRING(gen, GSTR_ACTION_CRAFT_TO_ROOM)));
+			build_page_display(ch, "Repair-to-Char: %s", NULLSAFE(GEN_STRING(gen, GSTR_ACTION_REPAIR_TO_CHAR)));
+			build_page_display(ch, "Repair-to-Room: %s", NULLSAFE(GEN_STRING(gen, GSTR_ACTION_REPAIR_TO_ROOM)));
 			break;
 		}
 		case GENERIC_COOLDOWN: {
-			size += snprintf(buf + size, sizeof(buf) - size, "Wear-off: %s\r\n", GET_COOLDOWN_WEAR_OFF(gen) ? GET_COOLDOWN_WEAR_OFF(gen) : "(none)");
+			build_page_display(ch, "Wear-off: %s", GET_COOLDOWN_WEAR_OFF(gen) ? GET_COOLDOWN_WEAR_OFF(gen) : "(none)");
 			break;
 		}
 		case GENERIC_AFFECT: {
-			size += snprintf(buf + size, sizeof(buf) - size, "DoT attack type: %d %s\r\n", GET_AFFECT_DOT_ATTACK(gen), (GET_AFFECT_DOT_ATTACK(gen) > 0) ? get_attack_name_by_vnum(GET_AFFECT_DOT_ATTACK(gen)) : "(none)");
-			size += snprintf(buf + size, sizeof(buf) - size, "Apply to-char: %s\r\n", GET_AFFECT_APPLY_TO_CHAR(gen) ? GET_AFFECT_APPLY_TO_CHAR(gen) : "(none)");
-			size += snprintf(buf + size, sizeof(buf) - size, "Apply to-room: %s\r\n", GET_AFFECT_APPLY_TO_ROOM(gen) ? GET_AFFECT_APPLY_TO_ROOM(gen) : "(none)");
-			size += snprintf(buf + size, sizeof(buf) - size, "Wear-off: %s\r\n", GET_AFFECT_WEAR_OFF_TO_CHAR(gen) ? GET_AFFECT_WEAR_OFF_TO_CHAR(gen) : "(none)");
-			size += snprintf(buf + size, sizeof(buf) - size, "Wear-off to room: %s\r\n", GET_AFFECT_WEAR_OFF_TO_ROOM(gen) ? GET_AFFECT_WEAR_OFF_TO_ROOM(gen) : "(none)");
-			size += snprintf(buf + size, sizeof(buf) - size, "Look at char: %s\r\n", GET_AFFECT_LOOK_AT_CHAR(gen) ? GET_AFFECT_LOOK_AT_CHAR(gen) : "(none)");
-			size += snprintf(buf + size, sizeof(buf) - size, "Look at room: %s\r\n", GET_AFFECT_LOOK_AT_ROOM(gen) ? GET_AFFECT_LOOK_AT_ROOM(gen) : "(none)");
+			build_page_display(ch, "DoT attack type: %d %s", GET_AFFECT_DOT_ATTACK(gen), (GET_AFFECT_DOT_ATTACK(gen) > 0) ? get_attack_name_by_vnum(GET_AFFECT_DOT_ATTACK(gen)) : "(none)");
+			build_page_display(ch, "Apply to-char: %s", GET_AFFECT_APPLY_TO_CHAR(gen) ? GET_AFFECT_APPLY_TO_CHAR(gen) : "(none)");
+			build_page_display(ch, "Apply to-room: %s", GET_AFFECT_APPLY_TO_ROOM(gen) ? GET_AFFECT_APPLY_TO_ROOM(gen) : "(none)");
+			build_page_display(ch, "Wear-off: %s", GET_AFFECT_WEAR_OFF_TO_CHAR(gen) ? GET_AFFECT_WEAR_OFF_TO_CHAR(gen) : "(none)");
+			build_page_display(ch, "Wear-off to room: %s", GET_AFFECT_WEAR_OFF_TO_ROOM(gen) ? GET_AFFECT_WEAR_OFF_TO_ROOM(gen) : "(none)");
+			build_page_display(ch, "Look at char: %s", GET_AFFECT_LOOK_AT_CHAR(gen) ? GET_AFFECT_LOOK_AT_CHAR(gen) : "(none)");
+			build_page_display(ch, "Look at room: %s", GET_AFFECT_LOOK_AT_ROOM(gen) ? GET_AFFECT_LOOK_AT_ROOM(gen) : "(none)");
 			break;
 		}
 		case GENERIC_CURRENCY: {
-			size += snprintf(buf + size, sizeof(buf) - size, "Singular: %s\r\n", NULLSAFE(GEN_STRING(gen, GSTR_CURRENCY_SINGULAR)));
-			size += snprintf(buf + size, sizeof(buf) - size, "Plural: %s\r\n", NULLSAFE(GEN_STRING(gen, GSTR_CURRENCY_PLURAL)));
+			build_page_display(ch, "Singular: %s", NULLSAFE(GEN_STRING(gen, GSTR_CURRENCY_SINGULAR)));
+			build_page_display(ch, "Plural: %s", NULLSAFE(GEN_STRING(gen, GSTR_CURRENCY_PLURAL)));
 			break;
 		}
 		case GENERIC_COMPONENT: {
-			size += snprintf(buf + size, sizeof(buf) - size, "Plural: %s\r\n", NULLSAFE(GEN_STRING(gen, GSTR_COMPONENT_PLURAL)));
-			size += snprintf(buf + size, sizeof(buf) - size, "Item: [%d] %s\r\n", GET_COMPONENT_OBJ_VNUM(gen), get_obj_name_by_proto(GET_COMPONENT_OBJ_VNUM(gen)));
+			build_page_display(ch, "Plural: %s", NULLSAFE(GEN_STRING(gen, GSTR_COMPONENT_PLURAL)));
+			build_page_display(ch, "Item: [%d] %s", GET_COMPONENT_OBJ_VNUM(gen), get_obj_name_by_proto(GET_COMPONENT_OBJ_VNUM(gen)));
 			
 			get_generic_relation_display(GEN_RELATIONS(gen), TRUE, part, NULL);
-			size += snprintf(buf + size, sizeof(buf) - size, "Relations:\r\n%s", GEN_RELATIONS(gen) ? part : " none\r\n");
+			build_page_display(ch, "Relations:\r\n%s", GEN_RELATIONS(gen) ? part : " none");
 			get_generic_relation_display(GEN_COMPUTED_RELATIONS(gen), TRUE, part, NULL);
-			size += snprintf(buf + size, sizeof(buf) - size, "Extended Relations:\r\n%s", GEN_COMPUTED_RELATIONS(gen) ? part : " none\r\n");
+			build_page_display(ch, "Extended Relations:\r\n%s", GEN_COMPUTED_RELATIONS(gen) ? part : " none");
 			break;
 		}
 		case GENERIC_MOON: {
-			size += snprintf(buf + size, sizeof(buf) - size, "Cycle: \ty%.2f day%s\t0\r\n", GET_MOON_CYCLE_DAYS(gen), PLURAL(GET_MOON_CYCLE_DAYS(gen)));
+			build_page_display(ch, "Cycle: \ty%.2f day%s\t0", GET_MOON_CYCLE_DAYS(gen), PLURAL(GET_MOON_CYCLE_DAYS(gen)));
 			break;
 		}
 		case GENERIC_LANGUAGE: {
@@ -2068,7 +2044,7 @@ void do_stat_generic(char_data *ch, generic_data *gen) {
 		}
 	}
 
-	page_string(ch->desc, buf, TRUE);
+	send_page_display(ch);
 }
 
 
@@ -2080,74 +2056,72 @@ void do_stat_generic(char_data *ch, generic_data *gen) {
 */
 void olc_show_generic(char_data *ch) {
 	generic_data *gen = GET_OLC_GENERIC(ch->desc);
-	char buf[MAX_STRING_LENGTH], lbuf[MAX_STRING_LENGTH];
+	char lbuf[MAX_STRING_LENGTH];
 	
 	if (!gen) {
 		return;
 	}
 	
-	*buf = '\0';
-	
-	sprintf(buf + strlen(buf), "[%s%d\t0] %s%s\t0\r\n", OLC_LABEL_CHANGED, GET_OLC_VNUM(ch->desc), OLC_LABEL_UNCHANGED, !real_generic(GEN_VNUM(gen)) ? "new generic" : GEN_NAME(real_generic(GEN_VNUM(gen))));
-	sprintf(buf + strlen(buf), "<%sname\t0> %s\r\n", OLC_LABEL_STR(GEN_NAME(gen), default_generic_name), NULLSAFE(GEN_NAME(gen)));
-	sprintf(buf + strlen(buf), "<%stype\t0> %s\r\n", OLC_LABEL_VAL(GEN_TYPE(gen), 0), generic_types[GEN_TYPE(gen)]);
+	build_page_display(ch, "[%s%d\t0] %s%s\t0", OLC_LABEL_CHANGED, GET_OLC_VNUM(ch->desc), OLC_LABEL_UNCHANGED, !real_generic(GEN_VNUM(gen)) ? "new generic" : GEN_NAME(real_generic(GEN_VNUM(gen))));
+	build_page_display(ch, "<%sname\t0> %s", OLC_LABEL_STR(GEN_NAME(gen), default_generic_name), NULLSAFE(GEN_NAME(gen)));
+	build_page_display(ch, "<%stype\t0> %s", OLC_LABEL_VAL(GEN_TYPE(gen), 0), generic_types[GEN_TYPE(gen)]);
 	
 	sprintbit(GEN_FLAGS(gen), generic_flags, lbuf, TRUE);
-	sprintf(buf + strlen(buf), "<%sflags\t0> %s\r\n", OLC_LABEL_VAL(GEN_FLAGS(gen), NOBITS), lbuf);
+	build_page_display(ch, "<%sflags\t0> %s", OLC_LABEL_VAL(GEN_FLAGS(gen), NOBITS), lbuf);
 	
 	// GENERIC_x
 	switch (GEN_TYPE(gen)) {
 		case GENERIC_LIQUID: {
-			sprintf(buf + strlen(buf), "<%sliquid\t0> %s\r\n", OLC_LABEL_STR(GET_LIQUID_NAME(gen), ""), GET_LIQUID_NAME(gen) ? GET_LIQUID_NAME(gen) : "(none)");
-			sprintf(buf + strlen(buf), "<%scolor\t0> %s\r\n", OLC_LABEL_STR(GET_LIQUID_COLOR(gen), ""), GET_LIQUID_COLOR(gen) ? GET_LIQUID_COLOR(gen) : "(none)");
-			sprintf(buf + strlen(buf), "<%shunger\t0> %d hour%s\r\n", OLC_LABEL_VAL(GET_LIQUID_FULL(gen), 0), GET_LIQUID_FULL(gen), PLURAL(GET_LIQUID_FULL(gen)));
-			sprintf(buf + strlen(buf), "<%sthirst\t0> %d hour%s\r\n", OLC_LABEL_VAL(GET_LIQUID_THIRST(gen), 0), GET_LIQUID_THIRST(gen), PLURAL(GET_LIQUID_THIRST(gen)));
-			sprintf(buf + strlen(buf), "<%sdrunk\t0> %d hour%s\r\n", OLC_LABEL_VAL(GET_LIQUID_DRUNK(gen), 0), GET_LIQUID_DRUNK(gen), PLURAL(GET_LIQUID_DRUNK(gen)));
+			build_page_display(ch, "<%sliquid\t0> %s", OLC_LABEL_STR(GET_LIQUID_NAME(gen), ""), GET_LIQUID_NAME(gen) ? GET_LIQUID_NAME(gen) : "(none)");
+			build_page_display(ch, "<%scolor\t0> %s", OLC_LABEL_STR(GET_LIQUID_COLOR(gen), ""), GET_LIQUID_COLOR(gen) ? GET_LIQUID_COLOR(gen) : "(none)");
+			build_page_display(ch, "<%shunger\t0> %d hour%s", OLC_LABEL_VAL(GET_LIQUID_FULL(gen), 0), GET_LIQUID_FULL(gen), PLURAL(GET_LIQUID_FULL(gen)));
+			build_page_display(ch, "<%sthirst\t0> %d hour%s", OLC_LABEL_VAL(GET_LIQUID_THIRST(gen), 0), GET_LIQUID_THIRST(gen), PLURAL(GET_LIQUID_THIRST(gen)));
+			build_page_display(ch, "<%sdrunk\t0> %d hour%s", OLC_LABEL_VAL(GET_LIQUID_DRUNK(gen), 0), GET_LIQUID_DRUNK(gen), PLURAL(GET_LIQUID_DRUNK(gen)));
 			
 			sprintbit(GET_LIQUID_FLAGS(gen), liquid_flags, lbuf, TRUE);
-			sprintf(buf + strlen(buf), "<%sliquidflags\t0> %s\r\n", OLC_LABEL_VAL(GET_LIQUID_FLAGS(gen), NOBITS), lbuf);
+			build_page_display(ch, "<%sliquidflags\t0> %s", OLC_LABEL_VAL(GET_LIQUID_FLAGS(gen), NOBITS), lbuf);
 			break;
 		}
 		case GENERIC_ACTION: {
-			sprintf(buf + strlen(buf), "<%sbuild2char\t0> %s\r\n", OLC_LABEL_STR(GEN_STRING(gen, GSTR_ACTION_BUILD_TO_CHAR), ""), GEN_STRING(gen, GSTR_ACTION_BUILD_TO_CHAR) ? GEN_STRING(gen, GSTR_ACTION_BUILD_TO_CHAR) : "(not set)");
-			sprintf(buf + strlen(buf), "<%sbuild2room\t0> %s\r\n", OLC_LABEL_STR(GEN_STRING(gen, GSTR_ACTION_BUILD_TO_ROOM), ""), GEN_STRING(gen, GSTR_ACTION_BUILD_TO_ROOM) ? GEN_STRING(gen, GSTR_ACTION_BUILD_TO_ROOM) : "(not set)");
-			sprintf(buf + strlen(buf), "<%scraft2char\t0> %s\r\n", OLC_LABEL_STR(GEN_STRING(gen, GSTR_ACTION_CRAFT_TO_CHAR), ""), GEN_STRING(gen, GSTR_ACTION_CRAFT_TO_CHAR) ? GEN_STRING(gen, GSTR_ACTION_CRAFT_TO_CHAR) : "(not set)");
-			sprintf(buf + strlen(buf), "<%scraft2room\t0> %s\r\n", OLC_LABEL_STR(GEN_STRING(gen, GSTR_ACTION_CRAFT_TO_ROOM), ""), GEN_STRING(gen, GSTR_ACTION_CRAFT_TO_ROOM) ? GEN_STRING(gen, GSTR_ACTION_CRAFT_TO_ROOM) : "(not set)");
-			sprintf(buf + strlen(buf), "<%srepair2char\t0> %s\r\n", OLC_LABEL_STR(GEN_STRING(gen, GSTR_ACTION_REPAIR_TO_CHAR), ""), GEN_STRING(gen, GSTR_ACTION_REPAIR_TO_CHAR) ? GEN_STRING(gen, GSTR_ACTION_REPAIR_TO_CHAR) : "(not set)");
-			sprintf(buf + strlen(buf), "<%srepair2room\t0> %s\r\n", OLC_LABEL_STR(GEN_STRING(gen, GSTR_ACTION_REPAIR_TO_ROOM), ""), GEN_STRING(gen, GSTR_ACTION_REPAIR_TO_ROOM) ? GEN_STRING(gen, GSTR_ACTION_REPAIR_TO_ROOM) : "(not set)");
+			build_page_display(ch, "<%sbuild2char\t0> %s", OLC_LABEL_STR(GEN_STRING(gen, GSTR_ACTION_BUILD_TO_CHAR), ""), GEN_STRING(gen, GSTR_ACTION_BUILD_TO_CHAR) ? GEN_STRING(gen, GSTR_ACTION_BUILD_TO_CHAR) : "(not set)");
+			build_page_display(ch, "<%sbuild2room\t0> %s", OLC_LABEL_STR(GEN_STRING(gen, GSTR_ACTION_BUILD_TO_ROOM), ""), GEN_STRING(gen, GSTR_ACTION_BUILD_TO_ROOM) ? GEN_STRING(gen, GSTR_ACTION_BUILD_TO_ROOM) : "(not set)");
+			build_page_display(ch, "<%scraft2char\t0> %s", OLC_LABEL_STR(GEN_STRING(gen, GSTR_ACTION_CRAFT_TO_CHAR), ""), GEN_STRING(gen, GSTR_ACTION_CRAFT_TO_CHAR) ? GEN_STRING(gen, GSTR_ACTION_CRAFT_TO_CHAR) : "(not set)");
+			build_page_display(ch, "<%scraft2room\t0> %s", OLC_LABEL_STR(GEN_STRING(gen, GSTR_ACTION_CRAFT_TO_ROOM), ""), GEN_STRING(gen, GSTR_ACTION_CRAFT_TO_ROOM) ? GEN_STRING(gen, GSTR_ACTION_CRAFT_TO_ROOM) : "(not set)");
+			build_page_display(ch, "<%srepair2char\t0> %s", OLC_LABEL_STR(GEN_STRING(gen, GSTR_ACTION_REPAIR_TO_CHAR), ""), GEN_STRING(gen, GSTR_ACTION_REPAIR_TO_CHAR) ? GEN_STRING(gen, GSTR_ACTION_REPAIR_TO_CHAR) : "(not set)");
+			build_page_display(ch, "<%srepair2room\t0> %s", OLC_LABEL_STR(GEN_STRING(gen, GSTR_ACTION_REPAIR_TO_ROOM), ""), GEN_STRING(gen, GSTR_ACTION_REPAIR_TO_ROOM) ? GEN_STRING(gen, GSTR_ACTION_REPAIR_TO_ROOM) : "(not set)");
 			break;
 		}
 		case GENERIC_COOLDOWN: {
-			sprintf(buf + strlen(buf), "<%swearoff\t0> %s\r\n", OLC_LABEL_STR(GEN_STRING(gen, GSTR_COOLDOWN_WEAR_OFF), ""), GET_COOLDOWN_WEAR_OFF(gen) ? GET_COOLDOWN_WEAR_OFF(gen) : "(none)");
-			sprintf(buf + strlen(buf), "<%sstandardwearoff\t0> (to add a basic wear-off message based on the name)\r\n", OLC_LABEL_STR(GEN_STRING(gen, GSTR_COOLDOWN_WEAR_OFF), ""));
+			build_page_display(ch, "<%swearoff\t0> %s", OLC_LABEL_STR(GEN_STRING(gen, GSTR_COOLDOWN_WEAR_OFF), ""), GET_COOLDOWN_WEAR_OFF(gen) ? GET_COOLDOWN_WEAR_OFF(gen) : "(none)");
+			build_page_display(ch, "<%sstandardwearoff\t0> (to add a basic wear-off message based on the name)", OLC_LABEL_STR(GEN_STRING(gen, GSTR_COOLDOWN_WEAR_OFF), ""));
 			break;
 		}
 		case GENERIC_AFFECT: {
-			sprintf(buf + strlen(buf), "<%sapply2char\t0> %s\r\n", OLC_LABEL_STR(GEN_STRING(gen, GSTR_AFFECT_APPLY_TO_CHAR), ""), GET_AFFECT_APPLY_TO_CHAR(gen) ? GET_AFFECT_APPLY_TO_CHAR(gen) : "(none)");
-			sprintf(buf + strlen(buf), "<%sapply2room\t0> %s\r\n", OLC_LABEL_STR(GEN_STRING(gen, GSTR_AFFECT_APPLY_TO_ROOM), ""), GET_AFFECT_APPLY_TO_ROOM(gen) ? GET_AFFECT_APPLY_TO_ROOM(gen) : "(none)");
-			sprintf(buf + strlen(buf), "<%swearoff\t0> %s\r\n", OLC_LABEL_STR(GEN_STRING(gen, GSTR_AFFECT_WEAR_OFF_TO_CHAR), ""), GET_AFFECT_WEAR_OFF_TO_CHAR(gen) ? GET_AFFECT_WEAR_OFF_TO_CHAR(gen) : "(none)");
-			sprintf(buf + strlen(buf), "<%sstandardwearoff\t0> (to add a basic wear-off message based on the name)\r\n", OLC_LABEL_STR(GEN_STRING(gen, GSTR_AFFECT_WEAR_OFF_TO_CHAR), ""));
-			sprintf(buf + strlen(buf), "<%swearoff2room\t0> %s\r\n", OLC_LABEL_STR(GEN_STRING(gen, GSTR_AFFECT_WEAR_OFF_TO_ROOM), ""), GET_AFFECT_WEAR_OFF_TO_ROOM(gen) ? GET_AFFECT_WEAR_OFF_TO_ROOM(gen) : "(none)");
-			sprintf(buf + strlen(buf), "<%slookatchar\t0> %s\r\n", OLC_LABEL_STR(GEN_STRING(gen, GSTR_AFFECT_LOOK_AT_CHAR), ""), GET_AFFECT_LOOK_AT_CHAR(gen) ? GET_AFFECT_LOOK_AT_CHAR(gen) : "(none)");
-			sprintf(buf + strlen(buf), "<%slookatroom\t0> %s\r\n", OLC_LABEL_STR(GEN_STRING(gen, GSTR_AFFECT_LOOK_AT_ROOM), ""), GET_AFFECT_LOOK_AT_ROOM(gen) ? GET_AFFECT_LOOK_AT_ROOM(gen) : "(none)");
-			sprintf(buf + strlen(buf), "<%sdotattack\t0> %d %s\r\n", OLC_LABEL_VAL(GET_AFFECT_DOT_ATTACK(gen), 0), GET_AFFECT_DOT_ATTACK(gen), (GET_AFFECT_DOT_ATTACK(gen) > 0) ? get_attack_name_by_vnum(GET_AFFECT_DOT_ATTACK(gen)) : "(none)");
+			build_page_display(ch, "<%sapply2char\t0> %s", OLC_LABEL_STR(GEN_STRING(gen, GSTR_AFFECT_APPLY_TO_CHAR), ""), GET_AFFECT_APPLY_TO_CHAR(gen) ? GET_AFFECT_APPLY_TO_CHAR(gen) : "(none)");
+			build_page_display(ch, "<%sapply2room\t0> %s", OLC_LABEL_STR(GEN_STRING(gen, GSTR_AFFECT_APPLY_TO_ROOM), ""), GET_AFFECT_APPLY_TO_ROOM(gen) ? GET_AFFECT_APPLY_TO_ROOM(gen) : "(none)");
+			build_page_display(ch, "<%swearoff\t0> %s", OLC_LABEL_STR(GEN_STRING(gen, GSTR_AFFECT_WEAR_OFF_TO_CHAR), ""), GET_AFFECT_WEAR_OFF_TO_CHAR(gen) ? GET_AFFECT_WEAR_OFF_TO_CHAR(gen) : "(none)");
+			build_page_display(ch, "<%sstandardwearoff\t0> (to add a basic wear-off message based on the name)", OLC_LABEL_STR(GEN_STRING(gen, GSTR_AFFECT_WEAR_OFF_TO_CHAR), ""));
+			build_page_display(ch, "<%swearoff2room\t0> %s", OLC_LABEL_STR(GEN_STRING(gen, GSTR_AFFECT_WEAR_OFF_TO_ROOM), ""), GET_AFFECT_WEAR_OFF_TO_ROOM(gen) ? GET_AFFECT_WEAR_OFF_TO_ROOM(gen) : "(none)");
+			build_page_display(ch, "<%slookatchar\t0> %s", OLC_LABEL_STR(GEN_STRING(gen, GSTR_AFFECT_LOOK_AT_CHAR), ""), GET_AFFECT_LOOK_AT_CHAR(gen) ? GET_AFFECT_LOOK_AT_CHAR(gen) : "(none)");
+			build_page_display(ch, "<%slookatroom\t0> %s", OLC_LABEL_STR(GEN_STRING(gen, GSTR_AFFECT_LOOK_AT_ROOM), ""), GET_AFFECT_LOOK_AT_ROOM(gen) ? GET_AFFECT_LOOK_AT_ROOM(gen) : "(none)");
+			build_page_display(ch, "<%sdotattack\t0> %d %s", OLC_LABEL_VAL(GET_AFFECT_DOT_ATTACK(gen), 0), GET_AFFECT_DOT_ATTACK(gen), (GET_AFFECT_DOT_ATTACK(gen) > 0) ? get_attack_name_by_vnum(GET_AFFECT_DOT_ATTACK(gen)) : "(none)");
 			break;
 		}
 		case GENERIC_CURRENCY: {
-			sprintf(buf + strlen(buf), "<%ssingular\t0> %s\r\n", OLC_LABEL_STR(GEN_STRING(gen, GSTR_CURRENCY_SINGULAR), ""), GEN_STRING(gen, GSTR_CURRENCY_SINGULAR) ? GEN_STRING(gen, GSTR_CURRENCY_SINGULAR) : "(not set)");
-			sprintf(buf + strlen(buf), "<%splural\t0> %s\r\n", OLC_LABEL_STR(GEN_STRING(gen, GSTR_CURRENCY_PLURAL), ""), GEN_STRING(gen, GSTR_CURRENCY_PLURAL) ? GEN_STRING(gen, GSTR_CURRENCY_PLURAL) : "(not set)");
+			build_page_display(ch, "<%ssingular\t0> %s", OLC_LABEL_STR(GEN_STRING(gen, GSTR_CURRENCY_SINGULAR), ""), GEN_STRING(gen, GSTR_CURRENCY_SINGULAR) ? GEN_STRING(gen, GSTR_CURRENCY_SINGULAR) : "(not set)");
+			build_page_display(ch, "<%splural\t0> %s", OLC_LABEL_STR(GEN_STRING(gen, GSTR_CURRENCY_PLURAL), ""), GEN_STRING(gen, GSTR_CURRENCY_PLURAL) ? GEN_STRING(gen, GSTR_CURRENCY_PLURAL) : "(not set)");
 			break;
 		}
 		case GENERIC_COMPONENT: {
-			sprintf(buf + strlen(buf), "<%splural\t0> %s\r\n", OLC_LABEL_STR(GEN_STRING(gen, GSTR_COMPONENT_PLURAL), ""), GEN_STRING(gen, GSTR_COMPONENT_PLURAL) ? GEN_STRING(gen, GSTR_COMPONENT_PLURAL) : "(not set)");
-			sprintf(buf + strlen(buf), "<%sitem\t0> [%d] %s\r\n", OLC_LABEL_VAL(GET_COMPONENT_OBJ_VNUM(gen), NOTHING), GET_COMPONENT_OBJ_VNUM(gen), get_obj_name_by_proto(GET_COMPONENT_OBJ_VNUM(gen)));
+			build_page_display(ch, "<%splural\t0> %s", OLC_LABEL_STR(GEN_STRING(gen, GSTR_COMPONENT_PLURAL), ""), GEN_STRING(gen, GSTR_COMPONENT_PLURAL) ? GEN_STRING(gen, GSTR_COMPONENT_PLURAL) : "(not set)");
+			build_page_display(ch, "<%sitem\t0> [%d] %s", OLC_LABEL_VAL(GET_COMPONENT_OBJ_VNUM(gen), NOTHING), GET_COMPONENT_OBJ_VNUM(gen), get_obj_name_by_proto(GET_COMPONENT_OBJ_VNUM(gen)));
 			
 			get_generic_relation_display(GEN_RELATIONS(gen), TRUE, lbuf, NULL);
-			sprintf(buf + strlen(buf), "<%srelations\t0>\r\n%s", OLC_LABEL_PTR(GEN_RELATIONS(gen)), lbuf);
+			build_page_display(ch, "<%srelations\t0>\r\n%s", OLC_LABEL_PTR(GEN_RELATIONS(gen)), lbuf);
 			break;
 		}
 		case GENERIC_MOON: {
-			sprintf(buf + strlen(buf), "<%scycle\t0> %.2f day%s\r\n", OLC_LABEL_VAL(GET_MOON_CYCLE(gen), 0), GET_MOON_CYCLE_DAYS(gen), PLURAL(GET_MOON_CYCLE_DAYS(gen)));
+			build_page_display(ch, "<%scycle\t0> %.2f day%s", OLC_LABEL_VAL(GET_MOON_CYCLE(gen), 0), GET_MOON_CYCLE_DAYS(gen), PLURAL(GET_MOON_CYCLE_DAYS(gen)));
 			break;
 		}
 		case GENERIC_LANGUAGE: {
@@ -2156,7 +2130,7 @@ void olc_show_generic(char_data *ch) {
 		}
 	}
 		
-	page_string(ch->desc, buf, TRUE);
+	send_page_display(ch);
 }
 
 
@@ -2173,10 +2147,11 @@ int vnum_generic(char *searchname, char_data *ch) {
 	
 	HASH_ITER(hh, generic_table, iter, next_iter) {
 		if (multi_isname(searchname, GEN_NAME(iter))) {
-			msg_to_char(ch, "%3d. [%5d] %s (%s)\r\n", ++found, GEN_VNUM(iter), GEN_NAME(iter), generic_types[GEN_TYPE(iter)]);
+			build_page_display(ch, "%3d. [%5d] %s (%s)", ++found, GEN_VNUM(iter), GEN_NAME(iter), generic_types[GEN_TYPE(iter)]);
 		}
 	}
 	
+	send_page_display(ch);
 	return found;
 }
 
@@ -2747,7 +2722,7 @@ OLC_MODULE(genedit_quick_cooldown) {
 	// ensure some data
 	GEN_VNUM(GET_OLC_GENERIC(ch->desc)) = vnum;
 	GEN_TYPE(GET_OLC_GENERIC(ch->desc)) = GENERIC_COOLDOWN;
-	snprintf(buf, sizeof(buf), "Your %s cooldown has ended.", GEN_NAME(GET_OLC_GENERIC(ch->desc)));
+	safe_snprintf(buf, sizeof(buf), "Your %s cooldown has ended.", GEN_NAME(GET_OLC_GENERIC(ch->desc)));
 	if (GEN_STRING(GET_OLC_GENERIC(ch->desc), GSTR_COOLDOWN_WEAR_OFF)) {
 		free(GEN_STRING(GET_OLC_GENERIC(ch->desc), GSTR_COOLDOWN_WEAR_OFF));
 	}
@@ -2764,12 +2739,12 @@ OLC_MODULE(genedit_standardwearoff) {
 	
 	switch (GEN_TYPE(gen)) {
 		case GENERIC_COOLDOWN: {
-			snprintf(buf, sizeof(buf), "Your %s cooldown has ended.", GEN_NAME(gen));
+			safe_snprintf(buf, sizeof(buf), "Your %s cooldown has ended.", GEN_NAME(gen));
 			pos = GSTR_COOLDOWN_WEAR_OFF;
 			break;
 		}
 		case GENERIC_AFFECT: {
-			snprintf(buf, sizeof(buf), "Your %s wears off.", GEN_NAME(gen));
+			safe_snprintf(buf, sizeof(buf), "Your %s wears off.", GEN_NAME(gen));
 			pos = GSTR_AFFECT_WEAR_OFF_TO_CHAR;
 			break;
 		}

@@ -716,12 +716,12 @@ ADMIN_UTIL(util_bldconvert) {
 		strtolower(VEH_KEYWORDS(to_veh));
 		
 		// build short desc
-		snprintf(buf, sizeof(buf), "%s %s", AN(GET_BLD_NAME(from_bld)), GET_BLD_NAME(from_bld));
+		safe_snprintf(buf, sizeof(buf), "%s %s", AN(GET_BLD_NAME(from_bld)), GET_BLD_NAME(from_bld));
 		strtolower(buf);
 		set_vehicle_short_desc(to_veh, buf);
 		
 		// build long desc
-		snprintf(buf, sizeof(buf), "%s %s is here.", AN(GET_BLD_NAME(from_bld)), GET_BLD_NAME(from_bld));
+		safe_snprintf(buf, sizeof(buf), "%s %s is here.", AN(GET_BLD_NAME(from_bld)), GET_BLD_NAME(from_bld));
 		strtolower(buf);
 		set_vehicle_long_desc(to_veh, CAP(buf));
 		
@@ -847,7 +847,7 @@ ADMIN_UTIL(util_bldconvert) {
 		GET_OLC_CRAFT(ch->desc) = setup_olc_craft(from_craft);
 		GET_OLC_VNUM(ch->desc) = from_vnum;
 		
-		snprintf(buf, sizeof(buf), "dismantle %s", GET_CRAFT_NAME(GET_OLC_CRAFT(ch->desc)));
+		safe_snprintf(buf, sizeof(buf), "dismantle %s", GET_CRAFT_NAME(GET_OLC_CRAFT(ch->desc)));
 		free(GET_CRAFT_NAME(GET_OLC_CRAFT(ch->desc)));
 		GET_CRAFT_NAME(GET_OLC_CRAFT(ch->desc)) = str_dup(buf);
 		
@@ -947,7 +947,7 @@ ADMIN_UTIL(util_bldconvert) {
 			msg_to_char(ch, "- Building %d %s in requirements for SOC [%d %s].\r\n", to_vnum, GET_BLD_NAME(from_bld), SOC_VNUM(soc), SOC_NAME(soc));
 		}
 	}
-	snprintf(buf, sizeof(buf), "%d", from_vnum);
+	safe_snprintf(buf, sizeof(buf), "%d", from_vnum);
 	HASH_ITER(hh, trigger_table, trig, next_trig) {
 		LL_FOREACH(trig->cmdlist, cmd) {
 			if (strstr(cmd->cmd, buf)) {
@@ -981,12 +981,12 @@ ADMIN_UTIL(util_bldconvert) {
 		}
 	}
 	
-	snprintf(buf, sizeof(buf), "OLC: %s has cloned building %d %s to vehicle %d", GET_NAME(ch), from_vnum, GET_BLD_NAME(from_bld), to_vnum);
+	safe_snprintf(buf, sizeof(buf), "OLC: %s has cloned building %d %s to vehicle %d", GET_NAME(ch), from_vnum, GET_BLD_NAME(from_bld), to_vnum);
 	if (!BLD_FLAGGED(from_bld, BLD_OPEN)) {
-		snprintf(buf + strlen(buf), sizeof(buf) - strlen(buf), ", interior room bld %d", to_vnum);
+		safe_snprintf(buf + strlen(buf), sizeof(buf) - strlen(buf), ", interior room bld %d", to_vnum);
 	}
 	if (from_craft) {
-		snprintf(buf + strlen(buf), sizeof(buf) - strlen(buf), ", and craft %d (with updates to craft %d)", to_vnum, from_vnum);
+		safe_snprintf(buf + strlen(buf), sizeof(buf) - strlen(buf), ", and craft %d (with updates to craft %d)", to_vnum, from_vnum);
 	}
 	syslog(SYS_OLC, GET_INVIS_LEV(ch), TRUE, "%s", buf);
 }
@@ -1129,9 +1129,7 @@ int sort_isf_list(struct isf_type *a, struct isf_type *b) {
 
 ADMIN_UTIL(util_islandsize) {
 	struct isf_type *isf, *next_isf, *list = NULL;
-	char buf[MAX_STRING_LENGTH];
 	room_data *room, *next_room;
-	size_t size;
 	int isle;
 	
 	HASH_ITER(hh, world_table, room, next_room) {
@@ -1151,20 +1149,16 @@ ADMIN_UTIL(util_islandsize) {
 	
 	HASH_SORT(list, sort_isf_list);
 	
-	size = snprintf(buf, sizeof(buf), "Island sizes:\r\n");
+	build_page_display_str(ch, "Island sizes:");
 	HASH_ITER(hh, list, isf, next_isf) {
-		if (size < sizeof(buf)) {
-			size += snprintf(buf + size, sizeof(buf) - size, "%2d: %d tile%s\r\n", isf->island, isf->count, PLURAL(isf->count));
-		}
+		build_page_display(ch, "%2d: %d tile%s", isf->island, isf->count, PLURAL(isf->count));
 		
 		// free as we go
 		HASH_DEL(list, isf);
 		free(isf);
 	}
 	
-	if (ch->desc) {
-		page_string(ch->desc, buf, TRUE);
-	}
+	send_page_display(ch);
 }
 
 
@@ -1451,7 +1445,7 @@ ADMIN_UTIL(util_temperature) {
 			if (climate_temperature[bit].season_weight != NO_TEMP_MOD) {
 				season_mod += climate_temperature[bit].season_weight;
 				++season_count;
-				snprintf(season_part, sizeof(season_part), "%.1f%%", 100.0 * climate_temperature[bit].season_weight);
+				safe_snprintf(season_part, sizeof(season_part), "%.1f%%", 100.0 * climate_temperature[bit].season_weight);
 			}
 			else {
 				strcpy(season_part, "no mod for");
@@ -1459,7 +1453,7 @@ ADMIN_UTIL(util_temperature) {
 			if (climate_temperature[bit].sun_weight != NO_TEMP_MOD) {
 				sun_mod += climate_temperature[bit].sun_weight;
 				++sun_count;
-				snprintf(sun_part, sizeof(sun_part), "%.1f%%", 100.0 * climate_temperature[bit].sun_weight);
+				safe_snprintf(sun_part, sizeof(sun_part), "%.1f%%", 100.0 * climate_temperature[bit].sun_weight);
 			}
 			else {
 				strcpy(sun_part, "no mod for");
@@ -1467,14 +1461,14 @@ ADMIN_UTIL(util_temperature) {
 			
 			if (climate_temperature[bit].cold_modifier != NO_TEMP_MOD && climate_temperature[bit].cold_modifier != 1.0) {
 				cold_mod *= climate_temperature[bit].cold_modifier;
-				snprintf(cold_mod_part, sizeof(cold_mod_part), ", %.2f cold modifier", climate_temperature[bit].cold_modifier);
+				safe_snprintf(cold_mod_part, sizeof(cold_mod_part), ", %.2f cold modifier", climate_temperature[bit].cold_modifier);
 			}
 			else {
 				*cold_mod_part = '\0';
 			}
 			if (climate_temperature[bit].heat_modifier != NO_TEMP_MOD && climate_temperature[bit].heat_modifier != 1.0) {
 				heat_mod *= climate_temperature[bit].heat_modifier;
-				snprintf(heat_mod_part, sizeof(heat_mod_part), ", %.2f heat modifier", climate_temperature[bit].heat_modifier);
+				safe_snprintf(heat_mod_part, sizeof(heat_mod_part), ", %.2f heat modifier", climate_temperature[bit].heat_modifier);
 			}
 			else {
 				*heat_mod_part = '\0';
@@ -1803,37 +1797,29 @@ void do_instance_info(char_data *ch, char *argument) {
 
 // shows by adventure
 void do_instance_list_all(char_data *ch) {
-	char buf[MAX_STRING_LENGTH];
 	adv_data *adv, *next_adv;
 	int count = 0;
-	size_t size;
 	
-	size = snprintf(buf, sizeof(buf), "Instances by adventure:\r\n");
+	build_page_display_str(ch, "Instances by adventure:");
 	
 	// list by adventure
 	HASH_ITER(hh, adventure_table, adv, next_adv) {
-		if (size >= sizeof(buf)) {
-			break;
-		}
-		
 		// skip in-dev adventures with no count
 		count = count_instances(adv);
 		if (ADVENTURE_FLAGGED(adv, ADV_IN_DEVELOPMENT) && !count) {
 			continue;
 		}
 		
-		size += snprintf(buf + size, sizeof(buf) - size, "[%5d] %s (%d/%d)\r\n", GET_ADV_VNUM(adv), GET_ADV_NAME(adv), count, adjusted_instance_limit(adv));
+		build_page_display(ch, "[%5d] %s (%d/%d)", GET_ADV_VNUM(adv), GET_ADV_NAME(adv), count, adjusted_instance_limit(adv));
 	}
 	
-	if (ch->desc) {
-		page_string(ch->desc, buf, TRUE);
-	}
+	send_page_display(ch);
 }
 
 
 // list by name
 void do_instance_list(char_data *ch, char *argument) {
-	char buf[MAX_STRING_LENGTH], line[MAX_STRING_LENGTH];
+	char line[MAX_STRING_LENGTH];
 	struct instance_data *inst;
 	adv_data *adv = NULL;
 	adv_vnum vnum;
@@ -1854,8 +1840,6 @@ void do_instance_list(char_data *ch, char *argument) {
 		return;
 	}
 	
-	*buf = '\0';
-	
 	DL_FOREACH(instance_list, inst) {
 		// num is out of the total instances, not just ones shown
 		++num;
@@ -1863,22 +1847,19 @@ void do_instance_list(char_data *ch, char *argument) {
 		if (!adv || adv == INST_ADVENTURE(inst)) {
 			++count;
 			instance_list_row(inst, num, line, sizeof(line));
-			
-			if (snprintf(buf + strlen(buf), sizeof(buf) - strlen(buf), "%s", line) < strlen(line)) {
-				break;
-			}
+			build_page_display_str(ch, line);
 		}
 	}
 	
-	snprintf(buf + strlen(buf), sizeof(buf) - strlen(buf), "%d total instances shown\r\n", count);
-	page_string(ch->desc, buf, TRUE);
+	build_page_display(ch, "%d total instances shown", count);
+	send_page_display(ch);
 }
 
 
 void do_instance_nearby(char_data *ch, char *argument) {
-	char buf[MAX_STRING_LENGTH], line[MAX_STRING_LENGTH];
+	char line[MAX_STRING_LENGTH];
 	struct instance_data *inst;
-	int num = 0, count = 0, distance = 50, size;
+	int num = 0, count = 0, distance = 50;
 	room_data *inst_loc, *loc;
 	
 	loc = GET_MAP_LOC(IN_ROOM(ch)) ? real_room(GET_MAP_LOC(IN_ROOM(ch))->vnum) : NULL;
@@ -1888,7 +1869,7 @@ void do_instance_nearby(char_data *ch, char *argument) {
 		return;
 	}
 	
-	size = snprintf(buf, sizeof(buf), "Instances within %d tiles:\r\n", distance);
+	build_page_display(ch, "Instances within %d tiles:", distance);
 	
 	if (loc) {	// skip work if no map location found
 		DL_FOREACH(instance_list, inst) {
@@ -1898,16 +1879,13 @@ void do_instance_nearby(char_data *ch, char *argument) {
 			if (inst_loc && !INSTANCE_FLAGGED(inst, INST_COMPLETED) && compute_distance(loc, inst_loc) <= distance) {
 				++count;
 				instance_list_row(inst, num, line, sizeof(line));
-				size += snprintf(buf + size, sizeof(buf) - size, "%s", line);
-				if (size >= sizeof(buf)) {
-					break;
-				}
+				build_page_display_str(ch, line);
 			}
 		}
 	}
 	
-	snprintf(buf + size, sizeof(buf) - size, "%d total instances shown\r\n", count);
-	page_string(ch->desc, buf, TRUE);
+	build_page_display(ch, "%d total instances shown", count);
+	send_page_display(ch);
 }
 
 
@@ -1976,14 +1954,14 @@ void instance_list_row(struct instance_data *inst, int number, char *save_buffer
 	}
 	
 	if (INST_FAKE_LOC(inst) && ROOM_OWNER(INST_FAKE_LOC(inst))) {
-		snprintf(owner, sizeof(owner), "(%s%s\t0)", EMPIRE_BANNER(ROOM_OWNER(INST_FAKE_LOC(inst))), EMPIRE_NAME(ROOM_OWNER(INST_FAKE_LOC(inst))));
+		safe_snprintf(owner, sizeof(owner), "(%s%s\t0)", EMPIRE_BANNER(ROOM_OWNER(INST_FAKE_LOC(inst))), EMPIRE_NAME(ROOM_OWNER(INST_FAKE_LOC(inst))));
 	}
 	else {
 		*owner = '\0';
 	}
 
 	sprintbit(INST_FLAGS(inst), instance_flags, flg, TRUE);
-	snprintf(save_buffer, size, "%3d. [%5d] %s [%d] (%d, %d)%s %s%s\r\n", number, GET_ADV_VNUM(INST_ADVENTURE(inst)), GET_ADV_NAME(INST_ADVENTURE(inst)), INST_FAKE_LOC(inst) ? GET_ROOM_VNUM(INST_FAKE_LOC(inst)) : NOWHERE, INST_FAKE_LOC(inst) ? X_COORD(INST_FAKE_LOC(inst)) : NOWHERE, INST_FAKE_LOC(inst) ? Y_COORD(INST_FAKE_LOC(inst)) : NOWHERE, info, INST_FLAGS(inst) != NOBITS ? flg : "", owner);
+	safe_snprintf(save_buffer, size, "%3d. [%5d] %s [%d] (%d, %d)%s %s%s\r\n", number, GET_ADV_VNUM(INST_ADVENTURE(inst)), GET_ADV_NAME(INST_ADVENTURE(inst)), INST_FAKE_LOC(inst) ? GET_ROOM_VNUM(INST_FAKE_LOC(inst)) : NOWHERE, INST_FAKE_LOC(inst) ? X_COORD(INST_FAKE_LOC(inst)) : NOWHERE, INST_FAKE_LOC(inst) ? Y_COORD(INST_FAKE_LOC(inst)) : NOWHERE, info, INST_FLAGS(inst) != NOBITS ? flg : "", owner);
 }
 
 
@@ -3063,21 +3041,27 @@ int perform_set(char_data *ch, char_data *vict, int mode, char *val_arg) {
  //////////////////////////////////////////////////////////////////////////////
 //// STAT / VSTAT ////////////////////////////////////////////////////////////
 
-
 /**
 * Shows summarized spawn info for any spawn_info list to the character, only
 * if there is something to show. No output is shown if there are no spawns.
 *
-* @param char_data *ch The person to show it to.
+* @param char_data *ch The person who will see the spawn summary.
+* @param bool use_page_display If TRUE, stores it to the character's page_display instead of sending it now.
 * @param struct spawn_info *list Any list of spawn_info.
 */
-void show_spawn_summary_to_char(char_data *ch, struct spawn_info *list) {
-	char output[MAX_STRING_LENGTH], line[MAX_STRING_LENGTH], entry[MAX_INPUT_LENGTH];
-	char flg[MAX_INPUT_LENGTH];
+void show_spawn_summary_display(char_data *ch, bool use_page_display, struct spawn_info *list) {
+	bool any;
+	char line[MAX_STRING_LENGTH], entry[MAX_INPUT_LENGTH], flg[MAX_INPUT_LENGTH];
 	struct spawn_info *spawn;
 	
+	if (!ch || !list) {
+		return;	// nothing to show
+	}
+	
+	build_page_display_str(ch, "Spawn info:");
+	
 	// spawns?
-	*output = '\0';
+	any = FALSE;
 	*line = '\0';
 	for (spawn = list; spawn; spawn = spawn->next) {
 		if (spawn->flags) {
@@ -3090,18 +3074,24 @@ void show_spawn_summary_to_char(char_data *ch, struct spawn_info *list) {
 			sprintf(entry, " %s (%d) %.2f%%", skip_filler(get_mob_name_by_proto(spawn->vnum, FALSE)), spawn->vnum, spawn->percent);
 		}
 		
-		if (*line || *output) {
+		if (any) {
 			strcat(line, ",");
 		}
 		if (strlen(line) + strlen(entry) > 78) {
-			strcat(line, "\r\n");
-			strcat(output, line);
+			build_page_display_str(ch, line);
 			*line = '\0';
 		}
 		strcat(line, entry);
+		any = TRUE;
 	}
-	if (*output || *line) {
-		msg_to_char(ch, "Spawn info:\r\n%s%s%s", output, line, (*line ? "\r\n" : ""));
+	
+	// anything left in the line?
+	if (*line) {
+		build_page_display_str(ch, line);
+	}
+	
+	if (!use_page_display) {
+		send_page_display(ch);
 	}
 }
 
@@ -3117,10 +3107,10 @@ void do_stat_adventure(char_data *ch, adv_data *adv) {
 		return;
 	}
 	
-	msg_to_char(ch, "VNum: [&c%d&0], Name: &c%s&0 (by &c%s&0)\r\n", GET_ADV_VNUM(adv), GET_ADV_NAME(adv), GET_ADV_AUTHOR(adv));
-	msg_to_char(ch, "%s", NULLSAFE(GET_ADV_DESCRIPTION(adv)));
+	build_page_display(ch, "VNum: [&c%d&0], Name: &c%s&0 (by &c%s&0)", GET_ADV_VNUM(adv), GET_ADV_NAME(adv), GET_ADV_AUTHOR(adv));
+	build_page_display_str(ch, NULLSAFE(GET_ADV_DESCRIPTION(adv)));
 	
-	msg_to_char(ch, "VNum range: [&c%d&0-&c%d&0], Level range: [&c%d&0-&c%d&0]\r\n", GET_ADV_START_VNUM(adv), GET_ADV_END_VNUM(adv), GET_ADV_MIN_LEVEL(adv), GET_ADV_MAX_LEVEL(adv));
+	build_page_display(ch, "VNum range: [&c%d&0-&c%d&0], Level range: [&c%d&0-&c%d&0]", GET_ADV_START_VNUM(adv), GET_ADV_END_VNUM(adv), GET_ADV_MIN_LEVEL(adv), GET_ADV_MAX_LEVEL(adv));
 
 	// reset time display helper
 	if (GET_ADV_RESET_TIME(adv) == 0) {
@@ -3133,20 +3123,25 @@ void do_stat_adventure(char_data *ch, adv_data *adv) {
 		sprintf(lbuf, "%d min", GET_ADV_RESET_TIME(adv));
 	}
 	
-	msg_to_char(ch, "Instance limit: [&c%d&0/&c%d&0 (&c%d&0)], Player limit: [&c%d&0], Reset time: [&c%s&0]\r\n", count_instances(adventure_proto(GET_ADV_VNUM(adv))), adjusted_instance_limit(adv), GET_ADV_MAX_INSTANCES(adv), GET_ADV_PLAYER_LIMIT(adv), lbuf);
+	build_page_display(ch, "Instance limit: [&c%d&0/&c%d&0 (&c%d&0)], Player limit: [&c%d&0], Reset time: [&c%s&0]", count_instances(adventure_proto(GET_ADV_VNUM(adv))), adjusted_instance_limit(adv), GET_ADV_MAX_INSTANCES(adv), GET_ADV_PLAYER_LIMIT(adv), lbuf);
 	
 	sprintbit(GET_ADV_FLAGS(adv), adventure_flags, lbuf, TRUE);
-	msg_to_char(ch, "Flags: &g%s&0\r\n", lbuf);
+	build_page_display(ch, "Flags: &g%s&0", lbuf);
 	
-	msg_to_char(ch, "Temperature: [\tc%s\t0]\r\n", temperature_types[GET_ADV_TEMPERATURE_TYPE(adv)]);
+	build_page_display(ch, "Temperature: [\tc%s\t0]", temperature_types[GET_ADV_TEMPERATURE_TYPE(adv)]);
 	
-	get_adventure_linking_display(GET_ADV_LINKING(adv), lbuf);
-	msg_to_char(ch, "Linking rules:\r\n%s", lbuf);
+	build_page_display_str(ch, "Linking rules:");
+	show_adventure_linking_display(ch, GET_ADV_LINKING(adv), FALSE);
 	
 	if (GET_ADV_SCRIPTS(adv)) {
-		get_script_display(GET_ADV_SCRIPTS(adv), lbuf);
-		msg_to_char(ch, "Scripts:\r\n%s", lbuf);
+		build_page_display(ch, "Scripts:");
+		show_script_display(ch, GET_ADV_SCRIPTS(adv), FALSE);
 	}
+	else {
+		build_page_display_str(ch, "Scripts: none");
+	}
+	
+	send_page_display(ch);
 }
 
 
@@ -3155,20 +3150,20 @@ void do_stat_adventure(char_data *ch, adv_data *adv) {
 *
 * @param char_data *ch The player requesting stats.
 * @param book_data *book The book to stat.
+* @param bool details If TRUE, sends whole paragraphs. FALSE just sends previews.
 */
-void do_stat_book(char_data *ch, book_data *book) {
-	char buf[MAX_STRING_LENGTH], line[MAX_STRING_LENGTH];
+void do_stat_book(char_data *ch, book_data *book, bool details) {
+	char line[MAX_STRING_LENGTH];
 	struct paragraph_data *para;
 	player_index_data *index;
-	size_t size = 0;
 	int count, len, num;
 	char *ptr, *txt;
 	
-	size += snprintf(buf + size, sizeof(buf) - size, "Book VNum: [\tc%d\t0], Author: \ty%s\t0 (\tc%d\t0)\r\n", BOOK_VNUM(book), (index = find_player_index_by_idnum(BOOK_AUTHOR(book))) ? index->fullname : "nobody", BOOK_AUTHOR(book));
-	size += snprintf(buf + size, sizeof(buf) - size, "Title: %s\t0\r\n", BOOK_TITLE(book));
-	size += snprintf(buf + size, sizeof(buf) - size, "Byline: %s\t0\r\n", BOOK_BYLINE(book));
-	size += snprintf(buf + size, sizeof(buf) - size, "Item: [%s]\r\n", BOOK_ITEM_NAME(book));
-	size += snprintf(buf + size, sizeof(buf) - size, "%s", BOOK_ITEM_DESC(book));	// desc has its own crlf
+	build_page_display(ch, "Book VNum: [\tc%d\t0], Author: \ty%s\t0 (\tc%d\t0)", BOOK_VNUM(book), (index = find_player_index_by_idnum(BOOK_AUTHOR(book))) ? index->fullname : "nobody", BOOK_AUTHOR(book));
+	build_page_display(ch, "Title: %s\t0", BOOK_TITLE(book));
+	build_page_display(ch, "Byline: %s\t0", BOOK_BYLINE(book));
+	build_page_display(ch, "Item: [%s]", BOOK_ITEM_NAME(book));
+	build_page_display_str(ch, NULLSAFE(BOOK_ITEM_DESC(book)));	// desc has its own crlf
 	
 	// precompute number of paragraphs
 	num = 0;
@@ -3179,26 +3174,26 @@ void do_stat_book(char_data *ch, book_data *book) {
 	count = 0;
 	LL_FOREACH(BOOK_PARAGRAPHS(book), para) {
 		++count;
-		txt = para->text;
-		skip_spaces(&txt);
-		len = strlen(txt);
-		len = MIN(len, 62);	// aiming for full page width then a ...
-		snprintf(line, sizeof(line), "Paragraph %*d: %-*.*s...", (num >= 10 ? 2 : 1), count, len, len, txt);
-		if ((ptr = strstr(line, "\r\n"))) {	// line ended early?
-			sprintf(ptr, "...");	// overwrite the crlf
-		}
 		
-		// too big?
-		if (size + strlen(line) + 2 >= sizeof(buf)) {
-			break;
+		if (details) {
+			build_page_display(ch, "\r\nParagraph %d:\r\n%s", count, para->text);
 		}
-		
-		size += snprintf(buf + size, sizeof(buf) - size, "%s\r\n", line);
+		else {
+			// just previews
+			txt = para->text;
+			skip_spaces(&txt);
+			len = strlen(txt);
+			len = MIN(len, 62);	// aiming for full page width then a ...
+			safe_snprintf(line, sizeof(line), "Paragraph %*d: %-*.*s...", (num >= 10 ? 2 : 1), count, len, len, txt);
+			if ((ptr = strstr(line, "\r\n"))) {	// line ended early?
+				sprintf(ptr, "...");	// overwrite the crlf
+			}
+			
+			build_page_display_str(ch, line);
+		}
 	}
 	
-	if (ch->desc) {
-		page_string(ch->desc, buf, TRUE);
-	}
+	send_page_display(ch);
 }
 
 
@@ -3211,85 +3206,92 @@ void do_stat_book(char_data *ch, book_data *book) {
 */
 void do_stat_building(char_data *ch, bld_data *bdg, bool details) {
 	char lbuf[MAX_STRING_LENGTH];
+	struct page_display *line;
 	
-	msg_to_char(ch, "Building VNum: [&c%d&0], Name: '&c%s&0'\r\n", GET_BLD_VNUM(bdg), GET_BLD_NAME(bdg));
+	build_page_display(ch, "Building VNum: [&c%d&0], Name: '&c%s&0'", GET_BLD_VNUM(bdg), GET_BLD_NAME(bdg));
 	
-	msg_to_char(ch, "Room Title: %s\r\n", GET_BLD_TITLE(bdg));
+	build_page_display(ch, "Room Title: %s", GET_BLD_TITLE(bdg));
 	
 	// icon line
-	msg_to_char(ch, "Icon: %s&0", GET_BLD_ICON(bdg) ? one_icon_display(GET_BLD_ICON(bdg), NULL) : "none");
+	line = build_page_display(ch, "Icon: %s&0", GET_BLD_ICON(bdg) ? one_icon_display(GET_BLD_ICON(bdg), NULL) : "none");
 	if (GET_BLD_HALF_ICON(bdg)) {
-		msg_to_char(ch, "  Half Icon: %s&0", GET_BLD_HALF_ICON(bdg) ? one_icon_display(GET_BLD_HALF_ICON(bdg), NULL) : "none");
+		append_page_display_line(line, "  Half Icon: %s&0", GET_BLD_HALF_ICON(bdg) ? one_icon_display(GET_BLD_HALF_ICON(bdg), NULL) : "none");
 	}
 	if (GET_BLD_QUARTER_ICON(bdg)) {
-		msg_to_char(ch, "  Quarter Icon: %s&0", GET_BLD_QUARTER_ICON(bdg) ? one_icon_display(GET_BLD_QUARTER_ICON(bdg), NULL) : "none");
+		append_page_display_line(line, "  Quarter Icon: %s&0", GET_BLD_QUARTER_ICON(bdg) ? one_icon_display(GET_BLD_QUARTER_ICON(bdg), NULL) : "none");
 	}
-	msg_to_char(ch, "\r\n");
 	
 	if (GET_BLD_DESC(bdg) && *GET_BLD_DESC(bdg)) {
-		msg_to_char(ch, "Description:\r\n%s", GET_BLD_DESC(bdg));
+		build_page_display(ch, "Description:\r\n%s", GET_BLD_DESC(bdg));
 	}
 	
 	if (GET_BLD_COMMANDS(bdg) && *GET_BLD_COMMANDS(bdg)) {
-		msg_to_char(ch, "Command list: &c%s&0\r\n", GET_BLD_COMMANDS(bdg));
+		build_page_display(ch, "Command list: &c%s&0", GET_BLD_COMMANDS(bdg));
 	}
 	
-	msg_to_char(ch, "Hitpoints: [&g%d&0], Fame: [&g%d&0], Extra Rooms: [&g%d&0], Height: [&g%d&0]\r\n", GET_BLD_MAX_DAMAGE(bdg), GET_BLD_FAME(bdg), GET_BLD_EXTRA_ROOMS(bdg), GET_BLD_HEIGHT(bdg));
-	msg_to_char(ch, "Citizens: [&g%d&0], Military: [&g%d&0], Artisan: [&g%d&0] &c%s&0\r\n", GET_BLD_CITIZENS(bdg), GET_BLD_MILITARY(bdg), GET_BLD_ARTISAN(bdg), GET_BLD_ARTISAN(bdg) != NOTHING ? get_mob_name_by_proto(GET_BLD_ARTISAN(bdg), FALSE) : "none");
+	build_page_display(ch, "Hitpoints: [&g%d&0], Fame: [&g%d&0], Extra Rooms: [&g%d&0], Height: [&g%d&0]", GET_BLD_MAX_DAMAGE(bdg), GET_BLD_FAME(bdg), GET_BLD_EXTRA_ROOMS(bdg), GET_BLD_HEIGHT(bdg));
+	build_page_display(ch, "Citizens: [&g%d&0], Military: [&g%d&0], Artisan: [&g%d&0] &c%s&0", GET_BLD_CITIZENS(bdg), GET_BLD_MILITARY(bdg), GET_BLD_ARTISAN(bdg), GET_BLD_ARTISAN(bdg) != NOTHING ? get_mob_name_by_proto(GET_BLD_ARTISAN(bdg), FALSE) : "none");
 	
 	if (GET_BLD_RELATIONS(bdg)) {
-		get_bld_relations_display(GET_BLD_RELATIONS(bdg), lbuf);
-		msg_to_char(ch, "Relations:\r\n%s", lbuf);
+		build_page_display_str(ch, "Relations:");
+		show_bld_relations_display(ch, GET_BLD_RELATIONS(bdg), FALSE);
 	}
 	
-	sprintbit(GET_BLD_FLAGS(bdg), bld_flags, buf, TRUE);
-	msg_to_char(ch, "Building flags: &c%s&0\r\n", buf);
+	sprintbit(GET_BLD_FLAGS(bdg), bld_flags, lbuf, TRUE);
+	build_page_display(ch, "Building flags: &c%s&0", lbuf);
 	
-	sprintbit(GET_BLD_FUNCTIONS(bdg), function_flags, buf, TRUE);
-	msg_to_char(ch, "Functions: &g%s&0\r\n", buf);
+	sprintbit(GET_BLD_FUNCTIONS(bdg), function_flags, lbuf, TRUE);
+	build_page_display(ch, "Functions: &g%s&0", lbuf);
 	
-	sprintbit(GET_BLD_DESIGNATE_FLAGS(bdg), designate_flags, buf, TRUE);
-	msg_to_char(ch, "Designate flags: &c%s&0\r\n", buf);
+	sprintbit(GET_BLD_DESIGNATE_FLAGS(bdg), designate_flags, lbuf, TRUE);
+	build_page_display(ch, "Designate flags: &c%s&0", lbuf);
 	
-	sprintbit(GET_BLD_BASE_AFFECTS(bdg), room_aff_bits, buf, TRUE);
-	msg_to_char(ch, "Base affects: &g%s&0\r\n", buf);
+	sprintbit(GET_BLD_BASE_AFFECTS(bdg), room_aff_bits, lbuf, TRUE);
+	build_page_display(ch, "Base affects: &g%s&0", lbuf);
 	
-	msg_to_char(ch, "Temperature: [\tc%s\t0]\r\n", temperature_types[GET_BLD_TEMPERATURE_TYPE(bdg)]);
+	build_page_display(ch, "Temperature: [\tc%s\t0]", temperature_types[GET_BLD_TEMPERATURE_TYPE(bdg)]);
 	
 	if (GET_BLD_EX_DESCS(bdg)) {
 		struct extra_descr_data *desc;
 		
 		if (details) {
-			msg_to_char(ch, "Extra descs:\r\n");
+			build_page_display_str(ch, "Extra descs:");
 			LL_FOREACH(GET_BLD_EX_DESCS(bdg), desc) {
-				msg_to_char(ch, "[ &c%s&0 ]\r\n%s", desc->keyword, desc->description);
+				build_page_display(ch, "[ &c%s&0 ]\r\n%s", desc->keyword, desc->description);
 			}
 		}
 		else {
-			sprintf(buf, "Extra descs:&c");
+			sprintf(lbuf, "Extra descs:&c");
 			LL_FOREACH(GET_BLD_EX_DESCS(bdg), desc) {
-				strcat(buf, " ");
-				strcat(buf, desc->keyword);
+				strcat(lbuf, " ");
+				strcat(lbuf, desc->keyword);
 			}
-			msg_to_char(ch, "%s&0\r\n", buf);
+			strcat(lbuf, "&0");
+			build_page_display_str(ch, lbuf);
 		}
 	}
 	
 	if (GET_BLD_INTERACTIONS(bdg)) {
-		send_to_char("Interactions:\r\n", ch);
-		get_interaction_display(GET_BLD_INTERACTIONS(bdg), buf);
-		send_to_char(buf, ch);
+		build_page_display_str(ch, "Interactions:");
+		show_interaction_display(ch, GET_BLD_INTERACTIONS(bdg), FALSE);
 	}
 	
 	if (GET_BLD_REGULAR_MAINTENANCE(bdg)) {
-		get_resource_display(ch, GET_BLD_REGULAR_MAINTENANCE(bdg), buf);
-		msg_to_char(ch, "Regular maintenance:\r\n%s", buf);
+		build_page_display_str(ch, "Regular maintenance:");
+		show_resource_display(ch, GET_BLD_REGULAR_MAINTENANCE(bdg), FALSE);
 	}
 	
-	get_script_display(GET_BLD_SCRIPTS(bdg), lbuf);
-	msg_to_char(ch, "Scripts:\r\n%s", lbuf);
+	if (GET_BLD_SCRIPTS(bdg)) {
+		build_page_display_str(ch, "Scripts:");
+		show_script_display(ch, GET_BLD_SCRIPTS(bdg), FALSE);
+	}
+	else {
+		build_page_display_str(ch, "Scripts: none");
+	}
 	
-	show_spawn_summary_to_char(ch, GET_BLD_SPAWNS(bdg));
+	show_spawn_summary_display(ch, TRUE, GET_BLD_SPAWNS(bdg));
+	
+	send_page_display(ch);
 }
 
 
@@ -3310,90 +3312,91 @@ void do_stat_character(char_data *ch, char_data *k, bool details) {
 	struct over_time_effect_type *dot;
 	struct affected_type *aff;
 	archetype_data *arch;
+	struct page_display *line;
 	
 	bool is_proto = (IS_NPC(k) && k == mob_proto(GET_MOB_VNUM(k)));
 	
 	// ensure fully loaded
 	check_delayed_load(k);
 
-	sprinttype(GET_REAL_SEX(k), genders, buf, sizeof(buf), "???");
-	CAP(buf);
+	sprinttype(GET_REAL_SEX(k), genders, lbuf, sizeof(lbuf), "???");
+	CAP(lbuf);
 	if (!IS_NPC(k)) {
-		msg_to_char(ch, "%s PC '\ty%s\t0', Lastname '\ty%s\t0', IDNum: [%5d], In room [%5d]\r\n", buf, GET_NAME(k), GET_CURRENT_LASTNAME(k) ? GET_CURRENT_LASTNAME(k) : "none", GET_IDNUM(k), IN_ROOM(k) ? GET_ROOM_VNUM(IN_ROOM(k)) : NOWHERE);
+		build_page_display(ch, "%s PC '\ty%s\t0', Lastname '\ty%s\t0', IDNum: [%5d], In room [%5d]", lbuf, GET_NAME(k), GET_CURRENT_LASTNAME(k) ? GET_CURRENT_LASTNAME(k) : "none", GET_IDNUM(k), IN_ROOM(k) ? GET_ROOM_VNUM(IN_ROOM(k)) : NOWHERE);
 	}
 	else {	// mob
-		msg_to_char(ch, "%s %s '\ty%s\t0', ID: [%5d], In room [%5d]\r\n", buf, (!IS_MOB(k) ? "NPC" : "MOB"), GET_NAME(k), k->script_id, IN_ROOM(k) ? GET_ROOM_VNUM(IN_ROOM(k)) : NOWHERE);
+		build_page_display(ch, "%s %s '\ty%s\t0', ID: [%5d], In room [%5d]", lbuf, (!IS_MOB(k) ? "NPC" : "MOB"), GET_NAME(k), k->script_id, IN_ROOM(k) ? GET_ROOM_VNUM(IN_ROOM(k)) : NOWHERE);
 	}
 	
 	if (!IS_NPC(k) && GET_ACCOUNT(k)) {
 		if (GET_ACCESS_LEVEL(ch) >= LVL_TO_SEE_ACCOUNTS) {
-			sprintbit(GET_ACCOUNT(k)->flags, account_flags, buf, TRUE);
-			msg_to_char(ch, "Account: [%d], Flags: &g%s&0\r\n", GET_ACCOUNT(k)->id, buf);
+			sprintbit(GET_ACCOUNT(k)->flags, account_flags, lbuf, TRUE);
+			build_page_display(ch, "Account: [%d], Flags: &g%s&0", GET_ACCOUNT(k)->id, lbuf);
 		}
 		else {	// low-level imms only see certain account flags
-			sprintbit(GET_ACCOUNT(k)->flags & VISIBLE_ACCT_FLAGS, account_flags, buf, TRUE);
-			msg_to_char(ch, "Account: &g%s&0\r\n", buf);
+			sprintbit(GET_ACCOUNT(k)->flags & VISIBLE_ACCT_FLAGS, account_flags, lbuf, TRUE);
+			build_page_display(ch, "Account: &g%s&0", lbuf);
 		}
 	}
 	
 	if (k->desc) {
 		// protocol info
-		msg_to_char(ch, "Connection info: Client: [%s], X-Colors: [%s\t0], MSDP: [%s\t0],\r\n", NULLSAFE(k->desc->pProtocol->pVariables[eMSDP_CLIENT_ID]->pValueString), ((k->desc->pProtocol->b256Support || k->desc->pProtocol->pVariables[eMSDP_XTERM_256_COLORS]->ValueInt) ? "\tgyes" : "\trno"), (k->desc->pProtocol->bMSDP ? "\tgyes" : "\trno"));
-		msg_to_char(ch, "   MSP: [%s\t0], MXP: [%s\t0], NAWS: [%s\t0], Screen: [%dx%d]\r\n", ((k->desc->pProtocol->bMSP || k->desc->pProtocol->pVariables[eMSDP_SOUND]->ValueInt) ? "\tgyes" : "\trno"), ((k->desc->pProtocol->bMXP || k->desc->pProtocol->pVariables[eMSDP_MXP]->ValueInt) ? "\tgyes" : "\trno"), (k->desc->pProtocol->bNAWS ? "\tgyes" : "\trno"), k->desc->pProtocol->ScreenWidth, k->desc->pProtocol->ScreenHeight);
+		build_page_display(ch, "Connection info: Client: [%s], X-Colors: [%s\t0], MSDP: [%s\t0],", NULLSAFE(k->desc->pProtocol->pVariables[eMSDP_CLIENT_ID]->pValueString), ((k->desc->pProtocol->b256Support || k->desc->pProtocol->pVariables[eMSDP_XTERM_256_COLORS]->ValueInt) ? "\tgyes" : "\trno"), (k->desc->pProtocol->bMSDP ? "\tgyes" : "\trno"));
+		build_page_display(ch, "   MSP: [%s\t0], MXP: [%s\t0], NAWS: [%s\t0], Screen: [%dx%d]", ((k->desc->pProtocol->bMSP || k->desc->pProtocol->pVariables[eMSDP_SOUND]->ValueInt) ? "\tgyes" : "\trno"), ((k->desc->pProtocol->bMXP || k->desc->pProtocol->pVariables[eMSDP_MXP]->ValueInt) ? "\tgyes" : "\trno"), (k->desc->pProtocol->bNAWS ? "\tgyes" : "\trno"), k->desc->pProtocol->ScreenWidth, k->desc->pProtocol->ScreenHeight);
 	}
 	
 	if (IS_MOB(k)) {
-		msg_to_char(ch, "Alias: &y%s&0, VNum: [&c%5d&0]\r\n", GET_PC_NAME(k), GET_MOB_VNUM(k));
-		msg_to_char(ch, "L-Des: &y%s&0%s", (GET_LONG_DESC(k) ? GET_LONG_DESC(k) : "<None>\r\n"), NULLSAFE(GET_LOOK_DESC(k)));
+		build_page_display(ch, "Alias: &y%s&0, VNum: [&c%5d&0]", GET_PC_NAME(k), GET_MOB_VNUM(k));
+		build_page_display(ch, "L-Des: &y%s&0%s", (GET_LONG_DESC(k) ? GET_LONG_DESC(k) : "<None>\r\n"), NULLSAFE(GET_LOOK_DESC(k)));
 	}
 
 	if (IS_NPC(k)) {
-		msg_to_char(ch, "Scaled level: [&c%d&0|&c%d&0-&c%d&0], Faction: [\tt%s\t0]\r\n", GET_CURRENT_SCALE_LEVEL(k), GET_MIN_SCALE_LEVEL(k), GET_MAX_SCALE_LEVEL(k), MOB_FACTION(k) ? FCT_NAME(MOB_FACTION(k)) : "none");
+		build_page_display(ch, "Scaled level: [&c%d&0|&c%d&0-&c%d&0], Faction: [\tt%s\t0]", GET_CURRENT_SCALE_LEVEL(k), GET_MIN_SCALE_LEVEL(k), GET_MAX_SCALE_LEVEL(k), MOB_FACTION(k) ? FCT_NAME(MOB_FACTION(k)) : "none");
 	}
 	else {	// not NPC
-		msg_to_char(ch, "Title: %s&0\r\n", (GET_TITLE(k) ? GET_TITLE(k) : "<None>"));
+		build_page_display(ch, "Title: %s&0", (GET_TITLE(k) ? GET_TITLE(k) : "<None>"));
 		
 		if (GET_REFERRED_BY(k) && *GET_REFERRED_BY(k)) {
-			msg_to_char(ch, "Referred by: %s\r\n", GET_REFERRED_BY(k));
+			build_page_display(ch, "Referred by: %s", GET_REFERRED_BY(k));
 		}
 		if (GET_PROMO_ID(k) > 0) {
-			msg_to_char(ch, "Promo code: %s\r\n", promo_codes[GET_PROMO_ID(k)].code);
+			build_page_display(ch, "Promo code: %s", promo_codes[GET_PROMO_ID(k)].code);
 		}
 
 		get_player_skill_string(k, lbuf, TRUE);
-		msg_to_char(ch, "Access Level: [&c%d&0], Class: [%s/&c%s&0], Skill Level: [&c%d&0], Gear Level: [&c%d&0], Total: [&c%d&0/&c%d&0]\r\n", GET_ACCESS_LEVEL(k), lbuf, class_role[(int) GET_CLASS_ROLE(k)], GET_SKILL_LEVEL(k), GET_GEAR_LEVEL(k), IN_ROOM(k) ? GET_COMPUTED_LEVEL(k) : GET_LAST_KNOWN_LEVEL(k), GET_HIGHEST_KNOWN_LEVEL(k));
+		build_page_display(ch, "Access Level: [&c%d&0], Class: [%s/&c%s&0], Skill Level: [&c%d&0], Gear Level: [&c%d&0], Total: [&c%d&0/&c%d&0]", GET_ACCESS_LEVEL(k), lbuf, class_role[(int) GET_CLASS_ROLE(k)], GET_SKILL_LEVEL(k), GET_GEAR_LEVEL(k), IN_ROOM(k) ? GET_COMPUTED_LEVEL(k) : GET_LAST_KNOWN_LEVEL(k), GET_HIGHEST_KNOWN_LEVEL(k));
 		
-		msg_to_char(ch, "Archetypes:");
+		line = build_page_display(ch, "Archetypes:");
 		for (iter = 0, count = 0; iter < NUM_ARCHETYPE_TYPES; ++iter) {
 			if ((arch = archetype_proto(CREATION_ARCHETYPE(k, iter)))) {
-				msg_to_char(ch, "%s%s", (count++ > 0) ? ", " : " ", GET_ARCH_NAME(arch));
+				append_page_display_line(line, "%s%s", (count++ > 0) ? ", " : " ", GET_ARCH_NAME(arch));
 			}
 		}
-		msg_to_char(ch, "%s\r\n", count ? "" : " none");
+		append_page_display_line(line, "%s", count ? "" : " none");
 		
-		coin_string(GET_PLAYER_COINS(k), buf);
-		msg_to_char(ch, "Coins: %s\r\n", buf);
+		coin_string(GET_PLAYER_COINS(k), lbuf);
+		build_page_display(ch, "Coins: %s", lbuf);
 
 		strcpy(buf1, (char *) asctime(localtime(&(k->player.time.birth))));
 		strcpy(buf2, buf1 + 20);
 		buf1[10] = '\0';	// DoW Mon Day
 		buf2[4] = '\0';	// get only year
 
-		msg_to_char(ch, "Created: [%s, %s], Played [%dh %dm], Age [%d]\r\n", buf1, buf2, k->player.time.played / SECS_PER_REAL_HOUR, ((k->player.time.played % SECS_PER_REAL_HOUR) / SECS_PER_REAL_MIN), age(k)->year);
+		build_page_display(ch, "Created: [%s, %s], Played [%dh %dm], Age [%d]", buf1, buf2, k->player.time.played / SECS_PER_REAL_HOUR, ((k->player.time.played % SECS_PER_REAL_HOUR) / SECS_PER_REAL_MIN), age(k)->year);
 		if (get_highest_access_level(GET_ACCOUNT(k)) <= GET_ACCESS_LEVEL(ch) && GET_ACCESS_LEVEL(ch) >= LVL_TO_SEE_ACCOUNTS) {
-			msg_to_char(ch, "Created from host: [%s]\r\n", NULLSAFE(GET_CREATION_HOST(k)));
+			build_page_display(ch, "Created from host: [%s]", NULLSAFE(GET_CREATION_HOST(k)));
 		}
 		
 		if (GET_ACCESS_LEVEL(k) >= LVL_BUILDER) {
-			sprintbit(GET_OLC_FLAGS(k), olc_flag_bits, buf, TRUE);
-			msg_to_char(ch, "OLC Vnums: [&c%d-%d&0], Flags: &g%s&0\r\n", GET_OLC_MIN_VNUM(k), GET_OLC_MAX_VNUM(k), buf);
+			sprintbit(GET_OLC_FLAGS(k), olc_flag_bits, lbuf, TRUE);
+			build_page_display(ch, "OLC Vnums: [&c%d-%d&0], Flags: &g%s&0", GET_OLC_MIN_VNUM(k), GET_OLC_MAX_VNUM(k), lbuf);
 		}
 	}
 
 	if (!IS_NPC(k) || GET_CURRENT_SCALE_LEVEL(k) > 0) {
-		msg_to_char(ch, "Health: [&g%d&0/&g%d&0]  Move: [&g%d&0/&g%d&0]  Mana: [&g%d&0/&g%d&0]  Blood: [&g%d&0/&g%d&0]\r\n", GET_HEALTH(k), GET_MAX_HEALTH(k), GET_MOVE(k), GET_MAX_MOVE(k), GET_MANA(k), GET_MAX_MANA(k), GET_BLOOD(k), GET_MAX_BLOOD(k));
+		build_page_display(ch, "Health: [&g%d&0/&g%d&0]  Move: [&g%d&0/&g%d&0]  Mana: [&g%d&0/&g%d&0]  Blood: [&g%d&0/&g%d&0]", GET_HEALTH(k), GET_MAX_HEALTH(k), GET_MOVE(k), GET_MAX_MOVE(k), GET_MANA(k), GET_MAX_MANA(k), GET_BLOOD(k), GET_MAX_BLOOD(k));
 
-		display_attributes(k, ch);
+		build_page_display_str(ch, display_attributes(k));
 
 		// dex is removed from dodge to make it easier to compare to caps
 		val = get_dodge_modifier(k, NULL, FALSE) - (hit_per_dex * GET_DEXTERITY(k));;
@@ -3403,148 +3406,155 @@ void do_stat_character(char_data *ch, char_data *k, bool details) {
 		sprintf(lbuf2, "Block  [%s%d&0]", HAPPY_COLOR(val, 0), val);
 		
 		sprintf(lbuf3, "Resist  [%d|%d]", GET_RESIST_PHYSICAL(k), GET_RESIST_MAGICAL(k));
-		msg_to_char(ch, "  %-28.28s %-28.28s %-28.28s\r\n", lbuf, lbuf2, lbuf3);
+		build_page_display(ch, "  %-28.28s %-28.28s %-28.28s", lbuf, lbuf2, lbuf3);
 	
 		sprintf(lbuf, "Physical  [%s%+d&0]", HAPPY_COLOR(GET_BONUS_PHYSICAL(k), 0), GET_BONUS_PHYSICAL(k));
 		sprintf(lbuf2, "Magical  [%s%+d&0]", HAPPY_COLOR(GET_BONUS_MAGICAL(k), 0), GET_BONUS_MAGICAL(k));
 		sprintf(lbuf3, "Healing  [%s%+d&0]", HAPPY_COLOR(GET_BONUS_HEALING(k), 0), GET_BONUS_HEALING(k));
-		msg_to_char(ch, "  %-28.28s %-28.28s %-28.28s\r\n", lbuf, lbuf2, lbuf3);
+		build_page_display(ch, "  %-28.28s %-28.28s %-28.28s", lbuf, lbuf2, lbuf3);
 
 		// dex is removed from to-hit to make it easier to compare to caps
 		val = get_to_hit(k, NULL, FALSE, FALSE) - (hit_per_dex * GET_DEXTERITY(k));;
 		sprintf(lbuf, "To-hit  [%s%d&0]", HAPPY_COLOR(val, base_hit_chance), val);
 		sprintf(lbuf2, "Speed  [&0%.2f&0]", get_combat_speed(k, WEAR_WIELD));
 		sprintf(lbuf3, "Crafting  [%s%d&0]", HAPPY_COLOR(get_crafting_level(k), IS_NPC(k) ? get_approximate_level(k) : GET_SKILL_LEVEL(k)), get_crafting_level(k));
-		msg_to_char(ch, "  %-28.28s %-28.28s %-28.28s\r\n", lbuf, lbuf2, lbuf3);
+		build_page_display(ch, "  %-28.28s %-28.28s %-28.28s", lbuf, lbuf2, lbuf3);
 		
 		if (IS_NPC(k)) {
 			sprintf(lbuf, "Mob-dmg  [%d]", MOB_DAMAGE(k));
 			sprintf(lbuf2, "Mob-hit  [%d]", MOB_TO_HIT(k));
 			sprintf(lbuf3, "Mob-dodge  [%d]", MOB_TO_DODGE(k));
-			msg_to_char(ch, "  %-24.24s %-24.24s %-24.24s\r\n", lbuf, lbuf2, lbuf3);
+			build_page_display(ch, "  %-24.24s %-24.24s %-24.24s", lbuf, lbuf2, lbuf3);
 			
-			msg_to_char(ch, "NPC Bare Hand Dam: %d\r\n", MOB_DAMAGE(k));
+			build_page_display(ch, "NPC Bare Hand Dam: %d", MOB_DAMAGE(k));
 		}
 	}
 
 	sprinttype(GET_POS(k), position_types, buf2, sizeof(buf2), "UNDEFINED");
-	sprintf(buf, "Pos: %s, Fighting: %s", buf2, (FIGHTING(k) ? GET_NAME(FIGHTING(k)) : "Nobody"));
+	line = build_page_display(ch, "Pos: %s, Fighting: %s", buf2, (FIGHTING(k) ? GET_NAME(FIGHTING(k)) : "Nobody"));
 
 	if (IS_NPC(k)) {
-		sprintf(buf + strlen(buf), ", Attack: %d %s, Move: %s, Size: %s", MOB_ATTACK_TYPE(k), get_attack_name_by_vnum(MOB_ATTACK_TYPE(k)), mob_move_types[(int)MOB_MOVE_TYPE(k)], size_types[GET_SIZE(k)]);
+		append_page_display_line(line, ", Attack: %d %s, Move: %s, Size: %s", MOB_ATTACK_TYPE(k), get_attack_name_by_vnum(MOB_ATTACK_TYPE(k)), mob_move_types[(int)MOB_MOVE_TYPE(k)], size_types[GET_SIZE(k)]);
 	}
 	if (k->desc) {
 		sprinttype(STATE(k->desc), connected_types, buf2, sizeof(buf2), "UNDEFINED");
-		strcat(buf, ", Connected: ");
-		strcat(buf, buf2);
+		append_page_display_line(line, ", Connected: %s", buf2);
 	}
-	send_to_char(strcat(buf, "\r\n"), ch);
 
 	if (IS_NPC(k)) {
 		sprintbit(MOB_FLAGS(k), action_bits, buf2, TRUE);
-		msg_to_char(ch, "NPC flags: &c%s&0\r\n", buf2);
-		msg_to_char(ch, "Nameset: \ty%s\t0, Language: [\tc%d\t0] \ty%s\t0\r\n", name_sets[MOB_NAME_SET(k)], MOB_LANGUAGE(k), get_generic_name_by_vnum(MOB_LANGUAGE(k)));
+		build_page_display(ch, "NPC flags: &c%s&0", buf2);
+		build_page_display(ch, "Nameset: \ty%s\t0, Language: [\tc%d\t0] \ty%s\t0", name_sets[MOB_NAME_SET(k)], MOB_LANGUAGE(k), get_generic_name_by_vnum(MOB_LANGUAGE(k)));
 	}
 	else {
-		msg_to_char(ch, "Idle Timer (minutes) [\tg%.1f\t0], View Height: [\tg%d\t0]\r\n", GET_IDLE_SECONDS(k) / (double) SECS_PER_REAL_MIN, get_view_height(k, IN_ROOM(k)));
+		build_page_display(ch, "Idle Timer (minutes) [\tg%.1f\t0], View Height: [\tg%d\t0]", GET_IDLE_SECONDS(k) / (double) SECS_PER_REAL_MIN, get_view_height(k, IN_ROOM(k)));
+		
 		sprintbit(PLR_FLAGS(k), player_bits, buf2, TRUE);
-		msg_to_char(ch, "PLR: &c%s&0\r\n", buf2);
+		build_page_display(ch, "PLR: &c%s&0", buf2);
+		
 		sprintbit(PRF_FLAGS(k), preference_bits, buf2, TRUE);
-		msg_to_char(ch, "PRF: &g%s&0\r\n", buf2);
+		build_page_display(ch, "PRF: &g%s&0", buf2);
+		
 		sprintbit(GET_BONUS_TRAITS(k), bonus_bits, buf2, TRUE);
-		msg_to_char(ch, "BONUS: &c%s&0\r\n", buf2);
+		build_page_display(ch, "BONUS: &c%s&0", buf2);
+		
 		prettier_sprintbit(GET_GRANT_FLAGS(k), grant_bits, buf2);
-		msg_to_char(ch, "GRANTS: &g%s&0\r\n", buf2);
+		build_page_display(ch, "GRANTS: &g%s&0", buf2);
+		
 		sprintbit(SYSLOG_FLAGS(k), syslog_types, buf2, TRUE);
-		msg_to_char(ch, "SYSLOGS: &c%s&0\r\n", buf2);
+		build_page_display(ch, "SYSLOGS: &c%s&0", buf2);
 	}
 
 	if (!is_proto) {
-		sprintf(buf, "Carried items: %d/%d; ", IS_CARRYING_N(k), CAN_CARRY_N(k));
+		line = build_page_display(ch, "Carried items: %d/%d; ", IS_CARRYING_N(k), CAN_CARRY_N(k));
 		DL_COUNT2(k->carrying, j, i, next_content);	// TODO these var names are absurd
-		sprintf(buf + strlen(buf), "Items in: inventory: %d, ", i);
+		append_page_display_line(line, "Items in: inventory: %d, ", i);
 
-		for (i = 0, i2 = 0; i < NUM_WEARS; i++)
-			if (GET_EQ(k, i))
+		for (i = 0, i2 = 0; i < NUM_WEARS; i++) {
+			if (GET_EQ(k, i)) {
 				i2++;
-		sprintf(buf2, "eq: %d\r\n", i2);
-		send_to_char(strcat(buf, buf2), ch);
+			}
+		}
+		append_page_display_line(line, "eq: %d", i2);
 	}
 
 	if (IS_NPC(k) && k->interactions) {
-		send_to_char("Interactions:\r\n", ch);
-		get_interaction_display(k->interactions, buf);
-		send_to_char(buf, ch);
+		build_page_display_str(ch, "Interactions:");
+		show_interaction_display(ch, k->interactions, FALSE);
 	}
 	
 	if (MOB_CUSTOM_MSGS(k)) {
 		struct custom_message *mcm;
 		
 		if (details) {
-			msg_to_char(ch, "Custom messages:\r\n");
+			build_page_display(ch, "Custom messages:");
 			LL_FOREACH(MOB_CUSTOM_MSGS(k), mcm) {
-				msg_to_char(ch, " %s: %s\r\n", mob_custom_types[mcm->type], mcm->msg);
+				build_page_display(ch, " %s: %s", mob_custom_types[mcm->type], mcm->msg);
 			}
 		}
 		else {
 			LL_COUNT(MOB_CUSTOM_MSGS(k), mcm, count);
-			msg_to_char(ch, "Custom messages: %d\r\n", count);
+			build_page_display(ch, "Custom messages: %d", count);
 		}
 	}
 
 	if (!IS_NPC(k)) {
-		msg_to_char(ch, "Hunger: %d, Thirst: %d, Drunk: %d\r\n", GET_COND(k, FULL), GET_COND(k, THIRST), GET_COND(k, DRUNK));
-		msg_to_char(ch, "Temperature: %d (%s), Warmth: %d, Cooling: %d\r\n", get_relative_temperature(k), temperature_to_string(get_relative_temperature(k)), GET_WARMTH(k), GET_COOLING(k));
-		msg_to_char(ch, "Speaking: %s, Recent deaths: %d\r\n", get_generic_name_by_vnum(GET_SPEAKING(k)), GET_RECENT_DEATH_COUNT(k));
+		build_page_display(ch, "Hunger: %d, Thirst: %d, Drunk: %d", GET_COND(k, FULL), GET_COND(k, THIRST), GET_COND(k, DRUNK));
+		build_page_display(ch, "Temperature: %d (%s), Warmth: %d, Cooling: %d", get_relative_temperature(k), temperature_to_string(get_relative_temperature(k)), GET_WARMTH(k), GET_COOLING(k));
+		build_page_display(ch, "Speaking: %s, Recent deaths: %d", get_generic_name_by_vnum(GET_SPEAKING(k)), GET_RECENT_DEATH_COUNT(k));
 	}
 	
 	if (IS_MORPHED(k)) {
-		msg_to_char(ch, "Morphed into: %d - %s\r\n", MORPH_VNUM(GET_MORPH(k)), get_morph_desc(k, FALSE));
+		build_page_display(ch, "Morphed into: %d - %s", MORPH_VNUM(GET_MORPH(k)), get_morph_desc(k, FALSE));
 	}
 	if (IS_DISGUISED(k)) {
-		msg_to_char(ch, "Disguised as: %s\r\n", GET_DISGUISED_NAME(k));
+		build_page_display(ch, "Disguised as: %s", GET_DISGUISED_NAME(k));
 	}
 
 	if (!is_proto) {
-		sprintf(buf, "Leader is: %s, Followers are:", ((GET_LEADER(k)) ? GET_NAME(GET_LEADER(k)) : "<none>"));
+		sprintf(lbuf, "Leader is: %s, Followers are:", ((GET_LEADER(k)) ? GET_NAME(GET_LEADER(k)) : "<none>"));
 		for (fol = k->followers; fol; fol = fol->next) {
 			sprintf(buf2, "%s %s", found++ ? "," : "", PERS(fol->follower, ch, 1));
-			strcat(buf, buf2);
-			if (strlen(buf) >= 62) {
-				if (fol->next)
-					send_to_char(strcat(buf, ",\r\n"), ch);
-				else
-					send_to_char(strcat(buf, "\r\n"), ch);
-				*buf = found = 0;
+			strcat(lbuf, buf2);
+			if (strlen(lbuf) >= 62) {
+				if (fol->next) {
+					build_page_display(ch, "%s,", lbuf);
+				}
+				else {
+					build_page_display_str(ch, lbuf);
+				}
+				*lbuf = found = 0;
 			}
 		}
 
-		if (*buf) {
-			send_to_char(strcat(buf, "\r\n"), ch);
+		if (*lbuf) {
+			build_page_display_str(ch, lbuf);
 		}
 	}
 
 	// cooldowns
 	if (k->cooldowns) {
 		found = FALSE;
-		msg_to_char(ch, "Cooldowns: ");
+		line = build_page_display(ch, "Cooldowns: ");
 		
 		for (cool = k->cooldowns; cool; cool = cool->next) {
 			diff = cool->expire_time - time(0);
 			
 			if (diff > 0) {
-				msg_to_char(ch, "%s&c%s&0 %s", (found ? ", ": ""), get_generic_name_by_vnum(cool->type), colon_time(diff, FALSE, NULL));
+				append_page_display_line(line, "%s&c%s&0 %s", (found ? ", ": ""), get_generic_name_by_vnum(cool->type), colon_time(diff, FALSE, NULL));
 				
 				found = TRUE;
 			}
 		}
 		
-		msg_to_char(ch, "%s\r\n", (found ? "" : "none"));
+		if (!found) {
+			append_page_display_line(line, "none");
+		}
 	}
 
 	/* Showing the bitvector */
 	sprintbit(AFF_FLAGS(k), affected_bits, buf2, TRUE);
-	msg_to_char(ch, "AFF: &c%s&0\r\n", buf2);
+	build_page_display(ch, "AFF: &c%s&0", buf2);
 
 	/* Routine to show what spells a char is affected by */
 	if (k->affected) {
@@ -3579,13 +3589,13 @@ void do_stat_character(char_data *ch, char_data *k, bool details) {
 				sprintbit(aff->bitvector, affected_bits, buf2, TRUE);
 				strcat(buf, buf2);
 			}
-			send_to_char(strcat(buf, "\r\n"), ch);
+			build_page_display_str(ch, buf);
 		}
 	}
 	
 	// dots
 	for (dot = k->over_time_effects; dot; dot = dot->next) {
-		msg_to_char(ch, "TYPE: (%s) &r%s&0 %d %s damage (%d/%d)\r\n", colon_time(dot->time_remaining, FALSE, NULL), get_generic_name_by_vnum(dot->type), dot->damage * dot->stack, damage_types[dot->damage_type], dot->stack, dot->max_stack);
+		build_page_display(ch, "TYPE: (%s) &r%s&0 %d %s damage (%d/%d)", colon_time(dot->time_remaining, FALSE, NULL), get_generic_name_by_vnum(dot->type), dot->damage * dot->stack, damage_types[dot->damage_type], dot->stack, dot->max_stack);
 	}
 
 	/* check mobiles for a script */
@@ -3593,18 +3603,18 @@ void do_stat_character(char_data *ch, char_data *k, bool details) {
 		do_sstat_character(ch, k);
 		if (SCRIPT_MEM(k)) {
 			mem = SCRIPT_MEM(k);
-			msg_to_char(ch, "Script memory:\r\n  Remember             Command\r\n");
+			build_page_display_str(ch, "Script memory:\r\n  Remember             Command");
 			while (mem) {
 				char_data *mc = find_char(mem->id);
 				if (!mc) {
-					msg_to_char(ch, "  ** Corrupted!\r\n");
+					build_page_display(ch, "  ** Corrupted!");
 				}
 				else {
 					if (mem->cmd) {
-						msg_to_char(ch, "  %-20.20s%s\r\n", PERS(mc, mc, TRUE), mem->cmd);
+						build_page_display(ch, "  %-20.20s%s", PERS(mc, mc, TRUE), mem->cmd);
 					}
 					else {
-						msg_to_char(ch, "  %-20.20s <default>\r\n", PERS(mc, mc, TRUE));
+						build_page_display(ch, "  %-20.20s <default>", PERS(mc, mc, TRUE));
 					}
 				}
 				
@@ -3612,68 +3622,70 @@ void do_stat_character(char_data *ch, char_data *k, bool details) {
 			}
 		}
 	}
+	
+	send_page_display(ch);
 }
 
 
 void do_stat_craft(char_data *ch, craft_data *craft) {
+	char lbuf[MAX_STRING_LENGTH];
 	ability_data *abil;
 	bld_data *bld;
 	int seconds;
+	struct page_display *line;
 	
-	msg_to_char(ch, "Name: '&y%s&0', Vnum: [&g%d&0], Type: &c%s&0\r\n", GET_CRAFT_NAME(craft), GET_CRAFT_VNUM(craft), craft_types[GET_CRAFT_TYPE(craft)]);
+	build_page_display(ch, "Name: '&y%s&0', Vnum: [&g%d&0], Type: &c%s&0", GET_CRAFT_NAME(craft), GET_CRAFT_VNUM(craft), craft_types[GET_CRAFT_TYPE(craft)]);
 	
 	if (CRAFT_IS_BUILDING(craft)) {
 		bld = building_proto(GET_CRAFT_BUILD_TYPE(craft));
-		msg_to_char(ch, "Builds: [&c%d&0] %s\r\n", GET_CRAFT_BUILD_TYPE(craft), bld ? GET_BLD_NAME(bld) : "UNKNOWN");
+		build_page_display(ch, "Builds: [&c%d&0] %s", GET_CRAFT_BUILD_TYPE(craft), bld ? GET_BLD_NAME(bld) : "UNKNOWN");
 	}
 	else if (CRAFT_IS_VEHICLE(craft)) {
-		msg_to_char(ch, "Creates Vehicle: [&c%d&0] %s\r\n", GET_CRAFT_OBJECT(craft), (GET_CRAFT_OBJECT(craft) == NOTHING ? "NOTHING" : get_vehicle_name_by_proto(GET_CRAFT_OBJECT(craft))));
+		build_page_display(ch, "Creates Vehicle: [&c%d&0] %s", GET_CRAFT_OBJECT(craft), (GET_CRAFT_OBJECT(craft) == NOTHING ? "NOTHING" : get_vehicle_name_by_proto(GET_CRAFT_OBJECT(craft))));
 	}
 	else if (CRAFT_FLAGGED(craft, CRAFT_SOUP)) {
-		msg_to_char(ch, "Creates Volume: [&g%d drink%s&0], Liquid: [&g%d&0] %s\r\n", GET_CRAFT_QUANTITY(craft), PLURAL(GET_CRAFT_QUANTITY(craft)), GET_CRAFT_OBJECT(craft), get_generic_string_by_vnum(GET_CRAFT_OBJECT(craft), GENERIC_LIQUID, GSTR_LIQUID_NAME));
+		build_page_display(ch, "Creates Volume: [&g%d drink%s&0], Liquid: [&g%d&0] %s", GET_CRAFT_QUANTITY(craft), PLURAL(GET_CRAFT_QUANTITY(craft)), GET_CRAFT_OBJECT(craft), get_generic_string_by_vnum(GET_CRAFT_OBJECT(craft), GENERIC_LIQUID, GSTR_LIQUID_NAME));
 	}
 	else {
-		msg_to_char(ch, "Creates Quantity: [&g%d&0], Item: [&c%d&0] %s\r\n", GET_CRAFT_QUANTITY(craft), GET_CRAFT_OBJECT(craft), get_obj_name_by_proto(GET_CRAFT_OBJECT(craft)));
+		build_page_display(ch, "Creates Quantity: [&g%d&0], Item: [&c%d&0] %s", GET_CRAFT_QUANTITY(craft), GET_CRAFT_OBJECT(craft), get_obj_name_by_proto(GET_CRAFT_OBJECT(craft)));
 	}
 	
-	sprintf(buf, "[%d] %s", GET_CRAFT_ABILITY(craft), (GET_CRAFT_ABILITY(craft) == NO_ABIL ? "none" : get_ability_name_by_vnum(GET_CRAFT_ABILITY(craft))));
+	sprintf(lbuf, "[%d] %s", GET_CRAFT_ABILITY(craft), (GET_CRAFT_ABILITY(craft) == NO_ABIL ? "none" : get_ability_name_by_vnum(GET_CRAFT_ABILITY(craft))));
 	if ((abil = find_ability_by_vnum(GET_CRAFT_ABILITY(craft))) && ABIL_ASSIGNED_SKILL(abil) != NULL) {
-		sprintf(buf + strlen(buf), " ([%d] %s %d)", SKILL_VNUM(ABIL_ASSIGNED_SKILL(abil)), SKILL_NAME(ABIL_ASSIGNED_SKILL(abil)), ABIL_SKILL_LEVEL(abil));
+		sprintf(lbuf + strlen(lbuf), " ([%d] %s %d)", SKILL_VNUM(ABIL_ASSIGNED_SKILL(abil)), SKILL_NAME(ABIL_ASSIGNED_SKILL(abil)), ABIL_SKILL_LEVEL(abil));
 	}
-	msg_to_char(ch, "Ability: &y%s&0, Level: &g%d&0", buf, GET_CRAFT_MIN_LEVEL(craft));
+	line = build_page_display(ch, "Ability: &y%s&0, Level: &g%d&0", lbuf, GET_CRAFT_MIN_LEVEL(craft));
 	
 	if (!CRAFT_IS_BUILDING(craft) && !CRAFT_IS_VEHICLE(craft)) {
 		seconds = GET_CRAFT_TIME(craft) * ACTION_CYCLE_TIME;
-		msg_to_char(ch, ", Time: [&g%d action tick%s&0 | &g%s&0]\r\n", GET_CRAFT_TIME(craft), PLURAL(GET_CRAFT_TIME(craft)), colon_time(seconds, FALSE, NULL));
-	}
-	else {
-		msg_to_char(ch, "\r\n");
+		append_page_display_line(line, ", Time: [&g%d action tick%s&0 | &g%s&0]", GET_CRAFT_TIME(craft), PLURAL(GET_CRAFT_TIME(craft)), colon_time(seconds, FALSE, NULL));
 	}
 
-	sprintbit(GET_CRAFT_FLAGS(craft), craft_flags, buf, TRUE);
-	msg_to_char(ch, "Flags: &c%s&0\r\n", buf);
+	sprintbit(GET_CRAFT_FLAGS(craft), craft_flags, lbuf, TRUE);
+	build_page_display(ch, "Flags: &c%s&0", lbuf);
 	
-	prettier_sprintbit(GET_CRAFT_REQUIRES_TOOL(craft), tool_flags, buf);
-	msg_to_char(ch, "Requires tool: &y%s&0\r\n", buf);
+	prettier_sprintbit(GET_CRAFT_REQUIRES_TOOL(craft), tool_flags, lbuf);
+	build_page_display(ch, "Requires tool: &y%s&0", lbuf);
 	
-	sprintbit(GET_CRAFT_REQUIRES_FUNCTION(craft), function_flags, buf, TRUE);
-	msg_to_char(ch, "Requires Functions: \tg%s\t0\r\n", buf);
+	sprintbit(GET_CRAFT_REQUIRES_FUNCTION(craft), function_flags, lbuf, TRUE);
+	build_page_display(ch, "Requires Functions: \tg%s\t0", lbuf);
 	
 	if (CRAFT_IS_BUILDING(craft) || CRAFT_IS_VEHICLE(craft)) {
-		ordered_sprintbit(GET_CRAFT_BUILD_ON(craft), bld_on_flags, bld_on_flags_order, TRUE, buf);
-		msg_to_char(ch, "Build on: &g%s&0\r\n", buf);
-		ordered_sprintbit(GET_CRAFT_BUILD_FACING(craft), bld_on_flags, bld_on_flags_order, TRUE, buf);
-		msg_to_char(ch, "Build facing: &c%s&0\r\n", buf);
+		ordered_sprintbit(GET_CRAFT_BUILD_ON(craft), bld_on_flags, bld_on_flags_order, TRUE, lbuf);
+		build_page_display(ch, "Build on: &g%s&0", lbuf);
+		ordered_sprintbit(GET_CRAFT_BUILD_FACING(craft), bld_on_flags, bld_on_flags_order, TRUE, lbuf);
+		build_page_display(ch, "Build facing: &c%s&0", lbuf);
 	}
 	
 	if (GET_CRAFT_REQUIRES_OBJ(craft) != NOTHING) {
-		msg_to_char(ch, "Requires item: [%d] &g%s&0\r\n", GET_CRAFT_REQUIRES_OBJ(craft), skip_filler(get_obj_name_by_proto(GET_CRAFT_REQUIRES_OBJ(craft))));
+		build_page_display(ch, "Requires item: [%d] &g%s&0", GET_CRAFT_REQUIRES_OBJ(craft), skip_filler(get_obj_name_by_proto(GET_CRAFT_REQUIRES_OBJ(craft))));
 	}
 
 	// resources
-	msg_to_char(ch, "Resources required:\r\n");
-	get_resource_display(ch, GET_CRAFT_RESOURCES(craft), buf);
-	send_to_char(buf, ch);
+	build_page_display_str(ch, "Resources required:");
+	show_resource_display(ch, GET_CRAFT_RESOURCES(craft), FALSE);
+	
+	send_page_display(ch);
 }
 
 
@@ -3688,30 +3700,29 @@ void do_stat_crop(char_data *ch, crop_data *cp, bool details) {
 	int count;
 	struct custom_message *ocm;
 	
-	msg_to_char(ch, "Crop VNum: [&c%d&0], Name: '&c%s&0'\r\n", GET_CROP_VNUM(cp), GET_CROP_NAME(cp));
-	msg_to_char(ch, "Room Title: %s, Mapout Color: %s\r\n", GET_CROP_TITLE(cp), mapout_color_names[GET_CROP_MAPOUT(cp)]);
+	build_page_display(ch, "Crop VNum: [&c%d&0], Name: '&c%s&0'", GET_CROP_VNUM(cp), GET_CROP_NAME(cp));
+	build_page_display(ch, "Room Title: %s, Mapout Color: %s", GET_CROP_TITLE(cp), mapout_color_names[GET_CROP_MAPOUT(cp)]);
 	
 	ordered_sprintbit(GET_CROP_CLIMATE(cp), climate_flags, climate_flags_order, (CROP_FLAGGED(cp, CROPF_ANY_LISTED_CLIMATE) ? TRUE : FALSE), buf);
-	msg_to_char(ch, "Climate: &c%s&0\r\n", GET_CROP_CLIMATE(cp) ? buf : "(none)");
+	build_page_display(ch, "Climate: &c%s&0", GET_CROP_CLIMATE(cp) ? buf : "(none)");
 	
 	sprintbit(GET_CROP_FLAGS(cp), crop_flags, buf, TRUE);
-	msg_to_char(ch, "Crop flags: &g%s&0\r\n", buf);
+	build_page_display(ch, "Crop flags: &g%s&0", buf);
 	
 	if (GET_CROP_ICONS(cp)) {
-		msg_to_char(ch, "Icons:\r\n");
-		get_icons_display(GET_CROP_ICONS(cp), buf1);
-		send_to_char(buf1, ch);
+		build_page_display_str(ch, "Icons:");
+		show_icons_display(ch, GET_CROP_ICONS(cp), FALSE);
 	}
 	
-	msg_to_char(ch, "Location: X-Min: [&g%d&0], X-Max: [&g%d&0], Y-Min: [&g%d&0], Y-Max: [&g%d&0]\r\n", GET_CROP_X_MIN(cp), GET_CROP_X_MAX(cp), GET_CROP_Y_MIN(cp), GET_CROP_Y_MAX(cp));
+	build_page_display(ch, "Location: X-Min: [&g%d&0], X-Max: [&g%d&0], Y-Min: [&g%d&0], Y-Max: [&g%d&0]", GET_CROP_X_MIN(cp), GET_CROP_X_MAX(cp), GET_CROP_Y_MIN(cp), GET_CROP_Y_MAX(cp));
 	
 	if (GET_CROP_EX_DESCS(cp)) {
 		struct extra_descr_data *desc;
 		
 		if (details) {
-			msg_to_char(ch, "Extra descs:\r\n");
+			build_page_display(ch, "Extra descs:");
 			LL_FOREACH(GET_CROP_EX_DESCS(cp), desc) {
-				msg_to_char(ch, "[ &c%s&0 ]\r\n%s", desc->keyword, desc->description);
+				build_page_display(ch, "[ &c%s&0 ]\r\n%s", desc->keyword, desc->description);
 			}
 		}
 		else {
@@ -3720,30 +3731,31 @@ void do_stat_crop(char_data *ch, crop_data *cp, bool details) {
 				strcat(buf, " ");
 				strcat(buf, desc->keyword);
 			}
-			msg_to_char(ch, "%s&0\r\n", buf);
+			build_page_display(ch, "%s&0", buf);
 		}
 	}
 	
 	if (GET_CROP_CUSTOM_MSGS(cp)) {
 		if (details) {
-			msg_to_char(ch, "Custom messages:\r\n");
+			build_page_display(ch, "Custom messages:");
 			LL_FOREACH(GET_CROP_CUSTOM_MSGS(cp), ocm) {
-				msg_to_char(ch, " %s: %s\r\n", crop_custom_types[ocm->type], ocm->msg);
+				build_page_display(ch, " %s: %s", crop_custom_types[ocm->type], ocm->msg);
 			}
 		}
 		else {
 			LL_COUNT(GET_CROP_CUSTOM_MSGS(cp), ocm, count);
-			msg_to_char(ch, "Custom messages: %d\r\n", count);
+			build_page_display(ch, "Custom messages: %d", count);
 		}
 	}
 	
 	if (GET_CROP_INTERACTIONS(cp)) {
-		send_to_char("Interactions:\r\n", ch);
-		get_interaction_display(GET_CROP_INTERACTIONS(cp), buf);
-		send_to_char(buf, ch);
+		build_page_display_str(ch, "Interactions:");
+		show_interaction_display(ch, GET_CROP_INTERACTIONS(cp), FALSE);
 	}
 	
-	show_spawn_summary_to_char(ch, GET_CROP_SPAWNS(cp));
+	show_spawn_summary_display(ch, TRUE, GET_CROP_SPAWNS(cp));
+	
+	send_page_display(ch);
 }
 
 
@@ -3759,6 +3771,7 @@ void do_stat_empire(char_data *ch, empire_data *emp) {
 	player_index_data *index;
 	char line[256];
 	bool any;
+	struct page_display *pline;
 	
 	// determine rank by iterating over the sorted empire list
 	found_rank = 0;
@@ -3769,55 +3782,64 @@ void do_stat_empire(char_data *ch, empire_data *emp) {
 		}
 	}
 	
-	msg_to_char(ch, "%s%s\t0, Adjective: [%s%s\t0], VNum: [\tc%5d\t0]\r\n", EMPIRE_BANNER(emp), EMPIRE_NAME(emp), EMPIRE_BANNER(emp), EMPIRE_ADJECTIVE(emp), EMPIRE_VNUM(emp));
-	msg_to_char(ch, "Leader: [\ty%s\t0], Created: [\ty%-24.24s\t0], Score/rank: [\tc%d #%d\t0]\r\n", (index = find_player_index_by_idnum(EMPIRE_LEADER(emp))) ? index->fullname : "UNKNOWN", ctime(&EMPIRE_CREATE_TIME(emp)), get_total_score(emp), found_rank);
+	build_page_display(ch, "%s%s\t0, Adjective: [%s%s\t0], VNum: [\tc%5d\t0]", EMPIRE_BANNER(emp), EMPIRE_NAME(emp), EMPIRE_BANNER(emp), EMPIRE_ADJECTIVE(emp), EMPIRE_VNUM(emp));
+	build_page_display(ch, "Leader: [\ty%s\t0], Created: [\ty%-24.24s\t0], Score/rank: [\tc%d #%d\t0]", (index = find_player_index_by_idnum(EMPIRE_LEADER(emp))) ? index->fullname : "UNKNOWN", ctime(&EMPIRE_CREATE_TIME(emp)), get_total_score(emp), found_rank);
 	
 	ptime = summarize_weekly_playtime(emp);
-	msg_to_char(ch, "Last %d weeks playtime: ", PLAYTIME_WEEKS_TO_TRACK);
+	pline = build_page_display(ch, "Last %d weeks playtime: ", PLAYTIME_WEEKS_TO_TRACK);
 	for (iter = 0; iter < PLAYTIME_WEEKS_TO_TRACK; ++iter) {
-		msg_to_char(ch, "%s%s%s", (iter > 0 ? ", " : ""), simple_time_since(time(0) - ptime[iter]), (iter == (PLAYTIME_WEEKS_TO_TRACK-1) ? "\r\n" : ""));
+		append_page_display_line(pline, "%s%s", (iter > 0 ? ", " : ""), simple_time_since(time(0) - ptime[iter]));
+	}
+	
+	if (EMPIRE_NEXT_TIMEOUT(emp) > time(0)) {
+		build_page_display(ch, "Next timeout check: [%s %s]", colon_time(EMPIRE_NEXT_TIMEOUT(emp) - time(0), FALSE, NULL), (EMPIRE_NEXT_TIMEOUT(emp) >= time(0) ? "from now" : "ago"));
+	}
+	else {
+		build_page_display(ch, "Next timeout check: [%ld / not scheduled]", EMPIRE_NEXT_TIMEOUT(emp));
 	}
 	
 	sprintbit(EMPIRE_ADMIN_FLAGS(emp), empire_admin_flags, line, TRUE);
-	msg_to_char(ch, "Admin flags: \tg%s\t0\r\n", line);
+	build_page_display(ch, "Admin flags: \tg%s\t0", line);
 	
 	sprintbit(EMPIRE_FRONTIER_TRAITS(emp), empire_trait_types, line, TRUE);
-	msg_to_char(ch, "Frontier traits: \tc%s\t0\r\n", line);
+	build_page_display(ch, "Frontier traits: \tc%s\t0", line);
 
-	msg_to_char(ch, "Technology: \tg");
+	pline = build_page_display(ch, "Technology: \tg");
 	for (iter = 0, len = 0, any = FALSE; iter < NUM_TECHS; ++iter) {
 		if (EMPIRE_HAS_TECH(emp, iter)) {
 			any = TRUE;
 			if (len > 0 && len + strlen(empire_tech_types[iter]) + 3 >= 80) {	// new line
-				msg_to_char(ch, ",\r\n%s", empire_tech_types[iter]);
+				append_page_display_line(pline, ",\r\n%s", empire_tech_types[iter]);
 				len = strlen(empire_tech_types[iter]);
 			}
 			else {	// same line
-				msg_to_char(ch, "%s%s", (len > 0) ? ", " : "", empire_tech_types[iter]);
+				append_page_display_line(pline, "%s%s", (len > 0) ? ", " : "", empire_tech_types[iter]);
 				len += strlen(empire_tech_types[iter]) + 2;
 			}
 		}
 	}
 	if (!any) {
-		msg_to_char(ch, "none");
+		append_page_display_line(pline, "none");
 	}
-	msg_to_char(ch, "\t0\r\n");	// end tech
+	append_page_display_line(pline, "\t0");	// end tech
 	
-	msg_to_char(ch, "Members: [\tc%d\t0/\tc%d\t0], Citizens: [\tc%d\t0], Military: [\tc%d\t0]\r\n", EMPIRE_MEMBERS(emp), EMPIRE_TOTAL_MEMBER_COUNT(emp), EMPIRE_POPULATION(emp), EMPIRE_MILITARY(emp));
-	msg_to_char(ch, "Territory: [\tc%d\t0/\tc%d\t0], In-City: [\tc%d\t0], Outskirts: [\tc%d\t0/\tc%d\t0], Frontier: [\tc%d\t0/\tc%d\t0]\r\n", EMPIRE_TERRITORY(emp, TER_TOTAL), land_can_claim(emp, TER_TOTAL), EMPIRE_TERRITORY(emp, TER_CITY), EMPIRE_TERRITORY(emp, TER_OUTSKIRTS), land_can_claim(emp, TER_OUTSKIRTS), EMPIRE_TERRITORY(emp, TER_FRONTIER), land_can_claim(emp, TER_FRONTIER));
+	build_page_display(ch, "Members: [\tc%d\t0/\tc%d\t0], Citizens: [\tc%d\t0], Military: [\tc%d\t0]", EMPIRE_MEMBERS(emp), EMPIRE_TOTAL_MEMBER_COUNT(emp), EMPIRE_POPULATION(emp), EMPIRE_MILITARY(emp));
+	build_page_display(ch, "Territory: [\tc%d\t0/\tc%d\t0], In-City: [\tc%d\t0], Outskirts: [\tc%d\t0/\tc%d\t0], Frontier: [\tc%d\t0/\tc%d\t0]", EMPIRE_TERRITORY(emp, TER_TOTAL), land_can_claim(emp, TER_TOTAL), EMPIRE_TERRITORY(emp, TER_CITY), EMPIRE_TERRITORY(emp, TER_OUTSKIRTS), land_can_claim(emp, TER_OUTSKIRTS), EMPIRE_TERRITORY(emp, TER_FRONTIER), land_can_claim(emp, TER_FRONTIER));
 
-	msg_to_char(ch, "Wealth: [\ty%d\t0], Treasure: [\ty%d\t0], Coins: [\ty%.1f\t0]\r\n", (int) GET_TOTAL_WEALTH(emp), EMPIRE_WEALTH(emp), EMPIRE_COINS(emp));
-	msg_to_char(ch, "Greatness: [\tc%d\t0], Fame: [\tc%d\t0]\r\n", EMPIRE_GREATNESS(emp), EMPIRE_FAME(emp));
+	build_page_display(ch, "Wealth: [\ty%d\t0], Treasure: [\ty%d\t0], Coins: [\ty%.1f\t0]", (int) GET_TOTAL_WEALTH(emp), EMPIRE_WEALTH(emp), EMPIRE_COINS(emp));
+	build_page_display(ch, "Greatness: [\tc%d\t0], Fame: [\tc%d\t0]", EMPIRE_GREATNESS(emp), EMPIRE_FAME(emp));
 	
 	// progress points by category
 	total = 0;
+	pline = build_page_display_str(ch, "");
 	for (iter = 1; iter < NUM_PROGRESS_TYPES; ++iter) {
 		total += EMPIRE_PROGRESS_POINTS(emp, iter);
-		msg_to_char(ch, "%s: [\ty%d\t0], ", progress_types[iter], EMPIRE_PROGRESS_POINTS(emp, iter));
+		append_page_display_line(pline, "%s: [\ty%d\t0], ", progress_types[iter], EMPIRE_PROGRESS_POINTS(emp, iter));
 	}
-	msg_to_char(ch, "Total: [\ty%d\t0]\r\n", total);
+	append_page_display_line(pline, "Total: [\ty%d\t0]", total);
 	
 	// attributes
+	pline = build_page_display_str(ch, "");
 	for (iter = 0, len = 0; iter < NUM_EMPIRE_ATTRIBUTES; ++iter) {
 		switch (iter) {
 			case EATT_TERRITORY_PER_GREATNESS: {
@@ -3831,25 +3853,24 @@ void do_stat_empire(char_data *ch, empire_data *emp) {
 		}
 		
 		if (len > 0 && len + strlen(line) + 2 >= 80) {	// start new line
-			msg_to_char(ch, "\r\n%s", line);
+			append_page_display_line(pline, "\r\n%s", line);
 			len = strlen(line);
 		}
 		else {	// same line
-			msg_to_char(ch, "%s%s", (len > 0) ? ", " : "", line);
+			append_page_display_line(pline, "%s%s", (len > 0) ? ", " : "", line);
 			len += strlen(line) + 2;
 		}
 	}
-	if (len > 0) {
-		msg_to_char(ch, "\r\n");
-	}
 	
-	msg_to_char(ch, "Script information:\r\n");
+	build_page_display_str(ch, "Script information:");
 	if (SCRIPT(emp)) {
 		script_stat(ch, SCRIPT(emp));
 	}
 	else {
-		msg_to_char(ch, "  None.\r\n");
+		build_page_display_str(ch, "  None.");
 	}
+	
+	send_page_display(ch);
 }
 
 
@@ -3863,58 +3884,59 @@ void do_stat_global(char_data *ch, struct global_data *glb) {
 	char buf[MAX_STRING_LENGTH], buf2[MAX_STRING_LENGTH];
 	ability_data *abil;
 	
-	msg_to_char(ch, "Global VNum: [&c%d&0], Type: [&c%s&0], Name: '&c%s&0'\r\n", GET_GLOBAL_VNUM(glb), global_types[GET_GLOBAL_TYPE(glb)], GET_GLOBAL_NAME(glb));
+	build_page_display(ch, "Global VNum: [&c%d&0], Type: [&c%s&0], Name: '&c%s&0'", GET_GLOBAL_VNUM(glb), global_types[GET_GLOBAL_TYPE(glb)], GET_GLOBAL_NAME(glb));
 
 	sprintf(buf, "%s", (GET_GLOBAL_ABILITY(glb) == NO_ABIL ? "none" : get_ability_name_by_vnum(GET_GLOBAL_ABILITY(glb))));
 	if ((abil = find_ability_by_vnum(GET_GLOBAL_ABILITY(glb))) && ABIL_ASSIGNED_SKILL(abil) != NULL) {
 		sprintf(buf + strlen(buf), " (%s %d)", SKILL_ABBREV(ABIL_ASSIGNED_SKILL(abil)), ABIL_SKILL_LEVEL(abil));
 	}
-	msg_to_char(ch, "Requires ability: [&y%s&0], Percent: [&g%.2f&0]\r\n", buf, GET_GLOBAL_PERCENT(glb));
+	build_page_display(ch, "Requires ability: [&y%s&0], Percent: [&g%.2f&0]", buf, GET_GLOBAL_PERCENT(glb));
 	
 	sprintbit(GET_GLOBAL_FLAGS(glb), global_flags, buf, TRUE);
-	msg_to_char(ch, "Flags: &g%s&0\r\n", buf);
+	build_page_display(ch, "Flags: &g%s&0", buf);
 	
 	// GLOBAL_x
 	switch (GET_GLOBAL_TYPE(glb)) {
 		case GLOBAL_MOB_INTERACTIONS: {
 			sprintbit(GET_GLOBAL_TYPE_FLAGS(glb), action_bits, buf, TRUE);
 			sprintbit(GET_GLOBAL_TYPE_EXCLUDE(glb), action_bits, buf2, TRUE);
-			msg_to_char(ch, "Levels: [&g%s&0], Mob Flags: &c%s&0, Exclude: &c%s&0\r\n", level_range_string(GET_GLOBAL_MIN_LEVEL(glb), GET_GLOBAL_MAX_LEVEL(glb), 0), buf, buf2);
+			build_page_display(ch, "Levels: [&g%s&0], Mob Flags: &c%s&0, Exclude: &c%s&0", level_range_string(GET_GLOBAL_MIN_LEVEL(glb), GET_GLOBAL_MAX_LEVEL(glb), 0), buf, buf2);
 			break;
 		}
 		case GLOBAL_OBJ_INTERACTIONS: {
 			sprintbit(GET_GLOBAL_TYPE_FLAGS(glb), extra_bits, buf, TRUE);
 			sprintbit(GET_GLOBAL_TYPE_EXCLUDE(glb), extra_bits, buf2, TRUE);
-			msg_to_char(ch, "Levels: [&g%s&0], Obj Flags: &c%s&0, Exclude: &c%s&0\r\n", level_range_string(GET_GLOBAL_MIN_LEVEL(glb), GET_GLOBAL_MAX_LEVEL(glb), 0), buf, buf2);
+			build_page_display(ch, "Levels: [&g%s&0], Obj Flags: &c%s&0, Exclude: &c%s&0", level_range_string(GET_GLOBAL_MIN_LEVEL(glb), GET_GLOBAL_MAX_LEVEL(glb), 0), buf, buf2);
 			break;
 		}
 		case GLOBAL_MINE_DATA: {
 			sprintbit(GET_GLOBAL_TYPE_FLAGS(glb), sector_flags, buf, TRUE);
 			sprintbit(GET_GLOBAL_TYPE_EXCLUDE(glb), sector_flags, buf2, TRUE);
-			msg_to_char(ch, "Capacity: [&g%d-%d normal, %d-%d deep&0], Sector Flags: &c%s&0, Exclude: &c%s&0\r\n", GET_GLOBAL_VAL(glb, GLB_VAL_MAX_MINE_SIZE)/2, GET_GLOBAL_VAL(glb, GLB_VAL_MAX_MINE_SIZE), (int)(GET_GLOBAL_VAL(glb, GLB_VAL_MAX_MINE_SIZE) / 2.0 * 1.5), (int)(GET_GLOBAL_VAL(glb, GLB_VAL_MAX_MINE_SIZE) * 1.5), buf, buf2);
+			build_page_display(ch, "Capacity: [&g%d-%d normal, %d-%d deep&0], Sector Flags: &c%s&0, Exclude: &c%s&0", GET_GLOBAL_VAL(glb, GLB_VAL_MAX_MINE_SIZE)/2, GET_GLOBAL_VAL(glb, GLB_VAL_MAX_MINE_SIZE), (int)(GET_GLOBAL_VAL(glb, GLB_VAL_MAX_MINE_SIZE) / 2.0 * 1.5), (int)(GET_GLOBAL_VAL(glb, GLB_VAL_MAX_MINE_SIZE) * 1.5), buf, buf2);
 			break;
 		}
 		case GLOBAL_NEWBIE_GEAR: {
-			get_archetype_gear_display(GET_GLOBAL_GEAR(glb), buf2);
-			msg_to_char(ch, "Gear:\r\n%s", buf2);
+			build_page_display_str(ch, "Gear:");
+			show_archetype_gear_display(ch, GET_GLOBAL_GEAR(glb), FALSE);
 			break;
 		}
 		case GLOBAL_MAP_SPAWNS: {
 			ordered_sprintbit(GET_GLOBAL_TYPE_FLAGS(glb), climate_flags, climate_flags_order, TRUE, buf);
 			ordered_sprintbit(GET_GLOBAL_TYPE_EXCLUDE(glb), climate_flags, climate_flags_order, TRUE, buf2);
-			msg_to_char(ch, "Climate: &c%s&0 (Exclude: &c%s&0)\r\n", buf, buf2);
+			build_page_display(ch, "Climate: &c%s&0 (Exclude: &c%s&0)", buf, buf2);
 			sprintbit(GET_GLOBAL_SPARE_BITS(glb), spawn_flags, buf, TRUE);
-			msg_to_char(ch, "Spawn flags: &g%s&0\r\n", buf);
-			show_spawn_summary_to_char(ch, GET_GLOBAL_SPAWNS(glb));
+			build_page_display(ch, "Spawn flags: &g%s&0", buf);
+			show_spawn_summary_display(ch, TRUE, GET_GLOBAL_SPAWNS(glb));
 			break;
 		}
 	}
 	
 	if (GET_GLOBAL_INTERACTIONS(glb)) {
-		send_to_char("Interactions:\r\n", ch);
-		get_interaction_display(GET_GLOBAL_INTERACTIONS(glb), buf);
-		send_to_char(buf, ch);
+		build_page_display_str(ch, "Interactions:");
+		show_interaction_display(ch, GET_GLOBAL_INTERACTIONS(glb), FALSE);
 	}
+	
+	send_page_display(ch);
 }
 
 
@@ -3937,8 +3959,9 @@ void do_stat_object(char_data *ch, obj_data *j, bool details) {
 	player_index_data *index;
 	crop_data *cp;
 	bool any;
+	struct page_display *line;
 
-	msg_to_char(ch, "Name: '&y%s&0', Keywords: %s\r\n", GET_OBJ_DESC(j, ch, OBJ_DESC_SHORT), GET_OBJ_KEYWORDS(j));
+	build_page_display(ch, "Name: '&y%s&0', Keywords: %s", GET_OBJ_DESC(j, ch, OBJ_DESC_SHORT), GET_OBJ_KEYWORDS(j));
 
 	if (GET_OBJ_CURRENT_SCALE_LEVEL(j) > 0) {
 		sprintf(buf, " (%d)", GET_OBJ_CURRENT_SCALE_LEVEL(j));
@@ -3950,11 +3973,11 @@ void do_stat_object(char_data *ch, obj_data *j, bool details) {
 		strcpy(buf, " (no scale limit)");
 	}
 	
-	msg_to_char(ch, "Gear rating: [&g%.2f%s&0], VNum: [&g%5d&0], Type: &c%s&0\r\n", rate_item(j), buf, vnum, item_types[(int) GET_OBJ_TYPE(j)]);
-	msg_to_char(ch, "L-Des: %s\r\n", GET_OBJ_DESC(j, ch, OBJ_DESC_LONG));
+	build_page_display(ch, "Gear rating: [&g%.2f%s&0], VNum: [&g%5d&0], Type: &c%s&0", rate_item(j), buf, vnum, item_types[(int) GET_OBJ_TYPE(j)]);
+	build_page_display(ch, "L-Des: %s", GET_OBJ_DESC(j, ch, OBJ_DESC_LONG));
 	
 	if (GET_OBJ_ACTION_DESC(j)) {
-		msg_to_char(ch, "%s", GET_OBJ_ACTION_DESC(j));
+		build_page_display_str(ch, NULLSAFE(GET_OBJ_ACTION_DESC(j)));
 	}
 
 	*buf = 0;
@@ -3962,9 +3985,9 @@ void do_stat_object(char_data *ch, obj_data *j, bool details) {
 		struct extra_descr_data *desc;
 		
 		if (details) {
-			msg_to_char(ch, "Extra descs:\r\n");
+			build_page_display(ch, "Extra descs:");
 			LL_FOREACH(GET_OBJ_EX_DESCS(j), desc) {
-				msg_to_char(ch, "[ &c%s&0 ]\r\n%s", desc->keyword, desc->description);
+				build_page_display(ch, "[ &c%s&0 ]\r\n%s", desc->keyword, desc->description);
 			}
 		}
 		else {
@@ -3973,37 +3996,37 @@ void do_stat_object(char_data *ch, obj_data *j, bool details) {
 				strcat(buf, " ");
 				strcat(buf, desc->keyword);
 			}
-			send_to_char(strcat(buf, "&0\r\n"), ch);
+			build_page_display(ch, "%s&0", buf);
 		}
 	}
 	
 	sprintbit(GET_OBJ_WEAR(j), wear_bits, buf, TRUE);
-	msg_to_char(ch, "Can be worn on: &g%s&0\r\n", buf);
+	build_page_display(ch, "Can be worn on: &g%s&0", buf);
 
 	sprintbit(GET_OBJ_AFF_FLAGS(j), affected_bits, buf, TRUE);
-	msg_to_char(ch, "Set char bits : &y%s&0\r\n", buf);
+	build_page_display(ch, "Set char bits : &y%s&0", buf);
 
 	sprintbit(GET_OBJ_EXTRA(j), extra_bits, buf, TRUE);
-	msg_to_char(ch, "Extra flags   : &g%s&0\r\n", buf);
+	build_page_display(ch, "Extra flags   : &g%s&0", buf);
 	
 	prettier_sprintbit(GET_OBJ_TOOL_FLAGS(j), tool_flags, buf);
-	msg_to_char(ch, "Tool types: &y%s&0\r\n", buf);
+	build_page_display(ch, "Tool types: &y%s&0", buf);
 	
 	prettier_sprintbit(GET_OBJ_REQUIRES_TOOL(j), tool_flags, buf);
-	msg_to_char(ch, "Requires tool to use when crafting: \tg%s\t0\r\n", buf);
+	build_page_display(ch, "Requires tool to use when crafting: \tg%s\t0", buf);
 	
 	if (GET_OBJ_TIMER(j) > 0) {
 		minutes = GET_OBJ_TIMER(j) * SECS_PER_MUD_HOUR / SECS_PER_REAL_MIN;
-		snprintf(part, sizeof(part), "%d tick%s (%s%s)", GET_OBJ_TIMER(j), PLURAL(GET_OBJ_TIMER(j)), colon_time(minutes, TRUE, NULL), GET_OBJ_TIMER(j) < 60 ? " minutes" : "");
+		safe_snprintf(part, sizeof(part), "%d tick%s (%s%s)", GET_OBJ_TIMER(j), PLURAL(GET_OBJ_TIMER(j)), colon_time(minutes, TRUE, NULL), GET_OBJ_TIMER(j) < 60 ? " minutes" : "");
 	}
 	else {
 		strcpy(part, "none");
 	}
 	
-	msg_to_char(ch, "Timer: &y%s&0, Material: &y%s&0, Component type: [&y%d&0] &y%s&0\r\n", part, materials[GET_OBJ_MATERIAL(j)].name, GET_OBJ_COMPONENT(j), GET_OBJ_COMPONENT(j) != NOTHING ? get_generic_name_by_vnum(GET_OBJ_COMPONENT(j)) : "none");
+	build_page_display(ch, "Timer: &y%s&0, Material: &y%s&0, Component type: [&y%d&0] &y%s&0", part, materials[GET_OBJ_MATERIAL(j)].name, GET_OBJ_COMPONENT(j), GET_OBJ_COMPONENT(j) != NOTHING ? get_generic_name_by_vnum(GET_OBJ_COMPONENT(j)) : "none");
 	
 	if (GET_OBJ_REQUIRES_QUEST(j) != NOTHING) {
-		msg_to_char(ch, "Requires quest: [%d] &c%s&0\r\n", GET_OBJ_REQUIRES_QUEST(j), get_quest_name_by_proto(GET_OBJ_REQUIRES_QUEST(j)));
+		build_page_display(ch, "Requires quest: [%d] &c%s&0", GET_OBJ_REQUIRES_QUEST(j), get_quest_name_by_proto(GET_OBJ_REQUIRES_QUEST(j)));
 	}
 	
 	strcpy(buf, "In room: ");
@@ -4027,169 +4050,168 @@ void do_stat_object(char_data *ch, obj_data *j, bool details) {
 	strcat(buf, ", Worn by: ");
 	strcat(buf, j->worn_by ? GET_NAME(j->worn_by) : "Nobody");
 	strcat(buf, "\r\n");
-	send_to_char(buf, ch);
+	build_page_display_str(ch, buf);
 	
 	// binding section
 	if (OBJ_BOUND_TO(j)) {
 		struct obj_binding *bind;
 		
-		msg_to_char(ch, "Bound to:");
+		line = build_page_display(ch, "Bound to:");
 		any = FALSE;
 		for (bind = OBJ_BOUND_TO(j); bind; bind = bind->next) {
-			msg_to_char(ch, "%s %s", (any ? "," : ""), (index = find_player_index_by_idnum(bind->idnum)) ? index->fullname : "<unknown>");
+			append_page_display_line(line, "%s %s", (any ? "," : ""), (index = find_player_index_by_idnum(bind->idnum)) ? index->fullname : "<unknown>");
 			any = TRUE;
 		}
-		msg_to_char(ch, "\r\n");
 	}
 	
 	// ITEM_X: stat obj
 	switch (GET_OBJ_TYPE(j)) {
 		case ITEM_BOOK: {
 			book_data *book = book_proto(GET_BOOK_ID(j));
-			msg_to_char(ch, "Book: %d - %s\r\n", GET_BOOK_ID(j), (book ? BOOK_TITLE(book) : "unknown"));
+			build_page_display(ch, "Book: %d - %s", GET_BOOK_ID(j), (book ? BOOK_TITLE(book) : "unknown"));
 			break;
 		}
 		case ITEM_POISON: {
-			msg_to_char(ch, "Poison affect type: [%d] %s\r\n", GET_POISON_AFFECT(j), GET_POISON_AFFECT(j) != NOTHING ? get_generic_name_by_vnum(GET_POISON_AFFECT(j)) : "not custom");
-			msg_to_char(ch, "Charges remaining: %d\r\n", GET_POISON_CHARGES(j));
+			build_page_display(ch, "Poison affect type: [%d] %s", GET_POISON_AFFECT(j), GET_POISON_AFFECT(j) != NOTHING ? get_generic_name_by_vnum(GET_POISON_AFFECT(j)) : "not custom");
+			build_page_display(ch, "Charges remaining: %d", GET_POISON_CHARGES(j));
 			break;
 		}
 		case ITEM_RECIPE: {
 			craft_data *cft = craft_proto(GET_RECIPE_VNUM(j));
-			msg_to_char(ch, "Teaches craft: %d %s (%s)\r\n", GET_RECIPE_VNUM(j), cft ? GET_CRAFT_NAME(cft) : "UNKNOWN", cft ? craft_types[GET_CRAFT_TYPE(cft)] : "?");
+			build_page_display(ch, "Teaches craft: %d %s (%s)", GET_RECIPE_VNUM(j), cft ? GET_CRAFT_NAME(cft) : "UNKNOWN", cft ? craft_types[GET_CRAFT_TYPE(cft)] : "?");
 			break;
 		}
 		case ITEM_WEAPON:
-			msg_to_char(ch, "Speed: %.2f, Damage: %d (%s+%.2f base dps)\r\n", get_weapon_speed(j), GET_WEAPON_DAMAGE_BONUS(j), (IS_MAGIC_ATTACK(GET_WEAPON_TYPE(j)) ? "Intelligence" : "Strength"), get_base_dps(j));
-			msg_to_char(ch, "Damage type: %d %s (%s/%s)\r\n", GET_WEAPON_TYPE(j), get_attack_name_by_vnum(GET_WEAPON_TYPE(j)), weapon_types[get_attack_weapon_type_by_vnum(GET_WEAPON_TYPE(j))], damage_types[get_attack_damage_type_by_vnum(GET_WEAPON_TYPE(j))]);
+			build_page_display(ch, "Speed: %.2f, Damage: %d (%s+%.2f base dps)", get_weapon_speed(j), GET_WEAPON_DAMAGE_BONUS(j), (IS_MAGIC_ATTACK(GET_WEAPON_TYPE(j)) ? "Intelligence" : "Strength"), get_base_dps(j));
+			build_page_display(ch, "Damage type: %d %s (%s/%s)", GET_WEAPON_TYPE(j), get_attack_name_by_vnum(GET_WEAPON_TYPE(j)), weapon_types[get_attack_weapon_type_by_vnum(GET_WEAPON_TYPE(j))], damage_types[get_attack_damage_type_by_vnum(GET_WEAPON_TYPE(j))]);
 			break;
 		case ITEM_ARMOR:
-			msg_to_char(ch, "Armor type: %s\r\n", armor_types[GET_ARMOR_TYPE(j)]);
+			build_page_display(ch, "Armor type: %s", armor_types[GET_ARMOR_TYPE(j)]);
 			break;
 		case ITEM_CONTAINER:
-			msg_to_char(ch, "Holds: %d items\r\n", GET_MAX_CONTAINER_CONTENTS(j));
+			build_page_display(ch, "Holds: %d items", GET_MAX_CONTAINER_CONTENTS(j));
 
 			sprintbit(GET_CONTAINER_FLAGS(j), container_bits, buf, TRUE);
-			msg_to_char(ch, "Flags: %s\r\n", buf);
+			build_page_display(ch, "Flags: %s", buf);
 			break;
 		case ITEM_DRINKCON:
-			msg_to_char(ch, "Contains: %d/%d drinks of %s\r\n", GET_DRINK_CONTAINER_CONTENTS(j), GET_DRINK_CONTAINER_CAPACITY(j), get_generic_string_by_vnum(GET_DRINK_CONTAINER_TYPE(j), GENERIC_LIQUID, GSTR_LIQUID_NAME));
+			build_page_display(ch, "Contains: %d/%d drinks of %s", GET_DRINK_CONTAINER_CONTENTS(j), GET_DRINK_CONTAINER_CAPACITY(j), get_generic_string_by_vnum(GET_DRINK_CONTAINER_TYPE(j), GENERIC_LIQUID, GSTR_LIQUID_NAME));
 			break;
 		case ITEM_FOOD:
-			msg_to_char(ch, "Fills for: %d hour%s\r\n", GET_FOOD_HOURS_OF_FULLNESS(j), PLURAL(GET_FOOD_HOURS_OF_FULLNESS(j)));
+			build_page_display(ch, "Fills for: %d hour%s", GET_FOOD_HOURS_OF_FULLNESS(j), PLURAL(GET_FOOD_HOURS_OF_FULLNESS(j)));
 			break;
 		case ITEM_CORPSE:
-			msg_to_char(ch, "Corpse of: ");
+			line = build_page_display(ch, "Corpse of: ");
 
 			if (IS_NPC_CORPSE(j)) {
-				msg_to_char(ch, "[%d] %s\r\n", GET_CORPSE_NPC_VNUM(j), get_mob_name_by_proto(GET_CORPSE_NPC_VNUM(j), FALSE));
+				append_page_display_line(line, "[%d] %s", GET_CORPSE_NPC_VNUM(j), get_mob_name_by_proto(GET_CORPSE_NPC_VNUM(j), FALSE));
 			}
 			else if (IS_PC_CORPSE(j)) {
-				msg_to_char(ch, "[%d] %s\r\n", GET_CORPSE_PC_ID(j), (index = find_player_index_by_idnum(GET_CORPSE_PC_ID(j))) ? index->fullname : "a player");
+				append_page_display_line(line, "[%d] %s", GET_CORPSE_PC_ID(j), (index = find_player_index_by_idnum(GET_CORPSE_PC_ID(j))) ? index->fullname : "a player");
 			}
 			else {
-				msg_to_char(ch, "unknown\r\n");
+				append_page_display_line(line, "unknown");
 			}
 			
 			sprintbit(GET_CORPSE_FLAGS(j), corpse_flags, buf, TRUE);
-			msg_to_char(ch, "Corpse flags: %s\r\n", buf);
-			msg_to_char(ch, "Corpse size: %s\r\n", size_types[GET_CORPSE_SIZE(j)]);
+			build_page_display(ch, "Corpse flags: %s", buf);
+			build_page_display(ch, "Corpse size: %s", size_types[GET_CORPSE_SIZE(j)]);
 			break;
 		case ITEM_COINS: {
-			msg_to_char(ch, "Amount: %s\r\n", money_amount(real_empire(GET_COINS_EMPIRE_ID(j)), GET_COINS_AMOUNT(j)));
+			build_page_display(ch, "Amount: %s", money_amount(real_empire(GET_COINS_EMPIRE_ID(j)), GET_COINS_AMOUNT(j)));
 			break;
 		}
 		case ITEM_CURRENCY: {
-			msg_to_char(ch, "Amount: %d %s\r\n", GET_CURRENCY_AMOUNT(j), get_generic_string_by_vnum(GET_CURRENCY_VNUM(j), GENERIC_CURRENCY, WHICH_CURRENCY(GET_CURRENCY_AMOUNT(j))));
+			build_page_display(ch, "Amount: %d %s", GET_CURRENCY_AMOUNT(j), get_generic_string_by_vnum(GET_CURRENCY_VNUM(j), GENERIC_CURRENCY, WHICH_CURRENCY(GET_CURRENCY_AMOUNT(j))));
 			break;
 		}
 		case ITEM_MISSILE_WEAPON:
-			msg_to_char(ch, "Speed: %.2f, Damage: %d (%s+%.2f base dps)\r\n", get_weapon_speed(j), GET_MISSILE_WEAPON_DAMAGE(j), (IS_MAGIC_ATTACK(GET_MISSILE_WEAPON_TYPE(j)) ? "Intelligence" : "Strength"), get_base_dps(j));
-			msg_to_char(ch, "Damage type: %s\r\n", get_attack_name_by_vnum(GET_MISSILE_WEAPON_TYPE(j)));
-			msg_to_char(ch, "Ammo type: %c\r\n", 'A' + GET_MISSILE_WEAPON_AMMO_TYPE(j));
+			build_page_display(ch, "Speed: %.2f, Damage: %d (%s+%.2f base dps)", get_weapon_speed(j), GET_MISSILE_WEAPON_DAMAGE(j), (IS_MAGIC_ATTACK(GET_MISSILE_WEAPON_TYPE(j)) ? "Intelligence" : "Strength"), get_base_dps(j));
+			build_page_display(ch, "Damage type: %s", get_attack_name_by_vnum(GET_MISSILE_WEAPON_TYPE(j)));
+			build_page_display(ch, "Ammo type: %c", 'A' + GET_MISSILE_WEAPON_AMMO_TYPE(j));
 			break;
 		case ITEM_AMMO:
 			if (GET_AMMO_QUANTITY(j) > 0) {
-				msg_to_char(ch, "Quantity: %d\r\n", GET_AMMO_QUANTITY(j));
+				build_page_display(ch, "Quantity: %d", GET_AMMO_QUANTITY(j));
 			}
 			if (GET_AMMO_DAMAGE_BONUS(j) > 0) {
-				msg_to_char(ch, "Damage: %+d\r\n", GET_AMMO_DAMAGE_BONUS(j));
+				build_page_display(ch, "Damage: %+d", GET_AMMO_DAMAGE_BONUS(j));
 			}
-			msg_to_char(ch, "Ammo type: %c\r\n", 'A' + GET_AMMO_TYPE(j));
+			build_page_display(ch, "Ammo type: %c", 'A' + GET_AMMO_TYPE(j));
 			if (GET_OBJ_AFF_FLAGS(j) || GET_OBJ_APPLIES(j)) {
 				generic_data *aftype = find_generic(GET_OBJ_VNUM(j), GENERIC_AFFECT);
-				msg_to_char(ch, "Debuff name: %s\r\n", aftype ? GEN_NAME(aftype) : get_generic_name_by_vnum(ATYPE_RANGED_WEAPON));
+				build_page_display(ch, "Debuff name: %s", aftype ? GEN_NAME(aftype) : get_generic_name_by_vnum(ATYPE_RANGED_WEAPON));
 			}
 			break;
 		case ITEM_PACK: {
-			msg_to_char(ch, "Adds inventory space: %d\r\n", GET_PACK_CAPACITY(j));
+			build_page_display(ch, "Adds inventory space: %d", GET_PACK_CAPACITY(j));
 			break;
 		}
 		case ITEM_PORTAL:
 			if (j != obj_proto(GET_OBJ_VNUM(j))) {
-				msg_to_char(ch, "Portal destination: ");
+				line = build_page_display(ch, "Portal destination: ");
 				room = real_room(GET_PORTAL_TARGET_VNUM(j));
 				if (!room) {
-					msg_to_char(ch, "None\r\n");
+					append_page_display_line(line, "None");
 				}
 				else {
-					msg_to_char(ch, "%d - %s\r\n", GET_PORTAL_TARGET_VNUM(j), get_room_name(room, FALSE));
+					append_page_display_line(line, "%d - %s", GET_PORTAL_TARGET_VNUM(j), get_room_name(room, FALSE));
 				}
 			}
 			else {
 				// vstat -- just show target
-				msg_to_char(ch, "%d", GET_PORTAL_TARGET_VNUM(j));
+				build_page_display(ch, "Portal destination: %d", GET_PORTAL_TARGET_VNUM(j));
 			}
 			break;
 		case ITEM_PAINT: {
 			sprinttype(GET_PAINT_COLOR(j), paint_names, buf, sizeof(buf), "UNDEFINED");
 			sprinttype(GET_PAINT_COLOR(j), paint_colors, part, sizeof(part), "&0");
-			msg_to_char(ch, "Paint color: %s%s\t0\r\n", part, buf);
+			build_page_display(ch, "Paint color: %s%s\t0", part, buf);
 			break;
 		}
 		case ITEM_POTION: {
-			msg_to_char(ch, "Potion affect type: [%d] %s\r\n", GET_POTION_AFFECT(j), GET_POTION_AFFECT(j) != NOTHING ? get_generic_name_by_vnum(GET_POTION_AFFECT(j)) : "not custom");
-			msg_to_char(ch, "Potion cooldown: [%d] %s, %d second%s\r\n", GET_POTION_COOLDOWN_TYPE(j), GET_POTION_COOLDOWN_TYPE(j) != NOTHING ? get_generic_name_by_vnum(GET_POTION_COOLDOWN_TYPE(j)) : "no cooldown", GET_POTION_COOLDOWN_TIME(j), PLURAL(GET_POTION_COOLDOWN_TIME(j)));
+			build_page_display(ch, "Potion affect type: [%d] %s", GET_POTION_AFFECT(j), GET_POTION_AFFECT(j) != NOTHING ? get_generic_name_by_vnum(GET_POTION_AFFECT(j)) : "not custom");
+			build_page_display(ch, "Potion cooldown: [%d] %s, %d second%s", GET_POTION_COOLDOWN_TYPE(j), GET_POTION_COOLDOWN_TYPE(j) != NOTHING ? get_generic_name_by_vnum(GET_POTION_COOLDOWN_TYPE(j)) : "no cooldown", GET_POTION_COOLDOWN_TIME(j), PLURAL(GET_POTION_COOLDOWN_TIME(j)));
 			break;
 		}
 		case ITEM_WEALTH: {
 			sprintbit(GET_WEALTH_MINT_FLAGS(j), mint_flags, buf, TRUE);
-			msg_to_char(ch, "Wealth value: \ts%d\t0, flags: \tc%s\t0\r\n", GET_WEALTH_VALUE(j), buf);
+			build_page_display(ch, "Wealth value: \ts%d\t0, flags: \tc%s\t0", GET_WEALTH_VALUE(j), buf);
 			break;
 		}
 		case ITEM_LIGHTER: {
 			if (GET_LIGHTER_USES(j) == UNLIMITED) {
-				msg_to_char(ch, "Lighter uses: unlimited\r\n");
+				build_page_display(ch, "Lighter uses: unlimited");
 			}
 			else {
-				msg_to_char(ch, "Lighter uses: %d\r\n", GET_LIGHTER_USES(j));
+				build_page_display(ch, "Lighter uses: %d", GET_LIGHTER_USES(j));
 			}
 			break;
 		}
 		case ITEM_MINIPET: {
-			msg_to_char(ch, "Minipet: [%d] %s\r\n", GET_MINIPET_VNUM(j), get_mob_name_by_proto(GET_MINIPET_VNUM(j), FALSE));
+			build_page_display(ch, "Minipet: [%d] %s", GET_MINIPET_VNUM(j), get_mob_name_by_proto(GET_MINIPET_VNUM(j), FALSE));
 			break;
 		}
 		case ITEM_LIGHT: {
 			if (GET_LIGHT_HOURS_REMAINING(j) == UNLIMITED) {
-				snprintf(part, sizeof(part), "unlimited light");
+				safe_snprintf(part, sizeof(part), "unlimited light");
 			}
 			else {
-				snprintf(part, sizeof(part), "%d hour%s remaining", GET_LIGHT_HOURS_REMAINING(j), PLURAL(GET_LIGHT_HOURS_REMAINING(j)));
+				safe_snprintf(part, sizeof(part), "%d hour%s remaining", GET_LIGHT_HOURS_REMAINING(j), PLURAL(GET_LIGHT_HOURS_REMAINING(j)));
 			}
 			sprintbit(GET_LIGHT_FLAGS(j), light_flags, buf, TRUE);
-			msg_to_char(ch, "Light: \tc%s\t0 (\tc%s\t0), flags: \tc%s\t0\r\n", part, (GET_LIGHT_IS_LIT(j) ? "lit" : "unlit"), buf);
+			build_page_display(ch, "Light: \tc%s\t0 (\tc%s\t0), flags: \tc%s\t0", part, (GET_LIGHT_IS_LIT(j) ? "lit" : "unlit"), buf);
 			break;
 		}
 		default:
-			msg_to_char(ch, "Values 0-2: [&g%d&0] [&g%d&0] [&g%d&0]\r\n", GET_OBJ_VAL(j, 0), GET_OBJ_VAL(j, 1), GET_OBJ_VAL(j, 2));
+			build_page_display(ch, "Values 0-2: [&g%d&0] [&g%d&0] [&g%d&0]", GET_OBJ_VAL(j, 0), GET_OBJ_VAL(j, 1), GET_OBJ_VAL(j, 2));
 			break;
 	}
 	
 	// data that isn't type-based:
 	if (OBJ_FLAGGED(j, OBJ_PLANTABLE) && (cp = crop_proto(GET_OBJ_VAL(j, VAL_FOOD_CROP_TYPE)))) {
 		ordered_sprintbit(GET_CROP_CLIMATE(cp), climate_flags, climate_flags_order, CROP_FLAGGED(cp, CROPF_ANY_LISTED_CLIMATE) ? TRUE : FALSE, buf);
-		msg_to_char(ch, "Plants [%d] %s (%s%s).\r\n", GET_OBJ_VAL(j, VAL_FOOD_CROP_TYPE), GET_CROP_NAME(cp), GET_CROP_CLIMATE(cp) ? buf : "any climate", (CROP_FLAGGED(cp, CROPF_REQUIRES_WATER) ? "; must be near water" : ""));
+		build_page_display(ch, "Plants [%d] %s (%s%s).", GET_OBJ_VAL(j, VAL_FOOD_CROP_TYPE), GET_CROP_NAME(cp), GET_CROP_CLIMATE(cp) ? buf : "any climate", (CROP_FLAGGED(cp, CROPF_REQUIRES_WATER) ? "; must be near water" : ""));
 	}
 
 	/*
@@ -4198,26 +4220,32 @@ void do_stat_object(char_data *ch, obj_data *j, bool details) {
 	 */
 
 	if (j->contains) {
+		line = NULL;
 		sprintf(buf, "Contents:&g");
 		found = 0;
 		DL_FOREACH2(j->contains, j2, next_content) {
 			sprintf(buf2, "%s %s", found++ ? "," : "", GET_OBJ_DESC(j2, ch, OBJ_DESC_SHORT));
 			strcat(buf, buf2);
 			if (strlen(buf) >= 62) {
-				if (j2->next_content)
-					send_to_char(strcat(buf, ",\r\n"), ch);
-				else
-					send_to_char(strcat(buf, "\r\n"), ch);
+				if (j2->next_content) {
+					line = build_page_display(ch, "%s,", buf);
+				}
+				else {
+					line = build_page_display_str(ch, buf);
+				}
 				*buf = found = 0;
 			}
 		}
 
-		if (*buf)
-     		send_to_char(strcat(buf, "\r\n"), ch);
-		send_to_char("&0", ch);
+		if (*buf) {
+			line = build_page_display_str(ch, buf);
+     	}
+     	if (line) {
+     		append_page_display_line(line, "&0");
+		}
 	}
 	found = 0;
-	send_to_char("Applies:", ch);
+	line = build_page_display_str(ch, "Applies:");
 	for (apply = GET_OBJ_APPLIES(j); apply; apply = apply->next) {
 		if (apply->apply_type != APPLY_TYPE_NATURAL) {
 			sprintf(part, " (%s)", apply_type_names[(int)apply->apply_type]);
@@ -4225,24 +4253,23 @@ void do_stat_object(char_data *ch, obj_data *j, bool details) {
 		else {
 			*part = '\0';
 		}
-		msg_to_char(ch, "%s %+d to %s%s", found++ ? "," : "", apply->modifier, apply_types[(int) apply->location], part);
+		append_page_display_line(line, "%s %+d to %s%s", found++ ? "," : "", apply->modifier, apply_types[(int) apply->location], part);
 	}
-	if (!found)
-		send_to_char(" None", ch);
-
-	send_to_char("\r\n", ch);
+	if (!found) {
+		append_page_display_line(line, " None");
+	}
 	
 	if (GET_OBJ_STORAGE(j)) {
-		msg_to_char(ch, "Storage locations:");
+		line = build_page_display(ch, "Storage locations:");
 		
 		found = 0;
 		LL_FOREACH(GET_OBJ_STORAGE(j), store) {
 			// TYPE_x: storage type
 			if (store->type == TYPE_BLD) {
-				msg_to_char(ch, "%s[B%d] %s", (found++ > 0 ? ", " : " "), store->vnum, get_bld_name_by_proto(store->vnum));
+				append_page_display_line(line, "%s[B%d] %s", (found++ > 0 ? ", " : " "), store->vnum, get_bld_name_by_proto(store->vnum));
 			}
 			else if (store->type == TYPE_VEH) {
-				msg_to_char(ch, "%s[V%d] %s", (found++ > 0 ? ", " : " "), store->vnum, get_vehicle_name_by_proto(store->vnum));
+				append_page_display_line(line, "%s[V%d] %s", (found++ > 0 ? ", " : " "), store->vnum, get_vehicle_name_by_proto(store->vnum));
 			}
 			else {
 				// none?
@@ -4251,35 +4278,34 @@ void do_stat_object(char_data *ch, obj_data *j, bool details) {
 			
 			if (store->flags) {
 				sprintbit(store->flags, storage_bits, buf2, TRUE);
-				msg_to_char(ch, " ( %s)", buf2);
+				append_page_display_line(line, " ( %s)", buf2);
 			}
 		}
-		
-		msg_to_char(ch, "\r\n");
 	}
 	
 	if (GET_OBJ_INTERACTIONS(j)) {
-		send_to_char("Interactions:\r\n", ch);
-		get_interaction_display(GET_OBJ_INTERACTIONS(j), buf);
-		send_to_char(buf, ch);
+		build_page_display_str(ch, "Interactions:");
+		show_interaction_display(ch, GET_OBJ_INTERACTIONS(j), FALSE);
 	}
 	
 	if (GET_OBJ_CUSTOM_MSGS(j)) {
 		if (details) {
-			msg_to_char(ch, "Custom messages:\r\n");
+			build_page_display(ch, "Custom messages:");
 		
 			LL_FOREACH(GET_OBJ_CUSTOM_MSGS(j), ocm) {
-				msg_to_char(ch, " %s: %s\r\n", obj_custom_types[ocm->type], ocm->msg);
+				build_page_display(ch, " %s: %s", obj_custom_types[ocm->type], ocm->msg);
 			}
 		}
 		else {
 			LL_COUNT(GET_OBJ_CUSTOM_MSGS(j), ocm, count);
-			msg_to_char(ch, "Custom messages: %d\r\n", count);
+			build_page_display(ch, "Custom messages: %d", count);
 		}
 	}
 
 	/* check the object for a script */
 	do_sstat_object(ch, j);
+	
+	send_page_display(ch);
 }
 
 
@@ -4310,6 +4336,7 @@ void do_stat_room(char_data *ch) {
 	vehicle_data *veh;
 	struct string_hash *str_iter, *next_str, *str_hash = NULL;
 	size_t size;
+	struct page_display *line;
 	
 	if (ROOM_SECT_FLAGGED(IN_ROOM(ch), SECTF_HAS_CROP_DATA) && (cp = ROOM_CROP(IN_ROOM(ch)))) {
 		strcpy(buf2, GET_CROP_NAME(cp));
@@ -4328,82 +4355,80 @@ void do_stat_room(char_data *ch) {
 	}
 	
 	// title
-	msg_to_char(ch, "(%d, %d) %s\r\n", X_COORD(IN_ROOM(ch)), Y_COORD(IN_ROOM(ch)), get_room_name(IN_ROOM(ch), FALSE));
+	build_page_display(ch, "(%d, %d) %s", X_COORD(IN_ROOM(ch)), Y_COORD(IN_ROOM(ch)), get_room_name(IN_ROOM(ch), FALSE));
 	
 	// sector data
+	line = build_page_display_str(ch, "");
 	if (ROOM_SECT_FLAGGED(IN_ROOM(ch), SECTF_HAS_CROP_DATA) && (cp = ROOM_CROP(IN_ROOM(ch)))) {
-		msg_to_char(ch, "Crop: [\to%d\t0 - \to%s\t0], ", GET_CROP_VNUM(cp), GET_CROP_NAME(cp));
+		append_page_display_line(line, "Crop: [\to%d\t0 - \to%s\t0], ", GET_CROP_VNUM(cp), GET_CROP_NAME(cp));
 	}
-	msg_to_char(ch, "Sector: [\tc%d\t0 - \tc%s\t0]", GET_SECT_VNUM(SECT(IN_ROOM(ch))), GET_SECT_NAME(SECT(IN_ROOM(ch))));
-	msg_to_char(ch, ", Base: [\ty%d\t0 - \ty%s\t0]", GET_SECT_VNUM(BASE_SECT(IN_ROOM(ch))), GET_SECT_NAME(BASE_SECT(IN_ROOM(ch))));
+	append_page_display_line(line, "Sector: [\tc%d\t0 - \tc%s\t0]", GET_SECT_VNUM(SECT(IN_ROOM(ch))), GET_SECT_NAME(SECT(IN_ROOM(ch))));
+	append_page_display_line(line, ", Base: [\ty%d\t0 - \ty%s\t0]", GET_SECT_VNUM(BASE_SECT(IN_ROOM(ch))), GET_SECT_NAME(BASE_SECT(IN_ROOM(ch))));
 	if (GET_ROOM_VNUM(IN_ROOM(ch)) < MAP_SIZE && (map = &world_map[X_COORD(IN_ROOM(ch))][Y_COORD(IN_ROOM(ch))])) {
-		msg_to_char(ch, ", Natural: [\tg%d\t0 - \tg%s\t0]", GET_SECT_VNUM(map->natural_sector), GET_SECT_NAME(map->natural_sector));
+		append_page_display_line(line, ", Natural: [\tg%d\t0 - \tg%s\t0]", GET_SECT_VNUM(map->natural_sector), GET_SECT_NAME(map->natural_sector));
 	}
-	msg_to_char(ch, "\r\n");
 	
 	// building/room data
 	if (GET_ROOM_TEMPLATE(IN_ROOM(ch))) {
-		msg_to_char(ch, "Room template: [\to%d\t0 - \to%s\t0]\r\n", GET_RMT_VNUM(GET_ROOM_TEMPLATE(IN_ROOM(ch))), GET_RMT_TITLE(GET_ROOM_TEMPLATE(IN_ROOM(ch))));
+		build_page_display(ch, "Room template: [\to%d\t0 - \to%s\t0]", GET_RMT_VNUM(GET_ROOM_TEMPLATE(IN_ROOM(ch))), GET_RMT_TITLE(GET_ROOM_TEMPLATE(IN_ROOM(ch))));
 		if ((adv = get_adventure_for_vnum(GET_RMT_VNUM(GET_ROOM_TEMPLATE(IN_ROOM(ch)))))) {
-			msg_to_char(ch, "Adventure: [\to%d\t0 - \to%s\t0]\r\n", GET_ADV_VNUM(adv), GET_ADV_NAME(adv));
+			build_page_display(ch, "Adventure: [\to%d\t0 - \to%s\t0]", GET_ADV_VNUM(adv), GET_ADV_NAME(adv));
 		}
 	}
 	if (GET_BUILDING(IN_ROOM(ch))) {
-		msg_to_char(ch, "Building: [\to%d\t0 - \to%s\t0]\r\n", GET_BLD_VNUM(GET_BUILDING(IN_ROOM(ch))), GET_BLD_NAME(GET_BUILDING(IN_ROOM(ch))));
+		build_page_display(ch, "Building: [\to%d\t0 - \to%s\t0]", GET_BLD_VNUM(GET_BUILDING(IN_ROOM(ch))), GET_BLD_NAME(GET_BUILDING(IN_ROOM(ch))));
 	}
 	
-	msg_to_char(ch, "VNum: [\tg%d\t0], Lights: [\tg%d\t0], Island: [\tg%d\t0] %s, Height [\tg%d/%d\t0]\r\n", GET_ROOM_VNUM(IN_ROOM(ch)), ROOM_LIGHTS(IN_ROOM(ch)), GET_ISLAND_ID(IN_ROOM(ch)), GET_ISLAND(IN_ROOM(ch)) ? GET_ISLAND(IN_ROOM(ch))->name : "no island", ROOM_HEIGHT(IN_ROOM(ch)), get_room_blocking_height(IN_ROOM(ch), NULL));
+	build_page_display(ch, "VNum: [\tg%d\t0], Lights: [\tg%d\t0], Island: [\tg%d\t0] %s, Height [\tg%d/%d\t0]", GET_ROOM_VNUM(IN_ROOM(ch)), ROOM_LIGHTS(IN_ROOM(ch)), GET_ISLAND_ID(IN_ROOM(ch)), GET_ISLAND(IN_ROOM(ch)) ? GET_ISLAND(IN_ROOM(ch))->name : "no island", ROOM_HEIGHT(IN_ROOM(ch)), get_room_blocking_height(IN_ROOM(ch), NULL));
 	
 	// location/time data
 	if (X_COORD(IN_ROOM(ch)) != -1) {
 		tinfo = get_local_time(IN_ROOM(ch));
 		latitude = Y_TO_LATITUDE(Y_COORD(IN_ROOM(ch)));
 		longitude = X_TO_LONGITUDE(X_COORD(IN_ROOM(ch)));
-		msg_to_char(ch, "Globe: [\tc%.2f %s, %.2f %s\t0], Time: [\tc%d%s\t0], Sun: [\tc%s\t0], Hours of sun today: [\tc%.2f\t0]\r\n", ABSOLUTE(latitude), (latitude >= 0.0 ? "N" : "S"), ABSOLUTE(longitude), (longitude >= 0.0 ? "E" : "W"), TIME_TO_12H(tinfo.hours), AM_PM(tinfo.hours), sun_types[get_sun_status(IN_ROOM(ch))], get_hours_of_sun(IN_ROOM(ch)));
+		build_page_display(ch, "Globe: [\tc%.2f %s, %.2f %s\t0], Time: [\tc%d%s\t0], Sun: [\tc%s\t0], Hours of sun today: [\tc%.2f\t0]", ABSOLUTE(latitude), (latitude >= 0.0 ? "N" : "S"), ABSOLUTE(longitude), (longitude >= 0.0 ? "E" : "W"), TIME_TO_12H(tinfo.hours), AM_PM(tinfo.hours), sun_types[get_sun_status(IN_ROOM(ch))], get_hours_of_sun(IN_ROOM(ch)));
 		if ((zenith = get_zenith_days_from_solstice(IN_ROOM(ch))) != -1) {
-			msg_to_char(ch, "Zenith passage: [\tg%d day%s from the solstice\t0]\r\n", zenith, PLURAL(zenith));
+			build_page_display(ch, "Zenith passage: [\tg%d day%s from the solstice\t0]", zenith, PLURAL(zenith));
 		}
 	}
 	else {
-		msg_to_char(ch, "Globe: no data available (location is not on the map)\r\n");
+		build_page_display(ch, "Globe: no data available (location is not on the map)");
 	}
 	
 	// temperature info
-	msg_to_char(ch, "Temperature: \ty%d\t0 (\ty%s\t0), Season: \ty%s\t0\r\n", get_room_temperature(IN_ROOM(ch)), temperature_to_string(get_room_temperature(IN_ROOM(ch))), icon_types[GET_SEASON(IN_ROOM(ch))]);
+	build_page_display(ch, "Temperature: \ty%d\t0 (\ty%s\t0), Season: \ty%s\t0", get_room_temperature(IN_ROOM(ch)), temperature_to_string(get_room_temperature(IN_ROOM(ch))), icon_types[GET_SEASON(IN_ROOM(ch))]);
 	if (get_climate(IN_ROOM(ch)) != NOBITS) {
 		ordered_sprintbit(get_climate(IN_ROOM(ch)), climate_flags, climate_flags_order, FALSE, buf);
-		msg_to_char(ch, "Climate: \tc%s\t0\r\n", buf);
+		build_page_display(ch, "Climate: \tc%s\t0", buf);
 	}
 	
 	if (home != IN_ROOM(ch)) {
-		msg_to_char(ch, "Home room: &g%d&0 %s\r\n", GET_ROOM_VNUM(home), get_room_name(home, FALSE));
+		build_page_display(ch, "Home room: &g%d&0 %s", GET_ROOM_VNUM(home), get_room_name(home, FALSE));
 	}
 	
 	if (ROOM_CUSTOM_NAME(IN_ROOM(ch)) || ROOM_CUSTOM_ICON(IN_ROOM(ch)) || ROOM_CUSTOM_DESCRIPTION(IN_ROOM(ch))) {
-		msg_to_char(ch, "Custom:&y%s%s%s&0\r\n", ROOM_CUSTOM_NAME(IN_ROOM(ch)) ? " NAME" : "", ROOM_CUSTOM_ICON(IN_ROOM(ch)) ? " ICON" : "", ROOM_CUSTOM_DESCRIPTION(IN_ROOM(ch)) ? " DESCRIPTION" : "");
+		build_page_display(ch, "Custom:&y%s%s%s&0", ROOM_CUSTOM_NAME(IN_ROOM(ch)) ? " NAME" : "", ROOM_CUSTOM_ICON(IN_ROOM(ch)) ? " ICON" : "", ROOM_CUSTOM_DESCRIPTION(IN_ROOM(ch)) ? " DESCRIPTION" : "");
 	}
 
 	// ownership
 	if ((emp = ROOM_OWNER(home))) {
-		msg_to_char(ch, "Owner: %s%s&0", EMPIRE_BANNER(emp), EMPIRE_NAME(emp));
+		line = build_page_display(ch, "Owner: %s%s&0", EMPIRE_BANNER(emp), EMPIRE_NAME(emp));
 		if ((city = find_city(emp, IN_ROOM(ch)))) {
-			msg_to_char(ch, ", City: %s", city->name);
+			append_page_display_line(line, ", City: %s", city->name);
 		}
 		if (ROOM_PRIVATE_OWNER(home) != NOBODY) {
-			msg_to_char(ch, ", Home: %s", (index = find_player_index_by_idnum(ROOM_PRIVATE_OWNER(home))) ? index->fullname : "someone");
+			append_page_display_line(line, ", Home: %s", (index = find_player_index_by_idnum(ROOM_PRIVATE_OWNER(home))) ? index->fullname : "someone");
 		}
-		
-		send_to_char("\r\n", ch);
 	}
 
 	if (ROOM_AFF_FLAGS(IN_ROOM(ch))) {	
 		sprintbit(ROOM_AFF_FLAGS(IN_ROOM(ch)), room_aff_bits, buf2, TRUE);
-		msg_to_char(ch, "Status: &c%s&0\r\n", buf2);
+		build_page_display(ch, "Status: &c%s&0", buf2);
 	}
 	
 	if (COMPLEX_DATA(IN_ROOM(ch))) {
 		if (GET_INSIDE_ROOMS(home) > 0) {
-			msg_to_char(ch, "Designated rooms: %d\r\n", GET_INSIDE_ROOMS(home));
+			build_page_display(ch, "Designated rooms: %d", GET_INSIDE_ROOMS(home));
 		}
 		
 		if (IS_BURNING(home)) {
@@ -4412,15 +4437,15 @@ void do_stat_room(char_data *ch) {
 		else {
 			strcpy(buf2, "Not on fire");
 		}
-		msg_to_char(ch, "%s, Damage: %d/%d\r\n", buf2, (int) BUILDING_DAMAGE(home), GET_BUILDING(home) ? GET_BLD_MAX_DAMAGE(GET_BUILDING(home)) : 0);
+		build_page_display(ch, "%s, Damage: %d/%d", buf2, (int) BUILDING_DAMAGE(home), GET_BUILDING(home) ? GET_BLD_MAX_DAMAGE(GET_BUILDING(home)) : 0);
 	}
 
 	if (ROOM_SECT_FLAGGED(IN_ROOM(ch), SECTF_CAN_MINE) || room_has_function_and_city_ok(GET_LOYALTY(ch), IN_ROOM(ch), FNC_MINE)) {
 		if (get_room_extra_data(IN_ROOM(ch), ROOM_EXTRA_MINE_GLB_VNUM) <= 0 || !(glb = global_proto(get_room_extra_data(IN_ROOM(ch), ROOM_EXTRA_MINE_GLB_VNUM))) || GET_GLOBAL_TYPE(glb) != GLOBAL_MINE_DATA) {
-			msg_to_char(ch, "This area is unmined.\r\n");
+			build_page_display(ch, "This area is unmined.");
 		}
 		else {
-			msg_to_char(ch, "Mine type: %s, Amount remaining: %d\r\n", GET_GLOBAL_NAME(glb), get_room_extra_data(IN_ROOM(ch), ROOM_EXTRA_MINE_AMOUNT));
+			build_page_display(ch, "Mine type: %s, Amount remaining: %d", GET_GLOBAL_NAME(glb), get_room_extra_data(IN_ROOM(ch), ROOM_EXTRA_MINE_AMOUNT));
 		}
 	}
 	
@@ -4433,11 +4458,12 @@ void do_stat_room(char_data *ch) {
 			}
 		}
 		sprintbit(INST_FLAGS(inst), instance_flags, buf2, TRUE);
-		msg_to_char(ch, "Instance \tc%d\t0: [\tg%d\t0] \ty%s\t0, Main Room: [\tg%d\t0], Flags: \tc%s\t0\r\n", num, GET_ADV_VNUM(INST_ADVENTURE(inst)), GET_ADV_NAME(INST_ADVENTURE(inst)), (INST_START(inst) ? GET_ROOM_VNUM(INST_START(inst)) : NOWHERE), buf2);
+		build_page_display(ch, "Instance \tc%d\t0: [\tg%d\t0] \ty%s\t0, Main Room: [\tg%d\t0], Flags: \tc%s\t0", num, GET_ADV_VNUM(INST_ADVENTURE(inst)), GET_ADV_NAME(INST_ADVENTURE(inst)), (INST_START(inst) ? GET_ROOM_VNUM(INST_START(inst)) : NOWHERE), buf2);
 	}
 
 	sprintf(buf, "Chars present:&y");
 	found = 0;
+	line = NULL;
 	DL_FOREACH2(ROOM_PEOPLE(IN_ROOM(ch)), k, next_in_room) {
 		if (!CAN_SEE(ch, k))
 			continue;
@@ -4445,19 +4471,25 @@ void do_stat_room(char_data *ch) {
 		strcat(buf, buf2);
 		if (strlen(buf) >= 62) {
 			if (k->next_in_room) {
-				send_to_char(strcat(buf, ",\r\n"), ch);
+				line = build_page_display(ch, "%s,", buf);
 			}
 			else {
-				send_to_char(strcat(buf, "\r\n"), ch);
+				line = build_page_display_str(ch, buf);
 			}
 			*buf = found = 0;
 		}
 	}
-	msg_to_char(ch, "%s&0", (*buf ? strcat(buf, "\r\n") : ""));
+	if (*buf) {
+		line = build_page_display_str(ch, buf);
+	}
+	if (line) {
+		append_page_display_line(line, "&0");
+	}
 	
 	if (ROOM_VEHICLES(IN_ROOM(ch))) {
 		sprintf(buf, "Vehicles:&w");
 		found = 0;
+		line = NULL;
 		DL_FOREACH2(ROOM_VEHICLES(IN_ROOM(ch)), veh, next_in_room) {
 			if (!CAN_SEE_VEHICLE(ch, veh)) {
 				continue;
@@ -4466,19 +4498,20 @@ void do_stat_room(char_data *ch) {
 			strcat(buf, buf2);
 			if (strlen(buf) >= 62) {
 				if (veh->next_in_room) {
-					send_to_char(strcat(buf, ",\r\n"), ch);
+					line = build_page_display(ch, "%s,", buf);
 				}
 				else {
-					send_to_char(strcat(buf, "\r\n"), ch);
+					line = build_page_display_str(ch, buf);
 				}
 				*buf = found = 0;
 			}
 		}
-
 		if (*buf) {
-			send_to_char(strcat(buf, "\r\n"), ch);
+			line = build_page_display_str(ch, buf);
 		}
-		send_to_char("&0", ch);
+		if (line) {
+			append_page_display_line(line, "&0");
+		}
 	}
 	
 	if (ROOM_CONTENTS(IN_ROOM(ch))) {
@@ -4493,17 +4526,18 @@ void do_stat_room(char_data *ch) {
 		if (str_hash) {
 			size = snprintf(buf, sizeof(buf), "Contents:\tg");
 			found = 0;
+			line = NULL;
 			
 			HASH_ITER(hh, str_hash, str_iter, next_str) {
 				if (str_iter->count == 1) {
-					snprintf(buf2, sizeof(buf2), "%s %s", (found++ ? "," : ""), str_iter->str);
+					safe_snprintf(buf2, sizeof(buf2), "%s %s", (found++ ? "," : ""), str_iter->str);
 				}
 				else {
-					snprintf(buf2, sizeof(buf2), "%s %s (x%d)", (found++ ? "," : ""), str_iter->str, str_iter->count);
+					safe_snprintf(buf2, sizeof(buf2), "%s %s (x%d)", (found++ ? "," : ""), str_iter->str, str_iter->count);
 				}
 				if (size + strlen(buf2) > 79 && *buf) {
 					// end of line
-					msg_to_char(ch, "%s%s\r\n", buf, (found > 1) ? "," : "");
+					line = build_page_display(ch, "%s%s", buf, (found > 1) ? "," : "");
 					found = 0;
 					size = 0;
 					*buf = '\0';
@@ -4518,9 +4552,11 @@ void do_stat_room(char_data *ch) {
 			
 			// anything left?
 			if (*buf) {
-				msg_to_char(ch, "%s\r\n", buf);
+				line = build_page_display_str(ch, buf);
 			}
-			send_to_char("\t0", ch);
+			if (line) {
+				append_page_display_line(line, "\t0");
+			}
 		}
 	}
 	
@@ -4543,41 +4579,41 @@ void do_stat_room(char_data *ch) {
 		}
 		
 		if (*buf) {
-			msg_to_char(ch, "Citizens: %s\r\n", buf);
+			build_page_display(ch, "Citizens: %s", buf);
 		}
 	}
 	
 	if (COMPLEX_DATA(IN_ROOM(ch))) {
 		struct room_direction_data *ex;
 		for (ex = COMPLEX_DATA(IN_ROOM(ch))->exits; ex; ex = ex->next) {
-			if (ex->to_room == NOWHERE)
+			if (ex->to_room == NOWHERE) {
 				sprintf(buf1, " &cNONE&0");
-			else
+			}
+			else {
 				sprintf(buf1, "&c%5d&0", ex->to_room);
+			}
 			sprintbit(ex->exit_info, exit_bits, buf2, TRUE);
-			sprintf(buf, "Exit &c%-5s&0:  To: [%s], Keyword: %s, Type: %s\r\n", dirs[get_direction_for_char(ch, ex->dir)], buf1, ex->keyword ? ex->keyword : "None", buf2);
-			send_to_char(buf, ch);
+			build_page_display(ch, "Exit &c%-5s&0:  To: [%s], Keyword: %s, Type: %s", dirs[get_direction_for_char(ch, ex->dir)], buf1, ex->keyword ? ex->keyword : "None", buf2);
 		}
 	}
 	
 	if (ROOM_DEPLETION(IN_ROOM(ch))) {
-		send_to_char("Depletion: ", ch);
+		line = build_page_display(ch, "Depletion: ");
 		
 		comma = FALSE;
 		for (dep = ROOM_DEPLETION(IN_ROOM(ch)); dep; dep = dep->next) {
 			if (dep->count > 0 && dep->type < NUM_DEPLETION_TYPES) {
 				max = get_depletion_max(IN_ROOM(ch), dep->type);
 				if (max > 0) {
-					msg_to_char(ch, "%s%s (%d, %d%%)", comma ? ", " : "", depletion_types[dep->type], dep->count, dep->count * 100 / max);
+					append_page_display_line(line, "%s%s (%d, %d%%)", comma ? ", " : "", depletion_types[dep->type], dep->count, dep->count * 100 / max);
 				}
 				else {
 					// can't detect max
-					msg_to_char(ch, "%s%s (%d)", comma ? ", " : "", depletion_types[dep->type], dep->count);
+					append_page_display_line(line, "%s%s (%d)", comma ? ", " : "", depletion_types[dep->type], dep->count);
 				}
 				comma = TRUE;
 			}
 		}
-		send_to_char("\r\n", ch);
 	}
 
 	/* Routine to show what spells a room is affected by */
@@ -4611,21 +4647,23 @@ void do_stat_room(char_data *ch) {
 				sprintbit(aff->bitvector, room_aff_bits, buf2, TRUE);
 				strcat(buf, buf2);
 			}
-			send_to_char(strcat(buf, "\r\n"), ch);
+			build_page_display_str(ch, buf);
 		}
 	}
 	
 	if (ROOM_EXTRA_DATA(IN_ROOM(ch))) {
-		msg_to_char(ch, "Extra data:\r\n");
+		build_page_display(ch, "Extra data:");
 		
 		HASH_ITER(hh, ROOM_EXTRA_DATA(IN_ROOM(ch)), red, next_red) {
 			sprinttype(red->type, room_extra_types, buf, sizeof(buf), "UNDEFINED");
-			msg_to_char(ch, " %s: %d\r\n", buf, red->value);
+			build_page_display(ch, " %s: %d", buf, red->value);
 		}
 	}
 
 	/* check the room for a script */
-	do_sstat_room(ch);
+	do_sstat_room(ch, ch);
+	
+	send_page_display(ch);
 }
 
 
@@ -4637,41 +4675,42 @@ void do_stat_room(char_data *ch) {
 void do_stat_room_template(char_data *ch, room_template *rmt, bool details) {
 	char lbuf[MAX_STRING_LENGTH];
 	adv_data *adv;
+	struct page_display *line;
 	
 	if (!rmt) {
 		return;
 	}
 	
-	msg_to_char(ch, "VNum: [&c%d&0], Title: %s\r\n", GET_RMT_VNUM(rmt), GET_RMT_TITLE(rmt));
-	msg_to_char(ch, "%s", NULLSAFE(GET_RMT_DESC(rmt)));
+	build_page_display(ch, "VNum: [&c%d&0], Title: %s", GET_RMT_VNUM(rmt), GET_RMT_TITLE(rmt));
+	build_page_display_str(ch, NULLSAFE(GET_RMT_DESC(rmt)));
 
 	adv = get_adventure_for_vnum(GET_RMT_VNUM(rmt));
-	msg_to_char(ch, "Adventure: [&c%d %s&0]", !adv ? NOTHING : GET_ADV_VNUM(adv), !adv ? "NONE" : GET_ADV_NAME(adv));
+	line = build_page_display(ch, "Adventure: [&c%d %s&0]", !adv ? NOTHING : GET_ADV_VNUM(adv), !adv ? "NONE" : GET_ADV_NAME(adv));
 	if (GET_RMT_SUBZONE(rmt) != NOWHERE) {
-		msg_to_char(ch, ", Subzone: [\ty%d\t0]\r\n", GET_RMT_SUBZONE(rmt));
+		append_page_display_line(line, ", Subzone: [\ty%d\t0]", GET_RMT_SUBZONE(rmt));
 	}
 	else {
-		msg_to_char(ch, ", Subzone: [\tynone\t0]\r\n");
+		append_page_display_line(line, ", Subzone: [\tynone\t0]");
 	}
 	
 	sprintbit(GET_RMT_FLAGS(rmt), room_template_flags, lbuf, TRUE);
-	msg_to_char(ch, "Flags: &g%s&0\r\n", lbuf);
+	build_page_display(ch, "Flags: &g%s&0", lbuf);
 	
 	sprintbit(GET_RMT_FUNCTIONS(rmt), function_flags, lbuf, TRUE);
-	msg_to_char(ch, "Functions: &y%s&0\r\n", lbuf);
+	build_page_display(ch, "Functions: &y%s&0", lbuf);
 
 	sprintbit(GET_RMT_BASE_AFFECTS(rmt), room_aff_bits, lbuf, TRUE);
-	msg_to_char(ch, "Affects: &g%s&0\r\n", lbuf);
+	build_page_display(ch, "Affects: &g%s&0", lbuf);
 	
-	msg_to_char(ch, "Temperature: [\tc%s\t0]\r\n", temperature_types[GET_RMT_TEMPERATURE_TYPE(rmt)]);
+	build_page_display(ch, "Temperature: [\tc%s\t0]", temperature_types[GET_RMT_TEMPERATURE_TYPE(rmt)]);
 	
 	if (GET_RMT_EX_DESCS(rmt)) {
 		struct extra_descr_data *desc;
 		
 		if (details) {
-			msg_to_char(ch, "Extra descs:\r\n");
+			build_page_display(ch, "Extra descs:");
 			LL_FOREACH(GET_RMT_EX_DESCS(rmt), desc) {
-				msg_to_char(ch, "[ &c%s&0 ]\r\n%s", desc->keyword, desc->description);
+				build_page_display(ch, "[ &c%s&0 ]\r\n%s", desc->keyword, desc->description);
 			}
 		}
 		else {
@@ -4680,24 +4719,25 @@ void do_stat_room_template(char_data *ch, room_template *rmt, bool details) {
 				strcat(buf, " ");
 				strcat(buf, desc->keyword);
 			}
-			msg_to_char(ch, "%s&0\r\n", buf);
+			build_page_display(ch, "%s&0", buf);
 		}
 	}
 
-	get_exit_template_display(GET_RMT_EXITS(rmt), lbuf);
-	msg_to_char(ch, "Exits:\r\n%s", lbuf);
+	build_page_display_str(ch, "Exits:");
+	show_exit_template_display(ch, GET_RMT_EXITS(rmt), FALSE);
 	
 	if (GET_RMT_INTERACTIONS(rmt)) {
-		send_to_char("Interactions:\r\n", ch);
-		get_interaction_display(GET_RMT_INTERACTIONS(rmt), buf);
-		send_to_char(buf, ch);
+		build_page_display_str(ch, "Interactions:");
+		show_interaction_display(ch, GET_RMT_INTERACTIONS(rmt), FALSE);
 	}
 	
-	get_template_spawns_display(GET_RMT_SPAWNS(rmt), lbuf);
-	msg_to_char(ch, "Spawns:\r\n%s", lbuf);
+	build_page_display_str(ch, "Spawns:");
+	show_template_spawns_display(ch, GET_RMT_SPAWNS(rmt), FALSE);
 
-	get_script_display(GET_RMT_SCRIPTS(rmt), lbuf);
-	msg_to_char(ch, "Scripts:\r\n%s", lbuf);
+	build_page_display_str(ch, "Scripts:");
+	show_script_display(ch, GET_RMT_SCRIPTS(rmt), FALSE);
+	
+	send_page_display(ch);
 }
 
 
@@ -4714,43 +4754,41 @@ void do_stat_sector(char_data *ch, sector_data *st, bool details) {
 	char buf[MAX_STRING_LENGTH];
 	struct custom_message *ocm;
 	
-	msg_to_char(ch, "Sector VNum: [&c%d&0], Name: '&c%s&0', Live Count [&c%d&0/&c%d&0]\r\n", st->vnum, st->name, idx->sect_count, idx->base_count);
-	msg_to_char(ch, "Room Title: %s\r\n", st->title);
+	build_page_display(ch, "Sector VNum: [&c%d&0], Name: '&c%s&0', Live Count [&c%d&0/&c%d&0]", GET_SECT_VNUM(st), GET_SECT_NAME(st), idx->sect_count, idx->base_count);
+	build_page_display(ch, "Room Title: %s", GET_SECT_TITLE(st));
 	
-	if (st->commands && *st->commands) {
-		msg_to_char(ch, "Command list: &c%s&0\r\n", st->commands);
+	if (GET_SECT_COMMANDS(st) && *GET_SECT_COMMANDS(st)) {
+		build_page_display(ch, "Command list: &c%s&0", GET_SECT_COMMANDS(st));
 	}
 	
-	msg_to_char(ch, "Movement cost: [&g%d&0]  Roadside Icon: %c  Mapout Color: %s\r\n", st->movement_loss, st->roadside_icon, mapout_color_names[GET_SECT_MAPOUT(st)]);
+	build_page_display(ch, "Movement cost: [&g%d&0]  Roadside Icon: %c  Mapout Color: %s", GET_SECT_MOVE_LOSS(st), GET_SECT_ROADSIDE_ICON(st), mapout_color_names[GET_SECT_MAPOUT(st)]);
 	
-	if (st->icons) {
-		msg_to_char(ch, "Icons:\r\n");
-		get_icons_display(st->icons, buf1);
-		send_to_char(buf1, ch);
+	if (GET_SECT_ICONS(st)) {
+		build_page_display_str(ch, "Icons:");
+		show_icons_display(ch, GET_SECT_ICONS(st), FALSE);
 	}
 	
-	sprintbit(st->flags, sector_flags, buf, TRUE);
-	msg_to_char(ch, "Sector flags: &g%s&0\r\n", buf);
+	sprintbit(GET_SECT_FLAGS(st), sector_flags, buf, TRUE);
+	build_page_display(ch, "Sector flags: &g%s&0", buf);
 	
 	ordered_sprintbit(GET_SECT_CLIMATE(st), climate_flags, climate_flags_order, FALSE, buf);
-	msg_to_char(ch, "Temperature: [\tc%s\t0], Climate: &c%s&0\r\n", temperature_types[GET_SECT_TEMPERATURE_TYPE(st)], buf);
+	build_page_display(ch, "Temperature: [\tc%s\t0], Climate: &c%s&0", temperature_types[GET_SECT_TEMPERATURE_TYPE(st)], buf);
 	
-	ordered_sprintbit(st->build_flags, bld_on_flags, bld_on_flags_order, TRUE, buf);
-	msg_to_char(ch, "Build flags: &g%s&0\r\n", buf);
+	ordered_sprintbit(GET_SECT_BUILD_FLAGS(st), bld_on_flags, bld_on_flags_order, TRUE, buf);
+	build_page_display(ch, "Build flags: &g%s&0", buf);
 	
-	if (st->evolution) {
-		msg_to_char(ch, "Evolution information:\r\n");
-		get_evolution_display(st->evolution, buf1);
-		send_to_char(buf1, ch);
+	if (GET_SECT_EVOS(st)) {
+		build_page_display_str(ch, "Evolution information:");
+		show_evolution_display(ch, GET_SECT_EVOS(st), FALSE);
 	}
 	
 	if (GET_SECT_EX_DESCS(st)) {
 		struct extra_descr_data *desc;
 		
 		if (details) {
-			msg_to_char(ch, "Extra descs:\r\n");
+			build_page_display(ch, "Extra descs:");
 			LL_FOREACH(GET_SECT_EX_DESCS(st), desc) {
-				msg_to_char(ch, "[ &c%s&0 ]\r\n%s", desc->keyword, desc->description);
+				build_page_display(ch, "[ &c%s&0 ]\r\n%s", desc->keyword, desc->description);
 			}
 		}
 		else {
@@ -4759,34 +4797,35 @@ void do_stat_sector(char_data *ch, sector_data *st, bool details) {
 				strcat(buf, " ");
 				strcat(buf, desc->keyword);
 			}
-			msg_to_char(ch, "%s&0\r\n", buf);
+			build_page_display(ch, "%s&0", buf);
 		}
 	}
 	
 	if (GET_SECT_CUSTOM_MSGS(st)) {
 		if (details) {
-			msg_to_char(ch, "Custom messages:\r\n");
+			build_page_display(ch, "Custom messages:");
 			LL_FOREACH(GET_SECT_CUSTOM_MSGS(st), ocm) {
-				msg_to_char(ch, " %s: %s\r\n", sect_custom_types[ocm->type], ocm->msg);
+				build_page_display(ch, " %s: %s", sect_custom_types[ocm->type], ocm->msg);
 			}
 		}
 		else {
 			LL_COUNT(GET_SECT_CUSTOM_MSGS(st), ocm, count);
-			msg_to_char(ch, "Custom messages: %d\r\n", count);
+			build_page_display(ch, "Custom messages: %d", count);
 		}
 	}
 
-	if (st->interactions) {
-		send_to_char("Interactions:\r\n", ch);
-		get_interaction_display(st->interactions, buf);
-		send_to_char(buf, ch);
+	if (GET_SECT_INTERACTIONS(st)) {
+		build_page_display_str(ch, "Interactions:");
+		show_interaction_display(ch, GET_SECT_INTERACTIONS(st), FALSE);
 	}
 	
-	show_spawn_summary_to_char(ch, st->spawns);
+	show_spawn_summary_display(ch, TRUE, GET_SECT_SPAWNS(st));
 	
 	if (GET_SECT_NOTES(st) && *GET_SECT_NOTES(st)) {
-		msg_to_char(ch, "Notes:\r\n%s", GET_SECT_NOTES(st));
+		build_page_display(ch, "Notes:\r\n%s", GET_SECT_NOTES(st));
 	}
+	
+	send_page_display(ch);
 }
 
 
@@ -4806,10 +4845,11 @@ int vnum_adventure(char *searchname, char_data *ch) {
 	
 	HASH_ITER(hh, adventure_table, iter, next_iter) {
 		if (multi_isname(searchname, GET_ADV_NAME(iter)) || multi_isname(searchname, GET_ADV_AUTHOR(iter))) {
-			msg_to_char(ch, "%3d. [%5d] %s (%d-%d)\r\n", ++found, GET_ADV_VNUM(iter), GET_ADV_NAME(iter), GET_ADV_START_VNUM(iter), GET_ADV_END_VNUM(iter));
+			build_page_display(ch, "%3d. [%5d] %s (%d-%d)", ++found, GET_ADV_VNUM(iter), GET_ADV_NAME(iter), GET_ADV_START_VNUM(iter), GET_ADV_END_VNUM(iter));
 		}
 	}
 	
+	send_page_display(ch);
 	return found;
 }
 
@@ -4827,10 +4867,11 @@ int vnum_book(char *searchname, char_data *ch) {
 	
 	HASH_ITER(hh, book_table, book, next_book) {
 		if (multi_isname(searchname, BOOK_TITLE(book)) || multi_isname(searchname, BOOK_BYLINE(book))) {
-			msg_to_char(ch, "%3d. [%5d] %s\t0 (%s\t0)\r\n", ++found, BOOK_VNUM(book), BOOK_TITLE(book), BOOK_BYLINE(book));
+			build_page_display(ch, "%3d. [%5d] %s\t0 (%s\t0)", ++found, BOOK_VNUM(book), BOOK_TITLE(book), BOOK_BYLINE(book));
 		}
 	}
 
+	send_page_display(ch);
 	return (found);
 }
 
@@ -4848,10 +4889,11 @@ int vnum_building(char *searchname, char_data *ch) {
 	
 	HASH_ITER(hh, building_table, iter, next_iter) {
 		if (multi_isname(searchname, GET_BLD_NAME(iter))) {
-			msg_to_char(ch, "%3d. [%5d] %s\r\n", ++found, GET_BLD_VNUM(iter), GET_BLD_NAME(iter));
+			build_page_display(ch, "%3d. [%5d] %s", ++found, GET_BLD_VNUM(iter), GET_BLD_NAME(iter));
 		}
 	}
 	
+	send_page_display(ch);
 	return found;
 }
 
@@ -4869,10 +4911,11 @@ int vnum_craft(char *searchname, char_data *ch) {
 	
 	HASH_ITER(hh, craft_table, iter, next_iter) {
 		if (multi_isname(searchname, GET_CRAFT_NAME(iter))) {
-			msg_to_char(ch, "%3d. [%5d] %s (%s)\r\n", ++found, GET_CRAFT_VNUM(iter), GET_CRAFT_NAME(iter), craft_types[GET_CRAFT_TYPE(iter)]);
+			build_page_display(ch, "%3d. [%5d] %s (%s)", ++found, GET_CRAFT_VNUM(iter), GET_CRAFT_NAME(iter), craft_types[GET_CRAFT_TYPE(iter)]);
 		}
 	}
 	
+	send_page_display(ch);
 	return found;
 }
 
@@ -4890,10 +4933,11 @@ int vnum_crop(char *searchname, char_data *ch) {
 	
 	HASH_ITER(hh, crop_table, iter, next_iter) {
 		if (multi_isname(searchname, GET_CROP_NAME(iter)) || multi_isname(searchname, GET_CROP_TITLE(iter))) {
-			msg_to_char(ch, "%3d. [%5d] %s\r\n", ++found, GET_CROP_VNUM(iter), GET_CROP_NAME(iter));
+			build_page_display(ch, "%3d. [%5d] %s", ++found, GET_CROP_VNUM(iter), GET_CROP_NAME(iter));
 		}
 	}
 	
+	send_page_display(ch);
 	return found;
 }
 
@@ -4916,33 +4960,34 @@ int vnum_global(char *searchname, char_data *ch) {
 			switch (GET_GLOBAL_TYPE(iter)) {
 				case GLOBAL_MOB_INTERACTIONS: {
 					sprintbit(GET_GLOBAL_TYPE_FLAGS(iter), action_bits, flags, TRUE);
-					msg_to_char(ch, "%3d. [%5d] %s (%s) %s (%s)\r\n", ++found, GET_GLOBAL_VNUM(iter), GET_GLOBAL_NAME(iter), level_range_string(GET_GLOBAL_MIN_LEVEL(iter), GET_GLOBAL_MAX_LEVEL(iter), 0), flags, global_types[GET_GLOBAL_TYPE(iter)]);
+					build_page_display(ch, "%3d. [%5d] %s (%s) %s (%s)", ++found, GET_GLOBAL_VNUM(iter), GET_GLOBAL_NAME(iter), level_range_string(GET_GLOBAL_MIN_LEVEL(iter), GET_GLOBAL_MAX_LEVEL(iter), 0), flags, global_types[GET_GLOBAL_TYPE(iter)]);
 					break;
 				}
 				case GLOBAL_OBJ_INTERACTIONS: {
 					sprintbit(GET_GLOBAL_TYPE_FLAGS(iter), extra_bits, flags, TRUE);
-					msg_to_char(ch, "%3d. [%5d] %s (%s) %s (%s)\r\n", ++found, GET_GLOBAL_VNUM(iter), GET_GLOBAL_NAME(iter), level_range_string(GET_GLOBAL_MIN_LEVEL(iter), GET_GLOBAL_MAX_LEVEL(iter), 0), flags, global_types[GET_GLOBAL_TYPE(iter)]);
+					build_page_display(ch, "%3d. [%5d] %s (%s) %s (%s)", ++found, GET_GLOBAL_VNUM(iter), GET_GLOBAL_NAME(iter), level_range_string(GET_GLOBAL_MIN_LEVEL(iter), GET_GLOBAL_MAX_LEVEL(iter), 0), flags, global_types[GET_GLOBAL_TYPE(iter)]);
 					break;
 				}
 				case GLOBAL_MINE_DATA: {
 					sprintbit(GET_GLOBAL_TYPE_FLAGS(iter), sector_flags, flags, TRUE);
-					msg_to_char(ch, "%3d. [%5d] %s - %s (%s)\r\n", ++found, GET_GLOBAL_VNUM(iter), GET_GLOBAL_NAME(iter), flags, global_types[GET_GLOBAL_TYPE(iter)]);
+					build_page_display(ch, "%3d. [%5d] %s - %s (%s)", ++found, GET_GLOBAL_VNUM(iter), GET_GLOBAL_NAME(iter), flags, global_types[GET_GLOBAL_TYPE(iter)]);
 					break;
 				}
 				case GLOBAL_MAP_SPAWNS: {
 					ordered_sprintbit(GET_GLOBAL_TYPE_FLAGS(iter), climate_flags, climate_flags_order, TRUE, flags);
 					sprintbit(GET_GLOBAL_SPARE_BITS(iter), spawn_flags_short, flags2, TRUE);
-					msg_to_char(ch, "%3d. [%5d] %s (%s | %s) (%s)\r\n", ++found, GET_GLOBAL_VNUM(iter), GET_GLOBAL_NAME(iter), flags, trim(flags2), global_types[GET_GLOBAL_TYPE(iter)]);
+					build_page_display(ch, "%3d. [%5d] %s (%s | %s) (%s)", ++found, GET_GLOBAL_VNUM(iter), GET_GLOBAL_NAME(iter), flags, trim(flags2), global_types[GET_GLOBAL_TYPE(iter)]);
 					break;
 				}
 				default: {
-					msg_to_char(ch, "%3d. [%5d] %s (%s)\r\n", ++found, GET_GLOBAL_VNUM(iter), GET_GLOBAL_NAME(iter), global_types[GET_GLOBAL_TYPE(iter)]);
+					build_page_display(ch, "%3d. [%5d] %s (%s)", ++found, GET_GLOBAL_VNUM(iter), GET_GLOBAL_NAME(iter), global_types[GET_GLOBAL_TYPE(iter)]);
 					break;
 				}
 			}
 		}
 	}
 	
+	send_page_display(ch);
 	return found;
 }
 
@@ -4953,10 +4998,11 @@ int vnum_mobile(char *searchname, char_data *ch) {
 	
 	HASH_ITER(hh, mobile_table, mob, next_mob) {
 		if (multi_isname(searchname, mob->player.name)) {
-			msg_to_char(ch, "%3d. [%5d] %s%s\r\n", ++found, mob->vnum, mob->proto_script ? "[TRIG] " : "", mob->player.short_descr);
+			build_page_display(ch, "%3d. [%5d] %s%s", ++found, mob->vnum, mob->proto_script ? "[TRIG] " : "", mob->player.short_descr);
 		}
 	}
 
+	send_page_display(ch);
 	return (found);
 }
 
@@ -4967,9 +5013,11 @@ int vnum_object(char *searchname, char_data *ch) {
 	
 	HASH_ITER(hh, object_table, iter, next_iter) {
 		if (multi_isname(searchname, GET_OBJ_KEYWORDS(iter))) {
-			msg_to_char(ch, "%3d. [%5d] %s%s\r\n", ++found, GET_OBJ_VNUM(iter), iter->proto_script ? "[TRIG] " : "", GET_OBJ_SHORT_DESC(iter));
+			build_page_display(ch, "%3d. [%5d] %s%s", ++found, GET_OBJ_VNUM(iter), iter->proto_script ? "[TRIG] " : "", GET_OBJ_SHORT_DESC(iter));
 		}
 	}
+	
+	send_page_display(ch);
 	return (found);
 }
 
@@ -4987,10 +5035,11 @@ int vnum_room_template(char *searchname, char_data *ch) {
 	
 	HASH_ITER(hh, room_template_table, iter, next_iter) {
 		if (multi_isname(searchname, GET_RMT_TITLE(iter))) {
-			msg_to_char(ch, "%3d. [%5d] %s%s\r\n", ++found, GET_RMT_VNUM(iter), iter->proto_script ? "[TRIG] " : "", GET_RMT_TITLE(iter));
+			build_page_display(ch, "%3d. [%5d] %s%s", ++found, GET_RMT_VNUM(iter), iter->proto_script ? "[TRIG] " : "", GET_RMT_TITLE(iter));
 		}
 	}
 	
+	send_page_display(ch);
 	return found;
 }
 
@@ -5008,10 +5057,11 @@ int vnum_sector(char *searchname, char_data *ch) {
 	
 	HASH_ITER(hh, sector_table, sect, next_sect) {
 		if (multi_isname(searchname, GET_SECT_NAME(sect)) || multi_isname(searchname, GET_SECT_TITLE(sect))) {
-			msg_to_char(ch, "%3d. [%5d] %s\r\n", ++found, GET_SECT_VNUM(sect), GET_SECT_NAME(sect));
+			build_page_display(ch, "%3d. [%5d] %s", ++found, GET_SECT_VNUM(sect), GET_SECT_NAME(sect));
 		}
 	}
 	
+	send_page_display(ch);
 	return found;
 }
 
@@ -5029,10 +5079,11 @@ int vnum_trigger(char *searchname, char_data *ch) {
 	
 	HASH_ITER(hh, trigger_table, iter, next_iter) {
 		if (multi_isname(searchname, GET_TRIG_NAME(iter))) {
-			msg_to_char(ch, "%3d. [%5d] %s\r\n", ++found, GET_TRIG_VNUM(iter), GET_TRIG_NAME(iter));
+			build_page_display(ch, "%3d. [%5d] %s", ++found, GET_TRIG_VNUM(iter), GET_TRIG_NAME(iter));
 		}
 	}
 	
+	send_page_display(ch);
 	return found;
 }
 
@@ -5087,7 +5138,7 @@ ACMD(do_addnotes) {
 		msg_to_char(ch, "Notes too long, unable to add text. Use editnotes instead.\r\n");
 	}
 	else {
-		snprintf(notes, sizeof(notes), "%s%s\r\n", NULLSAFE(acct->notes), argument);
+		safe_snprintf(notes, sizeof(notes), "%s%s\r\n", NULLSAFE(acct->notes), argument);
 		if (acct->notes) {
 			free(acct->notes);
 		}
@@ -5279,22 +5330,20 @@ ACMD(do_at) {
 
 
 ACMD(do_automessage) {
-	char buf[MAX_STRING_LENGTH * 2], line[MAX_STRING_LENGTH], part[MAX_STRING_LENGTH];
-	char cmd_arg[MAX_INPUT_LENGTH], type_arg[MAX_INPUT_LENGTH], id_arg[MAX_STRING_LENGTH];
+	char part[MAX_STRING_LENGTH], cmd_arg[MAX_INPUT_LENGTH], type_arg[MAX_INPUT_LENGTH], id_arg[MAX_STRING_LENGTH];
 	struct automessage *msg, *next_msg;
 	int id, iter, type, interval = 5;
 	player_index_data *plr;
-	size_t size;
 	
 	argument = any_one_arg(argument, cmd_arg);
 	
 	if (is_abbrev(cmd_arg, "list")) {
-		size = snprintf(buf, sizeof(buf), "Automessages:\r\n");
+		build_page_display_str(ch, "Automessages:");
 		
 		HASH_ITER(hh, automessages_table, msg, next_msg) {
 			switch (msg->timing) {
 				case AUTOMSG_REPEATING: {
-					snprintf(part, sizeof(part), "%s (%dm)", automessage_types[msg->timing], msg->interval);
+					safe_snprintf(part, sizeof(part), "%s (%dm)", automessage_types[msg->timing], msg->interval);
 					break;
 				}
 				default: {
@@ -5304,24 +5353,13 @@ ACMD(do_automessage) {
 			}
 			
 			plr = find_player_index_by_idnum(msg->author);
-			snprintf(line, sizeof(line), "%d. %s (%s): %s\r\n", msg->id, part, plr->fullname, msg->msg);
-			
-			if (size + strlen(line) < sizeof(buf)) {
-				strcat(buf, line);
-				size += strlen(line);
-			}
-			else {
-				size += snprintf(buf + size, sizeof(buf) - size, "OVERFLOW\r\n");
-				break;
-			}
+			build_page_display(ch, "%d. %s (%s): %s", msg->id, part, plr->fullname, msg->msg);
 		}
 		
 		if (!automessages_table) {
-			size += snprintf(buf + size, sizeof(buf) - size, " none\r\n");
+			build_page_display_str(ch, " none");
 		}
-		if (ch->desc) {
-			page_string(ch->desc, buf, TRUE);
-		}
+		send_page_display(ch);
 	}
 	else if (is_abbrev(cmd_arg, "add")) {
 		argument = any_one_arg(argument, type_arg);
@@ -6496,11 +6534,11 @@ ACMD(do_invis) {
 
 
 ACMD(do_island) {
-	char arg1[MAX_INPUT_LENGTH], arg2[MAX_INPUT_LENGTH], output[MAX_STRING_LENGTH * 2], line[256], flags[256];
+	char arg1[MAX_INPUT_LENGTH], arg2[MAX_INPUT_LENGTH], flags[256];
 	struct island_info *isle, *next_isle;
 	room_data *center;
 	bitvector_t old;
-	size_t outsize;
+	struct page_display *line;
 	
 	argument = any_one_arg(argument, arg1);	// command
 	skip_spaces(&argument);	// remainder
@@ -6510,7 +6548,7 @@ ACMD(do_island) {
 		return;
 	}
 	else if (is_abbrev(arg1, "list")) {
-		outsize = snprintf(output, sizeof(output), "Islands:\r\n");
+		build_page_display(ch, "Islands:");
 		
 		HASH_ITER(hh, island_table, isle, next_isle) {
 			if (*argument && !multi_isname(argument, isle->name)) {
@@ -6519,22 +6557,14 @@ ACMD(do_island) {
 			
 			center = real_room(isle->center);
 			
-			snprintf(line, sizeof(line), "%2d. %s (%d, %d), size %d, levels %d-%d", isle->id, isle->name, (center ? FLAT_X_COORD(center) : -1), (center ? FLAT_Y_COORD(center) : -1), isle->tile_size, isle->min_level, isle->max_level);
+			line = build_page_display(ch, "%2d. %s (%d, %d), size %d, levels %d-%d", isle->id, isle->name, (center ? FLAT_X_COORD(center) : -1), (center ? FLAT_Y_COORD(center) : -1), isle->tile_size, isle->min_level, isle->max_level);
 			if (isle->flags) {
 				sprintbit(isle->flags, island_bits, flags, TRUE);
-				snprintf(line + strlen(line), sizeof(line) - strlen(line), ", %s", flags);
-			}
-			
-			if (strlen(line) + outsize < sizeof(output)) {
-				outsize += snprintf(output + outsize, sizeof(output) - outsize, "%s\r\n", line);
-			}
-			else {
-				outsize += snprintf(output + outsize, sizeof(output) - outsize, "OVERFLOW\r\n");
-				break;
+				append_page_display_line(line, ", %s", flags);
 			}
 		}
 		
-		page_string(ch->desc, output, TRUE);
+		send_page_display(ch);
 	}
 	else if (is_abbrev(arg1, "rename")) {
 		argument = one_argument(argument, arg2);
@@ -8812,7 +8842,7 @@ ACMD(do_vstat) {
 			msg_to_char(ch, "There is no book with that number.\r\n");
 			return;
 		}
-		do_stat_book(ch, book);
+		do_stat_book(ch, book, details);
 	}
 	else if (is_abbrev(arg1, "craft")) {	// alphabetic precedence for "vstat c"
 		craft_data *craft = craft_proto(number);

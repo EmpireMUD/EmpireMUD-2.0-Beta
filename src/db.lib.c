@@ -475,7 +475,7 @@ void load_automessages(void) {
 		return;	// there are no messages
 	}
 	
-	snprintf(error, sizeof(error), "automessage file");
+	safe_snprintf(error, sizeof(error), "automessage file");
 	
 	while (!end) {
 		if (!get_line(fl, line)) {
@@ -5441,7 +5441,7 @@ static struct island_info *load_one_island(FILE *fl, int id) {
 	char errstr[MAX_STRING_LENGTH], line[256], str_in[256];
 	struct island_info *isle;
 	
-	snprintf(errstr, sizeof(errstr), "island %d", id);
+	safe_snprintf(errstr, sizeof(errstr), "island %d", id);
 	
 	// this does all the adding to tables and whatnot too!
 	isle = get_island(id, TRUE);

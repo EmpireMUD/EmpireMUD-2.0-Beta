@@ -682,7 +682,7 @@ CONFIG_HANDLER(config_edit_bitvector) {
 		
 	// process (olc processor sends all messages)
 	old = config->data.bitvector_val;
-	snprintf(buf, sizeof(buf), "config %s", config->key);
+	safe_snprintf(buf, sizeof(buf), "config %s", config->key);
 	new = olc_process_flag(ch, argument, config->key, buf, (const char **)config->custom_data, old);
 	
 	// no change
@@ -972,7 +972,7 @@ CONFIG_HANDLER(config_edit_type) {
 		
 	// process (olc processor sends all messages)
 	old = config->data.int_val;
-	snprintf(buf, sizeof(buf), "config %s", config->key);
+	safe_snprintf(buf, sizeof(buf), "config %s", config->key);
 	new = olc_process_type(ch, argument, config->key, buf, (const char **)config->custom_data, old);
 	
 	// no change
@@ -1086,7 +1086,7 @@ CONFIG_HANDLER(config_show_bitvector) {
 	}
 
 	// send it through the olc processor, which will display it all
-	snprintf(buf, sizeof(buf), "config %s", config->key);
+	safe_snprintf(buf, sizeof(buf), "config %s", config->key);
 	olc_process_flag(ch, "", config->key, buf, (const char **)config->custom_data, config->data.bitvector_val);
 }
 
@@ -1212,7 +1212,7 @@ CONFIG_HANDLER(config_show_type) {
 	}
 
 	// send it through the olc processor, which will display it all
-	snprintf(buf, sizeof(buf), "config %s", config->key);
+	safe_snprintf(buf, sizeof(buf), "config %s", config->key);
 	olc_process_type(ch, "", config->key, buf, (const char **)config->custom_data, config->data.int_val);
 }
 
@@ -2116,10 +2116,10 @@ void init_config_system(void) {
 //// CONFIG SYSTEM: COMMAND //////////////////////////////////////////////////
 
 ACMD(do_config) {
-	char output[MAX_STRING_LENGTH*2], line[MAX_STRING_LENGTH], part[MAX_INPUT_LENGTH];
+	char line[MAX_STRING_LENGTH], part[MAX_INPUT_LENGTH];
 	char *val_arg = NULL, arg1[MAX_INPUT_LENGTH], arg2[MAX_INPUT_LENGTH];
 	struct config_type *cnf = NULL, *next_cnf;
-	int set = NOTHING, iter, size, lsize, count;
+	int set = NOTHING, iter, lsize, count;
 	bool verbose = FALSE;
 	
 	// basic safety
@@ -2172,7 +2172,7 @@ ACMD(do_config) {
 	// show whole set?
 	if (set != NOTHING && (verbose || !cnf)) {
 		// only set given: display that set
-		size = snprintf(output, sizeof(output), "%s configs:\r\n", config_groups[set]);
+		build_page_display(ch, "%s configs:", config_groups[set]);
 		HASH_ITER(hh, config_table, cnf, next_cnf) {
 			if (cnf->set != set || IS_SET(cnf->config_flags, CONF_FLAG_DEPRECATED)) {
 				continue;
@@ -2242,15 +2242,10 @@ ACMD(do_config) {
 				lsize += snprintf(line + lsize, sizeof(line) - lsize, " &c%s&0", cnf->description);
 			}
 			
-			size += snprintf(output + size, sizeof(output) - size, "&y%s&0: %s\r\n", cnf->key, line);
-			
-			// hit limit
-			if (size >= sizeof(output)) {
-				break;
-			}
+			build_page_display(ch, "&y%s&0: %s", cnf->key, line);
 		}
 		
-		page_string(ch->desc, output, TRUE);
+		send_page_display(ch);
 		return;
 	}
 	else if (cnf) {

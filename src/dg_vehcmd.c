@@ -82,7 +82,7 @@ void veh_log(vehicle_data *veh, const char *format, ...) {
 	va_list args;
 	char output[MAX_STRING_LENGTH];
 
-	snprintf(output, sizeof(output), "Veh (%s, VNum %d):: %s", VEH_SHORT_DESC(veh), VEH_VNUM(veh), format);
+	safe_snprintf(output, sizeof(output), "Veh (%s, VNum %d):: %s", VEH_SHORT_DESC(veh), VEH_VNUM(veh), format);
 
 	va_start(args, format);
 	script_vlog(output, args);

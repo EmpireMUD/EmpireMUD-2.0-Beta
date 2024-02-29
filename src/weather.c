@@ -887,7 +887,7 @@ bool look_at_moon(char_data *ch, char *name, int *number) {
 		}
 		
 		// ok: show it
-		snprintf(buf, sizeof(buf), "%s is %s, %s.\r\n", GEN_NAME(moon), moon_phases_long[phase], moon_positions[pos]);
+		safe_snprintf(buf, sizeof(buf), "%s is %s, %s.\r\n", GEN_NAME(moon), moon_phases_long[phase], moon_positions[pos]);
 		send_to_char(CAP(buf), ch);
 		act("$n looks at $t.", TRUE, ch, GEN_NAME(moon), NULL, TO_ROOM | ACT_STR_OBJ);
 		return TRUE;
@@ -929,7 +929,7 @@ void show_visible_moons(char_data *ch) {
 		}
 		
 		// ok: show it
-		snprintf(buf, sizeof(buf), "%s is %s, %s.\r\n", GEN_NAME(moon), moon_phases_long[phase], moon_positions[pos]);
+		safe_snprintf(buf, sizeof(buf), "%s is %s, %s.\r\n", GEN_NAME(moon), moon_phases_long[phase], moon_positions[pos]);
 		send_to_char(CAP(buf), ch);
 	}
 }
@@ -1207,7 +1207,7 @@ void check_temperature_penalties(char_data *ch) {
 				
 				// message only if it's new
 				if (SHOW_STATUS_MESSAGES(ch, SM_TEMPERATURE | SM_EXTREME_TEMPERATURE) && !affected_by_spell(ch, atype)) {
-					snprintf(buf, sizeof(buf), "\t%cYou start to feel faint in the sweltering temperature -- you're too hot!\t0", CUSTOM_COLOR_CHAR(ch, CUSTOM_COLOR_TEMPERATURE));
+					safe_snprintf(buf, sizeof(buf), "\t%cYou start to feel faint in the sweltering temperature -- you're too hot!\t0", CUSTOM_COLOR_CHAR(ch, CUSTOM_COLOR_TEMPERATURE));
 					act(buf, FALSE, ch, NULL, NULL, TO_CHAR | TO_SLEEP);
 				}
 				
@@ -1223,7 +1223,7 @@ void check_temperature_penalties(char_data *ch) {
 				
 				// message only if it's new
 				if (SHOW_STATUS_MESSAGES(ch, SM_TEMPERATURE | SM_EXTREME_TEMPERATURE) && !affected_by_spell(ch, atype)) {
-					snprintf(buf, sizeof(buf), "\t%cYou start to feel like you're getting too warm.\t0", CUSTOM_COLOR_CHAR(ch, CUSTOM_COLOR_TEMPERATURE));
+					safe_snprintf(buf, sizeof(buf), "\t%cYou start to feel like you're getting too warm.\t0", CUSTOM_COLOR_CHAR(ch, CUSTOM_COLOR_TEMPERATURE));
 					act(buf, FALSE, ch, NULL, NULL, TO_CHAR | TO_SLEEP);
 				}
 				
@@ -1245,7 +1245,7 @@ void check_temperature_penalties(char_data *ch) {
 				
 				// message only if it's new
 				if (SHOW_STATUS_MESSAGES(ch, SM_TEMPERATURE | SM_EXTREME_TEMPERATURE) && !affected_by_spell(ch, atype)) {
-					snprintf(buf, sizeof(buf), "\t%cThe bitter cold is starting to get to you -- you're freezing!\t0", CUSTOM_COLOR_CHAR(ch, CUSTOM_COLOR_TEMPERATURE));
+					safe_snprintf(buf, sizeof(buf), "\t%cThe bitter cold is starting to get to you -- you're freezing!\t0", CUSTOM_COLOR_CHAR(ch, CUSTOM_COLOR_TEMPERATURE));
 					act(buf, FALSE, ch, NULL, NULL, TO_CHAR | TO_SLEEP);
 				}
 				
@@ -1261,7 +1261,7 @@ void check_temperature_penalties(char_data *ch) {
 				
 				// message only if it's new
 				if (SHOW_STATUS_MESSAGES(ch, SM_TEMPERATURE | SM_EXTREME_TEMPERATURE) && !affected_by_spell(ch, atype)) {
-					snprintf(buf, sizeof(buf), "\t%cYou're starting to feel a little too cold.\t0", CUSTOM_COLOR_CHAR(ch, CUSTOM_COLOR_TEMPERATURE));
+					safe_snprintf(buf, sizeof(buf), "\t%cYou're starting to feel a little too cold.\t0", CUSTOM_COLOR_CHAR(ch, CUSTOM_COLOR_TEMPERATURE));
 					act(buf, FALSE, ch, NULL, NULL, TO_CHAR | TO_SLEEP);
 				}
 				

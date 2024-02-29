@@ -202,10 +202,10 @@ char *list_one_room_template(room_template *rmt, bool detail) {
 			*funcs = '\0';
 		}
 		
-		snprintf(output, sizeof(output), "[%5d] %s%s%s", GET_RMT_VNUM(rmt), GET_RMT_TITLE(rmt), flags, funcs);
+		safe_snprintf(output, sizeof(output), "[%5d] %s%s%s", GET_RMT_VNUM(rmt), GET_RMT_TITLE(rmt), flags, funcs);
 	}
 	else {
-		snprintf(output, sizeof(output), "[%5d] %s", GET_RMT_VNUM(rmt), GET_RMT_TITLE(rmt));
+		safe_snprintf(output, sizeof(output), "[%5d] %s", GET_RMT_VNUM(rmt), GET_RMT_TITLE(rmt));
 	}
 	
 	return output;
@@ -286,7 +286,7 @@ void olc_delete_room_template(char_data *ch, rmt_vnum vnum) {
 		return;
 	}
 	
-	snprintf(name, sizeof(name), "%s", NULLSAFE(GET_RMT_TITLE(rmt)));
+	safe_snprintf(name, sizeof(name), "%s", NULLSAFE(GET_RMT_TITLE(rmt)));
 	
 	if (HASH_COUNT(room_template_table) <= 1) {
 		msg_to_char(ch, "You can't delete the last room template.\r\n");
@@ -418,7 +418,7 @@ void olc_delete_room_template(char_data *ch, rmt_vnum vnum) {
 * @param char *argument The argument they entered.
 */
 void olc_fullsearch_room_template(char_data *ch, char *argument) {
-	char buf[MAX_STRING_LENGTH * 2], line[MAX_STRING_LENGTH], type_arg[MAX_INPUT_LENGTH], val_arg[MAX_INPUT_LENGTH], find_keywords[MAX_INPUT_LENGTH], extra_search[MAX_INPUT_LENGTH];
+	char type_arg[MAX_INPUT_LENGTH], val_arg[MAX_INPUT_LENGTH], find_keywords[MAX_INPUT_LENGTH], extra_search[MAX_INPUT_LENGTH];
 	int count;
 	
 	bitvector_t only_flags = NOBITS, only_functions = NOBITS, only_affs = NOBITS;;
@@ -427,7 +427,6 @@ void olc_fullsearch_room_template(char_data *ch, char *argument) {
 	
 	struct interaction_item *inter;
 	room_template *rmt, *next_rmt;
-	size_t size;
 	
 	if (!*argument) {
 		msg_to_char(ch, "See HELP REDIT FULLSEARCH for syntax.\r\n");
@@ -463,7 +462,7 @@ void olc_fullsearch_room_template(char_data *ch, char *argument) {
 		skip_spaces(&argument);
 	}
 	
-	size = snprintf(buf, sizeof(buf), "Room template fullsearch: %s\r\n", show_color_codes(find_keywords));
+	build_page_display(ch, "Room template fullsearch: %s", show_color_codes(find_keywords));
 	count = 0;
 	
 	// okay now look up templates
@@ -501,27 +500,18 @@ void olc_fullsearch_room_template(char_data *ch, char *argument) {
 		}
 		
 		// show it
-		snprintf(line, sizeof(line), "[%5d] %s\r\n", GET_RMT_VNUM(rmt), GET_RMT_TITLE(rmt));
-		if (strlen(line) + size < sizeof(buf)) {
-			size += snprintf(buf + size, sizeof(buf) - size, "%s", line);
-			++count;
-		}
-		else {
-			size += snprintf(buf + size, sizeof(buf) - size, "OVERFLOW\r\n");
-			break;
-		}
+		build_page_display(ch, "[%5d] %s", GET_RMT_VNUM(rmt), GET_RMT_TITLE(rmt));
+		++count;
 	}
 	
-	if (count > 0 && (size + 20) < sizeof(buf)) {
-		size += snprintf(buf + size, sizeof(buf) - size, "(%d templates)\r\n", count);
+	if (count > 0) {
+		build_page_display(ch, "(%d templates)", count);
 	}
-	else if (count == 0) {
-		size += snprintf(buf + size, sizeof(buf) - size, " none\r\n");
+	else {
+		build_page_display_str(ch, " none");
 	}
 	
-	if (ch->desc) {
-		page_string(ch->desc, buf, TRUE);
-	}
+	send_page_display(ch);
 }
 
 
@@ -532,7 +522,6 @@ void olc_fullsearch_room_template(char_data *ch, char *argument) {
 * @param crop_vnum vnum The crop vnum.
 */
 void olc_search_room_template(char_data *ch, rmt_vnum vnum) {
-	char buf[MAX_STRING_LENGTH];
 	room_template *rmt = room_template_proto(vnum), *iter, *next_iter;
 	quest_data *quest, *next_quest;
 	progress_data *prg, *next_prg;
@@ -540,7 +529,7 @@ void olc_search_room_template(char_data *ch, rmt_vnum vnum) {
 	shop_data *shop, *next_shop;
 	struct exit_template *ex;
 	obj_data *obj, *next_obj;
-	int size, found;
+	int found;
 	bool any;
 	
 	if (!rmt) {
@@ -549,35 +538,29 @@ void olc_search_room_template(char_data *ch, rmt_vnum vnum) {
 	}
 	
 	found = 0;
-	size = snprintf(buf, sizeof(buf), "Occurrences of room template %d (%s):\r\n", vnum, GET_RMT_TITLE(rmt));
+	build_page_display(ch, "Occurrences of room template %d (%s):", vnum, GET_RMT_TITLE(rmt));
 	
 	// objects
 	HASH_ITER(hh, object_table, obj, next_obj) {
 		if (IS_PORTAL(obj) && GET_PORTAL_TARGET_VNUM(obj) == vnum) {
 			++found;
-			size += snprintf(buf + size, sizeof(buf) - size, "OBJ [%5d] %s\r\n", GET_OBJ_VNUM(obj), GET_OBJ_SHORT_DESC(obj));
+			build_page_display(ch, "OBJ [%5d] %s", GET_OBJ_VNUM(obj), GET_OBJ_SHORT_DESC(obj));
 		}
 	}
 	
 	// progress
 	HASH_ITER(hh, progress_table, prg, next_prg) {
-		if (size >= sizeof(buf)) {
-			break;
-		}
 		// REQ_x: requirement search
 		any = find_requirement_in_list(PRG_TASKS(prg), REQ_VISIT_ROOM_TEMPLATE, vnum);
 		
 		if (any) {
 			++found;
-			size += snprintf(buf + size, sizeof(buf) - size, "PRG [%5d] %s\r\n", PRG_VNUM(prg), PRG_NAME(prg));
+			build_page_display(ch, "PRG [%5d] %s", PRG_VNUM(prg), PRG_NAME(prg));
 		}
 	}
 	
 	// quests
 	HASH_ITER(hh, quest_table, quest, next_quest) {
-		if (size >= sizeof(buf)) {
-			break;
-		}
 		any = find_quest_giver_in_list(QUEST_STARTS_AT(quest), QG_ROOM_TEMPLATE, vnum);
 		any |= find_quest_giver_in_list(QUEST_ENDS_AT(quest), QG_ROOM_TEMPLATE, vnum);
 		any |= find_requirement_in_list(QUEST_TASKS(quest), REQ_VISIT_ROOM_TEMPLATE, vnum);
@@ -585,20 +568,17 @@ void olc_search_room_template(char_data *ch, rmt_vnum vnum) {
 		
 		if (any) {
 			++found;
-			size += snprintf(buf + size, sizeof(buf) - size, "QST [%5d] %s\r\n", QUEST_VNUM(quest), QUEST_NAME(quest));
+			build_page_display(ch, "QST [%5d] %s", QUEST_VNUM(quest), QUEST_NAME(quest));
 		}
 	}
 	
 	// shops
 	HASH_ITER(hh, shop_table, shop, next_shop) {
-		if (size >= sizeof(buf)) {
-			break;
-		}
 		any = find_quest_giver_in_list(SHOP_LOCATIONS(shop), QG_ROOM_TEMPLATE, vnum);
 		
 		if (any) {
 			++found;
-			size += snprintf(buf + size, sizeof(buf) - size, "SHOP [%5d] %s\r\n", SHOP_VNUM(shop), SHOP_NAME(shop));
+			build_page_display(ch, "SHOP [%5d] %s", SHOP_VNUM(shop), SHOP_NAME(shop));
 		}
 	}
 
@@ -609,32 +589,29 @@ void olc_search_room_template(char_data *ch, rmt_vnum vnum) {
 			if (ex->target_room == vnum) {
 				any = TRUE;
 				++found;
-				size += snprintf(buf + size, sizeof(buf) - size, "RMT [%5d] %s\r\n", GET_RMT_VNUM(iter), GET_RMT_TITLE(iter));
+				build_page_display(ch, "RMT [%5d] %s", GET_RMT_VNUM(iter), GET_RMT_TITLE(iter));
 			}
 		}
 	}
 	
 	// socials
 	HASH_ITER(hh, social_table, soc, next_soc) {
-		if (size >= sizeof(buf)) {
-			break;
-		}
 		any = find_requirement_in_list(SOC_REQUIREMENTS(soc), REQ_VISIT_ROOM_TEMPLATE, vnum);
 		
 		if (any) {
 			++found;
-			size += snprintf(buf + size, sizeof(buf) - size, "SOC [%5d] %s\r\n", SOC_VNUM(soc), SOC_NAME(soc));
+			build_page_display(ch, "SOC [%5d] %s", SOC_VNUM(soc), SOC_NAME(soc));
 		}
 	}
 	
 	if (found > 0) {
-		size += snprintf(buf + size, sizeof(buf) - size, "%d location%s shown\r\n", found, PLURAL(found));
+		build_page_display(ch, "%d location%s shown", found, PLURAL(found));
 	}
 	else {
-		size += snprintf(buf + size, sizeof(buf) - size, " none\r\n");
+		build_page_display_str(ch, " none");
 	}
 	
-	page_string(ch->desc, buf, TRUE);
+	send_page_display(ch);
 }
 
 
@@ -825,16 +802,15 @@ int wordcount_room_template(room_template *rmt) {
 /**
 * Displays the exit templates from a given list.
 *
+* @param char_data *ch The person viewing it.
 * @param struct exit_template *list Pointer to the start of a list of exits.
-* @param char *save_buffer A buffer to store the result to.
+* @param bool send_output If TRUE, sends the page_display as text when done. Pass FALSE if you're building a larger page_display for the character.
 */
-void get_exit_template_display(struct exit_template *list, char *save_buffer) {
+void show_exit_template_display(char_data *ch, struct exit_template *list, bool send_output) {
 	struct exit_template *ex;
 	char lbuf[MAX_STRING_LENGTH], lbuf1[MAX_STRING_LENGTH], lbuf2[MAX_STRING_LENGTH];
 	int count = 0;
 	room_template *rmt;
-	
-	*save_buffer = '\0';
 	
 	for (ex = list; ex; ex = ex->next) {
 		// lbuf: kw
@@ -862,11 +838,15 @@ void get_exit_template_display(struct exit_template *list, char *save_buffer) {
 			strcpy(lbuf2, "UNKNOWN");
 		}
 		
-		sprintf(save_buffer + strlen(save_buffer), "%2d. %s: [%d] %s%s%s\r\n", ++count, dirs[ex->dir], ex->target_room, lbuf2, lbuf1, lbuf);
+		build_page_display(ch, "%2d. %s: [%d] %s%s%s", ++count, dirs[ex->dir], ex->target_room, lbuf2, lbuf1, lbuf);
 	}
 	
 	if (count == 0) {
-		strcat(save_buffer, " none\r\n");
+		build_page_display_str(ch, " none");
+	}
+	
+	if (send_output) {
+		send_page_display_as(ch, PD_NO_PAGINATION | PD_FREE_DISPLAY_AFTER);
 	}
 }
 
@@ -903,23 +883,26 @@ void get_spawn_template_name(struct adventure_spawn *spawn, char *save_buffer) {
 /**
 * Displays the adventure spawn rules from a given list.
 *
+* @param char_data *ch The person viewing it.
 * @param struct adventure_spawn *list Pointer to the start of a list of spawns.
-* @param char *save_buffer A buffer to store the result to.
+* @param bool send_output If TRUE, sends the page_display as text when done. Pass FALSE if you're building a larger page_display for the character.
 */
-void get_template_spawns_display(struct adventure_spawn *list, char *save_buffer) {
+void show_template_spawns_display(char_data *ch, struct adventure_spawn *list, bool send_output) {
 	struct adventure_spawn *spawn;
 	char lbuf[MAX_STRING_LENGTH];
 	int count = 0;
 	
-	*save_buffer = '\0';
-	
 	for (spawn = list; spawn; spawn = spawn->next) {
 		get_spawn_template_name(spawn, lbuf);	
-		sprintf(save_buffer + strlen(save_buffer), "%2d. [%s] %d %s (%.2f%%, limit %d)\r\n", ++count, adventure_spawn_types[spawn->type], spawn->vnum, lbuf, spawn->percent, spawn->limit);
+		build_page_display(ch, "%2d. [%s] %d %s (%.2f%%, limit %d)", ++count, adventure_spawn_types[spawn->type], spawn->vnum, lbuf, spawn->percent, spawn->limit);
 	}
 	
 	if (count == 0) {
-		strcat(save_buffer, " none\r\n");
+		build_page_display(ch, " none");
+	}
+	
+	if (send_output) {
+		send_page_display_as(ch, PD_NO_PAGINATION | PD_FREE_DISPLAY_AFTER);
 	}
 }
 
@@ -932,7 +915,7 @@ void get_template_spawns_display(struct adventure_spawn *list, char *save_buffer
 */
 void olc_show_room_template(char_data *ch) {
 	room_template *rmt = GET_OLC_ROOM_TEMPLATE(ch->desc);
-	char buf[MAX_STRING_LENGTH*4], lbuf[MAX_STRING_LENGTH*4];
+	char lbuf[MAX_STRING_LENGTH*4];
 	
 	adv_data *adv = get_adventure_for_vnum(GET_OLC_VNUM(ch->desc));
 	
@@ -940,67 +923,60 @@ void olc_show_room_template(char_data *ch) {
 		return;
 	}
 	
-	*buf = '\0';
-	
-	sprintf(buf + strlen(buf), "[%s%d\t0] %s%s\t0\r\n", OLC_LABEL_CHANGED, GET_OLC_VNUM(ch->desc), OLC_LABEL_UNCHANGED, !room_template_proto(GET_RMT_VNUM(rmt)) ? "new room template" : GET_RMT_TITLE(room_template_proto(GET_RMT_VNUM(rmt))));
-	sprintf(buf + strlen(buf), "Adventure: %d %s%s\t0\r\n", adv ? GET_ADV_VNUM(adv) : NOTHING, OLC_LABEL_CHANGED, adv ? GET_ADV_NAME(adv) : "none");
-	sprintf(buf + strlen(buf), "<%stitle\t0> %s\r\n", OLC_LABEL_STR(GET_RMT_TITLE(rmt), default_rmt_title), NULLSAFE(GET_RMT_TITLE(rmt)));
-	sprintf(buf + strlen(buf), "<%sdescription\t0>\r\n%s", OLC_LABEL_STR(GET_RMT_DESC(rmt), ""), NULLSAFE(GET_RMT_DESC(rmt)));
+	build_page_display(ch, "[%s%d\t0] %s%s\t0", OLC_LABEL_CHANGED, GET_OLC_VNUM(ch->desc), OLC_LABEL_UNCHANGED, !room_template_proto(GET_RMT_VNUM(rmt)) ? "new room template" : GET_RMT_TITLE(room_template_proto(GET_RMT_VNUM(rmt))));
+	build_page_display(ch, "Adventure: %d %s%s\t0", adv ? GET_ADV_VNUM(adv) : NOTHING, OLC_LABEL_CHANGED, adv ? GET_ADV_NAME(adv) : "none");
+	build_page_display(ch, "<%stitle\t0> %s", OLC_LABEL_STR(GET_RMT_TITLE(rmt), default_rmt_title), NULLSAFE(GET_RMT_TITLE(rmt)));
+	build_page_display(ch, "<%sdescription\t0>\r\n%s", OLC_LABEL_STR(GET_RMT_DESC(rmt), ""), NULLSAFE(GET_RMT_DESC(rmt)));
 	
 	if (GET_RMT_SUBZONE(rmt) != NOWHERE) {
-		snprintf(lbuf, sizeof(lbuf), "%d", GET_RMT_SUBZONE(rmt));
+		safe_snprintf(lbuf, sizeof(lbuf), "%d", GET_RMT_SUBZONE(rmt));
 	}
 	else {
 		strcpy(lbuf, "none");
 	}
-	sprintf(buf + strlen(buf), "<%ssubzone\t0> %s\r\n", OLC_LABEL_VAL(GET_RMT_SUBZONE(rmt), NOWHERE), lbuf);
+	build_page_display(ch, "<%ssubzone\t0> %s", OLC_LABEL_VAL(GET_RMT_SUBZONE(rmt), NOWHERE), lbuf);
 	
 	sprintbit(GET_RMT_FLAGS(rmt), room_template_flags, lbuf, TRUE);
-	sprintf(buf + strlen(buf), "<%sflags\t0> %s\r\n", OLC_LABEL_VAL(GET_RMT_FLAGS(rmt), NOBITS), lbuf);
+	build_page_display(ch, "<%sflags\t0> %s", OLC_LABEL_VAL(GET_RMT_FLAGS(rmt), NOBITS), lbuf);
 	
 	sprintbit(GET_RMT_FUNCTIONS(rmt), function_flags, lbuf, TRUE);
-	sprintf(buf + strlen(buf), "<%sfunctions\t0> %s\r\n", OLC_LABEL_VAL(GET_RMT_FUNCTIONS(rmt), NOBITS), lbuf);
+	build_page_display(ch, "<%sfunctions\t0> %s", OLC_LABEL_VAL(GET_RMT_FUNCTIONS(rmt), NOBITS), lbuf);
 	
 	sprintbit(GET_RMT_BASE_AFFECTS(rmt), room_aff_bits, lbuf, TRUE);
-	sprintf(buf + strlen(buf), "<%saffects\t0> %s\r\n", OLC_LABEL_VAL(GET_RMT_BASE_AFFECTS(rmt), NOBITS), lbuf);
+	build_page_display(ch, "<%saffects\t0> %s", OLC_LABEL_VAL(GET_RMT_BASE_AFFECTS(rmt), NOBITS), lbuf);
 	
-	sprintf(buf + strlen(buf), "<%stemperature\t0> %s\r\n", OLC_LABEL_VAL(GET_RMT_TEMPERATURE_TYPE(rmt), 0), temperature_types[GET_RMT_TEMPERATURE_TYPE(rmt)]);
+	build_page_display(ch, "<%stemperature\t0> %s", OLC_LABEL_VAL(GET_RMT_TEMPERATURE_TYPE(rmt), 0), temperature_types[GET_RMT_TEMPERATURE_TYPE(rmt)]);
 	
 	// exits
-	sprintf(buf + strlen(buf), "Exits: <%sexit\t0>, <%smatchexits\t0>\r\n", OLC_LABEL_PTR(GET_RMT_EXITS(rmt)), OLC_LABEL_PTR(GET_RMT_EXITS(rmt)));
+	build_page_display(ch, "Exits: <%sexit\t0>, <%smatchexits\t0>", OLC_LABEL_PTR(GET_RMT_EXITS(rmt)), OLC_LABEL_PTR(GET_RMT_EXITS(rmt)));
 	if (GET_RMT_EXITS(rmt)) {
-		get_exit_template_display(GET_RMT_EXITS(rmt), lbuf);
-		strcat(buf, lbuf);
+		show_exit_template_display(ch, GET_RMT_EXITS(rmt), FALSE);
 	}
 	
 	// exdesc
-	sprintf(buf + strlen(buf), "Extra descriptions: <%sextra\t0>\r\n", OLC_LABEL_PTR(GET_RMT_EX_DESCS(rmt)));
+	build_page_display(ch, "Extra descriptions: <%sextra\t0>", OLC_LABEL_PTR(GET_RMT_EX_DESCS(rmt)));
 	if (GET_RMT_EX_DESCS(rmt)) {
-		get_extra_desc_display(GET_RMT_EX_DESCS(rmt), lbuf, sizeof(lbuf));
-		strcat(buf, lbuf);
+		show_extra_desc_display(ch, GET_RMT_EX_DESCS(rmt), FALSE);
 	}
 	
-	sprintf(buf + strlen(buf), "Interactions: <%sinteraction\t0>\r\n", OLC_LABEL_PTR(GET_RMT_INTERACTIONS(rmt)));
+	build_page_display(ch, "Interactions: <%sinteraction\t0>", OLC_LABEL_PTR(GET_RMT_INTERACTIONS(rmt)));
 	if (GET_RMT_INTERACTIONS(rmt)) {
-		get_interaction_display(GET_RMT_INTERACTIONS(rmt), lbuf);
-		strcat(buf, lbuf);
+		show_interaction_display(ch, GET_RMT_INTERACTIONS(rmt), FALSE);
 	}
 	
 	// spawns
-	sprintf(buf + strlen(buf), "Spawns: <%sspawns\t0>\r\n", OLC_LABEL_PTR(GET_RMT_SPAWNS(rmt)));
+	build_page_display(ch, "Spawns: <%sspawns\t0>", OLC_LABEL_PTR(GET_RMT_SPAWNS(rmt)));
 	if (GET_RMT_SPAWNS(rmt)) {
-		get_template_spawns_display(GET_RMT_SPAWNS(rmt), lbuf);
-		strcat(buf, lbuf);
+		show_template_spawns_display(ch, GET_RMT_SPAWNS(rmt), FALSE);
 	}
 	
 	// scripts
-	sprintf(buf + strlen(buf), "Scripts: <%sscript\t0>\r\n", OLC_LABEL_PTR(GET_RMT_SCRIPTS(rmt)));
+	build_page_display(ch, "Scripts: <%sscript\t0>", OLC_LABEL_PTR(GET_RMT_SCRIPTS(rmt)));
 	if (GET_RMT_SCRIPTS(rmt)) {
-		get_script_display(GET_RMT_SCRIPTS(rmt), lbuf);
-		strcat(buf, lbuf);
+		show_script_display(ch, GET_RMT_SCRIPTS(rmt), FALSE);
 	}
 	
-	page_string(ch->desc, buf, TRUE);
+	send_page_display(ch);
 }
 
 

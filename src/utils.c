@@ -2596,7 +2596,7 @@ void change_look_desc(char_data *ch, char *str, bool format) {
 		}
 		else {
 			char temp[MAX_STRING_LENGTH];
-			snprintf(temp, sizeof(temp), "%s\r\n", str);
+			safe_snprintf(temp, sizeof(temp), "%s\r\n", str);
 			GET_LOOK_DESC(ch) = str_dup(temp);
 		}
 		
@@ -2649,7 +2649,7 @@ void change_look_desc_append(char_data *ch, char *str, bool format) {
 	
 	// the change
 	if (str && *str) {
-		snprintf(temp, sizeof(temp), "%s%s%s", NULLSAFE(GET_LOOK_DESC(ch)), NULLSAFE(str), (str[strlen(str)-1] == '\n' ? "" : "\r\n"));
+		safe_snprintf(temp, sizeof(temp), "%s%s%s", NULLSAFE(GET_LOOK_DESC(ch)), NULLSAFE(str), (str[strlen(str)-1] == '\n' ? "" : "\r\n"));
 
 		ch->customized = TRUE;
 		if (!proto || GET_LOOK_DESC(ch) != GET_LOOK_DESC(proto)) {
@@ -3685,7 +3685,7 @@ bool wake_and_stand(char_data *ch) {
 			do_unseat_from_vehicle(ch);
 			GET_POS(ch) = POS_STANDING;
 			msg_to_char(ch, "You %sget up.\r\n", (was_sleeping ? "awaken and " : ""));
-			snprintf(buf, sizeof(buf), "$n %sgets up.", (was_sleeping ? "awakens and " : ""));
+			safe_snprintf(buf, sizeof(buf), "$n %sgets up.", (was_sleeping ? "awakens and " : ""));
 			act(buf, TRUE, ch, NULL, NULL, TO_ROOM);
 			// no break -- drop through
 		}
@@ -3889,11 +3889,11 @@ void apply_resource(char_data *ch, struct resource_data *res, struct resource_da
 			charge_coins(ch, coin_emp, res->amount, build_used_list, msg_type == APPLY_RES_SILENT ? NULL : buf2);
 			
 			if (!messaged_char && msg_type != APPLY_RES_SILENT) {
-				snprintf(buf, sizeof(buf), "You spend %s.", buf2);
+				safe_snprintf(buf, sizeof(buf), "You spend %s.", buf2);
 				act(buf, FALSE, ch, NULL, NULL, TO_CHAR | TO_SPAMMY);
 			}
 			if (!messaged_room && msg_type != APPLY_RES_SILENT) {
-				snprintf(buf, sizeof(buf), "$n spends %s.", buf2);
+				safe_snprintf(buf, sizeof(buf), "$n spends %s.", buf2);
 				act(buf, FALSE, ch, NULL, NULL, TO_ROOM | TO_SPAMMY);
 			}
 			
@@ -3902,11 +3902,11 @@ void apply_resource(char_data *ch, struct resource_data *res, struct resource_da
 		}
 		case RES_CURRENCY: {
 			if (!messaged_char && msg_type != APPLY_RES_SILENT) {
-				snprintf(buf, sizeof(buf), "You spend %d %s.", res->amount, get_generic_string_by_vnum(res->vnum, GENERIC_CURRENCY, WHICH_CURRENCY(res->amount)));
+				safe_snprintf(buf, sizeof(buf), "You spend %d %s.", res->amount, get_generic_string_by_vnum(res->vnum, GENERIC_CURRENCY, WHICH_CURRENCY(res->amount)));
 				act(buf, FALSE, ch, NULL, NULL, TO_CHAR | TO_SPAMMY);
 			}
 			if (!messaged_room && msg_type != APPLY_RES_SILENT) {
-				snprintf(buf, sizeof(buf), "$n spends %d %s.", res->amount, get_generic_string_by_vnum(res->vnum, GENERIC_CURRENCY, WHICH_CURRENCY(res->amount)));
+				safe_snprintf(buf, sizeof(buf), "$n spends %d %s.", res->amount, get_generic_string_by_vnum(res->vnum, GENERIC_CURRENCY, WHICH_CURRENCY(res->amount)));
 				act(buf, FALSE, ch, NULL, NULL, TO_ROOM | TO_SPAMMY);
 			}
 			add_currency(ch, res->vnum, -(res->amount));
@@ -3915,11 +3915,11 @@ void apply_resource(char_data *ch, struct resource_data *res, struct resource_da
 		}
 		case RES_POOL: {
 			if (!messaged_char && msg_type != APPLY_RES_SILENT) {
-				snprintf(buf, sizeof(buf), "You spend %d %s point%s.", res->amount, pool_types[res->vnum], PLURAL(res->amount));
+				safe_snprintf(buf, sizeof(buf), "You spend %d %s point%s.", res->amount, pool_types[res->vnum], PLURAL(res->amount));
 				act(buf, FALSE, ch, NULL, NULL, TO_CHAR | TO_SPAMMY);
 			}
 			if (!messaged_room && msg_type != APPLY_RES_SILENT) {
-				snprintf(buf, sizeof(buf), "$n spends %s %s point%s.", (res->amount != 1) ? "some" : "a", pool_types[res->vnum], PLURAL(res->amount));
+				safe_snprintf(buf, sizeof(buf), "$n spends %s %s point%s.", (res->amount != 1) ? "some" : "a", pool_types[res->vnum], PLURAL(res->amount));
 				act(buf, FALSE, ch, NULL, NULL, TO_ROOM | TO_SPAMMY);
 			}
 			
@@ -4316,40 +4316,40 @@ char *get_resource_name(struct resource_data *res) {
 	// RES_x: resource type determines display
 	switch (res->type) {
 		case RES_OBJECT: {
-			snprintf(output, sizeof(output), "%dx %s", res->amount, skip_filler(get_obj_name_by_proto(res->vnum)));
+			safe_snprintf(output, sizeof(output), "%dx %s", res->amount, skip_filler(get_obj_name_by_proto(res->vnum)));
 			break;
 		}
 		case RES_COMPONENT: {
-			snprintf(output, sizeof(output), "%dx (%s)", res->amount, res->amount == 1 ? get_generic_name_by_vnum(res->vnum) : get_generic_string_by_vnum(res->vnum, GENERIC_COMPONENT, GSTR_COMPONENT_PLURAL));
+			safe_snprintf(output, sizeof(output), "%dx (%s)", res->amount, res->amount == 1 ? get_generic_name_by_vnum(res->vnum) : get_generic_string_by_vnum(res->vnum, GENERIC_COMPONENT, GSTR_COMPONENT_PLURAL));
 			break;
 		}
 		case RES_LIQUID: {
-			snprintf(output, sizeof(output), "%d unit%s of %s", res->amount, PLURAL(res->amount), get_generic_string_by_vnum(res->vnum, GENERIC_LIQUID, GSTR_LIQUID_NAME));
+			safe_snprintf(output, sizeof(output), "%d unit%s of %s", res->amount, PLURAL(res->amount), get_generic_string_by_vnum(res->vnum, GENERIC_LIQUID, GSTR_LIQUID_NAME));
 			break;
 		}
 		case RES_COINS: {
-			snprintf(output, sizeof(output), "%s", money_amount(real_empire(res->vnum), res->amount));
+			safe_snprintf(output, sizeof(output), "%s", money_amount(real_empire(res->vnum), res->amount));
 			break;
 		}
 		case RES_CURRENCY: {
-			snprintf(output, sizeof(output), "%d %s", res->amount, get_generic_string_by_vnum(res->vnum, GENERIC_CURRENCY, WHICH_CURRENCY(res->amount)));
+			safe_snprintf(output, sizeof(output), "%d %s", res->amount, get_generic_string_by_vnum(res->vnum, GENERIC_CURRENCY, WHICH_CURRENCY(res->amount)));
 			break;
 		}
 		case RES_POOL: {
-			snprintf(output, sizeof(output), "%d %s point%s", res->amount, pool_types[res->vnum], PLURAL(res->amount));
+			safe_snprintf(output, sizeof(output), "%d %s point%s", res->amount, pool_types[res->vnum], PLURAL(res->amount));
 			break;
 		}
 		case RES_ACTION: {
-			snprintf(output, sizeof(output), "%dx [%s]", res->amount, get_generic_name_by_vnum(res->vnum));
+			safe_snprintf(output, sizeof(output), "%dx [%s]", res->amount, get_generic_name_by_vnum(res->vnum));
 			break;
 		}
 		case RES_TOOL: {
 			prettier_sprintbit(res->vnum, tool_flags, buf);
-			snprintf(output, sizeof(output), "%dx %s (tool%s)", res->amount, buf, PLURAL(res->amount));
+			safe_snprintf(output, sizeof(output), "%dx %s (tool%s)", res->amount, buf, PLURAL(res->amount));
 			break;
 		}
 		default: {
-			snprintf(output, sizeof(output), "[unknown resource %d]", res->type);
+			safe_snprintf(output, sizeof(output), "[unknown resource %d]", res->type);
 			break;
 		}
 	}
@@ -4679,11 +4679,11 @@ bool has_resources(char_data *ch, struct resource_data *list, bool ground, bool 
 		if (send_msgs) {
 			// prepare prefix, if any
 			if (msg_prefix && *msg_prefix) {
-				snprintf(prefix, sizeof(prefix), "%s: You need", msg_prefix);
+				safe_snprintf(prefix, sizeof(prefix), "%s: You need", msg_prefix);
 				CAP(prefix);
 			}
 			else {
-				snprintf(prefix, sizeof(prefix), "You need");
+				safe_snprintf(prefix, sizeof(prefix), "You need");
 			}
 			
 			switch (res->type) {
@@ -4739,20 +4739,25 @@ bool has_resources(char_data *ch, struct resource_data *list, bool ground, bool 
 *
 * @param struct resource_data *list The list to show.
 * @param char *save_buffer A string to write the output to.
+* @param size_t buf_size The sizeof the variable sent as the save_buffer. Prevents buffer overrun.
 */
-void show_resource_list(struct resource_data *list, char *save_buffer) {
+void show_resource_list(struct resource_data *list, char *save_buffer, size_t buf_size) {
 	struct resource_data *res;
 	bool found = FALSE;
+	size_t size;
 	
 	*save_buffer = '\0';
+	size = 0;
 	
 	LL_FOREACH(list, res) {
-		sprintf(save_buffer + strlen(save_buffer), "%s%s", (found ? ", " : ""), get_resource_name(res));
-		found = TRUE;
+		if (size < buf_size) {
+			size += snprintf(save_buffer + size, buf_size - size, "%s%s", (found ? ", " : ""), get_resource_name(res));
+			found = TRUE;
+		}
 	}
 	
-	if (!*save_buffer) {
-		strcpy(save_buffer, "nothing");
+	if (!found && size < buf_size) {
+		size += snprintf(save_buffer + size, buf_size - size, "nothing");
 	}
 }
 
@@ -5028,13 +5033,13 @@ char *colon_time(long seconds, bool minutes_instead, char *unlimited_str) {
 	seconds %= SECS_PER_REAL_MIN;
 	
 	if (days > 0) {
-		snprintf(output, sizeof(output), "%d:%02d:%02d:%02d", days, hours, minutes, (int)seconds);
+		safe_snprintf(output, sizeof(output), "%d:%02d:%02d:%02d", days, hours, minutes, (int)seconds);
 	}
 	else if (hours > 0) {
-		snprintf(output, sizeof(output), "%d:%02d:%02d", hours, minutes, (int)seconds);
+		safe_snprintf(output, sizeof(output), "%d:%02d:%02d", hours, minutes, (int)seconds);
 	}
 	else {
-		snprintf(output, sizeof(output), "%d:%02d", minutes, (int)seconds);
+		safe_snprintf(output, sizeof(output), "%d:%02d", minutes, (int)seconds);
 	}
 	
 	// if we started with minutes, shave the seconds off
@@ -5319,22 +5324,22 @@ char *level_range_string(int min, int max, int current) {
 	static char output[65];
 	
 	if (current > 0) {
-		snprintf(output, sizeof(output), "%d", current);
+		safe_snprintf(output, sizeof(output), "%d", current);
 	}
 	else if (min == max) {	// could also be "0" here
-		snprintf(output, sizeof(output), "%d", min);
+		safe_snprintf(output, sizeof(output), "%d", min);
 	}
 	else if (min > 0 && max > 0) {
-		snprintf(output, sizeof(output), "%d-%d", min, max);
+		safe_snprintf(output, sizeof(output), "%d-%d", min, max);
 	}
 	else if (min > 0) {
-		snprintf(output, sizeof(output), "%d+", min);
+		safe_snprintf(output, sizeof(output), "%d+", min);
 	}
 	else if (max > 0) {
-		snprintf(output, sizeof(output), "1-%d", max);
+		safe_snprintf(output, sizeof(output), "1-%d", max);
 	}
 	else {
-		snprintf(output, sizeof(output), "0");
+		safe_snprintf(output, sizeof(output), "0");
 	}
 	
 	return output;
@@ -5740,10 +5745,10 @@ void sprinttype(int type, const char *names[], char *result, size_t max_result_s
 	}
 	
 	if (*names[nr] != '\n') {
-		snprintf(result, max_result_size, "%s", names[nr]);
+		safe_snprintf(result, max_result_size, "%s", names[nr]);
 	}
 	else {
-		snprintf(result, max_result_size, "%s", NULLSAFE(error_value));
+		safe_snprintf(result, max_result_size, "%s", NULLSAFE(error_value));
 	}
 }
 
@@ -6322,14 +6327,14 @@ char *coord_display(char_data *ch, int x, int y, bool fixed_width) {
 	}
 	else if (fixed_width) {
 		if (CHECK_MAP_BOUNDS(x, y)) {
-			snprintf(output, sizeof(output), " (%*d, %*d)", X_PRECISION, x, Y_PRECISION, y);
+			safe_snprintf(output, sizeof(output), " (%*d, %*d)", X_PRECISION, x, Y_PRECISION, y);
 		}
 		else {
-			snprintf(output, sizeof(output), " (%*.*s)", X_PRECISION + Y_PRECISION + 2, X_PRECISION + Y_PRECISION + 2, "unknown");
+			safe_snprintf(output, sizeof(output), " (%*.*s)", X_PRECISION + Y_PRECISION + 2, X_PRECISION + Y_PRECISION + 2, "unknown");
 		}
 	}
 	else if (CHECK_MAP_BOUNDS(x, y)) {
-		snprintf(output, sizeof(output), " (%d, %d)", x, y);
+		safe_snprintf(output, sizeof(output), " (%d, %d)", x, y);
 	}
 	else {
 		strcpy(output, " (unknown)");	// strcpy ok: known width
@@ -7128,7 +7133,7 @@ void lock_icon(room_data *room, struct icon_data *use_icon) {
 	// did we find one
 	if (icon) {
 		// prepend color (it's not automatically there)
-		snprintf(buffer, sizeof(buffer), "%s%s", icon->color, icon->icon);
+		safe_snprintf(buffer, sizeof(buffer), "%s%s", icon->color, icon->icon);
 	
 		// check for variable colors that must be stored
 		if (strstr(buffer, "&?")) {
@@ -7179,7 +7184,7 @@ void lock_icon_map(struct map_data *loc, struct icon_data *use_icon) {
 		}
 		
 		// prepend color code
-		snprintf(buffer, sizeof(buffer), "%s%s", icon->color, icon->icon);
+		safe_snprintf(buffer, sizeof(buffer), "%s%s", icon->color, icon->icon);
 	
 		// finally, check for variable colors that must be stored
 		if (strstr(buffer, "&?")) {

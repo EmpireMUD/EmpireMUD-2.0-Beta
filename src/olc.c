@@ -2862,12 +2862,12 @@ OLC_MODULE(olc_fullsearch) {
 
 // Usage: olc mob list <from vnum> [to vnum]
 OLC_MODULE(olc_list) {
-	char buf[MAX_STRING_LENGTH*2], buf1[MAX_STRING_LENGTH*2], buf2[MAX_STRING_LENGTH];
+	char buf1[MAX_STRING_LENGTH*2], buf2[MAX_STRING_LENGTH];
 	char arg[MAX_INPUT_LENGTH];
 	any_vnum from_vnum = NOTHING, to_vnum = NOTHING, iter;
 	bool found_from = FALSE, found_to = FALSE;
 	bool show_details = FALSE;
-	int count = 0, len;
+	int count = 0;
 	
 	skip_spaces(&argument);
 	
@@ -2924,9 +2924,6 @@ OLC_MODULE(olc_list) {
 		if (to_vnum == NOTHING) {
 			to_vnum = from_vnum;
 		}
-	
-		*buf = '\0';
-		len = 0;
 		
 		// OLC_x:
 		switch (type) {
@@ -2934,12 +2931,9 @@ OLC_MODULE(olc_list) {
 				char *list_one_ability(ability_data *abil, bool detail);
 				ability_data *abil, *next_abil;
 				HASH_ITER(hh, ability_table, abil, next_abil) {
-					if (len >= sizeof(buf)) {
-						break;
-					}
 					if (ABIL_VNUM(abil) >= from_vnum && ABIL_VNUM(abil) <= to_vnum) {
 						++count;
-						len += snprintf(buf + len, sizeof(buf) - len, "%s\r\n", list_one_ability(abil, show_details));
+						build_page_display_str(ch, list_one_ability(abil, show_details));
 					}
 				}
 				break;
@@ -2948,12 +2942,9 @@ OLC_MODULE(olc_list) {
 				char *list_one_adventure(adv_data *adv, bool detail);
 				adv_data *adv, *next_adv;
 				HASH_ITER(hh, adventure_table, adv, next_adv) {
-					if (len >= sizeof(buf)) {
-						break;
-					}
 					if (GET_ADV_VNUM(adv) >= from_vnum && GET_ADV_VNUM(adv) <= to_vnum) {
 						++count;
-						len += snprintf(buf + len, sizeof(buf) - len, "%s\r\n", list_one_adventure(adv, show_details));
+						build_page_display_str(ch, list_one_adventure(adv, show_details));
 					}
 				}
 				break;
@@ -2962,12 +2953,9 @@ OLC_MODULE(olc_list) {
 				char *list_one_archetype(archetype_data *arch, bool detail);
 				struct archetype_data *arch, *next_arch;
 				HASH_ITER(hh, archetype_table, arch, next_arch) {
-					if (len >= sizeof(buf)) {
-						break;
-					}
 					if (GET_ARCH_VNUM(arch) >= from_vnum && GET_ARCH_VNUM(arch) <= to_vnum) {
 						++count;
-						len += snprintf(buf + len, sizeof(buf) - len, "%s\r\n", list_one_archetype(arch, show_details));
+						build_page_display_str(ch, list_one_archetype(arch, show_details));
 					}
 				}
 				break;
@@ -2976,12 +2964,9 @@ OLC_MODULE(olc_list) {
 				char *list_one_attack_message(attack_message_data *amd, bool detail);
 				attack_message_data *amd, *next_amd;
 				HASH_ITER(hh, attack_message_table, amd, next_amd) {
-					if (len >= sizeof(buf)) {
-						break;
-					}
 					if (ATTACK_VNUM(amd) >= from_vnum && ATTACK_VNUM(amd) <= to_vnum) {
 						++count;
-						len += snprintf(buf + len, sizeof(buf) - len, "%s\r\n", list_one_attack_message(amd, show_details));
+						build_page_display_str(ch, list_one_attack_message(amd, show_details));
 					}
 				}
 				break;
@@ -2990,12 +2975,9 @@ OLC_MODULE(olc_list) {
 				char *list_one_augment(augment_data *aug, bool detail);
 				struct augment_data *aug, *next_aug;
 				HASH_ITER(hh, augment_table, aug, next_aug) {
-					if (len >= sizeof(buf)) {
-						break;
-					}
 					if (GET_AUG_VNUM(aug) >= from_vnum && GET_AUG_VNUM(aug) <= to_vnum) {
 						++count;
-						len += snprintf(buf + len, sizeof(buf) - len, "%s\r\n", list_one_augment(aug, show_details));
+						build_page_display_str(ch, list_one_augment(aug, show_details));
 					}
 				}
 				break;
@@ -3004,12 +2986,9 @@ OLC_MODULE(olc_list) {
 				char *list_one_book(book_data *book, bool detail);
 				book_data *book, *next_book;
 				HASH_ITER(hh, book_table, book, next_book) {
-					if (len >= sizeof(buf)) {
-						break;
-					}
 					if (BOOK_VNUM(book) >= from_vnum && BOOK_VNUM(book) <= to_vnum) {
 						++count;
-						len += snprintf(buf + len, sizeof(buf) - len, "%s\r\n", list_one_book(book, show_details));
+						build_page_display_str(ch, list_one_book(book, show_details));
 					}
 				}
 				break;
@@ -3018,12 +2997,9 @@ OLC_MODULE(olc_list) {
 				char *list_one_building(bld_data *bld, bool detail);
 				bld_data *bld, *next_bld;
 				HASH_ITER(hh, building_table, bld, next_bld) {
-					if (len >= sizeof(buf)) {
-						break;
-					}
 					if (GET_BLD_VNUM(bld) >= from_vnum && GET_BLD_VNUM(bld) <= to_vnum) {
 						++count;
-						len += snprintf(buf + len, sizeof(buf) - len, "%s\r\n", list_one_building(bld, show_details));
+						build_page_display_str(ch, list_one_building(bld, show_details));
 					}
 				}
 				break;
@@ -3032,12 +3008,9 @@ OLC_MODULE(olc_list) {
 				char *list_one_class(class_data *cls, bool detail);
 				class_data *cls, *next_cls;
 				HASH_ITER(hh, class_table, cls, next_cls) {
-					if (len >= sizeof(buf)) {
-						break;
-					}
 					if (CLASS_VNUM(cls) >= from_vnum && CLASS_VNUM(cls) <= to_vnum) {
 						++count;
-						len += snprintf(buf + len, sizeof(buf) - len, "%s\r\n", list_one_class(cls, show_details));
+						build_page_display_str(ch, list_one_class(cls, show_details));
 					}
 				}
 				break;
@@ -3046,12 +3019,9 @@ OLC_MODULE(olc_list) {
 				char *list_one_craft(craft_data *craft, bool detail);
 				craft_data *craft, *next_craft;
 				HASH_ITER(hh, craft_table, craft, next_craft) {
-					if (len >= sizeof(buf)) {
-						break;
-					}
 					if (GET_CRAFT_VNUM(craft) >= from_vnum && GET_CRAFT_VNUM(craft) <= to_vnum) {
 						++count;
-						len += snprintf(buf + len, sizeof(buf) - len, "%s\r\n", list_one_craft(craft, show_details));
+						build_page_display_str(ch, list_one_craft(craft, show_details));
 					}
 				}
 				break;
@@ -3060,12 +3030,9 @@ OLC_MODULE(olc_list) {
 				char *list_one_crop(crop_data *crop, bool detail);
 				crop_data *crop, *next_crop;
 				HASH_ITER(hh, crop_table, crop, next_crop) {
-					if (len >= sizeof(buf)) {
-						break;
-					}
 					if (GET_CROP_VNUM(crop) >= from_vnum && GET_CROP_VNUM(crop) <= to_vnum) {
 						++count;
-						len += snprintf(buf + len, sizeof(buf) - len, "%s\r\n", list_one_crop(crop, show_details));
+						build_page_display_str(ch, list_one_crop(crop, show_details));
 					}
 				}
 				break;
@@ -3074,12 +3041,9 @@ OLC_MODULE(olc_list) {
 				char *list_one_event(event_data *event, bool detail);
 				event_data *event, *next_event;
 				HASH_ITER(hh, event_table, event, next_event) {
-					if (len >= sizeof(buf)) {
-						break;
-					}
 					if (EVT_VNUM(event) >= from_vnum && EVT_VNUM(event) <= to_vnum) {
 						++count;
-						len += snprintf(buf + len, sizeof(buf) - len, "%s\r\n", list_one_event(event, show_details));
+						build_page_display_str(ch, list_one_event(event, show_details));
 					}
 				}
 				break;
@@ -3088,12 +3052,9 @@ OLC_MODULE(olc_list) {
 				char *list_one_faction(faction_data *fct, bool detail);
 				faction_data *fct, *next_fct;
 				HASH_ITER(hh, faction_table, fct, next_fct) {
-					if (len >= sizeof(buf)) {
-						break;
-					}
 					if (FCT_VNUM(fct) >= from_vnum && FCT_VNUM(fct) <= to_vnum) {
 						++count;
-						len += snprintf(buf + len, sizeof(buf) - len, "%s\r\n", list_one_faction(fct, show_details));
+						build_page_display_str(ch, list_one_faction(fct, show_details));
 					}
 				}
 				break;
@@ -3102,12 +3063,9 @@ OLC_MODULE(olc_list) {
 				char *list_one_generic(generic_data *gen, bool detail);
 				generic_data *gen, *next_gen;
 				HASH_ITER(hh, generic_table, gen, next_gen) {
-					if (len >= sizeof(buf)) {
-						break;
-					}
 					if (GEN_VNUM(gen) >= from_vnum && GEN_VNUM(gen) <= to_vnum) {
 						++count;
-						len += snprintf(buf + len, sizeof(buf) - len, "%s\r\n", list_one_generic(gen, show_details));
+						build_page_display_str(ch, list_one_generic(gen, show_details));
 					}
 				}
 				break;
@@ -3116,12 +3074,9 @@ OLC_MODULE(olc_list) {
 				char *list_one_global(struct global_data *glb, bool detail);
 				struct global_data *glb, *next_glb;
 				HASH_ITER(hh, globals_table, glb, next_glb) {
-					if (len >= sizeof(buf)) {
-						break;
-					}
 					if (GET_GLOBAL_VNUM(glb) >= from_vnum && GET_GLOBAL_VNUM(glb) <= to_vnum) {
 						++count;
-						len += snprintf(buf + len, sizeof(buf) - len, "%s\r\n", list_one_global(glb, show_details));
+						build_page_display_str(ch, list_one_global(glb, show_details));
 					}
 				}
 				break;
@@ -3130,12 +3085,9 @@ OLC_MODULE(olc_list) {
 				char *list_one_mobile(char_data *mob, bool detail);
 				char_data *mob, *next_mob;
 				HASH_ITER(hh, mobile_table, mob, next_mob) {
-					if (len >= sizeof(buf)) {
-						break;
-					}
 					if (GET_MOB_VNUM(mob) >= from_vnum && GET_MOB_VNUM(mob) <= to_vnum) {
 						++count;
-						len += snprintf(buf + len, sizeof(buf) - len, "%s\r\n", list_one_mobile(mob, show_details));
+						build_page_display_str(ch, list_one_mobile(mob, show_details));
 					}
 				}
 				break;
@@ -3144,12 +3096,9 @@ OLC_MODULE(olc_list) {
 				char *list_one_morph(morph_data *morph, bool detail);
 				morph_data *morph, *next_morph;
 				HASH_ITER(hh, morph_table, morph, next_morph) {
-					if (len >= sizeof(buf)) {
-						break;
-					}
 					if (MORPH_VNUM(morph) >= from_vnum && MORPH_VNUM(morph) <= to_vnum) {
 						++count;
-						len += snprintf(buf + len, sizeof(buf) - len, "%s\r\n", list_one_morph(morph, show_details));
+						build_page_display_str(ch, list_one_morph(morph, show_details));
 					}
 				}
 				break;
@@ -3158,12 +3107,9 @@ OLC_MODULE(olc_list) {
 				char *list_one_object(obj_data *obj, bool detail);
 				obj_data *obj, *next_obj;
 				HASH_ITER(hh, object_table, obj, next_obj) {
-					if (len >= sizeof(buf)) {
-						break;
-					}
 					if (GET_OBJ_VNUM(obj) >= from_vnum && GET_OBJ_VNUM(obj) <= to_vnum) {
 						++count;
-						len += snprintf(buf + len, sizeof(buf) - len, "%s\r\n", list_one_object(obj, show_details));
+						build_page_display_str(ch, list_one_object(obj, show_details));
 					}
 				}
 				break;
@@ -3172,12 +3118,9 @@ OLC_MODULE(olc_list) {
 				char *list_one_progress(progress_data *prg, bool detail);
 				progress_data *prg, *next_prg;
 				HASH_ITER(hh, progress_table, prg, next_prg) {
-					if (len >= sizeof(buf)) {
-						break;
-					}
 					if (PRG_VNUM(prg) >= from_vnum && PRG_VNUM(prg) <= to_vnum) {
 						++count;
-						len += snprintf(buf + len, sizeof(buf) - len, "%s\r\n", list_one_progress(prg, show_details));
+						build_page_display_str(ch, list_one_progress(prg, show_details));
 					}
 				}
 				break;
@@ -3186,12 +3129,9 @@ OLC_MODULE(olc_list) {
 				char *list_one_quest(quest_data *quest, bool detail);
 				quest_data *quest, *next_quest;
 				HASH_ITER(hh, quest_table, quest, next_quest) {
-					if (len >= sizeof(buf)) {
-						break;
-					}
 					if (QUEST_VNUM(quest) >= from_vnum && QUEST_VNUM(quest) <= to_vnum) {
 						++count;
-						len += snprintf(buf + len, sizeof(buf) - len, "%s\r\n", list_one_quest(quest, show_details));
+						build_page_display_str(ch, list_one_quest(quest, show_details));
 					}
 				}
 				break;
@@ -3200,12 +3140,9 @@ OLC_MODULE(olc_list) {
 				char *list_one_room_template(room_template *rmt, bool detail);
 				room_template *rmt, *next_rmt;
 				HASH_ITER(hh, room_template_table, rmt, next_rmt) {
-					if (len >= sizeof(buf)) {
-						break;
-					}
 					if (GET_RMT_VNUM(rmt) >= from_vnum && GET_RMT_VNUM(rmt) <= to_vnum) {
 						++count;
-						len += snprintf(buf + len, sizeof(buf) - len, "%s\r\n", list_one_room_template(rmt, show_details));
+						build_page_display_str(ch, list_one_room_template(rmt, show_details));
 					}
 				}
 				break;
@@ -3214,12 +3151,9 @@ OLC_MODULE(olc_list) {
 				char *list_one_sector(sector_data *sect, bool detail);
 				sector_data *sect, *next_sect;
 				HASH_ITER(hh, sector_table, sect, next_sect) {
-					if (len >= sizeof(buf)) {
-						break;
-					}
 					if (GET_SECT_VNUM(sect) >= from_vnum && GET_SECT_VNUM(sect) <= to_vnum) {
 						++count;
-						len += snprintf(buf + len, sizeof(buf) - len, "%s\r\n", list_one_sector(sect, show_details));
+						build_page_display_str(ch, list_one_sector(sect, show_details));
 					}
 				}
 				break;
@@ -3228,12 +3162,9 @@ OLC_MODULE(olc_list) {
 				char *list_one_shop(shop_data *shop, bool detail);
 				shop_data *shop, *next_shop;
 				HASH_ITER(hh, shop_table, shop, next_shop) {
-					if (len >= sizeof(buf)) {
-						break;
-					}
 					if (SHOP_VNUM(shop) >= from_vnum && SHOP_VNUM(shop) <= to_vnum) {
 						++count;
-						len += snprintf(buf + len, sizeof(buf) - len, "%s\r\n", list_one_shop(shop, show_details));
+						build_page_display_str(ch, list_one_shop(shop, show_details));
 					}
 				}
 				break;
@@ -3242,12 +3173,9 @@ OLC_MODULE(olc_list) {
 				char *list_one_skill(skill_data *skill, bool detail);
 				skill_data *skill, *next_skill;
 				HASH_ITER(hh, skill_table, skill, next_skill) {
-					if (len >= sizeof(buf)) {
-						break;
-					}
 					if (SKILL_VNUM(skill) >= from_vnum && SKILL_VNUM(skill) <= to_vnum) {
 						++count;
-						len += snprintf(buf + len, sizeof(buf) - len, "%s\r\n", list_one_skill(skill, show_details));
+						build_page_display_str(ch, list_one_skill(skill, show_details));
 					}
 				}
 				break;
@@ -3256,12 +3184,9 @@ OLC_MODULE(olc_list) {
 				char *list_one_social(social_data *soc, bool detail);
 				social_data *soc, *next_soc;
 				HASH_ITER(hh, social_table, soc, next_soc) {
-					if (len >= sizeof(buf)) {
-						break;
-					}
 					if (SOC_VNUM(soc) >= from_vnum && SOC_VNUM(soc) <= to_vnum) {
 						++count;
-						len += snprintf(buf + len, sizeof(buf) - len, "%s\r\n", list_one_social(soc, show_details));
+						build_page_display_str(ch, list_one_social(soc, show_details));
 					}
 				}
 				break;
@@ -3270,12 +3195,9 @@ OLC_MODULE(olc_list) {
 				char *list_one_trigger(trig_data *trig, bool detail);
 				trig_data *trig, *next_trig;
 				HASH_ITER(hh, trigger_table, trig, next_trig) {
-					if (len >= sizeof(buf)) {
-						break;
-					}
 					if (GET_TRIG_VNUM(trig) >= from_vnum && GET_TRIG_VNUM(trig) <= to_vnum) {
 						++count;
-						len += snprintf(buf + len, sizeof(buf) - len, "%s\r\n", list_one_trigger(trig, show_details));
+						build_page_display_str(ch, list_one_trigger(trig, show_details));
 					}
 				}
 				break;
@@ -3284,12 +3206,9 @@ OLC_MODULE(olc_list) {
 				char *list_one_vehicle(vehicle_data *veh, bool detail);
 				vehicle_data *veh, *next_veh;
 				HASH_ITER(hh, vehicle_table, veh, next_veh) {
-					if (len >= sizeof(buf)) {
-						break;
-					}
 					if (VEH_VNUM(veh) >= from_vnum && VEH_VNUM(veh) <= to_vnum) {
 						++count;
-						len += snprintf(buf + len, sizeof(buf) - len, "%s\r\n", list_one_vehicle(veh, show_details));
+						build_page_display_str(ch, list_one_vehicle(veh, show_details));
 					}
 				}
 				break;
@@ -3297,9 +3216,10 @@ OLC_MODULE(olc_list) {
 		}
 		
 		sprintbit(type, olc_type_bits, buf2, FALSE);
-		if (*buf) {
-			snprintf(buf1, sizeof(buf1), "Found %d %s%s:\r\n%s", count, buf2, (count != 1 ? "s" : ""), buf);
-			page_string(ch->desc, buf1, TRUE);
+		if (count > 0) {
+			safe_snprintf(buf1, sizeof(buf1), "Found %d %s%s:", count, buf2, (count != 1 ? "s" : ""));
+			build_page_display_prepend(ch, buf1);
+			send_page_display(ch);
 		}
 		else {
 			msg_to_char(ch, "Found no %ss in that range.\r\n", buf2);
@@ -3723,7 +3643,7 @@ OLC_MODULE(olc_save) {
 		switch (GET_OLC_TYPE(ch->desc)) {
 			case OLC_ABILITY: {
 				void save_olc_ability(descriptor_data *desc);
-				snprintf(name, sizeof(name), "%s", NULLSAFE(ABIL_NAME(GET_OLC_ABILITY(ch->desc))));
+				safe_snprintf(name, sizeof(name), "%s", NULLSAFE(ABIL_NAME(GET_OLC_ABILITY(ch->desc))));
 				save_olc_ability(ch->desc);
 				audit_ability(GET_OLC_ABILITY(ch->desc), ch);
 				free_ability(GET_OLC_ABILITY(ch->desc));
@@ -3732,7 +3652,7 @@ OLC_MODULE(olc_save) {
 			}
 			case OLC_ADVENTURE: {
 				void save_olc_adventure(descriptor_data *desc);
-				snprintf(name, sizeof(name), "%s", NULLSAFE(GET_ADV_NAME(GET_OLC_ADVENTURE(ch->desc))));
+				safe_snprintf(name, sizeof(name), "%s", NULLSAFE(GET_ADV_NAME(GET_OLC_ADVENTURE(ch->desc))));
 				save_olc_adventure(ch->desc);
 				audit_adventure(GET_OLC_ADVENTURE(ch->desc), ch, FALSE);
 				free_adventure(GET_OLC_ADVENTURE(ch->desc));
@@ -3741,7 +3661,7 @@ OLC_MODULE(olc_save) {
 			}
 			case OLC_ARCHETYPE: {
 				void save_olc_archetype(descriptor_data *desc);
-				snprintf(name, sizeof(name), "%s", NULLSAFE(GET_ARCH_NAME(GET_OLC_ARCHETYPE(ch->desc))));
+				safe_snprintf(name, sizeof(name), "%s", NULLSAFE(GET_ARCH_NAME(GET_OLC_ARCHETYPE(ch->desc))));
 				save_olc_archetype(ch->desc);
 				audit_archetype(GET_OLC_ARCHETYPE(ch->desc), ch);
 				free_archetype(GET_OLC_ARCHETYPE(ch->desc));
@@ -3750,7 +3670,7 @@ OLC_MODULE(olc_save) {
 			}
 			case OLC_ATTACK: {
 				void save_olc_attack_message(descriptor_data *desc);
-				snprintf(name, sizeof(name), "%s", NULLSAFE(ATTACK_NAME(GET_OLC_ATTACK(ch->desc))));
+				safe_snprintf(name, sizeof(name), "%s", NULLSAFE(ATTACK_NAME(GET_OLC_ATTACK(ch->desc))));
 				save_olc_attack_message(ch->desc);
 				audit_attack_message(GET_OLC_ATTACK(ch->desc), ch);
 				free_attack_message(GET_OLC_ATTACK(ch->desc));
@@ -3760,7 +3680,7 @@ OLC_MODULE(olc_save) {
 			}
 			case OLC_AUGMENT: {
 				void save_olc_augment(descriptor_data *desc);
-				snprintf(name, sizeof(name), "%s", NULLSAFE(GET_AUG_NAME(GET_OLC_AUGMENT(ch->desc))));
+				safe_snprintf(name, sizeof(name), "%s", NULLSAFE(GET_AUG_NAME(GET_OLC_AUGMENT(ch->desc))));
 				save_olc_augment(ch->desc);
 				audit_augment(GET_OLC_AUGMENT(ch->desc), ch);
 				free_augment(GET_OLC_AUGMENT(ch->desc));
@@ -3769,7 +3689,7 @@ OLC_MODULE(olc_save) {
 			}
 			case OLC_BOOK: {
 				void save_olc_book(descriptor_data *desc);
-				snprintf(name, sizeof(name), "%s", NULLSAFE(BOOK_TITLE(GET_OLC_BOOK(ch->desc))));
+				safe_snprintf(name, sizeof(name), "%s", NULLSAFE(BOOK_TITLE(GET_OLC_BOOK(ch->desc))));
 				save_olc_book(ch->desc);
 				// audit_book(GET_OLC_BOOK(ch->desc), ch);
 				free_book(GET_OLC_BOOK(ch->desc));
@@ -3777,7 +3697,7 @@ OLC_MODULE(olc_save) {
 				break;
 			}
 			case OLC_BUILDING: {
-				snprintf(name, sizeof(name), "%s", NULLSAFE(GET_BLD_NAME(GET_OLC_BUILDING(ch->desc))));
+				safe_snprintf(name, sizeof(name), "%s", NULLSAFE(GET_BLD_NAME(GET_OLC_BUILDING(ch->desc))));
 				save_olc_building(ch->desc);
 				audit_building(GET_OLC_BUILDING(ch->desc), ch);
 				free_building(GET_OLC_BUILDING(ch->desc));
@@ -3786,7 +3706,7 @@ OLC_MODULE(olc_save) {
 			}
 			case OLC_CLASS: {
 				void save_olc_class(descriptor_data *desc);
-				snprintf(name, sizeof(name), "%s", NULLSAFE(CLASS_NAME(GET_OLC_CLASS(ch->desc))));
+				safe_snprintf(name, sizeof(name), "%s", NULLSAFE(CLASS_NAME(GET_OLC_CLASS(ch->desc))));
 				save_olc_class(ch->desc);
 				audit_class(GET_OLC_CLASS(ch->desc), ch);
 				free_class(GET_OLC_CLASS(ch->desc));
@@ -3794,7 +3714,7 @@ OLC_MODULE(olc_save) {
 				break;
 			}
 			case OLC_CRAFT: {
-				snprintf(name, sizeof(name), "%s", NULLSAFE(GET_CRAFT_NAME(GET_OLC_CRAFT(ch->desc))));
+				safe_snprintf(name, sizeof(name), "%s", NULLSAFE(GET_CRAFT_NAME(GET_OLC_CRAFT(ch->desc))));
 				save_olc_craft(ch->desc);
 				audit_craft(GET_OLC_CRAFT(ch->desc), ch);
 				free_craft(GET_OLC_CRAFT(ch->desc));
@@ -3803,7 +3723,7 @@ OLC_MODULE(olc_save) {
 			}
 			case OLC_CROP: {
 				void save_olc_crop(descriptor_data *desc);
-				snprintf(name, sizeof(name), "%s", NULLSAFE(GET_CROP_NAME(GET_OLC_CROP(ch->desc))));
+				safe_snprintf(name, sizeof(name), "%s", NULLSAFE(GET_CROP_NAME(GET_OLC_CROP(ch->desc))));
 				save_olc_crop(ch->desc);
 				audit_crop(GET_OLC_CROP(ch->desc), ch);
 				free_crop(GET_OLC_CROP(ch->desc));
@@ -3812,7 +3732,7 @@ OLC_MODULE(olc_save) {
 			}
 			case OLC_EVENT: {
 				void save_olc_event(descriptor_data *desc);
-				snprintf(name, sizeof(name), "%s", NULLSAFE(EVT_NAME(GET_OLC_EVENT(ch->desc))));
+				safe_snprintf(name, sizeof(name), "%s", NULLSAFE(EVT_NAME(GET_OLC_EVENT(ch->desc))));
 				save_olc_event(ch->desc);
 				audit_event(GET_OLC_EVENT(ch->desc), ch);
 				free_event(GET_OLC_EVENT(ch->desc));
@@ -3821,7 +3741,7 @@ OLC_MODULE(olc_save) {
 			}
 			case OLC_FACTION: {
 				void save_olc_faction(descriptor_data *desc);
-				snprintf(name, sizeof(name), "%s", NULLSAFE(FCT_NAME(GET_OLC_FACTION(ch->desc))));
+				safe_snprintf(name, sizeof(name), "%s", NULLSAFE(FCT_NAME(GET_OLC_FACTION(ch->desc))));
 				save_olc_faction(ch->desc);
 				audit_faction(GET_OLC_FACTION(ch->desc), ch);
 				free_faction(GET_OLC_FACTION(ch->desc));
@@ -3830,7 +3750,7 @@ OLC_MODULE(olc_save) {
 			}
 			case OLC_GENERIC: {
 				void save_olc_generic(descriptor_data *desc);
-				snprintf(name, sizeof(name), "%s", NULLSAFE(GEN_NAME(GET_OLC_GENERIC(ch->desc))));
+				safe_snprintf(name, sizeof(name), "%s", NULLSAFE(GEN_NAME(GET_OLC_GENERIC(ch->desc))));
 				save_olc_generic(ch->desc);
 				audit_generic(GET_OLC_GENERIC(ch->desc), ch);
 				free_generic(GET_OLC_GENERIC(ch->desc));
@@ -3839,7 +3759,7 @@ OLC_MODULE(olc_save) {
 			}
 			case OLC_GLOBAL: {
 				void save_olc_global(descriptor_data *desc);
-				snprintf(name, sizeof(name), "%s", NULLSAFE(GET_GLOBAL_NAME(GET_OLC_GLOBAL(ch->desc))));
+				safe_snprintf(name, sizeof(name), "%s", NULLSAFE(GET_GLOBAL_NAME(GET_OLC_GLOBAL(ch->desc))));
 				save_olc_global(ch->desc);
 				audit_global(GET_OLC_GLOBAL(ch->desc), ch);
 				free_global(GET_OLC_GLOBAL(ch->desc));
@@ -3848,7 +3768,7 @@ OLC_MODULE(olc_save) {
 			}
 			case OLC_MOBILE: {
 				void save_olc_mobile(descriptor_data *desc);
-				snprintf(name, sizeof(name), "%s", NULLSAFE(GET_SHORT_DESC(GET_OLC_MOBILE(ch->desc))));
+				safe_snprintf(name, sizeof(name), "%s", NULLSAFE(GET_SHORT_DESC(GET_OLC_MOBILE(ch->desc))));
 				save_olc_mobile(ch->desc);
 				audit_mobile(GET_OLC_MOBILE(ch->desc), ch);
 				free_char(GET_OLC_MOBILE(ch->desc));
@@ -3857,7 +3777,7 @@ OLC_MODULE(olc_save) {
 			}
 			case OLC_MORPH: {
 				void save_olc_morph(descriptor_data *desc);
-				snprintf(name, sizeof(name), "%s", NULLSAFE(MORPH_SHORT_DESC(GET_OLC_MORPH(ch->desc))));
+				safe_snprintf(name, sizeof(name), "%s", NULLSAFE(MORPH_SHORT_DESC(GET_OLC_MORPH(ch->desc))));
 				save_olc_morph(ch->desc);
 				audit_morph(GET_OLC_MORPH(ch->desc), ch);
 				free_morph(GET_OLC_MORPH(ch->desc));
@@ -3866,7 +3786,7 @@ OLC_MODULE(olc_save) {
 			}
 			case OLC_OBJECT: {
 				void save_olc_object(descriptor_data *desc);
-				snprintf(name, sizeof(name), "%s", NULLSAFE(GET_OBJ_SHORT_DESC(GET_OLC_OBJECT(ch->desc))));
+				safe_snprintf(name, sizeof(name), "%s", NULLSAFE(GET_OBJ_SHORT_DESC(GET_OLC_OBJECT(ch->desc))));
 				save_olc_object(ch->desc);
 				audit_object(GET_OLC_OBJECT(ch->desc), ch);
 				free_obj(GET_OLC_OBJECT(ch->desc));
@@ -3875,7 +3795,7 @@ OLC_MODULE(olc_save) {
 			}
 			case OLC_PROGRESS: {
 				void save_olc_progress(descriptor_data *desc);
-				snprintf(name, sizeof(name), "%s", NULLSAFE(PRG_NAME(GET_OLC_PROGRESS(ch->desc))));
+				safe_snprintf(name, sizeof(name), "%s", NULLSAFE(PRG_NAME(GET_OLC_PROGRESS(ch->desc))));
 				save_olc_progress(ch->desc);
 				audit_progress(GET_OLC_PROGRESS(ch->desc), ch);
 				free_progress(GET_OLC_PROGRESS(ch->desc));
@@ -3884,7 +3804,7 @@ OLC_MODULE(olc_save) {
 			}
 			case OLC_QUEST: {
 				void save_olc_quest(descriptor_data *desc);
-				snprintf(name, sizeof(name), "%s", NULLSAFE(QUEST_NAME(GET_OLC_QUEST(ch->desc))));
+				safe_snprintf(name, sizeof(name), "%s", NULLSAFE(QUEST_NAME(GET_OLC_QUEST(ch->desc))));
 				save_olc_quest(ch->desc);
 				audit_quest(GET_OLC_QUEST(ch->desc), ch);
 				free_quest(GET_OLC_QUEST(ch->desc));
@@ -3893,7 +3813,7 @@ OLC_MODULE(olc_save) {
 			}
 			case OLC_ROOM_TEMPLATE: {
 				void save_olc_room_template(descriptor_data *desc);
-				snprintf(name, sizeof(name), "%s", NULLSAFE(GET_RMT_TITLE(GET_OLC_ROOM_TEMPLATE(ch->desc))));
+				safe_snprintf(name, sizeof(name), "%s", NULLSAFE(GET_RMT_TITLE(GET_OLC_ROOM_TEMPLATE(ch->desc))));
 				save_olc_room_template(ch->desc);
 				audit_room_template(GET_OLC_ROOM_TEMPLATE(ch->desc), ch);
 				free_room_template(GET_OLC_ROOM_TEMPLATE(ch->desc));
@@ -3902,7 +3822,7 @@ OLC_MODULE(olc_save) {
 			}
 			case OLC_SECTOR: {
 				void save_olc_sector(descriptor_data *desc);
-				snprintf(name, sizeof(name), "%s", NULLSAFE(GET_SECT_NAME(GET_OLC_SECTOR(ch->desc))));
+				safe_snprintf(name, sizeof(name), "%s", NULLSAFE(GET_SECT_NAME(GET_OLC_SECTOR(ch->desc))));
 				save_olc_sector(ch->desc);
 				audit_sector(GET_OLC_SECTOR(ch->desc), ch);
 				free_sector(GET_OLC_SECTOR(ch->desc));
@@ -3911,7 +3831,7 @@ OLC_MODULE(olc_save) {
 			}
 			case OLC_SHOP: {
 				void save_olc_shop(descriptor_data *desc);
-				snprintf(name, sizeof(name), "%s", NULLSAFE(SHOP_NAME(GET_OLC_SHOP(ch->desc))));
+				safe_snprintf(name, sizeof(name), "%s", NULLSAFE(SHOP_NAME(GET_OLC_SHOP(ch->desc))));
 				save_olc_shop(ch->desc);
 				audit_shop(GET_OLC_SHOP(ch->desc), ch);
 				free_shop(GET_OLC_SHOP(ch->desc));
@@ -3920,7 +3840,7 @@ OLC_MODULE(olc_save) {
 			}
 			case OLC_SKILL: {
 				void save_olc_skill(descriptor_data *desc);
-				snprintf(name, sizeof(name), "%s", NULLSAFE(SKILL_NAME(GET_OLC_SKILL(ch->desc))));
+				safe_snprintf(name, sizeof(name), "%s", NULLSAFE(SKILL_NAME(GET_OLC_SKILL(ch->desc))));
 				save_olc_skill(ch->desc);
 				audit_skill(GET_OLC_SKILL(ch->desc), ch);
 				free_skill(GET_OLC_SKILL(ch->desc));
@@ -3929,7 +3849,7 @@ OLC_MODULE(olc_save) {
 			}
 			case OLC_SOCIAL: {
 				void save_olc_social(descriptor_data *desc);
-				snprintf(name, sizeof(name), "%s", NULLSAFE(SOC_NAME(GET_OLC_SOCIAL(ch->desc))));
+				safe_snprintf(name, sizeof(name), "%s", NULLSAFE(SOC_NAME(GET_OLC_SOCIAL(ch->desc))));
 				save_olc_social(ch->desc);
 				audit_social(GET_OLC_SOCIAL(ch->desc), ch);
 				free_social(GET_OLC_SOCIAL(ch->desc));
@@ -3938,7 +3858,7 @@ OLC_MODULE(olc_save) {
 			}
 			case OLC_TRIGGER: {
 				void save_olc_trigger(descriptor_data *desc, char *script_text);
-				snprintf(name, sizeof(name), "%s", NULLSAFE(GET_TRIG_NAME(GET_OLC_TRIGGER(ch->desc))));
+				safe_snprintf(name, sizeof(name), "%s", NULLSAFE(GET_TRIG_NAME(GET_OLC_TRIGGER(ch->desc))));
 				save_olc_trigger(ch->desc, GET_OLC_STORAGE(ch->desc));
 				audit_trigger(GET_OLC_TRIGGER(ch->desc), ch);
 				free_trigger(GET_OLC_TRIGGER(ch->desc));
@@ -3951,7 +3871,7 @@ OLC_MODULE(olc_save) {
 			}
 			case OLC_VEHICLE: {
 				save_olc_vehicle(ch->desc);
-				snprintf(name, sizeof(name), "%s", NULLSAFE(VEH_SHORT_DESC(GET_OLC_VEHICLE(ch->desc))));
+				safe_snprintf(name, sizeof(name), "%s", NULLSAFE(VEH_SHORT_DESC(GET_OLC_VEHICLE(ch->desc))));
 				audit_vehicle(GET_OLC_VEHICLE(ch->desc), ch);
 				free_vehicle(GET_OLC_VEHICLE(ch->desc));
 				GET_OLC_VEHICLE(ch->desc) = NULL;
@@ -4611,15 +4531,14 @@ OLC_MODULE(olc_wordcount) {
 /**
 * Displays the evolution data from a given list.
 *
+* @param char_data *ch The person viewing it.
 * @param struct evolution_data *list Pointer to the start of a list of evos.
-* @param char *save_buffer A buffer to store the result to.
+* @param bool send_output If TRUE, sends the page_display as text when done. Pass FALSE if you're building a larger page_display for the character.
 */
-void get_evolution_display(struct evolution_data *list, char *save_buffer) {
+void show_evolution_display(char_data *ch, struct evolution_data *list, bool send_output) {
 	char lbuf[MAX_STRING_LENGTH], part[MAX_STRING_LENGTH];
 	struct evolution_data *evo;
 	int count = 0;
-	
-	*save_buffer = '\0';
 	
 	for (evo = list; evo; evo = evo->next) {
 		switch (evo_val_types[evo->type]) {
@@ -4641,10 +4560,14 @@ void get_evolution_display(struct evolution_data *list, char *save_buffer) {
 				break;
 			}
 		}
-		sprintf(save_buffer + strlen(save_buffer), " %d. %s%s %.2f%% becomes %s (%d)\r\n", ++count, evo_types[evo->type], lbuf, evo->percent, GET_SECT_NAME(sector_proto(evo->becomes)), evo->becomes);
+		build_page_display(ch, " %d. %s%s %.2f%% becomes %s (%d)", ++count, evo_types[evo->type], lbuf, evo->percent, GET_SECT_NAME(sector_proto(evo->becomes)), evo->becomes);
 	}
 	if (!list) {
-		sprintf(save_buffer + strlen(save_buffer), " none\r\n");
+		build_page_display_str(ch, " none");
+	}
+	
+	if (send_output) {
+		send_page_display_as(ch, PD_NO_PAGINATION | PD_FREE_DISPLAY_AFTER);
 	}
 }
 
@@ -4652,61 +4575,44 @@ void get_evolution_display(struct evolution_data *list, char *save_buffer) {
 /**
 * Displays the extra descs from a given list.
 *
+* @param char_data *ch The person viewing it.
 * @param struct extra_descr_data *list Pointer to the start of a list of decriptions.
-* @param char *save_buffer A buffer to store the result to.
-* @param size_t buf_size How large the save_buffer is.
+* @param bool send_output If TRUE, sends the page_display as text when done. Pass FALSE if you're building a larger page_display for the character.
 */
-void get_extra_desc_display(struct extra_descr_data *list, char *save_buffer, size_t buf_size) {
+void show_extra_desc_display(char_data *ch, struct extra_descr_data *list, bool send_output) {
 	struct extra_descr_data *ex;
-	char temp[MAX_STRING_LENGTH];
 	int count = 0;
-	size_t size, tsize;
-	
-	*save_buffer = '\0';
-	size = 0;
 	
 	for (ex = list; ex; ex = ex->next) {
-		tsize = snprintf(temp, sizeof(temp), " &y%d&0. %s\r\n%s", ++count, (ex->keyword ? ex->keyword : "(null)"), (ex->description ? ex->description : "(null)\r\n"));
-		
-		if (size + tsize < buf_size) {
-			strcat(save_buffer, temp);
-			size += tsize;
-		}
-		else {
-			size += snprintf(save_buffer + size, buf_size - size, "** OVERFLOW **\r\n");
-			break;
-		}
+		build_page_display(ch, " &y%d&0. %s\r\n%s", ++count, (ex->keyword ? ex->keyword : "(null)"), (ex->description ? ex->description : "(null)"));
 	}
 	if (count == 0) {
-		snprintf(save_buffer, buf_size, " none\r\n");
+		build_page_display_str(ch, " none");
+	}
+	
+	if (send_output) {
+		send_page_display_as(ch, PD_NO_PAGINATION | PD_FREE_DISPLAY_AFTER);
 	}
 }
 
 
 /**
-* Gets the display for a set of icons.
+* Display for a set of icons.
 *
+* @param char_data *ch The person viewing it.
 * @param struct icon_data *list Pointer to the start of a list of icons.
-* @param char *save_buffer A buffer to store the result to.
+* @param bool send_output If TRUE, sends the page_display as text when done. Pass FALSE if you're building a larger page_display for the character.
 */
-void get_icons_display(struct icon_data *list, char *save_buffer) {
-	char lbuf[MAX_INPUT_LENGTH], line[MAX_INPUT_LENGTH];
+void show_icons_display(char_data *ch, struct icon_data *list, bool send_output) {
 	struct icon_data *icon;
-	int size, count = 0;
-
-	*save_buffer = '\0';
+	int count = 0;
 	
 	for (icon = list; icon; icon = icon->next) {
-		sprintf(line, " %2d. %s: %s", ++count, icon_types[icon->type], one_icon_display(icon->icon, icon->color));
-		
-		// format column despite variable width of color codes
-		size = 34 + color_code_length(line);
-		sprintf(lbuf, "%%-%d.%ds%%s", size, size);
-		sprintf(save_buffer + strlen(save_buffer), lbuf, line, !(count % 2) ? "\r\n" : "");
+		build_page_display_col(ch, 2, FALSE, " %2d. %s: %s", ++count, icon_types[icon->type], one_icon_display(icon->icon, icon->color));
 	}
 	
-	if (count % 2) {
-		strcat(save_buffer, "\r\n");
+	if (send_output) {
+		send_page_display_as(ch, PD_NO_PAGINATION | PD_FREE_DISPLAY_AFTER);
 	}
 }
 
@@ -4731,44 +4637,44 @@ char *get_interaction_restriction_display(struct interact_restriction *list, boo
 		// INTERACT_RESTRICT_x
 		switch(res->type) {
 			case INTERACT_RESTRICT_ABILITY: {
-				snprintf(line, sizeof(line), "Ability: %s", get_ability_name_by_vnum(res->vnum));
+				safe_snprintf(line, sizeof(line), "Ability: %s", get_ability_name_by_vnum(res->vnum));
 				break;
 			}
 			case INTERACT_RESTRICT_PTECH: {
-				snprintf(line, sizeof(line), "PTech: %s", player_tech_types[res->vnum]);
+				safe_snprintf(line, sizeof(line), "PTech: %s", player_tech_types[res->vnum]);
 				break;
 			}
 			case INTERACT_RESTRICT_TECH: {
-				snprintf(line, sizeof(line), "Tech: %s", empire_tech_types[res->vnum]);
+				safe_snprintf(line, sizeof(line), "Tech: %s", empire_tech_types[res->vnum]);
 				break;
 			}
 			case INTERACT_RESTRICT_NORMAL: {
-				snprintf(line, sizeof(line), "Normal");
+				safe_snprintf(line, sizeof(line), "Normal");
 				break;
 			}
 			case INTERACT_RESTRICT_HARD: {
-				snprintf(line, sizeof(line), "Hard");
+				safe_snprintf(line, sizeof(line), "Hard");
 				break;
 			}
 			case INTERACT_RESTRICT_GROUP: {
-				snprintf(line, sizeof(line), "Group");
+				safe_snprintf(line, sizeof(line), "Group");
 				break;
 			}
 			case INTERACT_RESTRICT_BOSS: {
-				snprintf(line, sizeof(line), "Boss");
+				safe_snprintf(line, sizeof(line), "Boss");
 				break;
 			}
 			case INTERACT_RESTRICT_DEPLETION: {
-				snprintf(line, sizeof(line), "Depletion: %s", depletion_types[res->vnum]);
+				safe_snprintf(line, sizeof(line), "Depletion: %s", depletion_types[res->vnum]);
 				break;
 			}
 			case INTERACT_RESTRICT_TOOL: {
 				prettier_sprintbit(res->vnum, tool_flags, part);
-				snprintf(line, sizeof(line), "Tool: %s", part);
+				safe_snprintf(line, sizeof(line), "Tool: %s", part);
 				break;
 			}
 			default: {
-				snprintf(line, sizeof(line), "Unknown %d:%lld", res->type, res->vnum);
+				safe_snprintf(line, sizeof(line), "Unknown %d:%lld", res->type, res->vnum);
 				break;
 			}
 		}
@@ -4829,82 +4735,90 @@ const char *get_interaction_target(int type, any_vnum vnum) {
 /**
 * Displays the interactions data from a given list.
 *
+* @param char_data *ch The person viewing it.
 * @param struct interaction_item *list Pointer to the start of a list of interactions.
-* @param char *save_buffer A buffer to store the result to.
+* @param bool send_output If TRUE, sends the page_display as text when done. Pass FALSE if you're building a larger page_display for the character.
 */
-void get_interaction_display(struct interaction_item *list, char *save_buffer) {
+void show_interaction_display(char_data *ch, struct interaction_item *list, bool send_output) {
 	struct interaction_item *interact;
 	char quant[16];
 	int count = 0;
-	
-	*save_buffer = '\0';
+	struct page_display *line;
 	
 	for (interact = list; interact; interact = interact->next) {
 		if (interact_data[interact->type].one_at_a_time) {
-			snprintf(quant, sizeof(quant), "%d-max", interact->quantity);
+			safe_snprintf(quant, sizeof(quant), "%d-max", interact->quantity);
 		}
 		else {
-			snprintf(quant, sizeof(quant), "%dx", interact->quantity);
+			safe_snprintf(quant, sizeof(quant), "%dx", interact->quantity);
 		}
 		
-		sprintf(save_buffer + strlen(save_buffer), "%2d. %s: %s %s (%d) %.2f%%", ++count, interact_types[interact->type], quant, get_interaction_target(interact->type, interact->vnum), interact->vnum, interact->percent);
+		line = build_page_display(ch, "%2d. %s: %s %s (%d) %.2f%%", ++count, interact_types[interact->type], quant, get_interaction_target(interact->type, interact->vnum), interact->vnum, interact->percent);
 		if (isalpha(interact->exclusion_code)) {
-			sprintf(save_buffer + strlen(save_buffer), " (%c)", interact->exclusion_code);
+			append_page_display_line(line, " (%c)", interact->exclusion_code);
 		}
 		if (interact->restrictions) {
-			sprintf(save_buffer + strlen(save_buffer), " (%s)", get_interaction_restriction_display(interact->restrictions, TRUE));
+			append_page_display_line(line, " (%s)", get_interaction_restriction_display(interact->restrictions, TRUE));
 		}
-		strcat(save_buffer, "\r\n");
 	}
 	
 	if (count == 0) {
-		strcat(save_buffer, " none\r\n");
+		build_page_display_str(ch, " none");
+	}
+	
+	if (send_output) {
+		send_page_display_as(ch, PD_NO_PAGINATION | PD_FREE_DISPLAY_AFTER);
 	}
 }
 
 
 /**
-* Gets the display for a set of requirments (e.g. quest tasks).
+* Display a set of requirments (e.g. quest tasks).
 *
+* @param char_data *ch The person viewing it.
 * @param struct req_data *list Pointer to the start of a list of reqs.
-* @param char *save_buffer A buffer to store the result to.
+* @param bool send_output If TRUE, sends the page_display as text when done. Pass FALSE if you're building a larger page_display for the character.
 */
-void get_requirement_display(struct req_data *list, char *save_buffer) {
+void show_requirement_display(char_data *ch, struct req_data *list, bool send_output) {
 	struct req_data *req;
-	char buf[MAX_INPUT_LENGTH];
+	char part[256];
 	int count = 0;
 	
-	*save_buffer = '\0';
 	LL_FOREACH(list, req) {
 		if (req->custom) {
-			snprintf(buf, sizeof(buf), ": %s", req->custom);
+			safe_snprintf(part, sizeof(part), ": %s", req->custom);
 		}
 		else {
-			*buf = '\0';
+			*part = '\0';
 		}
 		
-		sprintf(save_buffer + strlen(save_buffer), "%2d. %s: %s%s\r\n", ++count, requirement_types[req->type], requirement_string(req, TRUE, FALSE), buf);
+		build_page_display(ch, "%2d. %s: %s%s", ++count, requirement_types[req->type], requirement_string(req, TRUE, FALSE), part);
 	}
 	
-	// empty list not shown
+	if (!list) {
+		build_page_display_str(ch, " none");
+	}
+	
+	if (send_output) {
+		send_page_display_as(ch, PD_NO_PAGINATION | PD_FREE_DISPLAY_AFTER);
+	}
 }
 
 
 /**
-* Gets the resource list for use in an editor or display.
+* Displays a resource list.
 *
-* @param char_data *ch Person viewing the list (for columns).
+* @param char_data *ch Person viewing the list.
 * @param struct resource_data *list The list to show.
-* @param char *save_buffer A string to write the output to.
+* @param bool send_output If TRUE, sends the page_display as text when done. Pass FALSE if you're building a larger page_display for the character.
 */
-void get_resource_display(char_data *ch, struct resource_data *list, char *save_buffer) {
-	bool vnum, screen_reader = (ch && PRF_FLAGGED(ch, PRF_SCREEN_READER));
+void show_resource_display(char_data *ch, struct resource_data *list, bool send_output) {
+	bool vnum;
 	char line[MAX_STRING_LENGTH], buf[MAX_STRING_LENGTH];
 	struct resource_data *res;
 	obj_data *obj;
 	int num;
 	
-	*save_buffer = '\0';
 	for (res = list, num = 1; res; res = res->next, ++num) {
 		// RES_x: resource type determines display
 		switch (res->type) {
@@ -4957,28 +4871,19 @@ void get_resource_display(char_data *ch, struct resource_data *list, char *save_
 		}
 		
 		// append
-		if (screen_reader) {
-			if (vnum) {
-				sprintf(save_buffer + strlen(save_buffer), " &y%2d&0. [%5d] %s\r\n", num, res->vnum, line);
-			}
-			else {
-				sprintf(save_buffer + strlen(save_buffer), " &y%2d&0. %s\r\n", num, line);
-			}
+		if (vnum) {
+			build_page_display_col(ch, 2, FALSE, " &y%2d&0. [%5d] %s", num, res->vnum, line);
 		}
-		else {	// not screen-reader
-			if (vnum) {
-				sprintf(save_buffer + strlen(save_buffer), " &y%2d&0. [%5d] %-26.26s%s", num, res->vnum, line, !(num % 2) ? "\r\n" : "");
-			}
-			else {
-				sprintf(save_buffer + strlen(save_buffer), " &y%2d&0. %-34.34s%s", num, line,  !(num % 2) ? "\r\n" : "");
-			}
+		else {
+			build_page_display_col(ch, 2, FALSE, " &y%2d&0. %s", num, line);
 		}
 	}
-	if (!*save_buffer) {
-		strcpy(save_buffer, "  none\r\n");
+	if (!list) {
+		build_page_display_str(ch, "  none");
 	}
-	else if (!screen_reader && !(num % 2)) {
-		strcat(save_buffer, "\r\n");
+	
+	if (send_output) {
+		send_page_display_as(ch, PD_NO_PAGINATION | PD_FREE_DISPLAY_AFTER);
 	}
 }
 
@@ -4986,29 +4891,24 @@ void get_resource_display(char_data *ch, struct resource_data *list, char *save_
 /**
 * Displays the scripts from a given list.
 *
+* @param char_data *ch The person viewing it.
 * @param struct trig_proto_list *list The list (start) to show.
-* @param char *save_buffer A buffer to store the results in.
+* @param bool send_output If TRUE, sends the page_display as text when done. Pass FALSE if you're building a larger page_display for the character.
 */
-void get_script_display(struct trig_proto_list *list, char *save_buffer) {
-	char lbuf[MAX_STRING_LENGTH];
+void show_script_display(char_data *ch, struct trig_proto_list *list, bool send_output) {
 	struct trig_proto_list *iter;
-	trig_data *proto;
 	int count = 0;
 	
-	*save_buffer = '\0';
-	
 	for (iter = list; iter; iter = iter->next) {
-		if ((proto = real_trigger(iter->vnum)) != NULL) {
-			strcpy(lbuf, GET_TRIG_NAME(proto));
-		}
-		else {
-			strcpy(lbuf, "UNKNOWN");
-		}
-		sprintf(save_buffer + strlen(save_buffer), "%2d. [%5d] %s\r\n", ++count, iter->vnum, lbuf);
+		build_page_display(ch, "%2d. [%5d] %s", ++count, iter->vnum, get_trigger_name_by_proto(iter->vnum));
 	}
 	
 	if (count == 0) {
-		strcat(save_buffer, " none\r\n");
+		build_page_display_str(ch, " none");
+	}
+	
+	if (send_output) {
+		send_page_display_as(ch, PD_NO_PAGINATION | PD_FREE_DISPLAY_AFTER);
 	}
 }
 
@@ -5077,10 +4977,10 @@ char *one_icon_display(char *icon, char *base_color) {
 	
 	if (base_color && *base_color) {
 		strcpy(cbuf, show_color_codes(base_color));
-		snprintf(output, sizeof(output), "%s%s  &0%s%s&0 %s", base_color, ibuf, base_color, cbuf, show_color_codes(icon));
+		safe_snprintf(output, sizeof(output), "%s%s  &0%s%s&0 %s", base_color, ibuf, base_color, cbuf, show_color_codes(icon));
 	}
 	else {
-		snprintf(output, sizeof(output), "%s  &0%s", ibuf, show_color_codes(icon));
+		safe_snprintf(output, sizeof(output), "%s  &0%s", ibuf, show_color_codes(icon));
 	}
 	
 	return output;
@@ -5742,7 +5642,7 @@ char *prompt_olc_info(char_data *ch) {
 	
 	sprintbit(GET_OLC_TYPE(ch->desc), olc_type_bits, typename, FALSE);
 	
-	snprintf(output, sizeof(output), "%c%d", LOWER(typename[0]), GET_OLC_VNUM(ch->desc));
+	safe_snprintf(output, sizeof(output), "%c%d", LOWER(typename[0]), GET_OLC_VNUM(ch->desc));
 	return output;
 }
 
@@ -6634,7 +6534,7 @@ void olc_process_requirements(char_data *ch, char *argument, struct req_data **l
 					found = TRUE;
 					
 					if (iter->custom) {
-						snprintf(buf, sizeof(buf), " (%s)", iter->custom);
+						safe_snprintf(buf, sizeof(buf), " (%s)", iter->custom);
 					}
 					else {
 						*buf = '\0';
@@ -6678,7 +6578,7 @@ void olc_process_requirements(char_data *ch, char *argument, struct req_data **l
 			req->custom = custom_text;
 			
 			if (req->custom) {
-				snprintf(buf, sizeof(buf), " (%s)", req->custom);
+				safe_snprintf(buf, sizeof(buf), " (%s)", req->custom);
 			}
 			else {
 				*buf = '\0';
@@ -6712,7 +6612,7 @@ void olc_process_requirements(char_data *ch, char *argument, struct req_data **l
 		
 		// shortcut string to buf
 		if (change && change->custom) {
-			snprintf(buf, sizeof(buf), " (%s)", change->custom);
+			safe_snprintf(buf, sizeof(buf), " (%s)", change->custom);
 		}
 		else {
 			*buf = '\0';
@@ -6768,7 +6668,7 @@ void olc_process_requirements(char_data *ch, char *argument, struct req_data **l
 					free(change->custom);
 				}
 				change->custom = NULL;
-				snprintf(buf, sizeof(buf), " (no custom text)");
+				safe_snprintf(buf, sizeof(buf), " (no custom text)");
 				msg_to_char(ch, "Changed %s %d to: %s%s\r\n", command, atoi(num_arg), requirement_string(change, TRUE, FALSE), buf);
 			}
 			else {
@@ -6776,7 +6676,7 @@ void olc_process_requirements(char_data *ch, char *argument, struct req_data **l
 					free(change->custom);
 				}
 				change->custom = str_dup(argument);
-				snprintf(buf, sizeof(buf), " (%s)", change->custom);
+				safe_snprintf(buf, sizeof(buf), " (%s)", change->custom);
 				msg_to_char(ch, "Changed %s %d to: %s%s\r\n", command, atoi(num_arg), requirement_string(change, TRUE, FALSE), buf);
 			}
 		}
@@ -8777,13 +8677,12 @@ void olc_process_spawns(char_data *ch, char *argument, struct spawn_info **list)
 	}
 	else if (is_abbrev(arg1, "list")) {
 		count = 0;
-		*buf = '\0';
 		for (spawn = *list; spawn; spawn = spawn->next) {
 			sprintbit(spawn->flags, spawn_flags, buf1, TRUE);
-			sprintf(buf + strlen(buf), " %d. %s (%d) %.2f%% %s\r\n", ++count, skip_filler(get_mob_name_by_proto(spawn->vnum, FALSE)), spawn->vnum, spawn->percent, buf1);
+			build_page_display(ch, " %d. %s (%d) %.2f%% %s\r\n", ++count, skip_filler(get_mob_name_by_proto(spawn->vnum, FALSE)), spawn->vnum, spawn->percent, buf1);
 		}
 		
-		page_string(ch->desc, buf, TRUE);
+		send_page_display(ch);
 	}
 	else {
 		msg_to_char(ch, "Usage: spawn add <vnum> <percent> [flags]\r\n");

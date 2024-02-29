@@ -476,10 +476,10 @@ empire_data *get_empire(char *name);
 obj_data *get_obj(char *name);
 
 void do_stat_trigger(char_data *ch, trig_data *trig);
-void do_sstat_room(char_data *ch);
-void do_sstat_object(char_data *ch, obj_data *j);
-void do_sstat_character(char_data *ch, char_data *k);
-void script_stat(char_data *ch, struct script_data *sc);
+void do_sstat_room(char_data *to, char_data *ch);
+void do_sstat_object(char_data *to, obj_data *j);
+void do_sstat_character(char_data *to, char_data *k);
+void script_stat(char_data *to, struct script_data *sc);
 
 struct script_data *create_script_data(void *attach_to, int type);
 void script_vlog(const char *format, va_list args);

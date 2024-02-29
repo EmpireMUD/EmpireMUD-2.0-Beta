@@ -159,7 +159,7 @@ bool audit_adventure(adv_data *adv, char_data *ch, bool only_one) {
 
 	// sub-audits
 	if (only_one && GET_ADV_START_VNUM(adv) <= GET_ADV_END_VNUM(adv)) {
-		snprintf(buf, sizeof(buf), "%d %d", GET_ADV_START_VNUM(adv), GET_ADV_END_VNUM(adv));
+		safe_snprintf(buf, sizeof(buf), "%d %d", GET_ADV_START_VNUM(adv), GET_ADV_END_VNUM(adv));
 		// OLC_x: auto-auditors
 		msg_to_char(ch, "Attack messages:\r\n");
 		olc_audit(ch, OLC_ATTACK, buf);
@@ -482,10 +482,10 @@ char *list_one_adventure(adv_data *adv, bool detail) {
 			}
 		}
 		
-		snprintf(output, sizeof(output), "[%5d] %s [%d-%d] (%s) %d mob%s, %d obj%s, %d room%s", GET_ADV_VNUM(adv), GET_ADV_NAME(adv), GET_ADV_START_VNUM(adv), GET_ADV_END_VNUM(adv), level_range_string(GET_ADV_MIN_LEVEL(adv), GET_ADV_MAX_LEVEL(adv), 0), count_mobs, PLURAL(count_mobs), count_objs, PLURAL(count_objs), count_rooms, PLURAL(count_rooms));
+		safe_snprintf(output, sizeof(output), "[%5d] %s [%d-%d] (%s) %d mob%s, %d obj%s, %d room%s", GET_ADV_VNUM(adv), GET_ADV_NAME(adv), GET_ADV_START_VNUM(adv), GET_ADV_END_VNUM(adv), level_range_string(GET_ADV_MIN_LEVEL(adv), GET_ADV_MAX_LEVEL(adv), 0), count_mobs, PLURAL(count_mobs), count_objs, PLURAL(count_objs), count_rooms, PLURAL(count_rooms));
 	}
 	else {
-		snprintf(output, sizeof(output), "[%5d] %s", GET_ADV_VNUM(adv), GET_ADV_NAME(adv));
+		safe_snprintf(output, sizeof(output), "[%5d] %s", GET_ADV_VNUM(adv), GET_ADV_NAME(adv));
 	}
 	
 	return output;
@@ -508,7 +508,7 @@ void olc_delete_adventure(char_data *ch, adv_vnum vnum) {
 		return;
 	}
 	
-	snprintf(name, sizeof(name), "%s", NULLSAFE(GET_ADV_NAME(adv)));
+	safe_snprintf(name, sizeof(name), "%s", NULLSAFE(GET_ADV_NAME(adv)));
 	
 	if (HASH_COUNT(adventure_table) <= 1) {
 		msg_to_char(ch, "You can't delete the last adventure zone.\r\n");
@@ -679,10 +679,11 @@ int wordcount_adventure(struct adventure_data *adv) {
 /**
 * Displays the linking rules from a given list.
 *
+* @param char_data *ch The person to display it to.
 * @param struct adventure_link_rule *list Pointer to the start of a list of links.
-* @param char *save_buffer A buffer to store the result to.
+* @param bool send_output If TRUE, sends the page_display as text when done. Pass FALSE if you're building a larger page_display for the character.
 */
-void get_adventure_linking_display(struct adventure_link_rule *list, char *save_buffer) {
+void show_adventure_linking_display(char_data *ch, struct adventure_link_rule *list, bool send_output) {
 	struct adventure_link_rule *rule;
 	char lbuf[MAX_STRING_LENGTH], flg[MAX_STRING_LENGTH], bon[MAX_STRING_LENGTH], bfac[MAX_STRING_LENGTH];
 	sector_data *sect;
@@ -690,8 +691,6 @@ void get_adventure_linking_display(struct adventure_link_rule *list, char *save_
 	bld_data *bld;
 	int count = 0;
 	size_t size;
-	
-	*save_buffer = '\0';
 	
 	for (rule = list; rule; rule = rule->next) {
 		// prepare build on/facing as several types use them
@@ -817,11 +816,15 @@ void get_adventure_linking_display(struct adventure_link_rule *list, char *save_
 		}
 		
 		sprintbit(rule->flags, adventure_link_flags, flg, TRUE);
-		sprintf(save_buffer + strlen(save_buffer), "%2d. %s: %s%s&g%s\t0\r\n", ++count, adventure_link_types[rule->type], lbuf, (rule->flags ? ", " : ""), (rule->flags ? flg : ""));
+		build_page_display(ch, "%2d. %s: %s%s&g%s\t0", ++count, adventure_link_types[rule->type], lbuf, (rule->flags ? ", " : ""), (rule->flags ? flg : ""));
 	}
 	
 	if (count == 0) {
-		strcat(save_buffer, " none\r\n");
+		build_page_display_str(ch, " none");
+	}
+	
+	if (send_output) {
+		send_page_display_as(ch, PD_NO_PAGINATION | PD_FREE_DISPLAY_AFTER);
 	}
 }
 
@@ -839,26 +842,24 @@ void olc_show_adventure(char_data *ch) {
 	if (!adv) {
 		return;
 	}
-	
-	*buf = '\0';
 
-	sprintf(buf + strlen(buf), "[%s%d\t0] %s%s\t0\r\n", OLC_LABEL_CHANGED, GET_OLC_VNUM(ch->desc), OLC_LABEL_UNCHANGED, !adventure_proto(GET_ADV_VNUM(adv)) ? "new adventure zone" : GET_ADV_NAME(adventure_proto(GET_ADV_VNUM(adv))));
-	sprintf(buf + strlen(buf), "<%sstartvnum\t0> %d\r\n", OLC_LABEL_VAL(GET_ADV_START_VNUM(adv), 0), GET_ADV_START_VNUM(adv));
-	sprintf(buf + strlen(buf), "<%sendvnum\t0> %d\r\n", OLC_LABEL_VAL(GET_ADV_END_VNUM(adv), 0), GET_ADV_END_VNUM(adv));
-	sprintf(buf + strlen(buf), "<%sname\t0> %s\r\n", OLC_LABEL_STR(GET_ADV_NAME(adv), default_adv_name), NULLSAFE(GET_ADV_NAME(adv)));
-	sprintf(buf + strlen(buf), "<%sauthor\t0> %s\r\n", OLC_LABEL_STR(GET_ADV_AUTHOR(adv), default_adv_author), NULLSAFE(GET_ADV_AUTHOR(adv)));
-	sprintf(buf + strlen(buf), "<%sdescription\t0>\r\n%s", OLC_LABEL_STR(GET_ADV_DESCRIPTION(adv), ""), NULLSAFE(GET_ADV_DESCRIPTION(adv)));
+	build_page_display(ch, "[%s%d\t0] %s%s\t0", OLC_LABEL_CHANGED, GET_OLC_VNUM(ch->desc), OLC_LABEL_UNCHANGED, !adventure_proto(GET_ADV_VNUM(adv)) ? "new adventure zone" : GET_ADV_NAME(adventure_proto(GET_ADV_VNUM(adv))));
+	build_page_display(ch, "<%sstartvnum\t0> %d", OLC_LABEL_VAL(GET_ADV_START_VNUM(adv), 0), GET_ADV_START_VNUM(adv));
+	build_page_display(ch, "<%sendvnum\t0> %d", OLC_LABEL_VAL(GET_ADV_END_VNUM(adv), 0), GET_ADV_END_VNUM(adv));
+	build_page_display(ch, "<%sname\t0> %s", OLC_LABEL_STR(GET_ADV_NAME(adv), default_adv_name), NULLSAFE(GET_ADV_NAME(adv)));
+	build_page_display(ch, "<%sauthor\t0> %s", OLC_LABEL_STR(GET_ADV_AUTHOR(adv), default_adv_author), NULLSAFE(GET_ADV_AUTHOR(adv)));
+	build_page_display(ch, "<%sdescription\t0>\r\n%s", OLC_LABEL_STR(GET_ADV_DESCRIPTION(adv), ""), NULLSAFE(GET_ADV_DESCRIPTION(adv)));
 	
 	sprintbit(GET_ADV_FLAGS(adv), adventure_flags, lbuf, TRUE);
-	sprintf(buf + strlen(buf), "<%sflags\t0> %s\r\n", OLC_LABEL_VAL(GET_ADV_FLAGS(adv), ADV_IN_DEVELOPMENT), lbuf);
+	build_page_display(ch, "<%sflags\t0> %s", OLC_LABEL_VAL(GET_ADV_FLAGS(adv), ADV_IN_DEVELOPMENT), lbuf);
 	
-	sprintf(buf + strlen(buf), "<%stemperature\t0> %s\r\n", OLC_LABEL_VAL(GET_ADV_TEMPERATURE_TYPE(adv), 0), temperature_types[GET_ADV_TEMPERATURE_TYPE(adv)]);
+	build_page_display(ch, "<%stemperature\t0> %s", OLC_LABEL_VAL(GET_ADV_TEMPERATURE_TYPE(adv), 0), temperature_types[GET_ADV_TEMPERATURE_TYPE(adv)]);
 	
-	sprintf(buf + strlen(buf), "<%sminlevel\t0> %d\r\n", OLC_LABEL_VAL(GET_ADV_MIN_LEVEL(adv), 0), GET_ADV_MIN_LEVEL(adv));
-	sprintf(buf + strlen(buf), "<%smaxlevel\t0> %d\r\n", OLC_LABEL_VAL(GET_ADV_MAX_LEVEL(adv), 0), GET_ADV_MAX_LEVEL(adv));
+	build_page_display(ch, "<%sminlevel\t0> %d", OLC_LABEL_VAL(GET_ADV_MIN_LEVEL(adv), 0), GET_ADV_MIN_LEVEL(adv));
+	build_page_display(ch, "<%smaxlevel\t0> %d", OLC_LABEL_VAL(GET_ADV_MAX_LEVEL(adv), 0), GET_ADV_MAX_LEVEL(adv));
 	
-	sprintf(buf + strlen(buf), "<%slimit\t0> %d instance%s (adjusts to %d)\r\n", OLC_LABEL_VAL(GET_ADV_MAX_INSTANCES(adv), 1), GET_ADV_MAX_INSTANCES(adv), (GET_ADV_MAX_INSTANCES(adv) != 1 ? "s" : ""), adjusted_instance_limit(adv));
-	sprintf(buf + strlen(buf), "<%splayerlimit\t0> %d\r\n", OLC_LABEL_VAL(GET_ADV_PLAYER_LIMIT(adv), 0), GET_ADV_PLAYER_LIMIT(adv));
+	build_page_display(ch, "<%slimit\t0> %d instance%s (adjusts to %d)", OLC_LABEL_VAL(GET_ADV_MAX_INSTANCES(adv), 1), GET_ADV_MAX_INSTANCES(adv), (GET_ADV_MAX_INSTANCES(adv) != 1 ? "s" : ""), adjusted_instance_limit(adv));
+	build_page_display(ch, "<%splayerlimit\t0> %d", OLC_LABEL_VAL(GET_ADV_PLAYER_LIMIT(adv), 0), GET_ADV_PLAYER_LIMIT(adv));
 	
 	// reset time display helper
 	if (GET_ADV_RESET_TIME(adv) <= 0) {
@@ -867,22 +868,20 @@ void olc_show_adventure(char_data *ch) {
 	else {
 		strcpy(lbuf, colon_time(GET_ADV_RESET_TIME(adv), TRUE, NULL));
 	}
-	sprintf(buf + strlen(buf), "<%sreset\t0> %d minutes %s\r\n", OLC_LABEL_VAL(GET_ADV_RESET_TIME(adv), default_adv_reset), GET_ADV_RESET_TIME(adv), lbuf);
+	build_page_display(ch, "<%sreset\t0> %d minutes %s", OLC_LABEL_VAL(GET_ADV_RESET_TIME(adv), default_adv_reset), GET_ADV_RESET_TIME(adv), lbuf);
 
-	sprintf(buf + strlen(buf), "Linking rules: <%slinking\t0>\r\n", OLC_LABEL_PTR(GET_ADV_LINKING(adv)));
+	build_page_display(ch, "Linking rules: <%slinking\t0>", OLC_LABEL_PTR(GET_ADV_LINKING(adv)));
 	if (GET_ADV_LINKING(adv)) {
-		get_adventure_linking_display(GET_ADV_LINKING(adv), lbuf);
-		strcat(buf, lbuf);
+		show_adventure_linking_display(ch, GET_ADV_LINKING(adv), FALSE);
 	}
 	
 	// scripts
-	sprintf(buf + strlen(buf), "Adventure Cleanup Scripts: <%sscript\t0>\r\n", OLC_LABEL_PTR(GET_ADV_SCRIPTS(adv)));
+	build_page_display(ch, "Adventure Cleanup Scripts: <%sscript\t0>", OLC_LABEL_PTR(GET_ADV_SCRIPTS(adv)));
 	if (GET_ADV_SCRIPTS(adv)) {
-		get_script_display(GET_ADV_SCRIPTS(adv), lbuf);
-		strcat(buf, lbuf);
+		show_script_display(ch, GET_ADV_SCRIPTS(adv), FALSE);
 	}
 		
-	page_string(ch->desc, buf, TRUE);
+	send_page_display(ch);
 }
 
 
@@ -932,15 +931,15 @@ OLC_MODULE(advedit_cascade) {
 		*line = '\0';
 		
 		if (GET_MIN_SCALE_LEVEL(mob) > 0 || GET_MAX_SCALE_LEVEL(mob) > 0) {
-			snprintf(line, sizeof(line), "already has levels %d-%d", GET_MIN_SCALE_LEVEL(mob), GET_MAX_SCALE_LEVEL(mob));
+			safe_snprintf(line, sizeof(line), "already has levels %d-%d", GET_MIN_SCALE_LEVEL(mob), GET_MAX_SCALE_LEVEL(mob));
 		}
 		else if (!player_can_olc_edit(ch, OLC_MOBILE, GET_MOB_VNUM(mob))) {
-			snprintf(line, sizeof(line), "no permission");
+			safe_snprintf(line, sizeof(line), "no permission");
 		}
 		else {
 			GET_MIN_SCALE_LEVEL(mob) = GET_ADV_MIN_LEVEL(adv);
 			GET_MAX_SCALE_LEVEL(mob) = GET_ADV_MAX_LEVEL(adv);
-			snprintf(line, sizeof(line), "updated");
+			safe_snprintf(line, sizeof(line), "updated");
 			save_mobs = TRUE;
 		}
 		
@@ -957,19 +956,19 @@ OLC_MODULE(advedit_cascade) {
 		*line = '\0';
 		
 		if (GET_OBJ_MIN_SCALE_LEVEL(obj) > 0 || GET_OBJ_MAX_SCALE_LEVEL(obj) > 0) {
-			snprintf(line, sizeof(line), "already has levels %d-%d", GET_OBJ_MIN_SCALE_LEVEL(obj), GET_OBJ_MAX_SCALE_LEVEL(obj));
+			safe_snprintf(line, sizeof(line), "already has levels %d-%d", GET_OBJ_MIN_SCALE_LEVEL(obj), GET_OBJ_MAX_SCALE_LEVEL(obj));
 		}
 		else if (!player_can_olc_edit(ch, OLC_OBJECT, GET_OBJ_VNUM(obj))) {
-			snprintf(line, sizeof(line), "no permission");
+			safe_snprintf(line, sizeof(line), "no permission");
 		}
 		else if (!OBJ_FLAGGED(obj, OBJ_SCALABLE)) {
-			snprintf(line, sizeof(line), "not scalable");
+			safe_snprintf(line, sizeof(line), "not scalable");
 		}
 		else {
 			obj->proto_data->min_scale_level = GET_ADV_MIN_LEVEL(adv);
 			obj->proto_data->max_scale_level = GET_ADV_MAX_LEVEL(adv);
 			OBJ_VERSION(obj) += 1;
-			snprintf(line, sizeof(line), "updated");
+			safe_snprintf(line, sizeof(line), "updated");
 			save_objs = TRUE;
 		}
 		
@@ -1628,15 +1627,15 @@ OLC_MODULE(advedit_uncascade) {
 		*line = '\0';
 		
 		if (GET_MIN_SCALE_LEVEL(mob) != GET_ADV_MIN_LEVEL(adv) || GET_MAX_SCALE_LEVEL(mob) != GET_ADV_MAX_LEVEL(adv)) {
-			snprintf(line, sizeof(line), "has levels %d-%d", GET_MIN_SCALE_LEVEL(mob), GET_MAX_SCALE_LEVEL(mob));
+			safe_snprintf(line, sizeof(line), "has levels %d-%d", GET_MIN_SCALE_LEVEL(mob), GET_MAX_SCALE_LEVEL(mob));
 		}
 		else if (!player_can_olc_edit(ch, OLC_MOBILE, GET_MOB_VNUM(mob))) {
-			snprintf(line, sizeof(line), "no permission");
+			safe_snprintf(line, sizeof(line), "no permission");
 		}
 		else {
 			GET_MIN_SCALE_LEVEL(mob) = 0;
 			GET_MAX_SCALE_LEVEL(mob) = 0;
-			snprintf(line, sizeof(line), "removed");
+			safe_snprintf(line, sizeof(line), "removed");
 			save_mobs = TRUE;
 		}
 		
@@ -1653,19 +1652,19 @@ OLC_MODULE(advedit_uncascade) {
 		*line = '\0';
 		
 		if (GET_OBJ_MIN_SCALE_LEVEL(obj) != GET_ADV_MIN_LEVEL(adv) || GET_OBJ_MAX_SCALE_LEVEL(obj) != GET_ADV_MAX_LEVEL(adv)) {
-			snprintf(line, sizeof(line), "has levels %d-%d", GET_OBJ_MIN_SCALE_LEVEL(obj), GET_OBJ_MAX_SCALE_LEVEL(obj));
+			safe_snprintf(line, sizeof(line), "has levels %d-%d", GET_OBJ_MIN_SCALE_LEVEL(obj), GET_OBJ_MAX_SCALE_LEVEL(obj));
 		}
 		else if (!player_can_olc_edit(ch, OLC_OBJECT, GET_OBJ_VNUM(obj))) {
-			snprintf(line, sizeof(line), "no permission");
+			safe_snprintf(line, sizeof(line), "no permission");
 		}
 		else if (!OBJ_FLAGGED(obj, OBJ_SCALABLE)) {
-			snprintf(line, sizeof(line), "not scalable");
+			safe_snprintf(line, sizeof(line), "not scalable");
 		}
 		else {
 			obj->proto_data->min_scale_level = 0;
 			obj->proto_data->max_scale_level = 0;
 			OBJ_VERSION(obj) += 1;
-			snprintf(line, sizeof(line), "updated");
+			safe_snprintf(line, sizeof(line), "updated");
 			save_objs = TRUE;
 		}
 		

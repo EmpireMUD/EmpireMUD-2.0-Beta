@@ -26,6 +26,7 @@
 * Contents:
 *   Helpers
 *   Paginator
+*   Page Display System
 *   Editor
 *   Script Formatter
 *   Text Formatter
@@ -163,7 +164,7 @@ void start_string_editor(descriptor_data *d, char *prompt, char **writeto, size_
 
 /* Add user input to the 'current' string (as defined by d->str) */
 void string_add(descriptor_data *d, char *str) {
-	char buf1[MAX_STRING_LENGTH];
+	char *temp;
 	player_index_data *index;
 	struct mail_data *mail;
 	account_data *acct;
@@ -359,8 +360,11 @@ void string_add(descriptor_data *d, char *str) {
 		else if (d->file_storage) {
 			if (action != STRINGADD_ABORT) {
 				if ((fl = fopen((char *)d->file_storage, "w"))){
-					if (*d->str)
-						fputs(stripcr(buf1, *d->str), fl);
+					if (*d->str) {
+						CREATE(temp, char, strlen(*d->str) + 1);
+						fputs(stripcr(temp, *d->str), fl);
+						free(temp);
+					}
 					fclose(fl);
 
 					syslog(SYS_GC, GET_INVIS_LEV(d->character), TRUE, "GC: %s saves '%s'", GET_NAME(d->character), d->file_storage);
@@ -629,6 +633,576 @@ void show_string(descriptor_data *d, char *input) {
 
 
 /* End of code by Michael Buselli */
+
+
+ //////////////////////////////////////////////////////////////////////////////
+//// PAGE DISPLAY SYSTEM /////////////////////////////////////////////////////
+
+// Usage: Build the player's page_display with the various build_page_display*
+// functions and then finalize it and send it to the player by calling
+// send_page_display(ch), which may or may not use the paginator depending on
+// the text length and settings. NPCs and dc'd players are ignored
+// automatically.
+
+/**
+* Frees a page_display and any text inside.
+*
+* @param struct page_display *pd The thing to free.
+*/
+void free_page_display_one(struct page_display *pd) {
+	if (pd) {
+		if (pd->text) {
+			free(pd->text);
+		}
+		free(pd);
+	}
+}
+
+
+/**
+* Frees a whole page_display list.
+*
+* @param struct page_display **list The list of lines to free.
+*/
+void free_page_display(struct page_display **list) {
+	struct page_display *pd, *next;
+	
+	if (list) {
+		DL_FOREACH_SAFE(*list, pd, next) {
+			DL_DELETE(*list, pd);
+			free_page_display_one(pd);
+		}
+	}
+}
+
+
+/**
+* Clears a player's page_display without sending it.
+*
+* @param const char_data *ch The player.
+*/
+void clear_page_display(const char_data *ch) {
+	if (ch && ch->desc) {
+		free_page_display(&ch->desc->page_lines);
+	}
+}
+
+
+/**
+* Ensures nothing is left in the page_displays buffers on all connected
+* descriptors. These should have been flushed by either send_page_display() or
+* free_page_display() by the function that used them.
+*/
+void clear_leftover_page_displays(void) {
+	descriptor_data *desc;
+	
+	LL_FOREACH(descriptor_list, desc) {
+		if (desc && desc->page_lines) {
+			log("SYSERR: %s has leftover page_display lines starting with: %s", (desc->character ? GET_NAME(desc->character) : "Unknown player"), NULLSAFE(desc->page_lines->text));
+			free_page_display(&desc->page_lines);
+		}
+	}
+}
+
+
+/**
+* Determines how wide a column should be, based on character preferences and
+* number of columns requested.
+*
+* @param const char_data *ch The player.
+* @param int cols How many columns will be shown.
+* @return int The character width of each column.
+*/
+int page_display_column_width(const char_data *ch, int cols) {
+	int width;
+	
+	// detect screen width
+	if (!ch || !ch->desc || PRF_FLAGGED(ch, PRF_SCREEN_READER)) {
+		width = 80;	// default
+	}
+	else {
+		width = ch->desc->pProtocol->ScreenWidth;
+	}
+	
+	// constrain width
+	width = MIN(width, 101);
+	if (width < 1) {
+		// that can't be right; return to default
+		width = 80;
+	}
+	
+	// safety
+	cols = MAX(1, cols);
+	
+	// calculate width
+	return (width - 1) / cols;
+}
+
+
+/**
+* Adds a new line to the end of a player's page_display. Will trim trailing
+* \r\n (crlf).
+*
+* @param const char_data *ch The person to add the display line to.
+* @param const char *fmt, ... va_arg format for the line to add.
+* @return struct page_display* A pointer to the new line, if it was added. May return NULL if it failed to add.
+*/
+struct page_display *build_page_display(const char_data *ch, const char *fmt, ...) {
+	char text[MAX_STRING_LENGTH];
+	va_list tArgList;
+	struct page_display *pd;
+	
+	if (!ch || !ch->desc || !fmt) {
+		return NULL;
+	}
+	
+	CREATE(pd, struct page_display, 1);
+	
+	va_start(tArgList, fmt);
+	pd->length = vsprintf(text, fmt, tArgList);
+	va_end(tArgList);
+	
+	// check trailing crlf
+	while (pd->length > 0 && (text[pd->length-1] == '\r' || text[pd->length-1] == '\n')) {
+		text[--pd->length] = '\0';
+	}
+	
+	if (pd->length >= 0) {
+		pd->text = strdup(text);
+		DL_APPEND(ch->desc->page_lines, pd);
+	}
+	else {
+		// nevermind
+		free_page_display_one(pd);
+		pd = NULL;
+	}
+	
+	return pd;
+}
+
+
+/**
+* Adds a new line to the end of a player's page_display. Will trim trailing
+* \r\n (crlf).
+*
+* This is intended for displays that will have multiple columns. Any sequential
+* entries with the same column count will attempt to display in columns.
+*
+* @param const char_data *ch The person to add the display line to.
+* @param int cols The number of columns for the display (2, 3, etc).
+* @param bool strict_cols If TRUE, the string may be truncated.
+* @param const char *fmt, ... va_arg format for the line to add.
+* @return struct page_display* A pointer to the new line, if it was added. May return NULL if it failed to add.
+*/
+struct page_display *build_page_display_col(const char_data *ch, int cols, bool strict_cols, const char *fmt, ...) {
+	char text[MAX_STRING_LENGTH];
+	int max;
+	va_list tArgList;
+	struct page_display *pd;
+	
+	if (!ch || !ch->desc || !fmt) {
+		return NULL;
+	}
+	
+	CREATE(pd, struct page_display, 1);
+	
+	va_start(tArgList, fmt);
+	pd->length = vsprintf(text, fmt, tArgList);
+	va_end(tArgList);
+	
+	// check trailing crlf
+	while (pd->length > 0 && (text[pd->length-1] == '\r' || text[pd->length-1] == '\n')) {
+		text[--pd->length] = '\0';
+	}
+	
+	// enforce strict cols
+	if (strict_cols && pd->length > (max = page_display_column_width(ch, cols))) {
+		pd->length = max + color_code_length(text);
+		text[pd->length - 1] = '\0';
+	}
+	
+	if (pd->length >= 0) {
+		pd->cols = cols;
+		pd->text = strdup(text);
+		DL_APPEND(ch->desc->page_lines, pd);
+	}
+	else {
+		// nevermind
+		free_page_display_one(pd);
+		pd = NULL;
+	}
+	
+	return pd;
+}
+
+
+/**
+* Adds a new line to the end of a player's page_display. Will trim trailing
+* \r\n (crlf).
+*
+* @param const char_data *ch The person to add the display line to.
+* @param const char *str The string to add as the new line (will be copied).
+* @return struct page_display* A pointer to the new line, if it was added. May return NULL if it failed to add.
+*/
+struct page_display *build_page_display_str(const char_data *ch, const char *str) {
+	struct page_display *pd;
+	
+	if (!ch || !ch->desc || !str) {
+		return NULL;
+	}
+	
+	CREATE(pd, struct page_display, 1);
+	
+	pd->length = strlen(str);
+	pd->text = strdup(str);
+	DL_APPEND(ch->desc->page_lines, pd);
+	
+	// check trailing crlf
+	while (pd->length > 0 && (pd->text[pd->length-1] == '\r' || pd->text[pd->length-1] == '\n')) {
+		pd->text[--pd->length] = '\0';
+	}
+	
+	return pd;
+}
+
+
+/**
+* Adds a new line to the end of a player's page_display. Will trim trailing
+* \r\n (crlf).
+*
+* This is intended for displays that will have multiple columns. Any sequential
+* entries with the same column count will attempt to display in columns.
+*
+* @param const char_data *ch The person to add the display line to.
+* @param int cols The number of columns for the display (2, 3, etc).
+* @param bool strict_cols If TRUE, the string may be truncated.
+* @param const char *str The string to add as the new line (will be copied).
+* @return struct page_display* A pointer to the new line, if it was added. May return NULL if it failed to add.
+*/
+struct page_display *build_page_display_col_str(const char_data *ch, int cols, bool strict_cols, const char *str) {
+	int max;
+	struct page_display *pd;
+	
+	if (!ch || !ch->desc || !str) {
+		return NULL;
+	}
+	
+	CREATE(pd, struct page_display, 1);
+	
+	pd->length = strlen(str);
+	pd->text = strdup(str);
+	pd->cols = cols;
+	DL_APPEND(ch->desc->page_lines, pd);
+	
+	// check trailing crlf
+	while (pd->length > 0 && (pd->text[pd->length-1] == '\r' || pd->text[pd->length-1] == '\n')) {
+		pd->text[--pd->length] = '\0';
+	}
+	
+	// enforce strict cols
+	if (strict_cols && pd->length > (max = page_display_column_width(ch, cols))) {
+		pd->length = max + color_code_length(pd->text);
+		pd->text[pd->length - 1] = '\0';
+	}
+	
+	return pd;
+}
+
+
+/**
+* Adds a new line to a player's page_display -- at the BEGINNING.
+* Will trim trailing \r\n (crlf).
+*
+* @param const char_data *ch The person to add the display line to (at the beginning).
+* @param const char *str The string to add as the new line (will be copied).
+* @return struct page_display* A pointer to the new line, if it was added. May return NULL if it failed to add.
+*/
+struct page_display *build_page_display_prepend(const char_data *ch, const char *str) {
+	struct page_display *pd;
+	
+	if (!ch || !ch->desc || !str) {
+		return NULL;
+	}
+	
+	CREATE(pd, struct page_display, 1);
+	
+	pd->length = strlen(str);
+	pd->text = strdup(str);
+	DL_PREPEND(ch->desc->page_lines, pd);
+	
+	// check trailing crlf
+	while (pd->length > 0 && (pd->text[pd->length-1] == '\r' || pd->text[pd->length-1] == '\n')) {
+		pd->text[--pd->length] = '\0';
+	}
+	
+	return pd;
+}
+
+
+/**
+* Appends text to an existing page_display line.
+* Will trim trailing \r\n (crlf).
+*
+* Be cautious using this on lines that are part of column displays.
+*
+* @param struct page_display *line The line to append to.
+* @param const char *fmt, ... va_arg format for the text to add.
+*/
+void append_page_display_line(struct page_display *line, const char *fmt, ...) {
+	char text[MAX_STRING_LENGTH];
+	char *temp;
+	int len;
+	va_list tArgList;
+	
+	if (!line || !fmt) {
+		return;
+	}
+	
+	va_start(tArgList, fmt);
+	len = vsprintf(text, fmt, tArgList);
+	va_end(tArgList);
+	
+	CREATE(temp, char, line->length + len + 1);
+	strcpy(temp, NULLSAFE(line->text));
+	strcat(temp, text);
+	
+	line->length += len;
+	
+	if (line->text) {
+		free(line->text);
+	}
+	line->text = temp;
+	
+	// check trailing crlf
+	while (line->length > 0 && (line->text[line->length-1] == '\r' || line->text[line->length-1] == '\n')) {
+		line->text[--line->length] = '\0';
+	}
+}
+
+
+/**
+* Builds a page_display list into a string. This allocates memory for the
+* string so you must free it when you're done. The original list is left alone.
+*
+* @param const struct page_display *list The list of page_display lines to convert.
+* @param const char_data *ch Optional: The viewier. If NULL, default settings will be used for building the string.
+* @param bool add_crlfs If TRUE, adds line breaks between page_display lines. If FALSE, doesn't.
+* @return char* An allocated string representing the full page. (Must be free'd when done.)
+*/
+char *get_page_display_as_string(const struct page_display *list, const char_data *ch, bool add_crlfs) {
+	bool use_cols;
+	char *output, *ptr;
+	int clen, iter, needs_cols;
+	int last_col = 0, fixed_width = 0, col_count = 0;
+	size_t size, one;
+	const struct page_display *pd;
+	
+	if (!list) {
+		strdup("");	// shortcut
+	}
+	
+	use_cols = (ch && PRF_FLAGGED(ch, PRF_SCREEN_READER)) ? FALSE : TRUE;
+	
+	// compute size
+	size = 0;
+	DL_FOREACH(list, pd) {
+		if (pd->cols > 1 && use_cols) {
+			one = page_display_column_width(ch, pd->cols);
+			clen = color_code_length(pd->text);
+			if (one <= 0) {
+				one = pd->length + clen;
+			}
+			else if (pd->length - clen > one) {
+				// ensure room for wide columns
+				one *= ceil((double)(pd->length - clen) / (double) one);
+				one += clen;
+			}
+			else {
+				one = MAX(one, pd->length) + clen;
+			}
+		}
+		else {
+			one = pd->length;
+		}
+		
+		size += one + ((add_crlfs || pd->cols > 1) ? 2 : 0);
+	}
+	
+	// allocate
+	CREATE(output, char, size + 1);
+	*output = '\0';
+	
+	// build string
+	DL_FOREACH(list, pd) {
+		if (pd->cols <= 1 || !use_cols) {
+			// non-column display
+			if (last_col != 0 && col_count > 0) {
+				strcat(output, "\r\n");
+				col_count = 0;
+			}
+			last_col = 0;
+			strcat(output, NULLSAFE(pd->text));
+			if (add_crlfs) {
+				strcat(output, "\r\n");
+			}
+		}
+		else {
+			// columned display:
+			
+			// new size? column setup
+			if (pd->cols != last_col) {
+				if (col_count > 0) {
+					// flush previous columns
+					strcat(output, "\r\n");
+				}
+				
+				last_col = pd->cols;
+				fixed_width = page_display_column_width(ch, pd->cols);
+				col_count = 0;
+			}
+			
+			if (fixed_width > 0) {
+				// check how width this entry is
+				clen = color_code_length(pd->text);
+				needs_cols = ceil((double) (pd->length - clen) / fixed_width);
+				
+				// check fit
+				if (needs_cols + col_count > pd->cols) {
+					// doesn't fit; newline
+					strcat(output, "\r\n");
+					col_count = 0;
+				}
+				
+				// mark how many columns we used
+				col_count += needs_cols;
+				
+				// append and pad (only pad if it's not the last col
+				strcat(output, pd->text);
+				if (col_count < pd->cols) {
+					ptr = output + strlen(output);
+					for (iter = pd->length; iter < (fixed_width * needs_cols) + clen; ++iter) {
+						*(ptr++) = ' ';
+					}
+					*(ptr++) = '\0';
+				}
+				
+				// cap off columns if needed
+				if (col_count >= pd->cols) {
+					strcat(output, "\r\n");
+					col_count = 0;
+				}
+			}
+			else {
+				// don't bother
+				strcat(output, NULLSAFE(pd->text));
+				strcat(output, "\r\n");
+			}
+		}
+	}
+	
+	// check trailing columns?
+	if (last_col != 0 && col_count > 0) {
+		strcat(output, "\r\n");
+	}
+	
+	return output;
+}
+
+
+/**
+* Builds the final display for a pending player's page_display and sends it to
+* the player. By default, it sends the string, unformatted, to the paginator.
+*
+* Options:
+*  PD_FREE_DISPLAY_AFTER - will free the player's page_display after sending
+*  PD_NO_PAGINATION - skips the paginator
+*  PD_FORMAT_NORMAL - will format without indent
+*  PD_FORMAT_INDENT - will format with indent
+*  PD_FORMAT_WIDE - will use the wide formatter
+*
+* @param const char_data *ch The player to show it to.
+* @param bitvector_t options Any PD_ flags.
+*/
+void send_page_display_as(const char_data *ch, bitvector_t options) {
+	bitvector_t opts;
+	char *str;
+	
+	if (!ch || !ch->desc || !ch->desc->page_lines) {
+		return;	// nobody to page it to
+	}
+	
+	// build string version
+	str = get_page_display_as_string(ch->desc->page_lines, ch, IS_SET(options, PD_FORMAT_NORMAL | PD_FORMAT_INDENT) ? FALSE : TRUE);
+	
+	// optional formatting
+	if (IS_SET(options, PD_FORMAT_NORMAL | PD_FORMAT_INDENT | PD_FORMAT_WIDE)) {
+		opts = NOBITS;
+		opts |= (IS_SET(options, PD_FORMAT_INDENT) ? FORMAT_INDENT : NOBITS);
+		opts |= (IS_SET(options, PD_FORMAT_WIDE) ? FORMAT_WIDE : NOBITS);
+		format_text(&str, opts, ch->desc, MAX_STRING_LENGTH);
+	}
+	
+	// send (via the requested method)
+	if (IS_SET(options, PD_NO_PAGINATION)) {
+		send_to_char(str, ch);
+	}
+	else {
+		page_string(ch->desc, str, TRUE);
+	}
+	
+	// free string version
+	free(str);
+	
+	// free page_display lines (by request)
+	if (IS_SET(options, PD_FREE_DISPLAY_AFTER)) {
+		free_page_display(&ch->desc->page_lines);
+	}
+}
+
+
+/**
+* Trims blank lines from the start and end of ch's buffered page_display.
+*
+* @param const char_data *ch The person with the page_display to trim.
+* @return bool TRUE if anything is left in the page_display, FALSE if it's empty now.
+*/
+bool trim_page_display(const char_data *ch) {
+	struct page_display *pd, *next;
+	
+	if (ch && ch->desc) {
+		// trim start
+		DL_FOREACH_SAFE(ch->desc->page_lines, pd, next) {
+			if (!pd->text || !*pd->text || color_code_length(pd->text) == strlen(pd->text)) {
+				// contains nothing visible
+				DL_DELETE(ch->desc->page_lines, pd);
+				free_page_display_one(pd);
+			}
+			else {
+				// found a non-empty entry at start
+				break;
+			}
+		}
+		
+		// trim end (iterate backwards)
+		for (pd = ch->desc->page_lines ? ch->desc->page_lines->prev : NULL; pd; pd = next) {
+			next = (pd == ch->desc->page_lines ? NULL : pd->prev);
+			
+			if (!pd->text || !*pd->text || color_code_length(pd->text) == strlen(pd->text)) {
+				// contains nothing visible
+				DL_DELETE(ch->desc->page_lines, pd);
+				free_page_display_one(pd);
+			}
+			else {
+				// found a non-empty entry at end
+				break;
+			}
+		}
+		
+		return ch->desc->page_lines ? TRUE : FALSE;
+	}
+	
+	return FALSE;
+}
 
 
  //////////////////////////////////////////////////////////////////////////////

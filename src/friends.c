@@ -452,16 +452,16 @@ int sort_friends_by_last_logon(struct friend_data *a, struct friend_data *b) {
 // called through do_friend
 ACMD(do_friends_all) {
 	bool need_save = FALSE;
-	char output[MAX_STRING_LENGTH * 2], color[16], line[256], name[256], status[256];
+	char color[16], name[256], status[256];
 	int count;
-	size_t size, lsize, nsize, ssize;
+	size_t nsize, ssize;
 	account_data *acct;
 	char_data *plr;
 	struct friend_data *friend, *next_friend;
 	
 	HASH_SORT(GET_ACCOUNT(ch)->friends, sort_friends_by_last_logon);
 	
-	size = snprintf(output, sizeof(output), "Your friends list:\r\n");
+	build_page_display(ch, "Your friends list:");
 	count = 0;
 	
 	HASH_ITER(hh, GET_ACCOUNT_FRIENDS(ch), friend, next_friend) {
@@ -506,25 +506,15 @@ ACMD(do_friends_all) {
 		}
 		
 		// actual line
-		lsize = snprintf(line, sizeof(line), " %s%s%s%s\r\n", color, name, status, *color ? "\t0" : "");
+		build_page_display(ch, " %s%s%s%s", color, name, status, *color ? "\t0" : "");
 		++count;
-	
-		if (size + lsize + 80 < sizeof(output)) {
-			strcat(output, line);
-			size += lsize;
-		}
-		else {
-			// space reserved for this
-			strcat(output, "... and more\r\n");
-			break;
-		}
 	}
 	
 	if (!count) {
-		strcat(output, " none\r\n");
+		build_page_display(ch, " none");
 	}
 	
-	page_string(ch->desc, output, TRUE);
+	send_page_display(ch);
 	
 	if (need_save) {
 		// a friend was removed due to cleanup
@@ -535,13 +525,12 @@ ACMD(do_friends_all) {
 
 // called through do_friend
 ACMD(do_friends_online) {
-	char output[MAX_STRING_LENGTH * 2], line[256];
 	int count, status;
-	size_t size, lsize;
 	char_data *plr;
 	struct friend_data *friend;
+	struct page_display *line;
 	
-	size = snprintf(output, sizeof(output), "Friends online:\r\n");
+	build_page_display(ch, "Friends online:");
 	count = 0;
 	
 	DL_FOREACH2(player_character_list, plr, next_plr) {
@@ -559,40 +548,25 @@ ACMD(do_friends_online) {
 		
 		// seems ok to show
 		++count;
-		lsize = snprintf(line, sizeof(line), " %s", GET_NAME(plr));
+		line = build_page_display(ch, " %s", GET_NAME(plr));
 		
 		if ((friend = find_account_friend(GET_ACCOUNT(ch), GET_ACCOUNT_ID(plr))) && friend->original_name && strcmp(GET_NAME(plr), friend->original_name)) {
-			lsize += snprintf(line + lsize, sizeof(line) - lsize, " (%s)\r\n", friend->original_name);
-		}
-		else {
-			lsize += snprintf(line + lsize, sizeof(line) - lsize, "\r\n");
-		}
-		
-		if (size + lsize + 80 < sizeof(output)) {
-			strcat(output, line);
-			size += lsize;
-		}
-		else {
-			// space reserved for this
-			strcat(output, "... and more\r\n");
-			break;
+			append_page_display_line(line, " (%s)", friend->original_name);
 		}
 	}
 	
 	if (!count) {
-	    strcat(output, " none\r\n");
+	    build_page_display(ch, " none");
 	}
 	
-	page_string(ch->desc, output, TRUE);
+	send_page_display(ch);
 }
 
 
 // called through do_friend
 ACMD(do_friend_accept) {
 	bool file = FALSE, secret = FALSE;
-	char output[MAX_STRING_LENGTH * 2], line[256];
 	int count, status;
-	size_t size, lsize;
 	char_data *plr = NULL;
 	struct friend_data *friend, *next_friend;
 	
@@ -601,7 +575,7 @@ ACMD(do_friend_accept) {
 	}
 	else if (!*argument) {
 		// no-arg: show open requests
-		size = snprintf(output, sizeof(output), "Open friend requests you've received:\r\n");
+		build_page_display(ch, "Open friend requests you've received:");
 		count = 0;
 		
 		HASH_ITER(hh, GET_ACCOUNT_FRIENDS(ch), friend, next_friend) {
@@ -610,25 +584,15 @@ ACMD(do_friend_accept) {
 			}
 			
 			// otherwise show it
-			lsize = snprintf(line, sizeof(line), " %s\r\n", friend->original_name ? friend->original_name : "Unknown");
+			build_page_display(ch, " %s", friend->original_name ? friend->original_name : "Unknown");
 			++count;
-		
-			if (size + lsize + 80 < sizeof(output)) {
-				strcat(output, line);
-				size += lsize;
-			}
-			else {
-				// space reserved for this
-				strcat(output, "... and more\r\n");
-				break;
-			}
 		}
 		
 		if (!count) {
-			strcat(output, " none\r\n");
+			build_page_display(ch, " none");
 		}
 		
-		page_string(ch->desc, output, TRUE);
+		send_page_display(ch);
 		return;
 	}
 	else if (!(plr = find_or_load_player(argument, &file)) && !(plr = find_friend_player_by_stored_name(ch, argument, &file, &secret))) {
@@ -728,9 +692,7 @@ ACMD(do_friend_cancel) {
 // called through do_friend
 ACMD(do_friend_deny) {
 	bool file = FALSE, secret = FALSE;
-	char output[MAX_STRING_LENGTH * 2], line[256];
 	int count, status;
-	size_t size, lsize;
 	char_data *plr = NULL;
 	struct friend_data *friend, *next_friend;
 	
@@ -739,7 +701,7 @@ ACMD(do_friend_deny) {
 	}
 	else if (!*argument) {
 		// no-arg: show open requests
-		size = snprintf(output, sizeof(output), "Open friend requests you've received:\r\n");
+		build_page_display(ch, "Open friend requests you've received:");
 		count = 0;
 		
 		HASH_ITER(hh, GET_ACCOUNT_FRIENDS(ch), friend, next_friend) {
@@ -748,25 +710,15 @@ ACMD(do_friend_deny) {
 			}
 			
 			// otherwise show it
-			lsize = snprintf(line, sizeof(line), " %s\r\n", friend->original_name ? friend->original_name : "Unknown");
+			build_page_display(ch, " %s", friend->original_name ? friend->original_name : "Unknown");
 			++count;
-		
-			if (size + lsize + 80 < sizeof(output)) {
-				strcat(output, line);
-				size += lsize;
-			}
-			else {
-				// space reserved for this
-				strcat(output, "... and more\r\n");
-				break;
-			}
 		}
 		
 		if (!count) {
-			strcat(output, " none\r\n");
+			build_page_display(ch, " none");
 		}
 		
-		page_string(ch->desc, output, TRUE);
+		send_page_display(ch);
 		return;
 	}
 	else if (!(plr = find_or_load_player(argument, &file)) && !(plr = find_friend_player_by_stored_name(ch, argument, &file, &secret))) {
@@ -805,15 +757,13 @@ ACMD(do_friend_deny) {
 
 // called through do_friend
 ACMD(do_friend_request) {
-	char output[MAX_STRING_LENGTH * 2], line[256];
 	int count, status;
-	size_t size, lsize;
 	char_data *plr;
 	struct friend_data *friend, *next_friend;
 	
 	if (!*argument) {
 		// no-arg: show open requests
-		size = snprintf(output, sizeof(output), "Open friend requests you've sent:\r\n");
+		build_page_display(ch, "Open friend requests you've sent:");
 		count = 0;
 		
 		HASH_ITER(hh, GET_ACCOUNT_FRIENDS(ch), friend, next_friend) {
@@ -822,25 +772,15 @@ ACMD(do_friend_request) {
 			}
 			
 			// otherwise show it
-			lsize = snprintf(line, sizeof(line), " %s\r\n", friend->original_name ? friend->original_name : "Unknown");
+			build_page_display(ch, " %s", friend->original_name ? friend->original_name : "Unknown");
 			++count;
-		
-			if (size + lsize + 80 < sizeof(output)) {
-				strcat(output, line);
-				size += lsize;
-			}
-			else {
-				// space reserved for this
-				strcat(output, "... and more\r\n");
-				break;
-			}
 		}
 		
 		if (!count) {
-			strcat(output, " none\r\n");
+			build_page_display(ch, " none");
 		}
 		
-		page_string(ch->desc, output, TRUE);
+		send_page_display(ch);
 		return;
 	}	// end no-arg
 	

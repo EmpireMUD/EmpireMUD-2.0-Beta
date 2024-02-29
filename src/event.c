@@ -616,7 +616,7 @@ int gain_event_points(char_data *ch, any_vnum event_vnum, int points) {
 	
 	// cap?
 	if (EVT_MAX_POINTS(running->event) > 0) {
-		snprintf(capstr, sizeof(capstr), "/%d", EVT_MAX_POINTS(running->event));
+		safe_snprintf(capstr, sizeof(capstr), "/%d", EVT_MAX_POINTS(running->event));
 	}
 	else {
 		*capstr = '\0';
@@ -925,7 +925,7 @@ struct event_running_data *load_one_running_event(FILE *fl, int id) {
 	int int_in[4];
 	long long_in;
 	
-	snprintf(errstr, sizeof(errstr), "running event %d", id);
+	safe_snprintf(errstr, sizeof(errstr), "running event %d", id);
 	
 	// find or create/add
 	if ((re = find_running_event_by_id(id))) {
@@ -1289,10 +1289,10 @@ char *list_one_event(event_data *event, bool detail) {
 	static char output[MAX_STRING_LENGTH];
 	
 	if (detail) {
-		snprintf(output, sizeof(output), "[%5d] %s", EVT_VNUM(event), EVT_NAME(event));
+		safe_snprintf(output, sizeof(output), "[%5d] %s", EVT_VNUM(event), EVT_NAME(event));
 	}
 	else {
-		snprintf(output, sizeof(output), "[%5d] %s", EVT_VNUM(event), EVT_NAME(event));
+		safe_snprintf(output, sizeof(output), "[%5d] %s", EVT_VNUM(event), EVT_NAME(event));
 	}
 		
 	return output;
@@ -1306,13 +1306,12 @@ char *list_one_event(event_data *event, bool detail) {
 * @param any_vnum vnum The event vnum.
 */
 void olc_search_event(char_data *ch, any_vnum vnum) {
-	char buf[MAX_STRING_LENGTH];
 	event_data *event = find_event_by_vnum(vnum);
 	quest_data *quest, *next_quest;
 	progress_data *prg, *next_prg;
 	social_data *soc, *next_soc;
 	event_data *ev, *next_ev;
-	int size, found;
+	int found;
 	bool any;
 	
 	if (!event) {
@@ -1321,43 +1320,34 @@ void olc_search_event(char_data *ch, any_vnum vnum) {
 	}
 	
 	found = 0;
-	size = snprintf(buf, sizeof(buf), "Occurrences of event %d (%s):\r\n", vnum, EVT_NAME(event));
+	build_page_display(ch, "Occurrences of event %d (%s):", vnum, EVT_NAME(event));
 	
 	// other events
 	HASH_ITER(hh, event_table, ev, next_ev) {
-		if (size >= sizeof(buf)) {
-			break;
-		}
 		// QR_x: event rewards
 		any = find_event_reward_in_list(EVT_RANK_REWARDS(ev), QR_EVENT_POINTS, vnum);
 		any |= find_event_reward_in_list(EVT_THRESHOLD_REWARDS(ev), QR_EVENT_POINTS, vnum);
 		
 		if (any) {
 			++found;
-			size += snprintf(buf + size, sizeof(buf) - size, "EVT [%5d] %s\r\n", EVT_VNUM(ev), EVT_NAME(ev));
+			build_page_display(ch, "EVT [%5d] %s", EVT_VNUM(ev), EVT_NAME(ev));
 		}
 	}
 	
 	// progress
 	HASH_ITER(hh, progress_table, prg, next_prg) {
-		if (size >= sizeof(buf)) {
-			break;
-		}
 		// REQ_x: requirement search
 		any = find_requirement_in_list(PRG_TASKS(prg), REQ_EVENT_RUNNING, vnum);
 		any |= find_requirement_in_list(PRG_TASKS(prg), REQ_EVENT_NOT_RUNNING, vnum);
 		
 		if (any) {
 			++found;
-			size += snprintf(buf + size, sizeof(buf) - size, "PRG [%5d] %s\r\n", PRG_VNUM(prg), PRG_NAME(prg));
+			build_page_display(ch, "PRG [%5d] %s", PRG_VNUM(prg), PRG_NAME(prg));
 		}
 	}
 	
 	// quests
 	HASH_ITER(hh, quest_table, quest, next_quest) {
-		if (size >= sizeof(buf)) {
-			break;
-		}
 		// QR_x, REQ_x: quest types
 		any = find_requirement_in_list(QUEST_TASKS(quest), REQ_EVENT_RUNNING, vnum);
 		any |= find_requirement_in_list(QUEST_PREREQS(quest), REQ_EVENT_RUNNING, vnum);
@@ -1368,33 +1358,30 @@ void olc_search_event(char_data *ch, any_vnum vnum) {
 		
 		if (any) {
 			++found;
-			size += snprintf(buf + size, sizeof(buf) - size, "QST [%5d] %s\r\n", QUEST_VNUM(quest), QUEST_NAME(quest));
+			build_page_display(ch, "QST [%5d] %s", QUEST_VNUM(quest), QUEST_NAME(quest));
 		}
 	}
 	
 	// on socials
 	HASH_ITER(hh, social_table, soc, next_soc) {
-		if (size >= sizeof(buf)) {
-			break;
-		}
 		// REQ_x: quest types
 		any = find_requirement_in_list(SOC_REQUIREMENTS(soc), REQ_EVENT_RUNNING, vnum);
 		any |= find_requirement_in_list(SOC_REQUIREMENTS(soc), REQ_EVENT_NOT_RUNNING, vnum);
 		
 		if (any) {
 			++found;
-			size += snprintf(buf + size, sizeof(buf) - size, "SOC [%5d] %s\r\n", SOC_VNUM(soc), SOC_NAME(soc));
+			build_page_display(ch, "SOC [%5d] %s", SOC_VNUM(soc), SOC_NAME(soc));
 		}
 	}
 	
 	if (found > 0) {
-		size += snprintf(buf + size, sizeof(buf) - size, "%d location%s shown\r\n", found, PLURAL(found));
+		build_page_display(ch, "%d location%s shown", found, PLURAL(found));
 	}
 	else {
-		size += snprintf(buf + size, sizeof(buf) - size, " none\r\n");
+		build_page_display_str(ch, " none");
 	}
 	
-	page_string(ch->desc, buf, TRUE);
+	send_page_display(ch);
 }
 
 
@@ -2120,7 +2107,7 @@ void olc_delete_event(char_data *ch, any_vnum vnum) {
 		return;
 	}
 	
-	snprintf(name, sizeof(name), "%s", NULLSAFE(EVT_NAME(event)));
+	safe_snprintf(name, sizeof(name), "%s", NULLSAFE(EVT_NAME(event)));
 	
 	// end the event, if running -- BEFORE removing from the hash table
 	while ((running = find_running_event_by_vnum(vnum))) {
@@ -2396,17 +2383,17 @@ event_data *setup_olc_event(event_data *input) {
 //// DISPLAYS ////////////////////////////////////////////////////////////////
 
 /**
-* Gets the display for a set of event rewards.
+* Displays a set of event rewards.
 *
+* @parma char_data *ch The person viewing it.
 * @param struct event_reward *list Pointer to the start of a list of event rewards.
-* @param char *save_buffer A buffer to store the result to.
+* @param bool send_output If TRUE, sends the page_display as text when done. Pass FALSE if you're building a larger page_display for the character.
 */
-void get_event_reward_display(struct event_reward *list, char *save_buffer) {
+void show_event_reward_display(char_data *ch, struct event_reward *list, bool send_output) {
 	char buf[MAX_STRING_LENGTH];
 	struct event_reward *reward;
 	int count = 0;
 	
-	*save_buffer = '\0';
 	LL_FOREACH(list, reward) {
 		if (reward->max > 0) {
 			sprintf(buf, "Ranks %d-%d", reward->min, reward->max);
@@ -2414,10 +2401,16 @@ void get_event_reward_display(struct event_reward *list, char *save_buffer) {
 		else {
 			sprintf(buf, "%d points", reward->min);
 		}
-		sprintf(save_buffer + strlen(save_buffer), "%2d. %s: %s: %s\r\n", ++count, buf, quest_reward_types[reward->type], event_reward_string(reward, TRUE));
+		build_page_display(ch, "%2d. %s: %s: %s", ++count, buf, quest_reward_types[reward->type], event_reward_string(reward, TRUE));
 	}
 	
-	// empty list not shown
+	if (!list) {
+		build_page_display_str(ch, " none");
+	}
+	
+	if (send_output) {
+		send_page_display_as(ch, PD_NO_PAGINATION | PD_FREE_DISPLAY_AFTER);
+	}
 }
 
 
@@ -2428,26 +2421,25 @@ void get_event_reward_display(struct event_reward *list, char *save_buffer) {
 * @param event_data *event The event to display.
 */
 void do_stat_event(char_data *ch, event_data *event) {
-	char buf[MAX_STRING_LENGTH], part[MAX_STRING_LENGTH];
-	size_t size;
+	char part[MAX_STRING_LENGTH];
 	
 	if (!event) {
 		return;
 	}
 	
 	// first line
-	size = snprintf(buf, sizeof(buf), "VNum: [\tc%d\t0], Name: \tc%s\t0\r\n", EVT_VNUM(event), EVT_NAME(event));
-	size += snprintf(buf + size, sizeof(buf) - size, "%s", EVT_DESCRIPTION(event));
-	size += snprintf(buf + size, sizeof(buf) - size, "-------------------------------------------------\r\n");
-	size += snprintf(buf + size, sizeof(buf) - size, "%s", EVT_COMPLETE_MSG(event));
+	build_page_display(ch, "VNum: [\tc%d\t0], Name: \tc%s\t0", EVT_VNUM(event), EVT_NAME(event));
+	build_page_display(ch, "%s", EVT_DESCRIPTION(event));
+	build_page_display(ch, "-------------------------------------------------");
+	build_page_display(ch, "%s", EVT_COMPLETE_MSG(event));
 	
 	if (EVT_NOTES(event)) {
-		size += snprintf(buf + size, sizeof(buf) - size, "- Notes -----------------------------------------\r\n");
-		size += snprintf(buf + size, sizeof(buf) - size, "%s", EVT_NOTES(event));
+		build_page_display(ch, "- Notes -----------------------------------------");
+		build_page_display(ch, "%s", EVT_NOTES(event));
 	}
 	
 	sprintbit(EVT_FLAGS(event), event_flags, part, TRUE);
-	size += snprintf(buf + size, sizeof(buf) - size, "Flags: \tg%s\t0\r\n", part);	
+	build_page_display(ch, "Flags: \tg%s\t0", part);	
 	
 	if (EVT_REPEATS_AFTER(event) == NOT_REPEATABLE) {
 		strcpy(part, "never");
@@ -2458,22 +2450,22 @@ void do_stat_event(char_data *ch, event_data *event) {
 	else {
 		sprintf(part, "%d minutes (%s)", EVT_REPEATS_AFTER(event), colon_time(EVT_REPEATS_AFTER(event), TRUE, NULL));
 	}
-	size += snprintf(buf + size, sizeof(buf) - size, "Level limits: [\tc%s\t0], Duration: [\tc%d minutes (%s)\t0], Repeatable: [\tc%s\t0]\r\n", level_range_string(EVT_MIN_LEVEL(event), EVT_MAX_LEVEL(event), 0), EVT_DURATION(event), colon_time(EVT_DURATION(event), TRUE, NULL), part);
+	build_page_display(ch, "Level limits: [\tc%s\t0], Duration: [\tc%d minutes (%s)\t0], Repeatable: [\tc%s\t0]", level_range_string(EVT_MIN_LEVEL(event), EVT_MAX_LEVEL(event), 0), EVT_DURATION(event), colon_time(EVT_DURATION(event), TRUE, NULL), part);
 	
 	if (EVT_MAX_POINTS(event) > 0) {
-		size += snprintf(buf + size, sizeof(buf) - size, "Maximum points: [\tc%d\t0]\r\n", EVT_MAX_POINTS(event));
+		build_page_display(ch, "Maximum points: [\tc%d\t0]", EVT_MAX_POINTS(event));
 	}
 	else {
-		size += snprintf(buf + size, sizeof(buf) - size, "Maximum points: [\tcnone\t0]\r\n");
+		build_page_display(ch, "Maximum points: [\tcnone\t0]");
 	}
 	
-	get_event_reward_display(EVT_RANK_REWARDS(event), part);
-	size += snprintf(buf + size, sizeof(buf) - size, "Rank Rewards:\r\n%s", *part ? part : " none\r\n");
+	build_page_display_str(ch, "Rank Rewards:");
+	show_event_reward_display(ch, EVT_RANK_REWARDS(event), FALSE);
 	
-	get_event_reward_display(EVT_THRESHOLD_REWARDS(event), part);
-	size += snprintf(buf + size, sizeof(buf) - size, "Threshold Rewards:\r\n%s", *part ? part : " none\r\n");
+	build_page_display_str(ch, "Threshold Rewards:");
+	show_event_reward_display(ch, EVT_THRESHOLD_REWARDS(event), FALSE);
 	
-	page_string(ch->desc, buf, TRUE);
+	send_page_display(ch);
 }
 
 
@@ -2485,60 +2477,62 @@ void do_stat_event(char_data *ch, event_data *event) {
 */
 void olc_show_event(char_data *ch) {
 	event_data *event = GET_OLC_EVENT(ch->desc);
-	char buf[MAX_STRING_LENGTH], lbuf[MAX_STRING_LENGTH];
+	char lbuf[MAX_STRING_LENGTH];
 	
 	if (!event) {
 		return;
 	}
 	
-	*buf = '\0';
-	
-	sprintf(buf + strlen(buf), "[%s%d\t0] %s%s\t0\r\n", OLC_LABEL_CHANGED, GET_OLC_VNUM(ch->desc), OLC_LABEL_UNCHANGED, !find_event_by_vnum(EVT_VNUM(event)) ? "new event" : get_event_name_by_proto(EVT_VNUM(event)));
-	sprintf(buf + strlen(buf), "<%sname\t0> %s\r\n", OLC_LABEL_STR(EVT_NAME(event), default_event_name), NULLSAFE(EVT_NAME(event)));
-	sprintf(buf + strlen(buf), "<%sdescription\t0>\r\n%s", OLC_LABEL_STR(EVT_DESCRIPTION(event), default_event_description), NULLSAFE(EVT_DESCRIPTION(event)));
-	sprintf(buf + strlen(buf), "<%scompletemessage\t0>\r\n%s", OLC_LABEL_STR(EVT_COMPLETE_MSG(event), default_event_complete_msg), NULLSAFE(EVT_COMPLETE_MSG(event)));
+	build_page_display(ch, "[%s%d\t0] %s%s\t0", OLC_LABEL_CHANGED, GET_OLC_VNUM(ch->desc), OLC_LABEL_UNCHANGED, !find_event_by_vnum(EVT_VNUM(event)) ? "new event" : get_event_name_by_proto(EVT_VNUM(event)));
+	build_page_display(ch, "<%sname\t0> %s", OLC_LABEL_STR(EVT_NAME(event), default_event_name), NULLSAFE(EVT_NAME(event)));
+	build_page_display(ch, "<%sdescription\t0>\r\n%s", OLC_LABEL_STR(EVT_DESCRIPTION(event), default_event_description), NULLSAFE(EVT_DESCRIPTION(event)));
+	build_page_display(ch, "<%scompletemessage\t0>\r\n%s", OLC_LABEL_STR(EVT_COMPLETE_MSG(event), default_event_complete_msg), NULLSAFE(EVT_COMPLETE_MSG(event)));
 	
 	sprintbit(EVT_FLAGS(event), event_flags, lbuf, TRUE);
-	sprintf(buf + strlen(buf), "<%sflags\t0> %s\r\n", OLC_LABEL_VAL(EVT_FLAGS(event), EVTF_IN_DEVELOPMENT), lbuf);
+	build_page_display(ch, "<%sflags\t0> %s", OLC_LABEL_VAL(EVT_FLAGS(event), EVTF_IN_DEVELOPMENT), lbuf);
 	
 	if (EVT_MIN_LEVEL(event) > 0) {
-		sprintf(buf + strlen(buf), "<%sminlevel\t0> %d\r\n", OLC_LABEL_CHANGED, EVT_MIN_LEVEL(event));
+		build_page_display(ch, "<%sminlevel\t0> %d", OLC_LABEL_CHANGED, EVT_MIN_LEVEL(event));
 	}
 	else {
-		sprintf(buf + strlen(buf), "<%sminlevel\t0> none\r\n", OLC_LABEL_UNCHANGED);
+		build_page_display(ch, "<%sminlevel\t0> none", OLC_LABEL_UNCHANGED);
 	}
 	if (EVT_MAX_LEVEL(event) > 0) {
-		sprintf(buf + strlen(buf), "<%smaxlevel\t0> %d\r\n", OLC_LABEL_CHANGED, EVT_MAX_LEVEL(event));
+		build_page_display(ch, "<%smaxlevel\t0> %d", OLC_LABEL_CHANGED, EVT_MAX_LEVEL(event));
 	}
 	else {
-		sprintf(buf + strlen(buf), "<%smaxlevel\t0> none\r\n", OLC_LABEL_UNCHANGED);
+		build_page_display(ch, "<%smaxlevel\t0> none", OLC_LABEL_UNCHANGED);
 	}
 	
-	sprintf(buf + strlen(buf), "<%sduration\t0> %d minutes (%s)\r\n", OLC_LABEL_VAL(EVT_DURATION(event), 0), EVT_DURATION(event), colon_time(EVT_DURATION(event), TRUE, NULL));
+	build_page_display(ch, "<%sduration\t0> %d minutes (%s)", OLC_LABEL_VAL(EVT_DURATION(event), 0), EVT_DURATION(event), colon_time(EVT_DURATION(event), TRUE, NULL));
 	
 	if (EVT_REPEATS_AFTER(event) == NOT_REPEATABLE || EVT_REPEATS_AFTER(event) == 0) {
-		sprintf(buf + strlen(buf), "<%srepeat\t0> never\r\n", OLC_LABEL_VAL(EVT_REPEATS_AFTER(event), NOT_REPEATABLE));
+		build_page_display(ch, "<%srepeat\t0> never", OLC_LABEL_VAL(EVT_REPEATS_AFTER(event), NOT_REPEATABLE));
 	}
 	else if (EVT_REPEATS_AFTER(event) > 0) {
-		sprintf(buf + strlen(buf), "<%srepeat\t0> %d minutes (%s)\r\n", OLC_LABEL_VAL(EVT_REPEATS_AFTER(event), 0), EVT_REPEATS_AFTER(event), colon_time(EVT_REPEATS_AFTER(event), TRUE, NULL));
+		build_page_display(ch, "<%srepeat\t0> %d minutes (%s)", OLC_LABEL_VAL(EVT_REPEATS_AFTER(event), 0), EVT_REPEATS_AFTER(event), colon_time(EVT_REPEATS_AFTER(event), TRUE, NULL));
 	}
 	
 	if (EVT_MAX_POINTS(event) > 0) {
-		sprintf(buf + strlen(buf), "<%smaxpoints\t0> %d\r\n", OLC_LABEL_CHANGED, EVT_MAX_POINTS(event));
+		build_page_display(ch, "<%smaxpoints\t0> %d", OLC_LABEL_CHANGED, EVT_MAX_POINTS(event));
 	}
 	else {
-		sprintf(buf + strlen(buf), "<%smaxpoints\t0> none\r\n", OLC_LABEL_UNCHANGED);
+		build_page_display(ch, "<%smaxpoints\t0> none", OLC_LABEL_UNCHANGED);
 	}
 	
-	get_event_reward_display(EVT_RANK_REWARDS(event), lbuf);
-	sprintf(buf + strlen(buf), "Rank rewards: <%srank\t0>\r\n%s", OLC_LABEL_PTR(EVT_RANK_REWARDS(event)), lbuf);
+	build_page_display(ch, "Rank rewards: <%srank\t0>", OLC_LABEL_PTR(EVT_RANK_REWARDS(event)));
+	if (EVT_RANK_REWARDS(event)) {
+		show_event_reward_display(ch, EVT_RANK_REWARDS(event), FALSE);
+	}
 	
-	get_event_reward_display(EVT_THRESHOLD_REWARDS(event), lbuf);
-	sprintf(buf + strlen(buf), "Threshold rewards: <%sthreshold\t0>\r\n%s", OLC_LABEL_PTR(EVT_THRESHOLD_REWARDS(event)), lbuf);
+	build_page_display(ch, "Threshold rewards: <%sthreshold\t0>", OLC_LABEL_PTR(EVT_THRESHOLD_REWARDS(event)));
+	if (EVT_THRESHOLD_REWARDS(event)) {
+		show_event_reward_display(ch, EVT_THRESHOLD_REWARDS(event), FALSE);
+	}
 	
-	sprintf(buf + strlen(buf), "<%snotes\t0>\r\n%s", OLC_LABEL_PTR(EVT_NOTES(event)), NULLSAFE(EVT_NOTES(event)));
+	build_page_display(ch, "<%snotes\t0>\r\n%s", OLC_LABEL_PTR(EVT_NOTES(event)), NULLSAFE(EVT_NOTES(event)));
 	
-	page_string(ch->desc, buf, TRUE);
+	send_page_display(ch);
 }
 
 
@@ -2564,7 +2558,7 @@ void show_event_detail(char_data *ch, event_data *event) {
 	
 	// vnum portion
 	if (IS_IMMORTAL(ch)) {
-		snprintf(vnum, sizeof(vnum), "[%d] ", EVT_VNUM(event));
+		safe_snprintf(vnum, sizeof(vnum), "[%d] ", EVT_VNUM(event));
 	}
 	else {
 		*vnum = '\0';
@@ -2572,10 +2566,10 @@ void show_event_detail(char_data *ch, event_data *event) {
 	
 	// level portion
 	if (EVT_MIN_LEVEL(event) == EVT_MAX_LEVEL(event) && EVT_MIN_LEVEL(event) == 0) {
-		snprintf(part, sizeof(part), " (all levels)");
+		safe_snprintf(part, sizeof(part), " (all levels)");
 	}
 	else {
-		snprintf(part, sizeof(part), " (level %s)", level_range_string(EVT_MIN_LEVEL(event), EVT_MAX_LEVEL(event), 0));
+		safe_snprintf(part, sizeof(part), " (level %s)", level_range_string(EVT_MIN_LEVEL(event), EVT_MAX_LEVEL(event), 0));
 	}
 	
 	// header
@@ -2620,10 +2614,10 @@ void show_event_detail(char_data *ch, event_data *event) {
 		
 		// determine cap and point amount
 		if (EVT_MAX_POINTS(event) > 0) {
-			snprintf(point_str, sizeof(point_str), "/%d points", EVT_MAX_POINTS(event));
+			safe_snprintf(point_str, sizeof(point_str), "/%d points", EVT_MAX_POINTS(event));
 		}
 		else {
-			snprintf(point_str, sizeof(point_str), " point%s", (!ped || ped->points != 1) ? "s" : "");
+			safe_snprintf(point_str, sizeof(point_str), " point%s", (!ped || ped->points != 1) ? "s" : "");
 		}
 		
 		// show points
@@ -2649,11 +2643,10 @@ void show_event_detail(char_data *ch, event_data *event) {
 * @param struct event_running_data *re The event.
 */
 void show_event_leaderboard(char_data *ch, struct event_running_data *re) {
-	char buf[MAX_STRING_LENGTH], line[MAX_STRING_LENGTH], part[256];
+	char part[256];
 	struct event_leaderboard *lb, *next_lb;
 	player_index_data *index;
 	int rank = 0, total_rank = 0, last_points = -1;
-	size_t size;
 	
 	bool need_approval = config_get_bool("event_approval");
 	
@@ -2663,7 +2656,7 @@ void show_event_leaderboard(char_data *ch, struct event_running_data *re) {
 		return;
 	}
 	
-	size = snprintf(buf, sizeof(buf), "Leaderboard for %s:\r\n", EVT_NAME(re->event));
+	build_page_display(ch, "Leaderboard for %s:", EVT_NAME(re->event));
 	HASH_ITER(hh, re->player_leaderboard, lb, next_lb) {
 		if (lb->ignore || (need_approval && !lb->approved)) {
 			strcpy(part, " *");
@@ -2680,24 +2673,14 @@ void show_event_leaderboard(char_data *ch, struct event_running_data *re) {
 		}
 		
 		index = find_player_index_by_idnum(lb->id);
-		snprintf(line, sizeof(line), "%s. %s (%d)\r\n", part, index ? index->fullname : "???", lb->points);
-		
-		if (size + strlen(line) < sizeof(buf)) {
-			strcat(buf, line);
-			size += strlen(line);
-		}
-		else {
-			snprintf(buf + size, sizeof(buf) - size, "OVERFLOW\r\n");
-			break;
-		}
+		build_page_display(ch, "%s. %s (%d)", part, index ? index->fullname : "???", lb->points);
 	}
 	
 	if (!re->player_leaderboard) {
-		// always room left in 'buf' in this case
-		size += snprintf(buf + size, sizeof(buf) - size, " no entries\r\n");
+		build_page_display_str(ch, " no entries");
 	}
 	
-	page_string(ch->desc, buf, TRUE);
+	send_page_display(ch);
 }
 
 
@@ -2710,11 +2693,9 @@ void show_event_leaderboard(char_data *ch, struct event_running_data *re) {
 * @param struct event_running_data *re The event.
 */
 void show_event_rewards(char_data *ch, struct event_running_data *re) {
-	char buf[MAX_STRING_LENGTH * 2], line[MAX_STRING_LENGTH];
 	struct player_event_data *ped;
 	struct event_reward *reward;
 	bool collect, done;
-	size_t size;
 	
 	// basic sanitation
 	if (!re || !re->event || !ch->desc) {
@@ -2723,50 +2704,30 @@ void show_event_rewards(char_data *ch, struct event_running_data *re) {
 	}
 	
 	ped = get_event_data(ch, re->id);
-	size = 0;
-	*buf = '\0';
 	
 	// THRESHOLD
-	size += snprintf(buf + size, sizeof(buf) - size, "Threshold rewards for %s:\r\n", EVT_NAME(re->event));
+	build_page_display(ch, "Threshold rewards for %s:", EVT_NAME(re->event));
 	LL_FOREACH(EVT_THRESHOLD_REWARDS(re->event), reward) {
 		collect = (ped && ped->points >= reward->min);
 		done = (ped && ped->collected_points >= reward->min);
-		snprintf(line, sizeof(line), "%s%*d pt%s: %s%s\t0\r\n", done ? "\tc" : (collect ? "\tg" : ""), reward->min == 1 ? 4 : 3, reward->min, PLURAL(reward->min), event_reward_string(reward, IS_IMMORTAL(ch)), done ? " (collected)" : (collect ? " (pending)" : ""));
-		
-		if (size + strlen(line) < sizeof(buf)) {
-			strcat(buf, line);
-			size += strlen(line);
-		}
-		else {
-			snprintf(buf + size, sizeof(buf) - size, "OVERFLOW\r\n");
-			break;
-		}
+		build_page_display(ch, "%s%*d pt%s: %s%s\t0", done ? "\tc" : (collect ? "\tg" : ""), reward->min == 1 ? 4 : 3, reward->min, PLURAL(reward->min), event_reward_string(reward, IS_IMMORTAL(ch)), done ? " (collected)" : (collect ? " (pending)" : ""));
 	}
 	if (!EVT_THRESHOLD_REWARDS(re->event)) {
-		size += snprintf(buf + size, sizeof(buf) - size, " no threshold rewards\r\n");
+		build_page_display_str(ch, " no threshold rewards");
 	}
 	
 	// RANK
-	size += snprintf(buf + size, sizeof(buf) - size, "\r\nRank rewards for %s:\r\n", EVT_NAME(re->event));
+	build_page_display(ch, "\r\nRank rewards for %s:", EVT_NAME(re->event));
 	LL_FOREACH(EVT_RANK_REWARDS(re->event), reward) {
 		collect = (ped && ped->rank >= reward->min && ped->rank <= reward->max);
 		done = (ped && ped->status == EVTS_COLLECTED);
-		snprintf(line, sizeof(line), "%s %d-%d: %s%s\t0\r\n", (collect && done) ? "\tc" : (collect ? "\tg" : ""), reward->min, reward->max, event_reward_string(reward, IS_IMMORTAL(ch)), (collect && done) ? " (collected)" : (collect ? " (pending)" : ""));
-		
-		if (size + strlen(line) < sizeof(buf)) {
-			strcat(buf, line);
-			size += strlen(line);
-		}
-		else {
-			snprintf(buf + size, sizeof(buf) - size, "OVERFLOW\r\n");
-			break;
-		}
+		build_page_display(ch, "%s %d-%d: %s%s\t0", (collect && done) ? "\tc" : (collect ? "\tg" : ""), reward->min, reward->max, event_reward_string(reward, IS_IMMORTAL(ch)), (collect && done) ? " (collected)" : (collect ? " (pending)" : ""));
 	}
 	if (!EVT_RANK_REWARDS(re->event)) {
-		size += snprintf(buf + size, sizeof(buf) - size, " no rank rewards\r\n");
+		build_page_display_str(ch, " no rank rewards");
 	}
 	
-	page_string(ch->desc, buf, TRUE);
+	send_page_display(ch);
 }
 
 
@@ -2806,10 +2767,10 @@ void show_events_no_arg(char_data *ch) {
 			
 			// level portion
 			if (EVT_MIN_LEVEL(running->event) == EVT_MAX_LEVEL(running->event) && EVT_MIN_LEVEL(running->event) == 0) {
-				snprintf(part, sizeof(part), " (all levels)");
+				safe_snprintf(part, sizeof(part), " (all levels)");
 			}
 			else {
-				snprintf(part, sizeof(part), " (level %s)", level_range_string(EVT_MIN_LEVEL(running->event), EVT_MAX_LEVEL(running->event), 0));
+				safe_snprintf(part, sizeof(part), " (level %s)", level_range_string(EVT_MIN_LEVEL(running->event), EVT_MAX_LEVEL(running->event), 0));
 			}
 			
 			if (IS_IMMORTAL(ch)) {	// imms see id prefix
@@ -2821,10 +2782,10 @@ void show_events_no_arg(char_data *ch) {
 			if ((ped = get_event_data(ch, running->id))) {
 				// determine cap and point amount
 				if (EVT_MAX_POINTS(running->event) > 0) {
-					snprintf(point_str, sizeof(point_str), "/%d points", EVT_MAX_POINTS(running->event));
+					safe_snprintf(point_str, sizeof(point_str), "/%d points", EVT_MAX_POINTS(running->event));
 				}
 				else {
-					snprintf(point_str, sizeof(point_str), " point%s", PLURAL(ped->points));
+					safe_snprintf(point_str, sizeof(point_str), " point%s", PLURAL(ped->points));
 				}
 				
 				if ((rank = get_event_rank(ch, running)) > 0) {
@@ -2860,10 +2821,11 @@ int vnum_event(char *searchname, char_data *ch) {
 	
 	HASH_ITER(hh, event_table, iter, next_iter) {
 		if (multi_isname(searchname, EVT_NAME(iter))) {
-			msg_to_char(ch, "%3d. [%5d] %s\r\n", ++found, EVT_VNUM(iter), EVT_NAME(iter));
+			build_page_display(ch, "%3d. [%5d] %s", ++found, EVT_VNUM(iter), EVT_NAME(iter));
 		}
 	}
 	
+	send_page_display(ch);
 	return found;
 }
 
@@ -3310,14 +3272,14 @@ EVENT_CMD(evcmd_leaderboard) {
 
 // shows recent events
 EVENT_CMD(evcmd_recent) {
-	char buf[MAX_STRING_LENGTH * 2], line[MAX_STRING_LENGTH], part[MAX_STRING_LENGTH];
+	char line[MAX_STRING_LENGTH], part[MAX_STRING_LENGTH];
 	struct event_running_data *running;
 	struct player_event_data *ped;
 	int rank, when, count = 0;
-	size_t size, lsize;
+	size_t lsize;
 	char *ptr;
 	
-	size = snprintf(buf, sizeof(buf), "Recent events (see HELP EVENTS for more options):\r\n");
+	build_page_display(ch, "Recent events (see HELP EVENTS for more options):");
 	LL_FOREACH(running_events, running) {
 		if (!running->event) {
 			continue;	// can't show one with no event
@@ -3330,10 +3292,10 @@ EVENT_CMD(evcmd_recent) {
 		
 		// level portion
 		if (EVT_MIN_LEVEL(running->event) == EVT_MAX_LEVEL(running->event) && EVT_MIN_LEVEL(running->event) == 0) {
-			snprintf(part, sizeof(part), " (all levels)");
+			safe_snprintf(part, sizeof(part), " (all levels)");
 		}
 		else {
-			snprintf(part, sizeof(part), " (level %s)", level_range_string(EVT_MIN_LEVEL(running->event), EVT_MAX_LEVEL(running->event), 0));
+			safe_snprintf(part, sizeof(part), " (level %s)", level_range_string(EVT_MIN_LEVEL(running->event), EVT_MAX_LEVEL(running->event), 0));
 		}
 		
 		lsize = 0;
@@ -3362,28 +3324,15 @@ EVENT_CMD(evcmd_recent) {
 			lsize += snprintf(line + lsize, sizeof(line) - lsize, ", ended %s ago", ptr);
 		}
 		
-		if (lsize < sizeof(line) - 2) {
-			strcat(line, "\r\n");
-			lsize += 2;
-		}
-		
 		// append
-		if (lsize + size < sizeof(buf)) {
-			strcat(buf, line);
-			size += lsize;
-		}
-		else {
-			size += snprintf(buf + size, sizeof(buf) - size, "**OVERFLOW**\r\n");
-		}
+		build_page_display_str(ch, line);
 	}
 	
 	if (!count) {
-		strcat(buf, " none\r\n");	// always room in buf if !count
+		build_page_display_str(ch, " none");
 	}
 	
-	if (ch->desc) {
-		page_string(ch->desc, buf, TRUE);
-	}
+	send_page_display(ch);
 }
 
 

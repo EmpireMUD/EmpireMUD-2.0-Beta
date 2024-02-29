@@ -229,10 +229,10 @@ char *list_one_sector(sector_data *sect, bool detail) {
 	if (detail) {
 		ordered_sprintbit(GET_SECT_CLIMATE(sect), climate_flags, climate_flags_order, TRUE, clim);
 		ordered_sprintbit(GET_SECT_BUILD_FLAGS(sect), bld_on_flags, bld_on_flags_order, TRUE, bfl);
-		snprintf(output, sizeof(output), "[%5d] %s (%s) [%s]", GET_SECT_VNUM(sect), GET_SECT_NAME(sect), clim, bfl);
+		safe_snprintf(output, sizeof(output), "[%5d] %s (%s) [%s]", GET_SECT_VNUM(sect), GET_SECT_NAME(sect), clim, bfl);
 	}
 	else {
-		snprintf(output, sizeof(output), "[%5d] %s", GET_SECT_VNUM(sect), GET_SECT_NAME(sect));
+		safe_snprintf(output, sizeof(output), "[%5d] %s", GET_SECT_VNUM(sect), GET_SECT_NAME(sect));
 	}
 	
 	return output;
@@ -263,7 +263,7 @@ void olc_delete_sector(char_data *ch, sector_vnum vnum) {
 		return;
 	}
 	
-	snprintf(name, sizeof(name), "%s", NULLSAFE(GET_SECT_NAME(sect)));
+	safe_snprintf(name, sizeof(name), "%s", NULLSAFE(GET_SECT_NAME(sect)));
 	
 	if (HASH_COUNT(sector_table) <= 1) {
 		msg_to_char(ch, "You can't delete the last sector.\r\n");
@@ -441,7 +441,7 @@ void olc_delete_sector(char_data *ch, sector_vnum vnum) {
 * @param char *argument The argument they entered.
 */
 void olc_fullsearch_sector(char_data *ch, char *argument) {
-	char buf[MAX_STRING_LENGTH * 2], line[MAX_STRING_LENGTH], type_arg[MAX_INPUT_LENGTH], val_arg[MAX_INPUT_LENGTH], find_keywords[MAX_INPUT_LENGTH], extra_search[MAX_INPUT_LENGTH];
+	char type_arg[MAX_INPUT_LENGTH], val_arg[MAX_INPUT_LENGTH], find_keywords[MAX_INPUT_LENGTH], extra_search[MAX_INPUT_LENGTH];
 	bitvector_t find_interacts = NOBITS, found_interacts, only_build = NOBITS, find_custom = NOBITS, found_custom;
 	bitvector_t find_evos = NOBITS, found_evos;
 	bitvector_t not_flagged = NOBITS, only_flags = NOBITS, only_climate = NOBITS;
@@ -451,7 +451,6 @@ void olc_fullsearch_sector(char_data *ch, char *argument) {
 	struct evolution_data *evo;
 	sector_data *sect, *next_sect;
 	struct icon_data *icon;
-	size_t size;
 	bool match;
 	struct custom_message *cust;
 	
@@ -494,7 +493,7 @@ void olc_fullsearch_sector(char_data *ch, char *argument) {
 		skip_spaces(&argument);
 	}
 	
-	size = snprintf(buf, sizeof(buf), "Sector fullsearch: %s\r\n", show_color_codes(find_keywords));
+	build_page_display(ch, "Sector fullsearch: %s", show_color_codes(find_keywords));
 	count = 0;
 	
 	// okay now look up sects
@@ -567,27 +566,18 @@ void olc_fullsearch_sector(char_data *ch, char *argument) {
 		}
 		
 		// show it
-		snprintf(line, sizeof(line), "[%5d] %s\r\n", GET_SECT_VNUM(sect), GET_SECT_NAME(sect));
-		if (strlen(line) + size < sizeof(buf)) {
-			size += snprintf(buf + size, sizeof(buf) - size, "%s", line);
-			++count;
-		}
-		else {
-			size += snprintf(buf + size, sizeof(buf) - size, "OVERFLOW\r\n");
-			break;
-		}
+		build_page_display(ch, "[%5d] %s", GET_SECT_VNUM(sect), GET_SECT_NAME(sect));
+		++count;
 	}
 	
-	if (count > 0 && (size + 20) < sizeof(buf)) {
-		size += snprintf(buf + size, sizeof(buf) - size, "(%d sector%s)\r\n", count, PLURAL(count));
+	if (count > 0) {
+		build_page_display(ch, "(%d sector%s)", count, PLURAL(count));
 	}
-	else if (count == 0) {
-		size += snprintf(buf + size, sizeof(buf) - size, " none\r\n");
+	else {
+		build_page_display_str(ch, " none");
 	}
 	
-	if (ch->desc) {
-		page_string(ch->desc, buf, TRUE);
-	}
+	send_page_display(ch);
 }
 
 
@@ -598,14 +588,13 @@ void olc_fullsearch_sector(char_data *ch, char *argument) {
 * @param crop_vnum vnum The crop vnum.
 */
 void olc_search_sector(char_data *ch, sector_vnum vnum) {
-	char buf[MAX_STRING_LENGTH];
 	struct adventure_link_rule *link;
 	sector_data *real, *sect, *next_sect;
 	quest_data *quest, *next_quest;
 	progress_data *prg, *next_prg;
 	social_data *soc, *next_soc;
 	adv_data *adv, *next_adv;
-	int size, found;
+	int found;
 	bool any;
 	
 	real = sector_proto(vnum);
@@ -615,18 +604,15 @@ void olc_search_sector(char_data *ch, sector_vnum vnum) {
 	}
 	
 	found = 0;
-	size = snprintf(buf, sizeof(buf), "Occurrences of sector %d (%s):\r\n", vnum, GET_SECT_NAME(real));
+	build_page_display(ch, "Occurrences of sector %d (%s):", vnum, GET_SECT_NAME(real));
 	
 	// adventure rules
 	HASH_ITER(hh, adventure_table, adv, next_adv) {
-		if (size >= sizeof(buf)) {
-			break;
-		}
 		for (link = GET_ADV_LINKING(adv); link; link = link->next) {
 			if (link->type == ADV_LINK_PORTAL_WORLD) {
 				if (link->value == vnum) {
 					++found;
-					size += snprintf(buf + size, sizeof(buf) - size, "ADV [%5d] %s\r\n", GET_ADV_VNUM(adv), GET_ADV_NAME(adv));
+					build_page_display(ch, "ADV [%5d] %s", GET_ADV_VNUM(adv), GET_ADV_NAME(adv));
 					// only report once per adventure
 					break;
 				}
@@ -636,24 +622,18 @@ void olc_search_sector(char_data *ch, sector_vnum vnum) {
 	
 	// progress
 	HASH_ITER(hh, progress_table, prg, next_prg) {
-		if (size >= sizeof(buf)) {
-			break;
-		}
 		// REQ_x: requirement search
 		any = find_requirement_in_list(PRG_TASKS(prg), REQ_VISIT_SECTOR, vnum);
 		any |= find_requirement_in_list(PRG_TASKS(prg), REQ_OWN_SECTOR, vnum);
 		
 		if (any) {
 			++found;
-			size += snprintf(buf + size, sizeof(buf) - size, "PRG [%5d] %s\r\n", PRG_VNUM(prg), PRG_NAME(prg));
+			build_page_display(ch, "PRG [%5d] %s", PRG_VNUM(prg), PRG_NAME(prg));
 		}
 	}
 	
 	// quests
 	HASH_ITER(hh, quest_table, quest, next_quest) {
-		if (size >= sizeof(buf)) {
-			break;
-		}
 		any = find_requirement_in_list(QUEST_TASKS(quest), REQ_VISIT_SECTOR, vnum);
 		any |= find_requirement_in_list(QUEST_PREREQS(quest), REQ_VISIT_SECTOR, vnum);
 		any |= find_requirement_in_list(QUEST_TASKS(quest), REQ_OWN_SECTOR, vnum);
@@ -661,45 +641,39 @@ void olc_search_sector(char_data *ch, sector_vnum vnum) {
 		
 		if (any) {
 			++found;
-			size += snprintf(buf + size, sizeof(buf) - size, "QST [%5d] %s\r\n", QUEST_VNUM(quest), QUEST_NAME(quest));
+			build_page_display(ch, "QST [%5d] %s", QUEST_VNUM(quest), QUEST_NAME(quest));
 		}
 	}
 	
 	// sector evos
 	HASH_ITER(hh, sector_table, sect, next_sect) {
-		if (size >= sizeof(buf)) {
-			break;
-		}
 		any = has_evolution_to(sect, vnum);
 		any |= has_evolution_value(sect, EVO_VAL_SECTOR, vnum);
 		if (any) {
 			++found;
-			size += snprintf(buf + size, sizeof(buf) - size, "SCT [%5d] %s\r\n", GET_SECT_VNUM(sect), GET_SECT_NAME(sect));
+			build_page_display(ch, "SCT [%5d] %s", GET_SECT_VNUM(sect), GET_SECT_NAME(sect));
 		}
 	}
 	
 	// socials
 	HASH_ITER(hh, social_table, soc, next_soc) {
-		if (size >= sizeof(buf)) {
-			break;
-		}
 		any = find_requirement_in_list(SOC_REQUIREMENTS(soc), REQ_VISIT_SECTOR, vnum);
 		any |= find_requirement_in_list(SOC_REQUIREMENTS(soc), REQ_OWN_SECTOR, vnum);
 		
 		if (any) {
 			++found;
-			size += snprintf(buf + size, sizeof(buf) - size, "SOC [%5d] %s\r\n", SOC_VNUM(soc), SOC_NAME(soc));
+			build_page_display(ch, "SOC [%5d] %s", SOC_VNUM(soc), SOC_NAME(soc));
 		}
 	}
 	
 	if (found > 0) {
-		size += snprintf(buf + size, sizeof(buf) - size, "%d location%s shown\r\n", found, PLURAL(found));
+		build_page_display(ch, "%d location%s shown", found, PLURAL(found));
 	}
 	else {
-		size += snprintf(buf + size, sizeof(buf) - size, " none\r\n");
+		build_page_display_str(ch, " none");
 	}
 	
-	page_string(ch->desc, buf, TRUE);
+	send_page_display(ch);
 }
 
 
@@ -875,7 +849,7 @@ int wordcount_sector(sector_data *sect) {
 */
 void olc_show_sector(char_data *ch) {
 	sector_data *st = GET_OLC_SECTOR(ch->desc);
-	char buf[MAX_STRING_LENGTH * 4], lbuf[MAX_STRING_LENGTH * 4];
+	char lbuf[MAX_STRING_LENGTH * 4];
 	struct spawn_info *spawn;
 	struct custom_message *ocm;
 	int count;
@@ -883,69 +857,63 @@ void olc_show_sector(char_data *ch) {
 	if (!st) {
 		return;
 	}
-	
-	*buf = '\0';
 
-	sprintf(buf + strlen(buf), "[%s%d\t0] %s%s\t0\r\n", OLC_LABEL_CHANGED, GET_OLC_VNUM(ch->desc), OLC_LABEL_UNCHANGED, sector_proto(st->vnum) ? GET_SECT_NAME(sector_proto(st->vnum)) : "new sector");
-	sprintf(buf + strlen(buf), "<%sname\t0> %s\r\n", OLC_LABEL_STR(GET_SECT_NAME(st), default_sect_name), NULLSAFE(GET_SECT_NAME(st)));
-	sprintf(buf + strlen(buf), "<%stitle\t0> %s\r\n", OLC_LABEL_STR(GET_SECT_TITLE(st), default_sect_title), NULLSAFE(GET_SECT_TITLE(st)));
-	sprintf(buf + strlen(buf), "<%scommands\t0> %s\r\n", OLC_LABEL_STR(GET_SECT_COMMANDS(st), ""), NULLSAFE(GET_SECT_COMMANDS(st)));
-	sprintf(buf + strlen(buf), "<%sroadsideicon\t0> %c\r\n", OLC_LABEL_VAL(st->roadside_icon, default_roadside_icon), st->roadside_icon);
-	sprintf(buf + strlen(buf), "<%smapout\t0> %s\r\n", OLC_LABEL_VAL(GET_SECT_MAPOUT(st), 0), mapout_color_names[GET_SECT_MAPOUT(st)]);
+	build_page_display(ch, "[%s%d\t0] %s%s\t0", OLC_LABEL_CHANGED, GET_OLC_VNUM(ch->desc), OLC_LABEL_UNCHANGED, sector_proto(GET_SECT_VNUM(st)) ? GET_SECT_NAME(sector_proto(GET_SECT_VNUM(st))) : "new sector");
+	build_page_display(ch, "<%sname\t0> %s", OLC_LABEL_STR(GET_SECT_NAME(st), default_sect_name), NULLSAFE(GET_SECT_NAME(st)));
+	build_page_display(ch, "<%stitle\t0> %s", OLC_LABEL_STR(GET_SECT_TITLE(st), default_sect_title), NULLSAFE(GET_SECT_TITLE(st)));
+	build_page_display(ch, "<%scommands\t0> %s", OLC_LABEL_STR(GET_SECT_COMMANDS(st), ""), NULLSAFE(GET_SECT_COMMANDS(st)));
+	build_page_display(ch, "<%sroadsideicon\t0> %c", OLC_LABEL_VAL(GET_SECT_ROADSIDE_ICON(st), default_roadside_icon), GET_SECT_ROADSIDE_ICON(st));
+	build_page_display(ch, "<%smapout\t0> %s", OLC_LABEL_VAL(GET_SECT_MAPOUT(st), 0), mapout_color_names[GET_SECT_MAPOUT(st)]);
 
-	sprintf(buf + strlen(buf), "<%sicons\t0>\r\n", OLC_LABEL_PTR(GET_SECT_ICONS(st)));
-	get_icons_display(GET_SECT_ICONS(st), buf1);
-	strcat(buf, buf1);
+	build_page_display(ch, "<%sicons\t0>", OLC_LABEL_PTR(GET_SECT_ICONS(st)));
+	show_icons_display(ch, GET_SECT_ICONS(st), FALSE);
 
 	ordered_sprintbit(GET_SECT_CLIMATE(st), climate_flags, climate_flags_order, FALSE, lbuf);
-	sprintf(buf + strlen(buf), "<%sclimate\t0> %s\r\n", OLC_LABEL_VAL(st->climate, NOBITS), lbuf);
-	sprintf(buf + strlen(buf), "<%stemperature\t0> %s\r\n", OLC_LABEL_VAL(GET_SECT_TEMPERATURE_TYPE(st), 0), temperature_types[GET_SECT_TEMPERATURE_TYPE(st)]);
-	sprintf(buf + strlen(buf), "<%smovecost\t0> %d\r\n", OLC_LABEL_VAL(st->movement_loss, 0), st->movement_loss);
+	build_page_display(ch, "<%sclimate\t0> %s", OLC_LABEL_VAL(GET_SECT_CLIMATE(st), NOBITS), lbuf);
+	build_page_display(ch, "<%stemperature\t0> %s", OLC_LABEL_VAL(GET_SECT_TEMPERATURE_TYPE(st), 0), temperature_types[GET_SECT_TEMPERATURE_TYPE(st)]);
+	build_page_display(ch, "<%smovecost\t0> %d", OLC_LABEL_VAL(GET_SECT_MOVE_LOSS(st), 0), GET_SECT_MOVE_LOSS(st));
 
 	sprintbit(GET_SECT_FLAGS(st), sector_flags, lbuf, TRUE);
-	sprintf(buf + strlen(buf), "<%sflags\t0> %s\r\n", OLC_LABEL_VAL(GET_SECT_FLAGS(st), NOBITS), lbuf);
+	build_page_display(ch, "<%sflags\t0> %s", OLC_LABEL_VAL(GET_SECT_FLAGS(st), NOBITS), lbuf);
 	
-	ordered_sprintbit(st->build_flags, bld_on_flags, bld_on_flags_order, TRUE, lbuf);
-	sprintf(buf + strlen(buf), "<%sbuildflags\t0> %s\r\n", OLC_LABEL_VAL(st->build_flags, NOBITS), lbuf);
+	ordered_sprintbit(GET_SECT_BUILD_FLAGS(st), bld_on_flags, bld_on_flags_order, TRUE, lbuf);
+	build_page_display(ch, "<%sbuildflags\t0> %s", OLC_LABEL_VAL(GET_SECT_BUILD_FLAGS(st), NOBITS), lbuf);
 	
-	sprintf(buf + strlen(buf), "<%sevolution\t0>\r\n", OLC_LABEL_PTR(st->evolution));
-	if (st->evolution) {
-		get_evolution_display(st->evolution, buf1);
-		strcat(buf, buf1);
+	build_page_display(ch, "<%sevolution\t0>", OLC_LABEL_PTR(GET_SECT_EVOS(st)));
+	if (GET_SECT_EVOS(st)) {
+		show_evolution_display(ch, GET_SECT_EVOS(st), FALSE);
 	}
 
 	// exdesc
-	sprintf(buf + strlen(buf), "Extra descriptions: <%sextra\t0>\r\n", OLC_LABEL_PTR(GET_SECT_EX_DESCS(st)));
+	build_page_display(ch, "Extra descriptions: <%sextra\t0>", OLC_LABEL_PTR(GET_SECT_EX_DESCS(st)));
 	if (GET_SECT_EX_DESCS(st)) {
-		get_extra_desc_display(GET_SECT_EX_DESCS(st), lbuf, sizeof(lbuf));
-		strcat(buf, lbuf);
+		show_extra_desc_display(ch, GET_SECT_EX_DESCS(st), FALSE);
 	}
 
 	// custom messages
-	sprintf(buf + strlen(buf), "Custom messages: <%scustom\t0>\r\n", OLC_LABEL_PTR(GET_SECT_CUSTOM_MSGS(st)));
+	build_page_display(ch, "Custom messages: <%scustom\t0>", OLC_LABEL_PTR(GET_SECT_CUSTOM_MSGS(st)));
 	count = 0;
 	LL_FOREACH(GET_SECT_CUSTOM_MSGS(st), ocm) {
-		sprintf(buf + strlen(buf), " \ty%2d\t0. [%s] %s\r\n", ++count, sect_custom_types[ocm->type], ocm->msg);
+		build_page_display(ch, " \ty%2d\t0. [%s] %s", ++count, sect_custom_types[ocm->type], ocm->msg);
 	}
 
-	sprintf(buf + strlen(buf), "Interactions: <%sinteraction\t0>\r\n", OLC_LABEL_PTR(GET_SECT_INTERACTIONS(st)));
+	build_page_display(ch, "Interactions: <%sinteraction\t0>", OLC_LABEL_PTR(GET_SECT_INTERACTIONS(st)));
 	if (GET_SECT_INTERACTIONS(st)) {
-		get_interaction_display(GET_SECT_INTERACTIONS(st), buf1);
-		strcat(buf, buf1);
+		show_interaction_display(ch, GET_SECT_INTERACTIONS(st), FALSE);
 	}
 	
-	sprintf(buf + strlen(buf), "<%sspawns\t0>\r\n", OLC_LABEL_PTR(GET_SECT_SPAWNS(st)));
+	build_page_display(ch, "<%sspawns\t0>", OLC_LABEL_PTR(GET_SECT_SPAWNS(st)));
 	if (GET_SECT_SPAWNS(st)) {
 		count = 0;
 		for (spawn = GET_SECT_SPAWNS(st); spawn; spawn = spawn->next) {
 			++count;
 		}
-		sprintf(buf + strlen(buf), " %d spawn%s set\r\n", count, PLURAL(count));
+		build_page_display(ch, " %d spawn%s set", count, PLURAL(count));
 	}
 	
-	sprintf(buf + strlen(buf), "<%snotes\t0>\r\n%s", OLC_LABEL_PTR(GET_SECT_NOTES(st)), NULLSAFE(GET_SECT_NOTES(st)));
+	build_page_display(ch, "<%snotes\t0>\r\n%s", OLC_LABEL_PTR(GET_SECT_NOTES(st)), NULLSAFE(GET_SECT_NOTES(st)));
 	
-	page_string(ch->desc, buf, TRUE);
+	send_page_display(ch);
 }
 
 
@@ -954,7 +922,7 @@ void olc_show_sector(char_data *ch) {
 
 OLC_MODULE(sectedit_buildflags) {
 	sector_data *st = GET_OLC_SECTOR(ch->desc);
-	st->build_flags = olc_process_flag(ch, argument, "build", "buildflags", bld_on_flags, st->build_flags);
+	GET_SECT_BUILD_FLAGS(st) = olc_process_flag(ch, argument, "build", "buildflags", bld_on_flags, GET_SECT_BUILD_FLAGS(st));
 }
 
 
@@ -971,7 +939,7 @@ OLC_MODULE(sectedit_checktemperature) {
 	for (iter = 0; season_list[iter] != -1; ++iter) {
 		low = calculate_temperature(GET_SECT_TEMPERATURE_TYPE(st), GET_SECT_CLIMATE(st), season_list[iter], SUN_DARK);
 		high = calculate_temperature(GET_SECT_TEMPERATURE_TYPE(st), GET_SECT_CLIMATE(st), season_list[iter], SUN_LIGHT);
-		snprintf(buf, sizeof(buf), "%s: %d to %d", seasons[season_list[iter]], low, high);
+		safe_snprintf(buf, sizeof(buf), "%s: %d to %d", seasons[season_list[iter]], low, high);
 		msg_to_char(ch, "  %s\r\n", CAP(buf));
 	}
 }
@@ -1030,8 +998,8 @@ OLC_MODULE(sectedit_evolution) {
 			msg_to_char(ch, "Remove which evolution (number)?\r\n");
 		}
 		else if (!str_cmp(arg2, "all")) {
-			while ((evo = st->evolution)) {
-				st->evolution = evo->next;
+			while ((evo = GET_SECT_EVOS(st))) {
+				GET_SECT_EVOS(st) = evo->next;
 				free(evo);
 			}
 			msg_to_char(ch, "You remove all evolutions.\r\n");
@@ -1041,13 +1009,13 @@ OLC_MODULE(sectedit_evolution) {
 		}
 		else {
 			found = FALSE;
-			for (evo = st->evolution; evo && !found; evo = evo->next) {
+			for (evo = GET_SECT_EVOS(st); evo && !found; evo = evo->next) {
 				if (--num == 0) {
 					found = TRUE;
 					
 					msg_to_char(ch, "You remove evolution #%d.\r\n", atoi(arg2));
 					
-					LL_DELETE(st->evolution, evo);
+					LL_DELETE(GET_SECT_EVOS(st), evo);
 					free(evo);
 				}
 			}
@@ -1168,7 +1136,7 @@ OLC_MODULE(sectedit_evolution) {
 		// find which one to change
 		num = atoi(num_arg);
 		change = NULL;
-		for (evo = st->evolution; evo && !change; evo = evo->next) {
+		for (evo = GET_SECT_EVOS(st); evo && !change; evo = evo->next) {
 			if (--num == 0) {
 				change = evo;
 				break;
@@ -1320,7 +1288,7 @@ OLC_MODULE(sectedit_mapout) {
 
 OLC_MODULE(sectedit_movecost) {
 	sector_data *st = GET_OLC_SECTOR(ch->desc);
-	st->movement_loss = olc_process_number(ch, argument, "movement cost", "movecost", 0, 1000, st->movement_loss);
+	GET_SECT_MOVE_LOSS(st) = olc_process_number(ch, argument, "movement cost", "movecost", 0, 1000, GET_SECT_MOVE_LOSS(st));
 }
 
 
@@ -1354,13 +1322,13 @@ OLC_MODULE(sectedit_roadsideicon) {
 		msg_to_char(ch, "Invalid roadside icon '%c'.\r\n", *argument);
 	}
 	else {
-		st->roadside_icon = *argument;
+		GET_SECT_ROADSIDE_ICON(st) = *argument;
 		
 		if (PRF_FLAGGED(ch, PRF_NOREPEAT)) {
 			send_config_msg(ch, "ok_string");
 		}
 		else {
-			msg_to_char(ch, "The roadside icon is now '%c'.\r\n", st->roadside_icon);
+			msg_to_char(ch, "The roadside icon is now '%c'.\r\n", GET_SECT_ROADSIDE_ICON(st));
 		}
 	}
 }

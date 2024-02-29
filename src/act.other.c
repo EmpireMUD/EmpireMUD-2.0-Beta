@@ -318,12 +318,12 @@ void perform_alternate(char_data *old, char_data *new) {
 	old_emp = GET_LOYALTY(old);
 	
 	// prepare logs
-	snprintf(sys, sizeof(sys), "%s used alternate at %s to switch to %s", GET_NAME(old), (IN_ROOM(old) ? room_log_identifier(IN_ROOM(old)) : "an unknown location"), GET_NAME(new));
+	safe_snprintf(sys, sizeof(sys), "%s used alternate at %s to switch to %s", GET_NAME(old), (IN_ROOM(old) ? room_log_identifier(IN_ROOM(old)) : "an unknown location"), GET_NAME(new));
 
 	strcpy(temp, PERS(new, new, TRUE));
-	snprintf(mort_alt, sizeof(mort_alt), "%s has switched to %s", PERS(old, old, TRUE), temp);
-	snprintf(mort_in, sizeof(mort_in), "%s has entered the game", temp);
-	snprintf(mort_out, sizeof(mort_in), "%s has left the game", PERS(old, old, TRUE));
+	safe_snprintf(mort_alt, sizeof(mort_alt), "%s has switched to %s", PERS(old, old, TRUE), temp);
+	safe_snprintf(mort_in, sizeof(mort_in), "%s has entered the game", temp);
+	safe_snprintf(mort_out, sizeof(mort_in), "%s has left the game", PERS(old, old, TRUE));
 	
 	// peace out
 	if (!GET_INVIS_LEV(old)) {
@@ -563,11 +563,11 @@ static void print_group(char_data *ch) {
 			// show class section if they have one
 			if (!IS_NPC(k)) {
 				get_player_skill_string(k, skills, TRUE);
-				snprintf(class, sizeof(class), "/%s", skills);
+				safe_snprintf(class, sizeof(class), "/%s", skills);
 				
 				// screenreader sees role here; otherwise the name is highlighted
 				if (PRF_FLAGGED(ch, PRF_SCREEN_READER)) {
-					snprintf(class + strlen(class), sizeof(class) - strlen(class), "/%s", class_role[(int) GET_CLASS_ROLE(k)]);
+					safe_snprintf(class + strlen(class), sizeof(class) - strlen(class), "/%s", class_role[(int) GET_CLASS_ROLE(k)]);
 				}
 			}
 			else {
@@ -577,16 +577,16 @@ static void print_group(char_data *ch) {
 			// warnings
 			*alerts = '\0';
 			if (IS_DEAD(k)) {
-				snprintf(alerts, sizeof(alerts), " &r(dead)&0");
+				safe_snprintf(alerts, sizeof(alerts), " &r(dead)&0");
 			}
 			
 			// show location if different
 			if (IN_ROOM(k) != IN_ROOM(ch)) {
 				if (HAS_NAVIGATION(ch) && (IS_NPC(k) || HAS_NAVIGATION(k))) {
-					snprintf(loc, sizeof(loc), " - %s%s", get_room_name(IN_ROOM(k), FALSE), coord_display_room(ch, IN_ROOM(k), FALSE));
+					safe_snprintf(loc, sizeof(loc), " - %s%s", get_room_name(IN_ROOM(k), FALSE), coord_display_room(ch, IN_ROOM(k), FALSE));
 				}
 				else {
-					snprintf(loc, sizeof(loc), " - %s", get_room_name(IN_ROOM(k), FALSE));
+					safe_snprintf(loc, sizeof(loc), " - %s", get_room_name(IN_ROOM(k), FALSE));
 				}
 			}
 			else {
@@ -1104,7 +1104,7 @@ void alt_import_slash_channels(char_data *ch, char_data *alt) {
 	// if not in the game, slash channels are here
 	LL_FOREACH(LOAD_SLASH_CHANNELS(alt), load_slash) {
 		if ((chan = find_slash_channel_by_name(load_slash->name, TRUE)) && !find_on_slash_channel(ch, chan->id)) {
-			snprintf(buf, sizeof(buf), "join %s", chan->name);
+			safe_snprintf(buf, sizeof(buf), "join %s", chan->name);
 			do_slash_channel(ch, buf, 0, 0);
 			imported = TRUE;
 		}
@@ -1113,7 +1113,7 @@ void alt_import_slash_channels(char_data *ch, char_data *alt) {
 	// if in-game, slash channels are here
 	LL_FOREACH(GET_SLASH_CHANNELS(alt), iter) {
 		if (!find_on_slash_channel(ch, iter->id) && (chan = find_slash_channel_by_id(iter->id))) {
-			snprintf(buf, sizeof(buf), "join %s", chan->name);
+			safe_snprintf(buf, sizeof(buf), "join %s", chan->name);
 			do_slash_channel(ch, buf, 0, 0);
 			imported = TRUE;
 		}
@@ -1465,7 +1465,7 @@ ACMD(do_accept) {
 	else {
 		msg_to_char(ch, "You reject the offer for %s.\r\n", offer_types[type].name);
 		if ((from = is_playing(offer->from))) {
-			snprintf(buf, sizeof(buf), "$N has rejected your offer for %s.", offer_types[type].name);
+			safe_snprintf(buf, sizeof(buf), "$N has rejected your offer for %s.", offer_types[type].name);
 			act(buf, FALSE, from, NULL, ch, TO_CHAR);
 		}
 		delete = TRUE;
@@ -1480,13 +1480,13 @@ ACMD(do_accept) {
 
 
 ACMD(do_alternate) {
-	char arg[MAX_INPUT_LENGTH], buf[MAX_STRING_LENGTH], part[MAX_STRING_LENGTH];
+	char arg[MAX_INPUT_LENGTH], part[MAX_STRING_LENGTH];
 	struct account_player *plr;
 	player_index_data *index;
 	char_data *newch, *alt;
 	bool is_file = FALSE, timed_out;
 	int days, hours;
-	size_t size;
+	struct page_display *line;
 	
 	argument = any_one_arg(argument, arg);
 	
@@ -1501,7 +1501,7 @@ ACMD(do_alternate) {
 		msg_to_char(ch, "Usage: alternate <character name | list | import>\r\n");
 	}
 	else if (!str_cmp(arg, "list")) {
-		size = snprintf(buf, sizeof(buf), "Account characters:\r\n");
+		build_page_display(ch, "Account characters:");
 		
 		for (plr = GET_ACCOUNT(ch)->players; plr; plr = plr->next) {
 			if (!plr->player) {
@@ -1518,26 +1518,24 @@ ACMD(do_alternate) {
 			timed_out = member_is_timed_out_ch(alt);
 			get_player_skill_string(alt, part, TRUE);
 			if (PRF_FLAGGED(ch, PRF_SCREEN_READER)) {
-				size += snprintf(buf + size, sizeof(buf) - size, "[%d %s %s] %s%s&0", !is_file ? GET_COMPUTED_LEVEL(alt) : GET_LAST_KNOWN_LEVEL(alt), part, class_role[GET_CLASS_ROLE(alt)], (timed_out ? "&r" : ""), PERS(alt, alt, TRUE));
+				line = build_page_display(ch, "[%d %s %s] %s%s&0", !is_file ? GET_COMPUTED_LEVEL(alt) : GET_LAST_KNOWN_LEVEL(alt), part, class_role[GET_CLASS_ROLE(alt)], (timed_out ? "&r" : ""), PERS(alt, alt, TRUE));
 			}
 			else {	// not screenreader
-				size += snprintf(buf + size, sizeof(buf) - size, "[%d %s%s\t0] %s%s&0", !is_file ? GET_COMPUTED_LEVEL(alt) : GET_LAST_KNOWN_LEVEL(alt), class_role_color[GET_CLASS_ROLE(alt)], part, (timed_out ? "&r" : ""), PERS(alt, alt, TRUE));
+				line = build_page_display(ch, "[%d %s%s\t0] %s%s&0", !is_file ? GET_COMPUTED_LEVEL(alt) : GET_LAST_KNOWN_LEVEL(alt), class_role_color[GET_CLASS_ROLE(alt)], part, (timed_out ? "&r" : ""), PERS(alt, alt, TRUE));
 			}
 						
 			// online/not
 			if (!is_file) {
-				size += snprintf(buf + size, sizeof(buf) - size, "  - &conline&0%s", IS_AFK(alt) ? " - &rafk&0" : "");
+				append_page_display_line(line, "  - &conline&0%s", IS_AFK(alt) ? " - &rafk&0" : "");
 			}
 			else if ((time(0) - alt->prev_logon) < SECS_PER_REAL_DAY) {
 				hours = (time(0) - alt->prev_logon) / SECS_PER_REAL_HOUR;
-				size += snprintf(buf + size, sizeof(buf) - size, "  - %d hour%s ago%s", hours, PLURAL(hours), (timed_out ? ", &rtimed-out&0" : ""));
+				append_page_display_line(line, "  - %d hour%s ago%s", hours, PLURAL(hours), (timed_out ? ", &rtimed-out&0" : ""));
 			}
 			else {	// more than a day
 				days = (time(0) - alt->prev_logon) / SECS_PER_REAL_DAY;
-				size += snprintf(buf + size, sizeof(buf) - size, "  - %d day%s ago%s", days, PLURAL(days), (timed_out ? ", &rtimed-out&0" : ""));
+				append_page_display_line(line, "  - %d day%s ago%s", days, PLURAL(days), (timed_out ? ", &rtimed-out&0" : ""));
 			}
-		
-			size += snprintf(buf + size, sizeof(buf) - size, "\r\n");
 		
 			if (alt && is_file) {
 				free_char(alt);
@@ -1545,9 +1543,7 @@ ACMD(do_alternate) {
 		}
 		
 		// prevent rapid-use
-		if (ch->desc) {
-			page_string(ch->desc, buf, TRUE);
-		}
+		send_page_display(ch);
 		command_lag(ch, WAIT_OTHER);
 	}
 	else if (!str_cmp(arg, "import")) {
@@ -1731,14 +1727,13 @@ ACMD(do_changepass) {
 
 
 ACMD(do_companions) {
-	char buf[MAX_STRING_LENGTH * 2], line[MAX_STRING_LENGTH];
 	struct companion_data *cd, *next_cd, *found_cd;
 	char_data *mob, *proto = NULL;
 	struct companion_mod *cmod;
 	ability_data *abil;
-	size_t size, lsize;
-	bool found, full, low_in_skill = FALSE;
+	bool found, low_in_skill = FALSE;
 	int found_low_level = 0;
+	struct page_display *line;
 	
 	skip_spaces(&argument);
 	
@@ -1750,9 +1745,9 @@ ACMD(do_companions) {
 	setup_ability_companions(ch);
 	
 	if (!*argument) {
-		size = snprintf(buf, sizeof(buf), "You can summon the following companions:\r\n");
+		build_page_display(ch, "You can summon the following companions:");
 		
-		found = full = FALSE;
+		found = FALSE;
 		HASH_ITER(hh, GET_COMPANIONS(ch), cd, next_cd) {
 			if (cd->from_abil != NOTHING && !has_ability(ch, cd->from_abil)) {
 				continue;	// missing ability: don't show
@@ -1763,43 +1758,23 @@ ACMD(do_companions) {
 			
 			// build display
 			cmod = get_companion_mod_by_type(cd, CMOD_SHORT_DESC);
-			lsize = snprintf(line, sizeof(line), " %s", skip_filler(cmod ? cmod->str : get_mob_name_by_proto(cd->vnum, TRUE)));
+			line = build_page_display(ch, " %s", skip_filler(cmod ? cmod->str : get_mob_name_by_proto(cd->vnum, TRUE)));
 			
 			if (cd->from_abil != NOTHING && (abil = find_ability_by_vnum(cd->from_abil)) && ABIL_COST(abil) > 0) {
-				lsize += snprintf(line + lsize, sizeof(line) - lsize, " (%d %s)", ABIL_COST(abil), pool_types[ABIL_COST_TYPE(abil)]);
+				append_page_display_line(line, " (%d %s)", ABIL_COST(abil), pool_types[ABIL_COST_TYPE(abil)]);
 			}
 			
 			if (GET_MIN_SCALE_LEVEL(proto) > 0 && (cd->from_abil ? get_player_level_for_ability(ch, cd->from_abil) : get_approximate_level(ch)) < GET_MIN_SCALE_LEVEL(proto)) {
-				lsize += snprintf(line + lsize, sizeof(line) - lsize, " \trrequires level %d\t0", GET_MIN_SCALE_LEVEL(proto));
+				append_page_display_line(line, " \trrequires level %d\t0", GET_MIN_SCALE_LEVEL(proto));
 			}
 			
-			strcat(line, "\r\n");
-			lsize += 2;
 			found = TRUE;
-			
-			if (size + lsize < sizeof(buf)) {
-				strcat(buf, line);
-				size += lsize;
-			}
-			else {
-				full = TRUE;
-				break;
-			}
-			
-			if (full) {
-				break;
-			}
 		}
 		
 		if (!found) {
-			strcat(buf, " none\r\n");	// always room for this if !found
+			build_page_display_str(ch, " none");
 		}
-		if (full) {
-			snprintf(buf + size, sizeof(buf) - size, "OVERFLOW\r\n");
-		}
-		if (ch->desc) {
-			page_string(ch->desc, buf, TRUE);
-		}
+		send_page_display(ch);
 		return;
 	}
 	
@@ -2118,7 +2093,7 @@ ACMD(do_fightmessages) {
 	}
 	
 	if (!*argument) {
-		snprintf(buf, sizeof(buf), "%s message toggles:\r\n", message_type[subcmd]);
+		safe_snprintf(buf, sizeof(buf), "%s message toggles:\r\n", message_type[subcmd]);
 		send_to_char(CAP(buf), ch);
 		
 		count = 0;
@@ -2233,16 +2208,16 @@ ACMD(do_gen_write) {
 	}
 	
 	if (GET_ROOM_TEMPLATE(IN_ROOM(ch))) {
-		snprintf(locpart, sizeof(locpart), " [RMT%d]", GET_RMT_VNUM(GET_ROOM_TEMPLATE(IN_ROOM(ch))));
+		safe_snprintf(locpart, sizeof(locpart), " [RMT%d]", GET_RMT_VNUM(GET_ROOM_TEMPLATE(IN_ROOM(ch))));
 	}
 	else if (GET_BUILDING(IN_ROOM(ch))) {
-		snprintf(locpart, sizeof(locpart), " [BLD%d]", GET_BLD_VNUM(GET_BUILDING(IN_ROOM(ch))));
+		safe_snprintf(locpart, sizeof(locpart), " [BLD%d]", GET_BLD_VNUM(GET_BUILDING(IN_ROOM(ch))));
 	}
 	else if ((cp = ROOM_CROP(IN_ROOM(ch)))) {
-		snprintf(locpart, sizeof(locpart), " [CRP%d]", GET_CROP_VNUM(cp));
+		safe_snprintf(locpart, sizeof(locpart), " [CRP%d]", GET_CROP_VNUM(cp));
 	}
 	else {
-		snprintf(locpart, sizeof(locpart), " [%d]", GET_ROOM_VNUM(IN_ROOM(ch)));
+		safe_snprintf(locpart, sizeof(locpart), " [%d]", GET_ROOM_VNUM(IN_ROOM(ch)));
 	}
 	
 	fprintf(fl, "%-8s (%6.6s)%s %s\n", GET_NAME(ch), (tmp + 4), locpart, argument);
@@ -2553,10 +2528,9 @@ ACMD(do_herd) {
 
 
 ACMD(do_lastname) {
-	char arg1[MAX_INPUT_LENGTH], new_name[MAX_INPUT_LENGTH], output[MAX_STRING_LENGTH], line[MAX_STRING_LENGTH];
+	char arg1[MAX_INPUT_LENGTH], new_name[MAX_INPUT_LENGTH];
 	char *arg2, *best, *exact;
 	struct player_lastname *lastn;
-	size_t size;
 	int count;
 	
 	// we assume 'lastname <change | set | list> <name>' but also keep 'argument' whole too
@@ -2633,15 +2607,15 @@ ACMD(do_lastname) {
 		else {	// list them all
 			count = 0;
 			if (*arg2) {
-				size = snprintf(output, sizeof(output), "Lastnames matching '%s':\r\n", arg2);
+				build_page_display(ch, "Lastnames matching '%s':", arg2);
 			}
 			else {
-				size = snprintf(output, sizeof(output), "Your lastnames:\r\n");
+				build_page_display_str(ch, "Your lastnames:");
 			}
 		
 			if (GET_PERSONAL_LASTNAME(ch)) {
 				++count;
-				size += snprintf(output + size, sizeof(output) - size, " %s (personal)\r\n", GET_PERSONAL_LASTNAME(ch));
+				build_page_display(ch, " %s (personal)", GET_PERSONAL_LASTNAME(ch));
 			}
 		
 			LL_FOREACH(GET_LASTNAME_LIST(ch), lastn) {
@@ -2651,26 +2625,14 @@ ACMD(do_lastname) {
 		
 				// show it
 				++count;
-				snprintf(line, sizeof(line), " %s\r\n", NULLSAFE(lastn->name));
-				if (size + strlen(line) < sizeof(output)) {
-					strcat(output, line);
-					size += strlen(line);
-				}
-				else {
-					if (size + 10 < sizeof(output)) {
-						strcat(output, "OVERFLOW\r\n");
-					}
-					break;
-				}
+				build_page_display(ch, " %s", NULLSAFE(lastn->name));
 			}
 	
 			if (!count) {
-				strcat(output, " none\r\n");	// space reserved for this for sure
+				build_page_display_str(ch, " none");
 			}
 	
-			if (ch->desc) {
-				page_string(ch->desc, output, TRUE);
-			}
+			send_page_display(ch);
 		}
 	}
 	else if (IS_SET(config_get_bitvector("lastname_mode"), LASTNAME_CHOOSE_FROM_LIST)) {
@@ -2783,10 +2745,8 @@ ACMD(do_milk) {
 
 
 ACMD(do_minipets) {
-	char output[MAX_STRING_LENGTH * 2], line[MAX_STRING_LENGTH];
 	struct minipet_data *mini, *next_mini;
 	char_data *mob, *to_summon;
-	size_t size;
 	int count, number;
 	
 	skip_spaces(&argument);
@@ -2800,7 +2760,7 @@ ACMD(do_minipets) {
 	}
 	
 	if (!*argument) {	// just list minipets
-		size = snprintf(output, sizeof(output), "Minipets in your collection:\r\n");
+		build_page_display_str(ch, "Minipets in your collection:");
 		count = 0;
 	
 		HASH_ITER(hh, GET_MINIPETS(ch), mini, next_mini) {
@@ -2810,42 +2770,17 @@ ACMD(do_minipets) {
 		
 			// ok:
 			++count;
-		
-			if (PRF_FLAGGED(ch, PRF_SCREEN_READER)) {
-				snprintf(line, sizeof(line), "%s\r\n", skip_filler(GET_SHORT_DESC(mob)));
-			}
-			else {	// non-screenreader
-				snprintf(line, sizeof(line), " %-36.36s%s", skip_filler(GET_SHORT_DESC(mob)), !(count % 2) ? "\r\n" : "");
-			}
-		
-			if (size + strlen(line) + 14 < sizeof(output)) {
-				strcat(output, line);
-				size += strlen(line);
-			}
-			else {
-				strcat(output, "OVERFLOW\r\n");	// 10 characters always reserved
-				break;
-			}
+			build_page_display_col(ch, 2, FALSE, " %s", skip_filler(GET_SHORT_DESC(mob)));
 		}
 	
 		if (count == 0) {
-			strcat(output, " none\r\n");	// space always reserved for this
+			build_page_display_str(ch, " none");
 		}
-		else if (!PRF_FLAGGED(ch, PRF_SCREEN_READER) && (count % 2)) {
-			strcat(output, "\r\n");	// space always reserved for this
-		}
-		
-		if (count) {
-			snprintf(line, sizeof(line), " (%d total)\r\n", count);
-			if (size + strlen(line) < sizeof(output)) {
-				strcat(output, line);
-				size += strlen(line);
-			}
+		else {
+			build_page_display(ch, " (%d total)", count);
 		}
 	
-		if (ch->desc) {
-			page_string(ch->desc, output, TRUE);
-		}
+		send_page_display(ch);
 	}	// end no-arg
 	else if (GET_POS(ch) < POS_STANDING) {
 		send_low_pos_msg(ch);	// must be standing to do the rest
@@ -2906,14 +2841,12 @@ ACMD(do_minipets) {
 
 
 ACMD(do_morph) {
-	char buf[MAX_STRING_LENGTH], line[256];
 	morph_data *morph, *next_morph;
-	bool full = FALSE;
+	char line[MAX_STRING_LENGTH];
 	double multiplier;
+	size_t lsize;
 	obj_data *obj;
 	bool normal, fast;
-	size_t size, lsize;
-	int count;
 	char *tmp;
 	
 	skip_spaces(&argument);
@@ -2927,8 +2860,15 @@ ACMD(do_morph) {
 	}
 	
 	if (!*argument) {
-		count = 1;	// counting 'normal'
-		size = snprintf(buf, sizeof(buf), "You know the following morphs:\r\n %-*.*s%s", (!GET_MORPH(ch) ? 42 : 38), (!GET_MORPH(ch) ? 42 : 38), (!GET_MORPH(ch) ? "\tgnormal (current)\t0" : "normal"), PRF_FLAGGED(ch, PRF_SCREEN_READER) ? "\r\n" : "");
+		build_page_display_str(ch, "You know the following morphs:");
+		
+		// normal first
+		if (GET_MORPH(ch)) {
+			build_page_display_col(ch, 3, FALSE, " normal");
+		}
+		else {
+			build_page_display_col(ch, 3, FALSE, " \tgnormal (current)\t0");
+		}
 		
 		HASH_ITER(hh, morph_table, morph, next_morph) {
 			if (MORPH_FLAGGED(morph, MORPHF_IN_DEVELOPMENT | MORPHF_SCRIPT_ONLY)) {
@@ -2942,7 +2882,6 @@ ACMD(do_morph) {
 			}
 			
 			// build info line
-			++count;
 			if (strstr(MORPH_SHORT_DESC(morph), "#n")) {
 				tmp = str_replace("#n", PERS(ch, ch, TRUE), MORPH_SHORT_DESC(morph));
 				lsize = snprintf(line, sizeof(line), "%s", tmp);
@@ -2958,34 +2897,10 @@ ACMD(do_morph) {
 			}
 			
 			// append
-			if (PRF_FLAGGED(ch, PRF_SCREEN_READER) || !(count % 2) || lsize > 38) {
-				if (size + lsize + 3 < sizeof(buf)) {
-					size += snprintf(buf + size, sizeof(buf) - size, " %s%s\t0\r\n", (GET_MORPH(ch) == morph ? "\tg" : ""), line);
-				}
-				else {
-					full = TRUE;
-				}
-			}
-			else {
-				if (size + 39 < sizeof(buf)) {
-					size += snprintf(buf + size, sizeof(buf) - size, " %s%-38.38s\t0", (GET_MORPH(ch) == morph ? "\tg" : ""), line);
-				}
-				else {
-					full = TRUE;
-				}
-			}
+			build_page_display_col(ch, 3, FALSE, " %s%s\t0", (GET_MORPH(ch) == morph ? "\tg" : ""), line);
 		}
 		
-		if (full) {
-			snprintf(buf + size, sizeof(buf) - size, "OVERFLOW\r\n");
-		}
-		else if (count % 2 && size + 2 < sizeof(buf) && !PRF_FLAGGED(ch, PRF_SCREEN_READER)) {
-			strcat(buf, "\r\n");
-		}
-		
-		if (ch->desc) {
-			page_string(ch->desc, buf, TRUE);
-		}
+		send_page_display(ch);
 		return;
 	} // end no-argument
 	

@@ -827,10 +827,10 @@ void start_chopping(char_data *ch) {
 			strcpy(weapon, "your axe");
 		}
 		
-		snprintf(buf, sizeof(buf), "You swing back %s and prepare to chop...", weapon);
+		safe_snprintf(buf, sizeof(buf), "You swing back %s and prepare to chop...", weapon);
 		act(buf, FALSE, ch, NULL, NULL, TO_CHAR);
 		
-		snprintf(buf, sizeof(buf), "$n swings %s over $s shoulder...", weapon);
+		safe_snprintf(buf, sizeof(buf), "$n swings %s over $s shoulder...", weapon);
 		act(buf, TRUE, ch, NULL, NULL, TO_ROOM);
 	}
 }
@@ -1114,9 +1114,9 @@ void perform_saw(char_data *ch) {
 		}
 		
 		if (!success && !proto) {
-			snprintf(buf, sizeof(buf), "You finish sawing %s but get nothing.", get_obj_name_by_proto(GET_ACTION_VNUM(ch, 0)));
+			safe_snprintf(buf, sizeof(buf), "You finish sawing %s but get nothing.", get_obj_name_by_proto(GET_ACTION_VNUM(ch, 0)));
 			act(buf, FALSE, ch, NULL, NULL, TO_CHAR);
-			snprintf(buf, sizeof(buf), "$n finishes sawing off %s.", get_obj_name_by_proto(GET_ACTION_VNUM(ch, 0)));
+			safe_snprintf(buf, sizeof(buf), "$n finishes sawing off %s.", get_obj_name_by_proto(GET_ACTION_VNUM(ch, 0)));
 			act(buf, TRUE, ch, NULL, NULL, TO_ROOM);
 		}
 		
@@ -2119,7 +2119,7 @@ void process_repairing(char_data *ch) {
 			// copy this to display the next 1
 			temp_res = *VEH_NEEDS_RESOURCES(veh);
 			temp_res.next = NULL;
-			show_resource_list(&temp_res, buf);
+			show_resource_list(&temp_res, buf, sizeof(buf));
 			msg_to_char(ch, "You don't have %s and stop repairing.\r\n", buf);
 		}
 		else {
@@ -2170,9 +2170,9 @@ void process_scraping(char_data *ch) {
 		}
 		
 		if (!success && !proto) {
-			snprintf(buf, sizeof(buf), "You finish scraping off %s but get nothing.", get_obj_name_by_proto(GET_ACTION_VNUM(ch, 0)));
+			safe_snprintf(buf, sizeof(buf), "You finish scraping off %s but get nothing.", get_obj_name_by_proto(GET_ACTION_VNUM(ch, 0)));
 			act(buf, FALSE, ch, NULL, NULL, TO_CHAR);
-			snprintf(buf, sizeof(buf), "$n finishes scraping off %s.", get_obj_name_by_proto(GET_ACTION_VNUM(ch, 0)));
+			safe_snprintf(buf, sizeof(buf), "$n finishes scraping off %s.", get_obj_name_by_proto(GET_ACTION_VNUM(ch, 0)));
 			act(buf, TRUE, ch, NULL, NULL, TO_ROOM);
 		}
 		
@@ -2828,12 +2828,11 @@ ACMD(do_mint) {
 
 ACMD(do_plant) {
 	struct string_hash *str_iter, *next_str, *str_hash = NULL;
-	char buf[MAX_STRING_LENGTH], line[256], lbuf[256];
+	char line[256], lbuf[256];
 	struct evolution_data *evo;
 	sector_data *original;
 	obj_data *obj;
 	crop_data *cp;
-	size_t size;
 
 	one_argument(argument, arg);
 
@@ -2866,34 +2865,24 @@ ACMD(do_plant) {
 		DL_FOREACH2(ch->carrying, obj, next_content) {
 			if (OBJ_FLAGGED(obj, OBJ_PLANTABLE) && (cp = crop_proto(GET_OBJ_VAL(obj, VAL_FOOD_CROP_TYPE)))) {
 				ordered_sprintbit(GET_CROP_CLIMATE(cp), climate_flags, climate_flags_order, CROP_FLAGGED(cp, CROPF_ANY_LISTED_CLIMATE) ? TRUE : FALSE, lbuf);
-				snprintf(line, sizeof(line), "%s - %s%s", GET_OBJ_DESC(obj, ch, OBJ_DESC_SHORT), lbuf, (CROP_FLAGGED(cp, CROPF_REQUIRES_WATER) ? ", requires water" : ""));
+				safe_snprintf(line, sizeof(line), "%s - %s%s", GET_OBJ_DESC(obj, ch, OBJ_DESC_SHORT), lbuf, (CROP_FLAGGED(cp, CROPF_REQUIRES_WATER) ? ", requires water" : ""));
 				add_string_hash(&str_hash, line, 1);
 			}
 		}
 		
 		if (str_hash) {
 			// show plantables
-			size = snprintf(buf, sizeof(buf), "What do you want to plant:\r\n");
+			build_page_display(ch, "What do you want to plant:");
 			HASH_ITER(hh, str_hash, str_iter, next_str) {
 				if (str_iter->count == 1) {
-					snprintf(line, sizeof(line), " %s\r\n", str_iter->str);
+					build_page_display(ch, " %s", str_iter->str);
 				}
 				else {
-					snprintf(line, sizeof(line), " %s (x%d)\r\n", str_iter->str, str_iter->count);
-				}
-				if (size + strlen(line) + 16 < sizeof(buf)) {
-					strcat(buf, line);
-					size += strlen(line);
-				}
-				else {
-					size += snprintf(buf + size, sizeof(buf) - size, "OVERFLOW\r\n");
-					break;
+					build_page_display(ch, " %s (x%d)", str_iter->str, str_iter->count);
 				}
 			}
 			free_string_hash(&str_hash);
-			if (ch->desc) {
-				page_string(ch->desc, buf, TRUE);
-			}
+			send_page_display(ch);
 		}
 		else {
 			// nothing to plant
@@ -2921,12 +2910,12 @@ ACMD(do_plant) {
 	}
 	else if (!MATCH_CROP_SECTOR_CLIMATE(cp, get_climate(IN_ROOM(ch)))) {
 		if (CROP_FLAGGED(cp, CROPF_ANY_LISTED_CLIMATE)) {
-			ordered_sprintbit(GET_CROP_CLIMATE(cp), climate_flags, climate_flags_order, TRUE, buf);
-			msg_to_char(ch, "You can only plant that in areas that are: %s\r\n", buf);
+			ordered_sprintbit(GET_CROP_CLIMATE(cp), climate_flags, climate_flags_order, TRUE, lbuf);
+			msg_to_char(ch, "You can only plant that in areas that are: %s\r\n", lbuf);
 		}
 		else {
-			ordered_sprintbit(GET_CROP_CLIMATE(cp), climate_flags, climate_flags_order, FALSE, buf);
-			msg_to_char(ch, "You can only plant that in %s areas.\r\n", trim(buf));
+			ordered_sprintbit(GET_CROP_CLIMATE(cp), climate_flags, climate_flags_order, FALSE, lbuf);
+			msg_to_char(ch, "You can only plant that in %s areas.\r\n", trim(lbuf));
 		}
 	}
 	else if (run_ability_triggers_by_player_tech(ch, PTECH_PLANT_CROPS, NULL, NULL, NULL)) {
@@ -2950,8 +2939,8 @@ ACMD(do_plant) {
 		start_action(ch, ACT_PLANTING, 4);
 		
 		msg_to_char(ch, "You kneel and begin digging holes to plant %s here.\r\n", GET_CROP_NAME(cp));
-		sprintf(buf, "$n kneels and begins to plant %s here.", GET_CROP_NAME(cp));
-		act(buf, FALSE, ch, 0, 0, TO_ROOM);
+		sprintf(lbuf, "$n kneels and begins to plant %s here.", GET_CROP_NAME(cp));
+		act(lbuf, FALSE, ch, NULL, NULL, TO_ROOM);
 	}
 }
 
@@ -3342,11 +3331,11 @@ bool can_gen_interact_room(char_data *ch, room_data *room, const struct gen_inte
 		msg_to_char(ch, "You don't have permission to %s %s.\r\n", data->command, (room == IN_ROOM(ch) ? "here" : "there"));
 	}
 	else if (can_veh_but_no_permit && no_guest_room) {
-		snprintf(buf, sizeof(buf), "You can't %s $V because someone else owns %s area.", data->command, (room == IN_ROOM(ch) ? "this" : "that"));
+		safe_snprintf(buf, sizeof(buf), "You can't %s $V because someone else owns %s area.", data->command, (room == IN_ROOM(ch) ? "this" : "that"));
 		act(buf, FALSE, ch, NULL, can_veh_but_no_permit, TO_CHAR | ACT_VEH_VICT);
 	}
 	else if (can_veh_but_no_permit) {
-		snprintf(buf, sizeof(buf), "You don't have permission to %s $V.", data->command);
+		safe_snprintf(buf, sizeof(buf), "You don't have permission to %s $V.", data->command);
 		act(buf, FALSE, ch, NULL, can_veh_but_no_permit, TO_CHAR | ACT_VEH_VICT);
 	}
 	else if ((can_room_but_depleted || can_veh_but_depleted) && IS_SET(data->flags, GI_CONTINUE_WHEN_DEPLETED)) {
@@ -3709,7 +3698,7 @@ ACMD(do_gen_interact_room) {
 	}
 	else if (GET_ACTION(ch) == data->action && (!IS_SET(data->flags, GI_ALLOW_DIRECTION) || !*arg)) {
 		msg_to_char(ch, "You stop %s.\r\n", data->verb);
-		snprintf(buf, sizeof(buf), "$n stops %s.", data->verb);
+		safe_snprintf(buf, sizeof(buf), "$n stops %s.", data->verb);
 		act(buf, FALSE, ch, 0, 0, TO_ROOM);
 		cancel_action(ch);
 	}

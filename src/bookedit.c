@@ -90,9 +90,9 @@ obj_data *create_book_obj(book_data *book) {
 	obj = create_obj();
 	
 	set_obj_short_desc(obj, NULLSAFE(BOOK_ITEM_NAME(book)));
-	snprintf(buf, sizeof(buf), "book %s", skip_filler(NULLSAFE(BOOK_ITEM_NAME(book))));
+	safe_snprintf(buf, sizeof(buf), "book %s", skip_filler(NULLSAFE(BOOK_ITEM_NAME(book))));
 	set_obj_keywords(obj, buf);
-	snprintf(buf, sizeof(buf), "Someone has left %s here.", NULLSAFE(BOOK_ITEM_NAME(book)));
+	safe_snprintf(buf, sizeof(buf), "Someone has left %s here.", NULLSAFE(BOOK_ITEM_NAME(book)));
 	set_obj_long_desc(obj, buf);
 	set_obj_look_desc(obj, NULLSAFE(BOOK_ITEM_DESC(book)), FALSE);
 	
@@ -185,10 +185,10 @@ char *list_one_book(book_data *book, bool detail) {
 	static char output[MAX_STRING_LENGTH];
 	
 	if (detail) {
-		snprintf(output, sizeof(output), "[%5d] %s\t0 (%s\t0)", BOOK_VNUM(book), BOOK_TITLE(book), BOOK_BYLINE(book));
+		safe_snprintf(output, sizeof(output), "[%5d] %s\t0 (%s\t0)", BOOK_VNUM(book), BOOK_TITLE(book), BOOK_BYLINE(book));
 	}
 	else {
-		snprintf(output, sizeof(output), "[%5d] %s\t0", BOOK_VNUM(book), BOOK_TITLE(book));
+		safe_snprintf(output, sizeof(output), "[%5d] %s\t0", BOOK_VNUM(book), BOOK_TITLE(book));
 	}
 	
 	return output;
@@ -213,7 +213,7 @@ void olc_delete_book(char_data *ch, book_vnum vnum) {
 		return;
 	}
 	
-	snprintf(name, sizeof(name), "%s", NULLSAFE(BOOK_TITLE(book)));
+	safe_snprintf(name, sizeof(name), "%s", NULLSAFE(BOOK_TITLE(book)));
 	
 	// pull it from the world
 	remove_book_from_all_libraries(vnum);
@@ -441,7 +441,6 @@ int wordcount_book(book_data *book) {
 */
 void olc_show_book(char_data *ch) {
 	book_data *book = GET_OLC_BOOK(ch->desc);
-	char buf[MAX_STRING_LENGTH];
 	struct paragraph_data *para;
 	bool imm = IS_IMMORTAL(ch);
 	player_index_data *index;
@@ -450,35 +449,33 @@ void olc_show_book(char_data *ch) {
 	if (!book) {
 		return;
 	}
-	
-	*buf = '\0';
 
 	if (imm) {
-		sprintf(buf + strlen(buf), "[%s%d\t0] %s%s\t0\r\n", OLC_LABEL_CHANGED, GET_OLC_VNUM(ch->desc), OLC_LABEL_UNCHANGED, !book_proto(BOOK_VNUM(book)) ? "new book" : BOOK_TITLE(book_proto(BOOK_VNUM(book))));
+		build_page_display(ch, "[%s%d\t0] %s%s\t0", OLC_LABEL_CHANGED, GET_OLC_VNUM(ch->desc), OLC_LABEL_UNCHANGED, !book_proto(BOOK_VNUM(book)) ? "new book" : BOOK_TITLE(book_proto(BOOK_VNUM(book))));
 	}
 	else {
-		sprintf(buf + strlen(buf), "\tcEmpireMUD Book Editor: %s\t0\r\n", !book_proto(BOOK_VNUM(book)) ? "new book" : BOOK_TITLE(book_proto(BOOK_VNUM(book))));
+		build_page_display(ch, "\tcEmpireMUD Book Editor: %s\t0", !book_proto(BOOK_VNUM(book)) ? "new book" : BOOK_TITLE(book_proto(BOOK_VNUM(book))));
 	}
 	
-	sprintf(buf + strlen(buf), "<%stitle\t0> %s\r\n", OLC_LABEL_STR(BOOK_TITLE(book), default_book_title), NULLSAFE(BOOK_TITLE(book)));
-	sprintf(buf + strlen(buf), "<%sbyline\t0> %s\r\n", OLC_LABEL_STR(BOOK_BYLINE(book), ""), NULLSAFE(BOOK_BYLINE(book)));
-	sprintf(buf + strlen(buf), "<%sitem\t0> %s\r\n", OLC_LABEL_STR(BOOK_ITEM_NAME(book), default_book_item), NULLSAFE(BOOK_ITEM_NAME(book)));
-	sprintf(buf + strlen(buf), "<%sdescription\t0>\r\n%s", OLC_LABEL_STR(BOOK_ITEM_DESC(book), default_book_desc), NULLSAFE(BOOK_ITEM_DESC(book)));
+	build_page_display(ch, "<%stitle\t0> %s", OLC_LABEL_STR(BOOK_TITLE(book), default_book_title), NULLSAFE(BOOK_TITLE(book)));
+	build_page_display(ch, "<%sbyline\t0> %s", OLC_LABEL_STR(BOOK_BYLINE(book), ""), NULLSAFE(BOOK_BYLINE(book)));
+	build_page_display(ch, "<%sitem\t0> %s", OLC_LABEL_STR(BOOK_ITEM_NAME(book), default_book_item), NULLSAFE(BOOK_ITEM_NAME(book)));
+	build_page_display(ch, "<%sdescription\t0>\r\n%s", OLC_LABEL_STR(BOOK_ITEM_DESC(book), default_book_desc), NULLSAFE(BOOK_ITEM_DESC(book)));
 	
 	count = 0;
 	LL_FOREACH(BOOK_PARAGRAPHS(book), para) {
 		++count;
 	}
-	sprintf(buf + strlen(buf), "<%sparagraphs\t0> %d (list, edit, new, delete)\r\n", OLC_LABEL_PTR(BOOK_PARAGRAPHS(book)), count);
+	build_page_display(ch, "<%sparagraphs\t0> %d (list, edit, new, delete)", OLC_LABEL_PTR(BOOK_PARAGRAPHS(book)), count);
 	
 	if (imm) {
-		sprintf(buf + strlen(buf), "<%sauthor\t0> %s\r\n", OLC_LABEL_VAL(BOOK_AUTHOR(book), 0), (BOOK_AUTHOR(book) != 0 && (index = find_player_index_by_idnum(BOOK_AUTHOR(book)))) ? index->fullname : "nobody");
+		build_page_display(ch, "<%sauthor\t0> %s", OLC_LABEL_VAL(BOOK_AUTHOR(book), 0), (BOOK_AUTHOR(book) != 0 && (index = find_player_index_by_idnum(BOOK_AUTHOR(book)))) ? index->fullname : "nobody");
 	}
 	else {
-		sprintf(buf + strlen(buf), "<%slicense\t0>, <%ssave\t0>, <%sabort\t0>\r\n", OLC_LABEL_UNCHANGED, OLC_LABEL_UNCHANGED, OLC_LABEL_UNCHANGED);
+		build_page_display(ch, "<%slicense\t0>, <%ssave\t0>, <%sabort\t0>", OLC_LABEL_UNCHANGED, OLC_LABEL_UNCHANGED, OLC_LABEL_UNCHANGED);
 	}
 	
-	page_string(ch->desc, buf, TRUE);
+	send_page_display(ch);
 }
 
 
@@ -570,10 +567,9 @@ OLC_MODULE(booked_license) {
 
 
 OLC_MODULE(booked_paragraphs) {
-	char arg1[MAX_INPUT_LENGTH], buf[MAX_STRING_LENGTH * 2], line[MAX_STRING_LENGTH];
+	char arg1[MAX_INPUT_LENGTH];
 	book_data *book = GET_OLC_BOOK(ch->desc);
 	struct paragraph_data *para, *new;
-	size_t size;
 	
 	argument = any_one_arg(argument, arg1);
 	skip_spaces(&argument);
@@ -595,27 +591,15 @@ OLC_MODULE(booked_paragraphs) {
 			to = atoi(arg3) ? atoi(arg3) : -1;
 		}
 		
-		*buf = '\0';
-		size = 0;
-		
 		count = 0;
 		LL_FOREACH(BOOK_PARAGRAPHS(book), para) {
 			++count;
 			if ((from == -1 || from <= count) && (to == -1 || to >= count)) {
-				snprintf(line, sizeof(line), "\r\n\tcParagraph %d\t0\r\n%s", count, NULLSAFE(para->text));
-				
-				if (size + strlen(line) < sizeof(buf)) {
-					size += snprintf(buf + size, sizeof(buf) - size, "%s", line);
-				}
-				else {
-					// too long!
-					size += snprintf(buf + size, sizeof(buf) - size, "\r\n...string too long!\r\n");
-					break;
-				}
+				build_page_display(ch, "\r\n\tcParagraph %d\t0\r\n%s", count, NULLSAFE(para->text));
 			}
 		}
 		
-		page_string(ch->desc, buf, TRUE);
+		send_page_display(ch);
 	}
 	else if (is_abbrev(arg1, "edit")) {
 		bool found = FALSE;
@@ -690,6 +674,7 @@ OLC_MODULE(booked_paragraphs) {
 		}
 		else {
 			msg_to_char(ch, "Invalid paragraph position.\r\n");
+			free(new);
 		}
 	}
 	else if (is_abbrev(arg1, "delete") || is_abbrev(arg1, "remove")) {
@@ -864,11 +849,10 @@ LIBRARY_SCMD(bookedit_license) {
 
 LIBRARY_SCMD(bookedit_list) {
 	book_data *book, *next_book;
-	char buf[MAX_STRING_LENGTH], buf1[MAX_STRING_LENGTH];
+	char buf1[MAX_STRING_LENGTH];
 	int count = 0;
-	size_t size;
 
-	size = snprintf(buf, sizeof(buf), "Books you have written:\r\n");
+	build_page_display(ch, "Books you have written:");
 	
 	HASH_ITER(hh, book_table, book, next_book) {
 		if (BOOK_AUTHOR(book) != GET_IDNUM(ch)) {
@@ -881,14 +865,14 @@ LIBRARY_SCMD(bookedit_list) {
 		else {
 			*buf1 = '\0';
 		}
-		size += snprintf(buf + size, sizeof(buf) - size, "%s%d. %s\t0 (%s\t0)\r\n", buf1, ++count, BOOK_TITLE(book), BOOK_BYLINE(book));
+		build_page_display(ch, "%s%d. %s\t0 (%s\t0)", buf1, ++count, BOOK_TITLE(book), BOOK_BYLINE(book));
 	}
 
 	if (count == 0) {
-		size += snprintf(buf + size, sizeof(buf) - size, "  none\r\n");
+		build_page_display_str(ch, "  none");
 	}
 	
-	page_string(ch->desc, buf, TRUE);
+	send_page_display(ch);
 }
 
 

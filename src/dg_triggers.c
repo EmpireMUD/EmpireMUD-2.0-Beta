@@ -299,14 +299,14 @@ int buy_mtrigger(char_data *actor, char_data *shopkeeper, obj_data *buying, int 
 				add_var(&GET_TRIG_VARS(t), "shopkeeper", "", 0);
 			}
 			
-			snprintf(buf, sizeof(buf), "%d", cost);
+			safe_snprintf(buf, sizeof(buf), "%d", cost);
 			add_var(&GET_TRIG_VARS(t), "cost", buf, 0);
 			
 			if (currency == NOTHING) {
 				strcpy(buf, "coins");
 			}
 			else {
-				snprintf(buf, sizeof(buf), "%d", currency);
+				safe_snprintf(buf, sizeof(buf), "%d", currency);
 			}
 			add_var(&GET_TRIG_VARS(t), "currency", buf, 0);
 			
@@ -527,7 +527,7 @@ int finish_quest_mtrigger(char_data *actor, quest_data *quest, struct instance_d
 			if (TRIGGER_CHECK(t, MTRIG_FINISH_QUEST)) {
 				union script_driver_data_u sdd;
 				if (quest) {
-					snprintf(buf, sizeof(buf), "%d", QUEST_VNUM(quest));
+					safe_snprintf(buf, sizeof(buf), "%d", QUEST_VNUM(quest));
 					add_var(&GET_TRIG_VARS(t), "questvnum", buf, 0);
 					add_var(&GET_TRIG_VARS(t), "questname", QUEST_NAME(quest), 0);
 				}
@@ -790,7 +790,7 @@ int start_quest_mtrigger(char_data *actor, quest_data *quest, struct instance_da
 			if (TRIGGER_CHECK(t, MTRIG_START_QUEST)) {
 				union script_driver_data_u sdd;
 				if (quest) {
-					snprintf(buf, sizeof(buf), "%d", QUEST_VNUM(quest));
+					safe_snprintf(buf, sizeof(buf), "%d", QUEST_VNUM(quest));
 					add_var(&GET_TRIG_VARS(t), "questvnum", buf, 0);
 					add_var(&GET_TRIG_VARS(t), "questname", QUEST_NAME(quest), 0);
 				}
@@ -1087,7 +1087,7 @@ int bribe_mtrigger(char_data *ch, char_data *actor, int amount) {
 		if (TRIGGER_CHECK(t, MTRIG_BRIBE) && (amount >= GET_TRIG_NARG(t))) {
 			union script_driver_data_u sdd;
 			sdd.c = ch;
-			snprintf(buf, sizeof(buf), "%d", amount);
+			safe_snprintf(buf, sizeof(buf), "%d", amount);
 			add_var(&GET_TRIG_VARS(t), "amount", buf, 0);
 			ADD_UID_VAR(buf, t, char_script_id(actor), "actor", 0);
 			ret_val = script_driver(&sdd, t, MOB_TRIGGER, TRIG_NEW);
@@ -1445,7 +1445,7 @@ int get_otrigger(obj_data *obj, char_data *actor, bool preventable) {
 		if (TRIGGER_CHECK(t, OTRIG_GET) && (number(1, 100) <= GET_TRIG_NARG(t))) {
 			union script_driver_data_u sdd;
 			ADD_UID_VAR(buf, t, char_script_id(actor), "actor", 0);
-			snprintf(buf, sizeof(buf), "%d", preventable ? 1 : 0);
+			safe_snprintf(buf, sizeof(buf), "%d", preventable ? 1 : 0);
 			add_var(&GET_TRIG_VARS(t), "preventable", buf, 0);
 			sdd.o = obj;
 			ret_val = script_driver(&sdd, t, OBJ_TRIGGER, TRIG_NEW);
@@ -1495,7 +1495,7 @@ int finish_quest_otrigger_one(obj_data *obj, char_data *actor, quest_data *quest
 		if (TRIGGER_CHECK(t, OTRIG_FINISH_QUEST)) {
 			union script_driver_data_u sdd;
 			if (quest) {
-				snprintf(buf, sizeof(buf), "%d", QUEST_VNUM(quest));
+				safe_snprintf(buf, sizeof(buf), "%d", QUEST_VNUM(quest));
 				add_var(&GET_TRIG_VARS(t), "questvnum", buf, 0);
 				add_var(&GET_TRIG_VARS(t), "questname", QUEST_NAME(quest), 0);
 			}
@@ -1656,14 +1656,14 @@ int buy_otrig(obj_data *obj, char_data *actor, char_data *shopkeeper, obj_data *
 				add_var(&GET_TRIG_VARS(t), "shopkeeper", "", 0);
 			}
 		
-		snprintf(buf, sizeof(buf), "%d", cost);
+		safe_snprintf(buf, sizeof(buf), "%d", cost);
 		add_var(&GET_TRIG_VARS(t), "cost", buf, 0);
 		
 		if (currency == NOTHING) {
 			strcpy(buf, "coins");
 		}
 		else {
-			snprintf(buf, sizeof(buf), "%d", currency);
+			safe_snprintf(buf, sizeof(buf), "%d", currency);
 		}
 		add_var(&GET_TRIG_VARS(t), "currency", buf, 0);
 		
@@ -1902,7 +1902,7 @@ int start_quest_otrigger_one(obj_data *obj, char_data *actor, quest_data *quest,
 		if (TRIGGER_CHECK(t, OTRIG_START_QUEST)) {
 			union script_driver_data_u sdd;
 			if (quest) {
-				snprintf(buf, sizeof(buf), "%d", QUEST_VNUM(quest));
+				safe_snprintf(buf, sizeof(buf), "%d", QUEST_VNUM(quest));
 				add_var(&GET_TRIG_VARS(t), "questvnum", buf, 0);
 				add_var(&GET_TRIG_VARS(t), "questname", QUEST_NAME(quest), 0);
 			}
@@ -2690,7 +2690,7 @@ int finish_quest_wtrigger(room_data *room, char_data *actor, quest_data *quest, 
 			union script_driver_data_u sdd;
 			ADD_UID_VAR(buf, t, room_script_id(room), "room", 0);
 			if (quest) {
-				snprintf(buf, sizeof(buf), "%d", QUEST_VNUM(quest));
+				safe_snprintf(buf, sizeof(buf), "%d", QUEST_VNUM(quest));
 				add_var(&GET_TRIG_VARS(t), "questvnum", buf, 0);
 				add_var(&GET_TRIG_VARS(t), "questname", QUEST_NAME(quest), 0);
 			}
@@ -2823,14 +2823,14 @@ int buy_wtrigger(char_data *actor, char_data *shopkeeper, obj_data *buying, int 
 				add_var(&GET_TRIG_VARS(t), "shopkeeper", "", 0);
 			}
 		
-		snprintf(buf, sizeof(buf), "%d", cost);
+		safe_snprintf(buf, sizeof(buf), "%d", cost);
 		add_var(&GET_TRIG_VARS(t), "cost", buf, 0);
 		
 		if (currency == NOTHING) {
 			strcpy(buf, "coins");
 		}
 		else {
-			snprintf(buf, sizeof(buf), "%d", currency);
+			safe_snprintf(buf, sizeof(buf), "%d", currency);
 		}
 		add_var(&GET_TRIG_VARS(t), "currency", buf, 0);
 		
@@ -2987,7 +2987,7 @@ int start_quest_wtrigger(room_data *room, char_data *actor, quest_data *quest, s
 			union script_driver_data_u sdd;
 			ADD_UID_VAR(buf, t, room_script_id(room), "room", 0);
 			if (quest) {
-				snprintf(buf, sizeof(buf), "%d", QUEST_VNUM(quest));
+				safe_snprintf(buf, sizeof(buf), "%d", QUEST_VNUM(quest));
 				add_var(&GET_TRIG_VARS(t), "questvnum", buf, 0);
 				add_var(&GET_TRIG_VARS(t), "questname", QUEST_NAME(quest), 0);
 			}
@@ -3377,14 +3377,14 @@ int buy_vtrigger(char_data *actor, char_data *shopkeeper, obj_data *buying, int 
 				add_var(&GET_TRIG_VARS(t), "shopkeeper", "", 0);
 			}
 			
-			snprintf(buf, sizeof(buf), "%d", cost);
+			safe_snprintf(buf, sizeof(buf), "%d", cost);
 			add_var(&GET_TRIG_VARS(t), "cost", buf, 0);
 			
 			if (currency == NOTHING) {
 				strcpy(buf, "coins");
 			}
 			else {
-				snprintf(buf, sizeof(buf), "%d", currency);
+				safe_snprintf(buf, sizeof(buf), "%d", currency);
 			}
 			add_var(&GET_TRIG_VARS(t), "currency", buf, 0);
 			
@@ -3618,7 +3618,7 @@ int finish_quest_vtrigger(char_data *actor, quest_data *quest, struct instance_d
 			if (TRIGGER_CHECK(t, VTRIG_FINISH_QUEST)) {
 				union script_driver_data_u sdd;
 				if (quest) {
-					snprintf(buf, sizeof(buf), "%d", QUEST_VNUM(quest));
+					safe_snprintf(buf, sizeof(buf), "%d", QUEST_VNUM(quest));
 					add_var(&GET_TRIG_VARS(t), "questvnum", buf, 0);
 					add_var(&GET_TRIG_VARS(t), "questname", QUEST_NAME(quest), 0);
 				}
@@ -3920,7 +3920,7 @@ int start_quest_vtrigger(char_data *actor, quest_data *quest, struct instance_da
 			if (TRIGGER_CHECK(t, VTRIG_START_QUEST)) {
 				union script_driver_data_u sdd;
 				if (quest) {
-					snprintf(buf, sizeof(buf), "%d", QUEST_VNUM(quest));
+					safe_snprintf(buf, sizeof(buf), "%d", QUEST_VNUM(quest));
 					add_var(&GET_TRIG_VARS(t), "questvnum", buf, 0);
 					add_var(&GET_TRIG_VARS(t), "questname", QUEST_NAME(quest), 0);
 				}

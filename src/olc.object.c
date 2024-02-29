@@ -444,10 +444,10 @@ char *list_one_object(obj_data *obj, bool detail) {
 		else {
 			*flags = '\0';
 		}
-		snprintf(output, sizeof(output), "[%5d] %s (%s) %s", GET_OBJ_VNUM(obj), GET_OBJ_SHORT_DESC(obj), level_range_string(GET_OBJ_MIN_SCALE_LEVEL(obj), GET_OBJ_MAX_SCALE_LEVEL(obj), 0), flags);
+		safe_snprintf(output, sizeof(output), "[%5d] %s (%s) %s", GET_OBJ_VNUM(obj), GET_OBJ_SHORT_DESC(obj), level_range_string(GET_OBJ_MIN_SCALE_LEVEL(obj), GET_OBJ_MAX_SCALE_LEVEL(obj), 0), flags);
 	}
 	else {
-		snprintf(output, sizeof(output), "[%5d] %s", GET_OBJ_VNUM(obj), GET_OBJ_SHORT_DESC(obj));
+		safe_snprintf(output, sizeof(output), "[%5d] %s", GET_OBJ_VNUM(obj), GET_OBJ_SHORT_DESC(obj));
 	}
 	
 	return output;
@@ -496,7 +496,7 @@ void olc_delete_object(char_data *ch, obj_vnum vnum) {
 		return;
 	}
 	
-	snprintf(name, sizeof(name), "%s", NULLSAFE(GET_OBJ_SHORT_DESC(proto)));
+	safe_snprintf(name, sizeof(name), "%s", NULLSAFE(GET_OBJ_SHORT_DESC(proto)));
 	
 	if (HASH_COUNT(object_table) <= 1) {
 		msg_to_char(ch, "You can't delete the last object.\r\n");
@@ -1099,7 +1099,7 @@ void olc_delete_object(char_data *ch, obj_vnum vnum) {
 * @param char *argument The argument they entered.
 */
 void olc_fullsearch_obj(char_data *ch, char *argument) {
-	char buf[MAX_STRING_LENGTH * 2], line[MAX_STRING_LENGTH], type_arg[MAX_INPUT_LENGTH], val_arg[MAX_INPUT_LENGTH], find_keywords[MAX_INPUT_LENGTH], extra_search[MAX_INPUT_LENGTH];
+	char type_arg[MAX_INPUT_LENGTH], val_arg[MAX_INPUT_LENGTH], find_keywords[MAX_INPUT_LENGTH], extra_search[MAX_INPUT_LENGTH];
 	bitvector_t find_applies = NOBITS, found_applies, not_flagged = NOBITS, only_flags = NOBITS;
 	bitvector_t only_worn = NOBITS, not_worn = NOBITS, only_affs = NOBITS;
 	bitvector_t find_interacts = NOBITS, found_interacts, find_custom = NOBITS, found_custom;
@@ -1114,7 +1114,6 @@ void olc_fullsearch_obj(char_data *ch, char *argument) {
 	struct custom_message *cust;
 	obj_data *obj, *next_obj;
 	struct obj_apply *app;
-	size_t size;
 	
 	if (!*argument) {
 		msg_to_char(ch, "See HELP OEDIT FULLSEARCH for syntax.\r\n");
@@ -1175,7 +1174,7 @@ void olc_fullsearch_obj(char_data *ch, char *argument) {
 		skip_spaces(&argument);
 	}
 	
-	size = snprintf(buf, sizeof(buf), "Object fullsearch: %s\r\n", show_color_codes(find_keywords));
+	build_page_display(ch, "Object fullsearch: %s", show_color_codes(find_keywords));
 	count = 0;
 	
 	// okay now look up items
@@ -1292,27 +1291,18 @@ void olc_fullsearch_obj(char_data *ch, char *argument) {
 		}
 		
 		// show it
-		snprintf(line, sizeof(line), "[%5d] %s\r\n", GET_OBJ_VNUM(obj), GET_OBJ_SHORT_DESC(obj));
-		if (strlen(line) + size < sizeof(buf)) {
-			size += snprintf(buf + size, sizeof(buf) - size, "%s", line);
-			++count;
-		}
-		else {
-			size += snprintf(buf + size, sizeof(buf) - size, "OVERFLOW\r\n");
-			break;
-		}
+		build_page_display(ch, "[%5d] %s", GET_OBJ_VNUM(obj), GET_OBJ_SHORT_DESC(obj));
+		++count;
 	}
 	
-	if (count > 0 && (size + 18) < sizeof(buf)) {
-		size += snprintf(buf + size, sizeof(buf) - size, "(%d objects)\r\n", count);
+	if (count > 0) {
+		build_page_display(ch, "(%d objects)", count);
 	}
-	else if (count == 0) {
-		size += snprintf(buf + size, sizeof(buf) - size, " none\r\n");
+	else {
+		build_page_display_str(ch, " none");
 	}
 	
-	if (ch->desc) {
-		page_string(ch->desc, buf, TRUE);
-	}
+	send_page_display(ch);
 }
 
 
@@ -1323,7 +1313,6 @@ void olc_fullsearch_obj(char_data *ch, char *argument) {
 * @param crop_vnum vnum The crop vnum.
 */
 void olc_search_obj(char_data *ch, obj_vnum vnum) {
-	char buf[MAX_STRING_LENGTH];
 	struct adventure_spawn *asp;
 	struct interaction_item *inter;
 	struct adventure_link_rule *link;
@@ -1349,7 +1338,7 @@ void olc_search_obj(char_data *ch, obj_vnum vnum) {
 	bld_data *bld, *next_bld;
 	obj_data *proto, *obj, *next_obj;
 	struct resource_data *res;
-	int size, found;
+	int found;
 	bool any;
 	
 	if (!(proto = obj_proto(vnum))) {
@@ -1358,7 +1347,7 @@ void olc_search_obj(char_data *ch, obj_vnum vnum) {
 	}
 	
 	found = 0;
-	size = snprintf(buf, sizeof(buf), "Occurrences of object %d (%s):\r\n", vnum, GET_OBJ_SHORT_DESC(proto));
+	build_page_display(ch, "Occurrences of object %d (%s):", vnum, GET_OBJ_SHORT_DESC(proto));
 	
 	// abilities
 	HASH_ITER(hh, ability_table, abil, next_abil) {
@@ -1375,7 +1364,7 @@ void olc_search_obj(char_data *ch, obj_vnum vnum) {
 		
 		if (any) {
 			++found;
-			size += snprintf(buf + size, sizeof(buf) - size, "ABIL [%5d] %s\r\n", ABIL_VNUM(abil), ABIL_NAME(abil));
+			build_page_display(ch, "ABIL [%5d] %s", ABIL_VNUM(abil), ABIL_NAME(abil));
 		}
 	}
 	
@@ -1384,7 +1373,7 @@ void olc_search_obj(char_data *ch, obj_vnum vnum) {
 		for (link = GET_ADV_LINKING(adv); link; link = link->next) {
 			if (link->portal_in == vnum || link->portal_out == vnum) {
 				++found;
-				size += snprintf(buf + size, sizeof(buf) - size, "ADV [%5d] %s\r\n", GET_ADV_VNUM(adv), GET_ADV_NAME(adv));
+				build_page_display(ch, "ADV [%5d] %s", GET_ADV_VNUM(adv), GET_ADV_NAME(adv));
 				break;	// only need 1
 			}
 		}
@@ -1397,7 +1386,7 @@ void olc_search_obj(char_data *ch, obj_vnum vnum) {
 			if (gear->vnum == vnum) {
 				any = TRUE;
 				++found;
-				size += snprintf(buf + size, sizeof(buf) - size, "ARCH [%5d] %s\r\n", GET_ARCH_VNUM(arch), GET_ARCH_NAME(arch));
+				build_page_display(ch, "ARCH [%5d] %s", GET_ARCH_VNUM(arch), GET_ARCH_NAME(arch));
 			}
 		}
 	}
@@ -1408,13 +1397,13 @@ void olc_search_obj(char_data *ch, obj_vnum vnum) {
 		if (!any && GET_AUG_REQUIRES_OBJ(aug) == vnum) {
 			any = TRUE;
 			++found;
-			size += snprintf(buf + size, sizeof(buf) - size, "AUG [%5d] %s\r\n", GET_AUG_VNUM(aug), GET_AUG_NAME(aug));
+			build_page_display(ch, "AUG [%5d] %s", GET_AUG_VNUM(aug), GET_AUG_NAME(aug));
 		}
 		for (res = GET_AUG_RESOURCES(aug); res && !any; res = res->next) {
 			if (res->type == RES_OBJECT && res->vnum == vnum) {
 				any = TRUE;
 				++found;
-				size += snprintf(buf + size, sizeof(buf) - size, "AUG [%5d] %s\r\n", GET_AUG_VNUM(aug), GET_AUG_NAME(aug));
+				build_page_display(ch, "AUG [%5d] %s", GET_AUG_VNUM(aug), GET_AUG_NAME(aug));
 			}
 		}
 	}
@@ -1426,14 +1415,14 @@ void olc_search_obj(char_data *ch, obj_vnum vnum) {
 			if (interact_data[inter->type].vnum_type == TYPE_OBJ && inter->vnum == vnum) {
 				any = TRUE;
 				++found;
-				size += snprintf(buf + size, sizeof(buf) - size, "BLD [%5d] %s\r\n", GET_BLD_VNUM(bld), GET_BLD_NAME(bld));
+				build_page_display(ch, "BLD [%5d] %s", GET_BLD_VNUM(bld), GET_BLD_NAME(bld));
 			}
 		}
 		for (res = GET_BLD_REGULAR_MAINTENANCE(bld); res && !any; res = res->next) {
 			if (res->type == RES_OBJECT && res->vnum == vnum) {
 				any = TRUE;
 				++found;
-				size += snprintf(buf + size, sizeof(buf) - size, "BLD [%5d] %s\r\n", GET_BLD_VNUM(bld), GET_BLD_NAME(bld));
+				build_page_display(ch, "BLD [%5d] %s", GET_BLD_VNUM(bld), GET_BLD_NAME(bld));
 			}
 		}
 	}
@@ -1444,18 +1433,18 @@ void olc_search_obj(char_data *ch, obj_vnum vnum) {
 		if (!CRAFT_IS_BUILDING(craft) && !CRAFT_IS_VEHICLE(craft) && !IS_SET(GET_CRAFT_FLAGS(craft), CRAFT_SOUP) && GET_CRAFT_OBJECT(craft) == vnum) {
 			any = TRUE;
 			++found;
-			size += snprintf(buf + size, sizeof(buf) - size, "CFT [%5d] %s\r\n", GET_CRAFT_VNUM(craft), GET_CRAFT_NAME(craft));
+			build_page_display(ch, "CFT [%5d] %s", GET_CRAFT_VNUM(craft), GET_CRAFT_NAME(craft));
 		}
 		if (!any && GET_CRAFT_REQUIRES_OBJ(craft) == vnum) {
 			any = TRUE;
 			++found;
-			size += snprintf(buf + size, sizeof(buf) - size, "CFT [%5d] %s\r\n", GET_CRAFT_VNUM(craft), GET_CRAFT_NAME(craft));
+			build_page_display(ch, "CFT [%5d] %s", GET_CRAFT_VNUM(craft), GET_CRAFT_NAME(craft));
 		}
 		for (res = GET_CRAFT_RESOURCES(craft); res && !any; res = res->next) {
 			if (res->type == RES_OBJECT && res->vnum == vnum) {
 				any = TRUE;
 				++found;
-				size += snprintf(buf + size, sizeof(buf) - size, "CFT [%5d] %s\r\n", GET_CRAFT_VNUM(craft), GET_CRAFT_NAME(craft));
+				build_page_display(ch, "CFT [%5d] %s", GET_CRAFT_VNUM(craft), GET_CRAFT_NAME(craft));
 			}
 		}
 	}
@@ -1467,23 +1456,20 @@ void olc_search_obj(char_data *ch, obj_vnum vnum) {
 			if (interact_data[inter->type].vnum_type == TYPE_OBJ && inter->vnum == vnum) {
 				any = TRUE;
 				++found;
-				size += snprintf(buf + size, sizeof(buf) - size, "CRP [%5d] %s\r\n", GET_CROP_VNUM(crop), GET_CROP_NAME(crop));
+				build_page_display(ch, "CRP [%5d] %s", GET_CROP_VNUM(crop), GET_CROP_NAME(crop));
 			}
 		}
 	}
 	
 	// events
 	HASH_ITER(hh, event_table, event, next_event) {
-		if (size >= sizeof(buf)) {
-			break;
-		}
 		// QR_x: event rewards
 		any = find_event_reward_in_list(EVT_RANK_REWARDS(event), QR_OBJECT, vnum);
 		any |= find_event_reward_in_list(EVT_THRESHOLD_REWARDS(event), QR_OBJECT, vnum);
 		
 		if (any) {
 			++found;
-			size += snprintf(buf + size, sizeof(buf) - size, "EVT [%5d] %s\r\n", EVT_VNUM(event), EVT_NAME(event));
+			build_page_display(ch, "EVT [%5d] %s", EVT_VNUM(event), EVT_NAME(event));
 		}
 	}
 	
@@ -1491,7 +1477,7 @@ void olc_search_obj(char_data *ch, obj_vnum vnum) {
 	HASH_ITER(hh, generic_table, gen, next_gen) {
 		if (GET_COMPONENT_OBJ_VNUM(gen) == vnum) {
 			++found;
-			size += snprintf(buf + size, sizeof(buf) - size, "GEN [%5d] %s\r\n", GEN_VNUM(gen), GEN_NAME(gen));
+			build_page_display(ch, "GEN [%5d] %s", GEN_VNUM(gen), GEN_NAME(gen));
 		}
 	}
 	
@@ -1502,14 +1488,14 @@ void olc_search_obj(char_data *ch, obj_vnum vnum) {
 			if (interact_data[inter->type].vnum_type == TYPE_OBJ && inter->vnum == vnum) {
 				any = TRUE;
 				++found;
-				size += snprintf(buf + size, sizeof(buf) - size, "GLB [%5d] %s\r\n", GET_GLOBAL_VNUM(glb), GET_GLOBAL_NAME(glb));
+				build_page_display(ch, "GLB [%5d] %s", GET_GLOBAL_VNUM(glb), GET_GLOBAL_NAME(glb));
 			}
 		}
 		for (gear = GET_GLOBAL_GEAR(glb); gear && !any; gear = gear->next) {
 			if (gear->vnum == vnum) {
 				any = TRUE;
 				++found;
-				size += snprintf(buf + size, sizeof(buf) - size, "GLB [%5d] %s\r\n", GET_GLOBAL_VNUM(glb), GET_GLOBAL_NAME(glb));
+				build_page_display(ch, "GLB [%5d] %s", GET_GLOBAL_VNUM(glb), GET_GLOBAL_NAME(glb));
 			}
 		}
 	}
@@ -1521,7 +1507,7 @@ void olc_search_obj(char_data *ch, obj_vnum vnum) {
 			if (interact_data[inter->type].vnum_type == TYPE_OBJ && inter->vnum == vnum) {
 				any = TRUE;
 				++found;
-				size += snprintf(buf + size, sizeof(buf) - size, "MOB [%5d] %s\r\n", GET_MOB_VNUM(mob), GET_SHORT_DESC(mob));
+				build_page_display(ch, "MOB [%5d] %s", GET_MOB_VNUM(mob), GET_SHORT_DESC(mob));
 			}
 		}
 	}
@@ -1530,7 +1516,7 @@ void olc_search_obj(char_data *ch, obj_vnum vnum) {
 	HASH_ITER(hh, morph_table, morph, next_morph) {
 		if (MORPH_REQUIRES_OBJ(morph) == vnum) {
 			++found;
-			size += snprintf(buf + size, sizeof(buf) - size, "MPH [%5d] %s\r\n", MORPH_VNUM(morph), MORPH_SHORT_DESC(morph));
+			build_page_display(ch, "MPH [%5d] %s", MORPH_VNUM(morph), MORPH_SHORT_DESC(morph));
 		}
 	}
 	
@@ -1541,16 +1527,13 @@ void olc_search_obj(char_data *ch, obj_vnum vnum) {
 			if (interact_data[inter->type].vnum_type == TYPE_OBJ && inter->vnum == vnum) {
 				any = TRUE;
 				++found;
-				size += snprintf(buf + size, sizeof(buf) - size, "OBJ [%5d] %s\r\n", GET_OBJ_VNUM(obj), GET_OBJ_SHORT_DESC(obj));
+				build_page_display(ch, "OBJ [%5d] %s", GET_OBJ_VNUM(obj), GET_OBJ_SHORT_DESC(obj));
 			}
 		}
 	}
 	
 	// progress
 	HASH_ITER(hh, progress_table, prg, next_prg) {
-		if (size >= sizeof(buf)) {
-			break;
-		}
 		// REQ_x: requirement search
 		any = find_requirement_in_list(PRG_TASKS(prg), REQ_GET_OBJECT, vnum);
 		any |= find_requirement_in_list(PRG_TASKS(prg), REQ_WEARING, vnum);
@@ -1559,15 +1542,12 @@ void olc_search_obj(char_data *ch, obj_vnum vnum) {
 		
 		if (any) {
 			++found;
-			size += snprintf(buf + size, sizeof(buf) - size, "PRG [%5d] %s\r\n", PRG_VNUM(prg), PRG_NAME(prg));
+			build_page_display(ch, "PRG [%5d] %s", PRG_VNUM(prg), PRG_NAME(prg));
 		}
 	}
 	
 	// quests
 	HASH_ITER(hh, quest_table, quest, next_quest) {
-		if (size >= sizeof(buf)) {
-			break;
-		}
 		// QG_x, QR_x, REQ_x:
 		any = find_quest_giver_in_list(QUEST_STARTS_AT(quest), QG_OBJECT, vnum);
 		any |= find_quest_giver_in_list(QUEST_ENDS_AT(quest), QG_OBJECT, vnum);
@@ -1583,7 +1563,7 @@ void olc_search_obj(char_data *ch, obj_vnum vnum) {
 		
 		if (any) {
 			++found;
-			size += snprintf(buf + size, sizeof(buf) - size, "QST [%5d] %s\r\n", QUEST_VNUM(quest), QUEST_NAME(quest));
+			build_page_display(ch, "QST [%5d] %s", QUEST_VNUM(quest), QUEST_NAME(quest));
 		}
 	}
 	
@@ -1594,14 +1574,14 @@ void olc_search_obj(char_data *ch, obj_vnum vnum) {
 			if (asp->type == ADV_SPAWN_OBJ && asp->vnum == vnum) {
 				any = TRUE;
 				++found;
-				size += snprintf(buf + size, sizeof(buf) - size, "RMT [%5d] %s\r\n", GET_RMT_VNUM(rmt), GET_RMT_TITLE(rmt));
+				build_page_display(ch, "RMT [%5d] %s", GET_RMT_VNUM(rmt), GET_RMT_TITLE(rmt));
 			}
 		}
 		for (inter = GET_RMT_INTERACTIONS(rmt); inter && !any; inter = inter->next) {
 			if (interact_data[inter->type].vnum_type == TYPE_OBJ && inter->vnum == vnum) {
 				any = TRUE;
 				++found;
-				size += snprintf(buf + size, sizeof(buf) - size, "RMT [%5d] %s\r\n", GET_RMT_VNUM(rmt), GET_RMT_TITLE(rmt));
+				build_page_display(ch, "RMT [%5d] %s", GET_RMT_VNUM(rmt), GET_RMT_TITLE(rmt));
 			}
 		}
 	}
@@ -1613,30 +1593,24 @@ void olc_search_obj(char_data *ch, obj_vnum vnum) {
 			if (interact_data[inter->type].vnum_type == TYPE_OBJ && inter->vnum == vnum) {
 				any = TRUE;
 				++found;
-				size += snprintf(buf + size, sizeof(buf) - size, "SCT [%5d] %s\r\n", GET_SECT_VNUM(sect), GET_SECT_NAME(sect));
+				build_page_display(ch, "SCT [%5d] %s", GET_SECT_VNUM(sect), GET_SECT_NAME(sect));
 			}
 		}
 	}
 	
 	// shops
 	HASH_ITER(hh, shop_table, shop, next_shop) {
-		if (size >= sizeof(buf)) {
-			break;
-		}
 		any = find_quest_giver_in_list(SHOP_LOCATIONS(shop), QG_OBJECT, vnum);
 		any |= find_shop_item_in_list(SHOP_ITEMS(shop), vnum);
 		
 		if (any) {
 			++found;
-			size += snprintf(buf + size, sizeof(buf) - size, "SHOP [%5d] %s\r\n", SHOP_VNUM(shop), SHOP_NAME(shop));
+			build_page_display(ch, "SHOP [%5d] %s", SHOP_VNUM(shop), SHOP_NAME(shop));
 		}
 	}
 	
 	// socials
 	HASH_ITER(hh, social_table, soc, next_soc) {
-		if (size >= sizeof(buf)) {
-			break;
-		}
 		// REQ_x:
 		any = find_requirement_in_list(SOC_REQUIREMENTS(soc), REQ_GET_OBJECT, vnum);
 		any |= find_requirement_in_list(SOC_REQUIREMENTS(soc), REQ_WEARING, vnum);
@@ -1645,7 +1619,7 @@ void olc_search_obj(char_data *ch, obj_vnum vnum) {
 		
 		if (any) {
 			++found;
-			size += snprintf(buf + size, sizeof(buf) - size, "SOC [%5d] %s\r\n", SOC_VNUM(soc), SOC_NAME(soc));
+			build_page_display(ch, "SOC [%5d] %s", SOC_VNUM(soc), SOC_NAME(soc));
 		}
 	}
 	
@@ -1656,27 +1630,27 @@ void olc_search_obj(char_data *ch, obj_vnum vnum) {
 			if (res->type == RES_OBJECT && res->vnum == vnum) {
 				any = TRUE;
 				++found;
-				size += snprintf(buf + size, sizeof(buf) - size, "VEH [%5d] %s\r\n", VEH_VNUM(veh), VEH_SHORT_DESC(veh));
+				build_page_display(ch, "VEH [%5d] %s", VEH_VNUM(veh), VEH_SHORT_DESC(veh));
 			}
 		}
 		LL_FOREACH(VEH_INTERACTIONS(veh), inter) {
 			if (interact_data[inter->type].vnum_type == TYPE_OBJ && inter->vnum == vnum) {
 				any = TRUE;
 				++found;
-				size += snprintf(buf + size, sizeof(buf) - size, "VEH [%5d] %s\r\n", VEH_VNUM(veh), VEH_SHORT_DESC(veh));
+				build_page_display(ch, "VEH [%5d] %s", VEH_VNUM(veh), VEH_SHORT_DESC(veh));
 				break;
 			}
 		}
 	}
 	
 	if (found > 0) {
-		size += snprintf(buf + size, sizeof(buf) - size, "%d location%s shown\r\n", found, PLURAL(found));
+		build_page_display(ch, "%d location%s shown", found, PLURAL(found));
 	}
 	else {
-		size += snprintf(buf + size, sizeof(buf) - size, " none\r\n");
+		build_page_display_str(ch, " none");
 	}
 	
-	page_string(ch->desc, buf, TRUE);
+	send_page_display(ch);
 }
 
 
@@ -2075,7 +2049,7 @@ void set_obj_look_desc_append(obj_data *obj, const char *str, bool format) {
 	char temp[MAX_STRING_LENGTH];
 	
 	if (str && *str) {
-		snprintf(temp, sizeof(temp), "%s%s", NULLSAFE(GET_OBJ_ACTION_DESC(obj)), str);
+		safe_snprintf(temp, sizeof(temp), "%s%s", NULLSAFE(GET_OBJ_ACTION_DESC(obj)), str);
 		
 		// check trailing crlf
 		if (str[strlen(str)-1] != '\r' && str[strlen(str)-1] != '\n') {
@@ -2330,7 +2304,7 @@ void olc_get_values_display(char_data *ch, char *storage) {
 */
 void olc_show_object(char_data *ch) {
 	obj_data *obj = GET_OLC_OBJECT(ch->desc);
-	char buf[MAX_STRING_LENGTH*4], buf1[MAX_STRING_LENGTH*4];
+	char buf1[MAX_STRING_LENGTH*4];
 	struct obj_storage_type *store;
 	struct custom_message *ocm;
 	struct obj_apply *apply;
@@ -2340,12 +2314,11 @@ void olc_show_object(char_data *ch) {
 		return;
 	}
 	
-	*buf = '\0';
-	sprintf(buf + strlen(buf), "[%s%d\t0] %s%s\t0 (Gear rating [%s%.2f\t0])\r\n", OLC_LABEL_CHANGED, GET_OLC_VNUM(ch->desc), OLC_LABEL_UNCHANGED, !obj_proto(GET_OLC_VNUM(ch->desc)) ? "new object" : get_obj_name_by_proto(GET_OLC_VNUM(ch->desc)), OLC_LABEL_CHANGED, rate_item(obj));
-	sprintf(buf + strlen(buf), "<%skeywords\t0> %s\r\n", OLC_LABEL_STR(GET_OBJ_KEYWORDS(obj), default_obj_keywords), GET_OBJ_KEYWORDS(obj));
-	sprintf(buf + strlen(buf), "<%sshortdescription\t0> %s\r\n", OLC_LABEL_STR(GET_OBJ_SHORT_DESC(obj), default_obj_short), GET_OBJ_SHORT_DESC(obj));
-	sprintf(buf + strlen(buf), "<%slongdescription\t0> %s\r\n", OLC_LABEL_STR(GET_OBJ_LONG_DESC(obj), default_obj_long), GET_OBJ_LONG_DESC(obj));
-	sprintf(buf + strlen(buf), "<%slookdescription\t0>\r\n%s", OLC_LABEL_STR(GET_OBJ_ACTION_DESC(obj), ""), NULLSAFE(GET_OBJ_ACTION_DESC(obj)));
+	build_page_display(ch, "[%s%d\t0] %s%s\t0 (Gear rating [%s%.2f\t0])", OLC_LABEL_CHANGED, GET_OLC_VNUM(ch->desc), OLC_LABEL_UNCHANGED, !obj_proto(GET_OLC_VNUM(ch->desc)) ? "new object" : get_obj_name_by_proto(GET_OLC_VNUM(ch->desc)), OLC_LABEL_CHANGED, rate_item(obj));
+	build_page_display(ch, "<%skeywords\t0> %s", OLC_LABEL_STR(GET_OBJ_KEYWORDS(obj), default_obj_keywords), GET_OBJ_KEYWORDS(obj));
+	build_page_display(ch, "<%sshortdescription\t0> %s", OLC_LABEL_STR(GET_OBJ_SHORT_DESC(obj), default_obj_short), GET_OBJ_SHORT_DESC(obj));
+	build_page_display(ch, "<%slongdescription\t0> %s", OLC_LABEL_STR(GET_OBJ_LONG_DESC(obj), default_obj_long), GET_OBJ_LONG_DESC(obj));
+	build_page_display(ch, "<%slookdescription\t0>\r\n%s", OLC_LABEL_STR(GET_OBJ_ACTION_DESC(obj), ""), NULLSAFE(GET_OBJ_ACTION_DESC(obj)));
 	
 	if (GET_OBJ_TIMER(obj) > 0) {
 		seconds = GET_OBJ_TIMER(obj) * SECS_PER_MUD_HOUR;
@@ -2354,98 +2327,95 @@ void olc_show_object(char_data *ch) {
 	else {
 		strcpy(buf1, "none");
 	}
-	sprintf(buf + strlen(buf), "<%stype\t0> %s, <%smaterial\t0> %s, <%stimer\t0> %s\r\n", OLC_LABEL_VAL(GET_OBJ_TYPE(obj), 0), item_types[(int) GET_OBJ_TYPE(obj)], OLC_LABEL_VAL(GET_OBJ_MATERIAL(obj), 0), materials[GET_OBJ_MATERIAL(obj)].name, OLC_LABEL_VAL(GET_OBJ_TIMER(obj), 0), buf1);
+	build_page_display(ch, "<%stype\t0> %s, <%smaterial\t0> %s, <%stimer\t0> %s", OLC_LABEL_VAL(GET_OBJ_TYPE(obj), 0), item_types[(int) GET_OBJ_TYPE(obj)], OLC_LABEL_VAL(GET_OBJ_MATERIAL(obj), 0), materials[GET_OBJ_MATERIAL(obj)].name, OLC_LABEL_VAL(GET_OBJ_TIMER(obj), 0), buf1);
 	
 	sprintbit(GET_OBJ_WEAR(obj), wear_bits, buf1, TRUE);
-	sprintf(buf + strlen(buf), "<%swear\t0> %s\r\n", OLC_LABEL_VAL(GET_OBJ_WEAR(obj), ITEM_WEAR_TAKE), buf1);
+	build_page_display(ch, "<%swear\t0> %s", OLC_LABEL_VAL(GET_OBJ_WEAR(obj), ITEM_WEAR_TAKE), buf1);
 	
 	sprintbit(GET_OBJ_EXTRA(obj), extra_bits, buf1, TRUE);
-	sprintf(buf + strlen(buf), "<%sflags\t0> %s\r\n", OLC_LABEL_VAL(GET_OBJ_EXTRA(obj), NOBITS), buf1);
+	build_page_display(ch, "<%sflags\t0> %s", OLC_LABEL_VAL(GET_OBJ_EXTRA(obj), NOBITS), buf1);
 	
 	sprintbit(GET_OBJ_TOOL_FLAGS(obj), tool_flags, buf1, TRUE);
-	sprintf(buf + strlen(buf), "<%stools\t0> %s\r\n", OLC_LABEL_VAL(GET_OBJ_TOOL_FLAGS(obj), NOBITS), buf1);
+	build_page_display(ch, "<%stools\t0> %s", OLC_LABEL_VAL(GET_OBJ_TOOL_FLAGS(obj), NOBITS), buf1);
 	
 	sprintbit(GET_OBJ_REQUIRES_TOOL(obj), tool_flags, buf1, TRUE);
-	sprintf(buf + strlen(buf), "<%srequirestools\t0> %s\r\n", OLC_LABEL_VAL(GET_OBJ_REQUIRES_TOOL(obj), NOBITS), buf1);
+	build_page_display(ch, "<%srequirestools\t0> %s", OLC_LABEL_VAL(GET_OBJ_REQUIRES_TOOL(obj), NOBITS), buf1);
 	
-	sprintf(buf + strlen(buf), "<%scomponent\t0> [%d] %s\r\n", OLC_LABEL_VAL(GET_OBJ_COMPONENT(obj), NOTHING), GET_OBJ_COMPONENT(obj), GET_OBJ_COMPONENT(obj) != NOTHING ? get_generic_name_by_vnum(GET_OBJ_COMPONENT(obj)) : "none");
+	build_page_display(ch, "<%scomponent\t0> [%d] %s", OLC_LABEL_VAL(GET_OBJ_COMPONENT(obj), NOTHING), GET_OBJ_COMPONENT(obj), GET_OBJ_COMPONENT(obj) != NOTHING ? get_generic_name_by_vnum(GET_OBJ_COMPONENT(obj)) : "none");
 	
 	if (GET_OBJ_MIN_SCALE_LEVEL(obj) > 0) {
-		sprintf(buf + strlen(buf), "<%sminlevel\t0> %d\r\n", OLC_LABEL_CHANGED, GET_OBJ_MIN_SCALE_LEVEL(obj));
+		build_page_display(ch, "<%sminlevel\t0> %d", OLC_LABEL_CHANGED, GET_OBJ_MIN_SCALE_LEVEL(obj));
 	}
 	else {
-		sprintf(buf + strlen(buf), "<%sminlevel\t0> none\r\n", OLC_LABEL_UNCHANGED);
+		build_page_display(ch, "<%sminlevel\t0> none", OLC_LABEL_UNCHANGED);
 	}
 	if (GET_OBJ_MAX_SCALE_LEVEL(obj) > 0) {
-		sprintf(buf + strlen(buf), "<%smaxlevel\t0> %d\r\n", OLC_LABEL_CHANGED, GET_OBJ_MAX_SCALE_LEVEL(obj));
+		build_page_display(ch, "<%smaxlevel\t0> %d", OLC_LABEL_CHANGED, GET_OBJ_MAX_SCALE_LEVEL(obj));
 	}
 	else {
-		sprintf(buf + strlen(buf), "<%smaxlevel\t0> none\r\n", OLC_LABEL_UNCHANGED);
+		build_page_display(ch, "<%smaxlevel\t0> none", OLC_LABEL_UNCHANGED);
 	}
 	
 	if (GET_OBJ_REQUIRES_QUEST(obj) != NOTHING) {
-		sprintf(buf + strlen(buf), "<%srequiresquest\t0> [%d] %s\r\n", OLC_LABEL_CHANGED, GET_OBJ_REQUIRES_QUEST(obj), get_quest_name_by_proto(GET_OBJ_REQUIRES_QUEST(obj)));
+		build_page_display(ch, "<%srequiresquest\t0> [%d] %s", OLC_LABEL_CHANGED, GET_OBJ_REQUIRES_QUEST(obj), get_quest_name_by_proto(GET_OBJ_REQUIRES_QUEST(obj)));
 	}
 	else {
-		sprintf(buf + strlen(buf), "<%srequiresquest\t0> none\r\n", OLC_LABEL_UNCHANGED);
+		build_page_display(ch, "<%srequiresquest\t0> none", OLC_LABEL_UNCHANGED);
 	}
 	
 	olc_get_values_display(ch, buf1);
-	strcat(buf, buf1);
+	build_page_display_str(ch, buf1);
 
 	sprintbit(GET_OBJ_AFF_FLAGS(obj), affected_bits, buf1, TRUE);
-	sprintf(buf + strlen(buf), "<%saffects\t0> %s\r\n", OLC_LABEL_VAL(GET_OBJ_AFF_FLAGS(obj), NOBITS), buf1);
+	build_page_display(ch, "<%saffects\t0> %s", OLC_LABEL_VAL(GET_OBJ_AFF_FLAGS(obj), NOBITS), buf1);
 	
 	// applies / affected[]
 	count = 0;
-	sprintf(buf + strlen(buf), "Attribute Applies: <%sapply\t0>%s\r\n", OLC_LABEL_PTR(GET_OBJ_APPLIES(obj)), OBJ_FLAGGED(obj, OBJ_SCALABLE) ? " (scalable)" : "");
+	build_page_display(ch, "Attribute Applies: <%sapply\t0>%s", OLC_LABEL_PTR(GET_OBJ_APPLIES(obj)), OBJ_FLAGGED(obj, OBJ_SCALABLE) ? " (scalable)" : "");
 	for (apply = GET_OBJ_APPLIES(obj); apply; apply = apply->next) {
-		sprintf(buf + strlen(buf), " \ty%2d\t0. %+d to %s (%s)\r\n", ++count, apply->modifier, apply_types[(int) apply->location], apply_type_names[(int)apply->apply_type]);
+		build_page_display_col(ch, 2, FALSE, " \ty%2d\t0. %+d to %s (%s)", ++count, apply->modifier, apply_types[(int) apply->location], apply_type_names[(int)apply->apply_type]);
 	}
 	
 	// exdesc
-	sprintf(buf + strlen(buf), "Extra descriptions: <%sextra\t0>\r\n", OLC_LABEL_PTR(GET_OBJ_EX_DESCS(obj)));
+	build_page_display(ch, "Extra descriptions: <%sextra\t0>", OLC_LABEL_PTR(GET_OBJ_EX_DESCS(obj)));
 	if (GET_OBJ_EX_DESCS(obj)) {
-		get_extra_desc_display(GET_OBJ_EX_DESCS(obj), buf1, sizeof(buf1));
-		strcat(buf, buf1);
+		show_extra_desc_display(ch, GET_OBJ_EX_DESCS(obj), FALSE);
 	}
 
-	sprintf(buf + strlen(buf), "Interactions: <%sinteraction\t0>\r\n", OLC_LABEL_PTR(GET_OBJ_INTERACTIONS(obj)));
+	build_page_display(ch, "Interactions: <%sinteraction\t0>", OLC_LABEL_PTR(GET_OBJ_INTERACTIONS(obj)));
 	if (GET_OBJ_INTERACTIONS(obj)) {
-		get_interaction_display(GET_OBJ_INTERACTIONS(obj), buf1);
-		strcat(buf, buf1);
+		show_interaction_display(ch, GET_OBJ_INTERACTIONS(obj), FALSE);
 	}
 	
 	// storage
-	sprintf(buf + strlen(buf), "Storage: <%sstorage\t0>\r\n", OLC_LABEL_PTR(GET_OBJ_STORAGE(obj)));
+	build_page_display(ch, "Storage: <%sstorage\t0>", OLC_LABEL_PTR(GET_OBJ_STORAGE(obj)));
 	count = 0;
 	LL_FOREACH(GET_OBJ_STORAGE(obj), store) {
 		sprintbit(store->flags, storage_bits, buf2, TRUE);
 		
 		// TYPE_x: storage type
 		if (store->type == TYPE_BLD) {
-			sprintf(buf + strlen(buf), " \ty%d\t0. [B%d] %s ( %s)\r\n", ++count, store->vnum, get_bld_name_by_proto(store->vnum), buf2);
+			build_page_display_col(ch, 2, FALSE, " \ty%d\t0. [B%d] %s ( %s)", ++count, store->vnum, get_bld_name_by_proto(store->vnum), buf2);
 		}
 		else if (store->type == TYPE_VEH) {
-			sprintf(buf + strlen(buf), " \ty%d\t0. [V%d] %s ( %s)\r\n", ++count, store->vnum, get_vehicle_name_by_proto(store->vnum), buf2);
+			build_page_display_col(ch, 2, FALSE, " \ty%d\t0. [V%d] %s ( %s)", ++count, store->vnum, get_vehicle_name_by_proto(store->vnum), buf2);
 		}
 	}
 	
 	// custom messages
-	sprintf(buf + strlen(buf), "Custom messages: <%scustom\t0>\r\n", OLC_LABEL_PTR(GET_OBJ_CUSTOM_MSGS(obj)));
+	build_page_display(ch, "Custom messages: <%scustom\t0>", OLC_LABEL_PTR(GET_OBJ_CUSTOM_MSGS(obj)));
 	count = 0;
 	for (ocm = GET_OBJ_CUSTOM_MSGS(obj); ocm; ocm = ocm->next) {
-		sprintf(buf + strlen(buf), " \ty%2d\t0. [%s] %s\r\n", ++count, obj_custom_types[ocm->type], ocm->msg);
+		build_page_display(ch, " \ty%2d\t0. [%s] %s", ++count, obj_custom_types[ocm->type], ocm->msg);
 	}
 	
 	// scripts
-	sprintf(buf + strlen(buf), "Scripts: <%sscript\t0>\r\n", OLC_LABEL_PTR(GET_OBJ_SCRIPTS(obj)));
+	build_page_display(ch, "Scripts: <%sscript\t0>", OLC_LABEL_PTR(GET_OBJ_SCRIPTS(obj)));
 	if (GET_OBJ_SCRIPTS(obj)) {
-		get_script_display(GET_OBJ_SCRIPTS(obj), buf1);
-		strcat(buf, buf1);
+		show_script_display(ch, GET_OBJ_SCRIPTS(obj), FALSE);
 	}
 	
-	page_string(ch->desc, buf, TRUE);
+	send_page_display(ch);
 }
 
 
@@ -3227,21 +3197,21 @@ OLC_MODULE(oedit_quick_recipe) {
 	set_obj_val(obj, VAL_RECIPE_VNUM, GET_CRAFT_VNUM(cft));
 	
 	// keywords
-	snprintf(buf, sizeof(buf), "%s %s", (*argument ? argument : "recipe"), GET_CRAFT_NAME(cft));
+	safe_snprintf(buf, sizeof(buf), "%s %s", (*argument ? argument : "recipe"), GET_CRAFT_NAME(cft));
 	if (GET_OBJ_KEYWORDS(obj)) {
 		free(GET_OBJ_KEYWORDS(obj));
 	}
 	GET_OBJ_KEYWORDS(obj) = str_dup(buf);
 	
 	// short desc
-	snprintf(buf, sizeof(buf), "the %s %s", GET_CRAFT_NAME(cft), *argument ? argument : "recipe");
+	safe_snprintf(buf, sizeof(buf), "the %s %s", GET_CRAFT_NAME(cft), *argument ? argument : "recipe");
 	if (GET_OBJ_SHORT_DESC(obj)) {
 		free(GET_OBJ_SHORT_DESC(obj));
 	}
 	GET_OBJ_SHORT_DESC(obj) = str_dup(buf);
 	
 	// long desc
-	snprintf(buf, sizeof(buf), "The %s %s is on the ground.", GET_CRAFT_NAME(cft), *argument ? argument : "recipe");
+	safe_snprintf(buf, sizeof(buf), "The %s %s is on the ground.", GET_CRAFT_NAME(cft), *argument ? argument : "recipe");
 	if (GET_OBJ_LONG_DESC(obj)) {
 		free(GET_OBJ_LONG_DESC(obj));
 	}
@@ -3249,7 +3219,7 @@ OLC_MODULE(oedit_quick_recipe) {
 	
 	// look desc
 	strcpy(cmd, craft_types[GET_CRAFT_TYPE(cft)]);
-	snprintf(buf, sizeof(buf), "This %s will teach you to %s: %s.\r\n", (*argument ? argument : "recipe"), strtolower(cmd), GET_CRAFT_NAME(cft));
+	safe_snprintf(buf, sizeof(buf), "This %s will teach you to %s: %s.\r\n", (*argument ? argument : "recipe"), strtolower(cmd), GET_CRAFT_NAME(cft));
 	if (GET_OBJ_ACTION_DESC(obj)) {
 		free(GET_OBJ_ACTION_DESC(obj));
 	}

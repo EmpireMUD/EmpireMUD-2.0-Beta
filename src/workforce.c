@@ -1484,7 +1484,7 @@ void report_workforce_production_log(empire_data *emp) {
 	
 	LL_FOREACH_SAFE(EMPIRE_PRODUCTION_LOGS(emp), wplog, next) {
 		if (wplog->amount > 1) {
-			snprintf(amount_str, sizeof(amount_str), " (x%d)", wplog->amount);
+			safe_snprintf(amount_str, sizeof(amount_str), " (x%d)", wplog->amount);
 		}
 		else {
 			*amount_str = '\0';
@@ -1950,7 +1950,7 @@ void do_chore_gen_craft(empire_data *emp, room_data *room, vehicle_data *veh, in
 		
 			// only send message if someone else is present (don't bother verifying it's a player)
 			if (ROOM_PEOPLE(IN_ROOM(worker))->next_in_room) {
-				snprintf(buf, sizeof(buf), "$n finishes %s %s.", gen_craft_data[GET_CRAFT_TYPE(do_craft)].verb, get_obj_name_by_proto(GET_CRAFT_OBJECT(do_craft)));
+				safe_snprintf(buf, sizeof(buf), "$n finishes %s %s.", gen_craft_data[GET_CRAFT_TYPE(do_craft)].verb, get_obj_name_by_proto(GET_CRAFT_OBJECT(do_craft)));
 				act(buf, FALSE, worker, NULL, NULL, TO_ROOM);
 			}
 		
@@ -2889,10 +2889,10 @@ void do_chore_minting(empire_data *emp, room_data *room, vehicle_data *veh) {
 			add_workforce_production_log(emp, WPLOG_COINS, 0, amt);
 			
 			if (amt > 1) {
-				snprintf(buf, sizeof(buf), "$n finishes minting a batch of %d %s coins.", amt, EMPIRE_ADJECTIVE(emp));
+				safe_snprintf(buf, sizeof(buf), "$n finishes minting a batch of %d %s coins.", amt, EMPIRE_ADJECTIVE(emp));
 			}
 			else {
-				snprintf(buf, sizeof(buf), "$n finishes minting a single %s coin.", EMPIRE_ADJECTIVE(emp));
+				safe_snprintf(buf, sizeof(buf), "$n finishes minting a single %s coin.", EMPIRE_ADJECTIVE(emp));
 			}
 			act(buf, FALSE, worker, NULL, NULL, TO_ROOM | TO_QUEUE | TO_SPAMMY);
 		}
@@ -2937,7 +2937,7 @@ INTERACTION_FUNC(one_production_chore) {
 		// only send message if someone else is present (don't bother verifying it's a player)
 		if (ROOM_PEOPLE(IN_ROOM(ch))->next_in_room) {
 			if (amt > 1) {
-				snprintf(amtbuf, sizeof(amtbuf), " (x%d)", amt);
+				safe_snprintf(amtbuf, sizeof(amtbuf), " (x%d)", amt);
 			}
 			else {
 				*amtbuf = '\0';

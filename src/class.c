@@ -40,8 +40,8 @@ const char *default_class_name = "Unnamed Class";
 const char *default_class_abbrev = "???";
 
 // local protos
-void get_class_ability_display(struct class_ability *list, char *save_buffer, char_data *info_ch);
-void get_class_skill_display(struct class_skill_req *list, char *save_buffer, bool one_line);
+void show_class_ability_display(char_data *ch, struct class_ability *list, bool send_output, char_data *info_ch);
+void get_class_skill_display(struct class_skill_req *list, char *save_buffer, size_t buf_size, bool one_line);
 int sort_class_abilities(struct class_ability *a, struct class_ability *b);
 
 
@@ -622,11 +622,11 @@ char *list_one_class(class_data *cls, bool detail) {
 	char lbuf[MAX_STRING_LENGTH];
 	
 	if (detail) {
-		get_class_skill_display(CLASS_SKILL_REQUIREMENTS(cls), lbuf, TRUE);
-		snprintf(output, sizeof(output), "[%5d] %s - %s", CLASS_VNUM(cls), CLASS_NAME(cls), lbuf);
+		get_class_skill_display(CLASS_SKILL_REQUIREMENTS(cls), lbuf, sizeof(lbuf), TRUE);
+		safe_snprintf(output, sizeof(output), "[%5d] %s - %s", CLASS_VNUM(cls), CLASS_NAME(cls), lbuf);
 	}
 	else {
-		snprintf(output, sizeof(output), "[%5d] %s", CLASS_VNUM(cls), CLASS_NAME(cls));
+		safe_snprintf(output, sizeof(output), "[%5d] %s", CLASS_VNUM(cls), CLASS_NAME(cls));
 	}
 		
 	return output;
@@ -640,9 +640,8 @@ char *list_one_class(class_data *cls, bool detail) {
 * @param any_vnum vnum The class vnum.
 */
 void olc_search_class(char_data *ch, any_vnum vnum) {
-	char buf[MAX_STRING_LENGTH];
 	class_data *cls = find_class_by_vnum(vnum);
-	int size, found;
+	int found;
 	
 	if (!cls) {
 		msg_to_char(ch, "There is no class %d.\r\n", vnum);
@@ -650,18 +649,18 @@ void olc_search_class(char_data *ch, any_vnum vnum) {
 	}
 	
 	found = 0;
-	size = snprintf(buf, sizeof(buf), "Occurrences of class %d (%s):\r\n", vnum, CLASS_NAME(cls));
+	build_page_display(ch, "Occurrences of class %d (%s):", vnum, CLASS_NAME(cls));
 	
 	// classes are not actually used anywhere else
 	
 	if (found > 0) {
-		size += snprintf(buf + size, sizeof(buf) - size, "%d location%s shown\r\n", found, PLURAL(found));
+		build_page_display(ch, "%d location%s shown", found, PLURAL(found));
 	}
 	else {
-		size += snprintf(buf + size, sizeof(buf) - size, " none\r\n");
+		build_page_display_str(ch, " none");
 	}
 	
-	page_string(ch->desc, buf, TRUE);
+	send_page_display(ch);
 }
 
 
@@ -1110,7 +1109,7 @@ void olc_delete_class(char_data *ch, any_vnum vnum) {
 		return;
 	}
 	
-	snprintf(name, sizeof(name), "%s", NULLSAFE(CLASS_NAME(cls)));
+	safe_snprintf(name, sizeof(name), "%s", NULLSAFE(CLASS_NAME(cls)));
 	
 	// remove it from the hash table first
 	remove_class_from_table(cls);
@@ -1246,58 +1245,64 @@ class_data *setup_olc_class(class_data *input) {
 * @param class_data *cls The class to display.
 */
 void do_stat_class(char_data *ch, class_data *cls) {
-	char buf[MAX_STRING_LENGTH], part[MAX_STRING_LENGTH];
-	size_t size;
+	char part[MAX_STRING_LENGTH];
 	
 	if (!cls) {
 		return;
 	}
 	
 	// first line
-	size = snprintf(buf, sizeof(buf), "VNum: [\tc%d\t0], Name: \tc%s\t0, Abbrev: [\tc%s\t0]\r\n", CLASS_VNUM(cls), CLASS_NAME(cls), CLASS_ABBREV(cls));
+	build_page_display(ch, "VNum: [\tc%d\t0], Name: \tc%s\t0, Abbrev: [\tc%s\t0]", CLASS_VNUM(cls), CLASS_NAME(cls), CLASS_ABBREV(cls));
 	
-	size += snprintf(buf + size, sizeof(buf) - size, "Health: [\tg%d\t0], Moves: [\tg%d\t0], Mana: [\tg%d\t0]\r\n", CLASS_POOL(cls, HEALTH), CLASS_POOL(cls, MOVE), CLASS_POOL(cls, MANA));
+	build_page_display(ch, "Health: [\tg%d\t0], Moves: [\tg%d\t0], Mana: [\tg%d\t0]", CLASS_POOL(cls, HEALTH), CLASS_POOL(cls, MOVE), CLASS_POOL(cls, MANA));
 	
 	sprintbit(CLASS_FLAGS(cls), class_flags, part, TRUE);
-	size += snprintf(buf + size, sizeof(buf) - size, "Flags: \tg%s\t0\r\n", part);
+	build_page_display(ch, "Flags: \tg%s\t0", part);
 	
-	get_class_skill_display(CLASS_SKILL_REQUIREMENTS(cls), part, FALSE);
-	size += snprintf(buf + size, sizeof(buf) - size, "Skills required:\r\n%s", part);
+	get_class_skill_display(CLASS_SKILL_REQUIREMENTS(cls), part, sizeof(part), FALSE);
+	build_page_display(ch, "Skills required:\r\n%s", part);
 	
-	get_class_ability_display(CLASS_ABILITIES(cls), part, NULL);
-	size += snprintf(buf + size, sizeof(buf) - size, "Roles and abilities:\r\n%s%s", part, *part ? "\r\n" : " none\r\n");
+	build_page_display_str(ch, "Roles and abilities:");
+	show_class_ability_display(ch, CLASS_ABILITIES(cls), FALSE, NULL);
 
-	page_string(ch->desc, buf, TRUE);
+	send_page_display(ch);
 }
 
 
 /**
-* Gets the class role display for olc, stat, or other uses.
+* Displays the class role display for olc, stat, or other uses.
 *
+* @param char_data *ch The person viewing it.
 * @param struct class_ability *list The list of abilities to display.
-* @param char *save_buffer A buffer to store the display to.
+* @param bool send_output If TRUE, sends the page_display as text when done. Pass FALSE if you're building a larger page_display for the character.
 * @param char_data *info_ch Optional: highlights abilities this player has (or NULL).
 */
-void get_class_ability_display(struct class_ability *list, char *save_buffer, char_data *info_ch) {
+void show_class_ability_display(char_data *ch, struct class_ability *list, bool send_output, char_data *info_ch) {
 	int count = 0, last_role = -2;
 	struct class_ability *iter;
 	ability_data *abil;
-	
-	*save_buffer = '\0';
+	struct page_display *line = NULL;
 
 	LL_FOREACH(list, iter) {
 		if (iter->role != last_role) {
-			sprintf(save_buffer + strlen(save_buffer), "%s %s%s\t0: ", last_role != -2 ? "\r\n" : "", iter->role == NOTHING ? "\t0" : class_role_color[iter->role], iter->role == NOTHING ? "All" : class_role[iter->role]);
+			line = build_page_display(ch, "%s %s%s\t0: ", last_role != -2 ? "\r\n" : "", iter->role == NOTHING ? "\t0" : class_role_color[iter->role], iter->role == NOTHING ? "All" : class_role[iter->role]);
 			last_role = iter->role;
 			count = 0;
 		}
 		
 		if ((abil = find_ability_by_vnum(iter->vnum))) {
-			sprintf(save_buffer + strlen(save_buffer), "%s%s%s\t0", (count++ > 0) ? ", " : "", (info_ch && has_ability(info_ch, iter->vnum)) ? "\tg" : "", ABIL_NAME(abil));
+			append_page_display_line(line, "%s%s%s\t0", (count++ > 0) ? ", " : "", (info_ch && has_ability(info_ch, iter->vnum)) ? "\tg" : "", ABIL_NAME(abil));
 		}
 		else {
-			sprintf(save_buffer + strlen(save_buffer), "%s%d Unknown\t0", (count++ > 0) ? ", " : "", iter->vnum);
+			append_page_display_line(line, "%s%d Unknown\t0", (count++ > 0) ? ", " : "", iter->vnum);
 		}
+	}
+	if (!list) {
+		build_page_display_str(ch, " none");
+	}
+	
+	if (send_output) {
+		send_page_display_as(ch, PD_NO_PAGINATION | PD_FREE_DISPLAY_AFTER);
 	}
 }
 
@@ -1307,27 +1312,44 @@ void get_class_ability_display(struct class_ability *list, char *save_buffer, ch
 *
 * @param struct class_skill_req *list The list to display.
 * @param char *save_buffer A string to save it in.
+* @param size_t buf_size The sizeof the save_buffer, to prevent overruns.
 * @param bool one_line If TRUE, is a comma-separated line. Otherwise, a numbered list.
 */
-void get_class_skill_display(struct class_skill_req *list, char *save_buffer, bool one_line) {
-	char lbuf[MAX_STRING_LENGTH];
+void get_class_skill_display(struct class_skill_req *list, char *save_buffer, size_t buf_size, bool one_line) {
+	char skill_part[256], line[512];
 	struct class_skill_req *iter;
 	int count = 0;
+	size_t l_size;
 	
 	*save_buffer = '\0';
 	
 	LL_FOREACH(list, iter) {
-		snprintf(lbuf, sizeof(lbuf), "%s %d", get_skill_name_by_vnum(iter->vnum), iter->level);
+		++count;
+		safe_snprintf(skill_part, sizeof(skill_part), "%s %d", get_skill_name_by_vnum(iter->vnum), iter->level);
 		
+		// build line
 		if (one_line) {
-			sprintf(save_buffer + strlen(save_buffer), "%s%s", (*save_buffer ? ", " : ""), lbuf);
+			l_size = snprintf(line, sizeof(line), "%s%s", (count > 1 ? ", " : ""), skill_part);
 		}
 		else {
-			sprintf(save_buffer + strlen(save_buffer), "%2d. %s\r\n", ++count, lbuf);
+			l_size = snprintf(line, sizeof(line), "%2d. %s\r\n", ++count, skill_part);
+		}
+		
+		// size-check
+		if (l_size < buf_size - 5) {
+			strcat(save_buffer, line);
+			buf_size -= l_size;
+		}
+		else {
+			// overflow
+			if (buf_size > 5) {
+				sprintf(save_buffer + strlen(save_buffer), "...%s", (one_line ? "" : "\r\n"));
+			}
+			break;
 		}
 	}
 	if (!list) {
-		sprintf(save_buffer + strlen(save_buffer), "%snone%s", one_line ? "" : "  ", one_line ? "" : "\r\n");
+		safe_snprintf(save_buffer, buf_size, "%snone%s", one_line ? "" : "  ", one_line ? "" : "\r\n");
 	}
 }
 
@@ -1340,32 +1362,30 @@ void get_class_skill_display(struct class_skill_req *list, char *save_buffer, bo
 */
 void olc_show_class(char_data *ch) {
 	class_data *cls = GET_OLC_CLASS(ch->desc);
-	char buf[MAX_STRING_LENGTH], lbuf[MAX_STRING_LENGTH];
+	char lbuf[MAX_STRING_LENGTH];
 	
 	if (!cls) {
 		return;
 	}
 	
-	*buf = '\0';
-	
-	sprintf(buf + strlen(buf), "[%s%d\t0] %s%s\t0\r\n", OLC_LABEL_CHANGED, GET_OLC_VNUM(ch->desc), OLC_LABEL_UNCHANGED, !find_class_by_vnum(CLASS_VNUM(cls)) ? "new class" : CLASS_NAME(find_class_by_vnum(CLASS_VNUM(cls))));
-	sprintf(buf + strlen(buf), "<%sname\t0> %s\r\n", OLC_LABEL_STR(CLASS_NAME(cls), default_class_name), NULLSAFE(CLASS_NAME(cls)));
-	sprintf(buf + strlen(buf), "<%sabbrev\t0> %s\r\n", OLC_LABEL_STR(CLASS_ABBREV(cls), default_class_abbrev), NULLSAFE(CLASS_ABBREV(cls)));
+	build_page_display(ch, "[%s%d\t0] %s%s\t0", OLC_LABEL_CHANGED, GET_OLC_VNUM(ch->desc), OLC_LABEL_UNCHANGED, !find_class_by_vnum(CLASS_VNUM(cls)) ? "new class" : CLASS_NAME(find_class_by_vnum(CLASS_VNUM(cls))));
+	build_page_display(ch, "<%sname\t0> %s", OLC_LABEL_STR(CLASS_NAME(cls), default_class_name), NULLSAFE(CLASS_NAME(cls)));
+	build_page_display(ch, "<%sabbrev\t0> %s", OLC_LABEL_STR(CLASS_ABBREV(cls), default_class_abbrev), NULLSAFE(CLASS_ABBREV(cls)));
 	
 	sprintbit(CLASS_FLAGS(cls), class_flags, lbuf, TRUE);
-	sprintf(buf + strlen(buf), "<%sflags\t0> %s\r\n", OLC_LABEL_VAL(CLASS_FLAGS(cls), CLASSF_IN_DEVELOPMENT), lbuf);
+	build_page_display(ch, "<%sflags\t0> %s", OLC_LABEL_VAL(CLASS_FLAGS(cls), CLASSF_IN_DEVELOPMENT), lbuf);
 	
-	get_class_skill_display(CLASS_SKILL_REQUIREMENTS(cls), lbuf, FALSE);
-	sprintf(buf + strlen(buf), "Skills required: <%srequires\t0>\r\n%s", OLC_LABEL_PTR(CLASS_SKILL_REQUIREMENTS(cls)), CLASS_SKILL_REQUIREMENTS(cls) ? lbuf : "");
+	get_class_skill_display(CLASS_SKILL_REQUIREMENTS(cls), lbuf, sizeof(lbuf), FALSE);
+	build_page_display(ch, "Skills required: <%srequires\t0>\r\n%s", OLC_LABEL_PTR(CLASS_SKILL_REQUIREMENTS(cls)), CLASS_SKILL_REQUIREMENTS(cls) ? lbuf : "");
 	
-	sprintf(buf + strlen(buf), "<%smaxhealth\t0> %d\r\n", OLC_LABEL_VAL(CLASS_POOL(cls, HEALTH), base_player_pools[HEALTH]), CLASS_POOL(cls, HEALTH));
-	sprintf(buf + strlen(buf), "<%smaxmana\t0> %d\r\n", OLC_LABEL_VAL(CLASS_POOL(cls, MANA), base_player_pools[MANA]), CLASS_POOL(cls, MANA));
-	sprintf(buf + strlen(buf), "<%smaxmoves\t0> %d\r\n", OLC_LABEL_VAL(CLASS_POOL(cls, MOVE), base_player_pools[MOVE]), CLASS_POOL(cls, MOVE));
+	build_page_display(ch, "<%smaxhealth\t0> %d", OLC_LABEL_VAL(CLASS_POOL(cls, HEALTH), base_player_pools[HEALTH]), CLASS_POOL(cls, HEALTH));
+	build_page_display(ch, "<%smaxmana\t0> %d", OLC_LABEL_VAL(CLASS_POOL(cls, MANA), base_player_pools[MANA]), CLASS_POOL(cls, MANA));
+	build_page_display(ch, "<%smaxmoves\t0> %d", OLC_LABEL_VAL(CLASS_POOL(cls, MOVE), base_player_pools[MOVE]), CLASS_POOL(cls, MOVE));
 	
-	get_class_ability_display(CLASS_ABILITIES(cls), lbuf, NULL);
-	sprintf(buf + strlen(buf), "Class roles and abilities: <%srole\t0>\r\n%s%s", OLC_LABEL_PTR(CLASS_ABILITIES(cls)), lbuf, *lbuf ? "\r\n" : "");
+	build_page_display(ch, "Class roles and abilities: <%srole\t0>", OLC_LABEL_PTR(CLASS_ABILITIES(cls)));
+	show_class_ability_display(ch, CLASS_ABILITIES(cls), FALSE, NULL);
 	
-	page_string(ch->desc, buf, TRUE);
+	send_page_display(ch);
 }
 
 
@@ -1382,10 +1402,11 @@ int vnum_class(char *searchname, char_data *ch) {
 	
 	HASH_ITER(hh, class_table, iter, next_iter) {
 		if (multi_isname(searchname, CLASS_NAME(iter)) || multi_isname(searchname, CLASS_ABBREV(iter))) {
-			msg_to_char(ch, "%3d. [%5d] %s\r\n", ++found, CLASS_VNUM(iter), CLASS_NAME(iter));
+			build_page_display(ch, "%3d. [%5d] %s", ++found, CLASS_VNUM(iter), CLASS_NAME(iter));
 		}
 	}
 	
+	send_page_display(ch);
 	return found;
 }
 
@@ -1631,7 +1652,7 @@ OLC_MODULE(classedit_role) {
 //// COMMANDS ///////////////////////////////////////////////////////////////
 
 ACMD(do_class) {
-	char arg2[MAX_INPUT_LENGTH], buf[MAX_STRING_LENGTH];
+	char arg2[MAX_INPUT_LENGTH];
 	int found;
 	
 	two_arguments(argument, arg, arg2);
@@ -1677,10 +1698,10 @@ ACMD(do_class) {
 			msg_to_char(ch, "You don't have a class. You can earn your class by raising two skills to 76 or higher.\r\n");
 		}
 		else {
-			msg_to_char(ch, "%s\r\nClass: %s%s (%s)\t0 %d/%d/%d\r\n", PERS(ch, ch, TRUE), class_role_color[GET_CLASS_ROLE(ch)], SHOW_CLASS_NAME(ch), class_role[(int) GET_CLASS_ROLE(ch)], GET_SKILL_LEVEL(ch), GET_GEAR_LEVEL(ch), GET_COMPUTED_LEVEL(ch));
-			
-			get_class_ability_display(CLASS_ABILITIES(GET_CLASS(ch)), buf, ch);
-			msg_to_char(ch, " Available class abilities:\r\n%s%s", buf, *buf ? "\r\n" : "  none\r\n");
+			build_page_display(ch, "%s\r\nClass: %s%s (%s)\t0 %d/%d/%d", PERS(ch, ch, TRUE), class_role_color[GET_CLASS_ROLE(ch)], SHOW_CLASS_NAME(ch), class_role[(int) GET_CLASS_ROLE(ch)], GET_SKILL_LEVEL(ch), GET_GEAR_LEVEL(ch), GET_COMPUTED_LEVEL(ch));
+			build_page_display_str(ch, " Available class abilities:");
+			show_class_ability_display(ch, CLASS_ABILITIES(GET_CLASS(ch)), FALSE, ch);
+			send_page_display(ch);
 		}
 	}
 }

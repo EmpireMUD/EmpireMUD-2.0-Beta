@@ -1340,10 +1340,8 @@ int perform_alias(descriptor_data *d, char *orig) {
 
 /* The interface to the outside world: do_alias / do_unalias */
 ACMD(do_alias) {
-	char output[MAX_STRING_LENGTH * 2], line[MAX_INPUT_LENGTH];
 	char *repl;
 	struct alias_data *a;
-	size_t size, lsize;
 
 	if (IS_NPC(ch))
 		return;
@@ -1351,27 +1349,16 @@ ACMD(do_alias) {
 	repl = any_one_arg(argument, arg);
 
 	if (!*arg) {			/* no argument specified -- list currently defined aliases */
-		size = snprintf(output, sizeof(output), "Currently defined aliases:\r\n");
+		build_page_display(ch, "Currently defined aliases:");
 		if (GET_ALIASES(ch) == NULL) {
-			strcat(output, " None.\r\n");	// strcat: length ok
+			build_page_display(ch, " None.");
 		}
 		else {
 			LL_FOREACH(GET_ALIASES(ch), a) {
-				lsize = snprintf(line, sizeof(line), "%-15s %s\r\n", a->alias, show_color_codes(a->replacement));
-				if (size + lsize + 10 < sizeof(output)) {
-					strcat(output, line);
-					size += lsize;
-				}
-				else {
-					size += snprintf(output + size, sizeof(output) - size, "OVERFLOW\r\n");
-					break;
-				}
-			}
-			
-			if (ch->desc) {
-				page_string(ch->desc, output, TRUE);
+				build_page_display(ch, "%-15s %s", a->alias, show_color_codes(a->replacement));
 			}
 		}
+		send_page_display(ch);
 	}
 	else {			/* otherwise, add or remove aliases */
 		/* is this an alias we've already defined? */
@@ -1568,7 +1555,7 @@ void sort_commands(void) {
 
 
 ACMD(do_commands) {
-	int no, i, cmd_num;
+	int i, cmd_num;
 	int wizhelp = 0;
 	char_data *vict;
 
@@ -1594,25 +1581,19 @@ ACMD(do_commands) {
 	if (subcmd == SCMD_WIZHELP)
 		wizhelp = 1;
 
-	sprintf(buf, "The following %s%s are available to %s:\r\n", wizhelp ? "privileged " : "", "commands", vict == ch ? "you" : PERS(vict, ch, 1));
+	build_page_display(ch, "The following %s%s are available to %s:", wizhelp ? "privileged " : "", "commands", vict == ch ? "you" : PERS(vict, ch, 1));
 
 	/* cmd_num starts at 1, not 0, to remove 'RESERVED' */
-	for (no = 1, cmd_num = 1; cmd_num < num_of_cmds; cmd_num++) {
+	for (cmd_num = 1; cmd_num < num_of_cmds; cmd_num++) {
 		i = cmd_sort_info[cmd_num].sort_pos;
 		if (cmd_info[i].minimum_level >= 0 && (cmd_info[i].ability == NO_ABIL || has_ability(vict, cmd_info[i].ability)) && (GET_ACCESS_LEVEL(vict) >= cmd_info[i].minimum_level || (cmd_info[i].grants != NO_GRANTS && IS_GRANTED(vict, cmd_info[i].grants))) && (cmd_info[i].minimum_level >= LVL_GOD) == wizhelp) {
 			if (!IS_SET(cmd_info[i].flags, CMD_IMM_OR_MOB_ONLY) || GET_ACCESS_LEVEL(vict) >= LVL_START_IMM || IS_NPC(vict)) {
-				sprintf(buf + strlen(buf), "%-15s", cmd_info[i].command);
-				if (!(no % 5))
-					strcat(buf, "\r\n");
-				no++;
+				build_page_display_col_str(ch, 5, FALSE, cmd_info[i].command);
 			}
 		}
 	}
-
-	if ((no - 1) % 5) {
-		strcat(buf, "\r\n");
-	}
-	send_to_char(buf, ch);
+	
+	send_page_display(ch);
 }
 
 

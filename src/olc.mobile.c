@@ -287,10 +287,10 @@ char *list_one_mobile(char_data *mob, bool detail) {
 			*flags = '\0';
 		}
 		
-		snprintf(output, sizeof(output), "[%5d] %s (%s) %s", GET_MOB_VNUM(mob), GET_SHORT_DESC(mob), level_range_string(GET_MIN_SCALE_LEVEL(mob), GET_MAX_SCALE_LEVEL(mob), 0), flags);
+		safe_snprintf(output, sizeof(output), "[%5d] %s (%s) %s", GET_MOB_VNUM(mob), GET_SHORT_DESC(mob), level_range_string(GET_MIN_SCALE_LEVEL(mob), GET_MAX_SCALE_LEVEL(mob), 0), flags);
 	}
 	else {
-		snprintf(output, sizeof(output), "[%5d] %s", GET_MOB_VNUM(mob), GET_SHORT_DESC(mob));
+		safe_snprintf(output, sizeof(output), "[%5d] %s", GET_MOB_VNUM(mob), GET_SHORT_DESC(mob));
 	}
 	
 	return output;
@@ -332,7 +332,7 @@ void olc_delete_mobile(char_data *ch, mob_vnum vnum) {
 		return;
 	}
 	
-	snprintf(name, sizeof(name), "%s", NULLSAFE(GET_SHORT_DESC(proto)));
+	safe_snprintf(name, sizeof(name), "%s", NULLSAFE(GET_SHORT_DESC(proto)));
 	
 	if (HASH_COUNT(mobile_table) <= 1) {
 		msg_to_char(ch, "You can't delete the last mob.\r\n");
@@ -669,7 +669,7 @@ void olc_delete_mobile(char_data *ch, mob_vnum vnum) {
 * @param char *argument The argument they entered.
 */
 void olc_fullsearch_mob(char_data *ch, char *argument) {
-	char buf[MAX_STRING_LENGTH * 2], line[MAX_STRING_LENGTH], type_arg[MAX_INPUT_LENGTH], val_arg[MAX_INPUT_LENGTH], find_keywords[MAX_INPUT_LENGTH];
+	char type_arg[MAX_INPUT_LENGTH], val_arg[MAX_INPUT_LENGTH], find_keywords[MAX_INPUT_LENGTH];
 	bitvector_t  find_interacts = NOBITS, found_interacts, find_custom = NOBITS, found_custom;
 	bitvector_t not_flagged = NOBITS, only_flags = NOBITS, only_affs = NOBITS;
 	int only_move = NOTHING, only_nameset = NOTHING;
@@ -679,7 +679,6 @@ void olc_fullsearch_mob(char_data *ch, char *argument) {
 	struct interaction_item *inter;
 	struct custom_message *cust;
 	char_data *mob, *next_mob;
-	size_t size;
 	
 	if (!*argument) {
 		msg_to_char(ch, "See HELP MEDIT FULLSEARCH for syntax.\r\n");
@@ -721,7 +720,7 @@ void olc_fullsearch_mob(char_data *ch, char *argument) {
 		skip_spaces(&argument);
 	}
 	
-	size = snprintf(buf, sizeof(buf), "Mobile fullsearch: %s\r\n", show_color_codes(find_keywords));
+	build_page_display(ch, "Mobile fullsearch: %s", show_color_codes(find_keywords));
 	count = 0;
 	
 	// okay now look up mobs
@@ -788,27 +787,18 @@ void olc_fullsearch_mob(char_data *ch, char *argument) {
 		}
 		
 		// show it
-		snprintf(line, sizeof(line), "[%5d] %s\r\n", GET_MOB_VNUM(mob), GET_SHORT_DESC(mob));
-		if (strlen(line) + size < sizeof(buf)) {
-			size += snprintf(buf + size, sizeof(buf) - size, "%s", line);
-			++count;
-		}
-		else {
-			size += snprintf(buf + size, sizeof(buf) - size, "OVERFLOW\r\n");
-			break;
-		}
+		build_page_display(ch, "[%5d] %s", GET_MOB_VNUM(mob), GET_SHORT_DESC(mob));
+		++count;
 	}
 	
-	if (count > 0 && (size + 18) < sizeof(buf)) {
-		size += snprintf(buf + size, sizeof(buf) - size, "(%d mobiles)\r\n", count);
+	if (count > 0) {
+		build_page_display(ch, "(%d mobiles)", count);
 	}
-	else if (count == 0) {
-		size += snprintf(buf + size, sizeof(buf) - size, " none\r\n");
+	else {
+		build_page_display_str(ch, " none");
 	}
 	
-	if (ch->desc) {
-		page_string(ch->desc, buf, TRUE);
-	}
+	send_page_display(ch);
 }
 
 
@@ -820,7 +810,6 @@ void olc_fullsearch_mob(char_data *ch, char *argument) {
 */
 void olc_search_mob(char_data *ch, mob_vnum vnum) {
 	char_data *proto, *mob, *next_mob;
-	char buf[MAX_STRING_LENGTH];
 	struct spawn_info *spawn;
 	struct adventure_spawn *asp;
 	struct interaction_item *inter;
@@ -836,7 +825,7 @@ void olc_search_mob(char_data *ch, mob_vnum vnum) {
 	shop_data *shop, *next_shop;
 	social_data *soc, *next_soc;
 	bld_data *bld, *next_bld;
-	int size, found;
+	int found;
 	bool any;
 	
 	if (!(proto = mob_proto(vnum))) {
@@ -845,7 +834,7 @@ void olc_search_mob(char_data *ch, mob_vnum vnum) {
 	}
 	
 	found = 0;
-	size = snprintf(buf, sizeof(buf), "Occurrences of mobile %d (%s):\r\n", vnum, GET_SHORT_DESC(proto));
+	build_page_display(ch, "Occurrences of mobile %d (%s):", vnum, GET_SHORT_DESC(proto));
 	
 	// abilities
 	HASH_ITER(hh, ability_table, abil, next_abil) {
@@ -862,7 +851,7 @@ void olc_search_mob(char_data *ch, mob_vnum vnum) {
 		
 		if (any) {
 			++found;
-			size += snprintf(buf + size, sizeof(buf) - size, "ABIL [%5d] %s\r\n", ABIL_VNUM(abil), ABIL_NAME(abil));
+			build_page_display(ch, "ABIL [%5d] %s", ABIL_VNUM(abil), ABIL_NAME(abil));
 		}
 	}
 	
@@ -887,7 +876,7 @@ void olc_search_mob(char_data *ch, mob_vnum vnum) {
 		}
 		
 		if (any) {
-			size += snprintf(buf + size, sizeof(buf) - size, "BLD [%5d] %s\r\n", GET_BLD_VNUM(bld), GET_BLD_NAME(bld));
+			build_page_display(ch, "BLD [%5d] %s", GET_BLD_VNUM(bld), GET_BLD_NAME(bld));
 		}
 	}
 	
@@ -898,14 +887,14 @@ void olc_search_mob(char_data *ch, mob_vnum vnum) {
 			if (spawn->vnum == vnum) {
 				any = TRUE;
 				++found;
-				size += snprintf(buf + size, sizeof(buf) - size, "CRP [%5d] %s\r\n", GET_CROP_VNUM(crop), GET_CROP_NAME(crop));
+				build_page_display(ch, "CRP [%5d] %s", GET_CROP_VNUM(crop), GET_CROP_NAME(crop));
 			}
 		}
 		for (inter = GET_CROP_INTERACTIONS(crop); inter && !any; inter = inter->next) {
 			if (interact_data[inter->type].vnum_type == TYPE_MOB && inter->vnum == vnum) {
 				any = TRUE;
 				++found;
-				size += snprintf(buf + size, sizeof(buf) - size, "CRP [%5d] %s\r\n", GET_CROP_VNUM(crop), GET_CROP_NAME(crop));
+				build_page_display(ch, "CRP [%5d] %s", GET_CROP_VNUM(crop), GET_CROP_NAME(crop));
 			}
 		}
 	}
@@ -917,13 +906,13 @@ void olc_search_mob(char_data *ch, mob_vnum vnum) {
 			if (interact_data[inter->type].vnum_type == TYPE_MOB && inter->vnum == vnum) {
 				any = TRUE;
 				++found;
-				size += snprintf(buf + size, sizeof(buf) - size, "GLB [%5d] %s\r\n", GET_GLOBAL_VNUM(glb), GET_GLOBAL_NAME(glb));
+				build_page_display(ch, "GLB [%5d] %s", GET_GLOBAL_VNUM(glb), GET_GLOBAL_NAME(glb));
 			}
 		}
 		LL_FOREACH(GET_GLOBAL_SPAWNS(glb), spawn) {
 			if (spawn->vnum == vnum) {
 				++found;
-				size += snprintf(buf + size, sizeof(buf) - size, "GLB [%5d] %s\r\n", GET_GLOBAL_VNUM(glb), GET_GLOBAL_NAME(glb));
+				build_page_display(ch, "GLB [%5d] %s", GET_GLOBAL_VNUM(glb), GET_GLOBAL_NAME(glb));
 				break;
 			}
 		}
@@ -936,7 +925,7 @@ void olc_search_mob(char_data *ch, mob_vnum vnum) {
 			if (interact_data[inter->type].vnum_type == TYPE_MOB && inter->vnum == vnum) {
 				any = TRUE;
 				++found;
-				size += snprintf(buf + size, sizeof(buf) - size, "MOB [%5d] %s\r\n", GET_MOB_VNUM(mob), GET_SHORT_DESC(mob));
+				build_page_display(ch, "MOB [%5d] %s", GET_MOB_VNUM(mob), GET_SHORT_DESC(mob));
 			}
 		}
 	}
@@ -945,32 +934,26 @@ void olc_search_mob(char_data *ch, mob_vnum vnum) {
 	HASH_ITER(hh, object_table, obj, next_obj) {
 		if (IS_MINIPET(obj) && GET_MINIPET_VNUM(obj) == vnum) {
 			++found;
-			size += snprintf(buf + size, sizeof(buf) - size, "OBJ [%5d] %s\r\n", GET_OBJ_VNUM(obj), GET_OBJ_SHORT_DESC(obj));
+			build_page_display(ch, "OBJ [%5d] %s", GET_OBJ_VNUM(obj), GET_OBJ_SHORT_DESC(obj));
 		}
 	}
 	
 	// progress
 	HASH_ITER(hh, progress_table, prg, next_prg) {
-		if (size >= sizeof(buf)) {
-			break;
-		}
 		// REQ_x: requirement search
 		any = find_requirement_in_list(PRG_TASKS(prg), REQ_KILL_MOB, vnum);
 		
 		if (any) {
 			++found;
-			size += snprintf(buf + size, sizeof(buf) - size, "PRG [%5d] %s\r\n", PRG_VNUM(prg), PRG_NAME(prg));
+			build_page_display(ch, "PRG [%5d] %s", PRG_VNUM(prg), PRG_NAME(prg));
 		}
 	}
 	
 	// quests
 	HASH_ITER(hh, quest_table, quest, next_quest) {
-		if (size >= sizeof(buf)) {
-			break;
-		}
 		if (find_quest_giver_in_list(QUEST_STARTS_AT(quest), QG_MOBILE, vnum) || find_quest_giver_in_list(QUEST_ENDS_AT(quest), QG_MOBILE, vnum) || find_requirement_in_list(QUEST_TASKS(quest), REQ_KILL_MOB, vnum) || find_requirement_in_list(QUEST_PREREQS(quest), REQ_KILL_MOB, vnum)) {
 			++found;
-			size += snprintf(buf + size, sizeof(buf) - size, "QST [%5d] %s\r\n", QUEST_VNUM(quest), QUEST_NAME(quest));
+			build_page_display(ch, "QST [%5d] %s", QUEST_VNUM(quest), QUEST_NAME(quest));
 		}
 	}
 	
@@ -981,14 +964,14 @@ void olc_search_mob(char_data *ch, mob_vnum vnum) {
 			if (asp->type == ADV_SPAWN_MOB && asp->vnum == vnum) {
 				any = TRUE;
 				++found;
-				size += snprintf(buf + size, sizeof(buf) - size, "RMT [%5d] %s\r\n", GET_RMT_VNUM(rmt), GET_RMT_TITLE(rmt));
+				build_page_display(ch, "RMT [%5d] %s", GET_RMT_VNUM(rmt), GET_RMT_TITLE(rmt));
 			}
 		}
 		for (inter = GET_RMT_INTERACTIONS(rmt); inter && !any; inter = inter->next) {
 			if (interact_data[inter->type].vnum_type == TYPE_MOB && inter->vnum == vnum) {
 				any = TRUE;
 				++found;
-				size += snprintf(buf + size, sizeof(buf) - size, "RMT [%5d] %s\r\n", GET_RMT_VNUM(rmt), GET_RMT_TITLE(rmt));
+				build_page_display(ch, "RMT [%5d] %s", GET_RMT_VNUM(rmt), GET_RMT_TITLE(rmt));
 			}
 		}
 	}
@@ -1000,37 +983,31 @@ void olc_search_mob(char_data *ch, mob_vnum vnum) {
 			if (spawn->vnum == vnum) {
 				any = TRUE;
 				++found;
-				size += snprintf(buf + size, sizeof(buf) - size, "SCT [%5d] %s\r\n", GET_SECT_VNUM(sect), GET_SECT_NAME(sect));
+				build_page_display(ch, "SCT [%5d] %s", GET_SECT_VNUM(sect), GET_SECT_NAME(sect));
 			}
 		}
 		for (inter = GET_SECT_INTERACTIONS(sect); inter && !any; inter = inter->next) {
 			if (interact_data[inter->type].vnum_type == TYPE_MOB && inter->vnum == vnum) {
 				any = TRUE;
 				++found;
-				size += snprintf(buf + size, sizeof(buf) - size, "SCT [%5d] %s\r\n", GET_SECT_VNUM(sect), GET_SECT_NAME(sect));
+				build_page_display(ch, "SCT [%5d] %s", GET_SECT_VNUM(sect), GET_SECT_NAME(sect));
 			}
 		}
 	}
 	
 	// shops
 	HASH_ITER(hh, shop_table, shop, next_shop) {
-		if (size >= sizeof(buf)) {
-			break;
-		}
 		if (find_quest_giver_in_list(SHOP_LOCATIONS(shop), QG_MOBILE, vnum)) {
 			++found;
-			size += snprintf(buf + size, sizeof(buf) - size, "SHOP [%5d] %s\r\n", SHOP_VNUM(shop), SHOP_NAME(shop));
+			build_page_display(ch, "SHOP [%5d] %s", SHOP_VNUM(shop), SHOP_NAME(shop));
 		}
 	}
 	
 	// socials
 	HASH_ITER(hh, social_table, soc, next_soc) {
-		if (size >= sizeof(buf)) {
-			break;
-		}
 		if (find_requirement_in_list(SOC_REQUIREMENTS(soc), REQ_KILL_MOB, vnum)) {
 			++found;
-			size += snprintf(buf + size, sizeof(buf) - size, "SOC [%5d] %s\r\n", SOC_VNUM(soc), SOC_NAME(soc));
+			build_page_display(ch, "SOC [%5d] %s", SOC_VNUM(soc), SOC_NAME(soc));
 		}
 	}
 	
@@ -1051,18 +1028,18 @@ void olc_search_mob(char_data *ch, mob_vnum vnum) {
 		}
 		
 		if (any) {
-			size += snprintf(buf + size, sizeof(buf) - size, "VEH [%5d] %s\r\n", VEH_VNUM(veh), VEH_SHORT_DESC(veh));
+			build_page_display(ch, "VEH [%5d] %s", VEH_VNUM(veh), VEH_SHORT_DESC(veh));
 		}
 	}
 	
 	if (found > 0) {
-		size += snprintf(buf + size, sizeof(buf) - size, "%d location%s shown\r\n", found, PLURAL(found));
+		build_page_display(ch, "%d location%s shown", found, PLURAL(found));
 	}
 	else {
-		size += snprintf(buf + size, sizeof(buf) - size, " none\r\n");
+		build_page_display_str(ch, " none");
 	}
 	
-	page_string(ch->desc, buf, TRUE);
+	send_page_display(ch);
 }
 
 
@@ -1409,7 +1386,6 @@ OLC_MODULE(olc_refresh_companions) {
 * @param char_data *ch The person who is editing an mobile and will see its display.
 */
 void olc_show_mobile(char_data *ch) {
-	char buf[MAX_STRING_LENGTH * 4];	// these get long
 	char_data *mob = GET_OLC_MOBILE(ch->desc);
 	struct custom_message *mcm;
 	int count;
@@ -1418,61 +1394,58 @@ void olc_show_mobile(char_data *ch) {
 		return;
 	}
 	
-	*buf = '\0';
-	sprintf(buf + strlen(buf), "[%s%d\t0] %s%s\t0\r\n", OLC_LABEL_CHANGED, GET_OLC_VNUM(ch->desc), OLC_LABEL_UNCHANGED, !mob_proto(GET_OLC_VNUM(ch->desc)) ? "new mobile" : GET_SHORT_DESC(mob_proto(GET_OLC_VNUM(ch->desc))));
-	sprintf(buf + strlen(buf), "<%skeywords\t0> %s\r\n", OLC_LABEL_STR(GET_PC_NAME(mob), default_mob_keywords), GET_PC_NAME(mob));
-	sprintf(buf + strlen(buf), "<%sshortdescription\t0> %s\r\n", OLC_LABEL_STR(GET_SHORT_DESC(mob), default_mob_short), GET_SHORT_DESC(mob));
-	sprintf(buf + strlen(buf), "<%slongdescription\t0> %s", OLC_LABEL_STR(GET_LONG_DESC(mob), default_mob_long), GET_LONG_DESC(mob));
-	sprintf(buf + strlen(buf), "<%slookdescription\t0>\r\n%s", OLC_LABEL_PTR(GET_LOOK_DESC(mob)), NULLSAFE(GET_LOOK_DESC(mob)));
+	build_page_display(ch, "[%s%d\t0] %s%s\t0", OLC_LABEL_CHANGED, GET_OLC_VNUM(ch->desc), OLC_LABEL_UNCHANGED, !mob_proto(GET_OLC_VNUM(ch->desc)) ? "new mobile" : GET_SHORT_DESC(mob_proto(GET_OLC_VNUM(ch->desc))));
+	build_page_display(ch, "<%skeywords\t0> %s", OLC_LABEL_STR(GET_PC_NAME(mob), default_mob_keywords), GET_PC_NAME(mob));
+	build_page_display(ch, "<%sshortdescription\t0> %s", OLC_LABEL_STR(GET_SHORT_DESC(mob), default_mob_short), GET_SHORT_DESC(mob));
+	build_page_display(ch, "<%slongdescription\t0> %s", OLC_LABEL_STR(GET_LONG_DESC(mob), default_mob_long), GET_LONG_DESC(mob));
+	build_page_display(ch, "<%slookdescription\t0>\r\n%s", OLC_LABEL_PTR(GET_LOOK_DESC(mob)), NULLSAFE(GET_LOOK_DESC(mob)));
 	
-	sprintf(buf + strlen(buf), "<%ssex\t0> %s\r\n", OLC_LABEL_VAL(GET_SEX(mob), 0), genders[GET_SEX(mob)]);
+	build_page_display(ch, "<%ssex\t0> %s", OLC_LABEL_VAL(GET_SEX(mob), 0), genders[GET_SEX(mob)]);
 	
 	sprintbit(MOB_FLAGS(mob), action_bits, buf1, TRUE);
-	sprintf(buf + strlen(buf), "<%sflags\t0> %s\r\n", OLC_LABEL_VAL(MOB_FLAGS(mob), MOB_ISNPC), buf1);
+	build_page_display(ch, "<%sflags\t0> %s", OLC_LABEL_VAL(MOB_FLAGS(mob), MOB_ISNPC), buf1);
 	
 	sprintbit(AFF_FLAGS(mob), affected_bits, buf1, TRUE);
-	sprintf(buf + strlen(buf), "<%saffects\t0> %s\r\n", OLC_LABEL_VAL(AFF_FLAGS(mob), NOBITS), buf1);
+	build_page_display(ch, "<%saffects\t0> %s", OLC_LABEL_VAL(AFF_FLAGS(mob), NOBITS), buf1);
 
 	if (GET_MIN_SCALE_LEVEL(mob) > 0) {
-		sprintf(buf + strlen(buf), "<%sminlevel\t0> %d\r\n", OLC_LABEL_VAL(GET_MIN_SCALE_LEVEL(mob), 0), GET_MIN_SCALE_LEVEL(mob));
+		build_page_display(ch, "<%sminlevel\t0> %d", OLC_LABEL_VAL(GET_MIN_SCALE_LEVEL(mob), 0), GET_MIN_SCALE_LEVEL(mob));
 	}
 	else {
-		sprintf(buf + strlen(buf), "<%sminlevel\t0> none\r\n", OLC_LABEL_UNCHANGED);
+		build_page_display(ch, "<%sminlevel\t0> none", OLC_LABEL_UNCHANGED);
 	}
 	
 	if (GET_MAX_SCALE_LEVEL(mob) > 0) {	
-		sprintf(buf + strlen(buf), "<%smaxlevel\t0> %d\r\n", OLC_LABEL_VAL(GET_MAX_SCALE_LEVEL(mob), 0), GET_MAX_SCALE_LEVEL(mob));
+		build_page_display(ch, "<%smaxlevel\t0> %d", OLC_LABEL_VAL(GET_MAX_SCALE_LEVEL(mob), 0), GET_MAX_SCALE_LEVEL(mob));
 	}
 	else {
-		sprintf(buf + strlen(buf), "<%smaxlevel\t0> none\r\n", OLC_LABEL_UNCHANGED);
+		build_page_display(ch, "<%smaxlevel\t0> none", OLC_LABEL_UNCHANGED);
 	}
 	
-	sprintf(buf + strlen(buf), "<%sattack\t0> %d %s\r\n", OLC_LABEL_VAL(MOB_ATTACK_TYPE(mob), 0), MOB_ATTACK_TYPE(mob), get_attack_name_by_vnum(MOB_ATTACK_TYPE(mob)));
-	sprintf(buf + strlen(buf), "<%smovetype\t0> %s\r\n", OLC_LABEL_VAL(MOB_MOVE_TYPE(mob), 0), mob_move_types[(int) MOB_MOVE_TYPE(mob)]);
-	sprintf(buf + strlen(buf), "<%ssize\t0> %s\r\n", OLC_LABEL_VAL(SET_SIZE(mob), SIZE_NORMAL), size_types[(int)SET_SIZE(mob)]);
-	sprintf(buf + strlen(buf), "<%snameset\t0> %s, <%slanguage\t0> %d - %s\r\n", OLC_LABEL_VAL(MOB_NAME_SET(mob), 0), name_sets[MOB_NAME_SET(mob)], OLC_LABEL_VAL(MOB_LANGUAGE(mob), NOTHING), MOB_LANGUAGE(mob), (MOB_LANGUAGE(mob) == NOTHING ? "default" : get_generic_name_by_vnum(MOB_LANGUAGE(mob))));
-	sprintf(buf + strlen(buf), "<%sallegiance\t0> %s\r\n", OLC_LABEL_PTR(MOB_FACTION(mob)), MOB_FACTION(mob) ? FCT_NAME(MOB_FACTION(mob)) : "none");
+	build_page_display(ch, "<%sattack\t0> %d %s", OLC_LABEL_VAL(MOB_ATTACK_TYPE(mob), 0), MOB_ATTACK_TYPE(mob), get_attack_name_by_vnum(MOB_ATTACK_TYPE(mob)));
+	build_page_display(ch, "<%smovetype\t0> %s", OLC_LABEL_VAL(MOB_MOVE_TYPE(mob), 0), mob_move_types[(int) MOB_MOVE_TYPE(mob)]);
+	build_page_display(ch, "<%ssize\t0> %s", OLC_LABEL_VAL(SET_SIZE(mob), SIZE_NORMAL), size_types[(int)SET_SIZE(mob)]);
+	build_page_display(ch, "<%snameset\t0> %s, <%slanguage\t0> %d - %s", OLC_LABEL_VAL(MOB_NAME_SET(mob), 0), name_sets[MOB_NAME_SET(mob)], OLC_LABEL_VAL(MOB_LANGUAGE(mob), NOTHING), MOB_LANGUAGE(mob), (MOB_LANGUAGE(mob) == NOTHING ? "default" : get_generic_name_by_vnum(MOB_LANGUAGE(mob))));
+	build_page_display(ch, "<%sallegiance\t0> %s", OLC_LABEL_PTR(MOB_FACTION(mob)), MOB_FACTION(mob) ? FCT_NAME(MOB_FACTION(mob)) : "none");
 	
-	sprintf(buf + strlen(buf), "Interactions: <%sinteraction\t0>\r\n", OLC_LABEL_PTR(mob->interactions));
+	build_page_display(ch, "Interactions: <%sinteraction\t0>", OLC_LABEL_PTR(mob->interactions));
 	if (mob->interactions) {
-		get_interaction_display(mob->interactions, buf1);
-		strcat(buf, buf1);
+		show_interaction_display(ch, mob->interactions, FALSE);
 	}
 	
 	// custom messages
-	sprintf(buf + strlen(buf), "Custom messages: <%scustom\t0>\r\n", OLC_LABEL_PTR(MOB_CUSTOM_MSGS(mob)));
+	build_page_display(ch, "Custom messages: <%scustom\t0>", OLC_LABEL_PTR(MOB_CUSTOM_MSGS(mob)));
 	count = 0;
 	LL_FOREACH(MOB_CUSTOM_MSGS(mob), mcm) {
-		sprintf(buf + strlen(buf), " \ty%2d\t0. [%s] %s\r\n", ++count, mob_custom_types[mcm->type], mcm->msg);
+		build_page_display(ch, " \ty%2d\t0. [%s] %s", ++count, mob_custom_types[mcm->type], mcm->msg);
 	}
 	
-	sprintf(buf + strlen(buf), "Scripts: <%sscript\t0>\r\n", OLC_LABEL_PTR(mob->proto_script));
+	build_page_display(ch, "Scripts: <%sscript\t0>", OLC_LABEL_PTR(mob->proto_script));
 	if (mob->proto_script) {
-		get_script_display(mob->proto_script, buf1);
-		strcat(buf, buf1);
+		show_script_display(ch, mob->proto_script, FALSE);
 	}
 	
-	page_string(ch->desc, buf, TRUE);
+	send_page_display(ch);
 }
 
 

@@ -191,16 +191,16 @@ char *exit_description(char_data *ch, room_data *room, const char *prefix) {
 		check_x = X_COORD(room);
 		check_y = Y_COORD(room);
 		if (CHECK_MAP_BOUNDS(check_x, check_y)) {
-			snprintf(coords, sizeof(coords), " (%d, %d)", check_x, check_y);
+			safe_snprintf(coords, sizeof(coords), " (%d, %d)", check_x, check_y);
 		}
 		else {
-			snprintf(coords, sizeof(coords), " (unknown)");
+			safe_snprintf(coords, sizeof(coords), " (unknown)");
 		}
 	}
 	
 	*rlbuf = '\0';
 	if (ROOM_CUSTOM_NAME(room) && !ROOM_AFF_FLAGGED(room, ROOM_AFF_HIDE_REAL_NAME)) {
-		snprintf(rlbuf, sizeof(rlbuf), " (%s)", GET_BUILDING(room) ? GET_BLD_NAME(GET_BUILDING(room)) : GET_SECT_NAME(SECT(room)));
+		safe_snprintf(rlbuf, sizeof(rlbuf), " (%s)", GET_BUILDING(room) ? GET_BLD_NAME(GET_BUILDING(room)) : GET_SECT_NAME(SECT(room)));
 	}
 	
 	if (IS_IMMORTAL(ch) && PRF_FLAGGED(ch, PRF_ROOMFLAGS)) {
@@ -1469,7 +1469,7 @@ void look_at_room_by_loc(char_data *ch, room_data *room, bitvector_t options) {
 	if (ship_partial && GET_ROOM_VEHICLE(IN_ROOM(ch))) {
 		strcpy(tmpbuf, skip_filler(VEH_SHORT_DESC(GET_ROOM_VEHICLE(IN_ROOM(ch)))));
 		ucwords(tmpbuf);
-		snprintf(veh_buf, sizeof(veh_buf), ", %s the %s", VEH_FLAGGED(GET_ROOM_VEHICLE(IN_ROOM(ch)), VEH_IN) ? "Inside" : "Aboard", tmpbuf);
+		safe_snprintf(veh_buf, sizeof(veh_buf), ", %s the %s", VEH_FLAGGED(GET_ROOM_VEHICLE(IN_ROOM(ch)), VEH_IN) ? "Inside" : "Aboard", tmpbuf);
 	}
 	else {
 		*veh_buf = '\0';
@@ -1479,10 +1479,10 @@ void look_at_room_by_loc(char_data *ch, room_data *room, bitvector_t options) {
 	check_x = X_COORD(room);
 	check_y = Y_COORD(room);
 	if (CHECK_MAP_BOUNDS(check_x, check_y)) {
-		snprintf(locbuf, sizeof(locbuf), "(%d, %d)", check_x, check_y);
+		safe_snprintf(locbuf, sizeof(locbuf), "(%d, %d)", check_x, check_y);
 	}
 	else {
-		snprintf(locbuf, sizeof(locbuf), "(unknown)");
+		safe_snprintf(locbuf, sizeof(locbuf), "(unknown)");
 	}
 	
 	// append (Real Name) of a room if the name has been customized and DOESN'T appear in the custom name
@@ -1502,11 +1502,11 @@ void look_at_room_by_loc(char_data *ch, room_data *room, bitvector_t options) {
 		sprintbit(ROOM_AFF_FLAGS(IN_ROOM(ch)), room_aff_bits, flagbuf, TRUE);
 		if (GET_BUILDING(IN_ROOM(ch))) {
 			sprintbit(GET_BLD_FLAGS(GET_BUILDING(IN_ROOM(ch))), bld_flags, partialbuf, TRUE);
-			snprintf(flagbuf + strlen(flagbuf), sizeof(flagbuf) - strlen(flagbuf), "| %s", partialbuf);
+			safe_snprintf(flagbuf + strlen(flagbuf), sizeof(flagbuf) - strlen(flagbuf), "| %s", partialbuf);
 		}
 		if (GET_ROOM_TEMPLATE(IN_ROOM(ch))) {
 			sprintbit(GET_RMT_FLAGS(GET_ROOM_TEMPLATE(IN_ROOM(ch))), room_template_flags, partialbuf, TRUE);
-			snprintf(flagbuf + strlen(flagbuf), sizeof(flagbuf) - strlen(flagbuf), "| %s", partialbuf);
+			safe_snprintf(flagbuf + strlen(flagbuf), sizeof(flagbuf) - strlen(flagbuf), "| %s", partialbuf);
 		}
 		
 		sprintf(output, "[%d] %s%s%s%s %s&0 %s[ %s]\r\n", GET_ROOM_VNUM(room), advcolbuf, room_name_color, veh_buf, rlbuf, locbuf, (HAS_TRIGGERS(room) ? "[TRIG] " : ""), flagbuf);
@@ -1951,7 +1951,7 @@ void look_at_room_by_loc(char_data *ch, room_data *room, bitvector_t options) {
 	}
 
 	if (BUILDING_RESOURCES(room)) {
-		show_resource_list(BUILDING_RESOURCES(room), partialbuf);
+		show_resource_list(BUILDING_RESOURCES(room), partialbuf, sizeof(partialbuf));
 		msg_to_char(ch, "Remaining to %s: %s\r\n", (IS_DISMANTLING(room) ? "Dismantle" : (IS_INCOMPLETE(room) ? "Completion" : "Maintain")), partialbuf);
 	}
 	
@@ -1980,7 +1980,7 @@ void look_at_room_by_loc(char_data *ch, room_data *room, bitvector_t options) {
 		
 		if (!IS_SET(options, LRR_LOOK_OUT_INSIDE)) {
 			send_to_char("\tg", ch);
-			list_obj_to_char(ROOM_CONTENTS(room), ch, OBJ_DESC_LONG, FALSE);
+			list_obj_to_char(ROOM_CONTENTS(room), ch, OBJ_DESC_LONG, FALSE, FALSE);
 		}
 		
 		if (!IS_SET(options, LRR_LOOK_OUT_INSIDE)) {
@@ -2018,7 +2018,7 @@ void look_in_direction(char_data *ch, int dir) {
 	struct string_hash *str_hash = NULL;
 	
 	// check first for an extra description that covers the direction
-	snprintf(buf, sizeof(buf), "%s", dirs[dir]);
+	safe_snprintf(buf, sizeof(buf), "%s", dirs[dir]);
 	if ((exdesc = find_exdesc_for_char(ch, buf, NULL, NULL, NULL, NULL))) {
 		send_to_char(exdesc, ch);
 		return;
@@ -2312,14 +2312,14 @@ static void show_map_to_char(char_data *ch, struct mappc_data_container *mappc, 
 		}
 		// need a leading color? This is ignored if the icon appears to start with a color code other than &u or &&
 		if (*show_icon != COLOUR_CHAR || *(show_icon+1) == COLOUR_CHAR || *(show_icon+1) == 'u') {
-			snprintf(lbuf, sizeof(lbuf), "%s%s", icon_color, show_icon);
+			safe_snprintf(lbuf, sizeof(lbuf), "%s%s", icon_color, show_icon);
 			strcpy(show_icon, lbuf);
 		}
 	}
 	else {
 		// need a leading color? This is ignored if the icon appears to start with a color code other than &u or &&
 		if (*show_icon != COLOUR_CHAR || *(show_icon+1) == COLOUR_CHAR || *(show_icon+1) == 'u') {
-			snprintf(lbuf, sizeof(lbuf), "%s%s", icon_color, show_icon);
+			safe_snprintf(lbuf, sizeof(lbuf), "%s%s", icon_color, show_icon);
 			strcpy(show_icon, lbuf);
 		}
 		
@@ -2556,7 +2556,7 @@ void screenread_one_dir(char_data *ch, room_data *origin, int dir, int max_dist)
 		if (is_blocked && r_height <= top_height && (!ROOM_OWNER(to_room) || ROOM_OWNER(to_room) != GET_LOYALTY(ch))) {
 			// blocked by closer tile
 			if ((memory = get_player_map_memory(ch, GET_ROOM_VNUM(to_room), MAP_MEM_NAME))) {
-				snprintf(roombuf, sizeof(roombuf), "Blocked %s", memory);
+				safe_snprintf(roombuf, sizeof(roombuf), "Blocked %s", memory);
 			}
 			else {
 				strcpy(roombuf, "Blocked");
@@ -2585,7 +2585,7 @@ void screenread_one_dir(char_data *ch, room_data *origin, int dir, int max_dist)
 			else {
 				// too far: show only darkness
 				if ((memory = get_player_map_memory(ch, GET_ROOM_VNUM(to_room), MAP_MEM_NAME))) {
-					snprintf(roombuf, sizeof(roombuf), "Dark %s", memory);
+					safe_snprintf(roombuf, sizeof(roombuf), "Dark %s", memory);
 				}
 				else {
 					strcpy(roombuf, "Dark");
@@ -2604,12 +2604,12 @@ void screenread_one_dir(char_data *ch, room_data *origin, int dir, int max_dist)
 		else {
 			// different
 			if (*lastroom) {
-				snprintf(color, sizeof(color), "\t%c", (++count % 2) ? 'w' : '0');
+				safe_snprintf(color, sizeof(color), "\t%c", (++count % 2) ? 'w' : '0');
 				if (repeats > 0) {
-					snprintf(dirbuf + strlen(dirbuf), sizeof(dirbuf) - strlen(dirbuf), "%s%s%dx %s", *dirbuf ? ", " : "", color, repeats+1, lastroom);
+					safe_snprintf(dirbuf + strlen(dirbuf), sizeof(dirbuf) - strlen(dirbuf), "%s%s%dx %s", *dirbuf ? ", " : "", color, repeats+1, lastroom);
 				}
 				else {
-					snprintf(dirbuf + strlen(dirbuf), sizeof(dirbuf) - strlen(dirbuf), "%s%s%s", *dirbuf ? ", " : "", color, lastroom);
+					safe_snprintf(dirbuf + strlen(dirbuf), sizeof(dirbuf) - strlen(dirbuf), "%s%s%s", *dirbuf ? ", " : "", color, lastroom);
 				}
 			}
 			
@@ -2629,16 +2629,16 @@ void screenread_one_dir(char_data *ch, room_data *origin, int dir, int max_dist)
 	
 	// check for lingering data to append
 	if (*lastroom) {
-		snprintf(color, sizeof(color), "\t%c", (++count % 2) ? 'w' : '0');
+		safe_snprintf(color, sizeof(color), "\t%c", (++count % 2) ? 'w' : '0');
 		if (repeats > 0) {
-			snprintf(dirbuf + strlen(dirbuf), sizeof(dirbuf) - strlen(dirbuf), "%s%s%dx %s", *dirbuf ? ", " : "", color, repeats+1, lastroom);
+			safe_snprintf(dirbuf + strlen(dirbuf), sizeof(dirbuf) - strlen(dirbuf), "%s%s%dx %s", *dirbuf ? ", " : "", color, repeats+1, lastroom);
 		}
 		else {
-			snprintf(dirbuf + strlen(dirbuf), sizeof(dirbuf) - strlen(dirbuf), "%s%s%s", *dirbuf ? ", " : "", color, lastroom);
+			safe_snprintf(dirbuf + strlen(dirbuf), sizeof(dirbuf) - strlen(dirbuf), "%s%s%s", *dirbuf ? ", " : "", color, lastroom);
 		}
 	}
 
-	snprintf(buf, sizeof(buf), "%s: %s\t0\r\n", dirs[get_direction_for_char(ch, dir)], dirbuf);
+	safe_snprintf(buf, sizeof(buf), "%s: %s\t0\r\n", dirs[get_direction_for_char(ch, dir)], dirbuf);
 	CAP(buf);
 	msg_to_char(ch, "%s", buf);
 }
@@ -2694,7 +2694,7 @@ char *screenread_one_tile(char_data *ch, room_data *origin, room_data *to_room, 
 		
 		// indicate if more vehicles can be seen
 		if (total_vehicles > 1) {
-			snprintf(multi_str, sizeof(multi_str), ", %+d", total_vehicles - 1);
+			safe_snprintf(multi_str, sizeof(multi_str), ", %+d", total_vehicles - 1);
 		}
 		else {
 			*multi_str = '\0';
@@ -2814,7 +2814,7 @@ void perform_mortal_where(char_data *ch, char *arg) {
 	command_lag(ch, WAIT_OTHER);
 
 	if (!*arg) {
-		msg_to_char(ch, "Players near you (%d tile%s)\r\n------------------------------\r\n", max_distance, PLURAL(max_distance));
+		build_page_display(ch, "Players near you (%d tile%s)\r\n------------------------------", max_distance, PLURAL(max_distance));
 		DL_FOREACH2(player_character_list, i, next_plr) {
 			if (IS_NPC(i) || ch == i || !IN_ROOM(i))
 				continue;
@@ -2838,17 +2838,18 @@ void perform_mortal_where(char_data *ch, char *arg) {
 			// we'll only show distance if they're not on the same location
 			if (GET_MAP_LOC(IN_ROOM(ch)) == GET_MAP_LOC(IN_ROOM(i))) {
 				// same map location:
-				msg_to_char(ch, "%-20s - %s%s\r\n", PERS(i, ch, FALSE), get_room_name(IN_ROOM(i), FALSE), (IN_ROOM(ch) == IN_ROOM(i)) ? " (here)" : "");
+				build_page_display(ch, "%-20s - %s%s", PERS(i, ch, FALSE), get_room_name(IN_ROOM(i), FALSE), (IN_ROOM(ch) == IN_ROOM(i)) ? " (here)" : "");
 			}
 			else {
 				// not the same map location -- show distance/coords:
 				dir_str = get_partial_direction_to(ch, IN_ROOM(ch), IN_ROOM(i), FALSE);
 				// dist already set for us
 			
-				msg_to_char(ch, "%-20s -%s %s, %d tile%s %s\r\n", PERS(i, ch, FALSE), coord_display_room(ch, IN_ROOM(i), TRUE), get_room_name(IN_ROOM(i), FALSE), dist, PLURAL(dist), (*dir_str ? dir_str : "away"));
+				build_page_display(ch, "%-20s -%s %s, %d tile%s %s", PERS(i, ch, FALSE), coord_display_room(ch, IN_ROOM(i), TRUE), get_room_name(IN_ROOM(i), FALSE), dist, PLURAL(dist), (*dir_str ? dir_str : "away"));
 			}
-			gain_player_tech_exp(ch, PTECH_WHERE_UPGRADE, 10);
 		}
+		gain_player_tech_exp(ch, PTECH_WHERE_UPGRADE, 10);
+		send_page_display(ch);
 	}
 	else {			/* print only FIRST char, not all. */
 		found = NULL;
@@ -2903,47 +2904,55 @@ void perform_mortal_where(char_data *ch, char *arg) {
 }
 
 
-void print_object_location(int num, obj_data *obj, char_data *ch, int recur) {
+/**
+* For the immortal 'where' function. This is called recursively when the obj
+* is inside another obj.
+*
+* As of b5.179, now puts the output of this function into the character's
+* page_display.
+*
+* @param int num Number to show for the 'where' display.
+* @param obj_data *obj The object to show.
+* @param char_data *ch The person viewing it (text goes to the page_display).
+* @param bool recur Whether or not to recursively show contents.
+*/
+void print_object_location(int num, obj_data *obj, char_data *ch, bool recur) {
+	struct page_display *line;
+	
 	if (num > 0) {
-		sprintf(buf, "O%3d. %-25s - ", num, GET_OBJ_DESC(obj, ch, OBJ_DESC_SHORT));
+		line = build_page_display(ch, "O%3d. %-25s - ", num, GET_OBJ_DESC(obj, ch, OBJ_DESC_SHORT));
 	}
 	else {
-		sprintf(buf, "%35s", " - ");
+		line = build_page_display(ch, "%35s", " - ");
 	}
 	
 	if (HAS_TRIGGERS(obj)) {
-		strcat(buf, "[TRIG] ");
+		append_page_display_line(line, "[TRIG] ");
 	}
 
 	if (IN_ROOM(obj)) {
-		sprintf(buf + strlen(buf), "[%d]%s %s\r\n",  GET_ROOM_VNUM(IN_ROOM(obj)), coord_display_room(ch, IN_ROOM(obj), TRUE), get_room_name(IN_ROOM(obj), FALSE));
-		send_to_char(buf, ch);
+		append_page_display_line(line, "[%d]%s %s",  GET_ROOM_VNUM(IN_ROOM(obj)), coord_display_room(ch, IN_ROOM(obj), TRUE), get_room_name(IN_ROOM(obj), FALSE));
 	}
 	else if (obj->carried_by) {
-		sprintf(buf + strlen(buf), "carried by %s\r\n", PERS(obj->carried_by, ch, 1));
-		send_to_char(buf, ch);
+		append_page_display_line(line, "carried by %s", PERS(obj->carried_by, ch, 1));
 	}
 	else if (obj->in_vehicle) {
-		sprintf(buf + strlen(buf), "inside %s%s\r\n", get_vehicle_short_desc(obj->in_vehicle, ch), recur ? ", which is" : " ");
+		append_page_display_line(line, "inside %s%s", get_vehicle_short_desc(obj->in_vehicle, ch), recur ? ", which is" : " ");
 		if (recur) {
-			sprintf(buf + strlen(buf), "%35s[%d]%s %s\r\n", " - ", GET_ROOM_VNUM(IN_ROOM(obj->in_vehicle)), coord_display_room(ch, IN_ROOM(obj->in_vehicle), TRUE), get_room_name(IN_ROOM(obj->in_vehicle), FALSE));
+			build_page_display(ch, "%35s[%d]%s %s", " - ", GET_ROOM_VNUM(IN_ROOM(obj->in_vehicle)), coord_display_room(ch, IN_ROOM(obj->in_vehicle), TRUE), get_room_name(IN_ROOM(obj->in_vehicle), FALSE));
 		}
-		send_to_char(buf, ch);
 	}
 	else if (obj->worn_by) {
-		sprintf(buf + strlen(buf), "worn by %s\r\n", PERS(obj->worn_by, ch, 1));
-		send_to_char(buf, ch);
+		append_page_display_line(line, "worn by %s", PERS(obj->worn_by, ch, 1));
 	}
 	else if (obj->in_obj) {
-		sprintf(buf + strlen(buf), "inside %s%s\r\n", GET_OBJ_DESC(obj->in_obj, ch, OBJ_DESC_SHORT), (recur ? ", which is" : " "));
-		send_to_char(buf, ch);
+		append_page_display_line(line, "inside %s%s", GET_OBJ_DESC(obj->in_obj, ch, OBJ_DESC_SHORT), (recur ? ", which is" : " "));
 		if (recur) {
 			print_object_location(0, obj->in_obj, ch, recur);
 		}
 	}
 	else {
-		sprintf(buf + strlen(buf), "in an unknown location\r\n");
-		send_to_char(buf, ch);
+		append_page_display_line(line, "in an unknown location\r\n");
 	}
 }
 
@@ -2954,6 +2963,7 @@ void perform_immort_where(char_data *ch, char *arg) {
 	vehicle_data *veh;
 	char_data *i;
 	obj_data *k;
+	struct page_display *line;
 
 	if (!*arg) {
 		send_to_char("Players\r\n-------\r\n", ch);
@@ -2962,33 +2972,31 @@ void perform_immort_where(char_data *ch, char *arg) {
 				i = (d->original ? d->original : d->character);
 				if (i && CAN_SEE(ch, i) && IN_ROOM(i) && WIZHIDE_OK(ch, i)) {
 					if (d->original) {
-						msg_to_char(ch, "%-20s - [%7d]%s %s (in %s)", GET_NAME(i), GET_ROOM_VNUM(IN_ROOM(i)), coord_display(ch, X_COORD(IN_ROOM(d->character)), Y_COORD(IN_ROOM(d->character)), TRUE), get_room_name(IN_ROOM(d->character), FALSE), GET_NAME(d->character));
+						line = build_page_display(ch, "%-20s - [%7d]%s %s (in %s)", GET_NAME(i), GET_ROOM_VNUM(IN_ROOM(i)), coord_display(ch, X_COORD(IN_ROOM(d->character)), Y_COORD(IN_ROOM(d->character)), TRUE), get_room_name(IN_ROOM(d->character), FALSE), GET_NAME(d->character));
 					}
 					else {
-						msg_to_char(ch, "%-20s - [%7d]%s %s", GET_NAME(i), GET_ROOM_VNUM(IN_ROOM(i)), coord_display(ch, X_COORD(IN_ROOM(i)), Y_COORD(IN_ROOM(i)), TRUE), get_room_name(IN_ROOM(i), FALSE));
+						line = build_page_display(ch, "%-20s - [%7d]%s %s", GET_NAME(i), GET_ROOM_VNUM(IN_ROOM(i)), coord_display(ch, X_COORD(IN_ROOM(i)), Y_COORD(IN_ROOM(i)), TRUE), get_room_name(IN_ROOM(i), FALSE));
 					}
 					
 					if (ROOM_INSTANCE(IN_ROOM(d->character))) {
-						msg_to_char(ch, " (%s)\r\n", GET_ADV_NAME(INST_ADVENTURE(ROOM_INSTANCE(IN_ROOM(d->character)))));
-					}
-					else {
-						send_to_char("\r\n", ch);
+						append_page_display_line(line, " (%s)", GET_ADV_NAME(INST_ADVENTURE(ROOM_INSTANCE(IN_ROOM(d->character)))));
 					}
 				}
 			}
 		}
+		send_page_display(ch);
 	}
 	else {
 		DL_FOREACH(character_list, i) {
 			if (CAN_SEE(ch, i) && IN_ROOM(i) && WIZHIDE_OK(ch, i) && (multi_isname(arg, GET_PC_NAME(i)) || match_char_name(ch, i, arg, MATCH_GLOBAL, NULL))) {
 				found = 1;
-				msg_to_char(ch, "M%3d. %-25s - %s[%7d]%s %s\r\n", ++num, GET_NAME(i), (IS_NPC(i) && HAS_TRIGGERS(i)) ? "[TRIG] " : "", GET_ROOM_VNUM(IN_ROOM(i)), coord_display(ch, X_COORD(IN_ROOM(i)), Y_COORD(IN_ROOM(i)), TRUE), get_room_name(IN_ROOM(i), FALSE));
+				build_page_display(ch, "M%3d. %-25s - %s[%7d]%s %s\r\n", ++num, GET_NAME(i), (IS_NPC(i) && HAS_TRIGGERS(i)) ? "[TRIG] " : "", GET_ROOM_VNUM(IN_ROOM(i)), coord_display(ch, X_COORD(IN_ROOM(i)), Y_COORD(IN_ROOM(i)), TRUE), get_room_name(IN_ROOM(i), FALSE));
 			}
 		}
 		DL_FOREACH(vehicle_list, veh) {
 			if (CAN_SEE_VEHICLE(ch, veh) && multi_isname(arg, VEH_KEYWORDS(veh))) {
 				found = 1;
-				msg_to_char(ch, "V%3d. %-25s - %s[%7d]%s %s\r\n", ++num, VEH_SHORT_DESC(veh), (HAS_TRIGGERS(veh) ? "[TRIG] " : ""), GET_ROOM_VNUM(IN_ROOM(veh)), coord_display(ch, X_COORD(IN_ROOM(veh)), Y_COORD(IN_ROOM(veh)), TRUE), get_room_name(IN_ROOM(veh), FALSE));
+				build_page_display(ch, "V%3d. %-25s - %s[%7d]%s %s\r\n", ++num, VEH_SHORT_DESC(veh), (HAS_TRIGGERS(veh) ? "[TRIG] " : ""), GET_ROOM_VNUM(IN_ROOM(veh)), coord_display(ch, X_COORD(IN_ROOM(veh)), Y_COORD(IN_ROOM(veh)), TRUE), get_room_name(IN_ROOM(veh), FALSE));
 			}
 		}
 		DL_FOREACH(object_list, k) {
@@ -2997,7 +3005,10 @@ void perform_immort_where(char_data *ch, char *arg) {
 				print_object_location(++num, k, ch, TRUE);
 			}
 		}
-		if (!found) {
+		if (found) {
+			send_page_display(ch);
+		}
+		else {
 			send_to_char("Couldn't find any such thing.\r\n", ch);
 		}
 	}
@@ -3036,7 +3047,7 @@ ACMD(do_exits) {
 	if (COMPLEX_DATA(room) && ROOM_IS_CLOSED(room)) {
 		for (ex = COMPLEX_DATA(room)->exits; ex; ex = ex->next) {
 			if ((to_room = ex->room_ptr) && !EXIT_FLAGGED(ex, EX_CLOSED)) {
-				snprintf(buf2, sizeof(buf2), "%s%s\r\n", (cmd != -1 ? " " : ""), CAP(exit_description(ch, to_room, dirs[get_direction_for_char(ch, ex->dir)])));
+				safe_snprintf(buf2, sizeof(buf2), "%s%s\r\n", (cmd != -1 ? " " : ""), CAP(exit_description(ch, to_room, dirs[get_direction_for_char(ch, ex->dir)])));
 				if (size + strlen(buf2) < sizeof(buf)) {
 					strcat(buf, buf2);
 					size += strlen(buf2);
@@ -3066,7 +3077,7 @@ ACMD(do_exits) {
 			}
 			
 			// append
-			snprintf(buf2, sizeof(buf2), "%s%s\r\n", (cmd != -1 ? " " : ""), CAP(exit_description(ch, to_room, dirs[get_direction_for_char(ch, dir)])));
+			safe_snprintf(buf2, sizeof(buf2), "%s%s\r\n", (cmd != -1 ? " " : ""), CAP(exit_description(ch, to_room, dirs[get_direction_for_char(ch, dir)])));
 			if (size + strlen(buf2) < sizeof(buf)) {
 				strcat(buf, buf2);
 				size += strlen(buf2);
@@ -3208,7 +3219,7 @@ ACMD(do_scan) {
 		}
 		else {
 			// anything else, we keep
-			snprintf(new_arg + strlen(new_arg), sizeof(new_arg) - strlen(new_arg), "%s%s", *new_arg ? " " : "", arg);
+			safe_snprintf(new_arg + strlen(new_arg), sizeof(new_arg) - strlen(new_arg), "%s%s", *new_arg ? " " : "", arg);
 		}
 	}
 	

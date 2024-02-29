@@ -230,7 +230,7 @@ ACMD(do_confer) {
 		
 		// messaging
 		if (ch == vict) {
-			snprintf(buf, sizeof(buf), "You confer your own strength into %s!", confer_list[type].name);
+			safe_snprintf(buf, sizeof(buf), "You confer your own strength into %s!", confer_list[type].name);
 			act(buf, FALSE, ch, NULL, NULL, TO_CHAR | ACT_BUFF);
 			// no message to room!
 		}

@@ -797,9 +797,9 @@ void resume_craft_vehicle(char_data *ch, vehicle_data *veh, craft_data *craft) {
 	GET_ACTION_VNUM(ch, 0) = GET_CRAFT_VNUM(craft);
 	GET_ACTION_VNUM(ch, 1) = VEH_CONSTRUCTION_ID(veh);
 	
-	snprintf(buf, sizeof(buf), "You resume %s $V.", gen_craft_data[GET_CRAFT_TYPE(craft)].verb);
+	safe_snprintf(buf, sizeof(buf), "You resume %s $V.", gen_craft_data[GET_CRAFT_TYPE(craft)].verb);
 	act(buf, FALSE, ch, NULL, veh, TO_CHAR | ACT_VEH_VICT);
-	snprintf(buf, sizeof(buf), "$n resumes %s $V.", gen_craft_data[GET_CRAFT_TYPE(craft)].verb);
+	safe_snprintf(buf, sizeof(buf), "$n resumes %s $V.", gen_craft_data[GET_CRAFT_TYPE(craft)].verb);
 	act(buf, FALSE, ch, NULL, veh, TO_ROOM | ACT_VEH_VICT);
 }
 
@@ -846,10 +846,10 @@ void show_craft_info(char_data *ch, char *argument, int craft_type) {
 			*buf = '\0';
 			
 			if (GET_BLD_EXTRA_ROOMS(bld) > 0) {
-				snprintf(buf + strlen(buf), sizeof(buf) - strlen(buf), "%s%d rooms", (*buf ? ", " : ""), GET_BLD_EXTRA_ROOMS(bld) + 1);
+				safe_snprintf(buf + strlen(buf), sizeof(buf) - strlen(buf), "%s%d rooms", (*buf ? ", " : ""), GET_BLD_EXTRA_ROOMS(bld) + 1);
 			}
 			if (GET_BLD_FAME(bld) > 0) {
-				snprintf(buf + strlen(buf), sizeof(buf) - strlen(buf), "%sfame: %d", (*buf ? ", " : ""), GET_BLD_FAME(bld));
+				safe_snprintf(buf + strlen(buf), sizeof(buf) - strlen(buf), "%sfame: %d", (*buf ? ", " : ""), GET_BLD_FAME(bld));
 			}
 			
 			// show building line
@@ -870,19 +870,19 @@ void show_craft_info(char_data *ch, char *argument, int craft_type) {
 			*buf = '\0';
 			
 			if (VEH_SIZE(veh) > 0) {
-				snprintf(buf + strlen(buf), sizeof(buf) - strlen(buf), "%s%d%% of tile", (*buf ? ", " : ""), VEH_SIZE(veh) * 100 / config_get_int("vehicle_size_per_tile"));
+				safe_snprintf(buf + strlen(buf), sizeof(buf) - strlen(buf), "%s%d%% of tile", (*buf ? ", " : ""), VEH_SIZE(veh) * 100 / config_get_int("vehicle_size_per_tile"));
 			}
 			if (VEH_MAX_ROOMS(veh) > 0) {
-				snprintf(buf + strlen(buf), sizeof(buf) - strlen(buf), "%s%d rooms", (*buf ? ", " : ""), VEH_MAX_ROOMS(veh) + 1);
+				safe_snprintf(buf + strlen(buf), sizeof(buf) - strlen(buf), "%s%d rooms", (*buf ? ", " : ""), VEH_MAX_ROOMS(veh) + 1);
 			}
 			if (VEH_ANIMALS_REQUIRED(veh) > 0) {
-				snprintf(buf + strlen(buf), sizeof(buf) - strlen(buf), "%srequires %d animal%s", (*buf ? ", " : ""), VEH_ANIMALS_REQUIRED(veh), PLURAL(VEH_ANIMALS_REQUIRED(veh)));
+				safe_snprintf(buf + strlen(buf), sizeof(buf) - strlen(buf), "%srequires %d animal%s", (*buf ? ", " : ""), VEH_ANIMALS_REQUIRED(veh), PLURAL(VEH_ANIMALS_REQUIRED(veh)));
 			}
 			if (VEH_FAME(veh) > 0) {
-				snprintf(buf + strlen(buf), sizeof(buf) - strlen(buf), "%sfame: %d", (*buf ? ", " : ""), VEH_FAME(veh));
+				safe_snprintf(buf + strlen(buf), sizeof(buf) - strlen(buf), "%sfame: %d", (*buf ? ", " : ""), VEH_FAME(veh));
 			}
 			if (VEH_FLAGGED(veh, MOVABLE_VEH_FLAGS)) {
-				snprintf(buf + strlen(buf), sizeof(buf) - strlen(buf), "%sspeed: %s", (*buf ? ", " : ""), vehicle_speed_types[VEH_SPEED_BONUSES(veh)]);
+				safe_snprintf(buf + strlen(buf), sizeof(buf) - strlen(buf), "%sspeed: %s", (*buf ? ", " : ""), vehicle_speed_types[VEH_SPEED_BONUSES(veh)]);
 			}
 			
 			// show vehicle line
@@ -1044,7 +1044,7 @@ void show_craft_info(char_data *ch, char *argument, int craft_type) {
 		msg_to_char(ch, "Build facing: %s\r\n", buf);
 	}
 	
-	show_resource_list(GET_CRAFT_RESOURCES(craft), buf);
+	show_resource_list(GET_CRAFT_RESOURCES(craft), buf, sizeof(buf));
 	msg_to_char(ch, "Resources: %s\r\n", buf);	
 	
 	if (IS_SET(GET_CRAFT_FLAGS(craft), CRAFT_LEARNED) && !has_learned_craft(ch, GET_CRAFT_VNUM(craft))) {
@@ -1439,13 +1439,13 @@ void process_gen_craft_vehicle(char_data *ch, craft_data *type) {
 			// copy this to display the next 1
 			temp_res = *VEH_NEEDS_RESOURCES(veh);
 			temp_res.next = NULL;
-			show_resource_list(&temp_res, buf);
+			show_resource_list(&temp_res, buf, sizeof(buf));
 			msg_to_char(ch, "You don't have %s and stop %s.\r\n", buf, gen_craft_data[GET_CRAFT_TYPE(type)].verb);
 		}
 		else {
 			msg_to_char(ch, "You run out of resources and stop %s.\r\n", gen_craft_data[GET_CRAFT_TYPE(type)].verb);
 		}
-		snprintf(buf, sizeof(buf), "$n runs out of resources and stops %s.", gen_craft_data[GET_CRAFT_TYPE(type)].verb);
+		safe_snprintf(buf, sizeof(buf), "$n runs out of resources and stops %s.", gen_craft_data[GET_CRAFT_TYPE(type)].verb);
 		act(buf, FALSE, ch, NULL, NULL, TO_ROOM);
 		end_action(ch);
 	}
@@ -1976,9 +1976,9 @@ void do_gen_craft_vehicle(char_data *ch, craft_data *type, int dir) {
 		}
 	}
 	
-	snprintf(buf, sizeof(buf), "You begin %s $V.", gen_craft_data[GET_CRAFT_TYPE(type)].verb);
+	safe_snprintf(buf, sizeof(buf), "You begin %s $V.", gen_craft_data[GET_CRAFT_TYPE(type)].verb);
 	act(buf, FALSE, ch, NULL, veh, TO_CHAR | ACT_VEH_VICT);
-	snprintf(buf, sizeof(buf), "$n begins %s $V.", gen_craft_data[GET_CRAFT_TYPE(type)].verb);
+	safe_snprintf(buf, sizeof(buf), "$n begins %s $V.", gen_craft_data[GET_CRAFT_TYPE(type)].verb);
 	act(buf, FALSE, ch, NULL, veh, TO_ROOM | ACT_VEH_VICT);
 	
 	process_gen_craft_vehicle(ch, type);
@@ -1988,7 +1988,7 @@ void do_gen_craft_vehicle(char_data *ch, craft_data *type, int dir) {
 
 // subcmd must be CRAFT_TYPE_
 ACMD(do_gen_craft) {
-	char temp_arg[MAX_INPUT_LENGTH], short_arg[MAX_INPUT_LENGTH], last_arg[MAX_INPUT_LENGTH], buf[MAX_STRING_LENGTH * 2], line[256];
+	char temp_arg[MAX_INPUT_LENGTH], short_arg[MAX_INPUT_LENGTH], last_arg[MAX_INPUT_LENGTH];
 	int count, timer, num = 1, dir = NO_DIR, wrong_cmd = NOTHING;
 	craft_data *craft, *next_craft, *type = NULL, *find_type = NULL, *abbrev_match = NULL, *abbrev_no_res = NULL, *multi_match = NULL, *multi_no_res = NULL;
 	vehicle_data *veh;
@@ -1996,7 +1996,6 @@ ACMD(do_gen_craft) {
 	obj_data *found_obj = NULL, *drinkcon = NULL;
 	any_vnum missing_abil = NO_ABIL;
 	ability_data *cft_abil;
-	size_t size, lsize;
 	
 	if (IS_NPC(ch)) {
 		msg_to_char(ch, "NPCs can't craft.\r\n");
@@ -2194,7 +2193,7 @@ ACMD(do_gen_craft) {
 	}
 	else if (!*arg || list_only) {	// main no-arg (or list-only): master craft list
 		// master craft list
-		size = snprintf(buf, sizeof(buf), "You know how to %s:\r\n", gen_craft_data[subcmd].command);
+		build_page_display(ch, "You know how to %s:", gen_craft_data[subcmd].command);
 		count = 0;
 		
 		HASH_ITER(sorted_hh, sorted_crafts, craft, next_craft) {
@@ -2223,52 +2222,18 @@ ACMD(do_gen_craft) {
 			// valid:
 			++count;
 			if (PRF_FLAGGED(ch, PRF_ROOMFLAGS)) {
-				lsize = snprintf(line, sizeof(line), "[%5d] %s", GET_CRAFT_VNUM(craft), GET_CRAFT_NAME(craft));
+				build_page_display_col(ch, 2, FALSE, " [%5d] %s", GET_CRAFT_VNUM(craft), GET_CRAFT_NAME(craft));
 			}
 			else {
-				lsize = snprintf(line, sizeof(line), "%s", GET_CRAFT_NAME(craft));
-			}
-			
-			// screenreader and non-screenreader add it differently
-			if (PRF_FLAGGED(ch, PRF_SCREEN_READER)) {
-				if (size + lsize + 2 < sizeof(buf)) {
-					strcat(buf, line);
-					strcat(buf, "\r\n");
-					size += lsize + 2;
-				}
-				else {
-					snprintf(buf + size, sizeof(buf) - size, "OVERFLOW\r\n");
-					break;
-				}
-			}
-			else {	// non-screenreader
-				if ((count % 2) && lsize <= 38 && (size + MAX(40, lsize)) < sizeof(buf)) {
-					// left column
-					size += snprintf(buf + size, sizeof(buf) - size, "%-38.38s ", line);
-				}
-				else if (size + lsize + 2 < sizeof(buf)) {
-					// right column or wide left column
-					strcat(buf, line);
-					strcat(buf, "\r\n");
-					size += lsize + 2;
-				}
-				else {
-					snprintf(buf + size, sizeof(buf) - size, "OVERFLOW\r\n");
-					break;
-				}
+				build_page_display_col(ch, 2, FALSE, " %s", GET_CRAFT_NAME(craft));
 			}
 		}	// end loop
 		if (!count) {
-			strcat(buf, " nothing\r\n");	// always room here
-		}
-		else if (!PRF_FLAGGED(ch, PRF_SCREEN_READER) && (count % 2)) {
-			strcat(buf, "\r\n");
+			build_page_display_str(ch, " nothing");
 		}
 		
 		// and show it
-		if (ch->desc) {
-			page_string(ch->desc, buf, TRUE);
-		}
+		send_page_display(ch);
 	}
 	else if (GET_ACTION(ch) != ACT_NONE) {
 		msg_to_char(ch, "You're busy right now.\r\n");
@@ -2417,7 +2382,7 @@ ACMD(do_learn) {
 	// seems ok!
 	else {
 		add_learned_craft(ch, GET_RECIPE_VNUM(obj));
-		snprintf(buf, sizeof(buf), "You commit $p to memory (%s command).", gen_craft_data[GET_CRAFT_TYPE(recipe)].command);
+		safe_snprintf(buf, sizeof(buf), "You commit $p to memory (%s command).", gen_craft_data[GET_CRAFT_TYPE(recipe)].command);
 		act(buf, FALSE, ch, obj, NULL, TO_CHAR);
 		act("$n commits $p to memory.", TRUE, ch, obj, NULL, TO_ROOM);
 		extract_obj(obj);
@@ -2425,16 +2390,13 @@ ACMD(do_learn) {
 }
 
 
-
-
-
 ACMD(do_learned) {
-	char output[MAX_STRING_LENGTH * 2], line[MAX_STRING_LENGTH], temp[256];
+	char line[MAX_STRING_LENGTH], temp[256];
 	struct player_craft_data *pcd, *next_pcd, *lists[2];
 	int l_pos, width, last_type;
-	bool is_emp, overflow, comma;
+	bool is_emp, comma;
 	craft_data *craft;
-	size_t size, l_size, count;
+	size_t l_size, count;
 	
 	if (IS_NPC(ch)) {
 		msg_to_char(ch, "Mobs never learn.\r\n");
@@ -2446,10 +2408,10 @@ ACMD(do_learned) {
 	
 	skip_spaces(&argument);
 	if (*argument) {
-		size = snprintf(output, sizeof(output), "Learned recipes matching '%s':\r\n", argument);
+		build_page_display(ch, "Learned recipes matching '%s':", argument);
 	}
 	else {
-		size = snprintf(output, sizeof(output), "Learned recipes:\r\n");
+		build_page_display_str(ch, "Learned recipes:");
 	}
 	
 	// detect width for how wide the lists can go
@@ -2457,12 +2419,11 @@ ACMD(do_learned) {
 	width = MIN(width, sizeof(line) - 2);
 	
 	// search 2 lists
-	overflow = FALSE;
 	count = 0;
 	lists[0] = GET_LEARNED_CRAFTS(ch);
 	lists[1] = GET_LOYALTY(ch) ? EMPIRE_LEARNED_CRAFTS(GET_LOYALTY(ch)) : NULL;
 	
-	for (l_pos = 0, is_emp = FALSE; l_pos < 2 && !overflow; ++l_pos, is_emp = TRUE) {
+	for (l_pos = 0, is_emp = FALSE; l_pos < 2; ++l_pos, is_emp = TRUE) {
 		last_type = -1;	// reset each loop
 		*line = '\0';
 		l_size = 0;
@@ -2484,17 +2445,9 @@ ACMD(do_learned) {
 			
 			// check start of line
 			if (last_type == -1 || last_type != GET_CRAFT_TYPE(craft)) {
-				// append line now
+				// append line now?
 				if (*line) {
-					if (size + strlen(line) + 12 < sizeof(output)) {
-						strcat(output, line);
-						strcat(output, "\r\n");
-						size += strlen(line) + 2;
-					}
-					else {
-						overflow = TRUE;
-						strcat(output, "OVERFLOW\r\n");	// 10 characters always reserved
-					}
+					build_page_display_str(ch, line);
 				}
 				
 				// prepare new line
@@ -2508,16 +2461,7 @@ ACMD(do_learned) {
 			
 			// check line limit
 			if (l_size + strlen(GET_CRAFT_NAME(craft)) + 3 > width) {
-				if (size + strlen(line) + 13 < sizeof(output)) {
-					strcat(output, line);
-					strcat(output, ",\r\n");
-					size += strlen(line) + 3;
-				}
-				else {
-					overflow = TRUE;
-					strcat(output, "OVERFLOW\r\n");	// 10 characters always reserved
-					break;
-				}
+				build_page_display(ch, "%s,", line);
 				l_size = snprintf(line, sizeof(line), "   %s", GET_CRAFT_NAME(craft));
 				comma = TRUE;
 			}
@@ -2529,25 +2473,15 @@ ACMD(do_learned) {
 		
 		// check for trailing text
 		if (*line) {
-			if (size + strlen(line) + 12 < sizeof(output)) {
-				strcat(output, line);
-				strcat(output, "\r\n");
-				size += strlen(line) + 2;
-			}
-			else {
-				overflow = TRUE;
-				strcat(output, "OVERFLOW\r\n");	// 10 characters always reserved
-			}
+			build_page_display_str(ch, line);
 		}
 	}
 	
 	if (!count) {
-		strcat(output, "  none\r\n");	// space reserved for this for sure
+		build_page_display_str(ch, "  none");
 	}
 	
-	if (ch->desc) {
-		page_string(ch->desc, output, TRUE);
-	}
+	send_page_display(ch);
 }
 
 
@@ -2727,7 +2661,7 @@ ACMD(do_rework) {
 			sprintf(buf2, "$n names %s%s $p!", GET_OBJ_SHORT_DESC(obj), shared_by(obj, ch));
 			
 			// rename keywords
-			snprintf(temp, sizeof(temp), "%s %s", fname(GET_OBJ_KEYWORDS(proto)), skip_filler(argument));
+			safe_snprintf(temp, sizeof(temp), "%s %s", fname(GET_OBJ_KEYWORDS(proto)), skip_filler(argument));
 			set_obj_keywords(obj, temp);
 			
 			// rename short desc

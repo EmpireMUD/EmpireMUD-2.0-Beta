@@ -1,4 +1,4 @@
-/* ************************************************************************
+	/* ************************************************************************
 *   File: act.quest.c                                     EmpireMUD 2.0b5 *
 *  Usage: commands related to questing                                    *
 *                                                                         *
@@ -544,10 +544,10 @@ char *show_daily_quest_line(char_data *ch) {
 	if (event_count > 0) {
 		event_amount = IS_NPC(ch) ? 0 : (config_get_int("dailies_per_day") - GET_EVENT_DAILY_QUESTS(ch));
 		if (event_amount > 0) {
-			snprintf(event_part, sizeof(event_part), " and %d more event %s", event_amount, event_amount != 1 ? "dailies" : "daily");
+			safe_snprintf(event_part, sizeof(event_part), " and %d more event %s", event_amount, event_amount != 1 ? "dailies" : "daily");
 		}
 		else {
-			snprintf(event_part, sizeof(event_part), " and no more event dailies");
+			safe_snprintf(event_part, sizeof(event_part), " and no more event dailies");
 		}
 	}
 	else {
@@ -581,13 +581,12 @@ char *show_daily_quest_line(char_data *ch) {
 * @param quest_data *qst The quest to show.
 */
 void show_quest_info(char_data *ch, quest_data *qst) {
-	char buf[MAX_STRING_LENGTH], *buf2, vstr[128], output[MAX_STRING_LENGTH * 3];
+	char buf[MAX_STRING_LENGTH], *buf2, vstr[128];
 	struct quest_giver *giver;
 	struct player_quest *pq;
 	struct player_completed_quest *pcq;
 	int complete, total;
 	struct string_hash *str_iter, *next_str, *str_hash = NULL;
-	size_t size;
 
 	pcq = has_completed_quest(ch, QUEST_VNUM(qst), NOTHING);
 	
@@ -599,29 +598,25 @@ void show_quest_info(char_data *ch, quest_data *qst) {
 	}
 	
 	pq = is_on_quest(ch, QUEST_VNUM(qst));
-	size = 0;
-	*output = '\0';
 	
 	// title
 	if (pq) {
 		count_quest_tasks(pq->tracker, &complete, &total);
-		size += snprintf(output + size, sizeof(output) - size, "%s%s%s\t0 (%d/%d task%s)\r\n", vstr, QUEST_LEVEL_COLOR(ch, qst), QUEST_NAME(qst), complete, total, PLURAL(total));
+		build_page_display(ch, "%s%s%s\t0 (%d/%d task%s)", vstr, QUEST_LEVEL_COLOR(ch, qst), QUEST_NAME(qst), complete, total, PLURAL(total));
 	}
 	else if (pcq) {
-		size += snprintf(output + size, sizeof(output) - size, "%s%s%s\t0 (completed)\r\n", vstr, QUEST_LEVEL_COLOR(ch, qst), QUEST_NAME(qst));
+		build_page_display(ch, "%s%s%s\t0 (completed)", vstr, QUEST_LEVEL_COLOR(ch, qst), QUEST_NAME(qst));
 	}
 	else {
-		size += snprintf(output + size, sizeof(output) - size, "%s%s%s\t0 (not on quest)\r\n", vstr, QUEST_LEVEL_COLOR(ch, qst), QUEST_NAME(qst));
+		build_page_display(ch, "%s%s%s\t0 (not on quest)", vstr, QUEST_LEVEL_COLOR(ch, qst), QUEST_NAME(qst));
 	}
 	
-	size += snprintf(output + size, sizeof(output) - size, "%s", NULLSAFE(QUEST_DESCRIPTION(qst)));
+	build_page_display_str(ch, NULLSAFE(QUEST_DESCRIPTION(qst)));
 	
 	// tracker
 	if (pq) {
-		get_tracker_display(pq->tracker, buf);
-		if (*buf) {
-			size += snprintf(output + size, sizeof(output) - size, "Quest Tracker:\r\n%s", buf);
-		}
+		build_page_display_str(ch, "Quest Tracker:");
+		show_tracker_display(ch, pq->tracker, FALSE);
 	}
 	
 	// show quest giver: use a string hash to remove duplicates
@@ -655,37 +650,23 @@ void show_quest_info(char_data *ch, quest_data *qst) {
 			free(buf2);
 		}
 		
-		size += snprintf(output + size, sizeof(output) - size, "Turn in at: %s%s\r\n", buf, QUEST_FLAGGED(qst, QST_IN_CITY_ONLY) ? " (in-city only)" : "");
+		build_page_display(ch, "Turn in at: %s%s", buf, QUEST_FLAGGED(qst, QST_IN_CITY_ONLY) ? " (in-city only)" : "");
 	}
 	
 	if (QUEST_FLAGGED(qst, QST_GROUP_COMPLETION)) {
-		size += snprintf(output + size, sizeof(output) - size, "Group completion: This quest will auto-complete if any member of your group completes it while you're present.\r\n");
+		build_page_display_str(ch, "Group completion: This quest will auto-complete if any member of your group completes it while you're present.");
 	}
 	
 	// completed AND not on it again?
 	if (pcq && !pq) {
-		size += snprintf(output + size, sizeof(output) - size, "--\r\n%s", NULLSAFE(QUEST_COMPLETE_MSG(qst)));
-		get_quest_reward_display(QUEST_REWARDS(qst), buf, FALSE);
-		if (*buf) {
-			size += snprintf(output + size, sizeof(output) - size, "Quest Rewards:\r\n%s", buf);
+		build_page_display(ch, "--\r\n%s", NULLSAFE(QUEST_COMPLETE_MSG(qst)));
+		if (QUEST_REWARDS(qst)) {
+			build_page_display_str(ch, "Quest Rewards:");
+			show_quest_reward_display(ch, QUEST_REWARDS(qst), FALSE, FALSE);
 		}
 	}
 	
-	if (ch->desc) {
-		page_string(ch->desc, output, TRUE);
-	}
-}
-
-
-/**
-* @param char_data *ch The person to show to.
-* @param struct player_quest *pq The quest to show the tracker for.
-*/
-void show_quest_tracker(char_data *ch, struct player_quest *pq) {
-	char buf[MAX_STRING_LENGTH];
-	
-	get_tracker_display(pq->tracker, buf);
-	msg_to_char(ch, "Quest Tracker:\r\n%s", buf);
+	send_page_display(ch);
 }
 
 
@@ -712,7 +693,7 @@ void start_quest(char_data *ch, quest_data *qst, struct instance_data *inst) {
 	
 	// pre-reqs are already checked for us
 	msg_to_char(ch, "You start %s%s\t0:\r\n%s", QUEST_LEVEL_COLOR(ch, qst), QUEST_NAME(qst), NULLSAFE(QUEST_DESCRIPTION(qst)));
-	snprintf(buf, sizeof(buf), "$n starts %s.", QUEST_NAME(qst));
+	safe_snprintf(buf, sizeof(buf), "$n starts %s.", QUEST_NAME(qst));
 	act(buf, TRUE, ch, NULL, NULL, TO_ROOM);
 	
 	// set up data
@@ -739,21 +720,17 @@ void start_quest(char_data *ch, quest_data *qst, struct instance_data *inst) {
 //// QUEST SUBCOMMANDS ///////////////////////////////////////////////////////
 
 QCMD(qcmd_completed) {
-	char buf[MAX_STRING_LENGTH];
 	struct player_completed_quest *pcq, *next_pcq;
-	size_t size;
 	
 	// sort now
 	HASH_SORT(GET_COMPLETED_QUESTS(ch), sort_completed_quests_by_timestamp);
 	
-	size = snprintf(buf, sizeof(buf), "Completed quests:\r\n");
+	build_page_display(ch, "Completed quests:");
 	HASH_ITER(hh, GET_COMPLETED_QUESTS(ch), pcq, next_pcq) {
-		size += snprintf(buf + size, sizeof(buf) - size, "  %s\r\n", get_quest_name_by_proto(pcq->vnum));
+		build_page_display(ch, " %s", get_quest_name_by_proto(pcq->vnum));
 	}
 	
-	if (ch->desc) {
-		page_string(ch->desc, buf, TRUE);
-	}
+	send_page_display(ch);
 }
 
 
@@ -904,14 +881,13 @@ QCMD(qcmd_finish) {
 
 
 QCMD(qcmd_group) {
-	char buf[MAX_STRING_LENGTH], line[MAX_STRING_LENGTH];
+	char line[MAX_STRING_LENGTH];
 	struct group_member_data *mem;
 	struct player_quest *pq, *fq;
 	quest_data *proto;
 	char_data *friend;
 	int count, total;
 	bool any, have;
-	size_t size;
 	
 	if (!GROUP(ch)) {
 		msg_to_char(ch, "You are not in a group.\r\n");
@@ -922,7 +898,7 @@ QCMD(qcmd_group) {
 		return;
 	}
 	
-	size = snprintf(buf, sizeof(buf), "Quests in common with your group:\r\n");
+	build_page_display(ch, "Quests in common with your group:");
 	have = FALSE;
 	LL_FOREACH(GET_QUESTS(ch), pq) {
 		any = FALSE;
@@ -934,7 +910,7 @@ QCMD(qcmd_group) {
 			
 			if (!IS_NPC(friend) && friend != ch && (fq = is_on_quest(friend, pq->vnum))) {
 				count_quest_tasks(fq->tracker, &count, &total);
-				snprintf(line + strlen(line), sizeof(line) - strlen(line), "%s%s (%d/%d)", (any ? ", " : ""), GET_NAME(friend), count, total);
+				safe_snprintf(line + strlen(line), sizeof(line) - strlen(line), "%s%s (%d/%d)", (any ? ", " : ""), GET_NAME(friend), count, total);
 				any = TRUE;
 			}
 		}
@@ -942,18 +918,16 @@ QCMD(qcmd_group) {
 		if (any && *line) {
 			have = TRUE;
 			if ((proto = quest_proto(pq->vnum))) {
-				size += snprintf(buf + size, sizeof(buf) - size, "  %s%s\t0: %s\r\n", QUEST_LEVEL_COLOR(ch, proto), QUEST_NAME(proto), line);
+				build_page_display(ch, " %s%s\t0: %s", QUEST_LEVEL_COLOR(ch, proto), QUEST_NAME(proto), line);
 			}
 		}
 	}
 	
 	if (!have) {
-		size += snprintf(buf + size, sizeof(buf) - size, "  none\r\n");
+		build_page_display_str(ch, " none");
 	}
 	
-	if (ch->desc) {
-		page_string(ch->desc, buf, TRUE);
-	}
+	send_page_display(ch);
 }
 
 
@@ -977,12 +951,11 @@ QCMD(qcmd_info) {
 
 
 QCMD(qcmd_list) {
-	char buf[MAX_STRING_LENGTH], vstr[128], typestr[128];
+	char vstr[128], typestr[128];
 	struct quest_temp_list *quest_list = NULL, *qtl;
 	struct player_quest *pq;
 	quest_data *proto;
 	int count, total;
-	size_t size;
 	
 	if (!GET_QUESTS(ch)) {
 		msg_to_char(ch, "You aren't on any quests.\r\n");
@@ -995,7 +968,7 @@ QCMD(qcmd_list) {
 		return;
 	}
 	
-	size = snprintf(buf, sizeof(buf), "Your quests:\r\n");
+	build_page_display(ch, "Your quests:");
 	LL_FOREACH(GET_QUESTS(ch), pq) {
 		count_quest_tasks(pq->tracker, &count, &total);
 		if ((proto = quest_proto(pq->vnum))) {
@@ -1007,37 +980,35 @@ QCMD(qcmd_list) {
 			}
 			
 			if (IS_EVENT_DAILY(proto)) {
-				snprintf(typestr, sizeof(typestr), "; event daily");
+				safe_snprintf(typestr, sizeof(typestr), "; event daily");
 			}
 			else if (IS_DAILY_QUEST(proto)) {
-				snprintf(typestr, sizeof(typestr), "; daily");
+				safe_snprintf(typestr, sizeof(typestr), "; daily");
 			}
 			else if (IS_EVENT_QUEST(proto)) {
-				snprintf(typestr, sizeof(typestr), "; event");
+				safe_snprintf(typestr, sizeof(typestr), "; event");
 			}
 			else {
 				*typestr = '\0';
 			}
 			
-			size += snprintf(buf + size, sizeof(buf) - size, "  %s%s%s\t0 (%d/%d task%s%s)\r\n", vstr, QUEST_LEVEL_COLOR(ch, proto), QUEST_NAME(proto), count, total, PLURAL(total), typestr);
+			build_page_display(ch, "  %s%s%s\t0 (%d/%d task%s%s)", vstr, QUEST_LEVEL_COLOR(ch, proto), QUEST_NAME(proto), count, total, PLURAL(total), typestr);
 		}
 	}
 	
 	// show dailies status, too
-	size += snprintf(buf + size, sizeof(buf) - size, "%s\r\n", show_daily_quest_line(ch));
+	build_page_display_str(ch, show_daily_quest_line(ch));
 	
 	// any quests available here?
 	quest_list = build_available_quest_list(ch);
 	if (quest_list) {
 		count = 0;
 		LL_COUNT(quest_list, qtl, count);
-		size += snprintf(buf + size, sizeof(buf) - size, "There are %d quest%s available here%s.\r\n", count, PLURAL(count), PRF_FLAGGED(ch, PRF_NO_TUTORIALS) ? "" : " (type 'start' to see them)");
+		build_page_display(ch, "There are %d quest%s available here%s.", count, PLURAL(count), PRF_FLAGGED(ch, PRF_NO_TUTORIALS) ? "" : " (type 'start' to see them)");
 	}
 	free_quest_temp_list(quest_list);
 	
-	if (ch->desc) {
-		page_string(ch->desc, buf, TRUE);
-	}
+	send_page_display(ch);
 }
 
 
@@ -1088,7 +1059,7 @@ QCMD(qcmd_share) {
 		any = TRUE;
 		add_offer(friend, ch, OFFER_QUEST, pq->vnum);
 		act("You offer to share '$t' with $N.", FALSE, ch, QUEST_NAME(qst), friend, TO_CHAR | ACT_STR_OBJ);
-		snprintf(buf, sizeof(buf), "$o offers to share the quest %s%s\t0 with you (use 'accept/reject quest').", QUEST_LEVEL_COLOR(friend, qst), QUEST_NAME(qst));
+		safe_snprintf(buf, sizeof(buf), "$o offers to share the quest %s%s\t0 with you (use 'accept/reject quest').", QUEST_LEVEL_COLOR(friend, qst), QUEST_NAME(qst));
 		act(buf, FALSE, ch, QUEST_NAME(qst), friend, TO_VICT | ACT_STR_OBJ);
 	}
 	
@@ -1136,13 +1107,13 @@ QCMD(qcmd_start) {
 			}
 			
 			if (IS_EVENT_DAILY(qtl->quest)) {
-				snprintf(typestr, sizeof(typestr), " (event daily)");
+				safe_snprintf(typestr, sizeof(typestr), " (event daily)");
 			}
 			else if (IS_DAILY_QUEST(qtl->quest)) {
-				snprintf(typestr, sizeof(typestr), " (daily)");
+				safe_snprintf(typestr, sizeof(typestr), " (daily)");
 			}
 			else if (IS_EVENT_QUEST(qtl->quest)) {
-				snprintf(typestr, sizeof(typestr), " (event)");
+				safe_snprintf(typestr, sizeof(typestr), " (event)");
 			}
 			else {
 				*typestr = '\0';
@@ -1239,7 +1210,9 @@ QCMD(qcmd_tracker) {
 		msg_to_char(ch, "You don't seem to be on a quest called '%s' here.\r\n", argument);
 	}
 	else {
-		show_quest_tracker(ch, pq);
+		build_page_display(ch, "%s Tracker:", QUEST_NAME(qst));
+		show_tracker_display(ch, pq->tracker, FALSE);
+		send_page_display(ch);
 	}
 }
 
@@ -1350,7 +1323,7 @@ ACMD(do_finish) {
 	// pass-thru to "quest finish <args>"
 	char temp[MAX_INPUT_LENGTH];
 	skip_spaces(&argument);
-	snprintf(temp, sizeof(temp), "finish %s", argument);
+	safe_snprintf(temp, sizeof(temp), "finish %s", argument);
 	do_quest(ch, temp, 0, 0);
 }
 
@@ -1359,6 +1332,6 @@ ACMD(do_start) {
 	// pass-thru to "quest start <args>"
 	char temp[MAX_INPUT_LENGTH];
 	skip_spaces(&argument);
-	snprintf(temp, sizeof(temp), "start %s", argument);
+	safe_snprintf(temp, sizeof(temp), "start %s", argument);
 	do_quest(ch, temp, 0, 0);
 }
