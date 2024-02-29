@@ -7872,7 +7872,10 @@ void run_ability_hooks(char_data *ch, bitvector_t hook_type, any_vnum hook_value
 	vehicle_data *use_veh;
 	struct ability_exec *data;
 	struct player_ability_data *plab, *next_plab;
-	struct vnum_hash **use_limiter = NULL, *my_limiter = NULL;
+	struct vnum_hash **use_limiter = NULL;
+	
+	// this is static because it's saved, briefly, to the player (for passing around)
+	static struct vnum_hash *my_limiter = NULL;
 	
 	if (IS_NPC(ch) || IS_DEAD(ch) || EXTRACTED(ch)) {
 		return;
