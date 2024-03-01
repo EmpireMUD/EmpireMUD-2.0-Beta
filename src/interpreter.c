@@ -1602,9 +1602,7 @@ ACMD(do_missing_help_files) {
 	ability_data *abil, *next_abil;
 	skill_data *skill, *next_skill;
 	int iter, count;
-	char lbuf[MAX_STRING_LENGTH * 2];
 	
-	*lbuf = 0;
 	count = 0;
 	
 	// commands:
@@ -1613,10 +1611,8 @@ ACMD(do_missing_help_files) {
 			found = find_help_entry(LVL_TOP, cmd_info[iter].command);
 		
 			if (!found) {
-				sprintf(lbuf, "%s %-19.19s", lbuf, cmd_info[iter].command);
-				if ((++count % 4) == 0) {
-					strcat(lbuf, "\r\n");
-				}
+				++count;
+				build_page_display_col_str(ch, 4, FALSE, cmd_info[iter].command);
 			}
 		}
 	}
@@ -1631,16 +1627,12 @@ ACMD(do_missing_help_files) {
 		}
 		
 		if (!find_help_entry(LVL_TOP, SKILL_NAME(skill))) {
-			sprintf(lbuf, "%s %-19.19s", lbuf, SKILL_NAME(skill));
-			if ((++count % 4) == 0) {
-				strcat(lbuf, "\r\n");
-			}
+			++count;
+			build_page_display_col_str(ch, 4, FALSE, SKILL_NAME(skill));
 		}
 		if (SKILL_ABBREV(skill) && *SKILL_ABBREV(skill) && !find_help_entry(LVL_TOP, SKILL_ABBREV(skill))) {
-			sprintf(lbuf, "%s %-19.19s", lbuf, SKILL_ABBREV(skill));
-			if ((++count % 4) == 0) {
-				strcat(lbuf, "\r\n");
-			}
+			++count;
+			build_page_display_col_str(ch, 4, FALSE, SKILL_ABBREV(skill));
 		}
 	}
 	
@@ -1654,29 +1646,22 @@ ACMD(do_missing_help_files) {
 		}
 		
 		if (!find_help_entry(LVL_TOP, ABIL_NAME(abil))) {
-			sprintf(lbuf, "%s %-19.19s", lbuf, ABIL_NAME(abil));
-			if ((++count % 4) == 0) {
-				strcat(lbuf, "\r\n");
-			}
+			++count;
+			build_page_display_col_str(ch, 4, FALSE, ABIL_NAME(abil));
 		}
 		if (ABIL_COMMAND(abil) && *ABIL_COMMAND(abil) && str_cmp(ABIL_COMMAND(abil), ABIL_NAME(abil)) && !find_help_entry(LVL_TOP, ABIL_COMMAND(abil))) {
-			sprintf(lbuf, "%s %-19.19s", lbuf, ABIL_COMMAND(abil));
-			if ((++count % 4) == 0) {
-				strcat(lbuf, "\r\n");
-			}
+			++count;
+			build_page_display_col_str(ch, 4, FALSE, ABIL_COMMAND(abil));
 		}
 	}
 	
-	// possible need for trailing crlf
-	if ((count % 4) != 0) {
-		strcat(lbuf, "\r\n");
-	}
-	
-	if (strlen(lbuf) == 0) {
+	if (count == 0) {
 		msg_to_char(ch, "Everything appears to have help files (but some may just be abbreviations).\r\n");
+		clear_page_display(ch);	// should be empty, but this is the Justin Case
 	}
 	else {
-		msg_to_char(ch, "The following things need help files:\r\n%s", lbuf);
+		build_page_display_prepend(ch, "The following things need help files:");
+		send_page_display(ch);
 	}
 }
 

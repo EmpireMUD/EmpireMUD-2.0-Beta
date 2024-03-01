@@ -2666,6 +2666,7 @@ int partial_who(char_data *ch, char *name_search, int low, int high, empire_data
 		entry->role = GET_CLASS_ROLE(tch);
 		entry->string = str_dup(one_who_line(tch, shortlist, PRF_FLAGGED(ch, PRF_SCREEN_READER)));
 		LL_PREPEND(list, entry);
+		++count;
 	}
 	
 	// sort entries
@@ -2673,8 +2674,6 @@ int partial_who(char_data *ch, char *name_search, int low, int high, empire_data
 	
 	// iterate over entries
 	LL_FOREACH_SAFE(list, entry, next_entry) {
-		++count;
-		
 		// found a player: ensure header
 		if (!header) {
 			// title line

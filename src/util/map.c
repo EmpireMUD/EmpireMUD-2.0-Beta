@@ -1223,6 +1223,10 @@ void add_lake_river(struct island_data *isle) {
 				
 				to = shift(room, hor, ver);
 				
+				if (to == -1) {
+					continue;	// no location?
+				}
+				
 				if (grid[to].type == MOUNTAIN && (hor == -1 || hor == 2 || ver == -1 || ver == 2)) {
 					continue;	// skinnier river through mountains
 				}
