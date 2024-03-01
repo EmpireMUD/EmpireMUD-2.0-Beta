@@ -1835,7 +1835,7 @@ void show_character_affects_full(char_data *ch, char_data *to, bool show_conditi
 		safe_snprintf(start, sizeof(start), "You are");
 	}
 	else {
-		safe_snprintf(start, sizeof(start), "%s is", HSSH(ch));
+		safe_snprintf(start, sizeof(start), "&Z%s is", HSSH(ch));
 	}
 	
 	// Conditions: (optionally)
@@ -1888,7 +1888,7 @@ void show_character_affects_full(char_data *ch, char_data *to, bool show_conditi
 		build_page_display(to, "   %s riding %s.", start, get_mob_name_by_proto(GET_MOUNT_VNUM(ch), TRUE));
 	}
 	else if (has_player_tech(ch, PTECH_RIDING) && GET_MOUNT_VNUM(ch) != NOTHING && mob_proto(GET_MOUNT_VNUM(ch))) {
-		build_page_display(to, "   %s %s %s. Type 'mount' to ride it.", (ch == to ? "You" : HSHR(ch)), (ch == to ? "have" : "has"), get_mob_name_by_proto(GET_MOUNT_VNUM(ch), TRUE));
+		build_page_display(to, "   &Z%s %s %s. Type 'mount' to ride it.", (ch == to ? "You" : HSSH(ch)), (ch == to ? "have" : "has"), get_mob_name_by_proto(GET_MOUNT_VNUM(ch), TRUE));
 	}
 
 	/* Morph */
