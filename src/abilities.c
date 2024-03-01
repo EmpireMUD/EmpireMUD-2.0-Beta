@@ -6257,11 +6257,11 @@ void send_ability_immune_messages(char_data *ch, char_data *vict, ability_data *
 * @param obj_data *ovict The targeted object, if any (or NULL).
 * @param vehicle_data *vvict The targeted vehicle (NULL if none).
 * @param ability_data *abil The ability.
-* @param int use_pos The current message position.
+* @param int use_pos The current message position (starting with 0).
 * @param struct ability_exec *data The execution info for the ability (may be NULL).
 */
 void send_ability_over_time_messages(char_data *ch, char_data *vict, obj_data *ovict, vehicle_data *vvict, ability_data *abil, int use_pos, struct ability_exec *data) {
-	bool any, invis;
+	bool any, invis, num_msgs;
 	char *msg;
 	
 	bitvector_t act_flags = NOBITS;
@@ -6273,11 +6273,20 @@ void send_ability_over_time_messages(char_data *ch, char_data *vict, obj_data *o
 		return;
 	}
 	
+	// determine message count
+	if ((vict && vict != ch) || ovict || vvict) {
+		num_msgs = count_custom_messages(ABIL_CUSTOM_MSGS(abil), ABIL_CUSTOM_OVER_TIME_TARG_TO_CHAR);
+	}
+	else {
+		num_msgs = count_custom_messages(ABIL_CUSTOM_MSGS(abil), ABIL_CUSTOM_OVER_TIME_SELF_TO_CHAR);
+	}
+	
+	// var setup
 	any = FALSE;
 	invis = ABILITY_FLAGGED(abil, ABILF_INVISIBLE) ? TRUE : FALSE;
 	act_flags |= IS_SET(ABIL_TYPES(abil), ABILT_BUFF) ? ACT_BUFF : NOBITS;
 	act_flags |= IS_SET(ABIL_TYPES(abil), ABILT_RESTORE) ? ACT_HEAL : ACT_ABILITY;
-	act_flags |= (!ABILITY_FLAGGED(abil, ABILF_VIOLENT) && use_pos > 0) ? TO_SPAMMY : NOBITS;
+	act_flags |= (!ABILITY_FLAGGED(abil, ABILF_VIOLENT) && use_pos > 0 && use_pos < (num_msgs-1)) ? TO_SPAMMY : NOBITS;
 	
 	if (vict || (!vict && !ovict && !vvict)) {	// messaging with char target or no target
 		if (ch == vict || (!vict && !ovict && !vvict)) {	// message: targeting self
