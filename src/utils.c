@@ -2073,6 +2073,7 @@ char *any_one_word(char *argument, char *first_arg) {
 void chop_last_arg(char *string, char *most_args, char *last_arg) {
 	int end_pos;
 	
+	skip_spaces(&string);
 	*most_args = *last_arg = '\0';
 	
 	if (!string || !*string) {
