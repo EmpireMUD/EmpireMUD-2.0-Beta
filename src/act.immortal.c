@@ -7855,14 +7855,14 @@ ACMD(do_slay) {
 		else {
 			if (ch == vict) {
 				syslog(SYS_GC | SYS_DEATH, GET_INVIS_LEV(ch), TRUE, "ABUSE: %s has slain %sself at %s", GET_REAL_NAME(ch), HMHR(ch), room_log_identifier(IN_ROOM(vict)));
-				log_to_slash_channel_by_name(DEATH_LOG_CHANNEL, NULL, "%s has been slain at (%d, %d)", PERS(vict, vict, TRUE), X_COORD(IN_ROOM(vict)), Y_COORD(IN_ROOM(vict)));
+				log_to_slash_channel_by_name(DEATH_LOG_CHANNEL, NULL, "%s has been slain at%s", PERS(vict, vict, TRUE), coord_display_room(NULL, IN_ROOM(vict), FALSE));
 				act("You slay yourself!", FALSE, ch, NULL, NULL, TO_CHAR | DG_NO_TRIG);
 				act("$n slays $mself!", FALSE, ch, NULL, NULL, TO_ROOM | DG_NO_TRIG);
 			}
 			else {
 				if (!IS_NPC(vict)) {
 					syslog(SYS_GC | SYS_DEATH, GET_INVIS_LEV(ch), TRUE, "ABUSE: %s has slain %s at %s", GET_REAL_NAME(ch), GET_REAL_NAME(vict), room_log_identifier(IN_ROOM(vict)));
-					log_to_slash_channel_by_name(DEATH_LOG_CHANNEL, NULL, "%s has been slain at (%d, %d)", PERS(vict, vict, TRUE), X_COORD(IN_ROOM(vict)), Y_COORD(IN_ROOM(vict)));
+					log_to_slash_channel_by_name(DEATH_LOG_CHANNEL, NULL, "%s has been slain at%s", PERS(vict, vict, TRUE), coord_display_room(NULL, IN_ROOM(vict), FALSE));
 				}
 				
 				act("You chop $M to pieces! Ah! The blood!", FALSE, ch, NULL, vict, TO_CHAR | DG_NO_TRIG);

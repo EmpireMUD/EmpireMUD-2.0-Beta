@@ -617,7 +617,7 @@ WCMD(do_wslay) {
 			}
 			else {
 				// basic death log
-				log_to_slash_channel_by_name(DEATH_LOG_CHANNEL, vict, "%s has died at (%d, %d)!", PERS(vict, vict, TRUE), X_COORD(IN_ROOM(vict)), Y_COORD(IN_ROOM(vict)));
+				log_to_slash_channel_by_name(DEATH_LOG_CHANNEL, vict, "%s has died at%s!", PERS(vict, vict, TRUE), coord_display_room(NULL, IN_ROOM(vict), FALSE));
 			}
 			syslog(SYS_DEATH, 0, TRUE, "DEATH: %s has been killed by a script at %s (room %d, rmt %d, bld %d)", GET_NAME(vict), room_log_identifier(IN_ROOM(vict)), GET_ROOM_VNUM(room), GET_ROOM_TEMPLATE(room) ? GET_RMT_VNUM(GET_ROOM_TEMPLATE(room)) : -1, GET_BUILDING(room) ? GET_BLD_VNUM(GET_BUILDING(room)) : -1);
 		}

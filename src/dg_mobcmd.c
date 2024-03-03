@@ -2137,7 +2137,7 @@ ACMD(do_mslay) {
 			}
 			else {
 				// basic death log
-				log_to_slash_channel_by_name(DEATH_LOG_CHANNEL, vict, "%s has died at (%d, %d)!", PERS(vict, vict, TRUE), X_COORD(IN_ROOM(vict)), Y_COORD(IN_ROOM(vict)));
+				log_to_slash_channel_by_name(DEATH_LOG_CHANNEL, vict, "%s has died at%s!", PERS(vict, vict, TRUE), coord_display_room(NULL, IN_ROOM(vict), FALSE));
 			}
 			syslog(SYS_DEATH, 0, TRUE, "DEATH: %s has been killed by a script at %s (mob %d)", GET_NAME(vict), room_log_identifier(IN_ROOM(vict)), GET_MOB_VNUM(ch));
 		}
