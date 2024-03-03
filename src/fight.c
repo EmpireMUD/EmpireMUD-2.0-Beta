@@ -1562,24 +1562,31 @@ obj_data *make_corpse(char_data *ch) {
 		SET_BIT(GET_OBJ_EXTRA(corpse), OBJ_GROUP_DROP);
 	}
 	
-	if (human) {
-		sprintf(kws, "%s %s %s", GET_OBJ_KEYWORDS(corpse), skip_filler(PERS(ch, ch, FALSE)), size_data[size].corpse_keywords);
-		sprintf(shortdesc, "%s's body", PERS(ch, ch, FALSE));
-		safe_snprintf(longdesc, sizeof(longdesc), size_data[size].body_long_desc, PERS(ch, ch, FALSE));
-		CAP(longdesc);
+	// restrings?
+	if (GET_OBJ_VNUM(corpse) == o_CORPSE) {
+		// default corpse: set all strings
+		if (human) {
+			sprintf(kws, "%s %s %s", GET_OBJ_KEYWORDS(corpse), skip_filler(PERS(ch, ch, FALSE)), size_data[size].corpse_keywords);
+			sprintf(shortdesc, "%s's body", PERS(ch, ch, FALSE));
+			safe_snprintf(longdesc, sizeof(longdesc), size_data[size].body_long_desc, PERS(ch, ch, FALSE));
+			CAP(longdesc);
+		}
+		else {
+			sprintf(kws, "%s %s %s", GET_OBJ_KEYWORDS(corpse), skip_filler(PERS(ch, ch, FALSE)), size_data[size].corpse_keywords);
+			sprintf(shortdesc, "the corpse of %s", PERS(ch, ch, FALSE));
+			safe_snprintf(longdesc, sizeof(longdesc), size_data[size].corpse_long_desc, PERS(ch, ch, FALSE));
+			CAP(longdesc);
+		}
+		
+		// set strings
+		set_obj_keywords(corpse, kws);
+		set_obj_short_desc(corpse, shortdesc);
+		set_obj_long_desc(corpse, longdesc);
 	}
 	else {
-		sprintf(kws, "%s %s %s", GET_OBJ_KEYWORDS(corpse), skip_filler(PERS(ch, ch, FALSE)), size_data[size].corpse_keywords);
-		sprintf(shortdesc, "the corpse of %s", PERS(ch, ch, FALSE));
-		safe_snprintf(longdesc, sizeof(longdesc), size_data[size].corpse_long_desc, PERS(ch, ch, FALSE));
-		CAP(longdesc);
+		// custom corpse: add replacements?
 	}
 	
-	// set strings
-	set_obj_keywords(corpse, kws);
-	set_obj_short_desc(corpse, shortdesc);
-	set_obj_long_desc(corpse, longdesc);
-
 	set_obj_val(corpse, VAL_CORPSE_IDNUM, IS_NPC(ch) ? GET_MOB_VNUM(ch) : (-1 * GET_IDNUM(ch)));
 	set_obj_val(corpse, VAL_CORPSE_SIZE, size);
 	set_obj_val(corpse, VAL_CORPSE_FLAGS, (MOB_FLAGGED(ch, MOB_NO_LOOT) ? CORPSE_NO_LOOT : NOBITS));

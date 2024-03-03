@@ -6946,6 +6946,9 @@ This allows you to set whose corpse an item is. You can leave real corpses in
 your adventure zone, by creating corpse items and setting this value to one
 of your mobs.
 
+If the corpse is being used as a custom corpse on a mob, you can leave the
+corpseof field on the object empty (0) and it will be set when the mob dies.
+
 All corpse items must be the corpse of something (for skin/butcher data).
 
 See also: VNUM
