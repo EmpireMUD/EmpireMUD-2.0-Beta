@@ -6964,8 +6964,13 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 		}	// if (e) ...
 		
 		else {
-			if (vd && text_processed(field, subfield, vd, str, slen, go, sc, trig, type))
+			if (vd && text_processed(field, subfield, vd, str, slen, go, sc, trig, type)) {
 				return;
+			}
+			else {
+				// This fixes an issue where empty variables would give the last replacement instead, like %obj.vnum% could result in 'mecho'.
+				*str = '\0';
+			}
 		}
 	}
 }
