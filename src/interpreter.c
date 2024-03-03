@@ -2267,7 +2267,7 @@ int perform_dupe_check(descriptor_data *d) {
 			SEND_TO_Q("You take over your own body, already in use!\r\n", d);
 			act("$n suddenly keels over in pain, surrounded by a white aura...\r\n"
 				"$n's body has been taken over by a new spirit!", TRUE, d->character, 0, 0, TO_ROOM);
-			syslog(SYS_LOGIN, GET_INVIS_LEV(d->character), TRUE, "%s [%s] has re-logged in at %s ... disconnecting old socket", d->host, GET_NAME(d->character), IN_ROOM(d->character) ? room_log_identifier(IN_ROOM(d->character)) : "an unknown location");
+			syslog(SYS_LOGIN, GET_INVIS_LEV(d->character), TRUE, "%s [%s] has re-logged in at %s ... disconnecting old socket", GET_NAME(d->character), d->host, IN_ROOM(d->character) ? room_log_identifier(IN_ROOM(d->character)) : "an unknown location");
 			break;
 		case UNSWITCH:
 			SEND_TO_Q("Reconnecting to unswitched char.", d);
