@@ -2194,6 +2194,11 @@ ACMD(do_dismantle) {
 		confirm = TRUE;
 		argument = temp;
 	}
+	else if (!*arg && *temp && !str_cmp(temp, "confirm")) {
+		confirm = TRUE;
+		*temp = '\0';
+		argument = temp;
+	}
 	// else: just continue with the original argument
 	
 	// fall through to dismantle-vehicle?
