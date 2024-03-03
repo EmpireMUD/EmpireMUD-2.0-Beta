@@ -3414,7 +3414,16 @@ void do_stat_character(char_data *ch, char_data *k, bool details) {
 	line = build_page_display(ch, "Pos: %s, Fighting: %s", buf2, (FIGHTING(k) ? GET_NAME(FIGHTING(k)) : "Nobody"));
 
 	if (IS_NPC(k)) {
-		append_page_display_line(line, ", Attack: %d %s, Move: %s, Size: %s", MOB_ATTACK_TYPE(k), get_attack_name_by_vnum(MOB_ATTACK_TYPE(k)), mob_move_types[(int)MOB_MOVE_TYPE(k)], size_types[GET_SIZE(k)]);
+		append_page_display_line(line, ", Attack: %d %s, Move: %s", MOB_ATTACK_TYPE(k), get_attack_name_by_vnum(MOB_ATTACK_TYPE(k)), mob_move_types[(int)MOB_MOVE_TYPE(k)]);
+		
+		// size/corpse line
+		line = build_page_display(ch, "Size: %s, ", size_types[GET_SIZE(k)]);
+		if (MOB_CUSTOM_CORPSE(k) != NOTHING) {
+			append_page_display_line(line, "Custom corpse: none");
+		}
+		else {
+			append_page_display_line(line, "Custom corpse: [%d] %s", MOB_CUSTOM_CORPSE(k), get_obj_name_by_proto(MOB_CUSTOM_CORPSE(k)));
+		}
 	}
 	if (k->desc) {
 		sprinttype(STATE(k->desc), connected_types, buf2, sizeof(buf2), "UNDEFINED");

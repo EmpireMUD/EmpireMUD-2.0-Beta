@@ -754,7 +754,15 @@ void olc_delete_object(char_data *ch, obj_vnum vnum) {
 	
 	// update mobs
 	HASH_ITER(hh, mobile_table, mob, next_mob) {
+		// interactions
 		found = delete_from_interaction_list(&mob->interactions, TYPE_OBJ, vnum);
+		
+		// corpse
+		if (MOB_CUSTOM_CORPSE(mob) == vnum) {
+			found |= TRUE;
+			MOB_CUSTOM_CORPSE(mob) = NOTHING;
+		}
+		
 		if (found) {
 			syslog(SYS_OLC, GET_INVIS_LEV(ch), TRUE, "OLC: Mobile %d %s lost deleted related object", GET_MOB_VNUM(mob), GET_SHORT_DESC(mob));
 			save_library_file_for_vnum(DB_BOOT_MOB, mob->vnum);
@@ -988,8 +996,17 @@ void olc_delete_object(char_data *ch, obj_vnum vnum) {
 			}
 		}
 		if (GET_OLC_MOBILE(desc)) {
-			if (delete_from_interaction_list(&GET_OLC_MOBILE(desc)->interactions, TYPE_OBJ, vnum)) {
-				msg_to_char(desc->character, "One of the objects in an interaction for the mob you're editing was deleted.\r\n");
+			// interactions
+			found = delete_from_interaction_list(&GET_OLC_MOBILE(desc)->interactions, TYPE_OBJ, vnum);
+			
+			// corpse
+			if (MOB_CUSTOM_CORPSE(GET_OLC_MOBILE(desc)) == vnum) {
+				found |= TRUE;
+				MOB_CUSTOM_CORPSE(GET_OLC_MOBILE(desc)) = NOTHING;
+			}
+			
+			if (found) {
+				msg_to_char(desc->character, "One of the objects used by the mob you're editing was deleted.\r\n");
 			}
 		}
 		if (GET_OLC_MORPH(desc)) {
@@ -1500,9 +1517,18 @@ void olc_search_obj(char_data *ch, obj_vnum vnum) {
 		}
 	}
 	
-	// mob interactions
+	// mobs
 	HASH_ITER(hh, mobile_table, mob, next_mob) {
 		any = FALSE;
+		
+		// corpse
+		if (MOB_CUSTOM_CORPSE(mob) == vnum) {
+			any = TRUE;
+			++found;
+			build_page_display(ch, "MOB [%5d] %s", GET_MOB_VNUM(mob), GET_SHORT_DESC(mob));
+		}
+		
+		// interactions
 		for (inter = mob->interactions; inter && !any; inter = inter->next) {
 			if (interact_data[inter->type].vnum_type == TYPE_OBJ && inter->vnum == vnum) {
 				any = TRUE;

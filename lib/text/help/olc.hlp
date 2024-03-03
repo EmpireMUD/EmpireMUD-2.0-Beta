@@ -6044,6 +6044,20 @@ Common attack vnums:
 
 See also: OLC MOBILES
 #d
+"MEDIT CORPSE"
+
+Usage:  .corpse <vnum>
+        .corpse default
+
+This command sets or removes a custom corpse. If you aren't using a custom
+corpse, set this as 'default' (don't set it to the vnum of the default corpse).
+
+If a mob has no corpse at all, set the NO-CORPSE flag on the mob.
+
+The default corpse is vnum 1000.
+
+See also: OLC MOBILES
+#d
 "MEDIT CUSTOM"
 
 Usage:  .custom add <type> <message>

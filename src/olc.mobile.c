@@ -125,6 +125,10 @@ bool audit_mobile(char_data *mob, char_data *ch) {
 		olc_audit_msg(ch, GET_MOB_VNUM(mob), "Attack type %d is not valid (it is missing the MOBILE flag)", MOB_ATTACK_TYPE(mob));
 		problem = TRUE;
 	}
+	if (MOB_FLAGGED(mob, MOB_NO_CORPSE) && MOB_CUSTOM_CORPSE(mob) != NOTHING) {
+		olc_audit_msg(ch, GET_MOB_VNUM(mob), "NO-CORPSE and custom corpse are both set");
+		problem = TRUE;
+	}
 	if (MOB_FLAGGED(mob, MOB_ANIMAL) && !MOB_FLAGGED(mob, MOB_NO_CORPSE) && !has_interaction(mob->interactions, INTERACT_SKIN)) {
 		olc_audit_msg(ch, GET_MOB_VNUM(mob), "Animal has no skin");
 		problem = TRUE;
@@ -1389,6 +1393,7 @@ void olc_show_mobile(char_data *ch) {
 	char_data *mob = GET_OLC_MOBILE(ch->desc);
 	struct custom_message *mcm;
 	int count;
+	struct page_display *line;
 	
 	if (!mob) {
 		return;
@@ -1407,24 +1412,33 @@ void olc_show_mobile(char_data *ch) {
 	
 	sprintbit(AFF_FLAGS(mob), affected_bits, buf1, TRUE);
 	build_page_display(ch, "<%saffects\t0> %s", OLC_LABEL_VAL(AFF_FLAGS(mob), NOBITS), buf1);
-
-	if (GET_MIN_SCALE_LEVEL(mob) > 0) {
-		build_page_display(ch, "<%sminlevel\t0> %d", OLC_LABEL_VAL(GET_MIN_SCALE_LEVEL(mob), 0), GET_MIN_SCALE_LEVEL(mob));
-	}
-	else {
-		build_page_display(ch, "<%sminlevel\t0> none", OLC_LABEL_UNCHANGED);
-	}
 	
-	if (GET_MAX_SCALE_LEVEL(mob) > 0) {	
-		build_page_display(ch, "<%smaxlevel\t0> %d", OLC_LABEL_VAL(GET_MAX_SCALE_LEVEL(mob), 0), GET_MAX_SCALE_LEVEL(mob));
+	// min/max line
+	if (GET_MIN_SCALE_LEVEL(mob) > 0) {
+		line = build_page_display(ch, "<%sminlevel\t0> %d, ", OLC_LABEL_VAL(GET_MIN_SCALE_LEVEL(mob), 0), GET_MIN_SCALE_LEVEL(mob));
 	}
 	else {
-		build_page_display(ch, "<%smaxlevel\t0> none", OLC_LABEL_UNCHANGED);
+		line = build_page_display(ch, "<%sminlevel\t0> none, ", OLC_LABEL_UNCHANGED);
+	}
+	if (GET_MAX_SCALE_LEVEL(mob) > 0) {	
+		append_page_display_line(line, "<%smaxlevel\t0> %d", OLC_LABEL_VAL(GET_MAX_SCALE_LEVEL(mob), 0), GET_MAX_SCALE_LEVEL(mob));
+	}
+	else {
+		append_page_display_line(line, "<%smaxlevel\t0> none", OLC_LABEL_UNCHANGED);
 	}
 	
 	build_page_display(ch, "<%sattack\t0> %d %s", OLC_LABEL_VAL(MOB_ATTACK_TYPE(mob), 0), MOB_ATTACK_TYPE(mob), get_attack_name_by_vnum(MOB_ATTACK_TYPE(mob)));
 	build_page_display(ch, "<%smovetype\t0> %s", OLC_LABEL_VAL(MOB_MOVE_TYPE(mob), 0), mob_move_types[(int) MOB_MOVE_TYPE(mob)]);
-	build_page_display(ch, "<%ssize\t0> %s", OLC_LABEL_VAL(SET_SIZE(mob), SIZE_NORMAL), size_types[(int)SET_SIZE(mob)]);
+	
+	// size/custom corpse line
+	line = build_page_display(ch, "<%ssize\t0> %s, ", OLC_LABEL_VAL(SET_SIZE(mob), SIZE_NORMAL), size_types[(int)SET_SIZE(mob)]);
+	if (MOB_CUSTOM_CORPSE(ch) == NOTHING) {
+		append_page_display_line(line, "<%scorpse\t0> default", OLC_LABEL_VAL(MOB_CUSTOM_CORPSE(mob), NOTHING));
+	}
+	else {
+		append_page_display_line(line, "<%scorpse\t0> %d - %s", OLC_LABEL_VAL(MOB_CUSTOM_CORPSE(mob), NOTHING), MOB_CUSTOM_CORPSE(mob), get_obj_name_by_proto(MOB_CUSTOM_CORPSE(mob)));
+	}
+	
 	build_page_display(ch, "<%snameset\t0> %s, <%slanguage\t0> %d - %s", OLC_LABEL_VAL(MOB_NAME_SET(mob), 0), name_sets[MOB_NAME_SET(mob)], OLC_LABEL_VAL(MOB_LANGUAGE(mob), NOTHING), MOB_LANGUAGE(mob), (MOB_LANGUAGE(mob) == NOTHING ? "default" : get_generic_name_by_vnum(MOB_LANGUAGE(mob))));
 	build_page_display(ch, "<%sallegiance\t0> %s", OLC_LABEL_PTR(MOB_FACTION(mob)), MOB_FACTION(mob) ? FCT_NAME(MOB_FACTION(mob)) : "none");
 	
@@ -1495,6 +1509,30 @@ OLC_MODULE(medit_attack) {
 	else {
 		MOB_ATTACK_TYPE(mob) = ATTACK_VNUM(amd);
 		msg_to_char(ch, "Attack type set to [%d] %s.\r\n", ATTACK_VNUM(amd), ATTACK_NAME(amd));
+	}
+}
+
+
+OLC_MODULE(medit_corpse) {
+	char_data *mob = GET_OLC_MOBILE(ch->desc);
+	obj_data *proto;
+	
+	if (!*argument) {
+		msg_to_char(ch, "Set the custom corpse to what object vnum (or 'default')?\r\n");
+	}
+	else if (is_abbrev(argument, "default") || is_abbrev(argument, "none")) {
+		MOB_CUSTOM_CORPSE(mob) = NOTHING;
+		msg_to_char(ch, "You remove the custom corpse%s.\r\n", MOB_FLAGGED(mob, MOB_NO_CORPSE) ? "" : "; it will now use the default corpse");
+	}
+	else if (!isdigit(*argument) || !(proto = obj_proto(atoi(argument)))) {
+		msg_to_char(ch, "There's no such object vnum '%s'.\r\n", argument);
+	}
+	else if (!IS_CORPSE(proto)) {
+		msg_to_char(ch, "That object is not a corpse.\r\n");
+	}
+	else {
+		MOB_CUSTOM_CORPSE(mob) = GET_OBJ_VNUM(proto);
+		msg_to_char(ch, "You set its custom corpse to object %d: %s\r\n", GET_OBJ_VNUM(proto), GET_OBJ_SHORT_DESC(proto));
 	}
 }
 

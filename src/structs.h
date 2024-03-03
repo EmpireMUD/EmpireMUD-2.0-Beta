@@ -4308,6 +4308,7 @@ struct mob_special_data {
 	any_vnum language;	// default language (NOTHING to use global default instead)
 	struct custom_message *custom_msgs;	// any custom messages
 	faction_data *faction;	// if any
+	obj_vnum custom_corpse;	// obj vnum for the mob's corpse
 	
 	int to_hit;	// Mob's attack % bonus
 	int to_dodge;	// Mob's dodge % bonus

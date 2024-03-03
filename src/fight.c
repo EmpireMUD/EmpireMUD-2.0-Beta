@@ -1522,10 +1522,17 @@ void drop_loot(char_data *mob, char_data *killer) {
 obj_data *make_corpse(char_data *ch) {	
 	char shortdesc[MAX_INPUT_LENGTH], longdesc[MAX_INPUT_LENGTH], kws[MAX_INPUT_LENGTH];
 	obj_data *corpse, *rope, *o, *next_o;
+	obj_vnum corpse_vnum = o_CORPSE;
 	int i, size;
 	bool human = (!IS_NPC(ch) || MOB_FLAGGED(ch, MOB_HUMAN));
-
-	corpse = read_object(o_CORPSE, TRUE);
+	
+	// custom corpse?
+	if (IS_NPC(ch) && MOB_CUSTOM_CORPSE(ch) != NOTHING) {
+		corpse_vnum = MOB_CUSTOM_CORPSE(ch);
+	}
+	
+	// load obj
+	corpse = read_object(corpse_vnum, TRUE);
 	size = GET_SIZE(ch);
 	
 	// store as person's last corpse id
