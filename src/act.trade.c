@@ -1156,9 +1156,7 @@ void cancel_gen_craft(char_data *ch) {
 			else {
 				obj_to_room(obj, IN_ROOM(ch));
 			}
-			if (load_otrigger(obj) && obj->carried_by) {
-				get_otrigger(obj, obj->carried_by, FALSE);
-			}
+			load_otrigger(obj);
 		}
 		
 		if (CRAFT_FLAGGED(type, CRAFT_TAKE_REQUIRED_OBJ) && GET_CRAFT_REQUIRES_OBJ(type) != NOTHING && obj_proto(GET_CRAFT_REQUIRES_OBJ(type))) {
@@ -1179,9 +1177,7 @@ void cancel_gen_craft(char_data *ch) {
 					bind_obj_to_player(obj, ch);
 				}
 			}
-			if (load_otrigger(obj) && obj->carried_by) {
-				get_otrigger(obj, obj->carried_by, FALSE);
-			}
+			load_otrigger(obj);
 		}
 	}
 	
@@ -1247,9 +1243,6 @@ void finish_gen_craft(char_data *ch) {
 		scale_item_to_level(obj, get_craft_scale_level(ch, type));
 		
 		obj_ok = load_otrigger(obj);
-		if (obj_ok && obj->carried_by) {
-			get_otrigger(obj, obj->carried_by, FALSE);
-		}
 	}
 	else if (GET_CRAFT_QUANTITY(type) > 0) {
 		// NON-SOUP (careful, soup uses quantity for maximum contents
@@ -1281,9 +1274,6 @@ void finish_gen_craft(char_data *ch) {
 				}
 				
 				obj_ok = load_otrigger(obj);
-				if (obj_ok && obj->carried_by) {
-					get_otrigger(obj, obj->carried_by, FALSE);
-				}
 			}
 			
 			// mark for the empire

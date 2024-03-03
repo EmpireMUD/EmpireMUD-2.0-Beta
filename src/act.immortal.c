@@ -6703,9 +6703,7 @@ ACMD(do_load) {
 		act("$n makes a strange magical gesture.", TRUE, ch, 0, 0, TO_ROOM | DG_NO_TRIG);
 		act("$n has created $p!", FALSE, ch, obj, 0, TO_ROOM | DG_NO_TRIG);
 		act("You create $p.", FALSE, ch, obj, 0, TO_CHAR | DG_NO_TRIG);
-		if (load_otrigger(obj) && obj->carried_by) {
-			get_otrigger(obj, obj->carried_by, FALSE);
-		}
+		load_otrigger(obj);
 	}
 	else if (is_abbrev(buf, "vehicle")) {
 		if (!vehicle_proto(number)) {
@@ -6744,9 +6742,7 @@ ACMD(do_load) {
 		act("$n makes a strange magical gesture.", TRUE, ch, NULL, NULL, TO_ROOM | DG_NO_TRIG);
 		act("$n has created $p!", FALSE, ch, obj, NULL, TO_ROOM | DG_NO_TRIG);
 		act("You create $p.", FALSE, ch, obj, NULL, TO_CHAR | DG_NO_TRIG);
-		if (load_otrigger(obj) && obj->carried_by) {
-			get_otrigger(obj, obj->carried_by, FALSE);
-		}
+		load_otrigger(obj);
 	}
 	else {
 		send_to_char("That'll have to be either 'obj', 'mob', or 'vehicle'.\r\n", ch);

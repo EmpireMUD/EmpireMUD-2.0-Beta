@@ -768,9 +768,6 @@ void give_quest_rewards(char_data *ch, struct quest_reward *list, int reward_lev
 					}
 					
 					obj_ok = load_otrigger(obj);
-					if (obj_ok) {
-						get_otrigger(obj, ch, FALSE);
-					}
 				}
 				
 				// mark gained

@@ -191,9 +191,7 @@ INTERACTION_FUNC(pickpocket_interact) {
 		scale_item_to_level(obj, get_approximate_level(inter_mob));
 		obj_to_char(obj, ch);
 		act("You find $p!", FALSE, ch, obj, NULL, TO_CHAR | TO_QUEUE);
-		if (load_otrigger(obj)) {
-			get_otrigger(obj, ch, FALSE);
-		}
+		load_otrigger(obj);
 	}
 	
 	// mark gained

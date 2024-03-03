@@ -2201,9 +2201,6 @@ INTERACTION_FUNC(conjure_object_interaction) {
 		}
 		
 		obj_ok = load_otrigger(obj);
-		if (obj_ok && obj->carried_by == ch) {
-			get_otrigger(obj, ch, FALSE);
-		}
 	}
 	
 	// mark gained
@@ -2291,9 +2288,7 @@ INTERACTION_FUNC(devastate_crop) {
 	while (num-- > 0) {
 		obj_to_char_or_room((newobj = read_object(interaction->vnum, TRUE)), ch);
 		scale_item_to_level(newobj, 1);	// minimum level
-		if ((obj_ok = load_otrigger(newobj)) && newobj->carried_by) {
-			get_otrigger(newobj, newobj->carried_by, FALSE);
-		}
+		obj_ok = load_otrigger(newobj);
 	}
 	
 	if (newobj && obj_ok) {
@@ -2333,9 +2328,7 @@ INTERACTION_FUNC(devastate_trees) {
 	for (num = 0; num < amount; ++num) {
 		obj_to_char_or_room((newobj = read_object(interaction->vnum, TRUE)), ch);
 		scale_item_to_level(newobj, 1);	// minimum level
-		if ((obj_ok = load_otrigger(newobj)) && newobj->carried_by) {
-			get_otrigger(newobj, newobj->carried_by, FALSE);
-		}
+		obj_ok = load_otrigger(newobj);
 	}
 	
 	add_depletion(inter_room, DPLTN_CHOP, FALSE);
@@ -2363,9 +2356,6 @@ INTERACTION_FUNC(disenchant_obj_interact) {
 		scale_item_to_level(obj, 1);	// minimum level
 		obj_to_char(obj, ch);
 		obj_ok = load_otrigger(obj);
-		if (obj_ok) {
-			get_otrigger(obj, ch, FALSE);
-		}
 	}
 	
 	// mark gained

@@ -845,9 +845,7 @@ ACMD(do_mload) {
 			// must scale now
 			scale_item_to_level(object, GET_CURRENT_SCALE_LEVEL(ch));
 		
-			if (load_otrigger(object) && object->carried_by) {
-				get_otrigger(object, object->carried_by, FALSE);
-			}
+			load_otrigger(object);
 			return;
 		}
 		
@@ -896,9 +894,7 @@ ACMD(do_mload) {
 				return;
 			}
 			obj_to_char(object, tch);
-			if (load_otrigger(object)) {
-				get_otrigger(object, tch, FALSE);
-			}
+			load_otrigger(object);
 			return;
 		}
 		

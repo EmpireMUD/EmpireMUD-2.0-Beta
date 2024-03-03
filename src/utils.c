@@ -4402,9 +4402,7 @@ void give_resources(char_data *ch, struct resource_data *list, bool split) {
 						obj_to_room(obj, IN_ROOM(ch));
 					}
 					
-					if (load_otrigger(obj) && obj->carried_by) {
-						get_otrigger(obj, obj->carried_by, FALSE);
-					}
+					load_otrigger(obj);
 				}
 				break;
 			}

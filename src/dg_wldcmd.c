@@ -1282,14 +1282,11 @@ WCMD(do_wload) {
 			if (*arg2 && (pos = find_eq_pos_script(arg2)) >= 0 && !GET_EQ(tch, pos) && CAN_WEAR(object, wear_data[pos].item_wear)) {
 				equip_char(tch, object, pos);
 				load_otrigger(object);
-				// get_otrigger(object, tch, FALSE);
 				determine_gear_level(tch);
 				return;
 			}
 			obj_to_char(object, tch);
-			if (load_otrigger(object)) {
-				get_otrigger(object, tch, FALSE);
-			}
+			load_otrigger(object);
 			return;
 		}
 		cnt = get_obj_in_room(room, arg1);

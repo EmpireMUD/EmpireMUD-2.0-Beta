@@ -424,12 +424,12 @@ bool perform_get_from_vehicle(char_data *ch, obj_data *obj, vehicle_data *veh, i
 	}
 	
 	if (mode == FIND_OBJ_INV || can_take_obj(ch, obj)) {
+		// last-minute scaling: scale to its minimum (adventures will override this on their own)
+		if (GET_OBJ_CURRENT_SCALE_LEVEL(obj) < 1) {
+			scale_item_to_level(obj, GET_OBJ_MIN_SCALE_LEVEL(obj));
+		}
+		
 		if (get_otrigger(obj, ch, TRUE)) {
-			// last-minute scaling: scale to its minimum (adventures will override this on their own)
-			if (GET_OBJ_CURRENT_SCALE_LEVEL(obj) < 1) {
-				scale_item_to_level(obj, GET_OBJ_MIN_SCALE_LEVEL(obj));
-			}
-			
 			obj_to_char(obj, ch);
 			act("You get $p from $V.", FALSE, ch, obj, veh, TO_CHAR | TO_QUEUE | ACT_VEH_VICT);
 			act("$n gets $p from $V.", TRUE, ch, obj, veh, TO_ROOM | TO_QUEUE | ACT_VEH_VICT);

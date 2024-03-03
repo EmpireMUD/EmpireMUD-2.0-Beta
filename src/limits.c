@@ -441,9 +441,7 @@ INTERACTION_FUNC(consumes_or_decays_interact) {
 		}
 		
 		if (!fail) {
-			if (load_otrigger(new_obj) && new_obj->carried_by) {
-				get_otrigger(new_obj, new_obj->carried_by, FALSE);
-			}
+			load_otrigger(new_obj);
 		}
 	}
 	

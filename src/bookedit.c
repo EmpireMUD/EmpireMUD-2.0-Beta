@@ -251,9 +251,7 @@ void process_copying_book(char_data *ch) {
 			
 			msg_to_char(ch, "You finish a fresh copy of %s!\r\n", BOOK_TITLE(book));
 			act("$n finishes copying out $p.", TRUE, ch, obj, NULL, TO_ROOM);
-			if (load_otrigger(obj)) {
-				get_otrigger(obj, ch, FALSE);
-			}
+			load_otrigger(obj);
 		}
 		end_action(ch);
 	}
