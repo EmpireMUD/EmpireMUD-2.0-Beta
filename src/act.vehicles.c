@@ -1607,7 +1607,13 @@ ACMD(do_drag) {
 	}
 	// vehicle validation
 	else if (!(veh = get_vehicle_in_room_vis(ch, what, NULL))) {
-		msg_to_char(ch, "You don't see %s %s here.\r\n", AN(what), what);
+		// better error message when targeting items
+		if (get_obj_in_list_vis(ch, what, NULL, ROOM_CONTENTS(IN_ROOM(ch)))) {
+			msg_to_char(ch, "You can't drag items -- only vehicles.\r\n");
+		}
+		else {
+			msg_to_char(ch, "You don't see %s %s here.\r\n", AN(what), what);
+		}
 	}
 	else if (!VEH_FLAGGED(veh, VEH_DRAGGABLE)) {
 		msg_to_char(ch, "You can't drag that!\r\n");
