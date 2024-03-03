@@ -421,7 +421,7 @@ void perform_alternate(char_data *old, char_data *new) {
 	}
 	
 	// log late so we have a location
-	sprintf(sys + strlen(sys), " at %s.", room_log_identifier(IN_ROOM(new)));
+	sprintf(sys + strlen(sys), " [%s] at %s.", new->desc->host, room_log_identifier(IN_ROOM(new)));
 	syslog(SYS_LOGIN, invis_lev, TRUE, "%s", sys);
 	
 	if (AFF_FLAGGED(new, AFF_EARTHMELDED)) {

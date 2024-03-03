@@ -4654,6 +4654,12 @@ void enter_player_game(descriptor_data *d, int dolog, bool fresh) {
 	
 	if (ch->desc) {
 		send_initial_MSDP(ch->desc);
+		
+		// update stored host
+		if (ch->prev_host) {
+			free(ch->prev_host);
+		}
+		ch->prev_host = strdup(ch->desc->host);
 	}
 	
 	affect_total(ch);	// final affect total
