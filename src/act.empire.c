@@ -7702,12 +7702,12 @@ ACMD(do_roster) {
 		if (!is_file) {
 			append_page_display_line(line, "  - &conline&0%s", IS_AFK(member) ? " - &rafk&0" : "");
 		}
-		else if ((time(0) - member->prev_logon) < SECS_PER_REAL_DAY) {
-			hours = (time(0) - member->prev_logon) / SECS_PER_REAL_HOUR;
+		else if ((time(0) - GET_PREV_LOGON(member)) < SECS_PER_REAL_DAY) {
+			hours = (time(0) - GET_PREV_LOGON(member)) / SECS_PER_REAL_HOUR;
 			append_page_display_line(line, "  - %d hour%s ago%s", hours, PLURAL(hours), (timed_out ? ", &rtimed-out&0" : ""));
 		}
 		else {	// more than a day
-			days = (time(0) - member->prev_logon) / SECS_PER_REAL_DAY;
+			days = (time(0) - GET_PREV_LOGON(member)) / SECS_PER_REAL_DAY;
 			append_page_display_line(line, "  - %d day%s ago%s", days, PLURAL(days), (timed_out ? ", &rtimed-out&0" : ""));
 		}
 		

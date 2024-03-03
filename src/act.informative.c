@@ -5123,7 +5123,7 @@ ACMD(do_whois) {
 	
 	// last login info
 	if (!IS_IMMORTAL(victim) && !IN_ROOM(victim)) {
-		diff = time(0) - victim->prev_logon;
+		diff = time(0) - GET_PREV_LOGON(victim);
 		
 		if (diff > SECS_PER_REAL_YEAR) {
 			math = diff / SECS_PER_REAL_YEAR;

@@ -2137,8 +2137,8 @@ void send_login_motd(descriptor_data *desc, int bad_pws) {
 	}
 
 	/* Check previous logon */
-	if (desc->character->prev_host && desc->character->prev_logon > 0) {
-		sprintf(buf, "Your last login was on %6.10s from %s.\r\n", ctime(&desc->character->prev_logon), desc->character->prev_host);
+	if (GET_PREV_HOST(desc->character) && GET_PREV_LOGON(desc->character) > 0) {
+		sprintf(buf, "Your last login was on %6.10s from %s.\r\n", ctime(&GET_PREV_LOGON(desc->character)), GET_PREV_HOST(desc->character));
 		SEND_TO_Q(buf, desc);
 	}
 }
@@ -2251,10 +2251,10 @@ int perform_dupe_check(descriptor_data *d) {
 	
 	// update stored host
 	if (IN_ROOM(d->character)) {
-		if (d->character->prev_host) {
-			free(d->character->prev_host);
+		if (GET_PREV_HOST(d->character)) {
+			free(GET_PREV_HOST(d->character));
 		}
-		d->character->prev_host = strdup(d->host);
+		GET_PREV_HOST(d->character) = strdup(d->host);
 	}
 
 	switch (mode) {
@@ -2403,7 +2403,7 @@ void nanny(descriptor_data *d, char *arg) {
 				clear_char(d->character);
 				init_player_specials(d->character);
 				d->character->desc = d;
-				d->character->prev_host = str_dup(d->host);	// this will be overwritten if it's not a new char
+				GET_PREV_HOST(d->character) = str_dup(d->host);	// this will be overwritten if it's not a new char
 			}
 			
 			if (!*arg) {

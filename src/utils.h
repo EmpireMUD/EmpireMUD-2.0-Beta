@@ -1341,6 +1341,8 @@ int Y_COORD(room_data *room);	// formerly #define Y_COORD(room)  FLAT_Y_COORD(ge
 #define GET_PERSONAL_LASTNAME(ch)  CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->personal_lastname))
 #define GET_PLAYER_COINS(ch)  CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->coins))
 #define GET_PLEDGE(ch)  CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->pledge))
+#define GET_PREV_HOST(ch)  CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->prev_host))
+#define GET_PREV_LOGON(ch)  CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->prev_logon))
 #define GET_PROMO_ID(ch)  CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->promo_id))
 #define GET_PROMPT(ch)  CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->prompt))
 #define GET_QUESTS(ch)  CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->quests))

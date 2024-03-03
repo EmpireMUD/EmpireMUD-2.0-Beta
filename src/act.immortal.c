@@ -1202,7 +1202,7 @@ ADMIN_UTIL(util_playerdump) {
 			continue;
 		}
 		
-		fprintf(fl, "%s\t%d\t%d\t%s\n", GET_NAME(plr), GET_ACCOUNT(plr)->id, (plr->player.time.played / SECS_PER_REAL_HOUR), plr->prev_host);
+		fprintf(fl, "%s\t%d\t%d\t%s\n", GET_NAME(plr), GET_ACCOUNT(plr)->id, (plr->player.time.played / SECS_PER_REAL_HOUR), NULLSAFE(GET_PREV_HOST(plr)));
 		
 		// done
 		if (is_file && plr) {
@@ -6639,9 +6639,9 @@ ACMD(do_last) {
 	else {
 		strcpy(status, level_names[(int) GET_ACCESS_LEVEL(plr)][0]);
 		// crlf built into ctime
-		msg_to_char(ch, "[%5d] [%s] %-12s : %-18s : %-20s", GET_IDNUM(plr), status, GET_PC_NAME(plr), plr->desc ? plr->desc->host : plr->prev_host, file ? ctime(&plr->prev_logon) : ctime(&plr->player.time.logon));
+		msg_to_char(ch, "[%5d] [%s] %-12s : %-18s : %-20s", GET_IDNUM(plr), status, GET_PC_NAME(plr), plr->desc ? plr->desc->host : NULLSAFE(GET_PREV_HOST(plr)), file ? ctime(&GET_PREV_LOGON(plr)) : ctime(&plr->player.time.logon));
 		if (file) {
-			ago_ptr = strcpy(ago_buf, simple_time_since(plr->prev_logon));
+			ago_ptr = strcpy(ago_buf, simple_time_since(GET_PREV_LOGON(plr)));
 			skip_spaces(&ago_ptr);
 			msg_to_char(ch, "Last online %s ago\r\n", ago_ptr);
 		}
