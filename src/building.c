@@ -2203,10 +2203,6 @@ ACMD(do_dismantle) {
 			do_dismantle_vehicle(ch, veh, confirm);
 			return;
 		}
-		else if (!is_abbrev(arg, "building") && !isname(arg, get_room_name(IN_ROOM(ch), FALSE)) && (!GET_BUILDING(IN_ROOM(ch)) || !isname(arg, GET_BLD_NAME(GET_BUILDING(IN_ROOM(ch)))))) {
-			msg_to_char(ch, "You don't see %s %s here to dismantle.\r\n", AN(arg), arg);
-			return;
-		}
 		// else: fall through
 	}
 	
@@ -2217,7 +2213,7 @@ ACMD(do_dismantle) {
 	}
 	
 	// otherwise args are not welcome
-	if (*arg && !isname(arg, get_room_name(IN_ROOM(ch), FALSE))) {
+	if (*arg && !is_abbrev(arg, "building") && !isname(arg, get_room_name(IN_ROOM(ch), FALSE)) && (!GET_BUILDING(IN_ROOM(ch)) || !isname(arg, GET_BLD_NAME(GET_BUILDING(IN_ROOM(ch)))))) {
 		msg_to_char(ch, "You don't see that to dismantle here.\r\n");
 		return;
 	}
