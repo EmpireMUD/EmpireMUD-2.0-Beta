@@ -2158,7 +2158,6 @@ void set_workforce_limit_all(empire_data *emp, int chore, int limit);
 void show_workforce_setup_to_char(empire_data *emp, char_data *ch);
 
 // act.immortal.c
-void perform_autostore(obj_data *obj, empire_data *emp, int island);
 void perform_immort_vis(char_data *ch);
 void show_spawn_summary_display(char_data *ch, bool use_page_display, struct spawn_info *list);
 
@@ -2432,10 +2431,12 @@ void check_empire_storage_timers();
 void check_home_storage_timers(char_data *ch);
 void check_pointless_fight(char_data *mob);
 void check_ruined_cities(empire_data *only_emp);
+void force_autostore(room_data *room);
 void gain_condition(char_data *ch, int condition, int value);
 int health_gain(char_data *ch, bool info_only);
 int mana_gain(char_data *ch, bool info_only);
 int move_gain(char_data *ch, bool info_only);
+void perform_force_autostore(obj_data *obj, empire_data *emp, int island);
 void schedule_all_obj_timers(char_data *ch);
 void schedule_heal_over_time(char_data *ch);
 void schedule_obj_autostore_check(obj_data *obj, long new_autostore_timer);

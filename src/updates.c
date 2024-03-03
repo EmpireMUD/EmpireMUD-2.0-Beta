@@ -2526,7 +2526,7 @@ void b5_102_home_cleanup(void) {
 	HASH_ITER(hh, world_table, room, next_room) {
 		if (ROOM_PRIVATE_OWNER(HOME_ROOM(room)) != NOBODY) {
 			DL_FOREACH_SAFE2(ROOM_CONTENTS(room), obj, next_obj, next_content) {
-				perform_autostore(obj, ROOM_OWNER(room), NO_ISLAND);
+				perform_force_autostore(obj, ROOM_OWNER(room), NO_ISLAND);
 			}
 		}
 	}

@@ -114,26 +114,6 @@ void perform_unapprove(char_data *ch) {
 
 
 /**
-* Autostores one item. Contents are also stored.
-*
-* @param obj_dtaa *obj The item to autostore.
-* @param empire_data *emp The empire to store it to -- NOT CURRENTLY USED.
-* @param int island The islands to store it to -- NOT CURRENTLY USED.
-*/
-void perform_autostore(obj_data *obj, empire_data *emp, int island) {
-	obj_data *temp, *next_temp;
-	
-	// store the inside first
-	DL_FOREACH_SAFE2(obj->contains, temp, next_temp, next_content) {
-		perform_autostore(temp, emp, island);
-	}
-	
-	
-	check_autostore(obj, TRUE, emp);
-}
-
-
-/**
 * Sends a poofout/poofin message, moves a character, and looks at the room.
 *
 * @param char_data *ch The person.
@@ -5539,14 +5519,16 @@ ACMD(do_autostore) {
 		
 		if (obj) {
 			act("$n auto-stores $p.", FALSE, ch, obj, NULL, TO_ROOM | DG_NO_TRIG);
-			perform_autostore(obj, emp, GET_ISLAND_ID(IN_ROOM(ch)));
+			perform_force_autostore(obj, emp, GET_ISLAND_ID(IN_ROOM(ch)));
+			read_vault(emp);
 		}
 		else if (veh) {
 			act("$n auto-stores items in $V.", FALSE, ch, NULL, veh, TO_ROOM | DG_NO_TRIG | ACT_VEH_VICT);
 			
 			DL_FOREACH_SAFE2(VEH_CONTAINS(veh), obj, next_obj, next_content) {
-				perform_autostore(obj, VEH_OWNER(veh), GET_ISLAND_ID(IN_ROOM(ch)));
+				perform_force_autostore(obj, (VEH_OWNER(veh) && VEH_OWNER(veh) != emp) ? VEH_OWNER(veh) : emp, GET_ISLAND_ID(IN_ROOM(ch)));
 			}
+			read_vault((VEH_OWNER(veh) && VEH_OWNER(veh) != emp) ? VEH_OWNER(veh) : emp);
 		}
 		else {
 			send_to_char("Nothing here by that name.\r\n", ch);
@@ -5558,18 +5540,7 @@ ACMD(do_autostore) {
 	else {			// no argument. clean out the room
 		act("$n gestures...", FALSE, ch, 0, 0, TO_ROOM | DG_NO_TRIG);
 		send_to_room("The world seems a little cleaner.\r\n", IN_ROOM(ch));
-		
-		DL_FOREACH_SAFE2(ROOM_CONTENTS(IN_ROOM(ch)), obj, next_obj, next_content) {
-			perform_autostore(obj, emp, GET_ISLAND_ID(IN_ROOM(ch)));
-		}
-		
-		DL_FOREACH2(ROOM_VEHICLES(IN_ROOM(ch)), veh, next_in_room) {
-			DL_FOREACH_SAFE2(VEH_CONTAINS(veh), obj, next_obj, next_content) {
-				perform_autostore(obj, VEH_OWNER(veh), GET_ISLAND_ID(IN_ROOM(ch)));
-			}
-		}
-		
-		read_vault(emp);
+		force_autostore(IN_ROOM(ch));
 	}
 }
 
