@@ -1432,7 +1432,7 @@ void olc_show_mobile(char_data *ch) {
 	
 	// size/custom corpse line
 	line = build_page_display(ch, "<%ssize\t0> %s, ", OLC_LABEL_VAL(SET_SIZE(mob), SIZE_NORMAL), size_types[(int)SET_SIZE(mob)]);
-	if (MOB_CUSTOM_CORPSE(ch) == NOTHING) {
+	if (MOB_CUSTOM_CORPSE(mob) == NOTHING) {
 		append_page_display_line(line, "<%scorpse\t0> default", OLC_LABEL_VAL(MOB_CUSTOM_CORPSE(mob), NOTHING));
 	}
 	else {
