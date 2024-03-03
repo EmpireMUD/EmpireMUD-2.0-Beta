@@ -1922,6 +1922,8 @@ You can't enter a portal of any kind if it's on a tile you don't have
 permission to use, such as one owned by an enemy empire. Infiltrate can get
 around this (you still use the 'enter' command).
 
+Portal buildings cannot be painted.
+
 Immortals can open portals between any two locations.
 
 See also: PORTAL SICKNESS, COLLAPSE, INFILTRATE

@@ -875,6 +875,8 @@ dig for rocks anywhere except quarries (and sand pits).
 
 Quarries count as in-city territory when built in the outskirts (4x radius).
 
+Quarries cannot be painted.
+
 See also: DEPLETION, DIG, EXTENDED RADIUS, WORKFORCE, WORKFORCE PRODUCTION
 #
 "RAWHIDE STITCHING"
@@ -1032,6 +1034,7 @@ a shipyard, and the vessel can be sailed to a dock when finished. You can also
 upgrade the shipyard, if your empire has this knowledge.
 
 You gain experience every time you add resources to a ship being manufactured.
+Shipyards cannot be painted.
 
 With basic Shipbuilding you can manufacture:
   Caravel
