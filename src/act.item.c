@@ -2879,13 +2879,6 @@ static char_data *give_find_vict(char_data *ch, char *arg) {
 
 
 static void perform_give(char_data *ch, char_data *vict, obj_data *obj) {
-	if (!give_otrigger(obj, ch, vict)) {
-		return;
-	}
-	if (!receive_mtrigger(vict, ch, obj)) {
-		return;
-	}
-	
 	if (IS_NPC(vict) && AFF_FLAGGED(vict, AFF_CHARM)) {
 		msg_to_char(ch, "You cannot give items to charmed NPCs.\r\n");
 		return;
@@ -2904,6 +2897,19 @@ static void perform_give(char_data *ch, char_data *vict, obj_data *obj) {
 	// NPCs usually have no carry limit, but 'give' is an exception because otherwise crazy ensues
 	if (!CAN_CARRY_OBJ(vict, obj)) {
 		act("$N seems to have $S hands full.", FALSE, ch, 0, vict, TO_CHAR | TO_QUEUE);
+		return;
+	}
+	
+	// late scaling check: scale to its minimum if somehow unscaled
+	if (GET_OBJ_CURRENT_SCALE_LEVEL(obj) < 1) {
+		scale_item_to_level(obj, GET_OBJ_MIN_SCALE_LEVEL(obj));
+	}
+	
+	// triggers last
+	if (!give_otrigger(obj, ch, vict)) {
+		return;
+	}
+	if (!receive_mtrigger(vict, ch, obj)) {
 		return;
 	}
 
