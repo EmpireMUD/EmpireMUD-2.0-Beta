@@ -3414,15 +3414,15 @@ void do_stat_character(char_data *ch, char_data *k, bool details) {
 	line = build_page_display(ch, "Pos: %s, Fighting: %s", buf2, (FIGHTING(k) ? GET_NAME(FIGHTING(k)) : "Nobody"));
 
 	if (IS_NPC(k)) {
-		append_page_display_line(line, ", Attack: %d %s, Move: %s", MOB_ATTACK_TYPE(k), get_attack_name_by_vnum(MOB_ATTACK_TYPE(k)), mob_move_types[(int)MOB_MOVE_TYPE(k)]);
+		append_page_display_line(line, ", Attack: [\tc%d\t0] \ty%s\t0, Move: \ty%s\t0", MOB_ATTACK_TYPE(k), get_attack_name_by_vnum(MOB_ATTACK_TYPE(k)), mob_move_types[(int)MOB_MOVE_TYPE(k)]);
 		
 		// size/corpse line
-		line = build_page_display(ch, "Size: %s, ", size_types[GET_SIZE(k)]);
-		if (MOB_CUSTOM_CORPSE(k) != NOTHING) {
-			append_page_display_line(line, "Custom corpse: none");
+		line = build_page_display(ch, "Size: \ty%s\t0, ", size_types[GET_SIZE(k)]);
+		if (MOB_CUSTOM_CORPSE(k) == NOTHING) {
+			append_page_display_line(line, "Custom corpse: \tynone\t0");
 		}
 		else {
-			append_page_display_line(line, "Custom corpse: [%d] %s", MOB_CUSTOM_CORPSE(k), get_obj_name_by_proto(MOB_CUSTOM_CORPSE(k)));
+			append_page_display_line(line, "Custom corpse: [\tc%d\t0] \ty%s\t0", MOB_CUSTOM_CORPSE(k), get_obj_name_by_proto(MOB_CUSTOM_CORPSE(k)));
 		}
 	}
 	if (k->desc) {
