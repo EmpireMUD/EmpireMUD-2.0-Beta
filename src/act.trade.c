@@ -2801,8 +2801,8 @@ ACMD(do_tame) {
 	else if (!IS_NPC(mob) || !has_interaction(mob->interactions, INTERACT_TAME)) {
 		act("You can't tame $N!", FALSE, ch, 0, mob, TO_CHAR);
 	}
-	else if (GET_LED_BY(mob)) {
-		act("You can't tame $M right now.", FALSE, ch, NULL, mob, TO_CHAR);
+	else if (GET_LED_BY(mob) && GET_LED_BY(mob) != ch) {
+		act("You can't tame $M right now because someone is leading $M.", FALSE, ch, NULL, mob, TO_CHAR);
 	}
 	else if (run_ability_triggers_by_player_tech(ch, PTECH_TAME_ANIMALS, mob, NULL, NULL)) {
 		// triggered
