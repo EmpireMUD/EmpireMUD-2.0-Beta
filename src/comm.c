@@ -645,9 +645,11 @@ void perform_reboot(void) {
 
 	if (reboot_control.type == REBOOT_REBOOT) {
 		sprintf(buf, "\r\n[0;0;31m *** Rebooting ***[0;0;37m\r\nPlease be patient, this will take a second.\r\n\r\n");
+		log("Performing a reboot...");
 	}
 	else if (reboot_control.type == REBOOT_SHUTDOWN) {
 		sprintf(buf, "\r\n[0;0;31m *** Shutting Down ***[0;0;37m\r\nThe mud is shutting down, please reconnect later.\r\n\r\n");
+		log("Beginning shutdown...");
 	}
 
 	for (desc = descriptor_list; desc; desc = next_desc) {
