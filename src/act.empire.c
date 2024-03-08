@@ -1573,9 +1573,11 @@ void show_workforce_why(empire_data *emp, char_data *ch, char *argument) {
 	}
 	else if (only_room && ROOM_OWNER(only_room) != GET_LOYALTY(ch)) {
 		msg_to_char(ch, "Workforce isn't working because your empire doesn't own %s location.\r\n", (only_room == IN_ROOM(ch)) ? "this" : "that");
+		clear_page_display(ch);
 	}
 	else {
 		msg_to_char(ch, "No matching workforce problems found.\r\n");
+		clear_page_display(ch);
 	}
 }
 
