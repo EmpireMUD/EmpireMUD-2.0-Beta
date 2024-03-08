@@ -55,7 +55,6 @@ bool objpack_save_room(room_data *room);
 void save_instances();
 
 // locals
-void cancel_all_world_save_requests(int only_save_type);
 void grow_crop(struct map_data *map);
 void init_room(room_data *room, room_vnum vnum);
 void perform_requested_world_saves();

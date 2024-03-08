@@ -945,6 +945,7 @@ void set_room_custom_description(room_data *room, char *desc);
 void set_room_custom_icon(room_data *room, char *icon);
 void set_room_custom_name(room_data *room, char *name);
 void set_room_height(room_data *room, int height);
+void cancel_all_world_save_requests(int only_save_type);
 void check_all_exits();
 void check_terrain_height(room_data *room);
 void clear_private_owner(int id);
@@ -1023,8 +1024,14 @@ void free_exit_template(struct exit_template *ex);
 // act.comm.c
 extern bool global_mute_slash_channel_joins;
 
+// ban.c
+void free_invalid_list();
+
 // olc.object.c
 int set_obj_val(obj_data *obj, int pos, int value);
+
+// interpreter.c
+void free_command_sort();
 
 // statistics.c
 extern int max_players_this_uptime;

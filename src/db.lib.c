@@ -9242,6 +9242,18 @@ void free_whole_library(void) {
 		free(wizlock_message);
 	}
 	
+	// more things found not-freeing in b5.181
+	cancel_all_world_save_requests(NOBITS);
+	dg_event_free_all();
+	void free_command_sort();
+	free_invalid_list();
+	free_vnum_hash(&binary_world_index_updates);
+	free_vnum_hash(&mapout_update_requests);
+	
+	if (world_index_data) {
+		free(world_index_data);
+	}
+	
 	// free these last
 	HASH_ITER(hh, config_table, cnf, next_cnf) {
 		HASH_DEL(config_table, cnf);
