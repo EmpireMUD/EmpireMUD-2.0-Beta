@@ -200,8 +200,9 @@ started.
 It also requires the 'dismantle' empire privilege, unless you are the person
 who originally built the building.
 
-You can use 'nodismantle' to keep yourself from accidentally dismantling a
-building.
+You can use 'manage [vehicle] no-dismantle' to keep yourself from accidentally
+dismantling a building or vehicle. You can override the no-dismantle setting
+by typing 'dismantle [target] confirm'.
 
 Note: Mountain tiles only refresh with new ore if the mines (or other
 buildings) have been dismantled and removed before the reset cycle. However,

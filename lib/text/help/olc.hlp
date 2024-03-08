@@ -6044,6 +6044,20 @@ Common attack vnums:
 
 See also: OLC MOBILES
 #d
+"MEDIT CORPSE"
+
+Usage:  .corpse <vnum>
+        .corpse default
+
+This command sets or removes a custom corpse. If you aren't using a custom
+corpse, set this as 'default' (don't set it to the vnum of the default corpse).
+
+If a mob has no corpse at all, set the NO-CORPSE flag on the mob.
+
+The default corpse is vnum 1000.
+
+See also: OLC MOBILES
+#d
 "MEDIT CUSTOM"
 
 Usage:  .custom add <type> <message>
@@ -6931,6 +6945,9 @@ Usage:  .corpseof <mob vnum>
 This allows you to set whose corpse an item is. You can leave real corpses in
 your adventure zone, by creating corpse items and setting this value to one
 of your mobs.
+
+If the corpse is being used as a custom corpse on a mob, you can leave the
+corpseof field on the object empty (0) and it will be set when the mob dies.
 
 All corpse items must be the corpse of something (for skin/butcher data).
 

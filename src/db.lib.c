@@ -5658,12 +5658,16 @@ void parse_mobile(FILE *mob_f, int nr) {
 		log("SYSERR: Missing second numeric section of mob #%d", nr);
 		exit(1);
 	}
-	else if (sscanf(line, "%d %d %d %d %d", &t[0], &t[1], &t[2], &t[3], &t[4]) != 5) {
-		// pre-b5.146 version
-		t[4] = NOTHING;	// no language
-		if (sscanf(line, "%d %d %d %d", &t[0], &t[1], &t[2], &t[3]) != 4) {
-			log("SYSERR: Format in second numeric section of mob #%d\n...expecting line of form '# # # # #'", nr);
-			exit(1);
+	else if (sscanf(line, "%d %d %d %d %d %d", &t[0], &t[1], &t[2], &t[3], &t[4], &t[5]) != 6) {
+		// pre-b5.180 version
+		t[5] = NOTHING;	// no custom-corpse
+		if (sscanf(line, "%d %d %d %d %d", &t[0], &t[1], &t[2], &t[3], &t[4]) != 5) {
+			// pre-b5.146 version
+			t[4] = NOTHING;	// no language
+			if (sscanf(line, "%d %d %d %d", &t[0], &t[1], &t[2], &t[3]) != 4) {
+				log("SYSERR: Format in second numeric section of mob #%d\n...expecting line of form '# # # # #'", nr);
+				exit(1);
+			}
 		}
 	}
 
@@ -5672,6 +5676,7 @@ void parse_mobile(FILE *mob_f, int nr) {
 	mob->mob_specials.move_type = t[2];
 	mob->mob_specials.attack_type = t[3];
 	mob->mob_specials.language = t[4];
+	mob->mob_specials.custom_corpse = t[5];
 
 	// basic setup
 	mob->points.max_pools[HEALTH] = 10;
@@ -5762,8 +5767,8 @@ void write_mob_to_file(FILE *fl, char_data *mob) {
 	strcpy(temp2, bitv_to_alpha(AFF_FLAGS(mob)));
 	fprintf(fl, "%d %d %s %s %d\n", GET_MIN_SCALE_LEVEL(mob), GET_MAX_SCALE_LEVEL(mob), temp, temp2, SET_SIZE(mob));
 	
-	// sex name-list move-type attack-type language
-	fprintf(fl, "%d %d %d %d %d\n", GET_SEX(mob), MOB_NAME_SET(mob), MOB_MOVE_TYPE(mob), MOB_ATTACK_TYPE(mob), MOB_LANGUAGE(mob));
+	// sex name-list move-type attack-type language custom-corpse
+	fprintf(fl, "%d %d %d %d %d %d\n", GET_SEX(mob), MOB_NAME_SET(mob), MOB_MOVE_TYPE(mob), MOB_ATTACK_TYPE(mob), MOB_LANGUAGE(mob), MOB_CUSTOM_CORPSE(mob));
 
 	// optionals:
 	

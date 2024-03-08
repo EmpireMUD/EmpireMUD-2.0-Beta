@@ -5095,19 +5095,21 @@ void load_one_room_from_wld_file(room_vnum vnum, char index_data) {
 		}
 		else {
 			log("SYSERR: Unable to open wld file %s", fname);
+			exit(1);
 		}
 		return;
 	}
 	
 	// for fread_string
-	sprintf(error, "load_one_room_from_wld_file: vnum %d (code %d)", vnum, index_data);
+	sprintf(error, "load_one_room_from_wld_file: %s (code %d)", fname, index_data);
 	
 	end = FALSE;
 	while (!end) {
 		// load next line
 		if (!get_line(fl, line)) {
 			log("SYSERR: Unexpected end of file: %s", error);
-			exit(1);
+			fclose(fl);
+			return;
 		}
 		
 		// tags by starting letter (for speed)
@@ -5115,7 +5117,7 @@ void load_one_room_from_wld_file(room_vnum vnum, char index_data) {
 			case '#': {	// the vnum line with the load code
 				if (sscanf(line, "#%d %c", &int_in[0], &char_in) != 2) {
 					log("SYSERR: Invalid # line: %s", error);
-					exit(1);
+					break;
 				}
 				// #code may be M or R -- NEED room if it's R
 				if (char_in == 'R' && !room) {
@@ -5139,7 +5141,7 @@ void load_one_room_from_wld_file(room_vnum vnum, char index_data) {
 				if (!strn_cmp(line, "Affect: ", 8) && room) {
 					if (sscanf(line + 8, "%d %d %ld %d %d %llu", &int_in[0], &int_in[1], &long_in, &int_in[2], &int_in[3], &bit_in[0]) != 6) {
 						log("SYSERR: Invalid affect line: %s", error);
-						exit(1);
+						break;
 					}
 					
 					CREATE(af, struct affected_type, 1);
@@ -5155,7 +5157,7 @@ void load_one_room_from_wld_file(room_vnum vnum, char index_data) {
 				else if (!strn_cmp(line, "Aff-flags: ", 11)) {
 					if (sscanf(line + 11, "%llu %llu", &bit_in[0], &bit_in[1]) != 2) {
 						log("SYSERR: Invalid aff-flags line: %s", error);
-						exit(1);
+						break;
 					}
 					
 					shared->base_affects = bit_in[0];
@@ -5171,7 +5173,7 @@ void load_one_room_from_wld_file(room_vnum vnum, char index_data) {
 				else if (!strn_cmp(line, "Built-with: ", 12) && room) {
 					if (sscanf(line + 12, "%d %d %d %d", &int_in[0], &int_in[1], &int_in[2], &int_in[3]) != 4) {
 						log("SYSERR: Invalid built-with line: %s", error);
-						exit(1);
+						break;
 					}
 					if (!COMPLEX_DATA(room)) {
 						COMPLEX_DATA(room) = init_complex_data();
@@ -5210,7 +5212,7 @@ void load_one_room_from_wld_file(room_vnum vnum, char index_data) {
 				else if (!strn_cmp(line, "Depletion: ", 11)) {
 					if (sscanf(line + 11, "%d %d", &int_in[0], &int_in[1]) != 2) {
 						log("SYSERR: Invalid depletion line: %s", error);
-						exit(1);
+						break;
 					}
 					
 					CREATE(dep, struct depletion_data, 1);
@@ -5241,7 +5243,7 @@ void load_one_room_from_wld_file(room_vnum vnum, char index_data) {
 				else if (!strn_cmp(line, "Exit: ", 6) && room) {
 					if (sscanf(line + 6, "%d %d %d %d", &int_in[0], &int_in[1], &int_in[2], &int_in[3]) != 4) {
 						log("SYSERR: Invalid exit line: %s", error);
-						exit(1);
+						break;
 					}
 					if (!COMPLEX_DATA(room)) {
 						COMPLEX_DATA(room) = init_complex_data();
@@ -5266,7 +5268,7 @@ void load_one_room_from_wld_file(room_vnum vnum, char index_data) {
 				else if (!strn_cmp(line, "Extra: ", 7)) {
 					if (sscanf(line + 7, "%d %d", &int_in[0], &int_in[1]) != 2) {
 						log("SYSERR: Invalid extra-data line: %s", error);
-						exit(1);
+						break;
 					}
 					set_extra_data(&shared->extra_data, int_in[0], int_in[1]);
 				}
@@ -5312,7 +5314,7 @@ void load_one_room_from_wld_file(room_vnum vnum, char index_data) {
 					if (*reset_read == 'A') {	// affect: type cast_by duration modifier location bitvector
 						if (sscanf(reset_read, "%c %lld %lld %lld %lld %lld %s", &reset->command, &reset->arg1, &reset->arg2, &reset->arg3, &reset->arg4, &reset->arg5, str_in) != 7) {
 							log("SYSERR: Invalid load command: %s: '%s'", error, line);
-							exit(1);
+							break;
 						}
 						reset->sarg1 = str_dup(str_in);
 					}
@@ -5327,7 +5329,7 @@ void load_one_room_from_wld_file(room_vnum vnum, char index_data) {
 					else {	// all other types:
 						if (sscanf(reset_read, "%c %lld %lld %lld %d", &reset->command, &reset->arg1, &reset->arg2, &reset->arg3, &int_in[0]) != 5) {
 							log("SYSERR: Invalid load command: %s: '%s'", error, line);
-							exit(1);
+							break;
 						}
 						else {
 							// try to load strings ONLY if the last digit is non-zero
@@ -5372,7 +5374,7 @@ void load_one_room_from_wld_file(room_vnum vnum, char index_data) {
 				if (!strn_cmp(line, "Resource: ", 10) && room) {
 					if (sscanf(line + 10, "%d %d %d %d", &int_in[0], &int_in[1], &int_in[2], &int_in[3]) != 4) {
 						log("SYSERR: Invalid resource line: %s", error);
-						exit(1);
+						break;
 					}
 					if (!COMPLEX_DATA(room)) {
 						COMPLEX_DATA(room) = init_complex_data();
@@ -5392,7 +5394,7 @@ void load_one_room_from_wld_file(room_vnum vnum, char index_data) {
 				if (!strn_cmp(line, "Sector: ", 8) && room) {
 					if (sscanf(line + 8, "%d %d", &int_in[0], &int_in[1]) != 2) {
 						log("SYSERR: Invalid sector line: %s", error);
-						exit(1);
+						break;
 					}
 					
 					// need to unlink shared data, if present, if this is not an ocean
@@ -5430,7 +5432,7 @@ void load_one_room_from_wld_file(room_vnum vnum, char index_data) {
 				else if (!strn_cmp(line, "Track: ", 7)) {
 					if (sscanf(line + 7, "%d %ld %d %d", &int_in[0], &long_in, &int_in[1], &int_in[2]) != 4) {
 						log("SYSERR: Invalid track line: %s", error);
-						exit(1);
+						break;
 					}
 					
 					HASH_FIND_INT(shared->tracks, &int_in[0], track);

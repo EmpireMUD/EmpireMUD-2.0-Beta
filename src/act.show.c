@@ -383,7 +383,7 @@ SHOW(show_account) {
 			}
 			else {
 				// not playing but same account
-				ago_ptr = strcpy(ago_buf, simple_time_since(loaded->prev_logon));
+				ago_ptr = strcpy(ago_buf, simple_time_since(GET_PREV_LOGON(loaded)));
 				skip_spaces(&ago_ptr);
 				
 				if (strchr(ago_ptr, 'y')) {
@@ -401,7 +401,7 @@ SHOW(show_account) {
 				
 				msg_to_char(ch, " [%d %s] %s - \t%c%s ago\t0\r\n", GET_LAST_KNOWN_LEVEL(loaded), skills, GET_PC_NAME(loaded), color, ago_ptr);
 				if (last_online != ONLINE_NOW) {
-					last_online = MAX(last_online, loaded->prev_logon);
+					last_online = MAX(last_online, GET_PREV_LOGON(loaded));
 				}
 			}
 		}
@@ -1894,7 +1894,7 @@ SHOW(show_player) {
 	}
 	sprintf(buf, "Player: %-12s (%s) [%d]\r\n", GET_PC_NAME(plr), genders[(int) GET_REAL_SEX(plr)], GET_ACCESS_LEVEL(plr));
 	strcpy(birth, ctime(&plr->player.time.birth));
-	strcpy(lastlog, ctime(&plr->prev_logon));
+	strcpy(lastlog, ctime(&GET_PREV_LOGON(plr)));
 	// Www Mmm dd hh:mm:ss yyyy
 	sprintf(buf + strlen(buf), "Started: %-16.16s %4.4s   Last: %-16.16s %4.4s\r\n", birth, birth+20, lastlog, lastlog+20);
 	

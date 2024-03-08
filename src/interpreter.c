@@ -2137,8 +2137,8 @@ void send_login_motd(descriptor_data *desc, int bad_pws) {
 	}
 
 	/* Check previous logon */
-	if (desc->character->prev_host && desc->character->prev_logon > 0) {
-		sprintf(buf, "Your last login was on %6.10s from %s.\r\n", ctime(&desc->character->prev_logon), desc->character->prev_host);
+	if (GET_PREV_HOST(desc->character) && GET_PREV_LOGON(desc->character) > 0) {
+		sprintf(buf, "Your last login was on %6.10s from %s.\r\n", ctime(&GET_PREV_LOGON(desc->character)), GET_PREV_HOST(desc->character));
 		SEND_TO_Q(buf, desc);
 	}
 }
@@ -2245,8 +2245,17 @@ int perform_dupe_check(descriptor_data *d) {
 	REMOVE_BIT(PLR_FLAGS(d->character), PLR_MAILING);
 	STATE(d) = CON_PLAYING;
 
-	if (PLR_FLAGGED(d->character, PLR_IPMASK))
+	if (PLR_FLAGGED(d->character, PLR_IPMASK)) {
 		strcpy(d->host, "masked");
+	}
+	
+	// update stored host
+	if (IN_ROOM(d->character)) {
+		if (GET_PREV_HOST(d->character)) {
+			free(GET_PREV_HOST(d->character));
+		}
+		GET_PREV_HOST(d->character) = strdup(d->host);
+	}
 
 	switch (mode) {
 		case RECON:
@@ -2258,7 +2267,7 @@ int perform_dupe_check(descriptor_data *d) {
 			SEND_TO_Q("You take over your own body, already in use!\r\n", d);
 			act("$n suddenly keels over in pain, surrounded by a white aura...\r\n"
 				"$n's body has been taken over by a new spirit!", TRUE, d->character, 0, 0, TO_ROOM);
-			syslog(SYS_LOGIN, GET_INVIS_LEV(d->character), TRUE, "%s has re-logged in at %s ... disconnecting old socket", GET_NAME(d->character), IN_ROOM(d->character) ? room_log_identifier(IN_ROOM(d->character)) : "an unknown location");
+			syslog(SYS_LOGIN, GET_INVIS_LEV(d->character), TRUE, "%s [%s] has re-logged in at %s ... disconnecting old socket", GET_NAME(d->character), d->host, IN_ROOM(d->character) ? room_log_identifier(IN_ROOM(d->character)) : "an unknown location");
 			break;
 		case UNSWITCH:
 			SEND_TO_Q("Reconnecting to unswitched char.", d);
@@ -2394,7 +2403,7 @@ void nanny(descriptor_data *d, char *arg) {
 				clear_char(d->character);
 				init_player_specials(d->character);
 				d->character->desc = d;
-				d->character->prev_host = str_dup(d->host);	// this will be overwritten if it's not a new char
+				GET_PREV_HOST(d->character) = str_dup(d->host);	// this will be overwritten if it's not a new char
 			}
 			
 			if (!*arg) {

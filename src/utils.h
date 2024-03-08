@@ -918,6 +918,7 @@ int Y_COORD(room_data *room);	// formerly #define Y_COORD(room)  FLAT_Y_COORD(ge
 #define GET_MIN_SCALE_LEVEL(ch)  ((ch)->mob_specials.min_scale_level)
 #define MOB_NAME_SET(ch)  ((ch)->mob_specials.name_set)
 #define MOB_ATTACK_TYPE(ch)  ((ch)->mob_specials.attack_type)
+#define MOB_CUSTOM_CORPSE(ch)  ((ch)->mob_specials.custom_corpse)
 #define MOB_CUSTOM_MSGS(ch)  ((ch)->mob_specials.custom_msgs)
 #define MOB_DAMAGE(ch)  ((ch)->mob_specials.damage)
 #define MOB_DYNAMIC_NAME(ch)  ((ch)->mob_specials.dynamic_name)
@@ -1341,6 +1342,8 @@ int Y_COORD(room_data *room);	// formerly #define Y_COORD(room)  FLAT_Y_COORD(ge
 #define GET_PERSONAL_LASTNAME(ch)  CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->personal_lastname))
 #define GET_PLAYER_COINS(ch)  CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->coins))
 #define GET_PLEDGE(ch)  CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->pledge))
+#define GET_PREV_HOST(ch)  CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->prev_host))
+#define GET_PREV_LOGON(ch)  CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->prev_logon))
 #define GET_PROMO_ID(ch)  CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->promo_id))
 #define GET_PROMPT(ch)  CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->prompt))
 #define GET_QUESTS(ch)  CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->quests))
@@ -2158,7 +2161,6 @@ void set_workforce_limit_all(empire_data *emp, int chore, int limit);
 void show_workforce_setup_to_char(empire_data *emp, char_data *ch);
 
 // act.immortal.c
-void perform_autostore(obj_data *obj, empire_data *emp, int island);
 void perform_immort_vis(char_data *ch);
 void show_spawn_summary_display(char_data *ch, bool use_page_display, struct spawn_info *list);
 
@@ -2432,10 +2434,12 @@ void check_empire_storage_timers();
 void check_home_storage_timers(char_data *ch);
 void check_pointless_fight(char_data *mob);
 void check_ruined_cities(empire_data *only_emp);
+void force_autostore(room_data *room);
 void gain_condition(char_data *ch, int condition, int value);
 int health_gain(char_data *ch, bool info_only);
 int mana_gain(char_data *ch, bool info_only);
 int move_gain(char_data *ch, bool info_only);
+void perform_force_autostore(obj_data *obj, empire_data *emp, int island);
 void schedule_all_obj_timers(char_data *ch);
 void schedule_heal_over_time(char_data *ch);
 void schedule_obj_autostore_check(obj_data *obj, long new_autostore_timer);

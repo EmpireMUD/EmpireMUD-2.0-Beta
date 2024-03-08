@@ -992,7 +992,7 @@ OCMD(do_oslay) {
 			}
 			else {
 				// basic death log
-				log_to_slash_channel_by_name(DEATH_LOG_CHANNEL, vict, "%s has died at (%d, %d)!", PERS(vict, vict, TRUE), X_COORD(IN_ROOM(vict)), Y_COORD(IN_ROOM(vict)));
+				log_to_slash_channel_by_name(DEATH_LOG_CHANNEL, vict, "%s has died at%s!", PERS(vict, vict, TRUE), coord_display_room(NULL, IN_ROOM(vict), FALSE));
 			}
 			syslog(SYS_DEATH, 0, TRUE, "DEATH: %s has been killed by a script at %s (obj %d)", GET_NAME(vict), room_log_identifier(IN_ROOM(vict)), GET_OBJ_VNUM(obj));
 		}
@@ -1423,14 +1423,11 @@ OCMD(do_oload) {
 			if (*arg2 && (pos = find_eq_pos_script(arg2)) >= 0 && !GET_EQ(tch, pos) && CAN_WEAR(object, wear_data[pos].item_wear)) {
 				equip_char(tch, object, pos);
 				load_otrigger(object);
-				// get_otrigger(object, tch, FALSE);
 				determine_gear_level(tch);
 				return;
 			}
 			obj_to_char(object, tch);
-			if (load_otrigger(object)) {
-				get_otrigger(object, tch, FALSE);
-			}
+			load_otrigger(object);
 			return;
 		}
 		cnt = get_obj_near_obj(obj, arg1);

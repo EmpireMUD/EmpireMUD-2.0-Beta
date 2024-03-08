@@ -955,6 +955,9 @@ void free_char(char_data *ch) {
 		if (GET_CREATION_HOST(ch)) {
 			free(GET_CREATION_HOST(ch));
 		}
+		if (GET_PREV_HOST(ch)) {
+			free(GET_PREV_HOST(ch));
+		}
 		if (GET_REFERRED_BY(ch)) {
 			free(GET_REFERRED_BY(ch));
 		}
@@ -1114,9 +1117,6 @@ void free_char(char_data *ch) {
 	// mob prototype checks
 	proto = IS_NPC(ch) ? mob_proto(GET_MOB_VNUM(ch)) : NULL;
 	
-	if (ch->prev_host && (!proto || ch->prev_host != proto->prev_host)) {
-		free(ch->prev_host);
-	}
 	if (ch->player.name && (!proto || ch->player.name != proto->player.name)) {
 		free(ch->player.name);
 	}
@@ -1876,16 +1876,16 @@ char_data *read_player_from_file(FILE *fl, char *name, bool normal, char_data *c
 					GET_PERSONAL_LASTNAME(ch) = str_dup(trim(line + 10));
 				}
 				else if (!strn_cmp(line, "Last Host: ", 11)) {
-					if (ch->prev_host) {
-						free(ch->prev_host);
+					if (GET_PREV_HOST(ch)) {
+						free(GET_PREV_HOST(ch));
 					}
-					ch->prev_host = str_dup(trim(line + 11));
+					GET_PREV_HOST(ch) = str_dup(trim(line + 11));
 				}
 				else if (!strn_cmp(line, "Last Known Level: ", 18)) {
 					GET_LAST_KNOWN_LEVEL(ch) = atoi(line + 18);
 				}
 				else if (!strn_cmp(line, "Last Logon: ", 12)) {
-					ch->prev_logon = atol(line + 12);
+					GET_PREV_LOGON(ch) = atol(line + 12);
 				}
 				else if (!strn_cmp(line, "Last Tell: ", 11)) {
 					GET_LAST_TELL(ch) = atoi(line + 11);
@@ -2356,9 +2356,9 @@ char_data *read_player_from_file(FILE *fl, char *name, bool normal, char_data *c
 	REMOVE_BIT(PLR_FLAGS(ch), PLR_EXTRACTED | PLR_DONTSET);
 	
 	// Players who have been out for 1 hour get a free restore
-	RESTORE_ON_LOGIN(ch) = (((int) (time(0) - ch->prev_logon)) >= 1 * SECS_PER_REAL_HOUR);
+	RESTORE_ON_LOGIN(ch) = (((int) (time(0) - GET_PREV_LOGON(ch))) >= 1 * SECS_PER_REAL_HOUR);
 	if (GET_LOYALTY(ch)) {
-		REREAD_EMPIRE_TECH_ON_LOGIN(ch) = (EMPIRE_MEMBERS(GET_LOYALTY(ch)) < 1 || get_member_timeout_time(ch->player.time.birth, ch->prev_logon, ((double)ch->player.time.played) / SECS_PER_REAL_HOUR) <= time(0));
+		REREAD_EMPIRE_TECH_ON_LOGIN(ch) = (EMPIRE_MEMBERS(GET_LOYALTY(ch)) < 1 || get_member_timeout_time(ch->player.time.birth, GET_PREV_LOGON(ch), ((double)ch->player.time.played) / SECS_PER_REAL_HOUR) <= time(0));
 	}
 	
 	// ensure random triggers are shut off on home storage
@@ -2545,9 +2545,9 @@ void update_player_index(player_index_data *index, char_data *ch) {
 	index->fullname = str_dup(PERS(ch, ch, TRUE));
 	
 	index->account_id = GET_ACCOUNT(ch) ? GET_ACCOUNT(ch)->id : 0;	// may not be set yet
-	index->last_logon = ch->prev_logon;
+	index->last_logon = GET_PREV_LOGON(ch);
 	if (GET_ACCOUNT(ch)) {
-		GET_ACCOUNT(ch)->last_logon = MAX(GET_ACCOUNT(ch)->last_logon, ch->prev_logon);
+		GET_ACCOUNT(ch)->last_logon = MAX(GET_ACCOUNT(ch)->last_logon, GET_PREV_LOGON(ch));
 	}
 	index->birth = ch->player.time.birth;
 	index->played = ch->player.time.played;
@@ -2557,11 +2557,11 @@ void update_player_index(player_index_data *index, char_data *ch) {
 	index->rank = GET_RANK(ch);
 	index->highest_known_level = GET_HIGHEST_KNOWN_LEVEL(ch);
 	
-	if (ch->desc || ch->prev_host) {
+	if (ch->desc || GET_PREV_HOST(ch)) {
 		if (index->last_host) {
 			free(index->last_host);
 		}
-		index->last_host = str_dup((ch->desc && !PLR_FLAGGED(ch, PLR_KEEP_LAST_LOGIN_INFO)) ? ch->desc->host : ch->prev_host);
+		index->last_host = str_dup((ch->desc && !PLR_FLAGGED(ch, PLR_KEEP_LAST_LOGIN_INFO)) ? ch->desc->host : GET_PREV_HOST(ch));
 	}
 }
 
@@ -2669,12 +2669,12 @@ void write_player_primary_data_to_file(FILE *fl, char_data *ch) {
 	// Last login info
 	if (PLR_FLAGGED(ch, PLR_KEEP_LAST_LOGIN_INFO)) {
 		// player was loaded from file
-		fprintf(fl, "Last Host: %s\n", NULLSAFE(ch->prev_host));
-		fprintf(fl, "Last Logon: %ld\n", ch->prev_logon);
+		fprintf(fl, "Last Host: %s\n", NULLSAFE(GET_PREV_HOST(ch)));
+		fprintf(fl, "Last Logon: %ld\n", GET_PREV_LOGON(ch));
 	}
 	else {
 		update_played_time(ch);
-		fprintf(fl, "Last Host: %s\n", ch->desc ? ch->desc->host : NULLSAFE(ch->prev_host));
+		fprintf(fl, "Last Host: %s\n", ch->desc ? ch->desc->host : NULLSAFE(GET_PREV_HOST(ch)));
 		fprintf(fl, "Last Logon: %ld\n", ch->player.time.logon);
 	}
 	
@@ -4472,7 +4472,7 @@ void enter_player_game(descriptor_data *d, int dolog, bool fresh) {
 	// place character
 	char_to_room(ch, load_room);
 	qt_visit_room(ch, IN_ROOM(ch));
-	ch->prev_logon = ch->player.time.logon;	// and update prev_logon now
+	GET_PREV_LOGON(ch) = ch->player.time.logon;	// and update prev_logon now
 	
 	// verify morph stats
 	if (!IS_MORPHED(ch)) {
@@ -4654,6 +4654,12 @@ void enter_player_game(descriptor_data *d, int dolog, bool fresh) {
 	
 	if (ch->desc) {
 		send_initial_MSDP(ch->desc);
+		
+		// update stored host
+		if (GET_PREV_HOST(ch)) {
+			free(GET_PREV_HOST(ch));
+		}
+		GET_PREV_HOST(ch) = strdup(ch->desc->host);
 	}
 	
 	affect_total(ch);	// final affect total
@@ -6120,7 +6126,7 @@ bool member_is_timed_out_index(player_index_data *index) {
 * @return time_t When the member would time out (past/present/future).
 */
 time_t get_member_timeout_ch(char_data *ch) {
-	return get_member_timeout_time(ch->player.time.birth, ch->prev_logon, ((double)ch->player.time.played) / SECS_PER_REAL_HOUR);
+	return get_member_timeout_time(ch->player.time.birth, GET_PREV_LOGON(ch), ((double)ch->player.time.played) / SECS_PER_REAL_HOUR);
 }
 
 
@@ -6179,7 +6185,7 @@ void read_empire_members(empire_data *only_empire, bool read_techs) {
 		// check ch for empire traits
 		if (ch && (e = GET_LOYALTY(ch))) {
 			// record last-logon whether or not timed out
-			logon = is_file ? ch->prev_logon : time(0);
+			logon = is_file ? GET_PREV_LOGON(ch) : time(0);
 			if (logon > EMPIRE_LAST_LOGON(e)) {
 				EMPIRE_LAST_LOGON(e) = logon;
 			}

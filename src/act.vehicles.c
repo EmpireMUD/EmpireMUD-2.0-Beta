@@ -424,12 +424,12 @@ bool perform_get_from_vehicle(char_data *ch, obj_data *obj, vehicle_data *veh, i
 	}
 	
 	if (mode == FIND_OBJ_INV || can_take_obj(ch, obj)) {
+		// last-minute scaling: scale to its minimum (adventures will override this on their own)
+		if (GET_OBJ_CURRENT_SCALE_LEVEL(obj) < 1) {
+			scale_item_to_level(obj, GET_OBJ_MIN_SCALE_LEVEL(obj));
+		}
+		
 		if (get_otrigger(obj, ch, TRUE)) {
-			// last-minute scaling: scale to its minimum (adventures will override this on their own)
-			if (GET_OBJ_CURRENT_SCALE_LEVEL(obj) < 1) {
-				scale_item_to_level(obj, GET_OBJ_MIN_SCALE_LEVEL(obj));
-			}
-			
 			obj_to_char(obj, ch);
 			act("You get $p from $V.", FALSE, ch, obj, veh, TO_CHAR | TO_QUEUE | ACT_VEH_VICT);
 			act("$n gets $p from $V.", TRUE, ch, obj, veh, TO_ROOM | TO_QUEUE | ACT_VEH_VICT);
@@ -1607,7 +1607,13 @@ ACMD(do_drag) {
 	}
 	// vehicle validation
 	else if (!(veh = get_vehicle_in_room_vis(ch, what, NULL))) {
-		msg_to_char(ch, "You don't see %s %s here.\r\n", AN(what), what);
+		// better error message when targeting items
+		if (get_obj_in_list_vis(ch, what, NULL, ROOM_CONTENTS(IN_ROOM(ch)))) {
+			msg_to_char(ch, "You can't drag items -- only vehicles.\r\n");
+		}
+		else {
+			msg_to_char(ch, "You don't see %s %s here.\r\n", AN(what), what);
+		}
 	}
 	else if (!VEH_FLAGGED(veh, VEH_DRAGGABLE)) {
 		msg_to_char(ch, "You can't drag that!\r\n");

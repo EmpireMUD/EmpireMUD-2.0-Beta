@@ -783,10 +783,6 @@ void cancel_morphing(char_data *ch) {
 			bind_obj_to_player(obj, ch);
 			reduce_obj_binding(obj, ch);
 		}
-		
-		if (obj_ok) {
-			get_otrigger(obj, ch, FALSE);
-		}
 	}
 }
 
@@ -881,9 +877,6 @@ INTERACTION_FUNC(finish_chopping) {
 		scale_item_to_level(obj, 1);	// minimum level
 		obj_to_char_or_room(obj, ch);
 		obj_ok = load_otrigger(obj);
-		if (obj_ok) {
-			get_otrigger(obj, ch, FALSE);
-		}
 	}
 	
 	add_depletion(inter_room, DPLTN_CHOP, FALSE);
@@ -933,9 +926,6 @@ INTERACTION_FUNC(finish_harvesting) {
 			scale_item_to_level(obj, 1);	// minimum level
 			obj_to_char_or_room(obj, ch);
 			obj_ok = load_otrigger(obj);
-			if (obj_ok) {
-				get_otrigger(obj, ch, FALSE);
-			}
 		}
 		
 		// mark gained
@@ -989,9 +979,7 @@ INTERACTION_FUNC(finish_mining) {
 		act(cust ? cust : "With $s last stroke, $p falls from the wall where $n was picking!", FALSE, ch, obj, NULL, TO_ROOM);
 		
 		end_action(ch);
-		if ((obj_ok = load_otrigger(obj))) {
-			get_otrigger(obj, ch, FALSE);
-		}
+		obj_ok = load_otrigger(obj);
 		any = TRUE;
 	}
 	
@@ -1036,9 +1024,6 @@ INTERACTION_FUNC(finish_scraping) {
 			obj_to_room(load, IN_ROOM(ch));
 		}
 		obj_ok = load_otrigger(load);
-		if (obj_ok && load->carried_by) {
-			get_otrigger(load, load->carried_by, FALSE);
-		}
 	}
 	
 	// mark gained
@@ -3450,9 +3435,6 @@ INTERACTION_FUNC(finish_gen_interact_room) {
 		scale_item_to_level(obj, 1);	// minimum level
 		obj_to_char_or_room(obj, ch);
 		obj_ok = load_otrigger(obj);
-		if (obj_ok) {
-			get_otrigger(obj, ch, FALSE);
-		}
 	}
 	
 	// mark gained

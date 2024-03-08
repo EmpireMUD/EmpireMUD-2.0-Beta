@@ -4308,6 +4308,7 @@ struct mob_special_data {
 	any_vnum language;	// default language (NOTHING to use global default instead)
 	struct custom_message *custom_msgs;	// any custom messages
 	faction_data *faction;	// if any
+	obj_vnum custom_corpse;	// obj vnum for the mob's corpse
 	
 	int to_hit;	// Mob's attack % bonus
 	int to_dodge;	// Mob's dodge % bonus
@@ -4768,6 +4769,8 @@ struct player_special_data {
 	account_data *account;	// pointer to account_table entry
 	int temporary_account_id;	// used during creation
 	char *creation_host;	// host they created from
+	char *prev_host;	// last host they played from (or are they Trills?)
+	time_t prev_logon;	// Time (in secs) of prev logon
 	char *referred_by;	// as entered in character creation
 	byte invis_level;	// level of invisibility
 	byte immortal_level;	// stored so that if level numbers are changed, imms stay at the correct level
@@ -5085,9 +5088,6 @@ struct char_data {
 	struct follow_type *followers;	// List of chars followers
 	char_data *leader;	// Who is char following?
 	struct group_data *group;	// Character's Group
-
-	char *prev_host;	// Previous host (they're Trills)
-	time_t prev_logon;	// Time (in secs) of prev logon
 	
 	// live data (not saved, not freed)
 	struct quest_lookup *quest_lookups;

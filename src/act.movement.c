@@ -1498,13 +1498,25 @@ void char_through_portal(char_data *ch, obj_data *portal, bool following) {
 		act(buf, FALSE, ch, use_portal, GET_LEADING_VEHICLE(ch), TO_CHAR | TO_ROOM | ACT_VEH_VICT);
 	}
 	
+	// leading mob
+	if (GET_LEADING_MOB(ch) && IN_ROOM(GET_LEADING_MOB(ch)) == was_in && GET_POS(GET_LEADING_MOB(ch)) >= POS_STANDING && can_enter_room(GET_LEADING_MOB(ch), to_room)) {
+		if (!can_enter_portal(GET_LEADING_MOB(ch), portal, TRUE, TRUE)) {
+			// sent its own message
+			msg_to_char(GET_LEADING_MOB(ch), "You are unable to follow.\r\n");
+		}
+		else {
+			act("You follow $N.\r\n", FALSE, GET_LEADING_MOB(ch), NULL, ch, TO_CHAR);
+			char_through_portal(GET_LEADING_MOB(ch), portal, TRUE);
+		}
+	}
+	
 	// now followers
 	for (fol = ch->followers; fol; fol = next_fol) {
 		next_fol = fol->next;
 		if ((IN_ROOM(fol->follower) == was_in) && (GET_POS(fol->follower) >= POS_STANDING) && can_enter_room(fol->follower, to_room)) {
 			if (!can_enter_portal(fol->follower, portal, TRUE, TRUE)) {
 				// sent its own message
-				msg_to_char(ch, "You are unable to follow.\r\n");
+				msg_to_char(fol->follower, "You are unable to follow.\r\n");
 			}
 			else {
 				act("You follow $N.\r\n", FALSE, fol->follower, 0, ch, TO_CHAR);

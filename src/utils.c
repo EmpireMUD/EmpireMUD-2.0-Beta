@@ -2073,6 +2073,7 @@ char *any_one_word(char *argument, char *first_arg) {
 void chop_last_arg(char *string, char *most_args, char *last_arg) {
 	int end_pos;
 	
+	skip_spaces(&string);
 	*most_args = *last_arg = '\0';
 	
 	if (!string || !*string) {
@@ -4402,9 +4403,7 @@ void give_resources(char_data *ch, struct resource_data *list, bool split) {
 						obj_to_room(obj, IN_ROOM(ch));
 					}
 					
-					if (load_otrigger(obj) && obj->carried_by) {
-						get_otrigger(obj, obj->carried_by, FALSE);
-					}
+					load_otrigger(obj);
 				}
 				break;
 			}

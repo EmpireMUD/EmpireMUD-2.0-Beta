@@ -893,9 +893,7 @@ void finish_dismantle(char_data *ch, room_data *room) {
 				if (OBJ_FLAGGED(newobj, OBJ_BIND_FLAGS)) {
 					bind_obj_to_player(newobj, ch);
 				}
-				if (load_otrigger(newobj)) {
-					get_otrigger(newobj, ch, FALSE);
-				}
+				load_otrigger(newobj);
 			}
 		}
 	}
@@ -2089,8 +2087,9 @@ char *vnum_to_interlink(room_vnum vnum) {
 *
 * @param char_data *ch The player (not NPC).
 * @param vehicle_data *veh The vehicle they targeted.
+* @param bool confirm If TRUE, the player typed 'confirm' as the last arg. FALSE if not.
 */
-void do_dismantle_vehicle(char_data *ch, vehicle_data *veh) {
+void do_dismantle_vehicle(char_data *ch, vehicle_data *veh, bool confirm) {
 	char_data *ch_iter;
 	craft_data *craft;
 	
@@ -2132,8 +2131,8 @@ void do_dismantle_vehicle(char_data *ch, vehicle_data *veh) {
 	else if ((craft = find_craft_for_vehicle(veh)) && !CRAFT_FLAGGED(craft, CRAFT_DISMANTLE_WITHOUT_ABILITY) && GET_CRAFT_ABILITY(craft) != NO_ABIL && !has_ability(ch, GET_CRAFT_ABILITY(craft)) && get_vehicle_extra_data(veh, ROOM_EXTRA_ORIGINAL_BUILDER) != GET_ACCOUNT(ch)->id) {
 		msg_to_char(ch, "You don't have the skill needed to dismantle that properly.\r\n");
 	}
-	else if (VEH_FLAGGED(veh, VEH_PLAYER_NO_DISMANTLE) || ROOM_AFF_FLAGGED(IN_ROOM(veh), ROOM_AFF_NO_DISMANTLE)) {
-		msg_to_char(ch, "Turn off no-dismantle before dismantling that %s (see HELP MANAGE).\r\n", VEH_OR_BLD(veh));
+	else if ((VEH_FLAGGED(veh, VEH_PLAYER_NO_DISMANTLE) || ROOM_AFF_FLAGGED(IN_ROOM(veh), ROOM_AFF_NO_DISMANTLE)) && !confirm) {
+		msg_to_char(ch, "Turn off no-dismantle before dismantling that %s (see HELP MANAGE, or use 'dismantle %s confirm' to override).\r\n", VEH_OR_BLD(veh), fname(VEH_KEYWORDS(veh)));
 	}
 	else if (VEH_FLAGGED(veh, VEH_ON_FIRE)) {
 		msg_to_char(ch, "You can't dismantle that -- it's on fire!\r\n");
@@ -2178,6 +2177,8 @@ void do_dismantle_vehicle(char_data *ch, vehicle_data *veh) {
 
 
 ACMD(do_dismantle) {
+	bool confirm = FALSE;
+	char temp[MAX_INPUT_LENGTH];
 	vehicle_data *veh;
 	char_data *ch_iter;
 	craft_data *type;
@@ -2187,11 +2188,27 @@ ACMD(do_dismantle) {
 		return;
 	}
 	
+	// check a 'confirm' as the last arg?
+	chop_last_arg(argument, temp, arg);
+	if (*arg && !str_cmp(arg, "confirm")) {
+		confirm = TRUE;
+		argument = temp;
+	}
+	else if (!*arg && *temp && !str_cmp(temp, "confirm")) {
+		confirm = TRUE;
+		*temp = '\0';
+		argument = temp;
+	}
+	// else: just continue with the original argument
+	
 	// fall through to dismantle-vehicle?
 	one_argument(argument, arg);
-	if (*arg && (veh = get_vehicle_in_room_vis(ch, arg, NULL))) {
-		do_dismantle_vehicle(ch, veh);
-		return;
+	if (*arg) {
+		if ((veh = get_vehicle_in_room_vis(ch, arg, NULL))) {
+			do_dismantle_vehicle(ch, veh, confirm);
+			return;
+		}
+		// else: fall through
 	}
 	
 	// not a vehicle
@@ -2201,7 +2218,7 @@ ACMD(do_dismantle) {
 	}
 	
 	// otherwise args are not welcome
-	if (*arg && !isname(arg, get_room_name(IN_ROOM(ch), FALSE))) {
+	if (*arg && !is_abbrev(arg, "building") && !isname(arg, get_room_name(IN_ROOM(ch), FALSE)) && (!GET_BUILDING(IN_ROOM(ch)) || !isname(arg, GET_BLD_NAME(GET_BUILDING(IN_ROOM(ch)))))) {
 		msg_to_char(ch, "You don't see that to dismantle here.\r\n");
 		return;
 	}
@@ -2306,8 +2323,8 @@ ACMD(do_dismantle) {
 		return;
 	}
 
-	if (ROOM_AFF_FLAGGED(IN_ROOM(ch), ROOM_AFF_NO_DISMANTLE)) {
-		msg_to_char(ch, "You can't dismantle this building (use 'manage no-dismantle' to toggle).\r\n");
+	if (ROOM_AFF_FLAGGED(IN_ROOM(ch), ROOM_AFF_NO_DISMANTLE) && !confirm) {
+		msg_to_char(ch, "You can't dismantle this building (use 'manage no-dismantle' to toggle, or 'dismantle confirm' to override).\r\n");
 		return;
 	}
 	if (!can_see_in_dark_room(ch, IN_ROOM(ch), TRUE)) {

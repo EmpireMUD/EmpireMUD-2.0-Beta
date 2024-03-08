@@ -4837,14 +4837,6 @@ Skycleave: Shared get trigger (diary replacement, struggle)~
 1 g 100
 ~
 if %self.vnum% == 11890
-  * struggle
-  if %self.carried_by%
-    if %self.carried_by.affect(11822)%
-      * likely called during load trigger
-      return 1
-      halt
-    end
-  end
   * the struggle-- just purge
   %send% %actor% # You can't get that.
   return 0
@@ -4852,13 +4844,6 @@ if %self.vnum% == 11890
   halt
 end
 * otherwise: Time-traveler's diary:
-if %actor%
-  set ch %actor%
-elseif %self.carried_by%
-  set ch %self.carried_by%
-else
-  halt
-end
 * gives the pages in order if not owned, or at random if owned
 set diary_list 11918 11920 11919
 set list_size 3
@@ -4869,16 +4854,14 @@ set list %diary_list%
 while %list%
   set vnum %list.car%
   set list %list.cdr%
-  if !%ch.inventory(%vnum%)% && !%ch.on_quest(%vnum%)% && !%ch.completed_quest(%vnum%)%
-    if %ch%
-      %load% obj %vnum% %ch% inv
-      set obj %ch.inventory(%vnum%)%
-      if %obj% && %obj.vnum% == %vnum%
-        nop %obj.bind(%self%)%
-      end
-      %purge% %self%
-      halt
+  if !%actor.inventory(%vnum%)% && !%actor.on_quest(%vnum%)% && !%actor.completed_quest(%vnum%)%
+    %load% obj %vnum% %actor% inv
+    set obj %actor.inventory(%vnum%)%
+    if %obj% && %obj.vnum% == %vnum%
+      nop %obj.bind(%self%)%
     end
+    %purge% %self%
+    halt
   end
 done
 * just give a random one
@@ -4888,9 +4871,9 @@ while %pos% > 0
   set diary_list %diary_list.cdr%
   eval pos %pos% - 1
 done
-if %vnum% && %ch%
-  %load% obj %vnum% %ch% inv
-  set obj %ch.inventory(%vnum%)%
+if %vnum% && %actor%
+  %load% obj %vnum% %actor% inv
+  set obj %actor.inventory(%vnum%)%
   if %obj% && %obj.vnum% == %vnum%
     nop %obj.bind(%self%)%
   end

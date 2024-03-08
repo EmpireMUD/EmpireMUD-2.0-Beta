@@ -45,10 +45,10 @@ void mudstats_empires(char_data *ch, char *argument);
 void mudstats_time(char_data *ch, char *argument);
 
 // local protos
-ACMD(do_affects);
 void list_one_char(char_data *i, char_data *ch, int num);
 void look_at_char(char_data *i, char_data *ch, bool show_eq);
 void look_in_obj(char_data *ch, char *arg, obj_data *obj, vehicle_data *veh, bool send_page);
+void show_character_affects_full(char_data *ch, char_data *to, bool show_conditions, bool send_page);
 void show_one_stored_item_to_char(char_data *ch, empire_data *emp, struct empire_storage_data *store, bool show_zero, bool use_page_display);
 
 
@@ -1153,15 +1153,8 @@ void display_score_to_char(char_data *ch, char_data *to) {
 	// everything leaves a starting space so this next line does not need it
 	build_page_display(to, " +---------------------------------------------------------------------------+");
 	
-	// affects last -- put nothing after these as they may also flush send_page_display()
-	if (ch == to) {
-		// show full effects, which is only formatted for the character (subcmd=1 to indicate it's being called from another function)
-		do_affects(to, "", 0, 1);
-	}
-	else {
-		// show summary effects
-		show_character_affects(ch, to, FALSE);
-	}
+	// affects last
+	show_character_affects_full(ch, to, FALSE, FALSE);
 	
 	send_page_display(to);
 }
@@ -1817,6 +1810,99 @@ void show_character_affects(char_data *ch, char_data *to, bool send_output) {
 	
 	if (send_output) {
 		send_page_display_as(to, PD_NO_PAGINATION | PD_FREE_DISPLAY_AFTER);
+	}
+}
+
+
+/**
+* Shows all affs on a character plus their mount and disguised. Mainly designed
+* for use on the 'affects' command (when used on self) and the 'score' command.
+*
+* @param char_data *ch The person to view effects on.
+* @param char_data *to The person to show this to.
+* @param bool show_conditions If TRUE, will also show hunger/thirst/etc.
+* @param bool send_page If TRUE, sends the output at the end. If FALSE, just builds it into to's page_display.
+*/
+void show_character_affects_full(char_data *ch, char_data *to, bool show_conditions, bool send_page) {
+	bool any;
+	char start[256], temp[MAX_STRING_LENGTH];
+	char *str;
+
+	build_page_display(to, "  Affects:");
+	
+	// build sentence start
+	if (ch == to) {
+		safe_snprintf(start, sizeof(start), "You are");
+	}
+	else {
+		safe_snprintf(start, sizeof(start), "&Z%s is", HSSH(ch));
+	}
+	
+	// Conditions: (optionally)
+	if (show_conditions) {
+		// This reports conditions all on one line -- end each one with a comma and a space
+		*temp = '\0';
+		any = FALSE;
+		
+		// detect each condition
+		if ((str = how_hungry(ch)) && (strlen(str) + strlen(temp) + 4) < sizeof(temp)) {
+			strcat(temp, str);
+			strcat(temp, ", ");
+			any = TRUE;
+		}
+		if ((str = how_thirsty(ch)) && (strlen(str) + strlen(temp) + 4) < sizeof(temp)) {
+			strcat(temp, str);
+			strcat(temp, ", ");
+			any = TRUE;
+		}
+		if ((str = how_drunk(ch)) && (strlen(str) + strlen(temp) + 4) < sizeof(temp)) {
+			strcat(temp, str);
+			strcat(temp, ", ");
+			any = TRUE;
+		}
+		if ((str = how_blood_starved(ch)) && (strlen(str) + strlen(temp) + 4) < sizeof(temp)) {
+			strcat(temp, str);
+			strcat(temp, ", ");
+			any = TRUE;
+		}
+		
+		if (any) {
+			// trim final comma
+			temp[strlen(temp)-2] = '\0';
+			
+			// convert final comma to "and":
+			if ((str = strrchr(temp, ','))) {
+				*str = '\0';	// terminate temp here; keep the rest
+				str += 2;	// skip past ", "
+				
+				build_page_display(to, "   %s %s and %s.", start, temp, str);
+			}
+			else {
+				build_page_display(to, "   %s %s.", start, temp);
+			}
+		}
+	}
+	
+	// mount
+	if (IS_RIDING(ch)) {
+		build_page_display(to, "   %s riding %s.", start, get_mob_name_by_proto(GET_MOUNT_VNUM(ch), TRUE));
+	}
+	else if (has_player_tech(ch, PTECH_RIDING) && GET_MOUNT_VNUM(ch) != NOTHING && mob_proto(GET_MOUNT_VNUM(ch))) {
+		build_page_display(to, "   &Z%s %s %s. Type 'mount' to ride it.", (ch == to ? "You" : HSSH(ch)), (ch == to ? "have" : "has"), get_mob_name_by_proto(GET_MOUNT_VNUM(ch), TRUE));
+	}
+
+	/* Morph */
+	if (IS_MORPHED(ch)) {
+		build_page_display(to, "   %s in the form of %s!", start, get_morph_desc(ch, FALSE));
+	}
+	else if (IS_DISGUISED(ch)) {
+		build_page_display(to, "   %s disguised as %s!", start, PERS(ch, ch, FALSE));
+	}
+
+	show_character_affects(ch, to, FALSE);
+	
+	if (send_page) {
+		send_page_display(to);
 	}
 }
 
@@ -2753,10 +2839,7 @@ ACMD(do_adventure) {
 
 // this accepts a subcmd which, if non-zero, omits some things and does not do the final send_page_display() -- it leaves everything in ch's unsent page_display
 ACMD(do_affects) {
-	bool limited;
-	char *str;
 	char_data *vict;
-	int i;
 	
 	if (IS_NPC(ch)) {
 		return;
@@ -2779,63 +2862,9 @@ ACMD(do_affects) {
 		else {
 			show_character_affects_simple(vict, ch);
 		}
-		return;
 	}
-	
-	// if a subcmd was passed, we remove some of the info
-	limited = (subcmd != 0);
-
-	build_page_display(ch, "  Affects:");
-
-	// Conditions: not shown on limited view because 'score' shows them separately
-	if (!limited) {
-		// This reports conditions all on one line -- end each one with a comma and a space
-		sprintf(buf1, "   You are ");
-		if ((str = how_hungry(ch))) {
-			sprintf(buf1 + strlen(buf1), "%s, ", str);
-		}
-		if ((str = how_thirsty(ch))) {
-			sprintf(buf1 + strlen(buf1), "%s, ", str);
-		}
-		if ((str = how_drunk(ch))) {
-			sprintf(buf1 + strlen(buf1), "%s, ", str);
-		}
-		if ((str = how_blood_starved(ch))) {
-			sprintf(buf1 + strlen(buf1), "%s, ", str);
-		}
-
-		if (strlen(buf1) > 13) {	/* We have a condition */
-			buf1[strlen(buf1)-2] = '\0';	/* This removes the final ", " */
-			for (i = strlen(buf1); i >= 0; i--)
-				if (buf1[i] == ',') {	/* Looking for that last ',' */
-					strcpy(buf2, buf1 + i + 1);
-					sprintf(buf1 + i, " and%s", buf2);
-					break;
-				}
-			build_page_display(ch, "%s.", buf1);
-		}
-	}
-	
-	// mount
-	if (IS_RIDING(ch)) {
-		build_page_display(ch, "   You are riding %s.", get_mob_name_by_proto(GET_MOUNT_VNUM(ch), TRUE));
-	}
-	else if (has_player_tech(ch, PTECH_RIDING) && GET_MOUNT_VNUM(ch) != NOTHING && mob_proto(GET_MOUNT_VNUM(ch))) {
-		build_page_display(ch, "   You have %s. Type 'mount' to ride it.", get_mob_name_by_proto(GET_MOUNT_VNUM(ch), TRUE));
-	}
-
-	/* Morph */
-	if (IS_MORPHED(ch)) {
-		build_page_display(ch, "   You are in the form of %s!", get_morph_desc(ch, FALSE));
-	}
-	else if (IS_DISGUISED(ch)) {
-		build_page_display(ch, "   You are disguised as %s!", PERS(ch, ch, 0));
-	}
-
-	show_character_affects(ch, ch, FALSE);
-	
-	if (!limited) {
-		send_page_display(ch);
+	else {
+		show_character_affects_full(ch, ch, TRUE, TRUE);
 	}
 }
 
@@ -5094,7 +5123,7 @@ ACMD(do_whois) {
 	
 	// last login info
 	if (!IS_IMMORTAL(victim) && !IN_ROOM(victim)) {
-		diff = time(0) - victim->prev_logon;
+		diff = time(0) - GET_PREV_LOGON(victim);
 		
 		if (diff > SECS_PER_REAL_YEAR) {
 			math = diff / SECS_PER_REAL_YEAR;

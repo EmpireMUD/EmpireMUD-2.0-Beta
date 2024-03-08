@@ -187,9 +187,7 @@ INTERACTION_FUNC(combine_obj_interact) {
 	act(to_char, FALSE, ch, new_obj, NULL, TO_CHAR);
 	act(to_room, TRUE, ch, new_obj, NULL, TO_ROOM);
 	
-	if (load_otrigger(new_obj) && new_obj->carried_by) {
-		get_otrigger(new_obj, new_obj->carried_by, FALSE);
-	}
+	load_otrigger(new_obj);
 	
 	free_resource_list(res);
 	return TRUE;
@@ -568,9 +566,7 @@ INTERACTION_FUNC(identifies_to_interact) {
 		else {
 			obj_to_room(new_obj, IN_ROOM(ch));
 		}
-		if (load_otrigger(new_obj) && new_obj->carried_by) {
-			get_otrigger(new_obj, new_obj->carried_by, FALSE);
-		}
+		load_otrigger(new_obj);
 	}
 	
 	return TRUE;
@@ -1268,9 +1264,6 @@ INTERACTION_FUNC(light_obj_interact) {
 			obj_to_room(new, IN_ROOM(ch));
 		}
 		obj_ok = load_otrigger(new);
-		if (obj_ok && new->carried_by) {
-			get_otrigger(new, new->carried_by, FALSE);
-		}
 	}
 	
 	// mark gained
@@ -1638,9 +1631,7 @@ INTERACTION_FUNC(seed_obj_interact) {
 		else {
 			obj_to_room(new_obj, IN_ROOM(ch));
 		}
-		if (load_otrigger(new_obj) && new_obj->carried_by) {
-			get_otrigger(new_obj, new_obj->carried_by, FALSE);
-		}
+		load_otrigger(new_obj);
 	}
 	
 	return TRUE;
@@ -1692,9 +1683,7 @@ INTERACTION_FUNC(separate_obj_interact) {
 		else {
 			obj_to_room(new_obj, IN_ROOM(ch));
 		}
-		if (load_otrigger(new_obj) && new_obj->carried_by) {
-			get_otrigger(new_obj, new_obj->carried_by, FALSE);
-		}
+		load_otrigger(new_obj);
 	}
 	
 	return TRUE;
@@ -2624,12 +2613,12 @@ static bool perform_get_from_container(char_data *ch, obj_data *obj, obj_data *c
 		return FALSE;
 	}
 	if (mode == FIND_OBJ_INV || can_take_obj(ch, obj)) {
+		// last-minute scaling: scale to its minimum (adventures will override this on their own)
+		if (GET_OBJ_CURRENT_SCALE_LEVEL(obj) < 1) {
+			scale_item_to_level(obj, GET_OBJ_MIN_SCALE_LEVEL(obj));
+		}
+		
 		if (get_otrigger(obj, ch, TRUE)) {
-			// last-minute scaling: scale to its minimum (adventures will override this on their own)
-			if (GET_OBJ_CURRENT_SCALE_LEVEL(obj) < 1) {
-				scale_item_to_level(obj, GET_OBJ_MIN_SCALE_LEVEL(obj));
-			}
-			
 			obj_to_char(obj, ch);
 			act("You get $p from $P.", FALSE, ch, obj, cont, TO_CHAR | TO_QUEUE | ACT_OBJ_VICT);
 			act("$n gets $p from $P.", TRUE, ch, obj, cont, TO_ROOM | TO_QUEUE | ACT_OBJ_VICT);
@@ -2761,43 +2750,45 @@ static bool perform_get_from_room(char_data *ch, obj_data *obj) {
 		act("$p: you can't hold any more items.", FALSE, ch, obj, 0, TO_CHAR | TO_QUEUE);
 		return FALSE;
 	}
-	if (can_take_obj(ch, obj) && get_otrigger(obj, ch, TRUE)) {
+	if (can_take_obj(ch, obj)) {
 		// last-minute scaling: scale to its minimum (adventures will override this on their own)
 		if (GET_OBJ_CURRENT_SCALE_LEVEL(obj) < 1) {
 			scale_item_to_level(obj, GET_OBJ_MIN_SCALE_LEVEL(obj));
 		}
 		
-		obj_to_char(obj, ch);
-		act("You get $p.", FALSE, ch, obj, 0, TO_CHAR | TO_QUEUE);
-		act("$n gets $p.", TRUE, ch, obj, 0, TO_ROOM | TO_QUEUE);
+		if (get_otrigger(obj, ch, TRUE)) {
+			obj_to_char(obj, ch);
+			act("You get $p.", FALSE, ch, obj, 0, TO_CHAR | TO_QUEUE);
+			act("$n gets $p.", TRUE, ch, obj, 0, TO_ROOM | TO_QUEUE);
 					
-		if (stealing) {
-			record_theft_log(emp, GET_OBJ_VNUM(obj), 1);
+			if (stealing) {
+				record_theft_log(emp, GET_OBJ_VNUM(obj), 1);
 			
-			if (emp && IS_IMMORTAL(ch)) {
-				syslog(SYS_GC, GET_ACCESS_LEVEL(ch), TRUE, "ABUSE: %s stealing %s from %s", GET_NAME(ch), GET_OBJ_SHORT_DESC(obj), EMPIRE_NAME(emp));
-			}
-			else if (emp && !player_tech_skill_check_by_ability_difficulty(ch, PTECH_STEAL_COMMAND)) {
-				log_to_empire(emp, ELOG_HOSTILITY, "Theft at (%d, %d)", X_COORD(IN_ROOM(ch)), Y_COORD(IN_ROOM(ch)));
-			}
+				if (emp && IS_IMMORTAL(ch)) {
+					syslog(SYS_GC, GET_ACCESS_LEVEL(ch), TRUE, "ABUSE: %s stealing %s from %s", GET_NAME(ch), GET_OBJ_SHORT_DESC(obj), EMPIRE_NAME(emp));
+				}
+				else if (emp && !player_tech_skill_check_by_ability_difficulty(ch, PTECH_STEAL_COMMAND)) {
+					log_to_empire(emp, ELOG_HOSTILITY, "Theft at (%d, %d)", X_COORD(IN_ROOM(ch)), Y_COORD(IN_ROOM(ch)));
+				}
 			
-			if (!IS_IMMORTAL(ch)) {
-				GET_STOLEN_TIMER(obj) = time(0);
-				GET_STOLEN_FROM(obj) = emp ? EMPIRE_VNUM(emp) : NOTHING;
-				trigger_distrust_from_stealth(ch, emp);
-				gain_player_tech_exp(ch, PTECH_STEAL_COMMAND, 50);
-				add_offense(emp, OFFENSE_STEALING, ch, IN_ROOM(ch), offense_was_seen(ch, emp, NULL) ? OFF_SEEN : NOBITS);
-			}
+				if (!IS_IMMORTAL(ch)) {
+					GET_STOLEN_TIMER(obj) = time(0);
+					GET_STOLEN_FROM(obj) = emp ? EMPIRE_VNUM(emp) : NOTHING;
+					trigger_distrust_from_stealth(ch, emp);
+					gain_player_tech_exp(ch, PTECH_STEAL_COMMAND, 50);
+					add_offense(emp, OFFENSE_STEALING, ch, IN_ROOM(ch), offense_was_seen(ch, emp, NULL) ? OFF_SEEN : NOBITS);
+				}
 			
-			run_ability_hooks_by_player_tech(ch, PTECH_STEAL_COMMAND, NULL, obj, NULL, NULL);
-		}
-		else if (IS_STOLEN(obj) && GET_LOYALTY(ch) && GET_STOLEN_FROM(obj) == EMPIRE_VNUM(GET_LOYALTY(ch))) {
-			// un-steal if this was the original owner
-			GET_STOLEN_TIMER(obj) = 0;
-		}
+				run_ability_hooks_by_player_tech(ch, PTECH_STEAL_COMMAND, NULL, obj, NULL, NULL);
+			}
+			else if (IS_STOLEN(obj) && GET_LOYALTY(ch) && GET_STOLEN_FROM(obj) == EMPIRE_VNUM(GET_LOYALTY(ch))) {
+				// un-steal if this was the original owner
+				GET_STOLEN_TIMER(obj) = 0;
+			}
 		
-		get_check_money(ch, obj);
-		return TRUE;
+			get_check_money(ch, obj);
+			return TRUE;
+		}
 	}
 	return TRUE;	// return TRUE even though it failed -- don't break "get all" loops
 }
@@ -2888,13 +2879,6 @@ static char_data *give_find_vict(char_data *ch, char *arg) {
 
 
 static void perform_give(char_data *ch, char_data *vict, obj_data *obj) {
-	if (!give_otrigger(obj, ch, vict)) {
-		return;
-	}
-	if (!receive_mtrigger(vict, ch, obj)) {
-		return;
-	}
-	
 	if (IS_NPC(vict) && AFF_FLAGGED(vict, AFF_CHARM)) {
 		msg_to_char(ch, "You cannot give items to charmed NPCs.\r\n");
 		return;
@@ -2913,6 +2897,19 @@ static void perform_give(char_data *ch, char_data *vict, obj_data *obj) {
 	// NPCs usually have no carry limit, but 'give' is an exception because otherwise crazy ensues
 	if (!CAN_CARRY_OBJ(vict, obj)) {
 		act("$N seems to have $S hands full.", FALSE, ch, 0, vict, TO_CHAR | TO_QUEUE);
+		return;
+	}
+	
+	// late scaling check: scale to its minimum if somehow unscaled
+	if (GET_OBJ_CURRENT_SCALE_LEVEL(obj) < 1) {
+		scale_item_to_level(obj, GET_OBJ_MIN_SCALE_LEVEL(obj));
+	}
+	
+	// triggers last
+	if (!give_otrigger(obj, ch, vict)) {
+		return;
+	}
+	if (!receive_mtrigger(vict, ch, obj)) {
 		return;
 	}
 
@@ -3073,7 +3070,7 @@ static void drink_message(char_data *ch, obj_data *obj, byte type, int subcmd, i
 				act("$n sips from $p.", TRUE, ch, obj, NULL, TO_ROOM);
 			}
 			else if (obj_has_custom_message(obj, OBJ_CUSTOM_CONSUME_TO_ROOM)) {
-				act(obj_get_custom_message(obj, OBJ_CUSTOM_CONSUME_TO_ROOM), TRUE, ch, obj, get_generic_string_by_vnum(GET_DRINK_CONTAINER_TYPE(obj), GENERIC_LIQUID, GSTR_LIQUID_NAME), TO_ROOM);
+				act(obj_get_custom_message(obj, OBJ_CUSTOM_CONSUME_TO_ROOM), TRUE, ch, obj, get_generic_string_by_vnum(GET_DRINK_CONTAINER_TYPE(obj), GENERIC_LIQUID, GSTR_LIQUID_NAME), TO_ROOM | ACT_STR_VICT);
 			}
 			else {
 				sprintf(buf, "$n %s from $p.", subcmd == SCMD_SIP ? "sips" : "drinks");
@@ -4359,7 +4356,6 @@ void trade_buy(char_data *ch, char *argument) {
 		// obj
 		add_to_object_list(tpd->obj);
 		obj_to_char(tpd->obj, ch);
-		get_otrigger(tpd->obj, ch, FALSE);
 		tpd->obj = NULL;
 		
 		// cleanup
@@ -4485,7 +4481,6 @@ void trade_collect(char_data *ch, char *argument) {
 				obj_to_char(tpd->obj, ch);
 				
 				act("You collect $p from an expired auction.", FALSE, ch, tpd->obj, NULL, TO_CHAR);
-				get_otrigger(tpd->obj, ch, FALSE);
 				tpd->obj = NULL;
 				any = TRUE;
 			}
@@ -5029,8 +5024,6 @@ void warehouse_retrieve(char_data *ch, char *argument, int mode) {
 				
 				// this should not be running load triggers
 				// load_otrigger(obj);
-				
-				get_otrigger(obj, ch, FALSE);
 			}
 		}
 		

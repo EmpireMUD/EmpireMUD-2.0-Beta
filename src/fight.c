@@ -790,7 +790,7 @@ void siege_kill_vehicle_occupants(vehicle_data *veh, char_data *attacker, vehicl
 		DL_FOREACH_SAFE2(ROOM_PEOPLE(vrl->room), ch, next_ch, next_in_room) {
 			act("You are killed as $V is destroyed!", FALSE, ch, NULL, veh, TO_CHAR | ACT_VEH_VICT);
 			if (!IS_NPC(ch)) {
-				log_to_slash_channel_by_name(DEATH_LOG_CHANNEL, ch, "%s has been killed by siege damage at (%d, %d)!", PERS(ch, ch, TRUE), X_COORD(IN_ROOM(ch)), Y_COORD(IN_ROOM(ch)));
+				log_to_slash_channel_by_name(DEATH_LOG_CHANNEL, ch, "%s has been killed by siege damage at%s!", PERS(ch, ch, TRUE), coord_display_room(NULL, IN_ROOM(ch), FALSE));
 				syslog(SYS_DEATH, 0, TRUE, "DEATH: %s has been killed by siege damage at %s", GET_NAME(ch), room_log_identifier(IN_ROOM(ch)));
 			}
 			run_kill_triggers(ch, attacker, by_vehicle);
@@ -1522,10 +1522,17 @@ void drop_loot(char_data *mob, char_data *killer) {
 obj_data *make_corpse(char_data *ch) {	
 	char shortdesc[MAX_INPUT_LENGTH], longdesc[MAX_INPUT_LENGTH], kws[MAX_INPUT_LENGTH];
 	obj_data *corpse, *rope, *o, *next_o;
+	obj_vnum corpse_vnum = o_CORPSE;
 	int i, size;
 	bool human = (!IS_NPC(ch) || MOB_FLAGGED(ch, MOB_HUMAN));
-
-	corpse = read_object(o_CORPSE, TRUE);
+	
+	// custom corpse?
+	if (IS_NPC(ch) && MOB_CUSTOM_CORPSE(ch) != NOTHING) {
+		corpse_vnum = MOB_CUSTOM_CORPSE(ch);
+	}
+	
+	// load obj
+	corpse = read_object(corpse_vnum, TRUE);
 	size = GET_SIZE(ch);
 	
 	// store as person's last corpse id
@@ -1555,24 +1562,31 @@ obj_data *make_corpse(char_data *ch) {
 		SET_BIT(GET_OBJ_EXTRA(corpse), OBJ_GROUP_DROP);
 	}
 	
-	if (human) {
-		sprintf(kws, "%s %s %s", GET_OBJ_KEYWORDS(corpse), skip_filler(PERS(ch, ch, FALSE)), size_data[size].corpse_keywords);
-		sprintf(shortdesc, "%s's body", PERS(ch, ch, FALSE));
-		safe_snprintf(longdesc, sizeof(longdesc), size_data[size].body_long_desc, PERS(ch, ch, FALSE));
-		CAP(longdesc);
+	// restrings?
+	if (GET_OBJ_VNUM(corpse) == o_CORPSE) {
+		// default corpse: set all strings
+		if (human) {
+			sprintf(kws, "%s %s %s", GET_OBJ_KEYWORDS(corpse), skip_filler(PERS(ch, ch, FALSE)), size_data[size].corpse_keywords);
+			sprintf(shortdesc, "%s's body", PERS(ch, ch, FALSE));
+			safe_snprintf(longdesc, sizeof(longdesc), size_data[size].body_long_desc, PERS(ch, ch, FALSE));
+			CAP(longdesc);
+		}
+		else {
+			sprintf(kws, "%s %s %s", GET_OBJ_KEYWORDS(corpse), skip_filler(PERS(ch, ch, FALSE)), size_data[size].corpse_keywords);
+			sprintf(shortdesc, "the corpse of %s", PERS(ch, ch, FALSE));
+			safe_snprintf(longdesc, sizeof(longdesc), size_data[size].corpse_long_desc, PERS(ch, ch, FALSE));
+			CAP(longdesc);
+		}
+		
+		// set strings
+		set_obj_keywords(corpse, kws);
+		set_obj_short_desc(corpse, shortdesc);
+		set_obj_long_desc(corpse, longdesc);
 	}
 	else {
-		sprintf(kws, "%s %s %s", GET_OBJ_KEYWORDS(corpse), skip_filler(PERS(ch, ch, FALSE)), size_data[size].corpse_keywords);
-		sprintf(shortdesc, "the corpse of %s", PERS(ch, ch, FALSE));
-		safe_snprintf(longdesc, sizeof(longdesc), size_data[size].corpse_long_desc, PERS(ch, ch, FALSE));
-		CAP(longdesc);
+		// custom corpse: add replacements?
 	}
 	
-	// set strings
-	set_obj_keywords(corpse, kws);
-	set_obj_short_desc(corpse, shortdesc);
-	set_obj_long_desc(corpse, longdesc);
-
 	set_obj_val(corpse, VAL_CORPSE_IDNUM, IS_NPC(ch) ? GET_MOB_VNUM(ch) : (-1 * GET_IDNUM(ch)));
 	set_obj_val(corpse, VAL_CORPSE_SIZE, size);
 	set_obj_val(corpse, VAL_CORPSE_FLAGS, (MOB_FLAGGED(ch, MOB_NO_LOOT) ? CORPSE_NO_LOOT : NOBITS));
@@ -2892,7 +2906,7 @@ void besiege_room(char_data *attacker, room_data *to_room, int damage, vehicle_d
 		else {
 			msg_to_char(c, "You are hit and killed!\r\n");
 			if (!IS_NPC(c)) {
-				log_to_slash_channel_by_name(DEATH_LOG_CHANNEL, c, "%s has been killed by siege damage at (%d, %d)!", PERS(c, c, 1), X_COORD(IN_ROOM(c)), Y_COORD(IN_ROOM(c)));
+				log_to_slash_channel_by_name(DEATH_LOG_CHANNEL, c, "%s has been killed by siege damage at%s!", PERS(c, c, 1), coord_display_room(NULL, IN_ROOM(c), FALSE));
 				syslog(SYS_DEATH, 0, TRUE, "DEATH: %s has been killed by siege damage at %s", GET_NAME(c), room_log_identifier(IN_ROOM(c)));
 			}
 			run_kill_triggers(c, attacker, by_vehicle);
@@ -2995,7 +3009,7 @@ bool besiege_vehicle(char_data *attacker, vehicle_data *veh, int damage, int sie
 		if (VEH_SITTING_ON(veh)) {
 			act("You are killed as $V is destroyed!", FALSE, VEH_SITTING_ON(veh), NULL, veh, TO_CHAR | ACT_VEH_VICT);
 			if (!IS_NPC(VEH_SITTING_ON(veh))) {
-				log_to_slash_channel_by_name(DEATH_LOG_CHANNEL, VEH_SITTING_ON(veh), "%s has been killed by siege damage at (%d, %d)!", PERS(VEH_SITTING_ON(veh), VEH_SITTING_ON(veh), TRUE), X_COORD(IN_ROOM(veh)), Y_COORD(IN_ROOM(veh)));
+				log_to_slash_channel_by_name(DEATH_LOG_CHANNEL, VEH_SITTING_ON(veh), "%s has been killed by siege damage at%s!", PERS(VEH_SITTING_ON(veh), VEH_SITTING_ON(veh), TRUE), coord_display_room(NULL, IN_ROOM(veh), FALSE));
 				syslog(SYS_DEATH, 0, TRUE, "DEATH: %s has been killed by siege damage at %s", GET_NAME(VEH_SITTING_ON(veh)), room_log_identifier(IN_ROOM(veh)));
 			}
 			run_kill_triggers(VEH_SITTING_ON(veh), attacker, by_vehicle);
@@ -3419,7 +3433,7 @@ void death_log(char_data *ch, char_data *killer, int type) {
 	}
 	
 	// and log it
-	log_to_slash_channel_by_name(DEATH_LOG_CHANNEL, ch, "%s (%d, %d)", output, X_COORD(IN_ROOM(ch)), Y_COORD(IN_ROOM(ch)));
+	log_to_slash_channel_by_name(DEATH_LOG_CHANNEL, ch, "%s%s", output, coord_display_room(NULL, IN_ROOM(ch), FALSE));
 	syslog(SYS_DEATH, 0, TRUE, "DEATH: %s %s", output, room_log_identifier(IN_ROOM(ch)));
 }
 

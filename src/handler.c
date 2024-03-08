@@ -11001,9 +11001,7 @@ bool retrieve_resource(char_data *ch, empire_data *emp, struct empire_storage_da
 	}
 	
 	// do this after the "stolen" section, in case it'll purge the item
-	if (load_otrigger(obj)) {
-		get_otrigger(obj, ch, FALSE);
-	}
+	load_otrigger(obj);
 	
 	EMPIRE_NEEDS_STORAGE_SAVE(emp) = TRUE;
 	

@@ -114,26 +114,6 @@ void perform_unapprove(char_data *ch) {
 
 
 /**
-* Autostores one item. Contents are also stored.
-*
-* @param obj_dtaa *obj The item to autostore.
-* @param empire_data *emp The empire to store it to -- NOT CURRENTLY USED.
-* @param int island The islands to store it to -- NOT CURRENTLY USED.
-*/
-void perform_autostore(obj_data *obj, empire_data *emp, int island) {
-	obj_data *temp, *next_temp;
-	
-	// store the inside first
-	DL_FOREACH_SAFE2(obj->contains, temp, next_temp, next_content) {
-		perform_autostore(temp, emp, island);
-	}
-	
-	
-	check_autostore(obj, TRUE, emp);
-}
-
-
-/**
 * Sends a poofout/poofin message, moves a character, and looks at the room.
 *
 * @param char_data *ch The person.
@@ -1222,7 +1202,7 @@ ADMIN_UTIL(util_playerdump) {
 			continue;
 		}
 		
-		fprintf(fl, "%s\t%d\t%d\t%s\n", GET_NAME(plr), GET_ACCOUNT(plr)->id, (plr->player.time.played / SECS_PER_REAL_HOUR), plr->prev_host);
+		fprintf(fl, "%s\t%d\t%d\t%s\n", GET_NAME(plr), GET_ACCOUNT(plr)->id, (plr->player.time.played / SECS_PER_REAL_HOUR), NULLSAFE(GET_PREV_HOST(plr)));
 		
 		// done
 		if (is_file && plr) {
@@ -3434,7 +3414,16 @@ void do_stat_character(char_data *ch, char_data *k, bool details) {
 	line = build_page_display(ch, "Pos: %s, Fighting: %s", buf2, (FIGHTING(k) ? GET_NAME(FIGHTING(k)) : "Nobody"));
 
 	if (IS_NPC(k)) {
-		append_page_display_line(line, ", Attack: %d %s, Move: %s, Size: %s", MOB_ATTACK_TYPE(k), get_attack_name_by_vnum(MOB_ATTACK_TYPE(k)), mob_move_types[(int)MOB_MOVE_TYPE(k)], size_types[GET_SIZE(k)]);
+		append_page_display_line(line, ", Attack: [\tc%d\t0] \ty%s\t0, Move: \ty%s\t0", MOB_ATTACK_TYPE(k), get_attack_name_by_vnum(MOB_ATTACK_TYPE(k)), mob_move_types[(int)MOB_MOVE_TYPE(k)]);
+		
+		// size/corpse line
+		line = build_page_display(ch, "Size: \ty%s\t0, ", size_types[GET_SIZE(k)]);
+		if (MOB_CUSTOM_CORPSE(k) == NOTHING) {
+			append_page_display_line(line, "Custom corpse: \tynone\t0");
+		}
+		else {
+			append_page_display_line(line, "Custom corpse: [\tc%d\t0] \ty%s\t0", MOB_CUSTOM_CORPSE(k), get_obj_name_by_proto(MOB_CUSTOM_CORPSE(k)));
+		}
 	}
 	if (k->desc) {
 		sprinttype(STATE(k->desc), connected_types, buf2, sizeof(buf2), "UNDEFINED");
@@ -5539,14 +5528,16 @@ ACMD(do_autostore) {
 		
 		if (obj) {
 			act("$n auto-stores $p.", FALSE, ch, obj, NULL, TO_ROOM | DG_NO_TRIG);
-			perform_autostore(obj, emp, GET_ISLAND_ID(IN_ROOM(ch)));
+			perform_force_autostore(obj, emp, GET_ISLAND_ID(IN_ROOM(ch)));
+			read_vault(emp);
 		}
 		else if (veh) {
 			act("$n auto-stores items in $V.", FALSE, ch, NULL, veh, TO_ROOM | DG_NO_TRIG | ACT_VEH_VICT);
 			
 			DL_FOREACH_SAFE2(VEH_CONTAINS(veh), obj, next_obj, next_content) {
-				perform_autostore(obj, VEH_OWNER(veh), GET_ISLAND_ID(IN_ROOM(ch)));
+				perform_force_autostore(obj, (VEH_OWNER(veh) && VEH_OWNER(veh) != emp) ? VEH_OWNER(veh) : emp, GET_ISLAND_ID(IN_ROOM(ch)));
 			}
+			read_vault((VEH_OWNER(veh) && VEH_OWNER(veh) != emp) ? VEH_OWNER(veh) : emp);
 		}
 		else {
 			send_to_char("Nothing here by that name.\r\n", ch);
@@ -5558,18 +5549,7 @@ ACMD(do_autostore) {
 	else {			// no argument. clean out the room
 		act("$n gestures...", FALSE, ch, 0, 0, TO_ROOM | DG_NO_TRIG);
 		send_to_room("The world seems a little cleaner.\r\n", IN_ROOM(ch));
-		
-		DL_FOREACH_SAFE2(ROOM_CONTENTS(IN_ROOM(ch)), obj, next_obj, next_content) {
-			perform_autostore(obj, emp, GET_ISLAND_ID(IN_ROOM(ch)));
-		}
-		
-		DL_FOREACH2(ROOM_VEHICLES(IN_ROOM(ch)), veh, next_in_room) {
-			DL_FOREACH_SAFE2(VEH_CONTAINS(veh), obj, next_obj, next_content) {
-				perform_autostore(obj, VEH_OWNER(veh), GET_ISLAND_ID(IN_ROOM(ch)));
-			}
-		}
-		
-		read_vault(emp);
+		force_autostore(IN_ROOM(ch));
 	}
 }
 
@@ -6668,9 +6648,9 @@ ACMD(do_last) {
 	else {
 		strcpy(status, level_names[(int) GET_ACCESS_LEVEL(plr)][0]);
 		// crlf built into ctime
-		msg_to_char(ch, "[%5d] [%s] %-12s : %-18s : %-20s", GET_IDNUM(plr), status, GET_PC_NAME(plr), plr->desc ? plr->desc->host : plr->prev_host, file ? ctime(&plr->prev_logon) : ctime(&plr->player.time.logon));
+		msg_to_char(ch, "[%5d] [%s] %-12s : %-18s : %-20s", GET_IDNUM(plr), status, GET_PC_NAME(plr), plr->desc ? plr->desc->host : NULLSAFE(GET_PREV_HOST(plr)), file ? ctime(&GET_PREV_LOGON(plr)) : ctime(&plr->player.time.logon));
 		if (file) {
-			ago_ptr = strcpy(ago_buf, simple_time_since(plr->prev_logon));
+			ago_ptr = strcpy(ago_buf, simple_time_since(GET_PREV_LOGON(plr)));
 			skip_spaces(&ago_ptr);
 			msg_to_char(ch, "Last online %s ago\r\n", ago_ptr);
 		}
@@ -6732,9 +6712,7 @@ ACMD(do_load) {
 		act("$n makes a strange magical gesture.", TRUE, ch, 0, 0, TO_ROOM | DG_NO_TRIG);
 		act("$n has created $p!", FALSE, ch, obj, 0, TO_ROOM | DG_NO_TRIG);
 		act("You create $p.", FALSE, ch, obj, 0, TO_CHAR | DG_NO_TRIG);
-		if (load_otrigger(obj) && obj->carried_by) {
-			get_otrigger(obj, obj->carried_by, FALSE);
-		}
+		load_otrigger(obj);
 	}
 	else if (is_abbrev(buf, "vehicle")) {
 		if (!vehicle_proto(number)) {
@@ -6773,9 +6751,7 @@ ACMD(do_load) {
 		act("$n makes a strange magical gesture.", TRUE, ch, NULL, NULL, TO_ROOM | DG_NO_TRIG);
 		act("$n has created $p!", FALSE, ch, obj, NULL, TO_ROOM | DG_NO_TRIG);
 		act("You create $p.", FALSE, ch, obj, NULL, TO_CHAR | DG_NO_TRIG);
-		if (load_otrigger(obj) && obj->carried_by) {
-			get_otrigger(obj, obj->carried_by, FALSE);
-		}
+		load_otrigger(obj);
 	}
 	else {
 		send_to_char("That'll have to be either 'obj', 'mob', or 'vehicle'.\r\n", ch);
@@ -7884,14 +7860,14 @@ ACMD(do_slay) {
 		else {
 			if (ch == vict) {
 				syslog(SYS_GC | SYS_DEATH, GET_INVIS_LEV(ch), TRUE, "ABUSE: %s has slain %sself at %s", GET_REAL_NAME(ch), HMHR(ch), room_log_identifier(IN_ROOM(vict)));
-				log_to_slash_channel_by_name(DEATH_LOG_CHANNEL, NULL, "%s has been slain at (%d, %d)", PERS(vict, vict, TRUE), X_COORD(IN_ROOM(vict)), Y_COORD(IN_ROOM(vict)));
+				log_to_slash_channel_by_name(DEATH_LOG_CHANNEL, NULL, "%s has been slain at%s", PERS(vict, vict, TRUE), coord_display_room(NULL, IN_ROOM(vict), FALSE));
 				act("You slay yourself!", FALSE, ch, NULL, NULL, TO_CHAR | DG_NO_TRIG);
 				act("$n slays $mself!", FALSE, ch, NULL, NULL, TO_ROOM | DG_NO_TRIG);
 			}
 			else {
 				if (!IS_NPC(vict)) {
 					syslog(SYS_GC | SYS_DEATH, GET_INVIS_LEV(ch), TRUE, "ABUSE: %s has slain %s at %s", GET_REAL_NAME(ch), GET_REAL_NAME(vict), room_log_identifier(IN_ROOM(vict)));
-					log_to_slash_channel_by_name(DEATH_LOG_CHANNEL, NULL, "%s has been slain at (%d, %d)", PERS(vict, vict, TRUE), X_COORD(IN_ROOM(vict)), Y_COORD(IN_ROOM(vict)));
+					log_to_slash_channel_by_name(DEATH_LOG_CHANNEL, NULL, "%s has been slain at%s", PERS(vict, vict, TRUE), coord_display_room(NULL, IN_ROOM(vict), FALSE));
 				}
 				
 				act("You chop $M to pieces! Ah! The blood!", FALSE, ch, NULL, vict, TO_CHAR | DG_NO_TRIG);

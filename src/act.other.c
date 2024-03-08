@@ -421,7 +421,7 @@ void perform_alternate(char_data *old, char_data *new) {
 	}
 	
 	// log late so we have a location
-	sprintf(sys + strlen(sys), " at %s.", room_log_identifier(IN_ROOM(new)));
+	sprintf(sys + strlen(sys), " [%s] at %s.", new->desc->host, room_log_identifier(IN_ROOM(new)));
 	syslog(SYS_LOGIN, invis_lev, TRUE, "%s", sys);
 	
 	if (AFF_FLAGGED(new, AFF_EARTHMELDED)) {
@@ -622,9 +622,6 @@ INTERACTION_FUNC(shear_interact) {
 		obj = read_object(interaction->vnum, TRUE);
 		obj_to_char(obj, ch);
 		obj_ok = load_otrigger(obj);
-		if (obj_ok) {
-			get_otrigger(obj, ch, FALSE);
-		}
 	}
 	
 	// mark gained
@@ -680,9 +677,6 @@ INTERACTION_FUNC(skin_interact) {
 		scale_item_to_level(obj, 1);	// min scale
 		obj_to_char(obj, ch);
 		obj_ok = load_otrigger(obj);
-		if (obj_ok) {
-			get_otrigger(obj, ch, FALSE);
-		}
 	}
 	
 	// mark gained
@@ -1528,12 +1522,12 @@ ACMD(do_alternate) {
 			if (!is_file) {
 				append_page_display_line(line, "  - &conline&0%s", IS_AFK(alt) ? " - &rafk&0" : "");
 			}
-			else if ((time(0) - alt->prev_logon) < SECS_PER_REAL_DAY) {
-				hours = (time(0) - alt->prev_logon) / SECS_PER_REAL_HOUR;
+			else if ((time(0) - GET_PREV_LOGON(alt)) < SECS_PER_REAL_DAY) {
+				hours = (time(0) - GET_PREV_LOGON(alt)) / SECS_PER_REAL_HOUR;
 				append_page_display_line(line, "  - %d hour%s ago%s", hours, PLURAL(hours), (timed_out ? ", &rtimed-out&0" : ""));
 			}
 			else {	// more than a day
-				days = (time(0) - alt->prev_logon) / SECS_PER_REAL_DAY;
+				days = (time(0) - GET_PREV_LOGON(alt)) / SECS_PER_REAL_DAY;
 				append_page_display_line(line, "  - %d day%s ago%s", days, PLURAL(days), (timed_out ? ", &rtimed-out&0" : ""));
 			}
 		

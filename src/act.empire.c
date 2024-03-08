@@ -1573,9 +1573,11 @@ void show_workforce_why(empire_data *emp, char_data *ch, char *argument) {
 	}
 	else if (only_room && ROOM_OWNER(only_room) != GET_LOYALTY(ch)) {
 		msg_to_char(ch, "Workforce isn't working because your empire doesn't own %s location.\r\n", (only_room == IN_ROOM(ch)) ? "this" : "that");
+		clear_page_display(ch);
 	}
 	else {
 		msg_to_char(ch, "No matching workforce problems found.\r\n");
+		clear_page_display(ch);
 	}
 }
 
@@ -3618,6 +3620,9 @@ void do_abandon_room(char_data *ch, room_data *room, bool confirm) {
 	else if (HOME_ROOM(room) != room) {
 		msg_to_char(ch, "Just abandon the main room.\r\n");
 	}
+	else if (ROOM_OWNER(room) != GET_LOYALTY(ch) && !confirm) {
+		msg_to_char(ch, "You must use 'abandon [target] confirm' to abandon rooms you don't own.\r\n");
+	}
 	else if (ROOM_AFF_FLAGGED(room, ROOM_AFF_NO_ABANDON) && !confirm) {
 		msg_to_char(ch, "The area is set no-abandon. You must use 'abandon [target] confirm' to abandon it.\r\n");
 	}
@@ -3677,6 +3682,9 @@ void do_abandon_vehicle(char_data *ch, vehicle_data *veh, bool confirm) {
 	}
 	else if (VEH_CLAIMS_WITH_ROOM(veh) && ROOM_OWNER(IN_ROOM(veh))) {
 		msg_to_char(ch, "Abandon the whole tile instead.\r\n");
+	}
+	else if (VEH_OWNER(veh) != GET_LOYALTY(ch) && !confirm) {
+		msg_to_char(ch, "You must use 'abandon [target] confirm' to abandon %ss you don't own.\r\n", VEH_OR_BLD(veh));
 	}
 	else {
 		if (GET_LOYALTY(ch) != VEH_OWNER(veh)) {
@@ -7696,12 +7704,12 @@ ACMD(do_roster) {
 		if (!is_file) {
 			append_page_display_line(line, "  - &conline&0%s", IS_AFK(member) ? " - &rafk&0" : "");
 		}
-		else if ((time(0) - member->prev_logon) < SECS_PER_REAL_DAY) {
-			hours = (time(0) - member->prev_logon) / SECS_PER_REAL_HOUR;
+		else if ((time(0) - GET_PREV_LOGON(member)) < SECS_PER_REAL_DAY) {
+			hours = (time(0) - GET_PREV_LOGON(member)) / SECS_PER_REAL_HOUR;
 			append_page_display_line(line, "  - %d hour%s ago%s", hours, PLURAL(hours), (timed_out ? ", &rtimed-out&0" : ""));
 		}
 		else {	// more than a day
-			days = (time(0) - member->prev_logon) / SECS_PER_REAL_DAY;
+			days = (time(0) - GET_PREV_LOGON(member)) / SECS_PER_REAL_DAY;
 			append_page_display_line(line, "  - %d day%s ago%s", days, PLURAL(days), (timed_out ? ", &rtimed-out&0" : ""));
 		}
 		

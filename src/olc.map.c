@@ -576,8 +576,12 @@ OLC_MODULE(mapedit_decustomize) {
 
 
 OLC_MODULE(mapedit_room_name) {
-	if (!*argument)
+	if (SHARED_DATA(IN_ROOM(ch)) == &ocean_shared_data) {
+		msg_to_char(ch, "You cannot customize ocean tiles.\r\n");
+	}
+	else if (!*argument) {
 		msg_to_char(ch, "What would you like to name this room/tile (or \"none\")?\r\n");
+	}
 	else if (!str_cmp(argument, "none")) {
 		set_room_custom_name(IN_ROOM(ch), NULL);
 		msg_to_char(ch, "This room/tile no longer has a specialized name.\r\n");
@@ -592,18 +596,25 @@ OLC_MODULE(mapedit_room_name) {
 OLC_MODULE(mapedit_icon) {
 	delete_doubledollar(argument);
 
-	if (IS_INSIDE(IN_ROOM(ch)) || IS_ADVENTURE_ROOM(IN_ROOM(ch)))
+	if (SHARED_DATA(IN_ROOM(ch)) == &ocean_shared_data) {
+		msg_to_char(ch, "You cannot customize ocean tiles.\r\n");
+	}
+	else if (IS_INSIDE(IN_ROOM(ch)) || IS_ADVENTURE_ROOM(IN_ROOM(ch))) {
 		msg_to_char(ch, "You may not do that here.\r\n");
+	}
 	else if (!str_cmp(argument, "none")) {
 		set_room_custom_icon(IN_ROOM(ch), NULL);
 		msg_to_char(ch, "This area no longer has a specialized icon.\r\n");
 	}
-	else if (!*argument)
+	else if (!*argument) {
 		msg_to_char(ch, "What would you like to set the icon to (or \"none\")?\r\n");
-	else if (!validate_icon(argument, 4))
+	}
+	else if (!validate_icon(argument, 4)) {
 		msg_to_char(ch, "Room icons must be exactly four characters.\r\n");
-	else if (argument[0] != COLOUR_CHAR)
+	}
+	else if (argument[0] != COLOUR_CHAR) {
 		msg_to_char(ch, "Icons must begin with a color code.\r\n");
+	}
 	else {
 		set_room_custom_icon(IN_ROOM(ch), argument);
 		msg_to_char(ch, "This area now has the icon \"%s&0\".\r\n", argument);
@@ -640,7 +651,10 @@ OLC_MODULE(mapedit_delete_room) {
 
 
 OLC_MODULE(mapedit_room_description) {
-	if (!*argument) {
+	if (SHARED_DATA(IN_ROOM(ch)) == &ocean_shared_data) {
+		msg_to_char(ch, "You cannot customize ocean tiles.\r\n");
+	}
+	else if (!*argument) {
 		msg_to_char(ch, "To set a description, use \".map description set\".\r\n");
 		msg_to_char(ch, "To remove a description, use \".map description none\".\r\n");
 	}

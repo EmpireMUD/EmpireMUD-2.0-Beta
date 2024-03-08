@@ -441,9 +441,7 @@ INTERACTION_FUNC(consumes_or_decays_interact) {
 		}
 		
 		if (!fail) {
-			if (load_otrigger(new_obj) && new_obj->carried_by) {
-				get_otrigger(new_obj, new_obj->carried_by, FALSE);
-			}
+			load_otrigger(new_obj);
 		}
 	}
 	
@@ -1166,6 +1164,7 @@ static void reduce_outside_territory_one(empire_data *emp) {
 			}
 		}
 		
+		force_autostore(farthest);
 		abandon_room(farthest);
 	}
 }
@@ -1251,6 +1250,7 @@ static void reduce_stale_empires_one(empire_data *emp) {
 	// did we find one?
 	if (found_room) {
 		log_to_empire(emp, ELOG_TERRITORY, "Abandoning %s (%d, %d) because all members are timed out", get_room_name(found_room, FALSE), X_COORD(found_room), Y_COORD(found_room));
+		force_autostore(found_room);
 		abandon_room(found_room);
 	}
 }
@@ -1592,6 +1592,51 @@ static int compute_obj_event_timer(obj_data *obj) {
 	}
 	
 	return seconds;	// may still be 0
+}
+
+
+/**
+* Autostores one item. Contents are also stored.
+*
+* @param obj_dtaa *obj The item to autostore.
+* @param empire_data *emp The empire to store it to -- NOT CURRENTLY USED.
+* @param int island The islands to store it to -- NOT CURRENTLY USED.
+*/
+void perform_force_autostore(obj_data *obj, empire_data *emp, int island) {
+	obj_data *temp, *next_temp;
+	
+	// store the inside first
+	DL_FOREACH_SAFE2(obj->contains, temp, next_temp, next_content) {
+		perform_force_autostore(temp, emp, island);
+	}
+	
+	
+	check_autostore(obj, TRUE, emp);
+}
+
+
+/**
+* 
+*/
+void force_autostore(room_data *room) {
+	obj_data *obj, *next_obj;
+	vehicle_data *veh;
+	
+	if (room && ROOM_OWNER(room)) {
+		DL_FOREACH_SAFE2(ROOM_CONTENTS(room), obj, next_obj, next_content) {
+			perform_force_autostore(obj, ROOM_OWNER(room), GET_ISLAND_ID(room));
+		}
+	
+		DL_FOREACH2(ROOM_VEHICLES(room), veh, next_in_room) {
+			DL_FOREACH_SAFE2(VEH_CONTAINS(veh), obj, next_obj, next_content) {
+				if (!VEH_OWNER(veh) || VEH_OWNER(veh) == ROOM_OWNER(room)) {
+					perform_force_autostore(obj, ROOM_OWNER(room), GET_ISLAND_ID(room));
+				}
+			}
+		}
+	
+		read_vault(ROOM_OWNER(room));
+	}
 }
 
 
