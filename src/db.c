@@ -2256,6 +2256,7 @@ void load_tips_of_the_day(void) {
 	}
 	tips_of_the_day_size = pos;
 	log("Loaded %d tips of the day.", pos);
+	fclose(fl);
 }
 
 
