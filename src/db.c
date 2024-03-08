@@ -2196,6 +2196,7 @@ void load_intro_screens(void) {
 	}
 	
 	log("Loaded %d intro screens.", num_intro_screens);
+	close(index);
 }
 
 
