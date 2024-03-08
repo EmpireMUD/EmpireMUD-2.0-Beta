@@ -3070,7 +3070,7 @@ static void drink_message(char_data *ch, obj_data *obj, byte type, int subcmd, i
 				act("$n sips from $p.", TRUE, ch, obj, NULL, TO_ROOM);
 			}
 			else if (obj_has_custom_message(obj, OBJ_CUSTOM_CONSUME_TO_ROOM)) {
-				act(obj_get_custom_message(obj, OBJ_CUSTOM_CONSUME_TO_ROOM), TRUE, ch, obj, get_generic_string_by_vnum(GET_DRINK_CONTAINER_TYPE(obj), GENERIC_LIQUID, GSTR_LIQUID_NAME), TO_ROOM);
+				act(obj_get_custom_message(obj, OBJ_CUSTOM_CONSUME_TO_ROOM), TRUE, ch, obj, get_generic_string_by_vnum(GET_DRINK_CONTAINER_TYPE(obj), GENERIC_LIQUID, GSTR_LIQUID_NAME), TO_ROOM | ACT_STR_VICT);
 			}
 			else {
 				sprintf(buf, "$n %s from $p.", subcmd == SCMD_SIP ? "sips" : "drinks");
