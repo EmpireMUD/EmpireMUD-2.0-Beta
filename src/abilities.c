@@ -4491,6 +4491,13 @@ PREP_ABIL(prep_room_affect_ability) {
 	
 	affect_vnum = (ABIL_AFFECT_VNUM(abil) != NOTHING) ? ABIL_AFFECT_VNUM(abil) : ATYPE_BUFF;
 	
+	// safety -- shared ocean tiles don't support this
+	if (SHARED_DATA(room_targ) == &ocean_shared_data) {
+		msg_to_char(ch, "You can't do that %s.\r\n", (room_targ == IN_ROOM(ch)) ? "here" : "there");
+		CANCEL_ABILITY(data);
+		return;
+	}
+	
 	// toggle off?
 	if (ABILITY_FLAGGED(abil, ABILF_TOGGLE) && room_targ && room_affected_by_spell_from_caster(room_targ, affect_vnum, ch)) {
 		send_ability_toggle_messages(ch, abil, data);
