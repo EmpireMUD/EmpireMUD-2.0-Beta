@@ -1950,7 +1950,7 @@ void do_gen_craft_vehicle(char_data *ch, craft_data *type, int dir) {
 	set_vehicle_extra_data(veh, ROOM_EXTRA_BUILD_RECIPE, GET_CRAFT_VNUM(type));
 	
 	if (!IS_NPC(ch)) {
-		set_room_extra_data(IN_ROOM(ch), ROOM_EXTRA_ORIGINAL_BUILDER, GET_ACCOUNT(ch)->id);
+		set_vehicle_extra_data(veh, ROOM_EXTRA_ORIGINAL_BUILDER, GET_ACCOUNT(ch)->id);
 	}
 	
 	start_action(ch, ACT_GEN_CRAFT, -1);
