@@ -943,6 +943,11 @@ void set_private_owner(room_data *room, int idnum) {
 * @param char *desc The new description (will be copied).
 */
 void set_room_custom_description(room_data *room, char *desc) {
+	if (SHARED_DATA(room) == &ocean_shared_data) {
+		log("SYSERR: set_room_custom_description called on ocean room with '%20s'", NULLSAFE(desc));
+		return;
+	}
+	
 	if (ROOM_CUSTOM_DESCRIPTION(room)) {
 		free(ROOM_CUSTOM_DESCRIPTION(room));
 	}
@@ -959,6 +964,11 @@ void set_room_custom_description(room_data *room, char *desc) {
 * @param char *icon The new icon (will be copied).
 */
 void set_room_custom_icon(room_data *room, char *icon) {
+	if (SHARED_DATA(room) == &ocean_shared_data) {
+		log("SYSERR: set_room_custom_icon called on ocean room with '%s'", NULLSAFE(icon));
+		return;
+	}
+	
 	if (ROOM_CUSTOM_ICON(room)) {
 		free(ROOM_CUSTOM_ICON(room));
 	}
@@ -975,6 +985,11 @@ void set_room_custom_icon(room_data *room, char *icon) {
 * @param char *name The new name (will be copied).
 */
 void set_room_custom_name(room_data *room, char *name) {
+	if (SHARED_DATA(room) == &ocean_shared_data) {
+		log("SYSERR: set_room_custom_name called on ocean room with '%s'", NULLSAFE(name));
+		return;
+	}
+	
 	if (ROOM_CUSTOM_NAME(room)) {
 		free(ROOM_CUSTOM_NAME(room));
 	}
