@@ -57,7 +57,6 @@ void save_instances();
 // locals
 void grow_crop(struct map_data *map);
 void init_room(room_data *room, room_vnum vnum);
-void perform_requested_world_saves();
 int naturalize_newbie_island(struct map_data *tile, bool do_unclaim);
 int sort_empire_islands(struct empire_island *a, struct empire_island *b);
 bool write_map_and_room_to_file(room_vnum vnum, bool force_obj_pack);

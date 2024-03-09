@@ -4105,6 +4105,76 @@ PLAYER_UPDATE_FUNC(b5_176_affect_fix) {
 }
 
 
+// looks for bad data on oceans
+void b5_181_repair_extra_data(void) {
+	struct depletion_data *dep, *next_dep;
+	struct map_data *map;
+	struct track_data *track, *next_track;
+	
+	// fix world: look for non-buildings with original-builder data
+	LL_FOREACH(land_map, map) {
+		if (map->shared->extra_data && (!map->room || !GET_BUILDING(map->room))) {
+			if (get_extra_data(map->shared->extra_data, ROOM_EXTRA_ORIGINAL_BUILDER)) {
+				remove_extra_data(&map->shared->extra_data, ROOM_EXTRA_ORIGINAL_BUILDER);
+				request_world_save(map->vnum, WSAVE_ROOM);
+			}
+		}
+		
+		// force a save for all ocean tiles in case they had bad data
+		if (map->shared == &ocean_shared_data) {
+			request_world_save(map->vnum, WSAVE_ROOM);
+		}
+	}
+	
+	// fix ocean shared data, in case
+	if (ocean_shared_data.name) {
+		log("- Warning: Ocean had custom name");
+		free(ocean_shared_data.name);
+		ocean_shared_data.name = NULL;
+	}
+	if (ocean_shared_data.description) {
+		log("- Warning: Ocean had custom description");
+		free(ocean_shared_data.description);
+		ocean_shared_data.description = NULL;
+	}
+	if (ocean_shared_data.icon) {
+		log("- Warning: Ocean had custom icon");
+		free(ocean_shared_data.icon);
+		ocean_shared_data.icon = NULL;
+	}
+	if (ocean_shared_data.affects || ocean_shared_data.base_affects) {
+		log("- Warning: Ocean had affects");
+		ocean_shared_data.affects = ocean_shared_data.base_affects = NOBITS;
+	}
+	if (ocean_shared_data.depletion) {
+		log("- Warning: Ocean had depletion");
+		LL_FOREACH_SAFE(ocean_shared_data.depletion, dep, next_dep) {
+			LL_DELETE(ocean_shared_data.depletion, dep);
+			free(dep);
+		}
+	}
+	if (ocean_shared_data.extra_data) {
+		log("- Warning: Ocean had extra data");
+		free_extra_data(&ocean_shared_data.extra_data);
+	}
+	if (ocean_shared_data.tracks) {
+		log("- Warning: Ocean had tracks");
+		HASH_ITER(hh, ocean_shared_data.tracks, track, next_track) {
+			HASH_DEL(ocean_shared_data.tracks, track);
+			free(track);
+		}
+	}
+	if (ocean_shared_data.events) {
+		log("- Warning: Ocean had stored events");
+		cancel_all_stored_events(&ocean_shared_data.events);
+	}
+	
+	log("... saving updated world data");
+	perform_requested_world_saves();
+	write_binary_world_index_updates();
+}
+
+
 // ADD HERE, above: more beta 5 update functions
 
 
@@ -4217,6 +4287,7 @@ const struct {
 	{ "b5.174b", b5_174_library_triggers, NULL, "Updating libraries with new triggers" },
 	{ "b5.174c", b5_174_tavern_triggers, NULL, "Updating taverns with new triggers" },
 	{ "b5.176", NULL, b5_176_affect_fix, "Checking for players with bad affect times" },
+	{ "b5.181", b5_181_repair_extra_data, NULL, "Looking for bad world data and repairing oceans" },
 	
 	// ADD HERE, above: more beta 5 update lines
 	
