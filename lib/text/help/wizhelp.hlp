@@ -527,13 +527,16 @@ portal, even if that instance cannot be linked.
 
 See also: GRANT
 #d
-INVIS INVISIBLE
+INVIS INVISIBLE i2 i3 i4 i5 i6
 
 Usage:  invis [level]
 
 INVIS sets your invisibility level. With no argument, invis toggles between
 making you fully visible and fully invisible. If you specify an access level,
 only people at and above the level you specify will be able to see you.
+
+Your invisibility level is shown next to chat channels; people below that
+access level see "Someone" in place of your name.
 
 Examples:
 
