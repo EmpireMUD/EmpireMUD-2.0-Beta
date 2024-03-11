@@ -1894,6 +1894,7 @@ typedef enum {
 #define OBJ_IMPORTANT  BIT(27)	// B. prevents casual purging; can be used by scripts
 #define OBJ_LONG_TIMER_IN_STORAGE  BIT(28)	// C. decays more slowly when stored
 #define OBJ_NO_WAREHOUSE  BIT(29)	// D. cannot be stored in the home/warehouse anymore
+#define OBJ_NO_DECAY_IN_STORAGE  BIT(30)	// E. does not decay while stored
 
 #define OBJ_BIND_FLAGS  (OBJ_BIND_ON_EQUIP | OBJ_BIND_ON_PICKUP)	// all bind-on flags
 #define OBJ_PRESERVE_FLAGS  (OBJ_HARD_DROP | OBJ_GROUP_DROP | OBJ_SUPERIOR | OBJ_KEEP | OBJ_NO_BASIC_STORAGE | OBJ_NO_WAREHOUSE | OBJ_SEEDED | OBJ_BIND_FLAGS | OBJ_IMPORTANT)	// flags that are preserved

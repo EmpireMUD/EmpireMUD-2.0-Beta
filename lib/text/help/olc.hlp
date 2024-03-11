@@ -7101,6 +7101,7 @@ Available flags:
  &cIMPORTANT&0 - won't be hit by an immortal "purge" with no args; can be used by scripts
  &cLONG-TIMER-IN-STORAGE&0 - Decays slower while stored.
  &cNO-WAREHOUSE&0 - can no longer be stored in home/warehouse storage
+ &cNO-DECAY-IN-STORAGE&0 - tiemr does not tick down while stored
 
 See also: BINDING, OLC OBJECTS, LIGHT ITEM
 #d

@@ -3191,6 +3191,7 @@ const char *extra_bits[] = {
 	"IMPORTANT",
 	"LONG-TIMER-IN-STORAGE",
 	"NO-WAREHOUSE",
+	"NO-DECAY-IN-STORAGE",	// 30
 	"\n"
 };
 
@@ -3227,6 +3228,7 @@ const char *extra_bits_inv_flags[] = {
 	"",	// important
 	"",	// long-timer-in-storage
 	"",	// no-warehouse
+	"",	// no-decay-in-storage
 	"\n"
 };
 
@@ -3263,6 +3265,7 @@ const double obj_flag_scaling_bonus[] = {
 	1.0,	// OBJ_IMPORTANT
 	1.0,	// OBJ_LONG_TIMER_IN_STORAGE
 	1.0,	// OBJ_NO_WAREHOUSE
+	1.0,	// 30, OBJ_NO_DECAY_IN_STORAGE
 };
 
 
