@@ -37,7 +37,7 @@ a honey-cured ham~
 A large ham is lying in the dirt.~
 The ham is mouth-watering.
 ~
-6 m a 0 0 4
+6 mE a 0 0 5
 72 0 0
 7 336
 A
@@ -224,7 +224,7 @@ a plate of christmas cookies~
 A plate of cookies is lying here.~
 A variety of delicious cookies are spread across the plate.
 ~
-6 mC a 0 0 9
+6 mE a 0 0 10
 72 0 0
 7 69120
 A
@@ -326,7 +326,7 @@ A bowl of roast chestnuts is sitting here.~
    The insides of these chestnuts have turned a golden brown, and they smell
 delicious.
 ~
-6 mC a 0 0 7
+6 mE a 0 0 8
 18 0 0
 7 3240
 A
@@ -824,7 +824,7 @@ Some spider meat is lying on the ground.~
    Spider meat actually improves significantly after you cook it. Now it just
 tastes like rancid chicken.
 ~
-6 C a 0 0 6
+6 E a 0 0 7
 12 0 0
 7 96
 C
@@ -867,7 +867,7 @@ crusty goblin bread~
 Some crusty goblin bread is lying on the ground.~
 This bread is a bit tough to eat, but it doesn't taste too bad.
 ~
-6 0 a 0 0 5
+6 E a 0 0 6
 24 0 0
 7 336
 C
