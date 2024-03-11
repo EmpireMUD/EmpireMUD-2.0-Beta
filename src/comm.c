@@ -3831,8 +3831,13 @@ RETSIGTYPE reap(int sig) {
 
 RETSIGTYPE checkpointing(int sig) {
 	if (!tics_passed) {
-		log("SYSERR: CHECKPOINT shutdown: tics not updated. (Infinite loop suspected)");
-		abort();
+		if (reboot_control.type == REBOOT_SHUTDOWN && reboot_control.level == SHUTDOWN_COMPLETE) {
+			log("CHECKPOINT ignored because of shutdown-complete state (tics not updated, but PROBABLY not an infinite loop)");
+		}
+		else {
+			log("SYSERR: CHECKPOINT shutdown: tics not updated. (Infinite loop suspected)");
+			abort();
+		}
 	}
 	else {
 		tics_passed = 0;
