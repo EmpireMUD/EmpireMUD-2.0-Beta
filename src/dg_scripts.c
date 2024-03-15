@@ -2703,6 +2703,8 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 				else {
 					strcpy(str, "UNKNOWN");
 				}
+				
+				return;
 			}
 			else if (!str_cmp(var, "currency")) {
 				// %currency.<vnum>(<amt>)% gets the name for that currency
@@ -2720,6 +2722,8 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 				else {
 					strcpy(str, "UNKNOWN");
 				}
+				
+				return;
 			}
 			else if (!str_cmp(var, "language")) {
 				generic_data *lang = NULL;
@@ -2758,6 +2762,8 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 				else {
 					safe_snprintf(str, slen, "UNKNOWN");
 				}
+				
+				return;
 			}
 			else if (!str_cmp(var, "random")) {
 				if (!str_cmp(field, "char") || !str_cmp(field, "ally") || !str_cmp(field, "enemy")) {
@@ -2848,6 +2854,8 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 						safe_snprintf(str, slen, "0");
 					}
 				}
+				
+				return;
 			}
 			else if (!str_cmp(var, "temperature")) {
 				if (field && (*field == '-' || *field == '+' || isdigit(*field))) {
@@ -2856,6 +2864,8 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 				else {
 					strcpy(str, "");
 				}
+				
+				return;
 			}
 			// no else
 		}
