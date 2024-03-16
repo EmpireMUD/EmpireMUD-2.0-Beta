@@ -380,7 +380,7 @@ void olc_delete_trigger(char_data *ch, trig_vnum vnum) {
 	// update building protos
 	HASH_ITER(hh, building_table, bld, next_bld) {
 		if (delete_from_proto_list_by_vnum(&GET_BLD_SCRIPTS(bld), vnum)) {
-			syslog(SYS_OLC, GET_INVIS_LEV(ch), TRUE, "OLC: Building %d %s lost deleted trigger", GET_BLD_VNUM(bld), GET_BLD_NAME(adv));
+			syslog(SYS_OLC, GET_INVIS_LEV(ch), TRUE, "OLC: Building %d %s lost deleted trigger", GET_BLD_VNUM(bld), GET_BLD_NAME(bld));
 			save_library_file_for_vnum(DB_BOOT_BLD, GET_BLD_VNUM(bld));
 		}
 	}
