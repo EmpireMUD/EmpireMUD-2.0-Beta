@@ -666,7 +666,7 @@ int CAN_CARRY_N(char_data *ch);	// formerly a macro
 
 // helpers
 #define EMPIRE_ADMIN_FLAGGED(emp, flag)  IS_SET(EMPIRE_ADMIN_FLAGS(emp), (flag))
-#define EMPIRE_HAS_TECH(emp, num)  (EMPIRE_TECH((emp), (num)) > 0)
+#define EMPIRE_HAS_TECH(emp, num)  (EMPIRE_TECH((emp), (num)) > 0 || EMPIRE_ADMIN_FLAGGED((emp), EADM_ALL_TECHS))
 #define EMPIRE_IS_TIMED_OUT(emp)  (EMPIRE_LAST_LOGON(emp) + (config_get_int("whole_empire_timeout") * SECS_PER_REAL_DAY) < time(0))
 #define GET_TOTAL_WEALTH(emp)  (EMPIRE_WEALTH(emp) + (EMPIRE_COINS(emp) * COIN_VALUE))
 #define EXPLICIT_BANNER_TERMINATOR(emp)  (EMPIRE_BANNER_HAS_UNDERLINE(emp) ? "\t0" : "")

@@ -64,8 +64,8 @@ void abandon_lost_vehicles(void) {
 		if (!(emp = VEH_OWNER(veh))) {
 			continue;	// only looking to abandon owned vehs
 		}
-		if (EMPIRE_IMM_ONLY(emp)) {
-			continue;	// imm empire vehicles could be disastrous
+		if (EMPIRE_ADMIN_FLAGGED(emp, EADM_IGNORE_OVERAGES)) {
+			continue;	// skip 'em
 		}
 		if (EMPIRE_MEMBERS(emp) > 0 || EMPIRE_TERRITORY(emp, TER_TOTAL) > 0) {
 			continue;	// skip empires that still have territory or members

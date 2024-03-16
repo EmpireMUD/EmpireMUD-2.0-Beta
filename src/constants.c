@@ -2468,11 +2468,16 @@ const bool empire_log_request_only[] = {
 
 // EADM_x: empire admin flags
 const char *empire_admin_flags[] = {
-	"!WAR",
-	"!STEAL",
+	"NO-WAR",	// 0
+	"NO-STEAL",
 	"CITY-CLAIMS-ONLY",
-	"!RENAME",
+	"NO-RENAME",
 	"DID-NEWBIE-MOVE",
+	"FREE-NEEDS",	// 5
+	"IGNORE-OVERAGES",
+	"NO-DECAY",
+	"ALL-TECHS",
+	"FREE-WAR",
 	"\n"
 };
 

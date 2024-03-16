@@ -1283,7 +1283,7 @@ void annual_update_map_tile(struct map_data *tile) {
 	
 	// updates that only matter if there's a room:
 	if (room) {
-		if (ROOM_BLD_FLAGGED(room, BLD_IS_RUINS)) {
+		if (ROOM_BLD_FLAGGED(room, BLD_IS_RUINS) && (!ROOM_OWNER(room) || !EMPIRE_ADMIN_FLAGGED(ROOM_OWNER(room), EADM_NO_DECAY))) {
 			// roughly 2 real years for average chance for ruins to be gone
 			if (!number(0, 89)) {
 				if (!GET_BUILDING(room) || !BLD_FLAGGED(GET_BUILDING(room), BLD_NO_ABANDON_WHEN_RUINED)) {
@@ -1296,7 +1296,7 @@ void annual_update_map_tile(struct map_data *tile) {
 				}
 			}
 		}
-		else if (GET_BUILDING(room) && !IS_CITY_CENTER(room) && HOME_ROOM(room) == room && !ROOM_AFF_FLAGGED(room, ROOM_AFF_UNCLAIMABLE | ROOM_AFF_NO_DISREPAIR | ROOM_AFF_TEMPORARY) && (!ROOM_OWNER(room) || !EMPIRE_IMM_ONLY(ROOM_OWNER(room)))) {
+		else if (GET_BUILDING(room) && !IS_CITY_CENTER(room) && HOME_ROOM(room) == room && !ROOM_AFF_FLAGGED(room, ROOM_AFF_UNCLAIMABLE | ROOM_AFF_NO_DISREPAIR | ROOM_AFF_TEMPORARY) && (!ROOM_OWNER(room) || !EMPIRE_ADMIN_FLAGGED(ROOM_OWNER(room), EADM_NO_DECAY))) {
 			// normal building decay:						TODO: City center building could be given the no-disrepair affect, but existing muds would need a patch-updater
 		
 			// determine damage to do each year
@@ -1418,8 +1418,8 @@ void annual_update_map_tile(struct map_data *tile) {
 void annual_update_vehicle(vehicle_data *veh) {
 	char *msg;
 	
-	if (VEH_OWNER(veh) && EMPIRE_IMM_ONLY(VEH_OWNER(veh))) {
-		return;	// skip immortal vehicles
+	if (VEH_OWNER(veh) && EMPIRE_ADMIN_FLAGGED(VEH_OWNER(veh), EADM_NO_DECAY)) {
+		return;	// skip empire's vehicles
 	}
 	
 	// ensure a save
@@ -2811,9 +2811,7 @@ void read_empire_territory(empire_data *emp, bool check_tech) {
 * @param empire_data *emp An empire if doing one, or NULL to clear all of them.
 */
 void reread_empire_tech(empire_data *emp) {
-	struct empire_island *isle, *next_isle;
 	empire_data *iter, *next_iter;
-	int sub;
 	
 	// nowork
 	if (!empire_table) {
@@ -2827,27 +2825,6 @@ void reread_empire_tech(empire_data *emp) {
 	// re-read both things
 	read_empire_members(emp, TRUE);
 	read_empire_territory(emp, TRUE);
-	
-	// special-handling for imm-only empires: give them all techs
-	HASH_ITER(hh, empire_table, iter, next_iter) {
-		if (emp && iter != emp) {
-			continue;
-		}
-		if (!EMPIRE_IMM_ONLY(iter)) {
-			continue;
-		}
-		
-		// give all techs
-		for (sub = 0; sub < NUM_TECHS; ++sub) {
-			EMPIRE_TECH(iter, sub) += 1;
-		}
-		HASH_ITER(hh, EMPIRE_ISLANDS(iter), isle, next_isle) {
-			// give all island techs
-			for (sub = 0; sub < NUM_TECHS; ++sub) {
-				isle->tech[sub] += 1;
-			}
-		}
-	}
 	
 	// trigger a re-sort now
 	resort_empires(FALSE);

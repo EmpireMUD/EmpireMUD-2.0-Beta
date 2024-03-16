@@ -940,7 +940,7 @@ void check_ruined_cities(empire_data *only_emp) {
 	bool any = FALSE;
 	
 	HASH_ITER(hh, empire_table, emp, next_emp) {
-		if ((!only_emp || emp == only_emp) && !EMPIRE_IMM_ONLY(emp)) {
+		if ((!only_emp || emp == only_emp) && !EMPIRE_ADMIN_FLAGGED(emp, EADM_NO_DECAY)) {
 			LL_FOREACH_SAFE(EMPIRE_CITY_LIST(emp), city, next_city) {
 				any |= check_one_city_for_ruin(emp, city);
 			}
@@ -1010,7 +1010,7 @@ static void reduce_city_overage_one(empire_data *emp) {
 	struct empire_city_data *city = NULL;
 	room_data *loc;
 
-	if (!emp || EMPIRE_IMM_ONLY(emp)) {
+	if (!emp || EMPIRE_ADMIN_FLAGGED(emp, EADM_IGNORE_OVERAGES)) {
 		return;
 	}
 	
@@ -1055,7 +1055,7 @@ void reduce_city_overages(void) {
 	
 	HASH_ITER(hh, empire_table, iter, next_iter) {
 		// only bother on !imm empires that have MORE than one city (they can always keep the last one)
-		if (!EMPIRE_IMM_ONLY(iter) && count_cities(iter) > 1) {
+		if (!EMPIRE_ADMIN_FLAGGED(iter, EADM_IGNORE_OVERAGES) && count_cities(iter) > 1) {
 			points = city_points_available(iter);
 			
 			if (points >= 0) {	// no overage
@@ -1094,7 +1094,7 @@ static void reduce_outside_territory_one(empire_data *emp) {
 	bool junk, outskirts_over, frontier_over, total_over, was_large;
 	
 	// sanity
-	if (!emp || EMPIRE_IMM_ONLY(emp)) {
+	if (!emp || EMPIRE_ADMIN_FLAGGED(emp, EADM_IGNORE_OVERAGES)) {
 		return;
 	}
 	
@@ -1182,8 +1182,8 @@ void reduce_outside_territory(void) {
 	empire_data *iter, *next_iter;
 	
 	HASH_ITER(hh, empire_table, iter, next_iter) {
-		if (EMPIRE_IMM_ONLY(iter)) {
-			continue;	// ignore imms
+		if (EMPIRE_ADMIN_FLAGGED(iter, EADM_IGNORE_OVERAGES)) {
+			continue;	// ignore these
 		}
 		
 		if (EMPIRE_TERRITORY(iter, TER_OUTSKIRTS) > OUTSKIRTS_CLAIMS_AVAILABLE(iter) || EMPIRE_TERRITORY(iter, TER_FRONTIER) > land_can_claim(iter, TER_FRONTIER)) {
@@ -1275,7 +1275,7 @@ void reduce_stale_empires(void) {
 		}
 		
 		// check overages
-		if (!EMPIRE_IMM_ONLY(iter) && EMPIRE_MEMBERS(iter) == 0 && EMPIRE_TERRITORY(iter, TER_TOTAL) > 0) {
+		if (!EMPIRE_ADMIN_FLAGGED(iter, EADM_IGNORE_OVERAGES) && EMPIRE_MEMBERS(iter) == 0 && EMPIRE_TERRITORY(iter, TER_TOTAL) > 0) {
 			// when members hit 0, we consider the empire timed out
 			reduce_stale_empires_one(iter);
 		}

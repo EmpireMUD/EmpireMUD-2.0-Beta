@@ -453,6 +453,13 @@ int get_war_cost(empire_data *emp, empire_data *victim) {
 	double diff, max_diff;
 	int cost, offenses;
 	
+	if (emp && EMPIRE_ADMIN_FLAGGED(emp, EADM_FREE_WAR)) {
+		return 0;
+	}
+	if (victim && EMPIRE_ADMIN_FLAGGED(victim, EADM_FREE_WAR)) {
+		return 0;
+	}
+	
 	score_e = emp ? get_total_score(emp) : 0;
 	score_v = victim ? get_total_score(victim) : 0;
 	
@@ -4760,7 +4767,7 @@ ACMD(do_diplomacy) {
 	else if (ch_pol && POL_OFFERED(ch_pol, diplo_option[type].add_bits)) {
 		msg_to_char(ch, "Your empire has already made that offer.\r\n");
 	}
-	else if (IS_SET(diplo_option[type].flags, DIPF_REQUIRES_OFFENSE) && get_total_offenses_from_empire(ch_emp, vict_emp) < config_get_int("offense_min_to_war")) {
+	else if (IS_SET(diplo_option[type].flags, DIPF_REQUIRES_OFFENSE) && get_total_offenses_from_empire(ch_emp, vict_emp) < config_get_int("offense_min_to_war") && !EMPIRE_ADMIN_FLAGGED(ch_emp, EADM_FREE_WAR) && !EMPIRE_ADMIN_FLAGGED(vict_emp, EADM_FREE_WAR)) {
 		msg_to_char(ch, "You can only do that to an empire with at least %d offense%s.\r\n", config_get_int("offense_min_to_war"), PLURAL(config_get_int("offense_min_to_war")));
 	}
 	
