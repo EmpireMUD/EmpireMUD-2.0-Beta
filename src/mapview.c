@@ -782,6 +782,7 @@ void replace_icon_codes(char_data *ch, room_data *to_room, char *icon_buf, int t
 bool should_show_city_background(char_data *ch, room_data *to_room) {
 	struct empire_city_data *city;
 	
+	// ownership and city checks
 	if (!GET_LOYALTY(ch)) {
 		return FALSE;	// no empire anyway
 	}
@@ -791,8 +792,15 @@ bool should_show_city_background(char_data *ch, room_data *to_room) {
 	if (!is_in_city_for_empire(to_room, GET_LOYALTY(ch), FALSE, NULL)) {
 		return FALSE;	// definitely not in-city
 	}
-	if (GET_LOYALTY(ch) != ROOM_OWNER(to_room) && CHECK_CHAMELEON(IN_ROOM(ch), to_room) && compute_distance(city->location, to_room) > city_type[city->type].radius) {
-		return FALSE;	// wrong owner AND failed chameleon AND outside base radius (e.g. a road you cannot see)
+	
+	// things that only apply on a large-city-radius
+	if (compute_distance(city->location, to_room) > city_type[city->type].radius) {
+		if (ROOM_OWNER(to_room) && GET_LOYALTY(ch) != ROOM_OWNER(to_room)) {
+			return FALSE;	// owned by someone else outside of main radius
+		}
+		if (GET_LOYALTY(ch) != ROOM_OWNER(to_room) && CHECK_CHAMELEON(IN_ROOM(ch), to_room)) {
+			return FALSE;	// failed chameleon while not the owner
+		}
 	}
 	
 	// if we got here, it must be highlighted
