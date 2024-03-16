@@ -2296,6 +2296,12 @@ static void show_map_to_char(char_data *ch, struct mappc_data_container *mappc, 
 		
 		if (PRF_FLAGGED(ch, PRF_POLITICAL | PRF_INFORMATIVE) && !show_dark && veh_is_shown) {
 			// leave show_icon alone: it's colored for these already
+			// ... unless a background is needed
+			if (should_show_city_background(ch, to_room)) {
+				safe_snprintf(temp, sizeof(temp), "%s%s", get_banner_complement_color(ch, GET_LOYALTY(ch)), show_icon);
+				strcpy(show_icon, temp);
+				need_color_terminator = TRUE;
+			}
 		}
 		else if (PRF_FLAGGED(ch, PRF_POLITICAL) && !show_dark) {
 			if (should_show_city_background(ch, to_room)) {
