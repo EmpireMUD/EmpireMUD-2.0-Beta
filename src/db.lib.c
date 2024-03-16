@@ -9647,7 +9647,7 @@ int sort_empires(empire_data *a, empire_data *b) {
 	else if (a_timeout != b_timeout) {
 		return a_timeout ? 1 : -1;
 	}
-	else if (EMPIRE_IMM_ONLY(a) != EMPIRE_IMM_ONLY(b)) {
+	else if (EMPIRE_IMM_ONLY(a) != EMPIRE_IMM_ONLY(b) && config_get_bool("immortal_empire_restrictions")) {
 		return EMPIRE_IMM_ONLY(a) - EMPIRE_IMM_ONLY(b);
 	}
 	/*

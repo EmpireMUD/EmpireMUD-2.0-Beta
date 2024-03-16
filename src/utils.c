@@ -655,7 +655,7 @@ void score_empires(void) {
 		EMPIRE_SORT_VALUE(emp) = 0;
 	}
 	
-	#define SCORE_SKIP_EMPIRE(ee)  (EMPIRE_IMM_ONLY(ee) || EMPIRE_MEMBERS(ee) == 0 || EMPIRE_LAST_LOGON(ee) + time_to_empire_emptiness < time(0))
+	#define SCORE_SKIP_EMPIRE(ee)  ((EMPIRE_IMM_ONLY(ee) && config_get_bool("immortal_empire_restrictions")) || EMPIRE_MEMBERS(ee) == 0 || EMPIRE_LAST_LOGON(ee) + time_to_empire_emptiness < time(0))
 
 	// build data
 	HASH_ITER(hh, empire_table, emp, next_emp) {
@@ -938,7 +938,7 @@ void process_imports(void) {
 	int time_to_empire_emptiness = config_get_int("time_to_empire_emptiness") * SECS_PER_REAL_WEEK;
 	
 	HASH_ITER(hh, empire_table, emp, next_emp) {
-		if (EMPIRE_IMM_ONLY(emp)) {
+		if (EMPIRE_IMM_ONLY(emp) && config_get_bool("immortal_empire_restrictions")) {
 			continue;
 		}
 		if (!EMPIRE_HAS_TECH(emp, TECH_TRADE_ROUTES)) {
@@ -1256,7 +1256,7 @@ bool is_trading_with(empire_data *emp, empire_data *partner) {
 		return FALSE;
 	}
 	// neither can be imm-only
-	if (EMPIRE_IMM_ONLY(emp) || EMPIRE_IMM_ONLY(partner)) {
+	if ((EMPIRE_IMM_ONLY(emp) || EMPIRE_IMM_ONLY(partner)) && config_get_bool("immortal_empire_restrictions")) {
 		return FALSE;
 	}
 	// both must have trade routes

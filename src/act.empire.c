@@ -143,7 +143,7 @@ bool can_reclaim(char_data *ch, room_data *room) {
 		msg_to_char(ch, "Your empire already owns the area.\r\n");
 		return FALSE;
 	}
-	else if (EMPIRE_IMM_ONLY(enemy)) {
+	else if (EMPIRE_IMM_ONLY(enemy) && config_get_bool("immortal_empire_restrict_war")) {
 		msg_to_char(ch, "You cannot reclaim territory from immortal empires.\r\n");
 		return FALSE;
 	}
@@ -757,7 +757,7 @@ static void show_detailed_empire(char_data *ch, empire_data *e) {
 	append_page_display_line(pline, ")");
 
 	// show war cost?
-	if (GET_LOYALTY(ch) && GET_LOYALTY(ch) != e && !EMPIRE_IMM_ONLY(e) && !EMPIRE_IMM_ONLY(GET_LOYALTY(ch)) && !has_relationship(GET_LOYALTY(ch), e, DIPL_NONAGGR | DIPL_ALLIED)) {
+	if (GET_LOYALTY(ch) && GET_LOYALTY(ch) != e && !EMPIRE_IMM_ONLY(e) && (!EMPIRE_IMM_ONLY(GET_LOYALTY(ch)) || !config_get_bool("immortal_empire_restrict_war")) && !has_relationship(GET_LOYALTY(ch), e, DIPL_NONAGGR | DIPL_ALLIED)) {
 		int war_cost = get_war_cost(GET_LOYALTY(ch), e);
 		if (war_cost > 0) {
 			build_page_display(ch, "Cost to declare war or thievery on this empire: %d coin%s", war_cost, PLURAL(war_cost));
@@ -4668,7 +4668,7 @@ ACMD(do_diplomacy) {
 	}
 	
 	// own empire validation
-	else if (EMPIRE_IMM_ONLY(ch_emp)) {
+	else if (EMPIRE_IMM_ONLY(ch_emp) && config_get_bool("immortal_empire_restrictions")) {
 		msg_to_char(ch, "Empires belonging to immortals cannot engage in diplomacy.\r\n");
 	}
 	else if (!imm_access && GET_RANK(ch) < EMPIRE_PRIV(ch_emp, PRIV_DIPLOMACY)) {
@@ -4708,7 +4708,7 @@ ACMD(do_diplomacy) {
 	else if (!(vict_emp = get_empire_by_name(emp_arg))) {
 		msg_to_char(ch, "Unknown empire '%s'.\r\n", emp_arg);
 	}
-	else if (EMPIRE_IMM_ONLY(vict_emp)) {
+	else if (EMPIRE_IMM_ONLY(vict_emp) && config_get_bool("immortal_empire_restrictions")) {
 		msg_to_char(ch, "Empires belonging to immortals cannot engage in diplomacy.\r\n");
 	}
 	else if (ch_emp == vict_emp) {
@@ -5196,7 +5196,7 @@ ACMD(do_empires) {
 		if (EMPIRE_MEMBERS(emp) < min) {
 			continue;
 		}
-		if (!all && EMPIRE_IMM_ONLY(emp)) {
+		if (!all && EMPIRE_IMM_ONLY(emp) && config_get_bool("immortal_empire_restrictions")) {
 			continue;
 		}
 		if (!more && !EMPIRE_HAS_TECH(emp, TECH_PROMINENCE)) {
@@ -6475,7 +6475,7 @@ ACMD(do_import) {
 	else if (is_abbrev(arg, "list")) {
 		do_import_list(ch, emp, argument, subcmd);
 	}
-	else if (EMPIRE_IMM_ONLY(emp)) {
+	else if (EMPIRE_IMM_ONLY(emp) && config_get_bool("immortal_empire_restrictions")) {
 		msg_to_char(ch, "Immortal empires cannot trade.\r\n");
 	}
 	else if (!EMPIRE_HAS_TECH(emp, TECH_TRADE_ROUTES)) {
@@ -6965,10 +6965,12 @@ ACMD(do_pledge) {
 	else if (get_cooldown_time(ch, COOLDOWN_LEFT_EMPIRE) > 0 || get_cooldown_time(ch, COOLDOWN_PLEDGE) > 0) {
 		msg_to_char(ch, "You can't pledge again yet.\r\n");
 	}
-	else if ((IS_GOD(ch) || IS_IMMORTAL(ch)) && !EMPIRE_IMM_ONLY(e))
+	else if ((IS_GOD(ch) || IS_IMMORTAL(ch)) && !EMPIRE_IMM_ONLY(e) && config_get_bool("immortal_empire_restrictions")) {
 		msg_to_char(ch, "You may not join an empire.\r\n");
-	else if (EMPIRE_IMM_ONLY(e) && !IS_GOD(ch) && !IS_IMMORTAL(ch))
+	}
+	else if (EMPIRE_IMM_ONLY(e) && !IS_GOD(ch) && !IS_IMMORTAL(ch) && config_get_bool("immortal_empire_restrictions")) {
 		msg_to_char(ch, "You can't join that empire.\r\n");
+	}
 	else {
 		GET_PLEDGE(ch) = EMPIRE_VNUM(e);
 		add_cooldown(ch, COOLDOWN_PLEDGE, SECS_PER_REAL_HOUR);
