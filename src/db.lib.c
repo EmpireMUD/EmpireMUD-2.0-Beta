@@ -8849,6 +8849,7 @@ void free_whole_library(void) {
 	struct config_type *cnf, *next_cnf;
 	craft_data *craft, *next_craft;
 	crop_data *crop, *next_crop;
+	struct depletion_data *dep, *next_dep;
 	descriptor_data *desc;
 	// struct dg_owner_purged_tracker_type *dopt, *next_dopt;
 	empire_data *emp, *next_emp;
@@ -8877,6 +8878,7 @@ void free_whole_library(void) {
 	struct stats_data_struct *sds, *next_sds;
 	struct stored_data *data, *next_data;
 	struct slash_channel *slash, *next_slash;
+	struct track_data *track, *next_track;
 	struct trading_post_data *tpd, *next_tpd;
 	trig_data *trig, *next_trig;
 	struct txt_block *txb;
@@ -9240,6 +9242,63 @@ void free_whole_library(void) {
 	
 	if (wizlock_message) {
 		free(wizlock_message);
+	}
+	
+	// ocean shared data (should not be present; these log if they exist)
+	{
+		if (ocean_shared_data.name) {
+			log("Warning: Ocean had custom name");
+			free(ocean_shared_data.name);
+			ocean_shared_data.name = NULL;
+		}
+		if (ocean_shared_data.description) {
+			log("Warning: Ocean had custom description");
+			free(ocean_shared_data.description);
+			ocean_shared_data.description = NULL;
+		}
+		if (ocean_shared_data.icon) {
+			log("Warning: Ocean had custom icon");
+			free(ocean_shared_data.icon);
+			ocean_shared_data.icon = NULL;
+		}
+		if (ocean_shared_data.affects || ocean_shared_data.base_affects) {
+			log("Warning: Ocean had affects");
+			ocean_shared_data.affects = ocean_shared_data.base_affects = NOBITS;
+		}
+		if (ocean_shared_data.depletion) {
+			log("Warning: Ocean had depletion");
+			LL_FOREACH_SAFE(ocean_shared_data.depletion, dep, next_dep) {
+				LL_DELETE(ocean_shared_data.depletion, dep);
+				free(dep);
+			}
+		}
+		if (ocean_shared_data.extra_data) {
+			log("Warning: Ocean had extra data");
+			free_extra_data(&ocean_shared_data.extra_data);
+		}
+		if (ocean_shared_data.tracks) {
+			log("Warning: Ocean had tracks");
+			HASH_ITER(hh, ocean_shared_data.tracks, track, next_track) {
+				HASH_DEL(ocean_shared_data.tracks, track);
+				free(track);
+			}
+		}
+		if (ocean_shared_data.events) {
+			log("Warning: Ocean had stored events");
+			cancel_all_stored_events(&ocean_shared_data.events);
+		}
+	}
+	
+	// more things found not-freeing in b5.181
+	cancel_all_world_save_requests(NOBITS);
+	dg_event_free_all();
+	free_command_sort();
+	free_invalid_list();
+	free_vnum_hash(&binary_world_index_updates);
+	free_vnum_hash(&mapout_update_requests);
+	
+	if (world_index_data) {
+		free(world_index_data);
 	}
 	
 	// free these last

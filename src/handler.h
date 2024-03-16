@@ -422,12 +422,36 @@ void remove_extra_data(struct room_extra_data **list, int type);
 void set_extra_data(struct room_extra_data **list, int type, int value);
 
 // room extra data helpers (backwards-compatibility and shortcuts)
-#define add_to_room_extra_data(room, type, add_value)  do { add_to_extra_data(&ROOM_EXTRA_DATA(room), (type), (add_value)); request_world_save(GET_ROOM_VNUM(room), WSAVE_ROOM); } while (0)
 #define find_room_extra_data(room, type)  find_extra_data(ROOM_EXTRA_DATA(room), type)
 #define get_room_extra_data(room, type)  get_extra_data(ROOM_EXTRA_DATA(room), type)
-#define multiply_room_extra_data(room, type, multiplier)  do { multiply_extra_data(&ROOM_EXTRA_DATA(room), (type), (multiplier)); request_world_save(GET_ROOM_VNUM(room), WSAVE_ROOM); } while (0)
 #define remove_room_extra_data(room, type)  do { remove_extra_data(&ROOM_EXTRA_DATA(room), (type)); request_world_save(GET_ROOM_VNUM(room), WSAVE_ROOM); } while (0)
-#define set_room_extra_data(room, type, value)  do { set_extra_data(&ROOM_EXTRA_DATA(room), (type), (value)); request_world_save(GET_ROOM_VNUM(room), WSAVE_ROOM); } while (0)
+#define add_to_room_extra_data(room, type, add_value)  do {	\
+		if (SHARED_DATA(room) == &ocean_shared_data) {	\
+			log("SYSERR: add_to_room_extra_data called on shared ocean room %d (%d, %d)", GET_ROOM_VNUM(room), type, (int)(add_value));	\
+		}	\
+		else {	\
+			add_to_extra_data(&ROOM_EXTRA_DATA(room), (type), (add_value));	\
+			request_world_save(GET_ROOM_VNUM(room), WSAVE_ROOM);	\
+		}	\
+	} while (0)
+#define multiply_room_extra_data(room, type, multiplier)  do {	\
+		if (SHARED_DATA(room) == &ocean_shared_data) {	\
+			log("SYSERR: multiply_room_extra_data called on shared ocean room %d (%d, %.2f)", GET_ROOM_VNUM(room), type, (double)(multiplier));	\
+		}	\
+		else {	\
+			multiply_extra_data(&ROOM_EXTRA_DATA(room), (type), (multiplier));	\
+			request_world_save(GET_ROOM_VNUM(room), WSAVE_ROOM);	\
+		}	\
+	} while (0)
+#define set_room_extra_data(room, type, value)  do {	\
+		if (SHARED_DATA(room) == &ocean_shared_data) {	\
+			log("SYSERR: set_room_extra_data called on shared ocean room %d (%d, %d)", GET_ROOM_VNUM(room), type, (int)(value));	\
+		}	\
+		else {	\
+			set_extra_data(&ROOM_EXTRA_DATA(room), (type), (value));	\
+			request_world_save(GET_ROOM_VNUM(room), WSAVE_ROOM);	\
+		}	\
+	} while (0)
 
 // vehicle extra data helpers
 #define add_to_vehicle_extra_data(veh, type, add_value)  do { add_to_extra_data(&VEH_EXTRA_DATA(veh), type, add_value); request_vehicle_save_in_world(veh); } while (0)

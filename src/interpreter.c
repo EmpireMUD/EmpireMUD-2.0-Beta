@@ -1554,6 +1554,16 @@ void sort_commands(void) {
 }
 
 
+/**
+* Frees the command sort data during a "shutdown complete".
+*/
+void free_command_sort(void) {
+	free(cmd_sort_info);
+	cmd_sort_info = NULL;
+	num_of_cmds = 0;
+}
+
+
 ACMD(do_commands) {
 	int i, cmd_num;
 	int wizhelp = 0;

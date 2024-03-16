@@ -945,6 +945,7 @@ void set_room_custom_description(room_data *room, char *desc);
 void set_room_custom_icon(room_data *room, char *icon);
 void set_room_custom_name(room_data *room, char *name);
 void set_room_height(room_data *room, int height);
+void cancel_all_world_save_requests(int only_save_type);
 void check_all_exits();
 void check_terrain_height(room_data *room);
 void clear_private_owner(int id);
@@ -967,6 +968,7 @@ room_data *load_map_room(room_vnum vnum, bool schedule_unload);
 FILE *open_world_file(int block);
 void parse_other_shared_data(struct shared_room_data *shared, char *line, char *error_part);
 void perform_burn_room(room_data *room, int evo_type);
+void perform_requested_world_saves();
 room_data *real_real_room(room_vnum vnum);
 room_data *real_room(room_vnum vnum);
 void remove_room_from_world_tables(room_data *room);
@@ -987,6 +989,7 @@ void stop_burning(room_data *room);
 void update_world_index(room_vnum vnum, char value);
 void untrench_room(room_data *room);
 void write_all_wld_files();
+void write_binary_world_index_updates();
 void write_fresh_binary_map_file();
 void write_one_tile_to_binary_map_file(struct map_data *map);
 void write_whole_binary_world_index();
@@ -1023,8 +1026,14 @@ void free_exit_template(struct exit_template *ex);
 // act.comm.c
 extern bool global_mute_slash_channel_joins;
 
+// ban.c
+void free_invalid_list();
+
 // olc.object.c
 int set_obj_val(obj_data *obj, int pos, int value);
+
+// interpreter.c
+void free_command_sort();
 
 // statistics.c
 extern int max_players_this_uptime;

@@ -2263,9 +2263,13 @@ void check_empire_storage_timers(void) {
 			
 			// each storage on the island
 			HASH_ITER(hh, isle->store, store, next_store) {
-				if ((proto = store->proto) && OBJ_FLAGGED(proto, OBJ_LONG_TIMER_IN_STORAGE) && number(0, 2)) {
-					// skip entirely (66% chance: long timer in storage)
-					continue;
+				if ((proto = store->proto)) {
+					if (OBJ_FLAGGED(proto, OBJ_NO_DECAY_IN_STORAGE)) {
+						continue;	// skip: no decay in storage
+					}
+					else if (OBJ_FLAGGED(proto, OBJ_LONG_TIMER_IN_STORAGE) && number(0, 2)) {
+						continue;	// skip (66% chance: long timer in storage)
+					}
 				}
 				DL_FOREACH_SAFE(store->timers, st, next_st) {
 					EMPIRE_NEEDS_STORAGE_SAVE(emp) = TRUE;
@@ -2309,9 +2313,13 @@ void check_empire_storage_timers(void) {
 		// unique storage
 		DL_FOREACH_SAFE(EMPIRE_UNIQUE_STORAGE(emp), eus, next_eus) {
 			DL_FOREACH_SAFE(eus->timers, st, next_st) {
-				if (eus->obj && OBJ_FLAGGED(eus->obj, OBJ_LONG_TIMER_IN_STORAGE) && number(0, 2)) {
-					// skip entirely (66% chance: long timer in storage)
-					continue;
+				if (eus->obj) {
+					if (OBJ_FLAGGED(eus->obj, OBJ_NO_DECAY_IN_STORAGE)) {
+						continue;	// skip: no decay in storage
+					}
+					else if (OBJ_FLAGGED(eus->obj, OBJ_LONG_TIMER_IN_STORAGE) && number(0, 2)) {
+						continue;	// entirely (66% chance: long timer in storage)
+					}
 				}
 				EMPIRE_NEEDS_STORAGE_SAVE(emp) = TRUE;
 				--st->timer;
@@ -2353,9 +2361,13 @@ void check_empire_storage_timers(void) {
 		
 		// shipping
 		DL_FOREACH_SAFE(EMPIRE_SHIPPING_LIST(emp), shipd, next_shipd) {
-			if ((proto = obj_proto(shipd->vnum)) && OBJ_FLAGGED(proto, OBJ_LONG_TIMER_IN_STORAGE) && number(0, 2)) {
-				// skip entirely (66% chance: long timer in storage)
-				continue;
+			if ((proto = obj_proto(shipd->vnum))) {
+				if (OBJ_FLAGGED(proto, OBJ_NO_DECAY_IN_STORAGE)) {
+					continue;	// skip: no decay in storage
+				}
+				else if (OBJ_FLAGGED(proto, OBJ_LONG_TIMER_IN_STORAGE) && number(0, 2)) {
+					continue;	// entirely (66% chance: long timer in storage)
+				}
 			}
 			DL_FOREACH_SAFE(shipd->timers, st, next_st) {
 				EMPIRE_NEEDS_STORAGE_SAVE(emp) = TRUE;
@@ -2403,9 +2415,13 @@ void check_home_storage_timers(char_data *ch) {
 	
 	any = FALSE;
 	DL_FOREACH_SAFE(GET_HOME_STORAGE(ch), eus, next_eus) {
-		if (eus->obj && OBJ_FLAGGED(eus->obj, OBJ_LONG_TIMER_IN_STORAGE) && number(0, 2)) {
-			// skip entirely (66% chance: long timer in storage)
-			continue;
+		if (eus->obj) {
+			if (OBJ_FLAGGED(eus->obj, OBJ_NO_DECAY_IN_STORAGE)) {
+				continue;	// skip: no decay in storage
+			}
+			else if (OBJ_FLAGGED(eus->obj, OBJ_LONG_TIMER_IN_STORAGE) && number(0, 2)) {
+				continue;	// skip entirely (66% chance: long timer in storage)
+			}
 		}
 		DL_FOREACH_SAFE(eus->timers, st, next_st) {
 			--st->timer;

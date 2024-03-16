@@ -55,10 +55,8 @@ bool objpack_save_room(room_data *room);
 void save_instances();
 
 // locals
-void cancel_all_world_save_requests(int only_save_type);
 void grow_crop(struct map_data *map);
 void init_room(room_data *room, room_vnum vnum);
-void perform_requested_world_saves();
 int naturalize_newbie_island(struct map_data *tile, bool do_unclaim);
 int sort_empire_islands(struct empire_island *a, struct empire_island *b);
 bool write_map_and_room_to_file(room_vnum vnum, bool force_obj_pack);
@@ -945,6 +943,11 @@ void set_private_owner(room_data *room, int idnum) {
 * @param char *desc The new description (will be copied).
 */
 void set_room_custom_description(room_data *room, char *desc) {
+	if (SHARED_DATA(room) == &ocean_shared_data) {
+		log("SYSERR: set_room_custom_description called on ocean room with '%20s'", NULLSAFE(desc));
+		return;
+	}
+	
 	if (ROOM_CUSTOM_DESCRIPTION(room)) {
 		free(ROOM_CUSTOM_DESCRIPTION(room));
 	}
@@ -961,6 +964,11 @@ void set_room_custom_description(room_data *room, char *desc) {
 * @param char *icon The new icon (will be copied).
 */
 void set_room_custom_icon(room_data *room, char *icon) {
+	if (SHARED_DATA(room) == &ocean_shared_data) {
+		log("SYSERR: set_room_custom_icon called on ocean room with '%s'", NULLSAFE(icon));
+		return;
+	}
+	
 	if (ROOM_CUSTOM_ICON(room)) {
 		free(ROOM_CUSTOM_ICON(room));
 	}
@@ -977,6 +985,11 @@ void set_room_custom_icon(room_data *room, char *icon) {
 * @param char *name The new name (will be copied).
 */
 void set_room_custom_name(room_data *room, char *name) {
+	if (SHARED_DATA(room) == &ocean_shared_data) {
+		log("SYSERR: set_room_custom_name called on ocean room with '%s'", NULLSAFE(name));
+		return;
+	}
+	
 	if (ROOM_CUSTOM_NAME(room)) {
 		free(ROOM_CUSTOM_NAME(room));
 	}
@@ -4577,6 +4590,10 @@ bool write_map_and_room_to_file(room_vnum vnum, bool force_obj_pack) {
 	map = (vnum < MAP_SIZE) ? &world_map[MAP_X_COORD(vnum)][MAP_Y_COORD(vnum)] : NULL;
 	room = (map && map->room) ? map->room : real_real_room(vnum);
 	shared = (map ? map->shared : (room ? SHARED_DATA(room) : NULL));
+	if (shared == &ocean_shared_data) {
+		// never write shared ocean data
+		shared = NULL;
+	}
 	
 	// cancel map/room if there's nothing to save for them
 	if (room && CAN_UNLOAD_MAP_ROOM(room)) {	// but actually skip the room if it's unloadable
@@ -4679,44 +4696,48 @@ bool write_map_and_room_to_file(room_vnum vnum, bool force_obj_pack) {
 	}
 	
 	// shared data
-	if (shared->icon) {
-		fprintf(fl, "Icon:\n%s~\n", shared->icon);
-	}
-	if (shared->description) {
-		strcpy(temp, shared->description);
-		strip_crlf(temp);
-		fprintf(fl, "Desc:\n%s~\n", temp);
-	}
-	if (shared->name) {
-		fprintf(fl, "Name:\n%s~\n", shared->name);
-	}
-	LL_FOREACH(shared->depletion, dep) {
-		fprintf(fl, "Depletion: %d %d\n", dep->type, dep->count);
-	}
-	HASH_ITER(hh, shared->tracks, track, next_track) {
-		if (now - track->timestamp > SECS_PER_REAL_HOUR) {
-			// delete expired tracks while we're here
-			HASH_DEL(shared->tracks, track);
-			free(track);
+	if (shared) {
+		if (shared->icon) {
+			fprintf(fl, "Icon:\n%s~\n", shared->icon);
 		}
-		else {
-			fprintf(fl, "Track: %d %ld %d %d\n", track->id, track->timestamp, track->dir, track->to_room);
+		if (shared->description) {
+			strcpy(temp, shared->description);
+			strip_crlf(temp);
+			fprintf(fl, "Desc:\n%s~\n", temp);
 		}
-	}
-	HASH_ITER(hh, shared->extra_data, red, next_red) {
-		fprintf(fl, "Extra: %d %d\n", red->type, red->value);
+		if (shared->name) {
+			fprintf(fl, "Name:\n%s~\n", shared->name);
+		}
+		LL_FOREACH(shared->depletion, dep) {
+			fprintf(fl, "Depletion: %d %d\n", dep->type, dep->count);
+		}
+		HASH_ITER(hh, shared->tracks, track, next_track) {
+			if (now - track->timestamp > SECS_PER_REAL_HOUR) {
+				// delete expired tracks while we're here
+				HASH_DEL(shared->tracks, track);
+				free(track);
+			}
+			else {
+				fprintf(fl, "Track: %d %ld %d %d\n", track->id, track->timestamp, track->dir, track->to_room);
+			}
+		}
+		HASH_ITER(hh, shared->extra_data, red, next_red) {
+			fprintf(fl, "Extra: %d %d\n", red->type, red->value);
+		}
 	}
 	
 	// data only stored if it's not in the binary map file
 	if (room && !map) {
-		if (shared->height) {
-			fprintf(fl, "Height: %d\n", shared->height);
-		}
-		if (shared->island_id) {
-			fprintf(fl, "Island: %d\n", shared->island_id);
-		}
-		if (shared->affects || shared->base_affects) {
-			fprintf(fl, "Aff-flags: %llu %llu\n", shared->base_affects, shared->affects);
+		if (shared) {
+			if (shared->height) {
+				fprintf(fl, "Height: %d\n", shared->height);
+			}
+			if (shared->island_id) {
+				fprintf(fl, "Island: %d\n", shared->island_id);
+			}
+			if (shared->affects || shared->base_affects) {
+				fprintf(fl, "Aff-flags: %llu %llu\n", shared->base_affects, shared->affects);
+			}
 		}
 		if (ROOM_CROP(room)) {
 			fprintf(fl, "Crop: %d\n", GET_CROP_VNUM(ROOM_CROP(room)));

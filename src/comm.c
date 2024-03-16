@@ -77,7 +77,6 @@ void chore_update();
 void clear_leftover_page_displays();
 void display_automessages();
 void frequent_combat(unsigned long pulse);
-void perform_requested_world_saves();
 void process_import_evolutions();
 void process_imports();
 void process_shipping();
@@ -96,7 +95,6 @@ void update_guard_towers();
 void update_instance_world_size();
 void update_trading_post();
 void weather_and_time();
-void write_binary_world_index_updates();
 void write_book_library_file();
 void write_mapout_updates();
 void write_running_events_file();
@@ -3833,8 +3831,13 @@ RETSIGTYPE reap(int sig) {
 
 RETSIGTYPE checkpointing(int sig) {
 	if (!tics_passed) {
-		log("SYSERR: CHECKPOINT shutdown: tics not updated. (Infinite loop suspected)");
-		abort();
+		if (reboot_control.type == REBOOT_SHUTDOWN && reboot_control.level == SHUTDOWN_COMPLETE) {
+			log("CHECKPOINT ignored because of shutdown-complete state (tics not updated, but PROBABLY not an infinite loop)");
+		}
+		else {
+			log("SYSERR: CHECKPOINT shutdown: tics not updated. (Infinite loop suspected)");
+			abort();
+		}
 	}
 	else {
 		tics_passed = 0;

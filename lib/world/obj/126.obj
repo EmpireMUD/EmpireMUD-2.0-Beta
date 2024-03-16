@@ -58,7 +58,7 @@ A sorcerous biscuit is lying here.~
    This flaky, crumbly biscuit is bright pink in color, a sure sign it was made
 by sorcerers.
 ~
-6 m a 0 0 6
+6 mE a 0 0 7
 24 0 0
 7 336
 A
@@ -691,7 +691,7 @@ a bolt of candy cloth~
 A bolt of candy cloth is sitting out.~
 This strange, sweet cloth is woven from sugar and yet surprisingly durable.
 ~
-6 lC a 0 0 10
+6 lE a 0 0 11
 2 0 0
 11 8760
 M

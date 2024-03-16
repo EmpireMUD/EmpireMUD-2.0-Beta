@@ -140,7 +140,7 @@ a small cooked fruit~
 A small cooked fruit is lying here.~
 It's been cooked until you can't really tell what it started out as.
 ~
-6 gC a 0 0 11
+6 gE a 0 0 12
 6 0 0
 7 336
 C
@@ -231,7 +231,7 @@ some cooked fruit~
 Some cooked fruit is lying on the ground.~
 The fruit is well-cooked.
 ~
-6 gC a 0 0 12
+6 gE a 0 0 13
 24 0 0
 7 336
 C

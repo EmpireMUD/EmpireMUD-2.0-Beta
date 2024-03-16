@@ -43,7 +43,7 @@ A jar of pickled glowkra is shining away.~
    This jar contains freshly pickled glowkra pods. It's bright enough to light
 the way at night.
 ~
-6 cC a 0 0 9
+6 cE a 0 0 10
 12 0 0
 8 8760
 B
@@ -68,7 +68,7 @@ A plate of seafood glowkra gumbo is resting here.~
    This dish has the rich smell of garlic, pepper, fish, and okra. The okra
 seem to be glowing.
 ~
-6 0 a 0 0 6
+6 E a 0 0 7
 48 0 0
 0 336
 M
@@ -358,7 +358,7 @@ A figgy pudding has been left on the ground.~
    This figgy pudding has the mystical smell of Magiterranean herbs. Somehow,
 it's still warm and each bite reminds you of home.
 ~
-6 0 a 0 0 3
+6 E a 0 0 4
 48 0 0
 7 336
 R
@@ -382,7 +382,7 @@ a pouch of dried figs~
 A pouch of dried figs is lying here.~
 These figs are dried, but still have the moist taste of pudding.
 ~
-6 C a 0 0 6
+6 E a 0 0 7
 48 0 0
 7 4320
 M
@@ -496,7 +496,7 @@ magi-netically engineered puppy pod can be used to grow a furry friend. Grow
 your own best friend!
 Type 'use pod' to summon a temporary puppy pet.
 ~
-3 be a 0 0 3
+3 beE a 0 0 4
 0 10509 0
 0 336
 R
@@ -673,7 +673,7 @@ a rhubarb pie~
 All you can smell is that warm rhubarb pie on the ground.~
 The pie looks delicious!
 ~
-6 m a 0 0 7
+6 mE a 0 0 8
 24 0 0
 7 336
 A
@@ -1395,7 +1395,7 @@ A plate of cold cuts is lying on the ground.~
    These cold cuts are, indeed, very cold. It's as if they were made from
 frozen meat.
 ~
-6 m a 0 0 6
+6 mE a 0 0 7
 18 0 0
 7 336
 A

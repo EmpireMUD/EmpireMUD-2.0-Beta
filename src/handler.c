@@ -9571,6 +9571,7 @@ char *requirement_string(struct req_data *req, bool show_vnums, bool allow_custo
 void add_depletion(room_data *room, int type, bool multiple) {
 	// shortcut: oceans are undepletable
 	if (SHARED_DATA(room) == &ocean_shared_data) {
+		log("SYSERR: add_depletion called on shared ocean room %d (%s)", GET_ROOM_VNUM(room), depletion_types[type]);
 		return;
 	}
 	perform_add_depletion(&ROOM_DEPLETION(room), type, multiple);

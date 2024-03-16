@@ -1888,7 +1888,9 @@ The ROOM-AFFECT ability type means that the ability will place an effect on the
 room. This type of ability cannot be combined with buff or passive-buff
 abilities. It always targets the room -- you must set a &gROOM&0 target flag.
 
-These support the TOGGLE flag if the player can choose to end them.
+These support the TOGGLE flag if the player can choose to end them. Note that
+these abilities can never target normal ocean tiles because those tiles share
+data and do not support room affects.
 
 Properties of room-affect abilities:
  <&yshortduration&0> How long it lasts (at low skill level).
@@ -7099,6 +7101,7 @@ Available flags:
  &cIMPORTANT&0 - won't be hit by an immortal "purge" with no args; can be used by scripts
  &cLONG-TIMER-IN-STORAGE&0 - Decays slower while stored.
  &cNO-WAREHOUSE&0 - can no longer be stored in home/warehouse storage
+ &cNO-DECAY-IN-STORAGE&0 - tiemr does not tick down while stored
 
 See also: BINDING, OLC OBJECTS, LIGHT ITEM
 #d

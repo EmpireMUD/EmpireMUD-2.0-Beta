@@ -279,3 +279,18 @@ void Read_Invalid_List(void) {
 
 	fclose(fp);
 }
+
+
+/**
+* Frees the memory for the invalid name list during 'shutdown complete'.
+*/
+void free_invalid_list(void) {
+	int iter;
+	
+	for (iter = 0; iter < num_invalid; ++iter) {
+		if (invalid_list[iter]) {
+			free(invalid_list[iter]);
+		}
+	}
+	num_invalid = 0;
+}

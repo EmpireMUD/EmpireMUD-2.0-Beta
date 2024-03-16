@@ -95,7 +95,6 @@ void load_slash_channels();
 void load_tips_of_the_day();
 void load_trading_post();
 void load_world_from_binary_index();
-void perform_requested_world_saves();
 void renum_world();
 void run_reboot_triggers();
 void schedule_map_unloads();
@@ -107,7 +106,6 @@ void verify_daily_quest_cycles();
 void verify_empire_goals();
 void verify_running_events();
 void verify_sectors();
-void write_binary_world_index_updates();
 void write_whole_mapout();
 int sort_abilities_by_data(ability_data *a, ability_data *b);
 int sort_archetypes_by_data(archetype_data *a, archetype_data *b);
@@ -2196,6 +2194,7 @@ void load_intro_screens(void) {
 	}
 	
 	log("Loaded %d intro screens.", num_intro_screens);
+	fclose(index);
 }
 
 
@@ -2256,6 +2255,7 @@ void load_tips_of_the_day(void) {
 	}
 	tips_of_the_day_size = pos;
 	log("Loaded %d tips of the day.", pos);
+	fclose(fl);
 }
 
 

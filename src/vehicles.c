@@ -275,16 +275,10 @@ int count_players_in_vehicle(vehicle_data *veh, bool ignore_invis_imms) {
 * @return bool TRUE if the vehicle survived, FALSE if it was ruined.
 */
 bool decay_one_vehicle(vehicle_data *veh, char *message) {
-	static struct resource_data *default_res = NULL;
 	empire_data *emp = VEH_OWNER(veh);
-	struct resource_data *old_list;
+	struct resource_data *old_list, *default_res;
 	char buf[256];
 	char *msg;
-	
-	// resources if it doesn't have its own
-	if (!default_res) {
-		add_to_resource_list(&default_res, RES_COMPONENT, COMP_NAILS, 1, 0);
-	}
 	
 	// update health
 	VEH_HEALTH(veh) -= MAX(1.0, ((double) VEH_MAX_HEALTH(veh) / 10.0));
@@ -313,7 +307,16 @@ bool decay_one_vehicle(vehicle_data *veh, char *message) {
 	// apply maintenance if not dismantling -- and is either complete OR has had at least 1 item added
 	if (!VEH_IS_DISMANTLING(veh) && (VEH_IS_COMPLETE(veh) || VEH_BUILT_WITH(veh))) {
 		old_list = VEH_NEEDS_RESOURCES(veh);
-		VEH_NEEDS_RESOURCES(veh) = combine_resources(old_list, VEH_REGULAR_MAINTENANCE(veh) ? VEH_REGULAR_MAINTENANCE(veh) : default_res);
+		if (VEH_REGULAR_MAINTENANCE(veh)) {
+			VEH_NEEDS_RESOURCES(veh) = combine_resources(old_list, VEH_REGULAR_MAINTENANCE(veh));
+		}
+		else {
+			// no regular maintenance? we need the default
+			default_res = NULL;
+			add_to_resource_list(&default_res, RES_COMPONENT, COMP_NAILS, 1, 0);
+			VEH_NEEDS_RESOURCES(veh) = combine_resources(old_list, default_res);
+			free_resource_list(default_res);
+		}
 		free_resource_list(old_list);
 	}
 	
