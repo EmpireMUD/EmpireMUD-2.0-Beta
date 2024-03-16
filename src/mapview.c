@@ -772,6 +772,34 @@ void replace_icon_codes(char_data *ch, room_data *to_room, char *icon_buf, int t
 }
 
 
+/**
+* Determines if a tile should be highlighted with a city background color.
+*
+* @param char_data *ch The viewer.
+* @param room_data *to_room Which room they're viewing on the map.
+* @return bool TRUE if it should have the city background color; FALSE if not.
+*/
+bool should_show_city_background(char_data *ch, room_data *to_room) {
+	struct empire_city_data *city;
+	
+	if (!GET_LOYALTY(ch)) {
+		return FALSE;	// no empire anyway
+	}
+	if (!(city = find_city(GET_LOYALTY(ch), to_room))) {
+		return FALSE;	// definitely no city
+	}
+	if (!is_in_city_for_empire(to_room, GET_LOYALTY(ch), FALSE, NULL)) {
+		return FALSE;	// definitely not in-city
+	}
+	if (GET_LOYALTY(ch) != ROOM_OWNER(to_room) && !CHECK_CHAMELEON(IN_ROOM(ch), to_room) && compute_distance(city->location, to_room) > city_type[city->type].radius) {
+		return FALSE;	// wrong owner AND failed chameleon AND outside base radius (e.g. a road you cannot see)
+	}
+	
+	// if we got here, it must be highlighted
+	return TRUE;
+}
+
+
  //////////////////////////////////////////////////////////////////////////////
 //// LINE-OF-SIGHT FUNCTIONS /////////////////////////////////////////////////
 
@@ -2179,7 +2207,7 @@ static void show_map_to_char(char_data *ch, struct mappc_data_container *mappc, 
 	int iter;
 	int tileset = GET_SEASON(to_room);
 	struct icon_data *base_icon, *crop_icon = NULL;
-	bool junk, painted, veh_is_shown = FALSE, person_is_shown = FALSE;
+	bool painted, veh_is_shown = FALSE, person_is_shown = FALSE;
 	char *base_color, *str;
 	vehicle_data *show_veh = NULL;
 	
@@ -2262,7 +2290,7 @@ static void show_map_to_char(char_data *ch, struct mappc_data_container *mappc, 
 			// leave show_icon alone: it's colored for these already
 		}
 		else if (PRF_FLAGGED(ch, PRF_POLITICAL) && !show_dark) {
-			if (GET_LOYALTY(ch) && (GET_LOYALTY(ch) == ROOM_OWNER(to_room) || ((!ROOM_OWNER(to_room) || CHECK_CHAMELEON(IN_ROOM(ch), to_room)) && find_city(GET_LOYALTY(ch), to_room))) && is_in_city_for_empire(to_room, GET_LOYALTY(ch), FALSE, &junk)) {
+			if (should_show_city_background(ch, to_room)) {
 				strcpy(temp, get_banner_complement_color(ch, GET_LOYALTY(ch)));
 				need_color_terminator = TRUE;
 			}
