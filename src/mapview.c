@@ -791,7 +791,7 @@ bool should_show_city_background(char_data *ch, room_data *to_room) {
 	if (!is_in_city_for_empire(to_room, GET_LOYALTY(ch), FALSE, NULL)) {
 		return FALSE;	// definitely not in-city
 	}
-	if (GET_LOYALTY(ch) != ROOM_OWNER(to_room) && !CHECK_CHAMELEON(IN_ROOM(ch), to_room) && compute_distance(city->location, to_room) > city_type[city->type].radius) {
+	if (GET_LOYALTY(ch) != ROOM_OWNER(to_room) && CHECK_CHAMELEON(IN_ROOM(ch), to_room) && compute_distance(city->location, to_room) > city_type[city->type].radius) {
 		return FALSE;	// wrong owner AND failed chameleon AND outside base radius (e.g. a road you cannot see)
 	}
 	
