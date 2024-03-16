@@ -63,7 +63,7 @@ void tog_pvp(char_data *ch);
 //// EMPIREMUD CONSTANTS /////////////////////////////////////////////////////
 
 // Shown on the "version" command and sent over MSSP
-const char *version = "EmpireMUD 2.0 beta 5.181";
+const char *version = "EmpireMUD 2.0 beta 5.182";
 const char *DG_SCRIPT_VERSION = "DG Scripts 1.0.12 e5.1.5";
 
 
