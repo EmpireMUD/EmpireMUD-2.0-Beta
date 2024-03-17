@@ -10234,9 +10234,8 @@ See also: LIGHT OBJECT, OEDIT USES
 #d
 LOOKUP LOOK-UP "OLC LOOKUP" "VNUM LOOKUP" "ADVENTURE LOOKUP"
 
-Usage:  .lookup <vnum>
-
-This command tells you what adventure a vnum belongs to.
+To look up what adventure a vnum is from, use the adventure fullsearch:
+> .adv fullsearch -vnum <vnum>
 
 See also: VNUM
 #d
