@@ -2301,6 +2301,30 @@ The following adventure flags are available:
 
 See also: ADVEDIT MINLEVEL, OLC ADVENTURES, OLC REMOVEINDEV
 #d
+"ADVEDIT FULLSEARCH"
+
+Usage:  .adv fullsearch -<field> <argument> <...>
+
+This command allows you to search for adventures matching certain criteria.
+You can specify multiple fields if you want. Any arguments that don't start
+with a dash (-) are matched to the adventure's name and other text.
+
+Fields:
+  &c-author&0 - search the author field for exact text
+  &c-flagged&0, &c-unflagged&0 - see HELP ADVEDIT FLAGS
+  &c-level&0, &c-levelover&0, &c-levelunder&0 - search level range
+  &c-limit&0, &c-limitover&0, &c-limitunder&0 - search instance limit
+  &c-link&0 - search by linking rule types, see HELP ADVEDIT LINKING
+  &c-playerlimit&0, &c-playerlimitover&0, &c-playerlimitunder&0 - search player limit
+  &c-reset&0, &c-resetover&0, &c-resetunder&0 - search reset time
+  &c-temperature&0 - see HELP ADVEDIT TEMPERATURE
+  &c-vnum&0 - search for which adventure contains a given vnum
+  &c-vmin&0, &c-vmax&0 - range limits for which adventures to search
+
+Examples:
+ > .adv fullsearch -author "Paul Clarke" -temperature "always comfortable"
+ > .adv fullsearch -flagged !NEARBY -flagged DETECTABLE
+#d
 "ADVEDIT LIMIT" "INSTANCE LIMIT"
 
 Usage:  .limit <number>
@@ -8017,6 +8041,7 @@ See the individual help files such as OEDIT FULLSEARCH.
 
 Supported types:
   ability
+  adventure
   attack
   building (search designatable rooms with -flag ROOM)
   craft
@@ -8032,7 +8057,7 @@ Supported types:
   trigger
   vehicle
 
-Unsupported types: adventure, augment, archetype, book, class, event, faction,
+Unsupported types: augment, archetype, book, class, event, faction,
    global, morph, shop, social
 #d
 "OLC LIST" OLIST MLIST RLIST
