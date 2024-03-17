@@ -3170,8 +3170,10 @@ void do_stat_book(char_data *ch, book_data *book, bool details) {
 			}
 			
 			build_page_display_str(ch, line);
-			build_page_display_str(ch, "(use vstat -d to view all paragraphs)");
 		}
+	}
+	if (count > 0 && !details) {
+		build_page_display_str(ch, "(use vstat -d to view all paragraph text)");
 	}
 	
 	send_page_display(ch);
