@@ -3270,10 +3270,12 @@ void scale_item_to_level(obj_data *obj, int level) {
 	// helper
 	#define SHARE_OR_BONUS(val)  { \
 		if ((val) > 0 || scale_negative) { \
-			total_share += ABSOLUTE(val); \
+			SAFE_ADD(total_share, ABSOLUTE(val), INT_MIN, INT_MAX, FALSE);	\
 		} \
 		else if ((val) < 0) { \
-			bonus += ceil(ABSOLUTE(val) * apply_values[(int)apply->location]); \
+			int temp = ABSOLUTE(val);	\
+			SAFE_MULTIPLY(temp, apply_values[(int)apply->location], INT_MIN, INT_MAX, FALSE);	\
+			SAFE_ADD(bonus, temp, INT_MIN, INT_MAX, FALSE);	\
 		} \
 	}
 	// end helper
@@ -3322,15 +3324,19 @@ void scale_item_to_level(obj_data *obj, int level) {
 	// NOW: total_share is the total amount to split, and bonus is extra points because some things are negative
 	
 	// points_to_give based on level and bonus!
-	points_to_give = MAX(1.0, (double) level * scale_points_at_100 / 100) + bonus;
+	points_to_give = level;
+	SAFE_MULTIPLY_DOUBLE(points_to_give, scale_points_at_100, INT_MIN, INT_MAX, FALSE);
+	points_to_give /= 100.0;
+	SAFE_ADD_DOUBLE(points_to_give, bonus, INT_MIN, INT_MAX, FALSE);
+	
 	// armor scaling
 	if (IS_ARMOR(obj)) {
-		points_to_give *= armor_scale_bonus[GET_ARMOR_TYPE(obj)];
+		SAFE_MULTIPLY_DOUBLE(points_to_give, armor_scale_bonus[GET_ARMOR_TYPE(obj)], INT_MIN, INT_MAX, FALSE);
 	}
 	// scaling based on obj flags
 	for (bits = GET_OBJ_EXTRA(obj), iter = 0; bits; bits >>= 1, ++iter) {
 		if (IS_SET(bits, BIT(0))) {
-			points_to_give *= obj_flag_scaling_bonus[iter];
+			SAFE_MULTIPLY_DOUBLE(points_to_give, obj_flag_scaling_bonus[iter], INT_MIN, INT_MAX, FALSE);
 		}
 	}
 	// wear-based scaling
@@ -3340,8 +3346,8 @@ void scale_item_to_level(obj_data *obj, int level) {
 			sig = MAX(sig, wear_significance[iter]);
 		}
 	}
-	points_to_give *= wear_pos_modifier[sig];
-	points_to_give *= base_mod;	// final modifier
+	SAFE_MULTIPLY_DOUBLE(points_to_give, wear_pos_modifier[sig], INT_MIN, INT_MAX, FALSE);
+	SAFE_MULTIPLY_DOUBLE(points_to_give, base_mod, INT_MIN, INT_MAX, FALSE);	// final modifier
 	
 	// ok get ready
 	points_to_give = MAX(1.0, points_to_give);	// minimum of 1 point

@@ -2871,6 +2871,44 @@ void sort_einv_for_empire(empire_data *emp, int einv_sort_type);
 	} while (0)
 
 
+// bounds-safe multiplication
+#define SAFE_MULTIPLY(field, amount, min, max, warn)  do { \
+		long long _safe_mult_old_val = (field);	\
+		field *= (amount);	\
+		if ((amount) != 0 && (field) / (amount) != _safe_mult_old_val) {	\
+			(field) = (max);	\
+			if (warn) {	\
+				log("SYSERR: SAFE_MULTIPLY out of bounds at %s:%d.", __FILE__, __LINE__);	\
+			}	\
+		}	\
+		else if ((field) < (min)) {	\
+			(field) = (min);	\
+		}	\
+		else if ((field) > (max)) {	\
+			(field) = (max);	\
+		}	\
+	} while (0)
+
+
+// bounds-safe multiplication: doubles
+#define SAFE_MULTIPLY_DOUBLE(field, amount, min, max, warn)  do { \
+		long double _safe_mult_old_val = (field);	\
+		field *= (amount);	\
+		if ((amount) != 0 && (field) / (amount) != _safe_mult_old_val) {	\
+			(field) = (max);	\
+			if (warn) {	\
+				log("SYSERR: SAFE_MULTIPLY_DOUBLE out of bounds at %s:%d.", __FILE__, __LINE__);	\
+			}	\
+		}	\
+		else if ((field) < (min)) {	\
+			(field) = (min);	\
+		}	\
+		else if ((field) > (max)) {	\
+			(field) = (max);	\
+		}	\
+	} while (0)
+
+
 // shortcudt for messaging
 #define send_config_msg(ch, conf)  msg_to_char((ch), "%s\r\n", config_get_string(conf))
 
