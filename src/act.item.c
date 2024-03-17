@@ -1521,6 +1521,30 @@ static void perform_wear(char_data *ch, obj_data *obj, int where) {
 				return;
 			}
 		}
+		
+		// check safety: health
+		val = GET_MAX_HEALTH(ch);
+		LL_FOREACH(GET_OBJ_APPLIES(obj), apply) {
+			if (apply->location == APPLY_HEALTH) {
+				val += apply->modifier;
+			}
+		}
+		if (val < 1) {
+			act("You cannot use $p because your health pool would drop too low!", FALSE, ch, obj, NULL, TO_CHAR);
+			return;
+		}
+		
+		// check safety: blood
+		val = GET_MAX_BLOOD(ch);
+		LL_FOREACH(GET_OBJ_APPLIES(obj), apply) {
+			if (apply->location == APPLY_BLOOD) {
+				val += apply->modifier;
+			}
+		}
+		if (val < 1) {
+			act("You cannot use $p because you would run out of blood!", FALSE, ch, obj, NULL, TO_CHAR);
+			return;
+		}
 
 		/* See if a trigger disallows it */
 		if (!wear_otrigger(obj, ch, where) || (obj->carried_by != ch)) {
