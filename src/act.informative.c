@@ -735,7 +735,7 @@ void look_at_target(char_data *ch, char *arg, char *more_args, bool look_inside)
 	char targ_arg[MAX_INPUT_LENGTH];
 	int found = FALSE, fnum;
 	bitvector_t bits;
-	char_data *found_char = NULL;
+	char_data *found_char = NULL, *proto;
 	obj_data *found_obj = NULL, *ex_obj = NULL;
 	vehicle_data *found_veh = NULL, *ex_veh = NULL;
 	bool inv_only = FALSE;
@@ -832,6 +832,14 @@ void look_at_target(char_data *ch, char *arg, char *more_args, bool look_inside)
 			send_page_display(ch);
 			act("$n looks at $p.", TRUE, ch, found_obj, NULL, TO_ROOM);
 		}
+	}
+	
+	// try mount
+	if (!found && GET_MOUNT_VNUM(ch) != NOTHING && (!str_cmp(arg, "mount") || ((proto = mob_proto(GET_MOUNT_VNUM(ch))) && isname(arg, GET_PC_NAME(proto))))) {
+		act("$n looks at $s mount.", FALSE, ch, NULL, NULL, TO_ROOM);
+		proto = mob_proto(GET_MOUNT_VNUM(ch));
+		msg_to_char(ch, "You look at your mount:\r\n%s", GET_LOOK_DESC(proto));
+		found = TRUE;
 	}
 	
 	// try sky
