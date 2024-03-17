@@ -2472,7 +2472,7 @@ const char *empire_admin_flags[] = {
 	"NO-STEAL",
 	"CITY-CLAIMS-ONLY",
 	"NO-RENAME",
-	"DID-NEWBIE-MOVE",
+	"FREE-NEWBIE-MOVE",
 	"FREE-NEEDS",	// 5
 	"IGNORE-OVERAGES",
 	"NO-DECAY",
