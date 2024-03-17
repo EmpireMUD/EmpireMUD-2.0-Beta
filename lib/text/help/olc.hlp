@@ -601,9 +601,9 @@ See also: AFFECT FLAGS, OLC ABILITIES, BUFF ABILITY
 
 Usage:  .affectvnum <vnum | none>
 
-For buff abilities, this determines which 'affect' (generic) to use. The affect
-determines what text is shown on the 'affects' command or when the ability
-wears off.
+For buff abilities, this determines which 'affect' (from the generic editor) to
+use. The affect determines what text is shown on the 'affects' command or when
+the ability wears off.
 
 If you don't specify an ability, it will just say 'buff' and will have no wear-
 off message.
@@ -612,7 +612,7 @@ If you use the LIMIT-CROWD-CONTROL flag, using this buff will cancel it on
 other mobs in the same room. For example, sapping 1 mob cancels anyone else
 you have sapped.
 
-See also: OLC ABILITIES, BUFF ABILITY, ABILEDIT FLAGS
+See also: OLC ABILITIES, BUFF ABILITY, ABILEDIT FLAGS, AFFECT GENERICS
 #d
 "ABILEDIT HOOK" "ABILEDIT HOOKS" "ABILEDIT HOOKS" "ABILITY HOOKS" "HOOKED ABILITIES" "HOOK ABILITIES"
 
@@ -721,7 +721,7 @@ Messaging notes:
 
 Example buff abilities: 1 Fly, 97 Bash, 166 Foresight, 205 Master Survivalist
 
-See also: OLC ABILITIES, ABILEDIT TYPES
+See also: OLC ABILITIES, ABILEDIT TYPES, AFFECT GENERICS
 #d
 "ABILEDIT BUILDING-DAMAGE ABILITY" "BUILDING-DAMAGE ABILITY" "BUILDING-DAMAGE ABILITIES" "BUILDING DAMAGE ABILITY" "ABILEDIT BUILDING DAMAGE ABILITY"
 
@@ -1122,7 +1122,7 @@ Message notes:
 
 Example DoT abilities: 98 Cut Deep, 125 Skybrand, 155 Jab
 
-See also: OLC ABILITIES, ABILEDIT SCALE, ABILEDIT TYPES
+See also: OLC ABILITIES, ABILEDIT SCALE, ABILEDIT TYPES, AFFECT GENERICS
 #d
 "ABILEDIT FLAGS" "ABILITY FLAGS"
 
@@ -1905,7 +1905,7 @@ Messaging notes:
 
 Example room-affect abilities: 11 Darkness, 186 Ritual of Defense
 
-See also: OLC ABILITIES, ABILEDIT TYPES, ROOM AFFECTS
+See also: OLC ABILITIES, ABILEDIT TYPES, ROOM AFFECTS, AFFECT GENERICS
 #d
 "ABILEDIT SCALE"
 
@@ -2923,7 +2923,7 @@ If players have more than one archetype that give languages, they will speak
 all of those languages. If no archetypes provide a language, you should ensure
 you have at least one BASIC-flagged language for players to speak.
 
-See also: OLC ARCHETYPES, LANGUAGE, GENERIC LANGUAGE
+See also: OLC ARCHETYPES, LANGUAGE, LANGUAGE GENERICS
 #d
 "ARCHEDIT LORE"
 
@@ -4465,13 +4465,13 @@ See also: OLC CLASSES, VNUM
 #d
 COMPONENTS "RESOURCE COMPONENTS" "COMPONENT RESOURCES"
 
-Components are generic categories of objects. This allows recipes to require
+Components are broad categories of objects. This allows recipes to require
 a type of object, rather than a specific object. Components are 'generics',
 so there can be any number of types of components in the game. Components can
 also be sub-types of other components using the 'relations' settings in the
 generic editor.
 
-See also: GENERIC COMPONENTS, OEDIT COMPONENT
+See also: COMPONENT GENERICS, OEDIT COMPONENT
 #d
 "CRAFT VEHICLES" "VEHICLE CRAFTS"
 
@@ -4996,7 +4996,7 @@ See also: OLC GENERICS, DOLLAR SIGN CODES
 "GENERIC AFFECTS" "AFFECTS EDITOR" "AFFECT EDITOR" "AFFECT GENERICS"
 
 Generic 'affects' are used by spells, abilities, and scripts to show names on
-the affect list, and to show messages when these effects wear off.
+the affect list, and to show messages related to the affects.
 
 Affects have several properties:
   <&yapply2char&0> An optional message shown to the character when the affect
@@ -5024,7 +5024,7 @@ Usage:  .apply2char <message | none>
 This message is sent to the character when he/she gains this affect. This
 message is optional.
 
-See also: OLC GENERICS, GENERIC AFFECTS
+See also: OLC GENERICS, AFFECTS GENERICS
 #d
 "GENEDIT APPLY2ROOM"
 
@@ -5033,7 +5033,7 @@ Usage:  .apply2room <message | none>
 This message is sent to the room when a person gains this affect. It will
 only be shown to players who can see that person. This message is optional.
 
-See also: OLC GENERICS, GENERIC AFFECTS
+See also: OLC GENERICS, AFFECT GENERICS
 #d
 "GENEDIT LOOKATCHAR" "GENEDIT LOOK-AT-CHAR" "GENEDIT LOOK AT CHAR"
 
@@ -5048,7 +5048,7 @@ Example:
 You look at Albert:
 You notice a distinct, red glint in his eyes.
 
-See also: OLC GENERICS, GENERIC AFFECTS, DOLLAR SIGN CODES
+See also: OLC GENERICS, AFFECT GENERICS, DOLLAR SIGN CODES
 #d
 "GENEDIT LOOKATROOM" "GENEDIT LOOK-AT-ROOM" "GENEDIT LOOK AT ROOM"
 
@@ -5063,7 +5063,7 @@ Example:
 <Queen> Victoria stands before you in full regalia.
 ...she has a majestic aura about her!
 
-See also: OLC GENERICS, GENERIC AFFECTS, DOLLAR SIGN CODES
+See also: OLC GENERICS, AFFECT GENERICS, DOLLAR SIGN CODES
 #d
 "GENERIC COMPONENTS" "COMPONENT GENERICS" "COMPONENT EDITOR"
 
@@ -5200,7 +5200,7 @@ rock.
 Where possible, try to use the same vnum for the item and for the component.
 However, this is not required if you have a compelling reason not to.
 
-See also: GENERIC COMPONENTS
+See also: COMPONENT GENERICS
 #d
 "GENERIC LANGUAGE" "LANGUAGE GENERICS" "LANGUAGE EDITOR"
 
@@ -5263,7 +5263,7 @@ Usage:  .plural <text>
 
 For currencies and components, this is the plural version of the name.
 
-See also: GENERIC CURRENCY, GENERIC COMPONENTS
+See also: CURRENCY GENERICS, COMPONENT GENERICS
 #d
 "GENEDIT QUICKCOOLDOWN"
 
@@ -5289,7 +5289,7 @@ Components: A generic component 'counts as' all the types it's related to. For
 example, a 'fine sapling' component could have 'sapling' as one of its
 relations. This means all 'fine saplings' also count as 'saplings'.
 
-See also: GENERIC COMPONENTS
+See also: COMPONENT GENERICS
 #d
 "GENEDIT STANDARDWEAROFF"
 
@@ -5298,7 +5298,7 @@ Usage:  .standardwearoff
 This sets the 'wearoff' property to a standard message based on the name of
 the generic.
 
-See also: OLC GENERICS, GENERIC AFFECTS, GENERIC COOLDOWNS, GENEDIT WEAROFF
+See also: OLC GENERICS, AFFECT GENERICS, COOLDOWN GENERICS, GENEDIT WEAROFF
 #d
 "GENEDIT TYPE"
 
@@ -5323,7 +5323,7 @@ The wearoff message is sent to the player when the cooldown/affect ends. This
 message is optional.
 
 See also: OLC GENERICS, GENERIC AFFECTS, GENERIC COOLDOWNS,
-GENEDIT STANDARDWEAROFF
+   GENEDIT STANDARDWEAROFF
 #d
 "GENEDIT WEAROFF2ROOM"
 
@@ -5333,7 +5333,7 @@ The wearoff message is sent to the rest of the room when a player's affect
 ends. It will only be shown to players who can see that person. This message
 is optional.
 
-See also: OLC GENERICS, GENERIC AFFECTS
+See also: OLC GENERICS, AFFECT GENERICS
 #d
 "GEDIT CAPACITY"
 
@@ -6667,12 +6667,12 @@ Corpse:
 
 Currency:
  0 - amount
- 1 - generic currency vnum
+ 1 - generic currency vnum (CURRENCY GENERICS)
 
 Drink Container:
  0 - max capacity (scalable)
  1 - current amount
- 2 - generic liquid vnum
+ 2 - generic liquid vnum (LIQUID GENERICS)
 
 Food:
  0 - hours of fullness
@@ -6707,7 +6707,7 @@ Paint:
 
 Poison:
  1 - poison charges remaining
- 2 - generic affect vnum (optional, defaults to 3004 poisoned)
+ 2 - generic affect vnum (optional, defaults to 3004 poisoned, AFFECT GENERICS)
 
 Portal:
  0 - target room vnum (real vnum, not template)
@@ -6715,7 +6715,7 @@ Portal:
      the portal has been loaded into the world, when it becomes the real vnum
 
 Potions:
- 0 - generic cooldown vnum (optional)
+ 0 - generic cooldown vnum (optional, COOLDOWN GENERICS)
  1 - cooldown time in seconds (optional)
  2 - generic affect vnum (optional, defaults to 3102 potion)
 
@@ -6744,7 +6744,7 @@ See also: AFFECT FLAGS, OLC OBJECTS
 
 Usage:  .affecttype <vnum>
 
-This lets you set a generic affect that will be used for the item's benefits.
+This lets you set an affect generic that will be used for the item's benefits.
 This is how you set a custom name to appear on a player's 'affects' list.
 
 Potions: If two potions have the same affect vnum (including -1/none), one
@@ -6756,7 +6756,7 @@ poisoner, a new affect will overwrite an older one.
 NOTE: This affecttype only applies if the poison/potion has applies or aff
 flags. Any affects applied by a script will not inherit this type.
 
-See also: GENERIC AFFECT, OLC OBJECTS
+See also: AFFECT GENERICS, OLC OBJECTS
 #d
 "OEDIT APPLY" "OEDIT APPLIES" APPLIES
 
@@ -6905,7 +6905,7 @@ generic part of a crafting recipe.
 
 Components are all 'generics' -- use 'vnum gen <name>' to search them.
 
-See also: SHOW COMPONENTS, SHOW USES, GENERIC COMPONENTS
+See also: SHOW COMPONENTS, SHOW USES, COMPONENT GENERICS
 #d
 "OEDIT CONTAINERFLAGS" "OEDIT CONTAINER FLAGS"
 
@@ -6961,7 +6961,7 @@ Usage:  .currency <vnum>
 
 This sets the vnum of the adventure currency (a generic).
 
-See also: GENERIC CURRENCY
+See also: CURRENCY GENERICS
 #d
 "OEDIT CUSTOM" "CUSTOM MESSAGES"
 
@@ -8163,7 +8163,8 @@ The following types will have IN-DEVELOPMENT flags removed in the vnum range:
 - skills
 - socials
 
-See also: OLC CONTROLS, OLC ADVENTURES, ADVEDIT FLAGS, CEDIT FLAGS
+See also: OLC CONTROLS, OLC ADVENTURES, ADVEDIT FLAGS, CEDIT FLAGS,
+   MOON GENERICS
 #d
 "OLC RESOURCES" "RESOURCE ADD" "RESOURCE CHANGE" "RESOURCE REMOVE" "RESOURCE MOVE"
 
@@ -8710,7 +8711,7 @@ Available reward types:
  &cQUEST-CHAIN&0 - Starts a player on another quest, if they meet the pre-reqs and
     are not already on it.
  &cREPUTATION&0 - Gain/lose faction reputation.
- &cCURRENCY&0 - Gives generic currency (e.g. tokens).
+ &cCURRENCY&0 - Gives currency (e.g. tokens, see CURRENCY GENERICS).
  &cEVENT-POINTS&0 - Points toward an event (only happens if the event is running).
  &cSPEAK-LANGUAGE&0 - Can now speak a language.
  &cRECOGNIZE-LANGUAGE&0 - Can now recognize a language (will not override one the
@@ -9314,7 +9315,7 @@ Example:
 
 For notes on the mud's building rules, see HELP BUILDING GUIDE.
 
-See also: OLC, OLC ABORT, OLC EDIT, OLC EDITOR, OLC SAVE
+See also: OLC, OLC ABORT, OLC EDIT, OLC EDITOR, OLC SAVE, CURRENCY GENERICS
 #d
 "SHOPEDIT CLOSES" "SHOPEDIT OPENS"
 
@@ -9361,7 +9362,7 @@ The parameters for add/change are:
 - reputation: If the shop has allegiance to a faction, this is the lowest
   reputation that can buy the item (optional).
 
-See also: SHOPEDIT ALLEGIANCE, OLC SHOPS, GENERIC CURRENCY, VNUM
+See also: SHOPEDIT ALLEGIANCE, OLC SHOPS, CURRENCY GENERICS, VNUM
 #d
 "SHOPEDIT LOCATIONS"
 
@@ -9708,10 +9709,10 @@ These abilities have two additional custom messages available.
  &ctoggle-to-char&0 - Shown to the character. If missing, they see "Okay."
  &ctoggle-to-room&0 - Shown to the room. Nothing is shown if this is missing.
 
-If the affect itself has a wearoff or wearoff2room message on its generic,
-those are shown after the toggle messages.
+If the affect itself has a wearoff or wearoff2room message on its affect
+generic, those are shown after the toggle messages.
 
-See also: ABILEDIT CUSTOM MESSAGES, AFFECT GENERIC
+See also: ABILEDIT CUSTOM MESSAGES, AFFECT GENERICS
 #
 "TRIGEDIT ARGUMENTS"
 
@@ -9855,6 +9856,8 @@ Object values:
  0 - remaining number of shots
  1 - damage bonus (scalable)
  2 - ammo type (must match type on the missile weapon)
+
+See also: AFFECT GENERICS
 #d
 "BOARD ITEM" "BOARD OBJECT"
 
@@ -9968,7 +9971,7 @@ Object values:
  0 - amount
  1 - generic currency vnum
 
-See also: GENERIC CURRENCY
+See also: CURRENCY GENERICS
 #d
 "DAMAGE TYPES" "DAMAGE TYPE"
 
@@ -10013,6 +10016,8 @@ Custom messages:
 
 Interactions:
  DECAYS-TO - only when a 1-USE drink container's timer expires
+
+See also: LIQUID GENERICS
 #d
 "FOOD ITEM" "FOOD OBJECT"
 
@@ -10234,7 +10239,7 @@ Minipets automatically gain the following when summoned:
  - Flags: SENTINEL SPAWNED !LOOT !EXPERIENCE (and ISNPC)
  - Affects: !ATTACK CHARMED
 
-See also: OLC OBJECTS, MINIPET, GENERIC COOLDOWN
+See also: OLC OBJECTS, MINIPET, COOLDOWN GENERICS
 #d
 "MISSILE WEAPON ITEM" "MISSILE WEAPON OBJECT"
 
@@ -10256,8 +10261,8 @@ See also: AMMO ITEM
 
 This is used for items that don't have another applicable type. It has no
 base requirements to use it, and can represent almost anything. This type also
-gives you access to edit the object's 3 generic values, which may be useful
-for scripting.
+gives you access to edit the object's 3 basic values, which may be useful for
+scripting.
 
 Object values:
  - does not use the values, but allows them to be used for scripting
@@ -10315,6 +10320,8 @@ until it is used up and discarded completely.
 Object values:
  1 - poison charges remaining
  2 - generic affect vnum (optional, defaults to 3004 poisoned)
+
+See also: AFFECT GENERICS
 #d
 "PORTAL ITEM" "PORTAL OBJECT"
 
@@ -10358,6 +10365,8 @@ Object values:
  0 - generic cooldown vnum (optional)
  1 - cooldown time in seconds (optional)
  2 - generic affect vnum (optional, defaults to 3102 potion)
+
+See also: COOLDOWN GENERICS
 #d
 "RECIPE ITEM" "RECIPE OBJECT"
 
@@ -10408,7 +10417,7 @@ You can add resource actions using generics. Here are some common ones:
   1004 scout area            1010 repair walls
   1005 block water
 
-See also: BEDIT RESOURCE, CEDIT RESOURCES, VEDIT RESOURCE, OLC GENERICS
+See also: BEDIT RESOURCE, CEDIT RESOURCES, VEDIT RESOURCE, ACTION GENERICS
 #d
 RUIN RUINS "DECAYING RUINS" "RUINS BUILDING" "RUINS LIST" "RUIN LIST"
 
@@ -10459,8 +10468,8 @@ currently an option.
 #d
 "UNDEFINED ITEM" "UNDEFINED OBJECT"
 
-The UNDEFINED item type should not be used for live items. If you need a
-generic item, use type OTHER.
+The UNDEFINED item type should not be used for live items. Use the OTHER type
+for items that don't have any specific type.
 #d
 "UPGRADE CRAFTS" "UPGRADES TO" UPGRADES-TO
 
