@@ -2938,8 +2938,8 @@ You can also search all attributes using fields like:
   Also works for: &ydexterity&0/&ydex&0, &ycharisma&0/&ycha&0, &ygreatness&0/&ygrt&0, &yintelligence&0/&yint&0, &ywits&0
 
 Examples:
- > .arch fullsearch -type Enchantment -wear WIELD
- > .arch fullsearch -flagged SELF-ONLY -wear HOLD
+ > .arch fullsearch -type ORIGIN -rank Lord
+ > .arch fullsearch -flagged BASIC -unflagged IN-DEV
 
 To search other fields, you can generally use the normal "search" option for
 other OLC types. For example, to find all archetypes that give a short sword,

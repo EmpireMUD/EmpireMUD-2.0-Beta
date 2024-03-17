@@ -870,7 +870,7 @@ void olc_fullsearch_archetype(char_data *ch, char *argument) {
 		if (*find_lore && !multi_isname(find_lore, GET_ARCH_LORE(arch))) {
 			continue;
 		}
-		if (*find_rank && !multi_isname(find_lore, GET_ARCH_MALE_RANK(arch)) && !multi_isname(find_lore, GET_ARCH_FEMALE_RANK(arch))) {
+		if (*find_rank && !multi_isname(find_rank, GET_ARCH_MALE_RANK(arch)) && !multi_isname(find_rank, GET_ARCH_FEMALE_RANK(arch))) {
 			continue;
 		}
 		if (*find_keywords && !multi_isname(find_keywords, GET_ARCH_NAME(arch)) && !multi_isname(find_keywords, GET_ARCH_DESC(arch)) && !multi_isname(find_keywords, GET_ARCH_LORE(arch)) && !multi_isname(find_keywords, GET_ARCH_MALE_RANK(arch)) && !multi_isname(find_keywords, GET_ARCH_FEMALE_RANK(arch))) {
