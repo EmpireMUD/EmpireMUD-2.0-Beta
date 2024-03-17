@@ -4179,6 +4179,9 @@ void b5_181_repair_extra_data(void) {
 void b5_182_empire_update(void) {
 	empire_data *emp, *next_emp;
 	
+	// normally this is computed AFTER this step
+	reread_empire_tech(NULL);
+	
 	HASH_ITER(hh, empire_table, emp, next_emp) {
 		if (EMPIRE_IMM_ONLY(emp)) {
 			log("- Set admin flags on immortal empire [%d] %s", EMPIRE_VNUM(emp), EMPIRE_NAME(emp));
