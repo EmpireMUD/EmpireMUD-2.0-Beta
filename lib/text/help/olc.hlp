@@ -3350,6 +3350,30 @@ Available flags:
 
 See also: OLC AUGMENTS
 #d
+"AUGEDIT FULLSEARCH"
+
+Usage:  .aug fullsearch -<field> <argument> <...>
+
+This command allows you to search for augments matching certain criteria. You
+can specify multiple fields if you want. Any arguments that don't start with a
+dash (-) are matched to the augment's name.
+
+Fields:
+  &c-apply&0 - see HELP APPLIES
+  &c-flagged&0, &-cunflagged&0 - see HELP AUGEDIT FLAGS
+  &c-requiresobject&0 - requires any object
+  &c-type&0 - see HELP AUGEDIT TYPE
+  &c-wear&0, &-cnowear&0 - see HELP OEDIT WEAR
+  &c-vmin&0, &c-vmax&0 - VNUM range limits
+
+Examples:
+ > .aug fullsearch -type Enchantment -wear WIELD
+ > .aug fullsearch -flagged SELF-ONLY -wear HOLD
+
+To search other fields, you can generally use the normal "search" option for
+other OLC types. For example, to find all augments that rqeuire a bloodstone,
+use ".o search 104".
+#d
 "AUGEDIT NAME"
 
 Usage:  .name <name>
@@ -8043,6 +8067,7 @@ Supported types:
   ability
   adventure
   attack
+  augment
   building (search designatable rooms with -flag ROOM)
   craft
   crop
@@ -8057,7 +8082,7 @@ Supported types:
   trigger
   vehicle
 
-Unsupported types: augment, archetype, book, class, event, faction,
+Unsupported types: archetype, book, class, event, faction,
    global, morph, shop, social
 #d
 "OLC LIST" OLIST MLIST RLIST
