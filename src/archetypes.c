@@ -708,6 +708,192 @@ char *list_one_archetype(archetype_data *arch, bool detail) {
 
 
 /**
+* Searches properties of archetypes.
+*
+* @param char_data *ch The person searching.
+* @param char *argument The argument they entered.
+*/
+void olc_fullsearch_archetype(char_data *ch, char *argument) {
+	bitvector_t not_flagged = NOBITS, only_flags = NOBITS;
+	char type_arg[MAX_INPUT_LENGTH], val_arg[MAX_INPUT_LENGTH], find_keywords[MAX_INPUT_LENGTH], find_lore[MAX_INPUT_LENGTH], find_rank[MAX_INPUT_LENGTH];
+	int count, only_type = NOTHING, vmin = NOTHING, vmax = NOTHING;
+	int only_strength = NOTHING, strength_over = NOTHING, strength_under = NOTHING;
+	int only_dexterity = NOTHING, dexterity_over = NOTHING, dexterity_under = NOTHING;
+	int only_charisma = NOTHING, charisma_over = NOTHING, charisma_under = NOTHING;
+	int only_greatness = NOTHING, greatness_over = NOTHING, greatness_under = NOTHING;
+	int only_intelligence = NOTHING, intelligence_over = NOTHING, intelligence_under = NOTHING;
+	int only_wits = NOTHING, wits_over = NOTHING, wits_under = NOTHING;
+	archetype_data *arch, *next_arch;
+	
+	if (!*argument) {
+		msg_to_char(ch, "See HELP ARCHEDIT FULLSEARCH for syntax.\r\n");
+		return;
+	}
+	
+	// process argument
+	*find_keywords = '\0';
+	*find_lore = '\0';
+	*find_rank = '\0';
+	while (*argument) {
+		// figure out a type
+		argument = any_one_arg(argument, type_arg);
+		
+		if (!strcmp(type_arg, "-")) {
+			continue;	// just skip stray dashes
+		}
+		
+		FULLSEARCH_FLAGS("flags", only_flags, archetype_flags)
+		FULLSEARCH_FLAGS("flagged", only_flags, archetype_flags)
+		FULLSEARCH_STRING("lore", find_lore)
+		FULLSEARCH_STRING("rank", find_rank)
+		FULLSEARCH_LIST("type", only_type, archetype_types)
+		FULLSEARCH_FLAGS("unflagged", not_flagged, archetype_flags)
+		FULLSEARCH_INT("vmin", vmin, 0, INT_MAX)
+		FULLSEARCH_INT("vmax", vmax, 0, INT_MAX)
+		
+		FULLSEARCH_INT("strength", only_strength, 0, INT_MAX)
+		FULLSEARCH_INT("strengthover", strength_over, 0, INT_MAX)
+		FULLSEARCH_INT("strover", strength_over, 0, INT_MAX)
+		FULLSEARCH_INT("strengthunder", strength_under, 0, INT_MAX)
+		FULLSEARCH_INT("strunder", strength_under, 0, INT_MAX)
+		FULLSEARCH_INT("dexterity", only_dexterity, 0, INT_MAX)
+		FULLSEARCH_INT("dexterityover", dexterity_over, 0, INT_MAX)
+		FULLSEARCH_INT("dexover", dexterity_over, 0, INT_MAX)
+		FULLSEARCH_INT("dexterityunder", dexterity_under, 0, INT_MAX)
+		FULLSEARCH_INT("dexunder", dexterity_under, 0, INT_MAX)
+		FULLSEARCH_INT("charisma", only_charisma, 0, INT_MAX)
+		FULLSEARCH_INT("charismaover", charisma_over, 0, INT_MAX)
+		FULLSEARCH_INT("chaover", charisma_over, 0, INT_MAX)
+		FULLSEARCH_INT("charismaunder", charisma_under, 0, INT_MAX)
+		FULLSEARCH_INT("chaunder", charisma_under, 0, INT_MAX)
+		FULLSEARCH_INT("greatness", only_greatness, 0, INT_MAX)
+		FULLSEARCH_INT("greatnessover", greatness_over, 0, INT_MAX)
+		FULLSEARCH_INT("grtover", greatness_over, 0, INT_MAX)
+		FULLSEARCH_INT("greatnessunder", greatness_under, 0, INT_MAX)
+		FULLSEARCH_INT("grtunder", greatness_under, 0, INT_MAX)
+		FULLSEARCH_INT("intelligence", only_intelligence, 0, INT_MAX)
+		FULLSEARCH_INT("intelligenceover", intelligence_over, 0, INT_MAX)
+		FULLSEARCH_INT("intover", intelligence_over, 0, INT_MAX)
+		FULLSEARCH_INT("intelligenceunder", intelligence_under, 0, INT_MAX)
+		FULLSEARCH_INT("intunder", intelligence_under, 0, INT_MAX)
+		FULLSEARCH_INT("wits", only_wits, 0, INT_MAX)
+		FULLSEARCH_INT("witsover", wits_over, 0, INT_MAX)
+		FULLSEARCH_INT("witsunder", wits_under, 0, INT_MAX)
+		
+		else {	// not sure what to do with it? treat it like a keyword
+			sprintf(find_keywords + strlen(find_keywords), "%s%s", *find_keywords ? " " : "", type_arg);
+		}
+		
+		// prepare for next loop
+		skip_spaces(&argument);
+	}
+	
+	build_page_display(ch, "Archetype fullsearch: %s", show_color_codes(find_keywords));
+	count = 0;
+	
+	// okay now look them up
+	HASH_ITER(hh, archetype_table, arch, next_arch) {
+		if ((vmin != NOTHING && GET_ARCH_VNUM(arch) < vmin) || (vmax != NOTHING && GET_ARCH_VNUM(arch) > vmax)) {
+			continue;	// vnum range
+		}
+		
+		if (not_flagged != NOBITS && ARCHETYPE_FLAGGED(arch, not_flagged)) {
+			continue;
+		}
+		if (only_flags != NOBITS && (GET_ARCH_FLAGS(arch) & only_flags) != only_flags) {
+			continue;
+		}
+		if (only_type != NOTHING && GET_ARCH_TYPE(arch) != only_type) {
+			continue;
+		}
+		
+		if (only_strength != NOTHING && GET_ARCH_ATTRIBUTE(arch, STRENGTH) != only_strength) {
+			continue;
+		}
+		if (strength_over != NOTHING && GET_ARCH_ATTRIBUTE(arch, STRENGTH) < strength_over) {
+			continue;
+		}
+		if (strength_under != NOTHING && GET_ARCH_ATTRIBUTE(arch, STRENGTH) > strength_under) {
+			continue;
+		}
+		
+		if (only_dexterity != NOTHING && GET_ARCH_ATTRIBUTE(arch, DEXTERITY) != only_dexterity) {
+			continue;
+		}
+		if (dexterity_over != NOTHING && GET_ARCH_ATTRIBUTE(arch, DEXTERITY) < dexterity_over) {
+			continue;
+		}
+		if (dexterity_under != NOTHING && GET_ARCH_ATTRIBUTE(arch, DEXTERITY) > dexterity_under) {
+			continue;
+		}
+		
+		if (only_charisma != NOTHING && GET_ARCH_ATTRIBUTE(arch, CHARISMA) != only_charisma) {
+			continue;
+		}
+		if (charisma_over != NOTHING && GET_ARCH_ATTRIBUTE(arch, CHARISMA) < charisma_over) {
+			continue;
+		}
+		if (charisma_under != NOTHING && GET_ARCH_ATTRIBUTE(arch, CHARISMA) > charisma_under) {
+			continue;
+		}
+		
+		if (only_greatness != NOTHING && GET_ARCH_ATTRIBUTE(arch, GREATNESS) != only_greatness) {
+			continue;
+		}
+		if (greatness_over != NOTHING && GET_ARCH_ATTRIBUTE(arch, GREATNESS) < greatness_over) {
+			continue;
+		}
+		if (greatness_under != NOTHING && GET_ARCH_ATTRIBUTE(arch, GREATNESS) > greatness_under) {
+			continue;
+		}
+		
+		if (only_intelligence != NOTHING && GET_ARCH_ATTRIBUTE(arch, INTELLIGENCE) != only_intelligence) {
+			continue;
+		}
+		if (intelligence_over != NOTHING && GET_ARCH_ATTRIBUTE(arch, INTELLIGENCE) < intelligence_over) {
+			continue;
+		}
+		if (intelligence_under != NOTHING && GET_ARCH_ATTRIBUTE(arch, INTELLIGENCE) > intelligence_under) {
+			continue;
+		}
+		
+		if (only_wits != NOTHING && GET_ARCH_ATTRIBUTE(arch, WITS) != only_wits) {
+			continue;
+		}
+		if (wits_over != NOTHING && GET_ARCH_ATTRIBUTE(arch, WITS) < wits_over) {
+			continue;
+		}
+		if (wits_under != NOTHING && GET_ARCH_ATTRIBUTE(arch, WITS) > wits_under) {
+			continue;
+		}
+		
+		if (*find_lore && !multi_isname(find_lore, GET_ARCH_LORE(arch))) {
+			continue;
+		}
+		if (*find_rank && !multi_isname(find_lore, GET_ARCH_MALE_RANK(arch)) && !multi_isname(find_lore, GET_ARCH_FEMALE_RANK(arch))) {
+			continue;
+		}
+		if (*find_keywords && !multi_isname(find_keywords, GET_ARCH_NAME(arch)) && !multi_isname(find_keywords, GET_ARCH_DESC(arch)) && !multi_isname(find_keywords, GET_ARCH_LORE(arch)) && !multi_isname(find_keywords, GET_ARCH_MALE_RANK(arch)) && !multi_isname(find_keywords, GET_ARCH_FEMALE_RANK(arch))) {
+			continue;
+		}
+		
+		// show it
+		build_page_display(ch, "[%5d] %s", GET_ARCH_VNUM(arch), GET_ARCH_NAME(arch));
+		++count;
+	}
+	
+	if (count > 0) {
+		build_page_display(ch, "(%d archetypes)", count);
+	}
+	else {
+		build_page_display_str(ch, " none");
+	}
+	
+	send_page_display(ch);
+}
+
+
+/**
 * Searches for all uses of an archetype and displays them.
 *
 * @param char_data *ch The player.

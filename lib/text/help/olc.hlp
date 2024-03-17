@@ -2916,6 +2916,35 @@ Available flags:
 
 See also: OLC ARCHETYPES
 #d
+"ARCHEDIT FULLSEARCH"
+
+Usage:  .arch fullsearch -<field> <argument> <...>
+
+This command allows you to search for archetypes matching certain criteria. You
+can specify multiple fields if you want. Any arguments that don't start with a
+dash (-) are matched to the archetype's name, lore, description, and ranks.
+
+Fields:
+  &c-flagged&0, &-cunflagged&0 - see HELP ARCHEDIT FLAGS
+  &c-lore&0 - search lore strings for text
+  &c-rank&0 - search ranks for text
+  &c-type&0 - see HELP ARCHEDIT TYPE
+  &c-vmin&0, &c-vmax&0 - VNUM range limits
+
+You can also search all attributes using fields like:
+  &c-strength&0 or &c-str&0 - search exact attribute
+  &c-strengthover&0 or &c-strover&0 - search attribute with at least this number
+  &c-strengthunder&0 or &c-strunder0 - search attribute with at most this number
+  Also works for: &ydexterity&0/&ydex&0, &ycharisma&0/&ycha&0, &ygreatness&0/&ygrt&0, &yintelligence&0/&yint&0, &ywits&0
+
+Examples:
+ > .arch fullsearch -type Enchantment -wear WIELD
+ > .arch fullsearch -flagged SELF-ONLY -wear HOLD
+
+To search other fields, you can generally use the normal "search" option for
+other OLC types. For example, to find all archetypes that give a short sword,
+use ".o search 2102".
+#d
 "ARCHEDIT GEAR" "GEDIT GEAR"
 
 Usage:  .gear add <slot | inventory> <vnum>
@@ -3371,7 +3400,7 @@ Examples:
  > .aug fullsearch -flagged SELF-ONLY -wear HOLD
 
 To search other fields, you can generally use the normal "search" option for
-other OLC types. For example, to find all augments that rqeuire a bloodstone,
+other OLC types. For example, to find all augments that require a bloodstone,
 use ".o search 104".
 #d
 "AUGEDIT NAME"
@@ -8066,6 +8095,7 @@ See the individual help files such as OEDIT FULLSEARCH.
 Supported types:
   ability
   adventure
+  archetype
   attack
   augment
   building (search designatable rooms with -flag ROOM)
@@ -8082,8 +8112,7 @@ Supported types:
   trigger
   vehicle
 
-Unsupported types: archetype, book, class, event, faction,
-   global, morph, shop, social
+Unsupported types: book, class, event, faction, global, morph, shop, social
 #d
 "OLC LIST" OLIST MLIST RLIST
 

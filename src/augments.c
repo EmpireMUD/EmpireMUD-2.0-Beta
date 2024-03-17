@@ -287,7 +287,7 @@ void olc_fullsearch_augment(char_data *ch, char *argument) {
 		FULLSEARCH_FLAGS("flagged", only_flags, augment_flags)
 		FULLSEARCH_BOOL("requiresobject", requires_obj)
 		FULLSEARCH_LIST("type", only_type, augment_types)
-		FULLSEARCH_FLAGS("unflagged", not_flagged, adventure_flags)
+		FULLSEARCH_FLAGS("unflagged", not_flagged, augment_flags)
 		FULLSEARCH_FLAGS("wear", only_worn, wear_bits)
 		FULLSEARCH_FLAGS("nowear", not_worn, wear_bits)
 		FULLSEARCH_INT("vmin", vmin, 0, INT_MAX)
