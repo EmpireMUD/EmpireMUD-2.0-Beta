@@ -3660,8 +3660,8 @@ struct string_hash {
 
 // for text file loading (and do_tedit in act.immortal.c)
 struct text_file_data_type {
-	char *name;
-	char *filename;
+	const char *name;
+	const char *filename;
 	bool can_edit;
 	int level;	// to edit
 	int size;	// when editing

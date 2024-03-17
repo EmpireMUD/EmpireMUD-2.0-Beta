@@ -130,7 +130,7 @@ struct file_lookup_struct file_lookup[] = {
 
 
 // TEXT_FILE_x: text file loading (and optional editing via do_tedit in act.immortal.c)
-struct text_file_data_type text_file_data[NUM_TEXT_FILE_STRINGS] = {
+const struct text_file_data_type text_file_data[NUM_TEXT_FILE_STRINGS] = {
 	// name, filename, can-edit, level-to-edit, max-size
 	{ "credits", LIB_TEXT"credits", TRUE, LVL_CIMPL, MAX_STRING_LENGTH },
 	{ "godlist", LIB_TEXT"godlist", FALSE, 0, 0 },
