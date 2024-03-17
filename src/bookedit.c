@@ -196,6 +196,111 @@ char *list_one_book(book_data *book, bool detail) {
 
 
 /**
+* Searches properties of books.
+*
+* @param char_data *ch The person searching.
+* @param char *argument The argument they entered.
+*/
+void olc_fullsearch_book(char_data *ch, char *argument) {
+	bool found;
+	char type_arg[MAX_INPUT_LENGTH], val_arg[MAX_INPUT_LENGTH], find_keywords[MAX_INPUT_LENGTH];
+	char only_byline[MAX_INPUT_LENGTH], only_item[MAX_INPUT_LENGTH];
+	int count, vmin = NOTHING, vmax = NOTHING;
+	book_data *book, *next_book;
+	struct paragraph_data *para;
+	
+	if (!*argument) {
+		msg_to_char(ch, "See HELP BOOKEDIT FULLSEARCH for syntax.\r\n");
+		return;
+	}
+	
+	// process argument
+	*only_byline = '\0';
+	*only_item = '\0';
+	*find_keywords = '\0';
+	while (*argument) {
+		// figure out a type
+		argument = any_one_arg(argument, type_arg);
+		
+		if (!strcmp(type_arg, "-")) {
+			continue;	// just skip stray dashes
+		}
+		
+		FULLSEARCH_STRING("byline", only_byline)
+		FULLSEARCH_STRING("item", only_item)
+		FULLSEARCH_INT("vmin", vmin, 0, INT_MAX)
+		FULLSEARCH_INT("vmax", vmax, 0, INT_MAX)
+		
+		else {	// not sure what to do with it? treat it like a keyword
+			sprintf(find_keywords + strlen(find_keywords), "%s%s", *find_keywords ? " " : "", type_arg);
+		}
+		
+		// prepare for next loop
+		skip_spaces(&argument);
+	}
+	
+	build_page_display(ch, "Book fullsearch: %s", show_color_codes(find_keywords));
+	count = 0;
+	
+	// okay now look them up
+	HASH_ITER(hh, book_table, book, next_book) {
+		if ((vmin != NOTHING && BOOK_VNUM(book) < vmin) || (vmax != NOTHING && BOOK_VNUM(book) > vmax)) {
+			continue;	// vnum range
+		}
+		
+		if (*only_byline && !strstr(only_byline, BOOK_BYLINE(book))) {
+			continue;
+		}
+		if (*only_item && !strstr(only_item, BOOK_ITEM_NAME(book)) && !strstr(only_item, BOOK_ITEM_DESC(book))) {
+			continue;
+		}
+		
+		if (*find_keywords) {
+			found = FALSE;
+			if (multi_isname(find_keywords, BOOK_TITLE(book))) {
+				found = TRUE;
+			}
+			else if (multi_isname(find_keywords, BOOK_BYLINE(book))) {
+				found = TRUE;
+			}
+			else if (multi_isname(find_keywords, BOOK_ITEM_DESC(book))) {
+				found = TRUE;
+			}
+			else if (multi_isname(find_keywords, BOOK_ITEM_NAME(book))) {
+				found = TRUE;
+			}
+			else {
+				LL_FOREACH(BOOK_PARAGRAPHS(book), para) {
+					if (para->text && multi_isname(find_keywords, para->text)) {
+						found = TRUE;
+						break;
+					}
+				}
+			}
+			
+			// did we find it?
+			if (!found) {
+				continue;
+			}
+		}
+		
+		// show it
+		build_page_display(ch, "[%5d] %s", BOOK_VNUM(book), BOOK_TITLE(book));
+		++count;
+	}
+	
+	if (count > 0) {
+		build_page_display(ch, "(%d books)", count);
+	}
+	else {
+		build_page_display_str(ch, " none");
+	}
+	
+	send_page_display(ch);
+}
+
+
+/**
 * WARNING: This function actually deletes a book. This can be called without
 * the 'ch' parameter to delete a book without logging or messaging, e.g. a
 * delete by the author.

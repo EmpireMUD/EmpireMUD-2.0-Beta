@@ -4093,6 +4093,23 @@ Examples:
 
 See also: OLC BUILDINGS
 #d
+"BOOKEDIT FULLSEARCH"
+
+Usage:  .book fullsearch -<field> <argument> <...>
+
+This command allows you to search for books matching certain criteria. You
+can specify multiple fields if you want. Any arguments that don't start with a
+dash (-) are matched to the all book's text fields, &uincluding paragraphs&0.
+
+Fields:
+  &c-byline&0 - search for text in the book's byline
+  &c-item&0 - search for text in the book's item name or description
+  &c-vmin&0, &c-vmax&0 - VNUM range limits
+
+Examples:
+ > .book fullsearch -type ORIGIN -rank Lord
+ > .arch fullsearch -flagged BASIC -unflagged IN-DEV
+#d
 "CEDIT BUILDFACING" "CEDIT BUILD FACING"
 
 Usage:  .buildfacing [add | remove] <flags>
