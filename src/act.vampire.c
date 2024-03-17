@@ -236,7 +236,10 @@ int GET_MAX_BLOOD(char_data *ch) {
 			}
 		}
 	}
-
+	
+	// ensure nobody ever has below 1 max blood
+	base = MAX(base, 1);
+	
 	return base;
 }
 
