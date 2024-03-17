@@ -4673,6 +4673,10 @@ void look_at_vehicle(vehicle_data *veh, char_data *ch, bool send_page) {
 		build_page_display(ch, "It has been painted %s%s%s&0.", colbuf, (VEH_FLAGGED(veh, VEH_BRIGHT_PAINT) ? "bright " : ""), lbuf);
 	}
 	
+	if (VEH_ANIMALS(veh)) {
+		build_page_display(ch, "It is being pulled by %s.", list_harnessed_mobs(veh));
+	}
+	
 	if (VEH_NEEDS_RESOURCES(veh)) {
 		show_resource_list(VEH_NEEDS_RESOURCES(veh), lbuf, sizeof(lbuf));
 		
@@ -4685,10 +4689,6 @@ void look_at_vehicle(vehicle_data *veh, char_data *ch, bool send_page) {
 		else {
 			build_page_display(ch, "Resources to completion: %s", lbuf);
 		}
-	}
-	
-	if (VEH_ANIMALS(veh)) {
-		build_page_display(ch, "It is being pulled by: %s", list_harnessed_mobs(veh));
 	}
 	
 	if (send_page) {
