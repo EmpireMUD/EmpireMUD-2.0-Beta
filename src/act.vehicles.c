@@ -1848,7 +1848,12 @@ ACMD(do_drive) {
 		// sends own error
 	}
 	else if (dir == NO_DIR && !path_to_room && (dir = parse_direction(ch, argument)) == NO_DIR) {
-		msg_to_char(ch, "'%s' isn't a direction you can %s.\r\n", argument, drive_data[subcmd].command);
+		if (*argument) {
+			msg_to_char(ch, "'%s' isn't a direction you can %s.\r\n", argument, drive_data[subcmd].command);
+		}
+		else {
+			msg_to_char(ch, "Invalid %s instruction. Either provide a direction, a path, or a pair of coordinates.\r\n", drive_data[subcmd].verb);
+		}
 	}
 	else if (!dir_only && !path_to_room && (dir == NO_DIR || dir == DIR_RANDOM)) {
 		msg_to_char(ch, "Invalid path string.\r\n");
