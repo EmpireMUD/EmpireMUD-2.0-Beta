@@ -4618,11 +4618,9 @@ void do_stat_vehicle(char_data *ch, vehicle_data *veh, bool details) {
 */
 void look_at_vehicle(vehicle_data *veh, char_data *ch, bool send_page) {
 	char lbuf[MAX_STRING_LENGTH], colbuf[256];
-	char_data *mob;
 	player_index_data *index;
 	vehicle_data *proto;
 	struct page_display *line;
-	struct vehicle_attached_mob *vam;
 	
 	if (!veh || !ch || !ch->desc) {
 		return;
