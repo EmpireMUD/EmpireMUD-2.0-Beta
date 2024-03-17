@@ -654,7 +654,7 @@ void olc_fullsearch_adventure(char_data *ch, char *argument) {
 		if (reset_under != NOTHING && (GET_ADV_RESET_TIME(adv) == 0 || GET_ADV_RESET_TIME(adv) > reset_under)) {
 			continue;
 		}
-		if (only_temp != NOBITS && GET_ADV_TEMPERATURE_TYPE(adv) != only_temp) {
+		if (only_temp != NOTHING && GET_ADV_TEMPERATURE_TYPE(adv) != only_temp) {
 			continue;
 		}
 		if (only_vnum != NOTHING && (only_vnum < GET_ADV_START_VNUM(adv) || only_vnum > GET_ADV_END_VNUM(adv))) {
