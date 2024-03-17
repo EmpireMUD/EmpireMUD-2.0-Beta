@@ -11112,7 +11112,7 @@ void do_stat_ability(char_data *ch, ability_data *abil, bool details) {
 		}
 		else {
 			LL_COUNT(ABIL_CUSTOM_MSGS(abil), custm, count);
-			build_page_display(ch, "Custom messages: %d", count);
+			build_page_display(ch, "Custom messages: \tc%d\t0 (use vstat -d to view)", count);
 		}
 	}
 	

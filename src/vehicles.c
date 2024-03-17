@@ -4447,6 +4447,7 @@ void do_stat_vehicle(char_data *ch, vehicle_data *veh, bool details) {
 				append_page_display_line(line, " %s", desc->keyword);
 			}
 			append_page_display_line(line, "\t0");
+			build_page_display_str(ch, "(use vstat -d to view all extra descs)");
 		}
 	}
 	
@@ -4581,7 +4582,7 @@ void do_stat_vehicle(char_data *ch, vehicle_data *veh, bool details) {
 		}
 		else {
 			LL_COUNT(VEH_CUSTOM_MSGS(veh), custm, count);
-			build_page_display(ch, "Custom messages: %d", count);
+			build_page_display(ch, "Custom messages: \tc%d\t0 (use vstat -d to view)", count);
 		}
 	}
 	
