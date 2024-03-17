@@ -852,8 +852,9 @@ void look_at_target(char_data *ch, char *arg, char *more_args, bool look_inside)
 			LL_FOREACH(VEH_ANIMALS(veh_iter), vam) {
 				if ((proto = mob_proto(vam->mob)) && isname(arg, GET_PC_NAME(proto)) && --fnum <= 0) {
 					found = TRUE;
-					act("You look at $N, harnessed to $v:", FALSE, ch, veh_iter, proto, TO_CHAR | ACT_VEH_OBJ);
-					send_to_char(GET_LOOK_DESC(proto), ch);
+					act("You look at $N, harnessed to $v:", FALSE, ch, veh_iter, proto, TO_CHAR | ACT_VEH_OBJ | TO_PAGE_DISPLAY);
+					build_page_display_str(ch, GET_LOOK_DESC(proto));
+					send_page_display(ch);
 					
 					act("$n looks at $N, harnessed to $v.", TRUE, ch, veh_iter, proto, TO_ROOM | ACT_VEH_OBJ);
 				}
@@ -866,7 +867,8 @@ void look_at_target(char_data *ch, char *arg, char *more_args, bool look_inside)
 		found = TRUE;
 		act("$n looks at $s mount.", FALSE, ch, NULL, NULL, TO_ROOM);
 		proto = mob_proto(GET_MOUNT_VNUM(ch));
-		msg_to_char(ch, "You look at your mount:\r\n%s", GET_LOOK_DESC(proto));
+		build_page_display(ch, "You look at your mount:\r\n%s", GET_LOOK_DESC(proto));
+		send_page_display(ch);
 	}
 	
 	// try mount (others)
@@ -874,8 +876,9 @@ void look_at_target(char_data *ch, char *arg, char *more_args, bool look_inside)
 		DL_FOREACH2(ROOM_PEOPLE(IN_ROOM(ch)), ch_iter, next_in_room) {
 			if (ch_iter != ch && CAN_SEE(ch, ch_iter) && !IS_NPC(ch_iter) && IS_RIDING(ch_iter) && (proto = mob_proto(GET_MOUNT_VNUM(ch_iter))) && isname(arg, GET_PC_NAME(proto)) && --fnum <= 0) {
 				found = TRUE;
-				act("You look at $N's mount:", FALSE, ch, NULL, ch_iter, TO_CHAR);
-				send_to_char(GET_LOOK_DESC(proto), ch);
+				act("You look at $N's mount:", FALSE, ch, NULL, ch_iter, TO_CHAR | TO_PAGE_DISPLAY);
+				build_page_display_str(ch, GET_LOOK_DESC(proto));
+				send_page_display(ch);
 				
 				act("$n looks at your mount.", TRUE, ch, NULL, ch_iter, TO_VICT);
 				act("$n looks at $N's mount.", TRUE, ch, NULL, ch_iter, TO_NOTVICT);
