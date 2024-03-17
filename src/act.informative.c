@@ -859,6 +859,8 @@ void look_at_target(char_data *ch, char *arg, char *more_args, bool look_inside)
 			if (ch_iter != ch && CAN_SEE(ch, ch_iter) && !IS_NPC(ch_iter) && IS_RIDING(ch_iter) && (proto = mob_proto(GET_MOUNT_VNUM(ch_iter))) && isname(arg, GET_PC_NAME(proto)) && --fnum <= 0) {
 				found = TRUE;
 				act("You look at $N's mount:", FALSE, ch, NULL, ch_iter, TO_CHAR);
+				act("$n looks at your mount.", TRUE, ch, NULL, ch_iter, TO_VICT);
+				act("$n looks at $N's mount.", TRUE, ch, NULL, ch_iter, TO_NOTVICT);
 				send_to_char(GET_LOOK_DESC(proto), ch);
 			}
 		}
