@@ -737,9 +737,10 @@ void look_at_target(char_data *ch, char *arg, char *more_args, bool look_inside)
 	bitvector_t bits;
 	char_data *found_char = NULL, *proto, *ch_iter;
 	obj_data *found_obj = NULL, *ex_obj = NULL;
-	vehicle_data *found_veh = NULL, *ex_veh = NULL;
+	vehicle_data *found_veh = NULL, *ex_veh = NULL, *veh_iter;
 	bool inv_only = FALSE;
 	char *exdesc;
+	struct vehicle_attached_mob *vam;
 
 	if (!ch->desc)
 		return;
@@ -845,6 +846,21 @@ void look_at_target(char_data *ch, char *arg, char *more_args, bool look_inside)
 		}
 	}
 	
+	// try harnessed mobs
+	if (!found) {
+		DL_FOREACH2(ROOM_VEHICLES(IN_ROOM(ch)), veh_iter, next_in_room) {
+			LL_FOREACH(VEH_ANIMALS(veh_iter), vam) {
+				if ((proto = mob_proto(vam->mob)) && isname(arg, GET_PC_NAME(proto)) && --fnum <= 0) {
+					found = TRUE;
+					act("You look at $N, harnessed to $v:", FALSE, ch, veh_iter, proto, TO_CHAR | ACT_VEH_OBJ);
+					send_to_char(GET_LOOK_DESC(proto), ch);
+					
+					act("$n looks at $N, harnessed to $v.", TRUE, ch, veh_iter, proto, TO_ROOM | ACT_VEH_OBJ);
+				}
+			}
+		}
+	}
+	
 	// try mount (own)
 	if (!found && GET_MOUNT_VNUM(ch) != NOTHING && (!str_cmp(arg, "mount") || ((proto = mob_proto(GET_MOUNT_VNUM(ch))) && isname(arg, GET_PC_NAME(proto)))) && --fnum <= 0) {
 		found = TRUE;
@@ -859,9 +875,10 @@ void look_at_target(char_data *ch, char *arg, char *more_args, bool look_inside)
 			if (ch_iter != ch && CAN_SEE(ch, ch_iter) && !IS_NPC(ch_iter) && IS_RIDING(ch_iter) && (proto = mob_proto(GET_MOUNT_VNUM(ch_iter))) && isname(arg, GET_PC_NAME(proto)) && --fnum <= 0) {
 				found = TRUE;
 				act("You look at $N's mount:", FALSE, ch, NULL, ch_iter, TO_CHAR);
+				send_to_char(GET_LOOK_DESC(proto), ch);
+				
 				act("$n looks at your mount.", TRUE, ch, NULL, ch_iter, TO_VICT);
 				act("$n looks at $N's mount.", TRUE, ch, NULL, ch_iter, TO_NOTVICT);
-				send_to_char(GET_LOOK_DESC(proto), ch);
 			}
 		}
 	}
