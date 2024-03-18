@@ -1380,10 +1380,10 @@ void olc_fullsearch_event(char_data *ch, char *argument) {
 		if (only_dur != NOTHING && EVT_DURATION(event) != only_dur) {
 			continue;
 		}
-		if (dur_over != NOTHING && EVT_DURATION(event) < only_dur) {
+		if (dur_over != NOTHING && EVT_DURATION(event) < dur_over) {
 			continue;
 		}
-		if (dur_under != NOTHING && (EVT_DURATION(event) == 0 || EVT_DURATION(event) > only_dur)) {
+		if (dur_under != NOTHING && (EVT_DURATION(event) == 0 || EVT_DURATION(event) > dur_under)) {
 			continue;
 		}
 		if (only_level != NOTHING && (EVT_MIN_LEVEL(event) > only_level || EVT_MAX_LEVEL(event) < only_level)) {
@@ -1398,19 +1398,19 @@ void olc_fullsearch_event(char_data *ch, char *argument) {
 		if (only_maxp != NOTHING && EVT_MAX_POINTS(event) != only_maxp) {
 			continue;
 		}
-		if (maxp_over != NOTHING && EVT_MAX_POINTS(event) < only_maxp) {
+		if (maxp_over != NOTHING && EVT_MAX_POINTS(event) < maxp_over) {
 			continue;
 		}
-		if (maxp_under != NOTHING && (EVT_MAX_POINTS(event) == 0 || EVT_MAX_POINTS(event) > only_maxp)) {
+		if (maxp_under != NOTHING && (EVT_MAX_POINTS(event) == 0 || EVT_MAX_POINTS(event) > maxp_under)) {
 			continue;
 		}
 		if (only_repeat != NOTHING && EVT_REPEATS_AFTER(event) != only_repeat) {
 			continue;
 		}
-		if (repeat_over != NOTHING && EVT_REPEATS_AFTER(event) < only_repeat) {
+		if (repeat_over != NOTHING && EVT_REPEATS_AFTER(event) < repeat_over) {
 			continue;
 		}
-		if (repeat_under != NOTHING && (EVT_REPEATS_AFTER(event) == 0 || EVT_REPEATS_AFTER(event) > only_repeat)) {
+		if (repeat_under != NOTHING && (EVT_REPEATS_AFTER(event) == 0 || EVT_REPEATS_AFTER(event) > repeat_under)) {
 			continue;
 		}
 		if (only_reward != NOTHING) {
