@@ -609,7 +609,7 @@ void olc_fullsearch_adventure(char_data *ch, char *argument) {
 			continue;	// vnum range
 		}
 		
-		if (*only_author && !strstr(only_author, GET_ADV_AUTHOR(adv))) {
+		if (*only_author && !str_str(GET_ADV_AUTHOR(adv), only_author)) {
 			continue;
 		}
 		if (not_flagged != NOBITS && ADVENTURE_FLAGGED(adv, not_flagged)) {

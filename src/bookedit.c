@@ -248,25 +248,25 @@ void olc_fullsearch_book(char_data *ch, char *argument) {
 			continue;	// vnum range
 		}
 		
-		if (*only_byline && !strstr(only_byline, BOOK_BYLINE(book))) {
+		if (*only_byline && (!BOOK_BYLINE(book) || !str_str(BOOK_BYLINE(book), only_byline))) {
 			continue;
 		}
-		if (*only_item && !strstr(only_item, BOOK_ITEM_NAME(book)) && !strstr(only_item, BOOK_ITEM_DESC(book))) {
+		if (*only_item && (!BOOK_ITEM_NAME(book) || !str_str(BOOK_ITEM_NAME(book), only_item)) && (!BOOK_ITEM_DESC(book) || !str_str(BOOK_ITEM_DESC(book), only_item))) {
 			continue;
 		}
 		
 		if (*find_keywords) {
 			found = FALSE;
-			if (multi_isname(find_keywords, BOOK_TITLE(book))) {
+			if (BOOK_TITLE(book) && multi_isname(find_keywords, BOOK_TITLE(book))) {
 				found = TRUE;
 			}
-			else if (multi_isname(find_keywords, BOOK_BYLINE(book))) {
+			else if (BOOK_BYLINE(book) && multi_isname(find_keywords, BOOK_BYLINE(book))) {
 				found = TRUE;
 			}
-			else if (multi_isname(find_keywords, BOOK_ITEM_DESC(book))) {
+			else if (BOOK_ITEM_DESC(book) && multi_isname(find_keywords, BOOK_ITEM_DESC(book))) {
 				found = TRUE;
 			}
-			else if (multi_isname(find_keywords, BOOK_ITEM_NAME(book))) {
+			else if (BOOK_ITEM_NAME(book) && multi_isname(find_keywords, BOOK_ITEM_NAME(book))) {
 				found = TRUE;
 			}
 			else {
