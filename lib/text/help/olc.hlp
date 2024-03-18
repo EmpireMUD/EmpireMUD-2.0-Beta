@@ -8115,6 +8115,7 @@ Supported types:
   archetype
   attack
   augment
+  book
   building (search designatable rooms with -flag ROOM)
   craft
   crop
@@ -8129,7 +8130,7 @@ Supported types:
   trigger
   vehicle
 
-Unsupported types: book, class, event, faction, global, morph, shop, social
+Unsupported types: class, event, faction, global, morph, shop, social
 #d
 "OLC LIST" OLIST MLIST RLIST
 
