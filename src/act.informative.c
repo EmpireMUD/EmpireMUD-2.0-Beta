@@ -2028,7 +2028,7 @@ void show_character_affects_simple(char_data *ch, char_data *to) {
 		}
 		
 		// caster?
-		if (aff->cast_by == CAST_BY_ID(to)) {
+		if (dot->cast_by == CAST_BY_ID(to)) {
 			safe_snprintf(line + strlen(line), sizeof(line) - strlen(line), " (you)");
 		}
 		
