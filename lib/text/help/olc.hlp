@@ -4807,6 +4807,32 @@ The following faction flags are available:
 
 See also: OLC EVENTS, OLC REMOVEINDEV
 #d
+"EVEDIT FULLSEARCH" "EVENT FULLSEARCH"
+
+Usage:  .ev fullsearch -<field> <argument> <...>
+
+This command allows you to search for events matching certain criteria. You
+can specify multiple fields if you want. Any arguments that don't start with a
+dash (-) are matched to the event's name and strings.
+
+Fields:
+  &c-duration&0, &c-durationover&0, &c-durationunder&0 - Search duration times
+  &c-flagged&0, &cunflagged&0 - see HELP EVEDIT FLAGS
+  &c-level&0, &clevelover&0, &clevelunder&0 - Search the level range of events
+  &c-maxpoints&0, &c-maxpointsover&0, &c-maxpointsunder&0 - Search points limits
+  &c-repeat&0, &crepeatover&0, &crepeatunder&0 - Search for specific repeat times
+  &c-reward&0 - Search for 1 reward type; see HELP QEDIT REWARDS
+  &c-vmin&0, &c-vmax&0 - VNUM range limits
+
+Examples:
+ > .ev fullsearch -level 150
+ > .ev fullsearch -flagged EMPIRE-ONLY -task OWN-BUILDING
+ > .ev fullsearch -repeatover 1 -vmin 10000 -vmax 10099
+
+To search other fields, you can generally use the normal "search" option for
+other OLC types. For example, to find events that reward a great shipment of
+resources (object 11514), use ".o search 11514".
+#d
 "EVEDIT NAME"
 
 Usage:  .name <name>
@@ -8119,6 +8145,7 @@ Supported types:
   building (search designatable rooms with -flag ROOM)
   craft
   crop
+  event
   generic
   mobile
   object
@@ -8130,7 +8157,7 @@ Supported types:
   trigger
   vehicle
 
-Unsupported types: class, event, faction, global, morph, shop, social
+Unsupported types: class, faction, global, morph, shop, social
 #d
 "OLC LIST" OLIST MLIST RLIST
 
