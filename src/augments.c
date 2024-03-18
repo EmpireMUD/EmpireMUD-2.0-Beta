@@ -252,6 +252,112 @@ char *list_one_augment(augment_data *aug, bool detail) {
 
 
 /**
+* Searches properties of augments.
+*
+* @param char_data *ch The person searching.
+* @param char *argument The argument they entered.
+*/
+void olc_fullsearch_augment(char_data *ch, char *argument) {
+	bool requires_obj = FALSE;
+	bitvector_t not_flagged = NOBITS, only_flags = NOBITS;
+	bitvector_t find_applies = NOBITS, found_applies, only_worn = NOBITS, not_worn = NOBITS;
+	char type_arg[MAX_INPUT_LENGTH], val_arg[MAX_INPUT_LENGTH], find_keywords[MAX_INPUT_LENGTH];
+	int count, only_type = NOTHING, vmin = NOTHING, vmax = NOTHING;
+	augment_data *aug, *next_aug;
+	struct apply_data *app;
+	
+	if (!*argument) {
+		msg_to_char(ch, "See HELP AUGEDIT FULLSEARCH for syntax.\r\n");
+		return;
+	}
+	
+	// process argument
+	*find_keywords = '\0';
+	while (*argument) {
+		// figure out a type
+		argument = any_one_arg(argument, type_arg);
+		
+		if (!strcmp(type_arg, "-")) {
+			continue;	// just skip stray dashes
+		}
+		
+		FULLSEARCH_FLAGS("apply", find_applies, apply_types)
+		FULLSEARCH_FLAGS("applies", find_applies, apply_types)
+		FULLSEARCH_FLAGS("flags", only_flags, augment_flags)
+		FULLSEARCH_FLAGS("flagged", only_flags, augment_flags)
+		FULLSEARCH_BOOL("requiresobject", requires_obj)
+		FULLSEARCH_LIST("type", only_type, augment_types)
+		FULLSEARCH_FLAGS("unflagged", not_flagged, augment_flags)
+		FULLSEARCH_FLAGS("wear", only_worn, wear_bits)
+		FULLSEARCH_FLAGS("nowear", not_worn, wear_bits)
+		FULLSEARCH_INT("vmin", vmin, 0, INT_MAX)
+		FULLSEARCH_INT("vmax", vmax, 0, INT_MAX)
+		
+		else {	// not sure what to do with it? treat it like a keyword
+			sprintf(find_keywords + strlen(find_keywords), "%s%s", *find_keywords ? " " : "", type_arg);
+		}
+		
+		// prepare for next loop
+		skip_spaces(&argument);
+	}
+	
+	build_page_display(ch, "Augment fullsearch: %s", show_color_codes(find_keywords));
+	count = 0;
+	
+	// okay now look them up
+	HASH_ITER(hh, augment_table, aug, next_aug) {
+		if ((vmin != NOTHING && GET_AUG_VNUM(aug) < vmin) || (vmax != NOTHING && GET_AUG_VNUM(aug) > vmax)) {
+			continue;	// vnum range
+		}
+		
+		if (not_flagged != NOBITS && AUGMENT_FLAGGED(aug, not_flagged)) {
+			continue;
+		}
+		if (only_flags != NOBITS && (GET_AUG_FLAGS(aug) & only_flags) != only_flags) {
+			continue;
+		}
+		if (only_type != NOTHING && GET_AUG_TYPE(aug) != only_type) {
+			continue;
+		}
+		if (only_worn != NOBITS && (GET_AUG_WEAR_FLAGS(aug) & only_worn) != only_worn) {
+			continue;
+		}
+		if (not_worn != NOBITS && IS_SET(GET_AUG_WEAR_FLAGS(aug), not_worn)) {
+			continue;
+		}
+		if (requires_obj && GET_AUG_REQUIRES_OBJ(aug) == NOTHING) {
+			continue;
+		}
+		if (find_applies) {	// look up its applies
+			found_applies = NOBITS;
+			LL_FOREACH(GET_AUG_APPLIES(aug), app) {
+				found_applies |= BIT(app->location);
+			}
+			if ((find_applies & found_applies) != find_applies) {
+				continue;
+			}
+		}
+		if (*find_keywords && !multi_isname(find_keywords, GET_AUG_NAME(aug))) {
+			continue;
+		}
+		
+		// show it
+		build_page_display(ch, "[%5d] %s", GET_AUG_VNUM(aug), GET_AUG_NAME(aug));
+		++count;
+	}
+	
+	if (count > 0) {
+		build_page_display(ch, "(%d augments)", count);
+	}
+	else {
+		build_page_display_str(ch, " none");
+	}
+	
+	send_page_display(ch);
+}
+
+
+/**
 * Searches for all uses of an augment and displays them.
 *
 * @param char_data *ch The player.

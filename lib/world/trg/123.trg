@@ -1842,7 +1842,7 @@ done
 %echoaround% %actor% ~%actor% disappears down the serragon's gullet!
 %teleport% %actor% %outside%
 %at% %outside% %echoaround% %actor% ~%actor% comes flying out the serragon's mouth!
-%slay% %actor% %actor.name% has been eaten by the hoarfrost serragon at %outside.coords%!
+%slay% %actor% %actor.real_name% has been eaten by the hoarfrost serragon at %outside.coords%!
 %purge% %self%
 ~
 $

@@ -381,15 +381,19 @@ Usage:  eedit <empire> adminflags [add | remove] [flags]
 
 Immortals with the "EMPIRES" grant can set administrative flags on empires.
 
- &g!WAR&0 - Empire cannot unilaterally declare war.
- &g!STEAL&0 - Empire cannot steal from other empires.
+ &gNO-WAR&0 - Empire cannot unilaterally declare war.
+ &gNO-STEAL&0 - Empire cannot steal from other empires.
  &gCITY-CLAIMS-ONLY&0 - Empire cannot claim out-of-city territory.
- &g!RENAME&0 - Empire cannot change its name, adjective, description, or ranks.
- &gDID-NEWBIE-MOVE&0 - Empire got its free move from the newbie island when it
-    built a city. Removing this flag then founding a new city will move newbie
-    items again.
+ &gNO-RENAME&0 - Empire cannot change its name, adjective, description, or ranks.
+ &gFREE-NEWBIE-MOVE&0 - Empire will get a free move from the newbie island when
+    it founds a city (all empires start with this flag).
+ &gFREE-NEEDS&0 - Empire does not collect "needs" such as food for workforce.
+ &gIGNORE-OVERAGES&0 - Will not lose territory or city points when over the cap.
+ &gNO-DECAY&0 - Buildings do not suffer annual decay.
+ &gALL-TECHS&0 - Empire can use all empire techs (e.g. Seafaring).
+ &gFREE-WAR&0 - Wars by/against the empire have no cost.
 
-Both the !WAR and !STEAL flags will prevent 'reclaim' from being used by OR
+Both the NO-WAR and NO-STEAL flags will prevent 'reclaim' from being used by OR
 against the empire.
 
 See also: GRANT, RECLAIM

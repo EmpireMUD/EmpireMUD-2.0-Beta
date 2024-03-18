@@ -1300,6 +1300,180 @@ char *list_one_event(event_data *event, bool detail) {
 
 
 /**
+* Searches properties of events.
+*
+* @param char_data *ch The person searching.
+* @param char *argument The argument they entered.
+*/
+void olc_fullsearch_event(char_data *ch, char *argument) {
+	bool any;
+	char type_arg[MAX_INPUT_LENGTH], val_arg[MAX_INPUT_LENGTH], find_keywords[MAX_INPUT_LENGTH];
+	int count;
+	struct event_reward *reward;
+	
+	bitvector_t only_flags = NOBITS, not_flagged = NOBITS;
+	int vmin = NOTHING, vmax = NOTHING, only_level = NOTHING, level_over = NOTHING, level_under = NOTHING;
+	int only_dur = NOTHING, dur_over = NOTHING, dur_under = NOTHING;
+	int only_maxp = NOTHING, maxp_over = NOTHING, maxp_under = NOTHING;
+	int only_repeat = NOTHING, repeat_over = NOTHING, repeat_under = NOTHING;
+	int only_reward = NOTHING;
+	
+	event_data *event, *next_event;
+	
+	if (!*argument) {
+		msg_to_char(ch, "See HELP EVEDIT FULLSEARCH for syntax.\r\n");
+		return;
+	}
+	
+	// process argument
+	*find_keywords = '\0';
+	while (*argument) {
+		// figure out a type
+		argument = any_one_arg(argument, type_arg);
+		
+		if (!strcmp(type_arg, "-")) {
+			continue;	// just skip stray dashes
+		}
+		
+		FULLSEARCH_INT("duration", only_dur, 0, INT_MAX)
+		FULLSEARCH_INT("durationover", dur_over, 0, INT_MAX)
+		FULLSEARCH_INT("durationunder", dur_under, 0, INT_MAX)
+		FULLSEARCH_FLAGS("flags", only_flags, event_flags)
+		FULLSEARCH_FLAGS("flagged", only_flags, event_flags)
+		FULLSEARCH_INT("level", only_level, 0, INT_MAX)
+		FULLSEARCH_INT("levelover", level_over, 0, INT_MAX)
+		FULLSEARCH_INT("levelunder", level_under, 0, INT_MAX)
+		FULLSEARCH_INT("maxpoints", only_maxp, 0, INT_MAX)
+		FULLSEARCH_INT("maxpointsover", maxp_over, 0, INT_MAX)
+		FULLSEARCH_INT("maxpointsunder", maxp_under, 0, INT_MAX)
+		FULLSEARCH_FLAGS("unflagged", not_flagged, event_flags)
+		FULLSEARCH_INT("repeat", only_repeat, 0, INT_MAX)
+		FULLSEARCH_INT("repeatover", repeat_over, 0, INT_MAX)
+		FULLSEARCH_INT("repeatunder", repeat_under, 0, INT_MAX)
+		FULLSEARCH_LIST("rewards", only_reward, quest_reward_types)
+		FULLSEARCH_INT("vmin", vmin, 0, INT_MAX)
+		FULLSEARCH_INT("vmax", vmax, 0, INT_MAX)
+		
+		else {	// not sure what to do with it? treat it like a keyword
+			sprintf(find_keywords + strlen(find_keywords), "%s%s", *find_keywords ? " " : "", type_arg);
+		}
+		
+		// prepare for next loop
+		skip_spaces(&argument);
+	}
+	
+	build_page_display(ch, "Event fullsearch: %s", show_color_codes(find_keywords));
+	count = 0;
+	
+	// okay now look up events
+	HASH_ITER(hh, event_table, event, next_event) {
+		if ((vmin != NOTHING && EVT_VNUM(event) < vmin) || (vmax != NOTHING && EVT_VNUM(event) > vmax)) {
+			continue;	// vnum range
+		}
+		
+		if (not_flagged != NOBITS && IS_SET(EVT_FLAGS(event), not_flagged)) {
+			continue;
+		}
+		if (only_flags != NOBITS && (EVT_FLAGS(event) & only_flags) != only_flags) {
+			continue;
+		}
+		if (only_dur != NOTHING && EVT_DURATION(event) != only_dur) {
+			continue;
+		}
+		if (dur_over != NOTHING && EVT_DURATION(event) < dur_over) {
+			continue;
+		}
+		if (dur_under != NOTHING && (EVT_DURATION(event) == 0 || EVT_DURATION(event) > dur_under)) {
+			continue;
+		}
+		if (only_level != NOTHING && (EVT_MIN_LEVEL(event) > only_level || EVT_MAX_LEVEL(event) < only_level)) {
+			continue;
+		}
+		if (level_over != NOTHING && EVT_MAX_LEVEL(event) < level_over && EVT_MIN_LEVEL(event) < level_over) {
+			continue;
+		}
+		if (level_under != NOTHING && EVT_MAX_LEVEL(event) > level_over && EVT_MIN_LEVEL(event) > level_over) {
+			continue;
+		}
+		if (only_maxp != NOTHING && EVT_MAX_POINTS(event) != only_maxp) {
+			continue;
+		}
+		if (maxp_over != NOTHING && EVT_MAX_POINTS(event) < maxp_over) {
+			continue;
+		}
+		if (maxp_under != NOTHING && (EVT_MAX_POINTS(event) == 0 || EVT_MAX_POINTS(event) > maxp_under)) {
+			continue;
+		}
+		if (only_repeat != NOTHING && EVT_REPEATS_AFTER(event) != only_repeat) {
+			continue;
+		}
+		if (repeat_over != NOTHING && EVT_REPEATS_AFTER(event) < repeat_over) {
+			continue;
+		}
+		if (repeat_under != NOTHING && (EVT_REPEATS_AFTER(event) == 0 || EVT_REPEATS_AFTER(event) > repeat_under)) {
+			continue;
+		}
+		if (only_reward != NOTHING) {
+			any = FALSE;
+			LL_FOREACH(EVT_RANK_REWARDS(event), reward) {
+				if (reward->type == only_reward) {
+					any = TRUE;
+					break;
+				}
+			}
+			if (!any) {
+				LL_FOREACH(EVT_THRESHOLD_REWARDS(event), reward) {
+					if (reward->type == only_reward) {
+						any = TRUE;
+						break;
+					}
+				}
+			}
+			if (!any) {
+				continue;	// reward type not found
+			}
+		}
+		
+		// search strings
+		if (*find_keywords) {
+			any = FALSE;
+			
+			if (multi_isname(find_keywords, EVT_NAME(event))) {
+				any = TRUE;
+			}
+			else if (multi_isname(find_keywords, EVT_DESCRIPTION(event))) {
+				any = TRUE;
+			}
+			else if (multi_isname(find_keywords, EVT_COMPLETE_MSG(event))) {
+				any = TRUE;
+			}
+			else if (multi_isname(find_keywords, EVT_NOTES(event))) {
+				any = TRUE;
+			}
+			
+			// did we find a match in any string
+			if (!any) {
+				continue;
+			}
+		}
+		
+		// show it
+		build_page_display(ch, "[%5d] %s", EVT_VNUM(event), EVT_NAME(event));
+		++count;
+	}
+	
+	if (count > 0) {
+		build_page_display(ch, "(%d events)", count);
+	}
+	else {
+		build_page_display_str(ch, " none");
+	}
+	
+	send_page_display(ch);
+}
+
+
+/**
 * Searches for all uses of an event and displays them.
 *
 * @param char_data *ch The player.

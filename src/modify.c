@@ -1944,7 +1944,7 @@ void format_text(char **ptr_string, bitvector_t mode, descriptor_data *desc, uns
 	
 	// ensure the original string ends with a \r\n -- the formatter requires it
 	if (*ptr_string && (*ptr_string)[strlen(*ptr_string) - 1] != '\n' && strlen(*ptr_string) < maxlen + 2) {
-		RECREATE(*ptr_string, char, strlen(*ptr_string) + 2);
+		RECREATE(*ptr_string, char, strlen(*ptr_string) + 3);
 		strcat(*ptr_string, "\r\n");
 	}
 
@@ -2019,9 +2019,12 @@ void format_text(char **ptr_string, bitvector_t mode, descriptor_data *desc, uns
 	// re-add a crlf
 	strcat(formatted, "\r\n");
 
-	if (strlen(formatted) + 1 > maxlen)
+	if (strlen(formatted) + 1 > maxlen) {
 		formatted[maxlen-1] = '\0';
-	RECREATE(*ptr_string, char, MIN(maxlen, strlen(formatted) + 1));
+	}
+	len = strlen(formatted) + 1;
+	len = MIN(maxlen, len);
+	RECREATE(*ptr_string, char, len);
 	strcpy(*ptr_string, formatted);
 }
 

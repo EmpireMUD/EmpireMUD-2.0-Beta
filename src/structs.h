@@ -1065,11 +1065,16 @@ typedef struct vehicle_data vehicle_data;
 
 
 // EADM_x: empire admin flags
-#define EADM_NO_WAR  BIT(0)	// may not start a unilateral war
-#define EADM_NO_STEAL  BIT(1)	// may not steal from other empires
-#define EADM_CITY_CLAIMS_ONLY  BIT(2)	// may only claim in-city
-#define EADM_NO_RENAME  BIT(3)	// cannot change name/adjective/description
-#define EADM_DID_NEWBIE_MOVE  BIT(4)	// empire got its free move from the newbie island
+#define EADM_NO_WAR				BIT(0)	// may not start a unilateral war
+#define EADM_NO_STEAL			BIT(1)	// may not steal from other empires
+#define EADM_CITY_CLAIMS_ONLY	BIT(2)	// may only claim in-city
+#define EADM_NO_RENAME			BIT(3)	// cannot change name/adjective/description
+#define EADM_FREE_NEWBIE_MOVE	BIT(4)	// empire gets a free move from the newbie island next time it founds a city
+#define EADM_FREE_NEEDS			BIT(5)	// does not charge needs
+#define EADM_IGNORE_OVERAGES	BIT(6)	// does not remove territory etc when over caps
+#define EADM_NO_DECAY			BIT(7)	// territory does not decay
+#define EADM_ALL_TECHS			BIT(8)	// empire can use all technologies
+#define EADM_FREE_WAR			BIT(9)	// no war costs
 
 
 // EATT_x: empire attributes
@@ -3655,8 +3660,8 @@ struct string_hash {
 
 // for text file loading (and do_tedit in act.immortal.c)
 struct text_file_data_type {
-	char *name;
-	char *filename;
+	const char *name;
+	const char *filename;
 	bool can_edit;
 	int level;	// to edit
 	int size;	// when editing

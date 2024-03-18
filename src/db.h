@@ -1040,7 +1040,7 @@ extern int max_players_this_uptime;
 
 // text file strings
 extern char *text_file_strings[NUM_TEXT_FILE_STRINGS];
-extern struct text_file_data_type text_file_data[NUM_TEXT_FILE_STRINGS];
+extern const struct text_file_data_type text_file_data[NUM_TEXT_FILE_STRINGS];
 
 // workforce.c
 extern struct empire_territory_data *global_next_territory_entry;

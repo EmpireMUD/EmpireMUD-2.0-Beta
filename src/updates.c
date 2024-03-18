@@ -4175,6 +4175,28 @@ void b5_181_repair_extra_data(void) {
 }
 
 
+// b5.182 adds now-optional flags to immortal empires, and flips DID-NEWBIE-MOVE to FREE-NEWBIE-MOVE
+void b5_182_empire_update(void) {
+	empire_data *emp, *next_emp;
+	
+	// normally this is computed AFTER this step
+	reread_empire_tech(NULL);
+	
+	HASH_ITER(hh, empire_table, emp, next_emp) {
+		if (EMPIRE_IMM_ONLY(emp)) {
+			log("- Set admin flags on immortal empire [%d] %s", EMPIRE_VNUM(emp), EMPIRE_NAME(emp));
+			SET_BIT(EMPIRE_ADMIN_FLAGS(emp), EADM_FREE_NEEDS | EADM_IGNORE_OVERAGES | EADM_NO_DECAY | EADM_ALL_TECHS);
+		}
+		
+		// this patch also inverts the meaning of DID-NEWBIE-MOVE to FREE-NEWBIE-MOVE
+		TOGGLE_BIT(EMPIRE_ADMIN_FLAGS(emp), EADM_FREE_NEWBIE_MOVE);
+		
+		// all empires should have been updated
+		EMPIRE_NEEDS_SAVE(emp) = TRUE;
+	}
+}
+
+
 // ADD HERE, above: more beta 5 update functions
 
 
@@ -4288,6 +4310,7 @@ const struct {
 	{ "b5.174c", b5_174_tavern_triggers, NULL, "Updating taverns with new triggers" },
 	{ "b5.176", NULL, b5_176_affect_fix, "Checking for players with bad affect times" },
 	{ "b5.181", b5_181_repair_extra_data, NULL, "Looking for bad world data and repairing oceans" },
+	{ "b5.182", b5_182_empire_update, NULL, "Updating empire admin flags (HELP EEDIT ADMIN FLAGS)..." },
 	
 	// ADD HERE, above: more beta 5 update lines
 	

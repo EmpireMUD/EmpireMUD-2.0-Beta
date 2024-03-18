@@ -1751,6 +1751,7 @@ void do_stat_attack_message(char_data *ch, attack_message_data *amd, bool detail
 			// only show 1 line per message on stat
 			build_page_display(ch, "%d. %s", ++count, to_show ? to_show : "(blank)");
 		}
+		build_page_display_str(ch, "(use vstat -d to view all messages)");
 	}
 	if (!count) {
 		build_page_display(ch, " none");

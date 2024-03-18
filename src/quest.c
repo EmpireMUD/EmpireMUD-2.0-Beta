@@ -4017,10 +4017,10 @@ void olc_fullsearch_quest(char_data *ch, char *argument) {
 		if (only_repeat != NOTHING && QUEST_REPEATABLE_AFTER(quest) != only_repeat) {
 			continue;
 		}
-		if (repeat_over != NOTHING && QUEST_REPEATABLE_AFTER(quest) < only_repeat) {
+		if (repeat_over != NOTHING && QUEST_REPEATABLE_AFTER(quest) < repeat_over) {
 			continue;
 		}
-		if (repeat_under != NOTHING && (QUEST_REPEATABLE_AFTER(quest) == 0 || QUEST_REPEATABLE_AFTER(quest) > only_repeat)) {
+		if (repeat_under != NOTHING && (QUEST_REPEATABLE_AFTER(quest) == 0 || QUEST_REPEATABLE_AFTER(quest) > repeat_under)) {
 			continue;
 		}
 		if (only_reward != NOTHING) {

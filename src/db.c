@@ -1196,17 +1196,23 @@ int file_to_string(const char *name, char *buf) {
 int file_to_string_alloc(const char *name, char **buf) {
 	char temp[MAX_STRING_LENGTH];
 	descriptor_data *in_use;
-
-	for (in_use = descriptor_list; in_use; in_use = in_use->next)
-		if (in_use->showstr_vector && *in_use->showstr_vector == *buf)
+	
+	LL_FOREACH(descriptor_list, in_use) {
+		if (in_use->showstr_vector && *in_use->showstr_vector == *buf) {
+			syslog(SYS_GC, in_use->character ? GET_INVIS_LEV(in_use->character) : LVL_START_IMM, FALSE, "Warning: Failed to load '%s' due to open editor", name);
 			return (-1);
+		}
+	}
 
 	/* Lets not free() what used to be there unless we succeeded. */
-	if (file_to_string(name, temp) < 0)
+	if (file_to_string(name, temp) < 0) {
+		syslog(SYS_GC, LVL_START_IMM, TRUE, "Warning: Unable to load '%s'", name);
 		return (-1);
+	}
 
-	if (*buf)
+	if (*buf) {
 		free(*buf);
+	}
 
 	*buf = str_dup(temp);
 	return (0);
@@ -1304,7 +1310,14 @@ void init_text_file_strings(void) {
 * @param int type Any TEXT_FILE_ type.
 */
 void reload_text_string(int type) {
-	if (type >= 0 && type < NUM_TEXT_FILE_STRINGS && text_file_data[type].filename && *text_file_data[type].filename) {
+	if (type < 0 || type >= NUM_TEXT_FILE_STRINGS) {
+		log("SYSERR: reload_text_string called with invalid type %d", type);
+	}
+	else if (!text_file_data[type].filename || !*text_file_data[type].filename) {
+		log("SYSERR: reload_text_string called on type %d with no filename set", type);
+	}
+	else {
+		// ok:
 		if (text_file_strings[type]) {
 			free(text_file_strings[type]);
 			text_file_strings[type] = NULL;

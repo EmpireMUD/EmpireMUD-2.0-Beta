@@ -3961,7 +3961,10 @@ void trigger_distrust_from_hostile(char_data *ch, empire_data *emp) {
 	struct empire_political_data *pol;
 	empire_data *chemp = GET_LOYALTY(ch);
 	
-	if (!emp || EMPIRE_IMM_ONLY(emp) || IS_IMMORTAL(ch) || GET_LOYALTY(ch) == emp) {
+	if (!emp || IS_IMMORTAL(ch) || GET_LOYALTY(ch) == emp) {
+		return;
+	}
+	if (EMPIRE_IMM_ONLY(emp) && config_get_bool("immortal_empire_restrict_war")) {
 		return;
 	}
 	

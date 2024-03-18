@@ -90,8 +90,11 @@ void display_statistics_to_char(char_data *ch) {
 
 	/* Find best scores.. */
 	HASH_ITER(hh, empire_table, emp, next_emp) {
-		if (EMPIRE_IMM_ONLY(emp) || EMPIRE_IS_TIMED_OUT(emp)) {
-			continue;
+		if (EMPIRE_IMM_ONLY(emp) && config_get_bool("immortal_empire_restrictions")) {
+			continue;	// imm-only
+		}
+		if (EMPIRE_IS_TIMED_OUT(emp)) {
+			continue;	// timed out
 		}
 		
 		if (EMPIRE_MEMBERS(emp) > populous_empire) {
@@ -132,8 +135,11 @@ void display_statistics_to_char(char_data *ch) {
 	
 	// build strings
 	HASH_ITER(hh, empire_table, emp, next_emp) {
-		if (EMPIRE_IMM_ONLY(emp) || EMPIRE_IS_TIMED_OUT(emp)) {
-			continue;
+		if (EMPIRE_IMM_ONLY(emp) && config_get_bool("immortal_empire_restrictions")) {
+			continue;	// imm-only 
+		}
+		if (EMPIRE_IS_TIMED_OUT(emp)) {
+			continue;	// timed out
 		}
 		
 		if (populous_empire != NOTHING && num_populous < 5 && EMPIRE_MEMBERS(emp) >= populous_empire) {

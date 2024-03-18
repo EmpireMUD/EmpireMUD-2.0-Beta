@@ -64,8 +64,8 @@ void abandon_lost_vehicles(void) {
 		if (!(emp = VEH_OWNER(veh))) {
 			continue;	// only looking to abandon owned vehs
 		}
-		if (EMPIRE_IMM_ONLY(emp)) {
-			continue;	// imm empire vehicles could be disastrous
+		if (EMPIRE_ADMIN_FLAGGED(emp, EADM_IGNORE_OVERAGES)) {
+			continue;	// skip 'em
 		}
 		if (EMPIRE_MEMBERS(emp) > 0 || EMPIRE_TERRITORY(emp, TER_TOTAL) > 0) {
 			continue;	// skip empires that still have territory or members
@@ -4447,6 +4447,7 @@ void do_stat_vehicle(char_data *ch, vehicle_data *veh, bool details) {
 				append_page_display_line(line, " %s", desc->keyword);
 			}
 			append_page_display_line(line, "\t0");
+			build_page_display_str(ch, "(use vstat -d to view all extra descs)");
 		}
 	}
 	
@@ -4581,7 +4582,7 @@ void do_stat_vehicle(char_data *ch, vehicle_data *veh, bool details) {
 		}
 		else {
 			LL_COUNT(VEH_CUSTOM_MSGS(veh), custm, count);
-			build_page_display(ch, "Custom messages: %d", count);
+			build_page_display(ch, "Custom messages: \tc%d\t0 (use vstat -d to view)", count);
 		}
 	}
 	
@@ -4670,6 +4671,10 @@ void look_at_vehicle(vehicle_data *veh, char_data *ch, bool send_page) {
 			strtoupper(buf1);
 		}
 		build_page_display(ch, "It has been painted %s%s%s&0.", colbuf, (VEH_FLAGGED(veh, VEH_BRIGHT_PAINT) ? "bright " : ""), lbuf);
+	}
+	
+	if (VEH_ANIMALS(veh)) {
+		build_page_display(ch, "It is being pulled by %s.", list_harnessed_mobs(veh));
 	}
 	
 	if (VEH_NEEDS_RESOURCES(veh)) {

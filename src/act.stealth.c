@@ -62,7 +62,7 @@ bool can_infiltrate(char_data *ch, empire_data *emp) {
 		return FALSE;
 	}
 	
-	if (EMPIRE_IMM_ONLY(emp)) {
+	if (EMPIRE_IMM_ONLY(emp) && config_get_bool("immortal_empire_restrict_stealth")) {
 		msg_to_char(ch, "You cannot infiltrate immortal empires.\r\n");
 		return FALSE;
 	}
@@ -138,7 +138,7 @@ bool can_steal(char_data *ch, empire_data *emp) {
 		return FALSE;
 	}
 	
-	if (EMPIRE_IMM_ONLY(emp)) {
+	if (EMPIRE_IMM_ONLY(emp) && config_get_bool("immortal_empire_restrict_stealth")) {
 		msg_to_char(ch, "You can't steal from immortal empires.\r\n");
 		return FALSE;
 	}
@@ -246,7 +246,10 @@ void trigger_distrust_from_stealth(char_data *ch, empire_data *emp) {
 	struct empire_political_data *pol;
 	empire_data *chemp = GET_LOYALTY(ch);
 	
-	if (!emp || EMPIRE_IMM_ONLY(emp) || IS_IMMORTAL(ch) || GET_LOYALTY(ch) == emp) {
+	if (!emp || IS_IMMORTAL(ch) || GET_LOYALTY(ch) == emp) {
+		return;
+	}
+	if (EMPIRE_IMM_ONLY(emp) && config_get_bool("immortal_empire_restrict_stealth")) {
 		return;
 	}
 	

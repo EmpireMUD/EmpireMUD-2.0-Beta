@@ -1820,7 +1820,7 @@ void check_einv_auto_move(empire_data *emp, int new_island) {
 	}
 	
 	// check if we're doing the free newbie move
-	if (!EMPIRE_ADMIN_FLAGGED(emp, EADM_DID_NEWBIE_MOVE) && !IS_SET(new_isle->flags, ISLE_NEWBIE)) {
+	if (EMPIRE_ADMIN_FLAGGED(emp, EADM_FREE_NEWBIE_MOVE) && !IS_SET(new_isle->flags, ISLE_NEWBIE)) {
 		move_newbie = TRUE;
 	}
 	
@@ -1876,7 +1876,7 @@ void check_einv_auto_move(empire_data *emp, int new_island) {
 	}
 	if (move_newbie) {
 		EMPIRE_NEEDS_SAVE(emp) = TRUE;
-		SET_BIT(EMPIRE_ADMIN_FLAGS(emp), EADM_DID_NEWBIE_MOVE);
+		REMOVE_BIT(EMPIRE_ADMIN_FLAGS(emp), EADM_FREE_NEWBIE_MOVE);
 	}
 }
 
@@ -1974,6 +1974,9 @@ empire_data *create_empire(char_data *ch) {
 	for (iter = 0; iter < NUM_PRIVILEGES; ++iter) {
 		EMPIRE_PRIV(emp, iter) = 2;
 	}
+	
+	// mark for 1 free move
+	SET_BIT(EMPIRE_ADMIN_FLAGS(emp), EADM_FREE_NEWBIE_MOVE);
 	
 	// this is necessary to save some parts at all
 	emp->storage_loaded = TRUE;
@@ -9647,7 +9650,7 @@ int sort_empires(empire_data *a, empire_data *b) {
 	else if (a_timeout != b_timeout) {
 		return a_timeout ? 1 : -1;
 	}
-	else if (EMPIRE_IMM_ONLY(a) != EMPIRE_IMM_ONLY(b)) {
+	else if (EMPIRE_IMM_ONLY(a) != EMPIRE_IMM_ONLY(b) && config_get_bool("immortal_empire_restrictions")) {
 		return EMPIRE_IMM_ONLY(a) - EMPIRE_IMM_ONLY(b);
 	}
 	/*

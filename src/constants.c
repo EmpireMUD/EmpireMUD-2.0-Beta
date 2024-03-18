@@ -63,7 +63,7 @@ void tog_pvp(char_data *ch);
 //// EMPIREMUD CONSTANTS /////////////////////////////////////////////////////
 
 // Shown on the "version" command and sent over MSSP
-const char *version = "EmpireMUD 2.0 beta 5.181";
+const char *version = "EmpireMUD 2.0 beta 5.182";
 const char *DG_SCRIPT_VERSION = "DG Scripts 1.0.12 e5.1.5";
 
 
@@ -2468,11 +2468,16 @@ const bool empire_log_request_only[] = {
 
 // EADM_x: empire admin flags
 const char *empire_admin_flags[] = {
-	"!WAR",
-	"!STEAL",
+	"NO-WAR",	// 0
+	"NO-STEAL",
 	"CITY-CLAIMS-ONLY",
-	"!RENAME",
-	"DID-NEWBIE-MOVE",
+	"NO-RENAME",
+	"FREE-NEWBIE-MOVE",
+	"FREE-NEEDS",	// 5
+	"IGNORE-OVERAGES",
+	"NO-DECAY",
+	"ALL-TECHS",
+	"FREE-WAR",
 	"\n"
 };
 

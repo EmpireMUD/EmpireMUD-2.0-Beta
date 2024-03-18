@@ -2562,7 +2562,11 @@ toward your stats your gear level.
 To use an ability like "enchant" on another player's shared slot, type the
 player's name as the target of the enchantment.
 
-See also: ENCHANT
+Sharing an item will bind it to you, so it should only be used on bound items.
+If a BoE item isn't bound yet, you can just give it to another person to
+enchant, and don't have to share it.
+
+See also: BOE, ENCHANT
 #
 SHEATH SHEATHE
 

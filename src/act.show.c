@@ -243,7 +243,7 @@ SHOW(show_resource) {
 	
 	// ok now build the data
 	HASH_ITER(hh, empire_table, emp, next_emp) {
-		if (EMPIRE_IMM_ONLY(emp)) {
+		if (EMPIRE_IMM_ONLY(emp) && config_get_bool("immortal_empire_restrictions")) {
 			continue;	// skip imms
 		}
 		
@@ -2010,7 +2010,7 @@ SHOW(show_progress) {
 	}
 	else {
 		HASH_ITER(hh, empire_table, emp, next_emp) {
-			if (EMPIRE_IMM_ONLY(emp)) {
+			if (EMPIRE_IMM_ONLY(emp) && config_get_bool("immortal_empire_restrictions")) {
 				continue;	// safe to skip these
 			}
 			

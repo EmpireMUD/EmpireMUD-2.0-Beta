@@ -964,7 +964,7 @@ void show_craft_info(char_data *ch, char *argument, int craft_type) {
 					strcat(buf, ", unlimited");
 				}
 				else {
-					sprintf(buf + strlen(buf), "%d hour%s of light", GET_LIGHT_HOURS_REMAINING(proto), PLURAL(GET_LIGHT_HOURS_REMAINING(proto)));
+					sprintf(buf + strlen(buf), ", %d hour%s of light", GET_LIGHT_HOURS_REMAINING(proto), PLURAL(GET_LIGHT_HOURS_REMAINING(proto)));
 				}
 				prettier_sprintbit(GET_LIGHT_FLAGS(proto), light_flags, part);
 				if (*part) {

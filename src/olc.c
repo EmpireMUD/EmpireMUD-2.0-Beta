@@ -44,7 +44,6 @@ OLC_MODULE(olc_edit);
 OLC_MODULE(olc_fullsearch);
 OLC_MODULE(olc_free);
 OLC_MODULE(olc_list);
-OLC_MODULE(olc_lookup);
 OLC_MODULE(olc_refresh_companions);
 OLC_MODULE(olc_removeindev);
 OLC_MODULE(olc_save);
@@ -617,7 +616,6 @@ const struct olc_command_data olc_data[] = {
 	{ "wordcount", olc_wordcount, OLC_ABILITY | OLC_ARCHETYPE | OLC_ATTACK | OLC_AUGMENT | OLC_BOOK | OLC_BUILDING | OLC_CLASS | OLC_CRAFT | OLC_CROP | OLC_EVENT | OLC_FACTION | OLC_GENERIC | OLC_GLOBAL | OLC_MOBILE | OLC_MORPH | OLC_OBJECT | OLC_PROGRESS | OLC_QUEST | OLC_SECTOR | OLC_SHOP | OLC_SKILL | OLC_SOCIAL | OLC_TRIGGER | OLC_ADVENTURE | OLC_ROOM_TEMPLATE | OLC_VEHICLE, NOBITS },
 	
 	// admin
-	{ "lookup", olc_lookup, NOBITS, NOBITS },
 	{ "refreshcompanions", olc_refresh_companions, NOBITS, NOBITS },
 	{ "removeindev", olc_removeindev, NOBITS, NOBITS },
 	{ "setflags", olc_set_flags, NOBITS, NOBITS },
@@ -1187,7 +1185,7 @@ const struct olc_command_data olc_data[] = {
 	
 	
 	// misc commands that should not take precedence over editor commands
-	{ "fullsearch", olc_fullsearch, OLC_ABILITY | OLC_ATTACK | OLC_BUILDING | OLC_CRAFT | OLC_CROP | OLC_GENERIC | OLC_MOBILE |  OLC_OBJECT | OLC_PROGRESS | OLC_QUEST | OLC_ROOM_TEMPLATE | OLC_SECTOR | OLC_SKILL | OLC_TRIGGER | OLC_VEHICLE, NOBITS },
+	{ "fullsearch", olc_fullsearch, OLC_ABILITY | OLC_ADVENTURE | OLC_ARCHETYPE | OLC_ATTACK | OLC_AUGMENT | OLC_BOOK | OLC_BUILDING | OLC_CRAFT | OLC_CROP | OLC_EVENT | OLC_GENERIC | OLC_MOBILE |  OLC_OBJECT | OLC_PROGRESS | OLC_QUEST | OLC_ROOM_TEMPLATE | OLC_SECTOR | OLC_SKILL | OLC_TRIGGER | OLC_VEHICLE, NOBITS },
 	
 	// this goes last
 	{ "\n", NULL, NOBITS, NOBITS }
@@ -2784,9 +2782,29 @@ OLC_MODULE(olc_fullsearch) {
 			olc_fullsearch_abil(ch, argument);
 			break;
 		}
+		case OLC_ADVENTURE: {
+			void olc_fullsearch_adventure(char_data *ch, char *argument);
+			olc_fullsearch_adventure(ch, argument);
+			break;
+		}
+		case OLC_ARCHETYPE: {
+			void olc_fullsearch_archetype(char_data *ch, char *argument);
+			olc_fullsearch_archetype(ch, argument);
+			break;
+		}
 		case OLC_ATTACK: {
 			void olc_fullsearch_attack_message(char_data *ch, char *argument);
 			olc_fullsearch_attack_message(ch, argument);
+			break;
+		}
+		case OLC_AUGMENT: {
+			void olc_fullsearch_augment(char_data *ch, char *argument);
+			olc_fullsearch_augment(ch, argument);
+			break;
+		}
+		case OLC_BOOK: {
+			void olc_fullsearch_book(char_data *ch, char *argument);
+			olc_fullsearch_book(ch, argument);
 			break;
 		}
 		case OLC_BUILDING: {
@@ -2802,6 +2820,11 @@ OLC_MODULE(olc_fullsearch) {
 		case OLC_CROP: {
 			void olc_fullsearch_crop(char_data *ch, char *argument);
 			olc_fullsearch_crop(ch, argument);
+			break;
+		}
+		case OLC_EVENT: {
+			void olc_fullsearch_event(char_data *ch, char *argument);
+			olc_fullsearch_event(ch, argument);
 			break;
 		}
 		case OLC_GENERIC: {
@@ -3226,27 +3249,6 @@ OLC_MODULE(olc_list) {
 		else {
 			msg_to_char(ch, "Found no %ss in that range.\r\n", buf2);
 		}
-	}
-}
-
-
-OLC_MODULE(olc_lookup) {
-	any_vnum vnum;
-	struct adventure_data *adv;
-	
-	one_argument(argument, arg);
-	
-	if (!*arg) {
-		msg_to_char(ch, "Lookup what vnum?\r\n");
-	}
-	else if (!isdigit(*arg) || (vnum = atoi(arg)) < 0) {
-		msg_to_char(ch, "Invalid vnum '%s'.\r\n", arg);
-	}
-	else if (!(adv = get_adventure_for_vnum(vnum))) {
-		msg_to_char(ch, "That vnum is not part of any adventure.\r\n");
-	}
-	else {
-		msg_to_char(ch, "[%5d] %s%s\r\n", GET_ADV_VNUM(adv), GET_ADV_NAME(adv), ADVENTURE_FLAGGED(adv, ADV_IN_DEVELOPMENT) ? " (IN-DEVELOPMENT)" : "");
 	}
 }
 

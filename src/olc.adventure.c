@@ -537,6 +537,159 @@ void olc_delete_adventure(char_data *ch, adv_vnum vnum) {
 
 
 /**
+* Searches properties of adventures.
+*
+* @param char_data *ch The person searching.
+* @param char *argument The argument they entered.
+*/
+void olc_fullsearch_adventure(char_data *ch, char *argument) {
+	any_vnum only_vnum = NOTHING;
+	char type_arg[MAX_INPUT_LENGTH], val_arg[MAX_INPUT_LENGTH], find_keywords[MAX_INPUT_LENGTH];
+	char only_author[MAX_INPUT_LENGTH];
+	bitvector_t not_flagged = NOBITS, only_flags = NOBITS, find_links = NOBITS, found_links = NOBITS;
+	int count, level_over = NOTHING, level_under = NOTHING, only_level = NOTHING, only_temp = NOTHING, vmin = NOTHING, vmax = NOTHING;
+	int limit_over = NOTHING, limit_under = NOTHING, only_limit = NOTHING;
+	int plimit_over = NOTHING, plimit_under = NOTHING, only_plimit = NOTHING;
+	int reset_over = NOTHING, reset_under = NOTHING, only_reset = NOTHING;
+	adv_data *adv, *next_adv;
+	struct adventure_link_rule *link;
+	
+	if (!*argument) {
+		msg_to_char(ch, "See HELP ADVEDIT FULLSEARCH for syntax.\r\n");
+		return;
+	}
+	
+	// process argument
+	*only_author = '\0';
+	*find_keywords = '\0';
+	while (*argument) {
+		// figure out a type
+		argument = any_one_arg(argument, type_arg);
+		
+		if (!strcmp(type_arg, "-")) {
+			continue;	// just skip stray dashes
+		}
+		
+		FULLSEARCH_STRING("author", only_author)
+		FULLSEARCH_FLAGS("flags", only_flags, adventure_flags)
+		FULLSEARCH_FLAGS("flagged", only_flags, adventure_flags)
+		FULLSEARCH_INT("level", only_level, 0, INT_MAX)
+		FULLSEARCH_INT("levelover", level_over, 0, INT_MAX)
+		FULLSEARCH_INT("levelunder", level_under, 0, INT_MAX)
+		FULLSEARCH_INT("limit", only_limit, 0, INT_MAX)
+		FULLSEARCH_INT("limitover", limit_over, 0, INT_MAX)
+		FULLSEARCH_INT("limitunder", limit_under, 0, INT_MAX)
+		FULLSEARCH_FLAGS("link", find_links, adventure_link_types)
+		FULLSEARCH_INT("playerlimit", only_plimit, 0, INT_MAX)
+		FULLSEARCH_INT("playerlimitover", plimit_over, 0, INT_MAX)
+		FULLSEARCH_INT("playerlimitunder", plimit_under, 0, INT_MAX)
+		FULLSEARCH_INT("reset", only_reset, 0, INT_MAX)
+		FULLSEARCH_INT("resetover", reset_over, 0, INT_MAX)
+		FULLSEARCH_INT("resetunder", reset_under, 0, INT_MAX)
+		FULLSEARCH_LIST("temperature", only_temp, temperature_types)
+		FULLSEARCH_FLAGS("unflagged", not_flagged, adventure_flags)
+		FULLSEARCH_INT("vnum", only_vnum, 0, INT_MAX)
+		FULLSEARCH_INT("vmin", vmin, 0, INT_MAX)
+		FULLSEARCH_INT("vmax", vmax, 0, INT_MAX)
+		
+		else {	// not sure what to do with it? treat it like a keyword
+			sprintf(find_keywords + strlen(find_keywords), "%s%s", *find_keywords ? " " : "", type_arg);
+		}
+		
+		// prepare for next loop
+		skip_spaces(&argument);
+	}
+	
+	build_page_display(ch, "Adventure fullsearch: %s", show_color_codes(find_keywords));
+	count = 0;
+	
+	// okay now look them up
+	HASH_ITER(hh, adventure_table, adv, next_adv) {
+		if ((vmin != NOTHING && GET_ADV_VNUM(adv) < vmin) || (vmax != NOTHING && GET_ADV_VNUM(adv) > vmax)) {
+			continue;	// vnum range
+		}
+		
+		if (*only_author && !str_str(GET_ADV_AUTHOR(adv), only_author)) {
+			continue;
+		}
+		if (not_flagged != NOBITS && ADVENTURE_FLAGGED(adv, not_flagged)) {
+			continue;
+		}
+		if (only_flags != NOBITS && (GET_ADV_FLAGS(adv) & only_flags) != only_flags) {
+			continue;
+		}
+		if (only_level != NOTHING && (only_level < GET_ADV_MIN_LEVEL(adv) || only_level > GET_ADV_MAX_LEVEL(adv))) {
+			continue;
+		}
+		if (level_over != NOTHING && GET_ADV_MIN_LEVEL(adv) < level_over && GET_ADV_MAX_LEVEL(adv) < level_over) {
+			continue;
+		}
+		if (level_under != NOTHING && GET_ADV_MIN_LEVEL(adv) > level_under && GET_ADV_MAX_LEVEL(adv) > level_under) {
+			continue;
+		}
+		if (only_limit != NOTHING && GET_ADV_MAX_INSTANCES(adv) != only_limit) {
+			continue;
+		}
+		if (limit_over != NOTHING && GET_ADV_MAX_INSTANCES(adv) < limit_over) {
+			continue;
+		}
+		if (limit_under != NOTHING && (GET_ADV_MAX_INSTANCES(adv) == 0 || GET_ADV_MAX_INSTANCES(adv) > limit_under)) {
+			continue;
+		}
+		if (only_plimit != NOTHING && GET_ADV_PLAYER_LIMIT(adv) != only_plimit) {
+			continue;
+		}
+		if (plimit_over != NOTHING && GET_ADV_PLAYER_LIMIT(adv) < plimit_over) {
+			continue;
+		}
+		if (plimit_under != NOTHING && (GET_ADV_PLAYER_LIMIT(adv) == 0 || GET_ADV_PLAYER_LIMIT(adv) > plimit_under)) {
+			continue;
+		}
+		if (only_reset != NOTHING && GET_ADV_RESET_TIME(adv) != only_reset) {
+			continue;
+		}
+		if (reset_over != NOTHING && GET_ADV_RESET_TIME(adv) < reset_over) {
+			continue;
+		}
+		if (reset_under != NOTHING && (GET_ADV_RESET_TIME(adv) == 0 || GET_ADV_RESET_TIME(adv) > reset_under)) {
+			continue;
+		}
+		if (only_temp != NOTHING && GET_ADV_TEMPERATURE_TYPE(adv) != only_temp) {
+			continue;
+		}
+		if (only_vnum != NOTHING && (only_vnum < GET_ADV_START_VNUM(adv) || only_vnum > GET_ADV_END_VNUM(adv))) {
+			continue;
+		}
+		if (find_links) {	// look up its linking rules
+			found_links = NOBITS;
+			LL_FOREACH(GET_ADV_LINKING(adv), link) {
+				found_links |= BIT(link->type);
+			}
+			if ((find_links & found_links) != find_links) {
+				continue;
+			}
+		}
+		if (*find_keywords && !multi_isname(find_keywords, GET_ADV_NAME(adv)) && !multi_isname(find_keywords, GET_ADV_AUTHOR(adv)) && !multi_isname(find_keywords, GET_ADV_DESCRIPTION(adv))) {
+			continue;
+		}
+		
+		// show it
+		build_page_display(ch, "[%5d] %s", GET_ADV_VNUM(adv), GET_ADV_NAME(adv));
+		++count;
+	}
+	
+	if (count > 0) {
+		build_page_display(ch, "(%d adventures)", count);
+	}
+	else {
+		build_page_display_str(ch, " none");
+	}
+	
+	send_page_display(ch);
+}
+
+
+/**
 * Function to save a player's changes to a adventure zone (or a new one).
 *
 * @param descriptor_data *desc The descriptor who is saving.

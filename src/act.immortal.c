@@ -3172,6 +3172,9 @@ void do_stat_book(char_data *ch, book_data *book, bool details) {
 			build_page_display_str(ch, line);
 		}
 	}
+	if (count > 0 && !details) {
+		build_page_display_str(ch, "(use vstat -d to view all paragraph text)");
+	}
 	
 	send_page_display(ch);
 }
@@ -3248,6 +3251,7 @@ void do_stat_building(char_data *ch, bld_data *bdg, bool details) {
 			}
 			strcat(lbuf, "&0");
 			build_page_display_str(ch, lbuf);
+			build_page_display_str(ch, "(use vstat -d to view all extra descs)");
 		}
 	}
 	
@@ -3483,7 +3487,7 @@ void do_stat_character(char_data *ch, char_data *k, bool details) {
 		}
 		else {
 			LL_COUNT(MOB_CUSTOM_MSGS(k), mcm, count);
-			build_page_display(ch, "Custom messages: %d", count);
+			build_page_display(ch, "Custom messages: \tc%d\t0 (use vstat -d to view)", count);
 		}
 	}
 
@@ -3721,6 +3725,7 @@ void do_stat_crop(char_data *ch, crop_data *cp, bool details) {
 				strcat(buf, desc->keyword);
 			}
 			build_page_display(ch, "%s&0", buf);
+			build_page_display_str(ch, "(use vstat -d to view all extra descs)");
 		}
 	}
 	
@@ -3733,7 +3738,7 @@ void do_stat_crop(char_data *ch, crop_data *cp, bool details) {
 		}
 		else {
 			LL_COUNT(GET_CROP_CUSTOM_MSGS(cp), ocm, count);
-			build_page_display(ch, "Custom messages: %d", count);
+			build_page_display(ch, "Custom messages: \tc%d\t0 (use vstat -d to view)", count);
 		}
 	}
 	
@@ -3986,6 +3991,7 @@ void do_stat_object(char_data *ch, obj_data *j, bool details) {
 				strcat(buf, desc->keyword);
 			}
 			build_page_display(ch, "%s&0", buf);
+			build_page_display_str(ch, "(use vstat -d to view all extra descs)");
 		}
 	}
 	
@@ -4287,7 +4293,7 @@ void do_stat_object(char_data *ch, obj_data *j, bool details) {
 		}
 		else {
 			LL_COUNT(GET_OBJ_CUSTOM_MSGS(j), ocm, count);
-			build_page_display(ch, "Custom messages: %d", count);
+			build_page_display(ch, "Custom messages: \tc%d\t0 (use vstat -d to view)", count);
 		}
 	}
 
@@ -4709,6 +4715,7 @@ void do_stat_room_template(char_data *ch, room_template *rmt, bool details) {
 				strcat(buf, desc->keyword);
 			}
 			build_page_display(ch, "%s&0", buf);
+			build_page_display_str(ch, "(use vstat -d to view all extra descs)");
 		}
 	}
 
@@ -4787,6 +4794,7 @@ void do_stat_sector(char_data *ch, sector_data *st, bool details) {
 				strcat(buf, desc->keyword);
 			}
 			build_page_display(ch, "%s&0", buf);
+			build_page_display_str(ch, "(use vstat -d to view all extra descs)");
 		}
 	}
 	
@@ -4799,7 +4807,7 @@ void do_stat_sector(char_data *ch, sector_data *st, bool details) {
 		}
 		else {
 			LL_COUNT(GET_SECT_CUSTOM_MSGS(st), ocm, count);
-			build_page_display(ch, "Custom messages: %d", count);
+			build_page_display(ch, "Custom messages: \tc%d\t0 (use vstat -d to view)", count);
 		}
 	}
 

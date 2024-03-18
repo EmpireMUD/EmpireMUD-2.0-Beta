@@ -655,7 +655,7 @@ void score_empires(void) {
 		EMPIRE_SORT_VALUE(emp) = 0;
 	}
 	
-	#define SCORE_SKIP_EMPIRE(ee)  (EMPIRE_IMM_ONLY(ee) || EMPIRE_MEMBERS(ee) == 0 || EMPIRE_LAST_LOGON(ee) + time_to_empire_emptiness < time(0))
+	#define SCORE_SKIP_EMPIRE(ee)  ((EMPIRE_IMM_ONLY(ee) && config_get_bool("immortal_empire_restrictions")) || EMPIRE_MEMBERS(ee) == 0 || EMPIRE_LAST_LOGON(ee) + time_to_empire_emptiness < time(0))
 
 	// build data
 	HASH_ITER(hh, empire_table, emp, next_emp) {
@@ -938,7 +938,7 @@ void process_imports(void) {
 	int time_to_empire_emptiness = config_get_int("time_to_empire_emptiness") * SECS_PER_REAL_WEEK;
 	
 	HASH_ITER(hh, empire_table, emp, next_emp) {
-		if (EMPIRE_IMM_ONLY(emp)) {
+		if (EMPIRE_IMM_ONLY(emp) && config_get_bool("immortal_empire_restrictions")) {
 			continue;
 		}
 		if (!EMPIRE_HAS_TECH(emp, TECH_TRADE_ROUTES)) {
@@ -1256,7 +1256,7 @@ bool is_trading_with(empire_data *emp, empire_data *partner) {
 		return FALSE;
 	}
 	// neither can be imm-only
-	if (EMPIRE_IMM_ONLY(emp) || EMPIRE_IMM_ONLY(partner)) {
+	if ((EMPIRE_IMM_ONLY(emp) || EMPIRE_IMM_ONLY(partner)) && config_get_bool("immortal_empire_restrictions")) {
 		return FALSE;
 	}
 	// both must have trade routes
@@ -1469,7 +1469,10 @@ bool has_permission(char_data *ch, int type, room_data *loc) {
 * @return TRUE if successful, FALSE if not (and sends its own error message to ch)
 */
 bool has_tech_available(char_data *ch, int tech) {
-	if (!ROOM_OWNER(IN_ROOM(ch))) {
+	if (GET_LOYALTY(ch) && EMPIRE_ADMIN_FLAGGED(GET_LOYALTY(ch), EADM_ALL_TECHS)) {
+		return TRUE;	// admin flag allows all techs
+	}
+	else if (!ROOM_OWNER(IN_ROOM(ch))) {
 		msg_to_char(ch, "In order to do that you need to be in the territory of an empire with %s.\r\n", empire_tech_types[tech]);
 		return FALSE;
 	}
@@ -1499,6 +1502,9 @@ bool has_tech_available_room(room_data *room, int tech) {
 	
 	if (!emp) {
 		return FALSE;
+	}
+	if (EMPIRE_ADMIN_FLAGGED(emp, EADM_ALL_TECHS)) {
+		return TRUE;	// admin flag allows all techs (regardless of location)
 	}
 	
 	// see if it requires island

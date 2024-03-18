@@ -735,11 +735,12 @@ void look_at_target(char_data *ch, char *arg, char *more_args, bool look_inside)
 	char targ_arg[MAX_INPUT_LENGTH];
 	int found = FALSE, fnum;
 	bitvector_t bits;
-	char_data *found_char = NULL;
+	char_data *found_char = NULL, *proto, *ch_iter;
 	obj_data *found_obj = NULL, *ex_obj = NULL;
-	vehicle_data *found_veh = NULL, *ex_veh = NULL;
+	vehicle_data *found_veh = NULL, *ex_veh = NULL, *veh_iter;
 	bool inv_only = FALSE;
 	char *exdesc;
+	struct vehicle_attached_mob *vam;
 
 	if (!ch->desc)
 		return;
@@ -835,13 +836,53 @@ void look_at_target(char_data *ch, char *arg, char *more_args, bool look_inside)
 	}
 	
 	// try sky
-	if (!found && !str_cmp(arg, "sky")) {
+	if (!found && !str_cmp(arg, "sky") && --fnum <= 0) {
 		found = TRUE;
 		if (!IS_OUTDOORS(ch) && !CAN_LOOK_OUT(IN_ROOM(ch))) {
 			msg_to_char(ch, "You can't see the sky from here.\r\n");
 		}
 		else {
 			do_weather(ch, "", 0, 0);
+		}
+	}
+	
+	// try harnessed mobs
+	if (!found) {
+		DL_FOREACH2(ROOM_VEHICLES(IN_ROOM(ch)), veh_iter, next_in_room) {
+			LL_FOREACH(VEH_ANIMALS(veh_iter), vam) {
+				if ((proto = mob_proto(vam->mob)) && isname(arg, GET_PC_NAME(proto)) && --fnum <= 0) {
+					found = TRUE;
+					act("You look at $N, harnessed to $v:", FALSE, ch, veh_iter, proto, TO_CHAR | ACT_VEH_OBJ | TO_PAGE_DISPLAY);
+					build_page_display_str(ch, GET_LOOK_DESC(proto));
+					send_page_display(ch);
+					
+					act("$n looks at $N, harnessed to $v.", TRUE, ch, veh_iter, proto, TO_ROOM | ACT_VEH_OBJ);
+				}
+			}
+		}
+	}
+	
+	// try mount (own)
+	if (!found && GET_MOUNT_VNUM(ch) != NOTHING && (!str_cmp(arg, "mount") || ((proto = mob_proto(GET_MOUNT_VNUM(ch))) && isname(arg, GET_PC_NAME(proto)))) && --fnum <= 0) {
+		found = TRUE;
+		act("$n looks at $s mount.", FALSE, ch, NULL, NULL, TO_ROOM);
+		proto = mob_proto(GET_MOUNT_VNUM(ch));
+		build_page_display(ch, "You look at your mount:\r\n%s", GET_LOOK_DESC(proto));
+		send_page_display(ch);
+	}
+	
+	// try mount (others)
+	if (!found) {
+		DL_FOREACH2(ROOM_PEOPLE(IN_ROOM(ch)), ch_iter, next_in_room) {
+			if (ch_iter != ch && CAN_SEE(ch, ch_iter) && !IS_NPC(ch_iter) && IS_RIDING(ch_iter) && (proto = mob_proto(GET_MOUNT_VNUM(ch_iter))) && isname(arg, GET_PC_NAME(proto)) && --fnum <= 0) {
+				found = TRUE;
+				act("You look at $N's mount:", FALSE, ch, NULL, ch_iter, TO_CHAR | TO_PAGE_DISPLAY);
+				build_page_display_str(ch, GET_LOOK_DESC(proto));
+				send_page_display(ch);
+				
+				act("$n looks at your mount.", TRUE, ch, NULL, ch_iter, TO_VICT);
+				act("$n looks at $N's mount.", TRUE, ch, NULL, ch_iter, TO_NOTVICT);
+			}
 		}
 	}
 	
@@ -1987,7 +2028,7 @@ void show_character_affects_simple(char_data *ch, char_data *to) {
 		}
 		
 		// caster?
-		if (aff->cast_by == CAST_BY_ID(to) ? " (you)" : "") {
+		if (dot->cast_by == CAST_BY_ID(to)) {
 			safe_snprintf(line + strlen(line), sizeof(line) - strlen(line), " (you)");
 		}
 		
