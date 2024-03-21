@@ -412,20 +412,24 @@ switch %move%
       %echo% &&OA wave of fire rolls over the platform!&&0
       set ch %room.people%
       while %ch%
+        set next_ch %ch.next_in_room%
         if %ch.var(did_scfdodge,0)%
-          %echo% &&O~%ch% dives behind a rock just in time!&&0
+          %send% %ch% &&OYou dive behind a rock just in time!&&0
+          %echoaround% %ch% &&O~%ch% dives behind a rock just in time!&&0
         else
           if %diff% <= 2
-            %echo% &&O~ch% is burned by the wave of fire!&&0
+            %send% %ch% &&0You're burned by the wave of fire!&&0
+            %echoaround% %ch% &&O~%ch% is burned by the wave of fire!&&0
             %damage% %ch% 100 fire
             %dot% #18013 %ch% 100 30 fire 3
           else
-            %echo% &&O~ch% is severely burned by the wave of fire!&&0
+            %send% %ch% &&OYou're severely burned by the wave of fire!&&0
+            %echoaround% %ch% &&O~%ch% is severely burned by the wave of fire!&&0
             %damage% %ch% 300 fire
             %dot% #18013 %ch% 200 30 fire 3
           end
         end
-        set ch %ch.next_in_room%
+        set ch %next_ch%
       done
       scfight clear dodge
       eval i %i%+1
@@ -444,17 +448,21 @@ switch %move%
     while %ch%
       if %ch.var(did_scfdodge,0)%
         if %diff% <= 2
-          %echo% &&O~%ch% leaps gracefully over the swinging chain!&&0
+          %send% %ch% &&OYou leap gracefully over the swinigng chain!&&0
+          %echoaround% %ch% &&O~%ch% leaps gracefully over the swinging chain!&&0
         else
-          %echo% &&O~%ch% ducks gracefully under the swinging chain!&&0
+          %send% %ch% &&OYou duck gracefully under the swinging chain!&&0
+          %echoaround% %ch% &&O~%ch% ducks gracefully under the swinging chain!&&0
         end
       else
         if %diff% <= 2
-          %echo% &&O~ch% is tripped by the end of the swinging chain!&&0
+          %send% %ch% &&OYou're tripped by the end of the swinging chain!&&0
+          %echoaround% %ch% &&O~%ch% is tripped by the end of the swinging chain!&&0
           %damage% %ch% 50 physical
           dg_affect #18014 %ch% STUNNED on 5
         else
-          %echo% &&O~ch% is struck and sent flying by the end of the swinging chain!&&0
+          %send% %ch% &&OYou are struck and sent flying by the end of the swinging chain!&&0
+          %echoaround% %ch% &&O~%ch% is struck and sent flying by the end of the swinging chain!&&0
           %damage% %ch% 100 physical
           dg_affect #18014 %ch% STUNNED on 10
         end
@@ -501,30 +509,34 @@ eval num_left %num_left% - 1
 remote moves_left %self.id%
 remote num_left %self.id%
 eval pain 33 * %diff%
+set targ %self.fighting%
+if !%targ%
+  halt
+end
 switch %move%
   case 1
     * Molten Punch
-    set targ_id %actor.id%
-    %send% %actor% &&O**** &&Z|%self% fist turns to molten lava as &%self% takes aim at you... ****&&0 (dodge)
-    %echoaround% %actor% &&O&&Z|%self% fist turns to molten lava as &%self% takes aim at ~%actor%...&&0
+    set targ_id %targ.id%
+    %send% %targ% &&O**** &&Z|%self% fist turns to molten lava as &%self% takes aim at you... ****&&0 (dodge)
+    %echoaround% %targ% &&O&&Z|%self% fist turns to molten lava as &%self% takes aim at ~%targ%...&&0
     set cycle 0
     while %cycle% < 5
       scfight clear dodge
-      scfight setup dodge %actor%
+      scfight setup dodge %targ%
       wait 5 s
-      if %actor.id% != %targ_id% || %actor.room% != %self.room%
+      if %targ.id% != %targ_id% || %targ.room% != %self.room%
         * gone
         halt
       end
-      if !%actor.var(did_scfdodge,0)%
-        %echo% &&O&&Z~%self% punches ^%self% molten fist into |%actor% chest!&&0
-        %damage% %actor% %pain% fire
+      if !%targ.var(did_scfdodge,0)%
+        %echo% &&O&&Z~%self% punches ^%self% molten fist into |%targ% chest!&&0
+        %damage% %targ% %pain% fire
       else
-        %send% %actor% You narrowly dodge |%self% fist!
+        %send% %targ% You narrowly dodge |%self% fist!
       end
       if %cycle% < 5
-        %send% %actor% &&O**** &&Z~%self% pulls ^%self% fist back for another punch! ****&&0 (dodge)
-      elseif !%actor.var(did_scfdodge,0)%
+        %send% %targ% &&O**** &&Z~%self% pulls ^%self% fist back for another punch! ****&&0 (dodge)
+      elseif !%targ.var(did_scfdodge,0)%
         * missed the last one
         %echo% &&OThat final punch sends a wave of molten lava across the lair!&&0
         %aoe% 100 fire
@@ -569,19 +581,19 @@ switch %move%
   case 3
     * Claw Grab
     scfight clear struggle
-    set targ_id %actor.id%
-    %send% %actor% &&O**** &&Z~%self% grabs you with ^%self% enormous clawed hand! ****&&0 (struggle)
-    %echoaround% %actor% &&O&&Z~%self% grabs ~%actor% with ^%self% clawed hand!&&0
-    scfight setup struggle %actor% 20
+    set targ_id %targ.id%
+    %send% %targ% &&O**** &&Z~%self% grabs you with ^%self% enormous clawed hand! ****&&0 (struggle)
+    %echoaround% %targ% &&O&&Z~%self% grabs ~%targ% with ^%self% clawed hand!&&0
+    scfight setup struggle %targ% 20
     if %person.affect(9602)%
       set scf_strug_char You struggle against the fiend's claws...
-      set scf_strug_room ~%%actor%% struggles against the fiend's claws...
+      set scf_strug_room ~%%targ%% struggles against the fiend's claws...
       set scf_free_char You slip out of the fiend's grip!
-      set scf_free_room ~%%actor%% slips out of the fiend's grip!
-      remote scf_strug_char %actor.id%
-      remote scf_strug_room %actor.id%
-      remote scf_free_char %actor.id%
-      remote scf_free_room %actor.id%
+      set scf_free_room ~%%targ%% slips out of the fiend's grip!
+      remote scf_strug_char %targ.id%
+      remote scf_strug_room %targ.id%
+      remote scf_free_char %targ.id%
+      remote scf_free_room %targ.id%
     end
     if %diff% == 1
       dg_affect #18017 %self% HARD-STUNNED on 20
@@ -590,26 +602,26 @@ switch %move%
     set cycle 0
     while %cycle% < 5
       wait 4 s
-      if %actor.id% != %targ_id% || %actor.room% != %self.room%
+      if %targ.id% != %targ_id% || %targ.room% != %self.room%
         * gone
         dg_affect #18017 %self% off
         halt
-      elseif !%actor.affect(9602)%
+      elseif !%targ.affect(9602)%
         * got free
         dg_affect #18017 %self% off
         halt
       elseif %cycle% < 4
-        %send% %actor% &&O**** You shout in agony as ~%self% clenches ^%self% claws into you! ****&&0 (struggle)
-        %echoaround% %actor% &&0&&Z~%self% clenches ^%self% claws into ~%self%!&&0
-        %damage% %actor% %pain% physical
+        %send% %targ% &&O**** You shout in agony as ~%self% clenches ^%self% claws into you! ****&&0 (struggle)
+        %echoaround% %targ% &&0&&Z~%self% clenches ^%self% claws into ~%targ%!&&0
+        %damage% %targ% %pain% physical
       else
         * final cycle and they didn't get free
         if %diff% < 4
-          %echo% &&O&&Z~%self% slams ~%actor% down hard into the rocks!&&0
-          %damage% %actor% 200 physical
+          %echo% &&O&&Z~%self% slams ~%targ% down hard into the rocks!&&0
+          %damage% %targ% 200 physical
         else
-          %echo% &&O&&Z~%self% throws ~%actor% into the lava below!&&0
-          %slay% %actor% &&Z%actor.real_name% has been thrown into the lava at %self.room.coords%!
+          %echo% &&O&&Z~%self% throws ~%targ% into the lava below!&&0
+          %slay% %targ% &&Z%targ.real_name% has been thrown into the lava at %self.room.coords%!
         end
       end
       eval cycle %cycle% + 1
