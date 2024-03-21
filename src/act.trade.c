@@ -2726,7 +2726,7 @@ ACMD(do_rework) {
 			msg_to_char(ch, "It is already superior.\r\n");
 			return;
 		}
-		else if (!OBJ_FLAGGED(proto, OBJ_SCALABLE) || OBJ_FLAGGED(obj, OBJ_GENERIC_DROP)) {
+		else if (!OBJ_FLAGGED(proto, OBJ_SCALABLE)) {
 			msg_to_char(ch, "It can't be made superior.\r\n");
 			return;
 		}
