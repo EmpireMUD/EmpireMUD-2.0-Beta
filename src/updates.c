@@ -4249,6 +4249,8 @@ PLAYER_UPDATE_FUNC(b5_183_water_bottle_update_plr) {
 	
 	const obj_vnum BOTTLE_1 = 2112, BOTTLE_2 = 2136;
 	
+	check_delayed_load(ch);
+	
 	// equipment
 	for (pos = 0; pos < NUM_WEARS; ++pos) {
 		if ((obj = GET_EQ(ch, pos)) && (GET_OBJ_VNUM(obj) == BOTTLE_1 || GET_OBJ_VNUM(obj) == BOTTLE_2) && (objpr = obj_proto(GET_OBJ_VNUM(obj)))) {
