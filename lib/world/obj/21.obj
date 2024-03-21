@@ -157,9 +157,10 @@ A gourd bottle rolls around on the ground.~
    This bottle gourd has been dried and hollowed out to make it perfect to hold
 water. Type 'fill bottle' near the river or at an oasis to refill it.
 ~
-5 0 a 0 0 3
+5 0 a 0 0 4
 12 12 0
 7 0
+T 130
 S
 #2113
 saddle~
@@ -516,7 +517,7 @@ A gourd bottle rolls around on the ground.~
    This bottle gourd has been dried and hollowed out to make it perfect to hold
 water. Type 'fill bottle' near the river or at an oasis to refill it.
 ~
-5 0 a 0 0 5
+5 0 a 0 0 6
 12 0 0
 7 0
 C
@@ -525,6 +526,7 @@ R
 4 5121 0
 R
 4 5610 0
+T 130
 S
 #2137
 knife obsidian~

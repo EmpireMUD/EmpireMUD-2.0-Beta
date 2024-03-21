@@ -20,7 +20,7 @@ R
 R
 6 180 1
 W
-2 180 0 1
+2 180 0 1 -
 Z
 2 180
 S
@@ -44,7 +44,7 @@ R
 R
 6 183 1
 W
-2 940 0 1
+2 940 0 1 -
 Z
 2 940
 S
@@ -69,7 +69,7 @@ R
 6 919 1
 T 121
 W
-2 919 0 1
+2 919 0 1 -
 Z
 2 919
 S
@@ -92,7 +92,7 @@ R
 R
 6 5107 1
 W
-2 124 0 1
+2 124 0 1 -
 Z
 2 124
 S
@@ -113,7 +113,7 @@ A
 R
 0 0 1
 W
-2 125 0 1
+2 125 0 1 -
 Z
 2 125
 S
@@ -136,7 +136,7 @@ R
 R
 6 127 1
 W
-2 126 0 1
+2 126 0 1 -
 Z
 2 126
 S
@@ -164,9 +164,69 @@ R
 R
 6 5107 1
 W
-2 127 0 1
+2 127 0 1 -
 Z
 2 127
+S
+#128
+Pole Tutorial~
+   You've found a sapling -- a narrow, straight tree. You can scrape the
+sapling to make a pole, which can then be used to make buildings or crafts. 
+Here's how:
+ 1. 'Use' a knife tool (such as a handaxe).
+ 2. Type 'scrape sapling' (or 'scrape shoot', if you have that instead).
+(You can type 'toggle tutorials' to stop seeing new tutorial quests.)
+~
+You've mastered scraping saplings to make poles.
+~
+6 h 0 15 -1
+A
+2 131
+A
+2 134
+A
+2 135
+A
+2 136
+R
+0 0 1
+W
+1 6035 0 1 -
+Z
+2 142
+Z
+2 146
+S
+#130
+Water Tutorial~
+   When you get thirsty, you can type 'drink bottle' to drink from your gourd
+water bottle. But when the bottle is empty, you'll need to refill it. Here's
+how:
+ 1. Find the edge of a lake or river using 'scan lake' or 'scan river'. They
+    can usually be found on the newbie island, but you may have to move around
+    to find them. You don't need to enter the lake or river tile, just stand
+    next to it.
+ 2. You could also build a well. Type 'build info well' to see what you need
+    to make one. If you're using a well, stand on the same tile as the well.
+ 3. Type 'fill bottle' to fill it from the river, lake, or well.
+ 4. If you're having trouble completing this quest, it might be because your
+    bottle was already full. Try using 'pour bottle out' first.
+(You can type 'toggle tutorials' to stop seeing new tutorial quests.)
+~
+You've mastered scraping saplings to make poles.
+~
+6 h 0 15 -1
+A
+2 2112
+R
+0 0 1
+W+
+11 0 0 1 x
+Fill the gourd bottle~
+Z
+2 2112
+Z
+2 2136
 S
 #160
 Mining Tutorial~
@@ -187,11 +247,11 @@ A
 R
 0 0 1
 W
-2 160 0 1
+2 160 0 1 -
 W
-2 165 0 1
+2 165 0 1 -
 W
-2 166 0 1
+2 166 0 1 -
 Z
 2 160
 Z
@@ -216,7 +276,7 @@ A
 R
 0 0 1
 W
-2 175 0 1
+2 175 0 1 -
 Z
 2 175
 S
@@ -239,7 +299,7 @@ A
 R
 0 0 1
 W
-2 179 0 1
+2 179 0 1 -
 Z
 2 179
 S
@@ -259,7 +319,7 @@ R
 R
 6 919 919
 W
-2 181 0 1
+2 181 0 1 -
 Z
 2 181
 S
@@ -284,7 +344,7 @@ P
 R
 0 0 1
 W
-2 184 0 1
+2 184 0 1 -
 Z
 2 184
 S
@@ -310,7 +370,7 @@ P
 R
 0 0 1
 W
-2 184 0 1
+2 184 0 1 -
 Z
 2 184
 S
