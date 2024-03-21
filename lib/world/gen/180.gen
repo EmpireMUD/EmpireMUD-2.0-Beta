@@ -1,0 +1,66 @@
+#18000
+molten essence~
+5 0
+0 0 0 0
+T0
+molten essence~
+T1
+molten essence~
+S
+#18004
+fiend ability cooldown~
+3 0
+0 0 0 0
+S
+#18006
+physical ward~
+4 0
+0 0 0 0
+S
+#18007
+magical ward~
+4 0
+0 0 0 0
+S
+#18008
+resistance ward~
+4 0
+0 0 0 0
+S
+#18009
+knockdown~
+4 0
+0 0 0 0
+T0
+You stagger to your feet.~
+T1
+$n staggers to $s feet.~
+S
+#18010
+fiery glare~
+4 0
+0 0 0 0
+S
+#18012
+rising flames~
+4 0
+0 0 0 0
+S
+#18013
+fire wave~
+4 0
+0 0 0 0
+S
+#18014
+chain strike~
+4 0
+0 0 0 0
+T0
+You stagger to your feet.~
+S
+#18017
+claw grab~
+4 0
+0 0 0 0
+S
+$
