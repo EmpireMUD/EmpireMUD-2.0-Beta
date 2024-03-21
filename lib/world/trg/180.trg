@@ -382,14 +382,14 @@ switch %move%
       %echo% &&OA fire elemental bursts from the lava, leaping onto the platform!&&0
       set rep 1
     end
-    while %rep%<0
+    while %rep%>0
       %load% m 18077 ally %self.level%
       set ele %room.people%
       if %ele.vnum% == 18077
         remote diff %ele.id%
       end
       eval rep %rep%-1
-    end
+    done
   break
   case 2
     * Wave of Fire
