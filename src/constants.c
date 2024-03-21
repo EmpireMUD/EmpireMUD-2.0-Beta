@@ -3887,6 +3887,8 @@ const char *bld_relationship_types[] = {
 	"UPGRADES-TO-VEH",
 	"FORCE-UPGRADE-BLD",
 	"FORCE-UPGRADE-VEH",	// 5
+	"COUNTS-AS-BLD",
+	"COUNTS-AS-VEH",
 	"\n"
 };
 
@@ -3899,6 +3901,8 @@ const int bld_relationship_vnum_types[] = {
 	TYPE_VEH,	// UPGRADES-TO-VEH
 	TYPE_BLD,	// FORCE-UPGRADE-BLD
 	TYPE_VEH,	// 5, FORCE-UPGRADE-VEH
+	TYPE_BLD,	// COUNTS-AS-BLD
+	TYPE_VEH,	// COUNTS-AS-VEH
 };
 
 

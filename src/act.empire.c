@@ -3867,6 +3867,7 @@ ACMD(do_buildcheck) {
 	craft_data *craft, *next_craft;
 	empire_data *emp = GET_LOYALTY(ch);
 	vehicle_data *veh;
+	struct bld_relation *relat;
 	struct empire_territory_data *ter, *next_ter;
 	struct empire_vehicle_data *vter, *next_vter;
 	struct vnum_hash *bld_hash = NULL, *veh_hash = NULL;
@@ -3940,10 +3941,24 @@ ACMD(do_buildcheck) {
 	// next see what the empire has for vehicles
 	HASH_ITER(hh, EMPIRE_VEHICLE_LIST(emp), vter, next_vter) {
 		if (vter->veh && (!here || GET_ISLAND_ID(IN_ROOM(vter->veh)) == GET_ISLAND_ID(IN_ROOM(ch)))) {
+			// main vehicle check
 			if ((vh = find_in_vnum_hash(veh_hash, VEH_VNUM(vter->veh)))) {
 				// found one: delete from hash
 				HASH_DEL(veh_hash, vh);
 				free(vh);
+			}
+			// relation checks
+			LL_FOREACH(VEH_RELATIONS(vter->veh), relat) {
+				if (relat->type == BLD_REL_COUNTS_AS_BLD && (vh = find_in_vnum_hash(bld_hash, relat->vnum))) {
+					// found/delete building
+					HASH_DEL(bld_hash, vh);
+					free(vh);
+				}
+				else if (relat->type == BLD_REL_COUNTS_AS_VEH && (vh = find_in_vnum_hash(veh_hash, relat->vnum))) {
+					// found/delete vehicle
+					HASH_DEL(veh_hash, vh);
+					free(vh);
+				}
 			}
 		}
 	}
@@ -3951,10 +3966,24 @@ ACMD(do_buildcheck) {
 	// and buildings
 	HASH_ITER(hh, EMPIRE_TERRITORY_LIST(emp), ter, next_ter) {
 		if (ter->room && GET_BUILDING(ter->room) && (!here || GET_ISLAND_ID(ter->room) == GET_ISLAND_ID(IN_ROOM(ch)))) {
+			// main building check
 			if ((vh = find_in_vnum_hash(bld_hash, GET_BLD_VNUM(GET_BUILDING(ter->room))))) {
 				// found one: delete from hash
 				HASH_DEL(bld_hash, vh);
 				free(vh);
+			}
+			// relation checks
+			LL_FOREACH(GET_BLD_RELATIONS(GET_BUILDING(ter->room)), relat) {
+				if (relat->type == BLD_REL_COUNTS_AS_BLD && (vh = find_in_vnum_hash(bld_hash, relat->vnum))) {
+					// found/delete building
+					HASH_DEL(bld_hash, vh);
+					free(vh);
+				}
+				else if (relat->type == BLD_REL_COUNTS_AS_VEH && (vh = find_in_vnum_hash(veh_hash, relat->vnum))) {
+					// found/delete vehicle
+					HASH_DEL(veh_hash, vh);
+					free(vh);
+				}
 			}
 		}
 	}

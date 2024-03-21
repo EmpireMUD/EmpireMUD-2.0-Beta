@@ -1421,13 +1421,15 @@ void show_bld_relations_display(char_data *ch, struct bld_relation *list, bool s
 		switch (relat->type) {
 			case BLD_REL_UPGRADES_TO_VEH:
 			case BLD_REL_FORCE_UPGRADE_VEH:
-			case BLD_REL_STORES_LIKE_VEH: {
+			case BLD_REL_STORES_LIKE_VEH:
+			case BLD_REL_COUNTS_AS_VEH: {
 				build_page_display(ch, "%2d. %s: [%5d] %s", ++count, bld_relationship_types[relat->type], relat->vnum, get_vehicle_name_by_proto(relat->vnum));
 				break;
 			}
 			case BLD_REL_UPGRADES_TO_BLD:
 			case BLD_REL_FORCE_UPGRADE_BLD:
 			case BLD_REL_STORES_LIKE_BLD:
+			case BLD_REL_COUNTS_AS_BLD:
 			default: {
 				build_page_display(ch, "%2d. %s: [%5d] %s", ++count, bld_relationship_types[relat->type], relat->vnum, get_bld_name_by_proto(relat->vnum));
 				break;
