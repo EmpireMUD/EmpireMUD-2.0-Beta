@@ -1,0 +1,27 @@
+#18005
+fiend massive molten chained~
+the half-chained molten fiend~
+A massive molten fiend stands half-submerged in magma, one arm chained to the wall!~
+b 16 0 0 0 5
+0 0 -1 -1
+D
+   This towering, red-skinned demon has goat-like horns wreathed in flames atop
+its snarling visage. One of its massive, muscular arms is free, while the other
+remains chained to the rock wall. It looks really angry now, but it can't
+really reach you!
+~
+S
+#18006
+fiend massive molten unchained~
+the unchained molten fiend~
+A massive molten fiend stands half-submerged in magma, now free from its chains!~
+b 10 0 0 q 5
+0 0 -1 -1
+D
+   This towering, red-skinned demon has goat-like horns wreathed in flames atop
+its snarling visage. The broken ends of the chains swing uselessly from the
+dark iron shackles around its wrists, and it swings its man-sized, clawed hands
+with incandescent fury!
+~
+S
+$
