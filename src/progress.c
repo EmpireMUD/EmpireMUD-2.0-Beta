@@ -1425,7 +1425,11 @@ void et_gain_building(empire_data *emp, any_vnum vnum) {
 	
 	HASH_ITER(hh, EMPIRE_GOALS(emp), goal, next_goal) {
 		LL_FOREACH(goal->tracker, task) {
-			if (task->type == REQ_OWN_BUILDING && task->vnum == vnum) {
+			if (task->type == REQ_OWN_BUILDING && building_counts_as(bld, task->vnum, NOTHING)) {
+				++task->current;
+				TRIGGER_DELAYED_REFRESH(emp, DELAY_REFRESH_GOAL_COMPLETE);
+			}
+			else if (task->type == REQ_OWN_VEHICLE && building_counts_as(bld, NOTHING, task->vnum)) {
 				++task->current;
 				TRIGGER_DELAYED_REFRESH(emp, DELAY_REFRESH_GOAL_COMPLETE);
 			}
@@ -1492,7 +1496,11 @@ void et_gain_vehicle(empire_data *emp, vehicle_data *veh) {
 	
 	HASH_ITER(hh, EMPIRE_GOALS(emp), goal, next_goal) {
 		LL_FOREACH(goal->tracker, task) {
-			if (task->type == REQ_OWN_VEHICLE && task->vnum == VEH_VNUM(veh)) {
+			if (task->type == REQ_OWN_VEHICLE && vehicle_counts_as(veh, NOTHING, task->vnum)) {
+				++task->current;
+				TRIGGER_DELAYED_REFRESH(emp, DELAY_REFRESH_GOAL_COMPLETE);
+			}
+			else if (task->type == REQ_OWN_BUILDING && vehicle_counts_as(veh, task->vnum, NOTHING)) {
 				++task->current;
 				TRIGGER_DELAYED_REFRESH(emp, DELAY_REFRESH_GOAL_COMPLETE);
 			}
@@ -1622,10 +1630,14 @@ void et_lose_building(empire_data *emp, any_vnum vnum) {
 	
 	HASH_ITER(hh, EMPIRE_GOALS(emp), goal, next_goal) {
 		LL_FOREACH(goal->tracker, task) {
-			if (task->type == REQ_OWN_BUILDING && task->vnum == vnum) {
+			if (task->type == REQ_OWN_BUILDING && building_counts_as(bld, task->vnum, NOTHING)) {
 				--task->current;
 				
 				// check min
+				task->current = MAX(task->current, 0);
+			}
+			else if (task->type == REQ_OWN_VEHICLE && building_counts_as(bld, NOTHING, task->vnum)) {
+				--task->current;
 				task->current = MAX(task->current, 0);
 			}
 			else if (task->type == REQ_OWN_BUILDING_FUNCTION && (GET_BLD_FUNCTIONS(bld) & task->misc) == task->misc) {
@@ -1696,7 +1708,14 @@ void et_lose_vehicle(empire_data *emp, vehicle_data *veh) {
 	
 	HASH_ITER(hh, EMPIRE_GOALS(emp), goal, next_goal) {
 		LL_FOREACH(goal->tracker, task) {
-			if (task->type == REQ_OWN_VEHICLE && task->vnum == VEH_VNUM(veh)) {
+			if (task->type == REQ_OWN_VEHICLE && vehicle_counts_as(veh, NOTHING, task->vnum)) {
+				--task->current;
+				TRIGGER_DELAYED_REFRESH(emp, DELAY_REFRESH_GOAL_COMPLETE);
+				
+				// check min
+				task->current = MAX(task->current, 0);
+			}
+			else if (task->type == REQ_OWN_BUILDING && vehicle_counts_as(veh, task->vnum, NOTHING)) {
 				--task->current;
 				TRIGGER_DELAYED_REFRESH(emp, DELAY_REFRESH_GOAL_COMPLETE);
 				
