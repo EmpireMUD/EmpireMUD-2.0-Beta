@@ -2926,7 +2926,7 @@ int mana_gain(char_data *ch, bool info_only) {
 		gain += GET_MANA_REGEN(ch);
 		
 		if (HAS_BONUS_TRAIT(ch, BONUS_MANA_REGEN)) {
-			gain += 1 + (get_approximate_level(ch) / 20);
+			gain += 1 + (GET_HIGHEST_KNOWN_LEVEL(ch) / 20);
 		}
 		
 		if (GET_POS(ch) == POS_SLEEPING && !AFF_FLAGGED(ch, AFF_EARTHMELDED)) {
@@ -2973,7 +2973,7 @@ int move_gain(char_data *ch, bool info_only) {
 		gain += GET_MOVE_REGEN(ch);
 		
 		if (HAS_BONUS_TRAIT(ch, BONUS_MOVE_REGEN)) {
-			gain += 1 + (get_approximate_level(ch) / 20);
+			gain += 1 + (GET_HIGHEST_KNOWN_LEVEL(ch) / 20);
 		}
 		
 		if (GET_POS(ch) == POS_SLEEPING && !AFF_FLAGGED(ch, AFF_EARTHMELDED)) {

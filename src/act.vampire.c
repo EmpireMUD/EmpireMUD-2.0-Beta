@@ -232,7 +232,7 @@ int GET_MAX_BLOOD(char_data *ch) {
 
 		if (IS_VAMPIRE(ch)) {
 			if (HAS_BONUS_TRAIT(ch, BONUS_BLOOD)) {
-				base += config_get_int("pool_bonus_amount") * (1 + (get_approximate_level(ch) / 25));
+				base += config_get_int("pool_bonus_amount") * (1 + (GET_HIGHEST_KNOWN_LEVEL(ch) / 25));
 			}
 		}
 	}
