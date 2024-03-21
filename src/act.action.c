@@ -1912,11 +1912,11 @@ void process_music(char_data *ch) {
 	// instrument-to-room
 	if (obj_has_custom_message(obj, OBJ_CUSTOM_INSTRUMENT_TO_ROOM)) {
 		// find next message
-		if ((msg = get_custom_message_pos(GET_OBJ_CUSTOM_MSGS(obj), OBJ_CUSTOM_INSTRUMENT_TO_CHAR, GET_ACTION_VNUM(ch, 1)))) {
+		if ((msg = get_custom_message_pos(GET_OBJ_CUSTOM_MSGS(obj), OBJ_CUSTOM_INSTRUMENT_TO_ROOM, GET_ACTION_VNUM(ch, 1)))) {
 			GET_ACTION_VNUM(ch, 1) += 1;
 		}
 		else {
-			msg = get_custom_message_pos(GET_OBJ_CUSTOM_MSGS(obj), OBJ_CUSTOM_INSTRUMENT_TO_CHAR, 0);
+			msg = get_custom_message_pos(GET_OBJ_CUSTOM_MSGS(obj), OBJ_CUSTOM_INSTRUMENT_TO_ROOM, 0);
 			GET_ACTION_VNUM(ch, 1) = 1;
 		}
 		
