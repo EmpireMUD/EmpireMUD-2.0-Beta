@@ -1,50 +1,75 @@
-#18075
+#18000
 A Precarious Ledge~
    You descend into the fissure, following a rock ledge along one wall. You are
 immediately struck by the furnace-like heat rising from the magma below, and
-your ears are constantly assaulted by a deafening roar. If you drop anything
-here, it will probably be lost forever. Light shines from an opening in the
+your ears are constantly assaulted by a deafening roar. Anything thrown from
+the ledge will probably be lost forever. Light shines from an opening in the
 wall at the other end of the ledge.
    A stone plate lying nearby has words carved into it.
 ~
-c 0 0
+c 0 0 -1
 D14
 ~
 0 18076
 E
-plate stone~
-   The following words have been burned into the volcanic rock by some great,
-concentrated heat: "Return the relics of the fiend to the earth and receive
-their power for yourself."
+plate stone words~
+   It reads, 'Return the relics of the fiend to the earth, and receive their
+power for yourself.'
+   Use 'throw <item> lava' to throw an item into the fissure. Destroying the
+Fiend's gear in this way will award you 1 to 5 molten essence, based on the
+quality of the item you throw in. Type 'coins' to see your molten essence.
+   Use 'list' and 'buy' to create new Fiend gear using molten essence. These
+items will always be normal quality, but can be upgraded.
+   Use 'infuse <item>' to upgrade the Fiend's gear to a higher item quality and
+rescale it to your highest level (max 300). You must have killed the Fiend at
+least once on the corresponding difficulty level.
+
+Infusing items costs molten essence:
+   - 5 for Hard (from Normal difficulty)
+   - 5 for Group (from Hard)
+   - 10 for Boss (from Group)
+   - 2 essence to rescale a Boss item to your new highest level again
 ~
 E
-fissure magma down~
+fissure magma lava down off ledge~
    The almost unnatural heat radiating up from the magma at the bottom of the
 fissure looks like it could destroy anything but magic itself.
+(Use 'throw <item> lava' to throw an item off the ledge.)
 ~
 T 18075
 T 18082
-T 18084
-T 18085
 T 18086
+T 18010
+Z1 10
 S
 #18076
 The Fiend's Lair~
    You emerge on a narrow ledge in a large, domed cavern. Not far below is a
 huge, boiling lake of magma. Ahead of you, a narrow rock bridge slopes downward
 to a central pillar, barely elevated above the magma.
+   An infernal slab stands nearby, engraved with fiery runes.
 ~
-c 0 0
+c 0 0 -1
 D14
 ~
-0 18075
+0 18000
 E
 bridge rock narrow~
    The bridge is somewhat narrow but thick, formed from a black volcanic stone.
 It will not collapse under the weight of a few adventures, and as long as
 you're careful you should be able to stay on it.
 ~
+E
+infernal slab fiery runes~
+   The large, rough slab of black stone sits at one edge of the central pillar.
+Demonic runes carved into its surface glow with a fiery orange light. As you
+scan the lines, their intonation echoes unbidden in your mind. You sense that
+this is the fiend's true name, and could strengthen or weaken it if recited in
+its presence.
+Usage: difficulty <normal | hard | group | boss>
+~
 M 0 18075 100.00 1
 T 18086
+Z1 13
 S
 $
