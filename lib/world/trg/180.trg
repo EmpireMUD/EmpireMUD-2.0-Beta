@@ -129,6 +129,10 @@ end
 Molten Fiend: change phases (hit percent)~
 0 l 100
 ~
+* Attach the heal-and-reset trigger
+if !%self.has_trigger(18007)%
+  attach 18007 %self.id%
+end
 eval health_perc 100 * %self.health% / %self.maxhealth%
 set phase %self.var(phase, 1)%
 * probably add an 'or' condition here for the power charge affect
@@ -622,11 +626,6 @@ Molten Fiend out-of-combat reset~
 if %self.fighting%
   halt
 end
-set active_phase %self.var(phase, 1)%
-if %self.health% == %self.maxhealth% && !%self.affect(18006)% && !%self.affect(18007)% && !%self.affect(18008)% && %active_phase% == 1
-  * No need to reset
-  halt
-end
 if %active_phase% > 1
   %echo% With a blinding flash of light, the chains restraining ~%self% are restored!
 end
@@ -638,6 +637,8 @@ dg_affect #18008 %self% off
 %restore% %self%
 * Purge remaining fire elementals
 %purge% instance mob 18077 $n vanishes in a flash of flames.
+* Detach self (Will reattach from hitpercent trigger when fighting resumes)
+detach 18007 %self.id%
 ~
 #18008
 Molten Fiend: new fight main controller~
