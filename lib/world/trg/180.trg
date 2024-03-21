@@ -144,10 +144,6 @@ if !%lastphase%
   remote lastphase %self.id%
 end
 if %phase% > 1
-  * Attach reset trigger
-  if !%self.has_trigger(18007)%
-    attach 18007 %self.id%
-  end
   * Messaging and morphs
   if %lastphase% != %phase%
     switch %phase%
@@ -623,19 +619,25 @@ done
 Molten Fiend out-of-combat reset~
 0 ab 100
 ~
-if !%self.fighting%
-  %echo% With a blinding flash of light, the chains restraining ~%self% are restored!
-  %echo% |%self% wounds are healed!
-  attach 18004 %self.id%
-  detach 18005 %self.id%
-  detach 18006 %self.id%
-  dg_affect #18006 %self% off
-  dg_affect #18007 %self% off
-  dg_affect #18008 %self% off
-  %morph% %self% normal
-  %restore% %self%
+if %self.fighting%
+  halt
 end
-* todo need to purge remaining fire elementals as well
+set active_phase %self.var(phase, 1)%
+if %self.health% == %self.maxhealth% && !%self.affect(18006)% && !%self.affect(18007)% && !%self.affect(18008)% && %active_phase% == 1
+  * No need to reset
+  halt
+end
+if %active_phase% > 1
+  %echo% With a blinding flash of light, the chains restraining ~%self% are restored!
+end
+%echo% |%self% wounds are healed!
+dg_affect #18006 %self% off
+dg_affect #18007 %self% off
+dg_affect #18008 %self% off
+%morph% %self% normal
+%restore% %self%
+* Purge remaining fire elementals
+%purge% instance mob 18077 $n vanishes in a flash of flames.
 ~
 #18008
 Molten Fiend: new fight main controller~
