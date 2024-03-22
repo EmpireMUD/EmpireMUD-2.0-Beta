@@ -7095,7 +7095,7 @@ ACMD(do_list) {
 	char line[MAX_STRING_LENGTH], rep[256], tmp[256], matching[MAX_INPUT_LENGTH], vstr[128], drinkstr[128], *ptr;
 	struct shop_temp_list *stl, *shop_list = NULL;
 	struct shop_item *item;
-	bool any, any_cur, this;
+	bool any, any_cur, this, first = TRUE;
 	obj_data *obj;
 	any_vnum vnum;
 	bool ok, id, all, found_id = FALSE;
@@ -7200,19 +7200,21 @@ ACMD(do_list) {
 				// create line
 				if (stl->from_mob) {
 					strcpy(tmp, PERS(stl->from_mob, ch, FALSE));
-					build_page_display(ch, "%s%s%s%s sells%s:", (*buf ? "\r\n" : ""), vstr, CAP(tmp), rep, matching);
+					build_page_display(ch, "%s%s%s%s sells%s:", (!first ? "\r\n" : ""), vstr, CAP(tmp), rep, matching);
 				}
 				else if (stl->from_obj) {
 					strcpy(tmp, GET_OBJ_SHORT_DESC(stl->from_obj));
-					build_page_display(ch, "%s%s%s%s sells%s:", (*buf ? "\r\n" : ""), vstr, CAP(tmp), rep, matching);
+					build_page_display(ch, "%s%s%s%s sells%s:", (!first ? "\r\n" : ""), vstr, CAP(tmp), rep, matching);
 				}
 				else if (stl->from_veh) {
 					strcpy(tmp, get_vehicle_short_desc(stl->from_veh, ch));
-					build_page_display(ch, "%s%s%s%s sells%s:", (*buf ? "\r\n" : ""), vstr, CAP(tmp), rep, matching);
+					build_page_display(ch, "%s%s%s%s sells%s:", (!first ? "\r\n" : ""), vstr, CAP(tmp), rep, matching);
 				}
 				else {
-					build_page_display(ch, "%s%sYou can %sbuy%s%s:", (*buf ? "\r\n" : ""), vstr, (*buf ? "also " : ""), rep, matching);
+					build_page_display(ch, "%s%sYou can %sbuy%s%s:", (!first ? "\r\n" : ""), vstr, (!first ? "also " : ""), rep, matching);
 				}
+				
+				first = FALSE;
 			}
 			
 			if (SHOP_ALLEGIANCE(stl->shop) && item->min_rep != REP_NONE) {
