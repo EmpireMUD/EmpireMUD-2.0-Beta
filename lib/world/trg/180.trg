@@ -395,7 +395,7 @@ switch %move%
     * Wave of Fire
     * Launch multiple waves of fire at the group
     * Each player: Dodge or damage + dot
-    %echo% &&O&&Z~%self% draws back a hand, curling it into a fist...&&0
+    %echo% &&O&&Z~%self% lifts up a hand, curling it into a fist...&&0
     wait 3 s
     %echo% &&OThe lava below the platform starts to churn and roil!&&0
     set i 1
