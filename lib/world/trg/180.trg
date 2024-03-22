@@ -595,7 +595,7 @@ switch %move%
     %send% %targ% &&O**** &&Z~%self% grabs you with its enormous clawed hand! ****&&0 (struggle)
     %echoaround% %targ% &&O&&Z~%self% grabs ~%targ% with its clawed hand!&&0
     scfight setup struggle %targ% 20
-    if %person.affect(9602)%
+    if %targ.affect(9602)%
       set scf_strug_char You struggle against the fiend's claws...
       set scf_strug_room ~%%targ%% struggles against the fiend's claws...
       set scf_free_char You slip out of the fiend's grip!
