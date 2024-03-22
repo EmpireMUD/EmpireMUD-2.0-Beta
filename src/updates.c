@@ -4280,6 +4280,43 @@ PLAYER_UPDATE_FUNC(b5_183_water_bottle_update_plr) {
 }
 
 
+// b5.183 replaces the Molten Fiend adventure.
+void b5_183_molten_fiend_update(void) {
+	bool needs_save = FALSE;
+	adv_data *old_adv, *new_adv;
+	struct instance_data *inst, *next_inst;
+	
+	const adv_vnum OLD_FIEND = 281;
+	const adv_vnum NEW_FIEND = 18000;
+	
+	// first, detect data and transfer it (for empiremuds where it changed)
+	old_adv = adventure_proto(OLD_FIEND);
+	new_adv = adventure_proto(NEW_FIEND);
+	if (new_adv) {
+		if (!old_adv || ADVENTURE_FLAGGED(old_adv, ADV_IN_DEVELOPMENT)) {
+			log("- Adding IN-DEV flag to 18000 Molten Fiend");
+			SET_BIT(GET_ADV_FLAGS(new_adv), ADV_IN_DEVELOPMENT);
+			needs_save = TRUE;
+		}
+		if (old_adv && GET_ADV_MAX_INSTANCES(new_adv) != GET_ADV_MAX_INSTANCES(old_adv)) {
+			log("- Updating instance limit to %d on 18000 Molten Fiend", GET_ADV_MAX_INSTANCES(old_adv));
+			GET_ADV_MAX_INSTANCES(new_adv) = GET_ADV_MAX_INSTANCES(old_adv);
+			needs_save = TRUE;
+		}
+		if (needs_save) {
+			save_library_file_for_vnum(DB_BOOT_ADV, NEW_FIEND);
+		}
+	}
+	
+	// now despawn old instances
+	DL_FOREACH_SAFE(instance_list, inst, next_inst) {
+		if (!INST_ADVENTURE(inst) || GET_ADV_VNUM(INST_ADVENTURE(inst)) == OLD_FIEND) {
+			delete_instance(inst, TRUE);
+		}
+	}
+}
+
+
 // ADD HERE, above: more beta 5 update functions
 
 
@@ -4395,6 +4432,7 @@ const struct {
 	{ "b5.181", b5_181_repair_extra_data, NULL, "Looking for bad world data and repairing oceans" },
 	{ "b5.182", b5_182_empire_update, NULL, "Updating empire admin flags (HELP EEDIT ADMIN FLAGS)..." },
 	{ "b5.183", b5_183_water_bottle_update, b5_183_water_bottle_update_plr, "Applying new triggers to water bottles" },
+	{ "b5.183a", b5_183_molten_fiend_update, NULL, "Updating Molten Fiend adventure from 281 to 18000" },
 	
 	// ADD HERE, above: more beta 5 update lines
 	
