@@ -89,16 +89,16 @@ end
 wait 1
 switch %diff%
   case 1
-    %echo% &&O&&Z~%self% stirs, ^%self% fiery eyes flickering with anger as you approach.&&0
+    %echo% &&O&&Z~%self% stirs, its fiery eyes flickering with anger as you approach.&&0
   break
   case 2
-    %echo% &&O&&Z~%self% shifts, chains straining, fiery eyes burning with fury, the flames around ^%self% horns flaring brightly.&&0
+    %echo% &&O&&Z~%self% shifts, chains straining, fiery eyes burning with fury, the flames around its horns flaring brightly.&&0
   break
   case 3
-    %echo% &&O&&Z~%self% roars thunderously, shaking the fissure as magma ripples around ^%self% chains and searing heat blisters your skin!&&0
+    %echo% &&O&&Z~%self% roars thunderously, shaking the fissure as magma ripples around its chains and searing heat blisters your skin!&&0
   break
   case 4
-    %echo% &&O&&Z|%self% overwhelming presence snarls with pure malevolence, ^%self% blazing eyes locked on you, chains groaning in protest against ^%self% undeniable power!&&0
+    %echo% &&O&&Z|%self% overwhelming presence snarls with pure malevolence, its blazing eyes locked on you, chains groaning in protest against its undeniable power!&&0
   break
 done
 ~
@@ -203,6 +203,7 @@ set moves_left %moves_left% %old%
 eval num_left %num_left% - 1
 remote moves_left %self.id%
 remote num_left %self.id%
+eval delay 9 - %diff%
 switch %move%
   case 1
     * Channel Ward
@@ -228,12 +229,12 @@ switch %move%
     %echo% &&OA fiery sigil appears above |%self% forehead...&&0
     %echo% &&O**** &&Z~%self% starts channeling a %ability% ward! ****&&0 (interrupt)
     set needed 1
-    if %diff%>2
+    if %diff%>2 && %room.players_present%>1
       set needed 2
     end
     scfight clear interrupt
     scfight setup interrupt all
-    wait 5 s
+    wait %delay% s
     if %self.count_scfinterrupt% >= %needed%
       set ch %room.people%
       while %ch%
@@ -268,13 +269,12 @@ switch %move%
     * Thrash
     * Bring down rocks from the ceiling
     * Each player: Dodge or damage + stun (just damage on normal)
-    %echo% &&O&&Z~%self% thrashes and roars, straining against ^%self% chains!&&0
+    %echo% &&O&&Z~%self% thrashes and roars, straining against its chains!&&0
     wait 3 s
     %echo% &&O**** The ground shakes and rocks start to fall from the ceiling! ****&&0 (dodge)
-    set needed 1
     scfight clear dodge
     scfight setup dodge all
-    wait 5 s
+    wait %delay% s
     set ch %room.people%
     while %ch%
       set next_ch %ch.next_in_room%
@@ -287,8 +287,10 @@ switch %move%
             %damage% %ch% 150
           else
             %echo% &&OA large falling rock crashes into ~%ch%, knocking *%ch% flat!&&0
+            if (%self.level% + 100) > %ch.level% && !%ch.aff_flagged(!STUN)%
+              dg_affect #18009 %ch% STUNNED on 10
+            end
             %damage% %ch% 300
-            dg_affect #18009 %ch% STUNNED on 10
           end
         end
       end
@@ -311,12 +313,12 @@ switch %move%
     %send% %tank% &&O**** You feel an intense pressure from |%self% glare! ****&&0 (interrupt)
     %echoaround% %tank% &&O**** ~%tank% starts to smoulder slightly! ****&&0 (interrupt)
     set needed 1
-    if %diff%>2
+    if %diff%>2 && %room.players_present%>1
       set needed 2
     end
     scfight clear interrupt
     scfight setup interrupt all
-    wait 5 s
+    wait %delay% s
     if %verify% != %tank.id% || %self.room% != %tank.room%
       %echo% &&O&&Z~%self% blinks, losing the target of its glare.&&0
     elseif %self.count_scfinterrupt% >= %needed%
@@ -366,6 +368,7 @@ set moves_left %moves_left% %old%
 eval num_left %num_left% - 1
 remote moves_left %self.id%
 remote num_left %self.id%
+eval delay 9 - %diff%
 switch %move%
   case 1
     * Summon Fire Elemental
@@ -396,7 +399,7 @@ switch %move%
     wait 3 s
     %echo% &&OThe lava below the platform starts to churn and roil!&&0
     set i 1
-    set loops 3
+    eval loops %diff% + 1
     while %i%<=%loops%
       if %i%==1
         %echo% &&O**** A wave of molten rock and fire sweeps toward you! ****&&0 (dodge)
@@ -405,7 +408,7 @@ switch %move%
       end
       scfight clear dodge
       scfight setup dodge all
-      wait 5 s
+      wait %delay% s
       %echo% &&OA wave of fire rolls over the platform!&&0
       set ch %room.people%
       while %ch%
@@ -432,17 +435,17 @@ switch %move%
       done
       scfight clear dodge
       eval i %i%+1
-      wait 3 s
+      wait %delay% s
     done
   break
   case 3
     * Chain Strike
     * Tries to trip the group with the broken end of its chains (dodge or stun)
     * Almost no warning but relatively light punishment
-    %echo% &&O**** &&Z~%self% suddenly whips the broken end of ^%self% chains at you! ****&&0 (dodge)
+    %echo% &&O**** &&Z~%self% suddenly whips the broken end of its chains at you! ****&&0 (dodge)
     scfight clear dodge
     scfight setup dodge all
-    wait 3 s
+    wait %delay% s
     set ch %room.people%
     while %ch%
       set next_ch %ch.next_in_room%
@@ -459,13 +462,17 @@ switch %move%
           if %diff% <= 2
             %send% %ch% &&OYou're tripped by the end of the swinging chain!&&0
             %echoaround% %ch% &&O&&Z~%ch% is tripped by the end of the swinging chain!&&0
+            if (%self.level% + 100) > %ch.level% && !%ch.aff_flagged(!STUN)%
+              dg_affect #18014 %ch% STUNNED on 5
+            end
             %damage% %ch% 50 physical
-            dg_affect #18014 %ch% STUNNED on 5
           else
             %send% %ch% &&OYou are struck and sent flying by the end of the swinging chain!&&0
             %echoaround% %ch% &&O&&Z~%ch% is struck and sent flying by the end of the swinging chain!&&0
+            if (%self.level% + 100) > %ch.level% && !%ch.aff_flagged(!STUN)%
+              dg_affect #18014 %ch% STUNNED on 10
+            end
             %damage% %ch% 100 physical
-            dg_affect #18014 %ch% STUNNED on 10
           end
         end
       end
@@ -515,35 +522,36 @@ set targ %self.fighting%
 if !%targ%
   halt
 end
+eval delay 9 - %diff%
 switch %move%
   case 1
     * Molten Punch
     set targ_id %targ.id%
     %send% %targ% &&O**** &&Z|%self% fist turns to molten lava as &%self% takes aim at you... ****&&0 (dodge)
     %echoaround% %targ% &&O&&Z|%self% fist turns to molten lava as &%self% takes aim at ~%targ%...&&0
-    set cycle 0
-    while %cycle% < 5
+    set cycle %diff% + 1
+    while %cycle% > 0
       scfight clear dodge
       scfight setup dodge %targ%
-      wait 5 s
+      wait %delay% s
       if %targ.id% != %targ_id% || %targ.room% != %self.room%
         * gone
         halt
       end
       if !%targ.var(did_scfdodge,0)%
-        %echo% &&O&&Z~%self% punches ^%self% molten fist into |%targ% chest!&&0
+        %echo% &&O&&Z~%self% punches its molten fist into |%targ% chest!&&0
         %damage% %targ% %pain% fire
       else
         %send% %targ% &&OYou narrowly dodge |%self% fist!&&0
       end
-      if %cycle% < 5
-        %send% %targ% &&O**** &&Z~%self% pulls ^%self% fist back for another punch! ****&&0 (dodge)
+      if %cycle% > 1
+        %send% %targ% &&O**** &&Z~%self% pulls its fist back for another punch! ****&&0 (dodge)
       elseif !%targ.var(did_scfdodge,0)%
         * missed the last one
         %echo% &&OThat final punch sends a wave of molten lava across the lair!&&0
         %aoe% 100 fire
       end
-      eval cycle %cycle% + 1
+      eval cycle %cycle% - 1
     done
     scfight clear dodge
   break
@@ -552,24 +560,24 @@ switch %move%
     * 1/1/2/2 successful interrupts needed on EACH cycle
     %echo% &&O**** &&Z~%self% creates a burning orb that simmers and pulses.... ****&&0 (interrupt)
     set needed 1
-    if %diff%>2
+    if %diff% > 2 && %room.players_present% > 1
       set needed 2
     end
-    set cycle 0
+    set cycle %diff% + 1
     set fails 0
-    while %cycle% < 5
+    while %cycle% > 0
       scfight clear interrupt
       scfight setup interrupt all
-      wait 5 s
+      wait %delay% s
       if %self.count_scfinterrupt% < %needed%
         %echo% &&OYou shout in agony as a fiery pulse from the burning orb sears through you!&&0
         %aoe% %pain% fire
         eval fails %fails% + 1
       end
-      if %cycle% < 4
+      if %cycle% > 1
         %echo% &&O**** Fiery mana streams from ~%self% to the burning orb.... ****&&0 (interrupt)
       end
-      eval cycle %cycle% + 1
+      eval cycle %cycle% - 1
     done
     if %fails% > 0
       eval pain %diff% * %fails% * 50
@@ -584,8 +592,8 @@ switch %move%
     * Claw Grab
     scfight clear struggle
     set targ_id %targ.id%
-    %send% %targ% &&O**** &&Z~%self% grabs you with ^%self% enormous clawed hand! ****&&0 (struggle)
-    %echoaround% %targ% &&O&&Z~%self% grabs ~%targ% with ^%self% clawed hand!&&0
+    %send% %targ% &&O**** &&Z~%self% grabs you with its enormous clawed hand! ****&&0 (struggle)
+    %echoaround% %targ% &&O&&Z~%self% grabs ~%targ% with its clawed hand!&&0
     scfight setup struggle %targ% 20
     if %person.affect(9602)%
       set scf_strug_char You struggle against the fiend's claws...
@@ -601,9 +609,9 @@ switch %move%
       dg_affect #18017 %self% HARD-STUNNED on 20
     end
     * ticks
-    set cycle 0
-    while %cycle% < 5
-      wait 4 s
+    set cycle %diff% + 1
+    while %cycle% > 0
+      wait %delay% s
       if %targ.id% != %targ_id% || %targ.room% != %self.room%
         * gone
         dg_affect #18017 %self% off
@@ -612,9 +620,9 @@ switch %move%
         * got free
         dg_affect #18017 %self% off
         halt
-      elseif %cycle% < 4
-        %send% %targ% &&O**** You shout in agony as ~%self% clenches ^%self% claws into you! ****&&0 (struggle)
-        %echoaround% %targ% &&O&&Z~%self% clenches ^%self% claws into ~%targ%!&&0
+      elseif %cycle% > 1
+        %send% %targ% &&O**** You shout in agony as ~%self% clenches its claws into you! ****&&0 (struggle)
+        %echoaround% %targ% &&O&&Z~%self% clenches its claws into ~%targ%!&&0
         %damage% %targ% %pain% physical
       else
         * final cycle and they didn't get free
@@ -626,7 +634,7 @@ switch %move%
           %slay% %targ% &&Z%targ.real_name% has been thrown into the lava at %self.room.coords%!
         end
       end
-      eval cycle %cycle% + 1
+      eval cycle %cycle% - 1
     done
     scfight clear struggle
     dg_affect #18017 %self% off
@@ -1169,7 +1177,7 @@ Fiend Immunities~
 if !(%abilityname%==disarm)
   halt
 end
-%send% %actor% You cannot disarm ~%self% - ^%self% magic is innate!
+%send% %actor% You cannot disarm ~%self% - its magic is innate!
 return 0
 ~
 #18081

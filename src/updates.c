@@ -4197,18 +4197,18 @@ void b5_182_empire_update(void) {
 }
 
 
-// b5.183 adds a new trigger to water bottles
-void b5_183_water_bottle_update(void) {
+// b5.183 adds a new trigger to water bottles and molten essence
+void b5_183_trigger_update(void) {
 	struct empire_unique_storage *eus;
 	struct trading_post_data *tpd;
 	empire_data *emp, *next_emp;
 	obj_data *obj, *objpr;
 	
-	const obj_vnum BOTTLE_1 = 2112, BOTTLE_2 = 2136;
+	const obj_vnum vnum_list[] = { 2112, 2136, 18097, NOTHING };
 	
 	log(" - assigning triggers to object list...");
 	DL_FOREACH(object_list, obj) {
-		if ((GET_OBJ_VNUM(obj) == BOTTLE_1 || GET_OBJ_VNUM(obj) == BOTTLE_2) && (objpr = obj_proto(GET_OBJ_VNUM(obj)))) {
+		if (search_block_int(GET_OBJ_VNUM(obj), vnum_list) != NOTHING && (objpr = obj_proto(GET_OBJ_VNUM(obj)))) {
 			free_proto_scripts(&obj->proto_script);
 			obj->proto_script = copy_trig_protos(objpr->proto_script);
 			assign_triggers(obj, OBJ_TRIGGER);
@@ -4218,7 +4218,7 @@ void b5_183_water_bottle_update(void) {
 	log(" - assigning triggers to warehouse objects...");
 	HASH_ITER(hh, empire_table, emp, next_emp) {
 		DL_FOREACH(EMPIRE_UNIQUE_STORAGE(emp), eus) {
-			if ((obj = eus->obj) && (GET_OBJ_VNUM(obj) == BOTTLE_1 || GET_OBJ_VNUM(obj) == BOTTLE_2) && (objpr = obj_proto(GET_OBJ_VNUM(obj)))) {
+			if ((obj = eus->obj) && search_block_int(GET_OBJ_VNUM(obj), vnum_list) != NOTHING && (objpr = obj_proto(GET_OBJ_VNUM(obj)))) {
 				free_proto_scripts(&obj->proto_script);
 				obj->proto_script = copy_trig_protos(objpr->proto_script);
 				assign_triggers(obj, OBJ_TRIGGER);
@@ -4228,7 +4228,7 @@ void b5_183_water_bottle_update(void) {
 
 	log(" - assigning triggers to trading post objects...");
 	DL_FOREACH(trading_list, tpd) {
-		if ((obj = tpd->obj) && (GET_OBJ_VNUM(obj) == BOTTLE_1 || GET_OBJ_VNUM(obj) == BOTTLE_2) && (objpr = obj_proto(GET_OBJ_VNUM(obj)))) {
+		if ((obj = tpd->obj) && search_block_int(GET_OBJ_VNUM(obj), vnum_list) != NOTHING && (objpr = obj_proto(GET_OBJ_VNUM(obj)))) {
 			free_proto_scripts(&obj->proto_script);
 			obj->proto_script = copy_trig_protos(objpr->proto_script);
 			assign_triggers(obj, OBJ_TRIGGER);
@@ -4241,19 +4241,19 @@ void b5_183_water_bottle_update(void) {
 }
 
 
-// b5.183 adds a new trigger to water bottle
-PLAYER_UPDATE_FUNC(b5_183_water_bottle_update_plr) {
+// b5.183 adds a new trigger to water bottles and molten essences
+PLAYER_UPDATE_FUNC(b5_183_trigger_update_plr) {
 	int pos;
 	obj_data *obj, *objpr;
 	struct empire_unique_storage *eus;
 	
-	const obj_vnum BOTTLE_1 = 2112, BOTTLE_2 = 2136;
+	const obj_vnum vnum_list[] = { 2112, 2136, 18097, NOTHING };
 	
 	check_delayed_load(ch);
 	
 	// equipment
 	for (pos = 0; pos < NUM_WEARS; ++pos) {
-		if ((obj = GET_EQ(ch, pos)) && (GET_OBJ_VNUM(obj) == BOTTLE_1 || GET_OBJ_VNUM(obj) == BOTTLE_2) && (objpr = obj_proto(GET_OBJ_VNUM(obj)))) {
+		if ((obj = GET_EQ(ch, pos)) && search_block_int(GET_OBJ_VNUM(obj), vnum_list) != NOTHING && (objpr = obj_proto(GET_OBJ_VNUM(obj)))) {
 			free_proto_scripts(&obj->proto_script);
 			obj->proto_script = copy_trig_protos(objpr->proto_script);
 			assign_triggers(obj, OBJ_TRIGGER);
@@ -4262,7 +4262,7 @@ PLAYER_UPDATE_FUNC(b5_183_water_bottle_update_plr) {
 	
 	// inventory
 	DL_FOREACH2(ch->carrying, obj, next_content) {
-		if ((GET_OBJ_VNUM(obj) == BOTTLE_1 || GET_OBJ_VNUM(obj) == BOTTLE_2) && (objpr = obj_proto(GET_OBJ_VNUM(obj)))) {
+		if (search_block_int(GET_OBJ_VNUM(obj), vnum_list) != NOTHING && (objpr = obj_proto(GET_OBJ_VNUM(obj)))) {
 			free_proto_scripts(&obj->proto_script);
 			obj->proto_script = copy_trig_protos(objpr->proto_script);
 			assign_triggers(obj, OBJ_TRIGGER);
@@ -4271,7 +4271,7 @@ PLAYER_UPDATE_FUNC(b5_183_water_bottle_update_plr) {
 	
 	// home items
 	DL_FOREACH(GET_HOME_STORAGE(ch), eus) {
-		if ((obj = eus->obj) && (GET_OBJ_VNUM(obj) == BOTTLE_1 || GET_OBJ_VNUM(obj) == BOTTLE_2) && (objpr = obj_proto(GET_OBJ_VNUM(obj)))) {
+		if ((obj = eus->obj) && search_block_int(GET_OBJ_VNUM(obj), vnum_list) != NOTHING && (objpr = obj_proto(GET_OBJ_VNUM(obj)))) {
 			free_proto_scripts(&obj->proto_script);
 			obj->proto_script = copy_trig_protos(objpr->proto_script);
 			assign_triggers(obj, OBJ_TRIGGER);
@@ -4431,7 +4431,7 @@ const struct {
 	{ "b5.176", NULL, b5_176_affect_fix, "Checking for players with bad affect times" },
 	{ "b5.181", b5_181_repair_extra_data, NULL, "Looking for bad world data and repairing oceans" },
 	{ "b5.182", b5_182_empire_update, NULL, "Updating empire admin flags (HELP EEDIT ADMIN FLAGS)..." },
-	{ "b5.183", b5_183_water_bottle_update, b5_183_water_bottle_update_plr, "Applying new triggers to water bottles" },
+	{ "b5.183", b5_183_trigger_update, b5_183_trigger_update_plr, "Applying new triggers to water bottles and molten essence" },
 	{ "b5.183a", b5_183_molten_fiend_update, NULL, "Updating Molten Fiend adventure from 281 to 18000" },
 	
 	// ADD HERE, above: more beta 5 update lines

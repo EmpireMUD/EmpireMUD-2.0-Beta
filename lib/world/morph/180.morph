@@ -2,7 +2,7 @@
 fiend massive molten chained~
 the half-chained molten fiend~
 A massive molten fiend stands half-submerged in magma, one arm chained to the wall!~
-b 16 0 0 0 5
+bn 16 0 0 0 5
 0 0 -1 -1
 D
    This towering, red-skinned demon has goat-like horns wreathed in flames atop
@@ -15,7 +15,7 @@ S
 fiend massive molten unchained~
 the unchained molten fiend~
 A massive molten fiend stands half-submerged in magma, now free from its chains!~
-b 10 0 0 q 5
+bn 10 0 0 q 5
 0 0 -1 -1
 D
    This towering, red-skinned demon has goat-like horns wreathed in flames atop
