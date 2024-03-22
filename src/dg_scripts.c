@@ -8689,10 +8689,17 @@ struct cmdlist_element *find_done(struct cmdlist_element *cl) {
 	for (c = cl->next; c && c->next; c = c->next) {
 		for (p = c->cmd; *p && isspace(*p); p++);
 
-		if (!strn_cmp("while ", p, 6) || !strn_cmp("switch ", p, 7))
+		if (!strn_cmp("while ", p, 6) || !strn_cmp("switch ", p, 7)) {
 			c = find_done(c);
-		else if (!strn_cmp("done", p, 3))
+		}
+		else if (!strn_cmp("done", p, 3)) {
 			return c;
+		}
+		
+		if (!c || !c->next) {
+			script_log("find_done reached an error without finding done.");
+			return NULL;
+		}
 	}
 
 	return c;
