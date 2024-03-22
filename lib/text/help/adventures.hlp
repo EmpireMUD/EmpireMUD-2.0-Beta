@@ -528,14 +528,27 @@ to speed it up with magic.
 
 See also: ADVENTURE
 #
-"MOUNTAIN VALLEY: MOLTEN FIEND" "MOUNTAIN VALLEY MOLTEN FIEND" "MOLTEN FIEND"
+"MOLTEN FIEND" "MOUNTAIN VALLEY: MOLTEN FIEND" "MOUNTAIN VALLEY MOLTEN FIEND"
 
-Mountain Valley: Molten Fiend (level 200-250 adventure)
+Molten Fiend (level 200-300 adventure)
 
 A powerful demon, buried beneath the earth in ages past, is trying to break
 free, and its struggles have opened this molten crevice in the mountains!
 Bring a capable party with you, for the demon's lengthy imprisonment has only
 fueled the fires of its rage!
+
+This adventure has a difficulty selector that lets you choose how hard it will
+be -- and how good the gear will be.
+
+If you don't get the items you want from the fiend, you can throw them off the
+precipice into the lava to convert them to molten essence, which can then be
+converted back into the gear item of your choice. You can then spend more
+molten essence to infuse it up to level 300 and raise its quality. However, you
+cannot raise it to a higher difficulty level than the highest molten fiend
+you've defeated.
+
+The 'list', 'buy', and 'infuse' commands only work at the Precarious Ledge in
+the fiend's fissure.
 
 See also: ADVENTURE
 #
