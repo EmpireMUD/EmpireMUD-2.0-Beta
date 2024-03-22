@@ -8667,6 +8667,7 @@ struct cmdlist_element *find_case(trig_data *trig, struct cmdlist_element *cl, v
 		
 		if (!c || !c->next) {
 			script_log("Trigger: %s, VNum %d, find_case reached an error without finding case or done.", GET_TRIG_NAME(trig), GET_TRIG_VNUM(trig));
+			return NULL;
 		}
 	}
 	return c;
