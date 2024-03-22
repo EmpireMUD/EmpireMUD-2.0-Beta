@@ -66,13 +66,15 @@ bool audit_adventure(adv_data *adv, char_data *ch, bool only_one) {
 	else {
 		// check overlapping vnums
 		HASH_ITER(hh, adventure_table, adv_iter, next_adv) {
-			if ((GET_ADV_START_VNUM(adv_iter) >= GET_ADV_START_VNUM(adv) && GET_ADV_START_VNUM(adv_iter) <= GET_ADV_END_VNUM(adv)) || (GET_ADV_END_VNUM(adv_iter) >= GET_ADV_START_VNUM(adv) && GET_ADV_END_VNUM(adv_iter) <= GET_ADV_END_VNUM(adv))) {
-				olc_audit_msg(ch, GET_ADV_VNUM(adv), "Adventure %d %s is entirely within its vnum range", GET_ADV_VNUM(adv_iter), GET_ADV_NAME(adv_iter));
-				problem = TRUE;
-			}
-			else if ((GET_ADV_START_VNUM(adv) >= GET_ADV_START_VNUM(adv_iter) && GET_ADV_START_VNUM(adv) <= GET_ADV_END_VNUM(adv_iter)) || (GET_ADV_END_VNUM(adv) >= GET_ADV_START_VNUM(adv_iter) && GET_ADV_END_VNUM(adv) <= GET_ADV_END_VNUM(adv_iter))) {
-				olc_audit_msg(ch, GET_ADV_VNUM(adv), "Entirely with the vnum range of adventure %d %s", GET_ADV_VNUM(adv_iter), GET_ADV_NAME(adv_iter));
-				problem = TRUE;
+			if (adv_iter != adv) {
+				if ((GET_ADV_START_VNUM(adv_iter) >= GET_ADV_START_VNUM(adv) && GET_ADV_START_VNUM(adv_iter) <= GET_ADV_END_VNUM(adv)) || (GET_ADV_END_VNUM(adv_iter) >= GET_ADV_START_VNUM(adv) && GET_ADV_END_VNUM(adv_iter) <= GET_ADV_END_VNUM(adv))) {
+					olc_audit_msg(ch, GET_ADV_VNUM(adv), "Adventure %d %s is entirely within its vnum range", GET_ADV_VNUM(adv_iter), GET_ADV_NAME(adv_iter));
+					problem = TRUE;
+				}
+				else if ((GET_ADV_START_VNUM(adv) >= GET_ADV_START_VNUM(adv_iter) && GET_ADV_START_VNUM(adv) <= GET_ADV_END_VNUM(adv_iter)) || (GET_ADV_END_VNUM(adv) >= GET_ADV_START_VNUM(adv_iter) && GET_ADV_END_VNUM(adv) <= GET_ADV_END_VNUM(adv_iter))) {
+					olc_audit_msg(ch, GET_ADV_VNUM(adv), "Entirely with the vnum range of adventure %d %s", GET_ADV_VNUM(adv_iter), GET_ADV_NAME(adv_iter));
+					problem = TRUE;
+				}
 			}
 		}
 	}
