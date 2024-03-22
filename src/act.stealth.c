@@ -53,6 +53,9 @@ bool can_infiltrate(char_data *ch, empire_data *emp) {
 	if (!emp) {
 		return TRUE;
 	}
+	if (IS_IMMORTAL(ch)) {
+		return TRUE;	// ok for immortals
+	}
 	if (chemp) {	// look this up for later
 		pol = find_relation(chemp, emp);
 	}
@@ -116,6 +119,9 @@ bool can_steal(char_data *ch, empire_data *emp) {
 	// no empire = ok
 	if (!emp) {
 		return TRUE;
+	}
+	if (IS_IMMORTAL(ch)) {
+		return TRUE;	// imms ok
 	}
 	
 	if (!has_player_tech(ch, PTECH_STEAL_COMMAND)) {
@@ -669,7 +675,7 @@ ACMD(do_infiltrate) {
 		}
 		
 		// distrust just in case
-		if (emp) {
+		if (!IS_IMMORTAL(ch) && emp) {
 			trigger_distrust_from_stealth(ch, emp);
 			add_offense(emp, OFFENSE_INFILTRATED, ch, IN_ROOM(ch), offense_was_seen(ch, emp, was_in) ? OFF_SEEN : NOBITS);
 		}
@@ -709,7 +715,7 @@ ACMD(do_pickpocket) {
 	else if (ch_emp && vict_emp && GET_RANK(ch) < EMPIRE_PRIV(ch_emp, PRIV_STEALTH) && !has_relationship(ch_emp, vict_emp, DIPL_WAR | DIPL_THIEVERY)) {
 		msg_to_char(ch, "You don't have permission to steal that -- you could start a war!\r\n");
 	}
-	else if (ch_emp && vict_emp && ch_emp != vict_emp && !PRF_FLAGGED(ch, PRF_STEALTHABLE) && !has_relationship(ch_emp, vict_emp, DIPL_WAR | DIPL_THIEVERY)) {
+	else if (!IS_IMMORTAL(ch) && ch_emp && vict_emp && ch_emp != vict_emp && !PRF_FLAGGED(ch, PRF_STEALTHABLE) && !has_relationship(ch_emp, vict_emp, DIPL_WAR | DIPL_THIEVERY)) {
 		msg_to_char(ch, "You cannot pickpocket that target because your 'stealthable' toggle is off.\r\n");
 	}
 	else if (FIGHTING(vict)) {
@@ -784,7 +790,7 @@ ACMD(do_pickpocket) {
 			}
 		}
 		
-		if (vict_emp && vict_emp != ch_emp) {
+		if (!IS_IMMORTAL(ch) && vict_emp && vict_emp != ch_emp) {
 			trigger_distrust_from_stealth(ch, vict_emp);
 			add_offense(vict_emp, OFFENSE_PICKPOCKETED, ch, IN_ROOM(ch), offense_was_seen(ch, vict_emp, NULL) ? OFF_SEEN : NOBITS);
 		}

@@ -2626,7 +2626,7 @@ static bool perform_get_from_container(char_data *ch, obj_data *obj, obj_data *c
 			// sends own message
 			return FALSE;
 		}
-		if (!PRF_FLAGGED(ch, PRF_STEALTHABLE)) {
+		if (!IS_IMMORTAL(ch) && !PRF_FLAGGED(ch, PRF_STEALTHABLE)) {
 			// can_steal() technically checks this, but it isn't always called
 			msg_to_char(ch, "You cannot steal because your 'stealthable' toggle is off.\r\n");
 			return FALSE;
@@ -2647,7 +2647,7 @@ static bool perform_get_from_container(char_data *ch, obj_data *obj, obj_data *c
 			act("You get $p from $P.", FALSE, ch, obj, cont, TO_CHAR | TO_QUEUE | ACT_OBJ_VICT);
 			act("$n gets $p from $P.", TRUE, ch, obj, cont, TO_ROOM | TO_QUEUE | ACT_OBJ_VICT);
 			
-			if (stealing) {
+			if (stealing && !IS_IMMORTAL(ch)) {
 				record_theft_log(emp, GET_OBJ_VNUM(obj), 1);
 				
 				if (emp && IS_IMMORTAL(ch)) {
@@ -2760,7 +2760,7 @@ static bool perform_get_from_room(char_data *ch, obj_data *obj) {
 			// sends own message
 			return FALSE;
 		}
-		if (!PRF_FLAGGED(ch, PRF_STEALTHABLE)) {
+		if (!IS_IMMORTAL(ch) && !PRF_FLAGGED(ch, PRF_STEALTHABLE)) {
 			// can_steal() technically checks this, but it isn't always called
 			msg_to_char(ch, "You cannot steal because your 'stealthable' toggle is off.\r\n");
 			return FALSE;
@@ -2785,7 +2785,7 @@ static bool perform_get_from_room(char_data *ch, obj_data *obj) {
 			act("You get $p.", FALSE, ch, obj, 0, TO_CHAR | TO_QUEUE);
 			act("$n gets $p.", TRUE, ch, obj, 0, TO_ROOM | TO_QUEUE);
 					
-			if (stealing) {
+			if (stealing && !IS_IMMORTAL(ch)) {
 				record_theft_log(emp, GET_OBJ_VNUM(obj), 1);
 			
 				if (emp && IS_IMMORTAL(ch)) {
