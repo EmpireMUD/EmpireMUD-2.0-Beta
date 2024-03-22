@@ -8643,11 +8643,12 @@ struct cmdlist_element *find_case(trig_data *trig, struct cmdlist_element *cl, v
 	if (!(cl->next))
 		return cl;  
 
-	for (c = cl->next; c->next; c = c->next) {
+	for (c = cl->next; c && c->next; c = c->next) {
 		for (p = c->cmd; *p && isspace(*p); p++);
 
-		if (!strn_cmp("while ", p, 6) || !strn_cmp("switch", p, 6))
+		if (!strn_cmp("while ", p, 6) || !strn_cmp("switch", p, 6)) {
 			c = find_done(c);
+		}
 		else if (!strn_cmp("case ", p, 5)) {
 			buf = (char*)malloc(MAX_STRING_LENGTH);
 			eval_op("==", result, p + 5, buf, go, sc, trig);
@@ -8657,10 +8658,16 @@ struct cmdlist_element *find_case(trig_data *trig, struct cmdlist_element *cl, v
 			}
 			free(buf);
 		}
-		else if (!strn_cmp("default", p, 7))
+		else if (!strn_cmp("default", p, 7)) {
 			return c;
-		else if (!strn_cmp("done", p, 3))   
+		}
+		else if (!strn_cmp("done", p, 4)) {
 			return c;
+		}
+		
+		if (!c) {
+			script_log("Trigger: %s, VNum %d, find_case reached an error without finding case or done.", GET_TRIG_NAME(trig), GET_TRIG_VNUM(trig));
+		}
 	}
 	return c;
 }        
