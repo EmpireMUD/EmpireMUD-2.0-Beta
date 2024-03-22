@@ -4293,7 +4293,7 @@ void b5_183_molten_fiend_update(void) {
 	old_adv = adventure_proto(OLD_FIEND);
 	new_adv = adventure_proto(NEW_FIEND);
 	if (new_adv) {
-		if (!old_adv || ADVENTURE_FLAGGED(old_adv, ADV_IN_DEVELOPMENT)) {
+		if (!old_adv) {
 			log("- Adding IN-DEV flag to 18000 Molten Fiend");
 			SET_BIT(GET_ADV_FLAGS(new_adv), ADV_IN_DEVELOPMENT);
 			needs_save = TRUE;
