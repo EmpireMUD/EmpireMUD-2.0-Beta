@@ -3558,7 +3558,7 @@ void do_stat_character(char_data *ch, char_data *k, bool details) {
 			if (aff->expire_time == UNLIMITED) {
 				strcpy(lbuf, "infinite");
 			}
-			else if (AFFECTS_CONVERTED(k)) {
+			else if (IS_NPC(k) || AFFECTS_CONVERTED(k)) {
 				duration = aff->expire_time - time(0);
 				duration = MAX(duration, 0);
 				strcpy(lbuf, colon_time(duration, FALSE, NULL));
