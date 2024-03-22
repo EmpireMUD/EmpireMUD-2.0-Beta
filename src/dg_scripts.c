@@ -8643,7 +8643,7 @@ struct cmdlist_element *find_case(trig_data *trig, struct cmdlist_element *cl, v
 	if (!(cl->next))
 		return cl;  
 
-	for (c = cl->next; c && c->next; c = c->next) {
+	for (c = cl->next; c->next; c = c->next) {
 		for (p = c->cmd; *p && isspace(*p); p++);
 
 		if (!strn_cmp("while ", p, 6) || !strn_cmp("switch", p, 6)) {
@@ -8665,7 +8665,7 @@ struct cmdlist_element *find_case(trig_data *trig, struct cmdlist_element *cl, v
 			return c;
 		}
 		
-		if (!c) {
+		if (!c || !c->next) {
 			script_log("Trigger: %s, VNum %d, find_case reached an error without finding case or done.", GET_TRIG_NAME(trig), GET_TRIG_VNUM(trig));
 		}
 	}
