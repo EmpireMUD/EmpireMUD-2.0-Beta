@@ -35,7 +35,7 @@ if %diff% == 1
   * Then we don't need to do anything
   if %self.longdesc% ~= (difficulty)
     %send% %actor% You ignore the words on the infernal slab...
-    %echoaround% %actor% ~%actor% reads the words on the infernal slab...
+    %echoaround% %actor% ~%actor% ignores the words on the infernal slab...
   else
     %send% %actor% You frantically read the words on the infernal slab in reverse...
     %echoaround% %actor% ~%actor% frantically reads the words on the infernal slab in reverse...
@@ -89,16 +89,16 @@ end
 wait 1
 switch %diff%
   case 1
-    %echo% ~%self% stirs, ^%self% fiery eyes flickering with anger as you approach.
+    %echo% &&O&&Z~%self% stirs, ^%self% fiery eyes flickering with anger as you approach.&&0
   break
   case 2
-    %echo% ~%self% shifts, chains straining, fiery eyes burning with fury, the flames around ^%self% horns flaring brightly.
+    %echo% &&O&&Z~%self% shifts, chains straining, fiery eyes burning with fury, the flames around ^%self% horns flaring brightly.&&0
   break
   case 3
-    %echo% ~%self% roars thunderously, shaking the fissure as magma ripples around ^%self% chains and searing heat blisters your skin!
+    %echo% &&O&&Z~%self% roars thunderously, shaking the fissure as magma ripples around ^%self% chains and searing heat blisters your skin!&&0
   break
   case 4
-    %echo% |%self% overwhelming presence snarls with pure malevolence, ^%self% blazing eyes locked on you, chains groaning in protest against ^%self% undeniable power!
+    %echo% &&O&&Z|%self% overwhelming presence snarls with pure malevolence, ^%self% blazing eyes locked on you, chains groaning in protest against ^%self% undeniable power!&&0
   break
 done
 ~
@@ -152,11 +152,11 @@ if %phase% > 1
   if %lastphase% != %phase%
     switch %phase%
       case 2
-        %echo% One of |%self% chains shatters!
+        %echo% &&OOne of |%self% chains shatters!&&0
         %morph% %self% 18005
       break
       case 3
-        %echo% |%self% second chain shatters, freeing *%self%!
+        %echo% &&O|%self% second chain shatters, freeing *%self%!&&0
         %morph% %self% 18006
       break
     done
@@ -225,7 +225,7 @@ switch %move%
         set ability magical
       end
     end
-    %echo% A fiery sigil appears above |%self% forehead...
+    %echo% &&OA fiery sigil appears above |%self% forehead...&&0
     %echo% &&O**** &&Z~%self% starts channeling a %ability% ward! ****&&0 (interrupt)
     set needed 1
     if %diff%>2
@@ -237,10 +237,12 @@ switch %move%
     if %self.count_scfinterrupt% >= %needed%
       set ch %room.people%
       while %ch%
-        if %ch.var(did_scfinterrupt,0)%
-          %send% %ch% &&OYou manage to disrupt |%self% %ability% ward!&&0
-        else
-          %send% %ch% &&O&&Z~%self% %ability% ward is disrupted!&&0
+        if %self.is_enemy(%ch%)%
+          if %ch.var(did_scfinterrupt,0)%
+            %send% %ch% &&OYou manage to disrupt |%self% %ability% ward!&&0
+          else
+            %send% %ch% &&O&&Z~%self% %ability% ward is disrupted!&&0
+          end
         end
         set ch %ch.next_in_room%
       done
@@ -275,19 +277,22 @@ switch %move%
     wait 5 s
     set ch %room.people%
     while %ch%
-      if %ch.var(did_scfdodge,0)%
-        %echo% &&ORocks crash down all around ~%ch%, barely missing *%ch%!&&0
-      else
-        if %diff% == 1
-          %echo% &&OA falling rock bonks ~%ch% on the head!&&0
-          %damage% %ch% 150
+      set next_ch %ch.next_in_room%
+      if %self.is_enemy(%ch%)%
+        if %ch.var(did_scfdodge,0)%
+          %echo% &&ORocks crash down all around ~%ch%, barely missing *%ch%!&&0
         else
-          %echo% &&OA large falling rock crashes into ~%ch%, knocking *%ch% flat!&&0
-          %damage% %ch% 300
-          dg_affect #18009 %ch% STUNNED on 10
+          if %diff% == 1
+            %echo% &&OA falling rock bonks ~%ch% on the head!&&0
+            %damage% %ch% 150
+          else
+            %echo% &&OA large falling rock crashes into ~%ch%, knocking *%ch% flat!&&0
+            %damage% %ch% 300
+            dg_affect #18009 %ch% STUNNED on 10
+          end
         end
       end
-      set ch %ch.next_in_room%
+      set ch %next_ch%
     done
     scfight clear dodge
   break
@@ -312,18 +317,10 @@ switch %move%
     scfight clear interrupt
     scfight setup interrupt all
     wait 5 s
-    if %verify% != %tank.id%
+    if %verify% != %tank.id% || %self.room% != %tank.room%
       %echo% &&O&&Z~%self% blinks, losing the target of its glare.&&0
-      halt
-    end
-    if %self.count_scfinterrupt% >= %needed%
-      set ch %room.people%
-      while %ch%
-        if %ch.var(did_scfinterrupt,0)%
-          %echo% &&O&&Z~%self% blinks and looks away, its curse dissipating!&&0
-        end
-        set ch %ch.next_in_room%
-      done
+    elseif %self.count_scfinterrupt% >= %needed%
+      %echo% &&O&&Z~%self% blinks and looks away, its curse dissipating!&&0
     else
       %send% %tank% &&OYou suddenly burst into flames!&&0
       %echoaround% %tank% &&O~%tank% suddenly bursts into flames!&&0
@@ -413,20 +410,22 @@ switch %move%
       set ch %room.people%
       while %ch%
         set next_ch %ch.next_in_room%
-        if %ch.var(did_scfdodge,0)%
-          %send% %ch% &&OYou dive behind a rock just in time!&&0
-          %echoaround% %ch% &&O~%ch% dives behind a rock just in time!&&0
-        else
-          if %diff% <= 2
-            %send% %ch% &&0You're burned by the wave of fire!&&0
-            %echoaround% %ch% &&O~%ch% is burned by the wave of fire!&&0
-            %damage% %ch% 100 fire
-            %dot% #18013 %ch% 100 30 fire 3
+        if %self.is_enemy(%ch%)%
+          if %ch.var(did_scfdodge,0)%
+            %send% %ch% &&OYou dive behind a rock just in time!&&0
+            %echoaround% %ch% &&O&&Z~%ch% dives behind a rock just in time!&&0
           else
-            %send% %ch% &&OYou're severely burned by the wave of fire!&&0
-            %echoaround% %ch% &&O~%ch% is severely burned by the wave of fire!&&0
-            %damage% %ch% 300 fire
-            %dot% #18013 %ch% 200 30 fire 3
+            if %diff% <= 2
+              %send% %ch% &&OYou're burned by the wave of fire!&&0
+              %echoaround% %ch% &&O&&Z~%ch% is burned by the wave of fire!&&0
+              %damage% %ch% 100 fire
+              %dot% #18013 %ch% 100 30 fire 3
+            else
+              %send% %ch% &&OYou're severely burned by the wave of fire!&&0
+              %echoaround% %ch% &&O&&Z~%ch% is severely burned by the wave of fire!&&0
+              %damage% %ch% 300 fire
+              %dot% #18013 %ch% 200 30 fire 3
+            end
           end
         end
         set ch %next_ch%
@@ -440,34 +439,37 @@ switch %move%
     * Chain Strike
     * Tries to trip the group with the broken end of its chains (dodge or stun)
     * Almost no warning but relatively light punishment
-    %echo% **** &&O&&Z~%self% suddenly whips the broken end of ^%self% chains at you! ****&&0 (dodge)
+    %echo% &&O**** &&Z~%self% suddenly whips the broken end of ^%self% chains at you! ****&&0 (dodge)
     scfight clear dodge
     scfight setup dodge all
     wait 3 s
     set ch %room.people%
     while %ch%
-      if %ch.var(did_scfdodge,0)%
-        if %diff% <= 2
-          %send% %ch% &&OYou leap gracefully over the swinigng chain!&&0
-          %echoaround% %ch% &&O~%ch% leaps gracefully over the swinging chain!&&0
+      set next_ch %ch.next_in_room%
+      if %self.is_enemy(%ch%)%
+        if %ch.var(did_scfdodge,0)%
+          if %diff% <= 2
+            %send% %ch% &&OYou leap gracefully over the swinging chain!&&0
+            %echoaround% %ch% &&O&&Z~%ch% leaps gracefully over the swinging chain!&&0
+          else
+            %send% %ch% &&OYou duck gracefully under the swinging chain!&&0
+            %echoaround% %ch% &&O&&Z~%ch% ducks gracefully under the swinging chain!&&0
+          end
         else
-          %send% %ch% &&OYou duck gracefully under the swinging chain!&&0
-          %echoaround% %ch% &&O~%ch% ducks gracefully under the swinging chain!&&0
-        end
-      else
-        if %diff% <= 2
-          %send% %ch% &&OYou're tripped by the end of the swinging chain!&&0
-          %echoaround% %ch% &&O~%ch% is tripped by the end of the swinging chain!&&0
-          %damage% %ch% 50 physical
-          dg_affect #18014 %ch% STUNNED on 5
-        else
-          %send% %ch% &&OYou are struck and sent flying by the end of the swinging chain!&&0
-          %echoaround% %ch% &&O~%ch% is struck and sent flying by the end of the swinging chain!&&0
-          %damage% %ch% 100 physical
-          dg_affect #18014 %ch% STUNNED on 10
+          if %diff% <= 2
+            %send% %ch% &&OYou're tripped by the end of the swinging chain!&&0
+            %echoaround% %ch% &&O&&Z~%ch% is tripped by the end of the swinging chain!&&0
+            %damage% %ch% 50 physical
+            dg_affect #18014 %ch% STUNNED on 5
+          else
+            %send% %ch% &&OYou are struck and sent flying by the end of the swinging chain!&&0
+            %echoaround% %ch% &&O&&Z~%ch% is struck and sent flying by the end of the swinging chain!&&0
+            %damage% %ch% 100 physical
+            dg_affect #18014 %ch% STUNNED on 10
+          end
         end
       end
-      set ch %ch.next_in_room%
+      set ch %next_ch%
     done
     scfight clear dodge
   break
@@ -532,7 +534,7 @@ switch %move%
         %echo% &&O&&Z~%self% punches ^%self% molten fist into |%targ% chest!&&0
         %damage% %targ% %pain% fire
       else
-        %send% %targ% You narrowly dodge |%self% fist!
+        %send% %targ% &&OYou narrowly dodge |%self% fist!&&0
       end
       if %cycle% < 5
         %send% %targ% &&O**** &&Z~%self% pulls ^%self% fist back for another punch! ****&&0 (dodge)
@@ -560,7 +562,7 @@ switch %move%
       scfight setup interrupt all
       wait 5 s
       if %self.count_scfinterrupt% < %needed%
-        %echo% &&OYou should in agony as a fiery pulse from the burning orb sears through you!&&0
+        %echo% &&OYou shout in agony as a fiery pulse from the burning orb sears through you!&&0
         %aoe% %pain% fire
         eval fails %fails% + 1
       end
@@ -612,7 +614,7 @@ switch %move%
         halt
       elseif %cycle% < 4
         %send% %targ% &&O**** You shout in agony as ~%self% clenches ^%self% claws into you! ****&&0 (struggle)
-        %echoaround% %targ% &&0&&Z~%self% clenches ^%self% claws into ~%targ%!&&0
+        %echoaround% %targ% &&O&&Z~%self% clenches ^%self% claws into ~%targ%!&&0
         %damage% %targ% %pain% physical
       else
         * final cycle and they didn't get free
@@ -638,14 +640,14 @@ Molten Fiend out-of-combat reset~
 if %self.fighting%
   halt
 end
+%morph% %self% normal
 if %active_phase% > 1
-  %echo% With a blinding flash of light, the chains restraining ~%self% are restored!
+  %echo% &&OWith a blinding flash of light, the chains restraining ~%self% are restored!&&0
 end
-%echo% |%self% wounds are healed!
+%echo% &&O&&Z|%self% wounds are healed!&&0
 dg_affect #18006 %self% off
 dg_affect #18007 %self% off
 dg_affect #18008 %self% off
-%morph% %self% normal
 %restore% %self%
 * Purge remaining fire elementals
 %purge% instance mob 18077 $n vanishes in a flash of flames.
@@ -800,7 +802,7 @@ end
 %purge% %self%
 ~
 #18012
-fire elemental ramp up~
+Molten Fiend: Fire elemental ramp up~
 0 k 100
 ~
 set boss %self.room.people(18075)%
@@ -817,7 +819,7 @@ if %diff%>1
   dg_affect #18012 %self% BONUS-PHYSICAL %damage% 30
   dg_affect #18012 %self% BONUS-MAGICAL %damage% 30
   if %stacks% // 5 == 0
-    %echo% |%self% flames grow hotter!
+    %echo% &&O&&Z|%self% flames grow hotter!&&0
   end
 end
 ~
@@ -945,6 +947,7 @@ wait 2 sec
 Fiend Battle~
 0 k 25
 ~
+* Deprecated: No longer used
 eval test 100*%self.health%/%self.maxhealth%
 set phase 1
 if %test%<67
@@ -1123,7 +1126,7 @@ Fiend adds timer~
 0 n 100
 ~
 wait 30 sec
-%echo% ~%self% burns out, disappearing with a puff of smoke!
+%echo% &&O&&Z~%self% burns out, disappearing with a puff of smoke!&&0
 %purge% %self%
 ~
 #18078
@@ -1216,6 +1219,8 @@ return 1
 Fissure shop list~
 2 c 0
 list~
+* Deprecated: this script is no longer used
+halt
 * If player has no essence, ignore the command
 if !%actor.has_resources(18097,1)%
   return 0
@@ -1251,6 +1256,8 @@ end
 Molten fiend shop buy~
 2 c 0
 buy~
+* Deprecated: This script is no longer used
+halt
 * This trigger is REALLY LONG.
 * If player has no essence, ignore the command
 if !%actor.has_resources(18097,1)%
