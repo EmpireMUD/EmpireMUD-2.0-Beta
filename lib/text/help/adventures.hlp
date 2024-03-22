@@ -548,7 +548,13 @@ cannot raise it to a higher difficulty level than the highest molten fiend
 you've defeated.
 
 The 'list', 'buy', and 'infuse' commands only work at the Precarious Ledge in
-the fiend's fissure.
+the fiend's fissure. Use 'list id' to check items before buying them.
+
+Gear sets:
+  Healer: hearthflame, molten heart, renewal, frozen flame, abyssal flames
+  Caster: emberweave, dark ember, cold lava, pyrespark, embercrest
+  Melee: Flametalon, igneous, pyroclastic, flame-wreathed
+  Tank: magma-forged, volcanic fortress, flowing lava, diabolic crown
 
 See also: ADVENTURE
 #
