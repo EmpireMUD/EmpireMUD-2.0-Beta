@@ -818,7 +818,7 @@ also log the death to the syslog and to the death slash-channel. You can
 provide a custom message as an optional argument.
 
 The default death log is:
-%person.name% has died at %person.room.coords%!
+%person.real_name% has died at %person.room.coords%!
 #d
 "SWITCH STATEMENT" "CASE STATEMENT" "BREAK STATEMENT" "DEFAULT STATEMENT" CASE DEFAULT BREAK TRIG-SWITCH TRIGEDIT-SWITCH
 
