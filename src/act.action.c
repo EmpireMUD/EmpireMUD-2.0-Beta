@@ -3447,9 +3447,10 @@ INTERACTION_FUNC(finish_gen_interact_room) {
 		if (inter_veh) {
 			add_vehicle_depletion(inter_veh, depletion, TRUE);
 		}
-		else {
+		else if (SHARED_DATA(inter_room ? inter_room : IN_ROOM(ch)) != &ocean_shared_data) {
 			add_depletion(inter_room ? inter_room : IN_ROOM(ch), depletion, TRUE);
 		}
+		// else: don't add depletion if it's a shared ocean room
 	}
 	
 	if (obj_ok && obj) {
