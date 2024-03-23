@@ -707,7 +707,7 @@ if %target.carried_by% != %actor%
   %send% %actor% You can only infuse an item in your inventory.
   halt
 end
-if %target.vnum% < 18012 || %target.vnum% > 18049 || !%target.wearable% || (%target.level% == 0)
+if %target.vnum% < 18012 || %target.vnum% > 18050 || !%target.wearable% || (%target.level% == 0)
   %send% %actor% You can't infuse @%target%!
   halt
 end
@@ -1204,7 +1204,7 @@ end
 %send% %actor% You hurl @%object% from the ledge, into the fissure!
 %echoaround% %actor% ~%actor% hurls @%object% from the ledge, into the fissure!
 %echo% @%object% vanishes into the fiery darkness...
-if ((%object.vnum% >= 18075) && (%object.vnum% <= 18094)) || ((%object.vnum% >= 18012) && (%object.vnum% <= 18049))
+if (%object.vnum% >= 18075 && %object.vnum% <= 18094) || (%object.vnum% >= 18012 && %object.vnum% <= 18050)
   if %object.is_flagged(GROUP-DROP)% && %object.is_flagged(HARD-DROP)%
     set value 5
   elseif %object.is_flagged(GROUP-DROP)%
