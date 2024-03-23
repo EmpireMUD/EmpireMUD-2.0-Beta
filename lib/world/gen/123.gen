@@ -33,7 +33,7 @@ difficult~
 4 0
 0 0 0 0
 T4
-Type 'difficult <normal | hard | group | boss>' to fight it.~
+Type 'difficulty <normal | hard | group | boss>' to fight it.~
 T5
 ...type 'difficulty' to prepare to fight $m!~
 S
