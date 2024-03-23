@@ -1902,7 +1902,7 @@ mission to use both buildings. The portal will stay open for a few minutes.
 You can target the portal building on the other end using either its co-
 ordinates, or the name of a person who is at the other side.
 
-Portals have a maximum distance of 50 tiles unless both ends are in a city.
+Portals have a maximum distance of 50 tiles unless both ends are in cities.
 
 You can portal to specific coordinates by using parentheses (123, 456) or by
 typing the coordinates with no space -- 123,456 -- but you can target your
