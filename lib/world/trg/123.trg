@@ -1225,9 +1225,9 @@ elseif %move% == 2
   * Coil
   scfight clear struggle
   if %room.players_present% > 1
-    %echo% &&CThere's a screeching sound as ~%self% begins to coil around the whole party!&&0 (struggle)
+    %echo% &&C**** There's a screeching sound as ~%self% begins to coil around the whole party! ****&&0 (struggle)
   else
-    %echo% &&CThere's a screeching sound as ~%self% begins to coil around you!&&0 (struggle)
+    %echo% &&C**** There's a screeching sound as ~%self% begins to coil around you! ****&&0 (struggle)
   end
   if %diff% == 1
     dg_affect #12353 %self% HARD-STUNNED on 20
@@ -1326,7 +1326,7 @@ elseif %move% == 4
   * Frost Pores / Heat Drain
   scfight clear struggle
   %echo% &&CA cold mist seeps from |%self% pores and flows over you...&&0
-  %echo% &&CYou begin to freeze in place!&&0 (struggle)
+  %echo% &&C**** You begin to freeze in place! ****&&0 (struggle)
   if %diff% == 1
     dg_affect #12353 %self% HARD-STUNNED on 20
   end
@@ -1357,12 +1357,12 @@ elseif %move% == 4
       if %person.affect(9602)%
         set ongoing 1
         if %diff% > 1
-          %send% %person% &&CYou feel the heat draining out of your body!&&0 (struggle)
+          %send% %person% &&C**** You feel the heat draining out of your body! ****&&0 (struggle)
           dg_affect #12356 %person% BONUS-PHYSICAL %punish% 20
           dg_affect #12356 %person% BONUS-MAGICAL %punish% 20
           dg_affect #12356 %person% COOLING 20 20
         else
-          %send% %person% &&CYou're trapped in the frost!&&0 (struggle)
+          %send% %person% &&C**** You're trapped in the frost! ****&&0 (struggle)
         end
       end
       set person %person.next_in_room%

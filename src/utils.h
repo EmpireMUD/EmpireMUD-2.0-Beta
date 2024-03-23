@@ -1899,6 +1899,7 @@ struct time_info_data *mud_time_passed(time_t t2, time_t t1);
 struct time_info_data *real_time_passed(time_t t2, time_t t1);
 
 // building functions from utils.c
+bool building_counts_as(bld_data *bld, bld_vnum which_bld, veh_vnum which_veh);
 bld_data *get_building_by_name(char *name, bool room_only);
 
 // character functions from utils.c
@@ -2081,6 +2082,9 @@ void sprinttype(int type, const char *names[], char *result, size_t max_result_s
 char *time_length_string(int seconds);
 char *trim(char *string);
 char *undouble_map_ampersands(char *icon);
+
+// vehicle functions in utils.c
+bool vehicle_counts_as(vehicle_data *veh, bld_vnum which_bld, veh_vnum which_veh);
 
 // world functions in utils.c
 bool check_sunny(room_data *room);

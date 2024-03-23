@@ -760,6 +760,8 @@ typedef struct vehicle_data vehicle_data;
 #define BLD_REL_UPGRADES_TO_VEH  3	// upgrades to another vehicle type
 #define BLD_REL_FORCE_UPGRADE_BLD  4	// automatically upgrades on-reboot
 #define BLD_REL_FORCE_UPGRADE_VEH  5	// automatically upgrades on-reboot
+#define BLD_REL_COUNTS_AS_BLD  6	// counts as a certain building e.g. for buildcheck
+#define BLD_REL_COUNTS_AS_VEH  7	// counts as a certain vehicle e.g. for buildcheck
 
 
 // Designate flags -- DES_x -- can only designate if building and room both have a matching flag

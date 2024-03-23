@@ -5,7 +5,7 @@ A molten heart sizzles on the ground.~
    The rhythmic beat of the molten heart is almost soothing, even as you wonder
 how you're able to hold it in your hands without burning yourself.
 ~
-3 mp ao 0 14
+3 mp ao 0 0 14
 0 0 0
 1 0
 A
@@ -30,7 +30,7 @@ A set of hearthflame robes lie smouldering on the ground.~
    Layered fabric in every shade of red and orange form these robes, which are
 warm to the touch. In low light, they almost seem to be on fire!
 ~
-27 emp aq 0 18
+27 emp aq 0 0 18
 0 0 0
 11 0
 A
@@ -56,7 +56,7 @@ a hearthflame skirt~
 A warm hearthflame skirt is lying here.~
 This dark red cloth skirt feels soothing and warm to the touch.
 ~
-27 mp af 0 7
+27 mp af 0 0 7
 0 0 0
 11 0
 A
@@ -82,7 +82,7 @@ hearthflame sleeves~
 A pair of hearthflame sleeves is lying here.~
 Touching these dark red cloth sleeves makes you feel slightly more calm.
 ~
-27 mp ai 0 9
+27 mp ai 0 0 9
 0 0 0
 11 0
 A
@@ -109,7 +109,7 @@ A set of hearthflame handwraps are here.~
    The dark red ribbons that form the handwraps are warm to the touch, as if
 they've been hanging from the hearth.
 ~
-27 mp ah 0 7
+27 mp ah 0 0 7
 0 0 0
 11 0
 A
@@ -133,7 +133,7 @@ the flaming band of renewal~
 The flaming band of renewal lies on the ground.~
 The little ring almost seems to be made of fire itself!
 ~
-2 amp ab 0 15
+2 amp ab 0 0 15
 0 0 0
 10 0
 A
@@ -156,7 +156,7 @@ There is a pair of flame-shaped earrings lying here.~
    You're not sure if these intricate earrings are made from gemstones, or
 magically frozen fires. They should be safe to wear anyhow.
 ~
-2 mp am 0 5
+2 mp am 0 0 5
 0 0 0
 10 0
 A
@@ -179,7 +179,7 @@ An obsidian crown wreathed in abyssal flames is levitating here!~
    Despite their dull hue, the flames adorning this demonic status symbol give
 off the heat of a blast furnace.
 ~
-2 mp ae 0 13
+2 mp ae 0 0 13
 0 0 0
 1 0
 A
@@ -204,7 +204,7 @@ A dark ember floats in mid-air.~
    The ember glows with a dull violet flame, hard to see except in the lowest
 of lights.
 ~
-3 mp ao 0 14
+3 mp ao 0 0 14
 0 0 0
 1 0
 A
@@ -230,7 +230,7 @@ A pair of emberweave flare pants blaze on the ground.~
 they are only pleasantly warm to the touch. They flare at the bottom, perhaps
 to fit over boots.
 ~
-27 mp af 0 8
+27 mp af 0 0 8
 0 0 0
 1 0
 A
@@ -257,7 +257,7 @@ A pair of burning emberweave pauldrons have been left here.~
    The crowned pauldrons stand tall, smouldering only slightly. They look as if
 they were woven from ash and rock, and are warm to the touch.
 ~
-27 mp ai 0 9
+27 mp ai 0 0 9
 0 0 0
 1 0
 A
@@ -280,7 +280,7 @@ A pair of fine emberweave gloves sizzle on the ground.~
    These elegant, skintight gloves look as if they were woven from ash. A trio
 of coals smoulders on the back of each, though they don't burn your hands.
 ~
-27 mp ah 0 15
+27 mp ah 0 0 15
 0 0 0
 1 0
 A
@@ -305,7 +305,7 @@ A ring made of lava is lying here, cold to the touch!~
    This ring is weirdly cool to the touch. It seems to be safe, but the
 patterns on it still look like they're flowing...
 ~
-2 amp ab 0 8
+2 amp ab 0 0 8
 0 0 0
 1 0
 A
@@ -328,7 +328,7 @@ A pair of pyrespark earrings crackle on the ground.~
    The earrings hover like little balls of fire, sputtering and crackling to
 themselves.
 ~
-2 mp am 0 7
+2 mp am 0 0 7
 0 0 0
 10 0
 A
@@ -351,7 +351,7 @@ An incandescent set of emberwave raiments is scattered on the ground.~
    Smoke rises off of the ashen raiments, which give off a faint glow like so
 much magma simmering just below the surface.
 ~
-27 emp aq 0 15
+27 emp aq 0 0 15
 0 0 0
 1 0
 A
@@ -378,7 +378,7 @@ An embercrest crown lies here, burning.~
    The crown is hewn from obsidian and granite, with a single burning coal in
 the center that creates heat waves above your head.
 ~
-2 mp ae 0 14
+2 mp ae 0 0 14
 0 0 0
 1 0
 A
@@ -403,7 +403,7 @@ A flaming talon is stabbed into the ground here.~
    This talon, about the size and shape of a dagger, blazes energetically with
 fiendish flames. It looks absolutely lethal!
 ~
-1 imp ano f 5
+1 imp ano f 0 5
 0 2 4
 14 0
 A
@@ -430,7 +430,7 @@ A set of igneous legplates have been left here.~
    The legplates are surprisingly light, considering they're made from igneous
 rock. Veins of lava streak down them, making them perfect for a cold night.
 ~
-27 mp af 0 16
+27 mp af 0 0 16
 1 0 0
 1 0
 A
@@ -454,7 +454,7 @@ burning igneous pauldrons~
 A pair of burning pauldrons is lying here.~
 These tall, rocky pauldrons burn like little furnaces above your shoulders.
 ~
-27 mp ai 0 17
+27 mp ai 0 0 17
 1 0 0
 2 0
 A
@@ -481,7 +481,7 @@ A pair of blazing handguards lie here.~
    The handguards look, at first, to be made of rock. But on closer inspection,
 they're both light and flexible, and only sharp on the outside.
 ~
-27 mp ah 0 16
+27 mp ah 0 0 16
 1 0 0
 1 0
 A
@@ -505,7 +505,7 @@ the pyroclastic ring of ignition~
 A pyroclastic ring has been left behind.~
 The ring swirls and roils like lava, though it does not burn the bearer.
 ~
-2 amp ab 0 16
+2 amp ab 0 0 16
 0 0 0
 1 0
 A
@@ -528,7 +528,7 @@ A razor-sharp igneous earring is lying here.~
    If you don't want to wear it, you could always stab someone with it... Then
 again, you would probably cut yourself in the process.
 ~
-2 mp am 0 7
+2 mp am 0 0 7
 0 0 0
 1 0
 A
@@ -549,7 +549,7 @@ A set of roiling battlegear is stacked on the ground.~
    The rocky armor seems united only by an understory of live magma. Still,
 it's merely warm to the touch as it stokes the fire inside you.
 ~
-27 emp aq 0 18
+27 emp aq 0 0 18
 1 0 0
 1 0
 A
@@ -574,7 +574,7 @@ The flame-wreathed crown of perdition lies here.~
    The rocky crown burns with an orange flame that covers your hair. Despite
 this, you are unburned.
 ~
-2 mp ae 0 18
+2 mp ae 0 0 18
 0 0 0
 1 0
 A
@@ -599,7 +599,7 @@ A magma-forged bulwark stands here.~
    The enormous shield resembles solid lava after it has cooled, with only
 hints of the tectonic forces that shaped it.
 ~
-23 emp ao 0 16
+23 emp ao 0 0 16
 0 0 0
 2 0
 A
@@ -624,7 +624,7 @@ A set of magma-forged legguards are lying here.~
    These legguards were forged in the depths of a volcano, perhaps by the
 Molten Fiend itself!
 ~
-27 mp af 0 16
+27 mp af 0 0 16
 3 0 0
 2 0
 A
@@ -649,7 +649,7 @@ A pair of heavy magma-forged pauldrons is lying here.~
    These heavy iron pauldrons were forged by the land itself at a density no
 mortal smith could hope to match.
 ~
-27 mp ai 0 16
+27 mp ai 0 0 16
 3 0 0
 2 0
 A
@@ -674,7 +674,7 @@ A set of magma-forged hand plates lie on the ground.~
    These plates, forged deep within the earth, are capable of protecting the
 hands of the wearer from cataclysmic force.
 ~
-27 mp ah 0 8
+27 mp ah 0 0 8
 3 0 0
 2 0
 A
@@ -696,7 +696,7 @@ the volcanic fortress band~
 A tank ring is here.~
 The ring is unusually large and appears to have been forged from lava!
 ~
-2 amp ab 0 17
+2 amp ab 0 0 17
 0 0 0
 1 0
 A
@@ -722,7 +722,7 @@ Earcuffs made of flowing lava shine dimly on the ground.~
 burn when you touch them. Instead, you feel protected from even the hardest
 blows.
 ~
-2 mp am 0 7
+2 mp am 0 0 7
 0 0 0
 1 0
 A
@@ -745,7 +745,7 @@ A huge suit of magma-forged plate armor is piled up here.~
    This pile of massive armor plates were forged by the land itself to an
 incredible density. No normal man could even wear this armor.
 ~
-27 emp aq 0 14
+27 emp aq 0 0 14
 3 0 0
 2 0
 A
@@ -771,7 +771,7 @@ the diabolic crown of the underworld~
 The diabolic crown of the underworld simmers on the ground.~
    The crown sizzles and simmers with the fury of the underworld.
 ~
-2 mp ae 0 18
+2 mp ae 0 0 18
 0 0 0
 1 0
 A
@@ -796,7 +796,7 @@ A bladed bow made from a fiend's horns is lying here.~
    This raises an interesting question: did someone carve this out, or were
 this demon's horns always neatly bow-shaped?
 ~
-20 mp ap 0 6
+20 mp ap 0 0 6
 29 1 0
 14 0
 S
@@ -807,7 +807,7 @@ Someone has left a flame-embroidered pouch here.~
    This leather pouch is stained with fiery designs. It appears to be quite
 deep... Luckily, it is too small to fall into.
 ~
-24 mp ar 0 24
+24 mp ar 0 0 24
 10 0 0
 7 0
 A
@@ -830,7 +830,7 @@ Someone has left a molten pouch here.~
    This soft and spacious pouch seems to be made of flowing lava! Luckily, some
 enchantment keeps it from burning you... Or the things inside.
 ~
-24 mp ar 0 25
+24 mp ar 0 0 25
 10 0 0
 10 0
 A
@@ -852,7 +852,7 @@ Someone has left a basalt pouch here.~
 property that makes it as soft and supple as leather. Perfect for holding all
 your things.
 ~
-24 mp ar 0 27
+24 mp ar 0 0 27
 10 0 0
 10 0
 A
@@ -873,7 +873,7 @@ A sheet of flickering flames is hovering here!~
    This sheet of magical fire radiates all of its heat in one direction - you
 could safely wrap it around yourself!
 ~
-2 mp ak 0 6
+2 mp ak 0 0 6
 0 0 0
 10 0
 A
@@ -898,7 +898,7 @@ A molten minipet whistle is spewing lava on the ground.~
    The rocky whistle sputters flecks of redhot lava. This whistle grants you a
 molten friend minipet when you 'use' it.
 ~
-19 p a 0 8
+19 p a 0 0 8
 18051 0 0
 1 0
 C
@@ -911,7 +911,7 @@ A fiendskin lies on the ground.~
    This thick, leathery demon hide is nice and warm on the inside. When worn by
 a worthy champion, it takes on a molten appearance.
 ~
-2 p ad 0 1
+2 p ad 0 0 1
 0 0 0
 7 0
 A
@@ -936,7 +936,7 @@ A tectonic tuba rests nearby.~
 engravings. Its fiery bell, obsidian mouthpiece, and lava-inspired valves
 produce deep, earthy tones.
 ~
-22 0 ao 0 4
+22 0 ao 0 0 6
 0 0 0
 1 0
 C
@@ -1019,9 +1019,6 @@ M
 2
 Each note you play on the tectonic tuba resonates with the strength of the molten depths.~
 M
-2
-You play the tectonic tuba.~
-M
 3
 $n plays the tectonic tuba.~
 M
@@ -1045,11 +1042,9 @@ $n plays the tectonic tuba.~
 M
 3
 You resonate along with the powerful notes of $n's tectonic tuba.~
-M
-3
-$n plays the tectonic tuba.~
 R
 4 5193 0
+T 18056
 S
 #18070
 replacer loot molten fiend~
@@ -1057,11 +1052,12 @@ the Molten Fiend loot replacer~
 The Molten Fiend loot replacer is here.~
 This item is replaced when loaded.
 ~
-0 mp a 0 4
+3 mp a 0 0 6
 0 0 0
 1 0
 C
 200 300
+T 18070
 S
 #18075
 skirt firecloth brilliant worn~
@@ -1072,7 +1068,7 @@ inferno! It is only warm, not hot, to the touch.
    This skirt came from an old demon, from ages past. It may still be exchanged
 by throwing it off the ledge in the fiend's fissure.
 ~
-27 mp af 0 2
+27 mp af 0 0 2
 0 0 0
 10 0
 A
@@ -1093,7 +1089,7 @@ raging inferno! They throw off a fierce heat, but are safe to wear.
    These pauldrons came from an old demon, from ages past. They may still be
 exchanged by throwing them off the ledge in the fiend's fissure.
 ~
-27 mp ai 0 3
+27 mp ai 0 0 3
 0 0 0
 10 0
 A
@@ -1113,7 +1109,7 @@ A warm hearthflame skirt is lying here.~
    This skirt came from an old demon, from ages past. It may still be exchanged
 by throwing it off the ledge in the fiend's fissure.
 ~
-27 mp af 0 3
+27 mp af 0 0 3
 0 0 0
 10 0
 A
@@ -1133,7 +1129,7 @@ A pair of hearthflame sleeves is lying here.~
    These sleeves came from an old demon, from ages past. They may still be
 exchanged by throwing them off the ledge in the fiend's fissure.
 ~
-27 mp ai 0 5
+27 mp ai 0 0 5
 0 0 0
 11 0
 A
@@ -1154,7 +1150,7 @@ mortal smith could hope to match.
    These pauldrons came from an old demon, from ages past. They may still be
 exchanged by throwing them off the ledge in the fiend's fissure.
 ~
-27 mp ai 0 13
+27 mp ai 0 0 13
 3 0 0
 2 0
 A
@@ -1175,7 +1171,7 @@ incredible density. No normal man could even wear this armor.
    This armor came from an old demon, from ages past. It may still be exchanged
 by throwing it off the ledge in the fiend's fissure.
 ~
-27 emp aq 0 10
+27 emp aq 0 0 10
 3 0 0
 2 0
 A
@@ -1196,7 +1192,7 @@ guards! Be careful not to shrug.
    These pauldrons came from an old demon, from ages past. They may still be
 exchanged by throwing them off the ledge in the fiend's fissure.
 ~
-27 mp ai 0 13
+27 mp ai 0 0 13
 1 0 0
 2 0
 A
@@ -1219,7 +1215,7 @@ of a blizzard.
    This jerkin came from an old demon, from ages past. It may still be
 exchanged by throwing it off the ledge in the fiend's fissure.
 ~
-27 mp aq 0 12
+27 mp aq 0 0 12
 1 0 0
 7 0
 A
@@ -1240,7 +1236,7 @@ deep... Luckily, it is too small to fall into.
    This pouch came from an old demon, from ages past. It may still be exchanged
 by throwing it off the ledge in the fiend's fissure.
 ~
-24 mp ar 0 20
+24 mp ar 0 0 20
 2 0 0
 7 0
 A
@@ -1261,7 +1257,7 @@ damage! It's a bit awkward to hold, though.
    This shield came from an old demon, from ages past. It may still be
 exchanged by throwing it off the ledge in the fiend's fissure.
 ~
-23 mp ao 0 6
+23 mp ao 0 0 6
 0 0 0
 1 0
 A
@@ -1280,7 +1276,7 @@ patterns on it still look like they're flowing...
    This ring came from an old demon, from ages past. It may still be exchanged
 by throwing it off the ledge in the fiend's fissure.
 ~
-2 mp ab 0 2
+2 mp ab 0 0 2
 0 0 0
 1 0
 A
@@ -1301,7 +1297,7 @@ could safely wrap it around yourself!
    This mantle came from an old demon, from ages past. It may still be
 exchanged by throwing it off the ledge in the fiend's fissure.
 ~
-27 mp ak 0 2
+27 mp ak 0 0 2
 0 0 0
 10 0
 A
@@ -1326,7 +1322,7 @@ magically frozen fires. They should be safe to wear anyhow.
    These earrings came from an old demon, from ages past. They may still be
 exchanged by throwing them off the ledge in the fiend's fissure.
 ~
-2 mp am 0 2
+2 mp am 0 0 2
 0 0 0
 10 0
 A
@@ -1345,7 +1341,7 @@ they are only pleasantly warm to the touch.
    These gloves came from an old demon, from ages past. They may still be
 exchanged by throwing them off the ledge in the fiend's fissure.
 ~
-27 mp ah 0 2
+27 mp ah 0 0 2
 0 0 0
 11 0
 A
@@ -1364,7 +1360,7 @@ crest, are extremely hot, but safe to wear. For a given value of 'safe'.
    These gauntlets came from an old demon, from ages past. They may still be
 exchanged by throwing them off the ledge in the fiend's fissure.
 ~
-27 mp ah 0 3
+27 mp ah 0 0 3
 3 0 0
 2 0
 A
@@ -1387,7 +1383,7 @@ unholy vitality to the wearer!
    These earrings came from an old demon, from ages past. They may still be
 exchanged by throwing them off the ledge in the fiend's fissure.
 ~
-2 mp am 0 2
+2 mp am 0 0 2
 0 0 0
 4 0
 A
@@ -1408,7 +1404,7 @@ fiendish flames. It looks absolutely lethal!
    This talon came from an old demon, from ages past. It may still be exchanged
 by throwing it off the ledge in the fiend's fissure.
 ~
-1 imp ano f 2
+1 imp ano f 0 2
 0 6 4
 14 0
 A
@@ -1425,7 +1421,7 @@ again, you would probably cut yourself in the process.
    This earring came from an old demon, from ages past. It may still be
 exchanged by throwing it off the ledge in the fiend's fissure.
 ~
-2 mp am 0 3
+2 mp am 0 0 3
 0 0 0
 8 0
 A
@@ -1444,7 +1440,7 @@ off the heat of a blast furnace. Only the wearer is safe...
    This crown came from an old demon, from ages past. It may still be exchanged
 by throwing it off the ledge in the fiend's fissure.
 ~
-2 mp ae 0 8
+2 mp ae 0 0 8
 0 0 0
 1 0
 A
@@ -1467,7 +1463,7 @@ this demon's horns always neatly bow-shaped?
    This bow came from an old demon, from ages past. It may still be exchanged
 by throwing it off the ledge in the fiend's fissure.
 ~
-20 mp ap 0 5
+20 mp ap 0 0 5
 29 1 0
 14 0
 S
@@ -1477,7 +1473,7 @@ a hellsteed's reins~
 A set of hellish reins are lying here.~
 These reins can be used just once, to summon a hellsteed mount.
 ~
-3 0 a 0 5
+3 0 a 0 0 5
 18078 0 0
 7 0
 T 9910
@@ -1489,7 +1485,7 @@ The ashes of a noble phoenix are lying here.~
    This pile of ash, when used, will be restored into a noble Phoenix, which
 will be indebted to you!
 ~
-3 0 a 0 9
+3 0 a 0 0 9
 18079 0 0
 10 0
 T 9910
@@ -1505,10 +1501,11 @@ something out of it?
 While standing on the ledge, type 'list' to see the things you can make and
 'buy <item>' to buy one.
 ~
-3 mp ao 0 8
+3 mp ao 0 0 8
 0 0 0
 10 0
 C
 200 250
+T 18011
 S
 $

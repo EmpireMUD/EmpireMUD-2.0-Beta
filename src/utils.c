@@ -30,6 +30,7 @@
 /**
 * Contents:
 *   Basic Utils
+*   Building Utils
 *   Empire Utils
 *   Empire Trade Utils
 *   Empire Diplomacy Utils
@@ -46,6 +47,7 @@
 *   Sector Utils
 *   String Utils
 *   Type Utils
+*   Vehicle Utils
 *   World Utils
 *   Misc Utils
 */
@@ -371,6 +373,42 @@ struct time_info_data *real_time_passed(time_t t2, time_t t1) {
 	now.year = -1;
 
 	return (&now);
+}
+
+
+ //////////////////////////////////////////////////////////////////////////////
+//// BUILDING UTILS //////////////////////////////////////////////////////////
+
+/**
+* Determine if a building counts as a given building or vehicle, for quests and
+* progress goals. This can match it to a a building, a vehicle, or both.
+*
+* @param bld_data *bld The building to check.
+* @param bld_vnum which_bld Which building to compare it to (may be NOTHING to skip).
+* @param veh_vnum which_veh Which vehicle to compare it to (may be NOTHING to skip).
+*/
+bool building_counts_as(bld_data *bld, bld_vnum which_bld, veh_vnum which_veh) {
+	struct bld_relation *relat;
+	
+	if (!bld) {
+		return FALSE;	// bad input
+	}
+	if (which_bld != NOTHING && GET_BLD_VNUM(bld) == which_bld) {
+		return TRUE;	// perfect match
+	}
+	
+	// check relations
+	LL_FOREACH(GET_BLD_RELATIONS(bld), relat) {
+		if (which_bld != NOTHING && relat->type == BLD_REL_COUNTS_AS_BLD && relat->vnum == which_bld) {
+			return TRUE;
+		}
+		else if (which_veh != NOTHING && relat->type == BLD_REL_COUNTS_AS_VEH && relat->vnum == which_veh) {
+			return TRUE;
+		}
+	}
+	
+	// otherwise
+	return FALSE;
 }
 
 
@@ -6246,6 +6284,42 @@ sector_data *get_sect_by_name(char *name) {
 	}
 	
 	return abbrev_match;	// if any
+}
+
+
+ //////////////////////////////////////////////////////////////////////////////
+//// VEHICLE UTILS ///////////////////////////////////////////////////////////
+
+/**
+* Determine if a vehicle counts as a given building or vehicle, for quests and
+* progress goals. This can match it to a a building, a vehicle, or both.
+*
+* @param vehicle_data *veh The vehicle to check.
+* @param bld_vnum which_bld Which building to compare it to (may be NOTHING to skip).
+* @param veh_vnum which_veh Which vehicle to compare it to (may be NOTHING to skip).
+*/
+bool vehicle_counts_as(vehicle_data *veh, bld_vnum which_bld, veh_vnum which_veh) {
+	struct bld_relation *relat;
+	
+	if (!veh) {
+		return FALSE;	// bad input
+	}
+	if (which_veh != NOTHING && VEH_VNUM(veh) == which_veh) {
+		return TRUE;	// perfect match
+	}
+	
+	// check relations
+	LL_FOREACH(VEH_RELATIONS(veh), relat) {
+		if (which_bld != NOTHING && relat->type == BLD_REL_COUNTS_AS_BLD && relat->vnum == which_bld) {
+			return TRUE;
+		}
+		else if (which_veh != NOTHING && relat->type == BLD_REL_COUNTS_AS_VEH && relat->vnum == which_veh) {
+			return TRUE;
+		}
+	}
+	
+	// otherwise
+	return FALSE;
 }
 
 

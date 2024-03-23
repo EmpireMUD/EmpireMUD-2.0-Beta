@@ -3989,6 +3989,8 @@ Available relationship types:
  &cSTORES-LIKE-BLD&0 - Inherits the storage as target building
  &cSTORES-LIKE-VEH&0 - Inherits the storage as target vehicle
                   (stores-like does not include warehouses; use function flags)
+ &cCOUNTS-AS-BLD&0 - For buildcheck, progress, and quests, counts as another
+ &cCOUNTS-AS-VEH&0 -     building or vehicle, too
 
 See also: OLC BUILDINGS
 #d

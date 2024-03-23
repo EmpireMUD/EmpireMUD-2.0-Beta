@@ -10993,7 +10993,7 @@ bool retrieve_resource(char_data *ch, empire_data *emp, struct empire_storage_da
 	act("You retrieve $p.", FALSE, ch, obj, 0, TO_CHAR | TO_QUEUE);
 	act("$n retrieves $p.", TRUE, ch, obj, 0, TO_ROOM | TO_QUEUE);
 	
-	if (stolen) {
+	if (stolen && !IS_IMMORTAL(ch)) {
 		record_theft_log(emp, GET_OBJ_VNUM(obj), 1);
 		GET_STOLEN_TIMER(obj) = time(0);
 		GET_STOLEN_FROM(obj) = EMPIRE_VNUM(emp);

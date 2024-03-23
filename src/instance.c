@@ -2568,7 +2568,7 @@ static void renum_instances(void) {
 		}
 		
 		// check bad instance
-		if (!INST_ADVENTURE(inst) || !INST_LOCATION(inst) || (!INST_START(inst) && !IS_SET(INST_FLAGS(inst), INST_NEEDS_LOAD))) {
+		if (!INST_ADVENTURE(inst) || ADVENTURE_FLAGGED(INST_ADVENTURE(inst), ADV_IN_DEVELOPMENT) || !INST_LOCATION(inst) || (!INST_START(inst) && !IS_SET(INST_FLAGS(inst), INST_NEEDS_LOAD))) {
 			delete_instance(inst, FALSE);
 		}
 	}

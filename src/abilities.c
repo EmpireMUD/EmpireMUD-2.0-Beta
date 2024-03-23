@@ -4632,7 +4632,7 @@ PREP_ABIL(prep_teleport_ability) {
 	// see if we're infiltrating
 	// TODO could this be moved to a function
 	if (HOME_ROOM(to_room) != HOME_ROOM(IN_ROOM(ch))) {
-		if (ROOM_OWNER(to_room) && !can_use_room(ch, to_room, GUESTS_ALLOWED) && (!GET_LOYALTY(ch) || !has_relationship(GET_LOYALTY(ch), ROOM_OWNER(to_room), DIPL_WAR | DIPL_THIEVERY))) {
+		if (!IS_IMMORTAL(ch) && ROOM_OWNER(to_room) && !can_use_room(ch, to_room, GUESTS_ALLOWED) && (!GET_LOYALTY(ch) || !has_relationship(GET_LOYALTY(ch), ROOM_OWNER(to_room), DIPL_WAR | DIPL_THIEVERY))) {
 			// stealthable seems to apply
 			if (!PRF_FLAGGED(ch, PRF_STEALTHABLE)) {
 				msg_to_char(ch, "You need to toggle 'stealthable' on to do that.\r\n");
@@ -5561,7 +5561,7 @@ DO_ABIL(do_teleport_ability) {
 			}
 		}
 	
-		if (infiltrate && ROOM_OWNER(to_room)) {
+		if (infiltrate && !IS_IMMORTAL(ch) && ROOM_OWNER(to_room)) {
 			// distrust just in case
 			trigger_distrust_from_stealth(ch, ROOM_OWNER(to_room));
 			gain_player_tech_exp(ch, PTECH_INFILTRATE, 50);

@@ -4197,6 +4197,126 @@ void b5_182_empire_update(void) {
 }
 
 
+// b5.183 adds a new trigger to water bottles and molten essence
+void b5_183_trigger_update(void) {
+	struct empire_unique_storage *eus;
+	struct trading_post_data *tpd;
+	empire_data *emp, *next_emp;
+	obj_data *obj, *objpr;
+	
+	const obj_vnum vnum_list[] = { 2112, 2136, 18097, NOTHING };
+	
+	log(" - assigning triggers to object list...");
+	DL_FOREACH(object_list, obj) {
+		if (search_block_int(GET_OBJ_VNUM(obj), vnum_list) != NOTHING && (objpr = obj_proto(GET_OBJ_VNUM(obj)))) {
+			free_proto_scripts(&obj->proto_script);
+			obj->proto_script = copy_trig_protos(objpr->proto_script);
+			assign_triggers(obj, OBJ_TRIGGER);
+		}
+	}
+
+	log(" - assigning triggers to warehouse objects...");
+	HASH_ITER(hh, empire_table, emp, next_emp) {
+		DL_FOREACH(EMPIRE_UNIQUE_STORAGE(emp), eus) {
+			if ((obj = eus->obj) && search_block_int(GET_OBJ_VNUM(obj), vnum_list) != NOTHING && (objpr = obj_proto(GET_OBJ_VNUM(obj)))) {
+				free_proto_scripts(&obj->proto_script);
+				obj->proto_script = copy_trig_protos(objpr->proto_script);
+				assign_triggers(obj, OBJ_TRIGGER);
+			}
+		}
+	}
+
+	log(" - assigning triggers to trading post objects...");
+	DL_FOREACH(trading_list, tpd) {
+		if ((obj = tpd->obj) && search_block_int(GET_OBJ_VNUM(obj), vnum_list) != NOTHING && (objpr = obj_proto(GET_OBJ_VNUM(obj)))) {
+			free_proto_scripts(&obj->proto_script);
+			obj->proto_script = copy_trig_protos(objpr->proto_script);
+			assign_triggers(obj, OBJ_TRIGGER);
+		}
+	}
+
+	// ensure everything gets saved this way since we won't do this again
+	save_all_empires();
+	save_trading_post();
+}
+
+
+// b5.183 adds a new trigger to water bottles and molten essences
+PLAYER_UPDATE_FUNC(b5_183_trigger_update_plr) {
+	int pos;
+	obj_data *obj, *objpr;
+	struct empire_unique_storage *eus;
+	
+	const obj_vnum vnum_list[] = { 2112, 2136, 18097, NOTHING };
+	
+	check_delayed_load(ch);
+	
+	// equipment
+	for (pos = 0; pos < NUM_WEARS; ++pos) {
+		if ((obj = GET_EQ(ch, pos)) && search_block_int(GET_OBJ_VNUM(obj), vnum_list) != NOTHING && (objpr = obj_proto(GET_OBJ_VNUM(obj)))) {
+			free_proto_scripts(&obj->proto_script);
+			obj->proto_script = copy_trig_protos(objpr->proto_script);
+			assign_triggers(obj, OBJ_TRIGGER);
+		}
+	}
+	
+	// inventory
+	DL_FOREACH2(ch->carrying, obj, next_content) {
+		if (search_block_int(GET_OBJ_VNUM(obj), vnum_list) != NOTHING && (objpr = obj_proto(GET_OBJ_VNUM(obj)))) {
+			free_proto_scripts(&obj->proto_script);
+			obj->proto_script = copy_trig_protos(objpr->proto_script);
+			assign_triggers(obj, OBJ_TRIGGER);
+		}
+	}
+	
+	// home items
+	DL_FOREACH(GET_HOME_STORAGE(ch), eus) {
+		if ((obj = eus->obj) && search_block_int(GET_OBJ_VNUM(obj), vnum_list) != NOTHING && (objpr = obj_proto(GET_OBJ_VNUM(obj)))) {
+			free_proto_scripts(&obj->proto_script);
+			obj->proto_script = copy_trig_protos(objpr->proto_script);
+			assign_triggers(obj, OBJ_TRIGGER);
+		}
+	}
+}
+
+
+// b5.183 replaces the Molten Fiend adventure.
+void b5_183_molten_fiend_update(void) {
+	bool needs_save = FALSE;
+	adv_data *old_adv, *new_adv;
+	struct instance_data *inst, *next_inst;
+	
+	const adv_vnum OLD_FIEND = 281;
+	const adv_vnum NEW_FIEND = 18000;
+	
+	// first, detect data and transfer it (for empiremuds where it changed)
+	old_adv = adventure_proto(OLD_FIEND);
+	new_adv = adventure_proto(NEW_FIEND);
+	if (new_adv) {
+		if (!old_adv) {
+			log("- Adding IN-DEV flag to 18000 Molten Fiend");
+			SET_BIT(GET_ADV_FLAGS(new_adv), ADV_IN_DEVELOPMENT);
+			needs_save = TRUE;
+		}
+		if (old_adv && GET_ADV_MAX_INSTANCES(new_adv) != GET_ADV_MAX_INSTANCES(old_adv)) {
+			log("- Updating instance limit to %d on 18000 Molten Fiend", GET_ADV_MAX_INSTANCES(old_adv));
+			GET_ADV_MAX_INSTANCES(new_adv) = GET_ADV_MAX_INSTANCES(old_adv);
+			needs_save = TRUE;
+		}
+		if (needs_save) {
+			save_library_file_for_vnum(DB_BOOT_ADV, NEW_FIEND);
+		}
+	}
+	
+	// now despawn old instances
+	DL_FOREACH_SAFE(instance_list, inst, next_inst) {
+		if (!INST_ADVENTURE(inst) || GET_ADV_VNUM(INST_ADVENTURE(inst)) == OLD_FIEND) {
+			delete_instance(inst, TRUE);
+		}
+	}
+}
+
+
 // ADD HERE, above: more beta 5 update functions
 
 
@@ -4311,6 +4431,8 @@ const struct {
 	{ "b5.176", NULL, b5_176_affect_fix, "Checking for players with bad affect times" },
 	{ "b5.181", b5_181_repair_extra_data, NULL, "Looking for bad world data and repairing oceans" },
 	{ "b5.182", b5_182_empire_update, NULL, "Updating empire admin flags (HELP EEDIT ADMIN FLAGS)..." },
+	{ "b5.183", b5_183_trigger_update, b5_183_trigger_update_plr, "Applying new triggers to water bottles and molten essence" },
+	{ "b5.183a", b5_183_molten_fiend_update, NULL, "Updating Molten Fiend adventure from 281 to 18000" },
 	
 	// ADD HERE, above: more beta 5 update lines
 	

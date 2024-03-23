@@ -63,8 +63,8 @@ void tog_pvp(char_data *ch);
 //// EMPIREMUD CONSTANTS /////////////////////////////////////////////////////
 
 // Shown on the "version" command and sent over MSSP
-const char *version = "EmpireMUD 2.0 beta 5.182";
-const char *DG_SCRIPT_VERSION = "DG Scripts 1.0.12 e5.1.5";
+const char *version = "EmpireMUD 2.0 beta 5.183";
+const char *DG_SCRIPT_VERSION = "DG Scripts 1.0.12 e5.1.6";
 
 
 // data for the built-in game levels -- this adapts itself if you reduce the number of immortal levels
@@ -3887,6 +3887,8 @@ const char *bld_relationship_types[] = {
 	"UPGRADES-TO-VEH",
 	"FORCE-UPGRADE-BLD",
 	"FORCE-UPGRADE-VEH",	// 5
+	"COUNTS-AS-BLD",
+	"COUNTS-AS-VEH",
 	"\n"
 };
 
@@ -3899,6 +3901,8 @@ const int bld_relationship_vnum_types[] = {
 	TYPE_VEH,	// UPGRADES-TO-VEH
 	TYPE_BLD,	// FORCE-UPGRADE-BLD
 	TYPE_VEH,	// 5, FORCE-UPGRADE-VEH
+	TYPE_BLD,	// COUNTS-AS-BLD
+	TYPE_VEH,	// COUNTS-AS-VEH
 };
 
 

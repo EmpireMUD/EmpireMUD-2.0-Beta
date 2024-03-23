@@ -409,10 +409,10 @@ bool perform_get_from_vehicle(char_data *ch, obj_data *obj, vehicle_data *veh, i
 		return FALSE;
 	}
 	
-	if ((emp = VEH_OWNER(veh)) && (!GET_LOYALTY(ch) || EMPIRE_VNUM(GET_LOYALTY(ch)) != GET_STOLEN_FROM(obj)) && !can_use_vehicle(ch, veh, GUESTS_ALLOWED)) {
+	if ((emp = VEH_OWNER(veh)) && !IS_IMMORTAL(ch) && (!GET_LOYALTY(ch) || EMPIRE_VNUM(GET_LOYALTY(ch)) != GET_STOLEN_FROM(obj)) && !can_use_vehicle(ch, veh, GUESTS_ALLOWED)) {
 		stealing = TRUE;
 		
-		if (!IS_IMMORTAL(ch) && emp && !can_steal(ch, emp)) {
+		if (!can_steal(ch, emp)) {
 			// sends own message
 			return FALSE;
 		}
@@ -434,7 +434,7 @@ bool perform_get_from_vehicle(char_data *ch, obj_data *obj, vehicle_data *veh, i
 			act("You get $p from $V.", FALSE, ch, obj, veh, TO_CHAR | TO_QUEUE | ACT_VEH_VICT);
 			act("$n gets $p from $V.", TRUE, ch, obj, veh, TO_ROOM | TO_QUEUE | ACT_VEH_VICT);
 			
-			if (stealing) {
+			if (stealing && !IS_IMMORTAL(ch)) {
 				record_theft_log(emp, GET_OBJ_VNUM(obj), 1);
 				
 				if (emp && IS_IMMORTAL(ch)) {

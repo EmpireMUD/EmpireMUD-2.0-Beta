@@ -214,23 +214,48 @@ int count_crop_variety_in_list(obj_data *list) {
 * @return int The number of completed buildings with that vnum, owned by emp.
 */
 int count_owned_buildings(empire_data *emp, bld_vnum vnum) {
+	struct bld_relation *relat;
 	struct empire_territory_data *ter, *next_ter;
+	struct empire_vehicle_data *vter, *next_vter;
 	int count = 0;	// ah ah ah
 	
 	if (!emp || vnum == NOTHING) {
 		return count;
 	}
 	
+	// check buildings
 	HASH_ITER(hh, EMPIRE_TERRITORY_LIST(emp), ter, next_ter) {
 		if (!IS_COMPLETE(ter->room) || !GET_BUILDING(ter->room)) {
 			continue;
 		}
-		if (GET_BLD_VNUM(GET_BUILDING(ter->room)) != vnum) {
+		
+		// counts 2 ways:
+		if (GET_BLD_VNUM(GET_BUILDING(ter->room)) == vnum) {
+			++count;
+		}
+		else {
+			LL_FOREACH(GET_BLD_RELATIONS(GET_BUILDING(ter->room)), relat) {
+				if (relat->type == BLD_REL_COUNTS_AS_BLD && relat->vnum == vnum) {
+					++count;
+					break;
+				}
+			}
+		}
+	}
+	
+	// also check vehicle counts-as
+	HASH_ITER(hh, EMPIRE_VEHICLE_LIST(emp), vter, next_vter) {
+		if (!vter->veh || !VEH_IS_COMPLETE(vter->veh)) {
 			continue;
 		}
 		
-		// found
-		++count;
+		// only checking counts-as
+		LL_FOREACH(VEH_RELATIONS(vter->veh), relat) {
+			if (relat->type == BLD_REL_COUNTS_AS_BLD && relat->vnum == vnum) {
+				++count;
+				break;	// only need 1
+			}
+		}
 	}
 	
 	return count;
@@ -406,22 +431,46 @@ int count_owned_sector(empire_data *emp, sector_vnum vnum) {
 */
 int count_owned_vehicles(empire_data *emp, any_vnum vnum) {
 	int count = 0;
+	struct bld_relation *relat;
+	struct empire_territory_data *ter, *next_ter;
 	struct empire_vehicle_data *vter, *next_vter;
 	
 	if (!emp || vnum == NOTHING) {
 		return count;
 	}
 	
+	// count vehicles
 	HASH_ITER(hh, EMPIRE_VEHICLE_LIST(emp), vter, next_vter) {
 		if (!vter->veh || !VEH_IS_COMPLETE(vter->veh)) {
 			continue;
 		}
-		if (VEH_VNUM(vter->veh) != vnum) {
+		
+		// count 2 ways
+		if (VEH_VNUM(vter->veh) == vnum) {
+			++count;
+		}
+		else {
+			LL_FOREACH(VEH_RELATIONS(vter->veh), relat) {
+				if (relat->type == BLD_REL_COUNTS_AS_VEH && relat->vnum == vnum) {
+					++count;
+					break;	// only need 1
+				}
+			}
+		}
+	}
+	
+	// check building counts-as
+	HASH_ITER(hh, EMPIRE_TERRITORY_LIST(emp), ter, next_ter) {
+		if (!IS_COMPLETE(ter->room) || !GET_BUILDING(ter->room)) {
 			continue;
 		}
 		
-		// found
-		++count;
+		LL_FOREACH(GET_BLD_RELATIONS(GET_BUILDING(ter->room)), relat) {
+			if (relat->type == BLD_REL_COUNTS_AS_VEH && relat->vnum == vnum) {
+				++count;
+				break;
+			}
+		}
 	}
 	
 	return count;
@@ -3003,7 +3052,10 @@ void qt_gain_building(char_data *ch, any_vnum vnum) {
 	
 	LL_FOREACH(GET_QUESTS(ch), pq) {
 		LL_FOREACH(pq->tracker, task) {
-			if (task->type == REQ_OWN_BUILDING && task->vnum == vnum) {
+			if (task->type == REQ_OWN_BUILDING && building_counts_as(bld, task->vnum, NOTHING)) {
+				++task->current;
+			}
+			else if (task->type == REQ_OWN_VEHICLE && building_counts_as(bld, NOTHING, task->vnum)) {
 				++task->current;
 			}
 			else if (task->type == REQ_OWN_BUILDING_FUNCTION && (GET_BLD_FUNCTIONS(bld) & task->misc) == task->misc) {
@@ -3070,7 +3122,10 @@ void qt_gain_vehicle(char_data *ch, vehicle_data *veh) {
 	
 	LL_FOREACH(GET_QUESTS(ch), pq) {
 		LL_FOREACH(pq->tracker, task) {
-			if (task->type == REQ_OWN_VEHICLE && task->vnum == VEH_VNUM(veh)) {
+			if (task->type == REQ_OWN_VEHICLE && vehicle_counts_as(veh, NOTHING, task->vnum)) {
+				++task->current;
+			}
+			else if (task->type == REQ_OWN_BUILDING && vehicle_counts_as(veh, task->vnum, NOTHING)) {
 				++task->current;
 			}
 			else if (task->type == REQ_OWN_VEHICLE_FLAGGED && (VEH_FLAGS(veh) & task->misc) == task->misc) {
@@ -3234,7 +3289,10 @@ void qt_lose_building(char_data *ch, any_vnum vnum) {
 	
 	LL_FOREACH(GET_QUESTS(ch), pq) {
 		LL_FOREACH(pq->tracker, task) {
-			if (task->type == REQ_OWN_BUILDING && task->vnum == vnum) {
+			if (task->type == REQ_OWN_BUILDING && building_counts_as(bld, task->vnum, NOTHING)) {
+				--task->current;
+			}
+			else if (task->type == REQ_OWN_VEHICLE && building_counts_as(bld, NOTHING, task->vnum)) {
 				--task->current;
 			}
 			else if (task->type == REQ_OWN_BUILDING_FUNCTION && (GET_BLD_FUNCTIONS(bld) & task->misc) == task->misc) {
@@ -3331,7 +3389,10 @@ void qt_lose_vehicle(char_data *ch, vehicle_data *veh) {
 	
 	LL_FOREACH(GET_QUESTS(ch), pq) {
 		LL_FOREACH(pq->tracker, task) {
-			if (task->type == REQ_OWN_VEHICLE && task->vnum == VEH_VNUM(veh)) {
+			if (task->type == REQ_OWN_VEHICLE && vehicle_counts_as(veh, NOTHING, task->vnum)) {
+				--task->current;
+			}
+			else if (task->type == REQ_OWN_BUILDING && vehicle_counts_as(veh, task->vnum, NOTHING)) {
 				--task->current;
 			}
 			else if (task->type == REQ_OWN_VEHICLE_FLAGGED && (VEH_FLAGS(veh) & task->misc) == task->misc) {

@@ -1,42 +1,66 @@
+#18051
+friend molten~
+a molten friend~
+A molten friend wags its tails as it runs circles around you.
+~
+1 1 bdoD nG 1
+0 0 64 9 -1 -1
+D
+   This little molten friend sizzles as it rolls around in front of you,
+exposing its soft lava belly. When it yips, it sounds like crackling embers in
+a lively fire -- which would be an apt comparison if the little friend had half
+the energy.
+~
+M
+0
+With an excited yip and a loud crackle, $n bounds past your leg, nearly setting you ablaze.~
+M
+0
+$n leaps around like a flame as $e tries to get you to play.~
+M
+0
+$n twirls all three of $s tails with delight.~
+M
+0
+$n shimmers as lava glows from beneath $s rocky coat.~
+M
+0
+With an abyssal woof, $n pounces on an imaginary target, sending sparks flying in every direction.~
+M
+0
+$n's rocky fur crackles and glows as $e sears past you.~
+M
+0
+$n's eyes gleam with volcanic mirth as $e chases $s tails, each one just out of reach.~
+S
 #18075
 fiend molten massive chained~
 the molten fiend~
-A massive molten fiend is chained to the wall here, half-submerged in magma!
+A massive molten fiend is chained to the wall here, half-submerged in magma! (difficulty)
 ~
-0 0 bdxyAB cG 5
-0 0 0 16
+0 0 bdxyAB cEG 5
+0 0 0 16 -1 -1
 D
    This towering, red-skinned demon has goat-like horns wreathed in flames atop
 its snarling visage. Its bare, muscular arms, thick as tree-trunks, strain
 against the dark iron shackles binding its wrists to the rock behind it.
 ~
-I 4 18075 10.00 1 a  # LOOT: a firecloth skirt
-I 4 18076 10.00 1 a  # LOOT: firecloth pauldrons
-I 4 18077 10.00 1 a  # LOOT: a hearthflame skirt
-I 4 18078 10.00 1 a  # LOOT: hearthflame sleeves
-I 4 18079 10.00 1 a  # LOOT: magma-forged pauldrons
-I 4 18080 10.00 1 a  # LOOT: core-forged plate armor
-I 4 18081 10.00 1 a  # LOOT: huge spiked pauldrons
-I 4 18082 10.00 1 a  # LOOT: a fiendskin jerkin
-I 4 18083 10.00 1 a  # LOOT: a bottomless pouch
-I 4 18084 10.00 1 a  # LOOT: an igneous shield
-I 4 18085 10.00 1 b  # LOOT: a cold lava ring
-I 4 18086 10.00 1 b  # LOOT: a mantle of flames
-I 4 18087 10.00 1 b  # LOOT: frozen flame earrings
-I 4 18088 10.00 1 b  # LOOT: emberweave gloves
-I 4 18089 10.00 1 b  # LOOT: molten gauntlets
-I 4 18090 10.00 1 b  # LOOT: the molten fiend's earrings
-I 4 18091 10.00 1 b  # LOOT: Flametalon
-I 4 18092 10.00 1 b  # LOOT: an obsidian earring
-I 4 18093 10.00 1 b  # LOOT: a crown of abyssal flames
-I 4 18094 10.00 1 b  # LOOT: a fiendhorn bladed bow
-I 4 18095 10.00 1 c  # LOOT: a hellsteed's reins
-I 4 18096 5.00 1 c  # LOOT: a pile of phoenix ash
-T 18076
-T 10000
+I 4 18070 100.00 1  # LOOT: Molten Fiend loot replacer
 T 18079
 T 18080
 T 18081
+T 18000
+T 18001
+T 18002
+T 18009
+T 18003
+T 18004
+T 18005
+T 18006
+T 18008
+T 9600
+T 9601
+T 9604
 S
 #18077
 elemental fire~
@@ -44,12 +68,12 @@ a fire elemental~
 A fire elemental blazes brightly here!
 ~
 0 0 bdhox cmG 3
-0 0 2 12
+0 0 2 12 -1 -1
 D
-The elemental looks unstable. It probably won't last long.
+   A floating, featureless mass of flames in the vague shape of a humanoid. It
+looks unstable, burning hotter by the second!
 ~
-T 18077
-T 18078
+T 18012
 S
 #18078
 hellsteed pitch-black black steed~
@@ -57,12 +81,12 @@ a pitch-black hellsteed~
 A pitch-black hellsteed is rearing here, mane and tail ablaze!
 ~
 100 150 dej c 4
-0 0 12 11
+0 0 12 11 -1 -1
 D
    This obsidian-skinned demonic steed has a mane and tail of flames, and
 hooves of molten iron that leave smoking craters in their wake!
 ~
-I 3 18080 100.00 1  # BARDE: a fearsome hellcharger
+I 3 18080 100.00 1  # BARDE: fearsome hellcharger
 S
 #18079
 phoenix magnificent~
@@ -70,12 +94,12 @@ a magnificent phoenix~
 A magnificent phoenix soars overhead, beating its massive wings of flame!
 ~
 100 125 dehj m 4
-0 0 2 12
+0 0 2 12 -1 -1
 D
    Greater phoenixes such as this one are drawn to the sides of those who fight
 evil. They have the power to return from their ashes if slain.
 ~
-I 4 18096 100.00 1  # LOOT: a pile of phoenix ash
+I 4 18096 100.00 1  # LOOT: pile of phoenix ash
 S
 #18080
 hellcharger fearsome charger~
@@ -83,7 +107,7 @@ a fearsome hellcharger~
 A fearsome hellcharger clad in molten mail is trampling the charred ground!
 ~
 100 150 dejy c 4
-0 0 12 11
+0 0 12 11 -1 -1
 D
    This obsidian-skinned demonic steed has a mane and tail of flames, and
 hooves of molten iron that leave smoking craters in their wake! Someone has

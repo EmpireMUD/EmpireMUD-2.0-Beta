@@ -127,7 +127,7 @@ You can have more than one mount, but you have to switch them at a stable.
 You can abbreviate most things including commands and names.
 If you've typed too many commands and are waiting for them to happen, you can use + to insert a command at the front of the list.
 If you've typed too many commands and are waiting for them to happen, you can type -- to clear them all out of the queue.
-The only way to remove seeded fields is with Devastation Ritual.
+You can burn seeded fields or remove them with the Devastation Ritual.
 You can't use your tomb to respawn if it's on fire.
 You can turn off workforce for a tile or building by typing 'workforce no-work'.
 You can use 'cede' to transfer land ownership to someone else.

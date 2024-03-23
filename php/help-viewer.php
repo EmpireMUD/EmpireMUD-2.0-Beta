@@ -52,7 +52,7 @@ foreach (explode("\n", $list) as $fname) {
 </style>
 
 <form action="<?= $_SERVER['SCRIPT_NAME'] ?>" method="GET">
-	<input type="text" name="q" placeholder="search" value="<?= $q ?>" size="40" tabindex="1" />
+	<input type="text" name="q" placeholder="search" value="<?= htmlentities($q) ?>" size="40" tabindex="1" />
 	<input type="submit" value="search" tabindex="2" />
 	<input type="checkbox" id="allowimm" name="imm" value="1" tabindex="3" <?= ($allowimm ? 'checked="checked"' : '') ?> /> <label for="allowimm">search immortal helps too</label>
 </form>

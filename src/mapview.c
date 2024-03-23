@@ -554,11 +554,11 @@ char *get_room_name(room_data *room, bool color) {
 * @param char_data *ch The observing player.
 * @param room_data *room The room the character is looking at.
 * @param char *icon The incoming icon, which may be recolored.
-* @param int pos 0 is a building, 1 is the base tile.
+* @param int pos Which position the partial icon is in (0-3 for quarters, 4 for whole, and 5-6 for halves).
 * @return char* The possibly-recolored icon.
 */
 char *partial_room_icon(char_data *ch, room_data *room, char *icon, int pos) {
-	static char storage[2][100];
+	static char storage[7][100];
 	char temp[80], col_buf[80];
 	
 	*storage[pos] = '\0';
@@ -695,7 +695,7 @@ void replace_icon_codes(char_data *ch, room_data *to_room, char *icon_buf, int t
 			icon = get_icon_from_set(GET_SECT_ICONS(BASE_SECT(to_room)), tileset);
 			sprintf(temp, "%s%c", icon ? icon->color : "&0", GET_SECT_ROADSIDE_ICON(BASE_SECT(to_room)));
 			str = str_replace("@.", temp, icon_buf);
-			strcpy(icon_buf, partial_room_icon(ch, to_room, str, 0));
+			strcpy(icon_buf, partial_room_icon(ch, to_room, str, 4));
 			free(str);
 		}
 		// east (@e) tile attachment
@@ -1365,13 +1365,15 @@ void build_vehicle_icon(char_data *ch, room_data *room, vehicle_data *main_veh, 
 	// TODO should the building be FIRST in some cases?
 	if (GET_BUILDING(room) && (!memory_only || !ROOM_AFF_FLAGGED(room, ROOM_AFF_CHAMELEON)) && !CHECK_CHAMELEON(IN_ROOM(ch), room)) {
 		if (!whole) {
-			whole = partial_room_icon(ch, room, GET_BLD_ICON(GET_BUILDING(room)), 0);
+			whole = partial_room_icon(ch, room, GET_BLD_ICON(GET_BUILDING(room)), WHOLE_ICON);
 		}
 		if (GET_BLD_HALF_ICON(GET_BUILDING(room)) && half_size < 2) {
-			half[half_size++] = partial_room_icon(ch, room, GET_BLD_HALF_ICON(GET_BUILDING(room)), 0);
+			half[half_size] = partial_room_icon(ch, room, GET_BLD_HALF_ICON(GET_BUILDING(room)), half_size == 0 ? HALF_1 : HALF_2);
+			++half_size;
 		}
 		if (GET_BLD_QUARTER_ICON(GET_BUILDING(room)) && quarter_size < 4) {
-			quarter[quarter_size++] = partial_room_icon(ch, room, GET_BLD_QUARTER_ICON(GET_BUILDING(room)), 0);
+			quarter[quarter_size] = partial_room_icon(ch, room, GET_BLD_QUARTER_ICON(GET_BUILDING(room)), quarter_size);
+			++quarter_size;
 		}
 	}
 	
@@ -1390,7 +1392,7 @@ void build_vehicle_icon(char_data *ch, room_data *room, vehicle_data *main_veh, 
 					strcat(outbuf, quarter[iter]);
 				}
 				else if (iter == (x % 4)) {
-					strcat(outbuf, partial_room_icon(ch, room, "@.", 1));
+					strcat(outbuf, partial_room_icon(ch, room, "@.", quarter_size++));
 				}
 				else {
 					strcat(outbuf, quarter[iter-1]);
@@ -1398,7 +1400,7 @@ void build_vehicle_icon(char_data *ch, room_data *room, vehicle_data *main_veh, 
 			}
 		}
 		else if (quarter_size == 2) {
-			strcpy(temp, partial_room_icon(ch, room, "@.", 1));
+			strcpy(temp, partial_room_icon(ch, room, "@.", quarter_size++));
 			sprintf(outbuf, "%s%s%s%s", quarter[0], temp, quarter[1], temp);
 		}
 	}
@@ -1408,7 +1410,7 @@ void build_vehicle_icon(char_data *ch, room_data *room, vehicle_data *main_veh, 
 	}
 	else if (half_size == 1 && !whole) {
 		// show 1 half icon for some reason
-		strcpy(temp, partial_room_icon(ch, room, "@.", 1));
+		strcpy(temp, partial_room_icon(ch, room, "@.", half_size++));
 		sprintf(outbuf, "%s%s%s", temp, half[0], temp);
 	}
 	else if (whole) {
