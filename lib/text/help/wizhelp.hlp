@@ -568,13 +568,16 @@ This immortal command allows the game's staff to name islands and apply
 properties to them. This command is grantable.
 
 Island flags:
- NEWBIE - Wipes claims periodically
- !AGGRO - Prevents aggro mobs, and guard towers won't fire
- !CUSTOMIZE - Cannot be renamed by players
- CONTINENT - Is a whole continent (affects adventure spawns)
- !CHART - Cannot be charted by players
- !TEMPERATURE-PENALTIES - Players are not harmed by heat/cold here
- ALWAYS-LIGHT - Outdoor tiles are lit at night
+ &cNEWBIE&0 - Wipes claims periodically
+ &c!AGGRO&0 - Prevents aggro mobs, and guard towers won't fire
+ &c!CUSTOMIZE&0 - Cannot be renamed by players
+ &cCONTINENT&0 - Is a whole continent (affects adventure spawns)
+ &c!CHART&0 - Cannot be charted by players
+ &c!TEMPERATURE-PENALTIES&0 - Players are not harmed by heat/cold here
+ &cALWAYS-LIGHT&0 - Outdoor tiles are lit at night
+ &cALWAYS-DARK&0 - Outdoor tiles are dark even during the day
+ &cALWAYS-DAY&0 - The sun is always up.
+ &cALWAYS-NIGHT&0 - The sun is always down.
 
 See also: CHART, GRANT
 #d

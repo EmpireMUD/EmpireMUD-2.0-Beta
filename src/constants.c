@@ -1788,6 +1788,7 @@ const char *affected_bits[] = {
 	"AUTO-RESURRECT",
 	"COUNTERSPELL",		// 45
 	"!DISARM",
+	"!MORPH",
 	"\n"
 };
 
@@ -1840,6 +1841,7 @@ const char *affected_bits_consider[] = {
 	"",	// auto-resurrect
 	"",	// 45 - counterspell
 	"$E cannot be disarmed",	// !disarm
+	"",	// !morph
 	"\n"
 };
 
@@ -1892,6 +1894,7 @@ const bool aff_is_bad[] = {
 	FALSE,	// auto-resurrect
 	FALSE,	// 45 - counterspell
 	FALSE,	// !disarm
+	TRUE,	// !morph
 };
 
 
@@ -4318,6 +4321,9 @@ const char *island_bits[] = {
 	"!CHART",	// 5
 	"!TEMPERATURE-PENALTIES",
 	"ALWAYS-LIGHT",
+	"ALWAYS-DARK",
+	"ALWAYS-DAY",
+	"ALWAYS-NIGHT",	// 10
 	"\n"
 };
 

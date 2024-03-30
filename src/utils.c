@@ -7366,8 +7366,8 @@ bool room_is_light(room_data *room, bool count_adjacent_light, bool ignore_magic
 		return FALSE;	// always dark
 	}
 	
-	// things that make the room light
-	if (GET_ISLAND(room) && IS_SET(GET_ISLAND(room)->flags, ISLE_ALWAYS_LIGHT) && IS_OUTDOOR_TILE(room)) {
+	// 1. things that make the room light
+	if (GET_ISLAND(room) && IS_SET(GET_ISLAND(room)->flags, ISLE_ALWAYS_LIGHT) && IS_OUTDOOR_TILE(room) && !NO_LOCATION(room)) {
 		return TRUE;
 	}
 	if (ROOM_LIGHTS(room) > 0 || RMT_FLAGGED(room, RMT_LIGHT)) {
@@ -7376,9 +7376,6 @@ bool room_is_light(room_data *room, bool count_adjacent_light, bool ignore_magic
 	if (IS_ANY_BUILDING(room) && (ROOM_OWNER(room) || ROOM_AFF_FLAGGED(room, ROOM_AFF_UNCLAIMABLE))) {
 		return TRUE;	// not dark: claimed (or unclaimable) building
 	}
-	if (!RMT_FLAGGED(room, RMT_DARK) && get_sun_status(room) != SUN_DARK) {
-		return TRUE;	// not dark: it isn't dark outside
-	}
 	if (ROOM_OWNER(room) && EMPIRE_HAS_TECH(ROOM_OWNER(room), TECH_CITY_LIGHTS) && get_territory_type_for_empire(room, ROOM_OWNER(room), FALSE, NULL, NULL) != TER_FRONTIER) {
 		return TRUE;	// not dark: city lights
 	}
@@ -7386,7 +7383,17 @@ bool room_is_light(room_data *room, bool count_adjacent_light, bool ignore_magic
 		return TRUE;	// not dark: adjacent room is light
 	}
 	
-	// otherwise: it's dark
+	// 2. things that make the room dark
+	if (GET_ISLAND(room) && IS_SET(GET_ISLAND(room)->flags, ISLE_ALWAYS_DARK) && IS_OUTDOOR_TILE(room) && !NO_LOCATION(room)) {
+		return FALSE;
+	}
+	
+	// 3. normal daylight checks
+	if (!RMT_FLAGGED(room, RMT_DARK) && get_sun_status(room) != SUN_DARK) {
+		return TRUE;	// not dark: it isn't dark outside
+	}
+	
+	// 4. otherwise: it's dark
 	return FALSE;
 }
 

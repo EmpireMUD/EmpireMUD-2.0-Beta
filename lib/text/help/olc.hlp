@@ -2839,6 +2839,7 @@ The following affect flags are available:
  &cCOUNTERSPELL&0 - Will cancel the next counterspellable ability then remove its
    affect. If applied by an ability, will also trigger skill gain and hooks.
  &c!DISARM&0 - Cannot be disarmed.
+ &c!MORPH&0 - Cannot manually morph or unmorph one's self.
 #d
 ARCHEDIT "OLC ARCHETYPES" "ARCHETYPE OLC" "ARCHETYPE EDITOR"
 
