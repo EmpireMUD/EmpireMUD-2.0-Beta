@@ -2585,6 +2585,139 @@ int find_diplomacy_option(char *arg) {
 }
 
 
+/**
+* This function allows a script to change the diplomatic relations between two
+* empires. Unlike player diplomacy commands, this change is immediate and does
+* not require the other empire to accept it. This also bypasses all
+* restrictions, costs nothing, and does not cause an elog. All open offers
+* between the two empires will be canceled. There will be a syslog for the new
+* diplomatic status.
+*
+* @param trig_data *trig The trigger calling this function. This is optional, and may be NULL, but should be provided if possible.
+* @param empire_data *emp The first empire.
+* @param empire_data *other The second empire.
+* @param bitvector_t set_type One DIPL_ flag to set.
+*/
+void script_change_diplomacy(trig_data *trig, empire_data *emp, empire_data *other, bitvector_t set_type) {
+	int iter, opt = NOTHING;
+	struct empire_political_data *emp_pol = NULL, *other_pol = NULL;
+	
+	// sanitation
+	if (!emp || !other || set_type == NOBITS) {
+		script_log("Trigger: %s, vnum %d. script_change_diplomacy called with invalid input", trig ? GET_TRIG_NAME(trig) : "???", trig ? GET_TRIG_VNUM(trig) : NOTHING);
+		return;
+	}
+	
+	// find an entry in the diplo_option struct
+	for (iter = 0; *diplo_option[iter].keywords != '\n'; ++iter) {
+		if (diplo_option[iter].add_bits == set_type) {
+			opt = iter;
+			break;
+		}
+	}
+	if (opt == NOTHING) {
+		char name[MAX_STRING_LENGTH];
+		sprintbit(set_type, diplomacy_flags, name, FALSE);
+		script_log("Trigger: %s, vnum %d. script_change_diplomacy: No configuration data for %s", trig ? GET_TRIG_NAME(trig) : "???", trig ? GET_TRIG_VNUM(trig) : NOTHING, name);
+		return;
+	}
+	
+	// look up/add relationship entries
+	if (!(emp_pol = find_relation(emp, other))) {
+		emp_pol = create_relation(emp, other);
+	}
+	if (!(other_pol = find_relation(other, emp))) {
+		other_pol = create_relation(other, emp);
+	}
+	
+	// apply (first empire)
+	emp_pol->start_time = time(0);
+	REMOVE_BIT(emp_pol->type, diplo_option[opt].remove_bits);
+	emp_pol->offer = NOBITS;
+	SET_BIT(emp_pol->type, diplo_option[opt].add_bits);
+	
+	// and back (second empire)
+	if (!IS_SET(diplo_option[opt].flags, DIPF_ONLY_FLAG_SELF)) {
+		other_pol->start_time = time(0);
+		REMOVE_BIT(other_pol->type, diplo_option[opt].remove_bits);
+		other_pol->offer = NOBITS;
+		SET_BIT(other_pol->type, diplo_option[opt].add_bits);
+	}
+	
+	syslog(SYS_EMPIRE, 0, TRUE, "DIPL: %s set to %s with %s by trigger %s, vnum %d", EMPIRE_NAME(emp), fname(diplo_option[opt].keywords), EMPIRE_NAME(other), trig ? GET_TRIG_NAME(trig) : "???", trig ? GET_TRIG_VNUM(trig) : NOTHING);
+	
+	// starting a war avenges offenses
+	if (POL_FLAGGED(emp_pol, DIPL_WAR)) {
+		avenge_offenses_from_empire(emp, other);
+	}
+	
+	et_change_diplomacy(emp);
+	et_change_diplomacy(other);
+	
+	// save
+	EMPIRE_NEEDS_SAVE(emp) = TRUE;
+	EMPIRE_NEEDS_SAVE(other) = TRUE;
+}
+
+
+/**
+* Removes a diplomatic status, if it's set, between two empires. All other
+* diplomacy is left alone. This function will syslog if any status is removed,
+* but is silent if not. This can only remove one DIPL_ flag at a time; call it
+* multiple times to remove more than one.
+*
+* @param trig_data *trig The trigger calling this function. This is optional, and may be NULL, but should be provided if possible.
+* @param empire_data *emp The first empire.
+* @param empire_data *other The second empire.
+* @param bitvector_t remove_type One DIPL_ flag to remove.
+*/
+void script_remove_diplomacy(trig_data *trig, empire_data *emp, empire_data *other, bitvector_t remove_type) {
+	int iter, opt = NOTHING;
+	struct empire_political_data *emp_pol = NULL, *other_pol = NULL;
+	
+	// sanitation
+	if (!emp || !other || remove_type == NOBITS) {
+		script_log("Trigger: %s, vnum %d. script_remove_diplomacy called with invalid input", trig ? GET_TRIG_NAME(trig) : "???", trig ? GET_TRIG_VNUM(trig) : NOTHING);
+		return;
+	}
+	
+	// find an entry in the diplo_option struct
+	for (iter = 0; *diplo_option[iter].keywords != '\n'; ++iter) {
+		if (diplo_option[iter].add_bits == remove_type) {
+			opt = iter;
+			break;
+		}
+	}
+	if (opt == NOTHING) {
+		char name[MAX_STRING_LENGTH];
+		sprintbit(remove_type, diplomacy_flags, name, FALSE);
+		script_log("Trigger: %s, vnum %d. script_remove_diplomacy: No configuration data for %s", trig ? GET_TRIG_NAME(trig) : "???", trig ? GET_TRIG_VNUM(trig) : NOTHING, name);
+		return;
+	}
+	
+	// first empire
+	if ((emp_pol = find_relation(emp, other))) {
+		emp_pol->start_time = time(0);
+		REMOVE_BIT(emp_pol->type, diplo_option[opt].add_bits);
+		REMOVE_BIT(emp_pol->offer, diplo_option[opt].add_bits);
+		et_change_diplomacy(emp);
+		EMPIRE_NEEDS_SAVE(emp) = TRUE;
+		
+		// only need 1 syslog for both
+		syslog(SYS_EMPIRE, 0, TRUE, "DIPL: %s removed %s with %s by trigger %s, vnum %d", EMPIRE_NAME(emp), fname(diplo_option[opt].keywords), EMPIRE_NAME(other), trig ? GET_TRIG_NAME(trig) : "???", trig ? GET_TRIG_VNUM(trig) : NOTHING);
+	}
+	
+	// second empire
+	if ((other_pol = find_relation(other, emp))) {
+		other_pol->start_time = time(0);
+		REMOVE_BIT(other_pol->type, diplo_option[opt].add_bits);
+		REMOVE_BIT(other_pol->offer, diplo_option[opt].add_bits);
+		et_change_diplomacy(other);
+		EMPIRE_NEEDS_SAVE(other) = TRUE;
+	}
+}
+
+
  //////////////////////////////////////////////////////////////////////////////
 //// EFIND HELPERS ///////////////////////////////////////////////////////////
 

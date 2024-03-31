@@ -203,6 +203,9 @@ Empire variables are accessed via %char.empire% (or obj, room, vehicle). If
 the thing belongs to no empire, this will be empty.
 
 When using field - The variable returns:
+&cadd_diplomacy(emp,type)&0 - Adds a given diplomatic relationship type with
+   another empire (peace, war, thievery, allied, nonaggression, trade,
+   distrust, truce).
 &cadd_progress(vnum)&0 - Grants a progression goal (preferably set NO-AUTOSTART).
 &cadjective&0 - Adjective form of the empire's name.
 &cbanner&0 - Empire's banner (as a color code).
@@ -220,6 +223,8 @@ When using field - The variable returns:
 &cgive_coins(amount)&0 - Adds to the empire's coin count. This is always in the
    empire's own currency (no exchange rate).
 &cgreatness&0 - The empire's total greatness value.
+&chas_diplomacy(emp,type)&0 - Checks if this empire has a given diplomacy type
+   with another empire (see add_diplomacy, above, for a list).
 &chas_progress(vnum)&0 - Checks if the empire has earned/purchased a goal.
 &chas_storage(vnum,location)&0 - Amount of an object (vnum) the empire has
    stored at the given location (which must be a room variable).
@@ -237,6 +242,8 @@ When using field - The variable returns:
 &cqualifies_for_progress(vnum)&0 - True if the empire meets the prerequisites.
 &crank(num)&0 - Returns the name of a given rank.
 &cranks&0 - The number of ranks in the empire.
+&cremove_diplomacy(emp,type)&0 - Cancels a diplomatic relationship type with
+   another empire (see add_diplomacy, above, for a list).
 &cremove_progress(vnum)&0 - Takes away a progression goal. Warning: If the empire
    still qualifies for the goal, they may instantly re-earn it. This works best
    if you only remove NO-AUTOSTART goals.

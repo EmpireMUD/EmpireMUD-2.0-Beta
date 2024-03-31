@@ -596,6 +596,10 @@ int veh_script_id(vehicle_data *veh);
 // wait helpers
 EVENT_CANCEL_FUNC(cancel_wait_event);
 
+// from act.empire.c
+void script_change_diplomacy(trig_data *trig, empire_data *emp, empire_data *other, bitvector_t set_type);
+void script_remove_diplomacy(trig_data *trig, empire_data *emp, empire_data *other, bitvector_t remove_type);
+
 // from vehicles.c
 void vehicle_interior_dismantle_triggers(vehicle_data *veh, char_data *ch);
 
