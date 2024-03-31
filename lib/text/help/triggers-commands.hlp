@@ -492,6 +492,29 @@ Valid wear positions are: head, ears, neck1, neck2, clothes, armor, about,
 arms, wrists, hands, rfinger, lfinger, waist, legs, feet, pack, saddle,
 sheath1, sheath2, wield, ranged, hold, shared
 #d
+%LOG% "SCRIPT LOGGING" "LOGGING IN SCRIPTS"
+
+This function has 3 modes:
+
+Usage: %log% syslog <syslog type> <message>
+
+Logs to the game's syslog. Valid syslog types are: config, death, error, gc,
+info, level, login, olc, script, system, validation, empire, event.
+
+Usage: %log% mortlog <message>
+
+Logs to the mortlog, shown to mortals who have it turned on. There is no
+subtype for mortlogs (unlike syslogs and empire logs).
+
+Usage: %log% <empire> <elog type> <message>
+
+Logs to a specific empire. You should generally provide an empire variable for
+the first argument, but can also provide an empire name (in quotes if longer
+than one word). Available elog types are: Admin, Diplomacy, Hostility, Members,
+Territory, Trade, Logins, Shipping, Workforce, Progress, Alert.
+
+See also: ELOG, MORTLOG, SYSLOG
+#d
 MAKEUID
 
 Usage:  makeuid <variable> <id>

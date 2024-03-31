@@ -531,6 +531,7 @@ void remove_trigger_from_global_lists(trig_data *trig, bool random_only);
 void script_damage(char_data *vict, char_data *killer, int level, int dam_type, double modifier, int show_attack_message);
 void script_damage_over_time(char_data *vict, any_vnum atype, int level, int dam_type, double modifier, int dur_seconds, int max_stacks, char_data *cast_by);
 void script_heal(void *thing, int type, char *argument);
+void script_log_command(char *argument, char *source_info);
 bool script_message_should_queue(char **string);
 void script_modify(char *argument);
 void sub_write(char *arg, char_data *ch, byte find_invis, int targets);

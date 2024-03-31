@@ -1187,6 +1187,59 @@ void script_heal(void *thing, int type, char *argument) {
 
 
 /**
+* This is the functional portion of the %log% script command.
+*
+* Usage: %log% syslog <syslog type> <message>
+* Usage: %log% mortlog <message>
+* Usage: %log% <empire> <elog type> <message>
+*
+* @param char *argument All arguments passed to %log%.
+* @param char *source_info Identifying information in case of error.
+*/
+void script_log_command(char *argument, char *source_info) {
+	char arg1[MAX_INPUT_LENGTH], arg2[MAX_INPUT_LENGTH];
+	int type;
+	empire_data *to_emp;
+	
+	// pull out 1st arg
+	argument = any_one_word(argument, arg1);
+	
+	if (!*arg1) {
+		script_log("script_log_command (%s): Missing arguments", source_info);
+	}
+	else if (is_abbrev(arg1, "syslog")) {
+		argument = any_one_word(argument, arg2);
+		
+		if ((type = search_block(arg2, syslog_types, FALSE)) != NOTHING) {
+			skip_spaces(&argument);
+			syslog(BIT(type), 0, TRUE, "SCRIPT (%s): %s", source_info, argument);
+		}
+		else {
+			script_log("script_log_command (%s): Invalid syslog type '%s'", source_info, arg2);
+		}
+	}
+	else if (is_abbrev(arg1, "mortlog")) {
+		skip_spaces(&argument);
+		mortlog("%s", argument);
+	}
+	else if ((to_emp = get_empire(arg1))) {
+		argument = any_one_word(argument, arg2);
+		
+		if ((type = search_block(arg2, empire_log_types, FALSE)) != NOTHING) {
+			skip_spaces(&argument);
+			log_to_empire(to_emp, type, "%s", argument);
+		}
+		else {
+			script_log("script_log_command (%s): Invalid elog type '%s'", source_info, arg2);
+		}
+	}
+	else {
+		script_log("script_log_command (%s): Invalid argument '%s'", source_info, arg1);
+	}
+}
+
+
+/**
 * %mod% <variable> <field> <value>
 *
 * This function allows scripts to modify a mob/object/room/vehicle.
