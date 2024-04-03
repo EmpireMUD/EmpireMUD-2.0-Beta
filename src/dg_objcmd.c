@@ -645,6 +645,13 @@ OCMD(do_otransform) {
 }
 
 
+OCMD(do_olog) {
+	char source_info[MAX_STRING_LENGTH];
+	safe_snprintf(source_info, sizeof(source_info), "obj %d %s", GET_OBJ_VNUM(obj), GET_OBJ_SHORT_DESC(obj));
+	script_log_command(argument, source_info);
+}
+
+
 OCMD(do_omod) {
 	script_modify(argument);
 }
@@ -1928,6 +1935,7 @@ const struct obj_command_info obj_cmd_info[] = {
 	{ "oforce", do_oforce, NO_SCMD },
 	{ "oheal", do_oheal, NO_SCMD },
 	{ "oload", do_oload, NO_SCMD },
+	{ "olog", do_olog, NO_SCMD },
 	{ "omod", do_omod, NO_SCMD },
 	{ "omorph", do_omorph, NO_SCMD },
 	{ "oown", do_oown, NO_SCMD },

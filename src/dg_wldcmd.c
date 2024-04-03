@@ -1331,6 +1331,13 @@ WCMD(do_wload) {
 }
 
 
+WCMD(do_wlog) {
+	char source_info[MAX_STRING_LENGTH];
+	safe_snprintf(source_info, sizeof(source_info), "room %d %s", GET_ROOM_VNUM(room), get_room_name(room, FALSE));
+	script_log_command(argument, source_info);
+}
+
+
 WCMD(do_wmod) {
 	script_modify(argument);
 }
@@ -1736,6 +1743,7 @@ const struct wld_command_info wld_cmd_info[] = {
 	{ "wforce", do_wforce, NO_SCMD },
 	{ "wheal", do_wheal, NO_SCMD },
 	{ "wload", do_wload, NO_SCMD },
+	{ "wlog", do_wlog, NO_SCMD },
 	{ "wmod", do_wmod, NO_SCMD },
 	{ "wmorph", do_wmorph, NO_SCMD },
 	{ "wpurge", do_wpurge, NO_SCMD },

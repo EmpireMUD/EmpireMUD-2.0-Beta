@@ -2902,7 +2902,10 @@ ACMD(do_morph) {
 	morph = NULL;
 	multiplier = fast ? 3.0 : 1.0;
 	
-	if (normal && !IS_MORPHED(ch)) {
+	if (AFF_FLAGGED(ch, AFF_NO_MORPH)) {
+		msg_to_char(ch, "You can't seem to morph right now!\r\n");
+	}
+	else if (normal && !IS_MORPHED(ch)) {
 		msg_to_char(ch, "You aren't morphed.\r\n");
 	}
 	else if (!IS_NPC(ch) && GET_ACTION(ch) != ACT_NONE) {

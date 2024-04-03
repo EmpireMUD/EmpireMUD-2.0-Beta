@@ -1213,6 +1213,7 @@ void list_char_to_char(char_data *list, char_data *ch) {
 	
 	bool use_mob_stacking = config_get_bool("use_mob_stacking");
 	#define MOB_CAN_STACK(ch)  (use_mob_stacking && !GET_COMPANION(ch) && !GET_LED_BY(ch) && GET_POS(ch) != POS_FIGHTING && !MOB_FLAGGED((ch), MOB_EMPIRE | MOB_TIED | MOB_MOUNTABLE))
+	#define SAME_MOB_STACK(a, b)  (GET_MOB_VNUM(a) == GET_MOB_VNUM(b) && GET_POS(a) == GET_POS(b) && FIGHTING(a) == FIGHTING(b) && GET_LED_BY(a) == GET_LED_BY(b) && (GET_LONG_DESC(a) == GET_LONG_DESC(b) || !strcmp(GET_LONG_DESC(a), GET_LONG_DESC(b))))
 	
 	// no work
 	if (!list || !ch || !ch->desc) {
@@ -1225,7 +1226,7 @@ void list_char_to_char(char_data *list, char_data *ch) {
 			if (IS_NPC(i) && MOB_CAN_STACK(i)) {
 				// check if already showed this mob...
 				DL_FOREACH2(list, j, next_in_room) {
-					if (j == i || (GET_MOB_VNUM(j) == GET_MOB_VNUM(i) && MOB_CAN_STACK(j) && CAN_SEE(ch, j) && GET_POS(j) == GET_POS(i))) {
+					if (j == i || (MOB_CAN_STACK(j) && SAME_MOB_STACK(j, i) && CAN_SEE(ch, j))) {
 						break;
 					}
 				}
@@ -1236,7 +1237,7 @@ void list_char_to_char(char_data *list, char_data *ch) {
 				
 				// count duplicates
 				DL_FOREACH2(i->next_in_room, j, next_in_room) {
-					if (GET_MOB_VNUM(j) == GET_MOB_VNUM(i) && MOB_CAN_STACK(j) && CAN_SEE(ch, j) && GET_POS(j) == GET_POS(i)) {
+					if (MOB_CAN_STACK(j) && SAME_MOB_STACK(j, i) && CAN_SEE(ch, j)) {
 						++c;
 					}
 				}

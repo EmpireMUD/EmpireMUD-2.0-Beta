@@ -826,6 +826,10 @@ void save_olc_trigger(descriptor_data *desc, char *script_text) {
 		live_trig->trigger_type = trig->trigger_type;
 		live_trig->narg = trig->narg;
 		
+		// update script types on attached-to
+		if (live_trig->attached_to) {
+			update_script_types(live_trig->attached_to);
+		}
 	}
 	
 	// free existing commands

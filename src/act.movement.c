@@ -2715,7 +2715,7 @@ ACMD(do_portal) {
 			dist = compute_distance(IN_ROOM(ch), target);
 			
 			if (dist > max_out_of_city_portal) {
-				msg_to_char(ch, "You can't open a portal further away than %d tile%s unless both ends are in a city%s.\r\n", max_out_of_city_portal, PLURAL(max_out_of_city_portal), wait_here ? " (this city was founded too recently)" : (wait_there ? " (that city was founded too recently)" : ""));
+				msg_to_char(ch, "You can't open a portal further away than %d tile%s unless both ends are in cities%s.\r\n", max_out_of_city_portal, PLURAL(max_out_of_city_portal), wait_here ? " (this city was founded too recently)" : (wait_there ? " (that city was founded too recently)" : ""));
 				return;
 			}
 		}

@@ -443,6 +443,13 @@ VCMD(do_vsend) {
 }
 
 
+VCMD(do_vlog) {
+	char source_info[MAX_STRING_LENGTH];
+	safe_snprintf(source_info, sizeof(source_info), "veh %d %s", VEH_VNUM(veh), VEH_SHORT_DESC(veh));
+	script_log_command(argument, source_info);
+}
+
+
 VCMD(do_vmod) {
 	script_modify(argument);
 }
@@ -1806,6 +1813,7 @@ const struct vehicle_command_info veh_cmd_info[] = {
 	{ "vforce", do_vforce, NO_SCMD },
 	{ "vheal", do_vheal, NO_SCMD },
 	{ "vload", do_vload, NO_SCMD },
+	{ "vlog", do_vlog, NO_SCMD },
 	{ "vmod", do_vmod, NO_SCMD },
 	{ "vmorph", do_vmorph, NO_SCMD },
 	{ "vpurge", do_vpurge, NO_SCMD },

@@ -924,6 +924,7 @@ typedef struct vehicle_data vehicle_data;
 #define AFF_AUTO_RESURRECT  BIT(44)	// S. will self-resurrect on death
 #define AFF_COUNTERSPELL  BIT(45)	// T. will block a counterspellable ability and then remove itself
 #define AFF_NO_DISARM  BIT(46)	// U. player cannot be disarmed
+#define AFF_NO_MORPH  BIT(47)	// V. cannot manually morph/unmorph
 
 
 // Injury flags -- IS_INJURED
@@ -2987,6 +2988,9 @@ typedef enum {
 #define ISLE_NO_CHART  BIT(5)	// f. island can't be targeted with the chart command
 #define ISLE_NO_TEMPERATURE_PENALTIES  BIT(6)	// g. players are not penalized for heat/cold here
 #define ISLE_ALWAYS_LIGHT  BIT(7)	// h. outdoor tiles are always light
+#define ISLE_ALWAYS_DARK  BIT(8)	// i. outdoor tiles are always dark
+#define ISLE_ALWAYS_DAY  BIT(9)		// j. island is always daytime
+#define ISLE_ALWAYS_NIGHT  BIT(10)	// k. island is always nighttime
 
 
 // ROOM_AFF_x: Room affects -- these are similar to room flags, but if you want to set them

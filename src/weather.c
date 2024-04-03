@@ -540,6 +540,14 @@ int get_sun_status(room_data *room) {
 	double hour, sun_mod, longitude, percent;
 	int x_coord;
 	
+	// shortcut based on island flags
+	if (GET_ISLAND(room) && IS_SET(GET_ISLAND(room)->flags, ISLE_ALWAYS_DAY) && !NO_LOCATION(room)) {
+		return SUN_LIGHT;
+	}
+	else if (GET_ISLAND(room) && IS_SET(GET_ISLAND(room)->flags, ISLE_ALWAYS_NIGHT) && !NO_LOCATION(room)) {
+		return SUN_DARK;
+	}
+	
 	if ((x_coord = X_COORD(room)) == -1) {
 		// no x-coord (not in a mappable spot)
 		hour = main_time_info.hours + PERCENT_THROUGH_CURRENT_HOUR;

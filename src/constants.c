@@ -63,8 +63,8 @@ void tog_pvp(char_data *ch);
 //// EMPIREMUD CONSTANTS /////////////////////////////////////////////////////
 
 // Shown on the "version" command and sent over MSSP
-const char *version = "EmpireMUD 2.0 beta 5.183";
-const char *DG_SCRIPT_VERSION = "DG Scripts 1.0.12 e5.1.6";
+const char *version = "EmpireMUD 2.0 beta 5.184";
+const char *DG_SCRIPT_VERSION = "DG Scripts 1.0.12 e5.1.7";
 
 
 // data for the built-in game levels -- this adapts itself if you reduce the number of immortal levels
@@ -1788,6 +1788,7 @@ const char *affected_bits[] = {
 	"AUTO-RESURRECT",
 	"COUNTERSPELL",		// 45
 	"!DISARM",
+	"!MORPH",
 	"\n"
 };
 
@@ -1840,6 +1841,7 @@ const char *affected_bits_consider[] = {
 	"",	// auto-resurrect
 	"",	// 45 - counterspell
 	"$E cannot be disarmed",	// !disarm
+	"",	// !morph
 	"\n"
 };
 
@@ -1892,6 +1894,7 @@ const bool aff_is_bad[] = {
 	FALSE,	// auto-resurrect
 	FALSE,	// 45 - counterspell
 	FALSE,	// !disarm
+	TRUE,	// !morph
 };
 
 
@@ -4318,6 +4321,9 @@ const char *island_bits[] = {
 	"!CHART",	// 5
 	"!TEMPERATURE-PENALTIES",
 	"ALWAYS-LIGHT",
+	"ALWAYS-DARK",
+	"ALWAYS-DAY",
+	"ALWAYS-NIGHT",	// 10
 	"\n"
 };
 

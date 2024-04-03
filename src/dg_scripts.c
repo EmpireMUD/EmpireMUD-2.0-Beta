@@ -2225,6 +2225,7 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 		"force",
 		"heal",
 		"load",
+		"log",
 		"mod",
 		"morph",
 		"own",
@@ -3617,7 +3618,7 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 					}
 					else if (!str_cmp(field, "end_adventure_summon")) {
 						*str = '\0';
-						if (IS_NPC(c) && PLR_FLAGGED(c, PLR_ADVENTURE_SUMMONED)) {
+						if (!IS_NPC(c) && PLR_FLAGGED(c, PLR_ADVENTURE_SUMMONED)) {
 							adventure_unsummon(c);
 						}
 					}
@@ -4277,6 +4278,7 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 								if (fnd && fol->follower) {	// already found c...
 									safe_snprintf(str, slen, "%c%d", UID_CHAR, char_script_id(fol->follower));
 									success = TRUE;
+									break;
 								}
 								else if (fol->follower == c) {
 									fnd = TRUE;	// found my position in the list
@@ -6534,7 +6536,37 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 			*str = '\x1';
 			switch (LOWER(*field)) {
 				case 'a': {	// emp.a*
-					if (!str_cmp(field, "add_progress")) {
+					if (!str_cmp(field, "add_diplomacy")) {
+						if (subfield && *subfield) {
+							// arg1: 2nd empire
+							// arg2: diplomacy type
+							char arg1[256], arg2[256];
+							int dip_type;
+							empire_data *other_emp;
+						
+							comma_args(subfield, arg1, arg2);
+							if (*arg1 && (other_emp = get_empire(arg1))) {
+								// have other empire
+								if (*arg2 && (dip_type = search_block(subfield, diplomacy_flags, FALSE)) != NOTHING) {
+									script_change_diplomacy(trig, e, other_emp, BIT(dip_type));
+									*str = '\0';
+								}
+								else {
+									script_log("Trigger: %s, VNum %d. add_diplomacy called with invalid status '%s'", GET_TRIG_NAME(trig), GET_TRIG_VNUM(trig), arg2);
+									*str = '\0';
+								}
+							}
+							else {
+								// missing other empire
+								*str = '\0';
+							}
+						}
+						else {
+							// missing subfield?
+							*str = '\0';
+						}
+					}
+					else if (!str_cmp(field, "add_progress")) {
 						if (subfield && *subfield) {
 							progress_data *prg;
 							any_vnum vnum;
@@ -6673,7 +6705,36 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 					break;
 				}
 				case 'h': {	// emp.h*
-					if (!str_cmp(field, "has_progress")) {
+					if (!str_cmp(field, "has_diplomacy")) {
+						if (subfield && *subfield) {
+							// arg1: 2nd empire
+							// arg2: diplomacy type
+							char arg1[256], arg2[256];
+							int dip_type;
+							empire_data *other_emp;
+						
+							comma_args(subfield, arg1, arg2);
+							if (*arg1 && (other_emp = get_empire(arg1))) {
+								// have other empire
+								if (*arg2 && (dip_type = search_block(subfield, diplomacy_flags, FALSE)) != NOTHING) {
+									snprintf(str, slen, "%d", has_relationship(e, other_emp, BIT(dip_type)) ? 1 : 0);
+								}
+								else {
+									script_log("Trigger: %s, VNum %d. has_diplomacy called with invalid status '%s'", GET_TRIG_NAME(trig), GET_TRIG_VNUM(trig), arg2);
+									strcpy(str, "0");
+								}
+							}
+							else {
+								// missing other empire
+								strcpy(str, "0");
+							}
+						}
+						else {
+							// missing subfield?
+							strcpy(str, "0");
+						}
+					}
+					else if (!str_cmp(field, "has_progress")) {
 						if (subfield && *subfield) {
 							any_vnum vnum;
 							
@@ -6830,6 +6891,36 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 							}
 						}
 						else {
+							*str = '\0';
+						}
+					}
+					else if (!str_cmp(field, "remove_diplomacy")) {
+						if (subfield && *subfield) {
+							// arg1: 2nd empire
+							// arg2: diplomacy type
+							char arg1[256], arg2[256];
+							int dip_type;
+							empire_data *other_emp;
+						
+							comma_args(subfield, arg1, arg2);
+							if (*arg1 && (other_emp = get_empire(arg1))) {
+								// have other empire
+								if (*arg2 && (dip_type = search_block(subfield, diplomacy_flags, FALSE)) != NOTHING) {
+									script_remove_diplomacy(trig, e, other_emp, BIT(dip_type));
+									*str = '\0';
+								}
+								else {
+									script_log("Trigger: %s, VNum %d. remove_diplomacy called with invalid status '%s'", GET_TRIG_NAME(trig), GET_TRIG_VNUM(trig), arg2);
+									*str = '\0';
+								}
+							}
+							else {
+								// missing other empire
+								*str = '\0';
+							}
+						}
+						else {
+							// missing subfield?
 							*str = '\0';
 						}
 					}
