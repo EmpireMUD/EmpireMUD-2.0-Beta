@@ -5506,6 +5506,8 @@ This set of flags applies to the global table itself.
 Available flags:
  IN-DEVELOPMENT - Will not be used live.
  ADVENTURE-ONLY - This global table will only apply to the adventure it's in.
+    Supported for: Mob Interactions (only when mob is attached to an instance),
+    Obj Interactions (disenchant), Mine Data (in room templates only).
  CUMULATIVE-PRC - Percent check will be cumulative.
  CHOOSE-LAST - The first choose-last global that passes the percent check will
     be saved for later, and only used if no other global succeeds. This can
