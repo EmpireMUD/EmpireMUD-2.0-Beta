@@ -4278,6 +4278,7 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 								if (fnd && fol->follower) {	// already found c...
 									safe_snprintf(str, slen, "%c%d", UID_CHAR, char_script_id(fol->follower));
 									success = TRUE;
+									break;
 								}
 								else if (fol->follower == c) {
 									fnd = TRUE;	// found my position in the list
