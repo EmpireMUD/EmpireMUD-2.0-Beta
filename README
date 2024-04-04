@@ -1,3 +1,34 @@
+EmpireMUD 2.0 beta 6 is coming in 2024! In the mean time, if you want to run
+an EmpireMUD server, consider using the beta-dev branch rather than the
+master. This branch has many updates to its features, code, and content.
+
+Here's how to get the beta-dev branch with a fresh clone:
+1. git clone https://github.com/EmpireMUD/EmpireMUD-2.0-Beta.git empiremud
+2. cd empiremud
+3. git checkout -b beta-dev remotes/origin/beta-dev
+4. Follow the rest of the steps below under "Compiling and Running EmpireMUD".
+
+Or, if you already have a working copy of EmpireMUD, here's how to switch to
+the beta-dev branch:
+1. Shut down your EmpireMUD with "shutdown die", and wait for it to finish.
+   It's very important that the MUD is shut down before updating.
+2. Create a backup, just in case (gzipping your EmpireMUD directory is an
+   easy way, or use EmpireMUD's PHP backup tool if you've configured it).
+3. In your EmpireMUD directory, type:
+4. git stash
+5. git checkout -b beta-dev remotes/origin/beta-dev
+6. git stash pop
+7. ./configure  (do this even if you configured it before; there are new code
+   files and the configure script will add them to your Makefile)
+8. cd src
+9. make all
+10. If you were running a version older than beta 4, you may need to run the
+   included playerfile converter. Contact paul@empiremud.net for assistance
+   or log into empiremud.net port 4000 and I am happy to assist you.
+11. You can now restart the autorun with "./autorun &" in your EmpireMUD
+   directory.
+
+
 Warning: Always back up your EmpireMUD before updating your git checkout. Some
 patches may require playerfile conversions or may have other unexpected side-
 effects.
