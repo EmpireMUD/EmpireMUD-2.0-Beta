@@ -2464,7 +2464,8 @@ int new_descriptor(int s) {
 		sockets_connected++;
 
 	if (sockets_connected >= max_players) {
-		write_to_descriptor(desc, "Sorry, %s is full right now... please try again later!\r\n", config_get_string("mud_name")));
+		safe_snprintf(buf, sizeof(buf), "Sorry, %s is full right now... please try again later!\r\n", config_get_string("mud_name"));
+		write_to_descriptor(desc, buf);
 		CLOSE_SOCKET(desc);
 		return (0);
 	}
