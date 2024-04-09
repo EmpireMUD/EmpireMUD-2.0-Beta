@@ -1,0 +1,282 @@
+#12103
+cinnamon~
+A Cinnamon Orchard~
+9 l bh
+24 51 49 100
+D0
+VVV&OI~
+&L~
+D0
+VV&OI&?V~
+&L~
+D0
+V&OI&?VV~
+&L~
+D0
+&OI&?VVV~
+&L~
+D0
+&OI&?V&OI&?V~
+&L~
+D0
+V&OI&?V&OI~
+&L~
+I 6 12102 100.00 10  # FORAGE: handful of hard and woody ovoid seeds
+I 7 12103 100.00 25  # PICK: basket of red-brown cinnamon bark strips
+I 20 128 100.00 1  # CHOP: massive jungle tree
+U
+0
+Shoots burst from the ground, maturing to towering evergreen trees within seconds.~
+X
+mature cinnamon tree orchard trees around crop~
+   This area contains a grouping of evergreen trees ranging from 20-30 feet in
+height, with shiny leathery leaves ovular or lanceolate in shape. Some of the
+trunks have been cut into, exposing a reddish-brown bark.
+~
+S
+#12105
+peppercorns~
+A Field of Peppercorn Vines~
+14 l 0
+0 100 0 100
+D0
+&t.&?8&t.&?8~
+&J~
+I 6 12105 100.00 10  # FORAGE: smooth, round and hard black seeds
+I 8 12106 100.00 6  # HARVEST: basket of round pea-sized peppercorn berries
+U
+0
+Sprigs burst from the ground and climb the prepared trellises in seconds.~
+X
+peppercorn peppercorns mature vines field crop around~
+   This field is dotted with trellises and planted with rows of vines that
+claim them to a height of a good 10-15 feet, with heart-shaped leaves and long
+spikes of small greenish white flowers. There are berries growing, ranging from
+green to red, and they appear to be what is harvested.
+~
+S
+#12109
+cardamom~
+A Field of Cardamom~
+4 l 0
+49 76 49 100
+D0
+wWww~
+&J~
+D0
+wwWw~
+&J~
+D0
+wWWw~
+&J~
+I 6 12108 100.00 10  # FORAGE: small, hard, dark angular seeds
+I 8 12109 100.00 6  # HARVEST: basket of fragrant cardamom pods
+U
+0
+Within seconds, seedlings burst from the ground, grow to plants several feet tall, and are filled with green pods.~
+X
+cardamom field herb plants crop around~
+   These tall plants are several feet high and have long, reed-like stems with
+large lanceolate leaves. They are currently loaded with green, pod-like fruits.
+~
+S
+#12112
+cloves~
+A Clove Orchard~
+36 l b
+99 26 49 100
+D0
+WWWW~
+&L~
+D0
+W&P>&?WW~
+&L~
+D0
+WW&P<&?W~
+&L~
+D0
+&P>&?WWW~
+&L~
+D0
+WWW&P<~
+&L~
+I 6 12111 100.00 10  # FORAGE: nail-shaped seeds
+I 7 12112 100.00 25  # PICK: basket of pink flower buds
+I 20 128 100.00 1  # CHOP: massive jungle tree
+U
+0
+Trees burst from the ground and stretch toward the sky, filling out instantly with leaves and buds.~
+X
+cloves orchard trees crop around~
+   The evergreen trees in this orchard are a good 30 feet tall, with large
+leaves, and currently fairly bursting with pink flower buds.
+~
+S
+#12115
+nutmeg~
+A Nutmeg Tree Orchard~
+20 l b
+74 1 49 100
+D0
+^&yo&?^^~
+&L~
+D0
+&yo&?^^^~
+&L~
+D0
+^^^&yo~
+&L~
+D0
+^^&yo&?^~
+&L~
+I 6 12114 100.00 10  # FORAGE: dense light-brown seeds
+I 7 12115 100.00 25  # PICK: nutmeg fruit
+I 20 128 100.00 1  # CHOP: massive jungle tree
+U
+0
+Seedlings erupt from the ground, blooming within seconds into magnificent 60-foot-tall trees!~
+X
+nutmeg mace trees orchard crop around~
+   This magnificent-looking orchard is used for cultivating both nutmeg and
+mace, as they come from the same fruit. The trees are as high as 60 feet with
+dense dark-green foliage. Their fruits resemble apricots. Some of them have
+split open, revealing a glossy, lacey red husk surrounding dense seeds -- the
+sources of mace and nutmeg, respectively.
+~
+S
+#12119
+ginger~
+A Bed of Ginger Plants~
+35 l 0
+24 51 0 51
+D0
+w&t.&?w&t.&?~
+&L~
+I 6 12118 100.00 12  # FORAGE: knobby, irregularly-shaped ginger root
+I 8 12119 100.00 6  # HARVEST: basket of knobby ginger roots
+U
+0
+Man-high plants burst from the ground and immediately flower in a glorious display of white, pink and yellow brilliance.~
+X
+ginger plants field bed mature crop around~
+   Tall green stems rise from the ground to man height, covered with glossy
+lance-shaped leaves and long, narrow spikes of small tubular flowers ranging
+from white to pink and yellow. The useful part is underground in the form of
+their roots, which are fibrous and knobby with an irregular shape and a yellow
+to tan interior.
+~
+S
+#12122
+saffron~
+A Bed of Flowering Saffron Plants~
+3 l 0
+49 76 0 51
+D0
+w&t.&?w&t.&?~
+&v~
+I 6 12121 100.00 8  # FORAGE: handful of small round saffron corms
+I 8 12122 100.00 9  # HARVEST: basket of bright red saffron threads
+U
+0
+The earth seems to writhe as a grassy plant thrusts up through the soil.~
+X
+saffron plants flowering bed around crop~
+   These low-growing plants are grass-like, with lanceolate green leaves
+growing from the ground. Its lavender and lilac flowers are funnel-shaped and
+tubular, with darker veins of color running through the petals. In the center
+are three bright red threads that stand out magnificently against the petals.
+~
+S
+#12125
+vanilla~
+A Field of Climbing Vanilla Vines~
+41 l 0
+74 1 0 51
+D0
+&t.&?8&t.&?8~
+&L~
+I 6 12124 100.00 12  # FORAGE: cutting from a climbing vine
+I 8 12125 100.00 6  # HARVEST: basket of vanilla beans
+U
+0
+Looking like a writhing mass of snakes, vines climb rapidly up whatever vertical surface is available and burst into aromatic flower.~
+X
+vanilla field climbing vines around crop~
+   Requiring a support structure to grow, these vines have been carefully
+coaxed to climb preexisting trees, poles, and whatever else was handy. The
+vines appear to be thriving, showing off smooth, glossy ovate leaves. Nodes
+where future leaves might grow, roots clinging to nearby surfaces, flowers and
+pods are visible along the vine at various points. The pods are what will be
+harvested.
+~
+S
+#12128
+cacao~
+A Cacao Orchard~
+41 l b
+99 26 0 51
+D0
+^&oo&?^^~
+&G~
+D0
+&oo&?^^^~
+&G~
+D0
+^^^&oo~
+&G~
+D0
+^^&oo&?^~
+&G~
+D0
+^&ro&?^^~
+&G~
+D0
+&ro&?^^^~
+&G~
+D0
+^^^&ro~
+&G~
+D0
+^^&ro&?^~
+&G~
+I 6 12127 100.00 12  # FORAGE: handful of beans from a cacao pod
+I 7 12128 100.00 25  # PICK: basket of cocoa beans
+I 20 128 100.00 1  # CHOP: massive jungle tree
+U
+0
+Trees push up through the fertile soil and are 15-25 feet tall within seconds.~
+X
+cacao cocoa orchard trees crop around~
+   This is an orchard of thriving evergreen cacao trees, as they're properly
+called, ranging in height from 15-25 feet. They are straight, smooth-barked
+trees, whose leaves are broad and glossy, with a dark upper surface and a
+lighter underside. Small aromatic flowers grow directly on the trunk and
+largest branches of the trees, and some of them have already fruited, showing
+large elongated pods ranging in color from yellow to red. These are the
+beginnings of cocoa.
+~
+S
+#12132
+onions~
+A Bed of Onions~
+20 j 0
+55 88 60 100
+D0
+&uvvvv&0~
+&g~
+I 6 12135 100.00 8  # FORAGE: small onion
+I 8 12136 25.00 6 h  # HARVEST: basket of onions
+I 8 12136 25.00 5 h  # HARVEST: basket of onions
+I 8 12136 25.00 4 h  # HARVEST: basket of onions
+I 8 12136 25.00 3 h  # HARVEST: basket of onions
+U
+0
+Cylindrical leaves push up from the ground all around.~
+X
+bed onions around crop plants~
+   The field is filled with plants whose green leaves are long, hollow, tubular
+and waxy. Several layers of them stick up from each plant and some of the
+plants have flowering stalks in the center.
+~
+S
+$
