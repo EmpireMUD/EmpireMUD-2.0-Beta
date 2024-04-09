@@ -865,6 +865,31 @@ Common skin components include:
 See also: SKIN COMMAND, SEWING, LEATHERWORKING, RAWHIDE STITCHING, TAN, FUR
    HUNTSMAN
 #
+SPICE SPICES PEPPER COCOA CACAO CARDAMOM CINNAMON CLOVES GINGER NUTMEG "MACE SPICE" SAFFRON VANILLA
+
+Spice (component)
+
+Used for:  baking, cooking
+Stored in:  Spicery
+
+Spices are often found by foraging in tropical areas. They can be planted,
+grown into crops, harvested or picked, then processed at the spicery to create
+fine and exotic products.
+
+Known spices include:
+  black pepper, from peppercorns
+  cocoa powder, from cacao beans
+  ground cardamom, from cardamom pods
+  ground cinnamon, from cinnamon bark
+  ground cloves, from pink clove buds
+  ground ginger, from ginger roots
+  ground nutmeg, from nutmeg seeds
+  mace powder, from nutmeg fruit
+  saffron threads, from saffron
+  vanilla powder, from vanilla beans
+
+See also: BAKE, COOK, HARVEST, FORAGE, PICK, PROCESS, SPICERY
+#
 SPLIT
 
 Usage:  split <amount> <type> coins
