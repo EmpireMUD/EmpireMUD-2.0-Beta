@@ -4856,7 +4856,7 @@ ACMD(do_diplomacy) {
 		}
 	}
 	else if (IS_SET(diplo_option[type].flags, DIPF_NOT_MUTUAL_WAR) && config_get_bool("mutual_war_only")) {
-		msg_to_char(ch, "This EmpireMUD does not allow you to unilaterally declare %s.\r\n", fname(diplo_option[type].keywords));
+		msg_to_char(ch, "%s does not allow you to unilaterally declare %s.\r\n", config_get_string("mud_name"), fname(diplo_option[type].keywords));
 	}
 	else if (IS_SET(diplo_option[type].flags, DIPF_NOT_MUTUAL_WAR) && EMPIRE_ADMIN_FLAGGED(ch_emp, EADM_NO_WAR)) {
 		msg_to_char(ch, "Your empire has been forbidden from declaring unilateral %s.\r\n", fname(diplo_option[type].keywords));

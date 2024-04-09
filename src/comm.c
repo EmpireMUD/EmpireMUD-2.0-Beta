@@ -2464,7 +2464,7 @@ int new_descriptor(int s) {
 		sockets_connected++;
 
 	if (sockets_connected >= max_players) {
-		write_to_descriptor(desc, "Sorry, EmpireMUD is full right now... please try again later!\r\n");
+		write_to_descriptor(desc, "Sorry, %s is full right now... please try again later!\r\n", config_get_string("mud_name")));
 		CLOSE_SOCKET(desc);
 		return (0);
 	}

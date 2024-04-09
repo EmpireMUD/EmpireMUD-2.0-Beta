@@ -1721,7 +1721,7 @@ struct {
 void prompt_creation(descriptor_data *d) {
 	switch (STATE(d)) {
 		case CON_Q_SCREEN_READER: {
-			SEND_TO_Q("\r\nEmpireMUD makes heavy use of an ascii map, but also supports screen\r\n", d);
+			msg_to_desc(d, "\r\n%s makes heavy use of an ascii map, but also supports screen\r\n", config_get_string("mud_name"));
 			SEND_TO_Q("readers for the visually impaired. This will replace the map with a short\r\n", d);
 			SEND_TO_Q("description of what you can see in each direction on the world map. This\r\n", d);
 			SEND_TO_Q("option is only recommended for players using screen readers. You can see\r\n", d);

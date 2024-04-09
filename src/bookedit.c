@@ -38,9 +38,9 @@ const char *bookedit_license_display =
 "  enter copyrighted text or any text written by another person. You assume\r\n"
 "  full liability for any text you enter.\r\n"
 "- All text you write is the property of you, the author.\r\n"
-"- You grant EmpireMUD a license to use this text free-of-charge for the purpose\r\n"
-"  of displaying this text in the EmpireMUD game.\r\n"
-"- EmpireMUD will never use this text for any other purpose.\r\n";
+"- You grant this MUD a license to use this text free-of-charge for the purpose\r\n"
+"  of displaying this text in this game.\r\n"
+"- This MUD will never use this text for any other purpose.\r\n";
 
 const char *default_book_title = "Untitled";
 const char *default_book_item = "a book";
@@ -557,7 +557,7 @@ void olc_show_book(char_data *ch) {
 		build_page_display(ch, "[%s%d\t0] %s%s\t0", OLC_LABEL_CHANGED, GET_OLC_VNUM(ch->desc), OLC_LABEL_UNCHANGED, !book_proto(BOOK_VNUM(book)) ? "new book" : BOOK_TITLE(book_proto(BOOK_VNUM(book))));
 	}
 	else {
-		build_page_display(ch, "\tcEmpireMUD Book Editor: %s\t0", !book_proto(BOOK_VNUM(book)) ? "new book" : BOOK_TITLE(book_proto(BOOK_VNUM(book))));
+		build_page_display(ch, "\tc%s Book Editor: %s\t0", config_get_string("mud_name"), !book_proto(BOOK_VNUM(book)) ? "new book" : BOOK_TITLE(book_proto(BOOK_VNUM(book))));
 	}
 	
 	build_page_display(ch, "<%stitle\t0> %s", OLC_LABEL_STR(BOOK_TITLE(book), default_book_title), NULLSAFE(BOOK_TITLE(book)));
