@@ -23,7 +23,7 @@ $mapHeight = 1000;
 $minRadiusToName = 10;	// cities below this size won't show name/owner
 
 // Where to load city data:
-$pathToData = '/path/to/empireMUD/data/';	// your path, ending in 'data/'
+$pathToData = '/home/ubuntu/mud/data/';	// your path, ending in 'data/'
 
 $cityList = array();
 if (file_exists($pathToData . 'map-cities.txt')) {

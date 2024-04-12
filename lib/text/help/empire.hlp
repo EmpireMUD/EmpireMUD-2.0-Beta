@@ -140,7 +140,7 @@ There is a 60-minute waiting period between when you found a city, and when it
 counts as a city for things like City Teleportation, certain buildings such as
 the palace, for guard towers, and for some other game rules.
 
-EmpireMUD periodically checks if cities have no claimed buildings and, if so,
+Undying Dominion periodically checks if cities have no claimed buildings and, if so,
 will remove the city center and refund the city point. This helps keep the map
 clean, and you can prevent it by making sure there is at least one claimed
 building in your city. If a city is removed in this way, your elog will say the
@@ -1407,7 +1407,7 @@ scores, as well as the number of offenses the other empire has committed
 against you recently. Check the empire detail page for the cost to declare war
 on an empire.
 
-Some EmpireMUDs require a certain number of offenses before you can declare
+Some Undying Dominions require a certain number of offenses before you can declare
 war, to prevent unprovoked wars.
 
 The exchange rate at war is 10%.

@@ -15,16 +15,16 @@ godlist_header 1
 hiring_builders 0
 hiring_coders 0
 huh_string Huh?!?
-mud_contact 
-mud_created 2015
-mud_hostname 
+mud_contact admin@undyingdominion.com 
+mud_created 2024
+mud_hostname undyingdominion.com 
 mud_icon 
-mud_ip 
+mud_ip 141.148.154.242
 mud_location 
 mud_minimum_age 
-mud_name EmpireMUD
+mud_name Undying Dominion
 mud_status Live
-mud_website
+mud_website https://undyingdominion.com
 name_rules 0
 name_rules_lastname 0
 newyear_message The ground under you shakes violently!
@@ -37,7 +37,7 @@ acquire territory, harvest grain, and command an empire! Try the INFO and HELP
 commands to get started.
 ~
 starting_year 1150
-welcome_message Welcome to your EmpireMUD! Prepare to face your destiny!
+welcome_message Enter, brave soul, into a realm of mystery and danger. Will you rise to lead mighty empires, or succumb to the horrors of the undead?
 who_list_sort 0
 wizlist_header 1
    *************************************************************************
@@ -52,10 +52,10 @@ wizlist_header 1
 chip_timer 4
 chop_depletion 4
 chop_timer 30
-chore_distance 20
+chore_distance 50
 common_depletion 125
 dig_base_timer 4
-fishing_timer 40
+fishing_timer 20
 forage_base_timer 4
 garden_depletion 440
 gather_base_timer 4
@@ -66,13 +66,13 @@ max_chore_resource 200
 max_chore_resource_over_total 25
 max_chore_resource_per_member 100
 max_chore_resource_skilled 750
-mining_timer 45
+mining_timer 22
 panning_timer 10
 pick_base_timer 4
 pick_depletion 14
 planting_base_timer 192
 planting_workforce_timer 24
-prospecting_workforce_hours 30
+prospecting_workforce_hours 1
 saw_timer 8
 scrape_timer 4
 shear_growth_time 6
@@ -100,18 +100,18 @@ max_out_of_city_portal 50
 min_distance_between_ally_cities 10
 min_distance_between_cities 30
 min_distance_from_city_to_starting_location 25
-minutes_to_full_city 60
+minutes_to_full_city 0
 players_per_city_point 2
 *
 * Empire configs
-building_population_timer 48
-decay_in_storage 1
+building_population_timer 1
+decay_in_storage 0
 empire_log_ttl 30
 frontier_timeout 30
 homeless_citizen_speed 10
-immortal_empire_restrictions 1
-immortal_empire_restrict_stealth 1
-immortal_empire_restrict_war 1
+immortal_empire_restrict_stealth 0
+immortal_empire_restrict_war 0
+immortal_empire_restrictions 0
 land_frontier_modifier 0.050000
 land_min_cap 15
 land_outside_city_modifier 0.350000
@@ -156,8 +156,8 @@ mob_spawn_interval 5
 mob_spawn_radius 5
 npc_follower_limit 6
 num_duplicates_in_stable 2
-spawn_limit_per_room 3
-use_mob_stacking 0
+spawn_limit_per_room 10
+use_mob_stacking 1
 *
 * Other configs
 test_config 0
@@ -177,10 +177,10 @@ delete_abandoned_players_after 0
 delete_inactive_players_after 0
 delete_invalid_players_after 30
 exp_level_difference 50
-hours_to_advanced_bonus_traits 12
-hours_to_bonus_trait_reset 12
-hours_to_first_bonus_trait 0
-hours_to_second_bonus_trait 48
+hours_to_advanced_bonus_traits 36000
+hours_to_bonus_trait_reset 360000
+hours_to_first_bonus_trait 36000
+hours_to_second_bonus_trait 36000
 idle_action_rent_time 225
 idle_linkdead_rent_time 5
 idle_rent_time 20
@@ -192,10 +192,10 @@ max_home_store_uniques 300
 max_light_radius_base 5
 max_map_size 12
 max_map_while_moving 5
-max_player_attribute 15
+max_player_attribute 30
 max_sleeping_regen_time 60
-num_bonus_trait_daily_skills 5
-num_daily_skill_points 15
+num_bonus_trait_daily_skills 0
+num_daily_skill_points 0
 offer_time 75
 pool_bonus_amount 15
 remove_lore_after_years 2
@@ -213,7 +213,7 @@ temperature_penalties 0
 enchant_points_at_100 2.000000
 exp_from_workforce 0.100000
 greater_enchantments_bonus 1.500000
-min_exp_to_roll_skillup 1
+min_exp_to_roll_skillup 100
 morph_timer 2
 must_be_vampire You must be a vampire to use this ability.
 potion_apply_per_100 1.333300
@@ -238,7 +238,7 @@ use_autowiz 1
 imports_per_day 100
 trading_post_days_to_timeout 60
 trading_post_fee 0.050000
-trading_post_max_hours 72
+trading_post_max_hours 504
 *
 * War configs
 burn_down_time 600
@@ -251,7 +251,7 @@ hostile_login_delay 30
 mutual_war_only 0
 offense_min_to_war 0
 offenses_for_free_war 200
-pk_mode b
+pk_mode bf
 pvp_timer 5
 rogue_flag_time 1440
 seconds_per_death 30
@@ -261,7 +261,7 @@ stun_immunity_time 5
 vehicle_siege_time 30
 war_cost_max 50000
 war_cost_min 5000
-war_login_delay 30
+war_login_delay 0
 *
 * World configs
 adjust_instance_limits 1
@@ -276,7 +276,7 @@ ignore_island_levels 0
 interlink_distance 4
 interlink_mountain_limit 1
 interlink_river_limit 0
-naturalize_newbie_islands 0
+naturalize_newbie_islands 1
 naturalize_unclaimable 1
 nearby_sector_distance 2
 newbie_adventure_cap 25
@@ -314,13 +314,13 @@ staff to find out what you have to do to be approved.
 write_approval 1
 *
 * Mail configs
-mail_available_message A pigeon is circling overhead with mail for you.
-mail_not_available_message You can't see any mail pigeons following you.
-mail_receive_message_to_char A pigeon lands and you find ## attached to its leg.
-mail_receive_message_to_room A pigeon lands and $n unties ## from its leg.
+mail_available_message A raven is circling overhead with mail for you.
+mail_not_available_message You can't see any ravens following you.
+mail_receive_message_to_char A raven lands and you find ## attached to its leg.
+mail_receive_message_to_room A raven lands and $$n unties ## from its leg.
 mail_requires_building_to_receive 0
 mail_requires_building_to_receive_message You can only recieve mail at a working pigeon post.
 mail_requires_building_to_send 1
-mail_requires_building_to_send_message You can only send mail from a working pigeon post.
-mail_send_message You tie your message to a pigeon and it flies away!
+mail_requires_building_to_send_message You can only send mail from a working raven mail post.
+mail_send_message You tie your message to a raven and feathers fall as it flies away!
 $~

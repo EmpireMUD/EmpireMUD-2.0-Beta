@@ -15,15 +15,15 @@ Instructions for EmpireMUD administrators:
 1 0 ahl 0
 L
 1 0
-10800 -1 -1
+10800 -1 -1 -1
 2 bd bkn
 L
 6 0
-100 -1 -1
+100 -1 -1 -1
 -1 0 0
 L
 5 0
-43200 -1 -1
+43200 -1 -1 -1
 -1 0 0
 S
 #51
@@ -40,18 +40,18 @@ Instructions for EmpireMUD Administrators:
     newbie islands with mountains on them.
 ~
 10825 10849 0-50
-1 0 hl 0
+2 0 hl 0
 L
 6 0
-100 -1 -1
+100 -1 -1 -1
 -1 0 0
 L
 5 0
-43200 -1 -1
+43200 -1 -1 -1
 -1 0 0
 L
 1 0
-10825 -1 -1
+10825 -1 -1 -1
 9 c ekln
 S
 #52
@@ -69,14 +69,14 @@ Instructions for EmpireMUD administrators:
 locations) in your game.
 ~
 10850 10899 0-50
-1 0 l 0
+2 0 l 0
 L
 5 0
-43200 -1 -1
+43200 -1 -1 -1
 -1 0 0
 L
 2 0
-18 10850 10851
+18 10850 10851 -1
 -1 0 0
 S
 $

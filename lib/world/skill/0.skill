@@ -396,7 +396,6 @@ A 309 12 60
 A 7 -1 75
 A 8 -1 10
 A 9 -1 40
-A 19 -1 75
 A 242 27 90
 A 12 -1 20
 A 136 9 80
@@ -431,5 +430,20 @@ Y 6 2 100 211 0
 Y 6 3 100 211 0
 Y 6 4 100 21 0
 Y 6 5 100 21 0
+S
+#8
+Undeath~
+Und~
+New Undeath Skill line~
+0
+L 100 1
+S
+#9
+Empathy~
+Ept~
+Sacrifice your health for power and purpose.~
+b
+A 100000 -1 1
+L 100 0
 S
 $

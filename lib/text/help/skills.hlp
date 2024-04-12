@@ -775,7 +775,7 @@ You can travel randomly between starting locations using the transport command.
 Alternatively, you can give the coordinates of a starting location (or the name
 of a person who is at one) to transport directly there.
 
-On EmpireMUD, starting locations are called Towers of Souls. Nobody may claim
+On Undying Dominion, starting locations are called Towers of Souls. Nobody may claim
 the area immediately around a Tower of Souls (&y*/\*&0).
 
 See also: TOMB, TRANSPORT

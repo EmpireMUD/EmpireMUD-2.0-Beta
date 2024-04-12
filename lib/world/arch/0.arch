@@ -4,7 +4,7 @@ Ready to take on the world~
 Left home in search of adventure~
 Adventurer~
 Adventurer~
-0 0
+0 0 -1
 A
 0 2
 A
@@ -44,7 +44,7 @@ Raised to rule (Battle, Trade)~
 Left the manor in search of greatness~
 Lord~
 Lady~
-0 b
+0 b -1
 A
 0 2
 A
@@ -70,7 +70,7 @@ G
 G
 21 2104  # a torch
 G
--1 2146  # fine sewing needles
+-1 2146  # a fine sewing kit
 K
 0 20
 K
@@ -82,7 +82,7 @@ Trained by a great artisan (Trade)~
 Graduated from an apprenticeship~
 Tradesman~
 Tradesman~
-0 b
+0 b -1
 A
 0 2
 A
@@ -108,7 +108,7 @@ G
 G
 21 2104  # a torch
 G
--1 2145  # feather sewing needles
+-1 2145  # a feather sewing kit
 G
 22 2148  # a hobby knife
 K
@@ -120,7 +120,7 @@ Built for battle (Battle, Survival)~
 Left to seek $s own fame~
 Sir~
 Lady~
-0 b
+0 b -1
 A
 0 2
 A
@@ -156,7 +156,7 @@ Cleaved from stone (Survival, Trade)~
 Left the logging camp to seek fortune~
 Adventurer~
 Adventurer~
-0 b
+0 b -1
 A
 0 2
 A
@@ -194,7 +194,7 @@ Rise from nothing (Trade, Survival)~
 Left the tribe to seek greatness~
 Elder~
 Elder~
-0 b
+0 b -1
 A
 0 1
 A
@@ -232,7 +232,7 @@ The shadows of society (Stealth, Battle)~
 Stepped out of the shadows~
 Adventurer~
 Adventurer~
-0 b
+0 b -1
 A
 0 2
 A
@@ -268,7 +268,7 @@ Wield ancient magic (Natural Magic, Survival)~
 Left the commune~
 Elder~
 Elder~
-0 b
+0 b -1
 A
 0 1
 A
@@ -304,7 +304,7 @@ Practice the rituals (High Sorcery, Battle)~
 Graduated from the Academy~
 Sorcerer~
 Sorceress~
-0 b
+0 b -1
 A
 0 1
 A
@@ -337,8 +337,8 @@ Lone Vampire~
 Empowered by blood (Vampire, Battle)~
 ~
 Hunter~
-Hunter~
-0 b
+Adventurer~
+0 c -1
 A
 0 2
 A
@@ -372,7 +372,7 @@ Practice both magics (High Sorcery, Natural Magic, Intelligence)~
 Branded a heretic~
 Heretic~
 Heretic~
-0 0
+0 0 -1
 A
 0 1
 A
@@ -406,7 +406,7 @@ A vampire noble from an old family (Vampire skill)~
 Became a recluse~
 Baron~
 Baroness~
-0 0
+0 c -1
 A
 0 2
 A
@@ -440,7 +440,7 @@ An apprentice alchemist (Natural Magic, Trade, Intelligence)~
 Finished an herbalist apprenticeship~
 Herbalist~
 Herbalist~
-0 0
+0 0 -1
 A
 0 1
 A
@@ -476,7 +476,7 @@ A streetwise bruiser up to no good (Battle, Stealth)~
 Moved on to bigger and better things~
 Hood~
 Hood~
-0 0
+0 0 -1
 A
 0 3
 A
@@ -512,7 +512,7 @@ A skilled fighter looking to move up (Battle)~
 Left prizefighting for greater fame~
 Warlord~
 Warlord~
-0 0
+0 0 -1
 A
 0 3
 A
@@ -546,7 +546,7 @@ Lurking in the shadows of society (Vampire, Stealth, Battle)~
 Moved into the shadows~
 Hunter~
 Hunter~
-0 0
+0 c -1
 A
 0 2
 A

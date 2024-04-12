@@ -32,7 +32,7 @@
 ini_set('memory_limit', '512M');
 
 // CHANGE THIS: the path to your mud
-$basePath = "/path/to/empireMUD";
+$basePath = "/home/ubuntu/mud";
 
 
 // argument parsing

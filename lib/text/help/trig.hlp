@@ -4,10 +4,10 @@ Stands for Death Gate scripts and are named after the original MUD they came
 from. DG Scripts is a popular CircleMUD snippet and is also included with
 TBAMUD, the successor to the CIrcleMUD project.
 
-EmpireMUD uses a ported version of DG Scripts that has additional variables
-and functionality unique to the EmpireMUD code base, such as support for
+Undying Dominion uses a ported version of DG Scripts that has additional variables
+and functionality unique to the Undying Dominion code base, such as support for
 scripting vehicles. It is also missing some of the functions that no longer
-exist from its CircleMUD base code. For the most part, EmpireMUD's version of
+exist from its CircleMUD base code. For the most part, Undying Dominion's version of
 DG Scripts attempts to preserve the variables and syntax of classic DG Scripts
 in order to make the system easy to learn for people already familiar with the
 scripting system, and to make it easier to use online DG Scripts tutorials.
@@ -203,9 +203,6 @@ Empire variables are accessed via %char.empire% (or obj, room, vehicle). If
 the thing belongs to no empire, this will be empty.
 
 When using field - The variable returns:
-&cadd_diplomacy(emp,type)&0 - Adds a given diplomatic relationship type with
-   another empire (peace, war, thievery, allied, nonaggression, trade,
-   distrust, truce).
 &cadd_progress(vnum)&0 - Grants a progression goal (preferably set NO-AUTOSTART).
 &cadjective&0 - Adjective form of the empire's name.
 &cbanner&0 - Empire's banner (as a color code).
@@ -223,8 +220,6 @@ When using field - The variable returns:
 &cgive_coins(amount)&0 - Adds to the empire's coin count. This is always in the
    empire's own currency (no exchange rate).
 &cgreatness&0 - The empire's total greatness value.
-&chas_diplomacy(emp,type)&0 - Checks if this empire has a given diplomacy type
-   with another empire (see add_diplomacy, above, for a list).
 &chas_progress(vnum)&0 - Checks if the empire has earned/purchased a goal.
 &chas_storage(vnum,location)&0 - Amount of an object (vnum) the empire has
    stored at the given location (which must be a room variable).
@@ -242,8 +237,6 @@ When using field - The variable returns:
 &cqualifies_for_progress(vnum)&0 - True if the empire meets the prerequisites.
 &crank(num)&0 - Returns the name of a given rank.
 &cranks&0 - The number of ranks in the empire.
-&cremove_diplomacy(emp,type)&0 - Cancels a diplomatic relationship type with
-   another empire (see add_diplomacy, above, for a list).
 &cremove_progress(vnum)&0 - Takes away a progression goal. Warning: If the empire
    still qualifies for the goal, they may instantly re-earn it. This works best
    if you only remove NO-AUTOSTART goals.
@@ -333,7 +326,7 @@ The Global trigger type is not an event itself, but is instead combined with
 the Random trigger event. This allows the Random trigger to fire even if there
 are no players present.
 
-Because EmpireMUD's world is so large, you should use Global triggers sparingly
+Because Undying Dominion's world is so large, you should use Global triggers sparingly
 and not on things that spawn on the map. Also consider having the script
 detach any random trigger that's no longer needed.
 

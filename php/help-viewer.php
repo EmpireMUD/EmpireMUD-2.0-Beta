@@ -1,4 +1,9 @@
 <?php
+include 'includes/header.php'
+?>
+
+
+<?php
 /**
 * help-viewer.php
 * EmpireMUD 2.0 web-based help files
@@ -16,7 +21,7 @@
 
 
 // CONFIGURE: path to help index, ending in /
-$indexPath = '/path/to/empireMUD/lib/text/help/';
+$indexPath = '/home/ubuntu/mud/lib/text/help/';
 
 
 // input
@@ -43,11 +48,17 @@ foreach (explode("\n", $list) as $fname) {
 
 <style>
 	div.result {
-		font-family: "Lucida Console", Monaco, monospace;
-		font-size: 10pt;
-		margin: 5px;
-		padding: 5px;
-		border: 1px solid gray;
+	    font-family: "Lucida Console", Monaco, monospace;
+	    font-size: 10pt;
+	    margin: 5px;
+	    padding: 5px;
+	    border: 1px solid gray;
+	    overflow: auto; /* Enable vertical scrolling if needed */
+	    overflow-wrap: normal; /* Allow long words to break */
+	 /*   word-break: break-word; */
+	    display: flex; /* Use flexbox */
+	    flex-direction: column; /* Arrange children in a column */
+	    flex: 1; /* Allow the box to grow to fill available space */
 	}
 </style>
 

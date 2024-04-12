@@ -1,6 +1,6 @@
 VTRIG "VEHICLE TRIGGERS" "VEH TRIGGERS" "TRIGEDIT VEHICLES" VEHICLE-TRIGGERS TRIGEDIT-VEHICLES VEH-TRIGGERS
 
-Vehicles are fully scriptable in EmpireMUD, and are able to fire triggers,
+Vehicles are fully scriptable in Undying Dominion, and are able to fire triggers,
 can execute commands, and can be stored as variables.
 
 See also:

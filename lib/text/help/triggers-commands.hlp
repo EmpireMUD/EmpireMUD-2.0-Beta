@@ -269,7 +269,7 @@ See also: REDIT AFFECTS, GENERIC AFFECTS
 #d
 DG_CAST
 
-EmpireMUD does not use the "dg_cast" command because it doesn't have CircleMUD-
+Undying Dominion does not use the "dg_cast" command because it doesn't have CircleMUD-
 style spells. Instead, mobs can use most player abilities directly at no cost.
 #d
 %DOOR% MDOOR ODOOR VDOOR WDOOR TRIGEDIT-EXIT TRIG-EXIT 
@@ -491,29 +491,6 @@ Load an object in another object:  %load% obj 1300 %container%
 Valid wear positions are: head, ears, neck1, neck2, clothes, armor, about,
 arms, wrists, hands, rfinger, lfinger, waist, legs, feet, pack, saddle,
 sheath1, sheath2, wield, ranged, hold, shared
-#d
-%LOG% "SCRIPT LOGGING" "LOGGING IN SCRIPTS"
-
-This function has 3 modes:
-
-Usage: %log% syslog <syslog type> <message>
-
-Logs to the game's syslog. Valid syslog types are: config, death, error, gc,
-info, level, login, olc, script, system, validation, empire, event.
-
-Usage: %log% mortlog <message>
-
-Logs to the mortlog, shown to mortals who have it turned on. There is no
-subtype for mortlogs (unlike syslogs and empire logs).
-
-Usage: %log% <empire> <elog type> <message>
-
-Logs to a specific empire. You should generally provide an empire variable for
-the first argument, but can also provide an empire name (in quotes if longer
-than one word). Available elog types are: Admin, Diplomacy, Hostility, Members,
-Territory, Trade, Logins, Shipping, Workforce, Progress, Alert.
-
-See also: ELOG, MORTLOG, SYSLOG
 #d
 MAKEUID
 
@@ -1033,7 +1010,7 @@ See also: %BUILD%, %TERRACROP%
 #d
 %TRANSFORM% TRANSFORM MTRANSFORM OTRANSFORM
 
-&rNOTE: This functionality is disabled and not currently supported by EmpireMUD.
+&rNOTE: This functionality is disabled and not currently supported by Undying Dominion.
 If you have a use for it, send a request for it to be implemented.&0
 
 Usage:  %transform% <vnum|-vnum>

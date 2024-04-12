@@ -160,7 +160,7 @@ characters on the same account. No password is required.
 
 Players will only see the login/logout messages unless they are in the same
 empire as both your alts, in which case they will see a "switch" message.
-However, if this EmpireMUD has public logins enabled, alternate will always
+However, if this Undying Dominion has public logins enabled, alternate will always
 give a "switch" mortlog (instead of elogs).
 
 You can't use alternate again within 60 seconds of a previous use. Please don't
@@ -1224,7 +1224,7 @@ See also: COINS, KEEP
 #
 GOSSIP
 
-EmpireMUD does not have the gossip channel. There are no global in-character
+Undying Dominion does not have the gossip channel. There are no global in-character
 channels.
 
 See also: CHANNELS
@@ -1261,7 +1261,7 @@ access to a private group channel. You can also type "group" by itself to see
 the status of all members. You will automatically assist members of your group,
 including NPCs, who are in combat.
 
-Unlike older CircleMUDs, EmpireMUD does not require that you be following a
+Unlike older CircleMUDs, Undying Dominion does not require that you be following a
 player to group with them, and members don't have to be present for you to
 invite them to the group.
 
@@ -1388,13 +1388,13 @@ See also: ALTERNATE, ALT IMPORT, DIPLOMACY
 #
 INFO POLICY VERSION RULES CREDITS
 
-Type these commands to see you important information about EmpireMUD. It is a
+Type these commands to see you important information about Undying Dominion. It is a
 good idea to read them every once in a while.
 
    info     - quickstart information for new players
    policy   - policies and rules
-   credits  - the people who made EmpireMUD possible
-   version  - displays the current EmpireMUD version
+   credits  - the people who made Undying Dominion possible
+   version  - displays the current Undying Dominion version
 #
 INVENTORY INV I
 
@@ -1902,7 +1902,7 @@ mission to use both buildings. The portal will stay open for a few minutes.
 You can target the portal building on the other end using either its co-
 ordinates, or the name of a person who is at the other side.
 
-Portals have a maximum distance of 50 tiles unless both ends are in cities.
+Portals have a maximum distance of 50 tiles unless both ends are in a city.
 
 You can portal to specific coordinates by using parentheses (123, 456) or by
 typing the coordinates with no space -- 123,456 -- but you can target your
@@ -1966,7 +1966,7 @@ See also: FILL, TRENCH
 #
 PRACTICE PRACTICES PRACTICING
 
-EmpireMUD does not use the 'practice' system. Instead, manage your skills and
+Undying Dominion does not use the 'practice' system. Instead, manage your skills and
 abilities with the 'skill' command.
 
 See also: SKILLS
@@ -2151,7 +2151,7 @@ See also: GRAB, HOLD, WEAR, WIELD, SHEATH, DRAW, SWAP
 #
 RENT RENTING INN SAVING
 
-EmpireMUD does not use the 'rent' system from CircleMUD. Players generally log
+Undying Dominion does not use the 'rent' system from CircleMUD. Players generally log
 into the game in the same place they logged out, with their entire inventory
 and equipment intact.
 
@@ -2214,7 +2214,7 @@ Immortals see also: BREAKREPLY
 #
 REPORT
 
-EmpireMUD doesn't have a 'report' command. If you're looking on information on
+Undying Dominion doesn't have a 'report' command. If you're looking on information on
 your group members, try the 'group' command by itself or the 'summary' command.
 If you want to see your own stats from combat, use 'meters'.
 
@@ -2467,7 +2467,7 @@ See also: MANUFACTURE
 To turn on/off screen reader mode: toggle screen-reader
 
 A screen reader is an assistive device for players who are blind or visually
-impaired. Since EmpireMUD relies so heavily on the ascii map to show what's
+impaired. Since Undying Dominion relies so heavily on the ascii map to show what's
 going on around you, we have created this mode especially for players who
 can't see the map.
 
@@ -2793,7 +2793,7 @@ SWAP
 
 Usage:  swap
 
-EmpireMUD uses many different weapon types for activities, and most require
+Undying Dominion uses many different weapon types for activities, and most require
 that they be in the wielding position (rather than just held). The swap
 command switches the weapons in your hands so that you may quickly change
 activities, even with a full inventory.
@@ -2845,7 +2845,7 @@ Cold temperatures (in order): &Cchilly, cold, frosty, icy, frigid, freezing&0
 Comfortable temperatures: &Jcool, pleasant, balmy&0
 Hot temperatures: &Owarm, hot, scorching, sweltering, blistering, searing&0
 
-Some EmpireMUDs have penalties for being too cold or too hot:
+Some Undying Dominions have penalties for being too cold or too hot:
 
 Cold penalties: slow effect, get hungry faster, actions are slow
 Freezing penalties: distracted from timed actions, damage over time
@@ -3161,7 +3161,7 @@ See also: EQUIPMENT, REMOVE, WEAR, SHEATH, DRAW, SWAP
 #
 WIMPY
 
-EmpireMUD does not have a 'wimpy' command. There is no automatic way for
+Undying Dominion does not have a 'wimpy' command. There is no automatic way for
 players to flee.
 
 See also: FLEE, FLEET

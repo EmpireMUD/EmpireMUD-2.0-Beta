@@ -1,6 +1,6 @@
 RTRIG "ROOM TRIGGERS" "WORLD TRIGGERS" "TRIGEDIT ROOMS" ROOM-TRIGGERS TRIGEDIT-ROOMS
 
-Rooms and room templates are fully scriptable in EmpireMUD, and are able to
+Rooms and room templates are fully scriptable in Undying Dominion, and are able to
 fire triggers, can execute commands, and can be stored as variables.
 
 See also:

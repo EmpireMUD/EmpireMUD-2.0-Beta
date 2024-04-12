@@ -858,7 +858,7 @@ done
 Hill Giant fight commands~
 0 c 0
 duck dive jump~
-if !%self.var(running)%
+if !%self.running%
   %send% %actor% You don't need to do that right now.
   return 1
   halt

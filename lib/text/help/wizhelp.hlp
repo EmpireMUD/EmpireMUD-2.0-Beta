@@ -269,7 +269,7 @@ See also: GRANT
 #d
 EVOLVE EVOLVER EVOLUTIONS
 
-The 'evolve' utility is a separate program the EmpireMUD runs once per 30
+The 'evolve' utility is a separate program the Undying Dominion runs once per 30
 minutes to update the map. This is normally silent, but will result in logs if
 you run it manually ('util evolve') or if the evolver fails to run.
 
@@ -339,7 +339,7 @@ FULLSAVE
 
 Usage:  fullsave
 
-This command forces a full save of the entire world. Because EmpireMUD writes
+This command forces a full save of the entire world. Because Undying Dominion writes
 world changes as they occur (or, within 1 second), it should never be necessary
 to perform a full save.
 
@@ -362,7 +362,7 @@ mortals sacrificed to them, and could only create items using raw materials
 from the sacrifices.
 
 There have been no changes, maintenance, or improvements to the god system in
-EmpireMUD 2.0 and it is not considered operational. Concerns that would have
+Undying Dominion 2.0 and it is not considered operational. Concerns that would have
 to be addressed include:
  - It's currently possible to get infinite resources by creating items that can
    be broken down or crafted into multiple other items, then sacrificing those
@@ -568,16 +568,13 @@ This immortal command allows the game's staff to name islands and apply
 properties to them. This command is grantable.
 
 Island flags:
- &cNEWBIE&0 - Wipes claims periodically
- &c!AGGRO&0 - Prevents aggro mobs, and guard towers won't fire
- &c!CUSTOMIZE&0 - Cannot be renamed by players
- &cCONTINENT&0 - Is a whole continent (affects adventure spawns)
- &c!CHART&0 - Cannot be charted by players
- &c!TEMPERATURE-PENALTIES&0 - Players are not harmed by heat/cold here
- &cALWAYS-LIGHT&0 - Outdoor tiles are lit at night
- &cALWAYS-DARK&0 - Outdoor tiles are dark even during the day
- &cALWAYS-DAY&0 - The sun is always up.
- &cALWAYS-NIGHT&0 - The sun is always down.
+ NEWBIE - Wipes claims periodically
+ !AGGRO - Prevents aggro mobs, and guard towers won't fire
+ !CUSTOMIZE - Cannot be renamed by players
+ CONTINENT - Is a whole continent (affects adventure spawns)
+ !CHART - Cannot be charted by players
+ !TEMPERATURE-PENALTIES - Players are not harmed by heat/cold here
+ ALWAYS-LIGHT - Outdoor tiles are lit at night
 
 See also: CHART, GRANT
 #d
@@ -748,7 +745,7 @@ PLAYERDELETE "PLAYER DELETE" "DELETE PLAYER" DELETEPLAYER PLRDELETE
 Usage:  playerdelete <name> CONFIRM
 
 This command deletes a player completely. It cannot be used on players with
-the !DEL flag set. There is no way to undo this command (unless your EmpireMUD
+the !DEL flag set. There is no way to undo this command (unless your Undying Dominion
 keeps backups of mud files). You must type the word 'CONFIRM' as the second
 argument, in all capital letters. This command also cannot be abbreviated.
 
@@ -1698,7 +1695,7 @@ SHUTDOWN
 Usage:  shutdown [now | timer | cancel] [normal | pause | die | complete]
 
 SHUTDOWN shuts the MUD down. The SHUTDOWN command works in conjunction with
-EmpireMUD's 'autorun' script. If you are not using autorun, the arguments are
+Undying Dominion's 'autorun' script. If you are not using autorun, the arguments are
 meaningless. If you are using autorun, the following arguments are available:
 
 normal - Will shut down then reboot.

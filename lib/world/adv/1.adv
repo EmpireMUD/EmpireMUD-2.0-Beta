@@ -481,7 +481,7 @@ Notes for implementors:
   the notes.
 ~
 10730 10749 0-25
-1 0 al 0
+2 0 l 0
 L
 5 0
 10080 -1 -1 -1
@@ -505,7 +505,7 @@ Directions for implementors:
 - Make sure your newbie islands have mountains.
 ~
 10750 10774 0-25
-1 10 ehjl 0
+2 10 ehjl 0
 L
 5 0
 10080 -1 -1 -1

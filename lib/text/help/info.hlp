@@ -52,7 +52,7 @@ See also: ELOG, PROGRESS
 #
 ACTION ACTIONS "TIMED ACTIONS"
 
-EmpireMUD uses timed actions for most chores. These are things that happen
+Undying Dominion uses timed actions for most chores. These are things that happen
 over time until complete. Some of them will also automatically repeat when
 finished, if there is still something left to chop/mine/dig. You can cancel
 any timed action by typing 'stop'.
@@ -90,10 +90,10 @@ See also: MAJESTY
 APPROVE UNAPPROVE AUTHORIZED AUTHORIZATION APPROVAL APPROVED "ANONYMOUS HOST" "PUBLIC HOST" "ANONYMOUS PUBLIC HOST" MORTAPPROVE
 
 Some MUDs require that characters are 'approved' before they are allowed to
-play the full game. Different EmpireMUDs configure this differently. In
+play the full game. Different Undying Dominions configure this differently. In
 general, approval is required 
 
-By default, EmpireMUDs auto-approve all characters except ones that log in from
+By default, Undying Dominions auto-approve all characters except ones that log in from
 anonymous public hosts. These are hosts that don't provide the game with your
 actual IP address. Characters that are created from anonymous hosts will not
 auto-approve, and approved characters cannot play from those hosts.
@@ -107,7 +107,7 @@ ADVENTURE "ADVENTURE ZONE" ZONE "ADVENTURE SUMMON"
 Usage:  adventure
         adventure summon <player>
 
-EmpireMUD features instanced adventure zones including caves, magical planes,
+Undying Dominion features instanced adventure zones including caves, magical planes,
 and more. Sometimes you can see them on the 'nearby' command. You can get some
 more information about an adventure using the 'adventure' command.
 
@@ -182,7 +182,7 @@ See also: TOGGLE
 #
 AUTOSTORE AUTO-STORE "AUTO STORE" AUTOCLEANUP "AUTO-CLEANUP" "AUTO CLEANUP"
 
-EmpireMUD conserves resources by cleaning up items that are left out in its
+Undying Dominion conserves resources by cleaning up items that are left out in its
 vast, open world. All items left on the ground or in containers may be stored
 or cleaned up automatically.
 
@@ -470,7 +470,7 @@ These are channels reserved for specific purposes. Messages on these channels
 reach everyone who is monitoring them. You can turn the "shout" and "tell"
 channels on and off using the "toggle" command.
 
-The following channels are available on EmpireMUD:
+The following channels are available on Undying Dominion:
 
 Global channels:
 &Y/ooc&0 - General chat
@@ -530,7 +530,7 @@ Commands:  coins [type]
            exchange <number> <empire | misc> coins
            get coins
 
-Coins in EmpireMUD are minted by empires, and the value of a coin varies from
+Coins in Undying Dominion are minted by empires, and the value of a coin varies from
 empire to empire. If you have good relations with another empire, they will
 give more value to your currency than one that distrusts you. Currency is only
 converted at the exchange rate for certain actions like depositing in the vault
@@ -710,7 +710,7 @@ See also: MOON, BY MOONLIGHT, NIGHTSIGHT
 #
 DEATH DYING
 
-When you die in EmpireMUD, you will lie on the ground for a short time, until
+When you die in Undying Dominion, you will lie on the ground for a short time, until
 you type 'respawn'. When you respawn, you'll appear at your chosen tomb, at
 any nearby tomb your empire owns, or at a random starting location. You can
 only be reanimated in a tomb if your empire owns one on the same island
@@ -1046,7 +1046,7 @@ perfect night vision.
 #
 INSTANCES INSTANTIATION INSTANCING
 
-EmpireMUD uses "instances" of adventures to help fill the large, dynamic world.
+Undying Dominion uses "instances" of adventures to help fill the large, dynamic world.
 It would be difficult to build enough content to cover the entire world, so
 copies of adventure zones are created and placed around the world.
 
@@ -1095,7 +1095,7 @@ See also: EXCAVATE, PLANT, FARMING
 LEVEL LEVELS "GEAR LEVELS" "SKILL LEVEL" "COMPOSITE LEVEL" "TOTAL LEVEL"
 
 Unlike many games, where your skills and equipment are based on your level,
-EmpireMUD does it backwards. Your level is based on your skills and gear.
+Undying Dominion does it backwards. Your level is based on your skills and gear.
 You have three different levels.
 
 Skill level: This level is determined by your top 3 skills, and is currently
@@ -1224,7 +1224,7 @@ band information (data not displayed in-game) on request. You can learn more
 about it by searching the internet for MSDP + your mud client, or at this
 website: http://tintin.sourceforge.net/msdp/index.php
 
-EmpireMUD supports the following MSDP variables:
+Undying Dominion supports the following MSDP variables:
 
  ACCOUNT_NAME - The player's login name
  CHARACTER_NAME - The character's full name
@@ -1317,7 +1317,7 @@ MUDSTATS
 
 Usage:  mudstats <option>
 
-This command displays various statistics about this EmpireMUD.
+This command displays various statistics about this Undying Dominion.
 
 Options:
  configs: Shows how the game is configured.
@@ -1326,7 +1326,7 @@ Options:
 #
 MULTIPLAYING MULTI-PLAYING "MULTI PLAYING"
 
-EmpireMUD allows you to have multiple characters, but never online at the same
+Undying Dominion allows you to have multiple characters, but never online at the same
 time as each other. You can enroll your alts in your own empire even if they
 are offline.
 
@@ -1369,7 +1369,7 @@ See also: NEARBY
 "NEWBIE ISLANDS"
 
 Newbie islands are a safe place for newbies to learn and practice the game.
-Depending on the settings for this EmpireMUD, some of the following things
+Depending on the settings for this Undying Dominion, some of the following things
 may happen on newbie islands:
 - Empires that are older than 1 week lose most claimed land on a newbie island
   (they may still claim a small number of tiles).
@@ -1407,7 +1407,7 @@ Player techs are traits, capabilities, or upgrades that are applied to a player
 by abilities. They are similar to empire technologies.
 
 The ability info display ("ability <name>") lists any techs granted by the
-ability. For players familiar with EmpireMUD, this may indicate what the
+ability. For players familiar with Undying Dominion, this may indicate what the
 ability does. However, you can usually find better information about it in the
 help file for the ability.
 
@@ -1417,7 +1417,7 @@ See also: EMPIRE TECHNOLOGIES
 #
 PLAYERKILLING "PLAYER KILLING" PK PVP "TOGGLE PVP"
 
-EmpireMUD player-killing rules
+Undying Dominion player-killing rules
 
 The rules for player-killing are enforced by the game engine. If you are
 not following these rules, the game will prevent you from attacking another
@@ -1522,7 +1522,7 @@ If your resistance is negative, you will take increased damage.
 
 Physical resistance includes resistance to fire damage (but not magical fire;
 that's magic resistance). This trait is similar to the "soak" trait from older
-versions of EmpireMUD.
+versions of Undying Dominion.
 
 See also: RESIST-MAGICAL, SCORE
 #
@@ -1558,7 +1558,7 @@ See also: MAINTAIN
 #
 SCALING "MOB SCALING" "SCALING MOBS"
 
-EmpireMUD uses a system of mob-scaling where mobs are procedurally adjusted
+Undying Dominion uses a system of mob-scaling where mobs are procedurally adjusted
 to the level of the player or group that is fighting them. Each mob has a
 minimum and maximum scale level, and will scale to any level in that range,
 based on the composite skill of the player.
@@ -1705,7 +1705,7 @@ See also: CRAFT, CHIP, FISH
 #
 SPEED "COMBAT SPEED" "FIGHT SPEED" "FIGHTING SPEED"
 
-On EmpireMUD, combat is speed-based, not round-based or turn-based. Each
+On Undying Dominion, combat is speed-based, not round-based or turn-based. Each
 weapon or other attack has an associated speed, which determines how long or
 short your character waits between attacks.
 

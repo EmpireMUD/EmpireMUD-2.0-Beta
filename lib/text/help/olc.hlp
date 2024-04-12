@@ -1,6 +1,6 @@
 OLC .OLC "DOT OLC" "DOT-OLC"
 
-EmpireMUD .olc: An on-line creation system for editing your world.
+Undying Dominion .olc: An on-line creation system for editing your world.
 
 Usage:  .<type> <command>
         .<command>
@@ -96,8 +96,8 @@ veh - vehicle
 #d
 "OLC LICENSE" "OLC RIGHTS"
 
-All content created for an EmpireMUD using its OLC (OnLine Creation) system
-becomes the property of the game for which it was created. EmpireMUD will not
+All content created for an Undying Dominion using its OLC (OnLine Creation) system
+becomes the property of the game for which it was created. Undying Dominion will not
 remove the author's credit on adventure zones or other content, and major
 contributors may appear in the game credits.
 
@@ -105,13 +105,13 @@ Content builders must use original ideas, concepts, and characters. They must
 not copy, steal, or otherwise unlawfully use the intellectual property of
 others, except as explicitly allowed by the original author.
 
-A person who created content for EmpireMUD, but no longer wants EmpireMUD to
-use that content, may request that the content be removed. However, EmpireMUD
+A person who created content for Undying Dominion, but no longer wants Undying Dominion to
+use that content, may request that the content be removed. However, Undying Dominion
 is under no obligation to do so.
 #d
 BUILDING "BUILDING GUIDE" "BUILDING PARADIGM" "BUILDING CONTENT" "CONTENT BUILDING"
 
-Content for EmpireMUD is built using the .olc system, which provides editors
+Content for Undying Dominion is built using the .olc system, which provides editors
 for adventures, buildings (and designated rooms), craft (and building) recipes,
 crops, mobs, objects, room templates, sectors, and triggers. This document
 describes the game's current guidelines for building that content. For help
@@ -135,7 +135,7 @@ Adventures (ADVEDIT):
 
 Archetypes (ARCHEDIT):
 - Each set of archetypes has its own rules.
-- If your EmpireMUD wants to add races, cultures, or other groupings, you
+- If your Undying Dominion wants to add races, cultures, or other groupings, you
   can use new archetype types.
 - 'Origins' should have a total of 11 attribute points (3 2 2 2 1 1).
 - 'Origins' should have a total of 30 skill points; 'Hobbies' should have 5.
@@ -178,7 +178,7 @@ Buildings (BEDIT):
 - See BUILDING-VEHICLES
 
 Classes (CLASSEDIT):
-- EmpireMUD is not currently using 'classes' at all, but they are still
+- Undying Dominion is not currently using 'classes' at all, but they are still
   included as features for muds that want to implement them.
 - A player will get assigned the class with the most matching skills, so adding
   a 100/100/75 class would give them a more specific version of the 100/100.
@@ -2330,7 +2330,7 @@ Examples:
 Usage:  .limit <number>
 
 This number controls how many copies of an adventure can exist in the world
-at a time. The number you set here is used on default EmpireMUDs with roughly
+at a time. The number you set here is used on default Undying Dominions with roughly
 a 300000-tile world. Your MUD automatically adjusts the instance limit if you
 have a larger or smaller world than that.
 
@@ -2839,7 +2839,6 @@ The following affect flags are available:
  &cCOUNTERSPELL&0 - Will cancel the next counterspellable ability then remove its
    affect. If applied by an ability, will also trigger skill gain and hooks.
  &c!DISARM&0 - Cannot be disarmed.
- &c!MORPH&0 - Cannot manually morph or unmorph one's self.
 #d
 ARCHEDIT "OLC ARCHETYPES" "ARCHETYPE OLC" "ARCHETYPE EDITOR"
 
@@ -3027,7 +3026,7 @@ See also: OLC ARCHETYPES
 Usage:  .type <type>
 
 Archetype types sort them into categories. During creation, a player picks one
-from each category. EmpireMUDs may add or remove archetype types, for example
+from each category. Undying Dominions may add or remove archetype types, for example
 to add races or cultures.
 
 Available types:
@@ -4439,7 +4438,7 @@ CLASSEDIT "OLC CLASSES" "OLC CLASS"
 Usage:  .class <command>
         .command
 
-The .olc class editor allows you to set up player classes. On EmpireMUD, the
+The .olc class editor allows you to set up player classes. On Undying Dominion, the
 players don't begin with classes -- they unlock them by leveling up certain
 skills. Classes can have broadly overlapping requirements (but can't be
 identical to each other), allowing players with similar sets of skills to end
@@ -4535,7 +4534,7 @@ names).
 The actual requirement is 24 levels below the value you set -- if you set a
 skill requirement to 100, a player will qualify when it hits 76.
 
-All stock EmpireMUD classes specify two skills at level 100, but you have more
+All stock Undying Dominion classes specify two skills at level 100, but you have more
 flexibility if you want to do something different. For example, you could do
 more specialized classes that require two skills at 100 and a third at 75.
 If you intend to change the number of skills that a player can raise to 50/75/
@@ -5338,7 +5337,7 @@ Flags used by languages:
   BASIC - All players can automatically speak this language.
   IN-DEVELOPMENT - Language is not available.
 
-EmpireMUD comes with language [150] English and all characters start with this
+Undying Dominion comes with language [150] English and all characters start with this
 language. Add the IN-DEV flag to disable it.
 
 See also: OLC GENERICS, SPEAK, SET LANGUAGE, SHOW LANGUAGES
@@ -5363,7 +5362,7 @@ to players on 'look up' or 'weather' and to immortals on 'show moons'.
 Aside from their name, moons have just one property:
   <&ycycle&0> the number of days in the moon's full cycle
 
-Note: Earth's moon has a natural cycle of 29.53 days but since EmpireMUD uses
+Note: Earth's moon has a natural cycle of 29.53 days but since Undying Dominion uses
 30-day months, this is better approximated as 29.13 days.
 
 See also: OLC GENERICS
@@ -5506,8 +5505,6 @@ This set of flags applies to the global table itself.
 Available flags:
  IN-DEVELOPMENT - Will not be used live.
  ADVENTURE-ONLY - This global table will only apply to the adventure it's in.
-    Supported for: Mob Interactions (only when mob is attached to an instance),
-    Obj Interactions (disenchant), Mine Data (in room templates only).
  CUMULATIVE-PRC - Percent check will be cumulative.
  CHOOSE-LAST - The first choose-last global that passes the percent check will
     be saved for later, and only used if no other global succeeds. This can
@@ -6107,7 +6104,7 @@ This command allows you to toggle the unclaimable status of the map tile you
 are in, or of a larger area around it. The whole area is toggled on if the
 room you're standing in is toggled on, and vice versa.
 
-By tradition, EmpireMUD sets the area around starting locations as unclaimable
+By tradition, Undying Dominion sets the area around starting locations as unclaimable
 so that nobody can build guard towers that threaten players on the start spot.
 
 Example:
@@ -9333,7 +9330,7 @@ Usage:  .icons add <type> <color code> <icon>
         .icons change <number> <type | color | icon> <value>
         .icons remove <number | all>
 
-EmpireMUD uses four different seasons and the biggest change between them is
+Undying Dominion uses four different seasons and the biggest change between them is
 that sectors look different at different times of year. You can also specify
 an icon for ANY season. The <type> parameter is where you specify which season,
 and a list of valid types is shown on the olc display for the sector.
@@ -9995,7 +9992,7 @@ because boards require code support as well.
 #d
 "BOOK ITEM" "BOOK OBJECT"
 
-The BOOK type is used along with the bookedit interface and EmpireMUD's library
+The BOOK type is used along with the bookedit interface and Undying Dominion's library
 system. You can spawn books in adventures by writing them in the book editor,
 then assigning their book ID to a book object in your adventure zone. The
 data from the book editor will override your short description, long desc-
@@ -10011,7 +10008,7 @@ There are two different ways to do buildings:
 - Using the .vehicle editor with the BUILDING flag creates a building that sits
   in a map tile like a vehicle.
 
-Most EmpireMUDs will combine the two systems. Some features, like walls and
+Most Undying Dominions will combine the two systems. Some features, like walls and
 fences, work best as whole-tile buildings. Others, like homes, work better as
 vehicle-buildings.
 
@@ -10055,7 +10052,7 @@ Object values:
 #d
 "CONTAINER ITEM" "CONTAINER OBJECT"
 
-EmpireMUD does not use containers with the TAKE flag. These items should only
+Undying Dominion does not use containers with the TAKE flag. These items should only
 be used on the ground. If you want to raise inventory capacity, use the PACK
 item type instead.
 
@@ -10067,7 +10064,7 @@ Object values:
 #d
 "CORPSE ITEM" "CORPSE OBJECT"
 
-EmpireMUD does not currently allow content builders to add actual corpse
+Undying Dominion does not currently allow content builders to add actual corpse
 objects. You can use the CONTAINER item type if you don't set it as take-able,
 or else you can use OTHER but won't be able to put items inside the corpse.
 
@@ -10484,7 +10481,7 @@ In order to make potions storable, you should set their min- and max-level to
 the same number, e.g. 100-100. This allows them to be both scalable and
 storable.
 
-Note: Prior to EmpireMUD 2.0 b5.23, potions had a pre-determined list of
+Note: Prior to Undying Dominion 2.0 b5.23, potions had a pre-determined list of
 effects and used custom scaling.
 
 Potions can only be used once, and then are lost.
@@ -10591,7 +10588,7 @@ If you want an off-hand item for casters, consider type OTHER.
 The SHIP item type represents large ships with interiors, which are piloted
 around on water tiles by players inside. These cannot be built in OLC because
 they still require code support to spawn them correctly. Future versions of
-EmpireMUD will change this by using scripts to set up the interior; it is not
+Undying Dominion will change this by using scripts to set up the interior; it is not
 currently an option.
 #d
 "UNDEFINED ITEM" "UNDEFINED OBJECT"
@@ -11107,7 +11104,7 @@ instead.
 #d
 "DOLLAR SIGN CODES" "DOLLARSIGN CODES" $$ $$n $$e $$v $$m $$p $$o $$p $$v $$k $$l
 
-EmpireMUD uses the so-called dollar sign codes in a function called act(),
+Undying Dominion uses the so-called dollar sign codes in a function called act(),
 which is used to send action text to people in the game. Usually this only
 appears in the code itself, but there are a few places where players encounter
 it -- such as emotes and custom object messages.

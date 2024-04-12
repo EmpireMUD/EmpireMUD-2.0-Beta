@@ -2,7 +2,7 @@ CLASS CLASSES "CLASS SKILLS"
 
 Usage:  class  (command deprecated)
 
-EmpireMUD does not currently use classes. However, the code base includes a
+Undying Dominion does not currently use classes. However, the code base includes a
 feature where classes can be defined as certain combinations of high-level
 skills.
 
@@ -10,7 +10,7 @@ Some help files refer to "class skills", meaning "a skill in the 76-100 range".
 This is very similar to the "synergies" feature which was designed to replace
 classes.
 
-An EmpireMUD could choose to use classes by adding some new ones in OLC.
+An Undying Dominion could choose to use classes by adding some new ones in OLC.
 Players will automatically be assigned any class that matches their skills,
 but the class is not currently displayed anywhere.
 #

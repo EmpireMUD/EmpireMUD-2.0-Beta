@@ -1,6 +1,6 @@
 BOOK BOOKS
 
-EmpireMUD features a book editor and a library system. You can collect books in
+Undying Dominion features a book editor and a library system. You can collect books in
 your library, or even write your own. When you shelve a book in your library,
 it becomes permanently available for checkout at that library. Once you've
 written a book in the book editor, you can create as many copies of that book
@@ -159,14 +159,14 @@ See also: BOOKEDIT
 #
 "BOOKEDIT LICENSE"
 
-You are using EmpireMUD's book editor under these terms:
+You are using Undying Dominion's book editor under these terms:
 - All text you write here must be original and written by you. You may not
   enter copyrighted text or any text written by another person. You assume
   full liability for any text you enter.
 - All text you write is the property of you, the author.
-- You grant EmpireMUD a license to use this text free-of-charge for the purpose
-  of displaying this text in the EmpireMUD game.
-- EmpireMUD will never use this text for any other purpose.
+- You grant Undying Dominion a license to use this text free-of-charge for the purpose
+  of displaying this text in the Undying Dominion game.
+- Undying Dominion will never use this text for any other purpose.
 
 See also: BOOKEDIT
 #
