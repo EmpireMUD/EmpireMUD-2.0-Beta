@@ -4014,7 +4014,7 @@ ACMD(do_mark) {
 		GET_MARK_LOCATION(ch) = NOWHERE;
 		msg_to_char(ch, "You clear your marked location.\r\n");
 	}
-	else if (GET_ROOM_VNUM(here) >= MAP_SIZE || RMT_FLAGGED(IN_ROOM(ch), RMT_NO_LOCATION)) {
+	else if (!here || GET_ROOM_VNUM(here) >= MAP_SIZE || RMT_FLAGGED(IN_ROOM(ch), RMT_NO_LOCATION)) {
 		msg_to_char(ch, "You may only mark distances on the map.\r\n");
 	}
 	else {
