@@ -166,7 +166,8 @@ S
 D
 The baker owns and runs this little shop.
 ~
-I 4 3313 100.00 2  # LOOT: loaf of bread
+I 4 3313 100.00 2  # LOOT: good loaf of bread
+T 12102
 S
 #215
 #n glassblower blower~
