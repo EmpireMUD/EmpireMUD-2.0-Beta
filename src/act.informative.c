@@ -1047,12 +1047,12 @@ void display_score_to_char(char_data *ch, char_data *to) {
 	// build header (max length: 79)
 	safe_snprintf(lbuf, sizeof(lbuf), " %s ", config_get_string("mud_name"));
 	strcpy(lbuf2, " +");
-	for (iter = 1; iter < (78 - (3 + strlen(lbuf))) / 2; ++iter) {
+	for (iter = 0; iter < (78 - (3 + strlen(lbuf))) / 2; ++iter) {
 		// pad initial dashes
 		strcat(lbuf2, "-");
 	}
 	strcat(lbuf2, lbuf);
-	for (iter = strlen(lbuf2); iter < 78; ++iter) {
+	for (iter = strlen(lbuf2); iter < 77; ++iter) {
 		strcat(lbuf2, "-");
 	}
 	strcat(lbuf2, "+");
