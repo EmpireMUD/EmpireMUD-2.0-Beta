@@ -1039,13 +1039,26 @@ void display_score_to_char(char_data *ch, char_data *to) {
 	char lbuf[MAX_STRING_LENGTH], lbuf2[MAX_STRING_LENGTH], lbuf3[MAX_STRING_LENGTH];
 	char *str;
 	struct player_skill_data *skdata, *next_skill;
-	int i, j, cols, count, pts, val, temperature;
+	int i, j, cols, count, iter, pts, val, temperature;
 	empire_data *emp;
 	struct time_info_data playing_time;
 	struct page_display *line;
-
-
-	build_page_display(to, " +----------------------------- EmpireMUD 2.0b5 -----------------------------+");
+	
+	// build header (max length: 79)
+	safe_snprintf(lbuf, sizeof(lbuf), " %s ", config_get_string("mud_name"));
+	strcpy(lbuf2, " +");
+	for (iter = 0; iter < (78 - (3 + strlen(lbuf))) / 2; ++iter) {
+		// pad initial dashes
+		strcat(lbuf2, "-");
+	}
+	strcat(lbuf2, lbuf);
+	for (iter = strlen(lbuf2); iter < 78; ++iter) {
+		strcat(lbuf2, "-");
+	}
+	strcat(lbuf2, "+");
+	
+	// append header
+	build_page_display_str(to, lbuf2);
 	
 	// row 1 col 1: name
 	line = build_page_display(to, "  Name: %-18.18s", PERS(ch, ch, 1));
