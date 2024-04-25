@@ -49,7 +49,7 @@ set counter %self.var(counter,0)%
 if %counter% == 0
   eval counter 8 + %random.11%
 end
-set target %actor.char_target(%arg.argument(1)%)%
+set target %actor.char_target(%arg.argument1%)%
 if %actor.disabled% || %actor.position% == Sleeping
   %send% %actor% You can't do that right now.
   halt

@@ -30,7 +30,7 @@ Herd Cats~
 0 c 0
 herd~
 * test targeting me
-if %actor.char_target(%arg.argument(1)%)% != %self%
+if %actor.char_target(%arg.argument1%)% != %self%
   return 0
   halt
 end
@@ -103,7 +103,7 @@ No Herd~
 0 c 0
 herd~
 * test targeting me
-if %actor.char_target(%arg.argument(1)%)% != %self%
+if %actor.char_target(%arg.argument1%)% != %self%
   return 0
   halt
 end
@@ -401,7 +401,7 @@ tame feed~
 set target 5
 * This script also overrides 'feed'
 if %cmd% == feed
-  if %actor.char_target(%arg.argument(2)%) == %self%
+  if %actor.char_target(%arg.argument2%) == %self%
     %send% %actor% Just 'give' the food to *%self%.
     return 1
   else

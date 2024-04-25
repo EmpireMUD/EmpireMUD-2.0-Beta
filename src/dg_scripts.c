@@ -2038,8 +2038,8 @@ int text_processed(char *field, char *subfield, struct trig_var_data *vd, char *
 		safe_snprintf(str, slen, "%s", AN(vd->value));
 		return TRUE;
 	}
-	else if (!str_cmp(field, "argument")) {	// fetch words in the argument (skipping filler)
-		if (!subfield || !*subfield) {	// number of real arguments
+	else if (!strn_cmp(field, "argument", 8)) {	// fetch words in the argument (skipping filler)
+		if (!str_cmp(field, "arguments") || !str_cmp(field, "argument")) {	// number of real arguments
 			int count = 0;
 			
 			p = vd->value;
@@ -2049,8 +2049,8 @@ int text_processed(char *field, char *subfield, struct trig_var_data *vd, char *
 			}
 			safe_snprintf(str, slen, "%d", count);
 		}
-		else if (isdigit(*subfield) && atoi(subfield) > 0) {
-			int num = atoi(subfield);
+		else if (isdigit(*(field+8)) && atoi(field+8) > 0) {
+			int num = atoi(field+8);
 			
 			p = vd->value;
 			*tmpvar = '\0';
@@ -2066,6 +2066,10 @@ int text_processed(char *field, char *subfield, struct trig_var_data *vd, char *
 				// not found (ran out of args)
 				*str = '\0';
 			}
+		}
+		else {
+			// unknown
+			*str = '\0';
 		}
 		return TRUE;
 	}
