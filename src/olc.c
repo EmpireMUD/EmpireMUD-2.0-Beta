@@ -5085,10 +5085,10 @@ bool audit_interactions(any_vnum vnum, struct interaction_item *list, int attach
 		}
 		
 		// store quantity for later except chores that are often high
-		if (!interact_data[iter->type].one_at_a_time && iter->type != INTERACT_LIQUID_CONJURE) {
+		if (!interact_data[iter->type].one_at_a_time && iter->quantity >= interact_data[iter->type].warn_quantity) {
 			max_quantity = MAX(max_quantity, iter->quantity);
 		}
-		else if (interact_data[iter->type].one_at_a_time && (min_q_1_at_a_time == -1 || min_q_1_at_a_time > iter->quantity)) {
+		else if (interact_data[iter->type].one_at_a_time && (min_q_1_at_a_time == -1 || min_q_1_at_a_time > iter->quantity) && iter->quantity <= interact_data[iter->type].warn_quantity) {
 			min_q_1_at_a_time = iter->quantity;
 		}
 		
