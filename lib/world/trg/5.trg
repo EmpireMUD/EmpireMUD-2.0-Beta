@@ -83,9 +83,8 @@ done
 Moon Rabbit commands~
 0 ct 0
 order~
-set arg1 %arg.car%
-set arg %arg.cdr%
-set arg2 %arg.car%
+set arg1 %arg.argument(1)%
+set arg2 %arg.argument(2)%
 * discard the rest
 if %actor.char_target(%arg1%)% != %self% && !(companion /= %arg1%)
   return 0
@@ -199,9 +198,8 @@ done
 Spirit Wolf commands~
 0 ct 0
 order~
-set arg1 %arg.car%
-set arg %arg.cdr%
-set arg2 %arg.car%
+set arg1 %arg.argument(1)%
+set arg2 %arg.argument(2)%
 * discard the rest
 if %actor.char_target(%arg1%)% != %self% && !(companion /= %arg1%)
   return 0
@@ -730,9 +728,8 @@ nop %self.set_cooldown(500, 25)%
 Phoenix commands~
 0 ct 0
 order~
-set arg1 %arg.car%
-set arg %arg.cdr%
-set arg2 %arg.car%
+set arg1 %arg.argument(1)%
+set arg2 %arg.argument(2)%
 * discard the rest
 if %actor.char_target(%arg1%)% != %self% && !(companion /= %arg1%)
   return 0
@@ -792,9 +789,8 @@ end
 Scorpion Shadow commands~
 0 ct 0
 order~
-set arg1 %arg.car%
-set arg %arg.cdr%
-set arg2 %arg.car%
+set arg1 %arg.argument(1)%
+set arg2 %arg.argument(2)%
 * discard the rest
 if %actor.char_target(%arg1%)% != %self% && !(companion /= %arg1%)
   return 0
@@ -854,9 +850,8 @@ end
 Owl Shadow commands~
 0 ct 0
 order~
-set arg1 %arg.car%
-set arg %arg.cdr%
-set arg2 %arg.car%
+set arg1 %arg.argument(1)%
+set arg2 %arg.argument(2)%
 * discard the rest
 if %actor.char_target(%arg1%)% != %self% && !(companion /= %arg1%)
   return 0
@@ -916,9 +911,8 @@ end
 Basilisk commands~
 0 ct 0
 order~
-set arg1 %arg.car%
-set arg %arg.cdr%
-set arg2 %arg.car%
+set arg1 %arg.argument(1)%
+set arg2 %arg.argument(2)%
 * discard the rest
 if %actor.char_target(%arg1%)% != %self% && !(companion /= %arg1%)
   return 0
@@ -978,9 +972,8 @@ end
 Salamander commands~
 0 ct 0
 order~
-set arg1 %arg.car%
-set arg %arg.cdr%
-set arg2 %arg.car%
+set arg1 %arg.argument(1)%
+set arg2 %arg.argument(2)%
 * discard the rest
 if %actor.char_target(%arg1%)% != %self% && !(companion /= %arg1%)
   return 0
@@ -1040,9 +1033,8 @@ end
 Banshee commands~
 0 ct 0
 order~
-set arg1 %arg.car%
-set arg %arg.cdr%
-set arg2 %arg.car%
+set arg1 %arg.argument(1)%
+set arg2 %arg.argument(2)%
 * discard the rest
 if %actor.char_target(%arg1%)% != %self% && !(companion /= %arg1%)
   return 0

@@ -113,7 +113,7 @@ end
 No pickpocket while unkillable~
 0 c 0
 pickpocket~
-if !%arg% || %actor.char_target(%arg.car%)% != %self%
+if !%arg% || %actor.char_target(%arg.argument(1)%)% != %self%
   return 0
   halt
 end

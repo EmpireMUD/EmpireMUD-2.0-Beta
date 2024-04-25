@@ -3,7 +3,7 @@ Egg: Throw~
 1 c 2
 throw~
 return 0
-if %actor.obj_target(%arg.car%)% != %self%
+if %actor.obj_target(%arg.argument(1)%)% != %self%
   halt
 end
 wait 1
