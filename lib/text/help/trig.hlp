@@ -652,6 +652,8 @@ Special Variables When using field - The variable returns:
  
 &cself&0 - The mob, item, or room running the script. Normal fields may be 
                 used with this.
+&ccomponent.<vnum>(amt)&0 - Gets the component name by vnum. The amt is used to
+   determine whether to use the singular or plural name.
 &ccooldown.<vnum>&0 - Get the name of a cooldown, by vnum.
 &ccurrency.<vnum>(amt)&0 - Gets the currency name. The amt is used to determine
    whether to use the singular or plural name.

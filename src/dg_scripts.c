@@ -2691,6 +2691,25 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 				}
 				return;
 			}
+			else if (!str_cmp(var, "component")) {
+				// %component.<vnum>(<amt>)% gets the name for that component
+				if (field && *field && isdigit(*field)) {
+					generic_data *gen;
+					int amt = subfield ? atoi(subfield) : 1;
+					
+					if ((gen = find_generic(atoi(field), GENERIC_COMPONENT))) {
+						safe_snprintf(str, slen, "%s",(amt == 1) ? GET_COMPONENT_SINGULAR(gen) : GET_COMPONENT_PLURAL(gen));
+					}
+					else {
+						strcpy(str, "UNKNOWN");
+					}
+				}
+				else {
+					strcpy(str, "UNKNOWN");
+				}
+				
+				return;
+			}
 			else if (!str_cmp(var, "cooldown")) {
 				if (field && *field && isdigit(*field)) {
 					generic_data *gen;
@@ -4944,6 +4963,9 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 					}
 					else if (!str_cmp(field, "component_type")) {
 						safe_snprintf(str, slen, "%s", GET_OBJ_COMPONENT(o) != NOTHING ? get_generic_name_by_vnum(GET_OBJ_COMPONENT(o)) : "");
+					}
+					else if (!str_cmp(field, "component_vnum")) {
+						safe_snprintf(str, slen, "%d", GET_OBJ_COMPONENT(o) != NOTHING ? GET_OBJ_COMPONENT(o) : 0);
 					}
 					else if (!str_cmp(field, "contents")) {
 						if (o->contains) {
