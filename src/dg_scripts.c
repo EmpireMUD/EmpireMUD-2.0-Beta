@@ -2038,6 +2038,37 @@ int text_processed(char *field, char *subfield, struct trig_var_data *vd, char *
 		safe_snprintf(str, slen, "%s", AN(vd->value));
 		return TRUE;
 	}
+	else if (!str_cmp(field, "argument")) {	// fetch words in the argument (skipping filler)
+		if (!subfield || !*subfield) {	// number of real arguments
+			int count = 0;
+			
+			p = vd->value;
+			while (*p) {
+				p = one_word(p, tmpvar);
+				++count;
+			}
+			safe_snprintf(str, slen, "%d", count);
+		}
+		else if (isdigit(*subfield) && atoi(subfield) > 0) {
+			int num = atoi(subfield);
+			
+			p = vd->value;
+			*tmpvar = '\0';
+			while (*p && num > 0) {
+				p = one_word(p, tmpvar);
+				--num;
+			}
+			if (num == 0) {
+				// found
+				safe_snprintf(str, slen, "%s", tmpvar);
+			}
+			else {
+				// not found (ran out of args)
+				*str = '\0';
+			}
+		}
+		return TRUE;
+	}
 	else if (!str_cmp(field, "cap")) {                 // capitalize first letter
 		safe_snprintf(str, slen, "%s", vd->value);
 		for (p = str; *p; ++p) {

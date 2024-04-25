@@ -786,6 +786,10 @@ When using field - The variable returns
 &ctrim&0 - Returns the string without any leading or trailing whitespace. 
    This is used to trim extra spaces from the beginning or end of a string.
 &cana&0 - Returns "a" or "an" depending on the first letter of the string.
+&cargument(num)&0 - Returns the word in position "num" of the string, starting
+   with 1. Or, without a num, gets the number of words in the argument. Quotes
+   or parentheses around "two words" result in them counting as 1 word or
+   argument.
 &ccap&0 - Returns the string with the first letter capitalized.
 &ccar&0 - Returns the first word of the string. For %text%="this is the string";
    %text.car% will yield "this".
