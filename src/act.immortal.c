@@ -6843,9 +6843,10 @@ ACMD(do_moveeinv) {
 
 
 ACMD(do_oset) {
-	char obj_arg[MAX_INPUT_LENGTH], field_arg[MAX_INPUT_LENGTH], *obj_arg_ptr = obj_arg;
+	char obj_arg[MAX_INPUT_LENGTH], field_arg[MAX_INPUT_LENGTH], val_arg[MAX_INPUT_LENGTH];
+	char *obj_arg_ptr = obj_arg;
 	obj_data *obj;
-	int number;
+	int number, which;
 	bool was_lit;
 	
 	argument = one_argument(argument, obj_arg);
@@ -6854,7 +6855,7 @@ ACMD(do_oset) {
 	number = get_number(&obj_arg_ptr);
 	
 	if (!*obj_arg_ptr || !*field_arg) {
-		msg_to_char(ch, "Usage: oset <object> <field> <value>\r\n");
+		msg_to_char(ch, "Usage: oset <object> <field> <argument>\r\n");
 	}
 	else if (!(obj = get_obj_in_list_vis(ch, obj_arg_ptr, &number, ch->carrying)) && !(obj = get_obj_in_list_vis(ch, obj_arg_ptr, &number, ROOM_CONTENTS(IN_ROOM(ch))))) {
 		msg_to_char(ch, "You don't seem to have %s %s.\r\n", AN(obj_arg), obj_arg);
@@ -6929,6 +6930,29 @@ ACMD(do_oset) {
 			schedule_obj_timer_update(obj, TRUE);
 			request_obj_save_in_world(obj);
 			msg_to_char(ch, "You change its timer to %d.\r\n", GET_OBJ_TIMER(obj));
+		}
+	}
+	else if (is_abbrev(field_arg, "argument")) {
+		argument = any_one_arg(argument, val_arg);	// 0-2
+		skip_spaces(&argument);	// remainder
+		
+		if (!*val_arg || !isdigit(*val_arg)) {
+			msg_to_char(ch, "Usage: oset <object> value <number> <argument>\r\n");
+		}
+		else if ((which = atoi(val_arg)) < 0 || which >= NUM_OBJ_VAL_POSITIONS) {
+			msg_to_char(ch, "You must choose a value between 0 and %d.\r\n", NUM_OBJ_VAL_POSITIONS-1);
+		}
+		else if (!*argument) {
+			msg_to_char(ch, "Set value %d to what?\r\n", which);
+		}
+		else if (!is_number(argument)) {
+			msg_to_char(ch, "You can only set the object value to a number.\r\n");
+		}
+		else {
+			// ok:
+			set_obj_val(obj, which, atoi(argument));
+			syslog(SYS_GC, GET_ACCESS_LEVEL(ch), TRUE, "ABUSE: %s has set value %d of obj %s to %d at %s", GET_NAME(ch), which, GET_OBJ_SHORT_DESC(obj), GET_OBJ_VAL(obj, which), room_log_identifier(IN_ROOM(ch)));
+			msg_to_char(ch, "You set value %d to %d.\r\n", which, GET_OBJ_VAL(obj, which));
 		}
 	}
 	else {

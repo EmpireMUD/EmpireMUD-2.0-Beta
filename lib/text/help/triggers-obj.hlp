@@ -111,7 +111,7 @@ Value position numbers are: 0, 1, 2
 
 Note: You must use "osetval" (not "%setval%") for this.
 
-See also: OBJECT VALUES
+See also: OBJECT VALUES, OSET
 #d
 OTIMER %TIMER% 
 

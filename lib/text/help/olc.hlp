@@ -7228,7 +7228,7 @@ Available flags:
  &cNO-WAREHOUSE&0 - can no longer be stored in home/warehouse storage
  &cNO-DECAY-IN-STORAGE&0 - tiemr does not tick down while stored
 
-See also: BINDING, OLC OBJECTS, LIGHT ITEM
+See also: BINDING, OLC OBJECTS, LIGHT ITEM, OSET
 #d
 "OEDIT FULLNESS"
 
@@ -7791,7 +7791,7 @@ the 'plants' property. If you can't see the plants property in the editor,
 it means your value1 is invalid for planting and you should set your value1
 back to 0.
 
-See also: OEDIT PLANTS, OLC OBJECTS
+See also: OEDIT PLANTS, OLC OBJECTS, OSET
 #d
 "OEDIT WEALTH"
 
