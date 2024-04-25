@@ -696,8 +696,8 @@ done
 Infuse fiend gear at fissure~
 2 c 0
 infuse~
-set target %actor.obj_target(%arg.car%)%
-set conf %arg.cdr%
+set target %actor.obj_target(%arg.argument1%)%
+set conf %arg.argument2%
 * Validate target
 if !%target%
   %send% %actor% What do you want to infuse and upgrade?
@@ -1192,13 +1192,13 @@ Molten Fiend: throw stuff in fissure (for molten essence)~
 2 c 0
 throw~
 set val_args lava fissure magma down off ledge
-if !(%val_args% ~= %arg.cdr%)
+if !(%val_args% ~= %arg.argument2%)
   %send% %actor% Usage: throw <item> lava
   halt
 end
-set object %actor.obj_target(%arg.car%)%
+set object %actor.obj_target(%arg.argument1%)%
 if !%object%
-  %send% %actor% You don't seem to have a %arg.car%.
+  %send% %actor% You don't seem to have a %arg.argument1%.
   halt
 end
 %send% %actor% You hurl @%object% from the ledge, into the fissure!

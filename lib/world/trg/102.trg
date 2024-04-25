@@ -1157,7 +1157,7 @@ if %arg% == all
   set targ 0
 else
   set all 0
-  set targ %actor.obj_target_inv(%arg.car%)%
+  set targ %actor.obj_target_inv(%arg.argument1%)%
   if !%arg%
     %send% %actor% Sell what? (or try 'sell all')
     halt

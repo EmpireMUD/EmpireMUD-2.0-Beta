@@ -100,14 +100,14 @@ if !%arg%
   return 0
   halt
 end
-if !(%actor.obj_target(%arg.car%)% == %self%)
+if !(%actor.obj_target(%arg.argument1%)% == %self%)
   return 0
   halt
 end
 if !%actor.on_quest(16602)% && !%actor.on_quest(16603)%
   %send% %actor% You don't need @%self%, might as well just toss it.
 else
-  set target %actor.char_target(%arg.cdr%)%
+  set target %actor.char_target(%arg.argument2%)%
   set OnQuest 0
   if %actor.on_quest(16602)%
     if !(%target.vnum% == 10703)
@@ -586,7 +586,7 @@ if !%arg%
   return 0
   halt
 end
-set MoveDir %actor.parse_dir(%arg.car%)%
+set MoveDir %actor.parse_dir(%arg.argument1%)%
 set SelfRoom %self.room%
 if !%SelfRoom.in_city%
   %send% %actor% While you have a gift to deliver, you should probably be sneaking around your own city.
@@ -700,7 +700,7 @@ if !%arg%
   return 0
   halt
 end
-if %actor.obj_target(%arg.car%)% != %self%
+if %actor.obj_target(%arg.argument1%)% != %self%
   return 0
   halt
 end
@@ -720,13 +720,12 @@ if %FoundSense%
   %send% %actor% The rage of the last time you confronted the grinchy demon is still strong here.
   halt
 end
-set arg2 %arg.cdr%
-if !%arg2%
+if !%arg.argument2%
   %send% %actor% What difficulty would you like to summon the Grinchy Demon at? (Normal, Hard, Group or Boss)
   return 1
   halt
 end
-set arg %arg2%
+set arg %arg.argument2%
 if normal /= %arg%
   %send% %actor% Setting difficulty to Normal...
   set diff 1
@@ -1299,15 +1298,15 @@ throw~
 if !%arg%
   return 0
   halt
-elseif !(%actor.obj_target(%arg.car%)% == %self%)
+elseif !(%actor.obj_target(%arg.argument1%)% == %self%)
   return 0
   halt
 end
-if !%arg.cdr%
+if !%arg.argument2%
   %send% %actor% Fine, but who or what did you want to throw @%self% at?
   halt
 end
-if (abominable /= %arg.cdr%) || (snowman /= %arg.cdr%)
+if (abominable /= %arg.argument2%) || (snowman /= %arg.argument2%)
   set person %self.room.people%
   while %person%
     if %person.vnum% == 16628
@@ -1342,11 +1341,11 @@ if !%arg%
   return 0
   halt
 end
-if !(%actor.obj_target(%arg.car%)% == %self%)
+if !(%actor.obj_target(%arg.argument1%)% == %self%)
   return 0
   halt
 end
-if !(freezing /= %arg.cdr%)
+if !(freezing /= %arg.argument2%)
   %send% %actor% You must enchant @%self% with freezing to subdue the abominable snowman.
   halt
 end
@@ -2156,7 +2155,7 @@ Prevent burning of straw goat in front of witnesses~
 1 c 4
 light burn~
 * check targeting
-if !%arg% || %actor.obj_target(%arg.car%)% != %self%
+if !%arg% || %actor.obj_target(%arg.argument1%)% != %self%
   return 0
   halt
 end
@@ -2310,7 +2309,7 @@ Elfish flying sleigh wax: enchant command~
 1 c 2
 enchant~
 * targeting
-set sleigh %actor.veh_target(%arg.car%)%
+set sleigh %actor.veh_target(%arg.argument1%)%
 if (!%arg% || !%sleigh%)
   return 0
   halt
@@ -2375,7 +2374,7 @@ Dreidel: drop~
 Flying reindeer polish: use polish~
 1 c 2
 use~
-if %actor.obj_target(%arg.car%)% != %self%
+if %actor.obj_target(%arg.argument1%)% != %self%
   return 0
   halt
 end
@@ -2744,7 +2743,7 @@ end
 Spin Dreidel~
 1 c 6
 spin~
-if (!%arg% || %actor.obj_target(%arg.car%)% != %self%)
+if (!%arg% || %actor.obj_target(%arg.argument1%)% != %self%)
   return 0
   halt
 end
@@ -2837,7 +2836,7 @@ detach 16658 %room.id%
 Open Stocking (winter wonderland dailies)~
 1 c 2
 open~
-if !%arg% || %actor.obj_target(%arg.car%)% != %self%
+if !%arg% || %actor.obj_target(%arg.argument1%)% != %self%
   return 0
   halt
 end
@@ -3242,8 +3241,8 @@ return 0
 Winter Wonderland: Mount cannot be harnessed~
 0 ct 0
 harness~
-set anim_arg %arg.car%
-set veh_arg %arg.cdr%
+set anim_arg %arg.argument1%
+set veh_arg %arg.argument2%
 if (!%anim_arg% || !%veh_arg%)
   return 0
   halt
@@ -3391,7 +3390,7 @@ end
 Open Stocking (winter wonderland dailies) 2021-2022~
 1 c 2
 open~
-if !%arg% || %actor.obj_target(%arg.car%)% != %self%
+if !%arg% || %actor.obj_target(%arg.argument1%)% != %self%
   return 0
   halt
 end
@@ -3444,7 +3443,7 @@ if !%arg%
   return 0
   halt
 end
-if %actor.obj_target(%arg.car%)% != %self%
+if %actor.obj_target(%arg.argument1%)% != %self%
   return 0
   halt
 end
@@ -3467,7 +3466,7 @@ if %room.contents(16614)%
   %send% %actor% There is still a strong sense of rage in this place.
   halt
 end
-set arg2 %arg.cdr%
+set arg2 %arg.argument2%
 if !%arg2%
   %send% %actor% What difficulty would you like to summon a winter demon at? (Normal, Hard, Group or Boss)
   return 1
@@ -3885,7 +3884,7 @@ Winter Wonderland: Boss fight tester~
 1 c 2
 test~
 return 1
-if !%arg% \|\| !%arg.cdr%
+if !%arg% || !%arg.cdr%
   %send% %actor% Usage: test <grinch \| krampus> <normal \| hard \| group \| boss>
   halt
 end
@@ -3969,12 +3968,12 @@ if %actor.aff_flagged(blind)%
   return 0
   halt
 end
-if !%event.running(10700)% && (%actor.obj_target(%arg.cdr%)% == %self% || %actor.obj_target(%arg.car%)% == %self%)
+if !%event.running(10700)% && (%actor.obj_target(%arg.argument2%)% == %self% || %actor.obj_target(%arg.argument1%)% == %self%)
   %send% %actor% @%self% suddenly vanishes!
   %quest% %actor% drop 16690
   %purge% %self%
   halt
-elseif !%actor.on_quest(16690)% && (%actor.obj_target(%arg.cdr%)% == %self% || %actor.obj_target(%arg.car%)% == %self%)
+elseif !%actor.on_quest(16690)% && (%actor.obj_target(%arg.argument2%)% == %self% || %actor.obj_target(%arg.argument1%)% == %self%)
   %send% %actor% You can't use @%self% while you're not on its quest.
   halt
 end
@@ -3983,11 +3982,7 @@ set Cookie16661 %self.Cookie16661%
 set Cookie16662 %self.Cookie16662%
 * only looking at it?
 if %cmd% == look
-  if %arg.car% == in || %arg.car% == at
-    * pull off a leading in/at
-    set arg %arg.cdr%
-  end
-  if %actor.obj_target(%arg.car%)% != %self%
+  if %actor.obj_target(%arg.argument1%)% != %self%
     return 0
     halt
   end
@@ -4045,12 +4040,12 @@ if %cmd% == look
   halt
 end
 * otherwise the command was 'put'
-if %actor.obj_target(%arg.cdr%)% != %self%
+if %actor.obj_target(%arg.argument2%)% != %self%
   return 0
   halt
 end
 * detect arg
-set PutObj %arg.car%
+set PutObj %arg.argument1%
 set CookieCount 0
 * check for "all" arg
 if (%PutObj% == all || %PutObj% == all.Cookies || %putObj% == all.Cookie)
@@ -4261,13 +4256,13 @@ if !%event.running(10700)%
   %send% %actor% The winter holiday event isn't currently running.
   halt
 end
-set target %actor.char_target(%arg.car%)%
+set target %actor.char_target(%arg.argument1%)%
 if !%target%
   %send% %actor% You don't see them here.
   halt
 end
-set val %target.gain_event_points(10700,%arg.cdr%)%
-%send% %actor% You have modified |%target% event points by %arg.cdr%.
+set val %target.gain_event_points(10700,%arg.argument2%)%
+%send% %actor% You have modified |%target% event points by %arg.argument2%.
 %send% %actor% &%target% now has %val% points.
 ~
 $

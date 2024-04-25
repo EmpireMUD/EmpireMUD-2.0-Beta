@@ -618,7 +618,7 @@ use~
 * Flushes out a Goblin Challenge
 return 1
 * basic errors first
-if !%arg% || %actor.obj_target(%arg.car%)% != %self%
+if !%arg% || %actor.obj_target(%arg.argument1%)% != %self%
   return 0
   halt
 elseif %actor.fighting%
@@ -692,7 +692,7 @@ set num_needed 2
 set bug_list 11133 11137 11140
 return 1
 * basic errors first
-set vict %actor.char_target(%arg.car%)%
+set vict %actor.char_target(%arg.argument1%)%
 if !%arg%
   %send% %actor% Net whom?
   halt
@@ -835,12 +835,12 @@ GoA: Loom of diminution (shrink ray)~
 shrink~
 return 1
 set room %actor.room%
-set vict %actor.char_target(%arg.car%)%
+set vict %actor.char_target(%arg.argument1%)%
 if !%arg%
   %send% %actor% Shrink whom with the loom of diminution?
   halt
 elseif !%vict%
-  %send% %actor% You don't see anybody called %arg.car% here.
+  %send% %actor% You don't see anybody called %arg.argument1% here.
   halt
 elseif %vict.vnum% < 10200 || %vict.vnum% > 10205 || %vict.affect(18232)%
   %send% %actor% You take aim at ~%vict% with the loom, but it doesn't have any effect!
@@ -1084,7 +1084,7 @@ GoA: Use stone orb of hiding~
 1 c 2
 use~
 * check targeting
-if !%arg% || %actor.obj_target(%arg.car%)% != %self%
+if !%arg% || %actor.obj_target(%arg.argument1%)% != %self%
   return 0
   halt
 end
@@ -1260,7 +1260,7 @@ GoA: Use skeleton key to steal scrolls~
 use~
 return 1
 set room %actor.room%
-if !%arg% || %actor.obj_target(%arg.car%)% != %self%
+if !%arg% || %actor.obj_target(%arg.argument1%)% != %self%
   return 0
   halt
 elseif %self.val0%
@@ -1328,12 +1328,12 @@ GoA: Reflect mob with smoky mirror~
 reflect~
 return 1
 set room %actor.room%
-set vict %actor.char_target(%arg.car%)%
+set vict %actor.char_target(%arg.argument1%)%
 if !%arg%
   %send% %actor% Reflect whom with the strange and smoky mirror?
   halt
 elseif !%vict%
-  %send% %actor% You don't see anybody called %arg.car% here.
+  %send% %actor% You don't see anybody called %arg.argument1% here.
   halt
 elseif %vict.vnum% < 10401 || %vict.vnum% > 10415
   %send% %actor% You hold the strange and smoky mirror up to ~%vict% but can't see a reflection.
@@ -1687,16 +1687,16 @@ end
 Frost Siphon: use~
 1 c 2
 use~
-if %actor.obj_target(%arg.car%)% != %self%
+if %actor.obj_target(%arg.argument1%)% != %self%
   return 0
   halt
 end
-set target %actor.char_target(%arg.cdr%)%
-if !%arg.cdr%
+set target %actor.char_target(%arg.argument2%)%
+if !%arg.argument2%
   %send% %actor% Use the siphon on whom?
   halt
 elseif !%target%
-  %send% %actor% You don't see a '%arg.cdr%' here.
+  %send% %actor% You don't see a '%arg.argument2%' here.
   halt
 end
 if %target.vnum% != 10551 && %target.vnum% != 10552
@@ -1930,11 +1930,11 @@ end
 Imagine Dragons~
 1 c 2
 use~
-if %actor.obj_target(%arg.car%)% != %self%
+if %actor.obj_target(%arg.argument1%)% != %self%
   return 0
   halt
 end
-if %arg.cdr%
+if %arg.argument2%
   %send% %actor% Usage: use staff
   return 1
   halt

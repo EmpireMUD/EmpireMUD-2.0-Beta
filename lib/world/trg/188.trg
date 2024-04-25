@@ -6,7 +6,7 @@ sacrifice~
 return 0
 halt
 * discard arguments after the first
-set arg %arg.car%
+set arg %arg.argument1%
 if %actor.obj_target(%arg%)% != %self%
   return 0
   halt
@@ -45,7 +45,7 @@ if !%arg%
   return 0
   halt
 end
-if %actor.obj_target(%arg.car%)% != %self%
+if %actor.obj_target(%arg.argument1%)% != %self%
   return 0
   halt
 end
@@ -66,7 +66,7 @@ if %found_grave%
   %send% %actor% You cannot summon another Headless Horse Man here yet.
   halt
 end
-set arg2 %arg.cdr%
+set arg2 %arg.argument2%
 if !%arg2%
   %send% %actor% What difficulty would you like to summon the Headless Horse Man at? (Normal, Hard, Group or Boss)
   return 1
@@ -391,12 +391,12 @@ if %actor.aff_flagged(blind)%
   return 0
   halt
 end
-if !%event.running(18800)% && (%actor.obj_target(%arg.cdr%)% == %self% || %actor.obj_target(%arg.car%)% == %self%)
+if !%event.running(18800)% && (%actor.obj_target(%arg.argument2%)% == %self% || %actor.obj_target(%arg.argument1%)% == %self%)
   %send% %actor% @%self% suddenly vanishes!
   %quest% %actor% drop 18808
   %purge% %self%
   halt
-elseif !%actor.on_quest(18808)% && (%actor.obj_target(%arg.cdr%)% == %self% || %actor.obj_target(%arg.car%)% == %self%)
+elseif !%actor.on_quest(18808)% && (%actor.obj_target(%arg.argument2%)% == %self% || %actor.obj_target(%arg.argument1%)% == %self%)
   %send% %actor% You can't use @%self% while you're not on its quest.
   halt
 end
@@ -412,10 +412,7 @@ set Candy18810 %self.Candy18810%
 set Candy18811 %self.Candy18811%
 * only looking at it?
 if %cmd% == look || %cmd% == examine
-  if %arg.car% == in
-    set arg %arg.cdr%
-  end
-  if %actor.obj_target(%arg.car%)% != %self%
+  if %actor.obj_target(%arg.argument1%)% != %self%
     return 0
     halt
   end
@@ -469,12 +466,12 @@ if %cmd% == look || %cmd% == examine
   halt
 end
 * otherwise the command was 'put'
-if %actor.obj_target(%arg.cdr%)% != %self%
+if %actor.obj_target(%arg.argument2%)% != %self%
   return 0
   halt
 end
 * detect arg
-set PutObj %arg.car%
+set PutObj %arg.argument1%
 * check for "all" arg
 if (%PutObj% == all || %PutObj% == all.Candies || %putObj% == all.Candy)
   set all 1
@@ -1143,7 +1140,7 @@ if %tokens% > 0
   eval doit %%actor.give_currency(18800, -%tokens%)%%
 end
 * validate arg
-if !%arg% || %actor.obj_target(%arg.car%)% != %self%
+if !%arg% || %actor.obj_target(%arg.argument1%)% != %self%
   return 0
   halt
 end
@@ -1258,7 +1255,7 @@ Macabre Menagerie: Bind animal~
 bind~
 set ban_list 222 223 9004 9010 9009 9011 9022 9024 9153 9154 9026 9033 9034 9035 9036 9037 9038 9039
 return 1
-set mob %actor.char_target(%arg%)%
+set mob %actor.char_target(%arg.argument1%)%
 if %self.val0% && %self.val1% && %self.val2%
   %send% %actor% @%self% can't bind any more spirits.
   halt
@@ -1272,7 +1269,7 @@ elseif !%arg%
   %send% %actor% Bind which animal?
   halt
 elseif !%mob%
-  %send% %actor% There's no '%arg.car%' here to bind.
+  %send% %actor% There's no '%arg.argument1%' here to bind.
   halt
 elseif %ban_list% ~= %mob.vnum%
   %send% %actor% You'll need to find something a lot scarier than ~%mob%.
@@ -1341,7 +1338,7 @@ elseif %self.val1% > 0 && %self.var(name1)% ~= %arg%
 elseif %self.val2% > 0 && %self.var(name2)% ~= %arg%
   set vnum %self.val2%
   nop %self.val2(-1)%
-elseif %arg.car% == cage || %actor.obj_target(%arg%)% == %self%
+elseif %arg.argument1% == cage || %actor.obj_target(%arg.argument1%)% == %self%
   if %self.val0% > 0
     set vnum %self.val0%
     nop %self.val0(-1)%
@@ -1360,7 +1357,7 @@ elseif %arg.car% == cage || %actor.obj_target(%arg%)% == %self%
   end
 else
   * huh?
-  %send% %actor% There doesn't seem to be %arg.ana% %arg.car% bound in the bone cage.
+  %send% %actor% There doesn't seem to be %arg.argument1.ana% %arg.argument1% bound in the bone cage.
   halt
 end
 * prepare the mob
@@ -2816,19 +2813,19 @@ nop %tent.dump%
 Halloween: Magi-genic Ooze mount upgrader~
 1 c 2
 use~
-if %actor.obj_target(%arg.car%)% != %self%
+if %actor.obj_target(%arg.argument1%)% != %self%
   return 0
   halt
 end
 * All other results return 1
 return 1
 set vnum 0
-if !%arg.cdr%
+if !%arg.argument2%
   %send% %actor% Use the ooze on which mount (giant tarantula or headless horse)?
   halt
-elseif tarantula /= %arg.cdr% || giant tarantula /= %arg.cdr%
+elseif tarantula /= %arg.argument2% || giant tarantula /= %arg.argument2%
   set vnum 18879
-elseif horse /= %arg.cdr% || headless horse /= %arg.cdr%
+elseif horse /= %arg.argument2% || headless horse /= %arg.argument2%
   set vnum 18839
 else
   %send% %actor% Use the ooze on which mount (giant tarantula or headless horse)?
@@ -2929,7 +2926,7 @@ if invoke /= %cmd%
   halt
 elseif paint /= %cmd%
   *** PAINT COMMAND: Validate arg
-  set mob %actor.char_target(%arg.car%)%
+  set mob %actor.char_target(%arg.argument1%)%
   if !%arg% || !%mob% || %mob.vnum% != 18880
     return 0
     halt
@@ -2970,7 +2967,7 @@ Ancestor's Offering: Place Portrait~
 1 c 2
 place~
 * usage: place <portrait>
-if !%arg% || %actor.obj_target(%arg.car%)% != %self%
+if !%arg% || %actor.obj_target(%arg.argument1%)% != %self%
   %send% %actor% Place what?
   halt
 end
@@ -3115,7 +3112,7 @@ Flying pumpkin coach spell~
 1 c 2
 enchant~
 * targeting
-set coach %actor.veh_target(%arg.car%)%
+set coach %actor.veh_target(%arg.argument1%)%
 if (!%arg% || !%coach%)
   return 0
   halt

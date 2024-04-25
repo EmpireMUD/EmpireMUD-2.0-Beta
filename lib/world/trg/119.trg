@@ -367,7 +367,7 @@ Skycleave: Claw Game (broken)~
 1 c 4
 play~
 * play claw
-if !%arg.car% || !(%self.name% ~= %arg.car%)
+if !%arg.argument1% || !(%self.name% ~= %arg.argument1%)
   return 0
   halt
 end
@@ -389,7 +389,7 @@ Skycleave: Claw Game (fixed)~
 1 c 4
 play~
 * Usage: play claw
-if %actor.is_npc% || !%arg.car% || !(%self.name% ~= %arg.car%)
+if %actor.is_npc% || !%arg.argument1% || !(%self.name% ~= %arg.argument1%)
   return 0
   halt
 end
@@ -2084,7 +2084,7 @@ halt
 Skycleave: Secret passage levers~
 1 c 4
 pull~
-if !%arg.car% || %actor.obj_target(%arg.car%)% != %self%
+if !%arg.argument1% || %actor.obj_target(%arg.argument1%)% != %self%
   return 0
   halt
 end
@@ -2619,7 +2619,7 @@ Skycleave: Detect look interaction~
 look~
 return 0
 * detects looking at character
-if %actor.char_target(%arg.car%)% == %self%
+if %actor.char_target(%arg.argument1%)% == %self%
   * looking at me
   switch %self.vnum%
     case 11933
@@ -2797,8 +2797,8 @@ elseif (%lich_cmds% ~= %cmd%) && (%room.template% == 11836 || %room.template% ==
   end
 elseif look /= %cmd% && %room.template% == 11981
   return 0
-  if %actor.obj_target(%arg.car%)% || %actor.char_target(%arg.car%)%
-    * probably hit something in inventory
+  if %actor.obj_target(%arg.argument1%)% || %actor.char_target(%arg.argument1%)%
+    * probably hit something in inventory or room
     halt
   end
   wait 0
@@ -3053,7 +3053,8 @@ attune~
 set allow_list 11900 11899
 set fake_list 10036 10037
 * targeting
-set obj %actor.obj_target_inv(%arg.car%)%
+set arg %arg.argument1%
+set obj %actor.obj_target_inv(%arg%)%
 if !%arg%
   %send% %actor% Which stone you like to attune?
   halt
@@ -3061,7 +3062,7 @@ elseif %arg% == all || %arg% ~= all.
   %send% %actor% You have to attune them one at a time.
   halt
 elseif !%obj%
-  %send% %actor% You don't seem to have %arg.ana% %arg.car%.
+  %send% %actor% You don't seem to have %arg.ana% %arg%.
   halt
 elseif %obj.vnum% == 11898
   %send% %actor% That skystone is already depleted. Try an unattuned stone.
@@ -5172,7 +5173,7 @@ Skycleave: Burn the heartwood of time (rescue the tower)~
 burn light~
 * some mobs block burning
 set mob_list 11871 11866 11872
-if !%arg.car% || %actor.obj_target(%arg.car%)% != %self%
+if !%arg.argument1% || %actor.obj_target(%arg.argument1%)% != %self%
   return 0
   halt
 end

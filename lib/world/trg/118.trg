@@ -3290,15 +3290,17 @@ detach 11835 %self.id%
 #11836
 Skycleave: Object interactions~
 1 c 4
-open release look free unleash~
+open examine release look free unleash~
 return 0
 if %arg.car% == in
   set arg %arg.cdr%
   set in_arg 1
+elseif examine /= %cmd%
+  set in_arg 1
 else
   set in_arg 0
 end
-if %actor.obj_target(%arg.car%)% != %self%
+if %actor.obj_target(%arg.argument1%)% != %self%
   halt
 end
 if %self.vnum% == 11836
@@ -5165,18 +5167,18 @@ nop %self.remove_mob_flag(NO-ATTACK)%
 Skycleave: Use magical items~
 1 c 2
 use~
-if %actor.obj_target_inv(%arg.car%)% != %self%
+if %actor.obj_target_inv(%arg.argument1%)% != %self%
   return 0
   halt
 end
 return 1
-set arg %arg.cdr%
+set arg %arg.argument2%
 if !%arg%
   set targ %actor.fighting%
 else
-  set targ %actor.char_target(%arg.car%)%
+  set targ %actor.char_target(%arg%)%
   if !%targ%
-    %send% %actor% You don't see %arg.car% here.
+    %send% %actor% You don't see %arg% here.
     halt
   elseif !%actor.is_enemy(%targ%)%
     %send% %actor% You can't use that on *%targ% right now.
@@ -7141,7 +7143,7 @@ elseif diagnose /= %cmd% && %self.vnum% == 11866
   %send% %actor% ~%self% doesn't look very good.
 elseif (mount /= %cmd% || ride /= %cmd%) && %self.vnum% == 11852
   * flying throne
-  if !%arg% || %actor.char_target(%arg.car%)% != %self%
+  if !%arg% || %actor.char_target(%arg.argument1%)% != %self%
     * pass through
     return 0
   elseif %actor.completed_quest(11918)% || %actor.completed_quest(11919)% || %actor.completed_quest(11864)%
@@ -7153,7 +7155,7 @@ elseif (mount /= %cmd% || ride /= %cmd%) && %self.vnum% == 11852
   end
 elseif (mount /= %cmd% || ride /= %cmd%) && %aqua_vnums% ~= %self.vnum%
   * fake aquatic mounts
-  set arg %arg.car%
+  set arg %arg.argument1%
   if %actor.has_tech(Riding)% && %arg% && %actor.char_target(%arg%)% == %self%
     set jelly %actor.inventory(11892)%
     if %jelly% && %actor.completed_quest(11972)%
