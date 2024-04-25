@@ -2044,6 +2044,9 @@ bool start_upgrade(char_data *ch, craft_data *upgrade_craft, room_data *from_roo
 			remove_vehicle_extra_data(new_veh, ROOM_EXTRA_PAINT_COLOR);
 		}
 		
+		// request save before finishing
+		request_vehicle_save_in_world(new_veh);
+		
 		// DONE: autocomplete if no resources on the upgrade
 		if (!VEH_NEEDS_RESOURCES(new_veh)) {
 			if (ch) {
@@ -2052,9 +2055,11 @@ bool start_upgrade(char_data *ch, craft_data *upgrade_craft, room_data *from_roo
 				cancel_action(ch);
 			}
 			complete_vehicle(new_veh);
+			
+			// run triggers: WARNING: these are allowed to purge the vehicle
+			complete_vtrigger(new_veh);
 		}
 		
-		request_vehicle_save_in_world(new_veh);
 	} // end upgrade-to-vehicle
 	
 	affect_total_room(in_room);

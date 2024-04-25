@@ -3765,7 +3765,7 @@ INTERACTION_FUNC(ruin_building_to_vehicle_interaction) {
 	bld_data *old_bld;
 	room_data *inside;
 	char *to_free;
-	int paint;
+	int paint, veh_ok;
 	
 	if (!inter_room || !(proto = vehicle_proto(interaction->vnum)) || GET_ROOM_VNUM(inter_room) >= MAP_SIZE) {
 		return FALSE;	// safety: only works on the map
@@ -3876,7 +3876,10 @@ INTERACTION_FUNC(ruin_building_to_vehicle_interaction) {
 	}
 	
 	request_vehicle_save_in_world(ruin);
-	load_vtrigger(ruin);
+	veh_ok = load_vtrigger(ruin);
+	if (veh_ok) {
+		veh_ok = complete_vtrigger(ruin);
+	}
 	request_world_save(GET_ROOM_VNUM(inter_room), WSAVE_ROOM);
 	return TRUE;
 }

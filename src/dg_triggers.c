@@ -2529,13 +2529,15 @@ void adventure_cleanup_wtrigger(room_data *room) {
 * Called when a building is completed.
 *
 * @param room_data *room The building's location.
+* @return int The return value of the script (0 for fail/stop or 1 to continue).
 */
-void complete_wtrigger(room_data *room) {
+int complete_wtrigger(room_data *room) {
 	char buf[MAX_INPUT_LENGTH];
+	int ret_val = 1;
 	trig_data *t, *next_t;
 
 	if (!SCRIPT_CHECK(room, WTRIG_COMPLETE)) {
-		return;
+		return ret_val;
 	}
 
 	LL_FOREACH_SAFE(TRIGGERS(SCRIPT(room)), t, next_t) {
@@ -2544,10 +2546,13 @@ void complete_wtrigger(room_data *room) {
 			ADD_UID_VAR(buf, t, room_script_id(room), "room", 0);
 			sdd.r = room;
 			if (!script_driver(&sdd, t, WLD_TRIGGER, TRIG_NEW)) {
+				ret_val = 0;
 				break;
 			}
 		}
 	}
+	
+	return ret_val;
 }
 
 
@@ -3449,6 +3454,35 @@ int command_vtrigger(char_data *actor, char *cmd, char *argument, int mode) {
 	}
 
 	return 0;
+}
+
+
+/**
+* Called when a vehicle is completed.
+*
+* @param vehicle_data *veh The vehicle that was just loaded.
+* @return int The return value of the script (0 for fail/stop or 1 to continue).
+*/
+int complete_vtrigger(vehicle_data *veh) {
+	int ret_val = 1;
+	trig_data *t, *next_t;
+
+	if (!SCRIPT_CHECK(veh, VTRIG_COMPLETE)) {
+		return ret_val;
+	}
+
+	LL_FOREACH_SAFE(TRIGGERS(SCRIPT(veh)), t, next_t) {
+		if (TRIGGER_CHECK(t, VTRIG_COMPLETE) && (number(1, 100) <= GET_TRIG_NARG(t))) {
+			union script_driver_data_u sdd;
+			sdd.v = veh;
+			if (!script_driver(&sdd, t, VEH_TRIGGER, TRIG_NEW)) {
+				ret_val = 0;
+				break;
+			}
+		}
+	}
+	
+	return ret_val;
 }
 
 

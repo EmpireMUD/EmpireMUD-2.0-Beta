@@ -122,8 +122,8 @@
 // BIT(10)
 // BIT(11)
 // BIT(12)
-#define VTRIG_LOAD  BIT(13)	// vehicle is loaded
-// BIT(14)
+#define VTRIG_LOAD             BIT(13)	// vehicle is loaded (even if incomplete)
+#define VTRIG_COMPLETE         BIT(14)	// vehicle is completed (or loaded already-complete)
 #define VTRIG_ABILITY          BIT(15)	// ability targeting the vehicle
 #define VTRIG_LEAVE  BIT(16)	// someone leaves the room
 // BIT(17)
@@ -432,7 +432,7 @@ void reboot_otrigger(obj_data *obj);
 
 // world triggers
 void adventure_cleanup_wtrigger(room_data *room);
-void complete_wtrigger(room_data *room);
+int complete_wtrigger(room_data *room);
 int dismantle_wtrigger(room_data *room, char_data *actor, bool preventable);
 void load_wtrigger(room_data *room);
 void reset_wtrigger(room_data *ch);
@@ -445,6 +445,7 @@ void reboot_wtrigger(room_data *room);
 
 // vehicle triggers
 int ability_vtrigger(char_data *actor, vehicle_data *veh, any_vnum abil);
+int complete_vtrigger(vehicle_data *veh);
 int destroy_vtrigger(vehicle_data *veh, char *method);
 int dismantle_vtrigger(char_data *actor, vehicle_data *veh, bool preventable);
 int entry_vtrigger(vehicle_data *veh, char *method);

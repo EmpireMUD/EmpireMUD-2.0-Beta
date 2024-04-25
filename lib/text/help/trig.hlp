@@ -431,8 +431,8 @@ Argument type:  percent chance to execute
 Return value:  return 0 if purging the thing itself
 
 The Load trigger happens when something is first loaded into the game (but not
-on reboot or re-login). For crafted vehicles, the Load trigger doesn't happen
-until construction is complete.
+on reboot or re-login). For crafted vehicles, the Load trigger runs BEFORE the
+vehicle is complete.
 
 Certain actions like unharnessing a mob from a vehicle will load a new copy of
 the mob and set off its load triggers.
@@ -446,7 +446,7 @@ should consider doing a "wait 1" (or longer) before purging it.
 Only the FIRST load trigger will run unless it also has the Allow-Multiple
 type.
 
-See also: RTRIG COMPLETE
+See also: RTRIG COMPLETE, VTRIG COMPLETE
 #d
 "METHOD LIST" "METHODS LIST"
 

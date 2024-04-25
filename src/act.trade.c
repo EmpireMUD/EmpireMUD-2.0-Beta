@@ -1413,8 +1413,10 @@ void process_gen_craft_vehicle(char_data *ch, craft_data *type) {
 	if (!VEH_NEEDS_RESOURCES(veh)) {
 		act("$V is finished!", FALSE, ch, NULL, veh, TO_CHAR | TO_ROOM | ACT_VEH_VICT);
 		
-		// WARNING: complete_vehicle runs triggers that could purge the vehicle
 		complete_vehicle(veh);
+		
+		// run triggers: WARNING: these could purge the vehicle
+		complete_vtrigger(veh);
 		
 		// stop all actors on this type
 		DL_FOREACH2(ROOM_PEOPLE(IN_ROOM(ch)), vict, next_in_room) {

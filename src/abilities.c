@@ -2256,6 +2256,9 @@ INTERACTION_FUNC(conjure_vehicle_interaction) {
 		
 		special_vehicle_setup(ch, veh);
 		veh_ok = load_vtrigger(veh);
+		if (veh_ok) {
+			veh_ok = complete_vtrigger(veh);
+		}
 	}
 	
 	// messaging?

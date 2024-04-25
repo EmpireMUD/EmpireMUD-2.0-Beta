@@ -1272,6 +1272,7 @@ void instance_obj_setup(struct instance_data *inst, obj_data *obj) {
 * @param room_data *room The room to reset.
 */
 static void reset_instance_room(struct instance_data *inst, room_data *room) {
+	int veh_ok;
 	room_template *rmt = GET_ROOM_TEMPLATE(room);
 	struct adventure_spawn *spawn;
 	vehicle_data *veh;
@@ -1328,7 +1329,10 @@ static void reset_instance_room(struct instance_data *inst, room_data *room) {
 						if (ROOM_PEOPLE(IN_ROOM(veh))) {
 							act("$V appears.", FALSE, ROOM_PEOPLE(IN_ROOM(veh)), NULL, veh, TO_CHAR | TO_ROOM | ACT_VEH_VICT);
 						}
-						load_vtrigger(veh);
+						veh_ok = load_vtrigger(veh);
+						if (veh_ok) {
+							veh_ok = complete_vtrigger(veh);
+						}
 					}
 					break;
 				}

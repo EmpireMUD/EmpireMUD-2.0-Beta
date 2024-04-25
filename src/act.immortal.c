@@ -6671,6 +6671,7 @@ ACMD(do_last) {
 
 
 ACMD(do_load) {
+	int veh_ok;
 	vehicle_data *veh;
 	char_data *mob, *mort;
 	obj_data *obj;
@@ -6746,7 +6747,10 @@ ACMD(do_load) {
 			syslog(SYS_GC, GET_ACCESS_LEVEL(ch), TRUE, "ABUSE: %s loaded vehicle %s in mortal empire (%s) at %s", GET_NAME(ch), VEH_SHORT_DESC(veh), EMPIRE_NAME(ROOM_OWNER(IN_ROOM(ch))), room_log_identifier(IN_ROOM(ch)));
 		}
 		
-		load_vtrigger(veh);
+		veh_ok = load_vtrigger(veh);
+		if (veh_ok) {
+			veh_ok = complete_vtrigger(veh);
+		}
 	}
 	else if (is_abbrev(buf, "book")) {
 		if (!book_proto(number)) {
@@ -7476,6 +7480,7 @@ ACMD(do_rescale) {
 
 
 ACMD(do_restore) {
+	bool need_trig = FALSE;
 	char name_arg[MAX_INPUT_LENGTH], *type_args, arg[MAX_INPUT_LENGTH], msg[MAX_STRING_LENGTH], types[MAX_STRING_LENGTH];
 	ability_data *abil, *next_abil;
 	skill_data *skill, *next_skill;
@@ -7515,7 +7520,15 @@ ACMD(do_restore) {
 		
 		remove_vehicle_flags(veh, VEH_ON_FIRE);
 		if (!VEH_IS_DISMANTLING(veh)) {
+			if (VEH_NEEDS_RESOURCES(veh) && !VEH_IS_COMPLETE(veh)) {
+				need_trig = TRUE;
+			}
+			
 			complete_vehicle(veh);
+			
+			if (need_trig) {
+				complete_vtrigger(veh);
+			}
 		}
 		return;
 	}

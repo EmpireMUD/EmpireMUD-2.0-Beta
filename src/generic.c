@@ -1419,7 +1419,10 @@ void olc_delete_generic(char_data *ch, any_vnum vnum) {
 			request_vehicle_save_in_world(veh);
 			
 			if (!VEH_NEEDS_RESOURCES(veh)) {
-				complete_vehicle(veh);	// this could purge it
+				complete_vehicle(veh);
+				
+				// run triggers: could purge it
+				complete_vtrigger(veh);
 			}
 		}
 	}

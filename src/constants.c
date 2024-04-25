@@ -4949,7 +4949,7 @@ const char *vtrig_types[] = {
 	"*",	// 11
 	"*",	// 12
 	"Load",
-	"*",	// 14
+	"Complete",	// 14
 	"Ability",	// 15
 	"Leave",
 	"*",	// 17
@@ -4982,7 +4982,7 @@ const bitvector_t vtrig_argument_types[] = {
 	NOBITS,	// 11
 	NOBITS,	// 12
 	TRIG_ARG_PERCENT,	// load
-	NOBITS,	// 14
+	TRIG_ARG_PERCENT,	// complete
 	TRIG_ARG_PERCENT,	// 15, ability
 	TRIG_ARG_PERCENT,	// leave
 	NOBITS,	// 17
