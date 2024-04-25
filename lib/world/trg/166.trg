@@ -2284,8 +2284,8 @@ done
 Only harness flying mobs~
 5 c 0
 harness~
-set anim_arg %arg.car%
-set veh_arg %arg.cdr%
+set anim_arg %arg.argument(1)%
+set veh_arg %arg.argument(2)%
 if (!%anim_arg% || !%veh_arg%)
   return 0
   halt
