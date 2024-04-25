@@ -3851,6 +3851,11 @@ room_data *get_ship_pen(void) {
 		}
 	}
 	
+	if (!building_proto(RTYPE_SHIP_HOLDING_PEN)) {
+		log("SYSERR: get_ship_pen: Failed because building type %d does not exist", RTYPE_SHIP_HOLDING_PEN);
+		exit(1);
+	}
+	
 	// did not find -- make one
 	room = create_room(NULL);
 	attach_building_to_room(building_proto(RTYPE_SHIP_HOLDING_PEN), room, TRUE);

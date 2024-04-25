@@ -392,6 +392,10 @@ void construct_building(room_data *room, bld_vnum type) {
 		log("SYSERR: construct_building called on location off the map");
 		return;
 	}
+	if (!building_proto(type)) {
+		syslog(SYS_ERROR, LVL_START_IMM, TRUE, "SYSERR: construct_building called with invalid building type %d at room %d", type, GET_ROOM_VNUM(room));
+		return;
+	}
 	
 	disassociate_building(room);	// just in case
 	
@@ -449,6 +453,11 @@ void construct_tunnel(char_data *ch, int dir, room_data *entrance, room_data *ex
 	
 	room_data *new_room, *last_room = entrance, *to_room;
 	int iter;
+	
+	if (!building_proto(RTYPE_TUNNEL)) {
+		syslog(SYS_ERROR, LVL_START_IMM, TRUE, "SYSERR: construct_tunnel called with no valid tunnel building %d", RTYPE_TUNNEL);
+		return;
+	}
 	
 	if (!resources) {
 		add_to_resource_list(&resources, RES_COMPONENT, COMP_PILLAR, 12, 0);
