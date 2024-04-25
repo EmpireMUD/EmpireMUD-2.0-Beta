@@ -948,7 +948,7 @@ void olc_show_room_template(char_data *ch) {
 	build_page_display(ch, "<%stemperature\t0> %s", OLC_LABEL_VAL(GET_RMT_TEMPERATURE_TYPE(rmt), 0), temperature_types[GET_RMT_TEMPERATURE_TYPE(rmt)]);
 	
 	// exits
-	build_page_display(ch, "Exits: <%sexit\t0>, <%smatchexits\t0>", OLC_LABEL_PTR(GET_RMT_EXITS(rmt)), OLC_LABEL_PTR(GET_RMT_EXITS(rmt)));
+	build_page_display(ch, "Exits: <%sexit\t0>, <%smatchexits\t0>", OLC_LABEL_PTR(GET_RMT_EXITS(rmt)), OLC_LABEL_UNCHANGED);
 	if (GET_RMT_EXITS(rmt)) {
 		show_exit_template_display(ch, GET_RMT_EXITS(rmt), FALSE);
 	}
