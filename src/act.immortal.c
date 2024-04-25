@@ -6932,7 +6932,7 @@ ACMD(do_oset) {
 			msg_to_char(ch, "You change its timer to %d.\r\n", GET_OBJ_TIMER(obj));
 		}
 	}
-	else if (is_abbrev(field_arg, "argument")) {
+	else if (is_abbrev(field_arg, "value")) {
 		argument = any_one_arg(argument, val_arg);	// 0-2
 		skip_spaces(&argument);	// remainder
 		
