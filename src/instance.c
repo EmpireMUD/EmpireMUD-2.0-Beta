@@ -1031,9 +1031,23 @@ void delete_instance(struct instance_data *inst, bool run_cleanup) {
 			if (INST_ROOM(inst, iter)) {
 				// get rid of vehicles first (helps relocate players inside)
 				DL_FOREACH_SAFE2(ROOM_VEHICLES(INST_ROOM(inst, iter)), veh, next_veh, next_in_room) {
-					vehicle_from_room(veh);
-					vehicle_to_room(veh, extraction_room);
-					extract_vehicle(veh);
+					if (VEH_INSTANCE_ID(veh) == INST_ID(inst)) {
+						// vehicle part of instance
+						empty_instance_vehicle(inst, veh, INST_LOCATION(inst));
+						vehicle_from_room(veh);
+						vehicle_to_room(veh, extraction_room);
+						extract_vehicle(veh);
+					}
+					else {
+						// vehicle not part of instance
+						vehicle_from_room(veh);
+						vehicle_to_room(veh, INST_LOCATION(inst));
+						
+						if (ROOM_PEOPLE(IN_ROOM(veh))) {
+							act("$V arrives.", FALSE, ROOM_PEOPLE(IN_ROOM(veh)), NULL, NULL, TO_CHAR | TO_ROOM);
+						}
+						entry_vtrigger(veh, "system");
+					}
 				}
 	
 				relocate_players(INST_ROOM(inst, iter), room);
