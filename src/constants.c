@@ -1328,7 +1328,7 @@ const char *player_tech_types[] = {
 	"Fish-Command",
 	"Forage-Command",
 	"Harvest-Upgrade",
-	"Sire-Vampire",
+	"Vampire-Siring",
 	"Hide-Upgrade",	// 20
 	"Infiltrate",
 	"Infiltrate-Upgrade",

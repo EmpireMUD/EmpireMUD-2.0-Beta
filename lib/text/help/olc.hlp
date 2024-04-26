@@ -1721,12 +1721,12 @@ Available techs are:
  &cChip-Command&0 *
  &cSaw-Command&0 *
  &cScrape-Command&0 *
- &cSire-Vampire&0 * - Player can sire other players to become vampires.
  &cMap-Memory&0 * - Remembers blocked/dark tiles on look/scan.
  &cSearch-Command&0 *^
  &cTrack-Command&0 *
  &cResist-Poison&0 * - Reduced effect from poisons.
  &cVampire-Bite&0 *^ - Can use bite for blood, if a vampire, rather than the social.
+ &cVampire-Siring&0 * - Player can sire other players to become vampires.
  &cEnemy-Buff-Details&0 * - Can see full details using 'affects' on others.
  &cConceal-Equipment&0 * - Others cannot see your equipment on 'look'.
  &cConceal-Inventory&0 * - Others cannot see your inventory on 'look'.
