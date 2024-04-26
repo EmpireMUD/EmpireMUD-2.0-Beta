@@ -3024,7 +3024,7 @@ end
 ~
 #11938
 Walking Sorcery Tower: interior setup~
-5 n 100
+5 o 100
 ~
 set inter %self.interior%
 if !%inter%

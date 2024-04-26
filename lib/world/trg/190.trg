@@ -550,7 +550,7 @@ end
 ~
 #19047
 Walking Hut setup~
-5 n 100
+5 o 100
 ~
 set inter %self.interior%
 if (!%inter%)
