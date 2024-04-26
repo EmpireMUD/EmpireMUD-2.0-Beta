@@ -2902,7 +2902,7 @@ ACMD(do_morph) {
 	morph = NULL;
 	multiplier = fast ? 3.0 : 1.0;
 	
-	if (AFF_FLAGGED(ch, AFF_NO_MORPH)) {
+	if (AFF_FLAGGED(ch, AFF_NO_MORPH) && !IS_IMMORTAL(ch)) {
 		msg_to_char(ch, "You can't seem to morph right now!\r\n");
 	}
 	else if (normal && !IS_MORPHED(ch)) {
