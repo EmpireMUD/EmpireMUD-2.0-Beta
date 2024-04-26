@@ -2184,7 +2184,7 @@ void process_scraping(char_data *ch) {
 * @param char_data *ch The sirer (?).
 */
 void process_siring(char_data *ch) {
-	if (!GET_FEEDING_FROM(ch)) {
+	if (!GET_FEEDING_FROM(ch) || !has_player_tech(ch, PTECH_SIRE_VAMPIRE)) {
 		cancel_action(ch);
 	}
 	else if (GET_BLOOD(GET_FEEDING_FROM(ch)) <= 0) {

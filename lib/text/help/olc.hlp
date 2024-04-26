@@ -1721,6 +1721,7 @@ Available techs are:
  &cChip-Command&0 *
  &cSaw-Command&0 *
  &cScrape-Command&0 *
+ &cSire-Vampire&0 * - Player can sire other players to become vampires.
  &cMap-Memory&0 * - Remembers blocked/dark tiles on look/scan.
  &cSearch-Command&0 *^
  &cTrack-Command&0 *
