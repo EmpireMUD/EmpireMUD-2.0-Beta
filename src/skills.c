@@ -2230,7 +2230,7 @@ ACMD(do_skills) {
 		
 		// check if I have the skill, if needed
 		for (iter = 0; iter < 2; ++iter) {
-			if (SKILL_FLAGGED(synergy[iter], SKILLF_NO_PREVIEW) && get_skill_level(ch, SKILL_VNUM(synergy[iter])) < 1) {
+			if (SKILL_FLAGGED(synergy[iter], SKILLF_NO_PREVIEW) && get_skill_level(ch, SKILL_VNUM(synergy[iter])) < 1 && !IS_IMMORTAL(ch)) {
 				msg_to_char(ch, "You don't know the %s skill.\r\n", SKILL_NAME(synergy[iter]));
 				return;
 			}
@@ -2313,7 +2313,7 @@ ACMD(do_skills) {
 		// show 1 skill's details
 		
 		// validate
-		if (SKILL_FLAGGED(skill, SKILLF_NO_PREVIEW) && get_skill_level(ch, SKILL_VNUM(skill)) < 1) {
+		if (SKILL_FLAGGED(skill, SKILLF_NO_PREVIEW) && get_skill_level(ch, SKILL_VNUM(skill)) < 1 && !IS_IMMORTAL(ch)) {
 			msg_to_char(ch, "You don't know the %s skill.\r\n", SKILL_NAME(skill));
 			return;
 		}
