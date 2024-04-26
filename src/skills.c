@@ -2228,6 +2228,14 @@ ACMD(do_skills) {
 			return;
 		}
 		
+		// check if I have the skill, if needed
+		for (iter = 0; iter < 2; ++iter) {
+			if (SKILL_FLAGGED(synergy[iter], SKILLF_NO_PREVIEW) && get_skill_level(ch, SKILL_VNUM(synergy[iter])) < 1) {
+				msg_to_char(ch, "You don't know the %s skill.\r\n", SKILL_NAME(synergy[iter]));
+				return;
+			}
+		}
+		
 		// displays: first build the list of abils
 		for (iter = 0; iter < 2; ++iter) {
 			skill_data *first = synergy[iter], *second = synergy[iter ? 0 : 1];
@@ -2303,6 +2311,12 @@ ACMD(do_skills) {
 	}
 	else if (skill) {
 		// show 1 skill's details
+		
+		// validate
+		if (SKILL_FLAGGED(skill, SKILLF_NO_PREVIEW) && get_skill_level(ch, SKILL_VNUM(skill)) < 1) {
+			msg_to_char(ch, "You don't know the %s skill.\r\n", SKILL_NAME(skill));
+			return;
+		}
 		
 		// if no levels were requested, default to only showing up to the next cap
 		if (min_level == -1 && max_level == -1 && !want_all) {

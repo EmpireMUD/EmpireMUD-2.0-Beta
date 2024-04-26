@@ -4770,6 +4770,7 @@ const char *skill_flags[] = {
 	"VAMPIRE",
 	"CASTER",
 	"REMOVED-BY-PURIFY",	// 5
+	"NO-PREVIEW",
 	"\n"
 };
 

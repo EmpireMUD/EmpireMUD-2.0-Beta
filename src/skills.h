@@ -376,6 +376,7 @@
 #define SKILLF_VAMPIRE  BIT(3)	// d. players with this skill are considered vampires
 #define SKILLF_CASTER  BIT(4)	// e. players with this skill are considered spellcasters/mages
 #define SKILLF_REMOVED_BY_PURIFY  BIT(5)	// f. lose this skill if hit by the 'purify' spell
+#define SKILLF_NO_PREVIEW  BIT(6)	// g. cannot view skill if you don't have it
 
 
  //////////////////////////////////////////////////////////////////////////////

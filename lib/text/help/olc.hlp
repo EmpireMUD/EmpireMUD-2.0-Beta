@@ -9585,6 +9585,7 @@ Available flags:
  &cVAMPIRE&0 - Players with this skill are considered vampires.
  &cCASTER&0 - Players with this skill are spellcasters/mages.
  &cREMOVED-BY-PURIFY&0 - Lose this skill if hit by the purify spell.
+ &cNO-PREVIEW&0 - Cannot view the skill unless you have at least 1 point in it.
 
 See also: OLC SKILLS, OLC REMOVEINDEV
 #d
