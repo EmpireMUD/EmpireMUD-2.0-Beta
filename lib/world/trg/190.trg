@@ -134,12 +134,13 @@ end
 Swamp Hag 2.0 Diff Select~
 1 c 4
 difficulty~
+set room %self.room%
 if !%arg%
   %send% %actor% You must specify a level of difficulty.
   return 1
   halt
 end
-if %instance.players_present% > %self.room.players_present%
+if %instance.players_present% > %room.players_present%
   %send% %actor% You cannot set a difficulty while players are elsewhere in the adventure.
   return 1
   halt
@@ -192,11 +193,28 @@ if %exitroom%
   %door% %exitroom% %exitroom.enter_dir% room %newroom%
   %door% %newroom% %exitroom.exit_dir% room %exitroom%
 end
-set person %self.room.people%
+* move people
+set person %room.people%
 while %person%
   set next_person %person.next_in_room%
   %teleport% %person% %newroom%
   set person %next_person%
+done
+* move vehicles
+set veh %room.vehicles%
+while %veh%
+  set next_veh %veh.next_in_room%
+  %teleport% %veh% %newroom%
+  set veh %next_veh%
+done
+* move stray items
+set obj %room.contents%
+while %obj%
+  set next_obj %obj.next_in_list%
+  if %obj% != %self%
+    %teleport% %obj% %newroom%
+  end
+  set obj %next_obj%
 done
 otimer 24
 ~
