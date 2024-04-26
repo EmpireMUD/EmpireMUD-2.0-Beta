@@ -1609,7 +1609,7 @@ done
 ~
 #18850
 Halloween: Bylda Bear finish~
-5 n 100
+5 o 100
 ~
 wait 1
 %echo% The Bylda lets out a powerful roar as it comes to life and smashes out of its frame!
@@ -2781,7 +2781,7 @@ return 1
 ~
 #18875
 load the victim~
-5 n 100
+5 o 100
 ~
 %at% %self.interior% %load% mob 18873
 set victim %self.interior.people.id%
