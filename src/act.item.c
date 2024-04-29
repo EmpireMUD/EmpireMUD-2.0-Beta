@@ -5582,7 +5582,7 @@ ACMD(do_drink) {
 		}
 		else {	// no-arg and no room water: try to show drinkables
 			check_list[0] = ch->carrying;
-			check_list[1] = can_use_room(ch, IN_ROOM(ch), MEMBERS_AND_ALLIES) ? ROOM_CONTENTS(IN_ROOM(ch)) : NULL;
+			check_list[1] = can_use_room(ch, IN_ROOM(ch), GUESTS_ALLOWED) ? ROOM_CONTENTS(IN_ROOM(ch)) : NULL;
 			for (iter = 0; iter < 2; ++iter) {
 				if (check_list[iter]) {
 					DL_FOREACH2(check_list[iter], obj, next_content) {
@@ -5634,7 +5634,7 @@ ACMD(do_drink) {
 		}
 	}
 
-	if (type == NOTHING && !(obj = get_obj_in_list_vis(ch, argptr, &number, ch->carrying)) && (!can_use_room(ch, IN_ROOM(ch), MEMBERS_AND_ALLIES) || !(obj = get_obj_in_list_vis(ch, argptr, &number, ROOM_CONTENTS(IN_ROOM(ch)))))) {
+	if (type == NOTHING && !(obj = get_obj_in_list_vis(ch, argptr, &number, ch->carrying)) && (!can_use_room(ch, IN_ROOM(ch), GUESTS_ALLOWED) || !(obj = get_obj_in_list_vis(ch, argptr, &number, ROOM_CONTENTS(IN_ROOM(ch)))))) {
 		if ((veh = get_vehicle_in_room_vis(ch, argptr, NULL)) && vehicle_has_function_and_city_ok(veh, FNC_DRINK_WATER)) {
 			// try the vehicle
 			if (!VEH_IS_COMPLETE(veh)) {
@@ -6002,7 +6002,7 @@ ACMD(do_eat) {
 	if (!*argptr) {	// no-arg: try to show edibles
 		// check inventory for edibles...
 		check_list[0] = ch->carrying;
-		check_list[1] = can_use_room(ch, IN_ROOM(ch), MEMBERS_AND_ALLIES) ? ROOM_CONTENTS(IN_ROOM(ch)) : NULL;
+		check_list[1] = can_use_room(ch, IN_ROOM(ch), GUESTS_ALLOWED) ? ROOM_CONTENTS(IN_ROOM(ch)) : NULL;
 		for (iter = 0; iter < 2; ++iter) {
 			if (check_list[iter]) {
 				DL_FOREACH2(check_list[iter], obj, next_content) {
@@ -6043,7 +6043,7 @@ ACMD(do_eat) {
 		return;
 	}
 	if (!(food = get_obj_in_list_vis(ch, argptr, &number, ch->carrying))) {
-		if (!can_use_room(ch, IN_ROOM(ch), MEMBERS_AND_ALLIES) || !(food = get_obj_in_list_vis(ch, argptr, &number, ROOM_CONTENTS(IN_ROOM(ch))))) {
+		if (!can_use_room(ch, IN_ROOM(ch), GUESTS_ALLOWED) || !(food = get_obj_in_list_vis(ch, argptr, &number, ROOM_CONTENTS(IN_ROOM(ch))))) {
 			msg_to_char(ch, "You don't seem to have %s %s.\r\n", AN(arg), arg);
 			return;
 		}
