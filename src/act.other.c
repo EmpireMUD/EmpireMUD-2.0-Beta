@@ -2467,6 +2467,9 @@ ACMD(do_herd) {
 	else if (GET_POS(victim) < POS_STANDING || MOB_FLAGGED(victim, MOB_TIED)) {
 		act("You can't herd $M right now.", FALSE, ch, NULL, victim, TO_CHAR);
 	}
+	else if (GET_LED_BY(victim) && GET_LED_BY(victim) == ch) {
+		msg_to_char(ch, "You're already leading them; they'll move move with you when you walk.\r\n");
+	}
 	else if (GET_LED_BY(victim) && IN_ROOM(GET_LED_BY(victim)) == IN_ROOM(victim)) {
 		msg_to_char(ch, "You can't herd someone who is being led by someone else.\r\n");
 	}
