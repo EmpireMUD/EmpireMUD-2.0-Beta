@@ -97,15 +97,18 @@ S
 #12102
 Master Baker Trials~
    It's now time for your master's trials. Prepare your very best recipes in
-front of your royal baker to prove your worthiness to be taught. You must make
-a seafood feast, a roast turkey feast, a roast meat platter, a mixed vegetable
-board, and an extravagant dessert platter.
-   Be sure to make them at the bakery.
+front of your royal baker to prove your worthiness to be taught. You must make:
+     - a seafood feast
+     - a roast turkey feast
+     - a roast meat platter
+     - a mixed vegetable board
+     - a extravagant dessert platter
+Be sure to make them at the bakery, where the baker can supervise.
 ~
    You have completed the quest. Beaming proudly at you, the baker recognizes
 you as a fellow master of the craft and rewards you.
 ~
-5 0 100 0 -1
+6 0 100 0 -1
 A
 1 214
 P
@@ -116,16 +119,9 @@ R
 2 12138 1
 R
 2 12139 1
-W
-2 3359 0 1 a
-W
-2 3357 0 1 a
-W
-2 3360 0 1 a
-W
-2 3358 0 1 a
-W
-2 3361 0 1 a
+W+
+11 0 0 5 -
+Make all five feasts in front of the baker~
 Z
 1 214
 S

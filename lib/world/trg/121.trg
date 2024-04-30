@@ -2,37 +2,47 @@
 Master Baker's Trials~
 0 e 0
 finishes cooking~
-if %actor.on_quest(12102)% & %object%
-  set want_vnums 3357 3358 3359 3360 3361
-  if %want_vnums% ~= %object.vnum%
-    * mark that we got this one
-    if !%actor.var(12102_made_%object.vnum%)%
-      set 12102_made_%object.vnum% 1
-      remote 12102_made_%object.vnum% %actor.id%
-say Ah, a perfect example of %object.shortdesc%! Nicely done.
+if !%actor.on_quest(12102)% || !%object%
+  halt
+end
+set want_vnums 3357 3358 3359 3360 3361
+set num_wanted 5
+if %want_vnums% ~= %object.vnum%
+  * mark that we got this one
+  if !%actor.var(12102_made_%object.vnum%)%
+    set 12102_made_%object.vnum% 1
+    remote 12102_made_%object.vnum% %actor.id%
+    say Ah, a perfect example of %object.shortdesc%! Nicely done.
+    * triggers once per feast
+    %quest% %actor% trigger 12102
+  end
+  * check if we got 'em all
+  set missing 0
+  set list %want_vnums%
+  while %list%
+    set vnum %list.car%
+    set list %list.cdr%
+    if !%actor.var(12102_made_%vnum%)%
+      eval missing %missing% + 1
     end
-    * check if we got 'em all
-    set missing 0
+  done
+  * double-check trigger count
+  while %actor.quest_triggered(12102)% < (%num_wanted% - %missing%)
+    %quest% %actor% trigger 12102
+  done
+  while %actor.quest_triggered(12102)% > (%num_wanted% - %missing%)
+    %quest% %actor% untrigger 12102
+  done
+  * did we finish the quest?
+  if %actor.quest_triggered(12102)% >= %num_wanted%
+    %send% %actor% You've finished all the feasts for the quest!
+    * and delete the vars
     set list %want_vnums%
     while %list%
       set vnum %list.car%
       set list %list.cdr%
-      if !%actor.var(12102_made_%vnum%)%
-        set missing 1
-      end
+      rdelete 12102_made_%vnum% %actor.id%
     done
-    * did we finish the quest?
-    if !%missing%
-      %quest% %actor% trigger 12102
-      %send% %actor% You've finished all the feasts for the quest!
-      * and delete the vars
-      set list %want_vnums%
-      while %list%
-        set vnum %list.car%
-        set list %list.cdr%
-        rdelete 12102_made_%vnum% %actor.id%
-      done
-    end
   end
 end
 ~
