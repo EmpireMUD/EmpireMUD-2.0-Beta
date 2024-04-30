@@ -596,8 +596,8 @@ When using field  - The variable returns:
 &cposition&0 - Returns Standing, Sitting, Fighting, etc.
 &cquest_finished(vnum)&0 - TRUE if the player is on that quest and has all
    tasks completed.
-&cquest_triggered(vnum)&0 - TRUE if the player is on the quest and that quest
-   has a 'triggered' task that has already been completed.
+&cquest_triggered(vnum)&0 - If the player is on the quest and that quest has a
+   'triggered' task, this gets the number of times it's been triggered.
 &creal_name&0 - Their real name (not morphed, not disguised).
 &cremove_companion(vnum)&0 - Takes away a companion mob. If it comes from an
    ability, the player will get a fresh copy of it automatically.
