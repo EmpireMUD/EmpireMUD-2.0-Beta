@@ -43,6 +43,8 @@ if %want_vnums% ~= %object.vnum%
       set list %list.cdr%
       rdelete 12102_made_%vnum% %actor.id%
     done
+    wait 1
+    %quest% %actor% finish 12102
   end
 end
 ~
