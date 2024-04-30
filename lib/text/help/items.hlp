@@ -876,6 +876,8 @@ Spices are often found by foraging in tropical areas. They can be planted,
 grown into crops, harvested or picked, then processed at the spicery to create
 fine and exotic products.
 
+Processing spices usually requires the Gourmet Chef ability.
+
 Known spices include:
   black pepper, from peppercorns
   cocoa powder, from cacao beans
@@ -888,7 +890,7 @@ Known spices include:
   saffron threads, from saffron
   vanilla powder, from vanilla beans
 
-See also: BAKE, COOK, HARVEST, FORAGE, PICK, PROCESS, SPICERY
+See also: BAKE, COOK, GOURMET CHEF, HARVEST, FORAGE, PICK, PROCESS, SPICERY
 #
 SPLIT
 
