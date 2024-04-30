@@ -10772,7 +10772,7 @@ char *ability_data_display(struct ability_data_list *adl) {
 			break;
 		}
 		case ADL_PAINT_COLOR: {
-			safe_snprintf(output, sizeof(output), "%s: %s%s", type_str, paint_colors[adl->vnum], paint_names[adl->vnum]);
+			safe_snprintf(output, sizeof(output), "%s: %s%s\t0", type_str, paint_colors[adl->vnum], paint_names[adl->vnum]);
 			break;
 		}
 		case ADL_ACTION: {
