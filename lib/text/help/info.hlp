@@ -265,6 +265,7 @@ Block cap:
 - Start with the mob's level divided by 2 (half)
 - For hard mobs, raise the total by 10%
 - For group mobs, raise the total by 30%
+- For boss mobs, raise by both 10% and 30% (43% total)
 
 You must be within 50 of the block cap to have a chance to block at all.
 Otherwise, your opponent is too skilled for you to block.
