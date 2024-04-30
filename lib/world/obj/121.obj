@@ -1,0 +1,807 @@
+#12100
+porkchop chop fried crisp~
+a fried porkchop~
+A crisp fried pork chop has been left here.~
+   This porkchop has been fried in a lightly seasoned batter until crisp.
+Simple and delicious.
+~
+6 gmE a 0 0 12
+24 0 0
+7 336
+A
+15 1 0
+C
+1 1
+O+ 1 6222
+R
+4 5619 0
+S
+#12101
+pie pecan~
+a pecan pie~
+A pecan pie sits here cooling.~
+It's crusted with pecans and pleasantly gooey, with a deliciously flaky crust.
+~
+6 gmp a 0 0 5
+48 0 0
+0 336
+A
+7 1 0
+A
+6 1 0
+C
+1 100
+M
+4
+You eat the pie and wish you had room for another piece.~
+S
+#12102
+seeds handful hard brown woody ovoid~
+a handful of hard and woody ovoid seeds~
+A handful of hard brown ovoid seeds with a woody texture are scattered here.~
+   There's a handful of ovoid seeds, brown in color, with a hard and woody
+texture. They don't look edible, but you could try planting them somewhere.
+~
+3 bgC a 0 0 9
+0 12103 0
+0 8760
+C
+75 75
+O+ 1 6180
+R
+4 5210 0
+R
+4 12102 0
+S
+#12103
+cinnamon bark strips basket red-brown~
+a basket of red-brown cinnamon bark strips~
+A basket of red-brown cinnamon bark has been dropped here.~
+   Several strips of red-brown bark have been cut from a tree and collected,
+ready to be sold or used as is or dried and ground first. You can process this
+bark into cinnamon.
+~
+3 g a 0 0 12
+0 12103 0
+0 1444
+C
+75 75
+M
+20
+$n walks through the orchard, occasionally cutting into a tree's bark. ~
+M
+19
+You walk through the orchard, taking careful bark cuttings from the trees.~
+R
+4 12102 0
+S
+#12104
+cinnamon red-brown small pouch powder spicy ground~
+a small pouch of ground cinnamon~
+A small pouch of red-brown powder sits here with a spicy scent.~
+   A small pouch of red-brown cinnamon powder has a warm and spicy scent,
+promising to add to any dish in which it's used.
+~
+3 g a 0 0 13
+0 0 0
+0 0
+C
+75 75
+O+ 1 6183
+R
+4 5606 0
+R
+4 12102 0
+S
+#12105
+seeds hard round smooth black~
+some smooth, round and hard black seeds~
+Some hard, round, smooth black seeds have been dropped here.~
+   These hard seeds are smooth and black. Probably a little too tough to eat in
+current form, but might be ground or planted for some purpose.
+~
+3 bgC a 0 0 10
+0 12105 0
+0 8760
+C
+75 75
+O+ 1 6183
+R
+4 5210 0
+R
+4 12102 0
+S
+#12106
+peppercorn berries round pea-sized basket~
+a basket of round pea-sized peppercorn berries~
+A basket of small round berries has been dropped here.~
+   These round berries range from green to red, depending on maturity. They can
+be used in this form as green peppercorns, or dried and ground up as black.
+Either way they promise a spicy and tasty addition to the chef's dish of
+choice. You can process these peppercorns into pepper.
+~
+3 bgC a 0 0 13
+0 12105 0
+0 1444
+C
+75 75
+O+ 1 6183
+R
+4 12102 0
+S
+#12107
+pepper black ground pouch~
+a pouch of ground black pepper~
+A pouch of ground black pepper is here.~
+   Some peppercorns have been harvested, then dried and ground into this
+strong-smelling black powder. Used with care, It ought to compliment many
+dishes in a skilled chef's repertoire.
+~
+3 g a 0 0 13
+0 0 0
+0 0
+C
+75 75
+O+ 1 6183
+R
+4 5606 0
+R
+4 12102 0
+S
+#12108
+seeds small angular dark hard~
+some small, hard, dark angular seeds~
+Some hard dark seeds with an angular shape are scattered here.~
+These seeds are hard, dark and angular. They might be useful for planting.
+~
+3 bg a 0 0 5
+0 12109 0
+0 8760
+C
+75 75
+O+ 1 6180
+R
+4 5210 0
+R
+4 12102 0
+S
+#12109
+pods cardamom basket fragrant~
+a basket of fragrant cardamom pods~
+A basket of cardamom pods sits here scenting the air.~
+   These green fruits can be used in dishes as they are, or further processed
+into ground cardamom.
+~
+3 bgC a 0 0 13
+0 12109 0
+0 1444
+C
+75 75
+I 25 12108 100.00 1  # SEED: small, hard, dark angular seeds
+I 26 12108 100.00 1  # DECAYS-TO: small, hard, dark angular seeds
+O+ 1 6183
+R
+4 12102 0
+S
+#12110
+cardamom ground small pouch~
+a small pouch of ground cardamom~
+A small pouch of ground cardamom powder is here.~
+   This fragrant powder, ranging from dark brown to black, promises to be an
+interesting addition to a dish.
+~
+3 g a 0 0 8
+0 0 0
+0 0
+C
+75 75
+O+ 1 6183
+R
+4 5606 0
+R
+4 12102 0
+S
+#12111
+seeds dark nail-shaped hard woody~
+some nail-shaped seeds~
+Some nail-shaped seeds are scattered here, looking hard, dark-brown and woody.~
+   These seeds look too hard and woody to be enjoyable as a snack, but they
+could perhaps be planted and further processed.
+~
+3 bg a 0 0 8
+0 12112 0
+0 1444
+C
+75 75
+O+ 1 6180
+R
+4 5210 0
+R
+4 12102 0
+S
+#12112
+flower buds pink basket~
+a basket of pink flower buds~
+A basket of pink flower buds sits here, infusing the air with the scent of cloves.~
+   This basket of pink flower buds is quite aromatic and promises to add to a
+dish if properly prepared. You can process these buds into cloves.
+~
+3 gC a 0 0 9
+0 12112 0
+0 1444
+C
+75 75
+I 25 12111 100.00 1  # SEED: nail-shaped seeds
+I 26 12111 100.00 1  # DECAYS-TO: nail-shaped seeds
+O+ 1 6180
+R
+4 12102 0
+S
+#12113
+cloves pouch small ground~
+a small pouch of ground cloves~
+A small pouch of ground cloves is here.~
+   Deep red-brown in color, this powder bears a warm, sweet and spicy aroma
+that promises to enhance a dish prepared by a skilled chef.
+~
+3 g a 0 0 6
+0 0 0
+0 0
+C
+75 75
+O+ 1 6183
+R
+4 5606 0
+R
+4 12102 0
+S
+#12114
+seeds dense light-brown~
+some dense light-brown seeds~
+Some hard, dense, light-brown seeds are scattered here.~
+   These seeds are heavier in the hand than their size would seem to indicate
+they should be. They do not appear to be something suited to a snack, but
+amazing things might happen when they are ground or planted. You can process
+these seeds into nutmeg.
+~
+3 bg a 0 0 6
+0 12115 0
+0 8760
+C
+75 75
+O+ 1 6180
+R
+4 5210 0
+R
+4 12102 0
+S
+#12115
+fruit nutmeg split open~
+a nutmeg fruit~
+A mature nutmeg fruit has split open, revealing red lacy innards and brown seeds.~
+   This fruit resembles an apricot somewhat. It has matured and split open,
+revealing a waxy, lacey red aril surrounding a dense brown seed. It does not
+appear to be something one would wish to eat in its current form, being rather
+hard and woody. It does, however, serve as the source for not one, but two
+spices, when properly processed. You can process the fruit into mace.
+~
+6 gC a 0 0 21
+2 0 0
+0 1444
+C
+75 75
+I 25 12114 100.00 1  # SEED: dense light-brown seeds
+R
+4 12102 0
+S
+#12116
+nutmeg pouch ground small~
+a small pouch of ground nutmeg~
+A small pouch of ground nutmeg sits here.~
+Some nutmeg seeds have been grated or ground into useable form for recipes.
+~
+3 g a 0 0 7
+0 0 0
+0 0
+C
+75 75
+O+ 1 6183
+R
+4 5606 0
+R
+4 12102 0
+S
+#12117
+mace glossy red powder pouch small~
+a small pouch of glossy red mace powder~
+A small pouch of glossy red mace powder is here.~
+   The husk surrounding a nutmeg seed has been dried and ground into a reddish,
+glossy-looking powder that smells a bit like a mix of pepper and cinnamon, with
+an underlying hint of citrus that speaks to its origination as a fruit.
+~
+3 g a 0 0 9
+0 0 0
+0 0
+C
+75 75
+O+ 1 6183
+R
+4 5606 0
+R
+4 12102 0
+S
+#12118
+ginger root knobby irregular irregularly shaped irregularly-shaped~
+a knobby, irregularly-shaped ginger root~
+A knobby root from a ginger plant, irregular in shape, sits here.~
+   This is the edible portion of a ginger plant. You could combine it with a
+few more and plant your own or use it as is.
+~
+3 gC a 0 0 9
+0 0 0
+0 1444
+C
+75 75
+I 14 12119 100.00 4  # COMBINE: basket of knobby ginger roots
+O+ 1 6180
+R
+4 12102 0
+S
+#12119
+ginger roots basket knobby~
+a basket of knobby ginger roots~
+A basket of knobby ginger roots sits here.~
+   This basket of knobby, irregularly shaped roots, ranging from yellow to tan,
+represent the edible part of a ginger plant. You can process these roots into
+ginger.
+~
+3 bgC a 0 0 6
+0 12119 0
+0 1444
+C
+75 75
+I 15 12118 100.00 4  # SEPARATE: knobby, irregularly-shaped ginger root
+O+ 1 6180
+R
+4 12102 0
+S
+#12120
+ginger powder small pouch ground~
+a small pouch of ground ginger powder~
+A small pouch of ground ginger powder is here.~
+   Useable in both beverages and foods, this pungent spice promises to enhance
+many a kitchen endeavour.
+~
+3 g a 0 0 5
+0 0 0
+0 0
+C
+75 75
+O+ 1 6183
+R
+4 5606 0
+R
+4 12102 0
+S
+#12121
+bulbs saffron corms papery small round handful~
+a handful of small round saffron corms~
+A few plant bulbs, small, round, and papery in texture, have been dropped here.~
+   These small, round, papery bulbs are difficult to see, their color blending
+in with the surrounding soil. What's truly valuable is inside them, as they are
+the beginnings of what will become a saffron plant -- a valuable spice.
+~
+3 bg a 0 0 11
+0 12122 0
+0 8760
+C
+75 75
+O+ 1 6180
+R
+4 12102 0
+R
+4 5210 0
+S
+#12122
+saffron threads basket bright red~
+a basket of bright red saffron threads~
+A basket of bright red threads from some flower has been dropped here.~
+   These bright red threads have been removed from the flowers and can be dried
+into a potently scented spice. You can process these threads into saffron but
+will need a vial to store them in.
+~
+3 gC a 0 0 7
+0 12122 0
+0 1444
+C
+75 75
+M
+19
+You walk through the field of flowering plants, carefully choosing the best from which to take the bright red threads in the center.~
+M
+20
+$n walks through the field, occasionally stopping to denude a flower of all three of its bright red central threads.~
+R
+4 12102 0
+S
+#12123
+saffron threads delicate tiny glass vial deep red~
+a tiny glass vial of delicate saffron threads~
+A tiny glass vial holding a few delicate threads of deep red saffron spice sits here.~
+   A little goes a long way with this strong spice, so there are only a few
+precious, delicate deep red threads within this little vial of saffron.
+~
+3 g a 0 0 9
+0 0 0
+0 0
+C
+75 75
+I 27 808 100.00 1  # CONSUMES-TO: glass vial
+O+ 1 6183
+R
+4 5606 0
+R
+4 12102 0
+S
+#12124
+vine cutting climbing~
+a cutting from a climbing vine~
+A piece of a vine, complete with leaves and nodes, has been dropped here.~
+   About 18 inches tall, this vine has nodes on it and leaves at the top end.
+Some of the leaves appear to have been cut off the lower end to allow room for
+roots to grow. Good things might happen if you plant it somewhere.
+~
+3 bgC a 0 0 5
+0 12125 0
+0 1444
+C
+75 75
+R
+4 12102 0
+R
+4 5619 0
+S
+#12125
+beans vanilla basket pods long slender brown cylindrical~
+a basket of vanilla beans~
+A basket of long, slender, cylindrical brown pods is sitting here containing vanilla beans.~
+   These long, cylindrical pods have been plucked from a vine and are ready to
+be processed into vanilla.
+~
+3 bgC a 0 0 5
+0 12125 0
+0 1444
+C
+75 75
+R
+4 12102 0
+S
+#12126
+vanilla powder pouch~
+a pouch of vanilla powder~
+A pouch of vanilla powder sits here.~
+   This small pouch holds a quantity of sweet-smelling deep brown powder.
+~
+3 g a 0 0 8
+0 0 0
+0 0
+C
+75 75
+I 27 808 100.00 1  # CONSUMES-TO: glass vial
+O+ 1 6183
+R
+4 5606 0
+R
+4 12102 0
+S
+#12127
+beans handful cacao pod~
+a handful of beans from a cacao pod~
+A handful of beams have been removed from their protective cacao pods.~
+   These are the beginnings of cocoa. You can gather more and plant them
+somewhere.
+~
+3 gC a 0 0 10
+0 0 0
+0 1444
+C
+75 75
+I 14 12128 100.00 4  # COMBINE: basket of cocoa beans
+O+ 1 6180
+R
+4 5619 0
+S
+#12128
+beans cocoa basket~
+a basket of cocoa beans~
+A basket of cocoa beans sits here.~
+   These beans can be removed from their pods and processed into chocolate, or
+replanted.
+~
+3 bgC a 0 0 6
+0 12128 0
+0 1444
+C
+75 75
+I 15 12127 100.00 4  # SEPARATE: handful of beans from a cacao pod
+O+ 1 6180
+R
+4 5210 0
+R
+4 12102 0
+S
+#12129
+chocolate block creamy compact milk~
+a compact block of creamy milk chocolate~
+A block of creamy milk chocolate sits here temptingly.~
+   This is a glossy light brown piece of chocolate just daring you not to eat
+it. Its sweet scent infuses the air immediately around it if you lean close
+enough.
+~
+6 gC a 0 0 4
+48 0 0
+0 1200
+A
+11 1 0
+A
+16 1 0
+O+ 1 6340
+R
+4 5619 0
+S
+#12130
+cocoa powder small pouch~
+a small pouch of cocoa powder~
+A small pouch of cocoa powder sits here.~
+   This pouch of cocoa is ready to be used in any number of desserts, or as a
+drink.
+~
+3 gC a 0 0 9
+0 0 0
+0 1200
+C
+75 75
+O+ 1 6183
+R
+4 5619 0
+R
+4 5606 0
+S
+#12131
+chocolate dark dense block~
+a dense block of dark chocolate~
+A dense block of dark chocolate sits here invitingly.~
+   This dense dark brown piece of chocolate sits temptingly before you, its
+intense, slightly bitter aroma infusing the air if you lean close enough.
+~
+6 gC a 0 0 5
+48 0 0
+0 1200
+A
+6 3 0
+A
+14 1 0
+C
+1 100
+O+ 1 6340
+R
+4 5619 0
+R
+4 5606 0
+S
+#12132
+stew venison pot savory steaming~
+a steaming pot of savory venison stew~
+A massive pot of deer stew sits here ssending up delicious-smelling  steam.~
+   Someone fixed up a massive pot of delicious-smelling deer stew. Lean deer
+meat floats in a sea of vegetables and spiced broth.
+~
+6 g a 0 0 4
+96 0 0
+7 24
+A
+1 1 0
+A
+2 1 0
+A
+8 1 0
+A
+9 1 0
+C
+1 1
+M
+4
+You ladle up a bowl of stew and devour it.~
+O+ 1 6242
+S
+#12133
+chili pot~
+a pot of chili~
+A massive pot of chili has been prepared and steams invitingly.~
+   This pot of chili won a cook-off contest at a recent fair. Now you get some.
+Aren't you lucky?
+~
+6 g a 0 0 2
+96 0 0
+7 24
+A
+14 2 0
+A
+6 2 0
+A
+7 2 0
+C
+1 1
+O+ 1 6242
+S
+#12134
+chicken pot pie steaming golden-brown flaky crust~
+a golden-brown steaming chicken pot pie~
+A golden-brown chicken pot pie with a flaky crust sits here steaming invitingly.~
+   This is a double-crusted pot pie filled with premium chicken meat and
+vegetables swimming in a savory gravy containing herbs and spices. It won a
+recent cook-off and now you get a slice, too.
+~
+6 0 a 0 0 2
+96 0 0
+7 24
+A
+21 1 0
+A
+22 1 0
+A
+17 1 0
+C
+75 75
+S
+#12135
+small onion~
+a small onion~
+A small onion has been dropped here.~
+   This is a small round vegetable with an interesting papery texture and
+petal-like layers. You could use it in some small recipe or combine it with a
+few more of its kind and plant it somewhere.
+~
+6 gC a 0 0 3
+2 0 0
+0 2160
+I 14 12136 100.00 4  # COMBINE: basket of onions
+O+ 1 6142
+S
+#12136
+onions basket~
+a basket of onions~
+A basket of onions has been set down here.~
+This basket of onions can be used in recipes or replanted.
+~
+6 bgC a 0 0 4
+12 12132 0
+7 2160
+C
+1 1
+I 15 12135 100.00 4  # SEPARATE: small onion
+O+ 1 6152
+R
+4 5215 0
+S
+#12137
+steaming pot hearty spicy gumbo stew~
+a steaming pot of gumbo~
+A steaming pot of gumbo, a hearty and spicy stew, sits here.~
+   One of those glorious dishes that basically consists of tossing a bunch of
+goodness in a pot and cooking it slowly, this particular recipe recently won a
+cooking contest and promises to be a very filling meal. Its scent is a savory
+mix of meats, veggies and spices.
+~
+6 E a 0 0 3
+96 0 0
+0 336
+A
+23 1 0
+A
+19 1 0
+S
+#12138
+leggings master chef's pocketed leather~
+the master chef's pocketed leather leggings~
+Supple leather leggings with lots of pockets have been dropped here.~
+   Shimmering in several colors, these leggings appear to be enchanted, but
+those with magical talent can discern that it is merely a creative die job.
+They are made of soft and supple leather that fits close to the skin and moves
+with the wearer. The clever craftsman who made them must have put forth all
+possible efforts as despite the close fit, pockets do not bulge outward and
+make awkward lumps when filled.
+~
+2 dp af 0 0 8
+0 0 0
+7 0
+A
+5 1 0
+A
+19 10 0
+A
+25 25 0
+C
+100 400
+S
+#12139
+skirt master chef's pocketed leather~
+the master chef's pocketed skirt~
+A long and supple skirt of leather with many pockets lies here.~
+   Shimmering in several colors, this skirt appears to be enchanted, but those
+with magical talent can discern that it is merely a creative die job. It is
+made of soft and supple leather that fits close to the skin and moves with the
+wearer. The clever craftsman who made it must have put forth all possible
+efforts as despite the close fit, pockets do not bulge outward and make awkward
+lumps when filled.
+~
+2 dp af 0 0 11
+0 0 0
+7 0
+A
+5 1 0
+A
+19 10 0
+A
+25 25 0
+C
+100 400
+S
+#12140
+feast royal truly massive proportions~
+a royal feast~
+A feast of truly massive proportions has been arranged.~
+   A master chef, or perhaps several such beings, have been at work and put on
+a feast large enough for the entire empire to gorge themselves into blissful
+insensibility several times over. Several tables groan with the weight of
+savories and subtleties. Chow down!
+~
+6 emE a 0 0 3
+192 0 0
+7 288
+A
+15 1 0
+A
+16 1 0
+A
+23 1 0
+A
+7 1 0
+A
+6 1 0
+A
+11 1 0
+C
+100 100
+M
+4
+You might have intended to only take one small thing from one small table, but you find yourself sampling all of them!~
+M
+5
+%n wanders the tables and picks something from each of them, looking replete afterword.~
+M
+17
+Alas you failed to set out the feast in time and many of the foods are starting to turn strange colors and grow things they weren't intended to grow. You have to toss it all.~
+M
+18
+Servitors come to clear away what's left of the food, leaving only sad, empty tables.~
+R
+4 5619 0
+S
+#12141
+compendium book imperial chef thick compact hard-bound silk cover title~
+a compact compendium~
+A thick, compact, hard-bound book with a silk cover lies here with "The Imperial Chef" for a title.~
+   This book is thick, but narrow, being comprised of cards of stiff parchment
+rather than fine pages. Its cover is hardened and then covered in two layers of
+silk to protect its contents and also allow for a few more recipes to be stuck
+in. Embroidered on the outer layer is the title "The Imperial Chef".
+~
+3 0 a 0 0 3
+0 0 0
+0 0
+C
+100 100
+T 12141
+S
+$

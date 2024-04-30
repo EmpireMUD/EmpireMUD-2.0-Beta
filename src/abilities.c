@@ -2256,6 +2256,9 @@ INTERACTION_FUNC(conjure_vehicle_interaction) {
 		
 		special_vehicle_setup(ch, veh);
 		veh_ok = load_vtrigger(veh);
+		if (veh_ok) {
+			veh_ok = complete_vtrigger(veh);
+		}
 	}
 	
 	// messaging?
@@ -10769,7 +10772,7 @@ char *ability_data_display(struct ability_data_list *adl) {
 			break;
 		}
 		case ADL_PAINT_COLOR: {
-			safe_snprintf(output, sizeof(output), "%s: %s%s", type_str, paint_colors[adl->vnum], paint_names[adl->vnum]);
+			safe_snprintf(output, sizeof(output), "%s: %s%s\t0", type_str, paint_colors[adl->vnum], paint_names[adl->vnum]);
 			break;
 		}
 		case ADL_ACTION: {

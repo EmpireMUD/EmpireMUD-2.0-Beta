@@ -21,6 +21,7 @@
 #include "skills.h"
 #include "vnums.h"
 #include "constants.h"
+#include "dg_scripts.h"
 
 /**
 * Contents:
@@ -3241,12 +3242,17 @@ void vehicle_chore_build(empire_data *emp, vehicle_data *veh, int chore) {
 				if (chore == CHORE_MAINTENANCE) {
 					add_workforce_production_log(emp, WPLOG_MAINTENANCE, 0, 1);
 					act("$n finishes repairing $V.", FALSE, worker, NULL, veh, TO_ROOM | ACT_VEH_VICT);
+					
+					complete_vehicle(veh);
 				}
 				else {
 					add_workforce_production_log(emp, WPLOG_VEHICLE_DONE, VEH_VNUM(veh), 1);
 					act("$n finishes constructing $V.", FALSE, worker, NULL, veh, TO_ROOM | ACT_VEH_VICT);
+					
+					// run triggers: MAY purge the vehicle
+					complete_vehicle(veh);
+					complete_vtrigger(veh);
 				}
-				complete_vehicle(veh);
 			}
 			else {
 				sprintf(buf, "$n works on %s $V.", (chore == CHORE_MAINTENANCE) ? "repairing" : "constructing");

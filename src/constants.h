@@ -88,6 +88,7 @@ struct interact_data_t {
 	int attach_type;	// TYPE_ it attaches to (TYPE_MOB, etc)
 	int vnum_type;		// TYPE_ of the vnum it produces (TYPE_OBJ, etc)
 	bool one_at_a_time;	// quantity represents the maximum amount, but resource is gained one at a time
+	int warn_quantity;	// auditor warns >= (normal) or <= (one-at-a-time interacts) this amount
 	int depletion;	// DPLTN_ type, if any (NOTHING if not applicable)
 };
 

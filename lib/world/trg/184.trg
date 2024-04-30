@@ -396,7 +396,7 @@ done
 Spirit Steed: Only leader may mount~
 0 ct 0
 mount harness~
-if %actor.char_target(%arg.car%)% != %self%
+if %actor.char_target(%arg.argument1%)% != %self%
   return 0
   halt
 end

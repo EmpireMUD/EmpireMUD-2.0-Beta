@@ -1303,7 +1303,9 @@ obj_data *die(char_data *ch, char_data *killer) {
 	}
 	
 	// disable things
-	perform_morph(ch, NULL);
+	if (IS_MORPHED(ch) && !AFF_FLAGGED(ch, AFF_NO_MORPH)) {
+		perform_morph(ch, NULL);
+	}
 	cancel_blood_upkeeps(ch, FALSE);
 	perform_dismount(ch);
 	
@@ -3829,7 +3831,7 @@ void perform_execute(char_data *ch, char_data *victim, int attacktype, int damty
 		return;
 	}
 
-	if (revert && IS_MORPHED(victim)) {
+	if (revert && IS_MORPHED(victim) && !AFF_FLAGGED(victim, AFF_NO_MORPH)) {
 		sprintf(buf, "%s reverts into $n!", PERS(victim, victim, FALSE));
 		msg = !CHAR_MORPH_FLAGGED(victim, MORPHF_NO_MORPH_MESSAGE);
 

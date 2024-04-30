@@ -15,8 +15,8 @@ Lantern: Refill with candle using put~
 put~
 set max_light 48
 * basic args (pass back to normal 'put')
-set candle_arg %arg.car%
-set lantern_arg %arg.cdr.car%
+set candle_arg %arg.argument1%
+set lantern_arg %arg.argument2%
 if !%candle_arg% || !%lantern_arg%
   return 0
   halt

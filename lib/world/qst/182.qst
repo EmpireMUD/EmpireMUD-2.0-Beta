@@ -87,6 +87,11 @@ Guild of Adventurers: My Very Own Egg~
    You have acquired an atlasian egg -- a truly rare treasure indeed! You can
 feel the embryonic tortoise's heartbeat within the shell. You need to find some
 clear desert or plains and 'plant' the egg to help it grow and hatch.
+   Be warned that once you start this process, there is a time limit. The egg
+will only survive if you manage to hatch it within 1 year (of game time; type
+'mudstats configs' to see how long a game year is). Hatching the egg will
+require items from the Gigantic Nest, Grove, Primeval, Skycleave, and Molten
+Fiend adventures.
 ~
 The egg is settled into its nest... but it still needs care in order to hatch.
 ~
@@ -106,6 +111,9 @@ Guild of Adventurers: Tending the Egg~
 rearing of atlasian tortoises, but it doesn't seem like any ordinary covering
 is going to help. Fortunately, you've heard of a salve made from burnt zephyr
 cattails. If only you could find some...
+   Be sure to complete this task within 1 year (of game time; type 'mudstats
+configs' to see how long a game year is), or the egg will die.
+   Hint: Zephyr cattails come from the quest "Gigantic Nest: Hatch the Egg".
 ~
    You spread the burnt zephyr salve on the egg, and can hear a soft cooing
 sound coming from inside. The egg twitches a little... It seems happy, but
@@ -132,10 +140,16 @@ recall the story of hatching a giant egg. And as you recall, he did it by
 building a huge fire from magewood, and lighting it with powerful magical
 artifacts. You jot down a quick list: magewood, wild fire, violet gems,
 skystones, and the essence of a molten fiend.
+   Be sure to complete this task within 1 year (of game time; type 'mudstats
+configs' to see how long a game year is), or the egg will die.
+   Hint: Some of the ingredients for the bonfire come from the Grove, Primeval,
+Skycleave, and Molten Fiend adventures.
 ~
    You stack the magewood, sprinkle it with skystones and violet gems, and
 light the whole thing ablaze with wild fire and molten essence! Now to wait for
 it to hatch...
+   Hatching can take up to 6 days (of game time; type 'mudstats configs' to see
+how long a game day is).
 ~
 11 d 0 0 0
 A

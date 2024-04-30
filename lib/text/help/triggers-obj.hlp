@@ -111,7 +111,7 @@ Value position numbers are: 0, 1, 2
 
 Note: You must use "osetval" (not "%setval%") for this.
 
-See also: OBJECT VALUES
+See also: OBJECT VALUES, OSET
 #d
 OTIMER %TIMER% 
 
@@ -211,6 +211,7 @@ When using field  - The variable returns:
 &ccan_wear(flag)&0 - True if the object has the given wear flag (HELP OEDIT WEAR).
 &ccarried_by&0 - The id of the character carrying the object, or an empty return.
 &ccomponent_type&0 - The name of what type of component it is, if it is one.
+&ccomponent_vnum&0 - The vnum of the type of component it is, if it is one.
 &ccontents&0 - Gives the first object in a container.
 &ccount(str)&0 - Number of matching items (name/vnum) inside it.
 &ccustom(TYPE,NUM)&0 - Get an obj's custom string. NUM is optional. If there is

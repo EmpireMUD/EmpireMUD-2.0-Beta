@@ -74,7 +74,7 @@ void display_statistics_to_char(char_data *ch) {
 	if (!ch || !ch->desc)
 		return;
 
-	msg_to_char(ch, "\r\nEmpireMUD Statistics:\r\n");
+	msg_to_char(ch, "\r\n%s Statistics:\r\n", config_get_string("mud_name"));
 
 	mytime = boot_time;
 

@@ -136,7 +136,7 @@ end
 ~
 #921
 Caravan setup~
-5 n 100
+5 o 100
 ~
 set inter %self.interior%
 if (!%inter%)
@@ -161,7 +161,7 @@ end
 ~
 #952
 Caravel setup~
-5 n 100
+5 o 100
 ~
 set inter %self.interior%
 if (!%inter% || %inter.aft%)
@@ -172,7 +172,7 @@ detach 952 %self.id%
 ~
 #953
 Cog setup~
-5 n 100
+5 o 100
 ~
 set inter %self.interior%
 if (!%inter% || %inter.down%)
@@ -183,7 +183,7 @@ detach 953 %self.id%
 ~
 #954
 Longship setup~
-5 n 100
+5 o 100
 ~
 set inter %self.interior%
 if (!%inter% || %inter.aft%)
@@ -194,7 +194,7 @@ detach 954 %self.id%
 ~
 #955
 Brigantine setup~
-5 n 100
+5 o 100
 ~
 set inter %self.interior%
 if (!%inter%)
@@ -210,7 +210,7 @@ detach 955 %self.id%
 ~
 #956
 Carrack setup~
-5 n 100
+5 o 100
 ~
 set inter %self.interior%
 if (!%inter%)
@@ -226,7 +226,7 @@ detach 956 %self.id%
 ~
 #957
 Hulk setup~
-5 n 100
+5 o 100
 ~
 set inter %self.interior%
 if (!%inter%)

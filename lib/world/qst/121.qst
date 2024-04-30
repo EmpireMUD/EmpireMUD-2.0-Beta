@@ -1,0 +1,128 @@
+#12100
+The Baker's Apprentice~
+   Your royal baker has finally arrived and, fresh off a string of cooking
+contest wins, is looking for someone to teach. The knowledge will not be passed
+on, however, until you prove yourself worthy and truly dedicated to the art and
+science of fine food. First you must prove yourself with the basics.
+   To show your worth, the baker would like you to make: 3 loaves of banana
+bread, 3 loaves of garlic bread, 3 loves of plain bread, 3 nutty squash
+flatbreads, 3 apple pies, 3 cherry pies, 3 fried meat pies, 3 delicious roast
+plates, 3 pouches of spicy jerky, and 3 jars of blueberry jam.
+~
+   'Well done.'
+   The baker is pleased with your performance and sends you off to learn more
+recipes.
+~
+6 0 50 0 -1
+A
+1 214
+R
+6 12101 12101
+R
+13 12100 12100
+W
+2 3313 0 3 a
+W
+2 3331 0 3 a
+W
+2 3371 0 3 a
+W
+2 3326 0 3 a
+W
+2 3325 0 3 a
+W
+2 3301 0 3 a
+W
+2 3303 0 3 a
+W
+2 3300 0 3 a
+W
+2 3333 0 3 a
+W
+2 3341 0 3 a
+Z
+1 214
+S
+#12101
+The Baker's Journeyman~
+   The baker is pleased with your progress and now wishes you to find out about
+traditional recipes. This time the baker is going for variety, not simply
+quantity produced, since you've demonstrated that you do know your way around a
+kitchen.
+   The baker would like you to make a pot roast, some stewed vegetables, some
+jellied eels, some fish and chips, a bowl of chili, chicken and dumplings, a
+shepher's pie, a hearty meatloaf, biscuits and gravy, a rich berry cobbler, and
+mom's fruit pie -- any fruit will do.
+~
+   The baker is gaining respect for you by the recipe and tells you that soon
+enough, you should be ready to undertake your master's trials and earn the
+promised knowledge.
+~
+7 0 75 0 -1
+A
+1 214
+P
+15 270 0 1 a
+P
+0 12100 0 1 a
+R
+6 12102 12102
+R
+13 12101 12101
+W
+2 3352 0 1 a
+W
+2 3356 0 1 a
+W
+2 3351 0 1 a
+W
+2 3347 0 1 a
+W
+2 3353 0 1 a
+W
+2 3354 0 1 a
+W
+2 3348 0 1 a
+W
+2 3346 0 1 a
+W
+2 3345 0 1 a
+W
+2 3355 0 1 a
+W
+2 3349 0 1 a
+Z
+1 214
+S
+#12102
+Master Baker Trials~
+   It's now time for your master's trials. Prepare your very best recipes in
+front of your royal baker to prove your worthiness to be taught. You must make:
+     - a seafood feast
+     - a roast turkey feast
+     - a roast meat platter
+     - a mixed vegetable board
+     - a extravagant dessert platter
+Be sure to make them at the bakery, where the baker can supervise.
+~
+   You have completed the quest. Beaming proudly at you, the baker recognizes
+you as a fellow master of the craft and rewards you.
+~
+6 0 100 0 -1
+A
+1 214
+P
+15 271 0 1 a
+P
+0 12101 0 1 a
+R
+2 12138 1
+R
+2 12139 1
+W+
+11 0 0 5 -
+Make all five feasts in front of the baker~
+Z
+1 214
+S
+$

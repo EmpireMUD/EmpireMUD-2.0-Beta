@@ -1,0 +1,33 @@
+#12102
+Spicery~
+The Spicery~
+&0[SP]~
+16 0 0 0
+0 0 0 12100
+C
+inventory, retrieve, store~
+D
+   This brick-lined cellar might once have been a root cellar, but has been
+modified and put to use to prepare and store spices, so the center has a
+collection of tools for the purpose, mostly to ground the spice and package it
+once it's dried elsewhere. The construction is good for keeping moisture away
+from the comparatively delicate products stored here, and also helps keep the
+temperature stable. It's cool and dry down underground where the empire's
+collection of exotic spices is stored until traded or used. The walls are lined
+with stone shelves and cubbies for baskets and pouches to handle the spice no
+matter what form it's in. There's a mixture of the smell of earth and a mingled
+spicy aroma. There are a few structural timbers for support, but generally the
+construction of this building does not encourage fire.
+~
+F
+N
+I 29 5007 100.00 1  # RUINS-TO-BLD: Ruins
+R
+1002 4 5 0
+R
+6000 1 1 0
+R
+6790 1 1 0
+Z1 7
+S
+$

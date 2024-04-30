@@ -577,7 +577,10 @@ void olc_delete_object(char_data *ch, obj_vnum vnum) {
 			request_vehicle_save_in_world(veh);
 			
 			if (!VEH_NEEDS_RESOURCES(veh)) {
-				complete_vehicle(veh);	// this could purge it
+				complete_vehicle(veh);
+				
+				// run triggers: this could purge it
+				complete_vtrigger(veh);
 			}
 		}
 	}
@@ -2398,7 +2401,9 @@ void olc_show_object(char_data *ch) {
 	}
 	
 	olc_get_values_display(ch, buf1);
-	build_page_display_str(ch, buf1);
+	if (*buf1) {
+		build_page_display_str(ch, buf1);
+	}
 
 	sprintbit(GET_OBJ_AFF_FLAGS(obj), affected_bits, buf1, TRUE);
 	build_page_display(ch, "<%saffects\t0> %s", OLC_LABEL_VAL(GET_OBJ_AFF_FLAGS(obj), NOBITS), buf1);

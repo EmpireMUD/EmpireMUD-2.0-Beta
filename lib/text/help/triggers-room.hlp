@@ -28,19 +28,23 @@ Variables:
 
 See also: WAIT
 #d
-"COMPLETE TRIGGER" "RTRIG COMPLETE" TRIGEDIT-ROOM-COMPLETE TRIGEDIT-COMPLETE TRIG-COMPLETE
+"COMPLETE TRIGGER" "RTRIG COMPLETE" "VTRIG COMPLETE" TRIGEDIT-ROOM-COMPLETE TRIGEDIT-VEH-COMPLETE TRIGEDIT-COMPLETE TRIG-COMPLETE
 
 Complete (trigger type)
 
 Argument type:  percent chance to execute
 Return value:  return 0 to prevent further Complete triggers
 
-This trigger happens when a building is completed.
+This trigger happens when a building or vehicle is completed.
+
+If a vehicle is loaded in an already-completed state, such as with %load%, the
+Complete trigger(s) will run right away. If you purge a vehicle in its own
+Complete trigger, you MUST return 0.
 
 Variables:
-  &c%room%&0 - The room that was just completed.
+  &c%room%&0 - The room that was just completed (room trigger only).
 
-See also: RTRIG LOAD
+See also: RTRIG LOAD, VTRIG LOAD
 #d
 "RTRIG COMMANDS" "ROOM COMMANDS" TRIGEDIT-ROOM-COMMANDS
 

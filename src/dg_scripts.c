@@ -2038,6 +2038,41 @@ int text_processed(char *field, char *subfield, struct trig_var_data *vd, char *
 		safe_snprintf(str, slen, "%s", AN(vd->value));
 		return TRUE;
 	}
+	else if (!strn_cmp(field, "argument", 8)) {	// fetch words in the argument (skipping filler)
+		if (!str_cmp(field, "arguments") || !str_cmp(field, "argument")) {	// number of real arguments
+			int count = 0;
+			
+			p = vd->value;
+			while (*p) {
+				p = one_word(p, tmpvar);
+				++count;
+			}
+			safe_snprintf(str, slen, "%d", count);
+		}
+		else if (isdigit(*(field+8)) && atoi(field+8) > 0) {
+			int num = atoi(field+8);
+			
+			p = vd->value;
+			*tmpvar = '\0';
+			while (*p && num > 0) {
+				p = one_word(p, tmpvar);
+				--num;
+			}
+			if (num == 0) {
+				// found
+				safe_snprintf(str, slen, "%s", tmpvar);
+			}
+			else {
+				// not found (ran out of args)
+				*str = '\0';
+			}
+		}
+		else {
+			// unknown
+			*str = '\0';
+		}
+		return TRUE;
+	}
 	else if (!str_cmp(field, "cap")) {                 // capitalize first letter
 		safe_snprintf(str, slen, "%s", vd->value);
 		for (p = str; *p; ++p) {
@@ -2689,6 +2724,25 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 					// bad field
 					script_log("Trigger: %s, VNum %d, unknown instance field: '%s'", GET_TRIG_NAME(trig), GET_TRIG_VNUM(trig), field);
 				}
+				return;
+			}
+			else if (!str_cmp(var, "component")) {
+				// %component.<vnum>(<amt>)% gets the name for that component
+				if (field && *field && isdigit(*field)) {
+					generic_data *gen;
+					int amt = subfield ? atoi(subfield) : 1;
+					
+					if ((gen = find_generic(atoi(field), GENERIC_COMPONENT))) {
+						safe_snprintf(str, slen, "%s",(amt == 1) ? GET_COMPONENT_SINGULAR(gen) : GET_COMPONENT_PLURAL(gen));
+					}
+					else {
+						strcpy(str, "UNKNOWN");
+					}
+				}
+				else {
+					strcpy(str, "UNKNOWN");
+				}
+				
 				return;
 			}
 			else if (!str_cmp(var, "cooldown")) {
@@ -4944,6 +4998,9 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 					}
 					else if (!str_cmp(field, "component_type")) {
 						safe_snprintf(str, slen, "%s", GET_OBJ_COMPONENT(o) != NOTHING ? get_generic_name_by_vnum(GET_OBJ_COMPONENT(o)) : "");
+					}
+					else if (!str_cmp(field, "component_vnum")) {
+						safe_snprintf(str, slen, "%d", GET_OBJ_COMPONENT(o) != NOTHING ? GET_OBJ_COMPONENT(o) : 0);
 					}
 					else if (!str_cmp(field, "contents")) {
 						if (o->contains) {

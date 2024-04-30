@@ -1039,13 +1039,26 @@ void display_score_to_char(char_data *ch, char_data *to) {
 	char lbuf[MAX_STRING_LENGTH], lbuf2[MAX_STRING_LENGTH], lbuf3[MAX_STRING_LENGTH];
 	char *str;
 	struct player_skill_data *skdata, *next_skill;
-	int i, j, cols, count, pts, val, temperature;
+	int i, j, cols, count, iter, pts, val, temperature;
 	empire_data *emp;
 	struct time_info_data playing_time;
 	struct page_display *line;
-
-
-	build_page_display(to, " +----------------------------- EmpireMUD 2.0b5 -----------------------------+");
+	
+	// build header (max length: 79)
+	safe_snprintf(lbuf, sizeof(lbuf), " %s ", config_get_string("mud_name"));
+	strcpy(lbuf2, " +");
+	for (iter = 0; iter < (78 - (3 + strlen(lbuf))) / 2; ++iter) {
+		// pad initial dashes
+		strcat(lbuf2, "-");
+	}
+	strcat(lbuf2, lbuf);
+	for (iter = strlen(lbuf2); iter < 77; ++iter) {
+		strcat(lbuf2, "-");
+	}
+	strcat(lbuf2, "+");
+	
+	// append header
+	build_page_display_str(to, lbuf2);
 	
 	// row 1 col 1: name
 	line = build_page_display(to, "  Name: %-18.18s", PERS(ch, ch, 1));
@@ -4014,7 +4027,7 @@ ACMD(do_mark) {
 		GET_MARK_LOCATION(ch) = NOWHERE;
 		msg_to_char(ch, "You clear your marked location.\r\n");
 	}
-	else if (GET_ROOM_VNUM(here) >= MAP_SIZE || RMT_FLAGGED(IN_ROOM(ch), RMT_NO_LOCATION)) {
+	else if (!here || GET_ROOM_VNUM(here) >= MAP_SIZE || RMT_FLAGGED(IN_ROOM(ch), RMT_NO_LOCATION)) {
 		msg_to_char(ch, "You may only mark distances on the map.\r\n");
 	}
 	else {
@@ -4390,39 +4403,39 @@ ACMD(do_no_cmd) {
 	switch (subcmd) {
 		case NOCMD_CAST: {
 			// this one is no longer used because we have the 'cast' command again as of b5.166
-			msg_to_char(ch, "EmpireMUD doesn't use the 'cast' command. You use most abilities by typing their name.\r\n");
+			msg_to_char(ch, "%s doesn't use the 'cast' command. You use most abilities by typing their name.\r\n", config_get_string("mud_name"));
 			break;
 		}
 		case NOCMD_GOSSIP: {
-			msg_to_char(ch, "EmpireMUD doesn't have a gossip channel. Try the /ooc channel, or type /list to see which global channels you're on.\r\n");
+			msg_to_char(ch, "%s doesn't have a gossip channel. Try the /ooc channel, or type /list to see which global channels you're on.\r\n", config_get_string("mud_name"));
 			break;
 		}
 		case NOCMD_LEVELS: {
-			msg_to_char(ch, "EmpireMUD uses skills and gear to determine your level, not experience points. See HELP LEVELS for more info.\r\n");
+			msg_to_char(ch, "%s uses skills and gear to determine your level, not experience points. See HELP LEVELS for more info.\r\n", config_get_string("mud_name"));
 			break;
 		}
 		case NOCMD_PRACTICE: {
-			msg_to_char(ch, "EmpireMUD doesn't use 'practices' for skill gain. Type 'skills' or check out HELP SKILLS for more info.\r\n");
+			msg_to_char(ch, "%s doesn't use 'practices' for skill gain. Type 'skills' or check out HELP SKILLS for more info.\r\n", config_get_string("mud_name"));
 			break;
 		}
 		case NOCMD_RENT: {
-			msg_to_char(ch, "EmpireMUD doesn't require you to rent or save your character anywhere. You usually log back in right where you quit.\r\n");
+			msg_to_char(ch, "%s doesn't require you to rent or save your character anywhere. You usually log back in right where you quit.\r\n", config_get_string("mud_name"));
 			break;
 		}
 		case NOCMD_REPORT: {
-			msg_to_char(ch, "EmpireMUD doesn't have a 'report' command.\r\n");
+			msg_to_char(ch, "%s doesn't have a 'report' command.\r\n", config_get_string("mud_name"));
 			break;
 		}
 		case NOCMD_UNGROUP: {
-			msg_to_char(ch, "EmpireMUD doesn't have an 'ungroup' command. Use 'group leave' or 'group kick'.\r\n");
+			msg_to_char(ch, "%s doesn't have an 'ungroup' command. Use 'group leave' or 'group kick'.\r\n", config_get_string("mud_name"));
 			break;
 		}
 		case NOCMD_WIMPY: {
-			msg_to_char(ch, "EmpireMUD doesn't have a 'wimpy' command.\r\n");
+			msg_to_char(ch, "%s doesn't have a 'wimpy' command.\r\n", config_get_string("mud_name"));
 			break;
 		}
 		case NOCMD_TOGGLE: {
-			msg_to_char(ch, "EmpireMUD doesn't have that command by itself. Use 'toggle' instead.\r\n");
+			msg_to_char(ch, "%s doesn't have that command by itself. Use 'toggle' instead.\r\n", config_get_string("mud_name"));
 			break;
 		}
 		default: {

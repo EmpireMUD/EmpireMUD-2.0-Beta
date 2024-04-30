@@ -379,6 +379,10 @@ void sire_char(char_data *ch, char_data *victim) {
 
 		/* Turn off that SIRING action */
 		end_action(ch);
+		
+		// gain sire exp
+		gain_player_tech_exp(ch, PTECH_VAMPIRE_SIRING, 100);
+		run_ability_hooks_by_player_tech(ch, PTECH_VAMPIRE_SIRING, victim, NULL, NULL, NULL);
 
 		queue_delayed_update(ch, CDU_SAVE);
 		queue_delayed_update(victim, CDU_SAVE);
@@ -1324,6 +1328,9 @@ ACMD(do_sire) {
 	}
 	else if (IS_NPC(ch)) {
 		msg_to_char(ch, "Nope.\r\n");
+	}
+	else if (!has_player_tech(ch, PTECH_VAMPIRE_SIRING)) {
+		msg_to_char(ch, "You don't have the ability to sire others.\r\n");
 	}
 	else if (!*arg)
 		msg_to_char(ch, "Sire whom?\r\n");

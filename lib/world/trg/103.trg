@@ -316,21 +316,20 @@ Uninvited Guest: Complete on death~
 #10373
 Uninvited Guest: Box commands~
 1 c 4
-look open close~
+look examine open close~
 return 0
 if close /= %cmd%
-  if %actor.obj_target(%arg.car%)% == %self%
+  if %actor.obj_target(%arg.argument1%)% == %self%
     %send% %actor% It's already closed.
     return 1
   end
 elseif open /= %cmd%
-  if %actor.obj_target(%arg.car%)% == %self%
+  if %actor.obj_target(%arg.argument1%)% == %self%
     %send% %actor% You can't seem to get the box open. It's almost as if it's magically sealed.
     return 1
   end
-elseif look /= %cmd% && %arg.car% == in
-  set arg %arg.cdr%
-  if %actor.obj_target(%arg.car%)% == %self%
+elseif (look /= %cmd% && %arg.car% == in) || examine /= %cmd%
+  if %actor.obj_target(%arg.argument1%)% == %self%
     %send% %actor% You can't seem to get the box open to look inside.
     return 1
   end

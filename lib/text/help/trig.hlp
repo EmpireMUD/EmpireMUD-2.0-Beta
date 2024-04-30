@@ -431,8 +431,8 @@ Argument type:  percent chance to execute
 Return value:  return 0 if purging the thing itself
 
 The Load trigger happens when something is first loaded into the game (but not
-on reboot or re-login). For crafted vehicles, the Load trigger doesn't happen
-until construction is complete.
+on reboot or re-login). For crafted vehicles, the Load trigger runs BEFORE the
+vehicle is complete.
 
 Certain actions like unharnessing a mob from a vehicle will load a new copy of
 the mob and set off its load triggers.
@@ -446,7 +446,7 @@ should consider doing a "wait 1" (or longer) before purging it.
 Only the FIRST load trigger will run unless it also has the Allow-Multiple
 type.
 
-See also: RTRIG COMPLETE
+See also: RTRIG COMPLETE, VTRIG COMPLETE
 #d
 "METHOD LIST" "METHODS LIST"
 
@@ -652,6 +652,8 @@ Special Variables When using field - The variable returns:
  
 &cself&0 - The mob, item, or room running the script. Normal fields may be 
                 used with this.
+&ccomponent.<vnum>(amt)&0 - Gets the component name by vnum. The amt is used to
+   determine whether to use the singular or plural name.
 &ccooldown.<vnum>&0 - Get the name of a cooldown, by vnum.
 &ccurrency.<vnum>(amt)&0 - Gets the currency name. The amt is used to determine
    whether to use the singular or plural name.
@@ -784,6 +786,10 @@ When using field - The variable returns
 &ctrim&0 - Returns the string without any leading or trailing whitespace. 
    This is used to trim extra spaces from the beginning or end of a string.
 &cana&0 - Returns "a" or "an" depending on the first letter of the string.
+&cargument#&0 - Returns the word in position # of the string, starting with 1.
+   Accounts for filler words and quotes. (e.g. %arg.argument1%)
+&carguments&0 - Gets the number of words in the argument. Quotes or parentheses
+   around "two words" result in them counting as 1 word or argument.
 &ccap&0 - Returns the string with the first letter capitalized.
 &ccar&0 - Returns the first word of the string. For %text%="this is the string";
    %text.car% will yield "this".

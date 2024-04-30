@@ -47,7 +47,7 @@ Barrel of Fun: Setup command~
 1 c 6
 setup~
 set room %actor.room%
-if %actor.obj_target(%arg.car%)% != %self%
+if %actor.obj_target(%arg.argument1%)% != %self%
   return 0
   halt
 elseif %actor.fighting%
@@ -89,7 +89,7 @@ detach 232 %self.id%
 Barrel of Fun: Block 2nd setup~
 1 c 4
 setup~
-if %actor.obj_target(%arg.car%)% == %self%
+if %actor.obj_target(%arg.argument1%)% == %self%
   %send% %actor% It has already been set up.
   halt%
 else
@@ -466,8 +466,8 @@ nop %actor.cancel_adventure_summon%
 Letheian Icon use~
 1 c 2
 use~
-set item %arg.car%
-set sk %arg.cdr%
+set item %arg.argument1%
+set sk %arg.argument2%
 if (%actor.obj_target(%item%)% != %self%) && (use /= %cmd%)
   return 0
   halt

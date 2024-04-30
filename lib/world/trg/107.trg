@@ -171,11 +171,11 @@ Completer~
 Christmas present minipet: Open present~
 0 ct 0
 open~
-if %actor.obj_target(%arg.car%)%
+if %actor.obj_target(%arg.argument1%)%
   return 0
   halt
 end
-if %actor.char_target(%arg.car%)% != %self%
+if %actor.char_target(%arg.argument1%)% != %self%
   return 0
   halt
 end
@@ -337,7 +337,7 @@ Reindeer mount response~
 mount ride~
 * This marks last-reindeer-spawn-day when mounted, IF in the adventure
 return 0
-if %actor.char_target(%arg.car%)% == %self% && %self.room.template% >= 10700 && %self.room.template% <= 10729
+if %actor.char_target(%arg.argument1%)% == %self% && %self.room.template% >= 10700 && %self.room.template% <= 10729
   set last_christmas_reindeer_day %dailycycle%
   remote last_christmas_reindeer_day %actor.id%
 end
@@ -352,7 +352,7 @@ set list 10709 16657 16658 10723 10724 10725 10726 16653 16654 16655 16656
 * length is used to shuffle the start point of the list
 set length 11
 * Check targeting
-if %actor.obj_target(%arg.car%)% != %self%
+if %actor.obj_target(%arg.argument1%)% != %self%
   return 0
   halt
 end
@@ -476,7 +476,7 @@ set list 10709 16657 16658 10723 10724 10725 10726 16653 16654 16655 16656 16666
 set length 17
 *
 * Check targeting
-if %actor.obj_target(%arg.car%)% != %self%
+if %actor.obj_target(%arg.argument1%)% != %self%
   return 0
   halt
 end

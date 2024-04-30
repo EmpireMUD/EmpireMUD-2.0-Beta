@@ -4,7 +4,7 @@ the sorcerer's apprentice~
 A sorcerer's apprentice stands in front of the rift (adventure).
 ~
 0 25 bdvIL cnM 3
-1 0 0 15 -1
+1 0 0 15 -1 -1
 D
    The apprentice looks rather comical in his oversized blue robe, hat, and
 ears. He seems a little panicked that his spells have gone wrong.
@@ -45,7 +45,7 @@ a rocky elemental~
 A rocky earth elemental rises from the soil.
 ~
 0 25 dhKL cG 2
-0 0 21 14 -1
+0 0 21 14 -1 -1
 D
 This ball of rocks rolls and roils as if it's alive!
 ~
@@ -74,7 +74,7 @@ a burning elemental~
 A fire elemental burns brightly!
 ~
 0 25 dhKL cG 2
-0 0 18 33 -1
+0 0 18 33 -1 -1
 D
 Like a flame without a wick, this elemental burns brightly but all-too-briefly.
 ~
@@ -102,7 +102,7 @@ a wind elemental~
 A wind elemental rips across the land like a tornado!
 ~
 0 25 dhKL cG 2
-0 0 27 21 -1
+0 0 27 21 -1 -1
 D
 It looks like a little cone of dirt and debris.
 ~
@@ -127,7 +127,7 @@ a water elemental~
 A water elemental splashes about.
 ~
 0 25 dhKL cG 2
-0 0 10 20 -1
+0 0 10 20 -1 -1
 D
    When it rests, it just looks like a puddle. But when it's playing, it's
 somewhere between an otter and a tsunami.
@@ -151,7 +151,7 @@ a floating ember~
 An ember is floating here.
 ~
 1 1 bdhnoD G 0
-0 0 27 33 -1
+0 0 27 33 -1 -1
 D
 It's just a little glint of fire caught on the air.
 ~
@@ -163,7 +163,7 @@ a rolling rock~
 A little rock rolls around on the ground.
 ~
 1 1 bdoD n 2
-0 0 21 15 -1
+0 0 21 15 -1 -1
 D
    It's just a regular old cobble. If it didn't roll on its own, you'd hardly
 realize it's an elemental.
@@ -180,7 +180,7 @@ a ball of fire~
 A little ball of fire rolls around in the air.
 ~
 1 1 bdoD n 1
-0 0 21 15 -1
+0 0 21 15 -1 -1
 D
    It twists and turns in the air, always on the verge of burning out but never
 quite fading.
@@ -197,7 +197,7 @@ a light breeze~
 A light breeze whistles through your hair.
 ~
 1 1 bdoD n 0
-0 0 29 15 -1
+0 0 29 15 -1 -1
 D
 Well... how can you look at a breeze?
 ~
@@ -213,7 +213,7 @@ a little puddle~
 A little puddle splashes around on the ground.
 ~
 1 1 bdoD n 1
-0 0 10 15 -1
+0 0 10 15 -1 -1
 D
 The puddle is splashing around in itself.
 ~
@@ -229,7 +229,7 @@ a tiny broom~
 A tiny broom marches in circles.
 ~
 1 1 bdoD n 2
-0 0 35 15 -1
+0 0 35 15 -1 -1
 D
 The broom just looks happy to be here.
 ~
@@ -245,13 +245,13 @@ a mage of the Grove~
 A hooded figure is standing amongst the trees.
 ~
 5 0 dx c 3
-0 0 0 15 -1
+0 0 0 15 -1 -1
 D
    The mage is covered head-to-toe by a long brown robe, exposing only its
 face and hands. The face is bestial almost to the point of being inhuman, and
 the hands are unusually hairy.
 ~
-I 4 12654 5.00 1  # LOOT: wild fire
+I 4 12654 10.00 1  # LOOT: wild fire
 I 12 12684 5.00 1 p  # PICKPOCKET: golden seedling
 I 12 12686 20.00 1 p  # PICKPOCKET: sugar cubes
 I 12 12685 75.00 1 p  # PICKPOCKET: pocket lint of the Magiterranean
@@ -265,13 +265,13 @@ a mage of the Grove~
 A hooded figure is standing amongst the trees.
 ~
 5 0 bdvxI c 3
-0 0 0 15 -1
+0 0 0 15 -1 -1
 D
    The mage is covered head-to-toe by a long brown robe, exposing only its
 face and hands. The face is bestial almost to the point of being inhuman, and
 the hands are unusually hairy.
 ~
-I 4 12654 5.00 1  # LOOT: wild fire
+I 4 12654 10.00 1  # LOOT: wild fire
 I 12 12684 5.00 1 p  # PICKPOCKET: golden seedling
 I 12 12686 20.00 1 p  # PICKPOCKET: sugar cubes
 I 12 12685 75.00 1 p  # PICKPOCKET: pocket lint of the Magiterranean
@@ -285,13 +285,13 @@ a hooded faun~
 A tall, antlered mage stands beneath the canopy of trees.
 ~
 5 0 bdx c 3
-2 0 0 11 -1
+2 0 0 11 -1 -1
 D
    The mage's hood has been pulled back to reveal strange, branching antlers
 that protrude from the mage's forehead. Whatever this creature is, she's not
 entirely human.
 ~
-I 4 12654 5.00 1  # LOOT: wild fire
+I 4 12654 10.00 1  # LOOT: wild fire
 I 12 12684 5.00 1 p  # PICKPOCKET: golden seedling
 I 12 12686 20.00 1 p  # PICKPOCKET: sugar cubes
 I 12 12685 75.00 1 p  # PICKPOCKET: pocket lint of the Magiterranean
@@ -305,13 +305,13 @@ a weaver of the gopher~
 A weaver of the gopher is crouched in the dirt.
 ~
 5 0 bdx c 3
-1 0 0 5 -1
+1 0 0 5 -1 -1
 D
    Like all the other weavers, this one is wearing a brown, hooded robe. But
 his behavior is odd -- he's crouched down, scraping at the dirt with his hands
 like a gopher.
 ~
-I 4 12654 5.00 1  # LOOT: wild fire
+I 4 12654 10.00 1  # LOOT: wild fire
 I 12 12684 5.00 1 p  # PICKPOCKET: golden seedling
 I 12 12686 20.00 1 p  # PICKPOCKET: sugar cubes
 I 12 12685 75.00 1 p  # PICKPOCKET: pocket lint of the Magiterranean
@@ -325,12 +325,12 @@ the badger shifter~
 A huge creature - half man, half badger - looms over you!
 ~
 5 0 bdxL c 3
-1 0 0 10 -1
+1 0 0 10 -1 -1
 D
    The mage's brown robe is in tatters, barely clinging to the shoulders of
 this half-man, half-badger creature.
 ~
-I 4 12654 5.00 1  # LOOT: wild fire
+I 4 12654 15.00 1  # LOOT: wild fire
 I 12 12684 5.00 1 p  # PICKPOCKET: golden seedling
 I 12 12686 20.00 1 p  # PICKPOCKET: sugar cubes
 I 12 12685 75.00 1 p  # PICKPOCKET: pocket lint of the Magiterranean
@@ -354,12 +354,12 @@ Archweaver #n~
 Archweaver #n seems to glow with the energy of the Grove!
 ~
 5 0 bdvxIL c 3
-2 3 0 5 -1
+2 3 0 5 -1 -1
 D
    The archweaver's brown robe is woven with strands of glimmering gold and
 silver, which seem to pulse as she channels mana from the earth.
 ~
-I 4 12654 5.00 1  # LOOT: wild fire
+I 4 12654 15.00 1  # LOOT: wild fire
 I 12 12684 5.00 1 p  # PICKPOCKET: golden seedling
 I 12 12686 20.00 1 p  # PICKPOCKET: sugar cubes
 I 12 12685 75.00 1 p  # PICKPOCKET: pocket lint of the Magiterranean
@@ -383,14 +383,14 @@ the crow shifter~
 A tall mage in a black feathered cloak is perched above you.
 ~
 5 0 bdvxIL c 3
-2 0 0 10 -1
+2 0 0 10 -1 -1
 D
    This mage must belong to a different cult than the others, because instead
 of a brown robe, she's wearing a black one made primarily from bird feathers.
 She's crouched on a narrow branch with such agility that even the breeze
 doesn't cost her her footing.
 ~
-I 4 12654 5.00 1  # LOOT: wild fire
+I 4 12654 15.00 1  # LOOT: wild fire
 I 12 12684 5.00 1 p  # PICKPOCKET: golden seedling
 I 12 12686 20.00 1 p  # PICKPOCKET: sugar cubes
 I 12 12685 75.00 1 p  # PICKPOCKET: pocket lint of the Magiterranean
@@ -414,13 +414,13 @@ the turtle shifter~
 A rotund mage wallows peacefully in the water.
 ~
 5 0 bdxL c 3
-1 0 0 9 -1
+1 0 0 9 -1 -1
 D
    The mage is fat -- very fat, compared to the thin, gaunt figures that walk
 the rest of this grove. He isn't doing much. In fact, he seems content just to
 wallow in the water.
 ~
-I 4 12654 5.00 1  # LOOT: wild fire
+I 4 12654 15.00 1  # LOOT: wild fire
 I 12 12684 5.00 1 p  # PICKPOCKET: golden seedling
 I 12 12686 20.00 1 p  # PICKPOCKET: sugar cubes
 I 12 12685 75.00 1 p  # PICKPOCKET: pocket lint of the Magiterranean
@@ -445,7 +445,7 @@ a wildling~
 A bright red pair of eyes stare at you from the darkness.
 ~
 5 75 bdj ce 2
-0 0 17 10 -1
+0 0 17 10 -1 -1
 D
    This strange furry little creature is hard to see in in the shade beneath
 the canopy of trees. Long spines protrude from its black fur, and only its
@@ -453,7 +453,7 @@ gleaming white teeth give away its demeanor.
 ~
 I 0 3012 100.00 1  # BUTCHER: fillet of raw meat
 I 1 1350 100.00 1  # SKIN: small skin
-I 4 12654 5.00 1  # LOOT: wild fire
+I 4 12654 10.00 1  # LOOT: wild fire
 T 12656
 T 12658
 T 12650
@@ -464,7 +464,7 @@ a wotterling~
 A wotterling twists and curls through the trees.
 ~
 5 75 bdj ce 2
-0 0 6 10 -1
+0 0 6 10 -1 -1
 D
    This spiny black creature looks very similar to the wildlings you
 encountered earlier, except that it seems to be able to swim without coming up
@@ -472,7 +472,7 @@ to the surface for air.
 ~
 I 0 3012 100.00 1  # BUTCHER: fillet of raw meat
 I 1 1350 100.00 1  # SKIN: small skin
-I 4 12654 5.00 1  # LOOT: wild fire
+I 4 12654 10.00 1  # LOOT: wild fire
 T 12656
 T 12658
 T 12650
@@ -483,7 +483,7 @@ a wildling~
 A spiny black wildling is crawling down the tree.
 ~
 5 75 bdj ce 2
-0 0 1 10 -1
+0 0 1 10 -1 -1
 D
    This strange furry little creature is hard to see in in the shade beneath
 the canopy of trees. Long spines protrude from its black fur, and only its
@@ -491,7 +491,7 @@ gleaming white teeth give away its demeanor.
 ~
 I 0 3012 100.00 1  # BUTCHER: fillet of raw meat
 I 1 1350 100.00 1  # SKIN: small skin
-I 4 12654 5.00 1  # LOOT: wild fire
+I 4 12654 10.00 1  # LOOT: wild fire
 T 12656
 T 12658
 T 12650
@@ -502,13 +502,13 @@ an escaped wildling~
 A spiny black wildling is crawling down the tree.
 ~
 5 75 dj cde 2
-0 0 1 10 -1
+0 0 1 10 -1 -1
 D
 This strange little black creature doesn't look particularly friendly.
 ~
 I 0 3012 100.00 1  # BUTCHER: fillet of raw meat
 I 1 1350 100.00 1  # SKIN: small skin
-I 4 12654 5.00 1  # LOOT: wild fire
+I 4 12654 10.00 1  # LOOT: wild fire
 T 12656
 T 12658
 T 12661
@@ -519,13 +519,13 @@ a weaver of the Grove~
 A hooded mage is floating in the water.
 ~
 0 0 bdvxI c 3
-0 0 0 15 -1
+0 0 0 15 -1 -1
 D
    The mage is covered head-to-toe by a long brown robe, exposing only its
 face and hands. The face is bestial almost to the point of being inhuman, and
 the hands are unusually hairy.
 ~
-I 4 12654 5.00 1  # LOOT: wild fire
+I 4 12654 10.00 1  # LOOT: wild fire
 I 12 12684 5.00 1 p  # PICKPOCKET: golden seedling
 I 12 12686 20.00 1 p  # PICKPOCKET: sugar cubes
 I 12 12685 75.00 1 p  # PICKPOCKET: pocket lint of the Magiterranean
@@ -539,7 +539,7 @@ a tiny wildling~
 A tiny wildling stalks behind you.
 ~
 1 1 bdoD n 1
-0 0 14 9 -1
+0 0 14 9 -1 -1
 D
    This adorable little black creature is hard to identify. Its fur is raised
 into long spikes, although they aren't stiff enough to cause any damage. As you
@@ -569,7 +569,7 @@ a wildling~
 A tame wildling is curled up on the ground.
 ~
 0 75 dej 0 4
-0 0 0 10 -1
+0 0 0 10 -1 -1
 D
    This huge black furry creature is hard to identify, but it appears tame
 enough that you might be able to ride it.
@@ -584,7 +584,7 @@ an armored wildling~
 An armored wildling crouches low, completely covered in plate armor.
 ~
 125 125 dej 0 4
-0 0 0 10 -1
+0 0 0 10 -1 -1
 D
    This huge black furry creature is hard to identify, but it appears tame
 enough that you might be able to ride it.
@@ -597,7 +597,7 @@ the wildling weaver~
 A manaweaver clings to the henge, half-morphed into a spiky black wildling.
 ~
 50 75 bdovxI c 2
-1 0 0 10 -1
+1 0 0 10 -1 -1
 D
    This mage appears to have tried to morph into some kind of exotic creature,
 and failed. Long, spiky black fur protrudes from what's left of the weaver's
@@ -620,7 +620,7 @@ Grandmother Poplar's Poplar Goods~
 A gnarled old tree with the face of a woman is selling some goods. (list)
 ~
 0 0 bdABL cn 5
-2 0 0 15 -1
+2 0 0 15 -1 -1
 D
    The strange old tree is carved with the face of an aged woman. She gives a
 warm smile as you pass, and invites you to shop from her wares. (type list)
@@ -644,7 +644,7 @@ the talking fox~
 An orange talking fox stands here, wary.
 ~
 0 0 bdL cn 2
-0 0 0 15 -1
+0 0 0 15 -1 -1
 D
    This little orange fox is standing on its hind legs, as if it thinks it's
 people.
@@ -668,7 +668,7 @@ the Spirit of the Grove~
 A strange spirit lingers in the air.
 ~
 0 0 bdL cn 0
-0 0 0 15 -1
+0 0 0 15 -1 -1
 D
 The spirit is vaguely fox-like.
 ~
@@ -688,7 +688,7 @@ the spirit of rage~
 The spirit of rage is floating here, screaming with primal fury!
 ~
 0 0 bd n 0
-0 0 2 28 -1
+0 0 2 28 -1 -1
 D
    It's the manifestation of all the rage of ten thousand years of logging,
 hunting, and farming away the natural landscape.

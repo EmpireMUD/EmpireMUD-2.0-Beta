@@ -1726,6 +1726,7 @@ Available techs are:
  &cTrack-Command&0 *
  &cResist-Poison&0 * - Reduced effect from poisons.
  &cVampire-Bite&0 *^ - Can use bite for blood, if a vampire, rather than the social.
+ &cVampire-Siring&0 * - Player can sire other players to become vampires.
  &cEnemy-Buff-Details&0 * - Can see full details using 'affects' on others.
  &cConceal-Equipment&0 * - Others cannot see your equipment on 'look'.
  &cConceal-Inventory&0 * - Others cannot see your inventory on 'look'.
@@ -7228,7 +7229,7 @@ Available flags:
  &cNO-WAREHOUSE&0 - can no longer be stored in home/warehouse storage
  &cNO-DECAY-IN-STORAGE&0 - tiemr does not tick down while stored
 
-See also: BINDING, OLC OBJECTS, LIGHT ITEM
+See also: BINDING, OLC OBJECTS, LIGHT ITEM, OSET
 #d
 "OEDIT FULLNESS"
 
@@ -7791,7 +7792,7 @@ the 'plants' property. If you can't see the plants property in the editor,
 it means your value1 is invalid for planting and you should set your value1
 back to 0.
 
-See also: OEDIT PLANTS, OLC OBJECTS
+See also: OEDIT PLANTS, OLC OBJECTS, OSET
 #d
 "OEDIT WEALTH"
 
@@ -9585,6 +9586,7 @@ Available flags:
  &cVAMPIRE&0 - Players with this skill are considered vampires.
  &cCASTER&0 - Players with this skill are spellcasters/mages.
  &cREMOVED-BY-PURIFY&0 - Lose this skill if hit by the purify spell.
+ &cNO-PREVIEW&0 - Cannot view the skill unless you have at least 1 point in it.
 
 See also: OLC SKILLS, OLC REMOVEINDEV
 #d

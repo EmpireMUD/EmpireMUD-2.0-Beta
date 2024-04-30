@@ -75,11 +75,12 @@ Vehicles can trigger on the following events:
 &cGlobal&0 - Can happen even without players present (combine with Random).
 &cRandom&0 - Triggers randomly when players are around.
 &cCommand&0 - Responds to a player command.
+&cComplete&0 - When the vehicle is completed.
 &cSpeech&0 - Responds to player speech.
 &cDestroy&0 - Triggers when the vehicle would be destroyed.
 &cGreet&0 - Triggers when a person enters the room.
 &cEntry&0 - Triggers when the vehicle moves into a new room.
-&cLoad&0 - Triggers when the vehicle loads (or is finished being crafted).
+&cLoad&0 - Triggers when the vehicle first loads.
 &cAbility&0 - Triggers when the vehicle is the target of an ability.
 &cLeave&0 - Triggers when a person tries to leave.
 &cDismantle&0 - Triggers when someone tries to dismantle the vehicle.

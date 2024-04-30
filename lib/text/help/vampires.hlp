@@ -94,7 +94,7 @@ Example:
   > bite wolf
 
 See also: SAVAGE BITE, ANCIENT BLOOD, SANGUINE RESTORATION, TOGGLE,
-   UNNATURAL THIRST
+   UNNATURAL THIRST, SIRE
 #
 "BLOOD FORTITUDE" FORTITUDE
 
@@ -471,6 +471,8 @@ fresh blood from the sire.
 
 Siring will fail dramatically if the target cannot gain Vampire skill due to
 either having too many skills or having it no-skilled.
+
+Siring requires the Bite ability.
 
 Example:
   > sire Exar 

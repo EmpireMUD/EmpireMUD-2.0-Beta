@@ -698,7 +698,7 @@ See also: WIZNET, TOGGLE
 #d
 OSET "RESTRING OBJECT"
 
-Usage:  oset <object> <field> <value>
+Usage:  oset <object> <field> <argument>
 
 This command lets you modify an item in the world. It does not change the
 item's prototype; to do that you must use OLC. This command is grantable.
@@ -709,11 +709,18 @@ You can change the following fields:
   longdescription - The text shown on the ground.
   shortdescription - The text used to build strings, and in the inventory.
   timer - The decay timer on the item (-1 for no decay).
+  value - Set value 0, 1, or 2 to a number. See help files on object types for
+     the meaning of each value.
 
 Setting the keywords, longdescription, or shortdescription to "none" will
 restore its strings from the prototype (if one exists).
 
-See also: GRANT, OEDIT
+Examples:
+
+  > oset sword flag HARD-DROP
+  > oset bread value 0 72
+
+See also: GRANT, OEDIT, OBJ VALUES
 #d
 PAGE
 

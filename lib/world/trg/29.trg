@@ -28,7 +28,7 @@ end
 ~
 #2916
 Heroic Caravan Setup~
-5 n 100
+5 o 100
 ~
 set inter %self.interior%
 if (!%inter%)
@@ -52,7 +52,7 @@ detach 2916 %self.id%
 ~
 #2917
 Heroic Galleon Setup~
-5 n 100
+5 o 100
 ~
 set inter %self.interior%
 if (!%inter%)

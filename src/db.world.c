@@ -74,6 +74,7 @@ bool write_map_and_room_to_file(room_vnum vnum, bool force_obj_pack);
 * @return room_data *to_room The created room.
 */
 room_data *add_room_to_building(room_data *home_room, bld_vnum building_type) {
+	bld_vnum old;
 	room_data *to_room;
 	
 	// validate home_room
@@ -83,7 +84,14 @@ room_data *add_room_to_building(room_data *home_room, bld_vnum building_type) {
 	
 	// validate building type
 	if (building_type == NOTHING || !building_proto(building_type)) {
+		old = building_type;
 		building_type = config_get_int("default_interior");
+		
+		// validate this
+		if (!building_proto(building_type)) {
+			log("SYSERR: add_room_to_building: Invalid building vnum %d and default_interior %d is also invalid; attempting to add an interior room to room vnum %d", old, building_type, GET_ROOM_VNUM(home_room));
+			exit(1);
+		}
 	}
 	
 	// create it
@@ -3304,6 +3312,11 @@ room_data *get_extraction_room(void) {
 		}
 	}
 	
+	if (!building_proto(RTYPE_EXTRACTION_PIT)) {
+		log("SYSERR: get_extraction_room: Failed because building type %d does not exist", RTYPE_EXTRACTION_PIT);
+		exit(1);
+	}
+	
 	// did not find -- make one
 	room = create_room(NULL);
 	attach_building_to_room(building_proto(RTYPE_EXTRACTION_PIT), room, TRUE);
@@ -3752,7 +3765,7 @@ INTERACTION_FUNC(ruin_building_to_vehicle_interaction) {
 	bld_data *old_bld;
 	room_data *inside;
 	char *to_free;
-	int paint;
+	int paint, veh_ok;
 	
 	if (!inter_room || !(proto = vehicle_proto(interaction->vnum)) || GET_ROOM_VNUM(inter_room) >= MAP_SIZE) {
 		return FALSE;	// safety: only works on the map
@@ -3863,7 +3876,10 @@ INTERACTION_FUNC(ruin_building_to_vehicle_interaction) {
 	}
 	
 	request_vehicle_save_in_world(ruin);
-	load_vtrigger(ruin);
+	veh_ok = load_vtrigger(ruin);
+	if (veh_ok) {
+		veh_ok = complete_vtrigger(ruin);
+	}
 	request_world_save(GET_ROOM_VNUM(inter_room), WSAVE_ROOM);
 	return TRUE;
 }
@@ -5080,6 +5096,7 @@ void load_one_room_from_wld_file(room_vnum vnum, char index_data) {
 	int int_in[4];
 	char char_in, *reset_read, str_in[256];
 	FILE *fl;
+	bld_data *bld;
 	
 	map = (vnum < MAP_SIZE) ? &world_map[MAP_X_COORD(vnum)][MAP_Y_COORD(vnum)] : NULL;
 	room = real_real_room(vnum);	// if loaded already for some reason
@@ -5166,7 +5183,13 @@ void load_one_room_from_wld_file(room_vnum vnum, char index_data) {
 			}
 			case 'B': {
 				if (!strn_cmp(line, "Building: ", 10) && room) {
-					attach_building_to_room(building_proto(atoi(line+10)), room, FALSE);
+					int_in[0] = atoi(line+10);
+					if ((bld = building_proto(int_in[0]))) {
+						attach_building_to_room(bld, room, FALSE);
+					}
+					else {
+						log("WARNING: Invalid building type %d to attach to room %d", int_in[0], GET_ROOM_VNUM(room));
+					}
 				}
 				else if (!strn_cmp(line, "Built-with: ", 12) && room) {
 					if (sscanf(line + 12, "%d %d %d %d", &int_in[0], &int_in[1], &int_in[2], &int_in[3]) != 4) {

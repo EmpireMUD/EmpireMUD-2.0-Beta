@@ -651,11 +651,11 @@ Delayed Completer~
 ~
 #12524
 ankle brace completion~
-5 n 100
+5 o 100
 ~
 nop %self.link_instance%
 if !%instance.real_location%
-  %echo% ~%self% vanishes uselessly.
+  %echo% @%self% vanishes uselessly.
   %purge% %self%
 end
 set colossus %instance.mob(12500)%
@@ -1114,6 +1114,12 @@ Other adventurer load~
 if %self.room.template% == 12504
   %morph% %self% 12504
 end
+~
+#12539
+Start Ankle Brace~
+5 n 100
+~
+nop %self.link_instance%
 ~
 #12547
 Clockwork Colossus super-loot~

@@ -4,7 +4,7 @@ Beneath the Hut~
 here, filled with swarming insects. It looks like there's a rope ladder hanging
 above you, but you can't reach it.
 ~
-ah 0 0
+ah 0 0 -1
 M 1 19005 100.00 1
 T 19016
 S
@@ -14,7 +14,7 @@ Beneath the Hut~
 here, filled with swarming insects. A rope ladder hangs down from the hut above
 you, though the scratching at the floorboards make you hesitant to climb up.
 ~
-ah 0 0
+ah 0 0 -1
 D8
 ~
 0 19002
@@ -30,7 +30,7 @@ insects that swarm outside. The inside of the hut is a single room, cluttered
 with furs that have been turned into crude dolls and furniture made from
 strange bones. This is not the sort of place most people would choose to live.
 ~
-h 0 aGL
+h 0 aGLN -1
 D9
 ~
 0 19001

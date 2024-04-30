@@ -1058,7 +1058,7 @@ VCMD(do_vterraform) {
 VCMD(do_vload) {
 	char arg1[MAX_INPUT_LENGTH], arg2[MAX_INPUT_LENGTH], emp_arg[MAX_INPUT_LENGTH];
 	struct instance_data *inst = NULL;
-	int number = 0, pos;
+	int number = 0, pos, veh_ok;
 	book_data *book;
 	empire_data *emp;
 	room_data *room, *in_room;
@@ -1261,7 +1261,10 @@ VCMD(do_vload) {
 			perform_claim_vehicle(vehicle, ROOM_OWNER(HOME_ROOM(room)));
 		}
 		
-		load_vtrigger(vehicle);
+		veh_ok = load_vtrigger(vehicle);
+		if (veh_ok) {
+			veh_ok = complete_vtrigger(vehicle);
+		}
 	}
 	else {
 		veh_log(veh, "vload: bad type");
@@ -1596,6 +1599,7 @@ VCMD(do_vat)  {
 
 
 VCMD(do_vrestore) {
+	bool need_trig = FALSE;
 	struct affected_type *aff, *next_aff;
 	char arg[MAX_INPUT_LENGTH];
 	vehicle_data *vtarg = NULL;
@@ -1688,7 +1692,15 @@ VCMD(do_vrestore) {
 	if (vtarg) {
 		remove_vehicle_flags(vtarg, VEH_ON_FIRE);
 		if (!VEH_IS_DISMANTLING(vtarg)) {
+			if (VEH_NEEDS_RESOURCES(vtarg) && !VEH_IS_COMPLETE(vtarg)) {
+				need_trig = TRUE;
+			}
+			
 			complete_vehicle(vtarg);
+			
+			if (need_trig) {
+				complete_vtrigger(vtarg);
+			}
 		}
 	}
 	if (room) {

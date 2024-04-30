@@ -833,6 +833,7 @@ char *list_harnessed_mobs(vehicle_data *veh) {
 * INTERACTION_FUNC provides: ch, interaction, inter_room, inter_mob, inter_item, inter_veh
 */
 INTERACTION_FUNC(ruin_vehicle_to_vehicle_interaction) {
+	int veh_ok;
 	room_data *room = inter_room ? inter_room : (inter_veh ? IN_ROOM(inter_veh) : NULL);
 	struct resource_data *res, *next_res, *save = NULL;
 	vehicle_data *ruin, *proto, *veh_iter, *next_veh;
@@ -923,7 +924,10 @@ INTERACTION_FUNC(ruin_vehicle_to_vehicle_interaction) {
 	}
 	
 	request_vehicle_save_in_world(ruin);
-	load_vtrigger(ruin);
+	veh_ok = load_vtrigger(ruin);
+	if (veh_ok) {
+		veh_ok = complete_vtrigger(ruin);
+	}
 	return TRUE;
 }
 
@@ -1931,9 +1935,6 @@ void complete_vehicle(vehicle_data *veh) {
 		
 		// build the interior if not built?
 		get_vehicle_interior(veh);
-		
-		// run triggers
-		load_vtrigger(veh);
 	}
 	
 	if (room) {

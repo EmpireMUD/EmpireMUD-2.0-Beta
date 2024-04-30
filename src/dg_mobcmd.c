@@ -703,7 +703,7 @@ ACMD(do_mvehicleecho) {
 ACMD(do_mload) {	
 	struct instance_data *inst = get_instance_by_mob(ch);
 	char arg1[MAX_INPUT_LENGTH], arg2[MAX_INPUT_LENGTH], emp_arg[MAX_INPUT_LENGTH];
-	int number = 0, pos;
+	int number = 0, pos, veh_ok;
 	book_data *book;
 	empire_data *emp;
 	room_data *in_room;
@@ -940,7 +940,10 @@ ACMD(do_mload) {
 			perform_claim_vehicle(veh, ROOM_OWNER(HOME_ROOM(IN_ROOM(veh))));
 		}
 		
-		load_vtrigger(veh);
+		veh_ok = load_vtrigger(veh);
+		if (veh_ok) {
+			veh_ok = complete_vtrigger(veh);
+		}
 	}
 	else
 		mob_log(ch, "mload: bad type");
@@ -1242,6 +1245,7 @@ ACMD(do_mbuild) {
 
 
 ACMD(do_mrestore) {
+	bool need_trig = FALSE;
 	struct affected_type *aff, *next_aff;
 	char arg[MAX_INPUT_LENGTH];
 	vehicle_data *veh = NULL;
@@ -1337,7 +1341,15 @@ ACMD(do_mrestore) {
 	if (veh) {
 		remove_vehicle_flags(veh, VEH_ON_FIRE);
 		if (!VEH_IS_DISMANTLING(veh)) {
+			if (VEH_NEEDS_RESOURCES(veh) && !VEH_IS_COMPLETE(veh)) {
+				need_trig = TRUE;
+			}
+			
 			complete_vehicle(veh);
+			
+			if (need_trig) {
+				complete_vtrigger(veh);
+			}
 		}
 	}
 	if (room) {

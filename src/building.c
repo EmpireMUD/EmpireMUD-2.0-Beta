@@ -392,6 +392,10 @@ void construct_building(room_data *room, bld_vnum type) {
 		log("SYSERR: construct_building called on location off the map");
 		return;
 	}
+	if (!building_proto(type)) {
+		syslog(SYS_ERROR, LVL_START_IMM, TRUE, "SYSERR: construct_building called with invalid building type %d at room %d", type, GET_ROOM_VNUM(room));
+		return;
+	}
 	
 	disassociate_building(room);	// just in case
 	
@@ -449,6 +453,11 @@ void construct_tunnel(char_data *ch, int dir, room_data *entrance, room_data *ex
 	
 	room_data *new_room, *last_room = entrance, *to_room;
 	int iter;
+	
+	if (!building_proto(RTYPE_TUNNEL)) {
+		syslog(SYS_ERROR, LVL_START_IMM, TRUE, "SYSERR: construct_tunnel called with no valid tunnel building %d", RTYPE_TUNNEL);
+		return;
+	}
 	
 	if (!resources) {
 		add_to_resource_list(&resources, RES_COMPONENT, COMP_PILLAR, 12, 0);
@@ -2035,6 +2044,9 @@ bool start_upgrade(char_data *ch, craft_data *upgrade_craft, room_data *from_roo
 			remove_vehicle_extra_data(new_veh, ROOM_EXTRA_PAINT_COLOR);
 		}
 		
+		// request save before finishing
+		request_vehicle_save_in_world(new_veh);
+		
 		// DONE: autocomplete if no resources on the upgrade
 		if (!VEH_NEEDS_RESOURCES(new_veh)) {
 			if (ch) {
@@ -2043,9 +2055,11 @@ bool start_upgrade(char_data *ch, craft_data *upgrade_craft, room_data *from_roo
 				cancel_action(ch);
 			}
 			complete_vehicle(new_veh);
+			
+			// run triggers: WARNING: these are allowed to purge the vehicle
+			complete_vtrigger(new_veh);
 		}
 		
-		request_vehicle_save_in_world(new_veh);
 	} // end upgrade-to-vehicle
 	
 	affect_total_room(in_room);
