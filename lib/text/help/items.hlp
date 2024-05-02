@@ -865,7 +865,7 @@ Common skin components include:
 See also: SKIN COMMAND, SEWING, LEATHERWORKING, RAWHIDE STITCHING, TAN, FUR
    HUNTSMAN
 #
-SPICE SPICES PEPPER COCOA CACAO CARDAMOM CINNAMON CLOVES GINGER NUTMEG "MACE SPICE" SAFFRON VANILLA
+SPICE SPICES PEPPER COCOA CACAO CARDAMOM CINNAMON CLOVES GINGER NUTMEG "MACE SPICE" SAFFRON VANILLA CHILI
 
 Spice (component)
 
@@ -880,6 +880,7 @@ Processing spices usually requires the Gourmet Chef ability.
 
 Known spices include:
   black pepper, from peppercorns
+  chili powder, from chili peppers
   cocoa powder, from cacao beans
   ground cardamom, from cardamom pods
   ground cinnamon, from cinnamon bark
