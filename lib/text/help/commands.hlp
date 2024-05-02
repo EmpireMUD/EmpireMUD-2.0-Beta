@@ -1977,9 +1977,10 @@ Usage:  process [number] <thing>
         process info <thing>
         process list <keywords>
 
-"Process" is a crafting command used mainly for herbs and spices.
+"Process" is a crafting command used mainly for herbs and spices. Many of these
+require the Gourmet Chef ability.
 
-See also: PROCESS INFO, RECIPES, CRAFTING ABILITIES
+See also: PROCESS INFO, RECIPES, CRAFTING ABILITIES, GOURMET CHEF
 #
 PROGRESS PROGRESSION "EMPIRE PROGRESSION" "PROGRESS GOALS" "PROGRESSION GOALS" "PROGRESS POINTS" GOAL GOALS
 
