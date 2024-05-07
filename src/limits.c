@@ -86,6 +86,9 @@ bool can_mount_in_room(char_data *ch, room_data *room) {
 	else if (WATER_SECT(room) && !((has_player_tech(ch, PTECH_RIDING_UPGRADE) && MOUNT_FLAGGED(ch, MOUNT_AQUATIC)) || (has_player_tech(ch, PTECH_RIDING_FLYING) && MOUNT_FLAGGED(ch, MOUNT_FLYING)))) {
 		ok = FALSE;
 	}
+	else if (MOUNT_FLAGGED(ch, MOUNT_AQUATIC) && !find_flagged_sect_within_distance_from_char(ch, SECTF_FRESH_WATER | SECTF_OCEAN, NOBITS, 1)) {
+	
+	}
 	
 	return ok;
 }
