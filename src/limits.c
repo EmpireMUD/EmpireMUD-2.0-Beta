@@ -87,7 +87,7 @@ bool can_mount_in_room(char_data *ch, room_data *room) {
 		ok = FALSE;
 	}
 	else if (MOUNT_FLAGGED(ch, MOUNT_AQUATIC) && !find_flagged_sect_within_distance_from_char(ch, SECTF_FRESH_WATER | SECTF_OCEAN, NOBITS, 1)) {
-	
+		ok = FALSE;
 	}
 	
 	return ok;
