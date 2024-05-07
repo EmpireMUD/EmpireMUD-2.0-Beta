@@ -342,6 +342,21 @@ void check_island_assignment(room_data *room, struct map_data *map) {
 		*id = to_map->shared->island_id;
 		*island = to_map->shared->island_ptr;
 		(*island)->tile_size += 1;
+		
+		// adjust island edges
+		if ((*island)->edge[NORTH] == NOWHERE || MAP_Y_COORD((*island)->edge[NORTH]) < y) {
+			(*island)->edge[NORTH] = map->vnum;
+		}
+		if ((*island)->edge[SOUTH] == NOWHERE || MAP_Y_COORD((*island)->edge[SOUTH]) > y) {
+			(*island)->edge[SOUTH] = map->vnum;
+		}
+		if ((*island)->edge[EAST] == NOWHERE || MAP_X_COORD((*island)->edge[EAST]) < x) {
+			(*island)->edge[EAST] = map->vnum;
+		}
+		if ((*island)->edge[WEST] == NOWHERE || MAP_X_COORD((*island)->edge[WEST]) > x) {
+			(*island)->edge[WEST] = map->vnum;
+		}
+		
 		return;	// done
 	}
 	
