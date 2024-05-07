@@ -7282,6 +7282,9 @@ Fields:
   &c-type&0 - see HELP OEDIT TYPE
   &c-weapontype&0 - see HELP OEDIT WEAPONTYPE
   &c-wear&0, &c-nowear&0 - see HELP OEDIT WEAR
+  &c-val0&0, &c-val0over&0, &cval0under&0 - search value 0
+  &c-val1&0, &c-val1over&0, &cval1under&0 - search value 1
+  &c-val2&0, &c-val2over&0, &cval2under&0 - search value 2
   &c-vmin&0, &c-vmax&0 - VNUM range limits
 
 Type-based fields:

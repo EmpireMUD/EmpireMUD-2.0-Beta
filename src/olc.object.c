@@ -1134,6 +1134,9 @@ void olc_fullsearch_obj(char_data *ch, char *argument) {
 	bitvector_t only_tools = NOBITS, only_requires_tool = NOBITS, only_light_flags = NOBITS;
 	int count, only_level = NOTHING, only_type = NOTHING, only_mat = NOTHING;
 	int vmin = NOTHING, vmax = NOTHING, only_timer = -2, timer_over = NOTHING, timer_under = NOTHING;
+	int only_val0 = INT_MIN+1, only_val1 = INT_MIN+1, only_val2 = INT_MIN+1;
+	int val0_over = INT_MIN+1, val1_over = INT_MIN+1, val2_over = INT_MIN+1;
+	int val0_under = INT_MIN+1, val1_under = INT_MIN+1, val2_under = INT_MIN+1;
 	// light hours uses -2 because the valid range is -1 to INT_MAX
 	int only_light_hours = -2 ,light_hours_over = -2, light_hours_under = -2;
 	bool only_storable = FALSE, not_storable = FALSE, light_is_lit = FALSE, light_is_unlit = FALSE;
@@ -1191,6 +1194,15 @@ void olc_fullsearch_obj(char_data *ch, char *argument) {
 		FULLSEARCH_FLAGS("nowear", not_worn, wear_bits)
 		FULLSEARCH_FLAGS("worn", only_worn, wear_bits)
 		FULLSEARCH_FLAGS("noworn", not_worn, wear_bits)
+		FULLSEARCH_INT("val0", only_val0, INT_MIN+1, INT_MAX)
+		FULLSEARCH_INT("val0over", val0_over, INT_MIN+1, INT_MAX)
+		FULLSEARCH_INT("val0under", val0_under, INT_MIN+1, INT_MAX)
+		FULLSEARCH_INT("val1", only_val1, INT_MIN+1, INT_MAX)
+		FULLSEARCH_INT("val1over", val1_over, INT_MIN+1, INT_MAX)
+		FULLSEARCH_INT("val1under", val1_under, INT_MIN+1, INT_MAX)
+		FULLSEARCH_INT("val2", only_val2, INT_MIN+1, INT_MAX)
+		FULLSEARCH_INT("val2over", val2_over, INT_MIN+1, INT_MAX)
+		FULLSEARCH_INT("val2under", val2_under, INT_MIN+1, INT_MAX)
 		FULLSEARCH_INT("vmin", vmin, 0, INT_MAX)
 		FULLSEARCH_INT("vmax", vmax, 0, INT_MAX)
 		
@@ -1251,9 +1263,6 @@ void olc_fullsearch_obj(char_data *ch, char *argument) {
 		if (only_light_hours != -2 && (!IS_LIGHT(obj) || GET_LIGHT_HOURS_REMAINING(obj) != only_light_hours)) {
 			continue;
 		}
-		if (only_light_hours != -2 && (!IS_LIGHT(obj) || GET_LIGHT_HOURS_REMAINING(obj) != only_light_hours)) {
-			continue;
-		}
 		if (light_hours_over != -2 && (!IS_LIGHT(obj) || GET_LIGHT_HOURS_REMAINING(obj) < light_hours_over)) {
 			continue;
 		}
@@ -1282,6 +1291,33 @@ void olc_fullsearch_obj(char_data *ch, char *argument) {
 			continue;
 		}
 		if (only_weapontype && (!IS_WEAPON(obj) || GET_WEAPON_TYPE(obj) != ATTACK_VNUM(only_weapontype))) {
+			continue;
+		}
+		if (only_val0 != INT_MIN+1 && GET_OBJ_VAL(obj, 0) != only_val0) {
+			continue;
+		}
+		if (val0_over != INT_MIN+1 && GET_OBJ_VAL(obj, 0) < val0_over) {
+			continue;
+		}
+		if (val0_under != INT_MIN+1 && GET_OBJ_VAL(obj, 0) > val0_under) {
+			continue;
+		}
+		if (only_val1 != INT_MIN+1 && GET_OBJ_VAL(obj, 1) != only_val1) {
+			continue;
+		}
+		if (val1_over != INT_MIN+1 && GET_OBJ_VAL(obj, 1) < val1_over) {
+			continue;
+		}
+		if (val1_under != INT_MIN+1 && GET_OBJ_VAL(obj, 1) > val1_under) {
+			continue;
+		}
+		if (only_val2 != INT_MIN+1 && GET_OBJ_VAL(obj, 2) != only_val2) {
+			continue;
+		}
+		if (val2_over != INT_MIN+1 && GET_OBJ_VAL(obj, 2) < val2_over) {
+			continue;
+		}
+		if (val2_under != INT_MIN+1 && GET_OBJ_VAL(obj, 2) > val2_under) {
 			continue;
 		}
 		if (*extra_search && !find_exdesc(extra_search, GET_OBJ_EX_DESCS(obj), NULL)) {
