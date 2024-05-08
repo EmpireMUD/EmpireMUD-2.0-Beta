@@ -774,6 +774,9 @@ void identify_obj_to_char(obj_data *obj, char_data *ch, bool simple) {
 		else if (OBJ_FLAGGED(obj, OBJ_NO_BASIC_STORAGE | OBJ_NO_WAREHOUSE) && (!proto || !OBJ_FLAGGED(proto, OBJ_NO_BASIC_STORAGE | OBJ_NO_WAREHOUSE))) {
 			msg_to_char(ch, "Storage location: none (modified object)\r\n");
 		}
+		else {
+			msg_to_char(ch, "Storage location: none (cannot be stored)\r\n");
+		}
 	}
 
 	// binding section

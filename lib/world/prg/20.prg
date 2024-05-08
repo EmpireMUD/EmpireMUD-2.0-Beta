@@ -210,7 +210,7 @@ W
 S
 #2018
 Collecting Herbs~
-   A good stockpile of mgaic herbs is necessary for the health and development
+   A good stockpile of magic herbs is necessary for the health and development
 of an empire. Produce 50 of each magic herb to complete this goal.
 ~
 4 1 0 25 0

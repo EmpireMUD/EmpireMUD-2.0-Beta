@@ -534,9 +534,12 @@ Gourmet feast recipes:
   roast turkey feast (melee)
   seafood feast (caster)
 
+This ability also allows you to process many spices so they can be used for
+cooking.
+
 More gourmet recipes can be found around the world.
 
-See also: BUFF FOOD, COOKING FIRE
+See also: BUFF FOOD, COOKING FIRE, PROCESS, SPICES
 #
 "HERBCLOTH WEAVING" "SPARKFIBER CLOTH" "MANASILK CLOTH"
 

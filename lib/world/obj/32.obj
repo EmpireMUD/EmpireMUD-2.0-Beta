@@ -4,7 +4,7 @@ a cut of poultry~
 There is a cut of poultry sitting on the ground.~
 You can eat the poultry raw... or cook it.
 ~
-6 gC a 0 0 6
+6 glC a 0 0 7
 6 0 0
 7 24
 C
@@ -19,7 +19,7 @@ a slab of pork~
 There is a slab of pork sitting on the ground.~
 You can eat the pork raw... or cook it.
 ~
-6 gC a 0 0 6
+6 glC a 0 0 7
 6 0 0
 7 24
 C
@@ -34,7 +34,7 @@ a white egg~
 A white egg is lying on the ground.~
 It's a little white egg.
 ~
-6 g a 0 0 10
+6 gl a 0 0 11
 1 0 0
 7 336
 C

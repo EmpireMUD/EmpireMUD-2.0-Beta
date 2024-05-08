@@ -113,6 +113,7 @@ Included Adventure Zones
 [10980] Renegade Spellcaster! [10980-10999] (100-175) 8 mobs, 13 objs, 1 room
 [11800] The Tower Skycleave: Ashes of History [11800-11999] (150-250) 200 mobs, 200 objs, 140 rooms
 [12000] Binding Circle: Anat [12000-12029] (225-325) 5 mobs, 22 objs, 1 room
+[12100] Antara Golden's Spices and Recipes [12100-12199] (0) 1 mob, 43 objs, 0 rooms
 [12030] Binding Circle: Ba'al Hadad [12030-12059] (225-325) 5 mobs, 25 objs, 2 rooms
 [12300] Fur Dragon [12300-12349] (225-325) 5 mobs, 40 objs, 1 room
 [12350] Hoarfrost Serragon [12350-12399] (100-200) 9 mobs, 21 objs, 2 rooms

@@ -76,14 +76,17 @@ bool can_mount_in_room(char_data *ch, room_data *room) {
 	else if ((IS_COMPLETE(room) || ROOM_BLD_FLAGGED(room, BLD_CLOSED)) && !BLD_ALLOWS_MOUNTS(room)) {
 		ok = FALSE;
 	}
-	else if (DEEP_WATER_SECT(room) && !MOUNT_FLAGGED(ch, MOUNT_AQUATIC | MOUNT_WATERWALKING) && !EFFECTIVELY_FLYING(ch)) {
+	else if (DEEP_WATER_SECT(room) && !MOUNT_FLAGGED(ch, MOUNT_AQUATIC | MOUNT_WATERWALKING | MOUNT_FLYING) && !EFFECTIVELY_FLYING(ch)) {
 		ok = FALSE;
 	}
-	else if (!CAN_RIDE_WATERWALK_MOUNT(ch) && DEEP_WATER_SECT(room) && MOUNT_FLAGGED(ch, MOUNT_WATERWALKING) && !EFFECTIVELY_FLYING(ch)) {
+	else if (!CAN_RIDE_WATERWALK_MOUNT(ch) && DEEP_WATER_SECT(room) && MOUNT_FLAGGED(ch, MOUNT_WATERWALKING) && !MOUNT_FLAGGED(ch, MOUNT_FLYING)) {
 		// has a waterwalking mount, in deep water, but is missing the riding upgrade
 		ok = FALSE;
 	}
-	else if (!has_player_tech(ch, PTECH_RIDING_UPGRADE) && WATER_SECT(room) && !MOUNT_FLAGGED(ch, MOUNT_AQUATIC) && !EFFECTIVELY_FLYING(ch)) {
+	else if (WATER_SECT(room) && !((has_player_tech(ch, PTECH_RIDING_UPGRADE) && MOUNT_FLAGGED(ch, MOUNT_AQUATIC)) || (has_player_tech(ch, PTECH_RIDING_FLYING) && MOUNT_FLAGGED(ch, MOUNT_FLYING)))) {
+		ok = FALSE;
+	}
+	else if (MOUNT_FLAGGED(ch, MOUNT_AQUATIC) && !find_flagged_sect_within_distance_from_char(ch, SECTF_FRESH_WATER | SECTF_OCEAN, NOBITS, 1)) {
 		ok = FALSE;
 	}
 	

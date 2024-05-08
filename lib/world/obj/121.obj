@@ -220,8 +220,8 @@ R
 4 12102 0
 S
 #12112
-flower buds pink basket~
-a basket of pink flower buds~
+cloves flower buds pink basket~
+a basket of pink clove buds~
 A basket of pink flower buds sits here, infusing the air with the scent of cloves.~
    This basket of pink flower buds is quite aromatic and promises to add to a
 dish if properly prepared. You can process these buds into cloves.
@@ -337,13 +337,12 @@ A knobby root from a ginger plant, irregular in shape, sits here.~
    This is the edible portion of a ginger plant. You could combine it with a
 few more and plant your own or use it as is.
 ~
-3 gC a 0 0 9
+3 gC a 0 0 10
 0 0 0
 0 1444
 C
 75 75
 I 14 12119 100.00 4  # COMBINE: basket of knobby ginger roots
-O+ 1 6180
 R
 4 12102 0
 S
@@ -355,13 +354,12 @@ A basket of knobby ginger roots sits here.~
 represent the edible part of a ginger plant. You can process these roots into
 ginger.
 ~
-3 bgC a 0 0 6
+3 bgC a 0 0 7
 0 12119 0
 0 1444
 C
 75 75
 I 15 12118 100.00 4  # SEPARATE: knobby, irregularly-shaped ginger root
-O+ 1 6180
 R
 4 12102 0
 S
@@ -425,13 +423,13 @@ R
 4 12102 0
 S
 #12123
-saffron threads delicate tiny glass vial deep red~
-a tiny glass vial of delicate saffron threads~
-A tiny glass vial holding a few delicate threads of deep red saffron spice sits here.~
+saffron threads delicate tiny vial~
+a tiny vial of delicate saffron threads~
+A tiny vial holding a few delicate threads of deep red saffron spice sits here.~
    A little goes a long way with this strong spice, so there are only a few
 precious, delicate deep red threads within this little vial of saffron.
 ~
-3 g a 0 0 9
+3 g a 0 0 11
 0 0 0
 0 0
 C
@@ -556,9 +554,9 @@ A small pouch of cocoa powder sits here.~
    This pouch of cocoa is ready to be used in any number of desserts, or as a
 drink.
 ~
-3 gC a 0 0 9
+3 g a 0 0 11
 0 0 0
-0 1200
+0 0
 C
 75 75
 O+ 1 6183
@@ -566,6 +564,8 @@ R
 4 5619 0
 R
 4 5606 0
+R
+4 12102 0
 S
 #12131
 chocolate dark dense block~
@@ -662,11 +662,13 @@ A small onion has been dropped here.~
 petal-like layers. You could use it in some small recipe or combine it with a
 few more of its kind and plant it somewhere.
 ~
-6 gC a 0 0 3
+6 gC a 0 0 4
 2 0 0
 0 2160
 I 14 12136 100.00 4  # COMBINE: basket of onions
 O+ 1 6142
+R
+4 5619 0
 S
 #12136
 onions basket~

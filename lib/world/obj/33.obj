@@ -1353,7 +1353,7 @@ a small sack of sugar~
 A small sack of sugar has been left here.~
 You can use sugar for cooking.
 ~
-6 gE a 0 0 8
+6 glE a 0 0 9
 1 0 0
 0 8760
 C
@@ -1499,5 +1499,21 @@ C
 O+ 1 6242
 R
 4 5619 0
+S
+#3379
+powder chili envelope~
+an envelope of chili powder~
+An envelope of chili powder lies on the ground.~
+   The pungent red powder makes your nose burn if you get too close. This would
+be ideal for use in a recipe that requires a little kick.
+~
+3 g a 0 0 1
+0 0 0
+0 0
+O+ 1 6183
+R
+4 5606 0
+R
+4 12102 0
 S
 $

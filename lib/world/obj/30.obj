@@ -523,7 +523,7 @@ a basket of peppers~
 There is a basket of peppers on the ground.~
 You can plant peppers, cook food or brew them into poisons.
 ~
-3 bglC a 0 0 17
+3 bglC a 0 0 18
 0 3004 0
 7 504
 C
@@ -532,6 +532,8 @@ I 15 3035 100.00 4 e  # SEPARATE: ripe pepper
 O+ 1 6154
 R
 4 5215 0
+R
+4 12102 0
 S
 #3035
 pepper ripe~
@@ -1116,7 +1118,7 @@ a bundle of sugarcane~
 A bundle of sugarcane has been dropped here.~
 You can plant sugarcane or mill it into sugar.
 ~
-3 bC a 0 0 8
+3 bC a 0 0 10
 0 3072 0
 7 168
 C

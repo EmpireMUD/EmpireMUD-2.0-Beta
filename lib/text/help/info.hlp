@@ -71,7 +71,7 @@ The following things will speed up various chores:
    manufacture, mine, repair, play (music), excavate, pick, scrape, fillin,
    saw, quarry
 - Shovel: dig
-- Superior tool: chop, craft, forge, mine, saw, sew
+- Superior tool: chop, craft, forge, mine, process, saw, sew
 - Higher level tool: chop, fish, mine
 - Progression goals: excavate, prospect
 - Mastery abilities: forge, sew, crafts in general
@@ -854,7 +854,7 @@ Objects, rooms, and vehicles can all have extra descriptions.
 
 See also: look
 #
-FARMING CROPS ORCHARDS AGRICULTURE APPLES WHEAT CORN HOPS COTTON BARLEY PEACHES CHERRIES ORANGES RICE OLIVES PEAS GOURDS PLANTAINS TOMATOES BANANAS COCONUTS GRAPES PEPPERS POTATOES PLUMS STRAWBERRIES MANGOES BLUEBERRIES COFFEE OATS WATERMELONS
+FARMING CROPS ORCHARDS AGRICULTURE APPLES WHEAT CORN HOPS COTTON BARLEY PEACHES CHERRIES ORANGES RICE OLIVES PEAS GOURDS PLANTAINS TOMATOES BANANAS COCONUTS GRAPES PEPPERS POTATOES PLUMS STRAWBERRIES MANGOES BLUEBERRIES COFFEE OATS WATERMELONS ONIONS
 
 You can plant and manage crops in order to supply food and trade goods to your
 empire. The crops that grow in orchards can be picked; the rest are harvested.
@@ -867,9 +867,10 @@ Temperate crops (plains):
  &Y^^&Go&Y^&0  Apples              &Y^&oo&Y^^&0  Apricots             &Y::::&0  Barley
  &g%&Bo&g%%&0  Blueberries         &Y^^&Ro&Y^&0  Cherries             &Y^&to&Y^^&0  Coffee
  &giiii&0  Corn                &T,,,,&0  Garlic               &gxgxx&0  Grapes
- &g::::&0  Hops                &Tiiii&0  Oats                 &Y^o^^&0  Peaches
- &G&u....&0  Peas                &g^^&vo&g^&0  Plums                &gnnnn&0  Potatoes
- &gn&Rv&gnn&0  Strawberries        &Ro&g88&Ro&0  Tomatoes             &Y;;;;&0  Wheat
+ &g::::&0  Hops                &Tiiii&0  Oats                &g &uvvvv&0  Onions
+ &Y^o^^&0  Peaches             &G&u....&0  Peas                 &g^^&vo&g^&0  Plums
+ &gnnnn&0  Potatoes            &gn&Rv&gnn&0  Strawberries         &Ro&g88&Ro&0  Tomatoes
+ &Y;;;;&0  Wheat
 
 River crops (plains near river):
  &gmmom&0  Cucumbers           &g,,,,&0  Rice                 &yoooo&0  Squash
