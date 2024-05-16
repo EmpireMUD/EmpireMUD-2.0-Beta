@@ -7795,27 +7795,27 @@ char *simple_time_since(time_t when) {
 	diff = time(0) - when;
 	*output = '\0';
 	
-	if (diff > SECS_PER_REAL_YEAR && parts < 2) {
+	if (diff >= SECS_PER_REAL_YEAR && parts < 2) {
 		sprintf(output + strlen(output), "%*dy", parts ? 1 : 2, (int)(diff / SECS_PER_REAL_YEAR));
 		diff %= SECS_PER_REAL_YEAR;
 		++parts;
 	}
-	if (diff > SECS_PER_REAL_WEEK && parts < 2) {
+	if (diff >= SECS_PER_REAL_WEEK && parts < 2) {
 		sprintf(output + strlen(output), "%*dw", parts ? 1 : 2, (int)(diff / SECS_PER_REAL_WEEK));
 		diff %= SECS_PER_REAL_WEEK;
 		++parts;
 	}
-	if (diff > SECS_PER_REAL_DAY && parts < 2) {
+	if (diff >= SECS_PER_REAL_DAY && parts < 2) {
 		sprintf(output + strlen(output), "%*dd", parts ? 1 : 2, (int)(diff / SECS_PER_REAL_DAY));
 		diff %= SECS_PER_REAL_DAY;
 		++parts;
 	}
-	if (diff > SECS_PER_REAL_HOUR && parts < 2) {
+	if (diff >= SECS_PER_REAL_HOUR && parts < 2) {
 		sprintf(output + strlen(output), "%*dh", parts ? 1 : 2, (int)(diff / SECS_PER_REAL_HOUR));
 		diff %= SECS_PER_REAL_HOUR;
 		++parts;
 	}
-	if (diff > SECS_PER_REAL_MIN && parts < 2) {
+	if (diff >= SECS_PER_REAL_MIN && parts < 2) {
 		sprintf(output + strlen(output), "%*dm", parts ? 1 : 2, (int)(diff / SECS_PER_REAL_MIN));
 		diff %= SECS_PER_REAL_MIN;
 		++parts;
