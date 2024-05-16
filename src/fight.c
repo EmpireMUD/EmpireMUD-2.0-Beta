@@ -3236,6 +3236,14 @@ int damage(char_data *ch, char_data *victim, int dam, int attacktype, byte damty
 	if (GET_LEADER(ch) == victim) {
 		stop_follower(ch);	// don't allow following of people while fighting them
 	}
+	
+	// check companion, too
+	if (GET_COMPANION(victim) == ch) {
+		GET_COMPANION(victim) = NULL;
+	}
+	if (GET_COMPANION(ch) == victim) {
+		GET_COMPANION(ch) = NULL;
+	}
 
 	/* If the attacker is invisible, he becomes visible */
 	if (SHOULD_APPEAR(ch))
