@@ -652,7 +652,7 @@ void identify_obj_to_char(obj_data *obj, char_data *ch, bool simple) {
 	crop_data *cp;
 	int found;
 	double rating;
-	bool any, library, showed_level = FALSE;
+	bool any, library, any_store = FALSE, showed_level = FALSE;
 	
 	// sanity / don't bother
 	if (!obj || !ch || !ch->desc) {
@@ -757,6 +757,7 @@ void identify_obj_to_char(obj_data *obj, char_data *ch, bool simple) {
 		format_text(&temp, FORMAT_WIDE, ch->desc, MAX_STRING_LENGTH);
 		send_to_char(temp, ch);
 		free(temp);
+		any_store = TRUE;
 	}
 	
 	// other storage
@@ -774,7 +775,7 @@ void identify_obj_to_char(obj_data *obj, char_data *ch, bool simple) {
 		else if (OBJ_FLAGGED(obj, OBJ_NO_BASIC_STORAGE | OBJ_NO_WAREHOUSE) && (!proto || !OBJ_FLAGGED(proto, OBJ_NO_BASIC_STORAGE | OBJ_NO_WAREHOUSE))) {
 			msg_to_char(ch, "Storage location: none (modified object)\r\n");
 		}
-		else {
+		else if (!any_store) {
 			msg_to_char(ch, "Storage location: none (cannot be stored)\r\n");
 		}
 	}
