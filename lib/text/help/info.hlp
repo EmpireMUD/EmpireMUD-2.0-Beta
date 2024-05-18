@@ -494,6 +494,8 @@ currently speaking. Type 'speak' to see or change it. You can also use a
 different language for a single say/shout with #language-name. For example:
 > shout #english Hello!
 
+You can join or create new slash-channels with /join and leave with /leave.
+
 See also: TOGGLE, SAY, SLASH-CHANNELS, LANGUAGE
 #
 CHARISMA CHA
