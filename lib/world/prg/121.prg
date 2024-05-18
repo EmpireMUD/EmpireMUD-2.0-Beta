@@ -13,6 +13,7 @@ S
 The Baker's Journeyman~
    The empire's bakers have gained a deep respect for their leader as you have
 made the welfare and happiness of the citizenry your responsibility.
+   This goal requires the Family Recipes ability.
 ~
 4 2 0 30 cf
 K 7 10

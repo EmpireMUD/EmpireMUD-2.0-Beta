@@ -2306,10 +2306,7 @@ ACMD(do_gen_craft) {
 		// must call this after start_action() because it stores resources
 		extract_resources(ch, GET_CRAFT_RESOURCES(type), use_room, &GET_ACTION_RESOURCES(ch));
 		
-		if (GET_CRAFT_NAME(type)[strlen(GET_CRAFT_NAME(type))-1] == 's') {
-			msg_to_char(ch, "You start %s %s.\r\n", gen_craft_data[GET_CRAFT_TYPE(type)].verb, GET_CRAFT_NAME(type));
-		}
-		else if (GET_CRAFT_QUANTITY(type) > 1) {
+		if (GET_CRAFT_QUANTITY(type) > 1 || CRAFT_FLAGGED(type, CRAFT_SOME)) {
 			msg_to_char(ch, "You start %s some %s.\r\n", gen_craft_data[GET_CRAFT_TYPE(type)].verb, GET_CRAFT_NAME(type));
 		}
 		else {

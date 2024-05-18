@@ -1,7 +1,7 @@
 #12410
 crispy fish~
 12410 1
-3 293 h 6 -1 0 0
+3 293 hz 6 -1 0 0
 R
 6203 3 1 0
 S
@@ -126,7 +126,7 @@ S
 #12442
 seaweed salad~
 12442 1
-3 271 0 6 12407 f 0
+3 271 z 6 12407 f 0
 R
 12407 6 0 0
 R
@@ -176,7 +176,7 @@ S
 #12450
 heavy plated pantaloons~
 12450 1
-1 197 q 42 -1 0 0
+1 197 qz 42 -1 0 0
 R
 177 16 0 0
 R
@@ -193,7 +193,7 @@ S
 #12452
 goblin scullery pantaloons~
 12452 1
-4 199 q 24 -1 0 0
+4 199 qz 24 -1 0 0
 R
 176 16 0 0
 R
@@ -210,7 +210,7 @@ S
 #12454
 goblin sea-shaman pantaloons~
 12454 1
-4 199 q 24 -1 0 0
+4 199 qz 24 -1 0 0
 R
 176 16 0 0
 R
@@ -227,7 +227,7 @@ S
 #12456
 pirate boarding pantaloons~
 12456 1
-4 182 q 24 -1 0 0
+4 182 qz 24 -1 0 0
 R
 177 16 0 0
 R
@@ -244,7 +244,7 @@ S
 #12458
 goblin dress pantaloons~
 12458 1
-4 182 q 24 -1 0 0
+4 182 qz 24 -1 0 0
 R
 177 16 0 0
 R

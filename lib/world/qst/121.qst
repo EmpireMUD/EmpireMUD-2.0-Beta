@@ -53,22 +53,25 @@ kitchen.
 jellied eels, some fish and chips, a bowl of chili, chicken and dumplings, a
 shepher's pie, a hearty meatloaf, biscuits and gravy, a rich berry cobbler, and
 mom's fruit pie -- any fruit will do.
+   This task requires the Family Recipes ability.
 ~
    The baker is gaining respect for you by the recipe and tells you that soon
 enough, you should be ready to undertake your master's trials and earn the
 promised knowledge.
 ~
-7 0 75 0 -1
+9 0 75 0 -1
 A
 1 214
 P
-15 270 0 1 a
-P
 0 12100 0 1 a
+P
+9 6 0 75 a
 R
 6 12102 12102
 R
 13 12101 12101
+W
+15 270 0 1 a
 W
 2 3352 0 1 a
 W
@@ -104,23 +107,26 @@ front of your royal baker to prove your worthiness to be taught. You must make:
      - a mixed vegetable board
      - a extravagant dessert platter
 Be sure to make them at the bakery, where the baker can supervise.
+This task requires the Gourmet Chef ability.
 ~
    You have completed the quest. Beaming proudly at you, the baker recognizes
 you as a fellow master of the craft and rewards you.
 ~
-6 0 100 0 -1
+8 0 100 0 -1
 A
 1 214
 P
-15 271 0 1 a
-P
 0 12101 0 1 a
+P
+9 6 0 76 a
 R
 2 12138 1
 R
 2 12139 1
+W
+15 271 0 1 a
 W+
-11 0 0 5 -
+11 0 0 5 a
 Make all five feasts in front of the baker~
 Z
 1 214

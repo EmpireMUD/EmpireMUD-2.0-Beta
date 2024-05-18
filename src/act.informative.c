@@ -1409,7 +1409,12 @@ void list_one_char(char_data *i, char_data *ch, int num) {
 				// show crafting
 				craft_data *ctype = craft_proto(GET_ACTION_VNUM(i, 0));
 				if (ctype && strstr(gen_craft_data[GET_CRAFT_TYPE(ctype)].strings[GCD_LONG_DESC], "%s")) {
-					sprintf(buf1, "%s %s", AN(GET_CRAFT_NAME(ctype)), GET_CRAFT_NAME(ctype));
+					if (GET_CRAFT_QUANTITY(ctype) > 1 || CRAFT_FLAGGED(ctype, CRAFT_SOME)) {
+						sprintf(buf1, "some %s", GET_CRAFT_NAME(ctype));
+					}
+					else {
+						sprintf(buf1, "%s %s", AN(GET_CRAFT_NAME(ctype)), GET_CRAFT_NAME(ctype));
+					}
 					sprintf(buf, gen_craft_data[GET_CRAFT_TYPE(ctype)].strings[GCD_LONG_DESC], buf1);
 				}
 				else if (ctype) {

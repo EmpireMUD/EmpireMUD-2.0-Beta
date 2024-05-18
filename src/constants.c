@@ -63,7 +63,7 @@ void tog_pvp(char_data *ch);
 //// EMPIREMUD CONSTANTS /////////////////////////////////////////////////////
 
 // Shown on the "version" command and sent over MSSP
-const char *version = "EmpireMUD 2.0 beta 5.186";
+const char *version = "EmpireMUD 2.0 beta 5.187";
 const char *DG_SCRIPT_VERSION = "DG Scripts 1.0.12 e5.1.7";
 
 
@@ -2295,6 +2295,7 @@ const char *craft_flags[] = {
 	"UNDAMAGED-DISMANTLE-REFUND",
 	"FULL-DISMANTLE-REFUND",
 	"NO-BUILDCHECK",
+	"SOME",	// 25
 	"\n"
 };
 
@@ -2326,6 +2327,7 @@ const char *craft_flag_for_info[] = {
 	"",	// undamaged-dismantle-refund
 	"",	// full-dismantle-refund
 	"",	// no-buildcheck
+	"",	// some
 	"\n"
 };
 

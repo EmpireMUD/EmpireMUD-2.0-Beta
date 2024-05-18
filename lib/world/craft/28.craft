@@ -2,8 +2,6 @@
 imperial fox chain mail~
 2800 1
 1 197 q 42 -1 0 0
-B
-0 0 0
 L
 100
 R
@@ -23,8 +21,6 @@ S
 imperial fox helmet~
 2802 1
 1 197 q 42 -1 0 0
-B
-0 0 0
 L
 100
 R
@@ -41,9 +37,7 @@ S
 #2804
 imperial fox armguards~
 2804 1
-1 197 q 42 -1 0 0
-B
-0 0 0
+1 197 qz 42 -1 0 0
 L
 100
 R
@@ -61,8 +55,6 @@ S
 imperial fox shield~
 2806 1
 1 197 q 42 -1 0 0
-B
-0 0 0
 L
 100
 R
@@ -78,8 +70,6 @@ S
 heroic cerberus armor~
 2808 1
 1 197 q 42 -1 0 0
-B
-0 0 0
 L
 200
 R
@@ -101,8 +91,6 @@ S
 heroic cerberus helm~
 2810 1
 1 197 q 42 -1 0 0
-B
-0 0 0
 L
 200
 R
@@ -119,9 +107,7 @@ S
 #2812
 heroic cerberus vambraces~
 2812 1
-1 197 q 42 -1 0 0
-B
-0 0 0
+1 197 qz 42 -1 0 0
 L
 200
 R
@@ -139,8 +125,6 @@ S
 heroic cerberus shield~
 2814 1
 1 197 q 42 -1 0 0
-B
-0 0 0
 L
 200
 R
@@ -158,8 +142,6 @@ S
 imperial duelist's potion~
 2816 1
 6 124 hq 3 -1 0 0
-B
-0 0 0
 L
 175
 R

@@ -1965,7 +1965,7 @@ ACMD(do_dismiss) {
 	else if (!(vict = get_char_vis(ch, arg, NULL, FIND_CHAR_ROOM))) {
 		send_config_msg(ch, "no_person");
 	}
-	else if (!IS_NPC(vict) || GET_LEADER(vict) != ch || (!GET_COMPANION(vict) && !IS_MINIPET_OF(vict, ch))) {
+	else if (!IS_NPC(vict) || (GET_LEADER(vict) != ch && GET_COMPANION(vict) != ch) || (!GET_COMPANION(vict) && !IS_MINIPET_OF(vict, ch))) {
 		msg_to_char(ch, "You can only dismiss a companion or minipet.\r\n");
 	}
 	else if (FIGHTING(vict) || GET_POS(vict) < POS_SLEEPING) {
