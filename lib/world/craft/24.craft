@@ -2,8 +2,6 @@
 imperial eagle plate armor~
 2400 1
 1 197 q 42 -1 0 0
-B
-0 0 0
 L
 100
 R
@@ -21,8 +19,6 @@ S
 imperial eagle helm~
 2402 1
 1 197 q 42 -1 0 0
-B
-0 0 0
 L
 100
 R
@@ -37,9 +33,7 @@ S
 #2404
 imperial eagle vambraces~
 2404 1
-1 197 q 42 -1 0 0
-B
-0 0 0
+1 197 qz 42 -1 0 0
 L
 100
 R
@@ -55,8 +49,6 @@ S
 imperial eagle shield~
 2406 1
 1 197 q 42 -1 0 0
-B
-0 0 0
 L
 100
 R
@@ -70,8 +62,6 @@ S
 heroic griffin plate mail~
 2408 1
 1 197 q 42 -1 0 0
-B
-0 0 0
 L
 200
 R
@@ -91,8 +81,6 @@ S
 heroic griffin helm~
 2410 1
 1 197 q 42 -1 0 0
-B
-0 0 0
 L
 200
 R
@@ -107,9 +95,7 @@ S
 #2412
 heroic griffin bracers~
 2412 1
-1 197 q 42 -1 0 0
-B
-0 0 0
+1 197 qz 42 -1 0 0
 L
 200
 R
@@ -125,8 +111,6 @@ S
 heroic griffin shield~
 2414 1
 1 197 q 42 -1 0 0
-B
-0 0 0
 L
 200
 R
@@ -142,8 +126,6 @@ S
 imperial fortitude potion~
 2416 1
 6 124 hq 3 -1 0 0
-B
-0 0 0
 L
 175
 R

@@ -1,7 +1,7 @@
 #10308
 dragonscale leggings~
 10308 1
-4 199 hq 24 -1 0
+4 199 hqz 24 -1 0 0
 R
 10006 3 0 0
 R
@@ -14,7 +14,7 @@ S
 #10309
 dragonweave stockings~
 10309 1
-4 199 hq 24 -1 0
+4 199 hqz 24 -1 0 0
 R
 10006 3 0 0
 R
@@ -27,7 +27,7 @@ S
 #10310
 dragonplate breeches~
 10310 1
-1 197 hq 24 -1 0
+1 197 hqz 24 -1 0 0
 R
 10006 3 0 0
 R
@@ -40,7 +40,7 @@ S
 #10311
 dragonmail chaps~
 10311 1
-2 182 hq 24 -1 f
+2 182 hqz 24 -1 f 0
 R
 10006 3 0 0
 R
@@ -53,7 +53,7 @@ S
 #10340
 dragonfruit jam~
 10340 1
-3 293 h 15 10339 0
+3 293 hz 15 10339 0 0
 R
 10339 3 0 0
 R
@@ -62,7 +62,7 @@ S
 #10341
 dragonscale wristguard~
 10341 1
-1 197 q 30 -1 0
+1 197 q 30 -1 0 0
 R
 10006 3 0 0
 R
@@ -75,7 +75,7 @@ S
 #10343
 dragonscale bangles~
 10343 1
-2 199 q 30 -1 f
+2 199 qz 30 -1 f 0
 R
 10006 3 0 0
 R
@@ -86,7 +86,7 @@ S
 #10345
 dragonscale bracers~
 10345 1
-4 182 q 30 -1 0
+4 182 qz 30 -1 0 0
 R
 10006 3 0 0
 R
@@ -99,7 +99,7 @@ S
 #10347
 dragonscale saddle~
 10347 1
-4 182 q 30 -1 0
+4 182 q 30 -1 0 0
 R
 10006 2 0 0
 R

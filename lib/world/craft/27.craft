@@ -1,9 +1,7 @@
 #2700
 imperial raven robes~
 2700 1
-4 199 q 42 -1 0 0
-B
-0 0 0
+4 199 qz 42 -1 0 0
 L
 100
 R
@@ -25,8 +23,6 @@ S
 imperial raven crown~
 2702 1
 4 199 q 42 -1 0 0
-B
-0 0 0
 L
 100
 R
@@ -43,9 +39,7 @@ S
 #2704
 imperial raven wings~
 2704 1
-4 199 q 42 -1 0 0
-B
-0 0 0
+4 199 qz 42 -1 0 0
 L
 100
 R
@@ -63,8 +57,6 @@ S
 imperial raven effigy~
 2706 1
 2 203 aq 42 -1 0 0
-B
-0 0 0
 L
 100
 R
@@ -78,8 +70,6 @@ S
 heroic pegasus armor~
 2708 1
 4 199 q 42 -1 0 0
-B
-0 0 0
 L
 200
 R
@@ -97,8 +87,6 @@ S
 heroic pegasus hood~
 2710 1
 4 199 q 42 -1 0 0
-B
-0 0 0
 L
 200
 R
@@ -112,8 +100,6 @@ S
 heroic bands of the pegasus's blessing~
 2712 1
 4 199 q 42 -1 0 0
-B
-0 0 0
 L
 200
 R
@@ -127,8 +113,6 @@ S
 heroic pegasus shoe~
 2714 1
 1 203 q 42 -1 0 0
-B
-0 0 0
 L
 200
 R
@@ -144,8 +128,6 @@ S
 imperial magister's potion~
 2716 1
 6 124 hq 3 -1 0 0
-B
-0 0 0
 L
 175
 R
