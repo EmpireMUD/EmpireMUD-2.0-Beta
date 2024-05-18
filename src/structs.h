@@ -1025,6 +1025,7 @@ typedef struct vehicle_data vehicle_data;
 #define CRAFT_UNDAMAGED_DISMANTLE_REFUND  BIT(22)	// refunds all materials when dismantled while undamaged (instead of 90%)
 #define CRAFT_FULL_DISMANTLE_REFUND  BIT(23)	// refunds all materials when dismantled no matter what the health (instead of 20%-90%)
 #define CRAFT_NO_BUILDCHECK  BIT(24)	// this craft is ignored by the buildcheck command
+#define CRAFT_SOME  BIT(25)	// sentences say you're crafting "some <thing>" rather than "a <thing>"
 
 
 // For find_building_list_entry

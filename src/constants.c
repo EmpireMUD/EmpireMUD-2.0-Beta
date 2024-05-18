@@ -2295,6 +2295,7 @@ const char *craft_flags[] = {
 	"UNDAMAGED-DISMANTLE-REFUND",
 	"FULL-DISMANTLE-REFUND",
 	"NO-BUILDCHECK",
+	"SOME",	// 25
 	"\n"
 };
 
@@ -2326,6 +2327,7 @@ const char *craft_flag_for_info[] = {
 	"",	// undamaged-dismantle-refund
 	"",	// full-dismantle-refund
 	"",	// no-buildcheck
+	"",	// some
 	"\n"
 };
 
