@@ -7331,7 +7331,7 @@ ACMD(do_reboot) {
  * would be nice to have a syslog. -paul 12/8/2014
  */
 ACMD(do_reload) {
-	int iter;
+	int iter, val = 0;
 
 	one_argument(argument, arg);
 
@@ -7339,42 +7339,42 @@ ACMD(do_reload) {
 		load_intro_screens();
 		
 		for (iter = 0; iter < NUM_TEXT_FILE_STRINGS; ++iter) {
-			reload_text_string(iter);
+			val |= reload_text_string(iter);
 		}
 	}
 	else if (!str_cmp(arg, "wizlist")) {
-		reload_text_string(TEXT_FILE_WIZLIST);
+		val = reload_text_string(TEXT_FILE_WIZLIST);
 	}
 	else if (!str_cmp(arg, "godlist")) {
-		reload_text_string(TEXT_FILE_GODLIST);
+		val = reload_text_string(TEXT_FILE_GODLIST);
 	}
 	else if (!str_cmp(arg, "credits")) {
-		reload_text_string(TEXT_FILE_CREDITS);
+		val = reload_text_string(TEXT_FILE_CREDITS);
 	}
 	else if (!str_cmp(arg, "motd")) {
-		reload_text_string(TEXT_FILE_MOTD);
+		val = reload_text_string(TEXT_FILE_MOTD);
 	}
 	else if (!str_cmp(arg, "imotd")) {
-		reload_text_string(TEXT_FILE_IMOTD);
+		val = reload_text_string(TEXT_FILE_IMOTD);
 	}
 	else if (!str_cmp(arg, "news")) {
-		reload_text_string(TEXT_FILE_NEWS);
+		val = reload_text_string(TEXT_FILE_NEWS);
 	}
 	else if (!str_cmp(arg, "help")) {
-		reload_text_string(TEXT_FILE_HELP_SCREEN);
-		reload_text_string(TEXT_FILE_HELP_SCREEN_SCREENREADER);
+		val = reload_text_string(TEXT_FILE_HELP_SCREEN);
+		val |= reload_text_string(TEXT_FILE_HELP_SCREEN_SCREENREADER);
 	}
 	else if (!str_cmp(arg, "info")) {
-		reload_text_string(TEXT_FILE_INFO);
+		val = reload_text_string(TEXT_FILE_INFO);
 	}
 	else if (!str_cmp(arg, "policy")) {
-		reload_text_string(TEXT_FILE_POLICY);
+		val = reload_text_string(TEXT_FILE_POLICY);
 	}
 	else if (!str_cmp(arg, "handbook")) {
-		reload_text_string(TEXT_FILE_HANDBOOK);
+		val = reload_text_string(TEXT_FILE_HANDBOOK);
 	}
 	else if (!str_cmp(arg, "shortcredits")) {
-		reload_text_string(TEXT_FILE_SHORT_CREDITS);
+		val = reload_text_string(TEXT_FILE_SHORT_CREDITS);
 	}
 	else if (!str_cmp(arg, "intros")) {
 		load_intro_screens();
@@ -7404,9 +7404,14 @@ ACMD(do_reload) {
 		send_to_char("Unknown reload option.\r\n", ch);
 		return;
 	}
-
-	syslog(SYS_GC, GET_INVIS_LEV(ch), TRUE, "GC: %s has reloaded: %s", GET_NAME(ch), arg);
-	send_config_msg(ch, "ok_string");
+	
+	if (val >= 0) {
+		syslog(SYS_GC, GET_INVIS_LEV(ch), TRUE, "GC: %s has reloaded: %s", GET_NAME(ch), arg);
+		send_config_msg(ch, "ok_string");
+	}
+	else {
+		msg_to_char(ch, "Reload failed.\r\n");
+	}
 }
 
 

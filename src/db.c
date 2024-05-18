@@ -1199,7 +1199,7 @@ int file_to_string_alloc(const char *name, char **buf) {
 	
 	LL_FOREACH(descriptor_list, in_use) {
 		if (in_use->showstr_vector && *in_use->showstr_vector == *buf) {
-			syslog(SYS_GC, in_use->character ? GET_INVIS_LEV(in_use->character) : LVL_START_IMM, FALSE, "Warning: Failed to load '%s' due to open editor", name);
+			syslog(SYS_GC, in_use->character ? GET_INVIS_LEV(in_use->character) : LVL_START_IMM, FALSE, "Warning: Failed to load '%s' due to open paginator", name);
 			return (-1);
 		}
 	}
@@ -1308,8 +1308,9 @@ void init_text_file_strings(void) {
 * Reloads 1 text file, by type.
 *
 * @param int type Any TEXT_FILE_ type.
+* @return int The return code from file_to_string_alloc (-1 is error, 0 is success).
 */
-void reload_text_string(int type) {
+int reload_text_string(int type) {
 	if (type < 0 || type >= NUM_TEXT_FILE_STRINGS) {
 		log("SYSERR: reload_text_string called with invalid type %d", type);
 	}
@@ -1322,8 +1323,11 @@ void reload_text_string(int type) {
 			free(text_file_strings[type]);
 			text_file_strings[type] = NULL;
 		}
-		file_to_string_alloc(text_file_data[type].filename, &text_file_strings[type]);
+		return file_to_string_alloc(text_file_data[type].filename, &text_file_strings[type]);
 	}
+	
+	// otherwise (error)
+	return -1;
 }
 
 
