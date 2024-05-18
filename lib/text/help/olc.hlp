@@ -4258,6 +4258,7 @@ Available flags:
  &cFULL-DISMANTLE-REFUND&0 - refunds all materials when dismantled no matter
     what the health (instead of 20%-90%)
  &cNO-BUILDCHECK&0 - craft does not appear on the buildcheck command
+ &cSOME&0 - messages say you are crafting "some thing" rather than "a thing"
 
 Additional flags are available via the REQUIRESFUNCTION option.
 
