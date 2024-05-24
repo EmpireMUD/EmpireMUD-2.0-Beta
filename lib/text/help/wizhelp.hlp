@@ -1017,6 +1017,7 @@ account        PC      NAME         Sets account to match another character
 age            BOTH    NUMBER       Player age (and creation time)
 bonustrait     PC      MISC         Set bonus traits for player
 bonusexp       PC      NUMBER       Set daily bonus exp for the player
+bonusability   PC      MISC         Adds or removes bonus abilities
 coins          PC      MISC         Sets coins on-hand for player
 companion      PC      MISC         Sets a companion NPC on/off
 currency       PC      MISC         Sets amounts of adventure currencies

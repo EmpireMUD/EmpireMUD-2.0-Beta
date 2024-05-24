@@ -2081,6 +2081,7 @@ struct set_struct {
 		{ "currency", LVL_START_IMM, PC, MISC },
 		{ "companion", LVL_START_IMM, PC, MISC },
 		{ "unlockedarchetype", LVL_START_IMM, PC, MISC },
+		{ "bonusability", LVL_START_IMM, PC, MISC },
 
 		{ "strength",	LVL_START_IMM,	BOTH,	NUMBER },
 		{ "dexterity",	LVL_START_IMM,	BOTH,	NUMBER },
@@ -2854,6 +2855,46 @@ int perform_set(char_data *ch, char_data *vict, int mode, char *val_arg) {
 		else {
 			msg_to_char(ch, "Do you want to turn it on or off?\r\n");
 			return 0;
+		}
+	}
+	else if SET_CASE("bonusability") {
+		char vnum_arg[MAX_INPUT_LENGTH], onoff_arg[MAX_INPUT_LENGTH];
+		ability_data *abil;
+		
+		half_chop(val_arg, vnum_arg, onoff_arg);
+		
+		if (!*vnum_arg || !*onoff_arg) {
+			msg_to_char(ch, "Usage: set <name> bonusability <ability> <on | off>\r\n");
+			return 0;
+		}
+		if (!(abil = find_ability(vnum_arg))) {
+			msg_to_char(ch, "Invalid ability.\r\n");
+			return 0;
+		}
+		
+		if (!str_cmp(onoff_arg, "on")) {
+			add_bonus_ability(vict, ABIL_VNUM(abil));
+			assign_class_and_extra_abilities(vict, NULL, ROLE_NONE);
+			sprintf(output, "%s: added bonus ability %d %s.", GET_NAME(vict), ABIL_VNUM(abil), ABIL_NAME(abil));
+			
+			// notes when turned on
+			if (ABIL_IS_PURCHASE(abil) || ABIL_IS_SYNERGY(abil) || ABIL_IS_CLASS(abil)) {
+				msg_to_char(ch, "Warning: Ability [%d] %s is assigned to a skill or class.\r\n", ABIL_VNUM(abil), ABIL_NAME(abil));
+			}
+		}
+		else if (!str_cmp(onoff_arg, "off")) {
+			remove_bonus_ability(vict, ABIL_VNUM(abil));
+			assign_class_and_extra_abilities(vict, NULL, ROLE_NONE);
+			sprintf(output, "%s: removed bonus ability %d %s.", GET_NAME(vict), ABIL_VNUM(abil), ABIL_NAME(abil));
+		}
+		else {
+			msg_to_char(ch, "Do you want to turn it on or off?\r\n");
+			return 0;
+		}
+		
+		// extra notes
+		if (IS_IMMORTAL(vict)) {
+			msg_to_char(ch, "Warning: Immortals do not automatically gain or lose bonus abilities when assigned.\r\n");
 		}
 	}
 
