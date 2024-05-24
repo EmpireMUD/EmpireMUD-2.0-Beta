@@ -10139,9 +10139,7 @@ void olc_delete_ability(char_data *ch, any_vnum vnum) {
 		}
 		
 		remove_bonus_ability(chiter, vnum);	// if any
-		
-		// this doesn't seem right -- this is an ability vnum not a tech vnum
-		// remove_player_tech(chiter, vnum);
+		remove_player_tech(chiter, vnum);	// remove tech by ability
 	}
 	
 	// update olc editors
