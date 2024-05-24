@@ -392,6 +392,7 @@ Names and pronouns:
 When using field  - The variable returns:
 &cability(name)&0 - Returns whether or not the player knows the ability.
 &caction&0 - For players, the current timed action (e.g. crafting, digging).
+&cadd_bonus_ability(name/vnum)&0 - Grants a bonus ability to a player.
 &cadd_companion(vnum)&0 - Grants a mob as a companion (see COMPANION).
 &cadd_lastname(name)&0 - Adds a name to a player's lastname list.
 &cadd_learned(vnum)&0 - Adds a learnable recipe to the actor.
@@ -494,6 +495,7 @@ When using field  - The variable returns:
 &cgive_currency(vnum, amt)&0 - Gives an amount of adventure currency.
 &cgive_skill_reset(sk)&0 - Grants the player a free skill reset in that skill.
 &cgrt&0 - The actor's Greatness.
+&chas_bonus_ability(name/vnum)&0 - Determines if a player has a bonus ability.
 &chas_companion(vnum)&0 - Character has a given companion in their list.
 &chas_component(type, number)&0 - See if a player has a given generic component
    in their inventory. Example: %actor.has_component(6500, 10)%
@@ -599,6 +601,7 @@ When using field  - The variable returns:
 &cquest_triggered(vnum)&0 - If the player is on the quest and that quest has a
    'triggered' task, this gets the number of times it's been triggered.
 &creal_name&0 - Their real name (not morphed, not disguised).
+&cremove_bonus_ability(name/vnum)&0 - Revokes a bonus ability from a player.
 &cremove_companion(vnum)&0 - Takes away a companion mob. If it comes from an
    ability, the player will get a fresh copy of it automatically.
 &cremove_lastname(name)&0 - Removes a name from a player's lastname list.

@@ -50,8 +50,8 @@ int sort_class_abilities(struct class_ability *a, struct class_ability *b);
 
 /**
 * Checks that the player has the correct set of abilities from their class,
-* role, synergy, etc; and removes any they shouldn't have. This function
-* ignores immortals.
+* role, synergy, etc; and removes any they shouldn't have. This also applies
+* bonus abilities. This function ignores immortals.
 *
 * @param char_data *ch The player to check.
 * @param class_data *cls Optional: Any player class, or NULL to detect from the player.
@@ -74,6 +74,7 @@ void assign_class_and_extra_abilities(char_data *ch, class_data *cls, int role) 
 	struct class_ability *clab;
 	skill_data *skill;
 	any_vnum vnum;
+	struct player_bonus_ability *bonus_abil, *next_bonus_abil;
 
 	// simple sanity
 	if (IS_NPC(ch) || IS_IMMORTAL(ch)) {
@@ -189,7 +190,23 @@ void assign_class_and_extra_abilities(char_data *ch, class_data *cls, int role) 
 		}
 	}
 	
-	// STEP 4: assign/remove abilities
+	// STEP 4: check bonus abilities
+	HASH_ITER(hh, GET_BONUS_ABILITIES(ch), bonus_abil, next_bonus_abil) {
+		// STEP 4a: find/add an 'aat' entry
+		vnum = bonus_abil->vnum;
+		HASH_FIND_INT(hash, &vnum, aat);
+		if (!aat) {
+			CREATE(aat, struct assign_abil_t, 1);
+			aat->vnum = vnum;
+			aat->ptr = ability_proto(vnum);
+			HASH_ADD_INT(hash, vnum, aat);
+		}
+		
+		// player gets the ability
+		aat->can_have = TRUE;
+	}
+	
+	// STEP 5: assign/remove abilities
 	HASH_ITER(hh, hash, aat, next_aat) {
 		// remove any they shouldn't have
 		if (has_ability(ch, aat->vnum) && !aat->can_have) {

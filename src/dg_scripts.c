@@ -2968,7 +2968,21 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 							safe_snprintf(str, slen, "%s", action_data[GET_ACTION(c)].name);
 						}
 					}
-					
+					else if (!str_cmp(field, "add_bonus_ability")) {
+						if (subfield && *subfield) {
+							ability_data *ab = find_ability(subfield);
+							if (ab && !IS_NPC(c)) {
+								add_bonus_ability(c, ABIL_VNUM(ab));
+								safe_snprintf(str, slen, "1");
+							}
+							else {
+								safe_snprintf(str, slen, "0");
+							}
+						}
+						else {
+							safe_snprintf(str, slen, "0");
+						}
+					}
 					else if (!str_cmp(field, "add_companion")) {
 						if (!IS_NPC(c) && subfield && *subfield && isdigit(*subfield)) {
 							char_data *pet = mob_proto(atoi(subfield));
@@ -3872,7 +3886,21 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 					break;
 				}
 				case 'h': {	// char.h*
-					if (!str_cmp(field, "has_companion")) {
+					if (!str_cmp(field, "has_bonus_ability")) {
+						if (subfield && *subfield) {
+							ability_data *ab = find_ability(subfield);
+							if (ab) {
+								safe_snprintf(str, slen, (!IS_NPC(c) && has_bonus_ability(c, ABIL_VNUM(ab))) ? "1" : "0");
+							}
+							else {
+								safe_snprintf(str, slen, "0");
+							}
+						}
+						else {
+							safe_snprintf(str, slen, "0");
+						}
+					}
+					else if (!str_cmp(field, "has_companion")) {
 						if (!IS_NPC(c) && subfield && *subfield && isdigit(*subfield) && has_companion(c, atoi(subfield)) != NULL) {
 							strcpy(str, "1");
 						}
@@ -4505,6 +4533,21 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 				case 'r': {	// char.r*
 					if (!str_cmp(field, "real_name")) {
 						safe_snprintf(str, slen, "%s", PERS(c, c, TRUE));
+					}
+					else if (!str_cmp(field, "remove_bonus_ability")) {
+						if (subfield && *subfield) {
+							ability_data *ab = find_ability(subfield);
+							if (ab && !IS_NPC(c)) {
+								remove_bonus_ability(c, ABIL_VNUM(ab));
+								safe_snprintf(str, slen, "1");
+							}
+							else {
+								safe_snprintf(str, slen, "0");
+							}
+						}
+						else {
+							safe_snprintf(str, slen, "0");
+						}
 					}
 					else if (!str_cmp(field, "remove_companion")) {
 						if (!IS_NPC(c) && subfield && *subfield && isdigit(*subfield)) {

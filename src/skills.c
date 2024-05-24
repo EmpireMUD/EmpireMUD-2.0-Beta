@@ -1186,6 +1186,9 @@ int get_ability_points_spent(char_data *ch, any_vnum skill) {
 		if (!has_ability(ch, skab->vnum)) {
 			continue;	// does not have ability
 		}
+		if (has_bonus_ability(ch, skab->vnum)) {
+			continue;	// don't count bonus abilities as real purchases
+		}
 		
 		// found
 		++count;

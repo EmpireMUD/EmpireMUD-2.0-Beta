@@ -487,6 +487,57 @@ SHOW(show_author) {
 }
 
 
+SHOW(show_bonus_abilities) {
+	ability_data *abil;
+	char_data *plr = NULL;
+	size_t count;
+	bool file = FALSE;
+	struct player_bonus_ability *bonus_abil, *next_bonus_abil;
+	
+	argument = one_word(argument, arg);
+	skip_spaces(&argument);
+	
+	if (!*arg) {
+		msg_to_char(ch, "Usage: show bonusabilities <player> [keywords]\r\n");
+	}
+	else if (!(plr = find_or_load_player(arg, &file))) {
+		send_to_char("Show bonusabilities: There is no such player.\r\n", ch);
+	}
+	else {
+		if (*argument) {
+			build_page_display(ch, "Bonus abilities matching '%s' for %s:", argument, GET_NAME(plr));
+		}
+		else {
+			build_page_display(ch, "Bonus abilities for %s:", GET_NAME(plr));
+		}
+		
+		count = 0;
+		HASH_ITER(hh, GET_BONUS_ABILITIES(plr), bonus_abil, next_bonus_abil) {
+			if (!(abil = ability_proto(bonus_abil->vnum))) {
+				continue;	// no ability?
+			}
+			if (*argument && !multi_isname(argument, ABIL_NAME(abil))) {
+				continue;	// searched
+			}
+		
+			// show it
+			build_page_display(ch, " [%5d] %s", ABIL_VNUM(abil), ABIL_NAME(abil));
+			++count;
+		}
+	
+		if (!count) {
+			build_page_display_str(ch, "  none");
+		}
+	
+		send_page_display(ch);
+	}
+	
+	if (plr && file) {
+		free_char(plr);
+	}
+}
+
+
 SHOW(show_buildings) {
 	char part[256];
 	struct sector_index_type *idx;
@@ -3261,6 +3312,7 @@ struct show_struct {
 	// basic options
 	{ "ammotypes",		LVL_START_IMM,		show_ammotypes },
 	{ "author",			LVL_START_IMM,		show_author },
+	{ "bonusabilities",	LVL_START_IMM,		show_bonus_abilities },
 	{ "buildings",		LVL_START_IMM,		show_buildings },
 	{ "commons",		LVL_START_IMM,		show_commons },
 	{ "companions",		LVL_START_IMM,		show_companions },

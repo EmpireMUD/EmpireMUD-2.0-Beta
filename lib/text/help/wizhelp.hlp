@@ -1165,6 +1165,7 @@ Mode         Level    Description
 ------       ------   -------------
 &c ammotypes&0   Immort   The 'ammo type' setting for all bows and ammo.
 &c author&0      Immort   All books from a given author idnum.
+&c bonusabilities&0  Imm  The bonus abilities a player has acquired.
 &c buildings&0   Immort   Locations of buildings (vnum/name optional).
 &c commons&0     Immort   Players currently connected from duplicate sites.
 &c companions&0  Immort   A player's available companions.
@@ -1263,6 +1264,14 @@ These three show commands help manage the book system.
    Scripts can load a random lost book with "%load% book lost".
 
 See also: LOAD, %LOAD%
+#e
+"SHOW BONUSABILITIES" "SHOW BONUS ABILITIES"
+
+Usage:  show bonusabilities <player> [search phrase]
+
+Shows bonus abilities a player has acquired.
+
+See also: BONUS ABILITIES
 #e
 "SHOW COMPANIONS"
 

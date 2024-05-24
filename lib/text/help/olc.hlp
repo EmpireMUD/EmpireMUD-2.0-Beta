@@ -8853,6 +8853,8 @@ Available reward types:
  &cGRANT-PROGRESS&0 - Player's empire completes a progress goal.
  &cSTART-PROGRESS&0 - Player's empire starts a NO-AUTOSTART progress goal.
  &cUNLOCK-ARCHETYPE&0 - Grants the player/account a locked archetype for new chars.
+ &cBONUS-ABILITY&0 - Grants the player a bonus ability.
+ &cREMOVE-ABILITY&0 - Revokes a bonus ability from a player.
 
 Note: If you set empire coins as the reward, but the mob is not part of an
 empire, the player will receive misc coins instead.

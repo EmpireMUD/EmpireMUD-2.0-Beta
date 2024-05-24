@@ -755,6 +755,11 @@ void start_new_character(char_data *ch);
 int *summarize_weekly_playtime(empire_data *emp);
 void write_mail_to_file(FILE *fl, char_data *ch);
 
+// player bonus abilities
+void add_bonus_ability(char_data *ch, any_vnum ability_vnum);
+struct player_bonus_ability *has_bonus_ability(char_data *ch, any_vnum ability_vnum);
+void remove_bonus_ability(char_data *ch, any_vnum ability_vnum);
+
 // player equipment set
 int add_eq_set_to_char(char_data *ch, int set_id, char *name);
 void add_obj_to_eq_set(obj_data *obj, int set_id, int pos);

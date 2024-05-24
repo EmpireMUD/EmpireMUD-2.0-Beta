@@ -8879,6 +8879,8 @@ void olc_search_ability(char_data *ch, any_vnum vnum) {
 		// REQ_x: requirement search
 		any = find_requirement_in_list(QUEST_TASKS(quest), REQ_HAVE_ABILITY, vnum);
 		any |= find_requirement_in_list(QUEST_PREREQS(quest), REQ_HAVE_ABILITY, vnum);
+		any |= find_quest_reward_in_list(QUEST_REWARDS(quest), QR_BONUS_ABILITY, vnum);
+		any |= find_quest_reward_in_list(QUEST_REWARDS(quest), QR_REMOVE_ABILITY, vnum);
 		
 		if (any) {
 			++found;
@@ -10059,8 +10061,12 @@ void olc_delete_ability(char_data *ch, any_vnum vnum) {
 	
 	// update quests
 	HASH_ITER(hh, quest_table, quest, next_quest) {
+		// REQ_x:
 		found = delete_requirement_from_list(&QUEST_TASKS(quest), REQ_HAVE_ABILITY, vnum);
 		found |= delete_requirement_from_list(&QUEST_PREREQS(quest), REQ_HAVE_ABILITY, vnum);
+		// QR_x:
+		found |= delete_quest_reward_from_list(&QUEST_REWARDS(quest), QR_BONUS_ABILITY, vnum);
+		found |= delete_quest_reward_from_list(&QUEST_REWARDS(quest), QR_REMOVE_ABILITY, vnum);
 		
 		if (found) {
 			SET_BIT(QUEST_FLAGS(quest), QST_IN_DEVELOPMENT);
@@ -10132,7 +10138,10 @@ void olc_delete_ability(char_data *ch, any_vnum vnum) {
 			}
 		}
 		
-		remove_player_tech(chiter, vnum);
+		remove_bonus_ability(chiter, vnum);	// if any
+		
+		// this doesn't seem right -- this is an ability vnum not a tech vnum
+		// remove_player_tech(chiter, vnum);
 	}
 	
 	// update olc editors
@@ -10216,13 +10225,17 @@ void olc_delete_ability(char_data *ch, any_vnum vnum) {
 			found = delete_requirement_from_list(&PRG_TASKS(GET_OLC_PROGRESS(desc)), REQ_HAVE_ABILITY, vnum);
 		
 			if (found) {
-				SET_BIT(QUEST_FLAGS(GET_OLC_PROGRESS(desc)), PRG_IN_DEVELOPMENT);
+				SET_BIT(PRG_FLAGS(GET_OLC_PROGRESS(desc)), PRG_IN_DEVELOPMENT);
 				msg_to_desc(desc, "An ability used by the progression goal you're editing has been deleted.\r\n");
 			}
 		}
 		if (GET_OLC_QUEST(desc)) {
+			// REQ_x:
 			found = delete_requirement_from_list(&QUEST_TASKS(GET_OLC_QUEST(desc)), REQ_HAVE_ABILITY, vnum);
 			found |= delete_requirement_from_list(&QUEST_PREREQS(GET_OLC_QUEST(desc)), REQ_HAVE_ABILITY, vnum);
+			// QR_x:
+			found |= delete_quest_reward_from_list(&QUEST_REWARDS(GET_OLC_QUEST(desc)), QR_BONUS_ABILITY, vnum);
+			found |= delete_quest_reward_from_list(&QUEST_REWARDS(GET_OLC_QUEST(desc)), QR_REMOVE_ABILITY, vnum);
 		
 			if (found) {
 				SET_BIT(QUEST_FLAGS(GET_OLC_QUEST(desc)), QST_IN_DEVELOPMENT);

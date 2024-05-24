@@ -2690,6 +2690,8 @@ typedef enum {
 #define QR_GRANT_PROGRESS  12
 #define QR_START_PROGRESS  13
 #define QR_UNLOCK_ARCHETYPE  14
+#define QR_BONUS_ABILITY  15
+#define QR_REMOVE_ABILITY  16
 
 
 // indicates empire (rather than misc) coins for a reward
@@ -4723,6 +4725,13 @@ struct player_ability_data {
 };
 
 
+// extra abilities granted by quests, archetypes, and scripts
+struct player_bonus_ability {
+	any_vnum vnum;	// ability vnum
+	UT_hash_handle hh;	// player special data hash
+};
+
+
 // languages a player knows -- also used for empires
 struct player_language {
 	any_vnum vnum;	// vnum of the language (generic)
@@ -4896,6 +4905,7 @@ struct player_special_data {
 	any_vnum creation_archetype[NUM_ARCHETYPE_TYPES];	// array of creation choices
 	struct player_skill_data *skill_hash;
 	struct player_ability_data *ability_hash;
+	struct player_bonus_ability *bonus_abilities;	// additional abilities granted to the player
 	int current_skill_set;	// which skill set a player is currently in
 	bool can_gain_new_skills;	// not required to keep skills at zero
 	sh_int skill_level;  // levels computed based on skills above level 75

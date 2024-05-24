@@ -64,7 +64,7 @@ void tog_pvp(char_data *ch);
 
 // Shown on the "version" command and sent over MSSP
 const char *version = "EmpireMUD 2.0 beta 5.188";
-const char *DG_SCRIPT_VERSION = "DG Scripts 1.0.12 e5.1.7";
+const char *DG_SCRIPT_VERSION = "DG Scripts 1.0.12 e5.1.8";
 
 
 // data for the built-in game levels -- this adapts itself if you reduce the number of immortal levels
@@ -3755,6 +3755,8 @@ const char *quest_reward_types[] = {
 	"GRANT-PROGRESS",
 	"START-PROGRESS",
 	"UNLOCK-ARCHETYPE",
+	"BONUS-ABILITY",	// 15
+	"REMOVE-ABILITY",
 	"\n",
 };
 

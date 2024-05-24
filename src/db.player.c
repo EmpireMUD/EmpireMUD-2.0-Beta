@@ -31,6 +31,7 @@
 *   Account DB
 *   Core Player DB
 *   Delayed Update System
+*   Bonus Abilities
 *   Lastname Handlers
 *   loaded_player_hash For Offline Players
 *   Autowiz Wizlist Generator
@@ -1494,6 +1495,12 @@ char_data *read_player_from_file(FILE *fl, char *name, bool normal, char_data *c
 				else if (!strn_cmp(line, "Birth: ", 7)) {
 					ch->player.time.birth = atol(line + 7);
 				}
+				else if (!strn_cmp(line, "Bonus Ability: ", 15)) {
+					any_vnum bav = atoi(line + 15);
+					if (ability_proto(bav)) {
+						add_bonus_ability(ch, bav);
+					}
+				}
 				else if (!strn_cmp(line, "Bonus Exp: ", 11)) {
 					GET_DAILY_BONUS_EXPERIENCE(ch) = atoi(line + 11);
 				}
@@ -2576,6 +2583,7 @@ void update_player_index(player_index_data *index, char_data *ch) {
 void write_player_primary_data_to_file(FILE *fl, char_data *ch) {
 	struct affected_type *af;
 	struct player_ability_data *abil, *next_abil;
+	struct player_bonus_ability *bonus_abil, *next_bonus_abil;
 	struct player_skill_data *skill, *next_skill;
 	struct player_craft_data *pcd, *next_pcd;
 	struct player_currency *cur, *next_cur;
@@ -2750,6 +2758,9 @@ void write_player_primary_data_to_file(FILE *fl, char_data *ch) {
 		fprintf(fl, "Bad passwords: %d\n", GET_BAD_PWS(ch));
 	}
 	fprintf(fl, "Birth: %ld\n", ch->player.time.birth);
+	HASH_ITER(hh, GET_BONUS_ABILITIES(ch), bonus_abil, next_bonus_abil) {
+		fprintf(fl, "Bonus Ability: %d\n", bonus_abil->vnum);
+	}
 	fprintf(fl, "Bonus Exp: %d\n", GET_DAILY_BONUS_EXPERIENCE(ch));
 	fprintf(fl, "Bonus Traits: %s\n", bitv_to_alpha(GET_BONUS_TRAITS(ch)));
 	
@@ -3272,6 +3283,65 @@ void queue_delayed_update(char_data *ch, bitvector_t type) {
 			HASH_ADD_INT(char_delayed_update_list, id, cdu);
 		}
 		cdu->type |= type;
+	}
+}
+
+
+ //////////////////////////////////////////////////////////////////////////////
+//// BONUS ABILITIES /////////////////////////////////////////////////////////
+
+/**
+* Adds an ability to a player's bonus list (abilities that don't require
+* purchase to use).
+*
+* You should call assign_class_and_extra_abilities() after adding abilities.
+*
+* @param char_data *ch The player.
+* @param any_vnum ability_vnum The vnum of an ability to add.
+*/
+void add_bonus_ability(char_data *ch, any_vnum ability_vnum) {
+	struct player_bonus_ability *pba;
+	
+	if (!IS_NPC(ch) && ability_vnum != NOTHING && !has_bonus_ability(ch, ability_vnum)) {
+		CREATE(pba, struct player_bonus_ability, 1);
+		pba->vnum = ability_vnum;
+		HASH_ADD_INT(GET_BONUS_ABILITIES(ch), vnum, pba);
+		queue_delayed_update(ch, CDU_SAVE);
+	}
+}
+
+
+/**
+* Checks if a player has been granted a particular bonus ability.
+*
+* @param char_data *ch The player.
+* @param any_vnum ability_vnum The vnum of an ability to check.
+* @return struct player_bonus_ability* The bonus ability entry of found, or NULL if the player doesn't have it.
+*/
+struct player_bonus_ability *has_bonus_ability(char_data *ch, any_vnum ability_vnum) {
+	struct player_bonus_ability *pba;
+	
+	HASH_FIND_INT(GET_BONUS_ABILITIES(ch), &ability_vnum, pba);
+	return pba;	// may be NULL
+}
+
+
+/**
+* Removes an ability from a player's bonus list (abilities that don't require
+* purchase to use).
+*
+* You should call assign_class_and_extra_abilities() after removing abilities.
+*
+* @param char_data *ch The player.
+* @param any_vnum ability_vnum The vnum of an ability to remove.
+*/
+void remove_bonus_ability(char_data *ch, any_vnum ability_vnum) {
+	struct player_bonus_ability *pba;
+	
+	if (!IS_NPC(ch) && (pba = has_bonus_ability(ch, ability_vnum))) {
+		HASH_DEL(GET_BONUS_ABILITIES(ch), pba);
+		free(pba);
+		queue_delayed_update(ch, CDU_SAVE);
 	}
 }
 
