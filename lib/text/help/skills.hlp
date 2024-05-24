@@ -64,10 +64,13 @@ See also: ANIMAL HUSBANDRY, RIDE, STABLE
 #
 "BONUS ABILITY" "BONUS ABILITIES"
 
-Bonus abilities are abilities that are granted to a player by quests, scripts,
-archetypes, or by immortals. These abilities do not count as purchases and can
+Bonus abilities are additional abilities that are granted to a player, usually
+by quests or adventures. These abilities do not count as purchases and can
 be used in either skill swap. They are listed as "other abilities" when you
 type "skills".
+
+Note: Immortals do not automatically gain or lose bonus abilities from quests,
+scripts, or other sources.
 
 See also: ABILITY, SKILLS, SKILL SWAP
 #
