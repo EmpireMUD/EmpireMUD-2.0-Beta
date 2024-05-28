@@ -2887,6 +2887,7 @@ const char *mob_custom_types[] = {
 	"script4",	// 10
 	"script5",
 	"scavenge-corpse",
+	"consider-info",
 	"\n"
 };
 
@@ -2898,7 +2899,8 @@ const char *mob_custom_type_help =
 " Speak text: say say-day say-night\r\n"
 "&w Varying lond descriptions: long-desc&0\r\n"
 " Shown when a scavenger mob eats a corpse: scavenge-corpse\r\n"
-"&w Available for scripts: script1 script2 script3 script4 script5&0\r\n";
+"&w Shown when the player considers the mob: consider-info&0\r\n"
+" Available for scripts: script1 script2 script3 script4 script5\r\n";
 
 
 // MOB_MOVE_x: mob/vehicle move types

@@ -6214,6 +6214,7 @@ Message types:
  &cscript1&0 - &cscript5&0 - Can be referenced in scripts as
    %mob.custom(script1)%, %mob.custom(script1,0)%, etc.
  &cscavenge-corpse&0 - Shown when a SCAVENGER mob eats a corpse ($p is the corpse).
+ &cconsider-info&0 - Shown to a player when they 'consider' the mob.
 
 Note: The 'echo' and 'say' types share the same random interval, and the mob
 will only do one or the other each time.

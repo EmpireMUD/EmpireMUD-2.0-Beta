@@ -161,6 +161,11 @@ ACMD(do_consider) {
 		else {	// script-based
 			act("You cannot attack $N.", FALSE, ch, NULL, vict, TO_CHAR);
 		}
+		
+		// show this anyway
+		if (mob_has_custom_message(vict, MOB_CUSTOM_CONSIDER_INFO)) {
+			msg_to_char(ch, "%s\r\n", mob_get_custom_message(vict, MOB_CUSTOM_CONSIDER_INFO));
+		}
 	}
 	else {
 		// scale first
@@ -216,6 +221,11 @@ ACMD(do_consider) {
 		// no message sent?
 		if (!any) {
 			msg_to_char(ch, "You seem to be an even match.\r\n");
+		}
+		
+		// custom text
+		if (mob_has_custom_message(vict, MOB_CUSTOM_CONSIDER_INFO)) {
+			msg_to_char(ch, "%s\r\n", mob_get_custom_message(vict, MOB_CUSTOM_CONSIDER_INFO));
 		}
 		
 		// update spawn time: delay despawn due to interaction
