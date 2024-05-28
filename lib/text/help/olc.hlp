@@ -7137,6 +7137,7 @@ Message types:
  &center-portal-to-char&0 - Shown to the character when entering a portal ($p).
  &center-portal-to-room&0 - Shown to the room when char enters a portal ($p).
  &cexit-portal-to-room&0 - Shown to the room when char exits a portal ($p).
+ &cidentify-info&0 - Shown when the item is identified.
 
 Resource messages are shown when received from: butcher, chop, dig, fish,
 forage, harvest, mine, pick, quarry, scrape, shear, or skin. These use $p for

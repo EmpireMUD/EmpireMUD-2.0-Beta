@@ -1943,6 +1943,7 @@ typedef enum {
 #define OBJ_CUSTOM_ENTER_PORTAL_TO_CHAR  30
 #define OBJ_CUSTOM_ENTER_PORTAL_TO_ROOM  31
 #define OBJ_CUSTOM_EXIT_PORTAL_TO_ROOM  32
+#define OBJ_CUSTOM_IDENTIFY_INFO  33
 
 
 // RES_x: resource requirement types
