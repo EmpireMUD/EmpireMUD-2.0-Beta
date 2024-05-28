@@ -10676,6 +10676,9 @@ Player entering/exiting messages:
  &cexit-to-inside&0 - Shown to people inside a vehicle as a player exits.
  &cexit-to-outside&0 - Shown to people outside a vehicle as a player exits.
 
+Other messages:
+ &cidentify-info&0 - Shown when the vehicle is identified.
+
 See also: OLC VEHICLES, DOLLAR SIGN CODES
 #d
 "VEDIT DESIGNATE" "DESIGNATE FLAGS"

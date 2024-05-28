@@ -5594,6 +5594,7 @@ const char *veh_custom_types[] = {
 	"enter-to-outside",
 	"exit-to-inside",
 	"exit-to-outside",	// 5
+	"identify-info",
 	"\n"
 };
 

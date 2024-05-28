@@ -2820,6 +2820,7 @@ typedef enum {
 #define VEH_CUSTOM_ENTER_TO_OUTSIDE  3	// sent outside a vehicle when a player enters
 #define VEH_CUSTOM_EXIT_TO_INSIDE  4	// sent inside a vehicle when a player exits
 #define VEH_CUSTOM_EXIT_TO_OUTSIDE  5	// sent outside a vehicle when a player exits
+#define VEH_CUSTOM_IDENTIFY_INFO  6	// shown when a player identifies the vehicle
 
 
 // VSPEED_x: indicates the number of speed bonuses this vehicle gives to driving.

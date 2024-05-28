@@ -1246,6 +1246,10 @@ void identify_vehicle_to_char(vehicle_data *veh, char_data *ch) {
 	if (*buf) {
 		msg_to_char(ch, "Notes: %s\r\n", buf);
 	}
+	
+	if (veh_has_custom_message(veh, VEH_CUSTOM_IDENTIFY_INFO)) {
+		msg_to_char(ch, "%s\r\n", veh_get_custom_message(veh, VEH_CUSTOM_IDENTIFY_INFO));
+	}
 }
 
 
