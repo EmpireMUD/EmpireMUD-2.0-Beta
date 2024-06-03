@@ -1702,6 +1702,9 @@ same week, blue for same year, and red if it's over a year.
 
 If the account is not currently online, the most recent login time for the
 whole account is displayed at the bottom.
+
+This display also shows which empires the account's characters are in, and will
+indicate if they are the leader of any of those empires.
 #e
 "SHOW QUESTS"
 
