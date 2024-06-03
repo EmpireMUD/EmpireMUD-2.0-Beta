@@ -318,7 +318,7 @@ SHOW(show_resource) {
 SHOW(show_account) {
 	player_index_data *plr_index = NULL, *index, *next_index;
 	bool file = FALSE, loaded_file = FALSE;
-	char skills[MAX_STRING_LENGTH], ago_buf[256], *ago_ptr, color;
+	char empart[MAX_STRING_LENGTH], skills[MAX_STRING_LENGTH], ago_buf[256], *ago_ptr, color;
 	char_data *plr = NULL, *loaded;
 	int acc_id = NOTHING;
 	time_t last_online = -1;	// -1 here will indicate no data, -2 will indicate online now
@@ -377,8 +377,16 @@ SHOW(show_account) {
 		get_player_skill_string(loaded, skills, TRUE);
 		
 		if (GET_ACCOUNT(loaded)->id == acc_id) {
+			// empire portion
+			if (GET_LOYALTY(loaded)) {
+				safe_snprintf(empart, sizeof(empart), " - %s%s&0%s", EMPIRE_BANNER(GET_LOYALTY(loaded)), EMPIRE_NAME(GET_LOYALTY(loaded)), (GET_IDNUM(loaded) == EMPIRE_LEADER(GET_LOYALTY(loaded))) ? " (leader)" : "");
+			}
+			else {
+				*empart = '\0';
+			}
+			
 			if (!loaded_file) {
-				msg_to_char(ch, " &c[%d %s] %s  (online)&0\r\n", GET_COMPUTED_LEVEL(loaded), skills, GET_PC_NAME(loaded));
+				msg_to_char(ch, " &c[%d %s] %s  (online)&0%s\r\n", GET_COMPUTED_LEVEL(loaded), skills, GET_PC_NAME(loaded), empart);
 				last_online = ONLINE_NOW;
 			}
 			else {
@@ -399,7 +407,7 @@ SHOW(show_account) {
 					color = 'G';
 				}
 				
-				msg_to_char(ch, " [%d %s] %s - \t%c%s ago\t0\r\n", GET_LAST_KNOWN_LEVEL(loaded), skills, GET_PC_NAME(loaded), color, ago_ptr);
+				msg_to_char(ch, " [%d %s] %s - \t%c%s ago\t0%s\r\n", GET_LAST_KNOWN_LEVEL(loaded), skills, GET_PC_NAME(loaded), color, ago_ptr, empart);
 				if (last_online != ONLINE_NOW) {
 					last_online = MAX(last_online, GET_PREV_LOGON(loaded));
 				}
