@@ -747,7 +747,8 @@ Usage:  ready fireball
 
 While warriors fight with axes and thieves fight with daggers, most mages
 prefer to fight using magic. The Ready Fireball ability removes your main
-weapon and replaces your normal combat attacks with fireballs.
+weapon and replaces your normal combat attacks with fireballs, which you'll
+automatically conjure and throw as your attack.
 
 The strength of your fireball will be based on your Natural Magic skill level,
 unless you have a Natural Magic over 75, in which case it will be based on
@@ -758,6 +759,9 @@ If you wish to stop using fireballs, you can type "remove fireball" just like
 you would with a weapon.
 
 Gains experience when you ready fireballs, and when you attack with them.
+
+Your character only summons fireballs when throwing them in combat; this
+ability can't be used to light up an area or to light things on fire.
 #
 REJUVENATE
 

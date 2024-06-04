@@ -95,20 +95,21 @@ M
 As $n releases $p, it melts and drips to the ground in a puddle of blood.~
 S
 #1105
-fireball~
-a fireball~
+fireball readied~
+a readied fireball~
 A fireball is rolling around here.~
-You're ready to shoot fireballs.
+   You're ready to shoot fireballs. (You automatically create and throw
+fireballs as your regular attack in combat.)
 ~
 1 gmp ano 0 0 5
 0 1 16
 10 0
 M
 10
-The flame in your hand flickers and goes out.~
+You stop using fireballs as your attack.~
 M
 11
-The flame in $n's hand flickers and goes out.~
+$n is no longer using fireballs as $s attack.~
 S
 #1106
 orb light glowing~
