@@ -1174,8 +1174,8 @@ $n breathes fire at $N but $E dodges out of the way.
 #
 #
 You breathe fire at $N, but it doesn't seem to affect $M.
-$n breathes fire fire at you, but you can barely feel it.
-$n breathes fire fire at $N, who isn't even singed.
+$n breathes fire at you, but you can barely feel it.
+$n breathes fire at $N, who isn't even singed.
 
 M34 abc 0 +
 sling~
