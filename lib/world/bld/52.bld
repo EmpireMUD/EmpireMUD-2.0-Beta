@@ -296,7 +296,7 @@ A Sand Pit~
 4 0 dmn 0
 0 0 0 -1
 C
-dig~
+dig, retrieve, store~
 E
 pit sand down building around~
    The sand is fine-grained and soft, and it seems to go on forever. The pit is

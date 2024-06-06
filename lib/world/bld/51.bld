@@ -524,7 +524,7 @@ A Quarry~
 4 0 dmn 0
 0 0 0 -1
 C
-dig, quarry~
+dig, quarry, retrieve, store~
 E
 quarry stone pit down building around~
    As you approach the quarry, you are struck by the sheer size of the exposed
@@ -559,7 +559,7 @@ A Clay Pit~
 4 0 dmn 0
 0 0 0 -1
 C
-dig~
+dig, retrieve, store~
 E
 pit clay building around~
    As you approach the clay pit, the ground beneath your feet becomes softer
