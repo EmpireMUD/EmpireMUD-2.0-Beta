@@ -517,6 +517,48 @@ void show_ability_info(char_data *ch, ability_data *abil, ability_data *parent, 
 
 
 /**
+* Creates a list of available abilities that provide a given ptech, e.g. to
+* tell a player what ability they might need to do something.
+*
+* @param any_vnum tech The ptech number.
+* @param char *buffer A string to store the results in (as a comma-separated list).
+* @param size_t buffer_size The max size of the "buffer" parameter.
+* @return int The number of abilities found (0 for no matches).
+*/
+int ability_string_for_player_tech(any_vnum tech, char *buffer, size_t buffer_size) {
+	bool found;
+	int count = 0;
+	ability_data *abil, *next_abil;
+	struct ability_data_list *adl;
+	
+	*buffer = '\0';
+	
+	HASH_ITER(hh, ability_table, abil, next_abil) {
+		if (ABIL_ASSIGNED_SKILL(abil) && SKILL_FLAGGED(ABIL_ASSIGNED_SKILL(abil), SKILLF_IN_DEVELOPMENT)) {
+			continue;	// skip due to in-dev skill assignment
+		}
+		
+		// does it provide the tech
+		found = FALSE;
+		LL_FOREACH(ABIL_DATA(abil), adl) {
+			if (adl->type == ADL_PLAYER_TECH && adl->vnum == tech) {
+				found = TRUE;
+				break;
+			}
+		}
+		
+		// did it provide the tech?
+		if (found) {
+			safe_snprintf(buffer + strlen(buffer), buffer_size - strlen(buffer), "%s%s", (*buffer ? ", " : ""), ABIL_NAME(abil));
+			++count;
+		}
+	}
+	
+	return count;
+}
+
+
+/**
 * Builds the bit set for all hooks on the ability.
 *
 * @param ability_data *abil The ability to compile hooks for.
