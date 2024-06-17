@@ -298,6 +298,28 @@ bool check_solo_role(char_data *ch) {
 
 
 /**
+* Determines if an ability is attached to a class.
+*
+* @param class_data *cls The class to check.
+* @param any_vnum vnum Which ability to look for in the class list.
+* @return bool TRUE if the ability is assigned to the class; FALSE if not.
+*/
+bool find_ability_in_class(class_data *cls, any_vnum vnum) {
+	struct class_ability *clab;
+	
+	if (cls) {
+		LL_FOREACH(CLASS_ABILITIES(cls), clab) {
+			if (clab->vnum == vnum) {
+				return TRUE;
+			}
+		}
+	}
+	
+	return FALSE;	// otherwise
+}
+
+
+/**
 * Finds a class by ambiguous argument, which may be a vnum or a name.
 * Names are matched by exact match first, or by multi-abbrev.
 *

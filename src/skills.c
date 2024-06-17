@@ -2533,7 +2533,7 @@ bool can_wear_item(char_data *ch, obj_data *item, bool send_messages) {
 	if (tech != NOTHING && !has_player_tech(ch, tech)) {
 		if (send_messages) {
 			// build a list of abilities that offer this tech
-			if (ability_string_for_player_tech(tech, part, sizeof(part))) {
+			if (ability_string_for_player_tech(ch, tech, part, sizeof(part))) {
 				safe_snprintf(buf, sizeof(buf), "You don't have the correct ability to use $p (%s).", part);
 				act(buf, FALSE, ch, item, NULL, TO_CHAR);
 			}

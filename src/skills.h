@@ -519,7 +519,7 @@ ability_data *has_buff_ability_by_affect_and_affect_vnum(char_data *ch, bitvecto
 #define call_do_abil(name)  (name)(ch, abil, argument, level, vict, ovict, vvict, room_targ, data)
 
 // abilities.c prototypes
-int ability_string_for_player_tech(any_vnum tech, char *buffer, size_t buffer_size);
+int ability_string_for_player_tech(char_data *for_char, any_vnum tech, char *buffer, size_t buffer_size);
 void add_ability_gain_hook(char_data *ch, ability_data *abil);
 void add_all_gain_hooks(char_data *ch);
 void apply_ability_techs_to_player(char_data *ch, ability_data *abil);
@@ -559,6 +559,7 @@ void show_ability_info(char_data *ch, ability_data *abil, ability_data *parent, 
 extern class_data *class_table;
 extern class_data *sorted_classes;
 
+bool find_ability_in_class(class_data *cls, any_vnum vnum);
 class_data *find_class(char *argument);
 class_data *find_class_by_name(char *name);
 class_data *find_class_by_vnum(any_vnum vnum);
