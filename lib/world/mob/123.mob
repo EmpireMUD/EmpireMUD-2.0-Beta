@@ -293,7 +293,7 @@ M
 emote $n slaps $s tail against the ice again!~
 M
 8
-echo You struggle keep your footing as a crack spreads through the ice!~
+echo You struggle to keep your footing as a crack spreads through the ice!~
 M
 9
 emote $n coils around the vast, icy landscape.~
