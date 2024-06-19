@@ -90,11 +90,12 @@ A forgemaster with the Armorsmithing specialization can create many armors:
   bronze vambraces (arms)
   bronze buckler (shield)
   
-These armor pieces are all classified as Medium Armor.
+These armor pieces are all classified as Medium Armor and require the Medium
+Armor ability.
 
 Armorsmithing -> Sturdy Armors -> Imperial Armors
 
-See also: FORGE, WEAPONCRAFTING, STURDY ARMORS, IMPERIAL ARMORS
+See also: FORGE, WEAPONCRAFTING, STURDY ARMORS, IMPERIAL ARMORS, MEDIUM ARMOR
 #
 "ARTIFICER CRAFTS"
 
@@ -353,9 +354,11 @@ Misc:
   large backpack
   snakeskin saddle
 
+Armor from this set requires the Light Armor ability to use it.
+
 Rawhide Stitching -> Leatherworking -> Dangerous Leathers
 
-See also: LEATHERWORKING, MASTER TAILOR, RAWHIDE STITCHING, SEWING
+See also: LEATHERWORKING, MASTER TAILOR, RAWHIDE STITCHING, SEWING, LIGHT ARMOR
 #
 "DEADLY WEAPONS"
 
@@ -598,10 +601,14 @@ Heavy armor:
 
 Shield:
   ram shield
-  
+
+These armor pieces require the Medium Armor or Heavy Armor abilities. Shields
+require Shield Block.
+
 Armorsmithing -> Sturdy Armors -> Imperial Armors
 
-See also: FORGE, WEAPONCRAFTING, ARMORSMITHING, STURDY ARMORS
+See also: FORGE, WEAPONCRAFTING, ARMORSMITHING, STURDY ARMORS, SHIELD BLOCK,
+MEDIUM ARMOR, HEAVY ARMOR
 #
 "IRON BLADES"
 
@@ -677,10 +684,12 @@ Misc:
   leather backpack
   fine saddle
 
+Leather armor from this set requires the Light Armor ability to use it.
+
 Rawhide Stitching -> Leatherworking -> Dangerous Leathers
 
 See also: SEWING, DANGEROUS LEATHERS, MASTER TAILOR, RAWHIDE STITCHING, SKIN,
-  TAN
+  TAN, LIGHT ARMOR
 #
 "MAGIC ATTIRE" "MAGICAL ATTIRE" "MAGE ATTIRE"
 
@@ -696,9 +705,11 @@ You can make:
   furrowed sleeves
   apprentice shoes
 
+Most magical attire requires the Mage Armor ability.
+
 Sew -> Magic Attire -> Magical Vestments
 
-See also: MAGICAL VESTMENTS, MASTER TAILOR, WEAVE, SEW
+See also: MAGICAL VESTMENTS, MASTER TAILOR, WEAVE, SEW, MAGE ARMOR
 #
 "MAGICAL VESTMENTS" "MAGIC VESTMENTS" VESTMENTS
 
@@ -717,9 +728,11 @@ You can make:
   snakeskin robe (cooling)
   white fur robe (warm)
 
+Most magical vestments require the Mage Armor ability.
+
 Sew -> Magic Attire -> Magical Vestments
 
-See also: MAGIC ATTIRE, MASTER TAILOR, WEAVE, SEW
+See also: MAGIC ATTIRE, MASTER TAILOR, WEAVE, SEW, MAGE ARMOR
 #
 "MASTER BLACKSMITH"
 
@@ -907,6 +920,8 @@ Misc:
   rawhide boots
   rawhide knapsack
   rawhide saddle
+
+Rawhide gear does not require any armor ability to use it.
 
 Rawhide Stitching -> Leatherworking -> Dangerous Leathers
 
@@ -1107,12 +1122,14 @@ Sturdy Armors:
   mail coif (head)
   splint vambraces (arms)
   kite shield
-  
-These armor pieces are all classified as Medium Armor.
+
+These armor pieces are all classified as Medium Armor and require the Medium
+Armor ability. The kite shield requires Shield Block.
 
 Armorsmithing -> Sturdy Armors -> Imperial Armors
 
-See also: FORGE, WEAPONCRAFTING, ARMORSMITHING, IMPERIAL ARMORS
+See also: FORGE, WEAPONCRAFTING, ARMORSMITHING, IMPERIAL ARMORS, MEDIUM ARMOR,
+SHIELD BLOCK
 #
 TAN TANNING
 

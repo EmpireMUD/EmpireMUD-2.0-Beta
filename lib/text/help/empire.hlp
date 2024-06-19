@@ -122,7 +122,8 @@ Commands:
 - &ccity survey [-v]&0: Check the surrounding area for viability to found a
     city. Use the -v option for more detailed info.
 
-See also: CITY INFORMATION, CITY TRAITS, CLAIM, ESTABLISHING
+See also: CITY INFORMATION, CITY TRAITS, CLAIM, ESTABLISHING, CITY TYPES,
+CITY POINTS
 #
 "CITY INFORMATION" CITIES
 
@@ -152,7 +153,21 @@ no longer have enough city points available.
 See also: CITY COMMANDS, CITY TRAITS, CITY TYPES, ELOG, TECHNOLOGY, TERRITORY,
   WEALTH
 #
-"CITY TYPES" OUTPOST VILLAGE CAPITAL
+"CITY POINT" "CITY POINTS"
+
+A city point can be used to found a new city or make an existing city larger.
+You can view your available city points by typing "cities". Points are refunded
+if you downgrade or abandon a city, so you can use them again.
+
+Your maximum city size is also limited by your empire's progress. Goals such as
+Advanced Artisans raise your maximum city size.
+
+If you have more cities than your points allow, you will automatically lose
+some of them over time.
+
+See also: CITY COMMAND, CITY TYPES
+#
+"CITY TYPES" "CITY SIZE" OUTPOST VILLAGE CAPITAL
 
 Usage:  city <upgrade | downgrade> <city name/number>
 
@@ -168,11 +183,15 @@ only difference between them is the radius of the in-city territory.
 Some buildings, such as mines, count as in-city territory even in the outskirts
 (4x the normal distance from the city center).
 
+Your maximum city size is also limited by your empire's progress. Goals such as
+Advanced Artisans raise your maximum city size.
+
 You can see the city radius by typing 'toggle political' and looking at the
 background highlight (on the visual map), or you can use the 'mark' command
 to measure distances from the center if you're using a screenreader.
 
-See also: MARK, CITY INFORMATION, CITY COMMANDS, EXTENDED RADIUS, PROGRESSION
+See also: MARK, CITY INFORMATION, CITY COMMANDS, EXTENDED RADIUS, PROGRESSION,
+CITY POINT
 #
 CLAIM
 
