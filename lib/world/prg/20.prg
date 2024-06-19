@@ -321,8 +321,9 @@ W
 S
 #2040
 Trade Routes~
-   Your empire gains the ability to mint coins, build trading posts, make trade
-agreements with other empires, and use the import/export commands.
+   Your empire gains the ability to mint coins, build trading posts (with the
+Architect ability), make trade agreements with other empires, and use the
+import/export commands.
 ~
 2 2 10 0 b
 K 0 11
