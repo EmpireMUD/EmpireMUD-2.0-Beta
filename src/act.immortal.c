@@ -4104,83 +4104,83 @@ void do_stat_object(char_data *ch, obj_data *j, bool details) {
 	switch (GET_OBJ_TYPE(j)) {
 		case ITEM_BOOK: {
 			book_data *book = book_proto(GET_BOOK_ID(j));
-			build_page_display(ch, "Book: %d - %s", GET_BOOK_ID(j), (book ? BOOK_TITLE(book) : "unknown"));
+			build_page_display(ch, "Book: \tc%d\t0 - \ty%s\t0", GET_BOOK_ID(j), (book ? BOOK_TITLE(book) : "unknown"));
 			break;
 		}
 		case ITEM_POISON: {
-			build_page_display(ch, "Poison affect type: [%d] %s", GET_POISON_AFFECT(j), GET_POISON_AFFECT(j) != NOTHING ? get_generic_name_by_vnum(GET_POISON_AFFECT(j)) : "not custom");
-			build_page_display(ch, "Charges remaining: %d", GET_POISON_CHARGES(j));
+			build_page_display(ch, "Poison affect type: [\tc%d\t0] \ty%s\t0", GET_POISON_AFFECT(j), GET_POISON_AFFECT(j) != NOTHING ? get_generic_name_by_vnum(GET_POISON_AFFECT(j)) : "not custom");
+			build_page_display(ch, "Charges remaining: \tc%d\t0", GET_POISON_CHARGES(j));
 			break;
 		}
 		case ITEM_RECIPE: {
 			craft_data *cft = craft_proto(GET_RECIPE_VNUM(j));
-			build_page_display(ch, "Teaches craft: %d %s (%s)", GET_RECIPE_VNUM(j), cft ? GET_CRAFT_NAME(cft) : "UNKNOWN", cft ? craft_types[GET_CRAFT_TYPE(cft)] : "?");
+			build_page_display(ch, "Teaches craft: \tc%d \ty%s\t0 (%s)", GET_RECIPE_VNUM(j), cft ? GET_CRAFT_NAME(cft) : "UNKNOWN", cft ? craft_types[GET_CRAFT_TYPE(cft)] : "?");
 			break;
 		}
 		case ITEM_WEAPON:
-			build_page_display(ch, "Speed: %.2f, Damage: %d (%s+%.2f base dps)", get_weapon_speed(j), GET_WEAPON_DAMAGE_BONUS(j), (IS_MAGIC_ATTACK(GET_WEAPON_TYPE(j)) ? "Intelligence" : "Strength"), get_base_dps(j));
-			build_page_display(ch, "Damage type: %d %s (%s/%s)", GET_WEAPON_TYPE(j), get_attack_name_by_vnum(GET_WEAPON_TYPE(j)), weapon_types[get_attack_weapon_type_by_vnum(GET_WEAPON_TYPE(j))], damage_types[get_attack_damage_type_by_vnum(GET_WEAPON_TYPE(j))]);
+			build_page_display(ch, "Speed: \tc%.2f\t0, Damage: \tc%d\t0 (%s+%.2f base dps)", get_weapon_speed(j), GET_WEAPON_DAMAGE_BONUS(j), (IS_MAGIC_ATTACK(GET_WEAPON_TYPE(j)) ? "Intelligence" : "Strength"), get_base_dps(j));
+			build_page_display(ch, "Damage type: \tc%d \ty%s\t0 (%s/%s)", GET_WEAPON_TYPE(j), get_attack_name_by_vnum(GET_WEAPON_TYPE(j)), weapon_types[get_attack_weapon_type_by_vnum(GET_WEAPON_TYPE(j))], damage_types[get_attack_damage_type_by_vnum(GET_WEAPON_TYPE(j))]);
 			break;
 		case ITEM_ARMOR:
-			build_page_display(ch, "Armor type: %s", armor_types[GET_ARMOR_TYPE(j)]);
+			build_page_display(ch, "Armor type: \ty%s\t0", armor_types[GET_ARMOR_TYPE(j)]);
 			break;
 		case ITEM_CONTAINER:
-			build_page_display(ch, "Holds: %d items", GET_MAX_CONTAINER_CONTENTS(j));
+			build_page_display(ch, "Holds: \tc%d\t0 items", GET_MAX_CONTAINER_CONTENTS(j));
 
 			sprintbit(GET_CONTAINER_FLAGS(j), container_bits, buf, TRUE);
-			build_page_display(ch, "Flags: %s", buf);
+			build_page_display(ch, "Flags: \tg%s\t0", buf);
 			break;
 		case ITEM_DRINKCON:
-			build_page_display(ch, "Contains: %d/%d drinks of %s", GET_DRINK_CONTAINER_CONTENTS(j), GET_DRINK_CONTAINER_CAPACITY(j), get_generic_string_by_vnum(GET_DRINK_CONTAINER_TYPE(j), GENERIC_LIQUID, GSTR_LIQUID_NAME));
+			build_page_display(ch, "Contains: \tc%d\t0/\tc%d\t0 drinks of \ty%s\t0", GET_DRINK_CONTAINER_CONTENTS(j), GET_DRINK_CONTAINER_CAPACITY(j), get_generic_string_by_vnum(GET_DRINK_CONTAINER_TYPE(j), GENERIC_LIQUID, GSTR_LIQUID_NAME));
 			break;
 		case ITEM_FOOD:
-			build_page_display(ch, "Fills for: %d hour%s", GET_FOOD_HOURS_OF_FULLNESS(j), PLURAL(GET_FOOD_HOURS_OF_FULLNESS(j)));
+			build_page_display(ch, "Fills for: \tc%d\t0 hour%s", GET_FOOD_HOURS_OF_FULLNESS(j), PLURAL(GET_FOOD_HOURS_OF_FULLNESS(j)));
 			break;
 		case ITEM_CORPSE:
 			line = build_page_display(ch, "Corpse of: ");
 
 			if (IS_NPC_CORPSE(j)) {
-				append_page_display_line(line, "[%d] %s", GET_CORPSE_NPC_VNUM(j), get_mob_name_by_proto(GET_CORPSE_NPC_VNUM(j), FALSE));
+				append_page_display_line(line, "[\tc%d\t0] \ty%s\t0", GET_CORPSE_NPC_VNUM(j), get_mob_name_by_proto(GET_CORPSE_NPC_VNUM(j), FALSE));
 			}
 			else if (IS_PC_CORPSE(j)) {
-				append_page_display_line(line, "[%d] %s", GET_CORPSE_PC_ID(j), (index = find_player_index_by_idnum(GET_CORPSE_PC_ID(j))) ? index->fullname : "a player");
+				append_page_display_line(line, "[\tc%d\t0] \ty%s\t0", GET_CORPSE_PC_ID(j), (index = find_player_index_by_idnum(GET_CORPSE_PC_ID(j))) ? index->fullname : "a player");
 			}
 			else {
-				append_page_display_line(line, "unknown");
+				append_page_display_line(line, "\tyunknown\t0");
 			}
 			
 			sprintbit(GET_CORPSE_FLAGS(j), corpse_flags, buf, TRUE);
-			build_page_display(ch, "Corpse flags: %s", buf);
-			build_page_display(ch, "Corpse size: %s", size_types[GET_CORPSE_SIZE(j)]);
+			build_page_display(ch, "Corpse flags: \tg%s\t0", buf);
+			build_page_display(ch, "Corpse size: \ty%s\t0", size_types[GET_CORPSE_SIZE(j)]);
 			break;
 		case ITEM_COINS: {
-			build_page_display(ch, "Amount: %s", money_amount(real_empire(GET_COINS_EMPIRE_ID(j)), GET_COINS_AMOUNT(j)));
+			build_page_display(ch, "Amount: \ty%s\t0", money_amount(real_empire(GET_COINS_EMPIRE_ID(j)), GET_COINS_AMOUNT(j)));
 			break;
 		}
 		case ITEM_CURRENCY: {
-			build_page_display(ch, "Amount: %d %s", GET_CURRENCY_AMOUNT(j), get_generic_string_by_vnum(GET_CURRENCY_VNUM(j), GENERIC_CURRENCY, WHICH_CURRENCY(GET_CURRENCY_AMOUNT(j))));
+			build_page_display(ch, "Amount: \tc%d \ty%s\t0", GET_CURRENCY_AMOUNT(j), get_generic_string_by_vnum(GET_CURRENCY_VNUM(j), GENERIC_CURRENCY, WHICH_CURRENCY(GET_CURRENCY_AMOUNT(j))));
 			break;
 		}
 		case ITEM_MISSILE_WEAPON:
-			build_page_display(ch, "Speed: %.2f, Damage: %d (%s+%.2f base dps)", get_weapon_speed(j), GET_MISSILE_WEAPON_DAMAGE(j), (IS_MAGIC_ATTACK(GET_MISSILE_WEAPON_TYPE(j)) ? "Intelligence" : "Strength"), get_base_dps(j));
-			build_page_display(ch, "Damage type: %s", get_attack_name_by_vnum(GET_MISSILE_WEAPON_TYPE(j)));
-			build_page_display(ch, "Ammo type: %c", 'A' + GET_MISSILE_WEAPON_AMMO_TYPE(j));
+			build_page_display(ch, "Speed: \tc%.2f\t0, Damage: \tc%d\t0 (%s+%.2f base dps)", get_weapon_speed(j), GET_MISSILE_WEAPON_DAMAGE(j), (IS_MAGIC_ATTACK(GET_MISSILE_WEAPON_TYPE(j)) ? "Intelligence" : "Strength"), get_base_dps(j));
+			build_page_display(ch, "Damage type: \ty%s\t0", get_attack_name_by_vnum(GET_MISSILE_WEAPON_TYPE(j)));
+			build_page_display(ch, "Ammo type: \ty%c\t0", 'A' + GET_MISSILE_WEAPON_AMMO_TYPE(j));
 			break;
 		case ITEM_AMMO:
 			if (GET_AMMO_QUANTITY(j) > 0) {
-				build_page_display(ch, "Quantity: %d", GET_AMMO_QUANTITY(j));
+				build_page_display(ch, "Quantity: \tc%d\t0", GET_AMMO_QUANTITY(j));
 			}
 			if (GET_AMMO_DAMAGE_BONUS(j) > 0) {
-				build_page_display(ch, "Damage: %+d", GET_AMMO_DAMAGE_BONUS(j));
+				build_page_display(ch, "Damage: \tc%+d\t0", GET_AMMO_DAMAGE_BONUS(j));
 			}
-			build_page_display(ch, "Ammo type: %c", 'A' + GET_AMMO_TYPE(j));
+			build_page_display(ch, "Ammo type: \ty%c\t0", 'A' + GET_AMMO_TYPE(j));
 			if (GET_OBJ_AFF_FLAGS(j) || GET_OBJ_APPLIES(j)) {
 				generic_data *aftype = find_generic(GET_OBJ_VNUM(j), GENERIC_AFFECT);
-				build_page_display(ch, "Debuff name: %s", aftype ? GEN_NAME(aftype) : get_generic_name_by_vnum(ATYPE_RANGED_WEAPON));
+				build_page_display(ch, "Debuff name: \ty%s\t0", aftype ? GEN_NAME(aftype) : get_generic_name_by_vnum(ATYPE_RANGED_WEAPON));
 			}
 			break;
 		case ITEM_PACK: {
-			build_page_display(ch, "Adds inventory space: %d", GET_PACK_CAPACITY(j));
+			build_page_display(ch, "Adds inventory space: \tc%d\t0", GET_PACK_CAPACITY(j));
 			break;
 		}
 		case ITEM_PORTAL:
@@ -4188,15 +4188,15 @@ void do_stat_object(char_data *ch, obj_data *j, bool details) {
 				line = build_page_display(ch, "Portal destination: ");
 				room = real_room(GET_PORTAL_TARGET_VNUM(j));
 				if (!room) {
-					append_page_display_line(line, "None");
+					append_page_display_line(line, "\tyNone\t0 (\tc%d\t0)", GET_PORTAL_TARGET_VNUM(j));
 				}
 				else {
-					append_page_display_line(line, "%d - %s", GET_PORTAL_TARGET_VNUM(j), get_room_name(room, FALSE));
+					append_page_display_line(line, "\tc%d\t0 - \tc%s\t0", GET_PORTAL_TARGET_VNUM(j), get_room_name(room, FALSE));
 				}
 			}
 			else {
 				// vstat -- just show target
-				build_page_display(ch, "Portal destination: %d", GET_PORTAL_TARGET_VNUM(j));
+				build_page_display(ch, "Portal destination: \tc%d\t0", GET_PORTAL_TARGET_VNUM(j));
 			}
 			break;
 		case ITEM_PAINT: {
@@ -4206,26 +4206,26 @@ void do_stat_object(char_data *ch, obj_data *j, bool details) {
 			break;
 		}
 		case ITEM_POTION: {
-			build_page_display(ch, "Potion affect type: [%d] %s", GET_POTION_AFFECT(j), GET_POTION_AFFECT(j) != NOTHING ? get_generic_name_by_vnum(GET_POTION_AFFECT(j)) : "not custom");
-			build_page_display(ch, "Potion cooldown: [%d] %s, %d second%s", GET_POTION_COOLDOWN_TYPE(j), GET_POTION_COOLDOWN_TYPE(j) != NOTHING ? get_generic_name_by_vnum(GET_POTION_COOLDOWN_TYPE(j)) : "no cooldown", GET_POTION_COOLDOWN_TIME(j), PLURAL(GET_POTION_COOLDOWN_TIME(j)));
+			build_page_display(ch, "Potion affect type: [\tc%d\t0] \ty%s\t0", GET_POTION_AFFECT(j), GET_POTION_AFFECT(j) != NOTHING ? get_generic_name_by_vnum(GET_POTION_AFFECT(j)) : "not custom");
+			build_page_display(ch, "Potion cooldown: [\tc%d\t0] \ty%s\t0, \tc%d\t0 second%s", GET_POTION_COOLDOWN_TYPE(j), GET_POTION_COOLDOWN_TYPE(j) != NOTHING ? get_generic_name_by_vnum(GET_POTION_COOLDOWN_TYPE(j)) : "no cooldown", GET_POTION_COOLDOWN_TIME(j), PLURAL(GET_POTION_COOLDOWN_TIME(j)));
 			break;
 		}
 		case ITEM_WEALTH: {
 			sprintbit(GET_WEALTH_MINT_FLAGS(j), mint_flags, buf, TRUE);
-			build_page_display(ch, "Wealth value: \ts%d\t0, flags: \tc%s\t0", GET_WEALTH_VALUE(j), buf);
+			build_page_display(ch, "Wealth value: \tc%d\t0, flags: \tg%s\t0", GET_WEALTH_VALUE(j), buf);
 			break;
 		}
 		case ITEM_LIGHTER: {
 			if (GET_LIGHTER_USES(j) == UNLIMITED) {
-				build_page_display(ch, "Lighter uses: unlimited");
+				build_page_display(ch, "Lighter uses: \tsunlimited\t0");
 			}
 			else {
-				build_page_display(ch, "Lighter uses: %d", GET_LIGHTER_USES(j));
+				build_page_display(ch, "Lighter uses: \tc%d\t0", GET_LIGHTER_USES(j));
 			}
 			break;
 		}
 		case ITEM_MINIPET: {
-			build_page_display(ch, "Minipet: [%d] %s", GET_MINIPET_VNUM(j), get_mob_name_by_proto(GET_MINIPET_VNUM(j), FALSE));
+			build_page_display(ch, "Minipet: [\tc%d\t0] \ty%s\t0", GET_MINIPET_VNUM(j), get_mob_name_by_proto(GET_MINIPET_VNUM(j), FALSE));
 			break;
 		}
 		case ITEM_LIGHT: {
@@ -4236,18 +4236,18 @@ void do_stat_object(char_data *ch, obj_data *j, bool details) {
 				safe_snprintf(part, sizeof(part), "%d hour%s remaining", GET_LIGHT_HOURS_REMAINING(j), PLURAL(GET_LIGHT_HOURS_REMAINING(j)));
 			}
 			sprintbit(GET_LIGHT_FLAGS(j), light_flags, buf, TRUE);
-			build_page_display(ch, "Light: \tc%s\t0 (\tc%s\t0), flags: \tc%s\t0", part, (GET_LIGHT_IS_LIT(j) ? "lit" : "unlit"), buf);
+			build_page_display(ch, "Light: \tc%s\t0 (\tc%s\t0), flags: \tg%s\t0", part, (GET_LIGHT_IS_LIT(j) ? "lit" : "unlit"), buf);
 			break;
 		}
 		default:
-			build_page_display(ch, "Values 0-2: [&g%d&0] [&g%d&0] [&g%d&0]", GET_OBJ_VAL(j, 0), GET_OBJ_VAL(j, 1), GET_OBJ_VAL(j, 2));
+			build_page_display(ch, "Values 0-2: [\tg%d\t0] [\tg%d\t0] [\tg%d\t0]", GET_OBJ_VAL(j, 0), GET_OBJ_VAL(j, 1), GET_OBJ_VAL(j, 2));
 			break;
 	}
 	
 	// data that isn't type-based:
 	if (OBJ_FLAGGED(j, OBJ_PLANTABLE) && (cp = crop_proto(GET_OBJ_VAL(j, VAL_FOOD_CROP_TYPE)))) {
 		ordered_sprintbit(GET_CROP_CLIMATE(cp), climate_flags, climate_flags_order, CROP_FLAGGED(cp, CROPF_ANY_LISTED_CLIMATE) ? TRUE : FALSE, buf);
-		build_page_display(ch, "Plants [%d] %s (%s%s).", GET_OBJ_VAL(j, VAL_FOOD_CROP_TYPE), GET_CROP_NAME(cp), GET_CROP_CLIMATE(cp) ? buf : "any climate", (CROP_FLAGGED(cp, CROPF_REQUIRES_WATER) ? "; must be near water" : ""));
+		build_page_display(ch, "Plants [\tc%d\t0] \ty%s\t0 (%s%s).", GET_OBJ_VAL(j, VAL_FOOD_CROP_TYPE), GET_CROP_NAME(cp), GET_CROP_CLIMATE(cp) ? buf : "any climate", (CROP_FLAGGED(cp, CROPF_REQUIRES_WATER) ? "; must be near water" : ""));
 	}
 
 	/*
