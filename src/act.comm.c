@@ -2363,7 +2363,10 @@ ACMD(do_speak) {
 			}
 			
 			// show from adventure?
-			if (GEN_FLAGGED(gen, GEN_SHOW_ADVENTURE) && (adv = get_adventure_for_vnum(lang->vnum))) {
+			if (GET_CURRENCY_CUSTOM_ORIGIN(gen)) {
+				safe_snprintf(adv_part, sizeof(adv_part), " (%s)", GET_CURRENCY_CUSTOM_ORIGIN(gen));
+			}
+			else if (GEN_FLAGGED(gen, GEN_SHOW_ADVENTURE) && (adv = get_adventure_for_vnum(lang->vnum))) {
 				safe_snprintf(adv_part, sizeof(adv_part), " (%s)", GET_ADV_NAME(adv));
 			}
 			else {

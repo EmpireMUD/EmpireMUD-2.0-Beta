@@ -2025,6 +2025,7 @@ void do_stat_generic(char_data *ch, generic_data *gen) {
 		case GENERIC_CURRENCY: {
 			build_page_display(ch, "Singular: %s", NULLSAFE(GEN_STRING(gen, GSTR_CURRENCY_SINGULAR)));
 			build_page_display(ch, "Plural: %s", NULLSAFE(GEN_STRING(gen, GSTR_CURRENCY_PLURAL)));
+			build_page_display(ch, "Custom Origin: %s", GEN_STRING(gen, GSTR_CURRENCY_PLURAL) ? GEN_STRING(gen, GSTR_CURRENCY_PLURAL) : "(none)");
 			break;
 		}
 		case GENERIC_COMPONENT: {
@@ -2113,6 +2114,7 @@ void olc_show_generic(char_data *ch) {
 		case GENERIC_CURRENCY: {
 			build_page_display(ch, "<%ssingular\t0> %s", OLC_LABEL_STR(GEN_STRING(gen, GSTR_CURRENCY_SINGULAR), ""), GEN_STRING(gen, GSTR_CURRENCY_SINGULAR) ? GEN_STRING(gen, GSTR_CURRENCY_SINGULAR) : "(not set)");
 			build_page_display(ch, "<%splural\t0> %s", OLC_LABEL_STR(GEN_STRING(gen, GSTR_CURRENCY_PLURAL), ""), GEN_STRING(gen, GSTR_CURRENCY_PLURAL) ? GEN_STRING(gen, GSTR_CURRENCY_PLURAL) : "(not set)");
+			build_page_display(ch, "<%sorigin\t0> %s", OLC_LABEL_STR(GEN_STRING(gen, GSTR_CURRENCY_CUSTOM_ORIGIN), ""), GEN_STRING(gen, GSTR_CURRENCY_CUSTOM_ORIGIN) ? GEN_STRING(gen, GSTR_CURRENCY_CUSTOM_ORIGIN) : "(not set)");
 			break;
 		}
 		case GENERIC_COMPONENT: {
@@ -2365,6 +2367,27 @@ OLC_MODULE(genedit_repair2room) {
 
  //////////////////////////////////////////////////////////////////////////////
 //// CURRENCY OLC MODULES ////////////////////////////////////////////////////
+
+OLC_MODULE(genedit_origin) {
+	generic_data *gen = GET_OLC_GENERIC(ch->desc);
+	int pos = NOTHING;
+	
+	switch (GEN_TYPE(gen)) {
+		case GENERIC_CURRENCY: {
+			pos = GSTR_CURRENCY_CUSTOM_ORIGIN;
+			break;
+		}
+		default: {
+			msg_to_char(ch, "You can't set a custom origin on this type of generic.\r\n");
+			return;
+		}
+	}
+	
+	if (pos != NOTHING) {
+		olc_process_string(ch, argument, "origin", &GEN_STRING(gen, pos));
+	}
+}
+
 
 OLC_MODULE(genedit_plural) {
 	generic_data *gen = GET_OLC_GENERIC(ch->desc);

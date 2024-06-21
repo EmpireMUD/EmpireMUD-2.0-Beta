@@ -5239,8 +5239,9 @@ currency included in stock content is adventure-specific tokens.
 You must set 2 properties on currency:
   <&ysingular&0> the money's name (e.g. dragon token)
   <&yplural&0> a name to show when there's more than one (e.g. dragon tokens)
+  <&yorigin&0> optional source of this currency (overrides SHOW-ADVENTURE flag)
 
-See also: OLC GENERICS, GENEDIT PLURAL
+See also: OLC GENERICS, GENEDIT PLURAL, GENEDIT ORIGIN
 #d
 "GENEDIT DOTATTACK" "GENEDIT DOT ATTACK"
 
@@ -5381,6 +5382,21 @@ such as actions do appear to the player.
 Action and component names should be lowercase unless they are proper nouns.
 
 See also: OLC GENERICS
+#d
+"GENEDIT ORIGIN" "GENEDIT CUSTOM ORIGIN"
+
+Usage:  .origin <text>
+
+This optional field shows a custom origin for the currency. It overrides the
+SHOW-ADVENTURE flag.
+
+A currency with a custom origin might look like:
+  1 weight of the old gods (Binding Circle adventures)
+
+A currency with SHOW-ADVENTURE might look like:
+ 18 permafrost tokens (Magiterranean: Permafrost)
+
+See also: CURRENCY GENERICS
 #d
 "GENEDIT PLURAL"
 

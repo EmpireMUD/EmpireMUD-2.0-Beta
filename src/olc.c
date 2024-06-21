@@ -305,6 +305,7 @@ OLC_MODULE(genedit_quick_cooldown);
 OLC_MODULE(genedit_standardwearoff);
 OLC_MODULE(genedit_wearoff);
 OLC_MODULE(genedit_wearoff2room);
+OLC_MODULE(genedit_origin);
 OLC_MODULE(genedit_plural);
 OLC_MODULE(genedit_singular);
 OLC_MODULE(genedit_cycle);
@@ -883,6 +884,7 @@ const struct olc_command_data olc_data[] = {
 	{ "thirst", genedit_thirst, OLC_GENERIC, OLC_CF_EDITOR },
 	{ "liquidflags", genedit_liquidflags, OLC_GENERIC, OLC_CF_EDITOR },
 	// generic: currency
+	{ "origin", genedit_origin, OLC_GENERIC, OLC_CF_EDITOR },
 	{ "plural", genedit_plural, OLC_GENERIC, OLC_CF_EDITOR },
 	{ "singular", genedit_singular, OLC_GENERIC, OLC_CF_EDITOR },
 	// generic: component
