@@ -272,11 +272,13 @@ A couple of green olives have been dropped here.~
 This also isn't enough olives to plant an orchard, but you could combine them
 with more olives to get enough to plant.
 ~
-3 g a 0 0 9
+3 g a 0 0 10
 0 0 0
 7 48
 I 14 3019 100.00 4 x  # COMBINE: basket of olives
 O+ 1 6144
+R
+4 5619 0
 S
 #3019
 olives basket~
