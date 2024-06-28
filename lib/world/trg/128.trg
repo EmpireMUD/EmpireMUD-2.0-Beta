@@ -117,6 +117,27 @@ else
   %send% %actor% &&0       cforge goto <template vnum>
 end
 ~
+#12806
+Celestial Forge: Require permission to enter portal~
+1 c 4
+enter~
+return 0
+if %actor.obj_target(%arg.argument1%)% != %self% || %self.val0% <= 0
+  halt
+end
+* find target
+makeuid toroom room %self.val0%
+if !%toroom%
+  halt
+end
+* validate permission
+if !%actor.canuseroom_guest(%toroom%)%
+  %send% %actor% You don't have permission to enter that portal.
+  return 1
+  halt
+end
+* otherwise they're good to go!
+~
 #12810
 Celestial Forge: Mine attempt~
 2 c 0
