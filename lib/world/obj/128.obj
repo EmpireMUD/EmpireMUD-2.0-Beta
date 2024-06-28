@@ -35,7 +35,7 @@ the portal back~
 The portal back is spinning here.~
 The portal seems to lead back out of the forge.
 ~
-8 0 0 0 0 3
+8 0 0 0 0 4
 -1 0 0
 10 3
 C
@@ -43,5 +43,6 @@ C
 M
 18
 $p snaps shut!~
+T 12806
 S
 $
