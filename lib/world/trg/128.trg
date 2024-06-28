@@ -47,7 +47,7 @@ nop %actor.give_currency(%curr%, -1)%
 * update portal-in
 nop %inport.val0(%toroom.vnum%)%
 %send% %actor% You donate %str% to the forge and @%inport% appears!
-%echoaround% %actor% ~%actor% donates %str% to the forge and @%portal% appears!
+%echoaround% %actor% ~%actor% donates %str% to the forge and @%inport% appears!
 * portal back
 %load% obj 12806 %toroom%
 set outport %toroom.contents%
