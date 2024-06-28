@@ -1,0 +1,90 @@
+#12800
+#n smith starsmith~
+Starsmith #n~
+Starsmith #n is tending the forge.
+~
+100 150 bdqvI 0 3
+0 0 0 6 -1 -1
+D
+   The starsmith is dressed in a leather robe embossed with constellations both
+known and unknown. You can donate shards to open a portal to one of the great
+celestial forges: donate <which forge>
+ Iron / Lodestone Forge
+~
+I 4 2105 100.00 1  # LOOT: hammer
+T 12800
+S
+#12811
+Charlotte Gibilian~
+Charlotte~
+Charlotte Gibilian greets you as you approach.
+~
+0 0 bdvL cnG 3
+2 0 0 15 -1 -1
+D
+   Charlotte Gibilian stands tall, with a cascade of auburn hair rolling over
+her shoulders, and hazel eyes that gleam red in the light of Lodestone Forge.
+A sturdy leather apron hangs over her elegant ironweave tunic, stained with
+soot from the forge.
+~
+S
+#12812
+Jacob Hephaestian~
+Jacob~
+Jacob Hephaestian stands near an anvil. (list)
+~
+0 0 bdvL cnG 3
+1 0 0 15 -1 -1
+D
+   Jacob Hephaestian's fingers, ringed with iron and scarred from years of
+delicate craftwork, are folded in front of his waist as he greets you. His dark
+black hair is short and tousled, falling just above his brown eyes, which
+shimmer in the starlight.
+~
+S
+#12813
+Laila Brigidine~
+Laila~
+Laila Brigidine stands between the anvils. (list)
+~
+0 0 bdvL cnG 3
+2 0 0 15 -1 -1
+D
+   Laila Brigidine moves gracefully between the anvils, moving and rearranging
+stacks of patterns and designs. Her dark brown hair is loosely braided and
+hangs over her left shoulder. Above her brown eyes, the red dot of a bindi
+marks the spot between her eyebrows.
+~
+S
+#12814
+Aulia Thorian~
+Aulia~
+Aulia Thorian is standing by the smelting pit. (list)
+~
+0 0 bdvL cnG 3
+2 0 0 15 -1 -1
+D
+   Aulia Thorian tosses a spoonful of incense into the smelting pit, where it
+crackles and sizzles on the hot coals. She is a small woman with strong
+cheekbones and stern face wrapped in a red scarf that covers her hair. Her
+white blouse and red dress are covered with a leather apron that shows the
+marks of many years of use.
+~
+S
+#12815
+Bo Ptahite~
+Bo~
+Bo Ptahite is standing in front of the barrels. (list)
+~
+0 0 bdvL cnG 3
+1 0 0 15 -1 -1
+D
+   Bo Ptahite is taking an inventory of the barrels as you approach. His gray
+hair is cropped short above his long, age-spotted forehead. He smiles at you
+and straightens his shiny red jacket as you approach.
+~
+M
+0
+Some supplies appear from thin air and $n places them in a barrel.~
+S
+$

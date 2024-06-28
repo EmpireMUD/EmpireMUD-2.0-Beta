@@ -1,0 +1,47 @@
+#12800
+portal iron swirling~
+an iron portal~
+A portal of swirling iron rages in the front of you.~
+Tiny shards of iron rage and roil in the shape of a round portal.
+~
+8 0 0 0 0 2
+-1 0 0
+2 3
+C
+1 1
+M
+18
+$p creaks and snaps shut!~
+S
+#12805
+controller celestial forge~
+the celestial forge controller~
+The celestial forge controller is lying here.~
+   This elegant shard serves as the controller for a celestial forge. It can
+only be used by immortals.
+Usage: cforge goto iron
+       cforge goto <template vnum>
+~
+3 0 a 0 0 3
+0 0 0
+2 0
+C
+1 1
+T 12805
+S
+#12806
+portal back~
+the portal back~
+The portal back is spinning here.~
+The portal seems to lead back out of the forge.
+~
+8 0 0 0 0 3
+-1 0 0
+10 3
+C
+1 1
+M
+18
+$p snaps shut!~
+S
+$

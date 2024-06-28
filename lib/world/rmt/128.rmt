@@ -1,0 +1,365 @@
+#12800
+Within the Celestial Forge~
+This is an unused room inside the Celestial Forge.
+~
+cegi 0 0 12800
+S
+#12810
+The Mining Tunnel of a Bygone Age~
+   The rough-hewn tunnel around you is cut from solid rock and lit by glowing
+fireflies that scatter as you approach. At one end, rocky steps rise up through
+a narrow hole where the air smells of warm, spicy incense. At the other, the
+tunnel ends abruptly.
+~
+ci 0 0 12810
+D8
+~
+0 12811
+E
+tunnel walls rough-hewn hewn~
+   The walls of the tunnel bear the long strike marks of miners' picks, though
+no tools are present now.
+~
+E
+rock ore~
+   The tunnel has been cut deep into the rock. Traces of ore remain, but
+everything of value has been removed.
+~
+E
+fireflies firefly glowing~
+   Tiny fireflies line the high walls of the tunnel, blinking bright yellow
+from time to time. Each time you approach some of them, they scatter and land
+elsewhere.
+~
+E
+steps up hole~
+   The steps leading up to the hole are cut from the rocky tunnel itself.
+Through the hole, all you can see from this angle are the stars in the night
+sky.
+~
+E
+stars sky~
+You can see the starry night sky through the hole at the top of the stairs.
+~
+E
+end~
+The end of the tunnel is a curved rocky wall cut by miners' picks.
+~
+T 12803
+T 12810
+S
+#12811
+The Lodestone Forge~
+   An echoing, high-pitched tap follows each step you take on the iron floor.
+Around you, weapons and shields of all sorts hang on bright red walls, lit by
+iron lanterns. Above, the roof is open, showing the infinite expanse of a
+starry night. A heavy chain supports a massive lodestone over your head. Light
+wisps of smoke drift through the air, carrying the aroma of a warm, spicy
+incense.
+~
+cei 0 0 12810
+D9
+~
+0 12810
+D3
+~
+0 12812
+D1
+~
+0 12813
+D2
+~
+0 12814
+D0
+~
+0 12815
+E
+plates floor tiles~
+   The floor is made from square, black iron tiles arranged so precisely that
+there is no gap or grout between them. A large chain is bolted to the floor
+near the hole down to the tunnel.
+~
+E
+walls red~
+The towering walls have been painted a rich red color.
+~
+E
+weapons~
+   Many types of weapons hang on the tall walls. They all share one thing in
+common: they're forged from iron.
+~
+E
+shields~
+Iron shields adorn the wall in many different styles.
+~
+E
+lanterns~
+Iron lanterns hang along the walls.
+~
+E
+iron~
+Most of what you can see here is made from iron.
+~
+E
+roof up stars sky expanse~
+The endless night sky stretches out above you, twinkling with stars.
+~
+E
+chain~
+   A tremendous iron chain is attached to the floor and stretches toward the
+north, holding up a large lodestone -- or, perhaps, holding it down.
+~
+E
+lodestone stone~
+   The gleaming gray lodestone is the size of a modest carriage. It is eight
+feet off the floor and attached by a heavy chain, which it seems to be tugging
+at as it leans toward the north.
+~
+E
+smoke wisps~
+The wisps of smoke have a warm, spicy, almost sweet scent.
+~
+E
+hole tunnel steps stairs~
+A hole in the floor contains stone steps that lead down into the tunnel.
+~
+M 0 12811 100.00 1
+T 12803
+S
+#12812
+The Lodestone Forge~
+   The tap-tap-tap of light hammering echoes in time with the twinkling stars
+overhead. A trio of small anvils sit on wooden blocks that do little to dampen
+the sound. Between them, a red-hot pit smoulders with spiced smoke from
+incense which has been tossed into it.
+~
+cei 0 hv 12810
+D1
+~
+0 12811
+E
+anvils~
+   There are three anvils, each supported on a black wooden block. The anvils
+are small, but they seem very sturdy.
+~
+E
+blocks wooden ebony~
+Hefty blocks of ebony support each of the three anvils.
+~
+E
+pit coals vessels smelting~
+   A pit in the center of the tiled floor is filled with red-hot coals. Small
+melting vessels line the rim, perfect for working tiny metal crafts.
+~
+E
+smoke~
+   Smoke rises from the pit where incense has been tossed onto the hot coals.
+As it enters your nostrils, a warm, spiced aroma overtakes your senses.
+~
+E
+roof up stars sky expanse~
+   There is no roof above you. The room is open to the endless night sky and
+its dazzling stars.
+~
+E
+walls red~
+The smooth walls are painted red and hung with iron lanterns.
+~
+E
+plates iron floor tiles~
+The floor is made up of square iron plates.
+~
+E
+lanterns~
+There are iron lanterns hung along the walls.
+~
+E
+lodestone stone chain~
+   A massive chain in the center of the forge supports an even larger silvery
+lodestone, which seems to tug at the chain as it pulls upward and to the north.
+~
+M 0 12812 100.00 1
+T 12803
+S
+#12813
+The Lodestone Forge~
+   A pair of small anvils stand side-by-side atop a wooden block in front of
+a smelting pit that sparks and crackles as fresh incense sends up smoke with a
+warm, spicy aroma that rises upward and out of the open roof. The iron tiles
+of the floor are stained and partly melted near the pit.
+~
+cei 0 hv 12810
+D3
+~
+0 12811
+E
+anvils~
+   There are two small anvils on top of a wide block of ebony wood. Both show
+signs of use, but they still look sturdy.
+~
+E
+block wooden ebony~
+A long, thick block of ebony wood is supporting the anvils.
+~
+E
+pit smelting coals~
+   The pit in the floor is full of red-hot coals, though the temperature in
+here is quite comfortable.
+~
+E
+smoke incense~
+Spiced smoke rises from the smelting pit, where incense is crackling away.
+~
+E
+roof up stars sky expanse~
+The open roof reveals a cosmic canvas of twinkling stars.
+~
+E
+floor tiles plates~
+   The floor is made from tight-fitting squares of solid iron. Near the
+smelting pit, some of the tiles are partly melted.
+~
+E
+stains~
+The floor is stained with red-orange rust along some of the seams.
+~
+E
+walls red~
+The walls have been painted red and lit by iron lanterns.
+~
+E
+lanterns~
+Oil-burning iron lanterns hang along the walls.
+~
+E
+lodestone stone chain~
+   At the center of the forge, a huge, silvery lodestone strains against its
+iron chain as it pulls to the north.
+~
+M 0 12813 100.00 1
+T 12803
+S
+#12814
+The Lodestone Forge~
+   A mammoth anvil looms over an open smelting pit, wreathed in the warm, smoky
+incense that has been sprinkled over the coals. Tools of every sort hang
+between lanterns on the red wall, some so close to the open roof that they're
+out of reach for all but the giants.
+~
+cei 0 hv 12810
+D0
+~
+0 12811
+E
+anvil mammoth~
+   An enormous anvil stands next to the smelting pit. You could forge giants'
+armor on one this size.
+~
+E
+pit smelting coals~
+   The red-hot coals in the pit sizzle and simmer as they burn the incense that
+has been sprinkled over them.
+~
+E
+smoke~
+   Smoke rises from the incense in the smelting pit, swirls around the great
+anvil, and then wafts out the open roof.
+~
+E
+tools~
+   Many tools hang along the wall, though the ones that would be most useful
+are too high to reach.
+~
+E
+walls red~
+The red walls look recently-painted.
+~
+E
+roof up stars sky expanse~
+   Where there should be a roof, you instead see only the endless stars of the
+night sky.
+~
+E
+plates iron floor tiles~
+Square iron plates tile the floor.
+~
+E
+lodestone stone chain~
+   A tremendous, silvery lodestone hovers high in the air, pulling toward the
+north, held down only by a heavy chain.
+~
+E
+lanterns shadows~
+Iron lanterns hang along the walls, casting shadows around the tools.
+~
+M 0 12814 100.00 1
+T 12803
+S
+#12815
+The Lodestone Forge~
+   Cast iron barrels are stacked from the iron floor to the open top of the red
+walls, forming heavy walls of their own. Each is marked in fiery red letters,
+no two labeled alike. Wisps of smoke weave their way between them, carrying the
+warm, spicy, sweet smell of incense. On the floor, shards of iron are scattered
+across the black tiles and piled around the bases of the barrels. Above you, a
+tremendous lodestone strains against a heavy chain.
+~
+cei 0 0 12810
+D2
+~
+0 12811
+E
+barrels~
+   The barrels are made entirely of iron, each one seamlessly cast in a single
+piece. They are stacked all the way to the roof, far above your head. Each
+barrel is marked in fiery red letters.
+~
+E
+iron~
+Virtually everything here is made from iron, from the floor to the barrels.
+~
+E
+letters labels fiery red~
+The barrels are labeled in a red script that you cannot read.
+~
+E
+walls~
+The walls have been painted a rich red color.
+~
+E
+shards~
+   Iron shards are scattered around the barrels and across the floor, though
+they almost seem attached as you can barely move them. At most, you can slide
+them a few inches. But they cannot be lifted.
+~
+E
+roof up stars sky expanse~
+The top of the building is open to the sky, with its infinite exanse of stars.
+~
+E
+smoke~
+Smoky wisps of spiced incense hang in the air.
+~
+E
+plates floor tiles~
+   The square floor tiles are made of solid iron. Smaller shards of iron are
+scattered here and there.
+~
+E
+lodestone stone~
+   Above your head floats a truly gargantuan lodestone, tugging to the north
+against an enormous iron chain that tethers it to the center of the forge. The
+stone itself has a silvery gray sheen and seems to twinkle in the starlight.
+~
+E
+chain~
+The iron chain that tethers the lodestone is thick enough to pull a castle.
+~
+E
+lanterns~
+Barrels are stacked so high you can hardly see the lanterns on the wall.
+~
+M 0 12815 100.00 1
+T 12803
+S
+$
