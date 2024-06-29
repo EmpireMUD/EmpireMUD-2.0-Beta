@@ -59,6 +59,7 @@ if %outport% && %outport.vnum% == 12806
     %mod% %outport% longdesc The portal back to %emp% is open here.
     %mod% %outport% keywords portal back %emp%
   end
+  %at% %toroom% %echo% A portal whirls open!
 end
 ~
 #12803
