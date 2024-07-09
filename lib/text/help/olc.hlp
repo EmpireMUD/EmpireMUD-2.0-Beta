@@ -3709,6 +3709,8 @@ Available flags:
     the building (or in addition to, they have half or quarter icons); ONLY if
     the building is open or incomplete. Normally a building icon hides vehicle
     icons on the tile.
+ &cIMMUNE-DAMAGE&0 - building cannot be damaged normally (can still be burned
+    if BURNABLE is set; only takes yearly decay if resources are set)
  &cSAIL&0 - can enter this building with a boat
  &cITEM-LIMIT&0 - only a certain number of items can be dropped here
  &cLONG-AUTOSTORE&0 - autostore takes 72 hours instead of 3 here

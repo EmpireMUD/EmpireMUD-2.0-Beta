@@ -3862,7 +3862,7 @@ const char *bld_flags[] = {
 	"NO-CUSTOMIZE",
 	"NO-ABANDON-WHEN-RUINED",
 	"SHOW-VEHICLES",
-	"*",
+	"IMMUNE-DAMAGE",
 	"*",	// 25
 	"*",
 	"*",

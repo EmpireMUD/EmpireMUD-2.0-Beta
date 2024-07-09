@@ -700,7 +700,7 @@ typedef struct vehicle_data vehicle_data;
 #define BLD_NO_CUSTOMIZE  BIT(21)	// cannot be customized
 #define BLD_NO_ABANDON_WHEN_RUINED  BIT(22)	// won't auto-abandon when it becomes ruins
 #define BLD_SHOW_VEHICLES  BIT(23)	// can show vehicle icons in the room rather than overriding the building icon (only if OPEN)
-// #define BLD_UNUSED12  BIT(24)
+#define BLD_IMMUNE_DAMAGE  BIT(24)	// building cannot be damaged
 // #define BLD_UNUSED13  BIT(25)
 // #define BLD_UNUSED14  BIT(26)
 // #define BLD_UNUSED15  BIT(27)

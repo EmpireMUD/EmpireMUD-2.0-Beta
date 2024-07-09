@@ -2731,6 +2731,10 @@ bool validate_siege_target_room(char_data *ch, vehicle_data *veh, room_data *to_
 	else if (ch && ROOM_IS_CLOSED(from_room)) {
 		msg_to_char(ch, "You can't lay siege from indoors.\r\n");
 	}
+	else if (ch && ROOM_BLD_FLAGGED(to_room, BLD_IMMUNE_DAMAGE)) {
+		// only applies if a player is doing it
+		msg_to_char(ch, "You can't besiege that target.\r\n");
+	}
 	else if (ch && ROOM_BLD_FLAGGED(from_room, BLD_BARRIER)) {
 		msg_to_char(ch, "You can't lay siege from so close to a barrier.\r\n");
 	}
