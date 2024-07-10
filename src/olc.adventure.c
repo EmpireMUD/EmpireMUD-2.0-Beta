@@ -1257,7 +1257,11 @@ OLC_MODULE(advedit_linking) {
 		
 		// pull out type arg
 		argument = any_one_word(argument, type_arg);
-		if (!*type_arg || (linktype = search_block(type_arg, adventure_link_types, FALSE)) == NOTHING) {
+		if (!*type_arg) {
+			msg_to_char(ch, "You must provide a linking rule type (HELP ADVEDIT LINKING).\r\n");
+			return;
+		}
+		if ((linktype = search_block(type_arg, adventure_link_types, FALSE)) == NOTHING) {
 			msg_to_char(ch, "Invalid type '%s'.\r\n", type_arg);
 			return;
 		}
