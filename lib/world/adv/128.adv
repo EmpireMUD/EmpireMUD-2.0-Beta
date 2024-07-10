@@ -1,7 +1,15 @@
 #12800
 Celestial Forge~
 Paul Clarke~
-tbd
+   In every nation and creed, all of humanity looks up at the same stars. These
+twinkling dots of light are, in truth, the celestial sphere's greatest forges.
+And beneath them, in all ages and across all times, we, too, swing the hammer
+of the smith.
+   The greatest empires across the land pay tribute to the stars themselves
+with the celestial forges. Together, these sites of creation link to the great
+forges of ages past and future. Shatter your old and unwanted gear, donate its
+shards to the starsmith, and learn to forge the celestial rings, earrings, and
+treasures of the greatest smiths of all time!
 ~
 12800 12999 0-0
 1 30 dklm 0
@@ -9,6 +17,10 @@ L
 1 0
 12800 -1 -1 -1
 9 q 0
+L
+5 0
+10080 -1 -1 -1
+-1 0 0
 Z1 1
 S
 $

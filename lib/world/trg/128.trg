@@ -139,6 +139,153 @@ if !%actor.canuseroom_guest(%toroom%)%
 end
 * otherwise they're good to go!
 ~
+#12807
+Celestial Forge: One-time greet using script1 or script2~
+0 gh 100
+~
+* Uses mob custom script1 for a once-ever greeting per character and script2
+*   for players who have been to the instance before. Each script1/2 line
+*   sent every %line_gap% (9 sec) until it runs out of strings. The mob will
+*   be SENTINEL and SILENT during this period.
+* usage: .custom add <script1 | script2> <command> <string>
+* valid commands: say, emote, do (execute command), echo (script), skip, attackable
+* also: vforce <mob vnum in room> <command>
+* also: set line_gap <time> sec
+* also: mod <field> <value> -- runs %mod% %self%
+* NOTE: waits for %line_gap% (9 sec) after all commands EXCEPT do/vforce/set/attackable/mod
+set line_gap 9 sec
+* begin
+if %actor.is_npc%
+  halt
+end
+set room %self.room%
+* let everyone arrive
+wait 0
+if %self.fighting% || %self.disabled%
+  halt
+end
+* check for someone who needs the greeting
+set any_first 0
+set any_repeat 0
+set ch %room.people%
+while %ch%
+  if %ch.is_pc%
+    * check first visit
+    set 12800_visits %ch.var(12800_visits)%
+    if !(%12800_visits% ~= %self.vnum%)
+      set any_first 1
+      set 12800_visits %12800_visits% %self.vnum%
+      remote 12800_visits %ch.id%
+    end
+    * check repeat visit
+    set varname greet_%ch.id%
+    if !%self.varexists(%varname%)%
+      set any_repeat 1
+      set %varname% 1
+      remote %varname% %self.id%
+    end
+  end
+  set ch %ch.next_in_room%
+done
+* did anyone need the intro
+if %any_first%
+  set stype script1
+elseif %any_repeat%
+  set stype script2
+else
+  halt
+end
+* greeting detected: prepare (storing as variables prevents reboot issues)
+if !%self.mob_flagged(SENTINEL)%
+  set no_sentinel 1
+  remote no_sentinel %self.id%
+  nop %self.add_mob_flag(SENTINEL)%
+end
+if !%self.mob_flagged(SILENT)%
+  set no_silent 1
+  remote no_silent %self.id%
+  nop %self.add_mob_flag(SILENT)%
+end
+* Show the scripted text
+* tell story
+set pos 0
+set msg %self.custom(%stype%,%pos%)%
+while !%msg.empty%
+  * check early end
+  if %self.disabled% || %self.fighting%
+    halt
+  end
+  * next message
+  set mode %msg.car%
+  set msg %msg.cdr%
+  if %mode% == say
+    say %msg%
+    set waits 1
+  elseif %mode% == do
+    %msg.process%
+    set waits 0
+  elseif %mode% == echo
+    %echo% %msg.process%
+    set waits 1
+  elseif %mode% == vforce
+    set vnum %msg.car%
+    set msg %msg.cdr%
+    set targ %self.room.people(%vnum%)%
+    if %targ%
+      %force% %targ% %msg.process%
+    end
+    set waits 0
+  elseif %mode% == emote
+    emote %msg%
+    set waits 1
+  elseif %mode% == set
+    set subtype %msg.car%
+    set msg %msg.cdr%
+    if %subtype% == line_gap
+      set line_gap %msg%
+    else
+      %echo% ~%self%: Invalid set type '%subtype%' in storytime script.
+    end
+    set waits 0
+  elseif %mode% == skip
+    * nothing this round
+    set waits 1
+  elseif %mode% == attackable
+    if %self.aff_flagged(!ATTACK)%
+      dg_affect %self% !ATTACK off
+    end
+    set waits 0
+  elseif %mode% == mod
+    %mod% %self% %msg.process%
+    set waits 0
+  else
+    %echo% %self.name%: Invalid script message type '%mode%'.
+  end
+  * fetch next message and check wait
+  eval pos %pos% + 1
+  set msg %self.custom(%stype%,%pos%)%
+  if %waits% && %msg%
+    wait %line_gap%
+  end
+done
+* Done: mark as greeted for anybody now present (but NOT first-greet)
+set ch %room.people%
+while %ch%
+  if %ch.is_pc%
+    set varname greet_%ch.id%
+    set %varname% 1
+    remote %varname% %self.id%
+  end
+  set ch %ch.next_in_room%
+done
+* Done: cancel sentinel/silent
+if %self.varexists(no_sentinel)%
+  nop %self.remove_mob_flag(SENTINEL)%
+end
+if %self.varexists(no_silent)%
+  nop %self.remove_mob_flag(SILENT)%
+end
+~
 #12810
 Celestial Forge: Mine attempt~
 2 c 0
