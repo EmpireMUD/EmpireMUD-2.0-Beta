@@ -5978,7 +5978,7 @@ if %move% == 1 && !%self.aff_flagged(BLIND)%
 elseif %move% == 2
   * Lightning Torrent
   %echo% &&mThe Iskip holds his hands out to the side as sparks crackle around his fingers...&&0
-  %echo% &&m**** He seems to be drawing lighting up from the water! ****&&0 (interrupt and dodge)
+  %echo% &&m**** He seems to be drawing lightning up from the water! ****&&0 (interrupt and dodge)
   if %diff% == 1
     nop %self.add_mob_flag(NO-ATTACK)%
   end
