@@ -227,7 +227,7 @@ W
 S
 #1041
 Castle~
-   Build a castle, portcullis, or mountain hall). Usually castles involve
+   Build a castle, palace, or mountain hall. Usually castles involve
 interlinking more than one of these buildings and adding walls around them, but
 finishing the first building will complete this goal.
 ~
