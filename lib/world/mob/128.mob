@@ -27,6 +27,25 @@ her shoulders, and hazel eyes that gleam red in the light of Lodestone Forge.
 A sturdy leather apron hangs over her elegant ironweave tunic, stained with
 soot from the forge.
 ~
+M
+7
+say Testing once-ever greeting 1~
+M
+7
+say once-ever 2~
+M
+7
+say once-ever 3~
+M
+8
+say testing repeat visit greet 1~
+M
+8
+say testing repeat visit greet 2~
+M
+8
+say testing repeat visit greet 3~
+T 12807
 S
 #12812
 Jacob Hephaestian~
