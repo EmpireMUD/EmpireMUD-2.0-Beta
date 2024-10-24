@@ -2842,7 +2842,7 @@ int partial_who(char_data *ch, char *name_search, int low, int high, empire_data
 			}
 			
 			// divider
-			for (iter = 0; iter < sizeof(part) && iter < strlen(line->text); ++iter) {
+			for (iter = 0; line && iter < sizeof(part) && iter < strlen(line->text); ++iter) {
 				part[iter] = '-';
 			}
 			part[iter] = '\0';
