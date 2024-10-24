@@ -5027,6 +5027,10 @@ ACMD(do_who) {
 	bool rp = FALSE;
 	bool shortlist = FALSE;
 	empire_data *show_emp = NULL;
+	
+	if (REAL_NPC(ch)) {
+		return;
+	}
 
 	skip_spaces(&argument);
 	strcpy(buf, argument);
