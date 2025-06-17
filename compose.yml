@@ -12,7 +12,9 @@ services:
     volumes:
       - mud_data:/opt/empiremud/lib
       - mud_logs:/opt/empiremud/log
-      - mud_maps:/var/www/html 
+      - mud_maps:/var/www/html
+    #command: > 
+     # sh -c 'cp /opt/empiremud/map /opt/empiremud/lib/world/wld/' 
     restart: unless-stopped
     tty: true
 

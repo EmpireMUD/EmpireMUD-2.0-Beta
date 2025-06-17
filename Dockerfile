@@ -13,7 +13,7 @@ RUN --mount=type=cache,id=apt-cache,target=/var/cache/apt \
         build-essential autoconf pkg-config \
         libncurses5-dev libssl-dev \
         cron php-cli php-gd \
-        ccache && \
+        ccache vim less && \
     rm -rf /var/lib/apt/lists/*
 
 # GCC flags for the legacy codebase
@@ -27,12 +27,15 @@ FROM toolchain AS build
 WORKDIR /opt/empiremud
 
 # Copy source  (BuildKit uses zero-copy links, keeps cache)
-COPY --link . .
+COPY . .
 
 # Ensure map helper output dir exists, then build everything
 RUN mkdir -p lib/world/wld && \
-    ./configure && \
-    make -C src -j"$(nproc)" all
+    ./configure
+
+WORKDIR /opt/empiremud/src
+RUN make all
+RUN cp /opt/empiremud/lib/world/wld/map /opt/empiremud
 
 ###########################################################
 # 3) RUNTIME STAGE — slim, final image                    #
