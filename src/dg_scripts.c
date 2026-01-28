@@ -6336,12 +6336,7 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 				}
 				case 't': {	// room.t*
 					if (!str_cmp(field, "temperature")) {
-						if (subfield && *subfield && is_abbrev(subfield, "string")) {
-							safe_snprintf(str, slen, "%s", temperature_to_string(get_room_temperature(r)));
-						}
-						else {
-							safe_snprintf(str, slen, "%d", get_room_temperature(r));
-						}
+						safe_snprintf(str, slen, "%d", get_room_temperature(r));
 					}
 					else if (!str_cmp(field, "template")) {
 						if (r && GET_ROOM_TEMPLATE(r)) {
