@@ -6061,6 +6061,29 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 							*str = '\0';
 						}
 					}
+					else if (!str_cmp(field, "island")) {
+						char_data *for_ch;
+						empire_data *for_emp;
+						struct island_info *island;
+						
+						if (!RMT_FLAGGED(r, RMT_NO_LOCATION) && (island = GET_ISLAND(r))) {
+							// optional character/empire to get an island name for
+							if (subfield && *subfield == UID_CHAR && (for_emp = get_empire(subfield))) {
+								safe_snprintf(str, slen, "%s", get_island_name_for_empire(island->id, for_emp));
+							}
+							else if (subfield && *subfield && (for_ch = (*subfield == UID_CHAR ? get_char(subfield) : get_char_in_room(r, subfield)))) {
+								safe_snprintf(str, slen, "%s", get_island_name_for(island->id, for_ch));
+							}
+							else {
+								// basic name for island
+								safe_snprintf(str, slen, "%s", island->name);
+							}
+						}
+						else {
+							// not an island
+							*str = '\0';
+						}
+					}
 					else if (!str_cmp(field, "island_flagged")) {
 						if (subfield && *subfield) {
 							bitvector_t pos = search_block(subfield, island_bits, FALSE);

@@ -205,6 +205,8 @@ When using field - The variable returns:
 &cin_city&0 - For claimed land, true if the tile is in a city for the owner.
 &cin_city(true)&0 - Like in_city but also checks the one-hour city wait time.
 &cin_vehicle&0 - The vehicle the room is inside of, if any.
+&cisland, island(for)&0 - The name of the island the room is on, if any. If the
+   subfield is a person or empire, instead gives their custom name for it.
 &cisland_flagged(FLAG)&0 - See ISLAND FLAGS for a list.
 &cis_on_map&0 - True if the room is on the map (including closed buildings).
 &cis_outdoors&0 - True if it's on the map, in an outdoor adventure, etc.
