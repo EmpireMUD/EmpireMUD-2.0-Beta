@@ -55,6 +55,12 @@
 #define GLB_FUNCTION(name)		bool (name)(struct global_data *glb, char_data *ch, void *other_data)
 
 
+// used by charge_stored_resource() and add_to_empire_storage_with_timer()
+#define NO_STORAGE_TIMERS  0		// won't update timers at all (you did this yourself)
+#define STORAGE_TIMERS_OLDEST  1	// will reduce the oldest timers (withdrawing near-expiry items)
+#define STORAGE_TIMERS_NEWEST  2	// will reduce the newest timers (withdrawing freshest items)
+
+
  //////////////////////////////////////////////////////////////////////////////
 //// HANDLER MACROS //////////////////////////////////////////////////////////
 
@@ -476,10 +482,10 @@ bool has_evolution_value(sector_data *st, int val_type, any_vnum vnum);
 sector_data *reverse_lookup_evolution_for_sector(sector_data *in_sect, int evo_type);
 
 // storage handlers
-struct empire_storage_data *add_to_empire_storage_with_timer(empire_data *emp, int island, obj_vnum vnum, int amount, int timer, bool storage_timers);
-#define add_to_empire_storage(emp, island, vnum, amount, timer)  add_to_empire_storage_with_timer((emp), (island), (vnum), (amount), (timer), TRUE);
+struct empire_storage_data *add_to_empire_storage_with_timer(empire_data *emp, int island, obj_vnum vnum, int amount, int timer, int storage_timers);
+#define add_to_empire_storage(emp, island, vnum, amount, timer)  add_to_empire_storage_with_timer((emp), (island), (vnum), (amount), (timer), STORAGE_TIMERS_NEWEST);
 bool charge_stored_component(empire_data *emp, int island, any_vnum cmp_vnum, int amount, bool use_kept, bool basic_only, struct resource_data **build_used_list);
-bool charge_stored_resource(empire_data *emp, int island, obj_vnum vnum, int amount, bool storage_timers);
+bool charge_stored_resource(empire_data *emp, int island, obj_vnum vnum, int amount, int storage_timers);
 bool check_home_store_cap(char_data *ch, obj_data *obj, bool message, bool *capped);
 bool delete_stored_resource(empire_data *emp, obj_vnum vnum);
 bool empire_can_afford_component(empire_data *emp, int island, any_vnum cmp_vnum, int amount, bool include_kept, bool basic_only);

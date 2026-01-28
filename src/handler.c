@@ -10441,10 +10441,10 @@ sector_data *reverse_lookup_evolution_for_sector(sector_data *in_sect, int evo_t
 * @param obj_vnum vnum Any object to store.
 * @param int amount How much to add
 * @param int timer For items with timers, how much is left on those timers. Ignored if <= 0.
-* @param bool storage_timers If TRUE, adds/subtracts storage timers. If FALSE, you have handled this yourself.
+* @param int storage_timers How to update storage timers (NO_STORAGE_TIMERS, STORAGE_TIMERS_OLDEST, STORAGE_TIMERS_NEWEST). For adding, oldest/newest are the same but NO_STORAGE_TIMERS results in no add.
 * @return struct empire_storage_data* Returns a pointer to the storage entry.
 */
-struct empire_storage_data *add_to_empire_storage_with_timer(empire_data *emp, int island, obj_vnum vnum, int amount, int timer, bool storage_timers) {
+struct empire_storage_data *add_to_empire_storage_with_timer(empire_data *emp, int island, obj_vnum vnum, int amount, int timer, int storage_timers) {
 	struct empire_storage_data *store = find_stored_resource(emp, island, vnum);
 	struct empire_island *isle = get_empire_island(emp, island);
 	
@@ -10466,12 +10466,12 @@ struct empire_storage_data *add_to_empire_storage_with_timer(empire_data *emp, i
 	SAFE_ADD(store->amount, amount, 0, MAX_STORAGE, FALSE);
 	store->amount = MAX(store->amount, 0);
 	
-	if (storage_timers) {
+	if (storage_timers != NO_STORAGE_TIMERS) {
 		if (amount > 0) {
 			add_storage_timer(&store->timers, timer, amount);
 		}
 		else {
-			remove_storage_timer_items(&store->timers, -amount, TRUE);
+			remove_storage_timer_items(&store->timers, -amount, (storage_timers == STORAGE_TIMERS_OLDEST) ? TRUE : FALSE);
 		}
 	}
 	
@@ -10577,10 +10577,10 @@ bool charge_stored_component(empire_data *emp, int island, any_vnum cmp_vnum, in
 * @param int island Which island to charge for storage, or ANY_ISLAND to take from any available storage
 * @param obj_vnum vnum type to charge
 * @param int amount How much to charge
-* @param bool storage_timers If TRUE, adds/subtracts storage timers. If FALSE, you have handled this yourself.
+* @param int storage_timers How to update storage timers (NO_STORAGE_TIMERS, STORAGE_TIMERS_OLDEST, STORAGE_TIMERS_NEWEST).
 * @return bool TRUE if it was able to charge enough, FALSE if not
 */
-bool charge_stored_resource(empire_data *emp, int island, obj_vnum vnum, int amount, bool storage_timers) {
+bool charge_stored_resource(empire_data *emp, int island, obj_vnum vnum, int amount, int storage_timers) {
 	struct empire_island *isle, *next_isle;
 	struct empire_storage_data *store;
 	int this;
@@ -10981,15 +10981,33 @@ void read_vault(empire_data *emp) {
 	struct empire_island *isle, *next_isle;
 	int old = EMPIRE_WEALTH(emp);
 	obj_data *proto;
+	struct shipping_data *sd;
+	
+	if (!emp) {
+		return;	// safety
+	}
 	
 	EMPIRE_WEALTH(emp) = 0;
 	
+	// items in storage
 	HASH_ITER(hh, EMPIRE_ISLANDS(emp), isle, next_isle) {
 		HASH_ITER(hh, isle->store, store, next_store) {
 			if (store->amount > 0 && (proto = store->proto)) {
 				if (IS_WEALTH_ITEM(proto)) {
 					SAFE_ADD(EMPIRE_WEALTH(emp), (GET_WEALTH_VALUE(proto) * store->amount), 0, INT_MAX, FALSE);
 				}
+			}
+		}
+	}
+	
+	// items mid-shipment
+	
+	
+	// move all shipping entries over
+	DL_FOREACH(EMPIRE_SHIPPING_LIST(emp), sd) {
+		if (sd->amount > 0 && sd->vnum != NOTHING && (proto = obj_proto(sd->vnum))) {
+			if (IS_WEALTH_ITEM(proto)) {
+				SAFE_ADD(EMPIRE_WEALTH(emp), (GET_WEALTH_VALUE(proto) * sd->amount), 0, INT_MAX, FALSE);
 			}
 		}
 	}
@@ -11015,6 +11033,7 @@ bool retrieve_resource(char_data *ch, empire_data *emp, struct empire_storage_da
 	obj_data *obj, *proto;
 	bool room = FALSE;
 	int available, min;
+	struct storage_timer *timer;
 
 	proto = store->proto;
 	
@@ -11033,7 +11052,8 @@ bool retrieve_resource(char_data *ch, empire_data *emp, struct empire_storage_da
 	
 	// grab the timer from storage?
 	if (store->timers) {
-		GET_OBJ_TIMER(obj) = store->timers->timer;
+		timer = (store->timers->prev ? store->timers->prev : store->timers);
+		GET_OBJ_TIMER(obj) = timer->timer;
 		if ((min = config_get_int("min_timer_after_retrieve")) > 0 && min > GET_OBJ_TIMER(obj)) {
 			// don't raise it past the prototype
 			min = MIN(min, GET_OBJ_TIMER(proto));
@@ -11044,7 +11064,7 @@ bool retrieve_resource(char_data *ch, empire_data *emp, struct empire_storage_da
 	
 	// charge resource after borrowing the timer -- as it likely removes the first timer
 	available = store->amount - 1;	// for later
-	charge_stored_resource(emp, GET_ISLAND_ID(IN_ROOM(ch)), store->vnum, 1, TRUE);
+	charge_stored_resource(emp, GET_ISLAND_ID(IN_ROOM(ch)), store->vnum, 1, STORAGE_TIMERS_NEWEST);
 	
 	if (CAN_WEAR(obj, ITEM_WEAR_TAKE)) {
 		obj_to_char(obj, ch);

@@ -206,7 +206,7 @@ set dist %room.distance(%start%)%
 if %room.empire% || %self.fighting% || %self.disabled%
   * skip
   halt
-elseif %room.building_vnum% == 15901 && %room.health% < %room.maxhealth%
+elseif %room.building_vnum% == 15901 && %room.health% < %room.maxhealth% && %room.complete%
   %restore% %room%
   %echo% ~%self% repairs the barricades.
 elseif %room.sector_vnum% == 57
@@ -225,7 +225,7 @@ else
   set veh %room.vehicles%
   while %veh%
     if %veh.vnum% >= 15900 && %veh.vnum% <= 15910
-      if %veh.health% < %veh.maxhealth%
+      if %veh.health% < %veh.maxhealth% && %veh.complete%
         %echo% ~%self% repairs @%veh%.
         %restore% %veh%
       end

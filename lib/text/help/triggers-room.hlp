@@ -111,7 +111,7 @@ Variables:
   &c%direction%&0 - The direction the character came from, if any.
   &c%method%&0 - Type of movement (see METHOD LIST).
   &c%room%&0 - The room being entered.
-  &c%was_in&0 - Room the character was in before, if any (may be empty).
+  &c%was_in%&0 - Room the character was in before, if any (may be empty).
 
 You can add the "Player-in-Room" modifier.
 
@@ -142,6 +142,7 @@ Rooms can trigger on the following events:
 &cBuy&0 - Triggers when someone tries to buy in the room.
 &cAllow-Multiple&0 - For some triggers, multiple triggers can run. Put the
   triggers with this flag first; any trigger without it will end the list.
+&cDead-Ok&0 - Trigger works while the actor is dead (e.g. command trigs).
 
 For each type, there is a help file named &yRTRIG <type>&0.
 #d
@@ -179,6 +180,7 @@ When using field - The variable returns:
 &cdepletion(type)&0 - Get the current depletion amount (OLC DEPLETION) for the
    room, or change it with %room.depletion(type,amount)%; 0 is not-depleted.
 &cdirection(target)&0 - The approximate direction to the target.
+&cdismantling&0 - True if the room is being dismantled.
 &cdistance(target)&0 - The distance between this room and the target.
 &cempire&0 - The empire that owns the room, if any.
 &cempire_adjective&0 - The owner empire's adjective form, if any.
@@ -203,6 +205,8 @@ When using field - The variable returns:
 &cin_city&0 - For claimed land, true if the tile is in a city for the owner.
 &cin_city(true)&0 - Like in_city but also checks the one-hour city wait time.
 &cin_vehicle&0 - The vehicle the room is inside of, if any.
+&cisland, island(for)&0 - The name of the island the room is on, if any. If the
+   subfield is a person or empire, instead gives their custom name for it.
 &cisland_flagged(FLAG)&0 - See ISLAND FLAGS for a list.
 &cis_on_map&0 - True if the room is on the map (including closed buildings).
 &cis_outdoors&0 - True if it's on the map, in an outdoor adventure, etc.

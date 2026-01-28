@@ -405,6 +405,9 @@ With the basic teleportation ability, you can teleport at random (2 to 7 map
 tiles in any direction) or you can teleport to your home. You won't be able to
 teleport out of (or into) any room owned by a non-allied empire.
 
+If you use this in an adventure that doesn't have a corresponding map location,
+you'll teleport home even if you didn't type 'home' as the argument.
+
 This ability gains experience any time you use it to teleport.
 
 See also: CITY TELEPORTATION, RITUAL

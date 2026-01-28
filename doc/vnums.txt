@@ -124,6 +124,7 @@ Included Adventure Zones
 [12600] Elemental Escape [12600-12624] (1-25) 11 mobs, 18 objs, 1 room
 [12625] A Strange Plant [12625-12649] (0) 8 mobs, 16 objs, 2 rooms
 [12650] Magiterranean: The Grove [12650-12699] (1-75) 21 mobs, 33 objs, 22 rooms
+[12800] Celestial Forge [12800-12999] (0) 10 mobs, 35 objs, 7 rooms
 [15900] Shipwrecked Goblin Horde [15900-15999] (75-175) 20 mobs, 46 objs, 1 room
 [16000] Invasion of: The Goblin Necromancer [16000-16019] (125-200) 18 mobs, 16 objs, 10 rooms
 [16100] Oceanic Hydra [16100-16199] (225-325) 11 mobs, 51 objs, 1 room

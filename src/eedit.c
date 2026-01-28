@@ -132,14 +132,14 @@ char empire_banner_to_mapout_token(const char *banner) {
 	int num, color;
 	
 	color = -1;
-	for (num = 0; banner_to_mapout_token[0][0] != '\n'; ++num) {
-		if (banner && strchr(banner, banner_to_mapout_token[num][0])) {
+	for (num = 0; color_code_info[num].code != '\n'; ++num) {
+		if (banner && strchr(banner, color_code_info[num].code)) {
 			color = num;
 			break;
 		}
 	}
 	
-	return (color != -1 ? banner_to_mapout_token[color][1] : '?');
+	return (color != -1 ? color_code_info[color].mapout : '?');
 }
 
 
@@ -451,31 +451,84 @@ EEDIT(eedit_admin_flags) {
 
 
 EEDIT(eedit_banner) {
+	bool found, underline = FALSE;
+	char banner[256], *temp;
+	int iter;
 	room_data *room, *next_room;
 	
+	// clean trailing spaces
+	argument = trim(argument);
+	
+	// just in case
+	strcpy(banner, "&0");
+	
 	if (!*argument) {
-		msg_to_char(ch, "Set the empire banner to what (HELP COLOR)?\r\n");
+		msg_to_char(ch, "Set the empire banner to what? Available banners are:\r\n");
+		// NOTE: this starts at 1 because 0 and 1 are &0 and &n, which are the same
+		for (iter = 1; color_code_info[iter].code != '\n'; ++iter) {
+			msg_to_char(ch, " \t%c%s\t0\r\n", color_code_info[iter].code, color_code_info[iter].name);
+		}
+		return;
 	}
-	else if (!check_banner_color_string(argument, FALSE, FALSE)) {
-		msg_to_char(ch, "Invalid banner color (HELP COLOR) or too many color codes.\r\n");
+	
+	// validate color and prepare "banner" string
+	if (*argument == '&') {
+		// provided color codes
+		if (!check_banner_color_string(argument, FALSE, FALSE)) {
+			msg_to_char(ch, "Invalid banner color (HELP COLOR) or too many color codes.\r\n");
+			return;
+		}
+		else {
+			// valid
+			strcpy(banner, argument);
+		}
 	}
-	else if (!strcmp(argument, NULLSAFE(EMPIRE_BANNER(emp)))) {
+	else {
+		// detect underline
+		temp = any_one_arg(argument, arg);
+		if (is_abbrev(arg, "underlined")) {
+			skip_spaces(&temp);
+			argument = temp;
+			underline = TRUE;
+		}
+		
+		// detect name in list
+		found = FALSE;
+		for (iter = 0; color_code_info[iter].code != '\n' && !found; ++iter) {
+			if (is_abbrev(argument, color_code_info[iter].name)) {
+				found = TRUE;
+				safe_snprintf(banner, sizeof(banner), "%s&%c", (underline ? "&u" : ""), color_code_info[iter].code);
+			}
+		}
+		
+		if (!found) {
+			msg_to_char(ch, "Invalid banner color. Available banners are:\r\n");
+			// NOTE: this starts at 1 because 0 and 1 are &0 and &n, which are the same
+			for (iter = 1; color_code_info[iter].code != '\n'; ++iter) {
+				msg_to_char(ch, " \t%c%s\t0\r\n", color_code_info[iter].code, color_code_info[iter].name);
+			}
+			return;
+		}
+	}
+	
+	// ok, ready!
+	if (!strcmp(banner, NULLSAFE(EMPIRE_BANNER(emp)))) {
 		msg_to_char(ch, "That is already your current banner.\r\n");
 	}
 	else {
 		if (EMPIRE_BANNER(emp)) {
 			free(EMPIRE_BANNER(emp));
 		}
-		EMPIRE_BANNER(emp) = str_dup(argument);
+		EMPIRE_BANNER(emp) = str_dup(banner);
 		
 		EMPIRE_BANNER_HAS_UNDERLINE(emp) = (strstr(EMPIRE_BANNER(emp), "&u") ? TRUE : FALSE);
 		EMPIRE_MAPOUT_TOKEN(emp) = empire_banner_to_mapout_token(EMPIRE_BANNER(emp));
 
-		log_to_empire(emp, ELOG_ADMIN, "%s has changed the banner color", PERS(ch, ch, TRUE));
-		msg_to_char(ch, "The empire's banner is now: %s%s&0\r\n", EMPIRE_BANNER(emp), show_color_codes(EMPIRE_BANNER(emp)));
+		log_to_empire(emp, ELOG_ADMIN, "%s has changed the banner color to %s", PERS(ch, ch, TRUE), color_name_by_code(EMPIRE_BANNER(emp), TRUE));
+		msg_to_char(ch, "The empire's banner is now: %s%s&0\r\n", EMPIRE_BANNER(emp), color_name_by_code(EMPIRE_BANNER(emp), TRUE));
 		
 		if (emp != GET_LOYALTY(ch)) {
-			syslog(SYS_GC, GET_INVIS_LEV(ch), TRUE, "ABUSE: %s has changed %s's banner to %s%s&0", GET_NAME(ch), EMPIRE_NAME(emp), EMPIRE_BANNER(emp), show_color_codes(EMPIRE_BANNER(emp)));
+			syslog(SYS_GC, GET_INVIS_LEV(ch), TRUE, "ABUSE: %s has changed %s's banner to %s%s&0 %s", GET_NAME(ch), EMPIRE_NAME(emp), EMPIRE_BANNER(emp), show_color_codes(EMPIRE_BANNER(emp)), color_name_by_code(EMPIRE_BANNER(emp), TRUE));
 		}
 		
 		TRIGGER_DELAYED_REFRESH(emp, DELAY_REFRESH_MSDP_UPDATE_ALL);

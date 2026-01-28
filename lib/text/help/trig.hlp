@@ -212,6 +212,8 @@ When using field - The variable returns:
 &cadd_progress(vnum)&0 - Grants a progression goal (preferably set NO-AUTOSTART).
 &cadjective&0 - Adjective form of the empire's name.
 &cbanner&0 - Empire's banner (as a color code).
+&cbanner_name, banner_name_simple&0 - Empire's banner as color name with or without
+   underline.
 &ccan_recognize_lang(lang,on|off)&0 - Whether the empire can at least recognize
    a language. Optional on/off 2nd arg grants/removes this from the empire but
    NOT from members who already have it. Cannot add/remove if the empire speaks
@@ -370,7 +372,7 @@ Variables:
   &c%actor%&0 - The character entering the room.
   &c%direction%&0 - The direction the character came from, or 'none'.
   &c%method%&0 - Type of movement (see METHOD LIST).
-  &c%was_in&0 - Room the character was in before, if any (may be empty).
+  &c%was_in%&0 - Room the character was in before, if any (may be empty).
 
 You can add the "Player-in-Room" modifier.
 
@@ -503,7 +505,7 @@ Note: Entry triggers attached to charmed mobs will not fire unless the trigger
 
 Variables:
   &c%method%&0 - Type of movement (see METHOD LIST).
-  &c%was_in&0 - Room the character was in before, if any (may be empty).
+  &c%was_in%&0 - Room the character was in before, if any (may be empty).
 
 You can add the "Player-in-Room" modifier.
 
@@ -569,7 +571,7 @@ Variables:
   &c%actor%&0 - The character entering the room.
   &c%direction%&0 - The direction the character came from, or 'none'.
   &c%method%&0 - Type of movement (see METHOD LIST).
-  &c%was_in&0 - Room the character was in before, if any (may be empty).
+  &c%was_in%&0 - Room the character was in before, if any (may be empty).
 
 You can add the "Player-in-Room" modifier. However, this will make the trigger
 fire only when a player is ALREADY in the room with the pre-greet trigger.

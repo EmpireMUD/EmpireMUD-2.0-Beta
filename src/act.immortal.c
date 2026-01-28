@@ -42,9 +42,7 @@
 extern bool manual_evolutions;
 
 // external functions
-struct instance_data *build_instance_loc(adv_data *adv, struct adventure_link_rule *rule, room_data *loc, int dir);
 void do_stat_vehicle(char_data *ch, vehicle_data *veh, bool details);
-room_data *find_location_for_rule(adv_data *adv, struct adventure_link_rule *rule, int *which_dir);
 
 // locals
 void instance_list_row(struct instance_data *inst, int number, char *save_buffer, size_t size);
@@ -3849,6 +3847,8 @@ void do_stat_empire(char_data *ch, empire_data *emp) {
 	else {
 		build_page_display(ch, "Next timeout check: [%ld / not scheduled]", EMPIRE_NEXT_TIMEOUT(emp));
 	}
+	
+	build_page_display(ch, "Banner: [%s%s\t0]", EMPIRE_BANNER(emp), color_name_by_code(EMPIRE_BANNER(emp), TRUE));
 	
 	sprintbit(EMPIRE_ADMIN_FLAGS(emp), empire_admin_flags, line, TRUE);
 	build_page_display(ch, "Admin flags: \tg%s\t0", line);

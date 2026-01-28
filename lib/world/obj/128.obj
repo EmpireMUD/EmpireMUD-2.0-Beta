@@ -1,7 +1,7 @@
 #12800
 portal iron swirling~
 an iron portal~
-A portal of swirling iron rages in the front of you.~
+A portal of swirling iron rages in front of you.~
 Tiny shards of iron rage and roil in the shape of a round portal.
 ~
 8 0 0 0 0 2
@@ -13,13 +13,28 @@ M
 18
 $p creaks and snaps shut!~
 S
+#12801
+portal canvas cloth swirling~
+a canvas portal~
+A portal of swirling canvas cloth spins in front of you.~
+An unbroken sheet of canvas twists and wrings as it encircles a magical portal.
+~
+8 0 0 0 0 3
+-1 0 0
+11 3
+C
+1 1
+M
+18
+$p tears itself apart and dissolves into the air!~
+S
 #12805
 controller celestial forge~
 the celestial forge controller~
 The celestial forge controller is lying here.~
    This elegant shard serves as the controller for a celestial forge. It can
 only be used by immortals.
-Usage: cforge goto iron
+Usage: cforge goto iron, imperium
        cforge goto <template vnum>
 ~
 3 0 a 0 0 3
@@ -44,6 +59,27 @@ M
 18
 $p snaps shut!~
 T 12806
+S
+#12807
+shield relic lodestone stone~
+a lodestone relic shield~
+A lodestone relic shield is lying in the ashes.~
+   The rusted shield once bore an insignia, but decades of battle and centuries
+of time have left it inscrutible. What glory this shield still bears rests on
+the story of where it was found: on an old and broken battlefield, attached to
+a great colossus, fighting one last great fight.
+~
+23 emo ao 0 0 3
+0 0 0
+2 0
+A
+5 1 0
+C
+1 100
+E
+ashes~
+The lodestone relic shield rests in a pile of ashes.
+~
 S
 #12808
 field magnetic sparking~
@@ -527,7 +563,7 @@ you can summon and dismiss like any other companion. This elemental lasts until
 it is destroyed. Each elemental is built from up to 3 modules. This module adds
 melee combat capabilities:
    1 jagged module: It gains the ability to attack in combat.
-   2 jagged modules: Increasese its damage and adds 'order companion actuate'
+   2 jagged modules: Increases its damage and adds 'order companion actuate'
       to debuff the enemy.
    3 jagged modules: Increases its damage and makes it immune to disarm.
    Combining a jagged and magnetic module will also boost its damage.
@@ -540,15 +576,14 @@ C
 T 12834
 S
 #12836
-companion magnetic iron elemental~
+parts companion magnetic iron elemental~
 magnetic iron elemental companion parts~
 Some magnetic iron elemental parts are here.~
    These modular parts are used to construct an iron elemental companion, which
 you can summon and dismiss like any other companion. This elemental lasts until
 it is destroyed. Each elemental is built from up to 3 modules. This module adds
 casting capabilities:
-   1 magnetic module: Adds 'order companion magnetize', which buffs you during
-      combat.
+   1 magnetic module: Adds 'order companion magnetize', which buffs you.
    2 magnetic modules: Increases the potency of its buffs and, if combined with
       a jagged module, changes the melee attack to a magical one.
    3 magnetic modules: Increases the buffs again and makes them automatic.
@@ -607,5 +642,619 @@ for one rider with two animals.
 7 0 a 0 0 1
 12839 0 0
 0 0
+S
+#12840
+crate shards iron 100~
+a crate of 100 iron shards~
+A crate of iron shards is stacked here.~
+   This wooden crate is full of iron shards, the currency of Lodestone Forge.
+Open this box for a one-time supply of 100 iron shards.
+~
+3 e a 0 0 3
+5100 100 0
+0 0
+C
+1 1
+R
+4 5195 0
+T 12845
+S
+#12841
+crate shards imperium 100~
+a crate of 100 imperium shards~
+A crate of imperium shards is stacked here.~
+   This old crate is full of imperium shards, the currency of Victory Forge.
+Open this box for a one-time supply of 100 imperium shards.
+~
+3 e a 0 0 4
+5101 100 0
+0 0
+C
+1 1
+R
+4 5195 0
+T 12845
+S
+#12850
+standards banners flags~
+the camp standard~
+A camp standard flies over the forge.~
+A flag flies over the camp, showing the empire's standard.
+~
+3 0 0 0 0 2
+0 0 0
+0 0
+C
+1 1
+S
+#12851
+spark victory~
+a spark of victory~
+There's a spark of victory here.~
+   At a glance, it's a bright white metal token -- so white it can only be
+imperium -- but as you touch it, there's a spark. Just a little one. But in an
+instant, you feel bold, almost daring. This is the stuff victory is made of.
+   The spark of victory is a crafting material for Victorious Forging.
+~
+3 0 a 0 0 3
+0 0 0
+2 0
+C
+175 175
+R
+4 5108 0
+R
+4 5115 0
+S
+#12852
+ring black white restoration~
+a black and white ring of restoration~
+A black and white ring of restoration is lying on the ground.~
+   The ring is made of banded black nocturnium and white imperium, masterfully
+intertwined to form a single victorious loop.
+   The ring bears two green gemstones held in place by tiny beads of metal.
+Both gemstones are cut in a trapeze shape and oriented to form a healing sign.
+~
+2 amo ab 0 0 4
+0 0 0
+2 0
+A
+16 2 0
+A
+23 3 0
+A
+15 1 3
+C
+100 200
+T 12811
+S
+#12853
+inspiration black white ring of restoration~
+the inspiration for a black and white ring of restoration~
+The inspiration for a black and white ring of restoration is on the ground.~
+   You find yourself inspired by the battlefield smiths of legend, who hammered
+away through the night to keep the soldiers' equipment strong.
+   This inspiration will teach you to forge: black and white ring of
+restoration, a unique ring for healers.
+~
+7 0 a 0 0 1
+12852 0 0
+0 0
+S
+#12854
+earrings restoration black white~
+black and white earrings of restoration~
+Black and white earrings of restoration are lying here.~
+   Each earring gleams with white imperium on the front paired with a pitch
+black nocturnium backing. They attach at both the lobe and the helix, with
+delicate chains dangling from each.
+   Tiny green gems hover just below the end of the chains, suspended in the
+air by nothing at all, shimmering as they turn in the light.
+~
+2 mo am 0 0 3
+0 0 0
+2 0
+A
+8 1 0
+A
+23 2 0
+A
+16 1 3
+C
+100 200
+S
+#12855
+inspiration black white earrings of restoration~
+the inspiration for the black and white earrings of restoration~
+The inspiration for the black and white earrings of restoration is on the ground.~
+   You find yourself inspired by the battlefield smiths of legend, who hammered
+away through the night to keep the soldiers' equipment strong.
+   This inspiration will teach you to forge: black and white earrings of
+restoration, earrings for healers.
+~
+7 0 a 0 0 1
+12854 0 0
+0 0
+S
+#12856
+ring black white fortitude~
+a black and white ring of fortitude~
+A black and white ring of fortitude is lying on the ground.~
+   The ring is made of banded black nocturnium and white imperium, masterfully
+intertwined to form a single victorious loop.
+   A large step-cut yellow gem, held in place by metal prongs, covers much of
+your finger when wearing the ring.
+~
+2 amo ab 0 0 4
+0 0 0
+2 0
+A
+15 2 0
+A
+18 3 0
+A
+11 1 3
+C
+100 200
+T 12811
+S
+#12857
+inspiration black white ring of fortitude~
+the inspiration for a black and white ring of fortitude~
+The inspiration for a black and white ring of fortitude is on the ground.~
+   You find yourself inspired by the battlefield smiths of legend, who hammered
+away through the night to keep the soldiers' equipment strong.
+   This inspiration will teach you to forge: black and white ring of fortitude,
+a unique ring for tanks.
+~
+7 0 a 0 0 1
+12856 0 0
+0 0
+S
+#12858
+earrings fortitude black white~
+black and white earrings of fortitude~
+Black and white earrings of fortitude are lying here.~
+   Each earring gleams with white imperium on the front paired with a pitch
+black nocturnium backing. They attach at both the lobe and the helix, with
+delicate chains dangling from each.
+   Step-cut yellow gems dangle in midair below the metal chains of the
+earrings, occasionally spinning when light shines through them.
+~
+2 mo am 0 0 4
+0 0 0
+2 0
+A
+2 1 0
+A
+18 1 0
+A
+13 1 0
+A
+15 1 3
+C
+100 200
+S
+#12859
+inspiration black white earrings of fortitude~
+the inspiration for the black and white earrings of fortitude~
+The inspiration for the black and white earrings of fortitude is on the ground.~
+   You find yourself inspired by the battlefield smiths of legend, who hammered
+away through the night to keep the soldiers' equipment strong.
+   This inspiration will teach you to forge: black and white earrings of
+fortitude, earrings for tanks.
+~
+7 0 a 0 0 1
+12858 0 0
+0 0
+S
+#12860
+ring black white wrath~
+a black and white ring of wrath~
+A black and white ring of wrath is lying on the ground.~
+   The ring is made of banded black nocturnium and white imperium, masterfully
+intertwined to form a single victorious loop.
+   A chain of navette-cut red gemstones, arranged tip-to-tip, circles the full
+circumference of the ring.
+~
+2 amo ab 0 0 5
+0 0 0
+2 0
+A
+11 2 0
+A
+21 3 0
+A
+15 1 0
+C
+100 200
+T 12811
+S
+#12861
+inspiration black white ring of wrath~
+the inspiration for a black and white ring of wrath~
+The inspiration for a black and white ring of wrath is on the ground.~
+   You find yourself inspired by the battlefield smiths of legend, who hammered
+away through the night to keep the soldiers' equipment strong.
+   This inspiration will teach you to forge: black and white ring of wrath, a
+unique ring for melee dps.
+~
+7 0 a 0 0 1
+12860 0 0
+0 0
+S
+#12862
+earrings wrath black white~
+black and white earrings of wrath~
+Black and white earrings of wrath are lying here.~
+   Each earring gleams with white imperium on the front paired with a pitch
+black nocturnium backing. They attach at both the lobe and the helix, with
+delicate chains dangling from each.
+   Clusters of tiny red gems swirl in the air around the chains, sometimes
+falling like drops of blood before darting back up to their place below the
+earrings.
+~
+2 mo am 0 0 4
+0 0 0
+2 0
+A
+1 1 0
+A
+21 2 0
+A
+11 1 3
+C
+100 200
+S
+#12863
+inspiration black white earrings of wrath~
+the inspiration for the black and white earrings of wrath~
+The inspiration for the black and white earrings of wrath is on the ground.~
+   You find yourself inspired by the battlefield smiths of legend, who hammered
+away through the night to keep the soldiers' equipment strong.
+   This inspiration will teach you to forge: black and white earrings of wrath,
+earrings for melee dps.
+~
+7 0 a 0 0 1
+12862 0 0
+0 0
+S
+#12864
+ring black white arcana~
+a black and white ring of arcana~
+A black and white ring of arcana is lying on the ground.~
+   The ring is made of banded black nocturnium and white imperium, masterfully
+intertwined to form a single victorious loop.
+   A large radiant-cut blue gem hovers ever so slightly above the ring,
+capturing every stray mote of light.
+~
+2 amo ab 0 0 4
+0 0 0
+2 0
+A
+16 2 0
+A
+22 3 0
+A
+15 1 3
+C
+100 200
+T 12811
+S
+#12865
+inspiration black white ring of arcana~
+the inspiration for a black and white ring of arcana~
+The inspiration for a black and white ring of arcana is on the ground.~
+   You find yourself inspired by the battlefield smiths of legend, who hammered
+away through the night to keep the soldiers' equipment strong.
+   This inspiration will teach you to forge: black and white ring of arcana, a
+unique ring for caster dps.
+~
+7 0 a 0 0 1
+12864 0 0
+0 0
+S
+#12866
+earrings arcana black white~
+black and white earrings of arcana~
+Black and white earrings of arcana are lying here.~
+   Each earring gleams with white imperium on the front paired with a pitch
+black nocturnium backing. They attach at both the lobe and the helix, with
+delicate chains dangling from each.
+   Pampel-cut gemstones dangle in the air beneath the chains, suspended from
+nothing at all but swinging as if well-attached.
+~
+2 mo am 0 0 4
+0 0 0
+2 0
+A
+8 1 0
+A
+22 2 0
+A
+16 1 3
+C
+100 200
+S
+#12867
+inspiration black white earrings of arcana~
+the inspiration for the black and white earrings of arcana~
+The inspiration for the black and white earrings of arcana is on the ground.~
+   You find yourself inspired by the battlefield smiths of legend, who hammered
+away through the night to keep the soldiers' equipment strong.
+   This inspiration will teach you to forge: black and white earrings of
+arcana, earrings for caster dps.
+~
+7 0 a 0 0 1
+12866 0 0
+0 0
+S
+#12868
+ring black white valor~
+a black and white ring of valor~
+A black and white ring of valor is lying on the ground.~
+   The ring is made of banded black nocturnium and white imperium, masterfully
+intertwined to form a single victorious loop.
+   The inside of the ring is studded with sharp gemstones, set such that they
+cannot be seen while the ring is worn, but the bearer is sure to feel them.
+~
+2 amo ab 0 0 6
+0 0 0
+2 0
+A
+11 1 0
+A
+6 1 0
+A
+19 2 0
+A
+15 1 3
+C
+100 200
+T 12811
+S
+#12869
+inspiration black white ring of valor~
+the inspiration for a black and white ring of valor~
+The inspiration for a black and white ring of valor is on the ground.~
+   You find yourself inspired by the battlefield smiths of legend, who hammered
+away through the night to keep the soldiers' equipment strong.
+   This inspiration will teach you to forge: black and white ring of valor, a
+unique ring for overseers and laborers.
+~
+7 0 a 0 0 2
+12868 0 0
+0 0
+S
+#12870
+earrings valor black white~
+black and white earrings of valor~
+Black and white earrings of valor are lying here.~
+   Each earring gleams with white imperium on the front paired with a pitch
+black nocturnium backing. They attach at both the lobe and the helix, with
+delicate chains dangling from each.
+   A spiral of many-colored gems drapes from each earring, circling the fine
+chains but apparently unattached. A myriad of colors glimmer and swirl as light
+caught in the gems is amplified into a brilliant rainbow.
+~
+2 mo am 0 0 5
+0 0 0
+2 0
+A
+15 1 0
+A
+19 1 0
+A
+11 1 0
+A
+27 1 3
+C
+100 200
+S
+#12871
+inspiration black white earrings of valor~
+the inspiration for the black and white earrings of valor~
+The inspiration for the black and white earrings of valor is on the ground.~
+   You find yourself inspired by the battlefield smiths of legend, who hammered
+away through the night to keep the soldiers' equipment strong.
+   This inspiration will teach you to forge: black and white earrings of valor.
+These earrings are made for overseers and laborers of the empire.
+~
+7 0 a 0 0 2
+12870 0 0
+0 0
+S
+#12872
+mastery victorious inspiration~
+the inspiration for Victorious Mastery~
+The inspiration for Victorious Mastery is in the air.~
+   Purchase this and be inspired to forge superior Victory Forge items. This
+requires that you already have the Victorious Smithing ability, and will grant
+you Victorious Mastery. Each character can only buy this item once.
+~
+3 p a 0 0 3
+0 0 0
+2 0
+C
+100 100
+T 12833
+S
+#12873
+kit training imperium dummy~
+an imperium training dummy kit~
+An imperium training dummy kit is lying here.~
+   The kit contains lumber, gleaming imperium armor, and a heavy base. You can
+set up this kit to use for combat training for a short time. It will expire if
+you defeat it in combat, or will expire after a certain number of hours.
+   Type 'use dummy' to set this up for combat training.
+~
+3 e a 0 0 4
+12873 0 0
+2 0
+C
+1 1
+M
+33
+Type 'use dummy' to set this up for combat training.~
+R
+4 5171 0
+T 12838
+S
+#12874
+inspiration imperium training dummy~
+the imperium training dummy inspiration~
+The imperium training dummy inspiration is on the ground.~
+   You find yourself inspired by the battlefield smiths of legend, who hammered
+away through the night to keep the soldiers' equipment strong.
+   This inspiration will teach you to forge: imperium training dummy. This
+dummy is for combat practice for levels 100-200.
+~
+7 0 a 0 0 2
+12873 0 0
+0 0
+S
+#12875
+crown monomachus victory~
+the monomachus crown of victory~
+The monomachus crown of victory has been left here.~
+   Seven tall, obround imperium plates arranged side-to-side make up this
+magnificent crown. Each bears a legendary empire depicted in a fine nocturnium
+inlay and colored with brilliant cloisonne enamel. Oddly, the seventh pane has
+no figure -- or, perhaps, no one worthy has yet emerged.
+~
+2 mo ae 0 0 5
+0 0 0
+2 0
+A
+5 1 0
+A
+19 1 3
+A
+5 1 3
+C
+100 200
+S
+#12876
+inspiration monomachus crown~
+the monomachus crown inspiration~
+The monomachus crown inspiration is on the ground.~
+   You find yourself inspired by the battlefield smiths of legend, who hammered
+away through the night to keep the soldiers' equipment strong.
+   This inspiration will teach you to forge: monomachus crown, a spectacular
+piece of headwear that boosts your Greatness.
+~
+7 0 a 0 0 1
+12875 0 0
+0 0
+S
+#12877
+whistle minipet banner hawk~
+a banner hawk minipet whistle~
+A banner hawk minipet whistle is lying here.~
+   The little tube whistle is striped in gleaming white and midnight black
+metal and makes a soft, glorious tone if even the slightest wind passes through
+it. It can summon a banner hawk, who carries your empire's banner in its
+talons.
+   Type 'use whistle' to permanently add a new non-combat minipet to your list.
+You can have one minipet out at a time; type 'minipets' to list, manage, and
+summon one of your minipets.
+~
+19 p a 0 0 7
+12877 0 0
+2 0
+C
+1 1
+S
+#12878
+inspiration victory runner~
+the victory runner inspiration~
+The victory runner inspiration is on the ground.~
+   You find yourself inspired by the battlefield smiths of legend, who hammered
+away through the night to keep the soldiers' equipment strong.
+   This inspiration will teach you to craft: victory runner, a very fast
+vehicle for one rider with two animals.
+~
+7 0 a 0 0 2
+12878 0 0
+0 0
+S
+#12879
+parts companion plated imperium elemental~
+plated imperium elemental companion parts~
+Some plated imperium elemental companion parts are here.~
+   These modular parts are used to construct an imperium elemental companion,
+which you can summon and dismiss like any other companion. This elemental lasts
+until it is destroyed. Each elemental is built from up to 3 modules. This
+module adds tanking capabilities:
+   1 plated module: It gains more health and will rescue you in combat.
+   2 plated modules: Boosts its damage resistance.
+   3 plated modules: Adds 'order companion' options for healing, dodging,
+      taunting, and clearing itself of debuffs.
+~
+3 p a 0 0 1
+0 0 0
+2 0
+C
+125 125
+T 12834
+S
+#12880
+parts companion jagged imperium elemental~
+jagged imperium elemental companion parts~
+Some jagged imperium elemental companion parts are here.~
+   These modular parts are used to construct an imperium elemental companion,
+which you can summon and dismiss like any other companion. This elemental lasts
+until it is destroyed. Each elemental is built from up to 3 modules. This
+module adds melee combat capabilities:
+   1 jagged module: It gains the ability to attack in combat.
+   2 jagged modules: Increases its damage and adds 'order companion actuate'
+      to debuff the enemy.
+   3 jagged modules: Increases its damage and makes it immune to disarm.
+   Combining a jagged and magnetic module will also boost its damage.
+~
+3 p a 0 0 2
+0 0 0
+2 0
+C
+125 125
+T 12834
+S
+#12881
+parts companion magnetic imperium elemental~
+magnetic imperium elemental companion parts~
+Some magnetic imperium elemental parts are here.~
+   These modular parts are used to construct an imperium elemental companion,
+which you can summon and dismiss like any other companion. This elemental lasts
+until it is destroyed. Each elemental is built from up to 3 modules. This
+module adds casting capabilities:
+   1 magnetic module: Adds 'order companion magnetize', which buffs you.
+   2 magnetic modules: Increases the potency of its buffs and, if combined with
+      a jagged module, changes the melee attack to a magical one.
+   3 magnetic modules: Increases the buffs again and makes them automatic.
+   Combining a jagged and magnetic module will also boost its damage.
+~
+3 p a 0 0 3
+0 0 0
+2 0
+C
+125 125
+T 12834
+S
+#12882
+gear imperium great~
+a great imperium gear~
+A great imperium gear is lying here.~
+   This enormous gear is tremendously heavy, suggesting it is solid imperium
+all the way to the core. It once drove the heart of a great siege machine; now
+at best it functions as a shield. But with its large size, it's not a very
+maneuverable one.
+~
+23 emo ao 0 0 5
+0 0 0
+2 0
+A
+5 1 0
+C
+100 200
 S
 $

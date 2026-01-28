@@ -2050,10 +2050,18 @@ ACMD(do_gen_craft) {
 	quoted_arg_or_all(argument, temp_arg);
 	argument = temp_arg;
 	
-	// all other functions require standing
-	if (*argument && !list_only && GET_POS(ch) < POS_STANDING) {
-		send_low_pos_msg(ch);
-		return;
+	// remaining functions, other than listing, have more requirements
+	if (*argument && !list_only) {
+		// no animal forms
+		if (CHAR_MORPH_FLAGGED(ch, MORPHF_ANIMAL)) {
+			msg_to_char(ch, "You can't do that in this form!\r\n");
+			return;
+		}
+		// all other functions require standing
+		if (GET_POS(ch) < POS_STANDING) {
+			send_low_pos_msg(ch);
+			return;
+		}
 	}
 	
 	// optional leading number

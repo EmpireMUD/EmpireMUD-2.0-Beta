@@ -1947,7 +1947,7 @@ void do_chore_gen_craft(empire_data *emp, room_data *room, vehicle_data *veh, in
 			// charge resources (we pre-validated res->type and availability)
 			for (res = GET_CRAFT_RESOURCES(do_craft); res; res = res->next) {
 				if (res->type == RES_OBJECT) {
-					charge_stored_resource(emp, islid, res->vnum, res->amount, TRUE);
+					charge_stored_resource(emp, islid, res->vnum, res->amount, STORAGE_TIMERS_OLDEST);
 				}
 				else if (res->type == RES_COMPONENT) {
 					charge_stored_component(emp, islid, res->vnum, res->amount, FALSE, TRUE, NULL);
@@ -2088,7 +2088,7 @@ void do_chore_building(empire_data *emp, room_data *room, int mode) {
 					}
 				
 					add_to_resource_list(&GET_BUILT_WITH(room), RES_OBJECT, res->vnum, 1, 1);
-					charge_stored_resource(emp, islid, res->vnum, 1, TRUE);
+					charge_stored_resource(emp, islid, res->vnum, 1, STORAGE_TIMERS_OLDEST);
 				}
 				else if (res->type == RES_COMPONENT) {
 					if (mode == CHORE_MAINTENANCE) {
@@ -2470,7 +2470,7 @@ void do_chore_einv_interaction(empire_data *emp, room_data *room, vehicle_data *
 			einv_interaction_chore_type = chore;
 		
 			if (run_interactions(worker, GET_OBJ_INTERACTIONS(found_proto), interact_type, room, worker, found_proto, veh, one_einv_interaction_chore) && found_store) {
-				charge_stored_resource(emp, islid, found_store->vnum, 1, TRUE);
+				charge_stored_resource(emp, islid, found_store->vnum, 1, STORAGE_TIMERS_OLDEST);
 			}
 		}
 		else if ((worker = place_chore_worker(emp, chore, room))) {
@@ -2912,7 +2912,7 @@ void do_chore_minting(empire_data *emp, room_data *room, vehicle_data *veh) {
 			}
 			
 			vnum = highest->vnum;
-			charge_stored_resource(emp, islid, highest->vnum, 1, TRUE);
+			charge_stored_resource(emp, islid, highest->vnum, 1, STORAGE_TIMERS_OLDEST);
 			
 			orn = obj_proto(vnum);	// existence of this was pre-validated
 			amt = GET_WEALTH_VALUE(orn) * (1.0/COIN_VALUE);
@@ -3240,7 +3240,7 @@ void vehicle_chore_build(empire_data *emp, vehicle_data *veh, int chore) {
 						// remove an older matching object
 						remove_like_item_from_built_with(&VEH_BUILT_WITH(veh), obj_proto(res->vnum));
 					}
-					charge_stored_resource(emp, islid, res->vnum, 1, TRUE);
+					charge_stored_resource(emp, islid, res->vnum, 1, STORAGE_TIMERS_OLDEST);
 					if (!VEH_FLAGGED(veh, VEH_NEVER_DISMANTLE)) {
 						add_to_resource_list(&VEH_BUILT_WITH(veh), RES_OBJECT, res->vnum, 1, 1);
 					}

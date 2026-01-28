@@ -995,7 +995,7 @@ void script_trigger_check(void) {
 			case MOB_TRIGGER: {
 				mob = (char_data *)sc->attached_to;
 				in_room = IN_ROOM(mob);
-				if (GET_POS(mob) < POS_SLEEPING || IS_DEAD(mob) || EXTRACTED(mob) || AFF_FLAGGED(mob, AFF_STUNNED | AFF_HARD_STUNNED) || IS_INJURED(mob, INJ_TIED) || GET_FED_ON_BY(mob)) {
+				if (GET_POS(mob) < POS_SLEEPING || (IS_DEAD(mob) && !TRIGGER_CHECK(trig, MTRIG_DEAD_OK)) || EXTRACTED(mob) || AFF_FLAGGED(mob, AFF_STUNNED | AFF_HARD_STUNNED) || IS_INJURED(mob, INJ_TIED) || GET_FED_ON_BY(mob)) {
 					fail = TRUE;
 				}
 				if (AFF_FLAGGED(mob, AFF_CHARM) && !TRIGGER_CHECK(trig, MTRIG_CHARMED)) {
@@ -4410,6 +4410,9 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 					else if (!str_cmp(field, "maxblood")) {
 						safe_snprintf(str, slen, "%d", GET_MAX_BLOOD(c));
 					}
+					else if (!str_cmp(field, "maxlevel")) {
+						safe_snprintf(str, slen, "%d", IS_NPC(c) ? GET_MAX_SCALE_LEVEL(c) : get_approximate_level(c));
+					}
 					else if (!str_cmp(field, "mana")) {
 						int amt;
 						if (subfield && *subfield && (amt = atoi(subfield))) {
@@ -4437,6 +4440,9 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 							strcpy(str, "");
 						else
 							safe_snprintf(str, slen, "%c%d", UID_CHAR, char_script_id(GET_LEADER(c)));
+					}
+					else if (!str_cmp(field, "minlevel")) {
+						safe_snprintf(str, slen, "%d", IS_NPC(c) ? GET_MIN_SCALE_LEVEL(c) : get_approximate_level(c));
 					}
 					else if (!str_cmp(field, "mob_flagged")) {
 						if (subfield && *subfield) {
@@ -5905,6 +5911,9 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 							*str = '\0';
 						}
 					}
+					else if (!str_cmp(field, "dismantling")) {
+						safe_snprintf(str, slen, "%d", IS_DISMANTLING(r) ? 1 : 0);
+					}
 					else if (!str_cmp(field, "distance")) {
 						room_data *targ;
 						if (subfield && *subfield && (targ = get_room(r, subfield))) {
@@ -6049,6 +6058,29 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 							safe_snprintf(str, slen, "%c%d", UID_CHAR, veh_script_id(GET_ROOM_VEHICLE(r)));
 						}
 						else {
+							*str = '\0';
+						}
+					}
+					else if (!str_cmp(field, "island")) {
+						char_data *for_ch;
+						empire_data *for_emp;
+						struct island_info *island;
+						
+						if (!RMT_FLAGGED(r, RMT_NO_LOCATION) && (island = GET_ISLAND(r))) {
+							// optional character/empire to get an island name for
+							if (subfield && *subfield == UID_CHAR && (for_emp = get_empire(subfield))) {
+								safe_snprintf(str, slen, "%s", get_island_name_for_empire(island->id, for_emp));
+							}
+							else if (subfield && *subfield && (for_ch = (*subfield == UID_CHAR ? get_char(subfield) : get_char_in_room(r, subfield)))) {
+								safe_snprintf(str, slen, "%s", get_island_name_for(island->id, for_ch));
+							}
+							else {
+								// basic name for island
+								safe_snprintf(str, slen, "%s", island->name);
+							}
+						}
+						else {
+							// not an island
 							*str = '\0';
 						}
 					}
@@ -6557,6 +6589,9 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 							safe_snprintf(str, slen, "%d", get_vehicle_depletion(v, type));
 						}
 					}
+					else if (!str_cmp(field, "dismantling")) {
+						safe_snprintf(str, slen, "%d", VEH_IS_DISMANTLING(v) ? 1 : 0);
+					}
 					else if (!str_cmp(field, "driver")) {
 						if (VEH_DRIVER(v)) {
 							safe_snprintf(str, slen, "%c%d", UID_CHAR, char_script_id(VEH_DRIVER(v)));
@@ -6972,6 +7007,12 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 				case 'b': {	// emp.b*
 					if (!str_cmp(field, "banner")) {
 						safe_snprintf(str, slen, "%s", EMPIRE_BANNER(e));
+					}
+					else if (!str_cmp(field, "banner_name")) {
+						safe_snprintf(str, slen, "%s", color_name_by_code(EMPIRE_BANNER(e), TRUE));
+					}
+					else if (!str_cmp(field, "banner_name_simple")) {
+						safe_snprintf(str, slen, "%s", color_name_by_code(EMPIRE_BANNER(e), FALSE));
 					}
 					break;
 				}

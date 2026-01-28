@@ -1174,9 +1174,10 @@ int get_player_level_for_ability(char_data *ch, any_vnum abil_vnum) {
 /**
 * Chooses a random room up to the ability's RANGE data. If there is no range
 * data, it returns the current room. Does not return the current room if a
-* valid range is available.
+* valid range is available. This fails from a !LOCATION room template because
+* conceptually the player is not in this location.
 *
-* @param char_data *ch The pperson lookin for a random room.
+* @param char_data *ch The person lookin for a random room.
 * @param ability_data *abil Which ability they are using.
 * @param bool require_guest_permission If TRUE, checks permission
 * @return room_data* The random room, NULL if none found, or current room if range 0.
@@ -1188,6 +1189,9 @@ room_data *get_random_room_for_ability(char_data *ch, ability_data *abil, bool r
 	
 	range = get_ability_data_value(abil, ADL_RANGE, TRUE);
 	
+	if (RMT_FLAGGED(IN_ROOM(ch), RMT_NO_LOCATION)) {
+		return NULL;
+	}
 	if (!range) {
 		return IN_ROOM(ch);	// no range
 	}

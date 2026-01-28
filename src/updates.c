@@ -4698,6 +4698,57 @@ void b5_201_starsmith(void) {
 }
 
 
+// b5.202 despawn Celestial Forge to force a fresh instance
+void b5_202_celestial_forge(void) {
+	bool found = FALSE;
+	int num_rules, tries, dir = NO_DIR;
+	adv_data *adv;
+	room_data *loc;
+	struct adventure_link_rule *rule, *rule_iter;
+	struct instance_data *inst, *next_inst;
+	
+	const any_vnum CFORGE_ADV = 12800;
+	
+	if (!(adv = adventure_proto(CFORGE_ADV))) {
+		// adventure doesn't exist? fail silently
+		return;
+	}
+	
+	// delete it
+	DL_FOREACH_SAFE(instance_list, inst, next_inst) {
+		if (INST_ADVENTURE(inst) == adv) {
+			delete_instance(inst, TRUE);
+		}
+	}
+	
+	// attempt to add a fresh one
+	if (can_instance(adv)) {
+		// randomly choose one rule to attempt
+		for (tries = 0; tries < 5 && !found; ++tries) {
+			num_rules = 0;
+			rule = NULL;
+			for (rule_iter = GET_ADV_LINKING(adv); rule_iter; rule_iter = rule_iter->next) {
+				if (adventure_link_is_location_rule[rule_iter->type]) {
+					// choose one at random
+					if (!number(0, num_rules++) || !rule) {
+						rule = rule_iter;
+					}
+				}
+			}
+	
+			if (rule) {
+				if ((loc = find_location_for_rule(adv, rule, &dir))) {
+					// make it so!
+					if (build_instance_loc(adv, rule, loc, dir)) {
+						found = TRUE;
+					}
+				}
+			}
+		}
+	}
+}
+
+
 // ADD HERE, above: more beta 5 update functions
 
 
@@ -4819,6 +4870,7 @@ const struct {
 	{ "b5.196", b5_196_mine_data, NULL, "Updating mines with fullness data" },
 	{ "b5.196a", b5_196_mountain_eng, NULL, "Updating empires with Mountain Engineering" },
 	{ "b5.201", b5_201_starsmith, NULL, "Updating Celestial Forges with new artisan" },
+	{ "b5.202", b5_202_celestial_forge, NULL, "De-spawning and re-spawning the Celestial Forge to add new content" },
 	
 	// ADD HERE, above: more beta 5 update lines
 	

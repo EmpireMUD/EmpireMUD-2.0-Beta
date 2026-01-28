@@ -3285,6 +3285,38 @@ Your bolt of electricity hits $N, to no avail.
 $n's bolt of electricity hits you, to no avail.
 $n's bolt of electricity hits $N, to no avail.
 
+M12859 e 0 
+Scald DoT~
+~
+$N collapses as $S scalded flesh gives out, and dies.
+You collapse as your scalded flesh gives out, and die.
+$N collapses as $S scalded flesh gives out, and dies.
+#
+#
+#
+$N cries out as $S burns sear deeper into $S skin.
+You cry out as your burns sear deeper into your skin.
+$N cries out as $S burns sear deeper into $S skin.
+#
+#
+#
+
+M12859 e 0 
+Scald DoT~
+~
+$N succumbs to the agony of $S burns, and dies.
+You succumb to the agony of your burns, and die.
+$N succumbs to the agony of $S burns, and dies.
+#
+#
+#
+$N winces as $s blistered skin smolders painfully.
+You wince as your blistered skin smolders painfully.
+$N winces as $s blistered skin smolders painfully.
+#
+#
+#
+
 M16688 abc 32 +
 toy blaster~
 ~

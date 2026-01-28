@@ -451,6 +451,8 @@ void survey_city(char_data *ch, char *argument) {
 	room_data *room;
 	struct empire_city_data *city;
 	
+	bool imm_access = (IS_IMMORTAL(ch) ? TRUE : FALSE);
+	
 	// helper type
 	struct survey_city_t {
 		const char *dir;	// string (hash key)
@@ -477,7 +479,7 @@ void survey_city(char_data *ch, char *argument) {
 		msg_to_char(ch, "You can only survey for a city on the map.\r\n");
 		return;
 	}
-	if (ROOM_OWNER(IN_ROOM(ch)) && ROOM_OWNER(IN_ROOM(ch)) != GET_LOYALTY(ch)) {
+	if (ROOM_OWNER(IN_ROOM(ch)) && ROOM_OWNER(IN_ROOM(ch)) != GET_LOYALTY(ch) && !imm_access) {
 		msg_to_char(ch, "Someone else already owns this area.\r\n");
 		return;
 	}
@@ -501,12 +503,16 @@ void survey_city(char_data *ch, char *argument) {
 					// lower minimum
 					if (dist < min_distance_between_ally_cities) {
 						msg_to_char(ch, "You can't found a city within %d tiles of the center of %s.\r\n", min_distance_between_ally_cities, city->name);
-						return;
+						if (!imm_access) {
+							return;
+						}
 					}
 				}
 				else {
 					msg_to_char(ch, "You can't found a city within %d tiles of the center of %s.\r\n", min_distance_between_cities, city->name);
-					return;
+					if (!imm_access) {
+						return;
+					}
 				}
 			}
 		}

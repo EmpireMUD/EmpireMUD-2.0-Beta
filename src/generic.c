@@ -2051,7 +2051,7 @@ void do_stat_generic(char_data *ch, generic_data *gen) {
 		case GENERIC_CURRENCY: {
 			build_page_display(ch, "Singular: %s", NULLSAFE(GEN_STRING(gen, GSTR_CURRENCY_SINGULAR)));
 			build_page_display(ch, "Plural: %s", NULLSAFE(GEN_STRING(gen, GSTR_CURRENCY_PLURAL)));
-			build_page_display(ch, "Custom Origin: %s", GEN_STRING(gen, GSTR_CURRENCY_PLURAL) ? GEN_STRING(gen, GSTR_CURRENCY_PLURAL) : "(none)");
+			build_page_display(ch, "Custom Origin: %s", GEN_STRING(gen, GSTR_CURRENCY_CUSTOM_ORIGIN) ? GEN_STRING(gen, GSTR_CURRENCY_CUSTOM_ORIGIN) : "(none)");
 			break;
 		}
 		case GENERIC_COMPONENT: {

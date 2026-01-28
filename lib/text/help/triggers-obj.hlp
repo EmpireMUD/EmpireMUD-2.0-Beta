@@ -187,6 +187,7 @@ Objects can trigger on the following events:
 &cKill&0 - Triggers when the object's owner, or their ally, kills someone here.
 &cAllow-Multiple&0 - For some triggers, multiple triggers can run. Put the
   triggers with this flag first; any trigger without it will end the list.
+&cDead-Ok&0 - Trigger works while the actor is dead (e.g. command trigs).
 
 For each type, there is a help file named &yOTRIG <type>&0.
 #d

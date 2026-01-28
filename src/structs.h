@@ -3244,6 +3244,14 @@ struct char_delayed_update {
 };
 
 
+// data about the color codes
+struct color_code_info_t {
+	char code;		// letter after the '&'
+	char *name;		// Display name
+	char mapout;	// code used when output for the web map
+};
+
+
 // data storage for config system
 union config_data_union {
 	bitvector_t bitvector_val;

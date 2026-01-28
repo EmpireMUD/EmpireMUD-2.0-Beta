@@ -928,7 +928,7 @@ bool process_import_one(empire_data *emp) {
 				// items
 				orn = obj_proto(trade->vnum);
 				add_to_empire_storage(emp, found_island, trade->vnum, trade_amt, orn ? GET_OBJ_TIMER(orn) : 0);
-				charge_stored_resource(pair->emp, ANY_ISLAND, trade->vnum, trade_amt, TRUE);
+				charge_stored_resource(pair->emp, ANY_ISLAND, trade->vnum, trade_amt, STORAGE_TIMERS_OLDEST);
 				
 				// mark gather trackers
 				add_production_total(emp, trade->vnum, trade_amt);
@@ -7805,6 +7805,51 @@ void string_hash_to_string(struct string_hash *str_hash, char *to_string, size_t
 			break;
 		}
 	}
+}
+
+
+/**
+* Accepts a color code string like "&r" and reports on the first color code it
+* finds in there. The & is optional; it will also accept "r".
+*
+* @param const char *color_code_string The input string such as "&r" or "&L&u".
+* @param bool include_underline If TRUE, will prepend "underlined" on the color name; if FALSE ignores underline.
+* @return const char* The first color found, as a text name like "red".
+*/
+const char *color_name_by_code(const char *color_code_string, bool include_underline) {
+	static char output[256];
+	int iter, pos;
+	bool underline;
+	
+	if (!color_code_string || !*color_code_string) {
+		return "none";
+	}
+	
+	*output = '\0';
+	underline = (include_underline && strstr(color_code_string, "&u")) ? TRUE : FALSE;
+	
+	for (iter = 0; color_code_string[iter] != '\0'; ++iter) {
+		if (color_code_string[iter] == '&' || color_code_string[iter] == 'u' || isspace(color_code_string[iter])) {
+			// skip &, u, and space
+			continue;
+		}
+		
+		// is this a valid color code?
+		for (pos = 0; color_code_info[pos].code != '\n'; ++pos) {
+			if (strchr(color_code_string, color_code_info[pos].code)) {
+				// found!
+				if (underline) {
+					safe_snprintf(output, sizeof(output), "underlined %s", color_code_info[pos].name); 
+					return output;
+				}
+				else {
+					return color_code_info[pos].name;
+				}
+			}
+		}
+	}
+	
+	return *output ? output : "none";
 }
 
 

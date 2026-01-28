@@ -3571,8 +3571,8 @@ void add_shipping_queue(char_data *ch, empire_data *emp, int from_island, int to
 		msg_to_char(ch, "You set %d '%s' to ship to %s.\r\n", number, skip_filler(GET_OBJ_SHORT_DESC(store->proto)), isle ? get_island_name_for(isle->id, ch) : "an unknown island");
 	}
 	
-	// charge resources -- we pass FALSE at the end because we already split out the timers
-	charge_stored_resource(emp, from_island, store->vnum, number, FALSE);
+	// charge resources -- we pass NO_STORAGE_TIMERS at the end because we already split out the timers
+	charge_stored_resource(emp, from_island, store->vnum, number, NO_STORAGE_TIMERS);
 	EMPIRE_NEEDS_STORAGE_SAVE(emp) = TRUE;
 }
 

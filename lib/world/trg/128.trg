@@ -1,10 +1,13 @@
 #12800
 Celestial Forge: Donate to open portal~
-0 c 0 4
+0 c 0 7
 L c 12800
+L c 12801
 L c 12806
 L j 12810
+L j 12850
 L w 5100
+L w 5101
 donate~
 set room %self.room%
 set which 0
@@ -13,12 +16,17 @@ set dest 0
 if !%actor.canuseroom_guest(%room%)%
   %send% %actor% You don't have permission to do that here.
 elseif !%arg%
-  %send% %actor% Donate to which celestial forge? (iron, ...)
+  %send% %actor% Donate to which celestial forge? (iron, imperium, ...)
 elseif iron forge /= %arg% || lodestone forge /= %arg%
   set which 12800
   set dest 12810
   set curr 5100
   set str an iron shard
+elseif imperium forge /= %arg% || victory forge /= %arg%
+  set which 12801
+  set dest 12850
+  set curr 5101
+  set str an imperium shard
 else
   %send% %actor% Unknown celestial forge.
 end
@@ -70,12 +78,15 @@ end
 ~
 #12801
 Celestial Forge: Request exit~
-2 c 0 5
+2 c 0 8
 L c 9680
 L c 12800
+L c 12801
 L c 12806
 L e 5195
+L j 12800
 L j 12810
+L j 12850
 return~
 if %actor.is_npc%
   * possibly immortal trying to return
@@ -100,12 +111,15 @@ if %cf_return%
         %send% %actor% There's already a portal open for you!
         halt
       end
-      set obj %obj.next_content%
+      set obj %obj.next_in_list%
     done
     * if we got here, make a portal
     switch %room.template%
       case 12810
         set in_vnum 12800
+      break
+      case 12850
+        set in_vnum 12801
       break
       default
         set in_vnum 0
@@ -169,15 +183,19 @@ end
 ~
 #12802
 Celestial Forge: Detect player entry, Grant abilities, Start progress~
-2 g 100 8
+2 gA 100 12
 L c 9684
 L e 5195
 L i 12800
 L j 12810
 L j 12815
+L j 12850
+L j 12855
 L o 12810
+L o 12850
 L q 6
 L y 12810
+L y 12850
 ~
 if %actor.is_npc%
   halt
@@ -195,6 +213,19 @@ if %actor.skill(6)% >= 76
     end
     if %actor.empire%
       nop %actor.empire.start_progress(12810)%
+    end
+  end
+  if %room.template% >= 12850 && %room.template% <= 12855
+    if !%actor.has_bonus_ability(12850)%
+      * grant the ability after a short delay
+      %load% obj 9684 %actor%
+      set obj %actor.inventory%
+      if %obj.vnum% == 9684
+        nop %obj.val0(12850)%
+      end
+    end
+    if %actor.empire%
+      nop %actor.empire.start_progress(12850)%
     end
   end
 end
@@ -217,32 +248,73 @@ end
 ~
 #12803
 Celestial Forge: Time and Weather commands~
-2 c 0 1
+2 c 0 2
 L j 12810
+L j 12850
 time weather~
 if %cmd.mudcommand% == time
-  if %room.template% == 12810
-    %send% %actor% It looks like nighttime through the hole at the top of the tunnel.
-  else
-    %send% %actor% The beautiful night sky overhead tells you it's nighttime.
-  end
+  * TIME
+  switch %room.template%
+    case 12810
+      %send% %actor% It looks like nighttime through the hole at the top of the tunnel.
+    break
+    case 12850
+      %send% %actor% It looks like nighttime out through the flap.
+    break
+    default
+      %send% %actor% The beautiful night sky overhead tells you it's nighttime.
+    break
+  done
   return 1
 elseif %cmd.mudcommand% == weather
-  if %room.template% == 12810
-    %send% %actor% It's hard to tell the weather from in here.
-  else
-    %send% %actor% The night sky is cloudless and vast.
-  end
+  * WEATHER
+  switch %room.template%
+    case 12810
+      %send% %actor% It's hard to tell the weather from in here.
+    break
+    case 12850
+      %send% %actor% The night sky is cloudless outside.
+    break
+    default
+      %send% %actor% The night sky is cloudless and vast.
+    break
+  done
   return 1
 else
   * unknown command somehow?
   return 0
 end
 ~
+#12804
+Celestial Forge: Block adventure/survey on Shoals tile~
+2 c 0 0
+adventure survey~
+* This adventure uses a shallow tile as its real-world location. This script
+* is to prevent players from seeing what the shoals tile actually is.
+if %cmd% == adventure
+  %send% %actor% You are not in or near an adventure zone.
+elseif %cmd% == survey
+  %send% %actor% You survey the area:
+  if %room.island%
+    if %room.island(%actor%)% != %room.island%
+      %send% %actor% Location: %room.island(%actor%)% (%room.island%)
+    else
+      %send% %actor% Location: %room.island%
+    end
+  end
+  %send% %actor% Climate: %room.climate%
+  eval temp %%temperature.%room.temperature%%%
+  %send% %actor% Temperature: %temp%
+  %send% %actor% This location cannot be claimed.
+else
+  return 0
+end
+~
 #12805
 Celestial Forge: Immortal controller~
-1 c 2 1
+1 c 2 2
 L j 12810
+L j 12850
 cforge~
 if !%actor.is_immortal%
   %send% %actor% You lack the power to use this.
@@ -252,8 +324,10 @@ set mode %arg.car%
 set arg2 %arg.cdr%
 if goto /= %mode%
   * target handling
-  if iron /= %arg2%
+  if iron /= %arg2% || lodestone forge /= %arg2%
     set to_room %instance.nearest_rmt(12810)%
+  elseif imperium /= %arg2% || victory forge /= %arg2%
+    set to_room %instance.nearest_rmt(12850)%
   else
     set to_room %instance.nearest_rmt(%arg2%)%
   end
@@ -449,14 +523,19 @@ mine~
 ~
 #12811
 Celestial Forge: Unique item exclusion~
-1 j 0 5
+1 j 0 10
 L c 12810
 L c 12814
 L c 12818
 L c 12822
 L c 12826
+L c 12852
+L c 12856
+L c 12860
+L c 12864
+L c 12868
 ~
-set ring_list 12810 12814 12818 12822 12826
+set ring_list 12810 12814 12818 12822 12826 12852 12856 12860 12864 12868
 set ring_pos rfinger lfinger
 set pos_list
 *
@@ -483,6 +562,554 @@ end
 * ok
 return 1
 ~
+#12816
+Lodestone Colossus combat: Rust Stream, Armor All, Shield Fling, Rain of Rusted Blades~
+0 c 0 6
+L w 12817
+L w 12818
+L w 12819
+L w 12820
+L w 12821
+L w 12822
+!rust !armor !fling !blades~
+set targ %arg%
+set room %self.room%
+set diff %self.var(diff,1)%
+set cmd %cmd.substr(1)%
+if %actor% != %self% || !%targ% || %targ.id% == %self.id%
+  halt
+elseif %cmd% == rust
+  * Rust Stream (interrupt)
+  scfight clear interrupt
+  %echo% &&w**** Motes of rust begin to rise from the field the colossus's lodestones pulse... ****&&0 (interrupt)
+  if %diff% == 1
+    nop %self.add_mob_flag(NO-ATTACK)%
+  end
+  scfight setup interrupt all
+  wait 3 s
+  if %diff% > 2
+    set needed %room.players_present%
+  else
+    set needed 1
+  end
+  if %self.var(count_scfinterrupt,0)% < %needed%
+    %echo% &&w**** Vibrant red streams of rust flow through the air, toward the colossus... ****&&0 (interrupt)
+  end
+  wait 3 s
+  if %self.var(count_scfinterrupt,0)% >= %needed%
+    %echo% &&wThe rust rains down onto the battlefield as ~%self% loses focus and the lodestones fall silent!&&0
+    if %diff% == 1
+      dg_affect #12817 %self% HARD-STUNNED on 5
+    end
+    wait 30 s
+  else
+    %echo% &&wThe colossus grows as the streams of rust join with its tremendous body!&&0
+    eval amount %self.maxhealth% / 15
+    dg_affect #12818 %self% HEAL-OVER-TIME %amount% 15
+  end
+  scfight clear interrupt
+elseif %cmd% == armor
+  * Armor All (interrupt)
+  scfight clear interrupt
+  %echo% &&w**** The lodestones of the colossus pulse and the whole field begins to rattle... ****&&0 (interrupt)
+  if %diff% == 1
+    nop %self.add_mob_flag(NO-ATTACK)%
+  end
+  scfight setup interrupt all
+  wait 3 s
+  if %diff% > 2
+    set needed %room.players_present%
+  else
+    set needed 1
+  end
+  if %self.var(count_scfinterrupt,0)% < %needed%
+    %echo% &&w**** Pauldrons, greaves, and breastplates rise from the ashes, hovering in the air for just a moment... ****&&0 (interrupt)
+  end
+  wait 3 s
+  if %self.var(count_scfinterrupt,0)% >= %needed%
+    %echo% &&wThe cacophanous clatter deafens you momentarily as metal rains down on the battlefield.&&0
+    if %diff% == 1
+      dg_affect #12817 %self% HARD-STUNNED on 5
+    end
+    wait 30 s
+  else
+    %echo% &&wSlowly at first, then all at once, pieces of floating armor snap to the colossus, reinforcing its massive frame!&&0
+    eval amount %self.level% / 4
+    dg_affect #12819 %self% RESIST-PHYSICAL %amount% 30
+    dg_affect #12819 %self% RESIST-MAGICAL %amount% 30
+  end
+  scfight clear interrupt
+elseif %cmd% == fling
+  * Shield Fling (group duck)
+  scfight clear duck
+  %echo% &&wClanging echoes across the battlefield, distant at first, then all around you!&&0
+  if %diff% == 1
+    nop %self.add_mob_flag(NO-ATTACK)%
+  end
+  wait 3 s
+  %echo% &&w**** Shields, large and small, round and pointed, fly spinning from all across the field... toward you! ****&&0 (duck)
+  set cycle 1
+  eval wait 10 - %diff%
+  while %cycle% <= %diff%
+    scfight setup duck all
+    wait %wait% s
+    set ch %room.people%
+    while %ch%
+      set next_ch %ch.next_in_room%
+      if %self.is_enemy(%ch%)%
+        if !%ch.var(did_scfduck)%
+          %echo% &&wA flying shield strikes ~%ch% in the head!&&0
+          dg_affect #12820 %ch% STUNNED on 10
+          %damage% %ch% 50 physical
+        elseif %ch.is_pc%
+          %send% %ch% &&wYou feel the air whoosh just above your head as you duck just in time to avoid a shield!&&0
+          if %diff% == 1
+            dg_affect #12821 %ch% TO-HIT 25 20
+          end
+        end
+        if %cycle% < %diff%
+          %send% %ch% &&w**** More shields are still coming! ****&&0 (duck)
+        end
+      end
+      set ch %next_ch%
+    done
+    scfight clear duck
+    eval cycle %cycle% + 1
+  done
+  wait 8 s
+elseif %cmd% == blades
+  * Rain of Rusted Blades (group dodge)
+  scfight clear dodge
+  %echo% &&wA high-pitched screech pierces your ears as thousands of rusted blades scrape up from the ashes and rise into the air!&&0
+  if %diff% == 1
+    nop %self.add_mob_flag(NO-ATTACK)%
+  end
+  wait 3 s
+  %echo% &&w**** Rusted blades begin plummeting from above, one by one, all around you! ****&&0 (dodge)
+  set cycle 1
+  set hit 0
+  eval wait 10 - %diff%
+  while %cycle% <= %diff%
+    scfight setup dodge all
+    wait %wait% s
+    set ch %room.people%
+    while %ch%
+      set next_ch %ch.next_in_room%
+      if %self.is_enemy(%ch%)%
+        if !%ch.var(did_scfdodge)%
+          set hit 1
+          %echo% &&wA rusted blade gashes ~%ch% as it falls!&&0
+          %dot% #12822 %ch% 100 30 physical 2
+          %damage% %ch% 50 physical
+        elseif %ch.is_pc%
+          %send% %ch% &&wYou narrowly avoid a pair of blades that fall inches from your feet!&&0
+          if %diff% == 1
+            dg_affect #12821 %ch% TO-HIT 25 20
+          end
+        end
+        if %cycle% < %diff%
+          %send% %ch% &&w**** There are still more blades coming down... ****&&0 (dodge)
+        end
+      end
+      set ch %next_ch%
+    done
+    scfight clear dodge
+    eval cycle %cycle% + 1
+  done
+  wait 8 s
+end
+nop %self.remove_mob_flag(NO-ATTACK)%
+~
+#12817
+Celestial Forge: Arena return command~
+2 c 0 9
+L c 9680
+L j 12811
+L j 12817
+L j 12818
+L j 12819
+L j 12851
+L j 12857
+L j 12858
+L j 12859
+return~
+if %actor.fighting% || %actor.disabled%
+  %send% %actor% You can't do that right now.
+  halt
+elseif %actor.position% != Standing
+  %send% %actor% You need to stand up first.
+  halt
+end
+* setup
+switch %room.template%
+  case 12817
+  case 12818
+  case 12819
+    set dest %instance.nearest_rmt(12811)%
+    set mes swirl of iron filings
+  break
+  case 12857
+  case 12858
+  case 12859
+    set dest %instance.nearest_rmt(12851)%
+    set mes gleaming flash of imperium
+  break
+done
+if !%dest%
+  %send% %actor% You can't do that right now.
+  halt
+end
+* teleport
+%echoaround% %actor% ~%actor% vanishes with a %mes%!
+%send% %actor% You vanish with a %mes%!
+%teleport% %actor% %dest%
+%echoaround% %actor% ~%actor% appears in a %mes%!
+%load% obj 9680 %actor% inv
+* fellows
+set ch %room.people%
+while %ch%
+  set next_ch %ch.next_in_room%
+  if %ch.leader% == %actor% && !%ch.fighting%
+    %echoaround% %ch% ~%ch% vanishes with a %mes%!
+    %teleport% %ch% %dest%
+    %echoaround% %ch% ~%ch% appears in a %mes%!
+    if %ch.position% != Sleeping
+      %load% obj 9680 %ch% inv
+    end
+  end
+  set ch %next_ch%
+done
+~
+#12818
+Celetsial Forge: Reset arena and spawn mob~
+2 bw 100 10
+L b 12817
+L b 12857
+L b 12858
+L b 12859
+L j 12817
+L j 12818
+L j 12819
+L j 12857
+L j 12858
+L j 12859
+~
+* setup
+switch %self.template%
+  case 12817
+  case 12818
+  case 12819
+    set check_list 12817
+    set mob 12817
+    set mes The scattered weapons across the field suddenly shudder and slide, racing inward as a towering form of lodestone rises from the center, armored in the spoils of a thousand forgotten battles!
+  break
+  case 12857
+  case 12858
+  case 12859
+    set check_list 12857 12858 12859
+    set mob 12857
+    set mes The ground shakes as a fearsome War Machine rolls onto the battlefield, roaring like a furnace!
+  break
+  default
+    halt
+  break
+done
+* auto-restore if nobody is fighting
+wait 6 s
+set any 0
+set ch %room.people%
+while %ch% && !%any%
+  if %ch.fighting%
+    set any 1
+  end
+  set ch %ch.next_in_room%
+done
+if !%any%
+  set ch %room.people%
+  while %ch%
+    if %ch.health% < %ch.maxhealth% || %ch.mana% < %ch.maxmana%
+      %send% %ch% &&wThe spirit of the forge flows through you and restores you!&&0
+    end
+    %restore% %ch%
+    set ch %ch.next_in_room%
+  done
+end
+* spawn mob?
+set any 0
+while %check_list% && !%any%
+  set vnum %check_list.car%
+  set check_list %check_list.cdr%
+  if %room.people(%vnum%)%
+    set any 1
+  end
+done
+if !%any%
+  * load me!
+  wait 6 s
+  %load% mob %mob%
+  set guy %room.people%
+  if %guy.vnum% == %mob%
+    * success
+    %echo% &&w%mes%&&0
+  end
+end
+~
+#12819
+Celestial Forge: Challenge command to enter arena~
+2 c 0 9
+L c 9680
+L j 12811
+L j 12817
+L j 12818
+L j 12819
+L j 12851
+L j 12857
+L j 12858
+L j 12859
+challenge~
+* Tries to find an available arena to fight in
+* optional 'empty' arg gets you one with zero players
+if %actor.fighting% || %actor.disabled%
+  %send% %actor% You can't do that right now.
+  halt
+elseif %actor.position% != Standing
+  %send% %actor% You need to stand up first.
+  halt
+end
+* setup
+switch %room.template%
+  case 12811
+    set room_list 12817 12818 12819
+    set mes swirl of iron filings
+  break
+  case 12851
+    set room_list 12857 12858 12859
+    set mes gleaming flash of imperium
+  break
+done
+eval empty %arg% == empty
+set dest 0
+while %room_list% && !%dest%
+  set vnum %room_list.car%
+  set room_list %room_list.cdr%
+  set dest %instance.nearest_rmt(%vnum%)%
+  set ok 1
+  if %dest%
+    set ch %dest.people%
+    while %ch% && %ok%
+      if %ch.fighting%
+        set ok 0
+      elseif %empty% && %ch.is_pc%
+        set ok 0
+      end
+      set ch %ch.next_in_room%
+    done
+    if !%ok%
+      set dest 0
+    end
+  end
+done
+if !%dest%
+  %send% %actor% No challenge arena was available. Try again later.
+  halt
+end
+* teleport
+%echoaround% %actor% ~%actor% vanishes with a %mes%!
+%send% %actor% You vanish with a %mes%!
+%teleport% %actor% %dest%
+%echoaround% %actor% ~%actor% appears in a %mes%!
+%load% obj 9680 %actor% inv
+* fellows
+set ch %room.people%
+while %ch%
+  set next_ch %ch.next_in_room%
+  if %ch.leader% == %actor% && !%ch.fighting%
+    %echoaround% %ch% ~%ch% vanishes with a %mes%!
+    %teleport% %ch% %dest%
+    %echoaround% %ch% ~%ch% appears in a %mes%!
+    if %ch.position% != Sleeping
+      %load% obj 9680 %ch% inv
+    end
+  end
+  set ch %next_ch%
+done
+~
+#12820
+Celestial Forge: Loot once per day per person~
+0 f 100 4
+L b 12817
+L b 12857
+L b 12858
+L b 12859
+~
+eval min_level %self.minlevel% - 25
+set room %self.room%
+set ch %room.people%
+set any_ok 0
+switch %self.vnum%
+  case 12817
+    set varname %self.vnum%_daily
+    set loot a lodestone relic shield
+    set death The Lodestone Colossus crumbles into ash and bits of broken armor!
+  break
+  case 12857
+  case 12858
+  case 12859
+    set varname 12857_daily
+    set loot a great imperium gear
+    set death The War Machine collapses in a heap of broken wood and metal!
+  break
+  default
+    set varname %self.vnum%_daily
+    set loot
+    set death
+  break
+done
+* ensure a player has loot permission
+if %actor.is_pc% && %actor.level% >= %min_level% && %self.is_tagged_by(%actor%)%
+  if %actor.var(%varname%,0)% < %dailycycle%
+    * actor qualifies
+    set %varname% %dailycycle%
+    remote %varname% %actor.id%
+    nop %self.remove_mob_flag(!LOOT)%
+    set any_ok 1
+  end
+end
+* actor didn't qualify -- find anyone present who does
+set ch %room.people%
+while %ch% && !%any_ok%
+  if %ch.is_pc% && %ch.level% >= %min_level% && %self.is_tagged_by(%ch%)%
+    if %ch.var(%varname%,0)% < %dailycycle%
+      * ch qualifies
+      set %varname% %dailycycle%
+      remote %varname% %ch.id%
+      nop %self.remove_mob_flag(!LOOT)%
+      set any_ok 1
+    end
+  end
+  set ch %ch.next_in_room%
+done
+* death message
+if %death%
+  %echo% &&w&&Z%death%&&0
+  return 0
+end
+* did we drop it?
+if %any_ok% && %loot%
+  %echo% &&w&&Z%loot% falls to the ground as ~%self% is defeated!&&0
+end
+~
+#12821
+Celestial Forge: Single mob difficulty selector~
+0 c 0 0
+difficulty~
+if !%arg%
+  %send% %actor% You must specify a level of difficulty. (Normal, Hard, Group, or Boss)
+  return 1
+  halt
+end
+if %self.fighting%
+  %send% %actor% You can't change |%self% difficulty while &%self% is in combat!
+  return 1
+  halt
+end
+if normal /= %arg%
+  set diff 1
+elseif hard /= %arg%
+  set diff 2
+elseif group /= %arg%
+  set diff 3
+elseif boss /= %arg%
+  set diff 4
+else
+  %send% %actor% That is not a valid difficulty level for this encounter. (Normal, Hard, Group, or Boss)
+  return 1
+  halt
+end
+* messaging
+%send% %actor% You set the difficulty...
+%echoaround% %actor% ~%actor% sets the difficulty...
+* Clear existing difficulty flags and set new ones.
+remote diff %self.id%
+set mob %self%
+nop %mob.remove_mob_flag(HARD)%
+nop %mob.remove_mob_flag(GROUP)%
+if %diff% == 1
+  * Then we don't need to do anything
+  %echo% ~%self% has been set to Normal.
+elseif %diff% == 2
+  %echo% ~%self% has been set to Hard.
+  nop %mob.add_mob_flag(HARD)%
+elseif %diff% == 3
+  %echo% ~%self% has been set to Group.
+  nop %mob.add_mob_flag(GROUP)%
+elseif %diff% == 4
+  %echo% ~%self% has been set to Boss.
+  nop %mob.add_mob_flag(HARD)%
+  nop %mob.add_mob_flag(GROUP)%
+end
+nop %mob.unscale_and_reset%
+* remove no-attack
+if %mob.aff_flagged(!ATTACK)%
+  dg_affect %mob% !ATTACK off
+end
+* unscale and restore me
+nop %self.unscale_and_reset%
+* mark me as scaled
+set scaled 1
+remote scaled %self.id%
+* attempt to remove (difficulty) from longdesc
+set test (difficulty)
+if %self.longdesc% ~= %test%
+  set string %self.longdesc%
+  set replace %string.car%
+  set string %string.cdr%
+  while %string%
+    set word %string.car%
+    set string %string.cdr%
+    if %word% != %test%
+      set replace %replace% %word%
+    end
+  done
+  if %replace%
+    %mod% %self% longdesc %replace%
+  end
+end
+~
+#12822
+Celestial Forge: Mob gains no-attack on load~
+0 nA 100 0
+~
+* turn on no-attack (until diff-sel)
+dg_affect %self% !ATTACK on -1
+~
+#12823
+Celestial Forge: Message when no-attack mob is attacked~
+0 B 0 0
+~
+if %self.aff_flagged(!ATTACK)%
+  %send% %actor% You need to choose a difficulty before you can fight ~%self%.
+  %send% %actor% Usage: difficulty <normal \| hard \| group \| boss>
+  %echoaround% %actor% ~%actor% considers attacking ~%self%.
+  return 0
+else
+  * no need for this script anymore
+  detach 12823 %self.id%
+  return 1
+end
+~
+#12824
+Celestial Forge: Arena commands~
+2 cD 0 0
+flee respawn~
+if %cmd% == flee
+  %send% %actor% You cannot flee from this challenge. You must face it and live or die on your own merits.
+elseif %cmd% == respawn
+  %send% %actor% You cannot respawn from here. The spirit of the forge will restore you in a moment.
+else
+  return 0
+end
+~
 #12832
 Lodestone Firefly: Northward pull~
 0 bt 8 0
@@ -508,10 +1135,13 @@ done
 ~
 #12833
 Celestial Forge: Buy mastery item~
-1 n 100 3
+1 n 100 6
 L o 12810
 L o 12811
+L o 12850
+L o 12851
 L w 5100
+L w 5101
 ~
 set actor %self.carried_by%
 if !%actor%
@@ -523,6 +1153,12 @@ switch %self.vnum%
     set requires 12810
     set grants 12811
     set shard 5100
+    set refund 1000
+  break
+  case 12872
+    set requires 12850
+    set grants 12851
+    set shard 5101
     set refund 1000
   break
   default
@@ -554,9 +1190,12 @@ end
 ~
 #12834
 Shard companion: Buy shard companion~
-1 n 100 8
+1 n 100 11
 L b 12834
 L b 12844
+L c 12879
+L c 12880
+L c 12881
 L f 12837
 L w 5100
 L w 5101
@@ -598,6 +1237,21 @@ switch %self.vnum%
   case 12836
     set tier 1
     set new_vnum 12834
+    set upgrade caster
+  break
+  case 12879
+    set tier 2
+    set new_vnum 12844
+    set upgrade tank
+  break
+  case 12880
+    set tier 2
+    set new_vnum 12844
+    set upgrade dps
+  break
+  case 12881
+    set tier 2
+    set new_vnum 12844
     set upgrade caster
   break
   default
@@ -981,11 +1635,12 @@ detach 12837 %self.id%
 ~
 #12838
 Celestial Forge: Set up training dummy with use~
-1 c 6 1
+1 c 6 2
 L b 12838
+L b 12873
 use~
 * List of dummies to exclude here
-set dummy_list 12838
+set dummy_list 12838 12873
 *
 if %actor.obj_target(%arg.argument1%)% != %self%
   return 0
@@ -1116,7 +1771,7 @@ elseif %cmd% == reproach
   set cooldown 30
 elseif %cmd% == reset
   * remove debuffs
-  %echo% &&YA shard from ~%self% dissolves into a ball if gleaming metallic mana...&&0
+  %echo% &&YA shard from ~%self% dissolves into a ball of gleaming metallic mana...&&0
   cleanse
   set cooldown 30
 end
@@ -1277,7 +1932,7 @@ remote last_cmd %self.id%
 *
 if %last_cmd% == 1
   * Haste IF player isn't already hastened OR is already fighting
-  if %actor.affect(HASTE)% || %actor.fighting%
+  if %actor.aff_flagged(HASTE)% || %actor.fighting%
     set last_cmd 2
     remote last_cmd %self.id%
     set allow_cmd_5 1
@@ -1322,7 +1977,7 @@ elseif %last_cmd% == 4
   * boosts damage
   set weap %actor.eq(wield)%
   if %weap%
-    if %weap.magic%
+    if %weap.attack(magic)%
       set field BONUS-MAGICAL
       set desc glowing
     else
@@ -1343,7 +1998,7 @@ elseif %last_cmd% == 5
   * special regen move IF player had haste (skipped otherwise)
   if %actor.role% == Caster || %actor.role% == Healer
     set field MANA-REGEN
-  elseif %actor.role% == Tank || %actor.role == Melee
+  elseif %actor.role% == Tank || %actor.role% == Melee
     set field MOVE-REGEN
   elseif %actor.mana% < %actor.maxmana%
     set field MANA-REGEN
@@ -1386,6 +2041,413 @@ else
   * just trigger my command script
   wait 1
   magnetize
+end
+~
+#12845
+Celestial Forge: Open shard box~
+1 c 2 0
+open~
+if %actor.obj_target(%arg.argument1%)% != %self%
+  return 0
+  halt
+elseif %self.val0% <= 0 || %self.val1% < 1
+  %send% %actor% @%self% seems to be empty.
+  halt
+end
+* ok
+nop %actor.give_currency(%self.val0%,%self.val1%)%
+eval name %%currency.%self.val0%(%self.val1%)%%
+%send% %actor% You open @%self% and gain %self.val1% %name%!
+%echoaround% %actor% ~%actor5 opens @%self% and gains %self.val1% %name%!
+%purge% %self%
+~
+#12850
+Celestial Forge: Change camp standards on entry~
+2 gA 100 9
+L b 12851
+L b 12852
+L b 12855
+L c 12850
+L j 12851
+L j 12852
+L j 12853
+L j 12854
+L j 12855
+~
+set room_list 12851 12852 12853 12854 12855
+* sanity
+if %method% != portal || %actor.is_npc% || !%actor.empire% || !%was_in%
+  halt
+elseif %actor.empire% != %was_in.empire%
+  * not coming from own empire
+  halt
+end
+* short delay so only the first to enter this way triggers the change, if someone is following
+wait 1
+* detect color
+set color %actor.empire.banner_name_simple%
+if !%color% || %color% == none
+  halt
+end
+* update all the banners
+while %room_list%
+  set vnum %room_list.car%
+  set room_list %room_list.cdr%
+  set there %instance.nearest_rmt(%vnum%)%
+  if %there%
+    set obj %there.contents(12850)%
+    if %obj%
+      * update 1 banner
+      %mod% %obj% longdesc &Z%color.ana% %color% camp standard flies over the forge.
+      %mod% %obj% lookdesc The %color% camp standard rises above the forge, snapping and sighing in the night wind. Firelight from the smelter makes it visible against the starry night sky, splashed with the color of old embers and fresh blood.
+      %mod% %obj% append-lookdesc In the center of the %color% standard is the symbol of %actor.empire.name%.
+      %at% %there% %echo% The camp standard ripples and gleams as it changes to a new %color% emblem.
+    end
+  end
+done
+* and update mobs
+set Mateo %instance.mob(12851)%
+set Amina %instance.mob(12852)%
+set Oksana %instance.mob(12855)%
+if %Mateo%
+  %mod% %Mateo% lookdesc The master campwright is dressed in tight black trousers and a white shirt under a short, fitted black jacket, wrapped at the waist with %color.ana% %color% sash.
+  %mod% %Mateo% append-lookdesc His face, soot-stained from work at the smelter, is gentle, with sharp creases around his eyes. On his head, he wears a wide-brimmed black hat, though the sun has already set.
+end
+if %Amina%
+  %mod% %Amina% lookdesc The forgehand is steady as she raises and drops her hammer onto the anvil over and over, in perfect rhythm. She wears a hefty leather apron over a loose white dress
+  %mod% %Amina% append-lookdesc hemmed just above the ankle with patterns of red, yellow, and green. Over her shoulders, she has pinned a gold shawl with colorful beads and her head is
+  %mod% %Amina% append-lookdesc covered in a brimless gold cap decorated on the front with a stylized %color% flower.
+end
+if %Oksana%
+  %mod% %Oksana% lookdesc She wears a white blouse with %color% flowers, tucked loosely into a striped red and white skirt. Her long brown hair flows freely over her shoulders and, at the
+  %mod% %Oksana% append-lookdesc top, she has adorned it with flowers of all colors. Though she isn't working the anvil, she has the muscled build of a smith, and the old burn scars on her arms from years of toil at the forge.
+end
+~
+#12851
+Celestial Forge: Fake exits from Victory Forge~
+2 c 0 0
+north south east west northeast ne southeast se southwest sw northwest nw down~
+set dir %actor.parse_dir(%cmd%)%
+eval to_room %%room.%dir%(room)%%
+if !%to_room%
+  if %dir% == down
+    %send% %actor% You start to wander down the hill but somehow end up back by the forge.
+  else
+    %send% %actor% You wander %actor.dir(%dir%)% but somehow end up back by the forge.
+  end
+  set ch %room.people%
+  while %ch%
+    if %ch% != %actor%
+      if %dir% == down
+        %send% %ch% ~%actor% starts to wander down the hill but somehow ends up back by the forge.
+      else
+        %send% %ch% ~%actor% wanders %ch.dir(%dir%)% but somehow ends up back by the forge.
+      end
+    end
+    set ch %ch.next_in_room%
+  done
+else
+  return 0
+end
+~
+#12857
+Celestial Forge: War Machine phase 1 to 2~
+0 l 85 1
+L b 12858
+~
+%load% mob 12858
+set mob %self.room.people%
+if %mob.vnum% == 12858
+  set diff %self.var(diff,1)%
+  remote diff %mob.id%
+  nop %mob.remove_mob_flag(HARD)%
+  nop %mob.remove_mob_flag(GROUP)%
+  if %diff% == 1
+    * Then we don't need to do anything
+  elseif %diff% == 2
+    nop %mob.add_mob_flag(HARD)%
+  elseif %diff% == 3
+    nop %mob.add_mob_flag(GROUP)%
+  elseif %diff% == 4
+    nop %mob.add_mob_flag(HARD)%
+    nop %mob.add_mob_flag(GROUP)%
+  end
+  nop %mob.unscale_and_reset%
+  %scale% %mob% %self.level%
+  set scaled 1
+  remote scaled %mob.id%
+  * messaging
+  %echo% &&wPlate after plate breaks off of the War Machine, exposing its weapons!&&0
+  %force% %mob% maggro %self.fighting%
+  %purge% %self%
+end
+~
+#12858
+Celestial Forge: War Machine phase 2 to 3~
+0 l 30 1
+L b 12859
+~
+%load% mob 12859
+set mob %self.room.people%
+if %mob.vnum% == 12859
+  set diff %self.var(diff,1)%
+  remote diff %mob.id%
+  nop %mob.remove_mob_flag(HARD)%
+  nop %mob.remove_mob_flag(GROUP)%
+  if %diff% == 1
+    * Then we don't need to do anything
+  elseif %diff% == 2
+    nop %mob.add_mob_flag(HARD)%
+  elseif %diff% == 3
+    nop %mob.add_mob_flag(GROUP)%
+  elseif %diff% == 4
+    nop %mob.add_mob_flag(HARD)%
+    nop %mob.add_mob_flag(GROUP)%
+  end
+  nop %mob.unscale_and_reset%
+  %scale% %mob% %self.level%
+  set scaled 1
+  remote scaled %mob.id%
+  * messaging
+  %echo% &&wA trumpet sounds as the battered War Machine rallies for one last stand!&&0
+  %force% %mob% maggro %self.fighting%
+  %purge% %self%
+end
+~
+#12859
+War Machine phase 2 combat: Burning Catapult, Whirling Sawblades, Hammer Tremor, Scalding Vents, Grapple Winch~
+0 c 0 5
+L w 9602
+L w 12821
+L w 12857
+L w 12858
+L w 12859
+!catapult !whirl !tremor !scald !winch~
+set targ %arg%
+set room %self.room%
+set diff %self.var(diff,1)%
+set cmd %cmd.substr(1)%
+if %actor% != %self% || !%targ% || %targ.id% == %self.id%
+  halt
+elseif %cmd% == catapult
+  * Burning Catapult (dodge)
+  scfight clear dodge
+  %echo% &&wSmoke streams upward as the burning arm of a catapult extends from the War Machine!&&0
+  if %diff% == 1
+    nop %self.add_mob_flag(NO-ATTACK)%
+  end
+  wait 3 s
+  set cycle 1
+  eval pain 100 * (diff + 1)
+  eval wait 10 - %diff%
+  while %cycle% <= %diff%
+    set targ %random.enemy%
+    if !%targ%
+      halt
+    end
+    %send% %targ% &&w**** The catapult takes aim... at you! ****&&0 (dodge)
+    %echoaround% %targ% &&wThe catapult takes aim... at ~%targ%!&&0
+    scfight setup dodge %targ%
+    set targ_id %targ.id%
+    wait %wait% s
+    if %targ% && %targ_id% == %targ.id%
+      * still here
+      if %targ.var(did_scfdodge)%
+        %echo% &&wThere's a fiery explosion as the catapult hits the ground mere feet from where ~%targ% dodged!&&0
+        if %diff% == 1
+          dg_affect #12821 %targ% TO-HIT 25 20
+        end
+      else
+        * hit!
+        %echo% &&wA burning mass of pitch and tar from the catapult explodes into |%targ% chest!&&0
+        %damage% %targ% %pain% physical
+      end
+    end
+    scfight clear dodge
+    eval cycle %cycle% + 1
+  done
+  wait 8 s
+elseif %cmd% == whirl
+  * Whirling Sawblades (group duck)
+  scfight clear duck
+  %echo% &&wThe War Machine stops for a moment and creaks as long sawblades extend from its sides...&&0
+  if %diff% == 1
+    nop %self.add_mob_flag(NO-ATTACK)%
+  end
+  wait 3 s
+  %echo% &&w**** The War Machine begins to spin, slowly at first, then faster, and faster... ****&&0 (duck)
+  set cycle 1
+  eval wait 10 - %diff%
+  while %cycle% <= %diff%
+    scfight setup duck all
+    wait %wait% s
+    set ch %room.people%
+    while %ch%
+      set next_ch %ch.next_in_room%
+      if %self.is_enemy(%ch%)%
+        if !%ch.var(did_scfduck)%
+          %echo% &&wA sawblade catches ~%ch%, ripping through ^%ch% flesh, causing deep and grievous wounds!&&0
+          %dot% #12857 %ch% 100 30 physical 5
+          %damage% %ch% 50 physical
+        elseif %ch.is_pc%
+          %send% %ch% &&wYou feel the air slice past the top of your head as you narrowly duck the whirling sawblade.&&0
+          if %diff% == 1
+            dg_affect #12821 %ch% TO-HIT 25 20
+          end
+        end
+        if %cycle% < %diff%
+          %send% %ch% &&w**** It's still spinning! ****&&0 (duck)
+        end
+      end
+      set ch %next_ch%
+    done
+    scfight clear duck
+    eval cycle %cycle% + 1
+  done
+  wait 8 s
+elseif %cmd% == tremor
+  * Hammer Tremor (group jump)
+  scfight clear jump
+  %echo% &&wA mast rises from the top of the War Machine...&&0
+  if %diff% == 1
+    nop %self.add_mob_flag(NO-ATTACK)%
+  end
+  wait 3 s
+  %echo% &&w**** The War Machine raises its tremendous mast to the highest position... this isn't good! ****&&0 (jump)
+  set cycle 1
+  eval wait 10 - %diff%
+  while %cycle% <= %diff%
+    scfight setup jump all
+    wait %wait% s
+    %echo% &&wThe mast of the War Machine slams downward with a deafening thud! A tremor ripples across the battlefield...&&0
+    set ch %room.people%
+    while %ch%
+      set next_ch %ch.next_in_room%
+      if %self.is_enemy(%ch%)%
+        if !%ch.var(did_scfjump)%
+          if %ch.aff_flagged(!STUN)%
+            %echo% &&wThe tremor knocks ~%ch% into a broken wagon!&&0
+          else
+            %echo% &&wThe tremor knocks ~%ch% to the ground!&&0
+            dg_affect #12858 %ch% STUNNED on 10
+          end
+          %damage% %ch% 50 physical
+        elseif %ch.is_pc%
+          %send% %ch% &&wYou time your jump perfectly to avoid the tremor.&&0
+          if %diff% == 1
+            dg_affect #12821 %ch% TO-HIT 25 20
+          end
+        end
+        if %cycle% < %diff%
+          %send% %ch% &&w**** The mast is rising again! ****&&0 (jump)
+        end
+      end
+      set ch %next_ch%
+    done
+    scfight clear jump
+    eval cycle %cycle% + 1
+  done
+  wait 8 s
+elseif %cmd% == scald
+  * Scalding Vents (group dodge)
+  scfight clear dodge
+  %echo% &&wA furnace roars within the War Machine as low vents on its sides slide open...&&0
+  if %diff% == 1
+    nop %self.add_mob_flag(NO-ATTACK)%
+  end
+  wait 3 s
+  %echo% &&w**** Steam rises from the open vents as the War Machine turns and takes aim... ****&&0 (dodge)
+  set cycle 1
+  set hit 0
+  eval wait 10 - %diff%
+  while %cycle% <= %diff%
+    scfight setup dodge all
+    wait %wait% s
+    set ch %room.people%
+    while %ch%
+      set next_ch %ch.next_in_room%
+      if %self.is_enemy(%ch%)%
+        if !%ch.var(did_scfdodge)%
+          set hit 1
+          %echo% &&wA blast of steam from the War Machine scalds ~%ch%!&&0
+          %dot% #12859 %ch% 100 30 physical 5
+          %damage% %ch% 50 physical
+        elseif %ch.is_pc%
+          %send% %ch% &&wYou hurl yourself out of the way just in time to avoid a scalding blast of steam!&&0
+          if %diff% == 1
+            dg_affect #12821 %ch% TO-HIT 25 20
+          end
+        end
+        if %cycle% < %diff%
+          %send% %ch% &&w**** The vents are still steaming... ****&&0 (dodge)
+        end
+      end
+      set ch %next_ch%
+    done
+    scfight clear dodge
+    eval cycle %cycle% + 1
+  done
+  wait 8 s
+elseif %cmd% == winch
+  * Grapple Winch (struggle)
+  %echo% &&wA crossbow rises from the top of the War Machine...&&0
+  if %diff% == 1
+    nop %self.add_mob_flag(NO-ATTACK)%
+  end
+  wait 3 s
+  set cycle 1
+  eval wait 10 - %diff%
+  while %cycle% <= %diff%
+    set targ %random.enemy%
+    if !%targ%
+      halt
+    elseif !%targ.affect(9602)%
+      * only if not already struggling
+      %send% %targ% &&w**** The War Machine fires a grappler at you... You're caught, and being pulled in! ****&&0 (struggle)
+      %echoaround% %targ% &&wThe War Machine fires a grappler at ~%targ%... and starts reeling *%targ% in!&&0
+      scfight setup struggle %targ% 30
+      * messages
+      set scf_strug_char You struggle to free yourself from the winch...
+      set scf_strug_room ~%%actor%% struggles to free *%%actor%%self from the winch...
+      remote scf_strug_char %targ.id%
+      remote scf_strug_room %targ.id%
+      set scf_free_char You cut yourself free of the winch!
+      set scf_free_room ~%%actor%% cuts *%%actor%%self free of the winch!
+      remote scf_free_char %targ.id%
+      remote scf_free_room %targ.id%
+    end
+    eval cycle %cycle% + 1
+    wait %wait% s
+  done
+  eval pause 28 - (%wait% * %diff%)
+  wait %pause% s
+  * punish anybody still grappled
+  eval pain 100 * %diff%
+  set ch %room.people%
+  while %ch%
+    set next_ch %ch.next_in_room%
+    if %self.is_enemy(%ch%)% && %ch.affect(9602)%
+      %echo% &&wThe War Machine reels ~%ch% in and impales *%ch% on a dull spike!&&0
+      %damage% %ch% %pain% physical
+    end
+    set ch %next_ch%
+  done
+end
+nop %self.remove_mob_flag(NO-ATTACK)%
+~
+#12877
+Celestial Forge: Banner hawk load script~
+0 nt 100 0
+~
+set guy %self.leader%
+if !%guy% || !%guy.is_pc% || !%guy.empire%
+  halt
+end
+set emp %guy.empire%
+set color %emp.banner_name_simple%
+if %color% != none
+  %mod% %self% longdesc A sharp-eyed hawk trails %color.ana% %color% banner from its talons.
+  %mod% %self% lookdesc The lean, broad-winged hawk has feathers mottled in gleaming white and stark black. A light harness made of leather crosses its chest. In its talons, it clutches the %color% banner of %emp.name%.
 end
 ~
 $

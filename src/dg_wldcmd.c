@@ -1215,7 +1215,7 @@ WCMD(do_wload) {
 			}
 			
 			// ok: charge it
-			charge_stored_resource(emp, GET_ISLAND_ID(room), number, 1, TRUE);
+			charge_stored_resource(emp, GET_ISLAND_ID(room), number, 1, STORAGE_TIMERS_OLDEST);
 			EMPIRE_NEEDS_STORAGE_SAVE(emp) = TRUE;
 			
 			// and load it

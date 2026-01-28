@@ -18,4 +18,21 @@ R
 R
 6402 1 1 0
 S
+#12878
+runner victory~
+a victory runner~
+A victory runner is parked here.~
+   The low, narrow war cart is built almost entirely for speed. Its imperium
+frame is thin but rigid, with long-spoked wheels set wide for balance and
+wrapped in black nocturnium rims polished smooth by constant use.
+~
+~
+bfgku 19 5 0 2 0 0 0 0 0 -1 0
+C
+100 200
+P
+4
+R
+6402 2 1 0
+S
 $

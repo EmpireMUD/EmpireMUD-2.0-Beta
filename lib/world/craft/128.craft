@@ -161,4 +161,187 @@ R
 R
 6402 10 1 0
 S
+#12852
+black and white ring of restoration~
+12852 1
+1 12850 q 6 -1 0 0
+R
+12851 1 0 0
+R
+177 2 0 0
+R
+176 2 0 0
+R
+1300 2 0 0
+S
+#12854
+black and white earrings of restoration~
+12854 1
+1 12850 q 6 -1 0 0
+R
+12851 1 0 0
+R
+177 2 0 0
+R
+176 2 0 0
+R
+1300 2 0 0
+S
+#12856
+black and white ring of fortitude~
+12856 1
+1 12850 q 6 -1 0 0
+R
+12851 1 0 0
+R
+177 2 0 0
+R
+176 2 0 0
+R
+103 2 0 0
+S
+#12858
+black and white earrings of fortitude~
+12858 1
+1 12850 q 6 -1 0 0
+R
+12851 1 0 0
+R
+177 2 0 0
+R
+176 2 0 0
+R
+103 2 0 0
+S
+#12860
+black and white ring of wrath~
+12860 1
+1 12850 q 6 -1 0 0
+R
+12851 1 0 0
+R
+177 2 0 0
+R
+176 2 0 0
+R
+104 2 0 0
+S
+#12862
+black and white earrings of wrath~
+12862 1
+1 12850 q 6 -1 0 0
+R
+12851 1 0 0
+R
+177 2 0 0
+R
+176 2 0 0
+R
+104 2 0 0
+S
+#12864
+black and white ring of arcana~
+12864 1
+1 12850 q 6 -1 0 0
+R
+12851 1 0 0
+R
+177 2 0 0
+R
+176 2 0 0
+R
+1206 2 0 0
+S
+#12866
+black and white earrings of arcana~
+12866 1
+1 12850 q 6 -1 0 0
+R
+12851 1 0 0
+R
+177 2 0 0
+R
+176 2 0 0
+R
+1206 2 0 0
+S
+#12868
+black and white ring of valor~
+12868 1
+1 12850 q 6 -1 0 0
+R
+12851 1 0 0
+R
+177 2 0 0
+R
+176 2 0 0
+R
+6600 2 1 0
+S
+#12870
+black and white earrings of valor~
+12870 1
+1 12850 q 6 -1 0 0
+R
+12851 1 0 0
+R
+177 2 0 0
+R
+176 2 0 0
+R
+6600 2 1 0
+S
+#12873
+imperium training dummy~
+12873 1
+1 12850 q 6 -1 0 0
+R
+12851 1 0 0
+R
+6000 1 1 0
+R
+6790 1 1 0
+R
+6420 10 1 0
+R
+6720 6 1 0
+R
+177 1 0 0
+S
+#12875
+monomachus crown~
+12875 1
+1 12850 q 6 -1 0 0
+R
+12851 1 0 0
+R
+177 10 0 0
+R
+1206 1 0 0
+R
+104 1 0 0
+R
+103 1 0 0
+R
+1300 1 0 0
+S
+#12878
+victory runner~
+12878 1
+2 12850 nq 1 -1 0 e
+R
+12851 1 0 0
+R
+177 16 0 0
+R
+176 4 0 0
+R
+6035 2 1 0
+R
+6530 2 1 0
+R
+6521 4 1 0
+R
+6402 10 1 0
+S
 $

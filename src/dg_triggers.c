@@ -355,14 +355,17 @@ int command_mtrigger(char_data *actor, char *cmd, char *argument, int mode) {
 	DL_FOREACH_SAFE2(ROOM_PEOPLE(IN_ROOM(actor)), ch, ch_next, next_in_room) {
 		if (SCRIPT_CHECK(ch, MTRIG_COMMAND)) {
 			LL_FOREACH_SAFE(TRIGGERS(SCRIPT(ch)), t, next_t) {
+				if (!TRIGGER_CHECK(t, MTRIG_COMMAND)) {
+					continue;
+				}
+				if (IS_DEAD(actor) && !TRIGGER_CHECK(t, MTRIG_DEAD_OK)) {
+					continue;	// dead people can't command trigger
+				}
 				if (AFF_FLAGGED(ch, AFF_CHARM) && !TRIGGER_CHECK(t, MTRIG_CHARMED)) {
 					continue;
 				}
 				if (actor == ch && AFF_FLAGGED(ch, AFF_ORDERED) && !TRIGGER_CHECK(t, MTRIG_CHARMED)) {
 					// can't be ordered to use tyour own triggers without the charmed flag
-					continue;
-				}
-				if (!TRIGGER_CHECK(t, MTRIG_COMMAND)) {
 					continue;
 				}
 
@@ -1044,7 +1047,7 @@ int receive_mtrigger(char_data *ch, char_data *actor, obj_data *obj) {
 			ADD_UID_VAR(buf, t, obj_script_id(obj), "object", 0);
 			sdd.c = ch;
 			ret_val = script_driver(&sdd, t, MOB_TRIGGER, TRIG_NEW);
-			if (EXTRACTED(actor) || EXTRACTED(ch) || IS_DEAD(actor) || IS_DEAD(ch) || obj->carried_by != actor) {
+			if (EXTRACTED(actor) || EXTRACTED(ch) || (IS_DEAD(actor) && !TRIGGER_CHECK(t, MTRIG_DEAD_OK)) || (IS_DEAD(ch) && !TRIGGER_CHECK(t, MTRIG_DEAD_OK)) || obj->carried_by != actor) {
 				return 0;
 			}
 			else {
@@ -1133,7 +1136,7 @@ int bribe_mtrigger(char_data *ch, char_data *actor, int amount) {
 			ADD_UID_VAR(buf, t, char_script_id(actor), "actor", 0);
 			ret_val = script_driver(&sdd, t, MOB_TRIGGER, TRIG_NEW);
 			
-			if (EXTRACTED(actor) || EXTRACTED(ch) || IS_DEAD(actor) || IS_DEAD(ch)) {
+			if (EXTRACTED(actor) || EXTRACTED(ch) || (IS_DEAD(actor) && !TRIGGER_CHECK(t, MTRIG_DEAD_OK)) || (IS_DEAD(ch) && !TRIGGER_CHECK(t, MTRIG_DEAD_OK))) {
 				return 0;
 			}
 			else {
@@ -1787,6 +1790,9 @@ int cmd_otrig(obj_data *obj, char_data *actor, char *cmd, char *argument, int ty
 			// not a command trigger
 			if (!TRIGGER_CHECK(t, OTRIG_COMMAND)) {
 				continue;
+			}
+			if (IS_DEAD(actor) && !TRIGGER_CHECK(t, OTRIG_DEAD_OK)) {
+				continue;	// dead people can't command trigger
 			}
 			
 			// bad location
@@ -2939,6 +2945,9 @@ int command_wtrigger(char_data *actor, char *cmd, char *argument, int mode) {
 		if (!TRIGGER_CHECK(t, WTRIG_COMMAND)) {
 			continue;
 		}
+		if (IS_DEAD(actor) && !TRIGGER_CHECK(t, WTRIG_DEAD_OK)) {
+			continue;	// dead people can't command trigger
+		}
 
 		if (!GET_TRIG_ARG(t) || !*GET_TRIG_ARG(t)) {
 			syslog(SYS_ERROR, LVL_BUILDER, TRUE, "SYSERR: W-Command Trigger #%d has no text argument!", GET_TRIG_VNUM(t));
@@ -3490,6 +3499,9 @@ int command_vtrigger(char_data *actor, char *cmd, char *argument, int mode) {
 			LL_FOREACH_SAFE(TRIGGERS(SCRIPT(veh)), t, next_t) {
 				if (!TRIGGER_CHECK(t, VTRIG_COMMAND)) {
 					continue;
+				}
+				if (IS_DEAD(actor) && !TRIGGER_CHECK(t, VTRIG_DEAD_OK)) {
+					continue;	// dead people can't command trigger
 				}
 
 				if (!GET_TRIG_ARG(t) || !*GET_TRIG_ARG(t)) {
@@ -4084,9 +4096,7 @@ bool check_command_trigger(char_data *actor, char *cmd, char *argument, int mode
 	if (!IS_NPC(actor) && ACCOUNT_FLAGGED(actor, ACCT_FROZEN)) {
 		return cont;	// frozen players
 	}
-	if (IS_DEAD(actor)) {
-		return cont;	// dead people
-	}
+	// dead people no longer checked here as of b5.202, now checked in individual funcs
 	
 	// never override the toggle command for immortals
 	if (IS_IMMORTAL(actor) && is_abbrev(cmd, "toggles")) {

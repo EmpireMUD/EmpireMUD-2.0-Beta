@@ -1,0 +1,90 @@
+#12817
+Lodestone Forge: Shadow of the Colossus~
+   Charlotte makes no attempt to hide the fact that she's sizing you up. She
+pulls her mouth back into a contemplative face as she checks out your gear and
+watches you move.
+   'Legendary equipment requires a legendary victory,' she says. 'Think you're
+up to the task?'
+   She begins to weave the tale of a battlefield lost to time, where the lost
+and broken steel of warriors past have taken on a life of their own, bound by
+powerful lodestones, and always prepared for another battle.
+   If you're ready to prove your mettle against the creature, type 'challenge'
+from Charlotte Gibilian's location in Lodestone Forge. If you want to ensure a
+private arena, type 'challenge empty'. You can return from the challenge by
+typing 'return' from the battlefield.
+~
+   Still coughing from battlefield ash in your lungs, you emerge triumphant
+against the Lodestone Colossus, proving -- to yourself, at least -- that you're
+more than just another dented suit of armor in the rusty wasteland of history.
+   You can challenge the Lodestone Colossus again as many times as you want by
+typing 'challenge' or 'challenge empty' from Charlotte Gibilian's location in
+Lodestone Forge. However, it will only reward you with a shatterable relic
+shield once per day.
+   Remember, you can always return from the challenge by typing 'return' from
+the battlefield.
+~
+1 0 1 100 -1
+A
+1 12811
+R
+8 5100 100
+W+
+3 12817 0 1 -
+Defeat the Lodestone Colossus~
+Z
+1 12811
+Z
+3 12817
+Z
+3 12818
+Z
+3 12819
+S
+#12857
+Victory Forge: War Machine Springs to Life~
+   Mateo tips his hat to you with a bushy grin.
+   'Oye, have you come just to hammer?' he asks. 'Or are you here for more of a
+challenge?'
+   He points out over the battlefield, still smouldering below the hillside. To
+your eyes, it looks still, dead, unmoving. It could be a painting, but for the
+rising smoke and settling fog.
+   'The engine of war never stops, never sleeps. Even now, as we rebuild our
+weapons and armor, War is also preparing itself for us.'
+   Mateo stops and laughs.
+   'Maybe I'm not making any sense. But it's real. Legendary equipment deserves
+a legendary victory. Face the machine on its own battlefield. Show us all how
+it's done.'
+   If you're ready to prove your mettle against the machine, type 'challenge'
+from Master Campwright Mateo's location at Victory Forge. If you want to ensure
+a private arena, type 'challenge empty'. You can return from the challenge by
+typing 'return' from the battlefield.
+~
+   You wave your standard in triumph over the War Machine, knowing full well
+that the machine never falters, never rests, never stops coming. But you stood
+your ground and faced it, and stories will be told of this long after you have
+gone.
+   You can challenge the War Machine again as many times as you want by typing
+'challenge' or 'challenge empty' from Master Campwright Mateo's location at
+Vicstory Forge. However, it will only reward you with a shatterable imperium
+gear once per day.
+   Remember, you can always return from the challenge by typing 'return' from
+the battlefield.
+~
+3 0 100 200 -1
+A
+1 12851
+R
+8 5101 100
+W+
+3 12859 0 1 -
+Stop the War Machine~
+Z
+1 12851
+Z
+3 12857
+Z
+3 12858
+Z
+3 12859
+S
+$

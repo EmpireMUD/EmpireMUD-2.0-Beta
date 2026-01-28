@@ -256,7 +256,7 @@ while you sleep.
 
 When you're done with the shelter, be sure to dismantle it.
 #
-CELESTIALFORGE "CELESTIAL FORGE" SHATTER SHARD SHARDS "LODESTONE FORGE" "LODESTONE FORGING" "LODESTONE MASTERY"
+CELESTIALFORGE "CELESTIAL FORGE" SHATTER SHARD SHARDS "LODESTONE FORGE" "LODESTONE FORGING" "VICTORY FORGE" "VICTORIOUS SMITHING"
 
 [FF]  Celestial Forge  (Renown goal)
 
@@ -278,10 +278,12 @@ of any type. This will take you to the forge that matches the shard.
 
 Shard types and celstial forges:
   Lodestone Forge:  iron shards  (level 1-100)
-  imperium shards  (level 101-200)
+  Victory Forge:  imperium shards  (level 101-200)
   argentine shards  (level 201-300)
   meteorite shards  (level 301-400)
   celestial shards  (level 401-500)
+
+Higher celestial forges are not yet implemented.
 
 Each celestial forge has its own crafting ability, which you receive
 automatically if you visit that forge with Trade skill 76 or higher.
@@ -289,7 +291,11 @@ automatically if you visit that forge with Trade skill 76 or higher.
 To leave a celestial forge, type 'return' in its entry area. This will open a
 portal or teleport you out, depending upon how you entered.
 
-Higher celestial forges are not yet implemented.
+Each celestial forge also has a daily boss challenge. From the center of the
+forge, type 'challenge' to teleport to the first available arena where nobody
+is fighting, or 'challenge empty' to teleport to the first available arena with
+no players in it. Your followers come with you. Once the fight begins, no other
+players may join. Type 'return' to leave the challenge arena.
 
 See also: CURRENCY
 #

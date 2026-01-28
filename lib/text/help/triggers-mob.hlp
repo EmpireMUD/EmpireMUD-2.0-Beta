@@ -376,6 +376,7 @@ Mobs can trigger on the following events:
 &cAllow-Multiple&0 - For some triggers, multiple triggers can run. Put the
   triggers with this flag first; any trigger without it will end the list.
 &cCan-Fight&0 - Triggers when someone tries to attack.
+&cDead-Ok&0 - Trigger works while the actor is dead (e.g. command, random, receive, bribe).
 
 For each type, there is a help file named &yMTRIG <type>&0.
 #d
@@ -573,6 +574,7 @@ When using field  - The variable returns:
 &cmaxblood&0 - The maximum blood points of the actor.
 &cmaxcarrying&0 - Inventory size limit (total they can carry).
 &cmaxhealth&0 - The maximum hit points of the actor.
+&cmaxlevel, minlevel&0 - For NPCs, their upper and lower level limits.
 &cmaxmana&0 - The maximum mana points of the actor.
 &cmaxmove&0 - The maximum movement points of the actor.
 &cmob_flagged(FLAG)&0 - Returns TRUE if the NPC has the given flag, e.g. VAMPIRE.

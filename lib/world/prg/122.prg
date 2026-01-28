@@ -21,6 +21,6 @@ W+
 Build a shrine using the serragon's heart~
 W+
 2 12209 0 1 a
-Store a frilled serragon skull in a Cabinet of Curiosities~
+Store a frilled serragon skull in your vault~
 S
 $

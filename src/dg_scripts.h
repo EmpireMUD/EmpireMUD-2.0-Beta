@@ -77,6 +77,7 @@
 #define MTRIG_ALLOW_MULTIPLE   BIT(26)	// for triggers that block other triggers, allows multiple to run
 #define MTRIG_CAN_FIGHT        BIT(27)	// checked when trying to attack a mob you're not already fighting
 #define MTRIG_PRE_GREET_ALL    BIT(28)	// similar to greet-all but called BEFORE moving the person into the room
+#define MTRIG_DEAD_OK          BIT(29)	// trigger fires even if player is dead (e.g. command, random, receive, bribe)
 
 
 // OTRIG_x: obj trigger types
@@ -106,6 +107,9 @@
 #define OTRIG_BUY              BIT(24)	// attempting a purchase
 #define OTRIG_KILL             BIT(25)	// obj's owner has killed something
 #define OTRIG_ALLOW_MULTIPLE   BIT(26)	// for triggers that block other triggers, allows multiple to run
+// BIT(27)
+// BIT(28)
+#define OTRIG_DEAD_OK          BIT(29)	// trigger fires even if player is dead (e.g. command)
 
 
 // VTRIG_x: vehicle trigger types
@@ -136,6 +140,9 @@
 #define VTRIG_BUY              BIT(24)	// attempting a purchase in the room
 #define VTRIG_KILL             BIT(25)	// vehicle killed someone
 #define VTRIG_ALLOW_MULTIPLE   BIT(26)	// for triggers that block other triggers, allows multiple to run
+// BIT(27)
+// BIT(28)
+#define VTRIG_DEAD_OK          BIT(29)	// trigger fires even if player is dead (e.g. command)
 
 
 // WTRIG_x: wld trigger types
@@ -166,6 +173,9 @@
 #define WTRIG_BUY              BIT(24)	// attempting a purchase
 // BIT(25)
 #define WTRIG_ALLOW_MULTIPLE   BIT(26)	// for triggers that block other triggers, allows multiple to run
+// BIT(27)
+// BIT(28)
+#define WTRIG_DEAD_OK          BIT(29)	// trigger fires even if player is dead (e.g. command)
 
 
 /* obj command trigger types */

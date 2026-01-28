@@ -63,8 +63,8 @@ void tog_pvp(char_data *ch);
 //// EMPIREMUD CONSTANTS /////////////////////////////////////////////////////
 
 // Shown on the "version" command and sent over MSSP
-const char *version = "EmpireMUD 2.0 beta 5.201";
-const char *DG_SCRIPT_VERSION = "DG Scripts 1.0.12 e5.1.16";
+const char *version = "EmpireMUD 2.0 beta 5.202";
+const char *DG_SCRIPT_VERSION = "DG Scripts 1.0.12 e5.1.18";
 
 
 // data for the built-in game levels -- this adapts itself if you reduce the number of immortal levels
@@ -4472,43 +4472,48 @@ const char mapout_color_tokens[] = {
 };
 
 
-// this maps a banner color (the 'r' in "&r") to a mapout_color_token character ('1')
-const char banner_to_mapout_token[][2] = {
-	{ '0', '0' },
-	{ 'n', '0' },
+// convert color code e.g. &0: name "gray", mapout code '0'
+const struct color_code_info_t color_code_info[] = {
+	{ '0', "gray", '0' },
+	{ 'n', "gray", '0' },
+	
 	// non-bright colors:
-	{ 'r', 'a' },
-	{ 'g', 'f' },
-	{ 'b', 't' },
-	{ 'y', 'p' },
-	{ 'm', 'v' },
-	{ 'c', 'w' },
-	{ 'w', 'r' },
-	{ 'a', 'u' },
-	{ 'j', 'b' },
-	{ 'l', 'y' },
-	{ 'o', 'z' },
-	{ 'p', 'B' },
-	{ 't', 'q' },
-	{ 'v', 'E' },
+	{ 'r', "red", 'a' },
+	{ 'g', "green", 'f' },
+	{ 'b', "blue", 't' },
+	{ 'y', "yellow", 'p' },
+	{ 'm', "magenta", 'v' },
+	{ 'c', "cyan", 'w' },
+	{ 'w', "dark gray", 'r' },
+	{ 'a', "dark azure", 'u' },
+	{ 'j', "dark jade", 'b' },
+	{ 'l', "dark lime", 'y' },
+	{ 'o', "dark orange", 'z' },
+	{ 'p', "dark pink", 'B' },
+	{ 't', "dark tan", 'q' },
+	{ 'v', "violet", 'E' },
+	
 	// bright colors:
-	{ 'R', '1' },
-	{ 'G', '2' },
-	{ 'B', '4' },
-	{ 'Y', '3' },
-	{ 'M', '5' },
-	{ 'C', '6' },
-	{ 'W', '0' },
-	{ 'A', 'j' },
-	{ 'J', 'd' },
-	{ 'L', 'x' },
-	{ 'O', 'o' },
-	{ 'P', 'A' },
-	{ 'T', 'C' },
-	{ 'V', 'D' },
+	{ 'R', "bright red", '1' },
+	{ 'G', "bright green", '2' },
+	{ 'B', "bright blue", '4' },
+	{ 'Y', "bright yellow", '3' },
+	{ 'M', "bright magenta", '5' },
+	{ 'C', "bright cyan", '6' },
+	{ 'W', "white", '0' },
+	{ 'A', "azure", 'j' },
+	{ 'J', "jade", 'd' },
+	{ 'L', "lime", 'x' },
+	{ 'O', "orange", 'o' },
+	{ 'P', "pink", 'A' },
+	{ 'T', "tan", 'C' },
+	{ 'V', "bright violet", 'D' },
+	
+	// special codes
+	{ 'u', "underline", '0' },
 	
 	// last
-	{ '\n', '\n' }
+	{ '\n', "\n", '\n' }
 };
 
 
@@ -4895,6 +4900,7 @@ const char *trig_types[] = {
 	"Allow-Multiple",
 	"Can-Fight",
 	"Pre-Greet-All",
+	"Dead-Ok",
 	"\n"
 };
 
@@ -4929,6 +4935,7 @@ const bitvector_t mtrig_argument_types[] = {
 	NOBITS,	// allow-multiple
 	NOBITS,	// can-fight
 	TRIG_ARG_PERCENT,	// pre-greet-all
+	NOBITS,	// dead-ok
 };
 
 
@@ -4961,6 +4968,9 @@ const char *otrig_types[] = {
 	"Buy",
 	"Kill",		// 25
 	"Allow-Multiple",
+	"*",
+	"*",
+	"Dead-Ok",
 	"\n"
 };
 
@@ -4993,6 +5003,9 @@ const bitvector_t otrig_argument_types[] = {
 	TRIG_ARG_OBJ_WHERE,	// buy
 	TRIG_ARG_PERCENT,	// 25, kill
 	NOBITS,	// allow-multiple
+	NOBITS,	// 27
+	NOBITS,	// 28
+	NOBITS,	// dead-ok
 };
 
 
@@ -5025,6 +5038,9 @@ const char *vtrig_types[] = {
 	"Buy",
 	"Kill",		// 25
 	"Allow-Multiple",
+	"*",
+	"*",
+	"Dead-Ok",
 	"\n"
 };
 
@@ -5058,6 +5074,9 @@ const bitvector_t vtrig_argument_types[] = {
 	NOBITS,	// buy
 	TRIG_ARG_PERCENT,	// 25, kill
 	NOBITS,	// allow-multiple
+	NOBITS,	// 27
+	NOBITS,	// 28
+	NOBITS,	// dead-ok
 };
 
 
@@ -5090,6 +5109,9 @@ const char *wtrig_types[] = {
 	"Buy",
 	"*",	// 25
 	"Allow-Multiple",
+	"*",
+	"*",
+	"Dead-Ok",
 	"\n"
 };
 
@@ -5122,6 +5144,9 @@ const bitvector_t wtrig_argument_types[] = {
 	NOBITS,	// buy
 	NOBITS,	// 25
 	NOBITS,	// allow-multiple
+	NOBITS,	// 27
+	NOBITS,	// 28
+	NOBITS,	// dead-ok
 };
 
 

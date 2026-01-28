@@ -92,6 +92,7 @@ Vehicles can trigger on the following events:
 &cKill&0 - Triggers when the vehicle kills someone.
 &cAllow-Multiple&0 - For some triggers, multiple triggers can run. Put the
   triggers with this flag first; any trigger without it will end the list.
+&cDead-Ok&0 - Trigger works while the actor is dead (e.g. command trigs).
 
 For each type, there is a help file named &yVTRIG <type>&0.
 #d
@@ -119,6 +120,7 @@ When using field  - The variable returns:
 &cdedicated_to&0 - If the vehicle is dedicated to someone, gets the name.
 &cdepletion(type)&0 - Get the current depletion amount (OLC DEPLETION) for the
    vehicle, or change it with %veh.depletion(type,amount)%; 0 is not-depleted.
+&cdismantling&0 - True if the vehicle is being dismantled.
 &cdriver&0 - The person driving/sailing the vehicle, if any.
 &cdump&0 - Empties everything out of the vehicle, including people.
 &cdump_objects&0 - Empties just the contents, if the vehicle is a container.

@@ -704,6 +704,7 @@ static void show_detailed_empire(char_data *ch, empire_data *e) {
 	}
 	
 	build_page_display(ch, "Adjective form: %s", EMPIRE_ADJECTIVE(e));
+	build_page_display(ch, "Banner: %s%s\t0", EMPIRE_BANNER(e), color_name_by_code(EMPIRE_BANNER(e), TRUE));
 
 	build_page_display(ch, "Ranks%s:", (is_own_empire ? " and privileges" : ""));
 	for (iter = 1; iter <= EMPIRE_NUM_RANKS(e); ++iter) {
@@ -5960,6 +5961,10 @@ ACMD(do_estats) {
 		msg_to_char(ch, " (%s&0)", EMPIRE_ADJECTIVE(emp));
 	}
 	msg_to_char(ch, "\r\n");
+	
+	if (PRF_FLAGGED(ch, PRF_SCREEN_READER)) {
+		msg_to_char(ch, "Banner: %s%s\t0\r\n", EMPIRE_BANNER(emp), color_name_by_code(EMPIRE_BANNER(emp), TRUE));
+	}
 	
 	if (IS_IMMORTAL(ch)) {
 		sprintbit(EMPIRE_ADMIN_FLAGS(emp), empire_admin_flags, part, TRUE);
