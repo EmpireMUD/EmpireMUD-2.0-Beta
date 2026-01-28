@@ -1,12 +1,13 @@
 #12800
 Celestial Forge: Donate to open portal~
-0 c 0 6
+0 c 0 7
 L c 12800
 L c 12801
 L c 12806
 L j 12810
 L j 12850
 L w 5100
+L w 5101
 donate~
 set room %self.room%
 set which 0
@@ -77,12 +78,13 @@ end
 ~
 #12801
 Celestial Forge: Request exit~
-2 c 0 7
+2 c 0 8
 L c 9680
 L c 12800
 L c 12801
 L c 12806
 L e 5195
+L j 12800
 L j 12810
 L j 12850
 return~
@@ -283,10 +285,36 @@ else
   return 0
 end
 ~
+#12804
+Celestial Forge: Block adventure/survey on Shoals tile~
+2 c 0 0
+adventure survey~
+* This adventure uses a shallow tile as its real-world location. This script
+* is to prevent players from seeing what the shoals tile actually is.
+if %cmd% == adventure
+  %send% %actor% You are not in or near an adventure zone.
+elseif %cmd% == survey
+  %send% %actor% You survey the area:
+  if %room.island%
+    if %room.island(%actor%)% != %room.island%
+      %send% %actor% Location: %room.island(%actor%)% (%room.island%)
+    else
+      %send% %actor% Location: %room.island%
+    end
+  end
+  %send% %actor% Climate: %room.climate%
+  eval temp %%temperature.%room.temperature%%%
+  %send% %actor% Temperature: %temp%
+  %send% %actor% This location cannot be claimed.
+else
+  return 0
+end
+~
 #12805
 Celestial Forge: Immortal controller~
-1 c 2 1
+1 c 2 2
 L j 12810
+L j 12850
 cforge~
 if !%actor.is_immortal%
   %send% %actor% You lack the power to use this.
@@ -694,9 +722,16 @@ nop %self.remove_mob_flag(NO-ATTACK)%
 ~
 #12817
 Celestial Forge: Arena return command~
-2 c 0 2
+2 c 0 9
+L c 9680
 L j 12811
+L j 12817
+L j 12818
+L j 12819
 L j 12851
+L j 12857
+L j 12858
+L j 12859
 return~
 if %actor.fighting% || %actor.disabled%
   %send% %actor% You can't do that right now.
@@ -747,9 +782,17 @@ done
 ~
 #12818
 Celetsial Forge: Reset arena and spawn mob~
-2 bw 100 2
+2 bw 100 10
 L b 12817
+L b 12857
+L b 12858
+L b 12859
 L j 12817
+L j 12818
+L j 12819
+L j 12857
+L j 12858
+L j 12859
 ~
 * setup
 switch %self.template%
@@ -813,11 +856,16 @@ end
 ~
 #12819
 Celestial Forge: Challenge command to enter arena~
-2 c 0 4
+2 c 0 9
+L c 9680
 L j 12811
 L j 12817
 L j 12818
 L j 12819
+L j 12851
+L j 12857
+L j 12858
+L j 12859
 challenge~
 * Tries to find an available arena to fight in
 * optional 'empty' arg gets you one with zero players
@@ -888,7 +936,11 @@ done
 ~
 #12820
 Celestial Forge: Loot once per day per person~
-0 f 100 0
+0 f 100 4
+L b 12817
+L b 12857
+L b 12858
+L b 12859
 ~
 eval min_level %self.minlevel% - 25
 set room %self.room%
@@ -1083,10 +1135,13 @@ done
 ~
 #12833
 Celestial Forge: Buy mastery item~
-1 n 100 3
+1 n 100 6
 L o 12810
 L o 12811
+L o 12850
+L o 12851
 L w 5100
+L w 5101
 ~
 set actor %self.carried_by%
 if !%actor%
@@ -2008,7 +2063,10 @@ eval name %%currency.%self.val0%(%self.val1%)%%
 ~
 #12850
 Celestial Forge: Change camp standards on entry~
-2 gA 100 6
+2 gA 100 9
+L b 12851
+L b 12852
+L b 12855
 L c 12850
 L j 12851
 L j 12852
@@ -2127,7 +2185,7 @@ end
 #12858
 Celestial Forge: War Machine phase 2 to 3~
 0 l 30 1
-L b 12858
+L b 12859
 ~
 %load% mob 12859
 set mob %self.room.people%
@@ -2158,7 +2216,12 @@ end
 ~
 #12859
 War Machine phase 2 combat: Burning Catapult, Whirling Sawblades, Hammer Tremor, Scalding Vents, Grapple Winch~
-0 c 0 0
+0 c 0 5
+L w 9602
+L w 12821
+L w 12857
+L w 12858
+L w 12859
 !catapult !whirl !tremor !scald !winch~
 set targ %arg%
 set room %self.room%
