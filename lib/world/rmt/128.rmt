@@ -584,7 +584,7 @@ tables weights stone carved carvings tokens regiments plots battlefield~
 down by heavy stone and carved tokens that are used to plan the siege.
 ~
 E
-out~
+northeast ne out flap exit~
    Cool night air rushes in as you glance out the tent flap and see the
 smelter and anvils, all hard at work repairing arms and armor for the weary
 soldiers.
@@ -617,11 +617,6 @@ words.
 E
 seals wax~
 Red wax seals adorn rolled letters on the table.
-~
-E
-northeast ne out flap exit~
-   Looking out through the flap, you see a fiery smelter tended by a blacksmith
-in a wide black hat.
 ~
 T 12803
 T 12802
@@ -1026,7 +1021,7 @@ smoke~
 Smoke rises from parts of the battlefield, joining with the fog.
 ~
 E
-up stars sky expanse night~
+up stars sky night~
 The endless night sky stretches out above you, twinkling with stars.
 ~
 E
@@ -1076,7 +1071,7 @@ smoke~
 Smoke rises from parts of the battlefield, joining with the fog.
 ~
 E
-up stars sky expanse night~
+up stars sky night~
 The endless night sky stretches out above you, twinkling with stars.
 ~
 E
@@ -1126,7 +1121,7 @@ smoke~
 Smoke rises from parts of the battlefield, joining with the fog.
 ~
 E
-up stars sky expanse night~
+up stars sky night~
 The endless night sky stretches out above you, twinkling with stars.
 ~
 E
