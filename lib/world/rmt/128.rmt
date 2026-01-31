@@ -12,7 +12,7 @@ a narrow hole where the air smells of warm, spicy incense. At the other, the
 tunnel ends abruptly.
 Commands: return
 ~
-ci 0 0 12810
+cei 0 0 12810
 D8
 ~
 0 12811
@@ -560,7 +560,7 @@ as lanterns swing from the central poles. Outside there's a general silence,
 punctuated by the ring of hammers against hard anvils.
 Commands: return
 ~
-ci 0 0 12850
+cei 0 0 12850
 D5
 ~
 0 12851
@@ -1138,5 +1138,429 @@ T 12818
 T 12824
 T 12803
 Z1 1
+S
+#12890
+Above Silence Forge~
+   No sound echoes out as you step onto a raised tile platform beneath a starry
+night sky. A brick-filled archway stands at one end of the small platform; the
+other side has a twisting metal staircase that leads downward. As you look out,
+you see a massive wall enclosing a circular area below you. Something beneath
+the platform glows bright enough to cast shadows, but you can't see it from
+here. The rest of the circle's interior is dark, but an occasional flash
+illuminates shadowy figures working at anvils.
+Commands: return
+~
+cei 0 0 12890
+D9
+~
+0 12891
+E
+tiles platform~
+tba
+~
+E
+up stars sky expanse night~
+tba
+~
+E
+out~
+tba
+~
+E
+down~
+tba
+~
+E
+staircase stairs~
+tba
+~
+E
+metal~
+tba
+~
+E
+circle area~
+tba
+~
+E
+wall~
+tba
+~
+E
+beneath~
+tba
+~
+E
+glow~
+tba
+~
+E
+flashes anvils figures~
+tba
+~
+E
+shadows shadowy~
+tba
+~
+E
+pools water~
+tba
+~
+E
+archways~
+tba
+~
+T 12803
+T 12802
+T 12801
+T 12885
+T 12886
+T 12887
+S
+#12891
+Silence Forge~
+   Beneath the raised platform is a brilliant white bell, glowing like a star
+such that you can't look at it for long. It floats in the air above a small,
+engraved dais. Near the bell, a twisting staircase leads back up to the
+platform. The floor here is made of large tiles, apparently metal, but there is
+no sound as you step. There's no sound here at all, not even from the artisans
+working the anvils around you. Beyond them, in the distance, is a great, round
+wall too high to see over and too dark to make out from here.
+Commands: challenge
+~
+cei 0 0 12890
+D8
+~
+0 12890
+D3
+~
+0 12892
+D1
+~
+0 12893
+D2
+~
+0 12894
+D0
+~
+0 12895
+E
+platform up~
+tba
+~
+E
+bell white brilliant glowing star~
+tba
+~
+E
+dais engraved~
+tba
+~
+E
+floor tiles~
+tba
+~
+E
+metal~
+tba
+~
+E
+artisans~
+tba
+~
+E
+anvils~
+tba
+~
+E
+out around~
+tba
+~
+E
+wall distance~
+tba
+~
+E
+pools watere~
+tba
+~
+E
+north~
+tba
+~
+E
+south~
+tba
+~
+E
+east~
+tba
+~
+E
+west~
+tba
+~
+M 0 12891 100.00 1
+T 12803
+T 12802
+T 12819
+T 12885
+T 12886
+T 12887
+S
+#12892
+Silence Forge~
+   A large, round anvil rests between two pools of water beneath the endless
+starry night. A momentary flash of white light bursts forth each time Ixchel
+strikes the anvil, but it makes no sound. Behind the anvil, a tall archway
+marks the boundary of the metal tile floor. And beyond that, blocking your
+view, is the great circular wall.
+Commands: forge, smelt
+~
+cei 0 hv 12890
+D1
+~
+0 12891
+E
+anvil round~
+tba
+~
+E
+pools water~
+tba
+~
+E
+up sky~
+tba
+~
+E
+archway~
+tba
+~
+E
+floor down tile~
+tba
+~
+E
+metal~
+tba
+~
+E
+walls out~
+tba
+~
+E
+archway~
+tba
+~
+E
+east~
+tba
+~
+M 0 12892 100.00 1
+T 12803
+T 12802
+T 12819
+T 12885
+T 12886
+T 12887
+S
+#12893
+Silence Forge~
+   The air over the heavy, round anvil ripples with heat as the blade of an
+unfinished greatsword grows brighter and brighter in the forge at the center.
+Beyond the gleaming metal arch that stands at the rim of the tiled floor, the
+great wall seems to shift, even twitch, sending twinkles of soft, dappled light
+cascading across Silence Forge.
+Commands: forge, smelt
+~
+cei 0 hv 12890
+D3
+~
+0 12891
+E
+air ripples heat waves~
+tba
+~
+E
+anvil round heavy~
+tba
+~
+E
+blade sword greatsword~
+tba
+~
+E
+forge~
+tba
+~
+E
+center~
+tba
+~
+E
+archway~
+tba
+~
+E
+floor tiles tiled down~
+tba
+~
+E
+metal~
+tba
+~
+E
+rim~
+tba
+~
+E
+wall~
+tba
+~
+E
+tail~
+tba
+~
+E
+light cascade dappled dapples twinkles~
+tba
+~
+E
+scales serrations serrated~
+tba
+~
+E
+west~
+tba
+~
+M 0 12893 100.00 1
+T 12803
+T 12802
+T 12819
+T 12885
+T 12886
+T 12887
+S
+#12894
+Silence Forge~
+   Between two long pools of water stands a round anvil, large enough for 5
+expert smiths to work side-by-side, with a red-hot forge at its center. The air
+above it ripples up to the sky, where the stars dance in reverie. Behind it,
+past the end of the tiles and beyond a tall archway, the great wall that
+encircles Silence Forge seems to move.
+Commands: forge, smelt
+~
+cei 0 hv 12890
+D0
+~
+0 12891
+E
+pools water~
+tba
+~
+E
+anvil round~
+tba
+~
+E
+forge~
+tba
+~
+E
+red-hot redhot~
+tba
+~
+E
+heat ripples~
+tba
+~
+E
+stars up~
+tba
+~
+E
+floor down tiles tiled~
+tba
+~
+E
+walls out~
+tba
+~
+E
+head~
+tba
+~
+E
+scales serrations~
+tba
+~
+E
+serragon~
+tba
+~
+E
+north~
+tba
+~
+M 0 12894 100.00 1
+T 12803
+T 12802
+T 12819
+T 12885
+T 12886
+T 12887
+S
+#12895
+Silence Forge~
+   In this arc of the great circle, tightly packed between two pools of still
+water, wide baskets and tall stacks of bins organize a vast collection of
+metal, wood, and cloth to be used in the creation of legendary arms and armor.
+The supplies cast a fragmented shadow on the great wall from the soft light of
+the bell.
+~
+cei 0 0 12890
+D2
+~
+0 12891
+E
+arc circle~
+tba
+~
+E
+floor down tiles~
+tba
+~
+E
+baskets stacks bins collection wood cloth~
+tba
+~
+E
+supplies~
+tba
+~
+E
+shadow fragmented wall~
+tba
+~
+E
+bell light~
+tba
+~
+E
+pools water~
+tba
+~
+E
+south~
+tba
+~
+M 0 12895 100.00 1
+T 12803
+T 12802
+T 12819
+T 12885
+T 12886
+T 12887
 S
 $

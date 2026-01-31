@@ -28,6 +28,21 @@ M
 18
 $p tears itself apart and dissolves into the air!~
 S
+#12802
+portal silently~
+a silent portal~
+A portal rages silently before you.~
+The border of the portal is so dark it seems to absorb all light.
+~
+8 0 0 0 0 3
+-1 0 0
+10 3
+C
+1 1
+M
+18
+$p collapses and vanishes with a burst of light!~
+S
 #12805
 controller celestial forge~
 the celestial forge controller~

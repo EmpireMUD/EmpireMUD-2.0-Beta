@@ -516,7 +516,7 @@ S
 #12852
 amina veteran forgehand hand~
 Amina~
-Amina, Veteran Forgehand, works the anvil.
+Amina, Veteran Forgehand, works the anvil. (list)
 ~
 0 0 bdvL cnG 3
 2 0 0 15 -1 -1
@@ -587,7 +587,7 @@ S
 #12853
 Yara first~
 Yara~
-Yara of the First Anvil swings her hammer with precision.
+Yara of the First Anvil swings her hammer with precision. (list)
 ~
 0 0 bdvL cnG 3
 2 0 0 15 -1 -1
@@ -645,7 +645,7 @@ S
 #12854
 hiro siege-honored honored~
 Hiro~
-Hiro the Siege-Honored works tirelessly at the anvil.
+Hiro the Siege-Honored works tirelessly at the anvil. (list)
 ~
 0 0 bdvL cnG 3
 1 0 0 15 -1 -1
@@ -709,7 +709,7 @@ S
 #12855
 Oksana lawhammer hammer~
 Oksana~
-Oksana Lawhammer is tallying the supplies.
+Oksana Lawhammer is tallying the supplies. (list)
 ~
 0 0 bdvL cnG 3
 2 0 0 15 -1 -1
@@ -968,5 +968,116 @@ The lean, broad-winged hawk has feathers mottled in gleaming white and stark
 black. A light harness made of leather crosses its chest.
 ~
 T 12877
+S
+#12891
+kaito measured~
+Kaito~
+Kaito the Measured stands near the bell.
+~
+0 0 bdvL cnG 3
+1 0 0 15 -1 -1
+D
+   He wears a simple, sleeveless work robe tied at the waist, its dark fabric
+dusted with metal filings. His hair is bound back neatly, and he stands with
+perfect posture, making each motion deliberately. When he notices you, he
+inclines his head slightly and raises one hand in a calm, practiced sign of
+welcome.
+~
+M
+7
+emote $n bows.~
+M
+8
+emote $n bows.~
+T 12807
+S
+#12892
+ixchel starbound~
+Ixchel~
+Ixchel the Starbound hammers away at the forge. (list)
+~
+0 0 bdvL cnG 3
+2 0 0 15 -1 -1
+D
+   Her woven tunic is patterned with subtle geometric designs, reinforced at
+the shoulders with leather straps darkened by long years of use. Her skin has a
+warm bronze tone and her long hair is braided tightly to keep it clear of her
+work. Fine cords and small tools hang at her belt, and her hands are steady as
+she works dark metal into narrow, glowing bands.
+~
+M
+7
+emote $n waves.~
+M
+8
+emote $n waves.~
+T 12807
+S
+#12893
+saoirse gleaming~
+Saoirse~
+Saoirse the Gleaming is working the anvil. (list)
+~
+0 0 bdvL cnG 3
+2 0 0 15 -1 -1
+D
+   She's dressed in layered linen and wool, muted in color and tied back for
+work, with a heavy apron protecting her from stray sparks of light. Pale
+freckles dust her fair skin, and her red hair is gathered in into a loose twist
+at the back of her head. A simple knotwork charm is stitched into her sleeve,
+nearly hidden. She turns pieces in her hands thoughtfully, as if weighing more
+than just the material.
+~
+M
+7
+emote $n waves.~
+M
+8
+emote $n waves.~
+T 12807
+S
+#12894
+percy unfaltering~
+Percy~
+Percy the Unfaltering is examining something closely. (list)
+~
+0 0 bdvL cnG 3
+1 0 0 15 -1 -1
+D
+   He wears a well-worn smith's apron over plain, practical clothing. The
+sleeves and edges show signs they have been neatly mended many times over. His
+arms are marked by old burns, but he keeps his sleeves rolled up as he works.
+His brown hair is beginning to gray at the temples. He squints slightly as he
+inspects his creations, tinkering with them patiently until they're just so.
+~
+M
+7
+emote $n waves.~
+M
+8
+emote $n waves.~
+T 12807
+S
+#12895
+somsak ordered~
+Somsak~
+Somsak the Ordered is organizing items into the bins. (list)
+~
+0 0 bdvL cnG 3
+1 0 0 15 -1 -1
+D
+   He wears loose, lightweight garments suited for long hours of work, belted
+securely to keep them clear as he glides back and forth, every movement
+perfectly silent as he stacks, counts, and arranges everything. His dark hair
+is cropped short his face is calm but concerted as he gives you a small nod
+before returning to his tasks.
+~
+M
+7
+emote $n waves.~
+M
+8
+emote $n waves.~
+T 12807
 S
 $
