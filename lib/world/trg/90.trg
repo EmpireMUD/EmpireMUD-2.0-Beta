@@ -657,7 +657,7 @@ L t 9042
 switch %self.vnum%
   case 9042
     * Smith / Forgemaster
-    if %victim.vnum% == 212 || %victim.vnum% == 278
+    if %victim.vnum% == 212 || %victim.vnum% == 278 || %victim.vnum% == 12800
       set found 1
     end
   break
