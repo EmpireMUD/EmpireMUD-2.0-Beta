@@ -984,12 +984,67 @@ inclines his head slightly and raises one hand in a calm, practiced sign of
 welcome.
 ~
 M
+0
+The bell glows brighter for a moment.~
+M
+0
+You see a flash of light a hammer in the distance.~
+M
+0
+A warm breeze blows over you.~
+M
+0
+$n tends the bell.~
+M
+0
+$n stares at the stars in the pool of water.~
+M
+0
+The bell rocks back and forth in silence.~
+M
 7
-emote $n bows.~
+do signlang 1~
+M
+7
+skip~
+M
+7
+do signlang 2~
+M
+7
+skip~
+M
+7
+do signlang 3~
+M
+7
+skip~
+M
+7
+do signlang 4~
+M
+7
+skip~
+M
+7
+do signlang 5~
+M
+7
+skip~
 M
 8
-emote $n bows.~
+do signlang 1~
+M
+8
+skip~
+M
+8
+do signlang 3~
+M
+8
+skip~
 T 12807
+T 12888
 S
 #12892
 ixchel starbound~
@@ -1006,12 +1061,70 @@ work. Fine cords and small tools hang at her belt, and her hands are steady as
 she works dark metal into narrow, glowing bands.
 ~
 M
+0
+There's a bright flash of light as $n strikes the anvil with $s hammer.~
+M
+0
+There's a flash of light in the distance.~
+M
+0
+There's a puff of steam as $n dips a piece of hot iron in the pool.~
+M
+0
+The forge glows brighter as $n heats $s work in the center of the anvil.~
+M
+0
+Light ripples across the great wall as it seems to shift a few inches.~
+M
+0
+There's a bright flash of light as $n strikes the anvil with $s hammer.~
+M
+0
+Light cascades across the tiles as $n hammers at the anvil.~
+M
+0
+The stars ripple through the sky overhead.~
+M
 7
-emote $n waves.~
+echo ~%self% looks up at your and sets down ^%self% hammer.~
+M
+7
+do signlang 10~
+M
+7
+skip~
+M
+7
+do signlang 11~
+M
+7
+skip~
+M
+7
+do signlang 12~
+M
+7
+skip~
+M
+7
+do signlang 13~
+M
+7
+skip~
 M
 8
-emote $n waves.~
+do signlang 14~
+M
+8
+skip~
+M
+8
+do signlang 15~
+M
+8
+skip~
 T 12807
+T 12888
 S
 #12893
 saoirse gleaming~
@@ -1029,12 +1142,58 @@ nearly hidden. She turns pieces in her hands thoughtfully, as if weighing more
 than just the material.
 ~
 M
+0
+Shafts of light burst out from $n's hammer as $s works.~
+M
+0
+$n brings the hammer down hard and fast, letting out a great burst of light.~
+M
+0
+The tiles flash with little bursts of light as $n moves around the anvil.~
+M
+0
+$n stokes the forge.~
+M
+0
+$n ties back loose strands of hair.~
+M
+0
+The stars ripple overhead.~
+M
+0
+The wall sparkles with light as it shifts ever so slightly.~
+M
+0
+$n quenches a piece of hot metal in the pool.~
+M
+0
+There's a flash of light from one of the other anvils in the distance.~
+M
 7
-emote $n waves.~
+echo ~%self% sets ^%self% work in the center of the burning anvil.~
+M
+7
+do signlang 20~
+M
+7
+skip~
+M
+7
+do signlang 21~
+M
+7
+skip~
+M
+7
+do signlang 22~
 M
 8
-emote $n waves.~
+echo ~%self% glances at you as you come in.~
+M
+8
+do signlang 23~
 T 12807
+T 12888
 S
 #12894
 percy unfaltering~
@@ -1051,12 +1210,76 @@ His brown hair is beginning to gray at the temples. He squints slightly as he
 inspects his creations, tinkering with them patiently until they're just so.
 ~
 M
+0
+$n taps at the anvil with a small hammer, eliciting many tiny bursts of light that scatter across the forge.~
+M
+0
+There's a flash of light from one of the other anvils.~
+M
+0
+$n straightens $s tie.~
+M
+0
+$n peers at $s work through small spectacles.~
+M
+0
+$n tosses an ingot into the forge.~
+M
+0
+$n turns an ingot in the fire.~
+M
+0
+The stars ripple in the heat of the forge.~
+M
+0
+A single milky eye opens in the wall, twitches, and then closes again.~
+M
+0
+There's a fair glow through $n's short hair as $e runs $s fingers through it.~
+M
+0
+The great wall shifts, sending sparkles of light down its curving length.~
+M
+0
+$n watches the wall for a moment, brow furrowed.~
+M
+0
+$n stokes the forge.~
+M
+0
+Part of the wall shakes and waves, like a long frill.~
+M
 7
-emote $n waves.~
+echo ~%self% sets down a half-finished piece and walks over to shake hands.~
+M
+7
+do signlang 30~
+M
+7
+skip~
+M
+7
+do signlang 31~
+M
+7
+skip~
 M
 8
-emote $n waves.~
+echo ~%self% waves a polite hello.~
+M
+8
+do signlang 32~
+M
+8
+skip~
+M
+8
+do signlang 33~
+M
+8
+skip~
 T 12807
+T 12888
 S
 #12895
 somsak ordered~
@@ -1073,11 +1296,87 @@ is cropped short his face is calm but concerted as he gives you a small nod
 before returning to his tasks.
 ~
 M
+0
+A crate of ingots appears in the air and slams to the ground with a burst of white light.~
+M
+0
+$n organizes a set of poles in a bin.~
+M
+0
+$n wipes $s brow.~
+M
+0
+The stars twinkle overhead.~
+M
+0
+You catch a flash of light from the corner of your eye.~
+M
+0
+There's a burst of light from one of the anvils as a smith hits it with a large hammer.~
+M
+0
+The great wall moves just a little, sending a cascade of soft light down its length.~
+M
+0
+The bell at the center of the forge glows brighter for a moment.~
+M
+0
+$n packs stray shards into a crate.~
+M
+0
+A long bolt of cloth falls from the air into a soft pile on the ground; $n picks it up and folds it away.~
+M
+0
+The floor tiles glow as $n slides a heavy bin to the side.~
+M
 7
-emote $n waves.~
+echo ~%self% presses ^%self% palms together and bows slightly.~
+M
+7
+do signlang 40~
+M
+7
+skip~
+M
+7
+do signlang 41~
+M
+7
+skip~
+M
+7
+do signlang 42~
+M
+7
+skip~
+M
+7
+do signlang 43~
+M
+7
+skip~
+M
+7
+do signlang 44~
 M
 8
-emote $n waves.~
+echo ~%self% presses ^%self% palms together and bows slightly.~
+M
+8
+do signlang 41~
+M
+8
+skip~
+M
+8
+do signlang 45~
+M
+8
+skip~
+M
+8
+do signlang 46~
 T 12807
+T 12888
 S
 $

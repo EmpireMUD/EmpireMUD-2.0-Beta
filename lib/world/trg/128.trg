@@ -2588,4 +2588,139 @@ switch %cmd%
   break
 done
 ~
+#12888
+Celestial Forge: Sign language for Silence Forge~
+0 c 0 1
+L o 12891
+signlang~
+if %actor% != %self%
+  halt
+end
+switch %arg%
+  * KAITO
+  case 1
+    set abil_msg ~%self% inclines ^%self% head and signs with ^%self% hands, 'Welcome.'
+    set non_msg ~%self% inclines ^%self% head and raises one hand.
+  break
+  case 2
+    set abil_msg ~%self% signs, 'It is an honor to meet you.'
+    set non_msg ~%self% gestures with one hand to ^%self% brow and the other pointed forward.
+  break
+  case 3
+    set abil_msg ~%self% signs, 'Our forge is your forge.'
+    set non_msg ~%self% gestures around the area, then points forward again.
+  break
+  case 4
+    set abil_msg ~%self% signs, 'But be cautious not to create a sound...'
+    set non_msg ~%self% holds a hand up to ^%self% throat touches ^%self% thumb to ^%self% fingers...
+  break
+  case 5
+    set abil_msg ~%self% signs, 'For the Echo Serragon never sleeps.'
+    set non_msg ~%self% waves ^%self% hand through the air, palm-down, while turning in a full circle.
+  break
+  * IXCHEL
+  case 10
+    set abil_msg ~%self% signs with ^%self% hands, 'Oh! A new face.'
+    set non_msg ~%self% gestures around ^%self% face with ^%self% hands.
+  break
+  case 11
+    set abil_msg ~%self% signs, 'Didn't even hear you come in.'
+    set non_msg ~%self% shakes her head and points to one ear.
+  break
+  case 12
+    set abil_msg ~%self% signs, 'I'm hard at work for weapons to use against the beast.'
+    set non_msg ~%self% gestures toward the anvil with ^%self% hands, and then toward the great wall.
+  break
+  case 13
+    set abil_msg ~%self% signs, 'But I also have some inspiration for some rings, if you like.'
+    set non_msg ~%self% forms a circle with ^%self% fingers and then points to her head and then up at the night sky.
+  break
+  case 14
+    set abil_msg ~%self% looks up at you and signs with one hand, 'A bit busy here.'
+    set non_msg ~%self% looks up at you and makes a hammering motion with ^%self% free hand.
+  break
+  case 15
+    set abil_msg ~%self% signs, 'But feel free to look around.'
+    set non_msg ~%self% points to ^%self% eyes with ^%self% fingers, and then gestures around the area.
+  break
+  
+  * SAOIRSE
+  case 20
+    set abil_msg ~%self% signs with ^%self% hands, 'I didn't realize we have a new guest.'
+    set non_msg ~%self% makes a quick gesture with ^%self% hands, points at you, then gestures again.
+  break
+  case 21
+    set abil_msg ~%self% signs, 'I have some great ideas for earrings...'
+    set non_msg ~%self% points to ^%self% forehead and then to both ^%self% ears, with ^%self% palm up.
+  break
+  case 22
+    set abil_msg ~%self% signs, 'If you're quick about it.'
+    set non_msg ~%self% makes a walking motion with one hand on the other, points at you, and then spins one finger in a circle.
+  break
+  case 23
+    set abil_msg ~%self% signs with one hand, 'Have you fought the beast yet?'
+    set non_msg ~%self% crosses ^%self% arms in an X, points at you, then points at the great wall.
+  break
+  
+  * PERCY
+  case 30
+    set abil_msg ~%self% signs with ^%self% hands, 'I'm quite pleased to see you observing the Silence rule.'
+    set non_msg ~%self% holds ^%self% palm up, points forward, and then taps the top and bottom of ^%self% ear.
+  break
+  case 31
+    set abil_msg ~%self% signs, 'I'd hate for someone to alert the creature.'
+    set non_msg ~%self% touches ^%self% face and then flips ^%self% hand up and points toward the great wall.
+  break
+  case 32
+    set abil_msg ~%self% signs with ^%self% hands, 'I'm quite pleased you've returned.'
+    set non_msg ~%self% holds ^%self% palm upward and points forward.
+  break
+  case 33
+    set abil_msg ~%self% signs with ^%self% hands, 'There's still more availble here for you here.'
+    set non_msg ~%self% gestures around the area, then folds ^%self% hands and opens them like a book, and then points forward.
+  break
+  
+  * SOMSAK
+  case 40
+    set abil_msg ~%self% signs with ^%self% hands, 'Nice to see a new face. Are you here to work or shop?'
+    set non_msg ~%self% points forward and then waves ^%self% hand around ^%self% face. Then &%self% points to the anvils, then to ^%self% supplies.
+  break
+  case 41
+    set abil_msg ~%self% signs with ^%self% hands, 'I have lots of supplies if you need them.'
+    set non_msg ~%self% gestures around at all the supplies and then turns ^%self% palm upward and toward you.
+  break
+  case 42
+    set abil_msg ~%self% signs with ^%self% hands, 'No idea where it's all coming from.'
+    set non_msg ~%self% gestures around again, turns both palms down, then up.
+  break
+  case 43
+    set abil_msg ~%self% signs with ^%self% hands, 'Every time I turn around, there's more.'
+    set non_msg ~%self% taps *%self% on the shoulder, then gestures around again.
+  break
+  case 44
+    set abil_msg ~%self% signs with ^%self% hands, 'I'm quite pleased you've returned.'
+    set non_msg ~%self% holds ^%self% palm upward and points forward.
+  break
+  case 45
+    set abil_msg ~%self% signs with ^%self% hands, 'It's always better to keep armor in good repair.'
+    set non_msg ~%self% taps ^%self% forearm twice and then makes a knotting motion with ^%self% hands.
+  break
+  case 46
+    set abil_msg ~%self% signs with ^%self% hands, 'Nothing is too late to mend.'
+    set non_msg ~%self% gestures toward the sky from east to west and then drops the hand to ^%self% side before making a knotting motion again.
+  break
+done
+* check each person
+set ch %self.room.people%
+while %ch%
+  if %ch.is_pc%
+    if %ch.ability(12891)%
+      %send% %ch% %abil_msg%
+    else
+      %send% %ch% %non_msg%
+    end
+  end
+  set ch %ch.next_in_room%
+done
+~
 $
