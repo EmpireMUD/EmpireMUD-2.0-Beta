@@ -30,7 +30,7 @@ elseif imperium forge /= %arg% || victory forge /= %arg%
   set dest 12850
   set curr 5101
   set str an imperium shard
-elseif eventide forge /= %arg% || silence forge /= %arg%
+elseif eventide forge /= %arg% || echo forge /= %arg%
   set which 12802
   set dest 12890
   set curr 5102
@@ -357,7 +357,7 @@ if goto /= %mode%
     set to_room %instance.nearest_rmt(12810)%
   elseif imperium /= %arg2% || victory forge /= %arg2%
     set to_room %instance.nearest_rmt(12850)%
-  elseif eventide /= %arg2% || silence forge /= %arg2%
+  elseif eventide /= %arg2% || echo forge /= %arg2%
     set to_room %instance.nearest_rmt(12890)%
   else
     set to_room %instance.nearest_rmt(%arg2%)%
@@ -2522,7 +2522,7 @@ Celestial Forge: Silent actions~
 2 c 0 0
 beg bonk conjure pinch rite ritual snap summon~
 * targeting?
-set need_target beg pinch snap
+set need_target beg bonk pinch snap
 if %need_target% ~= %cmd%
   if !%arg%
     %send% %actor% &&Z%cmd% whom?&&0
@@ -2589,7 +2589,7 @@ switch %cmd%
 done
 ~
 #12888
-Celestial Forge: Sign language for Silence Forge~
+Celestial Forge: Sign language for Echo Forge~
 0 c 0 1
 L o 12891
 signlang~
@@ -2612,7 +2612,7 @@ switch %arg%
   break
   case 4
     set abil_msg ~%self% signs, 'But be cautious not to create a sound...'
-    set non_msg ~%self% holds a hand up to ^%self% throat touches ^%self% thumb to ^%self% fingers...
+    set non_msg ~%self% holds a hand up to ^%self% throat and touches ^%self% thumb to ^%self% fingers...
   break
   case 5
     set abil_msg ~%self% signs, 'For the Echo Serragon never sleeps.'
@@ -2676,7 +2676,7 @@ switch %arg%
     set non_msg ~%self% holds ^%self% palm upward and points forward.
   break
   case 33
-    set abil_msg ~%self% signs with ^%self% hands, 'There's still more availble here for you here.'
+    set abil_msg ~%self% signs, 'There's still more availble here for you here.'
     set non_msg ~%self% gestures around the area, then folds ^%self% hands and opens them like a book, and then points forward.
   break
   
@@ -2686,15 +2686,15 @@ switch %arg%
     set non_msg ~%self% points forward and then waves ^%self% hand around ^%self% face. Then &%self% points to the anvils, then to ^%self% supplies.
   break
   case 41
-    set abil_msg ~%self% signs with ^%self% hands, 'I have lots of supplies if you need them.'
+    set abil_msg ~%self% signs, 'I have lots of supplies if you need them.'
     set non_msg ~%self% gestures around at all the supplies and then turns ^%self% palm upward and toward you.
   break
   case 42
-    set abil_msg ~%self% signs with ^%self% hands, 'No idea where it's all coming from.'
+    set abil_msg ~%self% signs, 'No idea where it's all coming from.'
     set non_msg ~%self% gestures around again, turns both palms down, then up.
   break
   case 43
-    set abil_msg ~%self% signs with ^%self% hands, 'Every time I turn around, there's more.'
+    set abil_msg ~%self% signs, 'Every time I turn around, there's more.'
     set non_msg ~%self% taps *%self% on the shoulder, then gestures around again.
   break
   case 44
@@ -2702,11 +2702,11 @@ switch %arg%
     set non_msg ~%self% holds ^%self% palm upward and points forward.
   break
   case 45
-    set abil_msg ~%self% signs with ^%self% hands, 'It's always better to keep armor in good repair.'
+    set abil_msg ~%self% signs, 'It's always better to keep armor in good repair.'
     set non_msg ~%self% taps ^%self% forearm twice and then makes a knotting motion with ^%self% hands.
   break
   case 46
-    set abil_msg ~%self% signs with ^%self% hands, 'Nothing is too late to mend.'
+    set abil_msg ~%self% signs, 'Nothing is too late to mend.'
     set non_msg ~%self% gestures toward the sky from east to west and then drops the hand to ^%self% side before making a knotting motion again.
   break
 done

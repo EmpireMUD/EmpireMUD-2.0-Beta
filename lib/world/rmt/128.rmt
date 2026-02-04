@@ -1140,7 +1140,7 @@ T 12803
 Z1 1
 S
 #12890
-Above Silence Forge~
+Above Echo Forge~
    No sound echoes out as you step onto a raised tile platform beneath a starry
 night sky. A brick-filled archway stands at one end of the small platform; the
 other side has a twisting metal staircase that leads downward. As you look out,
@@ -1218,7 +1218,7 @@ T 12886
 T 12887
 S
 #12891
-Silence Forge~
+Echo Forge~
    Beneath the raised platform is a brilliant white bell, glowing like a star
 such that you can't look at it for long. It floats in the air above a small,
 engraved dais. Near the bell, a twisting staircase leads back up to the
@@ -1309,7 +1309,7 @@ T 12886
 T 12887
 S
 #12892
-Silence Forge~
+Echo Forge~
    A large, round anvil rests between two pools of water beneath the endless
 starry night. A momentary flash of white light bursts forth each time Ixchel
 strikes the anvil, but it makes no sound. Behind the anvil, a tall archway
@@ -1366,12 +1366,12 @@ T 12886
 T 12887
 S
 #12893
-Silence Forge~
+Echo Forge~
    The air over the heavy, round anvil ripples with heat as the blade of an
 unfinished greatsword grows brighter and brighter in the forge at the center.
 Beyond the gleaming metal arch that stands at the rim of the tiled floor, the
 great wall seems to shift, even twitch, sending twinkles of soft, dappled light
-cascading across Silence Forge.
+cascading across Echo Forge.
 Commands: forge, smelt
 ~
 cei 0 hv 12890
@@ -1443,12 +1443,12 @@ T 12886
 T 12887
 S
 #12894
-Silence Forge~
+Echo Forge~
    Between two long pools of water stands a round anvil, large enough for 5
 expert smiths to work side-by-side, with a red-hot forge at its center. The air
 above it ripples up to the sky, where the stars dance in reverie. Behind it,
 past the end of the tiles and beyond a tall archway, the great wall that
-encircles Silence Forge seems to move.
+encircles Echo Forge seems to move.
 Commands: forge, smelt
 ~
 cei 0 hv 12890
@@ -1524,7 +1524,7 @@ T 12886
 T 12887
 S
 #12895
-Silence Forge~
+Echo Forge~
    In this arc of the great circle, tightly packed between two pools of still
 water, wide baskets and tall stacks of bins organize a vast collection of
 metal, wood, and cloth to be used in the creation of legendary arms and armor.
