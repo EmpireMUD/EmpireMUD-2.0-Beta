@@ -1086,7 +1086,7 @@ M
 The stars ripple through the sky overhead.~
 M
 7
-echo ~%self% looks up at your and sets down ^%self% hammer.~
+echo ~%self% looks up at you and sets down ^%self% hammer.~
 M
 7
 do signlang 10~
