@@ -1150,65 +1150,76 @@ here. The rest of the circle's interior is dark, but an occasional flash
 illuminates shadowy figures working at anvils.
 Commands: return
 ~
-cei 0 0 12890
+cei b 0 12890
 D9
 ~
 0 12891
 E
-tiles platform~
-tba
+floor tiles tiled platform~
+   The platform is made from long tiles of dark gray metal. With each step you
+take, there's a flicker of light around your foot that skitters off into the
+distance until it's too faint to see.
 ~
 E
 up stars sky expanse night~
-tba
+The stars dance across the endless night sky as the hot air ripples overhead.
 ~
 E
-out~
-tba
+out wall north south east west ne northeast nw northwest se southeast sw southwest~
+You can't see anything beyond the great, dark wall in the distance.
 ~
 E
-down~
-tba
+down glow beneath~
+   A soft white glow encircles the tiled floor beneath the platform, casting
+shadows outward in all directions.
 ~
 E
 staircase stairs~
-tba
+The spiral staircase has cast metal steps and a matching handrail.
 ~
 E
 metal~
-tba
+Everything here is made of metal.
 ~
 E
-circle area~
-tba
-~
-E
-wall~
-tba
-~
-E
-beneath~
-tba
-~
-E
-glow~
-tba
+circle area forge~
+   Echo forge is a large, round space with dark metal floors and long pools of
+shallow water. Beyond that, there is only the great, circular wall.
 ~
 E
 flashes anvils figures~
-tba
+   There's a bright flash of light every time one of the figures below strikes
+an anvil with their hammer.
 ~
 E
 shadows shadowy~
-tba
+   Shadows stretch outward from the center of the forge, though none of them is
+long enough to reach the great wall.
 ~
 E
 pools water~
-tba
+   Wedge-shaped pools of water radiate out from the center of Echo Forge below,
+reflecting the starry sky in the gentle water.
+~
+E
+archway bricks~
+The archway is filled with clay bricks.
 ~
 E
 archways~
-tba
+   Archways lie along the edge of the floor below, positioned in each of the
+cardinal directions, though they lead nowhere. There's also an archway up here,
+on the platform, though this one is filled with bricks.
+~
+E
+serragon creature~
+   It's wrapped around the whole of Echo Forge, but you can't really get a look
+at it from here.
+~
+E
+light~
+   Light dances across the forge each time you take a step and flashes out each
+time a hammer strikes.
 ~
 T 12803
 T 12802
@@ -1228,7 +1239,7 @@ working the anvils around you. Beyond them, in the distance, is a great, round
 wall too high to see over and too dark to make out from here.
 Commands: challenge
 ~
-cei 0 0 12890
+cei b 0 12890
 D8
 ~
 0 12890
@@ -1246,59 +1257,94 @@ D0
 0 12895
 E
 platform up~
-tba
+   Above you, a square metal platform rests on nothing but the spiral
+staircase. It almost looks like it's floating there, right above the bell.
 ~
 E
-bell white brilliant glowing star~
-tba
+bell unrang light~
+   Above a small dais and below the raised platform hovers a glowing white
+bell, large enough to hang in a steeple and bright enough to light the whole
+town. It glows like a soft, bright white light that pulses as you walk, and
+when you touch it.
+   Inscribed on the dais below are the words 'The Unrang Bell'.
 ~
 E
-dais engraved~
-tba
+flashes~
+   Light flashes across the forge each time one of the smiths strikes the anvil
+with a hammer.
 ~
 E
-floor tiles~
-tba
+forge~
+Echo Forge is all around you.
+~
+E
+dais engraved engraving label~
+   A metal plinth stands beneath the bell, dark black even when the bell
+flashes at its brightest. A label on the plinth reads, 'The Unrang Bell'.
+~
+E
+floor tiles tiled down~
+   Dark gray metal tiles make up the floor of Echo Forge. Each time to take a
+step, there's a flicker of light around your foot that skitters off into the
+distance until it's too faint to see.
+~
+E
+stairs staircase~
+   A spiral staircase made of cast metal rises up toward the platform.
+Strangely, nothing supports the platorm except the staircase.
+~
+E
+archways~
+Metal archways lie at the north, south, east, and west edges of Echo Forge.
 ~
 E
 metal~
-tba
+Everything here is made of metal.
 ~
 E
 artisans~
-tba
+In each direction, you can see an artisan hard at work.
 ~
 E
 anvils~
-tba
+   Three massive, round anvils are seated around Echo Forge, one in the east,
+one in the west, and one to the south.
 ~
 E
-out around~
-tba
+walls distance~
+   In the distance, a massive wall encircles the forge, though it's so far that
+the light doesn't seem to reach.
 ~
 E
-wall distance~
-tba
-~
-E
-pools watere~
-tba
+pools water stars~
+   Pools of water radiate from the center of Echo Forge to the edges. You can
+watch the stars dance in the gently rippling water.
 ~
 E
 north~
-tba
+You see Somsak organizing items into bins.
 ~
 E
 south~
-tba
+You see a man bent over the anvil, examining something up close.
 ~
 E
 east~
-tba
+You see Saoirse working the anvil.
 ~
 E
 west~
-tba
+You see Ixchel working at the forge.
+~
+E
+out around ne northeast nw northwest se southeast sw southwest~
+   The metal tiles extend to the edge of the circle in all directions, though
+they stop well short of the great wall.
+~
+E
+serragon creature~
+   It's wrapped around the whole of Echo Forge, but you can't really get a look
+at it from here.
 ~
 M 0 12891 100.00 1
 T 12803
@@ -1315,47 +1361,73 @@ starry night. A momentary flash of white light bursts forth each time Ixchel
 strikes the anvil, but it makes no sound. Behind the anvil, a tall archway
 marks the boundary of the metal tile floor. And beyond that, blocking your
 view, is the great circular wall.
-Commands: forge, smelt
+Commands: forge, smelt, shatter <item to destroy>
 ~
-cei 0 hv 12890
+cei b hv 12890
 D1
 ~
 0 12891
 E
-anvil round~
-tba
+bell unrang light~
+   The bell glows white from the center of Echo Forge, lighting up the anvil
+and the pools, though its light barely reflects from the great wall. Each time
+a hammer strikes the anvil, you see both the hammer and the bell flash
+brilliantly.
+~
+E
+floor tiles tiled down~
+   Dark gray metal tiles make up the floor of Echo Forge. Each time to take a
+step, there's a flicker of light around your foot that skitters off into the
+distance until it's too faint to see.
+~
+E
+anvil round forge~
+   The anvil, if you can call it that, is round in shape, and large enough for
+five artisans to work side-by-side. At its center, a red-hot forge heats the
+master's works in progress. The air above it ripples up toward the sky, where
+it seems to make the stars dance across the heavens.
 ~
 E
 pools water~
-tba
+   Long pools of water run from the center of Echo Forge to the edges. The
+starry night sky ripples and dances in the reflection on the surface.
 ~
 E
-up sky~
-tba
+up stars sky expanse night~
+The stars dance across the endless night sky as the hot air ripples overhead.
 ~
 E
-archway~
-tba
-~
-E
-floor down tile~
-tba
+archway west~
+A tall metal archway guards the west edge of Echo Forge.
 ~
 E
 metal~
-tba
+Everything here is made of metal.
 ~
 E
-walls out~
-tba
+walls out north south nw northwest sw southwest~
+   A great wall wraps around Echo Forge, just a short distance from the
+archway. No light reflects from the wall, so you can only begin to make out the
+details when it suddenly moves, ever so slightly, sending a ripple of light
+across its surface, revealing many jagged and serrated edges.
 ~
 E
-archway~
-tba
+flashes ne northeast se southeast~
+   Light flashes across the forge each time one of the smiths strikes the anvil
+with a hammer.
+~
+E
+serragon creature~
+You can't really get a look at it from here.
+~
+E
+scales serrations serrated~
+   You can hardly see them except when light flashes across the wall, revealing
+that it is covered in serrated scales.
 ~
 E
 east~
-tba
+Kaito is standing near the Unrang Bell.
 ~
 M 0 12892 100.00 1
 T 12803
@@ -1364,6 +1436,7 @@ T 12819
 T 12885
 T 12886
 T 12887
+T 5195
 S
 #12893
 Echo Forge~
@@ -1372,67 +1445,99 @@ unfinished greatsword grows brighter and brighter in the forge at the center.
 Beyond the gleaming metal arch that stands at the rim of the tiled floor, the
 great wall seems to shift, even twitch, sending twinkles of soft, dappled light
 cascading across Echo Forge.
-Commands: forge, smelt
+Commands: forge, smelt, shatter <item to destroy>
 ~
-cei 0 hv 12890
+cei b hv 12890
 D3
 ~
 0 12891
 E
+bell unrang~
+   The bell glows white from the center of Echo Forge, lighting up the anvil
+and the pools, though its light barely reflects from the great wall. Each time
+a hammer strikes the anvil, you see both the hammer and the bell flash
+brilliantly.
+~
+E
+up stars sky expanse night~
+The stars dance across the endless night sky as the hot air ripples overhead.
+~
+E
+pools water~
+   Long pools of water run from the center of Echo Forge to the edges. The
+starry night sky ripples and dances in the reflection on the surface.
+~
+E
 air ripples heat waves~
-tba
+The air over the anvil ripples and waves.
 ~
 E
-anvil round heavy~
-tba
+anvil round~
+   The anvil, if you can call it that, is round in shape, and large enough for
+five artisans to work side-by-side. At its center, a red-hot forge heats the
+master's works in progress. The air above it ripples up toward the sky, where
+it seems to make the stars dance across the heavens.
 ~
 E
-blade sword greatsword~
-tba
+forge center~
+   The center of the anvil is a red-hot forge. An unfinished sword is resting
+in the heat.
 ~
 E
-forge~
-tba
-~
-E
-center~
-tba
-~
-E
-archway~
-tba
+archway east~
+A tall metal archway guards the east edge of Echo Forge.
 ~
 E
 floor tiles tiled down~
-tba
+   Dark gray metal tiles make up the floor of Echo Forge. Each time to take a
+step, there's a flicker of light around your foot that skitters off into the
+distance until it's too faint to see.
 ~
 E
 metal~
-tba
+Everything here is made of metal.
 ~
 E
 rim~
-tba
+The tiles end at the large, circular rim.
 ~
 E
-wall~
-tba
+walls out north south ne northeast se southeast~
+   The massive wall that encircles the forge stirs a little, revealing what
+appears to be the tip of a tail!
 ~
 E
-tail~
-tba
+tail tip~
+   The wall appears to have a tail! When it moves, light flickers across it,
+revealing that it is covered in huge, serrated scales.
 ~
 E
 light cascade dappled dapples twinkles~
-tba
+   You watch the wall move, ever so slightly, sending a cascade of dappled
+light across the entire area.
 ~
 E
 scales serrations serrated~
-tba
+   You can hardly see them except when light flashes across the wall, revealing
+that it is covered in serrated scales... like a serragon!
 ~
 E
 west~
-tba
+Kaito is standing by the Unrang Bell.
+~
+E
+flashes nw northwest sw southwest~
+   Light flashes across the forge each time one of the smiths strikes the anvil
+with a hammer.
+~
+E
+serragon creature~
+   It's wrapped around the whole of Echo Forge, but you can't really get a look
+at it from here, except for the tail.
+~
+E
+blade sword greatsword~
+An unfinished greatsword is resting in the forge at the center of the anvil.
 ~
 M 0 12893 100.00 1
 T 12803
@@ -1441,79 +1546,108 @@ T 12819
 T 12885
 T 12886
 T 12887
+T 5195
 S
 #12894
 Echo Forge~
-   Between two long pools of water stands a round anvil, large enough for 5
+   Between two long pools of water stands a round anvil, large enough for five
 expert smiths to work side-by-side, with a red-hot forge at its center. The air
 above it ripples up to the sky, where the stars dance in reverie. Behind it,
 past the end of the tiles and beyond a tall archway, the great wall that
 encircles Echo Forge seems to move.
-Commands: forge, smelt
+Commands: forge, smelt, shatter <item to destroy>
 ~
-cei 0 hv 12890
+cei b hv 12890
 D0
 ~
 0 12891
 E
+bell unrang light~
+   The bell glows white from the center of Echo Forge, lighting up the anvil
+and the pools, though its light barely reflects from the great wall. Each time
+a hammer strikes the anvil, you see both the hammer and the bell flash
+brilliantly.
+~
+E
+metal~
+Everything here is made of metal.
+~
+E
 pools water~
-tba
+   Long pools of water run from the center of Echo Forge to the edges. The
+starry night sky ripples and dances in the reflection on the surface.
 ~
 E
-anvil round~
-tba
+anvil round forge~
+   The anvil, if you can call it that, is round in shape, and large enough for
+five artisans to work side-by-side. At its center, a red-hot forge heats the
+master's works in progress. The air above it ripples up toward the sky, where
+it seems to make the stars dance across the heavens.
 ~
 E
-forge~
-tba
+archway south~
+A tall metal archway guards the south edge of Echo Forge.
 ~
 E
 red-hot redhot~
-tba
+The forge in the center of the anvil glows red-hot.
 ~
 E
-heat ripples~
-tba
+heat ripples waves~
+The air ripples and waves over the anvil.
 ~
 E
-stars up~
-tba
+up stars sky expanse night~
+The stars dance across the endless night sky as the hot air ripples overhead.
 ~
 E
-floor down tiles tiled~
-tba
+floor tiles tiled down~
+   Dark gray metal tiles make up the floor of Echo Forge. Each time to take a
+step, there's a flicker of light around your foot that skitters off into the
+distance until it's too faint to see.
 ~
 E
-walls out~
-tba
-~
-E
-head~
-tba
-~
-E
-scales serrations~
-tba
-~
-E
-serragon~
-tba
-~
-E
-north~
-tba
-~
-E
-eye milky~
-tba
+walls out east west se southeast sw southwest~
+   When it moves, the wall flickers with light and reveals its true shape: a
+long, continuous coil that loops around and around Echo Forge. And here,
+alarmingly close, it had a tremendous head!
 ~
 E
 head~
-tba
+   The impossibly large head is lined with a dozen serrated frills, all leading
+toward its mouth, which stretches from one side of the head to the other. When
+its eye shifts, it lights up for a moment, but you can see no pupil. There is
+only a milky white color.
 ~
 E
 frill~
-tba
+The creature's serrated frill identifies it as a serragon!
+~
+E
+scales serrations serrated~
+   The wall is covered along its full length with serrated scales, though they
+only become apparent when it moves and they flicker with momentary light.
+~
+E
+serragon creature~
+   You can only just make out the creature's head, covered in serrated frills.
+And then, just a little bit, the creature moves, sending a cascade of light
+down its jagged scales and allowing you to see the serragon in all its glory,
+if only for a moment.
+~
+E
+eye milky pupil~
+   The eye, larger than a full wagon, has a milky white color, but no
+discernible pupil.
+~
+E
+north~
+Kaito is standing by the Unrang Bell.
+~
+E
+flashes ne northeast nw northwest~
+   Light flashes across the forge each time one of the smiths strikes the anvil
+with a hammer.
 ~
 M 0 12894 100.00 1
 T 12803
@@ -1522,6 +1656,7 @@ T 12819
 T 12885
 T 12886
 T 12887
+T 5195
 S
 #12895
 Echo Forge~
@@ -1531,41 +1666,77 @@ metal, wood, and cloth to be used in the creation of legendary arms and armor.
 The supplies cast a fragmented shadow on the great wall from the soft light of
 the bell.
 ~
-cei 0 0 12890
+cei b 0 12890
 D2
 ~
 0 12891
 E
+bell unrang light~
+   The bell glows white from the center of Echo Forge, lighting up the piles
+of supplies, though the wall is far enough away the shadows don't seem to reach
+it. Every few moments, the bell flashes brighter.
+~
+E
+up stars sky expanse night~
+The stars dance across the endless night sky as the hot air ripples overhead.
+~
+E
 arc circle~
-tba
+The tiled floor forms a massive circle. You're standing near the north edge.
 ~
 E
-floor down tiles~
-tba
+archway north~
+A tall metal archway guards the north edge of Echo Forge.
 ~
 E
-baskets stacks bins collection wood cloth~
-tba
+metal~
+Everything here is made of metal.
 ~
 E
-supplies~
-tba
+floor tiles tiled down~
+   Dark gray metal tiles make up the floor of Echo Forge. Each time to take a
+step, there's a flicker of light around your foot that skitters off into the
+distance until it's too faint to see.
 ~
 E
-shadow fragmented wall~
-tba
+supplies baskets stacks bins collection wood cloth~
+All manner of smithing and crafting supplies are available here.
 ~
 E
-bell light~
-tba
+shadow fragmented walls tubes out east west ne northeast nw northwest~
+   The supplies cast shadows on the great, circular wall, revealing hints to
+its shape. It isn't a single, flat wall. It looks more like enormous tubes
+stacked upon each other. The shadows fragment at the borders of each tube,
+suggesting a serrated edge.
 ~
 E
 pools water~
-tba
+   Long pools of water run from the center of Echo Forge to the edges. The
+starry night sky ripples and dances in the reflection on the surface.
 ~
 E
 south~
-tba
+You the Unrang Bell at the center of the forge.
+~
+E
+anvils~
+   You see three large, round anvils in the distance, each being worked by one
+of the smiths. Each time they strike with the hammer, a bright light flashes
+across the forge.
+~
+E
+flashes se southeast sw southwest~
+   Light flashes across the forge each time one of the smiths strikes the anvil
+with a hammer.
+~
+E
+scales serrations serrated~
+   You can hardly see them except when light flashes across the wall, revealing
+that it is covered in serrated scales.
+~
+E
+serragon creature~
+You can't really get a look at it from here.
 ~
 M 0 12895 100.00 1
 T 12803
