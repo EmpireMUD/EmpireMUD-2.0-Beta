@@ -5410,7 +5410,7 @@ bool run_interactions(char_data *ch, struct interaction_item *run_list, int type
 * Runs all interactions for a room (sect, crop, building, vehicle; as
 * applicable). They run from most-specific to least: veh -> bdg -> crop -> sect
 *
-* @param char_data *ch The actor.
+* @param char_data *ch Optional: The actor (may be NULL).
 * @param room_data *room The location to run on.
 * @param int type Any INTERACT_ const.
 * @param vehicle_data *inter_veh Optional: Will pass this vehicle to any interaction func, and won't call other vehicles' interactions if set. (Pass NULL if not applicable.)
