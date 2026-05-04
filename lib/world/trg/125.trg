@@ -1056,6 +1056,9 @@ set person %room.people%
 while %person%
   if %person.is_pc%
     %quest% %person% start 12504
+    if %person.on_quest(12504)%
+      %send% %person% (You are now on the quest 'Hire the Rival Adventurer'.)
+    end
   end
   set person %person.next_in_room%
 done
