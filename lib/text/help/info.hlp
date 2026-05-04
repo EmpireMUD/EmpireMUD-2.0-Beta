@@ -1050,10 +1050,19 @@ through MSDP.
 See also: BLOOD, EAT, MSDP, PROMPT, REGENS, SATED THIRST, SLEEP, 
    STATUS MESSAGES, TIME, UNNATURAL THIRST
 #
+IMMOBILIZE IMMOBILIZED IMMOBILE
+
+The IMMOBILIZED affect, which appears on some spells and effects, prevents an
+affected character from moving or fleeing.
+
+Additionally, during ranged combat, an immobilized person cannot close the
+distance to switch from ranged to melee combat.
+#
 INFRA INFRAVISION
 
 The INFRA affect, which appears on some spells and items, allows a character
-perfect night vision.
+perfect night vision. This includes the ability to see the map clearly at night
+without being limited by the amount of light.
 #
 INSTANCES INSTANTIATION INSTANCING
 
