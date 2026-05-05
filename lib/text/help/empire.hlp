@@ -641,6 +641,11 @@ another item is matching the name, try having the correct item in your own
 inventory. This command will try to match an item in your inventory before
 searching the item database.
 
+Examples:
+  > import add 50 500 large tree
+  > import add 500 1 strange crystal seed
+  > export add 750 5 strange crystal seed
+
 See also: COINS, EXCHANGE RATE
 #
 "EXTENDED RADIUS" EXTENDED-RADIUS "LARGE CITY RADIUS" LARGE-CITY-RADIUS "LARGE RADIUS" LARGE-RADIUS
