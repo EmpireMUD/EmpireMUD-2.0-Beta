@@ -17,14 +17,26 @@ end
 Stealth GM Bribe coins: Prevent~
 0 m 0 0
 ~
-%send% %actor% ~%self% doesn't take bribes like that any more. Complete ^%self% quest instead.
+if %actor.skill(Stealth)% > 0
+  %send% %actor% No point trying to bribe ~%self -- you already know the Stealth skill.
+elseif !%ator.can_gain_new_skills%
+  %send% %actor% No point trying to bribe ~%self -- you can't learn a new skill tree right now.
+else
+  %send% %actor% ~%self% doesn't take bribes like that any more. Complete ^%self% quest instead.
+end
 return 0
 ~
 #222
 Stealth GM Bribe item: Prevent~
 0 j 100 0
 ~
-%send% %actor% ~%self% doesn't take bribes like that any more. Complete ^%self% quest instead.
+if %actor.skill(Stealth)% > 0
+  %send% %actor% No point trying to bribe ~%self -- you already know the Stealth skill.
+elseif !%ator.can_gain_new_skills%
+  %send% %actor% No point trying to bribe ~%self -- you can't learn a new skill tree right now.
+else
+  %send% %actor% ~%self% doesn't take bribes like that any more. Complete ^%self% quest instead.
+end
 return 0
 ~
 #230
