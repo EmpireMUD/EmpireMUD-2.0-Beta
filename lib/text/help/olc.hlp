@@ -9405,6 +9405,7 @@ Available sector flags:
  &cBASIC-CROP&0 - Indicates this tile counts as a basic crop tile for its
     climate. Used in conjunction with the CROP flag by commands like .map
     terrain.
+ &cHIDE-ON-ISLAND-DESCRIPTION&0 - Won't show in auto-generated island descs.
 
 See also: OLC SECTORS, TERRAIN HEIGHT
 #d

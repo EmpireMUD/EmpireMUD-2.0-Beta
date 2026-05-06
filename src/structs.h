@@ -2750,6 +2750,7 @@ typedef enum {
 #define SECTF_IRRIGATES_AREA  BIT(28)	// tiles around this one trigger irrigation evolutions
 #define SECTF_NO_WORKFORCE_AUTOABANDON  BIT(29)	// workforce will not auto-abandon this terrain
 #define SECTF_BASIC_CROP  BIT(30)	// to be used on the "basic crop tile" for its terrain
+#define SECTF_HIDE_ON_ISLAND_DESCRIPTION  BIT(31)	// won't be used in auto-generated island descriptions
 // note: evolutions use these as flags in a SIGNED sbitvector_t; limit is BIT(62)
 
 

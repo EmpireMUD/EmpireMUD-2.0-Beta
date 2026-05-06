@@ -4633,6 +4633,7 @@ const char *sector_flags[] = {
 	"IRRIGATES-AREA",
 	"NO-WORKFORCE-AUTOABANDON",
 	"BASIC-CROP",	// 30
+	"HIDE-ON-ISLAND-DESCRIPTION",
 	"\n"
 };
 

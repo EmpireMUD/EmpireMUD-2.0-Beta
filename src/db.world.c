@@ -3105,8 +3105,8 @@ void generate_island_descriptions(void) {
 	
 	// now count terrains
 	LL_FOREACH(land_map, map) {
-		if (map->base_sector && SECT_FLAGGED(map->base_sector, SECTF_OCEAN)) {
-			continue;	// skip ocean-flagged tiles
+		if (map->base_sector && SECT_FLAGGED(map->base_sector, SECTF_OCEAN | SECTF_HIDE_ON_ISLAND_DESCRIPTION)) {
+			continue;	// skip ocean- or hide-flagged tiles
 		}
 		
 		// find island
