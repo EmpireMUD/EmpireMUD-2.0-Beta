@@ -838,7 +838,7 @@ OLC_MODULE(mapedit_naturalize) {
 				// already same -- but refresh crop type if applicable
 				if (SECT_FLAGGED(map->sector_type, SECTF_HAS_CROP_DATA)) {
 					if (room || (room = real_room(map->vnum))) {
-						new_crop = get_potential_crop_for_location(room, NOTHING);
+						new_crop = get_potential_crop_for_location(room, NOTHING, NULL);
 						set_crop_type(room, new_crop ? new_crop : crop_table);
 					}
 				}
@@ -866,7 +866,7 @@ OLC_MODULE(mapedit_naturalize) {
 				
 				if (SECT_FLAGGED(map->natural_sector, SECTF_HAS_CROP_DATA)) {
 					room = real_room(map->vnum);	// need it loaded after all
-					new_crop = get_potential_crop_for_location(room, NOTHING);
+					new_crop = get_potential_crop_for_location(room, NOTHING, NULL);
 					set_crop_type(room, new_crop ? new_crop : crop_table);
 				}
 				else {
@@ -904,7 +904,7 @@ OLC_MODULE(mapedit_naturalize) {
 		
 		// reset crop?
 		if (ROOM_SECT_FLAGGED(IN_ROOM(ch), SECTF_HAS_CROP_DATA)) {
-			new_crop = get_potential_crop_for_location(IN_ROOM(ch), NOTHING);
+			new_crop = get_potential_crop_for_location(IN_ROOM(ch), NOTHING, NULL);
 			set_crop_type(IN_ROOM(ch), new_crop ? new_crop : crop_table);
 		}
 		

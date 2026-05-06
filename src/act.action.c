@@ -3560,7 +3560,7 @@ bool try_gen_interact_local_crops(char_data *ch, room_data *room, const struct g
 		return FALSE;	// must be outdoor
 	}
 	
-	if ((crop = get_potential_crop_for_location(room, data->interact))) {
+	if ((crop = get_potential_crop_for_location(room, data->interact, NULL))) {
 		return run_interactions(ch, GET_CROP_INTERACTIONS(crop), data->interact, room, NULL, NULL, NULL, finish_gen_interact_room);
 	}
 	else {

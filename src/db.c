@@ -986,7 +986,7 @@ void verify_sectors(void) {
 			if (!room) {
 				room = real_room(map->vnum);	// load it into memory
 			}
-			new_crop = get_potential_crop_for_location(room, NOTHING);
+			new_crop = get_potential_crop_for_location(room, NOTHING, NULL);
 			set_crop_type(room, new_crop ? new_crop : crop_table);
 		}
 	}

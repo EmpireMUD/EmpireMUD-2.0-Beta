@@ -215,7 +215,7 @@ void change_terrain(room_data *room, sector_vnum sect, sector_vnum base_sect) {
 	
 	// need to determine a crop?
 	if (!new_crop && SECT_FLAGGED(st, SECTF_HAS_CROP_DATA) && !ROOM_CROP(room)) {
-		new_crop = get_potential_crop_for_location(room, NOTHING);
+		new_crop = get_potential_crop_for_location(room, NOTHING, NULL);
 		if (!new_crop) {
 			new_crop = crop_table;
 		}
@@ -1634,7 +1634,7 @@ int naturalize_newbie_island(struct map_data *tile, bool do_unclaim) {
 		
 		if (SECT_FLAGGED(tile->natural_sector, SECTF_HAS_CROP_DATA)) {
 			room = real_room(tile->vnum);	// need it loaded after all
-			new_crop = get_potential_crop_for_location(room, NOTHING);
+			new_crop = get_potential_crop_for_location(room, NOTHING, NULL);
 			set_crop_type(room, new_crop ? new_crop : crop_table);
 		}
 		else {
@@ -3514,15 +3514,21 @@ int get_main_island(empire_data *emp) {
 * 
 * @param room_data *location The location to pick a crop for.
 * @param int must_have_interact Optional: Only pick crops with this interaction (pass NOTHING to skip).
+* @param char *build_string Optional: Will list all available crops here in the string (must hold MAX_STRING_LENGTH).
 * @return crop_data* Any crop, or NULL if it can't find one.
 */
-crop_data *get_potential_crop_for_location(room_data *location, int must_have_interact) {
+crop_data *get_potential_crop_for_location(room_data *location, int must_have_interact, char *build_string) {
 	int x = X_COORD(location), y = Y_COORD(location);
 	bool water = find_flagged_sect_within_distance_from_room(location, SECTF_FRESH_WATER, NOBITS, config_get_int("water_crop_distance"));
 	struct island_info *isle = NULL;
 	crop_data *found, *crop, *next_crop;
 	int num_found = 0;
 	bitvector_t climate;
+	
+	// init build_string?
+	if (build_string) {
+		*build_string = '\0';
+	}
 	
 	// small amount of random so the edges of the crops are less linear on the map
 	x += number(-10, 10);
@@ -3565,6 +3571,11 @@ crop_data *get_potential_crop_for_location(room_data *location, int must_have_in
 			if (CROP_FLAGGED(crop, CROPF_NEWBIE_ONLY) && (!isle || !IS_SET(isle->flags, ISLE_NEWBIE))) {
 				continue;
 			}
+		}
+		
+		// valid: store name if requested
+		if (build_string) {
+			safe_snprintf(build_string + strlen(build_string), MAX_STRING_LENGTH - strlen(build_string), "%s%s", (*build_string ? ", " : ""), GET_CROP_NAME(crop));
 		}
 		
 		// valid: choose at random
