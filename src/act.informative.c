@@ -481,14 +481,18 @@ void survey_city(char_data *ch, char *argument) {
 	}
 	if (ROOM_OWNER(IN_ROOM(ch)) && ROOM_OWNER(IN_ROOM(ch)) != GET_LOYALTY(ch) && !imm_access) {
 		msg_to_char(ch, "Someone else already owns this area.\r\n");
-		return;
+		if (!imm_access) {
+			return;
+		}
 	}
 	
 	// check proximity: starting locations
 	for (iter = 0; iter <= highest_start_loc_index; ++iter) {
 		if (compute_distance(IN_ROOM(ch), real_room(start_locs[iter])) < min_distance_from_city_to_starting_location) {
 			msg_to_char(ch, "You can't found a city within %d tiles of a starting location.\r\n", min_distance_from_city_to_starting_location);
-			return;
+			if (!imm_access) {
+				return;
+			}
 		}
 	}
 	
