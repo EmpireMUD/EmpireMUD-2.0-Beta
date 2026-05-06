@@ -4595,7 +4595,7 @@ ACMD(do_score) {
 
 
 ACMD(do_survey) {
-	char line[1024];
+	char line[MAX_STRING_LENGTH];
 	char *temp, *argptr;
 	struct empire_city_data *city;
 	struct empire_island *eisle;
@@ -4648,6 +4648,14 @@ ACMD(do_survey) {
 		}
 	}
 	*/
+	
+	// forage crop?
+	if (has_player_tech(ch, PTECH_FORAGE_COMMAND) && can_interact_room(IN_ROOM(ch), INTERACT_FORAGE)) {
+		get_potential_crop_for_location(IN_ROOM(ch), INTERACT_FORAGE, line);
+		if (*line) {
+			msg_to_char(ch, "Wild crops: %s\r\n", line);
+		}
+	}
 	
 	// empire
 	if (ROOM_OWNER(IN_ROOM(ch))) {
