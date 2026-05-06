@@ -9443,16 +9443,18 @@ Usage:  .icons add <type> <color code> <icon>
         .icons copy <from type> <from vnum>
         .icons change <number> <type | color | icon> <value>
         .icons remove <number | all>
+        .icons list
 
 EmpireMUD uses four different seasons and the biggest change between them is
 that sectors look different at different times of year. You can also specify
-an icon for ANY season. The <type> parameter is where you specify which season,
-and a list of valid types is shown on the olc display for the sector.
+an icon for ANY season.
 
-If more than one icon is available for a given season (or from season + any),
-one is chosen at random. If you want to have random icons available, but want
-one pre-selected, set the LOCK-ICON sector flag. Be warned, however, that once
-an icon is locked, it remains the same in any season.
+The <type> parameter is where you specify which season: spring, summer, autumn,
+winter, or ANY. If more than one icon is available for a given season (or from
+season + any), one is chosen at random.
+
+Use the LOCK-ICON flag to select 1 random icon and keep it; be warned, however,
+that once an icon is locked, it remains the same in any season.
 
 For icons, the base color is separate from the icon, so the icon does not
 need to start with a color code (unless it's different from the base you set).

@@ -885,6 +885,7 @@ void olc_show_sector(char_data *ch) {
 	struct spawn_info *spawn;
 	struct custom_message *ocm;
 	int count;
+	struct icon_data *icon_iter;
 	
 	if (!st) {
 		return;
@@ -897,8 +898,11 @@ void olc_show_sector(char_data *ch) {
 	build_page_display(ch, "<%sroadsideicon\t0> %c", OLC_LABEL_VAL(GET_SECT_ROADSIDE_ICON(st), default_roadside_icon), GET_SECT_ROADSIDE_ICON(st));
 	build_page_display(ch, "<%smapout\t0> %s", OLC_LABEL_VAL(GET_SECT_MAPOUT(st), 0), mapout_color_names[GET_SECT_MAPOUT(st)]);
 
-	build_page_display(ch, "<%sicons\t0>", OLC_LABEL_PTR(GET_SECT_ICONS(st)));
-	show_icons_display(ch, GET_SECT_ICONS(st), FALSE);
+	LL_COUNT(GET_SECT_ICONS(st), icon_iter, count);
+	build_page_display(ch, "<%sicons\t0> %d set", OLC_LABEL_PTR(GET_SECT_ICONS(st)), count);
+	if (!PRF_FLAGGED(ch, PRF_SCREEN_READER)) {
+		show_icons_display(ch, GET_SECT_ICONS(st), FALSE);
+	}
 
 	ordered_sprintbit(GET_SECT_CLIMATE(st), climate_flags, climate_flags_order, FALSE, lbuf);
 	build_page_display(ch, "<%sclimate\t0> %s", OLC_LABEL_VAL(GET_SECT_CLIMATE(st), NOBITS), lbuf);
