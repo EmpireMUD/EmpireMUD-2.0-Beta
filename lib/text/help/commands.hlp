@@ -3001,7 +3001,8 @@ Immortal toggles:
 Note: Political and informative views only show fully-lit tiles at night, not
 dim tiles.
 
-See also: FIGHT MESSAGES, FRIENDS, STATUS MESSAGES, TOGGLE <type>
+See also: FIGHT MESSAGES, FRIENDS, MANAGE, STATUS MESSAGES, TOGGLE <type>,
+  WORKFORCE
 #
 "TOGGLE NO-EMPIRE" "TOGGLE NOEMPIRE" NOEMPIRE NO-EMPIRE
 
