@@ -603,10 +603,12 @@ char *list_one_shop(shop_data *shop, bool detail) {
 		
 		// hours
 		if (SHOP_OPEN_TIME(shop) == SHOP_CLOSE_TIME(shop)) {
-			safe_snprintf(hours, sizeof(hours), "always open");
+			// don't show always open
+			*hours = '\0';
+			//safe_snprintf(hours, sizeof(hours), ", always open");
 		}
 		else {
-			safe_snprintf(hours, sizeof(hours), "open %d-%d", SHOP_OPEN_TIME(shop), SHOP_CLOSE_TIME(shop));
+			safe_snprintf(hours, sizeof(hours), ", open %d-%d", SHOP_OPEN_TIME(shop), SHOP_CLOSE_TIME(shop));
 		}
 		
 		// location
@@ -621,7 +623,7 @@ char *list_one_shop(shop_data *shop, bool detail) {
 			safe_snprintf(locations, sizeof(locations), "%d locations", locs);
 		}
 		
-		safe_snprintf(output, sizeof(output), "[%5d] %s%s - %d item%s, %s, %s", SHOP_VNUM(shop), SHOP_NAME(shop), SHOP_FLAGGED(shop, SHOP_IN_DEVELOPMENT) ? " (IN-DEV)" : "", count, PLURAL(count), hours, locations);
+		safe_snprintf(output, sizeof(output), "[%5d] %s%s - %d item%s%s, %s", SHOP_VNUM(shop), SHOP_NAME(shop), SHOP_FLAGGED(shop, SHOP_IN_DEVELOPMENT) ? " (IN-DEV)" : "", count, PLURAL(count), hours, locations);
 	}
 	else {
 		safe_snprintf(output, sizeof(output), "[%5d] %s%s", SHOP_VNUM(shop), SHOP_NAME(shop), SHOP_FLAGGED(shop, SHOP_IN_DEVELOPMENT) ? " (IN-DEV)" : "");
