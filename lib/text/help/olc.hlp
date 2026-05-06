@@ -4051,6 +4051,10 @@ cycle of decay will destroy them.
 Note: Interior rooms do not normally require any maintenance and don't take
 damage.
 
+Examples:
+ > .resource add component 1 nail
+ > .resource add action 1001
+
 See HELP OLC RESOURCES for more information.
 
 See also: BEDIT HITPOINTS, OLC BUILDINGS, MAINTAIN, RESOURCE ACTIONS
@@ -8672,8 +8676,8 @@ Fields:
   &c-vmin&0, &c-vmax&0 - VNUM range limits
 
 Examples:
- > .prog fullsearch -type PLAYER-TECH -ptech Swimming -vmin 10000 -vmax 10099
- > .prog fullsearch -flagged RANGED -flagged RANGED-ONLY
+ > .prog fullsearch -perk City-points
+ > .prog fullsearch -task OWN-ROADS
 
 To search other fields, you can generally use the normal "search" option for
 other OLC types. For example, to find all goals that require you to kill a
