@@ -3762,7 +3762,7 @@ void do_stat_crop(char_data *ch, crop_data *cp, bool details) {
 	if (GET_CROP_ICONS(cp)) {
 		if (PRF_FLAGGED(ch, PRF_SCREEN_READER) && !details) {
 			LL_COUNT(GET_CROP_ICONS(cp), icon_iter, count);
-			build_page_display(ch, "Icons: %d set", count);
+			build_page_display(ch, "Icons: &c%d&0 set", count);
 		}
 		else {
 			build_page_display_str(ch, "Icons:");
@@ -4828,7 +4828,7 @@ void do_stat_sector(char_data *ch, sector_data *st, bool details) {
 	if (GET_SECT_ICONS(st)) {
 		if (PRF_FLAGGED(ch, PRF_SCREEN_READER) && !details) {
 			LL_COUNT(GET_SECT_ICONS(st), icon_iter, count);
-			build_page_display(ch, "Icons: %d set", count);
+			build_page_display(ch, "Icons: &c%d&0 set", count);
 		}
 		else {
 			build_page_display_str(ch, "Icons:");
