@@ -2489,7 +2489,7 @@ if %move% == 1
   set object_4 a pet rock
   set which %random.4%
   eval obj %%object_%which%%%
-  if %which% == 1 || %which% == 3
+  if %which% == 3
     set itthem them
   else
     set itthem it
