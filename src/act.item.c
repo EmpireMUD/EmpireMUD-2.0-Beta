@@ -5684,7 +5684,13 @@ ACMD(do_drink) {
 		}
 
 		if (type == NOTHING) {
-			send_to_char("You can't find it!\r\n", ch);
+			// did we fail for permission to use room?
+			if (room_has_function_and_city_ok(NULL, IN_ROOM(ch), FNC_DRINK_WATER) && (is_abbrev(argptr, "water") || isname(argptr, get_room_name(IN_ROOM(ch), FALSE)))) {
+				msg_to_char(ch, "You don't have permission to drink from here.\r\n");
+			}
+			else {
+				send_to_char("You can't find it!\r\n", ch);
+			}
 			return;
 		}
 	}
