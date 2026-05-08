@@ -1811,21 +1811,21 @@ ACMD(do_drive) {
 		msg_to_char(ch, "You can't do that.\r\n");
 	}
 	else if (!*argument && GET_ACTION(ch) == drive_data[subcmd].action) {
+		// distance remaining?
+		*dist_buf = '\0';
+		if ((calc_dist = driving_distance_remaining(ch)) > 1) {
+			snprintf(dist_buf, sizeof(dist_buf), " Distance remaining: %d tiles.", calc_dist);
+		}
+		
 		if (GET_ACTION_VNUM(ch, 1) == -1) {
-			msg_to_char(ch, "You are currently %s %s.\r\n", drive_data[subcmd].verb, dirs[confused_dirs[get_north_for_char(ch)][0][GET_ACTION_VNUM(ch, 0)]]);
+			msg_to_char(ch, "You are currently %s %s.%s\r\n", drive_data[subcmd].verb, dirs[confused_dirs[get_north_for_char(ch)][0][GET_ACTION_VNUM(ch, 0)]], dist_buf);
 		}
 		else {
-			msg_to_char(ch, "You are currently %s %d tile%s %s.\r\n", drive_data[subcmd].verb, GET_ACTION_VNUM(ch, 1), PLURAL(GET_ACTION_VNUM(ch, 1)), dirs[confused_dirs[get_north_for_char(ch)][0][GET_ACTION_VNUM(ch, 0)]]);
+			msg_to_char(ch, "You are currently %s %d tile%s %s.%s\r\n", drive_data[subcmd].verb, GET_ACTION_VNUM(ch, 1), PLURAL(GET_ACTION_VNUM(ch, 1)), dirs[confused_dirs[get_north_for_char(ch)][0][GET_ACTION_VNUM(ch, 0)]], dist_buf);
 		}
 		
 		if (GET_ACTION_STRING(ch)) {
 			msg_to_char(ch, "Your remaining path is: %s\r\n", GET_ACTION_STRING(ch));
-		}
-
-		// distance remaining?
-		*dist_buf = '\0';
-		if ((calc_dist = driving_distance_remaining(ch)) > 1) {
-			msg_to_char(ch, "Distance remaining: %d tiles", calc_dist);
 		}
 	}
 	else if (GET_ACTION(ch) != ACT_NONE && GET_ACTION(ch) != drive_data[subcmd].action) {
