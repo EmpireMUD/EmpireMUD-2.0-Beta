@@ -2839,7 +2839,7 @@ The following affect flags are available:
  &cSLOW&0 - Combat speed reduced, like the Slow spell.
  &cSTUNNED&0 - Can't participate in combat or move -- do not use this on items.
  &cSTONED&0 - Sees the world in strange, trippy colors.
- &c!BLOOD&0 - Cannot spend blood points.
+ &cNO-SPEND-BLOOD&0 - Cannot spend blood points.
  &cDEATHSHROUDED&0 - Appears as a corpse and cannot act -- do not use this on items.
  &cEARTHMELDED&0 - Submerged in the earth and can't take normal actions -- do not use this on items.
  &cMUMMIFIED&0 - Immune to attack and cannot act -- do not use this on items.

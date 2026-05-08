@@ -1453,6 +1453,13 @@ NO-DRINK-BLOOD NODRINKBLOOD !DRINK-BLOOD "NO DRINK BLOOD"
 The NO-DRINK-BLOOD affect prevents a character from being bitten or sired by
 vampires.
 #
+NO-SPEND-BLOOD NOSPENDBLOOD !BLOOD !SPEND-BLOOD "NO SPEND BLOOD"
+
+The NO-SPEND-BLOOD affect prevents a character from using any ability that
+requires them to spend blood points.
+
+See also: VAMPIRE
+#
 NO-MORPH NOMORPH !MORPH "NO MORPH"
 
 The NO-MORPH affect prevents you from morphing or un-morphing.

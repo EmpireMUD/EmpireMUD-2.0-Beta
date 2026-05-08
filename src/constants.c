@@ -1790,7 +1790,7 @@ const char *affected_bits[] = {
 	"SLOW",
 	"STUNNED",
 	"STONED",	// 20
-	"!BLOOD",
+	"NO-SPEND-BLOOD",
 	"*",	// formerly CLAWS
 	"DEATHSHROUDED",
 	"EARTHMELDED",
@@ -1896,7 +1896,7 @@ const bool aff_is_bad[] = {
 	TRUE,	// slow
 	TRUE,	// stunned
 	TRUE,	// 20 - stoned
-	TRUE,	// !blood
+	TRUE,	// no-spend-blood
 	FALSE,	// * unused
 	FALSE,	// deathshrouded
 	FALSE,	// earthmelded
