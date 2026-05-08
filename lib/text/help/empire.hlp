@@ -1145,15 +1145,18 @@ Rewards the following buildings:
 
 See also: PROGRESS
 #
-SILVER GOLD COPPER
+SILVER GOLD COPPER "PRECIOUS METALS" "PRECIOUS METAL INGOTS"
 
-Copper, silver, and gold are found in mines, although more rarely than iron
-ore. They are used as currency in many empires for trade and exchange. Some
-empires, however, prefer to use material goods instead.
+Copper, silver, and gold are precious metals that can be found in mines. Smelt
+them into ingots for use in crafting; smelt them again to refine them into bars
+that you can store in your vault to increase your wealth.
 
-You must also smelt copper into nocturnium ore to make nocturnium ingots.
+You can split bars back into ingots using the 'separate' command.
 
-See also: RARE METALS, SMELT, SEPARATE
+You can also mint these precious metals into coins. Copper is also used when
+smelting nocturnium ingots.
+
+See also: COINS, MINT, RARE METALS, SMELT, SEPARATE
 #
 "STILT BUILDINGS" "STILT BUILDINGS GOAL"
 
