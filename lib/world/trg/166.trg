@@ -2526,7 +2526,7 @@ if %move% == 1
           %echo% &&G%obj% hits ~%targ% in the head!&&0
           eval ouch 75 * %diff%
           %damage% %targ% %ouch% physical
-          if %diff% > 1 && (%self.level% + 100) > %targ.level% && !%targ.aff_flagged(!STUN)%
+          if %diff% > 1 && (%self.level% + 100) > %targ.level% && !%targ.aff_flagged(NO-STUN)%
             dg_affect #16619 %targ% STUNNED on 5
           end
         break
@@ -2611,7 +2611,7 @@ elseif %move% == 2 && !%self.aff_flagged(BLIND)%
           %echo% &&G~%self% whacks ~%ch% in the head with the pole!&&0
           %send% %ch% That really hurt!
           %damage% %ch% 100 physical
-          if %diff% > 1 && (%self.level% + 100) > %targ.level% && !%targ.aff_flagged(!STUN)%
+          if %diff% > 1 && (%self.level% + 100) > %targ.level% && !%targ.aff_flagged(NO-STUN)%
             dg_affect #16616 %ch% STUNNED on 5
           end
         elseif %ch.is_pc%

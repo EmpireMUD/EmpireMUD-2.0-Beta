@@ -1031,7 +1031,7 @@ if %move% == 1 && !%self.aff_flagged(BLIND)%
         %echo% &&m%obj% bonks ~%targ% in the head!&&0
         eval ouch 75 * %diff%
         %damage% %targ% %ouch% physical
-        if %diff% == 4 && (%self.level% + 100) > %targ.level% && !%targ.aff_flagged(!STUN)%
+        if %diff% == 4 && (%self.level% + 100) > %targ.level% && !%targ.aff_flagged(NO-STUN)%
           dg_affect #11851 %targ% STUNNED on 5
         end
       break
@@ -1513,7 +1513,7 @@ elseif %move% == 3
       if %self.is_enemy(%ch%)%
         if !%ch.var(did_sfdodge)%
           %echo% &&mThe shaking floor knocks ~%ch% to the floor!&&0
-          if %cycle% == %diff% && %diff% >= 3 && (%self.level% + 100) > %ch.level% && !%ch.aff_flagged(!STUN)%
+          if %cycle% == %diff% && %diff% >= 3 && (%self.level% + 100) > %ch.level% && !%ch.aff_flagged(NO-STUN)%
             dg_affect #11814 %ch% STUNNED on 5
           end
           dg_affect #11818 %ch% TO-HIT -%debuff% 15
@@ -1691,7 +1691,7 @@ if %move% == 1 && !%self.aff_flagged(BLIND)%
     %morph% %targ% %vnum%
     %echoaround% %targ% &&m%old_shortdesc% grows long ears and a tail... and becomes ~%targ%!&&0
     %send% %targ% &&m**** You are suddenly transformed into %targ.name%! ****&&0 (fastmorph normal)
-    if %diff% == 4 && (%self.level% + 100) > %targ.level% && !%targ.aff_flagged(!STUN)%
+    if %diff% == 4 && (%self.level% + 100) > %targ.level% && !%targ.aff_flagged(NO-STUN)%
       dg_affect #11851 %targ% STUNNED on 5
     elseif %diff% >= 2
       nop %targ.command_lag(ABILITY)%
@@ -1818,7 +1818,7 @@ elseif %move% == 4
         %echo% &&m~%ch% is hit by pixy dust and starts to shrink!&&0
         dg_affect #11820 %ch% BONUS-PHYSICAL -%penalty% 30
         dg_affect #11821 %ch% BONUS-MAGICAL -%penalty% 30
-        if %diff% == 4 && (%self.level% + 100) > %ch.level% && !%ch.aff_flagged(!STUN)%
+        if %diff% == 4 && (%self.level% + 100) > %ch.level% && !%ch.aff_flagged(NO-STUN)%
           dg_affect #11851 %ch% STUNNED on 10
         end
         if %diff% >= 2
@@ -1955,7 +1955,7 @@ if %move% == 1 && !%self.aff_flagged(BLIND)%
     %send% %targ% &&mYou trip and fall!&&0
     %echoaround% %targ% &&m~%targ% trips and falls!&&0
     if %diff% > 2
-      if (%self.level% + 100) > %targ.level% && !%targ.aff_flagged(!STUN)%
+      if (%self.level% + 100) > %targ.level% && !%targ.aff_flagged(NO-STUN)%
         dg_affect #11814 %targ% STUNNED on 10
       end
       eval dam 40 + (%diff% * 40)
@@ -4352,7 +4352,7 @@ if %move% == 1 && !%self.aff_flagged(BLIND)%
   else
     %echo% &&m~%self% bashes ~%targ% with ^%self% shield!
     eval dur %diff% * 5
-    if (%self.level% + 100) > %targ.level% && !%targ.aff_flagged(!STUN)%
+    if (%self.level% + 100) > %targ.level% && !%targ.aff_flagged(NO-STUN)%
       dg_affect #11851 %targ% STUNNED on %dur%
     end
     if %diff% > 1
@@ -4398,7 +4398,7 @@ elseif %move% == 2 && !%self.aff_flagged(BLIND)%
       %at% %targ.room% %echoaround% %targ% ~%targ% flies in from above and splats next to the fountain!
       %slay% %targ%
     else
-      if %diff% > 1 && (%self.level% + 100) > %targ.level% && !%targ.aff_flagged(!STUN)%
+      if %diff% > 1 && (%self.level% + 100) > %targ.level% && !%targ.aff_flagged(NO-STUN)%
         %send% %targ% You fly into the wall and hit your head! That hurt!
         eval dur %diff% * 3
         dg_affect #11851 %targ% STUNNED on %dur%
@@ -4499,7 +4499,7 @@ if %move% == 1
             * hit
             %echo% &&mThe chain lightning hits ~%ch%!&&0
             %damage% %ch% 100 physical
-            if %cycle% == 4 && %diff% == 4 && (%self.level% + 100) > %ch.level% && !%ch.aff_flagged(!STUN)%
+            if %cycle% == 4 && %diff% == 4 && (%self.level% + 100) > %ch.level% && !%ch.aff_flagged(NO-STUN)%
               dg_affect #11851 %ch% STUNNED on 10
             end
           end
@@ -4983,7 +4983,7 @@ if %move% == 1
         if %self.is_enemy(%ch%)%
           %echo% &&mFlying debris slams into ~%ch%!&&0
           %damage% %ch% 100 physical
-          if %cycle% == 4 && %diff% == 4 && (%self.level% + 100) > %ch.level% && !%ch.aff_flagged(!STUN)%
+          if %cycle% == 4 && %diff% == 4 && (%self.level% + 100) > %ch.level% && !%ch.aff_flagged(NO-STUN)%
             dg_affect #11851 %ch% STUNNED on 10
           end
         end
@@ -5228,7 +5228,7 @@ switch %self.vnum%
       halt
     end
     %send% %actor% You throw @%self% at ~%targ%... it hits *%targ% in the head!
-    if !%targ.aff_flagged(!STUN)%
+    if !%targ.aff_flagged(NO-STUN)%
       %echoaround% %targ% ...&%targ% seems stunned.
       dg_affect #11851 %targ% STUNNED on 9
     end
@@ -5709,7 +5709,7 @@ elseif %move% == 3
             * hit
             %echo% &&mThe chain lightning hits ~%ch%!&&0
             %damage% %ch% 120 physical
-            if %cycle% == 4 && %diff% == 4 && (%self.level% + 100) > %ch.level% && !%ch.aff_flagged(!STUN)%
+            if %cycle% == 4 && %diff% == 4 && (%self.level% + 100) > %ch.level% && !%ch.aff_flagged(NO-STUN)%
               dg_affect #11851 %ch% STUNNED on 10
             end
           end
@@ -5863,7 +5863,7 @@ if %move% == 1 && !%self.aff_flagged(BLIND)%
     %morph% %targ% %vnum%
     %echoaround% %targ% &&m%old_shortdesc% is suddenly transformed into ~%targ%!&&0
     %send% %targ% &&m**** You are suddenly transformed into %targ.name%! ****&&0 (fastmorph normal)
-    if %diff% == 4 && (%self.level% + 100) > %targ.level% && !%targ.aff_flagged(!STUN)%
+    if %diff% == 4 && (%self.level% + 100) > %targ.level% && !%targ.aff_flagged(NO-STUN)%
       dg_affect #11851 %targ% STUNNED on 5
     elseif %diff% >= 2
       nop %targ.command_lag(ABILITY)%
@@ -5956,7 +5956,7 @@ elseif %move% == 3
       else
         set any 1
         %echo% &&mThe rosy pink light strikes ~%ch% in the chest and streams right through *%ch%!&&0
-        if %diff% == 4 && (%self.level% + 100) > %ch.level% && !%ch.aff_flagged(!STUN)%
+        if %diff% == 4 && (%self.level% + 100) > %ch.level% && !%ch.aff_flagged(NO-STUN)%
           dg_affect #11851 %ch% STUNNED on 10
         end
         if %diff% >= 3
@@ -6173,7 +6173,7 @@ elseif %move% == 2
             end
             %echo% &&mA shadow cuts straight through ~%ch% as it streams into the Ascendant!&&0
             %damage% %ch% 120 physical
-            if %cycle% == 4 && %diff% == 4 && (%self.level% + 100) > %ch.level% && !%ch.aff_flagged(!STUN)%
+            if %cycle% == 4 && %diff% == 4 && (%self.level% + 100) > %ch.level% && !%ch.aff_flagged(NO-STUN)%
               dg_affect #11851 %ch% STUNNED on 10
             end
           end
@@ -6745,7 +6745,7 @@ if %move% == 1 && !%self.aff_flagged(BLIND)%
     %morph% %targ% %vnum%
     %echoaround% %targ% &&m%old_shortdesc% is suddenly transformed into ~%targ%!&&0
     %send% %targ% &&m**** You are suddenly transformed into %targ.name%! ****&&0 (fastmorph normal)
-    if %diff% == 4 && (%self.level% + 100) > %targ.level% && !%targ.aff_flagged(!STUN)%
+    if %diff% == 4 && (%self.level% + 100) > %targ.level% && !%targ.aff_flagged(NO-STUN)%
       dg_affect #11851 %targ% STUNNED on 5
     elseif %diff% >= 2
       nop %targ.command_lag(ABILITY)%

@@ -1448,6 +1448,11 @@ The NO-DISARM affect prevents your weapon from being disarmed.
 
 See also: DISARM
 #
+NO-DRINK-BLOOD NODRINKBLOOD !DRINK-BLOOD "NO DRINK BLOOD"
+
+The NO-DRINK-BLOOD affect prevents a character from being bitten or sired by
+vampires.
+#
 NO-MORPH NOMORPH !MORPH "NO MORPH"
 
 The NO-MORPH affect prevents you from morphing or un-morphing.

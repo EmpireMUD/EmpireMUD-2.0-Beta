@@ -449,7 +449,7 @@ switch %random.3%
       %send% %actor% &&r~%self% delivers a devastating punch, sending you flying!
       %echoaround% %actor% ~%self% delivers a devastating punch, sending ~%actor% flying!
       %damage% %actor% 150 physical
-      if %actor.aff_flagged(!STUN)%
+      if %actor.aff_flagged(NO-STUN)%
         %send% %actor% You land on your feet and jump back into battle.
         %echoaround% %actor% ~%actor% lands on ^%actor% feet and charges back into battle.
       else

@@ -1170,7 +1170,7 @@ if %move% == 1
       else
         set any 1
         %echo% &&mThe rosy red light strikes ~%ch% in the chest and cuts right through *%ch%!&&0
-        if %diff% == 4 && (%self.level% + 100) > %ch.level% && !%ch.aff_flagged(!STUN)%
+        if %diff% == 4 && (%self.level% + 100) > %ch.level% && !%ch.aff_flagged(NO-STUN)%
           dg_affect #11851 %ch% STUNNED on 10
         end
         if %diff% >= 3
@@ -5799,7 +5799,7 @@ elseif %move% == 2 && !%self.aff_flagged(BLIND)%
   else
     * hit
     %echo% &&j~%self% lands on |%targ% chest and clangs both hammers together on ^%targ% head, shouting the whole time!&&0
-    if %diff% >= 3 && (%self.level% + 100) > %targ.level% && !%targ.aff_flagged(!STUN)%
+    if %diff% >= 3 && (%self.level% + 100) > %targ.level% && !%targ.aff_flagged(NO-STUN)%
       %send% %targ% &&jYou're seeing stars!&&0
       dg_affect #11851 %targ% STUNNED on 15
     end
@@ -5870,7 +5870,7 @@ elseif %move% == 4 && !%self.aff_flagged(BLIND)%
   else
     * hit
     %send% %targ% &&j|%self% hammers soar through the air and hit |%targ% head one after the other!&&0
-    if %diff% >= 3 && (%self.level% + 100) > %targ.level% && !%targ.aff_flagged(!STUN)%
+    if %diff% >= 3 && (%self.level% + 100) > %targ.level% && !%targ.aff_flagged(NO-STUN)%
       %send% %targ% &&jYou're seeing stars!&&0
       dg_affect #11851 %targ% STUNNED on 15
     elseif %diff% >= 2
@@ -6025,7 +6025,7 @@ elseif %move% == 2
             %send% %ch% &&mA lightning bolt strikes you right in the chest!&&0
             %echoaround% %ch% &&m~%ch% screams as a lightning bolt strikes *%ch%!&&0
             %damage% %ch% 120 physical
-            if %cycle% == 4 && %diff% == 4 && (%self.level% + 100) > %ch.level% && !%ch.aff_flagged(!STUN)%
+            if %cycle% == 4 && %diff% == 4 && (%self.level% + 100) > %ch.level% && !%ch.aff_flagged(NO-STUN)%
               dg_affect #11851 %ch% STUNNED on 10
             end
           end
@@ -6252,7 +6252,7 @@ elseif %move% == 2
       if %self.is_enemy(%ch%)%
         if !%ch.var(did_sfdodge)%
           %echo% &&AThere's a blinding flash as a bubble implodes right next to ~%ch%!&&0
-          if %cycle% == %diff% && %diff% >= 3 && (%self.level% + 100) > %ch.level% && !%ch.aff_flagged(!STUN)%
+          if %cycle% == %diff% && %diff% >= 3 && (%self.level% + 100) > %ch.level% && !%ch.aff_flagged(NO-STUN)%
             dg_affect #11851 %ch% STUNNED on 5
           end
           %damage% %ch% 130 physical
@@ -6317,7 +6317,7 @@ elseif %move% == 3
           %send% %ch% &&AYou gurgle in pain as the wave passes through you!&&0
           %echoaround% %ch% &&A~%ch% gurgles in pain as the wave passes through *%ch%!&&0
           %damage% %ch% 100 physical
-          if %cycle% == 4 && %diff% == 4 && (%self.level% + 100) > %ch.level% && !%ch.aff_flagged(!STUN)%
+          if %cycle% == 4 && %diff% == 4 && (%self.level% + 100) > %ch.level% && !%ch.aff_flagged(NO-STUN)%
             dg_affect #11851 %ch% STUNNED on 10
           end
         end
@@ -6531,7 +6531,7 @@ elseif %move% == 2
       if %self.is_enemy(%ch%)%
         if !%ch.var(did_sfdodge)%
           %echo% &&mThere's a blinding flash as the air explodes right next to ~%ch%!&&0
-          if %cycle% == %diff% && %diff% >= 3 && (%self.level% + 100) > %ch.level% && !%ch.aff_flagged(!STUN)%
+          if %cycle% == %diff% && %diff% >= 3 && (%self.level% + 100) > %ch.level% && !%ch.aff_flagged(NO-STUN)%
             dg_affect #11851 %ch% STUNNED on 5
           end
           %damage% %ch% 150 physical
@@ -6814,7 +6814,7 @@ elseif %move% == 2
   else
     * hit
     %echo% &&jThe sand flies into |%targ% eyes!&&0
-    if %diff% >= 3 && (%self.level% + 100) > %targ.level% && !%targ.aff_flagged(!STUN)%
+    if %diff% >= 3 && (%self.level% + 100) > %targ.level% && !%targ.aff_flagged(NO-STUN)%
       %send% %targ% &&jThat really hurt! You can't do anything but try to get the sand out of your eyes.&&0
       dg_affect #11851 %targ% STUNNED on 15
     else
@@ -7103,7 +7103,7 @@ elseif %move% == 3
       if !%ch.var(did_sfdodge)%
         set hit 1
         %echo% &&j~%self% trips ~%ch% with her thorny whip!&&0
-        if %diff% >= 3 && (%self.level% + 100) <= %ch.level% && !%ch.aff_flagged(!STUN)%
+        if %diff% >= 3 && (%self.level% + 100) <= %ch.level% && !%ch.aff_flagged(NO-STUN)%
           dg_affect #11814 %ch% STUNNED on 10
         else
           dg_affect #11814 %ch% DISARMED on 10

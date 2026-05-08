@@ -1877,7 +1877,7 @@ elseif %move% == 2
     eval amount %self.level% / 10
     dg_affect #12831 @%self% %enemy% off silent
     dg_affect #12831 %enemy% DODGE -%amount% 30
-  elseif %dps% >= 3 && !%enemy.aff_flagged(!STUN)%
+  elseif %dps% >= 3 && !%enemy.aff_flagged(NO-STUN)%
     * stun
     dg_affect #12831 @%self% %enemy% off silent
     dg_affect #12831 %enemy% STUNNED on 5
@@ -2356,7 +2356,7 @@ elseif %cmd% == tremor
       set next_ch %ch.next_in_room%
       if %self.is_enemy(%ch%)%
         if !%ch.var(did_scfjump)%
-          if %ch.aff_flagged(!STUN)%
+          if %ch.aff_flagged(NO-STUN)%
             %echo% &&wThe tremor knocks ~%ch% into a broken wagon!&&0
           else
             %echo% &&wThe tremor knocks ~%ch% to the ground!&&0

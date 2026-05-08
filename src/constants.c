@@ -1799,7 +1799,7 @@ const char *affected_bits[] = {
 	"NO-TRACKS",
 	"IMMUNE-POISON-DEBUFFS",
 	"IMMUNE-MENTAL-DEBUFFS",
-	"!STUN",	// 30
+	"NO-STUN",	// 30
 	"*ORDERED",
 	"NO-DRINK-BLOOD",
 	"DISTRACTED",
@@ -1852,7 +1852,7 @@ const char *affected_bits_consider[] = {
 	"",	// no-tracks
 	"$E is immune to poison debuffs.",	// immune-poison-debuffs
 	"$E is immune to mental debuffs.",	// immune-mental-debuffs
-	"$E is immune to stuns.",	// 30 - !stun
+	"$E is immune to stuns.",	// 30 - no-stun
 	"",	// ordred
 	"",	// no-drink-blood
 	"",	// distracted
@@ -1905,7 +1905,7 @@ const bool aff_is_bad[] = {
 	FALSE,	// no-tracks
 	FALSE,	// immune-poison-debuffs
 	FALSE,	// immune-mental-debuffs
-	FALSE,	// 30 - !stun
+	FALSE,	// 30 - no-stun
 	FALSE,	// ordered
 	FALSE,	// no-drink-blood
 	TRUE,	// distracted

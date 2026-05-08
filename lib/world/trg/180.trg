@@ -287,7 +287,7 @@ switch %move%
             %damage% %ch% 150
           else
             %echo% &&OA large falling rock crashes into ~%ch%, knocking *%ch% flat!&&0
-            if (%self.level% + 100) > %ch.level% && !%ch.aff_flagged(!STUN)%
+            if (%self.level% + 100) > %ch.level% && !%ch.aff_flagged(NO-STUN)%
               dg_affect #18009 %ch% STUNNED on 10
             end
             %damage% %ch% 300
@@ -462,14 +462,14 @@ switch %move%
           if %diff% <= 2
             %send% %ch% &&OYou're tripped by the end of the swinging chain!&&0
             %echoaround% %ch% &&O&&Z~%ch% is tripped by the end of the swinging chain!&&0
-            if (%self.level% + 100) > %ch.level% && !%ch.aff_flagged(!STUN)%
+            if (%self.level% + 100) > %ch.level% && !%ch.aff_flagged(NO-STUN)%
               dg_affect #18014 %ch% STUNNED on 5
             end
             %damage% %ch% 50 physical
           else
             %send% %ch% &&OYou are struck and sent flying by the end of the swinging chain!&&0
             %echoaround% %ch% &&O&&Z~%ch% is struck and sent flying by the end of the swinging chain!&&0
-            if (%self.level% + 100) > %ch.level% && !%ch.aff_flagged(!STUN)%
+            if (%self.level% + 100) > %ch.level% && !%ch.aff_flagged(NO-STUN)%
               dg_affect #18014 %ch% STUNNED on 10
             end
             %damage% %ch% 100 physical

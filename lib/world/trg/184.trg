@@ -358,7 +358,7 @@ elseif %num% == 4
   set person %room.people%
   while %person%
     if %person.is_pc%
-      if !%person.aff_flagged(!STUN)%
+      if !%person.aff_flagged(NO-STUN)%
         %send% %person% You are stunned by its enormity...
         dg_affect %person% STUNNED on 5
       end

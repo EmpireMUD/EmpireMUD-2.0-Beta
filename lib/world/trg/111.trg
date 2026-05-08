@@ -992,7 +992,7 @@ if !%target%
 end
 %send% %target% ~%self% wraps *%self%self around you, mummifying you and dragging you off to blissful slumber...
 %echoaround% %target% ~%self% wraps *%self%self around ~%target%, mummifying *%target% and dragging *%target% off to blissful slumber...
-if %target.aff_flagged(!STUN)% || %target.level% >= (%self.level% + 100)
+if %target.aff_flagged(NO-STUN)% || %target.level% >= (%self.level% + 100)
   * stun immunity or high level
   %damage% %target% 50
   dg_affect %self% HARD-STUNNED on 15

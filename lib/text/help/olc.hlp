@@ -2847,7 +2847,7 @@ The following affect flags are available:
  &cNO-TRACKS&0 - Does not leave tracks.
  &cIMMUNE-POISON-DEBUFFS&0 - Immune to any 'poison' debuffs.
  &cIMMUNE-MENTAL-DEBUFFS&0 - Immune to any 'mental' debuffs.
- &c!STUN&0 - Immune to stun effects.
+ &cNO-STUN&0 - Immune to stun effects.
  &cNO-DRINK-BLOOD&0 - Can't be bitten/sired by vampires.
  &cDISTRACTED&0 - Cannot perform timed actions.
  &cHARD-STUNNED&0 - A stun that cannot be cleansed and does not trigger immunity.
