@@ -2822,27 +2822,27 @@ The following affect flags are available:
    linked trait on that ability).
  &cINFRA&0 - Can see in the dark (glowing red eyes).
  &cSNEAK&0 - Cannot be seen while moving.
- &cHIDE&0 - Cannot be seen in room (without search).
- &c*CHARM&0 - NPC will take orders from its master -- do not use this on items.
+ &cHIDDEN&0 - Cannot be seen in room (without search).
+ &c*CHARM&0 - NPC will take orders from its master.
  &cINVIS&0 - Can't be seen, except by magic.
  &cIMMUNE-PHYSICAL-DEBUFFS&0 - Immune to any 'physical' debuffs.
  &cSENSE-HIDDEN&0 - Can see hidden people.
- &c!PHYSICAL&0 - Immune to physical damage -- do not use this on items.
- &cNO-TARGET-IN-ROOM&0 - Cannot be targeted in the room -- do not use this on items.
- &cNO-SEE-IN-ROOM&0 - Cannot be seen in the room at all -- do not use this on items.
+ &c!PHYSICAL&0 - Immune to physical damage.
+ &cNO-TARGET-IN-ROOM&0 - Cannot be targeted in the room.
+ &cNO-SEE-IN-ROOM&0 - Cannot be seen in the room at all.
  &cFLYING&0 - Is flying.
- &c!ATTACK&0 - Cannot be attacked -- do not use this on items.
+ &c!ATTACK&0 - Cannot be attacked.
  &cIMMUNE-MAGICAL-DEBUFFS&0 - Immune to any 'magical' debuffs.
- &cDISARMED&0 - Has lost their weapon -- do not use this on items.
+ &cDISARMED&0 - Has lost their weapon.
  &cHASTE&0 - Has the effect of the Hasten ability.
- &cIMMOBILIZED&0 - Cannot move -- do not use this on items.
+ &cIMMOBILIZED&0 - Cannot move.
  &cSLOW&0 - Combat speed reduced, like the Slow spell.
- &cSTUNNED&0 - Can't participate in combat or move -- do not use this on items.
+ &cSTUNNED&0 - Can't participate in combat or move.
  &cSTONED&0 - Sees the world in strange, trippy colors.
  &cNO-SPEND-BLOOD&0 - Cannot spend blood points.
- &cDEATHSHROUDED&0 - Appears as a corpse and cannot act -- do not use this on items.
- &cEARTHMELDED&0 - Submerged in the earth and can't take normal actions -- do not use this on items.
- &cMUMMIFIED&0 - Immune to attack and cannot act -- do not use this on items.
+ &cDEATHSHROUDED&0 - Appears as a corpse and cannot act.
+ &cEARTHMELDED&0 - Submerged in the earth and can't take normal actions.
+ &cMUMMIFIED&0 - Immune to attack and cannot act.
  &cSOULMASK&0 - Players cannot see affect details on character.
  &cNO-TRACKS&0 - Does not leave tracks.
  &cIMMUNE-POISON-DEBUFFS&0 - Immune to any 'poison' debuffs.
@@ -2851,7 +2851,7 @@ The following affect flags are available:
  &cNO-DRINK-BLOOD&0 - Can't be bitten/sired by vampires.
  &cDISTRACTED&0 - Cannot perform timed actions.
  &cHARD-STUNNED&0 - A stun that cannot be cleansed and does not trigger immunity.
- &cIMMUNE-DAMAGE&0 - Cannot take damage -- do not use this on items.
+ &cIMMUNE-DAMAGE&0 - Cannot take damage.
  &cIMMUNE-WHERE&0 - Cannot be found using the 'where' command.
  &cWATERWALKING&0 - Does not need to swim and doesn't drown. Unlike the AQUATIC
    mob flag, this allows it to move on both water and land.

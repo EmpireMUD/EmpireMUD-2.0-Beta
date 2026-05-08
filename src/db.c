@@ -2096,6 +2096,8 @@ void check_old_flag_names_in_triggers(void) {
 	struct cmdlist_element *cmd;
 	
 	const char *old_flag_names[] = {
+		"HIDE",
+		"ENTANGLED",
 		"!WHERE",	// b5.203
 		"!DISARM",	// b5.203
 		"!DRINK-BLOOD",	// b5.203
