@@ -288,11 +288,10 @@ room_data *get_shipping_target(char_data *ch, char *argument, bool *targeted_isl
 * @return bool TRUE if it moved, FALSE if it was blocked.
 */
 bool move_vehicle(char_data *ch, vehicle_data *veh, int dir, int subcmd) {
-	int dist;
 	room_data *to_room = NULL, *was_in;
 	struct follow_type *fol, *next_fol;
 	struct vehicle_room_list *vrl;
-	char buf[MAX_STRING_LENGTH], dist_buf[256];
+	char buf[MAX_STRING_LENGTH];
 	char_data *ch_iter;
 	
 	// sanity
@@ -371,12 +370,7 @@ bool move_vehicle(char_data *ch, vehicle_data *veh, int dir, int subcmd) {
 	// message driver and update MSDP
 	if (VEH_DRIVER(veh)) {
 		if (SHOW_STATUS_MESSAGES(VEH_DRIVER(veh), SM_VEHICLE_MOVEMENT)) {
-			*dist_buf = '\0';
-			if ((dist = driving_distance_remaining(VEH_DRIVER(veh))) > 1) {
-				// show 1 less distance than calculated, because it's updated after this
-				safe_snprintf(dist_buf, sizeof(dist_buf), " (distance: %d)", dist - 1);
-			}
-			safe_snprintf(buf, sizeof(buf), "You %s $V %s%s%s.", drive_data[subcmd].command, dirs[get_direction_for_char(VEH_DRIVER(veh), dir)], coord_display_room(VEH_DRIVER(veh), IN_ROOM(veh), FALSE), dist_buf);
+			safe_snprintf(buf, sizeof(buf), "You %s $V %s%s.", drive_data[subcmd].command, dirs[get_direction_for_char(VEH_DRIVER(veh), dir)], coord_display_room(VEH_DRIVER(veh), IN_ROOM(veh), FALSE));
 			act(buf, FALSE, VEH_DRIVER(veh), NULL, veh, TO_CHAR | ACT_VEH_VICT);
 		}
 		msdp_update_room(VEH_DRIVER(veh));
@@ -1826,6 +1820,12 @@ ACMD(do_drive) {
 		
 		if (GET_ACTION_STRING(ch)) {
 			msg_to_char(ch, "Your remaining path is: %s\r\n", GET_ACTION_STRING(ch));
+		}
+
+		// distance remaining?
+		*dist_buf = '\0';
+		if ((calc_dist = driving_distance_remaining(ch)) > 1) {
+			msg_to_char(ch, "Distance remaining: %d tiles", calc_dist);
 		}
 	}
 	else if (GET_ACTION(ch) != ACT_NONE && GET_ACTION(ch) != drive_data[subcmd].action) {
