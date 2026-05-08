@@ -1897,8 +1897,8 @@ elseif %move% == 3
   else
     eval duration 20
   end
-  dg_affect #12830 @%self% %enemy% off
-  dg_affect #12830 %enemy% SLOW on %durtion%
+  dg_affect #12830 @%self% %enemy% off silent
+  dg_affect #12830 %enemy% SLOW on %duration%
   %echo% &&Y~%self% unleashes a shard flurry at ~%enemy%, slowing ^%enemy% advance considerably!&&0
   if !%self.fighting%
     mkill %enemy%
