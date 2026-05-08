@@ -154,7 +154,7 @@ elseif minionize /= %cmd%
       %quest% %actor% trigger 1503
       * remove citizen?
       set targ_id %target.id%
-      dg_affect %target% !SEE on 5
+      dg_affect %target% NO-SEE-IN-ROOM on 5
       %own% %target% none
       * still here?
       if %target% && %target.id% == %targ_id%

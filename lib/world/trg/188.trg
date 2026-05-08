@@ -2746,7 +2746,7 @@ switch %count_up%
   break
 done
 set tent %self.room.in_vehicle%
-dg_affect %self% !see on -1
+dg_affect %self% NO-SEE-IN-ROOM on -1
 mgoto %tent.room%
 nop %tent.dump%
 %echo% Healers sadly dismantle %tent.shortdesc%.
@@ -2807,7 +2807,7 @@ if %self.varexists(spawn_time)%
   end
 end
 set tent %self.room.in_vehicle%
-dg_affect %self% !see on -1
+dg_affect %self% NO-SEE-IN-ROOM on -1
 mgoto %tent.room%
 nop %tent.dump%
 %echo% %self% Healers sadly dismantle %tent.shortdesc%.

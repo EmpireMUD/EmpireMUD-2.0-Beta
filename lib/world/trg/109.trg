@@ -218,7 +218,7 @@ if !%self.fighting% && %self.varexists(enrage_counter)%
   if %self.aff_flagged(!ATTACK)%
     halt
   end
-  if %self.aff_flagged(!SEE)%
+  if %self.aff_flagged(NO-SEE-IN-ROOM)%
     %echo% ~%self% returns.
   end
   %load% mob %self.vnum%
@@ -279,7 +279,7 @@ if %enraged%
     %echo% ~%self% runs behind a large stalagmite and disappears!
     %restore% %self%
     dg_affect %self% !ATTACK on 300
-    dg_affect %self% !SEE on -1
+    dg_affect %self% NO-SEE-IN-ROOM on -1
   end
   * Don't always show the message or it would be even spammier
   if %random.4% == 4

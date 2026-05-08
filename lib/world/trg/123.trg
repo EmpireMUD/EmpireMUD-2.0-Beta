@@ -924,11 +924,11 @@ wait 1
 * check leash
 set dist %room.distance(%instance.location%)%
 if %instance.location% && (%dist% > 4 && %random.2% == 2)
-  if !%self.aff_flagged(!SEE)%
+  if !%self.aff_flagged(NO-SEE-IN-ROOM)%
     %echo% ~%self% burrows down and vanishes from sight!
   end
   mgoto %instance.location%
-  if !%self.aff_flagged(!SEE)%
+  if !%self.aff_flagged(NO-SEE-IN-ROOM)%
     %echo% The ground shakes as ~%self% bursts forth from the pit!
   end
   halt

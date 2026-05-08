@@ -161,7 +161,7 @@ else
   * inside mobs
   * Mob will appear via its greet trig later
   nop %self.add_mob_flag(SILENT)%
-  dg_affect %self% !SEE on -1
+  dg_affect %self% NO-SEE-IN-ROOM on -1
 end
 ~
 #10851
@@ -354,14 +354,14 @@ while %person%
   end
   set person %person.next_in_room%
 done
-if %count% > 0 && %self.aff_flagged(!SEE)%
+if %count% > 0 && %self.aff_flagged(NO-SEE-IN-ROOM)%
   nop %self.remove_mob_flag(SILENT)%
-  dg_affect %self% !SEE off
+  dg_affect %self% NO-SEE-IN-ROOM off
   %echo% ~%self% appears from deep in the soulstream!
-elseif %count% == 0 && !%self.aff_flagged(!SEE)%
+elseif %count% == 0 && !%self.aff_flagged(NO-SEE-IN-ROOM)%
   %echo% ~%self% vanishes into the soulstream.
   nop %self.add_mob_flag(SILENT)%
-  dg_affect %self% !SEE on -1
+  dg_affect %self% NO-SEE-IN-ROOM on -1
 end
 ~
 #10861

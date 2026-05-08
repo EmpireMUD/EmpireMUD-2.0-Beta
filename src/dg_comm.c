@@ -85,7 +85,7 @@ void sub_write_to_char(char_data *ch, char *tokens[], void *otokens[], int token
 			case '^': {
 				if (!otokens[i] || token_type[i] != TYPE_MOB) {
 					// formerly included: || !CAN_SEE(ch, (char_data*) otokens[i])
-					// TODO if we had plural pronoun support, !see people should be "their"
+					// TODO if we had plural pronoun support, NO-SEE-IN-ROOM people should be "their"
 					strcat(sb,"its");
 				}
 				else if ((char_data*)otokens[i] == ch) {
@@ -99,7 +99,7 @@ void sub_write_to_char(char_data *ch, char *tokens[], void *otokens[], int token
 			case '&': {
 				if (!otokens[i] || token_type[i] != TYPE_MOB) {
 					// formerly included: || !CAN_SEE(ch, (char_data*) otokens[i])
-					// TODO if we had plural pronoun support, !see people should be "they"
+					// TODO if we had plural pronoun support, NO-SEE-IN-ROOM people should be "they"
 					strcat(sb,"it");
 				}
 				else if ((char_data*)otokens[i] == ch) {
@@ -113,7 +113,7 @@ void sub_write_to_char(char_data *ch, char *tokens[], void *otokens[], int token
 			case '*': {
 				if (!otokens[i] || token_type[i] != TYPE_MOB) {
 					// formerly included: || !CAN_SEE(ch, (char_data*) otokens[i])
-					// TODO if we had plural pronoun support, !see people should be "them"
+					// TODO if we had plural pronoun support, NO-SEE-IN-ROOM people should be "them"
 					strcat(sb,"it");
 				}
 				else if ((char_data*)otokens[i] == ch) {

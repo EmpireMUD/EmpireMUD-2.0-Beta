@@ -3023,7 +3023,7 @@ done
 Skycleave: Conditional mob visibility~
 0 C 100
 ~
-* toggles silent, !see
+* toggles silent, NO-SEE-IN-ROOM
 if %actor.is_npc%
   halt
 end
@@ -3089,7 +3089,7 @@ if %vis% && %self.affect(11832)%
   nop %self.remove_mob_flag(SILENT)%
   set arrives 1
 elseif !%vis% && !%self.affect(11832)%
-  dg_affect #11832 %self% !SEE on -1
+  dg_affect #11832 %self% NO-SEE-IN-ROOM on -1
   dg_affect #11832 %self% !TARGET on -1
   dg_affect #11832 %self% SNEAK on -1
   nop %self.add_mob_flag(SILENT)%

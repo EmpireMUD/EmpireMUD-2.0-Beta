@@ -325,7 +325,7 @@ Uninvited Guest: Coffin collapsed~
 wait 1 s
 set vampire %self.room.people(10370)%
 if %vampire%
-  if !%vampire.aff_flagged(!SEE)%
+  if !%vampire.aff_flagged(NO-SEE-IN-ROOM)%
     %force% %vampire% say Well that isn't good. Guess it's time to move on.
   end
 end
@@ -334,7 +334,7 @@ while %vampire%
   set vampire %self.room.people(10370)%
   if %vampire%
     if !%vampire.fighting%
-      if !%vampire.aff_flagged(!SEE)%
+      if !%vampire.aff_flagged(NO-SEE-IN-ROOM)%
         %echo% ~%vampire% leaves.
       end
       %purge% %vampire%
@@ -390,7 +390,7 @@ elseif %sun% != dark && !%affected% && %box%
   say If you'll excuse me...
   wait 1 s
   %echo% ~%self% opens the lid of @%box%, climbs inside, and slams the lid shut.
-  dg_affect #10370 %self% !SEE on -1
+  dg_affect #10370 %self% NO-SEE-IN-ROOM on -1
 end
 ~
 #10375
@@ -441,7 +441,7 @@ end
 set room %self.room%
 * let everyone arrive
 wait 0
-if %self.fighting% || %self.disabled% || %self.aff_flagged(!SEE)%
+if %self.fighting% || %self.disabled% || %self.aff_flagged(NO-SEE-IN-ROOM)%
   halt
 end
 * check for someone who needs the greeting
@@ -474,7 +474,7 @@ set pos 0
 set msg %self.custom(script1,%pos%)%
 while !%msg.empty%
   * check early end
-  if %self.disabled% || %self.fighting% || %self.aff_flagged(!SEE)%
+  if %self.disabled% || %self.fighting% || %self.aff_flagged(NO-SEE-IN-ROOM)%
     halt
   end
   * next message
@@ -550,7 +550,7 @@ Uninvited Guest: Put vampire in box on load~
 0 n 100
 ~
 if %self.room.sun% != light
-  dg_affect #10370 %self% !SEE on -1
+  dg_affect #10370 %self% NO-SEE-IN-ROOM on -1
 end
 ~
 $

@@ -1780,7 +1780,7 @@ const char *affected_bits[] = {
 	"SENSE-HIDDEN",
 	"!PHYSICAL",
 	"!TARGET",	// 10
-	"!SEE",
+	"NO-SEE-IN-ROOM",
 	"FLYING",
 	"!ATTACK",
 	"IMMUNE-MAGICAL-DEBUFFS",
@@ -1886,7 +1886,7 @@ const bool aff_is_bad[] = {
 	FALSE,	// sense-hidden
 	FALSE,	// immune-physical (damage)
 	FALSE,	// 10 - no-target-in-room
-	FALSE,	// no-see-in-room / !SEE
+	FALSE,	// no-see-in-room
 	FALSE,	// flying
 	FALSE,	// !attack
 	FALSE,	// immune-magical-debuffs

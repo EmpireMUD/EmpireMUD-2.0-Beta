@@ -1746,7 +1746,7 @@ else
     set xmas_pet_announce 1
     remote xmas_pet_announce %pc.id%
     * silently swap for the next pet
-    dg_affect %self% !SEE on 5
+    dg_affect %self% NO-SEE-IN-ROOM on 5
     * switch companions
     nop %pc.add_companion(%new_vnum%)%
     nop %pc.remove_companion(%self.vnum%)%
