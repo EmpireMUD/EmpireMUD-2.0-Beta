@@ -2852,7 +2852,7 @@ The following affect flags are available:
  &cDISTRACTED&0 - Cannot perform timed actions.
  &cHARD-STUNNED&0 - A stun that cannot be cleansed and does not trigger immunity.
  &cIMMUNE-DAMAGE&0 - Cannot take damage -- do not use this on items.
- &c!WHERE&0 - Cannot be found using the 'where' command.
+ &cIMMUNE-WHERE&0 - Cannot be found using the 'where' command.
  &cWATERWALKING&0 - Does not need to swim and doesn't drown. Unlike the AQUATIC
    mob flag, this allows it to move on both water and land.
  &cLIGHT&0 - Character provides light to the room.

@@ -1058,6 +1058,12 @@ affected character from moving or fleeing.
 Additionally, during ranged combat, an immobilized person cannot close the
 distance to switch from ranged to melee combat.
 #
+IMMUNE-WHERE IMMUNEWHERE "IMMUNE WHERE" "IMMUNE TO WHERE" !WHERE
+
+The IMMUNE-WHERE flag prevents a person from showing up on the 'where' command.
+
+See also: WHERE
+#
 INFRA INFRAVISION
 
 The INFRA affect, which appears on some spells and items, allows a character

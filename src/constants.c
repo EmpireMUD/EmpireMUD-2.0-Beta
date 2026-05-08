@@ -1805,7 +1805,7 @@ const char *affected_bits[] = {
 	"DISTRACTED",
 	"HARD-STUNNED",
 	"IMMUNE-DAMAGE",	// 35
-	"!WHERE",
+	"IMMUNE-WHERE",
 	"WATERWALKING",
 	"LIGHT",
 	"POOR-REGENS",
@@ -1858,7 +1858,7 @@ const char *affected_bits_consider[] = {
 	"",	// distracted
 	"",	// hard-stunned
 	"",	// 35 - immune-damage
-	"",	// !where
+	"",	// immune-where
 	"",	// waterwalking
 	"",	// light
 	"",	// poor-regens
