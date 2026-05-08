@@ -1816,7 +1816,7 @@ const char *affected_bits[] = {
 	"AUTO-RESURRECT",
 	"COUNTERSPELL",		// 45
 	"!DISARM",
-	"!MORPH",
+	"NO-MORPH",
 	"\n"
 };
 
@@ -1869,7 +1869,7 @@ const char *affected_bits_consider[] = {
 	"",	// auto-resurrect
 	"",	// 45 - counterspell
 	"$E cannot be disarmed",	// !disarm
-	"",	// !morph
+	"",	// no-morph
 	"\n"
 };
 
@@ -1922,7 +1922,7 @@ const bool aff_is_bad[] = {
 	FALSE,	// auto-resurrect
 	FALSE,	// 45 - counterspell
 	FALSE,	// !disarm
-	TRUE,	// !morph
+	TRUE,	// no-morph
 };
 
 
