@@ -171,7 +171,9 @@ while %num% <= %count%
     %own% %summon% %self.empire%
   end
   %echo% ~%summon% arrives!
-  %force% %summon% mkill %actor%
+  if %summon.can_fight(%actor%)%
+    %force% %summon% mkill %actor%
+  end
   eval num %num% + 1
 done
 ~
