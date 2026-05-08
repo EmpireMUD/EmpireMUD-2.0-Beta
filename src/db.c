@@ -62,6 +62,7 @@ void check_for_new_map();
 void check_learned_empire_crafts();
 void check_newbie_islands();
 void check_nowhere_einv_all();
+void check_old_flag_names_in_triggers();
 void check_for_player_wipe();
 void check_sector_times(any_vnum only_sect);
 void check_skills();
@@ -670,6 +671,7 @@ void boot_world(void) {
 	verify_running_events();
 	read_ability_requirements();
 	check_triggers();
+	check_old_flag_names_in_triggers();
 	compute_generic_relations();
 	
 	log("Sorting data.");
@@ -2083,6 +2085,39 @@ obj_data *read_object(obj_vnum nr, bool with_triggers) {
 
  //////////////////////////////////////////////////////////////////////////////
 //// MISCELLANEOUS HELPERS ///////////////////////////////////////////////////
+
+/**
+* Runs at startup to alert to any triggers that are using old versions of
+* affect flag names.
+*/
+void check_old_flag_names_in_triggers(void) {
+	int iter;
+	trig_data *trig, *next_trig;
+	struct cmdlist_element *cmd;
+	
+	const char *old_flag_names[] = {
+		"!WHERE",
+		"!DISARM",
+		"!DRINK-BLOOD",
+		"!MORPH",
+		"!SEE",
+		"!BLOOD",
+		"!STUN",
+		"!TARGET",
+		"\n"
+	};
+	
+	HASH_ITER(hh, trigger_table, trig, next_trig) {
+		LL_FOREACH(trig->cmdlist, cmd) {
+			for (iter = 0; *old_flag_names[iter] != '\n'; ++iter) {
+				if (strstr(cmd->cmd, old_flag_names[iter])) {
+					log("SCRIPT ERR: Trigger [%d] %s is using old affect flag name %s", GET_TRIG_VNUM(trig), GET_TRIG_NAME(trig), old_flag_names[iter]);
+				}
+			}
+		}
+	}
+}
+
 
 /* reset the time in the game from file */
 void reset_time(void) {
