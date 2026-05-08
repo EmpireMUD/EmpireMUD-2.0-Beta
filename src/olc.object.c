@@ -2559,6 +2559,7 @@ OLC_MODULE(oedit_affects) {
 	for (bits = GET_OBJ_AFF_FLAGS(obj), pos = 0; bits; bits >>= 1, ++pos) {
 		if (IS_SET(bits, BIT(0)) && !IS_SET(old_bits, BIT(pos)) && !allow_affect_flag_on_items[pos]) {
 			msg_to_char(ch, "Removing disallowed affect flag %s.\r\n", affected_bits[pos]);
+			REMOVE_BIT(GET_OBJ_AFF_FLAGS(obj), BIT(pos));
 		}
 	}
 }
