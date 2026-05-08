@@ -1840,10 +1840,10 @@ that you burn them. Try 'burn stumps' to remove them.
 
 See also: BURN, LIGHTER
 #
-STUN STUNNED "STUN IMMUNITY"
+STUN STUNNED "STUN IMMUNITY" NO-STUN NOSTUN !STUN "NO STUN"
 
 A character who is stunned, for instance by the Bash ability, cannot type
-commands or attack. Stuns are usually brief, and when they expire, you become
+commands or attack. Stuns are usually brief and when they expire, you become
 temporarily immune to other stuns.
 
 There is also a "stunned" condition for people who are reduced to 0 health.
