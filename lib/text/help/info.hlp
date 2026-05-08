@@ -1436,6 +1436,12 @@ automatically transferred there as a courtesy.
 
 See also: INFO, GETTING STARTED
 #
+NO-DISARM NODISARM !DISARM "NO DISARM"
+
+The NO-DISARM affect prevents your weapon from being disarmed.
+
+See also: DISARM
+#
 NO-MORPH NOMORPH !MORPH "NO MORPH"
 
 The NO-MORPH affect prevents you from morphing or un-morphing.

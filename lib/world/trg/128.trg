@@ -1482,7 +1482,7 @@ end
 if %dps% >= 3
   nop %self.add_mob_flag(DPS)%
   if !%self.affect(12835)%
-    dg_affect #12835 %self% !DISARM on -1
+    dg_affect #12835 %self% NO-DISARM on -1
   end
 end
 * caster

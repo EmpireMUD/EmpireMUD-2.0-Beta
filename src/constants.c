@@ -1815,7 +1815,7 @@ const char *affected_bits[] = {
 	"IMMUNE-TEMPERATURE",
 	"AUTO-RESURRECT",
 	"COUNTERSPELL",		// 45
-	"!DISARM",
+	"NO-DISARM",
 	"NO-MORPH",
 	"\n"
 };
@@ -1868,7 +1868,7 @@ const char *affected_bits_consider[] = {
 	"",	// immune-temperature
 	"",	// auto-resurrect
 	"",	// 45 - counterspell
-	"$E cannot be disarmed",	// !disarm
+	"$E cannot be disarmed",	// no-disarm
 	"",	// no-morph
 	"\n"
 };
@@ -1921,7 +1921,7 @@ const bool aff_is_bad[] = {
 	FALSE,	// immune-temperature
 	FALSE,	// auto-resurrect
 	FALSE,	// 45 - counterspell
-	FALSE,	// !disarm
+	FALSE,	// no-disarm
 	TRUE,	// no-morph
 };
 
