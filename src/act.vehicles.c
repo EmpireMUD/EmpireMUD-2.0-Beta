@@ -1964,8 +1964,7 @@ ACMD(do_drive) {
 		// distance remaining?
 		*dist_buf = '\0';
 		if ((calc_dist = driving_distance_remaining(VEH_DRIVER(veh))) > 1) {
-			// show 1 less distance than calculated, because it's updated after this
-			safe_snprintf(dist_buf, sizeof(dist_buf), " (distance: %d)", calc_dist - 1);
+			safe_snprintf(dist_buf, sizeof(dist_buf), " (distance: %d)", calc_dist);
 		}
 		
 		// messaging
