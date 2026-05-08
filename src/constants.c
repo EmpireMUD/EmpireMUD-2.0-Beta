@@ -1767,7 +1767,7 @@ const char *partial_dirs[][2] = {
  //////////////////////////////////////////////////////////////////////////////
 //// CHARACTER CONSTANTS /////////////////////////////////////////////////////
 
-// AFF_x (1/3) - flags
+// AFF_x (1/4) - flags
 const char *affected_bits[] = {
 	"BLIND",	// 0
 	"MAJESTY",
@@ -1820,7 +1820,7 @@ const char *affected_bits[] = {
 	"\n"
 };
 
-// AFF_x (2/3) - strings shown when you consider someone (empty for no-show)
+// AFF_x (2/4) - strings shown when you consider someone (empty for no-show)
 const char *affected_bits_consider[] = {
 	"",	// 0 - blind
 	"$E has a majestic aura!",	// majesty
@@ -1873,7 +1873,7 @@ const char *affected_bits_consider[] = {
 	"\n"
 };
 
-// AFF_x (3/3) - determines if an aff flag is "bad" for the bearer
+// AFF_x (3/4) - determines if an aff flag is "bad" for the bearer
 const bool aff_is_bad[] = {
 	TRUE,	// 0 - blind
 	FALSE,	// majesty
@@ -1923,6 +1923,58 @@ const bool aff_is_bad[] = {
 	FALSE,	// 45 - counterspell
 	FALSE,	// no-disarm
 	TRUE,	// no-morph
+};
+
+// AFF_x (4/4) - whether or not the affect can be put on an item
+const bool allow_affect_flag_on_items[] = {
+	TRUE,	// BLIND	// 0
+	TRUE,	// MAJESTY
+	TRUE,	// INFRA
+	TRUE,	// SNEAK
+	TRUE,	// HIDDEN
+	FALSE,	// *CHARM	// 5
+	TRUE,	// INVIS
+	TRUE,	// IMMUNE-PHYSICAL-DEBUFFS
+	TRUE,	// SENSE-HIDDEN
+	FALSE,	// !PHYSICAL
+	FALSE,	// NO-TARGET-IN-ROOM	// 10
+	FALSE,	// NO-SEE-IN-ROOM
+	TRUE,	// FLYING
+	FALSE,	// !ATTACK
+	TRUE,	// IMMUNE-MAGICAL-DEBUFFS
+	FALSE,	// DISARMED	// 15
+	TRUE,	// HASTE
+	TRUE,	// IMMOBILIZED
+	TRUE,	// SLOW
+	FALSE,	// STUNNED
+	TRUE,	// STONED	// 20
+	TRUE,	// NO-SPEND-BLOOD
+	FALSE,	// *	// formerly CLAWS
+	FALSE,	// DEATHSHROUDED
+	FALSE,	// EARTHMELDED
+	FALSE,	// MUMMIFIED	// 25
+	TRUE,	// SOULMASK
+	TRUE,	// NO-TRACKS
+	TRUE,	// IMMUNE-POISON-DEBUFFS
+	TRUE,	// IMMUNE-MENTAL-DEBUFFS
+	TRUE,	// NO-STUN	// 30
+	FALSE,	// *ORDERED
+	TRUE,	// NO-DRINK-BLOOD
+	TRUE,	// DISTRACTED
+	FALSE,	// HARD-STUNNED
+	FALSE,	// IMMUNE-DAMAGE	// 35
+	TRUE,	// IMMUNE-WHERE
+	TRUE,	// WATERWALKING
+	TRUE,	// LIGHT
+	TRUE,	// POOR-REGENS
+	TRUE,	// SLOWER-ACTIONS	// 40
+	TRUE,	// HUNGRIER
+	TRUE,	// THIRSTIER
+	TRUE,	// IMMUNE-TEMPERATURE
+	TRUE,	// AUTO-RESURRECT
+	TRUE,	// COUNTERSPELL		// 45
+	TRUE,	// NO-DISARM
+	TRUE	// NO-MORPH
 };
 
 

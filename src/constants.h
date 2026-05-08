@@ -248,6 +248,7 @@ extern const char *partial_dirs[][2];
 extern const char *affected_bits[];
 extern const char *affected_bits_consider[];
 extern const bool aff_is_bad[];
+extern const bool allow_affect_flag_on_items[];
 extern const char *health_levels[];
 extern const char *move_levels[];
 extern const char *mana_levels[];
