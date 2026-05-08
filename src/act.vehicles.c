@@ -372,8 +372,9 @@ bool move_vehicle(char_data *ch, vehicle_data *veh, int dir, int subcmd) {
 	if (VEH_DRIVER(veh)) {
 		if (SHOW_STATUS_MESSAGES(VEH_DRIVER(veh), SM_VEHICLE_MOVEMENT)) {
 			*dist_buf = '\0';
-			if ((dist = driving_distance_remaining(VEH_DRIVER(veh)))) {
-				safe_snprintf(dist_buf, sizeof(dist_buf), " (distance remaining: %d)", dist);
+			if ((dist = driving_distance_remaining(VEH_DRIVER(veh))) > 1) {
+				// show 1 less distance than calculated, because it's updated after this
+				safe_snprintf(dist_buf, sizeof(dist_buf), " (distance: %d)", dist - 1);
 			}
 			safe_snprintf(buf, sizeof(buf), "You %s $V %s%s%s.", drive_data[subcmd].command, dirs[get_direction_for_char(VEH_DRIVER(veh), dir)], coord_display_room(VEH_DRIVER(veh), IN_ROOM(veh), FALSE), dist_buf);
 			act(buf, FALSE, VEH_DRIVER(veh), NULL, veh, TO_CHAR | ACT_VEH_VICT);
