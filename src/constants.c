@@ -1779,7 +1779,7 @@ const char *affected_bits[] = {
 	"IMMUNE-PHYSICAL-DEBUFFS",
 	"SENSE-HIDDEN",
 	"!PHYSICAL",
-	"!TARGET",	// 10
+	"NO-TARGET-IN-ROOM",	// 10
 	"NO-SEE-IN-ROOM",
 	"FLYING",
 	"!ATTACK",

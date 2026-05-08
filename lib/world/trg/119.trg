@@ -254,7 +254,7 @@ switch %self.vnum%
   case 11801
     * Dylane 1B
     dg_affect #11832 %self% NO-SEE-IN-ROOM on -1
-    dg_affect #11832 %self% !TARGET on -1
+    dg_affect #11832 %self% NO-TARGET-IN-ROOM on -1
     dg_affect #11832 %self% SNEAK on -1
     nop %self.add_mob_flag(SILENT)%
   break

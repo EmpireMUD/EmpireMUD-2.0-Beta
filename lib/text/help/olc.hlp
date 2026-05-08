@@ -2828,7 +2828,7 @@ The following affect flags are available:
  &cIMMUNE-PHYSICAL-DEBUFFS&0 - Immune to any 'physical' debuffs.
  &cSENSE-HIDDEN&0 - Can see hidden people.
  &c!PHYSICAL&0 - Immune to physical damage -- do not use this on items.
- &c!TARGET&0 - Cannot be targeted in the room -- do not use this on items.
+ &cNO-TARGET-IN-ROOM&0 - Cannot be targeted in the room -- do not use this on items.
  &cNO-SEE-IN-ROOM&0 - Cannot be seen in the room at all -- do not use this on items.
  &cFLYING&0 - Is flying.
  &c!ATTACK&0 - Cannot be attacked -- do not use this on items.

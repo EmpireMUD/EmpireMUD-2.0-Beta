@@ -3090,7 +3090,7 @@ if %vis% && %self.affect(11832)%
   set arrives 1
 elseif !%vis% && !%self.affect(11832)%
   dg_affect #11832 %self% NO-SEE-IN-ROOM on -1
-  dg_affect #11832 %self% !TARGET on -1
+  dg_affect #11832 %self% NO-TARGET-IN-ROOM on -1
   dg_affect #11832 %self% SNEAK on -1
   nop %self.add_mob_flag(SILENT)%
   set leaves 1
