@@ -1801,7 +1801,7 @@ const char *affected_bits[] = {
 	"IMMUNE-MENTAL-DEBUFFS",
 	"!STUN",	// 30
 	"*ORDERED",
-	"!DRINK-BLOOD",
+	"NO-DRINK-BLOOD",
 	"DISTRACTED",
 	"HARD-STUNNED",
 	"IMMUNE-DAMAGE",	// 35
@@ -1854,7 +1854,7 @@ const char *affected_bits_consider[] = {
 	"$E is immune to mental debuffs.",	// immune-mental-debuffs
 	"$E is immune to stuns.",	// 30 - !stun
 	"",	// ordred
-	"",	// !drink-blood
+	"",	// no-drink-blood
 	"",	// distracted
 	"",	// hard-stunned
 	"",	// 35 - immune-damage

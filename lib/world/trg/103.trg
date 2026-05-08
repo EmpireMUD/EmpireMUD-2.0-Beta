@@ -405,8 +405,8 @@ elseif !%self.vampire% || %actor.is_npc% || %actor.vampire% || %room.sun% != dar
   halt
 elseif !%actor.can_gain_new_skills% || %actor.noskill(Vampire)%
   halt
-elseif %actor.aff_flagged(!DRINK-BLOOD)%
-  * Don't bite !DRINK-BLOOD targets
+elseif %actor.aff_flagged(NO-DRINK-BLOOD)%
+  * Don't bite NO-DRINK-BLOOD targets
   halt
 end
 %send% %actor% ~%self% lunges forward and sinks ^%self% teeth into your neck!

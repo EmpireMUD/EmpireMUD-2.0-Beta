@@ -745,8 +745,8 @@ set room %self.room%
 if %room.time(hour)% >= 7 && %room.time(hour)% <= 19
   halt
 end
-if %actor.aff_flagged(!DRINK-BLOOD)%
-  * Don't bite !DRINK-BLOOD targets
+if %actor.aff_flagged(NO-DRINK-BLOOD)%
+  * Don't bite NO-DRINK-BLOOD targets
   halt
 end
 %send% %actor% ~%self% lunges forward and sinks ^%self% teeth into your shoulder!

@@ -764,7 +764,7 @@ Notes:
   companions with script changes.
 
 When a companion is summoned, it automatically gets the SPAWNED, !LOOT, !EXP,
-and !DRINK-BLOOD flags.
+and NO-DRINK-BLOOD flags.
 
 Example companion abilities: 122 Familiar, 138 Bodyguard
 
@@ -1362,7 +1362,7 @@ an ability that targets one's self.
 
 The best example is 315 Splash Blood, which is a helper for ability
 314 Red Mist. Splash Blood hooks on any physical damage against a target but
-has a !DRINK-BLOOD immunity flag. If this immunity is present, nothing else
+has a NO-DRINK-BLOOD immunity flag. If this immunity is present, nothing else
 happens. If not, it will chain to 314 Red Mist, which targets the player to
 restore blood. Red Mist cannot check the immunity itself because its target is
 the player who's attacking, not the victim of the attack. Splash Blood fills in
@@ -2848,7 +2848,7 @@ The following affect flags are available:
  &cIMMUNE-POISON-DEBUFFS&0 - Immune to any 'poison' debuffs.
  &cIMMUNE-MENTAL-DEBUFFS&0 - Immune to any 'mental' debuffs.
  &c!STUN&0 - Immune to stun effects.
- &c!DRINK-BLOOD&0 - Can't be bitten/sired by vampires.
+ &cNO-DRINK-BLOOD&0 - Can't be bitten/sired by vampires.
  &cDISTRACTED&0 - Cannot perform timed actions.
  &cHARD-STUNNED&0 - A stun that cannot be cleansed and does not trigger immunity.
  &cIMMUNE-DAMAGE&0 - Cannot take damage -- do not use this on items.
