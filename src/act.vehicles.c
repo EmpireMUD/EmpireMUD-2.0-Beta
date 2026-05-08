@@ -73,6 +73,41 @@ void cancel_driving(char_data *ch) {
 
 
 /**
+* Calculates the distance remaining on a run/drive/sail/pilot path.
+*
+* @param char_data *ch A player who is running, driving, sailing, or piloting.
+* @return int The distance remaining in their path, or 0 if it can't be determined.
+*/
+int driving_distance_remaining(char_data *ch) {
+	char *ptr;
+	int distance;
+	
+	if (!IS_NPC(ch) && (GET_ACTION(ch) == ACT_RUNNING || GET_ACTION(ch) == ACT_DRIVING || GET_ACTION(ch) == ACT_SAILING || GET_ACTION(ch) == ACT_PILOTING)) {
+		// current travel -- check if avnum 1 would be -1 for unlimited (in which case, no estimate)
+		distance = (GET_ACTION_VNUM(ch, 1) > 0 ? GET_ACTION_VNUM(ch, 1) : 0);
+
+		// parse numbers from action string
+		for (ptr = GET_ACTION_STRING(ch); ptr && *ptr; ++ptr) {
+			if (isdigit(*ptr)) {
+				distance += atoi(ptr);
+				// skip past numbers
+				while (*ptr && isdigit(*(ptr + 1))) {
+					++ptr;
+				}
+			}
+			// otherwise ignore all contents
+		}
+	
+		// distance should now equal tiles remaining in the path
+		return distance;
+	}
+	
+	// all other cases
+	return 0;
+}
+
+
+/**
 * Finds a ship in ch's room or docked on ch's current island, which could be
 * dispatched. Ships in the same room are preferred even if they aren't owned
 * by ch; ships in other rooms are partially-validated for ownership and flags.
@@ -253,10 +288,11 @@ room_data *get_shipping_target(char_data *ch, char *argument, bool *targeted_isl
 * @return bool TRUE if it moved, FALSE if it was blocked.
 */
 bool move_vehicle(char_data *ch, vehicle_data *veh, int dir, int subcmd) {
+	int dist;
 	room_data *to_room = NULL, *was_in;
 	struct follow_type *fol, *next_fol;
 	struct vehicle_room_list *vrl;
-	char buf[MAX_STRING_LENGTH];
+	char buf[MAX_STRING_LENGTH], dist_buf[256];
 	char_data *ch_iter;
 	
 	// sanity
@@ -335,7 +371,11 @@ bool move_vehicle(char_data *ch, vehicle_data *veh, int dir, int subcmd) {
 	// message driver and update MSDP
 	if (VEH_DRIVER(veh)) {
 		if (SHOW_STATUS_MESSAGES(VEH_DRIVER(veh), SM_VEHICLE_MOVEMENT)) {
-			safe_snprintf(buf, sizeof(buf), "You %s $V %s%s.", drive_data[subcmd].command, dirs[get_direction_for_char(VEH_DRIVER(veh), dir)], coord_display_room(VEH_DRIVER(veh), IN_ROOM(veh), FALSE));
+			*dist_buf = '\0';
+			if ((dist = driving_distance_remaining(VEH_DRIVER(veh)))) {
+				safe_snprintf(dist_buf, sizeof(dist_buf), " (distance remaining: %d)", dist);
+			}
+			safe_snprintf(buf, sizeof(buf), "You %s $V %s%s%s.", drive_data[subcmd].command, dirs[get_direction_for_char(VEH_DRIVER(veh), dir)], coord_display_room(VEH_DRIVER(veh), IN_ROOM(veh), FALSE), dist_buf);
 			act(buf, FALSE, VEH_DRIVER(veh), NULL, veh, TO_CHAR | ACT_VEH_VICT);
 		}
 		msdp_update_room(VEH_DRIVER(veh));
