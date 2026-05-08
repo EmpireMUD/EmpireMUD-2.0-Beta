@@ -1798,7 +1798,7 @@ void do_drive_through_portal(char_data *ch, vehicle_data *veh, obj_data *portal,
 
 // do_sail, do_pilot (search hints)
 ACMD(do_drive) {
-	char buf[MAX_STRING_LENGTH], *found_path = NULL;
+	char buf[MAX_STRING_LENGTH], dist_buf[256], *found_path = NULL;
 	struct vehicle_room_list *vrl;
 	bool was_driving, same_dir, dir_only;
 	long long time_check = -1;
@@ -1806,7 +1806,7 @@ ACMD(do_drive) {
 	vehicle_data *veh;
 	char_data *ch_iter;
 	obj_data *portal;
-	int dir = NO_DIR, dist = -1;
+	int dir = NO_DIR, calc_dist, dist = -1;
 	
 	skip_run_filler(&argument);
 	dir_only = !strchr(argument, ' ') && (parse_direction(ch, argument) != NO_DIR);	// only 1 word, and is a direction
@@ -1961,11 +1961,19 @@ ACMD(do_drive) {
 		GET_DRIVING(ch) = veh;
 		VEH_DRIVER(veh) = ch;
 		
+		// distance remaining?
+		*dist_buf = '\0';
+		if ((calc_dist = driving_distance_remaining(VEH_DRIVER(veh))) > 1) {
+			// show 1 less distance than calculated, because it's updated after this
+			safe_snprintf(dist_buf, sizeof(dist_buf), " (distance: %d)", calc_dist - 1);
+		}
+		
+		// messaging
 		if (was_driving && !same_dir) {
-			msg_to_char(ch, "You turn %s.\r\n", dirs[get_direction_for_char(ch, dir)]);
+			msg_to_char(ch, "You turn %s%s.\r\n", dirs[get_direction_for_char(ch, dir)], dist_buf);
 		}
 		else {
-			msg_to_char(ch, "You start %s %s.\r\n", drive_data[subcmd].verb, dirs[get_direction_for_char(ch, dir)]);
+			msg_to_char(ch, "You start %s %s%s.\r\n", drive_data[subcmd].verb, dirs[get_direction_for_char(ch, dir)], dist_buf);
 		}
 		
 		// alert whole vehicle
