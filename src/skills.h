@@ -136,6 +136,7 @@
 #define ATAR_NOT_ENEMY		BIT(29)	// D. cannot target an enemy
 #define ATAR_DEAD_OK		BIT(30)	// E. can target dead people
 #define ATAR_ROOM_RANDOM_CAN_USE	BIT(31)	// F. similar to ROOM-RANDOM but checks use permission
+#define ATAR_NOT_STOLEN		BIT(32)	// G. object targeted cannot be stolen
 
 #define CHAR_ATARS			(ATAR_CHAR_ROOM | ATAR_CHAR_WORLD | ATAR_CHAR_CLOSEST | ATAR_SELF_ONLY)
 #define MULTI_CHAR_ATARS	(ATAR_ALLIES_MULTI | ATAR_GROUP_MULTI | ATAR_ANY_MULTI | ATAR_ENEMIES_MULTI)

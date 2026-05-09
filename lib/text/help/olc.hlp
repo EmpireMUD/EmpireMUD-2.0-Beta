@@ -2049,6 +2049,7 @@ Modifier flags (use in combination with the above flags):
  &yNOT-SELF&0 - Character target cannot be self.
  &yNOT-ALLY&0 - Cannot target an ally.
  &yNOT-ENEMY&0 - Cannot target an enemy.
+ &yNOT-STOLEN&0 - Object cannot be stolen.
  &yDEAD-OK&0 - Can target dead people (otherwise they are invalid).
  &yMULTI-CAN-SEE&0 - For multi-targeting, must be able to see each target.
 

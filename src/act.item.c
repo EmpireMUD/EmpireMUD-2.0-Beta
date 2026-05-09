@@ -5465,14 +5465,14 @@ ACMD(do_compare) {
 	charge_ability_cost(ch, NOTHING, 0, NOTHING, 0, WAIT_OTHER);
 	
 	// check identifies-to:
-	if (has_interaction(GET_OBJ_INTERACTIONS(obj), INTERACT_IDENTIFIES_TO) && (WORN_OR_CARRIED_BY(obj, ch) || can_use_room(ch, IN_ROOM(ch), MEMBERS_ONLY))) {
+	if (!IS_STOLEN(obj) && has_interaction(GET_OBJ_INTERACTIONS(obj), INTERACT_IDENTIFIES_TO) && (WORN_OR_CARRIED_BY(obj, ch) || can_use_room(ch, IN_ROOM(ch), MEMBERS_ONLY))) {
 		act("$n identifies $p.", TRUE, ch, obj, NULL, TO_ROOM);
 		run_identifies_to(ch, &obj, &extract_from);
 		if (ch->desc) {
 			send_stacked_msgs(ch->desc);	// flush the stacked id message before id'ing it
 		}
 	}
-	if (to_obj && has_interaction(GET_OBJ_INTERACTIONS(to_obj), INTERACT_IDENTIFIES_TO) && (WORN_OR_CARRIED_BY(to_obj, ch) || can_use_room(ch, IN_ROOM(ch), MEMBERS_ONLY))) {
+	if (to_obj && !IS_STOLEN(to_obj) && has_interaction(GET_OBJ_INTERACTIONS(to_obj), INTERACT_IDENTIFIES_TO) && (WORN_OR_CARRIED_BY(to_obj, ch) || can_use_room(ch, IN_ROOM(ch), MEMBERS_ONLY))) {
 		act("$n identifies $p.", TRUE, ch, to_obj, NULL, TO_ROOM);
 		run_identifies_to(ch, &to_obj, &extract_to);
 		if (ch->desc) {

@@ -2197,6 +2197,16 @@ bool validate_ability_target(char_data *ch, ability_data *abil, char_data *vict,
 		}
 		return FALSE;
 	}
+	
+	// objects
+	if (ovict && IS_SET(ABIL_TARGETS(abil), ATAR_NOT_STOLEN) && IS_STOLEN(ovict)) {
+		if (send_msgs) {
+			msg_to_char(ch, "You can't use that on a stolen item!\r\n");
+		}
+		return FALSE;
+	}
+	
+	// rooms
 	if (room_targ && room_targ != IN_ROOM(ch) && IS_SET(ABIL_TARGETS(abil), ATAR_ROOM_HERE) && !IS_SET(ABIL_TARGETS(abil), (ROOM_ATARS & ~ATAR_ROOM_HERE))) {
 		if (send_msgs) {
 			msg_to_char(ch, "You have to use it on the room you're in.\r\n");
@@ -2209,6 +2219,8 @@ bool validate_ability_target(char_data *ch, ability_data *abil, char_data *vict,
 		}
 		return FALSE;
 	}
+	
+	// other limits
 	if (!check_ability_limitations(ch, abil, vict, ovict, vvict, room_targ, send_msgs, fatal_error)) {
 		// sends own message when false
 		return FALSE;
