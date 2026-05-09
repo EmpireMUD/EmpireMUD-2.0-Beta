@@ -1090,18 +1090,45 @@ done
 Permafrost trash spawner~
 1 n 100
 ~
+* Ensures 2 of each trash mob, randomly, per instance
+set per_mob 2
+* find helper mob
+wait 1
+set mob %instance.mob(10550)%
+if !%mob%
+  %purge% %self%
+  halt
+end
+* order we'll try to spawn in is random
 switch %random.3%
   case 1
-    %load% mob 10553
+    set list 10553 10554 10555
   break
   case 2
-    %load% mob 10554
+    set list 10554 10553 10555
   break
   case 3
-    %load% mob 10555
+    set list 10555 10554 10553
   break
 done
+* attempt spawn
+set done 0
+while %list% && !%done%
+  set vnum %list.car%
+  set list %list.cdr%
+  if %mob.var(spawned_%vnum%,0)% <= %per_mob%
+    * valid!
+    set done 1
+  end
+done
+* load 'em
+if %vnum%
+  %load% mob %vnum%
+  eval spawned_%vnum% %mob.var(spawned_%vnum%,0)% + 1
+  remote spawned_%vnum% %mob.id%
+end
 %purge% %self%
+
 ~
 #10595
 Pacify the Permafrost quest start~
