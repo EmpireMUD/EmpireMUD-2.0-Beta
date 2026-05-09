@@ -1116,7 +1116,7 @@ set done 0
 while %list% && !%done%
   set vnum %list.car%
   set list %list.cdr%
-  if %mob.var(spawned_%vnum%,0)% <= %per_mob%
+  if %mob.var(spawned_%vnum%,0)% < %per_mob%
     * valid!
     set done 1
   end
