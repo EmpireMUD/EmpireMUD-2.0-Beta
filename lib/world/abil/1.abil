@@ -1441,7 +1441,7 @@ S
 Disenchant~
 0 -1 1.00 0 0 0
 C
-disenchant 8 i 2 5 0.00 -1 0 0 5 0
+disenchant 8 iG 2 5 0.00 -1 0 0 5 0
 D 16 40 0
 D 16 41 512
 D 64 20 0
