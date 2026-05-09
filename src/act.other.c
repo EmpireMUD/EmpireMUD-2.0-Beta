@@ -163,6 +163,9 @@ void do_douse_obj(char_data *ch, obj_data *obj, obj_data *cont) {
 	else if (!LIGHT_FLAGGED(obj, LIGHT_FLAG_CAN_DOUSE)) {
 		act("You can't seem to douse $p.", FALSE, ch, obj, NULL, TO_CHAR);
 	}
+	else if (IS_STOLEN(obj)) {
+		act("$p: you can't douse stolen items.", FALSE, ch, obj, NULL, TO_CHAR);
+	}
 	else if (IN_ROOM(obj) && !can_use_room(ch, IN_ROOM(ch), GUESTS_ALLOWED) && (IS_NPC(ch) || LAST_OWNER_ID(obj) != GET_IDNUM(ch))) {
 		msg_to_char(ch, "You can't douse anything here.\r\n");
 	}
@@ -3405,6 +3408,9 @@ ACMD(do_skin) {
 		msg_to_char(ch, "It's too badly mangled to get any amount of usable skin.\r\n");
 	else if (IS_SET(GET_CORPSE_FLAGS(obj), CORPSE_SKINNED))
 		msg_to_char(ch, "It's already been skinned.\r\n");
+	else if (IS_STOLEN(obj)) {
+		act("$p: you can't skin stolen corpses.", FALSE, ch, obj, NULL, TO_CHAR);
+	}
 	else if (!has_tool(ch, TOOL_KNIFE))
 		msg_to_char(ch, "You need to be using a good knife to skin a corpse.\r\n");
 	else {

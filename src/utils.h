@@ -1027,6 +1027,8 @@ int Y_COORD(room_data *room);	// formerly #define Y_COORD(room)  FLAT_Y_COORD(ge
 
 // definitions
 #define IS_STOLEN(obj)  (GET_STOLEN_TIMER(obj) > 0 && (config_get_int("stolen_object_timer") * SECS_PER_REAL_MIN) + GET_STOLEN_TIMER(obj) > time(0))
+#define IS_STOLEN_FROM(obj, ch)  (!IS_NPC(ch) && GET_LOYALTY(ch) && GET_STOLEN_FROM(obj) == EMPIRE_VNUM(GET_LOYALTY(ch)))
+#define IS_STOLEN_FROM_EMPIRE(obj, emp)  ((emp) && GET_STOLEN_FROM(obj) == EMPIRE_VNUM(emp))
 
 // helpers
 #define OBJ_FLAGGED(obj, flag)  (IS_SET(GET_OBJ_EXTRA(obj), (flag)))

@@ -516,6 +516,10 @@ bool perform_put_obj_in_vehicle(char_data *ch, obj_data *obj, vehicle_data *veh)
 		return FALSE;
 	}
 	
+	if (IS_STOLEN(obj)) {
+		act("$p: you can't put stolen items in there.", FALSE, ch, obj, NULL, TO_CHAR | TO_QUEUE);
+		return FALSE;
+	}
 	
 	// don't let people drop bound items in other people's vehicles
 	if (OBJ_BOUND_TO(obj) && VEH_OWNER(veh) && VEH_OWNER(veh) != GET_LOYALTY(ch)) {
@@ -523,7 +527,7 @@ bool perform_put_obj_in_vehicle(char_data *ch, obj_data *obj, vehicle_data *veh)
 		return FALSE;
 	}
 	if (GET_OBJ_REQUIRES_QUEST(obj) != NOTHING && !IS_NPC(ch) && !IS_IMMORTAL(ch)) {
-		act("$p: you can't put quest items in there.", FALSE, ch, obj, NULL, TO_CHAR);
+		act("$p: you can't put quest items in there.", FALSE, ch, obj, NULL, TO_CHAR | TO_QUEUE);
 		return FALSE;
 	}
 	

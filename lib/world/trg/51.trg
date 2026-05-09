@@ -557,9 +557,11 @@ end
 if !%target.wearable%
   %send% %actor% @%target% is not an equipment item.
   halt
-end
-if %target.is_flagged(*keep)%
-  %send% %actor% You can not shatter something you are keeping.
+elseif %target.is_flagged(*keep)%
+  %send% %actor% You cannot shatter something you are keeping.
+  halt
+elseif %target.is_stolen%
+  %send% %actor% You cannot shatter a stolen item.
   halt
 end
 * 26 ~ 200
