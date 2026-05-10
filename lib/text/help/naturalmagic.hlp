@@ -465,7 +465,7 @@ Wits, down to 0.75 seconds.
 
 See also: COMMAND LAG, HEALER
 #
-FLY FLIGHT FLYING
+FLY
 
 Fly (Natural Magic ability)
 
@@ -473,18 +473,15 @@ Usage:  fly
 Cost:  50 mana
 
 Powerful nature mages can fly on wings made of pure mana. This allows them
-to soar over seas, mountains, and even walls. If you also have the Ride
-ability, you can use flying mounts.
+to soar over seas, mountains, and even walls. If you have both the Ride and Fly
+abilities, you can ride flying mounts.
 
 Type "fly" again to land.
-
-Flying allows you to see over blocked terrain that's at the same elevation as
-you are.
 
 Gains experience as you fly around, as long as you're not mounted. Also gains
 experience when you take off.
 
-See also: RIDE
+See also: FLYING, RIDE
 #
 "GIANT TORTOISE FAMILIAR"
 
@@ -525,7 +522,7 @@ for you.
 
 See also: FAMILIAR, COMPANION, DISMISS
 #
-HASTEN HASTE
+HASTEN
 
 Hasten (Natural Magic ability)
 
@@ -539,8 +536,7 @@ at incredible speed. Gains experience when you cast the spell.
 
 If your target is in combat, you will join the combat upon using this ability.
 
-There is also a haste potion available. It has the same effect and does not
-stack with the hasten ability.
+See also: HASTE AFFECT
 #
 HEAL "HEAL FRIEND" "HEAL PARTY"
 

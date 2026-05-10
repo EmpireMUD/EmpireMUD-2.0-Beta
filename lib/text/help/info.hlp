@@ -775,6 +775,23 @@ stat is applied directly, but the next +20 only brings you up to +30.
 
 This is currently only used for resistances.
 #
+DISARMED "DISARMED AFFECT"
+
+A person may become DISARMED as a result of an ability (like Disarm) or a
+special move by a mob in combat. Only certain weapon types may be disarmed.
+
+If you are disarmed, you don't have to re-equip your weapon yourself. When the
+disarm affect wears off, it will still be in your <wield> slot.
+
+Disarmed players lose their weapon damage and will make basic unarmed 'hit'
+attacks (unless the disarmed weapon was a caster weapon, in which case they
+receive a basic 'mana blast' attack instead).
+
+Disarmed mobs lose half their damage and their attack type is changed to 'hit'
+or 'mana blast', but not all mobs can be disarmed.
+
+See also: DISARM
+#
 DISPLAY
 
 Usage:  display <text>
@@ -917,6 +934,20 @@ most regular land tiles, including plains, forest, desert, crops, and roads.
 
 Mountains, rivers, lakes, oceans, jungles, and swamps are not valid.
 #
+FLYING FLIGHT
+
+The FLYING affect means your character can move through the air, albeit at a
+limited height. Flight greatly reduces the amount of effort it takes to move;
+however, it will still cost more to fly over a mountain than flat land.
+
+Flying will allow you to pass over normal barriers such as walls. Some hostile
+creatures, such as sharks in the ocean, will not appear if you're flying.
+
+Flying also allows you to see over blocked terrain that's at the same elevation
+as you are.
+
+See also: FLY, LAND
+#
 GIMMICK "COMBAT GIMMICK" "FIGHT GIMMICK" "INTERACTIVE FIGHT"
 
 Some fights are interactive and will require you to type the right command at
@@ -967,6 +998,16 @@ A superior hammer will forge twice as fast.
 
 See also: BASIC CRAFTS, FORGE
 #
+HASTE "HASTE AFFECT"
+
+The HASTE affect speeds up a person so they attack faster in combat and perform
+ordinary chores at a higher speed.
+
+This affect may come from various places, such as abilities like Hasten or from
+potions. Different sources of HASTE do not stack.
+
+See also: HASTEN
+#
 HEALTH "HIT POINTS" HITPOINTS HP "HEALTH POINTS" "HEALTH POOL"
 
 The health pool is the amount of damage you can take before being knocked out.
@@ -976,6 +1017,19 @@ health, and you can enchant your gear to get even more.
 If you're knocked out with 0 health, you will die without assistance.
 
 See also: DEATH, ENDURANCE
+#
+HIDDEN HIDING
+
+A HIDDEN character doesn't appear when other characters type 'look' in the
+room, but can generally still be targeted by commands.
+
+Most things that hide your character will be broken if you type any normal game
+command -- or even just pressing return. You must remain very still to avoid
+becoming visible. Only rare commands like 'pickpocket' will keep you hidden.
+
+Find hidden characters using the 'search' command.
+
+See also: HIDE, SEARCH
 #
 HISTORY "CHANNEL HISTORY" "CHAT HISTORY"
 

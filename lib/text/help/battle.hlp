@@ -197,7 +197,7 @@ At Battle 76+, this ability becomes a toggle and you can turn it off at will.
 
 Gain experience when you activate Defend.
 #
-DISARM DISARMED
+DISARM
 
 Disarm (Battle ability)
 
@@ -211,17 +211,9 @@ In battle you can attempt to disarm your target, reducing the damage he deals by
 knocking away his weapon for a few seconds. If you're fighting someone already,
 you do not have to type the target name -- it will target him automatically.
 
-If you are disarmed, you don't have to re-equip your weapon yourself. When the
-disarm affect wears off, it will still be in your <wield> slot.
-
-Disarmed players lose their weapon damage, and will make basic unarmed 'hit'
-attacks (unless the disarmed weapon was a caster weapon, in which case they
-receive a basic 'mana blast' attack instead).
-
-Disarmed mobs lose half their damage and their attack type is changed to 'hit'
-or 'mana blast', but not all mobs can be disarmed.
-
 Gain experience when you try to disarm someone, even if it fails.
+
+See also: DISARMED
 #
 ENDURANCE
 
