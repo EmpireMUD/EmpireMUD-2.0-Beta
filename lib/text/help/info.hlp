@@ -1940,7 +1940,7 @@ that you burn them. Try 'burn stumps' to remove them.
 
 See also: BURN, LIGHTER
 #
-STUN STUNNED "STUN IMMUNITY" NO-STUN NOSTUN !STUN "NO STUN"
+STUN STUNNED "STUN IMMUNITY" NO-STUN NOSTUN !STUN "NO STUN" HARD-STUNNED HARDSTUNNED "HARD STUNNED"
 
 A character who is stunned, for instance by the Bash ability, cannot type
 commands or attack. Stuns are usually brief and when they expire, you become
@@ -1949,8 +1949,12 @@ temporarily immune to other stuns.
 There is also a "stunned" condition for people who are reduced to 0 health.
 Characters will normally recover from this through normal regeneration.
 
-Note: Some scripting NPCs can stun characters even while they have stun
-immunity. This is part of the combat script.
+If you are "hard-stunned", this version ignores stun immunity, and won't cause
+stun immunity when it wears off. This is generally used by scripted game
+content rather than player abilities. Some scripted NPCs can also stun
+characters even while they have stun immunity.
+
+See also: BASH
 #
 SUN SUNRISE SUNSET DAY
 
