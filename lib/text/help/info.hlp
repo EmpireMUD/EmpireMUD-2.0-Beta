@@ -1820,6 +1820,38 @@ proportionally.
 
 See also: SCORE, WITS, HASTEN, SLOW
 #
+STOLEN "STOLEN ITEMS" "STOLEN OBJECTS" (STOLEN)
+
+Items are marked with a (stolen) tag for 30 minutes after you steal them from
+another empire. These items must remain in your inventory until the timer
+expires and the (stolen) tag disappears. You cannot quit during this period.
+
+If you die or are logged out of the game for being idle too long, any stolen
+items are automatically returned.
+
+There are many things you cannot do to an item while it has the (stolen) tag:
+ - butcher
+ - chip
+ - combine
+ - craft (including build, forge, smelt, etc)
+ - douse
+ - drop (exception: may be dropped on the original owner's land)
+ - eat
+ - give (exception: may be given to the original owner)
+ - identify (in certain rare cases)
+ - light
+ - mint
+ - put
+ - rework
+ - saw
+ - scrape
+ - seed
+ - separate
+ - skin
+ - tan
+
+See also: STEAL
+#
 STRENGTH STR
 
 Strength (physical attribute)

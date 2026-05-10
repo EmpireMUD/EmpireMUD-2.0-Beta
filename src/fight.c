@@ -27,6 +27,7 @@
 /**
 * Contents:
 *   Getters / Helpers
+*   Stealing helpers
 *   Combat Meters
 *   Player-Killed-By
 *   Death and Corpses
@@ -852,6 +853,184 @@ void stop_combat_no_autokill(char_data *ch, char_data *killer) {
 
 
  //////////////////////////////////////////////////////////////////////////////
+//// STEALING HELPERS ////////////////////////////////////////////////////////
+
+/**
+* @param obj_data *cont Any object that might contain other objects.
+* @return bool TRUE if the object has any stolen contents; FALSE if not.
+*/
+bool has_stolen_contents(obj_data *cont) {
+	obj_data *obj;
+	
+	DL_FOREACH2(cont->contains, obj, next_content) {
+		if (IS_STOLEN(obj)) {
+			return TRUE;
+		}
+		else if (obj->contains && has_stolen_contents(obj)) {
+			return TRUE;
+		}
+	}
+	
+	return FALSE;
+}
+
+
+/*
+* @param char_data *ch A person.
+* @return bool TRUE if the person is in possession of any stolen items.
+*/
+bool has_stolen_items(char_data *ch) {
+	int pos;
+	obj_data *obj;
+	
+	for (pos = 0; pos < NUM_WEARS; ++pos) {
+		if ((obj = GET_EQ(ch, pos)) && IS_STOLEN(obj)) {
+			return TRUE;
+		}
+	}
+	
+	DL_FOREACH2(ch->carrying, obj, next_content) {
+		if (IS_STOLEN(obj)) {
+			return TRUE;
+		}
+		else if (obj->contains && has_stolen_contents(obj)) {
+			return TRUE;
+		}
+	}
+	
+	return FALSE;
+}
+
+
+/**
+* Sends a stolen item to basic storage, unique storage, or to the room it's in
+* if neither of those are available. This is called, for example, when a player
+* idles out with stolen items in their possession.
+*
+* @param obj_data *obj The object to return.
+*/
+void return_stolen_item_one(obj_data *obj) {
+	bool extract, full;
+	int island_id, timer;
+	empire_data *emp;
+	room_data *room;
+	
+	if (!(emp = real_empire(GET_STOLEN_FROM(obj)))) {
+		return;
+	}
+	
+	extract = FALSE;
+	
+	// where to store?
+	island_id = NO_ISLAND;
+	if ((room = obj_room(obj))) {
+		island_id = GET_ISLAND_ID(room);
+	}
+	if (island_id == NO_ISLAND) {
+		// backup
+		island_id = get_main_island(emp);
+	}
+	
+	// temporarily remove stolen timer so storage macros work
+	timer = GET_STOLEN_TIMER(obj);
+	GET_STOLEN_TIMER(obj) = 0;
+	
+	// attempt to store
+	if (OBJ_CAN_STORE(obj)) {
+		// flat storage
+		if (island_id != NO_ISLAND) {
+			log_to_empire(emp, ELOG_HOSTILITY, "%s: stolen item returned to storage on %s!", GET_OBJ_SHORT_DESC(obj), get_island_name_for_empire(island_id, emp));
+		}
+		else {
+			log_to_empire(emp, ELOG_HOSTILITY, "%s: stolen item returned to storage!", GET_OBJ_SHORT_DESC(obj));
+		}
+		add_to_empire_storage(emp, island_id, GET_OBJ_VNUM(obj), 1, GET_OBJ_TIMER(obj));
+		extract = TRUE;
+	}
+	else if (UNIQUE_OBJ_CAN_STORE(obj, FALSE)) {
+		if (island_id != NO_ISLAND) {
+			log_to_empire(emp, ELOG_HOSTILITY, "%s: stolen item returned to warehouse storage on %s!", GET_OBJ_SHORT_DESC(obj), get_island_name_for_empire(island_id, emp));
+		}
+		else {
+			log_to_empire(emp, ELOG_HOSTILITY, "%s: stolen item returned to warehouse storage!", GET_OBJ_SHORT_DESC(obj));
+		}
+		store_unique_item(NULL, &EMPIRE_UNIQUE_STORAGE(emp), obj, emp, room, &full);
+		if (full) {
+			if (room) {
+				log_to_empire(emp, ELOG_HOSTILITY, "%s: stolen item dropped on the ground at (%d, %d)!", GET_OBJ_SHORT_DESC(obj), X_COORD(room), Y_COORD(room));
+				GET_STOLEN_TIMER(obj) = timer;
+				obj_to_room(obj, room);
+			}
+			else {
+				extract = TRUE;
+			}
+		}
+	}
+	else {
+		if (room) {
+			log_to_empire(emp, ELOG_HOSTILITY, "%s: stolen item dropped on the ground at (%d, %d)!", GET_OBJ_SHORT_DESC(obj), X_COORD(room), Y_COORD(room));
+			GET_STOLEN_TIMER(obj) = timer;
+			obj_to_room(obj, room);
+		}
+		else {
+			extract = TRUE;
+		}
+	}
+	
+	// cleanup
+	if (extract) {
+		extract_obj(obj);
+	}
+}
+
+
+/**
+* @param obj_data *cont Any stolen items in cont are returned to the original owner.
+*/
+void return_stolen_items_from_obj(obj_data *cont) {
+	obj_data *obj, *next_obj;
+	
+	DL_FOREACH_SAFE2(cont->contains, obj, next_obj, next_content) {
+		if (IS_STOLEN(obj)) {
+			return_stolen_item_one(obj);
+		}
+		else if (obj->contains) {
+			return_stolen_items_from_obj(obj);
+		}
+	}
+}
+
+
+/**
+* Returns all stolen items in a character's possession to the original owner.
+*
+* To be called when a character idles out or otherwise loses the ability to
+* have stolen items.
+*
+* @param char_data *ch The person who may be in possession of stolen items.
+*/
+void return_stolen_items(char_data *ch) {
+	int pos;
+	obj_data *obj, *next_obj;
+	
+	for (pos = 0; pos < NUM_WEARS; ++pos) {
+		if ((obj = GET_EQ(ch, pos)) && IS_STOLEN(obj)) {
+			return_stolen_item_one(obj);
+		}
+	}
+	
+	DL_FOREACH_SAFE2(ch->carrying, obj, next_obj, next_content) {
+		if (IS_STOLEN(obj)) {
+			return_stolen_item_one(obj);
+		}
+		else if (obj->contains) {
+			return_stolen_items_from_obj(obj);
+		}
+	}
+}
+
+
+ //////////////////////////////////////////////////////////////////////////////
 //// COMBAT METERS ///////////////////////////////////////////////////////////
 
 /**
@@ -1636,6 +1815,8 @@ obj_data *make_corpse(char_data *ch) {
 	}
 	else {
 		// not an npc, but check for stolen
+		// NOTE: As of b5.203 this is code is unlikely to run; stolen items are returned before this now
+		// ... but just in case:
 		DL_FOREACH_SAFE2(ch->carrying, o, next_o, next_content) {
 			// is it stolen?
 			if (IS_STOLEN(o)) {
@@ -1772,6 +1953,9 @@ obj_data *player_death(char_data *ch) {
 	// update death stats
 	GET_LAST_DEATH_TIME(ch) = time(0);
 	GET_RECENT_DEATH_COUNT(ch) += 1;
+	
+	// return any stolen items they have
+	return_stolen_items(ch);
 	
 	// make them a player corpse	
 	if ((corpse = make_corpse(ch))) {

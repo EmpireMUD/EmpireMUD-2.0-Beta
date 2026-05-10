@@ -1590,6 +1590,10 @@ ACMD(do_alternate) {
 			msg_to_char(ch, "You're already playing that character.\r\n");
 			return;
 		}
+		if (has_stolen_items(ch)) {
+			msg_to_char(ch, "You can't switch characters while you have stolen items! Drop them on the owner's territory first, or wait for the timer to expire.\r\n");
+			return;
+		}
 		if (get_cooldown_time(ch, COOLDOWN_ALTERNATE) > 0 && !IS_IMMORTAL(newch)) {
 			msg_to_char(ch, "You can't alternate again so soon.\r\n");
 			return;
@@ -3182,6 +3186,9 @@ ACMD(do_quit) {
 	}
 	else if (ch->desc->str && !confirm) {
 		msg_to_char(ch, "You can't quit with a text editor open (use /save or /abort first, or 'quit confirm').\r\n");
+	}
+	else if (has_stolen_items(ch)) {
+		msg_to_char(ch, "You can't quit while you have stolen items! Drop them on the owner's territory first, or wait for the timer to expire.\r\n");
 	}
 	else if (GET_POS(ch) < POS_STUNNED && !confirm) {
 		msg_to_char(ch, "Quitting now will kill your character. Type 'quit confirm' to proceed.\r\n");

@@ -2035,6 +2035,9 @@ bool perform_idle_out(char_data *ch) {
 		act("$n is idle too long, and vanishes.", TRUE, ch, NULL, NULL, TO_ROOM);
 	}
 	
+	// any stolen items? return those now
+	return_stolen_items(ch);
+	
 	save_char(ch, died ? NULL : IN_ROOM(ch));
 	dismiss_any_minipet(ch);
 	despawn_companion(ch, NOTHING);
