@@ -1296,6 +1296,13 @@ You must have Navigation to do this.
 
 See also: SCAN, LOOK, MAP
 #
+MASK-AFFECTS MASKAFFECTS "MASK AFFECTS"
+
+The MASK-AFFECTS affect prevents others from seeing what's affecting you with
+the 'affects' command.
+
+See also: SOULMASK
+#
 MOON MOONS
 
 You can look for the moon by typing 'look up' or 'weather' while outside. Your

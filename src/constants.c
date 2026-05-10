@@ -1796,7 +1796,7 @@ const char *affected_bits[] = {
 	"DEATHSHROUDED",
 	"EARTHMELDED",
 	"MUMMIFIED",	// 25
-	"SOULMASK",
+	"MASK-AFFECTS",
 	"NO-TRACKS",
 	"IMMUNE-POISON-DEBUFFS",
 	"IMMUNE-MENTAL-DEBUFFS",
@@ -1849,7 +1849,7 @@ const char *affected_bits_consider[] = {
 	"",	// deathshrouded
 	"",	// earthmeld
 	"",	// 25 - mummified
-	"$E is soulmasked.",	// soulmask
+	"",	// mask-affects
 	"",	// no-tracks
 	"$E is immune to poison debuffs.",	// immune-poison-debuffs
 	"$E is immune to mental debuffs.",	// immune-mental-debuffs
@@ -1902,7 +1902,7 @@ const bool aff_is_bad[] = {
 	FALSE,	// deathshrouded
 	FALSE,	// earthmelded
 	FALSE,	// 25 - mummified
-	FALSE,	// soulmask
+	FALSE,	// mask-affects
 	FALSE,	// no-tracks
 	FALSE,	// immune-poison-debuffs
 	FALSE,	// immune-mental-debuffs
@@ -1954,7 +1954,7 @@ const bool allow_affect_flag_on_items[] = {
 	FALSE,	// DEATHSHROUDED
 	FALSE,	// EARTHMELDED
 	FALSE,	// MUMMIFIED	// 25
-	TRUE,	// SOULMASK
+	TRUE,	// MASK-AFFECTS
 	TRUE,	// NO-TRACKS
 	TRUE,	// IMMUNE-POISON-DEBUFFS
 	TRUE,	// IMMUNE-MENTAL-DEBUFFS

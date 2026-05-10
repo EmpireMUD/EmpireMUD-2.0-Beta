@@ -2844,7 +2844,7 @@ The following affect flags are available:
  &cDEATHSHROUDED&0 - Appears as a corpse and cannot act.
  &cEARTHMELDED&0 - Submerged in the earth and can't take normal actions.
  &cMUMMIFIED&0 - Immune to attack and cannot act.
- &cSOULMASK&0 - Players cannot see affect details on character.
+ &cMASK-AFFECTS&0 - Players cannot see affect details on character.
  &cNO-TRACKS&0 - Does not leave tracks.
  &cIMMUNE-POISON-DEBUFFS&0 - Immune to any 'poison' debuffs.
  &cIMMUNE-MENTAL-DEBUFFS&0 - Immune to any 'mental' debuffs.

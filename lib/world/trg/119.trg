@@ -5895,7 +5895,7 @@ end
 set room %self.room%
 set diff %self.diff%
 dg_affect #3021 %self% COUNTERSPELL on 15
-dg_affect #3021 %self% SOULMASK on 15
+dg_affect #3021 %self% MASK-AFFECTS on 15
 set m_l %self.var(m_l)%
 set n_m %self.var(n_m,0)%
 if !%m_l% || !%n_m%

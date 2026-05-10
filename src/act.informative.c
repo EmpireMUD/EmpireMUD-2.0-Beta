@@ -2010,7 +2010,7 @@ void show_character_affects_simple(char_data *ch, char_data *to) {
 	}
 	
 	is_ally = (is_fight_ally(to, ch) || GET_COMPANION(to) == ch);
-	details = is_ally || (has_player_tech(to, PTECH_ENEMY_BUFF_DETAILS) && !AFF_FLAGGED(ch, AFF_SOULMASK));
+	details = is_ally || (has_player_tech(to, PTECH_ENEMY_BUFF_DETAILS) && !AFF_FLAGGED(ch, AFF_MASK_AFFECTS));
 		
 	// build affects
 	LL_FOREACH(ch->affected, aff) {

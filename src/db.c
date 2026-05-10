@@ -2106,6 +2106,7 @@ void check_old_flag_names_in_triggers(void) {
 		"!BLOOD",	// b5.203
 		"!STUN",	// b5.203
 		"!TARGET",	// b5.203
+		"SOULMASK",	// b5.203
 		"\n"
 	};
 	
