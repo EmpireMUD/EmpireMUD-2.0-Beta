@@ -10015,13 +10015,16 @@ Examples:
 #d
 "TRIGEDIT LINKS"
 
-Usage:  .link add <type> <vnum>
-        .link remove <type> <vnum | all>
-        .link remove all
+Usage:  .links add <type> <vnum(s)>
+        .links remove <type> <vnum | all>
+        .links remove all
 
 Trigger links are used internally to help the game detect which other 'things'
 a trigger is connected to. This is primarily used with the '.olc search' system
 which would have trouble finding linked items using the trigger command text.
+
+You can add multiple vnums at the same type at once, for example:
+ > .links add obj 120 122 128 137
 
 For example, if trigger 9600 has a link to generic 9602:
  > .gen search 9602
