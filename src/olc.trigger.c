@@ -1187,7 +1187,8 @@ OLC_MODULE(tedit_links) {
 	
 	argument = any_one_arg(argument, cmd_arg);
 	argument = any_one_arg(argument, type_arg);
-	argument = any_one_arg(argument, vnum_arg);
+	argument = trim(argument);
+	strcpy(vnum_arg, argument);	// remainder
 	
 	if (!*cmd_arg || !*type_arg) {
 		msg_to_char(ch, "%s", usage);
