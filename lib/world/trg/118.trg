@@ -781,8 +781,6 @@ if %self.aff_flagged(!ATTACK)%
     switch %self.vnum%
       case 11849
         * Trixton Vye
-        set bleak %instance.mob(11848)%
-        set kara
         if %instance.mob(11847)%
           %send% %actor% When you approach Trixton Vye, you're pushed back by a cold force... Something -- or someone -- is protecting him.
         elseif %instance.mob(11848)%
@@ -3099,7 +3097,7 @@ elseif %self.vnum% == 11827
         %force% %djon% say They did not! He's worked here for like 50 years.
       end
       wait 9 s
-      set mageina %room.people(11905)5
+      set mageina %room.people(11905)%
       %force% %mageina% say More like 100 at this point.
       wait 9 s
       %force% %djon% say Wow, rude.

@@ -134,6 +134,7 @@ elseif %spruce_sects% ~= %vnum%
   %terraform% %room% 10307
 elseif %grove_sects% ~= %vnum%
   %echo% ~%self% scorches the grove!
+  %terraform% %room% 10301
 elseif %oasis_sects% ~= %vnum%
   %echo% ~%self% scorches the oasis!
   %terraform% %room% 10306
