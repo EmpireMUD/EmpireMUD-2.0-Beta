@@ -1,6 +1,6 @@
 #10400
 Hamlet guard intro speech~
-0 g 100
+0 g 100 0
 ~
 if %self.varexists(scaled)%
   * skip intro once scaled
@@ -52,7 +52,7 @@ done
 ~
 #10401
 Hamlet intro exit block~
-0 s 100
+0 s 100 0
 ~
 if %direction% != south && !%actor.nohassle% && !%self.varexists(scaled)%
   %send% %actor% You can't proceed until you choose a difficulty.
@@ -62,7 +62,28 @@ end
 ~
 #10402
 Hamlet unified trash spawner~
-1 n 100
+1 n 100 21
+L b 10401
+L b 10402
+L b 10403
+L b 10406
+L b 10407
+L b 10408
+L b 10411
+L b 10412
+L b 10413
+L j 10401
+L j 10402
+L j 10403
+L j 10404
+L j 10405
+L j 10406
+L j 10407
+L j 10408
+L j 10409
+L j 10410
+L j 10411
+L j 10412
 ~
 * Ensure no mobs here
 set template %self.room.template%
@@ -102,7 +123,40 @@ done
 ~
 #10403
 Hamlet of the Undead difficulty selector~
-0 c 0
+0 c 0 33
+L b 10401
+L b 10402
+L b 10403
+L b 10404
+L b 10405
+L b 10406
+L b 10407
+L b 10408
+L b 10409
+L b 10410
+L b 10411
+L b 10412
+L b 10413
+L b 10414
+L b 10415
+L j 10401
+L j 10402
+L j 10403
+L j 10404
+L j 10405
+L j 10406
+L j 10407
+L j 10408
+L j 10409
+L j 10410
+L j 10411
+L j 10412
+L j 10413
+L j 10414
+L j 10415
+L j 10416
+L j 10417
+L j 10418
 difficulty~
 return 1
 * Configs
@@ -193,7 +247,12 @@ remote scaled %self.id%
 ~
 #10404
 Hamlet burn-down (cleanup)~
-2 e 100
+2 e 100 5
+L b 10400
+L b 10405
+L b 10410
+L b 10415
+L e 10401
 ~
 * check if instance was scaled at all -- if not, don't bother with ruins
 set guard %instance.mob(10400)%
@@ -223,7 +282,16 @@ end
 ~
 #10405
 Mob block higher template id~
-0 s 100
+0 s 100 9
+L b 10401
+L b 10402
+L b 10403
+L b 10406
+L b 10407
+L b 10408
+L b 10411
+L b 10412
+L b 10413
 ~
 * list of mobs you can sneak past
 set sneakable_list 10401 10402 10403 10406 10407 10408 10411 10412 10413
@@ -242,7 +310,8 @@ return 0
 ~
 #10406
 Hamlet boss death (portal, complete, and echo)~
-0 f 100
+0 f 100 1
+L c 10400
 ~
 * Spawn town portal; no message
 %load% obj 10400
@@ -253,7 +322,7 @@ Hamlet boss death (portal, complete, and echo)~
 ~
 #10407
 Hamlet environmental object echoes~
-1 bw 3
+1 bw 3 0
 ~
 if %self.varexists(message_type)%
   set message_type %self.message_type%
@@ -269,7 +338,10 @@ done
 ~
 #10408
 Hamlet of the Undead env~
-2 bw 3
+2 bw 3 3
+L b 10405
+L b 10410
+L b 10415
 ~
 * check if any bosses remain
 set boss_mobs 10405 10410 10415
@@ -302,7 +374,7 @@ done
 ~
 #10409
 Necromancer combat~
-0 k 20
+0 k 20 0
 ~
 if !%self.affect(counterspell)%
   counterspell
@@ -349,13 +421,14 @@ end
 ~
 #10410
 Skeletal combat~
-0 k 8
+0 k 8 1
+L o 97
 ~
 bash
 ~
 #10411
 Necrofiend Combat~
-0 k 10
+0 k 10 0
 ~
 switch %random.2%
   case 1
@@ -381,7 +454,7 @@ done
 ~
 #10412
 Infernomancer combat~
-0 k 8
+0 k 8 0
 ~
 if !%self.affect(counterspell)%
   counterspell
@@ -423,7 +496,8 @@ end
 ~
 #10413
 Hamlet Start Progression~
-2 g 100
+2 g 100 1
+L y 10400
 ~
 if %actor.is_pc% && %actor.empire%
   nop %actor.empire.start_progress(10400)%
@@ -431,7 +505,14 @@ end
 ~
 #10414
 Hamlet environmental object setup~
-1 n 100
+1 n 100 7
+L j 10401
+L j 10402
+L j 10403
+L j 10408
+L j 10409
+L j 10411
+L j 10414
 ~
 * this script combines multiple environmental objects into one to conserve vnums
 set id %self.room.template%
@@ -469,26 +550,26 @@ detach 10414 %self.id%
 ~
 #10415
 Hamlet portal announcement~
-1 n 100
+1 n 100 0
 ~
 wait 1
 %echo% A portal back to the city gates spins open.
 ~
 #10450
 Sewer Ladder: Exit~
-1 c 4
+1 c 4 0
 exit~
 %force% %actor% enter exit
 ~
 #10451
 Sewer Ladder: Climb~
-1 c 4
+1 c 4 0
 climb~
 %force% %actor% enter exit
 ~
 #10452
 Sewer Environment~
-2 bw 5
+2 bw 5 0
 ~
 switch %random.4%
   case 1
@@ -507,7 +588,7 @@ done
 ~
 #10453
 Goblin Outpost Melee~
-0 k 10
+0 k 10 0
 ~
 if !%self.mob_flagged(HARD)% && !%self.mob_flagged(GROUP)%
   halt
@@ -523,7 +604,8 @@ done
 ~
 #10454
 GO Start Progression~
-2 g 100
+2 g 100 1
+L y 10450
 ~
 if %actor.is_pc% && %actor.empire%
   nop %actor.empire.start_progress(10450)%
@@ -531,7 +613,13 @@ end
 ~
 #10455
 Goblin Outpost per-mob difficulty selector~
-0 c 0
+0 c 0 6
+L b 10451
+L b 10452
+L b 10453
+L b 10454
+L b 10455
+L b 10457
 difficulty~
 if !%arg%
   %send% %actor% You must specify a level of difficulty. (Normal, Hard, or Group)
@@ -614,7 +702,7 @@ end
 ~
 #10456
 Wargreyn combat~
-0 k 8
+0 k 8 0
 ~
 if !%self.mob_flagged(HARD)% && !%self.mob_flagged(GROUP)%
   halt
@@ -630,7 +718,8 @@ done
 ~
 #10457
 Goblin Outpost mob setup~
-0 n 100
+0 n 100 1
+L b 10457
 ~
 dg_affect %self% !ATTACK on -1
 if %self.vnum% == 10457
@@ -640,7 +729,7 @@ end
 ~
 #10458
 Goblin Outpost attack info~
-0 B 0
+0 B 0 0
 ~
 if %self.aff_flagged(!ATTACK)%
   %send% %actor% You need to choose a difficulty before you can challenge ~%self%.
@@ -655,7 +744,12 @@ end
 ~
 #10459
 Goblin Outpost death replacements~
-0 f 100
+0 f 100 5
+L b 10451
+L b 10452
+L b 10453
+L b 10454
+L b 10457
 ~
 switch %self.vnum%
   case 10451
@@ -692,7 +786,7 @@ return 0
 ~
 #10460
 Goblin Outpost item BOE/BOP craft/loot twiddler~
-1 n 100
+1 n 100 0
 ~
 * items default to BOP but are set BOE if they come from a shop or craft
 set actor %self.carried_by%
@@ -725,7 +819,7 @@ detach 10460 %self.id%
 ~
 #10461
 Goblin Outpost: Pimmin combat~
-0 k 10
+0 k 10 0
 ~
 if !%self.mob_flagged(HARD)% && !%self.mob_flagged(GROUP)%
   halt
@@ -753,7 +847,7 @@ end
 ~
 #10462
 Goblin Outpost: Haxaw combat~
-0 k 8
+0 k 8 0
 ~
 if !%self.mob_flagged(HARD)% && !%self.mob_flagged(GROUP)%
   halt
@@ -768,7 +862,48 @@ end
 ~
 #10499
 Learn Goblin Outpost craft book~
-1 c 2
+1 c 2 41
+L a 10452
+L a 10453
+L a 10454
+L a 10455
+L a 10456
+L a 10457
+L a 10458
+L a 10459
+L a 10460
+L a 10461
+L a 10462
+L a 10463
+L a 10464
+L a 10465
+L a 10466
+L a 10467
+L a 10468
+L a 10469
+L a 10473
+L a 10474
+L a 10485
+L a 10486
+L a 10487
+L a 10488
+L a 10489
+L a 10490
+L a 10491
+L a 10492
+L a 10493
+L a 10494
+L c 10495
+L c 10496
+L c 10497
+L c 10498
+L c 10499
+L o 54
+L o 182
+L o 196
+L o 197
+L o 199
+L o 264
 learn~
 * Usage: learn <self>
 if %actor.obj_target(%arg%)% != %self%

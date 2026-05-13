@@ -1,6 +1,7 @@
 #10700
 Cookie or Chestnut quest turn in~
-2 v 0 0
+2 v 0 1
+L t 10700
 ~
 if %room.max_citizens% < 1
   return 0
@@ -75,7 +76,18 @@ done
 ~
 #10702
 Christmas Gift open~
-1 c 2 0
+1 c 2 11
+L c 10704
+L c 10710
+L c 10717
+L c 10719
+L c 10720
+L c 16617
+L c 16656
+L c 16657
+L c 16666
+L c 16696
+L t 16600
 open~
 * gifts are given in order
 set gift_list 16617 10717 16666 10719 10720 16657 16696 10704 10710 16656
@@ -128,7 +140,9 @@ end
 ~
 #10703
 Father Christmas gift give~
-0 g 100 0
+0 g 100 2
+L c 10702
+L y 10700
 ~
 if !%actor.is_pc%
   halt
@@ -196,7 +210,8 @@ nop %actor.command_lag(ABILITY)%
 ~
 #10710
 Faster Hestian Trinket (snowglobe)~
-1 c 2 0
+1 c 2 1
+L w 256
 use~
 * This is basically a [252] HESTIAN TRINKET with custom strings
 * checks
@@ -275,7 +290,8 @@ nop %actor.cancel_adventure_summon%
 ~
 #10712
 bottomless gift sack: spawn elf on claimed land~
-1 bw 3 0
+1 bw 3 1
+L b 10712
 ~
 * Randomly spawns an elf while worn (on claimed land)
 set ch %self.worn_by%
@@ -295,7 +311,9 @@ end
 ~
 #10713
 Reindeer spawner~
-0 h 100 0
+0 h 100 2
+L b 10700
+L b 10705
 ~
 if !%actor.varexists(last_christmas_reindeer_day)%
   set last_christmas_reindeer_day 0
@@ -338,7 +356,14 @@ end
 ~
 #10715
 Reindeer mount response~
-0 c 0 0
+0 c 0 7
+L j 10700
+L j 10701
+L j 10702
+L j 10703
+L j 10704
+L j 10705
+L j 10706
 mount ride~
 * This marks last-reindeer-spawn-day when mounted, IF in the adventure
 return 0
@@ -349,7 +374,17 @@ end
 ~
 #10727
 Winter Wonderland minipet whistle (random order) pre-2021~
-1 c 2 0
+1 c 2 10
+L b 10709
+L b 10723
+L b 10725
+L b 10726
+L b 16653
+L b 16654
+L b 16655
+L b 16656
+L b 16657
+L b 16658
 use~
 * NOTE: This is the pre-2021 version and has a shorter minipet list, for people who hoarded old whistles.
 * List of vnums granted by this whistle (minipet mobs)
@@ -399,7 +434,9 @@ end
 ~
 #10728
 Magical coal use~
-1 c 2 0
+1 c 2 2
+L b 10728
+L w 10728
 use~
 if %actor.obj_target(%arg%)% != %self%
   return 0
@@ -473,7 +510,26 @@ end
 ~
 #10729
 Winter Wonderland minipet whistle (random order) 2021-2025~
-1 c 2 0
+1 c 2 19
+L b 10706
+L b 10709
+L b 10723
+L b 10724
+L b 10725
+L b 10726
+L b 16653
+L b 16654
+L b 16655
+L b 16656
+L b 16657
+L b 16658
+L b 16666
+L b 16667
+L b 16668
+L b 16669
+L b 16670
+L b 16671
+L b 16672
 use~
 * List of vnums granted by this whistle (minipet mobs)
 set list 10709 16657 16658 10723 10724 10725 10726 16653 16654 16655 16656 16666 16667 16668 16669 10706 16670 16671 16672
@@ -562,7 +618,8 @@ done
 ~
 #10733
 Jill find Jack on reboot~
-0 x 0 0
+0 x 0 1
+L b 10732
 ~
 set jack %instance.mob(10732)%
 if !%jack%
@@ -589,7 +646,8 @@ done
 ~
 #10735
 Drop Other Candle Quest~
-2 u 100 0
+2 u 100 1
+L t 10734
 ~
 if %actor%
   %quest% %actor% drop 10734
@@ -629,7 +687,9 @@ done
 ~
 #10738
 Mother Goose Teleport~
-1 c 2 0
+1 c 2 2
+L j 10730
+L w 10738
 use~
 if %actor.obj_target(%arg%)% != %self%
   return 0
@@ -719,7 +779,11 @@ done
 ~
 #10740
 Mother goose mutually exclusive quests~
-2 v 0 0
+2 v 0 4
+L t 10732
+L t 10733
+L t 10734
+L t 10735
 ~
 switch %questvnum%
   case 10732
@@ -802,7 +866,11 @@ done
 ~
 #10748
 Mother Goose spawn~
-0 n 100 0
+0 n 100 4
+L b 10732
+L b 10733
+L b 10746
+L j 10730
 ~
 if (!%instance.location% || %self.room.template% != 10730)
   halt
@@ -824,7 +892,8 @@ end
 ~
 #10749
 Mother Goose: Breadcrumbs teleport you home~
-1 c 2 0
+1 c 2 1
+L w 10749
 use~
 * breadcrumb trinket: shorter copy of hestian trinket
 if %actor.obj_target(%arg%)% != %self%
@@ -902,7 +971,8 @@ nop %actor.cancel_adventure_summon%
 ~
 #10750
 Sell spider parts to Miner Nynar~
-1 c 2 0
+1 c 2 1
+L b 10754
 sell~
 * Test keywords
 if !%self.is_name(%arg%)%
@@ -929,7 +999,8 @@ nop %actor.give_coins(5)%
 ~
 #10751
 Sell spider meat to Miner Meena~
-1 c 2 0
+1 c 2 1
+L b 10755
 sell~
 * Test keywords
 if !%self.is_name(%arg%)%
@@ -956,7 +1027,15 @@ nop %actor.give_coins(5)%
 ~
 #10752
 Goblin Mine Shops~
-0 c 0 0
+0 c 0 8
+L b 10754
+L b 10755
+L b 10757
+L b 10758
+L c 10754
+L c 10768
+L c 10770
+L r 10771
 buy~
 set vnum -1
 set named a thing
@@ -1057,7 +1136,8 @@ end
 ~
 #10753
 Buy Potion/Nynar~
-0 c 0 0
+0 c 0 1
+L c 10754
 buy~
 set vnum -1
 set named a thing
@@ -1127,7 +1207,8 @@ done
 ~
 #10756
 Goblin Miner Spawn~
-0 n 100 0
+0 n 100 1
+L j 10750
 ~
 if (!%instance.location% || %self.room.template% != 10750)
   halt
@@ -1148,7 +1229,8 @@ mmove
 ~
 #10757
 Widow Spider Complete~
-0 f 100 0
+0 f 100 1
+L c 10769
 ~
 %buildingecho% %self.room% You hear the terrifying skree of the widow spider dying!
 %load% obj 10769
@@ -1156,7 +1238,8 @@ return 0
 ~
 #10758
 Buy Coffin/Blacklung~
-0 c 0 0
+0 c 0 1
+L c 10770
 buy~
 set vnum -1
 set named a thing
@@ -1182,7 +1265,8 @@ set coinstr %actor.charge_coins(50)%
 ~
 #10759
 Buy Raft/Hanx~
-0 c 0 0
+0 c 0 1
+L r 10771
 buy~
 set vnum -1
 set named a thing
@@ -1215,7 +1299,9 @@ end
 ~
 #10760
 Widow Spider: Bind~
-0 k 100 0
+0 k 100 2
+L w 10760
+L w 10761
 ~
 if %self.cooldown(10761)%
   halt
@@ -1255,7 +1341,8 @@ dg_affect #10760 %actor% STUNNED on 15
 ~
 #10761
 Widow Struggle Bind Struggle~
-0 c 0 0
+0 c 0 1
+L w 10760
 struggle~
 set break_free_at 1
 if !%actor.affect(10760)%
@@ -1315,7 +1402,8 @@ end
 ~
 #10772
 Goblin gravesite setup timer~
-2 o 100 0
+2 o 100 1
+L c 10771
 ~
 set obj %room.contents%
 while %obj%
@@ -1329,7 +1417,8 @@ done
 ~
 #10773
 Goblin raft replacer~
-1 n 100 0
+1 n 100 1
+L r 10771
 ~
 %load% veh 10771
 set raft %self.room.vehicles%
@@ -1378,13 +1467,18 @@ done
 ~
 #10777
 Fruit of Knowledge consume~
-1 s 100 0
+1 s 100 1
+L c 10780
 ~
 %load% obj 10780 %actor% inv
 ~
 #10778
 Tree of Knowledge spawner~
-2 e 100 0
+2 e 100 4
+L e 10775
+L e 10776
+L e 10778
+L e 10779
 ~
 if %room.building_vnum% == 10775
   %build% %room% 10778
@@ -1394,7 +1488,15 @@ end
 ~
 #10779
 Pick fruit of knowledge~
-2 c 0 0
+2 c 0 8
+L c 10777
+L h 4
+L h 26
+L h 90
+L h 104
+L h 10565
+L h 10775
+L h 10776
 pick~
 *
 set forest_list 4 90 104 10565
@@ -1421,7 +1523,14 @@ return 1
 ~
 #10780
 Tree of Knowledge skill gain~
-1 n 100 0
+1 n 100 7
+L q 0
+L q 2
+L q 3
+L q 4
+L q 5
+L q 6
+L q 7
 ~
 * Script is called by a temporary item on a VERY short delay
 wait 1

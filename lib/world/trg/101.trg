@@ -1,6 +1,6 @@
 #10100
 Swamp Hut passive~
-2 bw 5
+2 bw 5 0
 ~
 switch %random.4%
   case 1
@@ -19,7 +19,7 @@ done
 ~
 #10101
 Swamp Hag passive~
-0 bw 5
+0 bw 5 0
 ~
 * This script is no longer used. It was replaced by custom strings.
 switch %random.4%
@@ -39,7 +39,8 @@ done
 ~
 #10102
 Swamp Hag combat~
-0 k 15
+0 k 15 1
+L b 10101
 ~
 if !%actor.affect(blind)%
   blind
@@ -76,7 +77,12 @@ end
 ~
 #10103
 Swamp Hag reward~
-0 f 100
+0 f 100 5
+L q 0
+L q 2
+L q 3
+L q 4
+L q 7
 ~
 %adventurecomplete%
 set ch %self.room.people%
@@ -99,7 +105,7 @@ done
 ~
 #10104
 Swamp Rat combat~
-0 k 15
+0 k 15 0
 ~
 %echo% ~%self% bites deep!
 %send% %actor% You don't feel so good...
@@ -108,7 +114,7 @@ Swamp Rat combat~
 ~
 #10105
 Berk combat~
-0 k 15
+0 k 15 0
 ~
 if !%actor.affect(disarm)%
   disarm
@@ -139,7 +145,9 @@ end
 ~
 #10106
 Jorr combat~
-0 k 15
+0 k 15 2
+L w 3009
+L w 3015
 ~
 if !%actor.affect(3015)%
   colorburst
@@ -178,7 +186,9 @@ end
 ~
 #10107
 Tranc combat~
-0 k 15
+0 k 15 2
+L b 10108
+L w 3018
 ~
 * storing ids prevents errors when someone dies during a "wait"
 set id %actor.id%
@@ -207,7 +217,7 @@ remote hound %self.id%
 ~
 #10108
 Liza the Hound combat~
-0 k 15
+0 k 15 0
 ~
 set id %actor.id%
 wait 10
@@ -241,7 +251,8 @@ done
 ~
 #10109
 Bandits Start Progression~
-2 g 100
+2 g 100 1
+L y 10105
 ~
 if %actor.is_pc% && %actor.empire%
   nop %actor.empire.start_progress(10105)%
@@ -249,7 +260,8 @@ end
 ~
 #10110
 Egg hatch~
-1 ab 1
+1 ab 1 1
+L b 10113
 ~
 * Random trigger to hatch the egg.
 %echo% @%self% begins to twitch.
@@ -266,7 +278,7 @@ wait 1 sec
 ~
 #10111
 Sly combat~
-0 k 10
+0 k 10 0
 ~
 %echo% Sly's shadow stretches out and grabs at ~%actor%...
 set verify_target %actor.id%
@@ -294,7 +306,7 @@ end
 ~
 #10112
 Chiv combat~
-0 k 100
+0 k 100 0
 ~
 wait 10
 %echo% Chiv sinks into the shadows...
@@ -310,7 +322,7 @@ end
 ~
 #10113
 Stealth combat low-level~
-0 k 15
+0 k 15 0
 ~
 if !%actor.affect(blind)%
   blind
@@ -320,7 +332,8 @@ end
 ~
 #10114
 Baby dragon death~
-0 f 100
+0 f 100 1
+L b 9060
 ~
 %load% mob 9060
 %echo% A massive green dragon crashes through the roof!
@@ -328,7 +341,11 @@ return 0
 ~
 #10115
 Thieves spawner~
-1 n 100
+1 n 100 4
+L b 10110
+L b 10111
+L b 10112
+L b 10114
 ~
 * Warning: This script completely ignores spawn limits! Don't use it in instances that reset often
 * Set up variables: cumulative is the cumulative probability of all results so far (including the current one, found indicates we've rolled something and should stop checking
@@ -384,7 +401,10 @@ end
 ~
 #10116
 Bandits spawner~
-1 n 100
+1 n 100 3
+L b 10105
+L b 10106
+L b 10107
 ~
 * Warning: This script completely ignores spawn limits! Don't use it in instances that reset often
 * Set up variables: cumulative is the cumulative probability of all results so far (including the current one, found indicates we've rolled something and should stop checking
@@ -469,7 +489,8 @@ end
 ~
 #10117
 Thieves Start Progression~
-2 g 100
+2 g 100 1
+L y 10110
 ~
 if %actor.is_pc% && %actor.empire%
   nop %actor.empire.start_progress(10110)%
@@ -477,7 +498,7 @@ end
 ~
 #10140
 Cactus combat~
-0 k 25
+0 k 25 0
 ~
 switch %random.3%
   case 1
@@ -511,7 +532,11 @@ done
 ~
 #10141
 Delayed aggro greet/entry~
-0 gi 100
+0 gi 100 4
+L b 10140
+L b 10141
+L b 10142
+L t 10147
 ~
 if %actor%
   * Actor entered room - valid target?
@@ -560,7 +585,14 @@ end
 ~
 #10142
 Monsoon Rift cleanup + complete~
-2 v 100
+2 v 100 7
+L b 10140
+L b 10141
+L b 10142
+L b 10143
+L c 10140
+L c 10171
+L j 10145
 ~
 * Start of script fragment: Monsoon cleanup
 * Iterates over a series of vnums and removes all mobs with those vnums from the instance.
@@ -604,7 +636,7 @@ done
 ~
 #10143
 Saguaro treant combat~
-0 k 100
+0 k 100 0
 ~
 set verify_target %actor.id%
 switch %random.4%
@@ -642,7 +674,7 @@ done
 ~
 #10144
 Monsoon Cloud~
-1 bw 10
+1 bw 10 0
 ~
 switch %random.4%
   case 1
@@ -661,7 +693,9 @@ done
 ~
 #10145
 Monsoon totem fake chant command~
-1 c 2
+1 c 2 2
+L c 10144
+L t 10147
 chant~
 if (!(monsoon /= %arg%) || %actor.position% != Standing)
   return 0
@@ -742,7 +776,16 @@ done
 ~
 #10146
 Monsoon Rift cleanup + complete [Wandering Merchant version]~
-0 v 0
+0 v 0 9
+L b 10140
+L b 10141
+L b 10142
+L b 10143
+L b 10147
+L c 10140
+L c 10171
+L j 10145
+L t 10153
 ~
 if %questvnum% != 10153
   halt
@@ -793,7 +836,8 @@ done
 ~
 #10147
 Natural Magic: Cacti quench quest start~
-2 u 100
+2 u 100 1
+L c 10143
 ~
 if !%actor.inventory(10143)%
   %load% obj 10143 %actor% inv
@@ -806,7 +850,9 @@ rdelete monsoon_chant_counter %actor.id%
 ~
 #10148
 Monsoon cactus death tracker + reward~
-0 f 100
+0 f 100 2
+L t 10141
+L t 10147
 ~
 if %actor.on_quest(10147)%
   %quest% %actor% drop 10147
@@ -855,14 +901,14 @@ done
 ~
 #10149
 Saguaro treant must-fight~
-0 s 100
+0 s 100 0
 ~
 %send% %actor% You cannot flee from ~%self%!
 return 0
 ~
 #10150
 Free-tailed bat self-despawn~
-0 bw 3
+0 bw 3 0
 ~
 if (%self.disabled% || %self.fighting%)
   halt
@@ -872,7 +918,7 @@ end
 ~
 #10151
 Gila monster self-despawn~
-0 bw 3
+0 bw 3 0
 ~
 if (%self.disabled% || %self.fighting%)
   halt
@@ -882,7 +928,7 @@ end
 ~
 #10152
 Armadillo self-despawn~
-0 bw 3
+0 bw 3 0
 ~
 if (%self.disabled% || %self.fighting%)
   halt
@@ -892,7 +938,7 @@ end
 ~
 #10153
 Cactus wren emotes DEPRECATED~
-0 bw 10
+0 bw 10 0
 ~
 * DEPRECATED: these are now handled by custom mob screens
 if (%self.disabled% || %self.fighting%)
@@ -912,7 +958,7 @@ done
 ~
 #10154
 Antelope squirrel emotes DEPRECATED~
-0 bw 10
+0 bw 10 0
 ~
 * DEPRECATED: these are now just mob custom emotes
 if (%self.disabled% || %self.fighting%)
@@ -932,7 +978,7 @@ done
 ~
 #10155
 Bighorn sheep self-despawn~
-0 bw 3
+0 bw 3 0
 ~
 if (%self.disabled% || %self.fighting%)
   halt
@@ -942,7 +988,7 @@ end
 ~
 #10156
 Coati emotes DEPRECATED~
-0 bw 10
+0 bw 10 0
 ~
 * DEPRECATED: these are now mob custom emotes
 if (%self.disabled% || %self.fighting%)
@@ -962,7 +1008,7 @@ done
 ~
 #10157
 Monsoon room environment~
-2 bw 10
+2 bw 10 0
 ~
 switch %random.4%
   case 1
@@ -981,7 +1027,7 @@ done
 ~
 #10158
 Hug a Cactus~
-0 ct 0
+0 ct 0 0
 hug~
 * test targeting me
 if (%actor.char_target(%arg%)% != %self% || %actor.nohassle%)
@@ -995,7 +1041,7 @@ return 1
 ~
 #10159
 Teddybear cactus emoted DEPRECATED~
-0 btw 5
+0 btw 5 0
 ~
 * DEPRECATED: these are now mob custom strings
 if (%self.disabled% || %self.fighting%)
@@ -1015,7 +1061,9 @@ done
 ~
 #10160
 Monsoon sorcery quest study command~
-1 c 2
+1 c 2 2
+L c 10175
+L t 10144
 study~
 if (!((monsoon /= %arg%) || (rift /= %arg%)) || %actor.position% != Standing)
   return 0
@@ -1075,7 +1123,8 @@ done
 ~
 #10161
 Fake infiltrate higher template id~
-2 c 0
+2 c 0 1
+L t 10150
 infiltrate~
 if !%arg%
   return 0
@@ -1100,7 +1149,7 @@ return 1
 ~
 #10162
 Room block higher template id without infiltrate~
-2 q 100
+2 q 100 0
 ~
 * One quick trick to get the target room
 eval tricky %%self.%direction%(room)%%
@@ -1117,19 +1166,19 @@ return 0
 ~
 #10163
 Weather in the Rift~
-2 c 0
+2 c 0 0
 weather~
 %send% %actor% It's raining lightly overhead, but the weather worsens further off the path, until you can't see past the wall of rain.
 ~
 #10164
 Weather outside the Rift~
-1 c 4
+1 c 4 0
 weather~
 %send% %actor% Dark monsoon clouds loom overhead, dropping rain in sheets.
 ~
 #10165
 Suppress Weather~
-1 n 100
+1 n 100 0
 ~
 * Turns on !WEATHER for a number of seconds equal to <value1>
 * Fallback is to use the item's timer
@@ -1144,7 +1193,8 @@ end
 ~
 #10166
 Cactus Spawn Teleport~
-0 n 100
+0 n 100 1
+L j 10146
 ~
 if (!%instance.location% || %self.room.template% != 10146)
   halt
@@ -1155,7 +1205,9 @@ detach 10166 %self.id%
 ~
 #10167
 Monsoon thief + vampire spawn teleport/hide~
-0 n 100
+0 n 100 2
+L q 4
+L q 7
 ~
 set loc %instance.location%
 if !%loc% || !%self.vampire%
@@ -1191,7 +1243,9 @@ end
 ~
 #10168
 Spawn Saguaro Treant~
-2 u 100
+2 u 100 2
+L b 10143
+L c 10171
 ~
 * find and purge the saguaro obj
 set obj %room.contents%
@@ -1211,7 +1265,18 @@ end
 ~
 #10169
 Monsoon reward replacer~
-1 n 100
+1 n 100 11
+L c 10152
+L c 10153
+L c 10155
+L c 10159
+L c 10160
+L c 10162
+L c 10163
+L c 10165
+L c 10166
+L c 10167
+L c 10168
 ~
 * After 1 second, purge this object and load an object - rotating through the loot list
 wait 1
@@ -1268,7 +1333,9 @@ remote last_monsoon_loot_item %actor.id%
 ~
 #10171
 Monsoon thief + vampire reveal~
-0 hw 100
+0 hw 100 2
+L q 4
+L q 7
 ~
 if (%self.vampire% && %actor.skill(Vampire)% < 51) || (!%self.vampire% && %actor.skill(Stealth)% < 51)
   halt
@@ -1282,19 +1349,23 @@ detach 10171 %self.id%
 ~
 #10172
 Wandering Merchant Spawner~
-1 n 100
+1 n 100 1
+L b 10146
 ~
 %load% mob 10146
 ~
 #10173
 Give Supply List~
-2 u 100
+2 u 100 1
+L c 10174
 ~
 %load% obj 10174 %actor% inv
 ~
 #10174
 Give Sorcery Notes~
-2 u 100
+2 u 100 2
+L c 10142
+L t 10144
 ~
 if (%questvnum% == 10144)
   %load% obj 10142 %actor% inv
@@ -1302,7 +1373,8 @@ end
 ~
 #10175
 Monsoon wandering merchant leash~
-0 in 100
+0 in 100 1
+L j 10146
 ~
 set start_room %instance.location%
 if !%start_room%
@@ -1324,7 +1396,8 @@ end
 ~
 #10176
 Monsoon infuse bat totem at oasis~
-1 c 2
+1 c 2 1
+L t 10156
 infuse~
 if !%actor.vampire%
   return 0
@@ -1359,7 +1432,19 @@ nop %actor.blood(-%cost%)%
 ~
 #10177
 Monsoon eclipse vampire ritual~
-1 c 2
+1 c 2 12
+L b 10140
+L b 10141
+L b 10142
+L b 10143
+L b 10144
+L b 10145
+L b 10146
+L b 10147
+L c 10140
+L c 10171
+L j 10145
+L t 10157
 ritual rite~
 if (!(eclipse /= %arg%) || %actor.position% != Standing)
   return 0
@@ -1473,7 +1558,11 @@ done
 ~
 #10178
 Give Bat Totem~
-2 u 100
+2 u 100 4
+L c 10161
+L c 10173
+L t 10156
+L t 10157
 ~
 if (%questvnum% == 10156)
   %load% obj 10161 %actor% inv
@@ -1483,7 +1572,8 @@ end
 ~
 #10179
 Age Herbicide~
-1 f 0
+1 f 0 1
+L c 10177
 ~
 if %self.carried_by%
   %load% obj 10177 %self.carried_by% inv
@@ -1494,7 +1584,19 @@ end
 ~
 #10180
 Monsoon rift close sorcery ritual~
-1 c 2
+1 c 2 12
+L b 10140
+L b 10141
+L b 10142
+L b 10143
+L b 10144
+L b 10145
+L b 10146
+L b 10147
+L c 10140
+L c 10171
+L j 10145
+L t 10145
 ritual rite~
 if (!(rift /= %arg%) || %actor.position% != Standing)
   return 0
@@ -1603,7 +1705,9 @@ done
 ~
 #10181
 Archweaver tent fake search~
-2 c 0
+2 c 0 2
+L c 10178
+L t 10150
 search~
 if (%actor.position% != Standing)
   return 0
@@ -1671,7 +1775,9 @@ done
 ~
 #10190
 Lavaformer Spawn~
-0 n 100
+0 n 100 2
+L c 10190
+L j 10190
 ~
 if (!%instance.location% || %self.room.template% != 10190)
   halt
@@ -1682,7 +1788,9 @@ set volcanoportal %self.room.contents(10190)%
 ~
 #10191
 Lavaforming~
-0 i 100
+0 i 100 2
+L c 10192
+L h 10190
 ~
 set room %self.room%
 if !%instance.location%
@@ -1703,7 +1811,11 @@ end
 ~
 #10192
 Lava flow decay~
-1 f 0
+1 f 0 4
+L c 10192
+L c 10193
+L h 10191
+L h 10192
 ~
 set room %self.room%
 if (%self.vnum% == 10192)
@@ -1724,27 +1836,29 @@ return 0
 ~
 #10193
 Volcanic Weather~
-1 c 4
+1 c 4 0
 weather~
 %send% %actor% Dark clouds of volcanic ash cover the sky!
 ~
 #10194
 Lava Damage~
-1 bw 100
+1 bw 100 0
 ~
 %echo% The hot air from the lava flow blisters your skin!
 %aoe% 100 fire
 ~
 #10195
 Volcano Cleanup~
-2 e 100
+2 e 100 2
+L c 10192
+L h 10190
 ~
 %load% obj 10192
 %terraform% %room% 10190
 ~
 #10196
 Caldera Damage~
-2 bw 100
+2 bw 100 0
 ~
 %echo% The hot air from the caldera causes your flesh to blister and melt!
 %aoe% 1000 fire

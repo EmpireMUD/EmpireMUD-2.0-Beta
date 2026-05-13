@@ -1,6 +1,95 @@
 #10300
 Flame Dragon Terrorize~
-0 ab 10
+0 ab 10 89
+L h 0
+L h 1
+L h 2
+L h 3
+L h 4
+L h 7
+L h 12
+L h 13
+L h 14
+L h 20
+L h 21
+L h 23
+L h 24
+L h 25
+L h 26
+L h 32
+L h 34
+L h 36
+L h 37
+L h 38
+L h 39
+L h 40
+L h 44
+L h 45
+L h 46
+L h 47
+L h 50
+L h 51
+L h 54
+L h 56
+L h 59
+L h 60
+L h 63
+L h 64
+L h 70
+L h 71
+L h 72
+L h 73
+L h 74
+L h 75
+L h 76
+L h 77
+L h 79
+L h 80
+L h 81
+L h 82
+L h 83
+L h 84
+L h 88
+L h 89
+L h 90
+L h 91
+L h 200
+L h 202
+L h 203
+L h 204
+L h 210
+L h 211
+L h 212
+L h 220
+L h 221
+L h 222
+L h 223
+L h 224
+L h 230
+L h 231
+L h 233
+L h 240
+L h 241
+L h 243
+L h 244
+L h 10300
+L h 10301
+L h 10302
+L h 10303
+L h 10304
+L h 10305
+L h 10306
+L h 10307
+L h 10308
+L h 10309
+L h 10310
+L h 10311
+L h 10562
+L h 10563
+L h 10564
+L h 10565
+L h 10566
+L j 10300
 ~
 if (%self.fighting% || %self.disabled%)
   halt
@@ -67,7 +156,8 @@ end
 ~
 #10301
 Flame Dragon Start Progression: room~
-2 g 100
+2 g 100 1
+L y 10300
 ~
 if %actor.is_pc% && %actor.empire%
   nop %actor.empire.start_progress(10300)%
@@ -75,7 +165,7 @@ end
 ~
 #10302
 Flame Dragon combat~
-0 k 5
+0 k 5 0
 ~
 set chance %random.3%
 if %chance% < 3
@@ -94,7 +184,7 @@ end
 ~
 #10303
 Flame Dragon delay-completer~
-0 f 100
+0 f 100 0
 ~
 if %instance.start%
   * Attempt delayed despawn
@@ -106,7 +196,7 @@ end
 ~
 #10304
 Flame Dragon environmental~
-0 bw 5
+0 bw 5 0
 ~
 * This script is no longer used. It was replaced by custom strings.
 if (%self.fighting% || %self.disabled%)
@@ -129,7 +219,8 @@ done
 ~
 #10305
 Flame Dragon Start Progression: mob~
-0 h 100
+0 h 100 1
+L y 10300
 ~
 if %actor.is_pc% && %actor.empire%
   nop %actor.empire.start_progress(10300)%
@@ -137,13 +228,15 @@ end
 ~
 #10307
 Flame dragon despawn timer~
-1 f 0
+1 f 0 0
 ~
 %adventurecomplete%
 ~
 #10330
 Abandoned Dragon Fly Home~
-0 ab 10
+0 ab 10 2
+L h 6
+L j 10330
 ~
 if (%self.fighting% || %self.disabled%)
   halt
@@ -160,7 +253,11 @@ end
 ~
 #10331
 Abandoned Nest Spawner~
-1 n 100
+1 n 100 4
+L b 10330
+L b 10331
+L b 10332
+L b 10333
 ~
 eval vnum 10330 + %random.4% - 1
 %load% m %vnum%
@@ -168,7 +265,8 @@ eval vnum 10330 + %random.4% - 1
 ~
 #10332
 Abandon Dragon Start Progression: room~
-2 g 100
+2 g 100 1
+L y 10330
 ~
 if %actor.is_pc% && %actor.empire%
   nop %actor.empire.start_progress(10330)%
@@ -176,7 +274,8 @@ end
 ~
 #10333
 Abandon Dragon Start Progression: mob~
-0 h 100
+0 h 100 1
+L y 10330
 ~
 if %actor.is_pc% && %actor.empire%
   nop %actor.empire.start_progress(10330)%
@@ -184,7 +283,7 @@ end
 ~
 #10334
 Abandoned Dragon animation~
-0 bw 5
+0 bw 5 0
 ~
 if (%self.fighting% || %self.disabled%)
   halt
@@ -206,7 +305,7 @@ done
 ~
 #10335
 Dragon Whistle use~
-1 c 2
+1 c 2 0
 use~
 * Deprecated: the whistle now uses trig 9910 instead
 if !%self.is_name(%arg%)%
@@ -224,7 +323,7 @@ end
 ~
 #10336
 Non-Mount Summon~
-1 c 2
+1 c 2 0
 use~
 if !%self.is_name(%arg%)%
   return 0
@@ -245,7 +344,7 @@ end
 ~
 #10337
 Fire Ox animation~
-0 bw 5
+0 bw 5 0
 ~
 if (%self.fighting% || %self.disabled%)
   halt
@@ -264,7 +363,7 @@ end
 ~
 #10338
 Dragonguard animation~
-0 bw 5
+0 bw 5 0
 ~
 if (%self.fighting% || %self.disabled%)
   halt
@@ -289,7 +388,7 @@ done
 ~
 #10339
 Empire Non-Mount Summon~
-1 c 2
+1 c 2 0
 use~
 if !%self.is_name(%arg%)%
   return 0
@@ -310,7 +409,8 @@ end
 ~
 #10370
 Uninvited Guest: Delayed despawn box~
-1 f 0
+1 f 0 1
+L c 10371
 ~
 %adventurecomplete%
 %load% obj 10371
@@ -319,7 +419,8 @@ return 0
 ~
 #10371
 Uninvited Guest: Coffin collapsed~
-1 n 100
+1 n 100 1
+L b 10370
 ~
 %echo% The long box on the floor collapses into a pile of boards.
 wait 1 s
@@ -344,13 +445,13 @@ done
 ~
 #10372
 Uninvited Guest: Complete on death~
-0 f 100
+0 f 100 0
 ~
 %adventurecomplete%
 ~
 #10373
 Uninvited Guest: Box commands~
-1 c 4
+1 c 4 0
 look examine open close~
 return 0
 if close /= %cmd%
@@ -372,7 +473,9 @@ end
 ~
 #10374
 Uninvited Guest: Vampire wake/sleep~
-0 b 50
+0 b 50 2
+L c 10370
+L w 10370
 ~
 if %self.fighting% || %self.disabled%
   halt
@@ -395,7 +498,7 @@ end
 ~
 #10375
 Uninvited Guest: Bite in combat~
-0 k 33
+0 k 33 0
 ~
 set room %self.room%
 if (%actor.health% * 100 / %actor.maxhealth%) > 10
@@ -422,7 +525,7 @@ dg_affect %self% STUNNED on 5
 ~
 #10376
 Uninvited Guest: Custom one-time greetings using script1~
-0 hnwA 100
+0 hnwA 100 0
 ~
 * Uses mob custom script1 to for one-time greetings, with each script1 line
 *   sent every %line_gap% (9 sec) until it runs out of strings. The mob will
@@ -547,7 +650,8 @@ end
 ~
 #10377
 Uninvited Guest: Put vampire in box on load~
-0 n 100
+0 n 100 1
+L w 10370
 ~
 if %self.room.sun% != light
   dg_affect #10370 %self% NO-SEE-IN-ROOM on -1
