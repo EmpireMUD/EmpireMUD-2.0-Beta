@@ -265,9 +265,9 @@ if %actor.has_companion(12308)%
   %send% %actor% You already have that familiar in your companion list.
   halt
 end
-* check ability 122 Familiar
+* check ability 122 Feline Familiars
 if !%actor.ability(122)%
-  %send% %actor% You need to have the Familiar ability to use @%self%.
+  %send% %actor% You need to have the Feline Familiars ability to use @%self%.
   halt
 end
 * grant familiar
@@ -289,9 +289,9 @@ if !%pc%
   %purge% %self%
   halt
 end
-* check for familiar
+* check for feline familiars
 if !%pc.ability(122)%
-  %send% %pc% You must have the Familiar ability to summon ~%self%.
+  %send% %pc% You must have the Feline Familiars ability to summon ~%self%.
   %echo% ~%self% runs away.
   %purge% %self%
   halt
@@ -1594,23 +1594,23 @@ else
 end
 switch %self.vnum%
   case 12350
-    case 12352
-      * hoarfrost serragon, juvenile serragon
-      if !%self.aff_flagged(!ATTACK)%
-        %send% %actor% You can't imagine which part of it might be the "pocket" but it doesn't matter... you've attracted too much attention!
-        %aggro% %actor%
-      else
-        %send% %actor% You can't imagine which part of it might be the "pocket".
-      end
-    break
-    case 12353
-      * rabbit ice
-      %send% %actor% It doesn't seem to have any pockets.
-    break
-    default
-      %send% %actor% There's no way to get close enough to pickpocket ~%self% without *%self% noticing.
-    break
-  done
+  case 12352
+    * hoarfrost serragon, juvenile serragon
+    if !%self.aff_flagged(!ATTACK)%
+      %send% %actor% You can't imagine which part of it might be the "pocket" but it doesn't matter... you've attracted too much attention!
+      %aggro% %actor%
+    else
+      %send% %actor% You can't imagine which part of it might be the "pocket".
+    end
+  break
+  case 12353
+    * rabbit ice
+    %send% %actor% It doesn't seem to have any pockets.
+  break
+  default
+    %send% %actor% There's no way to get close enough to pickpocket ~%self% without *%self% noticing.
+  break
+done
 ~
 #12363
 Hoarfrost Serragon: Frostscale hatchling combat: Coil, Snapping Jaws~
@@ -1820,7 +1820,7 @@ while %ch%
     eval moved %moved% + 1
     %teleport% %ch% %to_room%
     %send% %ch% &&C**** &&Z~%self% swallows you whole! ****&&0
-    %load% obj 11805 %ch% inv
+    %load% obj 9680 %ch% inv
   elseif %ch.is_npc% && %ch.leader%
     if %self.is_tagged_by(%ch.leader%)%
       %teleport% %ch% %to_room%
@@ -2006,7 +2006,7 @@ while %ch%
   elseif %ch.is_pc% || !%ch.linked_to_instance%
     * Move ch
     %teleport% %ch% %to_room%
-    %load% obj 11805 %ch%
+    %load% obj 9680 %ch%
   end
   set ch %next_ch%
 done

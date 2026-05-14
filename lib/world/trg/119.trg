@@ -423,7 +423,6 @@ set spirit %instance.mob(11900)%
 set claw1 1
 remote claw1 %spirit.id%
 nop %self.val0(1)%
-detach 11909 %self.id%
 ~
 #11908
 Skycleave: Claw Game (fixed)~
@@ -1048,7 +1047,7 @@ switch %target.vnum%
     eval guile 1 + %random.3%
     eval luck 1 + %random.3%
   break
-  case 11919
+  case 11820
     * escaped pixy / skycleave
     set pixy an escaped pixy
     set speed %random.2%
@@ -3373,7 +3372,7 @@ if %rescale% && %self.level%
   wait 0
   %scale% %self% %self.level%
 end
-detach 11902 %self.id%
+detach 11940 %self.id%
 ~
 #11941
 Skycleave: Only drops loot for unique fighters~
@@ -5163,7 +5162,7 @@ while %count% < 12
   * next while loop
   eval count %count% + 1
 done
-dg_affect #11961 %actor% off silent
+dg_affect #11965 %actor% off silent
 ~
 #11966
 Skycleave: Shared get trigger (diary replacement, struggle)~
@@ -8197,7 +8196,7 @@ elseif %actor.action% != playing
 end
 * lists
 set list1 11873 11874 11875 11876 11877 11878 11879 11880 11881 11882 11883 11885 11886 11887
-set list2 615 616 10042 11520 11521 11522 11523 11524 11525 11526 11819 11820 11963 11982 11624 11625
+set list2 615 616 10042 11520 11521 11522 11523 11524 11525 11526 11819 11820 11963 11982 16624 16625
 * loop
 set ch %actor.room.people%
 while %ch%
