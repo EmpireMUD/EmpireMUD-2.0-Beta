@@ -1,6 +1,10 @@
 #12300
 Fur Dragon load, restring, and move~
-0 n 100
+0 n 100 4
+L e 12300
+L e 12301
+L e 12302
+L e 12303
 ~
 set loc %instance.real_location%
 if !%loc%
@@ -55,7 +59,7 @@ dg_affect %self% !ATTACK on -1
 ~
 #12301
 Fur Dragon: leash and update loc~
-0 i 100
+0 i 100 0
 ~
 * max distance from home (configurable)
 set leash_distance 25
@@ -70,13 +74,14 @@ nop %instance.set_location(%room%)%
 ~
 #12302
 Fur Dragon: delayed despawn~
-1 f 0
+1 f 0 0
 ~
 %adventurecomplete%
 ~
 #12303
 Fur Dragon: block enter portal when scaled~
-0 c 0
+0 c 0 1
+L c 12301
 enter~
 return 0
 set portal %actor.obj_target(%arg%)%
@@ -93,7 +98,7 @@ end
 ~
 #12304
 Fur Dragon: can't leave the burrow once scaled~
-0 q 100
+0 q 100 0
 ~
 if !%self.varexists(scaled)% || %actor.nohassle% || %actor.level% < 225
   return 1
@@ -104,7 +109,12 @@ end
 ~
 #12305
 Fur Dragon: difficulty selection and retreat to burrow~
-0 c 0
+0 c 0 5
+L e 12300
+L e 12301
+L e 12302
+L e 12303
+L j 12300
 difficulty~
 if !%arg%
   %send% %actor% You must specify a level of difficulty. (Hard, Group, or Boss)
@@ -192,7 +202,7 @@ if %loc% && %self.room% != %loc%
 ~
 #12306
 Fur Dragon: attack info before difficulty selection~
-0 B 0
+0 B 0 0
 ~
 if %self.aff_flagged(!ATTACK)%
   %send% %actor% You need to choose a difficulty before you can attack ~%self%.
@@ -207,7 +217,10 @@ end
 ~
 #12307
 Fur Dragon: death of the dragon~
-0 f 100
+0 f 100 3
+L b 12318
+L c 12302
+L j 12300
 ~
 if %self.room.template% == 12300
   %load% obj 12302 room
@@ -224,7 +237,12 @@ done
 ~
 #12308
 Fur Dragon: adventure cleanup~
-2 e 100
+2 e 100 5
+L e 12300
+L e 12301
+L e 12302
+L e 12303
+L e 12308
 ~
 if %room.building_vnum% >= 12300 && %room.building_vnum% <= 12303
   %build% %room% 12308
@@ -232,7 +250,9 @@ end
 ~
 #12309
 Fur Dragon: furry drake familiar flute~
-1 c 2
+1 c 2 2
+L b 12308
+L o 122
 use~
 if %actor.obj_target(%arg%)% != %self%
   return 0
@@ -258,7 +278,8 @@ nop %actor.add_companion(12308)%
 ~
 #12310
 Fur Dragon: furry drake load script~
-0 nt 100
+0 nt 100 1
+L o 122
 ~
 wait 1
 set pc %self.leader%
@@ -278,7 +299,8 @@ end
 ~
 #12311
 Fur Dragon: greet and slaughter and start progress~
-0 h 100
+0 h 100 1
+L y 12300
 ~
 set room %self.room%
 * attempt to kill an npc if it qualifies
@@ -307,7 +329,7 @@ done
 ~
 #12314
 Fur Dragon: block learn on patterns~
-1 c 2
+1 c 2 0
 learn~
 * ensure it targeted me
 if %actor.obj_target_inv(%arg%)% != %self%
@@ -330,7 +352,13 @@ return 0
 ~
 #12315
 Fur Dragon: loot/craft bop/boe twiddler and restringer~
-1 n 100
+1 n 100 6
+L c 12336
+L c 12337
+L c 12338
+L c 12339
+L c 12340
+L f 12316
 ~
 * items default to BOP but are set BOE if they come from a craft
 * if they remain BOP, this will also randomly restring them
@@ -448,7 +476,8 @@ detach 12315 %self.id%
 ~
 #12316
 Fur Dragon: study loot to learn craft~
-1 c 2
+1 c 2 1
+L c 12314
 study~
 * Note: requires 1x boss, 2x group, 3x hard, or 1x group + 1x hard (of same vnum)
 return 1
@@ -594,7 +623,11 @@ end
 ~
 #12317
 Fur Dragon Combat: Baby spawner~
-0 k 30
+0 k 30 4
+L b 12318
+L w 12317
+L w 12318
+L w 12321
 ~
 if %self.cooldown(12317)% || %self.cooldown(12318)%
   halt
@@ -645,7 +678,7 @@ nop %self.set_cooldown(12317, %timer%)%
 ~
 #12318
 Fur Dragon Combat: Purge baby dragons on enter~
-0 h 100
+0 h 100 0
 ~
 set mother %self.leader%
 if !%mother.fighting%
@@ -655,7 +688,9 @@ end
 ~
 #12319
 Fur Dragon Combat: Itchy mother~
-0 b 15
+0 b 15 2
+L w 12318
+L w 12319
 ~
 if !%self.fighting%
   halt
@@ -695,7 +730,9 @@ dg_affect #12319 %self% BONUS-PHYSICAL %buff% -1
 ~
 #12320
 Fur Dragon Combat: Scratch the ear~
-0 c 0
+0 c 0 2
+L w 12318
+L w 12320
 scratch~
 if %arg% != ear
   set target %actor.char_target(%arg%)%
@@ -736,7 +773,10 @@ remote FurScratching %actor.id%
 ~
 #12321
 Fur Dragon Combat: Buff the baby fur dragon~
-0 b 30
+0 b 30 3
+L b 12318
+L w 12319
+L w 12321
 ~
 if %self.cooldown(12321)%
   halt
@@ -835,7 +875,9 @@ nop %self.set_cooldown(12321, 90)%
 ~
 #12322
 Fur Dragon Combat: pounce~
-0 l 40
+0 l 40 2
+L b 12318
+L w 12322
 ~
 if %self.cooldown(12322)%
   halt
@@ -866,7 +908,9 @@ end
 ~
 #12350
 Hoarfrost Serragon: Leave pit on load~
-0 n 100
+0 n 100 2
+L j 12350
+L w 12350
 ~
 dg_affect #12350 %self% !ATTACK on -1
 if (!%instance.location% || %self.room.template% != 12350)
@@ -877,13 +921,14 @@ mgoto %instance.location%
 ~
 #12351
 Hoarfrost Serragon: Delayed completion~
-1 f 0
+1 f 0 0
 ~
 %adventurecomplete%
 ~
 #12352
 Hoarfrost Serragon: Death trigger~
-0 f 100
+0 f 100 1
+L c 12350
 ~
 set inside %instance.start%
 if %inside%
@@ -892,7 +937,120 @@ end
 ~
 #12353
 Hoarfrost Serragon: Terraformer~
-0 i 100
+0 i 100 113
+L h 0
+L h 1
+L h 2
+L h 3
+L h 4
+L h 5
+L h 6
+L h 7
+L h 8
+L h 9
+L h 12
+L h 13
+L h 14
+L h 19
+L h 20
+L h 21
+L h 23
+L h 24
+L h 25
+L h 26
+L h 32
+L h 33
+L h 36
+L h 37
+L h 38
+L h 39
+L h 40
+L h 41
+L h 42
+L h 43
+L h 44
+L h 45
+L h 46
+L h 47
+L h 50
+L h 51
+L h 53
+L h 54
+L h 56
+L h 57
+L h 58
+L h 59
+L h 60
+L h 63
+L h 64
+L h 70
+L h 71
+L h 72
+L h 73
+L h 74
+L h 75
+L h 76
+L h 77
+L h 78
+L h 79
+L h 80
+L h 81
+L h 82
+L h 83
+L h 84
+L h 85
+L h 87
+L h 88
+L h 89
+L h 90
+L h 91
+L h 200
+L h 201
+L h 202
+L h 203
+L h 204
+L h 210
+L h 211
+L h 212
+L h 220
+L h 221
+L h 222
+L h 223
+L h 224
+L h 230
+L h 231
+L h 232
+L h 233
+L h 234
+L h 240
+L h 241
+L h 242
+L h 243
+L h 244
+L h 245
+L h 250
+L h 251
+L h 252
+L h 253
+L h 260
+L h 12350
+L h 12351
+L h 12352
+L h 12353
+L h 12354
+L h 12355
+L h 12356
+L h 12357
+L h 12358
+L h 12359
+L h 12360
+L h 12361
+L h 12362
+L h 12363
+L h 12364
+L h 12365
+L h 12366
+L h 12367
 ~
 * freezes the tile as the creature walks in, or leashes it
 * configs:
@@ -999,7 +1157,8 @@ end
 ~
 #12354
 Hoarfrost Serragon: Start progress goal (pit)~
-2 g 100
+2 g 100 1
+L y 12350
 ~
 if %actor.is_pc% && %actor.empire%
   nop %actor.empire.start_progress(12350)%
@@ -1007,7 +1166,8 @@ end
 ~
 #12355
 Hoarfrost Serragon: Start progress goal (mob)~
-0 h 100
+0 h 100 1
+L y 12350
 ~
 if %actor.is_pc% && %actor.empire%
   nop %actor.empire.start_progress(12350)%
@@ -1015,7 +1175,10 @@ end
 ~
 #12356
 Hoarfrost Serragon: Difficulty selector with retreat~
-0 c 0
+0 c 0 3
+L f 12358
+L w 12350
+L w 12351
 difficulty~
 if !%arg%
   %send% %actor% You must specify a level of difficulty. (Normal, Hard, Group, or Boss)
@@ -1091,7 +1254,9 @@ attach 12358 %self.id%
 ~
 #12357
 Hoarfrost Serragon: Instruction to diff-sel~
-0 B 0
+0 B 0 2
+L w 12350
+L w 12360
 ~
 if %self.affect(12360)%
   %send% %actor% You can't attack ~%self% while it's in its death throes!
@@ -1108,7 +1273,10 @@ end
 ~
 #12358
 Hoarfrost Serragon: Resume wandering if nobody fights.~
-0 ab 10
+0 ab 10 3
+L w 12350
+L w 12351
+L w 12360
 ~
 * cancel sentinel and resume movement if nobody is around and fighting me
 if !%self.affect(12351)% && !%self.affect(12360)% && !%self.fighting% && %room.players_present% == 0
@@ -1123,7 +1291,15 @@ end
 ~
 #12359
 Hoarfrost Serragon combat: Avalanche Slam, Coil, Snapping Jaws, Frost Pores / Heat Drain~
-0 k 100
+0 k 100 8
+L w 9602
+L w 12352
+L w 12353
+L w 12355
+L w 12356
+L w 12357
+L w 12358
+L w 12359
 ~
 if %self.cooldown(12352)% || %self.disabled%
   halt
@@ -1372,7 +1548,7 @@ nop %self.remove_mob_flag(NO-ATTACK)%
 ~
 #12360
 Hoarfrost Serragon: Moving adventure command~
-0 c 0
+0 c 0 0
 adventure~
 if !(summon /= %arg.car%)
   %teleport% %actor% %instance.location%
@@ -1385,7 +1561,8 @@ end
 ~
 #12361
 Hoarfrost Serragon: Leash for ice creatures~
-0 i 100
+0 i 100 1
+L e 12350
 ~
 set room %self.room%
 if %room.building_vnum% == 12350
@@ -1401,7 +1578,11 @@ end
 ~
 #12362
 Hoarfrost Serragon: Pickpocket rejection strings~
-0 p 100
+0 p 100 4
+L b 12350
+L b 12352
+L b 12353
+L o 142
 ~
 if %ability% != 142
   * not pickpocket
@@ -1433,7 +1614,12 @@ switch %self.vnum%
 ~
 #12363
 Hoarfrost Serragon: Frostscale hatchling combat: Coil, Snapping Jaws~
-0 k 100
+0 k 100 5
+L w 9602
+L w 12352
+L w 12353
+L w 12355
+L w 12358
 ~
 if %self.cooldown(12352)% || %self.disabled%
   halt
@@ -1558,7 +1744,7 @@ nop %self.remove_mob_flag(NO-ATTACK)%
 ~
 #12364
 Hoarfrost Serragon: Fighting characters cannot flee~
-0 c 0
+0 c 0 0
 flee~
 if %actor.fighting%
   %send% %actor% PANIC! You couldn't escape! The serragon's enormous body is coiled around the entire area!
@@ -1569,7 +1755,13 @@ end
 ~
 #12365
 Hoarfrost Serragon: Phase Transition~
-0 l 10
+0 l 10 6
+L b 12357
+L b 12358
+L c 9680
+L f 12366
+L j 12351
+L w 12360
 ~
 * Serragon has dropped below 10% and will teleport players inside for phase 2
 makeuid to_room room i12351
@@ -1640,7 +1832,11 @@ done
 ~
 #12366
 Hoarfrost Serragon: Check end of phase 2~
-0 ab 100
+0 ab 100 4
+L b 12357
+L b 12358
+L j 12351
+L w 12360
 ~
 * Brings the serragon out of phase 2 if everyone died inside
 set cancel 0
@@ -1676,7 +1872,11 @@ end
 ~
 #12367
 Hoarfrost Serragon: Inside serragon craw death trig~
-0 f 100
+0 f 100 4
+L b 12350
+L b 12357
+L b 12358
+L w 12360
 ~
 set room %self.room%
 set mob %instance.mob(12350)%
@@ -1718,7 +1918,8 @@ return 0
 ~
 #12368
 Hoarfrost Serragon: Craw survival timer~
-0 bw 100
+0 bw 100 1
+L c 12370
 ~
 * Tracks each player's time inside and kills them if it's been too long.
 set room %self.room%
@@ -1760,7 +1961,11 @@ done
 ~
 #12369
 Hoarfrost Serragon: Post-kill safety teleporter~
-0 h 100
+0 h 100 4
+L b 12357
+L b 12358
+L c 9680
+L j 12351
 ~
 * Ensure no players accidentally log in inside this creature when it's not in phase 2
 if %actor.nohassle%
@@ -1808,7 +2013,7 @@ done
 ~
 #12370
 Hoarfrost Serragon: You died in the craw~
-1 n 100
+1 n 100 0
 ~
 wait 0
 set actor %self.carried_by%

@@ -2643,7 +2643,6 @@ switch %arg%
     set abil_msg ~%self% signs, 'But feel free to look around.'
     set non_msg ~%self% points to ^%self% eyes with ^%self% fingers, and then gestures around the area.
   break
-  
   * SAOIRSE
   case 20
     set abil_msg ~%self% signs with ^%self% hands, 'I didn't realize we have a new guest.'
@@ -2661,7 +2660,6 @@ switch %arg%
     set abil_msg ~%self% signs with one hand, 'Have you fought the beast yet?'
     set non_msg ~%self% crosses ^%self% arms in an X, points at you, then points at the great wall.
   break
-  
   * PERCY
   case 30
     set abil_msg ~%self% signs with ^%self% hands, 'I'm quite pleased to see you observing the Silence rule.'
@@ -2679,7 +2677,6 @@ switch %arg%
     set abil_msg ~%self% signs, 'There's still more availble here for you here.'
     set non_msg ~%self% gestures around the area, then folds ^%self% hands and opens them like a book, and then points forward.
   break
-  
   * SOMSAK
   case 40
     set abil_msg ~%self% signs with ^%self% hands, 'Nice to see a new face. Are you here to work or shop?'

@@ -2402,9 +2402,15 @@ end
 ~
 #11822
 Skycleave: Dodge, Interrupt, Free commands for fights~
-0 c 0 9
+0 c 0 15
 L b 11834
+L b 11923
+L b 11924
 L f 11821
+L j 11816
+L j 11817
+L j 11916
+L j 11917
 L j 11972
 L w 11812
 L w 11813

@@ -1,6 +1,9 @@
 #12200
 Ribbon Serragon: Load~
-0 n 100
+0 n 100 3
+L c 12201
+L j 12200
+L w 12200
 ~
 dg_affect #12200 %self% !ATTACK on -1
 wait 1
@@ -33,13 +36,28 @@ end
 ~
 #12201
 Ribbon Serragon: Down to enter pit~
-1 c 4
+1 c 4 0
 down~
 %force% %actor% enter pit
 ~
 #12202
 Ribbon Serragon: Death trigger and loot~
-0 f 100
+0 f 100 15
+L b 12200
+L b 12201
+L b 12202
+L c 600
+L c 12200
+L c 12203
+L c 12204
+L c 12205
+L c 12206
+L c 12207
+L c 12208
+L c 12209
+L c 12214
+L c 12216
+L c 12220
 ~
 if %self.vnum% != 12200
   if %instance.mob(12200)%
@@ -187,13 +205,14 @@ end
 ~
 #12203
 Ribbon Serragon: Delayed completion~
-1 f 0
+1 f 0 0
 ~
 %adventurecomplete%
 ~
 #12204
 Ribbon Serragon: Start progress goal~
-2 g 100
+2 g 100 1
+L y 12200
 ~
 if %actor.is_pc% && %actor.empire%
   nop %actor.empire.start_progress(12200)%
@@ -201,7 +220,8 @@ end
 ~
 #12205
 Ribbon Serragon: Wander~
-0 b 8
+0 b 8 1
+L j 12200
 ~
 if %self.fighting% || %self.disabled%
   halt
@@ -219,7 +239,8 @@ end
 ~
 #12206
 Ribbon Serragon: Difficulty selector~
-0 c 0
+0 c 0 1
+L w 12200
 difficulty~
 if !%arg%
   %send% %actor% You must specify a level of difficulty. (Normal, Hard, Group, or Boss)
@@ -278,7 +299,8 @@ remote scaled %self.id%
 ~
 #12207
 Ribbon Serragon: Instruction to diff-sel~
-0 B 0
+0 B 0 1
+L w 12200
 ~
 if %self.affect(12200)%
   %send% %actor% You need to choose a difficulty before you can attack ~%self%.
@@ -292,7 +314,9 @@ end
 ~
 #12208
 Ribbon Serragon: Phase change~
-0 l 50
+0 l 50 2
+L b 12201
+L b 12202
 ~
 * loads and sets up mobs 12201, 12202
 %echo% &&lThe ribbon serragon rises up and splits -- it's not one serragon, it's two!&&0
@@ -327,7 +351,7 @@ done
 ~
 #12209
 Ribbon Serragon: Simple fight script for pair~
-0 k 10
+0 k 10 0
 ~
 * Paired serragon has simpler combat scripts as its difficulty is higher
 if !%self.aff_flagged(HASTE)% || !%self.aff_flagged(SLOW)%
@@ -340,7 +364,13 @@ end
 ~
 #12210
 Vermilion Serragon combat: Flaming Maw, Crushing Coils, Tail Pin~
-0 k 100
+0 k 100 6
+L w 9602
+L w 12202
+L w 12203
+L w 12205
+L w 12206
+L w 12208
 ~
 if %self.cooldown(12202)% || %self.disabled%
   halt
@@ -533,7 +563,15 @@ nop %self.remove_mob_flag(NO-ATTACK)%
 ~
 #12211
 Veridian Serragon combat: Needle Lunge, Sawtooth Constriction, Leafblade Sweep~
-0 k 100
+0 k 100 8
+L w 9602
+L w 12202
+L w 12203
+L w 12207
+L w 12208
+L w 12209
+L w 12211
+L w 12212
 ~
 if %self.cooldown(12202)% || %self.disabled%
   halt
@@ -727,7 +765,8 @@ nop %self.remove_mob_flag(NO-ATTACK)%
 ~
 #12212
 Ribbon Serragon: Pickpocket rejection strings~
-0 p 100
+0 p 100 1
+L o 142
 ~
 if %ability% != 142
   * not pickpocket
@@ -746,7 +785,8 @@ end
 ~
 #12213
 Ribbon Serragon: Environmental echoes~
-0 b 8
+0 b 8 1
+L j 12200
 ~
 if %self.fighting%
   halt
@@ -821,7 +861,10 @@ end
 ~
 #12214
 Ribbon Serragons: Recombine if out of combat~
-0 ab 33
+0 ab 33 3
+L b 12200
+L b 12201
+L b 12202
 ~
 wait 30 s
 if %self.fighting% || %self.disabled%
@@ -851,7 +894,9 @@ end
 ~
 #12250
 Stomping Ground: Shared mob load trig~
-0 n 100
+0 n 100 2
+L b 12250
+L b 12251
 ~
 set important_vnums 12250 12251
 wait 0
@@ -874,7 +919,25 @@ end
 ~
 #12251
 Stomping Ground: Terraform tile on cleanup~
-2 e 100
+2 e 100 18
+L h 200
+L h 203
+L h 210
+L h 211
+L h 212
+L h 220
+L h 221
+L h 222
+L h 223
+L h 224
+L h 232
+L h 233
+L h 237
+L h 239
+L h 247
+L h 249
+L h 250
+L h 252
 ~
 * converts to grassland when despawning adventure
 set terra_sects 203 210 211 212 220 221 222 223 224 232 233 237 239 247 249 250 252
@@ -884,7 +947,9 @@ end
 ~
 #12252
 Stomping Ground: Elephant death~
-0 f 100
+0 f 100 2
+L c 12251
+L c 12255
 ~
 * This only belongs on elephants listed as %important_vnums% in trig 12250
 set start %instance.start%
@@ -899,7 +964,15 @@ end
 ~
 #12253
 Stomping Ground: Leash~
-0 i 100
+0 i 100 8
+L e 12250
+L h 5
+L h 9
+L h 32
+L h 33
+L h 57
+L h 58
+L h 200
 ~
 set allow_outside_sects 5 9 32 33 57 58
 set room %self.room%
@@ -947,7 +1020,29 @@ end
 ~
 #12254
 Stomping Ground: Terraform jungle to grassland~
-0 ab 7
+0 ab 7 22
+L c 128
+L c 134
+L c 135
+L c 147
+L c 150
+L h 200
+L h 203
+L h 210
+L h 212
+L h 220
+L h 221
+L h 223
+L h 224
+L h 232
+L h 234
+L h 237
+L h 239
+L h 247
+L h 249
+L h 250
+L h 252
+L h 12250
 ~
 * Terraforms ONLY the listed vnums, and only when attached to an instance
 set room %self.room%
@@ -1033,7 +1128,9 @@ wait 60 s
 ~
 #12255
 Stomping Ground: Tame small elephant to gain minipet~
-0 c 0
+0 c 0 2
+L b 12255
+L o 34
 tame feed~
 * mostly a copy of 9028 with updates for the minipet here
 * Amount of tameness required
@@ -1081,14 +1178,18 @@ end
 ~
 #12256
 Stomping Ground: Trumpeting Call~
-0 b 2
+0 b 2 0
 ~
 %echo% ~%self% raises ^%self% trunk to the sky and lets out a powerful call...
 %regionecho% %self.room% 15 A trumpeting call echoes through the tropical air.
 ~
 #12257
 Stomping Ground: Spawn friends~
-0 b 4
+0 b 4 4
+L b 12252
+L b 12254
+L e 12250
+L h 200
 ~
 * summons a friend at random over time
 set room %self.room%

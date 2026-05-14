@@ -1,6 +1,7 @@
 #12400
 Reset rep on entry~
-2 g 100
+2 g 100 1
+L v 12401
 ~
 if %actor.is_pc%
   eval test %%visited_%actor.id%%%
@@ -14,13 +15,15 @@ end
 ~
 #12401
 Exit cave~
-1 c 4
+1 c 4 0
 exit leave~
 %force% %actor% enter exit
 ~
 #12402
 free deckhand~
-0 c 0
+0 c 0 2
+L b 12407
+L v 12401
 free~
 if %actor.char_target(%arg%)% != %self%
   return 0
@@ -38,7 +41,13 @@ nop %actor.set_reputation(12401, Despised)%
 ~
 #12403
 Goblin Pirate death~
-0 f 100
+0 f 100 6
+L b 12401
+L b 12403
+L b 12404
+L b 12405
+L v 12401
+L w 12403
 ~
 dg_affect %self% BLIND off
 * load new goblin?
@@ -84,7 +93,7 @@ done
 ~
 #12404
 Cove: Delayed Despawn~
-1 f 0
+1 f 0 0
 ~
 %adventurecomplete%
 return 0
@@ -93,7 +102,16 @@ return 0
 ~
 #12405
 Underwater Cave difficulty select~
-1 c 4
+1 c 4 9
+L b 12403
+L b 12404
+L b 12405
+L b 12406
+L b 12407
+L b 12419
+L b 12420
+L c 12461
+L j 12401
 difficulty~
 if !%arg%
   %send% %actor% You must specify a level of difficulty (Normal or Hard).
@@ -155,7 +173,9 @@ set newroom i12401
 ~
 #12406
 breath messaging~
-1 n 100
+1 n 100 2
+L b 12406
+L v 12401
 ~
 set actor %self.carried_by%
 wait 1
@@ -178,7 +198,8 @@ end
 ~
 #12407
 Goblin cove: Collect seaweed~
-2 c 0
+2 c 0 1
+L c 12407
 pick forage~
 if %depleted%
   %send% %actor% You can't find any seaweed here.
@@ -193,7 +214,11 @@ set item %actor.inventory(12407)%
 ~
 #12408
 Goblin Cove trash spawner~
-1 n 100
+1 n 100 4
+L b 12408
+L b 12409
+L b 12410
+L b 12411
 ~
 * Ensure no mobs here
 set ch %self.room.people%
@@ -225,7 +250,11 @@ wait 1
 ~
 #12409
 Underwater cave mob block~
-0 s 100
+0 s 100 4
+L t 12406
+L t 12407
+L t 12408
+L t 12409
 ~
 if %direction% == south
   halt
@@ -242,7 +271,9 @@ return 0
 ~
 #12410
 Track detects higher template~
-2 c 0
+2 c 0 2
+L o 73
+L o 80
 track~
 eval tofind %room.template%+1
 if (!%actor.ability(Track)% || !%actor.ability(Navigation)%)
@@ -284,7 +315,18 @@ end
 ~
 #12411
 Golden Goblin: Quest completion for goblins~
-2 v 0
+2 v 0 11
+L b 12401
+L b 12402
+L b 12403
+L b 12404
+L b 12405
+L b 12406
+L t 12406
+L t 12407
+L t 12408
+L t 12409
+L t 18240
 ~
 * set no-kill
 set vnum 12401
@@ -306,7 +348,7 @@ end
 ~
 #12412
 Goblin Cove loot load boe/bop~
-1 n 100
+1 n 100 0
 ~
 set actor %self.carried_by%
 if !%actor%
@@ -337,7 +379,9 @@ end
 ~
 #12413
 Underwater~
-2 bgw 100
+2 bgw 100 2
+L c 12409
+L y 12400
 ~
 if !%actor%
   set person %room.people%
@@ -379,7 +423,9 @@ end
 ~
 #12414
 Air Supply~
-2 g 100
+2 g 100 2
+L b 12406
+L v 12401
 ~
 * change based on quest, etc
 set breath 8
@@ -395,7 +441,8 @@ remote breath %actor.id%
 ~
 #12415
 Maelstrom pull~
-2 g 100
+2 g 100 1
+L j 12405
 ~
 wait 5
 %echo% The water is starting to swirl...
@@ -406,7 +453,8 @@ wait 8 sec
 ~
 #12416
 Maelstrom~
-2 bgw 100
+2 bgw 100 1
+L j 12406
 ~
 wait 5 sec
 %echo% You are tossed to and fro by the raging waters!
@@ -426,7 +474,7 @@ done
 ~
 #12417
 Parrot script~
-0 dt 0
+0 dt 0 0
 *~
 if %random.2% == 2
   wait 5
@@ -435,7 +483,8 @@ end
 ~
 #12418
 Goblin Pirate: Flintlock Pistol~
-0 k 25
+0 k 25 1
+L w 12400
 ~
 if %self.cooldown(12400)%
   halt
@@ -462,7 +511,9 @@ wait 5
 ~
 #12419
 Goblin Pirate: Ankle Stab~
-0 k 33
+0 k 33 2
+L w 12400
+L w 12419
 ~
 if %self.cooldown(12400)%
   halt
@@ -476,7 +527,9 @@ dg_affect #12419 %actor% DODGE -10 5
 ~
 #12420
 Goblin Pirate: Grog~
-0 k 50
+0 k 50 2
+L w 12400
+L w 12420
 ~
 if %self.cooldown(12400)%
   halt
@@ -489,7 +542,9 @@ dg_affect #12420 %self% HASTE on 10
 ~
 #12421
 Goblin Pirate: Blind~
-0 k 100
+0 k 100 2
+L w 12400
+L w 12421
 ~
 if %self.cooldown(12400)%
   halt
@@ -505,7 +560,10 @@ dg_affect #12421 %target% BLIND on 5
 ~
 #12422
 Goblin Pirate Captain: Parrot Attack~
-0 k 100
+0 k 100 3
+L w 12400
+L w 12422
+L w 12423
 ~
 if %self.cooldown(12400)%
   halt
@@ -531,7 +589,8 @@ end
 ~
 #12423
 Hydra: Aggravated Assault~
-0 k 25
+0 k 25 1
+L w 12400
 ~
 if %self.cooldown(12400)%
   halt
@@ -561,7 +620,9 @@ end
 ~
 #12424
 Hydra: Poison Bite~
-0 k 33
+0 k 33 2
+L w 12400
+L w 12424
 ~
 if %self.cooldown(12400)%
   halt
@@ -574,7 +635,9 @@ nop %self.set_cooldown(12400, 30)%
 ~
 #12425
 Hydra: Regeneration~
-0 k 50
+0 k 50 2
+L w 12400
+L w 12425
 ~
 if %self.cooldown(12400)%
   halt
@@ -589,7 +652,10 @@ dg_affect #12425 %self% HEAL-OVER-TIME %self.level% 15
 ~
 #12426
 Hydra: Crushing Grip~
-0 k 100
+0 k 100 3
+L w 12400
+L w 12428
+L w 12430
 ~
 if %self.cooldown(12400)%
   halt
@@ -616,7 +682,9 @@ done
 ~
 #12427
 Scylla: Hydrokinesis~
-0 k 25
+0 k 25 2
+L w 12400
+L w 12427
 ~
 if %self.cooldown(12400)%
   halt
@@ -632,7 +700,8 @@ dg_affect #12427 %self% HASTE on 30
 ~
 #12428
 Scylla: Chomp~
-0 k 33
+0 k 33 1
+L w 12400
 ~
 if %self.cooldown(12400)%
   halt
@@ -652,7 +721,9 @@ done
 ~
 #12429
 Scylla: Pressure Wave~
-0 k 50
+0 k 50 2
+L w 12400
+L w 12429
 ~
 if %self.cooldown(12400)%
   halt
@@ -675,7 +746,10 @@ done
 ~
 #12430
 Scylla: Crushing Grip~
-0 k 100
+0 k 100 3
+L w 12400
+L w 12428
+L w 12430
 ~
 if %self.cooldown(12400)%
   halt
@@ -696,7 +770,10 @@ done
 ~
 #12431
 Hydra/Scylla Grip Struggle~
-0 c 0
+0 c 0 3
+L w 12428
+L w 12430
+L w 12431
 struggle~
 set break_free_at 2
 if !%actor.affect(12430)%
@@ -731,7 +808,9 @@ end
 ~
 #12432
 Scylla dance phase~
-0 l 25
+0 l 25 2
+L w 12432
+L w 12433
 ~
 if %self.varexists(phase)%
   halt
@@ -813,7 +892,7 @@ end
 ~
 #12433
 Scylla: Dance Commands~
-0 c 0
+0 c 0 0
 up down left right~
 if %self.varexists(running)%
   if %self.running%
@@ -845,7 +924,8 @@ end
 ~
 #12434
 Scylla: Phase reset~
-0 bw 100
+0 bw 100 1
+L w 12432
 ~
 if !%self.fighting% && (%self.varexists(phase)% || %self.affect(12432)%)
   %restore% %self%
@@ -855,7 +935,9 @@ end
 ~
 #12435
 Fathma: Drowning Curse~
-0 k 25
+0 k 25 2
+L w 12400
+L w 12435
 ~
 if %self.cooldown(12400)%
   halt
@@ -886,7 +968,8 @@ end
 ~
 #12436
 Fathma: Heal Self~
-0 k 33
+0 k 33 1
+L w 12400
 ~
 if %self.cooldown(12400)%
   halt
@@ -900,7 +983,13 @@ wait 5 sec
 ~
 #12437
 Fathma: Familiar~
-0 k 50
+0 k 50 6
+L b 12408
+L b 12409
+L b 12410
+L b 12411
+L f 12440
+L w 12400
 ~
 if %self.cooldown(12400)%
   halt
@@ -921,7 +1010,9 @@ end
 ~
 #12438
 Fathma: Ice Bolt~
-0 k 100
+0 k 100 2
+L w 12400
+L w 12438
 ~
 if %self.cooldown(12400)%
   halt
@@ -939,7 +1030,8 @@ dg_affect #12438 %target% SLOW on 10
 ~
 #12439
 Underwater boss death: portal to exit~
-0 f 100
+0 f 100 1
+L c 12402
 ~
 %echo% As you slay ~%self%, a portal opens nearby.
 set loc %instance.location%
@@ -952,14 +1044,16 @@ end
 ~
 #12440
 Fathma summon timer~
-0 bknw 100
+0 bknw 100 0
 ~
 wait 20 sec
 %purge% %self% $n vanishes in a burst of sparkling blue mana.
 ~
 #12441
 Golden Goblin reputation gate~
-0 s 100
+0 s 100 2
+L c 12406
+L v 12401
 ~
 if %direction% == portal || %direction% == none
   halt
@@ -984,7 +1078,13 @@ return 0
 ~
 #12442
 Fathma death~
-0 f 100
+0 f 100 6
+L b 12414
+L b 12415
+L b 12416
+L c 12408
+L v 12401
+L w 12403
 ~
 dg_affect %self% BLIND off
 set vnum 12414
@@ -1014,7 +1114,13 @@ done
 ~
 #12443
 Golden Goblin underwater miniboss spawner~
-1 n 100
+1 n 100 6
+L b 12414
+L b 12415
+L b 12416
+L j 12409
+L j 12414
+L j 12417
 ~
 eval mob_1 12413 + %random.3%
 if %mob_1% == 12414
@@ -1049,7 +1155,12 @@ end
 ~
 #12444
 Fathma portal-to-surface~
-0 v 0
+0 v 0 5
+L c 12402
+L t 12406
+L t 12407
+L t 12408
+L t 12409
 ~
 return 1
 if %actor.completed_quest_instance(12406)% || %questvnum% == 12406
@@ -1087,7 +1198,8 @@ end
 ~
 #12445
 GG Start Progression~
-2 g 100
+2 g 100 1
+L y 12400
 ~
 if %actor.is_pc% && %actor.empire%
   nop %actor.empire.start_progress(12400)%
