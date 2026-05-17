@@ -2341,7 +2341,7 @@ if %actor.obj_target(%arg%)% != %self%
   return 0
   halt
 end
-if !(%actor.on_quest(18288) || %actor.on_quest(18289) || %actor.on_quest(18290) || %actor.on_quest(18391)%)
+if !(%actor.on_quest(18288) || %actor.on_quest(18289) || %actor.on_quest(18290) || %actor.on_quest(18291)%)
   %send% %actor% You don't have anything to talk to Scaldorran about right now.
   %send% %actor% @%self% vanishes in a puff of smoke.
   %purge% %self%

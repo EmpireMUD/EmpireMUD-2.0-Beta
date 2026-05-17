@@ -451,7 +451,7 @@ L w 10560
 if %self.cooldown(10560)%
   halt
 end
-if %self.affect(BLIND)%
+if %self.aff_flagged(BLIND)%
   %echo% |%self% eyes flash blue, and ^%self% vision clears!
   dg_affect %self% BLIND off 1
 end

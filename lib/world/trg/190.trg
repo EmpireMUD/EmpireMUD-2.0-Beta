@@ -28,7 +28,7 @@ if %self.cooldown(19001)%
   halt
 end
 * Clear blind just in case...
-if %self.affect(BLIND)%
+if %self.aff_flagged(BLIND)%
   %echo% |%self% eyes flash blue, and ^%self% vision clears!
   dg_affect %self% BLIND off 1
 end
@@ -1053,7 +1053,7 @@ if %goblin% || !%heroic_mode% || !%hard%
     set person %room.people%
     while %person%
       if %person.is_enemy(%self%)%
-        %dot% #10221 %person% 75 30 magical
+        %dot% #10211 %person% 75 30 magical
         dg_affect #10211 %person% SLOW on 30
       end
       set person %person.next_in_room%

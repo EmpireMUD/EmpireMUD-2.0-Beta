@@ -2080,7 +2080,7 @@ else
   %send% %actor% ~%self% nips at your ankles, drawing blood!
   %echoaround% %actor% ~%self% nips at |%actor% ankles, drawing blood!
   %damage% %actor% 25 physical
-  %dot% #12662 %actor% 25 10 physical
+  %dot% #12661 %actor% 25 10 physical
 end
 ~
 #12663

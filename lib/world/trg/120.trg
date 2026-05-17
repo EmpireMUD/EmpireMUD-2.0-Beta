@@ -223,7 +223,7 @@ if %self.cooldown(12002)%
   halt
 end
 nop %self.set_cooldown(12002, 30)%
-if %self.affect(BLIND)%
+if %self.aff_flagged(BLIND)%
   %echo% |%self% eyes flash red, and ^%self% vision clears!
   dg_affect %self% BLIND off 1
 end
@@ -413,7 +413,7 @@ if %self.cooldown(12003)%
   halt
 end
 nop %self.set_cooldown(12003, 30)%
-if %self.affect(BLIND)%
+if %self.aff_flagged(BLIND)%
   %echo% |%self% eyes flash red, and ^%self% vision clears!
   dg_affect %self% BLIND off 1
 end
@@ -903,7 +903,7 @@ if %self.cooldown(12030)%
   halt
 end
 nop %self.set_cooldown(12030, 20)%
-if %self.affect(BLIND)%
+if %self.aff_flagged(BLIND)%
   %echo% |%self% vision clears!
   dg_affect %self% BLIND off 1
 end

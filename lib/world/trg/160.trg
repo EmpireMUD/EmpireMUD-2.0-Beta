@@ -21,7 +21,7 @@ L b 16001
 if %self.cooldown(16001)%
   halt
 end
-if %self.affect(BLIND)%
+if %self.aff_flagged(BLIND)%
   %echo% |%self% eyes shine extra bright, and ^%self% vision returns!
   dg_affect %self% BLIND off 1
 end
@@ -43,7 +43,7 @@ L b 16002
 if %self.cooldown(16002)%
   halt
 end
-if %self.affect(BLIND)%
+if %self.aff_flagged(BLIND)%
   %echo% |%self% eyes shine extra bright, and ^%self% vision returns!
   dg_affect %self% BLIND off 1
 end
@@ -66,7 +66,7 @@ L b 16003
 if %self.cooldown(16003)%
   halt
 end
-if %self.affect(BLIND)%
+if %self.aff_flagged(BLIND)%
   %echo% |%self% eyes shine extra bright, and ^%self% vision returns!
   dg_affect %self% BLIND off 1
 end
