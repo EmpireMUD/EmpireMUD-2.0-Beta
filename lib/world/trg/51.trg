@@ -1,6 +1,7 @@
 #5107
 Mine Rename Based on Type~
-2 o 100 0
+2 o 100 1
+L f 5107
 ~
 wait 0
 set type %room.mine_type%

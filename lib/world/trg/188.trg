@@ -1,6 +1,7 @@
 #18800
 Summon ghost with candy~
-1 c 2 0
+1 c 2 1
+L b 18800
 sacrifice~
 * This is no longer used as of Oct 2020
 return 0

@@ -1116,7 +1116,8 @@ dg_affect %self% !ATTACK on -1
 ~
 #12823
 Celestial Forge: Message when no-attack mob is attacked~
-0 B 0 0
+0 B 0 1
+L f 12823
 ~
 if %self.aff_flagged(!ATTACK)%
   %send% %actor% You need to choose a difficulty before you can fight ~%self%.

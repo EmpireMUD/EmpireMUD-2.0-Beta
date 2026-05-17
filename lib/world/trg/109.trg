@@ -33,7 +33,8 @@ mmove
 ~
 #10903
 Colossal Dragon knight/thief limit wander~
-0 i 100 0
+0 i 100 1
+L f 10903
 ~
 set start_room %instance.location%
 if !%start_room%

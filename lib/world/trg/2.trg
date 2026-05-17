@@ -43,7 +43,8 @@ return 0
 ~
 #230
 Summon Thug load script~
-0 n 100 0
+0 n 100 1
+L f 230
 ~
 * cancels follow and sets loyalty to current room's empire
 if %self.leader%
@@ -59,7 +60,8 @@ detach 230 %self.id%
 ~
 #232
 Barrel of Fun: Setup command~
-1 c 6 0
+1 c 6 1
+L f 232
 setup~
 set room %actor.room%
 if %actor.obj_target(%arg.argument1%)% != %self%

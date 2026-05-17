@@ -322,7 +322,8 @@ L c 10400
 ~
 #10407
 Hamlet environmental object echoes~
-1 bw 3 0
+1 bw 3 1
+L f 10407
 ~
 if %self.varexists(message_type)%
   set message_type %self.message_type%
@@ -733,7 +734,8 @@ end
 ~
 #10458
 Goblin Outpost attack info~
-0 B 0 0
+0 B 0 1
+L f 10458
 ~
 if %self.aff_flagged(!ATTACK)%
   %send% %actor% You need to choose a difficulty before you can challenge ~%self%.
@@ -790,7 +792,8 @@ return 0
 ~
 #10460
 Goblin Outpost item BOE/BOP craft/loot twiddler~
-1 n 100 0
+1 n 100 1
+L f 10460
 ~
 * items default to BOP but are set BOE if they come from a shop or craft
 set actor %self.carried_by%

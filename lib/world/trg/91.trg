@@ -102,7 +102,6 @@ end
 Jungle Bird Animation~
 0 bw 20 0
 ~
-* Jungle Bird Animation (9106)
 switch (%random.8%)
   case 1
     %echo% ~%self% flies up and away, disappearing into the distance.
@@ -164,7 +163,8 @@ done
 ~
 #9117
 Animal Becomes Hidden Over Time~
-0 ab 20 0
+0 ab 20 1
+L f 9117
 ~
 eval times_hidden %self.var(times_hidden,0)% + 1
 if %times_hidden% > 50
@@ -181,7 +181,8 @@ end
 ~
 #9118
 Mob Becomes Hostile on Interaction~
-0 e 1 0
+0 e 1 1
+L f 9118
 you~
 * Mob becomes hostile after a player pays attention to it.
 if %actor.is_npc%
@@ -217,7 +218,6 @@ Great Horned Owl Animation~
 0 bw 3 0
 ~
 * This script is no longer used. It was replaced by custom strings.
-* Great Horned Owl Animation (9133)
 if (%random.2% == 1)
   %echo% ~%self% hoots loudly.
 else
@@ -229,8 +229,6 @@ Songbird Animation~
 0 bw 3 0
 ~
 * This script is no longer used. It was replaced by custom strings.
-* songbird Animation (9148)
-* Works for 148 and 149
 if ((%self.room.sector% /= Forest) || (%self.room.sector% /= Orchard))
   %echo% ~%self% Sings sweetly from a near by tree.
 end
@@ -240,7 +238,6 @@ woodpecker animation~
 0 bw 3 0
 ~
 * This script is no longer used. It was replaced by custom strings.
-* Woodpecker Animation (9150)
 if ((%self.room.sector% /= Forest) || (%self.room.sector% /= Orchard))
   %echo% ~%self% hammers into a tree with its beak, looking for food.
 end

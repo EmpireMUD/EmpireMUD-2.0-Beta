@@ -2191,7 +2191,8 @@ end
 ~
 #11921
 Skycleave: Search ability for hints and secret passages~
-2 p 100 0
+2 p 100 1
+L f 11936
 ~
 * This was Skycleave: Search ability for hints and secret passages
 * It is no longer used because search is handled by command triggers (#11936)
@@ -2200,7 +2201,13 @@ halt
 ~
 #11922
 Skycleave: Secret passage levers~
-1 c 4 0
+1 c 4 6
+L b 11923
+L b 11924
+L j 11816
+L j 11817
+L j 11916
+L j 11917
 pull~
 if !%arg.argument1% || %actor.obj_target(%arg.argument1%)% != %self%
   return 0
@@ -2263,7 +2270,11 @@ levtog
 ~
 #11924
 Skycleave: Open secret passage from hall side~
-0 n 100 0
+0 n 100 4
+L j 11817
+L j 11822
+L j 11917
+L j 11922
 ~
 if %self.room.template% < 11800 || %self.room.template% > 11999
   * Only works in Skycleave
@@ -3319,7 +3330,8 @@ remote skystone_finished %actor.id%
 ~
 #11940
 Skycleave: Craft-or-Drop: Set BoE/BoP and loot quality flags~
-1 n 100 0
+1 n 100 1
+L f 11940
 ~
 * This script makes loot BOP when dropped by a mob but BOE when crafted.
 * It will also inherit hard/group flags from an NPC and rescale itself.
@@ -3672,8 +3684,9 @@ end
 ~
 #11945
 Skycleave Dreams: Triple Wake or Pinch Self to Exit~
-2 c 0 20
+2 c 0 21
 L b 11900
+L f 11946
 L j 11830
 L j 11925
 L j 11975
@@ -3839,7 +3852,8 @@ end
 ~
 #11946
 Skycleave Dreams: Reset wake on poof-in~
-2 gwA 100 0
+2 gwA 100 1
+L f 11945
 ~
 * When a player enters by any means OTHER than normal walking, reset their
 * 'wake' count. Typing 'wake' 3 times exits the area using trigger 11945.
@@ -3905,7 +3919,8 @@ end
 ~
 #11948
 Skycleave: Pixy Queen's greeting~
-0 g 100 0
+0 g 100 1
+L b 11884
 ~
 * Queen gives a hidden wink if a player arrives who she met in the Dream (mob 11884)
 wait 1
@@ -8015,7 +8030,8 @@ done
 ~
 #11995
 Skycleave: Reset comment count on enter (room version)~
-2 gA 100 0
+2 gA 100 1
+L f 11996
 ~
 * pairs with triggers like 11996 to reset comments when a player arrives
 set comment 0
@@ -8023,7 +8039,8 @@ remote comment %self.id%
 ~
 #11996
 Priest's Dream: Presence of the god~
-2 bw 100 0
+2 bw 100 1
+L f 11995
 ~
 * dream cutscene: player meets the god of Orka
 * The comment sequence will reset whenever a player enters

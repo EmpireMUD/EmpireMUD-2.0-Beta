@@ -1086,7 +1086,8 @@ end
 ~
 #11142
 Mill Manor Chalice: Record location on load~
-1 n 100 0
+1 n 100 1
+L f 11142
 ~
 if %instance.id%
   set instid %instance.id%

@@ -22,7 +22,8 @@ end
 ~
 #10203
 Goblin Challenge: Better error message when attacking early~
-0 B 0 0
+0 B 0 1
+L f 10203
 ~
 if %self.aff_flagged(!ATTACK)%
   %send% %actor% You'll have to wait a moment. ~%self% is still getting ready.
@@ -965,7 +966,8 @@ return 0
 ~
 #10263
 DEPRECATED: mount whistle use~
-1 c 2 0
+1 c 2 1
+L f 9910
 use~
 * DEPRECATED: Use 9910 instead
 if %actor.obj_target(%arg%)% != %self%
@@ -1211,7 +1213,8 @@ end
 ~
 #10272
 Primeval item BOE/BOP craft/loot twiddler~
-1 n 100 0
+1 n 100 1
+L f 10272
 ~
 * items default to BOP but are set BOE if they come from a shop or craft
 set actor %self.carried_by%

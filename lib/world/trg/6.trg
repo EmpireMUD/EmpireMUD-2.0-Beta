@@ -498,7 +498,8 @@ done
 ~
 #617
 Free genie load~
-0 n 100 0
+0 n 100 1
+L f 617
 ~
 wait 1
 * only allows 1 copy of the genie here

@@ -185,7 +185,8 @@ end
 ~
 #10303
 Flame Dragon delay-completer~
-0 f 100 0
+0 f 100 1
+L c 10316
 ~
 if %instance.start%
   * Attempt delayed despawn
@@ -306,7 +307,8 @@ done
 ~
 #10335
 Dragon Whistle use~
-1 c 2 0
+1 c 2 1
+L f 9910
 use~
 * Deprecated: the whistle now uses trig 9910 instead
 if !%self.is_name(%arg%)%

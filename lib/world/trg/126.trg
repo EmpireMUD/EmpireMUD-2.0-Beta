@@ -1998,7 +1998,9 @@ done
 ~
 #12658
 Wildling combat: Nasty Bite~
-0 k 100 0
+0 k 100 2
+L w 12657
+L w 12658
 ~
 if %self.cooldown(12657)%
   halt

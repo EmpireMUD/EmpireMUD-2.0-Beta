@@ -257,7 +257,8 @@ detach 957 %self.id%
 ~
 #980
 Customize look description~
-1 c 7 0
+1 c 7 1
+L f 980
 customize~
 set targ %arg.car%
 if %actor.obj_target(%targ%)% != %self%

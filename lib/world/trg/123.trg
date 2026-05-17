@@ -202,7 +202,8 @@ if %loc% && %self.room% != %loc%
 ~
 #12306
 Fur Dragon: attack info before difficulty selection~
-0 B 0 0
+0 B 0 1
+L f 12306
 ~
 if %self.aff_flagged(!ATTACK)%
   %send% %actor% You need to choose a difficulty before you can attack ~%self%.

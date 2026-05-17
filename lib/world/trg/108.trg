@@ -117,7 +117,8 @@ done
 ~
 #10829
 Cave Phase 2 Linker~
-2 n 100 0
+2 n 100 1
+L f 10829
 ~
 if !%instance.id%
   halt

@@ -111,7 +111,8 @@ dg_affect %self% !ATTACK on -1
 ~
 #18002
 Molten Fiend: Message when attacked before diff-sel~
-0 B 0 0
+0 B 0 1
+L f 18002
 ~
 if %self.aff_flagged(!ATTACK)%
   %echoaround% %actor% ~%actor% considers attacking ~%self%...
@@ -497,7 +498,9 @@ done
 ~
 #18006
 Molten Fiend phase 3 attacks~
-0 c 0 0
+0 c 0 2
+L w 9602
+L w 18017
 fiendfight3~
 if %actor% != %self%
   return 0

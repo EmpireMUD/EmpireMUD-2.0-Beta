@@ -204,7 +204,9 @@ done
 ~
 #10016
 Urchin combat~
-0 k 10 0
+0 k 10 2
+L f 10016
+L o 156
 ~
 set chance %random.5%
 if (%chance% < 5)
@@ -727,7 +729,8 @@ done
 ~
 #10040
 Goblin combat~
-0 k 10 0
+0 k 10 1
+L o 156
 ~
 if %random.3% < 3
   %send% %actor% ~%self% stabs you in the leg with a goblin shortsword!
@@ -1427,7 +1430,9 @@ done
 ~
 #10066
 Skystone combine~
-1 c 2 0
+1 c 2 2
+L c 10036
+L c 10037
 combine~
 if !%self.is_name(%arg%)%
   return 0

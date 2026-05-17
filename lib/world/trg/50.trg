@@ -1,6 +1,7 @@
 #5006
 Open Ruins: Random Icon~
-2 n 100 0
+2 n 100 1
+L f 5006
 ~
 * pick random icons for ruins
 switch %random.7%
@@ -33,7 +34,8 @@ detach 5006 %room.id%
 ~
 #5007
 Closed Ruins: Random Icon~
-2 n 100 0
+2 n 100 1
+L f 5007
 ~
 * pick random icons for ruins
 switch %random.7%
@@ -165,7 +167,8 @@ detach 5009 %self.id%
 ~
 #5010
 Flooded Ruins Name Fixer~
-2 n 100 0
+2 n 100 1
+L f 5010
 ~
 if %room.title% ~= #n
   %mod% %room% title Some Flooded Ruins
@@ -174,7 +177,8 @@ detach 5010 %room.id%
 ~
 #5011
 Ruins name verifier for flooded ruins~
-5 n 100 0
+5 n 100 1
+L f 5011
 ~
 if %self.shortdesc% ~= #n
   %mod% %self% shortdesc some flooded ruins

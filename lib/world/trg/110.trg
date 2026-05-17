@@ -97,7 +97,8 @@ L c 11058
 ~
 #11007
 Cattails unclaimed decay~
-0 ab 100 0
+0 ab 100 1
+L f 11007
 ~
 set room %self.room%
 set cycles_left 3
@@ -151,7 +152,8 @@ end
 ~
 #11009
 Roc nest forage for trees~
-2 c 0 0
+2 c 0 1
+L f 11009
 forage~
 set num 4
 %send% %actor% You forage around and find a large tree (x%num%)!

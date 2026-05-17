@@ -8405,7 +8405,13 @@ remote cycle %self.id%
 ~
 #11875
 Smol Nes-Pik: Joiago gossip helper~
-0 c 0 0
+0 c 0 6
+L b 11878
+L b 11880
+L b 11881
+L b 11882
+L b 11883
+L j 11882
 joiago~
 * gossip helper for Joiago, partner to trigger 11877
 if %actor.vnum% != 11877 || %arg% != gossip
@@ -8626,7 +8632,8 @@ end
 ~
 #11876
 Smol Nes-Pik: Reset comment count on move~
-0 i 100 0
+0 i 100 1
+L f 11880
 ~
 * pairs with trigger 11880 etc to reset their commentary when they move
 set comment 0
@@ -8930,8 +8937,9 @@ done
 ~
 #11880
 Smol Nes-Pik: Lotte running commentary~
-0 bw 45 6
+0 bw 45 7
 L b 11882
+L f 11876
 L j 11879
 L j 11880
 L j 11881

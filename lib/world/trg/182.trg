@@ -1442,7 +1442,24 @@ detach 18253 %self.id%
 ~
 #18254
 GoA: Reflect mob with smoky mirror~
-1 c 2 0
+1 c 2 17
+L b 10401
+L b 10402
+L b 10403
+L b 10404
+L b 10405
+L b 10406
+L b 10407
+L b 10408
+L b 10409
+L b 10410
+L b 10411
+L b 10412
+L b 10413
+L b 10414
+L b 10415
+L b 10419
+L t 18254
 reflect~
 return 1
 set room %actor.room%
@@ -1765,7 +1782,9 @@ end
 ~
 #18260
 Buy goblin gala ticket~
-1 c 2 0
+1 c 2 2
+L b 10451
+L c 18261
 buy~
 set person %self.room.people%
 set found 0
