@@ -2350,11 +2350,9 @@ end
 ~
 #11927
 Skycleave: Drink Teacup~
-1 s 100 11
+1 s 100 9
 L b 11920
 L j 11800
-L j 11874
-L j 11900
 L j 11973
 L j 11974
 L t 11864

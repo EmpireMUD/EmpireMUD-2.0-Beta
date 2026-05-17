@@ -8,7 +8,7 @@ end
 ~
 #11801
 Skycleave: Complex leave rules for floors 2 and 3~
-0 sA 100 21
+0 sA 100 22
 L b 11815
 L b 11816
 L b 11817
@@ -30,6 +30,7 @@ L j 11823
 L j 11824
 L j 11825
 L j 11826
+L q 4
 ~
 set sneakable_vnums 11815 11816 11817 11841 11842 11843 11844 11845 11846
 set maze_vnums 11812 11813 11818 11819 11820 11821 11823 11824 11825 11826
@@ -6244,7 +6245,7 @@ nop %self.remove_mob_flag(NO-ATTACK)%
 ~
 #11855
 Mezvienne combat: Baleful Polymorph, Blinding Light of Dawn, Belt of Venus, Dark Fate~
-0 k 100 12
+0 k 100 11
 L c 11890
 L s 11854
 L s 11855
@@ -6256,7 +6257,6 @@ L w 11852
 L w 11854
 L w 11856
 L w 11857
-L w 18851
 ~
 if %self.cooldown(11800)% || %self.disabled%
   halt
@@ -6769,13 +6769,14 @@ nop %self.remove_mob_flag(NO-ATTACK)%
 ~
 #11857
 Skycleave: Mercenary name setup~
-0 nA 100 14
+0 nA 100 15
 L b 11841
 L b 11842
 L b 11843
 L b 11844
 L b 11845
-L b 1184611900
+L b 11846
+L b 11900
 L c 11890
 L w 11800
 L w 11815
@@ -6929,7 +6930,8 @@ detach 11857 %self.id%
 ~
 #11858
 Shade of Mezvienne fight: Shadow Whip, Shadow Flail, Total Darkness, Shade's Grasp, Drain Knezz~
-0 k 100 0
+0 k 100 1
+L o 11
 ~
 if %self.cooldown(11800)% || %self.disabled%
   halt
@@ -10394,15 +10396,15 @@ L j 11840
 L j 11841
 L j 11922
 L j 11930
+L j 11931
 L j 11932
 L j 11934
+L j 11935
 L j 11936
 L j 11938
 L j 11939
 L j 11940
 L j 11941
-L j 111931
-L j 1193511935
 ~
 * Converts the 3rd floor of Skycleave from phase A to phase B
 set start_room 11830

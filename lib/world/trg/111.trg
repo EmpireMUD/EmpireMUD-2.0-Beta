@@ -527,7 +527,6 @@ end
 #11127
 Burrow Canyons: difficulty selector~
 1 c 4 18
-L b 1110
 L b 11100
 L b 11101
 L b 11102
@@ -538,6 +537,7 @@ L b 11106
 L b 11107
 L b 11108
 L b 11109
+L b 11110
 L b 11111
 L b 11112
 L b 11113

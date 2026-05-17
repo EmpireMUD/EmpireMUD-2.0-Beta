@@ -15,7 +15,8 @@ end
 ~
 #221
 Stealth GM Bribe coins: Prevent~
-0 m 0 0
+0 m 0 1
+L q 4
 ~
 if %actor.skill(Stealth)% > 0
   %send% %actor% No point trying to bribe ~%self -- you already know the Stealth skill.
@@ -28,7 +29,8 @@ return 0
 ~
 #222
 Stealth GM Bribe item: Prevent~
-0 j 100 0
+0 j 100 1
+L q 4
 ~
 if %actor.skill(Stealth)% > 0
   %send% %actor% No point trying to bribe ~%self -- you already know the Stealth skill.

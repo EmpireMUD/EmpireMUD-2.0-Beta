@@ -721,11 +721,14 @@ dg_affect %self% BONUS-PHYSICAL 5 120
 ~
 #10254
 Malfernes combat~
-0 k 7 4
+0 k 7 7
 L o 166
 L o 173
 L o 175
 L o 178
+L w 3009
+L w 3015
+L w 3035
 ~
 if !%self.affect(foresight)%
   foresight
@@ -1012,13 +1015,15 @@ return 1
 ~
 #10266
 Primeval track ability~
-2 c 0 6
+2 c 0 8
 L b 10252
 L b 10255
 L b 10256
 L b 10257
 L b 10258
 L b 18280
+L o 73
+L o 80
 track~
 * check abils and arg
 if !%arg% || !%actor.ability(Track)% || !%actor.ability(Navigation)%
@@ -1116,7 +1121,9 @@ return 1
 ~
 #10267
 Primeval base camp track hint~
-2 c 0 0
+2 c 0 2
+L o 73
+L o 80
 track~
 * shows up after they fail to find tracks
 return 0
@@ -1127,7 +1134,9 @@ end
 ~
 #10268
 Primeval backtracking track hint~
-2 c 0 0
+2 c 0 2
+L o 73
+L o 80
 track~
 * when they try to track from the "backtracking" room
 return 0

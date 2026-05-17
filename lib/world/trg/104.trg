@@ -374,7 +374,9 @@ done
 ~
 #10409
 Necromancer combat~
-0 k 20 0
+0 k 20 2
+L o 120
+L w 3021
 ~
 if !%self.affect(counterspell)%
   counterspell
@@ -454,7 +456,9 @@ done
 ~
 #10412
 Infernomancer combat~
-0 k 8 0
+0 k 8 2
+L o 120
+L w 3021
 ~
 if !%self.affect(counterspell)%
   counterspell

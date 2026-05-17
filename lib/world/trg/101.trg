@@ -39,8 +39,10 @@ done
 ~
 #10102
 Swamp Hag combat~
-0 k 15 1
+0 k 15 3
 L b 10101
+L o 156
+L w 3028
 ~
 if !%actor.affect(blind)%
   blind
@@ -114,7 +116,11 @@ Swamp Rat combat~
 ~
 #10105
 Berk combat~
-0 k 15 0
+0 k 15 4
+L o 94
+L o 156
+L w 3018
+L w 3028
 ~
 if !%actor.affect(disarm)%
   disarm
@@ -322,7 +328,9 @@ end
 ~
 #10113
 Stealth combat low-level~
-0 k 15 0
+0 k 15 2
+L o 156
+L w 3028
 ~
 if !%actor.affect(blind)%
   blind

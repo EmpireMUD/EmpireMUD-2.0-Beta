@@ -1272,4 +1272,272 @@ A
 C
 100 200
 S
+#12885
+mote harmony~
+a mote of harmony~
+There's a mote of harmony in the air.~
+   It's imperceptible at first. Just a tune that won't leave your head. Then
+there's a flicker of light and a chord plays. And then another. And then you
+touch it and for a moment, the harmony of nature plays in your mind.
+   The mote of harmony is a crafting material for Resonant Lightcraft.
+~
+3 0 a 0 0 3
+0 0 0
+2 0
+C
+175 175
+R
+4 5108 0
+R
+4 5115 0
+S
+#12886
+ring silenced restoration~
+a silenced ring of restoration~
+A silenced ring of restoration is lying on the ground.~
+   The ring is twisted along its full loop, like a spiral, with a midnight
+blue-black finish that reflects precious little light. Along the top, it is
+serrated such that a careless touch might cut into flesh.
+   The ring bears two green gemstones held in place by tiny beads of metal.
+Both gemstones are cut in a trapeze shape and oriented to form a healing sign.
+~
+2 amo ab 0 0 4
+0 0 0
+2 0
+A
+16 2 0
+A
+23 3 0
+A
+15 1 3
+C
+200 300
+T 12811
+S
+#12887
+inspiration silenced ring of restoration~
+the inspiration for a silenced ring of restoration~
+The inspiration for a silenced ring of restoration is on the ground.~
+   You find yourself inspired by the whispersmiths who forge in secret and in
+silence to steel us against what looms in the dark.
+   This inspiration will teach you to forge: silenced ring of restoration, a
+unique ring for healers.
+~
+7 0 a 0 0 1
+12886 0 0
+0 0
+S
+#12888
+earrings restoration silenced~
+silenced earrings of restoration~
+Silenced earrings of restoration are lying here.~
+   The earrings are each a simple pair of blue-black loops, polished in a way
+that casts a striking reflection in the dark, but never in the light.
+   Tiny green gems hover just below the end of the chains, suspended in the
+air by nothing at all, shimmering as they turn in the light.
+~
+2 mo am 0 0 3
+0 0 0
+2 0
+A
+8 1 0
+A
+23 2 0
+A
+16 1 3
+C
+200 300
+S
+#12889
+inspiration silenced earrings of restoration~
+the inspiration for the silenced earrings of restoration~
+The inspiration for the silenced earrings of restoration is on the ground.~
+   You find yourself inspired by the whispersmiths who forge in secret and in
+silence to steel us against what looms in the dark.
+   This inspiration will teach you to forge: silenced earrings of restoration,
+earrings for healers.
+~
+7 0 a 0 0 1
+12888 0 0
+0 0
+S
+#12890
+ring silenced fortitude~
+a silenced ring of fortitude~
+A silenced ring of fortitude is lying on the ground.~
+   The ring is twisted along its full loop, like a spiral, with a midnight
+blue-black finish that reflects precious little light. Along the top, it is
+serrated such that a careless touch might cut into flesh.
+   A large step-cut yellow gem, held in place by metal prongs, covers much of
+your finger when wearing the ring.
+~
+2 amo ab 0 0 4
+0 0 0
+2 0
+A
+15 2 0
+A
+18 3 0
+A
+11 1 3
+C
+200 300
+T 12811
+S
+#12891
+inspiration silenced ring of fortitude~
+the inspiration for a silenced ring of fortitude~
+The inspiration for a silenced ring of fortitude is on the ground.~
+   You find yourself inspired by the whispersmiths who forge in secret and in
+silence to steel us against what looms in the dark.
+   This inspiration will teach you to forge: silenced ring of fortitude, a
+unique ring for tanks.
+~
+7 0 a 0 0 1
+12890 0 0
+0 0
+S
+#12892
+earrings fortitude silenced~
+silenced earrings of fortitude~
+Silenced earrings of fortitude are lying here.~
+   The earrings are each a simple pair of blue-black loops, polished in a way
+that casts a striking reflection in the dark, but never in the light.
+   Step-cut yellow gems dangle in midair below the metal chains of the
+earrings, occasionally spinning when light shines through them.
+~
+2 mo am 0 0 4
+0 0 0
+2 0
+A
+2 1 0
+A
+18 1 0
+A
+13 1 0
+A
+15 1 3
+C
+200 300
+S
+#12893
+inspiration silenced earrings of fortitude~
+the inspiration for the silenced earrings of fortitude~
+The inspiration for the silenced earrings of fortitude is on the ground.~
+   You find yourself inspired by the whispersmiths who forge in secret and in
+silence to steel us against what looms in the dark.
+   This inspiration will teach you to forge: silenced earrings of fortitude,
+earrings for tanks.
+~
+7 0 a 0 0 1
+12892 0 0
+0 0
+S
+#12894
+ring silenced wrath~
+a silenced ring of wrath~
+A silenced ring of wrath is lying on the ground.~
+   The ring is twisted along its full loop, like a spiral, with a midnight
+blue-black finish that reflects precious little light. Along the top, it is
+serrated such that a careless touch might cut into flesh.
+   A chain of navette-cut red gemstones, arranged tip-to-tip, circles the full
+circumference of the ring.
+~
+2 amo ab 0 0 5
+0 0 0
+2 0
+A
+11 2 0
+A
+21 3 0
+A
+15 1 0
+C
+200 300
+T 12811
+S
+#12895
+inspiration silenced ring of wrath~
+the inspiration for a silenced ring of wrath~
+The inspiration for a silenced ring of wrath is on the ground.~
+   You find yourself inspired by the whispersmiths who forge in secret and in
+silence to steel us against what looms in the dark.
+   This inspiration will teach you to forge: silenced ring of wrath, a unique
+ring for melee dps.
+~
+7 0 a 0 0 1
+12894 0 0
+0 0
+S
+#12896
+earrings wrath silenced~
+silenced earrings of wrath~
+Silenced earrings of wrath are lying here.~
+   The earrings are each a simple pair of blue-black loops, polished in a way
+that casts a striking reflection in the dark, but never in the light.
+   Clusters of tiny red gems swirl in the air around the chains, sometimes
+falling like drops of blood before darting back up to their place below the
+earrings.
+~
+2 mo am 0 0 4
+0 0 0
+2 0
+A
+1 1 0
+A
+21 2 0
+A
+11 1 3
+C
+200 300
+S
+#12897
+inspiration silenced earrings of wrath~
+the inspiration for the silenced earrings of wrath~
+The inspiration for the silenced earrings of wrath is on the ground.~
+   You find yourself inspired by the whispersmiths who forge in secret and in
+silence to steel us against what looms in the dark.
+   This inspiration will teach you to forge: silenced earrings of wrath,
+earrings for melee dps.
+~
+7 0 a 0 0 1
+12896 0 0
+0 0
+S
+#12898
+ring silenced arcana~
+a silenced ring of arcana~
+A silenced ring of arcana is lying on the ground.~
+   The ring is twisted along its full loop, like a spiral, with a midnight
+blue-black finish that reflects precious little light. Along the top, it is
+serrated such that a careless touch might cut into flesh.
+   A large radiant-cut blue gem hovers ever so slightly above the ring,
+capturing every stray mote of light.
+~
+2 amo ab 0 0 5
+0 0 0
+2 0
+A
+16 2 0
+A
+22 3 0
+A
+15 1 3
+C
+200 300
+T 12811
+S
+#12899
+inspiration silenced ring of arcana~
+the inspiration for a silenced ring of arcana~
+The inspiration for a silenced ring of arcana is on the ground.~
+   You find yourself inspired by the whispersmiths who forge in secret and in
+silence to steel us against what looms in the dark.
+   This inspiration will teach you to forge: silenced ring of arcana, a unique
+ring for caster dps.
+~
+7 0 a 0 0 1
+12898 0 0
+0 0
+S
 $

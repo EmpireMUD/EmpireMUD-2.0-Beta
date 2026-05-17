@@ -1,6 +1,6 @@
 #18000
 Molten Fiend: Difficulty selector~
-0 c 0
+0 c 0 0
 difficulty~
 if !%arg%
   %send% %actor% You must specify a level of difficulty. (Normal, Hard, Group, or Boss)
@@ -104,14 +104,14 @@ done
 ~
 #18001
 Molten Fiend: No-attack until diff-sel~
-0 n 100
+0 n 100 0
 ~
 * turn on no-attack (until diff-sel)
 dg_affect %self% !ATTACK on -1
 ~
 #18002
 Molten Fiend: Message when attacked before diff-sel~
-0 B 0
+0 B 0 0
 ~
 if %self.aff_flagged(!ATTACK)%
   %echoaround% %actor% ~%actor% considers attacking ~%self%...
@@ -127,7 +127,10 @@ end
 ~
 #18003
 Molten Fiend: change phases (hit percent)~
-0 l 100
+0 l 100 3
+L f 18007
+L s 18005
+L s 18006
 ~
 * Attach the heal-and-reset trigger
 if !%self.has_trigger(18007)%
@@ -170,7 +173,12 @@ end
 ~
 #18004
 Molten Fiend phase 1 attacks~
-0 c 0
+0 c 0 5
+L w 18006
+L w 18007
+L w 18008
+L w 18009
+L w 18010
 fiendfight1~
 if %actor% != %self%
   return 0
@@ -335,7 +343,12 @@ done
 ~
 #18005
 Molten Fiend phase 2 attacks~
-0 c 0
+0 c 0 5
+L b 18077
+L w 9602
+L w 18013
+L w 18014
+L w 18017
 fiendfight2~
 if %actor% != %self%
   return 0
@@ -484,7 +497,7 @@ done
 ~
 #18006
 Molten Fiend phase 3 attacks~
-0 c 0
+0 c 0 0
 fiendfight3~
 if %actor% != %self%
   return 0
@@ -643,7 +656,11 @@ done
 ~
 #18007
 Molten Fiend out-of-combat reset~
-0 ab 100
+0 ab 100 4
+L b 18077
+L w 18006
+L w 18007
+L w 18008
 ~
 if %self.fighting%
   halt
@@ -664,7 +681,8 @@ detach 18007 %self.id%
 ~
 #18008
 Molten Fiend: new fight main controller~
-0 k 100
+0 k 100 1
+L w 18004
 ~
 if %self.cooldown(18004)%
   halt
@@ -676,7 +694,7 @@ fiendfight%active_phase%
 ~
 #18009
 Molten Fiend: kill difficulty tracker (for infuse)~
-0 f 100
+0 f 100 0
 ~
 set 18075_highest_kill_diff %self.var(diff, 1)%
 set person %self.room.people%
@@ -694,7 +712,45 @@ done
 ~
 #18010
 Infuse fiend gear at fissure~
-2 c 0
+2 c 0 38
+L c 18012
+L c 18013
+L c 18014
+L c 18015
+L c 18016
+L c 18017
+L c 18018
+L c 18019
+L c 18021
+L c 18022
+L c 18023
+L c 18024
+L c 18025
+L c 18026
+L c 18027
+L c 18028
+L c 18029
+L c 18030
+L c 18031
+L c 18032
+L c 18033
+L c 18034
+L c 18035
+L c 18036
+L c 18037
+L c 18038
+L c 18039
+L c 18040
+L c 18041
+L c 18042
+L c 18043
+L c 18044
+L c 18046
+L c 18047
+L c 18048
+L c 18049
+L c 18050
+L w 18000
 infuse~
 set target %actor.obj_target(%arg.argument1%)%
 set conf %arg.argument2%
@@ -787,7 +843,9 @@ end
 ~
 #18011
 Convert old molten essence~
-1 b 100
+1 b 100 2
+L c 18097
+L w 18000
 ~
 eval actor %self.carried_by%
 if !%actor%
@@ -811,7 +869,8 @@ end
 ~
 #18012
 Molten Fiend: Fire elemental ramp up~
-0 k 100
+0 k 100 1
+L w 18012
 ~
 set boss %self.room.people(18075)%
 set diff %boss.var(diff,1)%
@@ -833,7 +892,7 @@ end
 ~
 #18056
 Tectonic Tuba~
-1 b 15
+1 b 15 0
 ~
 if !%self.worn_by%
   halt
@@ -857,7 +916,49 @@ done
 ~
 #18070
 Molten Fiend: Loot replacement~
-1 n 100
+1 n 100 42
+L c 18012
+L c 18013
+L c 18014
+L c 18015
+L c 18016
+L c 18017
+L c 18018
+L c 18019
+L c 18021
+L c 18022
+L c 18023
+L c 18024
+L c 18025
+L c 18026
+L c 18027
+L c 18028
+L c 18029
+L c 18030
+L c 18031
+L c 18032
+L c 18033
+L c 18034
+L c 18035
+L c 18036
+L c 18037
+L c 18038
+L c 18039
+L c 18040
+L c 18041
+L c 18042
+L c 18043
+L c 18044
+L c 18046
+L c 18047
+L c 18048
+L c 18049
+L c 18050
+L c 18051
+L c 18052
+L c 18056
+L c 18095
+L c 18096
 ~
 * loot list: CAUTION: the vnum line is approaching max-line-length of 255
 set loot_list 18012 18013 18014 18015 18016 18017 18018 18019 18021 18022 18023 18024 18025 18026 18027 18028 18029 18030 18031 18032 18033 18034 18035 18036 18037 18038 18039 18040 18041 18042 18043 18044 18046 18047 18048 18049 18050
@@ -943,7 +1044,7 @@ end
 ~
 #18075
 Fissure eruption~
-2 ab 1
+2 ab 1 0
 ~
 %regionecho% %room% 10 You feel a sudden wave of heat from the nearby fissure!
 wait 2 sec
@@ -953,7 +1054,14 @@ wait 2 sec
 ~
 #18076
 Fiend Battle~
-0 k 25
+0 k 25 7
+L b 18077
+L o 109
+L o 120
+L o 173
+L w 2013
+L w 3015
+L w 3021
 ~
 * Deprecated: No longer used
 eval test 100*%self.health%/%self.maxhealth%
@@ -1131,7 +1239,7 @@ wait 10 sec
 ~
 #18077
 Fiend adds timer~
-0 n 100
+0 n 100 0
 ~
 wait 30 sec
 %echo% &&O&&Z~%self% burns out, disappearing with a puff of smoke!&&0
@@ -1139,7 +1247,8 @@ wait 30 sec
 ~
 #18078
 Fiend adds battle~
-0 k 20
+0 k 20 1
+L b 18075
 ~
 set fiend %self.room.people(18075)%
 if %random.3%<3 && %fiend%
@@ -1158,7 +1267,7 @@ wait 5 sec
 ~
 #18079
 Fiend No Leave~
-0 s 100
+0 s 100 0
 ~
 if !%actor.fighting% && !%self.fighting%
   halt
@@ -1172,7 +1281,7 @@ return 0
 ~
 #18080
 Fiend Immunities~
-0 p 100
+0 p 100 0
 ~
 if !(%abilityname%==disarm)
   halt
@@ -1182,14 +1291,72 @@ return 0
 ~
 #18081
 Fiend No Flee~
-0 c 0
+0 c 0 0
 flee~
 %send% %actor% You turn to flee, but a wall of fire blocks your escape!
 %echoaround% %actor% ~%actor% turns to flee, but a wall of fire blocks ^%actor% escape!
 ~
 #18082
 Molten Fiend: throw stuff in fissure (for molten essence)~
-2 c 0
+2 c 0 58
+L c 18012
+L c 18013
+L c 18014
+L c 18015
+L c 18016
+L c 18017
+L c 18018
+L c 18019
+L c 18021
+L c 18022
+L c 18023
+L c 18024
+L c 18025
+L c 18026
+L c 18027
+L c 18028
+L c 18029
+L c 18030
+L c 18031
+L c 18032
+L c 18033
+L c 18034
+L c 18035
+L c 18036
+L c 18037
+L c 18038
+L c 18039
+L c 18040
+L c 18041
+L c 18042
+L c 18043
+L c 18044
+L c 18046
+L c 18047
+L c 18048
+L c 18049
+L c 18050
+L c 18075
+L c 18076
+L c 18077
+L c 18078
+L c 18079
+L c 18080
+L c 18081
+L c 18082
+L c 18083
+L c 18084
+L c 18085
+L c 18086
+L c 18087
+L c 18088
+L c 18089
+L c 18090
+L c 18091
+L c 18092
+L c 18093
+L c 18094
+L w 18000
 throw~
 set val_args lava fissure magma down off ledge
 if !(%val_args% ~= %arg.argument2%)
@@ -1225,7 +1392,8 @@ return 1
 ~
 #18084
 Fissure shop list~
-2 c 0
+2 c 0 1
+L c 18097
 list~
 * Deprecated: this script is no longer used
 halt
@@ -1262,7 +1430,28 @@ end
 ~
 #18085
 Molten fiend shop buy~
-2 c 0
+2 c 0 21
+L c 18075
+L c 18076
+L c 18077
+L c 18078
+L c 18079
+L c 18080
+L c 18081
+L c 18082
+L c 18083
+L c 18084
+L c 18085
+L c 18086
+L c 18087
+L c 18088
+L c 18089
+L c 18090
+L c 18091
+L c 18092
+L c 18093
+L c 18094
+L c 18097
 buy~
 * Deprecated: This script is no longer used
 halt
@@ -1401,7 +1590,8 @@ end
 ~
 #18086
 Fiend Start Progression~
-2 g 100
+2 g 100 1
+L y 18075
 ~
 if %actor.is_pc% && %actor.empire%
   nop %actor.empire.start_progress(18075)%

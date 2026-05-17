@@ -230,7 +230,8 @@ end
 ~
 #10017
 Rare thief death~
-0 f 100 0
+0 f 100 1
+L q 4
 ~
 set ch %self.room.people%
 while %ch%
@@ -939,11 +940,14 @@ wait 1 sec
 ~
 #10046
 Sorcerer combat~
-0 k 5 4
+0 k 5 7
 L o 166
 L o 173
 L o 175
 L o 178
+L w 3009
+L w 3015
+L w 3035
 ~
 if !%self.affect(foresight)%
   foresight
@@ -957,10 +961,11 @@ end
 ~
 #10047
 3F High Master combat~
-0 k 5 1
+0 k 5 2
 L o 174
+L w 3032
 ~
-if !%actor.affect(enervate)%
+if !%actor.affect(3032)%
   enervate
 else
   %send% %actor% ~%self% marks you with a piece of chalk. It burns!

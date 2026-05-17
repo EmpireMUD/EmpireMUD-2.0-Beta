@@ -1,6 +1,12 @@
 #16100
 Hydra Load~
-0 n 100
+0 n 100 6
+L b 16101
+L b 16102
+L b 16103
+L b 16104
+L c 16100
+L w 16100
 ~
 dg_affect #16100 %self% IMMUNE-DAMAGE on -1
 %echo% &&AThe flickering light begins to once again play over the hydra's skin.&&0 (Hydra is immune!)
@@ -20,7 +26,7 @@ eval randomhead %random.4% + 16100
 ~
 #16101
 hydra vicious head attack~
-0 k 10
+0 k 10 0
 ~
 set person %self.room.people%
 set counter 0
@@ -41,7 +47,13 @@ end
 ~
 #16102
 hydra head death~
-0 f 100
+0 f 100 6
+L b 16100
+L b 16101
+L b 16102
+L b 16103
+L b 16104
+L w 16100
 ~
 if !%self.char_target(hydra oceanic monstrous)%
   halt
@@ -78,7 +90,14 @@ end
 ~
 #16103
 hydra head random spawn~
-0 bw 100
+0 bw 100 7
+L b 16101
+L b 16102
+L b 16103
+L b 16104
+L w 16100
+L w 16102
+L w 16103
 ~
 set person %self.room.people%
 set headcount 0
@@ -123,7 +142,15 @@ end
 ~
 #16104
 hydra head count player enters~
-0 h 100
+0 h 100 8
+L b 16101
+L b 16102
+L b 16103
+L b 16104
+L c 16133
+L w 16100
+L w 16102
+L w 16103
 ~
 wait 1
 set person %self.room.people%
@@ -171,7 +198,7 @@ global HydraBuffCounter
 ~
 #16105
 wandering mob adventure command~
-0 c 0
+0 c 0 0
 adventure~
 if !(summon /= %arg.car%)
   %teleport% %actor% %instance.real_location%
@@ -184,7 +211,9 @@ return 0
 ~
 #16106
 hydra ethereal head combat~
-0 k 10
+0 k 10 2
+L w 16105
+L w 16106
 ~
 set person %self.room.people%
 set counter 0
@@ -209,7 +238,8 @@ end
 ~
 #16107
 hydra vicious head buff~
-0 l 40
+0 l 40 1
+L w 16107
 ~
 if %self.cooldown(16107)%
   halt
@@ -220,7 +250,13 @@ nop %self.set_cooldown(16107, 60)%
 ~
 #16108
 hydra death head purge~
-0 f 100
+0 f 100 6
+L b 16101
+L b 16102
+L b 16103
+L b 16104
+L c 16110
+L j 16100
 ~
 set person %self.room.people%
 while %person%
@@ -234,7 +270,8 @@ nop %instance.set_location(%instance.real_location%)%
 ~
 #16109
 hydra withering head debuff~
-0 k 20
+0 k 20 1
+L w 16109
 ~
 switch 3
   case 1
@@ -316,7 +353,7 @@ end
 ~
 #16110
 hydra leash~
-0 i 100
+0 i 100 0
 ~
 set room %self.room%
 if %room.distance(%instance.real_location%)% > 40
@@ -329,7 +366,9 @@ end
 ~
 #16111
 hydra slayer build~
-5 o 100
+5 o 100 2
+L e 16101
+L e 16102
 ~
 set inter %self.interior%
 if (!%inter%)
@@ -345,7 +384,12 @@ detach 16111 %self.id%
 ~
 #16112
 hydra minipet whistle~
-1 c 2
+1 c 2 5
+L b 16105
+L b 16106
+L b 16107
+L b 16108
+L b 16109
 use~
 eval GrantPet %random.5% + 16104
 set check_pet 1
@@ -376,7 +420,12 @@ done
 ~
 #16113
 hydra majestic head buffs~
-0 k 10
+0 k 10 5
+L b 16101
+L b 16102
+L b 16103
+L b 16104
+L w 16104
 ~
 set person %self.room.people%
 switch %random.4%
@@ -430,7 +479,7 @@ end
 ~
 #16114
 when hydra gear is crafted~
-1 n 100
+1 n 100 0
 ~
 if %self.level%
   set level %self.level%
@@ -468,7 +517,9 @@ wait 1
 ~
 #16115
 hydra seeking stone~
-1 c 2
+1 c 2 2
+L i 16100
+L w 16115
 seek~
 if !%arg%
   %send% %actor% Seek what?
@@ -511,7 +562,8 @@ end
 ~
 #16116
 hydra seeking stone only one~
-1 g 100
+1 g 100 1
+L c 16133
 ~
 if %actor.inventory(16133)%
   %send% %actor% You've already got a hydra seeking stone and can't bring yourself to pick up a second.
@@ -520,7 +572,12 @@ end
 ~
 #16117
 hydra seeking stone load~
-1 n 100
+1 n 100 5
+L b 16100
+L b 16101
+L b 16102
+L b 16103
+L b 16104
 ~
 eval actor %self.carried_by%
 if %actor.vnum% >= 16100 && %actor.vnum% <= 16104
@@ -529,7 +586,11 @@ end
 ~
 #16118
 baby hydra customizations~
-0 bw 75
+0 bw 75 4
+L b 16109
+L s 16102
+L s 16103
+L s 16104
 ~
 set random_roll %random.4%
 if %self.morph%
@@ -634,7 +695,8 @@ done
 ~
 #16119
 someone tries to leave the hydra~
-0 s 100
+0 s 100 1
+L w 16102
 ~
 if %actor.affect(16102)%
   dg_affect #16102 %actor% off
@@ -642,7 +704,49 @@ end
 ~
 #16120
 loot replacer~
-1 n 100
+1 n 100 42
+L c 16102
+L c 16103
+L c 16104
+L c 16105
+L c 16106
+L c 16107
+L c 16111
+L c 16112
+L c 16113
+L c 16114
+L c 16115
+L c 16116
+L c 16117
+L c 16118
+L c 16119
+L c 16120
+L c 16121
+L c 16122
+L c 16123
+L c 16124
+L c 16125
+L c 16126
+L c 16127
+L c 16128
+L c 16129
+L c 16130
+L c 16131
+L c 16132
+L c 16135
+L c 16136
+L c 16137
+L c 16138
+L c 16139
+L c 16140
+L c 16141
+L c 16142
+L c 16143
+L c 16144
+L c 16145
+L c 16146
+L c 16147
+L c 16148
 ~
 set actor %self.carried_by%
 eval LootRoll %random.1200%
@@ -745,7 +849,7 @@ wait 1
 ~
 #16121
 adventure clean up~
-1 f 0
+1 f 0 0
 ~
 %adventurecomplete%
 ~

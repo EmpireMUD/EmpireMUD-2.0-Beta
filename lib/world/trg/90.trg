@@ -411,7 +411,8 @@ mjunk all
 ~
 #9028
 Tameness Required to Tame~
-0 c 0 0
+0 c 0 1
+L o 34
 tame feed~
 * Amount of tameness required
 set target 5
@@ -539,10 +540,11 @@ halt
 ~
 #9033
 Fake pickpocket~
-1 c 2 4
+1 c 2 5
 L b 202
 L b 203
 L c 9033
+L o 142
 L t 9033
 pickpocket~
 set target %actor.char_target(%arg%)%
