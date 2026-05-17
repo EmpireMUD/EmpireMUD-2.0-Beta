@@ -67,7 +67,7 @@ bool audit_trigger(trig_data *trig, char_data *ch) {
 	bool problem = FALSE;
 	bitvector_t bits;
 	int pos;
-	bool links;
+	bool links, link_words;
 	struct trig_link *link;
 		
 	if (!str_cmp(GET_TRIG_NAME(trig), default_trig_name)) {
@@ -84,6 +84,7 @@ bool audit_trigger(trig_data *trig, char_data *ch) {
 	}
 	
 	links = FALSE;
+	link_words = FALSE;
 	
 	LL_FOREACH(trig->cmdlist, cmd) {
 		if (strlen(cmd->cmd) > 255) {
@@ -91,16 +92,25 @@ bool audit_trigger(trig_data *trig, char_data *ch) {
 			problem = TRUE;
 		}
 		
-		// check for links
+		// check for links: any 3+ digit number
 		for (pos = 0; pos < strlen(cmd->cmd) - 1 && !links; ++pos) {
-			if (isdigit(cmd->cmd[pos]) && isdigit(cmd->cmd[pos+1])) {
+			if (isdigit(cmd->cmd[pos]) && isdigit(cmd->cmd[pos+1]) && isdigit(cmd->cmd[pos+2])) {
 				links = TRUE;
 			}
+		}
+		
+		if (strstr(cmd->cmd, ".skill(") || strstr(cmd->cmd, ".affect(") || strstr(cmd->cmd, ".ability(") || strstr(cmd->cmd, ".has_component(") || strstr(cmd->cmd, ".is_component(") || strstr(cmd->cmd, ".charge_component(") || strstr(cmd->cmd, ".component_") || strstr(cmd->cmd, "%component.")) {
+			link_words = TRUE;
 		}
 	}
 	
 	if (links && !GET_TRIG_LINKS(trig)) {
 		olc_audit_msg(ch, GET_TRIG_VNUM(trig), "Contains numbers but has no links");
+		problem = TRUE;
+	}
+	
+	if (link_words && !GET_TRIG_LINKS(trig)) {
+		olc_audit_msg(ch, GET_TRIG_VNUM(trig), "Contains skill, affect, ability, or component but has no links");
 		problem = TRUE;
 	}
 	
