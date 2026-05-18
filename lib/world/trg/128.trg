@@ -2090,7 +2090,7 @@ end
 nop %actor.give_currency(%self.val0%,%self.val1%)%
 eval name %%currency.%self.val0%(%self.val1%)%%
 %send% %actor% You open @%self% and gain %self.val1% %name%!
-%echoaround% %actor% ~%actor5 opens @%self% and gains %self.val1% %name%!
+%echoaround% %actor% ~%actor% opens @%self% and gains %self.val1% %name%!
 %purge% %self%
 ~
 #12850
