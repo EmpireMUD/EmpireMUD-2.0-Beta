@@ -1721,6 +1721,11 @@ tiles and slowly prospect to look for metals. This can take a long time to
 finish but when it is done, any member of the empire can type 'prospect' on the
 tile to instantly find out what metal it has.
 
+Because this is a long, time-consuming chore, and because it often involves a
+large number of tiles per empire, this chore does not spawn a worker NPC (but
+it still costs food per hour per tile). All mountain tiles owned by an empire
+are prospected at the same time, so long as there's food available.
+
 You can turn on 'toggle informative' to see tiles that have been prospected by
 your empire.
 

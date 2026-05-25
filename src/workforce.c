@@ -111,7 +111,7 @@ struct empire_chore_type chore_data[NUM_CHORES] = {
 	{ "general", NOTHING, TRUE, NOTHING },
 	{ "fishing", FISHERMAN, FALSE, NOTHING },
 	{ "burn-stumps", STUMP_BURNER, FALSE, NOTHING },
-	{ "prospecting", PROSPECTOR, FALSE, TECH_WORKFORCE_PROSPECTING },
+	{ "prospecting", PROSPECTOR, FALSE, TECH_WORKFORCE_PROSPECTING },	// note: no longer spawns mobs as of b5.203
 		{ "unused", NOTHING, TRUE, NOTHING },
 };
 
@@ -3039,59 +3039,54 @@ void do_chore_production(empire_data *emp, room_data *room, vehicle_data *veh, i
 
 
 void do_chore_prospecting(empire_data *emp, room_data *room) {
-	bool can_mine = ROOM_CAN_MINE(room);
+	// ROOM_CAN_MINE is pre-checked as the condition for this chore
 	bool prospected_by_emp = (get_room_extra_data(room, ROOM_EXTRA_PROSPECT_EMPIRE) == EMPIRE_VNUM(emp));
 	bool has_ore = (get_room_extra_data(room, ROOM_EXTRA_MINE_AMOUNT) > 0);
 	bool undetermined = (get_room_extra_data(room, ROOM_EXTRA_MINE_GLB_VNUM) <= 0);
-	bool needs_prospect = (can_mine && (undetermined || (!prospected_by_emp && has_ore))); 
-	char_data *worker;
+	bool needs_prospect = (undetermined || (!prospected_by_emp && has_ore));
 	
 	if (needs_prospect) {
-		if ((worker = find_chore_worker_in_room(emp, room, NULL, chore_data[CHORE_PROSPECTING].mob))) {
-			charge_workforce(emp, CHORE_PROSPECTING, room, worker, 1, NOTHING, 0);
-			add_to_room_extra_data(room, ROOM_EXTRA_WORKFORCE_PROSPECT, 1);
+		charge_workforce(emp, CHORE_PROSPECTING, room, NULL, 1, NOTHING, 0);
+		add_to_room_extra_data(room, ROOM_EXTRA_WORKFORCE_PROSPECT, 1);
+		add_workforce_production_log(emp, WPLOG_PROSPECTED, 0, 1);
 		
-			if ((get_room_extra_data(room, ROOM_EXTRA_WORKFORCE_PROSPECT) * WORKFORCE_CYCLE) < (config_get_int("prospecting_workforce_hours") * SECS_PER_REAL_HOUR)) {
-				// still working: only send message if someone else is present (don't bother verifying it's a player)
-				if (ROOM_PEOPLE(IN_ROOM(worker))->next_in_room) {
-					switch (number(0, 2)) {
-						case 0: {
-							act("$n picks at the soil...", FALSE, worker, NULL, NULL, TO_ROOM | TO_SPAMMY | TO_QUEUE);
-							break;
-						}
-						case 1: {
-							act("$n tastes a pinch of soil...", FALSE, worker, NULL, NULL, TO_ROOM | TO_SPAMMY | TO_QUEUE);
-							break;
-						}
-						case 2: {
-							act("$n sifts through the dirt...", FALSE, worker, NULL, NULL, TO_ROOM | TO_SPAMMY | TO_QUEUE);
-							break;
-						}
+		if ((get_room_extra_data(room, ROOM_EXTRA_WORKFORCE_PROSPECT) * WORKFORCE_CYCLE) < (config_get_int("prospecting_workforce_hours") * SECS_PER_REAL_HOUR)) {
+			// still working: only send message if someone else is present (don't bother verifying it's a player)
+			if (ROOM_PEOPLE(room)) {
+				switch (number(0, 2)) {
+					case 0: {
+						act("A prospector picks at the soil...", FALSE, ROOM_PEOPLE(room), NULL, NULL, TO_CHAR | TO_ROOM | TO_SPAMMY | TO_QUEUE);
+						break;
+					}
+					case 1: {
+						act("A prospector tastes a pinch of soil...", FALSE, ROOM_PEOPLE(room), NULL, NULL, TO_CHAR | TO_ROOM | TO_SPAMMY | TO_QUEUE);
+						break;
+					}
+					case 2: {
+						act("A prospector sifts through the dirt...", FALSE, ROOM_PEOPLE(room), NULL, NULL, TO_CHAR | TO_ROOM | TO_SPAMMY | TO_QUEUE);
+						break;
 					}
 				}
 			}
-			else {
-				// finished working
-				act("$n finishes prospecting!", FALSE, worker, NULL, NULL, TO_ROOM | TO_SPAMMY | TO_QUEUE);
-			
-				// pass NULL for ch to init_mine so it just uses the empire
-				init_mine(room, NULL, emp);
-				set_room_extra_data(room, ROOM_EXTRA_PROSPECT_EMPIRE, EMPIRE_VNUM(emp));
-				remove_room_extra_data(room, ROOM_EXTRA_WORKFORCE_PROSPECT);
-				add_workforce_production_log(emp, WPLOG_PROSPECTED, 0, 1);
-			}
 		}
-		else if ((worker = place_chore_worker(emp, CHORE_PROSPECTING, room))) {
-			// fresh worker
-			charge_workforce(emp, CHORE_PROSPECTING, room, worker, 1, NOTHING, 0);
+		else {
+			// finished working
+			if (ROOM_PEOPLE(room)) {
+				act("A prospector finishes prospecting!", FALSE, ROOM_PEOPLE(room), NULL, NULL, TO_CHAR | TO_ROOM | TO_SPAMMY | TO_QUEUE);
+			}
+			
+			// pass NULL for ch to init_mine so it just uses the empire
+			init_mine(room, NULL, emp);
+			set_room_extra_data(room, ROOM_EXTRA_PROSPECT_EMPIRE, EMPIRE_VNUM(emp));
+			remove_room_extra_data(room, ROOM_EXTRA_WORKFORCE_PROSPECT);
 		}
 	}
-	else if (can_mine && !undetermined && !prospected_by_emp && !has_ore) {
+	else if (!undetermined && !prospected_by_emp && !has_ore) {
 		// empty -- just mark it for them
 		set_room_extra_data(room, ROOM_EXTRA_PROSPECT_EMPIRE, EMPIRE_VNUM(emp));
 		remove_room_extra_data(room, ROOM_EXTRA_WORKFORCE_PROSPECT);
 	}
-	else if (can_mine && !needs_prospect) {
+	else if (!needs_prospect) {
 		// actually do not need this error
 		// mark_workforce_delay(emp, room, CHORE_PROSPECTING, WF_PROB_ALREADY_PROSPECTED);
 	}
