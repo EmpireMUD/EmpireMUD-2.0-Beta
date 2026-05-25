@@ -1407,8 +1407,8 @@ void show_workforce_where(empire_data *emp, char_data *to, bool here, char *argu
 		total = 0;
 		
 		DL_FOREACH(EMPIRE_WORKFORCE_WHERE_LOG(emp), wwl) {
-			if (wwl->chore != only_chore || !wwl->mob) {
-				continue;	// wrong chore or no mob
+			if (wwl->chore != only_chore) {
+				continue;	// wrong chore
 			}
 			if (!(room = real_room(wwl->loc))) {
 				continue;	// no location
@@ -1419,7 +1419,12 @@ void show_workforce_where(empire_data *emp, char_data *to, bool here, char *argu
 			
 			// found
 			++total;
-			build_page_display(to, "%s %s: %s", coord_display_room(to, room, TRUE), skip_filler(get_room_name(room, FALSE)), GET_SHORT_DESC(wwl->mob));
+			if (wwl->mob) {
+				build_page_display(to, "%s %s: %s", coord_display_room(to, room, TRUE), skip_filler(get_room_name(room, FALSE)), GET_SHORT_DESC(wwl->mob));
+			}
+			else {
+				build_page_display(to, "%s %s", coord_display_room(to, room, TRUE), skip_filler(get_room_name(room, FALSE)));
+			}
 		}
 		if (total) {
 			build_page_display(to, " (%d total workers)", total);
@@ -1433,9 +1438,6 @@ void show_workforce_where(empire_data *emp, char_data *to, bool here, char *argu
 	else {	// SHOW ALL CHORES
 		// count up workforce mobs
 		DL_FOREACH(EMPIRE_WORKFORCE_WHERE_LOG(emp), wwl) {
-			if (!wwl->mob) {
-				continue;	// no mob?
-			}
 			if (!(room = real_room(wwl->loc))) {
 				continue;	// no location
 			}

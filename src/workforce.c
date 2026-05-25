@@ -620,6 +620,30 @@ void log_workforce_where(empire_data *emp, char_data *mob, int chore) {
 
 
 /**
+* Logs a location with no mob as having worked a chore during this cycle (these
+* logs are wiped during every cycle). To be used for chores like prospecting,
+* which do not spawn an NPC.
+*
+* @param empire_data *emp The empire to log to.
+* @param char_data *mob The mob who did the work.
+* @param int chore The CHORE_ performed.
+*/
+void log_workforce_where_no_mob(empire_data *emp, room_data *room, int chore) {
+	struct workforce_where_log *wwl;
+	
+	if (!emp || !room) {
+		return;	// no work
+	}
+	
+	CREATE(wwl, struct workforce_where_log, 1);
+	wwl->mob = NULL;
+	wwl->chore = chore;
+	wwl->loc = GET_ROOM_VNUM(room);
+	DL_APPEND(EMPIRE_WORKFORCE_WHERE_LOG(emp), wwl);
+}
+
+
+/**
 * When a mob is purged or loses its loyalty, call this to ensure it's not in
 * a 'workforce where' list.
 *
@@ -629,7 +653,7 @@ void log_workforce_where(empire_data *emp, char_data *mob, int chore) {
 void remove_from_workforce_where_log(empire_data *emp, char_data *mob) {
 	struct workforce_where_log *wwl, *next;
 	
-	if (emp) {
+	if (emp && mob) {
 		DL_FOREACH_SAFE(EMPIRE_WORKFORCE_WHERE_LOG(emp), wwl, next) {
 			if (wwl->mob == mob) {
 				DL_DELETE(EMPIRE_WORKFORCE_WHERE_LOG(emp), wwl);
@@ -847,6 +871,10 @@ void charge_workforce(empire_data *emp, int chore, room_data *room, char_data *w
 		
 		// log for workforce-where
 		log_workforce_where(emp, worker, chore);
+	}
+	else {
+		// no worker but can still log the location
+		log_workforce_where_no_mob(emp, room, chore);
 	}
 	
 	if (resource != NOTHING && room) {
