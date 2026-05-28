@@ -3881,6 +3881,11 @@ ACMD(do_abandon) {
 	confirm_arg_1 = !str_cmp(arg1, "confirm");
 	confirm = confirm_arg_1 || !str_cmp(arg2, "confirm");	// TRUE if they have the confirm arg
 	
+	if (confirm && !confirm_arg_1) {
+		// drop last arg (confirm) specifically for parse_room_from_coords below
+		strcpy(argument, arg1);
+	}
+	
 	if (!IS_APPROVED(ch) && config_get_bool("manage_empire_approval")) {
 		send_config_msg(ch, "need_approval_string");
 	}
