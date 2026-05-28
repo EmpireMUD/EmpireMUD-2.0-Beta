@@ -705,6 +705,9 @@ OLC_MODULE(mapedit_ruin) {
 	else if (*arg) {
 		msg_to_char(ch, "You don't see that here.\r\n");
 	}
+	else if (room != IN_ROOM(ch)) {
+		msg_to_char(ch, "You can't do that here. Ruin it from the main room or entrance.\r\n");
+	}
 	else if (GET_ROOM_VNUM(room) >= MAP_SIZE || !GET_BUILDING(room)) {
 		msg_to_char(ch, "You can only ruin map buildings and vehicles.\r\n");
 	}
