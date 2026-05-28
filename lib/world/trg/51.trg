@@ -547,7 +547,10 @@ L w 5103
 L w 5104
 shatter~
 eval target %%actor.obj_target(%arg.argument1%)%%
-if !%target%
+if !%arg%
+  %send% %actor% Shatter which piece of gear?
+  halt  
+elseif !%target%
   %send% %actor% You don't see that to shatter here.
   halt
 end
