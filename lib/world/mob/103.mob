@@ -133,12 +133,12 @@ S
 #10330
 wyvern wandering~
 a wandering wyvern~
-A wyvern is flying lazily above you.
+A wyvern is flying lazily above you. (difficulty)
 ~
 125 175 dgxyALM cm 6
 0 0 2 45 -1 -1
 D
-   Though it isn't the largest dragon on the landscape, this wyvern still cases
+   Though it isn't the largest dragon on the landscape, this wyvern still casts
 a long shadow as it soars. It seems lost, or perhaps like it's looking for
 somewhere new to settle.
 ~
@@ -148,26 +148,76 @@ I 1 10006 100.00 1  # SKIN: dragon scale
 I 4 10339 10.00 3  # LOOT: basket of dragonfruit
 I 4 10334 8.00 1 a  # LOOT: wyvern whistle
 I 4 10342 9.00 1 a  # LOOT: dragonscale wristguard pattern
+I+ 4 0  # Hard
+I+ 5 0  # Group
+I+ 6 0  # Boss
 I 4 10344 9.00 1 a  # LOOT: dragonscale bangles pattern
+I+ 4 0  # Hard
+I+ 5 0  # Group
+I+ 6 0  # Boss
 I 4 10346 9.00 1 a  # LOOT: dragonscale bracers pattern
+I+ 4 0  # Hard
+I+ 5 0  # Group
+I+ 6 0  # Boss
 I 4 10348 9.00 1 a  # LOOT: dragonscale saddle pattern
+I+ 4 0  # Hard
+I+ 5 0  # Group
+I+ 6 0  # Boss
 I 4 10349 8.00 1 a  # LOOT: unlucky adventurer's gloves
+I+ 4 0  # Hard
+I+ 5 0  # Group
+I+ 6 0  # Boss
 I 4 10350 8.00 1 a  # LOOT: unlucky adventurer's earrings
+I+ 4 0  # Hard
+I+ 5 0  # Group
+I+ 6 0  # Boss
 I 4 10351 8.00 1 a  # LOOT: unlucky adventurer's cloak
+I+ 4 0  # Hard
+I+ 5 0  # Group
+I+ 6 0  # Boss
 I 4 10352 8.00 1 a  # LOOT: unlucky adventurer's spellbook
+I+ 4 0  # Hard
+I+ 5 0  # Group
+I+ 6 0  # Boss
 I 4 10353 8.00 1 a  # LOOT: unlucky adventurer's dagger
+I+ 4 0  # Hard
+I+ 5 0  # Group
+I+ 6 0  # Boss
 I 4 10354 8.00 1 a  # LOOT: unlucky adventurer's shield
+I+ 4 0  # Hard
+I+ 5 0  # Group
+I+ 6 0  # Boss
 I 4 10355 8.00 1 a  # LOOT: effigy of an unlucky adventurer
+I+ 4 0  # Hard
+I+ 5 0  # Group
+I+ 6 0  # Boss
+M
+0
+$n flies in circles overhead.~
+M
+0
+$n casts a long shadow as $e soars.~
+M
+0
+$n spurts fire into the air.~
+M
+0
+$n eyes you warily.~
+M
+0
+$n swoops low, then soars back into the air.~
 T 10330
-T 10334
 T 10303
 T 10302
 T 10333
+T 10340
+T 10341
+T 10342
 S
 #10331
 dragon bull~
 a bull dragon~
-A bull dragon is stomping around.
+A bull dragon is stomping around. (difficulty)
 ~
 125 175 dgkxyALM c 6
 1 0 9 42 -1 -1
@@ -182,26 +232,73 @@ I 1 10006 100.00 1  # SKIN: dragon scale
 I 4 10339 10.00 3  # LOOT: basket of dragonfruit
 I 4 10337 8.00 1 a  # LOOT: dragon cowbell
 I 4 10342 9.00 1 a  # LOOT: dragonscale wristguard pattern
+I+ 4 0  # Hard
+I+ 5 0  # Group
+I+ 6 0  # Boss
 I 4 10344 9.00 1 a  # LOOT: dragonscale bangles pattern
+I+ 4 0  # Hard
+I+ 5 0  # Group
+I+ 6 0  # Boss
 I 4 10346 9.00 1 a  # LOOT: dragonscale bracers pattern
+I+ 4 0  # Hard
+I+ 5 0  # Group
+I+ 6 0  # Boss
 I 4 10348 9.00 1 a  # LOOT: dragonscale saddle pattern
+I+ 4 0  # Hard
+I+ 5 0  # Group
+I+ 6 0  # Boss
 I 4 10349 8.00 1 a  # LOOT: unlucky adventurer's gloves
+I+ 4 0  # Hard
+I+ 5 0  # Group
+I+ 6 0  # Boss
 I 4 10350 8.00 1 a  # LOOT: unlucky adventurer's earrings
+I+ 4 0  # Hard
+I+ 5 0  # Group
+I+ 6 0  # Boss
 I 4 10351 8.00 1 a  # LOOT: unlucky adventurer's cloak
+I+ 4 0  # Hard
+I+ 5 0  # Group
+I+ 6 0  # Boss
 I 4 10352 8.00 1 a  # LOOT: unlucky adventurer's spellbook
+I+ 4 0  # Hard
+I+ 5 0  # Group
+I+ 6 0  # Boss
 I 4 10353 8.00 1 a  # LOOT: unlucky adventurer's dagger
+I+ 4 0  # Hard
+I+ 5 0  # Group
+I+ 6 0  # Boss
 I 4 10354 8.00 1 a  # LOOT: unlucky adventurer's shield
+I+ 4 0  # Hard
+I+ 5 0  # Group
+I+ 6 0  # Boss
 I 4 10355 8.00 1 a  # LOOT: effigy of an unlucky adventurer
+I+ 4 0  # Hard
+I+ 5 0  # Group
+I+ 6 0  # Boss
+M
+0
+$n digs at the ground with $s massive claws.~
+M
+0
+$n spurts fire into the air.~
+M
+0
+$n eyes you warily.~
+M
+0
+$n rears up and flaps $s wings.~
 T 10330
 T 10303
-T 10334
 T 10302
 T 10333
+T 10340
+T 10341
+T 10342
 S
 #10332
 dragon guardian~
 a dragon guardian~
-A dragon guardian stands proudly before you.
+A dragon guardian stands proudly before you. (difficulty)
 ~
 125 175 dgxyALM cm 6
 0 0 2 44 -1 -1
@@ -216,26 +313,73 @@ I 1 10006 100.00 1  # SKIN: dragon scale
 I 4 10339 10.00 3  # LOOT: basket of dragonfruit
 I 4 10336 8.00 1 a  # LOOT: dragonguard stone
 I 4 10342 9.00 1 a  # LOOT: dragonscale wristguard pattern
+I+ 4 0  # Hard
+I+ 5 0  # Group
+I+ 6 0  # Boss
 I 4 10344 9.00 1 a  # LOOT: dragonscale bangles pattern
+I+ 4 0  # Hard
+I+ 5 0  # Group
+I+ 6 0  # Boss
 I 4 10346 9.00 1 a  # LOOT: dragonscale bracers pattern
+I+ 4 0  # Hard
+I+ 5 0  # Group
+I+ 6 0  # Boss
 I 4 10348 9.00 1 a  # LOOT: dragonscale saddle pattern
+I+ 4 0  # Hard
+I+ 5 0  # Group
+I+ 6 0  # Boss
 I 4 10349 8.00 1 a  # LOOT: unlucky adventurer's gloves
+I+ 4 0  # Hard
+I+ 5 0  # Group
+I+ 6 0  # Boss
 I 4 10350 8.00 1 a  # LOOT: unlucky adventurer's earrings
+I+ 4 0  # Hard
+I+ 5 0  # Group
+I+ 6 0  # Boss
 I 4 10351 8.00 1 a  # LOOT: unlucky adventurer's cloak
+I+ 4 0  # Hard
+I+ 5 0  # Group
+I+ 6 0  # Boss
 I 4 10352 8.00 1 a  # LOOT: unlucky adventurer's spellbook
+I+ 4 0  # Hard
+I+ 5 0  # Group
+I+ 6 0  # Boss
 I 4 10353 8.00 1 a  # LOOT: unlucky adventurer's dagger
+I+ 4 0  # Hard
+I+ 5 0  # Group
+I+ 6 0  # Boss
 I 4 10354 8.00 1 a  # LOOT: unlucky adventurer's shield
+I+ 4 0  # Hard
+I+ 5 0  # Group
+I+ 6 0  # Boss
 I 4 10355 8.00 1 a  # LOOT: effigy of an unlucky adventurer
+I+ 4 0  # Hard
+I+ 5 0  # Group
+I+ 6 0  # Boss
+M
+0
+$n sniffs at the air.~
+M
+0
+$n spurts fire into the air.~
+M
+0
+$n eyes you warily.~
+M
+0
+$n slams the ground with $s clawed fists.~
 T 10330
 T 10303
-T 10334
 T 10302
 T 10333
+T 10340
+T 10341
+T 10342
 S
 #10333
 dragon emerald~
 an emerald dragon~
-An emerald dragon is flying above you.
+An emerald dragon is flying above you. (difficulty)
 ~
 125 175 dgxyALM cm 6
 0 0 2 44 -1 -1
@@ -250,21 +394,68 @@ I 1 10006 100.00 1  # SKIN: dragon scale
 I 4 10339 10.00 3  # LOOT: basket of dragonfruit
 I 4 10335 8.00 1 a  # LOOT: emerald whistle
 I 4 10342 9.00 1 a  # LOOT: dragonscale wristguard pattern
+I+ 4 0  # Hard
+I+ 5 0  # Group
+I+ 6 0  # Boss
 I 4 10344 9.00 1 a  # LOOT: dragonscale bangles pattern
+I+ 4 0  # Hard
+I+ 5 0  # Group
+I+ 6 0  # Boss
 I 4 10346 9.00 1 a  # LOOT: dragonscale bracers pattern
+I+ 4 0  # Hard
+I+ 5 0  # Group
+I+ 6 0  # Boss
 I 4 10348 9.00 1 a  # LOOT: dragonscale saddle pattern
+I+ 4 0  # Hard
+I+ 5 0  # Group
+I+ 6 0  # Boss
 I 4 10349 8.00 1 a  # LOOT: unlucky adventurer's gloves
+I+ 4 0  # Hard
+I+ 5 0  # Group
+I+ 6 0  # Boss
 I 4 10350 8.00 1 a  # LOOT: unlucky adventurer's earrings
+I+ 4 0  # Hard
+I+ 5 0  # Group
+I+ 6 0  # Boss
 I 4 10351 8.00 1 a  # LOOT: unlucky adventurer's cloak
+I+ 4 0  # Hard
+I+ 5 0  # Group
+I+ 6 0  # Boss
 I 4 10352 8.00 1 a  # LOOT: unlucky adventurer's spellbook
+I+ 4 0  # Hard
+I+ 5 0  # Group
+I+ 6 0  # Boss
 I 4 10353 8.00 1 a  # LOOT: unlucky adventurer's dagger
+I+ 4 0  # Hard
+I+ 5 0  # Group
+I+ 6 0  # Boss
 I 4 10354 8.00 1 a  # LOOT: unlucky adventurer's shield
+I+ 4 0  # Hard
+I+ 5 0  # Group
+I+ 6 0  # Boss
 I 4 10355 8.00 1 a  # LOOT: effigy of an unlucky adventurer
+I+ 4 0  # Hard
+I+ 5 0  # Group
+I+ 6 0  # Boss
+M
+0
+$n flies in circles overhead.~
+M
+0
+$n spurts fire into the air.~
+M
+0
+$n eyes you warily.~
+M
+0
+$n swoops low, then soars back into the air.~
 T 10330
 T 10303
-T 10334
 T 10302
 T 10333
+T 10340
+T 10341
+T 10342
 S
 #10334
 wyvern baby~

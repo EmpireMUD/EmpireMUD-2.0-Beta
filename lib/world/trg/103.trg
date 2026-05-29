@@ -185,7 +185,11 @@ end
 ~
 #10303
 Flame Dragon delay-completer~
-0 f 100 1
+0 f 100 5
+L b 10330
+L b 10331
+L b 10332
+L b 10333
 L c 10316
 ~
 if %instance.start%
@@ -195,6 +199,26 @@ if %instance.start%
 else
   %adventurecomplete%
 end
+* add death cry
+switch %self.vnum%
+  case 10330
+    * Wandering Wyvern
+    %regionecho% %self.room% 50 An ear-piercing screech deafens the land as a great wyvern dies!
+  break
+  case 10331
+    * Bull Dragon
+    %regionecho% %self.room% 50 A deep, guttural wail rolls over the land as a bull dragon dies!
+  break
+  case 10332
+    * Dragon Guardian
+    %regionecho% %self.room% 50 A deep roar of anguish shakes the land as a dragon guardian dies!
+  break
+  case 10333
+    * Emerald Dragon
+    %regionecho% %self.room% -50 The sky turns green for a moment as the death cry of an emerald dragon pierces the air!
+  break
+done
+return 0
 ~
 #10304
 Flame Dragon environmental~
@@ -284,9 +308,13 @@ if %actor.is_pc% && %actor.empire%
 end
 ~
 #10334
-Abandoned Dragon animation~
+Abandoned Dragon animation (deprecated)~
 0 bw 5 0
 ~
+* replaced by custom strings
+detach 10334 %self.id%
+halt
+*
 if (%self.fighting% || %self.disabled%)
   halt
 end
@@ -409,6 +437,107 @@ if (%mob% && %mob.vnum% == %self.val0%)
   %echoaround% %actor% ~%actor% uses @%self% and ~%mob% appears!
 end
 %purge% %self%
+~
+#10340
+Wandering Dragon: Dragon setup~
+0 n 100 1
+L w 10340
+~
+dg_affect #10340 %self% !ATTACK on -1
+mmove
+~
+#10341
+Wandering Dragon: Message when attacking before diff-sel~
+0 B 0 1
+L f 10341
+~
+if %self.aff_flagged(!ATTACK)%
+  %echoaround% %actor% ~%actor% considers attacking ~%self%...
+  %echo% ~%self% spews fire into the air, taunting ~%actor%!
+  %send% %actor% You need to choose a difficulty before you can fight ~%self%.
+  %send% %actor% Usage: difficulty <normal \| hard \| group \| boss>
+  return 0
+else
+  * no need for this script anymore
+  detach 10341 %self.id%
+  return 1
+end
+~
+#10342
+Wandering Dragon: Single-mob difficulty selector~
+0 c 0 4
+L b 10330
+L b 10331
+L b 10332
+L b 10333
+difficulty~
+if !%arg% 
+  %send% %actor% You must specify a level of difficulty. (Normal, Hard, Group, or Boss)
+  return 1
+  halt
+end
+if %self.fighting%
+  %send% %actor% You can't change |%self% difficulty while &%self% is in combat!
+  return 1
+  halt
+end
+if normal /= %arg%
+  set difficulty 1
+  set str normal
+elseif hard /= %arg%
+  set difficulty 2
+  set str hard
+elseif group /= %arg%
+  set difficulty 3
+  set str group
+elseif boss /= %arg%
+  set difficulty 4
+  set str boss
+else
+  %send% %actor% That is not a valid difficulty level for this adventure. (Normal, Hard, Group, or Boss)
+  halt
+  return 1
+end
+* messaging
+%send% %actor% You set the difficulty to %str%...
+%echoaround% %actor% ~%actor% sets the difficulty to %str%...
+* Clear existing difficulty flags and set new ones.
+set mob %self%
+nop %mob.remove_mob_flag(HARD)%
+nop %mob.remove_mob_flag(GROUP)%
+if %difficulty% == 1
+  * Then we don't need to do anything
+elseif %difficulty% == 2
+  nop %mob.add_mob_flag(HARD)%
+elseif %difficulty% == 3
+  nop %mob.add_mob_flag(GROUP)%
+elseif %difficulty% == 4
+  nop %mob.add_mob_flag(HARD)%
+  nop %mob.add_mob_flag(GROUP)%
+end
+%restore% %mob%
+wait 1
+if %mob.aff_flagged(!ATTACK)%
+  dg_affect #10340 %mob% off
+  switch %mob.vnum%
+    case 10330
+      * Wandering Wyvern
+      %echo% ~%self% swoops low and blasts flame across the sky!
+    break
+    case 10331
+      * Bull Dragon
+      %echo% ~%self% fumes with smoke as &%self% prepares to charge!
+    break
+    case 10332
+      * Dragon Guardian
+      %echo% ~%self% extends ^%self% talons and prepares to defend!
+    break
+    case 10333
+      * Emerald Dragon
+      %echo% Green light blinds you as ~%self% swoops low!
+    break
+  done
+end
 ~
 #10370
 Uninvited Guest: Delayed despawn box~
