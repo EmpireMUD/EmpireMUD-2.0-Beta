@@ -3352,6 +3352,7 @@ void do_stat_character(char_data *ch, char_data *k, bool details) {
 	struct over_time_effect_type *dot;
 	struct affected_type *aff;
 	archetype_data *arch;
+	struct instance_data *inst, *inst_iter;
 	struct page_display *line;
 	
 	bool is_proto = (IS_NPC(k) && k == mob_proto(GET_MOB_VNUM(k)));
@@ -3578,6 +3579,25 @@ void do_stat_character(char_data *ch, char_data *k, bool details) {
 
 		if (*lbuf) {
 			build_page_display_str(ch, lbuf);
+		}
+		
+		// instance?
+		if (MOB_INSTANCE_ID(k) != NOTHING) {
+			if ((inst = get_instance_by_id(MOB_INSTANCE_ID(k)))) {
+				// detect instance number
+				count = 0;
+				DL_FOREACH(instance_list, inst_iter) {
+					++count;
+					if (inst_iter == inst) {
+						break;	// found
+					}
+				}
+				
+				build_page_display(ch, "Instance: \tc%d\t0 at [%d] (%d, %d), Adventure: [\tc%d\tc] \ty%s\t0", count, GET_ROOM_VNUM(inst->location), X_COORD(inst->location), Y_COORD(inst->location), (inst->adventure ? GET_ADV_VNUM(inst->adventure) : -1), (inst->adventure ? GET_ADV_NAME(inst->adventure) : "UNKNOWN"));
+			}
+			else {
+				build_page_display(ch, "Instance: \trbad instance id %d\t0", MOB_INSTANCE_ID(k));
+			}
 		}
 	}
 
