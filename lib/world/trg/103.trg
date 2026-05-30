@@ -438,31 +438,6 @@ if (%mob% && %mob.vnum% == %self.val0%)
 end
 %purge% %self%
 ~
-#10340
-Wandering Dragon: Dragon setup~
-0 n 100 1
-L w 10340
-~
-dg_affect #10340 %self% !ATTACK on -1
-mmove
-~
-#10341
-Wandering Dragon: Message when attacking before diff-sel~
-0 B 0 1
-L f 10341
-~
-if %self.aff_flagged(!ATTACK)%
-  %echoaround% %actor% ~%actor% considers attacking ~%self%...
-  %echo% ~%self% spews fire into the air, taunting ~%actor%!
-  %send% %actor% You need to choose a difficulty before you can fight ~%self%.
-  %send% %actor% Usage: difficulty <normal \| hard \| group \| boss>
-  return 0
-else
-  * no need for this script anymore
-  detach 10341 %self.id%
-  return 1
-end
-~
 #10342
 Wandering Dragon: Single-mob difficulty selector~
 0 c 0 4
@@ -471,7 +446,7 @@ L b 10331
 L b 10332
 L b 10333
 difficulty~
-if !%arg% 
+if !%arg%
   %send% %actor% You must specify a level of difficulty. (Normal, Hard, Group, or Boss)
   return 1
   halt
@@ -517,27 +492,25 @@ elseif %difficulty% == 4
 end
 %restore% %mob%
 wait 1
-if %mob.aff_flagged(!ATTACK)%
-  dg_affect #10340 %mob% off
-  switch %mob.vnum%
-    case 10330
-      * Wandering Wyvern
-      %echo% ~%self% swoops low and blasts flame across the sky!
-    break
-    case 10331
-      * Bull Dragon
-      %echo% ~%self% fumes with smoke as &%self% prepares to charge!
-    break
-    case 10332
-      * Dragon Guardian
-      %echo% ~%self% extends ^%self% talons and prepares to defend!
-    break
-    case 10333
-      * Emerald Dragon
-      %echo% Green light blinds you as ~%self% swoops low!
-    break
-  done
-end
+dg_affect %mob% !ATTACK off
+switch %mob.vnum%
+  case 10330
+    * Wandering Wyvern
+    %echo% ~%self% swoops low and blasts flame across the sky!
+  break
+  case 10331
+    * Bull Dragon
+    %echo% ~%self% fumes with smoke as &%self% prepares to charge!
+  break
+  case 10332
+    * Dragon Guardian
+    %echo% ~%self% extends ^%self% talons and prepares to defend!
+  break
+  case 10333
+    * Emerald Dragon
+    %echo% Green light blinds you as ~%self% swoops low!
+  break
+done
 ~
 #10370
 Uninvited Guest: Delayed despawn box~

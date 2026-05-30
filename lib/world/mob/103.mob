@@ -141,6 +141,7 @@ D
    Though it isn't the largest dragon on the landscape, this wyvern still casts
 a long shadow as it soars. It seems lost, or perhaps like it's looking for
 somewhere new to settle.
+Set difficulty with: difficulty <normal | hard | group | boss>
 ~
 I 0 3012 100.00 4  # BUTCHER: fillet of raw meat
 I 1 1351 100.00 2  # SKIN: large skin
@@ -210,8 +211,6 @@ T 10330
 T 10303
 T 10302
 T 10333
-T 10340
-T 10341
 T 10342
 S
 #10331
@@ -225,6 +224,7 @@ D
    Though it has wings, the bull dragon seems to spend more of its time on the
 ground as it roots through dirt and plants alike. It seems like it might be
 lost.
+Set difficulty with: difficulty <normal | hard | group | boss>
 ~
 I 0 3012 100.00 4  # BUTCHER: fillet of raw meat
 I 1 1351 100.00 2  # SKIN: large skin
@@ -291,8 +291,6 @@ T 10330
 T 10303
 T 10302
 T 10333
-T 10340
-T 10341
 T 10342
 S
 #10332
@@ -306,6 +304,7 @@ D
    Unlike most dragons, the guardian stands on its hind legs with its front
 claws and tremendous teeth poised to attack. It looks a bit lost here, and that
 has made it all the more fearsome.
+Set difficulty with: difficulty <normal | hard | group | boss>
 ~
 I 0 3012 100.00 4  # BUTCHER: fillet of raw meat
 I 1 1351 100.00 2  # SKIN: large skin
@@ -372,8 +371,6 @@ T 10330
 T 10303
 T 10302
 T 10333
-T 10340
-T 10341
 T 10342
 S
 #10333
@@ -387,6 +384,7 @@ D
    This shimmering green dragon's translucent scales have all the luster of
 emeralds. It casts a brilliant green shadow as it flies across the sky, but it
 seems like it might be lost.
+Set difficulty with: difficulty <normal | hard | group | boss>
 ~
 I 0 3012 100.00 4  # BUTCHER: fillet of raw meat
 I 1 1351 100.00 2  # SKIN: large skin
@@ -453,8 +451,6 @@ T 10330
 T 10303
 T 10302
 T 10333
-T 10340
-T 10341
 T 10342
 S
 #10334
