@@ -7,6 +7,75 @@ if %actor.is_pc% && %actor.empire%
   nop %actor.empire.start_progress(10900)%
 end
 ~
+#10901
+Colossal Red Dragon and Sir Vivor difficulty selector~
+0 c 0 2
+L b 10900
+L b 10901
+difficulty~
+if !%arg%
+  %send% %actor% You must specify a level of difficulty. (Normal, Hard, Group, or Boss)
+  return 1
+  halt
+elseif %self.fighting%
+  %send% %actor% You can't change |%self% difficulty while &%self% is in combat!
+  return 1
+  halt
+elseif %self.disabled%
+  %send% %actor% You can't change |%self% difficulty right now.
+  return 1
+  halt
+end
+if normal /= %arg%
+  set difficulty 1
+  set str normal
+elseif hard /= %arg%
+  set difficulty 2
+  set str hard
+elseif group /= %arg%
+  set difficulty 3
+  set str group
+elseif boss /= %arg%
+  set difficulty 4
+  set str boss
+else
+  %send% %actor% That is not a valid difficulty level for this adventure. (Normal, Hard, Group, or Boss)
+  halt
+  return 1
+end
+* messaging
+%send% %actor% You set the difficulty to %str%...
+%echoaround% %actor% ~%actor% sets the difficulty to %str%...
+* Clear existing difficulty flags and set new ones.
+nop %self.remove_mob_flag(HARD)%
+nop %self.remove_mob_flag(GROUP)%
+if %difficulty% == 1
+  * Then we don't need to do anything
+elseif %difficulty% == 2
+  nop %self.add_mob_flag(HARD)%
+elseif %difficulty% == 3
+  nop %self.add_mob_flag(GROUP)%
+elseif %difficulty% == 4
+  nop %self.add_mob_flag(HARD)%
+  nop %self.add_mob_flag(GROUP)%
+end
+%restore% %self%
+wait 1
+* in case
+dg_affect %self% !ATTACK off
+* alert
+switch %self.vnum%
+  case 10900
+    * colossal red dragon
+    %echo% ~%self% opens ^%self% mouth wide...
+    %regionecho% %self.room% 10 A colossal roar rattles across the land!
+  break
+  case 10901
+    * Sir Vivor
+    say Oh, is that how it's going to be? Alright, have at me, then!
+  break
+done
+~
 #10902
 Colossal Dragon knight/thief random move~
 0 n 100 1

@@ -1,7 +1,7 @@
 #10900
 dragon red colossal collosal collossal colosal~
 a colossal red dragon~
-A colossal red dragon looms over you!
+A colossal red dragon looms over you! (difficulty)
 ~
 250 300 bdgxyzABL cmE 6
 2 0 2 44 -1 -1
@@ -9,6 +9,7 @@ D
    Towering over you like a scaly red keep, the dragon simultaneously chills
 you to the bone and brings your skin blisteringly close to burning. Perhaps she
 hasn't seen you yet...
+Set difficulty with: difficulty <normal | hard | group | boss>
 ~
 I 0 10907 75.00 2  # BUTCHER: raw dragon steak
 I 0 10907 75.00 2  # BUTCHER: raw dragon steak
@@ -29,18 +30,31 @@ I 4 10904 4.00 1 e  # LOOT: crimson serpent egg
 I 4 10905 2.00 1 e  # LOOT: crimson dragon egg
 I 4 10906 2.00 1 e  # LOOT: sea dragon egg
 I 4 10910 7.69 1 g  # LOOT: dragonsteel warhammer
+I+ 6 0  # Boss
 I 4 10911 7.69 1 g  # LOOT: dragonsteel claymore
+I+ 6 0  # Boss
 I 4 10912 7.69 1 g  # LOOT: dragonbone mace
+I+ 6 0  # Boss
 I 4 10913 7.69 1 g  # LOOT: flaming draconic wand
+I+ 6 0  # Boss
 I 4 10914 7.69 1 g  # LOOT: flaming dragonbone staff
+I+ 6 0  # Boss
 I 4 10915 7.69 1 g  # LOOT: dragonbone wristblade
+I+ 6 0  # Boss
 I 4 10916 7.69 1 g  # LOOT: dragonbone tower shield
+I+ 6 0  # Boss
 I 4 10917 7.69 1 g  # LOOT: flaming red dragon charm
+I+ 6 0  # Boss
 I 4 10918 7.69 1 g  # LOOT: tome of dragonkind
+I+ 6 0  # Boss
 I 4 10919 7.69 1 g  # LOOT: crimson dragon girdle
+I+ 6 0  # Boss
 I 4 10920 7.70 1 g  # LOOT: burning dragonsteel waistband
+I+ 6 0  # Boss
 I 4 10921 7.70 1 g  # LOOT: flaming draconic cincture
+I+ 6 0  # Boss
 I 4 10922 7.70 1 g  # LOOT: burning dragoncloth sash
+I+ 6 0  # Boss
 M
 0
 $n coils around her hoard.~
@@ -59,11 +73,12 @@ T 10908
 T 10915
 T 10919
 T 10909
+T 10901
 S
 #10901
 Sir Vivor~
 Sir Vivor~
-Sir Vivor is glancing around nervously.
+Sir Vivor is glancing around nervously. (difficulty)
 ~
 250 300 bdkvxyzABIL cE 3
 1 0 0 1 -1 -1
@@ -71,6 +86,7 @@ D
    Rarely have these lands seen a man so gallant as this. His armor gleams even
 in the low light of the fire and his stark white teeth and protruding chin are
 the very definition of handsomeness. At least, according to his biography.
+Set difficulty with: difficulty <normal | hard | group | boss>
 ~
 I 4 10907 75.00 2  # LOOT: raw dragon steak
 I 4 10907 75.00 2  # LOOT: raw dragon steak
@@ -85,18 +101,31 @@ I 4 10904 4.00 1 e  # LOOT: crimson serpent egg
 I 4 10905 2.00 1 e  # LOOT: crimson dragon egg
 I 4 10906 2.00 1 e  # LOOT: sea dragon egg
 I 4 10910 7.69 1 g  # LOOT: dragonsteel warhammer
+I+ 6 0  # Boss
 I 4 10911 7.69 1 g  # LOOT: dragonsteel claymore
+I+ 6 0  # Boss
 I 4 10912 7.69 1 g  # LOOT: dragonbone mace
+I+ 6 0  # Boss
 I 4 10913 7.69 1 g  # LOOT: flaming draconic wand
+I+ 6 0  # Boss
 I 4 10914 7.69 1 g  # LOOT: flaming dragonbone staff
+I+ 6 0  # Boss
 I 4 10915 7.69 1 g  # LOOT: dragonbone wristblade
+I+ 6 0  # Boss
 I 4 10916 7.69 1 g  # LOOT: dragonbone tower shield
+I+ 6 0  # Boss
 I 4 10917 7.69 1 g  # LOOT: flaming red dragon charm
+I+ 6 0  # Boss
 I 4 10918 7.69 1 g  # LOOT: tome of dragonkind
+I+ 6 0  # Boss
 I 4 10919 7.69 1 g  # LOOT: crimson dragon girdle
+I+ 6 0  # Boss
 I 4 10920 7.70 1 g  # LOOT: burning dragonsteel waistband
+I+ 6 0  # Boss
 I 4 10921 7.70 1 g  # LOOT: flaming draconic cincture
+I+ 6 0  # Boss
 I 4 10922 7.70 1 g  # LOOT: burning dragoncloth sash
+I+ 6 0  # Boss
 I 4 10902 25.00 1 s  # LOOT: red dragon hide
 I 4 10902 25.00 2 s  # LOOT: red dragon hide
 I 4 10902 25.00 3 s  # LOOT: red dragon hide
@@ -119,6 +148,7 @@ T 10910
 T 10908
 T 10911
 T 10909
+T 10901
 S
 #10902
 Bangles thief nervous~
