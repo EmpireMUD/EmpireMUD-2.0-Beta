@@ -117,11 +117,10 @@ L e 12303
 L j 12300
 difficulty~
 if !%arg%
-  %send% %actor% You must specify a level of difficulty. (Hard, Group, or Boss)
+  %send% %actor% You must specify a level of difficulty. (Normal, Hard, Group, or Boss)
   return 1
   halt
-end
-if %self.fighting%
+elseif %self.fighting%
   %send% %actor% You can't change |%self% difficulty while &%self% is in combat!
   return 1
   halt
@@ -130,14 +129,16 @@ elseif %self.disabled%
   return 1
   halt
 end
-if hard /= %arg%
+if normal /= %arg%
+  set difficulty 1
+elseif hard /= %arg%
   set difficulty 2
 elseif group /= %arg%
   set difficulty 3
 elseif boss /= %arg%
   set difficulty 4
 else
-  %send% %actor% That is not a valid difficulty level for this adventure. (Hard, Group, or Boss)
+  %send% %actor% That is not a valid difficulty level for this adventure. (Normal, Hard, Group, or Boss)
   return 1
   halt
 end
@@ -234,10 +235,11 @@ else
 end
 set person %self.room.people%
 while %person%
+  set next %person.next_in_room%
   if %person.vnum% == 12318
     %purge% %person%
   end
-  set person %person.next_in_room%
+  set person %next%
 done
 ~
 #12308
@@ -471,9 +473,11 @@ else
   end
   * restringing: add to the look desc
   %mod% %self% append-lookdesc It looks like the last owner's fateful encounter with a fur dragon has left it a bit %adjective%.
-  set keywords %self.keywords%
-  %mod% %self% append-lookdesc-noformat Type 'study %keywords.car%' to take it apart and learn to craft it.
-  %mod% %self% append-lookdesc-noformat (Be sure to 'keep' any copies of it you don't want to lose.)
+  if %item.is_flagged(HARD-DROP)% || %item.is_flagged(GROUP-DROP)%
+    set keywords %self.keywords%
+    %mod% %self% append-lookdesc-noformat Type 'study %keywords.car%' to take it apart and learn to craft it.
+    %mod% %self% append-lookdesc-noformat (Be sure to 'keep' any copies of it you don't want to lose.)
+  end
   * add study script
   attach 12316 %self.id%
 end
@@ -494,6 +498,10 @@ if !%arg%
 elseif %actor.obj_target_inv(%arg%)% != %self%
   * possibly trying to study something else
   return 0
+  halt
+elseif !%item.is_flagged(HARD-DROP)% && !%item.is_flagged(GROUP-DROP)%
+  * Normal
+  %send% %actor% @%self% is too damaged to learn anything of use.
   halt
 elseif !%actor.empire%
   %send% %actor% You need to be in an empire to do this. Only members of your empire will be able to use the notes.

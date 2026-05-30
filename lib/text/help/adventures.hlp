@@ -145,6 +145,10 @@ mangled, and downright tattered gear that the fur dragon has collected from
 other adventurers, you can create crafting patterns for those same items.
 Studying consumes at least one of the items, depending on the item's quality.
 
+You can fight this dragon on any difficulty (normal, hard, group, boss) but
+some of the loot requires you to complete it at the original difficulty of
+"hard" or higher. Studying only works with "hard" or higher, as well.
+
 See also: ADVENTURE
 #
 GIANT GIANT! "HILL GIANT" "RIVER GIANT" "DUNE GIANT"
@@ -1045,7 +1049,7 @@ A muck dragon is roamings the swamps. These dragons are large, slimy, and
 particularly vicious. Fortunately, they never leave the water. Perhaps if you
 slay the dragon, you can take its riches for yourself.
 
-You can fight this dragons on any difficulty (normal, hard, group, boss) but
+You can fight this dragon on any difficulty (normal, hard, group, boss) but
 the most valuable loot requires you to complete it at the original difficulty
 of "group" or higher.
 
