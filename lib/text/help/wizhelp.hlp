@@ -1274,6 +1274,7 @@ Mode         Level    Description
 &c learned&0     Immort   Learned recipes for a player.
 &c libraries&0   Immort   Where a book is shelved.
 &c lostbooks&0   Immort   Books that are not shelved in any libraries.
+&c lostmobs&0    Immort   Adventure mobs that lost their instance.
 &c minipets&0    Immort   Minipets collected by a player.
 &c moons&0       Immort   Moons and their current phases/positions.
 &c mounts&0      Immort   Mounts owned by a player.
@@ -1522,6 +1523,23 @@ Shows you the recipes learned by a player or empire. For multi-word empire
 names, use "quotation marks".
 
 See also: SET LEARNED
+#e
+"SHOW LOSTMOBS" "SHOW LOST MOBS"
+
+Usage:  show lostmobs
+
+Finds adventure mobs that have slipped free of their instances.
+
+This specifically looks for mobs that:
+- have an instance ID
+- the ID does not correspond to an active instance
+
+This should be a rare case and usually these mobs can be safely purged.
+
+View a mob's instance information by using the 'stat' command on it; this
+section only appears if the mob has an instance ID.
+
+See also: PURGE, STAT
 #e
 "SHOW MINIPETS" "SHOW MINI-PETS"
 

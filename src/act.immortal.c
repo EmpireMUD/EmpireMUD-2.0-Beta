@@ -3593,7 +3593,7 @@ void do_stat_character(char_data *ch, char_data *k, bool details) {
 					}
 				}
 				
-				build_page_display(ch, "Instance: \tc%d\t0 at [%d] (%d, %d), Adventure: [\tc%d\tc] \ty%s\t0", count, GET_ROOM_VNUM(inst->location), X_COORD(inst->location), Y_COORD(inst->location), (inst->adventure ? GET_ADV_VNUM(inst->adventure) : -1), (inst->adventure ? GET_ADV_NAME(inst->adventure) : "UNKNOWN"));
+				build_page_display(ch, "Instance: \tc%d\t0 at [%d] (%d, %d), Adventure: [\tc%d\t0] \ty%s\t0", count, GET_ROOM_VNUM(inst->location), X_COORD(inst->location), Y_COORD(inst->location), (inst->adventure ? GET_ADV_VNUM(inst->adventure) : -1), (inst->adventure ? GET_ADV_NAME(inst->adventure) : "UNKNOWN"));
 			}
 			else {
 				build_page_display(ch, "Instance: \trbad instance id %d\t0", MOB_INSTANCE_ID(k));
