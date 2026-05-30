@@ -11,10 +11,12 @@ covered with fur from snout to tail. If it can fly, you don't see where the
 wings would be. Its eyes, huge yellow orbs with thin black slits for pupils,
 watch you as you watch them. Its ears follow you as you move, and it seems
 hungry.
-To fight it, type: difficulty <Hard | Group | Boss>
+To fight it, type: difficulty <Normal | Hard | Group | Boss>
 ~
 I 0 10907 100.00 4  # BUTCHER: raw dragon steak
 I 1 12310 100.00 8  # SKIN: fur dragon pelt
+I 1 10006 33.33 1  # SKIN: dragon scale
+I+ 3 0  # Normal
 I 1 10006 66.66 1  # SKIN: dragon scale
 I+ 4 0  # Hard
 I 1 10006 66.66 1 s  # SKIN: dragon scale
