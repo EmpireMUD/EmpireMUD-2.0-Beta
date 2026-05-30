@@ -645,7 +645,7 @@ wait 1
 * in case
 dg_affect %self% !ATTACK off
 * alert
-%echo% ~%self% opens its mouth wide...
+%echo% ~%self% opens ^%self% mouth wide...
 %regionecho% %self.room% 10 A gurgling roar shakes the entire landscape!
 ~
 #10956
