@@ -125,6 +125,10 @@ if %self.fighting%
   %send% %actor% You can't change |%self% difficulty while &%self% is in combat!
   return 1
   halt
+elseif %self.disabled%
+  %send% %actor% You can't change |%self% difficulty right now.
+  return 1
+  halt
 end
 if hard /= %arg%
   set difficulty 2
@@ -1188,6 +1192,10 @@ if !%arg%
 end
 if %self.fighting%
   %send% %actor% You can't change |%self% difficulty while &%self% is in combat!
+  return 1
+  halt
+elseif %self.disabled%
+  %send% %actor% You can't change |%self% difficulty right now.
   return 1
   halt
 end
