@@ -1,6 +1,6 @@
 #10800
 Pageboy spawn~
-0 n 100
+0 n 100 0
 ~
 if (!%instance.location%)
   halt
@@ -13,14 +13,14 @@ end
 ~
 #10801
 Give rejection~
-0 j 100
+0 j 100 0
 ~
 %send% %actor% You can't give items to ~%self%. Try "quest finish <name>" instead.
 return 0
 ~
 #10802
 Pageboy shout~
-0 ab 1
+0 ab 1 0
 ~
 if %random.3% == 3
   %regionecho% %self.room% 20 ~%self% shouts, 'Learn the Empire skill at the (^^) Royal Planning Office!'
@@ -28,7 +28,7 @@ end
 ~
 #10803
 imperial ring: setup on load~
-1 n 100
+1 n 100 0
 ~
 set pers %self.carried_by%
 if %pers%
@@ -47,7 +47,7 @@ end
 ~
 #10804
 imperial ring: bind-to-empire~
-1 j 0
+1 j 0 0
 ~
 if !%empire%
   %send% %actor% @%self% can't be used anymore.
@@ -70,7 +70,7 @@ return 1
 ~
 #10825
 Crier spawn~
-0 n 100
+0 n 100 0
 ~
 if (!%instance.location%)
   halt
@@ -83,14 +83,14 @@ end
 ~
 #10826
 Give rejection~
-0 j 100
+0 j 100 0
 ~
 %send% %actor% You can't give items to ~%self%. Try "quest finish <name>" instead.
 return 0
 ~
 #10827
 Crier Shout~
-0 ab 1
+0 ab 1 0
 ~
 if %random.3% == 3
   %regionecho% %self.room% 20 ~%self% shouts, 'Learn the Trade skill at the &&y/()\\ &&0Museum of Early Man!'
@@ -98,7 +98,7 @@ end
 ~
 #10828
 Curator environment~
-0 bw 5
+0 bw 5 0
 ~
 switch %random.4%
   case 1
@@ -117,7 +117,8 @@ done
 ~
 #10829
 Cave Phase 2 Linker~
-2 n 100
+2 n 100 1
+L f 10829
 ~
 if !%instance.id%
   halt
@@ -130,7 +131,9 @@ detach 10829 %room.id%
 ~
 #10830
 Cave Phase 2 Teleporter~
-2 g 100
+2 g 100 2
+L j 10826
+L t 10835
 ~
 if (%actor.is_pc% && %actor.completed_quest(10835)%)
   %teleport% %actor% i10826
@@ -143,13 +146,15 @@ end
 ~
 #10837
 Start Grandmaster's Journey~
-2 u 0
+2 u 0 1
+L c 10837
 ~
 %load% obj 10837 %actor%
 ~
 #10850
 Soulstream: Shared load trigger for mobs~
-0 n 100
+0 n 100 1
+L b 10862
 ~
 if %self.vnum% == 10862
   * outside greeter
@@ -161,12 +166,15 @@ else
   * inside mobs
   * Mob will appear via its greet trig later
   nop %self.add_mob_flag(SILENT)%
-  dg_affect %self% !SEE on -1
+  dg_affect %self% NO-SEE-IN-ROOM on -1
 end
 ~
 #10851
 Detect Ritual of Burdens~
-2 p 100
+2 p 100 3
+L o 163
+L t 10851
+L w 3052
 ~
 if (%ability% != 163 || !%actor.on_quest(10851)%)
   halt
@@ -188,7 +196,11 @@ done
 ~
 #10853
 Soulstream: Shared quest start (give item)~
-2 u 100
+2 u 100 4
+L c 10853
+L c 10862
+L t 10853
+L t 10862
 ~
 switch %questvnum%
   case 10853
@@ -201,7 +213,9 @@ done
 ~
 #10854
 Detect Heal~
-0 c 0
+0 c 0 2
+L o 109
+L t 10854
 heal~
 if ((!%self.is_name(%arg%)% && %actor.char_target(%arg%)% != %self%) || !%actor.ability(Heal)% || !%actor.on_quest(10854)%)
   return 0
@@ -214,7 +228,8 @@ return 1
 ~
 #10855
 Detect Sneak on Leave~
-0 s 100
+0 s 100 1
+L t 10855
 ~
 if %actor.on_quest(10855)% && !%actor.quest_triggered(10855)%
   if %actor.aff_flagged(SNEAK)%
@@ -232,7 +247,10 @@ end
 ~
 #10856
 Sneak tutorial: EZ-Sneak~
-0 c 0
+0 c 0 3
+L c 9680
+L o 29
+L t 10855
 sneak~
 return 0
 if !%arg%
@@ -263,7 +281,7 @@ end
 ~
 #10857
 Start Blood Tutorial~
-2 u 100
+2 u 100 0
 ~
 if (%actor.blood% >= (%actor.maxblood% - 5))
   * Ensure not at full blood by taking a little
@@ -274,7 +292,10 @@ remote bloodamt %actor.id%
 ~
 #10858
 Detect Full Blood + Soulstream Entry~
-2 g 100
+2 g 100 3
+L j 10850
+L t 10850
+L t 10857
 ~
 * Detect full blood
 if (%actor.on_quest(10857)% && %actor.varexists(bloodamt)%)
@@ -301,7 +322,8 @@ end
 ~
 #10859
 Convert Spirit Token~
-1 gh 100
+1 gh 100 1
+L w 10852
 ~
 %send% %actor% Your spirit token vanishes and can now be found on the 'coins' command.
 %actor.give_currency(10852,1)%
@@ -310,7 +332,21 @@ return 0
 ~
 #10860
 Soulstream Mob Show/Hide~
-0 h 100
+0 h 100 14
+L b 10851
+L b 10852
+L b 10853
+L b 10854
+L b 10855
+L b 10857
+L b 10858
+L q 0
+L q 2
+L q 3
+L q 4
+L q 5
+L q 6
+L q 7
 ~
 if %actor.is_npc%
   halt
@@ -354,19 +390,20 @@ while %person%
   end
   set person %person.next_in_room%
 done
-if %count% > 0 && %self.aff_flagged(!SEE)%
+if %count% > 0 && %self.aff_flagged(NO-SEE-IN-ROOM)%
   nop %self.remove_mob_flag(SILENT)%
-  dg_affect %self% !SEE off
+  dg_affect %self% NO-SEE-IN-ROOM off
   %echo% ~%self% appears from deep in the soulstream!
-elseif %count% == 0 && !%self.aff_flagged(!SEE)%
+elseif %count% == 0 && !%self.aff_flagged(NO-SEE-IN-ROOM)%
   %echo% ~%self% vanishes into the soulstream.
   nop %self.add_mob_flag(SILENT)%
-  dg_affect %self% !SEE on -1
+  dg_affect %self% NO-SEE-IN-ROOM on -1
 end
 ~
 #10861
 Detect Sneak on Greet~
-0 h 100
+0 h 100 1
+L t 10855
 ~
 if %actor.on_quest(10855)% && !%actor.quest_triggered(10855)%
   if %actor.aff_flagged(SNEAK)%
@@ -381,7 +418,8 @@ end
 ~
 #10862
 Soulstream: Look at and identify item for quest~
-1 c 2
+1 c 2 1
+L t 10862
 look examine identify~
 if %actor.obj_target(%arg.argument1%)% != %self%
   return 0
@@ -403,7 +441,8 @@ end
 ~
 #10865
 good omen buff~
-1 n 100
+1 n 100 1
+L w 10865
 ~
 set actor %self.carried_by%
 if %actor%

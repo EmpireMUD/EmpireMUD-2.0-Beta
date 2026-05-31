@@ -3352,6 +3352,7 @@ void do_stat_character(char_data *ch, char_data *k, bool details) {
 	struct over_time_effect_type *dot;
 	struct affected_type *aff;
 	archetype_data *arch;
+	struct instance_data *inst, *inst_iter;
 	struct page_display *line;
 	
 	bool is_proto = (IS_NPC(k) && k == mob_proto(GET_MOB_VNUM(k)));
@@ -3579,6 +3580,25 @@ void do_stat_character(char_data *ch, char_data *k, bool details) {
 		if (*lbuf) {
 			build_page_display_str(ch, lbuf);
 		}
+		
+		// instance?
+		if (MOB_INSTANCE_ID(k) != NOTHING) {
+			if ((inst = get_instance_by_id(MOB_INSTANCE_ID(k)))) {
+				// detect instance number
+				count = 0;
+				DL_FOREACH(instance_list, inst_iter) {
+					++count;
+					if (inst_iter == inst) {
+						break;	// found
+					}
+				}
+				
+				build_page_display(ch, "Instance: \tc%d\t0 at [%d] (%d, %d), Adventure: [\tc%d\t0] \ty%s\t0", count, GET_ROOM_VNUM(inst->location), X_COORD(inst->location), Y_COORD(inst->location), (inst->adventure ? GET_ADV_VNUM(inst->adventure) : -1), (inst->adventure ? GET_ADV_NAME(inst->adventure) : "UNKNOWN"));
+			}
+			else {
+				build_page_display(ch, "Instance: \trbad instance id %d\t0", MOB_INSTANCE_ID(k));
+			}
+		}
 	}
 
 	// cooldowns
@@ -3748,6 +3768,7 @@ void do_stat_craft(char_data *ch, craft_data *craft) {
 void do_stat_crop(char_data *ch, crop_data *cp, bool details) {
 	int count;
 	struct custom_message *ocm;
+	struct icon_data *icon_iter;
 	
 	build_page_display(ch, "Crop VNum: [&c%d&0], Name: '&c%s&0'", GET_CROP_VNUM(cp), GET_CROP_NAME(cp));
 	build_page_display(ch, "Room Title: %s, Mapout Color: %s", GET_CROP_TITLE(cp), mapout_color_names[GET_CROP_MAPOUT(cp)]);
@@ -3759,8 +3780,14 @@ void do_stat_crop(char_data *ch, crop_data *cp, bool details) {
 	build_page_display(ch, "Crop flags: &g%s&0", buf);
 	
 	if (GET_CROP_ICONS(cp)) {
-		build_page_display_str(ch, "Icons:");
-		show_icons_display(ch, GET_CROP_ICONS(cp), FALSE);
+		if (PRF_FLAGGED(ch, PRF_SCREEN_READER) && !details) {
+			LL_COUNT(GET_CROP_ICONS(cp), icon_iter, count);
+			build_page_display(ch, "Icons: &c%d&0 set", count);
+		}
+		else {
+			build_page_display_str(ch, "Icons:");
+			show_icons_display(ch, GET_CROP_ICONS(cp), FALSE);
+		}
 	}
 	
 	build_page_display(ch, "Location: X-Min: [&g%d&0], X-Max: [&g%d&0], Y-Min: [&g%d&0], Y-Max: [&g%d&0]", GET_CROP_X_MIN(cp), GET_CROP_X_MAX(cp), GET_CROP_Y_MIN(cp), GET_CROP_Y_MAX(cp));
@@ -4492,6 +4519,12 @@ void do_stat_room(char_data *ch) {
 		}
 		build_page_display(ch, "%s, Damage: %d/%d", buf2, (int) BUILDING_DAMAGE(home), GET_BUILDING(home) ? GET_BLD_MAX_DAMAGE(GET_BUILDING(home)) : 0);
 	}
+	
+	// crop?
+	if (can_interact_room(IN_ROOM(ch), INTERACT_FORAGE)) {
+		get_potential_crop_for_location(IN_ROOM(ch), INTERACT_FORAGE, buf2);
+		build_page_display(ch, "Forage crops: %s", *buf2 ? buf2 : "none");
+	}
 
 	if (ROOM_SECT_FLAGGED(IN_ROOM(ch), SECTF_CAN_MINE) || room_has_function_and_city_ok(NULL, IN_ROOM(ch), FNC_MINE)) {
 		if (get_room_extra_data(IN_ROOM(ch), ROOM_EXTRA_MINE_GLB_VNUM) <= 0 || !(glb = global_proto(get_room_extra_data(IN_ROOM(ch), ROOM_EXTRA_MINE_GLB_VNUM))) || GET_GLOBAL_TYPE(glb) != GLOBAL_MINE_DATA) {
@@ -4807,6 +4840,7 @@ void do_stat_sector(char_data *ch, sector_data *st, bool details) {
 	struct sector_index_type *idx = find_sector_index(GET_SECT_VNUM(st));
 	char buf[MAX_STRING_LENGTH];
 	struct custom_message *ocm;
+	struct icon_data *icon_iter;
 	
 	build_page_display(ch, "Sector VNum: [&c%d&0], Name: '&c%s&0', Live Count [&c%d&0/&c%d&0]", GET_SECT_VNUM(st), GET_SECT_NAME(st), idx->sect_count, idx->base_count);
 	build_page_display(ch, "Room Title: %s", GET_SECT_TITLE(st));
@@ -4818,8 +4852,14 @@ void do_stat_sector(char_data *ch, sector_data *st, bool details) {
 	build_page_display(ch, "Movement cost: [&g%d&0]  Roadside Icon: %c  Mapout Color: %s", GET_SECT_MOVE_LOSS(st), GET_SECT_ROADSIDE_ICON(st), mapout_color_names[GET_SECT_MAPOUT(st)]);
 	
 	if (GET_SECT_ICONS(st)) {
-		build_page_display_str(ch, "Icons:");
-		show_icons_display(ch, GET_SECT_ICONS(st), FALSE);
+		if (PRF_FLAGGED(ch, PRF_SCREEN_READER) && !details) {
+			LL_COUNT(GET_SECT_ICONS(st), icon_iter, count);
+			build_page_display(ch, "Icons: &c%d&0 set", count);
+		}
+		else {
+			build_page_display_str(ch, "Icons:");
+			show_icons_display(ch, GET_SECT_ICONS(st), FALSE);
+		}
 	}
 	
 	sprintbit(GET_SECT_FLAGS(st), sector_flags, buf, TRUE);

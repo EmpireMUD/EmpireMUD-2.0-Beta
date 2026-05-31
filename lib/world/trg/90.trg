@@ -154,7 +154,6 @@ Chicken Animation~
 0 bw 3 0
 ~
 * This script is no longer used. It was replaced by custom strings.
-* Chicken Animation (9010)
 switch (%random.4%)
   case 1
     * Hunt for food.
@@ -179,7 +178,6 @@ Rooster Animation~
 0 bw 3 0
 ~
 * This script is no longer used. It was replaced by custom strings.
-* Rooster Animation (9011)
 switch (%random.4%)
   case 1
     * Hunt for food.
@@ -204,7 +202,6 @@ Dog Animation~
 0 bw 3 0
 ~
 * This script is no longer used. It was replaced by custom strings.
-* Dog Animation (9012)
 switch (%random.8%)
   case 1
     * scratch
@@ -257,7 +254,6 @@ Prairie Dog Animation~
 0 bw 3 0
 ~
 * This script is no longer used. It was replaced by custom strings.
-* Prairie Dog Animation (9013)
 switch (%random.6%)
   case 1
     * Vanishing act.
@@ -277,7 +273,6 @@ Vulture Animation~
 0 bw 1 0
 ~
 * This script is no longer used. It was replaced by custom strings.
-* Vulture Animation (9018)
 %echo% ~%self% circles high overhead, patiently waiting...
 ~
 #9020
@@ -285,7 +280,6 @@ Quail Animation~
 0 bw 3 0
 ~
 * This script is no longer used. It was replaced by custom strings.
-* Quail Animation (9020)
 if (%random.2% == 1)
   %echo% ~%self% runs around on the ground looking for food.
 else
@@ -301,7 +295,6 @@ Donkey Animation~
 0 bw 3 0
 ~
 * This script is no longer used. It was replaced by custom strings.
-* Donkey Animation (9021)
 %echo% ~%self% brays loudly.
 ~
 #9022
@@ -309,7 +302,6 @@ Black Cat Animation~
 0 bw 3 0
 ~
 * This script is no longer used. It was replaced by custom strings.
-* Black Cat Animation (9022)
 switch (%random.3%)
   case 1
     %echo% ~%self% leaps from the shadows and dashes across your path!
@@ -337,7 +329,6 @@ Eagle Animation~
 0 bw 3 0
 ~
 * This script is no longer used. It was replaced by custom strings.
-* Eagle Animation (9025)
 if (%self.room.sector% == River)
   %echo% ~%self% dives into the water, then emerges with a fish.
   halt
@@ -411,7 +402,8 @@ mjunk all
 ~
 #9028
 Tameness Required to Tame~
-0 c 0 0
+0 c 0 1
+L o 34
 tame feed~
 * Amount of tameness required
 set target 5
@@ -539,10 +531,11 @@ halt
 ~
 #9033
 Fake pickpocket~
-1 c 2 4
+1 c 2 5
 L b 202
 L b 203
 L c 9033
+L o 142
 L t 9033
 pickpocket~
 set target %actor.char_target(%arg%)%
@@ -594,7 +587,6 @@ Horse Animation~
 0 bw 3 0
 ~
 * This script is no longer used. It was replaced by custom strings.
-* Horse Animation (9034)
 switch (%random.3%)
   case 1
     %echo% ~%self% nays loudly.
@@ -657,7 +649,7 @@ L t 9042
 switch %self.vnum%
   case 9042
     * Smith / Forgemaster
-    if %victim.vnum% == 212 || %victim.vnum% == 278
+    if %victim.vnum% == 212 || %victim.vnum% == 278 || %victim.vnum% == 12800
       set found 1
     end
   break
@@ -736,7 +728,8 @@ flee
 ~
 #9064
 Wandering Vampire combat~
-0 k 25 0
+0 k 25 1
+L f 9064
 ~
 if !%self.vampire()%
   halt
@@ -745,8 +738,8 @@ set room %self.room%
 if %room.time(hour)% >= 7 && %room.time(hour)% <= 19
   halt
 end
-if %actor.aff_flagged(!DRINK-BLOOD)%
-  * Don't bite !DRINK-BLOOD targets
+if %actor.aff_flagged(NO-DRINK-BLOOD)%
+  * Don't bite NO-DRINK-BLOOD targets
   halt
 end
 %send% %actor% ~%self% lunges forward and sinks ^%self% teeth into your shoulder!

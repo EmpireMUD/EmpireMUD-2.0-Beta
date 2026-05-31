@@ -1027,6 +1027,8 @@ int Y_COORD(room_data *room);	// formerly #define Y_COORD(room)  FLAT_Y_COORD(ge
 
 // definitions
 #define IS_STOLEN(obj)  (GET_STOLEN_TIMER(obj) > 0 && (config_get_int("stolen_object_timer") * SECS_PER_REAL_MIN) + GET_STOLEN_TIMER(obj) > time(0))
+#define IS_STOLEN_FROM(obj, ch)  (!IS_NPC(ch) && GET_LOYALTY(ch) && GET_STOLEN_FROM(obj) == EMPIRE_VNUM(GET_LOYALTY(ch)))
+#define IS_STOLEN_FROM_EMPIRE(obj, emp)  ((emp) && GET_STOLEN_FROM(obj) == EMPIRE_VNUM(emp))
 
 // helpers
 #define OBJ_FLAGGED(obj, flag)  (IS_SET(GET_OBJ_EXTRA(obj), (flag)))
@@ -2388,6 +2390,8 @@ int get_dodge_modifier(char_data *ch, char_data *attacker, bool can_gain_skill);
 int get_to_hit(char_data *ch, char_data *victim, bool off_hand, bool can_gain_skill);
 time_t get_last_killed_by_empire(char_data *ch, empire_data *emp);
 double get_weapon_speed(obj_data *weapon);
+bool has_stolen_contents(obj_data *cont);
+bool has_stolen_items(char_data *ch);
 bool is_fight_ally(char_data *ch, char_data *frenemy);
 bool is_fight_enemy(char_data *ch, char_data *frenemy);
 void out_of_blood(char_data *ch);
@@ -2396,6 +2400,9 @@ void perform_resurrection(char_data *ch, char_data *rez_by, room_data *loc, any_
 obj_data *player_death(char_data *ch);
 int reduce_damage_from_skills(int dam, char_data *victim, char_data *attacker, int damtype);
 void reset_combat_meters(char_data *ch);
+void return_stolen_item_one(obj_data *obj);
+void return_stolen_items_from_obj(obj_data *cont);
+void return_stolen_items(char_data *ch);
 int skill_message(int dam, char_data *ch, char_data *vict, int attacktype, attack_message_data *custom_fight_messages);
 void trigger_distrust_from_hostile(char_data *ch, empire_data *emp);
 bool validate_siege_target_room(char_data *ch, vehicle_data *veh, room_data *to_room);
@@ -2443,6 +2450,7 @@ bool same_subzone(room_data *a, room_data *b);
 void scale_instance_to_level(struct instance_data *inst, int level);
 void set_instance_fake_loc(struct instance_data *inst, room_data *loc);
 void unlink_instance_entrance(room_data *room, struct instance_data *inst, bool run_cleanup);
+void update_instance_world_size();
 
 // limits.c
 bool can_mount_in_room(char_data *ch, room_data *room);

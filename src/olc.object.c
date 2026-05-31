@@ -51,8 +51,10 @@ char **olc_material_list = NULL;	// used for olc
 * @return bool TRUE if any problems were reported; FALSE if all good.
 */
 bool audit_object(obj_data *obj, char_data *ch) {
+	bitvector_t bits;
 	bool is_adventure = (get_adventure_for_vnum(GET_OBJ_VNUM(obj)) != NULL);
 	char temp[MAX_STRING_LENGTH], temp2[MAX_STRING_LENGTH], temp3[MAX_STRING_LENGTH], unplural[MAX_STRING_LENGTH], *ptr;
+	int pos;
 	obj_data *obj_iter, *next_obj;
 	bool problem = FALSE, found;
 	attack_message_data *amd = NULL;
@@ -186,6 +188,14 @@ bool audit_object(obj_data *obj, char_data *ch) {
 	if (GET_OBJ_COMPONENT(obj) != NOTHING && !find_generic(GET_OBJ_COMPONENT(obj), GENERIC_COMPONENT)) {
 		olc_audit_msg(ch, GET_OBJ_VNUM(obj), "Invalid component vnum %d does not match a generic component", GET_OBJ_COMPONENT(obj));
 		problem = TRUE;
+	}
+	
+	// affects
+	for (bits = GET_OBJ_AFF_FLAGS(obj), pos = 0; bits; bits >>= 1, ++pos) {
+		if (IS_SET(bits, BIT(0)) && !allow_affect_flag_on_items[pos]) {
+			olc_audit_msg(ch, GET_OBJ_VNUM(obj), "Disallowed affect flag is set: %s", affected_bits[pos]);
+			problem = TRUE;
+		}
 	}
 	
 	// look for full keyword collisions
@@ -2537,8 +2547,21 @@ OLC_MODULE(oedit_action_desc) {
 
 
 OLC_MODULE(oedit_affects) {
+	bitvector_t bits, old_bits;
+	int pos;
 	obj_data *obj = GET_OLC_OBJECT(ch->desc);
+	
+	old_bits = GET_OBJ_AFF_FLAGS(obj);
+	
 	GET_OBJ_AFF_FLAGS(obj) = olc_process_flag(ch, argument, "affects", "affects", affected_bits, GET_OBJ_AFF_FLAGS(obj));
+	
+	// verify no illegal affects
+	for (bits = GET_OBJ_AFF_FLAGS(obj), pos = 0; bits; bits >>= 1, ++pos) {
+		if (IS_SET(bits, BIT(0)) && !IS_SET(old_bits, BIT(pos)) && !allow_affect_flag_on_items[pos]) {
+			msg_to_char(ch, "Removing disallowed affect flag %s.\r\n", affected_bits[pos]);
+			REMOVE_BIT(GET_OBJ_AFF_FLAGS(obj), BIT(pos));
+		}
+	}
 }
 
 

@@ -62,6 +62,7 @@ void check_for_new_map();
 void check_learned_empire_crafts();
 void check_newbie_islands();
 void check_nowhere_einv_all();
+void check_old_flag_names_in_triggers();
 void check_for_player_wipe();
 void check_sector_times(any_vnum only_sect);
 void check_skills();
@@ -101,7 +102,6 @@ void schedule_map_unloads();
 void setup_island_levels();
 void sort_commands();
 void startup_room_reset();
-void update_instance_world_size();
 void verify_daily_quest_cycles();
 void verify_empire_goals();
 void verify_running_events();
@@ -670,6 +670,7 @@ void boot_world(void) {
 	verify_running_events();
 	read_ability_requirements();
 	check_triggers();
+	check_old_flag_names_in_triggers();
 	compute_generic_relations();
 	
 	log("Sorting data.");
@@ -986,7 +987,7 @@ void verify_sectors(void) {
 			if (!room) {
 				room = real_room(map->vnum);	// load it into memory
 			}
-			new_crop = get_potential_crop_for_location(room, NOTHING);
+			new_crop = get_potential_crop_for_location(room, NOTHING, NULL);
 			set_crop_type(room, new_crop ? new_crop : crop_table);
 		}
 	}
@@ -2083,6 +2084,42 @@ obj_data *read_object(obj_vnum nr, bool with_triggers) {
 
  //////////////////////////////////////////////////////////////////////////////
 //// MISCELLANEOUS HELPERS ///////////////////////////////////////////////////
+
+/**
+* Runs at startup to alert to any triggers that are using old versions of
+* affect flag names.
+*/
+void check_old_flag_names_in_triggers(void) {
+	int iter;
+	trig_data *trig, *next_trig;
+	struct cmdlist_element *cmd;
+	
+	const char *old_flag_names[] = {
+		"HIDE",
+		"ENTANGLED",
+		"!WHERE",	// b5.203
+		"!DISARM",	// b5.203
+		"!DRINK-BLOOD",	// b5.203
+		"!MORPH",	// b5.203
+		"!SEE",	// b5.203
+		"!BLOOD",	// b5.203
+		"!STUN",	// b5.203
+		"!TARGET",	// b5.203
+		"SOULMASK",	// b5.203
+		"\n"
+	};
+	
+	HASH_ITER(hh, trigger_table, trig, next_trig) {
+		LL_FOREACH(trig->cmdlist, cmd) {
+			for (iter = 0; *old_flag_names[iter] != '\n'; ++iter) {
+				if (strstr(cmd->cmd, old_flag_names[iter])) {
+					log("SCRIPT ERR: Trigger [%d] %s is using old affect flag name %s", GET_TRIG_VNUM(trig), GET_TRIG_NAME(trig), old_flag_names[iter]);
+				}
+			}
+		}
+	}
+}
+
 
 /* reset the time in the game from file */
 void reset_time(void) {

@@ -1,6 +1,6 @@
 #10500
 Glowkra consume~
-1 s 100
+1 s 100 0
 ~
 * This script is no longer used. The glowkra has a buff food affect instead.
 if !(eat /= %command%)
@@ -11,7 +11,43 @@ dg_affect %actor% INFRA on 300
 ~
 #10501
 Magiterranean Terracrop~
-0 in 100
+0 in 100 36
+L e 5112
+L e 5174
+L g 10500
+L g 10501
+L g 10502
+L g 10503
+L g 10504
+L g 10505
+L g 10506
+L g 10507
+L g 10508
+L g 10509
+L g 10510
+L g 10511
+L h 0
+L h 1
+L h 2
+L h 3
+L h 4
+L h 7
+L h 13
+L h 36
+L h 37
+L h 38
+L h 39
+L h 40
+L h 41
+L h 42
+L h 43
+L h 44
+L h 45
+L h 50
+L h 54
+L h 56
+L h 90
+L j 10500
 ~
 * Valid terrains:
 set valid_sects 0 1 2 3 4 7 13 36 37 38 39 40 41 42 43 44 45 50 54 56 90
@@ -118,19 +154,20 @@ end
 ~
 #10502
 Magic Mushroom eat~
-1 s 100
+1 s 100 0
 ~
 dg_affect %actor% STONED on 75
 ~
 #10503
 Basket of Magic Mushrooms eat~
-1 s 100
+1 s 100 0
 ~
 dg_affect %actor% STONED on 900
 ~
 #10504
 Puppy receive treat~
-0 j 100
+0 j 100 1
+L c 10528
 ~
 set treat 10528
 if %object.vnum% == %treat%
@@ -153,7 +190,8 @@ end
 ~
 #10505
 Dragontooth Sceptre Summon~
-1 c 1
+1 c 1 1
+L b 10505
 use~
 * Check this item was the one used
 if !%self.is_name(%arg%)%
@@ -205,7 +243,11 @@ end
 ~
 #10506
 Puppy Plant use~
-1 c 2
+1 c 2 4
+L b 10501
+L b 10502
+L b 10503
+L b 10504
 use~
 if %actor.obj_target(%arg%)% != %self%
   return 0
@@ -246,7 +288,40 @@ end
 ~
 #10507
 Interdimensional Whirlwind Cleanup~
-2 e 100
+2 e 100 33
+L g 10500
+L g 10501
+L g 10502
+L g 10503
+L g 10504
+L g 10505
+L g 10506
+L g 10507
+L g 10508
+L g 10509
+L g 10510
+L g 10511
+L h 0
+L h 1
+L h 2
+L h 3
+L h 4
+L h 7
+L h 13
+L h 36
+L h 37
+L h 38
+L h 39
+L h 40
+L h 41
+L h 42
+L h 43
+L h 44
+L h 45
+L h 50
+L h 54
+L h 56
+L h 90
 ~
 *
 * Cleanable sect list from #10501
@@ -300,7 +375,7 @@ end
 ~
 #10508
 Dragonstooth sceptre equip first~
-1 c 6
+1 c 6 0
 use~
 if %actor.obj_target(%arg%)% != %self%
   return 0
@@ -311,7 +386,11 @@ return 1
 ~
 #10514
 Gemfruit decay~
-1 f 0
+1 f 0 4
+L c 103
+L c 104
+L c 1206
+L c 1300
 ~
 set actor %self.carried_by%
 set gem 0
@@ -362,12 +441,17 @@ return 0
 ~
 #10550
 Aquilo Combat~
-0 k 100
+0 k 100 5
+L b 10560
+L w 10551
+L w 10552
+L w 10553
+L w 10560
 ~
 if %self.cooldown(10560)%
   halt
 end
-if %self.affect(BLIND)%
+if %self.aff_flagged(BLIND)%
   %echo% |%self% eyes flash blue, and ^%self% vision clears!
   dg_affect %self% BLIND off 1
 end
@@ -407,7 +491,7 @@ switch %random.3%
     while %person%
       if %person.is_enemy(%self%)%
         dg_affect #10552 %person% SLOW on 20
-        if %heroic_mode% && !%person.aff_flagged(!STUN)%
+        if %heroic_mode% && !%person.aff_flagged(NO-STUN)%
           dg_affect #10552 %person% STUNNED on 5
         else
           %echo% The ice shatters, but leaves a lingering chill...
@@ -444,7 +528,7 @@ switch %random.3%
         %send% %actor% &&rThe comet crashes into you, smashing you to the ground, and explodes!
         %echoaround% %actor% The comet crashes into ~%actor%, smashing *%actor% to the ground, and explodes!
         %damage% %actor% 400 physical
-        if !%actor.aff_flagged(!STUN)%
+        if !%actor.aff_flagged(NO-STUN)%
           dg_affect #10553 %actor% STUNNED on 10
         end
         %echo% &&rFragments fly in all directions!
@@ -489,7 +573,12 @@ nop %self.set_cooldown(10560, 30)%
 ~
 #10551
 Permafrost Cryomancer combat~
-0 k 100
+0 k 100 5
+L b 10561
+L b 10562
+L w 10554
+L w 10555
+L w 10560
 ~
 if %self.cooldown(10560)%
   halt
@@ -535,13 +624,13 @@ switch %random.3%
       %send% %actor% You attempt to dig yourself out of the deep, painfully cold snowdrift!
       %dot% %actor% 50 20 magical
       dg_affect #10555 %actor% BLIND on 20
-      if !%actor.aff_flagged(!STUN)%
+      if !%actor.aff_flagged(NO-STUN)%
         dg_affect #10555 %actor% STUNNED on 20
       end
     else
       %send% %actor% You scramble to pull yourself out of the pile of snow.
       dg_affect #10555 %actor% BLIND on 5
-      if !%actor.aff_flagged(!STUN)%
+      if !%actor.aff_flagged(NO-STUN)%
         dg_affect #10555 %actor% STUNNED on 5
       end
     end
@@ -568,7 +657,12 @@ nop %self.set_cooldown(10560, 30)%
 ~
 #10552
 Permafrost Rime Mage Combat~
-0 k 100
+0 k 100 5
+L w 10556
+L w 10557
+L w 10558
+L w 10559
+L w 10560
 ~
 if %self.cooldown(10560)%
   halt
@@ -583,7 +677,7 @@ switch %random.3%
     %echoaround% %actor% ~%self% makes an arcane gesture at ~%actor%, and hoar frost suddenly encases *%actor%!
     dg_affect #10557 %actor% SLOW on 20
     if %heroic_mode%
-      if !%actor.aff_flagged(!STUN)%
+      if !%actor.aff_flagged(NO-STUN)%
         dg_affect #10556 %actor% STUNNED on 5
       end
       %dot% #10557 %actor% 100 20 magical
@@ -644,7 +738,9 @@ nop %self.set_cooldown(10560, 30)%
 ~
 #10553
 Permafrost trash combat~
-0 k 10
+0 k 10 2
+L b 10553
+L b 10554
 ~
 switch %random.3%
   case 1
@@ -688,7 +784,7 @@ switch %random.3%
       end
       %send% %actor% ~%self% crashes into you, leaving you briefly stunned!
       %echoaround% %actor% ~%self% crashes into ~%actor%, stunning *%actor%!
-      if !%actor.aff_flagged(!STUN)%
+      if !%actor.aff_flagged(NO-STUN)%
         dg_affect %actor% STUNNED on 5
       end
       %damage% %actor% 50
@@ -706,7 +802,13 @@ done
 ~
 #10554
 Frosty difficulty select~
-1 c 4
+1 c 4 6
+L b 10550
+L b 10551
+L b 10552
+L c 10555
+L j 10550
+L j 10552
 difficulty~
 if !%arg%
   %send% %actor% You must specify a level of difficulty.
@@ -776,13 +878,14 @@ done
 ~
 #10555
 Frosty delayed despawn~
-1 f 0
+1 f 0 0
 ~
 %adventurecomplete%
 ~
 #10556
 PF Start Progression~
-2 g 100
+2 g 100 1
+L y 10550
 ~
 if %actor.is_pc% && %actor.empire%
   nop %actor.empire.start_progress(10550)%
@@ -790,7 +893,7 @@ end
 ~
 #10558
 Frosty trash block higher template id~
-0 s 100
+0 s 100 0
 ~
 * One quick trick to get the target room
 set room_var %self.room%
@@ -808,7 +911,21 @@ return 0
 ~
 #10559
 River freezer~
-0 i 100
+0 i 100 14
+L h 5
+L h 19
+L h 32
+L h 53
+L h 85
+L h 87
+L h 260
+L h 10550
+L h 10551
+L h 10552
+L h 10553
+L h 10554
+L h 10555
+L h 10556
 ~
 set room %self.room%
 if !%instance.location%
@@ -843,7 +960,7 @@ end
 ~
 #10560
 Permafrost mob teleport out on load~
-0 n 100
+0 n 100 0
 ~
 if !%instance.location%
   %purge% %self%
@@ -856,9 +973,14 @@ mmove
 ~
 #10561
 Frost flower fake plant~
-1 c 2
+1 c 2 5
+L h 4
+L h 45
+L h 54
+L h 90
+L h 10565
 plant~
-set valid_sects 4 45 54 90 
+set valid_sects 4 45 54 90
 if %actor.obj_target(%arg%)% != %self%
   return 0
   halt
@@ -882,7 +1004,10 @@ return 1
 ~
 #10562
 Permafrost boss death~
-0 f 100
+0 f 100 3
+L b 10550
+L b 10559
+L w 10550
 ~
 * It's a token party and everyone's invited! ...No, not toking.
 set person %self.room.people%
@@ -908,7 +1033,7 @@ end
 ~
 #10563
 Permafrost weather~
-2 c 0
+2 c 0 0
 weather look~
 if look /= %cmd%
   if out == %arg%
@@ -927,7 +1052,10 @@ return 1
 ~
 #10564
 Permafrost boss minion timer~
-0 bnw 100
+0 bnw 100 3
+L b 10560
+L b 10561
+L b 10562
 ~
 if %self.vnum% == 10560
   * attached mob is Aquilo's summon (30 seconds)
@@ -951,7 +1079,9 @@ end
 ~
 #10566
 Polar Wind ship setup~
-5 o 100
+5 o 100 2
+L e 10561
+L e 10562
 ~
 set inter %self.interior%
 if (!%inter%)
@@ -967,7 +1097,8 @@ detach 10566 %self.id%
 ~
 #10569
 Permafrost store appear-check~
-0 hw 100
+0 hw 100 1
+L w 10550
 ~
 set cheapest_item_cost 14
 if !%actor.is_pc%
@@ -985,7 +1116,14 @@ end
 ~
 #10570
 Boss loot replacer~
-1 n 100
+1 n 100 7
+L c 10557
+L c 10564
+L c 10565
+L c 10566
+L c 10567
+L c 10568
+L c 10569
 ~
 set actor %self.carried_by%
 if %actor%
@@ -1046,7 +1184,14 @@ end
 ~
 #10593
 Wand of Polar Power activation~
-1 c 2
+1 c 2 7
+L b 10550
+L b 10551
+L b 10552
+L b 10553
+L b 10554
+L b 10555
+L t 10550
 freeze~
 if !%arg%
   %send% %actor% What do you want to blast with @%self%?
@@ -1088,24 +1233,55 @@ done
 ~
 #10594
 Permafrost trash spawner~
-1 n 100
+1 n 100 4
+L b 10550
+L b 10553
+L b 10554
+L b 10555
 ~
+* Ensures 2 of each trash mob, randomly, per instance
+set per_mob 2
+* find helper mob
+wait 1
+set mob %instance.mob(10550)%
+if !%mob%
+  %purge% %self%
+  halt
+end
+* order we'll try to spawn in is random
 switch %random.3%
   case 1
-    %load% mob 10553
+    set list 10553 10554 10555
   break
   case 2
-    %load% mob 10554
+    set list 10554 10553 10555
   break
   case 3
-    %load% mob 10555
+    set list 10555 10554 10553
   break
 done
+* attempt spawn
+set done 0
+while %list% && !%done%
+  set vnum %list.car%
+  set list %list.cdr%
+  if %mob.var(spawned_%vnum%,0)% < %per_mob%
+    * valid!
+    set done 1
+  end
+done
+* load 'em
+if %vnum%
+  %load% mob %vnum%
+  eval spawned_%vnum% %mob.var(spawned_%vnum%,0)% + 1
+  remote spawned_%vnum% %mob.id%
+end
 %purge% %self%
 ~
 #10595
 Pacify the Permafrost quest start~
-2 u 100
+2 u 100 1
+L c 10593
 ~
 %load% obj 10593 %actor% inv
 * formerly saved a variable; now uses quest tracker
@@ -1113,7 +1289,11 @@ rdelete permafrost_mobs_iced %actor.id%
 ~
 #10598
 Gem ice melt~
-1 f 0
+1 f 0 4
+L c 103
+L c 104
+L c 1206
+L c 1300
 ~
 set actor %self.carried_by%
 set object nothing
@@ -1153,7 +1333,11 @@ return 0
 ~
 #10599
 Frostblood Consecration Ritual~
-2 c 0
+2 c 0 4
+L c 10550
+L c 10555
+L c 10599
+L t 10555
 consecrate~
 if (%actor.position% != Standing)
   return 0

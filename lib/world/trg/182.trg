@@ -1,6 +1,7 @@
 #18200
 Atlas turtle board~
-0 c 0
+0 c 0 1
+L j 18201
 board~
 if %actor.char_target(%arg%)% != %self%
   return 0
@@ -33,7 +34,7 @@ done
 ~
 #18201
 City turtle greet~
-0 hw 100
+0 hw 100 0
 ~
 wait 5
 if %actor.room% != %self.room%
@@ -45,7 +46,7 @@ end
 ~
 #18202
 Atlasian Tortoise location updater~
-0 i 100
+0 i 100 0
 ~
 wait 1
 set room %self.room%
@@ -57,7 +58,8 @@ wait 5
 ~
 #18203
 City turtle load~
-0 n 100
+0 n 100 1
+L j 18200
 ~
 context %instance.id%
 if !%instance.real_location%
@@ -76,7 +78,8 @@ end
 ~
 #18204
 City turtle disembark~
-2 c 0
+2 c 0 1
+L b 18200
 disembark~
 if %cmd.mudcommand% != disembark
   return 0
@@ -111,7 +114,8 @@ done
 ~
 #18205
 City turtle look out~
-2 c 0
+2 c 0 1
+L b 18200
 look~
 if %cmd.mudcommand% == look && out == %arg%
   %send% %actor% Looking over the side of the tortoise, you see...
@@ -132,13 +136,18 @@ return 0
 ~
 #18206
 Tavern: Exit + Out + Leave~
-1 c 4
+1 c 4 0
 exit out leave~
 %force% %actor% enter door
 ~
 #18207
 Tavern Patron Spawner~
-1 n 100
+1 n 100 5
+L b 18201
+L b 18236
+L b 18237
+L b 18238
+L b 18239
 ~
 set message $n leaves.
 set room %self.room%
@@ -163,7 +172,9 @@ set person %room.people%
 ~
 #18208
 Seeker Stone: Atlasian Tortoise~
-1 c 2
+1 c 2 2
+L b 18200
+L j 18200
 seek~
 if !%arg%
   %send% %actor% Seek what?
@@ -207,13 +218,14 @@ end
 ~
 #18209
 Seek Adventure: Give Seeker Stone~
-2 u 0
+2 u 0 1
+L c 18208
 ~
 %load% obj 18208 %actor% inv
 ~
 #18210
 Fight Club death walk~
-0 f 100
+0 f 100 0
 ~
 if %random.5% == 5
   say Oww, shell shock.
@@ -223,7 +235,12 @@ return 0
 ~
 #18211
 Fight Club spawner~
-2 bg 50
+2 bg 50 5
+L b 18203
+L b 18204
+L b 18205
+L b 18206
+L b 18207
 ~
 wait 5
 set ch %room.people%
@@ -268,7 +285,7 @@ end
 ~
 #18212
 Mob block higher template id - faction reputation Liked~
-0 s 100
+0 s 100 0
 ~
 * One quick trick to get the target room
 set room_var %self.room%
@@ -287,7 +304,8 @@ return 0
 ~
 #18213
 Adventurer guild cornucopia reset~
-2 f 100
+2 f 100 1
+L c 18204
 ~
 set item_vnum 18204
 * Find the existing item
@@ -305,7 +323,9 @@ set object %room.contents%
 ~
 #18214
 Tortoise Trinket teleporter~
-1 c 2
+1 c 2 2
+L j 18201
+L w 18214
 use~
 if %actor.obj_target(%arg%)% != %self%
   return 0
@@ -374,7 +394,8 @@ done
 ~
 #18215
 GoA Start Progression~
-2 g 100
+2 g 100 1
+L y 18200
 ~
 if %actor.is_pc% && %actor.empire%
   nop %actor.empire.start_progress(18200)%
@@ -382,7 +403,11 @@ end
 ~
 #18216
 Adventurer's Guildhall Complete~
-2 o 100
+2 o 100 4
+L e 18217
+L e 18218
+L e 18219
+L e 18220
 ~
 * Add basement
 if !%room.down(room)%
@@ -412,7 +437,11 @@ detach 18216 %room.id%
 ~
 #18217
 Give Adventurer Guild Charter~
-2 u 100
+2 u 100 4
+L c 18216
+L c 18240
+L t 18200
+L t 18202
 ~
 if %questvnum% == 18200
   %load% obj 18216 %actor%
@@ -422,7 +451,7 @@ end
 ~
 #18218
 Guildhall mob out of city despawn~
-0 n 100
+0 n 100 0
 ~
 if !%self.room.in_city(true)%
   %purge% %self% $n leaves because this guildhall isn't in an active city.
@@ -432,7 +461,8 @@ end
 ~
 #18219
 Adventuring guild block vault~
-0 s 100
+0 s 100 1
+L q 4
 ~
 if %self.disabled% || %self.position% == Sleeping
   halt
@@ -471,13 +501,16 @@ return 0
 ~
 #18220
 Egg Timeout~
-1 f 0
+1 f 0 0
 ~
 %build% %self.room% demolish
 ~
 #18221
 Atlasian egg fake plant~
-1 c 2
+1 c 2 3
+L c 18222
+L e 18221
+L t 18221
 plant~
 if %actor.obj_target(%arg%)% != %self%
   return 0
@@ -509,7 +542,8 @@ end
 ~
 #18222
 Atlasian Egg growth stage 2~
-2 v 100
+2 v 100 1
+L e 18222
 ~
 if !(%room.building% ~= Egg)
   %echo% Something went wrong while growing the egg...
@@ -522,7 +556,10 @@ return 1
 ~
 #18223
 Atlasian Egg growth stage 3~
-2 v 100
+2 v 100 3
+L c 18222
+L c 18223
+L e 18223
 ~
 if !(%room.building% ~= Egg)
   %echo% Something went wrong while growing the egg...
@@ -544,7 +581,10 @@ done
 ~
 #18224
 Tortoise Vehicle Setup~
-5 n 100
+5 n 100 3
+L e 18225
+L e 18226
+L e 18227
 ~
 set inter %self.interior%
 if %inter%
@@ -568,7 +608,8 @@ detach 18224 %self.id%
 ~
 #18225
 Atlasian Turtle Egg: Hatch~
-1 f 0
+1 f 0 1
+L r 18224
 ~
 set room %self.room%
 %load% veh 18224
@@ -584,7 +625,7 @@ return 0
 ~
 #18226
 random guild adventurer description~
-0 n 100
+0 n 100 0
 ~
 switch %random.5%
   case 1
@@ -616,7 +657,15 @@ done
 ~
 #18227
 GoA: Use smoke bomb~
-1 c 2
+1 c 2 8
+L b 10200
+L b 10201
+L b 10202
+L b 10203
+L b 10204
+L b 10205
+L c 19060
+L t 18241
 use~
 * Flushes out a Goblin Challenge
 return 1
@@ -688,7 +737,11 @@ end
 ~
 #18228
 GoA: Use gilded net to catch bugs~
-1 c 2
+1 c 2 4
+L b 11133
+L b 11137
+L b 11140
+L t 18243
 net~
 * Catches a 'bug' in Mill Manor
 set num_needed 2
@@ -721,7 +774,11 @@ end
 ~
 #18229
 GoA: Rodentmort's water-logged cage~
-1 c 2
+1 c 2 4
+L b 18224
+L b 19000
+L c 11836
+L t 18245
 borrow release~
 return 1
 set room %self.room%
@@ -800,7 +857,9 @@ end
 ~
 #18230
 GoA: Rodentmort behavior~
-0 bt 75
+0 bt 75 2
+L c 1000
+L t 18245
 ~
 * seek food and eat
 set needed 3
@@ -834,7 +893,16 @@ done
 ~
 #18231
 GoA: Loom of diminution (shrink ray)~
-1 c 2
+1 c 2 9
+L b 10200
+L b 10201
+L b 10202
+L b 10203
+L b 10204
+L b 10205
+L t 18242
+L w 18231
+L w 18232
 shrink~
 return 1
 set room %actor.room%
@@ -887,7 +955,7 @@ done
 ~
 #18238
 Consider / Kill Death~
-0 c 0
+0 c 0 0
 consider kill~
 * Target check
 if %actor.char_target(%arg%)% != %self%
@@ -908,7 +976,8 @@ end
 ~
 #18240
 Adventurer Guild mount requires Liked~
-0 c 0
+0 c 0 1
+L w 18200
 mount ride~
 * Sanity check
 * I don't know why we'd have a mount called 'swap' but you never know
@@ -931,7 +1000,8 @@ return 0
 ~
 #18241
 Adventurer Guild mount requires Venerated~
-0 c 0
+0 c 0 1
+L w 18200
 mount ride~
 * Sanity check
 * I don't know why we'd have a mount called 'swap' but you never know
@@ -954,7 +1024,17 @@ return 0
 ~
 #18248
 GoA: Pry gem off the wall~
-1 c 2
+1 c 2 10
+L c 18249
+L j 18503
+L j 18504
+L j 18508
+L j 18509
+L j 18510
+L j 18511
+L j 18512
+L j 18513
+L j 18514
 pry~
 set valid_rooms 18503 18504 18508 18509 18510 18511 18512 18513 18514
 set needed 4
@@ -997,7 +1077,9 @@ end
 ~
 #18249
 GoA: Flame's End Fandango dragon script~
-0 b 100
+0 b 100 2
+L c 18255
+L t 18248
 ~
 * ticks every 13 seconds for the dragon dance
 set room %self.room%
@@ -1084,7 +1166,12 @@ end
 ~
 #18250
 GoA: Use stone orb of hiding~
-1 c 2
+1 c 2 5
+L b 10451
+L c 18261
+L c 18507
+L j 18501
+L t 18247
 use~
 * check targeting
 if !%arg% || %actor.obj_target(%arg.argument1%)% != %self%
@@ -1133,7 +1220,12 @@ done
 ~
 #18251
 GoA: Bribe bandits~
-1 c 2
+1 c 2 5
+L b 10105
+L b 10106
+L b 10107
+L b 10108
+L t 18251
 bribe~
 return 1
 * check bandit here
@@ -1227,7 +1319,9 @@ done
 ~
 #18252
 GoA: Pilfer pixy using a jar~
-1 c 2
+1 c 2 2
+L j 11918
+L t 18252
 pilfer~
 return 1
 set room %actor.room%
@@ -1259,7 +1353,28 @@ nop %self.val0(1)%
 ~
 #18253
 GoA: Use skeleton key to steal scrolls~
-1 c 2
+1 c 2 21
+L b 10401
+L b 10402
+L b 10403
+L b 10404
+L b 10405
+L b 10406
+L b 10407
+L b 10408
+L b 10409
+L b 10410
+L b 10411
+L b 10412
+L b 10413
+L b 10414
+L b 10415
+L b 11847
+L j 11835
+L j 11935
+L q 4
+L t 18253
+L t 18254
 use~
 return 1
 set room %actor.room%
@@ -1327,7 +1442,24 @@ detach 18253 %self.id%
 ~
 #18254
 GoA: Reflect mob with smoky mirror~
-1 c 2
+1 c 2 17
+L b 10401
+L b 10402
+L b 10403
+L b 10404
+L b 10405
+L b 10406
+L b 10407
+L b 10408
+L b 10409
+L b 10410
+L b 10411
+L b 10412
+L b 10413
+L b 10414
+L b 10415
+L b 10419
+L t 18254
 reflect~
 return 1
 set room %actor.room%
@@ -1381,7 +1513,12 @@ end
 ~
 #18255
 GoA: Flame's End Fandango dance~
-1 c 2
+1 c 2 5
+L b 10330
+L b 10331
+L b 10332
+L b 10333
+L f 18249
 dance twirl spin jump slide sway flutter glide stomp wave stretch wiggle clap skip hop shake tiptoe kick sashay pirouette~
 set room %actor.room%
 set 18248_dancing %actor.var(18248_dancing,-2)%
@@ -1506,7 +1643,16 @@ end
 ~
 #18256
 Catch wildling with a huge net~
-1 c 3
+1 c 3 9
+L b 10005
+L b 12658
+L b 12659
+L b 12660
+L b 12661
+L b 12668
+L b 12669
+L b 12670
+L c 18257
 net~
 if !%arg%
   %send% %actor% What do you want to catch with @%self%?
@@ -1555,13 +1701,15 @@ end
 ~
 #18257
 Give wildling net on quest start~
-2 u 100
+2 u 100 1
+L c 18256
 ~
 %load% obj 18256 %actor% inv
 ~
 #18258
 Adventurer Guild, Monsoon Attunement: Speak to Manaweaver~
-0 c 0
+0 c 0 1
+L c 18258
 speak~
 if %actor.inventory(18258)%
   %send% %actor% You have already talked to ~%self%.
@@ -1620,7 +1768,9 @@ done
 ~
 #18259
 Monsoon quest finish: trigger adventurer guild quest~
-2 v 100
+2 v 100 2
+L t 18258
+L t 18268
 ~
 * Have we already talked to the manaweaver?
 if %actor.on_quest(18258)% && %actor.inventory(18258)%
@@ -1632,7 +1782,9 @@ end
 ~
 #18260
 Buy goblin gala ticket~
-1 c 2
+1 c 2 2
+L b 10451
+L c 18261
 buy~
 set person %self.room.people%
 set found 0
@@ -1673,7 +1825,13 @@ set coinstr %actor.charge_coins(50)%
 ~
 #18261
 Give quest start items~
-2 u 100
+2 u 100 6
+L c 18260
+L c 18270
+L c 18272
+L t 18260
+L t 18270
+L t 18272
 ~
 if %questvnum% == 18260
   %load% obj 18260 %actor% inv
@@ -1688,7 +1846,10 @@ end
 ~
 #18270
 Frost Siphon: use~
-1 c 2
+1 c 2 3
+L b 10551
+L b 10552
+L t 18270
 use~
 if %actor.obj_target(%arg.argument1%)% != %self%
   return 0
@@ -1725,7 +1886,12 @@ end
 ~
 #18272
 Fake pickpocket~
-1 c 2
+1 c 2 5
+L b 228
+L b 237
+L c 18210
+L c 18272
+L t 18272
 pickpocket~
 set target %actor.char_target(%arg%)%
 if !%target%
@@ -1760,7 +1926,47 @@ end
 ~
 #18277
 Adventurer Guild Tier 2: Give items on start~
-2 u 0
+2 u 0 40
+L c 18215
+L c 18218
+L c 18220
+L c 18224
+L c 18248
+L c 18250
+L c 18251
+L c 18252
+L c 18253
+L c 18254
+L c 18255
+L c 18280
+L c 18281
+L c 18282
+L c 18286
+L c 18289
+L c 18290
+L c 18294
+L t 18241
+L t 18242
+L t 18243
+L t 18245
+L t 18246
+L t 18247
+L t 18248
+L t 18251
+L t 18252
+L t 18253
+L t 18254
+L t 18279
+L t 18280
+L t 18281
+L t 18282
+L t 18283
+L t 18285
+L t 18287
+L t 18289
+L t 18290
+L t 18291
+L t 18295
 ~
 switch %questvnum%
   case 18241
@@ -1837,7 +2043,12 @@ end
 ~
 #18278
 Support quest progress checker~
-2 v 0
+2 v 0 5
+L c 18280
+L t 18279
+L t 18283
+L t 18287
+L t 18295
 ~
 if %questvnum% == 18283
   * remove signalling stone if any
@@ -1854,7 +2065,16 @@ end
 ~
 #18280
 Signal Malfernes~
-1 c 2
+1 c 2 9
+L b 10252
+L b 10253
+L b 10254
+L b 18280
+L j 10250
+L t 18280
+L t 18281
+L t 18282
+L t 18283
 use~
 if %actor.obj_target(%arg%)% != %self%
   return 0
@@ -1901,7 +2121,28 @@ end
 ~
 #18281
 Use charm on chalice~
-1 c 2
+1 c 2 21
+L c 11131
+L c 18283
+L j 11130
+L j 11131
+L j 11132
+L j 11133
+L j 11134
+L j 11135
+L j 11136
+L j 11137
+L j 11138
+L j 11139
+L j 11140
+L j 11141
+L j 11142
+L j 11143
+L j 11144
+L j 11148
+L j 11149
+L j 11150
+L j 11151
 use~
 if %actor.obj_target(%arg%)% != %self%
   return 0
@@ -1931,7 +2172,16 @@ end
 ~
 #18282
 Imagine Dragons~
-1 c 2
+1 c 2 9
+L b 10300
+L b 10330
+L b 10331
+L b 10332
+L b 10333
+L b 18282
+L e 11800
+L j 11800
+L t 18282
 use~
 if %actor.obj_target(%arg.argument1%)% != %self%
   return 0
@@ -1984,13 +2234,14 @@ end
 ~
 #18283
 Imaginary dragon death~
-0 f 100
+0 f 100 0
 ~
 %echo% As ~%self% dies, you realize it was just a figment of your imagination.
 ~
 #18286
 Net Rats for Germione~
-1 c 2
+1 c 2 1
+L c 18287
 net~
 if !%arg%
   %send% %actor% What do you want to catch with @%self%?
@@ -2060,7 +2311,11 @@ end
 ~
 #18287
 Fake kill tree spirit~
-0 c 0
+0 c 0 4
+L h 0
+L h 4
+L h 18293
+L h 18294
 kill~
 if %actor.char_target(%arg%)% != %self%
   return 0
@@ -2090,7 +2345,13 @@ done
 ~
 #18288
 Resurrect Scaldorran: DEPRECATED~
-1 c 2
+1 c 2 6
+L b 10048
+L j 10055
+L t 18288
+L t 18289
+L t 18290
+L t 18291
 use~
 * This is deprecated with the new version of Skycleave (Ashes of History), which does not require it.
 return 0
@@ -2099,7 +2360,7 @@ if %actor.obj_target(%arg%)% != %self%
   return 0
   halt
 end
-if !(%actor.on_quest(18288) || %actor.on_quest(18289) || %actor.on_quest(18290) || %actor.on_quest(18391)%)
+if !(%actor.on_quest(18288) || %actor.on_quest(18289) || %actor.on_quest(18290) || %actor.on_quest(18291)%)
   %send% %actor% You don't have anything to talk to Scaldorran about right now.
   %send% %actor% @%self% vanishes in a puff of smoke.
   %purge% %self%
@@ -2125,7 +2386,12 @@ dg_affect %scaldorran% !ATTACK on -1
 ~
 #18289
 Bag roc egg for Scaldorran~
-1 c 2
+1 c 2 5
+L b 11002
+L c 11001
+L c 11021
+L c 18291
+L j 11000
 use~
 if %actor.obj_target(%arg%)% != %self%
   return 0
@@ -2165,7 +2431,21 @@ end
 ~
 #18290
 Bug the Grand High Sorcerer's Office~
-1 c 2
+1 c 2 14
+L b 11863
+L b 11868
+L b 11869
+L b 11968
+L b 11969
+L j 11864
+L j 11866
+L j 11868
+L j 11964
+L j 11966
+L j 11968
+L j 11973
+L q 4
+L t 18290
 plant~
 if %actor.obj_target(%arg%)% != %self%
   return 0
@@ -2226,7 +2506,9 @@ end
 ~
 #18291
 Plant dragon tree~
-0 i 10
+0 i 10 2
+L h 4
+L h 18294
 ~
 set room %self.room%
 if %room.sector_vnum% == 4
@@ -2238,7 +2520,8 @@ end
 ~
 #18292
 Thirteen coded greeting~
-0 g 100
+0 g 100 1
+L t 18292
 ~
 if %actor.on_quest(18292)% && !%actor.quest_triggered(18292)%
   wait 5
@@ -2247,7 +2530,8 @@ end
 ~
 #18293
 Seed of Imagination plant~
-1 c 2
+1 c 2 1
+L h 18293
 plant~
 if %actor.obj_target(%arg%)% != %self%
   return 0
@@ -2272,7 +2556,9 @@ end
 ~
 #18294
 quest trigger on start~
-1 n 100
+1 n 100 2
+L t 18279
+L t 18282
 ~
 wait 1
 switch %questvnum%
@@ -2289,7 +2575,28 @@ done
 ~
 #18295
 Verdant Wand: Teleport / Terraform~
-1 c 3
+1 c 3 21
+L h 0
+L h 2
+L h 20
+L h 21
+L h 26
+L h 58
+L h 200
+L h 220
+L h 10300
+L h 10301
+L h 10302
+L h 10303
+L h 10304
+L h 10305
+L h 10306
+L h 10307
+L h 10308
+L h 10309
+L h 10310
+L h 10311
+L h 10565
 use~
 if %actor.obj_target(%arg%)% != %self%
   return 0
@@ -2391,7 +2698,8 @@ done
 ~
 #18296
 Malfernes: Guild Quest Greeting~
-0 g 100
+0 g 100 1
+L t 18280
 ~
 if !%actor.on_quest(18280)% || %actor.quest_triggered(18280)% || %self.fighting% || %self.disabled%
   halt
@@ -2446,7 +2754,8 @@ done
 ~
 #18297
 Germione: Guild Quest Codeword~
-0 d 0
+0 d 0 1
+L t 18284
 friend~
 if !%actor.on_quest(18284)% || %actor.quest_triggered(18284)%
   %send% %actor% You don't need to give ~%self% the codeword now.
@@ -2504,7 +2813,13 @@ done
 ~
 #18298
 Scaldorran: Guild Quest Codeword~
-0 d 0
+0 d 0 6
+L b 10048
+L b 11836
+L f 11806
+L f 11839
+L f 11840
+L t 18288
 eternity~
 if !%actor.on_quest(18288)% || %actor.quest_triggered(18288)%
   %send% %actor% You don't need to give ~%self% the codeword now.
@@ -2581,7 +2896,8 @@ done
 ~
 #18299
 Thirteen: Guild Quest Codeword~
-0 d 0
+0 d 0 1
+L t 18292
 river~
 if !%actor.on_quest(18292)% || %actor.quest_triggered(18292)%
   %send% %actor% You don't need to give ~%self% the codeword now.

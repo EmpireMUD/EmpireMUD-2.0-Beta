@@ -1,6 +1,7 @@
 #5107
 Mine Rename Based on Type~
-2 o 100 0
+2 o 100 1
+L f 5107
 ~
 wait 0
 set type %room.mine_type%
@@ -546,7 +547,10 @@ L w 5103
 L w 5104
 shatter~
 eval target %%actor.obj_target(%arg.argument1%)%%
-if !%target%
+if !%arg%
+  %send% %actor% Shatter which piece of gear?
+  halt  
+elseif !%target%
   %send% %actor% You don't see that to shatter here.
   halt
 end
@@ -557,9 +561,11 @@ end
 if !%target.wearable%
   %send% %actor% @%target% is not an equipment item.
   halt
-end
-if %target.is_flagged(*keep)%
-  %send% %actor% You can not shatter something you are keeping.
+elseif %target.is_flagged(*keep)%
+  %send% %actor% You cannot shatter something you are keeping.
+  halt
+elseif %target.is_stolen%
+  %send% %actor% You cannot shatter a stolen item.
   halt
 end
 * 26 ~ 200

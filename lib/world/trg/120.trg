@@ -1,6 +1,8 @@
 #12000
 Purge hint on cleanup~
-2 e 100
+2 e 100 2
+L c 12000
+L c 12030
 ~
 set item %room.contents%
 while %item%
@@ -15,7 +17,7 @@ done
 ~
 #12001
 Old Gods difficulty selector~
-0 c 0
+0 c 0 0
 difficulty~
 if !%arg%
   %send% %actor% You must specify a level of difficulty. (Hard, Group or Boss)
@@ -24,6 +26,10 @@ if !%arg%
 end
 if %self.fighting%
   %send% %actor% You can't change |%self% difficulty while &%self% is in combat!
+  return 1
+  halt
+elseif %self.disabled%
+  %send% %actor% You can't change |%self% difficulty right now.
   return 1
   halt
 end
@@ -61,7 +67,8 @@ nop %mob.unscale_and_reset%
 ~
 #12002
 Old God death generic (unused)~
-0 f 100
+0 f 100 1
+L w 12000
 ~
 set tokens 0
 if %self.mob_flagged(GROUP)%
@@ -97,7 +104,12 @@ done
 ~
 #12003
 Old God load event~
-0 n 100
+0 n 100 5
+L b 12000
+L b 12030
+L c 12000
+L c 12030
+L e 12001
 ~
 set loc %instance.location%
 if !%loc%
@@ -120,7 +132,7 @@ end
 ~
 #12004
 Old Gods loot load boe/bop~
-1 n 100
+1 n 100 0
 ~
 set actor %self.carried_by%
 if !%actor%
@@ -151,13 +163,18 @@ end
 ~
 #12005
 Old Gods delayed despawn~
-1 f 0
+1 f 0 0
 ~
 %adventurecomplete%
 ~
 #12006
 Old God death~
-0 f 100
+0 f 100 5
+L b 12000
+L b 12030
+L c 12002
+L c 12031
+L w 12000
 ~
 set loc %instance.location%
 if %loc%
@@ -201,13 +218,16 @@ done
 ~
 #12007
 Anat: Summon Yatpan / Rain of Arrows~
-0 k 25
+0 k 25 3
+L b 12001
+L w 12002
+L w 12005
 ~
 if %self.cooldown(12002)%
   halt
 end
 nop %self.set_cooldown(12002, 30)%
-if %self.affect(BLIND)%
+if %self.aff_flagged(BLIND)%
   %echo% |%self% eyes flash red, and ^%self% vision clears!
   dg_affect %self% BLIND off 1
 end
@@ -252,7 +272,9 @@ end
 ~
 #12008
 Anat: Bloodbath~
-0 k 33
+0 k 33 2
+L w 12002
+L w 12008
 ~
 if %self.cooldown(12002)%
   halt
@@ -309,7 +331,9 @@ done
 ~
 #12009
 Anat: Impale~
-0 k 50
+0 k 50 2
+L w 12002
+L w 12009
 ~
 if %self.cooldown(12002)%
   halt
@@ -341,7 +365,9 @@ end
 ~
 #12010
 Anat: Earthshatter~
-0 k 100
+0 k 100 2
+L w 12002
+L w 12010
 ~
 if %self.cooldown(12002)%
   halt
@@ -381,13 +407,17 @@ done
 ~
 #12011
 Yatpan: Hawk Dive~
-0 k 100
+0 k 100 4
+L b 12000
+L w 12003
+L w 12012
+L w 12013
 ~
 if %self.cooldown(12003)%
   halt
 end
 nop %self.set_cooldown(12003, 30)%
-if %self.affect(BLIND)%
+if %self.aff_flagged(BLIND)%
   %echo% |%self% eyes flash red, and ^%self% vision clears!
   dg_affect %self% BLIND off 1
 end
@@ -447,7 +477,7 @@ end
 ~
 #12012
 Detect jump~
-0 c 0
+0 c 0 0
 jump~
 if !%self.varexists(running)%
   set running 0
@@ -465,7 +495,9 @@ remote jumped_%actor.id% %self.id%
 ~
 #12013
 Yatpan: Unsummon Self~
-0 b 33
+0 b 33 2
+L b 12000
+L w 12005
 ~
 if %self.fighting%
   halt
@@ -489,7 +521,8 @@ nop %anat.set_cooldown(12005, 0)%
 ~
 #12014
 Anat Start Progression: room~
-2 g 100
+2 g 100 1
+L y 12000
 ~
 if %actor.is_pc% && %actor.empire%
   nop %actor.empire.start_progress(12000)%
@@ -497,7 +530,8 @@ end
 ~
 #12015
 Anat Start Progression: mob~
-0 h 100
+0 h 100 1
+L y 12000
 ~
 if %actor.is_pc% && %actor.empire%
   nop %actor.empire.start_progress(12000)%
@@ -505,7 +539,15 @@ end
 ~
 #12030
 Hadad phase change: 1 to 2~
-0 l 50
+0 l 50 8
+L b 12031
+L f 12035
+L f 12036
+L f 12037
+L f 12038
+L f 12039
+L j 12031
+L w 12031
 ~
 if %self.varexists(phase)%
   if %self.phase% > 2
@@ -541,7 +583,15 @@ end
 ~
 #12031
 Hadad phase reset~
-0 ab 100
+0 ab 100 8
+L b 12031
+L f 12035
+L f 12036
+L f 12037
+L f 12038
+L f 12039
+L j 12031
+L w 12031
 ~
 if !%self.fighting% && %self.varexists(phase)%
   if %self.phase% == 2
@@ -592,7 +642,8 @@ end
 ~
 #12032
 Hadad: Enter Storm~
-0 c 0
+0 c 0 1
+L j 12031
 enter~
 set correct_phase 0
 if %self.varexists(phase)%
@@ -626,7 +677,14 @@ end
 ~
 #12033
 Hadad: Coming Storm death~
-0 f 100
+0 f 100 7
+L b 12030
+L f 12035
+L f 12036
+L f 12037
+L f 12038
+L f 12039
+L w 12031
 ~
 set hadad %instance.mob(12030)%
 if !%hadad%
@@ -663,7 +721,8 @@ done
 ~
 #12034
 Storm Chamber: Flee~
-2 c 0
+2 c 0 1
+L b 12030
 flee~
 set mob %instance.mob(12030)%
 if %mob%
@@ -689,7 +748,10 @@ end
 ~
 #12035
 Ba'al Hadad: Sonic Roar~
-0 k 25
+0 k 25 3
+L w 12030
+L w 12035
+L w 12040
 ~
 if %self.cooldown(12030)%
   halt
@@ -724,7 +786,9 @@ end
 ~
 #12036
 Ba'al Hadad: Bull Charge~
-0 k 33
+0 k 33 2
+L w 12030
+L w 12036
 ~
 if %self.cooldown(12030)%
   halt
@@ -763,7 +827,10 @@ end
 ~
 #12037
 Ba'al Hadad: Thunderbolt~
-0 k 50
+0 k 50 3
+L w 12030
+L w 12037
+L w 12038
 ~
 if %self.cooldown(12030)%
   halt
@@ -802,7 +869,8 @@ done
 ~
 #12038
 Ba'al Hadad: Raging Storm~
-0 k 100
+0 k 100 1
+L w 12030
 ~
 if %self.cooldown(12030)%
   halt
@@ -829,13 +897,17 @@ done
 ~
 #12039
 Ba'al Hadad / Coming Storm: Bolt from the Blue~
-0 k 100
+0 k 100 4
+L b 12030
+L b 12031
+L w 12030
+L w 12039
 ~
 if %self.cooldown(12030)%
   halt
 end
 nop %self.set_cooldown(12030, 20)%
-if %self.affect(BLIND)%
+if %self.aff_flagged(BLIND)%
   %echo% |%self% vision clears!
   dg_affect %self% BLIND off 1
 end
@@ -887,7 +959,8 @@ end
 ~
 #12040
 Hadad Start Progression: room~
-2 g 100
+2 g 100 1
+L y 12030
 ~
 if %actor.is_pc% && %actor.empire%
   nop %actor.empire.start_progress(12030)%
@@ -895,7 +968,7 @@ end
 ~
 #12041
 Ba'al Hadad / Coming Storm: Interrupt~
-0 c 0
+0 c 0 0
 interrupt~
 if !%self.varexists(running)%
   set running 0
@@ -923,7 +996,8 @@ remote interrupted %self.id%
 ~
 #12042
 Hadad Start Progression: mob~
-0 h 100
+0 h 100 1
+L y 12030
 ~
 if %actor.is_pc% && %actor.empire%
   nop %actor.empire.start_progress(12030)%
@@ -931,7 +1005,9 @@ end
 ~
 #12049
 Call Storm~
-1 c 3
+1 c 3 2
+L c 12050
+L w 12049
 use~
 if !(%self.is_name(%arg%)% && %self.worn_by%) && !(%actor.obj_target(%arg%)% == %self% && %self.carried_by%)
   return 0
@@ -987,13 +1063,13 @@ done
 ~
 #12050
 Stormcloud weather~
-1 c 4
+1 c 4 0
 weather~
 %send% %actor% The rainfall is so heavy you can barely see your hand in front of your face.
 ~
 #12051
 Stormcloud echoes~
-1 bw 10
+1 bw 10 0
 ~
 switch %random.4%
   case 1

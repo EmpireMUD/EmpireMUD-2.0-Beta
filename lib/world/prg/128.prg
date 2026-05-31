@@ -18,4 +18,14 @@ keep every soldier well-armed.
 4 4 0 5 cd
 K 7 5
 S
+#12890
+Echo Forge~
+   Your empire has achieved Echo Forge, the Wonderworks of Light, third of the
+Celestial Forges, where even sound tremors in reverence and fear. Here,
+legendary smiths cast light like twinkling stars as they practice their eternal
+craft beneath the night sky.
+~
+5 4 0 5 cd
+K 7 5
+S
 $

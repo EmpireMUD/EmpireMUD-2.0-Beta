@@ -1,6 +1,80 @@
 #18450
 Rising water terraformer~
-0 i 100
+0 i 100 74
+L h 0
+L h 1
+L h 2
+L h 3
+L h 4
+L h 7
+L h 12
+L h 13
+L h 14
+L h 17
+L h 20
+L h 21
+L h 22
+L h 23
+L h 24
+L h 25
+L h 26
+L h 36
+L h 37
+L h 38
+L h 39
+L h 44
+L h 45
+L h 46
+L h 47
+L h 70
+L h 71
+L h 72
+L h 73
+L h 74
+L h 75
+L h 76
+L h 77
+L h 78
+L h 80
+L h 81
+L h 82
+L h 83
+L h 84
+L h 86
+L h 88
+L h 89
+L h 90
+L h 200
+L h 201
+L h 202
+L h 203
+L h 204
+L h 210
+L h 211
+L h 212
+L h 220
+L h 221
+L h 222
+L h 223
+L h 224
+L h 230
+L h 231
+L h 233
+L h 234
+L h 240
+L h 241
+L h 242
+L h 243
+L h 244
+L h 250
+L h 18451
+L h 18452
+L h 18453
+L h 18454
+L h 18455
+L h 18456
+L h 18457
+L h 18458
 ~
 set room %self.room%
 if !%instance.location%
@@ -53,7 +127,8 @@ end
 ~
 #18451
 Dire beaver spawn~
-0 n 100
+0 n 100 1
+L j 18450
 ~
 set room %self.room%
 if (!%instance.location% || %room.template% != 18450)
@@ -67,7 +142,9 @@ end
 ~
 #18452
 Beaver dam cleanup~
-2 e 100
+2 e 100 2
+L e 18451
+L h 18450
 ~
 * this used to terraform but it results in canals becoming a river
 %build% %room% 18451
@@ -75,7 +152,13 @@ Beaver dam cleanup~
 ~
 #18453
 Beaver dam construction~
-0 i 100
+0 i 100 6
+L e 18451
+L h 5
+L h 19
+L h 53
+L h 85
+L h 87
 ~
 * sector vnums to allow
 set valid_sects 5 19 53 85 87
@@ -99,7 +182,9 @@ end
 ~
 #18454
 Dire beaver death: stop flooding~
-0 f 100
+0 f 100 2
+L b 18451
+L c 18455
 ~
 if !%instance%
   halt
@@ -116,13 +201,27 @@ end
 ~
 #18455
 Dammed River: Delayed adventure complete~
-1 f 0
+1 f 0 0
 ~
 %adventurecomplete%
 ~
 #18460
 Unstable Portal setup~
-2 n 100
+2 n 100 14
+L c 18460
+L c 18461
+L j 18462
+L j 18463
+L j 18464
+L j 18465
+L j 18466
+L j 18467
+L j 18468
+L j 18469
+L j 18470
+L j 18471
+L j 18472
+L j 18473
 ~
 * Pick a random room for the inside of the portal
 eval room_vnum 18461 + %random.12%
@@ -156,7 +255,7 @@ done
 ~
 #18461
 Unstable Portal - Block farther entry~
-2 q 100
+2 q 100 0
 ~
 if %actor.nohassle% || %direction% == none || %direction% == portal
   return 1
@@ -167,7 +266,11 @@ return 0
 ~
 #18462
 Give gift on entry~
-2 g 100
+2 g 100 4
+L c 18495
+L c 18497
+L c 18498
+L c 18499
 ~
 context %instance.id%
 * Don't message until after the room description shows
@@ -239,7 +342,7 @@ done
 ~
 #18463
 Cupboard environment~
-2 bw 20
+2 bw 20 0
 ~
 switch %random.3%
   case 1
@@ -255,7 +358,7 @@ done
 ~
 #18464
 Magic words~
-2 c 0
+2 c 0 0
 xyzzy plugh abracadabra~
 if abracadabra /= %cmd%
   %send% %actor% Good try, but that is an old worn-out magic word.
@@ -265,7 +368,8 @@ end
 ~
 #18465
 Twisty passages env~
-2 bw 20
+2 bw 20 1
+L c 18486
 ~
 switch %random.3%
   case 1
@@ -297,7 +401,7 @@ done
 ~
 #18466
 Unstable env~
-2 bw 10
+2 bw 10 0
 ~
 set num %random.5%
 if %num% == 1
@@ -358,7 +462,7 @@ elseif %num% == 4
   set person %room.people%
   while %person%
     if %person.is_pc%
-      if !%person.aff_flagged(!STUN)%
+      if !%person.aff_flagged(NO-STUN)%
         %send% %person% You are stunned by its enormity...
         dg_affect %person% STUNNED on 5
       end
@@ -371,7 +475,7 @@ end
 ~
 #18467
 Hobbit hole env~
-2 bw 10
+2 bw 10 0
 ~
 switch %random.6%
   case 1
@@ -398,7 +502,8 @@ done
 ~
 #18470
 Spirit Steed: Only leader may mount~
-0 ct 0
+0 ct 0 1
+L w 18473
 mount harness~
 if %actor.char_target(%arg.argument1%)% != %self%
   return 0
@@ -431,7 +536,7 @@ nop %self.remove_mob_flag(MOUNTABLE)%
 ~
 #18471
 Sparkle sparkle~
-2 bw 10
+2 bw 10 0
 ~
 * I am shuddering internally as I type this
 if %room.time(hour)% < 7 || %room.time(hour)% > 19
@@ -457,7 +562,7 @@ done
 ~
 #18472
 Oregon Trail env + dysentery~
-2 bw 10
+2 bw 10 0
 ~
 * Choose a random living player...
 set num_people 0
@@ -487,7 +592,8 @@ end
 ~
 #18473
 Unstable Portal: Precipice: Spawn scion~
-2 bw 50
+2 bw 50 1
+L b 18495
 ~
 wait 15 sec
 if %room.people(18495)%
@@ -513,7 +619,7 @@ end
 ~
 #18482
 "Leave" random direction~
-0 ab 25
+0 ab 25 0
 ~
 set direction_num %random.4%
 switch %direction_num%
@@ -535,7 +641,10 @@ done
 ~
 #18483
 "Arrive from" random direction~
-2 bw 33
+2 bw 33 3
+L b 18482
+L b 18483
+L b 18484
 ~
 set direction_num %random.4%
 switch %direction_num%
@@ -566,7 +675,7 @@ set mob %room.people%
 ~
 #18487
 Modern portal fake list/buy~
-2 c 0
+2 c 0 0
 list buy~
 if list /= %cmd%
   * List
@@ -603,7 +712,8 @@ end
 ~
 #18488
 Load vampire on enter~
-2 bw 100
+2 bw 100 1
+L b 18489
 ~
 return 1
 wait 5
@@ -627,7 +737,8 @@ detach 18488 %self.id%
 ~
 #18489
 EmpireMUD 1.0 Vampire Attack~
-0 n 100
+0 n 100 1
+L c 18489
 ~
 set room %self.room%
 set dawn 7
@@ -708,7 +819,7 @@ end
 ~
 #18490
 Hobbit poetry~
-0 btw 5
+0 btw 5 0
 ~
 emote clears %self.hisher% throat.
 wait 5 sec
@@ -816,7 +927,15 @@ emote falls silent.
 ~
 #18491
 DeLorean outta nowhere~
-2 bw 1
+2 bw 1 8
+L b 18491
+L b 18492
+L c 18490
+L j 18464
+L j 18468
+L j 18471
+L j 18472
+L r 18491
 ~
 %echo% Suddenly, there is a loud crash and a flash of blue-white light, and a strange silver chariot appears out of nowhere!
 %load% veh 18491
@@ -878,7 +997,16 @@ detach 18491 %self.id%
 ~
 #18492
 Tardis appears~
-2 bw 1
+2 bw 1 9
+L b 18491
+L b 18492
+L c 18493
+L j 18463
+L j 18465
+L j 18466
+L j 18470
+L j 18471
+L r 18492
 ~
 %echo% You hear a strange, grinding roar...
 wait 1 sec
@@ -944,20 +1072,35 @@ detach 18492 %self.id%
 ~
 #18493
 Colossal Cave unstable portal: Xyzzy command~
-2 c 0
+2 c 0 0
 xyzzy~
 %send% %actor% Nothing happens.
 ~
 #18494
 Doctor Who?~
-0 d 0
+0 d 0 0
 Doctor Who~
 wait 2
 say It's just The Doctor.
 ~
 #18495
 Change portal destination~
-1 c 2
+1 c 2 15
+L c 18460
+L c 18461
+L j 18460
+L j 18462
+L j 18463
+L j 18464
+L j 18465
+L j 18466
+L j 18467
+L j 18468
+L j 18469
+L j 18470
+L j 18471
+L j 18472
+L j 18473
 destination~
 set cupboard 18462
 set midgaard 18463
@@ -1032,14 +1175,16 @@ done
 ~
 #18496
 Unstable portal block where~
-2 c 0
+2 c 0 0
 where~
 %send% %actor% You don't even know where YOU are!
 return 1
 ~
 #18497
 Unstable Portal: Precipice: Grafted scion kill~
-0 z 100
+0 z 100 2
+L c 18482
+L j 18473
 ~
 set room %self.room%
 * mark player killed

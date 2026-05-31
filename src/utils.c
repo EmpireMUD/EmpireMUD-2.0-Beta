@@ -4115,6 +4115,9 @@ void extract_resources(char_data *ch, struct resource_data *list, bool ground, s
 							if (OBJ_FLAGGED(obj, OBJ_KEEP)) {
 								continue;
 							}
+							if (IS_STOLEN(obj)) {
+								continue;
+							}
 							if (!CAN_SEE_OBJ(ch, obj)) {
 								continue;
 							}
@@ -4662,6 +4665,9 @@ bool has_resources(char_data *ch, struct resource_data *list, bool ground, bool 
 							}
 							else if (OBJ_FLAGGED(obj, OBJ_KEEP)) {
 								continue;	// skip keeps
+							}
+							else if (IS_STOLEN(obj)) {
+								continue;
 							}
 							else if (!CAN_SEE_OBJ(ch, obj)) {
 								continue;	// skip can't-see

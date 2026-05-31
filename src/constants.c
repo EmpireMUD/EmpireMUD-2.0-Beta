@@ -63,7 +63,7 @@ void tog_pvp(char_data *ch);
 //// EMPIREMUD CONSTANTS /////////////////////////////////////////////////////
 
 // Shown on the "version" command and sent over MSSP
-const char *version = "EmpireMUD 2.0 beta 5.202";
+const char *version = "EmpireMUD 2.0 beta 5.203";
 const char *DG_SCRIPT_VERSION = "DG Scripts 1.0.12 e5.1.18";
 
 
@@ -343,6 +343,7 @@ const char *ability_target_flags[] = {
 	"NOT-ENEMY",
 	"DEAD-OK",	// 30
 	"ROOM-RANDOM-CAN-USE",
+	"NOT-STOLEN",
 	"\n"
 };
 
@@ -1767,7 +1768,7 @@ const char *partial_dirs[][2] = {
  //////////////////////////////////////////////////////////////////////////////
 //// CHARACTER CONSTANTS /////////////////////////////////////////////////////
 
-// AFF_x (1/3) - flags
+// AFF_x (1/4) - flags
 const char *affected_bits[] = {
 	"BLIND",	// 0
 	"MAJESTY",
@@ -1779,8 +1780,8 @@ const char *affected_bits[] = {
 	"IMMUNE-PHYSICAL-DEBUFFS",
 	"SENSE-HIDDEN",
 	"!PHYSICAL",
-	"!TARGET",	// 10
-	"!SEE",
+	"NO-TARGET-IN-ROOM",	// 10
+	"NO-SEE-IN-ROOM",
 	"FLYING",
 	"!ATTACK",
 	"IMMUNE-MAGICAL-DEBUFFS",
@@ -1790,22 +1791,22 @@ const char *affected_bits[] = {
 	"SLOW",
 	"STUNNED",
 	"STONED",	// 20
-	"!BLOOD",
+	"NO-SPEND-BLOOD",
 	"*",	// formerly CLAWS
 	"DEATHSHROUDED",
 	"EARTHMELDED",
 	"MUMMIFIED",	// 25
-	"SOULMASK",
+	"MASK-AFFECTS",
 	"NO-TRACKS",
 	"IMMUNE-POISON-DEBUFFS",
 	"IMMUNE-MENTAL-DEBUFFS",
-	"!STUN",	// 30
+	"NO-STUN",	// 30
 	"*ORDERED",
-	"!DRINK-BLOOD",
+	"NO-DRINK-BLOOD",
 	"DISTRACTED",
 	"HARD-STUNNED",
 	"IMMUNE-DAMAGE",	// 35
-	"!WHERE",
+	"IMMUNE-WHERE",
 	"WATERWALKING",
 	"LIGHT",
 	"POOR-REGENS",
@@ -1815,12 +1816,12 @@ const char *affected_bits[] = {
 	"IMMUNE-TEMPERATURE",
 	"AUTO-RESURRECT",
 	"COUNTERSPELL",		// 45
-	"!DISARM",
-	"!MORPH",
+	"NO-DISARM",
+	"NO-MORPH",
 	"\n"
 };
 
-// AFF_x (2/3) - strings shown when you consider someone (empty for no-show)
+// AFF_x (2/4) - strings shown when you consider someone (empty for no-show)
 const char *affected_bits_consider[] = {
 	"",	// 0 - blind
 	"$E has a majestic aura!",	// majesty
@@ -1848,17 +1849,17 @@ const char *affected_bits_consider[] = {
 	"",	// deathshrouded
 	"",	// earthmeld
 	"",	// 25 - mummified
-	"$E is soulmasked.",	// soulmask
+	"",	// mask-affects
 	"",	// no-tracks
 	"$E is immune to poison debuffs.",	// immune-poison-debuffs
 	"$E is immune to mental debuffs.",	// immune-mental-debuffs
-	"$E is immune to stuns.",	// 30 - !stun
+	"$E is immune to stuns.",	// 30 - no-stun
 	"",	// ordred
-	"",	// !drink-blood
+	"",	// no-drink-blood
 	"",	// distracted
 	"",	// hard-stunned
 	"",	// 35 - immune-damage
-	"",	// !where
+	"",	// immune-where
 	"",	// waterwalking
 	"",	// light
 	"",	// poor-regens
@@ -1868,12 +1869,12 @@ const char *affected_bits_consider[] = {
 	"",	// immune-temperature
 	"",	// auto-resurrect
 	"",	// 45 - counterspell
-	"$E cannot be disarmed",	// !disarm
-	"",	// !morph
+	"$E cannot be disarmed",	// no-disarm
+	"",	// no-morph
 	"\n"
 };
 
-// AFF_x (3/3) - determines if an aff flag is "bad" for the bearer
+// AFF_x (3/4) - determines if an aff flag is "bad" for the bearer
 const bool aff_is_bad[] = {
 	TRUE,	// 0 - blind
 	FALSE,	// majesty
@@ -1886,7 +1887,7 @@ const bool aff_is_bad[] = {
 	FALSE,	// sense-hidden
 	FALSE,	// immune-physical (damage)
 	FALSE,	// 10 - no-target-in-room
-	FALSE,	// no-see-in-room / !SEE
+	FALSE,	// no-see-in-room
 	FALSE,	// flying
 	FALSE,	// !attack
 	FALSE,	// immune-magical-debuffs
@@ -1896,16 +1897,16 @@ const bool aff_is_bad[] = {
 	TRUE,	// slow
 	TRUE,	// stunned
 	TRUE,	// 20 - stoned
-	TRUE,	// !blood
+	TRUE,	// no-spend-blood
 	FALSE,	// * unused
 	FALSE,	// deathshrouded
 	FALSE,	// earthmelded
 	FALSE,	// 25 - mummified
-	FALSE,	// soulmask
+	FALSE,	// mask-affects
 	FALSE,	// no-tracks
 	FALSE,	// immune-poison-debuffs
 	FALSE,	// immune-mental-debuffs
-	FALSE,	// 30 - !stun
+	FALSE,	// 30 - no-stun
 	FALSE,	// ordered
 	FALSE,	// no-drink-blood
 	TRUE,	// distracted
@@ -1921,8 +1922,60 @@ const bool aff_is_bad[] = {
 	FALSE,	// immune-temperature
 	FALSE,	// auto-resurrect
 	FALSE,	// 45 - counterspell
-	FALSE,	// !disarm
-	TRUE,	// !morph
+	FALSE,	// no-disarm
+	TRUE,	// no-morph
+};
+
+// AFF_x (4/4) - whether or not the affect can be put on an item
+const bool allow_affect_flag_on_items[] = {
+	TRUE,	// BLIND	// 0
+	TRUE,	// MAJESTY
+	TRUE,	// INFRA
+	TRUE,	// SNEAK
+	TRUE,	// HIDDEN
+	FALSE,	// *CHARM	// 5
+	TRUE,	// INVIS
+	TRUE,	// IMMUNE-PHYSICAL-DEBUFFS
+	TRUE,	// SENSE-HIDDEN
+	FALSE,	// !PHYSICAL
+	FALSE,	// NO-TARGET-IN-ROOM	// 10
+	FALSE,	// NO-SEE-IN-ROOM
+	TRUE,	// FLYING
+	FALSE,	// !ATTACK
+	TRUE,	// IMMUNE-MAGICAL-DEBUFFS
+	FALSE,	// DISARMED	// 15
+	TRUE,	// HASTE
+	TRUE,	// IMMOBILIZED
+	TRUE,	// SLOW
+	FALSE,	// STUNNED
+	TRUE,	// STONED	// 20
+	TRUE,	// NO-SPEND-BLOOD
+	FALSE,	// *	// formerly CLAWS
+	FALSE,	// DEATHSHROUDED
+	FALSE,	// EARTHMELDED
+	FALSE,	// MUMMIFIED	// 25
+	TRUE,	// MASK-AFFECTS
+	TRUE,	// NO-TRACKS
+	TRUE,	// IMMUNE-POISON-DEBUFFS
+	TRUE,	// IMMUNE-MENTAL-DEBUFFS
+	TRUE,	// NO-STUN	// 30
+	FALSE,	// *ORDERED
+	TRUE,	// NO-DRINK-BLOOD
+	TRUE,	// DISTRACTED
+	FALSE,	// HARD-STUNNED
+	FALSE,	// IMMUNE-DAMAGE	// 35
+	TRUE,	// IMMUNE-WHERE
+	TRUE,	// WATERWALKING
+	TRUE,	// LIGHT
+	TRUE,	// POOR-REGENS
+	TRUE,	// SLOWER-ACTIONS	// 40
+	TRUE,	// HUNGRIER
+	TRUE,	// THIRSTIER
+	TRUE,	// IMMUNE-TEMPERATURE
+	TRUE,	// AUTO-RESURRECT
+	TRUE,	// COUNTERSPELL		// 45
+	TRUE,	// NO-DISARM
+	TRUE	// NO-MORPH
 };
 
 
@@ -4633,6 +4686,7 @@ const char *sector_flags[] = {
 	"IRRIGATES-AREA",
 	"NO-WORKFORCE-AUTOABANDON",
 	"BASIC-CROP",	// 30
+	"HIDE-ON-ISLAND-DESCRIPTION",
 	"\n"
 };
 

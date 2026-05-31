@@ -67,7 +67,7 @@ bool audit_trigger(trig_data *trig, char_data *ch) {
 	bool problem = FALSE;
 	bitvector_t bits;
 	int pos;
-	bool links;
+	bool links, link_words;
 	struct trig_link *link;
 		
 	if (!str_cmp(GET_TRIG_NAME(trig), default_trig_name)) {
@@ -84,6 +84,7 @@ bool audit_trigger(trig_data *trig, char_data *ch) {
 	}
 	
 	links = FALSE;
+	link_words = FALSE;
 	
 	LL_FOREACH(trig->cmdlist, cmd) {
 		if (strlen(cmd->cmd) > 255) {
@@ -91,16 +92,25 @@ bool audit_trigger(trig_data *trig, char_data *ch) {
 			problem = TRUE;
 		}
 		
-		// check for links
+		// check for links: any 3+ digit number
 		for (pos = 0; pos < strlen(cmd->cmd) - 1 && !links; ++pos) {
-			if (isdigit(cmd->cmd[pos]) && isdigit(cmd->cmd[pos+1])) {
+			if (isdigit(cmd->cmd[pos]) && isdigit(cmd->cmd[pos+1]) && isdigit(cmd->cmd[pos+2])) {
 				links = TRUE;
 			}
+		}
+		
+		if (strstr(cmd->cmd, ".skill(") || strstr(cmd->cmd, ".affect(") || strstr(cmd->cmd, ".ability(") || strstr(cmd->cmd, ".has_component(") || strstr(cmd->cmd, ".is_component(") || strstr(cmd->cmd, ".charge_component(") || strstr(cmd->cmd, ".component_") || strstr(cmd->cmd, "%component.")) {
+			link_words = TRUE;
 		}
 	}
 	
 	if (links && !GET_TRIG_LINKS(trig)) {
 		olc_audit_msg(ch, GET_TRIG_VNUM(trig), "Contains numbers but has no links");
+		problem = TRUE;
+	}
+	
+	if (link_words && !GET_TRIG_LINKS(trig)) {
+		olc_audit_msg(ch, GET_TRIG_VNUM(trig), "Contains skill, affect, ability, or component but has no links");
 		problem = TRUE;
 	}
 	
@@ -1177,49 +1187,63 @@ OLC_MODULE(tedit_links) {
 	trig_data *trig = GET_OLC_TRIGGER(ch->desc);
 	any_vnum vnum;
 	bool any;
-	char cmd_arg[MAX_INPUT_LENGTH], type_arg[MAX_INPUT_LENGTH], vnum_arg[MAX_INPUT_LENGTH], buf[MAX_STRING_LENGTH];
+	char cmd_arg[MAX_INPUT_LENGTH], type_arg[MAX_INPUT_LENGTH], vnum_arg[MAX_INPUT_LENGTH], one_vnum[MAX_INPUT_LENGTH], buf[MAX_STRING_LENGTH], temp[MAX_INPUT_LENGTH];
 	int pos;
 	struct trig_link *link, *next_link;
 	
-	const char *usage = "Usage: links add <type> <vnum>\r\n"
+	const char *usage = "Usage: links add <type> <vnum(s)>\r\n"
 						"       links remove <type> <vnum | all>\r\n"
 						"       links remove all\r\n";
 	
 	argument = any_one_arg(argument, cmd_arg);
 	argument = any_one_arg(argument, type_arg);
-	argument = any_one_arg(argument, vnum_arg);
+	argument = trim(argument);
+	strcpy(vnum_arg, argument);	// remainder
 	
 	if (!*cmd_arg || !*type_arg) {
 		msg_to_char(ch, "%s", usage);
 	}
 	else if (is_abbrev(cmd_arg, "add")) {
-		if (!*vnum_arg || !isdigit(*vnum_arg) || (vnum = atoi(vnum_arg)) < 0) {
+		if (!*vnum_arg || !isdigit(*vnum_arg)) {
 			msg_to_char(ch, "%s", usage);
 		}
 		else if ((pos = search_block(type_arg, olc_type_bits, FALSE)) == NOTHING) {
 			msg_to_char(ch, "Unknown type '%s'.\r\n", type_arg);
 		}
 		else {
-			// ok to add -- first ensure not already in list
-			any = FALSE;
-			LL_FOREACH(GET_TRIG_LINKS(trig), link) {
-				if (IS_SET(link->type, BIT(pos)) && link->vnum == vnum) {
-					any = TRUE;
-					break;
-				}
-			}
-			
+			// for messaging
 			prettier_sprintbit(BIT(pos), olc_type_bits, buf);
-			if (any) {
-				msg_to_char(ch, "Link already exists to %s [%d] %s.\r\n", buf, vnum, get_name_by_olc_type(BIT(pos), vnum));
-			}
-			else {
-				CREATE(link, struct trig_link, 1);
-				link->type = BIT(pos);
-				link->vnum = vnum;
-				LL_PREPEND(GET_TRIG_LINKS(trig), link);
-				LL_SORT(GET_TRIG_LINKS(trig), sort_trigger_links);
-				msg_to_char(ch, "Link added for %s [%d] %s.\r\n", buf, vnum, get_name_by_olc_type(BIT(pos), vnum));
+			
+			// add mulitple entries
+			while (*vnum_arg) {
+				// accept multiple vnums: peel 1 off
+				half_chop(vnum_arg, one_vnum, temp);
+				strcpy(vnum_arg, temp);
+				if (!isdigit(*one_vnum) || (vnum = atoi(one_vnum)) < 0) {
+					msg_to_char(ch, "Invalid vnum '%s'.\r\n", one_vnum);
+					continue;	// try the rest anyway
+				}
+				
+				// ok to add -- first ensure not already in list
+				any = FALSE;
+				LL_FOREACH(GET_TRIG_LINKS(trig), link) {
+					if (IS_SET(link->type, BIT(pos)) && link->vnum == vnum) {
+						any = TRUE;
+						break;
+					}
+				}
+				
+				if (any) {
+					msg_to_char(ch, "Link already exists to %s [%d] %s.\r\n", buf, vnum, get_name_by_olc_type(BIT(pos), vnum));
+				}
+				else {
+					CREATE(link, struct trig_link, 1);
+					link->type = BIT(pos);
+					link->vnum = vnum;
+					LL_PREPEND(GET_TRIG_LINKS(trig), link);
+					LL_SORT(GET_TRIG_LINKS(trig), sort_trigger_links);
+					msg_to_char(ch, "Link added for %s [%d] %s.\r\n", buf, vnum, get_name_by_olc_type(BIT(pos), vnum));
+				}
 			}
 		}
 	}

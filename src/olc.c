@@ -7662,6 +7662,10 @@ void olc_process_icons(char_data *ch, char *argument, struct icon_data **list) {
 			msg_to_char(ch, "You can only change the type, color, or icon.\r\n");
 		}
 	}
+	else if (is_abbrev(arg1, "list")) {
+		msg_to_char(ch, "Icons:\r\n");
+		show_icons_display(ch, *list, TRUE);
+	}
 	else {
 		msg_to_char(ch, "Usage: icons add <type> <color code> <icon>\r\n");
 		msg_to_char(ch, "Usage: icons copy <from type> <from vnum>\r\n");
@@ -7674,6 +7678,10 @@ void olc_process_icons(char_data *ch, char *argument, struct icon_data **list) {
 		}
 		if ((iter % 2) != 0) {
 			msg_to_char(ch, "\r\n");
+		}
+		if (PRF_FLAGGED(ch, PRF_SCREEN_READER)) {
+			msg_to_char(ch, "Current icons:\r\n");
+			show_icons_display(ch, *list, TRUE);
 		}
 	}
 }

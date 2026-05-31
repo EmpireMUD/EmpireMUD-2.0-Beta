@@ -656,7 +656,8 @@ nop %self.set_cooldown(500, 25)%
 ~
 #514
 Shadow Wolf Familiars: Hide with Player~
-0 ct 0 0
+0 ct 0 1
+L o 20
 hide~
 * never block command
 return 0
@@ -1109,7 +1110,8 @@ end
 ~
 #550
 Dark Minion: Rescale on load~
-0 n 100 0
+0 n 100 1
+L q 7
 ~
 set actor %self.leader%
 if %actor%

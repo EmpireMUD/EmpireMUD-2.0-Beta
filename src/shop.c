@@ -592,10 +592,38 @@ bool audit_shop(shop_data *shop, char_data *ch) {
 * @return char* The line to show (without a CRLF).
 */
 char *list_one_shop(shop_data *shop, bool detail) {
+	char hours[256], locations[256];
 	static char output[MAX_STRING_LENGTH];
+	int count = 0, locs = 0;
+	struct quest_giver *loc;
+	struct shop_item *item;
 	
 	if (detail) {
-		safe_snprintf(output, sizeof(output), "[%5d] %s%s", SHOP_VNUM(shop), SHOP_NAME(shop), SHOP_FLAGGED(shop, SHOP_IN_DEVELOPMENT) ? " (IN-DEV)" : "");
+		LL_COUNT(SHOP_ITEMS(shop), item, count);
+		
+		// hours
+		if (SHOP_OPEN_TIME(shop) == SHOP_CLOSE_TIME(shop)) {
+			// don't show always open
+			*hours = '\0';
+			//safe_snprintf(hours, sizeof(hours), ", always open");
+		}
+		else {
+			safe_snprintf(hours, sizeof(hours), ", open %d-%d", SHOP_OPEN_TIME(shop), SHOP_CLOSE_TIME(shop));
+		}
+		
+		// location
+		LL_COUNT(SHOP_LOCATIONS(shop), loc, locs);
+		if (locs == 0) {
+			safe_snprintf(locations, sizeof(locations), "no locations");
+		}
+		else if (locs == 1) {
+			safe_snprintf(locations, sizeof(locations), "%s", quest_giver_string(SHOP_LOCATIONS(shop), TRUE));
+		}
+		else {
+			safe_snprintf(locations, sizeof(locations), "%d locations", locs);
+		}
+		
+		safe_snprintf(output, sizeof(output), "[%5d] %s%s - %d item%s%s, %s", SHOP_VNUM(shop), SHOP_NAME(shop), SHOP_FLAGGED(shop, SHOP_IN_DEVELOPMENT) ? " (IN-DEV)" : "", count, PLURAL(count), hours, locations);
 	}
 	else {
 		safe_snprintf(output, sizeof(output), "[%5d] %s%s", SHOP_VNUM(shop), SHOP_NAME(shop), SHOP_FLAGGED(shop, SHOP_IN_DEVELOPMENT) ? " (IN-DEV)" : "");

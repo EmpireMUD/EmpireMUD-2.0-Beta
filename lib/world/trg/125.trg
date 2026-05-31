@@ -1,6 +1,11 @@
 #12500
 Board / climb colossus~
-0 c 0
+0 c 0 5
+L b 12500
+L c 12504
+L j 12501
+L j 12502
+L w 12501
 climb board enter up~
 if %actor.char_target(%arg%)% != %self%
   return 0
@@ -38,7 +43,9 @@ done
 ~
 #12501
 Disembark colossus~
-2 c 0
+2 c 0 2
+L b 12500
+L b 12501
 leave exit disembark~
 set colossus %instance.mob(12500)%
 if !%colossus%
@@ -77,7 +84,8 @@ done
 ~
 #12502
 Colossus eye lasers~
-0 bw 15
+0 bw 15 1
+L b 12500
 ~
 set mob %instance.mob(12500)%
 if !%mob%
@@ -114,7 +122,7 @@ done
 ~
 #12503
 Colossus eye lasers: dodge command~
-0 c 0
+0 c 0 0
 dodge~
 if %actor.position% != Standing && %actor.position% != Fighting
   %send% %actor% You can't do that right now.
@@ -133,7 +141,8 @@ remote dodged_%actor.id% %self.id%
 ~
 #12504
 CC Start Progression~
-2 g 100
+2 g 100 1
+L y 12500
 ~
 if %actor.is_pc% && %actor.empire%
   nop %actor.empire.start_progress(12500)%
@@ -141,7 +150,10 @@ end
 ~
 #12505
 Colossus Fight: Lightning Punch (right arm)~
-0 k 16
+0 k 16 3
+L b 12509
+L w 12502
+L w 12505
 ~
 if %self.cooldown(12502)%
   halt
@@ -187,7 +199,10 @@ end
 ~
 #12506
 Colossus Fight: Retractable Blade (left arm)~
-0 k 20
+0 k 20 3
+L b 12508
+L w 12502
+L w 12506
 ~
 if %self.cooldown(12502)%
   halt
@@ -242,7 +257,8 @@ end
 ~
 #12507
 Colossus Fight: Rocket Barrage~
-0 k 25
+0 k 25 1
+L w 12502
 ~
 if %self.cooldown(12502)%
   halt
@@ -275,7 +291,10 @@ end
 ~
 #12508
 Colossus Fight: Maintenance Spiders~
-0 k 33
+0 k 33 3
+L b 12500
+L w 12502
+L w 12508
 ~
 if %self.cooldown(12502)%
   halt
@@ -307,7 +326,10 @@ end
 ~
 #12509
 Colossus Fight: Leg Stomp~
-0 k 50
+0 k 50 3
+L b 12501
+L w 12502
+L w 12509
 ~
 if %self.cooldown(12502)%
   halt
@@ -369,7 +391,9 @@ end
 ~
 #12510
 Colossus Fight: Eye Lasers~
-0 k 100
+0 k 100 2
+L w 12502
+L w 12511
 ~
 if %self.cooldown(12502)%
   halt
@@ -416,7 +440,9 @@ end
 ~
 #12511
 Board command at scaffold without colossus~
-2 c 0
+2 c 0 2
+L b 12500
+L b 12501
 climb board enter up~
 * find colossus present
 set person %room.people%
@@ -438,7 +464,7 @@ end
 ~
 #12512
 Try to board mini-colossus~
-0 c 0
+0 c 0 0
 climb board enter up~
 if %actor.char_target(%arg%)% != %self%
   return 0
@@ -449,7 +475,7 @@ return 1
 ~
 #12513
 Colossus mob block higher room~
-0 s 100
+0 s 100 0
 ~
 set room_var %self.room%
 eval tricky %%room_var.%direction%(room)%%
@@ -462,7 +488,9 @@ return 0
 ~
 #12514
 Colossus trash spawner~
-1 n 100
+1 n 100 2
+L b 12502
+L b 12503
 ~
 eval vnum 12501+%random.2%
 %load% mob %vnum%
@@ -473,7 +501,8 @@ set mob %room.people%
 ~
 #12515
 Adventurer quest start~
-0 bw 10
+0 bw 10 1
+L t 12504
 ~
 if %self.fighting%
   halt
@@ -490,7 +519,9 @@ done
 ~
 #12516
 Colossus load~
-0 n 100
+0 n 100 2
+L j 12500
+L w 12501
 ~
 if %self.room.template% == 12500
   mgoto %instance.real_location%
@@ -510,7 +541,8 @@ end
 ~
 #12517
 Colossus location updater + leash~
-0 i 100
+0 i 100 1
+L b 12500
 ~
 set room %self.room%
 if %room.distance(%instance.real_location%)% > 20
@@ -524,7 +556,7 @@ end
 ~
 #12518
 wandering mob adventure command~
-0 c 0
+0 c 0 0
 adventure~
 if !(summon /= %arg.car%)
   %teleport% %actor% %instance.real_location%
@@ -537,7 +569,9 @@ return 0
 ~
 #12519
 Colossus look out~
-2 c 0
+2 c 0 2
+L b 12500
+L b 12501
 look~
 if %cmd.mudcommand% == look && out == %arg%
   %send% %actor% Looking down from your perch on the colossus, you see...
@@ -561,7 +595,9 @@ return 0
 ~
 #12520
 Diagnose colossus~
-0 c 0
+0 c 0 2
+L b 12508
+L b 12509
 diagnose~
 if %actor.char_target(%arg%)% != %self%
   return 0
@@ -585,7 +621,10 @@ end
 ~
 #12521
 Colossus death~
-0 f 100
+0 f 100 3
+L b 12505
+L c 12504
+L w 12500
 ~
 set tokens 0
 if !%self.varexists(parts_destroyed)%
@@ -620,7 +659,8 @@ nop %instance.set_location(%instance.real_location%)%
 ~
 #12522
 free cannonballs~
-1 n 100
+1 n 100 1
+L c 12508
 ~
 set actor %self.carried_by%
 if %actor%
@@ -645,13 +685,15 @@ end
 ~
 #12523
 Delayed Completer~
-1 f 0
+1 f 0 0
 ~
 %adventurecomplete%
 ~
 #12524
 ankle brace completion~
-5 o 100
+5 o 100 2
+L b 12500
+L t 18250
 ~
 nop %self.link_instance%
 if !%instance.real_location%
@@ -680,7 +722,7 @@ done
 ~
 #12525
 Colossus eye lasers: greet~
-0 h 100
+0 h 100 0
 ~
 if %self.varexists(running)%
   if %self.running%
@@ -691,7 +733,8 @@ end
 ~
 #12526
 drop Hire/bribe quest on adv death~
-0 f 100
+0 f 100 1
+L t 12504
 ~
 set person %self.room.people%
 while %person%
@@ -705,7 +748,11 @@ done
 ~
 #12527
 Adventurer bribe~
-0 tv 0
+0 tv 0 4
+L f 12513
+L f 12515
+L f 12536
+L t 12504
 ~
 if %questvnum% == 12504
   if %self.aff_flagged(*CHARM)%
@@ -726,7 +773,9 @@ end
 ~
 #12528
 Colossus arm combat~
-0 k 100
+0 k 100 2
+L b 12500
+L w 12502
 ~
 if %self.cooldown(12502)%
   halt
@@ -775,7 +824,7 @@ done
 ~
 #12529
 Colossus arm cling~
-0 c 0
+0 c 0 0
 cling~
 if !%self.varexists(running)%
   %send% %actor% You don't need to cling on particularly tightly right now.
@@ -793,7 +842,7 @@ dg_affect %actor% HARD-STUNNED on 5
 ~
 #12530
 Clockwork Colossus loot bop/boe~
-1 n 100
+1 n 100 0
 ~
 set actor %self.carried_by%
 if !%actor%
@@ -836,7 +885,9 @@ end
 ~
 #12531
 Colossus arm death~
-0 f 100
+0 f 100 2
+L b 12500
+L w 12501
 ~
 %echo% &&wThe destruction of ~%self% weakens the colossus!&&0
 * Start of script fragment: colossus damage updater
@@ -866,7 +917,7 @@ end
 ~
 #12532
 Colossus Central Control dance~
-0 bw 100
+0 bw 100 0
 ~
 if !%self.varexists(active)%
   halt
@@ -957,7 +1008,8 @@ end
 ~
 #12533
 Colossus Central Control dance commands~
-0 c 0
+0 c 0 1
+L b 12500
 pull sabotage~
 if sabotage /= %cmd%
   if %self.varexists(active)%
@@ -1020,13 +1072,15 @@ end
 ~
 #12534
 Colossus Central Control load~
-0 nx 100
+0 nx 100 0
 ~
 dg_affect %self% !ATTACK on -1
 ~
 #12535
 Colossus Central Control death~
-0 f 100
+0 f 100 2
+L b 12500
+L b 12501
 ~
 set colossus %instance.mob(12500)%
 if !%colossus%
@@ -1044,7 +1098,8 @@ remote parts_destroyed %new_colossus.id%
 ~
 #12536
 Adventurer quest start act~
-0 e 0
+0 e 0 1
+L t 12504
 you~
 if %self.fighting%
   halt
@@ -1056,13 +1111,17 @@ set person %room.people%
 while %person%
   if %person.is_pc%
     %quest% %person% start 12504
+    if %person.on_quest(12504)%
+      %send% %person% (You are now on the quest 'Hire the Rival Adventurer'.)
+    end
   end
   set person %person.next_in_room%
 done
 ~
 #12537
 Central Control Greeting~
-0 h 100
+0 h 100 1
+L b 12500
 ~
 wait 1
 * Detect colossus
@@ -1113,7 +1172,9 @@ done
 ~
 #12538
 Other adventurer load~
-0 n 100
+0 n 100 2
+L j 12504
+L s 12504
 ~
 if %self.room.template% == 12504
   %morph% %self% 12504
@@ -1121,13 +1182,16 @@ end
 ~
 #12539
 Start Ankle Brace~
-5 n 100
+5 n 100 0
 ~
 nop %self.link_instance%
 ~
 #12547
 Clockwork Colossus super-loot~
-1 n 100
+1 n 100 3
+L c 12512
+L c 12513
+L c 12519
 ~
 set clothes 12519
 set vehicle 12513
@@ -1157,7 +1221,22 @@ wait 1
 ~
 #12548
 Clockwork Colossus premium loot~
-1 n 100
+1 n 100 15
+L c 12510
+L c 12511
+L c 12515
+L c 12516
+L c 12517
+L c 12518
+L c 12520
+L c 12521
+L c 12522
+L c 12523
+L c 12524
+L c 12525
+L c 12526
+L c 12527
+L c 12528
 ~
 set actor %self.carried_by%
 set percent_roll %random.10000%
@@ -1199,7 +1278,16 @@ wait 1
 ~
 #12549
 Clockwork Colossus BoP loot~
-1 n 100
+1 n 100 9
+L c 12529
+L c 12531
+L c 12533
+L c 12535
+L c 12537
+L c 12539
+L c 12541
+L c 12543
+L c 12545
 ~
 set actor %self.carried_by%
 if %self.level%
@@ -1219,7 +1307,25 @@ wait 1
 ~
 #12550
 Clockwork Colossus Normal Difficulty Loot~
-1 n 100
+1 n 100 18
+L c 12520
+L c 12521
+L c 12522
+L c 12523
+L c 12524
+L c 12525
+L c 12526
+L c 12527
+L c 12528
+L c 12529
+L c 12531
+L c 12533
+L c 12535
+L c 12537
+L c 12539
+L c 12541
+L c 12543
+L c 12545
 ~
 set actor %self.carried_by%
 if %self.level%
@@ -1243,7 +1349,13 @@ wait 1
 ~
 #12551
 Clockwork Colossus Loot Controller~
-1 n 100
+1 n 100 6
+L c 12506
+L c 12507
+L c 12547
+L c 12548
+L c 12549
+L c 12550
 ~
 * loot vars to be 0/1
 set normal 0
@@ -1314,7 +1426,13 @@ wait 1
 ~
 #12552
 Open belt panel~
-1 c 4
+1 c 4 6
+L c 12553
+L c 12554
+L c 12555
+L c 12556
+L c 12557
+L c 12558
 open pry~
 set target %actor.obj_target(%arg%)%
 if %target% != %self%
@@ -1330,7 +1448,15 @@ eval first_panel 12552 + %random.6%
 ~
 #12553
 Belt wires puzzle~
-1 c 4
+1 c 4 8
+L b 12500
+L c 12553
+L c 12554
+L c 12555
+L c 12556
+L c 12557
+L c 12558
+L c 12559
 cut~
 if !%arg%
   %send% %actor% Cut which wire?
@@ -1437,7 +1563,9 @@ end
 ~
 #12555
 Colossus book of chants command~
-1 c 2
+1 c 2 2
+L b 12500
+L j 12500
 chant~
 if binding /= %arg%
   set chant_num 1
@@ -1593,7 +1721,8 @@ end
 ~
 #12556
 Scrawled words -- colossus leg chant hint~
-1 c 4
+1 c 4 1
+L b 12500
 look examine~
 if %actor.obj_target(%arg%)% != %self%
   return 0
@@ -1621,7 +1750,8 @@ end
 ~
 #12557
 Colossus: Search leg alcove for book~
-2 c 0
+2 c 0 1
+L c 12560
 search~
 %load% obj 12560 %actor% inv
 set obj %actor.inventory(12560)%
@@ -1631,7 +1761,7 @@ detach 12557 %self.id%
 ~
 #12558
 Colossus chant book fake read~
-1 c 2
+1 c 2 0
 read~
 if %actor.obj_target(%arg%)% != %self%
   return 0
@@ -1641,7 +1771,10 @@ end
 ~
 #12562
 Clockwork Colossus debug tool~
-1 c 2
+1 c 2 3
+L b 12500
+L b 12501
+L w 12501
 use~
 if %actor.obj_target(%arg%)% != %self%
   return 0

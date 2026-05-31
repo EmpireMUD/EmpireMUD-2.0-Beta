@@ -1,6 +1,11 @@
 #12600
 Elemental trap~
-1 c 2
+1 c 2 5
+L b 12601
+L b 12602
+L b 12603
+L b 12604
+L b 12605
 trap~
 if !%arg%
   %send% %actor% Trap whom?
@@ -33,7 +38,10 @@ end
 ~
 #12601
 Earth Elemental: Burrow Charge~
-0 k 100
+0 k 100 3
+L w 12601
+L w 12605
+L w 12606
 ~
 if %self.cooldown(12605)%
   halt
@@ -70,7 +78,9 @@ end
 ~
 #12602
 Fire Elemental: Summon Ember~
-0 k 100
+0 k 100 2
+L b 12605
+L w 12605
 ~
 if %self.cooldown(12605)%
   halt
@@ -82,7 +92,9 @@ nop %self.set_cooldown(12605, 20)%
 ~
 #12603
 Air Elemental: Dust~
-0 k 100
+0 k 100 2
+L w 12603
+L w 12605
 ~
 if %self.cooldown(12605)%
   halt
@@ -94,7 +106,10 @@ dg_affect #12603 %actor% BLIND on 5
 ~
 #12604
 Water Elemental: Envelop~
-0 k 100
+0 k 100 3
+L w 12604
+L w 12605
+L w 12607
 ~
 if %self.cooldown(12605)%
   halt
@@ -121,7 +136,11 @@ done
 ~
 #12605
 Elemental Rift spawn~
-0 n 100
+0 n 100 4
+L b 12600
+L b 12602
+L c 12611
+L j 12600
 ~
 if %self.vnum% == 12602
   %load% obj 12611 %self% inv
@@ -149,7 +168,12 @@ end
 ~
 #12606
 Elemental Death~
-0 f 100
+0 f 100 5
+L b 12601
+L b 12602
+L b 12603
+L b 12604
+L c 12610
 ~
 * check level limit
 if %actor.level% > 50
@@ -202,7 +226,9 @@ done
 ~
 #12607
 Stomp earth elemental~
-0 c 0
+0 c 0 2
+L w 12601
+L w 12606
 stomp~
 if !%self.varexists(success)%
   set success 0
@@ -227,7 +253,7 @@ dg_affect #12601 %self% off
 ~
 #12608
 Ember: Attack~
-0 k 100
+0 k 100 0
 ~
 %send% %actor% ~%self% shoots a small bolt of fire at you.
 %echoaround% %actor% ~%self% shoots a small bolt of fire at ~%actor%.
@@ -239,7 +265,8 @@ end
 ~
 #12609
 Delayed completion on quest start~
-0 uv 0
+0 uv 0 1
+L c 12610
 ~
 if %instance.start%
   %at% %instance.start% %load% obj 12610
@@ -247,13 +274,15 @@ end
 ~
 #12610
 Delayed Completer~
-1 f 0
+1 f 0 0
 ~
 %adventurecomplete%
 ~
 #12611
 Water elemental: Struggle~
-0 c 0
+0 c 0 2
+L w 12604
+L w 12607
 struggle~
 set break_free_at 1
 if !%actor.affect(12604)%
@@ -283,14 +312,24 @@ end
 ~
 #12612
 Give rejection~
-0 j 100
+0 j 100 0
 ~
 %send% %actor% Don't give the item to ~%self%, use 'quest finish <quest name>' instead (or 'finish all').
 return 0
 ~
 #12625
 Strange Plant: Setup trig~
-2 n 100
+2 n 100 10
+L b 12625
+L b 12626
+L b 12627
+L b 12628
+L b 12641
+L c 9682
+L e 12625
+L e 12626
+L e 12627
+L e 12628
 ~
 set loc %instance.location%
 if !%loc%
@@ -338,7 +377,8 @@ done
 ~
 #12626
 Strange Plant: Player interacts with plant~
-0 e 1
+0 e 1 1
+L c 12644
 you~
 if !%actor.nohassle%
   %load% obj 12644 %actor%
@@ -348,7 +388,10 @@ end
 ~
 #12627
 Strange Plant: Mystery crop determination~
-1 c 2
+1 c 2 3
+L g 12630
+L g 12632
+L g 12633
 plant~
 * temporarily changes crop type and then changes back
 set safety_vnum 12632
@@ -376,7 +419,8 @@ nop %self.val1(%safety_vnum%)%
 ~
 #12628
 Strange Plant: Greet and trap~
-2 g 100
+2 g 100 1
+L c 12644
 ~
 if %method% != goto
   %load% obj 12644 %actor%
@@ -384,7 +428,8 @@ end
 ~
 #12629
 Strange Plant: Impending death countdown in the pitcher plant~
-0 bw 100
+0 bw 100 1
+L c 12642
 ~
 * Tracks each player's time inside and kills them if it's been too long.
 set room %self.room%
@@ -416,7 +461,8 @@ done
 ~
 #12630
 Strange Plant: Trap on leave~
-2 q 100
+2 q 100 1
+L c 12644
 ~
 set safe_methods ability enter exit portal summon goto transfer system script
 if %safe_methods% ~= %method%
@@ -440,7 +486,27 @@ end
 ~
 #12631
 Strange Plant: Defeat the plant~
-0 f 100
+0 f 100 20
+L b 12638
+L b 12641
+L c 12626
+L c 12627
+L c 12628
+L c 12629
+L c 12635
+L c 12645
+L e 12625
+L e 12626
+L e 12627
+L e 12628
+L f 12628
+L f 12630
+L f 12639
+L j 12625
+L w 12626
+L w 12627
+L w 12628
+L w 12629
 ~
 * Shared death trigger
 set room %self.room%
@@ -553,7 +619,9 @@ return 0
 ~
 #12632
 Strange Plant: Sundew struggle ticker~
-0 bw 100
+0 bw 100 2
+L c 12642
+L w 12626
 ~
 * ticks 3 times per 13-second random interval
 set room %self.room%
@@ -626,7 +694,9 @@ done
 ~
 #12633
 Strange Plant: Lantern vine strangle ticker~
-0 bw 100
+0 bw 100 2
+L c 12642
+L w 12627
 ~
 * ticks twice per 13-second random interval
 set room %self.room%
@@ -687,7 +757,9 @@ done
 ~
 #12634
 Strange Plant: Bog maw ticker~
-0 bw 100
+0 bw 100 2
+L c 12642
+L w 12629
 ~
 * ticks twice per 13-second random interval
 set room %self.room%
@@ -752,7 +824,11 @@ done
 ~
 #12635
 Strange Plant: Reject attacks and trap player~
-0 B 0
+0 B 0 4
+L b 12626
+L b 12627
+L b 12628
+L c 12644
 ~
 switch %self.vnum%
   case 12626
@@ -778,7 +854,13 @@ return 0
 ~
 #12636
 Strange Plant: Delayed despawn~
-1 f 0
+1 f 0 6
+L e 12625
+L e 12626
+L e 12627
+L e 12628
+L j 12625
+L j 12626
 ~
 * start here
 set room %self.room%
@@ -798,7 +880,9 @@ end
 ~
 #12637
 Strange Plant: Trap timer helper~
-1 n 100
+1 n 100 2
+L b 12625
+L c 9680
 ~
 wait 3 s
 makeuid actor %self.var(actor_id,0)%
@@ -834,7 +918,21 @@ end
 ~
 #12638
 Strange Plant: Room commands (burn, light, chop, quit)~
-2 c 0
+2 c 0 14
+L b 12625
+L b 12626
+L b 12627
+L b 12628
+L c 12625
+L c 12635
+L c 12644
+L c 12645
+L w 12626
+L w 12627
+L w 12629
+L w 12630
+L w 12631
+L w 12632
 burn light chop dig gather harvest pick plant quit struggle~
 * Shared command trig
 *
@@ -987,7 +1085,8 @@ end
 ~
 #12639
 Strange Plant: Randomly check for victims~
-2 bw 50
+2 bw 50 1
+L c 12644
 ~
 set actor %room.people%
 while %actor%
@@ -999,7 +1098,7 @@ done
 ~
 #12640
 Strange Plant: Only way out is up (must fly)~
-2 q 100
+2 q 100 0
 ~
 if %direction% == up && !%actor.is_flying%
   %send% %actor% The sides of the plant are too slippery... there's no way up!
@@ -1008,7 +1107,9 @@ end
 ~
 #12641
 Strange Plant: Safety catch after completion~
-0 hn 100
+0 hn 100 2
+L c 9680
+L j 12625
 ~
 * Teleport all players/followers out if finished
 if %actor.nohassle%
@@ -1055,7 +1156,11 @@ done
 ~
 #12642
 Strange Plant: You died helper object~
-1 n 100
+1 n 100 4
+L e 12625
+L e 12626
+L e 12627
+L e 12628
 ~
 wait 0
 set actor %self.carried_by%
@@ -1130,14 +1235,27 @@ done
 ~
 #12643
 Strange Plant: Reset timer on entry~
-0 h 100
+0 h 100 0
 ~
 * if a character escapes, the prevents them from dying immediately on return
 rdelete entry_time_%actor.id% %self.id%
 ~
 #12644
 Strange Plant: Trap helper~
-1 n 100
+1 n 100 13
+L b 12626
+L b 12627
+L b 12628
+L c 12637
+L c 12645
+L e 12625
+L e 12626
+L e 12627
+L e 12628
+L j 12626
+L w 12626
+L w 12627
+L w 12629
 ~
 wait 0
 set actor %self.carried_by%
@@ -1210,7 +1328,9 @@ done
 ~
 #12645
 Strange Plant: Struggle command~
-1 c 2
+1 c 2 2
+L b 12626
+L w 12626
 struggle~
 set target 45
 set times_needed 3
@@ -1278,7 +1398,9 @@ end
 ~
 #12646
 Strange Plant: Struggle safety check~
-1 ab 100
+1 ab 100 2
+L b 12626
+L w 12626
 ~
 * Ensures the 'struggle' handler does not stick around
 set ch %self.carried_by%
@@ -1300,7 +1422,8 @@ end
 ~
 #12647
 Strange Plant: Stuff command to put items in the bog maw~
-0 c 0
+0 c 0 1
+L c 12644
 stuff give put~
 * usage: stuff <object>
 set requires_items 3
@@ -1354,7 +1477,7 @@ end
 ~
 #12648
 Seedling pet rename part 1~
-0 n 50
+0 n 50 0
 ~
 wait %random.10% s
 set mode 1%random.8%
@@ -1413,7 +1536,7 @@ done
 ~
 #12649
 Seedling pet rename part 2~
-0 n 100
+0 n 100 0
 ~
 wait %random.10% s
 set mode 2%random.7%
@@ -1466,7 +1589,9 @@ done
 ~
 #12650
 Mob block higher template id (Grove 2.0)~
-0 s 100
+0 s 100 2
+L c 12667
+L t 12650
 ~
 * One quick trick to get the target room
 eval room_var %self.room%
@@ -1499,7 +1624,20 @@ return 0
 ~
 #12651
 Grove 2.0: Manaweaver death~
-0 f 100
+0 f 100 13
+L b 12654
+L b 12655
+L b 12656
+L b 12657
+L b 12661
+L b 12676
+L b 12677
+L c 12652
+L c 12653
+L j 12651
+L j 12652
+L t 12650
+L w 12650
 ~
 if %actor.on_quest(12650)%
   %quest% %actor% drop 12650
@@ -1570,7 +1708,14 @@ mgoto %oldroom%
 ~
 #12652
 Grove difficulty selector~
-1 c 4
+1 c 4 7
+L b 12654
+L b 12655
+L b 12656
+L b 12657
+L b 12661
+L c 12653
+L j 12652
 difficulty~
 if !%arg%
   %send% %actor% You must specify a level of difficulty.
@@ -1643,13 +1788,13 @@ end
 ~
 #12653
 Grove delayed despawner~
-1 f 0
+1 f 0 0
 ~
 %adventurecomplete%
 ~
 #12654
 Magiterranean Grove environment~
-2 bw 10
+2 bw 10 0
 ~
 switch %random.4%
   case 1
@@ -1668,7 +1813,8 @@ done
 ~
 #12655
 Difficulty selector load~
-1 n 100
+1 n 100 1
+L j 12652
 ~
 set tofind 12652
 set room %self.room%
@@ -1727,7 +1873,14 @@ end
 ~
 #12656
 Wildling Ambusher reveal~
-0 gi 100
+0 gi 100 7
+L b 12658
+L b 12659
+L c 12667
+L o 20
+L t 12650
+L w 12657
+L w 12658
 ~
 if %actor%
   * Actor entered room - valid target?
@@ -1826,7 +1979,7 @@ done
 ~
 #12657
 Grove underground environment~
-2 bw 10
+2 bw 10 0
 ~
 switch %random.4%
   case 1
@@ -1845,7 +1998,9 @@ done
 ~
 #12658
 Wildling combat: Nasty Bite~
-0 k 100
+0 k 100 2
+L w 12657
+L w 12658
 ~
 if %self.cooldown(12657)%
   halt
@@ -1859,7 +2014,9 @@ nop %self.set_cooldown(12657, 30)%
 ~
 #12659
 Faun Shifter 2.0: Rejuvenate~
-0 k 100
+0 k 100 2
+L w 12657
+L w 12659
 ~
 if %self.cooldown(12657)%
   halt
@@ -1871,7 +2028,10 @@ dg_affect #12659 %self% HEAL-OVER-TIME %amount% 30
 ~
 #12660
 Grove Manaweaver 2.0: Firebolt~
-0 k 100
+0 k 100 3
+L w 12657
+L w 12660
+L w 12670
 ~
 if %self.cooldown(12657)%
   halt
@@ -1892,7 +2052,7 @@ end
 ~
 #12661
 Escaped wildling load~
-0 n 100
+0 n 100 0
 ~
 if %instance.location%
   mgoto %instance.location%
@@ -1903,7 +2063,10 @@ mmove
 ~
 #12662
 Squirrel Shifter: Morph/Nibble~
-0 k 100
+0 k 100 3
+L s 12662
+L w 12657
+L w 12661
 ~
 if %self.cooldown(12657)%
   halt
@@ -1919,12 +2082,14 @@ else
   %send% %actor% ~%self% nips at your ankles, drawing blood!
   %echoaround% %actor% ~%self% nips at |%actor% ankles, drawing blood!
   %damage% %actor% 25 physical
-  %dot% #12662 %actor% 25 10 physical
+  %dot% #12661 %actor% 25 10 physical
 end
 ~
 #12663
 Badger Shifter: Morph~
-0 k 50
+0 k 50 2
+L s 12663
+L w 12657
 ~
 if %self.cooldown(12657)%
   halt
@@ -1942,7 +2107,10 @@ wait 1 sec
 ~
 #12664
 Badger Shifter: Earthen Claws~
-0 k 100
+0 k 100 3
+L w 12657
+L w 12664
+L w 12670
 ~
 if %self.cooldown(12657)%
   halt
@@ -1973,7 +2141,10 @@ end
 ~
 #12665
 Archweaver: Grand Fireball~
-0 k 50
+0 k 50 3
+L w 12657
+L w 12665
+L w 12666
 ~
 if %self.affect(12666)%
   %send% %actor% &&rThe flames wreathing |%self% staff burn you as &%self% swings at you!
@@ -2013,7 +2184,9 @@ end
 ~
 #12666
 Archweaver: Ignite Weapon~
-0 k 100
+0 k 100 2
+L w 12657
+L w 12666
 ~
 if %self.affect(12666)%
   %send% %actor% &&rThe flames wreathing |%self% staff burn you as &%self% swings at you!
@@ -2030,7 +2203,9 @@ dg_affect #12666 %self% SLOW on 15
 ~
 #12667
 Crow Shifter: Morph~
-0 k 50
+0 k 50 2
+L w 12657
+L w 12667
 ~
 if %self.cooldown(12657)%
   halt
@@ -2053,7 +2228,10 @@ end
 ~
 #12668
 Crow Shifter: Squall~
-0 k 100
+0 k 100 3
+L w 12657
+L w 12663
+L w 12670
 ~
 if %self.cooldown(12657)%
   halt
@@ -2077,7 +2255,10 @@ done
 ~
 #12669
 Turtle Shifter: Morph~
-0 k 50
+0 k 50 3
+L s 12666
+L w 12657
+L w 12669
 ~
 if %self.aff_flagged(IMMUNE-DAMAGE)% && %random.4% == 4
   %echo% ~%self% has retreated into ^%self% shell.
@@ -2101,7 +2282,10 @@ nop %self.add_mob_flag(NO-ATTACK)%
 ~
 #12670
 Turtle Shifter: Riptide~
-0 k 100
+0 k 100 3
+L w 12657
+L w 12669
+L w 12670
 ~
 if %self.cooldown(12657)%
   if %self.affect(12669) && %random.4% == 4
@@ -2136,7 +2320,9 @@ done
 ~
 #12671
 Stomp turtle shifter~
-0 c 0
+0 c 0 2
+L w 12669
+L w 12671
 stomp~
 if !%self.affect(12669)%
   %send% %actor% You don't need to do that right now.
@@ -2150,7 +2336,8 @@ dg_affect #12671 %self% HARD-STUNNED on 5
 ~
 #12672
 Grove Start Progression~
-2 g 100
+2 g 100 1
+L y 12650
 ~
 if %actor.is_pc% && %actor.empire%
   nop %actor.empire.start_progress(12650)%
@@ -2163,7 +2350,30 @@ end
 ~
 #12673
 Grove 2.0: Tranquility Chant~
-1 c 2
+1 c 2 23
+L b 12650
+L b 12651
+L b 12652
+L b 12653
+L b 12654
+L b 12655
+L b 12656
+L b 12657
+L b 12658
+L b 12659
+L b 12660
+L b 12661
+L b 12663
+L b 12686
+L c 12674
+L j 12650
+L j 12651
+L j 12652
+L j 12664
+L j 12665
+L t 12650
+L w 12650
+L w 12673
 chant~
 if (!(tranquility /= %arg%) || %actor.position% != Standing)
   return 0
@@ -2307,7 +2517,8 @@ done
 ~
 #12674
 Underwater (Grove 2.0)~
-2 bgw 100
+2 bgw 100 1
+L c 12675
 ~
 if !%actor%
   * Random
@@ -2363,7 +2574,7 @@ remote breath %actor.id%
 ~
 #12675
 Breath Messaging (Grove 2.0 underwater)~
-1 n 100
+1 n 100 0
 ~
 set actor %self.carried_by%
 wait 1
@@ -2383,7 +2594,7 @@ end
 ~
 #12676
 Air Supply (Grove 2.0)~
-2 g 100
+2 g 100 0
 ~
 * change based on quest, etc
 set breath 5
@@ -2396,7 +2607,16 @@ remote breath %actor.id%
 ~
 #12677
 Apply snake oil to grove gear~
-1 c 2
+1 c 2 9
+L c 12657
+L c 12658
+L c 12659
+L c 12660
+L c 12661
+L c 12662
+L c 12663
+L c 12664
+L c 12665
 oil~
 if !%arg%
   %send% %actor% Apply @%self% to what?
@@ -2428,7 +2648,10 @@ nop %target.flag(SUPERIOR)%
 ~
 #12678
 Seeker Stone: Grove~
-1 c 2
+1 c 2 3
+L j 12650
+L o 80
+L w 12678
 seek~
 if !%arg%
   %send% %actor% Seek what?
@@ -2475,7 +2698,9 @@ end
 ~
 #12679
 Manaweaver spawner~
-1 n 100
+1 n 100 2
+L b 12651
+L b 12652
 ~
 if %random.2% == 2
   %load% mob 12651
@@ -2486,7 +2711,9 @@ end
 ~
 #12680
 Grove track~
-2 c 0
+2 c 0 2
+L o 73
+L o 80
 track~
 if (!%actor.ability(Track)% || !%actor.ability(Navigation)%)
   * Fail through to ability message
@@ -2536,13 +2763,15 @@ end
 ~
 #12681
 Grove 2.0 Quest Finish completes adventure~
-2 v 0
+2 v 0 0
 ~
 %adventurecomplete%
 ~
 #12683
 Grove Manaweaver 2.0 Underwater: Water Blast~
-0 k 100
+0 k 100 2
+L w 12657
+L w 12670
 ~
 if %self.cooldown(12657)%
   halt
@@ -2563,7 +2792,9 @@ end
 ~
 #12685
 Give Grove 2.0 chant item~
-2 u 0
+2 u 0 2
+L c 12673
+L t 12650
 ~
 if %questvnum% == 12650
   %load% obj 12673 %actor% inv
@@ -2571,7 +2802,20 @@ end
 ~
 #12686
 Grove rage spirit speech~
-0 d 1
+0 d 1 13
+L b 12650
+L b 12654
+L b 12655
+L b 12656
+L b 12657
+L b 12658
+L b 12659
+L b 12660
+L b 12661
+L b 12663
+L t 12650
+L w 12650
+L w 12673
 *~
 if %actor.is_npc% && %actor.linked_to_instance%
   halt
@@ -2647,7 +2891,7 @@ end
 ~
 #12687
 Grove rage spirit time limit~
-0 bnw 100
+0 bnw 100 0
 ~
 wait 6 sec
 %echo% A voice in your head urges, 'Say it out loud!'

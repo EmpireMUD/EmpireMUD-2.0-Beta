@@ -1,6 +1,36 @@
 #18100
 Lumberjack chop~
-0 ab 10
+0 ab 10 30
+L h 0
+L h 1
+L h 2
+L h 3
+L h 4
+L h 23
+L h 26
+L h 36
+L h 42
+L h 43
+L h 44
+L h 45
+L h 46
+L h 54
+L h 59
+L h 90
+L h 210
+L h 211
+L h 220
+L h 221
+L h 222
+L h 224
+L h 232
+L h 233
+L h 10562
+L h 10563
+L h 10564
+L h 10565
+L h 10566
+L j 18100
 ~
 if %self.fighting%
   halt
@@ -129,7 +159,12 @@ remote evergreen %self.id%
 ~
 #18101
 Lumberjack drop logs~
-0 f 100
+0 f 100 5
+L c 124
+L c 126
+L c 129
+L c 10558
+L c 18106
 ~
 * logs
 set logs %self.var(logs,0)%
@@ -211,7 +246,7 @@ end
 ~
 #18102
 Goblin lumberjack combat~
-0 k 10
+0 k 10 0
 ~
 switch %random.3%
   case 1
@@ -227,7 +262,7 @@ done
 ~
 #18103
 Goblin lumberjack environmental~
-0 bw 50
+0 bw 50 0
 ~
 * This mob is only flagged SENTINEL when it's chopping
 if (%self.mob_flagged(SENTINEL)% && !%self.fighting%)
@@ -247,7 +282,47 @@ return 0
 ~
 #18104
 Goblin camp cleanup~
-2 e 100
+2 e 100 40
+L h 0
+L h 1
+L h 2
+L h 3
+L h 4
+L h 36
+L h 37
+L h 38
+L h 39
+L h 40
+L h 41
+L h 42
+L h 43
+L h 44
+L h 45
+L h 46
+L h 47
+L h 54
+L h 59
+L h 60
+L h 70
+L h 71
+L h 72
+L h 73
+L h 74
+L h 75
+L h 76
+L h 77
+L h 78
+L h 79
+L h 210
+L h 211
+L h 212
+L h 220
+L h 221
+L h 222
+L h 223
+L h 224
+L h 232
+L h 233
 ~
 * Replace the camp with stumps
 set vnum %room.base_sector_vnum%
@@ -278,7 +353,7 @@ end
 ~
 #18106
 Goblin camp despawn timer~
-1 f 0
+1 f 0 0
 ~
 %adventurecomplete%
 ~

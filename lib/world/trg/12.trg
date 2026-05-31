@@ -46,6 +46,10 @@ Pain Poison Hit~
 1 s 100 1
 L w 1273
 ~
+if !%target% || %target.dead%
+  return 0
+  halt
+end
 set scale 50
 if %actor.has_tech(Poison-Upgrade)%
   set scale 100

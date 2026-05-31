@@ -1,6 +1,12 @@
 #11900
 Skycleave: Skymerc mercenary spawner on diff select~
-0 c 0
+0 c 0 6
+L b 11841
+L b 11842
+L b 11843
+L b 11844
+L b 11845
+L b 11846
 skymerc~
 * Usage: skymerc <difficulty 1-4>
 if %actor% != %self%
@@ -29,7 +35,11 @@ done
 ~
 #11901
 Skycleave: Immortal controller / skycleave command~
-1 c 2
+1 c 2 4
+L b 11900
+L b 11923
+L b 11924
+L j 11800
 skycleave~
 if !%actor.is_immortal%
   %send% %actor% You lack the power to use this.
@@ -130,7 +140,7 @@ end
 ~
 #11902
 Skycleave: BoE loot quality flags~
-1 n 100
+1 n 100 0
 ~
 * Inherit hard/group flags from an NPC and rescale itself, on NON-CRAFTED BOE
 * first ensure there's a person
@@ -162,7 +172,12 @@ end
 ~
 #11903
 Skycleave: Reset mobs when out of combat~
-0 bw 100
+0 bw 100 5
+L b 11850
+L w 11864
+L w 11889
+L w 11890
+L w 11892
 ~
 * Resets "permanent" buffs when the mob is out of combat
 if %self.fighting% || %self.disabled%
@@ -183,7 +198,20 @@ dg_affect #11892 %self% off silent
 ~
 #11904
 Skycleave: Cleaning crew despawn~
-0 b 33
+0 b 33 13
+L b 11889
+L b 11902
+L b 11903
+L b 11926
+L b 11931
+L b 11937
+L b 11961
+L b 11965
+L b 11968
+L b 11970
+L c 11966
+L j 11914
+L j 11937
 ~
 if %self.loadtime% + 3600 > %timestamp%
   * more time left
@@ -248,13 +276,24 @@ done
 ~
 #11905
 Skycleave: Shared load script for mobs~
-0 nA 100
+0 nA 100 11
+L b 11801
+L b 11837
+L b 11861
+L b 11868
+L b 11900
+L b 11901
+L b 11902
+L b 11903
+L j 11910
+L j 11930
+L w 11832
 ~
 switch %self.vnum%
   case 11801
     * Dylane 1B
-    dg_affect #11832 %self% !SEE on -1
-    dg_affect #11832 %self% !TARGET on -1
+    dg_affect #11832 %self% NO-SEE-IN-ROOM on -1
+    dg_affect #11832 %self% NO-TARGET-IN-ROOM on -1
     dg_affect #11832 %self% SNEAK on -1
     nop %self.add_mob_flag(SILENT)%
   break
@@ -352,7 +391,8 @@ detach 11905 %self.id%
 ~
 #11906
 Skycleave: Secret Passage Detection~
-0 hw 100
+0 hw 100 1
+L b 11900
 ~
 if %actor.is_pc%
   * Mark for claw game
@@ -364,7 +404,8 @@ end
 ~
 #11907
 Skycleave: Claw Game (broken)~
-1 c 4
+1 c 4 1
+L b 11900
 play~
 * play claw
 if !%arg.argument1% || !(%self.name% ~= %arg.argument1%)
@@ -382,11 +423,29 @@ set spirit %instance.mob(11900)%
 set claw1 1
 remote claw1 %spirit.id%
 nop %self.val0(1)%
-detach 11909 %self.id%
 ~
 #11908
 Skycleave: Claw Game (fixed)~
-1 c 4
+1 c 4 19
+L b 11900
+L b 11989
+L b 11990
+L b 11991
+L b 11992
+L b 11993
+L b 11994
+L b 11995
+L b 11996
+L b 11997
+L b 11998
+L b 11999
+L c 11987
+L c 11988
+L c 11989
+L c 11990
+L c 11991
+L t 11907
+L t 11908
 play~
 * Usage: play claw
 if %actor.is_npc% || !%arg.argument1% || !(%self.name% ~= %arg.argument1%)
@@ -519,7 +578,9 @@ end
 ~
 #11909
 Skycleave: Skycleaver trinket 2.0 (and warpstone)~
-1 c 2
+1 c 2 2
+L j 11800
+L j 11910
 use~
 * will teleport the actor if used within this distance without a cooldown
 set always_teleport_vnum 11910
@@ -618,7 +679,16 @@ nop %actor.cancel_adventure_summon%
 ~
 #11910
 Skycleave: Auto-fill fountains~
-1 bw 20
+1 bw 20 9
+L c 11882
+L c 11885
+L c 11906
+L c 11921
+L c 11970
+L c 11981
+L w 0
+L w 11885
+L w 11921
 ~
 * ensures the fountains are never empty
 set max %self.val0%
@@ -646,7 +716,7 @@ done
 ~
 #11911
 Pixy Races: Racecall (command)~
-0 c 0
+0 c 0 0
 racecall~
 * announces the race in current positions
 if %actor% != %self%
@@ -856,7 +926,7 @@ raceman tricks
 ~
 #11912
 Pixy Races: Greet triggers upcoming race~
-0 hw 100
+0 hw 100 0
 ~
 * starts a race countdown if a player shows up and no race is waiting
 if %actor.is_npc%
@@ -882,7 +952,39 @@ racework countdown %max_time%
 ~
 #11913
 Pixy Races: Catch pixy in jar command~
-1 c 2
+1 c 2 32
+L b 615
+L b 616
+L b 10042
+L b 11520
+L b 11521
+L b 11522
+L b 11523
+L b 11524
+L b 11525
+L b 11526
+L b 11819
+L b 11820
+L b 11873
+L b 11874
+L b 11875
+L b 11876
+L b 11877
+L b 11878
+L b 11879
+L b 11880
+L b 11881
+L b 11882
+L b 11883
+L b 11884
+L b 11885
+L b 11886
+L b 11887
+L b 11963
+L b 11982
+L b 16624
+L b 16625
+L c 11914
 catch~
 set ok_list 615 616 10042 11520 11521 11522 11523 11524 11525 11526 11820 16624 16625 11963
 set clever_list 11819 11982
@@ -945,7 +1047,7 @@ switch %target.vnum%
     eval guile 1 + %random.3%
     eval luck 1 + %random.3%
   break
-  case 11919
+  case 11820
     * escaped pixy / skycleave
     set pixy an escaped pixy
     set speed %random.2%
@@ -1005,7 +1107,9 @@ remote last_race %jar.id%
 ~
 #11914
 Pixy Races: Check, name, or release pixy jar (command)~
-1 c 2
+1 c 2 2
+L c 11836
+L c 11913
 check name release~
 * vars
 set race_time 180
@@ -1112,7 +1216,16 @@ end
 ~
 #11915
 Skithe Ler-Wyn combat: Gash of Cronus, Forsaken Fate, Cut Short, Skithe Variations~
-0 k 50
+0 k 50 9
+L c 11890
+L w 11800
+L w 11822
+L w 11842
+L w 11851
+L w 11852
+L w 11854
+L w 11856
+L w 11859
 ~
 if %self.cooldown(11800)% || %self.disabled%
   halt
@@ -1170,7 +1283,7 @@ if %move% == 1
       else
         set any 1
         %echo% &&mThe rosy red light strikes ~%ch% in the chest and cuts right through *%ch%!&&0
-        if %diff% == 4 && (%self.level% + 100) > %ch.level% && !%ch.aff_flagged(!STUN)%
+        if %diff% == 4 && (%self.level% + 100) > %ch.level% && !%ch.aff_flagged(NO-STUN)%
           dg_affect #11851 %ch% STUNNED on 10
         end
         if %diff% >= 3
@@ -1345,7 +1458,9 @@ nop %self.remove_mob_flag(NO-ATTACK)%
 ~
 #11916
 Pixy Races: Race command for players~
-0 c 0
+0 c 0 2
+L c 11914
+L c 18252
 race watch~
 * Check status or enter a pixy, or choose who to watch
 return 1
@@ -1498,7 +1613,9 @@ end
 ~
 #11917
 Skycleave: Time traveler's corpse~
-2 gwA 100
+2 gwA 100 2
+L c 11917
+L c 11927
 ~
 * loads a corpse only if a person visits after having been here on a previous day
 set corpse_vnum 11927
@@ -1531,7 +1648,7 @@ end
 ~
 #11918
 Pixy Races: Racework (command)~
-0 c 0
+0 c 0 0
 racework~
 * configure:
 set win_distance 150
@@ -1785,7 +1902,10 @@ end
 ~
 #11919
 Pixy Races: Raceman (command)~
-0 c 0
+0 c 0 3
+L c 11914
+L t 11913
+L t 11914
 raceman~
 * manages the 'start', 'win', and 'tricks' messages/etc argument gives different messages
 if %actor% != %self%
@@ -1975,7 +2095,7 @@ end
 ~
 #11920
 Pixy Races: Main race controller~
-0 ab 100
+0 ab 100 0
 ~
 if !%self.varexists(state)%
   * uninitialized? (first run)
@@ -2071,7 +2191,8 @@ end
 ~
 #11921
 Skycleave: Search ability for hints and secret passages~
-2 p 100
+2 p 100 1
+L f 11936
 ~
 * This was Skycleave: Search ability for hints and secret passages
 * It is no longer used because search is handled by command triggers (#11936)
@@ -2080,7 +2201,13 @@ halt
 ~
 #11922
 Skycleave: Secret passage levers~
-1 c 4
+1 c 4 6
+L b 11923
+L b 11924
+L j 11816
+L j 11817
+L j 11916
+L j 11917
 pull~
 if !%arg.argument1% || %actor.obj_target(%arg.argument1%)% != %self%
   return 0
@@ -2100,7 +2227,15 @@ end
 ~
 #11923
 Skycleave: Open secret passage from goblin side~
-0 n 100
+0 n 100 8
+L j 11815
+L j 11816
+L j 11817
+L j 11822
+L j 11915
+L j 11916
+L j 11917
+L j 11922
 ~
 if %self.room.template% < 11800 || %self.room.template% > 11999
   * Only works in Skycleave
@@ -2135,7 +2270,11 @@ levtog
 ~
 #11924
 Skycleave: Open secret passage from hall side~
-0 n 100
+0 n 100 4
+L j 11817
+L j 11822
+L j 11917
+L j 11922
 ~
 if %self.room.template% < 11800 || %self.room.template% > 11999
   * Only works in Skycleave
@@ -2170,7 +2309,8 @@ levtog
 ~
 #11925
 Skycleave: levtog to disable levers~
-0 c 0
+0 c 0 1
+L c 11922
 levtog~
 if %actor% != %self%
   return 0
@@ -2184,7 +2324,13 @@ end
 ~
 #11926
 Skycleave: Open Magichanical Lab (Behold, Everything Bagel)~
-2 d 0
+2 d 0 6
+L b 11848
+L b 11900
+L j 11839
+L j 11840
+L j 11939
+L j 11940
 behold~
 * Check phrase
 if !(%speech% ~= behold && %speech% ~= everything && %speech% ~= bagel)
@@ -2215,7 +2361,16 @@ end
 ~
 #11927
 Skycleave: Drink Teacup~
-1 s 100
+1 s 100 9
+L b 11920
+L j 11800
+L j 11973
+L j 11974
+L t 11864
+L t 11918
+L t 11919
+L t 11920
+L w 11927
 ~
 dg_affect #11927 %actor% off silent
 dg_affect #11927 %actor% MANA-REGEN -1 60
@@ -2331,7 +2486,10 @@ dg_affect #11927 %actor% off silent
 ~
 #11928
 Skycleave: skyrogueslay command for floor 3~
-0 c 0
+0 c 0 3
+L b 11831
+L b 11840
+L j 11840
 skyrogueslay~
 if %actor% != %self%
   return 0
@@ -2365,7 +2523,9 @@ wait 1
 ~
 #11929
 Skycleave: Leave breadcrumbs in the pixy maze~
-2 qA 100
+2 qA 100 2
+L c 11929
+L c 11930
 ~
 return 1
 * basic checks
@@ -2402,7 +2562,8 @@ remote direction %obj.id%
 ~
 #11930
 Elemental Plane of Water: Spawn boss~
-2 bw 100
+2 bw 100 1
+L b 11928
 ~
 if %room.people(11928)%
   halt
@@ -2427,7 +2588,9 @@ end
 ~
 #11931
 Skycleave: Despawn boss and empty room when alone~
-0 ab 50
+0 ab 50 2
+L j 11908
+L j 11972
 ~
 if %self.fighting%
   halt
@@ -2470,7 +2633,7 @@ end
 ~
 #11932
 Elemental Plane of Water: Boss death and loot check~
-0 f 100
+0 f 100 0
 ~
 set min_level 125
 set room %self.room%
@@ -2518,7 +2681,9 @@ return 0
 ~
 #11933
 Elemental Plane of Water: Breath check~
-0 bw 75
+0 bw 75 2
+L c 11805
+L j 11908
 ~
 if !%self.varexists(scaled)%
   halt
@@ -2589,7 +2754,16 @@ end
 ~
 #11934
 Skycleave: Janitor cleanup service~
-0 bi 20
+0 bi 20 9
+L b 11837
+L c 1000
+L c 11864
+L c 11865
+L c 11867
+L c 11875
+L c 11876
+L c 11929
+L c 11930
 ~
 set purge_list 1000 11864 11865 11867 11875 11876 11929 11930
 wait 2 sec
@@ -2613,7 +2787,11 @@ end
 ~
 #11935
 Skycleave: Detect look interaction~
-0 c 0
+0 c 0 4
+L b 11888
+L b 11920
+L b 11933
+L t 11801
 look~
 return 0
 * detects looking at character
@@ -2639,7 +2817,26 @@ end
 ~
 #11936
 Skycleave: Room commands (Pixy Races, Lich Labs, Goblin Cages, Gate, Ossuary)~
-2 c 0
+2 c 0 19
+L b 11847
+L b 11900
+L b 11923
+L j 11815
+L j 11817
+L j 11822
+L j 11835
+L j 11836
+L j 11839
+L j 11841
+L j 11915
+L j 11917
+L j 11918
+L j 11922
+L j 11936
+L j 11939
+L j 11981
+L j 11989
+L w 11936
 touch open disturb wake awaken search attune look bet wager~
 set search_list 11815 11817 11822 11835 11836 11839 11841 11915 11917 11922 11939
 set lich_cmds touch open disturb wake awaken search
@@ -2815,7 +3012,17 @@ end
 ~
 #11937
 Skycleave: Gossipping pages~
-0 bw 50
+0 bw 50 10
+L b 11900
+L b 11926
+L b 11929
+L b 11934
+L b 11940
+L b 11959
+L b 11965
+L b 11969
+L j 11961
+L j 11963
 ~
 set spirit %instance.mob(11900)%
 * page sheila: chance to jump the no-mob barrier
@@ -3022,7 +3229,10 @@ end
 ~
 #11938
 Walking Sorcery Tower: interior setup~
-5 o 100
+5 o 100 3
+L e 11940
+L e 11941
+L e 11942
 ~
 set inter %self.interior%
 if !%inter%
@@ -3045,7 +3255,14 @@ detach 11938 %self.id%
 ~
 #11939
 Skycleave: Attune skystone at Goef the Oreonic~
-0 c 0
+0 c 0 7
+L c 10036
+L c 10037
+L c 11898
+L c 11899
+L c 11900
+L t 11942
+L w 11900
 attune~
 * attunes skystones for the user
 set allow_list 11900 11899
@@ -3113,7 +3330,8 @@ remote skystone_finished %actor.id%
 ~
 #11940
 Skycleave: Craft-or-Drop: Set BoE/BoP and loot quality flags~
-1 n 100
+1 n 100 1
+L f 11940
 ~
 * This script makes loot BOP when dropped by a mob but BOE when crafted.
 * It will also inherit hard/group flags from an NPC and rescale itself.
@@ -3164,11 +3382,14 @@ if %rescale% && %self.level%
   wait 0
   %scale% %self% %self.level%
 end
-detach 11902 %self.id%
+detach 11940 %self.id%
 ~
 #11941
 Skycleave: Only drops loot for unique fighters~
-0 f 100
+0 f 100 3
+L b 11852
+L b 11888
+L b 11920
 ~
 * mob only loses !LOOT flag if a unique person over min_level has tagged it
 * can also work in reverse, adding it
@@ -3229,7 +3450,8 @@ return 0
 ~
 #11942
 Rot and Ruin: Re-spawn boss when new player arrives~
-2 gA 100
+2 gA 100 1
+L b 11888
 ~
 * Iskip of Rot and Ruin (11888) respawns if any player arrives
 if %actor.is_npc%
@@ -3244,7 +3466,8 @@ end
 ~
 #11943
 Skycleave: Dreams of Smol Nes-Pik~
-2 bw 100
+2 bw 100 1
+L w 11943
 ~
 * Gives sleeping players dreams -- non-teleporting version
 set ch %room.people%
@@ -3351,7 +3574,9 @@ end
 ~
 #11944
 Smol Nes-Pik: Main entrance dream teleporter~
-2 bw 100
+2 bw 100 2
+L j 11875
+L w 11943
 ~
 * Sleeping players and their NPC followers teleport to Smol Nes-Pik
 set to_room %instance.nearest_rmt(11875)%
@@ -3459,7 +3684,28 @@ end
 ~
 #11945
 Skycleave Dreams: Triple Wake or Pinch Self to Exit~
-2 c 0
+2 c 0 21
+L b 11900
+L f 11946
+L j 11830
+L j 11925
+L j 11975
+L j 11976
+L j 11977
+L j 11978
+L j 11979
+L j 11980
+L j 11981
+L j 11982
+L j 11983
+L j 11984
+L j 11985
+L j 11986
+L j 11987
+L j 11988
+L j 11989
+L j 11991
+L j 11992
 wake pinch scriptwake run jump trip fall~
 * Teleports the player home if they type 'wake' 3 times while already awake
 * also accepts 'pinch <me/self/name>' or 'scriptwake MODE'
@@ -3606,7 +3852,8 @@ end
 ~
 #11946
 Skycleave Dreams: Reset wake on poof-in~
-2 gwA 100
+2 gwA 100 1
+L f 11945
 ~
 * When a player enters by any means OTHER than normal walking, reset their
 * 'wake' count. Typing 'wake' 3 times exits the area using trigger 11945.
@@ -3622,7 +3869,8 @@ end
 ~
 #11947
 Smol Nes-Pik: Queen flirts on entry~
-0 gw 100
+0 gw 100 1
+L c 1206
 ~
 * Queen flirtatiously greets the first player who enters and gives them a
 * blue iris (1206). On repeat visits, she just winks.
@@ -3671,7 +3919,8 @@ end
 ~
 #11948
 Skycleave: Pixy Queen's greeting~
-0 g 100
+0 g 100 1
+L b 11884
 ~
 * Queen gives a hidden wink if a player arrives who she met in the Dream (mob 11884)
 wait 1
@@ -3692,7 +3941,7 @@ end
 ~
 #11949
 Walking mausoleum death knell~
-2 g 100
+2 g 100 0
 ~
 if %method% == respawn
   %regionecho% %room% 50 A booming death knell echoes from %room.coords%.
@@ -3701,7 +3950,11 @@ end
 ~
 #11950
 Skycleave: Consume handler (long potions and other consumables)~
-1 s 100
+1 s 100 4
+L c 11884
+L c 11912
+L c 11924
+L c 11925
 ~
 * handles long-duration skycleave potions plus other consumables
 switch %self.vnum%
@@ -3742,7 +3995,7 @@ done
 ~
 #11951
 Queen's Nightmare: Block abilities in the jar~
-2 p 100
+2 p 100 0
 ~
 %send% %actor% None of your abilities have any effect in this jar. What a nightmare!
 %echoaround% %actor% ~%actor% struggles in futility to find a way out of the jar.
@@ -3750,7 +4003,7 @@ return 0
 ~
 #11952
 Rot and Ruin: Inside the sap: catch look and skip~
-2 c 0
+2 c 0 0
 look skip~
 if %cmd.mudcommand% == look && !%arg%
   %send% %actor% You can't see much of anything through the thick sap.
@@ -3768,7 +4021,8 @@ end
 ~
 #11953
 Rot and Ruin: Sap teleport manager (room)~
-2 bgwA 100
+2 bgwA 100 1
+L c 11891
 ~
 * this runs both at random and on enter
 if %actor%
@@ -3820,7 +4074,9 @@ end
 ~
 #11954
 Rot and Ruin: Sap intro/teleport~
-1 b 100
+1 b 100 2
+L j 11888
+L w 11891
 ~
 * fetch cycle
 if %self.varexists(cycle)%
@@ -3892,7 +4148,11 @@ remote cycle %self.id%
 ~
 #11955
 Smol Nes-Pik: Queen Vehl Cutscene Controller~
-0 bw 100
+0 bw 100 4
+L f 11956
+L f 11957
+L f 11958
+L f 11959
 ~
 * configs
 set num_stories 4
@@ -3933,7 +4193,9 @@ end
 ~
 #11956
 Smol Nes-Pik: Queen Vehl Cutscene: Repairs Continue Apace~
-0 ab 100
+0 ab 100 2
+L b 11876
+L j 11883
 ~
 * runs until 'line' hits the default cause in the switch
 * Queen Vehl, Story 1: Repairs Continue Apace
@@ -4008,7 +4270,9 @@ done
 ~
 #11957
 Smol Nes-Pik: Queen Vehl Cutscene: The Second Front~
-0 ab 100
+0 ab 100 2
+L b 11875
+L j 11883
 ~
 * runs until 'line' hits the default cause in the switch
 * Queen Vehl, Story 2: The Second Front
@@ -4116,7 +4380,9 @@ done
 ~
 #11958
 Smol Nes-Pik: Queen Vehl Cutscene: Queen's Remorse~
-0 ab 100
+0 ab 100 2
+L b 11874
+L j 11883
 ~
 * runs until 'line' hits the default cause in the switch
 * Queen Vehl, Story 3: Queen's Remorse
@@ -4260,7 +4526,11 @@ done
 ~
 #11959
 Smol Nes-Pik: Queen Vehl Cutscene: Under One Last Moon~
-0 ab 100
+0 ab 100 4
+L b 11873
+L b 11879
+L j 11883
+L j 11885
 ~
 * runs until 'line' hits the default cause in the switch
 * Queen Vehl, Story 4: Under One Last Moon
@@ -4454,7 +4724,10 @@ done
 ~
 #11960
 Smol Nes-Pik: Palace echo~
-2 d 0
+2 d 0 3
+L j 11883
+L j 11885
+L j 11889
 *~
 * Dew pools
 %at% i11885 %echo% ~%actor% echoes down from above, '%speech%'
@@ -4469,7 +4742,13 @@ end
 ~
 #11961
 Smol Nes-Pik: Drink dew of Tagra Nes~
-1 c 2
+1 c 2 6
+L j 11800
+L j 11880
+L j 11889
+L j 11890
+L j 11974
+L w 11961
 drink sip use~
 * Causes a teleport if the players sleeps in their home after drinking this
 if !%arg% || %actor.obj_target(%arg%)% != %self%
@@ -4596,7 +4875,57 @@ dg_affect #11961 %actor% off silent
 ~
 #11962
 Skycleave: Knezz's broken mirror portal~
-1 c 4
+1 c 4 50
+L j 11800
+L j 11801
+L j 11802
+L j 11803
+L j 11804
+L j 11805
+L j 11806
+L j 11807
+L j 11808
+L j 11860
+L j 11861
+L j 11862
+L j 11863
+L j 11864
+L j 11865
+L j 11866
+L j 11867
+L j 11868
+L j 11869
+L j 11870
+L j 11871
+L j 11910
+L j 11911
+L j 11912
+L j 11913
+L j 11914
+L j 11915
+L j 11916
+L j 11917
+L j 11918
+L j 11919
+L j 11920
+L j 11921
+L j 11922
+L j 11923
+L j 11924
+L j 11925
+L j 11926
+L j 11930
+L j 11931
+L j 11932
+L j 11933
+L j 11934
+L j 11935
+L j 11936
+L j 11937
+L j 11938
+L j 11939
+L j 11940
+L j 11941
 enter look examine~
 if (%actor.obj_target(%arg%)% != %self%)
   return 0
@@ -4625,7 +4954,9 @@ return 0
 ~
 #11963
 Skycleave Dreams: Help repeat commands on dew/tear~
-1 c 2
+1 c 2 2
+L c 11961
+L c 11965
 drink use~
 * This trigger only fires if 11961/11965 is already running
 return 0
@@ -4647,7 +4978,14 @@ done
 ~
 #11964
 Smol Nes-Pik: Adventure, time, and weather commands~
-2 c 0
+2 c 0 7
+L j 11882
+L j 11884
+L j 11885
+L j 11888
+L j 11889
+L j 11890
+L j 11891
 adventure time weather~
 set indoor_list 11882 11884 11885 11889
 set no_vis_list 11890 11891
@@ -4698,7 +5036,15 @@ end
 ~
 #11965
 Goblin's Dream: Jade tear sleep teleporter~
-1 c 2
+1 c 2 8
+L c 11979
+L j 11975
+L j 11976
+L j 11977
+L j 11978
+L j 11993
+L j 11994
+L w 11965
 use~
 * Causes a teleport if the players sleeps in their bedroom after using this
 if !%arg% || %actor.obj_target(%arg%)% != %self%
@@ -4829,11 +5175,15 @@ while %count% < 12
   * next while loop
   eval count %count% + 1
 done
-dg_affect #11961 %actor% off silent
+dg_affect #11965 %actor% off silent
 ~
 #11966
 Skycleave: Shared get trigger (diary replacement, struggle)~
-1 g 100
+1 g 100 4
+L c 11890
+L c 11918
+L c 11919
+L c 11920
 ~
 if %self.vnum% == 11890
   * the struggle-- just purge
@@ -4882,7 +5232,8 @@ end
 ~
 #11967
 Hanging gardens visitor restring~
-0 n 100
+0 n 100 1
+L b 11943
 ~
 set vnum 11943
 set female_list Maria Ana Mary Anna Elena Marie Fatima Olga Sandra Rita Xin Sri Yu Lei Hui Ying Yan Nushi
@@ -4978,7 +5329,15 @@ detach 11967 %self.id%
 ~
 #11968
 Gnarled old wand: By the Power of Skycleave~
-1 c 1
+1 c 1 8
+L b 11805
+L b 11905
+L b 11968
+L b 11970
+L j 11875
+L j 11973
+L j 11975
+L w 11883
 say ' shout whisper~
 return 0
 set room %actor.room%
@@ -5054,7 +5413,34 @@ end
 ~
 #11969
 Elemental Plane of Water: Hendecagon fountain summoned NPC run~
-0 ab 100
+0 ab 100 27
+L b 11854
+L b 11855
+L b 11856
+L b 11857
+L b 11858
+L c 11805
+L j 11901
+L j 11902
+L j 11903
+L j 11904
+L j 11910
+L j 11911
+L j 11912
+L j 11913
+L j 11922
+L j 11930
+L j 11931
+L j 11932
+L j 11933
+L j 11934
+L j 11960
+L j 11961
+L j 11962
+L j 11963
+L j 11970
+L j 11971
+L j 11972
 ~
 wait 3 sec
 * Runs down the tower and into the Elemental Plane of Water
@@ -5133,7 +5519,11 @@ done
 ~
 #11970
 Goblin's Dream: Arena challenge spawner~
-2 bw 90
+2 bw 90 4
+L b 11956
+L b 11957
+L b 11958
+L c 11973
 ~
 set mob_list 11956 11957 11958
 set first_mob 11956
@@ -5167,7 +5557,13 @@ end
 ~
 #11971
 Skycleave: Burn the heartwood of time (rescue the tower)~
-1 c 4
+1 c 4 6
+L b 11866
+L b 11871
+L b 11872
+L b 11895
+L b 11898
+L b 11900
 burn light~
 * some mobs block burning
 set mob_list 11871 11866 11872
@@ -5199,7 +5595,10 @@ remote finish4 %spirit.id%
 ~
 #11972
 Goblin's Dream: Arena must-fight timer~
-1 f 0
+1 f 0 3
+L b 11956
+L b 11957
+L b 11958
 ~
 * when this item expires, it resets the fight if nobody is fighting
 set mob_list 11956 11957 11958
@@ -5236,7 +5635,12 @@ return 0
 ~
 #11973
 Goblin's Dream: Arena challenge death~
-0 f 100
+0 f 100 5
+L b 11956
+L b 11957
+L b 11958
+L c 11972
+L c 11973
 ~
 * This both spawns the next mob and manages the !LOOT flag based on unique fighters
 set room %self.room%
@@ -5328,7 +5732,13 @@ done
 ~
 #11974
 Skycleave: Hendecagon fountain animation~
-1 b 15
+1 b 15 6
+L b 11854
+L b 11855
+L b 11856
+L b 11857
+L b 11858
+L j 11971
 ~
 set room %self.room%
 if %room.template% == 11971 && %random.4% == 4
@@ -5366,7 +5776,8 @@ end
 ~
 #11975
 Goblin's Dream: Main entrance dream telepoter~
-2 bw 100
+2 bw 100 1
+L j 11975
 ~
 * Sleeping players and their NPC followers teleport to Gobbrabakh of Orka
 set to_room %instance.nearest_rmt(11975)%
@@ -5410,7 +5821,14 @@ done
 ~
 #11976
 Goblin's Dream: Adventure, time, and weather commands~
-2 c 0
+2 c 0 7
+L j 11975
+L j 11976
+L j 11977
+L j 11978
+L j 11979
+L j 11980
+L j 11981
 adventure time weather~
 set indoor_list 11975 11976 11977 11978 11979 11980 11981
 if %cmd.mudcommand% == adventure
@@ -5455,7 +5873,8 @@ end
 ~
 #11977
 Elemental Plane of Water: Enter resets breath timer~
-2 gA 100
+2 gA 100 1
+L b 11928
 ~
 if !%actor.is_pc%
   halt
@@ -5477,7 +5896,8 @@ end
 ~
 #11978
 Goblin's Dream: Altar pilgrim behavior~
-0 ab 100
+0 ab 100 1
+L j 11991
 ~
 * This runs 100% of the time on mob 11979 (pilgrim) who is loaded by trig 11979
 * fetch sequence number: runs every 13sec until it hits a 'default' below
@@ -5542,7 +5962,9 @@ done
 ~
 #11979
 Goblin's Dream: Altar below pilgrim loader~
-2 bw 33
+2 bw 33 2
+L b 11979
+L j 11991
 ~
 * This script randomly loads a pilgrim into the room, if there isn't one yet.
 * The pilgrim will take care of its own actions and cleanup.
@@ -5600,7 +6022,18 @@ done
 ~
 #11980
 Goblin's Dream: Zenith passage every 30 minutes~
-2 b 30
+2 b 30 11
+L j 11982
+L j 11983
+L j 11984
+L j 11985
+L j 11986
+L j 11987
+L j 11988
+L j 11989
+L j 11990
+L j 11991
+L j 11992
 ~
 * once per 30 minutes
 set start_v 11982
@@ -5615,7 +6048,8 @@ wait 1787 sec
 ~
 #11981
 Skycleave: Handy mob restring command~
-0 c 0
+0 c 0 1
+L j 11982
 restring~
 * uses a self-only command trig
 if %actor% != %self%
@@ -5673,7 +6107,16 @@ end
 ~
 #11982
 Elver the Worthy combat: Hammer Dance, Ring Your Bell, Prayer of Thunder, Hammer Throw~
-0 k 100
+0 k 100 9
+L w 11800
+L w 11851
+L w 11852
+L w 11856
+L w 11952
+L w 11953
+L w 11954
+L w 11955
+L w 11956
 ~
 if %self.cooldown(11800)% || %self.disabled%
   halt
@@ -5799,7 +6242,7 @@ elseif %move% == 2 && !%self.aff_flagged(BLIND)%
   else
     * hit
     %echo% &&j~%self% lands on |%targ% chest and clangs both hammers together on ^%targ% head, shouting the whole time!&&0
-    if %diff% >= 3 && (%self.level% + 100) > %targ.level% && !%targ.aff_flagged(!STUN)%
+    if %diff% >= 3 && (%self.level% + 100) > %targ.level% && !%targ.aff_flagged(NO-STUN)%
       %send% %targ% &&jYou're seeing stars!&&0
       dg_affect #11851 %targ% STUNNED on 15
     end
@@ -5870,7 +6313,7 @@ elseif %move% == 4 && !%self.aff_flagged(BLIND)%
   else
     * hit
     %send% %targ% &&j|%self% hammers soar through the air and hit |%targ% head one after the other!&&0
-    if %diff% >= 3 && (%self.level% + 100) > %targ.level% && !%targ.aff_flagged(!STUN)%
+    if %diff% >= 3 && (%self.level% + 100) > %targ.level% && !%targ.aff_flagged(NO-STUN)%
       %send% %targ% &&jYou're seeing stars!&&0
       dg_affect #11851 %targ% STUNNED on 15
     elseif %diff% >= 2
@@ -5887,7 +6330,17 @@ nop %self.remove_mob_flag(NO-ATTACK)%
 ~
 #11983
 Iskip combat: Jar of Captivity, Lightning Torrent, Buff Blitz, Radiant Axe~
-0 k 100
+0 k 100 10
+L c 11890
+L w 3021
+L w 11800
+L w 11851
+L w 11852
+L w 11856
+L w 11888
+L w 11889
+L w 11890
+L w 11892
 ~
 if %self.cooldown(11800)% || %self.disabled%
   halt
@@ -5895,32 +6348,31 @@ end
 set room %self.room%
 set diff %self.diff%
 dg_affect #3021 %self% COUNTERSPELL on 15
-dg_affect #3021 %self% SOULMASK on 15
-set m_l %self.var(m_l)%
-set n_m %self.var(n_m,0)%
-if !%m_l% || !%n_m%
-  set m_l 1 2 3 4
-  set n_m 4
+dg_affect #3021 %self% MASK-AFFECTS on 15
+set ml %self.var(ml)%
+set nm %self.var(nm,0)%
+if !%ml% || !%nm%
+  set ml 1 2 3 4
+  set nm 4
 end
-eval which %%random.%n_m%%%
-set old %m_l%
-set m_l
+eval which %%random.%nm%%%
+set old %ml%
+set ml
 set move 0
 while %which% > 0
   set move %old.car%
   if %which% != 1
-    set m_l %m_l% %move%
+    set ml %ml% %move%
   end
   set old %old.cdr%
   eval which %which% - 1
 done
-set m_l %m_l% %old%
-eval n_m %n_m% - 1
-remote m_l %self.id%
-remote n_m %self.id%
+set ml %ml% %old%
+eval nm %nm% - 1
+remote ml %self.id%
+remote nm %self.id%
 skyfight lockout 30 35
 if %move% == 1 && !%self.aff_flagged(BLIND)%
-  * Jar of Captivity
   skyfight clear free
   skyfight clear struggle
   %echo% &&mThe Iskip pulls out an enormous clay jar and swoops down toward you...&&0
@@ -5974,7 +6426,6 @@ if %move% == 1 && !%self.aff_flagged(BLIND)%
   end
   dg_affect #11852 %self% off
 elseif %move% == 2
-  * Lightning Torrent
   %echo% &&mThe Iskip holds his hands out to the side as sparks crackle around his fingers...&&0
   %echo% &&m**** He seems to be drawing lightning up from the water! ****&&0 (interrupt and dodge)
   if %diff% == 1
@@ -6025,7 +6476,7 @@ elseif %move% == 2
             %send% %ch% &&mA lightning bolt strikes you right in the chest!&&0
             %echoaround% %ch% &&m~%ch% screams as a lightning bolt strikes *%ch%!&&0
             %damage% %ch% 120 physical
-            if %cycle% == 4 && %diff% == 4 && (%self.level% + 100) > %ch.level% && !%ch.aff_flagged(!STUN)%
+            if %cycle% == 4 && %diff% == 4 && (%self.level% + 100) > %ch.level% && !%ch.aff_flagged(NO-STUN)%
               dg_affect #11851 %ch% STUNNED on 10
             end
           end
@@ -6041,7 +6492,6 @@ elseif %move% == 2
   done
   skyfight clear interrupt
 elseif %move% == 3
-  * Buff Blitz
   %echo% &&mThe Iskip raises his hands to the sky and begins chanting something you don't understand...&&0
   %echo% &&m**** He seems to be casting spells... on himself! ****&&0 (interrupt)
   if %diff% == 1
@@ -6097,7 +6547,6 @@ elseif %move% == 3
   done
   skyfight clear interrupt
 elseif %move% == 4
-  * Radiant Axe
   skyfight clear dodge
   %echo% &&mThe Iskip speaks a few words in a language you don't understand...&&0
   wait 3 s
@@ -6143,7 +6592,14 @@ nop %self.remove_mob_flag(NO-ATTACK)%
 ~
 #11984
 First Water combat: Frozen Solid, Cavitation Cascade, Lightning Wave, Under Pressure~
-0 k 100
+0 k 100 7
+L c 11890
+L w 11800
+L w 11822
+L w 11851
+L w 11852
+L w 11856
+L w 11972
 ~
 if %self.cooldown(11800)% || %self.disabled%
   halt
@@ -6252,7 +6708,7 @@ elseif %move% == 2
       if %self.is_enemy(%ch%)%
         if !%ch.var(did_sfdodge)%
           %echo% &&AThere's a blinding flash as a bubble implodes right next to ~%ch%!&&0
-          if %cycle% == %diff% && %diff% >= 3 && (%self.level% + 100) > %ch.level% && !%ch.aff_flagged(!STUN)%
+          if %cycle% == %diff% && %diff% >= 3 && (%self.level% + 100) > %ch.level% && !%ch.aff_flagged(NO-STUN)%
             dg_affect #11851 %ch% STUNNED on 5
           end
           %damage% %ch% 130 physical
@@ -6317,7 +6773,7 @@ elseif %move% == 3
           %send% %ch% &&AYou gurgle in pain as the wave passes through you!&&0
           %echoaround% %ch% &&A~%ch% gurgles in pain as the wave passes through *%ch%!&&0
           %damage% %ch% 100 physical
-          if %cycle% == 4 && %diff% == 4 && (%self.level% + 100) > %ch.level% && !%ch.aff_flagged(!STUN)%
+          if %cycle% == 4 && %diff% == 4 && (%self.level% + 100) > %ch.level% && !%ch.aff_flagged(NO-STUN)%
             dg_affect #11851 %ch% STUNNED on 10
           end
         end
@@ -6389,7 +6845,14 @@ nop %self.remove_mob_flag(NO-ATTACK)%
 ~
 #11985
 Gray fox pet behavior~
-0 bt 25
+0 bt 25 7
+L b 534
+L b 9141
+L b 9933
+L b 11893
+L b 11946
+L b 11947
+L b 11977
 ~
 set list 11893 11946 11947 11977 534 9141 9933
 set room %self.room%
@@ -6440,7 +6903,16 @@ wait 30 s
 ~
 #11986
 Grand High Sorceress combat: Creeping Vines, Cavitation Cascade, Pocket Glitter, Scalding Air, Summon Frens~
-0 k 100
+0 k 100 9
+L b 11817
+L b 11820
+L c 11890
+L w 11800
+L w 11822
+L w 11851
+L w 11852
+L w 11856
+L w 11920
 ~
 if %self.cooldown(11800)% || %self.disabled%
   halt
@@ -6531,7 +7003,7 @@ elseif %move% == 2
       if %self.is_enemy(%ch%)%
         if !%ch.var(did_sfdodge)%
           %echo% &&mThere's a blinding flash as the air explodes right next to ~%ch%!&&0
-          if %cycle% == %diff% && %diff% >= 3 && (%self.level% + 100) > %ch.level% && !%ch.aff_flagged(!STUN)%
+          if %cycle% == %diff% && %diff% >= 3 && (%self.level% + 100) > %ch.level% && !%ch.aff_flagged(NO-STUN)%
             dg_affect #11851 %ch% STUNNED on 5
           end
           %damage% %ch% 150 physical
@@ -6695,7 +7167,15 @@ nop %self.remove_mob_flag(NO-ATTACK)%
 ~
 #11987
 Nailbokh the Axe combat: Axe-nado, Sand Slash, Whirling Storm, Rain of Hatchets~
-0 k 100
+0 k 100 8
+L w 11800
+L w 11851
+L w 11852
+L w 11856
+L w 11957
+L w 11958
+L w 11959
+L w 11960
 ~
 if %self.cooldown(11800)% || %self.disabled%
   halt
@@ -6814,7 +7294,7 @@ elseif %move% == 2
   else
     * hit
     %echo% &&jThe sand flies into |%targ% eyes!&&0
-    if %diff% >= 3 && (%self.level% + 100) > %targ.level% && !%targ.aff_flagged(!STUN)%
+    if %diff% >= 3 && (%self.level% + 100) > %targ.level% && !%targ.aff_flagged(NO-STUN)%
       %send% %targ% &&jThat really hurt! You can't do anything but try to get the sand out of your eyes.&&0
       dg_affect #11851 %targ% STUNNED on 15
     else
@@ -6928,7 +7408,17 @@ nop %self.remove_mob_flag(NO-ATTACK)%
 ~
 #11988
 Biksi, Champion of Orka combat: Thornlash, Thornbound, Triplash, Crown of Thorns~
-0 k 100
+0 k 100 10
+L c 11890
+L w 11800
+L w 11814
+L w 11852
+L w 11856
+L w 11888
+L w 11948
+L w 11949
+L w 11950
+L w 11951
 ~
 if %self.cooldown(11800)% || %self.disabled%
   halt
@@ -7103,7 +7593,7 @@ elseif %move% == 3
       if !%ch.var(did_sfdodge)%
         set hit 1
         %echo% &&j~%self% trips ~%ch% with her thorny whip!&&0
-        if %diff% >= 3 && (%self.level% + 100) <= %ch.level% && !%ch.aff_flagged(!STUN)%
+        if %diff% >= 3 && (%self.level% + 100) <= %ch.level% && !%ch.aff_flagged(NO-STUN)%
           dg_affect #11814 %ch% STUNNED on 10
         else
           dg_affect #11814 %ch% DISARMED on 10
@@ -7173,7 +7663,16 @@ nop %self.remove_mob_flag(NO-ATTACK)%
 ~
 #11989
 Goblin's Dream: Guard patrol~
-0 b 50
+0 b 50 9
+L j 11978
+L j 11983
+L j 11984
+L j 11985
+L j 11986
+L j 11988
+L j 11989
+L j 11990
+L j 11991
 ~
 * The captain of the guard doesn't wander; he patrols
 * This roughly folllows the expected room order:
@@ -7228,7 +7727,18 @@ done
 ~
 #11990
 Liberated wand casts spells on leader~
-0 bt 5
+0 bt 5 11
+L w 11988
+L w 11989
+L w 11990
+L w 11991
+L w 11992
+L w 11993
+L w 11994
+L w 11995
+L w 11996
+L w 11997
+L w 11998
 ~
 set verb_list flicks swishes taps twirls waves
 set verb_count 5
@@ -7332,7 +7842,9 @@ dg_affect #%vnum% %ch% %type% %amount% 300
 ~
 #11991
 Skycleave: Barrosh storytime using script1-3~
-0 bw 100
+0 bw 100 2
+L b 11966
+L b 11968
 ~
 * variant of 11840/Storytime:
 * script1: Grace died
@@ -7423,7 +7935,13 @@ wait %story_gap%
 ~
 #11992
 Smash striped stone seedling to create calamander forest~
-1 c 2
+1 c 2 6
+L h 220
+L h 221
+L h 223
+L h 224
+L h 232
+L h 11990
 smash~
 * smash <self>
 set valid_sects 220 221 223 224 232
@@ -7452,7 +7970,8 @@ end
 ~
 #11993
 Clingy cloak wears itself on uncloaked people~
-0 btw 20
+0 btw 20 1
+L c 11993
 ~
 set pers %random.char%
 if %pers.is_npc% || %pers.eq(about)%
@@ -7468,7 +7987,12 @@ end
 ~
 #11994
 Skycleave: Fake movement in hidden areas~
-2 q 100
+2 q 100 5
+L j 11972
+L j 11973
+L j 11974
+L j 11993
+L j 11994
 ~
 * for rooms with fake exits: you can't actually leave
 * but first ensure it's a walking direction
@@ -7506,7 +8030,8 @@ done
 ~
 #11995
 Skycleave: Reset comment count on enter (room version)~
-2 gA 100
+2 gA 100 1
+L f 11996
 ~
 * pairs with triggers like 11996 to reset comments when a player arrives
 set comment 0
@@ -7514,7 +8039,8 @@ remote comment %self.id%
 ~
 #11996
 Priest's Dream: Presence of the god~
-2 bw 100
+2 bw 100 1
+L f 11995
 ~
 * dream cutscene: player meets the god of Orka
 * The comment sequence will reset whenever a player enters
@@ -7563,7 +8089,7 @@ done
 ~
 #11997
 Adoring fan idle animations~
-0 bt 8
+0 bt 8 0
 ~
 * ensure leader
 set leader %self.leader%
@@ -7643,7 +8169,37 @@ done
 ~
 #11998
 Gemstone flute: Everybody dance now~
-1 ab 100
+1 ab 100 30
+L b 615
+L b 616
+L b 10042
+L b 11520
+L b 11521
+L b 11522
+L b 11523
+L b 11524
+L b 11525
+L b 11526
+L b 11819
+L b 11820
+L b 11873
+L b 11874
+L b 11875
+L b 11876
+L b 11877
+L b 11878
+L b 11879
+L b 11880
+L b 11881
+L b 11882
+L b 11883
+L b 11885
+L b 11886
+L b 11887
+L b 11963
+L b 11982
+L b 16624
+L b 16625
 ~
 set actor %self.worn_by%
 if !%actor%
@@ -7655,7 +8211,7 @@ elseif %actor.action% != playing
 end
 * lists
 set list1 11873 11874 11875 11876 11877 11878 11879 11880 11881 11882 11883 11885 11886 11887
-set list2 615 616 10042 11520 11521 11522 11523 11524 11525 11526 11819 11820 11963 11982 11624 11625
+set list2 615 616 10042 11520 11521 11522 11523 11524 11525 11526 11819 11820 11963 11982 16624 16625
 * loop
 set ch %actor.room.people%
 while %ch%
@@ -7714,7 +8270,7 @@ done
 ~
 #11999
 Crystal ball visions~
-0 ct 0
+0 ct 0 0
 look examine~
 * looking at me?
 if !%arg% || %actor.char_target(%arg%)% != %self%

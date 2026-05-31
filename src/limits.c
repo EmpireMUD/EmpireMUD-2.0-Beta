@@ -1435,6 +1435,11 @@ bool check_autostore(obj_data *obj, bool force, empire_data *override_emp) {
 		return FALSE;
 	}
 	
+	// override empire if stolen
+	if (IS_STOLEN(obj)) {
+		emp = real_empire(GET_STOLEN_FROM(obj));
+	}
+	
 	// ensure object is in a room, or in an object in a room
 	real_loc = IN_ROOM(top_obj);
 	in_veh = top_obj->in_vehicle;

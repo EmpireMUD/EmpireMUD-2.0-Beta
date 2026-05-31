@@ -775,6 +775,23 @@ stat is applied directly, but the next +20 only brings you up to +30.
 
 This is currently only used for resistances.
 #
+DISARMED "DISARMED AFFECT"
+
+A person may become DISARMED as a result of an ability (like Disarm) or a
+special move by a mob in combat. Only certain weapon types may be disarmed.
+
+If you are disarmed, you don't have to re-equip your weapon yourself. When the
+disarm affect wears off, it will still be in your <wield> slot.
+
+Disarmed players lose their weapon damage and will make basic unarmed 'hit'
+attacks (unless the disarmed weapon was a caster weapon, in which case they
+receive a basic 'mana blast' attack instead).
+
+Disarmed mobs lose half their damage and their attack type is changed to 'hit'
+or 'mana blast', but not all mobs can be disarmed.
+
+See also: DISARM
+#
 DISPLAY
 
 Usage:  display <text>
@@ -917,6 +934,20 @@ most regular land tiles, including plains, forest, desert, crops, and roads.
 
 Mountains, rivers, lakes, oceans, jungles, and swamps are not valid.
 #
+FLYING FLIGHT
+
+The FLYING affect means your character can move through the air, albeit at a
+limited height. Flight greatly reduces the amount of effort it takes to move;
+however, it will still cost more to fly over a mountain than flat land.
+
+Flying will allow you to pass over normal barriers such as walls. Some hostile
+creatures, such as sharks in the ocean, will not appear if you're flying.
+
+Flying also allows you to see over blocked terrain that's at the same elevation
+as you are.
+
+See also: FLY, LAND
+#
 GIMMICK "COMBAT GIMMICK" "FIGHT GIMMICK" "INTERACTIVE FIGHT"
 
 Some fights are interactive and will require you to type the right command at
@@ -967,6 +998,16 @@ A superior hammer will forge twice as fast.
 
 See also: BASIC CRAFTS, FORGE
 #
+HASTE "HASTE AFFECT"
+
+The HASTE affect speeds up a person so they attack faster in combat and perform
+ordinary chores at a higher speed.
+
+This affect may come from various places, such as abilities like Hasten or from
+potions. Different sources of HASTE do not stack.
+
+See also: HASTEN
+#
 HEALTH "HIT POINTS" HITPOINTS HP "HEALTH POINTS" "HEALTH POOL"
 
 The health pool is the amount of damage you can take before being knocked out.
@@ -976,6 +1017,19 @@ health, and you can enchant your gear to get even more.
 If you're knocked out with 0 health, you will die without assistance.
 
 See also: DEATH, ENDURANCE
+#
+HIDDEN HIDING
+
+A HIDDEN character doesn't appear when other characters type 'look' in the
+room, but can generally still be targeted by commands.
+
+Most things that hide your character will be broken if you type any normal game
+command -- or even just pressing return. You must remain very still to avoid
+becoming visible. Only rare commands like 'pickpocket' will keep you hidden.
+
+Find hidden characters using the 'search' command.
+
+See also: HIDE, SEARCH
 #
 HISTORY "CHANNEL HISTORY" "CHAT HISTORY"
 
@@ -1050,10 +1104,25 @@ through MSDP.
 See also: BLOOD, EAT, MSDP, PROMPT, REGENS, SATED THIRST, SLEEP, 
    STATUS MESSAGES, TIME, UNNATURAL THIRST
 #
+IMMOBILIZE IMMOBILIZED IMMOBILE
+
+The IMMOBILIZED affect, which appears on some spells and effects, prevents an
+affected character from moving or fleeing.
+
+Additionally, during ranged combat, an immobilized person cannot close the
+distance to switch from ranged to melee combat.
+#
+IMMUNE-WHERE IMMUNEWHERE "IMMUNE WHERE" "IMMUNE TO WHERE" !WHERE
+
+The IMMUNE-WHERE flag prevents a person from showing up on the 'where' command.
+
+See also: WHERE
+#
 INFRA INFRAVISION
 
 The INFRA affect, which appears on some spells and items, allows a character
-perfect night vision.
+perfect night vision. This includes the ability to see the map clearly at night
+without being limited by the amount of light.
 #
 INSTANCES INSTANTIATION INSTANCING
 
@@ -1226,6 +1295,13 @@ maximum distance, which is based on the size of the world map.
 You must have Navigation to do this.
 
 See also: SCAN, LOOK, MAP
+#
+MASK-AFFECTS MASKAFFECTS "MASK AFFECTS"
+
+The MASK-AFFECTS affect prevents others from seeing what's affecting you with
+the 'affects' command.
+
+See also: SOULMASK
 #
 MOON MOONS
 
@@ -1427,6 +1503,30 @@ automatically transferred there as a courtesy.
 
 See also: INFO, GETTING STARTED
 #
+NO-DISARM NODISARM !DISARM "NO DISARM"
+
+The NO-DISARM affect prevents your weapon from being disarmed.
+
+See also: DISARM
+#
+NO-DRINK-BLOOD NODRINKBLOOD !DRINK-BLOOD "NO DRINK BLOOD"
+
+The NO-DRINK-BLOOD affect prevents a character from being bitten or sired by
+vampires.
+#
+NO-SPEND-BLOOD NOSPENDBLOOD !BLOOD !SPEND-BLOOD "NO SPEND BLOOD"
+
+The NO-SPEND-BLOOD affect prevents a character from using any ability that
+requires them to spend blood points.
+
+See also: VAMPIRE
+#
+NO-MORPH NOMORPH !MORPH "NO MORPH"
+
+The NO-MORPH affect prevents you from morphing or un-morphing.
+
+See also: MORPH
+#
 OVEN OVENS
 
 Command:  bake <item>
@@ -1515,6 +1615,24 @@ inventory and gear.
 You can identify items to see which quest they belong to.
 
 See also: IDENTIFY
+#
+"RANGED COMBAT" RANGED
+
+Ranged combat in EmpireMUD is limited. To use it, you must equip a bow (or
+similar item) in your "ranged" equipment slot. This is done with the "hold"
+command. Begin combat with 'shoot' or with a ranged ability.
+
+Ranged combat is usually brief. Your target will run toward you to engage in
+melee combat; you will automatically switch to melee when they reach you. You
+can prolong ranged combat by immobilizing your target.
+
+If you shoot someone who also has a ranged weapon, or if they're fighting
+someone else, you can stay at range indefinitely. You can manually cancel
+ranged combat by typing 'approach'.
+
+Use the 'use' command to set a default arrow (or other ammo) type.
+
+See also: APPROACH, HOLD, IMMOBILIZED, SHOOT, USE
 #
 REGEN REGENS REGENERATION "REGEN RATE" "MANA REGENERATION" "MOVE REGENERATION" "HEALTH REGENERATION" MANA-REGEN MOVE-REGEN
 
@@ -1763,6 +1881,38 @@ proportionally.
 
 See also: SCORE, WITS, HASTEN, SLOW
 #
+STOLEN "STOLEN ITEMS" "STOLEN OBJECTS" (STOLEN)
+
+Items are marked with a (stolen) tag for 30 minutes after you steal them from
+another empire. These items must remain in your inventory until the timer
+expires and the (stolen) tag disappears. You cannot quit during this period.
+
+If you die or are logged out of the game for being idle too long, any stolen
+items are automatically returned.
+
+There are many things you cannot do to an item while it has the (stolen) tag:
+ - butcher
+ - chip
+ - combine
+ - craft (including build, forge, smelt, etc)
+ - douse
+ - drop (exception: may be dropped on the original owner's land)
+ - eat
+ - give (exception: may be given to the original owner)
+ - identify (in certain rare cases)
+ - light
+ - mint
+ - put
+ - rework
+ - saw
+ - scrape
+ - seed
+ - separate
+ - skin
+ - tan
+
+See also: STEAL
+#
 STRENGTH STR
 
 Strength (physical attribute)
@@ -1790,17 +1940,21 @@ that you burn them. Try 'burn stumps' to remove them.
 
 See also: BURN, LIGHTER
 #
-STUN STUNNED "STUN IMMUNITY"
+STUN STUNNED "STUN IMMUNITY" NO-STUN NOSTUN !STUN "NO STUN" HARD-STUNNED HARDSTUNNED "HARD STUNNED"
 
 A character who is stunned, for instance by the Bash ability, cannot type
-commands or attack. Stuns are usually brief, and when they expire, you become
+commands or attack. Stuns are usually brief and when they expire, you become
 temporarily immune to other stuns.
 
 There is also a "stunned" condition for people who are reduced to 0 health.
 Characters will normally recover from this through normal regeneration.
 
-Note: Some scripting NPCs can stun characters even while they have stun
-immunity. This is part of the combat script.
+If you are "hard-stunned", this version ignores stun immunity, and won't cause
+stun immunity when it wears off. This is generally used by scripted game
+content rather than player abilities. Some scripted NPCs can also stun
+characters even while they have stun immunity.
+
+See also: BASH
 #
 SUN SUNRISE SUNSET DAY
 
@@ -1937,7 +2091,7 @@ effect will get you past the water.
 
 Additional ways to get unstuck from somewhere:
 - Request help from a game administrator
-- Toggle autorecall on and then log out for a full hours
+- Toggle autorecall on and then log out for a full hour
 - Use a spell or trinket to teleport home
 
 See also: TOGGLE AUTORECALL

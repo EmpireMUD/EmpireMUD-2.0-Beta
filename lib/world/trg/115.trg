@@ -1,6 +1,7 @@
 #11500
 Clicky Pen~
-1 c 2
+1 c 2 1
+L z 11500
 click~
 if !%arg%
   %send% %actor% Click what?
@@ -16,7 +17,8 @@ nop %actor.gain_event_points(11500,1)%
 ~
 #11505
 Start Supplies for GoA quests~
-2 u 0
+2 u 0 1
+L c 11505
 ~
 if !%actor.inventory(11505)%
   %load% obj 11505 %actor%
@@ -25,7 +27,21 @@ end
 ~
 #11513
 small shipment of resources~
-1 n 100
+1 n 100 14
+L c 100
+L c 105
+L c 106
+L c 125
+L c 129
+L c 167
+L c 178
+L c 257
+L c 1306
+L c 1352
+L c 1353
+L c 1356
+L c 2038
+L c 3362
 ~
 wait 0
 * uses val0 (quantity of common items), val1 (quantity of rare items)
@@ -96,7 +112,23 @@ end
 ~
 #11514
 great shipment of resources~
-1 n 100
+1 n 100 16
+L c 172
+L c 173
+L c 176
+L c 177
+L c 600
+L c 604
+L c 612
+L c 613
+L c 614
+L c 615
+L c 1210
+L c 1211
+L c 1212
+L c 1213
+L c 1214
+L c 1215
 ~
 wait 0
 * uses val0 (quantity of common items), val1 (quantity of rare items)
@@ -172,14 +204,45 @@ end
 ~
 #11520
 Pixy Pursuit: start event/quest~
-2 u 0
+2 u 0 1
+L c 11520
 ~
 * Give enchanted jars
 %load% obj 11520 %actor% inv
 ~
 #11521
 Pixy Pursuit: catch~
-1 c 2
+1 c 2 30
+L b 615
+L b 616
+L b 10042
+L b 11520
+L b 11521
+L b 11522
+L b 11523
+L b 11524
+L b 11525
+L b 11526
+L b 11819
+L b 11820
+L b 11873
+L b 11874
+L b 11875
+L b 11876
+L b 11878
+L b 11879
+L b 11880
+L b 11881
+L b 11882
+L b 11883
+L b 11884
+L b 11885
+L b 11886
+L b 11887
+L b 11982
+L c 11521
+L c 11522
+L c 11535
 catch~
 * This is the command for capturing pixies for the Pixy Pursuit event
 return 1
@@ -299,7 +362,12 @@ end
 ~
 #11522
 Pixy Pursuit: exchange with alchemist~
-1 c 2
+1 c 2 5
+L b 231
+L c 11521
+L c 11522
+L c 11535
+L z 11520
 exchange~
 set alch 0
 set pers %actor.room.people%
@@ -340,9 +408,17 @@ end
 ~
 #11523
 Pixy Pursuit: spawn on move~
-0 i 100
+0 i 100 8
+L b 11520
+L b 11521
+L b 11522
+L b 11523
+L b 11524
+L b 11525
+L b 11526
+L c 11523
 ~
-* ensure leader present and event running 
+* ensure leader present and event running
 set leader %self.leader%
 if !%leader% || !%event.running(11520)%
   halt
@@ -412,7 +488,8 @@ remote last_11520_spawn %leader.id%
 ~
 #11524
 Pixy Pursuit: pixy combat script~
-0 k 100
+0 k 100 1
+L s 11528
 ~
 wait 1
 if %self.disabled%
@@ -434,7 +511,9 @@ end
 ~
 #11525
 Pixy Pursuit: check end~
-1 b 33
+1 b 33 2
+L t 11520
+L z 11520
 ~
 * Ensure event is still running / lose jars and drop quest if not
 if !%event.running(11520)% || !%self.carried_by%
@@ -447,7 +526,8 @@ end
 ~
 #11526
 Enchanted rainbow~
-1 n 100
+1 n 100 1
+L r 11526
 ~
 wait 1
 %load% veh 11526
@@ -466,7 +546,12 @@ end
 ~
 #11527
 Pixy House interior~
-2 o 100
+2 o 100 5
+L e 11528
+L e 11529
+L e 11530
+L e 11531
+L s 11528
 ~
 eval hall %%room.%room.enter_dir%(room)%%
 * Add hallway
@@ -510,7 +595,8 @@ detach 11527 %room.id%
 ~
 #11528
 Tiny Morph on Enter~
-2 g 100
+2 g 100 1
+L s 11528
 ~
 if %actor.is_npc% || %actor.nohassle% || !%room.complete%
   halt
@@ -524,7 +610,7 @@ end
 ~
 #11529
 Block morph~
-2 c 0
+2 c 0 0
 morph fastmorph~
 if %actor.nohassle% || !%room.complete%
   halt
@@ -533,7 +619,8 @@ end
 ~
 #11530
 Pixy Hunt: Whistle Hog~
-1 c 2
+1 c 2 1
+L b 11527
 whistle~
 if %arg% != hog && %arg% != pig
   return 0
@@ -565,7 +652,9 @@ return 1
 ~
 #11534
 Upgrade pixy pursuit gear~
-1 c 2
+1 c 2 2
+L c 11531
+L c 11533
 upgrade~
 if !%arg%
   %send% %actor% Use @%self% on what? (only works on elf-made leather shoes and wishing bags)

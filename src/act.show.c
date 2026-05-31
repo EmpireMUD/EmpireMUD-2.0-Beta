@@ -1728,6 +1728,33 @@ SHOW(show_lost_books) {
 }
 
 
+SHOW(show_lost_mobs) {
+	int count;
+	char_data *iter;
+	
+	build_page_display_str(ch, "Mobs with bad adventure instance links:");
+	
+	count = 0;
+	DL_FOREACH(character_list, iter) {
+		if (!IS_NPC(iter) || GET_MOB_VNUM(iter) < 10000) {
+			continue;	// ignore mobs from basic non-adventure vnums
+		}
+		if (MOB_INSTANCE_ID(iter) == NOTHING || get_instance_by_id(MOB_INSTANCE_ID(iter))) {
+			continue;	// ignore mobs not linked to an instance, or linked to a live instance
+		}
+		
+		// found
+		msg_to_char(ch, "%2d. [%5d] %s: %s\r\n", ++count, GET_MOB_VNUM(iter), GET_SHORT_DESC(iter), room_log_identifier(IN_ROOM(iter)));
+	}
+	
+	if (!count) {
+		build_page_display_str(ch, "  none");
+	}
+	
+	send_page_display(ch);
+}
+
+
 SHOW(show_minipets) {
 	struct minipet_data *mini, *next_mini;
 	char_data *mob, *plr = NULL;
@@ -3447,6 +3474,7 @@ struct show_struct {
 	{ "learned",		LVL_START_IMM,		show_learned },
 	{ "libraries",		LVL_START_IMM,		show_libraries },
 	{ "lostbooks",		LVL_START_IMM,		show_lost_books },
+	{ "lostmobs",		LVL_START_IMM,		show_lost_mobs },
 	{ "minipets",		LVL_START_IMM,		show_minipets },
 	{ "moons",			LVL_START_IMM,		show_moons },
 	{ "mounts",			LVL_START_IMM,		show_mounts },

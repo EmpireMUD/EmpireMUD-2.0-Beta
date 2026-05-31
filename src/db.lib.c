@@ -2501,7 +2501,7 @@ void free_empire(empire_data *emp) {
 * @param empire_data *emp The empire to assign the logs to.
 */
 void load_empire_logs_one(FILE *fl, empire_data *emp) {	
-	char line[1024], str_in[256], buf[MAX_STRING_LENGTH];
+	char line[1024], str_in[256], error[MAX_STRING_LENGTH];
 	struct empire_log_data *elog;
 	struct offense_data *off;
 	long long_in;
@@ -2512,11 +2512,11 @@ void load_empire_logs_one(FILE *fl, empire_data *emp) {
 	}
 	
 	// error for later
-	sprintf(buf,"SYSERR: Format error in empire logs for #%d (expecting letter)", EMPIRE_VNUM(emp));
+	sprintf(error, "SYSERR: Format error in empire logs for #%d (expecting letter)", EMPIRE_VNUM(emp));
 
 	for (;;) {
 		if (!get_line(fl, line)) {
-			log("%s", buf);
+			log("%s", error);
 			exit(1);
 		}
 		switch (*line) {
@@ -2529,7 +2529,7 @@ void load_empire_logs_one(FILE *fl, empire_data *emp) {
 				CREATE(elog, struct empire_log_data, 1);
 				elog->type = t[0];
 				elog->timestamp = (time_t) t[1];
-				elog->string = fread_string(fl, buf2);
+				elog->string = fread_string(fl, error);
 				DL_APPEND(EMPIRE_LOGS(emp), elog);
 				break;
 			}
@@ -2554,7 +2554,7 @@ void load_empire_logs_one(FILE *fl, empire_data *emp) {
 				return;
 			}
 			default: {
-				log("%s", buf);
+				log("%s", error);
 				exit(1);
 			}
 		}

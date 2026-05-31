@@ -37,7 +37,7 @@ S
 #10105
 berk~
 Berk~
-Berk is crouched by the fire, whittling some wood.
+Berk is crouched by the fire, whittling some wood. (difficulty)
 ~
 100 200 abdvzBI 0 3
 1 0 0 4 -1 -1
@@ -45,6 +45,8 @@ D
    He looks like he's been living out here for a while. You can't see what he's
 whittling, but there are a lot of charred wooden skewers around, so he's
 probably getting ready to make dinner.
+Set difficulty with: difficulty <normal | hard | group | boss>
+
 ~
 I 4 10109 10.00 1 X  # LOOT: bloodletter's ring
 I 4 10107 5.00 1 X  # LOOT: pack of dry rations
@@ -54,12 +56,14 @@ S
 #10106
 jorr~
 Jorr~
-Jorr is cooking a pot of beans over the fire.
+Jorr is cooking a pot of beans over the fire. (difficulty)
 ~
 100 200 abdvxzBI 0 3
 2 0 0 12 -1 -1
 D
 She's stirring the beans with a dagger. It's tough living out here.
+Set difficulty with: difficulty <normal | hard | group | boss>
+
 ~
 I 4 10105 10.00 1 X  # LOOT: black leather armor
 I 4 10107 5.00 1 X  # LOOT: pack of dry rations
@@ -69,13 +73,15 @@ S
 #10107
 tranc~
 Tranc~
-Tranc is strapping on his armor.
+Tranc is strapping on his armor. (difficulty)
 ~
 100 200 abdvyBI 0 3
 1 0 0 5 -1 -1
 D
    From the tusk marks on his armor, you can surmise he's getting ready to go
 hunt a boar.
+Set difficulty with: difficulty <normal | hard | group | boss>
+
 ~
 I 4 10106 10.00 1 X  # LOOT: spiked aklys
 I 4 10108 5.00 1 X  # LOOT: armored neck guard

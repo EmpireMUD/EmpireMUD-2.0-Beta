@@ -187,7 +187,8 @@ done
 ~
 #9274
 Chimp troop~
-0 n 100 0
+0 n 100 1
+L b 9274
 ~
 set num %random.3%
 while %num% > 0

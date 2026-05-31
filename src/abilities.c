@@ -204,7 +204,7 @@ void show_ability_info(char_data *ch, ability_data *abil, ability_data *parent, 
 	bool any, more_learned, same, has_param_details = FALSE;
 	char lbuf[MAX_STRING_LENGTH], sbuf[MAX_STRING_LENGTH];
 	char *ptr;
-	double chain_prc = 100.0;
+	double chance, chain_prc = 100.0;
 	int count, iter;
 	size_t l_size;
 	ability_data *abiter, *next_abil, *supercede;
@@ -422,7 +422,18 @@ void show_ability_info(char_data *ch, ability_data *abil, ability_data *parent, 
 	
 	if (ABIL_DIFFICULTY(abil) != DIFF_TRIVIAL) {
 		has_param_details = TRUE;
-		build_page_display(ch, "Difficulty: %s", skill_check_difficulty[ABIL_DIFFICULTY(abil)]);
+		
+		if (has_ability(ch, ABIL_VNUM(abil))) {
+			chance = get_ability_skill_level(ch, ABIL_VNUM(abil));
+			chance = MIN(chance, MAX_SKILL_CAP);
+			chance *= skill_check_difficulty_modifier[ABIL_DIFFICULTY(abil)];
+			chance = MIN(100.0, MAX(0.0, chance));
+			
+			build_page_display(ch, "Difficulty: %d%% chance - %s", (int)chance, skill_check_difficulty[ABIL_DIFFICULTY(abil)]);
+		}
+		else {
+			build_page_display(ch, "Difficulty: %s", skill_check_difficulty[ABIL_DIFFICULTY(abil)]);
+		}
 	}
 	
 	if (IS_SET(ABIL_TYPES(abil), ABILT_DOT) && ABIL_MAX_STACKS(abil) > 1) {
@@ -2186,6 +2197,16 @@ bool validate_ability_target(char_data *ch, ability_data *abil, char_data *vict,
 		}
 		return FALSE;
 	}
+	
+	// objects
+	if (ovict && IS_SET(ABIL_TARGETS(abil), ATAR_NOT_STOLEN) && IS_STOLEN(ovict)) {
+		if (send_msgs) {
+			msg_to_char(ch, "You can't use that on a stolen item!\r\n");
+		}
+		return FALSE;
+	}
+	
+	// rooms
 	if (room_targ && room_targ != IN_ROOM(ch) && IS_SET(ABIL_TARGETS(abil), ATAR_ROOM_HERE) && !IS_SET(ABIL_TARGETS(abil), (ROOM_ATARS & ~ATAR_ROOM_HERE))) {
 		if (send_msgs) {
 			msg_to_char(ch, "You have to use it on the room you're in.\r\n");
@@ -2198,6 +2219,8 @@ bool validate_ability_target(char_data *ch, ability_data *abil, char_data *vict,
 		}
 		return FALSE;
 	}
+	
+	// other limits
 	if (!check_ability_limitations(ch, abil, vict, ovict, vvict, room_targ, send_msgs, fatal_error)) {
 		// sends own message when false
 		return FALSE;

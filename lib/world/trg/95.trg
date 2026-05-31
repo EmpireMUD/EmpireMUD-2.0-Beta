@@ -69,7 +69,7 @@ if !%actor% || %actor.room% != %self.room% || %self.aff_flagged(IMMOBILIZED)% ||
 end
 %send% %actor% ~%self% crashes into you, leaving you briefly stunned!
 %echoaround% %actor% ~%self% crashes into ~%actor%, stunning *%actor%!
-if !%actor.aff_flagged(!STUN)%
+if !%actor.aff_flagged(NO-STUN)%
   dg_affect %actor% STUNNED on 5
 end
 %damage% %actor% 50

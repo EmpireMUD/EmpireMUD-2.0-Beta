@@ -164,10 +164,10 @@ S
 #11903
 The Central Chamber of the Tower Skycleave~
    The grand chamber of the first floor is strangely clean, though it is
-is obvious it gets a lot of traffic. The ebony walls, polished floor, and
-even the underside of the second-floor walkway above you are immaculate. A sign
-hangs on the wall next to a large door, opposite a hanging sculpture made from
-metal and wood.
+obvious it gets a lot of traffic. The ebony walls, polished floor, and even the
+underside of the second-floor walkway above you are immaculate. A sign hangs on
+the wall next to a large door, opposite a hanging sculpture made from metal and
+wood.
 ~
 c z 0 -1
 D7
@@ -4308,8 +4308,8 @@ wall.
 E
 reed mats~
    There are small reed mats on the floor for seating, as well as larger mats
-on the low platform beds. The pale yellow mats are made of plaited from reeds
-and rushes in simple geometric patterns.
+on the low platform beds. The pale yellow mats are plaited from reeds and
+rushes in simple geometric patterns.
 ~
 E
 platforms beds~
@@ -4472,8 +4472,8 @@ perhaps to dry over the oven.
 E
 reed mats~
    There are small reed mats on the floor for seating, as well as larger mats
-on the low platform beds. The pale yellow mats are made of plaited from reeds
-and rushes in simple geometric patterns.
+on the low platform beds. The pale yellow mats are plaited from reeds and
+rushes in simple geometric patterns.
 ~
 E
 platform bed blankets~
@@ -4567,8 +4567,8 @@ eyes while the dead ones are drawn with black squares for eyes.
 E
 reed mats~
    There are small reed mats on the floor for seating, as well as larger mats
-on the low platform beds. The pale yellow mats are made of plaited from reeds
-and rushes in simple geometric patterns.
+on the low platform beds. The pale yellow mats are plaited from reeds and
+rushes in simple geometric patterns.
 ~
 E
 platforms beds blankets~
@@ -5159,6 +5159,7 @@ cliffside stairs stairway down~
 of stairway, although the stirring in your stomach warns it won't be a
 comfortable descent. There are no handrails. And worse, the gaps between the
 steps drop a hundred feet to the rocks below.
+   From here, you can also climb down into a rather cozy-looking home.
 ~
 E
 openings slanted covers entrances chimneys~

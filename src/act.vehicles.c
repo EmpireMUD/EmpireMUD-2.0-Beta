@@ -73,6 +73,41 @@ void cancel_driving(char_data *ch) {
 
 
 /**
+* Calculates the distance remaining on a run/drive/sail/pilot path.
+*
+* @param char_data *ch A player who is running, driving, sailing, or piloting.
+* @return int The distance remaining in their path, or 0 if it can't be determined.
+*/
+int driving_distance_remaining(char_data *ch) {
+	char *ptr;
+	int distance;
+	
+	if (!IS_NPC(ch) && (GET_ACTION(ch) == ACT_RUNNING || GET_ACTION(ch) == ACT_DRIVING || GET_ACTION(ch) == ACT_SAILING || GET_ACTION(ch) == ACT_PILOTING)) {
+		// current travel -- check if avnum 1 would be -1 for unlimited (in which case, no estimate)
+		distance = (GET_ACTION_VNUM(ch, 1) > 0 ? GET_ACTION_VNUM(ch, 1) : 0);
+
+		// parse numbers from action string
+		for (ptr = GET_ACTION_STRING(ch); ptr && *ptr; ++ptr) {
+			if (isdigit(*ptr)) {
+				distance += atoi(ptr);
+				// skip past numbers
+				while (*ptr && isdigit(*(ptr + 1))) {
+					++ptr;
+				}
+			}
+			// otherwise ignore all contents
+		}
+	
+		// distance should now equal tiles remaining in the path
+		return distance;
+	}
+	
+	// all other cases
+	return 0;
+}
+
+
+/**
 * Finds a ship in ch's room or docked on ch's current island, which could be
 * dispatched. Ships in the same room are preferred even if they aren't owned
 * by ch; ships in other rooms are partially-validated for ownership and flags.
@@ -481,6 +516,10 @@ bool perform_put_obj_in_vehicle(char_data *ch, obj_data *obj, vehicle_data *veh)
 		return FALSE;
 	}
 	
+	if (IS_STOLEN(obj)) {
+		act("$p: you can't put stolen items in there.", FALSE, ch, obj, NULL, TO_CHAR | TO_QUEUE);
+		return FALSE;
+	}
 	
 	// don't let people drop bound items in other people's vehicles
 	if (OBJ_BOUND_TO(obj) && VEH_OWNER(veh) && VEH_OWNER(veh) != GET_LOYALTY(ch)) {
@@ -488,7 +527,7 @@ bool perform_put_obj_in_vehicle(char_data *ch, obj_data *obj, vehicle_data *veh)
 		return FALSE;
 	}
 	if (GET_OBJ_REQUIRES_QUEST(obj) != NOTHING && !IS_NPC(ch) && !IS_IMMORTAL(ch)) {
-		act("$p: you can't put quest items in there.", FALSE, ch, obj, NULL, TO_CHAR);
+		act("$p: you can't put quest items in there.", FALSE, ch, obj, NULL, TO_CHAR | TO_QUEUE);
 		return FALSE;
 	}
 	
@@ -1757,7 +1796,7 @@ void do_drive_through_portal(char_data *ch, vehicle_data *veh, obj_data *portal,
 
 // do_sail, do_pilot (search hints)
 ACMD(do_drive) {
-	char buf[MAX_STRING_LENGTH], *found_path = NULL;
+	char buf[MAX_STRING_LENGTH], dist_buf[256], *found_path = NULL;
 	struct vehicle_room_list *vrl;
 	bool was_driving, same_dir, dir_only;
 	long long time_check = -1;
@@ -1765,7 +1804,7 @@ ACMD(do_drive) {
 	vehicle_data *veh;
 	char_data *ch_iter;
 	obj_data *portal;
-	int dir = NO_DIR, dist = -1;
+	int dir = NO_DIR, calc_dist, dist = -1;
 	
 	skip_run_filler(&argument);
 	dir_only = !strchr(argument, ' ') && (parse_direction(ch, argument) != NO_DIR);	// only 1 word, and is a direction
@@ -1776,11 +1815,17 @@ ACMD(do_drive) {
 		msg_to_char(ch, "You can't do that.\r\n");
 	}
 	else if (!*argument && GET_ACTION(ch) == drive_data[subcmd].action) {
+		// distance remaining?
+		*dist_buf = '\0';
+		if ((calc_dist = driving_distance_remaining(ch)) > 1) {
+			snprintf(dist_buf, sizeof(dist_buf), " Distance remaining: %d tiles.", calc_dist);
+		}
+		
 		if (GET_ACTION_VNUM(ch, 1) == -1) {
-			msg_to_char(ch, "You are currently %s %s.\r\n", drive_data[subcmd].verb, dirs[confused_dirs[get_north_for_char(ch)][0][GET_ACTION_VNUM(ch, 0)]]);
+			msg_to_char(ch, "You are currently %s %s.%s\r\n", drive_data[subcmd].verb, dirs[confused_dirs[get_north_for_char(ch)][0][GET_ACTION_VNUM(ch, 0)]], dist_buf);
 		}
 		else {
-			msg_to_char(ch, "You are currently %s %d tile%s %s.\r\n", drive_data[subcmd].verb, GET_ACTION_VNUM(ch, 1), PLURAL(GET_ACTION_VNUM(ch, 1)), dirs[confused_dirs[get_north_for_char(ch)][0][GET_ACTION_VNUM(ch, 0)]]);
+			msg_to_char(ch, "You are currently %s %d tile%s %s.%s\r\n", drive_data[subcmd].verb, GET_ACTION_VNUM(ch, 1), PLURAL(GET_ACTION_VNUM(ch, 1)), dirs[confused_dirs[get_north_for_char(ch)][0][GET_ACTION_VNUM(ch, 0)]], dist_buf);
 		}
 		
 		if (GET_ACTION_STRING(ch)) {
@@ -1920,11 +1965,18 @@ ACMD(do_drive) {
 		GET_DRIVING(ch) = veh;
 		VEH_DRIVER(veh) = ch;
 		
+		// distance remaining?
+		*dist_buf = '\0';
+		if ((calc_dist = driving_distance_remaining(VEH_DRIVER(veh))) > 1) {
+			safe_snprintf(dist_buf, sizeof(dist_buf), " (distance: %d)", calc_dist);
+		}
+		
+		// messaging
 		if (was_driving && !same_dir) {
-			msg_to_char(ch, "You turn %s.\r\n", dirs[get_direction_for_char(ch, dir)]);
+			msg_to_char(ch, "You turn %s%s.\r\n", dirs[get_direction_for_char(ch, dir)], dist_buf);
 		}
 		else {
-			msg_to_char(ch, "You start %s %s.\r\n", drive_data[subcmd].verb, dirs[get_direction_for_char(ch, dir)]);
+			msg_to_char(ch, "You start %s %s%s.\r\n", drive_data[subcmd].verb, dirs[get_direction_for_char(ch, dir)], dist_buf);
 		}
 		
 		// alert whole vehicle

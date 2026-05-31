@@ -1,7 +1,7 @@
 #10900
 dragon red colossal collosal collossal colosal~
 a colossal red dragon~
-A colossal red dragon looms over you!
+A colossal red dragon looms over you! (difficulty)
 ~
 250 300 bdgxyzABL cmE 6
 2 0 2 44 -1 -1
@@ -9,6 +9,7 @@ D
    Towering over you like a scaly red keep, the dragon simultaneously chills
 you to the bone and brings your skin blisteringly close to burning. Perhaps she
 hasn't seen you yet...
+Set difficulty with: difficulty <normal | hard | group | boss>
 ~
 I 0 10907 75.00 2  # BUTCHER: raw dragon steak
 I 0 10907 75.00 2  # BUTCHER: raw dragon steak
@@ -29,18 +30,31 @@ I 4 10904 4.00 1 e  # LOOT: crimson serpent egg
 I 4 10905 2.00 1 e  # LOOT: crimson dragon egg
 I 4 10906 2.00 1 e  # LOOT: sea dragon egg
 I 4 10910 7.69 1 g  # LOOT: dragonsteel warhammer
+I+ 6 0  # Boss
 I 4 10911 7.69 1 g  # LOOT: dragonsteel claymore
+I+ 6 0  # Boss
 I 4 10912 7.69 1 g  # LOOT: dragonbone mace
+I+ 6 0  # Boss
 I 4 10913 7.69 1 g  # LOOT: flaming draconic wand
+I+ 6 0  # Boss
 I 4 10914 7.69 1 g  # LOOT: flaming dragonbone staff
+I+ 6 0  # Boss
 I 4 10915 7.69 1 g  # LOOT: dragonbone wristblade
+I+ 6 0  # Boss
 I 4 10916 7.69 1 g  # LOOT: dragonbone tower shield
+I+ 6 0  # Boss
 I 4 10917 7.69 1 g  # LOOT: flaming red dragon charm
+I+ 6 0  # Boss
 I 4 10918 7.69 1 g  # LOOT: tome of dragonkind
+I+ 6 0  # Boss
 I 4 10919 7.69 1 g  # LOOT: crimson dragon girdle
+I+ 6 0  # Boss
 I 4 10920 7.70 1 g  # LOOT: burning dragonsteel waistband
+I+ 6 0  # Boss
 I 4 10921 7.70 1 g  # LOOT: flaming draconic cincture
+I+ 6 0  # Boss
 I 4 10922 7.70 1 g  # LOOT: burning dragoncloth sash
+I+ 6 0  # Boss
 M
 0
 $n coils around her hoard.~
@@ -59,11 +73,12 @@ T 10908
 T 10915
 T 10919
 T 10909
+T 10901
 S
 #10901
 Sir Vivor~
 Sir Vivor~
-Sir Vivor is glancing around nervously.
+Sir Vivor is glancing around nervously. (difficulty)
 ~
 250 300 bdkvxyzABIL cE 3
 1 0 0 1 -1 -1
@@ -71,6 +86,7 @@ D
    Rarely have these lands seen a man so gallant as this. His armor gleams even
 in the low light of the fire and his stark white teeth and protruding chin are
 the very definition of handsomeness. At least, according to his biography.
+Set difficulty with: difficulty <normal | hard | group | boss>
 ~
 I 4 10907 75.00 2  # LOOT: raw dragon steak
 I 4 10907 75.00 2  # LOOT: raw dragon steak
@@ -85,18 +101,31 @@ I 4 10904 4.00 1 e  # LOOT: crimson serpent egg
 I 4 10905 2.00 1 e  # LOOT: crimson dragon egg
 I 4 10906 2.00 1 e  # LOOT: sea dragon egg
 I 4 10910 7.69 1 g  # LOOT: dragonsteel warhammer
+I+ 6 0  # Boss
 I 4 10911 7.69 1 g  # LOOT: dragonsteel claymore
+I+ 6 0  # Boss
 I 4 10912 7.69 1 g  # LOOT: dragonbone mace
+I+ 6 0  # Boss
 I 4 10913 7.69 1 g  # LOOT: flaming draconic wand
+I+ 6 0  # Boss
 I 4 10914 7.69 1 g  # LOOT: flaming dragonbone staff
+I+ 6 0  # Boss
 I 4 10915 7.69 1 g  # LOOT: dragonbone wristblade
+I+ 6 0  # Boss
 I 4 10916 7.69 1 g  # LOOT: dragonbone tower shield
+I+ 6 0  # Boss
 I 4 10917 7.69 1 g  # LOOT: flaming red dragon charm
+I+ 6 0  # Boss
 I 4 10918 7.69 1 g  # LOOT: tome of dragonkind
+I+ 6 0  # Boss
 I 4 10919 7.69 1 g  # LOOT: crimson dragon girdle
+I+ 6 0  # Boss
 I 4 10920 7.70 1 g  # LOOT: burning dragonsteel waistband
+I+ 6 0  # Boss
 I 4 10921 7.70 1 g  # LOOT: flaming draconic cincture
+I+ 6 0  # Boss
 I 4 10922 7.70 1 g  # LOOT: burning dragoncloth sash
+I+ 6 0  # Boss
 I 4 10902 25.00 1 s  # LOOT: red dragon hide
 I 4 10902 25.00 2 s  # LOOT: red dragon hide
 I 4 10902 25.00 3 s  # LOOT: red dragon hide
@@ -119,6 +148,7 @@ T 10910
 T 10908
 T 10911
 T 10909
+T 10901
 S
 #10902
 Bangles thief nervous~
@@ -191,7 +221,7 @@ S
 #10950
 dragon muck viscous vicious~
 a viscous muck dragon~
-A viscous muck dragon coils through the water.
+A viscous muck dragon coils through the water. (difficulty)
 ~
 225 325 dghuBLM choCDL 6
 0 0 5 45 -1 -1
@@ -200,6 +230,7 @@ D
 water, but it is enormous! The muck dragon's turquoise scales drip mud as its
 back arches out of the water, coiling in circles around you. What sort of prize
 might this dragon hold?
+Set difficulty with: difficulty <normal | hard | group | boss>
 ~
 I 0 10907 100.00 4  # BUTCHER: raw dragon steak
 I 1 1351 100.00 8  # SKIN: large skin
@@ -208,8 +239,14 @@ I 1 10006 30.00 2 a  # SKIN: dragon scale
 I 1 10006 10.00 3 a  # SKIN: dragon scale
 I 4 10960 100.00 1  # LOOT: monstrous carcass of a muck dragon
 I 4 10951 60.00 1 a  # LOOT: muck dragon's hoard
+I+ 5 0  # Group
+I+ 6 0  # Boss
 I 4 10952 30.00 1 a  # LOOT: Draconomicon
+I+ 5 0  # Group
+I+ 6 0  # Boss
 I 4 10953 10.00 1 a  # LOOT: golden princess
+I+ 5 0  # Group
+I+ 6 0  # Boss
 I 4 10954 12.50 3 b  # LOOT: bag of tiny red seeds
 I 4 10955 12.50 1 b  # LOOT: muck elemental stone
 M
@@ -234,6 +271,7 @@ T 10956
 T 10957
 T 10958
 T 10959
+T 10954
 S
 #10955
 elemental muck little~
@@ -269,7 +307,7 @@ S
 #10965
 giant hill~
 the hill giant~
-A hill giant towers over you, swinging a club the size of a tree!
+A hill giant towers over you, swinging a club the size of a tree! (difficulty)
 ~
 100 175 dkuvAILM cEG 6
 0 0 26 5 -1 -1
@@ -277,11 +315,21 @@ D
    The hill giant towers over you with an entire tree slung over its shoulder
 as a club. Luckily, the giant seems to be focused on problems its own size, and
 isn't even looking down at you.
+Set difficulty with: difficulty <normal | hard | group | boss>
 ~
 I 4 10973 100.00 1  # LOOT: giant wooden club
 I 4 10968 60.00 1 a  # LOOT: giant gold coin
+I+ 4 0  # Hard
+I+ 5 0  # Group
+I+ 6 0  # Boss
 I 4 10970 10.00 1 a  # LOOT: golden harp
+I+ 4 0  # Hard
+I+ 5 0  # Group
+I+ 6 0  # Boss
 I 4 10969 30.00 1 a  # LOOT: golden goose
+I+ 4 0  # Hard
+I+ 5 0  # Group
+I+ 6 0  # Boss
 I 4 10974 12.50 1 b  # LOOT: giant hovel schematic
 I 4 10971 12.50 1 b  # LOOT: giant ant whistle
 M
@@ -308,11 +356,12 @@ T 10971
 T 10972
 T 10973
 T 10974
+T 10969
 S
 #10966
 giant river~
 the river giant~
-A river giant towers over you, barely missing you on its path across the countryside!
+A river giant towers over you, barely missing you on its path across the countryside! (difficulty)
 ~
 100 175 dkuvAILM cEG 6
 0 0 26 5 -1 -1
@@ -320,11 +369,21 @@ D
    This giant is dressed mainly in gigantic nets, which appear to double as
 fishing tools. Its height dominates the landscape, taller than most trees. In
 fact, it has a tree slung over its shoulder like a club.
+Set difficulty with: difficulty <normal | hard | group | boss>
 ~
 I 4 10973 100.00 1  # LOOT: giant wooden club
 I 4 10968 60.00 1 a  # LOOT: giant gold coin
+I+ 4 0  # Hard
+I+ 5 0  # Group
+I+ 6 0  # Boss
 I 4 10970 10.00 1 a  # LOOT: golden harp
+I+ 4 0  # Hard
+I+ 5 0  # Group
+I+ 6 0  # Boss
 I 4 10969 30.00 1 a  # LOOT: golden goose
+I+ 4 0  # Hard
+I+ 5 0  # Group
+I+ 6 0  # Boss
 I 4 10972 12.50 1 b  # LOOT: giant's causeway schematic
 I 4 10971 12.50 1 b  # LOOT: giant ant whistle
 M
@@ -351,11 +410,12 @@ T 10971
 T 10972
 T 10973
 T 10974
+T 10969
 S
 #10967
 giant dune~
 the dune giant~
-A dune giant towers above you, with a tree over its shoulder!
+A dune giant towers above you, with a tree over its shoulder! (difficulty)
 ~
 100 175 dkuvAILM cEG 6
 0 0 26 5 -1 -1
@@ -363,11 +423,21 @@ D
    This gigantic desert nomad has a massive tree slung over its shoulder like a
 club. The giant is so large that it doesn't even appear to notice you down
 here.
+Set difficulty with: difficulty <normal | hard | group | boss>
 ~
 I 4 10973 100.00 1  # LOOT: giant wooden club
 I 4 10968 60.00 1 a  # LOOT: giant gold coin
+I+ 4 0  # Hard
+I+ 5 0  # Group
+I+ 6 0  # Boss
 I 4 10970 10.00 1 a  # LOOT: golden harp
+I+ 4 0  # Hard
+I+ 5 0  # Group
+I+ 6 0  # Boss
 I 4 10969 30.00 1 a  # LOOT: golden goose
+I+ 4 0  # Hard
+I+ 5 0  # Group
+I+ 6 0  # Boss
 I 4 10975 12.50 1 b  # LOOT: giant stone head schematic
 I 4 10971 12.50 1 b  # LOOT: giant ant whistle
 M
@@ -394,6 +464,7 @@ T 10971
 T 10972
 T 10973
 T 10974
+T 10969
 S
 #10968
 portents giant~

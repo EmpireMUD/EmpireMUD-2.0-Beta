@@ -163,6 +163,9 @@ void do_douse_obj(char_data *ch, obj_data *obj, obj_data *cont) {
 	else if (!LIGHT_FLAGGED(obj, LIGHT_FLAG_CAN_DOUSE)) {
 		act("You can't seem to douse $p.", FALSE, ch, obj, NULL, TO_CHAR);
 	}
+	else if (IS_STOLEN(obj)) {
+		act("$p: you can't douse stolen items.", FALSE, ch, obj, NULL, TO_CHAR);
+	}
 	else if (IN_ROOM(obj) && !can_use_room(ch, IN_ROOM(ch), GUESTS_ALLOWED) && (IS_NPC(ch) || LAST_OWNER_ID(obj) != GET_IDNUM(ch))) {
 		msg_to_char(ch, "You can't douse anything here.\r\n");
 	}
@@ -1585,6 +1588,10 @@ ACMD(do_alternate) {
 		}
 		if (newch == ch) {
 			msg_to_char(ch, "You're already playing that character.\r\n");
+			return;
+		}
+		if (has_stolen_items(ch)) {
+			msg_to_char(ch, "You can't switch characters while you have stolen items! Drop them on the owner's territory first, or wait for the timer to expire.\r\n");
 			return;
 		}
 		if (get_cooldown_time(ch, COOLDOWN_ALTERNATE) > 0 && !IS_IMMORTAL(newch)) {
@@ -3180,6 +3187,9 @@ ACMD(do_quit) {
 	else if (ch->desc->str && !confirm) {
 		msg_to_char(ch, "You can't quit with a text editor open (use /save or /abort first, or 'quit confirm').\r\n");
 	}
+	else if (has_stolen_items(ch)) {
+		msg_to_char(ch, "You can't quit while you have stolen items! Drop them on the owner's territory first, or wait for the timer to expire.\r\n");
+	}
 	else if (GET_POS(ch) < POS_STUNNED && !confirm) {
 		msg_to_char(ch, "Quitting now will kill your character. Type 'quit confirm' to proceed.\r\n");
 	}
@@ -3405,6 +3415,9 @@ ACMD(do_skin) {
 		msg_to_char(ch, "It's too badly mangled to get any amount of usable skin.\r\n");
 	else if (IS_SET(GET_CORPSE_FLAGS(obj), CORPSE_SKINNED))
 		msg_to_char(ch, "It's already been skinned.\r\n");
+	else if (IS_STOLEN(obj)) {
+		act("$p: you can't skin stolen corpses.", FALSE, ch, obj, NULL, TO_CHAR);
+	}
 	else if (!has_tool(ch, TOOL_KNIFE))
 		msg_to_char(ch, "You need to be using a good knife to skin a corpse.\r\n");
 	else {

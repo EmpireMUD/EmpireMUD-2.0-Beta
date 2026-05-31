@@ -764,7 +764,7 @@ Notes:
   companions with script changes.
 
 When a companion is summoned, it automatically gets the SPAWNED, !LOOT, !EXP,
-and !DRINK-BLOOD flags.
+and NO-DRINK-BLOOD flags.
 
 Example companion abilities: 122 Familiar, 138 Bodyguard
 
@@ -1362,7 +1362,7 @@ an ability that targets one's self.
 
 The best example is 315 Splash Blood, which is a helper for ability
 314 Red Mist. Splash Blood hooks on any physical damage against a target but
-has a !DRINK-BLOOD immunity flag. If this immunity is present, nothing else
+has a NO-DRINK-BLOOD immunity flag. If this immunity is present, nothing else
 happens. If not, it will chain to 314 Red Mist, which targets the player to
 restore blood. Red Mist cannot check the immunity itself because its target is
 the player who's attacking, not the victim of the attack. Splash Blood fills in
@@ -2049,6 +2049,7 @@ Modifier flags (use in combination with the above flags):
  &yNOT-SELF&0 - Character target cannot be self.
  &yNOT-ALLY&0 - Cannot target an ally.
  &yNOT-ENEMY&0 - Cannot target an enemy.
+ &yNOT-STOLEN&0 - Object cannot be stolen.
  &yDEAD-OK&0 - Can target dead people (otherwise they are invalid).
  &yMULTI-CAN-SEE&0 - For multi-targeting, must be able to see each target.
 
@@ -2822,37 +2823,37 @@ The following affect flags are available:
    linked trait on that ability).
  &cINFRA&0 - Can see in the dark (glowing red eyes).
  &cSNEAK&0 - Cannot be seen while moving.
- &cHIDE&0 - Cannot be seen in room (without search).
- &c*CHARM&0 - NPC will take orders from its master -- do not use this on items.
+ &cHIDDEN&0 - Cannot be seen in room (without search).
+ &c*CHARM&0 - NPC will take orders from its master.
  &cINVIS&0 - Can't be seen, except by magic.
  &cIMMUNE-PHYSICAL-DEBUFFS&0 - Immune to any 'physical' debuffs.
  &cSENSE-HIDDEN&0 - Can see hidden people.
- &c!PHYSICAL&0 - Immune to physical damage -- do not use this on items.
- &c!TARGET&0 - Cannot be targeted in the room -- do not use this on items.
- &c!SEE&0 - Cannot be seen in the room at all -- do not use this on items.
+ &c!PHYSICAL&0 - Immune to physical damage.
+ &cNO-TARGET-IN-ROOM&0 - Cannot be targeted in the room.
+ &cNO-SEE-IN-ROOM&0 - Cannot be seen in the room at all.
  &cFLYING&0 - Is flying.
- &c!ATTACK&0 - Cannot be attacked -- do not use this on items.
+ &c!ATTACK&0 - Cannot be attacked.
  &cIMMUNE-MAGICAL-DEBUFFS&0 - Immune to any 'magical' debuffs.
- &cDISARMED&0 - Has lost their weapon -- do not use this on items.
+ &cDISARMED&0 - Has lost their weapon.
  &cHASTE&0 - Has the effect of the Hasten ability.
- &cIMMOBILIZED&0 - Cannot move -- do not use this on items.
+ &cIMMOBILIZED&0 - Cannot move.
  &cSLOW&0 - Combat speed reduced, like the Slow spell.
- &cSTUNNED&0 - Can't participate in combat or move -- do not use this on items.
+ &cSTUNNED&0 - Can't participate in combat or move.
  &cSTONED&0 - Sees the world in strange, trippy colors.
- &c!BLOOD&0 - Cannot spend blood points.
- &cDEATHSHROUDED&0 - Appears as a corpse and cannot act -- do not use this on items.
- &cEARTHMELDED&0 - Submerged in the earth and can't take normal actions -- do not use this on items.
- &cMUMMIFIED&0 - Immune to attack and cannot act -- do not use this on items.
- &cSOULMASK&0 - Players cannot see affect details on character.
+ &cNO-SPEND-BLOOD&0 - Cannot spend blood points.
+ &cDEATHSHROUDED&0 - Appears as a corpse and cannot act.
+ &cEARTHMELDED&0 - Submerged in the earth and can't take normal actions.
+ &cMUMMIFIED&0 - Immune to attack and cannot act.
+ &cMASK-AFFECTS&0 - Players cannot see affect details on character.
  &cNO-TRACKS&0 - Does not leave tracks.
  &cIMMUNE-POISON-DEBUFFS&0 - Immune to any 'poison' debuffs.
  &cIMMUNE-MENTAL-DEBUFFS&0 - Immune to any 'mental' debuffs.
- &c!STUN&0 - Immune to stun effects.
- &c!DRINK-BLOOD&0 - Can't be bitten/sired by vampires.
+ &cNO-STUN&0 - Immune to stun effects.
+ &cNO-DRINK-BLOOD&0 - Can't be bitten/sired by vampires.
  &cDISTRACTED&0 - Cannot perform timed actions.
  &cHARD-STUNNED&0 - A stun that cannot be cleansed and does not trigger immunity.
- &cIMMUNE-DAMAGE&0 - Cannot take damage -- do not use this on items.
- &c!WHERE&0 - Cannot be found using the 'where' command.
+ &cIMMUNE-DAMAGE&0 - Cannot take damage.
+ &cIMMUNE-WHERE&0 - Cannot be found using the 'where' command.
  &cWATERWALKING&0 - Does not need to swim and doesn't drown. Unlike the AQUATIC
    mob flag, this allows it to move on both water and land.
  &cLIGHT&0 - Character provides light to the room.
@@ -2864,8 +2865,8 @@ The following affect flags are available:
  &cAUTO-RESURRECT&0 - Will resurrect on death.
  &cCOUNTERSPELL&0 - Will cancel the next counterspellable ability then remove its
    affect. If applied by an ability, will also trigger skill gain and hooks.
- &c!DISARM&0 - Cannot be disarmed.
- &c!MORPH&0 - Cannot manually morph or unmorph one's self.
+ &cNO-DISARM&0 - Cannot be disarmed.
+ &cNO-MORPH&0 - Cannot manually morph or unmorph one's self.
 #d
 ARCHEDIT "OLC ARCHETYPES" "ARCHETYPE OLC" "ARCHETYPE EDITOR"
 
@@ -4050,6 +4051,10 @@ cycle of decay will destroy them.
 
 Note: Interior rooms do not normally require any maintenance and don't take
 damage.
+
+Examples:
+ > .resource add component 1 nail
+ > .resource add action 1001
 
 See HELP OLC RESOURCES for more information.
 
@@ -8672,8 +8677,8 @@ Fields:
   &c-vmin&0, &c-vmax&0 - VNUM range limits
 
 Examples:
- > .prog fullsearch -type PLAYER-TECH -ptech Swimming -vmin 10000 -vmax 10099
- > .prog fullsearch -flagged RANGED -flagged RANGED-ONLY
+ > .prog fullsearch -perk City-points
+ > .prog fullsearch -task OWN-ROADS
 
 To search other fields, you can generally use the normal "search" option for
 other OLC types. For example, to find all goals that require you to kill a
@@ -9401,6 +9406,7 @@ Available sector flags:
  &cBASIC-CROP&0 - Indicates this tile counts as a basic crop tile for its
     climate. Used in conjunction with the CROP flag by commands like .map
     terrain.
+ &cHIDE-ON-ISLAND-DESCRIPTION&0 - Won't show in auto-generated island descs.
 
 See also: OLC SECTORS, TERRAIN HEIGHT
 #d
@@ -9438,16 +9444,18 @@ Usage:  .icons add <type> <color code> <icon>
         .icons copy <from type> <from vnum>
         .icons change <number> <type | color | icon> <value>
         .icons remove <number | all>
+        .icons list
 
 EmpireMUD uses four different seasons and the biggest change between them is
 that sectors look different at different times of year. You can also specify
-an icon for ANY season. The <type> parameter is where you specify which season,
-and a list of valid types is shown on the olc display for the sector.
+an icon for ANY season.
 
-If more than one icon is available for a given season (or from season + any),
-one is chosen at random. If you want to have random icons available, but want
-one pre-selected, set the LOCK-ICON sector flag. Be warned, however, that once
-an icon is locked, it remains the same in any season.
+The <type> parameter is where you specify which season: spring, summer, autumn,
+winter, or ANY. If more than one icon is available for a given season (or from
+season + any), one is chosen at random.
+
+Use the LOCK-ICON flag to select 1 random icon and keep it; be warned, however,
+that once an icon is locked, it remains the same in any season.
 
 For icons, the base color is separate from the icon, so the icon does not
 need to start with a color code (unless it's different from the base you set).
@@ -10007,13 +10015,16 @@ Examples:
 #d
 "TRIGEDIT LINKS"
 
-Usage:  .link add <type> <vnum>
-        .link remove <type> <vnum | all>
-        .link remove all
+Usage:  .links add <type> <vnum(s)>
+        .links remove <type> <vnum | all>
+        .links remove all
 
 Trigger links are used internally to help the game detect which other 'things'
 a trigger is connected to. This is primarily used with the '.olc search' system
 which would have trouble finding linked items using the trigger command text.
+
+You can add multiple vnums at the same type at once, for example:
+ > .links add obj 120 122 128 137
 
 For example, if trigger 9600 has a link to generic 9602:
  > .gen search 9602

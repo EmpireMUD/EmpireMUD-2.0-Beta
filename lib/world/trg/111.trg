@@ -1,6 +1,6 @@
 #11100
 Hermit Greeting~
-0 bgw 25
+0 bgw 25 0
 ~
 if %self.mob_flagged(SILENT)%
   halt
@@ -10,7 +10,8 @@ say Are you going to eat that?
 ~
 #11101
 Hermit Food Exchange~
-0 j 100
+0 j 100 1
+L c 11100
 ~
 if %object.type% != FOOD || %self.varexists(gave%actor.id%)%
   %send% %actor% ~%self% doesn't want @%object%!
@@ -33,7 +34,14 @@ end
 ~
 #11102
 Befriend Pegasus~
-0 j 100
+0 j 100 7
+L b 11104
+L c 11102
+L c 11103
+L c 11104
+L c 11105
+L c 11106
+L c 11107
 ~
 * Reject items other than the 6 crop items from this adventure
 if (%object.vnum% < 11102 || %object.vnum% > 11107)
@@ -77,7 +85,7 @@ end
 ~
 #11103
 Pegasus Fly Away~
-0 ab 5
+0 ab 5 0
 ~
 set count 0
 set target_char %self.room.people%
@@ -95,7 +103,8 @@ end
 ~
 #11104
 Cave Viper Combat~
-0 k 10
+0 k 10 1
+L w 11104
 ~
 if %self.cooldown(11104)%
   halt
@@ -114,7 +123,8 @@ nop %self.set_cooldown(11104,20)%
 ~
 #11105
 Venomous Skink Combat~
-0 k 10
+0 k 10 1
+L w 11104
 ~
 if %self.cooldown(11104)%
   halt
@@ -131,7 +141,7 @@ nop %self.set_cooldown(11104,20)%
 ~
 #11106
 Lean Left~
-2 c 0
+2 c 0 0
 left~
 context %actor.room.vnum%
 %send% %actor% You lean hard to the left!
@@ -143,7 +153,7 @@ remote lean_right %actor.id%
 ~
 #11107
 Lean Right~
-2 c 0
+2 c 0 0
 right~
 context %actor.room.vnum%
 %send% %actor% You lean hard to the right!
@@ -155,7 +165,7 @@ remote lean_right %actor.id%
 ~
 #11108
 Duck!~
-2 c 0
+2 c 0 0
 duck~
 context %actor.room.vnum%
 %send% %actor% You duck in the boat!
@@ -165,7 +175,8 @@ remote has_ducked %actor.id%
 ~
 #11109
 Rapids Start 11112~
-2 g 100
+2 g 100 1
+L j 11120
 ~
 wait 1 sec
 set room_var %actor.room%
@@ -178,7 +189,9 @@ end
 ~
 #11110
 Rock Obstacle 11120~
-2 g 100
+2 g 100 2
+L j 11121
+L j 11123
 ~
 if %actor.is_pc%
   set lean_left 0
@@ -239,7 +252,9 @@ end
 ~
 #11111
 Tree Branch 11121~
-2 g 100
+2 g 100 2
+L j 11122
+L j 11123
 ~
 if %actor.is_pc%
   set has_ducked 0
@@ -280,7 +295,9 @@ end
 ~
 #11112
 Narrow Opening 11122~
-2 g 100
+2 g 100 2
+L j 11113
+L j 11123
 ~
 if %actor.is_pc%
   set lean_left 0
@@ -342,7 +359,7 @@ end
 ~
 #11113
 Raptor greet/aggro~
-0 gw 100
+0 gw 100 0
 ~
 if (%self.fighting% || %self.disabled% || %actor.nohassle% || !(%actor.room%==%self.room%) || !%actor.is_pc%)
   halt
@@ -373,7 +390,7 @@ end
 ~
 #11114
 Loch colossus greet/aggro~
-0 gw 100
+0 gw 100 0
 ~
 if (%self.fighting% || %self.disabled% || %actor.nohassle% || !(%actor.room%==%self.room%) || !%actor.is_pc%)
   halt
@@ -404,7 +421,7 @@ end
 ~
 #11115
 Vehicle Coupon Summon~
-1 c 2
+1 c 2 0
 use~
 if !%self.is_name(%arg%)%
   return 0
@@ -426,14 +443,18 @@ end
 ~
 #11116
 Loch Colossus block door~
-0 r 100
+0 r 100 0
 ~
 %send% %actor% You cannot reach that while ~%self% is in the way.
 return 0
 ~
 #11117
 Burrow Canyons: Check mob difficulty on-load~
-0 n 100
+0 n 100 4
+L b 11100
+L b 11102
+L b 11103
+L b 11105
 ~
 set boss_mobs 11103 11105
 set mini_mobs 11100 11102
@@ -466,7 +487,7 @@ detach 11117 %self.id%
 ~
 #11118
 Burrow Canyons: Purge diff-sel on load~
-1 n 100
+1 n 100 0
 ~
 set start %instance.start%
 if %start.var(difficulty,0)% > 0
@@ -476,7 +497,8 @@ end
 ~
 #11123
 Start despawn time~
-2 g 100
+2 g 100 1
+L c 11124
 ~
 * This was formerly used to start the despawn timer when a player entered.
 * The difficulty selector now handles this.
@@ -488,14 +510,14 @@ detach 11123 %self.id%
 ~
 #11124
 Burrow Canyons Timed Despawn~
-1 f 0
+1 f 0 0
 ~
 * After 2 hours, ends the instance
 %adventurecomplete%
 ~
 #11125
 Add up exit to BC~
-2 n 100
+2 n 100 0
 ~
 set loc %instance.location%
 if %loc%
@@ -504,7 +526,25 @@ end
 ~
 #11127
 Burrow Canyons: difficulty selector~
-1 c 4
+1 c 4 18
+L b 11100
+L b 11101
+L b 11102
+L b 11103
+L b 11104
+L b 11105
+L b 11106
+L b 11107
+L b 11108
+L b 11109
+L b 11110
+L b 11111
+L b 11112
+L b 11113
+L c 11124
+L j 11100
+L j 11101
+L j 11123
 difficulty~
 return 1
 * Configs
@@ -607,7 +647,10 @@ end
 ~
 #11130
 Caretaker Replacement~
-2 q 100
+2 q 100 3
+L b 11135
+L b 11136
+L j 11142
 ~
 if !%actor.is_pc%
   halt
@@ -650,7 +693,7 @@ end
 ~
 #11131
 Hex Box Open 1: Garden~
-1 c 4
+1 c 4 0
 push~
 context %instance.id%
 if !(garden /= %arg%)
@@ -683,7 +726,7 @@ global hex_box_open
 ~
 #11132
 Hex Box Open 2: Mill~
-1 c 4
+1 c 4 0
 push~
 context %instance.id%
 if !(mill /= %arg%)
@@ -716,7 +759,7 @@ global hex_box_open
 ~
 #11133
 Hex Box Open 3: Stable~
-1 c 4
+1 c 4 0
 push~
 context %instance.id%
 if !(stable /= %arg%)
@@ -749,7 +792,9 @@ global hex_box_open
 ~
 #11134
 Hex Box Open 4: Estate~
-1 c 4
+1 c 4 2
+L c 11131
+L c 11141
 push~
 context %instance.id%
 if !(estate /= %arg%)
@@ -797,7 +842,9 @@ end
 ~
 #11135
 Sarcophagus open~
-1 c 4
+1 c 4 2
+L b 11138
+L c 11140
 open~
 context %instance.id%
 * Did they target me?
@@ -840,7 +887,15 @@ global sarcophagus_running
 ~
 #11136
 Chalice combine~
-1 b 100
+1 b 100 8
+L b 11140
+L c 1202
+L c 11134
+L c 11142
+L c 11143
+L c 11144
+L j 11130
+L j 11151
 ~
 set found_cutting 0
 set found_pod 0
@@ -914,7 +969,9 @@ end
 ~
 #11137
 Chalice Expiration~
-1 f 0
+1 f 0 2
+L j 11130
+L j 11150
 ~
 * Only works if still in the dungeon, otherwise decays naturally
 if %self.varexists(instid)% && %instance.id% && %self.var(instid)% == %instance.id%
@@ -930,7 +987,8 @@ end
 ~
 #11138
 Titanaconda combat~
-0 k 50
+0 k 50 1
+L w 3050
 ~
 * Countered by good entangle (not always desirable)
 if (%self.aff_flagged(IMMOBILIZED)% || %self.disabled%)
@@ -978,7 +1036,7 @@ end
 ~
 #11139
 Sleeping Ivy combat~
-0 k 50
+0 k 50 0
 ~
 * This is a mini-version of Titanconda's combat script (11138), and should
 * train the player for it.
@@ -992,7 +1050,7 @@ if !%target%
 end
 %send% %target% ~%self% wraps *%self%self around you, mummifying you and dragging you off to blissful slumber...
 %echoaround% %target% ~%self% wraps *%self%self around ~%target%, mummifying *%target% and dragging *%target% off to blissful slumber...
-if %target.aff_flagged(!STUN)% || %target.level% >= (%self.level% + 100)
+if %target.aff_flagged(NO-STUN)% || %target.level% >= (%self.level% + 100)
   * stun immunity or high level
   %damage% %target% 50
   dg_affect %self% HARD-STUNNED on 15
@@ -1007,7 +1065,7 @@ wait 15 sec
 ~
 #11140
 Lulling songbird combat~
-0 k 20
+0 k 20 0
 ~
 set target %random.enemy%
 if %target%
@@ -1019,7 +1077,8 @@ end
 ~
 #11141
 MM Start Progression~
-2 g 100
+2 g 100 1
+L y 11130
 ~
 if %actor.is_pc% && %actor.empire%
   nop %actor.empire.start_progress(11130)%
@@ -1027,7 +1086,8 @@ end
 ~
 #11142
 Mill Manor Chalice: Record location on load~
-1 n 100
+1 n 100 1
+L f 11142
 ~
 if %instance.id%
   set instid %instance.id%
@@ -1037,13 +1097,13 @@ detach 11142 %self.id%
 ~
 #11143
 Mill Manor: Delayed despawn~
-1 f 0
+1 f 0 0
 ~
 %adventurecomplete%
 ~
 #11144
 Mill Manor: Locked hex box interactions~
-1 c 4
+1 c 4 0
 put get open~
 * Script improves the response to get, put, and open commands on the locked hex box
 return 0
@@ -1072,7 +1132,20 @@ end
 ~
 #11150
 Mill Manor: Difficulty selector~
-1 c 4
+1 c 4 13
+L b 11130
+L b 11131
+L b 11132
+L b 11133
+L b 11134
+L b 11135
+L b 11136
+L b 11137
+L b 11138
+L b 11139
+L b 11140
+L j 11131
+L j 11151
 difficulty~
 return 1
 * Configs
@@ -1167,7 +1240,7 @@ end
 ~
 #11151
 Mill Manor: Delayed despawn~
-1 f 0
+1 f 0 0
 ~
 %adventurecomplete%
 ~

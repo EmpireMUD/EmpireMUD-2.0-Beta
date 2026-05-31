@@ -641,6 +641,11 @@ another item is matching the name, try having the correct item in your own
 inventory. This command will try to match an item in your inventory before
 searching the item database.
 
+Examples:
+  > import add 50 500 large tree
+  > import add 500 1 strange crystal seed
+  > export add 750 5 strange crystal seed
+
 See also: COINS, EXCHANGE RATE
 #
 "EXTENDED RADIUS" EXTENDED-RADIUS "LARGE CITY RADIUS" LARGE-CITY-RADIUS "LARGE RADIUS" LARGE-RADIUS
@@ -1140,15 +1145,18 @@ Rewards the following buildings:
 
 See also: PROGRESS
 #
-SILVER GOLD COPPER
+SILVER GOLD COPPER "PRECIOUS METALS" "PRECIOUS METAL INGOTS"
 
-Copper, silver, and gold are found in mines, although more rarely than iron
-ore. They are used as currency in many empires for trade and exchange. Some
-empires, however, prefer to use material goods instead.
+Copper, silver, and gold are precious metals that can be found in mines. Smelt
+them into ingots for use in crafting; smelt them again to refine them into bars
+that you can store in your vault to increase your wealth.
 
-You must also smelt copper into nocturnium ore to make nocturnium ingots.
+You can split bars back into ingots using the 'separate' command.
 
-See also: RARE METALS, SMELT, SEPARATE
+You can also mint these precious metals into coins. Copper is also used when
+smelting nocturnium ingots.
+
+See also: COINS, MINT, RARE METALS, SMELT, SEPARATE
 #
 "STILT BUILDINGS" "STILT BUILDINGS GOAL"
 
@@ -1712,6 +1720,11 @@ With the 'prospecting' chore, your workforce will camp out on claimed mountain
 tiles and slowly prospect to look for metals. This can take a long time to
 finish but when it is done, any member of the empire can type 'prospect' on the
 tile to instantly find out what metal it has.
+
+Because this is a long, time-consuming chore, and because it often involves a
+large number of tiles per empire, this chore does not spawn a worker NPC (but
+it still costs food per hour per tile). All mountain tiles owned by an empire
+are prospected at the same time, so long as there's food available.
 
 You can turn on 'toggle informative' to see tiles that have been prospected by
 your empire.

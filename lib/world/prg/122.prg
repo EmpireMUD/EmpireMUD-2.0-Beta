@@ -8,7 +8,7 @@ proof of your deed, and carry its bleeding heart to the city to consecrate a
 new shrine. Honor the serragon's power and memory to bring glory to your
 empire!
 ~
-5 4 0 5 c
+6 4 0 5 c
 K 7 5
 W+
 3 12201 0 1 a

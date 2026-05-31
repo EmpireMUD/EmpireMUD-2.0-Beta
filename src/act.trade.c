@@ -2663,6 +2663,9 @@ ACMD(do_rework) {
 		// not equippable or not real
 		msg_to_char(ch, "You can't rework that item.\r\n");
 	}
+	else if (IS_STOLEN(obj)) {
+		act("$p: you can't rework stolen items.", FALSE, ch, obj, NULL, TO_CHAR);
+	}
 	// "name": allowed on most items
 	else if (is_abbrev(arg2, "name")) {
 		// calculate gem cost based on the gear rating of the item

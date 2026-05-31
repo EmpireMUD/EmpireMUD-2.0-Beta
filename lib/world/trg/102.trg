@@ -1,19 +1,20 @@
 #10200
 Goblin Challenge Must Fight~
-0 s 100
+0 s 100 0
 ~
 %send% %actor% You have begun the Goblin Challenge and cannot leave without fighting ~%self%.
 return 0
 ~
 #10201
 Goblin Challenge No Flee~
-0 c 0
+0 c 0 0
 flee~
 %send% %actor% You cannot flee the Goblin Challenge!
 ~
 #10202
 GC Start Progression~
-2 g 100
+2 g 100 1
+L y 10200
 ~
 if %actor.is_pc% && %actor.empire%
   nop %actor.empire.start_progress(10200)%
@@ -21,7 +22,8 @@ end
 ~
 #10203
 Goblin Challenge: Better error message when attacking early~
-0 B 0
+0 B 0 1
+L f 10203
 ~
 if %self.aff_flagged(!ATTACK)%
   %send% %actor% You'll have to wait a moment. ~%self% is still getting ready.
@@ -33,7 +35,7 @@ end
 ~
 #10204
 Zelkab Bruiser Combat~
-0 k 10
+0 k 10 0
 ~
 switch %random.2%
   case 1
@@ -50,7 +52,9 @@ done
 ~
 #10205
 Zelkab Death~
-0 f 100
+0 f 100 2
+L b 10201
+L w 10216
 ~
 if !%self.varexists(difficulty)%
   * This is probably a summoned copy.
@@ -85,7 +89,7 @@ set mob_name %mob_name.car%
 ~
 #10206
 Garlgarl Shaman Combat~
-0 k 10
+0 k 10 0
 ~
 switch %random.4%
   case 1
@@ -107,7 +111,11 @@ done
 ~
 #10207
 Garlgarl Death~
-0 f 100
+0 f 100 4
+L b 10202
+L b 10203
+L w 10217
+L w 10218
 ~
 if !%self.varexists(difficulty)%
   * This is probably a summoned copy.
@@ -148,7 +156,7 @@ done
 ~
 #10208
 Filks Archer Combat~
-0 k 10
+0 k 10 0
 ~
 %send% %actor% Filks dashes backwards, draws her bow, and shoots you with a poison arrow!
 %echoaround% %actor% Filks dashes backwards, draws her bow, and shoots ~%actor% with a poison arrow!
@@ -157,7 +165,10 @@ Filks Archer Combat~
 ~
 #10209
 Filks Death~
-0 f 100
+0 f 100 3
+L b 10203
+L b 10204
+L w 10219
 ~
 if !%self.varexists(difficulty)%
   * This is probably a summoned copy.
@@ -202,14 +213,17 @@ end
 ~
 #10210
 Walts Sapper Combat~
-0 k 8
+0 k 8 0
 ~
 %echo% Walts runs to the edge of the nest, pulls out a bomb, and hurls it at you!
 %aoe% 100 physical
 ~
 #10211
 Walts Death~
-0 f 100
+0 f 100 3
+L b 10202
+L b 10204
+L w 10219
 ~
 if !%self.varexists(difficulty)%
   * This is probably a summoned copy.
@@ -254,7 +268,7 @@ end
 ~
 #10212
 Nilbog Champion Combat~
-0 k 8
+0 k 8 0
 ~
 switch %random.3%
   case 1
@@ -274,7 +288,9 @@ done
 ~
 #10213
 Nilbog Death~
-0 f 100
+0 f 100 2
+L b 10205
+L w 10220
 ~
 if !%self.varexists(difficulty)%
   * This is probably a summoned copy.
@@ -309,7 +325,7 @@ set mob_name %mob_name.car%
 ~
 #10214
 Furl War Shaman Combat~
-0 k 10
+0 k 10 0
 ~
 switch %random.4%
   case 1
@@ -328,7 +344,8 @@ done
 ~
 #10216
 Filks Respawn - deprecated~
-0 b 100
+0 b 100 1
+L b 10203
 ~
 * Respawns Walts if needed
 if (%self.fighting% || %self.disabled%)
@@ -354,7 +371,8 @@ end
 ~
 #10217
 Walts Respawn - deprecated~
-0 b 100
+0 b 100 1
+L b 10202
 ~
 * Respawns Filks if needed
 if (%self.fighting% || %self.disabled%)
@@ -380,7 +398,9 @@ end
 ~
 #10218
 Filks and Walts respawn~
-2 b 100
+2 b 100 2
+L b 10202
+L b 10203
 ~
 set filks_present 0
 set walts_present 0
@@ -447,7 +467,12 @@ end
 ~
 #10225
 Gardener greeting~
-0 g 100
+0 g 100 5
+L c 10233
+L c 10234
+L c 10235
+L c 10236
+L c 10237
 ~
 wait 5
 %send% %actor% ~%self% greets you warmly.
@@ -462,7 +487,25 @@ wait 5
 ~
 #10226
 Gardener Offer~
-0 c 0
+0 c 0 18
+L c 141
+L c 143
+L c 144
+L c 145
+L c 3002
+L c 3004
+L c 3005
+L c 3008
+L c 3010
+L c 3011
+L c 3019
+L c 3023
+L c 10233
+L c 10234
+L c 10235
+L c 10237
+L c 10238
+L c 10239
 offer~
 if (%actor.has_resources(3002,4)% && %actor.has_resources(3004,4)% && %actor.has_resources(3008,4)% && %actor.has_resources(3010,4)%)
   * fruits
@@ -510,7 +553,8 @@ end
 ~
 #10227
 M:HG Start Progression~
-2 g 100
+2 g 100 1
+L y 10225
 ~
 if %actor.is_pc% && %actor.empire%
   nop %actor.empire.start_progress(10225)%
@@ -518,7 +562,8 @@ end
 ~
 #10232
 Tumbleweed mount spawn~
-1 c 2
+1 c 2 1
+L b 10227
 use~
 if %actor.obj_target(%arg%)% != %self%
   return 0
@@ -538,7 +583,7 @@ end
 ~
 #10233
 Gardener passive~
-0 bw 15
+0 bw 15 0
 ~
 if %self.varexists(msg_pos)%
   eval msg_pos %self.msg_pos% + 1
@@ -566,7 +611,10 @@ remote msg_pos %self.id%
 ~
 #10235
 Hidden Token combine~
-1 c 2
+1 c 2 3
+L c 10233
+L c 10234
+L c 10236
 combine~
 if %actor.position% != Standing
   return 0
@@ -595,7 +643,9 @@ end
 ~
 #10236
 Hidden Garden teleport chant~
-1 c 2
+1 c 2 2
+L j 10225
+L j 10226
 chant~
 set room %self.room%
 * Only know the 'gardens' chant if the have the token.
@@ -630,7 +680,7 @@ end
 ~
 #10250
 Chronomancer intro~
-0 g 100
+0 g 100 0
 ~
 * Only care about portal entries
 if %direction% != none
@@ -649,14 +699,14 @@ say Oh, and watch out for Archsorcerer Malfernes. I think the chroniportation ha
 ~
 #10251
 Block chop, give error~
-2 c 0
+2 c 0 0
 chop~
 %send% %actor% A tangle of sharp vines too thick to pass stops you from getting close enough to the trees.
 return 1
 ~
 #10252
 King of the Dracosaurs grievous bite~
-0 k 7
+0 k 7 0
 ~
 %send% %actor% ~%self% takes a grievous bite out of you!
 %echoaround% %actor% ~%self% takes a grievous bite out of ~%actor%!
@@ -665,14 +715,21 @@ King of the Dracosaurs grievous bite~
 ~
 #10253
 Terrosaur combat~
-0 k 5
+0 k 5 0
 ~
 dg_affect %self% BONUS-PHYSICAL 5 120
 %echo% ~%self% seems to get angrier!
 ~
 #10254
 Malfernes combat~
-0 k 7
+0 k 7 7
+L o 166
+L o 173
+L o 175
+L o 178
+L w 3009
+L w 3015
+L w 3035
 ~
 if !%self.affect(foresight)%
   foresight
@@ -686,7 +743,8 @@ end
 ~
 #10255
 Primeval Start Progression~
-2 g 100
+2 g 100 1
+L y 10250
 ~
 if %actor.is_pc% && %actor.empire%
   nop %actor.empire.start_progress(10250)%
@@ -694,7 +752,9 @@ end
 ~
 #10256
 Primeval: Start delayed despawn~
-0 f 100
+0 f 100 2
+L b 10276
+L j 10251
 ~
 %buildingecho% %self.room% A bone-shattering roar echoes through the air!
 %at% i10251 %load% mob 10276
@@ -702,7 +762,11 @@ return 0
 ~
 #10257
 Dracosaur miniboss spawner~
-1 n 100
+1 n 100 4
+L b 10255
+L b 10256
+L b 10257
+L b 10258
 ~
 switch %random.3%
   case 1
@@ -721,7 +785,21 @@ done
 ~
 #10258
 Primeval difficulty selector~
-0 c 0
+0 c 0 14
+L b 10252
+L b 10253
+L b 10254
+L b 10255
+L b 10258
+L j 10250
+L j 10251
+L j 10252
+L j 10253
+L j 10254
+L j 10255
+L j 10256
+L j 10257
+L j 10258
 difficulty~
 return 1
 * Configs
@@ -815,7 +893,7 @@ remote scaled %self.id%
 ~
 #10259
 Priveal block exit until selected~
-0 s 100
+0 s 100 0
 ~
 if %direction% != portal && !%actor.nohassle% && !%self.varexists(scaled)%
   %send% %actor% The gate is shut. Choose a difficulty to proceed.
@@ -825,7 +903,11 @@ end
 ~
 #10260
 Dracosaur trash spawner~
-1 n 100
+1 n 100 4
+L b 10259
+L b 10260
+L b 10261
+L b 10262
 ~
 switch %random.3%
   case 1
@@ -844,7 +926,7 @@ done
 ~
 #10261
 Malfernes greet/aggro~
-0 g 100
+0 g 100 0
 ~
 if (%self.fighting% || %self.disabled% || %actor.nohassle%)
   halt
@@ -874,7 +956,7 @@ end
 ~
 #10262
 Primeval must-fight~
-0 s 100
+0 s 100 0
 ~
 if (%actor.nohassle% || %direction% == south)
   halt
@@ -884,7 +966,8 @@ return 0
 ~
 #10263
 DEPRECATED: mount whistle use~
-1 c 2
+1 c 2 1
+L f 9910
 use~
 * DEPRECATED: Use 9910 instead
 if %actor.obj_target(%arg%)% != %self%
@@ -907,7 +990,10 @@ end
 ~
 #10264
 Dracosaur boss spawner~
-1 n 100
+1 n 100 3
+L b 10252
+L b 10253
+L b 10254
 ~
 switch %random.3%
   case 1
@@ -924,14 +1010,22 @@ done
 ~
 #10265
 Primeval no-flee~
-0 c 0
+0 c 0 0
 flee~
 %send% %actor% There's nowhere to flee!
 return 1
 ~
 #10266
 Primeval track ability~
-2 c 0
+2 c 0 8
+L b 10252
+L b 10255
+L b 10256
+L b 10257
+L b 10258
+L b 18280
+L o 73
+L o 80
 track~
 * check abils and arg
 if !%arg% || !%actor.ability(Track)% || !%actor.ability(Navigation)%
@@ -1029,7 +1123,9 @@ return 1
 ~
 #10267
 Primeval base camp track hint~
-2 c 0
+2 c 0 2
+L o 73
+L o 80
 track~
 * shows up after they fail to find tracks
 return 0
@@ -1040,7 +1136,9 @@ end
 ~
 #10268
 Primeval backtracking track hint~
-2 c 0
+2 c 0 2
+L o 73
+L o 80
 track~
 * when they try to track from the "backtracking" room
 return 0
@@ -1051,7 +1149,8 @@ end
 ~
 #10270
 King of the Dracosaurs greet/aggro~
-0 g 100
+0 g 100 1
+L c 120
 ~
 if (%self.fighting% || %self.disabled% || %actor.nohassle%)
   halt
@@ -1082,7 +1181,8 @@ end
 ~
 #10271
 Terrosaur greet/aggro~
-0 g 100
+0 g 100 1
+L c 120
 ~
 if (%self.fighting% || %self.disabled% || %actor.nohassle%)
   halt
@@ -1113,7 +1213,8 @@ end
 ~
 #10272
 Primeval item BOE/BOP craft/loot twiddler~
-1 n 100
+1 n 100 1
+L f 10272
 ~
 * items default to BOP but are set BOE if they come from a shop or craft
 set actor %self.carried_by%
@@ -1146,7 +1247,13 @@ detach 10272 %self.id%
 ~
 #10273
 Primeval shop: sell resources to shop~
-0 c 0
+0 c 0 6
+L c 10252
+L c 10253
+L c 10254
+L c 10265
+L c 10267
+L w 10250
 sell~
 * Usage: sell <all | item>
 set valid_vnums 10252 10253 10254 10265 10267
@@ -1225,7 +1332,7 @@ end
 ~
 #10274
 Primeval environment~
-2 bw 5
+2 bw 5 0
 ~
 switch %random.4%
   case 1
@@ -1244,7 +1351,35 @@ done
 ~
 #10275
 Primeval Portal: learn craft book~
-1 c 2
+1 c 2 28
+L a 10255
+L a 10256
+L a 10258
+L a 10266
+L a 10268
+L a 10270
+L a 10272
+L a 10274
+L a 10276
+L a 10278
+L a 10280
+L a 10282
+L a 10287
+L a 10288
+L a 10289
+L a 10290
+L a 10291
+L a 10292
+L a 10293
+L a 10294
+L a 10297
+L a 10298
+L a 10299
+L o 170
+L o 182
+L o 196
+L o 197
+L o 199
 learn~
 * Usage: learn <self>
 if %actor.obj_target(%arg%)% != %self%
@@ -1331,14 +1466,14 @@ done
 ~
 #10276
 Primeval: Initialize delayed despawner~
-0 n 100
+0 n 100 0
 ~
 set spawn_time %timestamp%
 remote spawn_time %self.id%
 ~
 #10277
 Primeval: Delayed despawn~
-0 ab 10
+0 ab 10 0
 ~
 if %self.var(spawn_time,0)% + 1800 < %timestamp%
   %adventurecomplete%
@@ -1347,7 +1482,30 @@ end
 ~
 #10296
 Primeval Portal loot replacer~
-1 n 100
+1 n 100 23
+L c 10255
+L c 10256
+L c 10258
+L c 10266
+L c 10268
+L c 10270
+L c 10272
+L c 10274
+L c 10276
+L c 10278
+L c 10280
+L c 10282
+L c 10287
+L c 10288
+L c 10289
+L c 10290
+L c 10291
+L c 10292
+L c 10293
+L c 10294
+L c 10297
+L c 10298
+L c 10299
 ~
 * list of vnums and size of the list: WARNING this line must not pass 255 characters
 set vnum_list 10268 10270 10272 10282 10266 10274 10287 10288 10289 10290 10276 10278 10291 10292 10293 10255 10280 10258 10294 10256 10297 10298 10299

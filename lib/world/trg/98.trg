@@ -41,7 +41,8 @@ end
 ~
 #9804
 Cancel follow on load (for summons)~
-0 n 100 0
+0 n 100 1
+L f 9804
 ~
 * Summons enter the game following (silentyl). This cancels that.
 if %self.leader%
@@ -51,7 +52,8 @@ detach 9804 %self.id%
 ~
 #9805
 Summoned mob is charmed~
-0 n 100 0
+0 n 100 1
+L f 9805
 ~
 * Adds a CHARMED flag to the mob
 if %self.leader%

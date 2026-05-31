@@ -908,7 +908,7 @@ typedef struct vehicle_data vehicle_data;
 #define AFF_DEATHSHROUDED  BIT(23)	// x. deathshrouded
 #define AFF_EARTHMELDED  BIT(24)	// y. interred in the earth
 #define AFF_MUMMIFIED  BIT(25)	// z. mummified
-#define AFF_SOULMASK  BIT(26)	// A. shows no details to others on 'affects'
+#define AFF_MASK_AFFECTS  BIT(26)	// A. shows no details to others on 'affects', formerly called SOULMASK
 #define AFF_NO_TRACKS  BIT(27)	// B. leaves no tracks
 #define AFF_IMMUNE_POISON_DEBUFFS  BIT(28)	// C. Immune to any 'poison' debuffs
 #define AFF_IMMUNE_MENTAL_DEBUFFS  BIT(29)	// D. Immune to any 'mental' debuffs
@@ -2750,6 +2750,7 @@ typedef enum {
 #define SECTF_IRRIGATES_AREA  BIT(28)	// tiles around this one trigger irrigation evolutions
 #define SECTF_NO_WORKFORCE_AUTOABANDON  BIT(29)	// workforce will not auto-abandon this terrain
 #define SECTF_BASIC_CROP  BIT(30)	// to be used on the "basic crop tile" for its terrain
+#define SECTF_HIDE_ON_ISLAND_DESCRIPTION  BIT(31)	// won't be used in auto-generated island descriptions
 // note: evolutions use these as flags in a SIGNED sbitvector_t; limit is BIT(62)
 
 

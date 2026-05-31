@@ -1,6 +1,7 @@
 #11000
 No Portal Inside~
-1 n 100
+1 n 100 1
+L j 11000
 ~
 if %self.room.template% == 11000
   * This object is inside the adventure
@@ -11,7 +12,7 @@ end
 ~
 #11001
 Add Nest Exit~
-2 n 100
+2 n 100 0
 ~
 set loc %instance.location%
 if %loc%
@@ -20,7 +21,9 @@ end
 ~
 #11002
 Smash / Steal Roc fight~
-0 k 100
+0 k 100 2
+L b 11002
+L c 11053
 ~
 eval healthprct (100 * %actor.health%) / %actor.maxhealth%
 if %healthprct% < 90
@@ -71,7 +74,9 @@ done
 ~
 #11003
 Start Smash Quest~
-2 u 100
+2 u 100 2
+L b 11000
+L c 11021
 ~
 %load% mob 11000
 %load% obj 11021
@@ -80,7 +85,10 @@ set mob %room.people%
 ~
 #11006
 Hatch/Protect Finisher~
-2 v 100
+2 v 100 3
+L b 11004
+L b 11005
+L c 11058
 ~
 %load% mob 11004
 %load% mob 11005
@@ -89,7 +97,8 @@ Hatch/Protect Finisher~
 ~
 #11007
 Cattails unclaimed decay~
-0 ab 100
+0 ab 100 1
+L f 11007
 ~
 set room %self.room%
 set cycles_left 3
@@ -131,7 +140,9 @@ done
 ~
 #11008
 Give seeds if no seeds or cattails~
-2 u 100
+2 u 100 2
+L c 11008
+L c 11009
 ~
 if !%actor.inventory(11008)% && !%actor.inventory(11009)%
   nop %actor.add_resources(11008, 1)%
@@ -141,7 +152,8 @@ end
 ~
 #11009
 Roc nest forage for trees~
-2 c 0
+2 c 0 1
+L f 11009
 forage~
 set num 4
 %send% %actor% You forage around and find a large tree (x%num%)!
@@ -151,7 +163,9 @@ detach 11009 %self.id%
 ~
 #11010
 Scatter random corpses~
-0 b 50
+0 b 50 2
+L c 11022
+L c 11023
 ~
 if %self.room.distance(%instance.location%)% > 10
   mgoto %instance.location%
@@ -183,7 +197,8 @@ end
 ~
 #11011
 Escape adventure and mmove~
-0 n 100
+0 n 100 1
+L j 11000
 ~
 if (!%instance.location% || %self.room.template% != 11000)
   halt
@@ -196,7 +211,8 @@ mmove
 ~
 #11012
 Roc Hatchling break egg on hatch~
-0 n 100
+0 n 100 1
+L c 11001
 ~
 %echo% The egg begins to vibrate and crack...
 wait 1
@@ -213,7 +229,7 @@ detach 11012 %self.id%
 ~
 #11017
 Baby Ostrich emotes~
-0 btw 5
+0 btw 5 0
 ~
 if %self.disabled%
   halt
@@ -235,7 +251,10 @@ done
 ~
 #11018
 Stealth quest start~
-2 u 100
+2 u 100 3
+L b 11002
+L c 11021
+L c 11053
 ~
 * Egg
 %load% obj 11053 %actor% inv
@@ -254,13 +273,14 @@ set mob %room.people%
 ~
 #11019
 Start Protect Egg~
-2 u 100
+2 u 100 1
+L c 11054
 ~
 %load% obj 11054 %actor% inv
 ~
 #11020
 Begin hunt~
-0 n 100
+0 n 100 0
 ~
 wait 5 sec
 * exit nest
@@ -268,13 +288,14 @@ down
 ~
 #11021
 Delayed Completer~
-1 f 0
+1 f 0 0
 ~
 %adventurecomplete%
 ~
 #11022
 Delayed despawner remove roc egg~
-1 n 100
+1 n 100 1
+L c 11001
 ~
 wait 1
 set obj %self.room.contents%
@@ -288,7 +309,8 @@ done
 ~
 #11024
 Combat Roc Death~
-0 f 100
+0 f 100 1
+L b 11001
 ~
 %load% mob 11001
 set mob %self.room.people%
@@ -296,21 +318,23 @@ set mob %self.room.people%
 ~
 #11025
 Late adventurer announce~
-0 n 100
+0 n 100 0
 ~
 wait 1 sec
 say Ach! I'm always late to the party. Ah well, if you want to trade your corrupted talons for some goods, type list.
 ~
 #11026
 Shady Thief announce~
-0 n 100
+0 n 100 0
 ~
 wait 1 sec
 say This egg is exactly what the buyer wanted. While I'm here, type list if you want to trade your corrupted talons for some goods.
 ~
 #11027
 Block Nest Entry and Start Progression~
-2 g 100
+2 g 100 2
+L c 11053
+L y 11000
 ~
 if %actor.inventory(11053)%
   %send% %actor% You can't get back into the nest right now!
@@ -322,7 +346,7 @@ end
 ~
 #11032
 Wings of Daedalus decay~
-1 j 0
+1 j 0 0
 ~
 if %self.timer% > 0
   halt
@@ -332,7 +356,10 @@ otimer 24
 ~
 #11034
 Clockwork Roc Interior~
-5 o 100
+5 o 100 3
+L e 11035
+L e 11036
+L e 11037
 ~
 set inter %self.interior%
 if (!%inter%)
@@ -351,7 +378,12 @@ end
 ~
 #11052
 incredible reward replacer~
-1 n 100
+1 n 100 5
+L c 11017
+L c 11018
+L c 11019
+L c 11020
+L c 11035
 ~
 wait 1
 set actor %self.carried_by%
@@ -403,7 +435,10 @@ end
 ~
 #11053
 Stolen egg expiry~
-1 f 0
+1 f 0 3
+L b 11002
+L b 11003
+L t 11002
 ~
 set actor %self.carried_by%
 if !%actor%

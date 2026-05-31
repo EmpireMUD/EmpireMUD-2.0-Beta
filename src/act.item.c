@@ -1391,6 +1391,11 @@ static int perform_put(char_data *ch, obj_data *obj, obj_data *cont) {
 		return 0;
 	}
 	
+	if (IS_STOLEN(obj)) {
+		act("$p: you can't put stolen items in there.", FALSE, ch, obj, NULL, TO_CHAR | TO_QUEUE);
+		return 0;
+	}
+	
 	// don't let people drop bound items in other people's territory
 	if (IN_ROOM(cont) && OBJ_BOUND_TO(obj) && ROOM_OWNER(IN_ROOM(cont)) && ROOM_OWNER(IN_ROOM(cont)) != GET_LOYALTY(ch) && !IS_IMMORTAL(ch)) {
 		msg_to_char(ch, "You can't put bound items in items here.\r\n");
@@ -1965,9 +1970,10 @@ int perform_drop(char_data *ch, obj_data *obj, byte mode, const char *sname) {
 		return 0;
 	}
 	
-	// can't junk stolen items
-	if (mode == SCMD_JUNK && IS_STOLEN(obj)) {
-		act("$p: You can't junk stolen items!", FALSE, ch, obj, NULL, TO_CHAR | TO_QUEUE);
+	// cannot put down stolen items
+	if (IS_STOLEN(obj) && !IS_STOLEN_FROM_EMPIRE(obj, ROOM_OWNER(IN_ROOM(ch)))) {
+		snprintf(buf, sizeof(buf), "$p: You can't %s drop that here, it's stolen!", sname);
+		act(buf, FALSE, ch, obj, NULL, TO_CHAR | TO_QUEUE);
 		return -1;
 	}
 	
@@ -2019,6 +2025,11 @@ int perform_drop(char_data *ch, obj_data *obj, byte mode, const char *sname) {
 					syslog(SYS_GC, GET_ACCESS_LEVEL(ch), TRUE, "ABUSE: %s drops %s with in mortal empire (%s) at %s", GET_NAME(ch), GET_OBJ_SHORT_DESC(obj), EMPIRE_NAME(ROOM_OWNER(IN_ROOM(ch))), room_log_identifier(IN_ROOM(ch)));
 					logged = TRUE;
 				}
+			}
+			
+			if (IS_STOLEN(obj) && IS_STOLEN_FROM_EMPIRE(obj, ROOM_OWNER(IN_ROOM(ch)))) {
+				// un-steal if it belongs here
+				GET_STOLEN_TIMER(obj) = 0;
 			}
 			
 			return (1);
@@ -2688,7 +2699,7 @@ static bool perform_get_from_container(char_data *ch, obj_data *obj, obj_data *c
 				}
 				run_ability_hooks_by_player_tech(ch, PTECH_STEAL_COMMAND, NULL, obj, NULL, NULL);
 			}
-			else if (IS_STOLEN(obj) && GET_LOYALTY(ch) && GET_STOLEN_FROM(obj) == EMPIRE_VNUM(GET_LOYALTY(ch))) {
+			else if (IS_STOLEN(obj) && IS_STOLEN_FROM(obj, ch)) {
 				// un-steal if this was the original owner
 				GET_STOLEN_TIMER(obj) = 0;
 			}
@@ -2827,7 +2838,7 @@ static bool perform_get_from_room(char_data *ch, obj_data *obj) {
 			
 				run_ability_hooks_by_player_tech(ch, PTECH_STEAL_COMMAND, NULL, obj, NULL, NULL);
 			}
-			else if (IS_STOLEN(obj) && GET_LOYALTY(ch) && GET_STOLEN_FROM(obj) == EMPIRE_VNUM(GET_LOYALTY(ch))) {
+			else if (IS_STOLEN(obj) && IS_STOLEN_FROM(obj, ch)) {
 				// un-steal if this was the original owner
 				GET_STOLEN_TIMER(obj) = 0;
 			}
@@ -2943,6 +2954,11 @@ static void perform_give(char_data *ch, char_data *vict, obj_data *obj) {
 		return;
 	}
 	
+	if (IS_STOLEN(obj) && !IS_STOLEN_FROM(obj, vict)) {
+		act("$p: you can't give away stolen items.", FALSE, ch, obj, NULL, TO_CHAR | TO_QUEUE);
+		return;
+	}
+	
 	if (!bind_ok(obj, vict)) {
 		act("$p: item is bound.", FALSE, ch, obj, vict, TO_CHAR | TO_QUEUE);
 		return;
@@ -2969,7 +2985,7 @@ static void perform_give(char_data *ch, char_data *vict, obj_data *obj) {
 	act("$n gives you $p.", FALSE, ch, obj, vict, TO_VICT | TO_QUEUE);
 	act("$n gives $p to $N.", TRUE, ch, obj, vict, TO_NOTVICT | TO_QUEUE);
 	
-	if (IS_STOLEN(obj) && !IS_NPC(vict) && GET_LOYALTY(vict) && GET_STOLEN_FROM(obj) == EMPIRE_VNUM(GET_LOYALTY(vict))) {
+	if (IS_STOLEN(obj) && IS_STOLEN_FROM(obj, vict)) {
 		// un-steal if this was the original owner
 		GET_STOLEN_TIMER(obj) = 0;
 	}
@@ -5395,6 +5411,9 @@ ACMD(do_combine) {
 	else if (!has_interaction(GET_OBJ_INTERACTIONS(obj), INTERACT_COMBINE)) {
 		msg_to_char(ch, "You can't combine that!\r\n");
 	}
+	else if (IS_STOLEN(obj)) {
+		act("$p: you can't combine a stolen item.", FALSE, ch, obj, NULL, TO_CHAR);
+	}
 	else {
 		// will extract no matter what happens here
 		if (!run_interactions(ch, GET_OBJ_INTERACTIONS(obj), INTERACT_COMBINE, IN_ROOM(ch), NULL, obj, NULL, combine_obj_interact)) {
@@ -5446,14 +5465,14 @@ ACMD(do_compare) {
 	charge_ability_cost(ch, NOTHING, 0, NOTHING, 0, WAIT_OTHER);
 	
 	// check identifies-to:
-	if (has_interaction(GET_OBJ_INTERACTIONS(obj), INTERACT_IDENTIFIES_TO) && (WORN_OR_CARRIED_BY(obj, ch) || can_use_room(ch, IN_ROOM(ch), MEMBERS_ONLY))) {
+	if (!IS_STOLEN(obj) && has_interaction(GET_OBJ_INTERACTIONS(obj), INTERACT_IDENTIFIES_TO) && (WORN_OR_CARRIED_BY(obj, ch) || can_use_room(ch, IN_ROOM(ch), MEMBERS_ONLY))) {
 		act("$n identifies $p.", TRUE, ch, obj, NULL, TO_ROOM);
 		run_identifies_to(ch, &obj, &extract_from);
 		if (ch->desc) {
 			send_stacked_msgs(ch->desc);	// flush the stacked id message before id'ing it
 		}
 	}
-	if (to_obj && has_interaction(GET_OBJ_INTERACTIONS(to_obj), INTERACT_IDENTIFIES_TO) && (WORN_OR_CARRIED_BY(to_obj, ch) || can_use_room(ch, IN_ROOM(ch), MEMBERS_ONLY))) {
+	if (to_obj && !IS_STOLEN(to_obj) && has_interaction(GET_OBJ_INTERACTIONS(to_obj), INTERACT_IDENTIFIES_TO) && (WORN_OR_CARRIED_BY(to_obj, ch) || can_use_room(ch, IN_ROOM(ch), MEMBERS_ONLY))) {
 		act("$n identifies $p.", TRUE, ch, to_obj, NULL, TO_ROOM);
 		run_identifies_to(ch, &to_obj, &extract_to);
 		if (ch->desc) {
@@ -5684,7 +5703,13 @@ ACMD(do_drink) {
 		}
 
 		if (type == NOTHING) {
-			send_to_char("You can't find it!\r\n", ch);
+			// did we fail for permission to use room?
+			if (room_has_function_and_city_ok(NULL, IN_ROOM(ch), FNC_DRINK_WATER) && (is_abbrev(argptr, "water") || isname(argptr, get_room_name(IN_ROOM(ch), FALSE)))) {
+				msg_to_char(ch, "You don't have permission to drink from here.\r\n");
+			}
+			else {
+				send_to_char("You can't find it!\r\n", ch);
+			}
 			return;
 		}
 	}
@@ -6080,6 +6105,10 @@ ACMD(do_eat) {
 	}
 	if (!bind_ok(food, ch)) {
 		msg_to_char(ch, "You can't eat something that's bound to someone else.\r\n");
+		return;
+	}
+	if (IS_STOLEN(food)) {
+		act("$p: you can't eat stolen items.", FALSE, ch, food, NULL, TO_CHAR);
 		return;
 	}
 	
@@ -7060,6 +7089,9 @@ ACMD(do_light) {
 	else if (!CAN_LIGHT_OBJ(obj)) {
 		act("You can't light $p!", FALSE, ch, obj, NULL, TO_CHAR);
 	}
+	else if (IS_STOLEN(obj)) {
+		act("$p: you can't light stolen items.", FALSE, ch, obj, NULL, TO_CHAR);
+	}
 	else if (lighter == obj) {
 		msg_to_char(ch, "You can't use an item to light itself.\r\n");
 	}
@@ -8032,6 +8064,9 @@ ACMD(do_seed) {
 		else if (!has_interaction(GET_OBJ_INTERACTIONS(obj), INTERACT_SEED)) {
 			msg_to_char(ch, "You can't seed that!\r\n");
 		}
+		else if (IS_STOLEN(obj)) {
+			act("$p: you can't seed a stolen item.", FALSE, ch, obj, NULL, TO_CHAR);
+		}
 		else if (OBJ_FLAGGED(obj, OBJ_SEEDED)) {
 			msg_to_char(ch, "It has already been seeded.\r\n");
 		}
@@ -8060,7 +8095,7 @@ ACMD(do_seed) {
 			return;
 		}
 		DL_FOREACH_SAFE2(ch->carrying, obj, next_obj, next_content) {
-			if (!OBJ_FLAGGED(obj, OBJ_SEEDED) && has_interaction(GET_OBJ_INTERACTIONS(obj), INTERACT_SEED) && CAN_SEE_OBJ(ch, obj) && (obj_dotmode == FIND_ALL || isname(arg, GET_OBJ_KEYWORDS(obj)))) {
+			if (!OBJ_FLAGGED(obj, OBJ_SEEDED) && !IS_STOLEN(obj) && has_interaction(GET_OBJ_INTERACTIONS(obj), INTERACT_SEED) && CAN_SEE_OBJ(ch, obj) && (obj_dotmode == FIND_ALL || isname(arg, GET_OBJ_KEYWORDS(obj)))) {
 				// ok: seed 1 of many
 				any = TRUE;
 				if (run_interactions(ch, GET_OBJ_INTERACTIONS(obj), INTERACT_SEED, IN_ROOM(ch), NULL, obj, NULL, seed_obj_interact)) {
@@ -8106,6 +8141,9 @@ ACMD(do_separate) {
 	}
 	else if (!has_interaction(GET_OBJ_INTERACTIONS(obj), INTERACT_SEPARATE)) {
 		msg_to_char(ch, "You can't separate that!\r\n");
+	}
+	else if (IS_STOLEN(obj)) {
+		act("$p: you can't separate a stolen item.", FALSE, ch, obj, NULL, TO_CHAR);
 	}
 	else {		
 		if (run_interactions(ch, GET_OBJ_INTERACTIONS(obj), INTERACT_SEPARATE, IN_ROOM(ch), NULL, obj, NULL, separate_obj_interact)) {

@@ -2396,6 +2396,9 @@ ACMD(do_chip) {
 	else if (!has_interaction(GET_OBJ_INTERACTIONS(target), INTERACT_CHIP)) {
 		msg_to_char(ch, "You can't chip that!\r\n");
 	}
+	else if (IS_STOLEN(target)) {
+		act("$p: you can't chip stolen items.", FALSE, ch, target, NULL, TO_CHAR);
+	}
 	else if (!has_tool(ch, TOOL_KNAPPER)) {
 		msg_to_char(ch, "You need to be wielding some kind of knapper (or basic rock) to chip it.\r\n");
 	}
@@ -2804,6 +2807,9 @@ ACMD(do_mint) {
 	else if (!IS_WEALTH_ITEM(obj) || GET_WEALTH_VALUE(obj) <= 0 || IS_MINT_FLAGGED(obj, MINT_FLAG_NO_MINT)) {
 		msg_to_char(ch, "You can't mint that into coins.\r\n");
 	}
+	else if (IS_STOLEN(obj)) {
+		act("$p: you can't mint stolen items into coins.", FALSE, ch, obj, NULL, TO_CHAR);
+	}
 	else if (!can_see_in_dark_room(ch, IN_ROOM(ch), TRUE)) {
 		msg_to_char(ch, "It's too dark to mint anything here.\r\n");
 	}
@@ -3045,6 +3051,9 @@ ACMD(do_saw) {
 	else if (!has_interaction(GET_OBJ_INTERACTIONS(obj), INTERACT_SAW)) {
 		msg_to_char(ch, "You can't saw that!\r\n");
 	}
+	else if (IS_STOLEN(obj)) {
+		act("$p: you can't saw stolen items.", FALSE, ch, obj, NULL, TO_CHAR);
+	}
 	else if (!can_see_in_dark_room(ch, IN_ROOM(ch), TRUE)) {
 		msg_to_char(ch, "It's too dark to saw anything here.\r\n");
 	}
@@ -3100,6 +3109,9 @@ ACMD(do_scrape) {
 	}
 	else if (!has_interaction(GET_OBJ_INTERACTIONS(obj), INTERACT_SCRAPE)) {
 		msg_to_char(ch, "You can't scrape that!\r\n");
+	}
+	else if (IS_STOLEN(obj)) {
+		act("$p: you can't scrape stolen items.", FALSE, ch, obj, NULL, TO_CHAR);
 	}
 	else if (!has_tool(ch, TOOL_AXE | TOOL_KNIFE)) {
 		msg_to_char(ch, "You need to be using a good axe or knife to scrape anything.\r\n");
@@ -3174,6 +3186,9 @@ ACMD(do_tan) {
 	}
 	else if (!has_interaction(GET_OBJ_INTERACTIONS(obj), INTERACT_TAN)) {
 		msg_to_char(ch, "You can't tan that!\r\n");
+	}
+	else if (IS_STOLEN(obj)) {
+		act("$p: you can't tan stolen items.", FALSE, ch, obj, NULL, TO_CHAR);
 	}
 	else if (!can_use_room(ch, IN_ROOM(ch), GUESTS_ALLOWED)) {
 		msg_to_char(ch, "You don't have permission to tan here.\r\n");
@@ -3560,7 +3575,7 @@ bool try_gen_interact_local_crops(char_data *ch, room_data *room, const struct g
 		return FALSE;	// must be outdoor
 	}
 	
-	if ((crop = get_potential_crop_for_location(room, data->interact))) {
+	if ((crop = get_potential_crop_for_location(room, data->interact, NULL))) {
 		return run_interactions(ch, GET_CROP_INTERACTIONS(crop), data->interact, room, NULL, NULL, NULL, finish_gen_interact_room);
 	}
 	else {

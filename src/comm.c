@@ -93,7 +93,6 @@ void save_data_table(bool force);
 void update_actions();
 void update_empire_npc_data();
 void update_guard_towers();
-void update_instance_world_size();
 void update_trading_post();
 void weather_and_time();
 void write_book_library_file();

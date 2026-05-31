@@ -136,13 +136,13 @@ if !%leader%
   %purge% %self%
   halt
 end
-if %self.aff_flagged(!SEE)%
-  dg_affect %self% !SEE off 1
+if %self.aff_flagged(NO-SEE-IN-ROOM)%
+  dg_affect %self% NO-SEE-IN-ROOM off 1
   dg_affect %self% SNEAK off 1
   %echo% ~%self% appears out of nowhere and starts following ~%leader%.
 else
   %echo% ~%self% vanishes into thin air.
-  dg_affect %self% !SEE on -1
+  dg_affect %self% NO-SEE-IN-ROOM on -1
   dg_affect %self% SNEAK on -1
 end
 ~

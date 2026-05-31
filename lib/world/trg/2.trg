@@ -15,21 +15,36 @@ end
 ~
 #221
 Stealth GM Bribe coins: Prevent~
-0 m 0 0
+0 m 0 1
+L q 4
 ~
-%send% %actor% ~%self% doesn't take bribes like that any more. Complete ^%self% quest instead.
+if %actor.skill(Stealth)% > 0
+  %send% %actor% No point trying to bribe ~%self -- you already know the Stealth skill.
+elseif !%ator.can_gain_new_skills%
+  %send% %actor% No point trying to bribe ~%self -- you can't learn a new skill tree right now.
+else
+  %send% %actor% ~%self% doesn't take bribes like that any more. Complete ^%self% quest instead.
+end
 return 0
 ~
 #222
 Stealth GM Bribe item: Prevent~
-0 j 100 0
+0 j 100 1
+L q 4
 ~
-%send% %actor% ~%self% doesn't take bribes like that any more. Complete ^%self% quest instead.
+if %actor.skill(Stealth)% > 0
+  %send% %actor% No point trying to bribe ~%self -- you already know the Stealth skill.
+elseif !%ator.can_gain_new_skills%
+  %send% %actor% No point trying to bribe ~%self -- you can't learn a new skill tree right now.
+else
+  %send% %actor% ~%self% doesn't take bribes like that any more. Complete ^%self% quest instead.
+end
 return 0
 ~
 #230
 Summon Thug load script~
-0 n 100 0
+0 n 100 1
+L f 230
 ~
 * cancels follow and sets loyalty to current room's empire
 if %self.leader%
@@ -45,7 +60,8 @@ detach 230 %self.id%
 ~
 #232
 Barrel of Fun: Setup command~
-1 c 6 0
+1 c 6 1
+L f 232
 setup~
 set room %actor.room%
 if %actor.obj_target(%arg.argument1%)% != %self%
@@ -159,7 +175,9 @@ while %num% <= %count%
     %own% %summon% %self.empire%
   end
   %echo% ~%summon% arrives!
-  %force% %summon% mkill %actor%
+  if %summon.can_fight(%actor%)%
+    %force% %summon% mkill %actor%
+  end
   eval num %num% + 1
 done
 ~

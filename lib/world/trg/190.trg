@@ -1,6 +1,6 @@
 #19000
 Swamp Hut passive~
-2 bw 5
+2 bw 5 0
 ~
 switch %random.4%
   case 1
@@ -19,13 +19,16 @@ done
 ~
 #19001
 Swamp Hag 2.0: Summon Allies~
-0 k 100
+0 k 100 3
+L b 19001
+L b 19002
+L w 19001
 ~
 if %self.cooldown(19001)%
   halt
 end
 * Clear blind just in case...
-if %self.affect(BLIND)%
+if %self.aff_flagged(BLIND)%
   %echo% |%self% eyes flash blue, and ^%self% vision clears!
   dg_affect %self% BLIND off 1
 end
@@ -54,7 +57,9 @@ end
 ~
 #19002
 Swamp Hag 2.0: Pestle Smash~
-0 k 20
+0 k 20 2
+L w 19001
+L w 19002
 ~
 if %self.cooldown(19001)%
   halt
@@ -70,7 +75,9 @@ end
 ~
 #19003
 Swamp Hag 2.0: Voodoo Dolls~
-0 k 40
+0 k 40 2
+L w 19001
+L w 19003
 ~
 if %self.cooldown(19001)%
   halt
@@ -104,7 +111,9 @@ end
 ~
 #19004
 Swamp Hag 2.0: Insect Swarm~
-0 k 60
+0 k 60 2
+L w 19001
+L w 19004
 ~
 if %self.cooldown(19001)%
   halt
@@ -132,7 +141,9 @@ end
 ~
 #19005
 Swamp Hag 2.0 Diff Select~
-1 c 4
+1 c 4 2
+L b 19000
+L j 19001
 difficulty~
 set room %self.room%
 if !%arg%
@@ -220,13 +231,13 @@ otimer 24
 ~
 #19006
 Swamp Hag delayed despawn~
-1 f 0
+1 f 0 0
 ~
 %adventurecomplete%
 ~
 #19007
 Swamp Hag load BoP->BoE~
-1 n 100
+1 n 100 0
 ~
 set actor %self.carried_by%
 if !%actor%
@@ -257,7 +268,9 @@ end
 ~
 #19008
 Swamp Hag 2.0 Death~
-0 f 100
+0 f 100 2
+L c 19000
+L w 19000
 ~
 * Crystal ball
 %load% obj 19000
@@ -293,7 +306,9 @@ return 0
 ~
 #19009
 Swamp Hag 2.0 group: Bind ~
-0 k 100
+0 k 100 2
+L w 19001
+L w 19009
 ~
 if %self.cooldown(19001)%
   halt
@@ -336,7 +351,9 @@ dg_affect #19009 %actor% HARD-STUNNED on 75
 ~
 #19010
 Swamp Hag bind struggle~
-0 c 0
+0 c 0 2
+L w 19009
+L w 19010
 struggle~
 set break_free_at 3
 if !%actor.affect(19009)%
@@ -370,7 +387,9 @@ end
 ~
 #19011
 Swamp hag bind fallback~
-2 c 0
+2 c 0 2
+L b 19000
+L w 19009
 struggle~
 * Only if the hag is dead.
 if %instance.mob(19000)%
@@ -391,14 +410,17 @@ end
 ~
 #19012
 Hag difficulty select: wrong command~
-1 c 4
+1 c 4 0
 up climb~
 %send% %actor% You can't climb up the rope. Select a difficulty level first.
 return 1
 ~
 #19013
 Swamp Rat Combat 2.0~
-0 k 100
+0 k 100 3
+L b 19002
+L w 19013
+L w 19014
 ~
 * Scale up (group only)
 if %self.vnum% == 19002
@@ -438,14 +460,25 @@ end
 ~
 #19014
 Rat despawn~
-0 n 100
+0 n 100 0
 ~
 wait 30 sec
 %purge% %self% $n scurries into a crack in the floor.
 ~
 #19015
 Swamp Hag 2.0 loot replacer~
-1 n 100
+1 n 100 11
+L c 19001
+L c 19004
+L c 19006
+L c 19007
+L c 19008
+L c 19009
+L c 19010
+L c 19038
+L c 19040
+L c 19041
+L c 19048
 ~
 set actor %self.carried_by%
 if %actor%
@@ -539,7 +572,8 @@ end
 ~
 #19016
 SH Start Progression~
-2 g 100
+2 g 100 1
+L y 19000
 ~
 if %actor.is_pc% && %actor.empire%
   nop %actor.empire.start_progress(19000)%
@@ -547,7 +581,8 @@ end
 ~
 #19047
 Walking Hut setup~
-5 o 100
+5 o 100 1
+L e 19048
 ~
 set inter %self.interior%
 if (!%inter%)
@@ -560,7 +595,8 @@ detach 19047 %self.id%
 ~
 #19048
 Swamp hag hut: Fill with Coffee~
-2 c 0
+2 c 0 1
+L w 19048
 fill~
 set liquid_num 19048
 set name hag's coffee
@@ -590,7 +626,9 @@ nop %target.val1(%target.val0%)%
 ~
 #19060
 Goblin Challenge 2.0 Difficulty Selector~
-1 c 4
+1 c 4 2
+L b 10200
+L w 10215
 difficulty~
 set room %self.room%
 if !%arg%
@@ -653,7 +691,11 @@ end
 ~
 #19061
 Power Strike~
-0 k 33
+0 k 33 4
+L b 10204
+L w 10200
+L w 10201
+L w 10202
 ~
 if %self.cooldown(10200)%
   halt
@@ -682,7 +724,9 @@ end
 ~
 #19062
 Whirlwind Attack~
-0 k 50
+0 k 50 2
+L w 10200
+L w 10203
 ~
 if %self.cooldown(10200)%
   halt
@@ -712,7 +756,8 @@ end
 ~
 #19063
 Filks & Walts: Backstab!~
-0 k 33
+0 k 33 1
+L w 10200
 ~
 if %self.cooldown(10200)%
   halt
@@ -742,7 +787,9 @@ end
 ~
 #19064
 Filks & Walts: Flank Attack~
-0 k 50
+0 k 50 2
+L w 10200
+L w 10204
 ~
 if %self.cooldown(10200)%
   halt
@@ -773,7 +820,9 @@ end
 ~
 #19065
 Goblin Shaman: Goblinfire~
-0 k 33
+0 k 33 2
+L w 10200
+L w 10205
 ~
 if %self.cooldown(10200)%
   halt
@@ -792,7 +841,9 @@ end
 ~
 #19066
 Goblin Shaman: Fire Spiral~
-0 k 50
+0 k 50 2
+L b 10205
+L w 10200
 ~
 if %self.cooldown(10200)%
   halt
@@ -821,7 +872,9 @@ wait 3 sec
 ~
 #19067
 Zelkab: Knockout Punch~
-0 k 100
+0 k 100 2
+L w 10200
+L w 10206
 ~
 if %self.cooldown(10200)%
   halt
@@ -850,7 +903,9 @@ end
 ~
 #19068
 Garlgarl: Troll Blood~
-0 k 100
+0 k 100 2
+L w 10200
+L w 10207
 ~
 if %self.cooldown(10200)%
   halt
@@ -875,7 +930,9 @@ end
 ~
 #19069
 Filks: Poison Arrow~
-0 k 100
+0 k 100 2
+L w 10200
+L w 10208
 ~
 if %self.cooldown(10200)%
   halt
@@ -906,7 +963,9 @@ end
 ~
 #19070
 Walts: Bomb Lob~
-0 k 100
+0 k 100 2
+L w 10200
+L w 10209
 ~
 if %self.cooldown(10200)%
   halt
@@ -933,7 +992,9 @@ end
 ~
 #19071
 Nilbog: Shield Block~
-0 k 100
+0 k 100 2
+L w 10200
+L w 10210
 ~
 if %self.cooldown(10200)%
   halt
@@ -957,7 +1018,15 @@ end
 ~
 #19072
 Furl: Spellstorm / Moonrise~
-0 k 50
+0 k 50 8
+L b 10200
+L b 10201
+L b 10202
+L b 10203
+L b 10204
+L b 10205
+L w 10200
+L w 10211
 ~
 if %self.cooldown(10200)%
   halt
@@ -984,7 +1053,7 @@ if %goblin% || !%heroic_mode% || !%hard%
     set person %room.people%
     while %person%
       if %person.is_enemy(%self%)%
-        %dot% #10221 %person% 75 30 magical
+        %dot% #10211 %person% 75 30 magical
         dg_affect #10211 %person% SLOW on 30
       end
       set person %person.next_in_room%

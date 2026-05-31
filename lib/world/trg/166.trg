@@ -1,6 +1,10 @@
 #16600
 make the snowman~
-1 c 2 0
+1 c 2 4
+L b 16600
+L c 16605
+L t 16606
+L w 16600
 scoop make~
 if !%arg%
   return 0
@@ -94,7 +98,14 @@ end
 ~
 #16601
 steal victim's blood~
-1 c 2 0
+1 c 2 7
+L b 9175
+L b 10700
+L b 10703
+L b 10705
+L b 16652
+L t 16602
+L t 16603
 use~
 if !%arg%
   return 0
@@ -135,7 +146,53 @@ end
 ~
 #16602
 start a winter holiday quest~
-2 u 0 0
+2 u 0 46
+L b 16600
+L c 16600
+L c 16601
+L c 16604
+L c 16608
+L c 16610
+L c 16611
+L c 16613
+L c 16616
+L c 16618
+L c 16620
+L c 16625
+L c 16627
+L c 16629
+L c 16643
+L c 16644
+L c 16676
+L c 16677
+L c 16680
+L c 16687
+L c 16690
+L f 16617
+L f 16630
+L f 16633
+L t 16602
+L t 16603
+L t 16604
+L t 16605
+L t 16606
+L t 16607
+L t 16610
+L t 16611
+L t 16613
+L t 16617
+L t 16618
+L t 16620
+L t 16626
+L t 16628
+L t 16643
+L t 16644
+L t 16660
+L t 16676
+L t 16677
+L t 16680
+L t 16687
+L t 16690
 ~
 switch %questvnum%
   case 16607
@@ -230,7 +287,12 @@ done
 ~
 #16603
 winter boss deaths~
-0 f 100 0
+0 f 100 5
+L b 16613
+L b 16680
+L b 16688
+L t 16613
+L t 16680
 ~
 return 0
 switch %self.vnum%
@@ -258,7 +320,9 @@ done
 ~
 #16604
 post a letter to father christmas~
-1 c 2 0
+1 c 2 2
+L t 16604
+L t 16605
 post~
 if !(%actor.obj_target(%arg%)% == %self%)
   return 0
@@ -291,7 +355,9 @@ end
 ~
 #16605
 grinchy buff~
-0 l 20 0
+0 l 20 2
+L w 16605
+L w 16606
 ~
 if %self.cooldown(16605)%
   halt
@@ -317,7 +383,35 @@ dg_affect #16606 %self% DODGE %SelfLevel% -1
 ~
 #16606
 plant the christmas tree~
-1 c 2 0
+1 c 2 28
+L c 1002
+L c 16602
+L c 16607
+L e 5009
+L h 4
+L h 26
+L h 45
+L h 54
+L h 71
+L h 72
+L h 210
+L h 220
+L h 221
+L h 224
+L h 232
+L h 602
+L h 603
+L h 604
+L h 612
+L h 613
+L h 614
+L h 10563
+L h 10564
+L h 10565
+L h 16698
+L h 16699
+L t 16607
+L y 16600
 plant~
 * Check if they're interacting with the fallen xmas tree object or stand.
 set targ %actor.obj_target(%arg%)%
@@ -426,7 +520,45 @@ remote winter_holiday_sect_check %self.id%
 ~
 #16608
 xmas tree chopping~
-1 c 2 0
+1 c 2 38
+L b 16609
+L c 16606
+L f 16609
+L h 4
+L h 26
+L h 45
+L h 54
+L h 71
+L h 72
+L h 79
+L h 80
+L h 81
+L h 89
+L h 104
+L h 145
+L h 154
+L h 210
+L h 220
+L h 221
+L h 224
+L h 232
+L h 602
+L h 603
+L h 604
+L h 612
+L h 613
+L h 614
+L h 617
+L h 618
+L h 10562
+L h 10563
+L h 10564
+L h 10565
+L h 11989
+L h 11990
+L h 11991
+L h 16698
+L h 16699
 chop~
 * config valid sects (must also update trig 16609)
 set valid_sects 4 26 45 54 71 72 79 80 81 89 104 145 154 210 224 232 220 221 602 603 604 612 613 614 617 618 10562 10563 10564 10565 11989 11990 11991 16698 16699
@@ -457,7 +589,43 @@ end
 ~
 #16609
 xmas tree replacer~
-0 e 1 0
+0 e 1 36
+L c 120
+L c 122
+L c 128
+L c 147
+L c 150
+L c 603
+L c 618
+L c 10558
+L c 16606
+L c 16697
+L h 4
+L h 26
+L h 45
+L h 54
+L h 71
+L h 72
+L h 79
+L h 89
+L h 210
+L h 220
+L h 221
+L h 224
+L h 232
+L h 602
+L h 603
+L h 604
+L h 612
+L h 613
+L h 614
+L h 10562
+L h 10563
+L h 10564
+L h 10565
+L h 16698
+L h 16699
+L t 16607
 collects~
 if !%actor.on_quest(16607)% || %actor.inventory(16606)% || %actor.carrying% >= (%actor.maxcarrying% - 1)
   * exit early if not on quest or already has tree, or inventory full
@@ -515,7 +683,10 @@ remote winter_holiday_sect_check %mod_tree.id%
 ~
 #16610
 make snow angel~
-1 c 2 0
+1 c 2 3
+L c 16609
+L t 16610
+L w 16610
 make~
 if %arg% == angel
   %send% %actor% You have to make a snow angel specifically.
@@ -582,7 +753,11 @@ end
 ~
 #16611
 stealthy gift giving~
-1 c 2 0
+1 c 2 4
+L o 29
+L q 4
+L t 16611
+L w 16611
 sneak~
 if !%actor.ability(sneak)%
   return 0
@@ -662,7 +837,12 @@ end
 ~
 #16612
 pickpocket father xmas's hat~
-0 p 100 0
+0 p 100 5
+L c 16612
+L o 142
+L q 4
+L t 16612
+L w 16601
 ~
 if !(%abilityname%==pickpocket)
   halt
@@ -700,7 +880,9 @@ end
 ~
 #16613
 summon grinchy demon~
-1 c 2 0
+1 c 2 2
+L b 16613
+L c 16614
 use~
 if !%arg%
   return 0
@@ -804,7 +986,9 @@ remote diff %mob.id%
 ~
 #16614
 Winter Wonderland: Grinchy demon combat 1~
-0 bw 40 0
+0 bw 40 2
+L b 16614
+L w 16617
 ~
 if !%self.fighting% || %self.cooldown(16617)%
   halt
@@ -842,7 +1026,12 @@ nop %self.set_cooldown(16617, 90)%
 ~
 #16615
 Winter Wonderland: Grinchy combat 2~
-0 k 25 0
+0 k 25 5
+L w 16612
+L w 16613
+L w 16614
+L w 16615
+L w 16616
 ~
 set grinch_level 0
 if %self.mob_flagged(hard)%
@@ -1007,7 +1196,15 @@ end
 ~
 #16618
 winter dress up~
-1 c 2 0
+1 c 2 8
+L b 223
+L s 16617
+L s 16618
+L s 16619
+L s 16620
+L s 16621
+L t 16617
+L t 16618
 dress~
 if !%arg%
   %send% %actor% Who are you trying to dress?
@@ -1081,7 +1278,12 @@ return 0
 ~
 #16620
 hanging winter holiday ornaments~
-1 c 2 0
+1 c 2 5
+L c 16621
+L c 16622
+L c 16623
+L c 16624
+L t 16620
 hang~
 if !(%actor.obj_target(%arg%)% == %self%)
   return 0
@@ -1126,7 +1328,12 @@ end
 ~
 #16621
 Grinchy Demon and Krampus: Reset if out of combat.~
-0 ab 50 0
+0 ab 50 5
+L b 16614
+L w 16618
+L w 16684
+L w 16687
+L w 16689
 ~
 if %self.fighting%
   halt
@@ -1171,7 +1378,9 @@ done
 ~
 #16623
 pixy spawning~
-1 b 25 0
+1 b 25 2
+L b 16624
+L c 16626
 ~
 set carrying %self.carried_by%
 if !%carrying%
@@ -1191,7 +1400,9 @@ done
 ~
 #16624
 freeze the pixy~
-1 c 2 0
+1 c 2 2
+L b 16624
+L c 16626
 freeze~
 if !%arg%
   %send% %actor% What do you want to blast with @%self%?
@@ -1223,7 +1434,8 @@ end
 ~
 #16625
 pixy thaws out~
-1 f 0 0
+1 f 0 1
+L b 16625
 ~
 if !%self.carried_by%
   halt
@@ -1252,7 +1464,9 @@ end
 ~
 #16626
 pixy placement~
-1 c 2 0
+1 c 2 2
+L c 16607
+L t 16626
 place~
 if !%arg%
   return 0
@@ -1286,7 +1500,11 @@ end
 ~
 #16627
 ornament extention~
-1 c 4 0
+1 c 4 4
+L c 16621
+L c 16622
+L c 16623
+L c 16624
 buff~
 if !%arg%
   return 0
@@ -1308,7 +1526,10 @@ otimer 1152
 ~
 #16628
 throw the enchanted snowball~
-1 c 2 0
+1 c 2 3
+L b 16628
+L c 16630
+L t 16628
 throw~
 if !%arg%
   return 0
@@ -1350,7 +1571,9 @@ end
 ~
 #16629
 enchant the snowball~
-1 c 2 0
+1 c 2 2
+L c 1300
+L c 16628
 enchant~
 if !%arg%
   return 0
@@ -1376,7 +1599,8 @@ nop %actor.add_resources(1300, -6)%
 ~
 #16630
 snowman summons abominable snowman~
-0 i 50 0
+0 i 50 1
+L b 16628
 ~
 wait 1
 %load% mob 16628 %self.level%
@@ -1416,7 +1640,8 @@ end
 ~
 #16632
 abominable kills regular snowman~
-0 z 100 0
+0 z 100 1
+L b 16600
 ~
 if %actor.vnum% == 16600
   if %actor.PlayerOnAbominableQuest% && %actor.PlayerOnAbominableQuest.id% == %actor.PlayerOnAbominableQuest_id%
@@ -1438,7 +1663,10 @@ end
 ~
 #16633
 protected the snowman~
-0 v 0 0
+0 v 0 3
+L f 16617
+L f 16630
+L f 16633
 ~
 if %questvnum% != 16628
   halt
@@ -1452,7 +1680,8 @@ end
 ~
 #16634
 snowman has lived too long~
-0 ab 2 0
+0 ab 2 1
+L z 10700
 ~
 if %self.varexists(IWasBornOn)%
   eval SinceLoaded %dailycycle% - %self.IWasBornOn%
@@ -1467,7 +1696,8 @@ end
 ~
 #16635
 Holiday pet never dies~
-0 ft 100 0
+0 ft 100 1
+L w 16635
 ~
 Commands:
 if %self.varexists(deaths)%
@@ -1484,7 +1714,10 @@ return 0
 ~
 #16636
 Holiday pet load trigger / flee when scared~
-0 nt 100 0
+0 nt 100 3
+L b 16637
+L b 16640
+L w 16635
 ~
 set pc %self.companion%
 * Part 1: Update strings etc: (with script 16638)
@@ -1533,7 +1766,13 @@ end
 ~
 #16637
 Holiday pet name command~
-0 ct 0 0
+0 ct 0 6
+L b 16635
+L b 16636
+L b 16637
+L b 16638
+L b 16639
+L b 16640
 name~
 * NOTE: This script only allows naming one time, then detaches.
 * Admins may re-attach this script to a pet to allow the player to rename it.
@@ -1613,7 +1852,9 @@ detach 16637 %self.id%
 ~
 #16638
 Holiday pet self-naming helper~
-0 ct 0 0
+0 ct 0 2
+L b 16637
+L b 16640
 xmas_pet_setup~
 * Note: Some of this script is very similar to the load trigger 16636
 * Note: this requires that self is currently a companion and that its player
@@ -1694,7 +1935,13 @@ end
 ~
 #16639
 Holiday pet upgrade ticker~
-0 bt 50 0
+0 bt 50 6
+L b 16635
+L b 16636
+L b 16637
+L b 16638
+L b 16639
+L b 16640
 ~
 * configs
 set progress_to_level 10000
@@ -1746,7 +1993,7 @@ else
     set xmas_pet_announce 1
     remote xmas_pet_announce %pc.id%
     * silently swap for the next pet
-    dg_affect %self% !SEE on 5
+    dg_affect %self% NO-SEE-IN-ROOM on 5
     * switch companions
     nop %pc.add_companion(%new_vnum%)%
     nop %pc.remove_companion(%self.vnum%)%
@@ -1757,7 +2004,13 @@ end
 ~
 #16640
 Holiday pet adoption certificate~
-1 c 2 0
+1 c 2 6
+L b 16635
+L b 16636
+L b 16637
+L b 16638
+L b 16639
+L b 16640
 adopt~
 return 1
 set usage Usage: adopt <coat> <puppy/kitten>
@@ -1873,7 +2126,13 @@ end
 ~
 #16641
 Holiday Pet Leash (admin tool)~
-1 c 2 0
+1 c 2 6
+L b 16635
+L b 16636
+L b 16637
+L b 16638
+L b 16639
+L b 16640
 leash~
 set usage Usage: leash <person> <command>
 set valid_commands Valid commands: check (shows data), clear (wipes data), progress (view/change progress), rename (changes pet name), repair (tries to fix)
@@ -2010,7 +2269,11 @@ done
 ~
 #16642
 Holiday pet feeding~
-0 ct 0 0
+0 ct 0 4
+L w 6200
+L w 6220
+L w 16641
+L w 16642
 feed~
 * configs
 set safe_max_progress 10000000
@@ -2078,7 +2341,10 @@ end
 ~
 #16643
 Straw goat spawn trigger~
-0 n 100 0
+0 n 100 3
+L b 16643
+L b 16644
+L c 16644
 ~
 if %self.vnum% == 16643
   * Small mob goat
@@ -2106,7 +2372,9 @@ end
 ~
 #16644
 Burning straw goat~
-1 n 100 0
+1 n 100 2
+L t 16643
+L t 16644
 ~
 wait 1
 set ch %self.room.people%
@@ -2137,7 +2405,9 @@ end
 ~
 #16646
 Command: Burn or Light the small straw goat~
-0 c 0 0
+0 c 0 2
+L c 16643
+L q 4
 burn light~
 * targeting
 set target %actor.char_target(%arg%)%
@@ -2177,7 +2447,8 @@ end
 ~
 #16647
 Prevent burning of straw goat in front of witnesses~
-1 c 4 0
+1 c 4 1
+L q 4
 light burn~
 * check targeting
 if !%arg% || %actor.obj_target(%arg.argument1%)% != %self%
@@ -2209,7 +2480,13 @@ return 0
 ~
 #16648
 Holiday pet interactions and emotes~
-0 bt 10 0
+0 bt 10 6
+L b 16635
+L b 16636
+L b 16637
+L b 16638
+L b 16639
+L b 16640
 ~
 * basics
 set vnum %self.vnum%
@@ -2331,7 +2608,9 @@ return 0
 ~
 #16650
 Elfish flying sleigh wax: enchant command~
-1 c 2 0
+1 c 2 2
+L r 10715
+L r 16650
 enchant~
 * targeting
 set sleigh %actor.veh_target(%arg.argument1%)%
@@ -2397,7 +2676,12 @@ Dreidel: drop~
 ~
 #16652
 Flying reindeer polish: use polish~
-1 c 2 0
+1 c 2 5
+L b 9175
+L b 9176
+L b 10700
+L b 10705
+L b 16652
 use~
 if %actor.obj_target(%arg.argument1%)% != %self%
   return 0
@@ -2437,7 +2721,17 @@ end
 ~
 #16653
 Grinchy combat: Present Toss, Pole Swing, Summon/Buff Max~
-0 k 100 0
+0 k 100 10
+L b 16614
+L w 16614
+L w 16616
+L w 16618
+L w 16619
+L w 16620
+L w 16680
+L w 16684
+L w 16686
+L w 16687
 ~
 if %self.cooldown(16680)% || %self.disabled%
   halt
@@ -2489,7 +2783,7 @@ if %move% == 1
   set object_4 a pet rock
   set which %random.4%
   eval obj %%object_%which%%%
-  if %which% == 1 || %which% == 3
+  if %which% == 3
     set itthem them
   else
     set itthem it
@@ -2526,7 +2820,7 @@ if %move% == 1
           %echo% &&G%obj% hits ~%targ% in the head!&&0
           eval ouch 75 * %diff%
           %damage% %targ% %ouch% physical
-          if %diff% > 1 && (%self.level% + 100) > %targ.level% && !%targ.aff_flagged(!STUN)%
+          if %diff% > 1 && (%self.level% + 100) > %targ.level% && !%targ.aff_flagged(NO-STUN)%
             dg_affect #16619 %targ% STUNNED on 5
           end
         break
@@ -2611,7 +2905,7 @@ elseif %move% == 2 && !%self.aff_flagged(BLIND)%
           %echo% &&G~%self% whacks ~%ch% in the head with the pole!&&0
           %send% %ch% That really hurt!
           %damage% %ch% 100 physical
-          if %diff% > 1 && (%self.level% + 100) > %targ.level% && !%targ.aff_flagged(!STUN)%
+          if %diff% > 1 && (%self.level% + 100) > %targ.level% && !%targ.aff_flagged(NO-STUN)%
             dg_affect #16616 %ch% STUNNED on 5
           end
         elseif %ch.is_pc%
@@ -2669,9 +2963,16 @@ nop %self.remove_mob_flag(NO-ATTACK)%
 ~
 #16654
 Winds of Winter teleporter~
-1 c 2 3
+1 c 2 10
+L c 9680
 L i 10700
+L j 10700
 L j 10701
+L j 10702
+L j 10703
+L j 10704
+L j 10705
+L j 10706
 L w 16654
 use~
 set room %actor.room%
@@ -2757,7 +3058,12 @@ end
 ~
 #16655
 Upgrade Glitter: upgrade Winter Wonderland items~
-1 c 2 0
+1 c 2 5
+L c 10711
+L c 10712
+L c 16653
+L c 16654
+L c 16666
 upgrade~
 set max_level 400
 if !%arg%
@@ -2854,7 +3160,8 @@ end
 ~
 #16657
 Spin Dreidel~
-1 c 6 0
+1 c 6 1
+L w 16657
 spin~
 if (!%arg% || %actor.obj_target(%arg.argument1%)% != %self%)
   return 0
@@ -2895,7 +3202,10 @@ remote sign %self.id%
 ~
 #16658
 Ice Palace completion~
-2 o 100 0
+2 o 100 3
+L e 16655
+L e 16656
+L e 16657
 ~
 set edir %room.bld_dir(east)%
 set wdir %room.bld_dir(west)%
@@ -2959,7 +3269,11 @@ return 1
 ~
 #16660
 Straw Goat vandalism driver~
-5 ab 66 0
+5 ab 66 4
+L b 16660
+L c 16643
+L f 16661
+L t 16660
 ~
 * configs
 set quest_vnum 16660
@@ -3119,7 +3433,8 @@ done
 ~
 #16661
 Straw Goat protect command~
-5 c 0 0
+5 c 0 1
+L f 16660
 protect~
 * this pairs with trigger 16660 to handle quest 16660
 * pull vars
@@ -3229,7 +3544,9 @@ return 0
 ~
 #16667
 Floating lantern~
-0 n 100 0
+0 n 100 2
+L c 16667
+L w 16667
 ~
 set ch %self.leader%
 * determine whether it's a lit lantern this time or not
@@ -3264,7 +3581,9 @@ end
 ~
 #16668
 Eat the gingerbread man~
-0 ct 0 0
+0 ct 0 2
+L c 16668
+L w 16668
 eat bite nibble taste~
 * check targeting
 if %actor.char_target(%arg%)% != %self%
@@ -3302,7 +3621,10 @@ end
 ~
 #16669
 Snowmother spawn/despawn~
-0 btw 10 0
+0 btw 10 3
+L c 16615
+L c 16669
+L w 16669
 ~
 set melt 0
 set room %self.room%
@@ -3452,7 +3774,8 @@ done
 ~
 #16676
 Winter Wonderland music quests: play~
-1 c 3 0
+1 c 3 1
+L f 16677
 play~
 return 0
 set music_score 0
@@ -3463,7 +3786,14 @@ end
 ~
 #16677
 Winter Wonderland music quests: detect playing~
-1 b 100 0
+1 b 100 7
+L b 16675
+L b 16676
+L b 16677
+L f 16675
+L s 16675
+L t 16676
+L t 16677
 ~
 set questid %self.vnum%
 if %self.carried_by%
@@ -3562,7 +3892,17 @@ end
 ~
 #16678
 Open Stocking (winter wonderland dailies) 2021-2025~
-1 c 2 0
+1 c 2 10
+L c 600
+L c 10728
+L c 10729
+L c 11513
+L c 12147
+L c 16660
+L c 16661
+L c 16662
+L c 16696
+L z 10700
 open~
 if !%arg% || %actor.obj_target(%arg.argument1%)% != %self%
   return 0
@@ -3622,7 +3962,12 @@ return 1
 ~
 #16680
 summon winter demons~
-1 c 2 0
+1 c 2 5
+L b 16613
+L b 16680
+L b 16688
+L c 16614
+L j 10706
 use~
 if !%arg%
   return 0
@@ -3750,7 +4095,10 @@ remote diff %mob.id%
 ~
 #16681
 krampus healing tracker~
-0 e 1 0
+0 e 1 3
+L w 16680
+L w 16681
+L w 16682
 rejuvenation healing~
 if !%self.varexists(LastHealer)%
   set LastHealer %actor.id%
@@ -3798,7 +4146,8 @@ done
 ~
 #16682
 krampus low health recovery~
-0 l 20 0
+0 l 20 1
+L w 16683
 ~
 if %self.cooldown(16683)%
   halt
@@ -3843,7 +4192,14 @@ snow cube summon~
 ~
 #16684
 Krampus combat: Birch Bundle, Sack Up, Hornbutt, Rage heal/buff~
-0 k 100 0
+0 k 100 7
+L w 16680
+L w 16684
+L w 16685
+L w 16686
+L w 16687
+L w 16688
+L w 16689
 ~
 if %self.cooldown(16680)% || %self.disabled%
   halt
@@ -4071,7 +4427,10 @@ nop %self.remove_mob_flag(NO-ATTACK)%
 ~
 #16686
 Winter Wonderland: Boss fight tester~
-1 c 2 0
+1 c 2 3
+L b 16613
+L b 16680
+L b 16688
 test~
 return 1
 if !%arg% || !%arg.cdr%
@@ -4482,7 +4841,12 @@ nop %self.remove_mob_flag(NO-ATTACK)%
 ~
 #16690
 feed the vortex~
-1 c 2 0
+1 c 2 5
+L c 16660
+L c 16661
+L c 16662
+L t 16690
+L z 10700
 look put~
 set Needs 50
 if %actor.aff_flagged(blind)%
@@ -4634,7 +4998,10 @@ end
 ~
 #16691
 set the start variables on the vortex~
-1 n 100 0
+1 n 100 3
+L c 16660
+L c 16661
+L c 16662
 ~
 set Cookie16660 0
 set Cookie16661 0
@@ -4645,7 +5012,9 @@ remote Cookie16662 %self.id%
 ~
 #16692
 Winter Wonderland: Randomly trash the vortex if event isn't running~
-1 b 20 0
+1 b 20 2
+L t 16690
+L z 10700
 ~
 if %event.running(10700)%
   halt
@@ -4658,7 +5027,12 @@ end
 ~
 #16695
 Capture nordlys in jar~
-1 c 2 0
+1 c 2 5
+L c 16696
+L h 10564
+L h 16697
+L h 16698
+L h 16699
 recapture~
 * recapture nordlys
 set room %actor.room%
@@ -4707,7 +5081,16 @@ return 1
 ~
 #16696
 Open nordlys jar~
-1 c 2 0
+1 c 2 9
+L c 16695
+L h 10562
+L h 10563
+L h 10564
+L h 10565
+L h 10566
+L h 16697
+L h 16698
+L h 16699
 open~
 * open <self>
 set room %actor.room%
@@ -4761,7 +5144,8 @@ return 1
 ~
 #16699
 immortal event point modifier~
-1 c 2 0
+1 c 2 1
+L z 10700
 modify~
 if !%actor.is_immortal%
   %send% %actor% This isn't for your use!

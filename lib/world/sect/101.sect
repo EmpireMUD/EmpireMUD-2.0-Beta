@@ -1,7 +1,7 @@
 #10190
 Flowing Lava~
 A Raging Lava Flow~
-'^' 3 em 100 svx 0
+'^' 3 em 100 svxF 0
 D0
 /\/\~
 &R~
@@ -20,7 +20,7 @@ S
 #10191
 Cooling Lava~
 A Cooling Lava Flow~
-'^' 34 em 100 svx 0
+'^' 34 em 100 svxF 0
 D0
 /\/\~
 &w~

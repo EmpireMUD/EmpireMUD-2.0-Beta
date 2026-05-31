@@ -641,6 +641,7 @@ void olc_show_crop(char_data *ch) {
 	struct custom_message *ocm;
 	struct spawn_info *spawn;
 	int count;
+	struct icon_data *icon_iter;
 	
 	if (!cp) {
 		return;
@@ -650,9 +651,12 @@ void olc_show_crop(char_data *ch) {
 	build_page_display(ch, "<%sname\t0> %s", OLC_LABEL_STR(GET_CROP_NAME(cp), default_crop_name), NULLSAFE(GET_CROP_NAME(cp)));
 	build_page_display(ch, "<%stitle\t0> %s", OLC_LABEL_STR(GET_CROP_TITLE(cp), default_crop_title), NULLSAFE(GET_CROP_TITLE(cp)));
 	build_page_display(ch, "<%smapout\t0> %s", OLC_LABEL_VAL(GET_CROP_MAPOUT(cp), 0), mapout_color_names[GET_CROP_MAPOUT(cp)]);
-
-	build_page_display(ch, "<%sicons\t0>", OLC_LABEL_PTR(GET_CROP_ICONS(cp)));
-	show_icons_display(ch, GET_CROP_ICONS(cp), FALSE);
+	
+	LL_COUNT(GET_CROP_ICONS(cp), icon_iter, count);
+	build_page_display(ch, "<%sicons\t0> %d set", OLC_LABEL_PTR(GET_CROP_ICONS(cp)), count);
+	if (!PRF_FLAGGED(ch, PRF_SCREEN_READER)) {
+		show_icons_display(ch, GET_CROP_ICONS(cp), FALSE);
+	}
 	
 	ordered_sprintbit(GET_CROP_CLIMATE(cp), climate_flags, climate_flags_order, FALSE, lbuf);
 	build_page_display(ch, "<%sclimate\t0> %s", OLC_LABEL_VAL(GET_CROP_CLIMATE(cp), NOBITS), lbuf);

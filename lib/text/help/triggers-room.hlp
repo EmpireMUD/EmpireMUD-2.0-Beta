@@ -221,7 +221,7 @@ When using field - The variable returns:
 &cname&0 - The name of the room.
 &cpainted&0 - The color the building is painted, if any.
 &cpeople&0 - The id of the first character in the room, or an empty return.
-   Note that this will skip !SEE mobs.
+   Note that this will skip NO-SEE-IN-ROOM mobs.
 &cpeople(VNUM)&0 - The id of the first instance of that mob vnum in the room.
 &cplayers_present&0 - Number of players in the room; 0/false if none.
 &crmt_flagged(AFF)&0 - True if the room has a room template flag on it.

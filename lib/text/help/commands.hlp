@@ -166,8 +166,9 @@ give a "switch" mortlog (instead of elogs).
 You can't use alternate again within 60 seconds of a previous use. Please don't
 spam players by logging in and out more rapidly than this.
 
-You can't alt (or quit) in hostile territory. You can choose to disconnect
-instead, but this will leave your character vulnerable.
+You can't alt (or quit) in hostile territory or with stolen items in your
+inventory. You can choose to disconnect instead, but this will leave your
+character vulnerable.
 
 You should read the multiplaying/alts rules on the POLICY command for more
 information on these rules.
@@ -744,7 +745,7 @@ you have come prepared.
 
 Boss:
 For four players, which should include a tank, a healer, and two dps. This is
-the highest difficulty setting and will more damage to defeat in a longer
+the highest difficulty setting and will take more damage to defeat in a longer
 fight. Players are usually only able to handle boss difficulty alone if they
 are significantly above the mob's level and have strong gear and skills.
 
@@ -2107,6 +2108,8 @@ mountain reset. For more info on mountain resets, see HELP MINE.
 Prospecting happens instantly if your empire was the last one to prospect the
 tile.
 
+See WORKFORCE PROSPECTING for information about the workforce version.
+
 See also: MINE, DEEP MINES, RARE METALS
 #
 PUT
@@ -2138,8 +2141,9 @@ will see a message that you quit, unless public logins are enabled.
 
 You can use "alt" to quickly change characters, rather than quitting.
 
-You can't quit (or alt) in hostile territory. You can choose to disconnect
-instead, but this will leave your character vulnerable.
+You can't quit (or alt) in hostile territory or have stolen items in your
+inventory. You can choose to disconnect instead, but this will leave your
+character vulnerable.
 
 If your character is dying or dead, you must type 'quit confirm' as it will
 kill your character. If you are editing any text, this will also require you
@@ -3001,7 +3005,8 @@ Immortal toggles:
 Note: Political and informative views only show fully-lit tiles at night, not
 dim tiles.
 
-See also: FIGHT MESSAGES, FRIENDS, STATUS MESSAGES, TOGGLE <type>
+See also: FIGHT MESSAGES, FRIENDS, MANAGE, STATUS MESSAGES, TOGGLE <type>,
+  WORKFORCE
 #
 "TOGGLE NO-EMPIRE" "TOGGLE NOEMPIRE" NOEMPIRE NO-EMPIRE
 

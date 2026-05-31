@@ -1,13 +1,16 @@
 #12800
 Celestial Forge: Donate to open portal~
-0 c 0 7
+0 c 0 10
 L c 12800
 L c 12801
+L c 12802
 L c 12806
 L j 12810
 L j 12850
+L j 12890
 L w 5100
 L w 5101
+L w 5102
 donate~
 set room %self.room%
 set which 0
@@ -27,6 +30,11 @@ elseif imperium forge /= %arg% || victory forge /= %arg%
   set dest 12850
   set curr 5101
   set str an imperium shard
+* elseif eventide forge /= %arg% || echo forge /= %arg%
+*   set which 12802
+*   set dest 12890
+*   set curr 5102
+*   set str an eventide shard
 else
   %send% %actor% Unknown celestial forge.
 end
@@ -78,15 +86,17 @@ end
 ~
 #12801
 Celestial Forge: Request exit~
-2 c 0 8
+2 c 0 10
 L c 9680
 L c 12800
 L c 12801
+L c 12802
 L c 12806
 L e 5195
 L j 12800
 L j 12810
 L j 12850
+L j 12890
 return~
 if %actor.is_npc%
   * possibly immortal trying to return
@@ -120,6 +130,9 @@ if %cf_return%
       break
       case 12850
         set in_vnum 12801
+      break
+      case 12890
+        set in_vnum 12802
       break
       default
         set in_vnum 0
@@ -183,7 +196,7 @@ end
 ~
 #12802
 Celestial Forge: Detect player entry, Grant abilities, Start progress~
-2 gA 100 12
+2 gA 100 16
 L c 9684
 L e 5195
 L i 12800
@@ -191,11 +204,15 @@ L j 12810
 L j 12815
 L j 12850
 L j 12855
+L j 12890
+L j 12895
 L o 12810
 L o 12850
+L o 12890
 L q 6
 L y 12810
 L y 12850
+L y 12890
 ~
 if %actor.is_npc%
   halt
@@ -214,8 +231,7 @@ if %actor.skill(6)% >= 76
     if %actor.empire%
       nop %actor.empire.start_progress(12810)%
     end
-  end
-  if %room.template% >= 12850 && %room.template% <= 12855
+  elseif %room.template% >= 12850 && %room.template% <= 12855
     if !%actor.has_bonus_ability(12850)%
       * grant the ability after a short delay
       %load% obj 9684 %actor%
@@ -226,6 +242,18 @@ if %actor.skill(6)% >= 76
     end
     if %actor.empire%
       nop %actor.empire.start_progress(12850)%
+    end
+  elseif %room.template% >= 12890 && %room.template% <= 12895
+    if !%actor.has_bonus_ability(12890)%
+      * grant the ability after a short delay
+      %load% obj 9684 %actor%
+      set obj %actor.inventory%
+      if %obj.vnum% == 9684
+        nop %obj.val0(12890)%
+      end
+    end
+    if %actor.empire%
+      nop %actor.empire.start_progress(12890)%
     end
   end
 end
@@ -312,9 +340,10 @@ end
 ~
 #12805
 Celestial Forge: Immortal controller~
-1 c 2 2
+1 c 2 3
 L j 12810
 L j 12850
+L j 12890
 cforge~
 if !%actor.is_immortal%
   %send% %actor% You lack the power to use this.
@@ -328,6 +357,8 @@ if goto /= %mode%
     set to_room %instance.nearest_rmt(12810)%
   elseif imperium /= %arg2% || victory forge /= %arg2%
     set to_room %instance.nearest_rmt(12850)%
+  elseif eventide /= %arg2% || echo forge /= %arg2%
+    set to_room %instance.nearest_rmt(12890)%
   else
     set to_room %instance.nearest_rmt(%arg2%)%
   end
@@ -1012,6 +1043,10 @@ if %self.fighting%
   %send% %actor% You can't change |%self% difficulty while &%self% is in combat!
   return 1
   halt
+elseif %self.disabled%
+  %send% %actor% You can't change |%self% difficulty right now.
+  return 1
+  halt
 end
 if normal /= %arg%
   set diff 1
@@ -1085,7 +1120,8 @@ dg_affect %self% !ATTACK on -1
 ~
 #12823
 Celestial Forge: Message when no-attack mob is attacked~
-0 B 0 0
+0 B 0 1
+L f 12823
 ~
 if %self.aff_flagged(!ATTACK)%
   %send% %actor% You need to choose a difficulty before you can fight ~%self%.
@@ -1451,7 +1487,7 @@ end
 if %dps% >= 3
   nop %self.add_mob_flag(DPS)%
   if !%self.affect(12835)%
-    dg_affect #12835 %self% !DISARM on -1
+    dg_affect #12835 %self% NO-DISARM on -1
   end
 end
 * caster
@@ -1846,7 +1882,7 @@ elseif %move% == 2
     eval amount %self.level% / 10
     dg_affect #12831 @%self% %enemy% off silent
     dg_affect #12831 %enemy% DODGE -%amount% 30
-  elseif %dps% >= 3 && !%enemy.aff_flagged(!STUN)%
+  elseif %dps% >= 3 && !%enemy.aff_flagged(NO-STUN)%
     * stun
     dg_affect #12831 @%self% %enemy% off silent
     dg_affect #12831 %enemy% STUNNED on 5
@@ -1866,8 +1902,8 @@ elseif %move% == 3
   else
     eval duration 20
   end
-  dg_affect #12830 @%self% %enemy% off
-  dg_affect #12830 %enemy% SLOW on %durtion%
+  dg_affect #12830 @%self% %enemy% off silent
+  dg_affect #12830 %enemy% SLOW on %duration%
   %echo% &&Y~%self% unleashes a shard flurry at ~%enemy%, slowing ^%enemy% advance considerably!&&0
   if !%self.fighting%
     mkill %enemy%
@@ -2058,7 +2094,7 @@ end
 nop %actor.give_currency(%self.val0%,%self.val1%)%
 eval name %%currency.%self.val0%(%self.val1%)%%
 %send% %actor% You open @%self% and gain %self.val1% %name%!
-%echoaround% %actor% ~%actor5 opens @%self% and gains %self.val1% %name%!
+%echoaround% %actor% ~%actor% opens @%self% and gains %self.val1% %name%!
 %purge% %self%
 ~
 #12850
@@ -2325,7 +2361,7 @@ elseif %cmd% == tremor
       set next_ch %ch.next_in_room%
       if %self.is_enemy(%ch%)%
         if !%ch.var(did_scfjump)%
-          if %ch.aff_flagged(!STUN)%
+          if %ch.aff_flagged(NO-STUN)%
             %echo% &&wThe tremor knocks ~%ch% into a broken wagon!&&0
           else
             %echo% &&wThe tremor knocks ~%ch% to the ground!&&0
@@ -2449,5 +2485,244 @@ if %color% != none
   %mod% %self% longdesc A sharp-eyed hawk trails %color.ana% %color% banner from its talons.
   %mod% %self% lookdesc The lean, broad-winged hawk has feathers mottled in gleaming white and stark black. A light harness made of leather crosses its chest. In its talons, it clutches the %color% banner of %emp.name%.
 end
+~
+#12885
+Celestial Forge: Silent speech~
+2 c 0 0
+say ' whisper ask shout addict blonde boast brag chant fomo fubar greet love pray swear taunt vigor wtf~
+%send% %actor% You try to speak but no words come out.
+%echoaround% %actor% ~%actor%'s lips move but no sound comes out.
+~
+#12886
+Celestial Forge: Silent socials~
+2 c 0 0
+cackle chuckle giggle ijbol laugh lmao lol rofl claps applaud clap fart gasp groan hmm hum mmm moan mutter sigh whine bark burp cough disenchant dispel doh growl howl meow moo scream snarl sneer sniff sniffle snore whistle yodel sads cry sob~
+* Replace certain actions
+set laughs cackle chuckle giggle ijbol laugh lmao lol rofl
+set claps applaud clap
+set nothings fart gasp groan hmm hum mmm moan mutter sigh whine
+set faces bark burp cough disenchant dispel doh growl howl meow moo scream snarl sneer sniff sniffle snore whistle yodel
+set sads cry sob
+* messaging
+if %laughs% ~= %cmd%
+  %send% %actor% You try, but end up looking like a maniac.
+  %echoaround% %actor% ~%actor% opens ^%actor% mouth widely and makes a crazy face.
+elseif %claps% ~= %cmd%
+  %send% %actor% You clap silently.
+  %echoaround% %actor% ~%actor% claps silently.
+elseif %nothings% ~= %cmd%
+  %send% %actor% You try, but nothing comes out.
+elseif %faces% ~= %cmd%
+  %send% %actor% You try, but no sound comes out.
+  %echoaround% %actor% ~%actor% makes a strange face.
+elseif %sads% ~= %cmd%
+  %send% %actor% You weep quietly.
+  %echoaround% %actor% ~%actor% weeps quietly.
+else
+  return 0
+end
+~
+#12887
+Celestial Forge: Silent actions~
+2 c 0 0
+beg bonk conjure pinch rite ritual snap summon~
+* targeting?
+set need_target beg bonk pinch snap
+if %need_target% ~= %cmd%
+  if !%arg%
+    %send% %actor% &&Z%cmd% whom?&&0
+    halt
+  end
+  set target %actor.char_target(%arg%)%
+  if !%target%
+    %send% %actor% No one by that name here.
+    halt
+  end
+end
+* various actions
+switch %cmd%
+  case beg
+    if %target.disabled% || %target.position% == Sleeping
+      %send% %actor% That's rather futile.
+    else
+      %send% %actor% You plead silently with ~%target%.
+      %send% %target% ~%actor% pleads silently with you.
+      %echoneither% %actor% %target% ~%actor% pleads silently with ~%target%.
+    end
+  break
+  case bonk
+    %send% %actor% You bonk ~%target% silently over the head.
+    %send% %target% ~%actor% bonks you silently over the head, but it still hurts!
+    %echoneither% %actor% %target% ~%actor% bonks ~%target% silently over the head.
+  break
+  case pinch
+    %send% %actor% You pinch ~%target%!
+    %send% %target% ~%actor% pinches you. Ouch!
+    %echoneither% %actor% %target% ~%actor% pinches ~%target%.
+  break
+  case snap
+    %send% %actor% You try to snap your fingers, but there's no sound.
+    %echoaround% %actor% ~%actor% swipes ^%actor% fist silently through the air.
+  break
+  case conjure
+    if shimmering anvil /= %arg% || anvil /= %arg%
+      %send% %actor% You try to speak but no words come out.
+      %send% %actor% ... and nothing happens.
+      %echoaround% %actor% ~%actor%'s lips move but no sound comes out.
+    else
+      return 0
+    end
+  break
+  case rite
+  case ritual
+    if sense life /= %arg%
+      %send% %actor% You try, but no sound comes out.
+      %send% %actor% ... and nothing happens.
+    else
+      return 0
+    end
+  break
+  case summon
+    if animals /= %arg%
+      %send% %actor% You try, but no sound comes out.
+      %send% %actor% ... and nothing happens.
+      %echoaround% %actor% ~%actor% makes a silly face.
+    else
+      return 0
+    end
+  break
+done
+~
+#12888
+Celestial Forge: Sign language for Echo Forge~
+0 c 0 1
+L o 12891
+signlang~
+if %actor% != %self%
+  halt
+end
+switch %arg%
+  * KAITO
+  case 1
+    set abil_msg ~%self% inclines ^%self% head and signs with ^%self% hands, 'Welcome.'
+    set non_msg ~%self% inclines ^%self% head and raises one hand.
+  break
+  case 2
+    set abil_msg ~%self% signs, 'It is an honor to meet you.'
+    set non_msg ~%self% gestures with one hand to ^%self% brow and the other pointed forward.
+  break
+  case 3
+    set abil_msg ~%self% signs, 'Our forge is your forge.'
+    set non_msg ~%self% gestures around the area, then points forward again.
+  break
+  case 4
+    set abil_msg ~%self% signs, 'But be cautious not to create a sound...'
+    set non_msg ~%self% holds a hand up to ^%self% throat and touches ^%self% thumb to ^%self% fingers...
+  break
+  case 5
+    set abil_msg ~%self% signs, 'For the Echo Serragon never sleeps.'
+    set non_msg ~%self% waves ^%self% hand through the air, palm-down, while turning in a full circle.
+  break
+  * IXCHEL
+  case 10
+    set abil_msg ~%self% signs with ^%self% hands, 'Oh! A new face.'
+    set non_msg ~%self% gestures around ^%self% face with ^%self% hands.
+  break
+  case 11
+    set abil_msg ~%self% signs, 'Didn't even hear you come in.'
+    set non_msg ~%self% shakes her head and points to one ear.
+  break
+  case 12
+    set abil_msg ~%self% signs, 'I'm hard at work for weapons to use against the beast.'
+    set non_msg ~%self% gestures toward the anvil with ^%self% hands, and then toward the great wall.
+  break
+  case 13
+    set abil_msg ~%self% signs, 'But I also have some inspiration for some rings, if you like.'
+    set non_msg ~%self% forms a circle with ^%self% fingers and then points to her head and then up at the night sky.
+  break
+  case 14
+    set abil_msg ~%self% looks up at you and signs with one hand, 'A bit busy here.'
+    set non_msg ~%self% looks up at you and makes a hammering motion with ^%self% free hand.
+  break
+  case 15
+    set abil_msg ~%self% signs, 'But feel free to look around.'
+    set non_msg ~%self% points to ^%self% eyes with ^%self% fingers, and then gestures around the area.
+  break
+  * SAOIRSE
+  case 20
+    set abil_msg ~%self% signs with ^%self% hands, 'I didn't realize we have a new guest.'
+    set non_msg ~%self% makes a quick gesture with ^%self% hands, points at you, then gestures again.
+  break
+  case 21
+    set abil_msg ~%self% signs, 'I have some great ideas for earrings...'
+    set non_msg ~%self% points to ^%self% forehead and then to both ^%self% ears, with ^%self% palm up.
+  break
+  case 22
+    set abil_msg ~%self% signs, 'If you're quick about it.'
+    set non_msg ~%self% makes a walking motion with one hand on the other, points at you, and then spins one finger in a circle.
+  break
+  case 23
+    set abil_msg ~%self% signs with one hand, 'Have you fought the beast yet?'
+    set non_msg ~%self% crosses ^%self% arms in an X, points at you, then points at the great wall.
+  break
+  * PERCY
+  case 30
+    set abil_msg ~%self% signs with ^%self% hands, 'I'm quite pleased to see you observing the Silence rule.'
+    set non_msg ~%self% holds ^%self% palm up, points forward, and then taps the top and bottom of ^%self% ear.
+  break
+  case 31
+    set abil_msg ~%self% signs, 'I'd hate for someone to alert the creature.'
+    set non_msg ~%self% touches ^%self% face and then flips ^%self% hand up and points toward the great wall.
+  break
+  case 32
+    set abil_msg ~%self% signs with ^%self% hands, 'I'm quite pleased you've returned.'
+    set non_msg ~%self% holds ^%self% palm upward and points forward.
+  break
+  case 33
+    set abil_msg ~%self% signs, 'There's still more availble here for you here.'
+    set non_msg ~%self% gestures around the area, then folds ^%self% hands and opens them like a book, and then points forward.
+  break
+  * SOMSAK
+  case 40
+    set abil_msg ~%self% signs with ^%self% hands, 'Nice to see a new face. Are you here to work or shop?'
+    set non_msg ~%self% points forward and then waves ^%self% hand around ^%self% face. Then &%self% points to the anvils, then to ^%self% supplies.
+  break
+  case 41
+    set abil_msg ~%self% signs, 'I have lots of supplies if you need them.'
+    set non_msg ~%self% gestures around at all the supplies and then turns ^%self% palm upward and toward you.
+  break
+  case 42
+    set abil_msg ~%self% signs, 'No idea where it's all coming from.'
+    set non_msg ~%self% gestures around again, turns both palms down, then up.
+  break
+  case 43
+    set abil_msg ~%self% signs, 'Every time I turn around, there's more.'
+    set non_msg ~%self% taps *%self% on the shoulder, then gestures around again.
+  break
+  case 44
+    set abil_msg ~%self% signs with ^%self% hands, 'I'm quite pleased you've returned.'
+    set non_msg ~%self% holds ^%self% palm upward and points forward.
+  break
+  case 45
+    set abil_msg ~%self% signs, 'It's always better to keep armor in good repair.'
+    set non_msg ~%self% taps ^%self% forearm twice and then makes a knotting motion with ^%self% hands.
+  break
+  case 46
+    set abil_msg ~%self% signs, 'Nothing is too late to mend.'
+    set non_msg ~%self% gestures toward the sky from east to west and then drops the hand to ^%self% side before making a knotting motion again.
+  break
+done
+* check each person
+set ch %self.room.people%
+while %ch%
+  if %ch.is_pc%
+    if %ch.ability(12891)%
+      %send% %ch% %abil_msg%
+    else
+      %send% %ch% %non_msg%
+    end
+  end
+  set ch %ch.next_in_room%
+done
 ~
 $

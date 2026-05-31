@@ -1,6 +1,6 @@
 #11800
 Skycleave: Tower global announcement spammer~
-2 ab 1
+2 ab 1 0
 ~
 if %random.3% == 3
   %regionecho% %room% -100 You can see the Tower Skycleave in the distance. %room.coords%
@@ -8,7 +8,29 @@ end
 ~
 #11801
 Skycleave: Complex leave rules for floors 2 and 3~
-0 sA 100
+0 sA 100 22
+L b 11815
+L b 11816
+L b 11817
+L b 11820
+L b 11841
+L b 11842
+L b 11843
+L b 11844
+L b 11845
+L b 11846
+L c 11877
+L j 11812
+L j 11813
+L j 11818
+L j 11819
+L j 11820
+L j 11821
+L j 11823
+L j 11824
+L j 11825
+L j 11826
+L q 4
 ~
 set sneakable_vnums 11815 11816 11817 11841 11842 11843 11844 11845 11846
 set maze_vnums 11812 11813 11818 11819 11820 11821 11823 11824 11825 11826
@@ -67,7 +89,13 @@ return 0
 ~
 #11802
 Skycleave: Bribe mercenaries with coins~
-0 m 1
+0 m 1 6
+L b 11841
+L b 11842
+L b 11843
+L b 11844
+L b 11845
+L b 11846
 ~
 set required 500
 set given %self.var(given,0)%
@@ -112,7 +140,30 @@ end
 ~
 #11803
 Skycleave: Custom pickpocket rejection~
-0 p 100
+0 p 100 23
+L b 11829
+L b 11833
+L b 11834
+L b 11838
+L b 11863
+L b 11866
+L b 11869
+L b 11871
+L b 11872
+L b 11884
+L b 11888
+L b 11900
+L b 11915
+L b 11916
+L b 11917
+L b 11928
+L b 11934
+L b 11937
+L b 11938
+L b 11972
+L b 11981
+L b 11988
+L o 142
 ~
 if %ability% != 142
   * not pickpocket
@@ -189,7 +240,9 @@ return 0
 ~
 #11804
 Everflowing flagon (free refills)~
-1 bw 10
+1 bw 10 2
+L w 0
+L w 11804
 ~
 * drinkcon values: 0=capacity, 1=contents, 2=generic vnum
 if %self.val2% == 0
@@ -207,7 +260,11 @@ end
 ~
 #11805
 Skycleave: Shared load trigger for objects~
-1 n 100
+1 n 100 4
+L b 11940
+L c 11805
+L c 11960
+L v 11800
 ~
 switch %self.vnum%
   case 11805
@@ -239,7 +296,7 @@ done
 ~
 #11806
 One-time greetings using script1~
-0 hnwA 100
+0 hnwA 100 0
 ~
 * Uses mob custom script1 to for one-time greetings, with each script1 line
 *   sent every %line_gap% (9 sec) until it runs out of strings. The mob will
@@ -372,7 +429,43 @@ end
 ~
 #11807
 Skycleave: Shared receive trigger (Goblins, Queen, pixies, sorcerers)~
-0 j 100
+0 j 100 36
+L b 11805
+L b 11808
+L b 11813
+L b 11815
+L b 11816
+L b 11817
+L b 11818
+L b 11819
+L b 11820
+L b 11821
+L b 11825
+L b 11827
+L b 11828
+L b 11831
+L b 11835
+L b 11847
+L b 11905
+L b 11913
+L b 11920
+L b 11925
+L b 11931
+L b 11935
+L b 11942
+L b 11959
+L b 11970
+L c 1206
+L c 11872
+L c 11887
+L c 11893
+L c 11894
+L c 11896
+L c 11914
+L c 11976
+L j 11825
+L t 11821
+L t 11915
 ~
 if (%self.vnum% >= 11815 && %self.vnum% <= 11818) || %self.vnum% == 11821
   * goblins
@@ -581,14 +674,16 @@ end
 ~
 #11808
 Skycleave: Mob gains no-attack on load~
-0 nA 100
+0 nA 100 0
 ~
 * turn on no-attack (until diff-sel)
 dg_affect %self% !ATTACK on -1
 ~
 #11809
 Skycleave: Single mob difficulty selector~
-0 c 0
+0 c 0 2
+L b 11956
+L c 11972
 difficulty~
 if !%arg%
   %send% %actor% You must specify a level of difficulty. (Normal, Hard, Group, or Boss)
@@ -597,6 +692,10 @@ if !%arg%
 end
 if %self.fighting%
   %send% %actor% You can't change |%self% difficulty while &%self% is in combat!
+  return 1
+  halt
+elseif %self.disabled%
+  %send% %actor% You can't change |%self% difficulty right now.
   return 1
   halt
 end
@@ -671,7 +770,11 @@ end
 ~
 #11810
 Skycleave: Message when no-attack mob is attacked~
-0 B 0
+0 B 0 4
+L b 11847
+L b 11848
+L b 11849
+L f 11809
 ~
 if %self.aff_flagged(!ATTACK)%
   if %self.has_trigger(11809)%
@@ -683,8 +786,6 @@ if %self.aff_flagged(!ATTACK)%
     switch %self.vnum%
       case 11849
         * Trixton Vye
-        set bleak %instance.mob(11848)%
-        set kara
         if %instance.mob(11847)%
           %send% %actor% When you approach Trixton Vye, you're pushed back by a cold force... Something -- or someone -- is protecting him.
         elseif %instance.mob(11848)%
@@ -710,7 +811,24 @@ end
 ~
 #11811
 Skycleave: Directory look description~
-1 c 4
+1 c 4 17
+L b 11829
+L b 11861
+L b 11863
+L b 11867
+L b 11869
+L b 11870
+L b 11900
+L b 11968
+L b 11970
+L j 11801
+L j 11810
+L j 11830
+L j 11860
+L j 11901
+L j 11910
+L j 11930
+L j 11960
 look examine~
 return 0
 if %actor.obj_target(%arg%)% != %self%
@@ -827,7 +945,8 @@ end
 ~
 #11812
 Gemstone flute: Play to activate dancing~
-1 c 1
+1 c 1 1
+L f 11998
 play~
 return 0
 wait 1
@@ -845,7 +964,19 @@ end
 ~
 #11813
 Skycleave: Shared enter trigger~
-2 gwA 100
+2 gwA 100 12
+L b 11800
+L b 11802
+L b 11803
+L b 11808
+L b 11809
+L b 11822
+L b 11823
+L b 11824
+L b 11826
+L b 11904
+L j 11908
+L y 11800
 ~
 * based on room
 if %room.template% == 11908
@@ -892,7 +1023,55 @@ end
 ~
 #11814
 Skycleave: Loot controller~
-1 n 100
+1 n 100 48
+L c 11801
+L c 11802
+L c 11804
+L c 11806
+L c 11807
+L c 11810
+L c 11811
+L c 11812
+L c 11813
+L c 11814
+L c 11815
+L c 11816
+L c 11817
+L c 11818
+L c 11819
+L c 11820
+L c 11821
+L c 11822
+L c 11823
+L c 11824
+L c 11825
+L c 11826
+L c 11827
+L c 11828
+L c 11829
+L c 11837
+L c 11838
+L c 11840
+L c 11841
+L c 11842
+L c 11843
+L c 11844
+L c 11845
+L c 11846
+L c 11847
+L c 11848
+L c 11849
+L c 11850
+L c 11851
+L c 11852
+L c 11853
+L c 11854
+L c 11855
+L c 11856
+L c 11857
+L c 11858
+L c 11859
+L c 11916
 ~
 * Handles loot drops for skycleave bosses
 * determine where we are
@@ -949,7 +1128,11 @@ wait 0
 ~
 #11815
 Escaped Goblin combat: Throw Object, Pocket Sand~
-0 k 100
+0 k 100 4
+L w 11800
+L w 11841
+L w 11851
+L w 11856
 ~
 if %self.cooldown(11800)% || %self.disabled%
   halt
@@ -1031,7 +1214,7 @@ if %move% == 1 && !%self.aff_flagged(BLIND)%
         %echo% &&m%obj% bonks ~%targ% in the head!&&0
         eval ouch 75 * %diff%
         %damage% %targ% %ouch% physical
-        if %diff% == 4 && (%self.level% + 100) > %targ.level% && !%targ.aff_flagged(!STUN)%
+        if %diff% == 4 && (%self.level% + 100) > %targ.level% && !%targ.aff_flagged(NO-STUN)%
           dg_affect #11851 %targ% STUNNED on 5
         end
       break
@@ -1099,7 +1282,12 @@ nop %self.remove_mob_flag(NO-ATTACK)%
 ~
 #11816
 Goblin Commando combat: Goblinball, Slay the Griffin~
-0 k 100
+0 k 100 5
+L w 11800
+L w 11811
+L w 11816
+L w 11852
+L w 11856
 ~
 if %self.cooldown(11800)% || %self.disabled%
   halt
@@ -1234,7 +1422,10 @@ nop %self.remove_mob_flag(NO-ATTACK)%
 ~
 #11817
 Goblin Miner combat: Leaping Strike and All Mine~
-0 k 100
+0 k 100 3
+L w 11800
+L w 11852
+L w 11856
 ~
 if %self.cooldown(11800)% || %self.disabled%
   halt
@@ -1359,7 +1550,15 @@ nop %self.remove_mob_flag(NO-ATTACK)%
 ~
 #11818
 Venjer the Fox combat: Pixycraft Embiggening Elixir, Blinding Barrage, Tower Quake, Blastmaster Fox, Summon~
-0 k 100
+0 k 100 8
+L w 11800
+L w 11814
+L w 11817
+L w 11818
+L w 11823
+L w 11841
+L w 11852
+L w 11856
 ~
 if %self.cooldown(11800)% || %self.disabled%
   halt
@@ -1513,7 +1712,7 @@ elseif %move% == 3
       if %self.is_enemy(%ch%)%
         if !%ch.var(did_sfdodge)%
           %echo% &&mThe shaking floor knocks ~%ch% to the floor!&&0
-          if %cycle% == %diff% && %diff% >= 3 && (%self.level% + 100) > %ch.level% && !%ch.aff_flagged(!STUN)%
+          if %cycle% == %diff% && %diff% >= 3 && (%self.level% + 100) > %ch.level% && !%ch.aff_flagged(NO-STUN)%
             dg_affect #11814 %ch% STUNNED on 5
           end
           dg_affect #11818 %ch% TO-HIT -%debuff% 15
@@ -1602,7 +1801,19 @@ nop %self.remove_mob_flag(NO-ATTACK)%
 ~
 #11819
 Pixy Queen (Skycleave) combat: Baleful Polymorph, Creeping Vines, Shrinking Dust, Shimmering Glare, Summon~
-0 k 100
+0 k 100 12
+L b 11820
+L c 11890
+L s 11826
+L s 11827
+L w 11800
+L w 11822
+L w 11841
+L w 11851
+L w 11852
+L w 11854
+L w 11856
+L w 11857
 ~
 if %self.cooldown(11800)% || %self.disabled%
   halt
@@ -1691,7 +1902,7 @@ if %move% == 1 && !%self.aff_flagged(BLIND)%
     %morph% %targ% %vnum%
     %echoaround% %targ% &&m%old_shortdesc% grows long ears and a tail... and becomes ~%targ%!&&0
     %send% %targ% &&m**** You are suddenly transformed into %targ.name%! ****&&0 (fastmorph normal)
-    if %diff% == 4 && (%self.level% + 100) > %targ.level% && !%targ.aff_flagged(!STUN)%
+    if %diff% == 4 && (%self.level% + 100) > %targ.level% && !%targ.aff_flagged(NO-STUN)%
       dg_affect #11851 %targ% STUNNED on 5
     elseif %diff% >= 2
       nop %targ.command_lag(ABILITY)%
@@ -1818,7 +2029,7 @@ elseif %move% == 4
         %echo% &&m~%ch% is hit by pixy dust and starts to shrink!&&0
         dg_affect #11820 %ch% BONUS-PHYSICAL -%penalty% 30
         dg_affect #11821 %ch% BONUS-MAGICAL -%penalty% 30
-        if %diff% == 4 && (%self.level% + 100) > %ch.level% && !%ch.aff_flagged(!STUN)%
+        if %diff% == 4 && (%self.level% + 100) > %ch.level% && !%ch.aff_flagged(NO-STUN)%
           dg_affect #11851 %ch% STUNNED on 10
         end
         if %diff% >= 2
@@ -1859,7 +2070,12 @@ nop %self.remove_mob_flag(NO-ATTACK)%
 ~
 #11820
 Escaped Pixy (Skycleave) combat: Pixy Trip, Dangling Vine/Weapon Steal~
-0 k 100
+0 k 100 5
+L w 11800
+L w 11814
+L w 11815
+L w 11852
+L w 11856
 ~
 if %self.cooldown(11800)% || %self.disabled%
   halt
@@ -1955,7 +2171,7 @@ if %move% == 1 && !%self.aff_flagged(BLIND)%
     %send% %targ% &&mYou trip and fall!&&0
     %echoaround% %targ% &&m~%targ% trips and falls!&&0
     if %diff% > 2
-      if (%self.level% + 100) > %targ.level% && !%targ.aff_flagged(!STUN)%
+      if (%self.level% + 100) > %targ.level% && !%targ.aff_flagged(NO-STUN)%
         dg_affect #11814 %targ% STUNNED on 10
       end
       eval dam 40 + (%diff% * 40)
@@ -2036,7 +2252,15 @@ nop %self.remove_mob_flag(NO-ATTACK)%
 ~
 #11821
 Skycleave: Setup dodge, interrupt, struggle, free~
-0 c 0
+0 c 0 8
+L c 11890
+L f 11822
+L w 11800
+L w 11822
+L w 11861
+L w 11863
+L w 11888
+L w 11949
 skyfight~
 * Also requires trigger 11822
 * To initialize or clear data:
@@ -2183,7 +2407,22 @@ end
 ~
 #11822
 Skycleave: Dodge, Interrupt, Free commands for fights~
-0 c 0
+0 c 0 15
+L b 11834
+L b 11923
+L b 11924
+L f 11821
+L j 11816
+L j 11817
+L j 11916
+L j 11917
+L j 11972
+L w 11812
+L w 11813
+L w 11861
+L w 11863
+L w 11888
+L w 11949
 dodge interrupt free~
 * Also requires trigger 11821
 * handles dodge, interrupt, free
@@ -2319,7 +2558,25 @@ end
 ~
 #11823
 Skycleave: Boss Deaths: Pixy, Kara, Rojjer, Trixton, Barrosh, Shade~
-0 f 100
+0 f 100 18
+L b 11819
+L b 11835
+L b 11836
+L b 11847
+L b 11848
+L b 11849
+L b 11863
+L b 11867
+L b 11868
+L b 11869
+L b 11870
+L b 11897
+L b 11900
+L c 11863
+L c 11887
+L f 11803
+L j 11825
+L j 11870
 ~
 switch %self.vnum%
   case 11819
@@ -2442,7 +2699,12 @@ done
 ~
 #11824
 Skycleave: 2A Goblin names~
-0 nA 100
+0 nA 100 5
+L b 11815
+L b 11816
+L b 11817
+L b 11900
+L j 11973
 ~
 * Names the goblins sequentially - 14 max each
 switch %self.vnum%
@@ -2516,7 +2778,12 @@ detach 11824 %self.id%
 ~
 #11825
 Skycleave: Say 'Ala lilo' to open the secret passage from either side~
-2 d 0
+2 d 0 5
+L b 11924
+L j 11817
+L j 11822
+L j 11917
+L j 11922
 ala lilo~
 * works from: 11817, 11822, 11917, 11922
 * Check if it's already open
@@ -2536,7 +2803,9 @@ detach 11825 %self.id%
 ~
 #11826
 Skycleave: Pixy Maze track dummy~
-2 c 0
+2 c 0 2
+L j 11818
+L o 73
 track~
 if !%actor.ability(Track)% || !%arg%
   return 0
@@ -2564,7 +2833,18 @@ end
 ~
 #11827
 Skycleave: Spawn tourists in 1B~
-2 b 20
+2 b 20 11
+L b 11800
+L b 11802
+L b 11803
+L b 11808
+L b 11809
+L b 11821
+L b 11822
+L b 11823
+L b 11824
+L b 11826
+L j 11800
 ~
 * spawns 1 from the list at random each time and stores the rest to the room
 if %room.varexists(vnum_list)%
@@ -2606,7 +2886,23 @@ end
 ~
 #11828
 Skycleave: Floor 1B tourist dialogue~
-0 bw 20
+0 bw 20 16
+L b 11803
+L b 11809
+L b 11822
+L b 11824
+L b 11826
+L b 11827
+L b 11828
+L b 11905
+L b 11914
+L b 11969
+L j 11902
+L j 11903
+L j 11904
+L j 11905
+L j 11907
+L j 11908
 ~
 set room %self.room%
 wait 2 s
@@ -2812,7 +3108,7 @@ elseif %self.vnum% == 11827
         %force% %djon% say They did not! He's worked here for like 50 years.
       end
       wait 9 s
-      set mageina %room.people(11905)5
+      set mageina %room.people(11905)%
       %force% %mageina% say More like 100 at this point.
       wait 9 s
       %force% %djon% say Wow, rude.
@@ -2829,7 +3125,20 @@ remote last_%room.template% %self.id%
 ~
 #11829
 Skycleave: Otherworlder escape~
-0 ab 100
+0 ab 100 13
+L b 11841
+L b 11842
+L b 11843
+L b 11844
+L b 11845
+L b 11846
+L b 11847
+L j 11808
+L j 11832
+L j 11833
+L j 11835
+L j 11836
+L w 11852
 ~
 if %self.fighting% || %self.disabled%
   halt
@@ -2931,7 +3240,19 @@ end
 ~
 #11830
 Skycleave: Shared quest completion script~
-2 v 0
+2 v 0 12
+L b 11821
+L b 11933
+L f 11833
+L t 11802
+L t 11810
+L t 11811
+L t 11812
+L t 11821
+L t 11875
+L t 11975
+L v 11800
+L y 11800
 ~
 return 1
 switch %questvnum%
@@ -2994,7 +3315,11 @@ done
 ~
 #11831
 Skycleave: Shared quest start script~
-2 u 0
+2 u 0 4
+L b 11900
+L t 11810
+L t 11811
+L t 11812
 ~
 return 1
 set spirit %instance.mob(11900)%
@@ -3021,9 +3346,16 @@ done
 ~
 #11832
 Skycleave: Conditional mob visibility~
-0 C 100
+0 C 100 7
+L b 11801
+L b 11900
+L t 11802
+L t 11810
+L t 11811
+L t 11812
+L w 11832
 ~
-* toggles silent, !see
+* toggles silent, NO-SEE-IN-ROOM
 if %actor.is_npc%
   halt
 end
@@ -3089,8 +3421,8 @@ if %vis% && %self.affect(11832)%
   nop %self.remove_mob_flag(SILENT)%
   set arrives 1
 elseif !%vis% && !%self.affect(11832)%
-  dg_affect #11832 %self% !SEE on -1
-  dg_affect #11832 %self% !TARGET on -1
+  dg_affect #11832 %self% NO-SEE-IN-ROOM on -1
+  dg_affect #11832 %self% NO-TARGET-IN-ROOM on -1
   dg_affect #11832 %self% SNEAK on -1
   nop %self.add_mob_flag(SILENT)%
   set leaves 1
@@ -3112,7 +3444,12 @@ end
 ~
 #11833
 Skycleave: Quest cutscenes~
-0 cx 0
+0 cx 0 5
+L b 11919
+L b 11933
+L b 11939
+L f 11934
+L f 11935
 cutscene~
 * used for mob cutscenes
 if %actor% && %actor% != %self%
@@ -3172,7 +3509,12 @@ end
 ~
 #11834
 Skycleave: Free the otherworlder~
-0 c 0
+0 c 0 5
+L b 11829
+L b 11900
+L b 11934
+L c 18224
+L t 11834
 free unchain unshackle break smash release~
 return 1
 * validate arg
@@ -3241,7 +3583,13 @@ done
 ~
 #11835
 Skycleave: Barricade restrings~
-1 n 100
+1 n 100 6
+L j 11803
+L j 11804
+L j 11830
+L j 11832
+L j 11836
+L j 11865
 ~
 * not listed here: 11810 (uses default barricade), 11808 (default crate wall)
 switch %self.room.template%
@@ -3289,7 +3637,13 @@ detach 11835 %self.id%
 ~
 #11836
 Skycleave: Object interactions~
-1 c 4
+1 c 4 6
+L b 11836
+L b 11900
+L c 11836
+L c 11927
+L t 11836
+L t 11920
 open examine release look free unleash~
 return 0
 if %arg.car% == in
@@ -3356,14 +3710,22 @@ end
 ~
 #11837
 Skycleave: List command in wrong phase~
-0 c 0
+0 c 0 0
 list buy~
 %send% %actor% They don't seem to be selling anything right now. The tower is still under siege!
 return 1
 ~
 #11838
 Skycleave: Weyonomon wanders through walls in 1A~
-0 b 15
+0 b 15 8
+L j 11801
+L j 11802
+L j 11803
+L j 11804
+L j 11805
+L j 11806
+L j 11807
+L j 11808
 ~
 set target 0
 set dir north
@@ -3427,7 +3789,17 @@ end
 ~
 #11839
 Skycleave: Scaldorran murder spree~
-0 b 100
+0 b 100 10
+L b 11841
+L b 11842
+L b 11843
+L b 11844
+L b 11845
+L b 11846
+L b 11847
+L b 11848
+L b 11849
+L j 11836
 ~
 * the last 3 are the bosses; killing any 1 of them will stop him (only kills 1 boss)
 set merc_list 11841 11842 11843 11844 11845 11846 11848 11847 11849
@@ -3535,7 +3907,7 @@ detach 11839 %self.id%
 ~
 #11840
 Storytime using script1-5~
-0 bw 100
+0 bw 100 0
 ~
 * uses mob custom strings script1-script5 to tell short stories
 * usage: .custom add script# <command> <string>
@@ -3646,7 +4018,11 @@ wait %story_gap%
 ~
 #11841
 Mercenary Rogue combat: Vicious Blind, Knife Throw~
-0 k 100
+0 k 100 4
+L w 11800
+L w 11841
+L w 11842
+L w 11856
 ~
 if %self.cooldown(11800)% || %self.disabled%
   halt
@@ -3774,7 +4150,12 @@ nop %self.remove_mob_flag(NO-ATTACK)%
 ~
 #11842
 Mercenary Caster combat: Firebrand, Enchant Weapons~
-0 k 100
+0 k 100 5
+L w 11800
+L w 11843
+L w 11844
+L w 11852
+L w 11873
 ~
 if %self.cooldown(11800)% || %self.disabled%
   halt
@@ -3889,7 +4270,12 @@ nop %self.remove_mob_flag(NO-ATTACK)%
 ~
 #11843
 Mercenary Archer combat: Rapid Fire, Rain of Arrows~
-0 k 100
+0 k 100 5
+L w 11800
+L w 11824
+L w 11842
+L w 11852
+L w 11856
 ~
 if %self.cooldown(11800)% || %self.disabled%
   halt
@@ -4015,7 +4401,14 @@ nop %self.remove_mob_flag(NO-ATTACK)%
 ~
 #11844
 Mercenary Nature Mage combat: Healing Wave, Snake Form, Bite~
-0 k 100
+0 k 100 7
+L s 11848
+L w 3062
+L w 11800
+L w 11844
+L w 11848
+L w 11852
+L w 11856
 ~
 if %self.cooldown(11800)% || %self.disabled%
   halt
@@ -4179,7 +4572,11 @@ nop %self.remove_mob_flag(NO-ATTACK)%
 ~
 #11845
 Mercenary Vampire combat: Blood Curse, Exsanguinate~
-0 k 100
+0 k 100 4
+L w 11800
+L w 11842
+L w 11849
+L w 11852
 ~
 if %self.cooldown(11800)% || %self.disabled%
   halt
@@ -4291,7 +4688,16 @@ nop %self.remove_mob_flag(NO-ATTACK)%
 ~
 #11846
 Mercenary Tank combat: Shield Bash, Big Kick~
-0 k 100
+0 k 100 9
+L j 11830
+L j 11831
+L j 11832
+L j 11833
+L j 11834
+L w 11800
+L w 11851
+L w 11852
+L w 11856
 ~
 if %self.cooldown(11800)% || %self.disabled%
   halt
@@ -4352,7 +4758,7 @@ if %move% == 1 && !%self.aff_flagged(BLIND)%
   else
     %echo% &&m~%self% bashes ~%targ% with ^%self% shield!
     eval dur %diff% * 5
-    if (%self.level% + 100) > %targ.level% && !%targ.aff_flagged(!STUN)%
+    if (%self.level% + 100) > %targ.level% && !%targ.aff_flagged(NO-STUN)%
       dg_affect #11851 %targ% STUNNED on %dur%
     end
     if %diff% > 1
@@ -4398,7 +4804,7 @@ elseif %move% == 2 && !%self.aff_flagged(BLIND)%
       %at% %targ.room% %echoaround% %targ% ~%targ% flies in from above and splats next to the fountain!
       %slay% %targ%
     else
-      if %diff% > 1 && (%self.level% + 100) > %targ.level% && !%targ.aff_flagged(!STUN)%
+      if %diff% > 1 && (%self.level% + 100) > %targ.level% && !%targ.aff_flagged(NO-STUN)%
         %send% %targ% You fly into the wall and hit your head! That hurt!
         eval dur %diff% * 3
         dg_affect #11851 %targ% STUNNED on %dur%
@@ -4414,7 +4820,16 @@ nop %self.remove_mob_flag(NO-ATTACK)%
 ~
 #11847
 Kara Virduke Mercenary Archmage combat: Chain Lightning, Arcane Tattoos, Rainbow Beam, Summon Minions~
-0 k 100
+0 k 100 9
+L b 11842
+L b 11846
+L w 11800
+L w 11841
+L w 11847
+L w 11851
+L w 11852
+L w 11855
+L w 11856
 ~
 if %self.cooldown(11800)% || %self.disabled%
   halt
@@ -4499,7 +4914,7 @@ if %move% == 1
             * hit
             %echo% &&mThe chain lightning hits ~%ch%!&&0
             %damage% %ch% 100 physical
-            if %cycle% == 4 && %diff% == 4 && (%self.level% + 100) > %ch.level% && !%ch.aff_flagged(!STUN)%
+            if %cycle% == 4 && %diff% == 4 && (%self.level% + 100) > %ch.level% && !%ch.aff_flagged(NO-STUN)%
               dg_affect #11851 %ch% STUNNED on 10
             end
           end
@@ -4669,7 +5084,19 @@ end
 ~
 #11848
 Bleak Rojjer merc-ssassin combat: Shadow Assassin, Venomous Jab, Complete Darkness, Pin the Shadow, Summon Mercs~
-0 k 100
+0 k 100 12
+L b 11841
+L b 11845
+L c 11890
+L o 11
+L w 11800
+L w 11818
+L w 11845
+L w 11852
+L w 11856
+L w 11858
+L w 11860
+L w 11861
 ~
 if %self.cooldown(11800)% || %self.disabled%
   halt
@@ -4911,7 +5338,16 @@ nop %self.remove_mob_flag(NO-ATTACK)%
 ~
 #11849
 Trixton Vye Mercenary Leader combat: Hurricane Stone, Dancing Cane, Deathstone, Corpse's Grasp, Animate Corpse~
-0 k 100
+0 k 100 9
+L b 11850
+L c 11890
+L w 11800
+L w 11822
+L w 11842
+L w 11850
+L w 11851
+L w 11852
+L w 11856
 ~
 if %self.cooldown(11800)% || %self.disabled%
   halt
@@ -4983,7 +5419,7 @@ if %move% == 1
         if %self.is_enemy(%ch%)%
           %echo% &&mFlying debris slams into ~%ch%!&&0
           %damage% %ch% 100 physical
-          if %cycle% == 4 && %diff% == 4 && (%self.level% + 100) > %ch.level% && !%ch.aff_flagged(!STUN)%
+          if %cycle% == 4 && %diff% == 4 && (%self.level% + 100) > %ch.level% && !%ch.aff_flagged(NO-STUN)%
             dg_affect #11851 %ch% STUNNED on 10
           end
         end
@@ -5165,7 +5601,13 @@ nop %self.remove_mob_flag(NO-ATTACK)%
 ~
 #11850
 Skycleave: Use magical items~
-1 c 2
+1 c 2 6
+L c 11864
+L c 11865
+L c 11867
+L w 3021
+L w 11851
+L w 11865
 use~
 if %actor.obj_target_inv(%arg.argument1%)% != %self%
   return 0
@@ -5228,7 +5670,7 @@ switch %self.vnum%
       halt
     end
     %send% %actor% You throw @%self% at ~%targ%... it hits *%targ% in the head!
-    if !%targ.aff_flagged(!STUN)%
+    if !%targ.aff_flagged(NO-STUN)%
       %echoaround% %targ% ...&%targ% seems stunned.
       dg_affect #11851 %targ% STUNNED on 9
     end
@@ -5242,7 +5684,20 @@ end
 ~
 #11851
 Skycleave: Shared mob speech trigger~
-0 d 1
+0 d 1 13
+L b 11825
+L b 11902
+L b 11903
+L b 11919
+L b 11921
+L b 11922
+L b 11925
+L b 11926
+L b 11933
+L b 11939
+L b 11960
+L b 11961
+L t 11801
 zenith Maureen Eloise Heather Alastair Marina John Wright Dylane Ametnik Boghylda mice mouse waltur~
 switch %self.vnum%
   case 11902
@@ -5347,7 +5802,9 @@ done
 ~
 #11852
 Skycleave: Single-try pickpocket~
-0 p 100
+0 p 100 2
+L b 11920
+L o 142
 ~
 return 1
 * Only allows each player to attempt to pickpocket this mob 1 time
@@ -5389,7 +5846,18 @@ end
 ~
 #11853
 Escaped Otherworlder fight: Arm Grapple, Battle Form, Laser Clap~
-0 k 100
+0 k 100 11
+L c 11890
+L s 11829
+L s 11830
+L s 11831
+L s 11835
+L s 11836
+L s 11837
+L w 11800
+L w 11822
+L w 11852
+L w 11856
 ~
 if %self.cooldown(11800)% || %self.disabled%
   halt
@@ -5545,7 +6013,13 @@ nop %self.remove_mob_flag(NO-ATTACK)%
 ~
 #11854
 Skithe Ler-Wyn combat: Echoes of Dancing Cane, Slay the Griffin, Chain Lightning, Freezing Air~
-0 k 100
+0 k 100 6
+L w 11800
+L w 11811
+L w 11842
+L w 11851
+L w 11852
+L w 11856
 ~
 if %self.cooldown(11800)% || %self.disabled%
   halt
@@ -5709,7 +6183,7 @@ elseif %move% == 3
             * hit
             %echo% &&mThe chain lightning hits ~%ch%!&&0
             %damage% %ch% 120 physical
-            if %cycle% == 4 && %diff% == 4 && (%self.level% + 100) > %ch.level% && !%ch.aff_flagged(!STUN)%
+            if %cycle% == 4 && %diff% == 4 && (%self.level% + 100) > %ch.level% && !%ch.aff_flagged(NO-STUN)%
               dg_affect #11851 %ch% STUNNED on 10
             end
           end
@@ -5775,7 +6249,18 @@ nop %self.remove_mob_flag(NO-ATTACK)%
 ~
 #11855
 Mezvienne combat: Baleful Polymorph, Blinding Light of Dawn, Belt of Venus, Dark Fate~
-0 k 100
+0 k 100 11
+L c 11890
+L s 11854
+L s 11855
+L w 11800
+L w 11822
+L w 11841
+L w 11851
+L w 11852
+L w 11854
+L w 11856
+L w 11857
 ~
 if %self.cooldown(11800)% || %self.disabled%
   halt
@@ -5863,7 +6348,7 @@ if %move% == 1 && !%self.aff_flagged(BLIND)%
     %morph% %targ% %vnum%
     %echoaround% %targ% &&m%old_shortdesc% is suddenly transformed into ~%targ%!&&0
     %send% %targ% &&m**** You are suddenly transformed into %targ.name%! ****&&0 (fastmorph normal)
-    if %diff% == 4 && (%self.level% + 100) > %targ.level% && !%targ.aff_flagged(!STUN)%
+    if %diff% == 4 && (%self.level% + 100) > %targ.level% && !%targ.aff_flagged(NO-STUN)%
       dg_affect #11851 %targ% STUNNED on 5
     elseif %diff% >= 2
       nop %targ.command_lag(ABILITY)%
@@ -5956,7 +6441,7 @@ elseif %move% == 3
       else
         set any 1
         %echo% &&mThe rosy pink light strikes ~%ch% in the chest and streams right through *%ch%!&&0
-        if %diff% == 4 && (%self.level% + 100) > %ch.level% && !%ch.aff_flagged(!STUN)%
+        if %diff% == 4 && (%self.level% + 100) > %ch.level% && !%ch.aff_flagged(NO-STUN)%
           dg_affect #11851 %ch% STUNNED on 10
         end
         if %diff% >= 3
@@ -6031,35 +6516,43 @@ nop %self.remove_mob_flag(NO-ATTACK)%
 ~
 #11856
 Shadow Ascendant fight: Shadow Cage, Shadow Torrent, Freezing Air, Shadow Slice~
-0 k 100
+0 k 100 8
+L c 11890
+L w 11800
+L w 11822
+L w 11851
+L w 11852
+L w 11856
+L w 11863
+L w 11864
 ~
 if %self.cooldown(11800)% || %self.disabled%
   halt
 end
 set rm %self.room%
 set diff %self.diff%
-set m_l %self.var(m_l)%
-set n_m %self.var(n_m,0)%
-if !%m_l% || !%n_m%
-  set m_l 1 2 3 4
-  set n_m 4
+set ml %self.var(ml)%
+set nm %self.var(nm,0)%
+if !%ml% || !%nm%
+  set ml 1 2 3 4
+  set nm 4
 end
-eval which %%random.%n_m%%%
-set old %m_l%
-set m_l
+eval which %%random.%nm%%%
+set old %ml%
+set ml
 set move 0
 while %which% > 0
   set move %old.car%
   if %which% != 1
-    set m_l %m_l% %move%
+    set ml %ml% %move%
   end
   set old %old.cdr%
   eval which %which% - 1
 done
-set m_l %m_l% %old%
-eval n_m %n_m% - 1
-remote m_l %self.id%
-remote n_m %self.id%
+set ml %ml% %old%
+eval nm %nm% - 1
+remote ml %self.id%
+remote nm %self.id%
 skyfight lockout 30 35
 if %move% == 1
   skyfight clear free
@@ -6173,7 +6666,7 @@ elseif %move% == 2
             end
             %echo% &&mA shadow cuts straight through ~%ch% as it streams into the Ascendant!&&0
             %damage% %ch% 120 physical
-            if %cycle% == 4 && %diff% == 4 && (%self.level% + 100) > %ch.level% && !%ch.aff_flagged(!STUN)%
+            if %cycle% == 4 && %diff% == 4 && (%self.level% + 100) > %ch.level% && !%ch.aff_flagged(NO-STUN)%
               dg_affect #11851 %ch% STUNNED on 10
             end
           end
@@ -6280,7 +6773,22 @@ nop %self.remove_mob_flag(NO-ATTACK)%
 ~
 #11857
 Skycleave: Mercenary name setup~
-0 nA 100
+0 nA 100 15
+L b 11841
+L b 11842
+L b 11843
+L b 11844
+L b 11845
+L b 11846
+L b 11900
+L c 11890
+L w 11800
+L w 11815
+L w 11822
+L w 11852
+L w 11856
+L w 11869
+L w 11870
 ~
 * Mercenaries are spawned by trig 11900/skymerc, called in 5 rooms.
 * Up to 3 mercenaries spawn in each room, for a total of 15.
@@ -6426,7 +6934,8 @@ detach 11857 %self.id%
 ~
 #11858
 Shade of Mezvienne fight: Shadow Whip, Shadow Flail, Total Darkness, Shade's Grasp, Drain Knezz~
-0 k 100
+0 k 100 1
+L o 11
 ~
 if %self.cooldown(11800)% || %self.disabled%
   halt
@@ -6657,7 +7166,21 @@ nop %self.remove_mob_flag(NO-ATTACK)%
 ~
 #11859
 Mind-Controlled HS Barrosh fight: Baleful Polymorph, Devastation Ritual, Wave of Guilt, Deathbolt~
-0 k 100
+0 k 100 14
+L s 11867
+L s 11868
+L s 11869
+L s 11877
+L s 11878
+L s 11879
+L w 11800
+L w 11851
+L w 11852
+L w 11856
+L w 11868
+L w 11871
+L w 11872
+L w 11873
 ~
 if %self.cooldown(11800)% || %self.disabled%
   halt
@@ -6745,7 +7268,7 @@ if %move% == 1 && !%self.aff_flagged(BLIND)%
     %morph% %targ% %vnum%
     %echoaround% %targ% &&m%old_shortdesc% is suddenly transformed into ~%targ%!&&0
     %send% %targ% &&m**** You are suddenly transformed into %targ.name%! ****&&0 (fastmorph normal)
-    if %diff% == 4 && (%self.level% + 100) > %targ.level% && !%targ.aff_flagged(!STUN)%
+    if %diff% == 4 && (%self.level% + 100) > %targ.level% && !%targ.aff_flagged(NO-STUN)%
       dg_affect #11851 %targ% STUNNED on 5
     elseif %diff% >= 2
       nop %targ.command_lag(ABILITY)%
@@ -6888,7 +7411,9 @@ nop %self.remove_mob_flag(NO-ATTACK)%
 ~
 #11860
 Shard cultivator: upgrade shard tools~
-1 c 2
+1 c 2 2
+L c 11935
+L c 11936
 cultivate~
 return 1
 if !%arg%
@@ -6918,7 +7443,9 @@ eval level %actor.highest_level% + 50
 ~
 #11861
 Skycleave: Barrosh mind-control struggle scene~
-0 b 100
+0 b 100 2
+L j 11862
+L j 11867
 ~
 if %self.fighting% || %self.disabled%
   halt
@@ -6978,7 +7505,9 @@ done
 ~
 #11862
 Skycleave: skymote conversation helper~
-0 c 0
+0 c 0 2
+L b 11900
+L b 11931
 skymote~
 * Manages bits of conversations that otherwise use '11840 Storytime' but need
 * minor script-based information.
@@ -7029,7 +7558,10 @@ end
 ~
 #11863
 Skycleave: Shade ascension / Death of Knezz~
-0 b 100
+0 b 100 3
+L b 11863
+L b 11868
+L w 11874
 ~
 * This starts a timer that will kill Knezz and ascend the shade after 2 minutes
 set room %self.room%
@@ -7126,7 +7658,20 @@ end
 ~
 #11864
 Skycleave: Shared mob command trigger (Mez transition, tower mounts, Waltur)~
-0 c 0
+0 c 0 13
+L b 11852
+L b 11854
+L b 11855
+L b 11856
+L b 11857
+L b 11858
+L b 11866
+L b 11940
+L c 11892
+L t 11864
+L t 11918
+L t 11919
+L t 11972
 diagnose mount ride donate~
 set aqua_vnums 11854 11855 11856 11857 11858
 * modes
@@ -7175,7 +7720,9 @@ end
 ~
 #11865
 Skycleave: Knezz phase A post-fight cutscene~
-0 bw 100
+0 bw 100 2
+L f 11840
+L j 11869
 ~
 * messages starting shortly after load
 * fetch position
@@ -7249,7 +7796,7 @@ done
 ~
 #11866
 Skycleave: Skip command (for cutscenes)~
-0 c 0
+0 c 0 0
 skip~
 if !%self.varexists(skip)%
   %send% %actor% You skip the cutscene.
@@ -7262,7 +7809,21 @@ end
 ~
 #11867
 Skycleave: Boss room relocator~
-0 hnA 100
+0 hnA 100 14
+L b 11871
+L b 11872
+L b 11894
+L b 11895
+L b 11896
+L b 11897
+L b 11898
+L b 11899
+L b 11900
+L c 11805
+L j 11870
+L j 11871
+L j 11872
+L j 11971
 ~
 set no_purge_list 11871 11872
 * Teleports people/items out of a room that's restricted while the mob is there
@@ -7338,7 +7899,15 @@ done
 ~
 #11868
 Skycleave: Skithe Ler-Wyn reset trigger~
-0 ab 100
+0 ab 100 8
+L b 11865
+L b 11866
+L b 11871
+L b 11899
+L b 11900
+L c 11870
+L j 11870
+L j 11871
 ~
 * this resets the whole fight
 if %self.fighting% || %self.disabled% || %self.health% <= 0 || %self.aff_flagged(!ATTACK)%
@@ -7397,7 +7966,7 @@ end
 ~
 #11869
 Skycleave: Skithe Ler-Wyn load trigger~
-0 nA 100
+0 nA 100 0
 ~
 wait 0
 set room %self.room%
@@ -7470,7 +8039,9 @@ end
 ~
 #11870
 Skycleave: Mezvienne phase transition cutscene~
-0 ab 100
+0 ab 100 2
+L b 11872
+L b 11900
 ~
 * messaging following this mob being loaded and the players being teleported to her room
 * fetch position
@@ -7564,7 +8135,14 @@ done
 ~
 #11871
 Skycleave: Mezvienne starts phase transition (hitprc)~
-0 l 30
+0 l 30 7
+L b 11865
+L b 11866
+L b 11899
+L c 11870
+L j 11870
+L j 11872
+L w 11867
 ~
 set room %self.room%
 * messaging
@@ -7601,7 +8179,14 @@ done
 ~
 #11872
 Skycleave: Mezvienne starts phase transition (death)~
-0 f 100
+0 f 100 7
+L b 11865
+L b 11866
+L b 11899
+L c 11870
+L j 11870
+L j 11872
+L w 11867
 ~
 set room %self.room%
 * messaging
@@ -7638,7 +8223,12 @@ return 0
 ~
 #11873
 Skithe Ler-Wyn death~
-0 f 100
+0 f 100 5
+L b 11865
+L b 11899
+L c 11870
+L j 11870
+L j 11871
 ~
 * message
 %echo% &&mSkithe Ler-Wyn, Lion of Time, dissolves into the air above you with one final roar!&&0
@@ -7664,7 +8254,17 @@ return 0
 ~
 #11874
 Smol Nes-Pik: Torru and Nayyur~
-0 bw 100
+0 bw 100 10
+L b 11877
+L b 11878
+L b 11880
+L b 11881
+L b 11882
+L b 11883
+L b 11887
+L c 11888
+L c 11889
+L j 11882
 ~
 * controls both rot worshippers in the room; runs on 11886 Torru
 * this is one big cycle of text and then repeats
@@ -7809,7 +8409,13 @@ remote cycle %self.id%
 ~
 #11875
 Smol Nes-Pik: Joiago gossip helper~
-0 c 0
+0 c 0 6
+L b 11878
+L b 11880
+L b 11881
+L b 11882
+L b 11883
+L j 11882
 joiago~
 * gossip helper for Joiago, partner to trigger 11877
 if %actor.vnum% != 11877 || %arg% != gossip
@@ -8030,7 +8636,8 @@ end
 ~
 #11876
 Smol Nes-Pik: Reset comment count on move~
-0 i 100
+0 i 100 1
+L f 11880
 ~
 * pairs with trigger 11880 etc to reset their commentary when they move
 set comment 0
@@ -8038,7 +8645,17 @@ remote comment %self.id%
 ~
 #11877
 Smol Nes-Pik: Joiago gossip and mirth driver~
-0 bw 50
+0 bw 50 10
+L b 11878
+L b 11880
+L b 11881
+L b 11882
+L f 11883
+L j 11879
+L j 11880
+L j 11881
+L j 11882
+L j 11883
 ~
 * pairs with trigger 11876, 11875, 11883
 * check pickpocket
@@ -8258,7 +8875,10 @@ wait 20 s
 ~
 #11878
 Smol Nes-Pik: Keeper Bastain greeting~
-0 gw 90
+0 gw 90 3
+L b 11877
+L b 11880
+L b 11881
 ~
 if %direction% == none
   halt
@@ -8289,7 +8909,7 @@ end
 ~
 #11879
 Smol Nes-Pik: Broken ladder drop~
-2 gwA 100
+2 gwA 100 0
 ~
 * always returns 1
 return 1
@@ -8321,7 +8941,14 @@ done
 ~
 #11880
 Smol Nes-Pik: Lotte running commentary~
-0 bw 45
+0 bw 45 7
+L b 11882
+L f 11876
+L j 11879
+L j 11880
+L j 11881
+L j 11882
+L j 11883
 ~
 * pairs with trigger 11876
 set max_comment 4
@@ -8439,7 +9066,7 @@ wait 20 s
 ~
 #11881
 Stasis charm: Block morph and fastmorph commands when worn~
-1 c 1
+1 c 1 0
 morph fastmorph~
 if %arg.car%
   %send% %actor% You can't seem to morph! Something must be preventing it.
@@ -8450,7 +9077,12 @@ end
 ~
 #11882
 Smol Nes-Pik: Tresydion orations~
-0 bw 25
+0 bw 25 5
+L b 11877
+L b 11878
+L b 11880
+L b 11881
+L b 11883
 ~
 set max_comment 3
 set mob_list 11877 11878 11880 11881 11883
@@ -8598,7 +9230,13 @@ wait 30 sec
 ~
 #11883
 Smol Nes-Pik: Joiago gossip and humming driver, when pickpocketed~
-0 bw 50
+0 bw 50 6
+L b 11882
+L j 11879
+L j 11880
+L j 11881
+L j 11882
+L j 11883
 ~
 * pairs with trigger 11876, 11875, 11877
 set max_comment 4
@@ -8744,7 +9382,10 @@ wait 20 s
 ~
 #11884
 Rot and Ruin: Taste putrid sap to teleport~
-1 c 4
+1 c 4 3
+L j 11887
+L j 11891
+L w 11891
 taste eat drink sip lick~
 * This teleports players between templates 11887 and 11891
 * Note: See below for adding requirements to use it
@@ -8810,7 +9451,8 @@ end
 ~
 #11885
 Skycleave: Struggle to escape~
-1 c 2
+1 c 2 1
+L w 11822
 *~
 * runs on an obj in inventory; strength/intelligence help break out faster
 * uses optional string vars: strug_char, strug_room, free_char, free_room
@@ -8860,7 +9502,9 @@ end
 ~
 #11886
 Skycleave: Attack the statue to destroy it~
-1 c 4
+1 c 4 2
+L b 11896
+L b 11900
 break kill destroy shatter hit kick bash smash stab jab backstab attack~
 set target %actor.obj_target(%arg%)%
 if !%target%
@@ -8947,7 +9591,11 @@ remote finish2 %spirit.id%
 ~
 #11887
 Skycleave: Move-blocking object - Pixy Shield, Shadow Wall, Vortex~
-1 q 100
+1 q 100 4
+L b 11869
+L c 11863
+L c 11870
+L c 11887
 ~
 * One quick trick to get the target room
 set room_var %self.room%
@@ -8978,7 +9626,11 @@ return 0
 ~
 #11888
 Skycleave: skygobpix trash loader~
-0 c 0
+0 c 0 4
+L b 11815
+L b 11816
+L b 11817
+L b 11820
 skygobpix~
 * Usage: skygobpix <difficulty 1-4> <a (any) | g (goblin) | p (pixy)>
 if %actor% != %self%
@@ -9032,7 +9684,7 @@ done
 ~
 #11889
 Skycleave: Skydel despawner~
-0 c 0
+0 c 0 0
 skydel~
 * Usage: skydel <vnum> <msg type>
 *  msg 1: Name heads upstairs.
@@ -9067,7 +9719,27 @@ end
 ~
 #11890
 Skycleave: Difficulty selector floor 1 to 2~
-0 c 0
+0 c 0 20
+L b 11812
+L b 11818
+L b 11819
+L b 11864
+L b 11900
+L c 11831
+L j 11810
+L j 11811
+L j 11812
+L j 11813
+L j 11814
+L j 11816
+L j 11818
+L j 11819
+L j 11820
+L j 11821
+L j 11822
+L j 11823
+L j 11824
+L j 11825
 difficulty up~
 * Process argument
 if %cmd.mudcommand% == up
@@ -9136,7 +9808,28 @@ end
 ~
 #11891
 Skycleave: Difficulty selector floor 2 to 3~
-0 c 0
+0 c 0 21
+L b 11830
+L b 11831
+L b 11834
+L b 11835
+L b 11840
+L b 11847
+L b 11848
+L b 11849
+L b 11900
+L b 11910
+L c 11831
+L j 11830
+L j 11831
+L j 11832
+L j 11833
+L j 11834
+L j 11835
+L j 11836
+L j 11837
+L j 11839
+L j 11840
 difficulty up~
 * Process argument
 if %cmd.mudcommand% == up
@@ -9204,7 +9897,24 @@ end
 ~
 #11892
 Skycleave: Difficulty selector floor 3 to 4~
-0 c 0
+0 c 0 17
+L b 11851
+L b 11859
+L b 11860
+L b 11862
+L b 11867
+L b 11868
+L b 11869
+L b 11871
+L b 11900
+L b 11930
+L c 11831
+L j 11860
+L j 11865
+L j 11866
+L j 11867
+L j 11868
+L j 11871
 difficulty up~
 * Process argument
 if %cmd.mudcommand% == up
@@ -9267,13 +9977,25 @@ end
 ~
 #11893
 Skycleave: Dummy difficulty selector~
-0 c 0
+0 c 0 0
 difficulty~
 %send% %actor% You must complete this floor before you can select a difficulty for the next one.
 ~
 #11894
 Skycleave: Phase Change 1 Room~
-0 hn 100
+0 hn 100 12
+L b 11894
+L b 11895
+L b 11896
+L b 11897
+L b 11898
+L b 11899
+L c 11805
+L t 11810
+L t 11811
+L t 11812
+L t 11826
+L y 11800
 ~
 * Teleport all players/followers from 1 phase to the 2nd phase
 * And despawn all adventure mobs here
@@ -9353,7 +10075,42 @@ done
 ~
 #11895
 Skycleave: Phase change, floor 1~
-0 n 100
+0 n 100 35
+L b 11801
+L b 11804
+L b 11805
+L b 11806
+L b 11807
+L b 11827
+L b 11828
+L b 11894
+L b 11900
+L b 11901
+L b 11902
+L b 11904
+L b 11905
+L b 11906
+L b 11907
+L b 11908
+L b 11909
+L b 11929
+L b 11945
+L f 11827
+L f 11937
+L j 11800
+L j 11801
+L j 11802
+L j 11803
+L j 11804
+L j 11805
+L j 11806
+L j 11807
+L j 11808
+L j 11901
+L j 11904
+L j 11905
+L j 11906
+L j 11910
 ~
 * Converts the 1st floor of Skycleave from phase A to phase B
 set start_room 11801
@@ -9440,7 +10197,61 @@ remote phase1 %spirit.id%
 ~
 #11896
 Skycleave: Phase change, floor 2~
-0 n 100
+0 n 100 54
+L b 11811
+L b 11812
+L b 11813
+L b 11814
+L b 11815
+L b 11816
+L b 11817
+L b 11825
+L b 11837
+L b 11889
+L b 11891
+L b 11894
+L b 11900
+L b 11911
+L b 11912
+L b 11913
+L b 11914
+L b 11915
+L b 11916
+L b 11917
+L b 11918
+L b 11921
+L b 11922
+L b 11925
+L b 11945
+L c 11915
+L j 11804
+L j 11810
+L j 11811
+L j 11812
+L j 11813
+L j 11814
+L j 11815
+L j 11816
+L j 11817
+L j 11818
+L j 11819
+L j 11820
+L j 11821
+L j 11822
+L j 11823
+L j 11824
+L j 11825
+L j 11826
+L j 11910
+L j 11911
+L j 11912
+L j 11914
+L j 11915
+L j 11918
+L j 11919
+L j 11921
+L j 11922
+L j 11925
 ~
 * Converts the 2nd floor of Skycleave from phase A to phase B
 set start_room 11810
@@ -9557,7 +10368,55 @@ remote phase2 %spirit.id%
 ~
 #11897
 Skycleave: Phase change, floor 3~
-0 n 100
+0 n 100 48
+L b 11830
+L b 11831
+L b 11832
+L b 11834
+L b 11835
+L b 11837
+L b 11838
+L b 11839
+L b 11840
+L b 11892
+L b 11894
+L b 11900
+L b 11919
+L b 11931
+L b 11932
+L b 11933
+L b 11934
+L b 11935
+L b 11936
+L b 11938
+L b 11939
+L b 11940
+L b 11941
+L b 11942
+L b 11978
+L j 11830
+L j 11831
+L j 11832
+L j 11833
+L j 11834
+L j 11835
+L j 11836
+L j 11837
+L j 11838
+L j 11839
+L j 11840
+L j 11841
+L j 11922
+L j 11930
+L j 11931
+L j 11932
+L j 11934
+L j 11935
+L j 11936
+L j 11938
+L j 11939
+L j 11940
+L j 11941
 ~
 * Converts the 3rd floor of Skycleave from phase A to phase B
 set start_room 11830
@@ -9647,7 +10506,40 @@ remote phase3 %spirit.id%
 ~
 #11898
 Skycleave: Phase change, floor 4~
-0 n 100
+0 n 100 33
+L b 11861
+L b 11862
+L b 11864
+L b 11868
+L b 11870
+L b 11894
+L b 11900
+L b 11929
+L b 11959
+L b 11960
+L b 11961
+L b 11962
+L b 11964
+L b 11965
+L b 11966
+L b 11967
+L b 11969
+L c 11923
+L c 11968
+L c 11969
+L c 11970
+L j 11860
+L j 11861
+L j 11862
+L j 11863
+L j 11864
+L j 11865
+L j 11866
+L j 11867
+L j 11868
+L j 11869
+L j 11870
+L j 11871
 ~
 * Converts the 4th floor of Skycleave from phase A to phase B
 set start_room 11860
@@ -9737,7 +10629,7 @@ remote phase4 %spirit.id%
 ~
 #11899
 Skycleave: Skyload mobs on difficulty select~
-0 c 0
+0 c 0 0
 skyload~
 * Usage: skyload <mob vnum> <difficulty 1-4>
 if %actor% != %self%

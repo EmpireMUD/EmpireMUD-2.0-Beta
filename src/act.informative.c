@@ -481,14 +481,18 @@ void survey_city(char_data *ch, char *argument) {
 	}
 	if (ROOM_OWNER(IN_ROOM(ch)) && ROOM_OWNER(IN_ROOM(ch)) != GET_LOYALTY(ch) && !imm_access) {
 		msg_to_char(ch, "Someone else already owns this area.\r\n");
-		return;
+		if (!imm_access) {
+			return;
+		}
 	}
 	
 	// check proximity: starting locations
 	for (iter = 0; iter <= highest_start_loc_index; ++iter) {
 		if (compute_distance(IN_ROOM(ch), real_room(start_locs[iter])) < min_distance_from_city_to_starting_location) {
 			msg_to_char(ch, "You can't found a city within %d tiles of a starting location.\r\n", min_distance_from_city_to_starting_location);
-			return;
+			if (!imm_access) {
+				return;
+			}
 		}
 	}
 	
@@ -2006,7 +2010,7 @@ void show_character_affects_simple(char_data *ch, char_data *to) {
 	}
 	
 	is_ally = (is_fight_ally(to, ch) || GET_COMPANION(to) == ch);
-	details = is_ally || (has_player_tech(to, PTECH_ENEMY_BUFF_DETAILS) && !AFF_FLAGGED(ch, AFF_SOULMASK));
+	details = is_ally || (has_player_tech(to, PTECH_ENEMY_BUFF_DETAILS) && !AFF_FLAGGED(ch, AFF_MASK_AFFECTS));
 		
 	// build affects
 	LL_FOREACH(ch->affected, aff) {
@@ -4591,7 +4595,7 @@ ACMD(do_score) {
 
 
 ACMD(do_survey) {
-	char line[1024];
+	char line[MAX_STRING_LENGTH];
 	char *temp, *argptr;
 	struct empire_city_data *city;
 	struct empire_island *eisle;
@@ -4644,6 +4648,14 @@ ACMD(do_survey) {
 		}
 	}
 	*/
+	
+	// forage crop?
+	if (has_player_tech(ch, PTECH_FORAGE_COMMAND) && can_interact_room(IN_ROOM(ch), INTERACT_FORAGE)) {
+		get_potential_crop_for_location(IN_ROOM(ch), INTERACT_FORAGE, line);
+		if (*line) {
+			msg_to_char(ch, "Wild crops: %s\r\n", line);
+		}
+	}
 	
 	// empire
 	if (ROOM_OWNER(IN_ROOM(ch))) {
