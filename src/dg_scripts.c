@@ -2952,6 +2952,7 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 			}
 			else if (!str_cmp(var, "temperature")) {
 				if (field && (*field == '-' || *field == '+' || isdigit(*field))) {
+					// WARNING: does not work with negatives like %temperature.-3%
 					safe_snprintf(str, slen, "%s", temperature_to_string(atoi(field)));
 				}
 				else {
@@ -5409,10 +5410,14 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 					else if (!str_cmp(field, "is_name")) {
 						if (subfield && *subfield && MATCH_ITEM_NAME(subfield, o)) {
 							safe_snprintf(str, slen, "1");
-						}
+						} 
 						else {
 							safe_snprintf(str, slen, "0");
 						}
+					}
+					
+					else if (!str_cmp(field, "is_stolen")) {
+						safe_snprintf(str, slen, "%d", IS_STOLEN(o) ? 1 : 0);
 					}
 					break;
 				}
