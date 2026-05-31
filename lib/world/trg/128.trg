@@ -30,11 +30,11 @@ elseif imperium forge /= %arg% || victory forge /= %arg%
   set dest 12850
   set curr 5101
   set str an imperium shard
-elseif eventide forge /= %arg% || echo forge /= %arg%
-  set which 12802
-  set dest 12890
-  set curr 5102
-  set str an eventide shard
+* elseif eventide forge /= %arg% || echo forge /= %arg%
+*   set which 12802
+*   set dest 12890
+*   set curr 5102
+*   set str an eventide shard
 else
   %send% %actor% Unknown celestial forge.
 end
