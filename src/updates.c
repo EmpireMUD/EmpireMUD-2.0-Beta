@@ -37,8 +37,13 @@
 *   Update Data -- Add to the end of this array to activate the function
 *     (search for ADD HERE)
 *   Core Functions
+*   Helper Functions
 *   Pre-b5.116 World Loading
 */
+
+
+// local prototypes
+void update_replace_instances(const adv_vnum *vnum_list);
 
 
  //////////////////////////////////////////////////////////////////////////////
@@ -4749,6 +4754,22 @@ void b5_202_celestial_forge(void) {
 }
 
 
+// b5.203 just respawns adventures that added difficulty selectors
+void b5_203_adventure_update(void) {
+	adv_vnum list[] = {
+		127,	// [  127] Wandering Dragon
+		128,	// [  128] Colossal Red Dragon
+		10105,	// [10105] Ruins: Three Bandits
+		10300,	// [10300] Flame Dragon
+		10950,	// [10950] Viscous Muck Dragon
+		10965,	// [10965] Giant!
+		NOTHING
+	};
+	
+	update_replace_instances(list);
+}
+
+
 // ADD HERE, above: more beta 5 update functions
 
 
@@ -4871,6 +4892,7 @@ const struct {
 	{ "b5.196a", b5_196_mountain_eng, NULL, "Updating empires with Mountain Engineering" },
 	{ "b5.201", b5_201_starsmith, NULL, "Updating Celestial Forges with new artisan" },
 	{ "b5.202", b5_202_celestial_forge, NULL, "De-spawning and re-spawning the Celestial Forge to add new content" },
+	{ "b5.203", b5_203_adventure_update, NULL, "De-spawning and re-spawning updated adventures" },
 	
 	// ADD HERE, above: more beta 5 update lines
 	
@@ -4996,6 +5018,74 @@ void check_version(void) {
 		free_loaded_players();
 		save_all_empires();
 		save_world_after_startup = TRUE;
+	}
+}
+
+
+ //////////////////////////////////////////////////////////////////////////////
+//// HELPER FUNCTIONS ////////////////////////////////////////////////////////
+
+/**
+* De-spawns all instances from a list of adventures, then attempts to spawn
+* fresh ones right away.
+*
+* A vnum list should look like:
+* adv_vnum list[] = { 123, 124, 125, NOTHING };
+*
+* @param const adv_vnum *vnum_list An array of adventure vnums of any length, terminated by a NOTHING entry.
+*/
+void update_replace_instances(const adv_vnum *vnum_list) {
+	bool found;
+	int count, dir, iter, num_rules;
+	adv_data *adv;
+	room_data *loc;
+	struct adventure_link_rule *rule, *rule_iter;
+	struct instance_data *inst, *next_inst;
+	
+	// delete instances from the list
+	DL_FOREACH_SAFE(instance_list, inst, next_inst) {
+		if (!INST_ADVENTURE(inst)) {
+			// safety first
+			delete_instance(inst, TRUE);
+			continue;
+		}
+		
+		found = FALSE;
+		for (iter = 0; vnum_list[iter] != NOTHING && !found; ++iter) {
+			if (GET_ADV_VNUM(INST_ADVENTURE(inst)) == vnum_list[iter]) {
+				found = TRUE;
+			}
+		}
+		
+		if (found) {
+			delete_instance(inst, TRUE);
+		}
+	}
+	
+	// now attempt to spawn them
+	for (iter = 0; vnum_list[iter] != NOTHING; ++iter) {
+		if ((adv = adventure_proto(vnum_list[iter]))) {
+			for (count = 0; count < adjusted_instance_limit(adv) && can_instance(adv); ++count) {
+				// randomly choose one rule to attempt
+				num_rules = 0;
+				rule = NULL;
+				for (rule_iter = GET_ADV_LINKING(adv); rule_iter; rule_iter = rule_iter->next) {
+					if (adventure_link_is_location_rule[rule_iter->type]) {
+						// choose one at random
+						if (!number(0, num_rules++) || !rule) {
+							rule = rule_iter;
+						}
+					}
+				}
+				
+				// did we find one?
+				if (rule && (loc = find_location_for_rule(adv, rule, &dir))) {
+					if (build_instance_loc(adv, rule, loc, dir)) {
+						// result doesn't matter
+					}
+				}
+			}
+		}
 	}
 }
 
