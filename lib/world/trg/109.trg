@@ -44,6 +44,7 @@ else
   return 1
 end
 * messaging
+set old_diff %self.var(difficulty,4)%
 %send% %actor% You set the difficulty to %str%...
 %echoaround% %actor% ~%actor% sets the difficulty to %str%...
 * Clear existing difficulty flags and set new ones.
@@ -59,6 +60,7 @@ elseif %difficulty% == 4
   nop %self.add_mob_flag(HARD)%
   nop %self.add_mob_flag(GROUP)%
 end
+remote difficulty %self.id%
 %restore% %self%
 wait 1
 * in case
@@ -67,8 +69,12 @@ dg_affect %self% !ATTACK off
 switch %self.vnum%
   case 10900
     * colossal red dragon
-    %echo% ~%self% opens ^%self% mouth wide...
-    %regionecho% %self.room% 10 A colossal roar rattles across the land!
+    if %old_diff% > %difficulty%
+      %echo% ... &%self%'s on the small side, as colossal dragons go.
+    else
+      %echo% ~%self% opens ^%self% mouth wide...
+      %regionecho% %self.room% 10 A colossal roar rattles across the land!
+    end
   break
   case 10901
     * Sir Vivor
@@ -694,6 +700,7 @@ else
   return 1
 end
 * messaging
+set old_diff %self.var(difficulty,3)%
 %send% %actor% You set the difficulty to %str%...
 %echoaround% %actor% ~%actor% sets the difficulty to %str%...
 * Clear existing difficulty flags and set new ones.
@@ -709,13 +716,18 @@ elseif %difficulty% == 4
   nop %self.add_mob_flag(HARD)%
   nop %self.add_mob_flag(GROUP)%
 end
+remote difficulty %self.id%
 %restore% %self%
 wait 1
 * in case
 dg_affect %self% !ATTACK off
 * alert
-%echo% ~%self% opens its mouth wide...
-%regionecho% %self.room% 10 A gurgling roar shakes the entire landscape!
+if %old_diff% > %difficulty%
+  %echo% ... now that you're closer, ~%self% isn't as big as you feared.
+else
+  %echo% ~%self% opens its mouth wide...
+  %regionecho% %self.room% 10 A gurgling roar shakes the entire landscape!
+end
 ~
 #10956
 Muck Dragon: Muck Rake~

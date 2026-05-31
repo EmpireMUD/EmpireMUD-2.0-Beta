@@ -287,6 +287,7 @@ else
   return 1
 end
 * messaging
+set old_diff %self.var(difficulty,2)%
 %send% %actor% You set the difficulty to %str%...
 %echoaround% %actor% ~%actor% sets the difficulty to %str%...
 * Clear existing difficulty flags and set new ones.
@@ -302,16 +303,21 @@ elseif %difficulty% == 4
   nop %self.add_mob_flag(HARD)%
   nop %self.add_mob_flag(GROUP)%
 end
+remote difficulty %self.id%
 %restore% %self%
 wait 1
 * in case
 dg_affect %self% !ATTACK off
 * alert
-%echo% ~%self% cranes its neck and bellows flames across the sky!
-if %self.room.sun% == light
-  %regionecho% %self.room% -5 A massive fan of flames erupts through the air!
+if %old_diff% > %difficulty%
+  %echo% ... this flame dragon doesn't look so big up close.
 else
-  %regionecho% %self.room% -10 A massive fan of flames momentarily lights up the sky!
+  %echo% ~%self% cranes its neck and bellows flames across the sky!
+  if %self.room.sun% == light
+    %regionecho% %self.room% -5 A massive fan of flames erupts through the air!
+  else
+    %regionecho% %self.room% -10 A massive fan of flames momentarily lights up the sky!
+  end
 end
 ~
 #10307
@@ -540,6 +546,7 @@ else
   return 1
 end
 * messaging
+set old_diff %self.var(difficulty,2)%
 %send% %actor% You set the difficulty to %str%...
 %echoaround% %actor% ~%actor% sets the difficulty to %str%...
 * Clear existing difficulty flags and set new ones.
@@ -556,27 +563,33 @@ elseif %difficulty% == 4
   nop %mob.add_mob_flag(HARD)%
   nop %mob.add_mob_flag(GROUP)%
 end
+remote difficulty %self.id%
 %restore% %mob%
 wait 1
 dg_affect %mob% !ATTACK off
-switch %mob.vnum%
-  case 10330
-    * Wandering Wyvern
-    %echo% ~%self% swoops low and blasts flame across the sky!
-  break
-  case 10331
-    * Bull Dragon
-    %echo% ~%self% fumes with smoke as &%self% prepares to charge!
-  break
-  case 10332
-    * Dragon Guardian
-    %echo% ~%self% extends ^%self% talons and prepares to defend!
-  break
-  case 10333
-    * Emerald Dragon
-    %echo% Green light blinds you as ~%self% swoops low!
-  break
-done
+* alert
+if %old_diff% > %difficulty%
+  %echo% ... ~%self% doesn't look so big from this distance.
+else
+  switch %mob.vnum%
+    case 10330
+      * Wandering Wyvern
+      %echo% ~%self% swoops low and blasts flame across the sky!
+    break
+    case 10331
+      * Bull Dragon
+      %echo% ~%self% fumes with smoke as &%self% prepares to charge!
+    break
+    case 10332
+      * Dragon Guardian
+      %echo% ~%self% extends ^%self% talons and prepares to defend!
+    break
+    case 10333
+      * Emerald Dragon
+      %echo% Green light blinds you as ~%self% swoops low!
+    break
+  done
+end
 ~
 #10370
 Uninvited Guest: Delayed despawn box~
