@@ -196,6 +196,10 @@ Tranc combat~
 L b 10108
 L w 3018
 ~
+* skip on normal
+if %self.var(difficulty,3)% == 1
+  halt
+end
 * storing ids prevents errors when someone dies during a "wait"
 set id %actor.id%
 wait 10
@@ -502,6 +506,91 @@ L y 10110
 ~
 if %actor.is_pc% && %actor.empire%
   nop %actor.empire.start_progress(10110)%
+end
+~
+#10118
+Three Bandits: Difficulty selector~
+2 c 0 3
+L b 10105
+L b 10106
+L b 10107
+difficulty~
+* mob list
+set bandits 10105 10106 10107
+*
+if !%arg%
+  %send% %actor% You must specify a level of difficulty. (Normal, Hard, Group, or Boss)
+  return 1
+  halt
+end
+* parse difficulty
+if normal /= %arg%
+  set difficulty 1
+  set str normal
+elseif hard /= %arg%
+  set difficulty 2
+  set str hard
+elseif group /= %arg%
+  set difficulty 3
+  set str group
+elseif boss /= %arg%
+  set difficulty 4
+  set str boss
+else
+  %send% %actor% That is not a valid difficulty level for this adventure. (Normal, Hard, Group, or Boss)
+  halt
+  return 1
+end
+* messaging
+%send% %actor% You set the difficulty to %str%...
+%echoaround% %actor% ~%actor% sets the difficulty to %str%...
+* update mobs in the room
+set last 0
+set mob %room.people%
+while %mob%
+  set next %mob.next_in_room%
+  if %bandits% ~= %mob.vnum% && !%mob.fighting% && !%mob.disabled%
+    * Clear existing difficulty flags and set new ones.
+    nop %mob.remove_mob_flag(HARD)%
+    nop %mob.remove_mob_flag(GROUP)%
+    if %difficulty% == 1
+      * Then we don't need to do anything
+    elseif %difficulty% == 2
+      nop %mob.add_mob_flag(HARD)%
+    elseif %difficulty% == 3
+      nop %mob.add_mob_flag(GROUP)%
+    elseif %difficulty% == 4
+      nop %mob.add_mob_flag(HARD)%
+      nop %mob.add_mob_flag(GROUP)%
+    end
+    remote difficulty %mob.id%
+    %restore% %mob%
+    wait 1
+    * in case
+    dg_affect %mob% !ATTACK off
+    * for messaging
+    set last %mob%
+  end
+  set mob %next%
+done
+* alert
+if !%last%
+  %echo% ... nothing happened.
+else
+  switch %last.vnum%
+    case 10105
+      * Berk
+      say Looks like scrimshaw's on the menu tonight.
+    break
+    case 10106
+      * Jorr
+      %echo% The fire glints off |%last% teeth as &%last% stokes the embers.
+    break
+    case 10107
+      * Tranc
+      say Here, piggy, piggy...
+    break
+  done
 end
 ~
 #10140
