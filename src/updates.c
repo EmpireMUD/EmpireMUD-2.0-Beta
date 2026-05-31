@@ -5042,6 +5042,9 @@ void update_replace_instances(const adv_vnum *vnum_list) {
 	struct adventure_link_rule *rule, *rule_iter;
 	struct instance_data *inst, *next_inst;
 	
+	// will need this first
+	update_instance_world_size();
+	
 	// delete instances from the list
 	DL_FOREACH_SAFE(instance_list, inst, next_inst) {
 		if (!INST_ADVENTURE(inst)) {

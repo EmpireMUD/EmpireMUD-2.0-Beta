@@ -2450,6 +2450,7 @@ bool same_subzone(room_data *a, room_data *b);
 void scale_instance_to_level(struct instance_data *inst, int level);
 void set_instance_fake_loc(struct instance_data *inst, room_data *loc);
 void unlink_instance_entrance(room_data *room, struct instance_data *inst, bool run_cleanup);
+void update_instance_world_size();
 
 // limits.c
 bool can_mount_in_room(char_data *ch, room_data *room);

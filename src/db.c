@@ -102,7 +102,6 @@ void schedule_map_unloads();
 void setup_island_levels();
 void sort_commands();
 void startup_room_reset();
-void update_instance_world_size();
 void verify_daily_quest_cycles();
 void verify_empire_goals();
 void verify_running_events();
