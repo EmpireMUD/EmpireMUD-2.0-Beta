@@ -311,7 +311,7 @@ dg_affect %self% !ATTACK off
 * alert
 if %old_diff% > %difficulty%
   %echo% ... this flame dragon doesn't look so big up close.
-else
+elseif %old_diff% < %difficulty%
   %echo% ~%self% cranes its neck and bellows flames across the sky!
   if %self.room.sun% == light
     %regionecho% %self.room% -5 A massive fan of flames erupts through the air!
@@ -570,7 +570,7 @@ dg_affect %mob% !ATTACK off
 * alert
 if %old_diff% > %difficulty%
   %echo% ... ~%self% doesn't look so big from this distance.
-else
+elseif %old_diff% < %difficulty%
   switch %mob.vnum%
     case 10330
       * Wandering Wyvern

@@ -71,7 +71,7 @@ switch %self.vnum%
     * colossal red dragon
     if %old_diff% > %difficulty%
       %echo% ... &%self%'s on the small side, as colossal dragons go.
-    else
+    elseif %old_diff% < %difficulty%
       %echo% ~%self% opens ^%self% mouth wide...
       %regionecho% %self.room% 10 A colossal roar rattles across the land!
     end
@@ -724,7 +724,7 @@ dg_affect %self% !ATTACK off
 * alert
 if %old_diff% > %difficulty%
   %echo% ... now that you're closer, ~%self% isn't as big as you feared.
-else
+elseif %old_diff% < %difficulty%
   %echo% ~%self% opens its mouth wide...
   %regionecho% %self.room% 10 A gurgling roar shakes the entire landscape!
 end
