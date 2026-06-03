@@ -785,6 +785,12 @@ switch %room.template%
     set dest %instance.nearest_rmt(12851)%
     set mes gleaming flash of imperium
   break
+  case 12897
+  case 12898
+  case 12899
+    set dest %instance.nearest_rmt(12891)%
+    set mes raucously loud flash of light
+  break
 done
 if !%dest%
   %send% %actor% You can't do that right now.
@@ -840,6 +846,13 @@ switch %self.template%
     set check_list 12857 12858 12859
     set mob 12857
     set mes The ground shakes as a fearsome War Machine rolls onto the battlefield, roaring like a furnace!
+  break
+  case 12897
+  case 12898
+  case 12899
+    set check_list 12897
+    set mob 12897
+    set mes The great wall around the forge rises from one end and opens its many-toothed mouth... That's no wall!
   break
   default
     halt
@@ -916,6 +929,10 @@ switch %room.template%
   case 12851
     set room_list 12857 12858 12859
     set mes gleaming flash of imperium
+  break
+  case 12891
+    set room_list 12897 12898 12899
+    set mes tremendous flash of white light
   break
 done
 eval empty %arg% == empty
