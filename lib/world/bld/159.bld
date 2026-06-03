@@ -16,14 +16,14 @@ S
 Sea Barricade~
 A Shoddy Sea Barricade~
 &wXXXX~
-4 0 dkn 0
+3 0 dkn 0
 0 0 0 -1
 E
 barricades shoddy~
    It looks as though someone has used parts from an old shipwreck to create
 massive sea barricades.
 ~
-I 29 5010 100.00 1  # RUINS-TO-BLD: Flooded Ruins
+I 29 15906 100.00 1  # RUINS-TO-BLD: Ruined Sea Barricade
 R
 6000 1 1 0
 R
@@ -98,6 +98,25 @@ Best step carefully.
 R
 6790 12 1 0
 T 15907
+S
+#15906
+Ruined Sea Barricade~
+The Water-Logged Ruins of a Sea Barricade~
+&?~&wX>&?~~
+1 -1 dinxDQ 0
+0 0 0 -1
+B0
+&w>&?~~
+B1
+&w>~
+C
+dismantle~
+E
+ruins ruined barricades water-logged logged~
+   The old barricades have been battered and worn by many a wave and now, they
+protect nothing. What remains of them is mostly floating, unable to block even
+the largest ship.
+~
 S
 #15912
 Crab Pens~

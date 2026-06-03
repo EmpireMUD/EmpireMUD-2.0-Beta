@@ -1385,4 +1385,20 @@ do signlang 46~
 T 12807
 T 12888
 S
+#12897
+serragon echo~
+the Echo Serragon~
+The Echo Serragon is here.
+~
+201 300 dhnyzDJKL cEGU 6
+0 0 0 14 -1 -1
+D
+tbd
+~
+I 4 12916 100.00 1  # LOOT: diminished scale
+T 12822
+T 12821
+T 12823
+T 12820
+S
 $

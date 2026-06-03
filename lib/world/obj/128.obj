@@ -690,6 +690,22 @@ R
 4 5195 0
 T 12845
 S
+#12842
+crate shards eventide 100~
+a crate of 100 eventide shards~
+A crate of eventide shards is stacked here.~
+   This hefty crate is full of eventide shards, the currency of Echo Forge. 
+Open this box for a one-time supply of 100 eventide shards.
+~
+3 e a 0 0 5
+5102 100 0
+0 0
+C
+1 1
+R
+4 5195 0
+T 12845
+S
 #12850
 standards banners flags~
 the camp standard~
@@ -1298,8 +1314,9 @@ A silenced ring of restoration is lying on the ground.~
    The ring is twisted along its full loop, like a spiral, with a midnight
 blue-black finish that reflects precious little light. Along the top, it is
 serrated such that a careless touch might cut into flesh.
-   The ring bears two green gemstones held in place by tiny beads of metal.
-Both gemstones are cut in a trapeze shape and oriented to form a healing sign.
+   The ring bears two green gemstones held in place by gossamer threads of
+light. Both gemstones are cut in a trapeze shape and oriented to form a healing
+sign.
 ~
 2 amo ab 0 0 4
 0 0 0
@@ -1333,8 +1350,8 @@ silenced earrings of restoration~
 Silenced earrings of restoration are lying here.~
    The earrings are each a simple pair of blue-black loops, polished in a way
 that casts a striking reflection in the dark, but never in the light.
-   Tiny green gems hover just below the end of the chains, suspended in the
-air by nothing at all, shimmering as they turn in the light.
+   Tiny green gems dangle just below the end of the loops, fixed in the air by
+the tiniest gossamer threads of light, glinting together even in darkness.
 ~
 2 mo am 0 0 3
 0 0 0
@@ -1368,8 +1385,8 @@ A silenced ring of fortitude is lying on the ground.~
    The ring is twisted along its full loop, like a spiral, with a midnight
 blue-black finish that reflects precious little light. Along the top, it is
 serrated such that a careless touch might cut into flesh.
-   A large step-cut yellow gem, held in place by metal prongs, covers much of
-your finger when wearing the ring.
+   A large step-cut yellow gem, held in place by a web of glowing gossamer
+threads, covers much of your finger when wearing the ring.
 ~
 2 amo ab 0 0 4
 0 0 0
@@ -1403,8 +1420,8 @@ silenced earrings of fortitude~
 Silenced earrings of fortitude are lying here.~
    The earrings are each a simple pair of blue-black loops, polished in a way
 that casts a striking reflection in the dark, but never in the light.
-   Step-cut yellow gems dangle in midair below the metal chains of the
-earrings, occasionally spinning when light shines through them.
+   Step-cut yellow gems hang by glowing gossamer threads in midair below the
+hoops of the earrings, occasionally spinning when light shines through them.
 ~
 2 mo am 0 0 4
 0 0 0
@@ -1440,8 +1457,9 @@ A silenced ring of wrath is lying on the ground.~
    The ring is twisted along its full loop, like a spiral, with a midnight
 blue-black finish that reflects precious little light. Along the top, it is
 serrated such that a careless touch might cut into flesh.
-   A chain of navette-cut red gemstones, arranged tip-to-tip, circles the full
-circumference of the ring.
+   A series of navette-cut red gemstones, arranged tip-to-tip, circles the full
+circumference of the ring, fixed in place by the finest glowing threads of
+gossamer.
 ~
 2 amo ab 0 0 5
 0 0 0
@@ -1475,9 +1493,8 @@ silenced earrings of wrath~
 Silenced earrings of wrath are lying here.~
    The earrings are each a simple pair of blue-black loops, polished in a way
 that casts a striking reflection in the dark, but never in the light.
-   Clusters of tiny red gems swirl in the air around the chains, sometimes
-falling like drops of blood before darting back up to their place below the
-earrings.
+   A trio of tiny red gems hangs from each of the loops, held in place only by
+the faintest gossamer threads.
 ~
 2 mo am 0 0 4
 0 0 0
@@ -1511,8 +1528,8 @@ A silenced ring of arcana is lying on the ground.~
    The ring is twisted along its full loop, like a spiral, with a midnight
 blue-black finish that reflects precious little light. Along the top, it is
 serrated such that a careless touch might cut into flesh.
-   A large radiant-cut blue gem hovers ever so slightly above the ring,
-capturing every stray mote of light.
+   A large radiant-cut blue gem is fixed to the ring by a web of gossamer
+threads, each glowign faintly even in perfect dark.
 ~
 2 amo ab 0 0 5
 0 0 0

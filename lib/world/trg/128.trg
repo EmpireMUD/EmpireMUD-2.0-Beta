@@ -19,7 +19,7 @@ set dest 0
 if !%actor.canuseroom_guest(%room%)%
   %send% %actor% You don't have permission to do that here.
 elseif !%arg%
-  %send% %actor% Donate to which celestial forge? (iron, imperium, ...)
+  %send% %actor% Donate to which celestial forge? (iron, imperium, eventide, ...)
 elseif iron forge /= %arg% || lodestone forge /= %arg%
   set which 12800
   set dest 12810
@@ -30,11 +30,11 @@ elseif imperium forge /= %arg% || victory forge /= %arg%
   set dest 12850
   set curr 5101
   set str an imperium shard
-* elseif eventide forge /= %arg% || echo forge /= %arg%
-*   set which 12802
-*   set dest 12890
-*   set curr 5102
-*   set str an eventide shard
+elseif eventide forge /= %arg% || echo forge /= %arg%
+  set which 12802
+  set dest 12890
+  set curr 5102
+  set str an eventide shard
 else
   %send% %actor% Unknown celestial forge.
 end
@@ -967,11 +967,12 @@ done
 ~
 #12820
 Celestial Forge: Loot once per day per person~
-0 f 100 4
+0 f 100 5
 L b 12817
 L b 12857
 L b 12858
 L b 12859
+L b 12897
 ~
 eval min_level %self.minlevel% - 25
 set room %self.room%
@@ -989,6 +990,11 @@ switch %self.vnum%
     set varname 12857_daily
     set loot a great imperium gear
     set death The War Machine collapses in a heap of broken wood and metal!
+  break
+  case 12897
+    set varname %self.vnum%_daily
+    set loot a diminished scale
+    set death Scales fly from the serragon as it collapses in defeat!
   break
   default
     set varname %self.vnum%_daily
@@ -1171,13 +1177,19 @@ done
 ~
 #12833
 Celestial Forge: Buy mastery item~
-1 n 100 6
+1 n 100 12
+L c 12833
+L c 12872
+L c 12906
 L o 12810
 L o 12811
 L o 12850
 L o 12851
+L o 12890
+L o 12891
 L w 5100
 L w 5101
+L w 5102
 ~
 set actor %self.carried_by%
 if !%actor%
@@ -1195,6 +1207,12 @@ switch %self.vnum%
     set requires 12850
     set grants 12851
     set shard 5101
+    set refund 1000
+  break
+  case 12906
+    set requires 12890
+    set grants 12891
+    set shard 5102
     set refund 1000
   break
   default
@@ -1226,12 +1244,16 @@ end
 ~
 #12834
 Shard companion: Buy shard companion~
-1 n 100 11
+1 n 100 15
 L b 12834
 L b 12844
+L b 12913
 L c 12879
 L c 12880
 L c 12881
+L c 12913
+L c 12914
+L c 12915
 L f 12837
 L w 5100
 L w 5101
@@ -1242,7 +1264,7 @@ L w 5104
 set cost 150
 *
 * list in order from highest to lowest, count=max
-set comp_list 12844 12834
+set comp_list 12844 12834 12913
 set comp_count 2
 *
 * init
@@ -1288,6 +1310,21 @@ switch %self.vnum%
   case 12881
     set tier 2
     set new_vnum 12844
+    set upgrade caster
+  break
+  case 12913
+    set tier 3
+    set new_vnum 12913
+    set upgrade tank
+  break
+  case 12914
+    set tier 3
+    set new_vnum 12913
+    set upgrade dps
+  break
+  case 12915
+    set tier 3
+    set new_vnum 12913
     set upgrade caster
   break
   default
@@ -1379,9 +1416,10 @@ end
 ~
 #12836
 Shard companion: Death trigger~
-0 ft 100 8
+0 ft 100 9
 L b 12834
 L b 12844
+L b 12913
 L w 5100
 L w 5101
 L w 5102
@@ -1408,6 +1446,9 @@ switch %self.vnum%
   case 12844
     set tier 2
   break
+  case 12913
+    set tier 3
+  break
 done
 if %tier%
   * refund shard type
@@ -1430,9 +1471,10 @@ nop %actor.remove_companion(%self.vnum%)%
 ~
 #12837
 Shard companion: Setup and update~
-0 bt 100 8
+0 bt 100 9
 L b 12834
 L b 12844
+L b 12913
 L c 12808
 L w 12834
 L w 12835
@@ -1624,6 +1666,10 @@ switch %self.vnum%
     set metal imperium
     set desc_base The elemental gleams bright white, reflecting every stray beam of light that touches it.
   break
+  case 12913
+    set metal eventide
+    set desc_base The inky eventide surface of the elemental absorbs all light, reflecting only darkness.
+  break
   default
     set metal tin
     set desc_base The elemental looks to be made from old tin.
@@ -1671,12 +1717,13 @@ detach 12837 %self.id%
 ~
 #12838
 Celestial Forge: Set up training dummy with use~
-1 c 6 2
+1 c 6 3
 L b 12838
 L b 12873
+L b 12907
 use~
 * List of dummies to exclude here
-set dummy_list 12838 12873
+set dummy_list 12838 12873 12907
 *
 if %actor.obj_target(%arg.argument1%)% != %self%
   return 0
@@ -2724,5 +2771,51 @@ while %ch%
   end
   set ch %ch.next_in_room%
 done
+~
+#12889
+Echo Forge: Additional room commands~
+2 c 0 7
+L j 12890
+L j 12891
+L j 12892
+L j 12893
+L j 12894
+L j 12895
+L w 12891
+ring unring~
+if %room.template% == 12891
+  if !%arg% || bell /= %arg% || unrang /= %arg%
+    * unrung bell
+    if ring /= %cmd%
+      if %actor.cooldown(12891)%
+        %send% %actor% It's still swinging from the last ring. Wait a while before trying again.
+        halt
+      end
+      nop %actor.command_lag(ABILITY)%
+      %send% %actor% You give the bell a hard strike, which flashes with blinding light!
+      %echoaround% %actor% ~%actor% gives the bell a hard strike, which flashes with blinding light!
+      wait 1
+      %echo% The bell rocks over, gives another tremendous flash of light, and then settles into a gentle, rocking rhythm.
+      %at% i12890 %echo% There's a brilliant flash of light from below the platform.
+      %at% i12892 %echo% The bell flashes brilliantly from the center of Echo Forge.
+      %at% i12893 %echo% The bell flashes brilliantly from the center of Echo Forge.
+      %at% i12894 %echo% The bell flashes brilliantly from the center of Echo Forge.
+      %at% i12895 %echo% The bell flashes brilliantly from the center of Echo Forge.
+      nop %actor.set_cooldown(12891, 180)%
+    elseif unring /= %cmd%
+      nop %actor.command_lag(ABILITY)%
+      %send% %actor% It looks like someone else has already unrung the bell. You can't hear it at all.
+    else
+      * bad command
+      return 0
+    end
+  else
+    * bad arg
+    return 0
+  end
+else
+  * no action for this room
+  return 0
+end
 ~
 $
