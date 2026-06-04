@@ -344,7 +344,7 @@ colossus lodestone stone form shape center~
 the Lodestone Colossus~
 A Lodestone Colossus towers above the field. (difficulty)
 ~
-1 100 dhyzDJKL cEGU 3
+1 100 dhyzDJKL cEGU 6
 0 0 0 14 -1 -1
 D
    The behemoth is formed from hulking blocks of lodestone, cobbled and stacked
@@ -785,7 +785,7 @@ machine war plated heavily-plated fearsome~
 the War Machine~
 A heavily-plated War Machine rolls to the center of the field. (difficulty)
 ~
-101 200 dhnyzDJKL cEGU 3
+101 200 dhnyzDJKL cEGU 6
 0 0 0 30 -1 -1
 D
    It stands in the center of the fog like a forgotten siege engine brought
@@ -839,7 +839,7 @@ machine war fearsome plated heavily-plated~
 the War Machine~
 A fearsome War Machine rolls ever forward.
 ~
-101 200 dhyzDJKL cEGU 3
+101 200 dhyzDJKL cEGU 6
 0 0 0 30 -1 -1
 D
    The fearsome machine has been stripped of some of its best armor, but it
@@ -897,7 +897,7 @@ machine war plated heavily-plated fearsome battered~
 the War Machine~
 A battered War Machine creaks onward.
 ~
-101 200 dhzDJKL cEGU 3
+101 200 dhzDJKL cEGU 6
 0 0 0 30 -1 -1
 D
    Much of its armor now hangs twisted and torn away, exposing the timber

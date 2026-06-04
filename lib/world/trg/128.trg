@@ -753,7 +753,7 @@ nop %self.remove_mob_flag(NO-ATTACK)%
 ~
 #12817
 Celestial Forge: Arena return command~
-2 c 0 9
+2 c 0 13
 L c 9680
 L j 12811
 L j 12817
@@ -763,6 +763,10 @@ L j 12851
 L j 12857
 L j 12858
 L j 12859
+L j 12891
+L j 12897
+L j 12898
+L j 12899
 return~
 if %actor.fighting% || %actor.disabled%
   %send% %actor% You can't do that right now.
@@ -819,17 +823,21 @@ done
 ~
 #12818
 Celetsial Forge: Reset arena and spawn mob~
-2 bw 100 10
+2 bw 100 14
 L b 12817
 L b 12857
 L b 12858
 L b 12859
+L b 12897
 L j 12817
 L j 12818
 L j 12819
 L j 12857
 L j 12858
 L j 12859
+L j 12897
+L j 12898
+L j 12899
 ~
 * setup
 switch %self.template%
@@ -900,7 +908,7 @@ end
 ~
 #12819
 Celestial Forge: Challenge command to enter arena~
-2 c 0 9
+2 c 0 13
 L c 9680
 L j 12811
 L j 12817
@@ -910,6 +918,10 @@ L j 12851
 L j 12857
 L j 12858
 L j 12859
+L j 12891
+L j 12897
+L j 12898
+L j 12899
 challenge~
 * Tries to find an available arena to fight in
 * optional 'empty' arg gets you one with zero players

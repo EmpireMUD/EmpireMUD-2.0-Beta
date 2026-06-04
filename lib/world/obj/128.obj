@@ -694,7 +694,7 @@ S
 crate shards eventide 100~
 a crate of 100 eventide shards~
 A crate of eventide shards is stacked here.~
-   This hefty crate is full of eventide shards, the currency of Echo Forge. 
+   This hefty crate is full of eventide shards, the currency of Echo Forge.
 Open this box for a one-time supply of 100 eventide shards.
 ~
 3 e a 0 0 5
@@ -1287,6 +1287,22 @@ A
 5 1 0
 C
 100 200
+S
+#12884
+pelt manticore fine~
+a fine manticore pelt~
+A fine manticore pelt is stretched out on the ground.~
+   The body of the pelt has rich red fur, dense and unyielding to the touch. 
+It looks as though the quills have been removed.
+~
+3 0 a 0 0 10
+0 0 0
+7 0
+C
+100 100
+O+ 1 6551
+R
+4 5193 a
 S
 #12885
 mote harmony~
