@@ -1744,7 +1744,7 @@ SHOW(show_lost_mobs) {
 		}
 		
 		// found
-		msg_to_char(ch, "%2d. [%5d] %s: %s\r\n", ++count, GET_MOB_VNUM(iter), GET_SHORT_DESC(iter), room_log_identifier(IN_ROOM(iter)));
+		build_page_display(ch, "%2d. [%5d] %s: %s\r\n", ++count, GET_MOB_VNUM(iter), GET_SHORT_DESC(iter), room_log_identifier(IN_ROOM(iter)));
 	}
 	
 	if (!count) {
