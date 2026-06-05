@@ -12,6 +12,7 @@ L w 5100
 L w 5101
 L w 5102
 donate~
+set forge_list Lodestone Forge, Victory Forge, Echo Forge, ...
 set room %self.room%
 set which 0
 set dest 0
@@ -19,24 +20,27 @@ set dest 0
 if !%actor.canuseroom_guest(%room%)%
   %send% %actor% You don't have permission to do that here.
 elseif !%arg%
-  %send% %actor% Donate to which celestial forge? (iron, imperium, eventide, ...)
+  %send% %actor% Donate to which celestial forge? (%forge_list%)
 elseif iron forge /= %arg% || lodestone forge /= %arg%
+  set name Lodestone Forge
   set which 12800
   set dest 12810
   set curr 5100
   set str an iron shard
 elseif imperium forge /= %arg% || victory forge /= %arg%
+  set name Victory Forge
   set which 12801
   set dest 12850
   set curr 5101
   set str an imperium shard
 elseif eventide forge /= %arg% || echo forge /= %arg%
+  set name Echo Forge
   set which 12802
   set dest 12890
   set curr 5102
   set str an eventide shard
 else
-  %send% %actor% Unknown celestial forge.
+  %send% %actor% Unknown celestial forge. (%forge_list%)
 end
 * did we find one?
 if !%which% || !%dest%
@@ -44,7 +48,7 @@ if !%which% || !%dest%
 end
 * validate target
 if %room.contents(%which%)%
-  %send% %actor% There is already a portal to that celestial forge here.
+  %send% %actor% There is already a portal to %name% here.
   halt
 elseif %actor.currency(%curr%)% < 1
   eval curname %%currency.%curr%(1)%%
@@ -61,7 +65,7 @@ end
 set inport %room.contents%
 if %inport.vnum% != %which%
   %send% %actor% Something went wrong.
-  %log% syslog script Trig 12800 failed to open portal.
+  %log% syslog script Trig 12800 failed to open portal to %name%.
   halt
 end
 * charge
