@@ -2931,7 +2931,7 @@ elseif %cmd% == echo
   done
   * under limit?
   if %count% < (%diff% * %diff%)
-    %echo% &&w**** The serragon rears back and shrieks into the darkness... and the darkness echoes back! ****&&0
+    %echo% &&w**** The serragon rears back and shrieks into the darkness... and the darkness echoes back! ****&&0 (hit echo)
     %load% mob 12898 ally
   end
   * short cooldown
