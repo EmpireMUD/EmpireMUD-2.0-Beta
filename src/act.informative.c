@@ -3557,6 +3557,32 @@ ACMD(do_help) {
 }
 
 
+ACMD(do_helpindex) {
+	int iter;
+	
+	if (!help_table) {
+		msg_to_char(ch, "No help available.r\n");
+		return;
+	}
+	
+	build_page_display(ch, "Help file index:");
+	
+	for (iter = 0; iter <= top_of_helpt; ++iter) {
+		if (GET_ACCESS_LEVEL(ch) < help_table[iter].level) {
+			continue;
+		}
+		if (help_table[iter].duplicate && strchr(help_table[iter].keyword, ' ')) {
+			continue;	// skip duplicates unless they're 1 word
+		}
+		
+		// show it
+		build_page_display_col(ch, 5, FALSE, "%s", help_table[iter].keyword);
+	}
+	
+	send_page_display(ch);
+}
+
+
 ACMD(do_helpsearch) {
 	char **words = NULL;
 	int iter, wrd;
@@ -3617,7 +3643,7 @@ ACMD(do_helpsearch) {
 			
 			// FOUND!
 			found = TRUE;
-			build_page_display(ch, " %s", help_table[iter].keyword);
+			build_page_display_col(ch, 3, FALSE, " %s", help_table[iter].keyword);
 		}
 		
 		if (!found) {
