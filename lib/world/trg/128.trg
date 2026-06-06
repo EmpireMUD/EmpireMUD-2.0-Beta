@@ -1773,6 +1773,9 @@ elseif %actor.position% != Standing
 elseif !%actor.canuseroom_guest(%room%)%
   %send% %actor% You don't have permission to set up training dummies here.
   halt
+elseif %room.rmt_flagged(PEACEFUL)%
+  %send% %actor% You can't set up a training dummy here.
+  halt
 end
 * check other dummies
 set ch %room.people%
