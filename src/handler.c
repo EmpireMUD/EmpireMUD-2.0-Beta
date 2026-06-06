@@ -316,13 +316,17 @@ void affect_from_char(char_data *ch, any_vnum type, bool show_msg) {
 * @param any_vnum type Any ATYPE_ const/vnum to match.
 * @param int apply Any APPLY_ const to match.
 * @param bool show_msg If TRUE, will show the wears-off message.
+* @param char_data *caster Optional: If provided, only affects with that caster are removed (NULL to ignore caster).
 */
-void affect_from_char_by_apply(char_data *ch, any_vnum type, int apply, bool show_msg) {
+void affect_from_char_by_apply_and_caster(char_data *ch, any_vnum type, int apply, bool show_msg, char_data *caster) {
 	struct affected_type *aff, *next_aff;
 	bool shown = FALSE, any = FALSE;
 
 	for (aff = ch->affected; aff; aff = next_aff) {
 		next_aff = aff->next;
+		if (caster && aff->cast_by != CAST_BY_ID(caster)) {
+			continue;
+		}
 		if (aff->type == type && aff->location == apply) {
 			if (show_msg && !shown) {
 				show_wear_off_msg(ch, type);
@@ -346,8 +350,9 @@ void affect_from_char_by_apply(char_data *ch, any_vnum type, int apply, bool sho
 * @param any_vnum type Any ATYPE_ const/vnum to match. Use NOTHING to match any atype and only check bitvector.
 * @param bitvector_t bits Any AFF_ bit(s) to match.
 * @param bool show_msg If TRUE, will show the wears-off message.
+* @param char_data *caster Optional: If provided, only affects with that caster are removed (NULL to ignore caster).
 */
-void affect_from_char_by_bitvector(char_data *ch, any_vnum type, bitvector_t bits, bool show_msg) {
+void affect_from_char_by_bitvector_and_caster(char_data *ch, any_vnum type, bitvector_t bits, bool show_msg, char_data *caster) {
 	struct affected_type *aff, *next_aff;
 	bool shown = FALSE, any = FALSE;
 	
@@ -357,6 +362,9 @@ void affect_from_char_by_bitvector(char_data *ch, any_vnum type, bitvector_t bit
 
 	for (aff = ch->affected; aff; aff = next_aff) {
 		next_aff = aff->next;
+		if (caster && aff->cast_by != CAST_BY_ID(caster)) {
+			continue;
+		}
 		if ((type == NOTHING || aff->type == type) && IS_SET(aff->bitvector, bits)) {
 			if (show_msg && !shown) {
 				show_wear_off_msg(ch, type);

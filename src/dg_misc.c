@@ -177,10 +177,10 @@ void do_dg_affect(void *go, struct script_data *sc, trig_data *trig, int script_
 	// removing one type?
 	if (!str_cmp(value_p, "off")) {
 		if (type == APPLY_TYPE) {
-			affect_from_char_by_apply(ch, atype, i, !silent);
+			affect_from_char_by_apply_and_caster(ch, atype, i, !silent, caster);
 		}
 		else {
-			affect_from_char_by_bitvector(ch, atype, BIT(i), !silent);
+			affect_from_char_by_bitvector_and_caster(ch, atype, BIT(i), !silent, caster);
 		}
 		return;
 	}
