@@ -3558,6 +3558,7 @@ ACMD(do_help) {
 
 
 ACMD(do_helpindex) {
+	char temp[MAX_STRING_LENGTH];
 	int iter;
 	
 	if (!help_table) {
@@ -3576,7 +3577,16 @@ ACMD(do_helpindex) {
 		}
 		
 		// show it
-		build_page_display_col(ch, 5, FALSE, "%s", help_table[iter].keyword);
+		if (strchr(help_table[iter].keyword, '$')) {
+			// remove doubled dollarsign
+			strcpy(temp, help_table[iter].keyword);
+			delete_doubledollar(temp);
+			build_page_display_col(ch, 4, FALSE, " %s", temp);
+		}
+		else {
+			// simple
+			build_page_display_col(ch, 4, FALSE, " %s", help_table[iter].keyword);
+		}
 	}
 	
 	send_page_display(ch);
