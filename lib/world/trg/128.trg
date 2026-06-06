@@ -200,8 +200,9 @@ end
 ~
 #12802
 Celestial Forge: Detect player entry, Grant abilities, Start progress~
-2 gA 100 16
+2 gA 100 17
 L c 9684
+L c 12917
 L e 5195
 L i 12800
 L j 12810
@@ -259,6 +260,12 @@ if %actor.skill(6)% >= 76
     if %actor.empire%
       nop %actor.empire.start_progress(12890)%
     end
+  end
+end
+* Movement SFX
+if %room.template% >= 12890 && %room.template% <= 12899
+  if !%actor.inventory(12917)%
+    %load% obj 12917 %actor% inv
   end
 end
 * Track origin
@@ -827,12 +834,13 @@ done
 ~
 #12818
 Celetsial Forge: Reset arena and spawn mob~
-2 bw 100 14
+2 bw 100 15
 L b 12817
 L b 12857
 L b 12858
 L b 12859
 L b 12897
+L c 12918
 L j 12817
 L j 12818
 L j 12819
@@ -864,7 +872,7 @@ switch %self.template%
   case 12899
     set check_list 12897
     set mob 12897
-    set mes The great wall around the forge rises from one end and opens its many-toothed mouth... That's no wall!
+    set mes A long, sustained peal cuts through the silence and the great wall around the forge rises from one end, opening its many-toothed mouth wide... That's no wall!
   break
   default
     halt
@@ -909,11 +917,16 @@ if !%any%
     %echo% &&w%mes%&&0
   end
 end
+* check for object?
+if %mob% == 12897 && !%room.contents(12918)%
+  %load% obj 12918
+end
 ~
 #12819
 Celestial Forge: Challenge command to enter arena~
-2 c 0 13
+2 c 0 14
 L c 9680
+L c 12918
 L j 12811
 L j 12817
 L j 12818
@@ -1027,7 +1040,7 @@ switch %self.vnum%
   case 12897
     set varname %self.vnum%_daily
     set loot a diminished scale
-    set death Scales fly from the serragon as it collapses in defeat!
+    set death Scales fly from the serragon as it collapses in a circle around Echo Forge!
   break
   default
     set varname %self.vnum%_daily
@@ -1067,6 +1080,13 @@ end
 * did we drop it?
 if %any_ok% && %loot%
   %echo% &&w&&Z%loot% falls to the ground as ~%self% is defeated!&&0
+end
+* remove accessory item?
+if %self.vnum% == 12897
+  set obj %room.contents(12918)%
+  if %obj%
+    %purge% %obj%
+  end
 end
 ~
 #12821
@@ -2823,6 +2843,8 @@ L j 12894
 L j 12895
 L w 12891
 ring unring~
+set echo_arenas 12897 12898 12899
+*
 if %room.template% == 12891
   if !%arg% || bell /= %arg% || unrang /= %arg%
     * unrung bell
@@ -2853,9 +2875,186 @@ if %room.template% == 12891
     * bad arg
     return 0
   end
+elseif %echo_arenas% ~= %room.template%
+  if !%arg% || bell /= %arg% || unrang /= %arg%
+    * unrung bell
+    if ring /= %cmd%
+      if %actor.cooldown(12891)%
+        %send% %actor% It's still swinging from the last ring. Wait a while before trying again.
+        halt
+      end
+      nop %actor.command_lag(ABILITY)%
+      %send% %actor% You give the bell a hard strike...
+      %echoaround% %actor% ~%actor% gives the bell a hard strike...
+      wait 1
+      %echo% DONG! DONG! DONG! DONG!
+      nop %actor.set_cooldown(12891, 180)%
+    elseif unring /= %cmd%
+      nop %actor.command_lag(ABILITY)%
+      %send% %actor% You can't figure out how to unring the bell.
+    else
+      * bad command
+      return 0
+    end
+  else
+    * bad arg
+    return 0
+  end
 else
   * no action for this room
   return 0
 end
+~
+#12897
+Echo Serragon combat: Ring the Bell, Epic Screech, Echo of the Serragon~
+0 c 0 4
+L b 12898
+L w 12817
+L w 12821
+L w 12897
+!bell !echo !epic~
+set targ %arg%
+set room %self.room%
+set diff %self.var(diff,1)%
+set cmd %cmd.substr(1)%
+if %actor% != %self% || !%targ% || %targ.id% == %self.id%
+  halt
+elseif %cmd% == echo
+  * Echo of the Serragon (summons echo mob)
+  set ch %room.people%
+  set count 0
+  while %ch%
+    if %ch.vnum% == 12898
+      eval count %count% + 1
+    end
+    set ch %ch.next_in_room%
+  done
+  * under limit?
+  if %count% < (%diff% * %diff%)
+    %echo% &&w**** The serragon rears back and shrieks into the darkness... and the darkness echoes back! ****&&0
+    %load% mob 12898 ally
+  end
+elseif %cmd% == bell
+  * Ring the Bell (group duck)
+  scfight clear duck
+  %echo% &&wThe serragon's tail whips up behind you...&&0
+  if %diff% == 1
+    nop %self.add_mob_flag(NO-ATTACK)%
+  end
+  wait 3 s
+  %echo% &&w**** The serragon's tail is about to strike at the Unrang Bell... take cover! ****&&0 (duck)
+  set cycle 1
+  eval pain 50 * (%diff% * 2 - 1)
+  eval wait 10 - %diff%
+  while %cycle% <= %diff%
+    scfight setup duck all
+    wait %wait% s
+    %echo% &&wThe beast's tail strikes the bell and the tone is deafening!&&0
+    set ch %room.people%
+    while %ch%
+      set next_ch %ch.next_in_room%
+      if %self.is_enemy(%ch%)%
+        if !%ch.var(did_scfduck)%
+          %echo% &&wYour head feels like it's about to explode!&&0
+          dg_affect #12897 %ch% STUNNED on 10
+          %damage% %ch% %pain% direct
+        elseif %ch.is_pc%
+          %send% %ch% &&wYou take cover just in time!&&0
+          if %diff% == 1
+            dg_affect #12821 %ch% TO-HIT 25 20
+          end
+        end
+        if %cycle% < %diff%
+          %send% %ch% &&w**** It looks like it's about to hit the bell again! ****&&0 (duck)
+        end
+      end
+      set ch %next_ch%
+    done
+    scfight clear duck
+    eval cycle %cycle% + 1
+  done
+  wait 8 s
+elseif %cmd% == epic
+  * Epic Screech
+  scfight clear interrupt
+  %echo% &&w**** The serragon lifts its head up to the stars and takes a powerful breath... ****&&0 (interrupt)
+  if %diff% == 1
+    nop %self.add_mob_flag(NO-ATTACK)%
+  end
+  scfight setup interrupt all
+  wait 3 s
+  if %diff% > 2
+    set needed %room.players_present%
+  else
+    set needed 1
+  end
+  if %self.var(count_scfinterrupt,0)% < %needed%
+    %echo% &&w**** If ever there were a time to interrupt the serragon... ****&&0 (interrupt)
+  end
+  wait 3 s
+  if %self.var(count_scfinterrupt,0)% >= %needed%
+    %echo% &&wThe serragon is distracted as the Unrang Bell begins to ring!&&0
+    if %diff% == 1
+      dg_affect #12817 %self% HARD-STUNNED on 5
+    end
+    wait 30 s
+  else
+    %echo% &&wThe serragon's neck frills out as it unleashes its EPIC SCREECH!&&0
+    eval pain 100 * %diff%
+    %aoe% %pain% direct
+  end
+  scfight clear interrupt
+end
+nop %self.remove_mob_flag(NO-ATTACK)%
+~
+#12898
+Echo Forge: Echo of the serragon vicious buff~
+0 b 100 2
+L b 12897
+L w 12898
+~
+set room %self.room%
+set mommy %self.room.people(12897)%
+if !%mommy%
+  %echo% The echo fades into the distance.
+  %purge% %self%
+  halt
+end
+*
+eval stack %self.var(stack,0)% + 1
+remote stack %self.id%
+*
+if %mommy.var(diff,1)% > 2
+  eval stack %stack% * 2
+end
+*
+dg_affect #12898 @%self% %mommy% off
+dg_affect #12898 @%self% %mommy% BONUS-PHYSICAL %stack% 360
+~
+#12899
+Echo Forge: Echo of the serragon easy-kill~
+0 l 90 2
+L b 12897
+L w 12898
+~
+wait 1
+*
+set mommy %self.room.people(12897)%
+if %mommy%
+  dg_affect #12898 @%self% %mommy% off
+end
+*
+%echo% The echo fades into the vast night sky.
+*
+set ch %self.room.people%
+while %ch%
+  set next_ch %ch.next_in_room%
+  if %ch% != %self% && %ch.fighting% == %self% && %mommy%
+    %force% %ch% hit echoserragon
+  end
+  set ch %next_ch%
+done
+*
+%purge% %self%
 ~
 $

@@ -299,4 +299,53 @@ A
 C
 200 300
 S
+#12917
+glint light~
+a glint of light~
+Light is glinting here.~
+There's a momentary flash of light.
+~
+3 0 a 0 0 1
+0 0 0
+0 0
+T 12917
+S
+#12918
+debris ground~
+debris~
+The ground is scattered with debris.~
+Debris is scattered across the ground from the serragon's movements.
+~
+3 0 0 0 0 3
+0 0 0
+1 0
+E
+darkness~
+   Echo Forge seems darker now. With the bell fallen dark and any light on the
+horizon blocked by the great serragon, the stars alone light the arena.
+~
+E
+wall walls~
+   That's no wall! The shifting mass encircling Echo forge is, in reality, a
+tremendous serragon! Even as it moves, it's hard to see, as its serrated scales
+trap all light.
+~
+E
+floor tiles tiled down~
+   Blue-black metal tiles make up the floor of Echo Forge. There's a loud TAP
+sound each time you take a step. Debris from the serragon's movements litters
+the floor.
+~
+E
+out around ne nw se sw northeast southeast northwest southwest north south east west circle~
+   The metal tiles extend to the edge of the circle in all directions, though
+they stop well short of the massive serragon!
+~
+E
+pools water reflecting reflection~
+   Pools of water radiate from the center of Echo Forge to the edges. You can
+watch the serragon's movements in the reflection, as it blocks most of the
+stars.
+~
+S
 $
