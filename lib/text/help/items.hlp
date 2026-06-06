@@ -346,7 +346,7 @@ Furniture is cosmetic and provides no particular game function.
 
 See also: DRAG, WOODWORKING
 #
-FURS "FUR COMPONENT"
+FURS "FUR COMPONENT" "SMALL FURS" "LARGE FURS" "MYTHIC FURS"
 
 Fur (component)
 
@@ -355,7 +355,8 @@ Used for:  sewing
 Fur is a component type primarily used for clothing and mage armor.
 
 small furs: fox, wolverine, bright red, spotted fur
-large:  big cat pelt, wolf, tiger, polar bear fur
+large furs:  big cat pelt, wolf, tiger, polar bear fur
+mythic furs:  explore to find strange and valuable furs
 
 See also: COMPONENT, SEW, SKIN COMMAND
 #
