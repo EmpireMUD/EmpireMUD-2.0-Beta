@@ -2934,6 +2934,8 @@ elseif %cmd% == echo
     %echo% &&w**** The serragon rears back and shrieks into the darkness... and the darkness echoes back! ****&&0
     %load% mob 12898 ally
   end
+  * short cooldown
+  nop %self.set_cooldown(9603,10)%
 elseif %cmd% == bell
   * Ring the Bell (group duck)
   scfight clear duck
@@ -3017,6 +3019,11 @@ set room %self.room%
 set mommy %self.room.people(12897)%
 if !%mommy%
   %echo% The echo fades into the distance.
+  %purge% %self%
+  halt
+elseif !%mommy.fighting%
+  %echo% The echo fades into the distance.
+  dg_affect #12898 @%self% %mommy% off
   %purge% %self%
   halt
 end
