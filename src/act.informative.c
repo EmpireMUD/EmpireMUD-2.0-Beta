@@ -3561,19 +3561,34 @@ ACMD(do_helpindex) {
 	char temp[MAX_STRING_LENGTH];
 	int iter;
 	
+	if (!ch->desc) {
+		// don't bother
+		return;
+	}
+	
 	if (!help_table) {
 		msg_to_char(ch, "No help available.r\n");
 		return;
 	}
 	
-	build_page_display(ch, "Help file index:");
+	skip_spaces(&argument);
+	
+	if (*argument) {
+		build_page_display(ch, "Help file index like '%s':", argument);
+	}
+	else {
+		build_page_display(ch, "Help file index:");
+	}
 	
 	for (iter = 0; iter <= top_of_helpt; ++iter) {
 		if (GET_ACCESS_LEVEL(ch) < help_table[iter].level) {
 			continue;
 		}
-		if (help_table[iter].duplicate && strchr(help_table[iter].keyword, ' ')) {
-			continue;	// skip duplicates unless they're 1 word
+		if (help_table[iter].duplicate && !*argument && (strchr(help_table[iter].keyword, ' ') || strchr(help_table[iter].keyword, '-'))) {
+			continue;	// skip duplicates unless they're 1 word or an argument was given
+		}
+		if (*argument && !multi_isname(argument, help_table[iter].keyword)) {
+			continue;	// doesn't match given argument
 		}
 		
 		// show it

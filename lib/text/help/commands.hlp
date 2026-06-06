@@ -1314,8 +1314,12 @@ See also: COMMANDS, HELPSEARCH, SOCIALS
 HELPINDEX "HELP INDEX"
 
 Usage:  helpindex
+        helpindex <keywords>
 
 This command shows a rather long list of all help files available to you.
+
+If you provide one or more keywords, it looks for help files that have a
+keyword similar to the keywords you provided.
 
 See also: HELP, HELPSEARCH
 #
