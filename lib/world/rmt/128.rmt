@@ -997,6 +997,7 @@ blackened pits and splintered palisades, but no banners fly and no voices
 carry. From here, the hilltop forge looms as a dark silhouette against the
 night sky, its furnaces the only steady lights in the distance. Below it, a low
 fog creeps in from the edges of the field, draping it in a still silence.
+Commands: return
 ~
 aci 0 0 12857
 E
@@ -1047,6 +1048,7 @@ blackened pits and splintered palisades, but no banners fly and no voices
 carry. From here, the hilltop forge looms as a dark silhouette against the
 night sky, its furnaces the only steady lights in the distance. Below it, a low
 fog creeps in from the edges of the field, draping it in a still silence.
+Commands: return
 ~
 aci 0 0 12858
 E
@@ -1097,6 +1099,7 @@ blackened pits and splintered palisades, but no banners fly and no voices
 carry. From here, the hilltop forge looms as a dark silhouette against the
 night sky, its furnaces the only steady lights in the distance. Below it, a low
 fog creeps in from the edges of the field, draping it in a still silence.
+Commands: return
 ~
 aci 0 0 12859
 E
@@ -1145,8 +1148,8 @@ Above Echo Forge~
 night sky. A brick-filled archway stands at one end of the small platform; the
 other side has a twisting metal staircase that leads downward. As you look out,
 you see a massive wall enclosing a circular area below you. Something beneath
-the platform glows bright enough to cast shadows, but you can't see it from
-here. The rest of the circle's interior is dark, but an occasional flash
+the platform glows bright enough to cast inky shadows, but you can't see it
+from here. The rest of the circle's interior is dark, but the occasional flash
 illuminates shadowy figures working at anvils.
 Commands: return
 ~
@@ -1156,12 +1159,12 @@ D9
 0 12891
 E
 floor tiles tiled platform~
-   The platform is made from long tiles of dark gray metal. With each step you
-take, there's a flicker of light around your foot that skitters off into the
-distance until it's too faint to see.
+   The platform is made from long tiles of dark blue-black metal. With each
+step you take, there's a flicker of light around your foot that skitters off
+into the distance until it's too faint to see.
 ~
 E
-up stars sky expanse night~
+up stars starry sky expanse night~
 The stars dance across the endless night sky as the hot air ripples overhead.
 ~
 E
@@ -1175,16 +1178,21 @@ shadows outward in all directions.
 ~
 E
 staircase stairs~
-The spiral staircase has cast metal steps and a matching handrail.
+The spiral staircase is made of cast metal steps and a matching handrail.
+~
+E
+handrail railing~
+A sleek blue-black metal handrail runs down the spiral staircase.
 ~
 E
 metal~
-Everything here is made of metal.
+Everything here is made of a deep blue-black metal.
 ~
 E
 circle area forge~
-   Echo forge is a large, round space with dark metal floors and long pools of
-shallow water. Beyond that, there is only the great, circular wall.
+   Echo forge is a large, round space with shadowy blue-black metal floors and
+long pools of shallow water. Beyond that, there is only the great, circular
+wall.
 ~
 E
 flashes anvils figures~
@@ -1197,7 +1205,7 @@ shadows shadowy~
 long enough to reach the great wall.
 ~
 E
-pools water~
+pools water reflecting reflection~
    Wedge-shaped pools of water radiate out from the center of Echo Forge below,
 reflecting the starry sky in the gentle water.
 ~
@@ -1233,10 +1241,10 @@ Echo Forge~
    Beneath the raised platform is a brilliant white bell, glowing like a star
 such that you can't look at it for long. It floats in the air above a small,
 engraved dais. Near the bell, a twisting staircase leads back up to the
-platform. The floor here is made of large tiles, apparently metal, but there is
-no sound as you step. There's no sound here at all, not even from the artisans
-working the anvils around you. Beyond them, in the distance, is a great, round
-wall too high to see over and too dark to make out from here.
+platform. The floor here is made of large, dark tiles, apparently metal, but
+there is no sound as you step. There's no sound here at all, not even from the
+artisans working the anvils around you. Beyond them, in the distance, is a
+great, round wall too high to see over and too dark to make out from here.
 Commands: challenge
 ~
 cei b 0 12890
@@ -1284,7 +1292,7 @@ flashes at its brightest. A label on the plinth reads, 'The Unrang Bell'.
 ~
 E
 floor tiles tiled down~
-   Dark gray metal tiles make up the floor of Echo Forge. Each time to take a
+   Blue-black metal tiles make up the floor of Echo Forge. Each time to take a
 step, there's a flicker of light around your foot that skitters off into the
 distance until it's too faint to see.
 ~
@@ -1299,7 +1307,7 @@ Metal archways lie at the north, south, east, and west edges of Echo Forge.
 ~
 E
 metal~
-Everything here is made of metal.
+Everything here is made of a deep blue-black metal.
 ~
 E
 artisans~
@@ -1316,7 +1324,7 @@ walls distance~
 the light doesn't seem to reach.
 ~
 E
-pools water stars~
+pools water stars starry reflecting reflection~
    Pools of water radiate from the center of Echo Forge to the edges. You can
 watch the stars dance in the gently rippling water.
 ~
@@ -1337,7 +1345,7 @@ west~
 You see Ixchel working at the forge.
 ~
 E
-out around ne northeast nw northwest se southeast sw southwest~
+out around ne northeast nw northwest se southeast sw southwest circle~
    The metal tiles extend to the edge of the circle in all directions, though
 they stop well short of the great wall.
 ~
@@ -1345,6 +1353,11 @@ E
 serragon creature~
    It's wrapped around the whole of Echo Forge, but you can't really get a look
 at it from here.
+~
+E
+shadows shadowy~
+   Shadows stretch outward from the center of the forge, though none of them is
+long enough to reach the great wall.
 ~
 M 0 12891 100.00 1
 T 12803
@@ -1377,7 +1390,7 @@ brilliantly.
 ~
 E
 floor tiles tiled down~
-   Dark gray metal tiles make up the floor of Echo Forge. Each time to take a
+   Blue-black metal tiles make up the floor of Echo Forge. Each time to take a
 step, there's a flicker of light around your foot that skitters off into the
 distance until it's too faint to see.
 ~
@@ -1389,12 +1402,12 @@ master's works in progress. The air above it ripples up toward the sky, where
 it seems to make the stars dance across the heavens.
 ~
 E
-pools water~
+pools water reflecting reflection~
    Long pools of water run from the center of Echo Forge to the edges. The
 starry night sky ripples and dances in the reflection on the surface.
 ~
 E
-up stars sky expanse night~
+up stars starry sky expanse night~
 The stars dance across the endless night sky as the hot air ripples overhead.
 ~
 E
@@ -1403,7 +1416,7 @@ A tall metal archway guards the west edge of Echo Forge.
 ~
 E
 metal~
-Everything here is made of metal.
+Everything here is made of a deep blue-black metal.
 ~
 E
 walls out north south nw northwest sw southwest~
@@ -1429,6 +1442,11 @@ that it is covered in serrated scales.
 E
 east~
 Kaito is standing near the Unrang Bell.
+~
+E
+shadows shadowy~
+   Shadows stretch outward from the center of the forge, though none of them is
+long enough to reach the great wall.
 ~
 M 0 12892 100.00 1
 T 12803
@@ -1460,11 +1478,11 @@ a hammer strikes the anvil, you see both the hammer and the bell flash
 brilliantly.
 ~
 E
-up stars sky expanse night~
+up stars starry sky expanse night~
 The stars dance across the endless night sky as the hot air ripples overhead.
 ~
 E
-pools water~
+pools water reflecting reflection~
    Long pools of water run from the center of Echo Forge to the edges. The
 starry night sky ripples and dances in the reflection on the surface.
 ~
@@ -1490,13 +1508,13 @@ A tall metal archway guards the east edge of Echo Forge.
 ~
 E
 floor tiles tiled down~
-   Dark gray metal tiles make up the floor of Echo Forge. Each time to take a
+   Blue-black metal tiles make up the floor of Echo Forge. Each time to take a
 step, there's a flicker of light around your foot that skitters off into the
 distance until it's too faint to see.
 ~
 E
 metal~
-Everything here is made of metal.
+Everything here is made of a deep blue-black metal.
 ~
 E
 rim~
@@ -1540,6 +1558,11 @@ E
 blade sword greatsword~
 An unfinished greatsword is resting in the forge at the center of the anvil.
 ~
+E
+shadows shadowy~
+   Shadows stretch outward from the center of the forge, though none of them is
+long enough to reach the great wall.
+~
 M 0 12893 100.00 1
 T 12803
 T 12802
@@ -1571,10 +1594,10 @@ brilliantly.
 ~
 E
 metal~
-Everything here is made of metal.
+Everything here is made of a deep blue-black metal.
 ~
 E
-pools water~
+pools water reflecting reflection~
    Long pools of water run from the center of Echo Forge to the edges. The
 starry night sky ripples and dances in the reflection on the surface.
 ~
@@ -1598,12 +1621,12 @@ heat ripples waves~
 The air ripples and waves over the anvil.
 ~
 E
-up stars sky expanse night~
+up stars starry sky expanse night~
 The stars dance across the endless night sky as the hot air ripples overhead.
 ~
 E
 floor tiles tiled down~
-   Dark gray metal tiles make up the floor of Echo Forge. Each time to take a
+   Blue-black metal tiles make up the floor of Echo Forge. Each time to take a
 step, there's a flicker of light around your foot that skitters off into the
 distance until it's too faint to see.
 ~
@@ -1650,6 +1673,11 @@ flashes ne northeast nw northwest~
    Light flashes across the forge each time one of the smiths strikes the anvil
 with a hammer.
 ~
+E
+shadows shadowy~
+   Shadows stretch outward from the center of the forge, though none of them is
+long enough to reach the great wall.
+~
 M 0 12894 100.00 1
 T 12803
 T 12802
@@ -1678,7 +1706,7 @@ of supplies, though the wall is far enough away the shadows don't seem to reach
 it. Every few moments, the bell flashes brighter.
 ~
 E
-up stars sky expanse night~
+up stars starry sky expanse night~
 The stars dance across the endless night sky as the hot air ripples overhead.
 ~
 E
@@ -1691,11 +1719,11 @@ A tall metal archway guards the north edge of Echo Forge.
 ~
 E
 metal~
-Everything here is made of metal.
+Everything here is made of a deep blue-black metal.
 ~
 E
 floor tiles tiled down~
-   Dark gray metal tiles make up the floor of Echo Forge. Each time to take a
+   Blue-black metal tiles make up the floor of Echo Forge. Each time to take a
 step, there's a flicker of light around your foot that skitters off into the
 distance until it's too faint to see.
 ~
@@ -1704,14 +1732,14 @@ supplies baskets stacks bins collection wood cloth~
 All manner of smithing and crafting supplies are available here.
 ~
 E
-shadow fragmented walls tubes out east west ne northeast nw northwest~
+shadows shadowy fragmented walls tubes out east west ne northeast nw northwest~
    The supplies cast shadows on the great, circular wall, revealing hints to
 its shape. It isn't a single, flat wall. It looks more like enormous tubes
 stacked upon each other. The shadows fragment at the borders of each tube,
 suggesting a serrated edge.
 ~
 E
-pools water~
+pools water reflecting reflection~
    Long pools of water run from the center of Echo Forge to the edges. The
 starry night sky ripples and dances in the reflection on the surface.
 ~
@@ -1748,36 +1776,363 @@ T 12886
 T 12887
 S
 #12897
-Echo Forge Arena~
-tbd
+A Cavernous Battlefield~
+   A low rumble rises in the darkness from the great wall around the forge,
+echoing through your entire body before falling into silence for a moment.
+Your feet tap loudly as you walk along the blue-black metal tiles, but oddly,
+the sound doesn't bounce back off of the wall. Instead, it seems to escape into
+the starry night above.
+Commands: return
 ~
-aci 0 0 12897
+aci 0 hv 12897
+E
+darkness~
+   Echo Forge seems darker now. With the bell fallen dark and any light on the
+horizon blocked by the great wall, the stars alone light the arena.
+~
+E
+wall walls~
+   A tremendous wall encircles Echo Forge, taller than most buildings and, in
+this light, quite difficult to see. Every few moments, the entire wall releases
+a powerful, unsettling rumble that rolls through your very core and makes your
+hair stand on end.
+~
+E
+up stars starry sky expanse night~
+The stars dance across the endless night sky.
+~
+E
+metal~
+Everything here is made of a deep blue-black metal.
+~
+E
+floor tiles tiled down~
+   Blue-black metal tiles make up the floor of Echo Forge. There's a loud TAP
+sound each time you take a step. Long reflecting pools stretch out from the
+center of the area to the edge, but they stop short of the wall.
+~
+E
+forge~
+Echo Forge is all around you.
+~
+E
+battlefield field~
+The entire forge has become a battlefield!
+~
+E
+anvils~
+Large, round anvils with hot forges in their centers dot the area.
+~
+E
+platform~
+A raised platform sits above Echo Forge, but you can't access it right now.
+~
+E
+bell unrang dais~
+   Above a small dais and below the raised platform hovers a silvery argentine
+bell, large enough to hang in a steeple, glinting softly with the reflection of
+the stars.
+   Inscribed on the dais below are the words 'The Unrang Bell'.
+~
+E
+light~
+Most of the light here is coming from the stars dancing overhead.
+~
+E
+stairs staircase~
+   A delicate metal staircase rises toward the platform, but you can't access
+it right now.
+~
+E
+archways~
+Metal archways lie at the north, south, east, and west edges of Echo Forge.
+~
+E
+artisans~
+You didn't see where any of the artisans went, but they're not here.
+~
+E
+Kaito Percy Somsak~
+You don't see him here at the moment.
+~
+E
+Ixchel Saoirse~
+It looks like she left, but you didn't see where she went.
+~
+E
+out around ne nw se sw northeast southeast northwest southwest north south east west circle~
+   The metal tiles extend to the edge of the circle in all directions, though
+they stop well short of the great wall.
+~
+E
+serragon creature~
+   It's wrapped around the whole of Echo Forge, but you can't really get a look
+at it from here.
+~
+E
+pools water reflecting reflection~
+   Pools of water radiate from the center of Echo Forge to the edges. You can
+watch the stars dance in the gently rippling water.
+~
+E
+scales serrations serrated~
+You can't see that from here.
+~
+E
+frill~
+You can't see that from here.
+~
+E
+shadows shadowy~
+It's too dark to see any shadows.
+~
 T 12817
 T 12818
 T 12824
 T 12803
+T 12802
+T 5195
+T 12889
 Z1 1
 S
 #12898
-Echo Forge Arena~
-tbd
+A Cavernous Battlefield~
+   A low rumble rises in the darkness from the great wall around the forge,
+echoing through your entire body before falling into silence for a moment.
+Your feet tap loudly as you walk along the blue-black metal tiles, but oddly,
+the sound doesn't bounce back off of the wall. Instead, it seems to escape into
+the starry night above.
+Commands: return
 ~
-aci 0 0 12898
+aci 0 hv 12898
+E
+darkness~
+   Echo Forge seems darker now. With the bell fallen dark and any light on the
+horizon blocked by the great wall, the stars alone light the arena.
+~
+E
+wall walls~
+   A tremendous wall encircles Echo Forge, taller than most buildings and, in
+this light, quite difficult to see. Every few moments, the entire wall releases
+a powerful, unsettling rumble that rolls through your very core and makes your
+hair stand on end.
+~
+E
+up stars starry sky expanse night~
+The stars dance across the endless night sky.
+~
+E
+metal~
+Everything here is made of a deep blue-black metal.
+~
+E
+floor tiles tiled down~
+   Blue-black metal tiles make up the floor of Echo Forge. There's a loud TAP
+sound each time you take a step. Long reflecting pools stretch out from the
+center of the area to the edge, but they stop short of the wall.
+~
+E
+forge~
+Echo Forge is all around you.
+~
+E
+battlefield field~
+The entire forge has become a battlefield!
+~
+E
+anvils~
+Large, round anvils with hot forges in their centers dot the area.
+~
+E
+platform~
+A raised platform sits above Echo Forge, but you can't access it right now.
+~
+E
+bell unrang dais~
+   Above a small dais and below the raised platform hovers a silvery argentine
+bell, large enough to hang in a steeple, glinting softly with the reflection of
+the stars.
+   Inscribed on the dais below are the words 'The Unrang Bell'.
+~
+E
+light~
+Most of the light here is coming from the stars dancing overhead.
+~
+E
+stairs staircase~
+   A delicate metal staircase rises toward the platform, but you can't access
+it right now.
+~
+E
+archways~
+Metal archways lie at the north, south, east, and west edges of Echo Forge.
+~
+E
+artisans~
+You didn't see where any of the artisans went, but they're not here.
+~
+E
+Kaito Percy Somsak~
+You don't see him here at the moment.
+~
+E
+Ixchel Saoirse~
+It looks like she left, but you didn't see where she went.
+~
+E
+out around ne nw se sw northeast southeast northwest southwest north south east west circle~
+   The metal tiles extend to the edge of the circle in all directions, though
+they stop well short of the great wall.
+~
+E
+serragon creature~
+   It's wrapped around the whole of Echo Forge, but you can't really get a look
+at it from here.
+~
+E
+pools water reflecting reflection~
+   Pools of water radiate from the center of Echo Forge to the edges. You can
+watch the stars dance in the gently rippling water.
+~
+E
+scales serrations serrated~
+You can't see that from here.
+~
+E
+frill~
+You can't see that from here.
+~
+E
+shadows shadowy~
+It's too dark to see any shadows.
+~
 T 12817
 T 12818
 T 12824
 T 12803
+T 12802
+T 5195
+T 12889
 Z1 1
 S
 #12899
-Echo Forge Arena~
-tbd
+A Cavernous Battlefield~
+   A low rumble rises in the darkness from the great wall around the forge,
+echoing through your entire body before falling into silence for a moment.
+Your feet tap loudly as you walk along the blue-black metal tiles, but oddly,
+the sound doesn't bounce back off of the wall. Instead, it seems to escape into
+the starry night above.
+Commands: return
 ~
-aci 0 0 12899
+aci 0 hv 12899
+E
+darkness~
+   Echo Forge seems darker now. With the bell fallen dark and any light on the
+horizon blocked by the great wall, the stars alone light the arena.
+~
+E
+wall walls~
+   A tremendous wall encircles Echo Forge, taller than most buildings and, in
+this light, quite difficult to see. Every few moments, the entire wall releases
+a powerful, unsettling rumble that rolls through your very core and makes your
+hair stand on end.
+~
+E
+up stars starry sky expanse night~
+The stars dance across the endless night sky.
+~
+E
+metal~
+Everything here is made of a deep blue-black metal.
+~
+E
+floor tiles tiled down~
+   Blue-black metal tiles make up the floor of Echo Forge. There's a loud TAP
+sound each time you take a step. Long reflecting pools stretch out from the
+center of the area to the edge, but they stop short of the wall.
+~
+E
+forge~
+Echo Forge is all around you.
+~
+E
+battlefield field~
+The entire forge has become a battlefield!
+~
+E
+anvils~
+Large, round anvils with hot forges in their centers dot the area.
+~
+E
+platform~
+A raised platform sits above Echo Forge, but you can't access it right now.
+~
+E
+bell unrang dais~
+   Above a small dais and below the raised platform hovers a silvery argentine
+bell, large enough to hang in a steeple, glinting softly with the reflection of
+the stars.
+   Inscribed on the dais below are the words 'The Unrang Bell'.
+~
+E
+light~
+Most of the light here is coming from the stars dancing overhead.
+~
+E
+stairs staircase~
+   A delicate metal staircase rises toward the platform, but you can't access
+it right now.
+~
+E
+archways~
+Metal archways lie at the north, south, east, and west edges of Echo Forge.
+~
+E
+artisans~
+You didn't see where any of the artisans went, but they're not here.
+~
+E
+Kaito Percy Somsak~
+You don't see him here at the moment.
+~
+E
+Ixchel Saoirse~
+It looks like she left, but you didn't see where she went.
+~
+E
+out around ne nw se sw northeast southeast northwest southwest north south east west circle~
+   The metal tiles extend to the edge of the circle in all directions, though
+they stop well short of the great wall.
+~
+E
+serragon creature~
+   It's wrapped around the whole of Echo Forge, but you can't really get a look
+at it from here.
+~
+E
+pools water reflecting reflection~
+   Pools of water radiate from the center of Echo Forge to the edges. You can
+watch the stars dance in the gently rippling water.
+~
+E
+scales serrations serrated~
+You can't see that from here.
+~
+E
+frill~
+You can't see that from here.
+~
+E
+shadows shadowy~
+It's too dark to see any shadows.
+~
 T 12817
 T 12818
 T 12824
 T 12803
+T 12802
+T 5195
+T 12889
 Z1 1
 S
 $

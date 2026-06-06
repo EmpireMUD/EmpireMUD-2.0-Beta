@@ -1386,19 +1386,46 @@ T 12807
 T 12888
 S
 #12897
-serragon echo~
+serragon echo beast great echoserragon~
 the Echo Serragon~
-The Echo Serragon is here.
+A great beast coils all the way around the rim of the forge! (difficulty)
 ~
-201 300 dhnyzDJKL cEGU 6
-0 0 0 14 -1 -1
+201 300 dhyzDJKL cEGU 6
+0 0 0 12897 -1 -1
 D
-tbd
+   Though it's hard to see in the darkness, the creature is immense. When it
+moves its head, you can make out frills against the backdrop of stars. As it
+coils around the battlefield, it makes a deeply unsettling grating sound. If
+this thing is a serragon, that horrific sound is surely its serrated scales
+grinding against each other.
 ~
 I 4 12916 100.00 1  # LOOT: diminished scale
+M
+11
+!echo !echo !echo !bell !epic~
 T 12822
 T 12821
 T 12823
 T 12820
+T 9600
+T 9601
+T 9604
+T 9609
+T 12897
+S
+#12898
+echo serragon~
+the echo of the serragon~
+Are your eyes playing tricks on you, or is there another serragon?
+~
+201 300 dhnDJK cEGU 6
+0 0 0 14 -1 -1
+D
+   In this light, it's hard to be sure, but it looks like you're seeing another
+serragon!
+~
+T 12899
+T 12898
+T 12900
 S
 $
