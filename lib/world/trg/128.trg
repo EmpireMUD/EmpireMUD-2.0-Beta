@@ -2569,33 +2569,33 @@ end
 #12885
 Celestial Forge: Silent speech~
 2 c 0 0
-say ' whisper ask shout addict blonde boast brag chant fomo fubar greet love pray swear taunt vigor wtf~
+say ' whisper ask shout addict blonde boast brag chant curse fomo fubar greet love pray swear taunt vigor wtf~
 %send% %actor% You try to speak but no words come out.
 %echoaround% %actor% ~%actor%'s lips move but no sound comes out.
 ~
 #12886
 Celestial Forge: Silent socials~
 2 c 0 0
-cackle chuckle giggle ijbol laugh lmao lol rofl claps applaud clap fart gasp groan hmm hum mmm moan mutter sigh whine bark burp cough disenchant dispel doh growl howl meow moo scream snarl sneer sniff sniffle snore whistle yodel sads cry sob~
+cackle chuckle giggle ijbol laugh lmao lol rofl applaud clap fart gasp groan hiccup hmm hum mmm moan mutter sigh sing whine bark burp cough disenchant dispel doh growl howl meow moo scream shriek snarl sneer sniff sniffle snore whistle yodel cry sob~
 * Replace certain actions
-set laughs cackle chuckle giggle ijbol laugh lmao lol rofl
-set claps applaud clap
-set nothings fart gasp groan hmm hum mmm moan mutter sigh whine
-set faces bark burp cough disenchant dispel doh growl howl meow moo scream snarl sneer sniff sniffle snore whistle yodel
-set sads cry sob
+set laugh_list cackle chuckle giggle ijbol laugh lmao lol rofl
+set clap_list applaud clap
+set nothing_list fart gasp groan hmm hum mmm moan mutter sigh whine
+set face_list bark burp cough disenchant dispel doh growl hiccup howl meow moo scream shriek sing snarl sneer sniff sniffle snore whistle yodel
+set sad_list cry sob
 * messaging
-if %laughs% ~= %cmd%
+if %laugh_list% ~= %cmd%
   %send% %actor% You try, but end up looking like a maniac.
   %echoaround% %actor% ~%actor% opens ^%actor% mouth widely and makes a crazy face.
-elseif %claps% ~= %cmd%
+elseif %clap_list% ~= %cmd%
   %send% %actor% You clap silently.
   %echoaround% %actor% ~%actor% claps silently.
-elseif %nothings% ~= %cmd%
+elseif %nothing_list% ~= %cmd%
   %send% %actor% You try, but nothing comes out.
-elseif %faces% ~= %cmd%
+elseif %face_list% ~= %cmd%
   %send% %actor% You try, but no sound comes out.
   %echoaround% %actor% ~%actor% makes a strange face.
-elseif %sads% ~= %cmd%
+elseif %sad_list% ~= %cmd%
   %send% %actor% You weep quietly.
   %echoaround% %actor% ~%actor% weeps quietly.
 else
@@ -2605,9 +2605,9 @@ end
 #12887
 Celestial Forge: Silent actions~
 2 c 0 0
-beg bonk conjure pinch rite ritual snap summon~
+beg bonk cheer conjure pinch rite ritual snap summon~
 * targeting?
-set need_target beg bonk pinch snap
+set need_target beg bonk pinch
 if %need_target% ~= %cmd%
   if !%arg%
     %send% %actor% &&Z%cmd% whom?&&0
@@ -2634,6 +2634,10 @@ switch %cmd%
     %send% %actor% You bonk ~%target% silently over the head.
     %send% %target% ~%actor% bonks you silently over the head, but it still hurts!
     %echoneither% %actor% %target% ~%actor% bonks ~%target% silently over the head.
+  break
+  case cheer
+    %send% %actor% You cheer silently but exuberantly!
+    %echoaround% %actor% ~%actor cheers silently but exuberantly!
   break
   case pinch
     %send% %actor% You pinch ~%target%!
