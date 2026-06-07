@@ -446,7 +446,7 @@ int CAN_CARRY_N(char_data *ch);	// formerly a macro
 #define CAN_RIDE_WATERWALK_MOUNT(ch)  (has_player_tech((ch), PTECH_RIDING_UPGRADE))
 #define CAN_SEE_IN_MAGIC_DARKNESS(ch)  (IS_NPC(ch) ? (get_approximate_level(ch) > 100) : (PRF_FLAGGED((ch), PRF_HOLYLIGHT) || has_player_tech((ch), PTECH_SEE_IN_MAGIC_DARKNESS)))
 #define CAN_SPEND_BLOOD(ch)  (!AFF_FLAGGED(ch, AFF_CANT_SPEND_BLOOD))
-#define CAST_BY_ID(ch)  (IS_NPC(ch) ? (-1 * GET_MOB_VNUM(ch)) : GET_IDNUM(ch))
+#define CAST_BY_ID(ch)  (char_script_id(ch))
 #define EFFECTIVELY_FLYING_WITHOUT_MOUNT(ch)  (AFF_FLAGGED(ch, AFF_FLYING))
 #define EFFECTIVELY_FLYING(ch)  (IS_RIDING(ch) ? MOUNT_FLAGGED(ch, MOUNT_FLYING) : EFFECTIVELY_FLYING_WITHOUT_MOUNT(ch))
 #define EFFECTIVELY_SWIMMING_WITHOUT_MOUNT(ch)  (EFFECTIVELY_FLYING_WITHOUT_MOUNT(ch) || HAS_WATERWALKING(ch) || (IS_NPC(ch) ? MOB_FLAGGED((ch), MOB_AQUATIC) : has_player_tech((ch), PTECH_SWIMMING)))
