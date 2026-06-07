@@ -3367,6 +3367,12 @@ int damage(char_data *ch, char_data *victim, int dam, int attacktype, byte damty
 	bool full_miss = (dam <= 0);
 	attack_message_data *amd = custom_fight_messages ? custom_fight_messages : real_attack_message(attacktype);
 	
+	if (!amd) {
+		// fixes a crash bug and logs the error
+		syslog(SYS_ERROR, LVL_START_IMM, TRUE, "SYSERR: damage() called with invalid attacktype %d.", attacktype);
+		return 0;
+	}
+	
 	if (GET_POS(victim) <= POS_DEAD) {
 	    /* This is "normal"-ish now with delayed extraction. -gg 3/15/2001 */
 	    if (EXTRACTED(victim) || IS_DEAD(victim)) {
@@ -3467,6 +3473,7 @@ int damage(char_data *ch, char_data *victim, int dam, int attacktype, byte damty
 	 * death blow, send a skill_message if one exists; if not, default to a
 	 * dam_message. Otherwise, always send a dam_message.
 	 */
+
 	if (!ATTACK_FLAGGED(amd, AMDF_WEAPON | AMDF_MOBILE)) {
 		skill_message(dam, ch, victim, attacktype, custom_fight_messages);
 	}

@@ -12,6 +12,7 @@ L w 5100
 L w 5101
 L w 5102
 donate~
+set forge_list Lodestone Forge, Victory Forge, Echo Forge, ...
 set room %self.room%
 set which 0
 set dest 0
@@ -19,24 +20,27 @@ set dest 0
 if !%actor.canuseroom_guest(%room%)%
   %send% %actor% You don't have permission to do that here.
 elseif !%arg%
-  %send% %actor% Donate to which celestial forge? (iron, imperium, ...)
+  %send% %actor% Donate to which celestial forge? (%forge_list%)
 elseif iron forge /= %arg% || lodestone forge /= %arg%
+  set name Lodestone Forge
   set which 12800
   set dest 12810
   set curr 5100
   set str an iron shard
 elseif imperium forge /= %arg% || victory forge /= %arg%
+  set name Victory Forge
   set which 12801
   set dest 12850
   set curr 5101
   set str an imperium shard
-* elseif eventide forge /= %arg% || echo forge /= %arg%
-*   set which 12802
-*   set dest 12890
-*   set curr 5102
-*   set str an eventide shard
+elseif eventide forge /= %arg% || echo forge /= %arg%
+  set name Echo Forge
+  set which 12802
+  set dest 12890
+  set curr 5102
+  set str an eventide shard
 else
-  %send% %actor% Unknown celestial forge.
+  %send% %actor% Unknown celestial forge. (%forge_list%)
 end
 * did we find one?
 if !%which% || !%dest%
@@ -44,7 +48,7 @@ if !%which% || !%dest%
 end
 * validate target
 if %room.contents(%which%)%
-  %send% %actor% There is already a portal to that celestial forge here.
+  %send% %actor% There is already a portal to %name% here.
   halt
 elseif %actor.currency(%curr%)% < 1
   eval curname %%currency.%curr%(1)%%
@@ -61,7 +65,7 @@ end
 set inport %room.contents%
 if %inport.vnum% != %which%
   %send% %actor% Something went wrong.
-  %log% syslog script Trig 12800 failed to open portal.
+  %log% syslog script Trig 12800 failed to open portal to %name%.
   halt
 end
 * charge
@@ -196,8 +200,9 @@ end
 ~
 #12802
 Celestial Forge: Detect player entry, Grant abilities, Start progress~
-2 gA 100 16
+2 gA 100 17
 L c 9684
+L c 12917
 L e 5195
 L i 12800
 L j 12810
@@ -255,6 +260,12 @@ if %actor.skill(6)% >= 76
     if %actor.empire%
       nop %actor.empire.start_progress(12890)%
     end
+  end
+end
+* Movement SFX
+if %room.template% >= 12890 && %room.template% <= 12899
+  if !%actor.inventory(12917)%
+    %load% obj 12917 %actor% inv
   end
 end
 * Track origin
@@ -753,7 +764,7 @@ nop %self.remove_mob_flag(NO-ATTACK)%
 ~
 #12817
 Celestial Forge: Arena return command~
-2 c 0 9
+2 c 0 13
 L c 9680
 L j 12811
 L j 12817
@@ -763,6 +774,10 @@ L j 12851
 L j 12857
 L j 12858
 L j 12859
+L j 12891
+L j 12897
+L j 12898
+L j 12899
 return~
 if %actor.fighting% || %actor.disabled%
   %send% %actor% You can't do that right now.
@@ -819,17 +834,22 @@ done
 ~
 #12818
 Celetsial Forge: Reset arena and spawn mob~
-2 bw 100 10
+2 bw 100 15
 L b 12817
 L b 12857
 L b 12858
 L b 12859
+L b 12897
+L c 12918
 L j 12817
 L j 12818
 L j 12819
 L j 12857
 L j 12858
 L j 12859
+L j 12897
+L j 12898
+L j 12899
 ~
 * setup
 switch %self.template%
@@ -852,7 +872,7 @@ switch %self.template%
   case 12899
     set check_list 12897
     set mob 12897
-    set mes The great wall around the forge rises from one end and opens its many-toothed mouth... That's no wall!
+    set mes A long, sustained peal cuts through the silence and the great wall around the forge rises from one end, opening its many-toothed mouth wide... That's no wall!
   break
   default
     halt
@@ -897,11 +917,16 @@ if !%any%
     %echo% &&w%mes%&&0
   end
 end
+* check for object?
+if %mob% == 12897 && !%room.contents(12918)%
+  %load% obj 12918
+end
 ~
 #12819
 Celestial Forge: Challenge command to enter arena~
-2 c 0 9
+2 c 0 14
 L c 9680
+L c 12918
 L j 12811
 L j 12817
 L j 12818
@@ -910,6 +935,10 @@ L j 12851
 L j 12857
 L j 12858
 L j 12859
+L j 12891
+L j 12897
+L j 12898
+L j 12899
 challenge~
 * Tries to find an available arena to fight in
 * optional 'empty' arg gets you one with zero players
@@ -984,11 +1013,12 @@ done
 ~
 #12820
 Celestial Forge: Loot once per day per person~
-0 f 100 4
+0 f 100 5
 L b 12817
 L b 12857
 L b 12858
 L b 12859
+L b 12897
 ~
 eval min_level %self.minlevel% - 25
 set room %self.room%
@@ -1006,6 +1036,11 @@ switch %self.vnum%
     set varname 12857_daily
     set loot a great imperium gear
     set death The War Machine collapses in a heap of broken wood and metal!
+  break
+  case 12897
+    set varname %self.vnum%_daily
+    set loot a diminished scale
+    set death Scales fly from the serragon as it collapses in a circle around Echo Forge!
   break
   default
     set varname %self.vnum%_daily
@@ -1045,6 +1080,13 @@ end
 * did we drop it?
 if %any_ok% && %loot%
   %echo% &&w&&Z%loot% falls to the ground as ~%self% is defeated!&&0
+end
+* remove accessory item?
+if %self.vnum% == 12897
+  set obj %room.contents(12918)%
+  if %obj%
+    %purge% %obj%
+  end
 end
 ~
 #12821
@@ -1188,13 +1230,19 @@ done
 ~
 #12833
 Celestial Forge: Buy mastery item~
-1 n 100 6
+1 n 100 12
+L c 12833
+L c 12872
+L c 12906
 L o 12810
 L o 12811
 L o 12850
 L o 12851
+L o 12890
+L o 12891
 L w 5100
 L w 5101
+L w 5102
 ~
 set actor %self.carried_by%
 if !%actor%
@@ -1212,6 +1260,12 @@ switch %self.vnum%
     set requires 12850
     set grants 12851
     set shard 5101
+    set refund 1000
+  break
+  case 12906
+    set requires 12890
+    set grants 12891
+    set shard 5102
     set refund 1000
   break
   default
@@ -1243,12 +1297,16 @@ end
 ~
 #12834
 Shard companion: Buy shard companion~
-1 n 100 11
+1 n 100 15
 L b 12834
 L b 12844
+L b 12913
 L c 12879
 L c 12880
 L c 12881
+L c 12913
+L c 12914
+L c 12915
 L f 12837
 L w 5100
 L w 5101
@@ -1259,7 +1317,7 @@ L w 5104
 set cost 150
 *
 * list in order from highest to lowest, count=max
-set comp_list 12844 12834
+set comp_list 12844 12834 12913
 set comp_count 2
 *
 * init
@@ -1305,6 +1363,21 @@ switch %self.vnum%
   case 12881
     set tier 2
     set new_vnum 12844
+    set upgrade caster
+  break
+  case 12913
+    set tier 3
+    set new_vnum 12913
+    set upgrade tank
+  break
+  case 12914
+    set tier 3
+    set new_vnum 12913
+    set upgrade dps
+  break
+  case 12915
+    set tier 3
+    set new_vnum 12913
     set upgrade caster
   break
   default
@@ -1396,9 +1469,10 @@ end
 ~
 #12836
 Shard companion: Death trigger~
-0 ft 100 8
+0 ft 100 9
 L b 12834
 L b 12844
+L b 12913
 L w 5100
 L w 5101
 L w 5102
@@ -1425,6 +1499,9 @@ switch %self.vnum%
   case 12844
     set tier 2
   break
+  case 12913
+    set tier 3
+  break
 done
 if %tier%
   * refund shard type
@@ -1447,9 +1524,10 @@ nop %actor.remove_companion(%self.vnum%)%
 ~
 #12837
 Shard companion: Setup and update~
-0 bt 100 8
+0 bt 100 9
 L b 12834
 L b 12844
+L b 12913
 L c 12808
 L w 12834
 L w 12835
@@ -1641,6 +1719,10 @@ switch %self.vnum%
     set metal imperium
     set desc_base The elemental gleams bright white, reflecting every stray beam of light that touches it.
   break
+  case 12913
+    set metal eventide
+    set desc_base The inky eventide surface of the elemental absorbs all light, reflecting only darkness.
+  break
   default
     set metal tin
     set desc_base The elemental looks to be made from old tin.
@@ -1688,12 +1770,13 @@ detach 12837 %self.id%
 ~
 #12838
 Celestial Forge: Set up training dummy with use~
-1 c 6 2
+1 c 6 3
 L b 12838
 L b 12873
+L b 12907
 use~
 * List of dummies to exclude here
-set dummy_list 12838 12873
+set dummy_list 12838 12873 12907
 *
 if %actor.obj_target(%arg.argument1%)% != %self%
   return 0
@@ -1709,6 +1792,9 @@ elseif %actor.position% != Standing
   halt
 elseif !%actor.canuseroom_guest(%room%)%
   %send% %actor% You don't have permission to set up training dummies here.
+  halt
+elseif %room.rmt_flagged(PEACEFUL)%
+  %send% %actor% You can't set up a training dummy here.
   halt
 end
 * check other dummies
@@ -2506,33 +2592,33 @@ end
 #12885
 Celestial Forge: Silent speech~
 2 c 0 0
-say ' whisper ask shout addict blonde boast brag chant fomo fubar greet love pray swear taunt vigor wtf~
+say ' whisper ask shout addict blonde boast brag chant curse fomo fubar greet love pray swear taunt vigor wtf~
 %send% %actor% You try to speak but no words come out.
 %echoaround% %actor% ~%actor%'s lips move but no sound comes out.
 ~
 #12886
 Celestial Forge: Silent socials~
 2 c 0 0
-cackle chuckle giggle ijbol laugh lmao lol rofl claps applaud clap fart gasp groan hmm hum mmm moan mutter sigh whine bark burp cough disenchant dispel doh growl howl meow moo scream snarl sneer sniff sniffle snore whistle yodel sads cry sob~
+cackle chuckle giggle ijbol laugh lmao lol rofl applaud clap fart gasp groan hiccup hmm hum mmm moan mutter sigh sing whine bark burp cough disenchant dispel doh growl howl meow moo scream shriek snarl sneer sniff sniffle snore whistle yodel cry sob~
 * Replace certain actions
-set laughs cackle chuckle giggle ijbol laugh lmao lol rofl
-set claps applaud clap
-set nothings fart gasp groan hmm hum mmm moan mutter sigh whine
-set faces bark burp cough disenchant dispel doh growl howl meow moo scream snarl sneer sniff sniffle snore whistle yodel
-set sads cry sob
+set laugh_list cackle chuckle giggle ijbol laugh lmao lol rofl
+set clap_list applaud clap
+set nothing_list fart gasp groan hmm hum mmm moan mutter sigh whine
+set face_list bark burp cough disenchant dispel doh growl hiccup howl meow moo scream shriek sing snarl sneer sniff sniffle snore whistle yodel
+set sad_list cry sob
 * messaging
-if %laughs% ~= %cmd%
+if %laugh_list% ~= %cmd%
   %send% %actor% You try, but end up looking like a maniac.
   %echoaround% %actor% ~%actor% opens ^%actor% mouth widely and makes a crazy face.
-elseif %claps% ~= %cmd%
+elseif %clap_list% ~= %cmd%
   %send% %actor% You clap silently.
   %echoaround% %actor% ~%actor% claps silently.
-elseif %nothings% ~= %cmd%
+elseif %nothing_list% ~= %cmd%
   %send% %actor% You try, but nothing comes out.
-elseif %faces% ~= %cmd%
+elseif %face_list% ~= %cmd%
   %send% %actor% You try, but no sound comes out.
   %echoaround% %actor% ~%actor% makes a strange face.
-elseif %sads% ~= %cmd%
+elseif %sad_list% ~= %cmd%
   %send% %actor% You weep quietly.
   %echoaround% %actor% ~%actor% weeps quietly.
 else
@@ -2542,9 +2628,9 @@ end
 #12887
 Celestial Forge: Silent actions~
 2 c 0 0
-beg bonk conjure pinch rite ritual snap summon~
+beg bonk cheer conjure pinch rite ritual snap summon~
 * targeting?
-set need_target beg bonk pinch snap
+set need_target beg bonk pinch
 if %need_target% ~= %cmd%
   if !%arg%
     %send% %actor% &&Z%cmd% whom?&&0
@@ -2571,6 +2657,10 @@ switch %cmd%
     %send% %actor% You bonk ~%target% silently over the head.
     %send% %target% ~%actor% bonks you silently over the head, but it still hurts!
     %echoneither% %actor% %target% ~%actor% bonks ~%target% silently over the head.
+  break
+  case cheer
+    %send% %actor% You cheer silently but exuberantly!
+    %echoaround% %actor% ~%actor cheers silently but exuberantly!
   break
   case pinch
     %send% %actor% You pinch ~%target%!
@@ -2741,5 +2831,238 @@ while %ch%
   end
   set ch %ch.next_in_room%
 done
+~
+#12889
+Echo Forge: Additional room commands~
+2 c 0 7
+L j 12890
+L j 12891
+L j 12892
+L j 12893
+L j 12894
+L j 12895
+L w 12891
+ring unring~
+set echo_arenas 12897 12898 12899
+*
+if %room.template% == 12891
+  if !%arg% || bell /= %arg% || unrang /= %arg%
+    * unrung bell
+    if ring /= %cmd%
+      if %actor.cooldown(12891)%
+        %send% %actor% It's still swinging from the last ring. Wait a while before trying again.
+        halt
+      end
+      nop %actor.command_lag(ABILITY)%
+      %send% %actor% You give the bell a hard strike, which flashes with blinding light!
+      %echoaround% %actor% ~%actor% gives the bell a hard strike, which flashes with blinding light!
+      wait 1
+      %echo% The bell rocks over, gives another tremendous flash of light, and then settles into a gentle, rocking rhythm.
+      %at% i12890 %echo% There's a brilliant flash of light from below the platform.
+      %at% i12892 %echo% The bell flashes brilliantly from the center of Echo Forge.
+      %at% i12893 %echo% The bell flashes brilliantly from the center of Echo Forge.
+      %at% i12894 %echo% The bell flashes brilliantly from the center of Echo Forge.
+      %at% i12895 %echo% The bell flashes brilliantly from the center of Echo Forge.
+      nop %actor.set_cooldown(12891, 180)%
+    elseif unring /= %cmd%
+      nop %actor.command_lag(ABILITY)%
+      %send% %actor% It looks like someone else has already unrung the bell. You can't hear it at all.
+    else
+      * bad command
+      return 0
+    end
+  else
+    * bad arg
+    return 0
+  end
+elseif %echo_arenas% ~= %room.template%
+  if !%arg% || bell /= %arg% || unrang /= %arg%
+    * unrung bell
+    if ring /= %cmd%
+      if %actor.cooldown(12891)%
+        %send% %actor% It's still swinging from the last ring. Wait a while before trying again.
+        halt
+      end
+      nop %actor.command_lag(ABILITY)%
+      %send% %actor% You give the bell a hard strike...
+      %echoaround% %actor% ~%actor% gives the bell a hard strike...
+      wait 1
+      %echo% DONG! DONG! DONG! DONG!
+      nop %actor.set_cooldown(12891, 180)%
+    elseif unring /= %cmd%
+      nop %actor.command_lag(ABILITY)%
+      %send% %actor% You can't figure out how to unring the bell.
+    else
+      * bad command
+      return 0
+    end
+  else
+    * bad arg
+    return 0
+  end
+else
+  * no action for this room
+  return 0
+end
+~
+#12897
+Echo Serragon combat: Ring the Bell, Epic Screech, Echo of the Serragon~
+0 c 0 5
+L b 12898
+L w 9603
+L w 12817
+L w 12821
+L w 12897
+!bell !echo !epic~
+set targ %arg%
+set room %self.room%
+set diff %self.var(diff,1)%
+set cmd %cmd.substr(1)%
+if %actor% != %self% || !%targ% || %targ.id% == %self.id%
+  halt
+elseif %cmd% == echo
+  * Echo of the Serragon (summons echo mob)
+  set ch %room.people%
+  set count 0
+  while %ch%
+    if %ch.vnum% == 12898
+      eval count %count% + 1
+    end
+    set ch %ch.next_in_room%
+  done
+  * under limit?
+  if %count% < (%diff% * %diff%)
+    %echo% &&w**** The serragon rears back and shrieks into the darkness... and the darkness echoes back! ****&&0 (hit echo)
+    %load% mob 12898 ally
+  end
+  * short cooldown
+  nop %self.set_cooldown(9603,10)%
+elseif %cmd% == bell
+  * Ring the Bell (group duck)
+  scfight clear duck
+  %echo% &&wThe serragon's tail whips up behind you...&&0
+  if %diff% == 1
+    nop %self.add_mob_flag(NO-ATTACK)%
+  end
+  wait 3 s
+  %echo% &&w**** The serragon's tail is about to strike at the Unrang Bell... take cover! ****&&0 (duck)
+  set cycle 1
+  eval pain 50 * (%diff% * 2 - 1)
+  eval wait 10 - %diff%
+  while %cycle% <= %diff%
+    scfight setup duck all
+    wait %wait% s
+    %echo% &&wThe beast's tail strikes the bell and the tone is deafening!&&0
+    set ch %room.people%
+    while %ch%
+      set next_ch %ch.next_in_room%
+      if %self.is_enemy(%ch%)%
+        if !%ch.var(did_scfduck)%
+          %echo% &&wYour head feels like it's about to explode!&&0
+          dg_affect #12897 %ch% STUNNED on 10
+          %damage% %ch% %pain% direct
+        elseif %ch.is_pc%
+          %send% %ch% &&wYou take cover just in time!&&0
+          if %diff% == 1
+            dg_affect #12821 %ch% TO-HIT 25 20
+          end
+        end
+        if %cycle% < %diff%
+          %send% %ch% &&w**** It looks like it's about to hit the bell again! ****&&0 (duck)
+        end
+      end
+      set ch %next_ch%
+    done
+    scfight clear duck
+    eval cycle %cycle% + 1
+  done
+  wait 8 s
+elseif %cmd% == epic
+  * Epic Screech
+  scfight clear interrupt
+  %echo% &&w**** The serragon lifts its head up to the stars and takes a powerful breath... ****&&0 (interrupt)
+  if %diff% == 1
+    nop %self.add_mob_flag(NO-ATTACK)%
+  end
+  scfight setup interrupt all
+  wait 3 s
+  if %diff% > 2
+    set needed %room.players_present%
+  else
+    set needed 1
+  end
+  if %self.var(count_scfinterrupt,0)% < %needed%
+    %echo% &&w**** If ever there were a time to interrupt the serragon... ****&&0 (interrupt)
+  end
+  wait 3 s
+  if %self.var(count_scfinterrupt,0)% >= %needed%
+    %echo% &&wThe serragon is distracted as the Unrang Bell begins to ring!&&0
+    if %diff% == 1
+      dg_affect #12817 %self% HARD-STUNNED on 5
+    end
+    wait 30 s
+  else
+    %echo% &&wThe serragon's neck frills out as it unleashes its EPIC SCREECH!&&0
+    eval pain 100 * %diff%
+    %aoe% %pain% direct
+  end
+  scfight clear interrupt
+end
+nop %self.remove_mob_flag(NO-ATTACK)%
+~
+#12898
+Echo Forge: Echo of the serragon vicious buff~
+0 b 100 2
+L b 12897
+L w 12898
+~
+set room %self.room%
+set mommy %self.room.people(12897)%
+if !%mommy%
+  %echo% The echo fades into the distance.
+  %purge% %self%
+  halt
+elseif !%mommy.fighting%
+  %echo% The echo fades into the distance.
+  dg_affect #12898 @%self% %mommy% off
+  %purge% %self%
+  halt
+end
+*
+eval stack %self.var(stack,0)% + 1
+remote stack %self.id%
+*
+if %mommy.var(diff,1)% > 2
+  eval stack %stack% * 2
+end
+*
+dg_affect #12898 @%self% %mommy% off
+dg_affect #12898 @%self% %mommy% BONUS-PHYSICAL %stack% 360
+~
+#12899
+Echo Forge: Echo of the serragon easy-kill~
+0 l 90 2
+L b 12897
+L w 12898
+~
+wait 1
+*
+set mommy %self.room.people(12897)%
+if %mommy%
+  dg_affect #12898 @%self% %mommy% off
+end
+*
+%echo% The echo fades into the vast night sky.
+*
+set ch %self.room.people%
+while %ch%
+  set next_ch %ch.next_in_room%
+  if %ch% != %self% && %ch.fighting% == %self% && %mommy%
+    %force% %ch% hit echoserragon
+  end
+  set ch %next_ch%
+done
+*
+%purge% %self%
 ~
 $

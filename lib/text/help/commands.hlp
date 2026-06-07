@@ -1311,6 +1311,18 @@ Immortals may view mortal help files with: help -m <topic>
 
 See also: COMMANDS, HELPSEARCH, SOCIALS
 #
+HELPINDEX "HELP INDEX"
+
+Usage:  helpindex
+        helpindex <keywords>
+
+This command shows a rather long list of all help files available to you.
+
+If you provide one or more keywords, it looks for help files that have a
+keyword similar to the keywords you provided.
+
+See also: HELP, HELPSEARCH
+#
 HELPSEARCH "HELP SEARCH" "SEARCH HELP"
 
 Usage:  helpsearch <term(s)>
@@ -1319,7 +1331,7 @@ This command lets you search the body of help files, instead of just their
 keywords. You can search for multiple words at a time. If a single search
 term has multiple word, put it "in quotes".
 
-See also: HELP
+See also: HELP, HELPINDEX
 #
 HIDE-KEEP "TOGGLE HIDE-KEEP" "HIDE KEEP"
 

@@ -344,7 +344,7 @@ colossus lodestone stone form shape center~
 the Lodestone Colossus~
 A Lodestone Colossus towers above the field. (difficulty)
 ~
-1 100 dhyzDJKL cEGU 3
+1 100 dhyzDJKL cEGU 6
 0 0 0 14 -1 -1
 D
    The behemoth is formed from hulking blocks of lodestone, cobbled and stacked
@@ -785,7 +785,7 @@ machine war plated heavily-plated fearsome~
 the War Machine~
 A heavily-plated War Machine rolls to the center of the field. (difficulty)
 ~
-101 200 dhnyzDJKL cEGU 3
+101 200 dhnyzDJKL cEGU 6
 0 0 0 30 -1 -1
 D
    It stands in the center of the fog like a forgotten siege engine brought
@@ -839,7 +839,7 @@ machine war fearsome plated heavily-plated~
 the War Machine~
 A fearsome War Machine rolls ever forward.
 ~
-101 200 dhyzDJKL cEGU 3
+101 200 dhyzDJKL cEGU 6
 0 0 0 30 -1 -1
 D
    The fearsome machine has been stripped of some of its best armor, but it
@@ -897,7 +897,7 @@ machine war plated heavily-plated fearsome battered~
 the War Machine~
 A battered War Machine creaks onward.
 ~
-101 200 dhzDJKL cEGU 3
+101 200 dhzDJKL cEGU 6
 0 0 0 30 -1 -1
 D
    Much of its armor now hangs twisted and torn away, exposing the timber
@@ -1384,5 +1384,72 @@ M
 do signlang 46~
 T 12807
 T 12888
+S
+#12897
+serragon echo beast great echoserragon~
+the Echo Serragon~
+A great beast coils all the way around the rim of the forge! (difficulty)
+~
+201 300 dhyzDJKL cEGU 6
+0 0 0 12897 -1 -1
+D
+   Though it's hard to see in the darkness, the creature is immense. When it
+moves its head, you can make out frills against the backdrop of stars. As it
+coils around the battlefield, it makes a deeply unsettling grating sound. If
+this thing is a serragon, that horrific sound is surely its serrated scales
+grinding against each other.
+~
+I 4 12916 100.00 1  # LOOT: diminished scale
+M
+11
+!echo !echo !echo !bell !epic~
+M
+0
+$n shakes its head back and forth.~
+M
+0
+$n turns its head slowly.~
+M
+0
+$n turns the side of its head to you.~
+M
+0
+$n slowly blinks its huge, milky white eye.~
+M
+0
+There's a gnashing sound as $n shifts its entire mass.~
+M
+0
+$n prods at parts of the arena with its tapering tail.~
+M
+0
+There's a loud, dull DONG as $n's tail bumps the bell.~
+M
+0
+$n taps at the bell with the tip of its tail, giving a loud but brief DONG-DONG-DONG.~
+T 12822
+T 12821
+T 12823
+T 12820
+T 9600
+T 9601
+T 9604
+T 9609
+T 12897
+S
+#12898
+echo serragon~
+the echo of the serragon~
+Are your eyes playing tricks on you, or is there another serragon?
+~
+201 300 dhnDJK cEGU 6
+0 0 0 14 -1 -1
+D
+   In this light, it's hard to be sure, but it looks like you're seeing another
+serragon!
+~
+T 12899
+T 12898
+T 12900
 S
 $

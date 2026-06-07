@@ -580,7 +580,7 @@ else
   switch %last.vnum%
     case 10105
       * Berk
-      say Looks like scrimshaw's on the menu tonight.
+      %force% %last% say Looks like scrimshaw's on the menu tonight.
     break
     case 10106
       * Jorr
@@ -588,7 +588,7 @@ else
     break
     case 10107
       * Tranc
-      say Here, piggy, piggy...
+      %force% %last% say Here, piggy, piggy...
     break
   done
 end

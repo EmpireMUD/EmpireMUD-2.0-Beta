@@ -499,7 +499,7 @@ elseif %actor.obj_target_inv(%arg%)% != %self%
   * possibly trying to study something else
   return 0
   halt
-elseif !%item.is_flagged(HARD-DROP)% && !%item.is_flagged(GROUP-DROP)%
+elseif !%self.is_flagged(HARD-DROP)% && !%self.is_flagged(GROUP-DROP)%
   * Normal
   %send% %actor% @%self% is too damaged to learn anything of use.
   halt

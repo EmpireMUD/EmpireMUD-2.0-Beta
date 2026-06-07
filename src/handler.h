@@ -72,8 +72,10 @@
 
 // affect handlers
 void affect_from_char(char_data *ch, any_vnum type, bool show_msg);
-void affect_from_char_by_apply(char_data *ch, any_vnum type, int apply, bool show_msg);
-void affect_from_char_by_bitvector(char_data *ch, any_vnum type, bitvector_t bits, bool show_msg);
+void affect_from_char_by_apply_and_caster(char_data *ch, any_vnum type, int apply, char_data *caster, bool show_msg);
+#define affect_from_char_by_apply(ch, type, apply, show_msg)  affect_from_char_by_apply_and_caster((ch), (type), (apply), NULL, (show_msg))
+void affect_from_char_by_bitvector_and_caster(char_data *ch, any_vnum type, bitvector_t bits, char_data *caster, bool show_msg);
+#define affect_from_char_by_bitvector(ch, type, bits, show_msg)  affect_from_char_by_bitvector_and_caster((ch), (type), (bits), NULL, (show_msg))
 void affect_from_char_by_caster(char_data *ch, any_vnum type, char_data *caster, bool show_msg);
 void affects_from_char_by_aff_flag(char_data *ch, bitvector_t aff_flag, bool show_msg);
 void affect_from_room(room_data *room, any_vnum type);

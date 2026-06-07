@@ -4770,6 +4770,17 @@ void b5_203_adventure_update(void) {
 }
 
 
+// b5.204 adds a celestial forge
+void b5_204_celestial_forge(void) {
+	adv_vnum list[] = {
+		12800,	// [12800] Celestial Forge
+		NOTHING
+	};
+	
+	update_replace_instances(list);
+}
+
+
 // ADD HERE, above: more beta 5 update functions
 
 
@@ -4893,6 +4904,7 @@ const struct {
 	{ "b5.201", b5_201_starsmith, NULL, "Updating Celestial Forges with new artisan" },
 	{ "b5.202", b5_202_celestial_forge, NULL, "De-spawning and re-spawning the Celestial Forge to add new content" },
 	{ "b5.203", b5_203_adventure_update, NULL, "De-spawning and re-spawning updated adventures" },
+	{ "b5.204", b5_204_celestial_forge, NULL, "Re-spawning Celestial Forge" },
 	
 	// ADD HERE, above: more beta 5 update lines
 	

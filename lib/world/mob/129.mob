@@ -1,3 +1,22 @@
+#12907
+dummy training shadowy eventide tide~
+a shadowy eventide dummy~
+A shadowy eventide training dummy has been set up here.
+~
+200 300 bdhnyDJK 0 3
+0 0 0 15 -1 -1
+D
+   The inky blue suit of armor almost disappears in low light, fading into the
+shadows so masterfully that even its weighted wooden stand is barely visible.
+It has been reinforced so that it can take blow after blow with barely a
+teeter. And through all this, it never strikes back.
+~
+M
+13
+This training dummy will not attack back.~
+T 12839
+T 12840
+S
 #12911
 peal resonant ancient~
 the resonant peal~
@@ -13,5 +32,19 @@ reverberating peal of a bell long ago rung.
 M
 15
 An ancient peal resonantes through the water.~
+T 12911
+S
+#12913
+elemental eventide~
+an eventide elemental~
+An eventide elemental is here.
+~
+1 325 dhoGK cGL 3
+0 0 94 6 -1 -1
+D
+The elmental is assembling itself from leaves of blue-black eventide.
+~
+T 12836
+T 12835
 S
 $
