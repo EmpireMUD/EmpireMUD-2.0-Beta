@@ -316,7 +316,7 @@ debris~
 The ground is scattered with debris.~
 Debris is scattered across the ground from the serragon's movements.
 ~
-3 0 0 0 0 3
+3 0 0 0 0 4
 0 0 0
 1 0
 E
@@ -346,6 +346,12 @@ pools water reflecting reflection~
    Pools of water radiate from the center of Echo Forge to the edges. You can
 watch the serragon's movements in the reflection, as it blocks most of the
 stars.
+~
+E
+tail~
+   The serragon's long tail tapers to a fine point. The tail sweeps back and
+forth across Echo Forge, tapping at the ground, the arches, and occasionally
+even the red-hot forges.
 ~
 S
 $

@@ -1844,7 +1844,7 @@ battlefield field~
 The entire forge has become a battlefield!
 ~
 E
-anvils~
+anvils forges fires red-hot redhot~
 Large, round anvils with hot forges in their centers dot the area.
 ~
 E
@@ -1909,6 +1909,10 @@ You can't see that from here.
 E
 shadows shadowy~
 It's too dark to see any shadows.
+~
+E
+tail~
+As the wall shifts to the side, you think you see part of it flick like a tail.
 ~
 T 12817
 T 12818
@@ -1964,7 +1968,7 @@ battlefield field~
 The entire forge has become a battlefield!
 ~
 E
-anvils~
+anvils forges fires red-hot redhot~
 Large, round anvils with hot forges in their centers dot the area.
 ~
 E
@@ -2029,6 +2033,10 @@ You can't see that from here.
 E
 shadows shadowy~
 It's too dark to see any shadows.
+~
+E
+tail~
+As the wall shifts to the side, you think you see part of it flick like a tail.
 ~
 T 12817
 T 12818
@@ -2084,7 +2092,7 @@ battlefield field~
 The entire forge has become a battlefield!
 ~
 E
-anvils~
+anvils forges fires red-hot redhot~
 Large, round anvils with hot forges in their centers dot the area.
 ~
 E
@@ -2149,6 +2157,10 @@ You can't see that from here.
 E
 shadows shadowy~
 It's too dark to see any shadows.
+~
+E
+tail~
+As the wall shifts to the side, you think you see part of it flick like a tail.
 ~
 T 12817
 T 12818
