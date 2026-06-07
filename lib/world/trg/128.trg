@@ -2907,8 +2907,9 @@ end
 ~
 #12897
 Echo Serragon combat: Ring the Bell, Epic Screech, Echo of the Serragon~
-0 c 0 4
+0 c 0 5
 L b 12898
+L w 9603
 L w 12817
 L w 12821
 L w 12897

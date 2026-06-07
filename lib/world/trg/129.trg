@@ -10,6 +10,29 @@ if %mommy%
 end
 return 0
 ~
+#12911
+Echo Forge: Resonant peal minipet~
+0 int 100 7
+L j 12890
+L j 12891
+L j 12892
+L j 12893
+L j 12894
+L j 12895
+L s 12911
+~
+if %self.room.template% >= 12890 && %self.room.template% <= 12895
+  * activate
+  if %self.morph% != 12911
+    %morph% %self% 12911
+  end
+else
+  * deactivate
+  if %self.morph% == 12911
+    %morph% %self% normal
+  end
+end
+~
 #12917
 Echo Forge: Entry helper~
 1 n 100 9
