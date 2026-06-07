@@ -3036,7 +3036,7 @@ if %mommy.var(diff,1)% > 2
   eval stack %stack% * 2
 end
 *
-* dg_affect #12898 @%self% %mommy% off
+dg_affect #12898 @%self% %mommy% off
 dg_affect #12898 @%self% %mommy% BONUS-PHYSICAL %stack% 360
 ~
 #12899
