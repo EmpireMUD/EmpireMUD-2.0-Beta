@@ -1229,6 +1229,10 @@ light~
    Light dances across the forge each time you take a step and flashes out each
 time a hammer strikes.
 ~
+E
+footprints footsteps~
+Each step on the metal floor leaves a glowing footprint, if only briefly.
+~
 T 12803
 T 12802
 T 12801
@@ -1359,6 +1363,10 @@ shadows shadowy~
    Shadows stretch outward from the center of the forge, though none of them is
 long enough to reach the great wall.
 ~
+E
+footprints footsteps~
+Each step on the metal floor leaves a glowing footprint, if only briefly.
+~
 M 0 12891 100.00 1
 T 12803
 T 12802
@@ -1447,6 +1455,10 @@ E
 shadows shadowy~
    Shadows stretch outward from the center of the forge, though none of them is
 long enough to reach the great wall.
+~
+E
+footprints footsteps~
+Each step on the metal floor leaves a glowing footprint, if only briefly.
 ~
 M 0 12892 100.00 1
 T 12803
@@ -1563,6 +1575,10 @@ shadows shadowy~
    Shadows stretch outward from the center of the forge, though none of them is
 long enough to reach the great wall.
 ~
+E
+footprints footsteps~
+Each step on the metal floor leaves a glowing footprint, if only briefly.
+~
 M 0 12893 100.00 1
 T 12803
 T 12802
@@ -1678,6 +1694,10 @@ shadows shadowy~
    Shadows stretch outward from the center of the forge, though none of them is
 long enough to reach the great wall.
 ~
+E
+footprints footsteps~
+Each step on the metal floor leaves a glowing footprint, if only briefly.
+~
 M 0 12894 100.00 1
 T 12803
 T 12802
@@ -1766,6 +1786,10 @@ that it is covered in serrated scales.
 E
 serragon creature~
 You can't really get a look at it from here.
+~
+E
+footprints footsteps~
+Each step on the metal floor leaves a glowing footprint, if only briefly.
 ~
 M 0 12895 100.00 1
 T 12803
