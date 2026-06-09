@@ -695,6 +695,7 @@ When using field - The variable returns:
 &cinstance.set_location(room)&0 - Changes the map location of the instance, for
    example if the adventure appears to move.
 &cinstance.start&0 - The entry room of the instance, if any.
+&c_map.reverse(dir)&0 - Gets the reverse of a direction (east-west, etc).
 &clanguage.name(vnum|short)&0 - Gets the full name of a language (Low Goblish).
 &clanguage.short(vnum|name)&0 - Gets the short name of a language (low-goblish).
 &clanguage.vnum(short|name)&0 - Gets the vnum of a language by name.
