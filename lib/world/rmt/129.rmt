@@ -45,6 +45,7 @@ T 12803
 T 12802
 T 12801
 T 12920
+T 12921
 S
 #12921
 Terminus Forge~
@@ -111,10 +112,12 @@ E
 west east south northwest northeast southwest southeast nw ne sw se~
 tbd
 ~
+M 0 12921 100.00 1
 T 12803
 T 12802
 T 12819
 T 12920
+T 12921
 S
 #12922
 Terminus Forge~
@@ -184,11 +187,17 @@ E
 anvil~
 tbd
 ~
+E
+north south east west northeast nw northwest nw southeast se southwest sw~
+tbd
+~
+M 0 12922 100.00 1
 T 12803
 T 12802
 T 12819
 T 12920
 T 5195
+T 12921
 S
 #12923
 Terminus Forge~
@@ -247,11 +256,13 @@ E
 metal poles~
 tbd
 ~
+M 0 12923 100.00 1
 T 12803
 T 12802
 T 12819
 T 12920
 T 5195
+T 12921
 S
 #12924
 Terminus Forge~
@@ -294,6 +305,11 @@ E
 craggy stone rock meteorite peak~
 tbd
 ~
+E
+north south east west northeast nw northwest nw southeast se southwest sw~
+tbd
+~
+M 0 12924 100.00 1
 T 12803
 T 12802
 T 12819
@@ -351,6 +367,15 @@ E
 comet fiery fire~
 tbd
 ~
+E
+north south east west northeast nw northwest nw southeast se southwest sw~
+tbd
+~
+E
+out~
+tbd
+~
+M 0 12925 100.00 1
 T 12803
 T 12802
 T 12819
@@ -361,6 +386,7 @@ Beneath a Mighty Rock~
 massive, black rock. The walls here are glassy stone, carefully carved to
 create space to mine the underside of the rock. Portal scars mar the walls and
 floor from years of use.
+Commands: return
 ~
 cei 0 0 12920
 D8

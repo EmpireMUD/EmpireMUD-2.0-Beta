@@ -95,8 +95,9 @@ end
 ~
 #12920
 Celestial Forge: Terminus portal movement replacer~
-2 q 100 8
+2 q 100 9
 L c 9680
+L c 12919
 L j 12920
 L j 12921
 L j 12922
@@ -183,5 +184,63 @@ while %ch%
   set ch %next_ch%
 done
 return 0
+~
+#12921
+Terminus Forge: Room commands for flavor~
+2 c 0 1
+L j 12920
+enter jump leap~
+* default to 0, return 1 if a command is intercepted
+return 0
+* behavior depends on room
+if %room.template% == 12920
+  if leap /= %cmd% || jump /= %cmd%
+    %force% %actor% down
+    return 1
+  end
+elseif %room.template% == 12921
+  if enter /= %cmd%
+    if archway /= %arg%
+      %send% %actor% Enter which archway?
+      return 1
+    elseif %actor.parse_dir(%arg%)% == west
+      %force% %actor% %actor.dir(west)%
+      return 1
+    elseif %actor.parse_dir(%arg%)% == south
+      %force% %actor% %actor.dir(south)%
+      return 1
+    elseif %actor.parse_dir(%arg%)% == east
+      %force% %actor% %actor.dir(east)%
+      return 1
+    end
+  end
+elseif %room.template% == 12922
+  if enter /= %cmd%
+    if archway /= %arg% || %actor.parse_dir(%arg%)% == east
+      %force% %actor% %actor.dir(east)%
+      return 1
+    end
+  end
+elseif %room.template% == 12923
+  if enter /= %cmd%
+    if archway /= %arg% || %actor.parse_dir(%arg%)% == west
+      %force% %actor% %actor.dir(west)%
+      return 1
+    end
+  end
+elseif %room.template% == 12924
+  if enter /= %cmd%
+    if archway /= %arg% || %actor.parse_dir(%arg%)% == south
+      %force% %actor% %actor.dir(south)%
+      return 1
+    end
+  end
+end
+~
+#12922
+Terminus Forge: Impending doom ticker~
+0 b 50 0
+~
+*
 ~
 $

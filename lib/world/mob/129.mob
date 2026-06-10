@@ -47,4 +47,60 @@ The elmental is assembling itself from leaves of blue-black eventide.
 T 12836
 T 12835
 S
+#12921
+greeter~
+the greeter~
+The greeter is here.
+~
+0 0 bdvL cnG 3
+2 0 0 15 -1 -1
+D
+tbd
+~
+T 12922
+S
+#12922
+ringmaster master~
+the ringmaster~
+The ringmaster is here.
+~
+0 0 bdvL cnG 3
+2 0 0 15 -1 -1
+D
+tbd
+~
+S
+#12923
+earringer ringer~
+the earringer~
+The earringer is here.
+~
+0 0 bdvL cnG 3
+2 0 0 15 -1 -1
+D
+tbd
+~
+S
+#12924
+vendor~
+the vendor~
+The vendor is here.
+~
+0 0 bdvL cnG 3
+2 0 0 15 -1 -1
+D
+tbd
+~
+S
+#12925
+seller~
+the seller~
+The seller is here.
+~
+0 0 bdvL cnG 3
+2 0 0 15 -1 -1
+D
+tbd
+~
+S
 $
