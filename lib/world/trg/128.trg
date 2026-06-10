@@ -369,6 +369,8 @@ if goto /= %mode%
     set to_room %instance.nearest_rmt(12850)%
   elseif eventide /= %arg2% || echo forge /= %arg2%
     set to_room %instance.nearest_rmt(12890)%
+  elseif meteorite /= %arg2% || terminus forge /= %arg2%
+    set to_room %instance.nearest_rmt(12920)%
   else
     set to_room %instance.nearest_rmt(%arg2%)%
   end
@@ -384,7 +386,7 @@ if goto /= %mode%
     %force% %actor% look
   end
 else
-  %send% %actor% &&0Usage: cforge goto iron
+  %send% %actor% &&0Usage: cforge goto <iron | imperium | eventide | meteorite>
   %send% %actor% &&0       cforge goto <template vnum>
 end
 ~

@@ -1,1 +1,441 @@
+#12920
+Atop a Mighty Rock, Enflamed~
+   You reflexively shield your eyes from the bright flames that roar upward
+from the edges of the great rock you find yourself standing upon. A well-worn
+path leads from the craggy metal archway to the edge of the rock, to a small
+gap in the flame.
+~
+cei 0 0 12920
+D9
+~
+0 12921
+E
+flames~
+tbd
+~
+E
+rock~
+tbd
+~
+E
+path~
+tbd
+~
+E
+archway metal~
+tbd
+~
+E
+gap down~
+tbd
+~
+E
+out north east south west northeast northwest southeast southwest~
+tbd
+~
+E
+up stars starry sky expanse night~
+tbd
+~
+E
+ground~
+tbd
+~
+T 12803
+T 12802
+T 12801
+T 12920
+S
+#12921
+Terminus Forge~
+   Streaks of light tear across the sky above your head as you stand in a deep
+crater. At the bottom, a black, craggy rock rests in the center of the crater,
+flattened on top so it can be used as a platform. On three sides, metal
+archways made from the same rough metal crackle and spark, and briefly open
+like magical portals when you approach.
+Commands: challenge
+~
+cei 0 0 12920
+D3
+~
+0 12922
+D1
+~
+0 12923
+D2
+~
+0 12924
+D0
+~
+0 12925
+D9
+~
+0 12926
+E
+streaks sky up~
+tbd
+~
+E
+stars starry expanse night~
+tbd
+~
+E
+down bottom~
+tbd
+~
+E
+rock~
+tbd
+~
+E
+craggy~
+tbd
+~
+E
+meteorite rock~
+tbd
+~
+E
+archways portals~
+tbd
+~
+E
+platform~
+tbd
+~
+E
+north~
+tbd
+~
+E
+west east south northwest northeast southwest southeast nw ne sw se~
+tbd
+~
+T 12803
+T 12802
+T 12819
+T 12920
+S
+#12922
+Terminus Forge~
+   A roaring wall of fire surrounds the rock on this side of the archway. The
+crater is gone now; this rock is falling through the sky! The edges of this
+rock are red-hot, but the center is surprisingly cool. Poles near the edge hold
+pieces of metal in the roaring flame.
+Commands: forge, smelt, shatter <item to destroy>
+~
+cei 0 hv 12920
+D1
+~
+0 12921
+E
+fire wall roaring~
+tbd
+~
+E
+out~
+tbd
+~
+E
+down ground earth~
+tbd
+~
+E
+rock center around~
+tbd
+~
+E
+edges red-hot redhot~
+tbd
+~
+E
+hot~
+tbd
+~
+E
+poles metal~
+tbd
+~
+E
+flame ^ attach to fire~
+tbd
+~
+E
+sky~
+tbd
+~
+E
+stars starry up expanse~
+tbd
+~
+E
+night~
+tbd
+~
+E
+moons half-moons halfmoons~
+tbd
+~
+E
+archway~
+tbd
+~
+E
+anvil~
+tbd
+~
+T 12803
+T 12802
+T 12819
+T 12920
+T 5195
+S
+#12923
+Terminus Forge~
+   On this side of the archway, the roar of the flames is deafening, and it
+comes from every direction. You are standing on a small, red rock, inside a
+ring of rising fire, plummeting through the sky. A second rock, twice the size
+of this one, floats just beyond the wall of fire and it, too, is engulfed in
+flames.
+Commands: forge, smelt, shatter <item to destroy>
+~
+cei 0 hv 12920
+D3
+~
+0 12921
+E
+archway~
+tbd
+~
+E
+flames fire roaring~
+tbd
+~
+E
+north south east west northeast nw northwest nw southeast se southwest sw out~
+tbd
+~
+E
+meteor rock beyond second~
+tbd
+~
+E
+red~
+tbd
+~
+E
+ring ^ add to fire~
+tbd
+~
+E
+up stars starry sky expanse night~
+tbd
+~
+E
+down ground earth~
+tbd
+~
+E
+moons half-moons halfmoons~
+tbd
+~
+E
+anvil~
+tbd
+~
+E
+metal poles~
+tbd
+~
+T 12803
+T 12802
+T 12819
+T 12920
+T 5195
+S
+#12924
+Terminus Forge~
+   This side of the archway is serene. But for the tapping at the anvil, little
+sound disrupts the clear view of the stars. You find yourself upon a great rock
+or peak, but with no view of the world below. All around you, there are only
+stars and the immenseness of the night sky. The only other objects in the sky
+are the crescent moon and a large, glowing disc of blue.
+Commands: forge, shatter <item to destroy>
+~
+cei 0 h 12920
+D0
+~
+0 12921
+E
+archway~
+tbd
+~
+E
+anvil~
+tbd
+~
+E
+up stars starry sky expanse night out~
+tbd
+~
+E
+moon crescent~
+tbd
+~
+E
+disc disk glowing blue~
+tbd
+~
+E
+down~
+tbd
+~
+E
+craggy stone rock meteorite peak~
+tbd
+~
+T 12803
+T 12802
+T 12819
+T 12920
+T 5195
+S
+#12925
+Terminus Forge~
+   At the edge of the craggy stone platform, hefty stacks of boxes form a
+make-shift wall. Beyond that, above the rim of the crater, you can see a pair
+of half-moons hanging low in the sky. Above them blazes a fiery comet, slowly
+moving through the air.
+~
+cei 0 0 12920
+D2
+~
+0 12921
+E
+edge~
+tbd
+~
+E
+platform~
+tbd
+~
+E
+craggy stone rock meteorite~
+tbd
+~
+E
+rim~
+tbd
+~
+E
+crater~
+tbd
+~
+E
+boxes stacks wall make-shift makeshift~
+tbd
+~
+E
+moons half-moons halfmoons~
+tbd
+~
+E
+sky~
+tbd
+~
+E
+up stars starry expanse night~
+tbd
+~
+E
+comet fiery fire~
+tbd
+~
+T 12803
+T 12802
+T 12819
+S
+#12926
+Beneath a Mighty Rock~
+   You squeeze through a narrow passage and into a larger chamber between the
+massive, black rock. The walls here are glassy stone, carefully carved to
+create space to mine the underside of the rock. Portal scars mar the walls and
+floor from years of use.
+~
+cei 0 0 12920
+D8
+~
+0 12921
+E
+passage narrow~
+tbd
+~
+E
+chamber~
+tbd
+~
+E
+rock craggy~
+tbd
+~
+E
+walls~
+tbd
+~
+E
+glassy stone~
+tbd
+~
+E
+scars~
+tbd
+~
+E
+floor down~
+tbd
+~
+E
+up~
+tbd
+~
+T 12803
+T 12802
+T 12801
+S
+#12927
+A TBD Battlefield~
+tbd
+Commands: return
+~
+aci 0 0 12927
+T 12817
+T 12818
+T 12824
+T 12803
+Z1 1
+S
+#12928
+A TBD Battlefield~
+tbd
+Commands: return
+~
+aci 0 0 12928
+T 12817
+T 12818
+T 12824
+T 12803
+Z1 1
+S
+#12929
+A TBD Battlefield~
+tbd
+Commands: return
+~
+aci 0 0 12929
+T 12817
+T 12818
+T 12824
+T 12803
+Z1 1
+S
 $

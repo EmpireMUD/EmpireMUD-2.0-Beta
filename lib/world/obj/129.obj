@@ -213,10 +213,10 @@ the star cutter inspiration~
 The star cutter inspiration is on the ground.~
    You find yourself inspired by the whispersmiths who forge in secret and in
 silence to steel us against what looms in the dark.
-   This inspiration will teach you to craft: a star cutter, a fast, quiet,
-small sailing ship.
+   This inspiration will teach you to manufacture: a star cutter, a fast,
+quiet, small sailing ship.
 ~
-7 0 a 0 0 3
+7 0 a 0 0 4
 12912 0 0
 0 0
 S
@@ -353,5 +353,19 @@ tail~
 forth across Echo Forge, tapping at the ground, the arches, and occasionally
 even the red-hot forges.
 ~
+S
+#12919
+hesitation moment~
+a moment of hesitation~
+A moment of hesitation is here.~
+   This item causes the character to immediately perform a Terminus Forge
+Special Move.
+~
+3 0 a 0 0 8
+0 0 0
+0 2
+C
+1 1
+T 12919
 S
 $

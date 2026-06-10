@@ -76,4 +76,112 @@ elseif %echo_arena% ~= %actor.room.template%
 end
 %purge% %self%
 ~
+#12919
+Celestial Forge: Terminus movement helper obj~
+1 n 100 0
+~
+* Causes the player to move after a brief wait
+* requires this object has a 'direction' variable with a true direction
+* (not the direction for the player)
+wait 0
+set actor %self.carried_by%
+set direction %self.var(direction)%
+if %actor% && %direction%
+  if %actor.position% == Standing && !%actor.disabled% && !%actor.fighting% && !%actor.aff_flagged(IMMOBILIZED)%
+    %force% %actor% %actor.dir(%direction%)%
+  end
+end
+%purge% %self%
+~
+#12920
+Celestial Forge: Terminus portal movement replacer~
+2 q 100 8
+L c 9680
+L j 12920
+L j 12921
+L j 12922
+L j 12923
+L j 12924
+L j 12925
+L j 12926
+~
+* setup
+if %method% != move
+  * ignore
+  return 1
+  halt
+elseif %room.template% == 12920
+  * atop a mighty rock, leaping down into the crater
+  set mode 1
+else
+  * archway portal
+  set mode 2
+end
+* determine to-room
+eval dest %%room.%direction%(room)%%
+if !%dest%
+  * error
+  return 1
+  halt
+elseif %dest.template% == 12925 || %dest.template% == 12926
+  * allowed to walk
+  return 1
+  halt
+end
+* out-message
+if %mode% == 1
+  %send% %actor% You time it just right and leap off the rock... it's a long way down!
+  %echoaround% %actor% ~%actor% peers over the edge and then leaps off the rock...
+elseif !%actor.aff_flagged(SNEAK)%
+  %send% %actor% You step into the %actor.dir(%direction%)% archway...
+  set ch %room.people%
+  while %ch%
+    set next_ch %ch.next_in_room%
+    if %ch% != %actor% && !%ch.disabled%
+      if %ch.position% != Sleeping && %ch.can_see(%actor%)%
+        if %actor.is_npc%
+          %send% %ch% ~%actor% %actor.movetype% into the %ch.dir(%direction%)% archway and vanishes!
+        else
+          %send% %ch% ~%actor% steps into the %ch.dir(%direction%)% archway and vanishes!
+        end
+      end
+    end
+    set ch %next_ch%
+  done
+end
+* teleport
+%teleport% %actor% %dest%
+%load% obj 9680 %actor% inv
+* in-message
+if %mode% == 1
+  %at% %dest% %echoaround% %actor% ~%actor% comes screaming in from above but lands on ^%actor% feet!
+elseif !%actor.aff_flagged(SNEAK)%
+  set ch %dest.people%
+  set revdir %_map.reverse(%direction%)%
+  while %ch%
+    set next_ch %ch.next_in_room%
+    if %ch% != %actor% && !%ch.disabled%
+      if %ch.position% != Sleeping && %ch.can_see(%actor%)%
+        %send% %ch% ~%actor% appears from the %ch.dir(%revdir%)% archway!
+      end
+    end
+    set ch %next_ch%
+  done
+end
+* fellows: load the delayed-move helper obj
+set ch %room.people%
+while %ch%
+  set next_ch %ch.next_in_room%
+  if %ch.leader% == %actor%
+    %load% obj 12919 %ch% inv
+    set obj %ch.inventory(12919)%
+    if %obj%
+      * store required variable
+      remote direction %obj.id%
+    end
+  end
+  set ch %next_ch%
+done
+return 0
+~
 $

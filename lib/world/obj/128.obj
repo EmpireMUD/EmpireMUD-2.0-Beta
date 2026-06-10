@@ -49,7 +49,7 @@ the celestial forge controller~
 The celestial forge controller is lying here.~
    This elegant shard serves as the controller for a celestial forge. It can
 only be used by immortals.
-Usage: cforge goto iron, imperium
+Usage: cforge goto <iron | imperium | eventide | meteorite>
        cforge goto <template vnum>
 ~
 3 0 a 0 0 3
