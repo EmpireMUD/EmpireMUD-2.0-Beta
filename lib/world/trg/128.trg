@@ -342,7 +342,7 @@ elseif %cmd% == survey
     end
   end
   %send% %actor% Climate: %room.climate%
-  %send% %actor% Temperature: %temperature.(%room.temperature%)%
+  %send% %actor% Temperature: %temperature.text(%room.temperature%)%
   %send% %actor% This location cannot be claimed.
 else
   return 0
