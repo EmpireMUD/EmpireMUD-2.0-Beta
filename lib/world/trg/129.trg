@@ -241,6 +241,86 @@ end
 Terminus Forge: Impending doom ticker~
 0 b 50 0
 ~
+* config: seconds between meteors
+set interval 1200
+* vars
+set meteor %self.var(meteor,1)%
+set timer %self.var(timer,%timestamp%)%
+* skip 60 seconds of random checks
+if (%timestamp% - %timer%) < %interval%
+  * progress should be 0 to 20
+  eval progress (%timestamp% - %timer%) / 60
+  wait 60 s
+  * tick message
+  if %meteor% == 1
+    if %progress% < 5
+      %echo% A red-hot meteor fumes as it streaks through the sky.
+      %at% i12925 %echo% A red-hot meteor fumes as it streaks through the sky.
+      %at% i12922 %echo% The wall of flame grows brighter as the rock you're standing on plummets through the sky!
+    elseif %progress% < 10
+      %echo% There's a loud CRACK! as a plume of smoke blasts off of the meteor in the sky!
+      %at% i12925 %echo% There's a loud CRACK! as a plume of smoke blasts off of the meteor in the sky!
+      %at% i12922 %echo% There's a loud CRACK! sound from somewhere inside the rock beneath your feet!
+    elseif %progress% < 15
+      %echo% A faint roar rumbles through the air as a blazing meteor gets closer to the crater!
+      %at% i12925 %echo% A faint roar rumbles through the air as a blazing meteor gets closer to the crater!
+      %at% i12922 %echo% The rock falls through a layer of clouds as the flames around it intensify...
+    else
+      %echo% A roaring fireball dominates the sky as the meteor gets closer... and closer!
+      %at% i12925 %echo% A roaring fireball dominates the sky as the meteor gets closer... and closer!
+      %at% i12922 %echo% A glance outward shows the ground coming up fast!
+    end
+  elseif %meteor% == 2
+    if %progress% < 5
+      %echo% A pair of burning meteors drags across through the sky.
+      %at% i12925 %echo% A pair of burning meteors drags across through the sky.
+      %at% i12923 %echo% The flames around both this rock and its twin seem to grow as they streak through the sky!
+    elseif %progress% < 10
+      %echo% A pair of burning meteors in the sky seem to be getting closer...
+      %at% i12925 %echo% A pair of burning meteors in the sky seem to be getting closer...
+      %at% i12923 %echo% The ground beneath you swells and fizzles as the flames grow larger and larger.
+    elseif %progress% < 15
+      %echo% The air itself trembles as a pair of dazzling red meteors streak toward the crater.
+      %at% i12925 %echo% The air itself trembles as a pair of dazzling red meteors streak toward the crater.
+      %at% i12923 %echo% Clouds evaporate in the air beyond the wall of flames as you drop through them!
+    else
+      %echo% The ground rumbles as the pair of meteors streak closer to the crater...
+      %at% i12925 %echo% The ground rumbles as the pair of meteors streak closer to the crater...
+      %at% i12923 %echo% A glance outward shows the ground coming up fast!
+    end
+  end
+  * end this loop
+  remote timer %self.id%
+  halt
+end
 *
+* otherwise time for a meteor event!
+shout HEADS UP!
+wait 1
+%echo% ~%self% swings high and slams ^%self% eventide hammer down on the stone tree stump...
+wait 1
+if %meteor% == 1
+  %echo% The blazing meteor comes to a halt less than a tower's height above the crater and then, miraculously, rises back into the sky to begin its descent again!
+  %at% i12925 %echo% The blazing meteor comes to a halt less than a tower's height above the crater and then, miraculously, rises back into the sky to begin its descent again!
+  %at% i12922 %echo% The flames around the rock die down for a moment as you feel the whole thing come to a halt in the sky...
+  %at% i12922 %echo% ... and then the rock rises back into the sky!
+  %at% i12923 %echo% Through the flames, you see another great rock rise up through the sky, far above you, and then begin to plummet again!
+  wait 1
+  %at% i12922 %echo% You feel the rock lurch as it begins to drop. The flames roar up around the sides as you plummet toward the earth again!
+  set meteor 2
+elseif %meteor% == 2
+  %echo% The twin meteors come to a stop in the sky, dangerously close to the top of your head, and then retreat back up to the heavens together!
+  %at% i12925 %echo% The twin meteors come to a stop in the sky, dangerously close to the top of your head, and then retreat back up to the heavens together!
+  %at% i12922 %echo% Beyond the wall of flame, you see another pair of enormous rocks spiral upward into the sky high above you, and then both rocks drop again!
+  %at% i12923 %echo% The roaring flames around both this rock and its twin die down as both come to a halt low in the sky...
+  %at% i12923 %echo% ... the great rocks pause for just a moment and then, with a jolt, fly back up into the sky!
+  wait 1
+  %at% i12923 %echo% The moment's peace passes and you feel the rock begin to sink once more. In a moment, the wall of fire roars back to life as you streak through the sky!
+  set meteor 1
+end
+* reset
+set timer %timestamp%
+remote timer %self.id%
+remote meteor %self.id%
 ~
 $
