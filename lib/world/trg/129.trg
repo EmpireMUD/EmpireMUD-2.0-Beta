@@ -203,34 +203,34 @@ elseif %room.template% == 12921
     if archway /= %arg%
       %send% %actor% Enter which archway?
       return 1
-    elseif %actor.parse_dir(%arg%)% == west
+    elseif %actor.parse_dir(%arg.argument1%)% == west
       %force% %actor% %actor.dir(west)%
       return 1
-    elseif %actor.parse_dir(%arg%)% == south
+    elseif %actor.parse_dir(%arg.argument1%)% == south
       %force% %actor% %actor.dir(south)%
       return 1
-    elseif %actor.parse_dir(%arg%)% == east
+    elseif %actor.parse_dir(%arg.argument1%)% == east
       %force% %actor% %actor.dir(east)%
       return 1
     end
   end
 elseif %room.template% == 12922
   if enter /= %cmd%
-    if archway /= %arg% || %actor.parse_dir(%arg%)% == east
+    if archway /= %arg% || %actor.parse_dir(%arg.argument1%)% == east
       %force% %actor% %actor.dir(east)%
       return 1
     end
   end
 elseif %room.template% == 12923
   if enter /= %cmd%
-    if archway /= %arg% || %actor.parse_dir(%arg%)% == west
+    if archway /= %arg% || %actor.parse_dir(%arg.argument1%)% == west
       %force% %actor% %actor.dir(west)%
       return 1
     end
   end
 elseif %room.template% == 12924
   if enter /= %cmd%
-    if archway /= %arg% || %actor.parse_dir(%arg%)% == south
+    if archway /= %arg% || %actor.parse_dir(%arg.argument1%)% == south
       %force% %actor% %actor.dir(south)%
       return 1
     end

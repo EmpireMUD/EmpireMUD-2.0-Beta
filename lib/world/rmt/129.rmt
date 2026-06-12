@@ -2,8 +2,8 @@
 Atop a Mighty Rock, Enflamed~
    You reflexively shield your eyes from the bright flames that roar upward
 from the edges of the great rock you find yourself standing upon. A well-worn
-path leads from the craggy metal archway to the edge of the rock, to a small
-gap in the flame.
+path leads from the craggy peak to the edge of the rock, to a small gap in the
+flame.
 ~
 cei 0 0 12920
 D9
@@ -273,7 +273,7 @@ stars and the immenseness of the night sky. The only other objects in the sky
 are the crescent moon and a large, glowing disc of blue.
 Commands: forge, shatter <item to destroy>
 ~
-cei 0 h 12920
+cei 0 h 12924
 D0
 ~
 0 12921
@@ -315,6 +315,7 @@ T 12802
 T 12819
 T 12920
 T 5195
+T 12921
 S
 #12925
 Terminus Forge~

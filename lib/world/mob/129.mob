@@ -48,21 +48,21 @@ T 12836
 T 12835
 S
 #12921
-greeter~
-the greeter~
-The greeter is here.
+Amir~
+Amir~
+Amir, the Last Watch, keeps an eye on the sky.
 ~
 0 0 bdvL cnG 3
-2 0 0 15 -1 -1
+1 0 0 15 -1 -1
 D
 tbd
 ~
 T 12922
 S
 #12922
-ringmaster master~
-the ringmaster~
-The ringmaster is here.
+Hana~
+Hana~
+Hana of the Setting Stars works the anvil.
 ~
 0 0 bdvL cnG 3
 2 0 0 15 -1 -1
@@ -71,20 +71,20 @@ tbd
 ~
 S
 #12923
-earringer ringer~
-the earringer~
-The earringer is here.
+Kwame~
+Kwame~
+Kwame the Unyielding strikes the anvil again and again.
 ~
 0 0 bdvL cnG 3
-2 0 0 15 -1 -1
+1 0 0 15 -1 -1
 D
 tbd
 ~
 S
 #12924
-vendor~
-the vendor~
-The vendor is here.
+Elodie~
+Elodie~
+Elodie of the Near Miss is focused on her work.
 ~
 0 0 bdvL cnG 3
 2 0 0 15 -1 -1
@@ -93,12 +93,12 @@ tbd
 ~
 S
 #12925
-seller~
-the seller~
-The seller is here.
+Tane~
+Tane~
+Tane of the Ember Rain bustles back and forth to arrange the supplies.
 ~
 0 0 bdvL cnG 3
-2 0 0 15 -1 -1
+1 0 0 15 -1 -1
 D
 tbd
 ~
