@@ -250,47 +250,57 @@ D3
 0 12921
 E
 archway~
-tbd
+   The archway is made from the metallic rock itself and there is no distinct
+boundary where the archway ends and the rock begins. Through it, you can see
+Amir back at the crater.
 ~
 E
-flames fire roaring~
-tbd
+flames fire roaring ring~
+   Flames streak upward from the edges of the rock and blast high into the sky
+with a terrible noise, culminating in dark smoke which blocks your view of the
+sky. Poles hold pieces of metalwork in the flames.
 ~
 E
 north south east northeast nw northwest nw southeast se southwest sw out~
-tbd
+   Roaring flames surround this rock on all sides. Beyond that, you can see a
+second burning rock falling through the air alongside this one.
 ~
 E
-meteor rock beyond second~
-tbd
+meteor rocks beyond second~
+   A second, larger rock hovers in the air just beyond the flames that engulf
+this one. It, too, is burning as it plummets through the sky, leaving a smoky
+trail through the night.
 ~
 E
 red~
-tbd
+There's a lot of red here -- both rocks are on fire.
 ~
 E
-ring ^ add to fire~
-tbd
+up smoke smoky cloud~
+The flames around the rock have obscured the sky with a thick, dark cloud.
 ~
 E
-up stars starry sky expanse night~
-tbd
+stars starry sky expanse night~
+You can't see the stars through the smoke above you.
 ~
 E
 down ground earth~
-tbd
+   Glancing over the side of the rock, ever so carefully to avoid being singed,
+you can see you're plummeting fast toward the dark, cratered ground below.
 ~
 E
 moons half-moons halfmoons~
-tbd
+   Cracked and broken moons lie along the ground far below, still shining, if
+only faintly.
 ~
 E
 anvil~
-tbd
+   A glass anvil is anchored firmly to the ground. It flickers and gleams as it
+catches light from the flames.
 ~
 E
-metal poles~
-tbd
+metal poles pieces~
+Several poles hold pieces of metal in the roaring fire like a furnace.
 ~
 M 0 12923 100.00 1
 T 12803
@@ -316,31 +326,35 @@ D0
 0 12921
 E
 archway~
-tbd
+   The archway is a continuous part of the rock you're standing upon. It
+remains open, like a portal, showing the crater within, though it seems you're
+now quite far from there.
 ~
 E
 anvil~
-tbd
+An oversized anvil rests on the ground.
 ~
 E
 up stars starry sky expanse night out~
-tbd
+   The night is peaceful and endless, extending in all directions with
+uncountable stars. Only the crescent moon and the glowing disc block the view.
 ~
 E
 moon crescent~
-tbd
+The cresent moon hovers in the expanse before you.
 ~
 E
 disc disk glowing blue~
-tbd
+   A great, dark disc hangs in the starry expanse, glowing bright blue around
+its rim. It blocks a large part of your view in one direction.
 ~
 E
 down~
-tbd
+Beneath you is the rock you stand on; beneath that, only stars.
 ~
 E
-craggy stone rock meteorite peak~
-tbd
+craggy stone rock meteorite peak ground~
+The rock is dark gray. When you look over the edge, there's nothing beneath it.
 ~
 M 0 12924 100.00 1
 T 12803
@@ -364,51 +378,36 @@ D2
 0 12921
 E
 edge~
-tbd
+You're at the north edge of the rocky platform.
 ~
 E
 platform~
-tbd
+The platform is a large meteorite, stuck in a crater of its own making.
 ~
 E
 craggy stone rock meteorite~
-tbd
+The meteorite is rough like stone, but has the feel of metal.
 ~
 E
-rim~
-tbd
-~
-E
-crater~
-tbd
+rim crater north south east west northeast nw northwest nw southeast se southwest sw out~
+The rim of the crater blocks most of the view.
 ~
 E
 boxes stacks wall make-shift makeshift~
-tbd
+Boxes of supplies are loosely organized and form a sort of wall.
 ~
 E
 moons half-moons halfmoons~
-tbd
+   A pair of cracked and broken moons hang low in the sky, almost resting on
+the crater's rim.
 ~
 E
-sky~
-tbd
-~
-E
-up stars starry expanse night~
-tbd
+up stars starry expanse night sky~
+Meteors, comets, and shooting stars streak across the vast expanse of stars.
 ~
 E
 comet fiery fire~
-tbd
-~
-E
-north south east west northeast nw northwest nw southeast se southwest sw~
-tbd
-~
-E
-out~
-tbd
+The comet blazes across the night sky.
 ~
 M 0 12925 100.00 1
 T 12803
@@ -417,10 +416,10 @@ T 12819
 S
 #12926
 Beneath a Mighty Rock~
-   You squeeze through a narrow passage and into a larger chamber between the
+   You squeeze through a narrow passage and into a larger chamber beneath the
 massive, black rock. The walls here are glassy stone, carefully carved to
-create space to mine the underside of the rock. Portal scars mar the walls and
-floor from years of use.
+create space to mine the underside of the rock. Here and there, the stone is
+marred by long slices where portals have dug into it over many years.
 Commands: return
 ~
 cei 0 0 12920
@@ -429,35 +428,37 @@ D8
 0 12921
 E
 passage narrow~
-tbd
+   The passage back up to the surface of the crater is tight, but you can just
+squeeze through.
 ~
 E
 chamber~
-tbd
+The chamber beneath the rock is much more spacious than the passage.
 ~
 E
 rock craggy~
-tbd
+The metallic rock above you has been mined for ore; there's still a lot left.
 ~
 E
-walls~
-tbd
+walls grooves~
+The walls are glassy, grooved where they've been carved to make the chamber.
 ~
 E
 glassy stone~
-tbd
+   Much of the stone here is glassy, as if it was once heated to a tremendous
+temperature.
 ~
 E
 scars~
-tbd
+The walls and floors are scarred with grooves created by many magical portals.
 ~
 E
 floor down~
-tbd
+The floor is rock.
 ~
 E
-up~
-tbd
+up meteorite~
+Above you is the great meteorite nestled in the crater.
 ~
 T 12803
 T 12802
