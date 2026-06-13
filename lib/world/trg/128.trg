@@ -1,18 +1,21 @@
 #12800
 Celestial Forge: Donate to open portal~
-0 c 0 10
+0 c 0 13
 L c 12800
 L c 12801
 L c 12802
+L c 12803
 L c 12806
 L j 12810
 L j 12850
 L j 12890
+L j 12920
 L w 5100
 L w 5101
 L w 5102
+L w 5103
 donate~
-set forge_list Lodestone Forge, Victory Forge, Echo Forge, ...
+set forge_list Lodestone Forge, Victory Forge, Echo Forge, Terminus Forge, ...
 set room %self.room%
 set which 0
 set dest 0
@@ -38,6 +41,12 @@ elseif eventide forge /= %arg% || echo forge /= %arg%
   set which 12802
   set dest 12890
   set curr 5102
+  set str an eventide shard
+elseif meteorite forge /= %arg% || terminus forge /= %arg%
+  set name Terminus Forge
+  set which 12803
+  set dest 12920
+  set curr 5103
   set str an eventide shard
 else
   %send% %actor% Unknown celestial forge. (%forge_list%)
@@ -90,17 +99,20 @@ end
 ~
 #12801
 Celestial Forge: Request exit~
-2 c 0 10
+2 c 0 13
 L c 9680
 L c 12800
 L c 12801
 L c 12802
+L c 12803
 L c 12806
 L e 5195
 L j 12800
 L j 12810
 L j 12850
 L j 12890
+L j 12920
+L j 12926
 return~
 if %actor.is_npc%
   * possibly immortal trying to return
@@ -137,6 +149,10 @@ if %cf_return%
       break
       case 12890
         set in_vnum 12802
+      break
+      case 12920
+      case 12926
+        set in_vnum 12803
       break
       default
         set in_vnum 0
@@ -200,7 +216,7 @@ end
 ~
 #12802
 Celestial Forge: Detect player entry, Grant abilities, Start progress~
-2 gA 100 17
+2 gA 100 20
 L c 9684
 L c 12917
 L e 5195
@@ -211,9 +227,12 @@ L j 12850
 L j 12855
 L j 12890
 L j 12895
+L j 12920
+L j 12926
 L o 12810
 L o 12850
 L o 12890
+L o 12920
 L q 6
 L y 12810
 L y 12850
@@ -260,6 +279,18 @@ if %actor.skill(6)% >= 76
     if %actor.empire%
       nop %actor.empire.start_progress(12890)%
     end
+  elseif %room.template% >= 12920 && %room.template% <= 12926
+    if !%actor.has_bonus_ability(12920)%
+      * grant the ability after a short delay
+      %load% obj 9684 %actor%
+      set obj %actor.inventory%
+      if %obj.vnum% == 9684
+        nop %obj.val0(12920)%
+      end
+    end
+    if %actor.empire%
+      nop %actor.empire.start_progress(12920)%
+    end
   end
 end
 * Movement SFX
@@ -287,9 +318,16 @@ end
 ~
 #12803
 Celestial Forge: Time and Weather commands~
-2 c 0 2
+2 c 0 9
 L j 12810
 L j 12850
+L j 12920
+L j 12921
+L j 12922
+L j 12923
+L j 12924
+L j 12925
+L j 12926
 time weather~
 if %cmd.mudcommand% == time
   * TIME
@@ -300,6 +338,17 @@ if %cmd.mudcommand% == time
     case 12850
       %send% %actor% It looks like nighttime out through the flap.
     break
+    case 12920
+    case 12922
+    case 12923
+      %send% %actor% Through the flames, the starry sky reveals it to be nighttime.
+    break
+    case 12924
+      %send% %actor% It seems like a serene, endless night.
+    break
+    case 12926
+      %send% %actor% It's hard to tell the time from down here beneath the rock.
+    break
     default
       %send% %actor% The beautiful night sky overhead tells you it's nighttime.
     break
@@ -309,10 +358,23 @@ elseif %cmd.mudcommand% == weather
   * WEATHER
   switch %room.template%
     case 12810
+    case 12926
       %send% %actor% It's hard to tell the weather from in here.
     break
     case 12850
       %send% %actor% The night sky is cloudless outside.
+    break
+    case 12920
+    case 12922
+    case 12923
+      %send% %actor% Do the roaring flames that surround this rock count as weather?
+    break
+    case 12924
+      %send% %actor% There's no weather at all.
+    break
+    case 12921
+    case 12925
+      %send% %actor% The meteor showers are the only weather in the night sky.
     break
     default
       %send% %actor% The night sky is cloudless and vast.
@@ -765,7 +827,7 @@ nop %self.remove_mob_flag(NO-ATTACK)%
 ~
 #12817
 Celestial Forge: Arena return command~
-2 c 0 13
+2 c 0 17
 L c 9680
 L j 12811
 L j 12817
@@ -779,6 +841,10 @@ L j 12891
 L j 12897
 L j 12898
 L j 12899
+L j 12921
+L j 12927
+L j 12928
+L j 12929
 return~
 if %actor.fighting% || %actor.disabled%
   %send% %actor% You can't do that right now.
@@ -806,6 +872,12 @@ switch %room.template%
   case 12899
     set dest %instance.nearest_rmt(12891)%
     set mes raucously loud flash of light
+  break
+  case 12927
+  case 12928
+  case 12929
+    set dest %instance.nearest_rmt(12921)%
+    set mes fiery roar
   break
 done
 if !%dest%
@@ -925,7 +997,7 @@ end
 ~
 #12819
 Celestial Forge: Challenge command to enter arena~
-2 c 0 14
+2 c 0 18
 L c 9680
 L c 12918
 L j 12811
@@ -940,6 +1012,10 @@ L j 12891
 L j 12897
 L j 12898
 L j 12899
+L j 12921
+L j 12927
+L j 12928
+L j 12929
 challenge~
 * Tries to find an available arena to fight in
 * optional 'empty' arg gets you one with zero players
@@ -963,6 +1039,10 @@ switch %room.template%
   case 12891
     set room_list 12897 12898 12899
     set mes tremendous flash of white light
+  break
+  case 12921
+    set room_list 12927 12928 12929
+    set mes tremendous fiery whirl
   break
 done
 eval empty %arg% == empty

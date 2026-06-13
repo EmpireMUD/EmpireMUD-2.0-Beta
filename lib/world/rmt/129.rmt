@@ -10,36 +10,44 @@ D9
 ~
 0 12921
 E
-flames~
-tbd
+flames wall fire~
+   The entire rock upon which you stand is ringed by tall flames that roar as
+they race toward the sky. Smoke clouds above the flames block any view of the
+sky.
 ~
 E
 rock~
-tbd
+   You stand firmly on a rather large rock, engulfed in flames. At its edges,
+the rock is red-hot and shooting flames high into the sky. But here, nearer the
+center, it's surprisingly mild.
 ~
 E
 path~
-tbd
+   A worn footpath stretches from the peak, where you arrived, to the edge of
+the rock.
 ~
 E
-archway metal~
-tbd
+peak~
+The rock rises to the small peak where you arrived.
 ~
 E
-gap down~
-tbd
+gap down crater earth down ground~
+   Through a gap in the flames, you can see this enormous rock is plummeting
+toward a crater in the earth below!
 ~
 E
 out north east south west northeast northwest southeast southwest~
-tbd
+   A wall of flame surrounds the rock, roaring upward. Through it, you can just
+make out the ground below... and it's coming up fast!
 ~
 E
-up stars starry sky expanse night~
-tbd
+stars starry sky night~
+You can't see the sky through the smoky cloud above you.
 ~
 E
-ground~
-tbd
+clouds smoke smoky up~
+   A cloud of smoke billows up from the top of the flame, blocking all view of
+the sky.
 ~
 T 12803
 T 12802
@@ -73,44 +81,64 @@ D9
 ~
 0 12926
 E
-streaks sky up~
-tbd
+stump tree wood petrified stone~
+   Amir has a hefty tree stump which has, by some means or another, turned
+completely to stone. Cracks in the stump seem to be healing themselves, slowly
+vanishing from the surface.
+~
+E
+hammer~
+Amir carries a rather large hammer made from a blue-black metal.
+~
+E
+streaks sky up meteors~
+   Meteors streak through the sky, mostly as thin streaks of light, except
+three that burn brightly, trailing smoke through the night sky... and one of
+them appears to be heading straight toward the crater!
 ~
 E
 stars starry expanse night~
-tbd
+   The endless night sky stretches out above you, streaked every few moments
+by a shooting star. It would be tranquil if not for three large, blazing
+meteors that dot the sky, each trailing smoke through the air.
+~
+E
+smoke fire fiery~
+Long, smoky tails follow behind three fiery meteors that dot the sky.
 ~
 E
 down bottom~
-tbd
+   A black, craggy rock rests in the center of the crater. A small tunnel cuts
+beneath it, though you can't see what's down there from here.
 ~
 E
-rock~
-tbd
+rock meteorite~
+   The rock is dark in color and heavily pocked, but it has a smooth, almost
+polished finish. The flattened surface of the rock makes up the floor of the
+crater, though certainly the rock is larger and partially buried.
 ~
 E
 craggy~
-tbd
-~
-E
-meteorite rock~
-tbd
+The rock has a craggy, pock-marked surface.
 ~
 E
 archways portals~
-tbd
+   On three sides of you -- east, west, and south -- craggy stone archways
+mark the edges of the platform. They begin to glow like portals if you approach
+them, and you can see through to another place inside.
 ~
 E
 platform~
-tbd
+   The flat top of the rock forms a large platform. Archways mark the east,
+west, and south edges of the platform.
 ~
 E
 north~
-tbd
+The platform continue north, where Tane is stacking supplies.
 ~
 E
-west east south northwest northeast southwest southeast nw ne sw se~
-tbd
+out around~
+All you can see from here is the rim of the crater. Above that, only sky.
 ~
 M 0 12921 100.00 1
 T 12803
@@ -118,6 +146,7 @@ T 12802
 T 12819
 T 12920
 T 12921
+T 12923
 S
 #12922
 Terminus Forge~
@@ -132,64 +161,70 @@ D1
 ~
 0 12921
 E
-fire wall roaring~
-tbd
+fire flame fiery wall roaring~
+   The entire rock is surrounded by a blazing wall of fire, which streaks
+upward with incredible energy. Above it, a dark, smoky cloud blocks all view of
+the sky. Several poles hold pieces of red-hot metal in the flame.
 ~
 E
-out~
-tbd
-~
-E
-down ground earth~
-tbd
+out down ground earth north south west northeast nw northwest nw southeast se southwest sw~
+   Beyond the wall of fire, you can barely make out the night-blanketed world
+below. It looks like the rock is falling fast through the sky!
+   You can see glowing craters on the ground, as well as two cracked and broken
+moons that have fallen from the sky.
 ~
 E
 rock center around~
-tbd
+   The dark, metallic rock is large enough for you, Hana, and her anvil, and
+not a lot else.
 ~
 E
-edges red-hot redhot~
-tbd
+edges red-hot redhot hot~
+   At its edges, the rock is red-hot, almost to the point of melting it in the
+powerful fire that roars all around. Poles hold pieces of Hana's metal in the
+flames, turning them red-hot as well.
 ~
 E
-hot~
-tbd
-~
-E
-poles metal~
-tbd
-~
-E
-flame ^ attach to fire~
-tbd
+poles pieces metal~
+Poles heat pieces of metal in the powerful flames around the rock.
 ~
 E
 sky~
-tbd
+You can't see the sky through the thick smoke.
 ~
 E
-stars starry up expanse~
-tbd
+stars starry expanse~
+You can't see the stars through the thick smoke.
+~
+E
+smoke smoky clouds up~
+The dark, smoky cloud from the fire wall blocks all view of the sky above you.
 ~
 E
 night~
-tbd
+It's night out.
 ~
 E
-moons half-moons halfmoons~
-tbd
+moon crescent~
+   Beyond the flames, you can see the crescent moon low in the sky. Strangely,
+you can also see a pair of cracked and broken moons down below.
+~
+E
+moons half-moons halfmoons cracked broken~
+   Far below this burning rock, you see a pair of moons that have fallen from
+the sky. One is broken in half, and missing much of its glory. The other is
+merely cracked like a spiderweb and devoid of its luster.
 ~
 E
 archway~
-tbd
+   The archway is made from a craggy metal rather similar to the rock you find
+yourself upon. Through it, you can still see the crater you came from, rather
+similar to a portal.
 ~
 E
 anvil~
-tbd
-~
-E
-north south east west northeast nw northwest nw southeast se southwest sw~
-tbd
+   Hana is working at a heavy anvil that seems to be formed from the metallic
+rock beneath, with its surface polished to a perfect plane.
 ~
 M 0 12922 100.00 1
 T 12803
@@ -198,6 +233,7 @@ T 12819
 T 12920
 T 5195
 T 12921
+T 12923
 S
 #12923
 Terminus Forge~
@@ -221,7 +257,7 @@ flames fire roaring~
 tbd
 ~
 E
-north south east west northeast nw northwest nw southeast se southwest sw out~
+north south east northeast nw northwest nw southeast se southwest sw out~
 tbd
 ~
 E
@@ -263,6 +299,7 @@ T 12819
 T 12920
 T 5195
 T 12921
+T 12923
 S
 #12924
 Terminus Forge~
@@ -305,10 +342,6 @@ E
 craggy stone rock meteorite peak~
 tbd
 ~
-E
-north south east west northeast nw northwest nw southeast se southwest sw~
-tbd
-~
 M 0 12924 100.00 1
 T 12803
 T 12802
@@ -316,6 +349,7 @@ T 12819
 T 12920
 T 5195
 T 12921
+T 12923
 S
 #12925
 Terminus Forge~

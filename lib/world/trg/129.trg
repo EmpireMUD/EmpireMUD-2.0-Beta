@@ -272,8 +272,8 @@ if (%timestamp% - %timer%) < %interval%
     end
   elseif %meteor% == 2
     if %progress% < 5
-      %echo% A pair of burning meteors drags across through the sky.
-      %at% i12925 %echo% A pair of burning meteors drags across through the sky.
+      %echo% A pair of burning meteors drags across the sky.
+      %at% i12925 %echo% A pair of burning meteors drags across the sky.
       %at% i12923 %echo% The flames around both this rock and its twin seem to grow as they streak through the sky!
     elseif %progress% < 10
       %echo% A pair of burning meteors in the sky seem to be getting closer...
@@ -322,5 +322,41 @@ end
 set timer %timestamp%
 remote timer %self.id%
 remote meteor %self.id%
+~
+#12923
+Terminus Forge: Look through archways~
+2 c 0 4
+L j 12921
+L j 12922
+L j 12923
+L j 12924
+look~
+* return 0 in all cases because it also falls through to the people you can see
+return 0
+set dir %actor.parse_dir(%arg.argument1%)%
+switch %room.template%
+  case 12921
+    if %dir% == east || %dir% == west
+      %send% %actor% You approach the %actor.dir(%dir%)% archway and see a different rock... with a blazing wall of fire beyond it!
+    elseif %dir% == south
+      %send% %actor% You approach the %actor.dir(%dir%)% archway and see a large rock with a starry night sky beyond.
+    end
+  break
+  case 12922
+    if %dir% == east
+      %send% %actor% You look through the craggy metal archway and see the crater.
+    end
+  break
+  case 12923
+    if %dir% == west
+      %send% %actor% You look through the rough metal archway and see the crater.
+    end
+  break
+  case 12924
+    if %dir% == north
+      %send% %actor% You look through the quiet metal archway and see the crater.
+    end
+  break
+done
 ~
 $

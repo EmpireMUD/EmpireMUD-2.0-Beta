@@ -43,6 +43,22 @@ M
 18
 $p collapses and vanishes with a burst of light!~
 S
+#12803
+portal fiery firey~
+a fiery portal~
+A fiery portal roars and sputters.~
+   The border of the portal roars like a blast furnace, with flames whipping
+off in all directions.
+~
+8 0 0 0 0 4
+-1 0 0
+10 3
+C
+1 1
+M
+18
+$p burns out with a whiff of smoke.~
+S
 #12805
 controller celestial forge~
 the celestial forge controller~
@@ -1292,7 +1308,7 @@ S
 pelt manticore fine~
 a fine manticore pelt~
 A fine manticore pelt is stretched out on the ground.~
-   The body of the pelt has rich red fur, dense and unyielding to the touch. 
+   The body of the pelt has rich red fur, dense and unyielding to the touch.
 It looks as though the quills have been removed.
 ~
 3 0 a 0 0 10
