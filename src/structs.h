@@ -3762,6 +3762,8 @@ struct ability_data {
 	bitvector_t gain_hooks;	// AGH_ flags
 	bitvector_t requires_tool;	// TOOL_ flags required to use it
 	
+	char *notes;	// misc notes shown only to imms
+	
 	// command-related data
 	char *command;	// if ability has a command
 	byte min_position;	// to use the command

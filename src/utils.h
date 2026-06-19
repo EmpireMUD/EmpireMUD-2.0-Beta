@@ -127,6 +127,7 @@
 #define ABIL_MIN_POS(abil)  ((abil)->min_position)
 #define ABIL_MOVE_TYPE(abil)  ((abil)->move_type)
 #define ABIL_NAME(abil)  ((abil)->name)
+#define ABIL_NOTES(abil)  ((abil)->notes)
 #define ABIL_POOL_TYPE(abil)  ((abil)->pool_type)
 #define ABIL_REQUIRES_TOOL(abil)  ((abil)->requires_tool)
 #define ABIL_RESOURCE_COST(abil)  ((abil)->resource_cost)
