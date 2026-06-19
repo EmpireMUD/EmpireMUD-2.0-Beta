@@ -3177,6 +3177,10 @@ void do_stat_adventure(char_data *ch, adv_data *adv) {
 		build_page_display_str(ch, "Scripts: none");
 	}
 	
+	if (GET_ADV_NOTES(adv) && *GET_ADV_NOTES(adv)) {
+		build_page_display(ch, "Notes:\r\n%s", GET_ADV_NOTES(adv));
+	}
+	
 	send_page_display(ch);
 }
 

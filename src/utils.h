@@ -167,6 +167,7 @@
 #define GET_ADV_MIN_LEVEL(adv)  ((adv)->min_level)
 #define GET_ADV_MAX_LEVEL(adv)  ((adv)->max_level)
 #define GET_ADV_MAX_INSTANCES(adv)  ((adv)->max_instances)
+#define GET_ADV_NOTES(adv)  ((adv)->notes)
 #define GET_ADV_RESET_TIME(adv)  ((adv)->reset_time)
 #define GET_ADV_FLAGS(adv)  ((adv)->flags)
 #define GET_ADV_LINKING(adv)  ((adv)->linking)

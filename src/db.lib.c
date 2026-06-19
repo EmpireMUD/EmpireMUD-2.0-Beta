@@ -152,6 +152,9 @@ void free_adventure(adv_data *adv) {
 	if (GET_ADV_DESCRIPTION(adv) && (!proto || GET_ADV_DESCRIPTION(adv) != GET_ADV_DESCRIPTION(proto))) {
 		free(GET_ADV_DESCRIPTION(adv));
 	}
+	if (GET_ADV_NOTES(adv) && (!proto || GET_ADV_NOTES(adv) != GET_ADV_NOTES(proto))) {
+		free(GET_ADV_NOTES(adv));
+	}
 	if (GET_ADV_LINKING(adv) && (!proto || GET_ADV_LINKING(adv) != GET_ADV_LINKING(proto))) {
 		while ((link = GET_ADV_LINKING(adv))) {
 			GET_ADV_LINKING(adv) = link->next;
@@ -188,7 +191,7 @@ void init_adventure(adv_data *adv) {
 */
 void parse_adventure(FILE *fl, adv_vnum vnum) {
 	int int_in[4];
-	char line[256], str_in[256];
+	char line[256], str_in[256], buf2[MAX_STRING_LENGTH];
 	adv_data *adv, *find;
 
 	CREATE(adv, adv_data, 1);
@@ -280,6 +283,11 @@ void parse_adventure(FILE *fl, adv_vnum vnum) {
 				break;
 			}
 			
+			case '_': {	// notes
+				GET_ADV_NOTES(adv) = fread_string(fl, buf2);
+				break;
+			}
+			
 			default: {
 				log("SYSERR: Format error in %s, expecting alphabetic flags", buf2);
 				exit(1);
@@ -325,6 +333,13 @@ void write_adventure_to_file(FILE *fl, adv_data *adv) {
 	// Z: misc data
 	if (GET_ADV_TEMPERATURE_TYPE(adv)) {
 		fprintf(fl, "Z1 %d\n", GET_ADV_TEMPERATURE_TYPE(adv));
+	}
+	
+	// '_'
+	if (GET_ADV_NOTES(adv) && *GET_ADV_NOTES(adv)) {
+		strcpy(temp, GET_ADV_NOTES(adv));
+		strip_crlf(temp);
+		fprintf(fl, "_\n%s~\n", temp);
 	}
 	
 	// end

@@ -3910,6 +3910,8 @@ struct adventure_data {
 	char *author;
 	char *description;
 	
+	char *notes;	// misc notes shown only to imms
+	
 	// numeric data
 	rmt_vnum start_vnum, end_vnum;	// room template vnum range (inclusive)
 	int min_level, max_level;	// level range

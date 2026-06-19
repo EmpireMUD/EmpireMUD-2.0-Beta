@@ -114,6 +114,7 @@ OLC_MODULE(advedit_linking);
 OLC_MODULE(advedit_maxlevel);
 OLC_MODULE(advedit_minlevel);
 OLC_MODULE(advedit_name);
+OLC_MODULE(advedit_notes);
 OLC_MODULE(advedit_playerlimit);
 OLC_MODULE(advedit_reset);
 OLC_MODULE(advedit_script);
@@ -688,6 +689,7 @@ const struct olc_command_data olc_data[] = {
 	{ "maxlevel", advedit_maxlevel, OLC_ADVENTURE, OLC_CF_EDITOR },
 	{ "minlevel", advedit_minlevel, OLC_ADVENTURE, OLC_CF_EDITOR },
 	{ "name", advedit_name, OLC_ADVENTURE, OLC_CF_EDITOR },
+	{ "notes", advedit_notes, OLC_ADVENTURE, OLC_CF_EDITOR },
 	{ "playerlimit", advedit_playerlimit, OLC_ADVENTURE, OLC_CF_EDITOR },
 	{ "reset", advedit_reset, OLC_ADVENTURE, OLC_CF_EDITOR },
 	{ "script", advedit_script, OLC_ADVENTURE, OLC_CF_EDITOR },
