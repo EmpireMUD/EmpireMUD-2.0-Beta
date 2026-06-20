@@ -5913,6 +5913,8 @@ struct faction_data {
 	// optional traits
 	int rep_loss_per_kill;	// amount of change when killing a mob of this faction
 	
+	char *notes;	// misc notes shown only to imms
+	
 	// lists
 	UT_hash_handle hh;	// faction_table hash handle
 	UT_hash_handle sorted_hh;	// sorted_factions hash handle

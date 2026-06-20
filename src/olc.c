@@ -281,6 +281,7 @@ OLC_MODULE(fedit_matchrelations);
 OLC_MODULE(fedit_maxreputation);
 OLC_MODULE(fedit_minreputation);
 OLC_MODULE(fedit_name);
+OLC_MODULE(fedit_notes);
 OLC_MODULE(fedit_relation);
 OLC_MODULE(fedit_rep_per_kill);
 OLC_MODULE(fedit_startingreputation);
@@ -867,6 +868,7 @@ const struct olc_command_data olc_data[] = {
 	{ "maxreputation", fedit_maxreputation, OLC_FACTION, OLC_CF_EDITOR },
 	{ "minreputation", fedit_minreputation, OLC_FACTION, OLC_CF_EDITOR },
 	{ "name", fedit_name, OLC_FACTION, OLC_CF_EDITOR },
+	{ "notes", fedit_notes, OLC_FACTION, OLC_CF_EDITOR },
 	{ "relationship", fedit_relation, OLC_FACTION, OLC_CF_EDITOR },
 	{ "repperkill", fedit_rep_per_kill, OLC_FACTION, OLC_CF_EDITOR },
 	{ "startingreputation", fedit_startingreputation, OLC_FACTION, OLC_CF_EDITOR },
