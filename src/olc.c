@@ -204,6 +204,7 @@ OLC_MODULE(bedit_icon);
 OLC_MODULE(bedit_interaction);
 OLC_MODULE(bedit_military);
 OLC_MODULE(bedit_name);
+OLC_MODULE(bedit_notes);
 OLC_MODULE(bedit_quarter_icon);
 OLC_MODULE(bedit_relations);
 OLC_MODULE(bedit_resource);
@@ -784,6 +785,7 @@ const struct olc_command_data olc_data[] = {
 	{ "interaction", bedit_interaction, OLC_BUILDING, OLC_CF_EDITOR },
 	{ "military", bedit_military, OLC_BUILDING, OLC_CF_EDITOR },
 	{ "name", bedit_name, OLC_BUILDING, OLC_CF_EDITOR },
+	{ "notes", bedit_notes, OLC_BUILDING, OLC_CF_EDITOR },
 	{ "quartericon", bedit_quarter_icon, OLC_BUILDING, OLC_CF_EDITOR },
 	{ "relations", bedit_relations, OLC_BUILDING, OLC_CF_EDITOR },
 	{ "resources", bedit_resource, OLC_BUILDING, OLC_CF_EDITOR },

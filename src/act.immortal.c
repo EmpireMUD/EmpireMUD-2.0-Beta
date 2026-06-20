@@ -3335,6 +3335,10 @@ void do_stat_building(char_data *ch, bld_data *bdg, bool details) {
 	
 	show_spawn_summary_display(ch, TRUE, GET_BLD_SPAWNS(bdg));
 	
+	if (GET_BLD_NOTES(bdg) && *GET_BLD_NOTES(bdg)) {
+		build_page_display(ch, "Notes:\r\n%s", GET_BLD_NOTES(bdg));
+	}
+	
 	send_page_display(ch);
 }
 

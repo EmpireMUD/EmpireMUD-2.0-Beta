@@ -293,6 +293,7 @@
 #define GET_BLD_SHOP_LOOKUPS(bld)  ((bld)->shop_lookups)
 #define GET_BLD_TEMPERATURE_TYPE(bld)  ((bld)->temperature_type)
 #define GET_BLD_REGULAR_MAINTENANCE(bld)  ((bld)->regular_maintenance)
+#define GET_BLD_NOTES(bld)  ((bld)->notes)
 
 
  //////////////////////////////////////////////////////////////////////////////

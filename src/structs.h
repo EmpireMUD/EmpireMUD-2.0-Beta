@@ -4266,6 +4266,8 @@ struct bld_data {
 	struct resource_data *regular_maintenance;	// needed each reset cycle
 	struct bld_relation *relations;	// links to buildings/vehicles
 	
+	char *notes;	// misc notes shown only to imms
+	
 	// live data (not saved, not freed)
 	struct quest_lookup *quest_lookups;
 	struct shop_lookup *shop_lookups;

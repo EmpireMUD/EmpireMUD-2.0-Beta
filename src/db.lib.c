@@ -660,6 +660,9 @@ void free_building(bld_data *bdg) {
 	if (GET_BLD_DESC(bdg) && (!proto || GET_BLD_DESC(bdg) != GET_BLD_DESC(proto))) {
 		free(GET_BLD_DESC(bdg));
 	}
+	if (GET_BLD_NOTES(bdg) && (!proto || GET_BLD_NOTES(bdg) != GET_BLD_NOTES(proto))) {
+		free(GET_BLD_NOTES(bdg));
+	}
 	
 	if (GET_BLD_EX_DESCS(bdg) && (!proto || GET_BLD_EX_DESCS(bdg) != GET_BLD_EX_DESCS(proto))) {
 		free_extra_descs(&GET_BLD_EX_DESCS(bdg));
@@ -916,6 +919,11 @@ void parse_building(FILE *fl, bld_vnum vnum) {
 				}
 				break;
 			}
+			
+			case '_': {	// notes
+				GET_BLD_NOTES(bld) = fread_string(fl, buf2);
+				break;
+			}
 
 			// end
 			case 'S': {
@@ -1024,6 +1032,13 @@ void write_building_to_file(FILE *fl, bld_data *bld) {
 	// Z: misc data
 	if (GET_BLD_TEMPERATURE_TYPE(bld)) {
 		fprintf(fl, "Z1 %d\n", GET_BLD_TEMPERATURE_TYPE(bld));
+	}
+	
+	// '_'
+	if (GET_BLD_NOTES(bld) && *GET_BLD_NOTES(bld)) {
+		strcpy(temp, GET_BLD_NOTES(bld));
+		strip_crlf(temp);
+		fprintf(fl, "_\n%s~\n", temp);
 	}
 	
 	// end

@@ -891,7 +891,7 @@ void olc_fullsearch_building(char_data *ch, char *argument) {
 			continue;
 		}
 
-		if (*find_keywords && !multi_isname(find_keywords, GET_BLD_NAME(bld)) && !multi_isname(find_keywords, GET_BLD_TITLE(bld)) && !multi_isname(find_keywords, GET_BLD_DESC(bld)) && !search_extra_descs(find_keywords, GET_BLD_EX_DESCS(bld))) {
+		if (*find_keywords && !multi_isname(find_keywords, GET_BLD_NAME(bld)) && !multi_isname(find_keywords, GET_BLD_TITLE(bld)) && !multi_isname(find_keywords, GET_BLD_DESC(bld)) && (!GET_BLD_NOTES(bld) || !multi_isname(find_keywords, GET_BLD_NOTES(bld))) && !search_extra_descs(find_keywords, GET_BLD_EX_DESCS(bld))) {
 			continue;
 		}
 		
@@ -1157,6 +1157,9 @@ void save_olc_building(descriptor_data *desc) {
 	if (GET_BLD_DESC(proto)) {
 		free(GET_BLD_DESC(proto));
 	}
+	if (GET_BLD_NOTES(proto)) {
+		free(GET_BLD_NOTES(proto));
+	}
 	free_extra_descs(&GET_BLD_EX_DESCS(proto));
 	while ((spawn = GET_BLD_SPAWNS(proto))) {
 		GET_BLD_SPAWNS(proto) = spawn->next;
@@ -1199,6 +1202,10 @@ void save_olc_building(descriptor_data *desc) {
 			free(GET_BLD_DESC(bdg));
 		}
 		GET_BLD_DESC(bdg) = NULL;
+	}
+	if (GET_BLD_NOTES(bdg) && !*GET_BLD_NOTES(bdg)) {
+		free(GET_BLD_NOTES(bdg));
+		GET_BLD_NOTES(bdg) = NULL;
 	}
 	
 	// save data back over the proto-type
@@ -1257,6 +1264,7 @@ bld_data *setup_olc_building(bld_data *input) {
 		GET_BLD_COMMANDS(new) = GET_BLD_COMMANDS(input) ? str_dup(GET_BLD_COMMANDS(input)) : NULL;
 		GET_BLD_DESC(new) = GET_BLD_DESC(input) ? str_dup(GET_BLD_DESC(input)) : NULL;
 		GET_BLD_RELATIONS(new) = GET_BLD_RELATIONS(input) ? copy_bld_relations(GET_BLD_RELATIONS(input)) : NULL;
+		GET_BLD_NOTES(new) = GET_BLD_NOTES(input) ? str_dup(GET_BLD_NOTES(input)) : NULL;
 		
 		// copy extra descs
 		GET_BLD_EX_DESCS(new) = copy_extra_descs(GET_BLD_EX_DESCS(input));
@@ -1437,6 +1445,8 @@ void olc_show_building(char_data *ch) {
 		}
 		build_page_display(ch, " %d spawn%s set", count, PLURAL(count));
 	}
+	
+	build_page_display(ch, "<%snotes\t0>\r\n%s", OLC_LABEL_PTR(GET_BLD_NOTES(bdg)), NULLSAFE(GET_BLD_NOTES(bdg)));
 		
 	send_page_display(ch);
 }
@@ -1682,6 +1692,19 @@ OLC_MODULE(bedit_name) {
 	bld_data *bdg = GET_OLC_BUILDING(ch->desc);
 	olc_process_string(ch, argument, "name", &GET_BLD_NAME(bdg));
 	CAP(GET_BLD_NAME(bdg));
+}
+
+
+OLC_MODULE(bedit_notes) {
+	bld_data *bdg = GET_OLC_BUILDING(ch->desc);
+
+	if (ch->desc->str) {
+		msg_to_char(ch, "You are already editing a string.\r\n");
+	}
+	else {
+		sprintf(buf, "notes for %s", GET_BLD_NAME(bdg));
+		start_string_editor(ch->desc, buf, &GET_BLD_NOTES(bdg), MAX_NOTES, TRUE);
+	}
 }
 
 
