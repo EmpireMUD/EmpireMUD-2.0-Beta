@@ -234,6 +234,7 @@ OLC_MODULE(cedit_functions);
 OLC_MODULE(cedit_levelrequired);
 OLC_MODULE(cedit_liquid);
 OLC_MODULE(cedit_name);
+OLC_MODULE(cedit_notes);
 OLC_MODULE(cedit_quantity);
 OLC_MODULE(cedit_requiresobject);
 OLC_MODULE(cedit_resource);
@@ -814,6 +815,7 @@ const struct olc_command_data olc_data[] = {
 	{ "levelrequired", cedit_levelrequired, OLC_CRAFT, OLC_CF_EDITOR },
 	{ "liquid", cedit_liquid, OLC_CRAFT, OLC_CF_EDITOR },
 	{ "name", cedit_name, OLC_CRAFT, OLC_CF_EDITOR },
+	{ "notes", cedit_notes, OLC_CRAFT, OLC_CF_EDITOR },
 	{ "quantity", cedit_quantity, OLC_CRAFT, OLC_CF_EDITOR },
 	{ "requiresability", cedit_ability, OLC_CRAFT, OLC_CF_EDITOR },
 	{ "requiresfunction", cedit_functions, OLC_CRAFT, OLC_CF_EDITOR },

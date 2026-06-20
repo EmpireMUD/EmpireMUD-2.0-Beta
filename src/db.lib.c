@@ -1159,6 +1159,9 @@ void free_craft(craft_data *craft) {
 	if (GET_CRAFT_NAME(craft) && (!proto || GET_CRAFT_NAME(craft) != GET_CRAFT_NAME(proto))) {
 		free(GET_CRAFT_NAME(craft));
 	}
+	if (GET_CRAFT_NOTES(craft) && (!proto || GET_CRAFT_NOTES(craft) != GET_CRAFT_NOTES(proto))) {
+		free(GET_CRAFT_NOTES(craft));
+	}
 	
 	if (GET_CRAFT_RESOURCES(craft) && (!proto || GET_CRAFT_RESOURCES(craft) != GET_CRAFT_RESOURCES(proto))) {
 		free_resource_list(GET_CRAFT_RESOURCES(craft));
@@ -1285,6 +1288,11 @@ void parse_craft(FILE *fl, craft_vnum vnum) {
 				parse_resource(fl, &GET_CRAFT_RESOURCES(craft), buf2);
 				break;
 			}
+			
+			case '_': {	// notes
+				GET_CRAFT_NOTES(craft) = fread_string(fl, buf2);
+				break;
+			}
 
 			// end
 			case 'S': {
@@ -1308,7 +1316,7 @@ void parse_craft(FILE *fl, craft_vnum vnum) {
 * @param craft_data *craft The thing to save.
 */
 void write_craft_to_file(FILE *fl, craft_data *craft) {
-	char temp1[256], temp2[256], temp3[256];
+	char temp1[MAX_STRING_LENGTH], temp2[256], temp3[256];
 	
 	if (!fl || !craft) {
 		syslog(SYS_ERROR, LVL_START_IMM, TRUE, "SYSERR: write_craft_to_file called without %s", !fl ? "file" : "craft");
@@ -1340,6 +1348,13 @@ void write_craft_to_file(FILE *fl, craft_data *craft) {
 	
 	// 'R': resources
 	write_resources_to_file(fl, 'R', GET_CRAFT_RESOURCES(craft));
+	
+	// '_'
+	if (GET_CRAFT_NOTES(craft) && *GET_CRAFT_NOTES(craft)) {
+		strcpy(temp1, GET_CRAFT_NOTES(craft));
+		strip_crlf(temp1);
+		fprintf(fl, "_\n%s~\n", temp1);
+	}
 	
 	// end
 	fprintf(fl, "S\n");

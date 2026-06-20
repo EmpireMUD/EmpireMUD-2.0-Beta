@@ -5245,10 +5245,13 @@ struct craft_data {
 	bitvector_t build_on;	// BLD_ON_ flags for the tile it's built upon
 	bitvector_t build_facing;	// BLD_ON_ flags for the tile it's facing
 	
+	// requirements
 	bitvector_t requires_tool;	// any TOOL_ flags required to make this
 	obj_vnum requires_obj;	// only shows up if you have the item
 	bitvector_t requires_function;	// FNC_
 	struct resource_data *resources;	// linked list
+	
+	char *notes;	// misc notes shown only to imms
 	
 	UT_hash_handle hh;	// craft_table hash
 	UT_hash_handle sorted_hh;	// sorted_crafts hash

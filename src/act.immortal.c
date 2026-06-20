@@ -3762,6 +3762,10 @@ void do_stat_craft(char_data *ch, craft_data *craft) {
 	build_page_display_str(ch, "Resources required:");
 	show_resource_display(ch, GET_CRAFT_RESOURCES(craft), FALSE);
 	
+	if (GET_CRAFT_NOTES(craft) && *GET_CRAFT_NOTES(craft)) {
+		build_page_display(ch, "Notes:\r\n%s", GET_CRAFT_NOTES(craft));
+	}
+	
 	send_page_display(ch);
 }
 

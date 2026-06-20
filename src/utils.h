@@ -509,6 +509,7 @@ int CAN_CARRY_N(char_data *ch);	// formerly a macro
 #define GET_CRAFT_FLAGS(craft)  ((craft)->flags)
 #define GET_CRAFT_MIN_LEVEL(craft)  ((craft)->min_level)
 #define GET_CRAFT_NAME(craft)  ((craft)->name)
+#define GET_CRAFT_NOTES(craft)  ((craft)->notes)
 #define GET_CRAFT_OBJECT(craft)  ((craft)->object)
 #define GET_CRAFT_QUANTITY(craft)  ((craft)->quantity)
 #define GET_CRAFT_REQUIRES_OBJ(craft)  ((craft)->requires_obj)

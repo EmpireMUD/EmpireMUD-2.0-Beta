@@ -474,7 +474,7 @@ void olc_fullsearch_craft(char_data *ch, char *argument) {
 			continue;
 		}
 		
-		if (*find_keywords && !multi_isname(find_keywords, GET_CRAFT_NAME(craft))) {
+		if (*find_keywords && !multi_isname(find_keywords, GET_CRAFT_NAME(craft)) && (!GET_CRAFT_NOTES(craft) || !multi_isname(find_keywords, GET_CRAFT_NOTES(craft)))) {
 			continue;
 		}
 		
@@ -595,6 +595,9 @@ void save_olc_craft(descriptor_data *desc) {
 	if (GET_CRAFT_NAME(proto)) {
 		free(GET_CRAFT_NAME(proto));
 	}
+	if (GET_CRAFT_NOTES(proto)) {
+		free(GET_CRAFT_NOTES(proto));
+	}
 	free_resource_list(GET_CRAFT_RESOURCES(proto));
 	
 	// sanity
@@ -603,6 +606,10 @@ void save_olc_craft(descriptor_data *desc) {
 			free(GET_CRAFT_NAME(craft));
 		}
 		GET_CRAFT_NAME(craft) = str_dup(default_craft_name);
+	}
+	if (GET_CRAFT_NOTES(craft) && !*GET_CRAFT_NOTES(craft)) {
+		free(GET_CRAFT_NOTES(craft));
+		GET_CRAFT_NOTES(craft) = NULL;
 	}
 	
 	// save data back over the proto-type
@@ -639,6 +646,7 @@ craft_data *setup_olc_craft(craft_data *input) {
 
 		// copy things that are pointers
 		GET_CRAFT_NAME(new) = GET_CRAFT_NAME(input) ? str_dup(GET_CRAFT_NAME(input)) : NULL;
+		GET_CRAFT_NOTES(new) = GET_CRAFT_NOTES(input) ? str_dup(GET_CRAFT_NOTES(input)) : NULL;
 		GET_CRAFT_RESOURCES(new) = copy_resource_list(GET_CRAFT_RESOURCES(input));
 	}
 	else {
@@ -762,6 +770,8 @@ void olc_show_craft(char_data *ch) {
 	// resources
 	build_page_display(ch, "Resources required: <%sresource\t0>", OLC_LABEL_PTR(GET_CRAFT_RESOURCES(craft)));
 	show_resource_display(ch, GET_CRAFT_RESOURCES(craft), FALSE);
+	
+	build_page_display(ch, "<%snotes\t0>\r\n%s", OLC_LABEL_PTR(GET_CRAFT_NOTES(craft)), NULLSAFE(GET_CRAFT_NOTES(craft)));
 		
 	send_page_display(ch);
 }
@@ -945,6 +955,19 @@ OLC_MODULE(cedit_liquid) {
 OLC_MODULE(cedit_name) {
 	craft_data *craft = GET_OLC_CRAFT(ch->desc);
 	olc_process_string(ch, argument, "name", &GET_CRAFT_NAME(craft));
+}
+
+
+OLC_MODULE(cedit_notes) {
+	craft_data *craft = GET_OLC_CRAFT(ch->desc);
+
+	if (ch->desc->str) {
+		msg_to_char(ch, "You are already editing a string.\r\n");
+	}
+	else {
+		sprintf(buf, "notes for %s", GET_CRAFT_NAME(craft));
+		start_string_editor(ch->desc, buf, &GET_CRAFT_NOTES(craft), MAX_NOTES, TRUE);
+	}
 }
 
 
