@@ -5293,6 +5293,8 @@ struct crop_data {
 	struct interaction_item *interactions;	// interaction items
 	struct extra_descr_data *ex_description;	// extra descriptions
 	
+	char *notes;	// misc notes shown only to imms
+	
 	UT_hash_handle hh;	// crop_table hash
 };
 

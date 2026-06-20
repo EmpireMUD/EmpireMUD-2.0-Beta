@@ -1410,6 +1410,9 @@ void free_crop(crop_data *cp) {
 	if (GET_CROP_TITLE(cp) && (!proto || GET_CROP_TITLE(cp) != GET_CROP_TITLE(proto))) {
 		free(GET_CROP_TITLE(cp));
 	}
+	if (GET_CROP_NOTES(cp) && (!proto || GET_CROP_NOTES(cp) != GET_CROP_NOTES(proto))) {
+		free(GET_CROP_NOTES(cp));
+	}
 	
 	if (GET_CROP_ICONS(cp) && (!proto || GET_CROP_ICONS(cp) != GET_CROP_ICONS(proto))) {
 		free_icon_set(&GET_CROP_ICONS(cp));
@@ -1546,6 +1549,11 @@ void parse_crop(FILE *fl, crop_vnum vnum) {
 				parse_extra_desc(fl, &GET_CROP_EX_DESCS(crop), buf2);
 				break;
 			}
+			
+			case '_': {	// notes
+				GET_CROP_NOTES(crop) = fread_string(fl, buf2);
+				break;
+			}
 
 			// end
 			case 'S': {
@@ -1569,7 +1577,7 @@ void parse_crop(FILE *fl, crop_vnum vnum) {
 * @param crop_data *cp The thing to save.
 */
 void write_crop_to_file(FILE *fl, crop_data *cp) {
-	char temp1[256], temp2[256];
+	char temp1[MAX_STRING_LENGTH], temp2[256];
 	struct spawn_info *spawn;
 	
 	if (!fl || !cp) {
@@ -1604,6 +1612,13 @@ void write_crop_to_file(FILE *fl, crop_data *cp) {
 	
 	// X: extra descriptions
 	write_extra_descs_to_file(fl, 'X', GET_CROP_EX_DESCS(cp));
+	
+	// '_'
+	if (GET_CROP_NOTES(cp) && *GET_CROP_NOTES(cp)) {
+		strcpy(temp1, GET_CROP_NOTES(cp));
+		strip_crlf(temp1);
+		fprintf(fl, "_\n%s~\n", temp1);
+	}
 	
 	// end
 	fprintf(fl, "S\n");

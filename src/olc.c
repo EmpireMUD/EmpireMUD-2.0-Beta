@@ -252,6 +252,7 @@ OLC_MODULE(cropedit_icons);
 OLC_MODULE(cropedit_interaction);
 OLC_MODULE(cropedit_mapout);
 OLC_MODULE(cropedit_name);
+OLC_MODULE(cropedit_notes);
 OLC_MODULE(cropedit_spawns);
 OLC_MODULE(cropedit_title);
 OLC_MODULE(cropedit_xmax);
@@ -835,6 +836,7 @@ const struct olc_command_data olc_data[] = {
 	{ "interaction", cropedit_interaction, OLC_CROP, OLC_CF_EDITOR },
 	{ "mapout", cropedit_mapout, OLC_CROP, OLC_CF_EDITOR },
 	{ "name", cropedit_name, OLC_CROP, OLC_CF_EDITOR },
+	{ "notes", cropedit_notes, OLC_CROP, OLC_CF_EDITOR },
 	{ "spawns", cropedit_spawns, OLC_CROP, OLC_CF_EDITOR },
 	{ "title", cropedit_title, OLC_CROP, OLC_CF_EDITOR },
 	{ "xmax", cropedit_xmax, OLC_CROP, OLC_CF_EDITOR },

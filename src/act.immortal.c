@@ -3844,6 +3844,10 @@ void do_stat_crop(char_data *ch, crop_data *cp, bool details) {
 	
 	show_spawn_summary_display(ch, TRUE, GET_CROP_SPAWNS(cp));
 	
+	if (GET_CROP_NOTES(cp) && *GET_CROP_NOTES(cp)) {
+		build_page_display(ch, "Notes:\r\n%s", GET_CROP_NOTES(cp));
+	}
+	
 	send_page_display(ch);
 }
 

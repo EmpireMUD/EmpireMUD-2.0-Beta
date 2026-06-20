@@ -536,6 +536,7 @@ int CAN_CARRY_N(char_data *ch);	// formerly a macro
 #define GET_CROP_INTERACTIONS(crop)  ((crop)->interactions)
 #define GET_CROP_MAPOUT(crop)  ((crop)->mapout)
 #define GET_CROP_NAME(crop)  ((crop)->name)
+#define GET_CROP_NOTES(crop)  ((crop)->notes)
 #define GET_CROP_SPAWNS(crop)  ((crop)->spawns)
 #define GET_CROP_TITLE(crop)  ((crop)->title)
 #define GET_CROP_VNUM(crop)  ((crop)->vnum)
