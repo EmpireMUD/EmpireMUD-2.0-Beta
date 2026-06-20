@@ -874,7 +874,7 @@ void olc_fullsearch_archetype(char_data *ch, char *argument) {
 		if (*find_rank && !multi_isname(find_rank, GET_ARCH_MALE_RANK(arch)) && !multi_isname(find_rank, GET_ARCH_FEMALE_RANK(arch))) {
 			continue;
 		}
-		if (*find_keywords && !multi_isname(find_keywords, GET_ARCH_NAME(arch)) && !multi_isname(find_keywords, GET_ARCH_DESC(arch)) && !multi_isname(find_keywords, GET_ARCH_LORE(arch)) && !multi_isname(find_keywords, GET_ARCH_MALE_RANK(arch)) && !multi_isname(find_keywords, GET_ARCH_FEMALE_RANK(arch))) {
+		if (*find_keywords && !multi_isname(find_keywords, GET_ARCH_NAME(arch)) && !multi_isname(find_keywords, GET_ARCH_DESC(arch)) && !multi_isname(find_keywords, GET_ARCH_LORE(arch)) && !multi_isname(find_keywords, GET_ARCH_MALE_RANK(arch)) && !multi_isname(find_keywords, GET_ARCH_FEMALE_RANK(arch)) && (!GET_ARCH_NOTES(arch) || !multi_isname(find_keywords, GET_ARCH_NOTES(arch)))) {
 			continue;
 		}
 		
@@ -1131,6 +1131,9 @@ void free_archetype(archetype_data *arch) {
 	if (GET_ARCH_FEMALE_RANK(arch) && (!proto || GET_ARCH_FEMALE_RANK(arch) != GET_ARCH_FEMALE_RANK(proto))) {
 		free(GET_ARCH_FEMALE_RANK(arch));
 	}
+	if (GET_ARCH_NOTES(arch) && (!proto || GET_ARCH_NOTES(arch) != GET_ARCH_NOTES(proto))) {
+		free(GET_ARCH_NOTES(arch));
+	}
 	
 	if (GET_ARCH_GEAR(arch) && (!proto || GET_ARCH_GEAR(arch) != GET_ARCH_GEAR(proto))) {
 		free_archetype_gear(GET_ARCH_GEAR(arch));
@@ -1264,6 +1267,11 @@ void parse_archetype(FILE *fl, any_vnum vnum) {
 				break;
 			}
 			
+			case '_': {	// notes
+				GET_ARCH_NOTES(arch) = fread_string(fl, error);
+				break;
+			}
+			
 			// end
 			case 'S': {
 				return;
@@ -1320,6 +1328,7 @@ void write_archetype_gear_to_file(FILE *fl, struct archetype_gear *list) {
 * @param archetype_data *arch The thing to save.
 */
 void write_archetype_to_file(FILE *fl, archetype_data *arch) {
+	char temp[MAX_STRING_LENGTH];
 	struct archetype_skill *sk;
 	int iter;
 	
@@ -1353,6 +1362,13 @@ void write_archetype_to_file(FILE *fl, archetype_data *arch) {
 	// K: skills
 	for (sk = GET_ARCH_SKILLS(arch); sk; sk = sk->next) {
 		fprintf(fl, "K\n%d %d\n", sk->skill, sk->level);
+	}
+	
+	// '_'
+	if (GET_ARCH_NOTES(arch) && *GET_ARCH_NOTES(arch)) {
+		strcpy(temp, GET_ARCH_NOTES(arch));
+		strip_crlf(temp);
+		fprintf(fl, "_\n%s~\n", temp);
 	}
 	
 	// end
@@ -1907,6 +1923,9 @@ void save_olc_archetype(descriptor_data *desc) {
 	if (GET_ARCH_FEMALE_RANK(proto)) {
 		free(GET_ARCH_FEMALE_RANK(proto));
 	}
+	if (GET_ARCH_NOTES(proto)) {
+		free(GET_ARCH_NOTES(proto));
+	}
 	free_archetype_gear(GET_ARCH_GEAR(proto));
 	free_archetype_skills(GET_ARCH_SKILLS(proto));
 	
@@ -1934,6 +1953,10 @@ void save_olc_archetype(descriptor_data *desc) {
 			free(GET_ARCH_FEMALE_RANK(arch));
 		}
 		GET_ARCH_FEMALE_RANK(arch) = str_dup(default_archetype_rank);
+	}
+	if (GET_ARCH_NOTES(arch) && !*GET_ARCH_NOTES(arch)) {
+		free(GET_ARCH_NOTES(arch));
+		GET_ARCH_NOTES(arch) = NULL;
 	}
 
 	// save data back over the proto-type
@@ -2056,6 +2079,10 @@ void do_stat_archetype(char_data *ch, archetype_data *arch) {
 	build_page_display_str(ch, "Gear:");
 	show_archetype_gear_display(ch, GET_ARCH_GEAR(arch), FALSE);
 	
+	if (GET_ARCH_NOTES(arch) && *GET_ARCH_NOTES(arch)) {
+		build_page_display(ch, "Notes:\r\n%s", GET_ARCH_NOTES(arch));
+	}
+	
 	send_page_display(ch);
 }
 
@@ -2140,6 +2167,8 @@ void olc_show_archetype(char_data *ch) {
 	if (GET_ARCH_GEAR(arch)) {
 		show_archetype_gear_display(ch, GET_ARCH_GEAR(arch), FALSE);
 	}
+	
+	build_page_display(ch, "<%snotes\t0>\r\n%s", OLC_LABEL_PTR(GET_ARCH_NOTES(arch)), NULLSAFE(GET_ARCH_NOTES(arch)));
 	
 	send_page_display(ch);
 }
@@ -2305,6 +2334,19 @@ OLC_MODULE(archedit_malerank) {
 OLC_MODULE(archedit_name) {
 	archetype_data *arch = GET_OLC_ARCHETYPE(ch->desc);
 	olc_process_string(ch, argument, "name", &GET_ARCH_NAME(arch));
+}
+
+
+OLC_MODULE(archedit_notes) {
+	archetype_data *arch = GET_OLC_ARCHETYPE(ch->desc);
+
+	if (ch->desc->str) {
+		msg_to_char(ch, "You are already editing a string.\r\n");
+	}
+	else {
+		sprintf(buf, "notes for %s", GET_ARCH_NAME(arch));
+		start_string_editor(ch->desc, buf, &GET_ARCH_NOTES(arch), MAX_NOTES, TRUE);
+	}
 }
 
 

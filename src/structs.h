@@ -4060,6 +4060,8 @@ struct archetype_data {
 	struct archetype_gear *gear;	// linked list
 	int attributes[NUM_ATTRIBUTES];	// starting attributes (default 1)
 	
+	char *notes;	// misc notes shown only to imms
+	
 	UT_hash_handle hh;	// archetype_table hash handle
 	UT_hash_handle sorted_hh;	// sorted_archetypes hash handle
 };

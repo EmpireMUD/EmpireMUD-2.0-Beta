@@ -210,6 +210,7 @@
 #define GET_ARCH_LORE(arch)  ((arch)->lore)
 #define GET_ARCH_MALE_RANK(arch)  ((arch)->male_rank)
 #define GET_ARCH_NAME(arch)  ((arch)->name)
+#define GET_ARCH_NOTES(arch)  ((arch)->notes)
 #define GET_ARCH_SKILLS(arch)  ((arch)->skills)
 #define GET_ARCH_TYPE(arch)  ((arch)->type)
 #define GET_ARCH_VNUM(arch)  ((arch)->vnum)

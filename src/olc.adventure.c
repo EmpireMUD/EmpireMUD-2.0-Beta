@@ -781,6 +781,10 @@ void save_olc_adventure(descriptor_data *desc) {
 		}
 		GET_ADV_DESCRIPTION(adv) = str_dup("This new adventure zone has no description.\r\n");
 	}
+	if (GET_ADV_NOTES(adv) && !*GET_ADV_NOTES(adv)) {
+		free(GET_ADV_NOTES(adv));
+		GET_ADV_NOTES(adv) = NULL;
+	}
 	
 	// save data back over the proto-type
 	hh = proto->hh;	// save old hash handle

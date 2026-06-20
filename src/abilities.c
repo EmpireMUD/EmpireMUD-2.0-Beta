@@ -10773,6 +10773,10 @@ void save_olc_ability(descriptor_data *desc) {
 		free(ABIL_COMMAND(abil));	// don't allow empty
 		ABIL_COMMAND(abil) = NULL;
 	}
+	if (ABIL_NOTES(abil) && !*ABIL_NOTES(abil)) {
+		free(ABIL_NOTES(abil));
+		ABIL_NOTES(abil) = NULL;
+	}
 	
 	// save data back over the proto-type
 	hh = proto->hh;	// save old hash handle
@@ -10831,6 +10835,7 @@ ability_data *setup_olc_ability(ability_data *input) {
 		ABIL_DATA(new) = copy_data_list(ABIL_DATA(input));
 		ABIL_INTERACTIONS(new) = copy_interaction_list(ABIL_INTERACTIONS(input));
 		ABIL_HOOKS(new) = copy_ability_hooks(ABIL_HOOKS(input));
+		ABIL_NOTES(new) = ABIL_NOTES(input) ? str_dup(ABIL_NOTES(input)) : NULL;
 		
 		// unassign this data:
 		ABIL_ASSIGNED_SKILL(new) = NULL;

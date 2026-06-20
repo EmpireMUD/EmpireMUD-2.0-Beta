@@ -767,6 +767,10 @@ void save_olc_sector(descriptor_data *desc) {
 		}
 		GET_SECT_COMMANDS(st) = NULL;
 	}
+	if (GET_SECT_NOTES(st) && !*GET_SECT_NOTES(st)) {
+		free(GET_SECT_NOTES(st));
+		GET_SECT_NOTES(st) = NULL;
+	}
 	
 	// save data back over the proto-type
 	hh = proto->hh;	// save old hash handle
