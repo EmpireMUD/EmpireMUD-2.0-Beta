@@ -4031,6 +4031,10 @@ void do_stat_global(char_data *ch, struct global_data *glb) {
 		show_interaction_display(ch, GET_GLOBAL_INTERACTIONS(glb), FALSE);
 	}
 	
+	if (GET_GLOBAL_NOTES(glb) && *GET_GLOBAL_NOTES(glb)) {
+		build_page_display(ch, "Notes:\r\n%s", GET_GLOBAL_NOTES(glb));
+	}
+	
 	send_page_display(ch);
 }
 

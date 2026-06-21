@@ -864,6 +864,7 @@ int CAN_CARRY_N(char_data *ch);	// formerly a macro
 #define GET_GLOBAL_TYPE_FLAGS(glb)  ((glb)->type_flags)
 #define GET_GLOBAL_MIN_LEVEL(glb)  ((glb)->min_level)
 #define GET_GLOBAL_MAX_LEVEL(glb)  ((glb)->max_level)
+#define GET_GLOBAL_NOTES(glb)  ((glb)->notes)
 #define GET_GLOBAL_VAL(glb, pos)  ((glb)->value[(pos)])
 #define GET_GLOBAL_INTERACTIONS(glb)  ((glb)->interactions)
 #define GET_GLOBAL_SPARE_BITS(glb)  ((glb)->spare_bits)

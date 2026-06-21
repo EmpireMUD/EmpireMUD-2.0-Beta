@@ -3379,6 +3379,8 @@ struct global_data {
 	struct archetype_gear *gear;	// GLOBAL_NEWBIE_GEAR
 	struct spawn_info *spawns;	// GLOBAL_MAP_SPAWNS
 	
+	char *notes;	// misc notes shown only to imms
+	
 	UT_hash_handle hh;
 };
 

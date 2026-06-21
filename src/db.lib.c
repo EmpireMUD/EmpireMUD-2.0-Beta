@@ -4935,6 +4935,9 @@ void free_global(struct global_data *glb) {
 	if (GET_GLOBAL_NAME(glb) && (!proto || GET_GLOBAL_NAME(glb) != GET_GLOBAL_NAME(proto))) {
 		free(GET_GLOBAL_NAME(glb));
 	}
+	if (GET_GLOBAL_NOTES(glb) && (!proto || GET_GLOBAL_NOTES(glb) != GET_GLOBAL_NOTES(proto))) {
+		free(GET_GLOBAL_NOTES(glb));
+	}
 	
 	if (GET_GLOBAL_INTERACTIONS(glb) && (!proto || GET_GLOBAL_INTERACTIONS(glb) != GET_GLOBAL_INTERACTIONS(proto))) {
 		free_interactions(&GET_GLOBAL_INTERACTIONS(glb));
@@ -5057,6 +5060,11 @@ void parse_global(FILE *fl, any_vnum vnum) {
 				LL_APPEND(GET_GLOBAL_SPAWNS(glb), spawn);
 				break;
 			}
+			
+			case '_': {	// notes
+				GET_GLOBAL_NOTES(glb) = fread_string(fl, buf2);
+				break;
+			}
 
 			// end
 			case 'S': {
@@ -5113,6 +5121,13 @@ void write_global_to_file(FILE *fl, struct global_data *glb) {
 	LL_FOREACH(GET_GLOBAL_SPAWNS(glb), spawn) {
 		fprintf(fl, "M\n");
 		fprintf(fl, "%d %.2f %s\n", spawn->vnum, spawn->percent, bitv_to_alpha(spawn->flags));
+	}
+	
+	// '_'
+	if (GET_GLOBAL_NOTES(glb) && *GET_GLOBAL_NOTES(glb)) {
+		strcpy(temp, GET_GLOBAL_NOTES(glb));
+		strip_crlf(temp);
+		fprintf(fl, "_\n%s~\n", temp);
 	}
 	
 	// end

@@ -339,6 +339,9 @@ void save_olc_global(descriptor_data *desc) {
 	if (GET_GLOBAL_NAME(proto)) {
 		free(GET_GLOBAL_NAME(proto));
 	}
+	if (GET_GLOBAL_NOTES(proto)) {
+		free(GET_GLOBAL_NOTES(proto));
+	}
 	free_interactions(&GET_GLOBAL_INTERACTIONS(proto));
 	free_archetype_gear(GET_GLOBAL_GEAR(proto));
 	while ((spawn = GET_GLOBAL_SPAWNS(proto))) {
@@ -352,6 +355,10 @@ void save_olc_global(descriptor_data *desc) {
 			free(GET_GLOBAL_NAME(glb));
 		}
 		GET_GLOBAL_NAME(glb) = str_dup(default_glb_name);
+	}
+	if (GET_GLOBAL_NOTES(glb) && !*GET_GLOBAL_NOTES(glb)) {
+		free(GET_GLOBAL_NOTES(glb));
+		GET_GLOBAL_NOTES(glb) = NULL;
 	}
 
 	// save data back over the proto-type
@@ -383,6 +390,7 @@ struct global_data *setup_olc_global(struct global_data *input) {
 
 		// copy things that are pointers
 		GET_GLOBAL_NAME(new) = GET_GLOBAL_NAME(input) ? str_dup(GET_GLOBAL_NAME(input)) : NULL;
+		GET_GLOBAL_NOTES(new) = GET_GLOBAL_NOTES(input) ? str_dup(GET_GLOBAL_NOTES(input)) : NULL;
 		
 		// copy pointers
 		GET_GLOBAL_INTERACTIONS(new) = copy_interaction_list(GET_GLOBAL_INTERACTIONS(input));
@@ -539,6 +547,8 @@ void olc_show_global(char_data *ch) {
 			break;
 		}
 	}
+	
+	build_page_display(ch, "<%snotes\t0>\r\n%s", OLC_LABEL_PTR(GET_GLOBAL_NOTES(glb)), NULLSAFE(GET_GLOBAL_NOTES(glb)));
 	
 	send_page_display(ch);
 }
@@ -725,6 +735,19 @@ OLC_MODULE(gedit_mobflags) {
 OLC_MODULE(gedit_name) {
 	struct global_data *glb = GET_OLC_GLOBAL(ch->desc);
 	olc_process_string(ch, argument, "name", &GET_GLOBAL_NAME(glb));
+}
+
+
+OLC_MODULE(gedit_notes) {
+	struct global_data *glb = GET_OLC_GLOBAL(ch->desc);
+
+	if (ch->desc->str) {
+		msg_to_char(ch, "You are already editing a string.\r\n");
+	}
+	else {
+		sprintf(buf, "notes for %s", GET_GLOBAL_NAME(glb));
+		start_string_editor(ch->desc, buf, &GET_GLOBAL_NOTES(glb), MAX_NOTES, TRUE);
+	}
 }
 
 
