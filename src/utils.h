@@ -978,6 +978,7 @@ int Y_COORD(room_data *room);	// formerly #define Y_COORD(room)  FLAT_Y_COORD(ge
 #define MORPH_LOOK_DESC(mph)  ((mph)->look_desc)
 #define MORPH_MAX_SCALE(mph)  ((mph)->max_scale)
 #define MORPH_MOVE_TYPE(mph)  ((mph)->move_type)
+#define MORPH_NOTES(mph)  ((mph)->notes)
 #define MORPH_REQUIRES_OBJ(mph)  ((mph)->requires_obj)
 #define MORPH_SHORT_DESC(mph)  ((mph)->short_desc)
 #define MORPH_SIZE(mph)  ((mph)->size)

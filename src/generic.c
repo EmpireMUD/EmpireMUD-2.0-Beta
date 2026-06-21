@@ -1211,7 +1211,7 @@ void write_generic_index(FILE *fl) {
 */
 void write_generic_to_file(FILE *fl, generic_data *gen) {
 	struct generic_relation *rel, *next_rel;
-	char temp[256];
+	char temp[MAX_STRING_LENGTH];
 	int iter;
 	
 	if (!fl || !gen) {

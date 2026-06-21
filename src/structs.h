@@ -3504,6 +3504,8 @@ struct morph_data {
 	obj_vnum requires_obj;	// required item or NOTHING
 	int max_scale;	// highest possible level
 	
+	char *notes;	// misc notes shown only to imms
+	
 	UT_hash_handle hh;	// morph_table hash
 	UT_hash_handle sorted_hh;	// sorted_morphs hash
 };

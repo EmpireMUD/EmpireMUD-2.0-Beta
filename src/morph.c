@@ -695,6 +695,9 @@ void free_morph(morph_data *morph) {
 	if (MORPH_LOOK_DESC(morph) && (!proto || MORPH_LOOK_DESC(morph) != MORPH_LOOK_DESC(proto))) {
 		free(MORPH_LOOK_DESC(morph));
 	}
+	if (MORPH_NOTES(morph) && (!proto || MORPH_NOTES(morph) != MORPH_NOTES(proto))) {
+		free(MORPH_NOTES(morph));
+	}
 	
 	if (MORPH_APPLIES(morph) && (!proto || MORPH_APPLIES(morph) != MORPH_APPLIES(proto))) {
 		free_apply_list(MORPH_APPLIES(morph));
@@ -777,6 +780,11 @@ void parse_morph(FILE *fl, any_vnum vnum) {
 				MORPH_LOOK_DESC(morph) = fread_string(fl, error);
 				break;
 			}
+			
+			case '_': {	// notes
+				MORPH_NOTES(morph) = fread_string(fl, error);
+				break;
+			}
 						
 			// end
 			case 'S': {
@@ -818,7 +826,7 @@ void write_morphs_index(FILE *fl) {
 * @param morph_data *morph The thing to save.
 */
 void write_morph_to_file(FILE *fl, morph_data *morph) {
-	char temp[256], temp2[256];
+	char temp[MAX_STRING_LENGTH], temp2[256];
 	
 	if (!fl || !morph) {
 		syslog(SYS_ERROR, LVL_START_IMM, TRUE, "SYSERR: write_morph_to_file called without %s", !fl ? "file" : "morph");
@@ -848,6 +856,13 @@ void write_morph_to_file(FILE *fl, morph_data *morph) {
 		strcpy(temp, MORPH_LOOK_DESC(morph));
 		strip_crlf(temp);
 		fprintf(fl, "D\n%s~\n", temp);
+	}
+	
+	// '_'
+	if (MORPH_NOTES(morph) && *MORPH_NOTES(morph)) {
+		strcpy(temp, MORPH_NOTES(morph));
+		strip_crlf(temp);
+		fprintf(fl, "_\n%s~\n", temp);
 	}
 	
 	// end
@@ -980,6 +995,9 @@ void save_olc_morph(descriptor_data *desc) {
 	if (MORPH_LOOK_DESC(proto)) {
 		free(MORPH_LOOK_DESC(proto));
 	}
+	if (MORPH_NOTES(proto)) {
+		free(MORPH_NOTES(proto));
+	}
 	free_apply_list(MORPH_APPLIES(proto));
 	
 	// sanity
@@ -1004,6 +1022,10 @@ void save_olc_morph(descriptor_data *desc) {
 	if (MORPH_LOOK_DESC(morph) && !*MORPH_LOOK_DESC(morph)) {
 		free(MORPH_LOOK_DESC(morph));
 		MORPH_LOOK_DESC(morph) = NULL;
+	}
+	if (MORPH_NOTES(morph) && !*MORPH_NOTES(morph)) {
+		free(MORPH_NOTES(morph));
+		MORPH_NOTES(morph) = NULL;
 	}
 
 	// save data back over the proto-type
@@ -1043,6 +1065,7 @@ morph_data *setup_olc_morph(morph_data *input) {
 		MORPH_SHORT_DESC(new) = MORPH_SHORT_DESC(input) ? str_dup(MORPH_SHORT_DESC(input)) : NULL;
 		MORPH_LONG_DESC(new) = MORPH_LONG_DESC(input) ? str_dup(MORPH_LONG_DESC(input)) : NULL;
 		MORPH_LOOK_DESC(new) = MORPH_LOOK_DESC(input) ? str_dup(MORPH_LOOK_DESC(input)) : NULL;
+		MORPH_NOTES(new) = MORPH_NOTES(input) ? str_dup(MORPH_NOTES(input)) : NULL;
 		
 		// copy lists
 		MORPH_APPLIES(new) = copy_apply_list(MORPH_APPLIES(input));
@@ -1111,6 +1134,10 @@ void do_stat_morph(char_data *ch, morph_data *morph) {
 		append_page_display_line(line, "none");
 	}
 	
+	if (MORPH_NOTES(morph) && *MORPH_NOTES(morph)) {
+		build_page_display(ch, "Notes:\r\n%s", MORPH_NOTES(morph));
+	}
+	
 	send_page_display(ch);
 }
 
@@ -1177,6 +1204,8 @@ void olc_show_morph(char_data *ch) {
 	for (app = MORPH_APPLIES(morph), num = 1; app; app = app->next, ++num) {
 		build_page_display_col(ch, 2, FALSE, " %2d. %d to %s", num, app->weight, apply_types[app->location]);
 	}
+	
+	build_page_display(ch, "<%snotes\t0>\r\n%s", OLC_LABEL_PTR(MORPH_NOTES(morph)), NULLSAFE(MORPH_NOTES(morph)));
 	
 	send_page_display(ch);
 }
@@ -1332,6 +1361,19 @@ OLC_MODULE(morphedit_maxlevel) {
 OLC_MODULE(morphedit_movetype) {
 	morph_data *morph = GET_OLC_MORPH(ch->desc);
 	MORPH_MOVE_TYPE(morph) = olc_process_type(ch, argument, "move type", "movetype", mob_move_types, MORPH_MOVE_TYPE(morph));
+}
+
+
+OLC_MODULE(morphedit_notes) {
+	morph_data *morph = GET_OLC_MORPH(ch->desc);
+
+	if (ch->desc->str) {
+		msg_to_char(ch, "You are already editing a string.\r\n");
+	}
+	else {
+		sprintf(buf, "notes for %s", MORPH_SHORT_DESC(morph));
+		start_string_editor(ch->desc, buf, &MORPH_NOTES(morph), MAX_NOTES, TRUE);
+	}
 }
 
 
