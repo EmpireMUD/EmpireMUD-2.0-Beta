@@ -774,6 +774,7 @@ int CAN_CARRY_N(char_data *ch);	// formerly a macro
 #define GEN_COMPUTED_RELATIONS(gen)  ((gen)->computed_relations)
 #define GEN_FLAGS(gen)  ((gen)->flags)
 #define GEN_NAME(gen)  ((gen)->name)
+#define GEN_NOTES(gen)  ((gen)->notes)
 #define GEN_RELATIONS(gen)  ((gen)->relations)
 #define GEN_STRING(gen, pos)  ((gen)->string[(pos)])
 #define GEN_TYPE(gen)  ((gen)->type)

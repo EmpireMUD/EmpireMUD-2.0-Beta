@@ -290,6 +290,7 @@ OLC_MODULE(fedit_startingreputation);
 OLC_MODULE(genedit_flags);
 OLC_MODULE(genedit_liquidflags);
 OLC_MODULE(genedit_name);
+OLC_MODULE(genedit_notes);
 OLC_MODULE(genedit_type);
 OLC_MODULE(genedit_color);
 OLC_MODULE(genedit_drunk);
@@ -877,6 +878,7 @@ const struct olc_command_data olc_data[] = {
 	// generic commands
 	{ "flags", genedit_flags, OLC_GENERIC, OLC_CF_EDITOR },
 	{ "name", genedit_name, OLC_GENERIC, OLC_CF_EDITOR },
+	{ "notes", genedit_notes, OLC_GENERIC, OLC_CF_EDITOR },
 	{ "type", genedit_type, OLC_GENERIC, OLC_CF_EDITOR },
 	// generic: actions
 	{ "build2char", genedit_build2char, OLC_GENERIC, OLC_CF_EDITOR },

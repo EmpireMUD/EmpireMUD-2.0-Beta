@@ -5973,6 +5973,8 @@ struct generic_data {
 	struct generic_relation *relations;	// set in OLC
 	struct generic_relation *computed_relations;	// determined at runtime (expanded list)
 	
+	char *notes;	// misc notes shown only to imms
+	
 	UT_hash_handle hh;	// generic_table hash
 	UT_hash_handle sorted_hh;	// sorted_generics hash
 };
