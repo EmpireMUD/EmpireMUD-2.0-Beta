@@ -2867,7 +2867,7 @@ switch %arg%
     set non_msg ~%self% holds ^%self% palm upward and points forward.
   break
   case 33
-    set abil_msg ~%self% signs, 'There's still more availble here for you here.'
+    set abil_msg ~%self% signs, 'There's still more availble for you here.'
     set non_msg ~%self% gestures around the area, then folds ^%self% hands and opens them like a book, and then points forward.
   break
   * SOMSAK
