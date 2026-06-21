@@ -124,6 +124,44 @@ the adventure summon. (Except random-teleport.)
 
 See also: ACCEPT, COMBAT GIMMICK, DIFFICULTY SELECTOR, GROUP, NEARBY
 #
+AI "AI POLICY" "AI STATEMENT" "AI DISCLOSURE" "ARTIFICIAL INTELLIGENCE" GENAI CHATGPT MIDJOURNEY
+
+EmpireMUD AI Policy, Statement, and Disclosure
+
+CODE
+
+All EmpireMUD code is written and debugged by humans without AI tools. No vibe
+coding, no IDE auto-suggests, nothing more complicated than a regex search.
+
+GAME CONTENT
+
+Some content builders have chosen to use AI at various levels of the
+development process from brainstorming assistance to writing player-facing
+text. Most of the game's content, however, predates generative AI tools and was
+built on caffeine and dreams alone.
+
+No game content currently uses live AI services; all apparent NPC behavior is
+managed by human-written C code and DG Scripts instead.
+
+WEBSITE
+
+EmpireMUD's official website includes artwork created by subscription-based
+generative AI tools such as Midjourney and ChatGPT. EmpireMUD is a free game
+developed by an unpaid team and has no budget for genuine human artwork;
+subscriptions for these generative tools were paid for out-of-pocket. EmpireMUD
+accepts donations of appropriately-licensed, human-created artwork for use on
+the website.
+
+The purpose of AI artwork on the website is to beautify the site and to give a
+visual representation of each adventure in line with the original builders'
+vision. You are free to share these images or use them in other contexts so
+long as you include the original alt text so that continue to be accessible to
+blind users. We also appreciate if you attribute EmpireMUD as the source of
+these images.
+
+The website itself was written by hand (and keyboard) without the use of AI
+tools or content management services.
+#
 AOE "AREA OF EFFECT" "AREA EFFECT" "AREA-OF-EFFECT"
 
 An area-of-effect ability is one that hits multiple targets in the room. In
