@@ -6374,7 +6374,7 @@ void write_obj_to_file(FILE *fl, obj_data *obj) {
 	
 	// '_'
 	if (GET_OBJ_NOTES(obj) && *GET_OBJ_NOTES(obj)) {
-		strcpy(temp, GET_OBJ_NOTES(obj));
+		strcpy(temp, NULLSAFE(GET_OBJ_NOTES(obj)));
 		strip_crlf(temp);
 		fprintf(fl, "_\n%s~\n", temp);
 	}
