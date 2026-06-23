@@ -3150,7 +3150,7 @@ void olc_fullsearch_skill(char_data *ch, char *argument) {
 			else if (multi_isname(find_keywords, SKILL_ABBREV(sk))) {
 				any = TRUE;
 			}
-			else if (!SKILL_NOTES(sk) || !multi_isname(find_keywords, SKILL_NOTES(sk))) {
+			else if (SKILL_NOTES(sk) && multi_isname(find_keywords, SKILL_NOTES(sk))) {
 				any = TRUE;
 			}
 			

@@ -4193,7 +4193,7 @@ void olc_fullsearch_quest(char_data *ch, char *argument) {
 			else if (multi_isname(find_keywords, QUEST_COMPLETE_MSG(quest))) {
 				any = TRUE;
 			}
-			else if (!QUEST_NOTES(quest) || !multi_isname(find_keywords, QUEST_NOTES(quest))) {
+			else if (QUEST_NOTES(quest) && multi_isname(find_keywords, QUEST_NOTES(quest))) {
 				any = TRUE;
 			}
 			

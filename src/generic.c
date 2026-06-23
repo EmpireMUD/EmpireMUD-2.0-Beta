@@ -572,7 +572,7 @@ void olc_fullsearch_generic(char_data *ch, char *argument) {
 			if (multi_isname(find_keywords, GEN_NAME(gen))) {
 				any = TRUE;
 			}
-			else if (!GEN_NOTES(gen) || !multi_isname(find_keywords, GEN_NOTES(gen))) {
+			else if (GEN_NOTES(gen) && multi_isname(find_keywords, GEN_NOTES(gen))) {
 				any = TRUE;
 			}
 			
