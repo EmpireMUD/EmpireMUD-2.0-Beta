@@ -3639,6 +3639,8 @@ struct skill_data {
 	struct skill_ability *abilities;	// assigned abilities
 	struct synergy_ability *synergies;	// LL of abilities gained from paired skills
 	
+	char *notes;	// misc notes shown only to imms
+	
 	UT_hash_handle hh;	// skill_table hash handle
 	UT_hash_handle sorted_hh;	// sorted_skills hash handle
 };
@@ -6315,6 +6317,8 @@ struct shop_data {
 	
 	struct quest_giver *locations;	// shop locs
 	struct shop_item *items;	// for sale
+	
+	char *notes;	// misc notes shown only to imms
 	
 	UT_hash_handle hh;	// shop_table hash handle
 };

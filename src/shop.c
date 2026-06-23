@@ -767,6 +767,9 @@ void free_shop(shop_data *shop) {
 	if (SHOP_NAME(shop) && (!proto || SHOP_NAME(shop) != SHOP_NAME(proto))) {
 		free(SHOP_NAME(shop));
 	}
+	if (SHOP_NOTES(shop) && (!proto || SHOP_NOTES(shop) != SHOP_NOTES(proto))) {
+		free(SHOP_NOTES(shop));
+	}
 	
 	if (SHOP_ITEMS(shop) && (!proto || SHOP_ITEMS(shop) != SHOP_ITEMS(proto))) {
 		free_shop_item_list(SHOP_ITEMS(shop));
@@ -846,6 +849,11 @@ void parse_shop(FILE *fl, any_vnum vnum) {
 				break;
 			}
 			
+			case '_': {	// notes
+				SHOP_NOTES(shop) = fread_string(fl, error);
+				break;
+			}
+			
 			// end
 			case 'S': {
 				return;
@@ -903,7 +911,7 @@ void write_shop_index(FILE *fl) {
 */
 void write_shop_to_file(FILE *fl, shop_data *shop) {
 	struct shop_item *item;
-	char temp[256];
+	char temp[MAX_STRING_LENGTH];
 	
 	if (!fl || !shop) {
 		syslog(SYS_ERROR, LVL_START_IMM, TRUE, "SYSERR: write_shop_to_file called without %s", !fl ? "file" : "shop");
@@ -926,6 +934,13 @@ void write_shop_to_file(FILE *fl, shop_data *shop) {
 	
 	// 'L' locations
 	write_quest_givers_to_file(fl, 'L', SHOP_LOCATIONS(shop));
+	
+	// '_'
+	if (SHOP_NOTES(shop) && *SHOP_NOTES(shop)) {
+		strcpy(temp, SHOP_NOTES(shop));
+		strip_crlf(temp);
+		fprintf(fl, "_\n%s~\n", temp);
+	}
 	
 	// end
 	fprintf(fl, "S\n");
@@ -1045,6 +1060,9 @@ void save_olc_shop(descriptor_data *desc) {
 	if (SHOP_NAME(proto)) {
 		free(SHOP_NAME(proto));
 	}
+	if (SHOP_NOTES(proto)) {
+		free(SHOP_NOTES(proto));
+	}
 	free_shop_item_list(SHOP_ITEMS(proto));
 	free_quest_givers(SHOP_LOCATIONS(proto));
 	
@@ -1054,6 +1072,10 @@ void save_olc_shop(descriptor_data *desc) {
 			free(SHOP_NAME(shop));
 		}
 		SHOP_NAME(shop) = str_dup(default_shop_name);
+	}
+	if (SHOP_NOTES(shop) && !*SHOP_NOTES(shop)) {
+		free(SHOP_NOTES(shop));
+		SHOP_NOTES(shop) = NULL;
 	}
 	
 	// save data back over the proto-type
@@ -1088,6 +1110,7 @@ shop_data *setup_olc_shop(shop_data *input) {
 		
 		// copy things that are pointers
 		SHOP_NAME(new) = SHOP_NAME(input) ? str_dup(SHOP_NAME(input)) : NULL;
+		SHOP_NOTES(new) = SHOP_NOTES(input) ? str_dup(SHOP_NOTES(input)) : NULL;
 		SHOP_ITEMS(new) = copy_shop_item_list(SHOP_ITEMS(input));
 		SHOP_LOCATIONS(new) = copy_quest_givers(SHOP_LOCATIONS(input));
 	}
@@ -1174,6 +1197,10 @@ void do_stat_shop(char_data *ch, shop_data *shop) {
 	get_shop_items_display(shop, part);
 	build_page_display(ch, "Items:\r\n%s", part);
 	
+	if (SHOP_NOTES(shop) && *SHOP_NOTES(shop)) {
+		build_page_display(ch, "Notes:\r\n%s", SHOP_NOTES(shop));
+	}
+	
 	send_page_display(ch);
 }
 
@@ -1209,6 +1236,8 @@ void olc_show_shop(char_data *ch) {
 	
 	get_shop_items_display(shop, lbuf);
 	build_page_display(ch, "Items: <%sitem\t0>\r\n%s", OLC_LABEL_PTR(SHOP_ITEMS(shop)), lbuf);
+	
+	build_page_display(ch, "<%snotes\t0>\r\n%s", OLC_LABEL_PTR(SHOP_NOTES(shop)), NULLSAFE(SHOP_NOTES(shop)));
 	
 	send_page_display(ch);
 }
@@ -1585,6 +1614,19 @@ OLC_MODULE(shopedit_locations) {
 OLC_MODULE(shopedit_name) {
 	shop_data *shop = GET_OLC_SHOP(ch->desc);
 	olc_process_string(ch, argument, "name", &SHOP_NAME(shop));
+}
+
+
+OLC_MODULE(shopedit_notes) {
+	shop_data *shop = GET_OLC_SHOP(ch->desc);
+
+	if (ch->desc->str) {
+		msg_to_char(ch, "You are already editing a string.\r\n");
+	}
+	else {
+		sprintf(buf, "notes for %s", SHOP_NAME(shop));
+		start_string_editor(ch->desc, buf, &SHOP_NOTES(shop), MAX_NOTES, TRUE);
+	}
 }
 
 

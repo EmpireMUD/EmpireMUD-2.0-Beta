@@ -1693,6 +1693,7 @@ static inline int GET_SEASON(room_data *room) {
 #define SHOP_ITEMS(shop)  ((shop)->items)
 #define SHOP_LOCATIONS(shop)  ((shop)->locations)
 #define SHOP_NAME(shop)  ((shop)->name)
+#define SHOP_NOTES(shop)  ((shop)->notes)
 #define SHOP_OPEN_TIME(shop)  ((shop)->open_time)
 
 // helpers
@@ -1709,6 +1710,7 @@ static inline int GET_SEASON(room_data *room) {
 #define SKILL_MAX_LEVEL(skill)  ((skill)->max_level)
 #define SKILL_MIN_DROP_LEVEL(skill)  ((skill)->min_drop_level)
 #define SKILL_NAME(skill)  ((skill)->name)
+#define SKILL_NOTES(skill)  ((skill)->notes)
 #define SKILL_SYNERGIES(skill)  ((skill)->synergies)
 #define SKILL_VNUM(skill)  ((skill)->vnum)
 

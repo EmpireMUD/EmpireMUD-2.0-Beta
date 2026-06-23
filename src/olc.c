@@ -537,6 +537,7 @@ OLC_MODULE(shopedit_flags);
 OLC_MODULE(shopedit_items);
 OLC_MODULE(shopedit_locations);
 OLC_MODULE(shopedit_name);
+OLC_MODULE(shopedit_notes);
 OLC_MODULE(shopedit_opens);
 
 // skill modules
@@ -546,6 +547,7 @@ OLC_MODULE(skilledit_flags);
 OLC_MODULE(skilledit_maxlevel);
 OLC_MODULE(skilledit_mindrop);
 OLC_MODULE(skilledit_name);
+OLC_MODULE(skilledit_notes);
 OLC_MODULE(skilledit_showsynergies);
 OLC_MODULE(skilledit_showtree);
 OLC_MODULE(skilledit_synergy);
@@ -1138,6 +1140,7 @@ const struct olc_command_data olc_data[] = {
 	{ "items", shopedit_items, OLC_SHOP, OLC_CF_EDITOR },
 	{ "locations", shopedit_locations, OLC_SHOP, OLC_CF_EDITOR },
 	{ "name", shopedit_name, OLC_SHOP, OLC_CF_EDITOR },
+	{ "notes", shopedit_notes, OLC_SHOP, OLC_CF_EDITOR },
 	{ "opens", shopedit_opens, OLC_SHOP, OLC_CF_EDITOR },
 	
 	// skill commands
@@ -1147,6 +1150,7 @@ const struct olc_command_data olc_data[] = {
 	{ "maxlevel", skilledit_maxlevel, OLC_SKILL, OLC_CF_EDITOR },
 	{ "mindrop", skilledit_mindrop, OLC_SKILL, OLC_CF_EDITOR },
 	{ "name", skilledit_name, OLC_SKILL, OLC_CF_EDITOR },
+	{ "notes", skilledit_notes, OLC_SKILL, OLC_CF_EDITOR },
 	{ "synergy", skilledit_synergy, OLC_SKILL, OLC_CF_EDITOR },
 	{ "tree", skilledit_tree, OLC_SKILL, OLC_CF_EDITOR },
 	{ "showtree", skilledit_showtree, OLC_SKILL, OLC_CF_EDITOR },
