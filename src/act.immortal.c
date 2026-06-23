@@ -4401,6 +4401,10 @@ void do_stat_object(char_data *ch, obj_data *j, bool details) {
 			build_page_display(ch, "Custom messages: \tc%d\t0 (use vstat -d to view)", count);
 		}
 	}
+	
+	if (OBJ_IS_NOWHERE(j) && GET_OBJ_NOTES(j) && *GET_OBJ_NOTES(j)) {
+		build_page_display(ch, "Notes:\r\n%s", GET_OBJ_NOTES(j));
+	}
 
 	/* check the object for a script */
 	do_sstat_object(ch, j);

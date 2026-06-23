@@ -5978,6 +5978,10 @@ void free_obj_proto_data(struct obj_proto_data *data) {
 	free_quest_lookups(data->quest_lookups);
 	free_shop_lookups(data->shop_lookups);
 	
+	if (data->notes) {
+		free(data->notes);
+	}
+	
 	free(data);
 }
 
@@ -6043,6 +6047,7 @@ void parse_object(FILE *obj_f, int nr) {
 	int t[10], retval;
 	char *tmpptr;
 	char f1[256], f2[256], f3[256], f4[256];
+	char buf2[MAX_STRING_LENGTH];
 	struct obj_storage_type *store;
 	struct obj_apply *apply;
 	obj_data *obj, *find;
@@ -6262,6 +6267,11 @@ void parse_object(FILE *obj_f, int nr) {
 				break;
 			}
 			
+			case '_': {	// notes
+				obj->proto_data->notes = fread_string(obj_f, buf2);
+				break;
+			}
+			
 			case 'S':
 				check_object(obj);
 				return;
@@ -6361,6 +6371,13 @@ void write_obj_to_file(FILE *fl, obj_data *obj) {
 	
 	// T, V: triggers
 	write_trig_protos_to_file(fl, 'T', obj->proto_script);
+	
+	// '_'
+	if (GET_OBJ_NOTES(obj) && *GET_OBJ_NOTES(obj)) {
+		strcpy(temp, GET_OBJ_NOTES(obj));
+		strip_crlf(temp);
+		fprintf(fl, "_\n%s~\n", temp);
+	}
 
 	// END
 	fprintf(fl, "S\n");

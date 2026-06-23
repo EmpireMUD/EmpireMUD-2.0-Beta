@@ -441,6 +441,7 @@ OLC_MODULE(oedit_maxlevel);
 OLC_MODULE(oedit_minipet);
 OLC_MODULE(oedit_minlevel);
 OLC_MODULE(oedit_mintflags);
+OLC_MODULE(oedit_notes);
 OLC_MODULE(oedit_paint);
 OLC_MODULE(oedit_plants);
 OLC_MODULE(oedit_quantity);
@@ -1043,6 +1044,7 @@ const struct olc_command_data olc_data[] = {
 	{ "minlevel", oedit_minlevel, OLC_OBJECT, OLC_CF_EDITOR },
 	{ "minipet", oedit_minipet, OLC_OBJECT, OLC_CF_EDITOR },
 	{ "mintflags", oedit_mintflags, OLC_OBJECT, OLC_CF_EDITOR },
+	{ "notes", oedit_notes, OLC_OBJECT, OLC_CF_EDITOR },
 	{ "paint", oedit_paint, OLC_OBJECT, OLC_CF_EDITOR },
 	{ "plants", oedit_plants, OLC_OBJECT, OLC_CF_EDITOR },
 	{ "quantity", oedit_quantity, OLC_OBJECT, OLC_CF_EDITOR },

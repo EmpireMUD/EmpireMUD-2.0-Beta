@@ -6035,6 +6035,8 @@ struct obj_proto_data {
 	struct interaction_item *interactions;	// interaction items
 	struct obj_storage_type *storage;	// linked list of where an obj can be stored
 	
+	char *notes;	// misc notes shown only to imms
+	
 	// lookup tables
 	struct quest_lookup *quest_lookups;
 	struct shop_lookup *shop_lookups;

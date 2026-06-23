@@ -1024,6 +1024,7 @@ int Y_COORD(room_data *room);	// formerly #define Y_COORD(room)  FLAT_Y_COORD(ge
 #define GET_OBJ_MAX_SCALE_LEVEL(obj)  ((obj)->proto_data ? (obj)->proto_data->max_scale_level : 0)
 #define GET_OBJ_MIN_SCALE_LEVEL(obj)  ((obj)->proto_data ? (obj)->proto_data->min_scale_level : 0)
 #define GET_OBJ_QUEST_LOOKUPS(obj)  ((obj)->proto_data ? (obj)->proto_data->quest_lookups : NULL)
+#define GET_OBJ_NOTES(obj)  ((obj)->proto_data ? (obj)->proto_data->notes : NULL)
 #define GET_OBJ_REQUIRES_QUEST(obj)  ((obj)->proto_data ? (obj)->proto_data->requires_quest : NOTHING)
 #define GET_OBJ_REQUIRES_TOOL(obj)  ((obj)->proto_data ? (obj)->proto_data->requires_tool : NOTHING)
 #define GET_OBJ_SHOP_LOOKUPS(obj)  ((obj)->proto_data ? (obj)->proto_data->shop_lookups : NULL)
@@ -1039,6 +1040,7 @@ int Y_COORD(room_data *room);	// formerly #define Y_COORD(room)  FLAT_Y_COORD(ge
 #define IS_STOLEN(obj)  (GET_STOLEN_TIMER(obj) > 0 && (config_get_int("stolen_object_timer") * SECS_PER_REAL_MIN) + GET_STOLEN_TIMER(obj) > time(0))
 #define IS_STOLEN_FROM(obj, ch)  (!IS_NPC(ch) && GET_LOYALTY(ch) && GET_STOLEN_FROM(obj) == EMPIRE_VNUM(GET_LOYALTY(ch)))
 #define IS_STOLEN_FROM_EMPIRE(obj, emp)  ((emp) && GET_STOLEN_FROM(obj) == EMPIRE_VNUM(emp))
+#define OBJ_IS_NOWHERE(obj)  (!IN_ROOM(obj) && !((obj)->in_obj) && !((obj)->in_vehicle) && !((obj)->carried_by) && !((obj)->worn_by))
 
 // helpers
 #define OBJ_FLAGGED(obj, flag)  (IS_SET(GET_OBJ_EXTRA(obj), (flag)))
@@ -1048,7 +1050,7 @@ int Y_COORD(room_data *room);	// formerly #define Y_COORD(room)  FLAT_Y_COORD(ge
 #define TOOL_FLAGGED(obj, flag)  IS_SET(GET_OBJ_TOOL_FLAGS(obj), (flag))
 #define WORN_OR_CARRIED_BY(obj, ch)  ((obj)->worn_by == (ch) || (obj)->carried_by == (ch))
 
-// for stacking, sotring, etc
+// for stacking, sorting, etc
 #define OBJ_CAN_STACK(obj)  (GET_OBJ_TYPE(obj) != ITEM_CONTAINER && !IS_AMMO(obj))
 #define OBJ_CAN_STORE(obj)  (GET_OBJ_STORAGE(obj) && GET_OBJ_REQUIRES_QUEST(obj) == NOTHING && !OBJ_BOUND_TO(obj) && !OBJ_FLAGGED((obj), OBJ_NO_BASIC_STORAGE | OBJ_SUPERIOR | OBJ_ENCHANTED) && !IS_STOLEN(obj))
 #define OBJ_IS_IN_WORLD(obj)  (IN_ROOM(obj) || (obj)->in_obj || (obj)->in_vehicle || ((obj)->carried_by && IN_ROOM((obj)->carried_by)) || ((obj)->worn_by && IN_ROOM((obj)->worn_by)))
