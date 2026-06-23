@@ -484,6 +484,7 @@ OLC_MODULE(qedit_description);
 OLC_MODULE(qedit_ends);
 OLC_MODULE(qedit_flags);
 OLC_MODULE(qedit_name);
+OLC_MODULE(qedit_notes);
 OLC_MODULE(qedit_maxlevel);
 OLC_MODULE(qedit_minlevel);
 OLC_MODULE(qedit_prereqs);
@@ -502,6 +503,7 @@ OLC_MODULE(rmedit_interaction);
 OLC_MODULE(rmedit_flags);
 OLC_MODULE(rmedit_functions);
 OLC_MODULE(rmedit_matchexits);
+OLC_MODULE(rmedit_notes);
 OLC_MODULE(rmedit_title);
 OLC_MODULE(rmedit_script);
 OLC_MODULE(rmedit_spawns);
@@ -1083,6 +1085,7 @@ const struct olc_command_data olc_data[] = {
 	{ "ends", qedit_ends, OLC_QUEST, OLC_CF_EDITOR },
 	{ "flags", qedit_flags, OLC_QUEST, OLC_CF_EDITOR },
 	{ "name", qedit_name, OLC_QUEST, OLC_CF_EDITOR },
+	{ "notes", qedit_notes, OLC_QUEST, OLC_CF_EDITOR },
 	{ "maxlevel", qedit_maxlevel, OLC_QUEST, OLC_CF_EDITOR },
 	{ "minlevel", qedit_minlevel, OLC_QUEST, OLC_CF_EDITOR },
 	{ "prereqs", qedit_prereqs, OLC_QUEST, OLC_CF_EDITOR },
@@ -1101,6 +1104,7 @@ const struct olc_command_data olc_data[] = {
 	{ "flags", rmedit_flags, OLC_ROOM_TEMPLATE, OLC_CF_EDITOR },
 	{ "functions", rmedit_functions, OLC_ROOM_TEMPLATE, OLC_CF_EDITOR },
 	{ "matchexits", rmedit_matchexits, OLC_ROOM_TEMPLATE, OLC_CF_EDITOR },
+	{ "notes", rmedit_notes, OLC_ROOM_TEMPLATE, OLC_CF_EDITOR },
 	{ "title", rmedit_title, OLC_ROOM_TEMPLATE, OLC_CF_EDITOR },
 	{ "script", rmedit_script, OLC_ROOM_TEMPLATE, OLC_CF_EDITOR },
 	{ "spawns", rmedit_spawns, OLC_ROOM_TEMPLATE, OLC_CF_EDITOR },

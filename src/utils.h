@@ -1466,6 +1466,7 @@ int Y_COORD(room_data *room);	// formerly #define Y_COORD(room)  FLAT_Y_COORD(ge
 #define QUEST_MAX_LEVEL(quest)  ((quest)->max_level)
 #define QUEST_MIN_LEVEL(quest)  ((quest)->min_level)
 #define QUEST_NAME(quest)  ((quest)->name)
+#define QUEST_NOTES(quest)  ((quest)->notes)
 #define QUEST_PREREQS(quest)  ((quest)->prereqs)
 #define QUEST_REPEATABLE_AFTER(quest)  ((quest)->repeatable_after)
 #define QUEST_REWARDS(quest)  ((quest)->rewards)
@@ -1653,6 +1654,7 @@ static inline int GET_SEASON(room_data *room) {
 #define GET_RMT_SCRIPTS(rmt)  ((rmt)->proto_script)
 #define GET_RMT_SUBZONE(rmt)  ((rmt)->subzone)
 #define GET_RMT_TEMPERATURE_TYPE(rmt)  ((rmt)->temperature_type)
+#define GET_RMT_NOTES(rmt)  ((rmt)->notes)
 
 
  //////////////////////////////////////////////////////////////////////////////

@@ -4844,6 +4844,10 @@ void do_stat_room_template(char_data *ch, room_template *rmt, bool details) {
 	build_page_display_str(ch, "Scripts:");
 	show_script_display(ch, GET_RMT_SCRIPTS(rmt), FALSE);
 	
+	if (GET_RMT_NOTES(rmt) && *GET_RMT_NOTES(rmt)) {
+		build_page_display(ch, "Notes:\r\n%s", GET_RMT_NOTES(rmt));
+	}
+	
 	send_page_display(ch);
 }
 

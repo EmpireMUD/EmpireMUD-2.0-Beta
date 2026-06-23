@@ -4193,6 +4193,9 @@ void olc_fullsearch_quest(char_data *ch, char *argument) {
 			else if (multi_isname(find_keywords, QUEST_COMPLETE_MSG(quest))) {
 				any = TRUE;
 			}
+			else if (!QUEST_NOTES(quest) || !multi_isname(find_keywords, QUEST_NOTES(quest))) {
+				any = TRUE;
+			}
 			
 			// task customs text
 			LL_FOREACH(QUEST_TASKS(quest), req) {
@@ -5053,6 +5056,9 @@ void free_quest(quest_data *quest) {
 	if (QUEST_COMPLETE_MSG(quest) && (!proto || QUEST_COMPLETE_MSG(quest) != QUEST_COMPLETE_MSG(proto))) {
 		free(QUEST_COMPLETE_MSG(quest));
 	}
+	if (QUEST_NOTES(quest) && (!proto || QUEST_NOTES(quest) != QUEST_NOTES(proto))) {
+		free(QUEST_NOTES(quest));
+	}
 	
 	// pointers
 	if (QUEST_STARTS_AT(quest) && (!proto || QUEST_STARTS_AT(quest) != QUEST_STARTS_AT(proto))) {
@@ -5269,6 +5275,11 @@ void parse_quest(FILE *fl, any_vnum vnum) {
 				break;
 			}
 			
+			case '_': {	// notes
+				QUEST_NOTES(quest) = fread_string(fl, error);
+				break;
+			}
+			
 			// end
 			case 'S': {
 				return;
@@ -5421,6 +5432,13 @@ void write_quest_to_file(FILE *fl, quest_data *quest) {
 	
 	// Z. ends at
 	write_quest_givers_to_file(fl, 'Z', QUEST_ENDS_AT(quest));
+	
+	// '_'
+	if (QUEST_NOTES(quest) && *QUEST_NOTES(quest)) {
+		strcpy(temp, QUEST_NOTES(quest));
+		strip_crlf(temp);
+		fprintf(fl, "_\n%s~\n", temp);
+	}
 	
 	// end
 	fprintf(fl, "S\n");
@@ -5704,6 +5722,9 @@ void save_olc_quest(descriptor_data *desc) {
 	if (QUEST_COMPLETE_MSG(proto)) {
 		free(QUEST_COMPLETE_MSG(proto));
 	}
+	if (QUEST_NOTES(proto)) {
+		free(QUEST_NOTES(proto));
+	}
 	free_quest_givers(QUEST_STARTS_AT(proto));
 	free_quest_givers(QUEST_ENDS_AT(proto));
 	free_requirements(QUEST_TASKS(proto));
@@ -5729,6 +5750,10 @@ void save_olc_quest(descriptor_data *desc) {
 			free(QUEST_COMPLETE_MSG(quest));
 		}
 		QUEST_COMPLETE_MSG(quest) = str_dup(default_quest_complete_msg);
+	}
+	if (QUEST_NOTES(quest) && !*QUEST_NOTES(quest)) {
+		free(QUEST_NOTES(quest));
+		QUEST_NOTES(quest) = NULL;
 	}
 	
 	// save data back over the proto-type
@@ -5789,6 +5814,7 @@ quest_data *setup_olc_quest(quest_data *input) {
 		QUEST_NAME(new) = QUEST_NAME(input) ? str_dup(QUEST_NAME(input)) : NULL;
 		QUEST_DESCRIPTION(new) = QUEST_DESCRIPTION(input) ? str_dup(QUEST_DESCRIPTION(input)) : NULL;
 		QUEST_COMPLETE_MSG(new) = QUEST_COMPLETE_MSG(input) ? str_dup(QUEST_COMPLETE_MSG(input)) : NULL;
+		QUEST_NOTES(new) = QUEST_NOTES(input) ? str_dup(QUEST_NOTES(input)) : NULL;
 		
 		QUEST_STARTS_AT(new) = copy_quest_givers(QUEST_STARTS_AT(input));
 		QUEST_ENDS_AT(new) = copy_quest_givers(QUEST_ENDS_AT(input));
@@ -5935,6 +5961,10 @@ void do_stat_quest(char_data *ch, quest_data *quest) {
 	build_page_display_str(ch, "Scripts:");
 	show_script_display(ch, QUEST_SCRIPTS(quest), FALSE);
 	
+	if (QUEST_NOTES(quest) && *QUEST_NOTES(quest)) {
+		build_page_display(ch, "Notes:\r\n%s", QUEST_NOTES(quest));
+	}
+	
 	send_page_display(ch);
 }
 
@@ -6023,6 +6053,8 @@ void olc_show_quest(char_data *ch) {
 	if (QUEST_SCRIPTS(quest)) {
 		show_script_display(ch, QUEST_SCRIPTS(quest), FALSE);
 	}
+	
+	build_page_display(ch, "<%snotes\t0>\r\n%s", OLC_LABEL_PTR(QUEST_NOTES(quest)), NULLSAFE(QUEST_NOTES(quest)));
 	
 	send_page_display(ch);
 }
@@ -6123,6 +6155,19 @@ OLC_MODULE(qedit_flags) {
 OLC_MODULE(qedit_name) {
 	quest_data *quest = GET_OLC_QUEST(ch->desc);
 	olc_process_string(ch, argument, "name", &QUEST_NAME(quest));
+}
+
+
+OLC_MODULE(qedit_notes) {
+	quest_data *quest = GET_OLC_QUEST(ch->desc);
+
+	if (ch->desc->str) {
+		msg_to_char(ch, "You are already editing a string.\r\n");
+	}
+	else {
+		sprintf(buf, "notes for %s", QUEST_NAME(quest));
+		start_string_editor(ch->desc, buf, &QUEST_NOTES(quest), MAX_NOTES, TRUE);
+	}
 }
 
 

@@ -4039,6 +4039,8 @@ struct room_template {
 	struct quest_lookup *quest_lookups;
 	struct shop_lookup *shop_lookups;
 	
+	char *notes;	// misc notes shown only to imms
+	
 	UT_hash_handle hh;	// room_template_table hash
 };
 
@@ -6173,6 +6175,8 @@ struct quest_data {
 	bool daily_active;	// if FALSE, quest is not available today
 	
 	struct trig_proto_list *proto_script;	// quest triggers
+	
+	char *notes;	// misc notes shown only to imms
 	
 	UT_hash_handle hh;	// hash handle for quest_table
 };

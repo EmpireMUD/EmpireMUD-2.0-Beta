@@ -6596,6 +6596,9 @@ void free_room_template(room_template *rmt) {
 	if (GET_RMT_DESC(rmt) && (!proto || GET_RMT_DESC(rmt) != GET_RMT_DESC(proto))) {
 		free(GET_RMT_DESC(rmt));
 	}
+	if (GET_RMT_NOTES(rmt) && (!proto || GET_RMT_NOTES(rmt) != GET_RMT_NOTES(proto))) {
+		free(GET_RMT_NOTES(rmt));
+	}
 
 	if (GET_RMT_SPAWNS(rmt) && (!proto || GET_RMT_SPAWNS(rmt) != GET_RMT_SPAWNS(proto))) {
 		while ((spawn = GET_RMT_SPAWNS(rmt))) {
@@ -6774,6 +6777,11 @@ void parse_room_template(FILE *fl, rmt_vnum vnum) {
 				}
 				break;
 			}
+			
+			case '_': {	// notes
+				GET_RMT_NOTES(rmt) = fread_string(fl, buf2);
+				break;
+			}
 
 			// end
 			case 'S': {
@@ -6843,6 +6851,13 @@ void write_room_template_to_file(FILE *fl, room_template *rmt) {
 	// Z: misc data
 	if (GET_RMT_TEMPERATURE_TYPE(rmt)) {
 		fprintf(fl, "Z1 %d\n", GET_RMT_TEMPERATURE_TYPE(rmt));
+	}
+	
+	// '_'
+	if (GET_RMT_NOTES(rmt) && *GET_RMT_NOTES(rmt)) {
+		strcpy(temp, GET_RMT_NOTES(rmt));
+		strip_crlf(temp);
+		fprintf(fl, "_\n%s~\n", temp);
 	}
 	
 	// end
