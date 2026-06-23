@@ -4900,7 +4900,19 @@ do it in the quests or scripts that reward event points.
 
 See also: OLC EVENTS
 #d
-"EVEDIT NOTES" "ABILEDIT NOTES" "ADVEDIT NOTES" "ARCHEDIT NOTES" "BEDIT NOTES" "CEDIT NOTES" "CROPEDIT NOTES" "FEDIT NOTES" "GEDIT NOTES" "GENEDIT NOTES" "MORPHEDIT NOTES" "PROGEDIT NOTES" "QEDIT NOTES" "REDIT NOTES" "SECTEDIT NOTES" "SHOPEDIT NOTES" "SKILLEDIT NOTES"
+"EVEDIT NOTES" "ABILEDIT NOTES" "ADVEDIT NOTES" "ARCHEDIT NOTES" "BEDIT NOTES" "CEDIT NOTES" "CROPEDIT NOTES" "FEDIT NOTES" "GEDIT NOTES" "GENEDIT NOTES" "MORPHEDIT NOTES"
+
+Usage:  .notes
+
+Notes are for internal use only. This message is set in the string editor, and
+you should record anything that's important for future developers or immortals
+to know.
+
+This text is not shown to players. It is only visible on the 'stat' command.
+
+See also: OLC, STAT, STRING EDITOR
+#d
+"PROGEDIT NOTES" "QEDIT NOTES" "REDIT NOTES" "SECTEDIT NOTES" "SHOPEDIT NOTES" "SKILLEDIT NOTES" "VEDIT NOTES"
 
 Usage:  .notes
 

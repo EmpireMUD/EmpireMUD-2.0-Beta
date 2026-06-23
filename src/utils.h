@@ -1835,6 +1835,7 @@ static inline int GET_SEASON(room_data *room) {
 #define VEH_MILITARY(veh)  ((veh)->attributes->military)
 #define VEH_MIN_SCALE_LEVEL(veh)  ((veh)->attributes->min_scale_level)
 #define VEH_MOVE_TYPE(veh)  ((veh)->attributes->move_type)
+#define VEH_NOTES(veh)  ((veh)->attributes->notes)
 #define VEH_RELATIONS(veh)  ((veh)->attributes->relations)
 #define VEH_REQUIRES_CLIMATE(veh)  ((veh)->attributes->requires_climate)
 #define VEH_REGULAR_MAINTENANCE(veh)  ((veh)->attributes->regular_maintenance)

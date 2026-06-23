@@ -6472,6 +6472,8 @@ struct vehicle_attribute_data {
 	struct custom_message *custom_msgs;	// any custom messages
 	struct bld_relation *relations;	// links to buildings/vehicles
 	int height;	// 0+ addition to terrain height
+	
+	char *notes;	// misc notes shown only to imms
 };
 
 

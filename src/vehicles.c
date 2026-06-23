@@ -3206,6 +3206,10 @@ void free_vehicle(vehicle_data *veh) {
 			free_bld_relations(VEH_RELATIONS(veh));
 		}
 		
+		if (VEH_NOTES(veh) && (!proto || VEH_NOTES(veh) != VEH_NOTES(proto))) {
+			free(VEH_NOTES(veh));
+		}
+		
 		free(veh->attributes);
 	}
 	
@@ -3447,6 +3451,11 @@ void parse_vehicle(FILE *fl, any_vnum vnum) {
 				break;
 			}
 			
+			case '_': {	// notes
+				VEH_NOTES(veh) = fread_string(fl, error);
+				break;
+			}
+			
 			// end
 			case 'S': {
 				return;
@@ -3571,6 +3580,13 @@ void write_vehicle_to_file(FILE *fl, vehicle_data *veh) {
 	// U: relations
 	LL_FOREACH(VEH_RELATIONS(veh), relat) {
 		fprintf(fl, "U\n%d %d\n", relat->type, relat->vnum);
+	}
+	
+	// '_'
+	if (VEH_NOTES(veh) && *VEH_NOTES(veh)) {
+		strcpy(temp, VEH_NOTES(veh));
+		strip_crlf(temp);
+		fprintf(fl, "_\n%s~\n", temp);
 	}
 	
 	// end
@@ -4157,7 +4173,7 @@ void olc_fullsearch_vehicle(char_data *ch, char *argument) {
 			}
 		}
 		
-		if (*find_keywords && !multi_isname(find_keywords, VEH_KEYWORDS(veh)) && !multi_isname(find_keywords, VEH_LONG_DESC(veh)) && !multi_isname(find_keywords, VEH_LOOK_DESC(veh)) && !multi_isname(find_keywords, VEH_SHORT_DESC(veh)) && !search_extra_descs(find_keywords, VEH_EX_DESCS(veh)) && !search_custom_messages(find_keywords, VEH_CUSTOM_MSGS(veh))) {
+		if (*find_keywords && !multi_isname(find_keywords, VEH_KEYWORDS(veh)) && !multi_isname(find_keywords, VEH_LONG_DESC(veh)) && !multi_isname(find_keywords, VEH_LOOK_DESC(veh)) && !multi_isname(find_keywords, VEH_SHORT_DESC(veh)) && (!VEH_NOTES(veh) || !multi_isname(find_keywords, VEH_NOTES(veh))) && !search_extra_descs(find_keywords, VEH_EX_DESCS(veh)) && !search_custom_messages(find_keywords, VEH_CUSTOM_MSGS(veh))) {
 			continue;
 		}
 		
@@ -4226,6 +4242,10 @@ void save_olc_vehicle(descriptor_data *desc) {
 	if (VEH_QUARTER_ICON(veh) && !*VEH_QUARTER_ICON(veh)) {
 		free(VEH_QUARTER_ICON(veh));
 		VEH_QUARTER_ICON(veh) = NULL;
+	}
+	if (VEH_NOTES(veh) && !*VEH_NOTES(veh)) {
+		free(VEH_NOTES(veh));
+		VEH_NOTES(veh) = NULL;
 	}
 	VEH_HEALTH(veh) = VEH_MAX_HEALTH(veh);
 	prune_extra_descs(&VEH_EX_DESCS(veh));
@@ -4328,6 +4348,9 @@ void save_olc_vehicle(descriptor_data *desc) {
 	if (VEH_REGULAR_MAINTENANCE(proto)) {
 		free_resource_list(VEH_REGULAR_MAINTENANCE(proto));
 	}
+	if (VEH_NOTES(proto)) {
+		free(VEH_NOTES(proto));
+	}
 	free_interactions(&VEH_INTERACTIONS(proto));
 	while ((spawn = VEH_SPAWNS(proto))) {
 		VEH_SPAWNS(proto) = spawn->next;
@@ -4403,6 +4426,7 @@ vehicle_data *setup_olc_vehicle(vehicle_data *input) {
 		VEH_QUARTER_ICON(new) = VEH_QUARTER_ICON(input) ? str_dup(VEH_QUARTER_ICON(input)) : NULL;
 		VEH_LONG_DESC(new) = VEH_LONG_DESC(input) ? str_dup(VEH_LONG_DESC(input)) : NULL;
 		VEH_LOOK_DESC(new) = VEH_LOOK_DESC(input) ? str_dup(VEH_LOOK_DESC(input)) : NULL;
+		VEH_NOTES(new) = VEH_NOTES(input) ? str_dup(VEH_NOTES(input)) : NULL;
 		
 		// copy lists
 		VEH_REGULAR_MAINTENANCE(new) = copy_resource_list(VEH_REGULAR_MAINTENANCE(input));
@@ -4629,6 +4653,10 @@ void do_stat_vehicle(char_data *ch, vehicle_data *veh, bool details) {
 			build_page_display(ch, " %s: %d", part, red->value);
 		}
 	}
+
+	if (!IN_ROOM(veh) && VEH_NOTES(veh) && *VEH_NOTES(veh)) {
+		build_page_display(ch, "Notes:\r\n%s", VEH_NOTES(veh));
+	}
 	
 	// script info
 	build_page_display(ch, "Script information (id %d):", (SCRIPT(veh) && IN_ROOM(veh)) ? veh_script_id(veh) : veh->script_id);
@@ -4842,6 +4870,8 @@ void olc_show_vehicle(char_data *ch) {
 		}
 		build_page_display(ch, " %d spawn%s set", count, PLURAL(count));
 	}
+	
+	build_page_display(ch, "<%snotes\t0>\r\n%s", OLC_LABEL_PTR(VEH_NOTES(veh)), NULLSAFE(VEH_NOTES(veh)));
 	
 	send_page_display(ch);
 }
@@ -5113,6 +5143,19 @@ OLC_MODULE(vedit_minlevel) {
 OLC_MODULE(vedit_movetype) {
 	vehicle_data *veh = GET_OLC_VEHICLE(ch->desc);
 	VEH_MOVE_TYPE(veh) = olc_process_type(ch, argument, "move type", "movetype", mob_move_types, VEH_MOVE_TYPE(veh));
+}
+
+
+OLC_MODULE(vedit_notes) {
+	vehicle_data *veh = GET_OLC_VEHICLE(ch->desc);
+
+	if (ch->desc->str) {
+		msg_to_char(ch, "You are already editing a string.\r\n");
+	}
+	else {
+		sprintf(buf, "notes for %s", VEH_SHORT_DESC(veh));
+		start_string_editor(ch->desc, buf, &VEH_NOTES(veh), MAX_NOTES, TRUE);
+	}
 }
 
 

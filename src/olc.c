@@ -608,6 +608,7 @@ OLC_MODULE(vedit_maxlevel);
 OLC_MODULE(vedit_military);
 OLC_MODULE(vedit_minlevel);
 OLC_MODULE(vedit_movetype);
+OLC_MODULE(vedit_notes);
 OLC_MODULE(vedit_quarter_icon);
 OLC_MODULE(vedit_relations);
 OLC_MODULE(vedit_requiresclimate);
@@ -1211,6 +1212,7 @@ const struct olc_command_data olc_data[] = {
 	{ "military", vedit_military, OLC_VEHICLE, OLC_CF_EDITOR },
 	{ "minlevel", vedit_minlevel, OLC_VEHICLE, OLC_CF_EDITOR },
 	{ "movetype", vedit_movetype, OLC_VEHICLE, OLC_CF_EDITOR },
+	{ "notes", vedit_notes, OLC_VEHICLE, OLC_CF_EDITOR },
 	{ "quartericon", vedit_quarter_icon, OLC_VEHICLE, OLC_CF_EDITOR },
 	{ "relations", vedit_relations, OLC_VEHICLE, OLC_CF_EDITOR },
 	{ "requiresclimate", vedit_requiresclimate, OLC_VEHICLE, OLC_CF_EDITOR },
