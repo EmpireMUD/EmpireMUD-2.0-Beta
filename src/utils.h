@@ -1442,6 +1442,7 @@ int Y_COORD(room_data *room);	// formerly #define Y_COORD(room)  FLAT_Y_COORD(ge
 #define PRG_DESCRIPTION(prg)  ((prg)->description)
 #define PRG_FLAGS(prg)  ((prg)->flags)
 #define PRG_NAME(prg)  ((prg)->name)
+#define PRG_NOTES(prg)  ((prg)->notes)
 #define PRG_PERKS(prg)  ((prg)->perks)
 #define PRG_PREREQS(prg)  ((prg)->prereqs)
 #define PRG_TASKS(prg)  ((prg)->tasks)

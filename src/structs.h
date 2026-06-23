@@ -6123,6 +6123,8 @@ struct progress_data {
 	struct req_data *tasks;	// linked list of tasks to complete
 	struct progress_perk *perks;	// linked list of perks granted
 	
+	char *notes;	// misc notes shown only to imms
+	
 	UT_hash_handle hh;	// progress_table
 	UT_hash_handle sorted_hh;	// sorted_progress
 };
