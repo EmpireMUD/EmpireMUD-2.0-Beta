@@ -1144,8 +1144,8 @@ OLC_MODULE(advedit_cascade) {
 			safe_snprintf(line, sizeof(line), "no permission");
 		}
 		else {
-			GET_MIN_SCALE_LEVEL(mob) = GET_ADV_MIN_LEVEL(adv);
-			GET_MAX_SCALE_LEVEL(mob) = GET_ADV_MAX_LEVEL(adv);
+			SET_MIN_SCALE_LEVEL(mob, GET_ADV_MIN_LEVEL(adv));
+			SET_MAX_SCALE_LEVEL(mob, GET_ADV_MAX_LEVEL(adv));
 			safe_snprintf(line, sizeof(line), "updated");
 			save_mobs = TRUE;
 		}
@@ -1887,8 +1887,8 @@ OLC_MODULE(advedit_uncascade) {
 			safe_snprintf(line, sizeof(line), "no permission");
 		}
 		else {
-			GET_MIN_SCALE_LEVEL(mob) = 0;
-			GET_MAX_SCALE_LEVEL(mob) = 0;
+			SET_MIN_SCALE_LEVEL(mob, 0);
+			SET_MAX_SCALE_LEVEL(mob, 0);
 			safe_snprintf(line, sizeof(line), "removed");
 			save_mobs = TRUE;
 		}

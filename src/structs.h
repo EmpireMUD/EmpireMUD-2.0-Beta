@@ -4367,8 +4367,6 @@ struct map_file_data_v1 {
 // Specials used by NPCs, not PCs
 struct mob_special_data {
 	int current_scale_level;	// level the mob was scaled to, or -1 for not scaled
-	int min_scale_level;	// minimum level this mob may be scaled to
-	int max_scale_level;	// maximum level this mob may be scaled to
 	
 	int name_set;	// NAMES_x
 	any_vnum language;	// default language (NOTHING to use global default instead)

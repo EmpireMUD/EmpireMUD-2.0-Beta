@@ -927,9 +927,7 @@ int Y_COORD(room_data *room);	// formerly #define Y_COORD(room)  FLAT_Y_COORD(ge
 
 // ch->mob_specials: mob_special_data
 #define GET_CURRENT_SCALE_LEVEL(ch)  ((ch)->mob_specials.current_scale_level)
-#define GET_MAX_SCALE_LEVEL(ch)  ((ch)->mob_specials.max_scale_level)
 #define GET_MOB_VNUM(mob)  (IS_NPC(mob) ? (mob)->vnum : NOTHING)
-#define GET_MIN_SCALE_LEVEL(ch)  ((ch)->mob_specials.min_scale_level)
 #define MOB_NAME_SET(ch)  ((ch)->mob_specials.name_set)
 #define MOB_ATTACK_TYPE(ch)  ((ch)->mob_specials.attack_type)
 #define MOB_CUSTOM_MSGS(ch)  ((ch)->mob_specials.custom_msgs)
@@ -950,11 +948,15 @@ int Y_COORD(room_data *room);	// formerly #define Y_COORD(room)  FLAT_Y_COORD(ge
 
 // prototype data
 #define MOB_CUSTOM_CORPSE(ch)  (IS_NPC(ch) ? (ch)->proto_data->custom_corpse : NOTHING)
+#define GET_MAX_SCALE_LEVEL(ch)  (IS_NPC(ch) ? (ch)->proto_data->max_scale_level : 0)
+#define GET_MIN_SCALE_LEVEL(ch)  (IS_NPC(ch) ? (ch)->proto_data->min_scale_level : 0)
 #define MOB_QUEST_LOOKUPS(ch)  ((ch)->proto_data->quest_lookups)
 #define MOB_SHOP_LOOKUPS(ch)  ((ch)->proto_data->shop_lookups)
 
 // protected data (regular getter won't allow set)
-#define SET_CUSTOM_CORPSE(ch, val)  ((ch)->proto_data->custom_corpse = val)
+#define SET_CUSTOM_CORPSE(ch, val)  ((ch)->proto_data->custom_corpse = (val))
+#define SET_MAX_SCALE_LEVEL(ch, val)  ((ch)->proto_data->max_scale_level = (val))
+#define SET_MIN_SCALE_LEVEL(ch, val)  ((ch)->proto_data->min_scale_level = (val))
 
 // helpers
 #define IS_MOB(ch)  (IS_NPC(ch) && GET_MOB_VNUM(ch) != NOTHING)

@@ -1115,7 +1115,7 @@ void save_olc_mobile(descriptor_data *desc) {
 	char_data *mob = GET_OLC_MOBILE(desc), *mob_iter, *proto;
 	mob_vnum vnum = GET_OLC_VNUM(desc);
 	UT_hash_handle hh;
-	bool changed, is_mini;
+	bool changed, is_mini, level_change;
 	
 	// have a place to save it?
 	if (!(proto = mob_proto(vnum))) {
@@ -1130,8 +1130,11 @@ void save_olc_mobile(descriptor_data *desc) {
 	
 	// slight sanity checking
 	if (GET_MAX_SCALE_LEVEL(mob) < GET_MIN_SCALE_LEVEL(mob) && GET_MAX_SCALE_LEVEL(mob) > 0) {
-		GET_MAX_SCALE_LEVEL(mob) = GET_MIN_SCALE_LEVEL(mob);
+		SET_MAX_SCALE_LEVEL(mob, GET_MIN_SCALE_LEVEL(mob));
 	}
+	
+	// notes
+	level_change = (GET_MIN_SCALE_LEVEL(mob) != GET_MIN_SCALE_LEVEL(proto) || GET_MAX_SCALE_LEVEL(mob) != GET_MAX_SCALE_LEVEL(proto));
 	
 	// update the strings and pointers on live mobs
 	DL_FOREACH(character_list, mob_iter) {
@@ -1167,16 +1170,14 @@ void save_olc_mobile(descriptor_data *desc) {
 			MOB_FACTION(mob_iter) = MOB_FACTION(mob);
 			
 			// check for changes to level, flags, or damage
-			changed = (GET_MIN_SCALE_LEVEL(mob_iter) != GET_MIN_SCALE_LEVEL(mob)) || (GET_MAX_SCALE_LEVEL(mob_iter) != GET_MAX_SCALE_LEVEL(mob)) || (MOB_ATTACK_TYPE(mob_iter) != MOB_ATTACK_TYPE(mob)) || (MOB_FLAGS(mob_iter) != MOB_FLAGS(mob));
+			changed = (MOB_ATTACK_TYPE(mob_iter) != MOB_ATTACK_TYPE(mob)) || (MOB_FLAGS(mob_iter) != MOB_FLAGS(mob));
 			
 			// update stats
-			GET_MIN_SCALE_LEVEL(mob_iter) = GET_MIN_SCALE_LEVEL(mob);
-			GET_MAX_SCALE_LEVEL(mob_iter) = GET_MAX_SCALE_LEVEL(mob);
 			MOB_ATTACK_TYPE(mob_iter) = MOB_ATTACK_TYPE(mob);
 			MOB_FLAGS(mob_iter) = MOB_FLAGS(mob);
 			
 			// re-scale
-			if (changed && GET_CURRENT_SCALE_LEVEL(mob_iter) > 0) {
+			if ((changed || level_change) && GET_CURRENT_SCALE_LEVEL(mob_iter) > 0) {
 				scale_mob_to_level(mob_iter, GET_CURRENT_SCALE_LEVEL(mob_iter));
 			}
 
@@ -1682,13 +1683,13 @@ OLC_MODULE(medit_lookdescription) {
 
 OLC_MODULE(medit_maxlevel) {
 	char_data *mob = GET_OLC_MOBILE(ch->desc);	
-	GET_MAX_SCALE_LEVEL(mob) = olc_process_number(ch, argument, "maximum level", "maxlevel", 0, MAX_INT, GET_MAX_SCALE_LEVEL(mob));
+	SET_MAX_SCALE_LEVEL(mob, olc_process_number(ch, argument, "maximum level", "maxlevel", 0, MAX_INT, GET_MAX_SCALE_LEVEL(mob)));
 }
 
 
 OLC_MODULE(medit_minlevel) {
 	char_data *mob = GET_OLC_MOBILE(ch->desc);	
-	GET_MIN_SCALE_LEVEL(mob) = olc_process_number(ch, argument, "minimum level", "minlevel", 0, MAX_INT, GET_MIN_SCALE_LEVEL(mob));
+	SET_MIN_SCALE_LEVEL(mob, olc_process_number(ch, argument, "minimum level", "minlevel", 0, MAX_INT, GET_MIN_SCALE_LEVEL(mob)));
 }
 
 

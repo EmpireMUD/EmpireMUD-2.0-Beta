@@ -5723,8 +5723,8 @@ void parse_mobile(FILE *mob_f, int nr) {
 		}
 	}
 	
-	GET_MIN_SCALE_LEVEL(mob) = t[0];
-	GET_MAX_SCALE_LEVEL(mob) = t[1];
+	SET_MIN_SCALE_LEVEL(mob, t[0]);
+	SET_MAX_SCALE_LEVEL(mob, t[1]);
 	MOB_FLAGS(mob) = asciiflag_conv(f1);
 	AFF_FLAGS(mob) = asciiflag_conv(f2);
 	SET_SIZE(mob) = t[2];
