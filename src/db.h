@@ -654,6 +654,7 @@ int pick_generic_name(int name_set, int sex);
 void remove_mobile_from_table(char_data *mob);
 void reset_char(char_data *ch);
 void free_char(char_data *ch);
+void free_mob_proto_data(struct mob_proto_data *data);
 void set_title(char_data *ch, char *title);
 int sort_mobiles(char_data *a, char_data *b);
 

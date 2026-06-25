@@ -1214,6 +1214,7 @@ void save_olc_mobile(descriptor_data *desc) {
 
 	free_interactions(&proto->interactions);
 	free_custom_messages(MOB_CUSTOM_MSGS(proto));
+	free_mob_proto_data(proto->proto_data);
 	
 	if (proto->proto_script) {
 		free_proto_scripts(&proto->proto_script);
