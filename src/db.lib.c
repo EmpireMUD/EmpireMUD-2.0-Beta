@@ -5687,8 +5687,9 @@ void parse_mobile(FILE *mob_f, int nr) {
 	// create!
 	CREATE(mob, char_data, 1);
 	clear_char(mob);
+	clear_mob_proto_data(mob);
 	mob->vnum = nr;
-
+	
 	HASH_FIND_INT(mobile_table, &nr, find);
 	if (find) {
 		log("WARNING: Duplicate mobile vnum #%d", nr);

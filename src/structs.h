@@ -5139,6 +5139,7 @@ struct char_data {
 	struct mob_special_data mob_specials;	// NPC specials
 	struct interaction_item *interactions;	// mob interaction items
 	struct cooldown_data *cooldowns;	// ability cooldowns
+	struct mob_proto_data *proto_data;	// data that doesn't change
 	
 	struct affected_type *affected;	// affected by what spells
 	struct over_time_effect_type *over_time_effects;	// damage-over-time effects
@@ -5217,6 +5218,26 @@ struct over_time_effect_type {
 struct follow_type {
 	char_data *follower;
 	struct follow_type *next;
+};
+
+
+// mob properties that cannot change from the prototype
+struct mob_proto_data {
+	int	attack_type;	// weapon type
+	obj_vnum custom_corpse;	// obj vnum for the mob's corpse
+	int max_scale_level;	// maximum level this mob may be scaled to
+	int min_scale_level;	// minimum level this mob may be scaled to
+	byte move_type;	// how the mob moves
+	int name_set;	// the id for a NAMES_ namelist
+	
+	struct custom_message *custom_msgs;	// any custom messages
+	
+	faction_data *faction;	// if any
+	struct interaction_item *interactions;	// mob interaction items
+	
+	// lookup helpers
+	struct quest_lookup *quest_lookups;
+	struct shop_lookup *shop_lookups;
 };
 
 

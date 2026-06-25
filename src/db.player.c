@@ -830,6 +830,22 @@ void check_delayed_load(char_data *ch) {
 }
 
 
+/**
+* Frees the pointers inside a mob_proto_data, and the data item itself.
+*
+* @param struct mob_proto_data *data The thing to be free'd.
+*/
+void free_mob_proto_data(struct mob_proto_data *data) {
+	if (data) {
+		free_custom_messages(data->custom_msgs);
+		free_interactions(&data->interactions);
+		free_quest_lookups(data->quest_lookups);
+		free_shop_lookups(data->shop_lookups);
+		free(data);
+	}
+}
+
+
 /* release memory allocated for a char struct */
 void free_char(char_data *ch) {
 	struct player_automessage *automsg, *next_automsg;
@@ -1141,6 +1157,11 @@ void free_char(char_data *ch) {
 	}
 	if (MOB_CUSTOM_MSGS(ch) && (!proto || MOB_CUSTOM_MSGS(ch) != MOB_CUSTOM_MSGS(proto))) {
 		free_custom_messages(MOB_CUSTOM_MSGS(ch));
+	}
+	
+	if (ch->proto_data && (!proto || ch->proto_data != proto->proto_data)) {
+		free_mob_proto_data(ch->proto_data);
+		ch->proto_data = NULL;
 	}
 	
 	if (ch->desc) {
@@ -4829,10 +4850,8 @@ void init_player(char_data *ch) {
 	bool first = FALSE;
 	int i, iter, top_idnum;
 
-	// create a player_special structure, if needed
-	if (ch->player_specials == NULL) {
-		init_player_specials(ch);
-	}
+	// create a player_special structure -- prior to b5.205 this only happened if !ch->player_specials but this should be called anyway
+	init_player_specials(ch);
 	
 	// store temporary account id (may be overwritten by clear_player)
 	if (GET_TEMPORARY_ACCOUNT_ID(ch) != NOTHING) {

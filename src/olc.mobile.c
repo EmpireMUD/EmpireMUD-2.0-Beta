@@ -158,6 +158,34 @@ bool audit_mobile(char_data *mob, char_data *ch) {
 	return problem;
 }
 
+
+/**
+* Duplicates mob_proto_data for OLC editing. Does not copy quest or shop
+* lookups, which are reference data and not editable.
+*
+* @param struct mob_proto_data *input The incoming data.
+* @return struct mob_proto_data* The copied version.
+*/
+struct mob_proto_data *copy_mob_proto_data(struct mob_proto_data *input) {
+	struct mob_proto_data *mpd;
+	
+	CREATE(mpd, struct mob_proto_data, 1);
+	*mpd = *input;
+	
+	// lookups are not copied
+	mpd->quest_lookups = NULL;
+	mpd->shop_lookups = NULL;
+	
+	// copy pointers
+	mpd->custom_msgs = copy_custom_messages(input->custom_msgs);
+	mpd->interactions = copy_interaction_list(input->interactions);
+	
+	// input->faction is ok to just copy as a pointer to live data, not stored internally here
+	
+	return mpd;
+}
+
+
 /**
 * Creates a new mob entry.
 *
@@ -1222,6 +1250,7 @@ char_data *setup_olc_mobile(char_data *input) {
 		GET_SHORT_DESC(new) = GET_SHORT_DESC(input) ? str_dup(GET_SHORT_DESC(input)) : NULL;
 		GET_LONG_DESC(new) = GET_LONG_DESC(input) ? str_dup(GET_LONG_DESC(input)) : NULL;
 		GET_LOOK_DESC(new) = GET_LOOK_DESC(input) ? str_dup(GET_LOOK_DESC(input)) : NULL;
+		new->proto_data = copy_mob_proto_data(input->proto_data);
 
 		// copy scripts
 		SCRIPT(new) = NULL;
@@ -1235,13 +1264,14 @@ char_data *setup_olc_mobile(char_data *input) {
 	}
 	else {
 		new->player_specials = &dummy_mob;
+		clear_mob_proto_data(new);
 		
 		// brand new
 		GET_PC_NAME(new) = str_dup(default_mob_keywords);
 		GET_SHORT_DESC(new) = str_dup(default_mob_short);
 		GET_LONG_DESC(new) = str_dup(default_mob_long);
 		MOB_FLAGS(new) = MOB_ISNPC;
-
+		
 		SCRIPT(new) = NULL;
 		new->proto_script = NULL;
 	}
