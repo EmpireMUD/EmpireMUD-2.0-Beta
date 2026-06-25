@@ -1125,7 +1125,9 @@ void save_olc_mobile(descriptor_data *desc) {
 
 	// save lookups and preserve them
 	ql = MOB_QUEST_LOOKUPS(proto);
+	MOB_QUEST_LOOKUPS(proto) = NULL;	// prevent freeing
 	sl = MOB_SHOP_LOOKUPS(proto);
+	MOB_SHOP_LOOKUPS(proto) = NULL;
 	
 	// slight sanity checking
 	if (GET_MAX_SCALE_LEVEL(mob) < GET_MIN_SCALE_LEVEL(mob) && GET_MAX_SCALE_LEVEL(mob) > 0) {
