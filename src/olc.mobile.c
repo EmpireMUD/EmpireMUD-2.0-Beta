@@ -1114,8 +1114,6 @@ void olc_search_mob(char_data *ch, mob_vnum vnum) {
 void save_olc_mobile(descriptor_data *desc) {
 	char_data *mob = GET_OLC_MOBILE(desc), *mob_iter, *proto;
 	mob_vnum vnum = GET_OLC_VNUM(desc);
-	struct quest_lookup *ql;
-	struct shop_lookup *sl;
 	UT_hash_handle hh;
 	bool changed, is_mini;
 	
@@ -1124,10 +1122,10 @@ void save_olc_mobile(descriptor_data *desc) {
 		proto = create_mob_table_entry(vnum);
 	}
 
-	// save lookups and preserve them
-	ql = MOB_QUEST_LOOKUPS(proto);
-	MOB_QUEST_LOOKUPS(proto) = NULL;	// prevent freeing
-	sl = MOB_SHOP_LOOKUPS(proto);
+	// migrate lookup tables
+	MOB_QUEST_LOOKUPS(mob) = MOB_QUEST_LOOKUPS(proto);
+	MOB_QUEST_LOOKUPS(proto) = NULL;
+	MOB_SHOP_LOOKUPS(mob) = MOB_SHOP_LOOKUPS(proto);
 	MOB_SHOP_LOOKUPS(proto) = NULL;
 	
 	// slight sanity checking
@@ -1225,10 +1223,7 @@ void save_olc_mobile(descriptor_data *desc) {
 	
 	*proto = *mob;
 	proto->vnum = vnum;	// ensure correct vnum
-	
 	proto->hh = hh;	// restore hash handle
-	MOB_QUEST_LOOKUPS(proto) = ql;	// restore lookups
-	MOB_SHOP_LOOKUPS(proto) = sl;
 	
 	// and save to file
 	save_library_file_for_vnum(DB_BOOT_MOB, vnum);
