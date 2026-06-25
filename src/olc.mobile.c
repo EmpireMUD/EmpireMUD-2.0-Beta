@@ -203,6 +203,7 @@ char_data *create_mob_table_entry(mob_vnum vnum) {
 	
 	CREATE(mob, char_data, 1);
 	clear_char(mob);
+	clear_mob_proto_data(mob);
 	mob->vnum = vnum;
 	SET_BIT(MOB_FLAGS(mob), MOB_ISNPC);	// need this for some macroes
 	add_mobile_to_table(mob);
