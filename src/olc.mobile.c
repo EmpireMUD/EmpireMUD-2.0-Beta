@@ -1138,6 +1138,11 @@ void save_olc_mobile(descriptor_data *desc) {
 		if (IS_NPC(mob_iter) && GET_MOB_VNUM(mob_iter) == vnum) {
 			is_mini = (GET_LEADER(mob_iter) && IS_MINIPET_OF(mob_iter, GET_LEADER(mob_iter)));
 			
+			// proto data
+			if (mob_iter->proto_data == proto->proto_data) {
+				mob_iter->proto_data = mob->proto_data;
+			}
+			
 			// update strings
 			if (GET_PC_NAME(mob_iter) == GET_PC_NAME(proto)) {
 				GET_PC_NAME(mob_iter) = GET_PC_NAME(mob);
