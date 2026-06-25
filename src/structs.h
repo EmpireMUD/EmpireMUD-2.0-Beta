@@ -4374,7 +4374,6 @@ struct mob_special_data {
 	any_vnum language;	// default language (NOTHING to use global default instead)
 	struct custom_message *custom_msgs;	// any custom messages
 	faction_data *faction;	// if any
-	obj_vnum custom_corpse;	// obj vnum for the mob's corpse
 	
 	int to_hit;	// Mob's attack % bonus
 	int to_dodge;	// Mob's dodge % bonus
@@ -5221,7 +5220,6 @@ struct follow_type {
 
 // mob properties that cannot change from the prototype
 struct mob_proto_data {
-	int	attack_type;	// weapon type
 	obj_vnum custom_corpse;	// obj vnum for the mob's corpse
 	int max_scale_level;	// maximum level this mob may be scaled to
 	int min_scale_level;	// minimum level this mob may be scaled to

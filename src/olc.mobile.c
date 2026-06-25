@@ -1587,7 +1587,7 @@ OLC_MODULE(medit_corpse) {
 		msg_to_char(ch, "Set the custom corpse to what object vnum (or 'default')?\r\n");
 	}
 	else if (is_abbrev(argument, "default") || is_abbrev(argument, "none")) {
-		MOB_CUSTOM_CORPSE(mob) = NOTHING;
+		SET_CUSTOM_CORPSE(mob, NOTHING);
 		msg_to_char(ch, "You remove the custom corpse%s.\r\n", MOB_FLAGGED(mob, MOB_NO_CORPSE) ? "" : "; it will now use the default corpse");
 	}
 	else if (!isdigit(*argument) || !(proto = obj_proto(atoi(argument)))) {
@@ -1597,7 +1597,7 @@ OLC_MODULE(medit_corpse) {
 		msg_to_char(ch, "That object is not a corpse.\r\n");
 	}
 	else {
-		MOB_CUSTOM_CORPSE(mob) = GET_OBJ_VNUM(proto);
+		SET_CUSTOM_CORPSE(mob, GET_OBJ_VNUM(proto));
 		msg_to_char(ch, "You set its custom corpse to object %d: %s\r\n", GET_OBJ_VNUM(proto), GET_OBJ_SHORT_DESC(proto));
 	}
 }

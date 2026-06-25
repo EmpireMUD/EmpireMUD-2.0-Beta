@@ -5755,7 +5755,7 @@ void parse_mobile(FILE *mob_f, int nr) {
 	mob->mob_specials.move_type = t[2];
 	mob->mob_specials.attack_type = t[3];
 	mob->mob_specials.language = t[4];
-	mob->mob_specials.custom_corpse = t[5];
+	SET_CUSTOM_CORPSE(mob, t[5]);
 
 	// basic setup
 	mob->points.max_pools[HEALTH] = 10;

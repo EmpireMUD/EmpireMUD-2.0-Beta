@@ -782,7 +782,7 @@ void olc_delete_object(char_data *ch, obj_vnum vnum) {
 		// corpse
 		if (MOB_CUSTOM_CORPSE(mob) == vnum) {
 			found |= TRUE;
-			MOB_CUSTOM_CORPSE(mob) = NOTHING;
+			SET_CUSTOM_CORPSE(mob, NOTHING);
 		}
 		
 		if (found) {
@@ -1034,7 +1034,7 @@ void olc_delete_object(char_data *ch, obj_vnum vnum) {
 			// corpse
 			if (MOB_CUSTOM_CORPSE(GET_OLC_MOBILE(desc)) == vnum) {
 				found |= TRUE;
-				MOB_CUSTOM_CORPSE(GET_OLC_MOBILE(desc)) = NOTHING;
+				SET_CUSTOM_CORPSE(GET_OLC_MOBILE(desc), NOTHING);
 			}
 			
 			if (found) {

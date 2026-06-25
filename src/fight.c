@@ -1708,7 +1708,7 @@ obj_data *make_corpse(char_data *ch) {
 	bool human = (!IS_NPC(ch) || MOB_FLAGGED(ch, MOB_HUMAN));
 	
 	// custom corpse?
-	if (IS_NPC(ch) && MOB_CUSTOM_CORPSE(ch) != NOTHING) {
+	if (MOB_CUSTOM_CORPSE(ch) != NOTHING) {
 		corpse_vnum = MOB_CUSTOM_CORPSE(ch);
 	}
 	
