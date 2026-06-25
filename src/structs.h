@@ -5165,8 +5165,6 @@ struct char_data {
 	struct group_data *group;	// Character's Group
 	
 	// live data (not saved, not freed)
-	struct quest_lookup *quest_lookups;
-	struct shop_lookup *shop_lookups;
 	bool customized;	// mob strings need saving if TRUE
 	sh_int lights;	// number of lights on the character
 	

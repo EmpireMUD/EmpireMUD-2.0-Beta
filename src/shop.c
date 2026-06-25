@@ -41,7 +41,6 @@ const char *default_shop_name = "Unnamed Shop";
 // local funcs
 void add_shop_lookup(struct shop_lookup **list, shop_data *shop);
 bool remove_shop_lookup(struct shop_lookup **list, shop_data *shop);
-void update_mob_shop_lookups(mob_vnum vnum);
 void update_vehicle_shop_lookups(any_vnum vnum);
 
 
@@ -219,7 +218,6 @@ void add_or_remove_all_shop_lookups_for(shop_data *shop, bool add) {
 					else {
 						remove_shop_lookup(&MOB_SHOP_LOOKUPS(mob), shop);
 					}
-					update_mob_shop_lookups(GET_MOB_VNUM(mob));
 				}
 				break;
 			}
@@ -266,7 +264,7 @@ void add_or_remove_all_shop_lookups_for(shop_data *shop, bool add) {
 /**
 * Adds a shop lookup hint to a list (e.g. on a mob).
 *
-* Note: For mob/obj/veh shops, run update_mob_shop_lookups() etc after this.
+* Note: For obj/veh shops, run update_veh_shop_lookups() etc after this.
 *
 * @param struct shop_lookup **list A pointer to the list to add to.
 * @param shop_data *shop The shop to add.
@@ -454,7 +452,7 @@ void free_shop_temp_list(struct shop_temp_list *list) {
 /**
 * Adds a shop lookup hint to a list (e.g. on a mob).
 *
-* Note: For mob/obj/veh shop, run update_mob_shop_lookups() etc after this.
+* Note: For obj/veh shop, run update_veh_shop_lookups() etc after this.
 *
 * @param struct shop_lookup **list A pointer to the list to add to.
 * @param shop_data *shop The shop to add.
@@ -475,26 +473,6 @@ bool remove_shop_lookup(struct shop_lookup **list, shop_data *shop) {
 	}
 	
 	return any;
-}
-
-
-/**
-* Fixes shop lookup pointers on live copies of mobs -- this should ALWAYS
-* point to the proto.
-*/
-void update_mob_shop_lookups(mob_vnum vnum) {
-	char_data *proto, *mob;
-	
-	if (!(proto = mob_proto(vnum))) {
-		return;
-	}
-	
-	DL_FOREACH(character_list, mob) {
-		if (IS_NPC(mob) && GET_MOB_VNUM(mob) == vnum) {
-			// re-set the pointer
-			MOB_SHOP_LOOKUPS(mob) = MOB_SHOP_LOOKUPS(proto);
-		}
-	}
 }
 
 

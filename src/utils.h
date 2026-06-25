@@ -948,8 +948,10 @@ int Y_COORD(room_data *room);	// formerly #define Y_COORD(room)  FLAT_Y_COORD(ge
 #define MOB_SPAWN_TIME(ch)  ((ch)->mob_specials.spawn_time)
 #define MOB_TO_DODGE(ch)  ((ch)->mob_specials.to_dodge)
 #define MOB_TO_HIT(ch)  ((ch)->mob_specials.to_hit)
-#define MOB_QUEST_LOOKUPS(ch)  ((ch)->quest_lookups)
-#define MOB_SHOP_LOOKUPS(ch)  ((ch)->shop_lookups)
+
+// prototype data
+#define MOB_QUEST_LOOKUPS(ch)  ((ch)->proto_data->quest_lookups)
+#define MOB_SHOP_LOOKUPS(ch)  ((ch)->proto_data->shop_lookups)
 
 // helpers
 #define IS_MOB(ch)  (IS_NPC(ch) && GET_MOB_VNUM(ch) != NOTHING)

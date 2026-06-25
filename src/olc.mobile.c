@@ -1122,6 +1122,10 @@ void save_olc_mobile(descriptor_data *desc) {
 	if (!(proto = mob_proto(vnum))) {
 		proto = create_mob_table_entry(vnum);
 	}
+
+	// save lookups and preserve them
+	ql = MOB_QUEST_LOOKUPS(proto);
+	sl = MOB_SHOP_LOOKUPS(proto);
 	
 	// slight sanity checking
 	if (GET_MAX_SCALE_LEVEL(mob) < GET_MIN_SCALE_LEVEL(mob) && GET_MAX_SCALE_LEVEL(mob) > 0) {
@@ -1214,15 +1218,13 @@ void save_olc_mobile(descriptor_data *desc) {
 	
 	// save data back over the proto-type
 	hh = proto->hh;	// save old hash handle
-	ql = proto->quest_lookups;	// save lookups
-	sl = proto->shop_lookups;
 	
 	*proto = *mob;
 	proto->vnum = vnum;	// ensure correct vnum
 	
 	proto->hh = hh;	// restore hash handle
-	proto->quest_lookups = ql;	// restore lookups
-	proto->shop_lookups = sl;
+	MOB_QUEST_LOOKUPS(proto) = ql;	// restore lookups
+	MOB_SHOP_LOOKUPS(proto) = sl;
 	
 	// and save to file
 	save_library_file_for_vnum(DB_BOOT_MOB, vnum);

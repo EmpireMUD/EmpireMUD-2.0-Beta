@@ -9193,8 +9193,6 @@ void free_whole_library(void) {
 	free(help_table);
 	HASH_ITER(hh, mobile_table, mob, next_mob) {
 		remove_mobile_from_table(mob);
-		free_quest_lookups(MOB_QUEST_LOOKUPS(mob));
-		free_shop_lookups(MOB_SHOP_LOOKUPS(mob));
 		free_char(mob);
 	}
 	HASH_ITER(hh, attack_message_table, amd, next_amd) {

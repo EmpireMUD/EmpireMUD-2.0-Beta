@@ -46,7 +46,6 @@ const char *default_quest_complete_msg = "You have completed the quest.\r\n";
 void add_quest_lookup(struct quest_lookup **list, quest_data *quest);
 void add_to_quest_temp_list(struct quest_temp_list **list, quest_data *quest, struct instance_data *instance);
 bool remove_quest_lookup(struct quest_lookup **list, quest_data *quest);
-void update_mob_quest_lookups(mob_vnum vnum);
 void update_veh_quest_lookups(any_vnum vnum);
 void write_daily_quest_file();
 
@@ -1725,7 +1724,6 @@ void add_or_remove_all_quest_lookups_for(quest_data *quest, bool add) {
 						else {
 							remove_quest_lookup(&MOB_QUEST_LOOKUPS(mob), quest);
 						}
-						update_mob_quest_lookups(GET_MOB_VNUM(mob));
 					}
 					break;
 				}
@@ -1773,7 +1771,7 @@ void add_or_remove_all_quest_lookups_for(quest_data *quest, bool add) {
 /**
 * Adds a quest lookup hint to a list (e.g. on a mob).
 *
-* Note: For mob/obj/veh quests, run update_mob_quest_lookups() etc after this.
+* Note: For obj/veh quests, run update_veh_quest_lookups() etc after this.
 *
 * @param struct quest_lookup **list A pointer to the list to add to.
 * @param quest_data *quest The quest to add.
@@ -1827,7 +1825,7 @@ void free_quest_lookups(struct quest_lookup *list) {
 /**
 * Adds a quest lookup hint to a list (e.g. on a mob).
 *
-* Note: For mob/obj/veh quests, run update_mob_quest_lookups() etc after this.
+* Note: For obj/veh quests, run update_veh_quest_lookups() etc after this.
 *
 * @param struct quest_lookup **list A pointer to the list to add to.
 * @param quest_data *quest The quest to add.
@@ -1848,26 +1846,6 @@ bool remove_quest_lookup(struct quest_lookup **list, quest_data *quest) {
 	}
 	
 	return any;
-}
-
-
-/**
-* Fixes quest lookup pointers on live copies of mobs -- this should ALWAYS
-* point to the proto.
-*/
-void update_mob_quest_lookups(mob_vnum vnum) {
-	char_data *proto, *mob;
-	
-	if (!(proto = mob_proto(vnum))) {
-		return;
-	}
-	
-	DL_FOREACH(character_list, mob) {
-		if (IS_NPC(mob) && GET_MOB_VNUM(mob) == vnum) {
-			// re-set the pointer
-			MOB_QUEST_LOOKUPS(mob) = MOB_QUEST_LOOKUPS(proto);
-		}
-	}
 }
 
 
