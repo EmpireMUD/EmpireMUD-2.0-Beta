@@ -4368,7 +4368,6 @@ struct map_file_data_v1 {
 struct mob_special_data {
 	int current_scale_level;	// level the mob was scaled to, or -1 for not scaled
 	
-	int name_set;	// NAMES_x
 	any_vnum language;	// default language (NOTHING to use global default instead)
 	struct custom_message *custom_msgs;	// any custom messages
 	faction_data *faction;	// if any
@@ -5224,7 +5223,6 @@ struct mob_proto_data {
 	
 	struct custom_message *custom_msgs;	// any custom messages
 	
-	faction_data *faction;	// if any
 	struct interaction_item *interactions;	// mob interaction items
 	
 	// lookup helpers

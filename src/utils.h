@@ -928,7 +928,6 @@ int Y_COORD(room_data *room);	// formerly #define Y_COORD(room)  FLAT_Y_COORD(ge
 // ch->mob_specials: mob_special_data
 #define GET_CURRENT_SCALE_LEVEL(ch)  ((ch)->mob_specials.current_scale_level)
 #define GET_MOB_VNUM(mob)  (IS_NPC(mob) ? (mob)->vnum : NOTHING)
-#define MOB_NAME_SET(ch)  ((ch)->mob_specials.name_set)
 #define MOB_ATTACK_TYPE(ch)  ((ch)->mob_specials.attack_type)
 #define MOB_CUSTOM_MSGS(ch)  ((ch)->mob_specials.custom_msgs)
 #define MOB_DAMAGE(ch)  ((ch)->mob_specials.damage)
@@ -950,6 +949,7 @@ int Y_COORD(room_data *room);	// formerly #define Y_COORD(room)  FLAT_Y_COORD(ge
 #define GET_MAX_SCALE_LEVEL(ch)  (IS_NPC(ch) ? (ch)->proto_data->max_scale_level : 0)
 #define GET_MIN_SCALE_LEVEL(ch)  (IS_NPC(ch) ? (ch)->proto_data->min_scale_level : 0)
 #define MOB_MOVE_TYPE(ch)  (IS_NPC(ch) ? (ch)->proto_data->move_type : MOB_MOVE_WALK)
+#define MOB_NAME_SET(ch)  (IS_NPC(ch) ? (ch)->proto_data->name_set : 0)
 #define MOB_QUEST_LOOKUPS(ch)  ((ch)->proto_data->quest_lookups)
 #define MOB_SHOP_LOOKUPS(ch)  ((ch)->proto_data->shop_lookups)
 
@@ -958,6 +958,7 @@ int Y_COORD(room_data *room);	// formerly #define Y_COORD(room)  FLAT_Y_COORD(ge
 #define SET_MAX_SCALE_LEVEL(ch, val)  ((ch)->proto_data->max_scale_level = (val))
 #define SET_MIN_SCALE_LEVEL(ch, val)  ((ch)->proto_data->min_scale_level = (val))
 #define SET_MOVE_TYPE(ch, val)  ((ch)->proto_data->move_type = (val))
+#define SET_NAME_SET(ch, val)  ((ch)->proto_data->name_set = (val))
 
 // helpers
 #define IS_MOB(ch)  (IS_NPC(ch) && GET_MOB_VNUM(ch) != NOTHING)

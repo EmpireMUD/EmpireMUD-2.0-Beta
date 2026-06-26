@@ -1701,7 +1701,7 @@ OLC_MODULE(medit_movetype) {
 
 OLC_MODULE(medit_nameset) {
 	char_data *mob = GET_OLC_MOBILE(ch->desc);
-	MOB_NAME_SET(mob) = olc_process_type(ch, argument, "name set", "nameset", name_sets, MOB_NAME_SET(mob));
+	SET_NAME_SET(mob, olc_process_type(ch, argument, "name set", "nameset", name_sets, MOB_NAME_SET(mob)));
 }
 
 
