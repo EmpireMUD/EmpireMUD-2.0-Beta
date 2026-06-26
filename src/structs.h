@@ -3494,7 +3494,7 @@ struct morph_data {
 	bitvector_t flags;	// MORPHF_ flags
 	bitvector_t affects;	// AFF_ flags added
 	int attack_type;	// TYPE_ const
-	int move_type;	// MOVE_TYPE_ const
+	int move_type;	// MOB_MOVE_ const
 	int size;	// SIZE_ const for this form
 	struct apply_data *applies;	// how it modifies players
 	
@@ -4378,8 +4378,6 @@ struct mob_special_data {
 	int damage;	// Raw damage
 	int	attack_type;	// weapon type
 	
-	byte move_type;	// how the mob moves
-	
 	struct pursuit_data *pursuit;	// mob pursuit
 	room_vnum pursuit_leash_loc;	// where to return to
 	struct mob_tag *tagged_by;	// mob tagged by
@@ -5221,7 +5219,7 @@ struct mob_proto_data {
 	obj_vnum custom_corpse;	// obj vnum for the mob's corpse
 	int max_scale_level;	// maximum level this mob may be scaled to
 	int min_scale_level;	// minimum level this mob may be scaled to
-	byte move_type;	// how the mob moves
+	int move_type;	// MOB_MOVE_ type for how the mob moves
 	int name_set;	// the id for a NAMES_ namelist
 	
 	struct custom_message *custom_msgs;	// any custom messages

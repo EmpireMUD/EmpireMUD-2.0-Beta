@@ -1495,7 +1495,7 @@ void olc_show_mobile(char_data *ch) {
 	}
 	
 	build_page_display(ch, "<%sattack\t0> %d %s", OLC_LABEL_VAL(MOB_ATTACK_TYPE(mob), 0), MOB_ATTACK_TYPE(mob), get_attack_name_by_vnum(MOB_ATTACK_TYPE(mob)));
-	build_page_display(ch, "<%smovetype\t0> %s", OLC_LABEL_VAL(MOB_MOVE_TYPE(mob), 0), mob_move_types[(int) MOB_MOVE_TYPE(mob)]);
+	build_page_display(ch, "<%smovetype\t0> %s", OLC_LABEL_VAL(MOB_MOVE_TYPE(mob), 0), mob_move_types[MOB_MOVE_TYPE(mob)]);
 	
 	// size/custom corpse line
 	line = build_page_display(ch, "<%ssize\t0> %s, ", OLC_LABEL_VAL(SET_SIZE(mob), SIZE_NORMAL), size_types[(int)SET_SIZE(mob)]);
@@ -1695,7 +1695,7 @@ OLC_MODULE(medit_minlevel) {
 
 OLC_MODULE(medit_movetype) {
 	char_data *mob = GET_OLC_MOBILE(ch->desc);
-	MOB_MOVE_TYPE(mob) = olc_process_type(ch, argument, "move type", "movetype", mob_move_types, MOB_MOVE_TYPE(mob));
+	SET_MOVE_TYPE(mob, olc_process_type(ch, argument, "move type", "movetype", mob_move_types, MOB_MOVE_TYPE(mob)));
 }
 
 

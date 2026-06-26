@@ -938,7 +938,6 @@ int Y_COORD(room_data *room);	// formerly #define Y_COORD(room)  FLAT_Y_COORD(ge
 #define MOB_INSTANCE_ID(ch)  ((ch)->mob_specials.instance_id)
 #define MOB_INTERACTIONS(ch)  ((ch)->interactions)
 #define MOB_LANGUAGE(ch)  ((ch)->mob_specials.language)
-#define MOB_MOVE_TYPE(ch)  ((ch)->mob_specials.move_type)
 #define MOB_PURSUIT(ch)  ((ch)->mob_specials.pursuit)
 #define MOB_PURSUIT_LEASH_LOC(ch)  ((ch)->mob_specials.pursuit_leash_loc)
 #define MOB_TAGGED_BY(ch)  ((ch)->mob_specials.tagged_by)
@@ -950,6 +949,7 @@ int Y_COORD(room_data *room);	// formerly #define Y_COORD(room)  FLAT_Y_COORD(ge
 #define MOB_CUSTOM_CORPSE(ch)  (IS_NPC(ch) ? (ch)->proto_data->custom_corpse : NOTHING)
 #define GET_MAX_SCALE_LEVEL(ch)  (IS_NPC(ch) ? (ch)->proto_data->max_scale_level : 0)
 #define GET_MIN_SCALE_LEVEL(ch)  (IS_NPC(ch) ? (ch)->proto_data->min_scale_level : 0)
+#define MOB_MOVE_TYPE(ch)  (IS_NPC(ch) ? (ch)->proto_data->move_type : MOB_MOVE_WALK)
 #define MOB_QUEST_LOOKUPS(ch)  ((ch)->proto_data->quest_lookups)
 #define MOB_SHOP_LOOKUPS(ch)  ((ch)->proto_data->shop_lookups)
 
@@ -957,6 +957,7 @@ int Y_COORD(room_data *room);	// formerly #define Y_COORD(room)  FLAT_Y_COORD(ge
 #define SET_CUSTOM_CORPSE(ch, val)  ((ch)->proto_data->custom_corpse = (val))
 #define SET_MAX_SCALE_LEVEL(ch, val)  ((ch)->proto_data->max_scale_level = (val))
 #define SET_MIN_SCALE_LEVEL(ch, val)  ((ch)->proto_data->min_scale_level = (val))
+#define SET_MOVE_TYPE(ch, val)  ((ch)->proto_data->move_type = (val))
 
 // helpers
 #define IS_MOB(ch)  (IS_NPC(ch) && GET_MOB_VNUM(ch) != NOTHING)

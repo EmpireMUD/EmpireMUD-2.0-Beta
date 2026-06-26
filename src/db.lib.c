@@ -5752,7 +5752,7 @@ void parse_mobile(FILE *mob_f, int nr) {
 
 	mob->player.sex = t[0];
 	MOB_NAME_SET(mob) = t[1];
-	mob->mob_specials.move_type = t[2];
+	SET_MOVE_TYPE(mob, t[2]);
 	mob->mob_specials.attack_type = t[3];
 	mob->mob_specials.language = t[4];
 	SET_CUSTOM_CORPSE(mob, t[5]);
