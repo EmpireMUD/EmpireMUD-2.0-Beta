@@ -4369,7 +4369,6 @@ struct mob_special_data {
 	int current_scale_level;	// level the mob was scaled to, or -1 for not scaled
 	
 	any_vnum language;	// default language (NOTHING to use global default instead)
-	struct custom_message *custom_msgs;	// any custom messages
 	faction_data *faction;	// if any
 	
 	int to_hit;	// Mob's attack % bonus

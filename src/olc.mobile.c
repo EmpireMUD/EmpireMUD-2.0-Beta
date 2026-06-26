@@ -1217,7 +1217,6 @@ void save_olc_mobile(descriptor_data *desc) {
 	}
 
 	free_interactions(&proto->interactions);
-	free_custom_messages(MOB_CUSTOM_MSGS(proto));
 	free_mob_proto_data(proto->proto_data);
 	
 	if (proto->proto_script) {
@@ -1265,9 +1264,6 @@ char_data *setup_olc_mobile(char_data *input) {
 		
 		// copy interactions
 		new->interactions = copy_interaction_list(input->interactions);
-		
-		// copy custom msgs
-		MOB_CUSTOM_MSGS(new) = copy_custom_messages(MOB_CUSTOM_MSGS(input));
 	}
 	else {
 		new->player_specials = &dummy_mob;

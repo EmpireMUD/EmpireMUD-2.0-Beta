@@ -929,7 +929,6 @@ int Y_COORD(room_data *room);	// formerly #define Y_COORD(room)  FLAT_Y_COORD(ge
 #define GET_CURRENT_SCALE_LEVEL(ch)  ((ch)->mob_specials.current_scale_level)
 #define GET_MOB_VNUM(mob)  (IS_NPC(mob) ? (mob)->vnum : NOTHING)
 #define MOB_ATTACK_TYPE(ch)  ((ch)->mob_specials.attack_type)
-#define MOB_CUSTOM_MSGS(ch)  ((ch)->mob_specials.custom_msgs)
 #define MOB_DAMAGE(ch)  ((ch)->mob_specials.damage)
 #define MOB_DYNAMIC_NAME(ch)  ((ch)->mob_specials.dynamic_name)
 #define MOB_DYNAMIC_SEX(ch)  ((ch)->mob_specials.dynamic_sex)
@@ -946,6 +945,7 @@ int Y_COORD(room_data *room);	// formerly #define Y_COORD(room)  FLAT_Y_COORD(ge
 
 // prototype data
 #define MOB_CUSTOM_CORPSE(ch)  (IS_NPC(ch) ? (ch)->proto_data->custom_corpse : NOTHING)
+#define MOB_CUSTOM_MSGS(ch)  ((ch)->proto_data->custom_msgs)
 #define GET_MAX_SCALE_LEVEL(ch)  (IS_NPC(ch) ? (ch)->proto_data->max_scale_level : 0)
 #define GET_MIN_SCALE_LEVEL(ch)  (IS_NPC(ch) ? (ch)->proto_data->min_scale_level : 0)
 #define MOB_MOVE_TYPE(ch)  (IS_NPC(ch) ? (ch)->proto_data->move_type : MOB_MOVE_WALK)

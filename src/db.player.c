@@ -1155,9 +1155,6 @@ void free_char(char_data *ch) {
 	if (ch->interactions && (!proto || ch->interactions != proto->interactions)) {
 		free_interactions(&ch->interactions);
 	}
-	if (MOB_CUSTOM_MSGS(ch) && (!proto || MOB_CUSTOM_MSGS(ch) != MOB_CUSTOM_MSGS(proto))) {
-		free_custom_messages(MOB_CUSTOM_MSGS(ch));
-	}
 	
 	if (ch->proto_data && (!proto || ch->proto_data != proto->proto_data)) {
 		free_mob_proto_data(ch->proto_data);
