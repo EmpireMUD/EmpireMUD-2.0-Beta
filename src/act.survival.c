@@ -568,7 +568,7 @@ ACMD(do_butcher) {
 	else if (IS_STOLEN(corpse)) {
 		act("$p: you can't butcher stolen corpses.", FALSE, ch, corpse, NULL, TO_CHAR);
 	}
-	else if (GET_CORPSE_NPC_VNUM(corpse) == NOTHING || !(proto = mob_proto(GET_CORPSE_NPC_VNUM(corpse))) || !has_interaction(proto->interactions, INTERACT_BUTCHER)) {
+	else if (GET_CORPSE_NPC_VNUM(corpse) == NOTHING || !(proto = mob_proto(GET_CORPSE_NPC_VNUM(corpse))) || !has_interaction(MOB_INTERACTIONS(proto), INTERACT_BUTCHER)) {
 		msg_to_char(ch, "You can't get any good meat out of that.\r\n");
 	}
 	else if (IS_SET(GET_CORPSE_FLAGS(corpse), CORPSE_BUTCHERED)) {
@@ -581,7 +581,7 @@ ACMD(do_butcher) {
 		return;
 	}
 	else {
-		if (!IS_SET(GET_CORPSE_FLAGS(corpse), CORPSE_NO_LOOT) && run_interactions(ch, proto->interactions, INTERACT_BUTCHER, IN_ROOM(ch), NULL, corpse, NULL, butcher_interact)) {
+		if (!IS_SET(GET_CORPSE_FLAGS(corpse), CORPSE_NO_LOOT) && run_interactions(ch, MOB_INTERACTIONS(proto), INTERACT_BUTCHER, IN_ROOM(ch), NULL, corpse, NULL, butcher_interact)) {
 			// success
 			gain_player_tech_exp(ch, PTECH_BUTCHER_UPGRADE, 15);
 			run_ability_hooks_by_player_tech(ch, PTECH_BUTCHER_UPGRADE, NULL, NULL, NULL, NULL);

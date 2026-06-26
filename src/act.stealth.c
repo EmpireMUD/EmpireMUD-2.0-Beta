@@ -724,7 +724,7 @@ ACMD(do_pickpocket) {
 	else if (run_ability_triggers_by_player_tech(ch, PTECH_PICKPOCKET, vict, NULL, NULL)) {
 		return;
 	}
-	else if (MOB_FLAGGED(vict, MOB_PICKPOCKETED | MOB_NO_LOOT) || (!MOB_FLAGGED(vict, MOB_COINS) && AFF_FLAGGED(vict, AFF_NO_ATTACK) && !has_interaction(vict->interactions, INTERACT_PICKPOCKET))) {
+	else if (MOB_FLAGGED(vict, MOB_PICKPOCKETED | MOB_NO_LOOT) || (!MOB_FLAGGED(vict, MOB_COINS) && AFF_FLAGGED(vict, AFF_NO_ATTACK) && !has_interaction(MOB_INTERACTIONS(vict), INTERACT_PICKPOCKET))) {
 		act("$E doesn't appear to be carrying anything in $S pockets.", FALSE, ch, NULL, vict, TO_CHAR);
 	}
 	else {
@@ -747,7 +747,7 @@ ACMD(do_pickpocket) {
 			act("You pick $N's pocket...", FALSE, ch, NULL, vict, TO_CHAR);
 
 			// any will tell us if we got at least 1 item (also sends messages)
-			any = run_interactions(ch, vict->interactions, INTERACT_PICKPOCKET, IN_ROOM(ch), vict, NULL, NULL, pickpocket_interact);
+			any = run_interactions(ch, MOB_INTERACTIONS(vict), INTERACT_PICKPOCKET, IN_ROOM(ch), vict, NULL, NULL, pickpocket_interact);
 			any |= run_global_mob_interactions(ch, vict, INTERACT_PICKPOCKET, pickpocket_interact);
 			
 			if (coins > 0) {

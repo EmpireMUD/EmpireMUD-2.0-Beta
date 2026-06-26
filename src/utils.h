@@ -934,7 +934,6 @@ int Y_COORD(room_data *room);	// formerly #define Y_COORD(room)  FLAT_Y_COORD(ge
 #define MOB_DYNAMIC_SEX(ch)  ((ch)->mob_specials.dynamic_sex)
 #define MOB_FACTION(ch)  ((ch)->mob_specials.faction)
 #define MOB_INSTANCE_ID(ch)  ((ch)->mob_specials.instance_id)
-#define MOB_INTERACTIONS(ch)  ((ch)->interactions)
 #define MOB_LANGUAGE(ch)  ((ch)->mob_specials.language)
 #define MOB_PURSUIT(ch)  ((ch)->mob_specials.pursuit)
 #define MOB_PURSUIT_LEASH_LOC(ch)  ((ch)->mob_specials.pursuit_leash_loc)
@@ -946,6 +945,7 @@ int Y_COORD(room_data *room);	// formerly #define Y_COORD(room)  FLAT_Y_COORD(ge
 // prototype data
 #define MOB_CUSTOM_CORPSE(ch)  (IS_NPC(ch) ? (ch)->proto_data->custom_corpse : NOTHING)
 #define MOB_CUSTOM_MSGS(ch)  ((ch)->proto_data->custom_msgs)
+#define MOB_INTERACTIONS(ch)  ((ch)->proto_data->interactions)
 #define GET_MAX_SCALE_LEVEL(ch)  (IS_NPC(ch) ? (ch)->proto_data->max_scale_level : 0)
 #define GET_MIN_SCALE_LEVEL(ch)  (IS_NPC(ch) ? (ch)->proto_data->min_scale_level : 0)
 #define MOB_MOVE_TYPE(ch)  (IS_NPC(ch) ? (ch)->proto_data->move_type : MOB_MOVE_WALK)

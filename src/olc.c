@@ -7952,7 +7952,7 @@ void olc_process_interactions(char_data *ch, char *argument, struct interaction_
 				case OLC_MOBILE: {
 					char_data *mob = mob_proto(vnum);
 					if (mob) {
-						copyfrom = mob->interactions;
+						copyfrom = MOB_INTERACTIONS(mob);
 						none = copyfrom ? FALSE : TRUE;
 					}
 					break;

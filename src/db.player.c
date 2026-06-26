@@ -1152,9 +1152,6 @@ void free_char(char_data *ch) {
 	if (ch->proto_script && (!proto || ch->proto_script != proto->proto_script)) {
 		free_proto_scripts(&ch->proto_script);
 	}
-	if (ch->interactions && (!proto || ch->interactions != proto->interactions)) {
-		free_interactions(&ch->interactions);
-	}
 	
 	if (ch->proto_data && (!proto || ch->proto_data != proto->proto_data)) {
 		free_mob_proto_data(ch->proto_data);

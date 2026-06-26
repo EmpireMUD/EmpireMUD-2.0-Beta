@@ -5130,7 +5130,6 @@ struct char_data {
 	struct char_special_data char_specials;	// PC/NPC specials
 	struct player_special_data *player_specials;	// PC specials
 	struct mob_special_data mob_specials;	// NPC specials
-	struct interaction_item *interactions;	// mob interaction items
 	struct cooldown_data *cooldowns;	// ability cooldowns
 	struct mob_proto_data *proto_data;	// data that doesn't change
 	
@@ -5220,8 +5219,7 @@ struct mob_proto_data {
 	int move_type;	// MOB_MOVE_ type for how the mob moves
 	int name_set;	// the id for a NAMES_ namelist
 	
-	struct custom_message *custom_msgs;	// any custom messages
-	
+	struct custom_message *custom_msgs;	// any custom messages	
 	struct interaction_item *interactions;	// mob interaction items
 	
 	// lookup helpers

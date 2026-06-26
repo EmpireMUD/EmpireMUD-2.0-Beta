@@ -129,11 +129,11 @@ bool audit_mobile(char_data *mob, char_data *ch) {
 		olc_audit_msg(ch, GET_MOB_VNUM(mob), "NO-CORPSE and custom corpse are both set");
 		problem = TRUE;
 	}
-	if (MOB_FLAGGED(mob, MOB_ANIMAL) && !MOB_FLAGGED(mob, MOB_NO_CORPSE) && !has_interaction(mob->interactions, INTERACT_SKIN)) {
+	if (MOB_FLAGGED(mob, MOB_ANIMAL) && !MOB_FLAGGED(mob, MOB_NO_CORPSE) && !has_interaction(MOB_INTERACTIONS(mob), INTERACT_SKIN)) {
 		olc_audit_msg(ch, GET_MOB_VNUM(mob), "Animal has no skin");
 		problem = TRUE;
 	}
-	if (MOB_FLAGGED(mob, MOB_ANIMAL) && !MOB_FLAGGED(mob, MOB_NO_CORPSE) && !has_interaction(mob->interactions, INTERACT_BUTCHER)) {
+	if (MOB_FLAGGED(mob, MOB_ANIMAL) && !MOB_FLAGGED(mob, MOB_NO_CORPSE) && !has_interaction(MOB_INTERACTIONS(mob), INTERACT_BUTCHER)) {
 		olc_audit_msg(ch, GET_MOB_VNUM(mob), "Animal can't be butchered");
 		problem = TRUE;
 	}
@@ -153,7 +153,7 @@ bool audit_mobile(char_data *mob, char_data *ch) {
 		}
 	}
 	
-	problem |= audit_interactions(GET_MOB_VNUM(mob), mob->interactions, TYPE_MOB, ch);
+	problem |= audit_interactions(GET_MOB_VNUM(mob), MOB_INTERACTIONS(mob), TYPE_MOB, ch);
 	
 	return problem;
 }
@@ -486,7 +486,7 @@ void olc_delete_mobile(char_data *ch, mob_vnum vnum) {
 	
 	// update mob interactions
 	HASH_ITER(hh, mobile_table, mob_iter, next_mob) {
-		if (delete_from_interaction_list(&mob_iter->interactions, TYPE_MOB, vnum)) {
+		if (delete_from_interaction_list(&MOB_INTERACTIONS(mob_iter), TYPE_MOB, vnum)) {
 			syslog(SYS_OLC, GET_INVIS_LEV(ch), TRUE, "OLC: Mobile %d %s lost deleted related mob", GET_MOB_VNUM(mob_iter), GET_SHORT_DESC(mob_iter));
 			save_library_file_for_vnum(DB_BOOT_MOB, mob_iter->vnum);
 		}
@@ -628,7 +628,7 @@ void olc_delete_mobile(char_data *ch, mob_vnum vnum) {
 			}
 		}
 		if (GET_OLC_MOBILE(desc)) {
-			if (delete_from_interaction_list(&GET_OLC_MOBILE(desc)->interactions, TYPE_MOB, vnum)) {
+			if (delete_from_interaction_list(&MOB_INTERACTIONS(GET_OLC_MOBILE(desc)), TYPE_MOB, vnum)) {
 				msg_to_char(desc->character, "One of the mobs in an interaction for the mob you're editing was deleted.\r\n");
 			}
 		}
@@ -829,7 +829,7 @@ void olc_fullsearch_mob(char_data *ch, char *argument) {
 		}
 		if (find_interacts) {	// look up its interactions
 			found_interacts = NOBITS;
-			LL_FOREACH(mob->interactions, inter) {
+			LL_FOREACH(MOB_INTERACTIONS(mob), inter) {
 				found_interacts |= BIT(inter->type);
 			}
 			if ((find_interacts & found_interacts) != find_interacts) {
@@ -976,7 +976,7 @@ void olc_search_mob(char_data *ch, mob_vnum vnum) {
 	// mob interactions
 	HASH_ITER(hh, mobile_table, mob, next_mob) {
 		any = FALSE;
-		for (inter = mob->interactions; inter && !any; inter = inter->next) {
+		for (inter = MOB_INTERACTIONS(mob); inter && !any; inter = inter->next) {
 			if (interact_data[inter->type].vnum_type == TYPE_MOB && inter->vnum == vnum) {
 				any = TRUE;
 				++found;
@@ -1161,12 +1161,6 @@ void save_olc_mobile(descriptor_data *desc) {
 			}
 
 			// update pointers
-			if (mob_iter->interactions == proto->interactions) {
-				mob_iter->interactions = mob->interactions;
-			}
-			if (MOB_CUSTOM_MSGS(mob_iter) == MOB_CUSTOM_MSGS(proto)) {
-				MOB_CUSTOM_MSGS(mob_iter) = MOB_CUSTOM_MSGS(mob);
-			}
 			MOB_FACTION(mob_iter) = MOB_FACTION(mob);
 			
 			// check for changes to level, flags, or damage
@@ -1215,8 +1209,7 @@ void save_olc_mobile(descriptor_data *desc) {
 	if (GET_LOOK_DESC(proto)) {
 		free(GET_LOOK_DESC(proto));
 	}
-
-	free_interactions(&proto->interactions);
+	
 	free_mob_proto_data(proto->proto_data);
 	
 	if (proto->proto_script) {
@@ -1261,9 +1254,6 @@ char_data *setup_olc_mobile(char_data *input) {
 		// copy scripts
 		SCRIPT(new) = NULL;
 		new->proto_script = copy_trig_protos(input->proto_script);
-		
-		// copy interactions
-		new->interactions = copy_interaction_list(input->interactions);
 	}
 	else {
 		new->player_specials = &dummy_mob;
@@ -1505,9 +1495,9 @@ void olc_show_mobile(char_data *ch) {
 	build_page_display(ch, "<%snameset\t0> %s, <%slanguage\t0> %d - %s", OLC_LABEL_VAL(MOB_NAME_SET(mob), 0), name_sets[MOB_NAME_SET(mob)], OLC_LABEL_VAL(MOB_LANGUAGE(mob), NOTHING), MOB_LANGUAGE(mob), (MOB_LANGUAGE(mob) == NOTHING ? "default" : get_generic_name_by_vnum(MOB_LANGUAGE(mob))));
 	build_page_display(ch, "<%sallegiance\t0> %s", OLC_LABEL_PTR(MOB_FACTION(mob)), MOB_FACTION(mob) ? FCT_NAME(MOB_FACTION(mob)) : "none");
 	
-	build_page_display(ch, "Interactions: <%sinteraction\t0>", OLC_LABEL_PTR(mob->interactions));
-	if (mob->interactions) {
-		show_interaction_display(ch, mob->interactions, FALSE);
+	build_page_display(ch, "Interactions: <%sinteraction\t0>", OLC_LABEL_PTR(MOB_INTERACTIONS(mob)));
+	if (MOB_INTERACTIONS(mob)) {
+		show_interaction_display(ch, MOB_INTERACTIONS(mob), FALSE);
 	}
 	
 	// custom messages
@@ -1617,7 +1607,7 @@ OLC_MODULE(medit_flags) {
 
 OLC_MODULE(medit_interaction) {
 	char_data *mob = GET_OLC_MOBILE(ch->desc);
-	olc_process_interactions(ch, argument, &mob->interactions, TYPE_MOB);
+	olc_process_interactions(ch, argument, &MOB_INTERACTIONS(mob), TYPE_MOB);
 }
 
 

@@ -1677,7 +1677,7 @@ void drop_loot(char_data *mob, char_data *killer) {
 	}
 
 	// find and drop loot
-	run_interactions(mob, mob->interactions, INTERACT_LOOT, IN_ROOM(mob), mob, NULL, NULL, loot_interact);
+	run_interactions(mob, MOB_INTERACTIONS(mob), INTERACT_LOOT, IN_ROOM(mob), mob, NULL, NULL, loot_interact);
 	run_global_mob_interactions(mob, mob, INTERACT_LOOT, loot_interact);
 	
 	// coins?

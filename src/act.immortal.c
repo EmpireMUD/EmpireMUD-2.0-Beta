@@ -3536,9 +3536,9 @@ void do_stat_character(char_data *ch, char_data *k, bool details) {
 		append_page_display_line(line, "eq: %d", i2);
 	}
 
-	if (IS_NPC(k) && k->interactions) {
+	if (IS_NPC(k) && MOB_INTERACTIONS(k)) {
 		build_page_display_str(ch, "Interactions:");
-		show_interaction_display(ch, k->interactions, FALSE);
+		show_interaction_display(ch, MOB_INTERACTIONS(k), FALSE);
 	}
 	
 	if (MOB_CUSTOM_MSGS(k)) {

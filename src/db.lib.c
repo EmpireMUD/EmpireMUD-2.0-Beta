@@ -5792,7 +5792,7 @@ void parse_mobile(FILE *mob_f, int nr) {
 				break;
 			}
 			case 'I': {	// interaction item
-				parse_interaction(line, &mob->interactions, buf2);
+				parse_interaction(line, &MOB_INTERACTIONS(mob), buf2);
 				break;
 			}
 			
@@ -5864,7 +5864,7 @@ void write_mob_to_file(FILE *fl, char_data *mob) {
 	}
 	
 	// I: interactions
-	write_interactions_to_file(fl, mob->interactions);
+	write_interactions_to_file(fl, MOB_INTERACTIONS(mob));
 	
 	// M: custom message
 	write_custom_messages_to_file(fl, 'M', MOB_CUSTOM_MSGS(mob));

@@ -777,7 +777,7 @@ void olc_delete_object(char_data *ch, obj_vnum vnum) {
 	// update mobs
 	HASH_ITER(hh, mobile_table, mob, next_mob) {
 		// interactions
-		found = delete_from_interaction_list(&mob->interactions, TYPE_OBJ, vnum);
+		found = delete_from_interaction_list(&MOB_INTERACTIONS(mob), TYPE_OBJ, vnum);
 		
 		// corpse
 		if (MOB_CUSTOM_CORPSE(mob) == vnum) {
@@ -1029,7 +1029,7 @@ void olc_delete_object(char_data *ch, obj_vnum vnum) {
 		}
 		if (GET_OLC_MOBILE(desc)) {
 			// interactions
-			found = delete_from_interaction_list(&GET_OLC_MOBILE(desc)->interactions, TYPE_OBJ, vnum);
+			found = delete_from_interaction_list(&MOB_INTERACTIONS(GET_OLC_MOBILE(desc)), TYPE_OBJ, vnum);
 			
 			// corpse
 			if (MOB_CUSTOM_CORPSE(GET_OLC_MOBILE(desc)) == vnum) {
@@ -1604,7 +1604,7 @@ void olc_search_obj(char_data *ch, obj_vnum vnum) {
 		}
 		
 		// interactions
-		for (inter = mob->interactions; inter && !any; inter = inter->next) {
+		for (inter = MOB_INTERACTIONS(mob); inter && !any; inter = inter->next) {
 			if (interact_data[inter->type].vnum_type == TYPE_OBJ && inter->vnum == vnum) {
 				any = TRUE;
 				++found;
