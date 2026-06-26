@@ -179,6 +179,7 @@ struct mob_proto_data *copy_mob_proto_data(struct mob_proto_data *input) {
 	// copy pointers
 	mpd->custom_msgs = copy_custom_messages(input->custom_msgs);
 	mpd->interactions = copy_interaction_list(input->interactions);
+	mpd->notes = input->notes ? str_dup(input->notes) : NULL;
 	
 	// input->faction is ok to just copy as a pointer to live data, not stored internally here
 	
@@ -836,7 +837,7 @@ void olc_fullsearch_mob(char_data *ch, char *argument) {
 				continue;
 			}
 		}
-		if (*find_keywords && !multi_isname(find_keywords, GET_PC_NAME(mob)) && !multi_isname(find_keywords, GET_SHORT_DESC(mob)) && !multi_isname(find_keywords, GET_LONG_DESC(mob)) && (!GET_LOOK_DESC(mob) || !multi_isname(find_keywords, GET_LOOK_DESC(mob))) && !search_custom_messages(find_keywords, MOB_CUSTOM_MSGS(mob))) {
+		if (*find_keywords && !multi_isname(find_keywords, GET_PC_NAME(mob)) && !multi_isname(find_keywords, GET_SHORT_DESC(mob)) && !multi_isname(find_keywords, GET_LONG_DESC(mob)) && (!GET_LOOK_DESC(mob) || !multi_isname(find_keywords, GET_LOOK_DESC(mob))) && (!MOB_NOTES(mob) || !multi_isname(find_keywords, MOB_NOTES(mob))) && !search_custom_messages(find_keywords, MOB_CUSTOM_MSGS(mob))) {
 			continue;
 		}
 		
@@ -1131,6 +1132,10 @@ void save_olc_mobile(descriptor_data *desc) {
 	// slight sanity checking
 	if (GET_MAX_SCALE_LEVEL(mob) < GET_MIN_SCALE_LEVEL(mob) && GET_MAX_SCALE_LEVEL(mob) > 0) {
 		SET_MAX_SCALE_LEVEL(mob, GET_MIN_SCALE_LEVEL(mob));
+	}
+	if (MOB_NOTES(mob) && !*MOB_NOTES(mob)) {
+		free(MOB_NOTES(mob));
+		MOB_NOTES(mob) = NULL;
 	}
 	
 	// notes
@@ -1512,6 +1517,8 @@ void olc_show_mobile(char_data *ch) {
 		show_script_display(ch, mob->proto_script, FALSE);
 	}
 	
+	build_page_display(ch, "<%snotes\t0>\r\n%s", OLC_LABEL_PTR(MOB_NOTES(mob)), NULLSAFE(MOB_NOTES(mob)));
+	
 	send_page_display(ch);
 }
 
@@ -1688,6 +1695,19 @@ OLC_MODULE(medit_movetype) {
 OLC_MODULE(medit_nameset) {
 	char_data *mob = GET_OLC_MOBILE(ch->desc);
 	SET_NAME_SET(mob, olc_process_type(ch, argument, "name set", "nameset", name_sets, MOB_NAME_SET(mob)));
+}
+
+
+OLC_MODULE(medit_notes) {
+	char_data *mob = GET_OLC_MOBILE(ch->desc);
+
+	if (ch->desc->str) {
+		msg_to_char(ch, "You are already editing a string.\r\n");
+	}
+	else {
+		sprintf(buf, "notes for %s", GET_SHORT_DESC(mob));
+		start_string_editor(ch->desc, buf, &MOB_NOTES(mob), MAX_NOTES, TRUE);
+	}
 }
 
 

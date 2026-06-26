@@ -3674,6 +3674,11 @@ void do_stat_character(char_data *ch, char_data *k, bool details) {
 	for (dot = k->over_time_effects; dot; dot = dot->next) {
 		build_page_display(ch, "TYPE: (%s) &r%s&0 %d %s damage (%d/%d)", colon_time(dot->time_remaining, FALSE, NULL), get_generic_name_by_vnum(dot->type), dot->damage * dot->stack, damage_types[dot->damage_type], dot->stack, dot->max_stack);
 	}
+	
+	// notes on proto only
+	if (!IN_ROOM(k) && MOB_NOTES(k) && *MOB_NOTES(k)) {
+		build_page_display(ch, "Notes:\r\n%s", MOB_NOTES(k));
+	}
 
 	/* check mobiles for a script */
 	if (IS_NPC(k)) {

@@ -5222,6 +5222,8 @@ struct mob_proto_data {
 	struct custom_message *custom_msgs;	// any custom messages	
 	struct interaction_item *interactions;	// mob interaction items
 	
+	char *notes;	// misc notes shown only to imms
+	
 	// lookup helpers
 	struct quest_lookup *quest_lookups;
 	struct shop_lookup *shop_lookups;

@@ -950,6 +950,7 @@ int Y_COORD(room_data *room);	// formerly #define Y_COORD(room)  FLAT_Y_COORD(ge
 #define GET_MIN_SCALE_LEVEL(ch)  (IS_NPC(ch) ? (ch)->proto_data->min_scale_level : 0)
 #define MOB_MOVE_TYPE(ch)  (IS_NPC(ch) ? (ch)->proto_data->move_type : MOB_MOVE_WALK)
 #define MOB_NAME_SET(ch)  (IS_NPC(ch) ? (ch)->proto_data->name_set : 0)
+#define MOB_NOTES(ch)  ((ch)->proto_data->notes)
 #define MOB_QUEST_LOOKUPS(ch)  ((ch)->proto_data->quest_lookups)
 #define MOB_SHOP_LOOKUPS(ch)  ((ch)->proto_data->shop_lookups)
 

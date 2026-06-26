@@ -5681,7 +5681,7 @@ void remove_mobile_from_table(char_data *mob) {
 void parse_mobile(FILE *mob_f, int nr) {
 	int j, t[10], iter;
 	char line[256], *tmpptr;
-	char f1[128], f2[128];
+	char f1[128], f2[128], buf2[MAX_STRING_LENGTH];
 	char_data *mob, *find;
 	
 	// create!
@@ -5805,6 +5805,11 @@ void parse_mobile(FILE *mob_f, int nr) {
 				parse_trig_proto(line, &(mob->proto_script), buf2);
 				break;
 			}
+			
+			case '_': {	// notes
+				MOB_NOTES(mob) = fread_string(mob_f, buf2);
+				break;
+			}
 
 			case 'S': {
 				return;
@@ -5871,7 +5876,14 @@ void write_mob_to_file(FILE *fl, char_data *mob) {
 	
 	// T, V: triggers
 	write_trig_protos_to_file(fl, 'T', mob->proto_script);
-		
+	
+	// '_'
+	if (MOB_NOTES(mob) && *MOB_NOTES(mob)) {
+		strcpy(temp, MOB_NOTES(mob));
+		strip_crlf(temp);
+		fprintf(fl, "_\n%s~\n", temp);
+	}
+	
 	// END
 	fprintf(fl, "S\n");
 }

@@ -358,6 +358,7 @@ OLC_MODULE(medit_maxlevel);
 OLC_MODULE(medit_minlevel);
 OLC_MODULE(medit_movetype);
 OLC_MODULE(medit_nameset);
+OLC_MODULE(medit_notes);
 OLC_MODULE(medit_script);
 OLC_MODULE(medit_sex);
 OLC_MODULE(medit_size);
@@ -961,6 +962,7 @@ const struct olc_command_data olc_data[] = {
 	{ "minlevel", medit_minlevel, OLC_MOBILE, OLC_CF_EDITOR },
 	{ "movetype", medit_movetype, OLC_MOBILE, OLC_CF_EDITOR },
 	{ "nameset", medit_nameset, OLC_MOBILE, OLC_CF_EDITOR },
+	{ "notes", medit_notes, OLC_MOBILE, OLC_CF_EDITOR },
 	{ "script", medit_script, OLC_MOBILE, OLC_CF_EDITOR },
 	{ "sex", medit_sex, OLC_MOBILE, OLC_CF_EDITOR },
 	{ "shortdescription", medit_short_description, OLC_MOBILE, OLC_CF_EDITOR },

@@ -841,6 +841,9 @@ void free_mob_proto_data(struct mob_proto_data *data) {
 		free_interactions(&data->interactions);
 		free_quest_lookups(data->quest_lookups);
 		free_shop_lookups(data->shop_lookups);
+		if (data->notes) {
+			free(data->notes);
+		}
 		free(data);
 	}
 }
