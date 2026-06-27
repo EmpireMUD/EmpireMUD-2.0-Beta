@@ -490,6 +490,7 @@ int CAN_CARRY_N(char_data *ch);	// formerly a macro
 
 #define CLASS_VNUM(cls)  ((cls)->vnum)
 #define CLASS_NAME(cls)  ((cls)->name)
+#define CLASS_NOTES(cls)  ((cls)->notes)
 #define CLASS_ABBREV(cls)  ((cls)->abbrev)
 #define CLASS_FLAGS(cls)  ((cls)->flags)
 #define CLASS_POOL(cls, type)  ((cls)->pools[type])

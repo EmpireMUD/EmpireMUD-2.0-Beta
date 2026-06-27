@@ -4307,6 +4307,8 @@ struct class_data {
 	struct class_skill_req *skill_requirements;	// linked list
 	struct class_ability *abilities;	// linked list
 	
+	char *notes;	// misc notes shown only to imms
+	
 	UT_hash_handle hh;	// ability_table hash handle
 	UT_hash_handle sorted_hh;	// sorted_abilities hash handle
 };

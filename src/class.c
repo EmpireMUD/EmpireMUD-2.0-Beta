@@ -1014,6 +1014,9 @@ void free_class(class_data *cls) {
 	if (CLASS_ABBREV(cls) && (!proto || CLASS_ABBREV(cls) != CLASS_ABBREV(proto))) {
 		free(CLASS_ABBREV(cls));
 	}
+	if (CLASS_NOTES(cls) && (!proto || CLASS_NOTES(cls) != CLASS_NOTES(proto))) {
+		free(CLASS_NOTES(cls));
+	}
 	
 	if (CLASS_ABILITIES(cls) && (!proto || CLASS_ABILITIES(cls) != CLASS_ABILITIES(proto))) {
 		free_class_abilities(CLASS_ABILITIES(cls));
@@ -1106,6 +1109,11 @@ void parse_class(FILE *fl, any_vnum vnum) {
 				break;
 			}
 			
+			case '_': {	// notes
+				CLASS_NOTES(cls) = fread_string(fl, error);
+				break;
+			}
+			
 			// end
 			case 'S': {
 				return;
@@ -1146,6 +1154,7 @@ void write_class_index(FILE *fl) {
 * @param class_data *cls The thing to save.
 */
 void write_class_to_file(FILE *fl, class_data *cls) {
+	char temp[MAX_STRING_LENGTH];
 	struct class_skill_req *skill;
 	struct class_ability *abil;
 	int iter;
@@ -1178,6 +1187,13 @@ void write_class_to_file(FILE *fl, class_data *cls) {
 	// 'R': skill requirements
 	LL_FOREACH(CLASS_SKILL_REQUIREMENTS(cls), skill) {
 		fprintf(fl, "R %d %d\n", skill->vnum, skill->level);
+	}
+	
+	// '_'
+	if (CLASS_NOTES(cls) && *CLASS_NOTES(cls)) {
+		strcpy(temp, CLASS_NOTES(cls));
+		strip_crlf(temp);
+		fprintf(fl, "_\n%s~\n", temp);
 	}
 	
 	// end
@@ -1307,6 +1323,9 @@ void save_olc_class(descriptor_data *desc) {
 	if (CLASS_ABBREV(proto)) {
 		free(CLASS_ABBREV(proto));
 	}
+	if (CLASS_NOTES(proto)) {
+		free(CLASS_NOTES(proto));
+	}
 	free_class_abilities(CLASS_ABILITIES(proto));
 	free_class_skill_reqs(CLASS_SKILL_REQUIREMENTS(proto));
 	
@@ -1322,6 +1341,10 @@ void save_olc_class(descriptor_data *desc) {
 			free(CLASS_ABBREV(cls));
 		}
 		CLASS_ABBREV(cls) = str_dup(default_class_abbrev);
+	}
+	if (CLASS_NOTES(cls) && !*CLASS_NOTES(cls)) {
+		free(CLASS_NOTES(cls));
+		CLASS_NOTES(cls) = NULL;
 	}
 	
 	// save data back over the proto-type
@@ -1366,6 +1389,7 @@ class_data *setup_olc_class(class_data *input) {
 		// copy things that are pointers
 		CLASS_NAME(new) = CLASS_NAME(input) ? str_dup(CLASS_NAME(input)) : NULL;
 		CLASS_ABBREV(new) = CLASS_ABBREV(input) ? str_dup(CLASS_ABBREV(input)) : NULL;
+		CLASS_NOTES(new) = CLASS_NOTES(input) ? str_dup(CLASS_NOTES(input)) : NULL;
 		
 		// copy lists
 		CLASS_ABILITIES(new) = copy_class_abilities(CLASS_ABILITIES(input));
@@ -1412,6 +1436,10 @@ void do_stat_class(char_data *ch, class_data *cls) {
 	
 	build_page_display_str(ch, "Roles and abilities:");
 	show_class_ability_display(ch, CLASS_ABILITIES(cls), FALSE, NULL);
+	
+	if (CLASS_NOTES(cls) && *CLASS_NOTES(cls)) {
+		build_page_display(ch, "Notes:\r\n%s", CLASS_NOTES(cls));
+	}
 
 	send_page_display(ch);
 }
@@ -1533,6 +1561,8 @@ void olc_show_class(char_data *ch) {
 	build_page_display(ch, "Class roles and abilities: <%srole\t0>", OLC_LABEL_PTR(CLASS_ABILITIES(cls)));
 	show_class_ability_display(ch, CLASS_ABILITIES(cls), FALSE, NULL);
 	
+	build_page_display(ch, "<%snotes\t0>\r\n%s", OLC_LABEL_PTR(CLASS_NOTES(cls)), NULLSAFE(CLASS_NOTES(cls)));
+	
 	send_page_display(ch);
 }
 
@@ -1612,6 +1642,19 @@ OLC_MODULE(classedit_maxmoves) {
 OLC_MODULE(classedit_name) {
 	class_data *cls = GET_OLC_CLASS(ch->desc);
 	olc_process_string(ch, argument, "name", &CLASS_NAME(cls));
+}
+
+
+OLC_MODULE(classedit_notes) {
+	class_data *cls = GET_OLC_CLASS(ch->desc);
+
+	if (ch->desc->str) {
+		msg_to_char(ch, "You are already editing a string.\r\n");
+	}
+	else {
+		sprintf(buf, "notes for %s", CLASS_NAME(cls));
+		start_string_editor(ch->desc, buf, &CLASS_NOTES(cls), MAX_NOTES, TRUE);
+	}
 }
 
 

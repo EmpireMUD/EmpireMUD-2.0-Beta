@@ -9883,7 +9883,7 @@ void write_ability_index(FILE *fl) {
 * @param ability_data *abil The thing to save.
 */
 void write_ability_to_file(FILE *fl, ability_data *abil) {
-	char temp[256], temp2[256], temp3[256], temp4[256];
+	char temp[MAX_STRING_LENGTH], temp2[256], temp3[256], temp4[256];
 	struct ability_data_list *adl;
 	struct ability_hook *ahook;
 	struct ability_type *at;
