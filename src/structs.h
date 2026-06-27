@@ -4177,6 +4177,8 @@ struct augment_data {
 	struct apply_data *applies;	// how it modifies items
 	struct resource_data *resources;	// resources required
 	
+	char *notes;	// misc notes shown only to imms
+	
 	UT_hash_handle hh;	// augment_table hash
 	UT_hash_handle sorted_hh;	// sorted_augments hash
 };

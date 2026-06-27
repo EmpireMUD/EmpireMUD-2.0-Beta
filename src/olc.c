@@ -147,6 +147,7 @@ OLC_MODULE(attackedit_firstperson);
 OLC_MODULE(attackedit_flags);
 OLC_MODULE(attackedit_message);
 OLC_MODULE(attackedit_name);
+OLC_MODULE(attackedit_notes);
 OLC_MODULE(attackedit_normal);
 OLC_MODULE(attackedit_noun);
 OLC_MODULE(attackedit_slow);
@@ -171,6 +172,7 @@ OLC_MODULE(augedit_ability);
 OLC_MODULE(augedit_apply);
 OLC_MODULE(augedit_flags);
 OLC_MODULE(augedit_name);
+OLC_MODULE(augedit_notes);
 OLC_MODULE(augedit_requiresobject);
 OLC_MODULE(augedit_resource);
 OLC_MODULE(augedit_type);
@@ -743,6 +745,7 @@ const struct olc_command_data olc_data[] = {
 	{ "flags", attackedit_flags, OLC_ATTACK, OLC_CF_EDITOR },
 	{ "messages", attackedit_message, OLC_ATTACK, OLC_CF_EDITOR },
 	{ "name", attackedit_name, OLC_ATTACK, OLC_CF_EDITOR },
+	{ "notes", attackedit_notes, OLC_ATTACK, OLC_CF_EDITOR },
 	{ "normal", attackedit_normal, OLC_ATTACK, OLC_CF_EDITOR },
 	{ "noun", attackedit_noun, OLC_ATTACK, OLC_CF_EDITOR },
 	{ "slow", attackedit_slow, OLC_ATTACK, OLC_CF_EDITOR },
@@ -767,6 +770,7 @@ const struct olc_command_data olc_data[] = {
 	{ "apply", augedit_apply, OLC_AUGMENT, OLC_CF_EDITOR },
 	{ "flags", augedit_flags, OLC_AUGMENT, OLC_CF_EDITOR },
 	{ "name", augedit_name, OLC_AUGMENT, OLC_CF_EDITOR },
+	{ "notes", augedit_notes, OLC_AUGMENT, OLC_CF_EDITOR },
 	{ "requiresability", augedit_ability, OLC_AUGMENT, OLC_CF_EDITOR },
 	{ "requiresobject", augedit_requiresobject, OLC_AUGMENT, OLC_CF_EDITOR },
 	{ "resource", augedit_resource, OLC_AUGMENT, OLC_CF_EDITOR },

@@ -338,7 +338,7 @@ void olc_fullsearch_augment(char_data *ch, char *argument) {
 				continue;
 			}
 		}
-		if (*find_keywords && !multi_isname(find_keywords, GET_AUG_NAME(aug))) {
+		if (*find_keywords && !multi_isname(find_keywords, GET_AUG_NAME(aug)) && (!GET_AUG_NOTES(aug) || !multi_isname(find_keywords, GET_AUG_NOTES(aug)))) {
 			continue;
 		}
 		
@@ -510,6 +510,9 @@ void free_augment(augment_data *aug) {
 	if (GET_AUG_NAME(aug) && (!proto || GET_AUG_NAME(aug) != GET_AUG_NAME(proto))) {
 		free(GET_AUG_NAME(aug));
 	}
+	if (GET_AUG_NOTES(aug) && (!proto || GET_AUG_NOTES(aug) != GET_AUG_NOTES(proto))) {
+		free(GET_AUG_NOTES(aug));
+	}
 	
 	if (GET_AUG_APPLIES(aug) && (!proto || GET_AUG_APPLIES(aug) != GET_AUG_APPLIES(proto))) {
 		free_apply_list(GET_AUG_APPLIES(aug));
@@ -580,6 +583,11 @@ void parse_augment(FILE *fl, any_vnum vnum) {
 				break;
 			}
 			
+			case '_': {	// notes
+				GET_AUG_NOTES(aug) = fread_string(fl, error);
+				break;
+			}
+			
 			// end
 			case 'S': {
 				return;
@@ -620,7 +628,7 @@ void write_augments_index(FILE *fl) {
 * @param augment_data *aug The thing to save.
 */
 void write_augment_to_file(FILE *fl, augment_data *aug) {
-	char temp[256], temp2[256];
+	char temp[MAX_STRING_LENGTH], temp2[256];
 	
 	if (!fl || !aug) {
 		syslog(SYS_ERROR, LVL_START_IMM, TRUE, "SYSERR: write_augment_to_file called without %s", !fl ? "file" : "augment");
@@ -642,6 +650,13 @@ void write_augment_to_file(FILE *fl, augment_data *aug) {
 	
 	// 'R': resources
 	write_resources_to_file(fl, 'R', GET_AUG_RESOURCES(aug));
+	
+	// '_'
+	if (GET_AUG_NOTES(aug) && *GET_AUG_NOTES(aug)) {
+		strcpy(temp, GET_AUG_NOTES(aug));
+		strip_crlf(temp);
+		fprintf(fl, "_\n%s~\n", temp);
+	}
 	
 	// end
 	fprintf(fl, "S\n");
@@ -754,6 +769,9 @@ void save_olc_augment(descriptor_data *desc) {
 	if (GET_AUG_NAME(proto)) {
 		free(GET_AUG_NAME(proto));
 	}
+	if (GET_AUG_NOTES(proto)) {
+		free(GET_AUG_NOTES(proto));
+	}
 	free_apply_list(GET_AUG_APPLIES(proto));
 	free_resource_list(GET_AUG_RESOURCES(proto));
 	
@@ -763,6 +781,10 @@ void save_olc_augment(descriptor_data *desc) {
 			free(GET_AUG_NAME(aug));
 		}
 		GET_AUG_NAME(aug) = str_dup(default_aug_name);
+	}
+	if (GET_AUG_NOTES(aug) && !*GET_AUG_NOTES(aug)) {
+		free(GET_AUG_NOTES(aug));
+		GET_AUG_NOTES(aug) = NULL;
 	}
 
 	// save data back over the proto-type
@@ -799,6 +821,7 @@ augment_data *setup_olc_augment(augment_data *input) {
 
 		// copy things that are pointers
 		GET_AUG_NAME(new) = GET_AUG_NAME(input) ? str_dup(GET_AUG_NAME(input)) : NULL;
+		GET_AUG_NOTES(new) = GET_AUG_NOTES(input) ? str_dup(GET_AUG_NOTES(input)) : NULL;
 		
 		// copy lists
 		GET_AUG_APPLIES(new) = copy_apply_list(GET_AUG_APPLIES(input));
@@ -867,6 +890,10 @@ void do_stat_augment(char_data *ch, augment_data *aug) {
 	build_page_display_str(ch, "Resource cost:");
 	show_resource_display(ch, GET_AUG_RESOURCES(aug), FALSE);
 	
+	if (GET_AUG_NOTES(aug) && *GET_AUG_NOTES(aug)) {
+		build_page_display(ch, "Notes:\r\n%s", GET_AUG_NOTES(aug));
+	}
+	
 	send_page_display(ch);
 }
 
@@ -924,6 +951,8 @@ void olc_show_augment(char_data *ch) {
 	if (GET_AUG_RESOURCES(aug)) {
 		show_resource_display(ch, GET_AUG_RESOURCES(aug), FALSE);
 	}
+	
+	build_page_display(ch, "<%snotes\t0>\r\n%s", OLC_LABEL_PTR(GET_AUG_NOTES(aug)), NULLSAFE(GET_AUG_NOTES(aug)));
 	
 	send_page_display(ch);
 }
@@ -1010,6 +1039,19 @@ OLC_MODULE(augedit_flags) {
 OLC_MODULE(augedit_name) {
 	augment_data *aug = GET_OLC_AUGMENT(ch->desc);
 	olc_process_string(ch, argument, "name", &GET_AUG_NAME(aug));
+}
+
+
+OLC_MODULE(augedit_notes) {
+	augment_data *aug = GET_OLC_AUGMENT(ch->desc);
+
+	if (ch->desc->str) {
+		msg_to_char(ch, "You are already editing a string.\r\n");
+	}
+	else {
+		sprintf(buf, "notes for %s", GET_AUG_NAME(aug));
+		start_string_editor(ch->desc, buf, &GET_AUG_NOTES(aug), MAX_NOTES, TRUE);
+	}
 }
 
 
