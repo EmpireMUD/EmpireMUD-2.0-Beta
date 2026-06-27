@@ -257,6 +257,7 @@
 #define BOOK_FLAGS(book)		((book)->flags)
 #define BOOK_ITEM_DESC(book)	((book)->item_description)
 #define BOOK_ITEM_NAME(book)	((book)->item_name)
+#define BOOK_NOTES(book)		((book)->notes)
 #define BOOK_PARAGRAPHS(book)	((book)->paragraphs)
 #define BOOK_TITLE(book)		((book)->title)
 

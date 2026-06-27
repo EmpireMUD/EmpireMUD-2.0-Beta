@@ -3236,6 +3236,10 @@ void do_stat_book(char_data *ch, book_data *book, bool details) {
 		build_page_display_str(ch, "(use vstat -d to view all paragraph text)");
 	}
 	
+	if (BOOK_NOTES(book) && *BOOK_NOTES(book)) {
+		build_page_display(ch, "Notes:\r\n%s", BOOK_NOTES(book));
+	}
+	
 	send_page_display(ch);
 }
 

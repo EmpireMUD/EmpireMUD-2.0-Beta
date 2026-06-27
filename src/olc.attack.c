@@ -2352,7 +2352,7 @@ OLC_MODULE(attackedit_name) {
 }
 
 
-OLC_MODULE(attackedit_name) {
+OLC_MODULE(attackedit_notes) {
 	msg_to_char(ch, "Attack messages do not support the 'notes' field.\r\n");
 	// NOTE: this is due to how they are saved in the 'messages' file
 }

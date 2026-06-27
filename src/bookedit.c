@@ -159,6 +159,9 @@ void free_book(book_data *book) {
 	if (BOOK_ITEM_DESC(book) && (!proto || BOOK_ITEM_DESC(book) != BOOK_ITEM_DESC(proto))) {
 		free(BOOK_ITEM_DESC(book));
 	}
+	if (BOOK_NOTES(book) && (!proto || BOOK_NOTES(book) != BOOK_NOTES(proto))) {
+		free(BOOK_NOTES(book));
+	}
 	
 	if (BOOK_PARAGRAPHS(book) && (!proto || BOOK_PARAGRAPHS(book) != BOOK_PARAGRAPHS(proto))) {
 		while ((para = BOOK_PARAGRAPHS(book))) {
@@ -267,6 +270,9 @@ void olc_fullsearch_book(char_data *ch, char *argument) {
 				found = TRUE;
 			}
 			else if (BOOK_ITEM_NAME(book) && multi_isname(find_keywords, BOOK_ITEM_NAME(book))) {
+				found = TRUE;
+			}
+			else if (BOOK_NOTES(book) && multi_isname(find_keywords, BOOK_NOTES(book))) {
 				found = TRUE;
 			}
 			else {
@@ -429,6 +435,9 @@ void save_olc_book(descriptor_data *desc) {
 	if (BOOK_ITEM_DESC(proto)) {
 		free(BOOK_ITEM_DESC(proto));
 	}
+	if (BOOK_NOTES(proto)) {
+		free(BOOK_NOTES(proto));
+	}
 	while ((para = BOOK_PARAGRAPHS(proto))) {
 		if (para->text) {
 			free(para->text);
@@ -454,6 +463,10 @@ void save_olc_book(descriptor_data *desc) {
 		if (!para->text) {
 			para->text = str_dup("Empty paragraph.\r\n");
 		}
+	}
+	if (BOOK_NOTES(book) && !*BOOK_NOTES(book)) {
+		free(BOOK_NOTES(book));
+		BOOK_NOTES(book) = NULL;
 	}
 	
 	// may need to save multiple authors
@@ -499,6 +512,7 @@ book_data *setup_olc_book(book_data *input) {
 		BOOK_BYLINE(new) = BOOK_BYLINE(input) ? str_dup(BOOK_BYLINE(input)) : NULL;
 		BOOK_ITEM_NAME(new) = BOOK_ITEM_NAME(input) ? str_dup(BOOK_ITEM_NAME(input)) : NULL;
 		BOOK_ITEM_DESC(new) = BOOK_ITEM_DESC(input) ? str_dup(BOOK_ITEM_DESC(input)) : NULL;
+		BOOK_NOTES(new) = BOOK_NOTES(input) ? str_dup(BOOK_NOTES(input)) : NULL;
 		
 		BOOK_PARAGRAPHS(new) = NULL;
 		LL_FOREACH(BOOK_PARAGRAPHS(input), para) {
@@ -601,6 +615,10 @@ void olc_show_book(char_data *ch) {
 		build_page_display(ch, "<%slicense\t0>, <%ssave\t0>, <%sabort\t0>", OLC_LABEL_UNCHANGED, OLC_LABEL_UNCHANGED, OLC_LABEL_UNCHANGED);
 	}
 	
+	if (imm) {
+		build_page_display(ch, "<%snotes\t0>\r\n%s", OLC_LABEL_PTR(BOOK_NOTES(book)), NULLSAFE(BOOK_NOTES(book)));
+	}
+	
 	send_page_display(ch);
 }
 
@@ -689,6 +707,19 @@ OLC_MODULE(booked_item_name) {
 
 OLC_MODULE(booked_license) {
 	msg_to_char(ch, "%s", bookedit_license_display);
+}
+
+
+OLC_MODULE(booked_notes) {
+	book_data *book = GET_OLC_BOOK(ch->desc);
+
+	if (ch->desc->str) {
+		msg_to_char(ch, "You are already editing a string.\r\n");
+	}
+	else {
+		sprintf(buf, "notes for %s", BOOK_TITLE(book));
+		start_string_editor(ch->desc, buf, &BOOK_TITLE(book), MAX_NOTES, TRUE);
+	}
 }
 
 

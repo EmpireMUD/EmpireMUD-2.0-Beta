@@ -184,6 +184,7 @@ OLC_MODULE(booked_byline);
 OLC_MODULE(booked_item_description);
 OLC_MODULE(booked_item_name);
 OLC_MODULE(booked_license);
+OLC_MODULE(booked_notes);
 OLC_MODULE(booked_paragraphs);
 OLC_MODULE(booked_title);
 
@@ -784,6 +785,7 @@ const struct olc_command_data olc_data[] = {
 	{ "description", booked_item_description, OLC_BOOK, OLC_CF_EDITOR },
 	{ "item", booked_item_name, OLC_BOOK, OLC_CF_EDITOR },
 	{ "license", booked_license, OLC_BOOK, OLC_CF_EDITOR },
+	{ "notes", booked_notes, OLC_BOOK, OLC_CF_EDITOR },
 	{ "paragraphs", booked_paragraphs, OLC_BOOK, OLC_CF_EDITOR },
 	{ "title", booked_title, OLC_BOOK, OLC_CF_EDITOR },
 	

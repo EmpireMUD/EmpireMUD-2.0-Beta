@@ -4218,6 +4218,8 @@ struct book_data {
 	
 	struct paragraph_data *paragraphs;	// linked list
 	
+	char *notes;	// misc notes shown only to imms
+	
 	UT_hash_handle hh;	// book_table
 };
 

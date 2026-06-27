@@ -134,7 +134,7 @@ void parse_book(FILE *fl, book_vnum vnum) {
 	
 	room_vnum room;
 	int lvar[2];
-	char line[256], astr[256];
+	char line[256], astr[256], buf2[MAX_STRING_LENGTH];
 	
 	sprintf(buf2, "book #%d", vnum);
 	
@@ -203,6 +203,11 @@ void parse_book(FILE *fl, book_vnum vnum) {
 				}
 				break;
 			}
+			
+			case '_': {	// notes
+				BOOK_NOTES(book) = fread_string(fl, buf2);
+				break;
+			}
 
 			case 'S': {	// end!
 				return;
@@ -218,6 +223,8 @@ void parse_book(FILE *fl, book_vnum vnum) {
 
 /**
 * Save all books for one author to file.
+*
+* aka write_book_to_file()
 *
 * @param int idnum the author's idnum
 */
@@ -262,6 +269,13 @@ void save_author_books(int idnum) {
 			
 			// 'L': library
 			// Deprecated as of b5.174: libraries now have their own file
+			
+			// '_'
+			if (BOOK_NOTES(book) && *BOOK_NOTES(book)) {
+				strcpy(temp, BOOK_NOTES(book));
+				strip_crlf(temp);
+				fprintf(fl, "_\n%s~\n", temp);
+			}
 			
 			fprintf(fl, "S\n");
 		}
