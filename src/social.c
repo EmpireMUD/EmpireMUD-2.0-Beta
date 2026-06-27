@@ -340,6 +340,9 @@ void free_social(social_data *soc) {
 	if (SOC_NAME(soc) && (!proto || SOC_NAME(soc) != SOC_NAME(proto))) {
 		free(SOC_NAME(soc));
 	}
+	if (SOC_NOTES(soc) && (!proto || SOC_NOTES(soc) != SOC_NOTES(proto))) {
+		free(SOC_NOTES(soc));
+	}
 	
 	for (iter = 0; iter < NUM_SOCM_MESSAGES; ++iter) {
 		if (SOC_MESSAGE(soc, iter) && (!proto || SOC_MESSAGE(soc, iter) != SOC_MESSAGE(proto, iter))) {
@@ -418,6 +421,11 @@ void parse_social(FILE *fl, any_vnum vnum) {
 				break;
 			}
 			
+			case '_': {	// notes
+				SOC_NOTES(soc) = fread_string(fl, error);
+				break;
+			}
+			
 			// end
 			case 'S': {
 				return;
@@ -474,7 +482,7 @@ void write_socials_index(FILE *fl) {
 * @param social_data *soc The thing to save.
 */
 void write_social_to_file(FILE *fl, social_data *soc) {
-	char temp[256];
+	char temp[MAX_STRING_LENGTH];
 	int iter;
 	
 	if (!fl || !soc) {
@@ -502,6 +510,13 @@ void write_social_to_file(FILE *fl, social_data *soc) {
 		if (SOC_MESSAGE(soc, iter)) {
 			fprintf(fl, "M%d\n%s~\n", iter, SOC_MESSAGE(soc, iter));
 		}
+	}
+	
+	// '_'
+	if (SOC_NOTES(soc) && *SOC_NOTES(soc)) {
+		strcpy(temp, SOC_NOTES(soc));
+		strip_crlf(temp);
+		fprintf(fl, "_\n%s~\n", temp);
 	}
 	
 	// end
@@ -619,6 +634,9 @@ void save_olc_social(descriptor_data *desc) {
 	if (SOC_NAME(proto)) {
 		free(SOC_NAME(proto));
 	}
+	if (SOC_NOTES(proto)) {
+		free(SOC_NOTES(proto));
+	}
 	for (iter = 0; iter < NUM_SOCM_MESSAGES; ++iter) {
 		if (SOC_MESSAGE(proto, iter)) {
 			free(SOC_MESSAGE(proto, iter));
@@ -638,6 +656,10 @@ void save_olc_social(descriptor_data *desc) {
 			free(SOC_NAME(soc));
 		}
 		SOC_NAME(soc) = str_dup(default_social_name);
+	}
+	if (SOC_NOTES(soc) && !*SOC_NOTES(soc)) {
+		free(SOC_NOTES(soc));
+		SOC_NOTES(soc) = NULL;
 	}
 	
 	// save data back over the proto-type
@@ -676,6 +698,7 @@ social_data *setup_olc_social(social_data *input) {
 		// copy things that are pointers
 		SOC_COMMAND(new) = SOC_COMMAND(input) ? str_dup(SOC_COMMAND(input)) : NULL;
 		SOC_NAME(new) = SOC_NAME(input) ? str_dup(SOC_NAME(input)) : NULL;
+		SOC_NOTES(new) = SOC_NOTES(input) ? str_dup(SOC_NOTES(input)) : NULL;
 		SOC_REQUIREMENTS(new) = copy_requirements(SOC_REQUIREMENTS(input));
 		
 		for (iter = 0; iter < NUM_SOCM_MESSAGES; ++iter) {
@@ -729,6 +752,10 @@ void do_stat_social(char_data *ch, social_data *soc) {
 		build_page_display(ch, "\tc%s\t0: %s", social_message_types[iter][0], SOC_MESSAGE(soc, iter) ? SOC_MESSAGE(soc, iter) : "(none)");
 	}
 	
+	if (SOC_NOTES(soc) && *SOC_NOTES(soc)) {
+		build_page_display(ch, "Notes:\r\n%s", SOC_NOTES(soc));
+	}
+	
 	send_page_display(ch);
 }
 
@@ -767,6 +794,8 @@ void olc_show_social(char_data *ch) {
 	for (iter = 0; iter < NUM_SOCM_MESSAGES; ++iter) {
 		build_page_display(ch, "%s <%s%s\t0>: %s", social_message_types[iter][0], OLC_LABEL_STR(SOC_MESSAGE(soc, iter), ""), social_message_types[iter][1], SOC_MESSAGE(soc, iter) ? SOC_MESSAGE(soc, iter) : "(none)");
 	}
+	
+	build_page_display(ch, "<%snotes\t0>\r\n%s", OLC_LABEL_PTR(SOC_NOTES(soc)), NULLSAFE(SOC_NOTES(soc)));
 	
 	send_page_display(ch);
 }
@@ -832,6 +861,19 @@ OLC_MODULE(socedit_flags) {
 OLC_MODULE(socedit_name) {
 	social_data *soc = GET_OLC_SOCIAL(ch->desc);
 	olc_process_string(ch, argument, "name", &SOC_NAME(soc));
+}
+
+
+OLC_MODULE(socedit_notes) {
+	social_data *soc = GET_OLC_SOCIAL(ch->desc);
+
+	if (ch->desc->str) {
+		msg_to_char(ch, "You are already editing a string.\r\n");
+	}
+	else {
+		sprintf(buf, "notes for %s", SOC_NAME(soc));
+		start_string_editor(ch->desc, buf, &SOC_NOTES(soc), MAX_NOTES, TRUE);
+	}
 }
 
 

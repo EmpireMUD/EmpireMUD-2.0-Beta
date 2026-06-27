@@ -561,6 +561,7 @@ OLC_MODULE(socedit_charposition);
 OLC_MODULE(socedit_command);
 OLC_MODULE(socedit_flags);
 OLC_MODULE(socedit_name);
+OLC_MODULE(socedit_notes);
 OLC_MODULE(socedit_requirements);
 OLC_MODULE(socedit_targetposition);
 OLC_MODULE(socedit_n2char);
@@ -1168,6 +1169,7 @@ const struct olc_command_data olc_data[] = {
 	{ "command", socedit_command, OLC_SOCIAL, OLC_CF_EDITOR },
 	{ "flags", socedit_flags, OLC_SOCIAL, OLC_CF_EDITOR },
 	{ "name", socedit_name, OLC_SOCIAL, OLC_CF_EDITOR },
+	{ "notes", socedit_notes, OLC_SOCIAL, OLC_CF_EDITOR },
 	{ "requirements", socedit_requirements, OLC_SOCIAL, OLC_CF_EDITOR },
 	{ "targetposition", socedit_targetposition, OLC_SOCIAL, OLC_CF_EDITOR },
 	{ "n2character", socedit_n2char, OLC_SOCIAL, OLC_CF_EDITOR },

@@ -1740,6 +1740,7 @@ static inline int GET_SEASON(room_data *room) {
 #define SOC_MIN_CHAR_POS(soc)  ((soc)->min_char_position)
 #define SOC_MIN_VICT_POS(soc)  ((soc)->min_victim_position)
 #define SOC_NAME(soc)  ((soc)->name)
+#define SOC_NOTES(soc)  ((soc)->notes)
 #define SOC_REQUIREMENTS(soc)  ((soc)->requirements)
 #define SOC_VNUM(soc)  ((soc)->vnum)
 

@@ -6384,6 +6384,8 @@ struct social_data {
 	
 	char *message[NUM_SOCM_MESSAGES];	// strings
 	
+	char *notes;	// misc notes shown only to imms
+	
 	UT_hash_handle hh;	// social_table hash
 	UT_hash_handle sorted_hh;	// sorted_socials hash
 };
