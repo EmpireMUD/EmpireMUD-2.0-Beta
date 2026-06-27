@@ -29,25 +29,21 @@ elseif iron forge /= %arg% || lodestone forge /= %arg%
   set which 12800
   set dest 12810
   set curr 5100
-  set str an iron shard
 elseif imperium forge /= %arg% || victory forge /= %arg%
   set name Victory Forge
   set which 12801
   set dest 12850
   set curr 5101
-  set str an imperium shard
 elseif eventide forge /= %arg% || echo forge /= %arg%
   set name Echo Forge
   set which 12802
   set dest 12890
   set curr 5102
-  set str an eventide shard
 elseif meteorite forge /= %arg% || terminus forge /= %arg%
   set name Terminus Forge
   set which 12803
   set dest 12920
   set curr 5103
-  set str an eventide shard
 else
   %send% %actor% Unknown celestial forge. (%forge_list%)
 end
@@ -81,8 +77,9 @@ end
 nop %actor.give_currency(%curr%, -1)%
 * update portal-in
 nop %inport.val0(%toroom.vnum%)%
-%send% %actor% You donate %str% to the forge and @%inport% appears!
-%echoaround% %actor% ~%actor% donates %str% to the forge and @%inport% appears!
+eval curname %%currency.%curr%(1)%%
+%send% %actor% You donate %curname.ana% %curname% to the forge and @%inport% appears!
+%echoaround% %actor% ~%actor% donates %curname.ana% %curname% to the forge and @%inport% appears!
 * portal back
 %load% obj 12806 %toroom%
 set outport %toroom.contents%
