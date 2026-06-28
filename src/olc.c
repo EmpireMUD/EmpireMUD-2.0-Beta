@@ -1243,7 +1243,12 @@ const struct olc_command_data olc_data[] = {
 	
 	
 	// misc commands that should not take precedence over editor commands
-	{ "fullsearch", olc_fullsearch, OLC_ABILITY | OLC_ADVENTURE | OLC_ARCHETYPE | OLC_ATTACK | OLC_AUGMENT | OLC_BOOK | OLC_BUILDING | OLC_CRAFT | OLC_CROP | OLC_EVENT | OLC_GENERIC | OLC_MOBILE |  OLC_OBJECT | OLC_PROGRESS | OLC_QUEST | OLC_ROOM_TEMPLATE | OLC_SECTOR | OLC_SKILL | OLC_TRIGGER | OLC_VEHICLE, NOBITS },
+	{ "fullsearch", olc_fullsearch, OLC_ABILITY | OLC_ADVENTURE | OLC_ARCHETYPE
+		| OLC_ATTACK | OLC_AUGMENT | OLC_BOOK | OLC_BUILDING | OLC_CRAFT
+		| OLC_CROP | OLC_EVENT | OLC_GENERIC | OLC_MOBILE |  OLC_OBJECT
+		| OLC_PROGRESS | OLC_QUEST | OLC_ROOM_TEMPLATE | OLC_SECTOR
+		| OLC_SKILL | OLC_SOCIAL | OLC_TRIGGER | OLC_VEHICLE,
+		NOBITS },
 	
 	// this goes last
 	{ "\n", NULL, NOBITS, NOBITS }
@@ -2923,6 +2928,11 @@ OLC_MODULE(olc_fullsearch) {
 		case OLC_SKILL: {
 			void olc_fullsearch_skill(char_data *ch, char *argument);
 			olc_fullsearch_skill(ch, argument);
+			break;
+		}
+		case OLC_SOCIAL: {
+			void olc_fullsearch_social(char_data *ch, char *argument);
+			olc_fullsearch_social(ch, argument);
 			break;
 		}
 		case OLC_TRIGGER: {

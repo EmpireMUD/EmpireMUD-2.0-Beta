@@ -207,6 +207,127 @@ char *list_one_social(social_data *soc, bool detail) {
 
 
 /**
+* Searches properties of social.
+*
+* @param char_data *ch The person searching.
+* @param char *argument The argument they entered.
+*/
+void olc_fullsearch_social(char_data *ch, char *argument) {
+	bool any;
+	char type_arg[MAX_INPUT_LENGTH], val_arg[MAX_INPUT_LENGTH], find_keywords[MAX_INPUT_LENGTH];
+	int count, iter;
+	
+	bitvector_t only_flags = NOBITS, not_flagged = NOBITS;
+	int vmin = NOTHING, vmax = NOTHING;
+	int min_char_pos = POS_DEAD, max_char_pos = POS_STANDING, min_vict_pos = POS_DEAD, max_vict_pos = POS_STANDING;
+	bool must_have_req = FALSE, not_have_req = FALSE;
+	
+	social_data *soc, *next_soc;
+	
+	if (!*argument) {
+		msg_to_char(ch, "See HELP SOCEDIT FULLSEARCH for syntax.\r\n");
+		return;
+	}
+	
+	// process argument
+	*find_keywords = '\0';
+	while (*argument) {
+		// figure out a type
+		argument = any_one_arg(argument, type_arg);
+		
+		if (!strcmp(type_arg, "-")) {
+			continue;	// just skip stray dashes
+		}
+		
+		FULLSEARCH_FLAGS("flags", only_flags, social_flags)
+		FULLSEARCH_FLAGS("flagged", only_flags, social_flags)
+		FULLSEARCH_FLAGS("unflagged", not_flagged, social_flags)
+		FULLSEARCH_BOOL("hasrequirements", must_have_req)
+		FULLSEARCH_BOOL("norequirements", not_have_req)
+		FULLSEARCH_LIST("maxcharposition", max_char_pos, position_types)
+		FULLSEARCH_LIST("mincharposition", min_char_pos, position_types)
+		FULLSEARCH_LIST("maxvictposition", max_char_pos, position_types)
+		FULLSEARCH_LIST("minvictposition", min_char_pos, position_types)
+		FULLSEARCH_INT("vmin", vmin, 0, INT_MAX)
+		FULLSEARCH_INT("vmax", vmax, 0, INT_MAX)
+		
+		else {	// not sure what to do with it? treat it like a keyword
+			sprintf(find_keywords + strlen(find_keywords), "%s%s", *find_keywords ? " " : "", type_arg);
+		}
+		
+		// prepare for next loop
+		skip_spaces(&argument);
+	}
+	
+	build_page_display(ch, "Social fullsearch: %s", show_color_codes(find_keywords));
+	count = 0;
+	
+	// okay now look up socials
+	HASH_ITER(hh, social_table, soc, next_soc) {
+		if ((vmin != NOTHING && SOC_VNUM(soc) < vmin) || (vmax != NOTHING && SOC_VNUM(soc) > vmax)) {
+			continue;	// vnum range
+		}
+		if (not_flagged != NOBITS && IS_SET(SOC_FLAGS(soc), not_flagged)) {
+			continue;
+		}
+		if (only_flags != NOBITS && (SOC_FLAGS(soc) & only_flags) != only_flags) {
+			continue;
+		}
+		if (SOC_MIN_CHAR_POS(soc) < min_char_pos || SOC_MIN_CHAR_POS(soc) > max_char_pos) {
+			continue;
+		}
+		if (SOC_MIN_VICT_POS(soc) < min_vict_pos || SOC_MIN_VICT_POS(soc) > max_vict_pos) {
+			continue;
+		}
+		if (must_have_req && !SOC_REQUIREMENTS(soc)) {
+			continue;
+		}
+		if (not_have_req && SOC_REQUIREMENTS(soc)) {
+			continue;
+		}
+		
+		// search strings
+		if (*find_keywords) {
+			any = FALSE;
+			if (SOC_NAME(soc) && multi_isname(find_keywords, SOC_NAME(soc))) {
+				any = TRUE;
+			}
+			else if (SOC_COMMAND(soc) && multi_isname(find_keywords, SOC_COMMAND(soc))) {
+				any = TRUE;
+			}
+			else if (SOC_NOTES(soc) && multi_isname(find_keywords, SOC_NOTES(soc))) {
+				any = TRUE;
+			}
+			
+			for (iter = 0; iter < NUM_SOCM_MESSAGES && !any; ++iter) {
+				if (SOC_MESSAGE(soc, iter) && multi_isname(find_keywords, SOC_MESSAGE(soc, iter))) {
+					any = TRUE;
+				}
+			}
+			
+			// did we find a match in any string
+			if (!any) {
+				continue;
+			}
+		}
+		
+		// show it
+		build_page_display(ch, "[%5d] %s (%s)", SOC_VNUM(soc), SOC_NAME(soc), NULLSAFE(SOC_COMMAND(soc)));
+		++count;
+	}
+	
+	if (count > 0) {
+		build_page_display(ch, "(%d socials)", count);
+	}
+	else {
+		build_page_display_str(ch, " none");
+	}
+	
+	send_page_display(ch);
+}
+
+
+/**
 * Searches for all uses of a social and displays them.
 *
 * @param char_data *ch The player.

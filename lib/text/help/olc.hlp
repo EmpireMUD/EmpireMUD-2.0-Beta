@@ -9887,6 +9887,31 @@ Available flags:
 
 See also: OLC SOCIALS
 #d
+"SOCEDIT FULLSEARCH" "SOCIAL FULLSEARCH"
+
+Usage:  .social fullsearch -<field> <argument> <...>
+
+This command allows you to search for socials matching certain criteria. You
+can specify multiple fields if you want. Any arguments that don't start with a
+dash (-) are matched to the social's name and strings.
+
+Fields:
+  &c-flagged&0, &cunflagged&0 - see HELP SOCEDIT FLAGS
+  &c-hasrequirements&0, &c-norequirements&0 - find only ones that do or don't
+                                              have any requirements
+  &c-maxcharposition&0, &c-mincharposition&0 - for actor - HELP POSITIONS
+  &c-maxvictposition&0, &c-minvictposition&0 - for victim
+  &c-vmin&0, &c-vmax&0 - VNUM range limits
+
+Examples:
+ > .soc fullsearch clap -noreq
+ > .soc fullsearch -flag NOISY
+ > .soc fullsearch -flag NOISY -vmin 0 -vmax 9999
+
+To search the "requirements" field, you can generally use normal searches for
+other OLC types. For example, to find which social requires the hag's pointe
+shoes (object 19034), use ".obj search 19034".
+#d
 "SOCEDIT MESSAGES" "SOCEDIT N2CHARACTER" "SOCEDIT N2OTHERS" "SOCEDIT S2CHARACTER" "SOCEDIT S2OTHERS" "SOCEDIT T2CHARACTER" "SOCEDIT T2VICTIM" "SOCEDIT T2OTHERS" "SOCEDIT TNOTFOUND" "SOCEDIT SILENT2CHAR" "SOCEDIT SILENT2OTHERS"
 
 Usage:  .n2char <message | none>
