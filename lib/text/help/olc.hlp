@@ -8267,7 +8267,7 @@ Supported types:
   trigger
   vehicle
 
-Unsupported types: class, faction, global, morph, shop, social
+Unsupported types: class, faction, global, morph, shop
 #d
 "OLC LIST" OLIST MLIST RLIST
 
