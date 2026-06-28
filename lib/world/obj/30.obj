@@ -378,9 +378,9 @@ A basket of green peas is sitting on the ground.~
 like this, or cook something with them, or even plant them to start your own
 pea crop.
 ~
-6 bglC a 0 0 10
+6 bglC a 0 0 11
 12 11 0
-7 120
+7 168
 C
 1 1
 I 15 3020 100.00 4 x  # SEPARATE: handful of peas
@@ -720,9 +720,9 @@ a basket of strawberries~
 A basket of ripe strawberries is on the ground.~
 You can eat strawberries, or plant them.
 ~
-6 bglC a 0 0 13
+6 bglC a 0 0 14
 12 3007 0
-7 72
+7 168
 C
 1 1
 I 15 3040 100.00 4 e  # SEPARATE: couple of strawberries
@@ -1427,9 +1427,9 @@ a basket of cucumbers~
 Someone has dropped a basket of cucumbers on the ground.~
 Cucumbers can be planted, eaten, or made into pickles.
 ~
-6 bglC a 0 0 13
+6 bglC a 0 0 14
 6 3078 0
-7 120
+7 168
 C
 1 1
 I 15 3079 100.00 4 e  # SEPARATE: single ripe cucumber
