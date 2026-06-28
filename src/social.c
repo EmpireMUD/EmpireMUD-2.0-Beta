@@ -165,6 +165,10 @@ bool audit_social(social_data *soc, char_data *ch) {
 		olc_audit_msg(ch, SOC_VNUM(soc), "Social has s2char/s2other but not t2char (required)");
 		problem = TRUE;
 	}
+	if ((SOC_MESSAGE(soc, SOCM_SILENT_TO_CHAR) || SOC_MESSAGE(soc, SOCM_SILENT_TO_OTHERS)) && !SOCIAL_FLAGGED(soc, SOC_NOISY)) {
+		olc_audit_msg(ch, SOC_VNUM(soc), "Social has silent2char/other but missing NOISY flag (required)");
+		problem = TRUE;
+	}
 	
 	return problem;
 }
