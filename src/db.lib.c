@@ -9280,8 +9280,6 @@ void free_whole_library(void) {
 	master_uid_lookup_table = NULL;
 	HASH_ITER(hh, vehicle_table, veh, next_veh) {
 		remove_vehicle_from_table(veh);
-		free_quest_lookups(VEH_QUEST_LOOKUPS(veh));
-		free_shop_lookups(VEH_SHOP_LOOKUPS(veh));
 		free_vehicle(veh);
 	}
 	

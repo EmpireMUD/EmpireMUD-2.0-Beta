@@ -206,7 +206,6 @@ void add_or_remove_all_shop_lookups_for(shop_data *shop, bool add) {
 					else {
 						remove_shop_lookup(&GET_BLD_SHOP_LOOKUPS(bld), shop);
 					}
-					// does not require live update
 				}
 				break;
 			}
@@ -240,7 +239,6 @@ void add_or_remove_all_shop_lookups_for(shop_data *shop, bool add) {
 					else {
 						remove_shop_lookup(&GET_RMT_SHOP_LOOKUPS(rmt), shop);
 					}
-					// does not require live update
 				}
 				break;
 			}
@@ -252,7 +250,6 @@ void add_or_remove_all_shop_lookups_for(shop_data *shop, bool add) {
 					else {
 						remove_shop_lookup(&VEH_SHOP_LOOKUPS(veh), shop);
 					}
-					update_vehicle_shop_lookups(VEH_VNUM(veh));
 				}
 				break;
 			}
@@ -263,8 +260,6 @@ void add_or_remove_all_shop_lookups_for(shop_data *shop, bool add) {
 
 /**
 * Adds a shop lookup hint to a list (e.g. on a mob).
-*
-* Note: For obj/veh shops, run update_veh_shop_lookups() etc after this.
 *
 * @param struct shop_lookup **list A pointer to the list to add to.
 * @param shop_data *shop The shop to add.
@@ -452,8 +447,6 @@ void free_shop_temp_list(struct shop_temp_list *list) {
 /**
 * Adds a shop lookup hint to a list (e.g. on a mob).
 *
-* Note: For obj/veh shop, run update_veh_shop_lookups() etc after this.
-*
 * @param struct shop_lookup **list A pointer to the list to add to.
 * @param shop_data *shop The shop to add.
 * @return bool TRUE if it removed an entry, FALSE for no matches.
@@ -473,26 +466,6 @@ bool remove_shop_lookup(struct shop_lookup **list, shop_data *shop) {
 	}
 	
 	return any;
-}
-
-
-/**
-* Fixes shop lookup pointers on live copies of vehicles -- this should ALWAYS
-* point to the proto.
-*/
-void update_vehicle_shop_lookups(mob_vnum vnum) {
-	vehicle_data *proto, *veh;
-	
-	if (!(proto = vehicle_proto(vnum))) {
-		return;
-	}
-	
-	DL_FOREACH(vehicle_list, veh) {
-		if (VEH_VNUM(veh) == vnum) {
-			// re-set the pointer
-			VEH_SHOP_LOOKUPS(veh) = VEH_SHOP_LOOKUPS(proto);
-		}
-	}
 }
 
 

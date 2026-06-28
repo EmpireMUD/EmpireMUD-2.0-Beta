@@ -6459,8 +6459,7 @@ struct vehicle_data {
 	// lists
 	struct vehicle_data *prev, *next;	// vehicle_list (global) doubly-linked list
 	struct vehicle_data *prev_in_room, *next_in_room;	// ROOM_VEHICLES(room) doubly-linked list
-	struct quest_lookup *quest_lookups;
-	struct shop_lookup *shop_lookups;
+	
 	UT_hash_handle hh;	// vehicle_table hash handle
 };
 
@@ -6494,6 +6493,9 @@ struct vehicle_attribute_data {
 	int height;	// 0+ addition to terrain height
 	
 	char *notes;	// misc notes shown only to imms
+	
+	struct quest_lookup *quest_lookups;
+	struct shop_lookup *shop_lookups;
 };
 
 

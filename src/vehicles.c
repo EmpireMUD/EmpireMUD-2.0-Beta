@@ -3210,6 +3210,13 @@ void free_vehicle(vehicle_data *veh) {
 			free(VEH_NOTES(veh));
 		}
 		
+		if (VEH_QUEST_LOOKUPS(veh) && (!proto || VEH_QUEST_LOOKUPS(veh) != VEH_QUEST_LOOKUPS(proto))) {
+			free_quest_lookups(VEH_QUEST_LOOKUPS(veh));
+		}
+		if (VEH_SHOP_LOOKUPS(veh) && (!proto || VEH_SHOP_LOOKUPS(veh) != VEH_SHOP_LOOKUPS(proto))) {
+			free_shop_lookups(VEH_SHOP_LOOKUPS(veh));
+		}
+		
 		free(veh->attributes);
 	}
 	
@@ -4202,8 +4209,6 @@ void save_olc_vehicle(descriptor_data *desc) {
 	vehicle_data *proto, *veh = GET_OLC_VEHICLE(desc), *iter;
 	any_vnum vnum = GET_OLC_VNUM(desc);
 	struct spawn_info *spawn;
-	struct quest_lookup *ql;
-	struct shop_lookup *sl;
 	bitvector_t old_flags, add_affs, rem_affs;
 	UT_hash_handle hh;
 
@@ -4211,6 +4216,12 @@ void save_olc_vehicle(descriptor_data *desc) {
 	if (!(proto = vehicle_proto(vnum))) {
 		proto = create_vehicle_table_entry(vnum);
 	}
+	
+	// move quest/shop lookups over
+	VEH_QUEST_LOOKUPS(veh) = VEH_QUEST_LOOKUPS(proto);
+	VEH_QUEST_LOOKUPS(proto) = NULL;
+	VEH_SHOP_LOOKUPS(veh) = VEH_SHOP_LOOKUPS(proto);
+	VEH_SHOP_LOOKUPS(proto) = NULL;
 	
 	// sanity
 	if (!VEH_KEYWORDS(veh) || !*VEH_KEYWORDS(veh)) {
@@ -4368,15 +4379,10 @@ void save_olc_vehicle(descriptor_data *desc) {
 	
 	// save data back over the proto-type
 	hh = proto->hh;	// save old hash handle
-	ql = proto->quest_lookups;	// save lookups
-	sl = proto->shop_lookups;
 	
 	*proto = *veh;	// copy over all data
 	proto->vnum = vnum;	// ensure correct vnum
-	
 	proto->hh = hh;	// restore old hash handle
-	proto->quest_lookups = ql;	// restore lookups
-	proto->shop_lookups = sl;
 		
 	// and save to file
 	save_library_file_for_vnum(DB_BOOT_VEH, vnum);
@@ -4417,6 +4423,10 @@ vehicle_data *setup_olc_vehicle(vehicle_data *input) {
 		*new = *input;
 		CREATE(new->attributes, struct vehicle_attribute_data, 1);
 		*(new->attributes) = *(input->attributes);
+		
+		// don't copy lookups
+		VEH_QUEST_LOOKUPS(new) = NULL;
+		VEH_SHOP_LOOKUPS(new) = NULL;
 
 		// copy things that are pointers
 		VEH_KEYWORDS(new) = VEH_KEYWORDS(input) ? str_dup(VEH_KEYWORDS(input)) : NULL;

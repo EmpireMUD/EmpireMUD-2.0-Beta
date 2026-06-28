@@ -46,7 +46,6 @@ const char *default_quest_complete_msg = "You have completed the quest.\r\n";
 void add_quest_lookup(struct quest_lookup **list, quest_data *quest);
 void add_to_quest_temp_list(struct quest_temp_list **list, quest_data *quest, struct instance_data *instance);
 bool remove_quest_lookup(struct quest_lookup **list, quest_data *quest);
-void update_veh_quest_lookups(any_vnum vnum);
 void write_daily_quest_file();
 
 
@@ -1712,7 +1711,6 @@ void add_or_remove_all_quest_lookups_for(quest_data *quest, bool add) {
 						else {
 							remove_quest_lookup(&GET_BLD_QUEST_LOOKUPS(bld), quest);
 						}
-						// does not require live update
 					}
 					break;
 				}
@@ -1746,7 +1744,6 @@ void add_or_remove_all_quest_lookups_for(quest_data *quest, bool add) {
 						else {
 							remove_quest_lookup(&GET_RMT_QUEST_LOOKUPS(rmt), quest);
 						}
-						// does not require live update
 					}
 					break;
 				}
@@ -1758,7 +1755,6 @@ void add_or_remove_all_quest_lookups_for(quest_data *quest, bool add) {
 						else {
 							remove_quest_lookup(&VEH_QUEST_LOOKUPS(veh), quest);
 						}
-						update_veh_quest_lookups(VEH_VNUM(veh));
 					}
 					break;
 				}
@@ -1770,8 +1766,6 @@ void add_or_remove_all_quest_lookups_for(quest_data *quest, bool add) {
 
 /**
 * Adds a quest lookup hint to a list (e.g. on a mob).
-*
-* Note: For obj/veh quests, run update_veh_quest_lookups() etc after this.
 *
 * @param struct quest_lookup **list A pointer to the list to add to.
 * @param quest_data *quest The quest to add.
@@ -1825,8 +1819,6 @@ void free_quest_lookups(struct quest_lookup *list) {
 /**
 * Adds a quest lookup hint to a list (e.g. on a mob).
 *
-* Note: For obj/veh quests, run update_veh_quest_lookups() etc after this.
-*
 * @param struct quest_lookup **list A pointer to the list to add to.
 * @param quest_data *quest The quest to add.
 * @return bool TRUE if it removed an entry, FALSE for no matches.
@@ -1846,26 +1838,6 @@ bool remove_quest_lookup(struct quest_lookup **list, quest_data *quest) {
 	}
 	
 	return any;
-}
-
-
-/**
-* Fixes quest lookup pointers on live copies of vehicles -- this should ALWAYS
-* point to the proto.
-*/
-void update_veh_quest_lookups(any_vnum vnum) {
-	vehicle_data *proto, *veh;
-	
-	if (!(proto = vehicle_proto(vnum))) {
-		return;
-	}
-	
-	DL_FOREACH(vehicle_list, veh) {
-		if (VEH_VNUM(veh) == vnum) {
-			// re-set the pointer
-			VEH_QUEST_LOOKUPS(veh) = VEH_QUEST_LOOKUPS(proto);
-		}
-	}
 }
 
 
