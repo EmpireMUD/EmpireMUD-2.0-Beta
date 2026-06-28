@@ -312,7 +312,12 @@ void olc_fullsearch_social(char_data *ch, char *argument) {
 		}
 		
 		// show it
-		build_page_display(ch, "[%5d] %s (%s)", SOC_VNUM(soc), SOC_NAME(soc), NULLSAFE(SOC_COMMAND(soc)));
+		if (SOC_COMMAND(soc) && !str_cmp(SOC_NAME(soc), SOC_COMMAND(soc))) {
+			build_page_display(ch, "[%5d] %s", SOC_VNUM(soc), SOC_NAME(soc));
+		}
+		else {
+			build_page_display(ch, "[%5d] %s (%s)", SOC_VNUM(soc), SOC_NAME(soc), NULLSAFE(SOC_COMMAND(soc)));
+		}
 		++count;
 	}
 	
