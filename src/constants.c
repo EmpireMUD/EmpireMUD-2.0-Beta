@@ -4903,6 +4903,7 @@ const char *skill_flags[] = {
 const char *social_flags[] = {
 	"IN-DEVELOPMENT",
 	"HIDE-IF-INVIS",
+	"NOISY",
 	"\n"
 };
 
@@ -4916,7 +4917,9 @@ const char *social_message_types[NUM_SOCM_MESSAGES][2] = {
 	{ "Targeted to victim", "t2vict" },
 	{ "Target not found", "tnotfound" },	// 5
 	{ "Target-self to character", "s2char" },
-	{ "Target-self to others", "s2other" }
+	{ "Target-self to others", "s2other" },
+	{ "Silent to character", "silent2char" },
+	{ "Silent to others", "silent2others" }
 };
 
 

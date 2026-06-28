@@ -571,6 +571,8 @@ OLC_MODULE(socedit_n2char);
 OLC_MODULE(socedit_n2other);
 OLC_MODULE(socedit_s2char);
 OLC_MODULE(socedit_s2other);
+OLC_MODULE(socedit_silent2char);
+OLC_MODULE(socedit_silent2other);
 OLC_MODULE(socedit_t2char);
 OLC_MODULE(socedit_t2vict);
 OLC_MODULE(socedit_t2other);
@@ -1182,6 +1184,8 @@ const struct olc_command_data olc_data[] = {
 	{ "n2others", socedit_n2other, OLC_SOCIAL, OLC_CF_EDITOR },
 	{ "s2character", socedit_s2char, OLC_SOCIAL, OLC_CF_EDITOR },
 	{ "s2others", socedit_s2other, OLC_SOCIAL, OLC_CF_EDITOR },
+	{ "silent2character", socedit_silent2char, OLC_SOCIAL, OLC_CF_EDITOR },
+	{ "silent2others", socedit_silent2other, OLC_SOCIAL, OLC_CF_EDITOR },
 	{ "t2character", socedit_t2char, OLC_SOCIAL, OLC_CF_EDITOR },
 	{ "t2victim", socedit_t2vict, OLC_SOCIAL, OLC_CF_EDITOR },
 	{ "t2others", socedit_t2other, OLC_SOCIAL, OLC_CF_EDITOR },

@@ -2773,6 +2773,7 @@ typedef enum {
 // SOC_x: Social flags
 #define SOC_IN_DEVELOPMENT  BIT(0)	// a. can't be used by players
 #define SOC_HIDE_IF_INVIS  BIT(1)	// b. no "Someone" if player can't be seen
+#define SOC_NOISY  BIT(2)	// c. cannot be used in SILENT contexts
 
 
 // SOCM_x: social message string
@@ -2784,7 +2785,9 @@ typedef enum {
 #define SOCM_TARGETED_NOT_FOUND  5
 #define SOCM_SELF_TO_CHAR  6
 #define SOCM_SELF_TO_OTHERS  7
-#define NUM_SOCM_MESSAGES  8	// total
+#define SOCM_SILENT_TO_CHAR  8
+#define SOCM_SILENT_TO_OTHERS  9
+#define NUM_SOCM_MESSAGES  10	// total
 
 
  //////////////////////////////////////////////////////////////////////////////

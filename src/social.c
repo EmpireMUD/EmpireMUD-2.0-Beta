@@ -909,6 +909,16 @@ OLC_MODULE(socedit_s2other) {
 }
 
 
+OLC_MODULE(socedit_silent2char) {
+	process_soc_msg_field(ch, argument, SOCM_SILENT_TO_CHAR);
+}
+
+
+OLC_MODULE(socedit_silent2other) {
+	process_soc_msg_field(ch, argument, SOCM_SILENT_TO_OTHERS);
+}
+
+
 OLC_MODULE(socedit_t2char) {
 	process_soc_msg_field(ch, argument, SOCM_TARGETED_TO_CHAR);
 }

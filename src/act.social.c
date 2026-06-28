@@ -176,8 +176,47 @@ void perform_social(char_data *ch, social_data *soc, char *argument) {
 			}
 		}
 	}
-
-	if (!*buf) {
+	
+	// first: silenced room variant
+	if (SOCIAL_FLAGGED(soc, SOC_NOISY) && ROOM_AFF_FLAGGED(IN_ROOM(ch), ROOM_AFF_SILENT)) {
+		// to char
+		if (SOC_MESSAGE(soc, SOCM_SILENT_TO_CHAR) && *SOC_MESSAGE(soc, SOCM_SILENT_TO_CHAR)) {
+			sprintf(hbuf, "&%c%s&0\r\n", CUSTOM_COLOR_CHAR(ch, CUSTOM_COLOR_EMOTE), NULLSAFE(SOC_MESSAGE(soc, SOCM_SILENT_TO_CHAR)));
+			send_to_char(hbuf, ch);
+			if (ch->desc) {
+				add_to_channel_history(ch, CHANNEL_HISTORY_SAY, ch, hbuf, FALSE, 0, NOTHING);
+			}
+		}
+		else {
+			msg_to_char(ch, "&%cYou try, but no sound comes out.&0\r\n", CUSTOM_COLOR_CHAR(ch, CUSTOM_COLOR_EMOTE));
+			// don't bother adding to say history
+		}
+		
+		// to others, only if message present
+		if (SOC_MESSAGE(soc, SOCM_SILENT_TO_OTHERS) && *SOC_MESSAGE(soc, SOCM_SILENT_TO_OTHERS)) {
+			act(NULLSAFE(SOC_MESSAGE(soc, SOCM_SILENT_TO_OTHERS)), SOC_HIDDEN(soc), ch, NULL, NULL, TO_ROOM | TO_NOT_IGNORING);
+	
+			// fetch and store channel history for the room
+			DL_FOREACH2(ROOM_PEOPLE(IN_ROOM(ch)), c, next_in_room) {
+				if (c == ch || !c->desc) {
+					continue;
+				}
+				
+				if (c->desc->last_act_message) {
+					// the message was sent via act(), we can retrieve it from the desc
+					sprintf(hbuf, "&%c%s", CUSTOM_COLOR_CHAR(c, CUSTOM_COLOR_EMOTE), c->desc->last_act_message);
+					add_to_channel_history(c, CHANNEL_HISTORY_SAY, ch, hbuf, (IS_MORPHED(ch) || IS_DISGUISED(ch)), 0, NOTHING);
+				}
+				if (!IS_NPC(c) && GET_CUSTOM_COLOR(c, CUSTOM_COLOR_EMOTE)) {
+					// terminate color just in case
+					msg_to_char(c, "&0");
+				}
+			}
+		}
+		return;
+		// end silenced room
+	}
+	else if (!*buf) {
 		sprintf(hbuf, "&%c%s&0\r\n", CUSTOM_COLOR_CHAR(ch, CUSTOM_COLOR_EMOTE), NULLSAFE(SOC_MESSAGE(soc, SOCM_NO_ARG_TO_CHAR)));
 		send_to_char(hbuf, ch);
 		if (ch->desc) {
