@@ -3,7 +3,7 @@ dummy training shadowy eventide tide~
 a shadowy eventide dummy~
 A shadowy eventide training dummy has been set up here.
 ~
-200 300 bdhnyDJK 0 3
+200 300 bdhnyDJK G 3
 0 0 0 15 -1 -1
 D
    The inky blue suit of armor almost disappears in low light, fading into the
@@ -42,7 +42,7 @@ An eventide elemental is here.
 1 325 dhoGK cGL 3
 0 0 94 6 -1 -1
 D
-The elmental is assembling itself from leaves of blue-black eventide.
+The elemental is assembling itself from leaves of blue-black eventide.
 ~
 T 12836
 T 12835
@@ -66,7 +66,7 @@ S
 #12922
 Hana~
 Hana~
-Hana of the Setting Stars works the anvil.
+Hana of the Setting Stars works the anvil. (list)
 ~
 0 0 bdvL cnG 3
 2 0 0 15 -1 -1
@@ -81,7 +81,7 @@ S
 #12923
 Kwame~
 Kwame~
-Kwame the Unyielding strikes the anvil again and again.
+Kwame the Unyielding strikes the anvil again and again. (list)
 ~
 0 0 bdvL cnG 3
 1 0 0 15 -1 -1
@@ -95,7 +95,7 @@ S
 #12924
 Elodie~
 Elodie~
-Elodie of the Near Miss is focused on her work.
+Elodie of the Near Miss is focused on her work. (list)
 ~
 0 0 bdvL cnG 3
 2 0 0 15 -1 -1
@@ -109,12 +109,70 @@ S
 #12925
 Tane~
 Tane~
-Tane of the Ember Rain bustles back and forth to arrange the supplies.
+Tane of the Ember Rain bustles back and forth to arrange the supplies. (list)
 ~
 0 0 bdvL cnG 3
 1 0 0 15 -1 -1
 D
 tbd
 ~
+S
+#12927
+time lion~
+the Lion of Time~
+The Lion of Time glimmers in the fiery sky!
+~
+301 400 dhyzDJKL cEGU 6
+2 0 0 45 -1 -1
+D
+   The great lion's fur shimmers against the fiery sunset, sometimes little
+more than a constellation of lights, shifting as she prowls the sky. Her teeth,
+each larger than you are tall, catch the fading rays of sunlight as she bites
+at the fabric of reality itself.
+~
+I 4 12950 100.00 1  # LOOT: reward shield
+M
+11
+!echo !echo !echo !bell !epic~
+T 12822
+T 12821
+T 12823
+T 12820
+T 9600
+T 9601
+T 9604
+T 9609
+S
+#12941
+dummy training meteoric~
+a meteoric dummy~
+A meteoric training dummy is set up here.
+~
+300 400 bdhnyDJK G 3
+0 0 0 15 -1 -1
+D
+   The dummy is armored in meteoric metal, distinctly identified by its
+pock-marked surface and charred patina. The base is well-reinforced to take
+powerful blows from any combatant and stand its ground. No matter how hard it
+gets hit, it never strikes back.
+~
+M
+13
+This training dummy will not attack back.~
+T 12839
+T 12840
+S
+#12947
+elemental meteoric~
+a meteoric elemental~
+A meteoric elemental is here.
+~
+1 425 dhoGK cGL 3
+0 0 94 6 -1 -1
+D
+The elemental is coming together from small, metallic meteorites.
+~
+T 12836
+T 12835
 S
 $

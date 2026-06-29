@@ -625,7 +625,7 @@ mine~
 ~
 #12811
 Celestial Forge: Unique item exclusion~
-1 j 0 10
+1 j 0 20
 L c 12810
 L c 12814
 L c 12818
@@ -636,8 +636,18 @@ L c 12856
 L c 12860
 L c 12864
 L c 12868
+L c 12886
+L c 12890
+L c 12894
+L c 12898
+L c 12902
+L c 12920
+L c 12924
+L c 12928
+L c 12932
+L c 12936
 ~
-set ring_list 12810 12814 12818 12822 12826 12852 12856 12860 12864 12868
+set ring_list 12810 12814 12818 12822 12826 12852 12856 12860 12864 12868 12886 12890 12894 12898 12902 12920 12924 12928 12932 12936
 set ring_pos rfinger lfinger
 set pos_list
 *
@@ -904,12 +914,13 @@ done
 ~
 #12818
 Celetsial Forge: Reset arena and spawn mob~
-2 bw 100 15
+2 bw 100 19
 L b 12817
 L b 12857
 L b 12858
 L b 12859
 L b 12897
+L b 12927
 L c 12918
 L j 12817
 L j 12818
@@ -920,6 +931,9 @@ L j 12859
 L j 12897
 L j 12898
 L j 12899
+L j 12927
+L j 12928
+L j 12929
 ~
 * setup
 switch %self.template%
@@ -943,6 +957,13 @@ switch %self.template%
     set check_list 12897
     set mob 12897
     set mes A long, sustained peal cuts through the silence and the great wall around the forge rises from one end, opening its many-toothed mouth wide... That's no wall!
+  break
+  case 12927
+  case 12928
+  case 12929
+    set check_list 12927
+    set mob 12927
+    set mes The pink band across the sky rips open and the Lion of Time emerges, shimmering like the stars themselves, looming larger than life above you!
   break
   default
     halt
@@ -1308,19 +1329,23 @@ done
 ~
 #12833
 Celestial Forge: Buy mastery item~
-1 n 100 12
+1 n 100 16
 L c 12833
 L c 12872
 L c 12906
+L c 12940
 L o 12810
 L o 12811
 L o 12850
 L o 12851
 L o 12890
 L o 12891
+L o 12920
+L o 12921
 L w 5100
 L w 5101
 L w 5102
+L w 5103
 ~
 set actor %self.carried_by%
 if !%actor%
@@ -1344,6 +1369,12 @@ switch %self.vnum%
     set requires 12890
     set grants 12891
     set shard 5102
+    set refund 1000
+  break
+  case 12940
+    set requires 12920
+    set grants 12921
+    set shard 5103
     set refund 1000
   break
   default
@@ -1375,16 +1406,20 @@ end
 ~
 #12834
 Shard companion: Buy shard companion~
-1 n 100 15
+1 n 100 19
 L b 12834
 L b 12844
 L b 12913
+L b 12947
 L c 12879
 L c 12880
 L c 12881
 L c 12913
 L c 12914
 L c 12915
+L c 12947
+L c 12948
+L c 12949
 L f 12837
 L w 5100
 L w 5101
@@ -1395,8 +1430,8 @@ L w 5104
 set cost 150
 *
 * list in order from highest to lowest, count=max
-set comp_list 12844 12834 12913
-set comp_count 2
+set comp_list 12947 12913 12844 12834
+set comp_count 4
 *
 * init
 set tier 1
@@ -1456,6 +1491,21 @@ switch %self.vnum%
   case 12915
     set tier 3
     set new_vnum 12913
+    set upgrade caster
+  break
+  case 12947
+    set tier 4
+    set new_vnum 12947
+    set upgrade tank
+  break
+  case 12948
+    set tier 4
+    set new_vnum 12947
+    set upgrade dps
+  break
+  case 12949
+    set tier 4
+    set new_vnum 12947
     set upgrade caster
   break
   default
@@ -1547,10 +1597,11 @@ end
 ~
 #12836
 Shard companion: Death trigger~
-0 ft 100 9
+0 ft 100 10
 L b 12834
 L b 12844
 L b 12913
+L b 12947
 L w 5100
 L w 5101
 L w 5102
@@ -1580,6 +1631,9 @@ switch %self.vnum%
   case 12913
     set tier 3
   break
+  case 12947
+    set tier 4
+  break
 done
 if %tier%
   * refund shard type
@@ -1602,10 +1656,11 @@ nop %actor.remove_companion(%self.vnum%)%
 ~
 #12837
 Shard companion: Setup and update~
-0 bt 100 9
+0 bt 100 10
 L b 12834
 L b 12844
 L b 12913
+L b 12947
 L c 12808
 L w 12834
 L w 12835
@@ -1801,6 +1856,10 @@ switch %self.vnum%
     set metal eventide
     set desc_base The inky eventide surface of the elemental absorbs all light, reflecting only darkness.
   break
+  case 12947
+    set metal meteoric
+    set desc_base Heavy, pock-marked meteors cluster to form the elemental's body.
+  break
   default
     set metal tin
     set desc_base The elemental looks to be made from old tin.
@@ -1848,13 +1907,14 @@ detach 12837 %self.id%
 ~
 #12838
 Celestial Forge: Set up training dummy with use~
-1 c 6 3
+1 c 6 4
 L b 12838
 L b 12873
 L b 12907
+L b 12941
 use~
 * List of dummies to exclude here
-set dummy_list 12838 12873 12907
+set dummy_list 12838 12873 12907 12941
 *
 if %actor.obj_target(%arg.argument1%)% != %self%
   return 0
