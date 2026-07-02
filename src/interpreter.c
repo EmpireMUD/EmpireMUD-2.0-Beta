@@ -1247,6 +1247,11 @@ void perform_complex_alias(struct txt_q *input_q, char *orig, struct alias_data 
 	int num_of_tokens = 0, num;
 
 	skip_spaces(&orig);
+	
+	// buffer safety
+	if (strlen(orig) >= MAX_STRING_LENGTH) {
+		orig[MAX_STRING_LENGTH - 1] = '\0';
+	}
 
 	/* First, parse the original string */
 	temp = strtok(strcpy(buf2, orig), " ");
@@ -1274,15 +1279,27 @@ void perform_complex_alias(struct txt_q *input_q, char *orig, struct alias_data 
 				break;
 			}
 			else if ((num = *temp - '1') < num_of_tokens && num >= 0) {
-				strcpy(write_point, tokens[num]);
-				write_point += strlen(tokens[num]);
+				// b5.205 buffer overflow safety: absurd uses of the alias could easily cause an overflow here
+				if ((write_point - buf + strlen(tokens[num])) < MAX_STRING_LENGTH) {
+					strcpy(write_point, tokens[num]);
+					write_point += strlen(tokens[num]);
+				}
+				else {
+					// this would overflow the buffer, just skip it
+					// note this should never be possible with normal uses of the alias system
+				}
 			}
 			else if (num >= 0 && num >= num_of_tokens) {
 				// no arg, just skip it
 			}
 			else if (*temp == ALIAS_GLOB_CHAR) {
-				strcpy(write_point, orig);
-				write_point += strlen(orig);
+				if ((write_point - buf + strlen(orig)) < MAX_STRING_LENGTH) {
+					strcpy(write_point, orig);
+					write_point += strlen(orig);
+				}
+				else {
+					// this would overflow the buffer, see above
+				}
 			}
 			else if ((*(write_point++) = *temp) == '$') {	/* redouble $ for act safety */
 				*(write_point++) = '$';
