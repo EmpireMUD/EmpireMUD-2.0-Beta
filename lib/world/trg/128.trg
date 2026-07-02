@@ -315,7 +315,7 @@ end
 ~
 #12803
 Celestial Forge: Time and Weather commands~
-2 c 0 9
+2 c 0 12
 L j 12810
 L j 12850
 L j 12920
@@ -325,6 +325,9 @@ L j 12923
 L j 12924
 L j 12925
 L j 12926
+L j 12927
+L j 12928
+L j 12929
 time weather~
 if %cmd.mudcommand% == time
   * TIME
@@ -338,13 +341,18 @@ if %cmd.mudcommand% == time
     case 12920
     case 12922
     case 12923
-      %send% %actor% Through the flames, the starry sky reveals it to be nighttime.
+      %send% %actor% All you can see above the flames is dark smoke, but you surmise it is nighttime.
     break
     case 12924
       %send% %actor% It seems like a serene, endless night.
     break
     case 12926
       %send% %actor% It's hard to tell the time from down here beneath the rock.
+    break
+    case 12927
+    case 12928
+    case 12929
+      %send% %actor% There's no time for that now -- you're falling!
     break
     default
       %send% %actor% The beautiful night sky overhead tells you it's nighttime.
@@ -372,6 +380,11 @@ elseif %cmd.mudcommand% == weather
     case 12921
     case 12925
       %send% %actor% The meteor showers are the only weather in the night sky.
+    break
+    case 12927
+    case 12928
+    case 12929
+      %send% %actor% It's windier than you've ever seen before... because you're falling!
     break
     default
       %send% %actor% The night sky is cloudless and vast.
@@ -537,6 +550,8 @@ if !%self.mob_flagged(SILENT)%
   remote no_silent %self.id%
   nop %self.add_mob_flag(SILENT)%
 end
+* brief wait for players to enter
+wait 0
 * Show the scripted text
 * tell story
 set pos 0
@@ -615,6 +630,14 @@ if %self.varexists(no_sentinel)%
 end
 if %self.varexists(no_silent)%
   nop %self.remove_mob_flag(SILENT)%
+end
+~
+#12808
+Celestial Forge: Lonely boss despawn~
+0 ab 20 0
+~
+if !%self.room.players_present%
+  %purge% %self%
 end
 ~
 #12810

@@ -272,8 +272,8 @@ if (%timestamp% - %timer%) < %interval%
     end
   elseif %meteor% == 2
     if %progress% < 5
-      %echo% A pair of burning meteors drags across the sky.
-      %at% i12925 %echo% A pair of burning meteors drags across the sky.
+      %echo% A pair of burning meteors drag across the sky.
+      %at% i12925 %echo% A pair of burning meteors drag across the sky.
       %at% i12923 %echo% The flames around both this rock and its twin seem to grow as they streak through the sky!
     elseif %progress% < 10
       %echo% A pair of burning meteors in the sky seem to be getting closer...
@@ -282,7 +282,7 @@ if (%timestamp% - %timer%) < %interval%
     elseif %progress% < 15
       %echo% The air itself trembles as a pair of dazzling red meteors streak toward the crater.
       %at% i12925 %echo% The air itself trembles as a pair of dazzling red meteors streak toward the crater.
-      %at% i12923 %echo% Clouds evaporate in the air beyond the wall of flames as you drop through them!
+      %at% i12923 %echo% Beyond the wall of flames, you watch clouds evaporate as you drop through them!
     else
       %echo% The ground rumbles as the pair of meteors streak closer to the crater...
       %at% i12925 %echo% The ground rumbles as the pair of meteors streak closer to the crater...
@@ -358,5 +358,113 @@ switch %room.template%
     end
   break
 done
+~
+#12927
+Terminus Forge: Lion of Time intro~
+0 nA 100 0
+~
+wait 0
+set room %self.room%
+* find highest visit count and raise visit counts
+set ch %room.people%
+set highest 1
+while %ch%
+  if %ch.is_pc%
+    set skithe_visits %ch.varexists(skithe_visits,0)%
+    if %skithe_visits% > %highest%
+      set highest %skithe_visits%
+    end
+    * only raise visits by 1 per instance
+    if !%room.varexists(visited_%ch.id%)%
+      eval skithe_visits %skithe_visits% + 1
+      remote skithe_visits %ch.id%
+      set visited_%ch.id% 1
+      remote visited_%ch.id% %room.id%
+    end
+  end
+  set ch %ch.next_in_room%
+done
+* message based on highest visit count
+if %highest% >= 175
+  set message Just as you have tried hundreds of times before, so too will you fail again...
+elseif %highest% >= 125
+  set message You will fail again here, as you have failed more than a hundred times before...
+elseif %highest% >= 100
+  set message You have tried a hundred times, and a hundred times you have failed...
+elseif %highest% >= 75
+  set message So many attempts to stop me, and yet here we are again...
+elseif %highest% >= 50
+  set message How many times will do this? Fifty? A hundred? A thousand? It is not within your power or purview to stop me...
+elseif %highest% >= 25
+  set message Again? Do you not grow tired of this dance? I have all of time. You have what, another twenty years? Don't dare think it's longer...
+elseif %highest% >= 15
+  set message You again? You could do this another dozen times or a hundred; nothing you have done here will matter. Surely you know it is futile...
+elseif %highest% >= 10
+  set message You again? Did we not settle this matter already?
+elseif %highest% >= 5
+  set message Your persistence is admirable, if misguided. You lack the power to stop any of this...
+elseif %highest% >= 2
+  set message Back again so soon? Pity, I thought you had learned a lesson...
+else
+  set message Ah, fresh blood has poured itself into my time stream. Have you come here to be a vessel or merely a meal?
+end
+%echo% The Lion of Time, says, '%message%'
+wait 6 sec
+if !%self.fighting%
+  %echo% The Lion of Time, says, 'No power under the stars can stop me from devouring this bloated moment for all time!'
+end
+~
+#12945
+Celestial Forge: Blazing comet minipet~
+0 n 100 2
+L c 12952
+L w 12945
+~
+set ch %self.leader%
+* determine whether it's a light this time or not
+if %ch%
+  if %ch.cooldown(12945)%
+    set lit 0
+  else
+    set lit 1
+    nop %ch.set_cooldown(12945,21600)%
+  end
+else
+  * no ch
+  set lit 0
+end
+* set up self
+if %lit%
+  %load% obj 12952 %self% about
+  %mod% %self% append-lookdesc It's bright enough to light up the area!
+else
+  * not lit
+  %mod% %self% keywords comet streaking blazing
+  %mod% %self% longdesc A comet streaks overhead.
+  %mod% %self% shortdesc a streaking comet
+  %mod% %self% lookdesc It has a round, white nucleus and a long, diffuse gray tail. As you move to get a better look at the comet, you realize it's much closer -- and smaller -- than it first appeared.
+  %mod% %self% append-lookdesc-noformat (Blazing comets can only be summoned to provide light once every 6 hours.)
+end
+~
+#12946
+Celestial Forge: Blazing comet burn-out~
+1 f 0 0
+~
+set mob %self.worn_by%
+if !%mob%
+  halt
+end
+if !%mob.is_npc%
+  halt
+end
+%echo% The comet dims to a pale gray.
+%mod% %mob% keywords comet streaking
+%mod% %mob% longdesc A comet streaks overhead.
+%mod% %mob% shortdesc a streaking comet
+%mod% %mob% lookdesc It has a round, white nucleus and a long, diffuse gray tail. As you move to get a better look at the comet, you realize it's much closer -- and smaller -- than it first appeared.
+%mod% %mob% append-lookdesc-noformat (Blazing comets can only be summoned to provide light once every 6 hours.)
+* and purge self silently
+return 0
+%purge% %self%
 ~
 $

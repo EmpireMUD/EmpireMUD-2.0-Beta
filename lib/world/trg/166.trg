@@ -3528,7 +3528,7 @@ set mob %self.carried_by%
 if !%mob%
   halt
 end
-if !%mob.is_pc%
+if !%mob.is_npc%
   halt
 end
 %echo% The floating lantern burns out.

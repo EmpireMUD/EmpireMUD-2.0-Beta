@@ -722,6 +722,22 @@ R
 4 5195 0
 T 12845
 S
+#12843
+crate shards meteorite 100~
+a crate of 100 meteorite shards~
+A crate of meteorite shards is stacked here.~
+   This ponderous crate is full of meteorite shards, the currency of Terminus
+Forge. Open this box for a one-time supply of 100 meteorite shards.
+~
+3 e a 0 0 6
+5103 100 0
+0 0
+C
+1 1
+R
+4 5195 0
+T 12845
+S
 #12850
 standards banners flags~
 the camp standard~
@@ -1329,11 +1345,11 @@ there's a flicker of light and a chord plays. And then another. And then you
 touch it and for a moment, the harmony of nature plays in your mind.
    The mote of harmony is a crafting material for Resonant Lightcraft.
 ~
-3 0 a 0 0 3
+3 0 a 0 0 4
 0 0 0
 2 0
 C
-175 175
+275 275
 R
 4 5108 0
 R

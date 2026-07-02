@@ -5,7 +5,7 @@ from the edges of the great rock you find yourself standing upon. A well-worn
 path leads from the craggy peak to the edge of the rock, to a small gap in the
 flame.
 ~
-cei 0 0 12920
+cei 0 v 12920
 D9
 ~
 0 12921
@@ -472,50 +472,51 @@ rushing air beneath you almost feels like a solid platform, and you've found
 your footing.
 Commands: return
 ~
-aci 0 0 12927
+ci 0 0 12927
 E
 air~
-tbd
+   You're falling through the air! The ground is far below you, but less so
+with each passing instant.
 ~
 E
 ground down~
-tbd
+Looking down isn't the best idea right now.
 ~
 E
-sky up around~
-tbd
+sky up around out~
+   You're falling through the pink-gold sky of sunset, supported by nothing but
+the rushing wind from below.
 ~
 E
-out ^~
-tbd
+sunset radant radiance~
+   On one side, the last rays of golden sun peek from the very edge of the
+horizon, lighting distant clouds in fiery orange. On the other side, a rosy
+band of stunning pink separates the turqouise blue of day above from the deep
+and infinite blue of night below.
 ~
 E
-sunset~
-tbd
+rosy pink band~
+   A band of rosy pink light marks the transition between day and night in the
+east.
 ~
 E
 twilight~
-tbd
+   Twilight has just begun to settle on the land as the sun sets to the west
+and night rises in the east.
 ~
 E
 stars~
-tbd
+The first stars have begun to pierce twilight's veil.
 ~
 E
-platform~
-tbd
+platform footing~
+   The wind beneath you rushes up so fast that it almost feels as though you're
+standing on it.
 ~
 E
-footing~
-tbd
-~
-E
-radiant radiance ^~
-tbd
-~
-E
-east west etc~
-tbd
+north south east west northeast nw northwest nw southeast se southwest sw~
+   In all directions, the horizon appears further than you've ever seen it...
+as you plummet fast through the air!
 ~
 T 12817
 T 12818
@@ -531,7 +532,52 @@ rushing air beneath you almost feels like a solid platform, and you've found
 your footing.
 Commands: return
 ~
-aci 0 0 12928
+ci 0 0 12928
+E
+air~
+   You're falling through the air! The ground is far below you, but less so
+with each passing instant.
+~
+E
+ground down~
+Looking down isn't the best idea right now.
+~
+E
+sky up around out~
+   You're falling through the pink-gold sky of sunset, supported by nothing but
+the rushing wind from below.
+~
+E
+sunset radant radiance~
+   On one side, the last rays of golden sun peek from the very edge of the
+horizon, lighting distant clouds in fiery orange. On the other side, a rosy
+band of stunning pink separates the turqouise blue of day above from the deep
+and infinite blue of night below.
+~
+E
+rosy pink band~
+   A band of rosy pink light marks the transition between day and night in the
+east.
+~
+E
+twilight~
+   Twilight has just begun to settle on the land as the sun sets to the west
+and night rises in the east.
+~
+E
+stars~
+The first stars have begun to pierce twilight's veil.
+~
+E
+platform footing~
+   The wind beneath you rushes up so fast that it almost feels as though you're
+standing on it.
+~
+E
+north south east west northeast nw northwest nw southeast se southwest sw~
+   In all directions, the horizon appears further than you've ever seen it...
+as you plummet fast through the air!
+~
 T 12817
 T 12818
 T 12824
@@ -546,7 +592,52 @@ rushing air beneath you almost feels like a solid platform, and you've found
 your footing.
 Commands: return
 ~
-aci 0 0 12929
+ci 0 0 12929
+E
+air~
+   You're falling through the air! The ground is far below you, but less so
+with each passing instant.
+~
+E
+ground down~
+Looking down isn't the best idea right now.
+~
+E
+sky up around out~
+   You're falling through the pink-gold sky of sunset, supported by nothing but
+the rushing wind from below.
+~
+E
+sunset radant radiance~
+   On one side, the last rays of golden sun peek from the very edge of the
+horizon, lighting distant clouds in fiery orange. On the other side, a rosy
+band of stunning pink separates the turqouise blue of day above from the deep
+and infinite blue of night below.
+~
+E
+rosy pink band~
+   A band of rosy pink light marks the transition between day and night in the
+east.
+~
+E
+twilight~
+   Twilight has just begun to settle on the land as the sun sets to the west
+and night rises in the east.
+~
+E
+stars~
+The first stars have begun to pierce twilight's veil.
+~
+E
+platform footing~
+   The wind beneath you rushes up so fast that it almost feels as though you're
+standing on it.
+~
+E
+north south east west northeast nw northwest nw southeast se southwest sw~
+   In all directions, the horizon appears further than you've ever seen it...
+as you plummet fast through the air!
+~
 T 12817
 T 12818
 T 12824
