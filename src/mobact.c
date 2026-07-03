@@ -277,6 +277,9 @@ void random_encounter(char_data *ch) {
 	if (AFF_FLAGGED(ch, AFF_FLYING | AFF_MAJESTY)) {
 		return;
 	}
+	if (GET_SITTING_ON(ch) && VEH_FLAGGED(GET_SITTING_ON(ch), VEH_FLYING)) {
+		return;
+	}
 	
 	// water encounters don't trigger if the player is on a vehicle
 	if ((ROOM_SECT_FLAGGED(IN_ROOM(ch), SECTF_SHALLOW_WATER) || WATER_SECT(IN_ROOM(ch)) || ROOM_BLD_FLAGGED(IN_ROOM(ch), BLD_NEED_BOAT) || RMT_FLAGGED(IN_ROOM(ch), RMT_NEED_BOAT)) && (GET_SITTING_ON(ch) || EFFECTIVELY_FLYING(ch))) {
