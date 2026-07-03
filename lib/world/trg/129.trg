@@ -496,9 +496,13 @@ if %self.animals_harnessed% < %self.animals_required%
   %echo% ~%self% comes crashing down!
   set fool %self.sitting_in%
   if %fool%
-    %echoaround% %fool% ~%fool% splatters on the ground!
-    %send% %fool% You splatter on the ground!
-    %slay% %fool% %fool.real_name% has impacted the ground at %fool.room.coords%!
+    if %fool.room.is_water%
+      %force% %fool% stand
+    else
+      %echoaround% %fool% ~%fool% splatters on the ground!
+      %send% %fool% You splatter on the ground!
+      %slay% %fool% %fool.real_name% has impacted the ground at %fool.room.coords%!
+    end
   end
 end
 ~
