@@ -6128,11 +6128,17 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 							safe_snprintf(str, slen, "0");
 						}
 					}
+					else if (!str_cmp(field, "is_OCEAN")) {
+						safe_snprintf(str, slen, "%d", DEEP_WATER_SECT(r) ? 1 : 0);
+					}
 					else if (!str_cmp(field, "is_on_map")) {
 						safe_snprintf(str, slen, "%d", (GET_ROOM_VNUM(r) < MAP_SIZE) ? 1 : 0);
 					}
 					else if (!str_cmp(field, "is_outdoors")) {
 						safe_snprintf(str, slen, "%d", IS_OUTDOOR_TILE(r) ? 1 : 0);
+					}
+					else if (!str_cmp(field, "is_water")) {
+						safe_snprintf(str, slen, "%d", WATER_SECT(r) ? 1 : 0);
 					}
 					else if (!str_cmp(field, "is_zenith_day")) {
 						safe_snprintf(str, slen, "%d", is_zenith_day(r) ? 1 : 0);
