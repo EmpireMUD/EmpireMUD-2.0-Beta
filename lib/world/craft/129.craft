@@ -103,13 +103,13 @@ terminal ring of restoration~
 R
 12951 1 0 0
 R
-610 2 0 0
+610 8 0 0
 R
-611 2 0 0
+611 8 0 0
 R
 1300 2 0 0
 R
-6601 2 1 0
+6601 8 1 0
 S
 #12922
 terminal earrings of restoration~
@@ -118,13 +118,13 @@ terminal earrings of restoration~
 R
 12951 1 0 0
 R
-610 2 0 0
+610 8 0 0
 R
-611 2 0 0
+611 8 0 0
 R
 1300 2 0 0
 R
-6601 2 1 0
+6601 8 1 0
 S
 #12924
 terminal ring of fortitude~
@@ -133,13 +133,13 @@ terminal ring of fortitude~
 R
 12951 1 0 0
 R
-610 2 0 0
+610 8 0 0
 R
-611 2 0 0
+611 8 0 0
 R
 103 2 0 0
 R
-6601 2 1 0
+6601 8 1 0
 S
 #12926
 terminal earrings of fortitude~
@@ -148,13 +148,13 @@ terminal earrings of fortitude~
 R
 12951 1 0 0
 R
-610 2 0 0
+610 8 0 0
 R
-611 2 0 0
+611 8 0 0
 R
 103 2 0 0
 R
-6601 2 1 0
+6601 8 1 0
 S
 #12928
 terminal ring of wrath~
@@ -163,13 +163,13 @@ terminal ring of wrath~
 R
 12951 1 0 0
 R
-610 2 0 0
+610 8 0 0
 R
-611 2 0 0
+611 8 0 0
 R
 104 2 0 0
 R
-6601 2 1 0
+6601 8 1 0
 S
 #12930
 terminal earrings of wrath~
@@ -178,13 +178,13 @@ terminal earrings of wrath~
 R
 12951 1 0 0
 R
-610 2 0 0
+610 8 0 0
 R
-611 2 0 0
+611 8 0 0
 R
 104 2 0 0
 R
-6601 2 1 0
+6601 8 1 0
 S
 #12932
 terminal ring of arcana~
@@ -193,13 +193,13 @@ terminal ring of arcana~
 R
 12951 1 0 0
 R
-610 2 0 0
+610 8 0 0
 R
-611 2 0 0
+611 8 0 0
 R
 1206 2 0 0
 R
-6601 2 1 0
+6601 8 1 0
 S
 #12934
 terminal earrings of arcana~
@@ -208,13 +208,13 @@ terminal earrings of arcana~
 R
 12951 1 0 0
 R
-610 2 0 0
+610 8 0 0
 R
-611 2 0 0
+611 8 0 0
 R
 1206 2 0 0
 R
-6601 2 1 0
+6601 8 1 0
 S
 #12936
 terminal ring of valor~
@@ -223,13 +223,13 @@ terminal ring of valor~
 R
 12951 1 0 0
 R
-610 2 0 0
+610 8 0 0
 R
-611 2 0 0
+611 8 0 0
 R
 6600 2 1 0
 R
-6601 2 1 0
+6601 8 1 0
 S
 #12938
 terminal earrings of valor~
@@ -238,13 +238,13 @@ terminal earrings of valor~
 R
 12951 1 0 0
 R
-610 2 0 0
+610 8 0 0
 R
-611 2 0 0
+611 8 0 0
 R
 6600 2 1 0
 R
-6601 2 1 0
+6601 8 1 0
 S
 #12941
 meteoric training dummy~
@@ -253,7 +253,7 @@ meteoric training dummy~
 R
 12951 1 0 0
 R
-6000 1 1 0
+6001 1 1 0
 R
 6790 1 1 0
 R
@@ -262,6 +262,8 @@ R
 6720 6 1 0
 R
 611 1 0 0
+R
+610 1 0 0
 S
 #12943
 skyfall halo~
@@ -270,33 +272,35 @@ skyfall halo~
 R
 12951 1 0 0
 R
-610 6 0 0
+610 12 0 0
 R
 611 6 0 0
 R
-6601 6 1 0
+173 6 0 0
+R
+6601 12 1 0
 S
 #12946
-vehicle~
+impact harness~
 12946 1
-11 12920 nq 1 -1 0 bu
+11 12920 nq 1 -1 0 e
 R
 12951 1 0 0
 R
-611 16 0 0
+611 12 0 0
 R
-610 4 0 0
+610 32 0 0
 R
 6035 2 1 0
 R
-6531 12 1 0
+6531 24 1 0
 R
-6601 1 1 0
+6601 12 1 0
 R
-6075 12 1 0
+6001 12 1 0
+R
+6880 8 1 0
 R
 2037 3 0 0
-R
-2133 1 0 0
 S
 $

@@ -26,4 +26,26 @@ R
 R
 6790 1 1 0
 S
+#12946
+harness impact~
+an impact harness~
+An impact harness dangles here.~
+   The harness is just big enough for 1 person sitting comfortably. It's
+sturdy, but rather heavy, fashioned from argentine metal and strong leather.
+Ropes attach it to harnesses for flying animals so that when they are aloft,
+the impact harness allows its rider to soar through the sky.
+~
+~
+dfgn 25 10 0 2 0 1 0 0 0 -1 0
+C
+100 400
+H 0 1
+P
+3
+R
+1003 1 5 0
+T 12947
+T 9685
+T 12948
+S
 $

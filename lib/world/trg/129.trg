@@ -467,4 +467,39 @@ end
 return 0
 %purge% %self%
 ~
+#12947
+Impact Harness: Can't sit without mounts~
+5 c 0 0
+sit~
+if %actor.veh_target(%arg.argument1%)% != %self%
+  return 0
+elseif %self.animals_harnessed% < %self.animals_required%
+  if %self.animals_required% > 1
+    %send% %actor% You can't sit on @%self% without %self.animals_required% animals harnessed on.
+  else
+    %send% %actor% You can't sit on @%self% without an animal harnessed on.
+  end
+  return 1
+else
+  return 0
+end
+~
+#12948
+Impact Harness: Impact on un-harness~
+5 c 0 0
+unharness~
+* someone attempts to unharness anything here
+return 0
+wait 0
+* did I get unharnessed?
+if %self.animals_harnessed% < %self.animals_required%
+  %echo% ~%self% comes crashing down!
+  set fool %self.sitting_in%
+  if %fool%
+    %echoaround% %fool% ~%fool% splatters on the ground!
+    %send% %fool% You splatter on the ground!
+    %slay% %fool% %fool.real_name% has impacted the ground at %fool.room.coords%!
+  end
+end
+~
 $
