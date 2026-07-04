@@ -69,7 +69,7 @@ M
 say We do not get many new faces around here.~
 M
 7
-say Whatever your business, make it quick.~
+say Whatever your business, make it quick!~
 M
 7
 say No telling when one of these meteors will strike again.~
@@ -121,19 +121,19 @@ M
 emote $n swings at anvil without looking up.~
 M
 7
-say Not seen you here before.~
+emote $n shouts over the roar of the flames, 'Not seen you here before!'~
 M
 8
 emote $n swings at anvil without looking up.~
 M
 8
-say Don't remember seeing you here before.~
+emote $n shouts over the roar of the flames, 'Don't remember seeing you here before!'~
 M
 0
 $n walks to the edge and swaps the metal $e was working for a red-hot one from one of the poles.~
 M
-1
-Work, work.~
+0
+$n says, under the roar of the flames, 'Work, work.'~
 M
 0
 $n hammers at the anvil.~
@@ -166,13 +166,13 @@ M
 emote $n glances up at you from $s work.~
 M
 7
-say You must be new here. Don't stay too long. We are due to hit.~
+emote $n shouts over teh roar of the flames, 'You must be new here. Don't stay too long. We are due to hit.'~
 M
 8
 emote $n glances up at you from $s work.~
 M
 8
-say Ah, an unfamiliar face. I have some earring designs, but do not tarry.~
+emote $n shouts over the roar of the flames, 'Ah, an unfamiliar face! I have some earring designs, but do not tarry.'~
 M
 8
 say This rock is going down fast.~
@@ -186,8 +186,8 @@ M
 0
 $n swings $s hammer down on the anvil.~
 M
-1
-It is not safe to linger here.~
+0
+$n shouts, 'It is not safe to linger here.'~
 M
 0
 $n carries $s work to the edge of the rock and places it in the roaring flame before grabbing another red-hot piece to work on.~

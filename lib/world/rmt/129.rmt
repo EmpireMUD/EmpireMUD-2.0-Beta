@@ -149,6 +149,25 @@ E
 out around~
 All you can see from here is the rim of the crater. Above that, only sky.
 ~
+E
+moon~
+   You can't see the moon from here. Although, there are a pair of broken moons
+that seem to rest on the crater's rim.
+~
+E
+moons half-moons halfmoons cracked broken~
+   A pair of cracked and broken moons hang low in the sky, almost resting on
+the crater's rim.
+~
+E
+crater~
+You're standing in a deep crater.
+~
+E
+rim lip~
+   The rim of the crater blocks much of the horizon. Strangely, a pair of
+broken half-moons seem to rest on the crater's lip.
+~
 M 0 12921 100.00 1
 T 12803
 T 12802
@@ -369,6 +388,14 @@ Beneath you is the rock you stand on; beneath that, only stars.
 E
 craggy stone rock meteorite peak ground~
 The rock is dark gray. When you look over the edge, there's nothing beneath it.
+~
+E
+moons~
+There's just the one crescent moon.
+~
+E
+south east west southeast southwest se sw~
+Endless stars stretch out in all directions.
 ~
 M 0 12924 100.00 1
 T 12803
