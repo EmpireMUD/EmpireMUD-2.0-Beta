@@ -261,6 +261,8 @@ if (%timestamp% - %timer%) < %interval%
       %echo% There's a loud CRACK! as a plume of smoke blasts off of the meteor in the sky!
       %at% i12925 %echo% There's a loud CRACK! as a plume of smoke blasts off of the meteor in the sky!
       %at% i12922 %echo% There's a loud CRACK! sound from somewhere inside the rock beneath your feet!
+      %at% i12920 %echo% There's a loud CRACK! as smoke bursts from another meteor, in the distance.
+      %at% i12923 %echo% There's a loud CRACK! as smoke bursts from another meteor, in the distance.
     elseif %progress% < 15
       %echo% A faint roar rumbles through the air as a blazing meteor gets closer to the crater!
       %at% i12925 %echo% A faint roar rumbles through the air as a blazing meteor gets closer to the crater!
@@ -269,6 +271,8 @@ if (%timestamp% - %timer%) < %interval%
       %echo% A roaring fireball dominates the sky as the meteor gets closer... and closer!
       %at% i12925 %echo% A roaring fireball dominates the sky as the meteor gets closer... and closer!
       %at% i12922 %echo% A glance outward shows the ground coming up fast!
+      %at% i12920 %echo% Out below, you see another meteor about to strike the ground!
+      %at% i12923 %echo% Out below, you see another meteor about to strike the ground!
     end
   elseif %meteor% == 2
     if %progress% < 5
@@ -279,6 +283,8 @@ if (%timestamp% - %timer%) < %interval%
       %echo% A pair of burning meteors in the sky seem to be getting closer...
       %at% i12925 %echo% A pair of burning meteors in the sky seem to be getting closer...
       %at% i12923 %echo% The ground beneath you swells and fizzles as the flames grow larger and larger.
+      %at% i12920 %echo% A twin pair of burning meteors grow brighter as they streak down through the sky.
+      %at% i12922 %echo% A twin pair of burning meteors grow brighter as they streak down through the sky.
     elseif %progress% < 15
       %echo% The air itself trembles as a pair of dazzling red meteors streak toward the crater.
       %at% i12925 %echo% The air itself trembles as a pair of dazzling red meteors streak toward the crater.
@@ -287,6 +293,8 @@ if (%timestamp% - %timer%) < %interval%
       %echo% The ground rumbles as the pair of meteors streak closer to the crater...
       %at% i12925 %echo% The ground rumbles as the pair of meteors streak closer to the crater...
       %at% i12923 %echo% A glance outward shows the ground coming up fast!
+      %at% i12920 %echo% Out below, you see a pair of twin meteors about to strike the ground!
+      %at% i12922 %echo% Out below, you see a pair of twin meteors about to strike the ground!
     end
   end
   * end this loop
@@ -304,6 +312,7 @@ if %meteor% == 1
   %at% i12925 %echo% The blazing meteor comes to a halt less than a tower's height above the crater and then, miraculously, rises back into the sky to begin its descent again!
   %at% i12922 %echo% The flames around the rock die down for a moment as you feel the whole thing come to a halt in the sky...
   %at% i12922 %echo% ... and then the rock rises back into the sky!
+  %at% i12920 %echo% Through the flames, you see another great rock rise up through the sky, far above you, and then begin to plummet again!
   %at% i12923 %echo% Through the flames, you see another great rock rise up through the sky, far above you, and then begin to plummet again!
   wait 1
   %at% i12922 %echo% You feel the rock lurch as it begins to drop. The flames roar up around the sides as you plummet toward the earth again!
@@ -311,6 +320,7 @@ if %meteor% == 1
 elseif %meteor% == 2
   %echo% The twin meteors come to a stop in the sky, dangerously close to the top of your head, and then retreat back up to the heavens together!
   %at% i12925 %echo% The twin meteors come to a stop in the sky, dangerously close to the top of your head, and then retreat back up to the heavens together!
+  %at% i12920 %echo% Beyond the wall of flame, you see another pair of enormous rocks spiral upward into the sky high above you, and then both rocks drop again!
   %at% i12922 %echo% Beyond the wall of flame, you see another pair of enormous rocks spiral upward into the sky high above you, and then both rocks drop again!
   %at% i12923 %echo% The roaring flames around both this rock and its twin die down as both come to a halt low in the sky...
   %at% i12923 %echo% ... the great rocks pause for just a moment and then, with a jolt, fly back up into the sky!

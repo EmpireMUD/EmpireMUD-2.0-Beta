@@ -49,6 +49,15 @@ clouds smoke smoky up~
    A cloud of smoke billows up from the top of the flame, blocking all view of
 the sky.
 ~
+E
+moon crescent~
+The crescent moon hangs low in the sky.
+~
+E
+moons half-moons halfmoons~
+   As you look down over the edge of the rock, you see faint, broken moons
+hanging low in the sky near the crater.
+~
 T 12803
 T 12802
 T 12801
@@ -287,6 +296,11 @@ E
 down ground earth~
    Glancing over the side of the rock, ever so carefully to avoid being singed,
 you can see you're plummeting fast toward the dark, cratered ground below.
+~
+E
+moon crescent~
+   Over the edge of the rock, you can see the crescent moon nestled low in the
+sky.
 ~
 E
 moons half-moons halfmoons~
