@@ -1009,6 +1009,9 @@ if !%any%
       %send% %ch% &&wThe spirit of the forge flows through you and restores you!&&0
     end
     %restore% %ch%
+    if %ch.is_pc%
+      rdelete splat_%ch.id% %room.id%
+    end
     set ch %ch.next_in_room%
   done
 end

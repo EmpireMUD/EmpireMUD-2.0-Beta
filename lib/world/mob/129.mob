@@ -313,10 +313,34 @@ more than a constellation of lights, shifting as she prowls the sky. Her teeth,
 each larger than you are tall, catch the fading rays of sunlight as she bites
 at the fabric of reality itself.
 ~
-I 4 12950 100.00 1  # LOOT: reward shield
+I 4 12950 100.00 1  # LOOT: impact print
 M
 11
-!echo !echo !echo !bell !epic~
+!stars !stars !stars !consume !consume !sunshine~
+M
+0
+$n stalks around the circumference of the twilight.~
+M
+0
+$n shimmers in the sunset.~
+M
+0
+$n bares $s teeth.~
+M
+1
+Well? No time but the present.~
+M
+1
+You are only wasting your time.~
+M
+1
+Didn't any one ever tell you not to mess with the time lion?~
+M
+1
+Don't think you're here to challenge me.~
+M
+1
+Time's almost up.~
 T 12822
 T 12821
 T 12823
@@ -327,6 +351,7 @@ T 9604
 T 9609
 T 12927
 T 12808
+T 12929
 S
 #12941
 dummy training meteoric~

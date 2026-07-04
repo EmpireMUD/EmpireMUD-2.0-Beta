@@ -369,17 +369,26 @@ switch %room.template%
   break
 done
 ~
+#12926
+Terminus Forge: Reset splat timers on enter~
+2 g 100 0
+~
+if %actor.is_pc%
+  rdelete splat_%actor.id% %room.id%
+end
+~
 #12927
 Terminus Forge: Lion of Time intro~
 0 nA 100 0
 ~
 wait 0
 set room %self.room%
-* find highest visit count and raise visit counts
+* find highest visit count and raise visit counts -- and reset splat timers
 set ch %room.people%
 set highest 1
 while %ch%
   if %ch.is_pc%
+    rdelete splat_%ch.id% %room.id%
     set skithe_visits %ch.varexists(skithe_visits,0)%
     if %skithe_visits% > %highest%
       set highest %skithe_visits%
@@ -423,6 +432,190 @@ wait 6 sec
 if !%self.fighting%
   %echo% The Lion of Time, says, 'No power under the stars can stop me from devouring this bloated moment for all time!'
 end
+~
+#12928
+Terminus Forge: Splatter ticker~
+2 bw 100 0
+~
+* config time in seconds to live
+set splat_time 600
+* main loop
+set ch %room.people%
+while %ch%
+  set next_ch %ch.next_in_room%
+  if %ch.is_pc%
+    set splat %room.var(splat_%ch.id%,0)%
+    if %ch.fighting% || %splat% > 0
+      * falling
+      if %ch.is_flying%
+        * reset timer while flying
+        rdelete splat_%ch.id% %room.id%
+      elseif %splat% == 0
+        * start
+        set splat_%ch.id% %timestamp%
+        remote splat_%ch.id% %room.id%
+      else
+        * check fall
+        if (%timestamp% - %splat%) >= %splat_time%
+          * dedz
+          %send% %ch% &&wOops... the ground came up faster than extected...&&0
+          %send% %ch% &&wThe last thing that goes through your mind as your fall ends... is your boots.&&0
+          %echoaround% %ch% &&w~%ch% splatters as &%ch% hits the ground!&&0
+          %slay% %ch% %ch.real_name% has run out of time... and died
+        end
+      end
+    end
+  end
+  set ch %next_ch%
+done
+~
+#12929
+Lion of Time combat: Shooting stars, Consumption Time, Eternal Sunshine~
+0 c 0 3
+L w 12817
+L w 12821
+L w 12929
+!stars !consume !sunshine~
+set targ %arg%
+set room %self.room%
+set diff %self.var(diff,1)%
+set cmd %cmd.substr(1)%
+if %actor% != %self% || !%targ% || %targ.id% == %self.id%
+  halt
+elseif %cmd% == stars
+  * Shooting stars (group dodge)
+  scfight clear dodge
+  %echo% &&wBright lights twinkle to life across the world below...&&0
+  if %diff% == 1
+    nop %self.add_mob_flag(NO-ATTACK)%
+  end
+  wait 3 s
+  %echo% &&w**** Stars rise up from the ground -- watch out! ****&&0 (dodge)
+  set cycle 1
+  set hit 0
+  eval penalty 20 * %diff%
+  eval wait 10 - %diff%
+  while %cycle% <= %diff%
+    scfight setup dodge all
+    wait %wait% s
+    set ch %room.people%
+    while %ch%
+      set next_ch %ch.next_in_room%
+      if %self.is_enemy(%ch%)% && %ch.is_pc%
+        if !%ch.var(did_scfdodge)%
+          set hit 1
+          %echo% &&wA star passes through ~%ch% as it shoots into the sky!&&0
+          eval splat %room.var(splat_%ch.id%,60)% - %penalty%
+          if %splat% > 0
+            set splat_%ch.id% %splat%
+            remote splat_%ch.id% %room.id%
+          end
+        else
+          %send% %ch% &&wYou struggle to avoid a rising star as it shoots upward!&&0
+          if %diff% == 1
+            dg_affect #12821 %ch% TO-HIT 25 20
+          end
+        end
+        if %cycle% < %diff%
+          %send% %ch% &&w**** Here comes another one... ****&&0 (dodge)
+        end
+      end
+      set ch %next_ch%
+    done
+    scfight clear dodge
+    eval cycle %cycle% + 1
+  done
+  wait 8 s
+elseif %cmd% == consume
+  * Consumption Time (interrupt)
+  scfight clear interrupt
+  %echo% &&w**** The sunset grinds to a halt as the lion bites down on time itself! ****&&0 (interrupt)
+  if %diff% == 1
+    nop %self.add_mob_flag(NO-ATTACK)%
+  end
+  scfight setup interrupt all
+  eval penalty 30 * %diff%
+  wait 3 s
+  if %diff% > 2
+    set needed %room.players_present%
+  else
+    set needed 1
+  end
+  if %self.var(count_scfinterrupt,0)% < %needed%
+    %echo% &&w**** Meteors halt in the sky as the lion wolfs down time itself! ****&&0 (interrupt)
+  end
+  wait 3 s
+  if %self.var(count_scfinterrupt,0)% >= %needed%
+    %echo% &&wMeteors resume their fiery tumble as time returns to normal.&&0
+    if %diff% == 1
+      dg_affect #12817 %self% HARD-STUNNED on 5
+    end
+    wait 30 s
+  else
+    * %echo% wno message, just splat chance
+    set ch %room.people%
+    while %ch%
+      if %ch.is_pc%
+        eval splat %room.var(splat_%ch.id%,60)% - %penalty%
+        if %splat% > 0
+          set splat_%ch.id% %splat%
+          remote splat_%ch.id% %room.id%
+        end
+      end
+      set ch %ch.next_in_room%
+    done
+    * and heal me
+    eval amount %self.maxhealth% / 15
+    dg_affect #12929 %self% HEAL-OVER-TIME %amount% 15
+  end
+  scfight clear interrupt
+elseif %cmd% == sunshine
+  * Eternal Sunshine (group interrupt)
+  scfight clear interrupt
+  if %diff% == 1
+    nop %self.add_mob_flag(NO-ATTACK)%
+  end
+  %echo% &&w**** Meteors reverse course and rise into the air as the sun begins to peak over the western horizon... ****&&0 (interrupt)
+  if %diff% > 2
+    set needed %room.players_present%
+  else
+    set needed 1
+  end
+  set cycle 1
+  eval pain 100 * %diff%
+  eval wait 10 - %diff%
+  while %cycle% <= %diff%
+    scfight setup interrupt all
+    wait %wait% s
+    set ch %room.people%
+    while %ch%
+      set next_ch %ch.next_in_room%
+      if %self.is_enemy(%ch%)% && !%ch.dead%
+        if %self.var(count_scfinterrupt,0)% < %needed%
+          %echo% &&w~%ch% burns in the eternal sunshine!!&&0
+          if %diff% < 4
+            %damage% %ch% %pain% direct
+          else
+            %slay% %ch% %ch.real_name% has been destroyed in the eternal sunshine
+          end
+        elseif %ch.is_pc%
+          %send% %ch% &&wYou manage to interrupt the western sunrise!&&0
+          if %diff% == 1
+            dg_affect #12821 %ch% TO-HIT 25 20
+          end
+        end
+        if %cycle% < %diff%
+          %send% %ch% &&w**** The western sun is still rising -- there's little time! ****&&0 (interrupt)
+        end
+      end
+      set ch %next_ch%
+    done
+    scfight clear interrupt
+    eval cycle %cycle% + 1
+  done
+  wait 8 s
+end
+nop %self.remove_mob_flag(NO-ATTACK)%
 ~
 #12945
 Celestial Forge: Blazing comet minipet~
