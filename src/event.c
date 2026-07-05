@@ -2642,7 +2642,7 @@ void log_active_events_to_char(char_data *ch) {
 			safe_snprintf(when_str, sizeof(when_str), "%d second%s", when, PLURAL(when));
 		}
 		
-		msg_to_char(ch, "\tt[ Event: %s is running for %s: %s, %s ]\\0\r\n", EVT_NAME(running->event), when_str, point_str, rank_str);
+		msg_to_char(ch, "\tt[ Event: %s is running for %s: %s, %s ]\t0\r\n", EVT_NAME(running->event), when_str, point_str, rank_str);
 	}
 }
 
