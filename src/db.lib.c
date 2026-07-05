@@ -152,6 +152,9 @@ void free_adventure(adv_data *adv) {
 	if (GET_ADV_DESCRIPTION(adv) && (!proto || GET_ADV_DESCRIPTION(adv) != GET_ADV_DESCRIPTION(proto))) {
 		free(GET_ADV_DESCRIPTION(adv));
 	}
+	if (GET_ADV_NOTES(adv) && (!proto || GET_ADV_NOTES(adv) != GET_ADV_NOTES(proto))) {
+		free(GET_ADV_NOTES(adv));
+	}
 	if (GET_ADV_LINKING(adv) && (!proto || GET_ADV_LINKING(adv) != GET_ADV_LINKING(proto))) {
 		while ((link = GET_ADV_LINKING(adv))) {
 			GET_ADV_LINKING(adv) = link->next;
@@ -188,7 +191,7 @@ void init_adventure(adv_data *adv) {
 */
 void parse_adventure(FILE *fl, adv_vnum vnum) {
 	int int_in[4];
-	char line[256], str_in[256];
+	char line[256], str_in[256], buf2[MAX_STRING_LENGTH];
 	adv_data *adv, *find;
 
 	CREATE(adv, adv_data, 1);
@@ -280,6 +283,11 @@ void parse_adventure(FILE *fl, adv_vnum vnum) {
 				break;
 			}
 			
+			case '_': {	// notes
+				GET_ADV_NOTES(adv) = fread_string(fl, buf2);
+				break;
+			}
+			
 			default: {
 				log("SYSERR: Format error in %s, expecting alphabetic flags", buf2);
 				exit(1);
@@ -325,6 +333,13 @@ void write_adventure_to_file(FILE *fl, adv_data *adv) {
 	// Z: misc data
 	if (GET_ADV_TEMPERATURE_TYPE(adv)) {
 		fprintf(fl, "Z1 %d\n", GET_ADV_TEMPERATURE_TYPE(adv));
+	}
+	
+	// '_'
+	if (GET_ADV_NOTES(adv) && *GET_ADV_NOTES(adv)) {
+		strcpy(temp, GET_ADV_NOTES(adv));
+		strip_crlf(temp);
+		fprintf(fl, "_\n%s~\n", temp);
 	}
 	
 	// end
@@ -645,6 +660,9 @@ void free_building(bld_data *bdg) {
 	if (GET_BLD_DESC(bdg) && (!proto || GET_BLD_DESC(bdg) != GET_BLD_DESC(proto))) {
 		free(GET_BLD_DESC(bdg));
 	}
+	if (GET_BLD_NOTES(bdg) && (!proto || GET_BLD_NOTES(bdg) != GET_BLD_NOTES(proto))) {
+		free(GET_BLD_NOTES(bdg));
+	}
 	
 	if (GET_BLD_EX_DESCS(bdg) && (!proto || GET_BLD_EX_DESCS(bdg) != GET_BLD_EX_DESCS(proto))) {
 		free_extra_descs(&GET_BLD_EX_DESCS(bdg));
@@ -901,6 +919,11 @@ void parse_building(FILE *fl, bld_vnum vnum) {
 				}
 				break;
 			}
+			
+			case '_': {	// notes
+				GET_BLD_NOTES(bld) = fread_string(fl, buf2);
+				break;
+			}
 
 			// end
 			case 'S': {
@@ -1009,6 +1032,13 @@ void write_building_to_file(FILE *fl, bld_data *bld) {
 	// Z: misc data
 	if (GET_BLD_TEMPERATURE_TYPE(bld)) {
 		fprintf(fl, "Z1 %d\n", GET_BLD_TEMPERATURE_TYPE(bld));
+	}
+	
+	// '_'
+	if (GET_BLD_NOTES(bld) && *GET_BLD_NOTES(bld)) {
+		strcpy(temp, GET_BLD_NOTES(bld));
+		strip_crlf(temp);
+		fprintf(fl, "_\n%s~\n", temp);
 	}
 	
 	// end
@@ -1128,6 +1158,9 @@ void free_craft(craft_data *craft) {
 	
 	if (GET_CRAFT_NAME(craft) && (!proto || GET_CRAFT_NAME(craft) != GET_CRAFT_NAME(proto))) {
 		free(GET_CRAFT_NAME(craft));
+	}
+	if (GET_CRAFT_NOTES(craft) && (!proto || GET_CRAFT_NOTES(craft) != GET_CRAFT_NOTES(proto))) {
+		free(GET_CRAFT_NOTES(craft));
 	}
 	
 	if (GET_CRAFT_RESOURCES(craft) && (!proto || GET_CRAFT_RESOURCES(craft) != GET_CRAFT_RESOURCES(proto))) {
@@ -1255,6 +1288,11 @@ void parse_craft(FILE *fl, craft_vnum vnum) {
 				parse_resource(fl, &GET_CRAFT_RESOURCES(craft), buf2);
 				break;
 			}
+			
+			case '_': {	// notes
+				GET_CRAFT_NOTES(craft) = fread_string(fl, buf2);
+				break;
+			}
 
 			// end
 			case 'S': {
@@ -1278,7 +1316,7 @@ void parse_craft(FILE *fl, craft_vnum vnum) {
 * @param craft_data *craft The thing to save.
 */
 void write_craft_to_file(FILE *fl, craft_data *craft) {
-	char temp1[256], temp2[256], temp3[256];
+	char temp1[MAX_STRING_LENGTH], temp2[256], temp3[256];
 	
 	if (!fl || !craft) {
 		syslog(SYS_ERROR, LVL_START_IMM, TRUE, "SYSERR: write_craft_to_file called without %s", !fl ? "file" : "craft");
@@ -1310,6 +1348,13 @@ void write_craft_to_file(FILE *fl, craft_data *craft) {
 	
 	// 'R': resources
 	write_resources_to_file(fl, 'R', GET_CRAFT_RESOURCES(craft));
+	
+	// '_'
+	if (GET_CRAFT_NOTES(craft) && *GET_CRAFT_NOTES(craft)) {
+		strcpy(temp1, GET_CRAFT_NOTES(craft));
+		strip_crlf(temp1);
+		fprintf(fl, "_\n%s~\n", temp1);
+	}
 	
 	// end
 	fprintf(fl, "S\n");
@@ -1364,6 +1409,9 @@ void free_crop(crop_data *cp) {
 	}
 	if (GET_CROP_TITLE(cp) && (!proto || GET_CROP_TITLE(cp) != GET_CROP_TITLE(proto))) {
 		free(GET_CROP_TITLE(cp));
+	}
+	if (GET_CROP_NOTES(cp) && (!proto || GET_CROP_NOTES(cp) != GET_CROP_NOTES(proto))) {
+		free(GET_CROP_NOTES(cp));
 	}
 	
 	if (GET_CROP_ICONS(cp) && (!proto || GET_CROP_ICONS(cp) != GET_CROP_ICONS(proto))) {
@@ -1501,6 +1549,11 @@ void parse_crop(FILE *fl, crop_vnum vnum) {
 				parse_extra_desc(fl, &GET_CROP_EX_DESCS(crop), buf2);
 				break;
 			}
+			
+			case '_': {	// notes
+				GET_CROP_NOTES(crop) = fread_string(fl, buf2);
+				break;
+			}
 
 			// end
 			case 'S': {
@@ -1524,7 +1577,7 @@ void parse_crop(FILE *fl, crop_vnum vnum) {
 * @param crop_data *cp The thing to save.
 */
 void write_crop_to_file(FILE *fl, crop_data *cp) {
-	char temp1[256], temp2[256];
+	char temp1[MAX_STRING_LENGTH], temp2[256];
 	struct spawn_info *spawn;
 	
 	if (!fl || !cp) {
@@ -1559,6 +1612,13 @@ void write_crop_to_file(FILE *fl, crop_data *cp) {
 	
 	// X: extra descriptions
 	write_extra_descs_to_file(fl, 'X', GET_CROP_EX_DESCS(cp));
+	
+	// '_'
+	if (GET_CROP_NOTES(cp) && *GET_CROP_NOTES(cp)) {
+		strcpy(temp1, GET_CROP_NOTES(cp));
+		strip_crlf(temp1);
+		fprintf(fl, "_\n%s~\n", temp1);
+	}
 	
 	// end
 	fprintf(fl, "S\n");
@@ -4875,6 +4935,9 @@ void free_global(struct global_data *glb) {
 	if (GET_GLOBAL_NAME(glb) && (!proto || GET_GLOBAL_NAME(glb) != GET_GLOBAL_NAME(proto))) {
 		free(GET_GLOBAL_NAME(glb));
 	}
+	if (GET_GLOBAL_NOTES(glb) && (!proto || GET_GLOBAL_NOTES(glb) != GET_GLOBAL_NOTES(proto))) {
+		free(GET_GLOBAL_NOTES(glb));
+	}
 	
 	if (GET_GLOBAL_INTERACTIONS(glb) && (!proto || GET_GLOBAL_INTERACTIONS(glb) != GET_GLOBAL_INTERACTIONS(proto))) {
 		free_interactions(&GET_GLOBAL_INTERACTIONS(glb));
@@ -4997,6 +5060,11 @@ void parse_global(FILE *fl, any_vnum vnum) {
 				LL_APPEND(GET_GLOBAL_SPAWNS(glb), spawn);
 				break;
 			}
+			
+			case '_': {	// notes
+				GET_GLOBAL_NOTES(glb) = fread_string(fl, buf2);
+				break;
+			}
 
 			// end
 			case 'S': {
@@ -5053,6 +5121,13 @@ void write_global_to_file(FILE *fl, struct global_data *glb) {
 	LL_FOREACH(GET_GLOBAL_SPAWNS(glb), spawn) {
 		fprintf(fl, "M\n");
 		fprintf(fl, "%d %.2f %s\n", spawn->vnum, spawn->percent, bitv_to_alpha(spawn->flags));
+	}
+	
+	// '_'
+	if (GET_GLOBAL_NOTES(glb) && *GET_GLOBAL_NOTES(glb)) {
+		strcpy(temp, GET_GLOBAL_NOTES(glb));
+		strip_crlf(temp);
+		fprintf(fl, "_\n%s~\n", temp);
 	}
 	
 	// end
@@ -5606,14 +5681,15 @@ void remove_mobile_from_table(char_data *mob) {
 void parse_mobile(FILE *mob_f, int nr) {
 	int j, t[10], iter;
 	char line[256], *tmpptr;
-	char f1[128], f2[128];
+	char f1[128], f2[128], buf2[MAX_STRING_LENGTH];
 	char_data *mob, *find;
 	
 	// create!
 	CREATE(mob, char_data, 1);
 	clear_char(mob);
+	clear_mob_proto_data(mob);
 	mob->vnum = nr;
-
+	
 	HASH_FIND_INT(mobile_table, &nr, find);
 	if (find) {
 		log("WARNING: Duplicate mobile vnum #%d", nr);
@@ -5647,8 +5723,8 @@ void parse_mobile(FILE *mob_f, int nr) {
 		}
 	}
 	
-	GET_MIN_SCALE_LEVEL(mob) = t[0];
-	GET_MAX_SCALE_LEVEL(mob) = t[1];
+	SET_MIN_SCALE_LEVEL(mob, t[0]);
+	SET_MAX_SCALE_LEVEL(mob, t[1]);
 	MOB_FLAGS(mob) = asciiflag_conv(f1);
 	AFF_FLAGS(mob) = asciiflag_conv(f2);
 	SET_SIZE(mob) = t[2];
@@ -5675,11 +5751,11 @@ void parse_mobile(FILE *mob_f, int nr) {
 	}
 
 	mob->player.sex = t[0];
-	MOB_NAME_SET(mob) = t[1];
-	mob->mob_specials.move_type = t[2];
+	SET_NAME_SET(mob, t[1]);
+	SET_MOVE_TYPE(mob, t[2]);
 	mob->mob_specials.attack_type = t[3];
 	mob->mob_specials.language = t[4];
-	mob->mob_specials.custom_corpse = t[5];
+	SET_CUSTOM_CORPSE(mob, t[5]);
 
 	// basic setup
 	mob->points.max_pools[HEALTH] = 10;
@@ -5716,7 +5792,7 @@ void parse_mobile(FILE *mob_f, int nr) {
 				break;
 			}
 			case 'I': {	// interaction item
-				parse_interaction(line, &mob->interactions, buf2);
+				parse_interaction(line, &MOB_INTERACTIONS(mob), buf2);
 				break;
 			}
 			
@@ -5727,6 +5803,11 @@ void parse_mobile(FILE *mob_f, int nr) {
 			
 			case 'T': {	// trigger
 				parse_trig_proto(line, &(mob->proto_script), buf2);
+				break;
+			}
+			
+			case '_': {	// notes
+				MOB_NOTES(mob) = fread_string(mob_f, buf2);
 				break;
 			}
 
@@ -5788,14 +5869,21 @@ void write_mob_to_file(FILE *fl, char_data *mob) {
 	}
 	
 	// I: interactions
-	write_interactions_to_file(fl, mob->interactions);
+	write_interactions_to_file(fl, MOB_INTERACTIONS(mob));
 	
 	// M: custom message
 	write_custom_messages_to_file(fl, 'M', MOB_CUSTOM_MSGS(mob));
 	
 	// T, V: triggers
 	write_trig_protos_to_file(fl, 'T', mob->proto_script);
-		
+	
+	// '_'
+	if (MOB_NOTES(mob) && *MOB_NOTES(mob)) {
+		strcpy(temp, MOB_NOTES(mob));
+		strip_crlf(temp);
+		fprintf(fl, "_\n%s~\n", temp);
+	}
+	
 	// END
 	fprintf(fl, "S\n");
 }
@@ -5903,6 +5991,10 @@ void free_obj_proto_data(struct obj_proto_data *data) {
 	free_quest_lookups(data->quest_lookups);
 	free_shop_lookups(data->shop_lookups);
 	
+	if (data->notes) {
+		free(data->notes);
+	}
+	
 	free(data);
 }
 
@@ -5968,6 +6060,7 @@ void parse_object(FILE *obj_f, int nr) {
 	int t[10], retval;
 	char *tmpptr;
 	char f1[256], f2[256], f3[256], f4[256];
+	char buf2[MAX_STRING_LENGTH];
 	struct obj_storage_type *store;
 	struct obj_apply *apply;
 	obj_data *obj, *find;
@@ -6187,6 +6280,11 @@ void parse_object(FILE *obj_f, int nr) {
 				break;
 			}
 			
+			case '_': {	// notes
+				obj->proto_data->notes = fread_string(obj_f, buf2);
+				break;
+			}
+			
 			case 'S':
 				check_object(obj);
 				return;
@@ -6286,6 +6384,13 @@ void write_obj_to_file(FILE *fl, obj_data *obj) {
 	
 	// T, V: triggers
 	write_trig_protos_to_file(fl, 'T', obj->proto_script);
+	
+	// '_'
+	if (GET_OBJ_NOTES(obj) && *GET_OBJ_NOTES(obj)) {
+		strcpy(temp, obj->proto_data->notes);
+		strip_crlf(temp);
+		fprintf(fl, "_\n%s~\n", temp);
+	}
 
 	// END
 	fprintf(fl, "S\n");
@@ -6521,6 +6626,9 @@ void free_room_template(room_template *rmt) {
 	if (GET_RMT_DESC(rmt) && (!proto || GET_RMT_DESC(rmt) != GET_RMT_DESC(proto))) {
 		free(GET_RMT_DESC(rmt));
 	}
+	if (GET_RMT_NOTES(rmt) && (!proto || GET_RMT_NOTES(rmt) != GET_RMT_NOTES(proto))) {
+		free(GET_RMT_NOTES(rmt));
+	}
 
 	if (GET_RMT_SPAWNS(rmt) && (!proto || GET_RMT_SPAWNS(rmt) != GET_RMT_SPAWNS(proto))) {
 		while ((spawn = GET_RMT_SPAWNS(rmt))) {
@@ -6699,6 +6807,11 @@ void parse_room_template(FILE *fl, rmt_vnum vnum) {
 				}
 				break;
 			}
+			
+			case '_': {	// notes
+				GET_RMT_NOTES(rmt) = fread_string(fl, buf2);
+				break;
+			}
 
 			// end
 			case 'S': {
@@ -6768,6 +6881,13 @@ void write_room_template_to_file(FILE *fl, room_template *rmt) {
 	// Z: misc data
 	if (GET_RMT_TEMPERATURE_TYPE(rmt)) {
 		fprintf(fl, "Z1 %d\n", GET_RMT_TEMPERATURE_TYPE(rmt));
+	}
+	
+	// '_'
+	if (GET_RMT_NOTES(rmt) && *GET_RMT_NOTES(rmt)) {
+		strcpy(temp, GET_RMT_NOTES(rmt));
+		strip_crlf(temp);
+		fprintf(fl, "_\n%s~\n", temp);
 	}
 	
 	// end
@@ -9085,8 +9205,6 @@ void free_whole_library(void) {
 	free(help_table);
 	HASH_ITER(hh, mobile_table, mob, next_mob) {
 		remove_mobile_from_table(mob);
-		free_quest_lookups(MOB_QUEST_LOOKUPS(mob));
-		free_shop_lookups(MOB_SHOP_LOOKUPS(mob));
 		free_char(mob);
 	}
 	HASH_ITER(hh, attack_message_table, amd, next_amd) {
@@ -9162,8 +9280,6 @@ void free_whole_library(void) {
 	master_uid_lookup_table = NULL;
 	HASH_ITER(hh, vehicle_table, veh, next_veh) {
 		remove_vehicle_from_table(veh);
-		free_quest_lookups(VEH_QUEST_LOOKUPS(veh));
-		free_shop_lookups(VEH_SHOP_LOOKUPS(veh));
 		free_vehicle(veh);
 	}
 	

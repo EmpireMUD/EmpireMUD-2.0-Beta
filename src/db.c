@@ -1848,7 +1848,6 @@ void clear_char(char_data *ch) {
 	ch->vnum = NOBODY;
 	GET_POS(ch) = POS_STANDING;
 	SET_SIZE(ch) = SIZE_NORMAL;
-	MOB_CUSTOM_CORPSE(ch) = NOTHING;
 	MOB_INSTANCE_ID(ch) = NOTHING;
 	MOB_DYNAMIC_SEX(ch) = NOTHING;
 	MOB_DYNAMIC_NAME(ch) = NOTHING;
@@ -1857,6 +1856,21 @@ void clear_char(char_data *ch) {
 	GET_ROPE_VNUM(ch) = NOTHING;
 	
 	ch->customized = FALSE;
+}
+
+
+/**
+* Initializes mob's proto_data.
+*
+* @param char_data *ch The mob (also works on players as this data should be present but unused).
+*/
+void clear_mob_proto_data(char_data *ch) {
+	if (!ch->proto_data) {
+		CREATE(ch->proto_data, struct mob_proto_data, 1);
+	}
+	
+	// mob_proto_data inits
+	SET_CUSTOM_CORPSE(ch, NOTHING);
 }
 
 
@@ -1872,6 +1886,11 @@ void init_player_specials(char_data *ch) {
 	if (IS_NPC(ch)) {
 		syslog(SYS_ERROR, 0, TRUE, "SYSERR: init_player_specials called on an NPC");
 		return;
+	}
+	
+	// ensure they have dummy mob proto data
+	if (!ch->proto_data) {
+		clear_mob_proto_data(ch);
 	}
 	
 	// ensures they have unique player_specials

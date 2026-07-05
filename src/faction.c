@@ -510,6 +510,9 @@ void free_faction(faction_data *fct) {
 	if (FCT_DESCRIPTION(fct) && (!proto || FCT_DESCRIPTION(fct) != FCT_DESCRIPTION(proto))) {
 		free(FCT_DESCRIPTION(fct));
 	}
+	if (FCT_NOTES(fct) && (!proto || FCT_NOTES(fct) != FCT_NOTES(proto))) {
+		free(FCT_NOTES(fct));
+	}
 	
 	if (FCT_RELATIONS(fct) && (!proto || FCT_RELATIONS(fct) != FCT_RELATIONS(proto))) {
 		free_faction_relations(FCT_RELATIONS(fct));
@@ -601,6 +604,11 @@ void parse_faction(FILE *fl, any_vnum vnum) {
 				break;
 			}
 			
+			case '_': {	// notes
+				FCT_NOTES(fct) = fread_string(fl, error);
+				break;
+			}
+			
 			// end
 			case 'S': {
 				return;
@@ -673,6 +681,13 @@ void write_faction_to_file(FILE *fl, faction_data *fct) {
 	// 'R': relations
 	HASH_ITER(hh, FCT_RELATIONS(fct), rel, next_rel) {
 		fprintf(fl, "R %d %s\n", rel->vnum, bitv_to_alpha(rel->flags));
+	}
+	
+	// '_'
+	if (FCT_NOTES(fct) && *FCT_NOTES(fct)) {
+		strcpy(temp, FCT_NOTES(fct));
+		strip_crlf(temp);
+		fprintf(fl, "_\n%s~\n", temp);
 	}
 	
 	// end
@@ -1300,6 +1315,9 @@ void save_olc_faction(descriptor_data *desc) {
 	if (FCT_DESCRIPTION(proto)) {
 		free(FCT_DESCRIPTION(proto));
 	}
+	if (FCT_NOTES(proto)) {
+		free(FCT_NOTES(proto));
+	}
 	free_faction_relations(FCT_RELATIONS(proto));
 	
 	// sanity
@@ -1308,6 +1326,10 @@ void save_olc_faction(descriptor_data *desc) {
 			free(FCT_NAME(fct));
 		}
 		FCT_NAME(fct) = str_dup(default_faction_name);
+	}
+	if (FCT_NOTES(fct) && !*FCT_NOTES(fct)) {
+		free(FCT_NOTES(fct));
+		FCT_NOTES(fct) = NULL;
 	}
 	
 	// save data back over the proto-type
@@ -1350,6 +1372,7 @@ faction_data *setup_olc_faction(faction_data *input) {
 		// copy things that are pointers
 		FCT_NAME(new) = FCT_NAME(input) ? str_dup(FCT_NAME(input)) : NULL;
 		FCT_DESCRIPTION(new) = FCT_DESCRIPTION(input) ? str_dup(FCT_DESCRIPTION(input)) : NULL;
+		FCT_NOTES(new) = FCT_NOTES(input) ? str_dup(FCT_NOTES(input)) : NULL;
 		
 		// copy lists
 		FCT_RELATIONS(new) = copy_faction_relations(FCT_RELATIONS(input));
@@ -1397,6 +1420,10 @@ void do_stat_faction(char_data *ch, faction_data *fct) {
 	
 	build_page_display_str(ch, "Relations:");
 	show_faction_relation_display(ch, FCT_RELATIONS(fct), FALSE);
+	
+	if (FCT_NOTES(fct) && *FCT_NOTES(fct)) {
+		build_page_display(ch, "Notes:\r\n%s", FCT_NOTES(fct));
+	}
 	
 	send_page_display(ch);
 }
@@ -1458,6 +1485,8 @@ void olc_show_faction(char_data *ch) {
 	if (FCT_RELATIONS(fct)) {
 		show_faction_relation_display(ch, FCT_RELATIONS(fct), FALSE);
 	}
+	
+	build_page_display(ch, "<%snotes\t0>\r\n%s", OLC_LABEL_PTR(FCT_NOTES(fct)), NULLSAFE(FCT_NOTES(fct)));
 	
 	send_page_display(ch);
 }
@@ -1612,6 +1641,18 @@ OLC_MODULE(fedit_name) {
 	olc_process_string(ch, argument, "name", &FCT_NAME(fct));
 }
 
+
+OLC_MODULE(fedit_notes) {
+	faction_data *fct = GET_OLC_FACTION(ch->desc);
+
+	if (ch->desc->str) {
+		msg_to_char(ch, "You are already editing a string.\r\n");
+	}
+	else {
+		sprintf(buf, "notes for %s", FCT_NAME(fct));
+		start_string_editor(ch->desc, buf, &FCT_NOTES(fct), MAX_NOTES, TRUE);
+	}
+}
 
 
 OLC_MODULE(fedit_rep_per_kill) {

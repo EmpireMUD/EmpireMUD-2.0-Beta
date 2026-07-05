@@ -11,6 +11,8 @@ known and unknown. You can donate shards to open a portal to one of the great
 celestial forges: donate <which forge>
  Iron / Lodestone Forge
  Imperium / Victory Forge
+ Eventide / Echo Forge
+ Meteorite / Terminus Forge
 ~
 I 4 2105 100.00 1  # LOOT: hammer
 M
@@ -49,6 +51,9 @@ I've put in a shift at Victory Forge. Now that's hard work.~
 M
 1
 If you visit Echo Forge, it is critical you observe the Silence Rule and speak not a word.~
+M
+1
+The hottest flames are found at Terminus Forge, or thereabouts.~
 T 12800
 S
 #12811
@@ -383,6 +388,7 @@ T 9600
 T 9601
 T 9604
 T 9609
+T 12808
 S
 #12832
 firefly fly lodestone~
@@ -426,7 +432,7 @@ dummy training iron-plated ironplated plated~
 an iron-plated dummy~
 An iron-plated training dummy has been set up here.
 ~
-1 100 bdhnyDJK 0 3
+1 100 bdhnyDJK G 3
 0 0 0 15 -1 -1
 D
    Though it's little more than a suit of crude armor on a weighted wooden
@@ -833,6 +839,7 @@ T 12821
 T 12823
 T 12820
 T 12857
+T 12808
 S
 #12858
 machine war fearsome plated heavily-plated~
@@ -891,6 +898,7 @@ T 9600
 T 9601
 T 9604
 T 9609
+T 12808
 S
 #12859
 machine war plated heavily-plated fearsome battered~
@@ -943,13 +951,14 @@ M
 A loose shield clatters off the War Machine and skids along the ground.~
 T 12821
 T 12820
+T 12808
 S
 #12873
 dummy training gleaming imperium~
 a gleaming imperium dummy~
 A gleaming imperium training dummy has been set up here.
 ~
-100 200 bdhnyDJK 0 3
+100 200 bdhnyDJK G 3
 0 0 0 15 -1 -1
 D
    This glorious suit of armor has been fitted over a weighted wooden stand,
@@ -1436,6 +1445,7 @@ T 9601
 T 9604
 T 9609
 T 12897
+T 12808
 S
 #12898
 echo serragon~
@@ -1451,5 +1461,6 @@ serragon!
 T 12899
 T 12898
 T 12900
+T 12808
 S
 $

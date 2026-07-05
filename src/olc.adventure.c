@@ -703,7 +703,7 @@ void olc_fullsearch_adventure(char_data *ch, char *argument) {
 				continue;
 			}
 		}
-		if (*find_keywords && !multi_isname(find_keywords, GET_ADV_NAME(adv)) && !multi_isname(find_keywords, GET_ADV_AUTHOR(adv)) && !multi_isname(find_keywords, GET_ADV_DESCRIPTION(adv))) {
+		if (*find_keywords && !multi_isname(find_keywords, GET_ADV_NAME(adv)) && !multi_isname(find_keywords, GET_ADV_AUTHOR(adv)) && !multi_isname(find_keywords, GET_ADV_DESCRIPTION(adv)) && (!GET_ADV_NOTES(adv) || !multi_isname(find_keywords, GET_ADV_NOTES(adv)))) {
 			continue;
 		}
 		
@@ -750,6 +750,9 @@ void save_olc_adventure(descriptor_data *desc) {
 	if (GET_ADV_DESCRIPTION(proto)) {
 		free(GET_ADV_DESCRIPTION(proto));
 	}
+	if (GET_ADV_NOTES(proto)) {
+		free(GET_ADV_NOTES(proto));
+	}
 	while ((link = GET_ADV_LINKING(proto))) {
 		GET_ADV_LINKING(proto) = link->next;
 		free(link);
@@ -777,6 +780,10 @@ void save_olc_adventure(descriptor_data *desc) {
 			free(GET_ADV_DESCRIPTION(adv));
 		}
 		GET_ADV_DESCRIPTION(adv) = str_dup("This new adventure zone has no description.\r\n");
+	}
+	if (GET_ADV_NOTES(adv) && !*GET_ADV_NOTES(adv)) {
+		free(GET_ADV_NOTES(adv));
+		GET_ADV_NOTES(adv) = NULL;
 	}
 	
 	// save data back over the proto-type
@@ -816,6 +823,7 @@ adv_data *setup_olc_adventure(adv_data *input) {
 		GET_ADV_NAME(new) = GET_ADV_NAME(input) ? str_dup(GET_ADV_NAME(input)) : NULL;
 		GET_ADV_AUTHOR(new) = GET_ADV_AUTHOR(input) ? str_dup(GET_ADV_AUTHOR(input)) : NULL;
 		GET_ADV_DESCRIPTION(new) = GET_ADV_DESCRIPTION(input) ? str_dup(GET_ADV_DESCRIPTION(input)) : NULL;
+		GET_ADV_NOTES(new) = GET_ADV_NOTES(input) ? str_dup(GET_ADV_NOTES(input)) : NULL;
 		
 		// copy linking
 		GET_ADV_LINKING(new) = NULL;
@@ -1077,6 +1085,8 @@ void olc_show_adventure(char_data *ch) {
 	if (GET_ADV_SCRIPTS(adv)) {
 		show_script_display(ch, GET_ADV_SCRIPTS(adv), FALSE);
 	}
+	
+	build_page_display(ch, "<%snotes\t0>\r\n%s", OLC_LABEL_PTR(GET_ADV_NOTES(adv)), NULLSAFE(GET_ADV_NOTES(adv)));
 		
 	send_page_display(ch);
 }
@@ -1134,8 +1144,8 @@ OLC_MODULE(advedit_cascade) {
 			safe_snprintf(line, sizeof(line), "no permission");
 		}
 		else {
-			GET_MIN_SCALE_LEVEL(mob) = GET_ADV_MIN_LEVEL(adv);
-			GET_MAX_SCALE_LEVEL(mob) = GET_ADV_MAX_LEVEL(adv);
+			SET_MIN_SCALE_LEVEL(mob, GET_ADV_MIN_LEVEL(adv));
+			SET_MAX_SCALE_LEVEL(mob, GET_ADV_MAX_LEVEL(adv));
 			safe_snprintf(line, sizeof(line), "updated");
 			save_mobs = TRUE;
 		}
@@ -1778,6 +1788,19 @@ OLC_MODULE(advedit_name) {
 }
 
 
+OLC_MODULE(advedit_notes) {
+	adv_data *adv = GET_OLC_ADVENTURE(ch->desc);
+
+	if (ch->desc->str) {
+		msg_to_char(ch, "You are already editing a string.\r\n");
+	}
+	else {
+		sprintf(buf, "notes for %s", GET_ADV_NAME(adv));
+		start_string_editor(ch->desc, buf, &GET_ADV_NOTES(adv), MAX_NOTES, TRUE);
+	}
+}
+
+
 OLC_MODULE(advedit_playerlimit) {
 	adv_data *adv = GET_OLC_ADVENTURE(ch->desc);
 	GET_ADV_PLAYER_LIMIT(adv) = olc_process_number(ch, argument, "player limit", "playerlimit", 0, 50, GET_ADV_PLAYER_LIMIT(adv));
@@ -1864,8 +1887,8 @@ OLC_MODULE(advedit_uncascade) {
 			safe_snprintf(line, sizeof(line), "no permission");
 		}
 		else {
-			GET_MIN_SCALE_LEVEL(mob) = 0;
-			GET_MAX_SCALE_LEVEL(mob) = 0;
+			SET_MIN_SCALE_LEVEL(mob, 0);
+			SET_MAX_SCALE_LEVEL(mob, 0);
 			safe_snprintf(line, sizeof(line), "removed");
 			save_mobs = TRUE;
 		}

@@ -63,7 +63,7 @@ void tog_pvp(char_data *ch);
 //// EMPIREMUD CONSTANTS /////////////////////////////////////////////////////
 
 // Shown on the "version" command and sent over MSSP
-const char *version = "EmpireMUD 2.0 beta 5.204";
+const char *version = "EmpireMUD 2.0 beta 5.205";
 const char *DG_SCRIPT_VERSION = "DG Scripts 1.0.12 e5.1.18";
 
 
@@ -1869,7 +1869,7 @@ const char *affected_bits_consider[] = {
 	"",	// immune-temperature
 	"",	// auto-resurrect
 	"",	// 45 - counterspell
-	"$E cannot be disarmed",	// no-disarm
+	"$E cannot be disarmed.",	// no-disarm
 	"",	// no-morph
 	"\n"
 };
@@ -4903,6 +4903,7 @@ const char *skill_flags[] = {
 const char *social_flags[] = {
 	"IN-DEVELOPMENT",
 	"HIDE-IF-INVIS",
+	"NOISY",
 	"\n"
 };
 
@@ -4916,7 +4917,9 @@ const char *social_message_types[NUM_SOCM_MESSAGES][2] = {
 	{ "Targeted to victim", "t2vict" },
 	{ "Target not found", "tnotfound" },	// 5
 	{ "Target-self to character", "s2char" },
-	{ "Target-self to others", "s2other" }
+	{ "Target-self to others", "s2other" },
+	{ "Silent to character", "silent2char" },
+	{ "Silent to others", "silent2others" }
 };
 
 

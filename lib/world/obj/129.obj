@@ -7,15 +7,15 @@ that casts a striking reflection in the dark, but never in the light.
    Pampel-cut gemstones hang from the loops by just a single gossamer thread
 each. The threads glow faintly in the absence of light.
 ~
-2 mo am 0 0 4
+2 mo am 0 0 5
 0 0 0
 2 0
 A
 8 1 0
 A
-22 2 0
+22 6 0
 A
-16 1 3
+16 3 3
 C
 200 300
 S
@@ -79,7 +79,7 @@ that casts a striking reflection in the dark, but never in the light.
    A spiral of many-colored gems drapes from each earring loop, suspended by
 individual gossamer threads which glint with light behind the gems.
 ~
-2 mo am 0 0 5
+2 mo am 0 0 6
 0 0 0
 2 0
 A
@@ -213,10 +213,10 @@ the star cutter inspiration~
 The star cutter inspiration is on the ground.~
    You find yourself inspired by the whispersmiths who forge in secret and in
 silence to steel us against what looms in the dark.
-   This inspiration will teach you to craft: a star cutter, a fast, quiet,
-small sailing ship.
+   This inspiration will teach you to manufacture: a star cutter, a fast,
+quiet, small sailing ship.
 ~
-7 0 a 0 0 3
+7 0 a 0 0 4
 12912 0 0
 0 0
 S
@@ -291,13 +291,13 @@ tower shield and broader than a stable door. Its edges are finely serrated, but
 the back is quite smooth, save for some hairs that could be used to hold it
 like a shield, albeit not a very useful one.
 ~
-23 emo ao 0 0 7
+23 emo ao 0 0 8
 0 0 0
 2 0
 A
 5 1 0
 C
-200 300
+201 300
 S
 #12917
 glint light~
@@ -353,5 +353,621 @@ tail~
 forth across Echo Forge, tapping at the ground, the arches, and occasionally
 even the red-hot forges.
 ~
+S
+#12919
+hesitation moment~
+a moment of hesitation~
+A moment of hesitation is here.~
+   This item causes the character to immediately perform a Terminus Forge
+Special Move.
+~
+3 0 a 0 0 8
+0 0 0
+0 2
+C
+1 1
+T 12919
+S
+#12920
+ring terminal restoration~
+a terminal ring of restoration~
+A terminal ring of restoration is lying on the ground.~
+   On the outside, the silvery-white ring's finish is rough, but this was no
+hurried piece. The gems' settings show a rather exacting skill, as there are no
+prongs holding them in place.
+   The pair of green gemstones are cut in a trapeze shape and oriented to form
+an old healing sign.
+~
+2 amo ab 0 0 5
+0 0 0
+2 0
+A
+16 2 0
+A
+23 3 0
+A
+15 1 3
+A
+5 1 3
+C
+300 400
+T 12811
+S
+#12921
+inspiration terminal ring of restoration~
+the inspiration for a terminal ring of restoration~
+The inspiration for a terminal ring of restoration is on the ground.~
+   You find yourself inspired by the starsmiths who forge in the fiery chaos of
+starfall to prepare for what lurks beyond the sky.
+   This inspiration will teach you to forge: terminal ring of restoration, a
+unique ring for healers.
+~
+7 0 a 0 0 1
+12920 0 0
+0 0
+S
+#12922
+earrings restoration terminal~
+terminal earrings of restoration~
+Terminal earrings of restoration are lying here.~
+   Silvery-white beads dangle delicately from the finely-hammered argentine
+earrings, each attached to a gem without prongs, giving the impression they are
+supported on gossamer alone.
+   The gems are tiny, but shine a brilliant green. They have been cut into a
+trapeze shape long associated with healing.
+~
+2 mo am 0 0 6
+0 0 0
+2 0
+A
+8 1 0
+A
+23 8 0
+A
+16 4 3
+A
+5 1 3
+C
+300 400
+S
+#12923
+inspiration terminal earrings of restoration~
+the inspiration for the terminal earrings of restoration~
+The inspiration for the terminal earrings of restoration is on the ground.~
+   You find yourself inspired by the starsmiths who forge in the fiery chaos of
+starfall to prepare for what lurks beyond the sky.
+   This inspiration will teach you to forge: terminal earrings of restoration,
+earrings for healers.
+~
+7 0 a 0 0 1
+12922 0 0
+0 0
+S
+#12924
+ring terminal fortitude~
+a terminal ring of fortitude~
+A terminal ring of fortitude is lying on the ground.~
+   On the outside, the silvery-white ring's finish is rough, but this was no
+hurried piece. The gem setting shows a rather exacting skill, as there are no
+prongs holding it in place.
+   The gem is rather large, step-cut, and shines as a gleaming yellow beacon.
+~
+2 amo ab 0 0 5
+0 0 0
+2 0
+A
+15 2 0
+A
+18 3 0
+A
+11 1 3
+A
+5 1 3
+C
+300 400
+T 12811
+S
+#12925
+inspiration terminal ring of fortitude~
+the inspiration for a terminal ring of fortitude~
+The inspiration for a terminal ring of fortitude is on the ground.~
+   You find yourself inspired by the starsmiths who forge in the fiery chaos of
+starfall to prepare for what lurks beyond the sky.
+   This inspiration will teach you to forge: terminal ring of fortitude, a
+unique ring for tanks.
+~
+7 0 a 0 0 1
+12924 0 0
+0 0
+S
+#12926
+earrings fortitude terminal~
+terminal earrings of fortitude~
+Terminal earrings of fortitude are lying here.~
+   Silvery-white beads dangle delicately from the finely-hammered argentine
+earrings, each attached to a gem without prongs, giving the impression they are
+supported on gossamer alone.
+   The gems are step-cut and bright yellow, catching every stray mote of light.
+~
+2 mo am 0 0 6
+0 0 0
+2 0
+A
+2 1 0
+A
+18 4 0
+A
+13 4 0
+A
+15 4 3
+A
+5 1 3
+C
+300 400
+S
+#12927
+inspiration terminal earrings of fortitude~
+the inspiration for the terminal earrings of fortitude~
+The inspiration for the terminal earrings of fortitude is on the ground.~
+   You find yourself inspired by the starsmiths who forge in the fiery chaos of
+starfall to prepare for what lurks beyond the sky.
+   This inspiration will teach you to forge: terminal earrings of fortitude,
+earrings for tanks.
+~
+7 0 a 0 0 1
+12926 0 0
+0 0
+S
+#12928
+ring terminal wrath~
+a terminal ring of wrath~
+A terminal ring of wrath is lying on the ground.~
+   On the outside, the silvery-white ring's finish is rough, but this was no
+hurried piece. The gems' settings show a rather exacting skill, as there are no
+prongs holding them in place.
+   A series of navette-cut red gemstones, arranged tip-to-tip, encircles the
+brilliant ring.
+~
+2 amo ab 0 0 6
+0 0 0
+2 0
+A
+11 2 0
+A
+21 3 0
+A
+15 1 0
+A
+5 1 3
+C
+300 400
+T 12811
+S
+#12929
+inspiration terminal ring of wrath~
+the inspiration for a terminal ring of wrath~
+The inspiration for a terminal ring of wrath is on the ground.~
+   You find yourself inspired by the starsmiths who forge in the fiery chaos of
+starfall to prepare for what lurks beyond the sky.
+   This inspiration will teach you to forge: terminal ring of wrath, a unique
+ring for melee dps.
+~
+7 0 a 0 0 1
+12928 0 0
+0 0
+S
+#12930
+earrings wrath terminal~
+terminal earrings of wrath~
+Terminal earrings of wrath are lying here.~
+   Silvery-white beads dangle delicately from the finely-hammered argentine
+earrings, each attached to a gem without prongs, giving the impression they are
+supported on gossamer alone.
+   The navette-cut red gemstones cast dots of red as light strikes them.
+~
+2 mo am 0 0 5
+0 0 0
+2 0
+A
+1 1 0
+A
+21 8 0
+A
+11 4 3
+A
+5 1 3
+C
+300 400
+S
+#12931
+inspiration terminal earrings of wrath~
+the inspiration for the terminal earrings of wrath~
+The inspiration for the terminal earrings of wrath is on the ground.~
+   You find yourself inspired by the starsmiths who forge in the fiery chaos of
+starfall to prepare for what lurks beyond the sky.
+   This inspiration will teach you to forge: terminal earrings of wrath,
+earrings for melee dps.
+~
+7 0 a 0 0 1
+12930 0 0
+0 0
+S
+#12932
+ring terminal arcana~
+a terminal ring of arcana~
+A terminal ring of arcana is lying on the ground.~
+   On the outside, the silvery-white ring's finish is rough, but this was no
+hurried piece. The gem setting shows a rather exacting skill, as there are no
+prongs holding it in place.
+   The gem is a single, large, radiant-cut blue gem. Even in shadow, it casts
+a pale blue aura.
+~
+2 amo ab 0 0 6
+0 0 0
+2 0
+A
+16 2 0
+A
+22 3 0
+A
+15 1 3
+A
+5 1 3
+C
+300 400
+T 12811
+S
+#12933
+inspiration terminal ring of arcana~
+the inspiration for a terminal ring of arcana~
+The inspiration for a terminal ring of arcana is on the ground.~
+   You find yourself inspired by the starsmiths who forge in the fiery chaos of
+starfall to prepare for what lurks beyond the sky.
+   This inspiration will teach you to forge: terminal ring of arcana, a unique
+ring for caster dps.
+~
+7 0 a 0 0 1
+12932 0 0
+0 0
+S
+#12934
+earrings arcana terminal~
+terminal earrings of arcana~
+Terminal earrings of arcana are lying here.~
+   Silvery-white beads dangle delicately from the finely-hammered argentine
+earrings, each attached to a gem without prongs, giving the impression they are
+supported on gossamer alone.
+   The gems are blue, with a pampel cut. They seem to trap bright light, but
+glow steadily even in pitch black.
+~
+2 mo am 0 0 5
+0 0 0
+2 0
+A
+8 1 0
+A
+22 8 0
+A
+16 4 3
+A
+5 1 3
+C
+300 400
+S
+#12935
+inspiration terminal earrings of arcana~
+the inspiration for the terminal earrings of arcana~
+The inspiration for the terminal earrings of arcana is on the ground.~
+   You find yourself inspired by the starsmiths who forge in the fiery chaos of
+starfall to prepare for what lurks beyond the sky.
+   This inspiration will teach you to forge: terminal earrings of arcana,
+earrings for caster dps.
+~
+7 0 a 0 0 1
+12934 0 0
+0 0
+S
+#12936
+ring terminal valor~
+a terminal ring of valor~
+A terminal ring of valor is lying on the ground.~
+   On the outside, the silvery-white ring's finish is rough, but this was no
+hurried piece. The gems' settings show a rather exacting skill, as there are no
+prongs holding it them place.
+   Tiny gemstones cluster along the upper surface of the ring, gleaming almost
+white like the band itself.
+~
+2 amo ab 0 0 7
+0 0 0
+2 0
+A
+11 1 0
+A
+6 1 0
+A
+19 2 0
+A
+15 1 3
+A
+5 1 3
+C
+300 400
+T 12811
+S
+#12937
+inspiration terminal ring of valor~
+the inspiration for a terminal ring of valor~
+The inspiration for a terminal ring of valor is on the ground.~
+   You find yourself inspired by the starsmiths who forge in the fiery chaos of
+starfall to prepare for what lurks beyond the sky.
+   This inspiration will teach you to forge: terminal ring of valor, a unique
+ring for overseers and laborers.
+~
+7 0 a 0 0 2
+12936 0 0
+0 0
+S
+#12938
+earrings valor terminal~
+terminal earrings of valor~
+Terminal earrings of valor are lying here.~
+   Silvery-white beads dangle delicately from the finely-hammered argentine
+earrings, each attached to a gem without prongs, giving the impression they are
+supported on gossamer alone.
+   The small gems seem to shift in color as the light hits them, with such
+variety that they never appear the same twice.
+~
+2 mo am 0 0 6
+0 0 0
+2 0
+A
+15 1 0
+A
+19 1 0
+A
+11 1 0
+A
+27 1 3
+A
+5 1 3
+C
+300 400
+S
+#12939
+inspiration terminal earrings of valor~
+the inspiration for the terminal earrings of valor~
+The inspiration for the terminal earrings of valor is on the ground.~
+   You find yourself inspired by the starsmiths who forge in the fiery chaos of
+starfall to prepare for what lurks beyond the sky.
+   This inspiration will teach you to forge: terminal earrings of valor. These
+earrings are made for overseers and laborers of the empire.
+~
+7 0 a 0 0 2
+12938 0 0
+0 0
+S
+#12940
+mastery impact inspiration~
+the inspiration for Impact Mastery~
+The inspiration for Impact Mastery is in the air.~
+   Purchase this and be inspired to forge superior Terminus Forge items. This
+requires that you already have the Impact Forging ability, and will grant you
+Impact Mastery. Each character can only buy this item once.
+~
+3 p a 0 0 3
+0 0 0
+2 0
+C
+100 100
+T 12833
+S
+#12941
+kit training meteoric dummy~
+a meteoric training dummy kit~
+A meteoric training dummy kit is lying here.~
+   The kit contains lumber, blackened argentine armor, and a heavy base. You
+can set up this kit to use for combat training for a short time. It will expire
+if you defeat it in combat, or will expire after a certain number of hours.
+   Type 'use dummy' to set this up for combat training.
+~
+3 e a 0 0 5
+12941 0 0
+2 0
+C
+1 1
+M
+33
+Type 'use dummy' to set this up for combat training.~
+R
+4 5171 0
+T 12838
+S
+#12942
+inspiration meteoric training dummy~
+the meteoric training dummy inspiration~
+The meteoric training dummy inspiration is on the ground.~
+   You find yourself inspired by the starsmiths who forge in the fiery chaos of
+starfall to prepare for what lurks beyond the sky.
+   This inspiration will teach you to forge: meteoric training dummy. This
+dummy is for combat practice for levels 300-400.
+~
+7 0 a 0 0 3
+12941 0 0
+0 0
+S
+#12943
+halo skyfall fall~
+the skyfall halo~
+A skyfall halo spins in the air.~
+   Seven tiny meteors whirl in a circle, each chasing the next in an
+interminable loop.
+~
+2 mo ae 0 0 9
+0 0 0
+2 0
+A
+5 1 0
+A
+19 6 3
+A
+11 1 3
+A
+5 1 3
+C
+100 400
+S
+#12944
+inspiration skyfall halo~
+the skyfall halo inspiration~
+The skyfall halo inspiration is on the ground.~
+   You find yourself inspired by the starsmiths who forge in the fiery chaos of
+starfall to prepare for what lurks beyond the sky.
+   This inspiration will teach you to forge: skyfall halo, a meteoric piece of
+headwear that boosts your Greatness.
+~
+7 0 a 0 0 2
+12943 0 0
+0 0
+S
+#12945
+whistle minipet blazing comet~
+a blazing comet minipet whistle~
+A blazing comet minipet whistle is lying here.~
+It can summon a blazing comet to light up the sky.
+   Type 'use whistle' to permanently add a new non-combat minipet to your list.
+You can have one minipet out at a time; type 'minipets' to list, manage, and
+summon one of your minipets.
+~
+19 p a 0 0 8
+12945 0 0
+2 0
+C
+1 1
+S
+#12946
+inspiration impact harness~
+the impact harness inspiration~
+The impact harness inspiration is lying here.~
+   You find yourself inspired by the starsmiths who forge in the fiery chaos of
+starfall to prepare for what lurks beyond the sky.
+   This inspiration will teach you to manufacture: impact harness, a flying one-
+person vehicle that requires two flying mounts.
+~
+7 0 a 0 0 5
+12946 0 0
+0 0
+S
+#12947
+parts companion plated meteoric elemental~
+plated meteoric elemental companion parts~
+Some plated meteoric elemental companion parts are here.~
+   These modular parts are used to construct an meteoric elemental companion,
+which you can summon and dismiss like any other companion. This elemental lasts
+until it is destroyed. Each elemental is built from up to 3 modules. This
+module adds tanking capabilities:
+   1 plated module: It gains more health and will rescue you in combat.
+   2 plated modules: Boosts its damage resistance.
+   3 plated modules: Adds 'order companion' options for healing, dodging,
+      taunting, and clearing itself of debuffs.
+~
+3 p a 0 0 1
+0 0 0
+2 0
+C
+125 125
+T 12834
+S
+#12948
+parts companion jagged meteoric elemental~
+jagged meteoric elemental companion parts~
+Some jagged meteoric elemental companion parts are here.~
+   These modular parts are used to construct an meteoric elemental companion,
+which you can summon and dismiss like any other companion. This elemental lasts
+until it is destroyed. Each elemental is built from up to 3 modules. This
+module adds melee combat capabilities:
+   1 jagged module: It gains the ability to attack in combat.
+   2 jagged modules: Increases its damage and adds 'order companion actuate'
+      to debuff the enemy.
+   3 jagged modules: Increases its damage and makes it immune to disarm.
+   Combining a jagged and magnetic module will also boost its damage.
+~
+3 p a 0 0 2
+0 0 0
+2 0
+C
+125 125
+T 12834
+S
+#12949
+parts companion magnetic meteoric elemental~
+magnetic meteoric elemental companion parts~
+Some magnetic meteoric elemental parts are here.~
+   These modular parts are used to construct an meteoric elemental companion,
+which you can summon and dismiss like any other companion. This elemental lasts
+until it is destroyed. Each elemental is built from up to 3 modules. This
+module adds casting capabilities:
+   1 magnetic module: Adds 'order companion magnetize', which buffs you.
+   2 magnetic modules: Increases the potency of its buffs and, if combined with
+      a jagged module, changes the melee attack to a magical one.
+   3 magnetic modules: Increases the buffs again and makes them automatic.
+   Combining a jagged and magnetic module will also boost its damage.
+~
+3 p a 0 0 3
+0 0 0
+2 0
+C
+125 125
+T 12834
+S
+#12950
+print impact~
+an impact print~
+There's an impact print in the ground.~
+   This large, thin piece of glass catches the light at every gleaming angle.
+Inside the glass, flecks of metal and clods of rock are stuck fast, frozen in
+the moment this piece formed under the immense pressure of an impact. It's
+large enough to use as a shield. It has a broad, rounded shape with two subtle
+lobes at one end and a single, curving lobe at the other -- not unlike a cat's
+pawprint.
+~
+23 emo ao 0 0 8
+0 0 0
+2 0
+A
+5 1 0
+C
+301 400
+S
+#12951
+meteor unfallen~
+an unfallen meteor~
+An unfallen meteor hovers in the air.~
+   A soft mist falls from the rough, rocky meteor. The object is small enough
+to fit in a pocket, cold to the touch, and smoother in your hands than its
+pock-marked surface appears. It's a delicate thing, with a metallic sheen.
+   The unfallen meteor is a crafting material for Impact Forging.
+~
+3 0 a 0 0 4
+0 0 0
+2 0
+C
+375 375
+R
+4 5108 0
+R
+4 5115 0
+S
+#12952
+aura blazing~
+a blazing aura~
+A blazing aura streaks across the sky.~
+It's fiery and bright.
+~
+29 gk 0 0 0 6
+-1 1 0
+0 4
+C
+1 1
+T 12946
 S
 $

@@ -424,7 +424,7 @@ scraping noise follows every footstep as you trod along, watching as loose bits
 of iron slowly creep across the ground, drawn to the shape at the center.
 Commands: return
 ~
-aci 0 0 12817
+ci 0 0 12817
 E
 ground carpet~
    Rare hints of green poke through the ash and armor that carpet the
@@ -469,7 +469,7 @@ scraping noise follows every footstep as you trod along, watching as loose bits
 of iron slowly creep across the ground, drawn to the shape at the center.
 Commands: return
 ~
-aci 0 0 12818
+ci 0 0 12818
 E
 ground carpet~
    Rare hints of green poke through the ash and armor that carpet the
@@ -514,7 +514,7 @@ scraping noise follows every footstep as you trod along, watching as loose bits
 of iron slowly creep across the ground, drawn to the shape at the center.
 Commands: return
 ~
-aci 0 0 12819
+ci 0 0 12819
 E
 ground carpet~
    Rare hints of green poke through the ash and armor that carpet the
@@ -999,7 +999,7 @@ night sky, its furnaces the only steady lights in the distance. Below it, a low
 fog creeps in from the edges of the field, draping it in a still silence.
 Commands: return
 ~
-aci 0 0 12857
+ci 0 0 12857
 E
 battefield field around distance out expanse~
    Nightfall has brought silence to the battlefield as each and every soldier
@@ -1050,7 +1050,7 @@ night sky, its furnaces the only steady lights in the distance. Below it, a low
 fog creeps in from the edges of the field, draping it in a still silence.
 Commands: return
 ~
-aci 0 0 12858
+ci 0 0 12858
 E
 battefield field around distance out expanse~
    Nightfall has brought silence to the battlefield as each and every soldier
@@ -1101,7 +1101,7 @@ night sky, its furnaces the only steady lights in the distance. Below it, a low
 fog creeps in from the edges of the field, draping it in a still silence.
 Commands: return
 ~
-aci 0 0 12859
+ci 0 0 12859
 E
 battefield field around distance out expanse~
    Nightfall has brought silence to the battlefield as each and every soldier
@@ -1808,7 +1808,7 @@ the sound doesn't bounce back off of the wall. Instead, it seems to escape into
 the starry night above.
 Commands: return
 ~
-aci 0 hv 12897
+ci 0 hv 12897
 E
 darkness~
    Echo Forge seems darker now. With the bell fallen dark and any light on the
@@ -1932,7 +1932,7 @@ the sound doesn't bounce back off of the wall. Instead, it seems to escape into
 the starry night above.
 Commands: return
 ~
-aci 0 hv 12898
+ci 0 hv 12898
 E
 darkness~
    Echo Forge seems darker now. With the bell fallen dark and any light on the
@@ -2056,7 +2056,7 @@ the sound doesn't bounce back off of the wall. Instead, it seems to escape into
 the starry night above.
 Commands: return
 ~
-aci 0 hv 12899
+ci 0 hv 12899
 E
 darkness~
    Echo Forge seems darker now. With the bell fallen dark and any light on the

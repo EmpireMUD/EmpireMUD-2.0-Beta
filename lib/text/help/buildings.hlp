@@ -256,49 +256,6 @@ while you sleep.
 
 When you're done with the shelter, be sure to dismantle it.
 #
-CELESTIALFORGE "CELESTIAL FORGE" SHATTER SHARD SHARDS "LODESTONE FORGE" "LODESTONE FORGING" "VICTORY FORGE" "VICTORIOUS SMITHING"
-
-[FF]  Celestial Forge  (Renown goal)
-
-Commands:  shatter <item to destroy>
-           donate <shard type>
-Fame:  5
-Temperature:  always comfortable
-
-Your celestial forge is a place not only to forge gear, but to destroy gear you
-no longer need and recycle it into shards. The number and type of shards you
-get are based on the level and quality of the item.
-
-You can see how many shards you have by typing 'coins'.
-
-Each celestial forge in your empire is also linked to the divine celestial
-forges that sell crafting recipes and items in exchange for shards. To reach
-these forges, visit the Starsmith at your celestial forge and 'donate' a shard
-of any type. This will take you to the forge that matches the shard.
-
-Shard types and celestial forges:
-  Lodestone Forge:  iron shards  (level 1-100)
-  Victory Forge:  imperium shards  (level 101-200)
-  eventide shards  (level 201-300)
-  meteorite shards  (level 301-400)
-  celestial shards  (level 401-500)
-
-Higher celestial forges are not yet implemented.
-
-Each celestial forge has its own crafting ability, which you receive
-automatically if you visit that forge with Trade skill 76 or higher.
-
-To leave a celestial forge, type 'return' in its entry area. This will open a
-portal or teleport you out, depending upon how you entered.
-
-Each celestial forge also has a daily boss challenge. From the center of the
-forge, type 'challenge' to teleport to the first available arena where nobody
-is fighting, or 'challenge empty' to teleport to the first available arena with
-no players in it. Your followers come with you. Once the fight begins, no other
-players may join. Type 'return' to leave the challenge arena.
-
-See also: CURRENCY
-#
 CEMETERY
 
 .i.i  Cemetery  (Almost Famous goal)

@@ -3,7 +3,7 @@ dummy training shadowy eventide tide~
 a shadowy eventide dummy~
 A shadowy eventide training dummy has been set up here.
 ~
-200 300 bdhnyDJK 0 3
+200 300 bdhnyDJK G 3
 0 0 0 15 -1 -1
 D
    The inky blue suit of armor almost disappears in low light, fading into the
@@ -42,7 +42,359 @@ An eventide elemental is here.
 1 325 dhoGK cGL 3
 0 0 94 6 -1 -1
 D
-The elmental is assembling itself from leaves of blue-black eventide.
+The elemental is assembling itself from leaves of blue-black eventide.
+~
+T 12836
+T 12835
+S
+#12921
+Amir~
+Amir~
+Amir, the Last Watch, keeps an eye on the sky.
+~
+0 0 bdvL cnG 3
+1 0 0 15 -1 -1
+D
+   He wears a tight, white imama -- a basic turban -- over an undercap. A band
+of cloth covers his left eye; he shields the right eye with a hand as he
+watches the meteors in the sky. His loose, ankle-length thobe is a rich blue
+color that almost glows against the red light of the crater. Over one shoulder,
+he carries a heft blue-black eventide hammer, always ready to swing.
+~
+M
+7
+emote $n looks over and rests $s hammer on $s shoulder.~
+M
+7
+say We do not get many new faces around here.~
+M
+7
+say Whatever your business, make it quick!~
+M
+7
+say No telling when one of these meteors will strike again.~
+M
+8
+emote $n looks over.~
+M
+8
+say Great to see you again.~
+M
+8
+say Just make it quick. I would hate for you to get trapped here.~
+M
+0
+$n shifts $s hammer from one shoulder to the other.~
+M
+0
+$n holds a hand over $s eye and surveys the sky.~
+M
+1
+There's another one coming in. Get ready.~
+M
+0
+$n polishes $s eventide hammer.~
+M
+1
+We seem to have attracted trouble. If you want to challenge it.~
+M
+1
+Every once in a while, one of them makes land.~
+T 12922
+S
+#12922
+Hana~
+Hana~
+Hana of the Setting Stars works the anvil. (list)
+~
+0 0 bdvL cnG 3
+2 0 0 15 -1 -1
+D
+   She swings her hammer at the anvil over and over, in rapid succession,
+occasionally swapping the metal piece for one of the ones in the wall of fire
+around the edge of the rock. She wears a simple turquoise kimono belted by a
+plum-red obi. Her hair is bound up around her head to keep it off of her work.
+She takes little notice of you as she toils.
+~
+M
+7
+emote $n swings at anvil without looking up.~
+M
+7
+emote $n shouts over the roar of the flames, 'Not seen you here before!'~
+M
+8
+emote $n swings at anvil without looking up.~
+M
+8
+emote $n shouts over the roar of the flames, 'Don't remember seeing you here before!'~
+M
+0
+$n walks to the edge and swaps the metal $e was working for a red-hot one from one of the poles.~
+M
+0
+$n says, under the roar of the flames, 'Work, work.'~
+M
+0
+$n hammers at the anvil.~
+M
+0
+$n hammers at the anvil.~
+M
+0
+$n hammers at the anvil.~
+M
+0
+The flames roar ever louder.~
+T 12807
+S
+#12923
+Kwame~
+Kwame~
+Kwame the Unyielding strikes the anvil again and again. (list)
+~
+0 0 bdvL cnG 3
+1 0 0 15 -1 -1
+D
+   He wears a toga of brightly-colored, hand-woven cloth. It looks loose, but
+it seems to stay in place as he works at the anvil. His dark hair is cropped
+short and off his eyes; it glistens with the sweat he wipes back from his
+forehead.
+~
+M
+7
+emote $n glances up at you from $s work.~
+M
+7
+emote $n shouts over teh roar of the flames, 'You must be new here. Don't stay too long. We are due to hit.'~
+M
+8
+emote $n glances up at you from $s work.~
+M
+8
+emote $n shouts over the roar of the flames, 'Ah, an unfamiliar face! I have some earring designs, but do not tarry.'~
+M
+8
+say This rock is going down fast.~
+M
+0
+$n swings $s hammer down on the anvil.~
+M
+0
+$n swings $s hammer down on the anvil.~
+M
+0
+$n swings $s hammer down on the anvil.~
+M
+0
+$n shouts, 'It is not safe to linger here.'~
+M
+0
+$n carries $s work to the edge of the rock and places it in the roaring flame before grabbing another red-hot piece to work on.~
+M
+0
+There's a loud CRACK as a jet of smoke blasts off the side of the other rock.~
+M
+0
+The flames roar larger and louder.~
+T 12807
+S
+#12924
+Elodie~
+Elodie~
+Elodie of the Near Miss is focused on her work. (list)
+~
+0 0 bdvL cnG 3
+2 0 0 15 -1 -1
+D
+   She wears a simple red dress layered over a longer white one. Her auburn
+hair floats delicately in the air, held up by nothing at all, but always
+trailing behind her so it never blocks her vision. She works silently at the
+anvil, paying you little mind.
+~
+M
+7
+emote $n hardly takes notice of you as $e continues $s work.~
+M
+7
+say Another new face. I have some designs that might interest you.~
+M
+8
+emote $n spares only a brief glance to the side before continuing $s work.~
+M
+0
+The stars twinkle all around you.~
+M
+0
+$n sweeps a stray strand of hair from $s face.~
+M
+0
+$n taps at the anvil with precise strikes.~
+M
+0
+$n taps at the anvil.~
+M
+0
+$n switches to a smaller hammer.~
+M
+0
+$n switches to a larger hammer.~
+M
+0
+$n examines the piece $e's working on closely.~
+S
+#12925
+Tane~
+Tane~
+Tane of the Ember Rain bustles back and forth to arrange the supplies. (list)
+~
+0 0 bdvL cnG 3
+1 0 0 15 -1 -1
+D
+   He's a broad-shouldered man with weathered brown skin and long black hair,
+which is bound neatly behind his head. Moko patterns frame his jaw and
+cheekbones, while forge scars mark his muscled forearms. A soot-stained woven
+flax vest hides behind his leather apron. Tally sticks and inventory tags hang
+from his belt.
+~
+M
+7
+emote $n glances over.~
+M
+7
+say Someone new! Kia ora. Make yourself at home.~
+M
+7
+say Don't mind the meteors.~
+M
+7
+say They almost never hit.~
+M
+8
+emote $n glances over.~
+M
+8
+say Ah, kia ora, my friend!~
+M
+8
+say We just got some new stuff in. Have a look around.~
+M
+0
+A pile of ingots appear from thin air and clatter to the ground as $n rushes to organize them.~
+M
+0
+$n stacks boxes.~
+M
+0
+$n rearranges the boxes.~
+M
+0
+$n sorts items into their boxes.~
+M
+0
+There's a loud POP from somewhere overhead.~
+M
+1
+I worked at Echo Forge for a while, but this place is more my speed.~
+M
+0
+$n covers $s eyes and looks to the sky.~
+S
+#12927
+time lion~
+the Lion of Time~
+The Lion of Time glimmers in the fiery sky!
+~
+301 400 dhyDJKL cEGU 6
+2 0 0 45 -1 -1
+D
+   The great lion's fur shimmers against the fiery sunset, sometimes little
+more than a constellation of lights, shifting as she prowls the sky. Her teeth,
+each larger than you are tall, catch the fading rays of sunlight as she bites
+at the fabric of reality itself.
+~
+I 4 12950 100.00 1  # LOOT: impact print
+M
+11
+!stars !stars !stars !consume !consume !sunshine~
+M
+0
+$n stalks around the circumference of the twilight.~
+M
+0
+$n shimmers in the sunset.~
+M
+0
+$n bares $s teeth.~
+M
+1
+Well? No time but the present.~
+M
+1
+You are only wasting your time.~
+M
+1
+Didn't any one ever tell you not to mess with the time lion?~
+M
+1
+Don't think you're here to challenge me.~
+M
+1
+Time's almost up.~
+T 12822
+T 12821
+T 12823
+T 12820
+T 9600
+T 9601
+T 9604
+T 9609
+T 12927
+T 12808
+T 12929
+S
+#12941
+dummy training meteoric~
+a meteoric dummy~
+A meteoric training dummy is set up here.
+~
+300 400 bdhnyDJK G 3
+0 0 0 15 -1 -1
+D
+   The dummy is armored in meteoric metal, distinctly identified by its
+pock-marked surface and charred patina. The base is well-reinforced to take
+powerful blows from any combatant and stand its ground. No matter how hard it
+gets hit, it never strikes back.
+~
+M
+13
+This training dummy will not attack back.~
+T 12839
+T 12840
+S
+#12945
+comet blazing~
+a blazing comet~
+A blazing comet streaks overhead.
+~
+1 1 bdoD n 1
+0 0 84 15 -1 -1
+D
+   It has a round, white nucleus and a long, diffuse red tail. As you move to
+get a better look at the comet, you realize it's much closer -- and smaller --
+than it first appeared.
+~
+T 12945
+S
+#12947
+elemental meteoric~
+a meteoric elemental~
+A meteoric elemental is here.
+~
+1 425 dhoGK cGL 3
+0 0 94 6 -1 -1
+D
+The elemental is coming together from small, metallic meteorites.
 ~
 T 12836
 T 12835

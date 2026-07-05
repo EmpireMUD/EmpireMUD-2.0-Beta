@@ -65,15 +65,6 @@ Rewards the following buildings:
 
 See also: PROGRESS
 #
-BANNER
-
-The empire banner can be changed with the eedit command.
-
-It's a good idea to choose a distinct color so that people can see your empire
-on the political map.
-
-See also: COLOR, EMPIRE, POLITICAL, EEDIT
-#
 CEDE
 
 Usage:  cede <person>
@@ -378,12 +369,12 @@ name to its privileges. Only players who are at the maximum rank can change
 the empire's properties.
 
 Available options:
- adjective - the form of the empire name used in some sentences
- banner - set the color used for your empire's name and territory
+ adjective - the adjective form of the empire's name (HELP EMPIRE ADJECTIVE)
+ banner - set the color shown for your empire (HELP EMPIRE BANNER)
  changeleader - lets you set a new leader
  description - shown on your empire detail
  motd - change the "message of the day"
- name - set the full name of the empire
+ name - change the full name of the empire (HELP EMPIRE NAME)
  privilege - set the rank required to do certain things
  rank - change the name of a rank
  ranks - change the number of ranks
@@ -417,6 +408,73 @@ against the empire.
 
 See also: GRANT, RECLAIM
 #d
+"EEDIT ADJECTIVE" "EMPIRE ADJECTIVE"
+
+Usage:  eedit adjective <word>
+
+The empire's adjective form is one used on currency, territory, and in certain
+sentences. It should be similar to your empire's name, but simpler and shorter.
+
+The adjective should NOT be a general descriptor or trait. It should have a
+clear connection to the empire's name.
+
+By default, the adjective form is the same as the empire's name.
+
+Examples of good adjective choices for empire names:
+   Blue Rhino Empire - Bluanian
+   The Corridor Sentinels - Sentinel
+   Fiefdom of Amainiris - Amainirian
+   Heroes for Hire - Heroic
+   Kingdom of Moon - Moon
+   Reserve - Reserved
+   Wildcat Collective - Wildcat
+
+Example sentences where the adjective is shown:
+   Working adjective citizens...
+   Only adjective coins are stored here.
+   <Adjective> Sam, a citizen of Empire Name, is standing here.
+
+See also: EMPIRE NAME
+#
+"EEDIT BANNER" "EMPIRE BANNER" BANNER
+
+Usage:  eedit banner <color code>
+
+The empire banner appears on the ascii map and on the website's graphical map
+when 'political' view is enabled. See HELP COLOR for a list of color codes,
+which begin with && (ampersand). The underline code, &&u, may be used in
+combination with a color, but not by itself.
+
+Players using screenreader view instead see the empire adjective on remote
+tiles, and the empire name on their current tile.
+
+The banner color also appears anywhere the empire name is displays, on the
+titles of rooms owned by the empire, and on the empire details page.
+
+It's a good idea to choose a distinct color so that people can see your empire
+on the political map.
+
+See also: COLOR, EMPIRE DETAILS, SCREENREADER, TOGGLE POLITICAL
+#
+"EEDIT NAME" "EMPIRE NAME"
+
+Usage:  eedit name <new name>
+
+Choose a good name for your empire -- this is how the world will know you.
+
+There are no hard and fast guidelines for the empire name, but in general you
+should keep it short, avoid starting with "the", and avoid including words like
+"kingdom" or "empire".
+
+Be sure to capitalize any words in the empire name that should start with a
+capital letter; the game will not do this for you because you can choose lower-
+case letters for words such as "of".
+
+Changing the empire name will also change its adjective; use "eedit adjective"
+to set a good adjective to go with your new name.
+
+See also: EMPIRE ADJECTIVE, EMPIRE BANNER
+#
 EFIND
 
 Usage:  efind <name>

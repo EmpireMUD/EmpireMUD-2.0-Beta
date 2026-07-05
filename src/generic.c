@@ -572,6 +572,9 @@ void olc_fullsearch_generic(char_data *ch, char *argument) {
 			if (multi_isname(find_keywords, GEN_NAME(gen))) {
 				any = TRUE;
 			}
+			else if (GEN_NOTES(gen) && multi_isname(find_keywords, GEN_NOTES(gen))) {
+				any = TRUE;
+			}
 			
 			for (iter = 0; iter < NUM_GENERIC_STRINGS && !any; ++iter) {
 				if (GEN_STRING(gen, iter) && multi_isname(find_keywords, GEN_STRING(gen, iter))) {
@@ -948,6 +951,9 @@ void free_generic(generic_data *gen) {
 	if (GEN_NAME(gen) && (!proto || GEN_NAME(gen) != GEN_NAME(proto))) {
 		free(GEN_NAME(gen));
 	}
+	if (GEN_NOTES(gen) && (!proto || GEN_NOTES(gen) != GEN_NOTES(proto))) {
+		free(GEN_NOTES(gen));
+	}
 	
 	for (iter = 0; iter < NUM_GENERIC_STRINGS; ++iter) {
 		if (GEN_STRING(gen, iter) && (!proto || GEN_STRING(gen, iter) != GEN_STRING(proto, iter))) {
@@ -1041,6 +1047,11 @@ void parse_generic(FILE *fl, any_vnum vnum) {
 					log(" - error in %s: invalid string pos T%d", error, int_in[0]);
 					free(ptr);
 				}
+				break;
+			}
+			
+			case '_': {	// notes
+				GEN_NOTES(gen) = fread_string(fl, error);
 				break;
 			}
 			
@@ -1200,7 +1211,7 @@ void write_generic_index(FILE *fl) {
 */
 void write_generic_to_file(FILE *fl, generic_data *gen) {
 	struct generic_relation *rel, *next_rel;
-	char temp[256];
+	char temp[MAX_STRING_LENGTH];
 	int iter;
 	
 	if (!fl || !gen) {
@@ -1230,6 +1241,13 @@ void write_generic_to_file(FILE *fl, generic_data *gen) {
 		if (GEN_STRING(gen, iter) && *GEN_STRING(gen, iter)) {
 			fprintf(fl, "T%d\n%s~\n", iter, GEN_STRING(gen, iter));
 		}
+	}
+	
+	// '_'
+	if (GEN_NOTES(gen) && *GEN_NOTES(gen)) {
+		strcpy(temp, GEN_NOTES(gen));
+		strip_crlf(temp);
+		fprintf(fl, "_\n%s~\n", temp);
 	}
 	
 	// end
@@ -1860,6 +1878,9 @@ void save_olc_generic(descriptor_data *desc) {
 	if (GEN_NAME(proto)) {
 		free(GEN_NAME(proto));
 	}
+	if (GEN_NOTES(proto)) {
+		free(GEN_NOTES(proto));
+	}
 	for (iter = 0; iter < NUM_GENERIC_STRINGS; ++iter) {
 		if (GEN_STRING(proto, iter)) {
 			free(GEN_STRING(proto, iter));
@@ -1883,6 +1904,10 @@ void save_olc_generic(descriptor_data *desc) {
 			free(GEN_STRING(gen, iter));
 			GEN_STRING(gen, iter) = NULL;
 		}
+	}
+	if (GEN_NOTES(gen) && !*GEN_NOTES(gen)) {
+		free(GEN_NOTES(gen));
+		GEN_NOTES(gen) = NULL;
 	}
 	
 	// save data back over the proto-type
@@ -1931,6 +1956,7 @@ generic_data *setup_olc_generic(generic_data *input) {
 		
 		// copy things that are pointers
 		GEN_NAME(new) = GEN_NAME(input) ? str_dup(GEN_NAME(input)) : NULL;
+		GEN_NOTES(new) = GEN_NOTES(input) ? str_dup(GEN_NOTES(input)) : NULL;
 		for (iter = 0; iter < NUM_GENERIC_STRINGS; ++iter) {
 			GEN_STRING(new, iter) = GEN_STRING(input, iter) ? str_dup(GEN_STRING(input, iter)) : NULL;
 		}
@@ -2073,6 +2099,10 @@ void do_stat_generic(char_data *ch, generic_data *gen) {
 			break;
 		}
 	}
+	
+	if (GEN_NOTES(gen) && *GEN_NOTES(gen)) {
+		build_page_display(ch, "Notes:\r\n%s", GEN_NOTES(gen));
+	}
 
 	send_page_display(ch);
 }
@@ -2160,6 +2190,8 @@ void olc_show_generic(char_data *ch) {
 			break;
 		}
 	}
+	
+	build_page_display(ch, "<%snotes\t0>\r\n%s", OLC_LABEL_PTR(GEN_NOTES(gen)), NULLSAFE(GEN_NOTES(gen)));
 		
 	send_page_display(ch);
 }
@@ -2219,6 +2251,19 @@ OLC_MODULE(genedit_liquidflags) {
 OLC_MODULE(genedit_name) {
 	generic_data *gen = GET_OLC_GENERIC(ch->desc);
 	olc_process_string(ch, argument, "name", &GEN_NAME(gen));
+}
+
+
+OLC_MODULE(genedit_notes) {
+	generic_data *gen = GET_OLC_GENERIC(ch->desc);
+
+	if (ch->desc->str) {
+		msg_to_char(ch, "You are already editing a string.\r\n");
+	}
+	else {
+		sprintf(buf, "notes for %s", GEN_NAME(gen));
+		start_string_editor(ch->desc, buf, &GEN_NOTES(gen), MAX_NOTES, TRUE);
+	}
 }
 
 

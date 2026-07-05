@@ -43,7 +43,7 @@ S
 #202
 taunt~
 taunt~
-0 5 0
+c 5 0
 M0
 You taunt the nothing in front of you.~
 M1
@@ -153,7 +153,7 @@ S
 #208
 whine~
 whine~
-0 5 0
+c 5 0
 M0
 You whine pitifully.~
 M1
@@ -162,7 +162,7 @@ S
 #209
 whistle~
 whistle~
-0 5 0
+c 5 0
 M0
 You whistle appreciatively.~
 M1
@@ -239,7 +239,7 @@ S
 #214
 yodel~
 yodel~
-0 5 0
+c 5 0
 M0
 You start yodelling loudly and rather beautifully in your own ears.~
 M1
@@ -278,7 +278,7 @@ S
 #217
 hmm~
 hmm~
-0 5 0
+c 5 0
 M0
 You hmmmm... out loud.~
 M1
@@ -287,7 +287,7 @@ S
 #218
 sob~
 sob~
-b 5 0
+bc 5 0
 M0
 You sob miserably.~
 M1
@@ -296,7 +296,7 @@ S
 #219
 bark~
 bark~
-0 5 0
+c 5 0
 M0
 You get down on all fours and bark like a dog.~
 M1
@@ -313,7 +313,7 @@ S
 #220
 meow~
 meow~
-0 5 0
+c 5 0
 M0
 You meow like a small cat.~
 M1
@@ -330,7 +330,7 @@ S
 #221
 moo~
 moo~
-0 5 0
+c 5 0
 M0
 You say, 'Mooooooooooooo!'~
 M1
@@ -347,7 +347,7 @@ S
 #222
 blonde~
 blonde~
-0 5 0
+c 5 0
 M0
 You declare, 'Life's a blonde and then you dye.'~
 M1
@@ -383,7 +383,7 @@ S
 #224
 addict~
 addict~
-0 5 0
+c 5 0
 M0
 Who is an addict now?~
 M2
@@ -458,7 +458,7 @@ S
 #229
 shriek~
 shriek~
-0 5 0
+c 5 0
 M0
 You SHRIEK!~
 M1
@@ -522,7 +522,7 @@ S
 #233
 bonk~
 bonk~
-0 5 0
+c 5 0
 M0
 You look around for someone to bonk.~
 M1
@@ -539,6 +539,10 @@ M6
 You bonk yourself over the head, resulting in a hollow echo.~
 M7
 $n bonks $mself over the head, resulting in a hollow echo.~
+M8
+You look around for someone to bonk.~
+M9
+$n looks around for someone to bonk.~
 S
 #234
 bodyslam~
@@ -588,7 +592,7 @@ S
 #237
 boast~
 boast~
-b 5 0
+bc 5 0
 M0
 You boast about your abilities.~
 M1
@@ -597,7 +601,7 @@ S
 #238
 brag~
 brag~
-0 5 0
+c 5 0
 M0
 You brag about how much better you are than anyone else.~
 M1
@@ -621,7 +625,7 @@ S
 #240
 fubar~
 fubar~
-0 5 0
+c 5 0
 M0
 You declare the situation to be f*'d up beyond all recognition.~
 M1
@@ -642,7 +646,7 @@ S
 #241
 wtf~
 wtf~
-0 5 0
+c 5 0
 M0
 You shout, 'WHAT THE F***?!?'~
 M1
@@ -663,7 +667,7 @@ S
 #242
 pinch~
 pinch~
-0 5 0
+c 5 0
 M0
 You look around for someone to pinch.~
 M1
@@ -680,11 +684,15 @@ M6
 Thinking you're dreaming, you pinch yourself. Ouch.~
 M7
 $n pinches $mself. Maybe $e thinks $e's dreaming.~
+M8
+You look around for someone to pinch.~
+M9
+$n looks as though $e may pinch somebody.~
 S
 #243
 cheer~
 cheer~
-0 5 0
+c 5 0
 M0
 You cheer enthusiastically!~
 M1
@@ -972,7 +980,7 @@ S
 #259
 lmao~
 lmao~
-0 5 5
+c 5 5
 M0
 You laugh so hard you feel like your ass might fall off.~
 M1
@@ -993,7 +1001,7 @@ S
 #260
 fomo~
 fomo~
-0 5 5
+c 5 5
 M0
 You check anxiously for pigeons, feeling a pang of FOMO.~
 M1
@@ -1010,7 +1018,7 @@ S
 #261
 ijbol~
 ijbol~
-0 5 5
+c 5 5
 M0
 You just burst out laughing.~
 M1

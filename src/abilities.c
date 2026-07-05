@@ -9377,6 +9377,9 @@ void free_ability(ability_data *abil) {
 	if (ABIL_COMMAND(abil) && (!proto || ABIL_COMMAND(abil) != ABIL_COMMAND(proto))) {
 		free(ABIL_COMMAND(abil));
 	}
+	if (ABIL_NOTES(abil) && (!proto || ABIL_NOTES(abil) != ABIL_NOTES(proto))) {
+		free(ABIL_NOTES(abil));
+	}
 	if (ABIL_RESOURCE_COST(abil) && (!proto || ABIL_RESOURCE_COST(abil) != ABIL_RESOURCE_COST(proto))) {
 		free_resource_list(ABIL_RESOURCE_COST(abil));
 	}
@@ -9778,6 +9781,10 @@ void parse_ability(FILE *fl, any_vnum vnum) {
 				}
 				break;
 			}
+			case '_': {	// notes
+				ABIL_NOTES(abil) = fread_string(fl, error);
+				break;
+			}
 			
 			// end
 			case 'S': {
@@ -9876,7 +9883,7 @@ void write_ability_index(FILE *fl) {
 * @param ability_data *abil The thing to save.
 */
 void write_ability_to_file(FILE *fl, ability_data *abil) {
-	char temp[256], temp2[256], temp3[256], temp4[256];
+	char temp[MAX_STRING_LENGTH], temp2[256], temp3[256], temp4[256];
 	struct ability_data_list *adl;
 	struct ability_hook *ahook;
 	struct ability_type *at;
@@ -9965,6 +9972,13 @@ void write_ability_to_file(FILE *fl, ability_data *abil) {
 		fprintf(fl, "X+ 10 %d\n", ABIL_MOVE_TYPE(abil));
 	}
 	// former 'X' type is no longer used; replaced by X+
+	
+	// '_'
+	if (ABIL_NOTES(abil) && *ABIL_NOTES(abil)) {
+		strcpy(temp, ABIL_NOTES(abil));
+		strip_crlf(temp);
+		fprintf(fl, "_\n%s~\n", temp);
+	}
 	
 	// end
 	fprintf(fl, "S\n");
@@ -10669,7 +10683,7 @@ void olc_fullsearch_abil(char_data *ch, char *argument) {
 				continue;
 			}
 		}
-		if (*find_keywords && !multi_isname(find_keywords, ABIL_NAME(abil)) && !multi_isname(find_keywords, NULLSAFE(ABIL_COMMAND(abil))) && !search_custom_messages(find_keywords, ABIL_CUSTOM_MSGS(abil))) {
+		if (*find_keywords && !multi_isname(find_keywords, ABIL_NAME(abil)) && !multi_isname(find_keywords, NULLSAFE(ABIL_COMMAND(abil))) && (!ABIL_NOTES(abil) || !multi_isname(find_keywords, ABIL_NOTES(abil))) && !search_custom_messages(find_keywords, ABIL_CUSTOM_MSGS(abil))) {
 			continue;
 		}
 		
@@ -10736,6 +10750,9 @@ void save_olc_ability(descriptor_data *desc) {
 	if (ABIL_COMMAND(proto)) {
 		free(ABIL_COMMAND(proto));
 	}
+	if (ABIL_NOTES(proto)) {
+		free(ABIL_NOTES(proto));
+	}
 	while ((adl = ABIL_DATA(proto))) {
 		ABIL_DATA(proto) = adl->next;
 		free(adl);
@@ -10755,6 +10772,10 @@ void save_olc_ability(descriptor_data *desc) {
 	if (ABIL_COMMAND(abil) && !*ABIL_COMMAND(abil)) {
 		free(ABIL_COMMAND(abil));	// don't allow empty
 		ABIL_COMMAND(abil) = NULL;
+	}
+	if (ABIL_NOTES(abil) && !*ABIL_NOTES(abil)) {
+		free(ABIL_NOTES(abil));
+		ABIL_NOTES(abil) = NULL;
 	}
 	
 	// save data back over the proto-type
@@ -10807,12 +10828,14 @@ ability_data *setup_olc_ability(ability_data *input) {
 		ABIL_TYPE_LIST(new) = copy_ability_type_list(ABIL_TYPE_LIST(input));
 		ABIL_NAME(new) = ABIL_NAME(input) ? str_dup(ABIL_NAME(input)) : NULL;
 		ABIL_COMMAND(new) = ABIL_COMMAND(input) ? str_dup(ABIL_COMMAND(input)) : NULL;
+		ABIL_NOTES(new) = ABIL_NOTES(input) ? str_dup(ABIL_NOTES(input)) : NULL;
 		ABIL_RESOURCE_COST(new) = copy_resource_list(ABIL_RESOURCE_COST(input));
 		ABIL_CUSTOM_MSGS(new) = copy_custom_messages(ABIL_CUSTOM_MSGS(input));
 		ABIL_APPLIES(new) = copy_apply_list(ABIL_APPLIES(input));
 		ABIL_DATA(new) = copy_data_list(ABIL_DATA(input));
 		ABIL_INTERACTIONS(new) = copy_interaction_list(ABIL_INTERACTIONS(input));
 		ABIL_HOOKS(new) = copy_ability_hooks(ABIL_HOOKS(input));
+		ABIL_NOTES(new) = ABIL_NOTES(input) ? str_dup(ABIL_NOTES(input)) : NULL;
 		
 		// unassign this data:
 		ABIL_ASSIGNED_SKILL(new) = NULL;
@@ -11278,6 +11301,10 @@ void do_stat_ability(char_data *ch, ability_data *abil, bool details) {
 		}
 	}
 	
+	if (ABIL_NOTES(abil) && *ABIL_NOTES(abil)) {
+		build_page_display(ch, "Notes:\r\n%s", ABIL_NOTES(abil));
+	}
+	
 	send_page_display(ch);
 }
 
@@ -11473,6 +11500,8 @@ void olc_show_ability(char_data *ch) {
 	LL_FOREACH(ABIL_DATA(abil), adl) {
 		build_page_display(ch, " \ty%d\t0. %s", ++count, ability_data_display(adl));
 	}
+	
+	build_page_display(ch, "<%snotes\t0>\r\n%s", OLC_LABEL_PTR(ABIL_NOTES(abil)), NULLSAFE(ABIL_NOTES(abil)));
 	
 	send_page_display(ch);
 }
@@ -12482,6 +12511,19 @@ OLC_MODULE(abiledit_movetype) {
 OLC_MODULE(abiledit_name) {
 	ability_data *abil = GET_OLC_ABILITY(ch->desc);
 	olc_process_string(ch, argument, "name", &ABIL_NAME(abil));
+}
+
+
+OLC_MODULE(abiledit_notes) {
+	ability_data *abil = GET_OLC_ABILITY(ch->desc);
+
+	if (ch->desc->str) {
+		msg_to_char(ch, "You are already editing a string.\r\n");
+	}
+	else {
+		sprintf(buf, "notes for %s", ABIL_NAME(abil));
+		start_string_editor(ch->desc, buf, &ABIL_NOTES(abil), MAX_NOTES, TRUE);
+	}
 }
 
 

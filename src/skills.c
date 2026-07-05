@@ -3150,6 +3150,9 @@ void olc_fullsearch_skill(char_data *ch, char *argument) {
 			else if (multi_isname(find_keywords, SKILL_ABBREV(sk))) {
 				any = TRUE;
 			}
+			else if (SKILL_NOTES(sk) && multi_isname(find_keywords, SKILL_NOTES(sk))) {
+				any = TRUE;
+			}
 			
 			// did we find a match in any string
 			if (!any) {
@@ -3562,6 +3565,9 @@ void free_skill(skill_data *skill) {
 	if (SKILL_DESC(skill) && (!proto || SKILL_DESC(skill) != SKILL_DESC(proto))) {
 		free(SKILL_DESC(skill));
 	}
+	if (SKILL_NOTES(skill) && (!proto || SKILL_NOTES(skill) != SKILL_NOTES(proto))) {
+		free(SKILL_NOTES(skill));
+	}
 	if (SKILL_ABILITIES(skill) && (!proto || SKILL_ABILITIES(skill) != SKILL_ABILITIES(proto))) {
 		free_skill_abilities(SKILL_ABILITIES(skill));
 	}
@@ -3663,6 +3669,11 @@ void parse_skill(FILE *fl, any_vnum vnum) {
 				break;
 			}
 			
+			case '_': {	// notes
+				SKILL_NOTES(skill) = fread_string(fl, error);
+				break;
+			}
+			
 			// end
 			case 'S': {
 				return;
@@ -3703,6 +3714,7 @@ void write_skill_index(FILE *fl) {
 * @param skill_data *skill The thing to save.
 */
 void write_skill_to_file(FILE *fl, skill_data *skill) {
+	char temp[MAX_STRING_LENGTH];
 	struct synergy_ability *syn;
 	struct skill_ability *iter;
 	
@@ -3732,6 +3744,13 @@ void write_skill_to_file(FILE *fl, skill_data *skill) {
 	// Y: synergies
 	LL_FOREACH(SKILL_SYNERGIES(skill), syn) {
 		fprintf(fl, "Y %d %d %d %d %d\n", syn->role, syn->skill, syn->level, syn->ability, syn->unused);
+	}
+	
+	// '_'
+	if (SKILL_NOTES(skill) && *SKILL_NOTES(skill)) {
+		strcpy(temp, SKILL_NOTES(skill));
+		strip_crlf(temp);
+		fprintf(fl, "_\n%s~\n", temp);
 	}
 	
 	// end
@@ -4030,6 +4049,9 @@ void save_olc_skill(descriptor_data *desc) {
 	if (SKILL_DESC(proto)) {
 		free(SKILL_DESC(proto));
 	}
+	if (SKILL_NOTES(proto)) {
+		free(SKILL_NOTES(proto));
+	}
 	free_skill_abilities(SKILL_ABILITIES(proto));
 	free_synergy_abilities(SKILL_SYNERGIES(proto));
 	
@@ -4051,6 +4073,10 @@ void save_olc_skill(descriptor_data *desc) {
 			free(SKILL_DESC(skill));
 		}
 		SKILL_DESC(skill) = str_dup(default_skill_desc);
+	}
+	if (SKILL_NOTES(skill) && !*SKILL_NOTES(skill)) {
+		free(SKILL_NOTES(skill));
+		SKILL_NOTES(skill) = NULL;
 	}
 	
 	// save data back over the proto-type
@@ -4096,6 +4122,7 @@ skill_data *setup_olc_skill(skill_data *input) {
 		SKILL_NAME(new) = SKILL_NAME(input) ? str_dup(SKILL_NAME(input)) : NULL;
 		SKILL_ABBREV(new) = SKILL_ABBREV(input) ? str_dup(SKILL_ABBREV(input)) : NULL;
 		SKILL_DESC(new) = SKILL_DESC(input) ? str_dup(SKILL_DESC(input)) : NULL;
+		SKILL_NOTES(new) = SKILL_NOTES(input) ? str_dup(SKILL_NOTES(input)) : NULL;
 		SKILL_ABILITIES(new) = copy_skill_abilities(SKILL_ABILITIES(input));
 		SKILL_SYNERGIES(new) = copy_synergy_abilities(SKILL_SYNERGIES(input));
 	}
@@ -4327,6 +4354,10 @@ void do_stat_skill(char_data *ch, skill_data *skill) {
 		build_page_display_str(ch, part);
 	}
 	
+	if (SKILL_NOTES(skill) && *SKILL_NOTES(skill)) {
+		build_page_display(ch, "Notes:\r\n%s", SKILL_NOTES(skill));
+	}
+	
 	send_page_display(ch);
 }
 
@@ -4376,6 +4407,8 @@ void olc_show_skill(char_data *ch) {
 			build_page_display_str(ch, lbuf);
 		}
 	}
+	
+	build_page_display(ch, "<%snotes\t0>\r\n%s", OLC_LABEL_PTR(SKILL_NOTES(skill)), NULLSAFE(SKILL_NOTES(skill)));
 	
 	send_page_display(ch);
 }
@@ -4493,6 +4526,19 @@ OLC_MODULE(skilledit_mindrop) {
 OLC_MODULE(skilledit_name) {
 	skill_data *skill = GET_OLC_SKILL(ch->desc);
 	olc_process_string(ch, argument, "name", &SKILL_NAME(skill));
+}
+
+
+OLC_MODULE(skilledit_notes) {
+	skill_data *skill = GET_OLC_SKILL(ch->desc);
+
+	if (ch->desc->str) {
+		msg_to_char(ch, "You are already editing a string.\r\n");
+	}
+	else {
+		sprintf(buf, "notes for %s", SKILL_NAME(skill));
+		start_string_editor(ch->desc, buf, &SKILL_NOTES(skill), MAX_NOTES, TRUE);
+	}
 }
 
 

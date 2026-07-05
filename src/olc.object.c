@@ -777,12 +777,12 @@ void olc_delete_object(char_data *ch, obj_vnum vnum) {
 	// update mobs
 	HASH_ITER(hh, mobile_table, mob, next_mob) {
 		// interactions
-		found = delete_from_interaction_list(&mob->interactions, TYPE_OBJ, vnum);
+		found = delete_from_interaction_list(&MOB_INTERACTIONS(mob), TYPE_OBJ, vnum);
 		
 		// corpse
 		if (MOB_CUSTOM_CORPSE(mob) == vnum) {
 			found |= TRUE;
-			MOB_CUSTOM_CORPSE(mob) = NOTHING;
+			SET_CUSTOM_CORPSE(mob, NOTHING);
 		}
 		
 		if (found) {
@@ -1029,12 +1029,12 @@ void olc_delete_object(char_data *ch, obj_vnum vnum) {
 		}
 		if (GET_OLC_MOBILE(desc)) {
 			// interactions
-			found = delete_from_interaction_list(&GET_OLC_MOBILE(desc)->interactions, TYPE_OBJ, vnum);
+			found = delete_from_interaction_list(&MOB_INTERACTIONS(GET_OLC_MOBILE(desc)), TYPE_OBJ, vnum);
 			
 			// corpse
 			if (MOB_CUSTOM_CORPSE(GET_OLC_MOBILE(desc)) == vnum) {
 				found |= TRUE;
-				MOB_CUSTOM_CORPSE(GET_OLC_MOBILE(desc)) = NOTHING;
+				SET_CUSTOM_CORPSE(GET_OLC_MOBILE(desc), NOTHING);
 			}
 			
 			if (found) {
@@ -1377,7 +1377,7 @@ void olc_fullsearch_obj(char_data *ch, char *argument) {
 				continue;
 			}
 		}
-		if (*find_keywords && !multi_isname(find_keywords, GET_OBJ_KEYWORDS(obj)) && !multi_isname(find_keywords, GET_OBJ_SHORT_DESC(obj)) && !multi_isname(find_keywords, GET_OBJ_LONG_DESC(obj)) && !multi_isname(find_keywords, NULLSAFE(GET_OBJ_ACTION_DESC(obj))) && !search_custom_messages(find_keywords, GET_OBJ_CUSTOM_MSGS(obj)) && !search_extra_descs(find_keywords, GET_OBJ_EX_DESCS(obj))) {
+		if (*find_keywords && !multi_isname(find_keywords, GET_OBJ_KEYWORDS(obj)) && !multi_isname(find_keywords, GET_OBJ_SHORT_DESC(obj)) && !multi_isname(find_keywords, GET_OBJ_LONG_DESC(obj)) && !multi_isname(find_keywords, NULLSAFE(GET_OBJ_ACTION_DESC(obj))) && (!GET_OBJ_NOTES(obj) || !multi_isname(find_keywords, GET_OBJ_NOTES(obj))) && !search_custom_messages(find_keywords, GET_OBJ_CUSTOM_MSGS(obj)) && !search_extra_descs(find_keywords, GET_OBJ_EX_DESCS(obj))) {
 			continue;
 		}
 		
@@ -1604,7 +1604,7 @@ void olc_search_obj(char_data *ch, obj_vnum vnum) {
 		}
 		
 		// interactions
-		for (inter = mob->interactions; inter && !any; inter = inter->next) {
+		for (inter = MOB_INTERACTIONS(mob); inter && !any; inter = inter->next) {
 			if (interact_data[inter->type].vnum_type == TYPE_OBJ && inter->vnum == vnum) {
 				any = TRUE;
 				++found;
@@ -1887,6 +1887,12 @@ void save_olc_object(descriptor_data *desc) {
 	}
 	free_obj_proto_data(proto->proto_data);
 	
+	// sanity
+	if (GET_OBJ_NOTES(obj) && !*GET_OBJ_NOTES(obj)) {
+		free(obj->proto_data->notes);
+		obj->proto_data->notes = NULL;
+	}
+	
 	// old applies
 	free_obj_apply_list(GET_OBJ_APPLIES(proto));
 	GET_OBJ_APPLIES(proto) = NULL;
@@ -2016,6 +2022,7 @@ obj_data *setup_olc_object(obj_data *input) {
 		new->proto_data->custom_msgs = copy_custom_messages(input->proto_data->custom_msgs);
 		new->proto_data->interactions = copy_interaction_list(input->proto_data->interactions);
 		new->proto_data->storage = copy_storage(input->proto_data->storage);
+		new->proto_data->notes = GET_OBJ_NOTES(input) ? str_dup(GET_OBJ_NOTES(input)) : NULL;
 		// don't keep quest_lookups or shop_lookups
 		new->proto_data->quest_lookups = NULL;
 		new->proto_data->shop_lookups = NULL;
@@ -2525,6 +2532,8 @@ void olc_show_object(char_data *ch) {
 	if (GET_OBJ_SCRIPTS(obj)) {
 		show_script_display(ch, GET_OBJ_SCRIPTS(obj), FALSE);
 	}
+	
+	build_page_display(ch, "<%snotes\t0>\r\n%s", OLC_LABEL_PTR(GET_OBJ_NOTES(obj)), NULLSAFE(GET_OBJ_NOTES(obj)));
 	
 	send_page_display(ch);
 }
@@ -3229,6 +3238,19 @@ OLC_MODULE(oedit_minlevel) {
 	obj_data *obj = GET_OLC_OBJECT(ch->desc);
 	
 	obj->proto_data->min_scale_level = olc_process_number(ch, argument, "minimum level", "minlevel", 0, MAX_INT, GET_OBJ_MIN_SCALE_LEVEL(obj));
+}
+
+
+OLC_MODULE(oedit_notes) {
+	obj_data *obj = GET_OLC_OBJECT(ch->desc);
+
+	if (ch->desc->str) {
+		msg_to_char(ch, "You are already editing a string.\r\n");
+	}
+	else {
+		sprintf(buf, "notes for %s", GET_OBJ_SHORT_DESC(obj));
+		start_string_editor(ch->desc, buf, &(obj->proto_data->notes), MAX_NOTES, TRUE);
+	}
 }
 
 

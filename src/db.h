@@ -648,11 +648,13 @@ void init_player(char_data *ch);
 char_data *read_mobile(mob_vnum nr, bool with_triggers);
 char_data *mob_proto(mob_vnum vnum);
 void clear_char(char_data *ch);
+void clear_mob_proto_data(char_data *ch);
 void init_player_specials(char_data *ch);
 int pick_generic_name(int name_set, int sex);
 void remove_mobile_from_table(char_data *mob);
 void reset_char(char_data *ch);
 void free_char(char_data *ch);
+void free_mob_proto_data(struct mob_proto_data *data);
 void set_title(char_data *ch, char *title);
 int sort_mobiles(char_data *a, char_data *b);
 

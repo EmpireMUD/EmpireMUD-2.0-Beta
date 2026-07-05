@@ -2773,6 +2773,7 @@ typedef enum {
 // SOC_x: Social flags
 #define SOC_IN_DEVELOPMENT  BIT(0)	// a. can't be used by players
 #define SOC_HIDE_IF_INVIS  BIT(1)	// b. no "Someone" if player can't be seen
+#define SOC_NOISY  BIT(2)	// c. cannot be used in SILENT contexts
 
 
 // SOCM_x: social message string
@@ -2784,7 +2785,9 @@ typedef enum {
 #define SOCM_TARGETED_NOT_FOUND  5
 #define SOCM_SELF_TO_CHAR  6
 #define SOCM_SELF_TO_OTHERS  7
-#define NUM_SOCM_MESSAGES  8	// total
+#define SOCM_SILENT_TO_CHAR  8
+#define SOCM_SILENT_TO_OTHERS  9
+#define NUM_SOCM_MESSAGES  10	// total
 
 
  //////////////////////////////////////////////////////////////////////////////
@@ -3379,6 +3382,8 @@ struct global_data {
 	struct archetype_gear *gear;	// GLOBAL_NEWBIE_GEAR
 	struct spawn_info *spawns;	// GLOBAL_MAP_SPAWNS
 	
+	char *notes;	// misc notes shown only to imms
+	
 	UT_hash_handle hh;
 };
 
@@ -3492,7 +3497,7 @@ struct morph_data {
 	bitvector_t flags;	// MORPHF_ flags
 	bitvector_t affects;	// AFF_ flags added
 	int attack_type;	// TYPE_ const
-	int move_type;	// MOVE_TYPE_ const
+	int move_type;	// MOB_MOVE_ const
 	int size;	// SIZE_ const for this form
 	struct apply_data *applies;	// how it modifies players
 	
@@ -3501,6 +3506,8 @@ struct morph_data {
 	any_vnum ability;	// required ability or NO_ABIL
 	obj_vnum requires_obj;	// required item or NOTHING
 	int max_scale;	// highest possible level
+	
+	char *notes;	// misc notes shown only to imms
 	
 	UT_hash_handle hh;	// morph_table hash
 	UT_hash_handle sorted_hh;	// sorted_morphs hash
@@ -3635,6 +3642,8 @@ struct skill_data {
 	struct skill_ability *abilities;	// assigned abilities
 	struct synergy_ability *synergies;	// LL of abilities gained from paired skills
 	
+	char *notes;	// misc notes shown only to imms
+	
 	UT_hash_handle hh;	// skill_table hash handle
 	UT_hash_handle sorted_hh;	// sorted_skills hash handle
 };
@@ -3761,6 +3770,8 @@ struct ability_data {
 	bitvector_t immunities;	// AFF_ flags that block this ability
 	bitvector_t gain_hooks;	// AGH_ flags
 	bitvector_t requires_tool;	// TOOL_ flags required to use it
+	
+	char *notes;	// misc notes shown only to imms
 	
 	// command-related data
 	char *command;	// if ability has a command
@@ -3908,6 +3919,8 @@ struct adventure_data {
 	char *author;
 	char *description;
 	
+	char *notes;	// misc notes shown only to imms
+	
 	// numeric data
 	rmt_vnum start_vnum, end_vnum;	// room template vnum range (inclusive)
 	int min_level, max_level;	// level range
@@ -4031,6 +4044,8 @@ struct room_template {
 	struct quest_lookup *quest_lookups;
 	struct shop_lookup *shop_lookups;
 	
+	char *notes;	// misc notes shown only to imms
+	
 	UT_hash_handle hh;	// room_template_table hash
 };
 
@@ -4055,6 +4070,8 @@ struct archetype_data {
 	struct archetype_skill *skills;	// linked list
 	struct archetype_gear *gear;	// linked list
 	int attributes[NUM_ATTRIBUTES];	// starting attributes (default 1)
+	
+	char *notes;	// misc notes shown only to imms
 	
 	UT_hash_handle hh;	// archetype_table hash handle
 	UT_hash_handle sorted_hh;	// sorted_archetypes hash handle
@@ -4163,6 +4180,8 @@ struct augment_data {
 	struct apply_data *applies;	// how it modifies items
 	struct resource_data *resources;	// resources required
 	
+	char *notes;	// misc notes shown only to imms
+	
 	UT_hash_handle hh;	// augment_table hash
 	UT_hash_handle sorted_hh;	// sorted_augments hash
 };
@@ -4201,6 +4220,8 @@ struct book_data {
 	char *item_description;
 	
 	struct paragraph_data *paragraphs;	// linked list
+	
+	char *notes;	// misc notes shown only to imms
 	
 	UT_hash_handle hh;	// book_table
 };
@@ -4260,6 +4281,8 @@ struct bld_data {
 	struct resource_data *regular_maintenance;	// needed each reset cycle
 	struct bld_relation *relations;	// links to buildings/vehicles
 	
+	char *notes;	// misc notes shown only to imms
+	
 	// live data (not saved, not freed)
 	struct quest_lookup *quest_lookups;
 	struct shop_lookup *shop_lookups;
@@ -4290,6 +4313,8 @@ struct class_data {
 	int pools[NUM_POOLS];	// health/etc values at 100
 	struct class_skill_req *skill_requirements;	// linked list
 	struct class_ability *abilities;	// linked list
+	
+	char *notes;	// misc notes shown only to imms
 	
 	UT_hash_handle hh;	// ability_table hash handle
 	UT_hash_handle sorted_hh;	// sorted_abilities hash handle
@@ -4351,21 +4376,14 @@ struct map_file_data_v1 {
 // Specials used by NPCs, not PCs
 struct mob_special_data {
 	int current_scale_level;	// level the mob was scaled to, or -1 for not scaled
-	int min_scale_level;	// minimum level this mob may be scaled to
-	int max_scale_level;	// maximum level this mob may be scaled to
 	
-	int name_set;	// NAMES_x
 	any_vnum language;	// default language (NOTHING to use global default instead)
-	struct custom_message *custom_msgs;	// any custom messages
 	faction_data *faction;	// if any
-	obj_vnum custom_corpse;	// obj vnum for the mob's corpse
 	
 	int to_hit;	// Mob's attack % bonus
 	int to_dodge;	// Mob's dodge % bonus
 	int damage;	// Raw damage
 	int	attack_type;	// weapon type
-	
-	byte move_type;	// how the mob moves
 	
 	struct pursuit_data *pursuit;	// mob pursuit
 	room_vnum pursuit_leash_loc;	// where to return to
@@ -5121,8 +5139,8 @@ struct char_data {
 	struct char_special_data char_specials;	// PC/NPC specials
 	struct player_special_data *player_specials;	// PC specials
 	struct mob_special_data mob_specials;	// NPC specials
-	struct interaction_item *interactions;	// mob interaction items
 	struct cooldown_data *cooldowns;	// ability cooldowns
+	struct mob_proto_data *proto_data;	// data that doesn't change
 	
 	struct affected_type *affected;	// affected by what spells
 	struct over_time_effect_type *over_time_effects;	// damage-over-time effects
@@ -5148,8 +5166,6 @@ struct char_data {
 	struct group_data *group;	// Character's Group
 	
 	// live data (not saved, not freed)
-	struct quest_lookup *quest_lookups;
-	struct shop_lookup *shop_lookups;
 	bool customized;	// mob strings need saving if TRUE
 	sh_int lights;	// number of lights on the character
 	
@@ -5204,6 +5220,25 @@ struct follow_type {
 };
 
 
+// mob properties that cannot change from the prototype
+struct mob_proto_data {
+	obj_vnum custom_corpse;	// obj vnum for the mob's corpse
+	int max_scale_level;	// maximum level this mob may be scaled to
+	int min_scale_level;	// minimum level this mob may be scaled to
+	int move_type;	// MOB_MOVE_ type for how the mob moves
+	int name_set;	// the id for a NAMES_ namelist
+	
+	struct custom_message *custom_msgs;	// any custom messages	
+	struct interaction_item *interactions;	// mob interaction items
+	
+	char *notes;	// misc notes shown only to imms
+	
+	// lookup helpers
+	struct quest_lookup *quest_lookups;
+	struct shop_lookup *shop_lookups;
+};
+
+
 // For a person's lore
 struct lore_data {
 	int type;	// LORE_
@@ -5237,10 +5272,13 @@ struct craft_data {
 	bitvector_t build_on;	// BLD_ON_ flags for the tile it's built upon
 	bitvector_t build_facing;	// BLD_ON_ flags for the tile it's facing
 	
+	// requirements
 	bitvector_t requires_tool;	// any TOOL_ flags required to make this
 	obj_vnum requires_obj;	// only shows up if you have the item
 	bitvector_t requires_function;	// FNC_
 	struct resource_data *resources;	// linked list
+	
+	char *notes;	// misc notes shown only to imms
 	
 	UT_hash_handle hh;	// craft_table hash
 	UT_hash_handle sorted_hh;	// sorted_crafts hash
@@ -5281,6 +5319,8 @@ struct crop_data {
 	struct spawn_info *spawns;	// mob spawn data
 	struct interaction_item *interactions;	// interaction items
 	struct extra_descr_data *ex_description;	// extra descriptions
+	
+	char *notes;	// misc notes shown only to imms
 	
 	UT_hash_handle hh;	// crop_table hash
 };
@@ -5900,6 +5940,8 @@ struct faction_data {
 	// optional traits
 	int rep_loss_per_kill;	// amount of change when killing a mob of this faction
 	
+	char *notes;	// misc notes shown only to imms
+	
 	// lists
 	UT_hash_handle hh;	// faction_table hash handle
 	UT_hash_handle sorted_hh;	// sorted_factions hash handle
@@ -5956,6 +5998,8 @@ struct generic_data {
 	struct generic_relation *relations;	// set in OLC
 	struct generic_relation *computed_relations;	// determined at runtime (expanded list)
 	
+	char *notes;	// misc notes shown only to imms
+	
 	UT_hash_handle hh;	// generic_table hash
 	UT_hash_handle sorted_hh;	// sorted_generics hash
 };
@@ -6009,6 +6053,8 @@ struct obj_proto_data {
 	struct custom_message *custom_msgs;	// any custom messages
 	struct interaction_item *interactions;	// interaction items
 	struct obj_storage_type *storage;	// linked list of where an obj can be stored
+	
+	char *notes;	// misc notes shown only to imms
 	
 	// lookup tables
 	struct quest_lookup *quest_lookups;
@@ -6102,6 +6148,8 @@ struct progress_data {
 	struct req_data *tasks;	// linked list of tasks to complete
 	struct progress_perk *perks;	// linked list of perks granted
 	
+	char *notes;	// misc notes shown only to imms
+	
 	UT_hash_handle hh;	// progress_table
 	UT_hash_handle sorted_hh;	// sorted_progress
 };
@@ -6150,6 +6198,8 @@ struct quest_data {
 	bool daily_active;	// if FALSE, quest is not available today
 	
 	struct trig_proto_list *proto_script;	// quest triggers
+	
+	char *notes;	// misc notes shown only to imms
 	
 	UT_hash_handle hh;	// hash handle for quest_table
 };
@@ -6289,6 +6339,8 @@ struct shop_data {
 	struct quest_giver *locations;	// shop locs
 	struct shop_item *items;	// for sale
 	
+	char *notes;	// misc notes shown only to imms
+	
 	UT_hash_handle hh;	// shop_table hash handle
 };
 
@@ -6338,6 +6390,8 @@ struct social_data {
 	struct req_data *requirements;	// linked list of requirements
 	
 	char *message[NUM_SOCM_MESSAGES];	// strings
+	
+	char *notes;	// misc notes shown only to imms
 	
 	UT_hash_handle hh;	// social_table hash
 	UT_hash_handle sorted_hh;	// sorted_socials hash
@@ -6408,8 +6462,7 @@ struct vehicle_data {
 	// lists
 	struct vehicle_data *prev, *next;	// vehicle_list (global) doubly-linked list
 	struct vehicle_data *prev_in_room, *next_in_room;	// ROOM_VEHICLES(room) doubly-linked list
-	struct quest_lookup *quest_lookups;
-	struct shop_lookup *shop_lookups;
+	
 	UT_hash_handle hh;	// vehicle_table hash handle
 };
 
@@ -6441,6 +6494,11 @@ struct vehicle_attribute_data {
 	struct custom_message *custom_msgs;	// any custom messages
 	struct bld_relation *relations;	// links to buildings/vehicles
 	int height;	// 0+ addition to terrain height
+	
+	char *notes;	// misc notes shown only to imms
+	
+	struct quest_lookup *quest_lookups;
+	struct shop_lookup *shop_lookups;
 };
 
 

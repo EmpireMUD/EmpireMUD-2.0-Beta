@@ -82,6 +82,7 @@ OLC_MODULE(abiledit_maxstacks);
 OLC_MODULE(abiledit_minposition);
 OLC_MODULE(abiledit_movetype);
 OLC_MODULE(abiledit_name);
+OLC_MODULE(abiledit_notes);
 OLC_MODULE(abiledit_pooltype);
 OLC_MODULE(abiledit_resourcecost);
 OLC_MODULE(abiledit_scale);
@@ -113,6 +114,7 @@ OLC_MODULE(advedit_linking);
 OLC_MODULE(advedit_maxlevel);
 OLC_MODULE(advedit_minlevel);
 OLC_MODULE(advedit_name);
+OLC_MODULE(advedit_notes);
 OLC_MODULE(advedit_playerlimit);
 OLC_MODULE(advedit_reset);
 OLC_MODULE(advedit_script);
@@ -130,6 +132,7 @@ OLC_MODULE(archedit_language);
 OLC_MODULE(archedit_lore);
 OLC_MODULE(archedit_malerank);
 OLC_MODULE(archedit_name);
+OLC_MODULE(archedit_notes);
 OLC_MODULE(archedit_skill);
 OLC_MODULE(archedit_type);
 
@@ -144,6 +147,7 @@ OLC_MODULE(attackedit_firstperson);
 OLC_MODULE(attackedit_flags);
 OLC_MODULE(attackedit_message);
 OLC_MODULE(attackedit_name);
+OLC_MODULE(attackedit_notes);
 OLC_MODULE(attackedit_normal);
 OLC_MODULE(attackedit_noun);
 OLC_MODULE(attackedit_slow);
@@ -168,6 +172,7 @@ OLC_MODULE(augedit_ability);
 OLC_MODULE(augedit_apply);
 OLC_MODULE(augedit_flags);
 OLC_MODULE(augedit_name);
+OLC_MODULE(augedit_notes);
 OLC_MODULE(augedit_requiresobject);
 OLC_MODULE(augedit_resource);
 OLC_MODULE(augedit_type);
@@ -179,6 +184,7 @@ OLC_MODULE(booked_byline);
 OLC_MODULE(booked_item_description);
 OLC_MODULE(booked_item_name);
 OLC_MODULE(booked_license);
+OLC_MODULE(booked_notes);
 OLC_MODULE(booked_paragraphs);
 OLC_MODULE(booked_title);
 
@@ -201,6 +207,7 @@ OLC_MODULE(bedit_icon);
 OLC_MODULE(bedit_interaction);
 OLC_MODULE(bedit_military);
 OLC_MODULE(bedit_name);
+OLC_MODULE(bedit_notes);
 OLC_MODULE(bedit_quarter_icon);
 OLC_MODULE(bedit_relations);
 OLC_MODULE(bedit_resource);
@@ -216,6 +223,7 @@ OLC_MODULE(classedit_maxhealth);
 OLC_MODULE(classedit_maxmana);
 OLC_MODULE(classedit_maxmoves);
 OLC_MODULE(classedit_name);
+OLC_MODULE(classedit_notes);
 OLC_MODULE(classedit_requires);
 OLC_MODULE(classedit_role);
 
@@ -230,6 +238,7 @@ OLC_MODULE(cedit_functions);
 OLC_MODULE(cedit_levelrequired);
 OLC_MODULE(cedit_liquid);
 OLC_MODULE(cedit_name);
+OLC_MODULE(cedit_notes);
 OLC_MODULE(cedit_quantity);
 OLC_MODULE(cedit_requiresobject);
 OLC_MODULE(cedit_resource);
@@ -247,6 +256,7 @@ OLC_MODULE(cropedit_icons);
 OLC_MODULE(cropedit_interaction);
 OLC_MODULE(cropedit_mapout);
 OLC_MODULE(cropedit_name);
+OLC_MODULE(cropedit_notes);
 OLC_MODULE(cropedit_spawns);
 OLC_MODULE(cropedit_title);
 OLC_MODULE(cropedit_xmax);
@@ -275,6 +285,7 @@ OLC_MODULE(fedit_matchrelations);
 OLC_MODULE(fedit_maxreputation);
 OLC_MODULE(fedit_minreputation);
 OLC_MODULE(fedit_name);
+OLC_MODULE(fedit_notes);
 OLC_MODULE(fedit_relation);
 OLC_MODULE(fedit_rep_per_kill);
 OLC_MODULE(fedit_startingreputation);
@@ -283,6 +294,7 @@ OLC_MODULE(fedit_startingreputation);
 OLC_MODULE(genedit_flags);
 OLC_MODULE(genedit_liquidflags);
 OLC_MODULE(genedit_name);
+OLC_MODULE(genedit_notes);
 OLC_MODULE(genedit_type);
 OLC_MODULE(genedit_color);
 OLC_MODULE(genedit_drunk);
@@ -324,6 +336,7 @@ OLC_MODULE(gedit_minlevel);
 OLC_MODULE(gedit_mobexclude);
 OLC_MODULE(gedit_mobflags);
 OLC_MODULE(gedit_name);
+OLC_MODULE(gedit_notes);
 OLC_MODULE(gedit_objexclude);
 OLC_MODULE(gedit_objflags);
 OLC_MODULE(gedit_percent);
@@ -349,6 +362,7 @@ OLC_MODULE(medit_maxlevel);
 OLC_MODULE(medit_minlevel);
 OLC_MODULE(medit_movetype);
 OLC_MODULE(medit_nameset);
+OLC_MODULE(medit_notes);
 OLC_MODULE(medit_script);
 OLC_MODULE(medit_sex);
 OLC_MODULE(medit_size);
@@ -393,6 +407,7 @@ OLC_MODULE(morphedit_longdesc);
 OLC_MODULE(morphedit_lookdescription);
 OLC_MODULE(morphedit_maxlevel);
 OLC_MODULE(morphedit_movetype);
+OLC_MODULE(morphedit_notes);
 OLC_MODULE(morphedit_requiresobject);
 OLC_MODULE(morphedit_shortdesc);
 OLC_MODULE(morphedit_size);
@@ -431,6 +446,7 @@ OLC_MODULE(oedit_maxlevel);
 OLC_MODULE(oedit_minipet);
 OLC_MODULE(oedit_minlevel);
 OLC_MODULE(oedit_mintflags);
+OLC_MODULE(oedit_notes);
 OLC_MODULE(oedit_paint);
 OLC_MODULE(oedit_plants);
 OLC_MODULE(oedit_quantity);
@@ -460,6 +476,7 @@ OLC_MODULE(progedit_cost);
 OLC_MODULE(progedit_description);
 OLC_MODULE(progedit_flags);
 OLC_MODULE(progedit_name);
+OLC_MODULE(progedit_notes);
 OLC_MODULE(progedit_perks);
 OLC_MODULE(progedit_prereqs);
 OLC_MODULE(progedit_tasks);
@@ -473,6 +490,7 @@ OLC_MODULE(qedit_description);
 OLC_MODULE(qedit_ends);
 OLC_MODULE(qedit_flags);
 OLC_MODULE(qedit_name);
+OLC_MODULE(qedit_notes);
 OLC_MODULE(qedit_maxlevel);
 OLC_MODULE(qedit_minlevel);
 OLC_MODULE(qedit_prereqs);
@@ -491,6 +509,7 @@ OLC_MODULE(rmedit_interaction);
 OLC_MODULE(rmedit_flags);
 OLC_MODULE(rmedit_functions);
 OLC_MODULE(rmedit_matchexits);
+OLC_MODULE(rmedit_notes);
 OLC_MODULE(rmedit_title);
 OLC_MODULE(rmedit_script);
 OLC_MODULE(rmedit_spawns);
@@ -524,6 +543,7 @@ OLC_MODULE(shopedit_flags);
 OLC_MODULE(shopedit_items);
 OLC_MODULE(shopedit_locations);
 OLC_MODULE(shopedit_name);
+OLC_MODULE(shopedit_notes);
 OLC_MODULE(shopedit_opens);
 
 // skill modules
@@ -533,6 +553,7 @@ OLC_MODULE(skilledit_flags);
 OLC_MODULE(skilledit_maxlevel);
 OLC_MODULE(skilledit_mindrop);
 OLC_MODULE(skilledit_name);
+OLC_MODULE(skilledit_notes);
 OLC_MODULE(skilledit_showsynergies);
 OLC_MODULE(skilledit_showtree);
 OLC_MODULE(skilledit_synergy);
@@ -543,12 +564,15 @@ OLC_MODULE(socedit_charposition);
 OLC_MODULE(socedit_command);
 OLC_MODULE(socedit_flags);
 OLC_MODULE(socedit_name);
+OLC_MODULE(socedit_notes);
 OLC_MODULE(socedit_requirements);
 OLC_MODULE(socedit_targetposition);
 OLC_MODULE(socedit_n2char);
 OLC_MODULE(socedit_n2other);
 OLC_MODULE(socedit_s2char);
 OLC_MODULE(socedit_s2other);
+OLC_MODULE(socedit_silent2char);
+OLC_MODULE(socedit_silent2other);
 OLC_MODULE(socedit_t2char);
 OLC_MODULE(socedit_t2vict);
 OLC_MODULE(socedit_t2other);
@@ -593,6 +617,7 @@ OLC_MODULE(vedit_maxlevel);
 OLC_MODULE(vedit_military);
 OLC_MODULE(vedit_minlevel);
 OLC_MODULE(vedit_movetype);
+OLC_MODULE(vedit_notes);
 OLC_MODULE(vedit_quarter_icon);
 OLC_MODULE(vedit_relations);
 OLC_MODULE(vedit_requiresclimate);
@@ -655,6 +680,7 @@ const struct olc_command_data olc_data[] = {
 	{ "minposition", abiledit_minposition, OLC_ABILITY, OLC_CF_EDITOR },
 	{ "movetype", abiledit_movetype, OLC_ABILITY, OLC_CF_EDITOR },
 	{ "name", abiledit_name, OLC_ABILITY, OLC_CF_EDITOR },
+	{ "notes", abiledit_notes, OLC_ABILITY, OLC_CF_EDITOR },
 	{ "pooltype", abiledit_pooltype, OLC_ABILITY, OLC_CF_EDITOR },
 	{ "resourcecost", abiledit_resourcecost, OLC_ABILITY, OLC_CF_EDITOR },
 	{ "scale", abiledit_scale, OLC_ABILITY, OLC_CF_EDITOR },
@@ -686,6 +712,7 @@ const struct olc_command_data olc_data[] = {
 	{ "maxlevel", advedit_maxlevel, OLC_ADVENTURE, OLC_CF_EDITOR },
 	{ "minlevel", advedit_minlevel, OLC_ADVENTURE, OLC_CF_EDITOR },
 	{ "name", advedit_name, OLC_ADVENTURE, OLC_CF_EDITOR },
+	{ "notes", advedit_notes, OLC_ADVENTURE, OLC_CF_EDITOR },
 	{ "playerlimit", advedit_playerlimit, OLC_ADVENTURE, OLC_CF_EDITOR },
 	{ "reset", advedit_reset, OLC_ADVENTURE, OLC_CF_EDITOR },
 	{ "script", advedit_script, OLC_ADVENTURE, OLC_CF_EDITOR },
@@ -706,6 +733,7 @@ const struct olc_command_data olc_data[] = {
 	{ "lore", archedit_lore, OLC_ARCHETYPE, OLC_CF_EDITOR },
 	{ "malerank", archedit_malerank, OLC_ARCHETYPE, OLC_CF_EDITOR },
 	{ "name", archedit_name, OLC_ARCHETYPE, OLC_CF_EDITOR },
+	{ "notes", archedit_notes, OLC_ARCHETYPE, OLC_CF_EDITOR },
 	{ "startingskill", archedit_skill, OLC_ARCHETYPE, OLC_CF_EDITOR },
 	{ "type", archedit_type, OLC_ARCHETYPE, OLC_CF_EDITOR },
 	
@@ -720,6 +748,7 @@ const struct olc_command_data olc_data[] = {
 	{ "flags", attackedit_flags, OLC_ATTACK, OLC_CF_EDITOR },
 	{ "messages", attackedit_message, OLC_ATTACK, OLC_CF_EDITOR },
 	{ "name", attackedit_name, OLC_ATTACK, OLC_CF_EDITOR },
+	{ "notes", attackedit_notes, OLC_ATTACK, OLC_CF_EDITOR },
 	{ "normal", attackedit_normal, OLC_ATTACK, OLC_CF_EDITOR },
 	{ "noun", attackedit_noun, OLC_ATTACK, OLC_CF_EDITOR },
 	{ "slow", attackedit_slow, OLC_ATTACK, OLC_CF_EDITOR },
@@ -744,6 +773,7 @@ const struct olc_command_data olc_data[] = {
 	{ "apply", augedit_apply, OLC_AUGMENT, OLC_CF_EDITOR },
 	{ "flags", augedit_flags, OLC_AUGMENT, OLC_CF_EDITOR },
 	{ "name", augedit_name, OLC_AUGMENT, OLC_CF_EDITOR },
+	{ "notes", augedit_notes, OLC_AUGMENT, OLC_CF_EDITOR },
 	{ "requiresability", augedit_ability, OLC_AUGMENT, OLC_CF_EDITOR },
 	{ "requiresobject", augedit_requiresobject, OLC_AUGMENT, OLC_CF_EDITOR },
 	{ "resource", augedit_resource, OLC_AUGMENT, OLC_CF_EDITOR },
@@ -757,6 +787,7 @@ const struct olc_command_data olc_data[] = {
 	{ "description", booked_item_description, OLC_BOOK, OLC_CF_EDITOR },
 	{ "item", booked_item_name, OLC_BOOK, OLC_CF_EDITOR },
 	{ "license", booked_license, OLC_BOOK, OLC_CF_EDITOR },
+	{ "notes", booked_notes, OLC_BOOK, OLC_CF_EDITOR },
 	{ "paragraphs", booked_paragraphs, OLC_BOOK, OLC_CF_EDITOR },
 	{ "title", booked_title, OLC_BOOK, OLC_CF_EDITOR },
 	
@@ -778,6 +809,7 @@ const struct olc_command_data olc_data[] = {
 	{ "interaction", bedit_interaction, OLC_BUILDING, OLC_CF_EDITOR },
 	{ "military", bedit_military, OLC_BUILDING, OLC_CF_EDITOR },
 	{ "name", bedit_name, OLC_BUILDING, OLC_CF_EDITOR },
+	{ "notes", bedit_notes, OLC_BUILDING, OLC_CF_EDITOR },
 	{ "quartericon", bedit_quarter_icon, OLC_BUILDING, OLC_CF_EDITOR },
 	{ "relations", bedit_relations, OLC_BUILDING, OLC_CF_EDITOR },
 	{ "resources", bedit_resource, OLC_BUILDING, OLC_CF_EDITOR },
@@ -791,6 +823,7 @@ const struct olc_command_data olc_data[] = {
 	{ "abbrev", classedit_abbrev, OLC_CLASS, OLC_CF_EDITOR },
 	{ "flags", classedit_flags, OLC_CLASS, OLC_CF_EDITOR },
 	{ "name", classedit_name, OLC_CLASS, OLC_CF_EDITOR },
+	{ "notes", classedit_notes, OLC_CLASS, OLC_CF_EDITOR },
 	{ "maxhealth", classedit_maxhealth, OLC_CLASS, OLC_CF_EDITOR },
 	{ "maxmana", classedit_maxmana, OLC_CLASS, OLC_CF_EDITOR },
 	{ "maxmoves", classedit_maxmoves, OLC_CLASS, OLC_CF_EDITOR },
@@ -806,6 +839,7 @@ const struct olc_command_data olc_data[] = {
 	{ "levelrequired", cedit_levelrequired, OLC_CRAFT, OLC_CF_EDITOR },
 	{ "liquid", cedit_liquid, OLC_CRAFT, OLC_CF_EDITOR },
 	{ "name", cedit_name, OLC_CRAFT, OLC_CF_EDITOR },
+	{ "notes", cedit_notes, OLC_CRAFT, OLC_CF_EDITOR },
 	{ "quantity", cedit_quantity, OLC_CRAFT, OLC_CF_EDITOR },
 	{ "requiresability", cedit_ability, OLC_CRAFT, OLC_CF_EDITOR },
 	{ "requiresfunction", cedit_functions, OLC_CRAFT, OLC_CF_EDITOR },
@@ -825,6 +859,7 @@ const struct olc_command_data olc_data[] = {
 	{ "interaction", cropedit_interaction, OLC_CROP, OLC_CF_EDITOR },
 	{ "mapout", cropedit_mapout, OLC_CROP, OLC_CF_EDITOR },
 	{ "name", cropedit_name, OLC_CROP, OLC_CF_EDITOR },
+	{ "notes", cropedit_notes, OLC_CROP, OLC_CF_EDITOR },
 	{ "spawns", cropedit_spawns, OLC_CROP, OLC_CF_EDITOR },
 	{ "title", cropedit_title, OLC_CROP, OLC_CF_EDITOR },
 	{ "xmax", cropedit_xmax, OLC_CROP, OLC_CF_EDITOR },
@@ -855,6 +890,7 @@ const struct olc_command_data olc_data[] = {
 	{ "maxreputation", fedit_maxreputation, OLC_FACTION, OLC_CF_EDITOR },
 	{ "minreputation", fedit_minreputation, OLC_FACTION, OLC_CF_EDITOR },
 	{ "name", fedit_name, OLC_FACTION, OLC_CF_EDITOR },
+	{ "notes", fedit_notes, OLC_FACTION, OLC_CF_EDITOR },
 	{ "relationship", fedit_relation, OLC_FACTION, OLC_CF_EDITOR },
 	{ "repperkill", fedit_rep_per_kill, OLC_FACTION, OLC_CF_EDITOR },
 	{ "startingreputation", fedit_startingreputation, OLC_FACTION, OLC_CF_EDITOR },
@@ -862,6 +898,7 @@ const struct olc_command_data olc_data[] = {
 	// generic commands
 	{ "flags", genedit_flags, OLC_GENERIC, OLC_CF_EDITOR },
 	{ "name", genedit_name, OLC_GENERIC, OLC_CF_EDITOR },
+	{ "notes", genedit_notes, OLC_GENERIC, OLC_CF_EDITOR },
 	{ "type", genedit_type, OLC_GENERIC, OLC_CF_EDITOR },
 	// generic: actions
 	{ "build2char", genedit_build2char, OLC_GENERIC, OLC_CF_EDITOR },
@@ -909,6 +946,7 @@ const struct olc_command_data olc_data[] = {
 	{ "mobexclude", gedit_mobexclude, OLC_GLOBAL, OLC_CF_EDITOR },
 	{ "mobflags", gedit_mobflags, OLC_GLOBAL, OLC_CF_EDITOR },
 	{ "name", gedit_name, OLC_GLOBAL, OLC_CF_EDITOR },
+	{ "notes", gedit_notes, OLC_GLOBAL, OLC_CF_EDITOR },
 	{ "objexclude", gedit_objexclude, OLC_GLOBAL, OLC_CF_EDITOR },
 	{ "objflags", gedit_objflags, OLC_GLOBAL, OLC_CF_EDITOR },
 	{ "percent", gedit_percent, OLC_GLOBAL, OLC_CF_EDITOR },
@@ -935,6 +973,7 @@ const struct olc_command_data olc_data[] = {
 	{ "minlevel", medit_minlevel, OLC_MOBILE, OLC_CF_EDITOR },
 	{ "movetype", medit_movetype, OLC_MOBILE, OLC_CF_EDITOR },
 	{ "nameset", medit_nameset, OLC_MOBILE, OLC_CF_EDITOR },
+	{ "notes", medit_notes, OLC_MOBILE, OLC_CF_EDITOR },
 	{ "script", medit_script, OLC_MOBILE, OLC_CF_EDITOR },
 	{ "sex", medit_sex, OLC_MOBILE, OLC_CF_EDITOR },
 	{ "shortdescription", medit_short_description, OLC_MOBILE, OLC_CF_EDITOR },
@@ -978,6 +1017,7 @@ const struct olc_command_data olc_data[] = {
 	{ "lookdescription", morphedit_lookdescription, OLC_MORPH, OLC_CF_EDITOR },
 	{ "maxlevel", morphedit_maxlevel, OLC_MORPH, OLC_CF_EDITOR },
 	{ "movetype", morphedit_movetype, OLC_MORPH, OLC_CF_EDITOR },
+	{ "notes", morphedit_notes, OLC_MORPH, OLC_CF_EDITOR },
 	{ "requiresability", morphedit_ability, OLC_MORPH, OLC_CF_EDITOR },
 	{ "requiresobject", morphedit_requiresobject, OLC_MORPH, OLC_CF_EDITOR },
 	{ "shortdescription", morphedit_shortdesc, OLC_MORPH, OLC_CF_EDITOR },
@@ -1017,6 +1057,7 @@ const struct olc_command_data olc_data[] = {
 	{ "minlevel", oedit_minlevel, OLC_OBJECT, OLC_CF_EDITOR },
 	{ "minipet", oedit_minipet, OLC_OBJECT, OLC_CF_EDITOR },
 	{ "mintflags", oedit_mintflags, OLC_OBJECT, OLC_CF_EDITOR },
+	{ "notes", oedit_notes, OLC_OBJECT, OLC_CF_EDITOR },
 	{ "paint", oedit_paint, OLC_OBJECT, OLC_CF_EDITOR },
 	{ "plants", oedit_plants, OLC_OBJECT, OLC_CF_EDITOR },
 	{ "quantity", oedit_quantity, OLC_OBJECT, OLC_CF_EDITOR },
@@ -1048,6 +1089,7 @@ const struct olc_command_data olc_data[] = {
 	{ "description", progedit_description, OLC_PROGRESS, OLC_CF_EDITOR },
 	{ "flags", progedit_flags, OLC_PROGRESS, OLC_CF_EDITOR },
 	{ "name", progedit_name, OLC_PROGRESS, OLC_CF_EDITOR },
+	{ "notes", progedit_notes, OLC_PROGRESS, OLC_CF_EDITOR },
 	{ "perks", progedit_perks, OLC_PROGRESS, OLC_CF_EDITOR },
 	{ "prereqs", progedit_prereqs, OLC_PROGRESS, OLC_CF_EDITOR },
 	{ "tasks", progedit_tasks, OLC_PROGRESS, OLC_CF_EDITOR },
@@ -1061,6 +1103,7 @@ const struct olc_command_data olc_data[] = {
 	{ "ends", qedit_ends, OLC_QUEST, OLC_CF_EDITOR },
 	{ "flags", qedit_flags, OLC_QUEST, OLC_CF_EDITOR },
 	{ "name", qedit_name, OLC_QUEST, OLC_CF_EDITOR },
+	{ "notes", qedit_notes, OLC_QUEST, OLC_CF_EDITOR },
 	{ "maxlevel", qedit_maxlevel, OLC_QUEST, OLC_CF_EDITOR },
 	{ "minlevel", qedit_minlevel, OLC_QUEST, OLC_CF_EDITOR },
 	{ "prereqs", qedit_prereqs, OLC_QUEST, OLC_CF_EDITOR },
@@ -1079,6 +1122,7 @@ const struct olc_command_data olc_data[] = {
 	{ "flags", rmedit_flags, OLC_ROOM_TEMPLATE, OLC_CF_EDITOR },
 	{ "functions", rmedit_functions, OLC_ROOM_TEMPLATE, OLC_CF_EDITOR },
 	{ "matchexits", rmedit_matchexits, OLC_ROOM_TEMPLATE, OLC_CF_EDITOR },
+	{ "notes", rmedit_notes, OLC_ROOM_TEMPLATE, OLC_CF_EDITOR },
 	{ "title", rmedit_title, OLC_ROOM_TEMPLATE, OLC_CF_EDITOR },
 	{ "script", rmedit_script, OLC_ROOM_TEMPLATE, OLC_CF_EDITOR },
 	{ "spawns", rmedit_spawns, OLC_ROOM_TEMPLATE, OLC_CF_EDITOR },
@@ -1112,6 +1156,7 @@ const struct olc_command_data olc_data[] = {
 	{ "items", shopedit_items, OLC_SHOP, OLC_CF_EDITOR },
 	{ "locations", shopedit_locations, OLC_SHOP, OLC_CF_EDITOR },
 	{ "name", shopedit_name, OLC_SHOP, OLC_CF_EDITOR },
+	{ "notes", shopedit_notes, OLC_SHOP, OLC_CF_EDITOR },
 	{ "opens", shopedit_opens, OLC_SHOP, OLC_CF_EDITOR },
 	
 	// skill commands
@@ -1121,6 +1166,7 @@ const struct olc_command_data olc_data[] = {
 	{ "maxlevel", skilledit_maxlevel, OLC_SKILL, OLC_CF_EDITOR },
 	{ "mindrop", skilledit_mindrop, OLC_SKILL, OLC_CF_EDITOR },
 	{ "name", skilledit_name, OLC_SKILL, OLC_CF_EDITOR },
+	{ "notes", skilledit_notes, OLC_SKILL, OLC_CF_EDITOR },
 	{ "synergy", skilledit_synergy, OLC_SKILL, OLC_CF_EDITOR },
 	{ "tree", skilledit_tree, OLC_SKILL, OLC_CF_EDITOR },
 	{ "showtree", skilledit_showtree, OLC_SKILL, OLC_CF_EDITOR },
@@ -1131,12 +1177,15 @@ const struct olc_command_data olc_data[] = {
 	{ "command", socedit_command, OLC_SOCIAL, OLC_CF_EDITOR },
 	{ "flags", socedit_flags, OLC_SOCIAL, OLC_CF_EDITOR },
 	{ "name", socedit_name, OLC_SOCIAL, OLC_CF_EDITOR },
+	{ "notes", socedit_notes, OLC_SOCIAL, OLC_CF_EDITOR },
 	{ "requirements", socedit_requirements, OLC_SOCIAL, OLC_CF_EDITOR },
 	{ "targetposition", socedit_targetposition, OLC_SOCIAL, OLC_CF_EDITOR },
 	{ "n2character", socedit_n2char, OLC_SOCIAL, OLC_CF_EDITOR },
 	{ "n2others", socedit_n2other, OLC_SOCIAL, OLC_CF_EDITOR },
 	{ "s2character", socedit_s2char, OLC_SOCIAL, OLC_CF_EDITOR },
 	{ "s2others", socedit_s2other, OLC_SOCIAL, OLC_CF_EDITOR },
+	{ "silent2character", socedit_silent2char, OLC_SOCIAL, OLC_CF_EDITOR },
+	{ "silent2others", socedit_silent2other, OLC_SOCIAL, OLC_CF_EDITOR },
 	{ "t2character", socedit_t2char, OLC_SOCIAL, OLC_CF_EDITOR },
 	{ "t2victim", socedit_t2vict, OLC_SOCIAL, OLC_CF_EDITOR },
 	{ "t2others", socedit_t2other, OLC_SOCIAL, OLC_CF_EDITOR },
@@ -1181,6 +1230,7 @@ const struct olc_command_data olc_data[] = {
 	{ "military", vedit_military, OLC_VEHICLE, OLC_CF_EDITOR },
 	{ "minlevel", vedit_minlevel, OLC_VEHICLE, OLC_CF_EDITOR },
 	{ "movetype", vedit_movetype, OLC_VEHICLE, OLC_CF_EDITOR },
+	{ "notes", vedit_notes, OLC_VEHICLE, OLC_CF_EDITOR },
 	{ "quartericon", vedit_quarter_icon, OLC_VEHICLE, OLC_CF_EDITOR },
 	{ "relations", vedit_relations, OLC_VEHICLE, OLC_CF_EDITOR },
 	{ "requiresclimate", vedit_requiresclimate, OLC_VEHICLE, OLC_CF_EDITOR },
@@ -1193,7 +1243,12 @@ const struct olc_command_data olc_data[] = {
 	
 	
 	// misc commands that should not take precedence over editor commands
-	{ "fullsearch", olc_fullsearch, OLC_ABILITY | OLC_ADVENTURE | OLC_ARCHETYPE | OLC_ATTACK | OLC_AUGMENT | OLC_BOOK | OLC_BUILDING | OLC_CRAFT | OLC_CROP | OLC_EVENT | OLC_GENERIC | OLC_MOBILE |  OLC_OBJECT | OLC_PROGRESS | OLC_QUEST | OLC_ROOM_TEMPLATE | OLC_SECTOR | OLC_SKILL | OLC_TRIGGER | OLC_VEHICLE, NOBITS },
+	{ "fullsearch", olc_fullsearch, OLC_ABILITY | OLC_ADVENTURE | OLC_ARCHETYPE
+		| OLC_ATTACK | OLC_AUGMENT | OLC_BOOK | OLC_BUILDING | OLC_CRAFT
+		| OLC_CROP | OLC_EVENT | OLC_GENERIC | OLC_MOBILE |  OLC_OBJECT
+		| OLC_PROGRESS | OLC_QUEST | OLC_ROOM_TEMPLATE | OLC_SECTOR
+		| OLC_SKILL | OLC_SOCIAL | OLC_TRIGGER | OLC_VEHICLE,
+		NOBITS },
 	
 	// this goes last
 	{ "\n", NULL, NOBITS, NOBITS }
@@ -2873,6 +2928,11 @@ OLC_MODULE(olc_fullsearch) {
 		case OLC_SKILL: {
 			void olc_fullsearch_skill(char_data *ch, char *argument);
 			olc_fullsearch_skill(ch, argument);
+			break;
+		}
+		case OLC_SOCIAL: {
+			void olc_fullsearch_social(char_data *ch, char *argument);
+			olc_fullsearch_social(ch, argument);
 			break;
 		}
 		case OLC_TRIGGER: {
@@ -7918,7 +7978,7 @@ void olc_process_interactions(char_data *ch, char *argument, struct interaction_
 				case OLC_MOBILE: {
 					char_data *mob = mob_proto(vnum);
 					if (mob) {
-						copyfrom = mob->interactions;
+						copyfrom = MOB_INTERACTIONS(mob);
 						none = copyfrom ? FALSE : TRUE;
 					}
 					break;

@@ -3352,7 +3352,7 @@ ACMD(do_shear) {
 	else if (!(mob = get_char_vis(ch, arg, NULL, FIND_CHAR_ROOM))) {
 		send_config_msg(ch, "no_person");
 	}
-	else if (!IS_NPC(mob) || !has_interaction(mob->interactions, INTERACT_SHEAR)) {
+	else if (!IS_NPC(mob) || !has_interaction(MOB_INTERACTIONS(mob), INTERACT_SHEAR)) {
 		act("You can't shear $N!", FALSE, ch, NULL, mob, TO_CHAR);
 	}
 	else if (get_cooldown_time(mob, COOLDOWN_SHEAR) > 0) {
@@ -3364,7 +3364,7 @@ ACMD(do_shear) {
 	else {
 		check_scaling(mob, ch);	// ensure mob is scaled -- this matters for global interactions
 		
-		any = run_interactions(ch, mob->interactions, INTERACT_SHEAR, IN_ROOM(ch), mob, NULL, NULL, shear_interact);
+		any = run_interactions(ch, MOB_INTERACTIONS(mob), INTERACT_SHEAR, IN_ROOM(ch), mob, NULL, NULL, shear_interact);
 		any |= run_global_mob_interactions(ch, mob, INTERACT_SHEAR, shear_interact);
 		
 		if (any) {
@@ -3405,7 +3405,7 @@ ACMD(do_skin) {
 	}
 	else if (!IS_CORPSE(obj))
 		msg_to_char(ch, "You can only skin corpses.\r\n");
-	else if (GET_CORPSE_NPC_VNUM(obj) == NOTHING || !(proto = mob_proto(GET_CORPSE_NPC_VNUM(obj))) || !has_interaction(proto->interactions, INTERACT_SKIN)) {
+	else if (GET_CORPSE_NPC_VNUM(obj) == NOTHING || !(proto = mob_proto(GET_CORPSE_NPC_VNUM(obj))) || !has_interaction(MOB_INTERACTIONS(proto), INTERACT_SKIN)) {
 		msg_to_char(ch, "You can't skin that.\r\n");
 	}
 	else if (!bind_ok(obj, ch)) {
@@ -3422,7 +3422,7 @@ ACMD(do_skin) {
 		msg_to_char(ch, "You need to be using a good knife to skin a corpse.\r\n");
 	else {
 		// run it
-		if (IS_SET(GET_CORPSE_FLAGS(obj), CORPSE_NO_LOOT) || !run_interactions(ch, proto->interactions, INTERACT_SKIN, IN_ROOM(ch), NULL, obj, NULL, skin_interact)) {
+		if (IS_SET(GET_CORPSE_FLAGS(obj), CORPSE_NO_LOOT) || !run_interactions(ch, MOB_INTERACTIONS(proto), INTERACT_SKIN, IN_ROOM(ch), NULL, obj, NULL, skin_interact)) {
 			act("You try to skin $p but get nothing useful.", FALSE, ch, obj, NULL, TO_CHAR);
 		}
 		else {

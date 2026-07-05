@@ -208,8 +208,10 @@ When using field - The variable returns:
 &cisland, island(for)&0 - The name of the island the room is on, if any. If the
    subfield is a person or empire, instead gives their custom name for it.
 &cisland_flagged(FLAG)&0 - See ISLAND FLAGS for a list.
+&cis_ocean&0 - Room is an ocean tile.
 &cis_on_map&0 - True if the room is on the map (including closed buildings).
 &cis_outdoors&0 - True if it's on the map, in an outdoor adventure, etc.
+&cis_water&0 - Room is any type of water location that requires swimming.
 &cis_zenith_day&0 - True if it's the day of the sun's zenith passage here.
 &cmaxhealth&0 - For buildings or their interiors, maximum health/damage.
 &cmax_citizens&0 - If a building, the max number of citizens who can live here.

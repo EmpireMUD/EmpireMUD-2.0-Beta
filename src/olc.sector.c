@@ -574,7 +574,7 @@ void olc_fullsearch_sector(char_data *ch, char *argument) {
 		if (*extra_search && !find_exdesc(extra_search, GET_SECT_EX_DESCS(sect), NULL)) {
 			continue;
 		}
-		if (*find_keywords && !multi_isname(find_keywords, GET_SECT_NAME(sect)) && !multi_isname(find_keywords, GET_SECT_TITLE(sect)) && !multi_isname(find_keywords, GET_SECT_COMMANDS(sect)) && !search_extra_descs(find_keywords, GET_SECT_EX_DESCS(sect)) && !search_custom_messages(find_keywords, GET_SECT_CUSTOM_MSGS(sect))) {
+		if (*find_keywords && !multi_isname(find_keywords, GET_SECT_NAME(sect)) && !multi_isname(find_keywords, GET_SECT_TITLE(sect)) && (!GET_SECT_NOTES(sect) || !multi_isname(find_keywords, GET_SECT_NOTES(sect))) && !multi_isname(find_keywords, GET_SECT_COMMANDS(sect)) && !search_extra_descs(find_keywords, GET_SECT_EX_DESCS(sect)) && !search_custom_messages(find_keywords, GET_SECT_CUSTOM_MSGS(sect))) {
 			// check icons too
 			match = FALSE;
 			LL_FOREACH(GET_SECT_ICONS(sect), icon) {
@@ -766,6 +766,10 @@ void save_olc_sector(descriptor_data *desc) {
 			free(GET_SECT_COMMANDS(st));
 		}
 		GET_SECT_COMMANDS(st) = NULL;
+	}
+	if (GET_SECT_NOTES(st) && !*GET_SECT_NOTES(st)) {
+		free(GET_SECT_NOTES(st));
+		GET_SECT_NOTES(st) = NULL;
 	}
 	
 	// save data back over the proto-type

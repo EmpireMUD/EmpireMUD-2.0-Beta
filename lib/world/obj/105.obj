@@ -293,9 +293,9 @@ growing a lot of them.
 
 Brew (Healing Elixirs): magic mushroom potion
 ~
-6 bC a 0 0 14
+6 bC a 0 0 15
 12 10505 0
-7 72
+7 168
 B
 u
 I 15 10515 100.00 4 x  # SEPARATE: magic mushroom
@@ -345,9 +345,9 @@ from the manaweavers of the Magiterranean.
 Cook: figgy pudding
  2x basket of pudding figs
 ~
-6 bC a 0 0 5
+6 bC a 0 0 6
 24 10506 0
-7 120
+7 168
 R
 4 5114 0
 S
@@ -647,9 +647,9 @@ A bunch of rhubarb is piled on the ground.~
    These rhubarb stems are bright red, and fresh. There are some seeds
 intermixed in the bunch, so you could also plant them.
 ~
-6 bgC a 0 0 9
+6 bgC a 0 0 10
 12 10551 0
-7 72
+7 168
 O+ 1 6132
 R
 4 5215 0

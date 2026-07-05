@@ -3965,7 +3965,7 @@ ACMD(do_barde) {
 	else {
 		// find interact
 		found = FALSE;
-		for (interact = mob->interactions; interact; interact = interact->next) {
+		LL_FOREACH(MOB_INTERACTIONS(mob), interact) {
 			if (interact->type == INTERACT_BARDE && check_exclusion_set(&excl, interact->exclusion_code, interact->percent) && meets_interaction_restrictions(interact->restrictions, ch, GET_LOYALTY(ch), mob, NULL)) {
 				if (!found) {
 					// first one found

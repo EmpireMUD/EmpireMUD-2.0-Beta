@@ -1677,7 +1677,7 @@ void drop_loot(char_data *mob, char_data *killer) {
 	}
 
 	// find and drop loot
-	run_interactions(mob, mob->interactions, INTERACT_LOOT, IN_ROOM(mob), mob, NULL, NULL, loot_interact);
+	run_interactions(mob, MOB_INTERACTIONS(mob), INTERACT_LOOT, IN_ROOM(mob), mob, NULL, NULL, loot_interact);
 	run_global_mob_interactions(mob, mob, INTERACT_LOOT, loot_interact);
 	
 	// coins?
@@ -1708,7 +1708,7 @@ obj_data *make_corpse(char_data *ch) {
 	bool human = (!IS_NPC(ch) || MOB_FLAGGED(ch, MOB_HUMAN));
 	
 	// custom corpse?
-	if (IS_NPC(ch) && MOB_CUSTOM_CORPSE(ch) != NOTHING) {
+	if (MOB_CUSTOM_CORPSE(ch) != NOTHING) {
 		corpse_vnum = MOB_CUSTOM_CORPSE(ch);
 	}
 	

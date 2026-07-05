@@ -3152,7 +3152,7 @@ void do_chore_shearing(empire_data *emp, room_data *room, vehicle_data *veh) {
 			}
 			
 			// find shear interaction
-			for (interact = mob->interactions; interact && !shearable; interact = interact->next) {
+			for (interact = MOB_INTERACTIONS(mob); interact && !shearable; interact = interact->next) {
 				if (interact->type != INTERACT_SHEAR || !meets_interaction_restrictions(interact->restrictions, NULL, emp, mob, NULL)) {
 					continue;
 				}
@@ -3172,7 +3172,7 @@ void do_chore_shearing(empire_data *emp, room_data *room, vehicle_data *veh) {
 			found = FALSE;
 		
 			// we know it's shearable, but have to find the items
-			for (interact = shearable->interactions; interact; interact = interact->next) {
+			for (interact = MOB_INTERACTIONS(shearable); interact; interact = interact->next) {
 				if (interact->type == INTERACT_SHEAR && check_exclusion_set(&excl, interact->exclusion_code, interact->percent)) {
 					// messaging
 					if (!found) {

@@ -883,4 +883,29 @@ if %actor%
 end
 %purge% %self%
 ~
+#9685
+Vehicle: Only harness flying mobs~
+5 c 0 0
+harness~
+set anim_arg %arg.argument1%
+set veh_arg %arg.argument2%
+if (!%anim_arg% || !%veh_arg%)
+  return 0
+  halt
+end
+set mob %actor.char_target(%anim_arg%)%
+set veh %actor.veh_target(%veh_arg%)%
+if (!%mob% || !%veh% || %veh% != %self%)
+  return 0
+  halt
+end
+* check flying (block harness if not)
+if !%mob.is_flying%
+  %send% %actor% You can only harness flying animals to %veh.shortdesc%.
+  return 1
+  halt
+end
+* otherwise, just return 0 (allow the harness)
+return 0
+~
 $

@@ -1748,12 +1748,18 @@ void extract_char_final(char_data *ch) {
 	while ((obj = ch->carrying)) {
 		obj_from_char(obj);
 		obj_to_room(obj, IN_ROOM(ch));
+		if (OBJ_FLAGGED(obj, OBJ_SINGLE_USE)) {
+			extract_obj(obj);
+		}
 	}
 
 	/* transfer equipment to room, if any */
 	for (i = 0; i < NUM_WEARS; i++) {
 		if (GET_EQ(ch, i)) {
-			unequip_char_to_room(ch, i);
+			obj = unequip_char_to_room(ch, i);
+			if (obj && OBJ_FLAGGED(obj, OBJ_SINGLE_USE)) {
+				extract_obj(obj);
+			}
 		}
 	}
 

@@ -2241,6 +2241,9 @@ void free_progress(progress_data *prg) {
 	if (PRG_PERKS(prg) && (!proto || PRG_PERKS(prg) != PRG_PERKS(proto))) {
 		free_progress_perks(PRG_PERKS(prg));
 	}
+	if (PRG_NOTES(prg) && (!proto || PRG_NOTES(prg) != PRG_NOTES(proto))) {
+		free(PRG_NOTES(prg));
+	}
 	
 	free(prg);
 }
@@ -2321,6 +2324,11 @@ void parse_progress(FILE *fl, any_vnum vnum) {
 			}
 			case 'W': {	// tasks / work
 				parse_requirement(fl, &PRG_TASKS(prg), (*(line+1) == '+' ? TRUE : FALSE), error);
+				break;
+			}
+			
+			case '_': {	// notes
+				PRG_NOTES(prg) = fread_string(fl, error);
 				break;
 			}
 			
@@ -2414,6 +2422,13 @@ void write_progress_to_file(FILE *fl, progress_data *prg) {
 	
 	// W. tasks (work)
 	write_requirements_to_file(fl, 'W', PRG_TASKS(prg));
+	
+	// '_'
+	if (PRG_NOTES(prg) && *PRG_NOTES(prg)) {
+		strcpy(temp, PRG_NOTES(prg));
+		strip_crlf(temp);
+		fprintf(fl, "_\n%s~\n", temp);
+	}
 	
 	// end
 	fprintf(fl, "S\n");
@@ -2671,7 +2686,7 @@ void olc_fullsearch_progress(char_data *ch, char *argument) {
 				continue;
 			}
 		}
-		if (*find_keywords && !multi_isname(find_keywords, PRG_NAME(prg)) && !multi_isname(find_keywords, PRG_DESCRIPTION(prg))) {
+		if (*find_keywords && !multi_isname(find_keywords, PRG_NAME(prg)) && !multi_isname(find_keywords, PRG_DESCRIPTION(prg)) && (!PRG_NOTES(prg) || !multi_isname(find_keywords, PRG_NOTES(prg)))) {
 			continue;
 		}
 		
@@ -2721,6 +2736,9 @@ void save_olc_progress(descriptor_data *desc) {
 	if (PRG_DESCRIPTION(proto)) {
 		free(PRG_DESCRIPTION(proto));
 	}
+	if (PRG_NOTES(proto)) {
+		free(PRG_NOTES(proto));
+	}
 	free_progress_list(PRG_PREREQS(proto));
 	free_requirements(PRG_TASKS(proto));
 	free_progress_perks(PRG_PERKS(proto));
@@ -2735,6 +2753,10 @@ void save_olc_progress(descriptor_data *desc) {
 	if (PRG_DESCRIPTION(prg) && !*PRG_DESCRIPTION(prg)) {
 		free(PRG_DESCRIPTION(prg));
 		PRG_DESCRIPTION(prg) = NULL;
+	}
+	if (PRG_NOTES(prg) && !*PRG_NOTES(prg)) {
+		free(PRG_NOTES(prg));
+		PRG_NOTES(prg) = NULL;
 	}
 	
 	// save data back over the proto-type
@@ -2783,6 +2805,7 @@ progress_data *setup_olc_progress(progress_data *input) {
 		PRG_PREREQS(new) = copy_progress_list(PRG_PREREQS(input));
 		PRG_TASKS(new) = copy_requirements(PRG_TASKS(input));
 		PRG_PERKS(new) = copy_progress_perks(PRG_PERKS(input));
+		PRG_NOTES(new) = PRG_NOTES(input) ? str_dup(PRG_NOTES(input)) : NULL;
 		
 		PRG_VERSION(new) += 1;
 	}
@@ -2831,6 +2854,10 @@ void do_stat_progress(char_data *ch, progress_data *prg) {
 	
 	build_page_display_str(ch, "Perks:");
 	show_progress_perks_display(ch, PRG_PERKS(prg), TRUE, FALSE);
+	
+	if (PRG_NOTES(prg) && *PRG_NOTES(prg)) {
+		build_page_display(ch, "Notes:\r\n%s", PRG_NOTES(prg));
+	}
 	
 	send_page_display(ch);
 }
@@ -2882,6 +2909,8 @@ void olc_show_progress(char_data *ch) {
 	if (PRG_PERKS(prg)) {
 		show_progress_perks_display(ch, PRG_PERKS(prg), TRUE, FALSE);
 	}
+	
+	build_page_display(ch, "<%snotes\t0>\r\n%s", OLC_LABEL_PTR(PRG_NOTES(prg)), NULLSAFE(PRG_NOTES(prg)));
 	
 	send_page_display(ch);
 }
@@ -3047,6 +3076,19 @@ OLC_MODULE(progedit_prereqs) {
 OLC_MODULE(progedit_name) {
 	progress_data *prg = GET_OLC_PROGRESS(ch->desc);
 	olc_process_string(ch, argument, "name", &PRG_NAME(prg));
+}
+
+
+OLC_MODULE(progedit_notes) {
+	progress_data *prg = GET_OLC_PROGRESS(ch->desc);
+
+	if (ch->desc->str) {
+		msg_to_char(ch, "You are already editing a string.\r\n");
+	}
+	else {
+		sprintf(buf, "notes for %s", PRG_NAME(prg));
+		start_string_editor(ch->desc, buf, &PRG_NOTES(prg), MAX_NOTES, TRUE);
+	}
 }
 
 

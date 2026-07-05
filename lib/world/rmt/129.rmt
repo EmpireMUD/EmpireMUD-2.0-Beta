@@ -1,1 +1,691 @@
+#12920
+Atop a Mighty Rock, Enflamed~
+   You reflexively shield your eyes from the bright flames that roar upward
+from the edges of the great rock you find yourself standing upon. A well-worn
+path leads from the craggy peak to the edge of the rock, to a small gap in the
+flame.
+~
+cei 0 v 12920
+D9
+~
+0 12921
+E
+flames wall fire~
+   The entire rock upon which you stand is ringed by tall flames that roar as
+they race toward the sky. Smoke clouds above the flames block any view of the
+sky.
+~
+E
+rock~
+   You stand firmly on a rather large rock, engulfed in flames. At its edges,
+the rock is red-hot and shooting flames high into the sky. But here, nearer the
+center, it's surprisingly mild.
+~
+E
+path~
+   A worn footpath stretches from the peak, where you arrived, to the edge of
+the rock.
+~
+E
+peak~
+The rock rises to the small peak where you arrived.
+~
+E
+gap down crater earth down ground~
+   Through a gap in the flames, you can see this enormous rock is plummeting
+toward a crater in the earth below!
+~
+E
+out north east south west northeast northwest southeast southwest~
+   A wall of flame surrounds the rock, roaring upward. Through it, you can just
+make out the ground below... and it's coming up fast!
+~
+E
+stars starry sky night~
+You can't see the sky through the smoky cloud above you.
+~
+E
+clouds smoke smoky up~
+   A cloud of smoke billows up from the top of the flame, blocking all view of
+the sky.
+~
+E
+moon crescent~
+The crescent moon hangs low in the sky.
+~
+E
+moons half-moons halfmoons~
+   As you look down over the edge of the rock, you see faint, broken moons
+hanging low in the sky near the crater.
+~
+T 12803
+T 12802
+T 12801
+T 12920
+T 12921
+S
+#12921
+Terminus Forge~
+   Streaks of light tear across the sky above your head as you stand in a deep
+crater. At the bottom, a black, craggy rock rests in the center of the crater,
+flattened on top so it can be used as a platform. On three sides, metal
+archways made from the same rough metal crackle and spark, and briefly open
+like magical portals when you approach.
+Commands: challenge
+~
+cei 0 0 12920
+D3
+~
+0 12922
+D1
+~
+0 12923
+D2
+~
+0 12924
+D0
+~
+0 12925
+D9
+~
+0 12926
+E
+stump tree wood petrified stone~
+   Amir has a hefty tree stump which has, by some means or another, turned
+completely to stone. Cracks in the stump seem to be healing themselves, slowly
+vanishing from the surface.
+~
+E
+hammer~
+Amir carries a rather large hammer made from a blue-black metal.
+~
+E
+streaks sky up meteors~
+   Meteors streak through the sky, mostly as thin streaks of light, except
+three that burn brightly, trailing smoke through the night sky... and one of
+them appears to be heading straight toward the crater!
+~
+E
+stars starry expanse night~
+   The endless night sky stretches out above you, streaked every few moments
+by a shooting star. It would be tranquil if not for three large, blazing
+meteors that dot the sky, each trailing smoke through the air.
+~
+E
+smoke fire fiery~
+Long, smoky tails follow behind three fiery meteors that dot the sky.
+~
+E
+down bottom~
+   A black, craggy rock rests in the center of the crater. A small tunnel cuts
+beneath it, though you can't see what's down there from here.
+~
+E
+rock meteorite~
+   The rock is dark in color and heavily pocked, but it has a smooth, almost
+polished finish. The flattened surface of the rock makes up the floor of the
+crater, though certainly the rock is larger and partially buried.
+~
+E
+craggy~
+The rock has a craggy, pock-marked surface.
+~
+E
+archways portals~
+   On three sides of you -- east, west, and south -- craggy stone archways
+mark the edges of the platform. They begin to glow like portals if you approach
+them, and you can see through to another place inside.
+~
+E
+platform~
+   The flat top of the rock forms a large platform. Archways mark the east,
+west, and south edges of the platform.
+~
+E
+north~
+The platform continues north, where Tane is stacking supplies.
+~
+E
+out around~
+All you can see from here is the rim of the crater. Above that, only sky.
+~
+E
+moon~
+   You can't see the moon from here. Although, there are a pair of broken moons
+that seem to rest on the crater's rim.
+~
+E
+moons half-moons halfmoons cracked broken~
+   A pair of cracked and broken moons hang low in the sky, almost resting on
+the crater's rim.
+~
+E
+crater~
+You're standing in a deep crater.
+~
+E
+rim lip~
+   The rim of the crater blocks much of the horizon. Strangely, a pair of
+broken half-moons seem to rest on the crater's lip.
+~
+M 0 12921 100.00 1
+T 12803
+T 12802
+T 12819
+T 12920
+T 12921
+T 12923
+S
+#12922
+Terminus Forge~
+   A roaring wall of fire surrounds the rock on this side of the archway. The
+crater is gone now; this rock is falling through the sky! The edges of this
+rock are red-hot, but the center is surprisingly cool. Poles near the edge hold
+pieces of metal in the roaring flame.
+Commands: forge, smelt, shatter <item to destroy>
+~
+cei 0 hv 12920
+D1
+~
+0 12921
+E
+fire flame fiery wall roaring~
+   The entire rock is surrounded by a blazing wall of fire, which streaks
+upward with incredible energy. Above it, a dark, smoky cloud blocks all view of
+the sky. Several poles hold pieces of red-hot metal in the flame.
+~
+E
+out down ground earth north south west northeast nw northwest nw southeast se southwest sw~
+   Beyond the wall of fire, you can barely make out the night-blanketed world
+below. It looks like the rock is falling fast through the sky!
+   You can see glowing craters on the ground, as well as two cracked and broken
+moons that have fallen from the sky.
+~
+E
+rock center around~
+   The dark, metallic rock is large enough for you, Hana, and her anvil, and
+not a lot else.
+~
+E
+edges red-hot redhot hot~
+   At its edges, the rock is red-hot, almost to the point of melting it in the
+powerful fire that roars all around. Poles hold pieces of Hana's metal in the
+flames, turning them red-hot as well.
+~
+E
+poles pieces metal~
+Poles heat pieces of metal in the powerful flames around the rock.
+~
+E
+sky~
+You can't see the sky through the thick smoke.
+~
+E
+stars starry expanse~
+You can't see the stars through the thick smoke.
+~
+E
+smoke smoky clouds up~
+The dark, smoky cloud from the fire wall blocks all view of the sky above you.
+~
+E
+night~
+It's night out.
+~
+E
+moon crescent~
+   Beyond the flames, you can see the crescent moon low in the sky. Strangely,
+you can also see a pair of cracked and broken moons down below.
+~
+E
+moons half-moons halfmoons cracked broken~
+   Far below this burning rock, you see a pair of moons that have fallen from
+the sky. One is broken in half, and missing much of its glory. The other is
+merely cracked like a spiderweb and devoid of its luster.
+~
+E
+archway~
+   The archway is made from a craggy metal rather similar to the rock you find
+yourself upon. Through it, you can still see the crater you came from, rather
+similar to a portal.
+~
+E
+anvil~
+   Hana is working at a heavy anvil that seems to be formed from the metallic
+rock beneath, with its surface polished to a perfect plane.
+~
+M 0 12922 100.00 1
+T 12803
+T 12802
+T 12819
+T 12920
+T 5195
+T 12921
+T 12923
+S
+#12923
+Terminus Forge~
+   On this side of the archway, the roar of the flames is deafening, and it
+comes from every direction. You are standing on a small, red rock, inside a
+ring of rising fire, plummeting through the sky. A second rock, twice the size
+of this one, floats just beyond the wall of fire and it, too, is engulfed in
+flames.
+Commands: forge, smelt, shatter <item to destroy>
+~
+cei 0 hv 12920
+D3
+~
+0 12921
+E
+archway~
+   The archway is made from the metallic rock itself and there is no distinct
+boundary where the archway ends and the rock begins. Through it, you can see
+Amir back at the crater.
+~
+E
+flames fire roaring ring~
+   Flames streak upward from the edges of the rock and blast high into the sky
+with a terrible noise, culminating in dark smoke which blocks your view of the
+sky. Poles hold pieces of metalwork in the flames.
+~
+E
+north south east northeast nw northwest nw southeast se southwest sw out~
+   Roaring flames surround this rock on all sides. Beyond that, you can see a
+second burning rock falling through the air alongside this one.
+~
+E
+meteor rocks beyond second~
+   A second, larger rock hovers in the air just beyond the flames that engulf
+this one. It, too, is burning as it plummets through the sky, leaving a smoky
+trail through the night.
+~
+E
+red~
+There's a lot of red here -- both rocks are on fire.
+~
+E
+up smoke smoky cloud~
+The flames around the rock have obscured the sky with a thick, dark cloud.
+~
+E
+stars starry sky expanse night~
+You can't see the stars through the smoke above you.
+~
+E
+down ground earth~
+   Glancing over the side of the rock, ever so carefully to avoid being singed,
+you can see you're plummeting fast toward the dark, cratered ground below.
+~
+E
+moon crescent~
+   Over the edge of the rock, you can see the crescent moon nestled low in the
+sky.
+~
+E
+moons half-moons halfmoons~
+   Cracked and broken moons lie along the ground far below, still shining, if
+only faintly.
+~
+E
+anvil~
+   A glass anvil is anchored firmly to the ground. It flickers and gleams as it
+catches light from the flames.
+~
+E
+metal poles pieces~
+Several poles hold pieces of metal in the roaring fire like a furnace.
+~
+M 0 12923 100.00 1
+T 12803
+T 12802
+T 12819
+T 12920
+T 5195
+T 12921
+T 12923
+S
+#12924
+Terminus Forge~
+   This side of the archway is serene. But for the tapping at the anvil, little
+sound disrupts the clear view of the stars. You find yourself upon a great rock
+or peak, but with no view of the world below. All around you, there are only
+stars and the immenseness of the night sky. The only other objects in the sky
+are the crescent moon and a large, glowing disc of blue.
+Commands: forge, shatter <item to destroy>
+~
+cei 0 h 12924
+D0
+~
+0 12921
+E
+archway~
+   The archway is a continuous part of the rock you're standing upon. It
+remains open, like a portal, showing the crater within, though it seems you're
+now quite far from there.
+~
+E
+anvil~
+An oversized anvil rests on the ground.
+~
+E
+up stars starry sky expanse night out~
+   The night is peaceful and endless, extending in all directions with
+uncountable stars. Only the crescent moon and the glowing disc block the view.
+~
+E
+moon crescent~
+The cresent moon hovers in the expanse before you.
+~
+E
+disc disk glowing blue~
+   A great, dark disc hangs in the starry expanse, glowing bright blue around
+its rim. It blocks a large part of your view in one direction.
+~
+E
+down~
+Beneath you is the rock you stand on; beneath that, only stars.
+~
+E
+craggy stone rock meteorite peak ground~
+The rock is dark gray. When you look over the edge, there's nothing beneath it.
+~
+E
+moons~
+There's just the one crescent moon.
+~
+E
+south east west southeast southwest se sw~
+Endless stars stretch out in all directions.
+~
+M 0 12924 100.00 1
+T 12803
+T 12802
+T 12819
+T 12920
+T 5195
+T 12921
+T 12923
+S
+#12925
+Terminus Forge~
+   At the edge of the craggy stone platform, hefty stacks of boxes form a
+make-shift wall. Beyond that, above the rim of the crater, you can see a pair
+of half-moons hanging low in the sky. Above them blazes a fiery comet, slowly
+moving through the air.
+~
+cei 0 0 12920
+D2
+~
+0 12921
+E
+edge~
+You're at the north edge of the rocky platform.
+~
+E
+platform~
+The platform is a large meteorite, stuck in a crater of its own making.
+~
+E
+craggy stone rock meteorite~
+The meteorite is rough like stone, but has the feel of metal.
+~
+E
+rim crater north south east west northeast nw northwest nw southeast se southwest sw out~
+The rim of the crater blocks most of the view.
+~
+E
+boxes stacks wall make-shift makeshift~
+Boxes of supplies are loosely organized and form a sort of wall.
+~
+E
+moons half-moons halfmoons~
+   A pair of cracked and broken moons hang low in the sky, almost resting on
+the crater's rim.
+~
+E
+up stars starry expanse night sky~
+Meteors, comets, and shooting stars streak across the vast expanse of stars.
+~
+E
+comet fiery fire~
+The comet blazes across the night sky.
+~
+M 0 12925 100.00 1
+T 12803
+T 12802
+T 12819
+S
+#12926
+Beneath a Mighty Rock~
+   You squeeze through a narrow passage and into a larger chamber beneath the
+massive, black rock. The walls here are glassy stone, carefully carved to
+create space to mine the underside of the rock. Here and there, the stone is
+marred by long slices where portals have dug into it over many years.
+Commands: return
+~
+cei 0 0 12920
+D8
+~
+0 12921
+E
+passage narrow~
+   The passage back up to the surface of the crater is tight, but you can just
+squeeze through.
+~
+E
+chamber~
+The chamber beneath the rock is much more spacious than the passage.
+~
+E
+rock craggy~
+The metallic rock above you has been mined for ore; there's still a lot left.
+~
+E
+walls grooves~
+The walls are glassy, grooved where they've been carved to make the chamber.
+~
+E
+glassy stone~
+   Much of the stone here is glassy, as if it was once heated to a tremendous
+temperature.
+~
+E
+scars~
+The walls and floors are scarred with grooves created by many magical portals.
+~
+E
+floor down~
+The floor is rock.
+~
+E
+up meteorite~
+Above you is the great meteorite nestled in the crater.
+~
+T 12803
+T 12802
+T 12801
+S
+#12927
+A Battlefield in Freefall, at Sunset~
+   You're plummeting through the air! There's little time to admire the radiant
+sky; the ground is coming up fast. Yet somehow, at this speed, the rushing air
+eneath you almost feels like a solid platform, and you've found your footing.
+Commands: return
+~
+ci 0 0 12927
+E
+air~
+   You're falling through the air! The ground is far below you, but less so
+with each passing instant.
+~
+E
+ground down~
+Looking down isn't the best idea right now.
+~
+E
+sky up around out~
+   You're falling through the pink-gold sky of sunset, supported by nothing but
+the rushing wind from below.
+~
+E
+sunset radant radiance~
+   On one side, the last rays of golden sun peek from the very edge of the
+horizon, lighting distant clouds in fiery orange. On the other side, a rosy
+band of stunning pink separates the turqouise blue of day above from the deep
+and infinite blue of night below.
+~
+E
+rosy pink band~
+   A band of rosy pink light marks the transition between day and night in the
+east.
+~
+E
+twilight~
+   Twilight has just begun to settle on the land as the sun sets to the west
+and night rises in the east.
+~
+E
+stars~
+The first stars have begun to pierce twilight's veil.
+~
+E
+platform footing~
+   The wind beneath you rushes up so fast that it almost feels as though you're
+standing on it.
+~
+E
+north south east west northeast nw northwest nw southeast se southwest sw~
+   In all directions, the horizon appears further than you've ever seen it...
+as you plummet fast through the air!
+~
+T 12817
+T 12818
+T 12824
+T 12803
+T 12926
+T 12928
+Z1 1
+S
+#12928
+A Battlefield in Freefall, at Sunset~
+   You're plummeting through the air! There's little time to admire the radiant
+sky; the ground is coming up fast. Yet somehow, at this speed, the rushing air
+eneath you almost feels like a solid platform, and you've found your footing.
+Commands: return
+~
+ci 0 0 12928
+E
+air~
+   You're falling through the air! The ground is far below you, but less so
+with each passing instant.
+~
+E
+ground down~
+Looking down isn't the best idea right now.
+~
+E
+sky up around out~
+   You're falling through the pink-gold sky of sunset, supported by nothing but
+the rushing wind from below.
+~
+E
+sunset radant radiance~
+   On one side, the last rays of golden sun peek from the very edge of the
+horizon, lighting distant clouds in fiery orange. On the other side, a rosy
+band of stunning pink separates the turqouise blue of day above from the deep
+and infinite blue of night below.
+~
+E
+rosy pink band~
+   A band of rosy pink light marks the transition between day and night in the
+east.
+~
+E
+twilight~
+   Twilight has just begun to settle on the land as the sun sets to the west
+and night rises in the east.
+~
+E
+stars~
+The first stars have begun to pierce twilight's veil.
+~
+E
+platform footing~
+   The wind beneath you rushes up so fast that it almost feels as though you're
+standing on it.
+~
+E
+north south east west northeast nw northwest nw southeast se southwest sw~
+   In all directions, the horizon appears further than you've ever seen it...
+as you plummet fast through the air!
+~
+T 12817
+T 12818
+T 12824
+T 12803
+T 12926
+T 12928
+Z1 1
+S
+#12929
+A Battlefield in Freefall, at Sunset~
+   You're plummeting through the air! There's little time to admire the radiant
+sky; the ground is coming up fast. Yet somehow, at this speed, the rushing air
+eneath you almost feels like a solid platform, and you've found your footing.
+Commands: return
+~
+ci 0 0 12929
+E
+air~
+   You're falling through the air! The ground is far below you, but less so
+with each passing instant.
+~
+E
+ground down~
+Looking down isn't the best idea right now.
+~
+E
+sky up around out~
+   You're falling through the pink-gold sky of sunset, supported by nothing but
+the rushing wind from below.
+~
+E
+sunset radant radiance~
+   On one side, the last rays of golden sun peek from the very edge of the
+horizon, lighting distant clouds in fiery orange. On the other side, a rosy
+band of stunning pink separates the turqouise blue of day above from the deep
+and infinite blue of night below.
+~
+E
+rosy pink band~
+   A band of rosy pink light marks the transition between day and night in the
+east.
+~
+E
+twilight~
+   Twilight has just begun to settle on the land as the sun sets to the west
+and night rises in the east.
+~
+E
+stars~
+The first stars have begun to pierce twilight's veil.
+~
+E
+platform footing~
+   The wind beneath you rushes up so fast that it almost feels as though you're
+standing on it.
+~
+E
+north south east west northeast nw northwest nw southeast se southwest sw~
+   In all directions, the horizon appears further than you've ever seen it...
+as you plummet fast through the air!
+~
+T 12817
+T 12818
+T 12824
+T 12803
+T 12926
+T 12928
+Z1 1
+S
 $

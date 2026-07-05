@@ -2383,6 +2383,11 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 				struct instance_data *inst = get_instance_for_script(type, go);
 				safe_snprintf(str, slen, "%d", inst ? INST_ID(inst) : 0);
 			}
+			else if (!str_cmp(var, "_map")) {
+				// %_map% with no field
+				script_log("Trigger: %s, VNum %d, %%_map%% called with no field", GET_TRIG_NAME(trig), GET_TRIG_VNUM(trig));
+				strcpy(str, "0");
+			}
 			else if (!str_cmp(var, "timestamp")) {
 				safe_snprintf(str, slen, "%ld", time(0));
 				return;
@@ -2952,8 +2957,11 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 			}
 			else if (!str_cmp(var, "temperature")) {
 				if (field && (*field == '-' || *field == '+' || isdigit(*field))) {
-					// WARNING: does not work with negatives like %temperature.-3%
+					// WARNING: does not work with negatives like %temperature.-3% -- use %temperature.text(-3)%
 					safe_snprintf(str, slen, "%s", temperature_to_string(atoi(field)));
+				}
+				else if (field && !str_cmp(field, "text") && subfield && *subfield) {
+					safe_snprintf(str, slen, "%s", temperature_to_string(atoi(subfield)));
 				}
 				else {
 					strcpy(str, "");
@@ -3009,6 +3017,23 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 				}
 				else if (!str_cmp(field, "name")) {
 					safe_snprintf(str, slen, "%s", find_adv ? GET_ADV_NAME(find_adv) : "");
+				}
+				else {
+					strcpy(str, "");
+				}
+				return;
+			}
+			else if (!str_cmp(var, "_map")) {
+				if (!str_cmp(field, "reverse")) {
+					int dir;
+					
+					// %_map.reverse(dir)%
+					if (subfield && *subfield && ((dir = search_block(subfield, dirs, FALSE)) != NOTHING || (dir = search_block(subfield, alt_dirs, FALSE)) != NOTHING)) {
+						safe_snprintf(str, slen, "%s", dirs[rev_dir[dir]]);
+					}
+					else {
+						strcpy(str, "");
+					}
 				}
 				else {
 					strcpy(str, "");
@@ -6103,11 +6128,17 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 							safe_snprintf(str, slen, "0");
 						}
 					}
+					else if (!str_cmp(field, "is_OCEAN")) {
+						safe_snprintf(str, slen, "%d", DEEP_WATER_SECT(r) ? 1 : 0);
+					}
 					else if (!str_cmp(field, "is_on_map")) {
 						safe_snprintf(str, slen, "%d", (GET_ROOM_VNUM(r) < MAP_SIZE) ? 1 : 0);
 					}
 					else if (!str_cmp(field, "is_outdoors")) {
 						safe_snprintf(str, slen, "%d", IS_OUTDOOR_TILE(r) ? 1 : 0);
+					}
+					else if (!str_cmp(field, "is_water")) {
+						safe_snprintf(str, slen, "%d", WATER_SECT(r) ? 1 : 0);
 					}
 					else if (!str_cmp(field, "is_zenith_day")) {
 						safe_snprintf(str, slen, "%d", is_zenith_day(r) ? 1 : 0);

@@ -165,6 +165,10 @@ bool audit_social(social_data *soc, char_data *ch) {
 		olc_audit_msg(ch, SOC_VNUM(soc), "Social has s2char/s2other but not t2char (required)");
 		problem = TRUE;
 	}
+	if ((SOC_MESSAGE(soc, SOCM_SILENT_TO_CHAR) || SOC_MESSAGE(soc, SOCM_SILENT_TO_OTHERS)) && !SOCIAL_FLAGGED(soc, SOC_NOISY)) {
+		olc_audit_msg(ch, SOC_VNUM(soc), "Social has silent2char/other but missing NOISY flag (required)");
+		problem = TRUE;
+	}
 	
 	return problem;
 }
@@ -199,6 +203,132 @@ char *list_one_social(social_data *soc, bool detail) {
 	}
 		
 	return output;
+}
+
+
+/**
+* Searches properties of social.
+*
+* @param char_data *ch The person searching.
+* @param char *argument The argument they entered.
+*/
+void olc_fullsearch_social(char_data *ch, char *argument) {
+	bool any;
+	char type_arg[MAX_INPUT_LENGTH], val_arg[MAX_INPUT_LENGTH], find_keywords[MAX_INPUT_LENGTH];
+	int count, iter;
+	
+	bitvector_t only_flags = NOBITS, not_flagged = NOBITS;
+	int vmin = NOTHING, vmax = NOTHING;
+	int min_char_pos = POS_DEAD, max_char_pos = POS_STANDING, min_vict_pos = POS_DEAD, max_vict_pos = POS_STANDING;
+	bool must_have_req = FALSE, not_have_req = FALSE;
+	
+	social_data *soc, *next_soc;
+	
+	if (!*argument) {
+		msg_to_char(ch, "See HELP SOCEDIT FULLSEARCH for syntax.\r\n");
+		return;
+	}
+	
+	// process argument
+	*find_keywords = '\0';
+	while (*argument) {
+		// figure out a type
+		argument = any_one_arg(argument, type_arg);
+		
+		if (!strcmp(type_arg, "-")) {
+			continue;	// just skip stray dashes
+		}
+		
+		FULLSEARCH_FLAGS("flags", only_flags, social_flags)
+		FULLSEARCH_FLAGS("flagged", only_flags, social_flags)
+		FULLSEARCH_FLAGS("unflagged", not_flagged, social_flags)
+		FULLSEARCH_BOOL("hasrequirements", must_have_req)
+		FULLSEARCH_BOOL("norequirements", not_have_req)
+		FULLSEARCH_LIST("maxcharposition", max_char_pos, position_types)
+		FULLSEARCH_LIST("mincharposition", min_char_pos, position_types)
+		FULLSEARCH_LIST("maxvictposition", max_char_pos, position_types)
+		FULLSEARCH_LIST("minvictposition", min_char_pos, position_types)
+		FULLSEARCH_INT("vmin", vmin, 0, INT_MAX)
+		FULLSEARCH_INT("vmax", vmax, 0, INT_MAX)
+		
+		else {	// not sure what to do with it? treat it like a keyword
+			sprintf(find_keywords + strlen(find_keywords), "%s%s", *find_keywords ? " " : "", type_arg);
+		}
+		
+		// prepare for next loop
+		skip_spaces(&argument);
+	}
+	
+	build_page_display(ch, "Social fullsearch: %s", show_color_codes(find_keywords));
+	count = 0;
+	
+	// okay now look up socials
+	HASH_ITER(hh, social_table, soc, next_soc) {
+		if ((vmin != NOTHING && SOC_VNUM(soc) < vmin) || (vmax != NOTHING && SOC_VNUM(soc) > vmax)) {
+			continue;	// vnum range
+		}
+		if (not_flagged != NOBITS && IS_SET(SOC_FLAGS(soc), not_flagged)) {
+			continue;
+		}
+		if (only_flags != NOBITS && (SOC_FLAGS(soc) & only_flags) != only_flags) {
+			continue;
+		}
+		if (SOC_MIN_CHAR_POS(soc) < min_char_pos || SOC_MIN_CHAR_POS(soc) > max_char_pos) {
+			continue;
+		}
+		if (SOC_MIN_VICT_POS(soc) < min_vict_pos || SOC_MIN_VICT_POS(soc) > max_vict_pos) {
+			continue;
+		}
+		if (must_have_req && !SOC_REQUIREMENTS(soc)) {
+			continue;
+		}
+		if (not_have_req && SOC_REQUIREMENTS(soc)) {
+			continue;
+		}
+		
+		// search strings
+		if (*find_keywords) {
+			any = FALSE;
+			if (SOC_NAME(soc) && multi_isname(find_keywords, SOC_NAME(soc))) {
+				any = TRUE;
+			}
+			else if (SOC_COMMAND(soc) && multi_isname(find_keywords, SOC_COMMAND(soc))) {
+				any = TRUE;
+			}
+			else if (SOC_NOTES(soc) && multi_isname(find_keywords, SOC_NOTES(soc))) {
+				any = TRUE;
+			}
+			
+			for (iter = 0; iter < NUM_SOCM_MESSAGES && !any; ++iter) {
+				if (SOC_MESSAGE(soc, iter) && multi_isname(find_keywords, SOC_MESSAGE(soc, iter))) {
+					any = TRUE;
+				}
+			}
+			
+			// did we find a match in any string
+			if (!any) {
+				continue;
+			}
+		}
+		
+		// show it
+		if (SOC_COMMAND(soc) && !str_cmp(SOC_NAME(soc), SOC_COMMAND(soc))) {
+			build_page_display(ch, "[%5d] %s", SOC_VNUM(soc), SOC_NAME(soc));
+		}
+		else {
+			build_page_display(ch, "[%5d] %s (%s)", SOC_VNUM(soc), SOC_NAME(soc), NULLSAFE(SOC_COMMAND(soc)));
+		}
+		++count;
+	}
+	
+	if (count > 0) {
+		build_page_display(ch, "(%d socials)", count);
+	}
+	else {
+		build_page_display_str(ch, " none");
+	}
+	
+	send_page_display(ch);
 }
 
 
@@ -340,6 +470,9 @@ void free_social(social_data *soc) {
 	if (SOC_NAME(soc) && (!proto || SOC_NAME(soc) != SOC_NAME(proto))) {
 		free(SOC_NAME(soc));
 	}
+	if (SOC_NOTES(soc) && (!proto || SOC_NOTES(soc) != SOC_NOTES(proto))) {
+		free(SOC_NOTES(soc));
+	}
 	
 	for (iter = 0; iter < NUM_SOCM_MESSAGES; ++iter) {
 		if (SOC_MESSAGE(soc, iter) && (!proto || SOC_MESSAGE(soc, iter) != SOC_MESSAGE(proto, iter))) {
@@ -418,6 +551,11 @@ void parse_social(FILE *fl, any_vnum vnum) {
 				break;
 			}
 			
+			case '_': {	// notes
+				SOC_NOTES(soc) = fread_string(fl, error);
+				break;
+			}
+			
 			// end
 			case 'S': {
 				return;
@@ -474,7 +612,7 @@ void write_socials_index(FILE *fl) {
 * @param social_data *soc The thing to save.
 */
 void write_social_to_file(FILE *fl, social_data *soc) {
-	char temp[256];
+	char temp[MAX_STRING_LENGTH];
 	int iter;
 	
 	if (!fl || !soc) {
@@ -502,6 +640,13 @@ void write_social_to_file(FILE *fl, social_data *soc) {
 		if (SOC_MESSAGE(soc, iter)) {
 			fprintf(fl, "M%d\n%s~\n", iter, SOC_MESSAGE(soc, iter));
 		}
+	}
+	
+	// '_'
+	if (SOC_NOTES(soc) && *SOC_NOTES(soc)) {
+		strcpy(temp, SOC_NOTES(soc));
+		strip_crlf(temp);
+		fprintf(fl, "_\n%s~\n", temp);
 	}
 	
 	// end
@@ -619,6 +764,9 @@ void save_olc_social(descriptor_data *desc) {
 	if (SOC_NAME(proto)) {
 		free(SOC_NAME(proto));
 	}
+	if (SOC_NOTES(proto)) {
+		free(SOC_NOTES(proto));
+	}
 	for (iter = 0; iter < NUM_SOCM_MESSAGES; ++iter) {
 		if (SOC_MESSAGE(proto, iter)) {
 			free(SOC_MESSAGE(proto, iter));
@@ -638,6 +786,10 @@ void save_olc_social(descriptor_data *desc) {
 			free(SOC_NAME(soc));
 		}
 		SOC_NAME(soc) = str_dup(default_social_name);
+	}
+	if (SOC_NOTES(soc) && !*SOC_NOTES(soc)) {
+		free(SOC_NOTES(soc));
+		SOC_NOTES(soc) = NULL;
 	}
 	
 	// save data back over the proto-type
@@ -676,6 +828,7 @@ social_data *setup_olc_social(social_data *input) {
 		// copy things that are pointers
 		SOC_COMMAND(new) = SOC_COMMAND(input) ? str_dup(SOC_COMMAND(input)) : NULL;
 		SOC_NAME(new) = SOC_NAME(input) ? str_dup(SOC_NAME(input)) : NULL;
+		SOC_NOTES(new) = SOC_NOTES(input) ? str_dup(SOC_NOTES(input)) : NULL;
 		SOC_REQUIREMENTS(new) = copy_requirements(SOC_REQUIREMENTS(input));
 		
 		for (iter = 0; iter < NUM_SOCM_MESSAGES; ++iter) {
@@ -729,6 +882,10 @@ void do_stat_social(char_data *ch, social_data *soc) {
 		build_page_display(ch, "\tc%s\t0: %s", social_message_types[iter][0], SOC_MESSAGE(soc, iter) ? SOC_MESSAGE(soc, iter) : "(none)");
 	}
 	
+	if (SOC_NOTES(soc) && *SOC_NOTES(soc)) {
+		build_page_display(ch, "Notes:\r\n%s", SOC_NOTES(soc));
+	}
+	
 	send_page_display(ch);
 }
 
@@ -767,6 +924,8 @@ void olc_show_social(char_data *ch) {
 	for (iter = 0; iter < NUM_SOCM_MESSAGES; ++iter) {
 		build_page_display(ch, "%s <%s%s\t0>: %s", social_message_types[iter][0], OLC_LABEL_STR(SOC_MESSAGE(soc, iter), ""), social_message_types[iter][1], SOC_MESSAGE(soc, iter) ? SOC_MESSAGE(soc, iter) : "(none)");
 	}
+	
+	build_page_display(ch, "<%snotes\t0>\r\n%s", OLC_LABEL_PTR(SOC_NOTES(soc)), NULLSAFE(SOC_NOTES(soc)));
 	
 	send_page_display(ch);
 }
@@ -835,6 +994,19 @@ OLC_MODULE(socedit_name) {
 }
 
 
+OLC_MODULE(socedit_notes) {
+	social_data *soc = GET_OLC_SOCIAL(ch->desc);
+
+	if (ch->desc->str) {
+		msg_to_char(ch, "You are already editing a string.\r\n");
+	}
+	else {
+		sprintf(buf, "notes for %s", SOC_NAME(soc));
+		start_string_editor(ch->desc, buf, &SOC_NOTES(soc), MAX_NOTES, TRUE);
+	}
+}
+
+
 OLC_MODULE(socedit_requirements) {
 	social_data *soc = GET_OLC_SOCIAL(ch->desc);
 	olc_process_requirements(ch, argument, &SOC_REQUIREMENTS(soc), "requirement", FALSE);
@@ -864,6 +1036,16 @@ OLC_MODULE(socedit_s2char) {
 
 OLC_MODULE(socedit_s2other) {
 	process_soc_msg_field(ch, argument, SOCM_SELF_TO_OTHERS);
+}
+
+
+OLC_MODULE(socedit_silent2char) {
+	process_soc_msg_field(ch, argument, SOCM_SILENT_TO_CHAR);
+}
+
+
+OLC_MODULE(socedit_silent2other) {
+	process_soc_msg_field(ch, argument, SOCM_SILENT_TO_OTHERS);
 }
 
 

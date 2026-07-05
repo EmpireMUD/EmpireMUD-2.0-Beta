@@ -2832,7 +2832,7 @@ ACMD(do_tame) {
 	else if (!(mob = get_char_vis(ch, arg, NULL, FIND_CHAR_ROOM))) {
 		send_config_msg(ch, "no_person");
 	}
-	else if (!IS_NPC(mob) || !has_interaction(mob->interactions, INTERACT_TAME)) {
+	else if (!IS_NPC(mob) || !has_interaction(MOB_INTERACTIONS(mob), INTERACT_TAME)) {
 		act("You can't tame $N!", FALSE, ch, 0, mob, TO_CHAR);
 	}
 	else if (GET_LED_BY(mob) && GET_LED_BY(mob) != ch) {
@@ -2846,7 +2846,7 @@ ACMD(do_tame) {
 		act("$n tries to tame you...", FALSE, ch, NULL, mob, TO_VICT);
 		act("$n tries to tame $N...", FALSE, ch, NULL, mob, TO_NOTVICT);
 		
-		any = run_interactions(ch, mob->interactions, INTERACT_TAME, IN_ROOM(ch), mob, NULL, NULL, tame_interact);
+		any = run_interactions(ch, MOB_INTERACTIONS(mob), INTERACT_TAME, IN_ROOM(ch), mob, NULL, NULL, tame_interact);
 		
 		if (any) {
 			gain_player_tech_exp(ch, PTECH_TAME_ANIMALS, 50);

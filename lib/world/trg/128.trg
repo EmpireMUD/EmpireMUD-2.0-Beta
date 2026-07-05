@@ -1,18 +1,21 @@
 #12800
 Celestial Forge: Donate to open portal~
-0 c 0 10
+0 c 0 13
 L c 12800
 L c 12801
 L c 12802
+L c 12803
 L c 12806
 L j 12810
 L j 12850
 L j 12890
+L j 12920
 L w 5100
 L w 5101
 L w 5102
+L w 5103
 donate~
-set forge_list Lodestone Forge, Victory Forge, Echo Forge, ...
+set forge_list Lodestone Forge, Victory Forge, Echo Forge, Terminus Forge, ...
 set room %self.room%
 set which 0
 set dest 0
@@ -26,19 +29,21 @@ elseif iron forge /= %arg% || lodestone forge /= %arg%
   set which 12800
   set dest 12810
   set curr 5100
-  set str an iron shard
 elseif imperium forge /= %arg% || victory forge /= %arg%
   set name Victory Forge
   set which 12801
   set dest 12850
   set curr 5101
-  set str an imperium shard
 elseif eventide forge /= %arg% || echo forge /= %arg%
   set name Echo Forge
   set which 12802
   set dest 12890
   set curr 5102
-  set str an eventide shard
+elseif meteorite forge /= %arg% || terminus forge /= %arg%
+  set name Terminus Forge
+  set which 12803
+  set dest 12920
+  set curr 5103
 else
   %send% %actor% Unknown celestial forge. (%forge_list%)
 end
@@ -72,8 +77,9 @@ end
 nop %actor.give_currency(%curr%, -1)%
 * update portal-in
 nop %inport.val0(%toroom.vnum%)%
-%send% %actor% You donate %str% to the forge and @%inport% appears!
-%echoaround% %actor% ~%actor% donates %str% to the forge and @%inport% appears!
+eval curname %%currency.%curr%(1)%%
+%send% %actor% You donate %curname.ana% %curname% to the forge and @%inport% appears!
+%echoaround% %actor% ~%actor% donates %curname.ana% %curname% to the forge and @%inport% appears!
 * portal back
 %load% obj 12806 %toroom%
 set outport %toroom.contents%
@@ -90,17 +96,20 @@ end
 ~
 #12801
 Celestial Forge: Request exit~
-2 c 0 10
+2 c 0 13
 L c 9680
 L c 12800
 L c 12801
 L c 12802
+L c 12803
 L c 12806
 L e 5195
 L j 12800
 L j 12810
 L j 12850
 L j 12890
+L j 12920
+L j 12926
 return~
 if %actor.is_npc%
   * possibly immortal trying to return
@@ -137,6 +146,10 @@ if %cf_return%
       break
       case 12890
         set in_vnum 12802
+      break
+      case 12920
+      case 12926
+        set in_vnum 12803
       break
       default
         set in_vnum 0
@@ -200,7 +213,7 @@ end
 ~
 #12802
 Celestial Forge: Detect player entry, Grant abilities, Start progress~
-2 gA 100 17
+2 gA 100 20
 L c 9684
 L c 12917
 L e 5195
@@ -211,9 +224,12 @@ L j 12850
 L j 12855
 L j 12890
 L j 12895
+L j 12920
+L j 12926
 L o 12810
 L o 12850
 L o 12890
+L o 12920
 L q 6
 L y 12810
 L y 12850
@@ -260,6 +276,18 @@ if %actor.skill(6)% >= 76
     if %actor.empire%
       nop %actor.empire.start_progress(12890)%
     end
+  elseif %room.template% >= 12920 && %room.template% <= 12926
+    if !%actor.has_bonus_ability(12920)%
+      * grant the ability after a short delay
+      %load% obj 9684 %actor%
+      set obj %actor.inventory%
+      if %obj.vnum% == 9684
+        nop %obj.val0(12920)%
+      end
+    end
+    if %actor.empire%
+      nop %actor.empire.start_progress(12920)%
+    end
   end
 end
 * Movement SFX
@@ -287,9 +315,19 @@ end
 ~
 #12803
 Celestial Forge: Time and Weather commands~
-2 c 0 2
+2 c 0 12
 L j 12810
 L j 12850
+L j 12920
+L j 12921
+L j 12922
+L j 12923
+L j 12924
+L j 12925
+L j 12926
+L j 12927
+L j 12928
+L j 12929
 time weather~
 if %cmd.mudcommand% == time
   * TIME
@@ -300,6 +338,22 @@ if %cmd.mudcommand% == time
     case 12850
       %send% %actor% It looks like nighttime out through the flap.
     break
+    case 12920
+    case 12922
+    case 12923
+      %send% %actor% All you can see above the flames is dark smoke, but you surmise it is nighttime.
+    break
+    case 12924
+      %send% %actor% It seems like a serene, endless night.
+    break
+    case 12926
+      %send% %actor% It's hard to tell the time from down here beneath the rock.
+    break
+    case 12927
+    case 12928
+    case 12929
+      %send% %actor% There's no time for that now -- you're falling!
+    break
     default
       %send% %actor% The beautiful night sky overhead tells you it's nighttime.
     break
@@ -309,10 +363,28 @@ elseif %cmd.mudcommand% == weather
   * WEATHER
   switch %room.template%
     case 12810
+    case 12926
       %send% %actor% It's hard to tell the weather from in here.
     break
     case 12850
       %send% %actor% The night sky is cloudless outside.
+    break
+    case 12920
+    case 12922
+    case 12923
+      %send% %actor% Do the roaring flames that surround this rock count as weather?
+    break
+    case 12924
+      %send% %actor% There's no weather at all.
+    break
+    case 12921
+    case 12925
+      %send% %actor% The meteor showers are the only weather in the night sky.
+    break
+    case 12927
+    case 12928
+    case 12929
+      %send% %actor% It's windier than you've ever seen before... because you're falling!
     break
     default
       %send% %actor% The night sky is cloudless and vast.
@@ -342,8 +414,7 @@ elseif %cmd% == survey
     end
   end
   %send% %actor% Climate: %room.climate%
-  eval temp %%temperature.%room.temperature%%%
-  %send% %actor% Temperature: %temp%
+  %send% %actor% Temperature: %temperature.text(%room.temperature%)%
   %send% %actor% This location cannot be claimed.
 else
   return 0
@@ -370,6 +441,8 @@ if goto /= %mode%
     set to_room %instance.nearest_rmt(12850)%
   elseif eventide /= %arg2% || echo forge /= %arg2%
     set to_room %instance.nearest_rmt(12890)%
+  elseif meteorite /= %arg2% || terminus forge /= %arg2%
+    set to_room %instance.nearest_rmt(12920)%
   else
     set to_room %instance.nearest_rmt(%arg2%)%
   end
@@ -385,7 +458,7 @@ if goto /= %mode%
     %force% %actor% look
   end
 else
-  %send% %actor% &&0Usage: cforge goto iron
+  %send% %actor% &&0Usage: cforge goto <iron | imperium | eventide | meteorite>
   %send% %actor% &&0       cforge goto <template vnum>
 end
 ~
@@ -477,6 +550,8 @@ if !%self.mob_flagged(SILENT)%
   remote no_silent %self.id%
   nop %self.add_mob_flag(SILENT)%
 end
+* brief wait for players to enter
+wait 0
 * Show the scripted text
 * tell story
 set pos 0
@@ -557,6 +632,14 @@ if %self.varexists(no_silent)%
   nop %self.remove_mob_flag(SILENT)%
 end
 ~
+#12808
+Celestial Forge: Lonely boss despawn~
+0 ab 20 0
+~
+if !%self.room.players_present%
+  %purge% %self%
+end
+~
 #12810
 Celestial Forge: Mine attempt~
 2 c 0 0
@@ -565,7 +648,7 @@ mine~
 ~
 #12811
 Celestial Forge: Unique item exclusion~
-1 j 0 10
+1 j 0 20
 L c 12810
 L c 12814
 L c 12818
@@ -576,8 +659,18 @@ L c 12856
 L c 12860
 L c 12864
 L c 12868
+L c 12886
+L c 12890
+L c 12894
+L c 12898
+L c 12902
+L c 12920
+L c 12924
+L c 12928
+L c 12932
+L c 12936
 ~
-set ring_list 12810 12814 12818 12822 12826 12852 12856 12860 12864 12868
+set ring_list 12810 12814 12818 12822 12826 12852 12856 12860 12864 12868 12886 12890 12894 12898 12902 12920 12924 12928 12932 12936
 set ring_pos rfinger lfinger
 set pos_list
 *
@@ -764,7 +857,7 @@ nop %self.remove_mob_flag(NO-ATTACK)%
 ~
 #12817
 Celestial Forge: Arena return command~
-2 c 0 13
+2 c 0 17
 L c 9680
 L j 12811
 L j 12817
@@ -778,6 +871,10 @@ L j 12891
 L j 12897
 L j 12898
 L j 12899
+L j 12921
+L j 12927
+L j 12928
+L j 12929
 return~
 if %actor.fighting% || %actor.disabled%
   %send% %actor% You can't do that right now.
@@ -805,6 +902,12 @@ switch %room.template%
   case 12899
     set dest %instance.nearest_rmt(12891)%
     set mes raucously loud flash of light
+  break
+  case 12927
+  case 12928
+  case 12929
+    set dest %instance.nearest_rmt(12921)%
+    set mes fiery roar
   break
 done
 if !%dest%
@@ -834,12 +937,13 @@ done
 ~
 #12818
 Celetsial Forge: Reset arena and spawn mob~
-2 bw 100 15
+2 bw 100 19
 L b 12817
 L b 12857
 L b 12858
 L b 12859
 L b 12897
+L b 12927
 L c 12918
 L j 12817
 L j 12818
@@ -850,6 +954,9 @@ L j 12859
 L j 12897
 L j 12898
 L j 12899
+L j 12927
+L j 12928
+L j 12929
 ~
 * setup
 switch %self.template%
@@ -874,6 +981,13 @@ switch %self.template%
     set mob 12897
     set mes A long, sustained peal cuts through the silence and the great wall around the forge rises from one end, opening its many-toothed mouth wide... That's no wall!
   break
+  case 12927
+  case 12928
+  case 12929
+    set check_list 12927
+    set mob 12927
+    set mes The pink band across the sky rips open and the Lion of Time emerges, shimmering like the stars themselves, looming larger than life above you!
+  break
   default
     halt
   break
@@ -895,6 +1009,9 @@ if !%any%
       %send% %ch% &&wThe spirit of the forge flows through you and restores you!&&0
     end
     %restore% %ch%
+    if %ch.is_pc%
+      rdelete splat_%ch.id% %room.id%
+    end
     set ch %ch.next_in_room%
   done
 end
@@ -924,7 +1041,7 @@ end
 ~
 #12819
 Celestial Forge: Challenge command to enter arena~
-2 c 0 14
+2 c 0 18
 L c 9680
 L c 12918
 L j 12811
@@ -939,6 +1056,10 @@ L j 12891
 L j 12897
 L j 12898
 L j 12899
+L j 12921
+L j 12927
+L j 12928
+L j 12929
 challenge~
 * Tries to find an available arena to fight in
 * optional 'empty' arg gets you one with zero players
@@ -962,6 +1083,10 @@ switch %room.template%
   case 12891
     set room_list 12897 12898 12899
     set mes tremendous flash of white light
+  break
+  case 12921
+    set room_list 12927 12928 12929
+    set mes tremendous fiery whirl
   break
 done
 eval empty %arg% == empty
@@ -1230,19 +1355,23 @@ done
 ~
 #12833
 Celestial Forge: Buy mastery item~
-1 n 100 12
+1 n 100 16
 L c 12833
 L c 12872
 L c 12906
+L c 12940
 L o 12810
 L o 12811
 L o 12850
 L o 12851
 L o 12890
 L o 12891
+L o 12920
+L o 12921
 L w 5100
 L w 5101
 L w 5102
+L w 5103
 ~
 set actor %self.carried_by%
 if !%actor%
@@ -1266,6 +1395,12 @@ switch %self.vnum%
     set requires 12890
     set grants 12891
     set shard 5102
+    set refund 1000
+  break
+  case 12940
+    set requires 12920
+    set grants 12921
+    set shard 5103
     set refund 1000
   break
   default
@@ -1297,16 +1432,20 @@ end
 ~
 #12834
 Shard companion: Buy shard companion~
-1 n 100 15
+1 n 100 19
 L b 12834
 L b 12844
 L b 12913
+L b 12947
 L c 12879
 L c 12880
 L c 12881
 L c 12913
 L c 12914
 L c 12915
+L c 12947
+L c 12948
+L c 12949
 L f 12837
 L w 5100
 L w 5101
@@ -1317,8 +1456,8 @@ L w 5104
 set cost 150
 *
 * list in order from highest to lowest, count=max
-set comp_list 12844 12834 12913
-set comp_count 2
+set comp_list 12947 12913 12844 12834
+set comp_count 4
 *
 * init
 set tier 1
@@ -1378,6 +1517,21 @@ switch %self.vnum%
   case 12915
     set tier 3
     set new_vnum 12913
+    set upgrade caster
+  break
+  case 12947
+    set tier 4
+    set new_vnum 12947
+    set upgrade tank
+  break
+  case 12948
+    set tier 4
+    set new_vnum 12947
+    set upgrade dps
+  break
+  case 12949
+    set tier 4
+    set new_vnum 12947
     set upgrade caster
   break
   default
@@ -1469,10 +1623,11 @@ end
 ~
 #12836
 Shard companion: Death trigger~
-0 ft 100 9
+0 ft 100 10
 L b 12834
 L b 12844
 L b 12913
+L b 12947
 L w 5100
 L w 5101
 L w 5102
@@ -1502,6 +1657,9 @@ switch %self.vnum%
   case 12913
     set tier 3
   break
+  case 12947
+    set tier 4
+  break
 done
 if %tier%
   * refund shard type
@@ -1524,10 +1682,11 @@ nop %actor.remove_companion(%self.vnum%)%
 ~
 #12837
 Shard companion: Setup and update~
-0 bt 100 9
+0 bt 100 10
 L b 12834
 L b 12844
 L b 12913
+L b 12947
 L c 12808
 L w 12834
 L w 12835
@@ -1723,6 +1882,10 @@ switch %self.vnum%
     set metal eventide
     set desc_base The inky eventide surface of the elemental absorbs all light, reflecting only darkness.
   break
+  case 12947
+    set metal meteoric
+    set desc_base Heavy, pock-marked meteors cluster to form the elemental's body.
+  break
   default
     set metal tin
     set desc_base The elemental looks to be made from old tin.
@@ -1770,13 +1933,14 @@ detach 12837 %self.id%
 ~
 #12838
 Celestial Forge: Set up training dummy with use~
-1 c 6 3
+1 c 6 4
 L b 12838
 L b 12873
 L b 12907
+L b 12941
 use~
 * List of dummies to exclude here
-set dummy_list 12838 12873 12907
+set dummy_list 12838 12873 12907 12941
 *
 if %actor.obj_target(%arg.argument1%)% != %self%
   return 0
@@ -2786,7 +2950,7 @@ switch %arg%
     set non_msg ~%self% holds ^%self% palm upward and points forward.
   break
   case 33
-    set abil_msg ~%self% signs, 'There's still more availble here for you here.'
+    set abil_msg ~%self% signs, 'There's still more availble for you here.'
     set non_msg ~%self% gestures around the area, then folds ^%self% hands and opens them like a book, and then points forward.
   break
   * SOMSAK
