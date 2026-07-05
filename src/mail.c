@@ -144,6 +144,7 @@ ACMD(do_mail) {
 	char *tmstr, **write, *replaced;
 	const char *msg;
 	obj_data *obj;
+	player_index_data *pindex;
 	
 	if (IS_NPC(ch)) {
 		return;
@@ -159,7 +160,14 @@ ACMD(do_mail) {
 	}
 	else if (is_abbrev(arg, "check")) {
 		if (GET_MAIL_PENDING(ch)) {
-			msg_to_char(ch, "%s\r\n", config_get_string("mail_available_message") ? config_get_string("mail_available_message") : "You have mail waiting for you.");
+			build_page_display_str(ch, (config_get_string("mail_available_message") ? config_get_string("mail_available_message") : "You have mail waiting for you."));
+			
+			// list:
+			LL_FOREACH(GET_MAIL_PENDING(ch), mail) {
+				build_page_display(ch, " %s - %.20s%s", ((pindex = find_player_index_by_idnum(mail->from)) ? pindex->fullname : "(Unknown)"), mail->body, (strlen(mail->body) > 20 ? "..." : ""));
+			}
+			
+			send_page_display(ch);
 		}
 		else {
 			msg_to_char(ch, "%s\r\n", config_get_string("mail_not_available_message") ? config_get_string("mail_not_available_message") : "You don't seem to have any mail waiting for you.");
