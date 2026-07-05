@@ -696,7 +696,7 @@ return 0
 wait 0
 * did I get unharnessed?
 if %self.animals_harnessed% < %self.animals_required%
-  %echo% ~%self% comes crashing down!
+  %echo% @%self% comes crashing down!
   set fool %self.sitting_in%
   if %fool%
     if %fool.room.is_water%
