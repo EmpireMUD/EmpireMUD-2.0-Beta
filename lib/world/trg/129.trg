@@ -592,7 +592,8 @@ elseif %cmd% == sunshine
       set next_ch %ch.next_in_room%
       if %self.is_enemy(%ch%)% && !%ch.dead%
         if %self.var(count_scfinterrupt,0)% < %needed%
-          %echo% &&w~%ch% burns in the eternal sunshine!!&&0
+          %send% %ch% &&WThe eternal sunshine washes over you, cleansing you from existence!&&0
+          %echoaround% %ch% &&w~%ch% is washed away by the eternal sunshine!&&0
           if %diff% < 4
             %damage% %ch% %pain% direct
           else
