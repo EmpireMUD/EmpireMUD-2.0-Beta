@@ -196,9 +196,21 @@ ACMD(do_mail) {
 		}
 		else {
 			while ((mail = GET_MAIL_PENDING(ch)) && amt-- && ++count) {
+				pindex = find_player_index_by_idnum(mail->from);
+				
 				obj = create_obj();
-				set_obj_keywords(obj, "letter small mail");
-				set_obj_short_desc(obj, "a small letter");
+				
+				if (pindex) {
+					safe_snprintf(part, sizeof(part), "letter small mail %s", pindex->fullname);
+					set_obj_keywords(obj, part);
+					
+					safe_snprintf(part, sizeof(part), "a letter from %s", pindex->fullname);
+					set_obj_short_desc(obj, part);
+				}
+				else {
+					set_obj_keywords(obj, "letter small mail");
+					set_obj_short_desc(obj, "a small letter");
+				}
 				set_obj_long_desc(obj, "Someone has left a small letter here.");
 				obj->proto_data->type_flag = ITEM_MAIL;
 				GET_OBJ_WEAR(obj) = ITEM_WEAR_TAKE | ITEM_WEAR_HOLD;
