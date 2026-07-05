@@ -854,7 +854,7 @@ void show_craft_info(char_data *ch, char *argument, int craft_type) {
 	ability_data *abil;
 	craft_data *craft;
 	vehicle_data *veh;
-	obj_data *proto;
+	obj_data *proto = NULL;
 	bld_data *bld;
 	int craft_level, found_wrong_cmd = NOTHING;
 	
