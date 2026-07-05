@@ -832,6 +832,11 @@ void show_empire_diplomacy(char_data *ch, empire_data *emp, empire_data *only_wi
 		return;
 	}
 	
+	// show mine first?
+	if (GET_LOYALTY(ch) && emp != GET_LOYALTY(ch) && !only_with) {
+		show_empire_diplomacy(ch, emp, GET_LOYALTY(ch));
+	}
+	
 	// header
 	if (only_with) {
 		msg_to_char(ch, "Current diplomatic relations with %s:\r\n", EMPIRE_NAME(only_with));

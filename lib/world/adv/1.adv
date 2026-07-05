@@ -472,6 +472,9 @@ Paul Clarke~
 the items have gone missing. If you find what the characters are looking for,
 surely they'll be grateful. Nursery rhyme items can be found on low-level mobs
 all over the world.
+   Each adventure has its own goals and activities. For this one, fight mobs
+around the newbie island to find lost items, start the quest for each item, and
+seek out their original owners.
 
 Notes for implementors:
 - This adventure uses fixed-location instances.
@@ -500,6 +503,9 @@ Paul Clarke~
 Venture into the goblin mines and see what sends even goblins running for their
 lives! And maybe if you can find those goblins running around outside, they'll
 be willing to reward you for clearing out the mine.
+   Each adventure has its own goals and activities. In Goblin Mines, fight
+creatures inside the mine. Then, try 'where goblin' to find one of the goblins
+outside to trade with.
 
 Directions for implementors:
 - Increase the instance limit to the number of newbie islands in your game.
