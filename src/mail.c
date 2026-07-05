@@ -164,7 +164,7 @@ ACMD(do_mail) {
 			
 			// list:
 			LL_FOREACH(GET_MAIL_PENDING(ch), mail) {
-				build_page_display(ch, " %s - %.20s%s", ((pindex = find_player_index_by_idnum(mail->from)) ? pindex->fullname : "(Unknown)"), mail->body, (strlen(mail->body) > 20 ? "..." : ""));
+				build_page_display(ch, " %s - %.40s%s", ((pindex = find_player_index_by_idnum(mail->from)) ? pindex->fullname : "(Unknown)"), mail->body, (strlen(mail->body) > 40 ? "..." : ""));
 			}
 			
 			send_page_display(ch);
