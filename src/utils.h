@@ -2313,6 +2313,7 @@ bool find_and_bind(char_data *ch, obj_vnum vnum);
 int get_craft_scale_level(char_data *ch, craft_data *craft);
 int get_crafting_level(char_data *ch);
 obj_data *has_required_obj_for_craft(char_data *ch, obj_vnum vnum);
+bool obj_can_be_superior(obj_data *obj);
 
 // act.vampire.c
 bool cancel_biting(char_data *ch, bool preventable);

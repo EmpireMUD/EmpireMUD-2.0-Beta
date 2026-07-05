@@ -718,6 +718,35 @@ void list_available_augments(char_data *ch, int type, obj_data *matching_obj) {
 
 
 /**
+* Helper to determine if an object can be made superior. This is only true if
+* it's scalable or has an apply with the (superior) requirement.
+*
+* @param obj_data *obj The item to test.
+* @return bool TRUE if that item can be superior and FALSE if not.
+*/
+bool obj_can_be_superior(obj_data *obj) {
+	obj_data *proto;
+	struct obj_apply *apply;
+	
+	if (obj && (proto = obj_proto(GET_OBJ_VNUM(obj)))) {
+		// basic flags
+		if (OBJ_FLAGGED(proto, OBJ_SCALABLE | OBJ_SUPERIOR)) {
+			return TRUE;
+		}
+		
+		// superior applies
+		LL_FOREACH(GET_OBJ_APPLIES(proto), apply) {
+			if (apply->apply_type == APPLY_TYPE_SUPERIOR) {
+				return TRUE;
+			}
+		}
+	}
+	
+	return FALSE;	// in all other cases
+}
+
+
+/**
 * @param obj_data *obj Any item.
 * @param int apply_type APPLY_TYPE_x
 * @return bool TRUE if obj has at least 1 apply of that type.
@@ -1035,7 +1064,10 @@ void show_craft_info(char_data *ch, char *argument, int craft_type) {
 			sprintf(buf + strlen(buf), " (not learned)\t0");
 		}
 		if (abil && ABIL_MASTERY_ABIL(abil) != NOTHING) {
-			sprintf(buf + strlen(buf), ", Mastery: %s%s%s", (has_ability(ch, ABIL_MASTERY_ABIL(abil)) ? "" : "\tr"), get_ability_name_by_vnum(ABIL_MASTERY_ABIL(abil)), has_ability(ch, ABIL_MASTERY_ABIL(abil)) ? "" : " (not learned)\t0");
+			// hide for items that have no superior version
+			if (!proto || obj_can_be_superior(proto)) {
+				sprintf(buf + strlen(buf), ", Mastery: %s%s%s", (has_ability(ch, ABIL_MASTERY_ABIL(abil)) ? "" : "\tr"), get_ability_name_by_vnum(ABIL_MASTERY_ABIL(abil)), has_ability(ch, ABIL_MASTERY_ABIL(abil)) ? "" : " (not learned)\t0");
+			}
 		}
 		msg_to_char(ch, "Requires: %s\r\n", buf);
 	}
