@@ -2400,6 +2400,7 @@ void delete_player_from_running_events(char_data *ch);
 int gain_event_points(char_data *ch, any_vnum event_vnum, int points);
 struct player_event_data *get_event_data(char_data *ch, int event_id);
 bool has_uncollected_event_rewards(char_data *ch);
+void log_active_events_to_char(char_data *ch);
 struct event_running_data *only_one_running_event(int *count);
 
 // faction.c
