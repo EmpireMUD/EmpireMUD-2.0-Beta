@@ -2862,6 +2862,9 @@ char *where_relative_location(char_data *ch, char_data *vict) {
 	if (IN_ROOM(ch) == IN_ROOM(vict)) {
 		return " (here)";
 	}
+	else if (GET_ROOM_TEMPLATE(IN_ROOM(ch)) && find_instance_by_room(IN_ROOM(ch), FALSE, FALSE) == find_instance_by_room(IN_ROOM(vict), FALSE, FALSE)) {
+		return " (same adventure)";
+	}
 	else if ((room = HOME_ROOM(IN_ROOM(ch))) == HOME_ROOM(IN_ROOM(vict))) {
 		// same vehicle or building
 		if (GET_ROOM_VEHICLE(room)) {
