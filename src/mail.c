@@ -146,6 +146,8 @@ ACMD(do_mail) {
 	obj_data *obj;
 	player_index_data *pindex;
 	
+	const int preview_width = 40;
+	
 	if (IS_NPC(ch)) {
 		return;
 	}
@@ -164,7 +166,15 @@ ACMD(do_mail) {
 			
 			// list:
 			LL_FOREACH(GET_MAIL_PENDING(ch), mail) {
-				build_page_display(ch, " %s - %.40s%s", ((pindex = find_player_index_by_idnum(mail->from)) ? pindex->fullname : "(Unknown)"), mail->body, (strlen(mail->body) > 40 ? "..." : ""));
+				strncpy(mail_buf, NULLSAFE(mail->body), preview_width);
+				mail_buf[preview_width] = '\0';
+				tmstr = str_replace("\n", " ", mail_buf);
+				replaced = str_replace("\r", "", tmstr);
+				
+				build_page_display(ch, " %s - %.40s%s", ((pindex = find_player_index_by_idnum(mail->from)) ? pindex->fullname : "(Unknown)"), trim(replaced), (strlen(mail->body) > 40 ? "..." : ""));
+				
+				free(replaced);
+				free(tmstr);
 			}
 			
 			send_page_display(ch);
