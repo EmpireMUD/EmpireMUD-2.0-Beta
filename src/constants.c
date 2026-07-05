@@ -1869,7 +1869,7 @@ const char *affected_bits_consider[] = {
 	"",	// immune-temperature
 	"",	// auto-resurrect
 	"",	// 45 - counterspell
-	"$E cannot be disarmed",	// no-disarm
+	"$E cannot be disarmed.",	// no-disarm
 	"",	// no-morph
 	"\n"
 };
