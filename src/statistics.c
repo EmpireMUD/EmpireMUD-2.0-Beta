@@ -240,7 +240,12 @@ void mudstats_configs(char_data *ch, char *argument) {
 	build_page_display(ch, "Player-killing: %s", config_get_bitvector("pk_mode") ? part : "forbidden");
 	
 	// war
-	build_page_display(ch, "War: %d offense%s required%s", config_get_int("offense_min_to_war"), PLURAL(config_get_int("offense_min_to_war")), config_get_bool("mutual_war_only") ? ", wars must be mutual" : "");
+	if (config_get_bool("mutual_war_only")) {
+		build_page_display(ch, "War: wars must be mutual, no unilateral wars");
+	}
+	else {
+		build_page_display(ch, "War: %d offense%s required", config_get_int("offense_min_to_war"), PLURAL(config_get_int("offense_min_to_war")));
+	}
 	
 	// city
 	build_page_display(ch, "Cities: %d minutes to establish, %d tiles apart (%d for allies)", config_get_int("minutes_to_full_city"), config_get_int("min_distance_between_cities"), config_get_int("min_distance_between_ally_cities"));
