@@ -1896,6 +1896,8 @@ argument is optional.
 STAT PLAYER will search only for players; useful for statting people with
 names such as Wolf or Dolph.
 
+STAT EMPIRE will show critical stats about an empire.
+
 STAT OBJECT will search only for objects.
 
 STAT VEHICLE will search only for vehicles.

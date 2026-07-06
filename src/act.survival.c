@@ -347,7 +347,7 @@ void do_mount_new(char_data *ch, char *argument) {
 		msg_to_char(ch, "You can't ride on other players.\r\n");
 	}
 	else if (find_mount_data(ch, GET_MOB_VNUM(mob))) {
-		act("You already have $N in your stable.", FALSE, ch, NULL, mob, TO_CHAR);
+		act("You already have $t in your stable.", FALSE, ch, get_mob_name_by_proto(GET_MOB_VNUM(mob), TRUE), mob, TO_CHAR | ACT_STR_OBJ);
 	}
 	else if (!MOB_FLAGGED(mob, MOB_MOUNTABLE) && !IS_IMMORTAL(ch)) {
 		act("You can't ride $N!", FALSE, ch, 0, mob, TO_CHAR);
@@ -376,16 +376,16 @@ void do_mount_new(char_data *ch, char *argument) {
 		
 		if (only && (mount = find_mount_data(ch, GET_MOB_VNUM(mob)))) {
 			// NOTE: this deliberately has no carriage return (will get another message from do_mount_current)
-			msg_to_char(ch, "You gain %s as a mount and attempt to ride %s: ", PERS(mob, mob, FALSE), HMHR(mob));
-			act("$n gains $N as a mount.", FALSE, ch, NULL, mob, TO_NOTVICT);
+			msg_to_char(ch, "You gain %s as a mount and attempt to ride %s: ", get_mob_name_by_proto(GET_MOB_VNUM(mob), TRUE), HMHR(mob));
+			act("$n gains $t as a mount.", FALSE, ch, get_mob_name_by_proto(GET_MOB_VNUM(mob), TRUE), mob, TO_NOTVICT | ACT_STR_OBJ);
 			
 			GET_MOUNT_VNUM(ch) = mount->vnum;
 			GET_MOUNT_FLAGS(ch) = mount->flags;
 			do_mount_current(ch);
 		}
 		else {	// has other mobs
-			act("You gain $N as a mount and send $M back to your stable.", FALSE, ch, NULL, mob, TO_CHAR);
-			act("$n gains $N as a mount and sends $M back to $s stable.", FALSE, ch, NULL, mob, TO_NOTVICT);
+			act("You gain $t as a mount and send $M back to your stable.", FALSE, ch, get_mob_name_by_proto(GET_MOB_VNUM(mob), TRUE), mob, TO_CHAR | ACT_STR_OBJ);
+			act("$n gains $t as a mount and sends $M back to $s stable.", FALSE, ch, get_mob_name_by_proto(GET_MOB_VNUM(mob), TRUE), mob, TO_NOTVICT | ACT_STR_OBJ);
 		}
 		
 		// remove mob
