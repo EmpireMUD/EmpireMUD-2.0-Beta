@@ -510,6 +510,15 @@ is in.
 
 See also: BUILDING GUIDE
 #d
+AEDIT
+
+The correct help file prefixes for editors starting with 'A' are:
+  Abilities: ABILEDIT
+  Adventures: ADVEDIT
+  Archetypes: ARCHEDIT
+  Attack types: ATTACKEDIT
+  Augments: AUGEDIT
+#d
 ABILEDIT "OLC ABILITIES" "OLC ABILITY" "ABILITY EDITOR"
 
 Usage:  .abil <command>
@@ -8626,6 +8635,10 @@ labor will eat if it COULD produce something, even if the random roll fails.
 
 See also: INTERACTIONS, OLC WORKFORCE, OLC DEPLETION
 #d
+PEDIT
+
+For progress goal editor help files, use the PROGEDIT prefix instead.
+#d
 PROGEDIT "OLC PROGRESSION" "PROGRESSION OLC" "PROGRESS OLC"
 
 Usage:  .prog <command>
@@ -9560,6 +9573,12 @@ Each map room also has a BASE SECTOR and a NATURAL SECTOR. You can view all
 three sector types on a room using "stat room".
 
 See also: BASE SECTOR, MAPEDIT TERRAIN, NATURAL SECTOR, SECTEDIT, SHOW SECTORS
+#d
+SEDIT
+
+For shop editor help files, use the SHOPEDIT prefix instead. Other editors
+beginning with 'S' include sectors (SECTEDIT), skills (SKILLEDIT), and socials
+(SOCEDIT).
 #d
 SHOPEDIT "OLC SHOPS" "SHOP OLC"
 
