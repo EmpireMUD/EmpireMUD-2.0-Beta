@@ -1193,7 +1193,7 @@ void do_stat_trigger(char_data *ch, trig_data *trig) {
 			break;
 		}
 		default: {
-			attach = "";
+			attach = "error";
 			break;
 		}
 	}
