@@ -1245,6 +1245,7 @@ void script_stat(char_data *to, struct script_data *sc) {
 	char name[MAX_INPUT_LENGTH];
 	char namebuf[512];
 	char buf1[MAX_STRING_LENGTH];
+	char *attach;
 	
 	if (!to || !sc) {
 		return;
@@ -1268,27 +1269,27 @@ void script_stat(char_data *to, struct script_data *sc) {
 		build_page_display(to, "\r\n  Trigger: &y%s&0, VNum: [&g%5d&0]", GET_TRIG_NAME(t), GET_TRIG_VNUM(t));
 
 		if (t->attach_type==OBJ_TRIGGER) {
-			build_page_display(to, "  Trigger Intended Assignment: Objects");
+			attach = "object";
 			sprintbit(GET_TRIG_TYPE(t), otrig_types, buf1, TRUE);
 		}
 		else if (t->attach_type == WLD_TRIGGER || t->attach_type == RMT_TRIGGER || t->attach_type == BLD_TRIGGER || t->attach_type == ADV_TRIGGER) {
-			build_page_display(to, "  Trigger Intended Assignment: Rooms");
+			attach = "room";
 			sprintbit(GET_TRIG_TYPE(t), wtrig_types, buf1, TRUE);
 		}
 		else if (t->attach_type == VEH_TRIGGER) {
-			build_page_display(to, "  Trigger Intended Assignment: Vehicles");
+			attach = "vehicle";
 			sprintbit(GET_TRIG_TYPE(t), vtrig_types, buf1, TRUE);
 		}
 		else if (t->attach_type == EMP_TRIGGER) {
-			build_page_display(to, "  Trigger Intended Assignment: Empires");
+			attach = "empire";
 			sprintbit(GET_TRIG_TYPE(t), wtrig_types, buf1, TRUE);
 		}
 		else {
-			build_page_display(to, "  Trigger Intended Assignment: Mobiles");
+			attach = "mobile";
 			sprintbit(GET_TRIG_TYPE(t), trig_types, buf1, TRUE);
 		}
 
-		build_page_display(to, "  Trigger Type: %s, Numeric Arg: %d, Arg list: %s",  buf1, GET_TRIG_NARG(t), ((GET_TRIG_ARG(t) && *GET_TRIG_ARG(t)) ? GET_TRIG_ARG(t) : "None"));
+		build_page_display(to, "  Trigger Type: %s(%s), Numeric Arg: %d, Arg list: %s", buf1, attach, GET_TRIG_NARG(t), ((GET_TRIG_ARG(t) && *GET_TRIG_ARG(t)) ? GET_TRIG_ARG(t) : "None"));
 
 		if (GET_TRIG_WAIT(t)) {
 			build_page_display(to, "    Wait: %ld, Current line: %s", dg_event_time(GET_TRIG_WAIT(t)), t->curr_state ? t->curr_state->cmd : "End of Script");
