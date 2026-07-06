@@ -164,7 +164,9 @@ end
 ~
 #10905
 Colossal red dragon combat + enrage~
-0 k 100 0
+0 k 100 2
+L w 10905
+L w 10906
 ~
 set soft_enrage_rounds 140
 set hard_enrage_rounds 300
@@ -319,7 +321,8 @@ return 1
 ~
 #10910
 Sir Vivor Combat + Enrage~
-0 k 100 0
+0 k 100 1
+L w 10910
 ~
 set soft_enrage_rounds 140
 set hard_enrage_rounds 300
