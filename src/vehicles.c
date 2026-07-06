@@ -1764,7 +1764,7 @@ bool audit_vehicle(vehicle_data *veh, char_data *ch) {
 	}
 	
 	if (VEH_MAX_HEALTH(veh) < 1) {
-		olc_audit_msg(ch, VEH_VNUM(veh), "Hitpoints set lower than 1");
+		olc_audit_msg(ch, VEH_VNUM(veh), "Health set lower than 1");
 		problem = TRUE;
 	}
 	
@@ -3999,8 +3999,11 @@ void olc_fullsearch_vehicle(char_data *ch, char *argument) {
 		FULLSEARCH_INT("heightover", height_over, 0, INT_MAX)
 		FULLSEARCH_INT("heightunder", height_under, 0, INT_MAX)
 		FULLSEARCH_INT("hitpoints", only_hitpoints, 0, INT_MAX)
+		FULLSEARCH_INT("health", only_hitpoints, 0, INT_MAX)
 		FULLSEARCH_INT("hitpointsover", hitpoints_over, 0, INT_MAX)
+		FULLSEARCH_INT("healthover", hitpoints_over, 0, INT_MAX)
 		FULLSEARCH_INT("hitpointsunder", hitpoints_under, 0, INT_MAX)
+		FULLSEARCH_INT("healthunder", hitpoints_under, 0, INT_MAX)
 		FULLSEARCH_LIST("movetype", only_move, mob_move_types)
 		FULLSEARCH_INT("level", only_level, 0, INT_MAX)
 		FULLSEARCH_INT("rooms", only_rooms, 0, INT_MAX)
@@ -4801,7 +4804,7 @@ void olc_show_vehicle(char_data *ch) {
 	sprintbit(VEH_FLAGS(veh), vehicle_flags, lbuf, TRUE);
 	build_page_display(ch, "<%sflags\t0> %s", OLC_LABEL_VAL(VEH_FLAGS(veh), NOBITS), lbuf);
 	
-	build_page_display(ch, "<%shitpoints\t0> %d", OLC_LABEL_VAL(VEH_MAX_HEALTH(veh), 1), VEH_MAX_HEALTH(veh));
+	build_page_display(ch, "<%shealth\t0> %d", OLC_LABEL_VAL(VEH_MAX_HEALTH(veh), 1), VEH_MAX_HEALTH(veh));
 	build_page_display(ch, "<%smovetype\t0> %s", OLC_LABEL_VAL(VEH_MOVE_TYPE(veh), 0), mob_move_types[VEH_MOVE_TYPE(veh)]);
 	build_page_display(ch, "<%sspeed\t0> %s, <%ssize\t0> %d", OLC_LABEL_VAL(VEH_SPEED_BONUSES(veh), VSPEED_NORMAL), vehicle_speed_types[VEH_SPEED_BONUSES(veh)], OLC_LABEL_VAL(VEH_SIZE(veh), 0), VEH_SIZE(veh));
 	build_page_display(ch, "<%scapacity\t0> %d item%s, <%sanimalsrequired\t0> %d", OLC_LABEL_VAL(VEH_CAPACITY(veh), 0), VEH_CAPACITY(veh), PLURAL(VEH_CAPACITY(veh)), OLC_LABEL_VAL(VEH_ANIMALS_REQUIRED(veh), 0), VEH_ANIMALS_REQUIRED(veh));
@@ -5045,9 +5048,10 @@ OLC_MODULE(vedit_height) {
 }
 
 
+// this is shown as "health" as of b5.206; interface still accepts .hitpoints too
 OLC_MODULE(vedit_hitpoints) {
 	vehicle_data *veh = GET_OLC_VEHICLE(ch->desc);
-	VEH_MAX_HEALTH(veh) = olc_process_number(ch, argument, "hitpoints", "hitpoints", 1, 1000, VEH_MAX_HEALTH(veh));
+	VEH_MAX_HEALTH(veh) = olc_process_number(ch, argument, "health", "health", 1, 1000, VEH_MAX_HEALTH(veh));
 }
 
 

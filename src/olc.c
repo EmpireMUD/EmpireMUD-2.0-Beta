@@ -1218,6 +1218,7 @@ const struct olc_command_data olc_data[] = {
 	{ "forbidclimate", vedit_forbidclimate, OLC_VEHICLE, OLC_CF_EDITOR },
 	{ "functions", vedit_functions, OLC_VEHICLE, OLC_CF_EDITOR },
 	{ "halficon", vedit_half_icon, OLC_VEHICLE, OLC_CF_EDITOR },
+	{ "health", vedit_hitpoints, OLC_VEHICLE, OLC_CF_EDITOR },
 	{ "height", vedit_height, OLC_VEHICLE, OLC_CF_EDITOR },
 	{ "hitpoints", vedit_hitpoints, OLC_VEHICLE, OLC_CF_EDITOR },
 	{ "icon", vedit_icon, OLC_VEHICLE, OLC_CF_EDITOR },

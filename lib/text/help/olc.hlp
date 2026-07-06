@@ -478,12 +478,12 @@ Vehicles (VEDIT):
   other terrain.
 - A vehicle is effectively a chair if it has SIT but no movement flags.
 - Vehicles take 10% health damage each weekly reset ONLY if they're set to need
-  maintenance (or are incomplete). A vehicle with only 1 hitpoint won't last
+  maintenance (or are incomplete). A vehicle with only 1 health won't last
   long.
-- When a vehicle takes at least 10% of its max hitpoints in damage, it will
+- When a vehicle takes at least 10% of its max health in damage, it will
   also add 1 cycle's maintenance to its repair needs. If it has no maintenance
   set, it will add a "pouch of nails" instead.
-- If a vehicle takes damage that's less than 10% of its hitpoints, it still
+- If a vehicle takes damage that's less than 10% of its health, it still
   needs repair but doesn't require any additional resources.
 - You should generally avoid putting object storage on moving vehicles.
 - See BUILDING-VEHICLES
@@ -11019,7 +11019,7 @@ Fields:
      use e.g. "-icon any" to check if it has one at all.
   &c-interactions&0 - has a specific type, see HELP VEDIT INTERACTION
   &c-height -heightover -heightunder&0 - specific height amount
-  &c-hitpoints -hitpointsover -hitpointsunder&0 - specific hitpoint amount
+  &c-health -healthover -healthunder&0 - specific health amount
   &c-level&0 - matches anything where this level is within the range
   &c-military -militaryover -militaryunder&0 - specific military value
   &c-movetype&0 - see HELP VEDIT MOVETYPE
@@ -11029,7 +11029,7 @@ Fields:
   &c-vmin&0, &c-vmax&0 - VNUM range limits
 
 Examples:
- > .veh fullsearch -level 125 -hitpointsover 50
+ > .veh fullsearch -level 125 -healthover 50
  > .veh fullsearch wood -flagged BURNABLE -vmin 10000 -vmax 10099
 
 To search other fields, you can generally use the normal "search" option for
@@ -11056,20 +11056,20 @@ See also: OLC VEHICLES
 #d
 "VEDIT HITPOINTS" "VEDIT HEALTH"
 
-Usage:  .hitpoints <value>
+Usage:  .health <value>
 
 This number is how much damage a vehicle can take from a catapult or other
 sources, before it is destroyed.
 
 Vehicles like catapults deal 8 damage per 100 levels, per shot. Siege rituals
-deal Intelligence + 1 damage. You can determine how many hitpoints to give a
+deal Intelligence + 1 damage. You can determine how much health to give a
 building based on this.
 
 Any damage over 10% of a vehicle's health will also add "1 cycle" of required
 maintenance to the vehicle (or nails, if the vehicle requires no regular work).
-The repair command can be used to restore hitpoints.
+The repair command can be used to restore health -- or %restore% in a script.
 
-Common hitpoint levels:
+Common health levels:
  furniture: 1 (if it requires no maintenance)
  small cart: 5
  large cart: 25
@@ -11226,15 +11226,15 @@ these are not the resources needed to build the vehicle in the first place --
 only to repair it.
 
 If a vehicle takes damage from any source, and that damage is more than 10% of
-its hitpoints, it will also add the regular maintenance resources to the repair
+its health, it will also add the regular maintenance resources to the repair
 cost.
 
-Vehicles with only 1 hitpoint will never get their regular maintenance cost, as
+Vehicles with only 1 health will never get their regular maintenance cost, as
 even 1 cycle of decay will destroy them.
 
 See HELP OLC RESOURCES for more information.
 
-See also: VEDIT HITPOINTS, OLC VEHICLES, REPAIR, RESOURCE ACTIONS
+See also: VEDIT HEALTH, OLC VEHICLES, REPAIR, RESOURCE ACTIONS
 #d
 "VEDIT SHORTDESCRIPTION" "VEDIT SHORT DESCRIPTION"
 
