@@ -1153,6 +1153,7 @@ EVENTFUNC(trig_wait_event) {
 void do_stat_trigger(char_data *ch, trig_data *trig) {
 	struct cmdlist_element *cmd_list;
 	char buf[MAX_STRING_LENGTH];
+	char *attach;
 
 	if (!trig) {
 		log("SYSERR: NULL trigger passed to do_stat_trigger.");
@@ -1164,7 +1165,7 @@ void do_stat_trigger(char_data *ch, trig_data *trig) {
 	// x_TRIGGER
 	switch (trig->attach_type) {
 		case OBJ_TRIGGER: {
-			build_page_display(ch, "Trigger Intended Assignment: Objects");
+			attach = "object";
 			sprintbit(GET_TRIG_TYPE(trig), otrig_types, buf, TRUE);
 			break;
 		}
@@ -1172,28 +1173,28 @@ void do_stat_trigger(char_data *ch, trig_data *trig) {
 		case RMT_TRIGGER:
 		case BLD_TRIGGER:
 		case ADV_TRIGGER: {
-			build_page_display(ch, "Trigger Intended Assignment: Rooms");
+			attach = "room";
 			sprintbit(GET_TRIG_TYPE(trig), wtrig_types, buf, TRUE);
 			break;
 		}
 		case MOB_TRIGGER: {
-			build_page_display(ch, "Trigger Intended Assignment: Mobiles");
+			attach = "mobile";
 			sprintbit(GET_TRIG_TYPE(trig), trig_types, buf, TRUE);
 			break;
 		}
 		case VEH_TRIGGER: {
-			build_page_display(ch, "Trigger Intended Assignment: Vehicles");
+			attach = "vehicle";
 			sprintbit(GET_TRIG_TYPE(trig), vtrig_types, buf, TRUE);
 			break;
 		}
 		case EMP_TRIGGER: {
-			build_page_display(ch, "Trigger Intended Assignment: Empires");
+			attach = "empire";
 			sprintbit(GET_TRIG_TYPE(trig), wtrig_types, buf, TRUE);
 			break;
 		}
 	}
 
-	build_page_display(ch, "Trigger Type: %s, Numeric Arg: %d, Arg list: %s", buf, GET_TRIG_NARG(trig), ((GET_TRIG_ARG(trig) && *GET_TRIG_ARG(trig)) ? GET_TRIG_ARG(trig) : "None"));
+	build_page_display(ch, "Trigger Type: %s(%s), Numeric Arg: %d, Arg list: %s", buf, attach, GET_TRIG_NARG(trig), ((GET_TRIG_ARG(trig) && *GET_TRIG_ARG(trig)) ? GET_TRIG_ARG(trig) : "None"));
 	build_trigger_link_page_display(ch, trig, "Links:");
 
 	build_page_display(ch, "Commands:"); 
