@@ -4655,6 +4655,7 @@ ACMD(do_survey) {
 	// int base_height, mod_height;
 	bool junk, large_radius;
 	struct depletion_data *dep;
+	struct instance_data *inst;
 	
 	argptr = one_argument(argument, arg);
 	
@@ -4767,8 +4768,8 @@ ACMD(do_survey) {
 	}
 	
 	// adventure info
-	if (find_instance_by_room(IN_ROOM(ch), FALSE, TRUE)) {
-		do_adventure(ch, "", 0, 0);
+	if ((inst = find_instance_by_room(IN_ROOM(ch), FALSE, TRUE))) {
+		msg_to_char(ch, "Adventure: %s\r\n", GET_ADV_NAME(INST_ADVENTURE(inst)));
 	}
 	
 	// TO ADD:
