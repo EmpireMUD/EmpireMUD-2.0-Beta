@@ -4715,6 +4715,26 @@ Usage:  .mapout <color>
 
 This determines what color pixel the sector or crop has on the graphical map.
 
+Available colors:
+ Starting Location (shows a red diamond on the map)
+ Neutral (blank map color)
+ Bright White, Medium Gray, Dark Gray
+ Bright Red, Dark Red
+ Bright Green, Pale Green, Yellow-Green, Sea Green, Medium Green, Dark Green,
+   Olive Green, Lime Green, Dark Lime Green, Dark Dark Green
+ Bright Yellow, Pale Yellow, Deep Yellow, 
+ Bright Blue, Ice Blue, Light Blue, Medium Blue, Deep Blue, Dark Blue,
+   Dark Azure Blue
+ Bright Magenta, Dark Magenta, Pink, Dark Pink
+ Bright Cyan, Dark Cyan
+ Brown, Yellow Brown, Dark Brown, Tan, Light Tan
+ Orange, Dark Orange, Peach
+ Violet, Deep Violet
+
+To see what crops or sectors use these mapout colors, try:
+ > .crop fullsearch -mapout orange
+ > .sect fullsearch -mapout "sea green"
+
 See also: OLC CROPS, OLC SECTORS
 #d
 "CROPEDIT NAME"
