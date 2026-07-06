@@ -1192,6 +1192,10 @@ void do_stat_trigger(char_data *ch, trig_data *trig) {
 			sprintbit(GET_TRIG_TYPE(trig), wtrig_types, buf, TRUE);
 			break;
 		}
+		default: {
+			attach = "";
+			break;
+		}
 	}
 
 	build_page_display(ch, "Trigger Type: %s(%s), Numeric Arg: %d, Arg list: %s", buf, attach, GET_TRIG_NARG(trig), ((GET_TRIG_ARG(trig) && *GET_TRIG_ARG(trig)) ? GET_TRIG_ARG(trig) : "None"));
