@@ -66,7 +66,7 @@ void adventure_unsummon(char_data *ch) {
 	}
 	else {
 		// nowhere safe to send back to
-		char_to_room(ch, find_load_room(ch));
+		char_to_room(ch, find_load_room(ch, FALSE));
 		reloc = TRUE;
 	}
 	

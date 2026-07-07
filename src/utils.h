@@ -2054,7 +2054,7 @@ bool can_see_in_dark_room(char_data *ch, room_data *room, bool count_adjacent_li
 void command_lag(char_data *ch, int wait_type);
 void despawn_charmies(char_data *ch, any_vnum only_vnum);
 void determine_gear_level(char_data *ch);
-room_data *find_load_room(char_data *ch);
+room_data *find_load_room(char_data *ch, int *load_room_type);
 room_data *find_starting_location(room_data *near_room);
 int get_view_height(char_data *ch, room_data *from_room);
 bool has_one_day_playtime(char_data *ch);
@@ -2839,6 +2839,11 @@ void sort_einv_for_empire(empire_data *emp, int einv_sort_type);
 #define GROUP(ch)  (ch->group)
 #define GROUP_LEADER(group)  (group->leader)
 #define GROUP_FLAGS(group)  (group->group_flags)
+
+// used by find_load_room()
+#define LOAD_ROOM_START_LOC  0
+#define LOAD_ROOM_MY_TOMB  1
+#define LOAD_ROOM_ANY_TOMB  2
 
 // handy
 #define SELF(sub, obj)  ((sub) == (obj))

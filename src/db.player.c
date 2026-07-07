@@ -4533,7 +4533,7 @@ void enter_player_game(descriptor_data *d, int dolog, bool fresh) {
 
 	// nowhere found? must detect load room
 	if (!load_room) {
-		load_room = find_load_room(d->character);
+		load_room = find_load_room(d->character, NULL);
 		stop_action = TRUE;
 	}
 
