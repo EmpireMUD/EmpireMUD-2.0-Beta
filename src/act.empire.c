@@ -3661,6 +3661,12 @@ void scan_for_tile(char_data *ch, char *argument, int max_dist, bitvector_t only
 				}
 				else {	// not a vehicle
 					append_page_display_line(pline, "%s", get_room_name(loc, FALSE));
+					
+					if (ROOM_PAINT_COLOR(loc)) {
+						sprinttype(ROOM_PAINT_COLOR(loc), paint_names, paint_str, sizeof(paint_str), "UNDEFINED");
+						*paint_str = LOWER(*paint_str);
+						append_page_display_line(pline, " (%s%s)", (ROOM_AFF_FLAGGED(loc, ROOM_AFF_BRIGHT_PAINT) ? "bright " : ""), paint_str);
+					}
 				}
 				
 				// coords
