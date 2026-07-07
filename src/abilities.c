@@ -205,7 +205,7 @@ void show_ability_info(char_data *ch, ability_data *abil, ability_data *parent, 
 	char lbuf[MAX_STRING_LENGTH], sbuf[MAX_STRING_LENGTH];
 	char *ptr;
 	double chance, chain_prc = 100.0;
-	int count, iter;
+	int count, iter, max_width;
 	size_t l_size;
 	ability_data *abiter, *next_abil, *supercede;
 	craft_data *craft, *next_craft;
@@ -234,7 +234,8 @@ void show_ability_info(char_data *ch, ability_data *abil, ability_data *parent, 
 	}
 	else {
 		strcpy(lbuf, " ");
-		count = (66 - strlen(ABIL_NAME(abil)) - 4) / 2;
+		max_width = MIN(66, GET_SCREEN_WIDTH(ch));
+		count = (max_width - strlen(ABIL_NAME(abil)) - 4) / 2;
 		for (iter = 0; iter < count; ++iter) {
 			strcat(lbuf, "-");
 		}
