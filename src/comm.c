@@ -3793,25 +3793,26 @@ char *replace_prompt_codes(char_data *ch, char *str) {
 					tmp = i;
 					break;
 				}
-				case '_':
+				case '_': {
 					tmp = "\r\n";
 					break;
-				case '%':
-					*(cp++) = '%';
-					str++;
-					continue;
+				}
+				case '%': {
+					tmp = "%";
 					break;
-				default :
+				}
+				default : {
 					*(cp++) = '%';
 					str++;
 					continue;
 					break;
 				}
+			}
 
 			while ((*cp = *(tmp++))) {
 				cp++;
 			}
-			str++;
+			++str;
 		}
 		else if (!(*(cp++) = *(str++))) {
 			break;
