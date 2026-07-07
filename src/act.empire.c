@@ -3567,17 +3567,19 @@ void scan_for_tile(char_data *ch, char *argument, int max_dist, bitvector_t only
 						}
 					
 						// found a vehicle match but limit what we show
+						if (VEH_PAINT_COLOR(veh)) {
+							sprinttype(VEH_PAINT_COLOR(veh), paint_names, paint_str, sizeof(paint_str), "painted");
+							*paint_str = LOWER(*paint_str);
+							if (strlen(paint_str) < sizeof(paint_str) - 1) {
+								strcat(paint_str, " ");
+							}
+						}
+						else {
+							*paint_str = '\0';
+						}
+						
 						if (VEH_FLAGGED(veh, VEH_BUILDING)) {
 							if (PRF_FLAGGED(ch, PRF_INFORMATIVE)) {
-								if (VEH_PAINT_COLOR(veh)) {
-									sprinttype(VEH_PAINT_COLOR(veh), paint_names, paint_str, sizeof(paint_str), "painted");
-									*paint_str = LOWER(*paint_str);
-									strcat(paint_str, " ");
-								}
-								else {
-									*paint_str = '\0';
-								}
-								
 								get_informative_vehicle_string(ch, veh, temp);
 								if (*temp) {
 									vsize += snprintf(veh_string + vsize, sizeof(veh_string) - vsize, "%s%s%s [%s]", *veh_string ? ", " : "", paint_str, skip_filler(VEH_SHORT_DESC(veh)), temp);
@@ -3587,10 +3589,10 @@ void scan_for_tile(char_data *ch, char *argument, int max_dist, bitvector_t only
 								}
 							}
 							else if (!VEH_OWNER(veh) || VEH_CLAIMS_WITH_ROOM(veh) || !PRF_FLAGGED(ch, PRF_POLITICAL)) {
-								vsize += snprintf(veh_string + vsize, sizeof(veh_string) - vsize, "%s%s", *veh_string ? ", " : "", skip_filler(VEH_SHORT_DESC(veh)));
+								vsize += snprintf(veh_string + vsize, sizeof(veh_string) - vsize, "%s%s%s", *veh_string ? ", " : "", paint_str, skip_filler(VEH_SHORT_DESC(veh)));
 							}
 							else {
-								vsize += snprintf(veh_string + vsize, sizeof(veh_string) - vsize, "%s%s%s %s\t0", *veh_string ? ", " : "", EMPIRE_BANNER(VEH_OWNER(veh)), EMPIRE_ADJECTIVE(VEH_OWNER(veh)), skip_filler(VEH_SHORT_DESC(veh)));
+								vsize += snprintf(veh_string + vsize, sizeof(veh_string) - vsize, "%s%s%s %s%s\t0", *veh_string ? ", " : "", EMPIRE_BANNER(VEH_OWNER(veh)), EMPIRE_ADJECTIVE(VEH_OWNER(veh)), paint_str, skip_filler(VEH_SHORT_DESC(veh)));
 							}
 						}
 						else if (!scanned_veh || VEH_SIZE(veh) > VEH_SIZE(scanned_veh)) {	// not a building -- save?
@@ -3602,10 +3604,10 @@ void scan_for_tile(char_data *ch, char *argument, int max_dist, bitvector_t only
 					if (vsize == 0 && scanned_veh) {
 						// found a vehicle to show
 						if (!VEH_OWNER(scanned_veh) || VEH_CLAIMS_WITH_ROOM(scanned_veh) || !PRF_FLAGGED(ch, PRF_POLITICAL)) {
-							safe_snprintf(veh_string, sizeof(veh_string), "%s", skip_filler(VEH_SHORT_DESC(scanned_veh)));
+							safe_snprintf(veh_string, sizeof(veh_string), "%s%s", paint_str, skip_filler(VEH_SHORT_DESC(scanned_veh)));
 						}
 						else {
-							safe_snprintf(veh_string, sizeof(veh_string), "%s%s %s\t0", EMPIRE_BANNER(VEH_OWNER(scanned_veh)), EMPIRE_ADJECTIVE(VEH_OWNER(scanned_veh)), skip_filler(VEH_SHORT_DESC(scanned_veh)));
+							safe_snprintf(veh_string, sizeof(veh_string), "%s%s %s%s\t0", EMPIRE_BANNER(VEH_OWNER(scanned_veh)), EMPIRE_ADJECTIVE(VEH_OWNER(scanned_veh)), paint_str, skip_filler(VEH_SHORT_DESC(scanned_veh)));
 						}
 					}
 				}
