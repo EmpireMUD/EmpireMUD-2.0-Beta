@@ -7473,7 +7473,7 @@ ACMD(do_progress) {
 		
 		// purchase by name
 		if (!(prg = find_purchasable_goal_by_name(emp, arg2))) {
-			msg_to_char(ch, "No available progress by that name.\r\n");
+			msg_to_char(ch, "There is no progress reward available by that name%s.\r\n", (PRF_FLAGGED(ch, PRF_NO_TUTORIALS) ? "" : " (type 'progress buy' for a list)"));
 		}
 		else if (!PRG_FLAGGED(prg, PRG_PURCHASABLE)) {
 			// should not be able to hit this condition
