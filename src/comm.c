@@ -3419,9 +3419,6 @@ char *replace_prompt_codes(char_data *ch, char *str) {
 					if (HAS_WATERWALKING(ch)) {
 						strcat(i, "\t0W");
 					}
-					if (IS_IMMORTAL(ch) && !NOHASSLE(ch)) {
-						strcat(i, "\tVH");
-					}
 					if (config_get_bool("temperature_penalties") && get_temperature_type(IN_ROOM(ch)) != TEMPERATURE_ALWAYS_COMFORTABLE) {
 						int temperature = get_relative_temperature(ch);
 						int t_limit = config_get_int("temperature_discomfort");
@@ -3484,9 +3481,6 @@ char *replace_prompt_codes(char_data *ch, char *str) {
 					if (HAS_WATERWALKING(ch)) {
 						sprintf(i + strlen(i), "%swaterwalking", (*i ? " " : ""));
 					}
-					if (IS_IMMORTAL(ch) && !NOHASSLE(ch)) {
-						sprintf(i + strlen(i), "%shassle", (*i ? " " : ""));
-					}
 					if (config_get_bool("temperature_penalties") && get_temperature_type(IN_ROOM(ch)) != TEMPERATURE_ALWAYS_COMFORTABLE) {
 						int temperature = get_relative_temperature(ch);
 						int t_limit = config_get_int("temperature_discomfort");
@@ -3534,6 +3528,9 @@ char *replace_prompt_codes(char_data *ch, char *str) {
 						if (ch->desc && GET_OLC_TYPE(ch->desc) != 0) {
 							strcat(i, "\tcO");
 						}
+						if (!NOHASSLE(ch)) {
+							strcat(i, "\tVH");
+						}
 					}
 					
 					if (!*i) {
@@ -3561,6 +3558,9 @@ char *replace_prompt_codes(char_data *ch, char *str) {
 						}
 						if (ch->desc && GET_OLC_TYPE(ch->desc) != 0) {
 							sprintf(i + strlen(i), "%solc-%s", (*i ? " " : ""), prompt_olc_info(ch));
+						}
+						if (!NOHASSLE(ch)) {
+							sprintf(i + strlen(i), "%shassle", (*i ? " " : ""));
 						}
 					}
 					
