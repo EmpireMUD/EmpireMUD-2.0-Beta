@@ -6753,7 +6753,7 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 							safe_snprintf(str, slen, "0");	// no vnum provided
 						}
 					}
-					else if (!str_cmp(field, "health") || !str_cmp(field, "hitp") || !str_cmp(field, "hitpoints")) {
+					else if (!str_cmp(field, "health") || !str_cmp(field, "hitp")) {
 						safe_snprintf(str, slen, "%d", (int) VEH_HEALTH(v));
 					}
 					break;
@@ -6827,7 +6827,7 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 					break;
 				}
 				case 'm': {	// veh.m*
-					if (!str_cmp(field, "maxhealth") || !str_cmp(field, "maxhitp") || !str_cmp(field, "maxhitpoints")) {
+					if (!str_cmp(field, "maxhealth") || !str_cmp(field, "maxhitp")) {
 						safe_snprintf(str, slen, "%d", VEH_MAX_HEALTH(v));
 					}
 					else if (!str_cmp(field, "maxrooms")) {
