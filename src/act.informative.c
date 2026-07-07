@@ -4732,7 +4732,7 @@ ACMD(do_survey) {
 		if (BUILDING_DAMAGE(IN_ROOM(ch)) > 0 || (IS_COMPLETE(IN_ROOM(ch)) && BUILDING_RESOURCES(IN_ROOM(ch)))) {
 			maxhealth = GET_BUILDING(IN_ROOM(ch)) ? GET_BLD_MAX_DAMAGE(GET_BUILDING(IN_ROOM(ch))) : 1;
 			maxhealth = MAX(1, maxhealth);	// don't crash me, bro
-			health = (1.0 - (double) BUILDING_DAMAGE(IN_ROOM(ch)) / maxhealth) * 100.0;
+			health = (double) BUILDING_DAMAGE(IN_ROOM(ch)) / maxhealth * 100.0;
 			msg_to_char(ch, "It's in need of maintenance and repair (%d%% damaged).\r\n", (int)round(health));
 		}
 		if (IS_BURNING(IN_ROOM(ch))) {

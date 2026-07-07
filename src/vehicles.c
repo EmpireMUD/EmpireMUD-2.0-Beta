@@ -4751,7 +4751,7 @@ void look_at_vehicle(vehicle_data *veh, char_data *ch, bool send_page) {
 	}
 	
 	if (VEH_HEALTH(veh) < VEH_MAX_HEALTH(veh)) {
-		health = (double) VEH_HEALTH(veh) / MAX(1, VEH_MAX_HEALTH(veh)) * 100.0;
+		health = (1.0 - (double) VEH_HEALTH(veh) / MAX(1, VEH_MAX_HEALTH(veh))) * 100.0;
 		build_page_display(ch, "It's in need of repair (%d%% damaged).", (int)round(health));
 	}
 	
