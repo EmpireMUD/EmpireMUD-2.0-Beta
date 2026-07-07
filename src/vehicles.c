@@ -4690,6 +4690,7 @@ void do_stat_vehicle(char_data *ch, vehicle_data *veh, bool details) {
 */
 void look_at_vehicle(vehicle_data *veh, char_data *ch, bool send_page) {
 	char lbuf[MAX_STRING_LENGTH], colbuf[256];
+	double health;
 	player_index_data *index;
 	vehicle_data *proto;
 	struct page_display *line;
@@ -4747,6 +4748,11 @@ void look_at_vehicle(vehicle_data *veh, char_data *ch, bool send_page) {
 	
 	if (VEH_ANIMALS(veh)) {
 		build_page_display(ch, "It is being pulled by %s.", list_harnessed_mobs(veh));
+	}
+	
+	if (VEH_HEALTH(veh) < VEH_MAX_HEALTH(veh)) {
+		health = (double) VEH_HEALTH(veh) / MAX(1, VEH_MAX_HEALTH(veh));
+		build_page_display(ch, "It's in need of repair (%d%% damaged).", (int)round(health));
 	}
 	
 	if (VEH_NEEDS_RESOURCES(veh)) {
