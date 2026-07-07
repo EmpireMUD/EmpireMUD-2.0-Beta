@@ -3802,14 +3802,12 @@ char *replace_prompt_codes(char_data *ch, char *str) {
 					break;
 				}
 				default : {
-					*(cp++) = '%';
-					str++;
-					continue;
+					tmp = "%";
 					break;
 				}
 			}
 
-			while ((*cp = *(tmp++))) {
+			while ((cp - pbuf) < sizeof(pbuf) && (*cp = *(tmp++))) {
 				cp++;
 			}
 			++str;
@@ -3818,10 +3816,20 @@ char *replace_prompt_codes(char_data *ch, char *str) {
 			break;
 		}
 	}
-
-	*cp = '\0';
-
-	strcat(pbuf, "\t0");
+	
+	// guarantee string terminator
+	if ((cp - pbuf) < sizeof(pbuf)) {
+		*cp = '\0';
+	}
+	else {
+		pbuf[sizeof(pbuf)-1] = '\0';
+	}
+	
+	// append color terminator if possible
+	if (strlen(pbuf) + 2 < sizeof(pbuf)) {
+		strcat(pbuf, "\t0");
+	}
+	
 	return (pbuf);
 }
 
