@@ -2468,7 +2468,7 @@ ACMD(do_learned) {
 	}
 	
 	// detect width for how wide the lists can go
-	width = (ch->desc && ch->desc->pProtocol->ScreenWidth > 0) ? ch->desc->pProtocol->ScreenWidth : 80;
+	width = GET_SCREEN_WIDTH(ch);
 	width = MIN(width, sizeof(line) - 2);
 	
 	// search 2 lists

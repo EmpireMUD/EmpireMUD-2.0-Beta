@@ -417,17 +417,17 @@ int get_map_radius(char_data *ch) {
 	mapsize = GET_MAPSIZE(REAL_CHAR(ch));
 	if (mapsize == 0) {
 		// auto-detected
-		if (ch->desc && ch->desc->pProtocol->ScreenWidth > 0) {
-			int wide = (ch->desc->pProtocol->ScreenWidth - 6) / 8;	// the /8 is 4 chars per tile, doubled
+		if (CAN_NAWS(ch)) {
+			int wide = (GET_SCREEN_WIDTH(ch) - 6) / 8;	// the /8 is 4 chars per tile, doubled
 			int max_size = config_get_int("max_map_size");
-			if (ch->desc->pProtocol->ScreenHeight > 0) {
-				// cap based on height, too (save some room)
-				// this saves roughly 4 lines below the map -- if you're going
-				// to play around with it, be sure to test -- the math is not
-				// very straightforward. -paul
-				wide = MIN(wide, ((ch->desc->pProtocol->ScreenHeight - 7) / 2) - 1);	// the -1 at the end is to ensure even/odd numbers have an extra line rather than one too few
-				wide = MAX(wide, 1);	// otherwise, NAWS sometimes leads to a map with only the player
-			}
+			
+			// cap based on height, too (save some room)
+			// this saves roughly 4 lines below the map -- if you're going
+			// to play around with it, be sure to test -- the math is not
+			// very straightforward. -paul
+			wide = MIN(wide, ((GET_SCREEN_HEIGHT(ch) - 7) / 2) - 1);	// the -1 at the end is to ensure even/odd numbers have an extra line rather than one too few
+			wide = MAX(wide, 1);	// otherwise, NAWS sometimes leads to a map with only the player
+			
 			mapsize = MIN(wide, max_size);
 		}
 		else {

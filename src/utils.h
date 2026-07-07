@@ -1445,6 +1445,11 @@ int Y_COORD(room_data *room);	// formerly #define Y_COORD(room)  FLAT_Y_COORD(ge
 #define IS_THIRSTY(ch)  (GET_COND((ch), THIRST) >= (REAL_UPDATES_PER_MUD_HOUR * 24) && !HAS_BONUS_TRAIT((ch), BONUS_NO_THIRST) && !has_player_tech((ch), PTECH_NO_THIRST))
 #define IS_BLOOD_STARVED(ch)  (IS_VAMPIRE(ch) && GET_BLOOD(ch) <= config_get_int("blood_starvation_level"))
 
+// protocol helpers
+#define CAN_NAWS(ch)  ((ch)->desc && (ch)->desc->pProtocol->bNAWS)
+#define GET_SCREEN_WIDTH(ch)  (((ch)->desc && (ch)->desc->pProtocol->ScreenWidth > 0) ? (ch)->desc->pProtocol->ScreenWidth : 80)
+#define GET_SCREEN_HEIGHT(ch)  (((ch)->desc && (ch)->desc->pProtocol->ScreenHeight > 0) ? (ch)->desc->pProtocol->ScreenHeight : 24)
+
 // for act() and act-like things (requires to_sleeping and is_spammy set to true/false)
 #define SENDOK(ch)  (((ch)->desc || SCRIPT_CHECK((ch), MTRIG_ACT)) && (to_sleeping || AWAKE(ch)) && (!is_spammy || !PRF_FLAGGED((ch), PRF_NOSPAM)) && (!is_animal_move || IS_NPC(ch) || SHOW_STATUS_MESSAGES((ch), SM_ANIMAL_MOVEMENT)))
 
