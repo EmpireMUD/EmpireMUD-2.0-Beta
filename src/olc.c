@@ -804,7 +804,7 @@ const struct olc_command_data olc_data[] = {
 	{ "functions", bedit_functions, OLC_BUILDING, OLC_CF_EDITOR },
 	{ "halficon", bedit_half_icon, OLC_BUILDING, OLC_CF_EDITOR },
 	{ "height", bedit_height, OLC_BUILDING, OLC_CF_EDITOR },
-	{ "health", bedit_health, OLC_BUILDING, OLC_CF_EDITOR },
+	{ "health", bedit_hitpoints, OLC_BUILDING, OLC_CF_EDITOR },
 	{ "hitpoints", bedit_hitpoints, OLC_BUILDING, OLC_CF_EDITOR },
 	{ "icon", bedit_icon, OLC_BUILDING, OLC_CF_EDITOR },
 	{ "interaction", bedit_interaction, OLC_BUILDING, OLC_CF_EDITOR },
