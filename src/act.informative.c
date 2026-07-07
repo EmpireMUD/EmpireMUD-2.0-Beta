@@ -4441,7 +4441,7 @@ ACMD(do_nearby) {
 			
 			// owner part
 			if (ROOM_OWNER(loc)) {
-				safe_snprintf(part, sizeof(part), " / %s%s&0", EMPIRE_BANNER(ROOM_OWNER(loc)), EMPIRE_NAME(ROOM_OWNER(loc)));
+				safe_snprintf(part, sizeof(part), " / %s%s&0%s", EMPIRE_BANNER(ROOM_OWNER(loc)), EMPIRE_NAME(ROOM_OWNER(loc)), (ROOM_AFF_FLAGGED(loc, ROOM_AFF_PUBLIC) ? " (public)" : ""));
 			}
 			else {
 				*part = '\0';
