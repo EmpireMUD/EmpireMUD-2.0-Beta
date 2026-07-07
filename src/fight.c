@@ -1524,6 +1524,7 @@ obj_data *die(char_data *ch, char_data *killer) {
 		add_cooldown(ch, COOLDOWN_DEATH_RESPAWN, config_get_int("death_release_minutes") * SECS_PER_REAL_MIN);
 		
 		find_load_room(ch, &tomb_type);
+		// LOAD_ROOM_x
 		switch (tomb_type) {
 			case LOAD_ROOM_MY_TOMB: {
 				msg_to_char(ch, "Type 'respawn' to come back at your tomb.\r\n");

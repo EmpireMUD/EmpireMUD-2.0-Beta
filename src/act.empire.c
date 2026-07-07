@@ -6585,6 +6585,7 @@ ACMD(do_islands) {
 
 ACMD(do_tomb) {
 	bool any;
+	int tomb_type;
 	struct empire_territory_data *ter, *next_ter;
 	room_data *tomb, *real;
 	
@@ -6603,6 +6604,23 @@ ACMD(do_tomb) {
 		}
 		else {
 			build_page_display(ch, "Your tomb is at: %s%s%s", get_room_name(tomb, FALSE), coord_display_room(ch, tomb, FALSE), (GET_ISLAND_ID(tomb) == GET_ISLAND_ID(IN_ROOM(ch))) ? "" : " (different island)");
+			find_load_room(ch, &tomb_type);
+			// LOAD_ROOM_x
+			switch (tomb_type) {
+				case LOAD_ROOM_MY_TOMB: {
+					// no error
+					break;
+				}
+				case LOAD_ROOM_ANY_TOMB: {
+					msg_to_char(ch, "Your tomb is on a different island but your empire has a tomb on this island.\r\n");
+					break;
+				}
+				case LOAD_ROOM_START_LOC:
+				default: {
+					msg_to_char(ch, "You have no tombs %s.\r\n", (GET_ISLAND(IN_ROOM(ch)) ? "on this island" : "available here"));
+					break;
+				}
+			}
 		}
 		
 		// additional info

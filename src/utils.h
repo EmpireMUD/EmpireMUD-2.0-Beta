@@ -2840,7 +2840,7 @@ void sort_einv_for_empire(empire_data *emp, int einv_sort_type);
 #define GROUP_LEADER(group)  (group->leader)
 #define GROUP_FLAGS(group)  (group->group_flags)
 
-// used by find_load_room()
+// LOAD_ROOM_x: used by find_load_room()
 #define LOAD_ROOM_START_LOC  0
 #define LOAD_ROOM_MY_TOMB  1
 #define LOAD_ROOM_ANY_TOMB  2
