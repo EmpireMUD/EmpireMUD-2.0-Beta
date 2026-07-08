@@ -1872,7 +1872,7 @@ Targeted resurrection messages:
 
 Self-resurrection messages:
  &cself-to-char&0 - Sent to the caster when resurrecting.
- &cself-to-room&0 - Sent to teh room the caster is in when resurrecting.
+ &cself-to-room&0 - Sent to the room the caster is in when resurrecting.
 
 When the resurrection completes, it also sends:
  &cspec-to-char&0 - Sent to the person being resurrected.
