@@ -4847,8 +4847,15 @@ void init_player(char_data *ch) {
 	bool first = FALSE;
 	int i, iter, top_idnum;
 
-	// create a player_special structure -- prior to b5.205 this only happened if !ch->player_specials but this should be called anyway
-	init_player_specials(ch);
+	// create a player_special structure, if needed
+	if (ch->player_specials == NULL) {
+		init_player_specials(ch);
+	}
+	
+	// ensure they have dummy mob proto data
+	if (ch->proto_data == NULL) {
+		clear_mob_proto_data(ch);
+	}
 	
 	// store temporary account id (may be overwritten by clear_player)
 	if (GET_TEMPORARY_ACCOUNT_ID(ch) != NOTHING) {
