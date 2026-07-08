@@ -1003,7 +1003,7 @@ const struct olc_command_data olc_data[] = {
 	{ "remember", mapedit_remember, OLC_MAP, OLC_CF_MAP_EDIT },
 	{ "roomtype", mapedit_roomtype, OLC_MAP, OLC_CF_MAP_EDIT },
 	{ "ruin", mapedit_ruin, OLC_MAP, OLC_CF_MAP_EDIT },
-	{ "spawn", mapedit_spawns, OLC_MAP, OLC_CF_MAP_EDIT },
+	{ "spawn", mapedit_spawn, OLC_MAP, OLC_CF_MAP_EDIT },
 	{ "terrain", mapedit_terrain, OLC_MAP, OLC_CF_MAP_EDIT },
 	{ "unclaimable", mapedit_unclaimable, OLC_MAP, OLC_CF_MAP_EDIT },
 	{ "undeplete", mapedit_undeplete, OLC_MAP, OLC_CF_MAP_EDIT },

@@ -726,7 +726,7 @@ OLC_MODULE(mapedit_ruin) {
 
 OLC_MODULE(mapedit_spawn) {
 	msg_to_char(ch, "You trigger mob spawning in this room.\r\n");
-	spawn_one_room(IN_ROOM(ch));
+	spawn_one_room(IN_ROOM(ch), FALSE);
 }
 
 
