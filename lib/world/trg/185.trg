@@ -1105,6 +1105,9 @@ set start %instance.start%
 if %start% && %start.var(18247_hidden,0)%
   * shortcut and do not leave a temple behind
   halt
+elseif %room.aff_flagged(*UNCLAIMABLE)%
+  * do not put a building on an unclaimable tile
+  halt
 end
 set item %room.contents%
 while %item%
