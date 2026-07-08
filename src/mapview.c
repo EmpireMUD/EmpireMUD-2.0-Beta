@@ -2989,7 +2989,7 @@ void perform_mortal_where(char_data *ch, char *arg) {
 		if (found) {
 			if (GET_MAP_LOC(IN_ROOM(ch)) == GET_MAP_LOC(IN_ROOM(found))) {
 				// same map location:
-				msg_to_char(ch, "%s - %s%s\r\n", PERS(found, ch, FALSE), get_room_name(IN_ROOM(found), FALSE), where_relative_location(ch, i));
+				msg_to_char(ch, "%s - %s%s\r\n", PERS(found, ch, FALSE), get_room_name(IN_ROOM(found), FALSE), where_relative_location(ch, found));
 			}
 			else {
 				// not the same map location -- show distance/coords:
