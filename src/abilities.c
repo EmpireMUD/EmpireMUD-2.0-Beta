@@ -5087,7 +5087,7 @@ DO_ABIL(do_building_damage_ability) {
 		besiege_room(ch, room_targ, dam, NULL);
 		
 		if (SECT(room_targ) != secttype || bldtype != GET_BUILDING(room_targ)) {
-			msg_to_char(ch, "It is destroyed!\r\n");
+			msg_to_char(ch, "The building is destroyed!\r\n");
 			act("$n's target is destroyed!", FALSE, ch, NULL, NULL, TO_ROOM);
 		}
 		data->success = TRUE;

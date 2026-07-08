@@ -2082,7 +2082,7 @@ ACMD(do_fire) {
 			besiege_room(ch, room_targ, dam, veh);
 			
 			if (SECT(room_targ) != secttype) {
-				msg_to_char(ch, "It is destroyed!\r\n");
+				msg_to_char(ch, "The building is destroyed!\r\n");
 			}
 		}
 		else if (veh_targ) {
