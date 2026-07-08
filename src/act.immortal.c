@@ -3260,12 +3260,14 @@ void do_stat_building(char_data *ch, bld_data *bdg, bool details) {
 	build_page_display(ch, "Room Title: %s", GET_BLD_TITLE(bdg));
 	
 	// icon line
-	line = build_page_display(ch, "Icon: %s&0", GET_BLD_ICON(bdg) ? one_icon_display(GET_BLD_ICON(bdg), NULL) : "none");
-	if (GET_BLD_HALF_ICON(bdg)) {
-		append_page_display_line(line, "  Half Icon: %s&0", GET_BLD_HALF_ICON(bdg) ? one_icon_display(GET_BLD_HALF_ICON(bdg), NULL) : "none");
-	}
-	if (GET_BLD_QUARTER_ICON(bdg)) {
-		append_page_display_line(line, "  Quarter Icon: %s&0", GET_BLD_QUARTER_ICON(bdg) ? one_icon_display(GET_BLD_QUARTER_ICON(bdg), NULL) : "none");
+	if (!BLD_FLAGGED(bdg, BLD_ROOM) || GET_BLD_ICON(bdg) || GET_BLD_HALF_ICON(bdg) || GET_BLD_QUARTER_ICON(bdg)) {
+		line = build_page_display(ch, "Icon: %s&0", GET_BLD_ICON(bdg) ? one_icon_display(GET_BLD_ICON(bdg), NULL) : "none");
+		if (GET_BLD_HALF_ICON(bdg)) {
+			append_page_display_line(line, "  Half Icon: %s&0", GET_BLD_HALF_ICON(bdg) ? one_icon_display(GET_BLD_HALF_ICON(bdg), NULL) : "none");
+		}
+		if (GET_BLD_QUARTER_ICON(bdg)) {
+			append_page_display_line(line, "  Quarter Icon: %s&0", GET_BLD_QUARTER_ICON(bdg) ? one_icon_display(GET_BLD_QUARTER_ICON(bdg), NULL) : "none");
+		}
 	}
 	
 	if (GET_BLD_DESC(bdg) && *GET_BLD_DESC(bdg)) {
