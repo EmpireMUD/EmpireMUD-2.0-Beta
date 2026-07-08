@@ -2583,6 +2583,71 @@ event_data *setup_olc_event(event_data *input) {
 //// DISPLAYS ////////////////////////////////////////////////////////////////
 
 /**
+* Log active events to the player on login.
+*
+* @param char_data *ch The player.
+*/
+void log_active_events_to_char(char_data *ch) {
+	char point_str[256], rank_str[256], when_str[256];
+	double math;
+	int rank, when;
+	struct event_running_data *running;
+	struct player_event_data *ped;
+	
+	LL_FOREACH(running_events, running) {
+		if (!running->event) {
+			continue;
+		}
+		if (running->status != EVTS_RUNNING) {
+			continue;
+		}
+		
+		// point count?
+		if ((ped = get_event_data(ch, running->id))) {
+			// determine cap and point amount
+			if (EVT_MAX_POINTS(running->event) > 0) {
+				safe_snprintf(point_str, sizeof(point_str), "%d/%d point%s", ped->points, EVT_MAX_POINTS(running->event), PLURAL(ped->points));
+			}
+			else {
+				safe_snprintf(point_str, sizeof(point_str), "%d point%s", ped->points, PLURAL(ped->points));
+			}
+			
+			if ((rank = get_event_rank(ch, running)) > 0) {
+				safe_snprintf(rank_str, sizeof(rank_str), "rank %d", rank);
+			}
+			else {
+				safe_snprintf(rank_str, sizeof(rank_str), "unranked");
+			}
+		}
+		else {
+			safe_snprintf(point_str, sizeof(point_str), "not played");
+			safe_snprintf(rank_str, sizeof(rank_str), "unranked");
+		}
+		
+		// ends when?
+		when = running->start_time + (EVT_DURATION(running->event) * SECS_PER_REAL_MIN) - time(0);
+		if (when >= SECS_PER_REAL_DAY) {
+			math = round((double) when / SECS_PER_REAL_DAY);
+			safe_snprintf(when_str, sizeof(when_str), "%d day%s", (int)math, PLURAL((int)math));
+		}
+		else if (when >= SECS_PER_REAL_HOUR) {
+			math = round((double) when / SECS_PER_REAL_HOUR);
+			safe_snprintf(when_str, sizeof(when_str), "%d hour%s", (int)math, PLURAL((int)math));
+		}
+		else if (when >= SECS_PER_REAL_MIN) {
+			math = round((double) when / SECS_PER_REAL_MIN);
+			safe_snprintf(when_str, sizeof(when_str), "%d minute%s", (int)math, PLURAL((int)math));
+		}
+		else {
+			safe_snprintf(when_str, sizeof(when_str), "%d second%s", when, PLURAL(when));
+		}
+		
+		msg_to_char(ch, "\tt[ Event: %s is running for %s: %s, %s ]\t0\r\n", EVT_NAME(running->event), when_str, point_str, rank_str);
+	}
+}
+
+
+/**
 * Displays a set of event rewards.
 *
 * @parma char_data *ch The person viewing it.

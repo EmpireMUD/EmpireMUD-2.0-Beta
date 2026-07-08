@@ -834,10 +834,15 @@ void show_empire_diplomacy(char_data *ch, empire_data *emp, empire_data *only_wi
 	
 	// header
 	if (only_with) {
-		msg_to_char(ch, "Current diplomatic relations with %s:\r\n", EMPIRE_NAME(only_with));
+		msg_to_char(ch, "Relations with %s: ", EMPIRE_NAME(only_with));
 	}
 	else {
 		msg_to_char(ch, "Current diplomatic relations for %s:\r\n", EMPIRE_NAME(emp));
+	
+		// show mine first
+		if (GET_LOYALTY(ch) && emp != GET_LOYALTY(ch)) {
+			show_empire_diplomacy(ch, emp, GET_LOYALTY(ch));
+		}
 	}
 	any = FALSE;
 	
@@ -3562,17 +3567,19 @@ void scan_for_tile(char_data *ch, char *argument, int max_dist, bitvector_t only
 						}
 					
 						// found a vehicle match but limit what we show
+						if (VEH_PAINT_COLOR(veh)) {
+							sprinttype(VEH_PAINT_COLOR(veh), paint_names, paint_str, sizeof(paint_str), "painted");
+							*paint_str = LOWER(*paint_str);
+							if (strlen(paint_str) < sizeof(paint_str) - 1) {
+								strcat(paint_str, " ");
+							}
+						}
+						else {
+							*paint_str = '\0';
+						}
+						
 						if (VEH_FLAGGED(veh, VEH_BUILDING)) {
 							if (PRF_FLAGGED(ch, PRF_INFORMATIVE)) {
-								if (VEH_PAINT_COLOR(veh)) {
-									sprinttype(VEH_PAINT_COLOR(veh), paint_names, paint_str, sizeof(paint_str), "painted");
-									*paint_str = LOWER(*paint_str);
-									strcat(paint_str, " ");
-								}
-								else {
-									*paint_str = '\0';
-								}
-								
 								get_informative_vehicle_string(ch, veh, temp);
 								if (*temp) {
 									vsize += snprintf(veh_string + vsize, sizeof(veh_string) - vsize, "%s%s%s [%s]", *veh_string ? ", " : "", paint_str, skip_filler(VEH_SHORT_DESC(veh)), temp);
@@ -3582,10 +3589,10 @@ void scan_for_tile(char_data *ch, char *argument, int max_dist, bitvector_t only
 								}
 							}
 							else if (!VEH_OWNER(veh) || VEH_CLAIMS_WITH_ROOM(veh) || !PRF_FLAGGED(ch, PRF_POLITICAL)) {
-								vsize += snprintf(veh_string + vsize, sizeof(veh_string) - vsize, "%s%s", *veh_string ? ", " : "", skip_filler(VEH_SHORT_DESC(veh)));
+								vsize += snprintf(veh_string + vsize, sizeof(veh_string) - vsize, "%s%s%s", *veh_string ? ", " : "", paint_str, skip_filler(VEH_SHORT_DESC(veh)));
 							}
 							else {
-								vsize += snprintf(veh_string + vsize, sizeof(veh_string) - vsize, "%s%s%s %s\t0", *veh_string ? ", " : "", EMPIRE_BANNER(VEH_OWNER(veh)), EMPIRE_ADJECTIVE(VEH_OWNER(veh)), skip_filler(VEH_SHORT_DESC(veh)));
+								vsize += snprintf(veh_string + vsize, sizeof(veh_string) - vsize, "%s%s%s %s%s\t0", *veh_string ? ", " : "", EMPIRE_BANNER(VEH_OWNER(veh)), EMPIRE_ADJECTIVE(VEH_OWNER(veh)), paint_str, skip_filler(VEH_SHORT_DESC(veh)));
 							}
 						}
 						else if (!scanned_veh || VEH_SIZE(veh) > VEH_SIZE(scanned_veh)) {	// not a building -- save?
@@ -3597,10 +3604,10 @@ void scan_for_tile(char_data *ch, char *argument, int max_dist, bitvector_t only
 					if (vsize == 0 && scanned_veh) {
 						// found a vehicle to show
 						if (!VEH_OWNER(scanned_veh) || VEH_CLAIMS_WITH_ROOM(scanned_veh) || !PRF_FLAGGED(ch, PRF_POLITICAL)) {
-							safe_snprintf(veh_string, sizeof(veh_string), "%s", skip_filler(VEH_SHORT_DESC(scanned_veh)));
+							safe_snprintf(veh_string, sizeof(veh_string), "%s%s", paint_str, skip_filler(VEH_SHORT_DESC(scanned_veh)));
 						}
 						else {
-							safe_snprintf(veh_string, sizeof(veh_string), "%s%s %s\t0", EMPIRE_BANNER(VEH_OWNER(scanned_veh)), EMPIRE_ADJECTIVE(VEH_OWNER(scanned_veh)), skip_filler(VEH_SHORT_DESC(scanned_veh)));
+							safe_snprintf(veh_string, sizeof(veh_string), "%s%s %s%s\t0", EMPIRE_BANNER(VEH_OWNER(scanned_veh)), EMPIRE_ADJECTIVE(VEH_OWNER(scanned_veh)), paint_str, skip_filler(VEH_SHORT_DESC(scanned_veh)));
 						}
 					}
 				}
@@ -3656,6 +3663,12 @@ void scan_for_tile(char_data *ch, char *argument, int max_dist, bitvector_t only
 				}
 				else {	// not a vehicle
 					append_page_display_line(pline, "%s", get_room_name(loc, FALSE));
+					
+					if (ROOM_PAINT_COLOR(loc)) {
+						sprinttype(ROOM_PAINT_COLOR(loc), paint_names, paint_str, sizeof(paint_str), "UNDEFINED");
+						*paint_str = LOWER(*paint_str);
+						append_page_display_line(pline, " (%s%s)", (ROOM_AFF_FLAGGED(loc, ROOM_AFF_BRIGHT_PAINT) ? "bright " : ""), paint_str);
+					}
 				}
 				
 				// coords
@@ -6580,6 +6593,7 @@ ACMD(do_islands) {
 
 ACMD(do_tomb) {
 	bool any;
+	int tomb_type;
 	struct empire_territory_data *ter, *next_ter;
 	room_data *tomb, *real;
 	
@@ -6598,6 +6612,23 @@ ACMD(do_tomb) {
 		}
 		else {
 			build_page_display(ch, "Your tomb is at: %s%s%s", get_room_name(tomb, FALSE), coord_display_room(ch, tomb, FALSE), (GET_ISLAND_ID(tomb) == GET_ISLAND_ID(IN_ROOM(ch))) ? "" : " (different island)");
+			find_load_room(ch, &tomb_type);
+			// LOAD_ROOM_x
+			switch (tomb_type) {
+				case LOAD_ROOM_MY_TOMB: {
+					// no error
+					break;
+				}
+				case LOAD_ROOM_ANY_TOMB: {
+					msg_to_char(ch, "Your tomb is on a different island but your empire has a tomb on this island.\r\n");
+					break;
+				}
+				case LOAD_ROOM_START_LOC:
+				default: {
+					msg_to_char(ch, "You have no tombs %s.\r\n", (GET_ISLAND(IN_ROOM(ch)) ? "on this island" : "available here"));
+					break;
+				}
+			}
 		}
 		
 		// additional info
@@ -7468,7 +7499,7 @@ ACMD(do_progress) {
 		
 		// purchase by name
 		if (!(prg = find_purchasable_goal_by_name(emp, arg2))) {
-			msg_to_char(ch, "No available progress by that name.\r\n");
+			msg_to_char(ch, "There is no progress reward available by that name%s.\r\n", (PRF_FLAGGED(ch, PRF_NO_TUTORIALS) ? "" : " (type 'progress buy' for a list)"));
 		}
 		else if (!PRG_FLAGGED(prg, PRG_PURCHASABLE)) {
 			// should not be able to hit this condition

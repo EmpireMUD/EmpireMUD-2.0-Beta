@@ -1369,6 +1369,57 @@ else
   halt
 end
 ~
+#10762
+Goblin Mines: Sell info~
+0 c 0 4
+L b 10754
+L b 10755
+L c 10750
+L c 10751
+sell~
+set targ %actor.obj_target_inv(%arg.argument1%)%
+return 1
+switch %self.vnum%
+  case 10754
+    if !%arg%
+      %send% %actor% Sell what? (Hint: Miner Nynar only buys spider parts.)
+    elseif !%targ%
+      %send% %actor% You don't seem to have that.
+    elseif %targ.vnum% == 10750
+      * ok
+      return 0
+    elseif %targ.vnum% == 10751 && %self.room.people(10755)%
+      * pass thru to other goblin
+      return 0
+    else
+      %send% %actor% Miner Nynar doesn't want that. (Hint: He only buys spider parts.)
+    end
+  break
+  case 10755
+    if !%arg%
+      %send% %actor% Sell what? (Hint: Miner Meena only buys spider meat.)
+    elseif !%targ%
+      %send% %actor% You don't seem to have that.
+    elseif %targ.vnum% == 10751
+      * ok
+      return 0
+    elseif %targ.vnum% == 10750 && %self.room.people(10754)%
+      * pass thru to other goblin
+      return 0
+    else
+      %send% %actor% Miner Meena doesn't want that. (Hint: She only buys spider meat.)
+    end
+  break
+  default
+    if %self.room.people(10754)% || %self.room.people(10755)%
+      * pass thru to other goblin
+      return 0
+    else
+      %send% %actor% Nobody here wants to buy anything.
+    end
+  break
+done
+~
 #10769
 Delayed Completer~
 1 f 0 0

@@ -804,6 +804,7 @@ const struct olc_command_data olc_data[] = {
 	{ "functions", bedit_functions, OLC_BUILDING, OLC_CF_EDITOR },
 	{ "halficon", bedit_half_icon, OLC_BUILDING, OLC_CF_EDITOR },
 	{ "height", bedit_height, OLC_BUILDING, OLC_CF_EDITOR },
+	{ "health", bedit_hitpoints, OLC_BUILDING, OLC_CF_EDITOR },
 	{ "hitpoints", bedit_hitpoints, OLC_BUILDING, OLC_CF_EDITOR },
 	{ "icon", bedit_icon, OLC_BUILDING, OLC_CF_EDITOR },
 	{ "interaction", bedit_interaction, OLC_BUILDING, OLC_CF_EDITOR },
@@ -1219,6 +1220,7 @@ const struct olc_command_data olc_data[] = {
 	{ "functions", vedit_functions, OLC_VEHICLE, OLC_CF_EDITOR },
 	{ "halficon", vedit_half_icon, OLC_VEHICLE, OLC_CF_EDITOR },
 	{ "height", vedit_height, OLC_VEHICLE, OLC_CF_EDITOR },
+	{ "health", vedit_hitpoints, OLC_VEHICLE, OLC_CF_EDITOR },
 	{ "hitpoints", vedit_hitpoints, OLC_VEHICLE, OLC_CF_EDITOR },
 	{ "icon", vedit_icon, OLC_VEHICLE, OLC_CF_EDITOR },
 	{ "interaction", vedit_interaction, OLC_VEHICLE, OLC_CF_EDITOR },
@@ -4890,7 +4892,6 @@ void show_requirement_display(char_data *ch, struct req_data *list, bool send_ou
 * @param bool send_output If TRUE, sends the page_display as text when done. Pass FALSE if you're building a larger page_display for the character.
 */
 void show_resource_display(char_data *ch, struct resource_data *list, bool send_output) {
-	bool vnum;
 	char line[MAX_STRING_LENGTH], buf[MAX_STRING_LENGTH];
 	struct resource_data *res;
 	obj_data *obj;
@@ -4901,59 +4902,45 @@ void show_resource_display(char_data *ch, struct resource_data *list, bool send_
 		switch (res->type) {
 			case RES_OBJECT: {
 				obj = obj_proto(res->vnum);
-				sprintf(line, "%dx %s", res->amount, !obj ? "UNKNOWN" : skip_filler(GET_OBJ_SHORT_DESC(obj)));
-				vnum = TRUE;
+				sprintf(line, "%dx [%d] %s", res->amount, res->vnum, !obj ? "UNKNOWN" : skip_filler(GET_OBJ_SHORT_DESC(obj)));
 				break;
 			}
 			case RES_COMPONENT: {
 				sprintf(line, "%dx (%s)", res->amount, res->amount == 1 ? get_generic_name_by_vnum(res->vnum) : get_generic_string_by_vnum(res->vnum, GENERIC_COMPONENT, GSTR_COMPONENT_PLURAL));
-				vnum = FALSE;
 				break;
 			}
 			case RES_LIQUID: {
-				sprintf(line, "%d units %s", res->amount, get_generic_name_by_vnum(res->vnum));
-				vnum = TRUE;
+				sprintf(line, "%d units [%d] %s", res->amount, res->vnum, get_generic_name_by_vnum(res->vnum));
 				break;
 			}
 			case RES_COINS: {
 				strcpy(line, money_amount(real_empire(res->vnum), res->amount));
-				vnum = FALSE;
 				break;
 			}
 			case RES_POOL: {
 				sprintf(line, "%d %s", res->amount, pool_types[res->vnum]);
-				vnum = FALSE;
 				break;
 			}
 			case RES_ACTION: {
-				sprintf(line, "%dx [%s]", res->amount, get_generic_name_by_vnum(res->vnum));
-				vnum = TRUE;
+				sprintf(line, "%dx [%d] [%s]", res->amount, res->vnum, get_generic_name_by_vnum(res->vnum));
 				break;
 			}
 			case RES_CURRENCY: {
-				sprintf(line, "%dx %s", res->amount, get_generic_string_by_vnum(res->vnum, GENERIC_CURRENCY, WHICH_CURRENCY(res->amount)));
-				vnum = TRUE;
+				sprintf(line, "%dx [%d] %s", res->amount, res->vnum, get_generic_string_by_vnum(res->vnum, GENERIC_CURRENCY, WHICH_CURRENCY(res->amount)));
 				break;
 			}
 			case RES_TOOL: {
 				prettier_sprintbit(res->vnum, tool_flags, buf);
 				sprintf(line, "%dx %s (tool%s)", res->amount, buf, PLURAL(res->amount));
-				vnum = FALSE;
 				break;
 			}
 			default: {
 				strcpy(line, "???");
-				vnum = FALSE;
 			}
 		}
 		
 		// append
-		if (vnum) {
-			build_page_display_col(ch, 2, FALSE, " &y%2d&0. [%5d] %s", num, res->vnum, line);
-		}
-		else {
-			build_page_display_col(ch, 2, FALSE, " &y%2d&0. %s", num, line);
-		}
+		build_page_display_col(ch, 2, FALSE, " &y%2d&0. %s", num, line);
 	}
 	if (!list) {
 		build_page_display_str(ch, "  none");

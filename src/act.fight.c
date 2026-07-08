@@ -488,7 +488,7 @@ ACMD(do_respawn) {
 		act("$n shuffles off $s mortal coil and dies.", FALSE, ch, NULL, NULL, TO_ROOM);
 		
 		player_death(ch);
-		char_to_room(ch, find_load_room(ch));
+		char_to_room(ch, find_load_room(ch, NULL));
 		GET_LAST_DIR(ch) = NO_DIR;
 		qt_visit_room(ch, IN_ROOM(ch));
 		pre_greet_mtrigger(ch, IN_ROOM(ch), NO_DIR, "respawn", was_in);	// cannot pre-greet for respawn

@@ -87,4 +87,33 @@ Z
 Z
 3 12859
 S
+#12897
+Echo Forge: What Lies Beyond~
+tbd
+   If you're ready to prove your mettle against the machine, type 'challenge'
+from Master Campwright Mateo's location at Victory Forge. If you want to ensure
+a private arena, type 'challenge empty'. You can return from the challenge by
+typing 'return' from the battlefield.
+~
+tbd
+   Remember, you can always return from the challenge by typing 'return' from
+the battlefield.
+~
+5 a 200 300 -1
+A
+1 12891
+R
+8 5102 100
+W+
+3 12897 0 1 -
+Defeat the Echo Serragon~
+Z
+1 12891
+Z
+3 12897
+Z
+3 12898
+Z
+3 12899
+S
 $

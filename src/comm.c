@@ -3528,6 +3528,9 @@ char *replace_prompt_codes(char_data *ch, char *str) {
 						if (ch->desc && GET_OLC_TYPE(ch->desc) != 0) {
 							strcat(i, "\tcO");
 						}
+						if (!NOHASSLE(ch)) {
+							strcat(i, "\tVH");
+						}
 					}
 					
 					if (!*i) {
@@ -3555,6 +3558,9 @@ char *replace_prompt_codes(char_data *ch, char *str) {
 						}
 						if (ch->desc && GET_OLC_TYPE(ch->desc) != 0) {
 							sprintf(i + strlen(i), "%solc-%s", (*i ? " " : ""), prompt_olc_info(ch));
+						}
+						if (!NOHASSLE(ch)) {
+							sprintf(i + strlen(i), "%shassle", (*i ? " " : ""));
 						}
 					}
 					
@@ -3787,34 +3793,43 @@ char *replace_prompt_codes(char_data *ch, char *str) {
 					tmp = i;
 					break;
 				}
-				case '_':
+				case '_': {
 					tmp = "\r\n";
 					break;
-				case '%':
-					*(cp++) = '%';
-					str++;
-					continue;
-					break;
-				default :
-					*(cp++) = '%';
-					str++;
-					continue;
+				}
+				case '%': {
+					tmp = "%";
 					break;
 				}
+				default : {
+					tmp = "%";
+					break;
+				}
+			}
 
-			while ((*cp = *(tmp++))) {
+			while ((cp - pbuf) < sizeof(pbuf) && (*cp = *(tmp++))) {
 				cp++;
 			}
-			str++;
+			++str;
 		}
 		else if (!(*(cp++) = *(str++))) {
 			break;
 		}
 	}
-
-	*cp = '\0';
-
-	strcat(pbuf, "\t0");
+	
+	// guarantee string terminator
+	if ((cp - pbuf) < sizeof(pbuf)) {
+		*cp = '\0';
+	}
+	else {
+		pbuf[sizeof(pbuf)-1] = '\0';
+	}
+	
+	// append color terminator if possible
+	if (strlen(pbuf) + 2 < sizeof(pbuf)) {
+		strcat(pbuf, "\t0");
+	}
+	
 	return (pbuf);
 }
 

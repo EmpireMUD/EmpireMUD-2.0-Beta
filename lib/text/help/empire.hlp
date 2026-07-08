@@ -182,7 +182,7 @@ background highlight (on the visual map), or you can use the 'mark' command
 to measure distances from the center if you're using a screenreader.
 
 See also: MARK, CITY INFORMATION, CITY COMMANDS, EXTENDED RADIUS, PROGRESSION,
-CITY POINT
+CITY POINT, MOUNTAIN OUTPOST
 #
 CLAIM
 
@@ -1475,6 +1475,24 @@ Rewards the following buildings:
 
 See also: PROGRESS
 #
+"VILLAGE FOODS" "VILLAGE BREAD" "VILLAGE GRUEL" "VILLAGE RICE" "VILLAGE VEGETABLES" "PICKLED VILLAGE VEGETABLES" "VILLAGE OAT CAKES" "VILLAGE FRUIT PRESERVES" "VILLAGE EGGS" "PICKLED VILLAGE EGGS"
+
+The workforce will produce various village foods at a bakery, kitchen, or
+similar location. Having many different foods in the empire's inventory will
+help keep its workforce well-fed. Players can also retrieve these foods from
+the larder and take them along as long-lasting food.
+
+Examples of village foods:
+ loaf of village bread
+ village gruel
+ village rice
+ pickled village vegetables
+ village oat cakes
+ village fruit preserves
+ pickled village eggs
+
+See also: EINVENTORY, WORKFORCE CRAFTING
+#
 "WALLED TOWN" "WALLED TOWN GOAL"
 
 Walled Town (Defense goal)
@@ -1656,7 +1674,7 @@ Common things produced by this:
  Glass blower: glass ingots
  Tavern: barrels of ale
 
-See also: WORKFORCE CHORES, WORKFORCE LIMIT
+See also: VILLAGE FOODS, WORKFORCE CHORES, WORKFORCE LIMIT
 #
 "WORKFORCE FOOD" "FEEDING WORKFORCE" "WORKFORCE EATING" "STARVING WORKFORCE" "WORKFORCE IS STARVING"
 
@@ -1684,7 +1702,8 @@ reduce the chances of running out of food. Not all crops can be eaten raw. Give
 your workers a bakery and enable workforce crafting; they will cook raw foods
 into additional things to eat.
 
-See also: BAKERY, EINVENTORY, WORKFORCE, WORKFORCE CRAFTS, WORKFORCE WHY
+See also: BAKERY, EINVENTORY, WORKFORCE, WORKFORCE CRAFTING, WORKFORCE WHY,
+   VILLAGE FOODS
 #
 "WORKFORCE KEEP" "WORKFORCE KEEP DEFAULT" "DEFAULT KEEP" "DEFAULT WORKFORCE KEEP"
 

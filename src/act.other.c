@@ -438,6 +438,7 @@ void perform_alternate(char_data *old, char_data *new) {
 	msg_to_char(new, "\r\n");
 	
 	display_automessages_on_login(new);
+	log_active_events_to_char(new);
 	
 	if (!PRF_FLAGGED(new, PRF_NO_TUTORIALS)) {
 		display_tip_to_char(new);

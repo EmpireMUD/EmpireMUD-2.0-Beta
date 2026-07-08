@@ -9772,6 +9772,7 @@ end
 %echo% ~%self% drops the protective wards and breathes a sigh of relief.
 if !%self.room.up(room)%
   %door% %self.room% u room i11810
+  %echo% You can now go upstairs.
 end
 * Remove ward
 set ward %self.room.contents(11831)%
@@ -9862,6 +9863,7 @@ end
 %echo% ~%self% cancels ^%self% mana shield and steps away from the staircase.
 if !%self.room.up(room)%
   %door% %self.room% u room i11830
+  %echo% You can now go upstairs.
 end
 * Remove ward
 set ward %self.room.contents(11831)%
@@ -9947,6 +9949,7 @@ end
 %echo% ~%self% drops ^%self% wards and warns you to be careful upstairs.
 if !%self.room.up(room)%
   %door% %self.room% u room i11860
+  %echo% You can now go upstairs.
 end
 * Remove ward
 set ward %self.room.contents(11831)%

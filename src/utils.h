@@ -1445,6 +1445,11 @@ int Y_COORD(room_data *room);	// formerly #define Y_COORD(room)  FLAT_Y_COORD(ge
 #define IS_THIRSTY(ch)  (GET_COND((ch), THIRST) >= (REAL_UPDATES_PER_MUD_HOUR * 24) && !HAS_BONUS_TRAIT((ch), BONUS_NO_THIRST) && !has_player_tech((ch), PTECH_NO_THIRST))
 #define IS_BLOOD_STARVED(ch)  (IS_VAMPIRE(ch) && GET_BLOOD(ch) <= config_get_int("blood_starvation_level"))
 
+// protocol helpers
+#define CAN_NAWS(ch)  ((ch)->desc && (ch)->desc->pProtocol->bNAWS)
+#define GET_SCREEN_WIDTH(ch)  (((ch)->desc && (ch)->desc->pProtocol->ScreenWidth > 0) ? (ch)->desc->pProtocol->ScreenWidth : 80)
+#define GET_SCREEN_HEIGHT(ch)  (((ch)->desc && (ch)->desc->pProtocol->ScreenHeight > 0) ? (ch)->desc->pProtocol->ScreenHeight : 24)
+
 // for act() and act-like things (requires to_sleeping and is_spammy set to true/false)
 #define SENDOK(ch)  (((ch)->desc || SCRIPT_CHECK((ch), MTRIG_ACT)) && (to_sleeping || AWAKE(ch)) && (!is_spammy || !PRF_FLAGGED((ch), PRF_NOSPAM)) && (!is_animal_move || IS_NPC(ch) || SHOW_STATUS_MESSAGES((ch), SM_ANIMAL_MOVEMENT)))
 
@@ -2049,7 +2054,7 @@ bool can_see_in_dark_room(char_data *ch, room_data *room, bool count_adjacent_li
 void command_lag(char_data *ch, int wait_type);
 void despawn_charmies(char_data *ch, any_vnum only_vnum);
 void determine_gear_level(char_data *ch);
-room_data *find_load_room(char_data *ch);
+room_data *find_load_room(char_data *ch, int *load_room_type);
 room_data *find_starting_location(room_data *near_room);
 int get_view_height(char_data *ch, room_data *from_room);
 bool has_one_day_playtime(char_data *ch);
@@ -2313,6 +2318,7 @@ bool find_and_bind(char_data *ch, obj_vnum vnum);
 int get_craft_scale_level(char_data *ch, craft_data *craft);
 int get_crafting_level(char_data *ch);
 obj_data *has_required_obj_for_craft(char_data *ch, obj_vnum vnum);
+bool obj_can_be_superior(obj_data *obj);
 
 // act.vampire.c
 bool cancel_biting(char_data *ch, bool preventable);
@@ -2399,6 +2405,7 @@ void delete_player_from_running_events(char_data *ch);
 int gain_event_points(char_data *ch, any_vnum event_vnum, int points);
 struct player_event_data *get_event_data(char_data *ch, int event_id);
 bool has_uncollected_event_rewards(char_data *ch);
+void log_active_events_to_char(char_data *ch);
 struct event_running_data *only_one_running_event(int *count);
 
 // faction.c
@@ -2832,6 +2839,11 @@ void sort_einv_for_empire(empire_data *emp, int einv_sort_type);
 #define GROUP(ch)  (ch->group)
 #define GROUP_LEADER(group)  (group->leader)
 #define GROUP_FLAGS(group)  (group->group_flags)
+
+// LOAD_ROOM_x: used by find_load_room()
+#define LOAD_ROOM_START_LOC  0
+#define LOAD_ROOM_MY_TOMB  1
+#define LOAD_ROOM_ANY_TOMB  2
 
 // handy
 #define SELF(sub, obj)  ((sub) == (obj))

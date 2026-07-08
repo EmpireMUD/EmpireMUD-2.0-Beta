@@ -164,7 +164,9 @@ end
 ~
 #10905
 Colossal red dragon combat + enrage~
-0 k 100 0
+0 k 100 2
+L w 10905
+L w 10906
 ~
 set soft_enrage_rounds 140
 set hard_enrage_rounds 300
@@ -202,7 +204,7 @@ if %enraged%
   if %random.4% == 4
     %echo% |%self% eyes glow with white-hot rage!
   end
-  dg_affect %self% BONUS-PHYSICAL 5 3600
+  dg_affect #10905 %self% BONUS-PHYSICAL 5 3600
 end
 * Start of regular combat script:
 * Check chance (this was a percent on the script but the enrage counter needs to always work)
@@ -239,7 +241,7 @@ switch %random.4%
     if (%target%)
       %send% %target% &&r~%self% uses ^%self% tail to hurl a rock at you, stunning you momentarily!&&0
       %echoaround% %target% ~%self% hurls a rock at ~%target% with ^%self% tail, stunning *%target% momentarily!
-      dg_affect %target% STUNNED on 10
+      dg_affect #10906 %target% STUNNED on 10
       %damage% %target% 150 physical
     end
   break
@@ -319,7 +321,8 @@ return 1
 ~
 #10910
 Sir Vivor Combat + Enrage~
-0 k 100 0
+0 k 100 1
+L w 10910
 ~
 set soft_enrage_rounds 140
 set hard_enrage_rounds 300
@@ -365,7 +368,7 @@ if %enraged%
   if %random.4% == 4
     %echo% ~%self% swings his sword with strength born of terror!
   end
-  dg_affect %self% BONUS-PHYSICAL 5 3600
+  dg_affect #10905 %self% BONUS-PHYSICAL 5 3600
 end
 * Start of regular combat script:
 * Check chance (this was a percent on the script but the enrage counter needs to always work)
@@ -403,7 +406,7 @@ switch %random.4%
     set target %actor%
     %send% %target% ~%self% trips you and bashes you with the pommel of ^%self% sword, stunning you!
     %echoaround% %target% ~%self% trips ~%target% and bashes *%target% with the pommel of ^%self% sword, stunning *%target% momentarily!
-    dg_affect %target% HARD-STUNNED on 15
+    dg_affect #10910 %target% HARD-STUNNED on 15
     %damage% %target% 75 physical
   break
   * Blind on healer (whoever has the most max mana at least)

@@ -651,7 +651,7 @@ OLC_MODULE(mapedit_delete_room) {
 		home = HOME_ROOM(in_room);
 		
 		DL_FOREACH_SAFE2(ROOM_PEOPLE(IN_ROOM(ch)), c, next_c, next_in_room) {
-			char_to_room(c, home ? home : find_load_room(c));
+			char_to_room(c, home ? home : find_load_room(c, NULL));
 			act("$n appears in front of you.", TRUE, c, NULL, NULL, TO_ROOM);
 			if (c != ch) {
 				msg_to_char(c, "Room deleted.\r\n");

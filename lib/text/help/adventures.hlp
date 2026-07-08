@@ -172,6 +172,10 @@ elemental, and you can repeat these quests if you wait at least an hour after
 finishing them. You can purchase rewards from the apprentice with the 'list'
 and 'buy' commands. Hint: If you're a thief, try pickpocketing the apprentice.
 
+Each adventure has its own goals and activities. For this one, use the
+'where elemental' command to find and fight each elemental, pick up its item,
+and return them to the apprentice.
+
 The sorcerer's apprentice sells:
   a sorcerous biscuit - food
   a stone breastplate - raises health
@@ -262,10 +266,14 @@ See also: ADVENTURE
 
 Goblin Mines (level 1-25 adventure)
 
-   The goblins have fled the mines and something tells you it's not good.
+The goblins have fled the mines and something tells you it's not good.
 Venture into the goblin mines and see what sends even goblins running for their
 lives! And maybe if you can find those goblins, they'll be willing to reward
 you for clearing out the mine.
+
+Each adventure has its own goals and activities. In Goblin Mines, fight
+creatures inside the mine. Then, try 'where goblin' to find one of the goblins
+outside to trade with.
 
 You can buy items from four goblins who have fled the mines. If you don't have
 any coins, try selling spider parts to Miner Nynar or spider meat to Miner
@@ -276,7 +284,7 @@ Miner Meena sells a goblin pick (for mining).
 Miner Hanx sells a goblin raft (drag it to the shore and sit on it to sail).
 Blacklung, Goblin Foreman sells a goblin coffin (temporary, single-use tomb).
 
-See also: ADVENTURE
+See also: ADVENTURE, WHERE
 #
 "GOBLIN OUTPOST" "SEWER: GOBLIN OUTPOST" "THE SEWER: GOBLIN OUTPOST" "GOBLIN SEWERS"
 
@@ -1054,9 +1062,15 @@ See also: ADVENTURE, BURN
 
 Trade Tutorial: Museum of Early Man (level 1-50 adventure)
 
-Find this adventure in a cave on the newbie island using the 'nearby museum'
-command. In this adventure, you can learn to do quests, gather resources, and
-craft basic tools.
+This tutorial has quests for people who have the Trade skill under level 50.
+If you don't have Trade at all, look for the wandering museum crier and start
+his intro quest. You can type "nearby Museum" to find the museum.
+
+Each adventure has its own goals and activities. In this one, visit the
+museum and craft items to complete a series of quests.
+
+This adventure appears on a mountain tile, facing flat terrain. You may have to
+go around a mountain to find the entrance.
 
 See also: ADVENTURE, NEARBY, QUEST
 #

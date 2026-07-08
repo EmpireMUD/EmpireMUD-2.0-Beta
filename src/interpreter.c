@@ -2944,6 +2944,7 @@ void nanny(descriptor_data *d, char *arg) {
 			}
 			
 			display_automessages_on_login(d->character);
+			log_active_events_to_char(d->character);
 			
 			if (!PRF_FLAGGED(d->character, PRF_NO_TUTORIALS)) {
 				display_tip_to_char(d->character);

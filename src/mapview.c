@@ -417,17 +417,17 @@ int get_map_radius(char_data *ch) {
 	mapsize = GET_MAPSIZE(REAL_CHAR(ch));
 	if (mapsize == 0) {
 		// auto-detected
-		if (ch->desc && ch->desc->pProtocol->ScreenWidth > 0) {
-			int wide = (ch->desc->pProtocol->ScreenWidth - 6) / 8;	// the /8 is 4 chars per tile, doubled
+		if (CAN_NAWS(ch)) {
+			int wide = (GET_SCREEN_WIDTH(ch) - 6) / 8;	// the /8 is 4 chars per tile, doubled
 			int max_size = config_get_int("max_map_size");
-			if (ch->desc->pProtocol->ScreenHeight > 0) {
-				// cap based on height, too (save some room)
-				// this saves roughly 4 lines below the map -- if you're going
-				// to play around with it, be sure to test -- the math is not
-				// very straightforward. -paul
-				wide = MIN(wide, ((ch->desc->pProtocol->ScreenHeight - 7) / 2) - 1);	// the -1 at the end is to ensure even/odd numbers have an extra line rather than one too few
-				wide = MAX(wide, 1);	// otherwise, NAWS sometimes leads to a map with only the player
-			}
+			
+			// cap based on height, too (save some room)
+			// this saves roughly 4 lines below the map -- if you're going
+			// to play around with it, be sure to test -- the math is not
+			// very straightforward. -paul
+			wide = MIN(wide, ((GET_SCREEN_HEIGHT(ch) - 7) / 2) - 1);	// the -1 at the end is to ensure even/odd numbers have an extra line rather than one too few
+			wide = MAX(wide, 1);	// otherwise, NAWS sometimes leads to a map with only the player
+			
 			mapsize = MIN(wide, max_size);
 		}
 		else {
@@ -2846,6 +2846,59 @@ void show_screenreader_room(char_data *ch, room_data *room, bitvector_t options,
  //////////////////////////////////////////////////////////////////////////////
 //// WHERE FUNCTIONS /////////////////////////////////////////////////////////
 
+/**
+* Helper for mortal "where" command to show the relative location of vict to
+* ch.
+*
+* @param char_data *ch The person looking.
+* @param char_data *vict The person they are looking for.
+* @return char* A location hint string starting with a space like " (here)" or else an empty string.
+*/
+char *where_relative_location(char_data *ch, char_data *vict) {
+	static char outbuf[MAX_STRING_LENGTH];
+	room_data *room;
+	struct instance_data *inst;
+	
+	if (IN_ROOM(ch) == IN_ROOM(vict)) {
+		return " (here)";
+	}
+	else if (GET_ROOM_TEMPLATE(IN_ROOM(ch)) && GET_ROOM_TEMPLATE(IN_ROOM(vict)) && find_instance_by_room(IN_ROOM(ch), FALSE, FALSE) == find_instance_by_room(IN_ROOM(vict), FALSE, FALSE)) {
+		return " (same adventure)";
+	}
+	else if ((room = HOME_ROOM(IN_ROOM(ch))) == HOME_ROOM(IN_ROOM(vict))) {
+		// same vehicle or building
+		if (GET_ROOM_VEHICLE(room)) {
+			if (VEH_FLAGGED(GET_ROOM_VEHICLE(room), VEH_BUILDING)) {
+				return " (same building)";
+			}
+			else {
+				return " (same vehicle)";
+			}
+		}
+		else {
+			return " (same building)";
+		}
+	}
+	else if ((inst = find_instance_by_room(IN_ROOM(vict), FALSE, FALSE))) {
+		// adventure room
+		safe_snprintf(outbuf, sizeof(outbuf), " (%s)", GET_ADV_NAME(INST_ADVENTURE(inst)));
+		return outbuf;
+	}
+	else if (GET_ROOM_VEHICLE(IN_ROOM(vict))) {
+		// different vehicle
+		safe_snprintf(outbuf, sizeof(outbuf), " (%s)", VEH_SHORT_DESC(GET_ROOM_VEHICLE(IN_ROOM(vict))));
+		return outbuf;
+	}
+	else if (GET_BUILDING(IN_ROOM(vict)) && (room = HOME_ROOM(IN_ROOM(vict)))) {
+		// different building
+		safe_snprintf(outbuf, sizeof(outbuf), " (%s)", GET_BLD_NAME(GET_BUILDING(IN_ROOM(vict))));
+		return outbuf;
+	}
+	
+	return "";	// in all other cases
+}
+
+
 void perform_mortal_where(char_data *ch, char *arg) {
 	int closest, dist, max_distance;
 	const char *dir_str;
@@ -2888,7 +2941,7 @@ void perform_mortal_where(char_data *ch, char *arg) {
 			// we'll only show distance if they're not on the same location
 			if (GET_MAP_LOC(IN_ROOM(ch)) == GET_MAP_LOC(IN_ROOM(i))) {
 				// same map location:
-				build_page_display(ch, "%-20s - %s%s", PERS(i, ch, FALSE), get_room_name(IN_ROOM(i), FALSE), (IN_ROOM(ch) == IN_ROOM(i)) ? " (here)" : "");
+				build_page_display(ch, "%-20s - %s%s", PERS(i, ch, FALSE), get_room_name(IN_ROOM(i), FALSE), where_relative_location(ch, i));
 			}
 			else {
 				// not the same map location -- show distance/coords:
@@ -2936,7 +2989,7 @@ void perform_mortal_where(char_data *ch, char *arg) {
 		if (found) {
 			if (GET_MAP_LOC(IN_ROOM(ch)) == GET_MAP_LOC(IN_ROOM(found))) {
 				// same map location:
-				msg_to_char(ch, "%s - %s%s\r\n", PERS(found, ch, FALSE), get_room_name(IN_ROOM(found), FALSE), (IN_ROOM(ch) == IN_ROOM(found)) ? " (here)" : "");
+				msg_to_char(ch, "%s - %s%s\r\n", PERS(found, ch, FALSE), get_room_name(IN_ROOM(found), FALSE), where_relative_location(ch, i));
 			}
 			else {
 				// not the same map location -- show distance/coords:

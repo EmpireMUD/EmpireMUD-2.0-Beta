@@ -6745,15 +6745,21 @@ int get_room_blocking_height(room_data *room, bool *blocking_vehicle) {
 * Find an optimal place to start upon new login or death.
 *
 * @param char_data *ch The player to find a loadroom for.
+* @param int *load_room_type Optional: If not NULL, will be set to a LOAD_ROOM_ const based on what kind of load room we find.
 * @return room_data* The location of a place to start.
 */
-room_data *find_load_room(char_data *ch) {
+room_data *find_load_room(char_data *ch, int *load_room_type) {
 	struct empire_territory_data *ter, *next_ter;
 	struct empire_vehicle_data *vter, *next_vter;
 	room_data *rl, *rl_last_room, *found, *map;
 	int num_found = 0;
 	sh_int island;
 	bool veh_ok;
+	
+	if (load_room_type) {
+		// init to default
+		*load_room_type = LOAD_ROOM_START_LOC;
+	}
 	
 	// preferred graveyard?
 	if (!IS_NPC(ch) && (rl = real_room(GET_TOMB_ROOM(ch))) && room_has_function_and_city_ok(GET_LOYALTY(ch), rl, FNC_TOMB) && can_use_room(ch, rl, GUESTS_ALLOWED) && !IS_BURNING(rl)) {
@@ -6763,6 +6769,9 @@ room_data *find_load_room(char_data *ch) {
 		// does not require last room but if there is one, it must be the same island
 		rl_last_room = real_room(GET_LAST_ROOM(ch));
 		if (veh_ok && (!rl_last_room || GET_ISLAND(rl) == GET_ISLAND(rl_last_room))) {
+			if (load_room_type) {
+				*load_room_type = LOAD_ROOM_MY_TOMB;
+			}
 			return rl;
 		}
 	}
@@ -6777,6 +6786,9 @@ room_data *find_load_room(char_data *ch) {
 				// pick at random if more than 1
 				if (!number(0, num_found++) || !found) {
 					found = ter->room;
+					if (load_room_type) {
+						*load_room_type = LOAD_ROOM_ANY_TOMB;
+					}
 				}
 			}
 		}
@@ -6792,6 +6804,9 @@ room_data *find_load_room(char_data *ch) {
 				// pick at random if more than 1
 				if (!number(0, num_found++) || !found) {
 					found = IN_ROOM(vter->veh);
+					if (load_room_type) {
+						*load_room_type = LOAD_ROOM_ANY_TOMB;
+					}
 				}
 			}
 		}
@@ -7386,7 +7401,7 @@ void relocate_players(room_data *room, room_data *to_room) {
 	DL_FOREACH_SAFE2(ROOM_PEOPLE(room), ch, next_ch, next_in_room) {
 		if (!IS_NPC(ch)) {
 			if (!(target = to_room)) {
-				target = find_load_room(ch);
+				target = find_load_room(ch, NULL);
 			}
 			// absolute chaos
 			if (target == room) {
