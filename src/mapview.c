@@ -3377,9 +3377,23 @@ ACMD(do_scan) {
 
 
 ACMD(do_where) {
+	char *temp;
+	bool request_mortal = FALSE;
+	
 	skip_spaces(&argument);
+	
+	// check mortal where request
+	if (!strn_cmp(argument, "-m", 2)) {
+		temp = any_one_arg(argument, arg);
+		skip_spaces(&temp);
+		if (is_abbrev(arg, "-mortal")) {
+			request_mortal = TRUE;
+			argument = temp;
+		}
+		// otherwise, leave argument alone
+	}
 
-	if (GET_ACCESS_LEVEL(ch) >= LVL_GOD) {
+	if (GET_ACCESS_LEVEL(ch) >= LVL_GOD && !request_mortal) {
 		perform_immort_where(ch, argument);
 	}
 	else {

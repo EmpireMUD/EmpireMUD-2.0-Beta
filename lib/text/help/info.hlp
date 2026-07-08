@@ -2182,6 +2182,10 @@ Example:
   > where
   > where dragon
 
+Immortals see a vastly expanded version of this command, but may use the mortal
+version by giving "-mortal" or "-m" as the first argument, such as:
+  > where -m bear
+
 See also: MASTER TRACKER, NO TRACE, UNSEEN PASSING, WHERE RANGE
 #
 WHERE-RANGE "WHERE RANGE"
