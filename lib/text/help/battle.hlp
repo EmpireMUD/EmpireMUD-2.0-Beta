@@ -187,13 +187,13 @@ Defend (Battle ability)
 
 Usage:  defend
 Cooldown:  60 seconds
-Duration: 30 seconds / unlimited at Battle 76+
+Duration: 30 seconds / unlimited at Battle 100
 Cost:  30 move
 
 The defend ability temporarily raises your dodge rating at the cost of your
 to-hit rating. Use it to survive in battle.
 
-At Battle 76+, this ability becomes a toggle and you can turn it off at will.
+At Battle 100, this ability becomes a toggle and you can turn it off at will.
 
 Gain experience when you activate Defend.
 #
@@ -293,13 +293,13 @@ Frenzy (Battle ability)
 
 Usage:  frenzy
 Cooldown:  60 seconds
-Duration: 30 seconds / unlimited at Battle 76+
+Duration: 30 seconds / unlimited at Battle 100
 Cost:  30 move
 
 The frenzy ability temporarily raises your to-hit rating at the cost of your
 dodge rating. Use it to defeat your enemies with ease.
 
-At Battle 76+, this ability becomes a toggle and you can turn it off at will.
+At Battle 100, this ability becomes a toggle and you can turn it off at will.
 
 Gain experience when you activate Frenzy.
 #

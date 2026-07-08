@@ -2569,6 +2569,7 @@ void schedule_scavenge_event(char_data *ch, bool randomize);
 void set_mob_spawn_time(char_data *mob, long when);
 void setup_generic_npc(char_data *mob, empire_data *emp, int name, int sex);
 void spawn_mobs_from_center(room_data *center);
+void spawn_one_room(room_data *room, bool only_artisans);
 bool try_mobile_movement(char_data *ch);
 bool validate_spawn_location(room_data *room, bitvector_t spawn_flags, int x_coord, int y_coord, bool in_city);
 
