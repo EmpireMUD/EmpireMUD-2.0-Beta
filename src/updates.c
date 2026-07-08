@@ -4781,6 +4781,17 @@ void b5_204_celestial_forge(void) {
 }
 
 
+// b5.206 has some QOL improvements on goblin mines
+void b5_206_goblin_mines(void) {
+	adv_vnum list[] = {
+		181,	// [  181] Goblin Mines
+		NOTHING
+	};
+	
+	update_replace_instances(list);
+}
+
+
 // ADD HERE, above: more beta 5 update functions
 
 
@@ -4906,6 +4917,7 @@ const struct {
 	{ "b5.203", b5_203_adventure_update, NULL, "De-spawning and re-spawning updated adventures" },
 	{ "b5.204", b5_204_celestial_forge, NULL, "Re-spawning Celestial Forge" },
 	{ "b5.205", b5_204_celestial_forge, NULL, "Re-spawning Celestial Forge" },
+	{ "b5.206", b5_206_goblin_mines, NULL, "Re-spawning Goblin Mines" },
 	
 	// ADD HERE, above: more beta 5 update lines
 	
