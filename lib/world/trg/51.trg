@@ -433,6 +433,20 @@ if !%room.up(room)%
 end
 detach 5164 %room.id%
 ~
+#5185
+Portal dismantle~
+2 s 0 0
+~
+set obj %room.contents%
+while %obj%
+  set next_obj %obj.next_in_list%
+  if %obj.type% == PORTAL
+    %echo% @%obj% implodes and vanishes!
+    %purge% %obj%
+  end
+  set obj %next_obj%
+done
+~
 #5186
 Haven Interior~
 2 o 100 5
@@ -549,7 +563,7 @@ shatter~
 eval target %%actor.obj_target(%arg.argument1%)%%
 if !%arg%
   %send% %actor% Shatter which piece of gear?
-  halt  
+  halt
 elseif !%target%
   %send% %actor% You don't see that to shatter here.
   halt

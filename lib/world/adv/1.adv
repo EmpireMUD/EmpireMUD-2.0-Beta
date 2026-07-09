@@ -59,7 +59,7 @@ magi-netically modified crops into our world.
 (This adventure contains only the magical crops on the map.)
 ~
 10500 10549 5-0
-1 60 dglm 0
+1 60 dglmp 0
 L
 1 0
 10500 -1 -1 -1
@@ -346,7 +346,7 @@ Paul Clarke~
 The mountain has opened up and lava is flowing forth at the surface!
 ~
 10190 10199 0-0
-1 0 dgl 0
+1 0 dglp 0
 L
 4 0
 10190 10190 10190 -1
