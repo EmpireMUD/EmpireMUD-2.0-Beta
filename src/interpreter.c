@@ -1503,10 +1503,29 @@ bool char_can_act(char_data *ch, int min_pos, bool allow_animal, bool allow_invu
 * @param char_data *ch The player receiving the error.
 */
 void send_low_pos_msg(char_data *ch) {
+	int tomb_type;
+	
 	switch (GET_POS(ch)) {
 		case POS_DEAD: {
 			msg_to_char(ch, "Lie still; you are DEAD!!!\r\n");
-			msg_to_char(ch, "(Type 'respawn' to come back at your tomb.)\r\n");
+			
+			find_load_room(ch, &tomb_type);
+			// LOAD_ROOM_x
+			switch (tomb_type) {
+				case LOAD_ROOM_MY_TOMB: {
+					msg_to_char(ch, "(Type 'respawn' to come back at your tomb.)\r\n");
+					break;
+				}
+				case LOAD_ROOM_ANY_TOMB: {
+					msg_to_char(ch, "(Type 'respawn' to come back at a local tomb.)\r\n");
+					break;
+				}
+				case LOAD_ROOM_START_LOC:
+				default: {
+					msg_to_char(ch, "(Type 'respawn' to come back at a starting location.)\r\n");
+					break;
+				}
+			}
 			break;
 		}
 		case POS_INCAP:

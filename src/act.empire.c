@@ -6611,7 +6611,7 @@ ACMD(do_tomb) {
 			build_page_display(ch, "You have no tomb set.");
 		}
 		else {
-			build_page_display(ch, "Your tomb is at: %s%s%s", get_room_name(tomb, FALSE), coord_display_room(ch, tomb, FALSE), (GET_ISLAND_ID(tomb) == GET_ISLAND_ID(IN_ROOM(ch))) ? "" : " (different island)");
+			build_page_display(ch, "Your tomb is at: %s%s", get_room_name(tomb, FALSE), coord_display_room(ch, tomb, FALSE));
 			find_load_room(ch, &tomb_type);
 			// LOAD_ROOM_x
 			switch (tomb_type) {

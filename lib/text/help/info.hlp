@@ -756,7 +756,9 @@ When you die in EmpireMUD, you will lie on the ground for a short time, until
 you type 'respawn'. When you respawn, you'll appear at your chosen tomb, at
 any nearby tomb your empire owns, or at a random starting location. You can
 only be reanimated in a tomb if your empire owns one on the same island
-where you died (rivers don't count for this; only oceans separate islands).
+where you died (rivers don't count for this; only oceans separate islands) --
+OR, if you're in the ocean but within 100 tiles of a tomb, you can still
+respawn at that tomb.
 
 When you die, you'll come back hungry and thirsty, and with a quarter of your
 maximum health, moves, and mana. Vampires also come back with a quarter of
