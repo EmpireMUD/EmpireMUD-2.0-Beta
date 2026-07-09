@@ -6768,7 +6768,7 @@ room_data *find_load_room(char_data *ch, int *load_room_type) {
 		
 		// does not require last room but if there is one, it must be the same island
 		rl_last_room = real_room(GET_LAST_ROOM(ch));
-		if (veh_ok && (!rl_last_room || GET_ISLAND(rl) == GET_ISLAND(rl_last_room))) {
+		if (veh_ok && (!rl_last_room || GET_ISLAND(rl) == GET_ISLAND(rl_last_room) || (IN_ROOM(ch) && compute_distance(IN_ROOM(ch), rl) < config_get_int("tomb_off_island_distance")))) {
 			if (load_room_type) {
 				*load_room_type = LOAD_ROOM_MY_TOMB;
 			}

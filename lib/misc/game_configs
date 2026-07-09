@@ -208,6 +208,7 @@ temperature_extreme 30
 temperature_from_fire 10
 temperature_from_water 10
 temperature_penalties 0
+tomb_off_island_distance 100
 *
 * Skills configs
 enchant_points_at_100 2.000000
