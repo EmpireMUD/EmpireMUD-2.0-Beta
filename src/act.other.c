@@ -627,6 +627,7 @@ INTERACTION_FUNC(shear_interact) {
 	
 	for (iter = 0; iter < amt; ++iter) {
 		obj = read_object(interaction->vnum, TRUE);
+		scale_item_to_level(obj, inter_mob ? get_approximate_level(inter_mob) : GET_COMPUTED_LEVEL(ch));
 		obj_to_char(obj, ch);
 		obj_ok = load_otrigger(obj);
 	}
@@ -681,7 +682,7 @@ INTERACTION_FUNC(skin_interact) {
 		
 	for (num = 0; num < interaction->quantity; ++num) {
 		obj = read_object(interaction->vnum, TRUE);
-		scale_item_to_level(obj, 1);	// min scale
+		scale_item_to_level(obj, inter_item ? GET_OBJ_CURRENT_SCALE_LEVEL(inter_item) : GET_COMPUTED_LEVEL(ch));
 		obj_to_char(obj, ch);
 		obj_ok = load_otrigger(obj);
 	}
