@@ -1020,9 +1020,11 @@ most locations on the map. Follow these steps:
 ~
    You have satisfied the Spirit of the Wild! Digging and gathering are good
 ways to learn low-level Survival. When you reach Survival 5, use 'skill buy
-Navigation' to improve your map.
+Navigation' to improve your map. The benevolent spirit refuses to take the rock
+and flint; keep them to use yourself or try the 'junk' command to get rid of
+them forever.
 ~
-11 d 0 25 -1
+12 0 0 25 -1
 A
 1 10852
 P
@@ -1065,9 +1067,10 @@ it to learn how to use it. Here are the steps for this quest:
     'enter soulstream' to get back inside.
  7. Type 'finish Battle' at the Spirit of the Hunt.
 ~
-You have satisfied the Spirit of the Hunt!
+   You have satisfied the Spirit of the Hunt! The spirit has no use for the
+skin, and allows you to keep it for your own crafts.
 ~
-11 d 0 25 -1
+12 0 0 25 -1
 A
 1 10853
 P
@@ -1265,7 +1268,21 @@ spirit tokens you have right now.
 special companion! Use this spirit bell to add the 'companion spirit' to your
 minipet collection. Then you can type 'minipet companion spirit' to summon it.
 ~
-10 d 0 25 -1
+13 cd 0 25 -1
+A
+5 10851
+A
+5 10852
+A
+5 10853
+A
+5 10854
+A
+5 10855
+A
+5 10857
+A
+5 10858
 R
 2 10859 1
 W

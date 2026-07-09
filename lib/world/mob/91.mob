@@ -1247,6 +1247,7 @@ A small lemming darts between the shadows.
 D
 This tiny, round rodent has long, soft fur splotched with brown and black.
 ~
+F 9179
 I 0 3012 100.00 1  # BUTCHER: fillet of raw meat
 I 1 1350 100.00 1  # SKIN: small skin
 S
@@ -1280,7 +1281,7 @@ of a lion, and the ferocity of a dragon. Its brown and black fur is highly
 prized, but hard to remove as you must first get past the claws.
 ~
 I 0 3012 100.00 2  # BUTCHER: fillet of raw meat
-I 1 9181 100.00 2  # SKIN: wolverine fur
+I 1 9181 100.00 1  # SKIN: wolverine fur
 S
 #9182
 puffin rainbow-billed rainbowbilled~
