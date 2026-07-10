@@ -963,6 +963,10 @@ bool is_ability_enemy(char_data *ch, char_data *vict) {
 	if (!can_fight(ch, vict)) {
 		return FALSE;
 	}
+	if (GET_LOYALTY(ch) && GET_LOYALTY(ch) == GET_LOYALTY(vict)) {
+		// same empire, e.g. guard, and not fighting each other
+		return FALSE;
+	}
 	
 	return TRUE;
 	/* // skipping these because it defaults to TRUE:
