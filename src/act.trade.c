@@ -2139,7 +2139,9 @@ ACMD(do_gen_craft) {
 			}
 			
 			// match so far...
-			if (!str_cmp(arg, GET_CRAFT_NAME(craft)) || (GET_CRAFT_BUILD_FACING(craft) && *short_arg && !str_cmp(short_arg, GET_CRAFT_NAME(craft)))) {
+			if (!str_cmp(arg, GET_CRAFT_NAME(craft)) || (*short_arg && !str_cmp(short_arg, GET_CRAFT_NAME(craft)))) {
+				// prior to b5.207, short_arg was only checked here for buildings with facing: if (!str_cmp(arg, GET_CRAFT_NAME(craft)) || (GET_CRAFT_BUILD_FACING(craft) && *short_arg && !str_cmp(short_arg, GET_CRAFT_NAME(craft)))) {
+				
 				// do this last because it records if they are on the wrong command or just missing an ability
 				if (GET_CRAFT_TYPE(craft) != subcmd) {
 					wrong_cmd = GET_CRAFT_TYPE(craft);
