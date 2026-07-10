@@ -972,12 +972,23 @@ ACMD(do_mload) {
 
 ACMD(do_mlog) {
 	char source_info[MAX_STRING_LENGTH];
+	
+	if (!MOB_OR_IMPL(ch)) {
+		send_config_msg(ch, "huh_string");
+		return;
+	}
+	
 	safe_snprintf(source_info, sizeof(source_info), "mob %d %s", GET_MOB_VNUM(ch), GET_SHORT_DESC(ch));
 	script_log_command(argument, source_info);
 }
 
 
 ACMD(do_mmod) {
+	if (!MOB_OR_IMPL(ch)) {
+		send_config_msg(ch, "huh_string");
+		return;
+	}
+	
 	script_modify(argument);
 }
 
