@@ -6433,6 +6433,8 @@ dash (-) are matched to the mob's keywords and text fields.
 Fields:
   &c-affects&0, &cunaffected&0 - see HELP AFFECT FLAGS
   &c-attack&0 - see HELP MEDIT ATTACK
+  &c-corpse&0 - find mobs who have any custom corpse (for a specific corpse,
+     use '.obj search' instead)
   &c-custom&0 - has a specific type, see HELP MEDIT CUSTOM
   &c-faction&0 - is a member of a specific faction
   &c-flagged&0, &cunflagged&0 - see HELP MEDIT FLAGS
