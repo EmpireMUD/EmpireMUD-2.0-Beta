@@ -4360,7 +4360,38 @@ which recipe to craft, e.g. "craft hammock".
 Names should be as short as possible, while still being distinct from other
 existing craft recipes.
 
+See CRAFT NAME MATCHING for additional details.
+
 See also: OLC CRAFTS
+#d
+"CEDIT NAME MATCHING" "CRAFT NAME MATCHING"
+
+One of the goals in EmpireMUD is to make it easy for the player to type the
+thing he wants to do. Craft names accept abbreviations, including partial
+abbreviations of each word in the name.
+
+It tries to match a name in this order:
+1. Exact match for the full name the player typed (forge dracoscale vambraces)
+   OR, if the last word was a direction, exact match for the name the player
+   entered without the direction (build unearthly manor south). Caution: this
+   means if there's a craft called "sword of the great" and another called
+   "sword of the Great North", there's a risk of mismatch.
+2. Did the player type a simple abbreviation of the full name (forge
+   dracoscale) OR, if the last word was a direction, did the player type a
+   simple abbreviation without the direction (build unearthly man south).
+3. Did the player type a complex abbreviation of the full name (forge drac vam)
+   OR, again, with the final direction removed, did they type a complex
+   abbreviation of the craft name (build un man south).
+
+For this name matching, crafts are sorted from highest to lowest level ability
+required, and then alphabetically.
+
+This process is simpler if you avoid crafts that contain direction names,
+especially at the end of the craft name. However, if you do include a direction
+in the name itself, be sure to test how the player might try to type the craft
+to make sure it selects the right one.
+
+See also: CEDIT NAME
 #d
 "CEDIT QUANTITY"
 

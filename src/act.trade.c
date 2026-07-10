@@ -2156,7 +2156,9 @@ ACMD(do_gen_craft) {
 				type = craft;
 				break;
 			}
-			else if (!abbrev_match && (is_abbrev(arg, GET_CRAFT_NAME(craft)) || (GET_CRAFT_BUILD_FACING(craft) && *short_arg && is_abbrev(short_arg, GET_CRAFT_NAME(craft))))) {
+			else if (!abbrev_match && (is_abbrev(arg, GET_CRAFT_NAME(craft)) || (*short_arg && is_abbrev(short_arg, GET_CRAFT_NAME(craft))))) {
+				// prior to b5.207, also checked GET_CRAFT_BUILD_FACING(craft) for short_arg
+				
 				// do this last because it records if they are on the wrong command or just missing an ability
 				if (GET_CRAFT_TYPE(craft) != subcmd) {
 					wrong_cmd = GET_CRAFT_TYPE(craft);
@@ -2175,7 +2177,9 @@ ACMD(do_gen_craft) {
 					abbrev_no_res = craft;
 				}
 			}
-			else if (!multi_match && (multi_isname(arg, GET_CRAFT_NAME(craft)) || (GET_CRAFT_BUILD_FACING(craft) && *short_arg && multi_isname(short_arg, GET_CRAFT_NAME(craft))))) {
+			else if (!multi_match && (multi_isname(arg, GET_CRAFT_NAME(craft)) || (*short_arg && multi_isname(short_arg, GET_CRAFT_NAME(craft))))) {
+				// prior to b5.207, also checked GET_CRAFT_BUILD_FACING(craft) for short_arg
+				
 				// do this last because it records if they are on the wrong command or just missing an ability
 				if (GET_CRAFT_TYPE(craft) != subcmd) {
 					wrong_cmd = GET_CRAFT_TYPE(craft);

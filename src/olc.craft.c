@@ -45,7 +45,7 @@ const char *default_craft_name = "unnamed recipe";
 * @return bool TRUE if any problems were reported; FALSE if all good.
 */
 bool audit_craft(craft_data *craft, char_data *ch) {
-	char temp[MAX_STRING_LENGTH];
+	char temp[MAX_STRING_LENGTH], last_word[MAX_STRING_LENGTH];
 	bool problem = FALSE;
 	bld_data *bld = NULL;
 
@@ -74,6 +74,12 @@ bool audit_craft(craft_data *craft, char_data *ch) {
 	strtolower(temp);
 	if (strcmp(GET_CRAFT_NAME(craft), temp)) {
 		olc_audit_msg(ch, GET_CRAFT_VNUM(craft), "Non-lowercase name");
+		problem = TRUE;
+	}
+	
+	chop_last_arg(GET_CRAFT_NAME(craft), temp, last_word);
+	if (*last_word && parse_direction(ch, last_word) != NO_DIR) {
+		olc_audit_msg(ch, GET_CRAFT_VNUM(craft), "Craft name ends with a direction (HELP CRAFT NAME MATCHING)");
 		problem = TRUE;
 	}
 	
