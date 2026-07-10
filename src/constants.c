@@ -747,7 +747,7 @@ const char *room_template_flags[] = {
 	"!TELEPORT",
 	"LOOK-OUT",
 	"!LOCATION",
-	"*",
+	"WATER-DESCRIPTIONS",
 	"*",	// 10
 	"\n"
 };
