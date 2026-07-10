@@ -5368,6 +5368,11 @@ ACMD(do_buy) {
 				return;
 			}
 			
+			// mark purchase as production
+			if (GET_LOYALTY(ch)) {
+				add_production_total(GET_LOYALTY(ch), item->vnum, 1);
+			}
+			
 			// finish the purchase
 			if (item->currency == NOTHING) {
 				charge_coins(ch, coin_emp, item->cost, NULL, buf2);
