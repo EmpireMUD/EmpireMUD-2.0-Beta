@@ -9,6 +9,7 @@ D
    This appears on first glance to be an ordinary black housecat, but upon
 closer inspection, you detect a magical glint in its eye...
 ~
+T 9903
 S
 #501
 saber-toothed sabertoothed toothed cat familiar~
@@ -23,6 +24,7 @@ identified by the large, pronounced upper canine teeth that extend from its
 mouth even when closed, and give it its name. Judging by the magical glint in
 its eye, this one is probably a mage's familiar.
 ~
+T 9903
 S
 #502
 sphinx familiar~
@@ -38,6 +40,7 @@ forcing travellers to answer riddles, this one seems to have chosen to become
 the guardian of a mage instead. In combat, it will attempt to rescue its
 companion from attackers by forcing them to attack it instead.
 ~
+T 9903
 S
 #503
 griffin familiar~
@@ -53,6 +56,7 @@ guarding treasure, this one has instead decided to guard the mage it serves.
 In combat, it will attempt to rescue its companion from attackers by forcing
 them to attack it instead.
 ~
+T 9903
 S
 #504
 wolf dire familiar~
@@ -67,6 +71,7 @@ Judging by the magical glint in its eye, serves as a mage's familiar, perhaps
 seeing in them something of itself. In combat, it simply attacks with great
 ferocity.
 ~
+T 9903
 S
 #505
 rabbit moon familiar~
@@ -87,6 +92,7 @@ ability it should use in combat.
 ~
 T 505
 T 506
+T 9903
 S
 #506
 tortoise giant familiar~
@@ -102,6 +108,7 @@ it may be a mage's familiar. In combat, it does not attack at all, but will
 attempt to rescue its companion from attackers by forcing them to attack it
 instead.
 ~
+T 9903
 S
 #507
 wolf spirit familiar~
@@ -121,6 +128,7 @@ it should use in combat.
 ~
 T 507
 T 508
+T 9903
 S
 #508
 manticore huge familiar~
@@ -135,6 +143,7 @@ the sphinx. It has the head of a human, the body of a lion, and a tail bearing
 dozens of venomous spines. This manticore's lack of aggression clearly marks it
 as a mage's familiar. In combat, it simply attacks with great ferocity.
 ~
+T 9903
 S
 #509
 phoenix familiar~
@@ -154,6 +163,7 @@ ability it should use in combat.
 ~
 T 509
 T 516
+T 9903
 S
 #510
 shadow scorpion familiar~
@@ -174,6 +184,7 @@ ability it should use in combat.
 T 510
 T 514
 T 517
+T 9903
 S
 #511
 shadow owl familiar~
@@ -193,6 +204,7 @@ ability it should use in combat.
 T 511
 T 514
 T 518
+T 9903
 S
 #512
 basilisk familiar~
@@ -212,6 +224,7 @@ ability it should use in combat.
 ~
 T 512
 T 519
+T 9903
 S
 #513
 salamander familiar~
@@ -231,6 +244,7 @@ ability it should use in combat.
 ~
 T 513
 T 520
+T 9903
 S
 #514
 hulk skeletal familiar~
@@ -246,6 +260,7 @@ head-and-shoulders over you. Being a jumbled pastiche of human and animal bones
 does not diminish its strength, and merely adds to its terrifying appearance.
 In combat, it simply attacks with great ferocity.
 ~
+T 9903
 S
 #515
 banshee familiar~
@@ -265,6 +280,7 @@ ability it should use in combat.
 ~
 T 515
 T 521
+T 9903
 S
 #530
 chicken~
@@ -460,5 +476,6 @@ D
 This hapless citizen has a strange pallor about them.
 ~
 T 550
+T 9903
 S
 $
