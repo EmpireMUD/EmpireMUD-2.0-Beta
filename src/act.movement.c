@@ -1188,7 +1188,7 @@ bool player_can_move(char_data *ch, int dir, room_data *to_room, bitvector_t fla
 			return FALSE;
 		}
 	}
-	if (IS_RIDING(ch) && MOUNT_FLAGGED(ch, MOUNT_AQUATIC) && !WATER_SECT(to_room) && !IS_WATER_BUILDING(to_room) && !EFFECTIVELY_FLYING(ch)) {
+	if (IS_RIDING(ch) && MOUNT_FLAGGED(ch, MOUNT_AQUATIC) && !WATER_SECT(to_room) && !IS_WATER_BUILDING(to_room) && !EFFECTIVELY_FLYING(ch) && !WATER_SECT(IN_ROOM(ch))) {
 		if (PRF_FLAGGED(ch, PRF_AUTODISMOUNT)) {
 			do_dismount(ch, "", 0, 0);
 		}
