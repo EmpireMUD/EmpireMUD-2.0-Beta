@@ -6742,7 +6742,7 @@ ACMD(do_import) {
 	else if (is_abbrev(arg, "analyze") || is_abbrev(arg, "analysis")) {
 		do_import_analysis(ch, emp, argument, subcmd);
 	}
-	else if (EMPIRE_IMM_ONLY(emp) && config_get_bool("immortal_empire_restrictions")) {
+	else if (EMPIRE_IMM_ONLY(emp) && config_get_bool("immortal_empire_restrict_trade")) {
 		msg_to_char(ch, "Immortal empires cannot trade.\r\n");
 	}
 	else if (!imm_access && GET_RANK(ch) < EMPIRE_PRIV(emp, PRIV_TRADE)) {

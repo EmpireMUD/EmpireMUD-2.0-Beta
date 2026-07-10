@@ -976,7 +976,7 @@ void process_imports(void) {
 	int time_to_empire_emptiness = config_get_int("time_to_empire_emptiness") * SECS_PER_REAL_WEEK;
 	
 	HASH_ITER(hh, empire_table, emp, next_emp) {
-		if (EMPIRE_IMM_ONLY(emp) && config_get_bool("immortal_empire_restrictions")) {
+		if (EMPIRE_IMM_ONLY(emp) && config_get_bool("immortal_empire_restrict_trade")) {
 			continue;
 		}
 		if (!EMPIRE_HAS_TECH(emp, TECH_TRADE_ROUTES)) {
@@ -1294,7 +1294,7 @@ bool is_trading_with(empire_data *emp, empire_data *partner) {
 		return FALSE;
 	}
 	// neither can be imm-only
-	if ((EMPIRE_IMM_ONLY(emp) || EMPIRE_IMM_ONLY(partner)) && config_get_bool("immortal_empire_restrictions")) {
+	if ((EMPIRE_IMM_ONLY(emp) || EMPIRE_IMM_ONLY(partner)) && config_get_bool("immortal_empire_restrict_trade")) {
 		return FALSE;
 	}
 	// both must have trade routes

@@ -111,6 +111,7 @@ frontier_timeout 30
 homeless_citizen_speed 10
 immortal_empire_restrictions 1
 immortal_empire_restrict_stealth 1
+immortal_empire_restrict_trade 1
 immortal_empire_restrict_war 1
 land_frontier_modifier 0.050000
 land_min_cap 15
