@@ -530,11 +530,18 @@ void gain_ability_exp_from_moves(char_data *ch, room_data *was_in, bitvector_t f
 }
 
 
-int find_door(char_data *ch, const char *type, char *dir, const char *cmdname) {
+/**
+* @param char_data *ch The person looking for the door.
+* @param const char *type Door keyword.
+* @param char *dir Optional: Player-specified direction. (may be empty string)
+* @param const char *cmdname The command the player used (open/close).
+* @param int *number Optional: Support for the number.name syntax.
+*/
+int find_door(char_data *ch, const char *type, char *dir, const char *cmdname, int *number) {
 	struct room_direction_data *ex;
-	int door;
+	int door, num;
 
-	if (*dir) {			/* a direction was specified */
+	if (dir && *dir) {			/* a direction was specified */
 		if ((door = parse_direction(ch, dir)) == NO_DIR) {	/* Partial Match */
 			send_to_char("That's not a direction.\r\n", ch);
 			return (-1);
@@ -565,9 +572,9 @@ int find_door(char_data *ch, const char *type, char *dir, const char *cmdname) {
 			return (NO_DIR);
 		}
 		if (COMPLEX_DATA(IN_ROOM(ch))) {
-			for (ex = COMPLEX_DATA(IN_ROOM(ch))->exits; ex; ex = ex->next) {
+			for (ex = COMPLEX_DATA(IN_ROOM(ch))->exits, num = 0; ex; ex = ex->next) {
 				if (ex->keyword) {
-					if (isname((char *) type, ex->keyword)) {
+					if (isname((char *) type, ex->keyword) && (!number || ++num == *number)) {
 						return (ex->dir);
 					}
 				}
@@ -2454,7 +2461,7 @@ ACMD(do_follow) {
 
 
 ACMD(do_gen_door) {
-	int door = NO_DIR;
+	int number, door = NO_DIR;
 	char type[MAX_INPUT_LENGTH], dir[MAX_INPUT_LENGTH];
 	vehicle_data *tmp_veh = NULL;
 	obj_data *obj = NULL;
@@ -2472,14 +2479,18 @@ ACMD(do_gen_door) {
 	#define DOOR_IS_CLOSED(ch, obj, ex)	(!(DOOR_IS_OPEN(ch, obj, ex)))
 
 	skip_spaces(&argument);
+	number = get_number(&argument);
 	if (!*argument) {
 		sprintf(buf, "%s what?\r\n", cmd_door[subcmd]);
 		send_to_char(CAP(buf), ch);
 		return;
 	}
+	
 	two_arguments(argument, type, dir);
-	if (!generic_find(type, NULL, FIND_OBJ_INV | FIND_OBJ_ROOM, ch, &victim, &obj, &tmp_veh))
-		door = find_door(ch, type, dir, cmd_door[subcmd]);
+	
+	if (!generic_find(type, &number, FIND_OBJ_INV | FIND_OBJ_ROOM, ch, &victim, &obj, &tmp_veh)) {
+		door = find_door(ch, type, dir, cmd_door[subcmd], &number);
+	}
 	
 	ex = find_exit(IN_ROOM(ch), door);
 
