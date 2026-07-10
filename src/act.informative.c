@@ -1813,7 +1813,7 @@ void look_at_char(char_data *i, char_data *ch, bool show_eq) {
 			list_obj_to_char(i->carrying, ch, OBJ_DESC_INVENTORY, TRUE, TRUE);
 
 			if (ch != i && i->carrying) {
-				if (can_gain_exp_from(ch, i)) {
+				if (can_gain_exp_from(ch, i, NULL)) {
 					gain_player_tech_exp(ch, PTECH_SEE_INVENTORY, 5);
 				}
 				run_ability_hooks_by_player_tech(ch, PTECH_SEE_INVENTORY, i, NULL, NULL, NULL);

@@ -401,7 +401,7 @@ int apply_poison(char_data *ch, char_data *vict) {
 	}
 	
 	// GAIN SKILL NOW -- it at least attempts an application
-	if (can_gain_exp_from(ch, vict)) {
+	if (can_gain_exp_from(ch, vict, NULL)) {
 		gain_player_tech_exp(ch, PTECH_POISON, 2);
 		gain_player_tech_exp(ch, PTECH_POISON_UPGRADE, 2);
 	}
@@ -419,7 +419,7 @@ int apply_poison(char_data *ch, char_data *vict) {
 	
 	// attempt immunity/resist
 	if (has_player_tech(vict, PTECH_NO_POISON)) {
-		if (can_gain_exp_from(vict, ch)) {
+		if (can_gain_exp_from(vict, ch, NULL)) {
 			gain_player_tech_exp(vict, PTECH_NO_POISON, 10);
 		}
 		run_ability_hooks_by_player_tech(vict, PTECH_NO_POISON, ch, NULL, NULL, NULL);
@@ -431,7 +431,7 @@ int apply_poison(char_data *ch, char_data *vict) {
 		return 0;
 	}
 	if (has_player_tech(vict, PTECH_RESIST_POISON)) {
-		if (can_gain_exp_from(vict, ch)) {
+		if (can_gain_exp_from(vict, ch, NULL)) {
 			gain_player_tech_exp(vict, PTECH_RESIST_POISON, 10);
 		}
 		run_ability_hooks_by_player_tech(vict, PTECH_RESIST_POISON, ch, NULL, NULL, NULL);
@@ -796,7 +796,7 @@ ACMD(do_pickpocket) {
 		}
 		
 		// gain either way
-		if (can_gain_exp_from(ch, vict) && !AFF_FLAGGED(vict, AFF_NO_ATTACK)) {
+		if (can_gain_exp_from(ch, vict, NULL) && !AFF_FLAGGED(vict, AFF_NO_ATTACK)) {
 			gain_player_tech_exp(ch, PTECH_PICKPOCKET, 25);
 		}
 		run_ability_hooks_by_player_tech(ch, PTECH_PICKPOCKET, vict, NULL, NULL, NULL);

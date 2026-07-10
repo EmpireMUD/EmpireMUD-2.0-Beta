@@ -69,6 +69,7 @@
 #define ABILF_BUFF_SELF_NOT_TARGET	BIT(31)	// F. buff portion of the ability will go on the caster; everything else hits the victim
 #define ABILF_STAY_HIDDEN			BIT(32)	// G. will not automatically un-hide
 #define ABILF_BUFFS_COMMAND		    BIT(33)	// H. appears on the 'buffs' list
+#define ABILF_IGNORE_NO_EXP			BIT(34)	// I. overrides the no-exp flag on mobs
 
 #define ABILITY_ROLE_FLAGS	(ABILF_CASTER_ROLE | ABILF_HEALER_ROLE | ABILF_MELEE_ROLE | ABILF_TANK_ROLE)
 
@@ -594,7 +595,7 @@ void remove_skill_from_table(skill_data *skill);
 char *ability_color(char_data *ch, ability_data *abil);
 void add_ability(char_data *ch, ability_data *abil, bool reset_levels);
 void add_ability_by_set(char_data *ch, ability_data *abil, int skill_set, bool reset_levels);
-bool can_gain_exp_from(char_data *ch, char_data *vict);
+bool can_gain_exp_from(char_data *ch, char_data *vict, ability_data *abil);
 bool can_gain_skill_from(char_data *ch, ability_data *abil);
 bool can_use_ability(char_data *ch, any_vnum ability, int cost_pool, int cost_amount, int cooldown_type);
 bool can_wear_item(char_data *ch, obj_data *item, bool send_messages);

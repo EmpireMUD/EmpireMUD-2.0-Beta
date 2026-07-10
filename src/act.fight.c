@@ -316,7 +316,7 @@ ACMD(do_flee) {
 			was_fighting = FIGHTING(ch);
 			if (perform_move(ch, attempt, NULL, NOBITS)) {
 				send_to_char("You flee head over heels.\r\n", ch);
-				if (was_fighting && can_gain_exp_from(ch, was_fighting)) {
+				if (was_fighting && can_gain_exp_from(ch, was_fighting, NULL)) {
 					gain_player_tech_exp(ch, PTECH_FLEE_UPGRADE, 15);
 				}
 				GET_WAIT_STATE(ch) = 2 RL_SEC;

@@ -7846,7 +7846,7 @@ void call_ability_one(char_data *ch, ability_data *abil, char *argument, char_da
 	post_ability_procs(ch, abil, vict, ovict, vvict, room_targ, data);
 	
 	// exp gain unless we hit something that prevented costs
-	if (data->should_charge_cost && !IS_NPC(ch) && (!vict || can_gain_exp_from(ch, vict))) {
+	if (data->should_charge_cost && !IS_NPC(ch) && (!vict || can_gain_exp_from(ch, vict, abil))) {
 		// determine exp gain amount
 		if (ABIL_COOLDOWN_SECS(abil) >= 300) {
 			// long cooldown

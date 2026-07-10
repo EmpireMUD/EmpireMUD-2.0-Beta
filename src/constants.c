@@ -197,6 +197,7 @@ const char *ability_flags[] = {
 	"BUFF-SELF-NOT-TARGET",
 	"STAY-HIDDEN",
 	"BUFFS-COMMAND",
+	"IGNORE-NO-EXP",
 	"\n"
 };
 
@@ -237,6 +238,7 @@ const char *ability_flag_notes[] = {
 	"buffs self not target",
 	"won't cancel hide",
 	"",	// ABILF_BUFFS_COMMAND
+	"",	// ABILF_IGNORE_NO_EXP
 	"\n"
 };
 
