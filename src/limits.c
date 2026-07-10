@@ -281,7 +281,7 @@ void check_idle_menu_users(void) {
 		++d->idle_tics;
 		
 		// determine how long they can stay
-		allowed = (STATE(d) == CON_PASSWORD || STATE(d) == CON_GET_NAME) ? 2 : 20;
+		allowed = (STATE(d) == CON_PASSWORD || STATE(d) == CON_GET_NAME) ? 4 : 20;
 		
 		if (d->idle_tics > allowed) {
 			if (STATE(d) == CON_PASSWORD) {
