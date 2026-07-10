@@ -181,6 +181,8 @@ You can start all available quests with "quest start all". You can also use the
 
 There will be an indicator on any person, place, or thing that starts a quest.
 
+Immortals can start any quest by vnum (e.g. 'start 10859').
+
 See also: QUESTS, LEVEL COLORS, START
 #
 "QUEST TRACKER"
