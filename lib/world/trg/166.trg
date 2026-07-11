@@ -458,7 +458,7 @@ end
 %quest% %actor% trigger 16607
 set xmas_tree %room.contents(16607)%
 * update descriptions? each entry must end in a colon
-set unimpressive_sects 4: 26: 45: 54: 71: 72: 210: 224: 232:
+set unimpressive_sects 4: 26: 45: 54: 71: 72: 79: 210: 224: 232:
 set giant_sects 220: 221:
 set spruce_sects 10562: 10563: 10564: 10565:
 set magic_sects 602: 603: 604: 612: 613: 614: 16698: 16699:
