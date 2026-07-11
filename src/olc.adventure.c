@@ -724,6 +724,45 @@ void olc_fullsearch_adventure(char_data *ch, char *argument) {
 
 
 /**
+* Searches for all uses of an adventure and displays them.
+*
+* @param char_data *ch The player.
+* @param any_vnum vnum The faction vnum.
+*/
+void olc_search_adventure(char_data *ch, any_vnum vnum) {
+	adv_data *adv = adventure_proto(vnum);
+	trig_data *trig, *next_trig;
+	int found;
+	bool any;
+	
+	if (!adv) {
+		msg_to_char(ch, "There is no adventure %d.\r\n", vnum);
+		return;
+	}
+	
+	found = 0;
+	build_page_display(ch, "Occurrences of adventure %d (%s):", vnum, GET_ADV_NAME(adv));
+	
+	// triggers
+	HASH_ITER(hh, trigger_table, trig, next_trig) {
+		if (trigger_has_link(trig, OLC_ADVENTURE, vnum)) {
+			++found;
+			build_page_display(ch, "TRG [%5d] %s", GET_TRIG_VNUM(trig), GET_TRIG_NAME(trig));
+		}
+	}
+	
+	if (found > 0) {
+		build_page_display(ch, "%d location%s shown", found, PLURAL(found));
+	}
+	else {
+		build_page_display_str(ch, " none");
+	}
+	
+	send_page_display(ch);
+}
+
+
+/**
 * Function to save a player's changes to a adventure zone (or a new one).
 *
 * @param descriptor_data *desc The descriptor who is saving.
