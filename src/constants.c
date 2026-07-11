@@ -3927,7 +3927,7 @@ const bitvector_t bld_on_flags_order[] = {
 };
 
 
-// BLD_x: building flags -- * flags are removed flags
+// BLD_x (1/2): building flags -- * flags are removed flags
 const char *bld_flags[] = {
 	"ROOM",	// 0
 	"ALLOW-MOUNTS",
@@ -3977,6 +3977,60 @@ const char *bld_flags[] = {
 	"*",	// 45
 	"*",
 	"*",
+	"\n"
+};
+
+
+// BLD_x (2/2): player-facing version of building flags (map be empty strings)
+const char *bld_flag_notes[] = {
+	"",	// 0 - ROOM
+	"allows mounts",
+	"has a back entrance",
+	"open building",
+	"enclosed building",
+	"interlinkable",	// 5
+	"can herd animals in",
+	"can be dedicated",
+	"",	// IS-RUINS
+	"",	// !NPC
+	"blocks movement",	// 10
+	"only works in-city",
+	"counts as a city in outskirts",
+	"cannot be painted",
+	"",	// ATTACH-ROAD
+	"",	// 15 - BURNABLE
+	"",	// EXIT
+	"",	// OBSCURE-VISION
+	"",	// ROAD-ICON
+	"",	// ROAD-ICON-WIDE
+	"",	// 20 - ATTACH-BARRIER
+	"cannot be customized",
+	"",	// NO-ABANDON-WHEN-RUINED
+	"",	// SHOW-VEHICLES
+	"",	// IMMUNE-DAMAGE
+	"",	// 25 - HIDE-STORAGE-UNOWNED
+	"",
+	"",
+	"",
+	"can sail here",
+	"",	// 30
+	"",
+	"",
+	"",	// ITEM-LIMIT
+	"",	// LONG-AUTOSTORE
+	"",	// 35
+	"",
+	"",	// HIGH-DEPLETION
+	"",
+	"",
+	"",	// 40 - !DELETE
+	"",
+	"requires swimming or boat",
+	"",	// LOOK-OUT
+	"",	// 2ND-TERRITORY
+	"",	// 45
+	"",
+	"",
 	"\n"
 };
 

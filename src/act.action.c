@@ -1666,7 +1666,9 @@ void process_hunting(char_data *ch) {
 		end_action(ch);
 		gain_player_tech_exp(ch, PTECH_HUNT_ANIMALS, 10);
 		run_ability_hooks_by_player_tech(ch, PTECH_HUNT_ANIMALS, NULL, NULL, NULL, NULL);
-		add_depletion(IN_ROOM(ch), DPLTN_HUNT, TRUE);
+		if (SHARED_DATA(IN_ROOM(ch)) != &ocean_shared_data) {
+			add_depletion(IN_ROOM(ch), DPLTN_HUNT, TRUE);
+		}
 	}
 	else {
 		// tick messaging
@@ -1675,7 +1677,7 @@ void process_hunting(char_data *ch) {
 		}
 		
 		// chance to raise depletion anyway (the hunter is scaring off game)
-		if (!number(0, 5)) {
+		if (!number(0, 5) && SHARED_DATA(IN_ROOM(ch)) != &ocean_shared_data) {
 			add_depletion(IN_ROOM(ch), DPLTN_HUNT, FALSE);
 		}
 	}

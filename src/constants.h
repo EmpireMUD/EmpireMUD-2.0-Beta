@@ -378,6 +378,7 @@ extern const char *quest_reward_types[];
 extern const char *bld_on_flags[];
 extern const bitvector_t bld_on_flags_order[];
 extern const char *bld_flags[];
+extern const char *bld_flag_notes[];
 extern const char *bld_relationship_types[];
 extern const int bld_relationship_vnum_types[];
 extern const char *climate_flags[];

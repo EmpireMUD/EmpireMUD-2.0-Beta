@@ -889,6 +889,11 @@ void show_craft_info(char_data *ch, char *argument, int craft_type) {
 				safe_snprintf(buf + strlen(buf), sizeof(buf) - strlen(buf), "%sfame: %d", (*buf ? ", " : ""), GET_BLD_FAME(bld));
 			}
 			
+			prettier_sprintbit(GET_BLD_FLAGS(bld), bld_flag_notes, part);
+			if (*part && str_cmp(part, "none")) {
+				safe_snprintf(buf + strlen(buf), sizeof(buf) - strlen(buf), "%s%s", (*buf ? ", " : ""), part);
+			}
+			
 			// show building line
 			if (*buf) {
 				msg_to_char(ch, "Builds: %s (%s)\r\n", GET_BLD_NAME(bld), buf);
