@@ -383,7 +383,7 @@ dg_affect #16606 %self% DODGE %SelfLevel% -1
 ~
 #16606
 plant the christmas tree~
-1 c 2 28
+1 c 2 29
 L c 1002
 L c 16602
 L c 16607
@@ -394,6 +394,7 @@ L h 45
 L h 54
 L h 71
 L h 72
+L h 79
 L h 210
 L h 220
 L h 221
