@@ -733,7 +733,6 @@ void olc_search_adventure(char_data *ch, any_vnum vnum) {
 	adv_data *adv = adventure_proto(vnum);
 	trig_data *trig, *next_trig;
 	int found;
-	bool any;
 	
 	if (!adv) {
 		msg_to_char(ch, "There is no adventure %d.\r\n", vnum);
