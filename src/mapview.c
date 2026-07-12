@@ -798,7 +798,7 @@ bool should_show_city_background(char_data *ch, room_data *to_room) {
 		if (ROOM_OWNER(to_room) && GET_LOYALTY(ch) != ROOM_OWNER(to_room)) {
 			return FALSE;	// owned by someone else outside of main radius
 		}
-		if (GET_LOYALTY(ch) != ROOM_OWNER(to_room) && CHECK_CHAMELEON(IN_ROOM(ch), to_room)) {
+		if (GET_LOYALTY(ch) != ROOM_OWNER(to_room) && CHECK_CHAMELEON(IN_ROOM(ch), to_room) && !PRF_FLAGGED(ch, PRF_HOLYLIGHT)) {
 			return FALSE;	// failed chameleon while not the owner
 		}
 	}
@@ -2323,7 +2323,7 @@ static void show_map_to_char(char_data *ch, struct mappc_data_container *mappc, 
 			if (show_veh && !VEH_FLAGGED(show_veh, VEH_NO_CLAIM)) {
 				sprintf(show_icon, "%s%s%s", (VEH_OWNER(show_veh) && EMPIRE_BANNER(VEH_OWNER(show_veh))) ? EMPIRE_BANNER(VEH_OWNER(show_veh)) : "&0", temp, no_color);
 			}
-			else if (ROOM_OWNER(to_room) && (!CHECK_CHAMELEON(IN_ROOM(ch), to_room) || ROOM_OWNER(to_room) == GET_LOYALTY(ch))) {
+			else if (ROOM_OWNER(to_room) && (!CHECK_CHAMELEON(IN_ROOM(ch), to_room) || ROOM_OWNER(to_room) == GET_LOYALTY(ch) || PRF_FLAGGED(ch, PRF_HOLYLIGHT))) {
 				sprintf(show_icon, "%s%s%s", EMPIRE_BANNER(ROOM_OWNER(to_room)) ? EMPIRE_BANNER(ROOM_OWNER(to_room)) : "&0", temp, no_color);
 			}
 			else {
@@ -2763,7 +2763,7 @@ char *screenread_one_tile(char_data *ch, room_data *origin, room_data *to_room, 
 	}
 	
 	// show ownership (political)
-	if (PRF_FLAGGED(ch, PRF_POLITICAL) && !CHECK_CHAMELEON(origin, to_room)) {
+	if (PRF_FLAGGED(ch, PRF_POLITICAL) && (!CHECK_CHAMELEON(origin, to_room) || PRF_FLAGGED(ch, PRF_HOLYLIGHT))) {
 		emp = ROOM_OWNER(to_room);
 	
 		if (emp) {
