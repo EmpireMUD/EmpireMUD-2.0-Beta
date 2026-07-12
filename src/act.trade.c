@@ -941,6 +941,15 @@ void show_craft_info(char_data *ch, char *argument, int craft_type) {
 				safe_snprintf(buf + strlen(buf), sizeof(buf) - strlen(buf), "%sspeed: %s", (*buf ? ", " : ""), vehicle_speed_types[VEH_SPEED_BONUSES(veh)]);
 			}
 			
+			show_flags = VEH_FLAGS(veh);
+			if (VEH_FLAGGED(veh, VEH_BUILDING)) {
+				REMOVE_BIT(show_flags, HIDE_VEH_FLAGS_ON_BUILDING);
+			}
+			prettier_sprintbit(show_flags, identify_vehicle_flags, part);
+			if (*part && str_cmp(part, "none")) {
+				safe_snprintf(buf + strlen(buf), sizeof(buf) - strlen(buf), "%s%s", (*buf ? ", " : ""), part);
+			}
+			
 			// show vehicle line
 			if (*buf) {
 				msg_to_char(ch, "Creates %s: %s (%s)\r\n", VEH_OR_BLD(veh), VEH_SHORT_DESC(veh), buf);

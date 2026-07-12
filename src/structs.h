@@ -2837,6 +2837,8 @@ typedef enum {
 #define VEH_TINY  BIT(40)	// O. vehicle is small enough to ignore no-vehicle rooms (e.g. furniture)
 #define VEH_HIDE_STORAGE_UNOWNED  BIT(41)	// P. only shows as storage when identifying objects if owned
 
+#define HIDE_VEH_FLAGS_ON_BUILDING	(VEH_NO_BUILDING | VEH_NO_LOAD_ONTO_VEHICLE)	// not shown on craft info or identify for 'building' vehicles
+
 
 // VEH_CUSTOM_x: custom message types
 #define VEH_CUSTOM_RUINS_TO_ROOM  0	// sent when the building falls into ruin
