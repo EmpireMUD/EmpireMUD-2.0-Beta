@@ -4646,7 +4646,7 @@ ACMD(do_score) {
 
 
 ACMD(do_survey) {
-	char line[MAX_STRING_LENGTH];
+	char line[MAX_STRING_LENGTH], dep_line[256];
 	char *temp, *argptr;
 	double health;
 	struct empire_city_data *city;
@@ -4759,15 +4759,22 @@ ACMD(do_survey) {
 	
 	// depletion
 	*buf = '\0';
+	*dep_line = '\0';
 	LL_FOREACH(ROOM_DEPLETION(IN_ROOM(ch)), dep) {
-		if (dep->count > 0 && *depletion_strings[dep->type] && (max = get_depletion_max(IN_ROOM(ch), dep->type)) > 0) {
-			strcpy(line, depletion_strings[dep->type]);
-			prc = dep->count * 100 / max;
-			prc = MIN(100, MAX(1, prc)) / 25;
-			temp = str_replace("$$", depletion_levels[prc], line);
-			
-			safe_snprintf(buf + strlen(buf), sizeof(buf) - strlen(buf), "%s%s", *buf ? ", " : "", temp);
-			free(temp);
+		if (dep->count > 0 && (max = get_depletion_max(IN_ROOM(ch), dep->type)) > 0) {
+			if (*depletion_strings[dep->type]) {
+				strcpy(line, depletion_strings[dep->type]);
+				prc = dep->count * 100 / max;
+				prc = MIN(100, MAX(1, prc)) / 25;
+				temp = str_replace("$$", depletion_levels[prc], line);
+				
+				safe_snprintf(buf + strlen(buf), sizeof(buf) - strlen(buf), "%s%s", *buf ? ", " : "", temp);
+				free(temp);
+			}
+			else if (dep->type == DPLTN_PRODUCTION || dep->type == DPLTN_SECONDARY || dep->type == DPLTN_TERTIARY) {
+				prc = 100 - (dep->count * 100 / max);
+				safe_snprintf(dep_line + strlen(dep_line), sizeof(dep_line) - strlen(dep_line), "%s%d%%", *buf ? ", " : "", prc);
+			}
 		}
 	}
 	if (*buf) {
@@ -4781,6 +4788,9 @@ ACMD(do_survey) {
 		else {	// no comma
 			build_page_display(ch, "It looks like someone has %s.", buf);
 		}
+	}
+	if (*dep_line) {
+		build_page_display(ch, "Estimated production remaining: %s.", dep_line);
 	}
 	
 	// adventure info
