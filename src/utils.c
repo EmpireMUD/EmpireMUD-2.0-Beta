@@ -6768,7 +6768,7 @@ room_data *find_load_room(char_data *ch, int *load_room_type) {
 		
 		// does not require last room but if there is one, it must be the same island
 		rl_last_room = real_room(GET_LAST_ROOM(ch));
-		if (veh_ok && (!rl_last_room || GET_ISLAND(rl) == GET_ISLAND(rl_last_room) || (IN_ROOM(ch) && !GET_ISLAND(IN_ROOM(ch)) && compute_distance(IN_ROOM(ch), rl) < config_get_int("tomb_off_island_distance")))) {
+		if (veh_ok && (!rl_last_room || GET_ISLAND(rl) == GET_ISLAND(rl_last_room) || (IN_ROOM(ch) && !GET_ISLAND(IN_ROOM(ch)) && compute_distance(IN_ROOM(ch), rl) <= config_get_int("tomb_off_island_distance")))) {
 			if (load_room_type) {
 				*load_room_type = LOAD_ROOM_MY_TOMB;
 			}
@@ -6782,7 +6782,7 @@ room_data *find_load_room(char_data *ch, int *load_room_type) {
 		found = NULL;
 		// room territory
 		HASH_ITER(hh, EMPIRE_TERRITORY_LIST(GET_LOYALTY(ch)), ter, next_ter) {
-			if (room_has_function_and_city_ok(GET_LOYALTY(ch), ter->room, FNC_TOMB) && IS_COMPLETE(ter->room) && (GET_ISLAND_ID(ter->room) == island || (IN_ROOM(ch) && !GET_ISLAND(IN_ROOM(ch)) && compute_distance(IN_ROOM(ch), ter->room) < config_get_int("tomb_off_island_distance"))) && !IS_BURNING(ter->room)) {
+			if (room_has_function_and_city_ok(GET_LOYALTY(ch), ter->room, FNC_TOMB) && IS_COMPLETE(ter->room) && (GET_ISLAND_ID(ter->room) == island || (IN_ROOM(ch) && !GET_ISLAND(IN_ROOM(ch)) && compute_distance(IN_ROOM(ch), ter->room) <= config_get_int("tomb_off_island_distance"))) && !IS_BURNING(ter->room)) {
 				// pick at random if more than 1
 				if (!number(0, num_found++) || !found) {
 					found = ter->room;
