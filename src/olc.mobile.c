@@ -723,6 +723,7 @@ void olc_fullsearch_mob(char_data *ch, char *argument) {
 	char type_arg[MAX_INPUT_LENGTH], val_arg[MAX_INPUT_LENGTH], find_keywords[MAX_INPUT_LENGTH];
 	bitvector_t  find_interacts = NOBITS, found_interacts, find_custom = NOBITS, found_custom;
 	bitvector_t not_flagged = NOBITS, only_flags = NOBITS, only_affs = NOBITS, not_aff = NOBITS;
+	bool only_custom_corpse = FALSE;
 	int only_move = NOTHING, only_nameset = NOTHING;
 	int count, only_level = NOTHING, only_sex = NOTHING, only_size = NOTHING, vmin = NOTHING, vmax = NOTHING;
 	faction_data *only_fct = NULL;
@@ -749,6 +750,7 @@ void olc_fullsearch_mob(char_data *ch, char *argument) {
 		FULLSEARCH_FUNC("faction", only_fct, find_faction(val_arg))
 		FULLSEARCH_FLAGS("affects", only_affs, affected_bits)
 		FULLSEARCH_FUNC("attack", only_attack, find_attack_message_by_name_or_vnum(val_arg, FALSE))
+		FULLSEARCH_BOOL("corpse", only_custom_corpse)
 		FULLSEARCH_FLAGS("custom", find_custom, mob_custom_types)
 		FULLSEARCH_FLAGS("flags", only_flags, action_bits)
 		FULLSEARCH_FLAGS("flagged", only_flags, action_bits)
@@ -787,6 +789,9 @@ void olc_fullsearch_mob(char_data *ch, char *argument) {
 			if (GET_MIN_SCALE_LEVEL(mob) != 0 && only_level < GET_MIN_SCALE_LEVEL(mob)) {
 				continue;
 			}
+		}
+		if (only_custom_corpse && MOB_CUSTOM_CORPSE(mob) == NOTHING) {
+			continue;
 		}
 		if (only_sex != NOTHING && GET_SEX(mob) != only_sex) {
 			continue;

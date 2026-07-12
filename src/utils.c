@@ -976,7 +976,7 @@ void process_imports(void) {
 	int time_to_empire_emptiness = config_get_int("time_to_empire_emptiness") * SECS_PER_REAL_WEEK;
 	
 	HASH_ITER(hh, empire_table, emp, next_emp) {
-		if (EMPIRE_IMM_ONLY(emp) && config_get_bool("immortal_empire_restrictions")) {
+		if (EMPIRE_IMM_ONLY(emp) && config_get_bool("immortal_empire_restrict_trade")) {
 			continue;
 		}
 		if (!EMPIRE_HAS_TECH(emp, TECH_TRADE_ROUTES)) {
@@ -1294,7 +1294,7 @@ bool is_trading_with(empire_data *emp, empire_data *partner) {
 		return FALSE;
 	}
 	// neither can be imm-only
-	if ((EMPIRE_IMM_ONLY(emp) || EMPIRE_IMM_ONLY(partner)) && config_get_bool("immortal_empire_restrictions")) {
+	if ((EMPIRE_IMM_ONLY(emp) || EMPIRE_IMM_ONLY(partner)) && config_get_bool("immortal_empire_restrict_trade")) {
 		return FALSE;
 	}
 	// both must have trade routes
@@ -6768,7 +6768,7 @@ room_data *find_load_room(char_data *ch, int *load_room_type) {
 		
 		// does not require last room but if there is one, it must be the same island
 		rl_last_room = real_room(GET_LAST_ROOM(ch));
-		if (veh_ok && (!rl_last_room || GET_ISLAND(rl) == GET_ISLAND(rl_last_room))) {
+		if (veh_ok && (!rl_last_room || GET_ISLAND(rl) == GET_ISLAND(rl_last_room) || (IN_ROOM(ch) && !GET_ISLAND(IN_ROOM(ch)) && compute_distance(IN_ROOM(ch), rl) <= config_get_int("tomb_off_island_distance")))) {
 			if (load_room_type) {
 				*load_room_type = LOAD_ROOM_MY_TOMB;
 			}
@@ -6782,7 +6782,7 @@ room_data *find_load_room(char_data *ch, int *load_room_type) {
 		found = NULL;
 		// room territory
 		HASH_ITER(hh, EMPIRE_TERRITORY_LIST(GET_LOYALTY(ch)), ter, next_ter) {
-			if (room_has_function_and_city_ok(GET_LOYALTY(ch), ter->room, FNC_TOMB) && IS_COMPLETE(ter->room) && GET_ISLAND_ID(ter->room) == island && !IS_BURNING(ter->room)) {
+			if (room_has_function_and_city_ok(GET_LOYALTY(ch), ter->room, FNC_TOMB) && IS_COMPLETE(ter->room) && (GET_ISLAND_ID(ter->room) == island || (IN_ROOM(ch) && !GET_ISLAND(IN_ROOM(ch)) && compute_distance(IN_ROOM(ch), ter->room) <= config_get_int("tomb_off_island_distance"))) && !IS_BURNING(ter->room)) {
 				// pick at random if more than 1
 				if (!number(0, num_found++) || !found) {
 					found = ter->room;

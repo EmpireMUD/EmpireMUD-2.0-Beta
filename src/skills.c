@@ -2484,16 +2484,17 @@ ACMD(do_specialize) {
 *
 * @param char_data *ch The player trying to gain exp.
 * @param char_data *vict The victim of the ability.
+* @param ability_data *abil Optional: Which ability is being considered (may be NULL).
 * @return bool TRUE if okay to gain experience, or FALSE.
 */
-bool can_gain_exp_from(char_data *ch, char_data *vict) {
+bool can_gain_exp_from(char_data *ch, char_data *vict, ability_data *abil) {
 	if (IS_NPC(ch)) {
 		return FALSE;	// mobs gain no exp
 	}
 	if (ch == vict || !vict) {
 		return TRUE;	// always okay
 	}
-	if (MOB_FLAGGED(vict, MOB_NO_EXPERIENCE)) {
+	if (MOB_FLAGGED(vict, MOB_NO_EXPERIENCE) && (!abil || !ABILITY_FLAGGED(abil, ABILF_IGNORE_NO_EXP))) {
 		return FALSE;
 	}
 	if ((!IS_NPC(vict) || GET_CURRENT_SCALE_LEVEL(vict) > 0) && get_approximate_level(vict) < get_approximate_level(ch) - config_get_int("exp_level_difference")) {

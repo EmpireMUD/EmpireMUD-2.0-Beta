@@ -1756,7 +1756,7 @@ GLB_FUNCTION(run_global_map_spawns) {
 * @param room_data *room The location to spawn.
 * @param bool only_artisans If TRUE, the room has respawned too recently and will only spawn artisans
 */
-static void spawn_one_room(room_data *room, bool only_artisans) {
+void spawn_one_room(room_data *room, bool only_artisans) {
 	room_data *iter, *next_iter, *home;
 	struct empire_territory_data *ter;
 	struct empire_vehicle_data *vter;

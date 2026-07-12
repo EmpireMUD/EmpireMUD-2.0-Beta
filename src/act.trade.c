@@ -889,6 +889,22 @@ void show_craft_info(char_data *ch, char *argument, int craft_type) {
 				safe_snprintf(buf + strlen(buf), sizeof(buf) - strlen(buf), "%sfame: %d", (*buf ? ", " : ""), GET_BLD_FAME(bld));
 			}
 			
+			// building flags
+			if (GET_BLD_FLAGS(bld)) {
+				prettier_sprintbit(GET_BLD_FLAGS(bld), bld_flag_notes, part);
+				if (*part && str_cmp(part, "none")) {
+					safe_snprintf(buf + strlen(buf), sizeof(buf) - strlen(buf), "%s%s", (*buf ? ", " : ""), part);
+				}
+			}
+			
+			// room affs
+			if (GET_BLD_BASE_AFFECTS(bld)) {
+				prettier_sprintbit(GET_BLD_BASE_AFFECTS(bld), room_aff_notes, part);
+				if (*part && str_cmp(part, "none")) {
+					safe_snprintf(buf + strlen(buf), sizeof(buf) - strlen(buf), "%s%s", (*buf ? ", " : ""), part);
+				}
+			}
+			
 			// show building line
 			if (*buf) {
 				msg_to_char(ch, "Builds: %s (%s)\r\n", GET_BLD_NAME(bld), buf);
@@ -923,6 +939,15 @@ void show_craft_info(char_data *ch, char *argument, int craft_type) {
 			}
 			if (VEH_FLAGGED(veh, MOVABLE_VEH_FLAGS)) {
 				safe_snprintf(buf + strlen(buf), sizeof(buf) - strlen(buf), "%sspeed: %s", (*buf ? ", " : ""), vehicle_speed_types[VEH_SPEED_BONUSES(veh)]);
+			}
+			
+			show_flags = VEH_FLAGS(veh);
+			if (VEH_FLAGGED(veh, VEH_BUILDING)) {
+				REMOVE_BIT(show_flags, HIDE_VEH_FLAGS_ON_BUILDING);
+			}
+			prettier_sprintbit(show_flags, identify_vehicle_flags, part);
+			if (*part && str_cmp(part, "none")) {
+				safe_snprintf(buf + strlen(buf), sizeof(buf) - strlen(buf), "%s%s", (*buf ? ", " : ""), part);
 			}
 			
 			// show vehicle line
@@ -2139,7 +2164,9 @@ ACMD(do_gen_craft) {
 			}
 			
 			// match so far...
-			if (!str_cmp(arg, GET_CRAFT_NAME(craft)) || (GET_CRAFT_BUILD_FACING(craft) && *short_arg && !str_cmp(short_arg, GET_CRAFT_NAME(craft)))) {
+			if (!str_cmp(arg, GET_CRAFT_NAME(craft)) || (*short_arg && !str_cmp(short_arg, GET_CRAFT_NAME(craft)))) {
+				// prior to b5.207, short_arg was only checked here for buildings with facing: if (!str_cmp(arg, GET_CRAFT_NAME(craft)) || (GET_CRAFT_BUILD_FACING(craft) && *short_arg && !str_cmp(short_arg, GET_CRAFT_NAME(craft)))) {
+				
 				// do this last because it records if they are on the wrong command or just missing an ability
 				if (GET_CRAFT_TYPE(craft) != subcmd) {
 					wrong_cmd = GET_CRAFT_TYPE(craft);
@@ -2154,7 +2181,9 @@ ACMD(do_gen_craft) {
 				type = craft;
 				break;
 			}
-			else if (!abbrev_match && (is_abbrev(arg, GET_CRAFT_NAME(craft)) || (GET_CRAFT_BUILD_FACING(craft) && *short_arg && is_abbrev(short_arg, GET_CRAFT_NAME(craft))))) {
+			else if (!abbrev_match && (is_abbrev(arg, GET_CRAFT_NAME(craft)) || (*short_arg && is_abbrev(short_arg, GET_CRAFT_NAME(craft))))) {
+				// prior to b5.207, also checked GET_CRAFT_BUILD_FACING(craft) for short_arg
+				
 				// do this last because it records if they are on the wrong command or just missing an ability
 				if (GET_CRAFT_TYPE(craft) != subcmd) {
 					wrong_cmd = GET_CRAFT_TYPE(craft);
@@ -2173,7 +2202,9 @@ ACMD(do_gen_craft) {
 					abbrev_no_res = craft;
 				}
 			}
-			else if (!multi_match && (multi_isname(arg, GET_CRAFT_NAME(craft)) || (GET_CRAFT_BUILD_FACING(craft) && *short_arg && multi_isname(short_arg, GET_CRAFT_NAME(craft))))) {
+			else if (!multi_match && (multi_isname(arg, GET_CRAFT_NAME(craft)) || (*short_arg && multi_isname(short_arg, GET_CRAFT_NAME(craft))))) {
+				// prior to b5.207, also checked GET_CRAFT_BUILD_FACING(craft) for short_arg
+				
 				// do this last because it records if they are on the wrong command or just missing an ability
 				if (GET_CRAFT_TYPE(craft) != subcmd) {
 					wrong_cmd = GET_CRAFT_TYPE(craft);

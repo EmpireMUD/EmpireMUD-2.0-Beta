@@ -10,8 +10,8 @@ farm goose geese~
 season when they're moulting and can't fly away.
 ~
 I 29 5006 100.00 1 r  # RUINS-TO-BLD: Ruins
-I 31 3202 8.00 420 p  # PRODUCTION: egg
-I 31 3200 8.00 210 p  # PRODUCTION: cut of poultry
+I 31 3202 8.00 420 p  # PRODUCTION: white egg
+I 31 10715 8.00 210 p  # PRODUCTION: fine cut of goose
 I+ 7 11  # Depletion: secondary
 M
 16651 100.00 0

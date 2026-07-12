@@ -567,6 +567,13 @@ bool perform_put_obj_in_vehicle(char_data *ch, obj_data *obj, vehicle_data *veh)
 void perform_load_mob(char_data *ch, char_data *mob, vehicle_data *cont, room_data *to_room) {
 	room_data *was_in = IN_ROOM(mob);
 	
+	// cancel lead (player may be leading it)
+	if (GET_LED_BY(mob)) {
+		act("You stop leading $N.", FALSE, GET_LED_BY(mob), NULL, mob, TO_CHAR);
+		GET_LEADING_MOB(GET_LED_BY(mob)) = NULL;
+		GET_LED_BY(mob) = NULL;
+	}
+	
 	safe_snprintf(buf, sizeof(buf), "You load $N %sto $v.", IN_OR_ON(cont));
 	act(buf, FALSE, ch, cont, mob, TO_CHAR | ACT_VEH_OBJ);
 	safe_snprintf(buf, sizeof(buf), "$n loads you %sto $v.", IN_OR_ON(cont));
@@ -605,6 +612,13 @@ void perform_load_mob(char_data *ch, char_data *mob, vehicle_data *cont, room_da
 void perform_load_vehicle(char_data *ch, vehicle_data *veh, vehicle_data *cont, room_data *to_room) {
 	char buf[256];
 	
+	// player may be leading it
+	if (VEH_LED_BY(veh)) {
+		act("You stop leading $V.", FALSE, VEH_LED_BY(veh), NULL, veh, TO_CHAR | ACT_VEH_VICT);
+		GET_LEADING_VEHICLE(VEH_LED_BY(veh)) = NULL;
+		VEH_LED_BY(veh) = NULL;
+	}
+	
 	safe_snprintf(buf, sizeof(buf), "You load $V %sto $v.", IN_OR_ON(cont));
 	act(buf, FALSE, ch, cont, veh, TO_CHAR | ACT_VEH_OBJ | ACT_VEH_VICT);
 	safe_snprintf(buf, sizeof(buf), "$n loads $V %sto $v.", IN_OR_ON(cont));
@@ -629,6 +643,13 @@ void perform_load_vehicle(char_data *ch, vehicle_data *veh, vehicle_data *cont, 
 */
 void perform_unload_mob(char_data *ch, char_data *mob, vehicle_data *cont) {
 	room_data *was_in = IN_ROOM(mob);
+	
+	// cancel lead (player may be leading it)
+	if (GET_LED_BY(mob)) {
+		act("You stop leading $N.", FALSE, GET_LED_BY(mob), NULL, mob, TO_CHAR);
+		GET_LEADING_MOB(GET_LED_BY(mob)) = NULL;
+		GET_LED_BY(mob) = NULL;
+	}
 	
 	act("You unload $N from $v.", FALSE, ch, cont, mob, TO_CHAR | ACT_VEH_OBJ);
 	act("$n unloads you from $v.", FALSE, ch, cont, mob, TO_VICT | ACT_VEH_OBJ);
@@ -661,6 +682,13 @@ void perform_unload_mob(char_data *ch, char_data *mob, vehicle_data *cont) {
 * @param vehicle_data *cont The containing vehicle.
 */
 void perform_unload_vehicle(char_data *ch, vehicle_data *veh, vehicle_data *cont) {
+	// player may be leading it
+	if (VEH_LED_BY(veh)) {
+		act("You stop leading $V.", FALSE, VEH_LED_BY(veh), NULL, veh, TO_CHAR | ACT_VEH_VICT);
+		GET_LEADING_VEHICLE(VEH_LED_BY(veh)) = NULL;
+		VEH_LED_BY(veh) = NULL;
+	}
+	
 	act("You unload $V from $v.", FALSE, ch, cont, veh, TO_CHAR | ACT_VEH_OBJ | ACT_VEH_VICT);
 	act("$n unloads $V from $v.", FALSE, ch, cont, veh, TO_ROOM | ACT_VEH_OBJ | ACT_VEH_VICT);
 	
@@ -2317,7 +2345,7 @@ ACMD(do_load_vehicle) {
 				if (mob == ch || !IS_NPC(mob)) {
 					continue;
 				}
-				if (!MOB_FLAGGED(mob, MOB_ANIMAL | MOB_MOUNTABLE) || GET_LED_BY(mob)) {
+				if (!MOB_FLAGGED(mob, MOB_ANIMAL | MOB_MOUNTABLE) || (GET_LED_BY(mob) && GET_LED_BY(mob) != ch)) {
 					continue;
 				}
 				if (GET_POS(mob) < POS_STANDING || FIGHTING(mob) || AFF_FLAGGED(mob, AFF_IMMOBILIZED) || GET_FED_ON_BY(mob)) {
@@ -2339,7 +2367,7 @@ ACMD(do_load_vehicle) {
 			if (!can_use_vehicle(ch, veh, MEMBERS_ONLY)) {
 				continue;
 			}
-			if (VEH_SITTING_ON(veh) || VEH_LED_BY(veh) || VEH_DRIVER(veh)) {
+			if (VEH_SITTING_ON(veh) || (VEH_LED_BY(veh) && VEH_LED_BY(veh) != ch) || VEH_DRIVER(veh)) {
 				continue;
 			}
 		
@@ -2368,9 +2396,8 @@ ACMD(do_load_vehicle) {
 		else if (GET_POS(mob) < POS_STANDING || FIGHTING(mob) || AFF_FLAGGED(mob, AFF_IMMOBILIZED) || GET_FED_ON_BY(mob)) {
 			act("You can't load $M right now.", FALSE, ch, NULL, mob, TO_CHAR);
 		}
-		else if (GET_LED_BY(mob)) {
-			safe_snprintf(buf, sizeof(buf), "You can't load $N while %s leading $M.", GET_LED_BY(mob) == ch ? "you're" : "someone else is");
-			act(buf, FALSE, ch, NULL, mob, TO_CHAR);
+		else if (GET_LED_BY(mob) && GET_LED_BY(mob) != ch) {
+			act("You can't load $N while someone else is leading $M.", FALSE, ch, NULL, mob, TO_CHAR);
 		}
 		else {
 			perform_load_mob(ch, mob, cont, to_room);
@@ -2406,8 +2433,8 @@ ACMD(do_load_vehicle) {
 		else if (VEH_DRIVER(veh)) {
 			msg_to_char(ch, "You can't load %s while %s driving it.\r\n", get_vehicle_short_desc(veh, ch), VEH_DRIVER(veh) == ch ? "you're" : "someone else is");
 		}
-		else if (VEH_LED_BY(veh)) {
-			msg_to_char(ch, "You can't load %s while %s leading it.\r\n", get_vehicle_short_desc(veh, ch), VEH_LED_BY(veh) == ch ? "you're" : "someone else is");
+		else if (VEH_LED_BY(veh) && VEH_LED_BY(veh) != ch) {
+			msg_to_char(ch, "You can't load %s while someone else is leading it.\r\n", get_vehicle_short_desc(veh, ch));
 		}
 		else if (VEH_SITTING_ON(veh)) {
 			safe_snprintf(buf, sizeof(buf), "%s", position_types[GET_POS(VEH_SITTING_ON(veh))]);
@@ -2561,7 +2588,7 @@ ACMD(do_unload_vehicle) {
 				if (mob == ch || !IS_NPC(mob)) {
 					continue;
 				}
-				if (!MOB_FLAGGED(mob, MOB_ANIMAL | MOB_MOUNTABLE) || GET_LED_BY(mob)) {
+				if (!MOB_FLAGGED(mob, MOB_ANIMAL | MOB_MOUNTABLE) || (GET_LED_BY(mob) && GET_LED_BY(mob) != ch)) {
 					continue;
 				}
 				if (GET_POS(mob) < POS_STANDING || FIGHTING(mob) || AFF_FLAGGED(mob, AFF_IMMOBILIZED) || GET_FED_ON_BY(mob)) {
@@ -2583,7 +2610,7 @@ ACMD(do_unload_vehicle) {
 			if (!can_use_vehicle(ch, veh, MEMBERS_ONLY)) {
 				continue;
 			}
-			if (VEH_SITTING_ON(veh) || VEH_LED_BY(veh) || VEH_DRIVER(veh)) {
+			if (VEH_SITTING_ON(veh) || (VEH_LED_BY(veh) && VEH_LED_BY(veh) != ch) || VEH_DRIVER(veh)) {
 				continue;
 			}
 		
@@ -2612,9 +2639,8 @@ ACMD(do_unload_vehicle) {
 		else if (GET_POS(mob) < POS_STANDING || FIGHTING(mob) || AFF_FLAGGED(mob, AFF_IMMOBILIZED) || GET_FED_ON_BY(mob)) {
 			act("You can't unload $M right now.", FALSE, ch, NULL, mob, TO_CHAR);
 		}
-		else if (GET_LED_BY(mob)) {
-			safe_snprintf(buf, sizeof(buf), "You can't unload $N while %s leading $M.", GET_LED_BY(mob) == ch ? "you're" : "someone else is");
-			act(buf, FALSE, ch, NULL, mob, TO_CHAR);
+		else if (GET_LED_BY(mob) && GET_LED_BY(mob) != ch) {
+			act("You can't unload $N while someone else is leading $M.", FALSE, ch, NULL, mob, TO_CHAR);
 		}
 		else {
 			perform_unload_mob(ch, mob, cont);
@@ -2646,8 +2672,8 @@ ACMD(do_unload_vehicle) {
 		else if (VEH_DRIVER(veh)) {
 			msg_to_char(ch, "You can't unload %s while %s driving it.\r\n", get_vehicle_short_desc(veh, ch), VEH_DRIVER(veh) == ch ? "you're" : "someone else is");
 		}
-		else if (VEH_LED_BY(veh)) {
-			msg_to_char(ch, "You can't unload %s while %s leading it.\r\n", get_vehicle_short_desc(veh, ch), VEH_LED_BY(veh) == ch ? "you're" : "someone else is");
+		else if (VEH_LED_BY(veh) && VEH_LED_BY(veh) != ch) {
+			msg_to_char(ch, "You can't unload %s while someone else is leading it.\r\n", get_vehicle_short_desc(veh, ch));
 		}
 		else if (VEH_SITTING_ON(veh)) {
 			safe_snprintf(buf, sizeof(buf), "%s", position_types[GET_POS(VEH_SITTING_ON(veh))]);

@@ -74,7 +74,7 @@ bool check_block(char_data *ch, char_data *attacker, bool can_gain_skill) {
 		return FALSE;
 	}
 	
-	rating = get_block_rating(ch, can_gain_skill && can_gain_exp_from(ch, attacker));
+	rating = get_block_rating(ch, can_gain_skill && can_gain_exp_from(ch, attacker, NULL));
 	
 	// penalty for blind/dark
 	if (attacker && !CAN_SEE(ch, attacker)) {
@@ -702,7 +702,7 @@ int reduce_damage_from_skills(int dam, char_data *victim, char_data *attacker, i
 			if (absorb > 0) {
 				dam -= absorb;
 				set_mana(victim, GET_MANA(victim) - absorb);
-				if (can_gain_exp_from(victim, attacker)) {
+				if (can_gain_exp_from(victim, attacker, NULL)) {
 					gain_player_tech_exp(victim, PTECH_REDIRECT_MAGICAL_DAMAGE_TO_MANA, 5);
 				}
 				run_ability_hooks_by_player_tech(victim, PTECH_REDIRECT_MAGICAL_DAMAGE_TO_MANA, attacker, NULL, NULL, NULL);
@@ -714,7 +714,7 @@ int reduce_damage_from_skills(int dam, char_data *victim, char_data *attacker, i
 		if (has_player_tech(victim, PTECH_NO_POISON)) {
 			dam = 0;
 		}
-		if (can_gain_exp_from(victim, attacker)) {
+		if (can_gain_exp_from(victim, attacker, NULL)) {
 			gain_player_tech_exp(victim, PTECH_NO_POISON, 2);
 			gain_player_tech_exp(victim, PTECH_RESIST_POISON, 5);
 		}
@@ -3543,13 +3543,13 @@ int damage(char_data *ch, char_data *victim, int dam, int attacktype, byte damty
 	// skill gains when you take damage
 	if (!full_miss && !IS_NPC(victim) && ch != victim && !EXTRACTED(victim)) {
 		// endurance (extra HP)
-		if (can_gain_exp_from(victim, ch)) {
+		if (can_gain_exp_from(victim, ch, NULL)) {
 			run_ability_gain_hooks(victim, ch, AGH_TAKE_DAMAGE);
 		}
 
 		// armor skills
 		for (iter = 0; iter < NUM_WEARS; ++iter) {
-			if (wear_data[iter].count_stats && GET_EQ(victim, iter) && GET_ARMOR_TYPE(GET_EQ(victim, iter)) != NOTHING && can_gain_exp_from(victim, ch)) {
+			if (wear_data[iter].count_stats && GET_EQ(victim, iter) && GET_ARMOR_TYPE(GET_EQ(victim, iter)) != NOTHING && can_gain_exp_from(victim, ch, NULL)) {
 				switch (GET_ARMOR_TYPE(GET_EQ(victim, iter))) {
 					case ARMOR_MAGE: {
 						gain_player_tech_exp(victim, PTECH_ARMOR_MAGE, 2);
@@ -3859,7 +3859,7 @@ int hit(char_data *ch, char_data *victim, obj_data *weapon, bool combat_round) {
 		combat_meter_miss(ch);
 		combat_meter_dodge(victim);
 		ret_val = damage(ch, victim, 0, w_type, amd ? ATTACK_DAMAGE_TYPE(amd) : DAM_PHYSICAL, NULL);
-		if (can_gain_exp_from(victim, ch)) {
+		if (can_gain_exp_from(victim, ch, NULL)) {
 			run_ability_gain_hooks(victim, ch, AGH_DODGE);
 		}
 		return ret_val;
@@ -3868,7 +3868,7 @@ int hit(char_data *ch, char_data *victim, obj_data *weapon, bool combat_round) {
 		combat_meter_miss(ch);
 		combat_meter_block(victim);
 		block_attack(ch, victim, w_type);
-		if (can_gain_exp_from(victim, ch)) {
+		if (can_gain_exp_from(victim, ch, NULL)) {
 			run_ability_gain_hooks(victim, ch, AGH_BLOCK);
 		}
 		return 0;
@@ -3904,13 +3904,13 @@ int hit(char_data *ch, char_data *victim, obj_data *weapon, bool combat_round) {
 		
 		// All these abilities add damage: no skill gain on an already-beated foe
 		if (can_gain_skill) {
-			if (can_gain_exp_from(ch, victim)) {
+			if (can_gain_exp_from(ch, victim, NULL)) {
 				run_ability_gain_hooks(ch, victim, AGH_MELEE);
 			}
 			
 			if (!IS_NPC(ch) && has_ability(ch, ABIL_DAGGER_MASTERY) && weapon && match_attack_type(GET_WEAPON_TYPE(weapon), ATTACK_STAB)) {
 				dam *= 1.5;
-				if (can_gain_exp_from(ch, victim)) {
+				if (can_gain_exp_from(ch, victim, ability_proto(ABIL_DAGGER_MASTERY))) {
 					gain_ability_exp(ch, ABIL_DAGGER_MASTERY, 2);
 				}
 				run_ability_hooks(ch, AHOOK_ABILITY, ABIL_DAGGER_MASTERY, 0, victim, NULL, NULL, NULL, NOBITS);
@@ -3919,13 +3919,13 @@ int hit(char_data *ch, char_data *victim, obj_data *weapon, bool combat_round) {
 				// it could be considered a bug that this checks solo under the _assumption_ that the ptech comes from a synergy ability
 				// and the only solution that comes to mind would be to have each tech annotate where the player got it from in the player data
 				dam *= 1.5;
-				if (can_gain_exp_from(ch, victim)) {
+				if (can_gain_exp_from(ch, victim, NULL)) {
 					gain_player_tech_exp(ch, PTECH_TWO_HANDED_MASTERY, 2);
 				}
 			}
 			if (!IS_NPC(ch) && has_ability(ch, ABIL_STAFF_MASTERY) && weapon && TOOL_FLAGGED(weapon, TOOL_STAFF)) {
 				dam *= 1.5;
-				if (can_gain_exp_from(ch, victim)) {
+				if (can_gain_exp_from(ch, victim, ability_proto(ABIL_STAFF_MASTERY))) {
 					gain_ability_exp(ch, ABIL_STAFF_MASTERY, 2);
 				}
 				run_ability_hooks(ch, AHOOK_ABILITY, ABIL_STAFF_MASTERY, 0, victim, NULL, NULL, NULL, NOBITS);
@@ -3945,7 +3945,7 @@ int hit(char_data *ch, char_data *victim, obj_data *weapon, bool combat_round) {
 		
 		// exp gain
 		if (combat_round && !IS_NPC(ch)) {
-			if (can_gain_skill && can_gain_exp_from(ch, victim)) {
+			if (can_gain_skill && can_gain_exp_from(ch, victim, NULL)) {
 				gain_player_tech_exp(ch, PTECH_FASTER_MELEE_COMBAT, 2);
 			}
 			run_ability_hooks_by_player_tech(ch, PTECH_FASTER_MELEE_COMBAT, victim, NULL, NULL, NULL);
@@ -4361,7 +4361,7 @@ void perform_violence_missile(char_data *ch, obj_data *weapon) {
 	
 	if (success && AWAKE(vict) && has_player_tech(vict, PTECH_BLOCK_RANGED)) {
 		block = check_block(vict, ch, TRUE);
-		if (GET_EQ(vict, WEAR_HOLD) && IS_SHIELD(GET_EQ(vict, WEAR_HOLD)) && can_gain_exp_from(vict, ch)) {
+		if (GET_EQ(vict, WEAR_HOLD) && IS_SHIELD(GET_EQ(vict, WEAR_HOLD)) && can_gain_exp_from(vict, ch, NULL)) {
 			gain_player_tech_exp(vict, PTECH_BLOCK_RANGED, 2);
 		}
 	}
@@ -4371,7 +4371,7 @@ void perform_violence_missile(char_data *ch, obj_data *weapon) {
 	}
 	else if (!success) {
 		damage(ch, vict, 0, GET_MISSILE_WEAPON_TYPE(weapon), DAM_PHYSICAL, NULL);
-		if (can_gain_exp_from(vict, ch)) {
+		if (can_gain_exp_from(vict, ch, NULL)) {
 			run_ability_gain_hooks(vict, ch, AGH_DODGE);
 		}
 	}
@@ -4381,7 +4381,7 @@ void perform_violence_missile(char_data *ch, obj_data *weapon) {
 		
 		if (!IS_NPC(ch) && has_ability(ch, ABIL_BOWMASTER)) {
 			dam *= 1.5;
-			if (can_gain_exp_from(ch, vict)) {
+			if (can_gain_exp_from(ch, vict, ability_proto(ABIL_BOWMASTER))) {
 				gain_ability_exp(ch, ABIL_BOWMASTER, 2);
 			}
 			run_ability_hooks(ch, AHOOK_ABILITY, ABIL_BOWMASTER, 0, vict, NULL, NULL, NULL, NOBITS);
@@ -4415,7 +4415,7 @@ void perform_violence_missile(char_data *ch, obj_data *weapon) {
 		}
 		
 		// McSkillups
-		if (can_gain_exp_from(ch, vict)) {
+		if (can_gain_exp_from(ch, vict, NULL)) {
 			gain_player_tech_exp(ch, PTECH_RANGED_COMBAT, 2);
 			gain_player_tech_exp(ch, PTECH_FASTER_RANGED_COMBAT, 2);
 			run_ability_gain_hooks(ch, vict, AGH_RANGED);

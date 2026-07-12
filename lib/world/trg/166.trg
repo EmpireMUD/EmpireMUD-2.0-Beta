@@ -383,7 +383,7 @@ dg_affect #16606 %self% DODGE %SelfLevel% -1
 ~
 #16606
 plant the christmas tree~
-1 c 2 28
+1 c 2 29
 L c 1002
 L c 16602
 L c 16607
@@ -394,6 +394,7 @@ L h 45
 L h 54
 L h 71
 L h 72
+L h 79
 L h 210
 L h 220
 L h 221
@@ -458,7 +459,7 @@ end
 %quest% %actor% trigger 16607
 set xmas_tree %room.contents(16607)%
 * update descriptions? each entry must end in a colon
-set unimpressive_sects 4: 26: 45: 54: 71: 72: 210: 224: 232:
+set unimpressive_sects 4: 26: 45: 54: 71: 72: 79: 210: 224: 232:
 set giant_sects 220: 221:
 set spruce_sects 10562: 10563: 10564: 10565:
 set magic_sects 602: 603: 604: 612: 613: 614: 16698: 16699:
@@ -4604,7 +4605,7 @@ else
   %echoaround% %actor% ~%actor% pulls a present from a larger sack and tosses it into a nearby chimney!
   %at% %room% %echo% A present tumbles out of the fireplace and carefully hides itself!
 end
-set room_list %self.var(room_list)% %room.vnum%
+set room_list %self.var(room_list)% %room.homeroom.vnum%
 remote room_list %self.id%
 set empire_list %self.var(empire_list)% %eid%
 remote empire_list %self.id%

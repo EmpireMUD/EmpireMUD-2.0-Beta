@@ -439,7 +439,7 @@ the deed to an unearthly manor~
 The deed to an unearthly manor is here.~
 This deed allows you to build the 'unearthly manor' house.
 ~
-3 g a 0 0 4
+3 0 a 0 0 5
 0 0 0
 0 0
 Q 18828
@@ -695,7 +695,7 @@ A mausoleum cornerstone is lying here.~
    This magnificent marble cornerstone allows you to build a 'mausoleum', a
 large tomb with multiple rooms.
 ~
-3 eg a 0 0 2
+3 e a 0 0 3
 0 0 0
 1 0
 C

@@ -963,6 +963,10 @@ bool is_ability_enemy(char_data *ch, char_data *vict) {
 	if (!can_fight(ch, vict)) {
 		return FALSE;
 	}
+	if (GET_LOYALTY(ch) && GET_LOYALTY(ch) == GET_LOYALTY(vict)) {
+		// same empire, e.g. guard, and not fighting each other
+		return FALSE;
+	}
 	
 	return TRUE;
 	/* // skipping these because it defaults to TRUE:
@@ -7846,7 +7850,7 @@ void call_ability_one(char_data *ch, ability_data *abil, char *argument, char_da
 	post_ability_procs(ch, abil, vict, ovict, vvict, room_targ, data);
 	
 	// exp gain unless we hit something that prevented costs
-	if (data->should_charge_cost && !IS_NPC(ch) && (!vict || can_gain_exp_from(ch, vict))) {
+	if (data->should_charge_cost && !IS_NPC(ch) && (!vict || can_gain_exp_from(ch, vict, abil))) {
 		// determine exp gain amount
 		if (ABIL_COOLDOWN_SECS(abil) >= 300) {
 			// long cooldown

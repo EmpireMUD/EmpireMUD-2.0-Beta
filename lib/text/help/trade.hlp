@@ -129,8 +129,6 @@ Basic Crafts:
   candle
   rope, leather rope, cord rope
   shiv
-  canoe
-  raft
   bound wooden column
   saddle
   backstrap loom
@@ -856,6 +854,8 @@ Primitive crafts:
   fire sticks  (for lighting torches and fires)
   grinding stones  (for milling)
   feather sewing kit  (for sewing)
+  canoe
+  raft
 
 This ability also allows you to:
   saw

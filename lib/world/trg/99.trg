@@ -98,6 +98,22 @@ if %count% < 1
   %purge% %self%
 end
 ~
+#9903
+Lonely Despawn - Companions~
+0 abt 10 0
+~
+set despawn 0
+if !%self.companion%
+  set despawn 1
+elseif %self.companion.room% != %self.room%
+  set despawn 1
+end
+* ok?
+if %despawn%
+  %echo% ~%self% leaves.
+  %purge% %self%
+end
+~
 #9910
 Use: Summon Mob / Mount Whistle~
 1 c 2 0

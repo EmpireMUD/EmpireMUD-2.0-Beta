@@ -519,6 +519,7 @@ D
 tail gives it the elegant look of a fish in the sky.
 ~
 I 0 3200 100.00 1  # BUTCHER: cut of poultry
+I 0 9025 75.00 1  # BUTCHER: bird feathers
 S
 #10559
 freezer river~

@@ -2530,7 +2530,8 @@ end
 ~
 #18293
 Seed of Imagination plant~
-1 c 2 1
+1 c 2 2
+L h 0
 L h 18293
 plant~
 if %actor.obj_target(%arg%)% != %self%

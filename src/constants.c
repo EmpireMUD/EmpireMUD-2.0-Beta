@@ -63,7 +63,7 @@ void tog_pvp(char_data *ch);
 //// EMPIREMUD CONSTANTS /////////////////////////////////////////////////////
 
 // Shown on the "version" command and sent over MSSP
-const char *version = "EmpireMUD 2.0 beta 5.206";
+const char *version = "EmpireMUD 2.0 beta 5.207";
 const char *DG_SCRIPT_VERSION = "DG Scripts 1.0.12 e5.1.19";
 
 
@@ -197,6 +197,7 @@ const char *ability_flags[] = {
 	"BUFF-SELF-NOT-TARGET",
 	"STAY-HIDDEN",
 	"BUFFS-COMMAND",
+	"IGNORE-NO-EXP",
 	"\n"
 };
 
@@ -237,6 +238,7 @@ const char *ability_flag_notes[] = {
 	"buffs self not target",
 	"won't cancel hide",
 	"",	// ABILF_BUFFS_COMMAND
+	"",	// ABILF_IGNORE_NO_EXP
 	"\n"
 };
 
@@ -747,7 +749,7 @@ const char *room_template_flags[] = {
 	"!TELEPORT",
 	"LOOK-OUT",
 	"!LOCATION",
-	"*",
+	"WATER-DESCRIPTIONS",
 	"*",	// 10
 	"\n"
 };
@@ -3925,7 +3927,7 @@ const bitvector_t bld_on_flags_order[] = {
 };
 
 
-// BLD_x: building flags -- * flags are removed flags
+// BLD_x (1/2): building flags -- * flags are removed flags
 const char *bld_flags[] = {
 	"ROOM",	// 0
 	"ALLOW-MOUNTS",
@@ -3975,6 +3977,60 @@ const char *bld_flags[] = {
 	"*",	// 45
 	"*",
 	"*",
+	"\n"
+};
+
+
+// BLD_x (2/2): player-facing version of building flags (map be empty strings)
+const char *bld_flag_notes[] = {
+	"",	// 0 - ROOM
+	"allows mounts",
+	"has a back entrance",
+	"open building",
+	"enclosed building",
+	"interlinkable",	// 5
+	"can herd animals in",
+	"can be dedicated",
+	"",	// IS-RUINS
+	"",	// !NPC
+	"blocks movement",	// 10
+	"only works in-city",
+	"counts as a city in outskirts",
+	"cannot be painted",
+	"",	// ATTACH-ROAD
+	"",	// 15 - BURNABLE
+	"",	// EXIT
+	"",	// OBSCURE-VISION
+	"",	// ROAD-ICON
+	"",	// ROAD-ICON-WIDE
+	"",	// 20 - ATTACH-BARRIER
+	"cannot be customized",
+	"",	// NO-ABANDON-WHEN-RUINED
+	"",	// SHOW-VEHICLES
+	"",	// IMMUNE-DAMAGE
+	"",	// 25 - HIDE-STORAGE-UNOWNED
+	"",
+	"",
+	"",
+	"can sail here",
+	"",	// 30
+	"",
+	"",
+	"",	// ITEM-LIMIT
+	"",	// LONG-AUTOSTORE
+	"",	// 35
+	"",
+	"",	// HIGH-DEPLETION
+	"",
+	"",
+	"",	// 40 - !DELETE
+	"",
+	"requires swimming or boat",
+	"",	// LOOK-OUT
+	"",	// 2ND-TERRITORY
+	"",	// 45
+	"",
+	"",
 	"\n"
 };
 
@@ -4591,7 +4647,7 @@ const char *road_types[] = {
 };
 
 
-/* ROOM_AFF_x: */
+// ROOM_AFF_x (1/2): room affect flags
 const char *room_aff_bits[] = {
 	"MAGIC-DARKNESS",	// 0
 	"SILENT",
@@ -4620,6 +4676,39 @@ const char *room_aff_bits[] = {
 	"MAPOUT-BUILDING",
 	"NO-TRACKS",	// 25
 	"PERMANENT-PAINT",
+	"\n"
+};
+
+
+// ROOM_AFF_x (2/2): shown to players on survey (may be empty strings)
+const char *room_aff_notes[] = {
+	"magically dark",	// 0
+	"silent",
+	"",	// *HAS-INSTANCE
+	"chameleon",
+	"",	// *TEMPORARY
+	"",	// 5 - !EVOLVE
+	"",	// UNCLAIMABLE
+	"",	// PUBLIC
+	"being dismantled",
+	"cannot fly here",
+	"",	// 10 - !WEATHER
+	"", // *IN-VEHICLE
+	"",	// *!WORK
+	"",	// !DISREPAIR
+	"",	// *!DISMANTLE
+	"",	// 15 - *INCOMPLETE
+	"cannot teleport here",
+	"", // BRIGHT-PAINT
+	"",	// *FAKE-INSTANCE
+	"",	// !ABANDON
+	"mobs won't enter",	// 20
+	"animals won't enter",
+	"",	// NO-WORKFORCE-EVOS
+	"",	// HIDE-REAL-NAME
+	"",	// MAPOUT-BUILDING
+	"",	// 25 - NO-TRACKS
+	"", // PERMANENT-PAINT
 	"\n"
 };
 

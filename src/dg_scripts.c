@@ -6071,6 +6071,9 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 						}
 						safe_snprintf(str, slen, "%d", ROOM_HEIGHT(r));
 					}
+					else if (!str_cmp(field, "homeroom")) {
+						safe_snprintf(str, slen, "%c%d", UID_CHAR, room_script_id(HOME_ROOM(r)));
+					}
 					break;
 				}
 				case 'i': {	// room.i*

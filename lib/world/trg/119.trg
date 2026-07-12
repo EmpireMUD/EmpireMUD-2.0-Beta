@@ -2529,11 +2529,15 @@ L c 11930
 ~
 return 1
 * basic checks
-if %actor.is_npc% || !%direction% || %direction% == portal
+if %actor.is_npc% || !%direction% || %method% != move
+  halt
+elseif !%actor.inventory(11929)%
+  * needs crummy bread
   halt
 end
-* needs crummy bread
-if !%actor.inventory(11929)%
+* brief wait to ensure the player leaves the room
+wait 0
+if %actor.room% == %room%
   halt
 end
 * check for existing tracks in that dir, and bump the new ones up in the list

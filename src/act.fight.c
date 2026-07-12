@@ -316,7 +316,7 @@ ACMD(do_flee) {
 			was_fighting = FIGHTING(ch);
 			if (perform_move(ch, attempt, NULL, NOBITS)) {
 				send_to_char("You flee head over heels.\r\n", ch);
-				if (was_fighting && can_gain_exp_from(ch, was_fighting)) {
+				if (was_fighting && can_gain_exp_from(ch, was_fighting, NULL)) {
 					gain_player_tech_exp(ch, PTECH_FLEE_UPGRADE, 15);
 				}
 				GET_WAIT_STATE(ch) = 2 RL_SEC;
@@ -386,8 +386,19 @@ ACMD(do_hit) {
 				hit(ch, vict, GET_EQ(ch, WEAR_WIELD), FIGHTING(ch) ? FALSE : TRUE);	// count as exp only if not already fighting
 				
 				// ensure hitting
-				if (vict && !EXTRACTED(vict) && !IS_DEAD(vict) && FIGHTING(ch) && FIGHTING(ch) != vict) {
-					FIGHTING(ch) = vict;
+				if (vict && !EXTRACTED(vict) && !IS_DEAD(vict) && !EXTRACTED(ch) && !IS_DEAD(ch)) {
+					// ch->vict
+					if (FIGHTING(ch) && FIGHTING(ch) != vict) {
+						FIGHTING(ch) = vict;
+					}
+					else if (!FIGHTING(ch)) {
+						set_fighting(ch, vict, FMODE_MELEE);
+					}
+					
+					// vict->ch
+					if (!FIGHTING(vict)) {
+						set_fighting(vict, ch, FMODE_MELEE);
+					}
 				}
 			}
 			else {	// already fighting -- just change targets
@@ -406,6 +417,10 @@ ACMD(do_hit) {
 						FIGHT_MODE(ch) = FMODE_MISSILE;
 					}
 					FIGHT_WAIT(ch) = 0;
+				}
+				
+				if (!FIGHTING(vict)) {
+					set_fighting(vict, ch, FMODE_MELEE);
 				}
 			}
 			

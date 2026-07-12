@@ -255,6 +255,13 @@ void perform_social(char_data *ch, social_data *soc, char *argument) {
 		// mo message?
 		if (!SOC_MESSAGE(soc, SOCM_SELF_TO_CHAR) || !*SOC_MESSAGE(soc, SOCM_SELF_TO_CHAR)) {
 			msg_to_char(ch, "You can't really do that.\r\n");
+			
+			// send color terminators
+			DL_FOREACH2(ROOM_PEOPLE(IN_ROOM(ch)), c, next_in_room) {
+				if (c->desc && !IS_NPC(c) && GET_CUSTOM_COLOR(c, CUSTOM_COLOR_EMOTE)) {
+					send_to_char("&0", c);
+				}
+			}
 			return;
 		}
 		

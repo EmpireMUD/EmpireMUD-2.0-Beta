@@ -6611,7 +6611,7 @@ ACMD(do_tomb) {
 			build_page_display(ch, "You have no tomb set.");
 		}
 		else {
-			build_page_display(ch, "Your tomb is at: %s%s%s", get_room_name(tomb, FALSE), coord_display_room(ch, tomb, FALSE), (GET_ISLAND_ID(tomb) == GET_ISLAND_ID(IN_ROOM(ch))) ? "" : " (different island)");
+			build_page_display(ch, "Your tomb is at: %s%s", get_room_name(tomb, FALSE), coord_display_room(ch, tomb, FALSE));
 			find_load_room(ch, &tomb_type);
 			// LOAD_ROOM_x
 			switch (tomb_type) {
@@ -6742,7 +6742,7 @@ ACMD(do_import) {
 	else if (is_abbrev(arg, "analyze") || is_abbrev(arg, "analysis")) {
 		do_import_analysis(ch, emp, argument, subcmd);
 	}
-	else if (EMPIRE_IMM_ONLY(emp) && config_get_bool("immortal_empire_restrictions")) {
+	else if (EMPIRE_IMM_ONLY(emp) && config_get_bool("immortal_empire_restrict_trade")) {
 		msg_to_char(ch, "Immortal empires cannot trade.\r\n");
 	}
 	else if (!imm_access && GET_RANK(ch) < EMPIRE_PRIV(emp, PRIV_TRADE)) {

@@ -1178,6 +1178,7 @@ The following ability flags are available:
    everything else hits the ability's target.
  &cSTAY-HIDDEN&0 - Won't cancel a hide effect when typed.
  &cBUFFS-COMMAND&0 - Will appear on the buffs command (must be a BUFF).
+ &cIGNORE-NO-EXP&0 - Gains experience even on !EXP mobs.
 
 See also: OLC ABILITIES, ABILEDIT AFFECTVNUM
 #d
@@ -1872,7 +1873,7 @@ Targeted resurrection messages:
 
 Self-resurrection messages:
  &cself-to-char&0 - Sent to the caster when resurrecting.
- &cself-to-room&0 - Sent to teh room the caster is in when resurrecting.
+ &cself-to-room&0 - Sent to the room the caster is in when resurrecting.
 
 When the resurrection completes, it also sends:
  &cspec-to-char&0 - Sent to the person being resurrected.
@@ -4359,7 +4360,38 @@ which recipe to craft, e.g. "craft hammock".
 Names should be as short as possible, while still being distinct from other
 existing craft recipes.
 
+See CRAFT NAME MATCHING for additional details.
+
 See also: OLC CRAFTS
+#d
+"CEDIT NAME MATCHING" "CRAFT NAME MATCHING"
+
+One of the goals in EmpireMUD is to make it easy for the player to type the
+thing he wants to do. Craft names accept abbreviations, including partial
+abbreviations of each word in the name.
+
+It tries to match a name in this order:
+1. Exact match for the full name the player typed (forge dracoscale vambraces)
+   OR, if the last word was a direction, exact match for the name the player
+   entered without the direction (build unearthly manor south). Caution: this
+   means if there's a craft called "sword of the great" and another called
+   "sword of the Great North", there's a risk of mismatch.
+2. Did the player type a simple abbreviation of the full name (forge
+   dracoscale) OR, if the last word was a direction, did the player type a
+   simple abbreviation without the direction (build unearthly man south).
+3. Did the player type a complex abbreviation of the full name (forge drac vam)
+   OR, again, with the final direction removed, did they type a complex
+   abbreviation of the craft name (build un man south).
+
+For this name matching, crafts are sorted from highest to lowest level ability
+required, and then alphabetically.
+
+This process is simpler if you avoid crafts that contain direction names,
+especially at the end of the craft name. However, if you do include a direction
+in the name itself, be sure to test how the player might try to type the craft
+to make sure it selects the right one.
+
+See also: CEDIT NAME
 #d
 "CEDIT QUANTITY"
 
@@ -5934,6 +5966,8 @@ map editor commands make instant changes to the map where you're standing.
 
 You can get help on any of the mapeditor commands with &yHELP MAPEDIT <COMMAND>&0.
 The following commands are available:
+ basesector - Change the 'base' sector of the tile you're standing on.
+ build - Create a finished building on this tile.
  complete - Finishes the building you're standing in.
  convert2newbie - Converts an island's terrains to/from newbie terrains.
  decay - Performs 1 cycle of decay (building, trench) on the tile or vehicle.
@@ -5942,6 +5976,8 @@ The following commands are available:
  deleteroom - Deletes the room you're standing in (interior rooms only).
  description - Customize the description on an interior room.
  exit - Add a new exit between two interior rooms (similar to interlink).
+ grow - Triggers immediate growth, similar to chant of nature.
+ height - Set the 'height' property of this tile (e.g. Mountain).
  icon - Customize the map icon.
  maintain - Repairs and maintains a building.
  name - Customize the room title.
@@ -5951,6 +5987,7 @@ The following commands are available:
  remember - Stores the current terrain as the 'natural terrain'.
  roomtype - Change the type of an interior room.
  ruin - Turn a building or vehicle to ruins.
+ spawn - Cause the tile you're standing on to spawn mobs, if possible.
  terrain - Change the tile you're standing on.
  unclaimable - Make a tile or square of tiles unclaimable (or not).
  undeplete - Remove depletion from a tile or vehicle.
@@ -6202,6 +6239,22 @@ Usage:  .map ruin [vehicle]
 This command will reduce the map building you're in to ruins, or will do the
 same to a vehicle you target.
 #d
+"MAPEDIT SPAWN"
+
+Usage:  .map spawn
+
+This command causes the tile you're standing on to run a normal mob-spawning
+cycle.
+
+Mobs may spawn from:
+- the sector
+- the crop
+- the building
+- vehicles in the room
+
+Note: It's possible for nothing to spawn when you type this if all spawns fail
+their random chance OR if there are no spawns assigned to anything here.
+#d
 "MAPEDIT TERRAIN"
 
 Usage:  .map terrain <type/vnum>
@@ -6411,6 +6464,8 @@ dash (-) are matched to the mob's keywords and text fields.
 Fields:
   &c-affects&0, &cunaffected&0 - see HELP AFFECT FLAGS
   &c-attack&0 - see HELP MEDIT ATTACK
+  &c-corpse&0 - find mobs who have any custom corpse (for a specific corpse,
+     use '.obj search' instead)
   &c-custom&0 - has a specific type, see HELP MEDIT CUSTOM
   &c-faction&0 - is a member of a specific faction
   &c-flagged&0, &cunflagged&0 - see HELP MEDIT FLAGS
@@ -9064,15 +9119,16 @@ See also: OLC ROOM TEMPLATES, REDIT MATCH EXITS, VNUM
 Usage:  .flags [add | remove] <flags>
 
 The following room template flags are available:
- OUTDOOR - Affected by sun.
- DARK - Always requires a light. (By default, rooms are dark at night.)
- LIGHT - Never requires a light.
- !MOB - Mobs will not wander into the room (they may still be spawned there).
- PEACEFUL - No combat allowed.
- NEED-BOAT - Requires a boat, swimming, waterwalking, or flying.
- !TELEPORT - Cannot teleport in or out.
- LOOK-OUT - can see the map using "look out"
- !LOCATION - no location shown; disables "where"
+ &cOUTDOOR&0 - Affected by sun.
+ &cDARK&0 - Always requires a light. (By default, rooms are dark at night.)
+ &cLIGHT&0 - Never requires a light.
+ &c!MOB&0 - Mobs will not wander into the room (they may still be spawned there).
+ &cPEACEFUL&0 - No combat allowed.
+ &cNEED-BOAT&0 - Requires a boat, swimming, waterwalking, or flying.
+ &c!TELEPORT&0 - Cannot teleport in or out.
+ &cLOOK-OUT&0 - can see the map using "look out"
+ &c!LOCATION&0 - no location shown; disables "where"
+ &cWATER-DESCRIPTIONS&0 - mobs use water-long-desc
 
 See also: OLC ROOM TEMPLATES
 #d

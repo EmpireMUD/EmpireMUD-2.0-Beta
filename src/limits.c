@@ -83,7 +83,7 @@ bool can_mount_in_room(char_data *ch, room_data *room) {
 		// has a waterwalking mount, in deep water, but is missing the riding upgrade
 		ok = FALSE;
 	}
-	else if (WATER_SECT(room) && !has_player_tech(ch, PTECH_RIDING_UPGRADE) && !(has_player_tech(ch, PTECH_RIDING_FLYING) && MOUNT_FLAGGED(ch, MOUNT_FLYING))) {
+	else if (WATER_SECT(room) && !MOUNT_FLAGGED(ch, MOUNT_AQUATIC | MOUNT_WATERWALKING) && !has_player_tech(ch, PTECH_RIDING_UPGRADE) && !(has_player_tech(ch, PTECH_RIDING_FLYING) && MOUNT_FLAGGED(ch, MOUNT_FLYING))) {
 		ok = FALSE;
 	}
 	else if (MOUNT_FLAGGED(ch, MOUNT_AQUATIC) && !find_flagged_sect_within_distance_from_char(ch, SECTF_FRESH_WATER | SECTF_OCEAN, NOBITS, 1)) {
@@ -281,7 +281,7 @@ void check_idle_menu_users(void) {
 		++d->idle_tics;
 		
 		// determine how long they can stay
-		allowed = (STATE(d) == CON_PASSWORD || STATE(d) == CON_GET_NAME) ? 2 : 20;
+		allowed = (STATE(d) == CON_PASSWORD || STATE(d) == CON_GET_NAME) ? 4 : 20;
 		
 		if (d->idle_tics > allowed) {
 			if (STATE(d) == CON_PASSWORD) {
@@ -1097,7 +1097,7 @@ static void reduce_outside_territory_one(empire_data *emp) {
 	bool junk, outskirts_over, frontier_over, total_over, was_large;
 	
 	// sanity
-	if (!emp || EMPIRE_ADMIN_FLAGGED(emp, EADM_IGNORE_OVERAGES)) {
+	if (!emp || EMPIRE_IMM_ONLY(emp) || EMPIRE_ADMIN_FLAGGED(emp, EADM_IGNORE_OVERAGES)) {
 		return;
 	}
 	
@@ -1278,7 +1278,7 @@ void reduce_stale_empires(void) {
 		}
 		
 		// check overages
-		if (!EMPIRE_ADMIN_FLAGGED(iter, EADM_IGNORE_OVERAGES) && EMPIRE_MEMBERS(iter) == 0 && EMPIRE_TERRITORY(iter, TER_TOTAL) > 0) {
+		if (!EMPIRE_ADMIN_FLAGGED(iter, EADM_IGNORE_OVERAGES) && !EMPIRE_IMM_ONLY(iter) && EMPIRE_MEMBERS(iter) == 0 && EMPIRE_TERRITORY(iter, TER_TOTAL) > 0) {
 			// when members hit 0, we consider the empire timed out
 			reduce_stale_empires_one(iter);
 		}

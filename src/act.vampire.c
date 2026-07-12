@@ -1060,7 +1060,7 @@ ACMD(do_bite) {
 				set_blood(victim, MAX(1, GET_BLOOD(victim) - 2));
 			}
 			
-			if (can_gain_exp_from(ch, victim)) {
+			if (can_gain_exp_from(ch, victim, NULL)) {
 				gain_player_tech_exp(ch, PTECH_VAMPIRE_BITE, 10);
 				if (melee) {
 					gain_player_tech_exp(ch, PTECH_BITE_MELEE_UPGRADE, 10);
@@ -1252,7 +1252,7 @@ ACMD(do_command) {
 			strcpy(argument, buf);
 		do_say(ch, argument, 0, 0);
 		
-		if (can_gain_exp_from(ch, victim)) {
+		if (can_gain_exp_from(ch, victim, ability_proto(ABIL_VAMP_COMMAND))) {
 			gain_ability_exp(ch, ABIL_VAMP_COMMAND, 33.4);
 		}
 

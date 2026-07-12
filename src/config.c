@@ -1895,6 +1895,7 @@ void init_config_system(void) {
 	init_config(CONFIG_EMPIRE, "homeless_citizen_speed", CONFTYPE_INT, "tiles of movement per real minute, for migrating homeless");
 	init_config(CONFIG_EMPIRE, "immortal_empire_restrictions", CONFTYPE_BOOL, "prevents trade, diplomacy, etc between immortal and mortal empires");
 	init_config(CONFIG_EMPIRE, "immortal_empire_restrict_stealth", CONFTYPE_BOOL, "prevents stealth actions by and against immortal empires");
+	init_config(CONFIG_EMPIRE, "immortal_empire_restrict_trade", CONFTYPE_BOOL, "prevents immortal empire from engaging in import/export");
 	init_config(CONFIG_EMPIRE, "immortal_empire_restrict_war", CONFTYPE_BOOL, "prevents war actions by and against immortal empires");
 	init_config(CONFIG_EMPIRE, "land_per_greatness", CONFTYPE_INT, "base territory per 1 Greatness");
 	init_config(CONFIG_EMPIRE, "land_frontier_modifier", CONFTYPE_DOUBLE, "portion of land that can be far from cities");
@@ -2010,6 +2011,7 @@ void init_config_system(void) {
 	init_config(CONFIG_PLAYERS, "temperature_from_fire", CONFTYPE_INT, "warmth value from certain lights");
 	init_config(CONFIG_PLAYERS, "temperature_from_water", CONFTYPE_INT, "cooling value from water tiles");
 	init_config(CONFIG_PLAYERS, "temperature_penalties", CONFTYPE_BOOL, "whether or not players must manage warmth and cooling");
+	init_config(CONFIG_PLAYERS, "tomb_off_island_distance", CONFTYPE_INT, "distance from the tomb where player will respawn there even if off-island");
 	
 	// skills
 	init_config(CONFIG_SKILLS, "exp_from_workforce", CONFTYPE_DOUBLE, "amount of exp gained per chore completion");

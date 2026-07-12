@@ -798,7 +798,7 @@ bool should_show_city_background(char_data *ch, room_data *to_room) {
 		if (ROOM_OWNER(to_room) && GET_LOYALTY(ch) != ROOM_OWNER(to_room)) {
 			return FALSE;	// owned by someone else outside of main radius
 		}
-		if (GET_LOYALTY(ch) != ROOM_OWNER(to_room) && CHECK_CHAMELEON(IN_ROOM(ch), to_room)) {
+		if (GET_LOYALTY(ch) != ROOM_OWNER(to_room) && CHECK_CHAMELEON(IN_ROOM(ch), to_room) && !PRF_FLAGGED(ch, PRF_HOLYLIGHT)) {
 			return FALSE;	// failed chameleon while not the owner
 		}
 	}
@@ -2323,7 +2323,7 @@ static void show_map_to_char(char_data *ch, struct mappc_data_container *mappc, 
 			if (show_veh && !VEH_FLAGGED(show_veh, VEH_NO_CLAIM)) {
 				sprintf(show_icon, "%s%s%s", (VEH_OWNER(show_veh) && EMPIRE_BANNER(VEH_OWNER(show_veh))) ? EMPIRE_BANNER(VEH_OWNER(show_veh)) : "&0", temp, no_color);
 			}
-			else if (ROOM_OWNER(to_room) && (!CHECK_CHAMELEON(IN_ROOM(ch), to_room) || ROOM_OWNER(to_room) == GET_LOYALTY(ch))) {
+			else if (ROOM_OWNER(to_room) && (!CHECK_CHAMELEON(IN_ROOM(ch), to_room) || ROOM_OWNER(to_room) == GET_LOYALTY(ch) || PRF_FLAGGED(ch, PRF_HOLYLIGHT))) {
 				sprintf(show_icon, "%s%s%s", EMPIRE_BANNER(ROOM_OWNER(to_room)) ? EMPIRE_BANNER(ROOM_OWNER(to_room)) : "&0", temp, no_color);
 			}
 			else {
@@ -2763,7 +2763,7 @@ char *screenread_one_tile(char_data *ch, room_data *origin, room_data *to_room, 
 	}
 	
 	// show ownership (political)
-	if (PRF_FLAGGED(ch, PRF_POLITICAL) && !CHECK_CHAMELEON(origin, to_room)) {
+	if (PRF_FLAGGED(ch, PRF_POLITICAL) && (!CHECK_CHAMELEON(origin, to_room) || PRF_FLAGGED(ch, PRF_HOLYLIGHT))) {
 		emp = ROOM_OWNER(to_room);
 	
 		if (emp) {
@@ -2989,7 +2989,7 @@ void perform_mortal_where(char_data *ch, char *arg) {
 		if (found) {
 			if (GET_MAP_LOC(IN_ROOM(ch)) == GET_MAP_LOC(IN_ROOM(found))) {
 				// same map location:
-				msg_to_char(ch, "%s - %s%s\r\n", PERS(found, ch, FALSE), get_room_name(IN_ROOM(found), FALSE), where_relative_location(ch, i));
+				msg_to_char(ch, "%s - %s%s\r\n", PERS(found, ch, FALSE), get_room_name(IN_ROOM(found), FALSE), where_relative_location(ch, found));
 			}
 			else {
 				// not the same map location -- show distance/coords:
@@ -3377,9 +3377,23 @@ ACMD(do_scan) {
 
 
 ACMD(do_where) {
+	char *temp;
+	bool request_mortal = FALSE;
+	
 	skip_spaces(&argument);
+	
+	// check mortal where request
+	if (!strn_cmp(argument, "-m", 2)) {
+		temp = any_one_arg(argument, arg);
+		skip_spaces(&temp);
+		if (is_abbrev(arg, "-mortal")) {
+			request_mortal = TRUE;
+			argument = temp;
+		}
+		// otherwise, leave argument alone
+	}
 
-	if (GET_ACCESS_LEVEL(ch) >= LVL_GOD) {
+	if (GET_ACCESS_LEVEL(ch) >= LVL_GOD && !request_mortal) {
 		perform_immort_where(ch, argument);
 	}
 	else {

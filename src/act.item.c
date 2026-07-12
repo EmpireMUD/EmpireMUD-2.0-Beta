@@ -1240,10 +1240,10 @@ void identify_vehicle_to_char(vehicle_data *veh, char_data *ch) {
 	// flags as "notes":
 	show_flags = VEH_FLAGS(veh);
 	if (VEH_FLAGGED(veh, VEH_BUILDING)) {
-		// do not show these on 'building' vehicles as they are very common and don't make sense in context
-		REMOVE_BIT(show_flags, VEH_NO_BUILDING | VEH_NO_LOAD_ONTO_VEHICLE);
+		REMOVE_BIT(show_flags, HIDE_VEH_FLAGS_ON_BUILDING);
 	}
 	prettier_sprintbit(show_flags, identify_vehicle_flags, buf);
+	
 	if (VEH_FLAGGED(veh, VEH_SIT)) {
 		sprintf(buf + strlen(buf), "%scan sit %s", *buf ? ", " : "", VEH_FLAGGED(veh, VEH_IN) ? "in" : "on");
 	}
@@ -5366,6 +5366,11 @@ ACMD(do_buy) {
 				// triggered: purchase failed
 				extract_obj(obj);
 				return;
+			}
+			
+			// mark purchase as production
+			if (GET_LOYALTY(ch)) {
+				add_production_total(GET_LOYALTY(ch), item->vnum, 1);
 			}
 			
 			// finish the purchase

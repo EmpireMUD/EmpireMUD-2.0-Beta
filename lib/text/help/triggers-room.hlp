@@ -201,6 +201,8 @@ When using field - The variable returns:
 &chealth&0 - Current buildings or their interiors, remaining health/damage.
 &cheight&0 - Get the current height of a map tile or set it with &cheight(num)&0.
    Use &cview_height&0 instead if you want to include things built on it.
+&chomeroom&0 - For interiors of buildings, the starting/entrance room. For
+   interiors of ships, the room where you board the ship.
 &cid&0 - The unique id of the room.
 &cin_city&0 - For claimed land, true if the tile is in a city for the owner.
 &cin_city(true)&0 - Like in_city but also checks the one-hour city wait time.

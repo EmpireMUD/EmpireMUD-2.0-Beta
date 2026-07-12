@@ -1386,7 +1386,7 @@ void annual_update_map_tile(struct map_data *tile) {
 					}
 					ruin_one_building(room);
 				}
-				else if (emp) {
+				else if (emp && !EMPIRE_IMM_ONLY(emp)) {
 					log_to_empire(emp, ELOG_TERRITORY, "%s (%d, %d) has been abandoned due to decay", get_room_name(room, FALSE), X_COORD(room), Y_COORD(room));
 				}
 			}
@@ -3736,7 +3736,7 @@ INTERACTION_FUNC(ruin_building_to_building_interaction) {
 	}
 	
 	// abandon first -- this will take care of accessory rooms, too
-	if (!old_bld || !BLD_FLAGGED(old_bld, BLD_NO_ABANDON_WHEN_RUINED)) {
+	if ((!old_bld || !BLD_FLAGGED(old_bld, BLD_NO_ABANDON_WHEN_RUINED)) && ROOM_OWNER(inter_room) && !EMPIRE_IMM_ONLY(ROOM_OWNER(inter_room))) {
 		abandon_room(inter_room);
 	}
 	disassociate_building(inter_room);
@@ -3865,7 +3865,7 @@ INTERACTION_FUNC(ruin_building_to_vehicle_interaction) {
 	}
 	
 	// abandon first -- this will take care of accessory rooms, too
-	if (!old_bld || !BLD_FLAGGED(old_bld, BLD_NO_ABANDON_WHEN_RUINED)) {
+	if ((!old_bld || !BLD_FLAGGED(old_bld, BLD_NO_ABANDON_WHEN_RUINED)) && ROOM_OWNER(inter_room) && !EMPIRE_IMM_ONLY(ROOM_OWNER(inter_room))) {
 		abandon_room(inter_room);
 	}
 	disassociate_building(inter_room);
@@ -3950,7 +3950,7 @@ void ruin_one_building(room_data *room) {
 	}
 	else {	// failed to run a ruins interaction	
 		// abandon first -- this will take care of accessory rooms, too
-		if (!bld || !BLD_FLAGGED(bld, BLD_NO_ABANDON_WHEN_RUINED)) {
+		if ((!bld || !BLD_FLAGGED(bld, BLD_NO_ABANDON_WHEN_RUINED)) && ROOM_OWNER(room) && !EMPIRE_IMM_ONLY(ROOM_OWNER(room))) {
 			abandon_room(room);
 		}
 		disassociate_building(room);

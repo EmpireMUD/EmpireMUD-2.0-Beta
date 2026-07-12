@@ -1399,7 +1399,7 @@ void list_one_char(char_data *i, char_data *ch, int num) {
 		}
 		msg_to_char(ch, "%s\r\n", get_morph_desc(i, TRUE));
 	}
-	else if (IS_NPC(i) && WATER_SECT(IN_ROOM(i)) && mob_has_custom_message(i, MOB_CUSTOM_WATER_LONG_DESC) && GET_POS(i) == POS_STANDING) {
+	else if (IS_NPC(i) && (WATER_SECT(IN_ROOM(i)) || RMT_FLAGGED(IN_ROOM(i), RMT_WATER_DESCRIPTIONS)) && mob_has_custom_message(i, MOB_CUSTOM_WATER_LONG_DESC) && GET_POS(i) == POS_STANDING) {
 		if (AFF_FLAGGED(i, AFF_INVISIBLE)) {
 			msg_to_char(ch, "*");
 		}
@@ -1813,7 +1813,7 @@ void look_at_char(char_data *i, char_data *ch, bool show_eq) {
 			list_obj_to_char(i->carrying, ch, OBJ_DESC_INVENTORY, TRUE, TRUE);
 
 			if (ch != i && i->carrying) {
-				if (can_gain_exp_from(ch, i)) {
+				if (can_gain_exp_from(ch, i, NULL)) {
 					gain_player_tech_exp(ch, PTECH_SEE_INVENTORY, 5);
 				}
 				run_ability_hooks_by_player_tech(ch, PTECH_SEE_INVENTORY, i, NULL, NULL, NULL);
@@ -4646,7 +4646,7 @@ ACMD(do_score) {
 
 
 ACMD(do_survey) {
-	char line[MAX_STRING_LENGTH];
+	char line[MAX_STRING_LENGTH], dep_line[256];
 	char *temp, *argptr;
 	double health;
 	struct empire_city_data *city;
@@ -4666,38 +4666,38 @@ ACMD(do_survey) {
 		return;
 	}
 	
-	msg_to_char(ch, "You survey the area:\r\n");
+	build_page_display(ch, "You survey the area:");
 	
 	if (!RMT_FLAGGED(IN_ROOM(ch), RMT_NO_LOCATION) && (island = GET_ISLAND(IN_ROOM(ch)))) {
 		// find out if it has a local name
 		if (GET_LOYALTY(ch) && island->id != NO_ISLAND && (eisle = get_empire_island(GET_LOYALTY(ch), island->id)) && eisle->name && str_cmp(eisle->name, island->name)) {
-			msg_to_char(ch, "Location: %s (%s)%s%s\r\n", get_island_name_for(island->id, ch), island->name, IS_SET(island->flags, ISLE_NEWBIE) ? " (newbie island)" : "", IS_SET(island->flags, ISLE_CONTINENT) ? " (continent)" : "");
+			build_page_display(ch, "Location: %s (%s)%s%s", get_island_name_for(island->id, ch), island->name, IS_SET(island->flags, ISLE_NEWBIE) ? " (newbie island)" : "", IS_SET(island->flags, ISLE_CONTINENT) ? " (continent)" : "");
 		}
 		else {
-			msg_to_char(ch, "Location: %s%s%s\r\n", get_island_name_for(island->id, ch), IS_SET(island->flags, ISLE_NEWBIE) ? " (newbie island)" : "", IS_SET(island->flags, ISLE_CONTINENT) ? " (continent)" : "");
+			build_page_display(ch, "Location: %s%s%s", get_island_name_for(island->id, ch), IS_SET(island->flags, ISLE_NEWBIE) ? " (newbie island)" : "", IS_SET(island->flags, ISLE_CONTINENT) ? " (continent)" : "");
 		}
 	}
 	
 	if (get_climate(IN_ROOM(ch)) != NOBITS) {
 		ordered_sprintbit(get_climate(IN_ROOM(ch)), climate_flags, climate_flags_order, FALSE, buf);
-		msg_to_char(ch, "Climate: %s\r\n", buf);
+		build_page_display(ch, "Climate: %s", buf);
 	}
 	
 	if (BASE_SECT(IN_ROOM(ch)) != SECT(IN_ROOM(ch))) {
-		msg_to_char(ch, "Terrain: %s\r\n", GET_SECT_NAME(BASE_SECT(IN_ROOM(ch))));
+		build_page_display(ch, "Terrain: %s", GET_SECT_NAME(BASE_SECT(IN_ROOM(ch))));
 	}
 	
-	msg_to_char(ch, "Temperature: %s\r\n", temperature_to_string(get_room_temperature(IN_ROOM(ch))));
+	build_page_display(ch, "Temperature: %s", temperature_to_string(get_room_temperature(IN_ROOM(ch))));
 	
 	/* Not currently showing elevation
 	base_height = ROOM_HEIGHT(HOME_ROOM(IN_ROOM(ch)));
 	mod_height = get_room_blocking_height(IN_ROOM(ch), NULL);
 	if (base_height > 0 && mod_height > 0) {
 		if (mod_height != base_height) {
-			msg_to_char(ch, "Elevation: %d (with structures: %d)\r\n", base_height, mod_height);
+			build_page_display(ch, "Elevation: %d (with structures: %d)", base_height, mod_height);
 		}
 		else {
-			msg_to_char(ch, "Elevation: %d\r\n", base_height);
+			build_page_display(ch, "Elevation: %d", base_height);
 		}
 	}
 	*/
@@ -4706,38 +4706,49 @@ ACMD(do_survey) {
 	if (has_player_tech(ch, PTECH_FORAGE_COMMAND) && can_interact_room(IN_ROOM(ch), INTERACT_FORAGE)) {
 		get_potential_crop_for_location(IN_ROOM(ch), INTERACT_FORAGE, line);
 		if (*line) {
-			msg_to_char(ch, "Wild crops: %s\r\n", line);
+			build_page_display(ch, "Wild crops: %s", line);
 		}
 	}
 	
 	// empire
 	if (ROOM_OWNER(IN_ROOM(ch))) {
 		if ((ter_type = get_territory_type_for_empire(IN_ROOM(ch), ROOM_OWNER(IN_ROOM(ch)), FALSE, &junk, &large_radius)) == TER_CITY && (city = find_city(ROOM_OWNER(IN_ROOM(ch)), IN_ROOM(ch)))) {
-			msg_to_char(ch, "This is the %s%s&0 %s of %s%s.\r\n", EMPIRE_BANNER(ROOM_OWNER(IN_ROOM(ch))), EMPIRE_ADJECTIVE(ROOM_OWNER(IN_ROOM(ch))), city_type[city->type].name, city->name, large_radius ? " (extended radius)" : "");
+			build_page_display(ch, "This is the %s%s&0 %s of %s%s.", EMPIRE_BANNER(ROOM_OWNER(IN_ROOM(ch))), EMPIRE_ADJECTIVE(ROOM_OWNER(IN_ROOM(ch))), city_type[city->type].name, city->name, large_radius ? " (extended radius)" : "");
 		}
 		else if (ter_type == TER_OUTSKIRTS) {
-			msg_to_char(ch, "This is the outskirts of %s%s&0.\r\n", EMPIRE_BANNER(ROOM_OWNER(IN_ROOM(ch))), EMPIRE_NAME(ROOM_OWNER(IN_ROOM(ch))));
+			build_page_display(ch, "This is the outskirts of %s%s&0.", EMPIRE_BANNER(ROOM_OWNER(IN_ROOM(ch))), EMPIRE_NAME(ROOM_OWNER(IN_ROOM(ch))));
 		}
 		else {
-			msg_to_char(ch, "This area is claimed by %s%s&0.\r\n", EMPIRE_BANNER(ROOM_OWNER(IN_ROOM(ch))), EMPIRE_NAME(ROOM_OWNER(IN_ROOM(ch))));
+			build_page_display(ch, "This area is claimed by %s%s&0.", EMPIRE_BANNER(ROOM_OWNER(IN_ROOM(ch))), EMPIRE_NAME(ROOM_OWNER(IN_ROOM(ch))));
 		}
 	}
 	else if (GET_LOYALTY(ch)) {
 		ter_type = get_territory_type_for_empire(IN_ROOM(ch), GET_LOYALTY(ch), FALSE, &junk, &large_radius);
-		msg_to_char(ch, "This location would be %s for your empire%s.\r\n", (ter_type == TER_CITY ? "in a city" : (ter_type == TER_OUTSKIRTS ? "on the outskirts of a city" : "on the frontier")), large_radius ? " (extended radius)" : "");
+		build_page_display(ch, "This location would be %s for your empire%s.", (ter_type == TER_CITY ? "in a city" : (ter_type == TER_OUTSKIRTS ? "on the outskirts of a city" : "on the frontier")), large_radius ? " (extended radius)" : "");
 	}
 	
 	// building info
 	if (COMPLEX_DATA(IN_ROOM(ch))) {
-		if (BUILDING_DAMAGE(IN_ROOM(ch)) > 0 || (IS_COMPLETE(IN_ROOM(ch)) && BUILDING_RESOURCES(IN_ROOM(ch)))) {
+		if (GET_BUILDING(IN_ROOM(ch))) {
+			prettier_sprintbit(GET_BLD_FLAGS(GET_BUILDING(IN_ROOM(ch))), bld_flag_notes, line);
+			if (*line && str_cmp(line, "none")) {
+				build_page_display(ch, "Building notes: %s", line);
+			}
+			
+			prettier_sprintbit(GET_BLD_BASE_AFFECTS(GET_BUILDING(IN_ROOM(ch))), room_aff_notes, line);
+			if (*line && str_cmp(line, "none")) {
+				build_page_display(ch, "Affects: %s", line);
+			}
+		}
+		if (IS_COMPLETE(IN_ROOM(ch)) && (BUILDING_DAMAGE(IN_ROOM(ch)) > 0 || BUILDING_RESOURCES(IN_ROOM(ch)))) {
 			maxhealth = GET_BUILDING(IN_ROOM(ch)) ? GET_BLD_MAX_DAMAGE(GET_BUILDING(IN_ROOM(ch))) : 1;
 			maxhealth = MAX(1, maxhealth);	// don't crash me, bro
 			health = (double) BUILDING_DAMAGE(IN_ROOM(ch)) / maxhealth * 100.0;
 			health = MIN(100.0, health);
-			msg_to_char(ch, "It's in need of maintenance and repair (%d%% damaged).\r\n", (int)round(health));
+			build_page_display(ch, "It's in need of maintenance and repair (%d%% damaged).", (int)round(health));
 		}
 		if (IS_BURNING(IN_ROOM(ch))) {
-			msg_to_char(ch, "It's on fire!\r\n");
+			build_page_display(ch, "It's on fire!");
 		}
 	}
 	
@@ -4748,39 +4759,51 @@ ACMD(do_survey) {
 	
 	// depletion
 	*buf = '\0';
+	*dep_line = '\0';
 	LL_FOREACH(ROOM_DEPLETION(IN_ROOM(ch)), dep) {
-		if (dep->count > 0 && *depletion_strings[dep->type] && (max = get_depletion_max(IN_ROOM(ch), dep->type)) > 0) {
-			strcpy(line, depletion_strings[dep->type]);
-			prc = dep->count * 100 / max;
-			prc = MIN(100, MAX(1, prc)) / 25;
-			temp = str_replace("$$", depletion_levels[prc], line);
-			
-			safe_snprintf(buf + strlen(buf), sizeof(buf) - strlen(buf), "%s%s", *buf ? ", " : "", temp);
-			free(temp);
+		if (dep->count > 0 && (max = get_depletion_max(IN_ROOM(ch), dep->type)) > 0) {
+			if (*depletion_strings[dep->type]) {
+				strcpy(line, depletion_strings[dep->type]);
+				prc = dep->count * 100 / max;
+				prc = MIN(100, MAX(1, prc)) / 25;
+				temp = str_replace("$$", depletion_levels[prc], line);
+				
+				safe_snprintf(buf + strlen(buf), sizeof(buf) - strlen(buf), "%s%s", *buf ? ", " : "", temp);
+				free(temp);
+			}
+			else if (dep->type == DPLTN_PRODUCTION || dep->type == DPLTN_SECONDARY || dep->type == DPLTN_TERTIARY) {
+				prc = 100 - (dep->count * 100 / max);
+				prc = MAX(0, MIN(100, prc));
+				safe_snprintf(dep_line + strlen(dep_line), sizeof(dep_line) - strlen(dep_line), "%s%d%%", *dep_line ? ", " : "", prc);
+			}
 		}
 	}
 	if (*buf) {
 		// add an "and"
 		if ((temp = strrchr(buf, ',')) && temp != strchr(buf, ',')) {
-			msg_to_char(ch, "It looks like someone has %-*.*s and%s.\r\n", (int)(temp-buf+1), (int)(temp-buf+1), buf, temp + 1);
+			build_page_display(ch, "It looks like someone has %-*.*s and%s.", (int)(temp-buf+1), (int)(temp-buf+1), buf, temp + 1);
 		}
 		else if (temp) {
-			msg_to_char(ch, "It looks like someone has %-*.*s and%s.\r\n", (int)(temp-buf), (int)(temp-buf), buf, temp + 1);
+			build_page_display(ch, "It looks like someone has %-*.*s and%s.", (int)(temp-buf), (int)(temp-buf), buf, temp + 1);
 		}
 		else {	// no comma
-			msg_to_char(ch, "It looks like someone has %s.\r\n", buf);
+			build_page_display(ch, "It looks like someone has %s.", buf);
 		}
+	}
+	if (*dep_line) {
+		build_page_display(ch, "Estimated production remaining: %s.", dep_line);
 	}
 	
 	// adventure info
 	if ((inst = find_instance_by_room(IN_ROOM(ch), FALSE, TRUE))) {
-		msg_to_char(ch, "Adventure: %s\r\n", GET_ADV_NAME(INST_ADVENTURE(inst)));
+		build_page_display(ch, "Adventure: %s", GET_ADV_NAME(INST_ADVENTURE(inst)));
 	}
 	
 	// TO ADD:
 	//	- room name
 	//	- building info (name)
 	
+	send_page_display(ch);
 }
 
 

@@ -627,7 +627,7 @@ typedef struct vehicle_data vehicle_data;
 #define RMT_NO_TELEPORT  BIT(6)	// g. cannot teleport in/out
 #define RMT_LOOK_OUT  BIT(7)	// h. can see the map using "look out"
 #define RMT_NO_LOCATION  BIT(8)	// i. don't show a location, disables where
-	#define RMT_UNUSED1  BIT(9)
+#define RMT_WATER_DESCRIPTIONS  BIT(9)	// j. mobs/players show as floating
 	#define RMT_UNUSED2  BIT(10)
 
 
@@ -2836,6 +2836,8 @@ typedef enum {
 #define VEH_TEMPORARY  BIT(39)	// N. vehicle will be removed when instance ends
 #define VEH_TINY  BIT(40)	// O. vehicle is small enough to ignore no-vehicle rooms (e.g. furniture)
 #define VEH_HIDE_STORAGE_UNOWNED  BIT(41)	// P. only shows as storage when identifying objects if owned
+
+#define HIDE_VEH_FLAGS_ON_BUILDING	(VEH_NO_BUILDING | VEH_NO_LOAD_ONTO_VEHICLE)	// not shown on craft info or identify for 'building' vehicles
 
 
 // VEH_CUSTOM_x: custom message types

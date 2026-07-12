@@ -1191,6 +1191,16 @@ QCMD(qcmd_start) {
 		// show dailies status, too
 		msg_to_char(ch, "%s\r\n", show_daily_quest_line(ch));
 	}
+	else if (IS_IMMORTAL(ch) && is_number(argument) && (qst = quest_proto(atoi(argument)))) {
+		inst = find_instance_by_room(IN_ROOM(ch), FALSE, TRUE);
+		// not currently checking can-start for immortals with CAN_START_QUEST(ch, qst, inst)
+		if (is_on_quest(ch, QUEST_VNUM(qst))) {
+			msg_to_char(ch, "You are already on that quest.\r\n");
+		}
+		else {
+			start_quest(ch, qst, inst);
+		}
+	}
 	else if (GET_POS(ch) < POS_STANDING) {
 		// anything other than a list requires standing
 		msg_to_char(ch, "You must %s to start a quest.\r\n", FIGHTING(ch) ? "finish fighting" : "be standing");
