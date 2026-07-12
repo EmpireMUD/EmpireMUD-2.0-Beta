@@ -4773,7 +4773,8 @@ ACMD(do_survey) {
 			}
 			else if (dep->type == DPLTN_PRODUCTION || dep->type == DPLTN_SECONDARY || dep->type == DPLTN_TERTIARY) {
 				prc = 100 - (dep->count * 100 / max);
-				safe_snprintf(dep_line + strlen(dep_line), sizeof(dep_line) - strlen(dep_line), "%s%d%%", *buf ? ", " : "", prc);
+				prc = MAX(0, MIN(100, prc));
+				safe_snprintf(dep_line + strlen(dep_line), sizeof(dep_line) - strlen(dep_line), "%s%d%%", *dep_line ? ", " : "", prc);
 			}
 		}
 	}
