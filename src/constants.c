@@ -4231,9 +4231,9 @@ const char *depletion_strings[] = {
 	"trapped $$ animals",
 	"chopped $$ trees",
 	"hunted $$ animals",	// unlikely to be able to show this one
-	"",	// 10, production
-	"",	// secondary production
-	"",	// tertiary production
+	"produced $$ resources",	// 10, production
+	"produced $$ additional resources",	// secondary production
+	"produced $$ additional resources",	// tertiary production
 	"\n"
 };
 
