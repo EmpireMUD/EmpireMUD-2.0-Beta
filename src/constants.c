@@ -4647,7 +4647,7 @@ const char *road_types[] = {
 };
 
 
-/* ROOM_AFF_x: */
+// ROOM_AFF_x (1/2): room affect flags
 const char *room_aff_bits[] = {
 	"MAGIC-DARKNESS",	// 0
 	"SILENT",
@@ -4676,6 +4676,39 @@ const char *room_aff_bits[] = {
 	"MAPOUT-BUILDING",
 	"NO-TRACKS",	// 25
 	"PERMANENT-PAINT",
+	"\n"
+};
+
+
+// ROOM_AFF_x (2/2): shown to players on survey (may be empty strings)
+const char *room_aff_notes[] = {
+	"magically dark",	// 0
+	"silent",
+	"",	// *HAS-INSTANCE
+	"chameleon",
+	"",	// *TEMPORARY
+	"",	// 5 - !EVOLVE
+	"",	// UNCLAIMABLE
+	"",	// PUBLIC
+	"being dismantled",
+	"cannot fly here",
+	"",	// 10 - !WEATHER
+	"", // *IN-VEHICLE
+	"",	// *!WORK
+	"",	// !DISREPAIR
+	"",	// *!DISMANTLE
+	"",	// 15 - *INCOMPLETE
+	"cannot teleport here",
+	"", // BRIGHT-PAINT
+	"",	// *FAKE-INSTANCE
+	"",	// !ABANDON
+	"mobs won't enter",	// 20
+	"animals won't enter",
+	"",	// NO-WORKFORCE-EVOS
+	"",	// HIDE-REAL-NAME
+	"",	// MAPOUT-BUILDING
+	"",	// 25 - NO-TRACKS
+	"", // PERMANENT-PAINT
 	"\n"
 };
 

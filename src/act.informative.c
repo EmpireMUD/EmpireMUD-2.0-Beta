@@ -4734,6 +4734,11 @@ ACMD(do_survey) {
 			if (*line && str_cmp(line, "none")) {
 				msg_to_char(ch, "Building notes: %s\r\n", line);
 			}
+			
+			prettier_sprintbit(GET_BLD_BASE_AFFECTS(GET_BUILDING(IN_ROOM(ch))), room_aff_notes, line);
+			if (*line && str_cmp(line, "none")) {
+				msg_to_char(ch, "Affects: %s\r\n", line);
+			}
 		}
 		if (IS_COMPLETE(IN_ROOM(ch)) && (BUILDING_DAMAGE(IN_ROOM(ch)) > 0 || BUILDING_RESOURCES(IN_ROOM(ch)))) {
 			maxhealth = GET_BUILDING(IN_ROOM(ch)) ? GET_BLD_MAX_DAMAGE(GET_BUILDING(IN_ROOM(ch))) : 1;

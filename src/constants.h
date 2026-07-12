@@ -403,6 +403,7 @@ extern const char mapout_color_tokens[];
 extern const char *mine_levels[];
 extern const char *road_types[];
 extern const char *room_aff_bits[];
+extern const char *room_aff_notes[];
 extern const char *room_extra_types[];
 extern const char *sector_flags[];
 extern const char *sect_custom_types[];

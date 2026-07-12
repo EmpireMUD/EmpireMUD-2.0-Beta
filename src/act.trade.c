@@ -889,9 +889,20 @@ void show_craft_info(char_data *ch, char *argument, int craft_type) {
 				safe_snprintf(buf + strlen(buf), sizeof(buf) - strlen(buf), "%sfame: %d", (*buf ? ", " : ""), GET_BLD_FAME(bld));
 			}
 			
-			prettier_sprintbit(GET_BLD_FLAGS(bld), bld_flag_notes, part);
-			if (*part && str_cmp(part, "none")) {
-				safe_snprintf(buf + strlen(buf), sizeof(buf) - strlen(buf), "%s%s", (*buf ? ", " : ""), part);
+			// building flags
+			if (GET_BLD_FLAGS(bld)) {
+				prettier_sprintbit(GET_BLD_FLAGS(bld), bld_flag_notes, part);
+				if (*part && str_cmp(part, "none")) {
+					safe_snprintf(buf + strlen(buf), sizeof(buf) - strlen(buf), "%s%s", (*buf ? ", " : ""), part);
+				}
+			}
+			
+			// room affs
+			if (GET_BLD_BASE_AFFECTS(bld)) {
+				prettier_sprintbit(GET_BLD_BASE_AFFECTS(bld), room_aff_notes, part);
+				if (*part && str_cmp(part, "none")) {
+					safe_snprintf(buf + strlen(buf), sizeof(buf) - strlen(buf), "%s%s", (*buf ? ", " : ""), part);
+				}
 			}
 			
 			// show building line
