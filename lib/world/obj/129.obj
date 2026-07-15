@@ -1103,4 +1103,31 @@ _
 This is a temporary version to prevent workforce from harvesting it.
 ~
 S
+#12978
+robe stars many~
+a robe of many stars~
+A robe of many stars hangs in the air.~
+   The leather robe has an inky color that shifts softly as light strikes it;
+in the dark, it vanishes behind the twinkling constellations embossed in
+gleaming silver and gold. The familiar shapes -- the archer, the hunter, the
+fish -- join stars unknown to cover every inch of the effortlessly light
+garment.
+~
+2 p ad 0 0 13
+0 0 0
+7 0
+A
+5 1 0
+C
+1 1
+M
+12
+Starsmith $n stands before you.~
+M
+8
+Stars twinkle to life as you slip on the Starsmith's robe.~
+M
+9
+Stars twinkle to life as $n slips on an inky robe.~
+S
 $
