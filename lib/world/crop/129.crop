@@ -1,0 +1,59 @@
+#12972
+starfruit~
+A Golden Starfruit Tree~
+5 j ch
+0 100 0 100
+D0
+@.@.&?^@.~
+&Y~
+D0
+@.&?^@.@.~
+&Y~
+I 6 12975 100.00 8  # FORAGE: yellow starfruit
+I 8 12973 100.00 1  # HARVEST: gleaming basket of golden starfruit
+I 8 12974 100.00 2  # HARVEST: basket of fresh starfruit
+U
+0
+A single golden tree springs up from the ground!~
+X
+starfruit fruit tree trees golden around ground~
+   A single golden tree glimmers in the middle of the field. Bountiful
+star-shaped fruits dangle from its boughs, though none fall to the ground even
+in strong wind.
+~
+S
+#12974
+starfruit~
+Among Rows of Starfruit Trees~
+5 j ch
+0 100 0 100
+D0
+^^&Y^&?^~
+&G~
+D0
+^^&Y^&?^~
+&G~
+D0
+^&Y^&?^^~
+&G~
+D0
+^&Y^&?^^~
+&G~
+D0
+&Y^&?^^^~
+&G~
+D0
+^^^&Y^~
+&G~
+I 6 12975 100.00 25  # FORAGE: yellow starfruit
+I 7 12974 100.00 14  # PICK: basket of fresh starfruit
+U
+0
+Leafy green trees sprout neatly in rows and begin popping out yellow fruits!~
+X
+starfruit fruit trees rows orchard around ground~
+   Rows of small, green trees surround you. Star-shaped fruits, mostly ripe and
+yellow, dot each tree.
+~
+S
+$
