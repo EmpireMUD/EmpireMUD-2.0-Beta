@@ -710,4 +710,17 @@ if %self.animals_harnessed% < %self.animals_required%
   end
 end
 ~
+#12977
+Golden starfruit replacement on load~
+1 n 100 1
+L c 12973
+~
+wait 0
+if %self.carried_by%
+  %load% obj 12973 %self.carried_by% inv
+else
+  %load% obj 12973
+end
+%purge% %self%
+~
 $
