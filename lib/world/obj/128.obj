@@ -770,6 +770,31 @@ R
 4 5195 0
 T 12845
 S
+#12848
+inspiration smelt argentine ingots~
+the inspiration to smelt argentine ingots~
+The inspiration to smelt argentine ingots is here.~
+   You find yourself inspired by the starsmiths of old, who, in the light of
+the moon, forged a bright white metal that could stand against the stars
+themselves.
+   This inspiration will teach you to smelt: argentine ingot.
+~
+7 0 a 0 0 2
+610 0 0
+0 0
+S
+#12849
+inspiration smelt eventide ingots~
+the inspiration to smelt eventide ingots~
+The inspiration to smelt eventide ingots is here.~
+   You find yourself inspired by the starsmiths of old, who, in the dark of
+night, forged an inky black metal that could stand beside the stars themselves.
+   This inspiration will teach you to smelt: eventide ingot.
+~
+7 0 a 0 0 3
+611 0 0
+0 0
+S
 #12850
 standards banners flags~
 the camp standard~

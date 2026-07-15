@@ -86,10 +86,13 @@ Moonstone Smelting~
 eventide ingots, which are used in the making of powerful weapons and armor.
 Any member with Imperial Armors can smelt these two ingots.
 ~
-3 2 30 0 b
+4 2 30 0 ab
 K 2 610
 K 2 611
 P 2016
+_
+Replaced by object 12848, 12849 in Celestial Forge.
+~
 S
 #2909
 Herbcloth Weaving~
