@@ -11,7 +11,7 @@ in about an hour.
 
 See also: ADVENTURE
 #
-CELESTIALFORGE "CELESTIAL FORGE" SHATTER SHARD SHARDS "LODESTONE FORGE" "VICTORY FORGE" "ECHO FORGE" "TERMINUS FORGE" "IRON SHARDS" "IMPERIUM SHARDS" "EVENTIDE SHARDS" "METEORITE SHARDS" "CELESTIAL SHARDS"
+CELESTIALFORGE "CELESTIAL FORGE" SHATTER SHARD SHARDS "LODESTONE FORGE" "VICTORY FORGE" "ECHO FORGE" "TERMINUS FORGE" DAWNFORGE "THE DAWNFORGE" "IRON SHARDS" "IMPERIUM SHARDS" "EVENTIDE SHARDS" "METEORITE SHARDS" "CELESTIAL SHARDS"
 
 [FF]  Celestial Forge  (Renown goal)
 
@@ -35,7 +35,7 @@ of any type. This will take you to the forge that matches the shard:
   Victory Forge:  imperium shards  (level 101-200)
   Echo Forge:  eventide shards  (level 201-300)
   Terminus Forge:  meteorite shards  (level 301-400)
-  celestial shards  (level 401-500) -- coming soon!
+  The Dawnforge:  celestial shards  (level 401+)
 
 To leave a celestial forge, type 'return' in its entry area. This will open a
 portal or teleport you out, depending upon how you entered.
