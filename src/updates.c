@@ -4770,7 +4770,7 @@ void b5_203_adventure_update(void) {
 }
 
 
-// b5.204 adds a celestial forge -- this is ALSO used for b5.205
+// b5.204 adds a celestial forge -- this is ALSO used for b5.205, b5.208
 void b5_204_celestial_forge(void) {
 	adv_vnum list[] = {
 		12800,	// [12800] Celestial Forge
@@ -4918,6 +4918,7 @@ const struct {
 	{ "b5.204", b5_204_celestial_forge, NULL, "Re-spawning Celestial Forge" },
 	{ "b5.205", b5_204_celestial_forge, NULL, "Re-spawning Celestial Forge" },
 	{ "b5.206", b5_206_goblin_mines, NULL, "Re-spawning Goblin Mines" },
+	{ "b5.208", b5_204_celestial_forge, NULL, "Re-spawning Celestial Forge" },
 	
 	// ADD HERE, above: more beta 5 update lines
 	
