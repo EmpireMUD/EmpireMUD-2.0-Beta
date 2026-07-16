@@ -690,8 +690,9 @@ void show_prospect_result(char_data *ch, room_data *room) {
 *
 * @param char_data *ch The player.
 * @return bool TRUE if safe, FALSE if they cannot burn it.
+* @param bool confirmed If TRUE, player typed CONFIRM as the last arg. FALSE if not.
 */
-bool validate_burn_area(char_data *ch) {
+bool validate_burn_area(char_data *ch, bool confirmed) {
 	bool objless = has_player_tech(ch, PTECH_LIGHT_FIRE);
 	obj_data *lighter = NULL;
 	bool kept = FALSE;
@@ -708,6 +709,9 @@ bool validate_burn_area(char_data *ch) {
 	}
 	else if (GET_LOYALTY(ch) && IS_ANY_BUILDING(IN_ROOM(ch)) && ROOM_OWNER(IN_ROOM(ch)) == GET_LOYALTY(ch) && !HAS_DISMANTLE_PRIV_FOR_BUILDING(ch, IN_ROOM(ch))) {
 		msg_to_char(ch, "You don't have permission to burn the empire's buildings (it requires the dismantle privilege).\r\n");
+	}
+	else if (GET_LOYALTY(ch) && IS_ANY_BUILDING(IN_ROOM(ch)) && ROOM_OWNER(IN_ROOM(ch)) == GET_LOYALTY(ch) && !confirmed) {
+		msg_to_char(ch, "You must type 'burn <area> CONFIRM' to burn a building you own.\r\n");
 	}
 	else if (!objless && !lighter) {
 		// nothing to light it with
@@ -1189,7 +1193,8 @@ void process_build_action(char_data *ch) {
 * @param char_data *ch The person burning the area.
 */
 void process_burn_area(char_data *ch) {
-	if (!validate_burn_area(ch)) {
+	// this validate_burn_area passes TRUE for 'confirmed' because it MUST have been confirmed to start the burn.
+	if (!validate_burn_area(ch, TRUE)) {
 		// sends own message
 		cancel_action(ch);
 		return;
@@ -2477,8 +2482,9 @@ ACMD(do_chop) {
 * This is a timed action that triggers a room evolution.
 *
 * @param char_data *ch The character doing the action.
+* @param bool confirmed If TRUE, player typed CONFIRM as the last arg. FALSE if not.
 */
-void do_burn_area(char_data *ch) {
+void do_burn_area(char_data *ch, bool confirmed) {
 	obj_data *lighter = NULL;
 	bool kept;
 	
@@ -2491,7 +2497,7 @@ void do_burn_area(char_data *ch) {
 			msg_to_char(ch, "You don't seem to have a lighter%s.\r\n", (kept ? " that isn't marked (keep)" : ""));
 		}
 		else {
-			do_burn_building(ch, IN_ROOM(ch), lighter);
+			do_burn_building(ch, IN_ROOM(ch), lighter, confirmed);
 		}
 	}
 	else if (GET_ACTION(ch) != ACT_NONE) {
@@ -2500,7 +2506,7 @@ void do_burn_area(char_data *ch) {
 	else if (GET_POS(ch) != POS_STANDING) {
 		send_low_pos_msg(ch);
 	}
-	else if (!validate_burn_area(ch)) {
+	else if (!validate_burn_area(ch, confirmed)) {
 		// sends its own message
 	}
 	else {
