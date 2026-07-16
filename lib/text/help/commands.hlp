@@ -1443,7 +1443,8 @@ Usage:  inventory
 
 Use this command if you're uncertain about what you're carrying, or simply want
 to check that no thieves have got to your backpack. When in a storage building,
-this also checks the stored items there.
+this also checks the stored items there (use 'linventory' to see only stored
+items here, or 'einventory' to see items stored anywhere).
 
 You can also search your inventory by keyword, or use the following flags:
   &c-#&0 Only show the first # items.
@@ -1467,7 +1468,7 @@ Several toggles affect your inventory display including hide-keep,
 item-details, and item-quality.
 
 See also: EQUIPMENT, GRAB, HOLD, REMOVE, WEAR, STORE, RETRIEVE, WIELD, SWAP,
-   TOGGLE, LEVEL COLORS
+   TOGGLE, LEVEL COLORS, EINVENTORY, LINVENTORY
 #
 INTERLINK INTERLINKING
 
@@ -1603,6 +1604,18 @@ as ships. To store items in vehicles, use "put <item> <vehicle>" instead.
 This command was formerly called "boatload".
 
 See also: UNLOAD, BOARD, PUT, SAIL, SHIPS
+#
+"LOCAL INVENTORY" LOCALINVENTORY LINVENTORY LINV
+
+Usage: localinventory
+       linventory
+       linv
+
+This command lets you view items your empire has stored at your current
+location. This is the same information shown at the bottom of the regular
+'inventory' command.
+
+See also: INVENTORY, EINVENTORY, STORE, RETRIEVE
 #
 LOOK EXAMINE
 

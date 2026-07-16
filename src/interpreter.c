@@ -229,6 +229,7 @@ ACMD(do_light);
 ACMD(do_list);
 ACMD(do_load);
 ACMD(do_load_vehicle);
+ACMD(do_local_inventory);
 ACMD(do_look);
 ACMD(do_lore);
 
@@ -754,9 +755,11 @@ cpp_extern const struct command_info cmd_info[] = {
 	SCMD_CMD( "light", POS_SITTING, do_light, NO_MIN, CTYPE_UTIL, SCMD_LIGHT ),
 	SIMPLE_CMD( "list", POS_SITTING, do_list, NO_MIN, CTYPE_UTIL ),
 	SCMD_CMD( "library", POS_STANDING, do_library, NO_MIN, CTYPE_UTIL, SCMD_LIBRARY ),
+	SIMPLE_CMD( "linventory", POS_DEAD, do_local_inventory, NO_MIN, CTYPE_UTIL ),
 	GRANT_CMD( "load", POS_DEAD, do_load, LVL_CIMPL, CTYPE_IMMORTAL, GRANT_LOAD ),
 	STANDARD_CMD( "load", POS_STANDING, do_load_vehicle, NO_MIN, NO_GRANTS, NO_SCMD, CTYPE_MOVE, CMD_NO_ANIMALS, NO_ABIL ),
 	STANDARD_CMD( "loadvehicle", POS_STANDING, do_load_vehicle, NO_MIN, NO_GRANTS, NO_SCMD, CTYPE_MOVE, CMD_NO_ANIMALS, NO_ABIL ),
+	SIMPLE_CMD( "localinventory", POS_DEAD, do_local_inventory, NO_MIN, CTYPE_UTIL ),
 	GRANT_CMD( "lore", POS_DEAD, do_lore, LVL_CIMPL, CTYPE_IMMORTAL, GRANT_LORE ),
 	SCMD_CMD( "levels", POS_DEAD, do_no_cmd, NO_MIN, CTYPE_UTIL, NOCMD_LEVELS ),
 
