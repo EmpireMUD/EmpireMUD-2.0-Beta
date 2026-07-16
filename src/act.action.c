@@ -2899,7 +2899,7 @@ ACMD(do_plant) {
 	else if (ROOM_AFF_FLAGGED(IN_ROOM(ch), ROOM_AFF_NO_EVOLVE)) {
 		msg_to_char(ch, "You can't plant here right now.\r\n");
 	}
-	else if (!(obj = get_obj_in_list_vis(ch, arg, NULL, ch->carrying))) {
+	else if (!(obj = get_obj_in_list_vis_prefer_flag(ch, arg, NULL, ch->carrying, OBJ_PLANTABLE))) {
 		msg_to_char(ch, "You don't seem to have any %s.\r\n", arg);
 	}
 	else if (!OBJ_FLAGGED(obj, OBJ_PLANTABLE)) {
