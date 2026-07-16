@@ -4792,6 +4792,41 @@ void b5_206_goblin_mines(void) {
 }
 
 
+// b5.208: add dismantle trigger to portals
+void b5_208_portal_triggers(void) {
+	struct trig_proto_list *tpl;
+	room_data *room, *next_room;
+	int count = 0;
+	
+	// some vnums
+	any_vnum PORTAL_BUILDING = 5185;
+	
+	any_vnum PORTAL_TRIG_1 = 5185;
+	
+	if (!real_trigger(PORTAL_TRIG_1)) {
+		log("- portal update skipped because trig %d doesn't exist", PORTAL_TRIG_1);
+		return;
+	}
+	
+	HASH_ITER(hh, world_table, room, next_room) {
+		if (!GET_BUILDING(room)) {
+			continue;
+		}
+		
+		if (GET_BLD_VNUM(GET_BUILDING(room)) == PORTAL_BUILDING && (!SCRIPT(room) || !has_trigger(SCRIPT(room), PORTAL_TRIG_1))) {
+			CREATE(tpl, struct trig_proto_list, 1);
+			tpl->vnum = PORTAL_TRIG_1;
+			LL_APPEND(room->proto_script, tpl);
+			
+			assign_triggers(room, WLD_TRIGGER);
+			++count;
+		}
+	}
+	
+	log("- updated %d portals", count);
+}
+
+
 // ADD HERE, above: more beta 5 update functions
 
 
@@ -4919,6 +4954,7 @@ const struct {
 	{ "b5.205", b5_204_celestial_forge, NULL, "Re-spawning Celestial Forge" },
 	{ "b5.206", b5_206_goblin_mines, NULL, "Re-spawning Goblin Mines" },
 	{ "b5.208", b5_204_celestial_forge, NULL, "Re-spawning Celestial Forge" },
+	{ "b5.208a", b5_208_portal_triggers, NULL, "Adding missing portal triggers" },
 	
 	// ADD HERE, above: more beta 5 update lines
 	
