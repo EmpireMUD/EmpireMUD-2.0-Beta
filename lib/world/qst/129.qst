@@ -1,16 +1,29 @@
 #12927
-Terminus Forge: Forever Impending~
-tbd
-   If you're ready to prove your mettle against the machine, type 'challenge'
-from Master Campwright Mateo's location at Victory Forge. If you want to ensure
-a private arena, type 'challenge empty'. You can return from the challenge by
-typing 'return' from the battlefield.
+Terminus Forge: Time After Sometimes~
+   Amir wipes his brown and slings his hefty black hammer over his shoulder.
+He eyes the sky with his good side.
+   'There's no fire like the fire from the heavens,' he says. 'We have forged
+here for many years by cheating time.'
+   He taps at the stone tree stump with his foot.
+   'But now time is catching up with us. It has stalked us like a dragon in the
+reeds. Time comes for all of us, in the end. Sometimes, it is better to face it
+head on.'
+   If you're ready to prove your mettle against the predator in time, type
+'challenge' from Amir, the Last Watch's location at Terminus Forge. If you want
+to ensure a private arena, type 'challenge empty'. You can return from the
+challenge by typing 'return' from the battlefield.
 ~
-tbd
+   It seems time hasn't caught up with you just yet. You finally catch your
+breath after fighting for your life in freefall, having proven to yourself that
+you can stand toe to toe with the worst history has to offer.
+   You can challenge the Lion of Time again as many times as you want by typing
+'challenge' or 'challenge empty' from Amir, the Last Watch's location in
+Terminus Forge. However, it will only reward you with a shatterable impact
+print once per day.
    Remember, you can always return from the challenge by typing 'return' from
 the battlefield.
 ~
-7 a 300 400 -1
+8 0 300 400 -1
 A
 1 12921
 R

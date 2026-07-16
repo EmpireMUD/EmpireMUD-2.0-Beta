@@ -318,6 +318,17 @@ if %actor.skill(6)% >= 76
     end
   end
 end
+* Clear old fight vars
+if %method% != move
+  set var_list 12817_daily 12857_daily 12897_daily 12927_daily
+  while %var_list%
+    set varname %var_list.car%
+    set var_list %var_list.cdr%
+    if %actor.var(%varname%,0)% < %dailycycle%
+      rdelete %varname% %actor.id%
+    end
+  done
+done
 * Movement SFX
 if %room.template% >= 12890 && %room.template% <= 12899
   if !%actor.inventory(12917)%
@@ -1083,7 +1094,7 @@ end
 ~
 #12819
 Celestial Forge: Challenge command to enter arena~
-2 c 0 18
+2 c 0 19
 L c 9680
 L c 12918
 L j 12811
@@ -1102,6 +1113,7 @@ L j 12921
 L j 12927
 L j 12928
 L j 12929
+L j 12961
 challenge~
 * Tries to find an available arena to fight in
 * optional 'empty' arg gets you one with zero players
@@ -1129,6 +1141,11 @@ switch %room.template%
   case 12921
     set room_list 12927 12928 12929
     set mes tremendous fiery whirl
+  break
+  case 12961
+    * Dawnforge
+    %send% %actor% Awan of Light puts a starry hand on your shoulder and says, 'There is nothing to challenge here except yourself.'
+    halt
   break
 done
 eval empty %arg% == empty
@@ -1180,12 +1197,13 @@ done
 ~
 #12820
 Celestial Forge: Loot once per day per person~
-0 f 100 5
+0 f 100 6
 L b 12817
 L b 12857
 L b 12858
 L b 12859
 L b 12897
+L b 12927
 ~
 eval min_level %self.minlevel% - 25
 set room %self.room%
@@ -1208,6 +1226,11 @@ switch %self.vnum%
     set varname %self.vnum%_daily
     set loot a diminished scale
     set death Scales fly from the serragon as it collapses in a circle around Echo Forge!
+  break
+  case 12927
+    set varname %self.vnum%_daily
+    set loot an impact print
+    set death The Lion shimmers away into sparkles of light that fade into the sunset.
   break
   default
     set varname %self.vnum%_daily

@@ -89,17 +89,33 @@ Z
 S
 #12897
 Echo Forge: What Lies Beyond~
-tbd
-   If you're ready to prove your mettle against the machine, type 'challenge'
-from Master Campwright Mateo's location at Victory Forge. If you want to ensure
-a private arena, type 'challenge empty'. You can return from the challenge by
-typing 'return' from the battlefield.
+   Kaito bows to you and beckons you over. He inclines his head and signs with
+his hands, moving one hand along in a sinuous shape, the other hand showing
+great size. He pauses, taking a moment to collect himself. And then his eyes
+look past you, past the bell, to what lies beyond the light.
+   He gestures toward the great wall, turning around and around, halting with
+his hand pointed almost due south. He brings his hands together with fingers
+curled, hinging the hands together at the wrist and then clamping his fingers
+together like toothy jaws.
+   He makes the sign for 'big' again.
+   And then he points again to the wall.
+   ...
+   If you're ready to prove your mettle against the thing that lies beyond the
+light, type 'challenge' from Kaito the Measured's location at Echo Forge. If
+you want to ensure a private arena, type 'challenge empty'. You can return from
+the challenge by typing 'return' from the battlefield.
 ~
-tbd
+   The tremendous Echo Serragon slumps back into its familiar position as the
+wall around the forge. In the dark, it never sleeps. In the dark, it licks its
+wounds. In the dark, it waits.
+   You can challenge the Echo Serragon as many times as you want by typing
+'challenge' or 'challenge empty' from Kaito the Measured's location at Echo
+Forge. However, it will only reward you with a shatterable diminished scale
+once per day.
    Remember, you can always return from the challenge by typing 'return' from
 the battlefield.
 ~
-5 a 200 300 -1
+6 0 200 300 -1
 A
 1 12891
 R
