@@ -851,6 +851,7 @@ void free_mob_proto_data(struct mob_proto_data *data) {
 
 /* release memory allocated for a char struct */
 void free_char(char_data *ch) {
+	struct player_bonus_ability *bonab, *next_bonab;
 	struct player_automessage *automsg, *next_automsg;
 	struct slash_channel *loadslash, *next_loadslash;
 	struct player_ability_data *abil, *next_abil;
@@ -993,6 +994,11 @@ void free_char(char_data *ch) {
 		HASH_ITER(hh, GET_AUTOMESSAGES(ch), automsg, next_automsg) {
 			HASH_DEL(GET_AUTOMESSAGES(ch), automsg);
 			free(automsg);
+		}
+		
+		HASH_ITER(hh, GET_BONUS_ABILITIES(ch), bonab, next_bonab) {
+			HASH_DEL(GET_BONUS_ABILITIES(ch), bonab);
+			free(bonab);
 		}
 		
 		for (loadslash = LOAD_SLASH_CHANNELS(ch); loadslash; loadslash = next_loadslash) {
