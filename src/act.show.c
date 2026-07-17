@@ -2278,20 +2278,66 @@ SHOW(show_progression) {
 
 
 SHOW(show_quests) {
+	any_vnum vnum;
 	char name[MAX_INPUT_LENGTH], *arg2, when[256];
+	unsigned long long timer;
 	struct player_completed_quest *pcq, *next_pcq;
-	bool file = FALSE, found = FALSE;
+	bool file = FALSE, found = FALSE, on_q, completed_q;
 	struct player_quest *pq;
 	int count, total, diff;
 	quest_data *qst;
 	char_data *vict = NULL;
+	player_index_data *index, *next_index;
 	
 	arg2 = any_one_arg(argument, name);
 	skip_spaces(&arg2);
 	
 	if (!*name) {
-		msg_to_char(ch, "Show quests: Which player?\r\n");
+		msg_to_char(ch, "Show quests: Which player name or quest vnum?\r\n");
 	}
+	else if (isdigit(*name)) {	
+		// show quest by vnum
+		if ((vnum = atoi(name)) < 0 || !(qst = quest_proto(vnum))) {
+			msg_to_char(ch, "Invalid quest vnum %d.\r\n", vnum);
+			return;
+		}
+		
+		timer = microtime();
+		build_page_display(ch, "Searching players for quest %d %s:", vnum, QUEST_NAME(qst));
+		count = 0;
+		
+		// players
+		HASH_ITER(idnum_hh, player_table_by_idnum, index, next_index) {
+			// determine if we should load them
+			if ((time(0) - index->last_logon) > 60 * SECS_PER_REAL_DAY) {
+				continue;	// skip due to timeout
+			}
+			if (!(vict = find_or_load_player(index->name, &file))) {
+				continue;	// no player
+			}
+			
+			// determine if they are on the quest
+			check_delayed_load(vict);
+			on_q = is_on_quest(vict, vnum) ? TRUE : FALSE;
+			completed_q = has_completed_quest_any(vict, vnum) ? TRUE : FALSE;
+			
+			if (file) {
+				free_char(vict);
+				file = FALSE;
+			}
+			
+			// ok?
+			if (on_q || completed_q) {
+				build_page_display(ch, "%s: %s", index->fullname, (on_q ? "on quest" : "completed"));
+				++count;
+			}
+		}
+		
+		build_page_display(ch, "(%d player%s, %.2f seconds for search)", count, PLURAL(count), (microtime() - timer) / 1000000.0);
+		send_page_display(ch);
+		return;
+	}
+	// otherwise, show quest by player name
 	else if (!(vict = find_or_load_player(name, &file))) {
 		msg_to_char(ch, "Show quests: No player by that name.\r\n");
 	}
