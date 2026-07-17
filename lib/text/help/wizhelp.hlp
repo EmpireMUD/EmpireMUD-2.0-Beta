@@ -1835,7 +1835,8 @@ Usage:  show quests <player> [active | completed | quest name]
 This option allows you to see what quests players are on, and their progress.
 If you don't specify an option, you will see their list of active quests.
 
-You can also use it to view all active players who have completed a quest.
+You can also use it to view all active players who are on a quest or have
+completed that quest.
 #e
 SHUTDOWN
 
