@@ -403,7 +403,7 @@ See also: BUILD, RECIPES
 #
 BURN
 
-Usage:  burn <building | vehicle | area | direction>
+Usage:  burn <building | vehicle | area | direction> [confirm]
 
 To burn something, you must have fire sticks or some other lighter. You can use
 this command to light a building on fire, either from the same tile as the
@@ -424,6 +424,8 @@ requires the 'dismantle' privilege.
 
 In the tropics, burning stumps or grassland will create fertile soil for
 planting.
+
+You must type 'confirm' after the target to burn something you own.
 
 To light torches or other items, use 'light'.
 

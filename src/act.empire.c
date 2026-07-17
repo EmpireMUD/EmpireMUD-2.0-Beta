@@ -4299,7 +4299,7 @@ ACMD(do_burn) {
 
 	// check for CONFIRM
 	chop_last_arg(argument, most_args, last_arg);
-	if (*last_arg && !strcmp(last_arg, "CONFIRM")) {
+	if (*last_arg && !str_cmp(last_arg, "confirm")) {
 		confirmed = TRUE;
 		argument = most_args;
 	}

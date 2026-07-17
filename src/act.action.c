@@ -1193,8 +1193,7 @@ void process_build_action(char_data *ch) {
 * @param char_data *ch The person burning the area.
 */
 void process_burn_area(char_data *ch) {
-	// this validate_burn_area passes TRUE for 'confirmed' because it MUST have been confirmed to start the burn.
-	if (!validate_burn_area(ch, TRUE)) {
+	if (!validate_burn_area(ch, GET_ACTION_VNUM(ch, 0))) {
 		// sends own message
 		cancel_action(ch);
 		return;
@@ -2511,6 +2510,7 @@ void do_burn_area(char_data *ch, bool confirmed) {
 	}
 	else {
 		start_action(ch, ACT_BURN_AREA, 5);
+		GET_ACTION_VNUM(ch, 0) = (confirmed ? 1 : 0);
 		msg_to_char(ch, "You prepare to burn the area...\r\n");
 		act("$n prepares to burn the area...", FALSE, ch, NULL, NULL, TO_ROOM);
 	}
