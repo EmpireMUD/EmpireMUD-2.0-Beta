@@ -2733,6 +2733,7 @@ DO_ABIL(abil_action_devastate_area) {
 	if (to_room) {
 		if (ROOM_SECT_FLAGGED(to_room, SECTF_CROP) && (cp = ROOM_CROP(to_room)) && has_interaction(GET_CROP_INTERACTIONS(cp), INTERACT_HARVEST)) {
 			run_room_interactions(ch, to_room, INTERACT_HARVEST, NULL, MEMBERS_ONLY, devastate_crop);
+			run_room_interactions(ch, to_room, INTERACT_PICK, NULL, MEMBERS_ONLY, devastate_crop);
 			run_room_interactions(ch, to_room, INTERACT_CHOP, NULL, MEMBERS_ONLY, devastate_trees);
 			uncrop_tile(to_room);
 			data->success = TRUE;
