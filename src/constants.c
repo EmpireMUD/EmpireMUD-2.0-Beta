@@ -1485,6 +1485,7 @@ const char *syslog_types[] = {
 	"validation",	// 10
 	"empire",
 	"event",
+	"bans",
 	"\n"
 };
 

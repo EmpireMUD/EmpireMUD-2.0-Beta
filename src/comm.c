@@ -2506,7 +2506,7 @@ int new_descriptor(int s) {
 	/* determine if the site is banned */
 	if (isbanned(newd->host) == BAN_ALL) {
 		CLOSE_SOCKET(desc);
-		syslog(SYS_LOGIN, 0, FALSE, "Connection attempt denied from [%s]", newd->host);
+		syslog(SYS_BANS, 0, FALSE, "Connection attempt denied from [%s]", newd->host);
 		free(newd);
 		return (0);
 	}

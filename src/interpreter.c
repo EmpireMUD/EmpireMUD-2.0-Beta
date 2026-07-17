@@ -2522,7 +2522,7 @@ void nanny(descriptor_data *d, char *arg) {
 		case CON_NAME_CNFRM: {	/* wait for conf. of new name    */
 			if (UPPER(*arg) == 'Y') {
 				if (isbanned(d->host) >= BAN_NEW) {
-					syslog(SYS_LOGIN, 0, TRUE, "Request for new char %s denied from [%s] (siteban)", GET_PC_NAME(d->character), d->host);
+					syslog(SYS_BANS, 0, TRUE, "Request for new char %s denied from [%s] (siteban)", GET_PC_NAME(d->character), d->host);
 					SEND_TO_Q("Sorry, new characters are not allowed from your site!\r\n", d);
 					STATE(d) = CON_CLOSE;
 					return;
@@ -2607,7 +2607,7 @@ void nanny(descriptor_data *d, char *arg) {
 				if (isbanned(d->host) == BAN_SELECT && !ACCOUNT_FLAGGED(d->character, ACCT_SITEOK)) {
 					SEND_TO_Q("Sorry, this account has not been cleared for login from your site!\r\n", d);
 					STATE(d) = CON_CLOSE;
-					syslog(SYS_LOGIN, 0, TRUE, "Connection attempt for %s denied from %s", GET_NAME(d->character), d->host);
+					syslog(SYS_BANS, 0, TRUE, "Connection attempt for %s denied from %s", GET_NAME(d->character), d->host);
 					return;
 				}
 				if (GET_ACCESS_LEVEL(d->character) < wizlock_level) {

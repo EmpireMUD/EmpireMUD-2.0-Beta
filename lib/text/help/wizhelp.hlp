@@ -1968,6 +1968,7 @@ Available syslog types are:
   validation - the approve command
   empire - merges, diplomacy, and wars
   event - event beginning, end, and all point gains
+  bans - banning/unbanning and banned characters trying to connect
 
 See also: TOGGLE
 #d
