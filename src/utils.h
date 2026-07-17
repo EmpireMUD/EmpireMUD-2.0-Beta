@@ -2518,7 +2518,7 @@ void update_empire_needs(empire_data *emp, struct empire_island *eisle, struct e
 bool adjacent_room_is_light(room_data *room, bool ignore_magic_darkness);
 int distance_can_see_in_dark(char_data *ch);
 struct icon_data *get_icon_from_set(struct icon_data *set, int type);
-int get_map_radius(char_data *ch);
+int get_map_radius(char_data *ch, bool reduce_for_movement);
 char *get_mine_type_name(room_data *room);
 char *get_room_description(room_data *room);
 char *get_room_name(room_data *room, bool color);
