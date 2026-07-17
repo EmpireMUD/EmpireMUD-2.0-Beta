@@ -2942,7 +2942,7 @@ void do_import_list(char_data *ch, empire_data *emp, char *argument, int subcmd)
 	
 	// two different things we can show here:
 	
-	if (!partner) {
+	if (!partner || partner == emp) {
 		// show our own imports/exports based on type
 		use_emp = emp;
 		use_type = subcmd;
