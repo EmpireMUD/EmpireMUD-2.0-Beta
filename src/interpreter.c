@@ -528,7 +528,7 @@ cpp_extern const struct command_info cmd_info[] = {
 	SIMPLE_CMD( "ability", POS_DEAD, do_ability, NO_MIN, CTYPE_UTIL ),
 	SIMPLE_CMD( "abilities", POS_DEAD, do_ability, NO_MIN, CTYPE_UTIL ),
 	SCMD_CMD( "accept", POS_DEAD, do_accept, NO_MIN, CTYPE_UTIL, SCMD_ACCEPT ),
-	SIMPLE_CMD( "adventure", POS_RESTING, do_adventure, NO_MIN, CTYPE_UTIL ),
+	SIMPLE_CMD( "adventure", POS_SLEEPING, do_adventure, NO_MIN, CTYPE_UTIL ),
 	GRANT_CMD( "addnotes", POS_STANDING, do_addnotes, LVL_CIMPL, CTYPE_IMMORTAL, GRANT_EDITNOTES ),
 	GRANT_CMD( "advance", POS_DEAD, do_advance, LVL_CIMPL, CTYPE_IMMORTAL, GRANT_ADVANCE ),
 	SCMD_CMD( "alias", POS_DEAD, do_alias, NO_MIN, CTYPE_UTIL, SCMD_ALIAS ),
