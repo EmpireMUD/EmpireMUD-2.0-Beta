@@ -31,7 +31,7 @@ centaur headless horseman man~
 the headless centaur~
 A headless horse man rears back and brandishes his sword!
 ~
-25 400 bdoDK cG 4
+25 425 bdoDK cG 4
 1 0 12 1 -1 -1
 D
    This mighty centaur stands head and shoulders above you. Well, shoulders,
@@ -120,7 +120,7 @@ lantern attack-o-lantern~
 the attack-o-lantern~
 An attack-o-lantern is floating here.
 ~
-25 400 bdhozD c 3
+25 425 bdhozD c 3
 0 0 27 28 -1 -1
 D
 It's a carved pumpkin, but it looks like it might be enchanted.
