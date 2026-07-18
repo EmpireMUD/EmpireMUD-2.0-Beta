@@ -18,7 +18,7 @@ L w 5102
 L w 5103
 L w 5104
 donate~
-set forge_list Lodestone Forge, Victory Forge, Echo Forge, Terminus Forge, ...
+set forge_list Lodestone Forge, Victory Forge, Echo Forge, Terminus Forge, or the Dawnforge
 set room %self.room%
 set which 0
 set dest 0
@@ -47,7 +47,7 @@ elseif meteorite forge /= %arg% || meteorite shard /= %arg% || terminus forge /=
   set which 12803
   set dest 12920
   set curr 5103
-elseif celestial forge /= %arg% || celestial shard /= %arg% || dawnforge /= %arg%
+elseif celestial forge /= %arg% || celestial shard /= %arg% || dawnforge /= %arg% || the dawnforge /= %arg%
   set name the Dawnforge
   set which 12804
   set dest 12960
