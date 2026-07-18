@@ -934,13 +934,13 @@ A golden seedling is sitting here.~
    It looks like a tiny plant, but made from solid gold. Still, you swear it
 blows in the wind when you put it down.
 ~
-15 0 a 0 0 1
+15 0 a 0 0 2
 1 0 0
 4 0
 C
 1 1
 R
-4 5611 0
+4 5611 a
 S
 #12685
 lint pocket magiterranean~

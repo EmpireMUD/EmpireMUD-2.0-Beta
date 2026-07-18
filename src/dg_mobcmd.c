@@ -1918,7 +1918,7 @@ ACMD(do_mforce) {
 
 		if (*arg == UID_CHAR) {
 			if (!(victim = get_char(arg))) {
-				mob_log(ch, "mforce: victim (%s) does not exist",arg);
+				mob_log(ch, "mforce: victim (%s) does not exist (mforce %s %s)", arg, arg, argument);
 				return;
 			}
 		}

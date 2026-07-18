@@ -790,16 +790,18 @@ See also: RAWHIDE STITCHING, LEATHERWORKING, DANGEROUS LEATHERS,
 #
 "MOONSTONE SMELTING" "MOONSTONE ORE" MOONSTONE "ARGENTINE INGOT" "EVENTIDE INGOT"
 
-Moonstone Smelting (goal)
 Command:  smelt <argentine | eventide> ingot
 
 The super-rare moonstone ore is highly prized by metallurgists, and can be
 smelted with imperium and nocturnium ingots to produce valuable argentine and
 eventide metals, respectively.
 
-These metals are generally used in crafts in the 200-300 level range.
+Learn to smelt these ingots at the legendary Celestial Forges (also requires
+the Forge ability).
 
-See also: RARE METALS, SMELT
+These metals are generally used in crafts in the 200-400 level range.
+
+See also: CELESTIAL FORGE, RARE METALS, SMELT
 #
 PATTERNS "ADVENTURE CRAFTS" "CRAFTING PATTERNS" SCHEMATICS DESIGNS
 

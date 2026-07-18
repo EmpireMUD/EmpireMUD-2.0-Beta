@@ -688,4 +688,92 @@ T 12926
 T 12928
 Z1 1
 S
+#12960
+The Endless Bright~
+   You can see little else but bright white in all directions. There is no real
+floor here. You have no trouble walking in the luminous void, but can feel no
+firm ground beneath your feet.
+Commands: return
+~
+cei 0 0 12960
+D10
+~
+0 12961
+E
+white brightness out around north south east west northeast northwest southeast southwest se sw up down void luminous~
+   There's nothing but bright. Sometimes you see a swirl of pink or blue out of
+the corner of your eye... but when you look, it's nothing but white.
+~
+E
+ground~
+There is no ground.
+~
+E
+fore~
+You might be able to go forward to the Dawnforge...
+~
+T 12803
+T 12802
+T 12801
+S
+#12961
+The Dawnforge~
+   Soft pink and sapphire clouds curl and mingle with the vast, luminous space.
+You float in it, unchained from gravity, bound to nothing at all. Countless
+stars glimmer among the clouds, some no larger than a spark and others nearly
+large enough to leave the delicate nest. Wisps of radiant dust spiral around
+them, nourishing them and guarding them. There is no sense of distance or scale
+here; it might go on forever. Beyond it lies nothing but more stars.
+~
+cei 0 0 12960
+D10
+~
+0 12960
+E
+pink sapphire blue~
+Pink and blue clouds swirl and play.
+~
+E
+clouds~
+   Clouds surround you, though they're not like any kind you've seen before.
+These are fluffy swirls of dust that seem to cradle newborn stars.
+~
+E
+space~
+It's all around you.
+~
+E
+light starlight gleaming~
+Everything here gleams in the newborn starlight.
+~
+E
+stars~
+   As if in a sea of stars, you are surrounded by them on all sides. Tiny stars
+nestle in the clouds around you while fullgrown stars dot the distance.
+~
+E
+nest dust~
+The dusty clouds around you form a sort of nest for the stars.
+~
+E
+wisps dust spiral~
+Dust spirals around you; everything here is formed from it.
+~
+E
+out distance out around north south east west northeast northwest southeast southwest se sw up down void~
+It seems to go on forever.
+~
+E
+fore~
+You might be able to go forward back to the bright place...
+~
+E
+spark sparks~
+Tiny sparks are tucked into tufts of cloud.
+~
+M 0 12961 100.00 1
+T 12803
+T 12802
+T 12819
+S
 $

@@ -1,19 +1,22 @@
 #12800
 Celestial Forge: Donate to open portal~
-0 c 0 13
+0 c 0 16
 L c 12800
 L c 12801
 L c 12802
 L c 12803
+L c 12804
 L c 12806
 L j 12810
 L j 12850
 L j 12890
 L j 12920
+L j 12960
 L w 5100
 L w 5101
 L w 5102
 L w 5103
+L w 5104
 donate~
 set forge_list Lodestone Forge, Victory Forge, Echo Forge, Terminus Forge, ...
 set room %self.room%
@@ -24,26 +27,31 @@ if !%actor.canuseroom_guest(%room%)%
   %send% %actor% You don't have permission to do that here.
 elseif !%arg%
   %send% %actor% Donate to which celestial forge? (%forge_list%)
-elseif iron forge /= %arg% || lodestone forge /= %arg%
+elseif iron forge /= %arg% || iron shard /= %arg% || lodestone forge /= %arg%
   set name Lodestone Forge
   set which 12800
   set dest 12810
   set curr 5100
-elseif imperium forge /= %arg% || victory forge /= %arg%
+elseif imperium forge /= %arg% || imperium shard /= %arg% || victory forge /= %arg%
   set name Victory Forge
   set which 12801
   set dest 12850
   set curr 5101
-elseif eventide forge /= %arg% || echo forge /= %arg%
+elseif eventide forge /= %arg% || eventide shard /= %arg% || echo forge /= %arg%
   set name Echo Forge
   set which 12802
   set dest 12890
   set curr 5102
-elseif meteorite forge /= %arg% || terminus forge /= %arg%
+elseif meteorite forge /= %arg% || meteorite shard /= %arg% || terminus forge /= %arg%
   set name Terminus Forge
   set which 12803
   set dest 12920
   set curr 5103
+elseif celestial forge /= %arg% || celestial shard /= %arg% || dawnforge /= %arg%
+  set name the Dawnforge
+  set which 12804
+  set dest 12960
+  set curr 5104
 else
   %send% %actor% Unknown celestial forge. (%forge_list%)
 end
@@ -96,12 +104,13 @@ end
 ~
 #12801
 Celestial Forge: Request exit~
-2 c 0 13
+2 c 0 15
 L c 9680
 L c 12800
 L c 12801
 L c 12802
 L c 12803
+L c 12804
 L c 12806
 L e 5195
 L j 12800
@@ -110,6 +119,7 @@ L j 12850
 L j 12890
 L j 12920
 L j 12926
+L j 12960
 return~
 if %actor.is_npc%
   * possibly immortal trying to return
@@ -150,6 +160,9 @@ if %cf_return%
       case 12920
       case 12926
         set in_vnum 12803
+      break
+      case 12960
+        set in_vnum 12804
       break
       default
         set in_vnum 0
@@ -213,7 +226,7 @@ end
 ~
 #12802
 Celestial Forge: Detect player entry, Grant abilities, Start progress~
-2 gA 100 20
+2 gA 100 22
 L c 9684
 L c 12917
 L e 5195
@@ -226,6 +239,7 @@ L j 12890
 L j 12895
 L j 12920
 L j 12926
+L j 12960
 L o 12810
 L o 12850
 L o 12890
@@ -234,6 +248,7 @@ L q 6
 L y 12810
 L y 12850
 L y 12890
+L y 12960
 ~
 if %actor.is_npc%
   halt
@@ -288,8 +303,32 @@ if %actor.skill(6)% >= 76
     if %actor.empire%
       nop %actor.empire.start_progress(12920)%
     end
+  elseif %room.template% >= 12960 && %room.template% <= 12965
+    * not currently a bonus ability
+    * if !%actor.has_bonus_ability(12960)%
+    *   * grant the ability after a short delay
+    *   %load% obj 9684 %actor%
+    *   set obj %actor.inventory%
+    *   if %obj.vnum% == 9684
+    *     nop %obj.val0(12960)%
+    *   end
+    * end
+    if %actor.empire%
+      nop %actor.empire.start_progress(12960)%
+    end
   end
 end
+* Clear old fight vars
+if %method% != move
+  set var_list 12817_daily 12857_daily 12897_daily 12927_daily
+  while %var_list%
+    set varname %var_list.car%
+    set var_list %var_list.cdr%
+    if %actor.var(%varname%,0)% < %dailycycle%
+      rdelete %varname% %actor.id%
+    end
+  done
+done
 * Movement SFX
 if %room.template% >= 12890 && %room.template% <= 12899
   if !%actor.inventory(12917)%
@@ -354,6 +393,10 @@ if %cmd.mudcommand% == time
     case 12929
       %send% %actor% There's no time for that now -- you're falling!
     break
+    case 12960
+    case 12961
+      %send% %actor% There's no time here.
+    break
     default
       %send% %actor% The beautiful night sky overhead tells you it's nighttime.
     break
@@ -385,6 +428,12 @@ elseif %cmd.mudcommand% == weather
     case 12928
     case 12929
       %send% %actor% It's windier than you've ever seen before... because you're falling!
+    break
+    case 12960
+      %send% %actor% The outlook is bright.
+    break
+    case 12961
+      %send% %actor% It's very cloudy.
     break
     default
       %send% %actor% The night sky is cloudless and vast.
@@ -422,10 +471,12 @@ end
 ~
 #12805
 Celestial Forge: Immortal controller~
-1 c 2 3
+1 c 2 5
 L j 12810
 L j 12850
 L j 12890
+L j 12920
+L j 12960
 cforge~
 if !%actor.is_immortal%
   %send% %actor% You lack the power to use this.
@@ -437,12 +488,14 @@ if goto /= %mode%
   * target handling
   if iron /= %arg2% || lodestone forge /= %arg2%
     set to_room %instance.nearest_rmt(12810)%
-  elseif imperium /= %arg2% || victory forge /= %arg2%
+  elseif imperium shard /= %arg2% || victory forge /= %arg2%
     set to_room %instance.nearest_rmt(12850)%
-  elseif eventide /= %arg2% || echo forge /= %arg2%
+  elseif eventide shard /= %arg2% || echo forge /= %arg2%
     set to_room %instance.nearest_rmt(12890)%
-  elseif meteorite /= %arg2% || terminus forge /= %arg2%
+  elseif meteorite shard /= %arg2% || terminus forge /= %arg2%
     set to_room %instance.nearest_rmt(12920)%
+  elseif celestial shard /= %arg2% || dawnforge /= %arg2%
+    set to_room %instance.nearest_rmt(12960)%
   else
     set to_room %instance.nearest_rmt(%arg2%)%
   end
@@ -1041,7 +1094,7 @@ end
 ~
 #12819
 Celestial Forge: Challenge command to enter arena~
-2 c 0 18
+2 c 0 19
 L c 9680
 L c 12918
 L j 12811
@@ -1060,6 +1113,7 @@ L j 12921
 L j 12927
 L j 12928
 L j 12929
+L j 12961
 challenge~
 * Tries to find an available arena to fight in
 * optional 'empty' arg gets you one with zero players
@@ -1087,6 +1141,11 @@ switch %room.template%
   case 12921
     set room_list 12927 12928 12929
     set mes tremendous fiery whirl
+  break
+  case 12961
+    * Dawnforge
+    %send% %actor% Awan of Light puts a starry hand on your shoulder and says, 'There is nothing to challenge here except yourself.'
+    halt
   break
 done
 eval empty %arg% == empty
@@ -1138,12 +1197,13 @@ done
 ~
 #12820
 Celestial Forge: Loot once per day per person~
-0 f 100 5
+0 f 100 6
 L b 12817
 L b 12857
 L b 12858
 L b 12859
 L b 12897
+L b 12927
 ~
 eval min_level %self.minlevel% - 25
 set room %self.room%
@@ -1166,6 +1226,11 @@ switch %self.vnum%
     set varname %self.vnum%_daily
     set loot a diminished scale
     set death Scales fly from the serragon as it collapses in a circle around Echo Forge!
+  break
+  case 12927
+    set varname %self.vnum%_daily
+    set loot an impact print
+    set death The Lion shimmers away into sparkles of light that fade into the sunset.
   break
   default
     set varname %self.vnum%_daily

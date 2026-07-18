@@ -229,6 +229,7 @@ ACMD(do_light);
 ACMD(do_list);
 ACMD(do_load);
 ACMD(do_load_vehicle);
+ACMD(do_local_inventory);
 ACMD(do_look);
 ACMD(do_lore);
 
@@ -527,7 +528,7 @@ cpp_extern const struct command_info cmd_info[] = {
 	SIMPLE_CMD( "ability", POS_DEAD, do_ability, NO_MIN, CTYPE_UTIL ),
 	SIMPLE_CMD( "abilities", POS_DEAD, do_ability, NO_MIN, CTYPE_UTIL ),
 	SCMD_CMD( "accept", POS_DEAD, do_accept, NO_MIN, CTYPE_UTIL, SCMD_ACCEPT ),
-	SIMPLE_CMD( "adventure", POS_RESTING, do_adventure, NO_MIN, CTYPE_UTIL ),
+	SIMPLE_CMD( "adventure", POS_SLEEPING, do_adventure, NO_MIN, CTYPE_UTIL ),
 	GRANT_CMD( "addnotes", POS_STANDING, do_addnotes, LVL_CIMPL, CTYPE_IMMORTAL, GRANT_EDITNOTES ),
 	GRANT_CMD( "advance", POS_DEAD, do_advance, LVL_CIMPL, CTYPE_IMMORTAL, GRANT_ADVANCE ),
 	SCMD_CMD( "alias", POS_DEAD, do_alias, NO_MIN, CTYPE_UTIL, SCMD_ALIAS ),
@@ -754,9 +755,11 @@ cpp_extern const struct command_info cmd_info[] = {
 	SCMD_CMD( "light", POS_SITTING, do_light, NO_MIN, CTYPE_UTIL, SCMD_LIGHT ),
 	SIMPLE_CMD( "list", POS_SITTING, do_list, NO_MIN, CTYPE_UTIL ),
 	SCMD_CMD( "library", POS_STANDING, do_library, NO_MIN, CTYPE_UTIL, SCMD_LIBRARY ),
+	SIMPLE_CMD( "linventory", POS_DEAD, do_local_inventory, NO_MIN, CTYPE_UTIL ),
 	GRANT_CMD( "load", POS_DEAD, do_load, LVL_CIMPL, CTYPE_IMMORTAL, GRANT_LOAD ),
 	STANDARD_CMD( "load", POS_STANDING, do_load_vehicle, NO_MIN, NO_GRANTS, NO_SCMD, CTYPE_MOVE, CMD_NO_ANIMALS, NO_ABIL ),
 	STANDARD_CMD( "loadvehicle", POS_STANDING, do_load_vehicle, NO_MIN, NO_GRANTS, NO_SCMD, CTYPE_MOVE, CMD_NO_ANIMALS, NO_ABIL ),
+	SIMPLE_CMD( "localinventory", POS_DEAD, do_local_inventory, NO_MIN, CTYPE_UTIL ),
 	GRANT_CMD( "lore", POS_DEAD, do_lore, LVL_CIMPL, CTYPE_IMMORTAL, GRANT_LORE ),
 	SCMD_CMD( "levels", POS_DEAD, do_no_cmd, NO_MIN, CTYPE_UTIL, NOCMD_LEVELS ),
 
@@ -2519,7 +2522,7 @@ void nanny(descriptor_data *d, char *arg) {
 		case CON_NAME_CNFRM: {	/* wait for conf. of new name    */
 			if (UPPER(*arg) == 'Y') {
 				if (isbanned(d->host) >= BAN_NEW) {
-					syslog(SYS_LOGIN, 0, TRUE, "Request for new char %s denied from [%s] (siteban)", GET_PC_NAME(d->character), d->host);
+					syslog(SYS_BANS, 0, TRUE, "Request for new char %s denied from [%s] (siteban)", GET_PC_NAME(d->character), d->host);
 					SEND_TO_Q("Sorry, new characters are not allowed from your site!\r\n", d);
 					STATE(d) = CON_CLOSE;
 					return;
@@ -2604,7 +2607,7 @@ void nanny(descriptor_data *d, char *arg) {
 				if (isbanned(d->host) == BAN_SELECT && !ACCOUNT_FLAGGED(d->character, ACCT_SITEOK)) {
 					SEND_TO_Q("Sorry, this account has not been cleared for login from your site!\r\n", d);
 					STATE(d) = CON_CLOSE;
-					syslog(SYS_LOGIN, 0, TRUE, "Connection attempt for %s denied from %s", GET_NAME(d->character), d->host);
+					syslog(SYS_BANS, 0, TRUE, "Connection attempt for %s denied from %s", GET_NAME(d->character), d->host);
 					return;
 				}
 				if (GET_ACCESS_LEVEL(d->character) < wizlock_level) {

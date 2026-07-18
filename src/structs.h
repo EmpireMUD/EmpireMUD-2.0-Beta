@@ -2615,6 +2615,7 @@ typedef enum {
 #define SYS_VALID  BIT(10)	// validation logs
 #define SYS_EMPIRE  BIT(11)	// empire-related logs
 #define SYS_EVENT  BIT(12)	// event news and points
+#define SYS_BANS  BIT(13)	// ban/banned character logins
 
 
 // WAIT_x: Wait types for the command_lag() function.

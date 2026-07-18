@@ -59,16 +59,32 @@ M
 18
 $p burns out with a whiff of smoke.~
 S
+#12804
+gateway celestial portal swirling~
+a swirling celestial gateway~
+A celestial gateway swirls and shimmers in the air.~
+   Tiny stars glimmer in the pink and blue swirl of dust that forms the margin
+of the portal.
+~
+8 0 0 0 0 5
+-1 0 0
+10 3
+C
+1 1
+M
+18
+$p crashes closed with a big bang!~
+S
 #12805
 controller celestial forge~
 the celestial forge controller~
 The celestial forge controller is lying here.~
    This elegant shard serves as the controller for a celestial forge. It can
 only be used by immortals.
-Usage: cforge goto <iron | imperium | eventide | meteorite>
+Usage: cforge goto <iron | imperium | eventide | meteorite | celestial>
        cforge goto <template vnum>
 ~
-3 0 a 0 0 3
+3 0 a 0 0 4
 0 0 0
 2 0
 C
@@ -737,6 +753,47 @@ C
 R
 4 5195 0
 T 12845
+S
+#12844
+crate shards celestial 100~
+a crate of 100 celestial shards~
+A crate of celestial shards is stacked here.~
+   This golden crate is full of celestial shards, the currency of the
+Dawnforge. Open this box for a one-time supply of 100 celestial shards.
+~
+3 e a 0 0 7
+5104 100 0
+0 0
+C
+1 1
+R
+4 5195 0
+T 12845
+S
+#12848
+inspiration smelt argentine ingots~
+the inspiration to smelt argentine ingots~
+The inspiration to smelt argentine ingots is here.~
+   You find yourself inspired by the starsmiths of old, who, in the light of
+the moon, forged a bright white metal that could stand against the stars
+themselves.
+   This inspiration will teach you to smelt: argentine ingot.
+~
+7 0 a 0 0 2
+610 0 0
+0 0
+S
+#12849
+inspiration smelt eventide ingots~
+the inspiration to smelt eventide ingots~
+The inspiration to smelt eventide ingots is here.~
+   You find yourself inspired by the starsmiths of old, who, in the dark of
+night, forged an inky black metal that could stand beside the stars themselves.
+   This inspiration will teach you to smelt: eventide ingot.
+~
+7 0 a 0 0 3
+611 0 0
+0 0
 S
 #12850
 standards banners flags~

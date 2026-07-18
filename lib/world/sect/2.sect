@@ -988,11 +988,17 @@ S
 #233
 Seaside Wasteland~
 A Wasteland of Stumps on the Edge of the Sea~
-'.' 37 ls 3 dl pr
+'.' 37 ls 3 adl pr
 C
 burn stumps, pick~
 D0
-@w&?..@e~
+@w&?.&Tn@e~
+&t~
+D0
+@w&Tn&?.@e~
+&t~
+D0
+@w&Tnn@e~
 &t~
 E
 4 0 1.00 232

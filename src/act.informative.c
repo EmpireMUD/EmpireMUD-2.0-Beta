@@ -3911,6 +3911,25 @@ ACMD(do_inventory) {
 }
 
 
+ACMD(do_local_inventory) {
+	bool found;
+	
+	if (!GET_LOYALTY(ch)) {
+		msg_to_char(ch, "You aren't a member of any empire.\r\n");
+	}
+	else {
+		found = show_local_einv(ch, IN_ROOM(ch), FALSE, TRUE);
+		
+		if (found) {
+			send_page_display(ch);
+		}
+		else {
+			msg_to_char(ch, "Your empire has nothing stored here.\r\n");
+		}
+	}
+}
+
+
 ACMD(do_look) {
 	char arg2[MAX_INPUT_LENGTH], arg3[MAX_INPUT_LENGTH];
 	char *exdesc;

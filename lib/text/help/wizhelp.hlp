@@ -1830,9 +1830,13 @@ indicate if they are the leader of any of those empires.
 "SHOW QUESTS"
 
 Usage:  show quests <player> [active | completed | quest name]
+        show quests <quest vnum>
 
 This option allows you to see what quests players are on, and their progress.
 If you don't specify an option, you will see their list of active quests.
+
+You can also use it to view all active players who are on a quest or have
+completed that quest.
 #e
 SHUTDOWN
 
@@ -1968,6 +1972,7 @@ Available syslog types are:
   validation - the approve command
   empire - merges, diplomacy, and wars
   event - event beginning, end, and all point gains
+  bans - banning/unbanning and banned characters trying to connect
 
 See also: TOGGLE
 #d

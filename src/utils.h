@@ -2178,7 +2178,7 @@ bool vehicle_has_function_and_city_ok(vehicle_data *veh, bitvector_t fnc_flag);
 // act.action.c
 bool action_flagged(char_data *ch, bitvector_t actf);
 void cancel_action(char_data *ch);
-void do_burn_area(char_data *ch);
+void do_burn_area(char_data *ch, bool confirmed);
 void end_action(char_data *ch);
 obj_data *has_tool(char_data *ch, bitvector_t flags);
 obj_data *has_all_tools(char_data *ch, bitvector_t flags);
@@ -2205,7 +2205,7 @@ void write_one_slash_channel_message(FILE *fl, struct channel_history_data *entr
 // act.empire.c
 void add_to_empire_history(empire_data *emp, char_data *speaker, char *message, int rank);
 bool check_in_city_requirement(room_data *room, bool check_wait);
-void do_burn_building(char_data *ch, room_data *room, obj_data *lighter);
+void do_burn_building(char_data *ch, room_data *room, obj_data *lighter, bool confirmed);
 void do_customize_island(char_data *ch, char *argument);
 char *empire_history_filename(empire_data *emp);
 int get_territory_type_for_empire(room_data *loc, empire_data *emp, bool check_wait, bool *city_too_soon, bool *using_large_radius);
@@ -2337,7 +2337,7 @@ bool vampire_kill_feeding_target(char_data *ch, char *argument);
 // act.vehicles.c
 void do_customize_vehicle(char_data *ch, char *argument);
 void do_douse_vehicle(char_data *ch, vehicle_data *veh, obj_data *cont);
-void do_light_vehicle(char_data *ch, vehicle_data *veh, obj_data *flint);
+void do_light_vehicle(char_data *ch, vehicle_data *veh, obj_data *flint, bool confirmed);
 void do_sit_on_vehicle(char_data *ch, char *argument, int pos);
 void do_unseat_from_vehicle(char_data *ch);
 bool find_siege_target_for_vehicle(char_data *ch, vehicle_data *veh, char *arg, room_data **room_targ, int *dir, vehicle_data **veh_targ);
@@ -2518,7 +2518,7 @@ void update_empire_needs(empire_data *emp, struct empire_island *eisle, struct e
 bool adjacent_room_is_light(room_data *room, bool ignore_magic_darkness);
 int distance_can_see_in_dark(char_data *ch);
 struct icon_data *get_icon_from_set(struct icon_data *set, int type);
-int get_map_radius(char_data *ch);
+int get_map_radius(char_data *ch, bool reduce_for_movement);
 char *get_mine_type_name(room_data *room);
 char *get_room_description(room_data *room);
 char *get_room_name(room_data *room, bool color);

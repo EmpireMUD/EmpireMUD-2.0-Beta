@@ -41,7 +41,7 @@ demon grinchy tall green~
 a grinchy demon~
 A tall, green grinchy demon sneaks about.
 ~
-0 400 bdhoK cG 4
+0 425 bdhoK cG 4
 1 0 9 7 -1 -1
 D
    This demon is a furry green cave-dweller who absolutely hates Christmas.
@@ -70,7 +70,7 @@ dog max reindeer~
 Max the reindeer dog~
 A dog is here, dressed as a reindeer.
 ~
-50 400 bdhjoDK qG 3
+50 425 bdhjoDK qG 3
 1 0 0 9 -1 -1
 D
    Someone has attached a single fake antler to this little brown dog, and
@@ -899,7 +899,7 @@ krampus demon~
 the Krampus demon~
 The Krampus demon stands on mismatched legs, brandishing a switch.
 ~
-25 400 bdoK cqEG 3
+25 425 bdoK cqEG 3
 1 0 14 42 -1 -1
 D
    This demonic figure is half goat and half human, with the division down the
@@ -1057,7 +1057,7 @@ santa clockwork demonic~
 the Clockwork Santa~
 A demonic Clockwork Santa takes aim with his toy blaster!
 ~
-25 400 bdoK cqEG 3
+25 425 bdoK cqEG 3
 1 0 0 16688 -1 -1
 D
    Though he has the mirthy belly, white beard, and fuming red outfit of Santa

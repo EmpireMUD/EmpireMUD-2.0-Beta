@@ -7717,7 +7717,7 @@ ACMD(do_quaff) {
 		msg_to_char(ch, "You can only quaff potions.\r\n");
 	}
 	else if (GET_POTION_COOLDOWN_TYPE(obj) != NOTHING && get_cooldown_time(ch, GET_POTION_COOLDOWN_TYPE(obj)) > 0) {
-		msg_to_char(ch, "You can't quaff that until your %s cooldown expires.\r\n", get_generic_name_by_vnum(GET_POTION_COOLDOWN_TYPE(obj)));
+		msg_to_char(ch, "You can't quaff that until your %s cooldown expires (%s).\r\n", get_generic_name_by_vnum(GET_POTION_COOLDOWN_TYPE(obj)), colon_time(get_cooldown_time(ch, GET_POTION_COOLDOWN_TYPE(obj)), FALSE, NULL));
 	}
 	else {
 		if (GET_OBJ_CURRENT_SCALE_LEVEL(obj) == 0) {

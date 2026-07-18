@@ -63,8 +63,8 @@ void tog_pvp(char_data *ch);
 //// EMPIREMUD CONSTANTS /////////////////////////////////////////////////////
 
 // Shown on the "version" command and sent over MSSP
-const char *version = "EmpireMUD 2.0 beta 5.207";
-const char *DG_SCRIPT_VERSION = "DG Scripts 1.0.12 e5.1.20";
+const char *version = "EmpireMUD 2.0 beta 5.208";
+const char *DG_SCRIPT_VERSION = "DG Scripts 1.0.12 e5.1.21";
 
 
 // data for the built-in game levels -- this adapts itself if you reduce the number of immortal levels
@@ -1485,6 +1485,7 @@ const char *syslog_types[] = {
 	"validation",	// 10
 	"empire",
 	"event",
+	"bans",
 	"\n"
 };
 

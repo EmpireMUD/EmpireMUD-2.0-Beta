@@ -409,9 +409,10 @@ void get_informative_string(char_data *ch, char *buffer, bool dismantling, bool 
 * command, which actually sets the diameter.
 *
 * @param char_data *ch The person to get mapsize for.
+* @param bool reduce_for_movement If TRUE, can be reduced based on a high number of recent moves. If FALSE, skips this step.
 * @return int The map radius.
 */
-int get_map_radius(char_data *ch) {
+int get_map_radius(char_data *ch, bool reduce_for_movement) {
 	int mapsize, recent, max, smallmax;
 
 	mapsize = GET_MAPSIZE(REAL_CHAR(ch));
@@ -436,7 +437,7 @@ int get_map_radius(char_data *ch) {
 	}
 	
 	// automatically limit size if the player is moving too fast
-	if (mapsize > 5 && (recent = count_recent_moves(ch)) > 5) {
+	if (reduce_for_movement && mapsize > 5 && (recent = count_recent_moves(ch)) > 5) {
 		max = config_get_int("max_map_size") - (recent - 5);
 		mapsize = MIN(mapsize, max);
 		smallmax = config_get_int("max_map_while_moving");
@@ -1474,7 +1475,7 @@ void look_at_room_by_loc(char_data *ch, room_data *room, bitvector_t options) {
 		GET_LAST_LOOK_SUN(ch) = get_sun_status(IN_ROOM(ch));
 	}
 
-	mapsize = get_map_radius(ch);
+	mapsize = get_map_radius(ch, TRUE);
 
 	if (AFF_FLAGGED(ch, AFF_BLIND)) {
 		msg_to_char(ch, "You see nothing but infinite darkness...\r\n");
@@ -3355,12 +3356,12 @@ ACMD(do_scan) {
 	}
 	else if (!*new_arg && (dist >= 0 || dir_modifiers) && !dash_distance && !plus_distance) {
 		// normal 'screenreader look' scan with a custom distance
-		show_screenreader_room(ch, use_room, NOBITS, (dist != -1) ? dist : GET_MAPSIZE(ch), dir_modifiers);
+		show_screenreader_room(ch, use_room, NOBITS, (dist != -1) ? dist : get_map_radius(ch, FALSE), dir_modifiers);
 	}
 	else if ((dir = parse_direction(ch, new_arg)) == NO_DIR || (dist >= 0 && (dash_distance || plus_distance))) {
 		// scanning by tile name
 		clear_recent_moves(ch);
-		scan_for_tile(ch, new_arg, (dist != -1) ? dist : GET_MAPSIZE(ch), dir_modifiers, dash_distance);
+		scan_for_tile(ch, new_arg, (dist != -1) ? dist : get_map_radius(ch, FALSE), dir_modifiers, dash_distance);
 		gain_player_tech_exp(ch, PTECH_MAP_MEMORY, 0.1);
 	}
 	else if (dir >= NUM_2D_DIRS) {
@@ -3370,7 +3371,7 @@ ACMD(do_scan) {
 	else {
 		// valid dir: scan in one line
 		clear_recent_moves(ch);
-		screenread_one_dir(ch, use_room, dir, (dist != -1) ? dist : GET_MAPSIZE(ch));
+		screenread_one_dir(ch, use_room, dir, (dist != -1) ? dist : get_map_radius(ch, FALSE));
 		gain_player_tech_exp(ch, PTECH_MAP_MEMORY, 0.1);
 	}
 }

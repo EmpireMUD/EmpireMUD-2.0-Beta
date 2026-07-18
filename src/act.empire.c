@@ -2942,7 +2942,7 @@ void do_import_list(char_data *ch, empire_data *emp, char *argument, int subcmd)
 	
 	// two different things we can show here:
 	
-	if (!partner) {
+	if (!partner || partner == emp) {
 		// show our own imports/exports based on type
 		use_emp = emp;
 		use_type = subcmd;
@@ -4216,8 +4216,9 @@ ACMD(do_buildcheck) {
 * @param char_data *ch The person doing the burning.
 * @param room_data *room The targeted room (should be a map building).
 * @param obj_data *lighter Optional: If a lighter is given, it will be used for this. If not, we assume they don't need it.
+* @param bool confirmed If TRUE, player typed CONFIRM as the last arg. FALSE if not.
 */
-void do_burn_building(char_data *ch, room_data *room, obj_data *lighter) {
+void do_burn_building(char_data *ch, room_data *room, obj_data *lighter, bool confirmed) {
 	char to_char[256], to_room[256];
 	
 	// ensure we have the real room
@@ -4228,7 +4229,7 @@ void do_burn_building(char_data *ch, room_data *room, obj_data *lighter) {
 		msg_to_char(ch, "NPCs cannot light buildings on fire.\r\n");
 	}
 	else if (GET_ROOM_VEHICLE(room)) {
-		do_light_vehicle(ch, GET_ROOM_VEHICLE(room), lighter);
+		do_light_vehicle(ch, GET_ROOM_VEHICLE(room), lighter, confirmed);
 	}
 	else if (IS_BURNING(room)) {
 		msg_to_char(ch, "Looks like it's already on fire!\r\n");
@@ -4244,6 +4245,9 @@ void do_burn_building(char_data *ch, room_data *room, obj_data *lighter) {
 	}
 	else if (GET_LOYALTY(ch) && ROOM_OWNER(IN_ROOM(ch)) == GET_LOYALTY(ch) && !HAS_DISMANTLE_PRIV_FOR_BUILDING(ch, IN_ROOM(ch))) {
 		msg_to_char(ch, "You don't have permission to burn the empire's buildings (it requires the dismantle privilege).\r\n");
+	}
+	else if (GET_LOYALTY(ch) && ROOM_OWNER(IN_ROOM(ch)) == GET_LOYALTY(ch) && !confirmed) {
+		msg_to_char(ch, "You must type 'burn building CONFIRM' to burn a building you own.\r\n");
 	}
 	else if (!ROOM_BLD_FLAGGED(room, BLD_BURNABLE)) {
 		msg_to_char(ch, "It doesn't seem to be flammable.\r\n");
@@ -4286,20 +4290,27 @@ void do_burn_building(char_data *ch, room_data *room, obj_data *lighter) {
 
 ACMD(do_burn) {
 	bool objless = has_player_tech(ch, PTECH_LIGHT_FIRE);
-	char *argptr = arg;
+	char *argptr = arg, most_args[MAX_INPUT_LENGTH], last_arg[MAX_INPUT_LENGTH];
 	obj_data *lighter = NULL;
 	room_data *target;
 	vehicle_data *veh;
-	bool kept = FALSE;
+	bool kept = FALSE, confirmed = FALSE;
 	int number, dir;
 
+	// check for CONFIRM
+	chop_last_arg(argument, most_args, last_arg);
+	if (*last_arg && !str_cmp(last_arg, "confirm")) {
+		confirmed = TRUE;
+		argument = most_args;
+	}
+	
 	one_argument(argument, arg);
 	number = get_number(&argptr);
 
 	if (!objless) {
 		lighter = find_lighter_in_list(ch->carrying, &kept);
 	}
-
+	
 	if (!*argptr) {
 		msg_to_char(ch, "Burn what?\r\n");
 	}
@@ -4321,18 +4332,18 @@ ACMD(do_burn) {
 			msg_to_char(ch, "You can't burn anything in that direction.\r\n");
 		}
 		else {
-			do_burn_building(ch, target, lighter);
+			do_burn_building(ch, target, lighter, confirmed);
 		}
 	}
 	else if ((!str_cmp(arg, "building") || !str_cmp(arg, "build")) && IS_ANY_BUILDING(IN_ROOM(ch))) {
-		do_burn_building(ch, IN_ROOM(ch), lighter);
+		do_burn_building(ch, IN_ROOM(ch), lighter, confirmed);
 	}
 	else if (generic_find(argptr, &number, FIND_VEHICLE_ROOM | FIND_VEHICLE_INSIDE, ch, NULL, NULL, &veh)) {
 		// try burning a vehicle
-		do_light_vehicle(ch, veh, lighter);
+		do_light_vehicle(ch, veh, lighter, confirmed);
 	}
 	else if (!str_cmp(arg, "area") || !str_cmp(arg, "room") || !str_cmp(arg, "here") || isname(arg, get_room_name(IN_ROOM(ch), FALSE)) || isname(arg, GET_SECT_NAME(SECT(IN_ROOM(ch))))) {
-		do_burn_area(ch);
+		do_burn_area(ch, confirmed);
 	}
 		
 	else if (get_obj_in_list_vis_prefer_interaction(ch, argptr, &number, ch->carrying, INTERACT_LIGHT) || get_obj_in_list_vis_prefer_interaction(ch, argptr, &number, ROOM_CONTENTS(IN_ROOM(ch)), INTERACT_LIGHT)) {

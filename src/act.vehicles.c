@@ -1187,8 +1187,9 @@ void do_get_from_vehicle(char_data *ch, vehicle_data *veh, char *arg, int mode, 
 * @param char_data *ch The person trying to burn a vehicle.
 * @param vehicle_data *veh The vehicle to burn.
 * @param obj_data *lighter Optional: The lighter item, if any.
+* @param bool confirmed If TRUE, player typed 'CONFIRM' as the last argument. If FALSE, they didn't.
 */
-void do_light_vehicle(char_data *ch, vehicle_data *veh, obj_data *lighter) {
+void do_light_vehicle(char_data *ch, vehicle_data *veh, obj_data *lighter, bool confirmed) {
 	char buf[MAX_STRING_LENGTH];
 	
 	if (IS_NPC(ch)) {
@@ -1199,6 +1200,9 @@ void do_light_vehicle(char_data *ch, vehicle_data *veh, obj_data *lighter) {
 	}
 	else if (VEH_FLAGGED(veh, VEH_ON_FIRE)) {
 		msg_to_char(ch, "It is already on fire!\r\n");
+	}
+	else if (VEH_OWNER(veh) && VEH_OWNER(veh) == GET_LOYALTY(ch) && !confirmed) {
+		msg_to_char(ch, "You must type 'burn <vehicle> CONFIRM' to burn one you own.\r\n");
 	}
 	else if (VEH_OWNER(veh) && GET_LOYALTY(ch) != VEH_OWNER(veh) && !has_relationship(GET_LOYALTY(ch), VEH_OWNER(veh), DIPL_WAR)) {
 		// owned vehicle

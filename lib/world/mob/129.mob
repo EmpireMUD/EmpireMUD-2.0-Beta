@@ -306,7 +306,7 @@ time lion~
 the Lion of Time~
 The Lion of Time glimmers in the fiery sky!
 ~
-301 400 dhyDJKL cEGU 6
+301 400 dhyzDJKL cEGU 6
 2 0 0 45 -1 -1
 D
    The great lion's fur shimmers against the fiery sunset, sometimes little
@@ -400,5 +400,117 @@ The elemental is coming together from small, metallic meteorites.
 T 12836
 T 12835
 T 9903
+S
+#12961
+Awan luminous being~
+Awan of Light~
+A luminous being tends to the clouds. (list)
+~
+0 0 bdvL cnG 3
+0 0 0 15 -1 -1
+D
+   Though they have the curving form of a person, Awan seems more a bright
+light than a solid person. They gently scoop swirls of dusts into nests of
+cloud and tuck away the tiny sparks that will one day join the stars.
+~
+M
+7
+echo Awan opens their hands and sets a tiny spark in the cloudy nest.~
+M
+7
+echo Awan turns to you and shines all the brighter.~
+M
+7
+say Your arrival was written in the stars.~
+M
+7
+say Nonetheless...~
+M
+7
+say You are welcome to stay as long as you need.~
+M
+7
+say However...~
+M
+7
+say There is not much to see here yet.~
+M
+7
+say We forge ever forward...~
+M
+7
+say Creating the stars that will bring the next dawn.~
+M
+8
+echo Awan uses their hands to pile tufts of cloud around a tiny, delicate star.~
+M
+8
+echo Awan turns to you and shines all the brighter.~
+M
+8
+say Your return was written in the stars.~
+M
+8
+say Nonetheless...~
+M
+8
+say It is a wonderful surprise to see you again.~
+M
+8
+say However...~
+M
+8
+say There is not much to see here yet.~
+M
+8
+say Still, we forge forward.~
+M
+0
+$n tucks a tiny star into the clouds.~
+M
+0
+$n brushes some dust away with their hand.~
+M
+0
+$n dissolves into glimmering light and then reappears on the other side.~
+M
+0
+$n plucks a star from the cloudy nest and releases it into the sky.~
+M
+0
+$n tends to the clouds.~
+M
+0
+A newborn star sputters and sparks.~
+M
+0
+The stars twinkle from their nests.~
+T 12807
+S
+#12970
+stars unending myriad~
+the stars unending~
+Above you, myriad stars twinkle gently.
+~
+1 1 bdoD dn 1
+0 0 30 15 -1 -1
+D
+   Like tiny embers from the eternal fire, the stars twinkle over you,
+stretching out into infinity.
+~
+S
+#12971
+equinox star-forged starforged forged~
+a star-forged equinox~
+A star-forged equinox gallops across the sky.
+~
+100 200 deho mG 3
+2 0 2 22 -1 -1
+D
+   This magnificent beast is made from swirling clouds of dust lit up in
+brilliant rose and sapphire tones by thousands of twinkling stars inside. More
+constellation than steed, the equinox nevertheless stands ready to carry her
+rider through the night sky.
+~
 S
 $

@@ -350,6 +350,7 @@ obj_data *get_obj_by_vehicle(vehicle_data *veh, char *name);
 obj_data *get_obj_in_list_num(int num, obj_data *list);
 obj_data *get_obj_in_list_vnum(obj_vnum vnum, obj_data *list);
 obj_data *get_obj_in_list_vis(char_data *ch, char *name, int *number, obj_data *list);
+obj_data *get_obj_in_list_vis_prefer_flag(char_data *ch, char *name, int *number, obj_data *list, bitvector_t want_flag);
 obj_data *get_obj_in_list_vis_prefer_interaction(char_data *ch, char *name, int *number, obj_data *list, int interact_type);
 obj_data *get_obj_in_list_vis_prefer_type(char_data *ch, char *name, int *number, obj_data *list, int obj_type);
 obj_data *get_obj_in_room(room_data *room, char *name);

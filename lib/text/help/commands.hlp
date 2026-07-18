@@ -403,7 +403,7 @@ See also: BUILD, RECIPES
 #
 BURN
 
-Usage:  burn <building | vehicle | area | direction>
+Usage:  burn <building | vehicle | area | direction> [confirm]
 
 To burn something, you must have fire sticks or some other lighter. You can use
 this command to light a building on fire, either from the same tile as the
@@ -424,6 +424,8 @@ requires the 'dismantle' privilege.
 
 In the tropics, burning stumps or grassland will create fertile soil for
 planting.
+
+You must type 'confirm' after the target to burn something you own.
 
 To light torches or other items, use 'light'.
 
@@ -1443,7 +1445,8 @@ Usage:  inventory
 
 Use this command if you're uncertain about what you're carrying, or simply want
 to check that no thieves have got to your backpack. When in a storage building,
-this also checks the stored items there.
+this also checks the stored items there (use 'linventory' to see only stored
+items here, or 'einventory' to see items stored anywhere).
 
 You can also search your inventory by keyword, or use the following flags:
   &c-#&0 Only show the first # items.
@@ -1467,7 +1470,7 @@ Several toggles affect your inventory display including hide-keep,
 item-details, and item-quality.
 
 See also: EQUIPMENT, GRAB, HOLD, REMOVE, WEAR, STORE, RETRIEVE, WIELD, SWAP,
-   TOGGLE, LEVEL COLORS
+   TOGGLE, LEVEL COLORS, EINVENTORY, LINVENTORY
 #
 INTERLINK INTERLINKING
 
@@ -1603,6 +1606,18 @@ as ships. To store items in vehicles, use "put <item> <vehicle>" instead.
 This command was formerly called "boatload".
 
 See also: UNLOAD, BOARD, PUT, SAIL, SHIPS
+#
+"LOCAL INVENTORY" LOCALINVENTORY LINVENTORY LINV
+
+Usage: localinventory
+       linventory
+       linv
+
+This command lets you view items your empire has stored at your current
+location. This is the same information shown at the bottom of the regular
+'inventory' command.
+
+See also: INVENTORY, EINVENTORY, STORE, RETRIEVE
 #
 LOOK EXAMINE
 
@@ -2273,6 +2288,10 @@ Usage:  respawn
 
 When your character has died, you can still observe for a short time. When you
 are ready to respawn, use this command.
+
+You will come back at your tomb if it's on the same island or within 100 tiles
+of where you died. Otherwise, you'll come back at a random tomb your empire
+owns on the same island, or at a starting location if no tomb was available.
 
 See also: BRIEF RESPITE, DEATH, TOMB
 #

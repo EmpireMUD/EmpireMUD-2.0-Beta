@@ -970,4 +970,164 @@ C
 1 1
 T 12946
 S
+#12970
+whistle minipet stars unending~
+the unending stars minipet whistle~
+A minipet whistle for the stars unending is floating here.~
+It can summon the stars, even indoors.
+   Type 'use whistle' to permanently add a new non-combat minipet to your list.
+You can have one minipet out at a time; type 'minipets' to list, manage, and
+summon one of your minipets.
+~
+19 p a 0 0 9
+12970 0 0
+2 0
+C
+1 1
+S
+#12971
+whistle mount flying equinox star-forged starforged forged~
+a star-forged equinox flying mount whistle~
+A star-forged equinox whistle glimmers in the air.~
+   Though it's labeled a whistle, it's little more than a collection of tiny
+stars, bound together such that when you blow through it, it produces a Wow!
+signal and summons a star-forged equinox, a majestic flying mount.
+Type 'use whistle' to summon the flying mount.
+~
+3 p a 0 0 10
+12971 0 0
+10 0
+T 9910
+S
+#12972
+starseed seed golden~
+a golden starseed~
+A golden starseed floats in the air.~
+   This single golden seed is perfectly round and shines with the brilliance of
+the morning star, but casts no light around it.
+~
+3 b a 0 0 12
+0 12972 0
+4 0
+C
+1 1
+S
+#12973
+starfruit basket golden fruit gleaming~
+a gleaming basket of golden starfruit~
+A basket of golden starfruit gleams in the light.~
+   The hand-woven reed basket holds only a few of these heavy starfruits. They
+glow with the pure, bright light of the sun, though somehow they cast none of
+this light around the area. You cannot bite into them; they feel as if they're
+made of solid gold.
+~
+15 0 a 0 0 7
+32 0 0
+4 0
+C
+1 1
+I 15 12976 100.00 4 x  # SEPARATE: shining golden starfruit
+R
+4 5611 a
+S
+#12974
+starfruit fruit basket fresh~
+a basket of fresh starfruit~
+A basked of fresh starfruit has spilled on the ground.~
+   The fruits are slightly oval-shaped, but with five or six grooves running
+down them such that, when sliced, they make perfect little stars. They have a
+sweet-tart flavor and a quick, crisp texture.
+~
+6 bglC a 0 0 14
+12 12974 0
+7 672
+C
+1 1
+I 15 12975 100.00 4 x  # SEPARATE: yellow starfruit
+O+ 1 6132
+R
+4 5215 0
+S
+#12975
+starfruit fruit yellow~
+a yellow starfruit~
+A yellow starfruit is lying on the ground.~
+This curious oval fruit has several long grooves running down its length.
+~
+6 gC a 0 0 13
+2 0 0
+7 672
+C
+1 1
+I 14 12974 100.00 4 x  # COMBINE: basket of fresh starfruit
+M
+34
+Combine a few of these to get something you can plant.~
+O+ 1 6122
+R
+4 5215 0
+S
+#12976
+starfruit fruit shining golden~
+a shining golden starfruit~
+A golden starfruit shines on the ground.~
+   This oval-shaped fruit has grooves running down its length. It seems to be
+made of solid gold, and is surely worth its weight.
+~
+15 0 a 0 0 7
+8 0 0
+4 0
+C
+1 1
+I 14 12973 100.00 4 x  # COMBINE: gleaming basket of golden starfruit
+R
+4 5611 a
+S
+#12977
+starfruit basket golden fruit gleaming~
+a gleaming basket of golden starfruit~
+A basket of golden starfruit gleams in the light.~
+   The hand-woven reed basket holds only a few of these heavy starfruits. They
+glow with the pure, bright light of the sun, though somehow they cast none of
+this light around the area. You cannot bite into them; they feel as if they're
+made of solid gold.
+~
+3 0 a 0 0 9
+0 0 0
+4 0
+C
+1 1
+I 15 12976 100.00 4 x  # SEPARATE: shining golden starfruit
+T 12977
+_
+This is a temporary version to prevent workforce from harvesting it.
+~
+S
+#12978
+robe stars many~
+a robe of many stars~
+A robe of many stars hangs in the air.~
+   The leather robe has an inky color that shifts softly as light strikes it;
+in the dark, it vanishes behind the twinkling constellations embossed in
+gleaming silver and gold. The familiar shapes -- the archer, the hunter, the
+fish -- join stars unknown to cover every inch of the effortlessly light
+garment.
+~
+2 p ad 0 0 13
+0 0 0
+7 0
+A
+5 1 0
+C
+1 1
+M
+12
+Starsmith $n stands before you.~
+M
+8
+Stars twinkle to life as you slip on the Starsmith's robe.~
+M
+9
+Stars twinkle to life as $n slips on an inky robe.~
+S
 $
