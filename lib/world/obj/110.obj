@@ -790,13 +790,14 @@ A stolen egg is sitting here.~
    You've stolen the gigantic egg from the nest! Hurry, flee from its mother
 and wait for your buyer to appear.
 ~
-3 ep a 0 0 3
+3 ep a 0 0 5
 0 0 0
-14 4
+14 0
 C
 100 125
 Q 11002
 T 11053
+T 11054
 S
 #11054
 list supply~

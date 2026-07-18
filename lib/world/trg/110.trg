@@ -435,21 +435,27 @@ end
 ~
 #11053
 Stolen egg expiry~
-1 f 0 3
+1 bf 95 3
 L b 11002
 L b 11003
 L t 11002
 ~
+set chase_minutes 5
+* check timer
+if (%timestamp% - %self.var(start,0)%) < (%chase_minutes% * 60)
+  halt
+end
+*
 set actor %self.carried_by%
 if !%actor%
-  return 1
+  %echo% ~%self% breaks.
+  %purge% %self%
   halt
 end
 if %actor.fighting%
   * If the egg timer expires: if the player is fighting, they lose the egg.
   set enemy %actor.fighting%
   %send% %actor% The fight with ~%enemy% destroys the stolen egg!
-  return 0
   %purge% %self%
   halt
 else
@@ -466,10 +472,18 @@ else
   %quest% %actor% trigger 11002
   %send% %actor% ~%mob% takes the egg from you.
   %send% %actor% Type 'finish Steal the Egg' to complete the quest.
-  return 0
+  * brief pause
+  dg_affect %actor% IMMOBILIZED on 5
   %purge% %self%
   halt
 end
 * Impossible to get here
+~
+#11054
+Stolen egg init~
+1 n 100 0
+~
+set start %timestamp%
+remote start %self.id%
 ~
 $
