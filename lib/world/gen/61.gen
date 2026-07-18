@@ -46,7 +46,7 @@ S
 small temperate fruit~
 6 a
 0 6122 0 0
-R 6120
+R 6126
 T0
 small temperate fruits~
 S
@@ -54,7 +54,7 @@ S
 small tropical fruit~
 6 a
 0 6123 0 0
-R 6120
+R 6126
 T0
 small tropical fruits~
 S
@@ -62,7 +62,7 @@ S
 small desert fruit~
 6 a
 0 6124 0 0
-R 6120
+R 6126
 T0
 small desert fruits~
 S
@@ -72,7 +72,15 @@ small cooked fruit~
 0 6125 0 0
 R 6120
 T0
-small cooked fruit~
+small cooked fruits~
+S
+#6126
+small raw fruit~
+6 a
+0 6126 0 0
+R 6120
+T0
+small raw fruits~
 S
 #6130
 large fruit~
@@ -94,7 +102,7 @@ S
 large temperate fruit~
 6 a
 0 6132 0 0
-R 6130
+R 6136
 T0
 large temperate fruits~
 S
@@ -102,7 +110,7 @@ S
 large tropical fruit~
 6 a
 0 6133 0 0
-R 6130
+R 6136
 T0
 large tropical fruits~
 S
@@ -110,7 +118,7 @@ S
 large desert fruit~
 6 a
 0 6134 0 0
-R 6130
+R 6136
 T0
 large desert fruits~
 S
@@ -121,6 +129,14 @@ large cooked fruit~
 R 6130
 T0
 large cooked fruits~
+S
+#6136
+large raw fruit~
+6 a
+0 6136 0 0
+R 6130
+T0
+large raw fruits~
 S
 #6140
 small vegetable~
