@@ -4773,7 +4773,7 @@ bool has_resources(char_data *ch, struct resource_data *list, bool ground, bool 
 				}
 				case RES_TOOL: {
 					prettier_sprintbit(res->vnum, tool_flags, buf);
-					msg_to_char(ch, "%s %d more %s (tool%s)", (ok ? prefix : ","), res->amount, buf, PLURAL(res->amount));
+					msg_to_char(ch, "%s %d more %s (tool%s, not equipped/kept)", (ok ? prefix : ","), res->amount, buf, PLURAL(res->amount));
 					break;
 				}
 				case RES_COINS: {
