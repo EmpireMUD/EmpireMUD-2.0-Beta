@@ -3731,7 +3731,8 @@ void perform_abandon_vehicle(vehicle_data *veh) {
 			abandon_room(VEH_INTERIOR_HOME_ROOM(veh));
 		}
 		
-		adjust_vehicle_tech(veh, GET_ISLAND_ID(IN_ROOM(veh)), FALSE);
+		// adjust_vehicle_tech(veh, GET_ISLAND_ID(IN_ROOM(veh)), FALSE);
+		unapply_vehicle_to_island(veh);
 		
 		// remove territory entry?
 		if (emp && (vter = find_empire_vehicle_entry(emp, veh))) {
