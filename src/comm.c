@@ -2901,8 +2901,10 @@ int process_input(descriptor_data *t) {
 			
 			if (!replaced) {
 				// no match
-				SEND_TO_Q(input+1, t);
-				SEND_TO_Q(" not found in command history.\r\n", t);
+				if (*commandln) {
+					SEND_TO_Q(commandln, t);
+					SEND_TO_Q(" not found in command history.\r\n", t);
+				}
 				do_not_add = TRUE;
 				strcpy(input, "");
 			}
