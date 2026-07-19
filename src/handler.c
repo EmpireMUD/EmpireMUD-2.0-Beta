@@ -11079,9 +11079,6 @@ void read_vault(empire_data *emp) {
 	}
 	
 	// items mid-shipment
-	
-	
-	// move all shipping entries over
 	DL_FOREACH(EMPIRE_SHIPPING_LIST(emp), sd) {
 		if (sd->amount > 0 && sd->vnum != NOTHING && (proto = obj_proto(sd->vnum))) {
 			if (IS_WEALTH_ITEM(proto)) {
