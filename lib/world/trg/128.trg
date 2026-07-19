@@ -690,6 +690,14 @@ Celestial Forge: Lonely boss despawn~
 0 ab 20 0
 ~
 if !%self.room.players_present%
+  * remove accessory item?
+  if %self.vnum% == 12897
+    set obj %room.contents(12918)%
+    if %obj%
+      %purge% %obj%
+    end
+  end
+  * and purge me
   %purge% %self%
 end
 ~
