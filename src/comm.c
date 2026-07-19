@@ -2902,10 +2902,10 @@ int process_input(descriptor_data *t) {
 			if (!replaced) {
 				// no match
 				if (*commandln) {
+					SEND_TO_Q("'", t);
 					SEND_TO_Q(commandln, t);
-					SEND_TO_Q(" not found in command history.\r\n", t);
+					SEND_TO_Q("' not found in command history.\r\n", t);
 				}
-				do_not_add = TRUE;
 				strcpy(input, "");
 			}
 		}
