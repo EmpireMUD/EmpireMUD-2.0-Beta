@@ -1215,12 +1215,7 @@ void start_dismantle_vehicle(vehicle_data *veh, char_data *ch) {
 	if (VEH_OWNER(veh) && VEH_IS_COMPLETE(veh)) {
 		qt_empire_players_vehicle(VEH_OWNER(veh), qt_lose_vehicle, veh);
 		et_lose_vehicle(VEH_OWNER(veh), veh);
-		adjust_vehicle_tech(veh, GET_ISLAND_ID(IN_ROOM(veh)), FALSE);
-		
-		// adjust tech on interior
-		LL_FOREACH(VEH_ROOM_LIST(veh), vrl) {
-			adjust_building_tech(VEH_OWNER(veh), vrl->room, FALSE);
-		}
+		unapply_vehicle_to_island(veh);
 	}
 	
 	// any npcs living on/in it
