@@ -5657,7 +5657,6 @@ DO_ABIL(do_teleport_ability) {
 					if (pre_greet_mtrigger(fol->follower, to_room, NO_DIR, "ability", was_in)) {
 						act("$n vanishes!", TRUE, fol->follower, NULL, NULL, TO_ROOM);
 						char_to_room(fol->follower, IN_ROOM(ch));
-						send_ability_special_messages(fol->follower, vict, ovict, abil, data, NULL, 0);
 						
 						if (!enter_triggers(fol->follower, NO_DIR, "ability", TRUE, was_in) || !greet_triggers(fol->follower, NO_DIR, "ability", TRUE, was_in)) {
 							char_from_room(fol->follower);
@@ -5666,7 +5665,8 @@ DO_ABIL(do_teleport_ability) {
 						else {
 							look_at_room(fol->follower);
 						}
-						act("$n appears!", TRUE, fol->follower, NULL, NULL, TO_ROOM);
+						
+						send_ability_special_messages(fol->follower, vict, ovict, abil, data, NULL, 0);
 					}
 				}
 			}
