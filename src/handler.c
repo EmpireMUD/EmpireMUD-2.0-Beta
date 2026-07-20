@@ -533,6 +533,7 @@ void cancel_permanent_affects_room(room_data *room) {
 * @param int flags ADD_ or AVG_ + DURATION or MODIFIER (bitvectors)
 */
 void affect_join(char_data *ch, struct affected_type *af, int flags) {
+	int old_val;
 	struct affected_type *af_iter;
 	generic_data *gen;
 	bool found = FALSE;
@@ -553,6 +554,8 @@ void affect_join(char_data *ch, struct affected_type *af, int flags) {
 				af_iter->expire_time = af->expire_time;
 			}
 			
+			// check modifier change
+			old_val = af_iter->modifier;
 			if (IS_SET(flags, ADD_MODIFIER)) {
 				af_iter->modifier += af->modifier;
 			}
@@ -561,6 +564,12 @@ void affect_join(char_data *ch, struct affected_type *af, int flags) {
 			}
 			else {	// otherwise keep the new modifier
 				af_iter->modifier = af->modifier;
+			}
+			
+			// process modifier change
+			if (af_iter->modifier != old_val) {
+				affect_modify(ch, af_iter->location, old_val, af_iter->bitvector, FALSE);
+				affect_modify(ch, af_iter->location, af_iter->modifier, af_iter->bitvector, TRUE);
 			}
 
 			// prior to b5.129b this removed the old aff and applied a new one,
