@@ -9,8 +9,16 @@ L w 2030
 * get a fresh copy of the companion right away.
 set ch %self.companion%
 if %self.is_npc% && %ch% && !%ch.is_npc%
-  %ch.remove_companion(%self.vnum%)%
+  nop %ch.remove_companion(%self.vnum%)%
   nop %ch.set_cooldown(2030,180)%
+elseif %self.is_npc% && %self.var(leader_id)%
+  makeuid leader %self.var(leader_id)%
+  if %leader% && !%leader.is_npc%
+    if %leader.room% == %self.room% && (%leader.fighting% == %self% || %self.is_tagged_by(%leader%)%)
+      nop %leader.remove_companion(%self.vnum%)%
+      nop %leader.set_cooldown(2030,180)%
+    end
+  end
 end
 ~
 #221

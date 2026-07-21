@@ -29,14 +29,23 @@ return 0
 ~
 #9803
 Companion dies permanently~
-0 ft 100 0
+0 ft 100 1
+L f 9809
 ~
 * This script deletes a companion's entry when it dies.
+* Pairs with script 9809 to ensure it can detect leader later
 * If the companion comes from an ability (like Bodyguard) the player will
 * get a fresh copy of the companion right away.
 set ch %self.companion%
 if %self.is_npc% && %ch% && !%ch.is_npc%
   %ch.remove_companion(%self.vnum%)%
+elseif %self.is_npc% && %self.var(leader_id)%
+  makeuid leader %self.var(leader_id)%
+  if %leader% && !%leader.is_npc%
+    if %leader.room% == %self.room% && (%leader.fighting% == %self% || %self.is_tagged_by(%leader%)%)
+      nop %leader.remove_companion(%self.vnum%)%
+    end
+  end
 end
 ~
 #9804
@@ -175,6 +184,21 @@ else
   * will show normal 'stop' output
   return 0
 end
+~
+#9809
+Companion initialization for perma-death~
+0 n 100 1
+L f 9803
+~
+* permanently store leader ID in order to detect deaths correctly
+* to be used on companions that should permanently die when killed
+* Pairs with scripts 205 and 9803
+wait 0
+if %self.companion%
+  set leader_id %self.companion.id%
+  remote leader_id %self.id%
+end
+detach 9809 %self.id%
 ~
 #9850
 Equip imm-only~
