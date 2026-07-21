@@ -5603,6 +5603,7 @@ DO_ABIL(do_summon_random_ability) {
 DO_ABIL(do_teleport_ability) {
 	room_data *was_in = IN_ROOM(ch), *to_room;
 	bool infiltrate;
+	struct follow_type *fol, *next_fol;
 	
 	to_room = (room_targ ? room_targ : (vict ? IN_ROOM(vict) : (vvict ? IN_ROOM(vvict) : ovict ? obj_room(ovict) : IN_ROOM(ch))));
 	
@@ -5650,15 +5651,23 @@ DO_ABIL(do_teleport_ability) {
 			msdp_update_room(ch);	// once we're sure we're staying
 			data->success = TRUE;
 			
-			// teleport companion, too
-			if (GET_COMPANION(ch) && !FIGHTING(GET_COMPANION(ch)) && IN_ROOM(ch) != was_in && IN_ROOM(GET_COMPANION(ch)) == was_in) {
-				act("$n vanishes!", TRUE, GET_COMPANION(ch), NULL, NULL, TO_ROOM);
-				char_to_room(GET_COMPANION(ch), IN_ROOM(ch));
-				send_ability_special_messages(GET_COMPANION(ch), vict, ovict, abil, data, NULL, 0);
-				
-				if (!enter_triggers(GET_COMPANION(ch), NO_DIR, "ability", TRUE, was_in) || !greet_triggers(GET_COMPANION(ch), NO_DIR, "ability", TRUE, was_in)) {
-					char_from_room(GET_COMPANION(ch));
-					char_to_room(GET_COMPANION(ch), was_in);
+			// teleport followers, too
+			LL_FOREACH_SAFE(ch->followers, fol, next_fol) {
+				if (IS_NPC(fol->follower) && AFF_FLAGGED(fol->follower, AFF_CHARM) && IN_ROOM(fol->follower) == was_in && !FIGHTING(fol->follower)) {
+					if (pre_greet_mtrigger(fol->follower, to_room, NO_DIR, "ability", was_in)) {
+						act("$n vanishes!", TRUE, fol->follower, NULL, NULL, TO_ROOM);
+						char_to_room(fol->follower, IN_ROOM(ch));
+						
+						if (!enter_triggers(fol->follower, NO_DIR, "ability", TRUE, was_in) || !greet_triggers(fol->follower, NO_DIR, "ability", TRUE, was_in)) {
+							char_from_room(fol->follower);
+							char_to_room(fol->follower, was_in);
+						}
+						else {
+							look_at_room(fol->follower);
+						}
+						
+						send_ability_special_messages(fol->follower, vict, ovict, abil, data, NULL, 0);
+					}
 				}
 			}
 		}

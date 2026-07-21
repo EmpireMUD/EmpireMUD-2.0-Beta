@@ -6305,8 +6305,17 @@ ACMD(do_file) {
 		msg_to_char(ch, "You are not godly enough to view that file!\r\n");
 		return;
 	}
-
-	req_lines = (*value ? atoi(value) : 15);
+	
+	// determine display size
+	if (*value) {
+		req_lines = atoi(value);
+	}
+	else if (CAN_NAWS(ch)) {
+		req_lines = GET_SCREEN_HEIGHT(ch) - 3;
+	}
+	else {
+		req_lines = 21;
+	}
 
 	/* open the requested file */
 	if (!(req_file = fopen(file_lookup[l].file, "r"))) {
@@ -6334,14 +6343,13 @@ ACMD(do_file) {
 	while (!feof(req_file) && (strlen(output) + strlen(buf) + 2) < MAX_STRING_LENGTH) {
 		cur_line++;
 		if (cur_line > (num_lines - req_lines)) {
-			strcat(output, buf);
-			strcat(output, "\r\n");
+			build_page_display(ch, "%s", show_color_codes(buf));
 		}
 		get_line(req_file, buf);
 	}
-	page_string(ch->desc, show_color_codes(output), TRUE);
 
 	fclose(req_file);
+	send_page_display(ch);
 }
 
 

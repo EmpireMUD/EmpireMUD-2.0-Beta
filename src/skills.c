@@ -2335,7 +2335,8 @@ ACMD(do_skills) {
 		
 		// good to go
 		msg_to_char(ch, "You no longer know %s.\r\n", ABIL_NAME(abil));
-
+		
+		remove_bonus_ability(ch, ABIL_VNUM(abil));
 		remove_ability(ch, abil, FALSE);
 		check_skill_sell(ch, abil);
 		queue_delayed_update(ch, CDU_SAVE);
