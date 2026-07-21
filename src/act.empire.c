@@ -6592,23 +6592,23 @@ ACMD(do_islands) {
 			line = build_page_display(ch, " %s%s - ", get_island_name_for(isle->id, ch), coord_display_room(ch, room, FALSE));
 		
 			if (item->territory > 0) {
-				append_page_display_line(line, "%s%d territory%s", (comma ? ", " : ""), item->territory);
+				append_page_display_line(line, "%s%d territory", (comma ? ", " : ""), item->territory);
 				comma = TRUE;
 			}
 			if (item->einv_size > 0) {
-				append_page_display_line(line, "%d einventory%s", (comma ? ", " : ""), item->einv_size);
+				append_page_display_line(line, "%s%d einventory", (comma ? ", " : ""), item->einv_size);
 				comma = TRUE;
 			}
 			if (item->warehouse_size > 0) {
-				append_page_display_line(line, "%d warehouse%s", (comma ? ", " : ""), item->warehouse_size);
+				append_page_display_line(line, "%s%d warehouse", (comma ? ", " : ""), item->warehouse_size);
 				comma = TRUE;
 			}
 			if (item->shipping_size > 0) {
-				append_page_display_line(line, "%d shipping%s", (comma ? ", " : ""), item->shipping_size);
+				append_page_display_line(line, "%s%d shipping", (comma ? ", " : ""), item->shipping_size);
 				comma = TRUE;
 			}
 			if (item->population > 0) {
-				append_page_display_line(line, "%d citizen%s", (comma ? ", " : ""), item->population);
+				append_page_display_line(line, "%s%d citizen%s", (comma ? ", " : ""), item->population, PLURAL(item->population));
 				comma = TRUE;
 			}
 		}
