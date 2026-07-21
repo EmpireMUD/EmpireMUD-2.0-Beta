@@ -2495,14 +2495,33 @@ ACMD(do_gen_door) {
 	ex = find_exit(IN_ROOM(ch), door);
 
 	if ((obj) || (ex)) {
-		if (!(DOOR_IS_OPENABLE(ch, obj, ex)))
-			act("You can't $F that!", FALSE, ch, 0, cmd_door[subcmd], TO_CHAR | ACT_STR_VICT);
-		else if (!DOOR_IS_OPEN(ch, obj, ex) && IS_SET(flags_door[subcmd], NEED_OPEN))
-			send_to_char("But it's already closed!\r\n", ch);
-		else if (!DOOR_IS_CLOSED(ch, obj, ex) && IS_SET(flags_door[subcmd], NEED_CLOSED))
-			send_to_char("But it's currently open!\r\n", ch);
-		else
+		if (!(DOOR_IS_OPENABLE(ch, obj, ex))) {
+			if (obj) {
+				act("You can't $F $p!", FALSE, ch, obj, cmd_door[subcmd], TO_CHAR | ACT_STR_VICT);
+			}
+			else {
+				act("You can't $F that!", FALSE, ch, NULL, cmd_door[subcmd], TO_CHAR | ACT_STR_VICT);
+			}
+		}
+		else if (!DOOR_IS_OPEN(ch, obj, ex) && IS_SET(flags_door[subcmd], NEED_OPEN)) {
+			if (obj) {
+				act("But $p is already closed!", FALSE, ch, obj, NULL, TO_CHAR);
+			}
+			else {
+				send_to_char("But it's already closed!\r\n", ch);
+			}
+		}
+		else if (!DOOR_IS_CLOSED(ch, obj, ex) && IS_SET(flags_door[subcmd], NEED_CLOSED)) {
+			if (obj) {
+				act("But $p is currently open!", FALSE, ch, obj, NULL, TO_CHAR);
+			}
+			else {
+				send_to_char("But it's currently open!\r\n", ch);
+			}
+		}
+		else {
 			do_doorcmd(ch, obj, door, subcmd);
+		}
 	}
 	return;
 }
