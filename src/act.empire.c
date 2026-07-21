@@ -6507,6 +6507,7 @@ ACMD(do_home) {
 
 
 ACMD(do_islands) {
+	bool comma;
 	char emp_arg[MAX_INPUT_LENGTH];
 	struct do_islands_data *item, *next_item, *list = NULL;
 	struct empire_island *eisle, *next_eisle;
@@ -6587,22 +6588,28 @@ ACMD(do_islands) {
 		if (item->territory > 0 || item->einv_size > 0 || item->warehouse_size > 0 || item->shipping_size > 0 || item->population > 0) {
 			isle = get_island(item->id, TRUE);
 			room = real_room(isle->center);
+			comma = FALSE;
 			line = build_page_display(ch, " %s%s - ", get_island_name_for(isle->id, ch), coord_display_room(ch, room, FALSE));
 		
 			if (item->territory > 0) {
-				append_page_display_line(line, "%d territory%s", item->territory, (item->einv_size > 0 || item->population > 0) ? ", " : "");
+				append_page_display_line(line, "%s%d territory%s", (comma ? ", " : ""), item->territory);
+				comma = TRUE;
 			}
 			if (item->einv_size > 0) {
-				append_page_display_line(line, "%d einventory%s", item->einv_size, (item->population > 0) ? ", " : "");
+				append_page_display_line(line, "%d einventory%s", (comma ? ", " : ""), item->einv_size);
+				comma = TRUE;
 			}
 			if (item->warehouse_size > 0) {
-				append_page_display_line(line, "%d warehouse%s", item->einv_size, (item->population > 0) ? ", " : "");
+				append_page_display_line(line, "%d warehouse%s", (comma ? ", " : ""), item->warehouse_size);
+				comma = TRUE;
 			}
 			if (item->shipping_size > 0) {
-				append_page_display_line(line, "%d shipping%s", item->einv_size, (item->population > 0) ? ", " : "");
+				append_page_display_line(line, "%d shipping%s", (comma ? ", " : ""), item->shipping_size);
+				comma = TRUE;
 			}
 			if (item->population > 0) {
-				append_page_display_line(line, "%d citizen%s", item->population, PLURAL(item->population));
+				append_page_display_line(line, "%d citizen%s", (comma ? ", " : ""), item->population);
+				comma = TRUE;
 			}
 		}
 		
