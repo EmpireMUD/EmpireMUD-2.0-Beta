@@ -1162,6 +1162,10 @@ ACMD(do_boost) {
 		msg_to_char(ch, "You don't know how to boost '%s'.\r\n", arg);
 		return;
 	}
+	if (boost_data[pos].role != ROLE_NONE && GET_CLASS_ROLE(ch) != boost_data[pos].role) {	// no valid choice
+		msg_to_char(ch, "You need to be in the %s%s\t0 role to boost that.\r\n", class_role_color[boost_data[pos].role], class_role[boost_data[pos].role]);
+		return;
+	}
 	
 	// final checks:
 	if (boost_data[pos].main_att != NOTHING && GET_ATT(ch, boost_data[pos].main_att) >= att_max(ch)) {
