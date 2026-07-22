@@ -678,8 +678,9 @@ void replace_color_codes(char *string, char *new_color) {
 * @param room_data *to_room The room being looked at.
 * @param char *icon_buf The buffer where the icon is stored -- text in this buffer will be replaced.
 * @param int tileset Which tile set (season) to pull icons from.
+* @param bool is_vehicle If TRUE, uses the regular sector for this room rather than base sector.
 */
-void replace_icon_codes(char_data *ch, room_data *to_room, char *icon_buf, int tileset) {
+void replace_icon_codes(char_data *ch, room_data *to_room, char *icon_buf, int tileset, bool is_vehicle) {
 	struct icon_data *icon;
 	sector_data *sect;
 	char temp[256];
@@ -693,15 +694,16 @@ void replace_icon_codes(char_data *ch, room_data *to_room, char *icon_buf, int t
 		
 		// here (@.) roadside icon
 		if (strstr(icon_buf, "@.")) {
-			icon = get_icon_from_set(GET_SECT_ICONS(BASE_SECT(to_room)), tileset);
-			sprintf(temp, "%s%c", icon ? icon->color : "&0", GET_SECT_ROADSIDE_ICON(BASE_SECT(to_room)));
+			sect = is_vehicle ? SECT(to_room) : BASE_SECT(to_room);
+			icon = get_icon_from_set(GET_SECT_ICONS(sect), tileset);
+			sprintf(temp, "%s%c", icon ? icon->color : "&0", GET_SECT_ROADSIDE_ICON(sect));
 			str = str_replace("@.", temp, icon_buf);
 			strcpy(icon_buf, partial_room_icon(ch, to_room, str, 4));
 			free(str);
 		}
 		// east (@e) tile attachment
 		if (strstr(icon_buf, "@e")) {
-			sect = r_east ? BASE_SECT(r_east) : BASE_SECT(to_room);
+			sect = r_east ? BASE_SECT(r_east) : (is_vehicle ? SECT(to_room) : BASE_SECT(to_room));
 			icon = get_icon_from_set(GET_SECT_ICONS(sect), tileset);
 			sprintf(temp, "%s%c", icon ? icon->color : "&0", GET_SECT_ROADSIDE_ICON(sect));
 			str = str_replace("@e", temp, icon_buf);
@@ -710,7 +712,7 @@ void replace_icon_codes(char_data *ch, room_data *to_room, char *icon_buf, int t
 		}
 		// west (@w) tile attachment
 		if (strstr(icon_buf, "@w")) {
-			sect = r_west ? BASE_SECT(r_west) : BASE_SECT(to_room);
+			sect = r_west ? BASE_SECT(r_west) : (is_vehicle ? SECT(to_room) : BASE_SECT(to_room));
 			icon = get_icon_from_set(GET_SECT_ICONS(sect), tileset);
 			sprintf(temp, "%s%c", icon ? icon->color : "&0", GET_SECT_ROADSIDE_ICON(sect));
 			str = str_replace("@w", temp, icon_buf);
@@ -734,7 +736,8 @@ void replace_icon_codes(char_data *ch, room_data *to_room, char *icon_buf, int t
 			}
 			else {
 				// west is not a barrier
-				sprintf(temp, "&?%c", GET_SECT_ROADSIDE_ICON(BASE_SECT(to_room)));
+				sect = (is_vehicle ? SECT(to_room) : BASE_SECT(to_room));
+				sprintf(temp, "&?%c", GET_SECT_ROADSIDE_ICON(sect));
 				str = str_replace("@u", temp, icon_buf);
 				strcpy(icon_buf, str);
 				free(str);
@@ -760,7 +763,8 @@ void replace_icon_codes(char_data *ch, room_data *to_room, char *icon_buf, int t
 			}
 			else {
 				// east is not a barrier
-				sprintf(temp, "&?%c", GET_SECT_ROADSIDE_ICON(BASE_SECT(to_room)));
+				sect = (is_vehicle ? SECT(to_room) : BASE_SECT(to_room));
+				sprintf(temp, "&?%c", GET_SECT_ROADSIDE_ICON(sect));
 				str = str_replace("@v", temp, icon_buf);
 				strcpy(icon_buf, str);
 				free(str);
@@ -2292,7 +2296,7 @@ static void show_map_to_char(char_data *ch, struct mappc_data_container *mappc, 
 		strcpy(show_icon, "????");
 	}
 	
-	replace_icon_codes(ch, to_room, show_icon, tileset);
+	replace_icon_codes(ch, to_room, show_icon, tileset, veh_is_shown);
 	
 	// 3. Check for special icon coloring including &?
 	if (IS_BURNING(to_room)) {
@@ -2434,13 +2438,13 @@ static void show_map_to_char(char_data *ch, struct mappc_data_container *mappc, 
 			build_vehicle_icon(ch, to_room, show_veh, TRUE, veh_icon);
 			
 			// memorize building-vehicle icon
-			replace_icon_codes(ch, to_room, veh_icon, tileset);
+			replace_icon_codes(ch, to_room, veh_icon, tileset, TRUE);
 			add_player_map_memory(ch, GET_ROOM_VNUM(to_room), veh_icon, NULL, 0);
 		}
 		else {
 			// memorize map icon (may be a map building)
 			// TODO: should this ignore chameleon buildings and show the terrain instead? if so, split buildings from other icons
-			replace_icon_codes(ch, to_room, map_icon, tileset);
+			replace_icon_codes(ch, to_room, map_icon, tileset, FALSE);
 			add_player_map_memory(ch, GET_ROOM_VNUM(to_room), map_icon, NULL, 0);
 		}
 		
