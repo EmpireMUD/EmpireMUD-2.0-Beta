@@ -3143,7 +3143,7 @@ void do_chore_shearing(empire_data *emp, room_data *room, vehicle_data *veh) {
 	char_data *mob, *shearable = NULL;
 	obj_data *proto;
 	
-	bool any_already_sheared = FALSE;
+	bool any_already_sheared = FALSE, over_limit = TRUE;
 	struct interact_exclusion_data *excl = NULL;
 	struct interaction_item *interact;
 	bool found;
@@ -3167,6 +3167,7 @@ void do_chore_shearing(empire_data *emp, room_data *room, vehicle_data *veh) {
 					continue;
 				}
 				if (!can_gain_chore_resource(emp, room, CHORE_SHEARING, interact->vnum)) {
+					over_limit = TRUE;
 					continue;
 				}
 				
@@ -3208,7 +3209,7 @@ void do_chore_shearing(empire_data *emp, room_data *room, vehicle_data *veh) {
 			charge_workforce(emp, CHORE_SHEARING, room, worker, 1, NOTHING, 0);
 		}
 	}
-	else {
+	else if (any_already_sheared || over_limit) {
 		mark_workforce_delay(emp, room, CHORE_SHEARING, any_already_sheared ? WF_PROB_ALREADY_SHEARED : WF_PROB_OVER_LIMIT);
 		log_workforce_problem(emp, room, CHORE_SHEARING, any_already_sheared ? WF_PROB_ALREADY_SHEARED : WF_PROB_OVER_LIMIT, FALSE);
 	}
