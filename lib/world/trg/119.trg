@@ -5750,7 +5750,10 @@ if %room.template% == 11971 && %random.4% == 4
   eval vnum 11853 + %random.5%
   %load% mob %vnum%
   set mob %room.people%
-  %echo% ~%mob% springs from the fountain!
+  if %mob.vnum% == %vnum%
+    %echo% ~%mob% springs from the fountain!
+    nop %mob.remove_mob_flag(SPAWNED)%
+  end
 elseif %room.people%
   * echo-only version
   if %room.people.fighting%
