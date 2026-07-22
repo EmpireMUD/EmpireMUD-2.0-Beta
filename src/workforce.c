@@ -3143,7 +3143,7 @@ void do_chore_shearing(empire_data *emp, room_data *room, vehicle_data *veh) {
 	char_data *mob, *shearable = NULL;
 	obj_data *proto;
 	
-	bool any_already_sheared = FALSE, over_limit = TRUE;
+	bool any_already_sheared = FALSE, over_limit = FALSE;
 	struct interact_exclusion_data *excl = NULL;
 	struct interaction_item *interact;
 	bool found;
