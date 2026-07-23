@@ -2262,7 +2262,6 @@ static void show_map_to_char(char_data *ch, struct mappc_data_container *mappc, 
 	
 	// check for a vehicle with an icon: we do this even if it won't be displayed later (because it may be stored as the tile icon)
 	if (show_veh && VEH_HAS_ANY_ICON(show_veh)) {
-		// strcpy(veh_icon, VEH_ICON(show_veh));
 		build_vehicle_icon(ch, to_room, show_veh, FALSE, veh_icon);
 	}
 	
@@ -2337,8 +2336,7 @@ static void show_map_to_char(char_data *ch, struct mappc_data_container *mappc, 
 		}
 		else if (PRF_FLAGGED(ch, PRF_INFORMATIVE) && !show_dark) {
 			if (show_veh) {
-				// no need -- show_icon should already be colored for this
-				// sprintf(show_icon, "%s%s", get_informative_color_veh(ch, show_veh), no_color);
+				sprintf(show_icon, "%s%s", get_informative_color_veh(ch, show_veh), no_color);
 			}
 			else {
 				sprintf(show_icon, "%s%s", get_informative_color_room(ch, to_room), no_color);
