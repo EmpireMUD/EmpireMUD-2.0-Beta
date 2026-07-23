@@ -4478,7 +4478,7 @@ void do_stat_vehicle(char_data *ch, vehicle_data *veh, bool details) {
 	struct depletion_data *dep;
 	obj_data *obj;
 	bool comma;
-	int count, found;
+	int count, found, max, prc;
 	struct string_hash *str_iter, *next_str, *str_hash = NULL;
 	struct page_display *line;
 	
@@ -4587,9 +4587,17 @@ void do_stat_vehicle(char_data *ch, vehicle_data *veh, bool details) {
 		line = build_page_display(ch, "Depletion: ");
 		
 		comma = FALSE;
-		for (dep = VEH_DEPLETION(veh); dep; dep = dep->next) {
+		LL_FOREACH(VEH_DEPLETION(veh), dep) {
 			if (dep->type < NUM_DEPLETION_TYPES) {
-				append_page_display_line(line, "%s%s (%d)", comma ? ", " : "", depletion_types[dep->type], dep->count);
+				max = get_depletion_max(IN_ROOM(ch), dep->type);
+				if (max > 0 && dep->count > 0) {
+					prc = dep->count * 100 / max;
+					prc = MIN(100, MAX(1, prc)) / 25;
+					append_page_display_line(line, "%s%s (%d, %d%%)", comma ? ", " : "", depletion_types[dep->type], dep->count, prc);
+				}
+				else {
+					append_page_display_line(line, "%s%s (%d)", comma ? ", " : "", depletion_types[dep->type], dep->count);
+				}
 				comma = TRUE;
 			}
 		}
