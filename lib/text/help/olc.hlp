@@ -11071,6 +11071,7 @@ Fields:
   &c-extradesc&0 - has a specific keyword in its extra descs
   &c-fame -fameover -fameunder&0 - specific fame amount
   &c-flagged -unflagged&0 - see HELP VEDIT FLAGS
+  &c-forbidclimate&0 - see HELP CLIMATE FLAGS
   &c-functions&0 - see HELP VEDIT FUNCTIONS
   &c-icon -halficon -quartericon&0 - match the text of one of the icon fields;
      use e.g. "-icon any" to check if it has one at all.
@@ -11080,6 +11081,7 @@ Fields:
   &c-level&0 - matches anything where this level is within the range
   &c-military -militaryover -militaryunder&0 - specific military value
   &c-movetype&0 - see HELP VEDIT MOVETYPE
+  &c-requiresclimate&0 - see HELP CLIMATE FLAGS
   &c-rooms -roomsover -roomsunder&0 - specific extra rooms value
   &c-sizeunder -sizeover&0 - check a range of sizes (inclusive)
   &c-speed&0 - see HELP VEDIT SPEED
