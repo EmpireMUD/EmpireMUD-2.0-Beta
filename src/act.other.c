@@ -154,6 +154,8 @@ void do_customize_road(char_data *ch, char *argument) {
 * @param obj_data *cont Optional: The liquid container full of water (may be NULL).
 */
 void do_douse_obj(char_data *ch, obj_data *obj, obj_data *cont) {
+	bool send_throw_away = CAN_WEAR(obj, ITEM_WEAR_TAKE) ? TRUE : FALSE;
+	
 	if (!IS_LIGHT(obj)) {
 		msg_to_char(ch, "You can't douse that -- it's not a light or fire.\r\n");
 	}
@@ -195,7 +197,7 @@ void do_douse_obj(char_data *ch, obj_data *obj, obj_data *cont) {
 		}
 		
 		// douse it -- this may extract the item
-		if (douse_light(obj) == FALSE) {
+		if (douse_light(obj) == FALSE && send_throw_away) {
 			msg_to_char(ch, "It's used up and you throw it away.\r\n");
 		}
 	}
