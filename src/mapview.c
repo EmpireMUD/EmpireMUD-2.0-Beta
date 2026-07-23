@@ -2337,7 +2337,8 @@ static void show_map_to_char(char_data *ch, struct mappc_data_container *mappc, 
 		}
 		else if (PRF_FLAGGED(ch, PRF_INFORMATIVE) && !show_dark) {
 			if (show_veh) {
-				sprintf(show_icon, "%s%s", get_informative_color_veh(ch, show_veh), no_color);
+				// no need -- show_icon should already be colored for this
+				// sprintf(show_icon, "%s%s", get_informative_color_veh(ch, show_veh), no_color);
 			}
 			else {
 				sprintf(show_icon, "%s%s", get_informative_color_room(ch, to_room), no_color);
