@@ -2,7 +2,7 @@
 Wintry Forest~
 A Wintry Forest~
 &W^^^^~
-1000 0 d 0
+1000 0 dA 0
 0 0 0 -1
 E
 trees snow forest wintry winter around~
@@ -13,7 +13,7 @@ S
 Wintry Grove~
 A Wintry Desert Grove~
 &W..^.~
-1000 0 d 0
+1000 0 dA 0
 0 0 0 -1
 E
 trees snow wintry grove winter around~
@@ -24,7 +24,7 @@ S
 Giant Shoe~
 A Giant Shoe~
 &0&u| `n&0~
-1000 0 d 0
+1000 0 dA 0
 0 0 0 -1
 C
 adventure~
@@ -37,7 +37,7 @@ S
 Goblin Mine~
 A Goblin Mine Shaft~
 /&0[]&?\~
-1000 0 beR 0
+1000 0 beAR 0
 0 0 0 -1
 C
 adventure~

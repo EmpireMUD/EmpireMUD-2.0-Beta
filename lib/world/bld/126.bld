@@ -2,7 +2,7 @@
 Elemental Rift~
 A Rift Between Worlds~
 &o\()/~
-1000 0 d 0
+1000 0 dA 0
 0 0 0 -1
 E
 rift elemental~
@@ -42,7 +42,7 @@ S
 Gleaming Plant~
 A Gleaming Plant in the Jungle~
 @.&W*&r\@.~
-15 0 bdj 0
+15 0 bdjA 0
 0 0 0 -1
 A
 d
@@ -58,7 +58,7 @@ S
 Glowing Plant~
 A Glowing Plant in the Jungle~
 @.&Y*&L|@.~
-15 0 bdj 0
+15 0 bdjA 0
 0 0 0 -1
 A
 d
@@ -113,7 +113,7 @@ S
 Grove Portal~
 A Portal in the Forest~
 @.&L()@.~
-50 0 d 0
+50 0 dA 0
 0 0 0 -1
 C
 enter portal~
