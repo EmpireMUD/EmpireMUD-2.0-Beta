@@ -2200,6 +2200,11 @@ static void PerformSubnegotiation(descriptor_t *apDescriptor, char aCmd, char *a
 					/* We know for certain that this client does not have support */
 					pProtocol->b256Support = eNO;
 				}
+				else if (MatchString(pClientName, "FADO")) {
+					// newer MUD client with 256-color support
+					pProtocol->pVariables[eMSDP_XTERM_256_COLORS]->ValueInt = 1;
+					pProtocol->b256Support = eYES;
+				}
 			}
 			break;
 		}
