@@ -3956,7 +3956,7 @@ const char *bld_flags[] = {
 	"SHOW-VEHICLES",
 	"IMMUNE-DAMAGE",
 	"HIDE-STORAGE-UNOWNED",	// 25
-	"*",
+	"LIGHT",
 	"*",
 	"*",
 	"SAIL",
@@ -4010,7 +4010,7 @@ const char *bld_flag_notes[] = {
 	"",	// SHOW-VEHICLES
 	"",	// IMMUNE-DAMAGE
 	"",	// 25 - HIDE-STORAGE-UNOWNED
-	"",
+	"",	// LIGHT
 	"",
 	"",
 	"can sail here",
