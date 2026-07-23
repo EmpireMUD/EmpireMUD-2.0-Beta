@@ -1319,7 +1319,7 @@ void build_vehicle_icon(char_data *ch, room_data *room, vehicle_data *main_veh, 
 		quarter[iter] = NULL;
 	}
 	
-	// include main vehicle first
+	// include main vehicle first (don't use vehicle_is_chameleon() here because we don't want to store chameleon vehicles to memory)
 	if (main_veh && (!memory_only || !VEH_IS_COMPLETE(main_veh) || !VEH_FLAGGED(main_veh, VEH_CHAMELEON)) && (!memory_only || VEH_FLAGGED(main_veh, VEH_BUILDING))) {
 		if (VEH_ICON(main_veh)) {
 			whole = partial_vehicle_icon(ch, main_veh, VEH_ICON(main_veh), WHOLE_ICON);
@@ -1343,7 +1343,7 @@ void build_vehicle_icon(char_data *ch, room_data *room, vehicle_data *main_veh, 
 			continue;	// already shown
 		}
 		if (memory_only && VEH_IS_COMPLETE(veh) && VEH_FLAGGED(veh, VEH_CHAMELEON)) {
-			continue;	// hide chameleon
+			continue;	// hide chameleon: don't use vehicle_is_chameleon() here because we don't want to store chameleon vehicles to memory
 		}
 		if (memory_only && !VEH_FLAGGED(veh, VEH_BUILDING)) {
 			continue;	// hide non-building
