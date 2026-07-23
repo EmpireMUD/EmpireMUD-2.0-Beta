@@ -1557,7 +1557,7 @@ EVENTFUNC(mob_despawn_event) {
 	}
 	
 	// animal-in-a-stable checks
-	if (MOB_FLAGGED(mob, MOB_ANIMAL) && room_has_function_and_city_ok(NULL, IN_ROOM(mob), FNC_STABLE)) {
+	if (MOB_FLAGGED(mob, MOB_ANIMAL | MOB_MOUNTABLE) && room_has_function_and_city_ok(NULL, IN_ROOM(mob), FNC_STABLE)) {
 		// check mob crowding
 		count = 0;
 		DL_FOREACH2(ROOM_PEOPLE(IN_ROOM(mob)), chiter, next_in_room) {
