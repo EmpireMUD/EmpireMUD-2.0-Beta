@@ -4589,10 +4589,10 @@ void do_stat_vehicle(char_data *ch, vehicle_data *veh, bool details) {
 		comma = FALSE;
 		LL_FOREACH(VEH_DEPLETION(veh), dep) {
 			if (dep->type < NUM_DEPLETION_TYPES) {
-				max = get_depletion_max_vehicle(veh, dep->type);
+				max = get_depletion_max_vehicle(veh , dep->type);
 				if (max > 0 && dep->count > 0) {
 					prc = dep->count * 100 / max;
-					prc = MIN(100, MAX(1, prc)) / 25;
+					prc = MIN(100, MAX(1, prc));
 					append_page_display_line(line, "%s%s (%d, %d%%)", comma ? ", " : "", depletion_types[dep->type], dep->count, prc);
 				}
 				else {
