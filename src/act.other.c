@@ -2021,28 +2021,29 @@ ACMD(do_douse) {
 	if (!obj && !use_room) {
 		msg_to_char(ch, "You have nothing to douse the fire with!\r\n");
 	}
-	else if (*arg && str_cmp(arg, "fire")) {
-		if ((veh = get_vehicle_in_room_vis(ch, arg, NULL))) {
-			do_douse_vehicle(ch, veh, obj);
-		}
-		else if (GET_ROOM_VEHICLE(IN_ROOM(ch)) && isname(arg, VEH_KEYWORDS(GET_ROOM_VEHICLE(IN_ROOM(ch))))) {
-			do_douse_vehicle(ch, GET_ROOM_VEHICLE(IN_ROOM(ch)), obj);
-		}
-		else if (generic_find(arg, NULL, FIND_OBJ_INV | FIND_OBJ_ROOM | FIND_OBJ_EQUIP, ch, NULL, &found_obj, NULL)) {
-			do_douse_obj(ch, found_obj, obj);
-		}
-		else {
-			msg_to_char(ch, "You don't see %s %s to douse!\r\n", AN(arg), arg);
-		}
-	}
-	else if (GET_ROOM_VEHICLE(IN_ROOM(ch)) && VEH_FLAGGED(GET_ROOM_VEHICLE(IN_ROOM(ch)), VEH_ON_FIRE)) {
+	else if ((!*arg || !str_cmp(arg, "fire")) && GET_ROOM_VEHICLE(IN_ROOM(ch)) && VEH_FLAGGED(GET_ROOM_VEHICLE(IN_ROOM(ch)), VEH_ON_FIRE)) {
+		// 'douse fire' in burning vehicle
 		do_douse_vehicle(ch, GET_ROOM_VEHICLE(IN_ROOM(ch)), obj);
 	}
-	else if (!IS_ANY_BUILDING(IN_ROOM(ch)) || !IS_BURNING(room)) {
+	else if ((!*arg || !str_cmp(arg, "fire")) && IS_ANY_BUILDING(IN_ROOM(ch)) && IS_BURNING(room)) {
+		// 'douse fire' in burning building
+		do_douse_room(ch, room, obj);
+	}
+	else if (!*arg) {
+		// no-arg
 		msg_to_char(ch, "There's no fire here!\r\n");
 	}
+	else if ((veh = get_vehicle_in_room_vis(ch, arg, NULL))) {
+		do_douse_vehicle(ch, veh, obj);
+	}
+	else if (GET_ROOM_VEHICLE(IN_ROOM(ch)) && isname(arg, VEH_KEYWORDS(GET_ROOM_VEHICLE(IN_ROOM(ch))))) {
+		do_douse_vehicle(ch, GET_ROOM_VEHICLE(IN_ROOM(ch)), obj);
+	}
+	else if (generic_find(arg, NULL, FIND_OBJ_INV | FIND_OBJ_ROOM | FIND_OBJ_EQUIP, ch, NULL, &found_obj, NULL)) {
+		do_douse_obj(ch, found_obj, obj);
+	}
 	else {
-		do_douse_room(ch, room, obj);
+		msg_to_char(ch, "You don't see %s %s to douse!\r\n", AN(arg), arg);
 	}
 }
 
