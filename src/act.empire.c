@@ -5155,6 +5155,16 @@ ACMD(do_efind) {
 			if (VEH_OWNER(veh) != emp && (VEH_OWNER(veh) != NULL || ROOM_OWNER(IN_ROOM(veh)) != emp)) {
 				continue;
 			}
+			
+			// vehicle contents -- BEFORE checking keywords or building
+			DL_FOREACH2(VEH_CONTAINS(veh), obj, next_content) {
+				if ((all && CAN_WEAR(obj, ITEM_WEAR_TAKE)) || (!all && isname(arg, obj->name))) {
+					add_obj_to_efind(ch, &list, obj, NULL, IN_ROOM(veh));
+					++total;
+				}
+			}
+			
+			// additional checks to show the vehicle
 			if (all && VEH_FLAGGED(veh, VEH_BUILDING)) {
 				continue;	// 'all' skips buildings
 			}
@@ -5164,14 +5174,6 @@ ACMD(do_efind) {
 			
 			add_obj_to_efind(ch, &list, NULL, veh, IN_ROOM(veh));
 			++total;
-			
-			// vehicle contents
-			DL_FOREACH2(VEH_CONTAINS(veh), obj, next_content) {
-				if ((all && CAN_WEAR(obj, ITEM_WEAR_TAKE)) || (!all && isname(arg, obj->name))) {
-					add_obj_to_efind(ch, &list, obj, NULL, IN_ROOM(veh));
-					++total;
-				}
-			}
 		}
 
 		if (total > 0) {
