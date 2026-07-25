@@ -1070,3 +1070,15 @@ OLC_MODULE(mapedit_roomtype) {
 		complete_wtrigger(IN_ROOM(ch));
 	}
 }
+
+
+OLC_MODULE(mapedit_worldreset) {
+	if (!*argument || str_cmp(argument, "confirm")) {
+		msg_to_char(ch, "You must type '.map worldreset confirm' to do this. It will cause decay on the entire map.\r\n");
+	}
+	else {
+		syslog(SYS_GC, GET_INVIS_LEV(ch), TRUE, "OLC: %s used .map worldreset", GET_NAME(ch));
+		send_config_msg(ch, "ok_string");
+		annual_world_update();
+	}
+}

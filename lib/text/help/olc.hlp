@@ -5993,6 +5993,7 @@ The following commands are available:
  &cterrain&0 - Change the tile you're standing on.
  &cunclaimable&0 - Make a tile or square of tiles unclaimable (or not).
  &cundeplete&0 - Remove depletion from a tile or vehicle.
+ &cworldreset&0 - Runs a full maintenance/decay/newbie world reset.
 
 For notes on the mud's building rules, see HELP BUILDING GUIDE.
 
@@ -6117,7 +6118,7 @@ Usage:  .map evolve [confirm]
 This command runs a regular evolution cycle on the entire map. These normally
 occur every 30 minutes.
 
-See also: MAP OLC
+See also: EVOLVER, MAP OLC
 #d
 "MAPEDIT EXIT"
 
@@ -6302,6 +6303,17 @@ Example:
  > .map unclaimable 3
 
 See also: MAP OLC, MAPEDIT TERRAIN
+#d
+"MAPEDIT WORLDRESET" "MAPEDIT WORLD RESET" "MAPEDIT YEARLY" "UTILITY YEARLY" "UTIL YEARLY"
+
+Usage:  .map worldreset [confirm]
+
+This runs a regular world reset, which normally happens every 7.5 days,
+including building decay and a refresh of the newbie islands.
+
+This command was formerly 'utility yearly'.
+
+See also: WORLD RESET
 #d
 "MAPEDIT UNDEPLETE" UNDEPLETE "REMOVE DEPLETION"
 

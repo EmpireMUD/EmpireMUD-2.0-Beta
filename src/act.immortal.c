@@ -324,7 +324,6 @@ ADMIN_UTIL(util_strlen);
 ADMIN_UTIL(util_temperature);
 ADMIN_UTIL(util_tool);
 ADMIN_UTIL(util_wipeprogress);
-ADMIN_UTIL(util_yearly);
 
 
 struct {
@@ -347,7 +346,6 @@ struct {
 	{ "temperature", LVL_START_IMM, util_temperature },
 	{ "tool", LVL_IMPL, util_tool },
 	{ "wipeprogress", LVL_CIMPL, util_wipeprogress },
-	{ "yearly", LVL_CIMPL, util_yearly },
 
 	// last
 	{ "\n", LVL_TOP+1, NULL }
@@ -1450,17 +1448,6 @@ ADMIN_UTIL(util_wipeprogress) {
 		syslog(SYS_GC, GET_INVIS_LEV(ch), TRUE, "GC: %s has wiped empire progress for %s", GET_REAL_NAME(ch), emp ? EMPIRE_NAME(emp) : "all empires");
 		send_config_msg(ch, "ok_string");
 		full_reset_empire_progress(emp);	// if NULL, does ALL
-	}
-}
-
-
-ADMIN_UTIL(util_yearly) {
-	if (!*argument || str_cmp(argument, "confirm")) {
-		msg_to_char(ch, "You must type 'util yearly confirm' to do this. It will cause decay on the entire map.\r\n");
-	}
-	else {
-		send_config_msg(ch, "ok_string");
-		annual_world_update();
 	}
 }
 
