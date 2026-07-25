@@ -5634,6 +5634,7 @@ DO_ABIL(do_teleport_ability) {
 				return;
 			}
 			
+			qt_visit_room(ch, to_room);
 			look_at_room(ch);
 			
 			send_ability_special_messages(ch, vict, ovict, abil, data, NULL, 0);
@@ -5647,7 +5648,6 @@ DO_ABIL(do_teleport_ability) {
 			
 			GET_LAST_DIR(ch) = NO_DIR;
 			RESET_LAST_MESSAGED_TEMPERATURE(ch);
-			qt_visit_room(ch, to_room);
 			msdp_update_room(ch);	// once we're sure we're staying
 			data->success = TRUE;
 			
