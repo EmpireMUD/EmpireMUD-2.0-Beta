@@ -314,7 +314,6 @@ ADMIN_UTIL(util_bldconvert);
 ADMIN_UTIL(util_clear_roles);
 ADMIN_UTIL(util_diminish);
 ADMIN_UTIL(util_exportcsv);
-ADMIN_UTIL(util_islandsize);
 ADMIN_UTIL(util_pathtest);
 ADMIN_UTIL(util_playerdump);
 ADMIN_UTIL(util_randtest);
@@ -338,7 +337,6 @@ struct {
 	{ "clearroles", LVL_CIMPL, util_clear_roles },
 	{ "diminish", LVL_START_IMM, util_diminish },
 	{ "exportcsv", LVL_CIMPL, util_exportcsv },
-	{ "islandsize", LVL_START_IMM, util_islandsize },
 	{ "pathtest", LVL_START_IMM, util_pathtest },
 	{ "playerdump", LVL_IMPL, util_playerdump },
 	{ "randtest", LVL_CIMPL, util_randtest },
@@ -1085,51 +1083,6 @@ ADMIN_UTIL(util_exportcsv) {
 		msg_to_char(ch, "Export options:\r\n");
 		msg_to_char(ch, "  equipment - All equippable items.\r\n");
 	}
-}
-
-
-// util_islandsize: helper type
-struct isf_type {
-	int island;
-	int count;
-	UT_hash_handle hh;
-};
-int sort_isf_list(struct isf_type *a, struct isf_type *b) {
-	return a->island - b->island;
-}
-
-ADMIN_UTIL(util_islandsize) {
-	struct isf_type *isf, *next_isf, *list = NULL;
-	room_data *room, *next_room;
-	int isle;
-	
-	HASH_ITER(hh, world_table, room, next_room) {
-		if (GET_ROOM_VNUM(room) < MAP_SIZE) {
-			isle = GET_ISLAND_ID(room);
-			HASH_FIND_INT(list, &isle, isf);
-			if (!isf) {
-				CREATE(isf, struct isf_type, 1);
-				isf->island = isle;
-				isf->count = 0;
-				HASH_ADD_INT(list, island, isf);
-			}
-			
-			isf->count += 1;
-		}
-	}
-	
-	HASH_SORT(list, sort_isf_list);
-	
-	build_page_display_str(ch, "Island sizes:");
-	HASH_ITER(hh, list, isf, next_isf) {
-		build_page_display(ch, "%2d: %d tile%s", isf->island, isf->count, PLURAL(isf->count));
-		
-		// free as we go
-		HASH_DEL(list, isf);
-		free(isf);
-	}
-	
-	send_page_display(ch);
 }
 
 

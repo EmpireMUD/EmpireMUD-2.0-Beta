@@ -2064,7 +2064,6 @@ Available utilities:
  &cdiminish <number> <scale>&0 - Applies the game's diminishing returns formula,
     and returns the result.
  &cexportcsv&0 - Output a csv file with some game data.
- &cislandsize&0 - Counts and displays tile counts for all islands.
  &cpathtest&0 - Test function for the pathfinding code.
  &cplayerdump&0 - Outputs a data file with tab-separated lines for all players with
     account, playtime, and host.
