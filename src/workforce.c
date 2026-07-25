@@ -2566,8 +2566,9 @@ INTERACTION_FUNC(one_farming_chore) {
 void do_chore_farming(empire_data *emp, room_data *room) {
 	char_data *worker;
 	sector_data *old_sect;
+	bool can_harvest, can_pick;
 	
-	if (CAN_INTERACT_ROOM_NO_VEH(room, INTERACT_HARVEST) && can_gain_chore_resource_from_interaction_room(emp, room, CHORE_FARMING, INTERACT_HARVEST)) {
+	if ((can_harvest = CAN_INTERACT_ROOM_NO_VEH(room, INTERACT_HARVEST)) && can_gain_chore_resource_from_interaction_room(emp, room, CHORE_FARMING, INTERACT_HARVEST)) {
 		// HARVEST mode: all at once; not able to ewt_mark_resource_worker() until we're inside the interact
 		if ((worker = find_chore_worker_in_room(emp, room, NULL, chore_data[CHORE_FARMING].mob))) {
 			// farming is free
@@ -2633,7 +2634,7 @@ void do_chore_farming(empire_data *emp, room_data *room) {
 			charge_workforce(emp, CHORE_FARMING, room, worker, 0, NOTHING, 0);
 		}
 	}
-	else if (CAN_INTERACT_ROOM_NO_VEH(room, INTERACT_PICK) && can_gain_chore_resource_from_interaction_room(emp, room, CHORE_FARMING, INTERACT_PICK)) {
+	else if ((can_pick = CAN_INTERACT_ROOM_NO_VEH(room, INTERACT_PICK)) && can_gain_chore_resource_from_interaction_room(emp, room, CHORE_FARMING, INTERACT_PICK)) {
 		// PICK mode: 1 at a time; not able to ewt_mark_resource_worker() until we're inside the interact
 		if ((worker = find_chore_worker_in_room(emp, room, NULL, chore_data[CHORE_FARMING].mob))) {
 			// farming is free
@@ -2679,7 +2680,7 @@ void do_chore_farming(empire_data *emp, room_data *room) {
 			charge_workforce(emp, CHORE_FARMING, room, worker, 0, NOTHING, 0);
 		}
 	}
-	else {
+	else if (can_harvest || can_pick) {
 		mark_workforce_delay(emp, room, CHORE_FARMING, WF_PROB_OVER_LIMIT);
 		log_workforce_problem(emp, room, CHORE_FARMING, WF_PROB_OVER_LIMIT, FALSE);
 	}
