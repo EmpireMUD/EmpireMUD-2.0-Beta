@@ -30,6 +30,10 @@
 *   Edit Modules
 */
 
+// external variables
+extern bool manual_evolutions;
+
+
  //////////////////////////////////////////////////////////////////////////////
 //// DISPLAYS ////////////////////////////////////////////////////////////////
 
@@ -588,6 +592,19 @@ OLC_MODULE(mapedit_pass_walls) {
 OLC_MODULE(mapedit_decustomize) {
 	decustomize_room(IN_ROOM(ch));
 	msg_to_char(ch, "All customizations removed on this room/area.\r\n");
+}
+
+
+OLC_MODULE(mapedit_evolve) {
+	if (!*argument || str_cmp(argument, "confirm")) {
+		msg_to_char(ch, "You must type: .map evolve confirm\r\n");
+	}
+	else {
+		syslog(SYS_GC, GET_INVIS_LEV(ch), TRUE, "OLC: %s used .map evolve", GET_NAME(ch));
+		send_config_msg(ch, "ok_string");
+		manual_evolutions = TRUE;	// triggers a log
+		run_external_evolutions();
+	}
 }
 
 

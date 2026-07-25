@@ -39,7 +39,6 @@
 */
 
 // external variables
-extern bool manual_evolutions;
 
 // external functions
 void do_stat_vehicle(char_data *ch, vehicle_data *veh, bool details);
@@ -314,7 +313,6 @@ ADMIN_UTIL(util_approval);
 ADMIN_UTIL(util_bldconvert);
 ADMIN_UTIL(util_clear_roles);
 ADMIN_UTIL(util_diminish);
-ADMIN_UTIL(util_evolve);
 ADMIN_UTIL(util_exportcsv);
 ADMIN_UTIL(util_islandsize);
 ADMIN_UTIL(util_pathtest);
@@ -339,7 +337,6 @@ struct {
 	{ "bldconvert", LVL_CIMPL, util_bldconvert },
 	{ "clearroles", LVL_CIMPL, util_clear_roles },
 	{ "diminish", LVL_START_IMM, util_diminish },
-	{ "evolve", LVL_CIMPL, util_evolve },
 	{ "exportcsv", LVL_CIMPL, util_exportcsv },
 	{ "islandsize", LVL_START_IMM, util_islandsize },
 	{ "pathtest", LVL_START_IMM, util_pathtest },
@@ -1017,14 +1014,6 @@ ADMIN_UTIL(util_diminish) {
 		
 		msg_to_char(ch, "Diminished value: %.2f\r\n", result);
 	}
-}
-
-
-ADMIN_UTIL(util_evolve) {
-	syslog(SYS_GC, GET_INVIS_LEV(ch), TRUE, "GC: %s used util evolve", GET_NAME(ch));
-	send_config_msg(ch, "ok_string");
-	manual_evolutions = TRUE;	// triggers a log
-	run_external_evolutions();
 }
 
 
