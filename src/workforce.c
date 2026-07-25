@@ -2283,7 +2283,7 @@ void do_chore_chopping(empire_data *emp, room_data *room) {
 						// done
 						stop_room_action(room, ACT_CHOPPING);
 					
-						if (!ROOM_AFF_FLAGGED(room, ROOM_AFF_NO_ABANDON) && !ROOM_SECT_FLAGGED(room, SECTF_NO_WORKFORCE_AUTOABANDON) && empire_chore_limit(emp, GET_ISLAND_ID(room), CHORE_ABANDON_CHOPPED) && (!has_evolution_type(SECT(room), EVO_BURN_STUMPS) || !empire_chore_limit(emp, GET_ISLAND_ID(room), CHORE_BURN_STUMPS))) {
+						if (!ROOM_AFF_FLAGGED(room, ROOM_AFF_NO_ABANDON) && !ROOM_SECT_FLAGGED(room, SECTF_NO_WORKFORCE_AUTOABANDON) && empire_chore_limit(emp, GET_ISLAND_ID(room), CHORE_ABANDON_CHOPPED) && (!has_evolution_type(SECT(room), EVO_BURN_STUMPS) || !empire_chore_limit(emp, GET_ISLAND_ID(room), CHORE_BURN_STUMPS)) && count_building_vehicles_in_room(room, ROOM_OWNER(room)) == 0) {
 							if (ROOM_PEOPLE(room)) {
 								act("The worker abandons the area. It is now unclaimed.", FALSE, ROOM_PEOPLE(room), NULL, NULL, TO_CHAR | TO_ROOM);
 							}
@@ -2657,7 +2657,7 @@ void do_chore_farming(empire_data *emp, room_data *room) {
 					// change to base sect
 					uncrop_tile(room);
 					
-					if (!ROOM_AFF_FLAGGED(room, ROOM_AFF_NO_ABANDON) && !ROOM_SECT_FLAGGED(room, SECTF_NO_WORKFORCE_AUTOABANDON) && empire_chore_limit(emp, GET_ISLAND_ID(room), CHORE_ABANDON_FARMED)) {
+					if (!ROOM_AFF_FLAGGED(room, ROOM_AFF_NO_ABANDON) && !ROOM_SECT_FLAGGED(room, SECTF_NO_WORKFORCE_AUTOABANDON) && empire_chore_limit(emp, GET_ISLAND_ID(room), CHORE_ABANDON_FARMED) && count_building_vehicles_in_room(room, ROOM_OWNER(room)) == 0) {
 						if (ROOM_PEOPLE(room)) {
 							act("The worker abandons the area. It is now unclaimed.", FALSE, ROOM_PEOPLE(room), NULL, NULL, TO_CHAR | TO_ROOM);
 						}
