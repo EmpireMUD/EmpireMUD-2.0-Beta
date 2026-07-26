@@ -413,6 +413,9 @@ The BONUS-HEALING gear stat, also shown on your score page as "Healing +X",
 is an amount added to any healing abilities you use. This is similar to the
 way Intelligence is added to healing.
 
+Healing from this trait does not increase the cost of spells in the way
+Intelligence of level would.
+
 See also: SCORE
 #
 BONUS-MAGICAL "BONUS MAGICAL" "MAGICAL ATTRIBUTE" "MAGICAL TRAIT"

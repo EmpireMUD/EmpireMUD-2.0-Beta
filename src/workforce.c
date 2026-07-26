@@ -2024,7 +2024,12 @@ void do_chore_gen_craft(empire_data *emp, room_data *room, vehicle_data *veh, in
 		
 			// only send message if someone else is present (don't bother verifying it's a player)
 			if (ROOM_PEOPLE(IN_ROOM(worker))->next_in_room) {
-				safe_snprintf(buf, sizeof(buf), "$n finishes %s %s.", gen_craft_data[GET_CRAFT_TYPE(do_craft)].verb, get_obj_name_by_proto(GET_CRAFT_OBJECT(do_craft)));
+				if (GET_CRAFT_QUANTITY(do_craft) > 1) {
+					safe_snprintf(buf, sizeof(buf), "$n finishes %s %s (x%d).", gen_craft_data[GET_CRAFT_TYPE(do_craft)].verb, get_obj_name_by_proto(GET_CRAFT_OBJECT(do_craft)), GET_CRAFT_QUANTITY(do_craft));
+				}
+				else {
+					safe_snprintf(buf, sizeof(buf), "$n finishes %s %s.", gen_craft_data[GET_CRAFT_TYPE(do_craft)].verb, get_obj_name_by_proto(GET_CRAFT_OBJECT(do_craft)));
+				}
 				act(buf, FALSE, worker, NULL, NULL, TO_ROOM);
 			}
 		
