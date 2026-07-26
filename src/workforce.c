@@ -2344,7 +2344,7 @@ void do_chore_chopping(empire_data *emp, room_data *room) {
 			charge_workforce(emp, CHORE_CHOPPING, room, worker, 1, NOTHING, 0);
 		}
 	}
-	else {
+	else if (depleted || over_limit) {
 		mark_workforce_delay(emp, room, CHORE_CHOPPING, depleted ? WF_PROB_DEPLETED : WF_PROB_OVER_LIMIT);
 		log_workforce_problem(emp, room, CHORE_CHOPPING, depleted ? WF_PROB_DEPLETED : WF_PROB_OVER_LIMIT, FALSE);
 	}
