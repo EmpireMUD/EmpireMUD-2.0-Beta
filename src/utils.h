@@ -2206,6 +2206,7 @@ void write_one_slash_channel_message(FILE *fl, struct channel_history_data *entr
 // act.empire.c
 void add_to_empire_history(empire_data *emp, char_data *speaker, char *message, int rank);
 bool check_in_city_requirement(room_data *room, bool check_wait);
+void clean_empire_history(empire_data *emp);
 void do_burn_building(char_data *ch, room_data *room, obj_data *lighter, bool confirmed);
 void do_customize_island(char_data *ch, char *argument);
 char *empire_history_filename(empire_data *emp);

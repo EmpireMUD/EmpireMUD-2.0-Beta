@@ -28,6 +28,7 @@
 *   Global Channel Histories
 *   Pub_Comm
 *   Slash Channels
+*   Miscellaneous Channel Functions
 *   Communication Commands
 */
 
@@ -1772,6 +1773,37 @@ ACMD(do_slash_channel) {
 	}
 	else {
 		msg_to_char(ch, "You are not on a channel called '%s'.\r\n", arg);
+	}
+}
+
+
+ //////////////////////////////////////////////////////////////////////////////
+//// MISCELLANEOUS CHANNEL FUNCTIONS /////////////////////////////////////////
+
+/**
+* May be called periodically to clear global channels (not player channels such
+* as tell, which are cleaned when the player logs in).
+*/
+void clean_channel_histories(void) {
+	int iter;
+	empire_data *emp, *next_emp;
+	struct slash_channel *chan;
+	
+	// main global channels
+	for (iter = 0; iter < NUM_GLOBAL_HISTORIES && *global_history_files[iter]; ++iter) {
+		clean_global_channel(iter);
+	}
+	
+	// slash channels
+	LL_FOREACH(slash_channel_list, chan) {
+		clean_slash_channel(chan);
+	}
+	
+	// empire chats
+	HASH_ITER(hh, empire_table, emp, next_emp) {
+		if (EMPIRE_CHAT_HISTORY(emp)) {
+			clean_empire_history(emp);
+		}
 	}
 }
 
