@@ -2366,7 +2366,7 @@ static void show_map_to_char(char_data *ch, struct mappc_data_container *mappc, 
 		}
 		// need a leading color? This is ignored if the icon appears to start with a color code other than &u or &&
 		if (*show_icon != COLOUR_CHAR || *(show_icon+1) == COLOUR_CHAR || *(show_icon+1) == 'u') {
-			safe_snprintf(lbuf, sizeof(lbuf), "%s%s", icon_color, show_icon);
+			safe_snprintf(lbuf, sizeof(lbuf), "%s%s", col_buf, show_icon);
 			strcpy(show_icon, lbuf);
 		}
 	}
