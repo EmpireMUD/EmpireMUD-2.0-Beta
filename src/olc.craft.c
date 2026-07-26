@@ -174,6 +174,14 @@ bool audit_craft(craft_data *craft, char_data *ch) {
 		olc_audit_msg(ch, GET_CRAFT_VNUM(craft), "Unusual combination of SOUP and VEHICLE or BUILD");
 		problem = TRUE;
 	}
+	if (GET_CRAFT_TYPE(craft) == CRAFT_TYPE_WORKFORCE && (CRAFT_FLAGGED(craft, CRAFT_SOUP) || CRAFT_FLAGGED(craft, CRAFT_BUILDING) || CRAFT_FLAGGED(craft, CRAFT_VEHICLE))) {
+		olc_audit_msg(ch, GET_CRAFT_VNUM(craft), "WORKFORCE craft has SOUP, BUILDING, or VEHICLE type");
+		problem = TRUE;
+	}
+	if (GET_CRAFT_TYPE(craft) == CRAFT_TYPE_MILL && (CRAFT_FLAGGED(craft, CRAFT_SOUP) || CRAFT_FLAGGED(craft, CRAFT_BUILDING) || CRAFT_FLAGGED(craft, CRAFT_VEHICLE))) {
+		olc_audit_msg(ch, GET_CRAFT_VNUM(craft), "MILL craft has SOUP, BUILDING, or VEHICLE type");
+		problem = TRUE;
+	}
 	if (CRAFT_FLAGGED(craft, CRAFT_VEHICLE) && CRAFT_FLAGGED(craft, CRAFT_BUILDING)) {
 		olc_audit_msg(ch, GET_CRAFT_VNUM(craft), "Craft has both VEHICLE and BUILDING flags");
 		problem = TRUE;

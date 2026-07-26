@@ -4701,7 +4701,7 @@ switch %line%
   case 18
     say Time flows in one direction: up. It is pulled into the great tree at the roots, through the heartwood, and out the leaves and blooms. Once bound, it will be trapped in the heartwood and no time will flow.
     wait 9 sec
-    %force% %guard% say The great queen is wise. But such a thing ever been attempted?
+    %force% %guard% say The great queen is wise. But has such a thing ever been attempted?
     wait 9 sec
     say In the days of Ebsparo Neffer, her tresydions bound the heartwood of Tagra Mun, which now slumbers beyond the veil of time.
   break
@@ -5750,7 +5750,10 @@ if %room.template% == 11971 && %random.4% == 4
   eval vnum 11853 + %random.5%
   %load% mob %vnum%
   set mob %room.people%
-  %echo% ~%mob% springs from the fountain!
+  if %mob.vnum% == %vnum%
+    %echo% ~%mob% springs from the fountain!
+    nop %mob.remove_mob_flag(SPAWNED)%
+  end
 elseif %room.people%
   * echo-only version
   if %room.people.fighting%

@@ -45,6 +45,13 @@
 // local prototypes
 void update_replace_instances(const adv_vnum *vnum_list);
 
+// external prototypes used in multiple updaters
+PLAYER_UPDATE_FUNC(refresh_companions_player);
+
+// external vars used in multiple updates
+extern any_vnum refresh_companions_mob;
+extern any_vnum refresh_companions_trigger;
+
 
  //////////////////////////////////////////////////////////////////////////////
 //// BETA 2 UPDATE FUNCTIONS /////////////////////////////////////////////////
@@ -4827,6 +4834,25 @@ void b5_208_portal_triggers(void) {
 }
 
 
+// b5.210: add new triggers to some companions
+void b5_210_companion_update(void) {
+	const any_vnum BODYGUARD_VNUM = 205;
+	const any_vnum HABERDASHER_VNUM = 15922;
+	
+	const any_vnum NEW_COMPANION_TRIG = 9809;
+
+	refresh_companions_trigger = NEW_COMPANION_TRIG;
+	
+	// bodyguard
+	refresh_companions_mob = BODYGUARD_VNUM;
+	update_all_players(NULL, refresh_companions_player);
+	
+	// haperdasher
+	refresh_companions_mob = HABERDASHER_VNUM;
+	update_all_players(NULL, refresh_companions_player);
+}
+
+
 // ADD HERE, above: more beta 5 update functions
 
 
@@ -4955,6 +4981,7 @@ const struct {
 	{ "b5.206", b5_206_goblin_mines, NULL, "Re-spawning Goblin Mines" },
 	{ "b5.208", b5_204_celestial_forge, NULL, "Re-spawning Celestial Forge" },
 	{ "b5.208a", b5_208_portal_triggers, NULL, "Adding missing portal triggers" },
+	{ "b5.210", b5_210_companion_update, NULL, "Updating companions with new triggers" },
 	
 	// ADD HERE, above: more beta 5 update lines
 	

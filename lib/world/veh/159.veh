@@ -94,7 +94,7 @@ B1
 C
 75 200
 I 30 5004 100.00 1  # RUINS-TO-VEH: ruins of #n
-L kr 0
+L 0 nopst
 P
 2
 R
@@ -128,7 +128,7 @@ B1
 C
 75 200
 I 30 5006 100.00 1  # RUINS-TO-VEH: ruins of #n
-L kr 0
+L 0 nopst
 P
 2
 R
@@ -202,7 +202,7 @@ B1
 C
 75 200
 I 30 5004 100.00 1  # RUINS-TO-VEH: ruins of #n
-L kr 0
+L 0 nopst
 P
 2
 R

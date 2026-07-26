@@ -2731,7 +2731,7 @@ DO_ABIL(abil_action_devastate_area) {
 	
 	// SUCCESS: distribute resources
 	if (to_room) {
-		if (ROOM_SECT_FLAGGED(to_room, SECTF_CROP) && (cp = ROOM_CROP(to_room)) && has_interaction(GET_CROP_INTERACTIONS(cp), INTERACT_HARVEST)) {
+		if (ROOM_SECT_FLAGGED(to_room, SECTF_CROP) && (cp = ROOM_CROP(to_room)) && (has_interaction(GET_CROP_INTERACTIONS(cp), INTERACT_HARVEST) || has_interaction(GET_CROP_INTERACTIONS(cp), INTERACT_PICK))) {
 			run_room_interactions(ch, to_room, INTERACT_HARVEST, NULL, MEMBERS_ONLY, devastate_crop);
 			run_room_interactions(ch, to_room, INTERACT_PICK, NULL, MEMBERS_ONLY, devastate_crop);
 			run_room_interactions(ch, to_room, INTERACT_CHOP, NULL, MEMBERS_ONLY, devastate_trees);
@@ -3387,7 +3387,7 @@ bool check_ability_limitations(char_data *ch, ability_data *abil, char_data *vic
 			}
 			case ABIL_LIMIT_IN_CITY: {
 				bool wait = FALSE;
-				if (!ROOM_OWNER(any_room) && !is_in_city_for_empire(any_room, ROOM_OWNER(any_room), TRUE, &wait)) {
+				if (!ROOM_OWNER(any_room) || !is_in_city_for_empire(any_room, ROOM_OWNER(any_room), TRUE, &wait)) {
 					msg_to_char(ch, "You must be in a city to use that ability%s.\r\n", wait ? " (this city was founded too recently)" : "");
 					_set_fatal_error(TRUE);
 					return FALSE;
@@ -5634,6 +5634,7 @@ DO_ABIL(do_teleport_ability) {
 				return;
 			}
 			
+			qt_visit_room(ch, to_room);
 			look_at_room(ch);
 			
 			send_ability_special_messages(ch, vict, ovict, abil, data, NULL, 0);
@@ -5647,7 +5648,6 @@ DO_ABIL(do_teleport_ability) {
 			
 			GET_LAST_DIR(ch) = NO_DIR;
 			RESET_LAST_MESSAGED_TEMPERATURE(ch);
-			qt_visit_room(ch, to_room);
 			msdp_update_room(ch);	// once we're sure we're staying
 			data->success = TRUE;
 			

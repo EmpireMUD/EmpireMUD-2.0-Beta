@@ -80,37 +80,37 @@ if %open_list% ~= %self.vnum%
   * open-style ruins
   switch %random.7%
     case 1
-      %mod% %self% icon .&0_i&?.
+      %mod% %self% icon @.&0_i@.
       %mod% %self% halficon &0_i
       %mod% %self% quartericon &0i
     break
     case 2
-      %mod% %self% icon .&0[.&?.
-      %mod% %self% halficon &0[.
+      %mod% %self% icon @.&0[.@.
+      %mod% %self% halficon &0[@.
       %mod% %self% quartericon &0[
     break
     case 3
-      %mod% %self% icon .&0.v&?.
+      %mod% %self% icon @.&0.v@.
       %mod% %self% halficon &0.v
       %mod% %self% quartericon &0v
     break
     case 4
-      %mod% %self% icon .&0/]&?.
+      %mod% %self% icon @.&0/]@.
       %mod% %self% halficon &0/]
       %mod% %self% quartericon &0]
     break
     case 5
-      %mod% %self% icon .&0(\&?.
+      %mod% %self% icon @.&0(\@.
       %mod% %self% halficon &0(\
       %mod% %self% quartericon &0\
     break
     case 6
-      %mod% %self% icon .&0}\.
+      %mod% %self% icon @.&0}\@.
       %mod% %self% halficon &0}\
       %mod% %self% quartericon &0{
     break
     case 7
-      %mod% %self% icon &0..}&?.
+      %mod% %self% icon &0..}@.
       %mod% %self% halficon &0.}
       %mod% %self% quartericon &0}
     break
@@ -118,17 +118,17 @@ if %open_list% ~= %self.vnum%
 else
   switch %random.7%
     case 1
-      %mod% %self% icon ..&0/]
+      %mod% %self% icon @.@.&0/]
       %mod% %self% halficon &0/]
       %mod% %self% quartericon &0/
     break
     case 2
-      %mod% %self% icon &0[\&?..
+      %mod% %self% icon &0[\@.@.
       %mod% %self% halficon &0[\
       %mod% %self% quartericon &0\
     break
     case 3
-      %mod% %self% icon &0|\&?..
+      %mod% %self% icon &0|\@.@.
       %mod% %self% halficon &0|\
       %mod% %self% quartericon &0|
     break
@@ -138,18 +138,18 @@ else
       %mod% %self% quartericon &0[
     break
     case 5
-      %mod% %self% icon ..&0/]
+      %mod% %self% icon @.@.&0/]
       %mod% %self% halficon &0/]
       %mod% %self% quartericon &0]
     break
     case 6
-      %mod% %self% icon .&0-&?.&0]
+      %mod% %self% icon @.&0-@.&0]
       %mod% %self% halficon &0.]
       %mod% %self% quartericon &0.
     break
     case 7
-      %mod% %self% icon &0[&?.&0-&?.
-      %mod% %self% halficon &0[.
+      %mod% %self% icon &0[@.&0-@.
+      %mod% %self% halficon &0[@.
       %mod% %self% quartericon &0[
     break
   done

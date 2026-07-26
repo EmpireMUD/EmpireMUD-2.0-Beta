@@ -297,9 +297,9 @@ Silver, gold, and green strands of garland are artfully draped about the room.~
 back of the empire's storage barns.
 type: buff <target> to extend how long the ornament sticks around.
 ~
-3 v 0 0 0 8
+3 v 0 0 0 9
 0 0 0
-11 576
+11 1152
 T 16627
 S
 #16622
@@ -310,9 +310,9 @@ An artful hanging made up of candy canes dangles down in the middle of the area.
 an abstract winter scene.
 type: buff <target> to extend how long the ornament sticks around.
 ~
-3 v 0 0 0 10
+3 v 0 0 0 11
 0 0 0
-7 576
+7 1152
 T 16627
 S
 #16623
@@ -324,9 +324,9 @@ comes from within, but the design of the metal makes it impossible to see what
 causes it.
 type: buff <target> to extend how long the ornament sticks around.
 ~
-29 v 0 0 0 11
+29 v 0 0 0 12
 -1 1 0
-2 576
+2 1152
 T 16627
 S
 #16624
@@ -337,9 +337,9 @@ A set of reindeer hoofprints are clearly visible in the ground.~
 hoofprints in the ground.
 type: buff <target> to extend how long the ornament sticks around.
 ~
-3 v 0 0 0 9
+3 v 0 0 0 10
 0 0 0
-10 576
+10 1152
 T 16627
 S
 #16625

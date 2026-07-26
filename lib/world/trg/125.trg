@@ -175,6 +175,9 @@ else
     %echo% &&w~%self% draws back ^%self% right arm, lightning flickering around ^%self% clenched fist!&&0
     wait 3 sec
     set actor %self.fighting%
+    if !%actor%
+      halt
+    end
     %send% %actor% &&w|%self% lightning-charged punch smashes into you with a thunderous boom, sending you flying!&&0
     %echoaround% %actor% &&w|%self% lightning-charged punch smashes into ~%actor% with a thunderous boom, sending *%actor% flying!&&0
     %damage% %actor% 500 physical
@@ -188,6 +191,9 @@ else
     %echo% &&w~%self% draws back ^%self% right arm, lightning flickering around ^%self% clenched fist!&&0
     wait 3 sec
     set actor %self.fighting%
+    if !%actor%
+      halt
+    end
     %send% %actor% &&w|%self% lightning-charged punch crashes into you, stunning you!&&0
     %echoaround% %actor% &&w|%self% lightning-charged punch crashes into ~%actor%, stunning *%actor%!&&0
     %damage% %actor% 150 physical
@@ -340,7 +346,11 @@ if %self.varexists(parts_destroyed)%
 end
 if %self.vnum% == 12501
   %echo% &&w~%self% draws back ^%self% leg for a kick!&&0
+  set check_id %actor.id%
   wait 3 sec
+  if %actor.dead% || %actor.id% != %check_id%
+    halt
+  end
   %send% %actor% &&w~%self% kicks you hard, briefly stunning you!&&0
   %echoaround% %actor% &&w~%self% kicks ~%actor%, who looks dazed.&&0
   %damage% %actor% 200 physical
@@ -354,6 +364,9 @@ else
     %echo% &&w~%self% raises one leg high in the air, pistons shifting as &%self% gathers power...&&0
     wait 3 sec
     set actor %self.fighting%
+    if !%actor%
+      halt
+    end
     %send% %actor% &&w~%self% brings ^%self% foot down on top of you with an earth-shaking crash!&&0
     %echoaround% %actor% &&w~%self% brings ^%self% foot down on top of ~%actor% with an earth-shaking crash!&&0
     %damage% %actor% 300 physical
@@ -381,6 +394,9 @@ else
     %echo% &&w~%self% raises one leg high in the air...&&0
     wait 3 sec
     set actor %self.fighting%
+    if !%actor%
+      halt
+    end
     %send% %actor% &&w~%self% brings ^%self% foot down on top of you, pinning you to the ground!&&0
     %echoaround% %actor% &&w~%self% brings ^%self% foot down on top of ~%actor%, pinning *%actor% to the ground!&&0
     %damage% %actor% 300 physical
@@ -415,8 +431,9 @@ if %parts_destroyed% < 2
   end
   %send% %target% &&w~%self% glowers at you, and ^%self% eyes begin to glow red!&&0
   %echoaround% %target% &&w~%self% glowers at ~%target%, and ^%self% eyes begin to glow red!&&0
+  set target_id %target.id%
   wait 3 sec
-  if !%target% || %target.room% != %self.room%
+  if !%target% || %target.room% != %self.room% || %target.id% != %target_id%
     set target %self.fighting%
   end
   %send% %target% &&wThere is a blinding flash of light, and you feel unbearable heat and pain!&&0
@@ -428,8 +445,9 @@ if %parts_destroyed% < 2
 else
   %send% %target% &&w~%self% glowers at you, and ^%self% eyes begin to glow red!&&0
   %echoaround% %target% &&w~%self% glowers at ~%target%, and ^%self% eyes begin to glow red!&&0
+  set target_id %target.id%
   wait 3 sec
-  if !%target% || %target.room% != %self.room%
+  if !%target% || %target.room% != %self.room% || %target.id% != %target_id%
     set target %self.fighting%
   end
   %send% %target% &&wBeams of crimson energy fly from |%self% eyes, cutting into you!&&0

@@ -596,7 +596,9 @@ You can dismiss your companion from anywhere using 'dismiss companion'. If you
 log out with a companion active, it will automatically be re-summoned when you
 log back in (but you will have to re-cast any buffs on it).
 
-See also: DISMISS, BODYGUARD, FAMILIAR
+View your companion's health pool with the 'summary' command.
+
+See also: DISMISS, BODYGUARD, FAMILIAR, SUMMARY
 #
 COMPARE "COMPARE ITEMS"
 

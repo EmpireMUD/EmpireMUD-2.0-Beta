@@ -377,6 +377,7 @@ OLC_MODULE(mapedit_decay);
 OLC_MODULE(mapedit_decustomize);
 OLC_MODULE(mapedit_delete_exit);
 OLC_MODULE(mapedit_delete_room);
+OLC_MODULE(mapedit_evolve);
 OLC_MODULE(mapedit_exits);
 OLC_MODULE(mapedit_grow);
 OLC_MODULE(mapedit_height);
@@ -394,6 +395,7 @@ OLC_MODULE(mapedit_spawn);
 OLC_MODULE(mapedit_terrain);
 OLC_MODULE(mapedit_unclaimable);
 OLC_MODULE(mapedit_undeplete);
+OLC_MODULE(mapedit_worldreset);
 
 // morph modules
 OLC_MODULE(morphedit_ability);
@@ -991,6 +993,7 @@ const struct olc_command_data olc_data[] = {
 	{ "deleteexit", mapedit_delete_exit, OLC_MAP, OLC_CF_MAP_EDIT },
 	{ "deleteroom", mapedit_delete_room, OLC_MAP, OLC_CF_MAP_EDIT },
 	{ "description", mapedit_room_description, OLC_MAP, OLC_CF_MAP_EDIT },
+	{ "evolve", mapedit_evolve, OLC_MAP, OLC_CF_MAP_EDIT },
 	{ "exit", mapedit_exits, OLC_MAP, OLC_CF_MAP_EDIT },
 	{ "grow", mapedit_grow, OLC_MAP, OLC_CF_MAP_EDIT },
 	{ "height", mapedit_height, OLC_MAP, OLC_CF_MAP_EDIT },
@@ -1007,6 +1010,7 @@ const struct olc_command_data olc_data[] = {
 	{ "terrain", mapedit_terrain, OLC_MAP, OLC_CF_MAP_EDIT },
 	{ "unclaimable", mapedit_unclaimable, OLC_MAP, OLC_CF_MAP_EDIT },
 	{ "undeplete", mapedit_undeplete, OLC_MAP, OLC_CF_MAP_EDIT },
+	{ "worldreset", mapedit_worldreset, OLC_MAP, OLC_CF_MAP_EDIT },
 	
 	// morph commands
 	{ "apply", morphedit_apply, OLC_MORPH, OLC_CF_EDITOR },

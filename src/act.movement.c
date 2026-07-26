@@ -1468,6 +1468,9 @@ void char_through_portal(char_data *ch, obj_data *portal, bool following) {
 		return;
 	}
 	
+	// mark visit before looking so quest visits trigger in time to see the quest finish message (e.g. Enter the Soulstream)
+	qt_visit_room(ch, to_room);
+	
 	look_at_room(ch);
 	
 	if (!greet_triggers(ch, NO_DIR, "portal", TRUE, was_in)) {
@@ -1477,8 +1480,7 @@ void char_through_portal(char_data *ch, obj_data *portal, bool following) {
 		return;
 	}
 	
-	// update visit and last-dir
-	qt_visit_room(ch, to_room);
+	// room updates
 	GET_LAST_DIR(ch) = NO_DIR;
 	RESET_LAST_MESSAGED_TEMPERATURE(ch);
 	add_tracks(ch, was_in, NO_DIR, IN_ROOM(ch));
@@ -1600,7 +1602,6 @@ bool do_simple_move(char_data *ch, int dir, room_data *to_room, bitvector_t flag
 	// ACTUAL MOVEMENT
 	char_from_room(ch);
 	char_to_room(ch, to_room);
-	qt_visit_room(ch, to_room);
 
 	/* move them first, then move them back if they aren't allowed to go. */
 	/* see if an entry trigger disallows the move */
@@ -1609,6 +1610,8 @@ bool do_simple_move(char_data *ch, int dir, room_data *to_room, bitvector_t flag
 		char_to_room(ch, was_in);
 		return FALSE;
 	}
+	
+	qt_visit_room(ch, to_room);
 	
 	// MESSAGING: if we made it this far, send the messages
 	send_leave_message(ch, was_in, to_room, dir, flags);
@@ -2248,6 +2251,7 @@ ACMD(do_circle) {
 		return;
 	}
 	
+	qt_visit_room(ch, IN_ROOM(ch));
 	mark_move_time(ch);
 	if (ch->desc) {
 		look_at_room(ch);
@@ -2266,7 +2270,6 @@ ACMD(do_circle) {
 	}
 	
 	GET_LAST_DIR(ch) = dir;
-	qt_visit_room(ch, IN_ROOM(ch));
 	RESET_LAST_MESSAGED_TEMPERATURE(ch);
 	msdp_update_room(ch);	// once we're sure we're staying
 	
@@ -2495,14 +2498,33 @@ ACMD(do_gen_door) {
 	ex = find_exit(IN_ROOM(ch), door);
 
 	if ((obj) || (ex)) {
-		if (!(DOOR_IS_OPENABLE(ch, obj, ex)))
-			act("You can't $F that!", FALSE, ch, 0, cmd_door[subcmd], TO_CHAR | ACT_STR_VICT);
-		else if (!DOOR_IS_OPEN(ch, obj, ex) && IS_SET(flags_door[subcmd], NEED_OPEN))
-			send_to_char("But it's already closed!\r\n", ch);
-		else if (!DOOR_IS_CLOSED(ch, obj, ex) && IS_SET(flags_door[subcmd], NEED_CLOSED))
-			send_to_char("But it's currently open!\r\n", ch);
-		else
+		if (!(DOOR_IS_OPENABLE(ch, obj, ex))) {
+			if (obj) {
+				act("You can't $F $p!", FALSE, ch, obj, cmd_door[subcmd], TO_CHAR | ACT_STR_VICT);
+			}
+			else {
+				act("You can't $F that!", FALSE, ch, NULL, cmd_door[subcmd], TO_CHAR | ACT_STR_VICT);
+			}
+		}
+		else if (!DOOR_IS_OPEN(ch, obj, ex) && IS_SET(flags_door[subcmd], NEED_OPEN)) {
+			if (obj) {
+				act("But $p is already closed!", FALSE, ch, obj, NULL, TO_CHAR);
+			}
+			else {
+				send_to_char("But it's already closed!\r\n", ch);
+			}
+		}
+		else if (!DOOR_IS_CLOSED(ch, obj, ex) && IS_SET(flags_door[subcmd], NEED_CLOSED)) {
+			if (obj) {
+				act("But $p is currently open!", FALSE, ch, obj, NULL, TO_CHAR);
+			}
+			else {
+				send_to_char("But it's currently open!\r\n", ch);
+			}
+		}
+		else {
 			do_doorcmd(ch, obj, door, subcmd);
+		}
 	}
 	return;
 }

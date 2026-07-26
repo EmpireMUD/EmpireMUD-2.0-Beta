@@ -352,7 +352,7 @@ void do_mount_new(char_data *ch, char *argument) {
 	else if (!MOB_FLAGGED(mob, MOB_MOUNTABLE) && !IS_IMMORTAL(ch)) {
 		act("You can't ride $N!", FALSE, ch, 0, mob, TO_CHAR);
 	}
-	else if (!CAN_RIDE_MOUNT(ch, mob)) {
+	else if (!CAN_RIDE_MOUNT(ch, mob) && !IS_IMMORTAL(ch)) {
 		act("You don't have the correct ability to ride $N! (see HELP RIDE)", FALSE, ch, 0, mob, TO_CHAR);
 	}
 	else if (mob->desc || (GET_PC_NAME(mob) && (proto = mob_proto(GET_MOB_VNUM(mob))) && GET_PC_NAME(mob) != GET_PC_NAME(proto))) {

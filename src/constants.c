@@ -63,7 +63,7 @@ void tog_pvp(char_data *ch);
 //// EMPIREMUD CONSTANTS /////////////////////////////////////////////////////
 
 // Shown on the "version" command and sent over MSSP
-const char *version = "EmpireMUD 2.0 beta 5.209";
+const char *version = "EmpireMUD 2.0 beta 5.210";
 const char *DG_SCRIPT_VERSION = "DG Scripts 1.0.12 e5.1.21";
 
 
@@ -3956,7 +3956,7 @@ const char *bld_flags[] = {
 	"SHOW-VEHICLES",
 	"IMMUNE-DAMAGE",
 	"HIDE-STORAGE-UNOWNED",	// 25
-	"*",
+	"LIGHT",
 	"*",
 	"*",
 	"SAIL",
@@ -4010,7 +4010,7 @@ const char *bld_flag_notes[] = {
 	"",	// SHOW-VEHICLES
 	"",	// IMMUNE-DAMAGE
 	"",	// 25 - HIDE-STORAGE-UNOWNED
-	"",
+	"",	// LIGHT
 	"",
 	"",
 	"can sail here",

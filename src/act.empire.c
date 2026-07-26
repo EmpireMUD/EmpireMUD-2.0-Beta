@@ -3171,6 +3171,8 @@ struct do_islands_data {
 	int id;
 	int territory;
 	int einv_size;
+	int warehouse_size;
+	int shipping_size;
 	int population;
 	UT_hash_handle hh;
 };
@@ -3181,9 +3183,11 @@ struct do_islands_data {
 *
 * @param struct do_islands_data **list Pointer to a do_islands hash.
 * @param int island_id Which island.
-* @param int amount How much einv to add.
+* @param int einv_amount How much einv to add.
+* @param int warehouse_amount How much warehouse to add.
+* @param int shipping_amount How much shipping to add.
 */
-void do_islands_add_einv(struct do_islands_data **list, int island_id, int amount) {
+void do_islands_add_einv(struct do_islands_data **list, int island_id, int einv_amount, int warehouse_amount, int shipping_amount) {
 	struct do_islands_data *isle;
 	
 	HASH_FIND_INT(*list, &island_id, isle);
@@ -3192,7 +3196,9 @@ void do_islands_add_einv(struct do_islands_data **list, int island_id, int amoun
 		isle->id = island_id;
 		HASH_ADD_INT(*list, id, isle);
 	}
-	SAFE_ADD(isle->einv_size, amount, INT_MIN, INT_MAX, TRUE);
+	SAFE_ADD(isle->einv_size, einv_amount, INT_MIN, INT_MAX, TRUE);
+	SAFE_ADD(isle->warehouse_size, warehouse_amount, INT_MIN, INT_MAX, TRUE);
+	SAFE_ADD(isle->shipping_size, shipping_amount, INT_MIN, INT_MAX, TRUE);
 }
 
 
@@ -5149,6 +5155,16 @@ ACMD(do_efind) {
 			if (VEH_OWNER(veh) != emp && (VEH_OWNER(veh) != NULL || ROOM_OWNER(IN_ROOM(veh)) != emp)) {
 				continue;
 			}
+			
+			// vehicle contents -- BEFORE checking keywords or building
+			DL_FOREACH2(VEH_CONTAINS(veh), obj, next_content) {
+				if ((all && CAN_WEAR(obj, ITEM_WEAR_TAKE)) || (!all && isname(arg, obj->name))) {
+					add_obj_to_efind(ch, &list, obj, NULL, IN_ROOM(veh));
+					++total;
+				}
+			}
+			
+			// additional checks to show the vehicle
 			if (all && VEH_FLAGGED(veh, VEH_BUILDING)) {
 				continue;	// 'all' skips buildings
 			}
@@ -6501,6 +6517,7 @@ ACMD(do_home) {
 
 
 ACMD(do_islands) {
+	bool comma;
 	char emp_arg[MAX_INPUT_LENGTH];
 	struct do_islands_data *item, *next_item, *list = NULL;
 	struct empire_island *eisle, *next_eisle;
@@ -6547,7 +6564,7 @@ ACMD(do_islands) {
 		// mark storage
 		HASH_ITER(hh, eisle->store, store, next_store) {
 			if (store->amount > 0) {
-				do_islands_add_einv(&list, eisle->island, store->amount);
+				do_islands_add_einv(&list, eisle->island, store->amount, 0, 0);
 			}
 		}
 		
@@ -6557,12 +6574,12 @@ ACMD(do_islands) {
 	
 	// add unique storage
 	DL_FOREACH(EMPIRE_UNIQUE_STORAGE(emp), eus) {
-		do_islands_add_einv(&list, eus->island, eus->amount);
+		do_islands_add_einv(&list, eus->island, 0, eus->amount, 0);
 	}
 	
 	// add shipping
 	DL_FOREACH(EMPIRE_SHIPPING_LIST(emp), shipd) {
-		do_islands_add_einv(&list, shipd->from_island, shipd->amount);
+		do_islands_add_einv(&list, shipd->from_island, 0, 0, shipd->amount);
 	}
 	
 	// and then build the display while freeing it up
@@ -6578,19 +6595,31 @@ ACMD(do_islands) {
 		}
 		
 		// only show if they have one of these
-		if (item->territory > 0 || item->einv_size > 0 || item->population > 0) {
+		if (item->territory > 0 || item->einv_size > 0 || item->warehouse_size > 0 || item->shipping_size > 0 || item->population > 0) {
 			isle = get_island(item->id, TRUE);
 			room = real_room(isle->center);
+			comma = FALSE;
 			line = build_page_display(ch, " %s%s - ", get_island_name_for(isle->id, ch), coord_display_room(ch, room, FALSE));
 		
 			if (item->territory > 0) {
-				append_page_display_line(line, "%d territory%s", item->territory, (item->einv_size > 0 || item->population > 0) ? ", " : "");
+				append_page_display_line(line, "%s%d territory", (comma ? ", " : ""), item->territory);
+				comma = TRUE;
 			}
 			if (item->einv_size > 0) {
-				append_page_display_line(line, "%d einventory%s", item->einv_size, (item->population > 0) ? ", " : "");
+				append_page_display_line(line, "%s%d einventory", (comma ? ", " : ""), item->einv_size);
+				comma = TRUE;
+			}
+			if (item->warehouse_size > 0) {
+				append_page_display_line(line, "%s%d warehouse", (comma ? ", " : ""), item->warehouse_size);
+				comma = TRUE;
+			}
+			if (item->shipping_size > 0) {
+				append_page_display_line(line, "%s%d shipping", (comma ? ", " : ""), item->shipping_size);
+				comma = TRUE;
 			}
 			if (item->population > 0) {
-				append_page_display_line(line, "%d citizen%s", item->population, PLURAL(item->population));
+				append_page_display_line(line, "%s%d citizen%s", (comma ? ", " : ""), item->population, PLURAL(item->population));
+				comma = TRUE;
 			}
 		}
 		

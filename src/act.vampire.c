@@ -1131,7 +1131,7 @@ ACMD(do_boost) {
 		msg_to_char(ch, "Which attribute do you wish to boost? Or type 'boost end' to cancel boosts.\r\nAttributes:");
 		any = FALSE;
 		for (iter = 0; *boost_data[iter].name != '\n'; ++iter) {
-			if (boost_data[iter].role == ROLE_NONE || boost_data[iter].role == GET_CLASS_ROLE(ch)) {
+			if (boost_data[iter].role == ROLE_NONE || boost_data[iter].role == GET_CLASS_ROLE(ch) || (GET_CLASS_ROLE(ch) == ROLE_SOLO && check_solo_role(ch))) {
 				msg_to_char(ch, "%s%s", (any ? ", " : " "), boost_data[iter].name);
 				any = TRUE;
 			}
@@ -1160,6 +1160,10 @@ ACMD(do_boost) {
 	}
 	if (pos == NOTHING) {	// no valid choice
 		msg_to_char(ch, "You don't know how to boost '%s'.\r\n", arg);
+		return;
+	}
+	if (boost_data[pos].role != ROLE_NONE && GET_CLASS_ROLE(ch) != boost_data[pos].role && (GET_CLASS_ROLE(ch) != ROLE_SOLO || !check_solo_role(ch))) {
+		msg_to_char(ch, "You need to be in the %s%s\t0 role to boost that.\r\n", class_role_color[boost_data[pos].role], class_role[boost_data[pos].role]);
 		return;
 	}
 	

@@ -30,6 +30,10 @@
 *   Edit Modules
 */
 
+// external variables
+extern bool manual_evolutions;
+
+
  //////////////////////////////////////////////////////////////////////////////
 //// DISPLAYS ////////////////////////////////////////////////////////////////
 
@@ -591,6 +595,19 @@ OLC_MODULE(mapedit_decustomize) {
 }
 
 
+OLC_MODULE(mapedit_evolve) {
+	if (!*argument || str_cmp(argument, "confirm")) {
+		msg_to_char(ch, "You must type: .map evolve confirm\r\n");
+	}
+	else {
+		syslog(SYS_GC, GET_INVIS_LEV(ch), TRUE, "OLC: %s used .map evolve", GET_NAME(ch));
+		send_config_msg(ch, "ok_string");
+		manual_evolutions = TRUE;	// triggers a log
+		run_external_evolutions();
+	}
+}
+
+
 OLC_MODULE(mapedit_room_name) {
 	if (SHARED_DATA(IN_ROOM(ch)) == &ocean_shared_data) {
 		msg_to_char(ch, "You cannot customize ocean tiles.\r\n");
@@ -1051,5 +1068,17 @@ OLC_MODULE(mapedit_roomtype) {
 		attach_building_to_room(id, IN_ROOM(ch), TRUE);
 		msg_to_char(ch, "This room is now %s %s.\r\n", AN(GET_BLD_NAME(id)), GET_BLD_NAME(id));
 		complete_wtrigger(IN_ROOM(ch));
+	}
+}
+
+
+OLC_MODULE(mapedit_worldreset) {
+	if (!*argument || str_cmp(argument, "confirm")) {
+		msg_to_char(ch, "You must type '.map worldreset confirm' to do this. It will cause decay on the entire map.\r\n");
+	}
+	else {
+		syslog(SYS_GC, GET_INVIS_LEV(ch), TRUE, "OLC: %s used .map worldreset", GET_NAME(ch));
+		send_config_msg(ch, "ok_string");
+		annual_world_update();
 	}
 }

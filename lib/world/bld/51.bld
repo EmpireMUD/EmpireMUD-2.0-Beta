@@ -776,7 +776,7 @@ S
 Bridge~
 A Bridge Over the River~
 &c~&0--&c~~
-16 0 dmopsD 0
+16 0 dmopsxD 0
 0 0 0 -1
 E
 bridge building~
@@ -984,7 +984,7 @@ S
 Steps~
 On The Steps~
 .&0==&?.~
-4 0 dnot 0
+4 0 dnotx 0
 0 0 0 -1
 E
 steps stairs down building around~

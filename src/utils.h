@@ -2154,6 +2154,7 @@ bitvector_t get_climate(room_data *room);
 bitvector_t get_climate_map(struct map_data *map);
 bool get_coord_shift(int start_x, int start_y, int x_shift, int y_shift, int *new_x, int *new_y);
 int get_depletion_max(room_data *room, int depletion_type);
+int get_depletion_max_vehicle(vehicle_data *veh, int depletion_type);
 int get_direction_to(room_data *from, room_data *to);
 room_data *get_map_location_for(room_data *room);
 const char *get_partial_direction_to(char_data *ch, room_data *from, room_data *to, bool abbrev);
@@ -2533,13 +2534,57 @@ char *screenread_one_tile(char_data *ch, room_data *origin, room_data *to_room, 
 
 void get_informative_string(char_data *ch, char *buffer, bool dismantling, bool unfinished, bool major_disrepair, bool minor_disrepair, int mine_view, bool public, bool no_work, bool no_abandon, bool no_dismantle, bool chameleon);
 #define INFORMATIVE_MINE_VALUE(ch, room)  ((get_room_extra_data((room), ROOM_EXTRA_MINE_GLB_VNUM) > 0) ? ((PRF_FLAGGED((ch), PRF_HOLYLIGHT) || room_has_function_and_city_ok(GET_LOYALTY(ch), (room), FNC_MINE) || (GET_LOYALTY(ch) && get_room_extra_data((room), ROOM_EXTRA_PROSPECT_EMPIRE) == EMPIRE_VNUM(GET_LOYALTY(ch)))) ? (get_room_extra_data((room), ROOM_EXTRA_MINE_AMOUNT) > 0 ? 1 : -1) : 0) : 0)
-#define get_informative_tile_string(ch, room, buffer)  get_informative_string((ch), (buffer), (HOLYLIGHT_OR_TILE_OWNER((ch), (room)) && IS_DISMANTLING(room)) ? TRUE : FALSE, HOLYLIGHT_OR_TILE_OWNER((ch), (room)) ? !IS_COMPLETE(room) : FALSE, HAS_MAJOR_DISREPAIR(room), HAS_MINOR_DISREPAIR(room), INFORMATIVE_MINE_VALUE(ch, room), ROOM_AFF_FLAGGED((room), ROOM_AFF_PUBLIC) ? TRUE : FALSE, (HOLYLIGHT_OR_TILE_OWNER((ch), (room)) && ROOM_AFF_FLAGGED((room), ROOM_AFF_NO_WORK)) ? TRUE : FALSE, (HOLYLIGHT_OR_TILE_OWNER((ch), (room)) && ROOM_AFF_FLAGGED((room), ROOM_AFF_NO_ABANDON)) ? TRUE : FALSE, (HOLYLIGHT_OR_TILE_OWNER((ch), (room)) && ROOM_AFF_FLAGGED((room), ROOM_AFF_NO_DISMANTLE)) ? TRUE : FALSE, ((ch) && IS_IMMORTAL(ch) && ROOM_AFF_FLAGGED((room), ROOM_AFF_CHAMELEON) && IS_COMPLETE(room)))
-#define get_informative_vehicle_string(ch, veh, buffer)  get_informative_string((ch), (buffer), (HOLYLIGHT_OR_VEH_OWNER((ch), (veh)) && VEH_IS_DISMANTLING(veh)) ? TRUE : FALSE, HOLYLIGHT_OR_VEH_OWNER((ch), (veh)) ? (!VEH_IS_COMPLETE(veh) && !VEH_IS_DISMANTLING(veh)) : FALSE, VEH_HAS_MAJOR_DISREPAIR(veh), VEH_HAS_MINOR_DISREPAIR(veh), INFORMATIVE_MINE_VALUE(ch, IN_ROOM(veh)), VEH_IS_PUBLIC(veh), (HOLYLIGHT_OR_VEH_OWNER((ch), (veh)) && VEH_FLAGGED((veh), VEH_PLAYER_NO_WORK)) || (VEH_CLAIMS_WITH_ROOM(veh) && HOLYLIGHT_OR_TILE_OWNER((ch), IN_ROOM(veh)) && ROOM_AFF_FLAGGED(IN_ROOM(veh), ROOM_AFF_NO_WORK)), FALSE /*HOLYLIGHT_OR_VEH_OWNER((ch), (veh)) && VEH_FLAGGED((veh), VEH_PLAYER_NO_ABANDON)*/, (HOLYLIGHT_OR_VEH_OWNER((ch), (veh)) && VEH_FLAGGED((veh), VEH_PLAYER_NO_DISMANTLE)) ? TRUE : FALSE, (ch) && IS_IMMORTAL(ch) && (ROOM_AFF_FLAGGED(IN_ROOM(veh), ROOM_AFF_CHAMELEON) || VEH_FLAGGED(veh, VEH_CHAMELEON)) && IS_COMPLETE(IN_ROOM(veh)))
+#define get_informative_tile_string(ch, room, buffer)  get_informative_string((ch), (buffer), \
+	/* dismantling */ (HOLYLIGHT_OR_TILE_OWNER((ch), (room)) && IS_DISMANTLING(room)) ? TRUE : FALSE, \
+	/* unfinished */ HOLYLIGHT_OR_TILE_OWNER((ch), (room)) ? !IS_COMPLETE(room) : FALSE, \
+	/* major_disrepair */ HAS_MAJOR_DISREPAIR(room), \
+	/* minor_disrepair */ HAS_MINOR_DISREPAIR(room), \
+	/* mine_view */ INFORMATIVE_MINE_VALUE(ch, room), \
+	/* public */ ROOM_AFF_FLAGGED((room), ROOM_AFF_PUBLIC) ? TRUE : FALSE, \
+	/* no_work */ (HOLYLIGHT_OR_TILE_OWNER((ch), (room)) && ROOM_AFF_FLAGGED((room), ROOM_AFF_NO_WORK)) ? TRUE : FALSE, \
+	/* no_abandon */ (HOLYLIGHT_OR_TILE_OWNER((ch), (room)) && ROOM_AFF_FLAGGED((room), ROOM_AFF_NO_ABANDON)) ? TRUE : FALSE, \
+	/* no_dismantle */ (HOLYLIGHT_OR_TILE_OWNER((ch), (room)) && ROOM_AFF_FLAGGED((room), ROOM_AFF_NO_DISMANTLE)) ? TRUE : FALSE, \
+	/* chameleon */ ((ch) && IS_IMMORTAL(ch) && ROOM_AFF_FLAGGED((room), ROOM_AFF_CHAMELEON) && IS_COMPLETE(room)) \
+)
+#define get_informative_vehicle_string(ch, veh, buffer)  get_informative_string((ch), (buffer), \
+	/* dismantling */ (HOLYLIGHT_OR_VEH_OWNER((ch), (veh)) && VEH_IS_DISMANTLING(veh)) ? TRUE : FALSE, \
+	/* unfinished */ HOLYLIGHT_OR_VEH_OWNER((ch), (veh)) ? (!VEH_IS_COMPLETE(veh) && !VEH_IS_DISMANTLING(veh)) : FALSE, \
+	/* major_disrepair */ VEH_HAS_MAJOR_DISREPAIR(veh), \
+	/* minor_disrepair */ VEH_HAS_MINOR_DISREPAIR(veh), \
+	/* mine_view */ INFORMATIVE_MINE_VALUE(ch, IN_ROOM(veh)), \
+	/* public */ VEH_IS_PUBLIC(veh), \
+	/* no_work */ (HOLYLIGHT_OR_VEH_OWNER((ch), (veh)) && VEH_FLAGGED((veh), VEH_PLAYER_NO_WORK)) || (VEH_CLAIMS_WITH_ROOM(veh) && HOLYLIGHT_OR_TILE_OWNER((ch), IN_ROOM(veh)) && ROOM_AFF_FLAGGED(IN_ROOM(veh), ROOM_AFF_NO_WORK)), \
+	/* no_abandon */ FALSE /*HOLYLIGHT_OR_VEH_OWNER((ch), (veh)) && VEH_FLAGGED((veh), VEH_PLAYER_NO_ABANDON)*/, \
+	/* no_dismantle */ (HOLYLIGHT_OR_VEH_OWNER((ch), (veh)) && VEH_FLAGGED((veh), VEH_PLAYER_NO_DISMANTLE)) ? TRUE : FALSE, \
+	/* chameleon */ (ch) && IS_IMMORTAL(ch) && ((ROOM_AFF_FLAGGED(IN_ROOM(veh), ROOM_AFF_CHAMELEON) && IS_COMPLETE(IN_ROOM(veh))) || vehicle_is_chameleon(veh, IN_ROOM(ch))) \
+)
 
 char *get_informative_color(char_data *ch, bool dismantling, bool unfinished, bool major_disrepair, bool minor_disrepair, int mine_view, bool public, bool no_work, bool no_abandon, bool no_dismantle, bool chameleon);
 #define simple_distance(x, y, a, b)		((x - a) * (x - a) + (y - b) * (y - b))
-#define get_informative_color_room(ch, room)  get_informative_color((ch), (HOLYLIGHT_OR_TILE_OWNER((ch), (room)) && IS_DISMANTLING(room)) ? TRUE : FALSE, HOLYLIGHT_OR_TILE_OWNER((ch), (room)) ? !IS_COMPLETE(room) : FALSE, HAS_MAJOR_DISREPAIR(room), HAS_MINOR_DISREPAIR(room), INFORMATIVE_MINE_VALUE(ch, room), ROOM_AFF_FLAGGED(room, ROOM_AFF_PUBLIC) ? TRUE : FALSE, (HOLYLIGHT_OR_TILE_OWNER((ch), (room)) && ROOM_AFF_FLAGGED(room, ROOM_AFF_NO_WORK)) ? TRUE : FALSE, (HOLYLIGHT_OR_TILE_OWNER((ch), (room)) && ROOM_AFF_FLAGGED(room, ROOM_AFF_NO_ABANDON)) ? TRUE : FALSE, (HOLYLIGHT_OR_TILE_OWNER((ch), (room)) && ROOM_AFF_FLAGGED(room, ROOM_AFF_NO_DISMANTLE)) ? TRUE : FALSE, ch && IS_IMMORTAL(ch) && ROOM_AFF_FLAGGED(room, ROOM_AFF_CHAMELEON) && IS_COMPLETE(room) && simple_distance(X_COORD(IN_ROOM(ch)), Y_COORD(IN_ROOM(ch)), X_COORD(room), Y_COORD(room)) > 2)
-#define get_informative_color_veh(ch, veh)  get_informative_color((ch), (HOLYLIGHT_OR_VEH_OWNER((ch), (veh)) && VEH_IS_DISMANTLING(veh)) ? TRUE : FALSE, (HOLYLIGHT_OR_VEH_OWNER((ch), (veh)) && !VEH_IS_COMPLETE(veh) && !VEH_IS_DISMANTLING(veh)), VEH_HAS_MAJOR_DISREPAIR(veh), VEH_HAS_MINOR_DISREPAIR(veh), INFORMATIVE_MINE_VALUE(ch, IN_ROOM(veh)), VEH_IS_PUBLIC(veh), (HOLYLIGHT_OR_VEH_OWNER((ch), (veh)) && VEH_FLAGGED((veh), VEH_PLAYER_NO_WORK)) || (HOLYLIGHT_OR_TILE_OWNER((ch), IN_ROOM(veh)) && VEH_CLAIMS_WITH_ROOM(veh) && ROOM_AFF_FLAGGED(IN_ROOM(veh), ROOM_AFF_NO_WORK)), FALSE /* no-abandon */, (HOLYLIGHT_OR_VEH_OWNER((ch), (veh)) && VEH_FLAGGED((veh), VEH_PLAYER_NO_DISMANTLE)) ? TRUE : FALSE, (ch) && IS_IMMORTAL(ch) && (ROOM_AFF_FLAGGED(IN_ROOM(veh), ROOM_AFF_CHAMELEON) || VEH_FLAGGED(veh, VEH_CHAMELEON)) && IS_COMPLETE(IN_ROOM(veh)) && simple_distance(X_COORD(IN_ROOM(ch)), Y_COORD(IN_ROOM(ch)), X_COORD(IN_ROOM(veh)), Y_COORD(IN_ROOM(veh))) > 2)
+#define get_informative_color_room(ch, room)  get_informative_color((ch), \
+	/* dismantling */ (HOLYLIGHT_OR_TILE_OWNER((ch), (room)) && IS_DISMANTLING(room)) ? TRUE : FALSE, \
+	/* unfinished */  HOLYLIGHT_OR_TILE_OWNER((ch), (room)) ? !IS_COMPLETE(room) : FALSE, \
+	/* major_disrepair */ HAS_MAJOR_DISREPAIR(room), \
+	/* minor_disrepair */ HAS_MINOR_DISREPAIR(room), \
+	/* mine_view */ INFORMATIVE_MINE_VALUE(ch, room), \
+	/* public */ ROOM_AFF_FLAGGED(room, ROOM_AFF_PUBLIC) ? TRUE : FALSE, \
+	/* no_work */ (HOLYLIGHT_OR_TILE_OWNER((ch), (room)) && ROOM_AFF_FLAGGED(room, ROOM_AFF_NO_WORK)) ? TRUE : FALSE, \
+	/* no_abandon */ (HOLYLIGHT_OR_TILE_OWNER((ch), (room)) && ROOM_AFF_FLAGGED(room, ROOM_AFF_NO_ABANDON)) ? TRUE : FALSE, \
+	/* no_dismantle */ (HOLYLIGHT_OR_TILE_OWNER((ch), (room)) && ROOM_AFF_FLAGGED(room, ROOM_AFF_NO_DISMANTLE)) ? TRUE : FALSE, \
+	/* chameleon */ (ch) && IS_IMMORTAL(ch) && ROOM_AFF_FLAGGED(room, ROOM_AFF_CHAMELEON) && IS_COMPLETE(room) && simple_distance(X_COORD(IN_ROOM(ch)), Y_COORD(IN_ROOM(ch)), X_COORD(room), Y_COORD(room)) > (2 * 2) \
+)
+#define get_informative_color_veh(ch, veh)  get_informative_color((ch), \
+	/* dismantling */ (HOLYLIGHT_OR_VEH_OWNER((ch), (veh)) && VEH_IS_DISMANTLING(veh)) ? TRUE : FALSE, \
+	/* unfinished */ (HOLYLIGHT_OR_VEH_OWNER((ch), (veh)) && !VEH_IS_COMPLETE(veh) && !VEH_IS_DISMANTLING(veh)), \
+	/* major_disrepair */ VEH_HAS_MAJOR_DISREPAIR(veh), \
+	/* minor_disrepair */ VEH_HAS_MINOR_DISREPAIR(veh), \
+	/* mine_view */ INFORMATIVE_MINE_VALUE(ch, IN_ROOM(veh)), \
+	/* public */ VEH_IS_PUBLIC(veh), \
+	/* no_work */ (HOLYLIGHT_OR_VEH_OWNER((ch), (veh)) && VEH_FLAGGED((veh), VEH_PLAYER_NO_WORK)) || (HOLYLIGHT_OR_TILE_OWNER((ch), IN_ROOM(veh)) && VEH_CLAIMS_WITH_ROOM(veh) && ROOM_AFF_FLAGGED(IN_ROOM(veh), ROOM_AFF_NO_WORK)), \
+	/* no_abandon */ FALSE, \
+	/* no_dismantle */ (HOLYLIGHT_OR_VEH_OWNER((ch), (veh)) && VEH_FLAGGED((veh), VEH_PLAYER_NO_DISMANTLE)) ? TRUE : FALSE, \
+	/* chameleon */ (ch) && IS_IMMORTAL(ch) && ((ROOM_AFF_FLAGGED(IN_ROOM(veh), ROOM_AFF_CHAMELEON) && IS_COMPLETE(IN_ROOM(veh)) && simple_distance(X_COORD(IN_ROOM(ch)), Y_COORD(IN_ROOM(ch)), X_COORD(IN_ROOM(veh)), Y_COORD(IN_ROOM(veh))) > 2*2) || vehicle_is_chameleon(veh, IN_ROOM(ch))) \
+)
 
 // mobact.c
 void add_pursuit(char_data *ch, char_data *target);

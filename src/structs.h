@@ -707,7 +707,7 @@ typedef struct vehicle_data vehicle_data;
 #define BLD_SHOW_VEHICLES  BIT(23)	// can show vehicle icons in the room rather than overriding the building icon (only if OPEN)
 #define BLD_IMMUNE_DAMAGE  BIT(24)	// building cannot be damaged
 #define BLD_HIDE_STORAGE_UNOWNED  BIT(25)	// only shows as storage when identifying objects if owned
-// #define BLD_UNUSED14  BIT(26)
+#define BLD_LIGHT  BIT(26)	// building is always light
 // #define BLD_UNUSED15  BIT(27)
 // #define BLD_UNUSED16  BIT(28)
 #define BLD_SAIL  BIT(29)	// ships can pass through building

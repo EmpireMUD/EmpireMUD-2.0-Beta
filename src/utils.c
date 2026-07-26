@@ -6637,6 +6637,33 @@ int get_depletion_max(room_data *room, int depletion_type) {
 
 
 /**
+* Determines the maximum depletion amount the interactions on a certain vehicle
+* allow.
+*
+* @param vehicle_data *veh Which vehicle (to find interactions on).
+* @param int depletion_type Which depletion we're looking for.
+* @return int Detected deletion cap if any; -1 if not detected.
+*/
+int get_depletion_max_vehicle(vehicle_data *veh, int depletion_type) {
+	int max, best = -1;
+	struct interaction_item *interact;
+	
+	if (!veh) {
+		return best;
+	}
+	
+	LL_FOREACH(VEH_INTERACTIONS(veh), interact) {
+		if (determine_depletion_type(interact) == depletion_type) {
+			max = interact_data[interact->type].one_at_a_time ? interact->quantity : config_get_int("common_depletion");
+			best = MAX(best, max);
+		}
+	}
+	
+	return best;
+}
+
+
+/**
 * This finds the ultimate map point for a given room, resolving any number of
 * layers of boats and home rooms.
 *
@@ -7440,7 +7467,7 @@ bool room_is_light(room_data *room, bool count_adjacent_light, bool ignore_magic
 	if (GET_ISLAND(room) && IS_SET(GET_ISLAND(room)->flags, ISLE_ALWAYS_LIGHT) && IS_OUTDOOR_TILE(room) && !NO_LOCATION(room)) {
 		return TRUE;
 	}
-	if (ROOM_LIGHTS(room) > 0 || RMT_FLAGGED(room, RMT_LIGHT)) {
+	if (ROOM_LIGHTS(room) > 0 || RMT_FLAGGED(room, RMT_LIGHT) || ROOM_BLD_FLAGGED(room, BLD_LIGHT)) {
 		return TRUE;	// not dark: has a light source
 	}
 	if (IS_ANY_BUILDING(room) && (ROOM_OWNER(room) || ROOM_AFF_FLAGGED(room, ROOM_AFF_UNCLAIMABLE))) {

@@ -3740,6 +3740,7 @@ Available flags:
  &cIMMUNE-DAMAGE&0 - building cannot be damaged normally (can still be burned
     if BURNABLE is set; only takes yearly decay if resources are set)
  &cHIDE-STORAGE-UNOWNED&0 - only shows as storage when identifying objects if owned
+ &cLIGHT&0 - building is always light (mainly for adventures)
  &cSAIL&0 - can enter this building with a boat
  &cITEM-LIMIT&0 - only a certain number of items can be dropped here
  &cLONG-AUTOSTORE&0 - autostore takes 72 hours instead of 3 here
@@ -5966,31 +5967,33 @@ map editor commands make instant changes to the map where you're standing.
 
 You can get help on any of the mapeditor commands with &yHELP MAPEDIT <COMMAND>&0.
 The following commands are available:
- basesector - Change the 'base' sector of the tile you're standing on.
- build - Create a finished building on this tile.
- complete - Finishes the building you're standing in.
- convert2newbie - Converts an island's terrains to/from newbie terrains.
- decay - Performs 1 cycle of decay (building, trench) on the tile or vehicle.
- decustomize - Removes custom icon, name, and description.
- deleteexit - Removes an exit (careful about cutting off building interiors).
- deleteroom - Deletes the room you're standing in (interior rooms only).
- description - Customize the description on an interior room.
- exit - Add a new exit between two interior rooms (similar to interlink).
- grow - Triggers immediate growth, similar to chant of nature.
- height - Set the 'height' property of this tile (e.g. Mountain).
- icon - Customize the map icon.
- maintain - Repairs and maintains a building.
- name - Customize the room title.
- naturalize - Returns this tile to its 'natural terrain'.
- passwalls - Able to move on the map unblocked by walls, interiors, etc.
- populate - Forces a building/vehicle to populate an npc, if possible.
- remember - Stores the current terrain as the 'natural terrain'.
- roomtype - Change the type of an interior room.
- ruin - Turn a building or vehicle to ruins.
- spawn - Cause the tile you're standing on to spawn mobs, if possible.
- terrain - Change the tile you're standing on.
- unclaimable - Make a tile or square of tiles unclaimable (or not).
- undeplete - Remove depletion from a tile or vehicle.
+ &cbasesector&0 - Change the 'base' sector of the tile you're standing on.
+ &cbuild&0 - Create a finished building on this tile.
+ &ccomplete&0 - Finishes the building you're standing in.
+ &cconvert2newbie&0 - Converts an island's terrains to/from newbie terrains.
+ &cdecay&0 - Performs 1 cycle of decay (building, trench) on the tile or vehicle.
+ &cdecustomize&0 - Removes custom icon, name, and description.
+ &cdeleteexit&0 - Removes an exit (careful about cutting off building interiors).
+ &cdeleteroom&0 - Deletes the room you're standing in (interior rooms only).
+ &cdescription&0 - Customize the description on an interior room.
+ &cevolve&0 - Triggers map evolutions (just like a normal cycle), see EVOLVER.
+ &cexit&0 - Add a new exit between two interior rooms (similar to interlink).
+ &cgrow&0 - Triggers immediate growth, similar to chant of nature.
+ &cheight&0 - Set the 'height' property of this tile (e.g. Mountain).
+ &cicon&0 - Customize the map icon.
+ &cmaintain&0 - Repairs and maintains a building.
+ &cname&0 - Customize the room title.
+ &cnaturalize&0 - Returns this tile to its 'natural terrain'.
+ &cpasswalls&0 - Able to move on the map unblocked by walls, interiors, etc.
+ &cpopulate&0 - Forces a building/vehicle to populate an npc, if possible.
+ &cremember&0 - Stores the current terrain as the 'natural terrain'.
+ &croomtype&0 - Change the type of an interior room.
+ &cruin&0 - Turn a building or vehicle to ruins.
+ &cspawn&0 - Cause the tile you're standing on to spawn mobs, if possible.
+ &cterrain&0 - Change the tile you're standing on.
+ &cunclaimable&0 - Make a tile or square of tiles unclaimable (or not).
+ &cundeplete&0 - Remove depletion from a tile or vehicle.
+ &cworldreset&0 - Runs a full maintenance/decay/newbie world reset.
 
 For notes on the mud's building rules, see HELP BUILDING GUIDE.
 
@@ -6107,6 +6110,15 @@ but it can also be used to create custom roadsigns on roads (which show their
 custom description as a sign).
 
 See also: MAP OLC, ROADSIGN
+#d
+"MAPEDIT EVOLVE" "MAPEDIT EVOLVER"
+
+Usage:  .map evolve [confirm]
+
+This command runs a regular evolution cycle on the entire map. These normally
+occur every 30 minutes.
+
+See also: EVOLVER, MAP OLC
 #d
 "MAPEDIT EXIT"
 
@@ -6291,6 +6303,17 @@ Example:
  > .map unclaimable 3
 
 See also: MAP OLC, MAPEDIT TERRAIN
+#d
+"MAPEDIT WORLDRESET" "MAPEDIT WORLD RESET" "MAPEDIT YEARLY" "UTILITY YEARLY" "UTIL YEARLY"
+
+Usage:  .map worldreset [confirm]
+
+This runs a regular world reset, which normally happens every 7.5 days,
+including building decay and a refresh of the newbie islands.
+
+This command was formerly 'utility yearly'.
+
+See also: WORLD RESET
 #d
 "MAPEDIT UNDEPLETE" UNDEPLETE "REMOVE DEPLETION"
 
@@ -11070,6 +11093,7 @@ Fields:
   &c-extradesc&0 - has a specific keyword in its extra descs
   &c-fame -fameover -fameunder&0 - specific fame amount
   &c-flagged -unflagged&0 - see HELP VEDIT FLAGS
+  &c-forbidclimate&0 - see HELP CLIMATE FLAGS
   &c-functions&0 - see HELP VEDIT FUNCTIONS
   &c-icon -halficon -quartericon&0 - match the text of one of the icon fields;
      use e.g. "-icon any" to check if it has one at all.
@@ -11079,6 +11103,7 @@ Fields:
   &c-level&0 - matches anything where this level is within the range
   &c-military -militaryover -militaryunder&0 - specific military value
   &c-movetype&0 - see HELP VEDIT MOVETYPE
+  &c-requiresclimate&0 - see HELP CLIMATE FLAGS
   &c-rooms -roomsover -roomsunder&0 - specific extra rooms value
   &c-sizeunder -sizeover&0 - check a range of sizes (inclusive)
   &c-speed&0 - see HELP VEDIT SPEED

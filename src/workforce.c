@@ -782,12 +782,18 @@ static bool can_gain_chore_resource(empire_data *emp, room_data *loc, int chore,
 * @param struct interaction_item *list The list of interactions to check.
 * @param int interaction_type Any INTERACT_ types.
 * @param bool highest_only If TRUE, only checks if the empire can gain the thing with the highest percent.
+* @param bool *over_limit Optional: A variable to indicate whether or not the error was from a limit (rather than nothing available). TRUE if over limit, FALSE if not; pass NULL to ignore.
 * @return bool TRUE if the empire could gain the resource(s) from the interaction list.
 */
-bool can_gain_chore_resource_from_interaction_list(empire_data *emp, room_data *location, int chore, struct interaction_item *list, int interaction_type, bool highest_only) {
+bool can_gain_chore_resource_from_interaction_list(empire_data *emp, room_data *location, int chore, struct interaction_item *list, int interaction_type, bool highest_only, bool *over_limit) {
 	struct interaction_item *interact, *found = NULL;
 	double best_percent = 0.0;
 	obj_data *proto;
+	
+	// init
+	if (over_limit) {
+		*over_limit = FALSE;
+	}
 	
 	for (interact = list; interact; interact = interact->next) {
 		if (interact->type != interaction_type) {
@@ -814,9 +820,22 @@ bool can_gain_chore_resource_from_interaction_list(empire_data *emp, room_data *
 			// any 1 is fine
 			return TRUE;
 		}
+		else if (over_limit) {
+			*over_limit = TRUE;
+		}
 	}
 	
-	return (found && can_gain_chore_resource(emp, location, chore, found->vnum));
+	if (found) {
+		if (can_gain_chore_resource(emp, location, chore, found->vnum)) {
+			return TRUE;
+		}
+		else if (over_limit) {
+			*over_limit = FALSE;
+		}
+	}
+	
+	// otherwise
+	return FALSE;
 }
 
 
@@ -827,21 +846,38 @@ bool can_gain_chore_resource_from_interaction_list(empire_data *emp, room_data *
 * @param room_data *room The room whose interactions we'll check.
 * @param int chore which CHORE_
 * @param int interaction_type Any INTERACT_ types.
+* @param bool *over_limit Optional: A variable to indicate whether or not the error was from a limit (rather than nothing available). TRUE if over limit, FALSE if not; pass NULL to ignore.
 * @return bool TRUE if the empire could gain at least one resource from the interactions on this room.
 */
-bool can_gain_chore_resource_from_interaction_room(empire_data *emp, room_data *room, int chore, int interaction_type) {
-	bool found_any = FALSE;
+bool can_gain_chore_resource_from_interaction_room(empire_data *emp, room_data *room, int chore, int interaction_type, bool *over_limit) {
+	bool found_any = FALSE, temp = FALSE;
 	crop_data *cp;
 	
 	// warning: changing highest_only to TRUE will block crops that give straw 100% of the time from giving fruit if it's at 20%
 	static const bool highest_only = FALSE;
 	
-	found_any |= can_gain_chore_resource_from_interaction_list(emp, room, chore, GET_SECT_INTERACTIONS(SECT(room)), interaction_type, highest_only);
-	if (!found_any && ROOM_SECT_FLAGGED(room, SECTF_CROP) && (cp = ROOM_CROP(room))) {
-		found_any |= can_gain_chore_resource_from_interaction_list(emp, room, chore, GET_CROP_INTERACTIONS(cp), interaction_type, highest_only);
+	// init
+	if (over_limit) {
+		*over_limit = FALSE;
 	}
+	
+	found_any |= can_gain_chore_resource_from_interaction_list(emp, room, chore, GET_SECT_INTERACTIONS(SECT(room)), interaction_type, highest_only, &temp);
+	if (over_limit) {
+		*over_limit |= temp;
+	}
+	
+	if (!found_any && ROOM_SECT_FLAGGED(room, SECTF_CROP) && (cp = ROOM_CROP(room))) {
+		found_any |= can_gain_chore_resource_from_interaction_list(emp, room, chore, GET_CROP_INTERACTIONS(cp), interaction_type, highest_only, &temp);
+		if (over_limit) {
+			*over_limit |= temp;
+		}
+	}
+	
 	if (!found_any && GET_BUILDING(room)) {
-		found_any |= can_gain_chore_resource_from_interaction_list(emp, room, chore, GET_BLD_INTERACTIONS(GET_BUILDING(room)), interaction_type, highest_only);
+		found_any |= can_gain_chore_resource_from_interaction_list(emp, room, chore, GET_BLD_INTERACTIONS(GET_BUILDING(room)), interaction_type, highest_only, &temp);
+		if (over_limit) {
+			*over_limit |= temp;
+		}
 	}
 	
 	return found_any;
@@ -2254,7 +2290,8 @@ INTERACTION_FUNC(one_chop_chore) {
 void do_chore_chopping(empire_data *emp, room_data *room) {
 	char_data *worker;
 	bool depleted = (get_depletion(room, DPLTN_CHOP) >= get_depletion_max(room, DPLTN_CHOP));
-	bool can_gain = can_gain_chore_resource_from_interaction_room(emp, room, CHORE_CHOPPING, INTERACT_CHOP);
+	bool over_limit = FALSE;
+	bool can_gain = can_gain_chore_resource_from_interaction_room(emp, room, CHORE_CHOPPING, INTERACT_CHOP, &over_limit);
 	bool can_do = !depleted && can_gain;
 	
 	if (can_do) {
@@ -2283,7 +2320,7 @@ void do_chore_chopping(empire_data *emp, room_data *room) {
 						// done
 						stop_room_action(room, ACT_CHOPPING);
 					
-						if (!ROOM_AFF_FLAGGED(room, ROOM_AFF_NO_ABANDON) && !ROOM_SECT_FLAGGED(room, SECTF_NO_WORKFORCE_AUTOABANDON) && empire_chore_limit(emp, GET_ISLAND_ID(room), CHORE_ABANDON_CHOPPED) && (!has_evolution_type(SECT(room), EVO_BURN_STUMPS) || !empire_chore_limit(emp, GET_ISLAND_ID(room), CHORE_BURN_STUMPS))) {
+						if (!ROOM_AFF_FLAGGED(room, ROOM_AFF_NO_ABANDON) && !ROOM_SECT_FLAGGED(room, SECTF_NO_WORKFORCE_AUTOABANDON) && empire_chore_limit(emp, GET_ISLAND_ID(room), CHORE_ABANDON_CHOPPED) && (!has_evolution_type(SECT(room), EVO_BURN_STUMPS) || !empire_chore_limit(emp, GET_ISLAND_ID(room), CHORE_BURN_STUMPS)) && count_building_vehicles_in_room(room, ROOM_OWNER(room)) == 0) {
 							if (ROOM_PEOPLE(room)) {
 								act("The worker abandons the area. It is now unclaimed.", FALSE, ROOM_PEOPLE(room), NULL, NULL, TO_CHAR | TO_ROOM);
 							}
@@ -2307,7 +2344,7 @@ void do_chore_chopping(empire_data *emp, room_data *room) {
 			charge_workforce(emp, CHORE_CHOPPING, room, worker, 1, NOTHING, 0);
 		}
 	}
-	else {
+	else if (depleted || over_limit) {
 		mark_workforce_delay(emp, room, CHORE_CHOPPING, depleted ? WF_PROB_DEPLETED : WF_PROB_OVER_LIMIT);
 		log_workforce_problem(emp, room, CHORE_CHOPPING, depleted ? WF_PROB_DEPLETED : WF_PROB_OVER_LIMIT, FALSE);
 	}
@@ -2489,7 +2526,7 @@ void do_chore_einv_interaction(empire_data *emp, room_data *room, vehicle_data *
 		if (!has_interaction(GET_OBJ_INTERACTIONS(proto), interact_type)) {
 			continue;
 		}
-		if (!can_gain_chore_resource_from_interaction_list(emp, room, chore, GET_OBJ_INTERACTIONS(proto), interact_type, TRUE)) {
+		if (!can_gain_chore_resource_from_interaction_list(emp, room, chore, GET_OBJ_INTERACTIONS(proto), interact_type, TRUE, NULL)) {
 			any_over_limit = TRUE;
 			continue;
 		}
@@ -2566,8 +2603,9 @@ INTERACTION_FUNC(one_farming_chore) {
 void do_chore_farming(empire_data *emp, room_data *room) {
 	char_data *worker;
 	sector_data *old_sect;
+	bool over_harvest = FALSE, over_pick = FALSE;
 	
-	if (CAN_INTERACT_ROOM_NO_VEH(room, INTERACT_HARVEST) && can_gain_chore_resource_from_interaction_room(emp, room, CHORE_FARMING, INTERACT_HARVEST)) {
+	if (CAN_INTERACT_ROOM_NO_VEH(room, INTERACT_HARVEST) && can_gain_chore_resource_from_interaction_room(emp, room, CHORE_FARMING, INTERACT_HARVEST, &over_harvest)) {
 		// HARVEST mode: all at once; not able to ewt_mark_resource_worker() until we're inside the interact
 		if ((worker = find_chore_worker_in_room(emp, room, NULL, chore_data[CHORE_FARMING].mob))) {
 			// farming is free
@@ -2633,7 +2671,7 @@ void do_chore_farming(empire_data *emp, room_data *room) {
 			charge_workforce(emp, CHORE_FARMING, room, worker, 0, NOTHING, 0);
 		}
 	}
-	else if (CAN_INTERACT_ROOM_NO_VEH(room, INTERACT_PICK) && can_gain_chore_resource_from_interaction_room(emp, room, CHORE_FARMING, INTERACT_PICK)) {
+	else if (CAN_INTERACT_ROOM_NO_VEH(room, INTERACT_PICK) && can_gain_chore_resource_from_interaction_room(emp, room, CHORE_FARMING, INTERACT_PICK, &over_pick)) {
 		// PICK mode: 1 at a time; not able to ewt_mark_resource_worker() until we're inside the interact
 		if ((worker = find_chore_worker_in_room(emp, room, NULL, chore_data[CHORE_FARMING].mob))) {
 			// farming is free
@@ -2657,7 +2695,7 @@ void do_chore_farming(empire_data *emp, room_data *room) {
 					// change to base sect
 					uncrop_tile(room);
 					
-					if (!ROOM_AFF_FLAGGED(room, ROOM_AFF_NO_ABANDON) && !ROOM_SECT_FLAGGED(room, SECTF_NO_WORKFORCE_AUTOABANDON) && empire_chore_limit(emp, GET_ISLAND_ID(room), CHORE_ABANDON_FARMED)) {
+					if (!ROOM_AFF_FLAGGED(room, ROOM_AFF_NO_ABANDON) && !ROOM_SECT_FLAGGED(room, SECTF_NO_WORKFORCE_AUTOABANDON) && empire_chore_limit(emp, GET_ISLAND_ID(room), CHORE_ABANDON_FARMED) && count_building_vehicles_in_room(room, ROOM_OWNER(room)) == 0) {
 						if (ROOM_PEOPLE(room)) {
 							act("The worker abandons the area. It is now unclaimed.", FALSE, ROOM_PEOPLE(room), NULL, NULL, TO_CHAR | TO_ROOM);
 						}
@@ -2679,7 +2717,7 @@ void do_chore_farming(empire_data *emp, room_data *room) {
 			charge_workforce(emp, CHORE_FARMING, room, worker, 0, NOTHING, 0);
 		}
 	}
-	else {
+	else if (over_pick || over_harvest) {
 		mark_workforce_delay(emp, room, CHORE_FARMING, WF_PROB_OVER_LIMIT);
 		log_workforce_problem(emp, room, CHORE_FARMING, WF_PROB_OVER_LIMIT, FALSE);
 	}
@@ -2859,7 +2897,7 @@ void do_chore_mining(empire_data *emp, room_data *room, vehicle_data *veh) {
 	char_data *worker;
 	struct global_data *mine = global_proto(get_room_extra_data(room, ROOM_EXTRA_MINE_GLB_VNUM));
 	bool depleted = (!mine || GET_GLOBAL_TYPE(mine) != GLOBAL_MINE_DATA || get_room_extra_data(room, ROOM_EXTRA_MINE_AMOUNT) <= 0);
-	bool can_gain = can_gain_chore_resource_from_interaction_list(emp, room, CHORE_MINING, GET_GLOBAL_INTERACTIONS(mine), INTERACT_MINE, TRUE);
+	bool can_gain = can_gain_chore_resource_from_interaction_list(emp, room, CHORE_MINING, GET_GLOBAL_INTERACTIONS(mine), INTERACT_MINE, TRUE, NULL);
 	bool can_do = (!depleted && can_gain);
 	
 	if (can_do) {
@@ -3143,7 +3181,7 @@ void do_chore_shearing(empire_data *emp, room_data *room, vehicle_data *veh) {
 	char_data *mob, *shearable = NULL;
 	obj_data *proto;
 	
-	bool any_already_sheared = FALSE;
+	bool any_already_sheared = FALSE, over_limit = FALSE;
 	struct interact_exclusion_data *excl = NULL;
 	struct interaction_item *interact;
 	bool found;
@@ -3167,6 +3205,7 @@ void do_chore_shearing(empire_data *emp, room_data *room, vehicle_data *veh) {
 					continue;
 				}
 				if (!can_gain_chore_resource(emp, room, CHORE_SHEARING, interact->vnum)) {
+					over_limit = TRUE;
 					continue;
 				}
 				
@@ -3208,7 +3247,7 @@ void do_chore_shearing(empire_data *emp, room_data *room, vehicle_data *veh) {
 			charge_workforce(emp, CHORE_SHEARING, room, worker, 1, NOTHING, 0);
 		}
 	}
-	else {
+	else if (any_already_sheared || over_limit) {
 		mark_workforce_delay(emp, room, CHORE_SHEARING, any_already_sheared ? WF_PROB_ALREADY_SHEARED : WF_PROB_OVER_LIMIT);
 		log_workforce_problem(emp, room, CHORE_SHEARING, any_already_sheared ? WF_PROB_ALREADY_SHEARED : WF_PROB_OVER_LIMIT, FALSE);
 	}

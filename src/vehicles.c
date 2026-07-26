@@ -3934,6 +3934,7 @@ void olc_fullsearch_vehicle(char_data *ch, char *argument) {
 	char only_icon[MAX_INPUT_LENGTH], only_half_icon[MAX_INPUT_LENGTH], only_quarter_icon[MAX_INPUT_LENGTH];
 	bitvector_t only_designate = NOBITS, only_flags = NOBITS, only_functions = NOBITS, only_affs = NOBITS;
 	bitvector_t find_interacts = NOBITS, not_flagged = NOBITS, found_interacts = NOBITS, find_custom = NOBITS, found_custom = NOBITS;
+	bitvector_t only_requires_climate = NOBITS, only_forbid_climate = NOBITS;
 	int only_animals = NOTHING, only_cap = NOTHING, cap_over = NOTHING, cap_under = NOTHING;
 	int only_fame = NOTHING, fame_over = NOTHING, fame_under = NOTHING, only_speed = NOTHING;
 	int only_height = NOTHING, height_over = NOTHING, height_under = NOTHING;
@@ -3986,6 +3987,7 @@ void olc_fullsearch_vehicle(char_data *ch, char *argument) {
 		FULLSEARCH_FLAGS("flags", only_flags, vehicle_flags)
 		FULLSEARCH_FLAGS("unflagged", not_flagged, vehicle_flags)
 		FULLSEARCH_FLAGS("functions", only_functions, function_flags)
+		FULLSEARCH_FLAGS("forbidclimate", only_forbid_climate, climate_flags)
 		FULLSEARCH_STRING("icon", only_icon)
 		FULLSEARCH_STRING("halficon", only_half_icon)
 		FULLSEARCH_STRING("quartericon", only_quarter_icon)
@@ -4004,6 +4006,7 @@ void olc_fullsearch_vehicle(char_data *ch, char *argument) {
 		FULLSEARCH_INT("military", only_military, 0, INT_MAX)
 		FULLSEARCH_INT("militaryover", military_over, 0, INT_MAX)
 		FULLSEARCH_INT("militaryunder", military_under, 0, INT_MAX)
+		FULLSEARCH_FLAGS("requiresclimate", only_requires_climate, climate_flags)
 		FULLSEARCH_INT("sizeover", size_over, 0, INT_MAX)
 		FULLSEARCH_INT("sizeunder", size_under, 0, INT_MAX)
 		FULLSEARCH_LIST("speed", only_speed, vehicle_speed_types)
@@ -4063,6 +4066,12 @@ void olc_fullsearch_vehicle(char_data *ch, char *argument) {
 			continue;
 		}
 		if (only_functions != NOBITS && (VEH_FUNCTIONS(veh) & only_functions) != only_functions) {
+			continue;
+		}
+		if (only_requires_climate != NOBITS && (VEH_REQUIRES_CLIMATE(veh) & only_requires_climate) != only_requires_climate) {
+			continue;
+		}
+		if (only_forbid_climate != NOBITS && (VEH_FORBID_CLIMATE(veh) & only_forbid_climate) != only_forbid_climate) {
 			continue;
 		}
 		if (only_height != NOTHING && VEH_HEIGHT(veh) != only_height) {
@@ -4478,7 +4487,7 @@ void do_stat_vehicle(char_data *ch, vehicle_data *veh, bool details) {
 	struct depletion_data *dep;
 	obj_data *obj;
 	bool comma;
-	int count, found;
+	int count, found, max, prc;
 	struct string_hash *str_iter, *next_str, *str_hash = NULL;
 	struct page_display *line;
 	
@@ -4587,9 +4596,17 @@ void do_stat_vehicle(char_data *ch, vehicle_data *veh, bool details) {
 		line = build_page_display(ch, "Depletion: ");
 		
 		comma = FALSE;
-		for (dep = VEH_DEPLETION(veh); dep; dep = dep->next) {
+		LL_FOREACH(VEH_DEPLETION(veh), dep) {
 			if (dep->type < NUM_DEPLETION_TYPES) {
-				append_page_display_line(line, "%s%s (%d)", comma ? ", " : "", depletion_types[dep->type], dep->count);
+				max = get_depletion_max_vehicle(veh , dep->type);
+				if (max > 0 && dep->count > 0) {
+					prc = dep->count * 100 / max;
+					prc = MIN(100, MAX(1, prc));
+					append_page_display_line(line, "%s%s (%d, %d%%)", comma ? ", " : "", depletion_types[dep->type], dep->count, prc);
+				}
+				else {
+					append_page_display_line(line, "%s%s (%d)", comma ? ", " : "", depletion_types[dep->type], dep->count);
+				}
 				comma = TRUE;
 			}
 		}
