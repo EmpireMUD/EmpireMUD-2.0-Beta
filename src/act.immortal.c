@@ -3278,7 +3278,7 @@ void do_stat_character(char_data *ch, char_data *k, bool details) {
 		build_page_display(ch, "%s PC '\ty%s\t0', Lastname '\ty%s\t0', IDNum: [%5d], In room [%5d]", lbuf, GET_NAME(k), GET_CURRENT_LASTNAME(k) ? GET_CURRENT_LASTNAME(k) : "none", GET_IDNUM(k), IN_ROOM(k) ? GET_ROOM_VNUM(IN_ROOM(k)) : NOWHERE);
 	}
 	else {	// mob
-		build_page_display(ch, "%s %s '\ty%s\t0', ID: [%5d], In room [%5d]", lbuf, (!IS_MOB(k) ? "NPC" : "MOB"), GET_NAME(k), k->script_id, IN_ROOM(k) ? GET_ROOM_VNUM(IN_ROOM(k)) : NOWHERE);
+		build_page_display(ch, "%s %s '\ty%s\t0', ID: [%5d], In room [%5d]", lbuf, (!IS_MOB(k) ? "NPC" : "MOB"), GET_NAME(k), ((SCRIPT(k) && IN_ROOM(k)) ? char_script_id(k) : k->script_id), IN_ROOM(k) ? GET_ROOM_VNUM(IN_ROOM(k)) : NOWHERE);
 	}
 	
 	if (!IS_NPC(k) && GET_ACCOUNT(k)) {
