@@ -382,6 +382,7 @@ Available options:
 
 Ranking immortals may use the syntax:  eedit [empire] <option> <argument>
  adminflags - immortals may set admin flags on empires
+ rescan - immortals can have the game rescan territory and other stats
 
 See also: PRIVILEGE, EMPIRE TRAITS
 #
@@ -474,6 +475,24 @@ to set a good adjective to go with your new name.
 
 See also: EMPIRE ADJECTIVE, EMPIRE BANNER
 #
+"EEDIT RESCAN" "UTILITY RESCAN" "UTIL RESCAN" "RESCAN EMPIRES"
+
+Usage:  eedit <empire> rescan
+        eedit rescan <empire>
+        eedit rescan all
+
+Immortals with the "EMPIRES" grant can trigger a 'rescan' of one or all empires
+with this command. This refreshes or updates:
+ - empire techs, fame, and greatness
+ - progress goals
+ - dropped items
+ - territory claim counts
+ - checks empty cities for ruins
+
+This was formerly 'utility rescan'.
+
+See also: GRANT
+#d
 EFIND
 
 Usage:  efind <name>

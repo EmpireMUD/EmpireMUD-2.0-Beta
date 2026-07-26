@@ -1415,7 +1415,7 @@ Usage:  show dropped <empire>
 
 Shows the recorded counts of items on the ground in the empire. These items
 count towards the 'total' on the einventory command. You can refresh them
-with 'util rescan [empire].
+with 'eedit rescan [empire | all]'.
 
 See also: EINVENTORY
 #e
@@ -2071,8 +2071,6 @@ Available utilities:
     reports the results.
  &credoislands&0 - Renumbers all the islands (requires confirmation; may rearrange
     empire inventories).
- &crescan <empire | all>&0 - Rereads territory and members, which can fix issues.
-    Also re-scans items on the ground (SHOW DROPPED).
  &cresetbuildingtriggers <vnum | all>&0 - Reattaches triggers to buildings/rooms,
     e.g. if you made a change in OLC and want live buildings updated.
  &cstrlen&0 - Give various measures of string length.
