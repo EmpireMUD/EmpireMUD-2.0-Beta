@@ -2784,7 +2784,7 @@ void add_obj_to_efind(char_data *ch, struct efind_group **list, obj_data *obj, v
 	
 	if (obj && OBJ_CAN_STACK(obj)) {
 		DL_FOREACH(*list, eg) {
-			if (eg->location == location && eg->stackable && GET_OBJ_VNUM(eg->obj) == GET_OBJ_VNUM(obj)) {
+			if (eg->location == location && eg->stackable && GET_OBJ_VNUM(eg->obj) == GET_OBJ_VNUM(obj) && (GET_OBJ_SHORT_DESC(eg->obj) == GET_OBJ_SHORT_DESC(obj) || !strcmp(GET_OBJ_SHORT_DESC(eg->obj), GET_OBJ_SHORT_DESC(obj)))) {
 				eg->count += 1;
 				found = TRUE;
 				break;
