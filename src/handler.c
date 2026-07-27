@@ -12286,7 +12286,7 @@ void vehicle_to_room(vehicle_data *veh, room_data *room) {
 		return;
 	}
 	if (check_vehicle_recursion(veh, room)) {
-		log("SYSERR: vehicle_to_room attempting to place a vehicle inside itself (Room %d, vehicle %s)%s", GET_ROOM_VNUM(room), VEH_SHORT_DESC(veh), (!IN_ROOM(veh) ? ", sending to room 0 instead" : ""));
+		syslog(SYS_ERROR, LVL_START_IMM, TRUE, "SYSERR: vehicle_to_room attempting to place a vehicle inside itself (Room %d, vehicle %s)%s", GET_ROOM_VNUM(room), VEH_SHORT_DESC(veh), (!IN_ROOM(veh) ? ", sending to room 0 instead" : ""));
 		if (!IN_ROOM(veh)) {
 			// fail over
 			room = real_room(0);
