@@ -6576,14 +6576,7 @@ ACMD(do_get) {
 		if (cont_dotmode == FIND_INDIV) {
 			argptr = arg2;
 			number = get_number(&argptr);
-			if ((cont = get_obj_for_char_prefer_container(ch, argptr, &number))) {
-				// found preferred container
-				mode = (cont->carried_by ? FIND_OBJ_INV : (cont->worn_by ? FIND_OBJ_EQUIP : FIND_OBJ_ROOM));
-			}
-			else {
-				// try another way
-				mode = generic_find(argptr, &number, FIND_OBJ_INV | FIND_OBJ_ROOM | FIND_OBJ_EQUIP | FIND_VEHICLE_ROOM | FIND_VEHICLE_INSIDE, ch, &tmp_char, &cont, &find_veh);
-			}
+			mode = generic_find(argptr, &number, FIND_OBJ_INV | FIND_OBJ_ROOM | FIND_OBJ_EQUIP | FIND_VEHICLE_ROOM | FIND_VEHICLE_INSIDE, ch, &tmp_char, &cont, &find_veh);
 			
 			if (find_veh) {
 				// pass off to vehicle handler
@@ -7626,13 +7619,7 @@ ACMD(do_put) {
 	}
 	else {
 		number = get_number(&thecont);
-		if ((cont = get_obj_for_char_prefer_container(ch, thecont, &number))) {
-			// found preferred container
-		}
-		else {
-			// try another way
-			generic_find(thecont, &number, FIND_OBJ_INV | FIND_OBJ_ROOM | FIND_OBJ_EQUIP | FIND_VEHICLE_ROOM | FIND_VEHICLE_INSIDE, ch, &tmp_char, &cont, &find_veh);
-		}
+		generic_find(thecont, &number, FIND_OBJ_INV | FIND_OBJ_ROOM | FIND_OBJ_EQUIP | FIND_VEHICLE_ROOM | FIND_VEHICLE_INSIDE, ch, &tmp_char, &cont, &find_veh);
 		
 		if (find_veh) {
 			// override for put obj in vehicle
