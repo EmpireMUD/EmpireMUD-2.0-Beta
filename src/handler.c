@@ -12017,6 +12017,32 @@ int get_number(char **name) {
 //// VEHICLE HANDLERS ////////////////////////////////////////////////////////
 
 /**
+* Ensure a vehicle is not going inside itself.
+*
+* @param vehicle_data *veh The vehicle about to move.
+* @param room_data *room The target room to send it to.
+* @return bool TRUE if the vehicle would end up inside itself, FALSE if not.
+*/
+bool check_vehicle_recursion(vehicle_data *veh, room_data *room) {
+	vehicle_data *temp = room ? GET_ROOM_VEHICLE(room) : NULL;
+	
+	while (temp) {
+		if (temp == veh) {
+			// inside itself!?
+			return TRUE;
+		}
+		else {
+			// go up a level
+			temp = IN_ROOM(temp) ? GET_ROOM_VEHICLE(IN_ROOM(temp)) : NULL;
+		}
+	}
+	
+	// if we got here, we're safe
+	return FALSE;
+}
+
+
+/**
 * Pre-extracts a vehicle from the game. The actual extraction will happen
 * slightly later in extract_pending_vehicles().
 *
@@ -12258,6 +12284,17 @@ void vehicle_to_room(vehicle_data *veh, room_data *room) {
 	if (!veh || !room) {
 		log("SYSERR: Illegal value(s) passed to vehicle_to_room. (Room %p, vehicle %p)", room, veh);
 		return;
+	}
+	if (check_vehicle_recursion(veh, room)) {
+		log("SYSERR: vehicle_to_room attempting to place a vehicle inside itself (Room %d, vehicle %s)%s", GET_ROOM_VNUM(room), VEH_SHORT_DESC(veh), (!IN_ROOM(veh) ? ", sending to room 0 instead" : ""));
+		if (!IN_ROOM(veh)) {
+			// fail over
+			room = real_room(0);
+		}
+		else {
+			// just bloc kit
+			return;
+		}
 	}
 	
 	if (IN_ROOM(veh)) {
