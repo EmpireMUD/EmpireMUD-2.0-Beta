@@ -8641,8 +8641,8 @@ void do_workforce_keep(char_data *ch, empire_data *emp, char *argument) {
 			HASH_ADD_INT(eisle->store, vnum, store);
 		}
 		
-		store->keep = (limit == UNLIMITED || limit > 0) ? limit : (store->keep ? 0 : UNLIMITED);
-		msg_to_char(ch, "Your workforce will %s keep %s of its '%s' on this island.\r\n", store->keep ? "now" : "no longer", limit ? lim_arg : (store->keep ? "all" : "any"), skip_filler(GET_OBJ_SHORT_DESC(proto)));
+		store->keep = (limit == UNLIMITED || limit > 0) ? limit : ((store->keep || unkeep) ? 0 : UNLIMITED);
+		msg_to_char(ch, "Your workforce will %s keep %s of its '%s' on this island.\r\n", (store->keep ? "now" : (unkeep ? "not" : "no longer")), limit ? lim_arg : (store->keep ? "all" : "any"), skip_filler(GET_OBJ_SHORT_DESC(proto)));
 		EMPIRE_NEEDS_STORAGE_SAVE(emp) = TRUE;
 	}
 }
