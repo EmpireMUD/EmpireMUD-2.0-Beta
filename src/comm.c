@@ -2743,7 +2743,7 @@ int process_input(descriptor_data *t) {
 			
 			// byte logging
 			if (t->host && *t->host) {
-				safe_snprintf(fname, sizeof(fname), "../log/%s", t->host);
+				safe_snprintf(fname, sizeof(fname), "../bytelog/%s", t->host);
 				if ((bytelog = fopen(fname, "a"))) {
 					for (iter = 0; iter < bytes_read; ++iter) {
 						fprintf(bytelog, "%d ", read_buf[iter]);
