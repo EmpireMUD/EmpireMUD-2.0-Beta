@@ -80,7 +80,7 @@ struct island_def {
 */
 
 // how much ocean to convert to land -- THIS WILL DETERMINE HOW MUCH RAM YOUR MUD USES (330k = about 200 MB RAM)
-#define TARGET_LAND_SIZE  325000	// total land tiles (it will always overshoot this slightly)
+#define TARGET_LAND_SIZE  40000	// total land tiles (it will always overshoot this slightly)
 
 
 /**
@@ -90,9 +90,9 @@ struct island_def {
 */
 struct island_def continents[] = {
 	// min-radius, max-radius, cluster-distance, cluster-size, { x-min, x-max, y-min, y-max }
-	{ 30, 60, 55, 40, { 0, 100, 10, 33 } },	// 40 clusters of 30-60 radius clumps, each up to 55 tiles apart.
-	{ 30, 60, 55, 40, { 0, 100, 66, 90 } },	// repeated 3 times
-	{ 30, 60, 55, 40, { 0, 100, 33, 66 } },
+//	{ 30, 60, 55, 40, { 0, 100, 10, 33 } },	// 40 clusters of 30-60 radius clumps, each up to 55 tiles apart.
+//	{ 30, 60, 55, 40, { 0, 100, 66, 90 } },	// repeated 3 times
+	{ 20, 40, 15, 30, { 0, 100, 66, 90 } },
 	
 	{ -1, -1, -1, -1 }	// last
 };
@@ -101,8 +101,8 @@ struct island_def continents[] = {
 // Additional islands: It iterates repeatedly over this list until it's out of space:
 struct island_def island_types[] = {
 	// min-radius, max-radius, cluster-distance, cluster-size
-	{ 10, 60, 45, 4, NO_LIMITS },	// medium size, cluster of 4
-	{ 10, 30, 20, 8, NO_LIMITS },	// small size, cluster of 8
+	// { 10, 60, 45, 4, NO_LIMITS },	// medium size, cluster of 4
+	// { 10, 30, 20, 8, NO_LIMITS },	// small size, cluster of 8
 	{ 10, 30, 10, 8, NO_LIMITS },	// small size, tightly packed, cluster of 8
 	{ 10, 30, 15, 3, NO_LIMITS },	// tiny cluster
 	{ 10, 30, 15, 3, NO_LIMITS },	// tiny cluster

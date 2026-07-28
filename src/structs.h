@@ -107,8 +107,8 @@
  * Your actual RAM usage will depend on how much land your game has. Ocean
  * tiles are removed from memory when not in use.
  */
-#define MAP_WIDTH  1800
-#define MAP_HEIGHT  1000
+#define MAP_WIDTH  400
+#define MAP_HEIGHT  300
 #define MAP_SIZE  (MAP_WIDTH * MAP_HEIGHT)
 
 // for string formatting
@@ -152,7 +152,7 @@
 // NOTE: You should use a salt starting with "$5$" and ending with "$" in order
 // to get support for longer passwords and proper encryption, e.g. "$5$salt$"
 // See http://linux.die.net/man/3/crypt for more info.
-#define PASSWORD_SALT  "salt"
+#define PASSWORD_SALT  "$5$salt$"
 
 // features for determining whether or not a map tile needs to be in RAM as a room_data*
 #define BASIC_OCEAN  6	// sector vnum used as the base for fully ignorable and blank rooms
