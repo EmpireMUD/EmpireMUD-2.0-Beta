@@ -1221,4 +1221,26 @@ $n stands before you in a luxurious white fur robe.~
 R
 4 5617 0
 S
+#2375
+backpack pack magewhisper~
+a magewhisper backpack~
+A magewhisper backpack is floating here.~
+   The backpack has the scent of fermented magewhisper and, strangely, it looks
+a bit larger inside than outside.
+~
+24 mo ar 0 0 2
+1 0 0
+11 0
+S
+#2376
+pocket mana-vested manavested vested~
+a mana-vested pocket~
+A mana-vested pocket is lying here.~
+   This pocket attaches with a string at the waist. It's small, but when you
+reach inside, your arm sinks to the elbow.
+~
+24 mo ar 0 0 3
+1 0 0
+11 0
+S
 $

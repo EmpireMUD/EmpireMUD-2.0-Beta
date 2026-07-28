@@ -600,4 +600,98 @@ I 29 5006 100.00 1 r  # RUINS-TO-BLD: Ruins
 R
 1002 2 5 0
 S
+#5224
+Mountain Pasture~
+A High Mountain Pasture~
+&y/&g""&y\~
+24 0 bdp 0
+0 0 0 289
+E
+pasture building around~
+   Grass grows in places where the slopes are gentler. Parts of the pasture are
+fenced off, but much of the area is free for yaks to roam.
+~
+E
+grass~
+Where the grass grows, it grows tall. It seems to like being close to the sun.
+~
+E
+slopes mountains~
+The view from up here in the mountains is exquisite.
+~
+E
+yaks~
+Yaks roam in the distance, slowly plowing through the grass.
+~
+I 30 5004 100.00 1  # RUINS-TO-VEH: ruins of #n
+I 31 3012 6.00 360 p  # PRODUCTION: fillet of raw meat
+I 31 9234 4.00 80 p  # PRODUCTION: sack of yak wool
+I+ 7 11  # Depletion: secondary
+M
+9234 20.00 0
+M
+9314 100.00 0
+R
+6000 1 1 0
+R
+6790 1 1 0
+S
+#5225
+Mountain Pens~
+The High Mountain Pens~
+&y/&t''&y\~
+24 0 bdp 0
+0 0 0 290
+E
+grass~
+Where the grass grows, it grows tall. It seems to like being close to the sun.
+~
+E
+slopes mountains~
+The view from up here in the mountains is exquisite.
+~
+E
+pen pens building around~
+   Simple wood-and-rope pens dot the mountain pastures, though they do little
+to corral the llamas, who seem to have found their way out.
+~
+E
+llamas~
+Shaggy llamas graze here, both in the pens and on the mountainside.
+~
+I 30 5004 100.00 1  # RUINS-TO-VEH: ruins of #n
+I 31 3012 6.00 360 p  # PRODUCTION: fillet of raw meat
+I 31 1361 4.00 80 p  # PRODUCTION: bag of soft llama wool
+I+ 7 11  # Depletion: secondary
+M
+9142 20.00 0
+M
+9315 100.00 0
+R
+6000 1 1 0
+R
+6790 1 1 0
+S
+#5226
+Mountain Corral~
+A Stone Corral in the Mountains~
+&y/&w{}&y\~
+24 0 bdjn 0
+0 0 0 291
+E
+corral stone building around~
+   The corral is made from stacked stones, just high enough to keep the
+livestock in. A small lean-to provides a place to milk and shear; it's
+otherwise wide open.
+~
+E
+mountains~
+Scenic mountains extend into the distance, well beyond the little corral.
+~
+F
+w
+I 30 5004 100.00 1  # RUINS-TO-VEH: ruins of #n
+R
+6050 2 1 0
+S
 $

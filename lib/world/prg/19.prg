@@ -134,4 +134,24 @@ K 2 5111
 P 1002
 P 2011
 S
+#1909
+High Mountain Graziers~
+   Never content with the flats, your empire spreads its pastoral range to the
+highest mountain pastures, where it can graze yaks and llamas at the roof of
+the world.
+~
+4 1 0 5 0
+K 2 5224
+K 2 5225
+K 2 5226
+P 1908
+P 1904
+W
+7 5111 0 1 a
+W
+7 5214 0 1 a
+_
+A minor bonus for having both Mountain Engineering and Livestock Livelihood.
+~
+S
 $
