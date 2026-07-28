@@ -832,6 +832,17 @@ Rewards the following building:
 
 See also: PROGRESS
 #
+"HIGH MOUNTAIN GRAZIERS" "MOUNTAIN GRAZIERS" GRAZIERS
+
+High Mountain Graziers (Community goal)
+
+Rewards the following buildings:
+  &y/&g""&y\&0  mountain pasture
+  &y/&t''&y\&0  mountain pens
+  &y/&w{}&y\&0  mountain corral
+
+See also: LIVESTOCK LIVELIHOOD, MOUNTAIN ENGINEERING
+#
 HOME "HOME STORAGE"
 
 Usage:  home [set/unset/list/clear]
@@ -909,7 +920,7 @@ Buying this goal lets you build:
   |ST|  pigsty
   (SS)  stable
 
-See also: PROGRESS
+See also: &y/&w{}&y\  Mountain Corral, PROGRESS
 #
 LUXURIES "LUXURIES GOAL"
 
@@ -1006,7 +1017,7 @@ Rewards the following buildings:
   &y/&0OO&y\&0  Tunnel  (tunnel command)
   &y(FF)&0  volcanicforge
 
-See also: PROGRESS, TUNNEL
+See also: HIGH MOUNTAIN GRAZIERS, PROGRESS, TUNNEL
 #
 NONAGGRESSION "NON-AGGRESSION" "DIPLOMACY NONAGGRESSION"
 

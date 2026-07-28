@@ -780,6 +780,37 @@ Cannot be painted.
 
 See also: DRINK, FILL
 #
+"MOUNTAIN PASTURE" "YAK FARMING"
+
+&y/&g""&y\&0  Mountain Pasture  (High Mountain Graziers goal)
+
+Chameleon:  &y/\/\&0
+
+These pastures will produce yaks. Workforce can harvest their wool and meat.
+
+See also: WORKFORCE PRODUCTION
+#
+"MOUNTAIN PENS" "LLAMA FARMING"
+
+&y/&t''&y\&0  Mountain Pens  (High Mountain Graziers goal)
+
+Chameleon:  &y/\/\&0
+
+These pens will produce llamas. Workforce can harvest their wool and meat.
+
+See also: WORKFORCE PRODUCTION
+#
+"MOUNTAIN CORRAL" "STONE CORRAL"
+
+&y/&w{}&y\&0  Mountain Corral  (High Mountain Graziers goal)
+
+Chameleon:  &y/\/\&0
+
+This building functions as an open-air stable. Animals will remain inside and
+may be sheared or milked here.
+
+See also: MILK, SHEAR, STABLE
+#
 MUDHUT "MUD HUT"
 
 &y.&0()&y.&0  Mud Hut  (Build ability)
