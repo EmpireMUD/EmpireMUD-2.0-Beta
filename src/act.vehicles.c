@@ -762,8 +762,9 @@ void process_driving(char_data *ch) {
 	
 	// attempt to move the vehicle
 	if (!move_vehicle(ch, veh, dir, subcmd)) {
-		look_at_room(ch);	// show them where they stopped
-		msg_to_char(ch, "\r\n");	// extra linebreak between look and "vehicle stops"
+		// as of b5.211, suppress auto-look when there's an error. This is hiding the error message above the 'look'.
+		// look_at_room(ch);	// show them where they stopped
+		// msg_to_char(ch, "\r\n");	// extra linebreak between look and "vehicle stops"
 		cancel_action(ch);
 		return;
 	}
