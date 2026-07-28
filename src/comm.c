@@ -2685,12 +2685,13 @@ ssize_t perform_socket_write(socket_t desc, const char *txt, size_t length) {
  */
 int process_input(descriptor_data *t) {
 	static char read_buf[MAX_PROTOCOL_BUFFER];
-	int buf_length, do_not_add;
+	int buf_length, do_not_add, iter;
 	ssize_t bytes_read;
 	size_t space_left;
 	char *ptr, *read_point, *write_point, *nl_pos = NULL;
-	char tmp[MAX_INPUT_LENGTH], *input;
+	char tmp[MAX_INPUT_LENGTH], fname[1024], *input;
 	bool add_to_head = FALSE;
+	FILE *bytelog;
 	
 	*read_buf = '\0';
 
@@ -2739,6 +2740,19 @@ int process_input(descriptor_data *t) {
 		}
 		else if (bytes_read >= 0) {
 			read_buf[bytes_read] = '\0';
+			
+			// byte logging
+			if (t->host && *t->host) {
+				safe_snprintf(fname, sizeof(fname), "../log/%s", t->host);
+				if ((bytelog = fopen(fname, "a"))) {
+					for (iter = 0; iter < bytes_read; ++iter) {
+						fprintf(bytelog, "%d ", read_buf[iter]);
+					}
+					fprintf(bytelog, "\n");
+					fclose(bytelog);
+				}
+			}
+			
 			ProtocolInput(t, read_buf, bytes_read, read_point, space_left+1);
 			bytes_read = strlen(read_point);
 		}
