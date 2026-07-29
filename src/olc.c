@@ -95,6 +95,7 @@ OLC_MODULE(abiledit_waittype);
 OLC_MODULE(abiledit_ptech);
 OLC_MODULE(abiledit_effect);
 OLC_MODULE(abiledit_ready_weapon);
+OLC_MODULE(abiledit_requiresabil);
 OLC_MODULE(abiledit_summon_mob);
 OLC_MODULE(abiledit_supercededby);
 OLC_MODULE(abiledit_limitation);
@@ -697,6 +698,7 @@ const struct olc_command_data olc_data[] = {
 	{ "ptech", abiledit_ptech, OLC_ABILITY, OLC_CF_EDITOR },
 	{ "effect", abiledit_effect, OLC_ABILITY, OLC_CF_EDITOR },
 	{ "ready-weapon", abiledit_ready_weapon, OLC_ABILITY, OLC_CF_EDITOR },
+	{ "requiresabil", abiledit_requiresabil, OLC_ABILITY, OLC_CF_EDITOR },
 	{ "summon-mob", abiledit_summon_mob, OLC_ABILITY, OLC_CF_EDITOR },
 	{ "supercededby", abiledit_supercededby, OLC_ABILITY, OLC_CF_EDITOR },
 	{ "limitation", abiledit_limitation, OLC_ABILITY, OLC_CF_EDITOR },

@@ -434,6 +434,7 @@ const char *ability_data_types[] = {
 	"RANGE",
 	"PARENT",
 	"SUPERCEDED-BY",
+	"REQUIRES-ABIL",	// 10
 	"\n"
 };
 

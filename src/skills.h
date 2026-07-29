@@ -236,6 +236,7 @@
 #define ADL_RANGE			BIT(7)	// some abilities can control range
 #define ADL_PARENT			BIT(8)	// indicates this ability comes free with that one
 #define ADL_SUPERCEDED_BY	BIT(9)	// if player has that ability, use it instead of this one
+#define ADL_REQUIRES_ABIL	BIT(10)	// cannot use this ability unless you have another
 
 
 // AGH_x: ability gain hooks
@@ -538,6 +539,7 @@ void get_ability_type_display(struct ability_type *list, char *save_buffer, bool
 int get_player_level_for_ability(char_data *ch, any_vnum abil_vnum);
 bool has_ability_data_any(ability_data *abil, int type);
 bool has_ability_hook(ability_data *abil, bitvector_t hook_type, int hook_value);
+bool has_required_abilities(char_data *ch, ability_data *abil);
 char_data *load_companion_mob(char_data *leader, struct companion_data *cd);
 void perform_ability_command(char_data *ch, ability_data *abil, char *argument);
 void read_ability_requirements();

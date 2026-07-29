@@ -1095,7 +1095,9 @@ The 'data' field is used by different types of abilities. Available types are:
  &cACTION&0 - Performs action(s) when successful. See ABILEDIT ACTIONS
  &cRANGE&0 - Used by some actions, as noted.
  &cPARENT&0 - Grants this ability if player has its parent. See ABILEDIT PARENT
- &cSUPERCEDED-BY&0 - A better version of this ability. SEE ABILEDIT SUPERCEDE
+ &cSUPERCEDED-BY&0 - A better version of this ability. See ABILEDIT SUPERCEDE
+ &cREQUIRES-ABIL&0 - Can only use/trigger this ability if you have another.
+    See ABILEDIT REQUIRES-ABIL
 
 See also: ABILEDIT TYPES, ABILITY EFFECTS, PLAYER TECHNOLOGIES, OLC ABILITIES
 #d
@@ -1805,6 +1807,16 @@ This determines which pool a RESTORE ability will affect. If you set it to
 (not blood).
 
 See also: RESTORE ABILITY
+#d
+"ABILEDIT REQUIRES-ABILITY" "ABILEDIT REQUIRESABILITY" "ABILEDIT REQUIRES ABILITY"
+
+The REQUIRES-ABIL ability data indicates that the player can only use (or
+trigger) this ability if they also have another ability. 
+
+Also, if the player has an ability that is superceded by another, but they are
+missing a REQUIRES-ABIL for the 2nd ability, they will use the lower one.
+
+See also: OLC ABILITIES, ABILEDIT DATA
 #d
 "ABILEDIT RESOURCE ABILITY" "ABILEDIT RESOURCE ABILITIES" "RESOURCE ABILITY" "RESOURCE ABILITIES"
 
