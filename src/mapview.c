@@ -1436,13 +1436,13 @@ void build_vehicle_icon(char_data *ch, room_data *room, vehicle_data *main_veh, 
 * @param char_data *ch The person doing the looking.
 * @param room_data *room The room to look at.
 * @param bitvector_t options LRR_x flags.
-* @param const char *title_add Optional: Adds text to the room title, which should start with a comma or space. May be empty or NULL.
+* @param vehicle_data *view_from_veh Optional: For the "nested view" from aboard a ship, the ship we're currently viewing from. Usually NULL.
 */
-void look_at_room_by_loc(char_data *ch, room_data *room, bitvector_t options, const char *title_add) {
+void look_at_room_by_loc(char_data *ch, room_data *room, bitvector_t options, vehicle_data *view_from_veh) {
 	struct mappc_data_container *mappc = NULL;
 	struct mappc_data *pc, *next_pc;
 	struct empire_city_data *city;
-	char output[MAX_STRING_LENGTH], col_buf[256], flagbuf[MAX_STRING_LENGTH], locbuf[128], partialbuf[MAX_STRING_LENGTH], rlbuf[MAX_STRING_LENGTH], tmpbuf[MAX_STRING_LENGTH], advcolbuf[128];
+	char output[MAX_STRING_LENGTH], veh_buf[256], col_buf[256], flagbuf[MAX_STRING_LENGTH], locbuf[128], partialbuf[MAX_STRING_LENGTH], rlbuf[MAX_STRING_LENGTH], tmpbuf[MAX_STRING_LENGTH], advcolbuf[128];
 	char room_name_color[MAX_STRING_LENGTH];
 	int s, t, mapsize, iter, check_x, check_y, level, ter_type;
 	int first_iter, second_iter, xx, yy, magnitude, north;
@@ -1486,19 +1486,16 @@ void look_at_room_by_loc(char_data *ch, room_data *room, bitvector_t options, co
 		msg_to_char(ch, "You see nothing but infinite darkness...\r\n");
 		return;
 	}
-
-	if (!look_out && AFF_FLAGGED(ch, AFF_EARTHMELDED) && IS_ANY_BUILDING(IN_ROOM(ch)) && !ROOM_BLD_FLAGGED(IN_ROOM(ch), BLD_OPEN)) {
+	
+	// earthmeld cannot see room they are in when under a building
+	if (!look_out && AFF_FLAGGED(ch, AFF_EARTHMELDED) && room == IN_ROOM(ch) && IS_ANY_BUILDING(room) && !ROOM_BLD_FLAGGED(room, BLD_OPEN)) {
 		msg_to_char(ch, "You are beneath a building.\r\n");
 		return;
 	}
 
 	// check for ship
 	if (!look_out /* && !ship_partial */ && show_on_ship && !IS_SET(options, LRR_LOOK_OUT_INSIDE)) {
-		strcpy(tmpbuf, skip_filler(VEH_SHORT_DESC(GET_ROOM_VEHICLE(room))));
-		ucwords(tmpbuf);
-		safe_snprintf(locbuf, sizeof(locbuf), ", %s the %s", VEH_FLAGGED(GET_ROOM_VEHICLE(room), VEH_IN) ? "Inside" : "Aboard", tmpbuf);
-		
-		look_at_room_by_loc(ch, IN_ROOM(GET_ROOM_VEHICLE(room)), LRR_SHIP_PARTIAL, locbuf);
+		look_at_room_by_loc(ch, IN_ROOM(GET_ROOM_VEHICLE(room)), LRR_SHIP_PARTIAL, GET_ROOM_VEHICLE(room));
 	}
 
 	// mappc setup
@@ -1511,6 +1508,16 @@ void look_at_room_by_loc(char_data *ch, room_data *room, bitvector_t options, co
 	outer = room;
 	while (GET_ROOM_VEHICLE(outer) && IN_ROOM(GET_ROOM_VEHICLE(outer))) {
 		outer = IN_ROOM(GET_ROOM_VEHICLE(outer));
+	}
+	
+	// put ship in name
+	if (ship_partial && view_from_veh) {
+		strcpy(tmpbuf, skip_filler(VEH_SHORT_DESC(view_from_veh)));
+		ucwords(tmpbuf);
+		safe_snprintf(veh_buf, sizeof(veh_buf), ", %s the %s", VEH_FLAGGED(view_from_veh, VEH_IN) ? "Inside" : "Aboard", tmpbuf);
+	}
+	else {
+		*veh_buf = '\0';
 	}
 	
 	// set up location: may not actually have a map location
@@ -1537,6 +1544,7 @@ void look_at_room_by_loc(char_data *ch, room_data *room, bitvector_t options, co
 	}
 
 	if (IS_IMMORTAL(ch) && PRF_FLAGGED(ch, PRF_ROOMFLAGS)) {
+		// TODO this shows room flags for the room you're IN, e.g. when looking over the deck of a ship. Is that right?
 		sprintbit(ROOM_AFF_FLAGS(IN_ROOM(ch)), room_aff_bits, flagbuf, TRUE);
 		if (GET_BUILDING(IN_ROOM(ch))) {
 			sprintbit(GET_BLD_FLAGS(GET_BUILDING(IN_ROOM(ch))), bld_flags, partialbuf, TRUE);
@@ -1547,14 +1555,14 @@ void look_at_room_by_loc(char_data *ch, room_data *room, bitvector_t options, co
 			safe_snprintf(flagbuf + strlen(flagbuf), sizeof(flagbuf) - strlen(flagbuf), "| %s", partialbuf);
 		}
 		
-		sprintf(output, "[%d] %s%s%s%s %s&0 %s[ %s]\r\n", GET_ROOM_VNUM(room), advcolbuf, room_name_color, NULLSAFE(title_add), rlbuf, locbuf, (HAS_TRIGGERS(room) ? "[TRIG] " : ""), flagbuf);
+		sprintf(output, "[%d] %s%s%s%s %s&0 %s[ %s]\r\n", GET_ROOM_VNUM(room), advcolbuf, room_name_color, veh_buf, rlbuf, locbuf, (HAS_TRIGGERS(room) ? "[TRIG] " : ""), flagbuf);
 	}
-	else if (HAS_NAVIGATION(ch) && !NO_LOCATION(IN_ROOM(ch))) {
+	else if (HAS_NAVIGATION(ch) && !NO_LOCATION(room)) {
 		// need navigation to see coords
-		sprintf(output, "%s%s%s%s %s&0\r\n", advcolbuf, room_name_color, NULLSAFE(title_add), rlbuf, locbuf);
+		sprintf(output, "%s%s%s%s %s&0\r\n", advcolbuf, room_name_color, veh_buf, rlbuf, locbuf);
 	}
 	else {
-		sprintf(output, "%s%s%s%s&0\r\n", advcolbuf, room_name_color, rlbuf, NULLSAFE(title_add));
+		sprintf(output, "%s%s%s%s&0\r\n", advcolbuf, room_name_color, rlbuf, veh_buf);
 	}
 
 	// show the room
