@@ -1486,13 +1486,13 @@ void look_at_room_by_loc(char_data *ch, room_data *room, bitvector_t options) {
 		return;
 	}
 
-	if (!look_out && AFF_FLAGGED(ch, AFF_EARTHMELDED) && IS_ANY_BUILDING(room) && !ROOM_BLD_FLAGGED(room, BLD_OPEN)) {
+	if (!look_out && AFF_FLAGGED(ch, AFF_EARTHMELDED) && IS_ANY_BUILDING(IN_ROOM(ch)) && !ROOM_BLD_FLAGGED(IN_ROOM(ch), BLD_OPEN)) {
 		msg_to_char(ch, "You are beneath a building.\r\n");
 		return;
 	}
 
 	// check for ship
-	if (!look_out && !ship_partial && show_on_ship && !IS_SET(options, LRR_LOOK_OUT_INSIDE)) {
+	if (!look_out /* && !ship_partial */ && show_on_ship && !IS_SET(options, LRR_LOOK_OUT_INSIDE)) {
 		look_at_room_by_loc(ch, IN_ROOM(GET_ROOM_VEHICLE(room)), LRR_SHIP_PARTIAL);
 	}
 
@@ -1509,10 +1509,10 @@ void look_at_room_by_loc(char_data *ch, room_data *room, bitvector_t options) {
 	}
 	
 	// put ship in name
-	if (ship_partial && GET_ROOM_VEHICLE(room)) {
-		strcpy(tmpbuf, skip_filler(VEH_SHORT_DESC(GET_ROOM_VEHICLE(room))));
+	if (ship_partial && GET_ROOM_VEHICLE(IN_ROOM(ch))) {
+		strcpy(tmpbuf, skip_filler(VEH_SHORT_DESC(GET_ROOM_VEHICLE(IN_ROOM(ch)))));
 		ucwords(tmpbuf);
-		safe_snprintf(veh_buf, sizeof(veh_buf), ", %s the %s", VEH_FLAGGED(GET_ROOM_VEHICLE(room), VEH_IN) ? "Inside" : "Aboard", tmpbuf);
+		safe_snprintf(veh_buf, sizeof(veh_buf), ", %s the %s", VEH_FLAGGED(GET_ROOM_VEHICLE(IN_ROOM(ch)), VEH_IN) ? "Inside" : "Aboard", tmpbuf);
 	}
 	else {
 		*veh_buf = '\0';
@@ -1542,19 +1542,19 @@ void look_at_room_by_loc(char_data *ch, room_data *room, bitvector_t options) {
 	}
 
 	if (IS_IMMORTAL(ch) && PRF_FLAGGED(ch, PRF_ROOMFLAGS)) {
-		sprintbit(ROOM_AFF_FLAGS(room), room_aff_bits, flagbuf, TRUE);
-		if (GET_BUILDING(room)) {
-			sprintbit(GET_BLD_FLAGS(GET_BUILDING(room)), bld_flags, partialbuf, TRUE);
+		sprintbit(ROOM_AFF_FLAGS(IN_ROOM(ch)), room_aff_bits, flagbuf, TRUE);
+		if (GET_BUILDING(IN_ROOM(ch))) {
+			sprintbit(GET_BLD_FLAGS(GET_BUILDING(IN_ROOM(ch))), bld_flags, partialbuf, TRUE);
 			safe_snprintf(flagbuf + strlen(flagbuf), sizeof(flagbuf) - strlen(flagbuf), "| %s", partialbuf);
 		}
-		if (GET_ROOM_TEMPLATE(room)) {
-			sprintbit(GET_RMT_FLAGS(GET_ROOM_TEMPLATE(room)), room_template_flags, partialbuf, TRUE);
+		if (GET_ROOM_TEMPLATE(IN_ROOM(ch))) {
+			sprintbit(GET_RMT_FLAGS(GET_ROOM_TEMPLATE(IN_ROOM(ch))), room_template_flags, partialbuf, TRUE);
 			safe_snprintf(flagbuf + strlen(flagbuf), sizeof(flagbuf) - strlen(flagbuf), "| %s", partialbuf);
 		}
 		
 		sprintf(output, "[%d] %s%s%s%s %s&0 %s[ %s]\r\n", GET_ROOM_VNUM(room), advcolbuf, room_name_color, veh_buf, rlbuf, locbuf, (HAS_TRIGGERS(room) ? "[TRIG] " : ""), flagbuf);
 	}
-	else if (HAS_NAVIGATION(ch) && !NO_LOCATION(room)) {
+	else if (HAS_NAVIGATION(ch) && !NO_LOCATION(IN_ROOM(ch))) {
 		// need navigation to see coords
 		sprintf(output, "%s%s%s%s %s&0\r\n", advcolbuf, room_name_color, veh_buf, rlbuf, locbuf);
 	}
@@ -1842,7 +1842,7 @@ void look_at_room_by_loc(char_data *ch, room_data *room, bitvector_t options) {
 	// ship-partial ends here with some vehicles
 	if (ship_partial) {
 		send_to_char("\tw", ch);
-		list_vehicles_to_char(ROOM_VEHICLES(room), ch, TRUE, GET_ROOM_VEHICLE(room));
+		list_vehicles_to_char(ROOM_VEHICLES(room), ch, TRUE, GET_ROOM_VEHICLE(IN_ROOM(ch)));
 		send_to_char("\t0", ch);
 		return;
 	}
