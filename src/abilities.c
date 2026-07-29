@@ -7221,7 +7221,7 @@ void perform_ability_command(char_data *ch, ability_data *abil, char *argument) 
 			}
 		}
 		
-		msg_to_char(ch, "You are missing %s: %s\r\n", (strchr(buf, ',') ? "required abilities" : "a required ability"), buf);
+		msg_to_char(ch, "You are missing %s: %s.\r\n", (strchr(buf, ',') ? "required abilities" : "a required ability"), buf);
 		return;
 	}
 	
