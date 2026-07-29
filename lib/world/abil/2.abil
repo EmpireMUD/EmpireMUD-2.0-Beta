@@ -99,7 +99,7 @@ Outrage~
 a -1 1.00 0 0 0
 C
 outrage 7 AB 1 25 0.00 2009 9 0 2 2
-D 64 15 0
+D 512 216 0
 M
 2
 *~
@@ -125,7 +125,6 @@ M
 14
 $n spins wildly with outrage, hitting everything in sight!~
 T x 1
-T s 1
 X+ 8 25.00
 S
 #210
@@ -159,6 +158,40 @@ S
 Animal Forms~
 0 -1 1.00 0 0 0
 T k 1
+S
+#216
+Provoking Outrage~
+a -1 1.00 0 0 0
+C
+outrage 7 AB 1 25 0.00 2009 9 0 2 2
+D 64 15 0
+M
+2
+*~
+M
+3
+*~
+M
+4
+*~
+M
+10
+*~
+M
+11
+*~
+M
+12
+*~
+M
+13
+You spin wildly with outrage, hitting everything in sight!~
+M
+14
+$n spins wildly with outrage, hitting everything in sight!~
+T x 1
+T s 0
+X+ 8 25.00
 S
 #218
 Dual-Wield~

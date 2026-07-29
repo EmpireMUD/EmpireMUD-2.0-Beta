@@ -484,10 +484,10 @@ S
 column wooden bound pillars~
 a bound wooden column~
 A bound column of wood is lying on the ground.~
-   This sturdy column is made by several thin saplings bound with rope. It
-could be used in place of logs for building.
+   This sturdy column is made by several thin poles bound with rope. It could
+be used in place of logs for building.
 ~
-3 e a 0 0 10
+3 e a 0 0 11
 0 0 0
 0 0
 C
