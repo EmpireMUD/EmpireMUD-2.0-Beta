@@ -458,7 +458,7 @@ most other damage mitigation, like resist-magical.
 
 Gain experience when you take damage to your mana using this ability.
 #
-OUTRAGE
+OUTRAGE "PROVOKING OUTRAGE"
 
 Outrage (Battle ability)
 
@@ -467,10 +467,12 @@ Cost:  50 move + 25 move for each additional target
 Cooldown:  9 seconds
 
 Spin wildly, attacking everything in sight! This area-of-effect ability hits
-all NPCs in the room. If you have the Rescue ability, it will also attempt to
-rescue any player characters who are being attacked by those NPCs.
+all NPCs in the room.
 
-Both Outrage and its auto-Rescue are more effective at higher levels of Battle.
+When you're in the Tank role, this becomes also taunts enemies to attack you
+(similar to Rescue), but deals less damage.
+
+Outrage is more effective at higher levels of Battle.
 
 Gain experience whenever you use Outrage on at least one target.
 
