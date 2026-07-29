@@ -469,10 +469,10 @@ Cooldown:  9 seconds
 Spin wildly, attacking everything in sight! This area-of-effect ability hits
 all NPCs in the room.
 
-When you're in the Tank role, this becomes also taunts enemies to attack you
-(similar to Rescue), but deals less damage.
+If you also have the Rescue ability, this becomes Provoking Outrage. It does
+less damage but will also taunt the targets to attack you.
 
-Outrage is more effective at higher levels of Battle.
+This ability is more effective at higher levels of Battle.
 
 Gain experience whenever you use Outrage on at least one target.
 
