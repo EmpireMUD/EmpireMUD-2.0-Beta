@@ -1845,7 +1845,7 @@ void look_at_room_by_loc(char_data *ch, room_data *room, bitvector_t options, ve
 	// ship-partial ends here with some vehicles
 	if (ship_partial) {
 		send_to_char("\tw", ch);
-		list_vehicles_to_char(ROOM_VEHICLES(room), ch, TRUE, GET_ROOM_VEHICLE(IN_ROOM(ch)));
+		list_vehicles_to_char(ROOM_VEHICLES(room), ch, TRUE, view_from_veh);
 		send_to_char("\t0", ch);
 		return;
 	}
