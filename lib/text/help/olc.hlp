@@ -1816,6 +1816,9 @@ trigger) this ability if they also have another ability.
 Also, if the player has an ability that is superceded by another, but they are
 missing a REQUIRES-ABIL for the 2nd ability, they will use the lower one.
 
+This is only supported for COMMAND abilities. Passives, buffs, and other types
+do not support REQUIRES-ABIL data.
+
 See also: OLC ABILITIES, ABILEDIT DATA
 #d
 "ABILEDIT RESOURCE ABILITY" "ABILEDIT RESOURCE ABILITIES" "RESOURCE ABILITY" "RESOURCE ABILITIES"

@@ -499,11 +499,13 @@ void show_ability_info(char_data *ch, ability_data *abil, ability_data *parent, 
 		}
 	}
 	if (*lbuf) {
+		has_param_details = TRUE;
 		build_page_display(ch, "Requires ability: %s", lbuf);
 	}
 	
 	// supercede?
 	if ((supercede = check_superceded_by(ch, abil)) != abil) {
+		has_param_details = TRUE;
 		build_page_display(ch, "Superceded by: %s", ABIL_NAME(supercede));
 	}
 	
@@ -7177,7 +7179,7 @@ bool check_ability(char_data *ch, char *string, bool exact) {
 * @param char *argument The typed-in args.
 */
 void perform_ability_command(char_data *ch, ability_data *abil, char *argument) {
-	char arg[MAX_INPUT_LENGTH], *argptr = arg;
+	char arg[MAX_INPUT_LENGTH], buf[MAX_STRING_LENGTH], *argptr = arg;
 	struct ability_exec *data;
 	struct empire_city_data *city;
 	ability_data *super;
@@ -7188,6 +7190,7 @@ void perform_ability_command(char_data *ch, ability_data *abil, char *argument) 
 	bitvector_t multi_targ = NOBITS;
 	bool has = FALSE;
 	int find_dir, iter, level, number;
+	struct ability_data_list *adl;
 	
 	if (!ch || !abil) {
 		log("SYSERR: perform_ability_command called without %s.", ch ? "ability" : "character");
@@ -7205,6 +7208,20 @@ void perform_ability_command(char_data *ch, ability_data *abil, char *argument) 
 	// check for a supercede ability and pass control to that instead:
 	if ((super = check_superceded_by(ch, abil)) != abil) {
 		perform_ability_command(ch, super, argument);
+		return;
+	}
+	
+	// check if it requires another ability?
+	if (!has_required_abilities(ch, abil)) {
+		*buf = '\0';
+		
+		LL_FOREACH(ABIL_DATA(abil), adl) {
+			if (adl->type == ADL_REQUIRES_ABIL && !has_ability(ch, adl->vnum)) {
+				safe_snprintf(buf + strlen(buf), sizeof(buf) - strlen(buf), "%s%s", (*buf ? ", " : ""), get_ability_name_by_vnum(adl->vnum));
+			}
+		}
+		
+		msg_to_char(ch, "You are missing %s: %s\r\n", (strchr(buf, ',') ? "required abilities" : "a required ability"), buf);
 		return;
 	}
 	
@@ -12000,7 +12017,7 @@ OLC_MODULE(abiledit_data) {
 	signed long long misc = 0;
 	
 	// ADL_x: determine valid types first
-	allowed_types |= ADL_EFFECT | ADL_LIMITATION | ADL_RANGE | ADL_PARENT | ADL_SUPERCEDED_BY | ADL_REQUIRES_ABIL;
+	allowed_types |= ADL_EFFECT | ADL_LIMITATION | ADL_RANGE | ADL_PARENT | ADL_SUPERCEDED_BY;
 	if (IS_SET(ABIL_TYPES(abil), ABILT_ACTION)) {
 		allowed_types |= ADL_ACTION;
 	}
@@ -12016,6 +12033,9 @@ OLC_MODULE(abiledit_data) {
 	if (IS_SET(ABIL_TYPES(abil), ABILT_PAINT_BUILDING)) {
 		allowed_types |= ADL_PAINT_COLOR;
 	}
+	if (ABIL_COMMAND(abil) && *ABIL_COMMAND(abil)) {
+	 	allowed_types |= ADL_REQUIRES_ABIL;
+	 }
 	
 	// arg1 arg2
 	half_chop(argument, arg1, arg2);
