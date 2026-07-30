@@ -5204,7 +5204,7 @@ void warehouse_store(char_data *ch, char *argument, int mode) {
 			if (OBJ_FLAGGED(obj, OBJ_KEEP)) {
 				kept = TRUE;
 			}
-			else if (UNIQUE_OBJ_CAN_STORE(obj, home_mode) && check_home_store_cap(ch, obj, FALSE, &capped)) {
+			else if (UNIQUE_OBJ_CAN_STORE(obj, home_mode) && (!home_mode || check_home_store_cap(ch, obj, FALSE, &capped))) {
 				// may extract obj
 				store_unique_item(ch, (home_mode ? &GET_HOME_STORAGE(ch) : &EMPIRE_UNIQUE_STORAGE(use_emp)), obj, use_emp, home_mode ? NULL : IN_ROOM(ch), &full);
 				if (!full) {
@@ -5246,7 +5246,7 @@ void warehouse_store(char_data *ch, char *argument, int mode) {
 				kept = TRUE;	// mark for later
 			}
 			
-			if ((!OBJ_FLAGGED(obj, OBJ_KEEP) || (total == 1 && dotmode != FIND_ALLDOT)) && UNIQUE_OBJ_CAN_STORE(obj, home_mode) && check_home_store_cap(ch, obj, FALSE, &capped)) {
+			if ((!OBJ_FLAGGED(obj, OBJ_KEEP) || (total == 1 && dotmode != FIND_ALLDOT)) && UNIQUE_OBJ_CAN_STORE(obj, home_mode) && (!home_mode || check_home_store_cap(ch, obj, FALSE, &capped))) {
 				// may extract obj
 				store_unique_item(ch, (home_mode ? &GET_HOME_STORAGE(ch) : &EMPIRE_UNIQUE_STORAGE(use_emp)), obj, use_emp, home_mode ? NULL : IN_ROOM(ch), &full);
 				if (!full) {
