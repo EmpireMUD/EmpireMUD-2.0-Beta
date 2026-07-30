@@ -8346,7 +8346,8 @@ ACMD(do_territory) {
 		
 		// final ok: add to the list
 		if (ok && (node = find_territory_node_in_hash(&node_hash, iter, TRUE))) {
-			++(node->count);
+			// only ensure at least 1 on the count; do not add if the node is present from a vehicle
+			node->count = MAX(1, node->count);
 			
 			// mark as interior?
 			if (GET_ROOM_VNUM(iter) != node->vnum && (!node->details || !strstr(node->details, "interior"))) {
