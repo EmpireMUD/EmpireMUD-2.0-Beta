@@ -3303,14 +3303,14 @@ void check_auto_assist(char_data *ch) {
 		// champion rescue
 		if (IS_NPC(ch_iter) && MOB_FLAGGED(ch_iter, MOB_CHAMPION)) {
 			// 1: my champion
-			if (iter_leader == ch && FIGHTING(FIGHTING(ch)) == ch && !MOB_FLAGGED(FIGHTING(ch), MOB_NO_ATTACK)) {
+			if (FIGHTING(ch_iter) != FIGHTING(ch) && iter_leader == ch && FIGHTING(FIGHTING(ch)) == ch && !MOB_FLAGGED(FIGHTING(ch), MOB_NO_ATTACK)) {
 				if (check_champion_rescue(ch_iter, FIGHTING(ch))) {
 					// successful rescue
 					continue;
 				}
 			}
 			// 2: champion of my target
-			if (FIGHTING(ch) == iter_leader && !MOB_FLAGGED(ch, MOB_NO_ATTACK)) {
+			if (FIGHTING(ch_iter) != ch && FIGHTING(ch) == iter_leader && !MOB_FLAGGED(ch, MOB_NO_ATTACK)) {
 				if (check_champion_rescue(ch_iter, ch)) {
 					// successful rescue
 					continue;
