@@ -141,7 +141,7 @@ bool audit_object(obj_data *obj, char_data *ch) {
 		olc_audit_msg(ch, GET_OBJ_VNUM(obj), "LONG-TIMER-IN-STORAGE set with NO-DECAY-IN-STORAGE");
 		problem = TRUE;
 	}
-	if (OBJ_FLAGGED(obj, OBJ_LIGHT) && GET_OBJ_TIMER(obj) <= 0) {
+	if (OBJ_FLAGGED(obj, OBJ_LIGHT) && GET_OBJ_TIMER(obj) <= 0 && CAN_WEAR(obj, ITEM_WEAR_TAKE)) {
 		olc_audit_msg(ch, GET_OBJ_VNUM(obj), "Infinite light (LIGHT flag)");
 		problem = TRUE;
 	}
