@@ -1,23 +1,45 @@
-#2347
-Tier 2 Crafting Recipes~
-0 0 B 0 175-274
+#2341
+Tier 2 Crafting Recipes (Hard)~
+0 0 A 0 175-274 0
 E
--1 100.00
+-1 2.00
 0 0 0
-I 4 2347 1.00 1 c  # LOOT: the alchemical filter pattern
-I 4 2348 1.00 1 c  # LOOT: the antiquated device design
-I 4 2349 1.00 1 c  # LOOT: the concealed pouch pattern
-I 4 2350 1.00 1 c  # LOOT: the tinker's harness pattern
+I 4 2347 25.00 1 c  # LOOT: alchemical filter pattern
+I 4 2348 25.00 1 c  # LOOT: antiquated device design
+I 4 2349 25.00 1 c  # LOOT: concealed pouch pattern
+I 4 2350 25.00 1 c  # LOOT: tinker's harness pattern
+S
+#2342
+Tier 3 Crafting Recipes (Hard)~
+0 0 A 0 275-374 0
+E
+-1 2.00
+0 0 0
+I 4 2359 25.00 1 c  # LOOT: smuggled Olympian laurel branch pattern
+I 4 2360 25.00 1 c  # LOOT: Olympic silk recipe
+I 4 2361 25.00 1 c  # LOOT: Amazonian leather pattern
+I 4 2362 25.00 1 c  # LOOT: guild-forged hammer head pattern
+S
+#2347
+Tier 2 Crafting Recipes (Group)~
+0 0 B 0 175-274 0
+E
+-1 4.00
+0 0 0
+I 4 2347 25.00 1 c  # LOOT: alchemical filter pattern
+I 4 2348 25.00 1 c  # LOOT: antiquated device design
+I 4 2349 25.00 1 c  # LOOT: concealed pouch pattern
+I 4 2350 25.00 1 c  # LOOT: tinker's harness pattern
 S
 #2348
-Tier 3 Crafting Recipes~
-0 0 B 0 275-374
+Tier 3 Crafting Recipes (Group)~
+0 0 B 0 275-374 0
 E
--1 100.00
+-1 4.00
 0 0 0
-I 4 2359 1.00 1 c  # LOOT: the smuggled olympian laurel branch pattern
-I 4 2360 1.00 1 c  # LOOT: the olympic silk recipe
-I 4 2361 1.00 1 c  # LOOT: the antique wonders pattern
-I 4 2362 1.00 1 c  # LOOT: the guild-forged hammerhead pattern
+I 4 2359 25.00 1 c  # LOOT: smuggled Olympian laurel branch pattern
+I 4 2360 25.00 1 c  # LOOT: Olympic silk recipe
+I 4 2361 25.00 1 c  # LOOT: Amazonian leather pattern
+I 4 2362 25.00 1 c  # LOOT: guild-forged hammer head pattern
 S
 $

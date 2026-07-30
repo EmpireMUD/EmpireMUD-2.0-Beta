@@ -332,7 +332,7 @@ return 0
 ~
 #10860
 Soulstream Mob Show/Hide~
-0 h 100 14
+0 C 100 14
 L b 10851
 L b 10852
 L b 10853
@@ -379,10 +379,15 @@ switch %self.vnum%
     halt
   break
 done
-* Wait for all arrivals...
-wait 1
+* Wait for all arrivals... (not currently doing this)
+* wait 1
 * Count and see if we should then appear/disappear (sometimes followers enter late)
 set count 0
+* actor first
+if %actor.skill(%skl%)% > 0
+  eval count %count% + 1
+end
+* then people already in the room
 set person %self.room.people%
 while %person%
   if %person.is_pc% && %person.skill(%skl%)% > 0
