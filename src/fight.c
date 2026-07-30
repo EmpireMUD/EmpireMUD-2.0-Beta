@@ -146,7 +146,7 @@ bool check_champion_rescue(char_data *champion, char_data *rescue_from) {
 			
 		// nobody hitting them?
 		if (!hitting) {
-			perform_rescue(champion, GET_LEADER(champion), champion, RESCUE_RESCUE);
+			perform_rescue(champion, GET_LEADER(champion), rescue_from, RESCUE_RESCUE);
 			return TRUE;
 		}
 	}
