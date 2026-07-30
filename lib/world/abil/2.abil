@@ -165,6 +165,9 @@ a -1 1.00 0 0 0
 C
 outrage 7 AB 1 25 0.00 2009 9 0 2 2
 D 64 15 0
+D 1024 209 0
+D 1024 93 0
+D 256 209 0
 M
 2
 *~
@@ -190,7 +193,7 @@ M
 14
 $n spins wildly with outrage, hitting everything in sight!~
 T x 1
-T s 0
+T s 1
 X+ 8 25.00
 S
 #218
