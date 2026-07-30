@@ -64,6 +64,7 @@ struct cmdlist_element *compile_command_list(char *input) {
 void parse_trigger(FILE *trig_f, int nr) {
 	int t[2], k, attach_type, iter, num_links;
 	char line[256], *cmds, *s, flags[256], errors[MAX_INPUT_LENGTH];
+	size_t length;
 	struct cmdlist_element *cle;
 	trig_data *trig;
 	struct trig_link *link;
@@ -107,11 +108,26 @@ void parse_trigger(FILE *trig_f, int nr) {
 	CREATE(trig->cmdlist, struct cmdlist_element, 1);
 	trig->cmdlist->cmd = strdup(strtok(s, "\n\r"));
 	cle = trig->cmdlist;
-
+	
+	// ensure length safety
+	length = strlen(cle->cmd) + 2;	// add 2 for crlf
+	if (length >= MAX_CMD_LENGTH) {
+		log("SCRIPT: Trig %d first line is too long; truncating", nr);
+		free(cmds);
+		return;
+	}
+	
+	// one line at a time
 	while ((s = strtok(NULL, "\n\r"))) {
-		CREATE(cle->next, struct cmdlist_element, 1);
-		cle = cle->next;
-		cle->cmd = strdup(s);
+		length += strlen(s) + 2;	// add 2 for crlf
+		if (length >= MAX_CMD_LENGTH) {
+			log("SCRIPT: Trig %d too long, ignoring line: %s", nr, s);
+		}
+		else {
+			CREATE(cle->next, struct cmdlist_element, 1);
+			cle = cle->next;
+			cle->cmd = strdup(s);
+		}
 	}
 
 	free(cmds);
