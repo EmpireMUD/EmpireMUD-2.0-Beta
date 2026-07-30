@@ -897,7 +897,7 @@ void heartbeat(unsigned long heart_pulse) {
 	}
 	
 	// odd timing to avoid lining up with other ticks
-	if (HEARTBEAT(119)) {
+	if (HEARTBEAT(61)) {
 		update_empire_npc_data();
 		HEARTBEAT_LOG("14")
 	}
