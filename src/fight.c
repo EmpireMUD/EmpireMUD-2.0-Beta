@@ -123,6 +123,40 @@ bool check_can_still_fight(char_data *ch, char_data *victim) {
 
 
 /**
+* Checks if a champion character can/should rescue their leader.
+*
+* @param char_data *champion The champion mob.
+* @param char_data *rescue_from The mob they might rescue their leader from.
+* @return bool TRUE if it rescued, FALSE if not.
+*/
+bool check_champion_rescue(char_data *champion, char_data *rescue_from) {
+	bool hitting;
+	char_data *find;
+	
+	// can rescue only in melee, and only people who are fighting leader
+	if (champion && GET_LEADER(champion) && rescue_from && IN_ROOM(champion) == IN_ROOM(GET_LEADER(champion)) && MOB_FLAGGED(champion, MOB_CHAMPION) && FIGHTING(rescue_from) == GET_LEADER(champion) && FIGHT_MODE(rescue_from) == FMODE_MELEE) {
+		// champion only rescues if nobody is hitting them
+		hitting = FALSE;
+		DL_FOREACH2(ROOM_PEOPLE(IN_ROOM(champion)), find, next_in_room) {
+			if (find != champion && FIGHTING(find) == champion) {
+				hitting = TRUE;
+				break;
+			}
+		}
+			
+		// nobody hitting them?
+		if (!hitting) {
+			perform_rescue(champion, GET_LEADER(champion), champion, RESCUE_RESCUE);
+			return TRUE;
+		}
+	}
+	
+	// no rescue
+	return FALSE;
+}
+
+
+/**
 * Computes whether one person hits the other, or not, based on their to-hit
 * and dodge ratings.
 *
@@ -3244,8 +3278,8 @@ bool besiege_vehicle(char_data *attacker, vehicle_data *veh, int damage, int sie
 * @param char_data *ch The person who needs help!
 */
 void check_auto_assist(char_data *ch) {
-	char_data *ch_iter, *next_iter, *iter_leader, *top_ch, *top_iter, *find;
-	bool assist, hitting;
+	char_data *ch_iter, *next_iter, *iter_leader, *top_ch, *top_iter;
+	bool assist;
 	
 	// sanity
 	if (!ch || !FIGHTING(ch)) {
@@ -3267,25 +3301,21 @@ void check_auto_assist(char_data *ch) {
 		}
 		
 		// champion rescue
-		if (IS_NPC(ch_iter) && MOB_FLAGGED(ch_iter, MOB_CHAMPION) && iter_leader == ch && FIGHTING(FIGHTING(ch)) == ch && !MOB_FLAGGED(FIGHTING(ch), MOB_NO_ATTACK)) {
-			// can rescue only in melee
-			if (FIGHT_MODE(FIGHTING(ch)) == FMODE_MELEE) {
-				// champion only rescues if nobody is hitting them
-				hitting = FALSE;
-				DL_FOREACH2(ROOM_PEOPLE(IN_ROOM(ch)), find, next_in_room) {
-					if (find != ch_iter && FIGHTING(find) == ch_iter) {
-						hitting = TRUE;
-						break;
-					}
-				}
-				
-				// nobody hitting them?
-				if (!hitting) {
-					perform_rescue(ch_iter, ch, FIGHTING(ch), RESCUE_RESCUE);
+		if (IS_NPC(ch_iter) && MOB_FLAGGED(ch_iter, MOB_CHAMPION)) {
+			// 1: my champion
+			if (iter_leader == ch && FIGHTING(FIGHTING(ch)) == ch && !MOB_FLAGGED(FIGHTING(ch), MOB_NO_ATTACK)) {
+				if (check_champion_rescue(ch_iter, FIGHTING(ch))) {
+					// successful rescue
 					continue;
 				}
 			}
-			//  champion but not in melee? just fall through to normal assist for now
+			// 2: champion of my target
+			if (FIGHTING(ch) == iter_leader && !MOB_FLAGGED(ch, MOB_NO_ATTACK)) {
+				if (check_champion_rescue(ch_iter, ch)) {
+					// successful rescue
+					continue;
+				}
+			}
 		}
 		
 		// additional checks -- nobody other than champions will assist while fighting
