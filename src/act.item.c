@@ -6271,9 +6271,14 @@ ACMD(do_eat) {
 		extract_obj(food);
 	}
 	else {
+		// bind if needed
 		if (!IS_NPC(ch) && OBJ_FLAGGED(food, OBJ_BIND_FLAGS)) {
 			bind_obj_to_player(food, ch);
 			reduce_obj_binding(food, ch);
+		}
+		// if it WAS storable in basic storage, it becomes unstorable
+		if (GET_OBJ_STORAGE(food)) {
+			SET_BIT(GET_OBJ_EXTRA(food), OBJ_NO_BASIC_STORAGE | OBJ_NO_WAREHOUSE);
 		}
 		request_obj_save_in_world(food);
 	}
@@ -8101,7 +8106,13 @@ ACMD(do_seed) {
 		else {
 			// ok: seed individual
 			if (run_interactions(ch, GET_OBJ_INTERACTIONS(obj), INTERACT_SEED, IN_ROOM(ch), NULL, obj, NULL, seed_obj_interact)) {
+				// block basic storage and mark as seeded
 				SET_BIT(GET_OBJ_EXTRA(obj), OBJ_SEEDED | OBJ_NO_BASIC_STORAGE);
+				
+				// if it WAS storable in basic storage, it also becomes unstorable in the warehouse
+				if (GET_OBJ_STORAGE(obj)) {
+					SET_BIT(GET_OBJ_EXTRA(obj), OBJ_NO_WAREHOUSE);
+				}
 				
 				if (junk && !OBJ_FLAGGED(obj, OBJ_KEEP)) {
 					perform_drop(ch, obj, SCMD_JUNK, "junk");
@@ -8127,7 +8138,14 @@ ACMD(do_seed) {
 				// ok: seed 1 of many
 				any = TRUE;
 				if (run_interactions(ch, GET_OBJ_INTERACTIONS(obj), INTERACT_SEED, IN_ROOM(ch), NULL, obj, NULL, seed_obj_interact)) {
+					// block basic storage and mark as seeded
 					SET_BIT(GET_OBJ_EXTRA(obj), OBJ_SEEDED | OBJ_NO_BASIC_STORAGE);
+					
+					// if it WAS storable in basic storage, it also becomes unstorable in the warehouse
+					if (GET_OBJ_STORAGE(obj)) {
+						SET_BIT(GET_OBJ_EXTRA(obj), OBJ_NO_WAREHOUSE);
+					}
+					
 					if (junk && !OBJ_FLAGGED(obj, OBJ_KEEP)) {
 						perform_drop(ch, obj, SCMD_JUNK, "junk");
 					}
