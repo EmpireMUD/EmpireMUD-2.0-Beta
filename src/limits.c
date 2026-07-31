@@ -1545,7 +1545,7 @@ bool check_autostore(obj_data *obj, bool force, empire_data *override_emp) {
 		if (IS_COINS(obj)) {
 			increase_empire_coins(emp, real_empire(GET_COINS_EMPIRE_ID(obj)), GET_COINS_AMOUNT(obj));
 		}
-		else if (unique && is_home) {
+		else if (unique && is_home && check_douse_light_before_store(NULL, obj)) {
 			// home storage
 			if ((index = find_player_index_by_idnum(home_idnum)) && (loaded_ch = find_or_load_player(index->name, &file))) {
 				check_delayed_load(loaded_ch);
@@ -1556,7 +1556,7 @@ bool check_autostore(obj_data *obj, bool force, empire_data *override_emp) {
 			}
 			// failed to load owner: fall through to extract
 		}
-		else if (unique) {
+		else if (unique && check_douse_light_before_store(NULL, obj)) {
 			// this extracts it itself
 			store_unique_item(NULL, &EMPIRE_UNIQUE_STORAGE(emp), obj, emp, real_loc, &full);
 			return FALSE;

@@ -5563,6 +5563,10 @@ const char *requirement_types[] = {
 	"DIPLOMACY-OVER",
 	"OWN-ROADS",
 	"NOT-OWN-BUILDING",
+	"EMPIRE-HAS-PROGRESS",
+	"EMPIRE-LACKS-PROGRESS",	// 50
+	"EMPIRE-ON-PROGRESS",
+	"EMPIRE-NOT-ON-PROGRESS",
 	"\n",
 };
 
@@ -5618,6 +5622,10 @@ const bool requirement_amt_type[] = {
 	REQ_AMT_NUMBER,	// diplomacy-over
 	REQ_AMT_NUMBER,	// own-roads
 	REQ_AMT_NUMBER,	// not own building
+	REQ_AMT_NONE,	// empire-has-progress
+	REQ_AMT_NONE,	// 50, empire-lacks-progress
+	REQ_AMT_NONE,	// empire-on-progress
+	REQ_AMT_NONE,	// empire-not-on-progress
 };
 
 
@@ -5672,6 +5680,10 @@ const bool requirement_needs_tracker[] = {
 	FALSE,	// diplomacy-over
 	FALSE,	// own-roads
 	FALSE,	// not own building
+	FALSE,	// empire-has-progress
+	FALSE,	// 50, empire-lacks-progress
+	FALSE,	// empire-on-progress
+	FALSE,	// empire-not-on-progress
 };
 
 

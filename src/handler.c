@@ -9407,6 +9407,22 @@ bool meets_requirements(char_data *ch, struct req_data *list, struct instance_da
 				ok = (GET_LOYALTY(ch) && count_owned_roads(GET_LOYALTY(ch)) >= req->needed);
 				break;
 			}
+			case REQ_EMPIRE_HAS_PROGRESS: {
+				ok = (GET_LOYALTY(ch) && empire_has_completed_goal(GET_LOYALTY(ch), req->vnum));
+				break;
+			}
+			case REQ_EMPIRE_LACKS_PROGRESS: {
+				ok = (GET_LOYALTY(ch) && !empire_has_completed_goal(GET_LOYALTY(ch), req->vnum));
+				break;
+			}
+			case REQ_EMPIRE_ON_PROGRESS: {
+				ok = (GET_LOYALTY(ch) && get_current_goal(GET_LOYALTY(ch), req->vnum));
+				break;
+			}
+			case REQ_EMPIRE_NOT_ON_PROGRESS: {
+				ok = (GET_LOYALTY(ch) && !get_current_goal(GET_LOYALTY(ch), req->vnum));
+				break;
+			}
 			
 			// some types do not support pre-reqs
 			case REQ_KILL_MOB:
@@ -9686,6 +9702,22 @@ char *requirement_string(struct req_data *req, bool show_vnums, bool allow_custo
 		}
 		case REQ_OWN_ROADS: {
 			safe_snprintf(output, sizeof(output), "Own %dx tile%s of roads", req->needed, PLURAL(req->needed));
+			break;
+		}
+		case REQ_EMPIRE_HAS_PROGRESS: {
+			safe_snprintf(output, sizeof(output), "Empire earned: %s", get_progress_name_by_proto(req->vnum));
+			break;
+		}
+		case REQ_EMPIRE_LACKS_PROGRESS: {
+			safe_snprintf(output, sizeof(output), "Empire has not earned: %s", get_progress_name_by_proto(req->vnum));
+			break;
+		}
+		case REQ_EMPIRE_ON_PROGRESS: {
+			safe_snprintf(output, sizeof(output), "Empire has started: %s", get_progress_name_by_proto(req->vnum));
+			break;
+		}
+		case REQ_EMPIRE_NOT_ON_PROGRESS: {
+			safe_snprintf(output, sizeof(output), "Empire has not started: %s", get_progress_name_by_proto(req->vnum));
 			break;
 		}
 		default: {
@@ -11361,30 +11393,6 @@ void store_unique_item(char_data *ch, struct empire_unique_storage **to_list, ob
 	
 	if (!obj || !to_list) {
 		return;
-	}
-	
-	// attempt to douse:
-	if (LIGHT_IS_LIT(obj)) {
-		if (LIGHT_FLAGGED(obj, LIGHT_FLAG_CAN_DOUSE)) {
-			if (ch) {
-				act("You douse $p.", FALSE, ch, obj, NULL, TO_CHAR);
-				act("$n douses $p.", FALSE, ch, obj, NULL, TO_ROOM);
-			}
-			if (!douse_light(obj)) {
-				// purged?
-				if (ch) {
-					msg_to_char(ch, "It's used up and you throw it away.\r\n");
-				}
-				return;
-			}
-		}
-		else if (GET_LIGHT_HOURS_REMAINING(obj) != UNLIMITED) {
-			if (ch) {
-				act("$p: You cannot store this while it's lit.", FALSE, ch, obj, NULL, TO_CHAR);
-			}
-			// no douse = no store
-			return;
-		}
 	}
 	
 	// empty/clear the item:

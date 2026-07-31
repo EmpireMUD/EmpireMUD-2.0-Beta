@@ -501,6 +501,10 @@ typedef struct vehicle_data vehicle_data;
 #define REQ_DIPLOMACY_OVER  46
 #define REQ_OWN_ROADS  47
 #define REQ_NOT_OWN_BUILDING  48
+#define REQ_EMPIRE_HAS_PROGRESS  49
+#define REQ_EMPIRE_LACKS_PROGRESS  50
+#define REQ_EMPIRE_ON_PROGRESS  51
+#define REQ_EMPIRE_NOT_ON_PROGRESS  52
 
 
 // REQ_AMT_x: How numbers displayed for different REQ_ types
@@ -1072,6 +1076,7 @@ typedef struct vehicle_data vehicle_data;
 #define DELAY_REFRESH_GREATNESS  BIT(3)	// refreshes members-and-greatness
 #define DELAY_REFRESH_MSDP_UPDATE_CLAIMS  BIT(4)	// empire members needs an MSDP update for claims
 #define DELAY_REFRESH_MSDP_UPDATE_ALL  BIT(5)	// empire members needs an MSDP update for everything
+#define DELAY_REFRESH_CHECK_ELIGIBLE_GOALS  BIT(6)	// empire will check for new goals
 
 
 // EADM_x: empire admin flags

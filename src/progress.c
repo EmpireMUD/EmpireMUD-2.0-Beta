@@ -762,6 +762,9 @@ void check_for_eligible_goals(empire_data *emp) {
 			}
 		}
 	}
+	
+	// always run this too
+	et_update_progress(emp, NOTHING);
 }
 
 
@@ -809,7 +812,7 @@ void complete_goal(empire_data *emp, struct empire_goal *goal) {
 	add_completed_goal(emp, goal->vnum);
 	cancel_empire_goal(emp, goal);
 	
-	check_for_eligible_goals(emp);
+	TRIGGER_DELAYED_REFRESH(emp, DELAY_REFRESH_CHECK_ELIGIBLE_GOALS);
 }
 
 
@@ -925,7 +928,7 @@ void purchase_goal(empire_data *emp, progress_data *prg, char_data *purchased_by
 	}
 	
 	add_completed_goal(emp, PRG_VNUM(prg));
-	check_for_eligible_goals(emp);
+	TRIGGER_DELAYED_REFRESH(emp, DELAY_REFRESH_CHECK_ELIGIBLE_GOALS);
 }
 
 
@@ -1017,6 +1020,8 @@ void refresh_empire_goals(empire_data *emp, any_vnum only_vnum) {
 			}
 		}
 	}
+	
+	et_update_progress(emp, only_vnum);
 }
 
 
@@ -1130,6 +1135,22 @@ void refresh_one_goal_tracker(empire_data *emp, struct empire_goal *goal) {
 				task->current = count_owned_roads(emp);
 				break;
 			}
+			case REQ_EMPIRE_HAS_PROGRESS: {
+				task->current = empire_has_completed_goal(emp, task->vnum) ? task->needed : 0;
+				break;
+			}
+			case REQ_EMPIRE_LACKS_PROGRESS: {
+				task->current = empire_has_completed_goal(emp, task->vnum) ? 0 : task->needed;
+				break;
+			}
+			case REQ_EMPIRE_ON_PROGRESS: {
+				task->current = get_current_goal(emp, task->vnum) ? task->needed : 0;
+				break;
+			}
+			case REQ_EMPIRE_NOT_ON_PROGRESS: {
+				task->current = get_current_goal(emp, task->vnum) ? 0 : task->needed;
+				break;
+			}
 			
 			// ones that cannot be detected but are always true for progress goals
 			case REQ_DAYTIME:
@@ -1200,7 +1221,7 @@ void script_reward_goal(empire_data *emp, progress_data *prg) {
 	if (goal) {
 		cancel_empire_goal(emp, goal);
 	}
-	check_for_eligible_goals(emp);
+	TRIGGER_DELAYED_REFRESH(emp, DELAY_REFRESH_CHECK_ELIGIBLE_GOALS);
 }
 
 
@@ -1548,8 +1569,7 @@ void et_change_production_total(empire_data *emp, obj_vnum vnum, int amount) {
 	struct empire_goal *goal, *next_goal;
 	obj_data *proto = obj_proto(vnum);
 	struct req_data *task;
-	descriptor_data *desc;
-	char_data *ch;
+	char_data *ch_iter;
 	
 	if (!emp || vnum == NOTHING || amount == 0 || !proto) {
 		return;	// no work
@@ -1569,15 +1589,10 @@ void et_change_production_total(empire_data *emp, obj_vnum vnum, int amount) {
 	}
 	
 	// members online
-	LL_FOREACH(descriptor_list, desc) {
-		if (STATE(desc) != CON_PLAYING || !(ch = desc->character)) {
-			continue;
+	DL_FOREACH2(player_character_list, ch_iter, next_plr) {
+		if (!IS_NPC(ch_iter) && GET_LOYALTY(ch_iter) == emp) {		
+			qt_change_production_total(ch_iter, vnum, amount);
 		}
-		if (GET_LOYALTY(ch) != emp) {
-			continue;
-		}
-		
-		qt_change_production_total(ch, vnum, amount);
 	}
 }
 
@@ -1777,6 +1792,46 @@ void et_lose_vehicle(empire_data *emp, vehicle_data *veh) {
 			}
 		}
 	}
+}
+
+
+/**
+* Empire Tracker: empire changes status on a progress goal.
+*
+* This is called by refresh_empire_goals() and check_for_eligible_goals();
+* anything that adds or removes an empire's current or completed goals but
+* doesn't call one of those should also call this function.
+*
+* @param empire_data *emp The empire.
+* @param any_vnum vnum The progress goal vnum (or NOTHING to refresh all).
+*/
+void et_update_progress(empire_data *emp, any_vnum only_vnum) {
+	struct empire_goal *goal, *next_goal;
+	struct req_data *task;
+	
+	HASH_ITER(hh, EMPIRE_GOALS(emp), goal, next_goal) {
+		LL_FOREACH(goal->tracker, task) {
+			if (task->type == REQ_EMPIRE_HAS_PROGRESS && (only_vnum == NOTHING || task->vnum == only_vnum)) {
+				task->current = empire_has_completed_goal(emp, task->vnum) ? task->needed : 0;
+				TRIGGER_DELAYED_REFRESH(emp, DELAY_REFRESH_GOAL_COMPLETE);
+			}
+			else if (task->type == REQ_EMPIRE_LACKS_PROGRESS && (only_vnum == NOTHING || task->vnum == only_vnum)) {
+				task->current = empire_has_completed_goal(emp, task->vnum) ? 0 : task->needed;
+				TRIGGER_DELAYED_REFRESH(emp, DELAY_REFRESH_GOAL_COMPLETE);
+			}
+			else if (task->type == REQ_EMPIRE_ON_PROGRESS && (only_vnum == NOTHING || task->vnum == only_vnum)) {
+				task->current = get_current_goal(emp, task->vnum) ? task->needed : 0;
+				TRIGGER_DELAYED_REFRESH(emp, DELAY_REFRESH_GOAL_COMPLETE);
+			}
+			else if (task->type == REQ_EMPIRE_NOT_ON_PROGRESS && (only_vnum == NOTHING || task->vnum == only_vnum)) {
+				task->current = get_current_goal(emp, task->vnum) ? 0 : task->needed;
+				TRIGGER_DELAYED_REFRESH(emp, DELAY_REFRESH_GOAL_COMPLETE);
+			}
+		}
+	}
+	
+	// update players
+	qt_empire_players(emp, qt_update_progress, only_vnum);
 }
 
 
@@ -2592,6 +2647,10 @@ void olc_delete_progress(char_data *ch, any_vnum vnum) {
 	msg_to_char(ch, "Progress entry %d (%s) deleted.\r\n", vnum, name);
 	
 	free_progress(prg);
+	
+	// refresh everyone (immediately)
+	need_progress_refresh = TRUE;
+	check_progress_refresh();
 }
 
 

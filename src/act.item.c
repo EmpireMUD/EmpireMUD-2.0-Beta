@@ -130,6 +130,42 @@ bool can_take_obj(char_data *ch, obj_data *obj) {
 
 
 /**
+* Attempts to douse the light, with messaging, before storing it.
+*
+* @param char_data *ch Optional: The player trying to store it, may be NULL.
+* @param obj_data *obj The possible light (a non-light or unlit light is ignored).
+* @return bool TRUE if it's safe to store, FALSE if it was used up OR cannot be doused.
+*/
+bool check_douse_light_before_store(char_data *ch, obj_data *obj) {
+	if (LIGHT_IS_LIT(obj)) {
+		if (LIGHT_FLAGGED(obj, LIGHT_FLAG_CAN_DOUSE)) {
+			if (ch) {
+				act("You douse $p.", FALSE, ch, obj, NULL, TO_CHAR);
+				act("$n douses $p.", FALSE, ch, obj, NULL, TO_ROOM);
+			}
+			if (!douse_light(obj)) {
+				// purged?
+				if (ch) {
+					msg_to_char(ch, "It's used up and you throw it away.\r\n");
+				}
+				return FALSE;
+			}
+		}
+		else if (GET_LIGHT_HOURS_REMAINING(obj) != UNLIMITED) {
+			if (ch) {
+				act("$p: You cannot store this while it's lit.", FALSE, ch, obj, NULL, TO_CHAR);
+			}
+			// no douse = no store
+			return FALSE;
+		}
+	}
+	
+	// otherwise
+	return TRUE;
+}
+
+
+/**
 * Interaction func for "combine". This almost always extracts the original
 * item, so it should basically always return TRUE.
 *
@@ -5204,7 +5240,7 @@ void warehouse_store(char_data *ch, char *argument, int mode) {
 			if (OBJ_FLAGGED(obj, OBJ_KEEP)) {
 				kept = TRUE;
 			}
-			else if (UNIQUE_OBJ_CAN_STORE(obj, home_mode) && (!home_mode || check_home_store_cap(ch, obj, FALSE, &capped))) {
+			else if (UNIQUE_OBJ_CAN_STORE(obj, home_mode) && (!home_mode || check_home_store_cap(ch, obj, FALSE, &capped)) && check_douse_light_before_store(ch, obj)) {
 				// may extract obj
 				store_unique_item(ch, (home_mode ? &GET_HOME_STORAGE(ch) : &EMPIRE_UNIQUE_STORAGE(use_emp)), obj, use_emp, home_mode ? NULL : IN_ROOM(ch), &full);
 				if (!full) {
@@ -5246,7 +5282,7 @@ void warehouse_store(char_data *ch, char *argument, int mode) {
 				kept = TRUE;	// mark for later
 			}
 			
-			if ((!OBJ_FLAGGED(obj, OBJ_KEEP) || (total == 1 && dotmode != FIND_ALLDOT)) && UNIQUE_OBJ_CAN_STORE(obj, home_mode) && (!home_mode || check_home_store_cap(ch, obj, FALSE, &capped))) {
+			if ((!OBJ_FLAGGED(obj, OBJ_KEEP) || (total == 1 && dotmode != FIND_ALLDOT)) && UNIQUE_OBJ_CAN_STORE(obj, home_mode) && (!home_mode || check_home_store_cap(ch, obj, FALSE, &capped)) && check_douse_light_before_store(ch, obj)) {
 				// may extract obj
 				store_unique_item(ch, (home_mode ? &GET_HOME_STORAGE(ch) : &EMPIRE_UNIQUE_STORAGE(use_emp)), obj, use_emp, home_mode ? NULL : IN_ROOM(ch), &full);
 				if (!full) {
