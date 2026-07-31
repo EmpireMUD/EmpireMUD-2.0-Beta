@@ -171,4 +171,31 @@ W
 Z
 1 12100
 S
+#12104
+The Sweet Life~
+   While chatting with the spicer, the subject of chocolate comes up. 
+Producing enough chocolate could help the empire spread its influence...
+~
+   The empire has decided to produce chocolate! Complete the Sweet Life
+progress goal for a small reward.
+~
+2 0 75 0 0
+A
+1 12100
+P
+52 12104 0 1 a
+P
+0 12103 0 1 a
+P
+50 12104 0 1 a
+P
+49 12103 0 1 a
+R
+13 12104 12104
+W+
+12 12102 0 1 a
+Chat with the spicer about chocolate~
+Z
+1 12100
+S
 $
