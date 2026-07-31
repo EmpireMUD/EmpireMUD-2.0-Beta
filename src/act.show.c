@@ -627,6 +627,41 @@ SHOW(show_buildings) {
 }
 
 
+SHOW(show_builtwith) {
+	vehicle_data *veh = NULL;
+	struct resource_data *list, *res;
+	
+	// may target vehicle in room, vehicle you're in, or current room
+	one_argument(argument, arg);
+	if (*arg && !(veh = get_vehicle_in_room_vis(ch, arg, NULL)) && (!(veh = GET_ROOM_VEHICLE(IN_ROOM(ch))) || !multi_isname(argument, VEH_KEYWORDS(veh)))) {
+		msg_to_char(ch, "You don't see a vehicle called '%s' here.\r\n", arg);
+		return;
+	}
+	
+	// header
+	if (veh) {
+		build_page_display(ch, "Built-with list for %s:", VEH_SHORT_DESC(veh));
+		list = VEH_BUILT_WITH(veh);
+	}
+	else {
+		build_page_display(ch, "Built-with list for this room:");
+		list = GET_BUILT_WITH(IN_ROOM(ch));
+	}
+	
+	// list
+	LL_FOREACH(list, res) {
+		build_page_display(ch, " %s", get_resource_name(res));
+	}
+	
+	// empty?
+	if (!list) {
+		build_page_display(ch, " nothing");
+	}
+	
+	send_page_display(ch);
+}
+
+
 SHOW(show_commons) {
 	descriptor_data *d, *nd;
 	
@@ -3499,6 +3534,7 @@ struct show_struct {
 	{ "author",			LVL_START_IMM,		show_author },
 	{ "bonusabilities",	LVL_START_IMM,		show_bonus_abilities },
 	{ "buildings",		LVL_START_IMM,		show_buildings },
+	{ "builtwith",		LVL_START_IMM,		show_builtwith },
 	{ "commons",		LVL_START_IMM,		show_commons },
 	{ "companions",		LVL_START_IMM,		show_companions },
 	{ "components",		LVL_START_IMM,		show_components },

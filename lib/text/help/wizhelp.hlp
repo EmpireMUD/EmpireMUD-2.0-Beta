@@ -1253,6 +1253,7 @@ Mode         Level    Description
 &c author&0      Immort   All books from a given author idnum.
 &c bonusabilities&0  Imm  The bonus abilities a player has acquired.
 &c buildings&0   Immort   Locations of buildings (vnum/name optional).
+&c builtwith&0   Immort   Shows resources used to build or maintain a building.
 &c commons&0     Immort   Players currently connected from duplicate sites.
 &c companions&0  Immort   A player's available companions.
 &c components&0  Immort   All items matching a generic component vnum.
@@ -1360,6 +1361,13 @@ Usage:  show bonusabilities <player> [search phrase]
 Shows bonus abilities a player has acquired.
 
 See also: BONUS ABILITIES
+#e
+"SHOW BUILTWITH" "SHOW BUILT WITH"
+
+Uasge:  show builtwith [vehicle]
+
+Shows what the room you're in was built with or, if targeting a vehicle, it
+will show what that was built with.
 #e
 "SHOW COMPANIONS"
 
