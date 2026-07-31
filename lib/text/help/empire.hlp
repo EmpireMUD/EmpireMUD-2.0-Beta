@@ -1686,7 +1686,9 @@ Items marked (skilled) require the Skilled Labor goal. Skilled Labor chores
 tend to cost more food.
 
 Additional workforce chores are available from progress buys:
-  &gprospecting (Prospector Training):&0 NPCs will slowly prospect mountain tiles.
+  &gprospecting (Prospector Training):&0 The empire will slowly prospect mountain
+     tiles. This takes several days and uses food for all mountain tiles it
+     prospects, but will not spawn worker NPCs.
 
 See also: ABANDON, WORKFORCE, FEEDING WORKFORCE
 #
