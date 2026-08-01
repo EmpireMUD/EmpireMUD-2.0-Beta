@@ -341,11 +341,14 @@ A bundle of cassava stems lies here, neatly cut and tied for planting.~
 about a foot long and still faintly green at the tips. The bark is rough and
 fibrous, showing marks where it was freshly cut.
 ~
-3 bgC a 0 0 19
+3 bgC a 0 0 20
 0 12630 0
 0 4320
 C
 1 1
+M
+33
+Note: This is a single-use item so if it's used for construction, it won't be refunded when dismantled.~
 O+ 1 12633
 R
 4 5215 0
