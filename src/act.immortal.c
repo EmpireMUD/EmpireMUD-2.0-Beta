@@ -2787,7 +2787,7 @@ int perform_set(char_data *ch, char_data *vict, int mode, char *val_arg) {
 		
 		if (!str_cmp(onoff_arg, "on")) {
 			add_bonus_ability(vict, ABIL_VNUM(abil));
-			assign_class_and_extra_abilities(vict, NULL, ROLE_NONE);
+			assign_class_and_extra_abilities(vict, NULL, NOTHING);
 			sprintf(output, "%s: added bonus ability %d %s.", GET_NAME(vict), ABIL_VNUM(abil), ABIL_NAME(abil));
 			
 			// notes when turned on
@@ -2797,7 +2797,7 @@ int perform_set(char_data *ch, char_data *vict, int mode, char *val_arg) {
 		}
 		else if (!str_cmp(onoff_arg, "off")) {
 			remove_bonus_ability(vict, ABIL_VNUM(abil));
-			assign_class_and_extra_abilities(vict, NULL, ROLE_NONE);
+			assign_class_and_extra_abilities(vict, NULL, NOTHING);
 			sprintf(output, "%s: removed bonus ability %d %s.", GET_NAME(vict), ABIL_VNUM(abil), ABIL_NAME(abil));
 		}
 		else {

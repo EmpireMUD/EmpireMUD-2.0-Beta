@@ -3135,7 +3135,7 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 							ability_data *ab = find_ability(subfield);
 							if (ab && !IS_NPC(c)) {
 								add_bonus_ability(c, ABIL_VNUM(ab));
-								assign_class_and_extra_abilities(c, NULL, ROLE_NONE);
+								assign_class_and_extra_abilities(c, NULL, NOTHING);
 								safe_snprintf(str, slen, "1");
 							}
 							else {
@@ -4705,7 +4705,7 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 							ability_data *ab = find_ability(subfield);
 							if (ab && !IS_NPC(c)) {
 								remove_bonus_ability(c, ABIL_VNUM(ab));
-								assign_class_and_extra_abilities(c, NULL, ROLE_NONE);
+								assign_class_and_extra_abilities(c, NULL, NOTHING);
 								safe_snprintf(str, slen, "1");
 							}
 							else {

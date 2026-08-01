@@ -938,7 +938,7 @@ void give_quest_rewards(char_data *ch, struct quest_reward *list, int reward_lev
 				if (ability_proto(reward->vnum) && !has_bonus_ability(ch, reward->vnum)) {
 					msg_to_char(ch, "\tyYou gain the %s ability!\t0\r\n", get_ability_name_by_vnum(reward->vnum));
 					add_bonus_ability(ch, reward->vnum);
-					assign_class_and_extra_abilities(ch, NULL, ROLE_NONE);
+					assign_class_and_extra_abilities(ch, NULL, NOTHING);
 				}
 				break;
 			}
@@ -946,7 +946,7 @@ void give_quest_rewards(char_data *ch, struct quest_reward *list, int reward_lev
 				if (ability_proto(reward->vnum) && has_bonus_ability(ch, reward->vnum)) {
 					msg_to_char(ch, "\tyYou lose the %s ability.\t0\r\n", get_ability_name_by_vnum(reward->vnum));
 					remove_bonus_ability(ch, reward->vnum);
-					assign_class_and_extra_abilities(ch, NULL, ROLE_NONE);
+					assign_class_and_extra_abilities(ch, NULL, NOTHING);
 				}
 				break;
 			}
