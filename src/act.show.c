@@ -2625,6 +2625,7 @@ SHOW(show_skills) {
 			msg_to_char(ch, "%s%s", (found ? ", " : ""), ABIL_NAME(abil));
 			found = TRUE;
 		}
+		msg_to_char(ch, "&0\r\n");
 	}
 	
 	msg_to_char(ch, "&yOther&0: &g");
