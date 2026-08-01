@@ -2538,6 +2538,7 @@ SHOW(show_skills) {
 	char_data *vict;
 	bool found, is_file = FALSE;
 	int set;
+	struct player_bonus_ability *bonus_abil, *next_bonus_abil;
 	
 	argument = one_argument(argument, arg);
 	skip_spaces(&argument);
@@ -2611,6 +2612,20 @@ SHOW(show_skills) {
 		found = TRUE;
 	}
 	msg_to_char(ch, "&0%s\r\n", (found ? "" : "none"));
+	
+	if (GET_BONUS_ABILITIES(vict)) {
+		msg_to_char(ch, "&yBonus abilities&0: &g");
+		found = FALSE;
+		HASH_ITER(hh, GET_BONUS_ABILITIES(vict), bonus_abil, next_bonus_abil) {
+			if (!(abil = ability_proto(bonus_abil->vnum))) {
+				continue;	// no ability?
+			}
+			
+			// show it
+			msg_to_char(ch, "%s%s", (found ? ", " : ""), ABIL_NAME(abil));
+			found = TRUE;
+		}
+	}
 	
 	msg_to_char(ch, "&yOther&0: &g");
 	found = FALSE;
