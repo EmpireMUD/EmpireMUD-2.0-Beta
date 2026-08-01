@@ -1095,7 +1095,9 @@ The 'data' field is used by different types of abilities. Available types are:
  &cACTION&0 - Performs action(s) when successful. See ABILEDIT ACTIONS
  &cRANGE&0 - Used by some actions, as noted.
  &cPARENT&0 - Grants this ability if player has its parent. See ABILEDIT PARENT
- &cSUPERCEDED-BY&0 - A better version of this ability. SEE ABILEDIT SUPERCEDE
+ &cSUPERCEDED-BY&0 - A better version of this ability. See ABILEDIT SUPERCEDE
+ &cREQUIRES-ABIL&0 - Can only use/trigger this ability if you have another.
+    See ABILEDIT REQUIRES-ABIL
 
 See also: ABILEDIT TYPES, ABILITY EFFECTS, PLAYER TECHNOLOGIES, OLC ABILITIES
 #d
@@ -1805,6 +1807,19 @@ This determines which pool a RESTORE ability will affect. If you set it to
 (not blood).
 
 See also: RESTORE ABILITY
+#d
+"ABILEDIT REQUIRES-ABILITY" "ABILEDIT REQUIRESABILITY" "ABILEDIT REQUIRES ABILITY"
+
+The REQUIRES-ABIL ability data indicates that the player can only use (or
+trigger) this ability if they also have another ability. 
+
+Also, if the player has an ability that is superceded by another, but they are
+missing a REQUIRES-ABIL for the 2nd ability, they will use the lower one.
+
+This is only supported for COMMAND abilities. Passives, buffs, and other types
+do not support REQUIRES-ABIL data.
+
+See also: OLC ABILITIES, ABILEDIT DATA
 #d
 "ABILEDIT RESOURCE ABILITY" "ABILEDIT RESOURCE ABILITIES" "RESOURCE ABILITY" "RESOURCE ABILITIES"
 
@@ -9323,6 +9338,10 @@ Available tasks:
  &cCOMPLETED-QUEST-EVER&0 - Must complete a certain quest (ignoring same-instance).
  &cDAYTIME&0, &cNIGHTTIME&0 - Only valid during certain times of day (quests only).
  &cOWN-ROADS&0 - Empire owns enough road or road-icon tiles.
+ &cEMPIRE-HAS-PROGRESS&0 - Empire completed a progress goal.
+ &cEMPIRE-LACKS-PROGRESS&0 - Empire has not completed a progress goal.
+ &cEMPIRE-ON-PROGRESS&0 - Empire has started and is working on a progress goal.
+ &cEMPIRE-NOT-ON-PROGRESS&0 - Empire is not currently working on a progress goal.
 
 &r*&0 Some types require a trackable quest, and cannot be used as prereqs.
 ^ If a type requires flags and you use more than one flag, you MUST put the

@@ -1253,6 +1253,7 @@ Mode         Level    Description
 &c author&0      Immort   All books from a given author idnum.
 &c bonusabilities&0  Imm  The bonus abilities a player has acquired.
 &c buildings&0   Immort   Locations of buildings (vnum/name optional).
+&c builtwith&0   Immort   Shows resources used to build or maintain a building.
 &c commons&0     Immort   Players currently connected from duplicate sites.
 &c companions&0  Immort   A player's available companions.
 &c components&0  Immort   All items matching a generic component vnum.
@@ -1361,6 +1362,13 @@ Shows bonus abilities a player has acquired.
 
 See also: BONUS ABILITIES
 #e
+"SHOW BUILTWITH" "SHOW BUILT WITH"
+
+Uasge:  show builtwith [vehicle]
+
+Shows what the room you're in was built with or, if targeting a vehicle, it
+will show what that was built with.
+#e
 "SHOW COMPANIONS"
 
 Usage:  show companions <player> [search phrase]
@@ -1415,7 +1423,7 @@ Usage:  show dropped <empire>
 
 Shows the recorded counts of items on the ground in the empire. These items
 count towards the 'total' on the einventory command. You can refresh them
-with 'util rescan [empire].
+with 'eedit rescan [empire | all]'.
 
 See also: EINVENTORY
 #e
@@ -2071,8 +2079,6 @@ Available utilities:
     reports the results.
  &credoislands&0 - Renumbers all the islands (requires confirmation; may rearrange
     empire inventories).
- &crescan <empire | all>&0 - Rereads territory and members, which can fix issues.
-    Also re-scans items on the ground (SHOW DROPPED).
  &cresetbuildingtriggers <vnum | all>&0 - Reattaches triggers to buildings/rooms,
     e.g. if you made a change in OLC and want live buildings updated.
  &cstrlen&0 - Give various measures of string length.

@@ -63,8 +63,8 @@ void tog_pvp(char_data *ch);
 //// EMPIREMUD CONSTANTS /////////////////////////////////////////////////////
 
 // Shown on the "version" command and sent over MSSP
-const char *version = "EmpireMUD 2.0 beta 5.210";
-const char *DG_SCRIPT_VERSION = "DG Scripts 1.0.12 e5.1.21";
+const char *version = "EmpireMUD 2.0 beta 5.211";
+const char *DG_SCRIPT_VERSION = "DG Scripts 1.0.12 e5.1.22";
 
 
 // data for the built-in game levels -- this adapts itself if you reduce the number of immortal levels
@@ -434,6 +434,7 @@ const char *ability_data_types[] = {
 	"RANGE",
 	"PARENT",
 	"SUPERCEDED-BY",
+	"REQUIRES-ABIL",	// 10
 	"\n"
 };
 
@@ -5562,6 +5563,10 @@ const char *requirement_types[] = {
 	"DIPLOMACY-OVER",
 	"OWN-ROADS",
 	"NOT-OWN-BUILDING",
+	"EMPIRE-HAS-PROGRESS",
+	"EMPIRE-LACKS-PROGRESS",	// 50
+	"EMPIRE-ON-PROGRESS",
+	"EMPIRE-NOT-ON-PROGRESS",
 	"\n",
 };
 
@@ -5617,6 +5622,10 @@ const bool requirement_amt_type[] = {
 	REQ_AMT_NUMBER,	// diplomacy-over
 	REQ_AMT_NUMBER,	// own-roads
 	REQ_AMT_NUMBER,	// not own building
+	REQ_AMT_NONE,	// empire-has-progress
+	REQ_AMT_NONE,	// 50, empire-lacks-progress
+	REQ_AMT_NONE,	// empire-on-progress
+	REQ_AMT_NONE,	// empire-not-on-progress
 };
 
 
@@ -5671,6 +5680,10 @@ const bool requirement_needs_tracker[] = {
 	FALSE,	// diplomacy-over
 	FALSE,	// own-roads
 	FALSE,	// not own building
+	FALSE,	// empire-has-progress
+	FALSE,	// 50, empire-lacks-progress
+	FALSE,	// empire-on-progress
+	FALSE,	// empire-not-on-progress
 };
 
 

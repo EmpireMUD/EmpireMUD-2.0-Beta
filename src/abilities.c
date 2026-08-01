@@ -491,8 +491,21 @@ void show_ability_info(char_data *ch, ability_data *abil, ability_data *parent, 
 		has_param_details = TRUE;
 	}
 	
+	// requires abilities
+	*lbuf = '\0';
+	LL_FOREACH(ABIL_DATA(abil), adl) {
+		if (adl->type == ADL_REQUIRES_ABIL) {
+			safe_snprintf(lbuf + strlen(lbuf), sizeof(lbuf) - strlen(lbuf), "%s%s%s\t0", (*lbuf ? ", " : ""), (has_ability(ch, adl->vnum) ? "" : "\tr"), get_ability_name_by_vnum(adl->vnum));
+		}
+	}
+	if (*lbuf) {
+		has_param_details = TRUE;
+		build_page_display(ch, "Requires ability: %s", lbuf);
+	}
+	
 	// supercede?
 	if ((supercede = check_superceded_by(ch, abil)) != abil) {
+		has_param_details = TRUE;
 		build_page_display(ch, "Superceded by: %s", ABIL_NAME(supercede));
 	}
 	
@@ -797,7 +810,7 @@ ability_data *check_superceded_by(char_data *ch, ability_data *abil) {
 	struct ability_data_list *adl;
 	
 	LL_FOREACH(ABIL_DATA(abil), adl) {
-		if (adl->type == ADL_SUPERCEDED_BY && has_ability(ch, adl->vnum) && (other = ability_proto(adl->vnum)) && other != abil) {
+		if (adl->type == ADL_SUPERCEDED_BY && has_ability(ch, adl->vnum) && (other = ability_proto(adl->vnum)) && other != abil && has_required_abilities(ch, other)) {
 			// recurse!
 			return check_superceded_by(ch, other);
 		}
@@ -890,6 +903,28 @@ bool has_ability_hook(ability_data *abil, bitvector_t hook_type, int hook_value)
 		}
 	}
 	return FALSE;
+}
+
+
+/**
+* Checks REQUIRES-ABIL data to make sure the character has other required
+* abilities, if present.
+*
+* @param char_data *ch The person trying to use the ability.
+* @param ability_data *abil Which ability they want to use.
+* @return bool TRUE if they have all required abilities (or it requires none), or FALSE if they're missing one.
+*/
+bool has_required_abilities(char_data *ch, ability_data *abil) {
+	struct ability_data_list *adl;
+	
+	LL_FOREACH(ABIL_DATA(abil), adl) {
+		if (adl->type == ADL_REQUIRES_ABIL && !has_ability(ch, adl->vnum)) {
+			return FALSE;
+		}
+	}
+	
+	// none missing?
+	return TRUE;
 }
 
 
@@ -7144,7 +7179,7 @@ bool check_ability(char_data *ch, char *string, bool exact) {
 * @param char *argument The typed-in args.
 */
 void perform_ability_command(char_data *ch, ability_data *abil, char *argument) {
-	char arg[MAX_INPUT_LENGTH], *argptr = arg;
+	char arg[MAX_INPUT_LENGTH], buf[MAX_STRING_LENGTH], *argptr = arg;
 	struct ability_exec *data;
 	struct empire_city_data *city;
 	ability_data *super;
@@ -7155,6 +7190,7 @@ void perform_ability_command(char_data *ch, ability_data *abil, char *argument) 
 	bitvector_t multi_targ = NOBITS;
 	bool has = FALSE;
 	int find_dir, iter, level, number;
+	struct ability_data_list *adl;
 	
 	if (!ch || !abil) {
 		log("SYSERR: perform_ability_command called without %s.", ch ? "ability" : "character");
@@ -7172,6 +7208,20 @@ void perform_ability_command(char_data *ch, ability_data *abil, char *argument) 
 	// check for a supercede ability and pass control to that instead:
 	if ((super = check_superceded_by(ch, abil)) != abil) {
 		perform_ability_command(ch, super, argument);
+		return;
+	}
+	
+	// check if it requires another ability?
+	if (!has_required_abilities(ch, abil)) {
+		*buf = '\0';
+		
+		LL_FOREACH(ABIL_DATA(abil), adl) {
+			if (adl->type == ADL_REQUIRES_ABIL && !has_ability(ch, adl->vnum)) {
+				safe_snprintf(buf + strlen(buf), sizeof(buf) - strlen(buf), "%s%s", (*buf ? ", " : ""), get_ability_name_by_vnum(adl->vnum));
+			}
+		}
+		
+		msg_to_char(ch, "You are missing %s: %s.\r\n", (strchr(buf, ',') ? "required abilities" : "a required ability"), buf);
 		return;
 	}
 	
@@ -8891,6 +8941,7 @@ void olc_search_ability(char_data *ch, any_vnum vnum) {
 		any |= has_ability_hook(abiter, AHOOK_ABILITY, vnum);
 		any |= find_ability_data_entry_for(abiter, ADL_PARENT, vnum) ? TRUE : FALSE;
 		any |= find_ability_data_entry_for(abiter, ADL_SUPERCEDED_BY, vnum) ? TRUE : FALSE;
+		any |= find_ability_data_entry_for(abiter, ADL_REQUIRES_ABIL, vnum) ? TRUE : FALSE;
 		any |= find_interaction_restriction_in_list(ABIL_INTERACTIONS(abiter), INTERACT_RESTRICT_ABILITY, vnum);
 		
 		if (any) {
@@ -10082,6 +10133,7 @@ void olc_delete_ability(char_data *ch, any_vnum vnum) {
 		found |= delete_from_ability_hooks(abiter, AHOOK_ABILITY, vnum);
 		found |= delete_from_ability_data_list(abiter, ADL_PARENT, vnum);
 		found |= delete_from_ability_data_list(abiter, ADL_SUPERCEDED_BY, vnum);
+		found |= delete_from_ability_data_list(abiter, ADL_REQUIRES_ABIL, vnum);
 		found |= delete_from_interaction_restrictions(&ABIL_INTERACTIONS(abiter), INTERACT_RESTRICT_ABILITY, vnum);
 		
 		if (found) {
@@ -10301,6 +10353,7 @@ void olc_delete_ability(char_data *ch, any_vnum vnum) {
 			found |= delete_from_ability_hooks(GET_OLC_ABILITY(desc), AHOOK_ABILITY, vnum);
 			found |= delete_from_ability_data_list(GET_OLC_ABILITY(desc), ADL_PARENT, vnum);
 			found |= delete_from_ability_data_list(GET_OLC_ABILITY(desc), ADL_SUPERCEDED_BY, vnum);
+			found |= delete_from_ability_data_list(GET_OLC_ABILITY(desc), ADL_REQUIRES_ABIL, vnum);
 			found |= delete_from_interaction_restrictions(&ABIL_INTERACTIONS(GET_OLC_ABILITY(desc)), INTERACT_RESTRICT_ABILITY, vnum);
 			
 			if (found) {
@@ -10965,6 +11018,10 @@ char *ability_data_display(struct ability_data_list *adl) {
 			safe_snprintf(output, sizeof(output), "%s: %d %s", type_str, adl->vnum, get_ability_name_by_vnum(adl->vnum));
 			break;
 		}
+		case ADL_REQUIRES_ABIL: {
+			safe_snprintf(output, sizeof(output), "%s: %d %s", type_str, adl->vnum, get_ability_name_by_vnum(adl->vnum));
+			break;
+		}
 		default: {
 			safe_snprintf(output, sizeof(output), "%s: ???", type_str);
 			break;
@@ -11589,6 +11646,20 @@ OLC_MODULE(abiledit_ready_weapon) {
 }
 
 
+OLC_MODULE(abiledit_requiresabil) {
+	// pass-thru to .data: must rearrrange args
+	char arg[MAX_INPUT_LENGTH], arg1[MAX_INPUT_LENGTH], arg2[MAX_INPUT_LENGTH];
+	half_chop(argument, arg1, arg2);
+	if (is_abbrev(arg1, "add")) {
+		safe_snprintf(arg, sizeof(arg), "%s requires-abil %s", arg1, arg2);
+	}
+	else {
+		safe_snprintf(arg, sizeof(arg), "%s %s", arg1, arg2);
+	}
+	abiledit_data(ch, type, arg);
+}
+
+
 OLC_MODULE(abiledit_summon_mob) {
 	// pass-thru to .data: must rearrrange args
 	char arg[MAX_INPUT_LENGTH], arg1[MAX_INPUT_LENGTH], arg2[MAX_INPUT_LENGTH];
@@ -11962,6 +12033,9 @@ OLC_MODULE(abiledit_data) {
 	if (IS_SET(ABIL_TYPES(abil), ABILT_PAINT_BUILDING)) {
 		allowed_types |= ADL_PAINT_COLOR;
 	}
+	if (ABIL_COMMAND(abil) && *ABIL_COMMAND(abil)) {
+	 	allowed_types |= ADL_REQUIRES_ABIL;
+	 }
 	
 	// arg1 arg2
 	half_chop(argument, arg1, arg2);
@@ -12177,7 +12251,8 @@ OLC_MODULE(abiledit_data) {
 					val_id = ABIL_VNUM(find_abil);
 					break;
 				}
-				case ADL_SUPERCEDED_BY: {
+				case ADL_SUPERCEDED_BY:
+				case ADL_REQUIRES_ABIL: {
 					if (!(find_abil = find_ability(val_arg))) {
 						msg_to_char(ch, "Unknown ability '%s'.\r\n", val_arg);
 						return;

@@ -95,6 +95,7 @@ OLC_MODULE(abiledit_waittype);
 OLC_MODULE(abiledit_ptech);
 OLC_MODULE(abiledit_effect);
 OLC_MODULE(abiledit_ready_weapon);
+OLC_MODULE(abiledit_requiresabil);
 OLC_MODULE(abiledit_summon_mob);
 OLC_MODULE(abiledit_supercededby);
 OLC_MODULE(abiledit_limitation);
@@ -697,6 +698,7 @@ const struct olc_command_data olc_data[] = {
 	{ "ptech", abiledit_ptech, OLC_ABILITY, OLC_CF_EDITOR },
 	{ "effect", abiledit_effect, OLC_ABILITY, OLC_CF_EDITOR },
 	{ "ready-weapon", abiledit_ready_weapon, OLC_ABILITY, OLC_CF_EDITOR },
+	{ "requiresabil", abiledit_requiresabil, OLC_ABILITY, OLC_CF_EDITOR },
 	{ "summon-mob", abiledit_summon_mob, OLC_ABILITY, OLC_CF_EDITOR },
 	{ "supercededby", abiledit_supercededby, OLC_ABILITY, OLC_CF_EDITOR },
 	{ "limitation", abiledit_limitation, OLC_ABILITY, OLC_CF_EDITOR },
@@ -6083,7 +6085,7 @@ int olc_process_number(char_data *ch, char *argument, char *name, char *command,
 bool olc_parse_requirement_args(char_data *ch, int type, char *argument, bool find_amount, int *amount, any_vnum *vnum, bitvector_t *misc, char *group, char **custom_text) {
 	char arg[MAX_INPUT_LENGTH]; 
 	bool need_abil = FALSE, need_bld = FALSE, need_component = FALSE;
-	bool need_mob = FALSE, need_obj = FALSE, need_quest = FALSE;
+	bool need_mob = FALSE, need_obj = FALSE, need_prog = FALSE, need_quest = FALSE;
 	bool need_rmt = FALSE, need_sect = FALSE, need_skill = FALSE;
 	bool need_veh = FALSE, need_mob_flags = FALSE, need_faction = FALSE;
 	bool need_currency = FALSE, need_func_flags = FALSE, need_veh_flags = FALSE;
@@ -6196,6 +6198,13 @@ bool olc_parse_requirement_args(char_data *ch, int type, char *argument, bool fi
 		case REQ_SPEAK_LANGUAGE:
 		case REQ_RECOGNIZE_LANGUAGE: {
 			need_language = TRUE;
+			break;
+		}
+		case REQ_EMPIRE_HAS_PROGRESS:
+		case REQ_EMPIRE_LACKS_PROGRESS:
+		case REQ_EMPIRE_ON_PROGRESS:
+		case REQ_EMPIRE_NOT_ON_PROGRESS: {
+			need_prog = TRUE;
 			break;
 		}
 		case REQ_OWN_HOMES:
@@ -6361,6 +6370,17 @@ bool olc_parse_requirement_args(char_data *ch, int type, char *argument, bool fi
 		}
 		if (!isdigit(*arg) || (*vnum = atoi(arg)) < 0 || !obj_proto(*vnum)) {
 			msg_to_char(ch, "Invalid object vnum '%s'.\r\n", arg);
+			return FALSE;
+		}
+	}
+	if (need_prog) {
+		argument = any_one_arg(argument, arg);
+		if (!*arg) {
+			msg_to_char(ch, "You must provide a progress goal vnum.\r\n");
+			return FALSE;
+		}
+		if (!isdigit(*arg) || (*vnum = atoi(arg)) < 0 || !real_progress(*vnum)) {
+			msg_to_char(ch, "Invalid progress goal vnum '%s'.\r\n", arg);
 			return FALSE;
 		}
 	}

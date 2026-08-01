@@ -318,7 +318,6 @@ ADMIN_UTIL(util_pathtest);
 ADMIN_UTIL(util_playerdump);
 ADMIN_UTIL(util_randtest);
 ADMIN_UTIL(util_redo_islands);
-ADMIN_UTIL(util_rescan);
 ADMIN_UTIL(util_resetbuildingtriggers);
 ADMIN_UTIL(util_strlen);
 ADMIN_UTIL(util_temperature);
@@ -340,7 +339,6 @@ struct {
 	{ "playerdump", LVL_IMPL, util_playerdump },
 	{ "randtest", LVL_CIMPL, util_randtest },
 	{ "redoislands", LVL_CIMPL, util_redo_islands },
-	{ "rescan", LVL_START_IMM, util_rescan },
 	{ "resetbuildingtriggers", LVL_CIMPL, util_resetbuildingtriggers },
 	{ "strlen", LVL_START_IMM, util_strlen },
 	{ "temperature", LVL_START_IMM, util_temperature },
@@ -1240,35 +1238,6 @@ ADMIN_UTIL(util_redo_islands) {
 		syslog(SYS_GC, GET_INVIS_LEV(ch), TRUE, "GC: %s has renumbered islands", GET_NAME(ch));
 		number_and_count_islands(TRUE);
 		msg_to_char(ch, "Islands renumbered. Caution: empire inventories may now be in the wrong place.\r\n");
-	}
-}
-
-
-ADMIN_UTIL(util_rescan) {
-	empire_data *emp;
-	
-	if (GET_ACCESS_LEVEL(ch) < LVL_CIMPL && !IS_GRANTED(ch, GRANT_EMPIRES)) {
-		msg_to_char(ch, "You don't have permission to rescan empires.\r\n");
-	}
-	else if (!*argument) {
-		msg_to_char(ch, "Usage: rescan <empire | all>\r\n");
-	}
-	else if (!str_cmp(argument, "all")) {
-		syslog(SYS_INFO, GET_INVIS_LEV(ch), TRUE, "Rescanning all empires");
-		reread_empire_tech(NULL);
-		refresh_empire_dropped_items(NULL);
-		send_config_msg(ch, "ok_string");
-	}
-	else if (!(emp = get_empire_by_name(argument))) {
-		msg_to_char(ch, "Unknown empire.\r\n");
-	}
-	else {
-		syslog(SYS_INFO, GET_INVIS_LEV(ch), TRUE, "Rescanning empire: %s", EMPIRE_NAME(emp));
-		reread_empire_tech(emp);
-		refresh_empire_goals(emp, NOTHING);
-		refresh_empire_dropped_items(emp);
-		check_ruined_cities(emp);
-		send_config_msg(ch, "ok_string");
 	}
 }
 
@@ -2818,7 +2787,7 @@ int perform_set(char_data *ch, char_data *vict, int mode, char *val_arg) {
 		
 		if (!str_cmp(onoff_arg, "on")) {
 			add_bonus_ability(vict, ABIL_VNUM(abil));
-			assign_class_and_extra_abilities(vict, NULL, ROLE_NONE);
+			assign_class_and_extra_abilities(vict, NULL, NOTHING);
 			sprintf(output, "%s: added bonus ability %d %s.", GET_NAME(vict), ABIL_VNUM(abil), ABIL_NAME(abil));
 			
 			// notes when turned on
@@ -2828,7 +2797,7 @@ int perform_set(char_data *ch, char_data *vict, int mode, char *val_arg) {
 		}
 		else if (!str_cmp(onoff_arg, "off")) {
 			remove_bonus_ability(vict, ABIL_VNUM(abil));
-			assign_class_and_extra_abilities(vict, NULL, ROLE_NONE);
+			assign_class_and_extra_abilities(vict, NULL, NOTHING);
 			sprintf(output, "%s: removed bonus ability %d %s.", GET_NAME(vict), ABIL_VNUM(abil), ABIL_NAME(abil));
 		}
 		else {
@@ -3309,7 +3278,7 @@ void do_stat_character(char_data *ch, char_data *k, bool details) {
 		build_page_display(ch, "%s PC '\ty%s\t0', Lastname '\ty%s\t0', IDNum: [%5d], In room [%5d]", lbuf, GET_NAME(k), GET_CURRENT_LASTNAME(k) ? GET_CURRENT_LASTNAME(k) : "none", GET_IDNUM(k), IN_ROOM(k) ? GET_ROOM_VNUM(IN_ROOM(k)) : NOWHERE);
 	}
 	else {	// mob
-		build_page_display(ch, "%s %s '\ty%s\t0', ID: [%5d], In room [%5d]", lbuf, (!IS_MOB(k) ? "NPC" : "MOB"), GET_NAME(k), k->script_id, IN_ROOM(k) ? GET_ROOM_VNUM(IN_ROOM(k)) : NOWHERE);
+		build_page_display(ch, "%s %s '\ty%s\t0', ID: [%5d], In room [%5d]", lbuf, (!IS_MOB(k) ? "NPC" : "MOB"), GET_NAME(k), ((SCRIPT(k) && IN_ROOM(k)) ? char_script_id(k) : k->script_id), IN_ROOM(k) ? GET_ROOM_VNUM(IN_ROOM(k)) : NOWHERE);
 	}
 	
 	if (!IS_NPC(k) && GET_ACCOUNT(k)) {

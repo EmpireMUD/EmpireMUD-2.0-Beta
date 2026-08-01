@@ -627,6 +627,41 @@ SHOW(show_buildings) {
 }
 
 
+SHOW(show_builtwith) {
+	vehicle_data *veh = NULL;
+	struct resource_data *list, *res;
+	
+	// may target vehicle in room, vehicle you're in, or current room
+	one_argument(argument, arg);
+	if (*arg && !(veh = get_vehicle_in_room_vis(ch, arg, NULL)) && (!(veh = GET_ROOM_VEHICLE(IN_ROOM(ch))) || !multi_isname(argument, VEH_KEYWORDS(veh)))) {
+		msg_to_char(ch, "You don't see a vehicle called '%s' here.\r\n", arg);
+		return;
+	}
+	
+	// header
+	if (veh) {
+		build_page_display(ch, "Built-with list for %s:", VEH_SHORT_DESC(veh));
+		list = VEH_BUILT_WITH(veh);
+	}
+	else {
+		build_page_display(ch, "Built-with list for this room:");
+		list = GET_BUILT_WITH(IN_ROOM(ch));
+	}
+	
+	// list
+	LL_FOREACH(list, res) {
+		build_page_display(ch, " %s", get_resource_name(res));
+	}
+	
+	// empty?
+	if (!list) {
+		build_page_display(ch, " nothing");
+	}
+	
+	send_page_display(ch);
+}
+
+
 SHOW(show_commons) {
 	descriptor_data *d, *nd;
 	
@@ -2503,6 +2538,7 @@ SHOW(show_skills) {
 	char_data *vict;
 	bool found, is_file = FALSE;
 	int set;
+	struct player_bonus_ability *bonus_abil, *next_bonus_abil;
 	
 	argument = one_argument(argument, arg);
 	skip_spaces(&argument);
@@ -2576,6 +2612,21 @@ SHOW(show_skills) {
 		found = TRUE;
 	}
 	msg_to_char(ch, "&0%s\r\n", (found ? "" : "none"));
+	
+	if (GET_BONUS_ABILITIES(vict)) {
+		msg_to_char(ch, "&yBonus abilities&0: &g");
+		found = FALSE;
+		HASH_ITER(hh, GET_BONUS_ABILITIES(vict), bonus_abil, next_bonus_abil) {
+			if (!(abil = ability_proto(bonus_abil->vnum))) {
+				continue;	// no ability?
+			}
+			
+			// show it
+			msg_to_char(ch, "%s%s", (found ? ", " : ""), ABIL_NAME(abil));
+			found = TRUE;
+		}
+		msg_to_char(ch, "&0\r\n");
+	}
 	
 	msg_to_char(ch, "&yOther&0: &g");
 	found = FALSE;
@@ -3499,6 +3550,7 @@ struct show_struct {
 	{ "author",			LVL_START_IMM,		show_author },
 	{ "bonusabilities",	LVL_START_IMM,		show_bonus_abilities },
 	{ "buildings",		LVL_START_IMM,		show_buildings },
+	{ "builtwith",		LVL_START_IMM,		show_builtwith },
 	{ "commons",		LVL_START_IMM,		show_commons },
 	{ "companions",		LVL_START_IMM,		show_companions },
 	{ "components",		LVL_START_IMM,		show_components },

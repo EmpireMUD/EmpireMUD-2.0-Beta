@@ -1154,4 +1154,62 @@ M
 0
 $n tries to push a stubborn sheep.~
 S
+#289
+#n yakmaster master~
+the yakmaster~
+#n is following the yaks.
+~
+20 50 bdqvI 0 3
+0 0 0 15 -1 -1
+D
+The poor yakmaster is trying to keep the yaks together.
+~
+M
+0
+$n looks all over for one of the yaks.~
+M
+0
+$n pushes a yak's rump in a desperate attempt to get it to move.~
+M
+0
+$n whistles; the yaks just chew.~
+M
+0
+$n pouts.~
+S
+#290
+#n herder~
+the llama herder~
+#n is trying to manage the llamas.
+~
+20 50 bdqvI 0 3
+0 0 0 15 -1 -1
+D
+The llama herder seems to be having trouble keeping the llamas in the pens.
+~
+M
+0
+$n whistles sharply.~
+M
+0
+$n chases an escaped llama.~
+M
+0
+$n sighs.~
+M
+0
+$n repairs part of the pen.~
+S
+#291
+#n corral hand~
+#n~
+The corral hand is hard at work.
+~
+20 50 bdqvI 0 3
+0 0 0 15 -1 -1
+D
+   The corral hand tends the walls, shears the livestock, and otherwise spends
+the day enjoying fresh mountain air and endless scenery.
+~
+S
 $

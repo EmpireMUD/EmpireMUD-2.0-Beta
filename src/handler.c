@@ -9407,6 +9407,22 @@ bool meets_requirements(char_data *ch, struct req_data *list, struct instance_da
 				ok = (GET_LOYALTY(ch) && count_owned_roads(GET_LOYALTY(ch)) >= req->needed);
 				break;
 			}
+			case REQ_EMPIRE_HAS_PROGRESS: {
+				ok = (GET_LOYALTY(ch) && empire_has_completed_goal(GET_LOYALTY(ch), req->vnum));
+				break;
+			}
+			case REQ_EMPIRE_LACKS_PROGRESS: {
+				ok = (GET_LOYALTY(ch) && !empire_has_completed_goal(GET_LOYALTY(ch), req->vnum));
+				break;
+			}
+			case REQ_EMPIRE_ON_PROGRESS: {
+				ok = (GET_LOYALTY(ch) && get_current_goal(GET_LOYALTY(ch), req->vnum));
+				break;
+			}
+			case REQ_EMPIRE_NOT_ON_PROGRESS: {
+				ok = (GET_LOYALTY(ch) && !get_current_goal(GET_LOYALTY(ch), req->vnum));
+				break;
+			}
 			
 			// some types do not support pre-reqs
 			case REQ_KILL_MOB:
@@ -9686,6 +9702,22 @@ char *requirement_string(struct req_data *req, bool show_vnums, bool allow_custo
 		}
 		case REQ_OWN_ROADS: {
 			safe_snprintf(output, sizeof(output), "Own %dx tile%s of roads", req->needed, PLURAL(req->needed));
+			break;
+		}
+		case REQ_EMPIRE_HAS_PROGRESS: {
+			safe_snprintf(output, sizeof(output), "Empire earned: %s", get_progress_name_by_proto(req->vnum));
+			break;
+		}
+		case REQ_EMPIRE_LACKS_PROGRESS: {
+			safe_snprintf(output, sizeof(output), "Empire has not earned: %s", get_progress_name_by_proto(req->vnum));
+			break;
+		}
+		case REQ_EMPIRE_ON_PROGRESS: {
+			safe_snprintf(output, sizeof(output), "Empire has started: %s", get_progress_name_by_proto(req->vnum));
+			break;
+		}
+		case REQ_EMPIRE_NOT_ON_PROGRESS: {
+			safe_snprintf(output, sizeof(output), "Empire has not started: %s", get_progress_name_by_proto(req->vnum));
 			break;
 		}
 		default: {
@@ -11363,30 +11395,6 @@ void store_unique_item(char_data *ch, struct empire_unique_storage **to_list, ob
 		return;
 	}
 	
-	// attempt to douse:
-	if (LIGHT_IS_LIT(obj)) {
-		if (LIGHT_FLAGGED(obj, LIGHT_FLAG_CAN_DOUSE)) {
-			if (ch) {
-				act("You douse $p.", FALSE, ch, obj, NULL, TO_CHAR);
-				act("$n douses $p.", FALSE, ch, obj, NULL, TO_ROOM);
-			}
-			if (!douse_light(obj)) {
-				// purged?
-				if (ch) {
-					msg_to_char(ch, "It's used up and you throw it away.\r\n");
-				}
-				return;
-			}
-		}
-		else if (GET_LIGHT_HOURS_REMAINING(obj) != UNLIMITED) {
-			if (ch) {
-				act("$p: You cannot store this while it's lit.", FALSE, ch, obj, NULL, TO_CHAR);
-			}
-			// no douse = no store
-			return;
-		}
-	}
-	
 	// empty/clear the item:
 	REMOVE_BIT(GET_OBJ_EXTRA(obj), OBJ_KEEP);
 	clear_obj_eq_sets(obj);
@@ -12017,6 +12025,32 @@ int get_number(char **name) {
 //// VEHICLE HANDLERS ////////////////////////////////////////////////////////
 
 /**
+* Ensure a vehicle is not going inside itself.
+*
+* @param vehicle_data *veh The vehicle about to move.
+* @param room_data *room The target room to send it to.
+* @return bool TRUE if the vehicle would end up inside itself, FALSE if not.
+*/
+bool check_vehicle_recursion(vehicle_data *veh, room_data *room) {
+	vehicle_data *temp = room ? GET_ROOM_VEHICLE(room) : NULL;
+	
+	while (temp) {
+		if (temp == veh) {
+			// inside itself!?
+			return TRUE;
+		}
+		else {
+			// go up a level
+			temp = IN_ROOM(temp) ? GET_ROOM_VEHICLE(IN_ROOM(temp)) : NULL;
+		}
+	}
+	
+	// if we got here, we're safe
+	return FALSE;
+}
+
+
+/**
 * Pre-extracts a vehicle from the game. The actual extraction will happen
 * slightly later in extract_pending_vehicles().
 *
@@ -12258,6 +12292,17 @@ void vehicle_to_room(vehicle_data *veh, room_data *room) {
 	if (!veh || !room) {
 		log("SYSERR: Illegal value(s) passed to vehicle_to_room. (Room %p, vehicle %p)", room, veh);
 		return;
+	}
+	if (check_vehicle_recursion(veh, room)) {
+		syslog(SYS_ERROR, LVL_START_IMM, TRUE, "SYSERR: vehicle_to_room attempting to place a vehicle inside itself (Room %d, vehicle %s)%s", GET_ROOM_VNUM(room), VEH_SHORT_DESC(veh), (!IN_ROOM(veh) ? ", sending to room 0 instead" : ""));
+		if (!IN_ROOM(veh)) {
+			// fail over
+			room = real_room(0);
+		}
+		else {
+			// just bloc kit
+			return;
+		}
 	}
 	
 	if (IN_ROOM(veh)) {

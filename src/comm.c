@@ -74,6 +74,7 @@ void check_maintenance_and_depletion_reset();
 void check_newbie_islands();
 void check_wars();
 void chore_update();
+void clean_channel_histories();
 void clear_leftover_page_displays();
 void display_automessages();
 void expire_old_politics();
@@ -896,7 +897,7 @@ void heartbeat(unsigned long heart_pulse) {
 	}
 	
 	// odd timing to avoid lining up with other ticks
-	if (HEARTBEAT(119)) {
+	if (HEARTBEAT(61)) {
 		update_empire_npc_data();
 		HEARTBEAT_LOG("14")
 	}
@@ -932,6 +933,8 @@ void heartbeat(unsigned long heart_pulse) {
 	if (HEARTBEAT(SECS_PER_REAL_HOUR)) {
 		reduce_stale_empires();
 		HEARTBEAT_LOG("22")
+		clean_channel_histories();
+		HEARTBEAT_LOG("22.1")
 	}
 	
 	if (HEARTBEAT(30 * SECS_PER_REAL_MIN)) {

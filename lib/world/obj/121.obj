@@ -1504,14 +1504,14 @@ A single candy cane lies here.~
    Striped in red and white and smelling strongly of mint, this looks like a
 good snack that also promises to freshen your breath.
 ~
-6 gC a 0 0 7
+6 gC a 0 0 8
 2 0 0
-0 168
+0 4320
 A
 4 1 0
 C
 1 1
-I 14 12148 100.00 1  # COMBINE: bundle of candy canes
+I 14 12148 100.00 4  # COMBINE: bundle of candy canes
 M
 4
 You slowly munch on the candy cane and it leaves a cool minty aftertaste.~

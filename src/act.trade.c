@@ -296,7 +296,7 @@ craft_data *find_best_craft_by_name(char_data *ch, char *argument, int craft_typ
 		if (!str_cmp(argument, GET_CRAFT_NAME(craft))) {
 			if (GET_CRAFT_TYPE(craft) != craft_type) {
 				// check this late because we want to record a mismatch
-				if (found_wrong_cmd) {
+				if (GET_CRAFT_TYPE(craft) != CRAFT_TYPE_WORKFORCE && found_wrong_cmd) {
 					*found_wrong_cmd = GET_CRAFT_TYPE(craft);
 				}
 				continue;

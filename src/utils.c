@@ -538,6 +538,9 @@ void run_delayed_refresh(void) {
 					}
 				}
 			}
+			if (IS_SET(EMPIRE_DELAYED_REFRESH(emp), DELAY_REFRESH_CHECK_ELIGIBLE_GOALS)) {
+				check_for_eligible_goals(emp);
+			}
 			if (IS_SET(EMPIRE_DELAYED_REFRESH(emp), DELAY_REFRESH_MEMBERS)) {
 				read_empire_members(emp, FALSE);
 			}

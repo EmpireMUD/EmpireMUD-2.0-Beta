@@ -44,6 +44,7 @@ EEDIT(eedit_motd);
 EEDIT(eedit_name);
 EEDIT(eedit_privilege);
 EEDIT(eedit_rank);
+EEDIT(eedit_rescan);
 EEDIT(eedit_num_ranks);
 
 
@@ -317,6 +318,7 @@ const struct {
 	{ "privilege", eedit_privilege, NOBITS },
 	{ "rank", eedit_rank, NOBITS },
 	{ "ranks", eedit_num_ranks, NOBITS },
+	{ "rescan", eedit_rescan, EEDIT_FLAG_IMM_ONLY },
 	
 	// this goes last
 	{ "\n", NULL, NOBITS }
@@ -960,5 +962,51 @@ EEDIT(eedit_num_ranks) {
 		}
 		
 		TRIGGER_DELAYED_REFRESH(emp, DELAY_REFRESH_MSDP_UPDATE_ALL);
+	}
+}
+
+
+// immortal-only, accepts 'eedit <empire> rescan' and 'eedit rescan <empire | all>'
+EEDIT(eedit_rescan) {
+	bool all = FALSE;
+	empire_data *which = NULL;
+	
+	if (GET_ACCESS_LEVEL(ch) < LVL_CIMPL && !IS_GRANTED(ch, GRANT_EMPIRES)) {
+		msg_to_char(ch, "You don't have permission to rescan empires.\r\n");
+		return;
+	}
+	
+	// determine target empire
+	if (emp != GET_LOYALTY(ch)) {
+		which = emp;	// immortal using targeted rescan
+	}
+	else if (!*argument) {
+		msg_to_char(ch, "Rescan which empire (or 'all')?\r\n");
+		return;
+	}
+	else if (!str_cmp(argument, "all")) {
+		all = TRUE;
+	}
+	else if (!(which = get_empire_by_name(argument))) {
+		msg_to_char(ch, "Unknown empire.\r\n");
+		return;
+	}
+	else {
+		// in all other cases we set 'which'
+	}
+	
+	if (all) {
+		syslog(SYS_GC, GET_INVIS_LEV(ch), TRUE, "GC: %s has rescanned all empires", GET_NAME(ch));
+		reread_empire_tech(NULL);
+		refresh_empire_dropped_items(NULL);
+		send_config_msg(ch, "ok_string");
+	}
+	else {
+		syslog(SYS_GC, GET_INVIS_LEV(ch), TRUE, "GC: %s has rescanned empire: %s", GET_NAME(ch), EMPIRE_NAME(which));
+		reread_empire_tech(which);
+		refresh_empire_goals(which, NOTHING);
+		refresh_empire_dropped_items(which);
+		check_ruined_cities(which);
+		send_config_msg(ch, "ok_string");
 	}
 }

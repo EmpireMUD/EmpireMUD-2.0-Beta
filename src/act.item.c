@@ -130,6 +130,42 @@ bool can_take_obj(char_data *ch, obj_data *obj) {
 
 
 /**
+* Attempts to douse the light, with messaging, before storing it.
+*
+* @param char_data *ch Optional: The player trying to store it, may be NULL.
+* @param obj_data *obj The possible light (a non-light or unlit light is ignored).
+* @return bool TRUE if it's safe to store, FALSE if it was used up OR cannot be doused.
+*/
+bool check_douse_light_before_store(char_data *ch, obj_data *obj) {
+	if (LIGHT_IS_LIT(obj)) {
+		if (LIGHT_FLAGGED(obj, LIGHT_FLAG_CAN_DOUSE)) {
+			if (ch) {
+				act("You douse $p.", FALSE, ch, obj, NULL, TO_CHAR);
+				act("$n douses $p.", FALSE, ch, obj, NULL, TO_ROOM);
+			}
+			if (!douse_light(obj)) {
+				// purged?
+				if (ch) {
+					msg_to_char(ch, "It's used up and you throw it away.\r\n");
+				}
+				return FALSE;
+			}
+		}
+		else if (GET_LIGHT_HOURS_REMAINING(obj) != UNLIMITED) {
+			if (ch) {
+				act("$p: You cannot store this while it's lit.", FALSE, ch, obj, NULL, TO_CHAR);
+			}
+			// no douse = no store
+			return FALSE;
+		}
+	}
+	
+	// otherwise
+	return TRUE;
+}
+
+
+/**
 * Interaction func for "combine". This almost always extracts the original
 * item, so it should basically always return TRUE.
 *
@@ -5204,7 +5240,7 @@ void warehouse_store(char_data *ch, char *argument, int mode) {
 			if (OBJ_FLAGGED(obj, OBJ_KEEP)) {
 				kept = TRUE;
 			}
-			else if (UNIQUE_OBJ_CAN_STORE(obj, home_mode) && check_home_store_cap(ch, obj, FALSE, &capped)) {
+			else if (UNIQUE_OBJ_CAN_STORE(obj, home_mode) && (!home_mode || check_home_store_cap(ch, obj, FALSE, &capped)) && check_douse_light_before_store(ch, obj)) {
 				// may extract obj
 				store_unique_item(ch, (home_mode ? &GET_HOME_STORAGE(ch) : &EMPIRE_UNIQUE_STORAGE(use_emp)), obj, use_emp, home_mode ? NULL : IN_ROOM(ch), &full);
 				if (!full) {
@@ -5246,7 +5282,7 @@ void warehouse_store(char_data *ch, char *argument, int mode) {
 				kept = TRUE;	// mark for later
 			}
 			
-			if ((!OBJ_FLAGGED(obj, OBJ_KEEP) || (total == 1 && dotmode != FIND_ALLDOT)) && UNIQUE_OBJ_CAN_STORE(obj, home_mode) && check_home_store_cap(ch, obj, FALSE, &capped)) {
+			if ((!OBJ_FLAGGED(obj, OBJ_KEEP) || (total == 1 && dotmode != FIND_ALLDOT)) && UNIQUE_OBJ_CAN_STORE(obj, home_mode) && (!home_mode || check_home_store_cap(ch, obj, FALSE, &capped)) && check_douse_light_before_store(ch, obj)) {
 				// may extract obj
 				store_unique_item(ch, (home_mode ? &GET_HOME_STORAGE(ch) : &EMPIRE_UNIQUE_STORAGE(use_emp)), obj, use_emp, home_mode ? NULL : IN_ROOM(ch), &full);
 				if (!full) {
@@ -6235,9 +6271,14 @@ ACMD(do_eat) {
 		extract_obj(food);
 	}
 	else {
+		// bind if needed
 		if (!IS_NPC(ch) && OBJ_FLAGGED(food, OBJ_BIND_FLAGS)) {
 			bind_obj_to_player(food, ch);
 			reduce_obj_binding(food, ch);
+		}
+		// if it WAS storable in basic storage, it becomes unstorable
+		if (GET_OBJ_STORAGE(food)) {
+			SET_BIT(GET_OBJ_EXTRA(food), OBJ_NO_BASIC_STORAGE | OBJ_NO_WAREHOUSE);
 		}
 		request_obj_save_in_world(food);
 	}
@@ -6576,14 +6617,7 @@ ACMD(do_get) {
 		if (cont_dotmode == FIND_INDIV) {
 			argptr = arg2;
 			number = get_number(&argptr);
-			if ((cont = get_obj_for_char_prefer_container(ch, argptr, &number))) {
-				// found preferred container
-				mode = (cont->carried_by ? FIND_OBJ_INV : (cont->worn_by ? FIND_OBJ_EQUIP : FIND_OBJ_ROOM));
-			}
-			else {
-				// try another way
-				mode = generic_find(argptr, &number, FIND_OBJ_INV | FIND_OBJ_ROOM | FIND_OBJ_EQUIP | FIND_VEHICLE_ROOM | FIND_VEHICLE_INSIDE, ch, &tmp_char, &cont, &find_veh);
-			}
+			mode = generic_find(argptr, &number, FIND_OBJ_INV | FIND_OBJ_ROOM | FIND_OBJ_EQUIP | FIND_VEHICLE_ROOM | FIND_VEHICLE_INSIDE, ch, &tmp_char, &cont, &find_veh);
 			
 			if (find_veh) {
 				// pass off to vehicle handler
@@ -7626,13 +7660,7 @@ ACMD(do_put) {
 	}
 	else {
 		number = get_number(&thecont);
-		if ((cont = get_obj_for_char_prefer_container(ch, thecont, &number))) {
-			// found preferred container
-		}
-		else {
-			// try another way
-			generic_find(thecont, &number, FIND_OBJ_INV | FIND_OBJ_ROOM | FIND_OBJ_EQUIP | FIND_VEHICLE_ROOM | FIND_VEHICLE_INSIDE, ch, &tmp_char, &cont, &find_veh);
-		}
+		generic_find(thecont, &number, FIND_OBJ_INV | FIND_OBJ_ROOM | FIND_OBJ_EQUIP | FIND_VEHICLE_ROOM | FIND_VEHICLE_INSIDE, ch, &tmp_char, &cont, &find_veh);
 		
 		if (find_veh) {
 			// override for put obj in vehicle
@@ -8078,7 +8106,13 @@ ACMD(do_seed) {
 		else {
 			// ok: seed individual
 			if (run_interactions(ch, GET_OBJ_INTERACTIONS(obj), INTERACT_SEED, IN_ROOM(ch), NULL, obj, NULL, seed_obj_interact)) {
+				// block basic storage and mark as seeded
 				SET_BIT(GET_OBJ_EXTRA(obj), OBJ_SEEDED | OBJ_NO_BASIC_STORAGE);
+				
+				// if it WAS storable in basic storage, it also becomes unstorable in the warehouse
+				if (GET_OBJ_STORAGE(obj)) {
+					SET_BIT(GET_OBJ_EXTRA(obj), OBJ_NO_WAREHOUSE);
+				}
 				
 				if (junk && !OBJ_FLAGGED(obj, OBJ_KEEP)) {
 					perform_drop(ch, obj, SCMD_JUNK, "junk");
@@ -8104,7 +8138,14 @@ ACMD(do_seed) {
 				// ok: seed 1 of many
 				any = TRUE;
 				if (run_interactions(ch, GET_OBJ_INTERACTIONS(obj), INTERACT_SEED, IN_ROOM(ch), NULL, obj, NULL, seed_obj_interact)) {
+					// block basic storage and mark as seeded
 					SET_BIT(GET_OBJ_EXTRA(obj), OBJ_SEEDED | OBJ_NO_BASIC_STORAGE);
+					
+					// if it WAS storable in basic storage, it also becomes unstorable in the warehouse
+					if (GET_OBJ_STORAGE(obj)) {
+						SET_BIT(GET_OBJ_EXTRA(obj), OBJ_NO_WAREHOUSE);
+					}
+					
 					if (junk && !OBJ_FLAGGED(obj, OBJ_KEEP)) {
 						perform_drop(ch, obj, SCMD_JUNK, "junk");
 					}

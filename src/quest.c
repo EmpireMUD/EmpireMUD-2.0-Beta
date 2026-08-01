@@ -607,28 +607,25 @@ int count_quest_objects(char_data *ch, obj_vnum vnum, bool skip_keep) {
 */
 void expire_instance_quests(struct instance_data *inst) {
 	struct player_quest *pq;
-	descriptor_data *desc;
 	quest_data *quest;
 	char_data *ch;
 	
-	LL_FOREACH(descriptor_list, desc) {
-		if (STATE(desc) != CON_PLAYING || !(ch = desc->character) || IS_NPC(ch)) {
-			continue;
-		}
-		
-		LL_FOREACH_SAFE(GET_QUESTS(ch), pq, global_next_player_quest) {
-			if (pq->instance_id != INST_ID(inst) || pq->adventure != GET_ADV_VNUM(INST_ADVENTURE(inst))) {
-				continue;
+	DL_FOREACH2(player_character_list, ch, next_plr) {
+		if (!IS_NPC(ch)) {
+			LL_FOREACH_SAFE(GET_QUESTS(ch), pq, global_next_player_quest) {
+				if (pq->instance_id != INST_ID(inst) || pq->adventure != GET_ADV_VNUM(INST_ADVENTURE(inst))) {
+					continue;
+				}
+				if (!(quest = quest_proto(pq->vnum))) {
+					continue;
+				}
+				if (!QUEST_FLAGGED(quest, QST_EXPIRES_AFTER_INSTANCE)) {
+					continue;
+				}
+				
+				msg_to_char(ch, "You fail %s because the adventure instance ended.\r\n", QUEST_NAME(quest));
+				drop_quest(ch, pq);
 			}
-			if (!(quest = quest_proto(pq->vnum))) {
-				continue;
-			}
-			if (!QUEST_FLAGGED(quest, QST_EXPIRES_AFTER_INSTANCE)) {
-				continue;
-			}
-			
-			msg_to_char(ch, "You fail %s because the adventure instance ended.\r\n", QUEST_NAME(quest));
-			drop_quest(ch, pq);
 		}
 	}
 	global_next_player_quest = NULL;
@@ -904,7 +901,7 @@ void give_quest_rewards(char_data *ch, struct quest_reward *list, int reward_lev
 			case QR_GRANT_PROGRESS: {
 				if (GET_LOYALTY(ch) && (prog = real_progress(reward->vnum)) && !empire_has_completed_goal(GET_LOYALTY(ch), reward->vnum)) {
 					script_reward_goal(GET_LOYALTY(ch), prog);
-					check_for_eligible_goals(GET_LOYALTY(ch));
+					TRIGGER_DELAYED_REFRESH(GET_LOYALTY(ch), DELAY_REFRESH_CHECK_ELIGIBLE_GOALS);
 				}
 				break;
 			}
@@ -916,6 +913,7 @@ void give_quest_rewards(char_data *ch, struct quest_reward *list, int reward_lev
 							msg_to_char(ch, "\tyYour empire starts the progress goal: %s\t0\r\n", PRG_NAME(prog));
 							refresh_one_goal_tracker(GET_LOYALTY(ch), goal);
 						}
+						et_update_progress(GET_LOYALTY(ch), reward->vnum);
 					}
 				}
 				break;
@@ -940,7 +938,7 @@ void give_quest_rewards(char_data *ch, struct quest_reward *list, int reward_lev
 				if (ability_proto(reward->vnum) && !has_bonus_ability(ch, reward->vnum)) {
 					msg_to_char(ch, "\tyYou gain the %s ability!\t0\r\n", get_ability_name_by_vnum(reward->vnum));
 					add_bonus_ability(ch, reward->vnum);
-					assign_class_and_extra_abilities(ch, NULL, ROLE_NONE);
+					assign_class_and_extra_abilities(ch, NULL, NOTHING);
 				}
 				break;
 			}
@@ -948,7 +946,7 @@ void give_quest_rewards(char_data *ch, struct quest_reward *list, int reward_lev
 				if (ability_proto(reward->vnum) && has_bonus_ability(ch, reward->vnum)) {
 					msg_to_char(ch, "\tyYou lose the %s ability.\t0\r\n", get_ability_name_by_vnum(reward->vnum));
 					remove_bonus_ability(ch, reward->vnum);
-					assign_class_and_extra_abilities(ch, NULL, ROLE_NONE);
+					assign_class_and_extra_abilities(ch, NULL, NOTHING);
 				}
 				break;
 			}
@@ -1365,6 +1363,22 @@ void refresh_one_quest_tracker(char_data *ch, struct player_quest *pq) {
 			}
 			case REQ_OWN_ROADS: {
 				task->current = GET_LOYALTY(ch) ? count_owned_roads(GET_LOYALTY(ch)) : 0;
+				break;
+			}
+			case REQ_EMPIRE_HAS_PROGRESS: {
+				task->current = (GET_LOYALTY(ch) && empire_has_completed_goal(GET_LOYALTY(ch), task->vnum)) ? task->needed : 0;
+				break;
+			}
+			case REQ_EMPIRE_LACKS_PROGRESS: {
+				task->current = (!GET_LOYALTY(ch) || empire_has_completed_goal(GET_LOYALTY(ch), task->vnum)) ? 0 : task->needed;
+				break;
+			}
+			case REQ_EMPIRE_ON_PROGRESS: {
+				task->current = (GET_LOYALTY(ch) && get_current_goal(GET_LOYALTY(ch), task->vnum)) ? task->needed : 0;
+				break;
+			}
+			case REQ_EMPIRE_NOT_ON_PROGRESS: {
+				task->current = (!GET_LOYALTY(ch) || get_current_goal(GET_LOYALTY(ch), task->vnum)) ? 0 : task->needed;
 				break;
 			}
 		}
@@ -2805,23 +2819,17 @@ void qt_empire_greatness(char_data *ch, any_vnum amount) {
 * @param any_vnum vnum The vnum to pass to the function.
 */
 void qt_empire_players(empire_data *emp, void (*func)(char_data *ch, any_vnum vnum), any_vnum vnum) {
-	descriptor_data *desc;
 	char_data *ch;
 	
 	if (!emp || !func || vnum == NOTHING) {
 		return;
 	}
 	
-	LL_FOREACH(descriptor_list, desc) {
-		if (STATE(desc) != CON_PLAYING || !(ch = desc->character)) {
-			continue;
+	DL_FOREACH2(player_character_list, ch, next_plr) {
+		if (!IS_NPC(ch) && GET_LOYALTY(ch) == emp) {		
+			// call it
+			(func)(ch, vnum);
 		}
-		if (GET_LOYALTY(ch) != emp) {
-			continue;
-		}
-		
-		// call it
-		(func)(ch, vnum);
 	}
 }
 
@@ -2835,23 +2843,17 @@ void qt_empire_players(empire_data *emp, void (*func)(char_data *ch, any_vnum vn
 * @param vehicle_data *veh The vehicle to pass to the function.
 */
 void qt_empire_players_vehicle(empire_data *emp, void (*func)(char_data *ch, vehicle_data *veh), vehicle_data *veh) {
-	descriptor_data *desc;
 	char_data *ch;
 	
 	if (!emp || !func || !veh) {
 		return;
 	}
 	
-	LL_FOREACH(descriptor_list, desc) {
-		if (STATE(desc) != CON_PLAYING || !(ch = desc->character)) {
-			continue;
+	DL_FOREACH2(player_character_list, ch, next_plr) {
+		if (!IS_NPC(ch) && GET_LOYALTY(ch) == emp) {		
+			// call it
+			(func)(ch, veh);
 		}
-		if (GET_LOYALTY(ch) != emp) {
-			continue;
-		}
-		
-		// call it
-		(func)(ch, veh);
 	}
 }
 
@@ -3549,6 +3551,41 @@ void qt_untrigger_task(char_data *ch, any_vnum vnum, bool remove_all) {
 						task->current = MAX(task->current-1, 0);
 					}
 				}
+			}
+		}
+	}
+}
+
+
+/**
+* Quest Tracker: empire changes status on a progress goal (for the member).
+*
+* @param char_data *ch The empire member.
+* @param any_vnum vnum The progress goal vnum (or NOTHING to refresh all).
+*/
+void qt_update_progress(char_data *ch, any_vnum only_vnum) {
+	empire_data *emp;
+	struct player_quest *pq;
+	struct req_data *task;
+	
+	if (IS_NPC(ch) || !(emp = GET_LOYALTY(ch))) {
+		return;
+	}
+	
+	
+	LL_FOREACH(GET_QUESTS(ch), pq) {
+		LL_FOREACH(pq->tracker, task) {
+			if (task->type == REQ_EMPIRE_HAS_PROGRESS && (only_vnum == NOTHING || task->vnum == only_vnum)) {
+				task->current = empire_has_completed_goal(emp, task->vnum) ? task->needed : 0;
+			}
+			else if (task->type == REQ_EMPIRE_LACKS_PROGRESS && (only_vnum == NOTHING || task->vnum == only_vnum)) {
+				task->current = empire_has_completed_goal(emp, task->vnum) ? 0 : task->needed;
+			}
+			else if (task->type == REQ_EMPIRE_ON_PROGRESS && (only_vnum == NOTHING || task->vnum == only_vnum)) {
+				task->current = get_current_goal(emp, task->vnum) ? task->needed : 0;
+			}
+			else if (task->type == REQ_EMPIRE_NOT_ON_PROGRESS && (only_vnum == NOTHING || task->vnum == only_vnum)) {
+				task->current = get_current_goal(emp, task->vnum) ? 0 : task->needed;
 			}
 		}
 	}

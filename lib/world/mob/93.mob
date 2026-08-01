@@ -401,4 +401,75 @@ M
 0
 $n lets out a loud, cackling call.~
 S
+#9314
+yak stubborn shaggy~
+a stubborn yak~
+A stubborn yak is grazing here.
+~
+20 30 bdfjkoy 0 4
+0 0 0 42 -1 -1
+D
+   The yak's shaggy, dark brown fur is warm to the touch. Aside from the
+overgrown fringe, it looks rather like an ox.
+~
+I 0 3012 100.00 3  # BUTCHER: fillet of raw meat
+I 2 9234 5.00 4 s  # SHEAR: sack of yak wool
+I 2 9234 45.00 3 s  # SHEAR: sack of yak wool
+I 2 9234 50.00 2 s  # SHEAR: sack of yak wool
+M
+0
+$n chews some grass.~
+M
+6
+A shaggy yak stands nearby, chewing.~
+M
+6
+A yak watches you from nearby.~
+M
+6
+A yak snorts as it watches you.~
+M
+6
+A yak flicks its ear as it watches you.~
+M
+6
+A yak is grazing nearby.~
+M
+6
+A stubborn yak chews as it watches you.~
+S
+#9315
+llama woolly curious~
+a woolly llama~
+A woolly llama is grazing.
+~
+10 20 bdfjko 0 4
+0 0 0 9 -1 -1
+D
+The shaggy llama munches a mouthful of grass as it contemplates you.
+~
+I 0 3012 100.00 2  # BUTCHER: fillet of raw meat
+I 1 1351 100.00 1  # SKIN: large skin
+I 2 1361 100.00 1  # SHEAR: bag of soft llama wool
+I 2 1361 50.00 1  # SHEAR: bag of soft llama wool
+I 2 1361 5.00 1  # SHEAR: bag of soft llama wool
+M
+6
+A curious llama watches you.~
+M
+6
+A woolly llama chews on a mouthful of grass.~
+M
+6
+A woolly llama stands nearby.~
+M
+6
+A curious llama trots past.~
+M
+6
+A llama chews silently.~
+M
+6
+A llama chews loudly.~
+S
 $

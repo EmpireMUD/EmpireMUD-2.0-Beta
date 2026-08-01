@@ -6619,9 +6619,6 @@ if %move% == 1
 elseif %move% == 2
   %echo% &&mThe Shadow cracks and swirls as the office seems to darken...&&0
   %echo% &&m**** It seems to be drawing smaller shadows into itself! ****&&0 (interrupt and dodge)
-  if %diff% == 1
-    nop %self.add_mob_flag(NO-ATTACK)%
-  end
   skyfight clear dodge
   skyfight clear interrupt
   skyfight setup interrupt all
@@ -6733,9 +6730,6 @@ elseif %move% == 4
   %echo% &&mThe Shadow lets out a low rumble as it twists and contorts...&&0
   wait 3 s
   %echo% &&m**** The Shadow's sinuous tendrils sharpen into a vicious axe! ****&&0 (dodge)
-  if %diff% == 1
-    nop %self.add_mob_flag(NO-ATTACK)%
-  end
   skyfight setup dodge all
   wait 8 s
   set hit 0
@@ -6769,7 +6763,6 @@ elseif %move% == 4
   end
   wait 8 s
 end
-nop %self.remove_mob_flag(NO-ATTACK)%
 ~
 #11857
 Skycleave: Mercenary name setup~

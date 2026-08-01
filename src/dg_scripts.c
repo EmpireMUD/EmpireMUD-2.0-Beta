@@ -3135,7 +3135,7 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 							ability_data *ab = find_ability(subfield);
 							if (ab && !IS_NPC(c)) {
 								add_bonus_ability(c, ABIL_VNUM(ab));
-								assign_class_and_extra_abilities(c, NULL, ROLE_NONE);
+								assign_class_and_extra_abilities(c, NULL, NOTHING);
 								safe_snprintf(str, slen, "1");
 							}
 							else {
@@ -4705,7 +4705,7 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 							ability_data *ab = find_ability(subfield);
 							if (ab && !IS_NPC(c)) {
 								remove_bonus_ability(c, ABIL_VNUM(ab));
-								assign_class_and_extra_abilities(c, NULL, ROLE_NONE);
+								assign_class_and_extra_abilities(c, NULL, NOTHING);
 								safe_snprintf(str, slen, "1");
 							}
 							else {
@@ -7031,7 +7031,7 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 							if (isdigit(*subfield) && (vnum = atoi(subfield)) != NOTHING && (prg = real_progress(vnum))) {
 								if (!empire_has_completed_goal(e, vnum)) {
 									script_reward_goal(e, prg);
-									check_for_eligible_goals(e);
+									TRIGGER_DELAYED_REFRESH(e, DELAY_REFRESH_CHECK_ELIGIBLE_GOALS);
 								}
 								strcpy(str, "1");
 							}
@@ -7401,7 +7401,7 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 									cancel_empire_goal(e, goal);
 								}
 								strcpy(str, "1");
-								check_for_eligible_goals(e);
+								TRIGGER_DELAYED_REFRESH(e, DELAY_REFRESH_CHECK_ELIGIBLE_GOALS);
 							}
 							else {
 								strcpy(str, "0");
@@ -7429,11 +7429,13 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 									
 									if (goal) {
 										refresh_one_goal_tracker(e, goal);
-									}
-									// check if complete
-									count_quest_tasks(goal->tracker, &complete, &total);
-									if (complete == total) {
-										complete_goal(e, goal);
+										
+										// check if complete
+										count_quest_tasks(goal->tracker, &complete, &total);
+										if (complete == total) {
+											complete_goal(e, goal);
+										}
+										et_update_progress(e, PRG_VNUM(prg));
 									}
 								}
 								strcpy(str, "1");

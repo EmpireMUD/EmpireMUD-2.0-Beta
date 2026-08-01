@@ -2745,7 +2745,15 @@ ACMD(do_mine) {
 		msg_to_char(ch, "You don't have permission to mine here.\r\n");
 	}
 	else if (!room_has_function_and_city_ok(GET_LOYALTY(ch), IN_ROOM(ch), FNC_MINE)) {
-		msg_to_char(ch, "This isn't a mine.\r\n");
+		if (IS_DISMANTLING(IN_ROOM(ch))) {
+			msg_to_char(ch, "You can't mine here.\r\n");
+		}
+		else if (!IS_COMPLETE(IN_ROOM(ch))) {
+			msg_to_char(ch, "The building isn't finished.\r\n");
+		}
+		else {
+			msg_to_char(ch, "This isn't a mine.\r\n");
+		}
 	}
 	else if (!check_in_city_requirement(IN_ROOM(ch), TRUE)) {
 		msg_to_char(ch, "This mine only works in a city.\r\n");

@@ -144,8 +144,10 @@ of their command.
 Note: High level Immortals can only use command triggers when the "hassle"
    toggle is on. You can always "toggle hassle" as an immortal, even if a
    command trigger tries to prevent it.
-Note: Command triggers attached to charmed mobs will not fire unless the trigger
-   also has the Charmed type.
+Note: Command triggers attached to charmed mobs will not fire unless the
+   trigger also has the Charmed type.
+Note: If the player is dead, command triggers won't fire unless the Dead-Ok
+   type is also present.
 Note: If you trigger on a real game command, you should use the entire word
    (not an abbreviation); the trigger will also match abbreviations. If you are
    instead adding a new command, it will only work if the player types an exact
@@ -159,6 +161,15 @@ Variables:
   &c%arg%&0 - The arguments typed with the command (if any).
 
 See also: TOGGLE, MTRIG CHARMED
+#d
+DEAD-OK "MTRIG DEAD-OK" "OTRIG DEAD-OK" "RTRIG DEAD-OK" "VTRIG DEAD-OK"
+
+A dead player cannot use a command trigger unless the Dead-Ok trigger type is
+also set.
+
+This can be used, for example, to override the respawn command.
+
+See also: COMMAND TRIGGER
 #d
 "DISMANTLE TRIGGER" "RTRIG DISMANTLE" TRIGEDIT-ROOM-DISMANTLE "VTRIG DISMANTLE" TRIGEDIT-VEH-DISMANTLE TRIGEDIT-DISMANTLE TRIG-DISMANTLE
 

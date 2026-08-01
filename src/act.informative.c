@@ -930,7 +930,7 @@ void look_in_obj(char_data *ch, char *arg, obj_data *obj, vehicle_data *veh, boo
 	if (!obj && !veh && (!arg || !*arg)) {
 		send_to_char("Look in what?\r\n", ch);
 	}
-	else if (!obj && !veh && !(obj = get_obj_for_char_prefer_container(ch, arg, &number)) && !generic_find(arg, &number, FIND_OBJ_INV | FIND_OBJ_ROOM | FIND_OBJ_EQUIP | FIND_VEHICLE_ROOM | FIND_VEHICLE_INSIDE, ch, &dummy, &obj, &veh)) {
+	else if (!obj && !veh && !generic_find(arg, &number, FIND_OBJ_INV | FIND_OBJ_ROOM | FIND_OBJ_EQUIP | FIND_VEHICLE_ROOM | FIND_VEHICLE_INSIDE, ch, &dummy, &obj, &veh)) {
 		msg_to_char(ch, "There doesn't seem to be %s %s here.\r\n", AN(arg), arg);
 	}
 	else if (veh) {
@@ -3969,18 +3969,18 @@ ACMD(do_look) {
 			else if (GET_ROOM_VEHICLE(IN_ROOM(ch))) {
 				// look out from vehicle
 				clear_recent_moves(ch);
-				look_at_room_by_loc(ch, IN_ROOM(GET_ROOM_VEHICLE(IN_ROOM(ch))), LRR_LOOK_OUT_INSIDE);
+				look_at_room_by_loc(ch, IN_ROOM(GET_ROOM_VEHICLE(IN_ROOM(ch))), LRR_LOOK_OUT_INSIDE, NULL);
 			}
 			else if (!(map = (GET_MAP_LOC(IN_ROOM(ch)) ? real_room(GET_MAP_LOC(IN_ROOM(ch))->vnum) : NULL))) {
 				msg_to_char(ch, "You can't do that from here.\r\n");
 			}
 			else if (map == IN_ROOM(ch) && !ROOM_IS_CLOSED(IN_ROOM(ch))) {
 				clear_recent_moves(ch);
-				look_at_room_by_loc(ch, map, LRR_LOOK_OUT);
+				look_at_room_by_loc(ch, map, LRR_LOOK_OUT, NULL);
 			}
 			else {
 				clear_recent_moves(ch);
-				look_at_room_by_loc(ch, map, LRR_LOOK_OUT);
+				look_at_room_by_loc(ch, map, LRR_LOOK_OUT, NULL);
 			}
 		}
 		else if (is_abbrev(arg, "in")) {
@@ -4041,7 +4041,7 @@ ACMD(do_map) {
 	GET_MAPSIZE(ch) = dist;	// requested distance
 	
 	clear_recent_moves(ch);	// prevents shrinkage
-	look_at_room_by_loc(ch, IN_ROOM(ch), LRR_LOOK_OUT);
+	look_at_room_by_loc(ch, IN_ROOM(ch), LRR_LOOK_OUT, NULL);
 	
 	GET_MAPSIZE(ch) = mapsize;
 }
