@@ -1550,6 +1550,7 @@ bool start_upgrade(char_data *ch, craft_data *upgrade_craft, room_data *from_roo
 	bitvector_t set_bits;
 	char_data *temp_ch;
 	int original_builder, veh_level = 0;
+	empire_data *owner;
 	
 	// for moving data
 	int private_owner = NOBODY, dedicated_to = 0;
@@ -1771,6 +1772,16 @@ bool start_upgrade(char_data *ch, craft_data *upgrade_craft, room_data *from_roo
 				
 				if (deleted) {
 					check_all_exits();
+				}
+			}
+			
+			// cancel previous techs/stats
+			if ((owner = ROOM_OWNER(from_room))) {
+				adjust_building_tech(owner, from_room, FALSE);
+				
+				if (GET_BUILDING(from_room)) {
+					qt_empire_players(owner, qt_lose_building, GET_BLD_VNUM(GET_BUILDING(from_room)));
+					et_lose_building(owner, GET_BLD_VNUM(GET_BUILDING(from_room)));
 				}
 			}
 			
