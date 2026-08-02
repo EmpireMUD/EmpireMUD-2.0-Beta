@@ -106,6 +106,7 @@ set plains_sects 0 36 40 46 50 56 59 63 10566
 set jungle_sects 220 221 224
 set tropic_sects 200 204 210 211 212 222 223 230 231 233 240 241 243 244
 set tropic_crop_sects 202 203
+set foothills_sects 58 98 99
 * some other sects are handled individually below
 *
 set room %self.room%
@@ -147,7 +148,7 @@ elseif %jungle_sects% ~= %vnum%
 elseif %tropic_sects% ~= %vnum%
   %echo% ~%self% scorches the grassland!
   %terraform% %room% 10311
-elseif %vnum% == 58
+elseif %foothills_sects% ~= %vnum%
   %echo% ~%self% scorches the foothills!
   %terraform% %room% 10308
 elseif %vnum% == 33

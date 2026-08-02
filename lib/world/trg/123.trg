@@ -1074,13 +1074,14 @@ set frozen_forest 1 2 3 4 37 38 39 42 43 44 45 47 60 90
 set frozen_desert 20 23
 set frozen_grove 12 14 26 24 25
 set frozen_oasis 21 80 81 83 84
+set frozen_foothills 58 98 99
 set irrigated_field 70 73 75 77 78
 set irrigated_forest 71 74 79
 set irrigated_jungle 72 76
 set dry_oasis 82 91
 set irrigated_oasis 88 89
 set frozen_lake 32 33
-* note: sects 5, 19, 51, 53, 57, 58, 85, and 87 are checked individually below as well
+* note: sects 5, 19, 51, 53, 57, 85, and 87 are checked individually below as well
 * basic checks
 set room %self.room%
 if %self.fighting% || %self.disabled%
@@ -1160,7 +1161,7 @@ elseif %room.sector_vnum% == 5
 elseif %room.sector_vnum% == 53
   %echo% The river grinds to a halt as the entire estuary turns to ice!
   %terraform% %room% 12364
-elseif %room.sector_vnum% == 58
+elseif %frozen_foothills% ~= %room.sector_vnum%
   %echo% Hoarfrost grows on the grass as any icy cold overtakes the foothills!
   %terraform% %room% 12367
 elseif %frozen_lake% ~= %room.sector_vnum%

@@ -978,7 +978,7 @@ L h 57
 L h 58
 L h 200
 ~
-set allow_outside_sects 5 9 32 33 57 58
+set allow_outside_sects 5 9 32 33 57 58 98 99
 set room %self.room%
 * safety
 if %method% != move
