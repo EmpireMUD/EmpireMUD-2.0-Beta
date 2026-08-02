@@ -2971,7 +2971,7 @@ void do_import_list(char_data *ch, empire_data *emp, char *argument, int subcmd)
 			
 			// figure out actual cost
 			if (rate != 1.0) {
-				safe_snprintf(coin_conv, sizeof(coin_conv), " (%.1f)", trade->cost * rate);
+				safe_snprintf(coin_conv, sizeof(coin_conv), " (%.1f)", (round(trade->cost * rate * 10.0) / 10.0));
 			}
 			
 			// figure out indicator
