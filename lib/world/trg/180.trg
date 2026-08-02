@@ -770,7 +770,10 @@ if %target.carried_by% != %actor%
   %send% %actor% You can only infuse an item in your inventory.
   halt
 end
-if %target.vnum% < 18012 || %target.vnum% > 18050 || !%target.wearable% || (%target.level% == 0)
+if %target.vnum% >= 10875 && %target.vnum% <= 18094
+  %send% %actor% You cannot infuse older versions of the Molten Fiend's gear.
+  halt
+elseif %target.vnum% < 18012 || %target.vnum% > 18050 || !%target.wearable% || (%target.level% == 0)
   %send% %actor% You can't infuse @%target%!
   halt
 end
