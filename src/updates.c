@@ -4853,6 +4853,153 @@ void b5_210_companion_update(void) {
 }
 
 
+// b5.212: terrain repair for foothills that were converted to plains by adventures (and usually evolved from there)
+void b5_212_foothills_fix(void) {
+	int iter;
+	int changed_sect = 0, changed_base = 0;
+	sector_vnum to_sect, to_base;
+	crop_data *keep_crop;
+	room_data *room;
+	struct map_data *map;
+	
+	// checking for this natural sector
+	const sector_vnum FOOTHILLS_SECT = 58;
+	
+	// converts from-vnum -> to-vnum
+	sector_vnum foothills_conversion[][2] = {
+		{ 15, 13 },	// Jungle Field -> Seeded Field
+		{ 0, 58 },	// Plains -> Foothills
+		{ 1, 58 },	// Light Forest -> Foothills
+		{ 2, 58 },	// Forest -> Foothills
+		{ 3, 58 },	// Shady Forest -> Foothills
+		{ 4, 58 },	// Overgrown Forest -> Foothills
+		{ 7, 99 },	// Crop -> Foothills Crop
+		{ 13, 98 },	// Seeded Field -> Seeded Foothills
+		{ 17, 58 },	// Trench -> Foothills
+		{ 19, 58 },	// Canal -> Foothills
+		{ 36, 58 },	// Stumps -> Foothills
+		{ 37, 58 },	// Small Copse -> Foothills
+		{ 38, 58 },	// Copse -> Foothills
+		{ 39, 58 },	// Forest Edge -> Foothills
+		{ 40, 58 },	// Riverbank -> Foothills
+		{ 41, 58 },	// Floodplains -> Foothills
+		{ 42, 58 },	// Flooded Woods -> Foothills
+		{ 43, 58 },	// Flooded Forest -> Foothills
+		{ 44, 58 },	// Light Riverbank Forest -> Foothills
+		{ 45, 58 },	// Forested Riverbank -> Foothills
+		{ 46, 58 },	// Stumped Riverbank -> Foothills
+		{ 47, 58 },	// Riverside Copse -> Foothills
+		{ 50, 58 },	// Shore -> Foothills
+		{ 51, 58 },	// Beach -> Foothills
+		{ 53, 58 },	// Estuary -> Foothills
+		{ 54, 58 },	// Shoreside Tree -> Foothills
+		{ 55, 58 },	// Old Seaside Jungle -> Foothills
+		{ 56, 58 },	// Estuary Shore -> Foothills
+		{ 57, 58 },	// Shallow Sea -> Foothills
+		{ 59, 58 },	// Seaside Stumps -> Foothills
+		{ 90, 58 },	// Old-Growth Forest -> Foothills
+		{ 242, 58 },	// Flooded Riverbank -> Foothills
+		{ 245, 58 },	// Flooded Lake -> Foothills
+		{ 18451, 58 },	// Flooded Plains -> Foothills
+		{ 18452, 58 },	// Flooded Woods -> Foothills
+		{ 18453, 58 },	// Flooded Desert -> Foothills
+		{ 18454, 58 },	// Flooded Desert -> Foothills
+		{ 18455, 58 },	// Flooded Desert -> Foothills
+		{ 18456, 58 },	// Flooded Desert -> Foothills
+		{ 18457, 58 },	// Flooded Desert -> Foothills
+		{ 18458, 58 },	// Flooded Grassland -> Foothills
+		{ 10300, 10308 },	// Scorched Woods -> Scorched Foothills
+		{ 10301, 10308 },	// Scorched Grove -> Scorched Foothills
+		{ 10302, 10308 },	// Scorched Plains -> Scorched Foothills
+		{ 10303, 10308 },	// Scorched Crop -> Scorched Foothills
+		{ 10304, 10308 },	// Scorched Desert Crop -> Scorched Foothills
+		{ 10305, 10308 },	// Scorched Desert -> Scorched Foothills
+		{ 10306, 10308 },	// Scorched Oasis -> Scorched Foothills
+		{ 10307, 10308 },	// Scorched Spruce -> Scorched Foothills
+		{ 10309, 10308 },	// Scorched Tropical Crop -> Scorched Foothills
+		{ 10310, 10308 },	// Scorched Jungle -> Scorched Foothills
+		{ 10311, 10308 },	// Scorched Grassland -> Scorched Foothills
+		{ 10550, 58 },	// Frozen River -> Foothills
+		{ 10551, 58 },	// Frozen Estuary -> Foothills
+		{ 10552, 58 },	// Frozen Canal -> Foothills
+		{ 10553, 58 },	// Frozen Lake -> Foothills
+		{ 10554, 58 },	// Frozen Irrigation Canal -> Foothills
+		{ 10555, 58 },	// Frozen Canal -> Foothills
+		{ 10556, 58 },	// Frozen Canal -> Foothills
+		{ 10562, 58 },	// Thin Evergreen Forest -> Foothills
+		{ 10563, 58 },	// Evergreen Forest -> Foothills
+		{ 10564, 58 },	// Overgrown Evergreen Forest -> Foothills
+		{ 10565, 58 },	// Thick Evergreen Forest -> Foothills
+		{ 10566, 58 },	// Stumps -> Foothills
+		{ 12350, 12367 },	// Frozen Desert -> Frozen Hills
+		{ 12351, 12367 },	// Frozen Grove -> Frozen Hills
+		{ 12352, 12367 },	// Frozen Oasis -> Frozen Hills
+		{ 12353, 12367 },	// Frozen Beach -> Frozen Hills
+		{ 12354, 12367 },	// Frozen Shallows -> Frozen Hills
+		{ 12355, 12367 },	// Frozen Field -> Frozen Hills
+		{ 12356, 12367 },	// Frozen Forest -> Frozen Hills
+		{ 12357, 12367 },	// Frozen Jungle -> Frozen Hills
+		{ 12358, 12367 },	// Frozen Oasis -> Frozen Hills
+		{ 12359, 12367 },	// Frozen Irrigation Canal -> Frozen Hills
+		{ 12360, 12367 },	// Frozen Canal -> Frozen Hills
+		{ 12361, 12367 },	// Frozen Canal -> Frozen Hills
+		{ 12362, 12367 },	// Frozen Oasis -> Frozen Hills
+		{ 12363, 12367 },	// Frozen River -> Frozen Hills
+		{ 12364, 12367 },	// Frozen Estuary -> Frozen Hills
+		{ 12365, 12367 },	// Frozen Forest -> Frozen Hills
+		{ 12366, 12367 },	// Frozen Plains -> Frozen Hills
+		{ 12368, 12367 },	// Frozen Lake -> Frozen Hills
+		
+		{ -1, -1 }	// last
+	};
+	
+	LL_FOREACH(land_map, map) {
+		to_sect = to_base = NOTHING;
+		
+		// QUALIFY
+		if (map->shared == &ocean_shared_data) {
+			continue;	// just skip ocean
+		}
+		if (!map->natural_sector || GET_SECT_VNUM(map->natural_sector) != FOOTHILLS_SECT) {
+			continue;	// skip if natural sect wasn't foothills
+		}
+		
+		// DETERMINE: sectors to change
+		for (iter = 0; foothills_conversion[iter][0] != -1; ++iter) {
+			if (GET_SECT_VNUM(map->sector_type) == foothills_conversion[iter][0]) {
+				to_sect = foothills_conversion[iter][1];
+			}
+			if (GET_SECT_VNUM(map->base_sector) == foothills_conversion[iter][0]) {
+				to_base = foothills_conversion[iter][1];
+			}
+		}
+		
+		// LAST: do the work
+		if ((to_sect != NOTHING || to_base != NOTHING)) {
+			// log
+			log("- repairing (%d, %d) [%d] %s, base: [%d] %s", MAP_X_COORD(map->vnum), MAP_Y_COORD(map->vnum), GET_SECT_VNUM(map->sector_type), GET_SECT_NAME(map->sector_type), GET_SECT_VNUM(map->base_sector), GET_SECT_NAME(map->base_sector));
+			
+			if (to_sect != NOTHING) {
+				keep_crop = map->crop_type;
+				perform_change_sect(NULL, map, sector_proto(to_sect));
+				++changed_sect;
+				
+				// restore crop?
+				if (map->crop_type && keep_crop && map->crop_type != keep_crop && (room = real_room(map->vnum))) {
+					set_crop_type(room, keep_crop);
+				}
+			}
+			if (to_base != NOTHING) {
+				perform_change_base_sect(NULL, map, sector_proto(to_base));
+				++changed_base;
+			}
+		}
+	}
+	
+	log("- total: %d sector%s, %d base sector%s", changed_sect, PLURAL(changed_sect), changed_base, PLURAL(changed_base));
+}
+
+
 // ADD HERE, above: more beta 5 update functions
 
 
@@ -4982,6 +5129,7 @@ const struct {
 	{ "b5.208", b5_204_celestial_forge, NULL, "Re-spawning Celestial Forge" },
 	{ "b5.208a", b5_208_portal_triggers, NULL, "Adding missing portal triggers" },
 	{ "b5.210", b5_210_companion_update, NULL, "Updating companions with new triggers" },
+	{ "b5.212", b5_212_foothills_fix, NULL, "Repairing foothills that were converted to plains by adventures" },
 	
 	// ADD HERE, above: more beta 5 update lines
 	
