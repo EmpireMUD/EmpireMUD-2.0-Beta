@@ -950,7 +950,7 @@ end
 ~
 #12353
 Hoarfrost Serragon: Terraformer~
-0 i 100 113
+0 i 100 115
 L h 0
 L h 1
 L h 2
@@ -1017,6 +1017,8 @@ L h 88
 L h 89
 L h 90
 L h 91
+L h 98
+L h 99
 L h 200
 L h 201
 L h 202

@@ -968,7 +968,7 @@ end
 ~
 #12253
 Stomping Ground: Leash~
-0 i 100 8
+0 i 100 10
 L e 12250
 L h 5
 L h 9
@@ -976,6 +976,8 @@ L h 32
 L h 33
 L h 57
 L h 58
+L h 98
+L h 99
 L h 200
 ~
 set allow_outside_sects 5 9 32 33 57 58 98 99

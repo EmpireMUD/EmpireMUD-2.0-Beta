@@ -252,7 +252,7 @@ end
 ~
 #15904
 Shipwrecked Goblins: Tent setup and leash~
-0 i 100 78
+0 i 100 80
 L f 15904
 L f 15909
 L h 0
@@ -284,6 +284,8 @@ L h 78
 L h 83
 L h 84
 L h 91
+L h 98
+L h 99
 L h 200
 L h 202
 L h 203

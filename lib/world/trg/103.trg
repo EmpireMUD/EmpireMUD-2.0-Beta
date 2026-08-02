@@ -1,6 +1,6 @@
 #10300
 Flame Dragon Terrorize~
-0 ab 10 89
+0 ab 10 93
 L h 0
 L h 1
 L h 2
@@ -17,6 +17,7 @@ L h 24
 L h 25
 L h 26
 L h 32
+L h 33
 L h 34
 L h 36
 L h 37
@@ -31,6 +32,7 @@ L h 50
 L h 51
 L h 54
 L h 56
+L h 58
 L h 59
 L h 60
 L h 63
@@ -53,6 +55,8 @@ L h 88
 L h 89
 L h 90
 L h 91
+L h 98
+L h 99
 L h 200
 L h 202
 L h 203
