@@ -1125,6 +1125,18 @@ void show_craft_info(char_data *ch, char *argument, int craft_type) {
 		msg_to_char(ch, "Build facing: %s\r\n", buf);
 	}
 	
+	if (CRAFT_IS_VEHICLE(craft) && veh) {
+		// show terrain requirements on the vehicle, if any
+		if (VEH_REQUIRES_CLIMATE(veh)) {
+			ordered_sprintbit(VEH_REQUIRES_CLIMATE(veh), climate_flags, climate_flags_order, FALSE, buf);
+			msg_to_char(ch, "Required climate/terrain: %s\r\n", buf);
+		}
+		if (VEH_FORBID_CLIMATE(veh)) {
+			ordered_sprintbit(VEH_FORBID_CLIMATE(veh), climate_flags, climate_flags_order, FALSE, buf);
+			msg_to_char(ch, "Disallowed climate/terrain: %s\r\n", buf);
+		}
+	}
+	
 	show_resource_list(GET_CRAFT_RESOURCES(craft), buf, sizeof(buf));
 	msg_to_char(ch, "Resources: %s\r\n", buf);	
 	
