@@ -216,7 +216,13 @@ bool check_build_location_and_dir(char_data *ch, room_data *room, craft_data *ty
 	}
 	if (make_veh && (is_upgrade || !ROOM_IS_CLOSED(room)) && !vehicle_allows_climate(make_veh, room, NULL)) {
 		if (ch) {
-			msg_to_char(ch, "You can't %s %s here due to the climate or terrain.\r\n", command, get_vehicle_short_desc(make_veh, ch));
+			if (VEH_REQUIRES_CLIMATE(make_veh)) {
+				ordered_sprintbit(VEH_REQUIRES_CLIMATE(make_veh), climate_flags, climate_flags_order, FALSE, buf);
+				msg_to_char(ch, "You can't %s %s here due to the climate or terrain (requires %s).\r\n", command, get_vehicle_short_desc(make_veh, ch), buf);
+			}
+			else {
+				msg_to_char(ch, "You can't %s %s here due to the climate or terrain.\r\n", command, get_vehicle_short_desc(make_veh, ch));
+			}
 		}
 		return FALSE;
 	}
