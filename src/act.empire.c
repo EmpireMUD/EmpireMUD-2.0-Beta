@@ -1560,6 +1560,9 @@ void show_workforce_why(empire_data *emp, char_data *ch, char *argument) {
 			if (!(room = real_room(wf_log->loc))) {
 				continue;	// room is gone now
 			}
+			if (wf_log->chore == WF_PROB_ADVENTURE_PRESENT && room != IN_ROOM(ch)) {
+				continue;	// special handling: can only see an adventure-present error from the same room
+			}
 			
 			// ok, show it:
 			if (wf_log->count > 1) {
@@ -1585,6 +1588,10 @@ void show_workforce_why(empire_data *emp, char_data *ch, char *argument) {
 		any = TRUE;	// this is guaranteed for this mode
 		
 		LL_FOREACH(EMPIRE_WORKFORCE_LOG(emp), wf_log) {
+			if (wf_log->chore == WF_PROB_ADVENTURE_PRESENT && wf_log->loc != GET_ROOM_VNUM(IN_ROOM(ch))) {
+				continue;	// special handling: can only see an adventure-present error from the same room
+			}
+			
 			// count similar
 			last_chore = wf_log->chore;
 			last_problem = wf_log->problem;
