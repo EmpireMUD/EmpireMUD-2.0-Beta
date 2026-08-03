@@ -2375,9 +2375,21 @@ ACMD(do_load_vehicle) {
 			if (VEH_SITTING_ON(veh) || (VEH_LED_BY(veh) && VEH_LED_BY(veh) != ch) || VEH_DRIVER(veh)) {
 				continue;
 			}
-		
-			perform_load_vehicle(ch, veh, cont, to_room);
-			found = TRUE;
+			
+			// checks that could sent errors
+			if (VEH_SIZE(veh) > 0 && total_vehicle_size_in_room(to_room, NULL) + VEH_SIZE(veh) > config_get_int("vehicle_size_per_tile")) {
+				act("You can't load $v because $V doesn't have enough space.", FALSE, ch, veh, cont, TO_CHAR | ACT_VEH_OBJ | ACT_VEH_VICT);
+				found = TRUE;
+			}
+			else if (VEH_SIZE(veh) == 0 && total_small_vehicles_in_room(to_room, NULL) >= config_get_int("vehicle_max_per_tile")) {
+				act("You can't load $v because $V doesn't have enough space.", FALSE, ch, veh, cont, TO_CHAR | ACT_VEH_OBJ | ACT_VEH_VICT);
+				found = TRUE;
+			}
+			else {
+				// ok!
+				perform_load_vehicle(ch, veh, cont, to_room);
+				found = TRUE;
+			}
 		}
 		
 		if (!found) {
@@ -2440,6 +2452,12 @@ ACMD(do_load_vehicle) {
 		}
 		else if (VEH_LED_BY(veh) && VEH_LED_BY(veh) != ch) {
 			msg_to_char(ch, "You can't load %s while someone else is leading it.\r\n", get_vehicle_short_desc(veh, ch));
+		}
+		else if (VEH_SIZE(veh) > 0 && total_vehicle_size_in_room(to_room, NULL) + VEH_SIZE(veh) > config_get_int("vehicle_size_per_tile")) {
+			act("You can't load $v because $V doesn't have enough space.", FALSE, ch, veh, cont, TO_CHAR | ACT_VEH_OBJ | ACT_VEH_VICT);
+		}
+		else if (VEH_SIZE(veh) == 0 && total_small_vehicles_in_room(to_room, NULL) >= config_get_int("vehicle_max_per_tile")) {
+			act("You can't load $v because $V doesn't have enough space.", FALSE, ch, veh, cont, TO_CHAR | ACT_VEH_OBJ | ACT_VEH_VICT);
 		}
 		else if (VEH_SITTING_ON(veh)) {
 			safe_snprintf(buf, sizeof(buf), "%s", position_types[GET_POS(VEH_SITTING_ON(veh))]);
