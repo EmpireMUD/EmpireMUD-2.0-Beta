@@ -806,7 +806,14 @@ void process_driving(char_data *ch) {
 	}
 	
 	if (done) {
-		look_at_room(ch);	// show them where they stopped
+		// show them where they stopped
+		if (VEH_FLAGGED(veh, VEH_BUILDING) && ROOM_BLD_FLAGGED(IN_ROOM(ch), BLD_LOOK_OUT)) {
+			look_at_room_by_loc(ch, IN_ROOM(veh), LRR_LOOK_OUT_INSIDE, NULL);
+		}
+		else {
+			look_at_room(ch);
+		}
+		
 		msg_to_char(ch, "\r\n");	// extra linebreak between look and "vehicle stops"
 		cancel_action(ch);
 		return;
@@ -814,7 +821,13 @@ void process_driving(char_data *ch) {
 	
 	// not stopped by anything? auto-look each move
 	if (SHOW_STATUS_MESSAGES(ch, SM_TRAVEL_AUTO_LOOK)) {
-		look_at_room(ch);
+		if (VEH_FLAGGED(veh, VEH_BUILDING) && ROOM_BLD_FLAGGED(IN_ROOM(ch), BLD_LOOK_OUT)) {
+			look_at_room_by_loc(ch, IN_ROOM(veh), LRR_LOOK_OUT_INSIDE, NULL);
+		}
+		else {
+			// look here
+			look_at_room(ch);
+		}
 	}
 }
 
