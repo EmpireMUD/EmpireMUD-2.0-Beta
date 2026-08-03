@@ -853,7 +853,7 @@ void show_craft_info(char_data *ch, char *argument, int craft_type) {
 	struct obj_apply *apply;
 	ability_data *abil;
 	craft_data *craft;
-	vehicle_data *veh;
+	vehicle_data *veh = NULL;
 	obj_data *proto = NULL;
 	bld_data *bld;
 	int craft_level, found_wrong_cmd = NOTHING;
