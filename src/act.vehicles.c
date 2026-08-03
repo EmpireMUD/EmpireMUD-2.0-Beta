@@ -2014,7 +2014,7 @@ ACMD(do_drive) {
 		// distance remaining?
 		*dist_buf = '\0';
 		if ((calc_dist = driving_distance_remaining(VEH_DRIVER(veh))) > 1) {
-			safe_snprintf(dist_buf, sizeof(dist_buf), " (distance: %d)", calc_dist);
+			safe_snprintf(dist_buf, sizeof(dist_buf), " (total distance: %d)", calc_dist);
 		}
 		
 		// messaging
