@@ -198,17 +198,29 @@ ACMD(do_consider) {
 			any = TRUE;
 		}
 
-		// hit/dodge
+		// hit
 		hitch = get_to_hit(ch, vict, FALSE, FALSE) - get_dodge_modifier(vict, ch, FALSE);
+		*buf = '\0';
+		if (IS_NPC(vict)) {
+			safe_snprintf(buf, sizeof(buf), "Hit cap against $M: %d.", get_hit_cap_for(ch, vict));
+		}
 		if (hitch < 50) {
-			act("You would have trouble hitting $M.", FALSE, ch, NULL, vict, TO_CHAR);
+			safe_snprintf(buf + strlen(buf), sizeof(buf) - strlen(buf), "%sYou would have trouble hitting $M.", (*buf ? "  " : ""));
 			any = TRUE;
 		}
+		act(buf, FALSE, ch, NULL, vict, TO_CHAR);
+		
+		// dodge
 		hitch = get_to_hit(vict, ch, FALSE, FALSE) - get_dodge_modifier(ch, vict, FALSE);
+		*buf = '\0';
+		if (IS_NPC(vict)) {
+			safe_snprintf(buf, sizeof(buf), "Dodge cap against $M: %d.", get_dodge_cap_for(ch, vict));
+		}
 		if (hitch > 50) {
-			act("You would have trouble dodging $S attacks.", FALSE, ch, NULL, vict, TO_CHAR);
+			safe_snprintf(buf + strlen(buf), sizeof(buf) - strlen(buf), "%sYou would have trouble dodging $S attacks.", (*buf ? "  " : ""));
 			any = TRUE;
 		}
+		act(buf, FALSE, ch, NULL, vict, TO_CHAR);
 
 		// flags (with overflow protection on affected_bits_consider[])
 		for (bits = AFF_FLAGS(vict), pos = 0; bits && *affected_bits_consider[pos] != '\n'; bits >>= 1, ++pos) {

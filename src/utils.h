@@ -2599,6 +2599,8 @@ int determine_best_scale_level(char_data *ch, bool check_group);
 void end_pursuit(char_data *ch, char_data *target);
 struct generic_name_data *get_generic_name_list(int name_set, int sex);
 struct generic_name_data *get_best_name_list(int name_set, int sex);
+int get_dodge_cap_for(char_data *ch, char_data *attacker);
+int get_hit_cap_for(char_data *ch, char_data *vict);
 int mob_coins(char_data *mob);
 void random_encounter(char_data *ch);
 void reschedule_all_despawns();

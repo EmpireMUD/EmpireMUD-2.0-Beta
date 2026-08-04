@@ -2190,6 +2190,88 @@ int determine_best_scale_level(char_data *ch, bool check_group) {
 
 
 /**
+* Calculates the dodge cap a character can expect against a given target -- the
+* maximum amount of dodge that the character can benefit from.
+*
+* Warning: If mob scaling numbers change in scale_mob_to_level(), this
+* calculation must change, too.
+*
+* @param char_data *ch The person who will be dodging.
+* @param char_data *attacker The person who would attack them.
+* @return int The calculated dodge cap for this encounter.
+*/
+int get_dodge_cap_for(char_data *ch, char_data *attacker) {
+	double dodge = 0.0;
+	
+	if (!ch || !attacker) {
+		return 0;
+	}
+	
+	// level
+	dodge = get_approximate_level(attacker) - 50;
+	dodge = MAX(dodge, 0.0);
+	dodge += get_approximate_level(attacker) / 10;
+	
+	// flagging
+	if (MOB_FLAGGED(attacker, MOB_HARD)) {
+		dodge *= 1.1;
+	}
+	if (MOB_FLAGGED(attacker, MOB_GROUP)) {
+		dodge *= 1.3;
+	}
+	
+	// base add
+	dodge += 75;
+	
+	// dex modifier
+	dodge += 5 * (GET_DEXTERITY(attacker) - GET_DEXTERITY(ch));
+
+	return (int) dodge;
+}
+
+
+/**
+* Calculates the hit cap a character can expect against a given target -- the
+* level of to-hit after which more stats won't help.
+*
+* Warning: If mob scaling numbers change in scale_mob_to_level(), this
+* calculation must change, too.
+*
+* @param char_data *ch The person who will be attacking.
+* @param char_data *vict The target of the attack.
+* @return int The calculated hit cap for this encounter.
+*/
+int get_hit_cap_for(char_data *ch, char_data *vict) {
+	double to_hit = 0.0;
+	
+	if (!ch || !vict) {
+		return 0;
+	}
+	
+	// level
+	to_hit = get_approximate_level(vict) - 50;
+	to_hit = MAX(to_hit, 0.0);
+	to_hit += get_approximate_level(vict) / 10;
+	
+	// flagging
+	if (MOB_FLAGGED(vict, MOB_HARD)) {
+		to_hit *= 1.1;
+	}
+	if (MOB_FLAGGED(vict, MOB_GROUP)) {
+		to_hit *= 1.3;
+	}
+	
+	// base add
+	to_hit += 100;
+	
+	// dex modifier
+	to_hit += 5 * (GET_DEXTERITY(vict) - GET_DEXTERITY(ch));
+	
+	return (int) to_hit;
+}
+
+
+/**
 * Scales a mob below the leader's level like a companion. Companions generally
 * scale 25 levels below the character's level (or the use_level, if you pass
 * one) if the level is over 100. That is, companions scale with the character
@@ -2385,14 +2467,14 @@ void scale_mob_to_level(char_data *mob, int level) {
 	}
 	mob->mob_specials.damage = MAX(1, (int) ceil(value));
 	
-	// to-hit
+	// to-hit: if this changes, you must also update get_dodge_cap_for(), which must avoid this to-hit
 	value = MAX(0, level - 50) + (level * 0.1);
 	value *= MOB_FLAGGED(mob, MOB_HARD) ? 1.1 : 1.0;
 	value *= MOB_FLAGGED(mob, MOB_GROUP) ? 1.3 : 1.0;
 	value += 50;	// to hit-cap them
 	mob->mob_specials.to_hit = MAX(0, (int) round(value));
 	
-	// to-dodge
+	// to-dodge: if this changes, you must also update get_hit_cap_for(), which is for characters trying to hit this level of dodge
 	value = MAX(0, level - 50) + (level * 0.1);
 	value *= MOB_FLAGGED(mob, MOB_HARD) ? 1.1 : 1.0;
 	value *= MOB_FLAGGED(mob, MOB_GROUP) ? 1.3 : 1.0;
