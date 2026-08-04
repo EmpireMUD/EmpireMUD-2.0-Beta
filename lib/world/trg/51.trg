@@ -404,6 +404,8 @@ while %obj% && !%any%
 done
 if %any%
   %send% %actor% You are already bathing.
+  return 1
+  halt
 end
 * ok bathe:
 %load% obj 5162
