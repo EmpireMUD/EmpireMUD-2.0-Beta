@@ -393,6 +393,18 @@ elseif !%actor.canuseroom_guest%
   %send% %actor% You wouldn't want to get caught bathing in here.
   halt
 end
+* already bathing?
+set any 0
+set obj %room.people%
+while %obj% && !%any%
+  if %obj.vnum% == 5162 && %obj.val0% == %actor.id%
+    set any 1
+  end
+  set obj %obj.next_in_list%
+done
+if %any%
+  %send% %actor% You are already bathing.
+end
 * ok bathe:
 %load% obj 5162
 set obj %room.contents%
