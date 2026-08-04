@@ -101,7 +101,7 @@ else
   set needs_stop 0
 end
 * room set?
-if %needs_stop% && %actor.var(stop_room_lock)% && %actor.room.id% != %actor.var(set stop_room_lock)%
+if %needs_stop% && %actor.var(stop_room_lock)% && %actor.room.id% != %actor.var(stop_room_lock)%
   * wrong room, they moved, just cancel
   set stop_command 1
   remote stop_command %actor.id%
@@ -183,7 +183,7 @@ else
   set needs_stop 0
 end
 * room set?
-if %needs_stop% && %actor.var(stop_room_lock)% && %actor.room.id% != %actor.var(set stop_room_lock)%
+if %needs_stop% && %actor.var(stop_room_lock)% && %actor.room.id% != %actor.var(stop_room_lock)%
   * wrong room, they moved, just cancel
   set stop_command 1
   remote stop_command %actor.id%
