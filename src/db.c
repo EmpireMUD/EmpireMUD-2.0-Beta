@@ -1323,7 +1323,10 @@ int reload_text_string(char_data *ch, int type) {
 		// lastly, check open paginators and editors
 		LL_FOREACH(descriptor_list, in_use) {
 			if (in_use->showstr_vector && *in_use->showstr_vector == text_file_strings[type]) {
-				if (ch) {
+				if (ch && in_use->character && GET_INVIS_LEV(in_use->character) <= GET_ACCESS_LEVEL(ch)) {
+					msg_to_char(ch, "Unable to reload '%s' due to open paginator for %s.\r\n", text_file_data[type].filename, GET_NAME(in_use->character));
+				}
+				else if (ch) {
 					msg_to_char(ch, "Unable to reload '%s' due to open paginator.\r\n", text_file_data[type].filename);
 				}
 				else {
@@ -1332,7 +1335,10 @@ int reload_text_string(char_data *ch, int type) {
 				return (-1);
 			}
 			else if (in_use->str && *in_use->str == text_file_strings[type]) {
-				if (ch) {
+				if (ch && in_use->character && GET_INVIS_LEV(in_use->character) <= GET_ACCESS_LEVEL(ch)) {
+					msg_to_char(ch, "Unable to reload '%s' due to open editor for %s.\r\n", text_file_data[type].filename, GET_NAME(in_use->character));
+				}
+				else if (ch) {
 					msg_to_char(ch, "Unable to reload '%s' due to open editor.\r\n", text_file_data[type].filename);
 				}
 				else {
