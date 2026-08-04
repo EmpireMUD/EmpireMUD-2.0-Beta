@@ -686,9 +686,9 @@ See also: SKILLS, SPECIALIZE, SKILL CAPS, ABILITY POINTS, SKILL SWAP,
 
 Usage:  skill swap
 
-Players who reach level 100 can have two different sets of ability purchases
-for their skills. When you use "skill swap", all of your skills change from
-one set to the other.
+Players who reach a skill level* of 100 can have two different sets of ability
+purchases for their skills. When you use "skill swap", all of your skills
+change from one set to the other.
 
 Swapping skill sets costs 75% of your mana and movement points; it will
 regenerate normally. This prevents you from swapping during short breaks in
@@ -701,7 +701,10 @@ between both sets.
 
 Swapping skill sets takes 15 seconds and cannot be done in combat.
 
-See also: SKILLS, SLEEP
+* Note this requires skill level -- the one shown at the top of your 'skills'
+command -- rather than composite level.
+
+See also: SKILL LEVEL, SKILLS, SLEEP
 #
 SYNERGY SYNERGIES "SYNERGY ABILITY" "SKILL SYNERGY"
 
