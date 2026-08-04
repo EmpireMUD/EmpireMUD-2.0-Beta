@@ -1331,6 +1331,15 @@ int reload_text_string(char_data *ch, int type) {
 				}
 				return (-1);
 			}
+			else if (in_use->str && *in_use->str == text_file_strings[type]) {
+				if (ch) {
+					msg_to_char(ch, "Unable to reload '%s' due to open editor.\r\n", text_file_data[type].filename);
+				}
+				else {
+					syslog(SYS_GC, in_use->character ? GET_INVIS_LEV(in_use->character) : LVL_START_IMM, FALSE, "Warning: Failed to load '%s' due to open editor", text_file_data[type].filename);
+				}
+				return (-1);
+			}
 		}
 		
 		// ok:
