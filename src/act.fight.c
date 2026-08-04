@@ -202,7 +202,7 @@ ACMD(do_consider) {
 		hitch = get_to_hit(ch, vict, FALSE, FALSE) - get_dodge_modifier(vict, ch, FALSE);
 		*buf = '\0';
 		if (IS_NPC(vict)) {
-			safe_snprintf(buf, sizeof(buf), "Hit cap against $M: %d.", get_hit_cap_for(ch, vict));
+			safe_snprintf(buf, sizeof(buf), "Hit cap against $M: %d.", get_hit_cap_for(ch, get_approximate_level(vict), GET_DEXTERITY(vict), MOB_FLAGS(vict)));
 		}
 		if (hitch < 50) {
 			safe_snprintf(buf + strlen(buf), sizeof(buf) - strlen(buf), "%sYou would have trouble hitting $M.", (*buf ? "  " : ""));
@@ -214,7 +214,7 @@ ACMD(do_consider) {
 		hitch = get_to_hit(vict, ch, FALSE, FALSE) - get_dodge_modifier(ch, vict, FALSE);
 		*buf = '\0';
 		if (IS_NPC(vict)) {
-			safe_snprintf(buf, sizeof(buf), "Dodge cap against $M: %d.", get_dodge_cap_for(ch, vict));
+			safe_snprintf(buf, sizeof(buf), "Dodge cap against $M: %d.", get_dodge_cap_for(ch, get_approximate_level(vict), GET_DEXTERITY(vict), MOB_FLAGS(vict)));
 		}
 		if (hitch > 50) {
 			safe_snprintf(buf + strlen(buf), sizeof(buf) - strlen(buf), "%sYou would have trouble dodging $S attacks.", (*buf ? "  " : ""));

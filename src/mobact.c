@@ -2197,26 +2197,27 @@ int determine_best_scale_level(char_data *ch, bool check_group) {
 * calculation must change, too.
 *
 * @param char_data *ch The person who will be dodging.
-* @param char_data *attacker The person who would attack them.
+* @param int level Level of the attacker.
+* @param int dexterity Dexterity of the attacker.
+* @param bitvector_t mob_flags Mob flags of the attacker (MOB_HARD and/or MOB_GROUP).
 * @return int The calculated dodge cap for this encounter.
 */
-int get_dodge_cap_for(char_data *ch, char_data *attacker) {
+int get_dodge_cap_for(char_data *ch, int level, int dexterity, bitvector_t mob_flags) {
 	double dodge = 0.0;
 	
-	if (!ch || !attacker) {
+	if (!ch) {
 		return 0;
 	}
 	
 	// level
-	dodge = get_approximate_level(attacker) - 50;
-	dodge = MAX(dodge, 0.0);
-	dodge += get_approximate_level(attacker) / 10;
+	dodge = MAX(level - 50, 0.0);
+	dodge += level / 10;
 	
 	// flagging
-	if (MOB_FLAGGED(attacker, MOB_HARD)) {
+	if (IS_SET(mob_flags, MOB_HARD)) {
 		dodge *= 1.1;
 	}
-	if (MOB_FLAGGED(attacker, MOB_GROUP)) {
+	if (IS_SET(mob_flags, MOB_GROUP)) {
 		dodge *= 1.3;
 	}
 	
@@ -2224,7 +2225,7 @@ int get_dodge_cap_for(char_data *ch, char_data *attacker) {
 	dodge += 75;
 	
 	// dex modifier
-	dodge += 5 * (GET_DEXTERITY(attacker) - GET_DEXTERITY(ch));
+	dodge += 5 * (dexterity - GET_DEXTERITY(ch));
 
 	return (int) dodge;
 }
@@ -2238,26 +2239,27 @@ int get_dodge_cap_for(char_data *ch, char_data *attacker) {
 * calculation must change, too.
 *
 * @param char_data *ch The person who will be attacking.
-* @param char_data *vict The target of the attack.
+* @param int level Level of the target.
+* @param int dexterity Dexterity of the target.
+* @param bitvector_t mob_flags Mob flags of the target (MOB_HARD and/or MOB_GROUP).
 * @return int The calculated hit cap for this encounter.
 */
-int get_hit_cap_for(char_data *ch, char_data *vict) {
+int get_hit_cap_for(char_data *ch, int level, int dexterity, bitvector_t mob_flags) {
 	double to_hit = 0.0;
 	
-	if (!ch || !vict) {
+	if (!ch) {
 		return 0;
 	}
 	
 	// level
-	to_hit = get_approximate_level(vict) - 50;
-	to_hit = MAX(to_hit, 0.0);
-	to_hit += get_approximate_level(vict) / 10;
+	to_hit = MAX(level - 50, 0.0);
+	to_hit += level / 10;
 	
 	// flagging
-	if (MOB_FLAGGED(vict, MOB_HARD)) {
+	if (IS_SET(mob_flags, MOB_HARD)) {
 		to_hit *= 1.1;
 	}
-	if (MOB_FLAGGED(vict, MOB_GROUP)) {
+	if (IS_SET(mob_flags, MOB_GROUP)) {
 		to_hit *= 1.3;
 	}
 	
@@ -2265,7 +2267,7 @@ int get_hit_cap_for(char_data *ch, char_data *vict) {
 	to_hit += 100;
 	
 	// dex modifier
-	to_hit += 5 * (GET_DEXTERITY(vict) - GET_DEXTERITY(ch));
+	to_hit += 5 * (dexterity - GET_DEXTERITY(ch));
 	
 	return (int) to_hit;
 }
