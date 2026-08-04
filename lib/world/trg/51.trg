@@ -395,7 +395,7 @@ elseif !%actor.canuseroom_guest%
 end
 * already bathing?
 set any 0
-set obj %room.people%
+set obj %room.contents%
 while %obj% && !%any%
   if %obj.vnum% == 5162 && %obj.val0% == %actor.id%
     set any 1
