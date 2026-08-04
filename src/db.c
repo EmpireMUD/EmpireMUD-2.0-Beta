@@ -2285,7 +2285,7 @@ void load_intro_screens(void) {
 		fscanf(index, "%s\n", lbuf2);
 	}
 	
-	log("Loaded %d intro screens.", num_intro_screens);
+	log("Loaded %d intro screen%s.", num_intro_screens, PLURAL(num_intro_screens));
 	fclose(index);
 }
 
