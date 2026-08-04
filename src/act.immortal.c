@@ -7543,42 +7543,42 @@ ACMD(do_reload) {
 		load_intro_screens();
 		
 		for (iter = 0; iter < NUM_TEXT_FILE_STRINGS; ++iter) {
-			val |= reload_text_string(iter);
+			val |= reload_text_string(ch, iter);
 		}
 	}
 	else if (!str_cmp(arg, "wizlist")) {
-		val = reload_text_string(TEXT_FILE_WIZLIST);
+		val = reload_text_string(ch, TEXT_FILE_WIZLIST);
 	}
 	else if (!str_cmp(arg, "godlist")) {
-		val = reload_text_string(TEXT_FILE_GODLIST);
+		val = reload_text_string(ch, TEXT_FILE_GODLIST);
 	}
 	else if (!str_cmp(arg, "credits")) {
-		val = reload_text_string(TEXT_FILE_CREDITS);
+		val = reload_text_string(ch, TEXT_FILE_CREDITS);
 	}
 	else if (!str_cmp(arg, "motd")) {
-		val = reload_text_string(TEXT_FILE_MOTD);
+		val = reload_text_string(ch, TEXT_FILE_MOTD);
 	}
 	else if (!str_cmp(arg, "imotd")) {
-		val = reload_text_string(TEXT_FILE_IMOTD);
+		val = reload_text_string(ch, TEXT_FILE_IMOTD);
 	}
 	else if (!str_cmp(arg, "news")) {
-		val = reload_text_string(TEXT_FILE_NEWS);
+		val = reload_text_string(ch, TEXT_FILE_NEWS);
 	}
 	else if (!str_cmp(arg, "help")) {
-		val = reload_text_string(TEXT_FILE_HELP_SCREEN);
-		val |= reload_text_string(TEXT_FILE_HELP_SCREEN_SCREENREADER);
+		val = reload_text_string(ch, TEXT_FILE_HELP_SCREEN);
+		val |= reload_text_string(ch, TEXT_FILE_HELP_SCREEN_SCREENREADER);
 	}
 	else if (!str_cmp(arg, "info")) {
-		val = reload_text_string(TEXT_FILE_INFO);
+		val = reload_text_string(ch, TEXT_FILE_INFO);
 	}
 	else if (!str_cmp(arg, "policy")) {
-		val = reload_text_string(TEXT_FILE_POLICY);
+		val = reload_text_string(ch, TEXT_FILE_POLICY);
 	}
 	else if (!str_cmp(arg, "handbook")) {
-		val = reload_text_string(TEXT_FILE_HANDBOOK);
+		val = reload_text_string(ch, TEXT_FILE_HANDBOOK);
 	}
 	else if (!str_cmp(arg, "shortcredits")) {
-		val = reload_text_string(TEXT_FILE_SHORT_CREDITS);
+		val = reload_text_string(ch, TEXT_FILE_SHORT_CREDITS);
 	}
 	else if (!str_cmp(arg, "intros")) {
 		load_intro_screens();

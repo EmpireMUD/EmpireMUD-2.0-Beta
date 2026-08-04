@@ -1196,14 +1196,6 @@ int file_to_string(const char *name, char *buf) {
  */
 int file_to_string_alloc(const char *name, char **buf) {
 	char temp[MAX_STRING_LENGTH];
-	descriptor_data *in_use;
-	
-	LL_FOREACH(descriptor_list, in_use) {
-		if (in_use->showstr_vector && *in_use->showstr_vector == *buf) {
-			syslog(SYS_GC, in_use->character ? GET_INVIS_LEV(in_use->character) : LVL_START_IMM, FALSE, "Warning: Failed to load '%s' due to open paginator", name);
-			return (-1);
-		}
-	}
 
 	/* Lets not free() what used to be there unless we succeeded. */
 	if (file_to_string(name, temp) < 0) {
@@ -1308,22 +1300,40 @@ void init_text_file_strings(void) {
 /**
 * Reloads 1 text file, by type.
 *
+* @param char_data *ch Optional: Character who caused the reload and will receive error messages (may be NULL).
 * @param int type Any TEXT_FILE_ type.
 * @return int The return code from file_to_string_alloc (-1 is error, 0 is success).
 */
-int reload_text_string(int type) {
+int reload_text_string(char_data *ch, int type) {
+	descriptor_data *in_use;
+	
 	if (type < 0 || type >= NUM_TEXT_FILE_STRINGS) {
 		log("SYSERR: reload_text_string called with invalid type %d", type);
+		if (ch) {
+			msg_to_char(ch, "Error trying to reload text.\r\n");
+		}
 	}
 	else if (!text_file_data[type].filename || !*text_file_data[type].filename) {
 		log("SYSERR: reload_text_string called on type %d with no filename set", type);
+		if (ch) {
+			msg_to_char(ch, "Error trying to reload text.\r\n");
+		}
 	}
 	else {
-		// ok:
-		if (text_file_strings[type]) {
-			free(text_file_strings[type]);
-			text_file_strings[type] = NULL;
+		// lastly, check open paginators and editors
+		LL_FOREACH(descriptor_list, in_use) {
+			if (in_use->showstr_vector && *in_use->showstr_vector == text_file_strings[type]) {
+				if (ch) {
+					msg_to_char(ch, "Unable to reload '%s' due to open paginator.\r\n", text_file_data[type].filename);
+				}
+				else {
+					syslog(SYS_GC, in_use->character ? GET_INVIS_LEV(in_use->character) : LVL_START_IMM, FALSE, "Warning: Failed to load '%s' due to open paginator", text_file_data[type].filename);
+				}
+				return (-1);
+			}
 		}
+		
+		// ok:
 		return file_to_string_alloc(text_file_data[type].filename, &text_file_strings[type]);
 	}
 	

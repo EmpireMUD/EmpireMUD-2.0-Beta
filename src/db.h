@@ -1021,7 +1021,7 @@ extern char **tips_of_the_day;
 extern int tips_of_the_day_size;
 
 void load_intro_screens();
-int reload_text_string(int type);
+int reload_text_string(char_data *ch, int type);
 
 // more frees
 void free_apply_list(struct apply_data *list);
