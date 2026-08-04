@@ -1380,7 +1380,7 @@ restore blood. Red Mist cannot check the immunity itself because its target is
 the player who's attacking, not the victim of the attack. Splash Blood fills in
 the middle link for this.
 
-See also: OLC ABILITIES
+See also: OLC ABILITIES, ABILEDIT LINKED TRAIT
 #d
 "ABILEDIT LINKEDTRAIT" "ABILEDIT LINKED TRAIT"
 
@@ -1396,7 +1396,7 @@ The following traits cannot be used: &rHEALTH-REGEN, MOVE-REGEN, MANA-REGEN,
 AGE, MAX-MOVE, HEAL-OVER-TIME, MAX-HEALTH, MAX-MANA, INVENTORY, MAX-BLOOD,
 CRAFTING, BLOOD-UPKEEP&0
 
-See also: OLC ABILITIES, APPLIES
+See also: OLC ABILITIES, ABILEDIT LINK ABILITY, APPLIES
 #d
 "ABILEDIT MASTERYABILITY" "ABILEDIT MASTERY ABILITY"
 
