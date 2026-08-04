@@ -79,6 +79,9 @@ stop~
 * If you set 'needs_stop_command' to 1, this will also block the 'You can stop if you want to' message.
 * You can also set 'stop_message_char' for what to show the player.
 * You can also set 'stop_message_room' for what to show the player.
+* If the 'stop' only functions in one room, set 'stop_room_lock' to the room's ID.
+* (all those variables get remoted to the actor)
+*
 * 1. CHECK IF WE ARE JUST CLEARING DATA
 if %arg% == cleardata
   set stop_command 0
@@ -87,6 +90,7 @@ if %arg% == cleardata
   remote needs_stop_command %actor.id%
   rdelete stop_message_char %actor.id%
   rdelete stop_message_room %actor.id%
+  rdelete stop_room_lock %actor.id%
   return 1
   halt
 end
@@ -95,6 +99,19 @@ if %actor.varexists(needs_stop_command)%
   set needs_stop %actor.needs_stop_command%
 else
   set needs_stop 0
+end
+* room set?
+if %needs_stop% && %actor.var(stop_room_lock)% && %actor.room.id% != %actor.var(set stop_room_lock)%
+  * wrong room, they moved, just cancel
+  set stop_command 1
+  remote stop_command %actor.id%
+  set needs_stop_command 0
+  remote needs_stop_command %actor.id%
+  rdelete stop_message_char %actor.id%
+  rdelete stop_message_room %actor.id%
+  rdelete stop_room_lock %actor.id%
+  return 0
+  halt
 end
 * re-set needs_stop_command on the actor (prevents it from silencing repeatedly)
 set needs_stop_command 0
@@ -144,6 +161,9 @@ stop~
 * If you set 'needs_stop_command' to 1, this will also block the 'You can stop if you want to' message.
 * You can also set 'stop_message_char' for what to show the player.
 * You can also set 'stop_message_room' for what to show the player.
+* If the 'stop' only functions in one room, set 'stop_room_lock' to the room's ID.
+* (all those variables get remoted to the actor)
+*
 * 1. CHECK IF WE ARE JUST CLEARING DATA
 if %arg% == cleardata
   set stop_command 0
@@ -152,6 +172,7 @@ if %arg% == cleardata
   remote needs_stop_command %actor.id%
   rdelete stop_message_char %actor.id%
   rdelete stop_message_room %actor.id%
+  rdelete stop_room_lock %actor.id%
   return 1
   halt
 end
@@ -160,6 +181,19 @@ if %actor.varexists(needs_stop_command)%
   set needs_stop %actor.needs_stop_command%
 else
   set needs_stop 0
+end
+* room set?
+if %needs_stop% && %actor.var(stop_room_lock)% && %actor.room.id% != %actor.var(set stop_room_lock)%
+  * wrong room, they moved, just cancel
+  set stop_command 1
+  remote stop_command %actor.id%
+  set needs_stop_command 0
+  remote needs_stop_command %actor.id%
+  rdelete stop_message_char %actor.id%
+  rdelete stop_message_room %actor.id%
+  rdelete stop_room_lock %actor.id%
+  return 0
+  halt
 end
 * re-set needs_stop_command on the actor (prevents it from silencing repeatedly)
 set needs_stop_command 0
