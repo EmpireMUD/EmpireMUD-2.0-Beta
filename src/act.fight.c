@@ -221,6 +221,12 @@ ACMD(do_consider) {
 			any = TRUE;
 		}
 		act(buf, FALSE, ch, NULL, vict, TO_CHAR);
+		
+		// block
+		if (IS_NPC(vict) && has_player_tech(ch, PTECH_BLOCK)) {
+			safe_snprintf(buf, sizeof(buf), "Block cap against $M: %d.", get_block_cap_for(ch, get_approximate_level(vict), GET_DEXTERITY(vict), MOB_FLAGS(vict)));
+			act(buf, FALSE, ch, NULL, vict, TO_CHAR);
+		}
 
 		// flags (with overflow protection on affected_bits_consider[])
 		for (bits = AFF_FLAGS(vict), pos = 0; bits && *affected_bits_consider[pos] != '\n'; bits >>= 1, ++pos) {

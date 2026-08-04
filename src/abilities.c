@@ -1277,7 +1277,8 @@ room_data *get_random_room_for_ability(char_data *ch, ability_data *abil, bool r
 * @return double The modifier based on the trait (0 to 1.0).
 */
 double get_trait_modifier(char_data *ch, int apply) {
-	double value = 1.0;
+	double cap, value = 1.0;
+	int max;
 	
 	// APPLY_x: char's percent of max value for a trait
 	switch (apply) {
@@ -1306,15 +1307,20 @@ double get_trait_modifier(char_data *ch, int apply) {
 			break;
 		}
 		case APPLY_BLOCK: {
-			value = 1.0;	// TODO: move block cap calculation to a function
+			cap = get_block_cap_for(ch, GET_COMPUTED_LEVEL(ch), /* not used */ 0, NOBITS);
+			value = get_block_rating(ch, FALSE) / MAX(0.01, cap);
 			break;
 		}
 		case APPLY_TO_HIT: {
-			value = 1.0;	// TODO: move to-hit cap calculation to a function
+			max = att_max(ch);
+			cap = get_hit_cap_for(ch, GET_COMPUTED_LEVEL(ch), MIN(max, GET_COMPUTED_LEVEL(ch) / 20), NOBITS);
+			value = get_to_hit(ch, NULL, FALSE, FALSE) / MAX(0.01, cap);
 			break;
 		}
 		case APPLY_DODGE: {
-			value = 1.0;	// TODO: move dodge cap calculation to a function
+			max = att_max(ch);
+			cap = get_dodge_cap_for(ch, GET_COMPUTED_LEVEL(ch), MIN(max, GET_COMPUTED_LEVEL(ch) / 20), NOBITS);
+			value = get_dodge_modifier(ch, NULL, FALSE) / MAX(0.01, cap);
 			break;
 		}
 		case APPLY_RESIST_PHYSICAL: {

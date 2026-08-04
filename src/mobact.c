@@ -2190,6 +2190,41 @@ int determine_best_scale_level(char_data *ch, bool check_group) {
 
 
 /**
+* Calculates the block cap a character can expect against a given target -- the
+* maximum amount of block that the character can benefit from.
+*
+* Warning: If mob scaling numbers change in scale_mob_to_level(), this
+* calculation must change, too.
+*
+* @param char_data *ch The person who will be dodging.
+* @param int level Level of the attacker.
+* @param int dexterity Dexterity of the attacker.
+* @param bitvector_t mob_flags Mob flags of the attacker (MOB_HARD and/or MOB_GROUP).
+* @return int The calculated block cap for this encounter.
+*/
+int get_block_cap_for(char_data *ch, int level, int dexterity, bitvector_t mob_flags) {
+	double block = 0.0;
+	
+	if (!ch) {
+		return 0;
+	}
+	
+	// level
+	block = level / 2.0;
+	
+	// flagging
+	if (IS_SET(mob_flags, MOB_HARD)) {
+		block *= 1.1;
+	}
+	if (IS_SET(mob_flags, MOB_GROUP)) {
+		block *= 1.3;
+	}
+
+	return (int) block;
+}
+
+
+/**
 * Calculates the dodge cap a character can expect against a given target -- the
 * maximum amount of dodge that the character can benefit from.
 *
@@ -2424,7 +2459,7 @@ void scale_mob_to_level(char_data *mob, int level) {
 	value += MOB_FLAGGED(mob, MOB_GROUP) ? 2.0 : 0;
 	mob->real_attributes[STRENGTH] = MAX(1, (int) ceil(value));
 	
-	// dexterity
+	// dexterity: note the level/20.0 calculation is also used in get_trait_modifier()
 	value = level / 20.0;
 	value *= MOB_FLAGGED(mob, MOB_TANK) ? 1.25 : 1.0;
 	value += MOB_FLAGGED(mob, MOB_HARD) ? 1.25 : 0;
