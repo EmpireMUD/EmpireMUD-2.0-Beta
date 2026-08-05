@@ -1137,6 +1137,10 @@ void show_craft_info(char_data *ch, char *argument, int craft_type) {
 		}
 	}
 	
+	if (CRAFT_FLAGGED(craft, CRAFT_SOUP)) {
+		msg_to_char(ch, "Requires a container of water to make it in.\r\n");
+	}
+	
 	show_resource_list(GET_CRAFT_RESOURCES(craft), buf, sizeof(buf));
 	msg_to_char(ch, "Resources: %s\r\n", buf);	
 	
