@@ -6081,6 +6081,81 @@ ACMD(do_editnotes) {
 }
 
 
+ACMD(do_endthievery) {
+	char arg1[MAX_INPUT_LENGTH], arg2[MAX_INPUT_LENGTH];
+	empire_data *iter, *next_iter, *other, *first = NULL, *second = NULL;
+	struct empire_political_data *pol;
+	bool any, line;
+	
+	argument = any_one_word(argument, arg1);
+	argument = any_one_word(argument, arg2);
+	
+	if (!*arg1 && !*arg2) {	// no args: list active thievery
+		msg_to_char(ch, "Active thievery permits:\r\n");
+		
+		any = FALSE;
+		HASH_ITER(hh, empire_table, iter, next_iter) {
+			line = FALSE;
+			
+			LL_FOREACH(EMPIRE_DIPLOMACY(iter), pol) {
+				if (IS_SET(pol->type, DIPL_THIEVERY) && (other = real_empire(pol->id))) {
+					if (!line) {
+						msg_to_char(ch, " %s%s\t0 vs ", EMPIRE_BANNER(iter), EMPIRE_NAME(iter));
+					}
+					
+					msg_to_char(ch, "%s%s%s\t0", (line ? ", " : ""), EMPIRE_BANNER(other), EMPIRE_NAME(other));
+					any = line = TRUE;
+				}
+			}
+			
+			if (line) {
+				msg_to_char(ch, "\r\n");
+			}
+		}
+		
+		if (!any) {
+			msg_to_char(ch, " none\r\n");
+		}
+	}	// end no-arg
+	else if (!(first = get_empire(arg1))) {
+		msg_to_char(ch, "Invalid empire '%s'.\r\n", arg1);
+	}
+	else if (*arg2 && !(second = get_empire(arg2))) {
+		msg_to_char(ch, "Invalid empire '%s'.\r\n", arg2);
+	}
+	else {	// ok now ends thievery
+		any = FALSE;
+		
+		// we are guaranteed a "first" empire but not a "second"
+		LL_FOREACH(EMPIRE_DIPLOMACY(first), pol) {
+			if (second && pol->id != EMPIRE_VNUM(second)) {
+				continue;	// doing 1? or all?
+			}
+			if (!IS_SET(pol->type, DIPL_THIEVERY)) {
+				continue;	// not thievery
+			}
+			
+			other = (second ? second : real_empire(pol->id));
+			
+			// remove thievery, set distrust
+			REMOVE_BIT(pol->type, DIPL_THIEVERY);
+			pol->start_time = time(0);
+			
+			syslog(SYS_GC, GET_INVIS_LEV(ch), TRUE, "ABUSE: DIPL: %s has ended the thievery permit for %s against %s", GET_NAME(ch), EMPIRE_NAME(first), EMPIRE_NAME(other));
+			log_to_empire(first, ELOG_DIPLOMACY, "The thievery permit with %s has ended", EMPIRE_NAME(other));
+			any = TRUE;
+		}
+		
+		if (!any && second) {
+			msg_to_char(ch, "You didn't find a thievery permit to end for %s against %s.\r\n", EMPIRE_NAME(first), EMPIRE_NAME(second));
+		}
+		else if (!any) {
+			msg_to_char(ch, "%s has no active thievery permits.\r\n", EMPIRE_NAME(first));
+		}
+	}
+}
+
+
 ACMD(do_endwar) {
 	char arg1[MAX_INPUT_LENGTH], arg2[MAX_INPUT_LENGTH];
 	empire_data *iter, *next_iter, *other, *first = NULL, *second = NULL;

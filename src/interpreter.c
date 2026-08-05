@@ -144,6 +144,7 @@ ACMD(do_emotd);
 ACMD(do_empire_inventory);
 ACMD(do_empires);
 ACMD(do_empty);
+ACMD(do_endthievery);
 ACMD(do_endwar);
 ACMD(do_enroll);
 ACMD(do_enter);
@@ -649,6 +650,7 @@ cpp_extern const struct command_info cmd_info[] = {
 	SCMD_CMD( "ehistory", POS_DEAD, do_history, NO_MIN, CTYPE_COMM, SCMD_EMPIRE_HISTORY ),
 	STANDARD_CMD( "enchant", POS_STANDING, do_gen_augment, NO_MIN, NO_GRANTS, AUGMENT_ENCHANTMENT, CTYPE_BUILD, CMD_NO_ANIMALS, NO_ABIL ),
 	GRANT_CMD( "endwar", POS_DEAD, do_endwar, LVL_CIMPL, CTYPE_IMMORTAL, GRANT_EMPIRES ),
+	GRANT_CMD( "endthievery", POS_DEAD, do_endthievery, LVL_CIMPL, CTYPE_IMMORTAL, GRANT_EMPIRES ),
 	SIMPLE_CMD( "enter", POS_STANDING, do_enter, NO_MIN, CTYPE_MOVE ),
 	SIMPLE_CMD( "enroll", POS_DEAD, do_enroll, NO_MIN, CTYPE_EMPIRE ),
 	SIMPLE_CMD( "equipment", POS_DEAD, do_equipment, NO_MIN, CTYPE_UTIL ),
