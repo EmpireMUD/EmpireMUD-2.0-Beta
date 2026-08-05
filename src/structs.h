@@ -5680,6 +5680,7 @@ struct workforce_where_log {
 	char_data *mob;	// may be NULL if purged
 	int chore;	// CHORE_ const
 	room_vnum loc;	// where it happened
+	char *subloc;	// e.g. name of vehicle
 	struct workforce_where_log *prev, *next;
 };
 

@@ -1381,7 +1381,7 @@ void show_workforce_where(empire_data *emp, char_data *to, bool here, char *argu
 		UT_hash_handle hh;
 	};
 	
-	char line[256];
+	char line[256], subloc[256];
 	struct workforce_count_type *find, *wct, *next_wct, *counts = NULL;
 	struct workforce_where_log *wwl;
 	room_data *room;
@@ -1423,12 +1423,19 @@ void show_workforce_where(empire_data *emp, char_data *to, bool here, char *argu
 			}
 			
 			// found
+			
+			// build subloc
+			*subloc = '\0';
+			if (wwl->subloc) {
+				safe_snprintf(subloc, sizeof(subloc), " (%s)", skip_filler(wwl->subloc));
+			}
+			
 			++total;
 			if (wwl->mob) {
-				build_page_display(to, "%s %s: %s", coord_display_room(to, room, TRUE), skip_filler(get_room_name(room, FALSE)), GET_SHORT_DESC(wwl->mob));
+				build_page_display(to, "%s %s%s: %s", coord_display_room(to, room, TRUE), skip_filler(get_room_name(room, FALSE)), subloc, GET_SHORT_DESC(wwl->mob));
 			}
 			else {
-				build_page_display(to, "%s %s", coord_display_room(to, room, TRUE), skip_filler(get_room_name(room, FALSE)));
+				build_page_display(to, "%s %s%s", coord_display_room(to, room, TRUE), skip_filler(get_room_name(room, FALSE)), subloc);
 			}
 		}
 		if (total) {

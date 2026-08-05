@@ -2874,7 +2874,7 @@ char_data *find_chore_worker_in_room(empire_data *emp, room_data *room, vehicle_
 struct empire_npc_data *find_free_npc_for_chore(empire_data *emp, room_data *loc);
 void free_workforce_where_log(struct workforce_where_log **to_free);
 int *get_ordered_chores();
-void log_workforce_where(empire_data *emp, char_data *mob, int chore);
+void log_workforce_where(empire_data *emp, char_data *mob, int chore, vehicle_data *veh);
 void remove_from_workforce_where_log(empire_data *emp, char_data *mob);
 void set_workforce_production_limit(empire_data *emp, any_vnum vnum, int amount);
 int sort_einv_by_amount(struct empire_storage_data *a, struct empire_storage_data *b);
