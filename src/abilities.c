@@ -992,6 +992,9 @@ bool is_ability_enemy(char_data *ch, char_data *vict) {
 	if (GET_COMPANION(ch) == vict) {
 		return FALSE;	// nope
 	}
+	if (GET_LEADER(vict) == ch && IS_NPC(vict) && AFF_FLAGGED(vict, AFF_CHARM)) {
+		return FALSE;	// charmed follower
+	}
 	if (in_same_group(ch, vict)) {
 		return FALSE;	// nope
 	}
