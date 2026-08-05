@@ -77,10 +77,10 @@ stop~
 * Detects that a player has typed 'stop' for the purpose of a script.
 * You must intialize the player's 'stop_command' variable to 0 (use set and remote)
 * If you set 'needs_stop_command' to 1, this will also block the 'You can stop if you want to' message.
-* You can also set 'stop_message_char' for what to show the player.
-* You can also set 'stop_message_room' for what to show the player.
-* If the 'stop' only functions in one room, set 'stop_room_lock' to the room's ID.
-* (all those variables get remoted to the actor)
+* Set 'stop_message_char' for what to show the player.
+* Set 'stop_message_room' for what to show the player.
+* Set 'stop_room_lock' to the room's ID, or 0 if it's not restricted.
+* (all those variables should be remoted to the actor)
 *
 * 1. CHECK IF WE ARE JUST CLEARING DATA
 if %arg% == cleardata
@@ -159,10 +159,10 @@ stop~
 * Detects that a player has typed 'stop' for the purpose of a script.
 * You must intialize the player's 'stop_command' variable to 0 (use set and remote)
 * If you set 'needs_stop_command' to 1, this will also block the 'You can stop if you want to' message.
-* You can also set 'stop_message_char' for what to show the player.
-* You can also set 'stop_message_room' for what to show the player.
-* If the 'stop' only functions in one room, set 'stop_room_lock' to the room's ID.
-* (all those variables get remoted to the actor)
+* Set 'stop_message_char' for what to show the player.
+* Set 'stop_message_room' for what to show the player.
+* Set 'stop_room_lock' to the room's ID, or 0 if it's not restricted.
+* (all those variables should be remoted to the actor)
 *
 * 1. CHECK IF WE ARE JUST CLEARING DATA
 if %arg% == cleardata

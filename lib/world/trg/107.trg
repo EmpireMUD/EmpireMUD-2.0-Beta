@@ -253,10 +253,12 @@ set room_var %actor.room%
 set stop_command 0
 set stop_message_char You stop using %self.shortdesc%.
 set stop_message_room ~%actor% stops using %self.shortdesc%.
+set stop_room_lock %actor.room.id%
 set needs_stop_command 1
 remote stop_command %actor.id%
 remote stop_message_char %actor.id%
 remote stop_message_room %actor.id%
+remote stop_room_lock %actor.id%
 remote needs_stop_command %actor.id%
 * start going
 %send% %actor% You shake @%self% and it begins to swirl with light...
@@ -713,10 +715,12 @@ set room_var %actor.room%
 set stop_command 0
 set stop_message_char You stop using %self.shortdesc% to teleport.
 set stop_message_room ~%actor% stops using %self.shortdesc% to teleport.
+set stop_room_lock %actor.room.id%
 set needs_stop_command 1
 remote stop_command %actor.id%
 remote stop_message_char %actor.id%
 remote stop_message_room %actor.id%
+remote stop_room_lock %actor.id%
 remote needs_stop_command %actor.id%
 * begin
 %send% %actor% You touch @%self% and it begins to swirl with light...
@@ -934,10 +938,12 @@ set room_var %actor.room%
 set stop_command 0
 set stop_message_char You stop using %self.shortdesc%.
 set stop_message_room ~%actor% stops using %self.shortdesc%.
+set stop_room_lock %actor.room.id%
 set needs_stop_command 1
 remote stop_command %actor.id%
 remote stop_message_char %actor.id%
 remote stop_message_room %actor.id%
+remote stop_room_lock %actor.id%
 remote needs_stop_command %actor.id%
 * start going
 %send% %actor% You sprinkle some breadcrumbs and feel the wind whip them up into the air...
