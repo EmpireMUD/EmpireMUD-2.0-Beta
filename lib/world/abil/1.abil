@@ -294,7 +294,7 @@ S
 Purify~
 0 -1 1.00 o 0 0
 C
-purify 8 b 2 50 0.00 -1 0 0 1 0
+purify 8 bh 2 50 0.00 -1 0 0 1 0
 D 16 44 0
 D 64 21 0
 M
@@ -1837,6 +1837,12 @@ M
 M
 33
 $n begins writing words in the circles on the ground.~
+M
+8
+You detect no threats in the area.~
+M
+9
+*~
 T s 1
 S
 #194
