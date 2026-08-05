@@ -40,6 +40,7 @@
 
 // external vars
 extern int char_extractions_pending;
+extern int no_auto_deletes;
 
 // external funcs
 ACMD(do_dismount);
@@ -1298,7 +1299,7 @@ bool should_delete_empire(empire_data *emp) {
 		return TRUE;
 	}
 	
-	if (EMPIRE_LAST_LOGON(emp) + (config_get_int("time_to_empire_delete") * SECS_PER_REAL_WEEK) < time(0)) {
+	if (!no_auto_deletes && EMPIRE_LAST_LOGON(emp) + (config_get_int("time_to_empire_delete") * SECS_PER_REAL_WEEK) < time(0)) {
 		return TRUE;
 	}
 	

@@ -4327,7 +4327,7 @@ int main(int argc, char **argv) {
 					   "  -d <directory> Specify library directory (defaults to 'lib').\n"
 					   "  -h             Print this command line argument help.\n"
 					   "  -o <file>      Write log to <file> instead of stderr.\n"
-					   "  -q             Quick boot (doesn't auto-delete players)\n"
+					   "  -q             Quick boot (doesn't auto-delete players or empires)\n"
 					   "  -r             Restrict MUD -- no new players allowed.\n",
 					argv[0]);
 				exit(0);
