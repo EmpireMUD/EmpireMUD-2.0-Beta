@@ -5572,7 +5572,7 @@ ACMD(do_autostore) {
 		if (obj) {
 			act("$n auto-stores $p.", FALSE, ch, obj, NULL, TO_ROOM | DG_NO_TRIG);
 			perform_force_autostore(obj, emp, GET_ISLAND_ID(IN_ROOM(ch)));
-			read_vault(emp);
+			TRIGGER_DELAYED_REFRESH(emp, DELAY_REFRESH_VAULT);
 		}
 		else if (veh) {
 			act("$n auto-stores items in $V.", FALSE, ch, NULL, veh, TO_ROOM | DG_NO_TRIG | ACT_VEH_VICT);
@@ -5580,7 +5580,7 @@ ACMD(do_autostore) {
 			DL_FOREACH_SAFE2(VEH_CONTAINS(veh), obj, next_obj, next_content) {
 				perform_force_autostore(obj, (VEH_OWNER(veh) && VEH_OWNER(veh) != emp) ? VEH_OWNER(veh) : emp, GET_ISLAND_ID(IN_ROOM(ch)));
 			}
-			read_vault((VEH_OWNER(veh) && VEH_OWNER(veh) != emp) ? VEH_OWNER(veh) : emp);
+			TRIGGER_DELAYED_REFRESH((VEH_OWNER(veh) && VEH_OWNER(veh) != emp) ? VEH_OWNER(veh) : emp, DELAY_REFRESH_VAULT);
 		}
 		else {
 			send_to_char("Nothing here by that name.\r\n", ch);

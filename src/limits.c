@@ -1391,7 +1391,7 @@ void update_empire_needs(empire_data *emp, struct empire_island *eisle, struct e
 	}
 	
 	if (vault) {
-		read_vault(emp);
+		TRIGGER_DELAYED_REFRESH(emp, DELAY_REFRESH_VAULT);
 	}
 }
 
@@ -1643,8 +1643,10 @@ void force_autostore(room_data *room) {
 				}
 			}
 		}
-	
-		read_vault(ROOM_OWNER(room));
+		
+		if (ROOM_OWNER(room)) {
+			TRIGGER_DELAYED_REFRESH(ROOM_OWNER(room), DELAY_REFRESH_VAULT);
+		}
 	}
 }
 

@@ -8005,7 +8005,7 @@ ACMD(do_retrieve) {
 			remove_room_extra_data(IN_ROOM(ch), ROOM_EXTRA_CEDED);
 		}
 		
-		read_vault(emp);
+		TRIGGER_DELAYED_REFRESH(emp, DELAY_REFRESH_VAULT);
 	}
 }
 
@@ -8705,7 +8705,7 @@ ACMD(do_store) {
 			remove_room_extra_data(IN_ROOM(ch), ROOM_EXTRA_CEDED);
 		}
 		
-		read_vault(emp);
+		TRIGGER_DELAYED_REFRESH(emp, DELAY_REFRESH_VAULT);
 	}
 }
 

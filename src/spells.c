@@ -393,7 +393,7 @@ void do_summon_materials(char_data *ch, char *argument) {
 		// save the empire
 		if (found) {
 			set_mana(ch, GET_MANA(ch) - (cost * count));	// charge only the amount retrieved
-			read_vault(emp);
+			TRIGGER_DELAYED_REFRESH(emp, DELAY_REFRESH_VAULT);
 			gain_player_tech_exp(ch, PTECH_SUMMON_MATERIALS, 1);
 			run_ability_hooks_by_player_tech(ch, PTECH_SUMMON_MATERIALS, NULL, NULL, NULL, NULL);
 		}

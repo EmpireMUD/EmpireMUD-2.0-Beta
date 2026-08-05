@@ -11091,7 +11091,8 @@ bool obj_can_be_stored(obj_data *obj, room_data *loc, empire_data *by_emp, bool 
 
 
 /**
-* re-read the vault of an empire
+* re-read the vault of an empire -- prefer to call this on a delay:
+*   TRIGGER_DELAYED_REFRESH(emp, DELAY_REFRESH_VAULT);
 *
 * @empire_data *emp
 */

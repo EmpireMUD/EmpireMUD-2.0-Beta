@@ -553,6 +553,9 @@ void run_delayed_refresh(void) {
 			if (IS_SET(EMPIRE_DELAYED_REFRESH(emp), DELAY_REFRESH_MSDP_UPDATE_ALL)) {
 				update_MSDP_empire_data_all(emp, FALSE, FALSE);
 			}
+			if (IS_SET(EMPIRE_DELAYED_REFRESH(emp), DELAY_REFRESH_VAULT)) {
+				read_vault(emp);
+			}
 			
 			// clear this
 			EMPIRE_DELAYED_REFRESH(emp) = NOBITS;
@@ -951,6 +954,9 @@ bool process_import_one(empire_data *emp) {
 				// log
 				log_to_empire(emp, ELOG_TRADE, "Imported %s x%d from %s for %.1f coins", orn ? GET_OBJ_SHORT_DESC(orn) : "???", trade_amt, EMPIRE_NAME(pair->emp), cost);
 				log_to_empire(pair->emp, ELOG_TRADE, "Exported %s x%d to %s for %.1f coins", orn ? GET_OBJ_SHORT_DESC(orn) : "???", trade_amt, EMPIRE_NAME(emp), gain);
+				
+				TRIGGER_DELAYED_REFRESH(emp, DELAY_REFRESH_VAULT);
+				TRIGGER_DELAYED_REFRESH(pair->emp, DELAY_REFRESH_VAULT);
 			}
 		}
 		
@@ -974,7 +980,6 @@ bool process_import_one(empire_data *emp) {
 // runs daily imports
 void process_imports(void) {
 	empire_data *emp, *next_emp;
-	int amount;
 	
 	int time_to_empire_emptiness = config_get_int("time_to_empire_emptiness") * SECS_PER_REAL_WEEK;
 	
@@ -990,11 +995,7 @@ void process_imports(void) {
 		}
 		
 		// ok go
-		amount = process_import_one(emp);
-		
-		if (amount > 0) {
-			read_vault(emp);
-		}
+		process_import_one(emp);
 	}
 }
 
