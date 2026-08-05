@@ -2508,7 +2508,7 @@ int perform_set(char_data *ch, char_data *vict, int mode, char *val_arg) {
 		
 		// bounds check
 		if (!del_rep && (new_val < min_rep || new_val > max_rep)) {
-			msg_to_char(ch, "You can't set the reputation to that level. That faction has a range of %d-%d.\r\n", min_rep, max_rep);
+			msg_to_char(ch, "You can't set the reputation to that level. That faction has a range of %d to %d.\r\n", min_rep, max_rep);
 			return 0;
 		}
 		
