@@ -559,6 +559,19 @@ void run_delayed_refresh(void) {
 			
 			// clear this
 			EMPIRE_DELAYED_REFRESH(emp) = NOBITS;
+			
+			// saves?
+			if (!block_all_saves_due_to_shutdown) {
+				if (EMPIRE_NEEDS_SAVE(emp)) {
+					save_empire(emp, FALSE);
+				}
+				if (EMPIRE_NEEDS_STORAGE_SAVE(emp)) {
+					save_empire_storage(emp);
+				}
+				if (EMPIRE_NEEDS_LOGS_SAVE(emp)) {
+					save_empire_logs(emp);
+				}
+			}
 		}
 		
 		check_empire_refresh = FALSE;

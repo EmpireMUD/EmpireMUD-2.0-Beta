@@ -975,8 +975,8 @@ void heartbeat(unsigned long heart_pulse) {
 			write_running_events_file();
 			HEARTBEAT_LOG("28")
 		}
-		save_marked_empires();
-		HEARTBEAT_LOG("29")
+		// formerly: save_marked_empires, now part of run_delayed_refresh
+		// HEARTBEAT_LOG("29")
 	}
 	
 	if (HEARTBEAT(SECS_PER_REAL_DAY)) {
