@@ -1080,7 +1080,7 @@ bool validate_mobile_move(char_data *ch, int dir, room_data *to_room, bool pursu
 	}
 
 	// check building and entrances
-	if (dir != NO_DIR && ROOM_IS_CLOSED(to_room) && !IS_ADVENTURE_ROOM(IN_ROOM(ch)) && !IS_INSIDE(IN_ROOM(ch)) && BUILDING_ENTRANCE(to_room) != dir && (!ROOM_BLD_FLAGGED(to_room, BLD_TWO_ENTRANCES) || BUILDING_ENTRANCE(to_room) != rev_dir[dir])) {
+	if (dir != NO_DIR && ROOM_IS_CLOSED(to_room) && !ROOM_IS_CLOSED(IN_ROOM(ch)) && BUILDING_ENTRANCE(to_room) != dir && (!ROOM_BLD_FLAGGED(to_room, BLD_TWO_ENTRANCES) || BUILDING_ENTRANCE(to_room) != rev_dir[dir])) {
 		return FALSE;	// can't enter that direction
 	}
 	if (ROOM_AFF_FLAGGED(to_room, ROOM_AFF_REPEL_NPCS)) {
@@ -1119,7 +1119,7 @@ bool validate_mobile_move(char_data *ch, int dir, room_data *to_room, bool pursu
 	}
 	
 	// check building permissions (hostile empire locations only)
-	if (!IS_OUTDOOR_TILE(to_room) && room_emp && room_emp != ch_emp && (MOB_FLAGGED(ch, MOB_AGGRESSIVE) || empire_is_hostile(room_emp, ch_emp, to_room))) {
+	if (ROOM_IS_CLOSED(to_room) && !ROOM_IS_CLOSED(IN_ROOM(ch)) && room_emp && room_emp != ch_emp && (MOB_FLAGGED(ch, MOB_AGGRESSIVE) || empire_is_hostile(room_emp, ch_emp, to_room))) {
 		if (MOB_FLAGGED(ch, MOB_AGGRESSIVE | MOB_CITYGUARD)) {
 			if (!pursuit && EMPIRE_HAS_TECH(room_emp, TECH_LOCKS)) {
 				return FALSE;	// only locks blocks aggressive/cityguard, and only if not pursuing
