@@ -1515,6 +1515,7 @@ obj_data *perform_remove(char_data *ch, int pos) {
 
 
 static void perform_wear(char_data *ch, obj_data *obj, int where) {
+	bool any_match;
 	char buf[MAX_STRING_LENGTH];
 	struct obj_apply *apply;
 	int iter, type, val;
@@ -1570,15 +1571,17 @@ static void perform_wear(char_data *ch, obj_data *obj, int where) {
 	
 		// check weakness (check all applies first, in case they contradict like -1str +2str)
 		for (iter = 0; primary_attributes[iter] != NOTHING; ++iter) {
+			any_match = FALSE;
 			type = primary_attributes[iter];
 			val = GET_ATT(ch, type);
 			for (apply = GET_OBJ_APPLIES(obj); apply; apply = apply->next) {
 				if (apply_attribute[(int) apply->location] == type) {
 					val += apply->modifier;
+					any_match = TRUE;
 				}
 			}
 		
-			if (val < 1) {
+			if (val < 1 && any_match) {
 				sprintf(buf, "You are %s to use $p!", attributes[type].low_error);
 				act(buf, FALSE, ch, obj, 0, TO_CHAR);
 				return;
