@@ -712,7 +712,7 @@ typedef struct vehicle_data vehicle_data;
 #define BLD_IMMUNE_DAMAGE  BIT(24)	// building cannot be damaged
 #define BLD_HIDE_STORAGE_UNOWNED  BIT(25)	// only shows as storage when identifying objects if owned
 #define BLD_LIGHT  BIT(26)	// building is always light
-// #define BLD_UNUSED15  BIT(27)
+#define BLD_NO_WALKING_NPCS  BIT(27)	// mobs won't walk over but may fly over, like a fence
 // #define BLD_UNUSED16  BIT(28)
 #define BLD_SAIL  BIT(29)	// ships can pass through building
 // #define BLD_UNUSED17  BIT(30)

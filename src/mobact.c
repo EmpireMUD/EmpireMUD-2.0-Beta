@@ -1127,20 +1127,26 @@ bool mob_can_move_to_sect(char_data *mob, room_data *to_room) {
 * @param char_data *ch The mobile
 * @param int dir Which direction (NORTH, etc); may be NO_DIR
 * @param room_data *to_room The destination
+* @param bool pursuit If TRUE, loosens restrictions on movement due to a pursuit condition.
 * @return TRUE if the move is valid, FALSE otherwise
 */
-bool validate_mobile_move(char_data *ch, int dir, room_data *to_room) {
+bool validate_mobile_move(char_data *ch, int dir, room_data *to_room, bool pursuit) {
 	empire_data *ch_emp = GET_LOYALTY(ch);
 	empire_data *room_emp = ROOM_OWNER(to_room);
 	bool valid = TRUE;
 	
-	// !mob room
-	if (valid && (RMT_FLAGGED(to_room, RMT_NO_MOB) || (IS_COMPLETE(to_room) && ROOM_BLD_FLAGGED(to_room, BLD_NO_NPC)))) {
-		valid = FALSE;
+	// no-mob room template or no-npc building
+	if (!pursuit && (RMT_FLAGGED(to_room, RMT_NO_MOB) || (ROOM_BLD_FLAGGED(to_room, BLD_NO_NPC) && IS_COMPLETE(to_room)))) {
+		return FALSE;
 	}
 	
-	if (valid && ROOM_BLD_FLAGGED(to_room, BLD_BARRIER) && IS_COMPLETE(to_room)) {
-		valid = FALSE;
+	// barriers and fences
+	if (ROOM_BLD_FLAGGED(to_room, BLD_BARRIER | BLD_NO_WALKING_NPCS) && IS_COMPLETE(to_room) && (!AFF_FLAGGED(ch, AFF_FLYING) || ROOM_AFF_FLAGGED(to_room, ROOM_AFF_NO_FLY))) {
+		return FALSE;
+	}
+	
+	// things that only matter if they're not flying
+	if (!AFF_FLAGGED(ch, AFF_FLYING)) {
 	}
 	
 	// check building permissions (hostile empire locations only)
@@ -1223,7 +1229,7 @@ bool try_mobile_movement(char_data *ch) {
 			if (!(temp_room = get_vehicle_interior(veh))) {
 				continue; // no interior
 			}
-			if (!mob_can_move_to_sect(ch, temp_room) || !validate_mobile_move(ch, NO_DIR, temp_room)) {
+			if (!mob_can_move_to_sect(ch, temp_room) || !validate_mobile_move(ch, NO_DIR, temp_room, FALSE)) {
 				continue;	// won't go there
 			}
 			
@@ -1247,7 +1253,7 @@ bool try_mobile_movement(char_data *ch) {
 			if ((!ROOM_BLD_FLAGGED(to_room, BLD_OPEN) && !IS_COMPLETE(to_room)) || (!IS_ADVENTURE_ROOM(IN_ROOM(ch)) && !IS_INSIDE(IN_ROOM(ch)) && ROOM_IS_CLOSED(to_room) && BUILDING_ENTRANCE(to_room) != dir && (!ROOM_BLD_FLAGGED(to_room, BLD_TWO_ENTRANCES) || BUILDING_ENTRANCE(to_room) != rev_dir[dir]))) {
 				// can't go that way
 			}
-			else if (validate_mobile_move(ch, dir, to_room)) {
+			else if (validate_mobile_move(ch, dir, to_room, FALSE)) {
 				perform_move(ch, dir, to_room, MOVE_WANDER);
 			}
 		}
@@ -1256,7 +1262,7 @@ bool try_mobile_movement(char_data *ch) {
 		// indoor movement
 		to_room = use_exit->room_ptr;
 		
-		if (to_room && mob_can_move_to_sect(ch, to_room) && validate_mobile_move(ch, use_exit->dir, to_room)) {
+		if (to_room && mob_can_move_to_sect(ch, to_room) && validate_mobile_move(ch, use_exit->dir, to_room, FALSE)) {
 			perform_move(ch, use_exit->dir, to_room, MOVE_WANDER);
 		}
 	}

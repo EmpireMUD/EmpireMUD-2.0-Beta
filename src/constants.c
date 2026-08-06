@@ -3958,7 +3958,7 @@ const char *bld_flags[] = {
 	"IMMUNE-DAMAGE",
 	"HIDE-STORAGE-UNOWNED",	// 25
 	"LIGHT",
-	"*",
+	"NO-WALKING-NPCS",
 	"*",
 	"SAIL",
 	"*",	// 30
@@ -4012,7 +4012,7 @@ const char *bld_flag_notes[] = {
 	"",	// IMMUNE-DAMAGE
 	"",	// 25 - HIDE-STORAGE-UNOWNED
 	"",	// LIGHT
-	"",
+	"blocks walking npcs",	// NO-WALKING-NPCS
 	"",
 	"can sail here",
 	"",	// 30
