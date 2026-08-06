@@ -1733,7 +1733,7 @@ Available techs are:
  &cEnemy-Buff-Details&0 * - Can see full details using 'affects' on others.
  &cConceal-Equipment&0 * - Others cannot see your equipment on 'look'.
  &cConceal-Inventory&0 * - Others cannot see your inventory on 'look'.
- &cFlee-Upgrade&0 * - Increased chance to flee.
+ &cFlee-Upgrade&0 * - Increased chance to flee, lower wait after fleeing.
  &cFaster-Melee-Combat&0 * - Slight speed boost in melee combat.
  &cFaster-Ranged-Combat&0 * - Slight speed boost in ranged combat.
  &cRiding-Swap-Anywhere&0 * - Can mount-swap without a stable.

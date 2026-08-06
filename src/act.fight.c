@@ -337,7 +337,7 @@ ACMD(do_flee) {
 				if (was_fighting && can_gain_exp_from(ch, was_fighting, NULL)) {
 					gain_player_tech_exp(ch, PTECH_FLEE_UPGRADE, 15);
 				}
-				GET_WAIT_STATE(ch) = 2 RL_SEC;
+				GET_WAIT_STATE(ch) = (upgrade ? 2 RL_SEC : 1 RL_SEC);
 				run_ability_hooks_by_player_tech(ch, PTECH_FLEE_UPGRADE, NULL, NULL, NULL, NULL);
 			}
 			else {
