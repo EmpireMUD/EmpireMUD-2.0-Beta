@@ -305,13 +305,14 @@ struct icon_data *get_icon_from_set(struct icon_data *set, int type) {
 * @param bool minor_disrepair
 * @param int mine_view 0 = not a mine, 1 = mine with ore, -1 = mine with no ore
 * @param bool public
+* @param bool private
 * @param bool no_work
 * @param bool no_abandon
 * @param bool no_dismantle
 * @param bool chameleon
 * @return char* The color code.
 */
-char *get_informative_color(char_data *ch, bool dismantling, bool unfinished, bool major_disrepair, bool minor_disrepair, int mine_view, bool public, bool no_work, bool no_abandon, bool no_dismantle, bool chameleon) {
+char *get_informative_color(char_data *ch, bool dismantling, bool unfinished, bool major_disrepair, bool minor_disrepair, int mine_view, bool public, bool private, bool no_work, bool no_abandon, bool no_dismantle, bool chameleon) {
 	if (chameleon) {
 		return "\ty";
 	}
@@ -335,6 +336,9 @@ char *get_informative_color(char_data *ch, bool dismantling, bool unfinished, bo
 	}
 	else if (public && (!ch || INFORMATIVE_FLAGGED(ch, INFORMATIVE_PUBLIC))) {
 		return "\to";
+	}
+	else if (private && (!ch || INFORMATIVE_FLAGGED(ch, INFORMATIVE_PRIVATE))) {
+		return "\tp";
 	}
 	else if (no_work && (!ch || INFORMATIVE_FLAGGED(ch, INFORMATIVE_NO_WORK))) {
 		return "\tB";
@@ -362,12 +366,13 @@ char *get_informative_color(char_data *ch, bool dismantling, bool unfinished, bo
 * @param bool minor_disrepair
 * @param int mine_view 0 = not a mine, 1 = mine with ore, -1 = mine with no ore
 * @param bool public
+* @param bool private
 * @param bool no_work
 * @param bool no_abandon
 * @param bool no_dismantle
 * @param bool chameleon
 */
-void get_informative_string(char_data *ch, char *buffer, bool dismantling, bool unfinished, bool major_disrepair, bool minor_disrepair, int mine_view, bool public, bool no_work, bool no_abandon, bool no_dismantle, bool chameleon) {
+void get_informative_string(char_data *ch, char *buffer, bool dismantling, bool unfinished, bool major_disrepair, bool minor_disrepair, int mine_view, bool public, bool private, bool no_work, bool no_abandon, bool no_dismantle, bool chameleon) {
 	*buffer = '\0';
 
 	if (dismantling && (!ch || INFORMATIVE_FLAGGED(ch, INFORMATIVE_BUILDING_STATUS))) {
@@ -387,6 +392,9 @@ void get_informative_string(char_data *ch, char *buffer, bool dismantling, bool 
 	}
 	if (public && (!ch || INFORMATIVE_FLAGGED(ch, INFORMATIVE_PUBLIC))) {
 		sprintf(buffer + strlen(buffer), "%spublic", *buffer ? ", " :"");
+	}
+	if (private && (!ch || INFORMATIVE_FLAGGED(ch, INFORMATIVE_PRIVATE))) {
+		sprintf(buffer + strlen(buffer), "%sprivate", *buffer ? ", " :"");
 	}
 	if (no_work && (!ch || INFORMATIVE_FLAGGED(ch, INFORMATIVE_NO_WORK))) {
 		sprintf(buffer + strlen(buffer), "%sno-work", *buffer ? ", " :"");
@@ -1897,7 +1905,7 @@ void look_at_room_by_loc(char_data *ch, room_data *room, bitvector_t options, ve
 	emp = ROOM_OWNER(HOME_ROOM(room));
 	
 	if (GET_ROOM_VEHICLE(room) && VEH_OWNER(GET_ROOM_VEHICLE(room))) {
-		msg_to_char(ch, "The %s is owned by %s%s\t0%s.", skip_filler(VEH_SHORT_DESC(GET_ROOM_VEHICLE(room))), EMPIRE_BANNER(VEH_OWNER(GET_ROOM_VEHICLE(room))), EMPIRE_NAME(VEH_OWNER(GET_ROOM_VEHICLE(room))), ROOM_AFF_FLAGGED(HOME_ROOM(room), ROOM_AFF_PUBLIC) ? " (public)" : "");
+		msg_to_char(ch, "The %s is owned by %s%s\t0%s.", skip_filler(VEH_SHORT_DESC(GET_ROOM_VEHICLE(room))), EMPIRE_BANNER(VEH_OWNER(GET_ROOM_VEHICLE(room))), EMPIRE_NAME(VEH_OWNER(GET_ROOM_VEHICLE(room))), (ROOM_AFF_FLAGGED(HOME_ROOM(room), ROOM_AFF_PUBLIC) ? " (public)" : (ROOM_AFF_FLAGGED(HOME_ROOM(room), ROOM_AFF_PRIVATE) ? " (private)" : "")));
 		if (ROOM_PRIVATE_OWNER(HOME_ROOM(room)) != NOBODY) {
 			msg_to_char(ch, " This is %s's private residence.", (index = find_player_index_by_idnum(ROOM_PRIVATE_OWNER(HOME_ROOM(room)))) ? index->fullname : "someone");
 		}
@@ -1917,6 +1925,9 @@ void look_at_room_by_loc(char_data *ch, room_data *room, bitvector_t options, ve
 		
 		if (ROOM_AFF_FLAGGED(HOME_ROOM(room), ROOM_AFF_PUBLIC)) {
 			msg_to_char(ch, " (public)");
+		}
+		if (ROOM_AFF_FLAGGED(HOME_ROOM(room), ROOM_AFF_PRIVATE)) {
+			msg_to_char(ch, " (private)");
 		}
 		if (emp == GET_LOYALTY(ch) && ROOM_AFF_FLAGGED(HOME_ROOM(room), ROOM_AFF_NO_DISMANTLE)) {
 			msg_to_char(ch, " (no-dismantle)");

@@ -3575,6 +3575,7 @@ Some affects are managed by live data and commands (do not set affects with *):
  *TEMPORARY - will be removed when instance is cleaned up
  *UNCLAIMABLE - cannot be claimed
  *PUBLIC - can be used by empires other than the owner
+ *PRIVATE - cannot be used by allied empires
  *DISMANTLING - someone started dismantling it
  *IN-VEHICLE - room is part of the interior of a vehicle
  *!WORK - workforce ignores the room

@@ -1422,7 +1422,7 @@ bool emp_can_use_room(empire_data *emp, room_data *room, int mode) {
 		return TRUE;
 	}
 	// check allies if not a private room
-	if (mode != MEMBERS_ONLY && ROOM_PRIVATE_OWNER(homeroom) == NOBODY && has_relationship(ROOM_OWNER(homeroom), emp, DIPL_ALLIED)) {
+	if (mode != MEMBERS_ONLY && ROOM_PRIVATE_OWNER(homeroom) == NOBODY && !ROOM_AFF_FLAGGED(homeroom, ROOM_AFF_PRIVATE) && has_relationship(ROOM_OWNER(homeroom), emp, DIPL_ALLIED)) {
 		return TRUE;
 	}
 	
@@ -1456,7 +1456,7 @@ bool emp_can_use_vehicle(empire_data *emp, vehicle_data *veh, int mode) {
 		return TRUE;
 	}
 	// check allies
-	if (mode != MEMBERS_ONLY && emp && has_relationship(VEH_OWNER(veh), emp, DIPL_ALLIED)) {
+	if (mode != MEMBERS_ONLY && emp && !VEH_IS_PRIVATE(veh) && has_relationship(VEH_OWNER(veh), emp, DIPL_ALLIED)) {
 		return TRUE;
 	}
 	

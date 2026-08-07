@@ -1104,6 +1104,7 @@ const char *informative_view_bits[] = {
 	"no-work",
 	"no-abandon",	// 5
 	"no-dismantle",
+	"public",
 	"\n"
 };
 
@@ -4678,6 +4679,7 @@ const char *room_aff_bits[] = {
 	"MAPOUT-BUILDING",
 	"NO-TRACKS",	// 25
 	"PERMANENT-PAINT",
+	"*PRIVATE",
 	"\n"
 };
 
@@ -4711,6 +4713,7 @@ const char *room_aff_notes[] = {
 	"",	// MAPOUT-BUILDING
 	"",	// 25 - NO-TRACKS
 	"", // PERMANENT-PAINT
+	"",	// PRIVATE
 	"\n"
 };
 

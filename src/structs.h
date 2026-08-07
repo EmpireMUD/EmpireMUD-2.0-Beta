@@ -2346,9 +2346,10 @@ typedef enum {
 #define INFORMATIVE_NO_WORK  BIT(4)	// d. workforce is off
 #define INFORMATIVE_NO_ABANDON  BIT(5)	// e. protection against abandon
 #define INFORMATIVE_NO_DISMANTLE  BIT(6)	// f. workforce won't dismantle
+#define INFORMATIVE_PRIVATE  BIT(7)	// g. tile flagged as private
 
 // flags set at character creation
-#define DEFAULT_INFORMATIVE_BITS  (INFORMATIVE_BUILDING_STATUS | INFORMATIVE_DISREPAIR | INFORMATIVE_MINE_STATUS | INFORMATIVE_PUBLIC | INFORMATIVE_NO_WORK | INFORMATIVE_NO_ABANDON | INFORMATIVE_NO_DISMANTLE)
+#define DEFAULT_INFORMATIVE_BITS  (INFORMATIVE_BUILDING_STATUS | INFORMATIVE_DISREPAIR | INFORMATIVE_MINE_STATUS | INFORMATIVE_PUBLIC | INFORMATIVE_PRIVATE | INFORMATIVE_NO_WORK | INFORMATIVE_NO_ABANDON | INFORMATIVE_NO_DISMANTLE)
 
 
 // LASTNAME_x: config players lastname_mode: determines how players get last names
@@ -3066,6 +3067,7 @@ typedef enum {
 #define ROOM_AFF_MAPOUT_BUILDING  BIT(24)	// y. shows as a building on the mapout (set automatically)
 #define ROOM_AFF_NO_TRACKS  BIT(25)		// z. nobody leaves tracks and you cannot track
 #define ROOM_AFF_PERMANENT_PAINT  BIT(26)	// A. paint displays different and cannot be repainted; removed automatically on dismantle
+#define ROOM_AFF_PRIVATE  BIT(27)	// B. Empire forbids allies (private)
 // NOTE: limit BIT(31) -- This is currently an unsigned int, to save space since there are a lot of rooms in the world
 
 

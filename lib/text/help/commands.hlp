@@ -1394,6 +1394,7 @@ map see tiles in color:
   &g/[]\&0  has minable ore (mine-status)
   &r/\/\&0  depleted/no ore (mine-status)
   &o{LL}&0  public
+  &p(PP)&0  private
   &B^^^^&0  no-work
   &VW*WW&0  no-abandon
   &J.().&0  no-dismantle

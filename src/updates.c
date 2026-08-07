@@ -957,7 +957,7 @@ void b5_19_world_fix(void) {
 	bld_data *bld;
 	
 	bitvector_t flags_to_wipe = ROOM_AFF_MAGIC_DARKNESS | ROOM_AFF_SILENT | ROOM_AFF_NO_WEATHER | ROOM_AFF_NO_TELEPORT;
-	bitvector_t empire_only_flags = ROOM_AFF_PUBLIC | ROOM_AFF_NO_WORK | ROOM_AFF_NO_DISMANTLE | ROOM_AFF_NO_ABANDON;
+	bitvector_t empire_only_flags = ROOM_AFF_PUBLIC | ROOM_AFF_PRIVATE | ROOM_AFF_NO_WORK | ROOM_AFF_NO_DISMANTLE | ROOM_AFF_NO_ABANDON;
 	
 	LL_FOREACH(land_map, map) {
 		if (!map->shared->affects && !map->shared->base_affects) {
