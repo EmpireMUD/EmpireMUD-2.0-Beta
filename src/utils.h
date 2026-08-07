@@ -1879,6 +1879,7 @@ static inline int GET_SEASON(room_data *room) {
 #define VEH_OR_BLD(veh)  (VEH_FLAGGED((veh), VEH_BUILDING) ? "building" : "vehicle")
 #define VEH_PAINT_COLOR(veh)  get_vehicle_extra_data((veh), ROOM_EXTRA_PAINT_COLOR)
 #define VEH_PATRON(veh)  get_vehicle_extra_data((veh), ROOM_EXTRA_DEDICATE_ID)
+#define VEH_PURGES_WHEN_TILE_RUINS(veh)  (!VEH_OWNER(veh) && !VEH_CONTAINS(veh) && !VEH_REGULAR_MAINTENANCE(veh) && !VEH_FLAGGED((veh), VEH_IS_RUINS))
 #define VEH_PROVIDES_LIGHT(veh)  (VEH_FLAGGED((veh), VEH_BUILDING) && (VEH_OWNER(veh) || (IN_ROOM(veh) && ROOM_AFF_FLAGGED(IN_ROOM(veh), ROOM_AFF_UNCLAIMABLE))))
 
 

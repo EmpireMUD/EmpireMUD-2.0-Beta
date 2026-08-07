@@ -3748,7 +3748,7 @@ INTERACTION_FUNC(ruin_building_to_building_interaction) {
 	
 	// remove any unclaimed/empty vehicles (like furniture) -- those crumble with the building
 	DL_FOREACH_SAFE2(ROOM_VEHICLES(inter_room), veh_iter, next_veh, next_in_room) {
-		if (!VEH_OWNER(veh_iter) && !VEH_CONTAINS(veh_iter)) {
+		if (VEH_PURGES_WHEN_TILE_RUINS(veh_iter)) {
 			extract_vehicle(veh_iter);
 		}
 	}
@@ -3877,7 +3877,7 @@ INTERACTION_FUNC(ruin_building_to_vehicle_interaction) {
 	
 	// remove any unclaimed/empty vehicles (like furniture) -- those crumble with the building
 	DL_FOREACH_SAFE2(ROOM_VEHICLES(inter_room), veh_iter, next_veh, next_in_room) {
-		if (veh_iter != ruin && !VEH_OWNER(veh_iter) && !VEH_CONTAINS(veh_iter)) {
+		if (veh_iter != ruin && VEH_PURGES_WHEN_TILE_RUINS(veh_iter)) {
 			extract_vehicle(veh_iter);
 		}
 	}
@@ -3962,7 +3962,7 @@ void ruin_one_building(room_data *room) {
 	
 		// remove any unclaimed/empty vehicles that don't require maintenance (like furniture) -- those crumble with the building
 		DL_FOREACH_SAFE2(ROOM_VEHICLES(room), veh, next_veh, next_in_room) {
-			if (!VEH_OWNER(veh) && !VEH_CONTAINS(veh) && !VEH_REGULAR_MAINTENANCE(veh) && !VEH_FLAGGED(veh, VEH_IS_RUINS)) {
+			if (VEH_PURGES_WHEN_TILE_RUINS(veh)) {
 				extract_vehicle(veh);
 			}
 		}
