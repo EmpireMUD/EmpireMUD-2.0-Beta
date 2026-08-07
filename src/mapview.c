@@ -338,7 +338,7 @@ char *get_informative_color(char_data *ch, bool dismantling, bool unfinished, bo
 		return "\to";
 	}
 	else if (private && (!ch || INFORMATIVE_FLAGGED(ch, INFORMATIVE_PRIVATE))) {
-		return "\tp";
+		return "\tP";
 	}
 	else if (no_work && (!ch || INFORMATIVE_FLAGGED(ch, INFORMATIVE_NO_WORK))) {
 		return "\tB";

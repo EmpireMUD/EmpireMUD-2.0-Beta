@@ -1104,7 +1104,7 @@ const char *informative_view_bits[] = {
 	"no-work",
 	"no-abandon",	// 5
 	"no-dismantle",
-	"public",
+	"private",
 	"\n"
 };
 
