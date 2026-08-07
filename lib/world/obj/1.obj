@@ -382,10 +382,13 @@ a small flower~
 A small flower has been dropped here.~
 It's a very pretty flower.
 ~
-3 kl a 0 0 2
+3 kl a 0 0 3
 0 0 0
 7 64
 I 25 3090 100.00 1  # SEED: pocketful of wildflower seeds
+M
+33
+Note: This item does not count as the (flowers) component.~
 S
 #124
 heavy-log log logs heavy pillars~
