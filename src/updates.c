@@ -5022,6 +5022,15 @@ void b5_212a_stables_update(void) {
 }
 
 
+// b5.212b: player informative updates
+PLAYER_UPDATE_FUNC(b5_212_update_player_informative) {
+	check_delayed_load(ch);
+	if (INFORMATIVE_FLAGGED(ch, INFORMATIVE_PUBLIC)) {
+		SET_BIT(GET_INFORMATIVE_FLAGS(ch), INFORMATIVE_PRIVATE);
+	}
+}
+
+
 // ADD HERE, above: more beta 5 update functions
 
 
@@ -5153,6 +5162,7 @@ const struct {
 	{ "b5.210", b5_210_companion_update, NULL, "Updating companions with new triggers" },
 	{ "b5.212", b5_212_foothills_fix, NULL, "Repairing foothills that were converted to plains by adventures" },
 	{ "b5.212a", b5_212a_stables_update, NULL, "Removing learned recipe for Stables; this now just requires the Build ability" },
+	{ "b5.212b", NULL, b5_212_update_player_informative, "Updating players with new private informative flag" },
 	
 	// ADD HERE, above: more beta 5 update lines
 	
