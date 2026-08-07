@@ -3959,9 +3959,9 @@ void ruin_one_building(room_data *room) {
 			act("The building around you crumbles to ruin!", FALSE, ROOM_PEOPLE(room), NULL, NULL, TO_CHAR | TO_ROOM);
 		}
 	
-		// remove any unclaimed/empty vehicles (like furniture) -- those crumble with the building
+		// remove any unclaimed/empty vehicles that don't require maintenance (like furniture) -- those crumble with the building
 		DL_FOREACH_SAFE2(ROOM_VEHICLES(room), veh, next_veh, next_in_room) {
-			if (!VEH_OWNER(veh) && !VEH_CONTAINS(veh)) {
+			if (!VEH_OWNER(veh) && !VEH_CONTAINS(veh) && !VEH_REGULAR_MAINTENANCE(veh) && !VEH_FLAGGED(veh, VEH_IS_RUINS)) {
 				extract_vehicle(veh);
 			}
 		}
