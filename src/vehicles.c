@@ -114,22 +114,24 @@ void check_decayed_vehicle_abandon(vehicle_data *veh) {
 	bool any = FALSE;
 	
 	if (!VEH_OWNER(veh)) {
+		// abandon nothing if un-owned
 		return;
 	}
 	else if (!VEH_CLAIMS_WITH_ROOM(veh)) {
+		// just abandon the vehicle itself
 		perform_abandon_vehicle(veh);
 		return;
 	}
 	
-	// otherwise check the room for any non-decayed vehicles that claim with room
-	if (IN_ROOM(veh)) {
+	// otherwise, if check the room for any non-decayed/non-ruins vehicles that claim with room
+	if (IN_ROOM(veh) && ROOM_OWNER(IN_ROOM(veh)) && (!IS_ANY_BUILDING(IN_ROOM(veh)) || ROOM_BLD_FLAGGED(IN_ROOM(veh), BLD_IS_RUINS)) && HOME_ROOM(IN_ROOM(veh)) == IN_ROOM(veh)) {
 		DL_FOREACH2(ROOM_VEHICLES(IN_ROOM(veh)), iter, next_in_room) {
-			if (VEH_CLAIMS_WITH_ROOM(iter) && VEH_HEALTH(iter) > 0) {
+			if (iter != veh && VEH_CLAIMS_WITH_ROOM(iter) && VEH_HEALTH(iter) > 0 && !VEH_FLAGGED(iter, VEH_IS_RUINS)) {
 				any = TRUE;
 			}
 		}
 		
-		if (!any && ROOM_OWNER(IN_ROOM(veh)) && HOME_ROOM(IN_ROOM(veh)) == IN_ROOM(veh)) {
+		if (!any) {
 			abandon_room(IN_ROOM(veh));
 		}
 	}
