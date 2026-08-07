@@ -1482,7 +1482,7 @@ void annual_update_vehicle(vehicle_data *veh) {
 	annual_update_depletions(&VEH_DEPLETION(veh));
 	
 	// does not take annual damage (unless incomplete)
-	if (!VEH_REGULAR_MAINTENANCE(veh) && VEH_IS_COMPLETE(veh)) {
+	if (!VEH_REGULAR_MAINTENANCE(veh) && VEH_IS_COMPLETE(veh) && !VEH_FLAGGED(veh, VEH_IS_RUINS)) {
 		// check if it's abandoned furniture: no owner, unowned room, no instance id, not in an adventure, no players here
 		if (!VEH_OWNER(veh) && VEH_INSTANCE_ID(veh) != NOTHING && IN_ROOM(veh) && !ROOM_OWNER(IN_ROOM(veh)) && !IS_ADVENTURE_ROOM(IN_ROOM(veh)) && !any_players_in_room(IN_ROOM(veh))) {
 			// random chance of decay
@@ -1495,7 +1495,7 @@ void annual_update_vehicle(vehicle_data *veh) {
 	}
 	
 	// prepare to decay (ruins have special handling here)
-	if (VEH_FLAGGED(veh, VEH_IS_RUINS)) {
+	if (VEH_FLAGGED(veh, VEH_IS_RUINS) && !VEH_OWNER(veh)) {
 		// chance of ruining ruins: roughly 2 real years for average chance for ruins to be gone
 		if (!number(0, 89)) {
 			msg = veh_get_custom_message(veh, VEH_CUSTOM_RUINS_TO_ROOM);
