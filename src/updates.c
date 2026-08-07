@@ -5000,6 +5000,28 @@ void b5_212_foothills_fix(void) {
 }
 
 
+// b5.212a: Removing learned recipe for Stables; this now just requires the Build ability instead of a progress goal
+void b5_212a_stables_update(void) {
+	struct player_craft_data *pcd;
+	empire_data *emp, *next_emp;
+	
+	// will remove this from empires' learned lists
+	const any_vnum STABLE_CRAFT_VNUM = 5111;
+		
+	HASH_ITER(hh, empire_table, emp, next_emp) {
+		// find
+		HASH_FIND_INT(EMPIRE_LEARNED_CRAFTS(emp), &STABLE_CRAFT_VNUM, pcd);
+		
+		// and delete
+		if (pcd) {
+			HASH_DEL(EMPIRE_LEARNED_CRAFTS(emp), pcd);
+			free(pcd);
+			EMPIRE_NEEDS_SAVE(emp) = TRUE;
+		}
+	}
+}
+
+
 // ADD HERE, above: more beta 5 update functions
 
 
@@ -5130,6 +5152,7 @@ const struct {
 	{ "b5.208a", b5_208_portal_triggers, NULL, "Adding missing portal triggers" },
 	{ "b5.210", b5_210_companion_update, NULL, "Updating companions with new triggers" },
 	{ "b5.212", b5_212_foothills_fix, NULL, "Repairing foothills that were converted to plains by adventures" },
+	{ "b5.212a", b5_212a_stables_update, NULL, "Removing learned recipe for Stables; this now just requires the Build ability" },
 	
 	// ADD HERE, above: more beta 5 update lines
 	
