@@ -120,6 +120,7 @@ Basic buildings granted by the Build ability:
   (FF) forge
   (MM) mill  (must be by a river)
   (PP) potter
+  (SS) stable
   &g.^.&co&0 park
   .{}. shrine
   vvvv fence
@@ -1127,7 +1128,7 @@ See also: PROCESS, SPICES
 #
 STABLE
 
-(SS)  Stable  (Livestock Livelihood ability)
+(SS)  Stable  (Build ability)
 
 Stables are a safe place to keep your animals. You can also use them as a place
 to milk cows or shear sheep. This is also where you can barde horses.
