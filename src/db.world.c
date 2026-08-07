@@ -1471,15 +1471,16 @@ void annual_update_map_tile(struct map_data *tile) {
 void annual_update_vehicle(vehicle_data *veh) {
 	char *msg;
 	
-	if (VEH_OWNER(veh) && EMPIRE_ADMIN_FLAGGED(VEH_OWNER(veh), EADM_NO_DECAY)) {
-		return;	// skip empire's vehicles
-	}
-	
 	// ensure a save
 	request_vehicle_save_in_world(veh);
 	
 	// non-damage stuff:
 	annual_update_depletions(&VEH_DEPLETION(veh));
+	
+	// admin skip?
+	if (VEH_OWNER(veh) && EMPIRE_ADMIN_FLAGGED(VEH_OWNER(veh), EADM_NO_DECAY)) {
+		return;	// skip empire's vehicles
+	}
 	
 	// does not take annual damage (unless incomplete)
 	if (!VEH_REGULAR_MAINTENANCE(veh) && VEH_IS_COMPLETE(veh) && !VEH_FLAGGED(veh, VEH_IS_RUINS)) {
