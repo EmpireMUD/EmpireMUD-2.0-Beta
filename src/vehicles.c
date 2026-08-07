@@ -852,12 +852,10 @@ INTERACTION_FUNC(ruin_vehicle_to_vehicle_interaction) {
 	vehicle_to_room(ruin, room);
 	scale_vehicle_to_level(ruin, VEH_SCALE_LEVEL(inter_veh));	// attempt auto-detect of level
 	
-	// do not transfer ownership -- ruins never default to 'claimed'
-	/*
+	// ensure a claims-with-room vehicle claims correctly (auto-abandon on the room already happened, if applicable)
 	if (VEH_CLAIMS_WITH_ROOM(ruin) && ROOM_OWNER(HOME_ROOM(room))) {
 		perform_claim_vehicle(ruin, ROOM_OWNER(HOME_ROOM(room)));
 	}
-	*/
 	
 	// move contents
 	if ((inside = get_vehicle_interior(ruin))) {
@@ -943,10 +941,10 @@ INTERACTION_FUNC(ruin_vehicle_to_vehicle_interaction) {
 * @param char *message Optional: An act string (using $V for the vehicle) to send to the room. (NULL for none)
 */
 void ruin_vehicle(vehicle_data *veh, char *message) {
-	bool was_bld = VEH_FLAGGED(veh, VEH_BUILDING) ? TRUE : FALSE;
-	empire_data *emp = VEH_OWNER(veh);
-	room_data *room = IN_ROOM(veh);
 	struct vehicle_room_list *vrl;
+	
+	// ensure correct abandonment
+	check_decayed_vehicle_abandon(veh);
 	
 	if (!destroy_vtrigger(veh, "ruins")) {
 		VEH_HEALTH(veh) = MAX(1, VEH_HEALTH(veh));	// ensure health
@@ -971,11 +969,6 @@ void ruin_vehicle(vehicle_data *veh, char *message) {
 	
 	fully_empty_vehicle(veh, IN_ROOM(veh));
 	extract_vehicle(veh);
-	
-	// auto-abandon if it was the last building-vehicle and was ruined
-	if (was_bld && room && emp && count_building_vehicles_in_room(room, emp) == 0) {
-		abandon_room(room);
-	}
 }
 
 
