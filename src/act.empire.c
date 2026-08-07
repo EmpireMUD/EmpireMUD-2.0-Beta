@@ -1603,7 +1603,7 @@ void show_workforce_why(empire_data *emp, char_data *ch, char *argument) {
 			last_chore = wf_log->chore;
 			last_problem = wf_log->problem;
 			count = 1;
-			while (wf_log && wf_log->next && wf_log->next->chore == last_chore && wf_log->next->problem == last_problem) {
+			while (wf_log && wf_log->next && wf_log->next->chore == last_chore && wf_log->next->problem == last_problem && (last_problem != WF_PROB_ADVENTURE_PRESENT || wf_log->next->loc == GET_ROOM_VNUM(IN_ROOM(ch)))) {
 				count += wf_log->count;
 				wf_log = wf_log->next;	// advance past identical entries
 			}
