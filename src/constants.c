@@ -5383,6 +5383,8 @@ const char *global_flags[] = {
 	"CUMULATIVE-PRC",
 	"CHOOSE-LAST",
 	"RARE",
+	"NO-NEWBIE",	// 5
+	"NEWBIE-ONLY",
 	"\n"
 };
 

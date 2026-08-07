@@ -5236,7 +5236,7 @@ void start_new_character(char_data *ch) {
 	}
 	
 	// global newbie gear
-	run_globals(GLOBAL_NEWBIE_GEAR, run_global_newbie_gear, TRUE, NOBITS, ch, NULL, 0, NULL, NULL);
+	run_globals(GLOBAL_NEWBIE_GEAR, run_global_newbie_gear, TRUE, NOBITS, ch, IN_ROOM(ch), NULL, 0, NULL, NULL);
 	
 	// basic updates
 	determine_gear_level(ch);

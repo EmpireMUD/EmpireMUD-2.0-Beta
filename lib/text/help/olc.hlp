@@ -5665,6 +5665,8 @@ Available flags:
     be saved for later, and only used if no other global succeeds. This can
     be used to create 100% "choose if nothing else passes" final cases.
  RARE - Requires a special flag, e.g. Rare Metals for mine type.
+ NO-NEWBIE - Won't occur on newbie islands.
+ NEWBIE-ONLY - Only occurs on newbie islands.
 
 See also: GEDIT PERCENT, OLC GLOBALS
 #d

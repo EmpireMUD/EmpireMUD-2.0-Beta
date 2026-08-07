@@ -1841,7 +1841,7 @@ void spawn_one_room(room_data *room, bool only_artisans) {
 				data->x_coord = X_COORD(room);
 				data->y_coord = Y_COORD(room);
 				data->in_city = (ROOM_OWNER(home) && is_in_city_for_empire(room, ROOM_OWNER(home), TRUE, &junk)) ? TRUE : FALSE;
-				run_globals(GLOBAL_MAP_SPAWNS, run_global_map_spawns, TRUE, get_climate(room), NULL, NULL, 0, validate_global_map_spawns, data);
+				run_globals(GLOBAL_MAP_SPAWNS, run_global_map_spawns, TRUE, get_climate(room), NULL, room, NULL, 0, validate_global_map_spawns, data);
 				free(data);
 			}
 		}

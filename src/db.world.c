@@ -888,7 +888,7 @@ void init_mine(room_data *room, char_data *ch, empire_data *emp) {
 	CREATE(data, struct glb_room_emp_bean, 1);
 	data->empire = emp;
 	data->room = room;
-	run_globals(GLOBAL_MINE_DATA, run_global_mine_data, FALSE, GET_SECT_FLAGS(BASE_SECT(room)), ch, (GET_ROOM_TEMPLATE(room) ? get_adventure_for_vnum(GET_RMT_VNUM(GET_ROOM_TEMPLATE(room))) : NULL), ch ? GET_COMPUTED_LEVEL(ch) : 0, validate_global_mine_data, data);
+	run_globals(GLOBAL_MINE_DATA, run_global_mine_data, FALSE, GET_SECT_FLAGS(BASE_SECT(room)), ch, room, (GET_ROOM_TEMPLATE(room) ? get_adventure_for_vnum(GET_RMT_VNUM(GET_ROOM_TEMPLATE(room))) : NULL), ch ? GET_COMPUTED_LEVEL(ch) : 0, validate_global_mine_data, data);
 	free(data);
 }
 
