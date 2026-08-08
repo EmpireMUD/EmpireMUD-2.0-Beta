@@ -3905,8 +3905,8 @@ void autowiz_write_wizlist(int mode, FILE *out, int minlev, int maxlev) {
 * Reloads the wizlist and godlist files.
 */
 void reload_wizlists(void) {
-	reload_text_string(TEXT_FILE_WIZLIST);
-	reload_text_string(TEXT_FILE_GODLIST);
+	reload_text_string(NULL, TEXT_FILE_WIZLIST);
+	reload_text_string(NULL, TEXT_FILE_GODLIST);
 }
 
 
@@ -5236,7 +5236,7 @@ void start_new_character(char_data *ch) {
 	}
 	
 	// global newbie gear
-	run_globals(GLOBAL_NEWBIE_GEAR, run_global_newbie_gear, TRUE, NOBITS, ch, NULL, 0, NULL, NULL);
+	run_globals(GLOBAL_NEWBIE_GEAR, run_global_newbie_gear, TRUE, NOBITS, ch, IN_ROOM(ch), NULL, 0, NULL, NULL);
 	
 	// basic updates
 	determine_gear_level(ch);

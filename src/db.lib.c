@@ -3937,30 +3937,6 @@ void save_all_empires(void) {
 }
 
 
-/**
-* Delayed empire saves -- things marked as needing saves.
-*/
-void save_marked_empires(void) {
-	empire_data *emp, *next_emp;
-	
-	if (block_all_saves_due_to_shutdown) {
-		return;
-	}
-	
-	HASH_ITER(hh, empire_table, emp, next_emp) {
-		if (EMPIRE_NEEDS_SAVE(emp)) {
-			save_empire(emp, FALSE);
-		}
-		if (EMPIRE_NEEDS_STORAGE_SAVE(emp)) {
-			save_empire_storage(emp);
-		}
-		if (EMPIRE_NEEDS_LOGS_SAVE(emp)) {
-			save_empire_logs(emp);
-		}
-	}
-}
-
-
  //////////////////////////////////////////////////////////////////////////////
 //// EMPIRE NPC LIB //////////////////////////////////////////////////////////
 

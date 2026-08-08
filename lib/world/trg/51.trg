@@ -393,6 +393,20 @@ elseif !%actor.canuseroom_guest%
   %send% %actor% You wouldn't want to get caught bathing in here.
   halt
 end
+* already bathing?
+set any 0
+set obj %room.contents%
+while %obj% && !%any%
+  if %obj.vnum% == 5162 && %obj.val0% == %actor.id%
+    set any 1
+  end
+  set obj %obj.next_in_list%
+done
+if %any%
+  %send% %actor% You are already bathing.
+  return 1
+  halt
+end
 * ok bathe:
 %load% obj 5162
 set obj %room.contents%
@@ -408,10 +422,12 @@ nop %obj.val1(4)%
 set stop_command 0
 set stop_message_char You climb out of the water and get dressed.
 set stop_message_room ~%actor% climbs out of the water and gets dressed.
+set stop_room_lock %room.id%
 set needs_stop_command 1
 remote stop_command %actor.id%
 remote stop_message_char %actor.id%
 remote stop_message_room %actor.id%
+remote stop_room_lock %actor.id%
 remote needs_stop_command %actor.id%
 * start messages
 if %actor.eq(clothes)%

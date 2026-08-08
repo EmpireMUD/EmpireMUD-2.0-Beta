@@ -1084,6 +1084,7 @@ See also: OLC ABILITIES, DAMAGE ABILITY, DOT ABILITY
 
 Usage:  .data add <type> <name | vnum>
         .data remove <number | all>
+        .data move <number> <up | down>
 
 The 'data' field is used by different types of abilities. Available types are:
  &cPTECH&0 - Player technologies. Used by the PTECH ability type.
@@ -1380,7 +1381,7 @@ restore blood. Red Mist cannot check the immunity itself because its target is
 the player who's attacking, not the victim of the attack. Splash Blood fills in
 the middle link for this.
 
-See also: OLC ABILITIES
+See also: OLC ABILITIES, ABILEDIT LINKED TRAIT
 #d
 "ABILEDIT LINKEDTRAIT" "ABILEDIT LINKED TRAIT"
 
@@ -1396,7 +1397,7 @@ The following traits cannot be used: &rHEALTH-REGEN, MOVE-REGEN, MANA-REGEN,
 AGE, MAX-MOVE, HEAL-OVER-TIME, MAX-HEALTH, MAX-MANA, INVENTORY, MAX-BLOOD,
 CRAFTING, BLOOD-UPKEEP&0
 
-See also: OLC ABILITIES, APPLIES
+See also: OLC ABILITIES, ABILEDIT LINK ABILITY, APPLIES
 #d
 "ABILEDIT MASTERYABILITY" "ABILEDIT MASTERY ABILITY"
 
@@ -1733,7 +1734,7 @@ Available techs are:
  &cEnemy-Buff-Details&0 * - Can see full details using 'affects' on others.
  &cConceal-Equipment&0 * - Others cannot see your equipment on 'look'.
  &cConceal-Inventory&0 * - Others cannot see your inventory on 'look'.
- &cFlee-Upgrade&0 * - Increased chance to flee.
+ &cFlee-Upgrade&0 * - Increased chance to flee, lower wait after fleeing.
  &cFaster-Melee-Combat&0 * - Slight speed boost in melee combat.
  &cFaster-Ranged-Combat&0 * - Slight speed boost in ranged combat.
  &cRiding-Swap-Anywhere&0 * - Can mount-swap without a stable.
@@ -3575,6 +3576,7 @@ Some affects are managed by live data and commands (do not set affects with *):
  *TEMPORARY - will be removed when instance is cleaned up
  *UNCLAIMABLE - cannot be claimed
  *PUBLIC - can be used by empires other than the owner
+ *PRIVATE - cannot be used by allied empires
  *DISMANTLING - someone started dismantling it
  *IN-VEHICLE - room is part of the interior of a vehicle
  *!WORK - workforce ignores the room
@@ -3756,6 +3758,7 @@ Available flags:
     if BURNABLE is set; only takes yearly decay if resources are set)
  &cHIDE-STORAGE-UNOWNED&0 - only shows as storage when identifying objects if owned
  &cLIGHT&0 - building is always light (mainly for adventures)
+ &cNO-WALKING-NPCS&0 - mobs won't walk in but may fly over (like a fence)
  &cSAIL&0 - can enter this building with a boat
  &cITEM-LIMIT&0 - only a certain number of items can be dropped here
  &cLONG-AUTOSTORE&0 - autostore takes 72 hours instead of 3 here
@@ -5664,6 +5667,8 @@ Available flags:
     be saved for later, and only used if no other global succeeds. This can
     be used to create 100% "choose if nothing else passes" final cases.
  RARE - Requires a special flag, e.g. Rare Metals for mine type.
+ NO-NEWBIE - Won't occur on newbie islands.
+ NEWBIE-ONLY - Only occurs on newbie islands.
 
 See also: GEDIT PERCENT, OLC GLOBALS
 #d

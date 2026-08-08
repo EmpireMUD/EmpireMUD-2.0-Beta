@@ -938,7 +938,7 @@ ACMD(do_steal) {
 						gain_player_tech_exp(ch, PTECH_STEAL_UPGRADE, 50);
 					}
 
-					read_vault(emp);
+					TRIGGER_DELAYED_REFRESH(emp, DELAY_REFRESH_VAULT);
 				
 					GET_WAIT_STATE(ch) = 4 RL_SEC;	// long wait
 					run_ability_hooks_by_player_tech(ch, PTECH_STEAL_COMMAND, NULL, NULL, NULL, NULL);

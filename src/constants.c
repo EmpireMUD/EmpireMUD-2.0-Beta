@@ -63,7 +63,7 @@ void tog_pvp(char_data *ch);
 //// EMPIREMUD CONSTANTS /////////////////////////////////////////////////////
 
 // Shown on the "version" command and sent over MSSP
-const char *version = "EmpireMUD 2.0 beta 5.211";
+const char *version = "EmpireMUD 2.0 beta 5.212";
 const char *DG_SCRIPT_VERSION = "DG Scripts 1.0.12 e5.1.22";
 
 
@@ -1104,6 +1104,7 @@ const char *informative_view_bits[] = {
 	"no-work",
 	"no-abandon",	// 5
 	"no-dismantle",
+	"private",
 	"\n"
 };
 
@@ -3958,7 +3959,7 @@ const char *bld_flags[] = {
 	"IMMUNE-DAMAGE",
 	"HIDE-STORAGE-UNOWNED",	// 25
 	"LIGHT",
-	"*",
+	"NO-WALKING-NPCS",
 	"*",
 	"SAIL",
 	"*",	// 30
@@ -4012,7 +4013,7 @@ const char *bld_flag_notes[] = {
 	"",	// IMMUNE-DAMAGE
 	"",	// 25 - HIDE-STORAGE-UNOWNED
 	"",	// LIGHT
-	"",
+	"blocks walking npcs",	// NO-WALKING-NPCS
 	"",
 	"can sail here",
 	"",	// 30
@@ -4678,6 +4679,7 @@ const char *room_aff_bits[] = {
 	"MAPOUT-BUILDING",
 	"NO-TRACKS",	// 25
 	"PERMANENT-PAINT",
+	"*PRIVATE",
 	"\n"
 };
 
@@ -4711,6 +4713,7 @@ const char *room_aff_notes[] = {
 	"",	// MAPOUT-BUILDING
 	"",	// 25 - NO-TRACKS
 	"", // PERMANENT-PAINT
+	"",	// PRIVATE
 	"\n"
 };
 
@@ -5383,6 +5386,8 @@ const char *global_flags[] = {
 	"CUMULATIVE-PRC",
 	"CHOOSE-LAST",
 	"RARE",
+	"NO-NEWBIE",	// 5
+	"NEWBIE-ONLY",
 	"\n"
 };
 

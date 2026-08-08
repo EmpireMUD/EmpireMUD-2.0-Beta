@@ -198,16 +198,34 @@ ACMD(do_consider) {
 			any = TRUE;
 		}
 
-		// hit/dodge
+		// hit
 		hitch = get_to_hit(ch, vict, FALSE, FALSE) - get_dodge_modifier(vict, ch, FALSE);
+		*buf = '\0';
+		if (IS_NPC(vict)) {
+			safe_snprintf(buf, sizeof(buf), "Hit cap against $M: %d.", get_hit_cap_for(ch, get_approximate_level(vict), GET_DEXTERITY(vict), MOB_FLAGS(vict)));
+		}
 		if (hitch < 50) {
-			act("You would have trouble hitting $M.", FALSE, ch, NULL, vict, TO_CHAR);
+			safe_snprintf(buf + strlen(buf), sizeof(buf) - strlen(buf), "%sYou would have trouble hitting $M.", (*buf ? "  " : ""));
 			any = TRUE;
 		}
+		act(buf, FALSE, ch, NULL, vict, TO_CHAR);
+		
+		// dodge
 		hitch = get_to_hit(vict, ch, FALSE, FALSE) - get_dodge_modifier(ch, vict, FALSE);
+		*buf = '\0';
+		if (IS_NPC(vict)) {
+			safe_snprintf(buf, sizeof(buf), "Dodge cap against $M: %d.", get_dodge_cap_for(ch, get_approximate_level(vict), GET_DEXTERITY(vict), MOB_FLAGS(vict)));
+		}
 		if (hitch > 50) {
-			act("You would have trouble dodging $S attacks.", FALSE, ch, NULL, vict, TO_CHAR);
+			safe_snprintf(buf + strlen(buf), sizeof(buf) - strlen(buf), "%sYou would have trouble dodging $S attacks.", (*buf ? "  " : ""));
 			any = TRUE;
+		}
+		act(buf, FALSE, ch, NULL, vict, TO_CHAR);
+		
+		// block
+		if (IS_NPC(vict) && has_player_tech(ch, PTECH_BLOCK)) {
+			safe_snprintf(buf, sizeof(buf), "Block cap against $M: %d.", get_block_cap_for(ch, get_approximate_level(vict), GET_DEXTERITY(vict), MOB_FLAGS(vict)));
+			act(buf, FALSE, ch, NULL, vict, TO_CHAR);
 		}
 
 		// flags (with overflow protection on affected_bits_consider[])
@@ -319,7 +337,7 @@ ACMD(do_flee) {
 				if (was_fighting && can_gain_exp_from(ch, was_fighting, NULL)) {
 					gain_player_tech_exp(ch, PTECH_FLEE_UPGRADE, 15);
 				}
-				GET_WAIT_STATE(ch) = 2 RL_SEC;
+				GET_WAIT_STATE(ch) = (upgrade ? 2 RL_SEC : 1 RL_SEC);
 				run_ability_hooks_by_player_tech(ch, PTECH_FLEE_UPGRADE, NULL, NULL, NULL, NULL);
 			}
 			else {

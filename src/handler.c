@@ -3684,7 +3684,7 @@ void perform_abandon_room(room_data *room) {
 	
 	ROOM_OWNER(room) = NULL;
 
-	REMOVE_BIT(ROOM_BASE_FLAGS(room), ROOM_AFF_PUBLIC | ROOM_AFF_NO_WORK | ROOM_AFF_NO_ABANDON | ROOM_AFF_NO_DISMANTLE);
+	REMOVE_BIT(ROOM_BASE_FLAGS(room), ROOM_AFF_PUBLIC | ROOM_AFF_PRIVATE | ROOM_AFF_NO_WORK | ROOM_AFF_NO_ABANDON | ROOM_AFF_NO_DISMANTLE);
 
 	if (ROOM_PRIVATE_OWNER(room) != NOBODY) {
 		set_private_owner(room, NOBODY);
@@ -4657,14 +4657,15 @@ void stop_follower(char_data *ch) {
 * @param GLB_FUNCTION(*func) The function to be called on any successful global(s).
 * @param bool allow_many If TRUE, multiple globals can run. If FALSE, stops at the first successful one.
 * @param bitvector_t type_flags The flag set to compare against the global's type-flags and type-exclude.
-* @param char_data *ch Optional: The person running it (for level/ability requirements).
-* @param adv_data *adv Optional: The adventure it's running in, if any (GLB_FLAG_ADVENTURE_ONLY).
+* @param char_data *ch Optional: The person running it (for level/ability requirements), may be NULL.
+* @param room_data *room Optional: The location where it's taking place (for flags like NO-NEWBIE), may be NULL.
+* @param adv_data *adv Optional: The adventure it's running in, if any (GLB_FLAG_ADVENTURE_ONLY), may be NULL.
 * @param int level Optional: For level-constrained globals.
 * @param GLB_VALIDATOR(*validator) Optional: A function for additional validation.
 * @param void *other_data Optional: Additional data that can be passed through to the validator and to the final run function. This data may be cast to whatever type you need it to be.
 * @return bool TRUE if any globals ran; FALSE if not.
 */
-bool run_globals(int glb_type, GLB_FUNCTION(*func), bool allow_many, bitvector_t type_flags, char_data *ch, adv_data *adv, int level, GLB_VALIDATOR(*validator), void *other_data) {
+bool run_globals(int glb_type, GLB_FUNCTION(*func), bool allow_many, bitvector_t type_flags, char_data *ch, room_data *room, adv_data *adv, int level, GLB_VALIDATOR(*validator), void *other_data) {
 	struct global_data *glb, *next_glb, *choose_last;
 	bool done_cumulative = FALSE, found = FALSE;
 	int cumulative_prc;
@@ -4681,6 +4682,12 @@ bool run_globals(int glb_type, GLB_FUNCTION(*func), bool allow_many, bitvector_t
 		}
 		if (GET_GLOBAL_ABILITY(glb) != NO_ABIL && (!ch || !has_ability(ch, GET_GLOBAL_ABILITY(glb)))) {
 			continue;
+		}
+		if (room && IS_SET(GET_GLOBAL_FLAGS(glb), GLB_FLAG_NO_NEWBIE) && GET_ISLAND(room) && IS_SET(GET_ISLAND(room)->flags, ISLE_NEWBIE)) {
+			continue;	// no-newbie
+		}
+		if (room && IS_SET(GET_GLOBAL_FLAGS(glb), GLB_FLAG_NEWBIE_ONLY) && GET_ISLAND(room) && !IS_SET(GET_ISLAND(room)->flags, ISLE_NEWBIE)) {
+			continue;	// newbie-only
 		}
 		
 		// level limits
@@ -4706,7 +4713,7 @@ bool run_globals(int glb_type, GLB_FUNCTION(*func), bool allow_many, bitvector_t
 		}
 		
 		// now the user-specified validator
-		if (validator && !validator(glb, ch, other_data)) {
+		if (validator && !validator(glb, ch, room, other_data)) {
 			continue;
 		}
 		
@@ -4739,7 +4746,7 @@ bool run_globals(int glb_type, GLB_FUNCTION(*func), bool allow_many, bitvector_t
 		}
 		else {	// not choose-last
 			if (func) {
-				found |= func(glb, ch, other_data);
+				found |= func(glb, ch, room, other_data);
 			}
 			if (!allow_many) {
 				break;	// only use first match
@@ -4750,7 +4757,7 @@ bool run_globals(int glb_type, GLB_FUNCTION(*func), bool allow_many, bitvector_t
 	
 	// failover/choose-last
 	if (!found && choose_last && func) {
-		found |= func(choose_last, ch, other_data);
+		found |= func(choose_last, ch, room, other_data);
 	}
 	
 	return found;
@@ -5346,7 +5353,7 @@ bool run_global_mob_interactions(char_data *ch, char_data *mob, int type, INTERA
 	data->mob = mob;
 	data->type = type;
 	data->func = func;
-	any = run_globals(GLOBAL_MOB_INTERACTIONS, run_global_mob_interactions_func, TRUE, MOB_FLAGS(mob), ch, (inst ? INST_ADVENTURE(inst) : NULL), GET_CURRENT_SCALE_LEVEL(mob), NULL, data);
+	any = run_globals(GLOBAL_MOB_INTERACTIONS, run_global_mob_interactions_func, TRUE, MOB_FLAGS(mob), ch, IN_ROOM(mob), (inst ? INST_ADVENTURE(inst) : NULL), GET_CURRENT_SCALE_LEVEL(mob), NULL, data);
 	free(data);
 	
 	return any;
@@ -5374,7 +5381,7 @@ bool run_global_obj_interactions(char_data *ch, obj_data *obj, int type, INTERAC
 	data->obj = obj;
 	data->type = type;
 	data->func = func;
-	any = run_globals(GLOBAL_OBJ_INTERACTIONS, run_global_obj_interactions_func, TRUE, GET_OBJ_EXTRA(obj), ch, get_adventure_for_vnum(GET_OBJ_VNUM(obj)), GET_OBJ_CURRENT_SCALE_LEVEL(obj), NULL, data);
+	any = run_globals(GLOBAL_OBJ_INTERACTIONS, run_global_obj_interactions_func, TRUE, GET_OBJ_EXTRA(obj), ch, IN_ROOM(ch), get_adventure_for_vnum(GET_OBJ_VNUM(obj)), GET_OBJ_CURRENT_SCALE_LEVEL(obj), NULL, data);
 	free(data);
 	
 	return any;
@@ -11091,7 +11098,8 @@ bool obj_can_be_stored(obj_data *obj, room_data *loc, empire_data *by_emp, bool 
 
 
 /**
-* re-read the vault of an empire
+* re-read the vault of an empire -- prefer to call this on a delay:
+*   TRIGGER_DELAYED_REFRESH(emp, DELAY_REFRESH_VAULT);
 *
 * @empire_data *emp
 */

@@ -34,7 +34,7 @@ tiles.
 
 Privileged immortals can abandon rooms and vehicles they do not own.
 
-See also: CEDE, CLAIM, MANAGE, PRIVILEGE, PUBLICIZE
+See also: CEDE, CLAIM, MANAGE, PRIVILEGE
 #
 ALLIANCE "DIPLOMACY ALLIANCE" ALLY ALLIES ALLIED
 
@@ -199,7 +199,7 @@ with that empire.
 Privileged immortals can claim land/vehicles for other empires by giving the
 empire name as the last arg.
 
-See also: PRIVILEGE, ABANDON, CEDE, PUBLICIZE, TERRITORY, CITY CLAIM
+See also: PRIVILEGE, ABANDON, CEDE, MANAGE, TERRITORY, CITY CLAIM
 #
 DEDICATE
 
@@ -918,7 +918,6 @@ Buying this goal lets you build:
   |CC|  chickencoops
   &t|&G..&t|&0  pasture
   |ST|  pigsty
-  (SS)  stable
 
 See also: &y/&w{}&y\  Mountain Corral, PROGRESS
 #
@@ -947,7 +946,7 @@ Rewards the following buildings:
 
 See also: LUXURIES GOAL, PROGRESS
 #
-MANAGE MANAGEMENT "LAND MANAGEMENT" NOWORK NO-WORK NODISMANTLE NO-DISMANTLE PUBLIC PUBLICIZE
+MANAGE MANAGEMENT "LAND MANAGEMENT" NOWORK NO-WORK NODISMANTLE NO-DISMANTLE PUBLIC PUBLICIZE PRIVATE PRIVATIZE
 
 Usage:  manage [option] [on/off]
         manage <vehicle> [option] [on/off]
@@ -955,6 +954,7 @@ Usage:  manage [option] [on/off]
 This command allows you to manage land use. You can configure the following
 options:
  &cpublic&0 - Non-members can use the room/building.
+ &cprivate&0 - Allies cannot use the room/building.
  &cno-abandon&0 - The tile cannot be abandoned by accident (or by Workforce).
  &cno-dismantle&0 - The building cannot be dismantled.
  &cno-work&0 - Workforce will not work the tile (also applies to vehicles here).
@@ -1132,6 +1132,8 @@ PUBLICIZE
 
 Usage:  publicize
 
+Note: This command has been replaced by 'manage public'.
+
 Allows you to make an area public so others can use it. This also undoes the 
 same command. Others cannot withdraw from public vaults or dismantle public 
 buildings.
@@ -1139,7 +1141,7 @@ buildings.
 If a room is made public, other players may take items from the ground without
 being marked "hostile".
 
-See also: CLAIM, CEDE, ABANDON, UNPUBLICIZE, HOSTILE
+See also: CLAIM, CEDE, ABANDON, MANAGE, UNPUBLICIZE, HOSTILE
 #
 "RARE METALS"
 
@@ -1329,6 +1331,7 @@ Supported options:
    -no-dismantle   Only no-dismantle tiles.
    -no-work   Only no-work tiles.
    -public   Only public tiles.
+   -private  Only private tiles.
 
 You can also add search keywords. Starting a keyword with a dash (-) will
 search for tiles that DON'T have that word. If you need to exclude a word

@@ -853,7 +853,7 @@ void show_craft_info(char_data *ch, char *argument, int craft_type) {
 	struct obj_apply *apply;
 	ability_data *abil;
 	craft_data *craft;
-	vehicle_data *veh;
+	vehicle_data *veh = NULL;
 	obj_data *proto = NULL;
 	bld_data *bld;
 	int craft_level, found_wrong_cmd = NOTHING;
@@ -1123,6 +1123,22 @@ void show_craft_info(char_data *ch, char *argument, int craft_type) {
 	if (GET_CRAFT_BUILD_FACING(craft)) {
 		ordered_sprintbit(GET_CRAFT_BUILD_FACING(craft), bld_on_flags, bld_on_flags_order, TRUE, buf);
 		msg_to_char(ch, "Build facing: %s\r\n", buf);
+	}
+	
+	if (CRAFT_IS_VEHICLE(craft) && veh) {
+		// show terrain requirements on the vehicle, if any
+		if (VEH_REQUIRES_CLIMATE(veh)) {
+			ordered_sprintbit(VEH_REQUIRES_CLIMATE(veh), climate_flags, climate_flags_order, FALSE, buf);
+			msg_to_char(ch, "Required climate/terrain: %s\r\n", buf);
+		}
+		if (VEH_FORBID_CLIMATE(veh)) {
+			ordered_sprintbit(VEH_FORBID_CLIMATE(veh), climate_flags, climate_flags_order, FALSE, buf);
+			msg_to_char(ch, "Disallowed climate/terrain: %s\r\n", buf);
+		}
+	}
+	
+	if (CRAFT_FLAGGED(craft, CRAFT_SOUP)) {
+		msg_to_char(ch, "Requires a container of water to make it in.\r\n");
 	}
 	
 	show_resource_list(GET_CRAFT_RESOURCES(craft), buf, sizeof(buf));

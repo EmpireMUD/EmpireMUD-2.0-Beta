@@ -553,9 +553,25 @@ void run_delayed_refresh(void) {
 			if (IS_SET(EMPIRE_DELAYED_REFRESH(emp), DELAY_REFRESH_MSDP_UPDATE_ALL)) {
 				update_MSDP_empire_data_all(emp, FALSE, FALSE);
 			}
+			if (IS_SET(EMPIRE_DELAYED_REFRESH(emp), DELAY_REFRESH_VAULT)) {
+				read_vault(emp);
+			}
 			
 			// clear this
 			EMPIRE_DELAYED_REFRESH(emp) = NOBITS;
+			
+			// saves?
+			if (!block_all_saves_due_to_shutdown) {
+				if (EMPIRE_NEEDS_SAVE(emp)) {
+					save_empire(emp, FALSE);
+				}
+				if (EMPIRE_NEEDS_STORAGE_SAVE(emp)) {
+					save_empire_storage(emp);
+				}
+				if (EMPIRE_NEEDS_LOGS_SAVE(emp)) {
+					save_empire_logs(emp);
+				}
+			}
 		}
 		
 		check_empire_refresh = FALSE;
@@ -951,6 +967,9 @@ bool process_import_one(empire_data *emp) {
 				// log
 				log_to_empire(emp, ELOG_TRADE, "Imported %s x%d from %s for %.1f coins", orn ? GET_OBJ_SHORT_DESC(orn) : "???", trade_amt, EMPIRE_NAME(pair->emp), cost);
 				log_to_empire(pair->emp, ELOG_TRADE, "Exported %s x%d to %s for %.1f coins", orn ? GET_OBJ_SHORT_DESC(orn) : "???", trade_amt, EMPIRE_NAME(emp), gain);
+				
+				TRIGGER_DELAYED_REFRESH(emp, DELAY_REFRESH_VAULT);
+				TRIGGER_DELAYED_REFRESH(pair->emp, DELAY_REFRESH_VAULT);
 			}
 		}
 		
@@ -974,7 +993,6 @@ bool process_import_one(empire_data *emp) {
 // runs daily imports
 void process_imports(void) {
 	empire_data *emp, *next_emp;
-	int amount;
 	
 	int time_to_empire_emptiness = config_get_int("time_to_empire_emptiness") * SECS_PER_REAL_WEEK;
 	
@@ -990,11 +1008,7 @@ void process_imports(void) {
 		}
 		
 		// ok go
-		amount = process_import_one(emp);
-		
-		if (amount > 0) {
-			read_vault(emp);
-		}
+		process_import_one(emp);
 	}
 }
 
@@ -1408,7 +1422,7 @@ bool emp_can_use_room(empire_data *emp, room_data *room, int mode) {
 		return TRUE;
 	}
 	// check allies if not a private room
-	if (mode != MEMBERS_ONLY && ROOM_PRIVATE_OWNER(homeroom) == NOBODY && has_relationship(ROOM_OWNER(homeroom), emp, DIPL_ALLIED)) {
+	if (mode != MEMBERS_ONLY && ROOM_PRIVATE_OWNER(homeroom) == NOBODY && !ROOM_AFF_FLAGGED(homeroom, ROOM_AFF_PRIVATE) && has_relationship(ROOM_OWNER(homeroom), emp, DIPL_ALLIED)) {
 		return TRUE;
 	}
 	
@@ -1442,7 +1456,7 @@ bool emp_can_use_vehicle(empire_data *emp, vehicle_data *veh, int mode) {
 		return TRUE;
 	}
 	// check allies
-	if (mode != MEMBERS_ONLY && emp && has_relationship(VEH_OWNER(veh), emp, DIPL_ALLIED)) {
+	if (mode != MEMBERS_ONLY && emp && !VEH_IS_PRIVATE(veh) && has_relationship(VEH_OWNER(veh), emp, DIPL_ALLIED)) {
 		return TRUE;
 	}
 	

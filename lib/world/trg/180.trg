@@ -719,7 +719,7 @@ done
 ~
 #18010
 Infuse fiend gear at fissure~
-2 c 0 38
+2 c 0 57
 L c 18012
 L c 18013
 L c 18014
@@ -757,6 +757,25 @@ L c 18047
 L c 18048
 L c 18049
 L c 18050
+L c 18075
+L c 18076
+L c 18077
+L c 18078
+L c 18079
+L c 18080
+L c 18081
+L c 18082
+L c 18083
+L c 18084
+L c 18085
+L c 18086
+L c 18087
+L c 18088
+L c 18089
+L c 18090
+L c 18092
+L c 18093
+L c 18094
 L w 18000
 infuse~
 set target %actor.obj_target(%arg.argument1%)%
@@ -770,7 +789,10 @@ if %target.carried_by% != %actor%
   %send% %actor% You can only infuse an item in your inventory.
   halt
 end
-if %target.vnum% < 18012 || %target.vnum% > 18050 || !%target.wearable% || (%target.level% == 0)
+if %target.vnum% >= 10875 && %target.vnum% <= 18094
+  %send% %actor% You cannot infuse older versions of the Molten Fiend's gear.
+  halt
+elseif %target.vnum% < 18012 || %target.vnum% > 18050 || !%target.wearable% || (%target.level% == 0)
   %send% %actor% You can't infuse @%target%!
   halt
 end

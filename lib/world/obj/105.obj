@@ -260,9 +260,9 @@ magical crystal. It can also be planted to grow more gemfruit. Some gemfruits
 will fail to produce gems, and you must be holding them in your inventory when
 they decay to get any gems at all.
 ~
-6 b a 0 0 15
+6 b a 0 0 16
 48 10504 0
-12 240
+12 120
 T 10514
 S
 #10515

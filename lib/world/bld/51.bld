@@ -292,7 +292,7 @@ S
 Fence~
 A Wooden Fence~
 @u&0vv@v~
-4 0 djmpu 0
+4 0 dmpuB 0
 0 0 0 -1
 E
 fence wooden~
@@ -311,7 +311,7 @@ S
 Gate~
 A Wooden Gate~
 @u&0xx@v~
-4 0 djmopu 0
+4 0 dmopuB 0
 0 0 0 -1
 E
 gate fence wooden~
@@ -1833,7 +1833,7 @@ S
 Wall~
 A Stone Wall~
 @U&#VV@V~
-32 0 djknr 0
+32 0 dknr 0
 0 0 0 -1
 E
 wall stones building around~

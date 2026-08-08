@@ -383,6 +383,8 @@ typedef struct vehicle_data vehicle_data;
 #define GLB_FLAG_CUMULATIVE_PERCENT  BIT(2)	// accumulates percent with other valid globals instead of its own percent
 #define GLB_FLAG_CHOOSE_LAST  BIT(3)	// the first choose-last global that passes is saved for later, if nothing else is chosen
 #define GLB_FLAG_RARE  BIT(4)	// a rare result (has various definitions by type)
+#define GLB_FLAG_NO_NEWBIE  BIT(5)	// won't occur on newbie islands
+#define GLB_FLAG_NEWBIE_ONLY  BIT(6)	// only occurs on newbie islands
 
 
 // Group Defines
@@ -712,7 +714,7 @@ typedef struct vehicle_data vehicle_data;
 #define BLD_IMMUNE_DAMAGE  BIT(24)	// building cannot be damaged
 #define BLD_HIDE_STORAGE_UNOWNED  BIT(25)	// only shows as storage when identifying objects if owned
 #define BLD_LIGHT  BIT(26)	// building is always light
-// #define BLD_UNUSED15  BIT(27)
+#define BLD_NO_WALKING_NPCS  BIT(27)	// mobs won't walk over but may fly over, like a fence
 // #define BLD_UNUSED16  BIT(28)
 #define BLD_SAIL  BIT(29)	// ships can pass through building
 // #define BLD_UNUSED17  BIT(30)
@@ -1077,6 +1079,7 @@ typedef struct vehicle_data vehicle_data;
 #define DELAY_REFRESH_MSDP_UPDATE_CLAIMS  BIT(4)	// empire members needs an MSDP update for claims
 #define DELAY_REFRESH_MSDP_UPDATE_ALL  BIT(5)	// empire members needs an MSDP update for everything
 #define DELAY_REFRESH_CHECK_ELIGIBLE_GOALS  BIT(6)	// empire will check for new goals
+#define DELAY_REFRESH_VAULT  BIT(7)	// rescans the vault for wealth
 
 
 // EADM_x: empire admin flags
@@ -2343,9 +2346,10 @@ typedef enum {
 #define INFORMATIVE_NO_WORK  BIT(4)	// d. workforce is off
 #define INFORMATIVE_NO_ABANDON  BIT(5)	// e. protection against abandon
 #define INFORMATIVE_NO_DISMANTLE  BIT(6)	// f. workforce won't dismantle
+#define INFORMATIVE_PRIVATE  BIT(7)	// g. tile flagged as private
 
 // flags set at character creation
-#define DEFAULT_INFORMATIVE_BITS  (INFORMATIVE_BUILDING_STATUS | INFORMATIVE_DISREPAIR | INFORMATIVE_MINE_STATUS | INFORMATIVE_PUBLIC | INFORMATIVE_NO_WORK | INFORMATIVE_NO_ABANDON | INFORMATIVE_NO_DISMANTLE)
+#define DEFAULT_INFORMATIVE_BITS  (INFORMATIVE_BUILDING_STATUS | INFORMATIVE_DISREPAIR | INFORMATIVE_MINE_STATUS | INFORMATIVE_PUBLIC | INFORMATIVE_PRIVATE | INFORMATIVE_NO_WORK | INFORMATIVE_NO_ABANDON | INFORMATIVE_NO_DISMANTLE)
 
 
 // LASTNAME_x: config players lastname_mode: determines how players get last names
@@ -3063,6 +3067,7 @@ typedef enum {
 #define ROOM_AFF_MAPOUT_BUILDING  BIT(24)	// y. shows as a building on the mapout (set automatically)
 #define ROOM_AFF_NO_TRACKS  BIT(25)		// z. nobody leaves tracks and you cannot track
 #define ROOM_AFF_PERMANENT_PAINT  BIT(26)	// A. paint displays different and cannot be repainted; removed automatically on dismantle
+#define ROOM_AFF_PRIVATE  BIT(27)	// B. Empire forbids allies (private)
 // NOTE: limit BIT(31) -- This is currently an unsigned int, to save space since there are a lot of rooms in the world
 
 
@@ -5680,6 +5685,7 @@ struct workforce_where_log {
 	char_data *mob;	// may be NULL if purged
 	int chore;	// CHORE_ const
 	room_vnum loc;	// where it happened
+	char *subloc;	// e.g. name of vehicle
 	struct workforce_where_log *prev, *next;
 };
 

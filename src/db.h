@@ -465,8 +465,9 @@ void read_empire_territory(empire_data *emp, bool check_tech);
 empire_data *real_empire(empire_vnum vnum);
 void reread_empire_tech(empire_data *emp);
 void save_empire(empire_data *e, bool save_all_parts);
+void save_empire_logs(empire_data *emp);
+void save_empire_storage(empire_data *emp);
 void save_all_empires();
-void save_marked_empires();
 void set_empire_adjective(empire_data *emp, char *adjective);
 void set_empire_name(empire_data *emp, char *name);
 int sort_empires(empire_data *a, empire_data *b);
@@ -1021,7 +1022,7 @@ extern char **tips_of_the_day;
 extern int tips_of_the_day_size;
 
 void load_intro_screens();
-int reload_text_string(int type);
+int reload_text_string(char_data *ch, int type);
 
 // more frees
 void free_apply_list(struct apply_data *list);

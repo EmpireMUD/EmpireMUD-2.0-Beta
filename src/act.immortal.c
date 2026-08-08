@@ -2508,7 +2508,7 @@ int perform_set(char_data *ch, char_data *vict, int mode, char *val_arg) {
 		
 		// bounds check
 		if (!del_rep && (new_val < min_rep || new_val > max_rep)) {
-			msg_to_char(ch, "You can't set the reputation to that level. That faction has a range of %d-%d.\r\n", min_rep, max_rep);
+			msg_to_char(ch, "You can't set the reputation to that level. That faction has a range of %d to %d.\r\n", min_rep, max_rep);
 			return 0;
 		}
 		
@@ -5572,7 +5572,7 @@ ACMD(do_autostore) {
 		if (obj) {
 			act("$n auto-stores $p.", FALSE, ch, obj, NULL, TO_ROOM | DG_NO_TRIG);
 			perform_force_autostore(obj, emp, GET_ISLAND_ID(IN_ROOM(ch)));
-			read_vault(emp);
+			TRIGGER_DELAYED_REFRESH(emp, DELAY_REFRESH_VAULT);
 		}
 		else if (veh) {
 			act("$n auto-stores items in $V.", FALSE, ch, NULL, veh, TO_ROOM | DG_NO_TRIG | ACT_VEH_VICT);
@@ -5580,7 +5580,7 @@ ACMD(do_autostore) {
 			DL_FOREACH_SAFE2(VEH_CONTAINS(veh), obj, next_obj, next_content) {
 				perform_force_autostore(obj, (VEH_OWNER(veh) && VEH_OWNER(veh) != emp) ? VEH_OWNER(veh) : emp, GET_ISLAND_ID(IN_ROOM(ch)));
 			}
-			read_vault((VEH_OWNER(veh) && VEH_OWNER(veh) != emp) ? VEH_OWNER(veh) : emp);
+			TRIGGER_DELAYED_REFRESH((VEH_OWNER(veh) && VEH_OWNER(veh) != emp) ? VEH_OWNER(veh) : emp, DELAY_REFRESH_VAULT);
 		}
 		else {
 			send_to_char("Nothing here by that name.\r\n", ch);
@@ -6078,6 +6078,81 @@ ACMD(do_editnotes) {
 	ch->desc->notes_id = acct->id;
 
 	act("$n begins editing some notes.", TRUE, ch, FALSE, FALSE, TO_ROOM | DG_NO_TRIG);
+}
+
+
+ACMD(do_endthievery) {
+	char arg1[MAX_INPUT_LENGTH], arg2[MAX_INPUT_LENGTH];
+	empire_data *iter, *next_iter, *other, *first = NULL, *second = NULL;
+	struct empire_political_data *pol;
+	bool any, line;
+	
+	argument = any_one_word(argument, arg1);
+	argument = any_one_word(argument, arg2);
+	
+	if (!*arg1 && !*arg2) {	// no args: list active thievery
+		msg_to_char(ch, "Active thievery permits:\r\n");
+		
+		any = FALSE;
+		HASH_ITER(hh, empire_table, iter, next_iter) {
+			line = FALSE;
+			
+			LL_FOREACH(EMPIRE_DIPLOMACY(iter), pol) {
+				if (IS_SET(pol->type, DIPL_THIEVERY) && (other = real_empire(pol->id))) {
+					if (!line) {
+						msg_to_char(ch, " %s%s\t0 vs ", EMPIRE_BANNER(iter), EMPIRE_NAME(iter));
+					}
+					
+					msg_to_char(ch, "%s%s%s\t0", (line ? ", " : ""), EMPIRE_BANNER(other), EMPIRE_NAME(other));
+					any = line = TRUE;
+				}
+			}
+			
+			if (line) {
+				msg_to_char(ch, "\r\n");
+			}
+		}
+		
+		if (!any) {
+			msg_to_char(ch, " none\r\n");
+		}
+	}	// end no-arg
+	else if (!(first = get_empire(arg1))) {
+		msg_to_char(ch, "Invalid empire '%s'.\r\n", arg1);
+	}
+	else if (*arg2 && !(second = get_empire(arg2))) {
+		msg_to_char(ch, "Invalid empire '%s'.\r\n", arg2);
+	}
+	else {	// ok now ends thievery
+		any = FALSE;
+		
+		// we are guaranteed a "first" empire but not a "second"
+		LL_FOREACH(EMPIRE_DIPLOMACY(first), pol) {
+			if (second && pol->id != EMPIRE_VNUM(second)) {
+				continue;	// doing 1? or all?
+			}
+			if (!IS_SET(pol->type, DIPL_THIEVERY)) {
+				continue;	// not thievery
+			}
+			
+			other = (second ? second : real_empire(pol->id));
+			
+			// remove thievery, set distrust
+			REMOVE_BIT(pol->type, DIPL_THIEVERY);
+			pol->start_time = time(0);
+			
+			syslog(SYS_GC, GET_INVIS_LEV(ch), TRUE, "ABUSE: DIPL: %s has ended the thievery permit for %s against %s", GET_NAME(ch), EMPIRE_NAME(first), EMPIRE_NAME(other));
+			log_to_empire(first, ELOG_DIPLOMACY, "The thievery permit with %s has ended", EMPIRE_NAME(other));
+			any = TRUE;
+		}
+		
+		if (!any && second) {
+			msg_to_char(ch, "You didn't find a thievery permit to end for %s against %s.\r\n", EMPIRE_NAME(first), EMPIRE_NAME(second));
+		}
+		else if (!any) {
+			msg_to_char(ch, "%s has no active thievery permits.\r\n", EMPIRE_NAME(first));
+		}
+	}
 }
 
 
@@ -7543,42 +7618,42 @@ ACMD(do_reload) {
 		load_intro_screens();
 		
 		for (iter = 0; iter < NUM_TEXT_FILE_STRINGS; ++iter) {
-			val |= reload_text_string(iter);
+			val |= reload_text_string(ch, iter);
 		}
 	}
 	else if (!str_cmp(arg, "wizlist")) {
-		val = reload_text_string(TEXT_FILE_WIZLIST);
+		val = reload_text_string(ch, TEXT_FILE_WIZLIST);
 	}
 	else if (!str_cmp(arg, "godlist")) {
-		val = reload_text_string(TEXT_FILE_GODLIST);
+		val = reload_text_string(ch, TEXT_FILE_GODLIST);
 	}
 	else if (!str_cmp(arg, "credits")) {
-		val = reload_text_string(TEXT_FILE_CREDITS);
+		val = reload_text_string(ch, TEXT_FILE_CREDITS);
 	}
 	else if (!str_cmp(arg, "motd")) {
-		val = reload_text_string(TEXT_FILE_MOTD);
+		val = reload_text_string(ch, TEXT_FILE_MOTD);
 	}
 	else if (!str_cmp(arg, "imotd")) {
-		val = reload_text_string(TEXT_FILE_IMOTD);
+		val = reload_text_string(ch, TEXT_FILE_IMOTD);
 	}
 	else if (!str_cmp(arg, "news")) {
-		val = reload_text_string(TEXT_FILE_NEWS);
+		val = reload_text_string(ch, TEXT_FILE_NEWS);
 	}
 	else if (!str_cmp(arg, "help")) {
-		val = reload_text_string(TEXT_FILE_HELP_SCREEN);
-		val |= reload_text_string(TEXT_FILE_HELP_SCREEN_SCREENREADER);
+		val = reload_text_string(ch, TEXT_FILE_HELP_SCREEN);
+		val |= reload_text_string(ch, TEXT_FILE_HELP_SCREEN_SCREENREADER);
 	}
 	else if (!str_cmp(arg, "info")) {
-		val = reload_text_string(TEXT_FILE_INFO);
+		val = reload_text_string(ch, TEXT_FILE_INFO);
 	}
 	else if (!str_cmp(arg, "policy")) {
-		val = reload_text_string(TEXT_FILE_POLICY);
+		val = reload_text_string(ch, TEXT_FILE_POLICY);
 	}
 	else if (!str_cmp(arg, "handbook")) {
-		val = reload_text_string(TEXT_FILE_HANDBOOK);
+		val = reload_text_string(ch, TEXT_FILE_HANDBOOK);
 	}
 	else if (!str_cmp(arg, "shortcredits")) {
-		val = reload_text_string(TEXT_FILE_SHORT_CREDITS);
+		val = reload_text_string(ch, TEXT_FILE_SHORT_CREDITS);
 	}
 	else if (!str_cmp(arg, "intros")) {
 		load_intro_screens();

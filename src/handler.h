@@ -51,8 +51,8 @@
 
 
 // global function types -- for run_globals
-#define GLB_VALIDATOR(name)		bool (name)(struct global_data *glb, char_data *ch, void *other_data)
-#define GLB_FUNCTION(name)		bool (name)(struct global_data *glb, char_data *ch, void *other_data)
+#define GLB_VALIDATOR(name)		bool (name)(struct global_data *glb, char_data *ch, room_data *room, void *other_data)
+#define GLB_FUNCTION(name)		bool (name)(struct global_data *glb, char_data *ch, room_data *room, void *other_data)
 
 
 // used by charge_stored_resource() and add_to_empire_storage_with_timer()
@@ -231,7 +231,7 @@ void add_follower(char_data *ch, char_data *leader, bool msg);
 void stop_follower(char_data *ch);
 
 // global handlers
-bool run_globals(int glb_type, GLB_FUNCTION(*func), bool allow_many, bitvector_t type_flags, char_data *ch, adv_data *adv, int level, GLB_VALIDATOR(*validator), void *other_data);
+bool run_globals(int glb_type, GLB_FUNCTION(*func), bool allow_many, bitvector_t type_flags, char_data *ch, room_data *room, adv_data *adv, int level, GLB_VALIDATOR(*validator), void *other_data);
 
 // group handlers
 int count_group_members(struct group_data *group);

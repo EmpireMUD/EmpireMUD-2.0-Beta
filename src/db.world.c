@@ -840,7 +840,6 @@ GLB_VALIDATOR(validate_global_mine_data) {
 GLB_FUNCTION(run_global_mine_data) {
 	struct glb_room_emp_bean *data = (struct glb_room_emp_bean*)other_data;
 	empire_data *emp = (data ? data->empire : NULL);
-	room_data *room = (data ? data->room : NULL);
 	
 	if (!data || !room) {
 		return FALSE;	// no work
@@ -888,7 +887,7 @@ void init_mine(room_data *room, char_data *ch, empire_data *emp) {
 	CREATE(data, struct glb_room_emp_bean, 1);
 	data->empire = emp;
 	data->room = room;
-	run_globals(GLOBAL_MINE_DATA, run_global_mine_data, FALSE, GET_SECT_FLAGS(BASE_SECT(room)), ch, (GET_ROOM_TEMPLATE(room) ? get_adventure_for_vnum(GET_RMT_VNUM(GET_ROOM_TEMPLATE(room))) : NULL), ch ? GET_COMPUTED_LEVEL(ch) : 0, validate_global_mine_data, data);
+	run_globals(GLOBAL_MINE_DATA, run_global_mine_data, FALSE, GET_SECT_FLAGS(BASE_SECT(room)), ch, room, (GET_ROOM_TEMPLATE(room) ? get_adventure_for_vnum(GET_RMT_VNUM(GET_ROOM_TEMPLATE(room))) : NULL), ch ? GET_COMPUTED_LEVEL(ch) : 0, validate_global_mine_data, data);
 	free(data);
 }
 
@@ -1471,18 +1470,19 @@ void annual_update_map_tile(struct map_data *tile) {
 void annual_update_vehicle(vehicle_data *veh) {
 	char *msg;
 	
-	if (VEH_OWNER(veh) && EMPIRE_ADMIN_FLAGGED(VEH_OWNER(veh), EADM_NO_DECAY)) {
-		return;	// skip empire's vehicles
-	}
-	
 	// ensure a save
 	request_vehicle_save_in_world(veh);
 	
 	// non-damage stuff:
 	annual_update_depletions(&VEH_DEPLETION(veh));
 	
+	// admin skip?
+	if (VEH_OWNER(veh) && EMPIRE_ADMIN_FLAGGED(VEH_OWNER(veh), EADM_NO_DECAY)) {
+		return;	// skip empire's vehicles
+	}
+	
 	// does not take annual damage (unless incomplete)
-	if (!VEH_REGULAR_MAINTENANCE(veh) && VEH_IS_COMPLETE(veh)) {
+	if (!VEH_REGULAR_MAINTENANCE(veh) && VEH_IS_COMPLETE(veh) && !VEH_FLAGGED(veh, VEH_IS_RUINS)) {
 		// check if it's abandoned furniture: no owner, unowned room, no instance id, not in an adventure, no players here
 		if (!VEH_OWNER(veh) && VEH_INSTANCE_ID(veh) != NOTHING && IN_ROOM(veh) && !ROOM_OWNER(IN_ROOM(veh)) && !IS_ADVENTURE_ROOM(IN_ROOM(veh)) && !any_players_in_room(IN_ROOM(veh))) {
 			// random chance of decay
@@ -1495,7 +1495,7 @@ void annual_update_vehicle(vehicle_data *veh) {
 	}
 	
 	// prepare to decay (ruins have special handling here)
-	if (VEH_FLAGGED(veh, VEH_IS_RUINS)) {
+	if (VEH_FLAGGED(veh, VEH_IS_RUINS) && !VEH_OWNER(veh)) {
 		// chance of ruining ruins: roughly 2 real years for average chance for ruins to be gone
 		if (!number(0, 89)) {
 			msg = veh_get_custom_message(veh, VEH_CUSTOM_RUINS_TO_ROOM);
@@ -3747,7 +3747,7 @@ INTERACTION_FUNC(ruin_building_to_building_interaction) {
 	
 	// remove any unclaimed/empty vehicles (like furniture) -- those crumble with the building
 	DL_FOREACH_SAFE2(ROOM_VEHICLES(inter_room), veh_iter, next_veh, next_in_room) {
-		if (!VEH_OWNER(veh_iter) && !VEH_CONTAINS(veh_iter)) {
+		if (VEH_PURGES_WHEN_TILE_RUINS(veh_iter)) {
 			extract_vehicle(veh_iter);
 		}
 	}
@@ -3876,7 +3876,7 @@ INTERACTION_FUNC(ruin_building_to_vehicle_interaction) {
 	
 	// remove any unclaimed/empty vehicles (like furniture) -- those crumble with the building
 	DL_FOREACH_SAFE2(ROOM_VEHICLES(inter_room), veh_iter, next_veh, next_in_room) {
-		if (veh_iter != ruin && !VEH_OWNER(veh_iter) && !VEH_CONTAINS(veh_iter)) {
+		if (veh_iter != ruin && VEH_PURGES_WHEN_TILE_RUINS(veh_iter)) {
 			extract_vehicle(veh_iter);
 		}
 	}
@@ -3959,9 +3959,9 @@ void ruin_one_building(room_data *room) {
 			act("The building around you crumbles to ruin!", FALSE, ROOM_PEOPLE(room), NULL, NULL, TO_CHAR | TO_ROOM);
 		}
 	
-		// remove any unclaimed/empty vehicles (like furniture) -- those crumble with the building
+		// remove any unclaimed/empty vehicles that don't require maintenance (like furniture) -- those crumble with the building
 		DL_FOREACH_SAFE2(ROOM_VEHICLES(room), veh, next_veh, next_in_room) {
-			if (!VEH_OWNER(veh) && !VEH_CONTAINS(veh)) {
+			if (VEH_PURGES_WHEN_TILE_RUINS(veh)) {
 				extract_vehicle(veh);
 			}
 		}

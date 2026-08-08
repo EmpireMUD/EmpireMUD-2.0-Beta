@@ -249,6 +249,25 @@ for entering the game, only if there are any notes to show.
 
 See also: GRANT
 #d
+ENDTHIEVERY "END THIEVERY"
+
+Usage:  endthievery [empire] [second empire]
+
+This command is used by immortals to cancel active thievery permits. This
+command is part of the 'empires' grant. It has 3 modes:
+
+> endthievery
+With no arguments, this just lists active thievery permits.
+
+> endthievery <empire>
+With one empire, it ends all thievery permits for that empire.
+
+> endthievery <empire> <second empire>
+With two arguments, it ends the thievery permit for the first empire against
+the second.
+
+See also: END WAR, GRANT
+#d
 ENDWAR "END WAR"
 
 Usage:  endwar [empire] [second empire]
@@ -265,7 +284,7 @@ With one empire, it ends all wars for that empire.
 > endwar <empire> <second empire>
 With two arguments, it ends the war between those two empires.
 
-See also: GRANT
+See also: END THIEVERY, GRANT
 #d
 EVOLVE EVOLVER EVOLUTIONS
 

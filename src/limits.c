@@ -40,6 +40,7 @@
 
 // external vars
 extern int char_extractions_pending;
+extern int no_auto_deletes;
 
 // external funcs
 ACMD(do_dismount);
@@ -1298,7 +1299,7 @@ bool should_delete_empire(empire_data *emp) {
 		return TRUE;
 	}
 	
-	if (EMPIRE_LAST_LOGON(emp) + (config_get_int("time_to_empire_delete") * SECS_PER_REAL_WEEK) < time(0)) {
+	if (!no_auto_deletes && EMPIRE_LAST_LOGON(emp) + (config_get_int("time_to_empire_delete") * SECS_PER_REAL_WEEK) < time(0)) {
 		return TRUE;
 	}
 	
@@ -1390,7 +1391,7 @@ void update_empire_needs(empire_data *emp, struct empire_island *eisle, struct e
 	}
 	
 	if (vault) {
-		read_vault(emp);
+		TRIGGER_DELAYED_REFRESH(emp, DELAY_REFRESH_VAULT);
 	}
 }
 
@@ -1642,8 +1643,10 @@ void force_autostore(room_data *room) {
 				}
 			}
 		}
-	
-		read_vault(ROOM_OWNER(room));
+		
+		if (ROOM_OWNER(room)) {
+			TRIGGER_DELAYED_REFRESH(ROOM_OWNER(room), DELAY_REFRESH_VAULT);
+		}
 	}
 }
 

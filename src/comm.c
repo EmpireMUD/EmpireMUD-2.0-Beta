@@ -975,8 +975,8 @@ void heartbeat(unsigned long heart_pulse) {
 			write_running_events_file();
 			HEARTBEAT_LOG("28")
 		}
-		save_marked_empires();
-		HEARTBEAT_LOG("29")
+		// formerly: save_marked_empires, now part of run_delayed_refresh
+		// HEARTBEAT_LOG("29")
 	}
 	
 	if (HEARTBEAT(SECS_PER_REAL_DAY)) {
@@ -4327,7 +4327,7 @@ int main(int argc, char **argv) {
 					   "  -d <directory> Specify library directory (defaults to 'lib').\n"
 					   "  -h             Print this command line argument help.\n"
 					   "  -o <file>      Write log to <file> instead of stderr.\n"
-					   "  -q             Quick boot (doesn't auto-delete players)\n"
+					   "  -q             Quick boot (doesn't auto-delete players or empires)\n"
 					   "  -r             Restrict MUD -- no new players allowed.\n",
 					argv[0]);
 				exit(0);

@@ -992,6 +992,9 @@ bool is_ability_enemy(char_data *ch, char_data *vict) {
 	if (GET_COMPANION(ch) == vict) {
 		return FALSE;	// nope
 	}
+	if (GET_LEADER(vict) == ch && IS_NPC(vict) && AFF_FLAGGED(vict, AFF_CHARM)) {
+		return FALSE;	// charmed follower
+	}
 	if (in_same_group(ch, vict)) {
 		return FALSE;	// nope
 	}
@@ -1277,7 +1280,8 @@ room_data *get_random_room_for_ability(char_data *ch, ability_data *abil, bool r
 * @return double The modifier based on the trait (0 to 1.0).
 */
 double get_trait_modifier(char_data *ch, int apply) {
-	double value = 1.0;
+	double cap, value = 1.0;
+	int max;
 	
 	// APPLY_x: char's percent of max value for a trait
 	switch (apply) {
@@ -1306,15 +1310,20 @@ double get_trait_modifier(char_data *ch, int apply) {
 			break;
 		}
 		case APPLY_BLOCK: {
-			value = 1.0;	// TODO: move block cap calculation to a function
+			cap = get_block_cap_for(ch, GET_COMPUTED_LEVEL(ch), /* not used */ 0, NOBITS);
+			value = get_block_rating(ch, FALSE) / MAX(0.01, cap);
 			break;
 		}
 		case APPLY_TO_HIT: {
-			value = 1.0;	// TODO: move to-hit cap calculation to a function
+			max = att_max(ch);
+			cap = get_hit_cap_for(ch, GET_COMPUTED_LEVEL(ch), MIN(max, GET_COMPUTED_LEVEL(ch) / 20), NOBITS);
+			value = get_to_hit(ch, NULL, FALSE, FALSE) / MAX(0.01, cap);
 			break;
 		}
 		case APPLY_DODGE: {
-			value = 1.0;	// TODO: move dodge cap calculation to a function
+			max = att_max(ch);
+			cap = get_dodge_cap_for(ch, GET_COMPUTED_LEVEL(ch), MIN(max, GET_COMPUTED_LEVEL(ch) / 20), NOBITS);
+			value = get_dodge_modifier(ch, NULL, FALSE) / MAX(0.01, cap);
 			break;
 		}
 		case APPLY_RESIST_PHYSICAL: {
@@ -12276,9 +12285,66 @@ OLC_MODULE(abiledit_data) {
 			}
 		}
 	}
+	else if (is_abbrev(arg1, "move")) {
+		struct ability_data_list *to_move, *prev, *next;
+		bool up;
+		
+		// usage: data move <number> <up | down>
+		half_chop(arg2, val_arg, type_arg);
+		up = is_abbrev(type_arg, "up");
+		
+		if (!*val_arg || !*type_arg) {
+			msg_to_char(ch, "Usage: data move <number> <up | down>\r\n");
+		}
+		else if (!isdigit(*val_arg) || (num = atoi(val_arg)) < 1) {
+			msg_to_char(ch, "Invalid data entry number.\r\n");
+		}
+		else if (!is_abbrev(type_arg, "up") && !is_abbrev(type_arg, "down")) {
+			msg_to_char(ch, "You must specify whether you're moving it up or down in the list.\r\n");
+		}
+		else if (up && num == 1) {
+			msg_to_char(ch, "You can't move it up; it's already at the top of the list.\r\n");
+		}
+		else {
+			// find the one to move
+			to_move = prev = NULL;
+			for (adl = ABIL_DATA(abil); adl && !to_move; adl = adl->next) {
+				if (--num == 0) {
+					to_move = adl;
+				}
+				else {
+					// store for next iteration
+					prev = adl;
+				}
+			}
+			
+			if (!to_move) {
+				msg_to_char(ch, "Invalid data entry number.\r\n");
+			}
+			else if (!up && !to_move->next) {
+				msg_to_char(ch, "You can't move it down; it's already at the bottom of the list.\r\n");
+			}
+			else {
+				// SUCCESS: "move" them by swapping data
+				if (up) {
+					LL_DELETE(ABIL_DATA(abil), to_move);
+					LL_PREPEND_ELEM(ABIL_DATA(abil), prev, to_move);
+				}
+				else {
+					next = to_move->next;
+					LL_DELETE(ABIL_DATA(abil), to_move);
+					LL_APPEND_ELEM(ABIL_DATA(abil), next, to_move);
+				}
+				
+				// message: re-atoi(val_arg) because we destroyed num finding our target
+				msg_to_char(ch, "You move data entry %d %s.\r\n", atoi(val_arg), (up ? "up" : "down"));
+			}
+		}
+	}	// end 'move'
 	else {
 		msg_to_char(ch, "Usage: data add <type> <name | vnum>\r\n");
 		msg_to_char(ch, "Usage: data remove <number | all>\r\n");
+		msg_to_char(ch, "Usage: data move <number> <up | down>\r\n");
 		
 		found = FALSE;
 		msg_to_char(ch, "Allowed types:");

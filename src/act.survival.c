@@ -743,7 +743,7 @@ ACMD(do_hunt) {
 	data->x_coord = x_coord;
 	data->y_coord = y_coord;
 	data->helpers = &helpers;	// reference current list
-	run_globals(GLOBAL_MAP_SPAWNS, run_global_hunt_for_map_spawns, TRUE, get_climate(IN_ROOM(ch)), NULL, NULL, 0, validate_global_hunt_for_map_spawns, data);
+	run_globals(GLOBAL_MAP_SPAWNS, run_global_hunt_for_map_spawns, TRUE, get_climate(IN_ROOM(ch)), NULL, IN_ROOM(ch), NULL, 0, validate_global_hunt_for_map_spawns, data);
 	free(data);
 	
 	// find the thing to hunt

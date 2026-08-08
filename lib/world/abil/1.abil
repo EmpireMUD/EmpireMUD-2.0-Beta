@@ -294,7 +294,7 @@ S
 Purify~
 0 -1 1.00 o 0 0
 C
-purify 8 b 2 50 0.00 -1 0 0 1 0
+purify 8 bh 2 50 0.00 -1 0 0 1 0
 D 16 44 0
 D 64 21 0
 M
@@ -372,7 +372,7 @@ T s 1
 S
 #117
 Ready Fireball~
-0 -1 1.00 0 bcn 0
+0 -1 1.00 0 bn 0
 C
 unknown 5 a 2 30 0.00 -1 0 0 3 0
 D 4 1105 0
@@ -1793,8 +1793,8 @@ Ritual of Detection~
 gs -1 1.00 0 0 0
 C
 ritual 8 o 2 15 0.00 -1 0 0 5 0
-D 16 1 0
 D 16 7 0
+D 16 1 0
 D 16 8 0
 D 64 2 0
 D 64 3 0
@@ -1837,6 +1837,12 @@ M
 M
 33
 $n begins writing words in the circles on the ground.~
+M
+8
+You detect no threats in the area.~
+M
+9
+*~
 T s 1
 S
 #194

@@ -1381,7 +1381,7 @@ void show_workforce_where(empire_data *emp, char_data *to, bool here, char *argu
 		UT_hash_handle hh;
 	};
 	
-	char line[256];
+	char line[256], subloc[256];
 	struct workforce_count_type *find, *wct, *next_wct, *counts = NULL;
 	struct workforce_where_log *wwl;
 	room_data *room;
@@ -1423,12 +1423,19 @@ void show_workforce_where(empire_data *emp, char_data *to, bool here, char *argu
 			}
 			
 			// found
+			
+			// build subloc
+			*subloc = '\0';
+			if (wwl->subloc) {
+				safe_snprintf(subloc, sizeof(subloc), " (%s)", skip_filler(wwl->subloc));
+			}
+			
 			++total;
 			if (wwl->mob) {
-				build_page_display(to, "%s %s: %s", coord_display_room(to, room, TRUE), skip_filler(get_room_name(room, FALSE)), GET_SHORT_DESC(wwl->mob));
+				build_page_display(to, "%s %s%s: %s", coord_display_room(to, room, TRUE), skip_filler(get_room_name(room, FALSE)), subloc, GET_SHORT_DESC(wwl->mob));
 			}
 			else {
-				build_page_display(to, "%s %s", coord_display_room(to, room, TRUE), skip_filler(get_room_name(room, FALSE)));
+				build_page_display(to, "%s %s%s", coord_display_room(to, room, TRUE), skip_filler(get_room_name(room, FALSE)), subloc);
 			}
 		}
 		if (total) {
@@ -1560,6 +1567,9 @@ void show_workforce_why(empire_data *emp, char_data *ch, char *argument) {
 			if (!(room = real_room(wf_log->loc))) {
 				continue;	// room is gone now
 			}
+			if (wf_log->problem == WF_PROB_ADVENTURE_PRESENT && room != IN_ROOM(ch)) {
+				continue;	// special handling: can only see an adventure-present error from the same room
+			}
 			
 			// ok, show it:
 			if (wf_log->count > 1) {
@@ -1585,11 +1595,15 @@ void show_workforce_why(empire_data *emp, char_data *ch, char *argument) {
 		any = TRUE;	// this is guaranteed for this mode
 		
 		LL_FOREACH(EMPIRE_WORKFORCE_LOG(emp), wf_log) {
+			if (wf_log->problem == WF_PROB_ADVENTURE_PRESENT && wf_log->loc != GET_ROOM_VNUM(IN_ROOM(ch))) {
+				continue;	// special handling: can only see an adventure-present error from the same room
+			}
+			
 			// count similar
 			last_chore = wf_log->chore;
 			last_problem = wf_log->problem;
 			count = 1;
-			while (wf_log && wf_log->next && wf_log->next->chore == last_chore && wf_log->next->problem == last_problem) {
+			while (wf_log && wf_log->next && wf_log->next->chore == last_chore && wf_log->next->problem == last_problem && (last_problem != WF_PROB_ADVENTURE_PRESENT || wf_log->next->loc == GET_ROOM_VNUM(IN_ROOM(ch)))) {
 				count += wf_log->count;
 				wf_log = wf_log->next;	// advance past identical entries
 			}
@@ -2971,7 +2985,7 @@ void do_import_list(char_data *ch, empire_data *emp, char *argument, int subcmd)
 			
 			// figure out actual cost
 			if (rate != 1.0) {
-				safe_snprintf(coin_conv, sizeof(coin_conv), " (%.1f)", trade->cost * rate);
+				safe_snprintf(coin_conv, sizeof(coin_conv), " (%.1f)", (round(trade->cost * rate * 10.0) / 10.0));
 			}
 			
 			// figure out indicator
@@ -3046,7 +3060,7 @@ void do_import_analysis(char_data *ch, empire_data *emp, char *argument, int sub
 			
 			// figure out actual cost
 			if (rate != 1.0) {
-				safe_snprintf(coin_conv, sizeof(coin_conv), " (%.1f)", trade->cost * rate);
+				safe_snprintf(coin_conv, sizeof(coin_conv), " (%.1f)", (round(trade->cost * rate * 10.) / 10.0));
 			}
 			else {
 				*coin_conv = '\0';
@@ -3245,10 +3259,12 @@ void do_islands_has_territory(struct do_islands_data **list, int island_id, int 
  //////////////////////////////////////////////////////////////////////////////
 //// LAND MANAGEMENT /////////////////////////////////////////////////////////
 
-#define MANAGE_FUNC(name)		void (name)(char_data *ch, bool on)
+#define MANAGE_FUNC(name)		void (name)(char_data *ch, room_data *room, vehicle_data *veh, bool on)
 
 // protos
 MANAGE_FUNC(mng_nowork);
+MANAGE_FUNC(mng_private);
+MANAGE_FUNC(mng_public);
 
 
 // for do_manage
@@ -3270,7 +3286,8 @@ const struct manage_data_type manage_data[] = {
 	{ "no-abandon", "noabandon", PRIV_CLAIM, TRUE, ROOM_AFF_NO_ABANDON, TRUE, 0, NOBITS, NULL },
 	{ "no-dismantle", "nodismantle", PRIV_BUILD, TRUE, ROOM_AFF_NO_DISMANTLE, TRUE, 0, NOBITS, NULL },
 	{ "no-work", "nowork", PRIV_WORKFORCE, TRUE, ROOM_AFF_NO_WORK, FALSE, 0, NOBITS, mng_nowork },
-	{ "public", "publicize", PRIV_CLAIM, TRUE, ROOM_AFF_PUBLIC, TRUE, 0, NOBITS, NULL },
+	{ "public", "publicize", PRIV_CLAIM, TRUE, ROOM_AFF_PUBLIC, TRUE, 0, NOBITS, mng_public },
+	{ "private", "privatize", PRIV_CLAIM, TRUE, ROOM_AFF_PRIVATE, TRUE, 0, NOBITS, mng_private },
 	
 	{ "hide-real-name", NULL, NOTHING, FALSE, ROOM_AFF_HIDE_REAL_NAME, FALSE, LVL_CIMPL, NOBITS, NULL },
 	{ "unclaimable", NULL, NOTHING, FALSE, ROOM_AFF_UNCLAIMABLE, TRUE, LVL_CIMPL, NOBITS, NULL },
@@ -3288,9 +3305,43 @@ const struct manage_data_type manage_vehicle_data[] = {
 };
 
 
+/**
+* @param char_data *ch The player.
+* @param room_data *room For room management: The room (either current room or its home room) being managed.
+* @param vehicle_data *veh For vehicle management: The vehicle being managed.
+* @param bool on If TRUE, turning the flag on. If FALSE, turning it off.
+*/
 MANAGE_FUNC(mng_nowork) {
-	if (on && ROOM_OWNER(IN_ROOM(ch))) {
-		deactivate_workforce_room(ROOM_OWNER(IN_ROOM(ch)), IN_ROOM(ch));
+	if (on && room && ROOM_OWNER(room)) {
+		deactivate_workforce_room(ROOM_OWNER(room), room);
+	}
+}
+
+
+/**
+* @param char_data *ch The player.
+* @param room_data *room For room management: The room (either current room or its home room) being managed.
+* @param vehicle_data *veh For vehicle management: The vehicle being managed.
+* @param bool on If TRUE, turning the flag on. If FALSE, turning it off.
+*/
+MANAGE_FUNC(mng_private) {
+	if (on && room) {
+		REMOVE_BIT(ROOM_BASE_FLAGS(room), ROOM_AFF_PUBLIC);
+		affect_total_room(room);
+	}
+}
+
+
+/**
+* @param char_data *ch The player.
+* @param room_data *room For room management: The room (either current room or its home room) being managed.
+* @param vehicle_data *veh For vehicle management: The vehicle being managed.
+* @param bool on If TRUE, turning the flag on. If FALSE, turning it off.
+*/
+MANAGE_FUNC(mng_public) {
+	if (on && room) {
+		REMOVE_BIT(ROOM_BASE_FLAGS(room), ROOM_AFF_PRIVATE);
+		affect_total_room(room);
 	}
 }
 
@@ -6956,7 +7007,7 @@ void do_manage_vehicle(char_data *ch, vehicle_data *veh, char *argument) {
 		
 		// callback func (optional)
 		if (manage_vehicle_data[type].func) {
-			(manage_vehicle_data[type].func)(ch, on);
+			(manage_vehicle_data[type].func)(ch, NULL, veh, on);
 		}
 	}
 }
@@ -7013,6 +7064,9 @@ ACMD(do_manage) {
 			safe_snprintf(buf, sizeof(buf), "%s: %s\t0", manage_data[iter].name, on ? "\tgon" : "\troff");
 			msg_to_char(ch, " %s\r\n", CAP(buf));
 		}
+	}
+	else if (!IS_APPROVED(ch) && config_get_bool("manage_empire_approval")) {
+		send_config_msg(ch, "need_approval_string");
 	}
 	else if (type == NOTHING) {
 		msg_to_char(ch, "Unknown land management option '%s'.\r\n", arg);
@@ -7073,7 +7127,7 @@ ACMD(do_manage) {
 		
 		// callback func (optional)
 		if (manage_data[type].func) {
-			(manage_data[type].func)(ch, on);
+			(manage_data[type].func)(ch, flag_room, NULL, on);
 		}
 	}
 }
@@ -8063,7 +8117,7 @@ ACMD(do_territory) {
 	char search_str[MAX_INPUT_LENGTH], exclude_str[MAX_INPUT_LENGTH], arg[MAX_INPUT_LENGTH], arg2[MAX_INPUT_LENGTH], option_buf[1024], *remain;
 	bool ok, junk;
 	bool check_city, check_outskirts, check_frontier, any_type_found;
-	bool no_abandon, no_dismantle, no_work, public_only;
+	bool no_abandon, no_dismantle, no_work, public_only, private_only;
 	int dist_from_me, total, ttype;
 	crop_data *crop = NULL;
 	empire_data *emp = GET_LOYALTY(ch);
@@ -8099,7 +8153,7 @@ ACMD(do_territory) {
 	*search_str = *exclude_str = '\0';
 	check_city = check_outskirts = check_frontier = TRUE;
 	any_type_found = FALSE;
-	no_abandon = no_dismantle = no_work = public_only = FALSE;
+	no_abandon = no_dismantle = no_work = public_only = private_only = FALSE;
 	dist_from_me = -1;
 	find_island = NULL;
 	
@@ -8173,6 +8227,9 @@ ACMD(do_territory) {
 		else if (!str_cmp(arg, "public") || is_abbrev(arg, "-public")) {
 			public_only = TRUE;
 		}
+		else if (!str_cmp(arg, "private") || is_abbrev(arg, "-private")) {
+			private_only = TRUE;
+		}
 		else {
 			// unknown arg: treat as search
 			if (*arg != '-') {
@@ -8223,6 +8280,9 @@ ACMD(do_territory) {
 				continue;
 			}
 			if (public_only && !VEH_IS_PUBLIC(veh)) {
+				continue;
+			}
+			if (private_only && !VEH_IS_PRIVATE(veh)) {
 				continue;
 			}
 			
@@ -8296,6 +8356,9 @@ ACMD(do_territory) {
 			continue;
 		}
 		if (public_only && !ROOM_AFF_FLAGGED(iter, ROOM_AFF_PUBLIC)) {
+			continue;
+		}
+		if (private_only && !ROOM_AFF_FLAGGED(iter, ROOM_AFF_PRIVATE)) {
 			continue;
 		}
 		
@@ -8391,6 +8454,9 @@ ACMD(do_territory) {
 	}
 	if (public_only) {
 		safe_snprintf(option_buf + strlen(option_buf), sizeof(option_buf) - strlen(option_buf), "%sis public", (*option_buf ? ", " : ""));
+	}
+	if (private_only) {
+		safe_snprintf(option_buf + strlen(option_buf), sizeof(option_buf) - strlen(option_buf), "%sis private", (*option_buf ? ", " : ""));
 	}
 	if (*search_str) {
 		safe_snprintf(option_buf + strlen(option_buf), sizeof(option_buf) - strlen(option_buf), "%scontaining '%s'", (*option_buf ? ", " : ""), search_str);

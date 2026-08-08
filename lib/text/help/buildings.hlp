@@ -120,6 +120,7 @@ Basic buildings granted by the Build ability:
   (FF) forge
   (MM) mill  (must be by a river)
   (PP) potter
+  (SS) stable
   &g.^.&co&0 park
   .{}. shrine
   vvvv fence
@@ -502,9 +503,10 @@ infiltrate will make it through the gatehouse, and many of those will be
 stopped by your city guards. You require the Walled Town progress goal to
 build this.
 
-If you want to allow all traffic through the gatehouse, publicize it.
+If you want to allow all traffic through the gatehouse, use 'manage public' on
+it.
 
-See also: INFILTRATE, PUBLICIZE, WALL, WALLED TOWN
+See also: INFILTRATE, MANAGE, WALL, WALLED TOWN
 #
 GLASSBLOWER "GLASS BLOWER" GLASSBLOWING "GLASS BLOWING"
 
@@ -1127,7 +1129,7 @@ See also: PROCESS, SPICES
 #
 STABLE
 
-(SS)  Stable  (Livestock Livelihood ability)
+(SS)  Stable  (Build ability)
 
 Stables are a safe place to keep your animals. You can also use them as a place
 to milk cows or shear sheep. This is also where you can barde horses.

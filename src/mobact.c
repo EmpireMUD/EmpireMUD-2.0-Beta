@@ -45,6 +45,7 @@ ACMD(do_say);
 // local functions
 bool check_aggro(char_data *ch);
 bool check_mob_pursuit(char_data *ch);
+bool validate_mobile_move(char_data *ch, int dir, room_data *to_room, bool pursuit);
 
 
 // for validate_global_map_spawns, run_global_map_spawns
@@ -934,6 +935,7 @@ bool check_mob_pursuit(char_data *ch) {
 	char_data *vict;
 	int dir = NO_DIR;
 	bool found = FALSE, moved = FALSE;
+	room_data *to_room;
 	
 	// break out early if not pursuing
 	if (!MOB_PURSUIT(ch)) {
@@ -1007,19 +1009,19 @@ bool check_mob_pursuit(char_data *ch) {
 	}	// end iteration
 	
 	if (found && (dir != NO_DIR || track_to_room != NOWHERE) && !AFF_FLAGGED(ch, AFF_CHARM | AFF_IMMOBILIZED)) {
-		if (track_to_room && find_portal_in_room_targetting(IN_ROOM(ch), track_to_room)) {
-			perform_move(ch, NO_DIR, real_room(track_to_room), MOVE_ENTER_PORTAL | MOVE_WANDER);
+		if (track_to_room && find_portal_in_room_targetting(IN_ROOM(ch), track_to_room) && (to_room = real_room(track_to_room)) && validate_mobile_move(ch, NO_DIR, to_room, TRUE)) {
+			perform_move(ch, NO_DIR, to_room, MOVE_ENTER_PORTAL | MOVE_WANDER);
 			moved = TRUE;
 		}
-		else if (track_to_room != NOWHERE && find_vehicle_in_room_with_interior(IN_ROOM(ch), track_to_room)) {
-			perform_move(ch, NO_DIR, real_room(track_to_room), MOVE_ENTER_VEH | MOVE_WANDER);
+		else if (track_to_room != NOWHERE && find_vehicle_in_room_with_interior(IN_ROOM(ch), track_to_room) && (to_room = real_room(track_to_room)) && validate_mobile_move(ch, NO_DIR, to_room, TRUE)) {
+			perform_move(ch, NO_DIR, to_room, MOVE_ENTER_VEH | MOVE_WANDER);
 			moved = TRUE;
 		}
-		else if (GET_ROOM_VEHICLE(IN_ROOM(ch)) && IN_ROOM(GET_ROOM_VEHICLE(IN_ROOM(ch))) && GET_ROOM_VNUM(IN_ROOM(GET_ROOM_VEHICLE(IN_ROOM(ch)))) == track_to_room) {
-			perform_move(ch, NO_DIR, real_room(track_to_room), MOVE_EXIT | MOVE_WANDER);
+		else if (GET_ROOM_VEHICLE(IN_ROOM(ch)) && IN_ROOM(GET_ROOM_VEHICLE(IN_ROOM(ch))) && GET_ROOM_VNUM(IN_ROOM(GET_ROOM_VEHICLE(IN_ROOM(ch)))) == track_to_room && (to_room = real_room(track_to_room)) && validate_mobile_move(ch, NO_DIR, to_room, TRUE)) {
+			perform_move(ch, NO_DIR, to_room, MOVE_EXIT | MOVE_WANDER);
 			moved = TRUE;
 		}
-		else if (dir != NO_DIR) {
+		else if (dir != NO_DIR && validate_mobile_move(ch, dir, dir_to_room(IN_ROOM(ch), dir, FALSE), TRUE)) {
 			perform_move(ch, dir, NULL, MOVE_WANDER);
 			moved = TRUE;
 		}
@@ -1057,107 +1059,78 @@ bool check_mob_pursuit(char_data *ch) {
 
 
 /**
-* This checks if a mob is willing to move onto a given sect.
-*
-* @param char_data *mob The mob.
-* @param room_data *to_room The room to check movement into.
-* @return bool TRUE if the mob will move there, FALSE if not
-*/
-bool mob_can_move_to_sect(char_data *mob, room_data *to_room) {
-	sector_data *sect = SECT(to_room);
-	int move_type = MOB_MOVE_TYPE(mob);
-	bool ok = FALSE;
-	
-	// sect- and ability-based determinations
-	if (ROOM_PRIVATE_OWNER(to_room) != NOBODY) {
-		ok = FALSE;
-	}
-	else if (ROOM_AFF_FLAGGED(to_room, ROOM_AFF_REPEL_NPCS)) {
-		ok = FALSE;
-	}
-	else if (ROOM_AFF_FLAGGED(to_room, ROOM_AFF_REPEL_ANIMALS) && MOB_FLAGGED(mob, MOB_ANIMAL)) {
-		ok = FALSE;
-	}
-	else if (ROOM_BLD_FLAGGED(to_room, BLD_NO_NPC) && IS_COMPLETE(to_room)) {
-		// nope
-		ok = FALSE;
-	}
-	else if (ROOM_IS_CLOSED(to_room) && !ROOM_IS_CLOSED(IN_ROOM(mob)) && MOB_FLAGGED(mob, MOB_AVOID_BUILDINGS)) {
-		ok = FALSE;	// avoid buildings
-	}
-	else if (SECT_FLAGGED(sect, SECTF_IS_ROAD) && !MOB_FLAGGED(mob, MOB_AQUATIC) && move_type != MOB_MOVE_SWIM) {
-		ok = TRUE;
-	}
-	else if (AFF_FLAGGED(mob, AFF_FLYING)) {
-		ok = TRUE;
-	}
-	else if (SECT_FLAGGED(sect, SECTF_ROUGH)) {
-		if (move_type == MOB_MOVE_CLIMB || MOB_FLAGGED(mob, MOB_MOUNTAINWALK)) {
-			ok = TRUE;
-		}
-	}
-	else if (SECT_FLAGGED(sect, SECTF_FRESH_WATER | SECTF_OCEAN)) {
-		if (MOB_FLAGGED(mob, MOB_AQUATIC) || HAS_WATERWALKING(mob) || move_type == MOB_MOVE_SWIM || move_type == MOB_MOVE_PADDLE) {
-			ok = TRUE;
-		}
-	}
-	else {
-		// not mountain/ocean/river/road ... just check for move types that indicate non-flat-ground
-		if (move_type != MOB_MOVE_SWIM && move_type != MOB_MOVE_PADDLE) {
-			ok = TRUE;
-		}
-	}
-	
-	// overrides: things that cancel previous oks
-	
-	// non-humans won't enter buildings (open buildings only count if finished)
-	if (!MOB_FLAGGED(mob, MOB_HUMAN) && SECT_FLAGGED(sect, SECTF_MAP_BUILDING | SECTF_INSIDE) && ROOM_IS_CLOSED(to_room)) {
-		ok = FALSE;
-	}
-	
-	// done
-	return ok;
-}
-
-
-/**
 * This makes the final determination as to whether a mob can enter a specific
 * building or room.
 *
 * @param char_data *ch The mobile
 * @param int dir Which direction (NORTH, etc); may be NO_DIR
 * @param room_data *to_room The destination
+* @param bool pursuit If TRUE, loosens restrictions on movement due to a pursuit condition.
 * @return TRUE if the move is valid, FALSE otherwise
 */
-bool validate_mobile_move(char_data *ch, int dir, room_data *to_room) {
+bool validate_mobile_move(char_data *ch, int dir, room_data *to_room, bool pursuit) {
 	empire_data *ch_emp = GET_LOYALTY(ch);
 	empire_data *room_emp = ROOM_OWNER(to_room);
-	bool valid = TRUE;
+	sector_data *sect = SECT(to_room);
 	
-	// !mob room
-	if (valid && (RMT_FLAGGED(to_room, RMT_NO_MOB) || (IS_COMPLETE(to_room) && ROOM_BLD_FLAGGED(to_room, BLD_NO_NPC)))) {
-		valid = FALSE;
+	// sanity first
+	if (!ch || !to_room) {
+		log("SYSERR: validate_mobile_move called without %s", (ch ? "to_room" : "ch"));
+		return FALSE;
+	}
+
+	// check building and entrances
+	if (dir != NO_DIR && ROOM_IS_CLOSED(to_room) && !ROOM_IS_CLOSED(IN_ROOM(ch)) && BUILDING_ENTRANCE(to_room) != dir && (!ROOM_BLD_FLAGGED(to_room, BLD_TWO_ENTRANCES) || BUILDING_ENTRANCE(to_room) != rev_dir[dir])) {
+		return FALSE;	// can't enter that direction
+	}
+	if (ROOM_AFF_FLAGGED(to_room, ROOM_AFF_REPEL_NPCS)) {
+		return FALSE;	// repel aff
+	}
+	if (ROOM_AFF_FLAGGED(to_room, ROOM_AFF_REPEL_ANIMALS) && MOB_FLAGGED(ch, MOB_ANIMAL)) {
+		return FALSE;	// repel animals aff
+	}
+	if (ROOM_IS_CLOSED(to_room) && !ROOM_IS_CLOSED(IN_ROOM(ch)) && MOB_FLAGGED(ch, MOB_AVOID_BUILDINGS)) {
+		return FALSE;	// mobs that avoid buildings
+	}
+	if (!pursuit && ROOM_PRIVATE_OWNER(to_room) != NOBODY) {
+		return FALSE;	// private owner
+	}
+	if (!pursuit && !MOB_FLAGGED(ch, MOB_HUMAN) && SECT_FLAGGED(sect, SECTF_MAP_BUILDING | SECTF_INSIDE) && ROOM_IS_CLOSED(to_room)) {
+		return FALSE;	// non-human mobs normally avoid entering buildings
+	}
+	if (!pursuit && (RMT_FLAGGED(to_room, RMT_NO_MOB) || (ROOM_BLD_FLAGGED(to_room, BLD_NO_NPC) && IS_COMPLETE(to_room)))) {
+		return FALSE;	// no-mob room template or no-npc building
+	}
+	if (ROOM_BLD_FLAGGED(to_room, BLD_BARRIER | BLD_NO_WALKING_NPCS) && IS_COMPLETE(to_room) && (!AFF_FLAGGED(ch, AFF_FLYING) || ROOM_AFF_FLAGGED(to_room, ROOM_AFF_NO_FLY))) {
+		return FALSE;	// barriers and fences
 	}
 	
-	if (valid && ROOM_BLD_FLAGGED(to_room, BLD_BARRIER) && IS_COMPLETE(to_room)) {
-		valid = FALSE;
+	// things that only matter if they're not flying
+	if (!AFF_FLAGGED(ch, AFF_FLYING)) {
+		if (SECT_FLAGGED(sect, SECTF_ROUGH) && MOB_MOVE_TYPE(ch) != MOB_MOVE_CLIMB && !MOB_FLAGGED(ch, MOB_MOUNTAINWALK)) {
+			return FALSE;	// rough
+		}
+		if (WATER_SECT(to_room) && !MOB_FLAGGED(ch, MOB_AQUATIC) && !HAS_WATERWALKING(ch) && MOB_MOVE_TYPE(ch) != MOB_MOVE_SWIM && MOB_MOVE_TYPE(ch) != MOB_MOVE_PADDLE) {
+			return FALSE;	// water
+		}
+		if (!WATER_SECT(to_room) && MOB_FLAGGED(ch, MOB_AQUATIC)) {
+			return FALSE;	// aquatic mob rejects non-water sect
+		}
 	}
 	
 	// check building permissions (hostile empire locations only)
-	if (valid && !IS_OUTDOOR_TILE(to_room) && room_emp && room_emp != ch_emp && (MOB_FLAGGED(ch, MOB_AGGRESSIVE) || empire_is_hostile(room_emp, ch_emp, to_room))) {
+	if (ROOM_IS_CLOSED(to_room) && !ROOM_IS_CLOSED(IN_ROOM(ch)) && room_emp && room_emp != ch_emp && (MOB_FLAGGED(ch, MOB_AGGRESSIVE) || empire_is_hostile(room_emp, ch_emp, to_room))) {
 		if (MOB_FLAGGED(ch, MOB_AGGRESSIVE | MOB_CITYGUARD)) {
-			// only locks blocks aggressive/cityguard
-			if (EMPIRE_HAS_TECH(room_emp, TECH_LOCKS)) {
-				valid = FALSE;
+			if (!pursuit && EMPIRE_HAS_TECH(room_emp, TECH_LOCKS)) {
+				return FALSE;	// only locks blocks aggressive/cityguard, and only if not pursuing
 			}
 		}
-		else {
-			// not aggressive: blocked by non-matching empire
-			valid = FALSE;
+		else if (!pursuit || EMPIRE_HAS_TECH(room_emp, TECH_LOCKS)) {
+			return FALSE;	// not pursuit OR empire has locks: block mobs for hostile empire
 		}
 	}
 	
-	return valid;
+	return TRUE;	// ok!
 }
 
 
@@ -1223,7 +1196,7 @@ bool try_mobile_movement(char_data *ch) {
 			if (!(temp_room = get_vehicle_interior(veh))) {
 				continue; // no interior
 			}
-			if (!mob_can_move_to_sect(ch, temp_room) || !validate_mobile_move(ch, NO_DIR, temp_room)) {
+			if (!validate_mobile_move(ch, NO_DIR, temp_room, FALSE)) {
 				continue;	// won't go there
 			}
 			
@@ -1241,22 +1214,15 @@ bool try_mobile_movement(char_data *ch) {
 	else if (dir != -1 && IS_OUTDOORS(ch) && GET_ROOM_VNUM(IN_ROOM(ch)) < MAP_SIZE) {
 		// map movement:
 		to_room = real_shift(IN_ROOM(ch), shift_dir[dir][0], shift_dir[dir][1]);
-		
-		if (to_room && mob_can_move_to_sect(ch, to_room)) {
-			// check building and entrances
-			if ((!ROOM_BLD_FLAGGED(to_room, BLD_OPEN) && !IS_COMPLETE(to_room)) || (!IS_ADVENTURE_ROOM(IN_ROOM(ch)) && !IS_INSIDE(IN_ROOM(ch)) && ROOM_IS_CLOSED(to_room) && BUILDING_ENTRANCE(to_room) != dir && (!ROOM_BLD_FLAGGED(to_room, BLD_TWO_ENTRANCES) || BUILDING_ENTRANCE(to_room) != rev_dir[dir]))) {
-				// can't go that way
-			}
-			else if (validate_mobile_move(ch, dir, to_room)) {
-				perform_move(ch, dir, to_room, MOVE_WANDER);
-			}
+		if (to_room && validate_mobile_move(ch, dir, to_room, FALSE)) {
+			perform_move(ch, dir, to_room, MOVE_WANDER);
 		}
 	}
 	else if (use_exit && CAN_GO(ch, use_exit)) {
 		// indoor movement
 		to_room = use_exit->room_ptr;
 		
-		if (to_room && mob_can_move_to_sect(ch, to_room) && validate_mobile_move(ch, use_exit->dir, to_room)) {
+		if (to_room && validate_mobile_move(ch, use_exit->dir, to_room, FALSE)) {
 			perform_move(ch, use_exit->dir, to_room, MOVE_WANDER);
 		}
 	}
@@ -1875,7 +1841,7 @@ void spawn_one_room(room_data *room, bool only_artisans) {
 				data->x_coord = X_COORD(room);
 				data->y_coord = Y_COORD(room);
 				data->in_city = (ROOM_OWNER(home) && is_in_city_for_empire(room, ROOM_OWNER(home), TRUE, &junk)) ? TRUE : FALSE;
-				run_globals(GLOBAL_MAP_SPAWNS, run_global_map_spawns, TRUE, get_climate(room), NULL, NULL, 0, validate_global_map_spawns, data);
+				run_globals(GLOBAL_MAP_SPAWNS, run_global_map_spawns, TRUE, get_climate(room), NULL, room, NULL, 0, validate_global_map_spawns, data);
 				free(data);
 			}
 		}
@@ -2190,6 +2156,125 @@ int determine_best_scale_level(char_data *ch, bool check_group) {
 
 
 /**
+* Calculates the block cap a character can expect against a given target -- the
+* maximum amount of block that the character can benefit from.
+*
+* Warning: If mob scaling numbers change in scale_mob_to_level(), this
+* calculation must change, too.
+*
+* @param char_data *ch The person who will be dodging.
+* @param int level Level of the attacker.
+* @param int dexterity Dexterity of the attacker.
+* @param bitvector_t mob_flags Mob flags of the attacker (MOB_HARD and/or MOB_GROUP).
+* @return int The calculated block cap for this encounter.
+*/
+int get_block_cap_for(char_data *ch, int level, int dexterity, bitvector_t mob_flags) {
+	double block = 0.0;
+	
+	if (!ch) {
+		return 0;
+	}
+	
+	// level
+	block = level / 2.0;
+	
+	// flagging
+	if (IS_SET(mob_flags, MOB_HARD)) {
+		block *= 1.1;
+	}
+	if (IS_SET(mob_flags, MOB_GROUP)) {
+		block *= 1.3;
+	}
+
+	return (int) block;
+}
+
+
+/**
+* Calculates the dodge cap a character can expect against a given target -- the
+* maximum amount of dodge that the character can benefit from.
+*
+* Warning: If mob scaling numbers change in scale_mob_to_level(), this
+* calculation must change, too.
+*
+* @param char_data *ch The person who will be dodging.
+* @param int level Level of the attacker.
+* @param int dexterity Dexterity of the attacker.
+* @param bitvector_t mob_flags Mob flags of the attacker (MOB_HARD and/or MOB_GROUP).
+* @return int The calculated dodge cap for this encounter.
+*/
+int get_dodge_cap_for(char_data *ch, int level, int dexterity, bitvector_t mob_flags) {
+	double dodge = 0.0;
+	
+	if (!ch) {
+		return 0;
+	}
+	
+	// level
+	dodge = MAX(level - 50, 0.0);
+	dodge += level / 10;
+	
+	// flagging
+	if (IS_SET(mob_flags, MOB_HARD)) {
+		dodge *= 1.1;
+	}
+	if (IS_SET(mob_flags, MOB_GROUP)) {
+		dodge *= 1.3;
+	}
+	
+	// base add
+	dodge += 75;
+	
+	// dex modifier
+	dodge += 5 * (dexterity - GET_DEXTERITY(ch));
+
+	return (int) dodge;
+}
+
+
+/**
+* Calculates the hit cap a character can expect against a given target -- the
+* level of to-hit after which more stats won't help.
+*
+* Warning: If mob scaling numbers change in scale_mob_to_level(), this
+* calculation must change, too.
+*
+* @param char_data *ch The person who will be attacking.
+* @param int level Level of the target.
+* @param int dexterity Dexterity of the target.
+* @param bitvector_t mob_flags Mob flags of the target (MOB_HARD and/or MOB_GROUP).
+* @return int The calculated hit cap for this encounter.
+*/
+int get_hit_cap_for(char_data *ch, int level, int dexterity, bitvector_t mob_flags) {
+	double to_hit = 0.0;
+	
+	if (!ch) {
+		return 0;
+	}
+	
+	// level
+	to_hit = MAX(level - 50, 0.0);
+	to_hit += level / 10;
+	
+	// flagging
+	if (IS_SET(mob_flags, MOB_HARD)) {
+		to_hit *= 1.1;
+	}
+	if (IS_SET(mob_flags, MOB_GROUP)) {
+		to_hit *= 1.3;
+	}
+	
+	// base add
+	to_hit += 100;
+	
+	// dex modifier
+	to_hit += 5 * (dexterity - GET_DEXTERITY(ch));
+	
+	return (int) to_hit;
+}
+
+
+/**
 * Scales a mob below the leader's level like a companion. Companions generally
 * scale 25 levels below the character's level (or the use_level, if you pass
 * one) if the level is over 100. That is, companions scale with the character
@@ -2340,7 +2425,7 @@ void scale_mob_to_level(char_data *mob, int level) {
 	value += MOB_FLAGGED(mob, MOB_GROUP) ? 2.0 : 0;
 	mob->real_attributes[STRENGTH] = MAX(1, (int) ceil(value));
 	
-	// dexterity
+	// dexterity: note the level/20.0 calculation is also used in get_trait_modifier()
 	value = level / 20.0;
 	value *= MOB_FLAGGED(mob, MOB_TANK) ? 1.25 : 1.0;
 	value += MOB_FLAGGED(mob, MOB_HARD) ? 1.25 : 0;
@@ -2385,14 +2470,14 @@ void scale_mob_to_level(char_data *mob, int level) {
 	}
 	mob->mob_specials.damage = MAX(1, (int) ceil(value));
 	
-	// to-hit
+	// to-hit: if this changes, you must also update get_dodge_cap_for(), which must avoid this to-hit
 	value = MAX(0, level - 50) + (level * 0.1);
 	value *= MOB_FLAGGED(mob, MOB_HARD) ? 1.1 : 1.0;
 	value *= MOB_FLAGGED(mob, MOB_GROUP) ? 1.3 : 1.0;
 	value += 50;	// to hit-cap them
 	mob->mob_specials.to_hit = MAX(0, (int) round(value));
 	
-	// to-dodge
+	// to-dodge: if this changes, you must also update get_hit_cap_for(), which is for characters trying to hit this level of dodge
 	value = MAX(0, level - 50) + (level * 0.1);
 	value *= MOB_FLAGGED(mob, MOB_HARD) ? 1.1 : 1.0;
 	value *= MOB_FLAGGED(mob, MOB_GROUP) ? 1.3 : 1.0;

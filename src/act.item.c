@@ -1515,6 +1515,7 @@ obj_data *perform_remove(char_data *ch, int pos) {
 
 
 static void perform_wear(char_data *ch, obj_data *obj, int where) {
+	bool any_match;
 	char buf[MAX_STRING_LENGTH];
 	struct obj_apply *apply;
 	int iter, type, val;
@@ -1570,15 +1571,17 @@ static void perform_wear(char_data *ch, obj_data *obj, int where) {
 	
 		// check weakness (check all applies first, in case they contradict like -1str +2str)
 		for (iter = 0; primary_attributes[iter] != NOTHING; ++iter) {
+			any_match = FALSE;
 			type = primary_attributes[iter];
 			val = GET_ATT(ch, type);
 			for (apply = GET_OBJ_APPLIES(obj); apply; apply = apply->next) {
 				if (apply_attribute[(int) apply->location] == type) {
 					val += apply->modifier;
+					any_match = TRUE;
 				}
 			}
 		
-			if (val < 1) {
+			if (val < 1 && any_match) {
 				sprintf(buf, "You are %s to use $p!", attributes[type].low_error);
 				act(buf, FALSE, ch, obj, 0, TO_CHAR);
 				return;
@@ -3673,6 +3676,42 @@ int calculate_shipping_time(struct shipping_data *shipd) {
 
 
 /**
+* @param empire_data *emp The empire whose shipment it is.
+* @param struct shipping_data *shipment The shipment to cancel.
+* @param char_data *ch Optional: Character who will receive a cancel message (may be NULL).
+*/
+bool cancel_shipment(empire_data *emp, struct shipping_data *shipment, char_data *ch) {
+	obj_data *proto;
+	struct empire_storage_data *store;
+	
+	if (!emp || !shipment) {
+		log("SYSERR: cancel_shipment called with no %s", (emp ? "shipment" : "empire"));
+		return FALSE;
+	}
+	
+	if ((proto = obj_proto(shipment->vnum))) {
+		if (ch) {
+			msg_to_char(ch, "You cancel the shipment for %d '%s'.\r\n", shipment->amount, skip_filler(GET_OBJ_SHORT_DESC(proto)));
+		}
+		if (shipment->amount > 0) {
+			// amount can drop to 0 if they all decayed
+			store = add_to_empire_storage(emp, shipment->from_island, shipment->vnum, shipment->amount, 0);
+			if (store) {
+				merge_storage_timers(&store->timers, shipment->timers, shipment->amount);
+			}
+		}
+	}
+	
+	// and free it up
+	DL_DELETE(EMPIRE_SHIPPING_LIST(emp), shipment);
+	free_shipping_data(shipment);
+	EMPIRE_NEEDS_STORAGE_SAVE(emp) = TRUE;
+	
+	return TRUE;
+}
+
+
+/**
 * Unloads a shipment at its destination island (or the origin, if it can't find
 * docks). This frees the shipment data afterwards.
 *
@@ -4142,10 +4181,22 @@ void process_shipping_one(empire_data *emp) {
 */
 void process_shipping(void) {
 	empire_data *emp, *next_emp;
+	struct shipping_data *shipd, *next_shipd;
 	
 	HASH_ITER(hh, empire_table, emp, next_emp) {
-		if (EMPIRE_SHIPPING_LIST(emp) && !EMPIRE_IS_TIMED_OUT(emp)) {
-			process_shipping_one(emp);
+		if (EMPIRE_SHIPPING_LIST(emp)) {
+			if (EMPIRE_IS_TIMED_OUT(emp)) {
+				// TIMED OUT: cancel all shipping
+				log_to_empire(emp, ELOG_SHIPPING, "Canceled shipping orders due to idle empire");
+				
+				DL_FOREACH_SAFE(EMPIRE_SHIPPING_LIST(emp), shipd, next_shipd) {
+					cancel_shipment(emp, shipd, NULL);
+				}
+			}
+			else {
+				// ok to ship
+				process_shipping_one(emp);
+			}
 		}
 	}
 }
@@ -8005,7 +8056,7 @@ ACMD(do_retrieve) {
 			remove_room_extra_data(IN_ROOM(ch), ROOM_EXTRA_CEDED);
 		}
 		
-		read_vault(emp);
+		TRIGGER_DELAYED_REFRESH(emp, DELAY_REFRESH_VAULT);
 	}
 }
 
@@ -8302,7 +8353,7 @@ ACMD(do_ship) {
 	char *strptr;
 	struct island_info *from_isle, *to_isle;
 	empire_data *emp = GET_LOYALTY(ch);
-	struct empire_storage_data *store, *new_store;
+	struct empire_storage_data *store;
 	struct shipping_data *sd;
 	bool done, wrong_isle, gave_number = FALSE, all = FALSE, targeted_island = FALSE;
 	bool imm_access = GET_ACCESS_LEVEL(ch) >= LVL_CIMPL || IS_GRANTED(ch, GRANT_EMPIRES);
@@ -8438,22 +8489,11 @@ ACMD(do_ship) {
 				continue;
 			}
 			
-			// found!
-			msg_to_char(ch, "You cancel the shipment for %d '%s'.\r\n", sd->amount, skip_filler(GET_OBJ_SHORT_DESC(proto)));
-			if (sd->amount > 0) {
-				// amount can drop to 0 if they all decayed
-				new_store = add_to_empire_storage(emp, sd->from_island, sd->vnum, sd->amount, 0);
-				if (new_store) {
-					merge_storage_timers(&new_store->timers, sd->timers, sd->amount);
-				}
+			// ok?
+			if (cancel_shipment(emp, sd, ch)) {
+				done = TRUE;
+				break;	// only allow 1st match
 			}
-			
-			DL_DELETE(EMPIRE_SHIPPING_LIST(emp), sd);
-			free_shipping_data(sd);
-			EMPIRE_NEEDS_STORAGE_SAVE(emp) = TRUE;
-			
-			done = TRUE;
-			break;	// only allow 1st match
 		}
 		
 		if (!done) {
@@ -8705,7 +8745,7 @@ ACMD(do_store) {
 			remove_room_extra_data(IN_ROOM(ch), ROOM_EXTRA_CEDED);
 		}
 		
-		read_vault(emp);
+		TRIGGER_DELAYED_REFRESH(emp, DELAY_REFRESH_VAULT);
 	}
 }
 

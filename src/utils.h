@@ -1869,6 +1869,7 @@ static inline int GET_SEASON(room_data *room) {
 #define VEH_CLAIMS_WITH_ROOM(veh)  (VEH_FLAGGED((veh), VEH_BUILDING) && !VEH_FLAGGED((veh), MOVABLE_VEH_FLAGS | VEH_NO_CLAIM))
 #define VEH_HAS_ANY_ICON(veh)  (VEH_ICON(veh) || VEH_HALF_ICON(veh) || VEH_QUARTER_ICON(veh))
 #define VEH_IS_EXTRACTED(veh)  VEH_FLAGGED((veh), VEH_EXTRACTED)
+#define VEH_IS_PRIVATE(veh)  (VEH_INTERIOR_HOME_ROOM(veh) ? ROOM_AFF_FLAGGED(VEH_INTERIOR_HOME_ROOM(veh), ROOM_AFF_PRIVATE) : (IN_ROOM(veh) && ROOM_OWNER(IN_ROOM(veh)) == VEH_OWNER(veh) && ROOM_AFF_FLAGGED(IN_ROOM(veh), ROOM_AFF_PRIVATE)))
 #define VEH_IS_PUBLIC(veh)  (VEH_INTERIOR_HOME_ROOM(veh) ? ROOM_AFF_FLAGGED(VEH_INTERIOR_HOME_ROOM(veh), ROOM_AFF_PUBLIC) : (IN_ROOM(veh) && ROOM_OWNER(IN_ROOM(veh)) == VEH_OWNER(veh) && ROOM_AFF_FLAGGED(IN_ROOM(veh), ROOM_AFF_PUBLIC)))
 #define VEH_IS_VISIBLE_ON_MAPOUT(veh)  (VEH_FLAGGED((veh), VEH_BUILDING) && VEH_HAS_ANY_ICON(veh) && VEH_SIZE(veh) > 0 && !VEH_FLAGGED((veh), VEH_CHAMELEON))
 #define VEH_FLAGGED(veh, flag)  IS_SET(VEH_FLAGS(veh), (flag))
@@ -1879,6 +1880,7 @@ static inline int GET_SEASON(room_data *room) {
 #define VEH_OR_BLD(veh)  (VEH_FLAGGED((veh), VEH_BUILDING) ? "building" : "vehicle")
 #define VEH_PAINT_COLOR(veh)  get_vehicle_extra_data((veh), ROOM_EXTRA_PAINT_COLOR)
 #define VEH_PATRON(veh)  get_vehicle_extra_data((veh), ROOM_EXTRA_DEDICATE_ID)
+#define VEH_PURGES_WHEN_TILE_RUINS(veh)  (!VEH_OWNER(veh) && !VEH_CONTAINS(veh) && !VEH_REGULAR_MAINTENANCE(veh) && !VEH_FLAGGED((veh), VEH_IS_RUINS))
 #define VEH_PROVIDES_LIGHT(veh)  (VEH_FLAGGED((veh), VEH_BUILDING) && (VEH_OWNER(veh) || (IN_ROOM(veh) && ROOM_AFF_FLAGGED(IN_ROOM(veh), ROOM_AFF_UNCLAIMABLE))))
 
 
@@ -2534,7 +2536,7 @@ char *screenread_one_tile(char_data *ch, room_data *origin, room_data *to_room, 
 #define HOLYLIGHT_OR_TILE_OWNER(ch, room)  (PRF_FLAGGED((ch), PRF_HOLYLIGHT) || !ROOM_OWNER(room) || (GET_LOYALTY(ch) && GET_LOYALTY(ch) == ROOM_OWNER(room)))
 #define HOLYLIGHT_OR_VEH_OWNER(ch, veh)  (PRF_FLAGGED((ch), PRF_HOLYLIGHT) || !VEH_OWNER(veh) || (GET_LOYALTY(ch) && GET_LOYALTY(ch) == VEH_OWNER(veh)))
 
-void get_informative_string(char_data *ch, char *buffer, bool dismantling, bool unfinished, bool major_disrepair, bool minor_disrepair, int mine_view, bool public, bool no_work, bool no_abandon, bool no_dismantle, bool chameleon);
+void get_informative_string(char_data *ch, char *buffer, bool dismantling, bool unfinished, bool major_disrepair, bool minor_disrepair, int mine_view, bool public, bool private, bool no_work, bool no_abandon, bool no_dismantle, bool chameleon);
 #define INFORMATIVE_MINE_VALUE(ch, room)  ((get_room_extra_data((room), ROOM_EXTRA_MINE_GLB_VNUM) > 0) ? ((PRF_FLAGGED((ch), PRF_HOLYLIGHT) || room_has_function_and_city_ok(GET_LOYALTY(ch), (room), FNC_MINE) || (GET_LOYALTY(ch) && get_room_extra_data((room), ROOM_EXTRA_PROSPECT_EMPIRE) == EMPIRE_VNUM(GET_LOYALTY(ch)))) ? (get_room_extra_data((room), ROOM_EXTRA_MINE_AMOUNT) > 0 ? 1 : -1) : 0) : 0)
 #define get_informative_tile_string(ch, room, buffer)  get_informative_string((ch), (buffer), \
 	/* dismantling */ (HOLYLIGHT_OR_TILE_OWNER((ch), (room)) && IS_DISMANTLING(room)) ? TRUE : FALSE, \
@@ -2543,6 +2545,7 @@ void get_informative_string(char_data *ch, char *buffer, bool dismantling, bool 
 	/* minor_disrepair */ HAS_MINOR_DISREPAIR(room), \
 	/* mine_view */ INFORMATIVE_MINE_VALUE(ch, room), \
 	/* public */ ROOM_AFF_FLAGGED((room), ROOM_AFF_PUBLIC) ? TRUE : FALSE, \
+	/* private */ ROOM_AFF_FLAGGED((room), ROOM_AFF_PRIVATE) ? TRUE : FALSE, \
 	/* no_work */ (HOLYLIGHT_OR_TILE_OWNER((ch), (room)) && ROOM_AFF_FLAGGED((room), ROOM_AFF_NO_WORK)) ? TRUE : FALSE, \
 	/* no_abandon */ (HOLYLIGHT_OR_TILE_OWNER((ch), (room)) && ROOM_AFF_FLAGGED((room), ROOM_AFF_NO_ABANDON)) ? TRUE : FALSE, \
 	/* no_dismantle */ (HOLYLIGHT_OR_TILE_OWNER((ch), (room)) && ROOM_AFF_FLAGGED((room), ROOM_AFF_NO_DISMANTLE)) ? TRUE : FALSE, \
@@ -2555,13 +2558,14 @@ void get_informative_string(char_data *ch, char *buffer, bool dismantling, bool 
 	/* minor_disrepair */ VEH_HAS_MINOR_DISREPAIR(veh), \
 	/* mine_view */ INFORMATIVE_MINE_VALUE(ch, IN_ROOM(veh)), \
 	/* public */ VEH_IS_PUBLIC(veh), \
+	/* private */ VEH_IS_PRIVATE(veh), \
 	/* no_work */ (HOLYLIGHT_OR_VEH_OWNER((ch), (veh)) && VEH_FLAGGED((veh), VEH_PLAYER_NO_WORK)) || (VEH_CLAIMS_WITH_ROOM(veh) && HOLYLIGHT_OR_TILE_OWNER((ch), IN_ROOM(veh)) && ROOM_AFF_FLAGGED(IN_ROOM(veh), ROOM_AFF_NO_WORK)), \
 	/* no_abandon */ FALSE /*HOLYLIGHT_OR_VEH_OWNER((ch), (veh)) && VEH_FLAGGED((veh), VEH_PLAYER_NO_ABANDON)*/, \
 	/* no_dismantle */ (HOLYLIGHT_OR_VEH_OWNER((ch), (veh)) && VEH_FLAGGED((veh), VEH_PLAYER_NO_DISMANTLE)) ? TRUE : FALSE, \
 	/* chameleon */ (ch) && IS_IMMORTAL(ch) && ((ROOM_AFF_FLAGGED(IN_ROOM(veh), ROOM_AFF_CHAMELEON) && IS_COMPLETE(IN_ROOM(veh))) || vehicle_is_chameleon(veh, IN_ROOM(ch))) \
 )
 
-char *get_informative_color(char_data *ch, bool dismantling, bool unfinished, bool major_disrepair, bool minor_disrepair, int mine_view, bool public, bool no_work, bool no_abandon, bool no_dismantle, bool chameleon);
+char *get_informative_color(char_data *ch, bool dismantling, bool unfinished, bool major_disrepair, bool minor_disrepair, int mine_view, bool public, bool private, bool no_work, bool no_abandon, bool no_dismantle, bool chameleon);
 #define simple_distance(x, y, a, b)		((x - a) * (x - a) + (y - b) * (y - b))
 #define get_informative_color_room(ch, room)  get_informative_color((ch), \
 	/* dismantling */ (HOLYLIGHT_OR_TILE_OWNER((ch), (room)) && IS_DISMANTLING(room)) ? TRUE : FALSE, \
@@ -2570,6 +2574,7 @@ char *get_informative_color(char_data *ch, bool dismantling, bool unfinished, bo
 	/* minor_disrepair */ HAS_MINOR_DISREPAIR(room), \
 	/* mine_view */ INFORMATIVE_MINE_VALUE(ch, room), \
 	/* public */ ROOM_AFF_FLAGGED(room, ROOM_AFF_PUBLIC) ? TRUE : FALSE, \
+	/* private */ ROOM_AFF_FLAGGED(room, ROOM_AFF_PRIVATE) ? TRUE : FALSE, \
 	/* no_work */ (HOLYLIGHT_OR_TILE_OWNER((ch), (room)) && ROOM_AFF_FLAGGED(room, ROOM_AFF_NO_WORK)) ? TRUE : FALSE, \
 	/* no_abandon */ (HOLYLIGHT_OR_TILE_OWNER((ch), (room)) && ROOM_AFF_FLAGGED(room, ROOM_AFF_NO_ABANDON)) ? TRUE : FALSE, \
 	/* no_dismantle */ (HOLYLIGHT_OR_TILE_OWNER((ch), (room)) && ROOM_AFF_FLAGGED(room, ROOM_AFF_NO_DISMANTLE)) ? TRUE : FALSE, \
@@ -2582,6 +2587,7 @@ char *get_informative_color(char_data *ch, bool dismantling, bool unfinished, bo
 	/* minor_disrepair */ VEH_HAS_MINOR_DISREPAIR(veh), \
 	/* mine_view */ INFORMATIVE_MINE_VALUE(ch, IN_ROOM(veh)), \
 	/* public */ VEH_IS_PUBLIC(veh), \
+	/* private */ VEH_IS_PRIVATE(veh), \
 	/* no_work */ (HOLYLIGHT_OR_VEH_OWNER((ch), (veh)) && VEH_FLAGGED((veh), VEH_PLAYER_NO_WORK)) || (HOLYLIGHT_OR_TILE_OWNER((ch), IN_ROOM(veh)) && VEH_CLAIMS_WITH_ROOM(veh) && ROOM_AFF_FLAGGED(IN_ROOM(veh), ROOM_AFF_NO_WORK)), \
 	/* no_abandon */ FALSE, \
 	/* no_dismantle */ (HOLYLIGHT_OR_VEH_OWNER((ch), (veh)) && VEH_FLAGGED((veh), VEH_PLAYER_NO_DISMANTLE)) ? TRUE : FALSE, \
@@ -2599,6 +2605,9 @@ int determine_best_scale_level(char_data *ch, bool check_group);
 void end_pursuit(char_data *ch, char_data *target);
 struct generic_name_data *get_generic_name_list(int name_set, int sex);
 struct generic_name_data *get_best_name_list(int name_set, int sex);
+int get_block_cap_for(char_data *ch, int level, int dexterity, bitvector_t mob_flags);
+int get_dodge_cap_for(char_data *ch, int level, int dexterity, bitvector_t mob_flags);
+int get_hit_cap_for(char_data *ch, int level, int dexterity, bitvector_t mob_flags);
 int mob_coins(char_data *mob);
 void random_encounter(char_data *ch);
 void reschedule_all_despawns();
@@ -2871,7 +2880,7 @@ char_data *find_chore_worker_in_room(empire_data *emp, room_data *room, vehicle_
 struct empire_npc_data *find_free_npc_for_chore(empire_data *emp, room_data *loc);
 void free_workforce_where_log(struct workforce_where_log **to_free);
 int *get_ordered_chores();
-void log_workforce_where(empire_data *emp, char_data *mob, int chore);
+void log_workforce_where(empire_data *emp, char_data *mob, int chore, vehicle_data *veh);
 void remove_from_workforce_where_log(empire_data *emp, char_data *mob);
 void set_workforce_production_limit(empire_data *emp, any_vnum vnum, int amount);
 int sort_einv_by_amount(struct empire_storage_data *a, struct empire_storage_data *b);

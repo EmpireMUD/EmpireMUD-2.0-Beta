@@ -862,7 +862,8 @@ needs in order to hit you.
 
 For fighting NPCs, the highest possible dodge chance is 55%. Against players,
 it's 75%. Players who aren't in tank/solo role have a lower dodge cap by 20%.
-Some abilities may change the dodge cap as well.
+Some abilities may change the dodge cap as well. View your dodge cap against
+an NPC using the 'consider' command.
 
 Players' chance of hitting you is based on their to-hit score, but
 mobs are more predictable and it is possible to reach a "dodge cap", the amount
@@ -877,7 +878,7 @@ Dodge cap:
 - Add 75 to the total
 - Add +5 per Dexterity the mob has more than you
 
-See also: AFFECTS, SCORE, TO-HIT, IMPROVED REFLEXES
+See also: AFFECTS, CONSIDER, SCORE, TO-HIT, IMPROVED REFLEXES
 #
 DOT "DOT EFFECT" "DAMAGE OVER TIME" DAMAGE-OVER-TIME STACKS STACKING
 
@@ -2058,6 +2059,8 @@ based on your opponent's Dodge rating. You can compute the "hit cap" -- the
 point at which you'll hit 100% of the time -- based on the level of the mob
 you're fighting.
 
+View your hit cap against an NPC using the 'consider' command.
+
 Hit cap:
 - Start with the mob's level, minus 50 (not less than 0)
 - Add 10% of the mob's level
@@ -2067,7 +2070,7 @@ Hit cap:
 - Add 100 to the total
 - Add +5 per Dexterity the mob has more than you
 
-See also: AFFECTS, DODGE, SCORE
+See also: AFFECTS, CONSIDER, DODGE, SCORE
 #
 TRANSPORTATION
 

@@ -716,19 +716,20 @@ See also: BUFF, FAMILIAR, BUFF FAMILIARS, COMPANION, DISMISS, SUPPORT FAMILIARS
 #
 PURIFY
 
-Purify (Natural Magic ability)
-
+Purify
+Natural Magic Synergy Ability: 75 Vampire
 Usage:  purify <person>
 Cost:  50 mana
 
-Purify is used by Natural Magic casters to wipe away serious curses such as
-Vampirism. However, it doesn't work on daywalking vampires. You can cast this
-spell on those not affected by such curses, but it will have no effect.
+Natural Magic users who are also powerful vampires gain the Purify ability,
+which may be used to remove another person's Vampire abilities and status.
 
-This spell cures vampirism and removes all vampiric abilities and skill.
+This spell has no effect on daywalking vampires. It cannot be used upon
+yourself.
 
 Because this power could be used to harass other players, they must enable
-the "bother" toggle before you can use it on them.
+the "bother" toggle before you can use it on them. They will lose all Vampire
+skill levels and abilities.
 
 If your target is in combat, you will join the combat upon using this ability.
 Gains experience when successfully cast, even if it doesn't cure anything.
