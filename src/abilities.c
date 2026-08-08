@@ -3432,7 +3432,7 @@ bool check_ability_limitations(char_data *ch, ability_data *abil, char_data *vic
 			case ABIL_LIMIT_IN_CITY: {
 				bool wait = FALSE;
 				if (!ROOM_OWNER(any_room) || !is_in_city_for_empire(any_room, ROOM_OWNER(any_room), TRUE, &wait)) {
-					msg_to_char(ch, "You must be in a city to use that ability%s.\r\n", wait ? " (this city was founded too recently)" : "");
+					msg_to_char(ch, "You must be in a city, in a location you own, to use that ability%s.\r\n", wait ? " (this city was founded too recently)" : "");
 					_set_fatal_error(TRUE);
 					return FALSE;
 				}
