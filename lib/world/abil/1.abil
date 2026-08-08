@@ -1793,8 +1793,8 @@ Ritual of Detection~
 gs -1 1.00 0 0 0
 C
 ritual 8 o 2 15 0.00 -1 0 0 5 0
-D 16 1 0
 D 16 7 0
+D 16 1 0
 D 16 8 0
 D 64 2 0
 D 64 3 0
