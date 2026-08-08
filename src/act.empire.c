@@ -7065,6 +7065,9 @@ ACMD(do_manage) {
 			msg_to_char(ch, " %s\r\n", CAP(buf));
 		}
 	}
+	else if (!IS_APPROVED(ch) && config_get_bool("manage_empire_approval")) {
+		send_config_msg(ch, "need_approval_string");
+	}
 	else if (type == NOTHING) {
 		msg_to_char(ch, "Unknown land management option '%s'.\r\n", arg);
 	}
