@@ -12285,9 +12285,66 @@ OLC_MODULE(abiledit_data) {
 			}
 		}
 	}
+	else if (is_abbrev(arg1, "move")) {
+		struct ability_data_list *to_move, *prev, *next;
+		bool up;
+		
+		// usage: data move <number> <up | down>
+		half_chop(arg2, val_arg, type_arg);
+		up = is_abbrev(type_arg, "up");
+		
+		if (!*val_arg || !*type_arg) {
+			msg_to_char(ch, "Usage: data move <number> <up | down>\r\n");
+		}
+		else if (!isdigit(*val_arg) || (num = atoi(val_arg)) < 1) {
+			msg_to_char(ch, "Invalid data entry number.\r\n");
+		}
+		else if (!is_abbrev(type_arg, "up") && !is_abbrev(type_arg, "down")) {
+			msg_to_char(ch, "You must specify whether you're moving it up or down in the list.\r\n");
+		}
+		else if (up && num == 1) {
+			msg_to_char(ch, "You can't move it up; it's already at the top of the list.\r\n");
+		}
+		else {
+			// find the one to move
+			to_move = prev = NULL;
+			for (adl = ABIL_DATA(abil); adl && !to_move; adl = adl->next) {
+				if (--num == 0) {
+					to_move = adl;
+				}
+				else {
+					// store for next iteration
+					prev = adl;
+				}
+			}
+			
+			if (!to_move) {
+				msg_to_char(ch, "Invalid data entry number.\r\n");
+			}
+			else if (!up && !to_move->next) {
+				msg_to_char(ch, "You can't move it down; it's already at the bottom of the list.\r\n");
+			}
+			else {
+				// SUCCESS: "move" them by swapping data
+				if (up) {
+					LL_DELETE(ABIL_DATA(abil), to_move);
+					LL_PREPEND_ELEM(ABIL_DATA(abil), prev, to_move);
+				}
+				else {
+					next = to_move->next;
+					LL_DELETE(ABIL_DATA(abil), to_move);
+					LL_APPEND_ELEM(ABIL_DATA(abil), next, to_move);
+				}
+				
+				// message: re-atoi(val_arg) because we destroyed num finding our target
+				msg_to_char(ch, "You move data entry %d %s.\r\n", atoi(val_arg), (up ? "up" : "down"));
+			}
+		}
+	}	// end 'move'
 	else {
 		msg_to_char(ch, "Usage: data add <type> <name | vnum>\r\n");
 		msg_to_char(ch, "Usage: data remove <number | all>\r\n");
+		msg_to_char(ch, "Usage: data move <number> <up | down>\r\n");
 		
 		found = FALSE;
 		msg_to_char(ch, "Allowed types:");

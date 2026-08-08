@@ -1084,6 +1084,7 @@ See also: OLC ABILITIES, DAMAGE ABILITY, DOT ABILITY
 
 Usage:  .data add <type> <name | vnum>
         .data remove <number | all>
+        .data move <number> <up | down>
 
 The 'data' field is used by different types of abilities. Available types are:
  &cPTECH&0 - Player technologies. Used by the PTECH ability type.
