@@ -51,8 +51,8 @@
 
 
 // global function types -- for run_globals
-#define GLB_VALIDATOR(name)		bool (name)(struct global_data *glb, char_data *ch, void *other_data)
-#define GLB_FUNCTION(name)		bool (name)(struct global_data *glb, char_data *ch, void *other_data)
+#define GLB_VALIDATOR(name)		bool (name)(struct global_data *glb, char_data *ch, room_data *room, void *other_data)
+#define GLB_FUNCTION(name)		bool (name)(struct global_data *glb, char_data *ch, room_data *room, void *other_data)
 
 
 // used by charge_stored_resource() and add_to_empire_storage_with_timer()

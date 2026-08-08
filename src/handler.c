@@ -4713,7 +4713,7 @@ bool run_globals(int glb_type, GLB_FUNCTION(*func), bool allow_many, bitvector_t
 		}
 		
 		// now the user-specified validator
-		if (validator && !validator(glb, ch, other_data)) {
+		if (validator && !validator(glb, ch, room, other_data)) {
 			continue;
 		}
 		
@@ -4746,7 +4746,7 @@ bool run_globals(int glb_type, GLB_FUNCTION(*func), bool allow_many, bitvector_t
 		}
 		else {	// not choose-last
 			if (func) {
-				found |= func(glb, ch, other_data);
+				found |= func(glb, ch, room, other_data);
 			}
 			if (!allow_many) {
 				break;	// only use first match
@@ -4757,7 +4757,7 @@ bool run_globals(int glb_type, GLB_FUNCTION(*func), bool allow_many, bitvector_t
 	
 	// failover/choose-last
 	if (!found && choose_last && func) {
-		found |= func(choose_last, ch, other_data);
+		found |= func(choose_last, ch, room, other_data);
 	}
 	
 	return found;

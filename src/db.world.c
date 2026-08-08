@@ -840,7 +840,6 @@ GLB_VALIDATOR(validate_global_mine_data) {
 GLB_FUNCTION(run_global_mine_data) {
 	struct glb_room_emp_bean *data = (struct glb_room_emp_bean*)other_data;
 	empire_data *emp = (data ? data->empire : NULL);
-	room_data *room = (data ? data->room : NULL);
 	
 	if (!data || !room) {
 		return FALSE;	// no work
