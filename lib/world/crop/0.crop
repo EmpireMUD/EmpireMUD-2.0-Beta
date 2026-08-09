@@ -32,9 +32,8 @@ U
 Tiny shoots explode into full-grown stalks of wheat!~
 X
 wheat field crop~
-   You find yourself standing amidst a vast expanse of wheat. The golden stalks
-rise up to your waist, swaying gently in the wind. The air is filled with the
-earthy scent of fresh soil and growing grain.
+   The golden stalks of the vast wheat field rise up to your waist, brushing
+against you as they sway in the gentle wind.
 ~
 S
 #2
@@ -57,12 +56,7 @@ U
 A chorus of squeaking noises overwhelms you as stalk after stalk of corn bursts up from the ground!~
 X
 corn stalks ears field crop~
-   You find yourself surrounded by tall stalks of corn, reaching up to twice
-your height. The sturdy green plants stand in uniform rows, with only narrow
-paths for you to navigate through. The leaves rustle in the breeze, creating a
-soothing sound. You can see the ears of corn forming on the stalks, wrapped in
-protective layers of husks. The air is humid and filled with the sweet scent of
-growing corn.
+Tall corn stalks grow in narrow rows across thefield.
 ~
 S
 #3
@@ -83,17 +77,8 @@ U
 0
 You watch in wonder as the leafy hops climb from the soil!~
 X
-hops vines crop field~
-   You stand amidst a field of towering hop vines, their lush green leaves and
-delicate flowers reaching up towards the sky. The air is filled with the sweet
-aroma of ripening hops, a scent that can only be described as floral and
-earthy. As you take a closer look, you see the small, sticky yellow flowers
-clinging to the vines, each containing a potent dose of bitter oils and
-aromatic compounds. The vines stretch out in all directions, creating a dense
-canopy overhead that provides shade and shelter. The ground beneath your feet
-is soft and spongy, padded by layers of compost and straw. Looking out over the
-field, you see row after row of hop vines, a verdant landscape that seems to
-pulse with life and vitality.
+hops vines crop field poles buds~
+Tall poles support the hop vines, covered in fragrant buds.
 ~
 S
 #4
@@ -115,14 +100,8 @@ U
 Tufts of white pop with a BANG! from the fast-growing field!~
 X
 cotton field crop~
-   You find yourself standing in a vast field of cotton, the fluffy white bolls
-nestled in the branches of the plants. The air is filled with the sweet scent
-of blooming cotton, a fragrance that seems to permeate everything around you.
-The cotton plants stand in uniform rows, with only narrow paths for you to
-navigate through. The leaves of the plants are a deep green, providing a
-striking contrast to the white of the cotton bolls. As you look closer, you can
-see the delicate fibers of the cotton, soft and downy to the touch. The ground
-beneath your feet is soft and pliable, yielding gently as you walk.
+   Row after row of green plants stretch out before you, dotted with fluffy
+white bolls of fresh cotton.
 ~
 S
 #5
@@ -145,15 +124,7 @@ U
 Stalks of barley spring from the ground, fully-formed!~
 X
 barley field crop stalks~
-   You find yourself surrounded by a vast field of golden barley, its sturdy
-stalks standing tall and proud. The air is filled with the earthy scent of
-growing grain, a fragrance that seems to mingle with the freshness of the
-countryside. The barley plants are arranged in neat, orderly rows, with only
-narrow paths for you to navigate through. The leaves of the plants are a rich
-green, providing a striking contrast to the golden hue of the barley heads. As
-you take a closer look, you can see the tightly-packed clusters of grain at the
-tips of the stalks, each covered in a delicate, papery husk. The ground beneath
-your feet is firm and slightly elevated, as if you're walking on a small hill.
+Rows of tall, golden barley stalks grow in the well-tended field.
 ~
 S
 #6
@@ -200,15 +171,8 @@ U
 Trees spring up all over the orchard, dangling their juicy fruits!~
 X
 peaches orchard trees crop~
-   You find yourself surrounded by the lush greenery of a peach orchard, its
-gnarled branches heavy with fruit. The air is filled with the sweet scent of
-ripening peaches, a fragrance that seems to permeate everything around you.
-The peach trees are arranged in rows, their leaves a vibrant green, providing
-welcome shade from the sun. As you walk along the narrow paths between the
-trees, you can see the fuzzy, velvety skin of the peaches, each one a brilliant
-orange-red hue. The fruit hangs heavy on the branches, ripe and juicy, waiting
-to be plucked. Looking closer, you can see the delicate pink and white blossoms
-that will become next year's harvest.
+   Orderly rows of lush green trees make up this fragrant orchard. Ripe peaches
+hang from the trees; few last long enough to fall to the ground.
 ~
 S
 #7
@@ -255,15 +219,8 @@ U
 Fully-formed cherry trees rise from the orchard, already dotted with sweet red fruit!~
 X
 cherries cherry orchard trees crop~
-   You stand amidst the lush greenery of a cherry orchard, the trees laden with
-plump, red fruit. The air is filled with the sweet scent of ripening cherries,
-a fragrance that seems to hang in the stillness of the air. The cherry trees
-are arranged in neat rows, their branches crisscrossing above you to form a
-leafy canopy. As you make your way between the trees, you can see the clusters
-of cherries hanging heavy on the branches, each one a brilliant shade of red.
-The fruit seems almost within reach, just waiting to be plucked and savored.
-Looking closer, you can see the delicate white blossoms that have already given
-way to the fruit, promising an even greater bounty next year.
+   Ripe red cherries peek out from the orchard's lush green trees, which stand
+in long rows, just far enough apart to stand and pick the fruit.
 ~
 S
 #8
@@ -292,15 +249,8 @@ U
 New trees burst forth across the grove, each dangling succulent orange fruits!~
 X
 oranges orchard grove trees crop~
-   You are surrounded by a small orange grove, standing amidst the hardy,
-twisted trees. The leaves are glossy and green, providing a pleasant contrast
-against the dry, arid landscape. The oranges hang heavy on the branches, each
-one a bright and juicy fruit that looks almost out of place in this desert
-environment. The grove is small, but the oranges are abundant, seeming to fill
-the space with a lively and vibrant energy. You can almost feel the zest and
-freshness in the air, as if the essence of the oranges themselves is seeping
-into everything around you. The grove seems to be a small yet bountiful oasis,
-thriving amidst the desert's harsh conditions.
+   The trees are planted in orderly rows in this grove. The dark, glossy green
+leaves do little to hide the bright orange fruits.
 ~
 S
 #9
@@ -323,17 +273,9 @@ U
 Delicate stalks rise from the paddy, dangling ears of rice!~
 X
 rice paddy fields crop~
-   You stand in the midst of a vast rice paddy, the air thick with the scent of
-fresh soil and water. The paddies are a patchwork of small, rectangular fields,
-each one separated by narrow dirt walkways. The water in the paddies is still
-and shallow, just deep enough to allow the rice to grow. The rice itself is a
-bright green, the small plants swaying gently in the light breeze. You can see
-the occasional bird hopping around the fields, pecking at insects and seeds.
-The walkways between the paddies are soft and muddy, the earth having been
-turned over and moistened to allow for the growth of the rice. Looking out over
-the fields, you can see nothing but a sea of green, stretching out in every
-direction. The paddy fields seem to have a life of their own, with the water
-and the plants working together in a delicate and beautiful dance.
+   The air over the paddies is thick with clouds of tiny bugs. A patchwork of
+small, rectangular rice fields make up the well-watered paddies, separated by
+narrow dirt walkways.
 ~
 S
 #10
@@ -362,18 +304,8 @@ U
 Fresh trees rise from the ground and sprout hundreds of fresh olives!~
 X
 olives trees grove crop~
-   You find yourself surrounded by a small grove of olive trees in the desert,
-their twisted trunks and branches providing a welcome respite from the
-scorching sun. The trees are small and hardy, with silver-green leaves that
-glimmer in the sunlight. The olives themselves are small and hard, still
-ripening on the branches, each one a pale green hue against the dark foliage.
-The air is dry and hot, but the scent is fresh and earthy, with a hint of salt
-from the nearby desert. The ground beneath your feet is soft and sandy, the
-soil light and airy, providing a good environment for the trees to grow. As you
-walk through the grove, you can hear the gentle rustling of the leaves in the
-breeze, and the occasional chirp of a bird perched on a branch. The grove seems
-to be a small yet vibrant oasis in the midst of the harsh and unforgiving
-desert, a symbol of hope and resilience against the odds.
+   In the midst of the arid desert, this grove of olive trees manages to find
+enough water to produce a crop of the small, green fruits.
 ~
 S
 #11
@@ -395,17 +327,7 @@ U
 The field is ablaze with pink and purple flowers for an instant before they turn to fresh pea pods!~
 X
 peas crop field~
-   You come across a field of plump green peas, growing low to the ground on
-small, delicate stems. The plants are neatly arranged in rows, each one
-supported by a trellis or a simple wire mesh to keep them upright. The leaves
-are a rich shade of green, with tendrils curling out in all directions to grasp
-onto their supports. The peas themselves are nestled in the pods, their deep
-green color standing out against the pale green of the pod. As you walk through
-the field, you can hear the rustling of the leaves and the occasional snap of a
-pod opening to reveal the treasure inside. The scent in the air is fresh and
-earthy, with a hint of sweetness from the peas. The field seems to exude a
-sense of orderliness and neatness, with each plant standing tall and proud,
-ready to be harvested at just the right time.
+The low, delicate stems of pea plants grows in clean rows across the field.
 ~
 S
 #12
@@ -423,17 +345,8 @@ U
 Leaves unfold across the field as fully-formed squashes plop out onto the ground!~
 X
 field squash vines crop~
-   You find yourself standing in the midst of a lush and sprawling squash crop.
-The plants are large and leafy, with broad green leaves and thick stems winding
-their way across the ground. The squash themselves are hidden amidst the
-foliage, with only their pale yellow color peeking through. As you walk through
-the crop, you can hear the soft rustling of the leaves and the occasional snap
-of a stem breaking underfoot. The scent in the air is slightly sweet and
-earthy, with a hint of spice from the growing fruits. The ground beneath your
-feet is soft and yielding, the soil rich and dark, providing the perfect
-environment for the squash to grow. The crop seems to be a perfect example of
-the bounty of the earth, with each plant reaching out to produce as much as
-possible, eager to share its abundance with all who come near.
+   The squash crop sprawls out from its rows, covering every bit of dirt with
+broad leaves. Here and there, a ripe yellow squash peeks out from the foliage.
 ~
 S
 #13
@@ -480,15 +393,7 @@ U
 Trees burst from the ground all across the orchard as you start to hear apples hit the ground.~
 X
 apples orchard crop trees~
-   You find yourself surrounded by the beauty of an apple orchard. The trees
-stand tall and proud, with their leaves rustling in the breeze, their branches
-heavy with fruit. The crisp, cool air is filled with the sweet scent of
-ripening apples, a fragrance that is both refreshing and invigorating. As you
-walk through the orchard, you can hear the crunch of fallen leaves underfoot
-and the occasional plunk of a ripe apple falling from a tree. The ground
-beneath your feet is soft and slightly damp, the soil nourishing and rich. The
-orchard seems to be a place of abundance and vitality, with the trees reaching
-up towards the sky, their branches heavy with the weight of the fruit.
+Ripe apples hang from the many trees that make up this fragrant orchard.
 ~
 S
 #14
@@ -510,12 +415,9 @@ U
 Tiny shoots erupt into stalks as you watch clusters of plantains form before your very eyes!~
 X
 plantains stems trees crop~
-   You find yourself standing amidst a grove of plantains. The plants are tall
-and majestic, with broad green leaves swaying in the breeze, and clusters of
-plump fruit hanging from the branches. The air is heavy with the sweet, heady
-scent of ripe plantains, a fragrance that is both exotic and alluring. As you
-walk through the crop, you can hear the rustling of the leaves and the
-occasional snap of a stem breaking underfoot.
+   A grove of tall plantain stems with broad leaves blocks much of the sky,
+though the plants bend over to make it easier to reach the bunches of ripening
+fruit.
 ~
 S
 $
