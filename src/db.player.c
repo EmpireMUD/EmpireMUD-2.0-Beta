@@ -297,6 +297,7 @@ account_data *create_account_for_player(char_data *ch) {
 	CREATE(acct, account_data, 1);
 	acct->id = ++top_account_id;
 	acct->last_logon = ch->player.time.logon;
+	acct->last_friends_logon = ch->player.time.logon;
 	
 	add_account_to_table(acct);
 	add_player_to_account(ch, acct);
@@ -382,7 +383,7 @@ void parse_account(FILE *fl, int nr) {
 	struct pk_data *pk;
 	struct unlocked_archetype *unarch;
 	int int_in[3];
-	long l_in;
+	long l_in[2];
 	
 	// create
 	CREATE(acct, account_data, 1);
@@ -398,12 +399,25 @@ void parse_account(FILE *fl, int nr) {
 	safe_snprintf(err_buf, sizeof(err_buf), "account #%d", nr);
 	
 	// line 1: last login, flags
-	if (get_line(fl, line) && sscanf(line, "%ld %s", &l_in, str_in) == 2) {
-		acct->last_logon = l_in;
-		acct->flags = asciiflag_conv(str_in);
+	if (get_line(fl, line)) {
+		if (sscanf(line, "%ld %ld %s", &l_in[0], &l_in[1], str_in) == 2) {
+			acct->last_logon = l_in[0];
+			acct->last_friends_logon = l_in[1];
+			acct->flags = asciiflag_conv(str_in);
+		}
+		else if (sscanf(line, "%ld %s", &l_in[0], str_in) == 2) {
+			// backwards-compatible for pre-b5.213
+			acct->last_logon = l_in[0];
+			acct->last_friends_logon = l_in[0];
+			acct->flags = asciiflag_conv(str_in);
+		}
+		else {
+			log("SYSERR: Format error in line 1 of %s", err_buf);
+			exit(1);
+		}
 	}
 	else {
-		log("SYSERR: Format error in line 1 of %s", err_buf);
+		log("SYSERR: Missing line 1 of %s", err_buf);
 		exit(1);
 	}
 	
@@ -456,7 +470,7 @@ void parse_account(FILE *fl, int nr) {
 				break;
 			}
 			case 'K': {	// killed by
-				if (sscanf(line, "K %d %d %d %ld", &int_in[0], &int_in[1], &int_in[2], &l_in) != 4) {
+				if (sscanf(line, "K %d %d %d %ld", &int_in[0], &int_in[1], &int_in[2], &l_in[0]) != 4) {
 					log("SYSERR: Format error in K section of %s", err_buf);
 					exit(1);
 				}
@@ -465,7 +479,7 @@ void parse_account(FILE *fl, int nr) {
 				pk->killed_alt = int_in[0];
 				pk->player_id = int_in[1];
 				pk->empire = int_in[2];
-				pk->last_time = l_in;
+				pk->last_time = l_in[0];
 				
 				// order doesn't matter right?
 				LL_PREPEND(acct->killed_by, pk);
@@ -615,7 +629,7 @@ void write_account_to_file(FILE *fl, account_data *acct) {
 	}
 	
 	fprintf(fl, "#%d\n", acct->id);
-	fprintf(fl, "%ld %s\n", acct->last_logon, bitv_to_alpha(acct->flags));
+	fprintf(fl, "%ld %ld %s\n", acct->last_logon, acct->last_friends_logon, bitv_to_alpha(acct->flags));
 
 	strcpy(temp, NULLSAFE(acct->notes));
 	strip_crlf(temp);
@@ -777,6 +791,11 @@ void build_player_index(void) {
 			
 			// update last logon
 			acct->last_logon = MAX(acct->last_logon, plr->player->last_logon);
+		}
+		
+		// ensure we have a last_friends_logon
+		if (!acct->last_friends_logon) {
+			acct->last_friends_logon = acct->last_logon;
 		}
 		
 		// failed to load any players -- delete it
@@ -2506,10 +2525,22 @@ void save_char(char_data *ch, room_data *load_room) {
 	index = find_player_index_by_idnum(GET_IDNUM(ch));
 	update_player_index(index, ch);
 	
-	// update empire logon time if the player is in-game
-	if (IN_ROOM(ch) && !PLR_FLAGGED(ch, PLR_KEEP_LAST_LOGIN_INFO) && GET_LOYALTY(ch)) {
-		EMPIRE_LAST_LOGON(GET_LOYALTY(ch)) = time(0);
-		EMPIRE_NEEDS_SAVE(GET_LOYALTY(ch)) = TRUE;
+	// update logon time if the player is in-game
+	if (IN_ROOM(ch) && !PLR_FLAGGED(ch, PLR_KEEP_LAST_LOGIN_INFO)) {
+		// account logon
+		if (GET_ACCOUNT(ch)) {
+			GET_ACCOUNT(ch)->last_logon = time(0);
+			if (!PRF_FLAGGED(ch, PRF_NO_FRIENDS)) {
+				GET_ACCOUNT(ch)->last_friends_logon = time(0);
+			}
+			SAVE_ACCOUNT(GET_ACCOUNT(ch));
+		}
+		
+		// empire logon
+		if (GET_LOYALTY(ch)) {
+			EMPIRE_LAST_LOGON(GET_LOYALTY(ch)) = time(0);
+			EMPIRE_NEEDS_SAVE(GET_LOYALTY(ch)) = TRUE;
+		}
 	}
 }
 

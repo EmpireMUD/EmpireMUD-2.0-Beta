@@ -4449,6 +4449,7 @@ struct account_data {
 	int id;	// corresponds to player_index_data account_id and player's saved account id
 	struct account_player *players;	// linked list of players
 	time_t last_logon;	// timestamp of the last login on the account
+	time_t last_friends_logon;	// timestamp of the last time any alt without the no-friends flag logged in
 	bitvector_t flags;	// ACCT_
 	char *notes;	// account notes
 	

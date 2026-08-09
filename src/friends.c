@@ -439,7 +439,7 @@ int sort_friends_by_last_logon(struct friend_data *a, struct friend_data *b) {
 	}
 	else {
 		// dividing by seconds per day helps keep from using list order to detect secret no-friends alts
-		return ((time(0) - a_acc->last_logon) / SECS_PER_REAL_HOUR) - ((time(0) - b_acc->last_logon) / SECS_PER_REAL_HOUR);
+		return ((time(0) - a_acc->last_friends_logon) / SECS_PER_REAL_HOUR) - ((time(0) - b_acc->last_friends_logon) / SECS_PER_REAL_HOUR);
 	}
 }
 
@@ -494,14 +494,14 @@ ACMD(do_friends_all) {
 				ssize += snprintf(status + ssize, sizeof(status) - ssize, " (online)");
 				strcpy(color, "\tc");
 			}
-			else if (time(0) - acct->last_logon < SECS_PER_REAL_HOUR) {
+			else if (time(0) - acct->last_friends_logon < SECS_PER_REAL_HOUR) {
 				ssize += snprintf(status + ssize, sizeof(status) - ssize, " (online recently)");
 			}
-			else if (time(0) - acct->last_logon < 24 * SECS_PER_REAL_HOUR) {
+			else if (time(0) - acct->last_friends_logon < 24 * SECS_PER_REAL_HOUR) {
 				ssize += snprintf(status + ssize, sizeof(status) - ssize, " (less than 1 day ago)");
 			}
 			else {
-				ssize += snprintf(status + ssize, sizeof(status) - ssize, " (%s ago)", simple_time_since(acct->last_logon));
+				ssize += snprintf(status + ssize, sizeof(status) - ssize, " (%s ago)", simple_time_since(acct->last_friends_logon));
 			}
 		}
 		
