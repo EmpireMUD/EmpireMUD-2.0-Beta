@@ -184,7 +184,7 @@ trig_data *create_trigger_table_entry(trig_vnum vnum) {
 * @return char* The line to show (without a CRLF).
 */
 char *list_one_trigger(trig_data *trig, bool detail) {
-	char *attach, types[256];
+	char *attach, types[MAX_STRING_LENGTH];
 	static char output[MAX_STRING_LENGTH];
 	
 	if (detail) {
