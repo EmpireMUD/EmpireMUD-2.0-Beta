@@ -462,6 +462,10 @@ void perform_alternate(char_data *old, char_data *new) {
 		msg_to_char(new, "\r\n\tY%s\t0", msg);
 	}
 	
+	if (should_reset_bonus_traits(new) || num_earned_bonus_traits(new) > count_bits(GET_BONUS_TRAITS(new))) {
+		msg_to_char(new, "\r\n\tAYou have new bonus traits available. Quit and then re-login from the login screen to choose them.\t0");
+	}
+	
 	if (!IS_IMMORTAL(new)) {
 		add_cooldown(new, COOLDOWN_ALTERNATE, SECS_PER_REAL_MIN);
 	}

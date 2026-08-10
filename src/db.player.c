@@ -4063,22 +4063,10 @@ void announce_login(char_data *ch) {
 */
 bool check_bonus_trait_reset(char_data *ch) {
 	char buf[MAX_STRING_LENGTH];
-	int iter, hours;
-	struct time_info_data t;
+	int iter;
 	
-	if (IS_NPC(ch) || !ch->desc) {
+	if (IS_NPC(ch) || !ch->desc || !should_reset_bonus_traits(ch)) {
 		return FALSE;
-	}
-	
-	// compute playtime
-	t = *real_time_passed((time(0) - ch->player.time.logon) + ch->player.time.played, 0);
-	hours = t.day * 24 + t.hours;
-	
-	if (PLR_FLAGGED(ch, PLR_TRAITS_RESET)) {
-		return FALSE;	// already reset
-	}
-	if (!config_get_int("hours_to_bonus_trait_reset") || hours < config_get_int("hours_to_bonus_trait_reset")) {
-		return FALSE;	// no need to reset
 	}
 	
 	// OK: show explainer

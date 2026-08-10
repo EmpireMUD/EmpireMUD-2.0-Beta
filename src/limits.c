@@ -869,6 +869,31 @@ void real_update_player(char_data *ch) {
 }
 
 
+/**
+* @param char_data *ch Any player.
+* @return bool TRUE if they have reached the conditions for a bonus trait reset, FALSE if not.
+*/
+bool should_reset_bonus_traits(char_data *ch) {
+	int hours;
+	struct time_info_data passed;
+	
+	if (IS_NPC(ch) || PLR_FLAGGED(ch, PLR_TRAITS_RESET) || !config_get_int("hours_to_bonus_trait_reset")) {
+		return FALSE; // shortcut
+	}
+	
+	// compute playtime
+	passed = *real_time_passed((time(0) - ch->player.time.logon) + ch->player.time.played, 0);
+	hours = passed.day * 24 + passed.hours;
+	
+	if (hours >= config_get_int("hours_to_bonus_trait_reset")) {
+		return TRUE;
+	}
+	else {
+		return FALSE;
+	}
+}
+
+
  //////////////////////////////////////////////////////////////////////////////
 //// EMPIRE LIMITS ///////////////////////////////////////////////////////////
 
