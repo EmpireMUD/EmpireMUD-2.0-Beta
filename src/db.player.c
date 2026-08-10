@@ -400,7 +400,7 @@ void parse_account(FILE *fl, int nr) {
 	
 	// line 1: last login, flags
 	if (get_line(fl, line)) {
-		if (sscanf(line, "%ld %ld %s", &l_in[0], &l_in[1], str_in) == 2) {
+		if (sscanf(line, "%ld %ld %s", &l_in[0], &l_in[1], str_in) == 3) {
 			acct->last_logon = l_in[0];
 			acct->last_friends_logon = l_in[1];
 			acct->flags = asciiflag_conv(str_in);
