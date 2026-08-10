@@ -1664,7 +1664,7 @@ void do_instance_info(char_data *ch, char *argument) {
 			msg_to_char(ch, "Last reset: %-24.24s\r\n", (char *) asctime(localtime(&INST_LAST_RESET(inst))));
 		}
 		
-		msg_to_char(ch, "Instance age: %s (%d seconds)\r\n", simple_time_since(INST_AGE_TIMESTAMP(inst)), (time(0) - INST_AGE_TIMESTAMP(inst)));
+		msg_to_char(ch, "Instance age: %s (%d seconds)\r\n", simple_time_since(INST_AGE_TIMESTAMP(inst)), (int)(time(0) - INST_AGE_TIMESTAMP(inst)));
 		
 		if (INST_DIR(inst) != NO_DIR) {
 			msg_to_char(ch, "Facing: %s\r\n", dirs[INST_DIR(inst)]);
