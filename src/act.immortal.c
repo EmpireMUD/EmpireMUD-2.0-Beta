@@ -1660,7 +1660,7 @@ void do_instance_info(char_data *ch, char *argument) {
 		msg_to_char(ch, "Flags: %s\r\n", buf);
 		
 		msg_to_char(ch, "Created: %-24.24s\r\n", (char *) asctime(localtime(&INST_CREATED(inst))));
-		if (INST_LAST_RESET(inst) != INST_CREATED(inst)) {
+		if (INST_LAST_RESET(inst) != INST_CREATED(inst) && INST_LAST_RESET(inst) > 0) {
 			msg_to_char(ch, "Last reset: %-24.24s\r\n", (char *) asctime(localtime(&INST_LAST_RESET(inst))));
 		}
 		
