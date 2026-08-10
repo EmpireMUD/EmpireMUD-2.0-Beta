@@ -463,7 +463,7 @@ void perform_alternate(char_data *old, char_data *new) {
 	}
 	
 	if (should_reset_bonus_traits(new) || num_earned_bonus_traits(new) > count_bits(GET_BONUS_TRAITS(new))) {
-		msg_to_char(new, "\r\n\tAYou have new bonus traits available. Quit and then re-login from the login screen to choose them.\t0");
+		msg_to_char(new, "\r\n\tAYou have new bonus traits available. Quit and then re-login from the login screen to choose them.\t0\r\n");
 	}
 	
 	if (!IS_IMMORTAL(new)) {
