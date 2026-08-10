@@ -4005,6 +4005,7 @@ struct instance_data {
 	room_data *start;	// starting interior room (first room of zone)
 	int level;	// locked, scaled level
 	time_t created;	// when instantiated
+	time_t age_timestamp;	// used to calculate actual time the instance has been active while the mud is running (accounts for reboots)
 	time_t last_reset;	// for reset timers
 	
 	// data stored ONLY for delayed load

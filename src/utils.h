@@ -182,6 +182,7 @@
 // instance utils
 #define INSTANCE_FLAGGED(i, flg)  (IS_SET(INST_FLAGS(i), (flg)))
 #define INST_ADVENTURE(inst)  ((inst)->adventure)
+#define INST_AGE_TIMESTAMP(inst)  ((inst)->age_timestamp)
 #define INST_CREATED(inst)  ((inst)->created)
 #define INST_DIR(inst)  ((inst)->dir)
 #define INST_FAKE_LOC(inst)  ((inst)->fake_loc)
