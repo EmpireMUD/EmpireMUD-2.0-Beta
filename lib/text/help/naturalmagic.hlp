@@ -763,10 +763,13 @@ ready a fireball, this will include any levels you get from that weapon).
 If you wish to stop using fireballs, you can type "remove fireball" just like
 you would with a weapon.
 
-Gains experience when you ready fireballs, and when you attack with them.
+If you also learn the Wilderblaze ability, your fireballs be superior. Gains
+experience when you ready fireballs, and when you attack with them.
 
 Your character only summons fireballs when throwing them in combat; this
 ability can't be used to light up an area or to light things on fire.
+
+See also: SUPERIOR, WILDERBLAZE
 #
 REJUVENATE
 
@@ -1043,7 +1046,10 @@ Duration: 20 seconds
 This spell unleashes your mana as a wave of nigh-unstoppable fire that burns
 everyone in the area. It is stronger in the caster role.
 
-See also: CASTER ROLE
+The fireballs from your Ready Fireball are more powerful when you also know
+Wilderblaze.
+
+See also: CASTER ROLE, READY FIREBALL, SUPERIOR
 #
 WORM
 
