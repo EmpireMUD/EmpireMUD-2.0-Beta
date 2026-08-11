@@ -4549,15 +4549,15 @@ PREP_ABIL(prep_restore_ability) {
 		amount += subdata->scale_points * points_per_scale_over_100 * ((level - 100) / 100.0);
 	}
 	
-	// 4.1. check costs and reduce by available mana/etc
+	// 4.1. reduce to how much they actually need
+	diff = GET_MAX_POOL(vict, use_pool) - GET_CURRENT_POOL(vict, use_pool);
+	amount = MIN(amount, diff);
+	
+	// 4.2. check costs and reduce by available mana/etc
 	if (ABIL_COST_PER_AMOUNT(abil) != 0.0) {
 		check_available_ability_cost(ch, abil, data, &avail, NULL);
 		amount = MIN(amount, avail);
 	}
-	
-	// 4.2. reduce to how much they actually need
-	diff = GET_MAX_POOL(vict, use_pool) - GET_CURRENT_POOL(vict, use_pool);
-	amount = MIN(amount, diff);
 	
 	// 5. store amount of damage now -- before bonus-healing
 	data->total_amount += amount;
