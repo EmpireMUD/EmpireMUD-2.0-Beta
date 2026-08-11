@@ -499,6 +499,12 @@ them.
 Typing ready by itself will list the things you know how to ready, along with
 their costs (if any).
 
+Note: If you're already using a weapon from any Ready Weapon-type ability when
+you ready another weapon in the same slot from any ability of this type, the
+new weapon is capped at the same level as the current readied weapon. If this
+results in the wrong weapon level, remove the other readied weapon before
+readying a new one.
+
 See also:
   READY FIREBALL  (Natural Magic)
   READY BLOOD WEAPONS  (Vampire)

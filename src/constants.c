@@ -3278,7 +3278,7 @@ const char *extra_bits[] = {
 	"TWO-HANDED",
 	"BOE",
 	"BOP",	// 15
-	"*",	// formerly STAFF
+	"*READIED-WEAPON-ABIL",
 	"UNCOLLECTED-LOOT",
 	"*KEEP",
 	"*",	// formerly TOOL-PAN
@@ -3315,7 +3315,7 @@ const char *extra_bits_inv_flags[] = {
 	"2h",
 	"BoE",
 	"BoP",	// 15
-	"",	// *
+	"",	// ready-weapon-abil
 	"",	// uncollected
 	"keep",
 	"",	// *
@@ -3352,7 +3352,7 @@ const double obj_flag_scaling_bonus[] = {
 	1.8,	// OBJ_TWO_HANDED
 	1.3,	// OBJ_BIND_ON_EQUIP
 	1.4,	// 15, OBJ_BIND_ON_PICKUP
-	1.0,	// unused
+	1.0,	// OBJ_READIED_WEAPON_ABIL
 	1.0,	// OBJ_UNCOLLECTED_LOOT
 	1.0,	// OBJ_KEEP
 	1.0,	// unused

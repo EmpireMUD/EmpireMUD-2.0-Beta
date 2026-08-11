@@ -769,6 +769,11 @@ experience when you ready fireballs, and when you attack with them.
 Your character only summons fireballs when throwing them in combat; this
 ability can't be used to light up an area or to light things on fire.
 
+Note: If you're already using a weapon from any Ready Weapon-type ability when
+you use Ready Fireball, the fireball is capped at the same level as the current
+readied weapon. If this results in the wrong weapon level, remove the other
+readied weapon before activating Ready Fireball.
+
 See also: SUPERIOR, WILDERBLAZE
 #
 REJUVENATE

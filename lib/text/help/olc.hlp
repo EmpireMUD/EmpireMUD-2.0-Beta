@@ -7431,7 +7431,7 @@ Available flags:
  &cLIGHT&0 - lights up the room (prefer LIGHT item type instead of the flag)
  &cSUPERIOR&0 - crafted by a master craftsman, adds the (superior) tag
  &cLARGE&0 - takes up 2 inventory slots, adds the (large) tag
- &c*CREATED&0 - created by a god command
+ *CREATED - created by a god command
  &c1-USE&0 - is destroyed when un-equipped
  &cSLOW&0 - for weapons, attacks slower
  &cFAST&0 - for weapons, attacks faster
@@ -7442,9 +7442,9 @@ Available flags:
  &cTWO-HANDED&0 - weapon requires both hand slots
  &cBOE&0 - item binds to a player when it is equipped (or used)
  &cBOP&0 - item binds to a player when it is picked up
- &cSTAFF&0 - counts as a staff (even if it doesn't have a staff weapon type)
+ *READIED-WEAPON-ABIL - automatic when an item comes from any Ready Weapon ability
  &cUNCOLLECTED-LOOT&0 - will decay on the ground if no player gets it
- &c*KEEP&0 - player has marked the object with the 'keep' command
+ *KEEP - player has marked the object with the 'keep' command
  &c!AUTOSTORE&0 - will not autostore (e.g. furniture)
  &cHARD-DROP&0 - was dropped by a HARD mob (CAUTION: it will set this itself when dropped as loot)
  &cGROUP-DROP&0 - was dropped by a GROUP mob (CAUTION: it will set this itself when dropped as loot)

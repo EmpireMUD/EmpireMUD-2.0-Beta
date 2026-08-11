@@ -1909,7 +1909,7 @@ typedef enum {
 #define OBJ_TWO_HANDED  BIT(13)	// n. weapon requires both hands
 #define OBJ_BIND_ON_EQUIP  BIT(14)	// o. binds when equipped
 #define OBJ_BIND_ON_PICKUP  BIT(15)	// p. binds when acquired
-//	#define OBJ_UNUSED1  BIT(16)	// q. formerly STAFF
+#define OBJ_READIED_WEAPON_ABIL  BIT(16)	// q. set automatically by the Ready Weapon ability type to manage scaling correctly
 #define OBJ_UNCOLLECTED_LOOT  BIT(17)	// r. will junk instead of autostore
 #define OBJ_KEEP  BIT(18)	// s. obj will not be part of any "all" commands like "drop all"
 //	#define OBJ_UNUSED2  BIT(19)	// t. formerly TOOL-PAN
