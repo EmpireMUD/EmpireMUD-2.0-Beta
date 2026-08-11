@@ -1526,8 +1526,8 @@ bool vehicle_is_chameleon(vehicle_data *veh, room_data *from) {
 	if (!veh || !from || !IN_ROOM(veh)) {
 		return FALSE;	// safety
 	}
-	if (!VEH_IS_COMPLETE(veh) || VEH_NEEDS_RESOURCES(veh)) {
-		return FALSE;	// incomplete or unrepaired vehicles are not chameleon
+	if (!VEH_IS_COMPLETE(veh)) {
+		return FALSE;	// incomplete vehicles are not chameleon
 	}
 	if ((!VEH_FLAGGED(veh, VEH_CHAMELEON) || VEH_HAS_MAJOR_DISREPAIR(veh)) && (!IN_ROOM(veh) || !CHECK_CHAMELEON(from, IN_ROOM(veh)))) {
 		return FALSE;	// missing chameleon flags, or damaged
