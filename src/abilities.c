@@ -5385,6 +5385,7 @@ DO_ABIL(do_paint_building_ability) {
 
 // DO_ABIL provides: ch, abil, argument, level, vict, ovict, vvict, room_targ, data
 DO_ABIL(do_ready_weapon_ability) {
+	bool match;
 	int count, pos;
 	struct ability_data_list *adl;
 	obj_data *obj, *proto;
@@ -5422,6 +5423,22 @@ DO_ABIL(do_ready_weapon_ability) {
 		log("SYSERR: %s trying to ready %d %s with no valid wear bits (Ability %d %s)", GET_NAME(ch), GET_OBJ_VNUM(proto), GET_OBJ_SHORT_DESC(proto), ABIL_VNUM(abil), ABIL_NAME(abil));
 		// fail / no success
 		return;
+	}
+	
+	// determine if we're replacing an item from the SAME ability
+	if (GET_EQ(ch, pos) && GET_OBJ_CURRENT_SCALE_LEVEL(GET_EQ(ch, pos)) > 0) {
+		match = FALSE;
+		LL_FOREACH(ABIL_DATA(abil), adl) {
+			if (adl->type == ADL_READY_WEAPON && GET_OBJ_VNUM(GET_EQ(ch, pos)) == adl->vnum) {
+				match = TRUE;
+				break;
+			}
+		}
+		
+		if (match) {
+			// replacing an item from the same ability: cap level
+			level = MIN(level, GET_OBJ_CURRENT_SCALE_LEVEL(GET_EQ(ch, pos)));
+		}
 	}
 	
 	// attempt to remove existing item
