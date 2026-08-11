@@ -7833,6 +7833,12 @@ void call_ability_one(char_data *ch, ability_data *abil, char *argument, char_da
 			data->should_charge_cost = FALSE;
 			return;
 		}
+		else if (ABIL_COST_PER_SCALE_POINT(abil) > 0 && data->total_amount == 0) {
+			msg_to_char(ch, "You don't have enough %s for that ability to have any effect.\r\n", pool_types[ABIL_COST_TYPE(abil)]);
+			data->stop = TRUE;
+			data->should_charge_cost = FALSE;
+			return;
+		}
 	}
 	if (IS_SET(run_mode, RUN_ABIL_NORMAL)) {
 		// resource cost check -- normal ONLY
