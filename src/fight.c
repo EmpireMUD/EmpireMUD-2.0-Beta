@@ -4338,8 +4338,9 @@ void perform_violence_missile(char_data *ch, obj_data *weapon) {
 	obj_data *ammo, *best = NULL;
 	struct affected_type *af;
 	struct obj_apply *apply;
-	int dam = 0, ret, atype;
+	int dam = 0, ret, atype, bonus;
 	char_data *vict;
+	double attack_speed, cur_speed;
 	
 	if (!(vict = FIGHTING(ch))) {
 		return;
@@ -4425,6 +4426,19 @@ void perform_violence_missile(char_data *ch, obj_data *weapon) {
 	else {
 		// compute damage
 		dam = GET_MISSILE_WEAPON_DAMAGE(weapon) + (best ? GET_AMMO_DAMAGE_BONUS(best) : 0);
+		
+		// applicable bonuses
+		if (IS_MAGIC_ATTACK(GET_MISSILE_WEAPON_TYPE(weapon))) {
+			bonus = GET_INTELLIGENCE(ch) + GET_BONUS_MAGICAL(ch);
+		}
+		else {
+			bonus = GET_STRENGTH(ch) + GET_BONUS_PHYSICAL(ch);
+		}
+		
+		// bonus add is based on speeds
+		attack_speed = get_base_speed(ch, WEAR_RANGED);
+		cur_speed = get_combat_speed(ch, WEAR_RANGED);
+		dam += bonus * (attack_speed / basic_speed) * (attack_speed / cur_speed);
 		
 		if (!IS_NPC(ch) && has_ability(ch, ABIL_BOWMASTER)) {
 			dam *= 1.5;
