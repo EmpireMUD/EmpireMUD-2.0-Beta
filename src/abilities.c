@@ -7903,7 +7903,7 @@ void call_ability_one(char_data *ch, ability_data *abil, char *argument, char_da
 	for (iter = 0; do_ability_data[iter].type != NOBITS && !data->stop; ++iter) {
 		if (IS_SET(ABIL_TYPES(abil), do_ability_data[iter].type) && do_ability_data[iter].do_func) {
 			// ensure immunities don't block this type
-			if (vict && ABIL_IMMUNITIES(abil) && AFF_FLAGGED(vict, ABIL_IMMUNITIES(abil))) {
+			if (vict && do_ability_data[iter].check_immune && ABIL_IMMUNITIES(abil) && AFF_FLAGGED(vict, ABIL_IMMUNITIES(abil))) {
 				// if this results in no-success, player will see a fail message
 				// if another type succeeds, they will see success instead
 				continue;
