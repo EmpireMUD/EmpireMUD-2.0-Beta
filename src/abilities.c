@@ -7369,9 +7369,15 @@ void perform_ability_command(char_data *ch, ability_data *abil, char *argument) 
 			}
 		}
 		if (!has && IS_SET(ABIL_TARGETS(abil), ATAR_ROOM_HOME)) {
-			if (is_abbrev(argptr, "home") && (find_room = find_home(ch)) && can_use_room(ch, find_room, GUESTS_ALLOWED)) {
-				room_targ = find_room;
-				has = TRUE;
+			if (is_abbrev(argptr, "home")) {
+				if ((find_room = find_home(ch)) && can_use_room(ch, find_room, GUESTS_ALLOWED)) {
+					room_targ = find_room;
+					has = TRUE;
+				}
+				else {
+					msg_to_char(ch, "You don't have a home.\r\n");
+					return;
+				}
 			}
 		}
 		if (!has && IS_SET(ABIL_TARGETS(abil), ATAR_ROOM_ADJACENT)) {
