@@ -2473,7 +2473,7 @@ void do_eq_delete(char_data *ch, char *argument) {
 void do_eq_list(char_data *ch, char *argument) {
 	obj_data *obj;
 	struct player_eq_set *eq_set;
-	int count = 0;
+	int iter, count = 0;
 	
 	if (*argument) {
 		// show one set
@@ -2481,6 +2481,12 @@ void do_eq_list(char_data *ch, char *argument) {
 			if (multi_isname(argument, eq_set->name)) {
 				++count;
 				build_page_display(ch, "Equipment set '%s':", eq_set->name);
+				
+				for (iter = 0; iter < NUM_WEARS; ++iter) {
+					if ((obj = GET_EQ(ch, iter)) && get_obj_eq_set_by_id(obj, eq_set->id)) {
+						build_page_display_col(ch, 2, FALSE, " %s", GET_OBJ_SHORT_DESC(obj));
+					}
+				}
 				
 				DL_FOREACH2(ch->carrying, obj, next_content) {
 					if (get_obj_eq_set_by_id(obj, eq_set->id)) {
