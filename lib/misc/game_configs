@@ -109,6 +109,7 @@ decay_in_storage 1
 empire_log_ttl 30
 frontier_timeout 30
 homeless_citizen_speed 10
+immortal_empire_default_flags fghik
 immortal_empire_restrictions 1
 immortal_empire_restrict_stealth 1
 immortal_empire_restrict_trade 1

@@ -51,6 +51,9 @@ void ensure_storage_timers(any_vnum only_vnum);
 void ensure_home_storage_timers(char_data *ch, any_vnum only_vnum);
 void set_inherent_ptech(int ptech);
 
+// external vars used in configs
+extern const char *empire_admin_flags[];
+
 // locals
 #define deprecated_config(set, name, type)	{ init_config((set), (name), (type), "deprecated: do not set"); init_config_flags((name), CONF_FLAG_DEPRECATED); }
 
@@ -1904,6 +1907,8 @@ void init_config_system(void) {
 	init_config(CONFIG_EMPIRE, "decay_in_storage", CONFTYPE_BOOL, "stored items still count down their decay timers");
 		init_config_custom("decay_in_storage", config_show_bool, config_edit_decay_in_storage, NULL);
 	init_config(CONFIG_EMPIRE, "homeless_citizen_speed", CONFTYPE_INT, "tiles of movement per real minute, for migrating homeless");
+	init_config(CONFIG_PLAYERS, "immortal_empire_default_flags", CONFTYPE_BITVECTOR, "flags automatically set on new immortal empires");
+		init_config_custom("immortal_empire_default_flags", config_show_bitvector, config_edit_bitvector, empire_admin_flags);
 	init_config(CONFIG_EMPIRE, "immortal_empire_restrictions", CONFTYPE_BOOL, "prevents diplomacy, etc between immortal and mortal empires");
 		init_config_custom("immortal_empire_restrictions", config_show_bool, config_edit_immortal_empire_restrictions, NULL);
 	init_config(CONFIG_EMPIRE, "immortal_empire_restrict_stealth", CONFTYPE_BOOL, "prevents stealth actions by and against immortal empires");
