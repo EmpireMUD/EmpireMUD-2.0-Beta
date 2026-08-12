@@ -2471,20 +2471,47 @@ void do_eq_delete(char_data *ch, char *argument) {
 * @param char_data *ch The person viewing the list.
 */
 void do_eq_list(char_data *ch, char *argument) {
+	obj_data *obj;
 	struct player_eq_set *eq_set;
 	int count = 0;
 	
-	build_page_display_str(ch, "Saved equipment sets:");
-	LL_FOREACH(GET_EQ_SETS(ch), eq_set) {
-		++count;
-		build_page_display_col(ch, 3, FALSE, " %s", eq_set->name);
+	if (*argument) {
+		// show one set
+		LL_FOREACH(GET_EQ_SETS(ch), eq_set) {
+			if (multi_isname(argument, eq_set->name)) {
+				++count;
+				build_page_display(ch, "Equipment set '%s':", eq_set->name);
+				
+				DL_FOREACH2(ch->carrying, obj, next_content) {
+					if (get_obj_eq_set_by_id(obj, eq_set->id)) {
+						build_page_display_col(ch, 2, FALSE, " %s", GET_OBJ_SHORT_DESC(obj));
+					}
+				}
+				
+				// only show 1
+				send_page_display(ch);
+				break;
+			}
+		}
+		
+		if (!count) {
+			msg_to_char(ch, "You have no saved equipment set called '%s'.\r\n", argument);
+		}
 	}
-	
-	if (!count) {
-		build_page_display_str(ch, " none");
+	else {
+		// no-arg: list all sets
+		build_page_display_str(ch, "Saved equipment sets:");
+		LL_FOREACH(GET_EQ_SETS(ch), eq_set) {
+			++count;
+			build_page_display_col(ch, 3, FALSE, " %s", eq_set->name);
+		}
+		
+		if (!count) {
+			build_page_display_str(ch, " none");
+		}
+		
+		send_page_display(ch);
 	}
-	
-	send_page_display(ch);
 }
 
 
