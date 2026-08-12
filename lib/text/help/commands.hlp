@@ -1947,9 +1947,10 @@ See also: BANNER, TOGGLE
 #
 PORTAL PORTALS ENTER
 
-Building:  ~&b][&0~ portal  20 logs, 12 blocks, 20 nexus crystals  (High Sorcery ability)
+Building:  ~&b][&0~ portal  20 logs, 12 blocks, 20 nexus crystals  (Portalmancy goal)
 Built on:  plains, desert
 Fame:  1
+
 Commands:  portal [coordinates | number | keywords]
            portal -all
            portal -near <coordinates>
