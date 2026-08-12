@@ -2600,6 +2600,7 @@ typedef enum {
 #define SM_VEHICLE_MOVEMENT  BIT(15)	// messages shown to interior when vehicle moves
 #define SM_WEATHER  BIT(16)	// weather change messages
 #define SM_FIGHT_PROMPT  BIT(17)	// show or hide fprompt
+#define SM_PASSENGER_AUTO_LOOK  BIT(18)	// full 'look' when you're in a moving vehicle but not driving
 
 // flags set at character creation
 #define DEFAULT_STATUS_MESSAGES  (SM_ANIMAL_MOVEMENT | SM_CHANNEL_JOINS | SM_COOLDOWNS | SM_EMPIRE_LOGS | SM_HUNGER | SM_THIRST | SM_LOW_BLOOD | SM_MORTLOG | SM_PROMPT | SM_FIGHT_PROMPT | SM_SKILL_GAINS | SM_SUN | SM_SUN_AUTO_LOOK | SM_TEMPERATURE | SM_EXTREME_TEMPERATURE | SM_VEHICLE_MOVEMENT | SM_WEATHER)

@@ -410,6 +410,9 @@ bool move_vehicle(char_data *ch, vehicle_data *veh, int dir, int subcmd) {
 						safe_snprintf(buf, sizeof(buf), "$V %s %s%s.", mob_move_types[VEH_MOVE_TYPE(veh)], dirs[get_direction_for_char(ch_iter, dir)], coord_display_room(ch_iter, IN_ROOM(veh), FALSE));
 						act(buf, FALSE, ch_iter, NULL, veh, TO_CHAR | TO_SPAMMY | ACT_VEH_VICT);
 					}
+					if (SHOW_STATUS_MESSAGES(ch, SM_PASSENGER_AUTO_LOOK) && ROOM_BLD_FLAGGED(IN_ROOM(ch), BLD_LOOK_OUT)) {
+						look_at_room_by_loc(ch, IN_ROOM(veh), LRR_LOOK_OUT_INSIDE, veh);
+					}
 					
 					// but always msdp-update
 					msdp_update_room(ch_iter);
