@@ -5031,6 +5031,23 @@ PLAYER_UPDATE_FUNC(b5_212_update_player_informative) {
 }
 
 
+// b5.213 adds new admin flag to immortal empires
+void b5_213_immortal_empire_update(void) {
+	empire_data *emp, *next_emp;
+	
+	// normally this is computed AFTER this step
+	reread_empire_tech(NULL);
+	
+	HASH_ITER(hh, empire_table, emp, next_emp) {
+		if (EMPIRE_IMM_ONLY(emp) && EMPIRE_ADMIN_FLAGGED(emp, EADM_IGNORE_OVERAGES | EADM_NO_DECAY)) {
+			log("- Set ALLOW-NEWBIE-ISLE admin flag on immortal empire [%d] %s", EMPIRE_VNUM(emp), EMPIRE_NAME(emp));
+			SET_BIT(EMPIRE_ADMIN_FLAGS(emp), EADM_ALLOW_NEWBIE_ISLE);
+			EMPIRE_NEEDS_SAVE(emp) = TRUE;
+		}
+	}
+}
+
+
 // ADD HERE, above: more beta 5 update functions
 
 
@@ -5163,6 +5180,7 @@ const struct {
 	{ "b5.212", b5_212_foothills_fix, NULL, "Repairing foothills that were converted to plains by adventures" },
 	{ "b5.212a", b5_212a_stables_update, NULL, "Removing learned recipe for Stables; this now just requires the Build ability" },
 	{ "b5.212b", NULL, b5_212_update_player_informative, "Updating players with new private informative flag" },
+	{ "b5.213", b5_213_immortal_empire_update, NULL, "Adding new admin flag to immortal empires" },
 	
 	// ADD HERE, above: more beta 5 update lines
 	
