@@ -1633,7 +1633,7 @@ void check_newbie_islands(void) {
 		}
 		
 		// ensure ownership and that the empire is "not new"
-		if (!(emp = ROOM_OWNER(room)) || EMPIRE_IMM_ONLY(emp) || (EMPIRE_CREATE_TIME(emp) + (config_get_int("newbie_island_day_limit") * SECS_PER_REAL_DAY)) > time(0)) {
+		if (!(emp = ROOM_OWNER(room)) || EMPIRE_ADMIN_FLAGGED(emp, EADM_ALLOW_NEWBIE_ISLE) || (EMPIRE_CREATE_TIME(emp) + (config_get_int("newbie_island_day_limit") * SECS_PER_REAL_DAY)) > time(0)) {
 			continue;
 		}
 		

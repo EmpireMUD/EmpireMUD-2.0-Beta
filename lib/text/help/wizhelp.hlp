@@ -150,7 +150,7 @@ specific skill, or "all". This command is grantable.
 
 See also: GRANT, SET
 #d
-CONFIG
+CONFIG CONFIGURE CONFIGURATIONS
 
 Usage:  config <type> [-v]
         config [type] <key> [value]
@@ -541,7 +541,13 @@ Common grantable commands:
 
 Check out HELP IMMORTAL COMMANDS for more.
 
-See also: ACCESS LEVEL, GRANT, SHOW, WIZHELP
+Immortal empires are restricted from the following activities by default:
+  Stealth actions (config immortal_empire_restrict_stealth)
+  Import/export (config immortal_empire_restrict_trade)
+  War (config immortal_empire_restrict_war)
+  Diplomacy, joining mortal empires (config immortal_empire_restrictions)
+
+See also: ACCESS LEVEL, CONFIG, GRANT, SHOW, WIZHELP
 #d
 IMOTD
 

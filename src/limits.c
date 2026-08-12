@@ -1123,7 +1123,7 @@ static void reduce_outside_territory_one(empire_data *emp) {
 	bool junk, outskirts_over, frontier_over, total_over, was_large;
 	
 	// sanity
-	if (!emp || EMPIRE_IMM_ONLY(emp) || EMPIRE_ADMIN_FLAGGED(emp, EADM_IGNORE_OVERAGES)) {
+	if (!emp || EMPIRE_ADMIN_FLAGGED(emp, EADM_IGNORE_OVERAGES)) {
 		return;
 	}
 	
@@ -1304,7 +1304,7 @@ void reduce_stale_empires(void) {
 		}
 		
 		// check overages
-		if (!EMPIRE_ADMIN_FLAGGED(iter, EADM_IGNORE_OVERAGES) && !EMPIRE_IMM_ONLY(iter) && EMPIRE_MEMBERS(iter) == 0 && EMPIRE_TERRITORY(iter, TER_TOTAL) > 0) {
+		if (!EMPIRE_ADMIN_FLAGGED(iter, EADM_IGNORE_OVERAGES) && EMPIRE_MEMBERS(iter) == 0 && EMPIRE_TERRITORY(iter, TER_TOTAL) > 0) {
 			// when members hit 0, we consider the empire timed out
 			reduce_stale_empires_one(iter);
 		}

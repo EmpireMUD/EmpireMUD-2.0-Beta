@@ -2570,6 +2570,7 @@ const char *empire_admin_flags[] = {
 	"NO-DECAY",
 	"ALL-TECHS",
 	"FREE-WAR",
+	"ALLOW-NEWBIE-ISLE",	// 10
 	"\n"
 };
 

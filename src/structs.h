@@ -1093,6 +1093,7 @@ typedef struct vehicle_data vehicle_data;
 #define EADM_NO_DECAY			BIT(7)	// territory does not decay
 #define EADM_ALL_TECHS			BIT(8)	// empire can use all technologies
 #define EADM_FREE_WAR			BIT(9)	// no war costs
+#define EADM_ALLOW_NEWBIE_ISLE	BIT(10)	// can keep claims on newbie island
 
 
 // EATT_x: empire attributes
