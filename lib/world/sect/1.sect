@@ -177,7 +177,7 @@ Another tree shoots up toward the sky and joins the growing canopy!~
 X
 forest shade shady trees leaves around~
    The canopy blocks out much of the sky as owering trees shade the
-leaf-covered forest floor.  
+leaf-covered forest floor.
 ~
 _
 Newbie version of sect 3 Shady Forest
@@ -913,7 +913,7 @@ D4
 ....~
 &0~
 E
-8 0 100.00 113
+8 0 100.00 198
 I 5 102 9.00 125 x  # DIG: flint stone
 I 5 100 9.00 125 x  # DIG: rock
 I 5 109 9.00 125 x  # DIG: chunk of rock salt
@@ -1047,5 +1047,61 @@ A row of seaside stumps has grown tall shoots to form a leafy copse.
 _
 Newbie version of 60 Seaside Copse
 ~
+S
+#198
+Seeded Foothills~
+On a Seeded Foothill, By a Lake on the Newbie Island~
+',' 10 j 3 j kp
+C
+dig~
+D0
+,,,,~
+&t~
+E
+1 0 100.00 199
+E
+9 0 20.00 199
+E
+16 0 100.00 158
+E
+19 0 100.00 158
+I 5 109 8.00 125 X  # DIG: chunk of rock salt
+I 5 100 7.00 125 X  # DIG: rock
+I 5 102 15.00 125 X  # DIG: flint stone
+I 5 101 70.00 125 X  # DIG: lump of clay
+X
+foothills hills lake mountain around field seeded seeds plants crops~
+   Rows of crops have been planted across the foothills, taking advantage of a
+slightly higher elevation, but still on the margin of the lake, where water is
+never in short supply.
+~
+S
+#199
+Foothills Crop~
+A Crop on the Foothills on the Newbie Island~
+'.' 10 j 3 djkE kp
+D1
+????~
+&g~
+D2
+????~
+&g~
+D3
+????~
+&g~
+D4
+????~
+&0~
+E
+16 0 100.00 158
+E
+19 0 100.00 158
+I 5 109 8.00 125 X  # DIG: chunk of rock salt
+I 5 100 7.00 125 X  # DIG: rock
+I 5 102 15.00 125 X  # DIG: flint stone
+I 5 101 70.00 125 X  # DIG: lump of clay
+U
+0
+The crop grows with astounding speed!~
 S
 $
