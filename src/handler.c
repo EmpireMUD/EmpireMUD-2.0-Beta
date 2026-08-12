@@ -7674,7 +7674,9 @@ void obj_to_obj(obj_data *obj, obj_data *obj_to) {
 		
 		// clear these now
 		REMOVE_BIT(GET_OBJ_EXTRA(obj), OBJ_KEEP);
-		clear_obj_eq_sets(obj);
+		
+		// putting an item in another item does not inherently clear eq sets as of b5.213
+		// clear_obj_eq_sets(obj);
 		
 		DL_PREPEND2(obj_to->contains, obj, prev_content, next_content);
 		obj->in_obj = obj_to;
@@ -7706,9 +7708,11 @@ void obj_to_room(obj_data *object, room_data *room) {
 			++ROOM_LIGHTS(IN_ROOM(object));
 		}
 		
-		// clear these now
+		// clear keep now
 		REMOVE_BIT(GET_OBJ_EXTRA(object), OBJ_KEEP);
-		clear_obj_eq_sets(object);
+		
+		// dropping an item does not inherently clear eq sets as of b5.213
+		// clear_obj_eq_sets(object);
 
 		// set the timer here; actual rules for it are in limits.c
 		if (!suspend_autostore_updates) {
@@ -7747,9 +7751,11 @@ void obj_to_vehicle(obj_data *object, vehicle_data *veh) {
 		object->in_vehicle = veh;
 		VEH_CARRYING_N(veh) += obj_carry_size(object);
 		
-		// clear these now
+		// clear keeyp
 		REMOVE_BIT(GET_OBJ_EXTRA(object), OBJ_KEEP);
-		clear_obj_eq_sets(object);
+		
+		// putting an item in a vehicle does not inherently clear eq sets as of b5.213
+		// clear_obj_eq_sets(object);
 		
 		// set the timer here; actual rules for it are in limits.c
 		VEH_LAST_MOVE_TIME(veh) = time(0);
