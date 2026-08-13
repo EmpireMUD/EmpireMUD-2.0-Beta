@@ -462,6 +462,10 @@ void perform_alternate(char_data *old, char_data *new) {
 		msg_to_char(new, "\r\n\tY%s\t0", msg);
 	}
 	
+	if (should_reset_bonus_traits(new) || num_earned_bonus_traits(new) > count_bits(GET_BONUS_TRAITS(new))) {
+		msg_to_char(new, "\r\n\tAYou have new bonus traits available. Quit and then re-login from the login screen to choose them.\t0\r\n");
+	}
+	
 	if (!IS_IMMORTAL(new)) {
 		add_cooldown(new, COOLDOWN_ALTERNATE, SECS_PER_REAL_MIN);
 	}
@@ -1712,6 +1716,9 @@ ACMD(do_changepass) {
 	argument = any_one_word(argument, new1);
 	argument = any_one_word(argument, new2);
 	
+	// always clear command history-- don't keep passwords
+	clear_command_history(ch->desc);
+	
 	if (IS_NPC(ch)) {
 		msg_to_char(ch, "You can't do that.\r\n");
 	}
@@ -1735,7 +1742,8 @@ ACMD(do_changepass) {
 		if (ch->desc && ch->desc->snoop_by) {
 			syslog(SYS_INFO, MIN(LVL_TOP, MAX(GET_INVIS_LEV(ch), GET_ACCESS_LEVEL(ch) + 1)), TRUE, "WARNING: %s changed password while being snooped", GET_NAME(ch));
 		}
-		msg_to_char(ch, "You have successfully changed your password.\r\n");
+		
+		msg_to_char(ch, "You have successfully changed your password. Your command history has been cleared for privacy.\r\n");
 	}
 }
 

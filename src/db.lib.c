@@ -2021,6 +2021,7 @@ empire_data *create_empire(char_data *ch) {
 	EMPIRE_GREATNESS(emp) = GET_HIGHEST_KNOWN_GREATNESS(ch);
 	if (GET_ACCESS_LEVEL(ch) >= LVL_GOD) {
 		EMPIRE_IMM_ONLY(emp) = 1;
+		SET_BIT(EMPIRE_ADMIN_FLAGS(emp), config_get_bitvector("immortal_empire_default_flags"));
 	}
 	
 	// rank setup

@@ -403,6 +403,7 @@ Immortals with the "EMPIRES" grant can set administrative flags on empires.
  &gNO-DECAY&0 - Buildings do not suffer annual decay.
  &gALL-TECHS&0 - Empire can use all empire techs (e.g. Seafaring).
  &gFREE-WAR&0 - Wars by/against the empire have no cost.
+ &gALLOW-NEWBIE-ISLE&0 - Newbie island claims don't auto-clear.
 
 Both the NO-WAR and NO-STEAL flags will prevent 'reclaim' from being used by OR
 against the empire.

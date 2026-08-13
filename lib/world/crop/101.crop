@@ -43,14 +43,8 @@ U
 Tall, straight cacti shoot upward from the dirt as red fruit forms on their crowns!~
 X
 cacti cactus saguaros sahuaros plants crop~
-   The saguaro cacti stand tall and proud, their spiny arms reaching up to the
-sky. Each one is unique, with its own twists and turns, bumps and ridges. Some
-have arms that fork out like a V, while others are straight and true. The cacti
-are covered in sharp spines, making them look almost dangerous, but at the same
-time, they bear fruit that is both sweet and nourishing. The fruit is a deep
-red color, and when it's ripe, it bursts open to reveal a juicy, pulpy center.
-Despite the harshness of the desert, the saguaro cacti and their fruit are a
-symbol of resilience and sustenance.
+   The proud saguaro cacti tower high above you, pale green columns topped with
+bright red friuts.
 ~
 S
 #10150
@@ -111,18 +105,8 @@ U
 Gnarly mesquite trees climb out of the dirt before your eyes, and are soon draped with beige pods!~
 X
 trees mesquites pods plants crop~
-   As you approach the grove of mesquite trees, the scent of their delicate,
-yellowish-white flowers fills the air. The slender, thorny branches of the
-trees sway gently in the warm desert breeze, casting dappled shade on the dusty
-ground below. The rough, dark-brown bark of the trees is twisted and gnarled,
-with deep crevices and ridges. The bright green leaves are small and feathery,
-providing a soft contrast to the otherwise sharp and angular branches.
-   As you get closer, you notice that the branches of the trees are heavy with
-long, slender bean pods. The pods are a rich chocolate-brown color and hang in
-clusters from the branches. They have a slightly curved shape and a smooth,
-glossy surface, and are about six inches in length. The pods are filled with
-small, hard seeds, which are prized for their sweet, nutty flavor and used in a
-variety of dishes.
+   Fist-like clusters of beige seed pods hang from the green trees. The leaves
+are tiny, arranged like feathers hanging from the low branches.
 ~
 S
 #10153
@@ -170,15 +154,8 @@ U
 Trees climb from the dirt as wrinkled fruits grow magically beneath the branches!~
 X
 pears alligator avocados patch grove trees crop~
-   The alligator pear trees stand tall in the hot, dusty desert, their leaves
-shimmering in the bright sun. Each tree is heavy with dozens of plump, green
-alligator pears, their bumpy skin giving them a prehistoric look. The trees
-provide welcome shade for travelers passing through the barren landscape, and
-their delicious fruit is a valuable source of sustenance for those who know how
-to harvest it. As you look closer, you can see the rough, scaly texture of the
-pear's skin, and the creamy, buttery flesh inside. The trees seem to hold a
-sense of mystery and wonder, as if they are guarding some ancient secret within
-their branches.
+   These delicate trees are ornamented with odd pears that bear a green or
+black wrinkled skins.
 ~
 S
 #10155
@@ -226,16 +203,7 @@ U
 Dark green lime trees unfold themselves as they rise from the ground!~
 X
 trees limes fruit grove crop~
-   As you wander through the desert, you come across a grove of vibrant green
-lime trees. The trees stand tall and proud, with thick trunks and branches
-stretching out in every direction. The leaves are a deep shade of green, and
-the scent of citrus fills the air.
-   Small, round limes dangle from the branches, their bright green skin dotted
-with tiny bumps. Some of the fruit is ripe, and the limes practically glow in
-the sun. You can almost taste the tartness on your tongue just by looking at
-them.
-   The grove is a stark contrast to the sandy landscape surrounding it, and you
-can't help but feel a sense of wonder at the resilience of these trees.
+Small, round limes dangle from the rows of trees that make up this orchard.
 ~
 S
 #10157
@@ -298,14 +266,9 @@ U
 0
 Smouldering leaves unfold across the desert as bright firemelons grow beneath them!~
 X
-firemelons melons fruit vines bed field crop~
-   As you wander through the hot desert, you come across a patch of unusual
-fruit. Large melons of a deep maroon color with bright red stripes catch your
-eye, while nearby, bright crimson melons with dark red stripes are nestled
-among the sand. As you approach, you feel a warm, cinnamon-like scent wafting
-from the fruit. These are the legendary firemelons, prized for their unique
-color, aroma, and flavor. Though they may be difficult to find, the hunt is
-well worth it for those brave enough to venture into the desert.
+firemelons melons fruit vines bed field crop nests~
+Patches of of odd, flame-shaped leaves form nests for the large melons that
+seem to come in both deep maroon and bright crimson.
 ~
 S
 $

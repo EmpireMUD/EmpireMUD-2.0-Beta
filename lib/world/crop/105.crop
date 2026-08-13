@@ -160,8 +160,7 @@ gemfruits fruits gems field bushes crop~
 fruits with sparkling surfaces; some are ruby red, while others are emerald
 green or sapphire blue. Each fruit appears to have a different gem inside, from
 magical seashells to accursed bloodstones. The bushes themselves are small,
-with delicate branches and leaves that sway gently in the breeze. You can't
-help but feel drawn to the gemfruit and their enchanting power.
+with delicate branches and leaves that sway gently in the breeze.
 ~
 S
 #10505
@@ -185,10 +184,7 @@ X
 mushrooms magic patch crop~
    These mushrooms are unlike any you've ever seen. The caps are dull gray, but
 the mere whiff of their spores turn the whole field a kaleidoscope of colors,
-shifting and changing in a hypnotic pattern. As you draw closer, the scent of
-the mushrooms fills your nostrils, sweet and musky. You feel a sudden urge to
-take a bite, even though you know that these mushrooms can have strange effects
-on the mind.
+shifting and changing in a hypnotic pattern.
 ~
 S
 #10506
@@ -224,8 +220,7 @@ figs pudding fruit trees crop~
    Even before you approach the orchard of pudding fig trees, you notice their
 broad leaves shimmering with a faint golden glow. The figs that hang from the
 branches look plump and juicy, their skins a deep yellow hue with a subtle
-sheen. The air around the trees is thick with a sweet and tantalizing aroma
-that tickles your nose, hinting at the rumored pudding inside.
+sheen.
 ~
 S
 #10507
@@ -247,8 +242,8 @@ X
 beanstalks stalks beans plants crop~
    This towering plant is easily ten times your height, its thick stalk
 reaching towards the sky. The leaves are broad and lush, rustling gently in the
-breeze. You can't help but feel a sense of awe at the sight of these massive
-plants, wondering how tall they can truly grow.
+breeze. You can't see the top from here, so there's no telling how far it might
+grow.
 ~
 S
 #10508
@@ -271,10 +266,7 @@ Woody stems grow instantly from the ground, each angled like an axe handle!~
 X
 axeroot roots plot field crop~
    This plant is unlike any you've ever seen, its thick root system branching
-out in all directions like an intricate metal net. It seems solid and
-unyielding, like true iron. As you run your hand along the surface of the
-axeroot plant, you feel a sense of strength and durability; this is mighty
-stuff.
+out in all directions like an intricate metal net.
 ~
 S
 #10509
@@ -335,8 +327,7 @@ pickthorn thorns patch plants crop~
    The pickthorn bushes stand tall and proud, with thin and spindly branches
 that stretch upward like an ocotillo. At the end of each branch, there is a
 sharp and pointed thorn that glimmers in the light. This unique shape and an
-unusual sheen of iron make these plants ideal for all forms of mining and an
-invaluable resource in the Magiterranean.
+unusual sheen of iron make these plants ideal for all forms of mining.
 ~
 S
 #10511
@@ -370,11 +361,7 @@ X
 vines vigilant field plants crop~
    Vigilant Vines are a special type of plant that act as guardians to the
 land. These animated vines can sense intruders and use their sharp thorns to
-ward them off. They move quickly and with purpose, creating a menacing sight as
-they patrol the area. Despite their aggressiveness towards outsiders, they are
-known to be friendly to those who have earned their trust. Their vibrant green
-leaves and colorful flowers add a beautiful touch to the landscape, making them
-both fearsome and lovely to behold.
+ward them off.
 ~
 S
 #10551
@@ -408,14 +395,8 @@ U
 Leafy red stalks grow before your very eyes!~
 X
 rhubarb patch plants crop~
-   The field is filled with rows of stout, leafy plants that reach up to the
-chest. Each plant has a thick, fleshy stem with bright red skin and a pale
-green interior. The stems are arranged in a uniform pattern, with their leaves
-fanning out in all directions, providing some shade to the ground beneath. The
-leaves are large and green, with prominent veins running through them. The air
-is filled with the earthy smell of the soil and the sweet, tangy aroma of the
-rhubarb stems. The plants seem healthy and well-tended, with no signs of pests
-or disease.
+   The field is filled with leafy rows of low plants, each with a bright red
+stalk.
 ~
 S
 #10560
@@ -447,11 +428,7 @@ You watch in amazement as white ferns unfurl themselves across the field!~
 X
 ferns frost dell plants crop~
    The ferns are a sight to behold - small, delicate, and as white as freshly
-fallen snow. The fronds are intricately woven and incredibly fragile, seeming
-to sparkle in the light. Despite their fragile appearance, these ferns are
-incredibly hardy, able to thrive in even the harshest of winters. When touched,
-they release a chill that feels like a burst of icy air. You're left wondering
-what mysteries they might hold.
+fallen snow.
 ~
 S
 $

@@ -184,10 +184,46 @@ trig_data *create_trigger_table_entry(trig_vnum vnum) {
 * @return char* The line to show (without a CRLF).
 */
 char *list_one_trigger(trig_data *trig, bool detail) {
+	char *attach, types[MAX_STRING_LENGTH];
 	static char output[MAX_STRING_LENGTH];
 	
 	if (detail) {
-		safe_snprintf(output, sizeof(output), "[%5d] %s", GET_TRIG_VNUM(trig), GET_TRIG_NAME(trig));
+		switch (trig->attach_type) {
+			case OBJ_TRIGGER: {
+				attach = "object";
+				sprintbit(GET_TRIG_TYPE(trig), otrig_types, types, TRUE);
+				break;
+			}
+			case WLD_TRIGGER:
+			case RMT_TRIGGER:
+			case BLD_TRIGGER:
+			case ADV_TRIGGER: {
+				attach = "room";
+				sprintbit(GET_TRIG_TYPE(trig), wtrig_types, types, TRUE);
+				break;
+			}
+			case MOB_TRIGGER: {
+				attach = "mobile";
+				sprintbit(GET_TRIG_TYPE(trig), trig_types, types, TRUE);
+				break;
+			}
+			case VEH_TRIGGER: {
+				attach = "vehicle";
+				sprintbit(GET_TRIG_TYPE(trig), vtrig_types, types, TRUE);
+				break;
+			}
+			case EMP_TRIGGER: {
+				attach = "empire";
+				sprintbit(GET_TRIG_TYPE(trig), wtrig_types, types, TRUE);
+				break;
+			}
+			default: {
+				attach = "error";
+				*types = '\0';
+				break;
+			}
+		}
+		safe_snprintf(output, sizeof(output), "[%5d] %s (%s) %s", GET_TRIG_VNUM(trig), GET_TRIG_NAME(trig), attach, types);
 	}
 	else {
 		safe_snprintf(output, sizeof(output), "[%5d] %s", GET_TRIG_VNUM(trig), GET_TRIG_NAME(trig));

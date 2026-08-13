@@ -1083,16 +1083,17 @@ typedef struct vehicle_data vehicle_data;
 
 
 // EADM_x: empire admin flags
-#define EADM_NO_WAR				BIT(0)	// may not start a unilateral war
-#define EADM_NO_STEAL			BIT(1)	// may not steal from other empires
-#define EADM_CITY_CLAIMS_ONLY	BIT(2)	// may only claim in-city
-#define EADM_NO_RENAME			BIT(3)	// cannot change name/adjective/description
-#define EADM_FREE_NEWBIE_MOVE	BIT(4)	// empire gets a free move from the newbie island next time it founds a city
-#define EADM_FREE_NEEDS			BIT(5)	// does not charge needs
-#define EADM_IGNORE_OVERAGES	BIT(6)	// does not remove territory etc when over caps
-#define EADM_NO_DECAY			BIT(7)	// territory does not decay
-#define EADM_ALL_TECHS			BIT(8)	// empire can use all technologies
-#define EADM_FREE_WAR			BIT(9)	// no war costs
+#define EADM_NO_WAR				BIT(0)	// a. may not start a unilateral war
+#define EADM_NO_STEAL			BIT(1)	// b. may not steal from other empires
+#define EADM_CITY_CLAIMS_ONLY	BIT(2)	// c. may only claim in-city
+#define EADM_NO_RENAME			BIT(3)	// d. cannot change name/adjective/description
+#define EADM_FREE_NEWBIE_MOVE	BIT(4)	// e. empire gets a free move from the newbie island next time it founds a city
+#define EADM_FREE_NEEDS			BIT(5)	// f. does not charge needs
+#define EADM_IGNORE_OVERAGES	BIT(6)	// g. does not remove territory etc when over caps
+#define EADM_NO_DECAY			BIT(7)	// h. territory does not decay
+#define EADM_ALL_TECHS			BIT(8)	// i. empire can use all technologies
+#define EADM_FREE_WAR			BIT(9)	// j. no war costs
+#define EADM_ALLOW_NEWBIE_ISLE	BIT(10)	// k. can keep claims on newbie island
 
 
 // EATT_x: empire attributes
@@ -1909,7 +1910,7 @@ typedef enum {
 #define OBJ_TWO_HANDED  BIT(13)	// n. weapon requires both hands
 #define OBJ_BIND_ON_EQUIP  BIT(14)	// o. binds when equipped
 #define OBJ_BIND_ON_PICKUP  BIT(15)	// p. binds when acquired
-//	#define OBJ_UNUSED1  BIT(16)	// q. formerly STAFF
+#define OBJ_READIED_WEAPON_ABIL  BIT(16)	// q. set automatically by the Ready Weapon ability type to manage scaling correctly
 #define OBJ_UNCOLLECTED_LOOT  BIT(17)	// r. will junk instead of autostore
 #define OBJ_KEEP  BIT(18)	// s. obj will not be part of any "all" commands like "drop all"
 //	#define OBJ_UNUSED2  BIT(19)	// t. formerly TOOL-PAN
@@ -1926,7 +1927,7 @@ typedef enum {
 #define OBJ_NO_DECAY_IN_STORAGE  BIT(30)	// E. does not decay while stored
 
 #define OBJ_BIND_FLAGS  (OBJ_BIND_ON_EQUIP | OBJ_BIND_ON_PICKUP)	// all bind-on flags
-#define OBJ_PRESERVE_FLAGS  (OBJ_HARD_DROP | OBJ_GROUP_DROP | OBJ_SUPERIOR | OBJ_KEEP | OBJ_NO_BASIC_STORAGE | OBJ_NO_WAREHOUSE | OBJ_SEEDED | OBJ_BIND_FLAGS | OBJ_IMPORTANT)	// flags that are preserved
+#define OBJ_PRESERVE_FLAGS  (OBJ_HARD_DROP | OBJ_GROUP_DROP | OBJ_SUPERIOR | OBJ_KEEP | OBJ_NO_BASIC_STORAGE | OBJ_NO_WAREHOUSE | OBJ_SEEDED | OBJ_BIND_FLAGS | OBJ_IMPORTANT | OBJ_CREATED)	// flags that are preserved
 
 
 // OBJ_CUSTOM_x: custom message types
@@ -2435,7 +2436,7 @@ typedef enum {
 #define PRF_NOTELL  BIT(3)	// Can't receive tells
 #define PRF_POLITICAL  BIT(4)	// Changes map to political colors
 #define PRF_RP  BIT(5)	// RP-only
-	#define PRF_UNUSED_1  BIT(6)	// was MORTLOG before b5.162
+#define PRF_GRAY_CITY_BG  BIT(6)	// Changes city highlight color on ascii map
 #define PRF_NOREPEAT  BIT(7)	// No repetition of comm commands
 #define PRF_HOLYLIGHT  BIT(8)	// Immortal: Can see in dark
 #define PRF_INCOGNITO  BIT(9)	// Immortal: Can't be seen on the who list
@@ -2600,6 +2601,7 @@ typedef enum {
 #define SM_VEHICLE_MOVEMENT  BIT(15)	// messages shown to interior when vehicle moves
 #define SM_WEATHER  BIT(16)	// weather change messages
 #define SM_FIGHT_PROMPT  BIT(17)	// show or hide fprompt
+#define SM_PASSENGER_AUTO_LOOK  BIT(18)	// full 'look' when you're in a moving vehicle but not driving
 
 // flags set at character creation
 #define DEFAULT_STATUS_MESSAGES  (SM_ANIMAL_MOVEMENT | SM_CHANNEL_JOINS | SM_COOLDOWNS | SM_EMPIRE_LOGS | SM_HUNGER | SM_THIRST | SM_LOW_BLOOD | SM_MORTLOG | SM_PROMPT | SM_FIGHT_PROMPT | SM_SKILL_GAINS | SM_SUN | SM_SUN_AUTO_LOOK | SM_TEMPERATURE | SM_EXTREME_TEMPERATURE | SM_VEHICLE_MOVEMENT | SM_WEATHER)
@@ -4005,6 +4007,7 @@ struct instance_data {
 	room_data *start;	// starting interior room (first room of zone)
 	int level;	// locked, scaled level
 	time_t created;	// when instantiated
+	time_t age_timestamp;	// used to calculate actual time the instance has been active while the mud is running (accounts for reboots)
 	time_t last_reset;	// for reset timers
 	
 	// data stored ONLY for delayed load
@@ -4449,6 +4452,7 @@ struct account_data {
 	int id;	// corresponds to player_index_data account_id and player's saved account id
 	struct account_player *players;	// linked list of players
 	time_t last_logon;	// timestamp of the last login on the account
+	time_t last_friends_logon;	// timestamp of the last time any alt without the no-friends flag logged in
 	bitvector_t flags;	// ACCT_
 	char *notes;	// account notes
 	

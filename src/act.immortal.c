@@ -1590,7 +1590,7 @@ void do_instance_info(char_data *ch, char *argument) {
 	struct instance_mob *mc, *next_mc;
 	char buf[MAX_STRING_LENGTH];
 	struct instance_data *iter, *inst = NULL;
-	int num = 1, inst_num;
+	int age_minutes, num = 1, inst_num;
 	
 	// attempt to find instance here with no arg
 	if (!*argument) {
@@ -1660,9 +1660,12 @@ void do_instance_info(char_data *ch, char *argument) {
 		msg_to_char(ch, "Flags: %s\r\n", buf);
 		
 		msg_to_char(ch, "Created: %-24.24s\r\n", (char *) asctime(localtime(&INST_CREATED(inst))));
-		if (INST_LAST_RESET(inst) != INST_CREATED(inst)) {
+		if (INST_LAST_RESET(inst) != INST_CREATED(inst) && INST_LAST_RESET(inst) > 0) {
 			msg_to_char(ch, "Last reset: %-24.24s\r\n", (char *) asctime(localtime(&INST_LAST_RESET(inst))));
 		}
+		
+		age_minutes = (int)(time(0) - INST_AGE_TIMESTAMP(inst)) / SECS_PER_REAL_MIN;
+		msg_to_char(ch, "Instance age: %s (%d minute%s)\r\n", simple_time_since(INST_AGE_TIMESTAMP(inst)), age_minutes, PLURAL(age_minutes));
 		
 		if (INST_DIR(inst) != NO_DIR) {
 			msg_to_char(ch, "Facing: %s\r\n", dirs[INST_DIR(inst)]);
@@ -2238,6 +2241,10 @@ int perform_set(char_data *ch, char_data *vict, int mode, char *val_arg) {
 		}
 		SAVE_CHAR(vict);
 		check_autowiz(ch);
+		
+		if (GET_LOYALTY(vict)) {
+			check_empire_imm_only(GET_LOYALTY(vict));
+		}
 	}
 	else if SET_CASE("siteok") {
 		SET_OR_REMOVE(GET_ACCOUNT(vict)->flags, ACCT_SITEOK);
@@ -5275,6 +5282,10 @@ ACMD(do_advance) {
 	GET_IMMORTAL_LEVEL(victim) = GET_ACCESS_LEVEL(victim) > LVL_MORTAL ? (LVL_TOP - GET_ACCESS_LEVEL(victim)) : -1;
 	SAVE_CHAR(victim);
 	check_autowiz(victim);
+	
+	if (GET_LOYALTY(victim)) {
+		check_empire_imm_only(GET_LOYALTY(victim));
+	}
 }
 
 

@@ -4549,15 +4549,15 @@ PREP_ABIL(prep_restore_ability) {
 		amount += subdata->scale_points * points_per_scale_over_100 * ((level - 100) / 100.0);
 	}
 	
-	// 4.1. check costs and reduce by available mana/etc
+	// 4.1. reduce to how much they actually need
+	diff = GET_MAX_POOL(vict, use_pool) - GET_CURRENT_POOL(vict, use_pool);
+	amount = MIN(amount, diff);
+	
+	// 4.2. check costs and reduce by available mana/etc
 	if (ABIL_COST_PER_AMOUNT(abil) != 0.0) {
 		check_available_ability_cost(ch, abil, data, &avail, NULL);
 		amount = MIN(amount, avail);
 	}
-	
-	// 4.2. reduce to how much they actually need
-	diff = GET_MAX_POOL(vict, use_pool) - GET_CURRENT_POOL(vict, use_pool);
-	amount = MIN(amount, diff);
 	
 	// 5. store amount of damage now -- before bonus-healing
 	data->total_amount += amount;
@@ -5424,6 +5424,12 @@ DO_ABIL(do_ready_weapon_ability) {
 		return;
 	}
 	
+	// determine if we're replacing an item from any Ready Weapon ability
+	if (GET_EQ(ch, pos) && OBJ_FLAGGED(GET_EQ(ch, pos), OBJ_READIED_WEAPON_ABIL)) {
+		// replacement: use same level as the cap
+		level = MIN(level, GET_OBJ_CURRENT_SCALE_LEVEL(GET_EQ(ch, pos)));
+	}
+	
 	// attempt to remove existing item
 	if (GET_EQ(ch, pos)) {
 		perform_remove(ch, pos);
@@ -5436,6 +5442,7 @@ DO_ABIL(do_ready_weapon_ability) {
 	
 	// load the object
 	obj = read_object(obj_vnum, TRUE);
+	SET_BIT(GET_OBJ_EXTRA(obj), OBJ_READIED_WEAPON_ABIL);
 	
 	// mastery = superior
 	if (data->has_mastery) {
@@ -7362,9 +7369,15 @@ void perform_ability_command(char_data *ch, ability_data *abil, char *argument) 
 			}
 		}
 		if (!has && IS_SET(ABIL_TARGETS(abil), ATAR_ROOM_HOME)) {
-			if (is_abbrev(argptr, "home") && (find_room = find_home(ch)) && can_use_room(ch, find_room, GUESTS_ALLOWED)) {
-				room_targ = find_room;
-				has = TRUE;
+			if (is_abbrev(argptr, "home")) {
+				if ((find_room = find_home(ch)) && can_use_room(ch, find_room, GUESTS_ALLOWED)) {
+					room_targ = find_room;
+					has = TRUE;
+				}
+				else {
+					msg_to_char(ch, "You don't have a home.\r\n");
+					return;
+				}
 			}
 		}
 		if (!has && IS_SET(ABIL_TARGETS(abil), ATAR_ROOM_ADJACENT)) {
@@ -7826,6 +7839,12 @@ void call_ability_one(char_data *ch, ability_data *abil, char *argument, char_da
 			data->should_charge_cost = FALSE;
 			return;
 		}
+		else if (ABIL_COST_PER_AMOUNT(abil) > 0.0 && data->total_amount == 0) {
+			msg_to_char(ch, "You don't have enough %s for that ability to have any effect.\r\n", pool_types[ABIL_COST_TYPE(abil)]);
+			data->stop = TRUE;
+			data->should_charge_cost = FALSE;
+			return;
+		}
 	}
 	if (IS_SET(run_mode, RUN_ABIL_NORMAL)) {
 		// resource cost check -- normal ONLY
@@ -7903,7 +7922,7 @@ void call_ability_one(char_data *ch, ability_data *abil, char *argument, char_da
 	for (iter = 0; do_ability_data[iter].type != NOBITS && !data->stop; ++iter) {
 		if (IS_SET(ABIL_TYPES(abil), do_ability_data[iter].type) && do_ability_data[iter].do_func) {
 			// ensure immunities don't block this type
-			if (vict && ABIL_IMMUNITIES(abil) && AFF_FLAGGED(vict, ABIL_IMMUNITIES(abil))) {
+			if (vict && do_ability_data[iter].check_immune && ABIL_IMMUNITIES(abil) && AFF_FLAGGED(vict, ABIL_IMMUNITIES(abil))) {
 				// if this results in no-success, player will see a fail message
 				// if another type succeeds, they will see success instead
 				continue;

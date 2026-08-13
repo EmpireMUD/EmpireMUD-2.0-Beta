@@ -176,9 +176,6 @@ INTERACTION_FUNC(combine_obj_interact) {
 	struct resource_data *res = NULL;
 	obj_data *new_obj;
 	
-	// flags to keep on separate
-	bitvector_t preserve_flags = OBJ_SEEDED | OBJ_NO_BASIC_STORAGE | OBJ_NO_WAREHOUSE | OBJ_CREATED;
-	
 	// how many they need
 	add_to_resource_list(&res, RES_OBJECT, GET_OBJ_VNUM(inter_item), interaction->quantity, 0);
 	
@@ -192,6 +189,10 @@ INTERACTION_FUNC(combine_obj_interact) {
 	safe_snprintf(to_room, sizeof(to_room), "$n combines %dx %s into $p!", interaction->quantity, skip_filler(GET_OBJ_SHORT_DESC(inter_item)));
 	
 	new_obj = read_object(interaction->vnum, TRUE);
+	
+	// copy these flags, if any
+	SET_BIT(GET_OBJ_EXTRA(new_obj), (GET_OBJ_EXTRA(inter_item) & OBJ_PRESERVE_FLAGS));
+	
 	scale_item_to_level(new_obj, GET_OBJ_CURRENT_SCALE_LEVEL(inter_item));
 	
 	if (GET_OBJ_TIMER(new_obj) != UNLIMITED && GET_OBJ_TIMER(inter_item) != UNLIMITED) {
@@ -208,9 +209,6 @@ INTERACTION_FUNC(combine_obj_interact) {
 	// ownership
 	new_obj->last_owner_id = GET_IDNUM(ch);
 	new_obj->last_empire_id = GET_LOYALTY(ch) ? EMPIRE_VNUM(GET_LOYALTY(ch)) : NOTHING;
-	
-	// copy these flags, if any
-	SET_BIT(GET_OBJ_EXTRA(new_obj), (GET_OBJ_EXTRA(inter_item) & preserve_flags));
 	
 	// put it somewhere
 	if (CAN_WEAR(new_obj, ITEM_WEAR_TAKE)) {
@@ -564,9 +562,6 @@ INTERACTION_FUNC(identifies_to_interact) {
 	obj_data *new_obj;
 	int iter;
 	
-	// flags to keep on identifies-to
-	bitvector_t preserve_flags = OBJ_SEEDED | OBJ_CREATED | OBJ_KEEP;
-	
 	if (interaction->quantity > 1) {
 		safe_snprintf(to_char, sizeof(to_char), "%s turns out to be %s (x%d)!", GET_OBJ_SHORT_DESC(inter_item), get_obj_name_by_proto(interaction->vnum), interaction->quantity);
 	}
@@ -582,14 +577,15 @@ INTERACTION_FUNC(identifies_to_interact) {
 	
 	for (iter = 0; iter < interaction->quantity; ++iter) {
 		new_obj = read_object(interaction->vnum, TRUE);
+		
+		// copy these flags, if any
+		SET_BIT(GET_OBJ_EXTRA(new_obj), (GET_OBJ_EXTRA(inter_item) & OBJ_PRESERVE_FLAGS));
+		
 		scale_item_to_level(new_obj, GET_OBJ_CURRENT_SCALE_LEVEL(inter_item));
 	
 		if (GET_OBJ_TIMER(new_obj) != UNLIMITED && GET_OBJ_TIMER(inter_item) != UNLIMITED) {
 			GET_OBJ_TIMER(new_obj) = MIN(GET_OBJ_TIMER(new_obj), GET_OBJ_TIMER(inter_item));
 		}
-		
-		// copy these flags, if any
-		SET_BIT(GET_OBJ_EXTRA(new_obj), (GET_OBJ_EXTRA(inter_item) & preserve_flags));
 		
 		// ownership
 		new_obj->last_owner_id = GET_IDNUM(ch);
@@ -1738,9 +1734,6 @@ INTERACTION_FUNC(separate_obj_interact) {
 	obj_data *new_obj;
 	int iter;
 	
-	// flags to keep on separate
-	bitvector_t preserve_flags = OBJ_SEEDED | OBJ_NO_BASIC_STORAGE | OBJ_NO_WAREHOUSE | OBJ_CREATED;
-	
 	safe_snprintf(to_char, sizeof(to_char), "You separate %s into %s (x%d)!", GET_OBJ_SHORT_DESC(inter_item), get_obj_name_by_proto(interaction->vnum), interaction->quantity);
 	act(to_char, FALSE, ch, NULL, NULL, TO_CHAR);
 	safe_snprintf(to_room, sizeof(to_room), "$n separates %s into %s (x%d)!", GET_OBJ_SHORT_DESC(inter_item), get_obj_name_by_proto(interaction->vnum), interaction->quantity);
@@ -1753,14 +1746,15 @@ INTERACTION_FUNC(separate_obj_interact) {
 	
 	for (iter = 0; iter < interaction->quantity; ++iter) {
 		new_obj = read_object(interaction->vnum, TRUE);
+		
+		// copy these flags, if any
+		SET_BIT(GET_OBJ_EXTRA(new_obj), (GET_OBJ_EXTRA(inter_item) & OBJ_PRESERVE_FLAGS));
+		
 		scale_item_to_level(new_obj, GET_OBJ_CURRENT_SCALE_LEVEL(inter_item));
 	
 		if (GET_OBJ_TIMER(new_obj) != UNLIMITED && GET_OBJ_TIMER(inter_item) != UNLIMITED) {
 			GET_OBJ_TIMER(new_obj) = MIN(GET_OBJ_TIMER(new_obj), GET_OBJ_TIMER(inter_item));
 		}
-		
-		// copy these flags, if any
-		SET_BIT(GET_OBJ_EXTRA(new_obj), (GET_OBJ_EXTRA(inter_item) & preserve_flags));
 		
 		// ownership
 		new_obj->last_owner_id = GET_IDNUM(ch);
@@ -2471,20 +2465,53 @@ void do_eq_delete(char_data *ch, char *argument) {
 * @param char_data *ch The person viewing the list.
 */
 void do_eq_list(char_data *ch, char *argument) {
+	obj_data *obj;
 	struct player_eq_set *eq_set;
-	int count = 0;
+	int iter, count = 0;
 	
-	build_page_display_str(ch, "Saved equipment sets:");
-	LL_FOREACH(GET_EQ_SETS(ch), eq_set) {
-		++count;
-		build_page_display_col(ch, 3, FALSE, " %s", eq_set->name);
+	if (*argument) {
+		// show one set
+		LL_FOREACH(GET_EQ_SETS(ch), eq_set) {
+			if (multi_isname(argument, eq_set->name)) {
+				++count;
+				build_page_display(ch, "Equipment set '%s':", eq_set->name);
+				
+				for (iter = 0; iter < NUM_WEARS; ++iter) {
+					if ((obj = GET_EQ(ch, iter)) && get_obj_eq_set_by_id(obj, eq_set->id)) {
+						build_page_display_col(ch, 2, FALSE, " %s", GET_OBJ_SHORT_DESC(obj));
+					}
+				}
+				
+				DL_FOREACH2(ch->carrying, obj, next_content) {
+					if (get_obj_eq_set_by_id(obj, eq_set->id)) {
+						build_page_display_col(ch, 2, FALSE, " %s", GET_OBJ_SHORT_DESC(obj));
+					}
+				}
+				
+				// only show 1
+				send_page_display(ch);
+				break;
+			}
+		}
+		
+		if (!count) {
+			msg_to_char(ch, "You have no saved equipment set called '%s'.\r\n", argument);
+		}
 	}
-	
-	if (!count) {
-		build_page_display_str(ch, " none");
+	else {
+		// no-arg: list all sets
+		build_page_display_str(ch, "Saved equipment sets:");
+		LL_FOREACH(GET_EQ_SETS(ch), eq_set) {
+			++count;
+			build_page_display_col(ch, 3, FALSE, " %s", eq_set->name);
+		}
+		
+		if (!count) {
+			build_page_display_str(ch, " none");
+		}
+		
+		send_page_display(ch);
 	}
-	
-	send_page_display(ch);
 }
 
 

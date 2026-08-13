@@ -182,6 +182,7 @@
 // instance utils
 #define INSTANCE_FLAGGED(i, flg)  (IS_SET(INST_FLAGS(i), (flg)))
 #define INST_ADVENTURE(inst)  ((inst)->adventure)
+#define INST_AGE_TIMESTAMP(inst)  ((inst)->age_timestamp)
 #define INST_CREATED(inst)  ((inst)->created)
 #define INST_DIR(inst)  ((inst)->dir)
 #define INST_FAKE_LOC(inst)  ((inst)->fake_loc)
@@ -1607,7 +1608,7 @@ int Y_COORD(room_data *room);	// formerly #define Y_COORD(room)  FLAT_Y_COORD(ge
 // helpers
 #define BLD_FLAGGED(bld, flag)  IS_SET(GET_BLD_FLAGS(bld), (flag))
 #define BLD_DESIGNATE_FLAGGED(room, flag)  (GET_BUILDING(HOME_ROOM(room)) && IS_SET(GET_BLD_DESIGNATE_FLAGS(GET_BUILDING(HOME_ROOM(room))), (flag)))
-#define CHECK_CHAMELEON(from_room, to_room)  (ROOM_AFF_FLAGGED(to_room, ROOM_AFF_CHAMELEON) && IS_COMPLETE(to_room) && compute_distance(from_room, to_room) >= 2)
+#define CHECK_CHAMELEON(from_room, to_room)  (ROOM_AFF_FLAGGED(to_room, ROOM_AFF_CHAMELEON) && IS_COMPLETE(to_room) && !HAS_MAJOR_DISREPAIR(to_room) && compute_distance(from_room, to_room) >= 2)
 #define RMT_FLAGGED(room, flag)  (GET_ROOM_TEMPLATE(room) && IS_SET(GET_RMT_FLAGS(GET_ROOM_TEMPLATE(room)), (flag)))
 #define ROOM_AFF_FLAGGED(r, flag)  (IS_SET(ROOM_AFF_FLAGS(r), (flag)))
 #define ROOM_BLD_FLAGGED(room, flag)  (GET_BUILDING(room) && IS_SET(GET_BLD_FLAGS(GET_BUILDING(room)), (flag)))
@@ -1976,6 +1977,7 @@ void run_delayed_refresh();
 
 // empire utils from utils.c
 bool can_claim(char_data *ch);
+void check_empire_imm_only(empire_data *emp);
 int count_members_online(empire_data *emp);
 int count_tech(empire_data *emp);
 bool empire_can_claim(empire_data *emp);
@@ -2516,6 +2518,7 @@ void schedule_all_obj_timers(char_data *ch);
 void schedule_heal_over_time(char_data *ch);
 void schedule_obj_autostore_check(obj_data *obj, long new_autostore_timer);
 void schedule_obj_timer_update(obj_data *obj, bool override);
+bool should_reset_bonus_traits(char_data *ch);
 bool tick_obj_timer(obj_data *obj);
 void update_empire_needs(empire_data *emp, struct empire_island *eisle, struct empire_needs *needs);
 

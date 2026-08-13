@@ -9,9 +9,9 @@ report it immediately using the BUG command.~
 0 24
 S
 #1
-board~
-the board~
-A board is hanging on the wall.~
+board message~
+the message board~
+A message board is hanging on the wall.~
 Nothing.
 ~
 9 B 0 0 0 2

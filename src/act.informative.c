@@ -536,7 +536,7 @@ void survey_city(char_data *ch, char *argument) {
 				owned = rough = ocean = water = FALSE;
 				
 				// analyze tile
-				owned = (ROOM_OWNER(room) && ROOM_OWNER(room) != GET_LOYALTY(ch) && !ROOM_AFF_FLAGGED(room, ROOM_AFF_CHAMELEON));
+				owned = (ROOM_OWNER(room) && ROOM_OWNER(room) != GET_LOYALTY(ch) && !CHECK_CHAMELEON(IN_ROOM(ch), room));
 				rough = SECT_FLAGGED(BASE_SECT(room), SECTF_ROUGH) ? TRUE : FALSE;
 				ocean = SECT_FLAGGED(BASE_SECT(room), SECTF_OCEAN) ? TRUE : FALSE;
 				water = SECT_FLAGGED(BASE_SECT(room), SECTF_FRESH_WATER) ? TRUE : FALSE;

@@ -2942,6 +2942,7 @@ void nanny(descriptor_data *d, char *arg) {
 
 			// put them in-game
 			enter_player_game(d, TRUE, TRUE);
+			clear_command_history(d);
 			
 			msg_to_desc(d, "\r\n%s\r\n\r\n", config_get_string("welcome_message"));
 			act("$n has entered the game.", TRUE, d->character, 0, 0, TO_ROOM);

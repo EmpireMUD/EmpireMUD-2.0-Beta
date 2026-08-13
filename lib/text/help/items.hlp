@@ -1041,6 +1041,10 @@ Masterwork abilities (usually):
   Smelt - Master Craftsman or Master Blacksmith
   Woodworking - Master Craftsman
 
+Some abilities also have a bigger effect when you also know their mastery
+ability, such as Ready Fireball, which produces superior fireballs if you also
+know the Wilderblaze ability.
+
 See also: SCALABLE CRAFTS, ITEM-QUALITY
 #
 TEXTILES "TEXTILE COMPONENT" "CLOTH COMPONENT" CLOTH "COTTON CLOTH" "WOOL CLOTH"

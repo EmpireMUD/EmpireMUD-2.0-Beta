@@ -196,6 +196,25 @@ void add_slow_ip(char *ip) {
 }
 
 
+/**
+* Clears command history, e.g. to remove password from command history.
+*
+* @param descriptor_data *d The descriptor whose history should be cleared.
+*/
+void clear_command_history(descriptor_data *d) {
+	int iter;
+	
+	if (d) {
+		for (iter = 0; iter < HISTORY_SIZE; ++iter) {
+			if (d->history[iter]) {
+				free(d->history[iter]);
+				d->history[iter] = NULL;
+			}
+		}
+	}
+}
+
+
 // wipes the last act message on the descriptor
 void clear_last_act_message(descriptor_data *desc) {
 	if (desc->last_act_message) {

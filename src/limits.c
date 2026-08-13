@@ -869,6 +869,31 @@ void real_update_player(char_data *ch) {
 }
 
 
+/**
+* @param char_data *ch Any player.
+* @return bool TRUE if they have reached the conditions for a bonus trait reset, FALSE if not.
+*/
+bool should_reset_bonus_traits(char_data *ch) {
+	int hours;
+	struct time_info_data passed;
+	
+	if (IS_NPC(ch) || PLR_FLAGGED(ch, PLR_TRAITS_RESET) || !config_get_int("hours_to_bonus_trait_reset")) {
+		return FALSE; // shortcut
+	}
+	
+	// compute playtime
+	passed = *real_time_passed((time(0) - ch->player.time.logon) + ch->player.time.played, 0);
+	hours = passed.day * 24 + passed.hours;
+	
+	if (hours >= config_get_int("hours_to_bonus_trait_reset")) {
+		return TRUE;
+	}
+	else {
+		return FALSE;
+	}
+}
+
+
  //////////////////////////////////////////////////////////////////////////////
 //// EMPIRE LIMITS ///////////////////////////////////////////////////////////
 
@@ -1098,7 +1123,7 @@ static void reduce_outside_territory_one(empire_data *emp) {
 	bool junk, outskirts_over, frontier_over, total_over, was_large;
 	
 	// sanity
-	if (!emp || EMPIRE_IMM_ONLY(emp) || EMPIRE_ADMIN_FLAGGED(emp, EADM_IGNORE_OVERAGES)) {
+	if (!emp || EMPIRE_ADMIN_FLAGGED(emp, EADM_IGNORE_OVERAGES)) {
 		return;
 	}
 	
@@ -1279,7 +1304,7 @@ void reduce_stale_empires(void) {
 		}
 		
 		// check overages
-		if (!EMPIRE_ADMIN_FLAGGED(iter, EADM_IGNORE_OVERAGES) && !EMPIRE_IMM_ONLY(iter) && EMPIRE_MEMBERS(iter) == 0 && EMPIRE_TERRITORY(iter, TER_TOTAL) > 0) {
+		if (!EMPIRE_ADMIN_FLAGGED(iter, EADM_IGNORE_OVERAGES) && EMPIRE_MEMBERS(iter) == 0 && EMPIRE_TERRITORY(iter, TER_TOTAL) > 0) {
 			// when members hit 0, we consider the empire timed out
 			reduce_stale_empires_one(iter);
 		}

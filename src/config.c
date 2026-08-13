@@ -51,6 +51,9 @@ void ensure_storage_timers(any_vnum only_vnum);
 void ensure_home_storage_timers(char_data *ch, any_vnum only_vnum);
 void set_inherent_ptech(int ptech);
 
+// external vars used in configs
+extern const char *empire_admin_flags[];
+
 // locals
 #define deprecated_config(set, name, type)	{ init_config((set), (name), (type), "deprecated: do not set"); init_config_flags((name), CONF_FLAG_DEPRECATED); }
 
@@ -993,6 +996,13 @@ CONFIG_HANDLER(config_edit_type) {
 }
 
 
+// Customer handler for immortal empire restrictions that processes a bool and then runs updates
+CONFIG_HANDLER(config_edit_immortal_empire_restrictions) {
+	config_edit_bool(ch, config, argument);
+	resort_empires(TRUE);
+}
+
+
  //////////////////////////////////////////////////////////////////////////////
 //// CONFIG SYSTEM: CUSTOM EDITORS ///////////////////////////////////////////
 
@@ -1735,8 +1745,8 @@ void init_config(int set, char *key, int type, char *description) {
 * Attaches custom handlers to config entries.
 *
 * @param char *key The config key to update (must already be set up).
-* @param CONFIG_HANDLER(*show_func) The function to show the config to a player.
-* @param CONFIG_HANDLER(*edit_func) The function for the player to edit the config.
+* @param CONFIG_HANDLER(*show_func) The function to show the config to a player. May be NULL to keep the default.
+* @param CONFIG_HANDLER(*edit_func) The function for the player to edit the config. May be NULL to keep the default.
 * @param void *custom_data Misc data used by show_func/edit_func.
 */
 void init_config_custom(char *key, CONFIG_HANDLER(*show_func), CONFIG_HANDLER(*edit_func), void *custom_data) {
@@ -1755,8 +1765,12 @@ void init_config_custom(char *key, CONFIG_HANDLER(*show_func), CONFIG_HANDLER(*e
 	}
 	
 	// add data
-	cnf->show_func = show_func;
-	cnf->edit_func = edit_func;
+	if (show_func) {
+		cnf->show_func = show_func;
+	}
+	if (edit_func) {
+		cnf->edit_func = edit_func;
+	}
 	cnf->custom_data = custom_data;
 }
 
@@ -1893,7 +1907,10 @@ void init_config_system(void) {
 	init_config(CONFIG_EMPIRE, "decay_in_storage", CONFTYPE_BOOL, "stored items still count down their decay timers");
 		init_config_custom("decay_in_storage", config_show_bool, config_edit_decay_in_storage, NULL);
 	init_config(CONFIG_EMPIRE, "homeless_citizen_speed", CONFTYPE_INT, "tiles of movement per real minute, for migrating homeless");
-	init_config(CONFIG_EMPIRE, "immortal_empire_restrictions", CONFTYPE_BOOL, "prevents trade, diplomacy, etc between immortal and mortal empires");
+	init_config(CONFIG_PLAYERS, "immortal_empire_default_flags", CONFTYPE_BITVECTOR, "flags automatically set on new immortal empires");
+		init_config_custom("immortal_empire_default_flags", config_show_bitvector, config_edit_bitvector, empire_admin_flags);
+	init_config(CONFIG_EMPIRE, "immortal_empire_restrictions", CONFTYPE_BOOL, "prevents diplomacy, etc between immortal and mortal empires");
+		init_config_custom("immortal_empire_restrictions", config_show_bool, config_edit_immortal_empire_restrictions, NULL);
 	init_config(CONFIG_EMPIRE, "immortal_empire_restrict_stealth", CONFTYPE_BOOL, "prevents stealth actions by and against immortal empires");
 	init_config(CONFIG_EMPIRE, "immortal_empire_restrict_trade", CONFTYPE_BOOL, "prevents immortal empire from engaging in import/export");
 	init_config(CONFIG_EMPIRE, "immortal_empire_restrict_war", CONFTYPE_BOOL, "prevents war actions by and against immortal empires");

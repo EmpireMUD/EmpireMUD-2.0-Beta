@@ -2812,6 +2812,9 @@ ACMD(do_rework) {
 		
 		extract_resources(ch, cost_resources, can_use_room(ch, IN_ROOM(ch), MEMBERS_ONLY), NULL);
 		
+		// reset superior
+		REMOVE_BIT(GET_OBJ_EXTRA(obj), OBJ_SUPERIOR);
+		
 		// load a fresh one
 		new_obj = fresh_copy_obj(obj, GET_OBJ_CURRENT_SCALE_LEVEL(obj), FALSE, FALSE);
 		swap_obj_for_obj(obj, new_obj);

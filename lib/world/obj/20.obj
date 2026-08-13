@@ -571,12 +571,12 @@ M
 Type 'build tent' to set up a small shelter.~
 S
 #2037
-sail folded~
-a folded sail~
-A sail is folded neatly on the ground.~
+sail folded canvas~
+a canvas sail~
+A canvas sail is folded neatly on the ground.~
 Sails are used in shipbuilding.
 ~
-3 el a 0 0 3
+3 el a 0 0 4
 0 0 0
 11 0
 C

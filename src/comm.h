@@ -16,6 +16,7 @@
 
 /* comm.c */
 // TODO: organize these externs and probably move them down
+void clear_command_history(descriptor_data *d);
 void clear_last_act_message(descriptor_data *desc);
 void flush_queues(descriptor_data *d);
 void send_to_all(const char *messg, ...) __attribute__((format(printf, 1, 2)));

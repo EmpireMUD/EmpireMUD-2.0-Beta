@@ -1027,7 +1027,7 @@ With basic Sewing, you can make:
   canteen -- holds drinks
   satchel -- increases carrying capacity
   tent -- a portable shelter
-  sail -- for shipbuilding
+  canvas sail -- for shipbuilding
 
 Additional sewing items are available from other abilities in the Trade skill,
 as well as patterns and crafts hidden around the world.
@@ -1065,6 +1065,10 @@ Ships can be constructed via the manufacture command. This can only be done at
 a shipyard, and the vessel can be sailed to a dock when finished. You can also
 upgrade the shipyard, if your empire has this knowledge.
 
+Take note that some ships will require items from other abilities such as
+anchors (Forge), cannons (Deadly Weapons), and canvas sails (Sew). You can also
+import these components.
+
 You gain experience every time you add resources to a ship being manufactured.
 Shipyards cannot be painted.
 
@@ -1090,7 +1094,8 @@ Unlock more advanced ships through empire progression:
   Hulk (shipping, 1000 capacity)
 
 See also: CRAFT INFO, BOARD, DISEMBARK, SAIL, SHIPPING, SHIPS, UPGRADE,
-   RESOURCES, KEEP, SCRAP, VEHICLE, RECIPES, CRAFTING ABILITIES
+   RESOURCES, KEEP, SCRAP, VEHICLE, RECIPES, CRAFTING ABILITIES, SEW,
+   DEADLY WEAPONS
 #
 SIEGEWORKS "SIEGE WORKS"
 

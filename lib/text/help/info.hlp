@@ -1222,32 +1222,31 @@ Unlike many games, where your skills and equipment are based on your level,
 EmpireMUD does it backwards. Your level is based on your skills and gear.
 You have three different levels.
 
-Skill level: This level is determined by your top 3 skills, and is currently
-   capped at 100. You only reach that level when you have two skills at 100
-   and one skill at 75. You can see your skill level by typing "skills", or
-   in parentheses on your "score". Skill levels are grouped into three ranges:
-   Basic (up to 50), Specialty (up to 75), and Class (up to 100).
+Skill level: Rated 1 to 100. This level is determined by your top 3 skills,
+   with a maximum of 100, which you reach when you have two skills at 100 and
+   one skill at 75. You can see your skill level by typing "skills". Skill
+   levels are grouped into three ranges: Basic (up to 50), Specialty (up to
+   75), and Class (up to 100).
 
 Gear level: Your gear level raises your total level to 50 more than the average
    level of the gear you have equipped (except sheathed weapons, clothes, and
-   items in the ranged slot). You can see it by typing "eq". Some item flags
-   which make the item more powerful, such as superior and drop flags, raise
-   the effective levels of items for this purpose.
+   items in the ranged slot). Gear level is shown at the top of the "equipment"
+   command. Superior or hard/group/boss-drop items contribute more to this.
 
 Composite/total level: This is the sum of your skill and gear levels. It is the
    number used for scaling mobs to fight you. This is the level shown on your
    "score".
 
-Levels for mobs and items are rounded up to the next 5 (e.g. 73 to 75, 109 to
+Highest level: Your highest-ever composite level is used for determining the
+   reward level for special events and for which items you can equip. You can
+   equip items up to 25 levels above you (50 for BoP items) once you hit level
+   100. Bellow 100, items must be in the same level range as you (1-50, 50-75,
+   75-100).
+
+Levels for mobs and items are rounded up to the next 5 (e.g. 71 to 75, 109 to
 110).
 
-Note: Until level 100, you must be in the same level range as an item
-   (1-50, 50-75, 75-100, or 100+) or higher to equip it. After level 100, you
-   can't use gear that's more than 25 levels above you (50 for BoP items). Your
-   highest recent level is used, so you should still be able to remove all your
-   gear and re-equip it.
-
-See also: ROLE, SCALING, SYNERGY ABILITY
+See also: EVENTS, ROLE, SCALING, SYNERGY ABILITY
 Immortals see also: ACCESS LEVEL
 #
 "LEVEL COLORS" "COLOR BY LEVEL" "COLOR BY DIFFICULTY" "CONSIDER COLORS" "QUEST COLORS" "ADVENTURE COLORS"

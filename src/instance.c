@@ -162,6 +162,7 @@ struct instance_data *build_instance_loc(adv_data *adv, struct adventure_link_ru
 	INST_FAKE_LOC(inst) = loc;	// by default
 	INST_LEVEL(inst) = 0;	// unscaled
 	INST_CREATED(inst) = time(0);
+	INST_AGE_TIMESTAMP(inst) = time(0);
 	INST_LAST_RESET(inst) = 0;	// will update this on 1st reset
 	INST_START(inst) = NULL;
 	INST_SIZE(inst) = 0;
@@ -1447,7 +1448,7 @@ void prune_instances(void) {
 		delayed = IS_SET(INST_FLAGS(inst), INST_NEEDS_LOAD) ? TRUE : FALSE;
 		
 		// look for completed or orphaned instances
-		if (!INST_ADVENTURE(inst) || INSTANCE_FLAGGED(inst, INST_COMPLETED) || (!INST_START(inst) && !delayed) || !INST_LOCATION(inst) || (INST_SIZE(inst) == 0 && !delayed) || (rule && (INST_CREATED(inst) + 60 * rule->value) < time(0)) || (evt_run && !find_running_event_by_vnum(evt_run->value))) {
+		if (!INST_ADVENTURE(inst) || INSTANCE_FLAGGED(inst, INST_COMPLETED) || (!INST_START(inst) && !delayed) || !INST_LOCATION(inst) || (INST_SIZE(inst) == 0 && !delayed) || (rule && (INST_AGE_TIMESTAMP(inst) + 60 * rule->value) < time(0)) || (evt_run && !find_running_event_by_vnum(evt_run->value))) {
 			// well, only if empty
 			if (count_players_in_instance(inst, TRUE, NULL) == 0 && (!ADVENTURE_FLAGGED(INST_ADVENTURE(inst), ADV_CHECK_OUTSIDE_FIGHTS) || check_outside_fights(inst)) && check_outside_vehicles(inst)) {
 				delete_instance(inst, TRUE);
@@ -2442,7 +2443,7 @@ static struct instance_data *load_one_instance(FILE *fl, any_vnum idnum) {
 	struct instance_data *inst;
 	char line[256], str_in[256];
 	int i_in[4];
-	long l_in[2];
+	long l_in[3];
 
 	CREATE(inst, struct instance_data, 1);
 	INST_ID(inst) = idnum;
@@ -2468,15 +2469,26 @@ static struct instance_data *load_one_instance(FILE *fl, any_vnum idnum) {
 	INST_FLAGS(inst) = asciiflag_conv(str_in);
 	INST_FAKE_LOC(inst) = real_room(i_in[3]);
 
-	// line 2: level, created, last-reset
-	if (!get_line(fl, line) || sscanf(line, "%d %ld %ld", &i_in[0], &l_in[0], &l_in[1]) != 3) {
-		log("SYSERR: Format error in line 2 of instance %d", idnum);
+	// line 2: level, created, age, last-reset
+	if (!get_line(fl, line)) {
+		log("SYSERR: Missing line 2 of instance %d", idnum);
 		exit(1);
+	}
+	if (sscanf(line, "%d %ld %ld %ld", &i_in[0], &l_in[0], &l_in[1], &l_in[2]) != 4) {
+		if (sscanf(line, "%d %ld %ld", &i_in[0], &l_in[0], &l_in[2]) == 3) {
+			// backwards-compatible pre-b5.213
+			l_in[1] = time(0) - l_in[0];	// assume full age
+		}
+		else {
+			log("SYSERR: Format error in line 2 of instance %d", idnum);
+			exit(1);
+		}
 	}
 	
 	INST_LEVEL(inst) = i_in[0];
 	INST_CREATED(inst) = l_in[0];
-	INST_LAST_RESET(inst) = l_in[1];
+	INST_AGE_TIMESTAMP(inst) = time(0) - l_in[1];	// convert age in seconds to seconds-ago
+	INST_LAST_RESET(inst) = l_in[2];
 	
 	inst->room = NULL;
 	INST_SIZE(inst) = 0;
@@ -2678,7 +2690,7 @@ void save_instances(void) {
 	DL_FOREACH(instance_list, inst) {
 		fprintf(fl, "#%d\n", INST_ID(inst));
 		fprintf(fl, "%d %d %d %lld %d\n", GET_ADV_VNUM(INST_ADVENTURE(inst)), INST_LOCATION(inst) ? GET_ROOM_VNUM(INST_LOCATION(inst)) : NOWHERE, INST_START(inst) ? GET_ROOM_VNUM(INST_START(inst)) : NOWHERE, INST_FLAGS(inst), INST_FAKE_LOC(inst) ? GET_ROOM_VNUM(INST_FAKE_LOC(inst)) : NOWHERE);
-		fprintf(fl, "%d %ld %ld\n", INST_LEVEL(inst), INST_CREATED(inst), INST_LAST_RESET(inst));
+		fprintf(fl, "%d %ld %ld %ld\n", INST_LEVEL(inst), INST_CREATED(inst), (time(0) - INST_AGE_TIMESTAMP(inst)), INST_LAST_RESET(inst));
 		
 		// 'D' direction data
 		if (INST_DIR(inst) || INST_ROTATION(inst)) {

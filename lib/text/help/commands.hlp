@@ -926,6 +926,7 @@ Usage:  equipment [-all]  -- see your current gear
         equipment set <name>  -- save an equipment set
         equipment delete <name>  -- delete an equipment set
         equipment list  -- list your equipment sets
+        equipment list <name>  -- list items in the set
         equipment <name>  -- change to an equipment set
         equipment analyze  -- see help about your equipment
         equipment summary  -- see a summary of stats
@@ -1941,15 +1942,19 @@ This toggle changes your map colors from environmental to political. You will
 see each tile colored with the banner of the empire who owns it. Screenreader
 users will see empire names next to claimed tiles.
 
-Dimly lit tiles do not appear in 'informative' mode.
+If your MUD client doesn't show enough contrast with the background color of
+your city on the ascii map, try "toggle gray-city-bg on".
+
+Dimly lit tiles do not appear in 'political' mode.
 
 See also: BANNER, TOGGLE
 #
 PORTAL PORTALS ENTER
 
-Building:  ~&b][&0~ portal  20 logs, 12 blocks, 20 nexus crystals  (High Sorcery ability)
+Building:  ~&b][&0~ portal  20 logs, 12 blocks, 20 nexus crystals  (Portalmancy goal)
 Built on:  plains, desert
 Fame:  1
+
 Commands:  portal [coordinates | number | keywords]
            portal -all
            portal -near <coordinates>
@@ -3005,6 +3010,7 @@ Toggles:
   compact - no extra newlines
   exits - shows or hides exits and directions when you 'look'
   extra-spacing - adds an extra blank line after you type a command
+  gray-city-bg - changes the background color for cities on the political map
   hide-keep - basic inventory command won't show items with (keep) flags
   informative - informative map coloring -- HELP INFORMATIVE
   item-details - shows level and some other information in inventory/equipment
