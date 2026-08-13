@@ -416,6 +416,48 @@ bool building_counts_as(bld_data *bld, bld_vnum which_bld, veh_vnum which_veh) {
 //// EMPIRE UTILS ////////////////////////////////////////////////////////////
 
 /**
+* May upgrade an empire to imm-only status, but does not downgrade them. This
+* is based on the presence of only immortals in the empire. It will only warn
+* if there's a mix.
+*
+* @param empire_data *emp The empire to check.
+*/
+void check_empire_imm_only(empire_data *emp) {
+	int imms, morts;
+	player_index_data *index, *next_index;
+	
+	if (!emp || EMPIRE_IMM_ONLY(emp)) {
+		return;	// no work
+	}
+	
+	// gather data
+	imms = morts = 0;
+	HASH_ITER(name_hh, player_table_by_name, index, next_index) {
+		if (index->loyalty == emp) {
+			if (index->access_level >= LVL_GOD) {
+				++imms;
+			}
+			else {
+				++morts;
+			}
+		}
+	}
+	
+	if (imms > 0) {
+		// flag
+		syslog(SYS_EMPIRE, LVL_START_IMM, TRUE, "EMPIRE: %s is now an immortal empire", EMPIRE_NAME(emp));
+		SET_BIT(EMPIRE_ADMIN_FLAGS(emp), config_get_bitvector("immortal_empire_default_flags"));
+		EMPIRE_NEEDS_SAVE(emp) = TRUE;
+		
+		// warn
+		if (morts > 0 && config_get_bool("immortal_empire_restrictions")) {
+			syslog(SYS_EMPIRE, LVL_START_IMM, TRUE, "EMPIRE: %s contains both mortals and immortals", EMPIRE_NAME(emp));
+		}
+	}
+}
+
+
+/**
 * Cancels a requested refresh on 1 or more empires.
 *
 * @param empire_data *only_emp Optional: Only remove from one empire (default: NULL = all)

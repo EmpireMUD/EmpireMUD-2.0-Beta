@@ -1977,6 +1977,7 @@ void run_delayed_refresh();
 
 // empire utils from utils.c
 bool can_claim(char_data *ch);
+void check_empire_imm_only(empire_data *emp);
 int count_members_online(empire_data *emp);
 int count_tech(empire_data *emp);
 bool empire_can_claim(empire_data *emp);

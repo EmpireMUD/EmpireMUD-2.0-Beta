@@ -2241,6 +2241,10 @@ int perform_set(char_data *ch, char_data *vict, int mode, char *val_arg) {
 		}
 		SAVE_CHAR(vict);
 		check_autowiz(ch);
+		
+		if (GET_LOYALTY(vict)) {
+			check_empire_imm_only(GET_LOYALTY(vict));
+		}
 	}
 	else if SET_CASE("siteok") {
 		SET_OR_REMOVE(GET_ACCOUNT(vict)->flags, ACCT_SITEOK);
@@ -5278,6 +5282,10 @@ ACMD(do_advance) {
 	GET_IMMORTAL_LEVEL(victim) = GET_ACCESS_LEVEL(victim) > LVL_MORTAL ? (LVL_TOP - GET_ACCESS_LEVEL(victim)) : -1;
 	SAVE_CHAR(victim);
 	check_autowiz(victim);
+	
+	if (GET_LOYALTY(victim)) {
+		check_empire_imm_only(GET_LOYALTY(victim));
+	}
 }
 
 
