@@ -1716,6 +1716,9 @@ ACMD(do_changepass) {
 	argument = any_one_word(argument, new1);
 	argument = any_one_word(argument, new2);
 	
+	// always clear command history-- don't keep passwords
+	clear_command_history(ch->desc);
+	
 	if (IS_NPC(ch)) {
 		msg_to_char(ch, "You can't do that.\r\n");
 	}
@@ -1739,7 +1742,8 @@ ACMD(do_changepass) {
 		if (ch->desc && ch->desc->snoop_by) {
 			syslog(SYS_INFO, MIN(LVL_TOP, MAX(GET_INVIS_LEV(ch), GET_ACCESS_LEVEL(ch) + 1)), TRUE, "WARNING: %s changed password while being snooped", GET_NAME(ch));
 		}
-		msg_to_char(ch, "You have successfully changed your password.\r\n");
+		
+		msg_to_char(ch, "You have successfully changed your password. Your command history has been cleared for privacy.\r\n");
 	}
 }
 
