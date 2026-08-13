@@ -3007,6 +3007,7 @@ Toggles:
   compact - no extra newlines
   exits - shows or hides exits and directions when you 'look'
   extra-spacing - adds an extra blank line after you type a command
+  gray-city-bg - changes the background color for cities on the political map
   hide-keep - basic inventory command won't show items with (keep) flags
   informative - informative map coloring -- HELP INFORMATIVE
   item-details - shows level and some other information in inventory/equipment

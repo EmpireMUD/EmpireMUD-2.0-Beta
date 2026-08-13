@@ -2436,7 +2436,7 @@ typedef enum {
 #define PRF_NOTELL  BIT(3)	// Can't receive tells
 #define PRF_POLITICAL  BIT(4)	// Changes map to political colors
 #define PRF_RP  BIT(5)	// RP-only
-	#define PRF_UNUSED_1  BIT(6)	// was MORTLOG before b5.162
+#define PRF_GRAY_CITY_BG  BIT(6)	// Changes city highlight color on ascii map
 #define PRF_NOREPEAT  BIT(7)	// No repetition of comm commands
 #define PRF_HOLYLIGHT  BIT(8)	// Immortal: Can see in dark
 #define PRF_INCOGNITO  BIT(9)	// Immortal: Can't be seen on the who list

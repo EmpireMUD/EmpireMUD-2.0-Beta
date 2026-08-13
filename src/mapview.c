@@ -228,7 +228,7 @@ const char *get_banner_complement_color(char_data *ch, empire_data *emp) {
 	}
 	
 	// no extended colors? Send a gray background and hope for the best -- otherwise there's a risk of no-contrast coloring
-	if (!ch || !ch->desc || !ch->desc->pProtocol->pVariables[eMSDP_XTERM_256_COLORS]->ValueInt) {
+	if (!ch || !ch->desc || !ch->desc->pProtocol->pVariables[eMSDP_XTERM_256_COLORS]->ValueInt || PRF_FLAGGED(ch, PRF_GRAY_CITY_BG)) {
 		return "\t[B111]";
 	}
 
