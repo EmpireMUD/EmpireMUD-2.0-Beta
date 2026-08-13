@@ -447,6 +447,7 @@ void check_empire_imm_only(empire_data *emp) {
 		// flag
 		syslog(SYS_EMPIRE, LVL_START_IMM, TRUE, "EMPIRE: %s is now an immortal empire", EMPIRE_NAME(emp));
 		SET_BIT(EMPIRE_ADMIN_FLAGS(emp), config_get_bitvector("immortal_empire_default_flags"));
+		EMPIRE_IMM_ONLY(emp) = TRUE;
 		EMPIRE_NEEDS_SAVE(emp) = TRUE;
 		
 		// warn
