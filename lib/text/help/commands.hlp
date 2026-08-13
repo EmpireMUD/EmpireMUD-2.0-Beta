@@ -1942,7 +1942,10 @@ This toggle changes your map colors from environmental to political. You will
 see each tile colored with the banner of the empire who owns it. Screenreader
 users will see empire names next to claimed tiles.
 
-Dimly lit tiles do not appear in 'informative' mode.
+If your MUD client doesn't show enough contrast with the background color of
+your city on the ascii map, try "toggle gray-city-bg on".
+
+Dimly lit tiles do not appear in 'political' mode.
 
 See also: BANNER, TOGGLE
 #
