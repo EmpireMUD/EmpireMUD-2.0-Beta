@@ -3636,7 +3636,7 @@ int damage(char_data *ch, char_data *victim, int dam, int attacktype, byte damty
 		stop_fighting(victim);
 
 	/* Uh oh.  Victim died. */
-	if (GET_POS(victim) == POS_DEAD) {
+	if (GET_POS(victim) == POS_DEAD || (GET_POS(victim) <= POS_STUNNED && MOB_FLAGGED(victim, MOB_NO_UNCONSCIOUS))) {
 		if (match_attack_type(attacktype, ATTACK_VAMPIRE_BITE) && ch != victim && !AFF_FLAGGED(victim, AFF_NO_DRINK_BLOOD) && !GET_FEEDING_FROM(ch) && IN_ROOM(ch) == IN_ROOM(victim)) {
 			set_health(victim, 0);
 			GET_POS(victim) = POS_STUNNED;
