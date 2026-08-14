@@ -2675,6 +2675,15 @@ void nanny(descriptor_data *d, char *arg) {
 				return;
 			}
 			
+			any = FALSE;
+			for (iter = 0; iter < strlen(arg); ++iter) {
+				if (isalpha(arg[iter]) && !isupper(arg[iter])) {
+					any = TRUE;
+				}
+			}
+			if (!any) {
+				msg_to_desc(d, "WARNING: Your password 
+			
 			GET_PASSWD(d->character) = str_dup(CRYPT(arg, PASSWORD_SALT));
 			next_creation_step(d);
 			break;
