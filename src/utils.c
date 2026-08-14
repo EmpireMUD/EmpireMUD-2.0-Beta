@@ -4743,7 +4743,7 @@ bool has_resources(char_data *ch, struct resource_data *list, bool ground, bool 
 									break;
 								}
 								case RES_COMPONENT: {
-									if (GET_OBJ_COMPONENT(obj) == res->vnum || is_component_vnum(obj, res->vnum)) {
+									if (GET_OBJ_COMPONENT(obj) == res->vnum || (liter == 1 && is_component_vnum(obj, res->vnum))) {
 										--res->amount;
 										obj->search_mark = TRUE;
 									}
