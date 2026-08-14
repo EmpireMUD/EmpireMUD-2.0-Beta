@@ -5944,6 +5944,15 @@ switch %seq%
     nop %self.add_mob_flag(*PICKPOCKETED)%
   break
   case 4
+    * give-back
+    set pearl %self.inventory(11895)%
+    if %self.varexists(lost_pearl)% && %pearl%
+      %echo% ~%self% finds a pearl in ^%self% pocket!
+      rdelete lost_pearl %self.id%
+      %purge% %pearl%
+      wait 1 sec
+    end
+    *
     if %self.varexists(lost_pearl)%
       %echo% ~%self% pats ^%self% pocket trying to find something.
     elseif %random.2% == 1
@@ -5954,8 +5963,18 @@ switch %seq%
   break
   case 5
     * skip; long delay here if the player stole the pearl
-    if %self.varexists(lost_pearl)%
-      wait 360 s
+    set count 0
+    while %self.varexists(lost_pearl)% && %count% < 12
+      set pearl %self.inventory(11895)%
+      if %pearl%
+        %echo% ~%self% looks surprised as &%self% finds a pearl in ^%self% pocket!
+        wait 2 sec
+        %echo% ~%self% dusts off the pearl and puts it on the altar.
+        rdelete lost_pearl %self.id%
+        %purge% %pearl%
+      end
+      wait 30 s
+      eval count %count% + 1
     end
   break
   case 6
