@@ -4,22 +4,22 @@ blocks that are currently in use.
 
    0  boards, basic terrains
  100  misc natural resources, newbie island terrains
- 200  Empire NPCs and workforce crafts
-  50  clay/pottery items
+ 200  Empire NPCs and workforce crafts, tropical terrains
+  250 clay/pottery items
  300  Barded mount mobs
  400  High Sorcery mobs
  500  Natural Magic mobs, unlockable archetypes
- 600  level 200-300 crafting resources, with related sectors and mobs
+ 600  level 200-300 crafting resources, enchanted forests, related mobs
  700 
  800  Glass and wax items
  900  Carpentry items and carts
-  50  Ships
+  950 Ships
 
 1000  System objects, hobby archetypes
 1100  Magic/Sorcery/Vampire skill items
 1200  Herbs, potions, and poisons
 1300  Fishing and misc crafts
-  50  Skins, leather, and wool
+ 1350 Skins, leather, and wool
 1400  Paints and paint recipes
 1500  Unlockable hobby archetypes
 
@@ -67,7 +67,7 @@ blocks that are currently in use.
 9500  General combat scripts
 9600  More combat scripts
 9700
-9800
+9800  Additional script library
 9900  Miscellaneous immortal reward minipets and summoner items
 
 
