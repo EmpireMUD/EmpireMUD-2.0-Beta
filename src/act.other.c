@@ -2771,9 +2771,10 @@ ACMD(do_milk) {
 
 
 ACMD(do_minipets) {
+	bool random;
 	struct minipet_data *mini, *next_mini;
 	char_data *mob, *to_summon;
-	int count, number;
+	int count, num;
 	
 	skip_spaces(&argument);
 	
@@ -2820,18 +2821,35 @@ ACMD(do_minipets) {
 			dismiss_any_minipet(ch);
 		}
 	}
+	else if (!GET_MINIPETS(ch)) {
+		msg_to_char(ch, "You don't have any minipets.\r\n");
+	}
 	else {
-		number = get_number(&argument);
+		if (!str_cmp(argument, "rand") || !str_cmp(argument, "random")) {
+			random = TRUE;
+			num = 0;
+		}
+		else {
+			// not random: allow number-dot-name syntax
+			num = get_number(&argument);
+		}
 		
 		to_summon = NULL;	// to find
 		HASH_ITER(hh, GET_MINIPETS(ch), mini, next_mini) {
 			if (!(mob = mob_proto(mini->vnum))) {
 				continue;	// no mob
 			}
+			
+			if (random) {
+				// just pick based on number
+				if (!number(0, num++) || !to_summon) {
+					to_summon = mob;
+				}
+			}
 			else if (!multi_isname(argument, GET_PC_NAME(mob))) {
 				continue;	// no match
 			}
-			else if (--number == 0) {
+			else if (--num == 0) {
 				to_summon = mob;
 				break;	// FOUND!
 			}
