@@ -5975,7 +5975,7 @@ switch %seq%
       end
       wait 30 s
       eval count %count% + 1
-    end
+    done
   break
   case 6
     %echo% ~%self% stands up and brushes *%self%self off.
