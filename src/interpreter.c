@@ -2669,20 +2669,25 @@ void nanny(descriptor_data *d, char *arg) {
 		}
 
 		case CON_NEWPASSWD: {
+			bool has_alpha = FALSE, has_lowercase = FALSE;
+			
 			if (!*arg || strlen(arg) > MAX_PWD_LENGTH || strlen(arg) < 3 || !str_cmp(arg, GET_PC_NAME(d->character))) {
 				SEND_TO_Q("\r\nIllegal password.\r\n", d);
 				msg_to_desc(d, "Password: %s", telnet_go_ahead(d));
 				return;
 			}
 			
-			any = FALSE;
 			for (iter = 0; iter < strlen(arg); ++iter) {
-				if (isalpha(arg[iter]) && !isupper(arg[iter])) {
-					any = TRUE;
+				if (isalpha(arg[iter])) {
+					has_alpha = TRUE;
+					if (!isupper(arg[iter])) {
+						has_lowercase = TRUE;
+					}
 				}
 			}
-			if (!any) {
-				msg_to_desc(d, "WARNING: Your password 
+			if (has_alpha && !has_lowercase) {
+				msg_to_desc(d, "WARNING: Your password is all-uppercase. To change it, press enter. Otherwise:\r\n");
+			}
 			
 			GET_PASSWD(d->character) = str_dup(CRYPT(arg, PASSWORD_SALT));
 			next_creation_step(d);
