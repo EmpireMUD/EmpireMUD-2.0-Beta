@@ -5301,6 +5301,7 @@ void check_version(void) {
 	// ensure everything is saved
 	if (any) {
 		// b5.214: must check goals here, otherwise ships/buildings may be double-counted and trigger goals early in run_delayed_refresh()
+		need_progress_refresh = TRUE;
 		check_progress_refresh();
 		
 		save_island_table();
