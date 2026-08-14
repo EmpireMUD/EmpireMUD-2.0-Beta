@@ -663,6 +663,8 @@ fire damage.
 Hooked abilities send normal &cpre-&0, &ctarg-&0, &cself-&0, and &cfail-&0
 messages. You can set custom messages to * to silence them, as usual.
 
+Hooked abilities gain experience when they activate.
+
 See also: OLC ABILITIES
 #d
 "ABILEDIT APPLY" "ABILEDIT APPLIES"
