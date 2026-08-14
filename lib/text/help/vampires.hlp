@@ -416,6 +416,8 @@ Red Mist (Vampire ability)
 With this ability, you gain a chance to absorb blood from the air after any
 physical attack. Your claws and blood weapons are also upgraded in quality.
 
+Gain experience whenever this ability triggers.
+
 See also: CLAWS, READY BLOOD WEAPONS
 #
 REGENERATE
@@ -453,7 +455,7 @@ Usage:  bite [target]
 
 Your 'bite' becomes more dangerous in combat, with effects that depend on what
 group role you're in. All roles will steal a small amount of blood with each
-bite.
+bite. Gain experience when you bite a target.
 
 Melee/Solo role:
 - Bite never "taunts" the target to focus on you (instead of 33% chance).
