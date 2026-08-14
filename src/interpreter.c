@@ -2686,7 +2686,7 @@ void nanny(descriptor_data *d, char *arg) {
 				}
 			}
 			if (has_alpha && !has_lowercase) {
-				msg_to_desc(d, "\r\nWARNING: Your password is all-uppercase. To change it, press enter. Otherwise:");
+				msg_to_desc(d, "\r\nWARNING: Your password is all-uppercase. If this was a caps-lock error, press enter to try again. Otherwise:");
 			}
 			
 			GET_PASSWD(d->character) = str_dup(CRYPT(arg, PASSWORD_SALT));
