@@ -431,6 +431,7 @@ When using field  - The variable returns:
    recognize a language. Optional on/off 2nd arg grants/removes this from the
    player. Cannot add/remove if the player speaks (instead of recognizes) it.
 &ccan_see(target)&0 - Whether the character can see a person/object/vehicle.
+&ccan_see_in_room&0 - Is not blind and room is light or char sees in dark.
 &ccan_speak(lang,on|off)&0 - Whether the character can speak a language. Optional
    on/off 2nd arg grants/removes this from the player.
 &ccan_start_quest(vnum)&0 - Whether or not the character can start a quest.

@@ -3626,6 +3626,9 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 							safe_snprintf(str, slen, "0");
 						}
 					}
+					else if (!str_cmp(field, "can_see_in_room")) {
+						safe_snprintf(str, slen, "%d", (!AFF_FLAGGED(c, AFF_BLIND) && can_see_in_dark_room(c, IN_ROOM(c), FALSE)) ? 1 : 0);
+					}
 					else if (!str_cmp(field, "can_teleport_room")) {
 						room_data *troom = (subfield && *subfield) ? get_room(IN_ROOM(c), subfield) : IN_ROOM(c);
 						safe_snprintf(str, slen, "%d", (troom && can_teleport_to(c, troom, TRUE)) ? 1 : 0);
