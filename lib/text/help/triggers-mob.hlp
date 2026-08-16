@@ -593,7 +593,9 @@ When using field  - The variable returns:
 &cnext_in_room&0 - The next actor in the room as a variable (id) nice to use
    for loops, or an empty return.
 &cnohassle&0 - If TRUE, the player is an immortal with !HASSLE on.
+&cnohunger&0 - If TRUE, player never gets hungry.
 &cnoskill(Skill)&0 - TRUE if the player has 'noskilled' that skill.
+&cnothirst&0 - If TRUE, player never gets thirsty.
 &cobj_target(name)&0 - Finds a targeted object the character can see/has.
 &cobj_target_inv(name)&0 - Finds a targeted object in the character's inventory.
 &con_quest(vnum)&0 - TRUE if the player is currently on that quest.

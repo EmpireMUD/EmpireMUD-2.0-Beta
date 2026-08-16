@@ -4563,6 +4563,9 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 					else if (!str_cmp(field, "nohassle")) {
 						safe_snprintf(str, slen,"%d", NOHASSLE(c) ? 1 : 0);
 					}
+					else if (!str_cmp(field, "nohunger")) {
+						safe_snprintf(str, slen, "%d", (GET_COND(c, FULL) == -1 || HAS_BONUS_TRAIT(c, BONUS_NO_HUNGER)) ? 1 : 0);
+					}
 					else if (!str_cmp(field, "noskill")) {
 						if (subfield && *subfield && !IS_NPC(c)) {
 							skill_data *sk;							
@@ -4574,6 +4577,9 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 						if (*str != '1') {							
 							safe_snprintf(str, slen, "0");
 						}
+					}
+					else if (!str_cmp(field, "nothirst")) {
+						safe_snprintf(str, slen, "%d", (GET_COND(c, THIRST) == -1 || HAS_BONUS_TRAIT(c, BONUS_NO_THIRST)) ? 1 : 0);
 					}
 					break;
 				}
