@@ -11465,6 +11465,9 @@ void store_unique_item(char_data *ch, struct empire_unique_storage **to_list, ob
 				}
 			}
 		}
+		
+		// other data that can be removed
+		GET_AUTOSTORE_TIMER(obj) = 0;
 	}
 	
 	// mark storage timer
