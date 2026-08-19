@@ -1772,7 +1772,7 @@ obj_data *make_corpse(char_data *ch) {
 	if (!IS_NPC(ch)) {
 		GET_LAST_CORPSE_ID(ch) = obj_script_id(corpse);
 	}
-	else {	// mob corpse setup
+	else if (MOB_CUSTOM_CORPSE(ch) != NOTHING) {	// mob corpse setup, unless custom corpse given
 		if (!size_data[size].can_take_corpse) {
 			REMOVE_BIT(GET_OBJ_WEAR(corpse), ITEM_WEAR_TAKE);
 		}
@@ -1824,7 +1824,10 @@ obj_data *make_corpse(char_data *ch) {
 		// only set corpse idnum if it didn't have a custom one set
 		set_obj_val(corpse, VAL_CORPSE_IDNUM, IS_NPC(ch) ? GET_MOB_VNUM(ch) : (-1 * GET_IDNUM(ch)));
 	}
-	set_obj_val(corpse, VAL_CORPSE_SIZE, size);
+	if (MOB_CUSTOM_CORPSE(ch) == NOTHING) {
+		// only preserve size if it's not a custom corpse
+		set_obj_val(corpse, VAL_CORPSE_SIZE, size);
+	}
 	set_obj_val(corpse, VAL_CORPSE_FLAGS, (MOB_FLAGGED(ch, MOB_NO_LOOT) ? CORPSE_NO_LOOT : NOBITS));
 		
 	if (human) {
