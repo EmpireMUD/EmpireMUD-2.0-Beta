@@ -1820,7 +1820,10 @@ obj_data *make_corpse(char_data *ch) {
 		// custom corpse: add replacements?
 	}
 	
-	set_obj_val(corpse, VAL_CORPSE_IDNUM, IS_NPC(ch) ? GET_MOB_VNUM(ch) : (-1 * GET_IDNUM(ch)));
+	if (MOB_CUSTOM_CORPSE(ch) == NOTHING || GET_OBJ_VAL(corpse, VAL_CORPSE_IDNUM) <= 0) {
+		// only set corpse idnum if it didn't have a custom one set
+		set_obj_val(corpse, VAL_CORPSE_IDNUM, IS_NPC(ch) ? GET_MOB_VNUM(ch) : (-1 * GET_IDNUM(ch)));
+	}
 	set_obj_val(corpse, VAL_CORPSE_SIZE, size);
 	set_obj_val(corpse, VAL_CORPSE_FLAGS, (MOB_FLAGGED(ch, MOB_NO_LOOT) ? CORPSE_NO_LOOT : NOBITS));
 		
