@@ -519,9 +519,12 @@ void olc_delete_mobile(char_data *ch, mob_vnum vnum) {
 	
 	// update quests
 	HASH_ITER(hh, quest_table, quest, next_quest) {
-		// REQ_x: delete from quest
+		// QG_x, QR_x, REQ_x: delete from quest
 		found = delete_quest_giver_from_list(&QUEST_STARTS_AT(quest), QG_MOBILE, vnum);
 		found |= delete_quest_giver_from_list(&QUEST_ENDS_AT(quest), QG_MOBILE, vnum);
+		found |= find_quest_reward_in_list(QUEST_REWARDS(quest), QR_COMPANION, vnum);
+		found |= find_quest_reward_in_list(QUEST_REWARDS(quest), QR_REMOVE_COMPANION, vnum);
+		found |= find_quest_reward_in_list(QUEST_REWARDS(quest), QR_MINIPET, vnum);
 		found |= delete_requirement_from_list(&QUEST_TASKS(quest), REQ_KILL_MOB, vnum);
 		found |= delete_requirement_from_list(&QUEST_TASKS(quest), REQ_HAVE_COMPANION, vnum);
 		found |= delete_requirement_from_list(&QUEST_TASKS(quest), REQ_NOT_HAVE_COMPANION, vnum);
@@ -662,9 +665,12 @@ void olc_delete_mobile(char_data *ch, mob_vnum vnum) {
 			}
 		}
 		if (GET_OLC_QUEST(desc)) {
-			// QG_x, REQ_x: delete from quest editor
+			// QG_x, QR_x, REQ_x: delete from quest editor
 			found = delete_quest_giver_from_list(&QUEST_STARTS_AT(GET_OLC_QUEST(desc)), QG_MOBILE, vnum);
 			found |= delete_quest_giver_from_list(&QUEST_ENDS_AT(GET_OLC_QUEST(desc)), QG_MOBILE, vnum);
+			found |= delete_quest_reward_from_list(&QUEST_REWARDS(GET_OLC_QUEST(desc)), QR_COMPANION, vnum);
+			found |= delete_quest_reward_from_list(&QUEST_REWARDS(GET_OLC_QUEST(desc)), QR_REMOVE_COMPANION, vnum);
+			found |= delete_quest_reward_from_list(&QUEST_REWARDS(GET_OLC_QUEST(desc)), QR_MINIPET, vnum);
 			found |= delete_requirement_from_list(&QUEST_TASKS(GET_OLC_QUEST(desc)), REQ_KILL_MOB, vnum);
 			found |= delete_requirement_from_list(&QUEST_TASKS(GET_OLC_QUEST(desc)), REQ_HAVE_COMPANION, vnum);
 			found |= delete_requirement_from_list(&QUEST_TASKS(GET_OLC_QUEST(desc)), REQ_NOT_HAVE_COMPANION, vnum);
@@ -1036,9 +1042,12 @@ void olc_search_mob(char_data *ch, mob_vnum vnum) {
 	
 	// quests
 	HASH_ITER(hh, quest_table, quest, next_quest) {
-		// QG_x, REQ_x: quest search
+		// QG_x, QR_x, REQ_x: quest search
 		any = find_quest_giver_in_list(QUEST_STARTS_AT(quest), QG_MOBILE, vnum);
 		any |= find_quest_giver_in_list(QUEST_ENDS_AT(quest), QG_MOBILE, vnum);
+		any |= find_quest_reward_in_list(QUEST_REWARDS(quest), QR_COMPANION, vnum);
+		any |= find_quest_reward_in_list(QUEST_REWARDS(quest), QR_REMOVE_COMPANION, vnum);
+		any |= find_quest_reward_in_list(QUEST_REWARDS(quest), QR_MINIPET, vnum);
 		any |= find_requirement_in_list(QUEST_TASKS(quest), REQ_KILL_MOB, vnum);
 		any |= find_requirement_in_list(QUEST_TASKS(quest), REQ_HAVE_COMPANION, vnum);
 		any |= find_requirement_in_list(QUEST_TASKS(quest), REQ_NOT_HAVE_COMPANION, vnum);

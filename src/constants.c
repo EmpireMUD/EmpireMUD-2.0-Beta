@@ -3858,6 +3858,9 @@ const char *quest_reward_types[] = {
 	"UNLOCK-ARCHETYPE",
 	"BONUS-ABILITY",	// 15
 	"REMOVE-ABILITY",
+	"COMPANION",
+	"REMOVE-COMPANION",
+	"MINIPET",
 	"\n",
 };
 

@@ -2723,6 +2723,9 @@ typedef enum {
 #define QR_UNLOCK_ARCHETYPE  14
 #define QR_BONUS_ABILITY  15
 #define QR_REMOVE_ABILITY  16
+#define QR_COMPANION  17
+#define QR_REMOVE_COMPANION  18
+#define QR_MINIPET  19
 
 
 // indicates empire (rather than misc) coins for a reward

@@ -767,6 +767,8 @@ void give_quest_rewards(char_data *ch, struct quest_reward *list, int reward_lev
 	struct quest_reward *reward;
 	struct empire_goal *goal;
 	progress_data *prog;
+	struct companion_data *cd;
+	struct companion_mod *cmod;
 	
 	LL_FOREACH(list, reward) {
 		// QR_x: reward the rewards
@@ -950,6 +952,29 @@ void give_quest_rewards(char_data *ch, struct quest_reward *list, int reward_lev
 				}
 				break;
 			}
+			case QR_COMPANION: {
+				if (!has_companion(ch, reward->vnum)) {
+					cd = add_companion(ch, reward->vnum, NO_ABIL);
+					cmod = get_companion_mod_by_type(cd, CMOD_SHORT_DESC);
+					msg_to_char(ch, "\tyYou gain %s as a companion!\t0\r\n", cmod ? cmod->str : get_mob_name_by_proto(reward->vnum, TRUE));
+				}
+				break;
+			}
+			case QR_REMOVE_COMPANION: {
+				if ((cd = has_companion(ch, reward->vnum))) {
+					cmod = get_companion_mod_by_type(cd, CMOD_SHORT_DESC);
+					msg_to_char(ch, "\tyYou no longer have %s as a companion.\t0\r\n", cmod ? cmod->str : get_mob_name_by_proto(reward->vnum, TRUE));
+					remove_companion(ch, reward->vnum);
+				}
+				break;
+			}
+			case QR_MINIPET: {
+				if (!has_minipet(ch, reward->vnum)) {
+					add_minipet(ch, reward->vnum);
+					msg_to_char(ch, "\tyYou gain %s as a minipet!\t0\r\n", get_mob_name_by_proto(reward->vnum, TRUE));
+				}
+				break;
+			}
 		}
 	}
 }
@@ -1121,6 +1146,19 @@ char *quest_reward_string(struct quest_reward *reward, bool show_vnums) {
 			safe_snprintf(output, sizeof(output), "Removes bonus ability: %s%s", vnum, get_ability_name_by_vnum(reward->vnum));
 			break;
 		}
+		case QR_COMPANION: {
+			safe_snprintf(output, sizeof(output), "Grants companion: %s%s", vnum, get_mob_name_by_proto(reward->vnum, TRUE));
+			break;
+		}
+		case QR_REMOVE_COMPANION: {
+			safe_snprintf(output, sizeof(output), "Removes companion: %s%s", vnum, get_mob_name_by_proto(reward->vnum, TRUE));
+			break;
+		}
+		case QR_MINIPET: {
+			safe_snprintf(output, sizeof(output), "Grants minipet: %s%s", vnum, get_mob_name_by_proto(reward->vnum, TRUE));
+			break;
+		}
+
 		default: {
 			safe_snprintf(output, sizeof(output), "%s%dx Unknown", vnum, reward->amount);
 			break;
@@ -3896,6 +3934,15 @@ bool audit_quest(quest_data *quest, char_data *ch) {
 			case QR_REMOVE_ABILITY: {
 				break;
 			}
+			case QR_COMPANION:
+			case QR_REMOVE_COMPANION:
+			case QR_MINIPET: {
+				if (!mob_proto(rew->vnum)) {
+					olc_audit_msg(ch, QUEST_VNUM(quest), "Rewards unknown mob vnum %d", rew->vnum);
+					problem = TRUE;
+				}
+				break;
+			}
 		}
 	}
 	if (max_q > 10) {
@@ -4538,6 +4585,21 @@ any_vnum parse_quest_reward_vnum(char_data *ch, int type, char *vnum_arg, char *
 			}
 			if (!find_ability(vnum_arg)) {
 				msg_to_char(ch, "Invalid ability '%s'.\r\n", vnum_arg);
+				return PARSE_QRV_FAILED;
+			}
+			else {
+				ok = TRUE;
+			}
+			break;
+		}
+		case QR_COMPANION:
+		case QR_REMOVE_COMPANION:
+		case QR_MINIPET: {
+			if (!*vnum_arg) {
+				strcpy(vnum_arg, prev_arg);	// does not generally need 2 args
+			}
+			if (!isdigit(*vnum_arg) || !mob_proto(atoi(vnum_arg))) {
+				msg_to_char(ch, "Invalid mobile '%s'.\r\n", vnum_arg);
 				return PARSE_QRV_FAILED;
 			}
 			else {

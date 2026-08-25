@@ -9088,6 +9088,10 @@ Available reward types:
  &cUNLOCK-ARCHETYPE&0 - Grants the player/account a locked archetype for new chars.
  &cBONUS-ABILITY&0 - Grants the player a bonus ability.
  &cREMOVE-ABILITY&0 - Revokes a bonus ability from a player.
+ &cCOMPANION&0 - Grants a companion to the companion list (an npc that assists
+    in battle).
+ &cREMOVE-COMPANION&0 - Removes a companion from the companion list, if present.
+ &cMINIPET&0 - Grants a minipet (an npc that does not engage in combat).
 
 Note: If you set empire coins as the reward, but the mob is not part of an
 empire, the player will receive misc coins instead.
