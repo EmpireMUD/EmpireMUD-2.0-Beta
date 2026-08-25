@@ -2394,9 +2394,10 @@ int leave_otrigger(room_data *room, char_data *actor, int dir, char *custom_dir,
 * @param char_data *actor The player consuming the object.
 * @param int cmd The command that's consuming the item (OCMD_*).
 * @param char_data *target Optional: If the consume is targeted (e.g. poisons), the target (may be NULL).
+* @param int quantity How much is being consumed (hours of fullness, etc; often just 1 for arrows or similar).
 * @return int 0 to block consume, 1 to continue.
 */
-int consume_otrigger(obj_data *obj, char_data *actor, int cmd, char_data *target) {
+int consume_otrigger(obj_data *obj, char_data *actor, int cmd, char_data *target, int quantity) {
 	trig_data *t, *next_t;
 	bool multi = FALSE;
 	char buf[MAX_INPUT_LENGTH];
@@ -2419,6 +2420,9 @@ int consume_otrigger(obj_data *obj, char_data *actor, int cmd, char_data *target
 			else {
 				add_var(&GET_TRIG_VARS(t), "target", "", 0);
 			}
+			
+			safe_snprintf(buf, sizeof(buf), "%d", quantity);
+			add_var(&GET_TRIG_VARS(t), "quantity", buf, 0);
 			
 			switch (cmd) {
 				case OCMD_EAT: {

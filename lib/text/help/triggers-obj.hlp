@@ -41,6 +41,8 @@ Variables:
      may also be missing if they died).
   &c%self%&0 - The object being consumed.
   &c%command%&0 - Which consume command was used (e.g. drink).
+  &c%quantity&0 - Amount to be consumed (1 for arrows/poisons, usually more for
+     drink or eat).
 #d
 "FINISH TRIGGER" "OTRIG FINISH" TRIGEDIT-OBJ-FINISH
 

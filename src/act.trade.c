@@ -1913,7 +1913,7 @@ void do_gen_craft_building(char_data *ch, craft_data *type, int dir) {
 	if (!check_build_location_and_dir(ch, IN_ROOM(ch), type, dir, FALSE, &is_closed, &needs_reverse)) {
 		return;	// sends own messages
 	}
-	else if (found_obj && !consume_otrigger(found_obj, ch, OCMD_BUILD, NULL)) {
+	else if (found_obj && !consume_otrigger(found_obj, ch, OCMD_BUILD, NULL, 1)) {
 		return;	// the trigger should send its own message if it prevented this
 	}
 	
@@ -2373,7 +2373,7 @@ ACMD(do_gen_craft) {
 		// this sends its own message ("You need X more of ...")
 		//msg_to_char(ch, "You don't have the resources to %s that.\r\n", gen_craft_data[GET_CRAFT_TYPE(type)].command);
 	}
-	else if (GET_CRAFT_REQUIRES_OBJ(type) != NOTHING && found_obj && !consume_otrigger(found_obj, ch, OCMD_CRAFT, NULL)) {
+	else if (GET_CRAFT_REQUIRES_OBJ(type) != NOTHING && found_obj && !consume_otrigger(found_obj, ch, OCMD_CRAFT, NULL, 1)) {
 		return;	// trigger hopefully sent its own message
 	}
 	else {

@@ -4477,7 +4477,7 @@ void perform_violence_missile(char_data *ch, obj_data *weapon) {
 		}
 		
 		// fire a consume trigger but it can't block execution here
-		if (best && !consume_otrigger(best, ch, OCMD_SHOOT, (!EXTRACTED(vict) && !IS_DEAD(vict)) ? vict : NULL)) {
+		if (best && !consume_otrigger(best, ch, OCMD_SHOOT, (!EXTRACTED(vict) && !IS_DEAD(vict)) ? vict : NULL, 1)) {
 			purge = FALSE;	// ammo likely extracted
 		}
 		
