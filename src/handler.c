@@ -5857,6 +5857,8 @@ struct companion_data *add_companion(char_data *ch, any_vnum vnum, any_vnum from
 	}
 	cd->from_abil = from_abil;	// may be NO_ABIL
 	
+	qt_change_companion(ch, vnum, TRUE);
+	
 	return cd;
 }
 
@@ -6074,6 +6076,8 @@ void remove_companion(char_data *ch, any_vnum vnum) {
 		HASH_DEL(GET_COMPANIONS(ch), cd);
 		free_companion(cd);
 	}
+	
+	qt_change_companion(ch, vnum, FALSE);
 }
 
 
@@ -9437,7 +9441,7 @@ bool meets_requirements(char_data *ch, struct req_data *list, struct instance_da
 				break;
 			}
 			case REQ_HAVE_COMPANION: {
-				ok = has_companion(ch, req->vnum);
+				ok = has_companion(ch, req->vnum) ? TRUE : FALSE;
 				break;
 			}
 			case REQ_NOT_HAVE_COMPANION: {

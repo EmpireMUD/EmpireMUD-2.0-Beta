@@ -2882,6 +2882,34 @@ void qt_change_coins(char_data *ch) {
 
 
 /**
+* Quest Tracker: ch gains/loses a companion
+*
+* @param char_data *ch The player.
+* @param any_vnum companion Which companion vnum.
+*/
+void qt_change_companion(char_data *ch, any_vnum companion, bool gain) {
+	struct player_quest *pq;
+	struct req_data *task;
+	
+	if (IS_NPC(ch)) {
+		return;
+	}
+	
+	// player trackers
+	LL_FOREACH(GET_QUESTS(ch), pq) {
+		LL_FOREACH(pq->tracker, task) {
+			if (task->type == REQ_HAVE_COMPANION && companion == task->vnum) {
+				task->current = gain ? task->needed : 0;
+			}
+			else if (task->type == REQ_NOT_HAVE_COMPANION && companion == task->vnum) {
+				task->current = gain ? 0 : task->needed;
+			}
+		}
+	}
+}
+
+
+/**
 * Quest Tracker: ch gains/loses currency
 *
 * @param char_data *ch The player.
