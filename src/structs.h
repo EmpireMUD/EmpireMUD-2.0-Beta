@@ -507,6 +507,8 @@ typedef struct vehicle_data vehicle_data;
 #define REQ_EMPIRE_LACKS_PROGRESS  50
 #define REQ_EMPIRE_ON_PROGRESS  51
 #define REQ_EMPIRE_NOT_ON_PROGRESS  52
+#define REQ_HAVE_COMPANION  53
+#define REQ_NOT_HAVE_COMPANION  54
 
 
 // REQ_AMT_x: How numbers displayed for different REQ_ types

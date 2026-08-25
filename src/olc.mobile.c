@@ -504,7 +504,10 @@ void olc_delete_mobile(char_data *ch, mob_vnum vnum) {
 	
 	// update progress
 	HASH_ITER(hh, progress_table, prg, next_prg) {
+		// REQ_x: delete from prog
 		found = delete_requirement_from_list(&PRG_TASKS(prg), REQ_KILL_MOB, vnum);
+		found |= delete_requirement_from_list(&PRG_TASKS(prg), REQ_HAVE_COMPANION, vnum);
+		found |= delete_requirement_from_list(&PRG_TASKS(prg), REQ_NOT_HAVE_COMPANION, vnum);
 		
 		if (found) {
 			SET_BIT(PRG_FLAGS(prg), PRG_IN_DEVELOPMENT);
@@ -516,10 +519,15 @@ void olc_delete_mobile(char_data *ch, mob_vnum vnum) {
 	
 	// update quests
 	HASH_ITER(hh, quest_table, quest, next_quest) {
+		// REQ_x: delete from quest
 		found = delete_quest_giver_from_list(&QUEST_STARTS_AT(quest), QG_MOBILE, vnum);
 		found |= delete_quest_giver_from_list(&QUEST_ENDS_AT(quest), QG_MOBILE, vnum);
 		found |= delete_requirement_from_list(&QUEST_TASKS(quest), REQ_KILL_MOB, vnum);
+		found |= delete_requirement_from_list(&QUEST_TASKS(quest), REQ_HAVE_COMPANION, vnum);
+		found |= delete_requirement_from_list(&QUEST_TASKS(quest), REQ_NOT_HAVE_COMPANION, vnum);
 		found |= delete_requirement_from_list(&QUEST_PREREQS(quest), REQ_KILL_MOB, vnum);
+		found |= delete_requirement_from_list(&QUEST_PREREQS(quest), REQ_HAVE_COMPANION, vnum);
+		found |= delete_requirement_from_list(&QUEST_PREREQS(quest), REQ_NOT_HAVE_COMPANION, vnum);
 		
 		if (found) {
 			SET_BIT(QUEST_FLAGS(quest), QST_IN_DEVELOPMENT);
@@ -561,7 +569,10 @@ void olc_delete_mobile(char_data *ch, mob_vnum vnum) {
 	
 	// update socials
 	HASH_ITER(hh, social_table, soc, next_soc) {
+		// REQ_x: delete from social
 		found = delete_requirement_from_list(&SOC_REQUIREMENTS(soc), REQ_KILL_MOB, vnum);
+		found |= delete_requirement_from_list(&SOC_REQUIREMENTS(soc), REQ_HAVE_COMPANION, vnum);
+		found |= delete_requirement_from_list(&SOC_REQUIREMENTS(soc), REQ_NOT_HAVE_COMPANION, vnum);
 		
 		if (found) {
 			SET_BIT(SOC_FLAGS(soc), SOC_IN_DEVELOPMENT);
@@ -640,7 +651,10 @@ void olc_delete_mobile(char_data *ch, mob_vnum vnum) {
 			}
 		}
 		if (GET_OLC_PROGRESS(desc)) {
+			// REQ_x: delete from progress editor
 			found = delete_requirement_from_list(&PRG_TASKS(GET_OLC_PROGRESS(desc)), REQ_KILL_MOB, vnum);
+			found |= delete_requirement_from_list(&PRG_TASKS(GET_OLC_PROGRESS(desc)), REQ_HAVE_COMPANION, vnum);
+			found |= delete_requirement_from_list(&PRG_TASKS(GET_OLC_PROGRESS(desc)), REQ_NOT_HAVE_COMPANION, vnum);
 		
 			if (found) {
 				SET_BIT(QUEST_FLAGS(GET_OLC_PROGRESS(desc)), PRG_IN_DEVELOPMENT);
@@ -648,10 +662,15 @@ void olc_delete_mobile(char_data *ch, mob_vnum vnum) {
 			}
 		}
 		if (GET_OLC_QUEST(desc)) {
+			// QG_x, REQ_x: delete from quest editor
 			found = delete_quest_giver_from_list(&QUEST_STARTS_AT(GET_OLC_QUEST(desc)), QG_MOBILE, vnum);
 			found |= delete_quest_giver_from_list(&QUEST_ENDS_AT(GET_OLC_QUEST(desc)), QG_MOBILE, vnum);
 			found |= delete_requirement_from_list(&QUEST_TASKS(GET_OLC_QUEST(desc)), REQ_KILL_MOB, vnum);
+			found |= delete_requirement_from_list(&QUEST_TASKS(GET_OLC_QUEST(desc)), REQ_HAVE_COMPANION, vnum);
+			found |= delete_requirement_from_list(&QUEST_TASKS(GET_OLC_QUEST(desc)), REQ_NOT_HAVE_COMPANION, vnum);
 			found |= delete_requirement_from_list(&QUEST_PREREQS(GET_OLC_QUEST(desc)), REQ_KILL_MOB, vnum);
+			found |= delete_requirement_from_list(&QUEST_PREREQS(GET_OLC_QUEST(desc)), REQ_HAVE_COMPANION, vnum);
+			found |= delete_requirement_from_list(&QUEST_PREREQS(GET_OLC_QUEST(desc)), REQ_NOT_HAVE_COMPANION, vnum);
 			
 			if (found) {
 				SET_BIT(QUEST_FLAGS(GET_OLC_QUEST(desc)), QST_IN_DEVELOPMENT);
@@ -683,7 +702,10 @@ void olc_delete_mobile(char_data *ch, mob_vnum vnum) {
 			}
 		}
 		if (GET_OLC_SOCIAL(desc)) {
+			// REQ_x: delete from social editor
 			found = delete_requirement_from_list(&SOC_REQUIREMENTS(GET_OLC_SOCIAL(desc)), REQ_KILL_MOB, vnum);
+			found |= delete_requirement_from_list(&SOC_REQUIREMENTS(GET_OLC_SOCIAL(desc)), REQ_HAVE_COMPANION, vnum);
+			found |= delete_requirement_from_list(&SOC_REQUIREMENTS(GET_OLC_SOCIAL(desc)), REQ_NOT_HAVE_COMPANION, vnum);
 			
 			if (found) {
 				SET_BIT(SOC_FLAGS(GET_OLC_SOCIAL(desc)), SOC_IN_DEVELOPMENT);
@@ -1003,6 +1025,8 @@ void olc_search_mob(char_data *ch, mob_vnum vnum) {
 	HASH_ITER(hh, progress_table, prg, next_prg) {
 		// REQ_x: requirement search
 		any = find_requirement_in_list(PRG_TASKS(prg), REQ_KILL_MOB, vnum);
+		any |= find_requirement_in_list(PRG_TASKS(prg), REQ_HAVE_COMPANION, vnum);
+		any |= find_requirement_in_list(PRG_TASKS(prg), REQ_NOT_HAVE_COMPANION, vnum);
 		
 		if (any) {
 			++found;
@@ -1012,7 +1036,16 @@ void olc_search_mob(char_data *ch, mob_vnum vnum) {
 	
 	// quests
 	HASH_ITER(hh, quest_table, quest, next_quest) {
-		if (find_quest_giver_in_list(QUEST_STARTS_AT(quest), QG_MOBILE, vnum) || find_quest_giver_in_list(QUEST_ENDS_AT(quest), QG_MOBILE, vnum) || find_requirement_in_list(QUEST_TASKS(quest), REQ_KILL_MOB, vnum) || find_requirement_in_list(QUEST_PREREQS(quest), REQ_KILL_MOB, vnum)) {
+		// QG_x, REQ_x: quest search
+		any = find_quest_giver_in_list(QUEST_STARTS_AT(quest), QG_MOBILE, vnum);
+		any |= find_quest_giver_in_list(QUEST_ENDS_AT(quest), QG_MOBILE, vnum);
+		any |= find_requirement_in_list(QUEST_TASKS(quest), REQ_KILL_MOB, vnum);
+		any |= find_requirement_in_list(QUEST_TASKS(quest), REQ_HAVE_COMPANION, vnum);
+		any |= find_requirement_in_list(QUEST_TASKS(quest), REQ_NOT_HAVE_COMPANION, vnum);
+		any |= find_requirement_in_list(QUEST_PREREQS(quest), REQ_KILL_MOB, vnum);
+		any |= find_requirement_in_list(QUEST_PREREQS(quest), REQ_HAVE_COMPANION, vnum);
+		any |= find_requirement_in_list(QUEST_PREREQS(quest), REQ_NOT_HAVE_COMPANION, vnum);
+		if (any) {
 			++found;
 			build_page_display(ch, "QST [%5d] %s", QUEST_VNUM(quest), QUEST_NAME(quest));
 		}
@@ -1066,7 +1099,12 @@ void olc_search_mob(char_data *ch, mob_vnum vnum) {
 	
 	// socials
 	HASH_ITER(hh, social_table, soc, next_soc) {
-		if (find_requirement_in_list(SOC_REQUIREMENTS(soc), REQ_KILL_MOB, vnum)) {
+		// REQ_x: social search
+		any = find_requirement_in_list(SOC_REQUIREMENTS(soc), REQ_KILL_MOB, vnum);
+		any |= find_requirement_in_list(SOC_REQUIREMENTS(soc), REQ_HAVE_COMPANION, vnum);
+		any |= find_requirement_in_list(SOC_REQUIREMENTS(soc), REQ_NOT_HAVE_COMPANION, vnum);
+		
+		if (any) {
 			++found;
 			build_page_display(ch, "SOC [%5d] %s", SOC_VNUM(soc), SOC_NAME(soc));
 		}

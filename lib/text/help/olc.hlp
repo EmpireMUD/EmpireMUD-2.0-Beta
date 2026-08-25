@@ -9350,6 +9350,8 @@ Available tasks:
  &cEMPIRE-LACKS-PROGRESS&0 - Empire has not completed a progress goal.
  &cEMPIRE-ON-PROGRESS&0 - Empire has started and is working on a progress goal.
  &cEMPIRE-NOT-ON-PROGRESS&0 - Empire is not currently working on a progress goal.
+ &cHAVE-COMPANION&0 - Player has a companion in their list (quests only).
+ &cNOT-HAVE-COMPANION&0 - Player doesn't have a companion in their list (quests).
 
 &r*&0 Some types require a trackable quest, and cannot be used as prereqs.
 ^ If a type requires flags and you use more than one flag, you MUST put the

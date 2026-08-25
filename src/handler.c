@@ -6019,7 +6019,7 @@ struct companion_data *has_companion(char_data *ch, any_vnum vnum) {
 	struct companion_data *cd;
 	
 	if (IS_NPC(ch)) {
-		return FALSE;
+		return NULL;
 	}
 	
 	HASH_FIND_INT(GET_COMPANIONS(ch), &vnum, cd);
@@ -9436,6 +9436,14 @@ bool meets_requirements(char_data *ch, struct req_data *list, struct instance_da
 				ok = (GET_LOYALTY(ch) && !get_current_goal(GET_LOYALTY(ch), req->vnum));
 				break;
 			}
+			case REQ_HAVE_COMPANION: {
+				ok = has_companion(ch, req->vnum);
+				break;
+			}
+			case REQ_NOT_HAVE_COMPANION: {
+				ok = !has_companion(ch, req->vnum);
+				break;
+			}
 			
 			// some types do not support pre-reqs
 			case REQ_KILL_MOB:
@@ -9524,6 +9532,14 @@ char *requirement_string(struct req_data *req, bool show_vnums, bool allow_custo
 		}
 		case REQ_KILL_MOB: {
 			safe_snprintf(output, sizeof(output), "Kill %dx mob%s: %s%s", req->needed, PLURAL(req->needed), vnum, get_mob_name_by_proto(req->vnum, TRUE));
+			break;
+		}
+		case REQ_HAVE_COMPANION: {
+			safe_snprintf(output, sizeof(output), "Have companion: %s%s", vnum, get_mob_name_by_proto(req->vnum, TRUE));
+			break;
+		}
+		case REQ_NOT_HAVE_COMPANION: {
+			safe_snprintf(output, sizeof(output), "Don't have companion: %s%s", vnum, get_mob_name_by_proto(req->vnum, TRUE));
 			break;
 		}
 		case REQ_KILL_MOB_FLAGGED: {

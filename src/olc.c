@@ -6118,7 +6118,9 @@ bool olc_parse_requirement_args(char_data *ch, int type, char *argument, bool fi
 			need_obj = TRUE;
 			break;
 		}
-		case REQ_KILL_MOB: {
+		case REQ_KILL_MOB:
+		case REQ_HAVE_COMPANION:
+		case REQ_NOT_HAVE_COMPANION: {
 			need_mob = TRUE;
 			break;
 		}

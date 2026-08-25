@@ -5575,6 +5575,8 @@ const char *requirement_types[] = {
 	"EMPIRE-LACKS-PROGRESS",	// 50
 	"EMPIRE-ON-PROGRESS",
 	"EMPIRE-NOT-ON-PROGRESS",
+	"HAVE-COMPANION",
+	"NOT-HAVE-COMPANION",
 	"\n",
 };
 
@@ -5634,6 +5636,8 @@ const bool requirement_amt_type[] = {
 	REQ_AMT_NONE,	// 50, empire-lacks-progress
 	REQ_AMT_NONE,	// empire-on-progress
 	REQ_AMT_NONE,	// empire-not-on-progress
+	REQ_AMT_NONE,	// have-companion
+	REQ_AMT_NONE,	// not-have-companion
 };
 
 
@@ -5692,6 +5696,8 @@ const bool requirement_needs_tracker[] = {
 	FALSE,	// 50, empire-lacks-progress
 	FALSE,	// empire-on-progress
 	FALSE,	// empire-not-on-progress
+	FALSE,	// have-companion
+	FALSE,	// not-have-companion
 };
 
 
