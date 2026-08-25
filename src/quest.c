@@ -4567,19 +4567,7 @@ any_vnum parse_quest_reward_vnum(char_data *ch, int type, char *vnum_arg, char *
 			}
 			break;
 		}
-		case QR_BONUS_ABILITY: {
-			if (!*vnum_arg) {
-				strcpy(vnum_arg, prev_arg);	// does not generally need 2 args
-			}
-			if (!find_ability(vnum_arg)) {
-				msg_to_char(ch, "Invalid ability '%s'.\r\n", vnum_arg);
-				return PARSE_QRV_FAILED;
-			}
-			else {
-				ok = TRUE;
-			}
-			break;
-		}
+		case QR_BONUS_ABILITY:
 		case QR_REMOVE_ABILITY: {
 			if (!*vnum_arg) {
 				strcpy(vnum_arg, prev_arg);	// does not generally need 2 args
