@@ -4414,6 +4414,7 @@ void olc_search_quest(char_data *ch, any_vnum vnum) {
 * @return any_vnum The 'vnum' field for the reward, or -999 if it failed (because -1 is a VALID result).
 */
 any_vnum parse_quest_reward_vnum(char_data *ch, int type, char *vnum_arg, char *prev_arg) {
+	ability_data *abil;
 	faction_data *fct;
 	generic_data *gen;
 	event_data *event;
@@ -4583,11 +4584,12 @@ any_vnum parse_quest_reward_vnum(char_data *ch, int type, char *vnum_arg, char *
 			if (!*vnum_arg) {
 				strcpy(vnum_arg, prev_arg);	// does not generally need 2 args
 			}
-			if (!find_ability(vnum_arg)) {
+			if (!(abil = find_ability(vnum_arg))) {
 				msg_to_char(ch, "Invalid ability '%s'.\r\n", vnum_arg);
 				return PARSE_QRV_FAILED;
 			}
 			else {
+				vnum = ABIL_VNUM(abil);
 				ok = TRUE;
 			}
 			break;
@@ -4598,7 +4600,7 @@ any_vnum parse_quest_reward_vnum(char_data *ch, int type, char *vnum_arg, char *
 			if (!*vnum_arg) {
 				strcpy(vnum_arg, prev_arg);	// does not generally need 2 args
 			}
-			if (!isdigit(*vnum_arg) || !mob_proto(atoi(vnum_arg))) {
+			if (!isdigit(*vnum_arg) || (vnum = atoi(vnum_arg)) < 0 || !mob_proto(vnum)) {
 				msg_to_char(ch, "Invalid mobile '%s'.\r\n", vnum_arg);
 				return PARSE_QRV_FAILED;
 			}
