@@ -1419,6 +1419,14 @@ void refresh_one_quest_tracker(char_data *ch, struct player_quest *pq) {
 				task->current = (!GET_LOYALTY(ch) || get_current_goal(GET_LOYALTY(ch), task->vnum)) ? 0 : task->needed;
 				break;
 			}
+			case REQ_HAVE_COMPANION: {
+				task->current = has_companion(ch, task->vnum) ? task->needed : 0;
+				break;
+			}
+			case REQ_NOT_HAVE_COMPANION: {
+				task->current = has_companion(ch, task->vnum) ? 0 : task->needed;
+				break;
+			}
 		}
 	}
 }

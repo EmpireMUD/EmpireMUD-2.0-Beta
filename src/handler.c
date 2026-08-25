@@ -9445,7 +9445,7 @@ bool meets_requirements(char_data *ch, struct req_data *list, struct instance_da
 				break;
 			}
 			case REQ_NOT_HAVE_COMPANION: {
-				ok = !has_companion(ch, req->vnum);
+				ok = has_companion(ch, req->vnum) ? FALSE : TRUE;
 				break;
 			}
 			
