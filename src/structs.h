@@ -634,7 +634,7 @@ typedef struct vehicle_data vehicle_data;
 #define RMT_LOOK_OUT  BIT(7)	// h. can see the map using "look out"
 #define RMT_NO_LOCATION  BIT(8)	// i. don't show a location, disables where
 #define RMT_WATER_DESCRIPTIONS  BIT(9)	// j. mobs/players show as floating
-	#define RMT_UNUSED2  BIT(10)
+#define RMT_ALLOW_MOUNTS  BIT(10)	// k. player can mount here
 
 
  //////////////////////////////////////////////////////////////////////////////

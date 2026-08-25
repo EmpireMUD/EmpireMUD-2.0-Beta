@@ -9164,16 +9164,17 @@ See also: OLC ROOM TEMPLATES, REDIT MATCH EXITS, VNUM
 Usage:  .flags [add | remove] <flags>
 
 The following room template flags are available:
- &cOUTDOOR&0 - Affected by sun.
+ &cOUTDOOR&0 - Affected by sun and weather; player can mount.
  &cDARK&0 - Always requires a light. (By default, rooms are dark at night.)
  &cLIGHT&0 - Never requires a light.
  &c!MOB&0 - Mobs will not wander into the room (they may still be spawned there).
  &cPEACEFUL&0 - No combat allowed.
  &cNEED-BOAT&0 - Requires a boat, swimming, waterwalking, or flying.
  &c!TELEPORT&0 - Cannot teleport in or out.
- &cLOOK-OUT&0 - can see the map using "look out"
- &c!LOCATION&0 - no location shown; disables "where"
- &cWATER-DESCRIPTIONS&0 - mobs use water-long-desc
+ &cLOOK-OUT&0 - Can see the map using "look out".
+ &c!LOCATION&0 - No location shown; disables "where".
+ &cWATER-DESCRIPTIONS&0 - Mobs use water-long-desc.
+ &cALLOW-MOUNTS&0 - Player can mount (not needed if OUTDOOR is set).
 
 See also: OLC ROOM TEMPLATES
 #d

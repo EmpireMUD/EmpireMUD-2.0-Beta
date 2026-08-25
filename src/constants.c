@@ -751,7 +751,7 @@ const char *room_template_flags[] = {
 	"LOOK-OUT",
 	"!LOCATION",
 	"WATER-DESCRIPTIONS",
-	"*",	// 10
+	"ALLOW-MOUNTS",	// 10
 	"\n"
 };
 
