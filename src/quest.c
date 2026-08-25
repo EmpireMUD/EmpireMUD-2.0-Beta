@@ -956,7 +956,7 @@ void give_quest_rewards(char_data *ch, struct quest_reward *list, int reward_lev
 				if (!has_companion(ch, reward->vnum)) {
 					cd = add_companion(ch, reward->vnum, NO_ABIL);
 					cmod = get_companion_mod_by_type(cd, CMOD_SHORT_DESC);
-					msg_to_char(ch, "\tyYou gain %s as a companion!\t0\r\n", cmod ? cmod->str : get_mob_name_by_proto(reward->vnum, TRUE));
+					msg_to_char(ch, "\tyYou gain %s as a companion!%s\t0\r\n", cmod ? cmod->str : get_mob_name_by_proto(reward->vnum, TRUE), (!PRF_FLAGGED(ch, PRF_NO_TUTORIALS) ? " (Use the 'companion' command to summon a companion.)" : ""));
 				}
 				break;
 			}
@@ -971,7 +971,7 @@ void give_quest_rewards(char_data *ch, struct quest_reward *list, int reward_lev
 			case QR_MINIPET: {
 				if (!has_minipet(ch, reward->vnum)) {
 					add_minipet(ch, reward->vnum);
-					msg_to_char(ch, "\tyYou gain %s as a minipet!\t0\r\n", get_mob_name_by_proto(reward->vnum, TRUE));
+					msg_to_char(ch, "\tyYou gain %s as a minipet!%s\t0\r\n", get_mob_name_by_proto(reward->vnum, TRUE), (!PRF_FLAGGED(ch, PRF_NO_TUTORIALS) ? " (Use the 'minipet' command to summon a minipet.)" : ""));
 				}
 				break;
 			}
