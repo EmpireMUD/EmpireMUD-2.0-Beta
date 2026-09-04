@@ -5798,6 +5798,7 @@ const char *vehicle_flags[] = {
 	"*TEMPORARY",
 	"TINY",	// 40
 	"HIDE-STORAGE-UNOWNED",
+	"LIGHT",
 	"\n"
 };
 
@@ -5846,6 +5847,7 @@ const char *identify_vehicle_flags[] = {
 	"",	// *TEMPORARY
 	"",	// TINY	// 40
 	"",	// HIDE-STORAGE-UNOWNED
+	"provides light",	// LIGHT
 	"\n"
 };
 
