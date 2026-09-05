@@ -2771,7 +2771,7 @@ ACMD(do_milk) {
 
 
 ACMD(do_minipets) {
-	bool random;
+	bool random = FALSE;
 	struct minipet_data *mini, *next_mini;
 	char_data *mob, *to_summon;
 	int count, num;
