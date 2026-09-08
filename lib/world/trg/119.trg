@@ -954,7 +954,7 @@ racework countdown %max_time%
 ~
 #11913
 Pixy Races: Catch pixy in jar command~
-1 c 2 32
+1 c 2 33
 L b 615
 L b 616
 L b 10042
@@ -984,11 +984,12 @@ L b 11886
 L b 11887
 L b 11963
 L b 11982
+L b 13553
 L b 16624
 L b 16625
 L c 11914
 catch~
-set ok_list 615 616 10042 11520 11521 11522 11523 11524 11525 11526 11820 16624 16625 11963
+set ok_list 615 616 10042 11520 11521 11522 11523 11524 11525 11526 11820 16624 16625 11963 13553
 set clever_list 11819 11982
 set error_list 11873 11874 11875 11876 11877 11878 11879 11880 11881 11882 11883 11884 11885 11886 11887
 set jar_vnum 11914
@@ -1062,6 +1063,13 @@ switch %target.vnum%
     eval speed 1 + %random.3%
     eval guile 1 + %random.3%
     eval luck 1 + %random.3%
+  break
+  case 13553
+    * blind cave pixy
+    set pixy a blind cave pixy
+    set speed 1
+    eval guile 1 + %random.4%
+    eval luck %random.2%
   break
   default
     * all other vnums in the pixy_list
@@ -8197,7 +8205,7 @@ done
 ~
 #11998
 Gemstone flute: Everybody dance now~
-1 ab 100 30
+1 ab 100 32
 L b 615
 L b 616
 L b 10042
@@ -8226,6 +8234,8 @@ L b 11886
 L b 11887
 L b 11963
 L b 11982
+L b 13553
+L b 13554
 L b 16624
 L b 16625
 ~
@@ -8238,7 +8248,7 @@ elseif %actor.action% != playing
   halt
 end
 * lists
-set list1 11873 11874 11875 11876 11877 11878 11879 11880 11881 11882 11883 11885 11886 11887
+set list1 11873 11874 11875 11876 11877 11878 11879 11880 11881 11882 11883 11885 11886 11887 13553 13554
 set list2 615 616 10042 11520 11521 11522 11523 11524 11525 11526 11819 11820 11963 11982 16624 16625
 * loop
 set ch %actor.room.people%

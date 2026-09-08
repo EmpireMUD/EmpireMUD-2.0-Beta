@@ -1,0 +1,81 @@
+#13549
+Cyclopean Palace~
+A Cyclopean Palace~
+&w]**[~
+128 15 flrR abdeghijkm
+40 0 0 -1
+D
+   Enormous stone walls reach up toward the heavens. Each stone has been
+chiseled so precisely that although each one is a different size, they fit
+together with the finest of seams and require no mortar. The palace is immense.
+You could easily get lost in these halls.
+~
+H 0 1
+I 29 5007 100.00 1 r  # RUINS-TO-BLD: Ruins
+R
+6000 2 1 0
+R
+6790 2 1 0
+R
+6075 2 1 0
+Z1 2
+S
+#13583
+Hero's Grave~
+A Hero's Grave~
+&0[oo]~
+124 15 eh 0
+0 0 0 -1
+C
+dedicate, tomb~
+D
+   The tall stone walls rise over you, reaching improbable heights as they
+corbel inward. Gems set in the highest parts shimmer like stars. A single
+statue guards the an intricate sarcophagus at the back of the tomb.
+~
+E
+walls~
+   The walls are made from large, smooth stone blocks. They're rather tall;
+this tomb belongs to someone important.
+~
+E
+corbels ceiling gems stars up~
+   The ceiling is corbeled with overlapping stonework to come to a point at the
+top. Gems of many colors are set into it.
+~
+E
+statue~
+The statue has a heroic pose. It stands guard over a lone sarcophagus.
+~
+E
+sarcophagus~
+   The stone sarcophagus is carved with a human likeness. Finishing details are
+done in bronze and the whole thing is supported on a bronze pedestal.
+~
+E
+stonework~
+The building is made with masterful stonework to survive the ages.
+~
+E
+pedestal bronze~
+The sarcophagus stands on a bronze pedestal.
+~
+F
+B
+I 29 5007 100.00 1 r  # RUINS-TO-BLD: Ruins
+M
+9189 2.00 0
+M
+9190 2.00 0
+M
+9191 2.00 0
+M
+9198 2.00 0
+M
+9199 2.00 0
+R
+1002 1 5 0
+R
+13583 1 5 0
+S
+$

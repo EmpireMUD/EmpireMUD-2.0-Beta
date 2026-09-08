@@ -1,0 +1,48 @@
+#13505
+tent tattered old~
+the tattered tent~
+A tattered old tent lies crumpled in the corner.~
+   It's a simple canvas tent with frayed edges and a constellation of moth
+holes that have left it with little purpose. The tent is barely supported by
+what's left of its remaining pole. Nearby, a rotting length of rope is the only
+other sign that anybody else was ever here.
+~
+~
+ghxE 19 2 0 0 d 0 0 0 0 -1 0
+E
+pole~
+tbd
+~
+E
+corner~
+An old tent sits in the corner, half-collapsed.
+~
+P
+2
+S
+#13533
+chair old wooden~
+the old chair~
+An old wooden chair is facing the corner.~
+   Old, discolored, and badly worn though it may be, the chair is made of
+sturdy oak and still looks fit to sit. It's in the corner of the dead end,
+facing away from the corridor.
+~
+~
+fghvO 19 1 0 0 0 0 0 0 0 -1 0
+P
+2
+S
+#13556
+bedroll threadbare bare roll~
+the threadbare bedroll~
+There's a threadbare bedroll near the wall.~
+   The bedroll has seen a few rough floors in its time, but it's better than
+sleeping on the bare stone floor.
+~
+~
+xE 19 2 0 0 d 0 0 0 0 -1 0
+P
+2
+S
+$

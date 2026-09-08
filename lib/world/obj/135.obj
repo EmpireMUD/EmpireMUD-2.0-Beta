@@ -1,0 +1,2019 @@
+#13500
+seal passage further~
+the sealed passage~
+Further progress down the passage is blocked by a seal. (difficulty)~
+   The seal is carved in stone by a rough chisel, with the general shape of a
+double-sided axe head. Words beneath it are in an old script, and worn away by
+time, such that you cannot make out any word except one: Forbidden. You'll have
+to break the seal to continue.
+Usage:  difficulty <normal | hard | group | boss>
+~
+3 B 0 0 0 11
+0 0 0
+1 0
+T 13500
+S
+#13501
+chute~
+the chute~
+Part of the floor has fallen away, exposing a dark chute.~
+   Damage to the floor has revealed a large chute. It's dark down there; you
+can tell it drops at a steep angle, but can't see what's below from here.
+~
+3 0 0 0 0 1
+0 0 0
+1 0
+E
+seal~
+The seal has been broken.
+~
+E
+floor~
+   Time and weather have taken their toll on this floor. It's badly damaged,
+requiring you to tread carefully to avoid falling down the exposed chute.
+~
+E
+down~
+A steep chute leads to the darkness below.
+~
+S
+#13502
+chute falling~
+falling down the chute~
+You are falling down the chute!~
+You are falling down the chute!
+~
+3 0 a 0 0 3
+0 0 0
+0 0
+T 13502
+_
+This helper item manages players in the Labyrinth chute.
+~
+S
+#13503
+passage passageway tight narrow gap~
+a tight passage~
+There is a tight passage where some bricks have been removed.~
+   Damage to the brick wall has opened up a narrow passage, perhaps just wide
+enough for a person to squeeze through, though the wall is many layers thick
+and it will take some effort. An object stuck at the bottom of the gap makes
+passage all the more difficult. Oh! On closer inspection, it looks like there's
+a body stuck in there!
+~
+8 0 0 0 0 7
+-1 0 0
+1 0
+E
+body corpse object~
+   Peering into the tight passage in the wall, you discover a body lodged in
+the lower portion. The lower part of the passage is too tight to reach it, but
+it looks as if this poor soul was clutching a spool of glinting silver thread.
+~
+E
+piles~
+Bricks are piled near the passage in the wall.
+~
+E
+bricks end~
+   A brick wall blocks passage down this corridor, but some of the bricks have
+been removed, opening a tight gap. You might be able to squeeze through.
+~
+E
+damage~
+   The brick wall bears damage in several places. Notably, bricks have been
+removed to form a passage all the way through.
+~
+E
+mortar gaps~
+   The mortar is worn away in places, enough that someone has removed a fair
+number of bricks. A breeze blows through, though it's stale.
+~
+M
+30
+You press yourself through the narrow gap...~
+M
+31
+$n presses $mself into the narrow gap.~
+S
+#13504
+passage passageway tight narrow~
+a tight passage~
+There is a tight passage in a damaged part of one wall.~
+   Someone has removed some of the bricks from an archway, opening a very
+narrow passageway. It would be a tight squeeze, but you could surely make it
+through. An object stuck at the bottom of the passage will, however, cause some
+difficulty.
+~
+8 0 0 0 0 5
+-1 0 0
+1 0
+E
+body corpse object~
+   Peering into the tight passage in the wall, you discover a body lodged in
+the lower portion. The lower part of the passage is too tight to reach it.
+~
+M
+30
+You press yourself through the narrow passageway...~
+M
+31
+$n presses $mself into the narrow passageway.~
+S
+#13505
+thread silver bobbin~
+a bobbin of silver thread~
+A bobbin of silver thread is lying here.~
+   An incredibly fine strand of silver thread is wound tightly around the
+bobbin. It glints and gleams as you move it around in the light.
+~
+15 0 a 0 0 3
+6 0 0
+3 0
+C
+1 1
+I 15 13506 100.00 6 x  # SEPARATE: delicate silver thread
+R
+4 5611 a
+S
+#13506
+thread silver delicate~
+a delicate silver thread~
+A delicate silver thread has been discarded here.~
+   The thread is made of the finest silver and so thin that you can barely see
+it until it catches a bit of light.
+~
+15 0 a 0 0 4
+1 0 0
+3 0
+C
+1 1
+I 14 13505 100.00 6 x  # COMBINE: bobbin of silver thread
+R
+4 5611 a
+T 13506
+S
+#13507
+rope dangling~
+the dangling rope~
+A rope is attached here and hangs down the chute.~
+   The rope is tied securely to to the stone horn of the sculpted relief on the
+wall. It dangles down into the dark chute, far past what you can see from here.
+~
+3 B 0 0 0 6
+0 0 0
+0 0
+E
+carvings carved walls details reliefs~
+   Once, there were intricate scenes carved in bas-relief along the stones.
+But time has taken its toll, and now all you can make out are vague man-like
+shapes in some sort of grand scene, standing before a bull. Details are better
+on the bull, whose head is in high relief with one horn still intact.
+   A rope is attached to the horn and hangs down into the chute.
+~
+E
+frayed~
+The remains of a frayed rope are still attached next to the new one.
+~
+E
+horns bull~
+   A bull is carved in high relief from the stone wall. A rope hangs from one
+of its horns and dangles down the chute.
+~
+S
+#13508
+rope handhold hold~
+the rope~
+A rope hangs down from above, giving you a much-needed handhold.~
+   The rope feels secure, so it must be tied off somewhere above the top of the
+chute. With some effort, this should allow you to travel up or down the chute.
+~
+3 B 0 0 0 5
+0 0 0
+0 0
+S
+#13509
+rope~
+a rope~
+A rope dangles down from the chute high above.~
+   The rope hangs from the inky darkness of the chute above you. Lucky it's
+here, otherwise there might be no way back out!
+~
+3 B 0 0 0 7
+0 0 0
+0 0
+E
+up chute~
+A long rope hangs from the chute high above.
+~
+S
+#13510
+corpse remains hulking minotaur~
+the hulking corpse~
+The hulking remains of the minotaur lie across the stone floor.~
+   The giant's corpse lies face-down, its head partially supported by the pair
+of curved ivory horns that protrude from its mouth. Its lifeless eye, still
+open, is milky. The floor has cracked where the great beast fell.
+~
+10 egkp 0 0 0 4
+13510 5 0
+7 0
+C
+250 350
+E
+floor down cracked~
+The floor has cracked where the minotaur fell.
+~
+E
+horns~
+They look more like tusks.
+~
+E
+tusks ivory~
+Two long, curved ivory tusks protrude from the minotaur's mouth.
+~
+S
+#13511
+rope coiled~
+the coiled rope~
+Some rope, tied to a stone, is coiled on the floor.~
+   A length of rope is tied at one end to the bull sculpture with a secure
+knot. The remainder of the rope is coiled on the floor near the seal.
+~
+3 B 0 0 0 9
+0 0 0
+0 0
+E
+carvings carved walls details reliefs~
+   Once, there were intricate scenes carved in bas-relief along the stones.
+But time has taken its toll, and now all you can make out are vague man-like
+shapes in some sort of grand scene, standing before a bull. Details are better
+on the bull, whose head is in high relief with one horn still intact.
+   A rope is tied to one of the horns; the other end is coiled on the floor.
+~
+E
+frayed~
+A frayed old rope is attached to the bull sculpture next to the newer one.
+~
+E
+horns bull sculpture~
+   A rope is tied to one of the horns of the bull sculpture in the wall. The
+length of the rope is coiled on the floor near the seal.
+~
+S
+#13512
+key tarnished~
+a tarnished key~
+A tarnished key lies on the ground.~
+The key is old and worn.
+~
+3 kp a 0 0 2
+0 0 0
+3 0
+T 13519
+S
+#13513
+door wooden heavy~
+the door~
+There is a heavy wooden door in the brick wall.~
+   It's made from sturdy oak, but time has not been kind to this door. It bears
+long grooves, always paired, perhaps from the teeth of an unusually large
+rodent. Patches of fuzzy mold grow around the hinges, spreading toward the
+center. The door is set into a wall made from clay bricks.
+~
+3 B 0 0 0 5
+0 0 0
+0 0
+T 13509
+S
+#13514
+barrel old~
+the old barrel~
+An old barrel stands in the corner.~
+   The wooden barrel shows wear from years of use. It certainly doesn't look
+like it would hold up if someone tried to move it.
+~
+5 0 0 0 0 3
+48 48 13514
+0 0
+C
+1 1
+T 13521
+S
+#13515
+jar great~
+the great jar~
+A great jar sits near the wall, surrounded by smaller jars.~
+   The great jar is made from fired clay, but it's entirely unglazed, having
+only the reddish tone of terra cotta. It's immense. When you stand near the
+jar, you cannot see over the top of it. There are no markings on the outside of
+the jar, nor any you can see on the lid. Smaller jars, similar in character,
+are arranged around the large one.
+~
+3 0 0 0 0 7
+0 0 0
+6 0
+C
+1 1
+E
+jars smaller~
+   Clay jars on the floor range in size from a large melon at the smallest, up
+to the size of a well-fed hog at the largest. All the jars are undecorated and
+unglazed, having only the reddish color of terra cotta. No words or markings
+hint at their contents.
+~
+E
+lids~
+   You see no markings on the lids of the various jars. Every indication is
+that the lids are sealed, or even directly attached to the rest of the jar.
+Only the largest -- the great jar -- appears to have a lid that could be
+removed.
+~
+E
+seals~
+The jars all seem to be sealed.
+~
+M
+33
+Faint traces of ancient magic seal the great jar.~
+T 13518
+S
+#13516
+body corpse hapless adventurer~
+the body of a hapless adventurer~
+The body of a hapless adventurer is lying here.~
+They died.
+~
+10 gk a 0 0 3
+13516 3 0
+7 0
+C
+1 1
+T 13516
+T 13517
+S
+#13517
+hole square chute~
+the chute in the floor~
+A square hole in the floor leads to some sort of chute.~
+   It's a small hole, only large enough for one person. Perhaps this was
+originally part of a trap, or perhaps it had some other purpose. It isn't
+hidden in any way, but it appears likely to be a one-way trip.
+~
+8 0 0 0 0 2
+-1 0 0
+1 0
+E
+floor~
+   A square hole in the floor seems to lead to another chute. Let's hope this
+one has a ladder, too.
+~
+M
+30
+You jump down the chute.~
+M
+31
+$n jumps down into the chute.~
+S
+#13518
+passage passageway~
+the passage~
+There is a passage through the bricks.~
+   You can see that the brick wall is a lot thicker than it looks. It's not
+just one layer. It's a tight squeeze, but enough bricks have been prised loose
+that you can just make it through.
+~
+8 0 0 0 0 2
+13553 0 0
+6 0
+M
+30
+You squeeze through the passage.~
+M
+31
+$n squeezes through the passage.~
+S
+#13519
+tripped dark~
+tripped in the dark~
+You tripped in the dark.~
+You seem to have tripped.
+~
+3 0 a 0 0 1
+0 0 0
+0 1
+T 13519
+_
+Player has wandered too long in the dark.
+~
+S
+#13520
+remains madman man body corpse~
+the remains of the madman~
+The remains of a madman lie on the stones.~
+   What's left of the half-dressed man is sprawled out on the stones, pale and
+still. His chest is burned from the broken torch he fell on; now it's just a
+broken tent pole. His near-toothless mouth hangs agape. His story ends here,
+unwritten.
+~
+10 egkp a 0 0 6
+13520 3 0
+0 0
+C
+250 350
+S
+#13521
+fiend seal breaks~
+the fiend seal breaks~
+The fiend seal breaks.~
+It doesn't look like anything anymore.
+~
+3 0 a 0 0 1
+0 0 0
+10 1
+T 13519
+_
+Triggers a delayed subzone echo.
+~
+S
+#13523
+falling pit~
+falling in the pit~
+Falling in the pit is here.~
+You're falling!
+~
+3 0 a 0 0 2
+0 0 0
+0 0
+T 13519
+_
+Temporary helper object for the pit trap.
+~
+S
+#13524
+memento interment~
+a memento of interment~
+A memento of interment lies here.~
+   A piece of rubble; a stray silver thread; a bit of dried fungus. It's just
+enough to remind you of a place you once were. Of a memory that might slip away
+or a thought half-forgotten.
+   This memento is required to craft certain items.
+~
+3 0 a 0 0 2
+0 0 0
+1 0
+R
+4 5193 0
+S
+#13525
+corpse fuzzy goblin body~
+the corpse of a fuzzy goblin~
+The corpse of a fuzzy goblin is crumpled on the ground.~
+   She's dead. From her size and shape, she's clearly a goblin. But she's
+covered in fine layer of gray-brown fur with the slightest green tinge.
+~
+10 egkp a 0 0 8
+13526 2 0
+7 0
+C
+250 350
+S
+#13530
+champion dead horned body corpse~
+the dead champion~
+A dead champion lies motionless on the ground.~
+   The mutilated corpse is all but unrecognizable. The horns on its head,
+visible just moments ago, are gone with no trace. Blood stains on the
+embroidered tunic reveal the cause of death. Some champion.
+~
+10 egkp a 0 0 5
+13530 3 0
+7 500
+C
+250 350
+S
+#13533
+scenery labyrinth bowl basalt bubbling circle glyphs symbols arcane chalk bull golden plinth stone statuette books stacks notes scattered nest bones pile grave rocks dirt drawing chalk woman horse garden glowing plants mushrooms fungi table stone~
+labyrinth scenery~
+Some labyrinth scenery is here.~
+It looks scenic.
+~
+3 0 0 0 0 4
+0 0 0
+0 0
+T 13533
+_
+Used for random scenes in the labyrinth.
+Keywords for this include most keywords for items it becomes.
+~
+S
+#13534
+stash secret~
+the stash~
+A small stone block has been pushed aside, revealing a secret stash.~
+There's a small hiding place in the wall where a stone has been removed.
+~
+4 0 0 0 0 3
+10 0 0
+1 0
+E
+stone block~
+One of the smaller wall blocks has been prised out, leaving a cavity behind it.
+~
+T 13535
+S
+#13535
+skeleton pale green~
+a pale green skeleton~
+A pale green skeleton is piled on the ground.~
+   The skeleton has a mottled patina all over, fading from pale green to gray
+in places, with hints of brown at its wrists. The green color stains its heavy
+white robe at the neck and arms. The robe, frayed and dirty at the bottom, is
+tied at the waist with a simple length of rope.
+~
+15 e a 0 0 3
+4 0 0
+14 0
+C
+250 250
+R
+4 5611 a
+S
+#13536
+skeleton bronze polished~
+a polished bronze skeleton~
+A polished bronze skeleton is piled here.~
+   Its bones twinkle a brilliant bronze color in the light, each one clean and
+polished. Its helmet, equal in luster, is topped with a comb of short red hair
+that stands straight up. It wears nothing else except a stone breastplate.
+~
+15 e a 0 0 3
+4 0 0
+14 0
+C
+250 250
+R
+4 5611 a
+S
+#13537
+tunnel collapsed damaged~
+the collapsed tunnel~
+You can see the remains of a tunnel where the wall is damaged.~
+   A rather large tunnel through the earth once ended here, but it looks as
+though it has collapsed.
+~
+3 0 0 0 0 1
+0 0 0
+1 0
+E
+wall~
+One of the large stones has been pushed out of place, revealed an old tunnel.
+~
+S
+#13538
+trail slime~
+the slime trail~
+A trail of slime crisscrosses the stone floor.~
+   A trail of slime covers much of the floor, which is otherwise quite clean
+here.
+~
+3 0 0 0 0 1
+0 0 0
+7 0
+E
+floor~
+There's a worrying amount of slime on the floor.
+~
+S
+#13539
+bones pile~
+a pile of bones~
+There is a small pile of bones here.~
+   The bones are pure white and free of any fleshy bits. This looks like it
+came from more than one person... Or thing.
+~
+10 g a 0 0 2
+13544 2 0
+14 0
+C
+1 1
+O+ 1 6560
+R
+4 5120 0
+S
+#13540
+webbing webs spiderwebs cobwebs~
+the webbing~
+Cobwebs stretch from wall to wall and cover every corner.~
+   The corners, walls, and even part of the floor are covered in sticky webs.
+Best to be avoided.
+~
+3 0 0 0 0 6
+0 0 0
+1 0
+E
+corners~
+The corners are covered in huge spiderwebs!
+~
+S
+#13541
+hoard gold small~
+a small hoard of gold~
+A small hoard of gold is scattered here.~
+   On closer inspection much of this is actually bronze. But the few gold
+pieces that are here look valuable enough to keep.
+~
+15 0 a 0 0 3
+24 0 0
+4 0
+C
+250 250
+R
+4 5611 a
+S
+#13542
+hole odd~
+the odd hole~
+There's a rather odd hole in the stone.~
+   The hole is rather high on the wall, making it hard to see what's through
+there. It's not quite big enough for you to squeeze through, but it looks like
+something came through there.
+~
+3 0 0 0 0 3
+0 0 0
+1 0
+E
+wall stone~
+There's a small hole high up on the wall.
+~
+S
+#13543
+corpse body desiccated~
+a desiccated body~
+A small body lies desiccated in the corner.~
+   It's rather small, but it doesn't appear to be a child. The eye sockets are
+oddly square and bear a gray-green tinge. The skin, dried and brittle, has a
+pale gray color to it. This hapless fellow has been dead for quite some time.
+~
+10 gkp a 0 0 4
+13540 2 0
+7 72
+C
+100 100
+S
+#13544
+meat gooey hunk~
+a hunk of gooey meat~
+A hunk of gooey meat is rotting on the ground.~
+   It smells like bugs. But, this is what you've got to hand, so perhaps you
+could cook a 'dungeon steak' and have a meal.
+~
+6 g a 0 0 10
+2 0 0
+7 12
+C
+1 1
+R
+4 5119 0
+S
+#13545
+steak dungeon scrumptious~
+a scrumptious dungeon steak~
+A scrumptious dungeon steak is sitting on the ground.~
+   This chitin cutlet doesn't look half bad. It doesn't necessarily look half
+good, either, but when you're lost in a dungeon, any meat is a feast.
+~
+6 gE a 0 0 2
+12 0 0
+7 336
+C
+1 1
+O+ 1 6220
+R
+4 5619 0
+R
+4 5119 0
+S
+#13546
+sponge sponge-like spongelike spongey vast craggy hive mass~
+the sponge on the ceiling~
+A vast, craggy mass of sponge-like growth hangs from the ceiling overhead.~
+   The mass extends further into the darkness than you can see, covering a
+tremendous portion of the ceiling in this part of the maze. It's covered in
+holes both small and large; you watch as oversized pixies scurry in and out of
+them, quickly vanishing into the hive's interior. It has the gray color of
+dust. Here and there, you see small shelves that protrude like mushrooms from
+the larger structure.
+~
+3 0 0 0 0 5
+0 0 0
+7 0
+E
+ceiling~
+Some sort of hive is attached to the ceiling.
+~
+E
+mushrooms~
+Mushroom-like shelves grow out of the sides of the hive.
+~
+S
+#13547
+pixies bodies corpses body dead cave~
+a pile of dead cave pixies~
+Dead cave pixies litter the floor.~
+   The poor little creatures have died. Their bodies have started to darken and
+the stubby wings on their little backs have snapped off. Parts of them have
+already begun to crumble to dust.
+~
+10 gkp a 0 0 5
+13553 1 0
+7 6
+C
+100 100
+M
+18
+The pixy corpses turn to stone and crumble to dust.~
+M
+17
+The pixy corpses turn to stone and crumble to dust.~
+S
+#13548
+campfire fire small light~
+the campfire~
+A small campfire provides a little light.~
+   Little more than twigs fuel this tiny cooking fire, made in a depression in
+the floor. Faint though it is, it casts tall shadows against the walls.
+~
+29 B 0 0 0 1
+-1 1 9
+0 0
+C
+1 1
+E
+depression~
+The floor is worn away a bit; there's a fire built here.
+~
+E
+shadows ~
+The little fire casts tall shadows on the wall.
+~
+S
+#13549
+cornerstone stone cyclopean palace~
+the cornerstone of a cyclopean palace~
+The cornerstone of a cyclopean palace lies here.~
+   The cornerstone is massive. Two sides have been chiseled square so that it
+may be used in a mortarless cyclopean wall. Curiously, the top is incised with
+designs for an incredible palace, all built from stones like this one.
+   With this, you can build a 'cyclopean palace'.
+~
+3 e a 0 0 1
+0 0 0
+1 0
+C
+250 250
+R
+4 5193 0
+S
+#13550
+gauntlets tombsward ward pair~
+tombsward gauntlets~
+A pair of tombsward gauntlets have been left here.~
+   Bronze filigree covers the joints and edges of the dark, heavy gauntlets.
+The metal is black enough to disappear in a dark corner. Each knuckle is
+perfectly articulated and covered in a tiny plate. Under the wrists, metal
+studs cover thick leather straps and plated buckles.
+~
+27 mp ah 0 0 12
+3 0 0
+2 0
+A
+5 1 6
+A
+5 1 3
+A
+2 1 0
+A
+15 5 0
+A
+13 6 0
+A
+18 2 0
+A
+12 4 0
+A
+24 2 0
+C
+250 375
+T 13573
+S
+#13551
+beads silverseer seer set~
+a set of silverseer beads~
+A set of silverseer beads is lying here.~
+   The delicate beads gleam in even the dimmest light. They're strung together
+in a long chain, made to be looped around the hands and between the fingers
+even when holding other items. The ends of the chain dangle bronze discs with
+a spiral-and-eye motif on each side.
+~
+27 mp ah 0 0 13
+0 0 0
+2 0
+A
+5 1 6
+A
+5 1 3
+A
+8 1 0
+A
+9 1 0
+A
+16 3 0
+A
+7 6 0
+A
+23 9 0
+C
+250 375
+T 13573
+S
+#13552
+gloves shadow vaulter pair~
+shadow vaulter gloves~
+A pair of shadow vaulter gloves is hidden here.~
+   The black leather gloves are short, barely covering the wrist. Along the
+knuckles and backs of the hand, fine bronze stitching forms complex geometric
+patterns in a single unbroken line. But the fingers are plain black. All the
+harder to see them move in the dark.
+~
+27 mp ah 0 0 14
+1 0 0
+2 0
+A
+5 1 6
+A
+5 1 3
+A
+1 1 0
+A
+2 1 0
+A
+9 1 0
+A
+17 7 0
+A
+21 10 0
+C
+250 375
+T 13573
+S
+#13553
+handwraps wraps barrow weaver pair~
+barrow weaver handwraps~
+A pair of barrow weaver handwraps are lying here.~
+   The long, embroidered strands of forest green cloth shimmer in the dark with
+the magic of nature. White stitching outlines stems and leaves, while purple
+thread covers the length of it with delicate flowers.
+~
+27 mp ah 0 0 15
+0 0 0
+2 0
+A
+5 1 6
+A
+5 1 3
+A
+8 1 0
+A
+2 1 0
+A
+9 1 0
+A
+17 7 0
+A
+22 10 0
+C
+250 375
+T 13573
+S
+#13554
+gauntlets dolmen freeblade blade pair~
+dolmen freeblade gauntlets~
+A pair of dolmen freeblade gauntlets have been left here.~
+   The highly-articulated gauntlets are as light in weight as they are dark in
+color. Dark gray cloth forms the gloves and arms, covered in thin plates of
+black metal. There is a bronze spiral emblem on the back of the hand, and a
+second below the wrist.
+~
+27 mp ah 0 0 13
+2 0 0
+2 0
+A
+5 1 6
+A
+5 1 3
+A
+2 1 0
+A
+9 1 0
+A
+15 4 0
+A
+18 6 0
+A
+12 4 0
+A
+24 4 0
+C
+250 375
+T 13573
+S
+#13555
+gloves fur-lined furlined lined cyclopean king pair~
+the fur-lined gloves of the cyclopean king~
+The fur-lined gloves of the cyclopean king are here.~
+   The dark gray-green leather is covered in bronze filigree in a knotted
+pattern, coming together at the wrist in the shape of an eye, with a gleaming
+purple gem at its center. Gray and white fur flares out below the wrist.
+~
+27 mp ah 0 0 15
+2 0 0
+2 0
+A
+5 1 6
+A
+5 1 3
+A
+15 1 0
+A
+16 1 0
+A
+11 1 0
+A
+6 1 0
+A
+19 1 0
+C
+250 375
+T 13573
+_
+'pair' is added to keywords for trig 13573 to name it correctly.
+~
+S
+#13556
+sabatons tombsward ward pair~
+tombsward sabatons~
+A pair of tombsward sabatons are lying here.~
+   Heavy hand-forged plates cascade downward from the ankle, each lined with
+bronze filigree. The metal of the sabatons is so dark it could go unnoticed in
+a dark place.
+~
+27 mp ag 0 0 13
+3 0 0
+2 0
+A
+5 1 6
+A
+5 1 3
+A
+2 1 0
+A
+15 5 0
+A
+18 6 0
+A
+13 2 0
+A
+12 4 0
+A
+24 2 0
+C
+250 375
+T 13573
+S
+#13557
+slippers silverseer seer pair~
+silverseer slippers~
+A pair of silverseer slippers have been left behind.~
+   The slippers are made from pale gray strips of cloth, woven together and
+then ornamented with bronze filigree. There is a spiral-and-eye design at the
+back of each shoe, as if to watch behind.
+~
+27 mp ag 0 0 14
+0 0 0
+2 0
+A
+5 1 6
+A
+5 1 3
+A
+8 1 0
+A
+9 1 0
+A
+16 3 0
+A
+7 6 0
+A
+23 9 0
+C
+250 375
+T 13573
+S
+#13558
+boots shadow vaulter pair~
+shadow vaulter boots~
+A pair of shadow vaulter boots are standing here.~
+   The black leather boots have a smooth sole that makes no sound in even the
+quietest place. The ankles are made from overlapping leather plates, each one
+stitched with bronze thread.
+~
+27 mp ag 0 0 15
+1 0 0
+2 0
+A
+5 1 6
+A
+5 1 3
+A
+1 1 0
+A
+2 1 0
+A
+9 1 0
+A
+17 4 0
+A
+21 13 0
+C
+250 375
+T 13573
+S
+#13559
+boots barrow weaver pair~
+barrow weaver boots~
+A pair of barrow weaver boots are standing here.~
+   Boots is a loose description for what are essentially a pair of long,
+embroidered strips of forest green cloth. Each is made to be wrapped precisely
+around the feet and ankles, then bound with the accompanying bronzed leather
+cord. The cloth is stitched with hundreds of delicate purple flowers and the
+white outlines of tiny leaves.
+~
+27 mp ag 0 0 16
+0 0 0
+2 0
+A
+5 1 6
+A
+5 1 3
+A
+8 1 0
+A
+2 1 0
+A
+9 1 0
+A
+17 4 0
+A
+22 13 0
+C
+250 375
+T 13573
+S
+#13560
+sabatons dolmen freeblade blade pair~
+dolmen freeblade sabatons~
+A pair of dolmen freeblade sabatons are lying here.~
+   Black metal plates cover lightweight leather boots. The shinguard has a
+double spiral emblem.
+~
+27 mp ag 0 0 17
+2 0 0
+2 0
+A
+5 1 6
+A
+5 1 3
+A
+2 1 0
+A
+9 1 0
+A
+15 4 0
+A
+18 6 0
+A
+12 4 0
+A
+24 4 0
+C
+250 375
+T 13573
+S
+#13561
+boots fur cyclopean king pair~
+the fur boots of the cyclopean king~
+The fur boots of the cyclopean king stand here~
+   The dark gray-green leather is covered in bronze filigree in a knotted
+pattern, coming together near the top in the shape of an eye, with a dazzling
+purple gem at its center. Gray and white fur pours out at the knee.
+~
+27 mp ag 0 0 19
+2 0 0
+2 0
+A
+5 1 6
+A
+5 1 3
+A
+15 1 0
+A
+16 1 0
+A
+11 1 0
+A
+6 1 0
+A
+19 1 0
+C
+250 375
+T 13573
+_
+'pair' is added to keywords for trig 13573 to name it correctly.
+~
+S
+#13562
+cloak tombswarding~
+a cloak of tombswarding~
+A cloak of tombswarding hangs here.~
+   It's a dark gray canvas, calf-length. The back is embossed with a spiral
+motif in brown thread. Beneath the canvas is stiched a fine mesh of chainmail.
+~
+27 mp ak 0 0 20
+3 0 0
+2 0
+A
+5 1 6
+A
+5 1 3
+A
+2 1 0
+A
+13 1 0
+A
+12 9 0
+A
+24 9 0
+C
+250 375
+T 13573
+S
+#13563
+shroud silverseer~
+a silverseer shroud~
+A silverseer shroud hangs here.~
+   It is woven from strips of white and pale gray fabric, and stitched together
+with the fine gray hairs of an old mare. The hooded shroud hangs lower in the
+back than the front, with bronze discs tied to the frills at the bottom. Each
+disc has a spiral-and-eye design, and there are many of these.
+~
+27 mp ak 0 0 21
+0 0 0
+2 0
+A
+5 1 6
+A
+5 1 3
+A
+8 1 0
+A
+9 1 0
+A
+7 8 0
+A
+16 8 0
+A
+12 1 0
+A
+24 1 0
+C
+250 375
+T 13573
+S
+#13564
+cloak shadow vaulter~
+a shadow vaulter cloak~
+A shadow vaulter cloak hangs here.~
+   The hooded leather cloak is heavier than it looks; perhaps hiding a mesh of
+chainmail inside. The leather is black, dyed over and over until it resembles
+a void. The underside is stitched with a circular emblem depicting a shadowy
+figure standing in a stone archway flanked by large wings, beneath a downward-
+facing crescent moon.
+~
+27 mp ak 0 0 21
+1 0 0
+2 0
+A
+5 1 6
+A
+5 1 3
+A
+1 1 0
+A
+2 1 0
+A
+9 1 0
+A
+11 4 0
+A
+17 2 0
+A
+21 9 0
+A
+12 1 0
+A
+24 1 0
+C
+250 375
+T 13573
+S
+#13565
+cape barrow weaver~
+a barrow weaver cape~
+A barrow weaver cape hangs here.~
+   It's made to hang loosely off the shoulders, with a bronze chain across the
+neck. The back of the cloak is stitched with white thread in a grand spiral of
+vines and leaves surrounding a circle in the center which bears the shape of
+a skull between the roots and branches of a tree. To the left, a crescent moon
+and many-pointed star. To the right, the sigil of the sun.
+~
+27 mp ak 0 0 22
+0 0 0
+2 0
+A
+5 1 6
+A
+5 1 3
+A
+8 1 0
+A
+2 1 0
+A
+9 1 0
+A
+16 4 0
+A
+17 2 0
+A
+22 9 0
+A
+12 1 0
+A
+24 1 0
+C
+250 375
+T 13573
+S
+#13566
+cape dolmen freeblade blade~
+a dolmen freeblade cape~
+A dolmen freeblade cape hangs here.~
+   The dark green-gray cape is covered in scales of black metal that help
+deflect the blows of swords and axes. It's surprisingly light.
+~
+27 mp ak 0 0 23
+2 0 0
+2 0
+A
+5 1 6
+A
+5 1 3
+A
+2 1 0
+A
+9 1 0
+A
+17 3 0
+A
+18 3 0
+A
+12 6 0
+A
+24 6 0
+C
+250 375
+T 13573
+S
+#13567
+mantle king cyclopean~
+the mantle of the cyclopean king~
+The mantle of the cyclopean king is lying here.~
+   A set of sturdy, blackened argentine plates cover the shoulders, chest, and
+back in this elegant mantle. The whole of it is covered in filigree in three
+shades of brone. The lowest layer is a polished, gleaming bronze. The outer
+layer is a dark, tarnished bronze. And between them, verdigris. The whole of
+the mantle is set with thirteen purple gems, the largest of which is over the
+heart.
+~
+27 mp ak 0 0 24
+2 0 0
+2 0
+A
+5 1 6
+A
+5 1 3
+A
+15 1 0
+A
+16 1 0
+A
+11 1 0
+A
+6 1 0
+A
+19 1 0
+C
+250 375
+T 13573
+S
+#13568
+talisman labyrinthine fell crypt~
+the labyrinthine talisman of the fell crypt~
+The labyrinthine talisman of the fell crypt has fallen here.~
+   The pendant is shaped like a door, with a flat bottom and a rounded top,
+with a smaller door shape cut out from the bottom. It shows a twisting, curved,
+unbranching line that wends toward a grand violet gem near the top. A cluster
+of three smaller gems in the same color decorate the bottom corner.
+~
+2 amp ak 0 0 25
+0 0 0
+2 0
+A
+5 1 6
+A
+5 1 3
+A
+2 1 0
+A
+15 8 0
+A
+18 6 0
+A
+13 2 0
+A
+24 2 0
+A
+12 1 0
+C
+250 375
+T 13573
+S
+#13569
+talisman labyrinthine unconquered dawn~
+the labyrinthine talisman of the unconquered dawn~
+The labyrinthine talisman of the unconquered dawn has fallen here.~
+   The pendant has the shape of a scroll-and-lobe shield. The outline of a door
+is cut from the bottom, leading to a winding, re-curving line that spirals,
+unbranching, to a shining golden gem at the top, surrounding by bronze rays.
+The scrolled sides are set with smaller topaz gems among a floral flourish.
+~
+2 amp ak 0 0 26
+0 0 0
+2 0
+A
+5 1 6
+A
+5 1 3
+A
+8 1 0
+A
+16 10 0
+A
+7 8 0
+C
+250 375
+T 13573
+S
+#13570
+talisman labyrinthine nightmare queen~
+the labyrinthine talisman of the nightmare queen~
+The labyrinthine talisman of the nightmare queen has fallen here.~
+   The dark pendant is shaped like a horned shield, with an enormous purple gem
+at the top, set in an eight-direction compass rose. At the bottom of, the shape
+of a door is cut out of the metal. The doorway connects to the gem by a
+twisting, curved but unbroken line that wends its way upward.
+~
+2 amp ak 0 0 27
+0 0 0
+2 0
+A
+5 1 6
+A
+5 1 3
+A
+1 1 0
+A
+2 1 0
+A
+9 1 0
+A
+11 4 0
+A
+21 13 0
+C
+250 375
+T 13573
+S
+#13571
+talisman labyrinthine unending sky~
+the labyrinthine talisman of the unending sky~
+The labyrinthine talisman of the unending sky has fallen here.~
+   The pendant, in the shape of an upside-down shield, has a delicate finish of
+blue night-blue enamel behind a foreground of polished bronze. Two glistening
+blue gems are set in the bottom corners. Between them, the arched shape of a
+doorway is cut from the talisman. A curving path rises from it, twisting and
+winding, but never branching, as it rises toward the stars in the sky.
+~
+2 amp ak 0 0 28
+0 0 0
+2 0
+A
+5 1 6
+A
+5 1 3
+A
+8 1 0
+A
+2 1 0
+A
+9 1 0
+A
+16 4 0
+A
+22 13 0
+C
+250 375
+T 13573
+S
+#13572
+talisman labyrinthine inland sea~
+the labyrinthine talisman of the inland sea~
+The labyrinthine talisman of the inland sea has fallen here.~
+   The round pendant has a sea-green enamel background with crashing waves in
+low relief. Round, heavy teal gems are set un the upper left and lower right
+corners. An arched doorway us notched from the bottom of the talisman. Above
+it, a twisting path wriggles like a snake upward toward the top.
+~
+2 amp ak 0 0 29
+0 0 0
+2 0
+A
+5 1 6
+A
+5 1 3
+A
+2 1 0
+A
+9 1 0
+A
+15 4 0
+A
+11 2 0
+A
+16 2 0
+A
+17 3 0
+A
+18 3 0
+A
+12 2 0
+A
+24 2 0
+C
+250 375
+T 13573
+S
+#13573
+talisman labyrinthine cyclopean king~
+the labyrinthine talisman of the cyclopean king~
+The labyrinthine talisman of the cyclopean king has fallen here.~
+   The pendant is shaped like an archway, with columns carved on both sides and
+a square key motif across the top, with a small red diamond at the top. At the
+bottom, the shape of a door is cut from the pendant. From the door, a path
+twists and turns and curves back on itself as it works its way, unbranching,
+to the top, passing a large, circular ruby-red gem on its path.
+~
+2 amp ak 0 0 30
+0 0 0
+2 0
+A
+5 1 6
+A
+5 1 3
+A
+15 1 0
+A
+16 1 0
+A
+11 1 0
+A
+6 1 0
+A
+19 1 0
+C
+250 375
+T 13573
+S
+#13574
+controller labyrinthine bosss loot~
+a labyrinthine boss loot controller~
+A labyrinthine boss loot controller is here.~
+Loads items received from a miniboss.
+~
+3 mp a 0 0 5
+0 0 0
+0 0
+C
+250 350
+T 13592
+S
+#13575
+study labyrinth pattern~
+a labyrinth pattern study~
+A labyrinth pattern study is lying here.~
+   This item is loaded by trigger 12375, which will restring it and set its
+value0 property.
+~
+7 0 a 0 0 6
+0 0 0
+0 0
+C
+1 1
+T 13574
+S
+#13576
+axe golden double-bladed doublebladed bladed~
+a double-bladed golden axe~
+A double-bladed golden axe is displayed here.~
+   The light gleams off of the axe's golden blades, hammered smooth by one of
+the nameless old masters. The handle is well-burnished olive wood, inlaid with
+cedar. It isn't large enough or sharp enough for chopping wood; there are no
+wear marks on either blade.
+~
+15 0 a 0 0 5
+54 0 0
+4 0
+R
+4 5611 a
+S
+#13577
+statue priceless golden horse~
+a priceless golden horse statue~
+A priceless golden horse statue is displayed here.~
+   The heavy sculpture depicts a mare rearing up on its hind hooves and kicking
+its front legs in the air. Every detail is perfect down to the tail hair. From
+the weight, it might be nearly pure gold.
+~
+15 0 a 0 0 6
+96 0 0
+4 0
+R
+4 5611 a
+S
+#13578
+satchel archaeologist's archaeologists archeologist's archeologists~
+an archaeologist's satchel~
+An archaeologist's satchel was dropped here.~
+   The well-worn leather satchel has pockets inside of pockets. I Hefty buckles
+and double-stitched straps allow it to secure a tremendous number of items
+during even the roughest dungeon delves.
+~
+24 emo ar 0 0 8
+1 0 0
+7 0
+A
+5 1 3
+A
+5 1 6
+A
+28 25 0
+C
+250 375
+T 13578
+S
+#13579
+saddle toreador's toreadors elegant~
+a toreador's elegant saddle~
+A toreador's elegant saddle has been left behind.~
+   The aged leather saddle bears a stylized bull across both sides, stretched
+out as if in full gallop. A slab of dark stone forms a low backrest. Gilded
+cord lines the fringes of the saddle and sparkle even in low light.
+~
+2 emp as 0 0 6
+0 0 0
+7 0
+A
+11 5 0
+A
+6 1 0
+C
+250 350
+T 13578
+S
+#13580
+whistle minipet~
+a minipet whistle~
+A minipet whistle is here.~
+tbd
+Type 'use whistle'
+~
+19 p a 0 0 8
+13580 0 0
+2 0
+C
+1 1
+S
+#13581
+whistle mount bull golden glorious~
+a glorious golden bull mount whistle~
+A glorious golden bull mount whistle is lying here.~
+   It's actually more of a flute, made from reeds and bound together by fine
+string. The flute is old, but it plays a sweet tune.
+You can 'use' this whistle to summon a unique mount.
+~
+3 0 a 0 0 16
+13581 0 0
+0 0
+C
+1 1
+T 9910
+S
+#13582
+whistle graven pegasus flying mount~
+a graven pegasus flying mount whistle~
+A graven pegasus flying mount whistle is lying here.~
+   The old stone whistle has a chipped finger hole, but the other notes sound
+out melodically. The end might once have held a lanyard, but it's long gone.
+You can 'use' this whistle to summon a unique flying mount.
+~
+3 0 a 0 0 8
+13582 0 0
+1 0
+T 9910
+S
+#13583
+keystone stone hero's heroes heros grave~
+the keystone for a hero's grave~
+The keystone for a hero's grave is lying here.~
+   It's a stone carving in miniature depicting a grand tomb with a corbeled
+vault roof. It might serve as the keystone for the real thing.
+You can build (Architect): hero's grave
+~
+3 e a 0 0 2
+0 0 0
+1 0
+C
+1 1
+S
+#13584
+tablet ritual horned champion~
+a horned champion ritual tablet~
+A horned champion ritual tablet lies here.~
+   Strange words cover the clay tablet -- if, indeed, these are words. You find
+no meaning in them. Wedge-shaped markings form the image of a man with two
+horns on his head. A strange power radiates from the clay.
+   With this, you can morph into the Horned Champion!
+~
+3 p a 0 0 2
+0 0 0
+6 0
+C
+350 350
+S
+#13585
+tablet ritual horned percipient~
+a horned percipient ritual tablet~
+A horned percipient ritual tablet lies here.~
+   Old and forgotten symbols cover the clay tablet -- words, a spell, a tax
+record, there's no way to read them. The meaning is lost. Wedge-shaped markings
+form the shape of a sage with two horns on her head. A soothing power emanates
+from the clay.
+   With this, you can morph into the Horned Percipient!
+~
+3 p a 0 0 3
+0 0 0
+6 0
+C
+350 350
+S
+#13586
+tablet ritual horned raider~
+a horned raider ritual tablet~
+A horned raider ritual tablet lies here.~
+   Odd marks cover the surface of the clay tablet -- a tally, perhaps, or a
+forgotten language. The meaning doesn't matter. Wedge-shaped markings form the
+outline of a man with two horns on his head. A gnawing power radiates from the
+clay.
+   With this, you can morph into the Horned Raider!
+~
+3 p a 0 0 4
+0 0 0
+6 0
+C
+350 350
+S
+#13587
+tablet ritual horned disciple~
+a horned disciple ritual tablet~
+A horned disciple ritual tablet lies here.~
+   Forgotten words cover both sides of the clay tablet -- at least, you think
+they're words. You can draw no conclusions from the text. Wedge-shaped markings
+form the impression of a woman with two horns on her head. An old and uneasy
+power flows through the clay.
+   With this, you can morph into the Horned Disciple!
+~
+3 p a 0 0 5
+0 0 0
+6 0
+C
+350 350
+S
+#13588
+jar clay seeds~
+a clay jar of seeds~
+A clay jar is lying here.~
+   The tiny jar is made from glazed red clay with black lines. Round fruits are
+depicted on the sides. Inside, it holds dark red seeds.
+~
+3 b a 0 0 13
+0 13589 0
+6 0
+C
+1 1
+R
+4 5210 0
+R
+4 5193 0
+S
+#13589
+pomegranates basket~
+a basket of pomegranates~
+A basket of pomegranates is sitting here.~
+   The basket is full of ripe red-purple fruits, each one larger than your
+fist. The fruits have a sweet armoa but a notoriously tart flavor. Only the
+seeds and pulp are edible, but they make a colorful addition to fruitcakes and
+salads.
+~
+6 bgC a 0 0 16
+24 13589 0
+7 672
+C
+1 1
+I 15 13590 100.00 4 x  # SEPARATE: juicy pomegranate
+O+ 1 6134
+R
+4 5215 0
+S
+#13590
+pomegranate juicy~
+a juicy pomegranate~
+A juicy pomegranate is lying on the ground.~
+   The red-purple fruit has a thick husk to protect its tart juice and precious
+seeds. There's a sweet aroma when you press the pomegranate to your nose.
+~
+6 gC a 0 0 14
+4 0 0
+7 672
+C
+1 1
+I 14 13589 100.00 4 x  # COMBINE: basket of pomegranates
+M
+34
+Combine a few of these to get something you can plant.~
+O+ 1 6124
+R
+4 5215 0
+S
+#13591
+pomegranates over-ripe~
+some over-ripe pomegranates~
+Some over-ripe pomegranates are lying here.~
+   The pomegranates have lost their firmness and begun to brown. There's a
+slightly sharp, slightly sour aroma. But if you're lost somewhere without any
+food, you eat what's at hand.
+~
+6 g a 0 0 20
+12 0 0
+7 672
+C
+1 1
+M
+4
+You eat $p and feel a little funny.~
+M
+33
+It has begun to ferment.~
+O+ 1 6134
+R
+4 5619 0
+T 13591
+S
+#13592
+controller labyrinthine miniboss loot~
+a labyrinthine miniboss loot controller~
+A labyrinthine miniboss loot controller is here.~
+Loads items received from a miniboss.
+~
+3 mo a 0 0 4
+0 0 0
+0 0
+C
+250 350
+T 13592
+S
+#13593
+outfit tombsward's tombswards ward's wards~
+a tombsward's outfit~
+A tombsward's outfit is lying on the ground.~
+   This padded leather outfit is stained dark gray, almost black. Many buckles
+are stitched on to help attach pieces of heavy armor. A brown spiral is
+stitched on the chest, just above the heart. Hooks on the shoulders allow more
+items to be carried, for long treks.
+~
+2 mo ad 0 0 11
+0 0 0
+11 0
+A
+5 1 0
+A
+5 1 6
+C
+1 1
+M
+12
+Tombsward $n stands stalwart before you.~
+M
+8
+You dress yourself as a tombsward.~
+M
+9
+$n dresses $mself as a tombsward.~
+S
+#13594
+outfit silverseer's silverseers seer's seers~
+a silverseer's outfit~
+A silverseer's outfit is lying here.~
+   Layers of pale gray and white robes make up the silverseer set, the hooded
+oracle of death. The edges of the outer robes are frilled, and many of these
+frills bear a bronze disc stamped with the shape of an eye inside a spiral, and
+a spiral in the eye. Pockets and pouches adorn the waist.
+~
+2 mo ad 0 0 12
+0 0 0
+11 0
+A
+5 1 0
+A
+5 1 6
+C
+1 1
+M
+12
+Silverseer $n stands patiently.~
+M
+8
+You don the mantle of a silverseer.~
+M
+9
+$n dons the mantle of a silverseer.~
+S
+#13595
+outfit shadow vaulter's vaulters~
+a shadow vaulter's outfit~
+A shadow vaulter's outfit is hidden here.~
+   The outfit is made of black leather, hard to see in the shadows; all but
+invisible in the night. Bronze stitching in geometric patterns covers many of
+the under parts. A downward-facing crescent emblem is embossed on the chest.
+On the inside, it is possessed of many hidden pockets.
+~
+2 mo ad 0 0 13
+0 0 0
+11 0
+A
+5 1 0
+A
+5 1 6
+C
+1 1
+M
+12
+Shadow vaulter $n is skulking here.~
+M
+8
+You slip into the shadow vaulter's guise.~
+M
+9
+$n slips into a shadow vaulter's guise.~
+S
+#13596
+outfit barrow weaver~
+a barrow weaver outfit~
+A barrow weaver outfit is folded on the ground.~
+   The layered purple and white robes are made to hang loosely over fitted
+leather trousers, accented with white and bronze threads stitched in the shapes
+of all different types of leaf. The belt is hung with many pouches to carry
+supplies and tools.
+~
+2 mo ad 0 0 14
+0 0 0
+11 0
+A
+5 1 0
+A
+5 1 6
+C
+1 1
+M
+12
+Barrow weaver $n stands ready.~
+M
+8
+You slip into the barrow weaver robes.~
+M
+9
+$n slips into some barrow weaver robes.~
+S
+#13597
+outfit dolmen freeblade blade~
+a dolmen freeblade outfit~
+A dolmen freeblade outfit is lying here.~
+   Dark gray cloth and black leather make up the sturdy field outfit of the
+dolmen freeblade, made to carry supplies on the deepest, darkest adventures.
+An emblem over the heart shows a sword and dagger beneath a trilithon.
+~
+2 mo ad 0 0 15
+0 0 0
+11 0
+A
+5 1 0
+A
+5 1 6
+C
+1 1
+M
+12
+Dolmen freeblade $n is standing here.~
+M
+8
+You dress yourself as a dolmen freeblade.~
+M
+9
+$n dresses $mself as a dolmen freeblade.~
+S
+#13598
+regalia cyclopean set~
+the cyclopean regalia~
+A set of cyclopean regalia is lying here.~
+   The pale green-gray garment is made from elegant cloth and stitched with
+bronze and gold thread, with a purple shroud, equally embellished. About the
+shoulders, it bears a heavy bronze mantle beset with gems.
+~
+2 mo ad 0 0 16
+0 0 0
+11 0
+A
+5 1 0
+A
+5 1 6
+C
+1 1
+M
+14
+You stand beneath King $n.~
+M
+13
+You stand beneath Queen $n.~
+M
+8
+You dress yourself in the cyclopean regalia.~
+M
+9
+$n dresses $mself in cyclopean regalia.~
+S
+#13599
+controller labyrinth~
+the labyrinth controller~
+The labyrinth controller is here.~
+This tool controls the High Temple: Long Lost Labyrinth adventure.
+Usage: labyrinth goto <template vnum>
+       labyrinth status
+       labyrinth unseal (great jar / hidden boss)
+~
+3 k a 0 0 1
+0 0 0
+1 0
+C
+1 1
+T 13599
+S
+$

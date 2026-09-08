@@ -1,0 +1,935 @@
+#13502
+adventurer huddled~
+the huddled adventurer~
+Another adventurer is huddled in the corner.
+~
+250 350 bdvzI c 3
+1 0 0 7 -1 -1
+D
+   From the clothing, they're clearly an adventurer looking for treasure or
+fame in this forsaken labyrinth. But this adventurer is out of their depth and
+has tucked into a corner to wait out the coming horrors.
+~
+T 13598
+S
+#13503
+#n meek~
+#n the Meek~
+#n the Meek is standing here.
+~
+250 350 dozG cm 3
+0 1 0 7 -1 -1
+D
+   This once-stalwart adventurer is quick to tell the tale of being trapped in
+a labyrinth and the heroic rescue that followed.
+~
+T 9809
+T 9803
+S
+#13505
+spawner mob labyrinth~
+the labyrinth mob spawner~
+The labyrinth mob spawner is here.
+~
+250 350 bd dkl 3
+0 0 0 15 -1 -1
+D
+You can't see it anyway.
+~
+T 13505
+S
+#13510
+minotaur huge cyclopean~
+the Cyclopean Minotaur~
+A huge minotaur huffs as it circles the great chamber!
+~
+250 350 bdyIJKL cEG 5
+1 0 0 13510 -1 13510
+D
+   The minotaur towers over you, taller than a house by half! It stomps its
+heavy feet as it circles the chamber, filling the air with a cloud of fine dust
+that lingers near the stone floor. When it turns to you, the minotaur eyes you
+with one giant eye, right in the middle of its face. Long white horns extend
+from its grizzled beard, curving upward; surely those will be the last thing
+you see if you can't find a way past.
+~
+I 4 13574 100.00 1  # LOOT: labyrinthine boss loot controller
+I 4 13524 100.00 1  # LOOT: memento of interment
+I 4 13524 100.00 1  # LOOT: memento of interment
+I+ 6 0  # Boss
+M
+0
+$n paces back and forth around the room.~
+T 13515
+T 13511
+T 13513
+S
+#13512
+queen nightmare~
+the Nightmare Queen~
+The Nightmare Queen towers over you!
+~
+250 350 bdhyJKL cEG 5
+2 0 0 13512 -1 -1
+D
+   The specter of the Nightmare Queen is so large as to fill most of the
+chamber! Her face is that of a horse, with fiery eyes and steam rising from her
+flaring nostrils. Her torso and arms, wrapped in strips of red linen, are that
+of a woman. Her waist is at floor level, semi-transparent, unconstrained by the
+geometry of the floor. There's no way past her!
+~
+I 4 13574 100.00 1  # LOOT: labyrinthine boss loot controller
+I 4 13524 100.00 1  # LOOT: memento of interment
+I 4 13524 100.00 1  # LOOT: memento of interment
+I+ 6 0  # Boss
+T 13515
+T 13511
+T 13513
+S
+#13516
+adventurer hapless~
+a hapless adventurer~
+A hapless adventurer is here.
+~
+0 0 d 0 3
+0 0 0 15 -1 -1
+D
+They died.
+~
+_
+Used only as the name of a corpse.
+~
+S
+#13520
+#n wily man~
+Wily #n~
+A man is pacing back and forth, checking stones on the walls.
+~
+250 350 dvyJL cEM 3
+1 0 0 13520 -1 13520
+D
+   At first, it looks like you've found a friendly face in these dank depths.
+But as he comes into view, holding a crude torch made from a tent pole, his
+appearance paints a different picture. His uneven hair stands up on one side,
+but it's shaved nearly to the bone on the other, with fresh scabs dried blood.
+Few teeth remain in his mouth, but those that do are stained a deep orange.
+His eyes dart back and forth, never stopping. He's rail thin and half-dressed.
+And worse, he's muttering to himself. Looks like he's been down here a while.
+~
+I 4 13512 100.00 1  # LOOT: tarnished key
+I 4 13592 100.00 1  # LOOT: labyrinthine miniboss loot controller
+M
+0
+$n taps one of the smaller stones.~
+M
+0
+$n runs $s fingers along the wall.~
+M
+0
+$n scratches his head.~
+M
+0
+$n scratches behind $s ear.~
+M
+0
+$n picks at $s ear.~
+M
+1
+What's it looking at?~
+M
+1
+What's it want?~
+M
+1
+Might have to kill it.~
+M
+1
+Might have to eat it.~
+M
+0
+$n looks in your ear.~
+M
+0
+$n stares at you with one eye wide open.~
+M
+0
+$n picks at $s nose.~
+T 13523
+T 13511
+T 13520
+S
+#13525
+rat gigantic giant goblin~
+the gigantic goblin rat~
+A gigantic goblin rat paces back and forth in the labyrinth.
+~
+250 350 djyJL cE 4
+0 0 71 13541 -1 13525
+D
+   Its size is not the only thing unusual about this particular rodent: its
+ears are long and jagged, sticking far out to the sides, with a tinge of green.
+The rest, though, is pure rat, from the gray-brown fur to the long, pink tail.
+When it opens its mouth, you get a clear view of the long, straight, paired
+yellow teeth -- teeth that could gnaw straight through you.
+~
+I 4 13512 100.00 1  # LOOT: tarnished key
+I 4 13592 100.00 1  # LOOT: labyrinthine miniboss loot controller
+M
+0
+$n sniffs at you.~
+M
+0
+$n sniffs at the ground.~
+M
+0
+$n sniffs at the air.~
+M
+0
+$n releases a deep squeak.~
+M
+0
+$n grooms $s whiskers.~
+T 13523
+T 13526
+T 13511
+S
+#13526
+Cherrith goblin fuzzy~
+the fuzzy goblin~
+A fuzzy goblin is panting and catching her breath.
+~
+250 350 bdyzJL cE 2
+2 0 0 4 -1 13525
+D
+   She's got the right height for a goblin, but she's covered head to toe in a
+fine layer of gray-brown fur with a slight green tinge. Her leather clothing
+looks a bit chewed up, but otherwise no worse for the wear. She peers over her
+shoulder at every noise that echoes through the halls.
+~
+I 4 13592 100.00 1  # LOOT: labyrinthine miniboss loot controller
+M
+0
+$n jumps in the air with a *squeak* at a sound in the distance.~
+M
+0
+$n looks over $s shoulder.~
+M
+0
+$n wipes $s forehead.~
+M
+0
+$n almost jumps out of $s skin at the echoing sound of a drip in the distance.~
+M
+0
+$n peers around.~
+M
+0
+$n scratches behind $s ear.~
+T 13527
+T 13511
+S
+#13527
+Cherrith goblin fuzzy~
+the fuzzy goblin~
+A fuzzy goblin is panting and catching her breath.
+~
+250 350 bdyzJL cE 2
+2 0 0 4 -1 13525
+D
+   She's got the right height for a goblin, but she's covered head to toe in a
+fine layer of gray-brown fur with a slight green tinge. Her leather clothing
+looks a bit chewed up, but otherwise no worse for the wear.
+~
+I 4 13592 100.00 1  # LOOT: labyrinthine miniboss loot controller
+M
+0
+$n rolls a glass orb over $s hands.~
+M
+0
+$n rolls a glass orb back and forth over $s hand.~
+M
+0
+$n rolls a glass orb up one arm and down the other.~
+M
+0
+$n waves $s hand back and forth as a glass orb seems to dance on the edges of $s fingers.~
+M
+0
+$n rolls a glass orb over the back of $s hand.~
+M
+0
+$n rolls a glass orb back and forth.~
+T 13511
+T 13528
+S
+#13530
+champion horned #n~
+the horned champion~
+A horned champion emerges from the shadows, staring off into the darkness.
+~
+250 350 duvyJL cE 3
+0 3 0 13530 -1 13530
+D
+   The champion is imposing, with a stature that rivals the largest men you've
+seen. Two upturn horns, tan at the base and darkening to black at the tips,
+grace the sides of the head, which is covered in thick, shaggy hair not unlike
+a bison. Wide soot lines decorate the champion's face in a puzzling pattern,
+with the lips and area around the mouth blackout out completely. Below that,
+you can make out a sleeveless, knee-length woolen tunic with heavy embroidery.
+~
+I 4 13512 100.00 1  # LOOT: tarnished key
+I 4 13592 100.00 1  # LOOT: labyrinthine miniboss loot controller
+T 13523
+T 13511
+S
+#13535
+skeleton pale green~
+a pale green skeleton~
+&gA pale green skeleton lies on the ground.&y
+~
+250 350 abdhuJK chCDG 3
+0 0 0 15 -1 -1
+D
+   The skeleton has a mottled patina all over, fading from pale green to gray
+in places, with hints of brown at its wrists. The green color stains its heavy
+white robe at the neck and arms. The robe, frayed and dirty at the bottom, is
+tied at the waist with a simple length of rope.
+~
+I 4 13535 100.00 1  # LOOT: pale green skeleton
+M
+0
+The skeleton rattles its jaw with a clack clack clack.~
+M
+7
+A pale green skeleton is kneeling, head bowed.~
+T 13537
+T 13543
+T 13511
+T 13540
+S
+#13536
+skeleton bronze polished~
+the polished bronze skeleton~
+&gThere's a bronze skeleton on the floor.&y
+~
+250 350 abdhuyJK chCDG 3
+0 0 0 3 -1 -1
+D
+   Its bones twinkle a brilliant bronze color in the dim light, each one clean
+and polished. Its helmet, equal in luster, is topped with a comb of short red
+hair that stands straight up. It wears nothing else except a stone breastplate
+and holds a spear, also fashioned from stone, in its left hand.
+~
+I 4 13536 100.00 1  # LOOT: polished bronze skeleton
+M
+0
+The skeleton rattles its jaw with a clack clack clack.~
+T 13537
+T 13543
+T 13511
+S
+#13538
+shadow dead strange~
+the shadow of the dead~
+A strange shadow moves along the wall.
+~
+250 350 abduJK chCEG 0
+0 0 27 13538 -1 13543
+D
+   The shadow stretches up the stone wall, growing and shrinking as it passes
+over the stones. But try as you might, you cannot find the thing casting it.
+~
+M
+7
+A shadow grows as it moves toward you.~
+M
+0
+The light plays tricks on you.~
+M
+0
+You seem to be turned around.~
+M
+0
+Everything goes dark for a moment.~
+M
+0
+The hair on the back of your neck stands up.~
+M
+0
+You see something move out of the corner of your eye.~
+M
+0
+You hear coins jingling in the dark.~
+M
+0
+A fishy smell permeates the air.~
+M
+0
+Something brushes against your leg.~
+M
+0
+You hear sobbing in the distance.~
+M
+0
+You forgot something.~
+T 13537
+T 13543
+T 13511
+T 13540
+T 13538
+S
+#13539
+shadow wailing long~
+the wailing shadow~
+A long shadow stretches across the wall.
+~
+250 350 abduyJK chCEG 0
+0 0 0 13539 -1 13543
+D
+   The shadow screams and shrieks as it passes over the rough stones of the old
+labyrinth wall. The mournful wail cuts straight through you, piercing your ears
+despite your best efforts to cover them. And though it has the form of a
+person, you can see no one here to cast the shadow.
+~
+M
+0
+The light plays tricks on you.~
+M
+0
+You seem to be turned around.~
+M
+0
+Everything goes dark for a moment.~
+M
+0
+The hair on the back of your neck stands up.~
+M
+0
+You see something move out of the corner of your eye.~
+M
+0
+You hear coins jingling in the dark.~
+M
+0
+A fishy smell permeates the air.~
+M
+0
+Something brushes against your leg.~
+M
+0
+You hear sobbing in the distance.~
+M
+0
+You forgot something.~
+T 13537
+T 13543
+T 13511
+T 13538
+S
+#13540
+goblin lost~
+a lost goblin~
+A goblin is lost here.
+~
+250 350 bd 0 3
+1 0 0 15 -1 13543
+D
+He's not doing too well.
+~
+_
+This mob does not spawn; it's just here to have a corpse.
+~
+S
+#13541
+mole-rat molerat rat mammoth~
+a mammoth mole-rat~
+A mammoth mole-rat blocks the path!
+~
+250 350 abduJ cE 4
+0 0 0 13541 -1 -1
+D
+   The gray-pink fleshy creature is nearly the size of a horse! Its naked,
+wrinkled skin swishes against the stone walls as it bustles about, probing
+everything with its four long, thin ivory teeth. Its eyes are surprisingly
+tiny, like black beads on either side of its face.
+~
+I 0 3012 100.00 2  # BUTCHER: fillet of raw meat
+I 1 1351 100.00 1  # SKIN: large skin
+M
+7
+A mammoth mole-rat is gnawing at its own skin.~
+M
+0
+$n sniffs at the wall.~
+M
+0
+$n twitches its whiskers.~
+M
+0
+$n scrapes at the wall with its long teeth.~
+M
+0
+$n rolls onto its side and scratches its back.~
+M
+0
+$n bumps into a wall.~
+M
+0
+$n gnashes its long teeth.~
+T 13540
+T 13537
+T 13543
+S
+#13542
+queen mole-rat molerat rat mammoth~
+the mole-rat queen~
+A mammoth mole-rat queen gnashes her teeth as you approach!
+~
+250 350 abduyJ cE 4
+2 0 0 13541 -1 -1
+D
+   This gray-pink fleshy creature is so large she can barely move through the
+narrow passageway. Her skin, deeply wrinkled, shows impressions from the stone
+walls. Her tiny eyes glisten in the dim light, trained on you as you move. Her
+teeth, like long white sabers, gnash up and down at your approach.
+~
+I 0 3012 100.00 3  # BUTCHER: fillet of raw meat
+I 1 1351 100.00 2  # SKIN: large skin
+M
+0
+$n sniffs at the wall.~
+M
+0
+$n twitches $s whiskers.~
+M
+0
+$n scrapes at the wall with $s long teeth.~
+M
+0
+$n rolls onto $s side and scratches $s back.~
+M
+0
+$n bumps into a wall.~
+M
+0
+$n gnashes $s long teeth.~
+M
+0
+$n rears up and looms over you.~
+T 13540
+T 13537
+T 13543
+S
+#13544
+slime bone ball~
+a bone slime~
+A ball of slime rolls across the stones.
+~
+250 350 abduIJK chCDG 2
+0 0 21 13544 -1 13539
+D
+   Light dances across the gleaming surface of the slime as it rolls around,
+picking up stray bits from the ground and leaving behind a trail of fetid goo.
+When it approaches the wall, light reflecting on the stones shines through the
+slime, and you can see its insides are a clump of old bones and hair, and bits
+of discarded armor.
+~
+M
+7
+A ball of slime sloshes around.~
+M
+0
+$n scoots along the floor, sucking up bits of debris.~
+M
+0
+$n scoots along the floor.~
+M
+0
+$n rolls around on the floor.~
+M
+0
+There's a sloshing noise coming from $n.~
+M
+0
+There's a sloshing noise coming from $n.~
+M
+0
+$n coughs out a bone and then rolls it right back up again.~
+M
+0
+$n bumps into the wall with a splash, then starts rolling the other way.~
+T 13540
+T 13537
+T 13543
+T 13544
+T 13511
+T 13542
+S
+#13545
+cube death gelatinous~
+the death cube~
+You are suspended in some kind of gelatinous cube! It's all around you!
+~
+250 350 abdJK chCDGN 5
+0 0 0 15 -1 13539
+D
+   The entire passage is filled with an itchy, acrid gel, and you've become
+trapped inside! It's hard to move here, akin to walking through water in your
+armor. But each time you think you've reached the edge of the goo, it pulls you
+back in. There's no air, and your skin begins to burn as you realize you have
+sat here too long already.
+~
+M
+0
+Your skin burns.~
+M
+0
+Your eyes burn.~
+M
+0
+You can't breathe!~
+M
+0
+You're having trouble moving.~
+M
+0
+The cube burns you!~
+M
+0
+Your eyes sting.~
+M
+0
+Everything sounds muffled through the gelatinous cube.~
+T 13537
+T 13543
+T 13511
+T 13545
+S
+#13547
+spider silvery mirror giant~
+a silver mirror spider~
+A giant, silvery spider tends to the web.
+~
+250 350 abduJ cCG 3
+0 0 8 13547 -1 -1
+D
+   Its mirror-like silver body is the size of a dog, but its long, spindly,
+clear glass legs make it almost the size of a horse! It holds perfectly still;
+easy to miss if you're not looking right at it. If it has eyes, you can't see
+them -- but they certainly have spotted you.
+~
+M
+7
+A giant, silvery spider attempts to hide itself.~
+T 13540
+T 13547
+T 13537
+T 13543
+T 13511
+T 13548
+S
+#13548
+spider giant glimmer gold~
+the gold spider~
+A giant spider glimmers with gold in the dim light.
+~
+250 350 abduyJ cCG 3
+0 0 8 13547 -1 -1
+D
+   The yellow sheen of gold covers the enormous spider, casting flecks of
+gilded light across the dark stone walls. The spider holds perfectly still as
+you approach. You can't see its eyes to tell if it's awake or asleep. A closer
+inspection reveals an exciting truth: the spider has covered itself in bits of
+golden treasure! Oh, but it's not as much gold as it first seemed: the spider's
+mirror-like silver body makes it look like so much more.
+~
+I 4 13541 100.00 1  # LOOT: small hoard of gold
+T 13540
+T 13537
+T 13543
+T 13511
+T 13548
+S
+#13550
+termite giant~
+a giant termite~
+A giant termite gnaws at the wall.
+~
+250 350 abduJ cDG 3
+0 0 8 13547 -1 -1
+D
+   The enormous bug has a white, almost translucent body, ridged from to back,
+with thick, segmented legs. Its head is brown, almost bronze, with a pair of
+jet black mandibles that chew at the very stone of the wall. As you approach,
+one of the termite's antennae twists toward you... It may be busy, but it has
+certainly taken notice of your intrusion.
+~
+I 0 13544 100.00 1  # BUTCHER: hunk of gooey meat
+M
+7
+A giant termite works on enlarging the hole.~
+M
+0
+$n tears a little bite of stone from the wall.~
+M
+0
+$n chews something in its mandibles.~
+M
+0
+$n chews something in its mandibles.~
+M
+0
+$n chews something in its mandibles.~
+M
+0
+$n chews something in its mandibles.~
+M
+0
+$n chews something in its mandibles.~
+M
+0
+$n raises an antenna at you.~
+M
+0
+$n skitters back to the hole at the slightest sound.~
+T 13540
+T 13537
+T 13543
+T 13511
+S
+#13551
+centipede monstrous~
+the monstrous centipede~
+A monstrous centipede rears up taller than a horse and menaces you with countless legs!
+~
+250 350 abduzJ cDG 4
+0 0 8 13547 -1 -1
+D
+   The hideous creature's body is such a deep brown that it nearly vanishes
+against the darkness, but its myriad beige-orange legs, which writhe as it
+threatens you, stick out like shining daggers in the night. Its head curls
+back, hard to see and harder to hit; you'll have to deal with the legs first.
+Unfortunately, there's no other way past.
+~
+I 0 13544 100.00 2  # BUTCHER: hunk of gooey meat
+M
+0
+$n waves its many legs in the dark.~
+M
+0
+$n hisses at you.~
+M
+0
+A hissing sound echoes through the halls.~
+M
+0
+You find $n's long body surrounds you!~
+M
+0
+$n drums its legs rhythmically on the stone.~
+M
+0
+$n weaves back and forth in the darkness.~
+M
+0
+$n taps you with its antennae.~
+T 13537
+T 13543
+T 13511
+T 13551
+S
+#13553
+pixies pixy cluster blind cave~
+a cluster of blind cave pixies~
+A cluster of blind cave pixies is gleaning the stone.
+~
+250 350 abdxJ coG 1
+0 0 71 13553 -1 13547
+D
+   Several of the pale creatures cluster together on the ground, picking at the
+stones of the floor. They're flightless, with only the tiniest white wings
+sticking out of their shoulders. They're eating something off of the ground.
+Though they're somewhat larger than the flying pixies you've seen, the lot of
+them together are still smaller than a cat.
+~
+M
+7
+Blind cave pixies scrape at the floor.~
+M
+0
+A pixy squeals as it gobbles down a mote of dust.~
+M
+0
+Some of the pixies climb the wall, picking at the seams.~
+M
+0
+The pixies whistle a high tune as they work.~
+M
+0
+The pixies descend on something in the corner, gobbling it up before you can see what it was.~
+M
+0
+One of the pixies bumps into your foot.~
+M
+0
+Some of the pixies drum out a beat against the stone.~
+M
+0
+A faint drumbeat echoes in the distance.~
+M
+0
+A buzzing sound reverberates through the hall.~
+M
+0
+A buzzing sound reverberates through the hall.~
+T 13537
+T 13543
+T 13511
+T 13540
+S
+#13554
+guardian wokestone stone pixy creature~
+the wokestone guardian~
+A stone creature lumbers toward you with a pixy on its back!
+~
+250 350 abduxyJ chCGU 1
+0 0 28 5 -1 -1
+D
+   The little thing looks as if the very stone of the labyrinth has been
+scraped from the walls and given spirit. The guardian moves like an ape, with
+long, powerful arms and short, steady legs, swinging over to investigate you as
+you look at it. It hasn't got a face of its own. A near-translucent white cave
+pixy cleaves desperately to its shoulder.
+~
+M
+0
+The pixy shrieks at you from the back of the guardian.~
+M
+0
+The pixy shrieks words you don't understand.~
+M
+0
+$n paces back and forth in front of you.~
+M
+0
+$n pounds its little chest with its arms as the pixy shrieks at you.~
+M
+0
+The pixy shrieks at you from the back of the guardian.~
+T 13537
+T 13543
+T 13511
+T 13540
+S
+#13556
+#n~
+#n~
+#n is sitting by the fire.
+~
+250 350 abd c 3
+0 0 0 15 -1 -1
+M
+0
+$n moves a little closer to the fire.~
+M
+0
+$n drinks a capful of water.~
+M
+0
+$n coughs.~
+M
+1
+Move along.~
+M
+1
+There's no room for more.~
+M
+0
+$n tends the fire.~
+M
+0
+$n rubs $s hands over the fire.~
+M
+1
+Find your own spot.~
+T 13511
+T 13540
+_
+Look desc set by trig 13540.
+~
+S
+#13557
+#n~
+#n~
+#n leans against the wall, sharpening a sword.
+~
+250 350 abdyz cM 3
+0 0 0 1 -1 -1
+M
+1
+Move along.~
+M
+1
+Don't have room for you.~
+M
+1
+Don't start none, won't be none.~
+M
+1
+Get lost.~
+M
+0
+$n runs a whetstone along $s sword.~
+M
+0
+$n holds $s sword up, checking the edge.~
+M
+0
+$n picks at $s nails with the sword.~
+T 13511
+T 13540
+T 13523
+_
+Look desc set by trig 13540.
+~
+S
+#13580
+minipet~
+a minipet~
+A minipet is here.
+~
+1 1 bdoD mn 1
+0 0 0 5 -1 -1
+D
+tbd
+~
+S
+#13581
+bull golden glorious~
+a glorious golden bull~
+A glorious golden bull holds its head high.
+~
+100 100 dej 0 4
+0 0 39 42 -1 -1
+D
+   The light scatters in a dazzling pattern from the bull's horns as it rocks
+its head and huffs. Its coat has the glister of true gold, and twinkling in
+even the dimmest light.
+~
+S
+#13582
+pegasus graven~
+a graven pegasus~
+A graven pegasus stretches out its stone wings.
+~
+100 300 dej m 4
+0 0 2 9021 -1 -1
+D
+   The majestic beast is carved from living marble! If it held perfectly still,
+this pegasus would be the most detailed sculpture you have ever seen, down to
+the hairs of its tail. It doesn't seem to breathe, or even blind. But it
+gallops through the air with the ease of a dragonfly, beating its wings now and
+then for lift.
+~
+S
+$

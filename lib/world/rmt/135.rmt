@@ -1,0 +1,2664 @@
+#13500
+An Old and Forgotten Passage~
+   Through a narrow opening, you find a small chamber in the brick foundation
+beneath the temple. These bricks, smoothed and darkened by the ravages of time,
+protect a stone floor and part of an older stone wall, intrictately carved,
+though most of the details have worn away. It's cool down here. Sand fills the
+corners of the floor, long unswept, with only cobwebs to contain it.
+~
+d 0 0 -1
+E
+opening up~
+The opening is narrow, but you can squeeze through.
+~
+E
+chamber foundation~
+It's a rather small chamber in the foundation of the temple.
+~
+E
+temple~
+The temple is above you; what's down here seems older.
+~
+E
+stones blocks walls bricks~
+   The walls here are made of old brick except for the far wall, which is made
+from large stones that meet perfectly at the edges with no mortar.
+~
+E
+sand corners~
+Loose sand is strewn about the area and collects in the corners.
+~
+E
+floor down~
+The floor is made from large stones.
+~
+E
+cobwebs webs~
+Looks like nobody has swept this place out in quite some time.
+~
+E
+light~
+The only light here cascades down through the narrow opening.
+~
+E
+carvings carved details reliefs~
+   Once, there were intricate scenes carved in bas-relief along the stones of
+the far wall. But time has taken its toll, and now all you can make out are
+vague man-like shapes in some sort of grand scene, standing before a bull.
+Details are better on the bull, whose head is in high relief with one horn
+still intact.
+   The end of a frayed rope is still tied to the horn.
+~
+E
+rope frayed~
+   All that remains of the frayed old rope is the part that's tied to the
+bull's horns. No hint of its original purpose remains.
+~
+E
+horns bull sculpture~
+   A bit of old frayed rope is tied around one of the horns of a bull
+sculpture, carved in high relief from the stone wall.
+~
+M 1 13500 100.00 1
+T 13508
+T 13553
+S
+#13501
+A Steep, Dark Chute~
+   The long stone chute drops almost vertically toward the depths! The sides
+are too slick to grab and the slope is too steep to climb. It seems the only
+way forward is down.
+~
+bg 0 0 -1
+D8
+~
+0 13500
+D9
+~
+0 13505
+E
+chute~
+It's a fairly narrow stone chute; you can go up or down. But mostly down.
+~
+E
+up~
+Little light shines down from above. You can't see out of the chute from here.
+~
+E
+down depths~
+All you can see down there is darkness.
+~
+E
+sides stones~
+   The sides of the chute are made of enormous blocks of stone, cut so
+precisely that there are no gaps in the seams to grab.
+~
+E
+slope~
+It's quite steep.
+~
+T 13507
+T 13501
+T 13503
+S
+#13505
+An Old Campsite, Deep Underground~
+   The chamber isn't large, but it's large enough to rest comfortably and, for
+the moment, it's safe. High above, you can scarcely make out the end of the
+chute that deposited you here. Archways in the stone walls lead out in three
+directions; chalk marks cover the stones next to each path.
+~
+bg 0 0 13505
+D14
+~
+0 13510
+D14
+~
+0 13515
+D14
+~
+0 13520
+D8
+~
+0 13501
+E
+chute up above~
+You can barely see the chute from down here; the ceiling is far too high.
+~
+E
+corners~
+Sand collects in the corners.
+~
+E
+chamber campsite site~
+   The chamber isn't very large, but there's enough space that someone has set
+up a campsite.
+~
+E
+archways arches~
+Four archways exit this chamber, though one is bricked up.
+~
+E
+floor~
+   The floor, like the walls, is made from enormous, well-fitted stone blocks
+with no gaps or mortar at the seams. Sand is strewn here and there, and
+collects in the corners.
+~
+E
+rope~
+   An old rope is crumpled on the floor, overtaken by mushrooms and too fragile
+to move. It's not doing much good down here, anyway.
+~
+E
+north east south west northeast ne southeast se southwest sw northwest nw~
+It's hard to tell which way to start. Any path could lead to the center.
+~
+E
+stones walls~
+   The labyrinthine walls are made of square and rectangular stones of all
+sizes, arranged like a puzzle. Each stone is cut to match its neighbor so
+precisely that there are no gaps between them; no mortar was used to create
+this cyclopean maze.
+   There is, however, one wall that is made from ordinary brick.
+~
+E
+bricks clay mortar~
+   There once existed a fourth exit from this chamber, apparently, but it has
+been walled over with clay bricks. Unlike the stone walls, these bricks are
+held together by ordinary mortar.
+~
+E
+chalk marks~
+   Chalk marks on the stones around each path look like they might once have
+been a map -- or, at least, a warning. But they've been rubbed out and
+re-marked so many times, you can't make out the original intent.
+~
+E
+sand~
+   A fine layer of sand covers parts of the floor and collects in small piles
+along the edges and corners.
+~
+M 2 13505 100.00 1
+T 13507
+T 13504
+T 13529
+T 13553
+S
+#13510
+Lost in the Labyrinth 13510~
+   The long stone corridors are difficult to tell apart. This one stretches on
+into the darkness away from the makeshift camp, but there is no indication
+where it might lead or if it's the right path.
+~
+bg 0 0 13505
+D14
+~
+0 13505
+D14
+~
+0 13525
+E
+north east south west northeast ne southeast se southwest sw northwest nw~
+You can't make sense of the directions in this labyrinth -- it goes on forever.
+~
+E
+stones walls~
+   The massive stones of the labyrinth's walls are mismatched in size and shape
+but they all come together at neatly-hammered edges where the fit is so perfect
+that no mortar is needed to hold them perfectly in place.
+~
+E
+corridors halls paths~
+   The corridor extends in long, straight lines, branching only rarely. It's
+difficult to get any sense of direction or find a good path through.
+~
+E
+floor down~
+   The floor is made of the same stone as the walls and strewn with sand, which
+collects at the edges. The floor is sloped, gradually leading further down.
+~
+E
+sand~
+   A fine layer of sand covers parts of the floor and collects in small piles
+along the edges.
+~
+E
+darkness distance~
+In the distance, you see only darkness.
+~
+E
+makeshift camp~
+You're quite close to the campsite, such as it is.
+~
+E
+up ceiling~
+The ceiling is made of gray stone.
+~
+T 13504
+T 13529
+T 13553
+_
+Wing A room 1
+~
+S
+#13514
+Lost in the Labyrinth 13514~
+   The path ends at a wall slick with water. Mushrooms grow from the ceiling,
+releasing the occasional droplet, which echoes out through the labyrinth when
+it lands in the barrel. Bits of dead moss cling to the seams in the wall.
+~
+bg 0 0 13505
+D14
+~
+0 13515
+E
+alcove~
+There's an empty alcove in the far wall.
+~
+E
+path~
+   Every stone in this place looks the same; you can't tell if you're on the
+right path.
+~
+E
+walls water moisture wet~
+   The walls are slick with water that's seeping down from above. It looks like
+someone set up a barrel here to collect it.
+~
+E
+stones~
+   The massive stones that make up this dead end are slick with water,
+trickling in from an unseen source. White mineral deposits flank the wet parts.
+~
+E
+minerals deposits white~
+   Mineral deposits stain the wall around the wet parts, thick from many years
+of unchecked flow.
+~
+E
+ceiling mushrooms~
+Mushrooms grow along the seams of the ceiling stones.
+~
+E
+drip droplet~
+The occasional droplet of water falls from the ceiling and echoes out.
+~
+E
+labyrinth~
+The wholy place is a labyrinth.
+~
+E
+seams~
+The stones come together so well that the seams are all but invisible.
+~
+E
+moss~
+Dead moss clings to the wall.
+~
+E
+north east south west northeast ne southeast se southwest sw northwest nw~
+You can't make sense of the directions in this labyrinth -- it goes on forever.
+~
+M 1 13514 100.00 1
+T 13504
+T 13529
+T 13553
+_
+Wing B side room with water
+~
+S
+#13515
+Lost in the Labyrinth 13515~
+   The long stone corridors are difficult to tell apart. This one stretches on
+into the darkness, splitting into two paths here, though neither looks more
+promising than the other. The occasional sound of scurrying or clatter echoes
+down the hall; otherwise the silence is interrupted only by the infrequent
+sound of dripping.
+~
+bg 0 0 13505
+D14
+~
+0 13505
+D14
+~
+0 13514
+D14
+~
+0 13530
+E
+north east south west northeast ne southeast se southwest sw northwest nw~
+You can't make sense of the directions in this labyrinth -- it goes on forever.
+~
+E
+stone walls~
+   The heavy stone walls bear an alcove every ten paces or so, cut directly
+into the stones with no border.
+~
+E
+corridors halls paths~
+   The corridor extends in long, straight lines, branching only rarely. It's
+difficult to get any sense of direction or find a good path through.
+~
+E
+floor down~
+   The sloped floor is made of the same stone as the walls. A fine layer of
+sand covers parts of it and collects at the edges.
+~
+E
+darkness distance~
+In the distance, you see only darkness.
+~
+E
+sand~
+   A fine layer of sand covers parts of the floor and collects in small piles
+along the edges.
+~
+E
+alcoves~
+   The wall has small alcoves every ten steps, though they hold nothing of
+interest.
+~
+T 13504
+T 13529
+T 13553
+_
+Wing B room 1
+~
+S
+#13520
+Lost in the Labyrinth 13520~
+   The long stone corridors are difficult to tell apart. This one stretches on
+into the darkness away from the makeshift camp, but there is no indication
+where it might lead or if it's the right path.
+~
+bg 0 0 13505
+D14
+~
+0 13505
+D14
+~
+0 13535
+E
+north east south west northeast ne southeast se southwest sw northwest nw~
+You can't make sense of the directions in this labyrinth -- it goes on forever.
+~
+E
+stones walls~
+   The massive stones of the wall come together like a puzzle, fit perfectly
+in a careful arrangement with such fine seams that you couldn't stick a needle
+between them.
+~
+E
+corridors halls paths~
+   The corridor extends in long, straight lines, branching only rarely. It's
+difficult to get any sense of direction or find a good path through.
+~
+E
+floor down~
+   The floor is strewn with sand, which piles up at the edges. The floor is
+sloped gradually downward.
+~
+E
+sand piles~
+   A fine layer of sand covers parts of the floor and collects in small piles
+along the edges.
+~
+E
+darkness distance~
+In the distance, you see only darkness.
+~
+E
+makeshift camp~
+You're quite close to the campsite, such as it is.
+~
+T 13504
+T 13529
+T 13553
+S
+#13523
+A Rancid Pit of Jagged Spikes~
+   There is little space to walk between the long black spikes and the bones
+scattered among them. The gut-churning smell of rotting flesh is thick; this
+pit has fed all too recently. The only hope of escape is the old ladder against
+the wall.
+~
+bdg 0 0 13505
+D8
+~
+0 13524
+E
+spikes spines jagged black~
+   Each spike is nearly as tall as a man, made from some metal too old and
+stained to identify. They're attached securely to the floor at different
+angles, making it all but impossible to survive a fall -- as witnessed by the
+sheer number of bodies.
+~
+E
+bones bodies body corpses flesh rotting~
+   It wouldn't be a simple task to count the number of bodies in this foul pit,
+not least because most have decayed away to bones. Some bodies are fresher, but
+fresh is certainly not the way you'd describe them due to the sheer number of
+maggots.
+~
+E
+pit~
+   The pit slopes down at such a steep angle that the walls cannot be climbed.
+It's square in shape, but you can't tell quite how tall it is. There's only
+darkness above.
+~
+E
+ladder~
+The old metal ladder has a pale green color. It seems sturdy enough.
+~
+E
+walls stones~
+   The enormous stones of the wall are cut at a slight angle -- enough to
+funnel unwary adventurers down to the spikes; too steep to climb again. The
+stones are cut to such a precise shape that there is no mortar between them,
+and no gap where a finger could find traction.
+~
+E
+down floor~
+Bones litter the floor between the spikes.
+~
+E
+up~
+A ladder extends up into the darkness.
+~
+M 1 13533 100.00 8
+M 1 13533 100.00 8
+M 1 13533 100.00 8
+M 1 13533 100.00 8
+M 1 13533 100.00 8
+M 1 13533 100.00 8
+M 1 13533 100.00 8
+M 1 13533 100.00 8
+T 13504
+T 13522
+T 13529
+T 13553
+_
+Wing A trap room
+~
+S
+#13524
+Lost in the Labyrinth 13524~
+   The path comes to a dead end at a solid wall with a small alcove in it. A
+broken statue lies on the floor nearby. In the corner, a small hole in the
+floor -- easily missed at first glance -- bears a ladder down into darkness.
+~
+b 0 0 13505
+D14
+~
+0 13525
+D9
+~
+0 13523
+E
+north east south west northeast ne southeast se southwest sw northwest nw~
+You can't make sense of the directions in this labyrinth -- it goes on forever.
+~
+E
+stones walls~
+   Each wall is made of squared stones of many different sizes, but all are
+enormous. It must've taken the strength of giants to build this place. No gap
+is perceptible between the stones; they meet at perfect seams. There's a small
+alcove in the far wall.
+~
+E
+corridors halls paths~
+The corridor ends here, at a wall.
+~
+E
+floor~
+   The floor is made of identical stone to the wall. Bits of broken statue are
+strewn about below the alcove and loose sand piles in the corners.
+~
+E
+sand corners~
+Loose sand is sprinkled around the floor and collects in the corners.
+~
+E
+darkness distance~
+In the distance, you see only darkness.
+~
+E
+fungus reddish bristles seams~
+   There is a reddish-brown fungus growing along some of the seams between the
+stones of the wall.
+~
+E
+alcove~
+A small alcove recesses into the wall.
+~
+E
+statue broken marble~
+   A marble statue on the floor is broken in three pieces. It seems this one
+depicted a woman with the head of a horse.
+~
+E
+hole ladder~
+There's a small, square hole with an old ladder leading downward.
+~
+E
+down~
+You can't see anything down the hole; it's pitch black.
+~
+E
+up ceiling~
+The ceiling is made of gray stone.
+~
+T 13504
+T 13524
+T 13529
+T 13553
+_
+Wing A side room leading to spike pit
+~
+S
+#13525
+Lost in the Labyrinth 13525~
+   After walking some distance, you find a spot where the long stone corridor
+splits with a T. Each direction looks the same, with massive stones cut to form
+a smooth wall. Where the stones meet, lines of reddish fungus cling to the
+hair-thin seams and bristle as you pass.
+~
+bg 0 0 13505
+D14
+~
+0 13510
+D14
+~
+0 13524
+D14
+~
+0 13540
+E
+north east south west northeast ne southeast se southwest sw northwest nw~
+You can't make sense of the directions in this labyrinth -- it goes on forever.
+~
+E
+corridors halls paths~
+The corridor extends into darkness in three directions.
+~
+E
+T~
+The three corridors meet in a T shape.
+~
+E
+wall stones~
+   The rectangular stones are cut into precise squares and rectangles that meet
+with no mortar. Though, where mortar should be, there's a fungus growing in the
+thin seams.
+~
+E
+fungus reddish bristles seams~
+   A reddish-brown fungus is making a living in the ultra-fine seams of the
+labyrinth wall. It has small shelf-like bits along with redder hairs that
+bristle out toward you when you move too close.
+~
+E
+darkness distance~
+In the distance, you see only darkness.
+~
+E
+sand floor down~
+   A fine layer of sand covers parts of the floor and collects in small piles
+along the edges.
+~
+E
+up ceiling~
+The ceiling is made of gray stone.
+~
+T 13504
+T 13529
+T 13553
+_
+Wing A room 2
+~
+S
+#13529
+Lost in the Labyrinth 13529~
+   The corridor is long and unbending, and eventually reaches its end at a
+stone wall. A small alcove holds what's left of a smashed statue; the rest is
+on the floor in front, resting on a pile of sand. Musty air pours from a hole
+in the stones of the ceiling.
+~
+b 0 0 13505
+D14
+~
+0 13530
+E
+north east south west northeast ne southeast se southwest sw northwest nw~
+You can't make sense of the directions in this labyrinth -- it goes on forever.
+~
+E
+corridors halls paths~
+The corridor extends far past what you can see.
+~
+E
+end wall~
+The path ends abruptly at a stone wall with a small alcove.
+~
+E
+stones walls~
+   The three walls, the floor, and the ceiling are all made of the same massive
+stones -- many of them taller than you are. The stones fit together at square
+edges; surely it must have taken giants to build this place.
+~
+E
+alcove~
+   The alcove is little more than a recessed shelf. It holds the hooves of a
+broken statue.
+~
+E
+statue smashed marble broken~
+   Four uncloven hooves and a baseplate of marble are all that remains of the
+statue in the alcove. The rest of it is merely debris on the floor.
+~
+E
+floor down debris~
+   The floor, always sloping and never flat, is strewn with sand that collects
+along the edges and in the seams between the stones. Littered below the alcove
+are unidentifiable bits of crushed marble.
+~
+E
+sand piles~
+   A thin layer of sand covers parts of the floor and piles at the edges.
+~
+E
+hole ceiling up~
+   The air from the hole in the ceiling is stale. The hole is out of reach and
+doesn't look large enough to pull yourself through.
+~
+E
+darkness distance~
+In the distance, you see only darkness.
+~
+T 13504
+T 13524
+T 13529
+T 13553
+_
+Wing b side room
+~
+S
+#13530
+Lost in the Labyrinth 13530~
+   Two corridors meet at a crossroads here, though one direction is bricked
+off. Every ten steps or so, the stone walls bear an alcove, though most are
+empty save for some broken statues here and there, which also litter the floor.
+~
+bg 0 0 13505
+D14
+~
+0 13515
+D14
+~
+0 13529
+D14
+~
+0 13545
+E
+north east south west northeast ne southeast se southwest sw northwest nw~
+You can't make sense of the directions in this labyrinth -- it goes on forever.
+~
+E
+corridors halls paths~
+The corridor stretches out into the darkness in three directions.
+~
+E
+crossroads~
+Two corridors once crossed here, but one of them is covered with bricks.
+~
+E
+bricks bricked clay~
+One wall here is made from clay bricks, some of which bear scratchmarks.
+~
+E
+doorway~
+There's a doorway through the brick wall.
+~
+E
+stones~
+The interminable stone walls of the labyrinth have an alcove every few steps.
+~
+E
+alcoves~
+   Alcoves recede into the stone walls, providing small shelves that now hold
+only broken statues.
+~
+E
+statues broken marble~
+   Bits and pieces of stone and marble statues sit in the alcoves and litter
+the floors. Here a hand, there an ear, occasionally a hoof or horn. No statue
+remains intact.
+~
+E
+floor down~
+   The floor around the alcoves has broken statues and bits of marble dust. No
+part of the floor is even; it always seems to lead further down.
+~
+E
+up ceiling~
+The ceiling is made of gray stone.
+~
+M 1 13513 100.00 2
+T 13504
+T 13529
+T 13553
+_
+Wing B room 2
+~
+S
+#13534
+Lost in the Labyrinth 13534~
+   Mounds of ash cover much of the floor here, piling up against a brick wall
+and creating some difficulty in walking without kicking up a cloud of the
+stuff. In the stone wall on the left side, there's an alcove just where it
+meets the bricks.
+~
+b 0 0 13505
+D14
+~
+0 13535
+E
+north east south west northeast ne southeast se southwest sw northwest nw~
+You can't make sense of the directions in this labyrinth -- it goes on forever.
+~
+E
+mounds ashes piles dunes sand~
+   Ash mixes with sand on the floor to form small dunes that push up into piles
+against the brick wall. Whatever burned here, there was a lot of it.
+Curiously, there are no scorch marks.
+~
+E
+scorch burn~
+There are no scorch or burn marks here.
+~
+E
+floor down~
+You can hardly see the floor tiles here. Piles of sand and ash cover the floor.
+~
+E
+bricks~
+   Of the three walls here, one is made from traditional brick and mortar and
+set with a doorway.
+~
+E
+stones~
+   Two of the walls are stone, connected to each other by a wall of brick. One
+stone wall has an alcove that abuts the brick wall.
+~
+E
+walls~
+Two of the walls are stone, opposite each other and joined by a wall of brick.
+~
+E
+clouds~
+A low cloud of dust hangs in the air, stirred up by your movements.
+~
+E
+alcove left~
+   The edge of the alcove lines up exactly with the spot where the brick wall
+begins. It's hard to tell what purpose this served; it gives the wall an odd
+asymmetry.
+~
+E
+up ceiling~
+The ceiling is made of gray stone.
+~
+E
+darkness distance~
+In the distance, you see only darkness.
+~
+E
+corridors halls paths~
+The corridor stretches out farther than you can see.
+~
+M 1 13513 100.00 2
+T 13504
+T 13524
+T 13529
+T 13553
+S
+#13535
+Lost in the Labyrinth 13535~
+   The long stone walls of the corridor have recessed shelves set into them,
+though the shelves are largely empty. The path eventually comes to a T and
+split off, but all directions look the same. Some words are etched high on the
+wall, above one of the upper shelves.
+~
+bg 0 0 13505
+D14
+~
+0 13520
+D14
+~
+0 13534
+D14
+~
+0 13550
+E
+north east south west northeast ne southeast se southwest sw northwest nw~
+You can't make sense of the directions in this labyrinth -- it goes on forever.
+~
+E
+stones walls~
+   The walls are made from enormous stones, perfectly carved and hammered so
+that they present one smooth face, with nothing to hold them together except
+their shape and their weight. Shelves are cut into the walls, though their
+purpose seems lost.
+~
+E
+shelf shelves recessed~
+   Countless long shelves have been cut into the stone walls, but they now sit
+empty, save for the occasional lid to a long-lost jar. Some of the shelves have
+old ashes on them.
+~
+E
+jars lids rubble~
+   Here and there, the lid to a clay jar sits on one of the shelves, or a
+potsherd from the jar, but there are no whole jars here. Clay rubble lines the
+edge of the floor; perhaps that was the fate of the jars.
+~
+E
+potsherds sherds shards clay~
+Bits of broken clay jars can be found on the floor and on some of the shelves.
+~
+E
+T corridors halls paths~
+The hallways meet in a T shape.
+~
+E
+words graffiti etchings~
+   You climb all the way up to see what the words say. All that effort just to
+read 'Halfdan wrote this.'
+~
+E
+up ceiling~
+The ceiling is made of gray stone.
+~
+E
+darkness distance~
+In the distance, you see only darkness.
+~
+E
+floor down~
+   The floor has a long, gradual slope. Potsherds and clay dust collect along
+the edges, along with loose sand.
+~
+E
+sand~
+Sand sticks in the seams between the floor stones.
+~
+E
+ashes~
+There are some ashes spread out on the shelves.
+~
+T 13504
+T 13529
+T 13553
+S
+#13539
+Lost in the Labyrinth 13539~
+   You walk for a ways further. The corridor eventually comes to an end at a
+wall with a small alcove, both beset by a colony of rust-red fungus and small
+mushrooms. There's a hole in the ceiling, though not large enough to squeeze
+through.
+~
+b 0 0 13505
+D14
+~
+0 13540
+E
+north east south west northeast ne southeast se southwest sw northwest nw~
+You can't make sense of the directions in this labyrinth -- it goes on forever.
+~
+E
+stones walls~
+   The walls and floor are made from enormous stones, cut perfectly to fit
+together like puzzle pieces, with no gaps. The far wall holds an alcove; both
+the wall and the alcove are covered by a fuzzy red fungus and small mushrooms.
+~
+E
+corridors halls paths~
+The path ends here. In the opposite direction, you can see only darkness.
+~
+E
+floor down~
+Sand covers part of the uneven floor. There are also some small potsherds.
+~
+E
+sand ashes~
+   The floor has a fine layer of sand although, on closer inspection, much of
+this is ash.
+~
+E
+darkness distance~
+In the distance, you see only darkness.
+~
+E
+up chute ceiling hole~
+   The square hole leads up to another chute. You can see nothing up there but
+darkness.
+~
+E
+alcove~
+The wall bears a small alcove covered almost entirely in the fungus.
+~
+E
+fungus rust-red rustred rusted red reddish bristles seams mushrooms~
+   A rust-colored fungus has made a comfortable home on the wall and in the
+alcove. Small mushrooms poke out from it here and there; nothing you'd want to
+eat.
+~
+E
+potsherds pots sherds shards~
+Broken pottery is strewn about the floor, particularly under the alcove.
+~
+T 13504
+T 13524
+T 13529
+T 13553
+S
+#13540
+Lost in the Labyrinth 13540~
+   You eventually come to another T-junction in the corridor, same as the last.
+A glance in each direction reveals no hints; this could easily be the same fork
+at a different angle. The same reddish fungus lines the walls. Even the sand on
+the floor could be the same. Or different.
+~
+bdg 0 0 13505
+D14
+~
+0 13525
+D14
+~
+0 13539
+D14
+~
+0 13555
+E
+north east south west northeast ne southeast se southwest sw northwest nw~
+You can't make sense of the directions in this labyrinth -- it goes on forever.
+~
+E
+T-junction junction fork~
+Three corridors come together in a T shape.
+~
+E
+angle~
+No angle you look at is any different. This place is slightly maddening.
+~
+E
+fungus reddish bristles seams~
+   A reddish-brown fungus is making a living in the ultra-fine seams of the
+labyrinth wall. It has small shelf-like bits along with redder hairs that
+bristle out toward you when you move too close.
+~
+E
+darkness distance~
+In the distance, you see only darkness.
+~
+E
+sand~
+   A fine layer of sand covers parts of the floor and collects in small piles
+along the edges.
+~
+E
+floor down~
+   The stone floor slopes ever so slightly; you can't tell whether a higher or
+lower level counts as progress through the maze.
+~
+E
+corridors halls paths~
+The corridor extends into darkness in three directions.
+~
+E
+walls stones~
+   The rectangular stones are cut into precise squares and rectangles that meet
+with no mortar. Though, where mortar should be, there's a fungus growing in the
+thin seams.
+~
+E
+up ceiling~
+The ceiling is made of gray stone.
+~
+T 13504
+T 13529
+T 13553
+_
+Wing A room 3
+~
+S
+#13544
+Lost in the Labyrinth 13544~
+   A brick wall comes into view as you reach the end of a long corridor. The
+bricks are mortared to the stone side walls at the edges; not so much as a
+whisper of air makes it past. A pair of small alcoves face each other on the
+stone walls.
+~
+b 0 0 13505
+D14
+~
+0 13545
+E
+north east south west northeast ne southeast se southwest sw northwest nw~
+You can't make sense of the directions in this labyrinth -- it goes on forever.
+~
+E
+bricks~
+   The brick wall blocks further progress down this path. It's in poor shape,
+with some of the mortar picked away, but the wall is rather thick and even with
+this damage, there's no way past it.
+~
+E
+stones sides~
+   The long walls of this corridor are made from massive stone, cut to a smooth
+face and placed together without mortar. Two alcoves are cut into the stones
+near the brick wall.
+~
+E
+walls~
+   Two of the walls here are made from enormous stones; the third is a more
+traditional brick and mortar.
+~
+E
+corridors halls paths~
+   The corridor extends for quite a ways in one direction, but ends at a brick
+wall.
+~
+E
+mortar~
+The mortar holding the brick wall together is in poor shape.
+~
+E
+alcoves~
+   Two alcoves sit in the stone walls, facing each other. The floor below both
+alcoves is strewn with bits of smashed marble.
+~
+E
+floor down~
+Bits of broken statuary litter the sloping stone floor.
+~
+E
+statues statuary marble broken~
+   Bits of smashed and broken marble little the floor near the alcoves. Few
+bits of the rubble are recognizable; one of the statues might have been a horse
+or a bull.
+~
+E
+up ceiling~
+The ceiling is made of gray stone.
+~
+T 13504
+T 13524
+T 13529
+T 13553
+S
+#13545
+Lost in the Labyrinth 13545~
+   The corridor stretches on and on, never turning, until you come to a
+T-shaped junction. Here, it's difficult to choose a path, as every direction
+runs in a straight line as far as you can see. Beyond that, only darkness. A
+small puddle marks the center of the junction where water drips slowly from a
+seam in the ceiling.
+~
+bdg 0 0 13505
+D14
+~
+0 13530
+D14
+~
+0 13544
+D14
+~
+0 13560
+E
+north east south west northeast ne southeast se southwest sw northwest nw~
+You can't make sense of the directions in this labyrinth -- it goes on forever.
+~
+E
+corridors halls paths~
+   Two corridors meet here -- one that extends in two directions and another
+than intersects it. All three look the same from this vantage point.
+~
+E
+junction T-shaped Tshaped~
+The two corridors meet in a T shape.
+~
+E
+darkness distance~
+In the distance, you see only darkness.
+~
+E
+puddle water~
+   Every couple of minutes, a droplet of water falls from a seam in the ceiling
+and splashes into the puddle with an echoing ping.
+~
+E
+floor down~
+   The stone floor has a puddle in an impression in the center and sand
+collecting near the walls. Here and there, bits of broken marble statues
+decorate the area in front of the alcoves.
+~
+E
+stones walls~
+   The unending stone walls of the labyrinth are at once both unique and the
+same. Each of the massive blocks are bespoke; these were not cut in a factory.
+But no wall can be distinguished from any other. Alcoves line the walls, but
+most are empty.
+~
+E
+alcoves~
+   There's an alcove in the wall every ten paces or so, but most of them
+contain naught but dust.
+~
+E
+sand~
+Sand collects at the edges of the floor.
+~
+E
+statues broken marble~
+   A few bits of broken statue lie at the feet of some of the alcoves, but no
+piece is large enough to identify.
+~
+E
+up ceiling drips droplets seams~
+   The fine seams of the stone ceiling are wet with moisture and release the
+occasional droplet of water.
+~
+E
+impression~
+The water has certainly made an impression on the floor.
+~
+T 13504
+T 13529
+T 13553
+S
+#13546
+Lost in the Labyrinth 13546~
+   The chamber is only large enough for the stone table that sits at its
+center, with little space to stand on any side of it. A narrow archway serves
+as the only entrance or exit, though a chute in the corner looks promising.
+~
+bdg 0 0 13505
+D9
+~
+0 13554
+E
+table~
+   The stone table has a depression in its top that vaguely resembles a person,
+perhaps meant to cradle the head, body, arms, and legs comfortably. A series of
+small channels are cut into this, sloping like a drain toward the foot of the
+table where they meet a spout that drops down to a niche that might once have
+held a bucket.
+~
+E
+chamber~
+   It's one of the only parts of the labyrinth that looks like a small room
+rather than part of the maze.
+~
+E
+center~
+A stone table sits in the center of the room.
+~
+E
+sides~
+There's very little room on the sides.
+~
+E
+archway narrow exit entrance hall~
+A narrow archway with a short hall leads back to the maze.
+~
+E
+chute corner~
+A chute in the corner leads down into darkness.
+~
+E
+floor down slope~
+   The floor is cold stone, sloped slightly toward the corner where there's a
+chute leading downward.
+~
+E
+north east south west northeast ne southeast se southwest sw northwest nw~
+The walls of the chamber are stone. A small archway leads back out.
+~
+E
+stones~
+The whole room is made of stone, from the floor to the walls to the table.
+~
+E
+walls~
+   The walls are made of massive stone, perfectly fit together with straight,
+narrow seams. This chamber is so small that it almost feels like you're in the
+wall rather than the labyrinth.
+~
+E
+cobwebs webs~
+There are cobwebs here and there.
+~
+E
+up ceiling~
+The ceiling is made of gray stone.
+~
+E
+depression cradle~
+   The outline of a person has been carved from the stone table. You could
+almost nap in it, though it doesn't look comfortable.
+~
+E
+channels cuts~
+   Narrow channels are cut into the table, though you see no source of liquid
+for them to drain.
+~
+E
+drain spout foot~
+The channels in the table drain toward a spout at the foot.
+~
+E
+niche bucket~
+   The table looks as if it was meant to drain something into a bucket. The
+bucket itself is long gone, if it ever existed.
+~
+T 13504
+T 13529
+T 13553
+_
+Passage C-A
+~
+S
+#13547
+Lost in the Labyrinth 13547~
+   After a considerable walk, sloping ever downward, you reach a brick wall.
+And here, the corridor ends. A pair of alcoves in the stone side walls flank
+the bricks. A few jars nestle in the small pile of potsherds and sand that rest
+at the lowest spot, against the wall.
+~
+b 0 0 13505
+D14
+~
+0 13549
+E
+north east south west northeast ne southeast se southwest sw northwest nw~
+You can't make sense of the directions in this labyrinth -- it goes on forever.
+~
+E
+corridors halls paths~
+The corridor extends up into the darkess.
+~
+E
+darkness distance~
+In the distance, you see only darkness.
+~
+E
+shelves shelf recessed~
+The shelves ended some ways back up the corridor.
+~
+E
+stones~
+   The epic labyrinthine walls of the maze are made of dark stone, fitted like
+a puzzle into precise shapes that require no mortar. Weight and shape alone
+hold them in place.
+~
+E
+slope~
+The slope of the floor is steep until you reach the very end of the path.
+~
+E
+floor down~
+   A sand bank covers the floor at the lowest point, where the path meets the
+brick wall. Potsherds and old jars fill the sand.
+~
+E
+end bricks~
+   The steep passage ends at a solid brick wall. Its mortar is sloppy and its
+courses uneven, but it's quite sturdy.
+~
+E
+walls~
+   The long stone walls of the corridor end where they meet one made of brick
+and mortar. A pair of alcoves sit in the stone walls, near the end.
+~
+E
+alcoves~
+There is an alcove on each side, just before the stone walls end.
+~
+E
+pots jars~
+A couple of old clay jars rest in the pile of sand and debris. They're empty.
+~
+E
+potsherds sherds shards debris broken~
+   The sand pile is full of the broken remnants of old jars that have rolled
+down over the years.
+~
+E
+sand piles banks~
+   Sand piles up against the brick wall at the bottom of the corridor. It's
+full of other debris that has ended its journey here.
+~
+T 13504
+T 13524
+T 13529
+T 13553
+S
+#13548
+Lost in the Labyrinth 13548~
+   After some distance, the corridor ends at a stone wall with a small,
+recessed alcove. The shelves in the side walls are smaller here, not larger
+than your head, though there are dozens of them. The shelves are bare except
+the occasional cobweb or candle stub. Words are etched above the alcove.
+~
+b 0 0 13505
+D14
+~
+0 13549
+E
+north east south west northeast ne southeast se southwest sw northwest nw~
+You can't make sense of the directions in this labyrinth -- it goes on forever.
+~
+E
+corridors halls paths~
+The corridor extends back into the darkness.
+~
+E
+stones walls~
+   The cyclopean walls of the labyrinth are made of massive stones, cut to
+different-sized rectangles and squares, and fitted together without any mortar.
+Dozens of small shelves are cut into the walls here, though most are empty.
+~
+E
+shelves shelf recessed~
+   Many small shelves have been cut into the stone walls in neat rows and
+columns. Each shelf is only about the size of your head, but nothing of any
+important sits on any of them.
+~
+E
+alcove~
+   The alcove is larger than the other shelves. It sits alone in the end wall,
+though some words are etched above it.
+~
+E
+words graffiti etchings writing~
+You stretch to read the etchings, but find they only say 'Halfdan is best.'
+~
+E
+cobwebs webs~
+Cobwebs decorate the corners of the many shelves.
+~
+E
+candles stubs~
+The stubs of long-melted candles sit on some of the shelves.
+~
+E
+floor down slope~
+The floor slopes downward away from the wall.
+~
+E
+sand seams~
+A fine layer of sand clings to the floor in places and lodges in the seams.
+~
+E
+darkness distance~
+In the distance, you see only darkness.
+~
+E
+up ceiling~
+The ceiling is made of gray stone.
+~
+T 13504
+T 13524
+T 13529
+T 13553
+S
+#13549
+Lost in the Labyrinth 13549~
+   The stone hallway continues on and on before eventually coming to another
+junction. In all directions, the walls bear shelves that are empty save for a
+few bones or empty jars. The floor slopes slightly here, as everywhere in this
+puzzling place. There's no way to tell how far underground you are now.
+~
+bg 0 0 13505
+D14
+~
+0 13550
+D14
+~
+0 13547
+D14
+~
+0 13548
+E
+north east south west northeast ne southeast se southwest sw northwest nw~
+You can't make sense of the directions in this labyrinth -- it goes on forever.
+~
+E
+stones walls~
+   The stone walls are made from enormous stones, chiseled away to create the
+long rows of shelves that line all of these halls.
+~
+E
+shelves shelf recessed~
+   The shelves, which recess into the stone walls, must have held something
+once. But now all you find is the occasional bone or lid.
+~
+E
+jars lids pots clay~
+Here and there, you find a lid or an empty clay jar on the shelves.
+~
+E
+potsherds sherds shards~
+The floor has some shards of broken pottery.
+~
+E
+T~
+The hallways meet in a T shape.
+~
+E
+words graffiti etchings writing~
+   You find that someone has etched the words 'Good times to be had with the
+sister of Olav' in one of the shelves.
+~
+E
+corridors halls paths~
+The corridor splits into two more identical directions.
+~
+E
+floor down slope~
+   The ever-sloping floor leads up in one direction and down in two others, but
+it hardly matters.
+~
+E
+ashes ash~
+   Ashes decorate the otherwise empty shelves here and there, and there's
+plenty on the floor as well.
+~
+E
+sand~
+Sand intermingles with ash on the floor, especially along the edges.
+~
+E
+bones~
+Here and there, an old and well-gnawed bone rests on one of the shelves.
+~
+E
+darkness distance~
+In the distance, you see only darkness.
+~
+E
+up ceiling~
+The ceiling is made of gray stone.
+~
+T 13504
+T 13529
+T 13553
+S
+#13550
+Lost in the Labyrinth 13550~
+   The corridor stretches on, long, straight, and lined with empty shelves.
+Eventually you come to another T and it splits. Each path looks the same from
+here. A drip echoes in the distance; you're not sure from which direction.
+~
+bdg 0 0 13505
+D14
+~
+0 13535
+D14
+~
+0 13549
+D14
+~
+0 13565
+E
+north east south west northeast ne southeast se southwest sw northwest nw~
+You can't make sense of the directions in this labyrinth -- it goes on forever.
+~
+E
+corridors halls paths~
+   The corridors meet to form a T, but each direction looks the same: stone
+walls, shelves, and darkness.
+~
+E
+darkness distance~
+In the distance, you see only darkness.
+~
+E
+up ceiling~
+The ceiling is made of gray stone.
+~
+E
+shelves recessed shelf~
+   The shelves are cut directly into the enormous stones of the walls. There's
+little on them: a candle stub here, a bit of ash there.
+~
+E
+candle stub~
+   You find the melted stub of a candle on one of the shelves. There's not
+enough left to burn.
+~
+E
+ashes~
+Here and there, you find a little ash on the shelves.
+~
+E
+stones walls~
+   The massive stone blocks that form the walls must have taken giants to move
+them. Artisans put many hours of toil and skill into squaring them off and
+fitting them together. The walls have no mortar, only fine seems where the
+rocks meet.
+~
+E
+floor down~
+   Along the stone floors, sand collects in the seams and bits of broken clay
+litter the edges. The floor has a slow, gradual slope as the labyrinth leads
+further and further underground.
+~
+E
+clay broken pots jars potsherds sherds shards~
+Broken bits of clay -- perhaps pots or jars -- litter the edges of the floor.
+~
+E
+sand~
+   Sand is strewn about the floor, collecting especially in the seams between
+the stones.
+~
+E
+seams~
+   The stones of the walls and floor have only the thinnest seams. Sand
+collects here on the floor.
+~
+T 13504
+T 13529
+T 13553
+S
+#13553
+Lost in the Labyrinth 13553~
+   The path extends in darkness for some distance before ending abruptly at a
+brick wall. Sand on the floor is thicker here. A faint trail leads to the
+corner where the bricks meet stone.
+~
+bg 0 0 13505
+D14
+~
+0 13554
+E
+north east south west northeast ne southeast se southwest sw northwest nw~
+You can't make sense of the directions in this labyrinth -- it goes on forever.
+~
+E
+corridors halls paths~
+The corridor extends away from the brick wall, on into darkness.
+~
+E
+darkness distance~
+In the distance, you see only darkness.
+~
+E
+bricks~
+   It's a fairly standard wall made from clay bricks and simple mortar. Some of
+the bricks are damaged. Someone must've tried to get through the wall at some
+point, but it's quite solid.
+~
+E
+damage~
+The wall has damage from a pick or something similar. It didn't get very far.
+~
+E
+stones~
+   The two long, parallel walls are cyclopean -- that is, made from giant
+stones and cut to fit together without mortar.
+~
+E
+walls~
+   The side walls of this corridor are made from enormous stones and fitted
+together without any binder between them, in contrast to the wall that blocks
+passage at the end, which is made from brick and mortar.
+~
+E
+sand floor~
+   Sand piles up against the wall and covers much of the floor. There's an old
+trail that seems to lead to the corner.
+~
+E
+trail~
+   There's an old trail through the sand, like someone was coming back and
+forth. Not recent. Maybe someone was camped out here at some point. Perhaps if
+you search around for more...
+~
+E
+corner~
+   You don't see anything special about the corner where the trail ends. The
+bricks are mortared directly to the stone. There is a little breeze coming
+through, though. Perhaps if you search around for more...
+~
+E
+up ceiling soot~
+The ceiling stones are stained with soot.
+~
+T 13504
+T 13553
+T 13529
+_
+Wing A side room leading to secret passage
+~
+S
+#13554
+Lost in the Labyrinth 13554~
+   The long stone corridor may have once branched here as you come across an
+archway that is fully covered with uneven bricks. Opposite that, the wall has a
+small alcove with a broken jar.
+~
+b 0 0 13505
+D14
+~
+0 13555
+D14
+~
+0 13553
+E
+north east south west northeast ne southeast se southwest sw northwest nw~
+You can't make sense of the directions in this labyrinth -- it goes on forever.
+~
+E
+alcove shelf~
+   There's a small alcove cut directly into the stones of the wall. The pieces
+of a broken clay jar are scattered on the shelf.
+~
+E
+jar broken pieces~
+A broken clay jar sits in the alcove. There's no indication what it once held.
+~
+E
+stones walls~
+   The walls here are made from cyclopean stones, enormous and perfectly fitted
+together. All walls, that is, save for one. One wall here has an archway that
+has been bricked off.
+~
+E
+bricks bricked archway mortar uneven~
+   An archway to the side has been covered over completely with bricks, hastily
+mortared together to keep something out -- or in.
+~
+E
+corridors halls paths~
+   This corridor is long and unbranching. At least, it is now. An archway
+indicates there was once another path here.
+~
+E
+floor down~
+   The floor slopes ever so slightly downward. There's sand in places, mostly
+stuck in the floor seams or piled along the edges.
+~
+E
+sand ash~
+   There's some sand on the floor, although a close inspection suggests it may
+be mixed with ash.
+~
+E
+darkness distance~
+In the distance, you see only darkness.
+~
+E
+seams~
+   The hair-thin seams between the stones of the floor have trapped bits of
+sand.
+~
+E
+up ceiling~
+There's a chute in the ceiling, too high to reach.
+~
+E
+chute~
+You can see only darkness in the chute above.
+~
+T 13504
+T 13524
+T 13529
+T 13507
+T 13553
+_
+Wing A side wing leading to secret passage
+~
+S
+#13555
+Lost in the Labyrinth 13555~
+   After some time, the long, straight corridor splits into a side path with a
+T. It might originally have been a four-way intersection, but one side was
+bricked over long ago. Footsteps echo in the distance -- perhaps yours, perhaps
+not. Each direction looks identical from here. There isn't so much as a
+footprint in the sand to follow.
+~
+bg 0 0 13505
+D14
+~
+0 13540
+D14
+~
+0 13554
+D14
+~
+0 13570
+E
+north east south west northeast ne southeast se southwest sw northwest nw~
+You can't make sense of the directions in this labyrinth -- it goes on forever.
+~
+E
+corridors halls paths~
+   The corridor stretches out as far as you can see in all three directions.
+But that isn't very far. A fourth direction is blocked by a brick wall.
+~
+E
+bricks clay mortar~
+   There might once have been a fourth path here, but it's covered by a wall
+made of clay bricks, hastily mortared together long ago.
+~
+E
+darkness distance straight~
+In the distance, you see only darkness.
+~
+E
+side~
+Each side you look at is the same.
+~
+E
+footprints prints~
+There don't seem to be any footprints.
+~
+E
+sand~
+   A fine layer of sand covers parts of the floor and collects in small piles
+along the edges.
+~
+E
+walls stones~
+   The rectangular stones are cut into precise squares and rectangles that meet
+with no mortar. Though, where mortar should be, there's a fungus growing in the
+thin seams.
+~
+E
+fungus reddish bristles seams~
+   A reddish-brown fungus is making a living in the ultra-fine seams of the
+labyrinth wall. It has small shelf-like bits along with redder hairs that
+bristle out toward you when you move too close.
+~
+E
+floor down~
+The floor is sloped, gradually leading further down.
+~
+E
+up ceiling~
+The ceiling is made of gray stone.
+~
+T 13504
+T 13529
+T 13553
+_
+Wing A room 4
+~
+S
+#13558
+Lost in the Labyrinth 13558~
+   The walls are much closer here than anywhere else in the labyrinth. The dark
+stone walls are the usual distance apart, but you find yourself sandwiched
+between two walls of brick that are so close you can touch them both at once.
+A hole in the floor leads down into another corridor.
+~
+bg 0 0 13505
+D9
+~
+0 13559
+E
+walls~
+Walls enclose you on all sides.
+~
+E
+stones~
+   The maze's cyclopean architecture is barely visible in this tiny section,
+but it's here. The two short walls are made from the same massive stones that
+make up all the labyrinth's hallways.
+~
+E
+sandwich~
+You must be hungry.
+~
+E
+bricks~
+   The long walls in this tiny area are made from bricks. A few bricks are
+stacked on the floor, apparently having been removed from one of the walls to
+form a passageway.
+~
+E
+hole floor down~
+   A simple rope ladder dangling through the square hole will allow you to
+descend to one of the labyrinth's many corridors.
+~
+E
+corridors halls paths~
+The corridor is blocked off in all directions except down.
+~
+E
+mortar~
+Some of the mortar has been removed from around the bricks.
+~
+E
+up ceiling~
+There's a chute in the ceiling that leads up into darkness.
+~
+M 1 13518 100.00 1
+T 13504
+T 13558
+T 13529
+T 13553
+S
+#13559
+Lost in the Labyrinth 13559~
+   A hand reaches up from a pile of stone rubble where this long corridor comes
+to an end. More debris lies beneath the series of alcoves that line the walls,
+some of it recognizable bits of long-shattered statues. A cool draft blows
+through, carrying the smell of rot and ruin.
+~
+b 0 0 13505
+D14
+~
+0 13560
+E
+north east south west northeast ne southeast se southwest sw northwest nw~
+You can't make sense of the directions in this labyrinth -- it goes on forever.
+~
+E
+rope ladder~
+A rope ladder hangs from the chute in the ceiling.
+~
+E
+ceiling up~
+A chute in the ceiling leads upward into darkness.
+~
+E
+hand~
+A stone hand protrudes from the rubble of a broken statue.
+~
+E
+pile stone rubble debris~
+   Broken bits of stone lie at the base of each alcove, though it's small
+compared to the piles at the end of the hall. Chisel marks make it impossible
+to identify the statues; no crumb can be identified as a head or face. But the
+occasional finger suggests these were statues of people.
+~
+E
+statues statuary broken smashed~
+Many statues were smashed here.
+~
+E
+alcoves~
+   Alcoves line the long walls, never more than 10 steps apart. There is also
+an alcove in the final wall of the passage.
+~
+E
+darkness distance~
+In the distance, you see only darkness.
+~
+E
+sand~
+The floor is strewn with sand.
+~
+E
+floor down~
+   The floor is uneven, but generally flat compared to the sloping floors of
+the rest of the labyrinth. It's made from stone and strewn with smashed
+statues.
+~
+E
+corridors halls paths~
+The path ends here.
+~
+E
+stones walls~
+   The labyrinth's stone walls are impressive at every step. Giants must have
+built this.
+~
+T 13504
+T 13524
+T 13529
+T 13553
+_
+   Gains 'A rope ladder leads up into the chute above.' in its long desc from
+trigger 13558 if the secret passage opens.
+~
+S
+#13560
+Lost in the Labyrinth 13560~
+   After some time, you come to another T-junction in the interminable
+corridor. Where the path splits, the stone wall bears an elaborate scene,
+carved in relief, depicting some sort of procession. Alcoves sit empty on
+either side of the scene.
+~
+bg 0 0 13505
+D14
+~
+0 13545
+D14
+~
+0 13559
+D14
+~
+0 13575
+E
+north east south west northeast ne southeast se southwest sw northwest nw~
+You can't make sense of the directions in this labyrinth -- it goes on forever.
+~
+E
+T-junction junction~
+Two corridors meet squarely in front of the relief.
+~
+E
+corridors halls paths~
+Three paths diverge here, leading only to darkness.
+~
+E
+wall scene carving carved relief mural procession~
+   The elaborate scene is at least ten feet wide and shows dozens of people in
+an elaborate, multi-line procession. Curiously, someone has chiseled off all
+the heads, as well as some of the objects held in the figures' hands.
+~
+E
+faces heads~
+The heads on the relief have all been chiseled off.
+~
+E
+stones walls~
+   The walls are made of massive stones, squared off at their faces and joined
+together so precisely that there is no mortar or gap between them. Where the
+corridor splits, the stones have been carved in an intricate relief.
+~
+E
+floor down~
+Sand drifts line the cold, uneven stone floor.
+~
+E
+sand drifts~
+   The floor is strewn with loose sand which forms wave-like drifts near the
+junction.
+~
+E
+darkness distance~
+In the distance, you see only darkness.
+~
+E
+up ceiling~
+The ceiling is made of gray stone.
+~
+E
+alcoves~
+   Empty alcoves flank the carved wall. Beyond those, there's another alcove
+every ten steps or so.
+~
+T 13504
+T 13529
+T 13553
+S
+#13563
+Lost in the Labyrinth 13563~
+   Dust hangs heavy in the stale air where the cooridor ends at a pile of old
+clay jars spilled out across the stone floor -- big ones, little ones, but
+mostly broken ones. Part of the floor is cleared off, from the alcove in the
+far wall, forward, but it's difficult to walk without stepping on potsherds.
+~
+b 0 0 13505
+D14
+~
+0 13564
+E
+north east south west northeast ne southeast se southwest sw northwest nw~
+You can't make sense of the directions in this labyrinth -- it goes on forever.
+~
+E
+dust air~
+   The faint smell of burnt dust permeates your nostrils as you walk through
+the hazy air.
+~
+E
+corridors halls~
+   The corridor comes to end at a heavy stone wall with an alcove cut into it.
+It slopes upwards away from the wall, into the darkness.
+~
+E
+floor down slope~
+   The floor has a gradual slope upward, away from the dead end. There's only a
+small path of clear space through the pile of jars.
+~
+E
+piles broken smashed jars pots lids clutter clay~
+   Jars of all sizes are piled up here, all empty. Many of them are chiped or
+broken. None are matched with their lids, which are scattered amongst the
+clutter.
+~
+E
+clearing cleared~
+A path has been cleared between piles of jars.
+~
+E
+end~
+The wall at the end is made of stone, with an alcove set into it.
+~
+E
+stones walls~
+   The walls are made of massive stones which have been pieced together like a
+puzzle. The square edges are perfectly matched together to the point that there
+are no gaps and it requires no mortar.
+~
+E
+mortar~
+There isn't any mortar.
+~
+E
+shelves shelf recessed~
+The shelves ended a little ways back.
+~
+E
+alcove~
+An alcove is recessed into the stone wall at the end of the hall.
+~
+E
+potsherds sherds shards~
+Potsherds are strewn across the floor.
+~
+E
+darkness distance~
+In the distance, you see only darkness.
+~
+E
+up ceiling~
+The ceiling is made of gray stone.
+~
+T 13504
+T 13524
+T 13529
+T 13553
+S
+#13564
+Lost in the Labyrinth 13564~
+   Water pools on one of the long shelves cut into the stone wall, dripping on
+occasion as it seeps through unseen gaps. The shelves line both sides of the
+corridor for as far as you can see, though they sit bare and empty.
+~
+bg 0 0 13505
+D14
+~
+0 13565
+D14
+~
+0 13563
+E
+north east south west northeast ne southeast se southwest sw northwest nw~
+You can't make sense of the directions in this labyrinth -- it goes on forever.
+~
+E
+water pools~
+   A shallow pool of water sits in a depression in one of the stone shelves.
+It's too shallow to scoop even a handful out.
+~
+E
+drips dripping~
+   Every few momentsm, a drip echoes out as a mote of water falls into the
+shallow pool.
+~
+E
+gaps~
+   You can find no gaps in the stone walls. Each block fits perfectly with the
+one next to it.
+~
+E
+stones walls~
+   The walls are expertly crafted from massive hand-worked stones. It would
+take giants to move even one of these.
+~
+E
+unseen~
+You try to see the unseen, but fail.
+~
+E
+shelves shelf recessed~
+   Long shelves stretch out in the stone walls, cut deep enough to store many
+different things. But they don't. The shelves sit empty, except for the
+occasional melted candle stub or pool of water.
+~
+E
+candle stub melted~
+The melted remains of old candles sit on some of the shelves.
+~
+E
+potsherds sherds shards clay broken~
+Bits and pieces broken clay can be found along the bases of the walls.
+~
+E
+corridors halls paths~
+The corridor stretches out in two identical directions from here.
+~
+E
+darkness distance~
+In the distance, you see only darkness.
+~
+E
+up ceiling~
+The ceiling is made of gray stone.
+~
+E
+sand piles~
+A fine layer of sand covers parts of the floor and piles at the edges.
+~
+E
+floor down slope~
+   The floor has a slight slope, always leading you further and further down.
+Sand and potsherds cover parts of the floor, especially along the edges.
+~
+E
+words graffiti etchings writing~
+   As you search the shelves, you find someone has carved with words 'Halfdan
+loves Ingr' into the stone.
+~
+T 13504
+T 13529
+T 13553
+S
+#13565
+Lost in the Labyrinth 13565~
+   After some time, you come to a T-junction in the interminable hall. The dark
+stone walls bear long shelves cut directly from the rock. An archway in one
+wall is covered up in bricks; it's the only feature that distinguishes this
+spot from anywhere else in this corridor.
+~
+bg 0 0 13505
+D14
+~
+0 13550
+D14
+~
+0 13564
+D14
+~
+0 13580
+E
+north east south west northeast ne southeast se southwest sw northwest nw~
+You can't make sense of the directions in this labyrinth -- it goes on forever.
+~
+E
+T-junction corridors halls paths~
+The corridors run in three directions from here, all identical.
+~
+E
+stones~
+   The labyrinth is made from enormous stone, fitted together perfectly, like a
+jigsaw puzzle. The stonework is so precise that you could hardly fit a single
+hair into the seams.
+~
+E
+bricks archway~
+   At some point, an archway was covered up with bricks. The mortar is sloppy
+and the brick rows crooked, but the wall feels sturdy enough. There's some
+damage where someone tried to get through at some point.
+~
+E
+damage~
+   The wall damage doesn't look recent, but someone tried to get through the
+bricks.
+~
+E
+walls~
+   The walls are covered in recessed shelves. The only spot that's different is
+the archway, but it's covered in bricks.
+~
+E
+shelves shelf recessed~
+   Long, empty shelves are cut directly into the stone walls. Here and there,
+you find an empty pot or a stray lid, but little else.
+~
+E
+pots lids jars~
+   You find a stray clay pot; it's empty. On another shelf, there's a lid, but
+it doesn't match the jar.
+~
+E
+clay potsherds sherds shards bits~
+Broken bits of clay -- likely from old pots -- litter the floor.
+~
+E
+floor down~
+   Potsherds and bits of broken clay litter the stone floors. The floor has a
+long, gradual slope to it. You can't tell how far underground you are.
+~
+E
+sand~
+There's some sand stuck in the floor seams.
+~
+E
+words graffiti etchings~
+   You search around and find some graffiti but all it says is 'Sven's mother
+works my-'
+~
+E
+darkness distance~
+In the distance, you see only darkness.
+~
+E
+up ceiling~
+The ceiling is made of gray stone.
+~
+T 13504
+T 13529
+T 13553
+S
+#13570
+Lost in the Labyrinth 13570~
+   The long, straight corridor ends abruptly at a brick wall, mismatched
+against the cyclopean stones of the labyrinth's corridors. Whether that means
+you've reached the center or the edge is anybody's guess. The side wall bears a
+small alcove.
+~
+b 0 0 13505
+D14
+~
+0 13555
+E
+north east south west northeast ne southeast se southwest sw northwest nw~
+You can't make sense of the directions in this labyrinth -- it goes on forever.
+~
+E
+corridors halls paths~
+The corridor extends off into the darkness.
+~
+E
+floor down~
+   The floor is made of the same stone as the walls and strewn with sand, which
+collects at the edges. It slopes upwards from here, away from the brick wall.
+~
+E
+sand~
+   A fine layer of sand covers parts of the floor and collects in small piles
+along the edges.
+~
+E
+darkness distance~
+In the distance, you see only darkness.
+~
+E
+fungus reddish bristles seams~
+   A reddish-brown fungus is making a living in the ultra-fine seams of the
+labyrinth wall. It has small shelf-like bits along with redder hairs that
+bristle out toward you when you move too close.
+~
+E
+stones~
+   The walls to your sides are made of large, rectangular stones, cut perfectly
+to fit together without mortar and with only the thinnest seams.
+~
+E
+alcove~
+An alcove in the wall might once have held something, but now it sits empty.
+~
+E
+up ceiling~
+The ceiling is made of gray stone.
+~
+E
+bricks~
+   A wall of clay bricks blocks the end of the corridor. Gaps in the mortar
+allow a little air through, but the wall is solid.
+~
+E
+walls~
+The long stone walls end at a wall of bricks.
+~
+E
+gaps mortar~
+   Stale air passes through gaps in the mortar of the brick wall, but the wall
+is quite solid.
+~
+T 13504
+T 13524
+T 13529
+T 13553
+_
+Wing A room 5 / end - possible boss path
+~
+S
+#13575
+Lost in the Labyrinth 13575~
+   You reach the end of the corridor, where a stunning mosaic covers much of
+the floor, save for a few spaces where tiles are missing. Alcoves decorate the
+long stone walls, though most are empty. The far wall is made of brick, with
+small gaps in the mortar that allow a stale breeze to blow through.
+~
+b 0 0 13505
+D14
+~
+0 13560
+E
+north east south west northeast ne southeast se southwest sw northwest nw~
+You can't make sense of the directions in this labyrinth -- it goes on forever.
+~
+E
+end bricks~
+   The path ends at a brick wall. The bricks are old and broken in places, but
+the wall remains sturdy.
+~
+E
+mosaic stunning floor down~
+   The floor is paved with a mosaic of colorful tiles depicting a man and
+woman, though their heads and feet are missing. Indeed, sections of tile have
+been removed all over the mosaic.
+~
+E
+alcoves~
+   Alcoves recess into the stone walls roughly every ten steps for as far as
+you can see into the darkness.
+~
+E
+walls~
+The labyrinth's cyclopean walls end at one made of ordinary brick.
+~
+E
+mortar gaps~
+Gaps in the mortar allow stale air through the brick wall.
+~
+E
+up ceiling~
+The gray stone ceiling has a small hole high above you, well out of reach.
+~
+T 13504
+T 13524
+T 13529
+T 13553
+S
+#13580
+Lost in the Labyrinth 13580~
+   The long stone corridor comes to an end at another brick wall. Some of the
+bricks are damaged at the edge, leaving chunks on the ground. To the side, an
+alcove recesses into the stone wall. Ash is strewn across the floor except near
+the brick wall, where a soft breeze has blown the floor clear.
+~
+b 0 0 13505
+D14
+~
+0 13565
+E
+north east south west northeast ne southeast se southwest sw northwest nw~
+You can't make sense of the directions in this labyrinth -- it goes on forever.
+~
+E
+corridors halls paths~
+   Another dead end in the endless halls. In the other direction, it just
+stretches out straight into the darkness.
+~
+E
+stone~
+   The two side walls are made of stone by masterful -- and presumably massive
+-- masons. The stones meet at near-perfect seams with no gap, in contrast to
+the shoddy brickwork of the third wall. High up on the stone wall, it looks
+like someone has carved some words.
+~
+E
+bricks~
+   A brick wall bars further passage. The courses are uneven and the mortar
+globs up; someone was only concerned with closing this off quickly. Where it's
+damaged, you can see the wall is more than one layer thick.
+~
+E
+mortar globs~
+   The brick wall is held together by sloppy, uneven mortar that was never
+cleaned up at the end.
+~
+E
+damage edge~
+   Someone must have taken a maul to the brick wall at some point. Broken
+bricks lie at the ground. The damage reveals that the wall is many layers
+thick.
+~
+E
+chunks ground ash floor down~
+   The floor is littered with bits of broken bricks and a thin layer of ash,
+except around the wall, where gaps in the mortar allow a small breeze through.
+~
+E
+breeze~
+Well, you can't really see a breeze.
+~
+E
+alcove~
+   A narrow alcove is cut from the stone wall on one side. This might have
+served as a shelf for something once. Someone has carved some words up above
+the alcove.
+~
+E
+walls~
+A pair of stone walls end at one made of brick.
+~
+E
+darkness distance~
+In the distance, you see only darkness.
+~
+E
+up ceiling~
+The ceiling is made of gray stone.
+~
+E
+sand~
+There's a little sand on the floor, mixed with ash.
+~
+E
+ashes~
+Ashes cover much of the stone floor.
+~
+E
+shelves shelf recessed~
+The long, recessed shelves in the stone walls end well short of the brick wall.
+~
+E
+words graffiti etchings writing~
+   You use the alcove to climb up and read the words but you can only make out
+part of a name, '-fdan'.
+~
+T 13504
+T 13524
+T 13529
+T 13553
+S
+#13590
+The Chamber at the Center of the Labyrinth~
+   The narrow passage releases you into an oval chamber built from massive
+stone blocks. Compared to the low, narrow corridors of the labyrinth, this
+place is a palace. A foul stench permeates the stale air and sticks to your
+clothing; this place has been closed off a time. Low dust clouds rise from the
+layer of sand covering the floor, which is thin enough in places to see the
+stones beneath. Bricked-up archways encircle the chamber. There's an old ladder
+attached to one wall.
+~
+cdgk 0 0 13505
+D8
+~
+0 13591
+E
+chamber beehive~
+   It's a rather large chamber compared to the rest of the labyrinth, rising
+upward in a beehive shape, coming together near the top where the ladder exits.
+~
+E
+stone blocks~
+   The cyclopean chamber is entirely made from enormous stone blocks, each one
+perfectly shaped to come together like a puzzle. Alcoves cover the higher
+walls, each with a statue in it.
+~
+E
+alcoves statues~
+   The beehive-like chamber has many alcoves spiraling up toward the ceiling.
+Many are filled with statues, notably including a winged horse, a winged bull,
+a winged man, and a winged woman. All the lower statues have been destroyed,
+however so the alcoves nearest the floor have little more than feet and ankles.
+~
+E
+sand floor~
+The floor is covered in fine arena sand.
+~
+E
+stones walls~
+   Like the rest of the labyrinth, this chamber is built with cyclopean
+architecture: tremendously large blocks, many of them taller than you are, are
+cut so exactly that they meet at a hairline seam with no mortar or binder. The
+stones are dark.
+   The lowest part of the wall has a series of archways, each one bricked over
+long ago.
+~
+E
+ladder~
+   The ladder is metal -- perhaps bronze -- but age and water have left it
+stained and encrusted. Still, it may be the only way out.
+~
+E
+up shaft ceiling~
+A ladder extends into a dark shaft above.
+~
+E
+dust~
+Dust hangs low in the air.
+~
+E
+archways bricks~
+   The archways that encircle the lowest part of the wall are completely
+covered by mortared brick walls. One section has been damaged to the point that
+it forms a narrow passageway out of the chamber.
+~
+E
+mortar~
+   Though the brick walls in the archways are held together by mortar, the
+remainder of this enormous chamber is made of stones that fit together so well
+that there are barely even seams.
+~
+E
+jars shattered potsherds sherds shards debris piles~
+   Potsherds pile up near the passage, where shattered jars sit in a pile of
+ash and debris.
+~
+E
+ashes~
+   The floor has a fine layer of ash. Piles of ashes and potsherds line the
+wall near the passage.
+~
+E
+floor down~
+   The stone floor is covered in a fine layer of ash, disturbed by the many
+footprints of the pacing minotaur.
+~
+E
+footprints prints~
+   The minotaur's hefty foot prints are visible in the layer of fine ash on the
+floor.
+~
+M 1 13504 100.00 1
+M 0 13510 100.00 1
+M 1 13515 100.00 1
+T 13553
+_
+Boss arena
+~
+S
+#13591
+Climbing~
+   The old ladder is sturdy. You climb through a square shaft, gradually
+narrowing, high above the minotaur's arena but still well below the temple.
+Still, a wisp of cool, fresh air gives reason to hope that freedom is within
+your reach.
+~
+bdgk 0 0 13505
+D9
+~
+0 13590
+D8
+~
+0 13592
+E
+ladder~
+The metal ladder is old and encrusted with lime, but it's sturdy.
+~
+E
+shaft square~
+The shaft narrows as it rises.
+~
+E
+up~
+You think you see light up ahead.
+~
+E
+down~
+You've climbed so far that you can hardly see the chamber below.
+~
+S
+#13592
+In the Temple Rafters~
+   The ladder ends at a hefty timber beam above the temple. That must have been
+a maintenance shaft or perhaps the chimney of an old hypocaust. The air here is
+fresh, almost crisp. The rafters lead on a bit further, where they might be low
+enough to jump down.
+~
+cg 0 0 -1
+D9
+~
+0 13591
+D2
+~
+0 13593
+E
+ladder~
+An old metal ladder is attached to the rafters, leading down into the depths.
+~
+E
+timber beams~
+The timber beams, wide enough for you to walk easily, seem sturdy enough.
+~
+E
+shaft chimney~
+A shaft descends downward into darkness.
+~
+E
+hypocaust~
+The shaft might have been part of an old system to heat the temple walls.
+~
+E
+rafters~
+The rafters are made from huge timber beams.
+~
+E
+down temple~
+You're high above the temple floor, in the rafters.
+~
+S
+#13593
+In the Temple Rafters~
+   It's hard to see how extensive the rafters are from down in the temple, but
+now that you're up here, they seem to go on forever. The timber beams are
+sturdy enough to hold your weight, but it looks like you could also safely jump
+down from here.
+~
+cdg 0 0 -1
+D0
+~
+0 13592
+E
+rafters~
+The rafters are made of huge timber beams.
+~
+E
+timber beams~
+The beams are wide and sturdy.
+~
+E
+down~
+You're high above the temple, but there's room to jump down here.
+~
+E
+temple~
+You're high above the temple, in the rafters.
+~
+T 13593
+S
+$

@@ -1,0 +1,117 @@
+#13502
+oh chute~
+4 0
+0 0 0 0
+T5
+...$e is falling down the chute!~
+S
+#13514
+Barrel Water~
+1 0
+0 0 2 1
+T0
+stale water~
+T1
+murky~
+S
+#13520
+on fire~
+4 0
+65 0 0 0
+T0
+You manage to pat out the last of the flames.~
+T5
+...$e's on fire!~
+S
+#13523
+spike trap~
+4 0
+0 0 0 0
+T0
+You manage to free yourself from the spikes.~
+T1
+$n manages to free $mself from the spikes.~
+T5
+...$e is impaled on the spikes!~
+S
+#13524
+deep underground~
+4 0
+0 0 0 0
+S
+#13525
+gnawing hex~
+4 0
+0 0 0 0
+S
+#13533
+bubbly~
+4 0
+0 0 0 0
+T0
+The bubbly feeling fades and you sink back toward the ground.~
+T1
+$n lands back on the ground.~
+T2
+You feel your feet leave the ground as you float up into the air!~
+T3
+$e floats up into the air!~
+T5
+...$e's floating in the air.~
+S
+#13538
+death's shadow~
+4 0
+0 0 0 0
+T0
+The cold approach of death no longer troubles you.~
+T2
+You feel the cold approach of death...~
+T5
+...$e looks pale.~
+S
+#13544
+acid spray~
+4 0
+13542 0 0 0
+T0
+The acid is finally neutralized.~
+T5
+...$e's covered in sizzling acid!~
+S
+#13548
+mirror spider venom~
+4 0
+13548 0 0 0
+T0
+The pain from your spider bite begins to subside.~
+T2
+The wound burns!~
+S
+#13551
+monstrous centipede venom~
+4 0
+66 0 0 0
+T0
+You feel less sluggish.~
+T2
+You feel sluggish...~
+S
+#13583
+intricate carving~
+2 0
+0 0 0 0
+T0
+You chisel at the stone to carve details in the tomb.~
+T1
+$n chisels at the stone to carve details in the tomb.~
+T2
+You chisel at the stone to carve details in the tomb.~
+T3
+$n chisels at the stone to carve details in the tomb.~
+T4
+You chisel damaged sections from the tomb.~
+T5
+$n chisels damaged sections from the tomb.~
+S
+$

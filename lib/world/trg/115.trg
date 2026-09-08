@@ -212,7 +212,7 @@ L c 11520
 ~
 #11521
 Pixy Pursuit: catch~
-1 c 2 30
+1 c 2 31
 L b 615
 L b 616
 L b 10042
@@ -240,6 +240,7 @@ L b 11885
 L b 11886
 L b 11887
 L b 11982
+L b 13553
 L c 11521
 L c 11522
 L c 11535
@@ -318,6 +319,11 @@ switch %target.vnum%
   case 11526
     * fox/wits pixy
     set has %actor.wits%
+  break
+  case 13553
+    * blind cave pixy
+    set needs %random.500%
+    set has %actor.level%
   break
   default
     * all other vnums

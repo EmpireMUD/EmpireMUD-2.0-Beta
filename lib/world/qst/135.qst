@@ -1,0 +1,73 @@
+#13502
+Labyrinth: Out of My Depth~
+   At first, there's no movement, as if the adventurer in the corner hopes you
+haven't noticed them. There's a moment of awkward silence, and then a glance
+over the shoulder.
+   'I was worried you were that madman again,' the meek adventurer says. 'That
+will be me before long if I don't get out of here. I thought it was just a
+little ruin on the hillside, next thing I know I'm sliding down a dark chute
+and then... this. Just this. This maddening place.'
+   There's a heavy sigh.
+   'If you can get me out of here, I'll owe you one. Maybe several. What do you
+say?'
+   Use 'finish Out of My Depth' to accept and gain the meek adventurer as a
+permanent companion, or 'quest drop Out of My Depth' to decline.
+~
+'You won't regret this,' says the meek adventurer, getting up.
+~
+2 bc 250 350 -1
+A
+1 13502
+P
+54 13503 0 1 -
+R
+17 13503 13503
+W+
+54 13503 0 1 a
+Agree to get me out of here~
+Z
+1 13502
+S
+#13526
+Labyrinth: See You On The Other Side~
+   The fuzzy goblin scratches behind her ear and checks herself all over before
+thanking you for the rescue.
+   'Not gonna lie,' she says. 'Most harrowing experience of my entire life. And
+I've been through plenty. Could tell you some stories... but not here. Ghost
+the nasty minotaur and meet up again outside.'
+~
+   You find the fuzzy goblin resting on a large beam up in the rafters,
+catching her breath. She leans back and nibbles at a bit of moldy cheese.
+   'All started with a woman,' she says as she licks her fingers. 'Yeah, yeah,
+same old story, I know. But here we are. Honestly thought I'd be a rat forever.
+Despite all my rage, trapped like a rat in a... well, you know.'
+   She brushes her green-tinged fur with her fingernails, trying to smooth down
+spots that seem to have a mind of their own. She looks up at you.
+   'Guess the spell hasn't worn off completely, and me having a bad fur day.
+Not my worst day, though. If I ever catch the rat that turned me...' she looks
+around at the temple. 'If he's even still alive. Don't know how long I was a
+rat. Before that, I was Cherrith. Used to be a Goblin King...
+   'Had it all, gold, silver, copper, fame, adoring followers, even my own
+labby.... But there was a woman. Something about her. She was different, wasn't
+just some sewer babe; she the babe with the power, let me tell you. Any-who,
+the crew didn't want her around because she was, well, you know...'
+   The goblin scratches behind her ear.
+   'She was a human. They kept calling me Pinko. Stabbed more than a few of
+them but was losin' follower left, right, and under. Pretty soon I hear some
+other goblin casting a spell and BAM! Rats...
+   'Couldn't even be Rat King on account of I can't dance.'
+   She pauses and looks up at you.
+   'Craziest thing you ever hear, right? No more labbies for me. Don't think
+I can go back to being Goblin King, neither. Maybe I can find Babe, though.
+Human luck to you, friend-o. Or whatever you say.'
+~
+1 bci 250 350 -1
+A
+1 13526
+W+
+13 13592 0 1 -
+Get past the minotaur~
+Z
+1 13527
+S
+$
