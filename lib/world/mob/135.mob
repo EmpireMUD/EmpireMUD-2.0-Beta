@@ -105,7 +105,7 @@ S
 Wily #n~
 A man is pacing back and forth, checking stones on the walls.
 ~
-250 350 dvyJL cEM 3
+250 350 dvJL cEM 3
 1 0 0 13520 -1 13520
 D
    At first, it looks like you've found a friendly face in these dank depths.
@@ -163,7 +163,7 @@ rat gigantic giant goblin~
 the gigantic goblin rat~
 A gigantic goblin rat paces back and forth in the labyrinth.
 ~
-250 350 djyJL cE 4
+250 350 djJL cE 4
 0 0 71 13541 -1 13525
 D
    Its size is not the only thing unusual about this particular rodent: its
@@ -198,7 +198,7 @@ Cherrith goblin fuzzy~
 the fuzzy goblin~
 A fuzzy goblin is panting and catching her breath.
 ~
-250 350 bdyzJL cE 2
+250 350 bdzJL cE 2
 2 0 0 4 -1 13525
 D
    She's got the right height for a goblin, but she's covered head to toe in a
@@ -233,7 +233,7 @@ Cherrith goblin fuzzy~
 the fuzzy goblin~
 A fuzzy goblin is panting and catching her breath.
 ~
-250 350 bdyzJL cE 2
+250 350 bdzJL cE 2
 2 0 0 4 -1 13525
 D
    She's got the right height for a goblin, but she's covered head to toe in a
@@ -267,7 +267,7 @@ champion horned #n~
 the horned champion~
 A horned champion emerges from the shadows, staring off into the darkness.
 ~
-250 350 duvyJL cE 3
+250 350 duvJL cE 3
 0 3 0 13530 -1 13530
 D
    The champion is imposing, with a stature that rivals the largest men you've
@@ -570,7 +570,7 @@ cube death gelatinous~
 the death cube~
 You are suspended in some kind of gelatinous cube! It's all around you!
 ~
-250 350 abdJK chCDGN 5
+250 350 abdIJK chCDGN 5
 0 0 0 15 -1 13539
 D
    The entire passage is filled with an itchy, acrid gel, and you've become

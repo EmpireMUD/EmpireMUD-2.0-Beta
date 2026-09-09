@@ -245,7 +245,8 @@ S
 Lost in the Labyrinth 13514~
    The path ends at a wall slick with water. Mushrooms grow from the ceiling,
 releasing the occasional droplet, which echoes out through the labyrinth when
-it lands in the barrel. Bits of dead moss cling to the seams in the wall.
+it splashes down. Bits of dead moss cling to the seams in the wall, nourished
+by the water but starved without sun.
 ~
 bg 0 0 13505
 D14
@@ -263,7 +264,7 @@ right path.
 E
 walls water moisture wet~
    The walls are slick with water that's seeping down from above. It looks like
-someone set up a barrel here to collect it.
+someone set up a basin here to collect it.
 ~
 E
 stones~

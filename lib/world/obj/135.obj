@@ -287,13 +287,13 @@ center. The door is set into a wall made from clay bricks.
 T 13509
 S
 #13514
-barrel old~
-the old barrel~
-An old barrel stands in the corner.~
-   The wooden barrel shows wear from years of use. It certainly doesn't look
-like it would hold up if someone tried to move it.
+basin old~
+the old basin~
+An old basin stands in the corner.~
+   The wooden basin shows wear from many years of use. It looks as if it would
+fall apart if someone tried to move it.
 ~
-5 0 0 0 0 3
+5 0 0 0 0 4
 48 48 13514
 0 0
 C
@@ -2004,7 +2004,7 @@ S
 controller labyrinth~
 the labyrinth controller~
 The labyrinth controller is here.~
-This tool controls the High Temple: Long Lost Labyrinth adventure.
+This tool controls the High Temple: Long-Lost Labyrinth adventure.
 Usage: labyrinth goto <template vnum>
        labyrinth status
        labyrinth unseal (great jar / hidden boss)

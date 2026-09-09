@@ -523,13 +523,6 @@ if %elite% && %elitev%
   %load% mob %elitev%
   set mob %self.room.people%
   remote diff %mob.id%
-  nop %mob.remove_mob_flag(HARD)%
-  nop %mob.remove_mob_flag(GROUP)%
-  if %diff% == 3
-    nop %mob.add_mob_flag(HARD)%
-  elseif %diff% == 4
-    nop %mob.add_mob_flag(GROUP)%
-  end
 end
 %purge% %self%
 ~
@@ -1140,7 +1133,7 @@ end
 Labyrinth: Clothes off my back~
 1 c 6 1
 L f 13517
-get~
+get take~
 * make corpse naked if empty
 return 0
 wait 1
@@ -1316,7 +1309,7 @@ if %hit% && !%self.aff_flagged(DISARMED)%
 end
 ~
 #13521
-Labyrinth: Drink the murky barrel water~
+Labyrinth: Drink the murky basin water~
 1 c 6 4
 L c 13514
 L c 13515
@@ -1780,12 +1773,16 @@ elseif "taste drink sip use" ~= %cmd% && %self.var(bubbles)%
   end
   * end bubbles
 elseif "get take use" ~= %cmd% && %self.var(statue)%
-  %send% %actor% You reach out to grab the golden statuette...
-  %echoaround% %actor% ~%actor% reaches out to grab the golden statuette...
-  %echo% The stone floor in front of the plinth drops open for a moment, swallowing ~%actor%!
-  %teleport% %actor% i13523
-  %at% %actor.room% %echoaround% %actor% ~%actor% falls in from a chute high above!
-  %echo% The floor snaps shut again.
+  if %arg% == all || %actor.obj_target(%arg.argument1%)% == %self%
+    %send% %actor% You reach out to grab the golden statuette...
+    %echoaround% %actor% ~%actor% reaches out to grab the golden statuette...
+    %echo% The stone floor in front of the plinth drops open for a moment, swallowing ~%actor%!
+    %teleport% %actor% i13523
+    %at% %actor.room% %echoaround% %actor% ~%actor% falls in from a chute high above!
+    %echo% The floor snaps shut again.
+  else
+    return 0
+  end
 elseif %cmd% == use && %self.var(summoning)%
   %send% %actor% The chalk circle allows you to use the summon or teleport abilities here.
 elseif "search dig" ~= %cmd% && %self.var(grave)%
@@ -1815,7 +1812,7 @@ end
 Labyrinth: Secret stash empty~
 1 c 4 1
 L f 13535
-get~
+get take~
 return 0
 wait 1
 if !%self.contents%
@@ -3045,7 +3042,7 @@ elseif status /= %arg.car%
   elseif %room.template% >= 13500 && %room.template% <= 13599
     %send% %actor% Labyrinth region: unknown
   else
-    %send% %actor% You are not in the Long Lost Labyrinth.
+    %send% %actor% You are not in the Long-Lost Labyrinth.
     halt
   end
   * Entry/difficulty?
