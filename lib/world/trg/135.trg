@@ -1755,10 +1755,7 @@ L c 13567
 L f 13534
 L j 13523
 L w 13533
-taste drink sip use search get take dig~
-* set bubble_cmds taste drink sip use
-* set statue_cmds get take use
-*
+taste drink sip use search get take dig push pull rub dust~
 if !%actor.can_see(%self%)%
   return 0
 elseif "taste drink sip use" ~= %cmd% && %self.var(bubbles)%
@@ -1776,7 +1773,7 @@ elseif "taste drink sip use" ~= %cmd% && %self.var(bubbles)%
     return 0
   end
   * end bubbles
-elseif "get take use" ~= %cmd% && %self.var(statue)%
+elseif "get take use push pull rub dust" ~= %cmd% && %self.var(statue)%
   if %arg% == all || %actor.obj_target(%arg.argument1%)% == %self%
     %send% %actor% You reach out to grab the golden statuette...
     %echoaround% %actor% ~%actor% reaches out to grab the golden statuette...
