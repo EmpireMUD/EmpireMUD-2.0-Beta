@@ -1506,7 +1506,11 @@ end
 * no more loot from killing me
 nop %self.add_mob_flag(!LOOT)%
 * load and give item
-%load% obj 13592 %self% inv
+set level %actor.level%
+if %level% > 350
+  set level 350
+end
+%load% obj 13592 %self% inv %level%
 * obj must go to self's inv first
 set obj %self.inventory%
 %send% %actor% &&Y&&Z~%self% gives you @%obj%.&&0
