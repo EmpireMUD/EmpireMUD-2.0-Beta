@@ -771,7 +771,7 @@ end
 ~
 #13511
 Labyrinth: Shared death trigger~
-0 fA 100 23
+0 fA 100 24
 L b 13510
 L b 13512
 L b 13520
@@ -793,6 +793,7 @@ L b 13553
 L b 13554
 L c 13515
 L c 13521
+L c 13522
 L j 13590
 L j 13592
 ~
@@ -828,7 +829,8 @@ switch %self.vnum%
     * Nightmare Queen
     %echo% ~%self% throws her head back and convulses...
     %subecho% %self.room% The terrifying death whinny of the Nightmare Queen echoes out through the labyrinth!
-    %echo% ~%self% crumbles into dust and falls like snow to the chamber floor.
+    %echo% &%self% explodes in a cloud of glimmering ash that falls like snow to cover everything in the chamber!
+    %load% obj 13522 %self.room%
     return 0
   break
   case 13520
@@ -1541,13 +1543,14 @@ end
 ~
 #13533
 Labyrinth: Scenery setup~
-1 n 100 27
+1 n 100 28
 L b 13502
 L b 13510
 L c 851
 L c 940
 L c 2038
 L c 13517
+L c 13526
 L c 13533
 L c 13534
 L c 13549
@@ -1645,11 +1648,9 @@ else
   * and setup
   switch %pos%
     case 1
-      * library: candle stubs, stacks of books on the ground, plot hints
-      %mod% %self% keywords books stacks dozens notes scattered
-      %mod% %self% shortdesc the notes and stacks of books
-      %mod% %self% longdesc Dozens of books are stacked in piles, along with scattered notes.
-      %mod% %self% lookdesc The books range from quite old to oddly new. Some are histories, others are spell books. Most of the notes are indecipherable, but one lists spells including 'Embiggen Bug', 'Hex a Person into a Rat', tbd.
+      * library
+      %load% obj 13526 %self.room%
+      %purge% %self%
     break
     case 2
       * bone nest: just grisly, the abandoned nest of something that was collecting bones
@@ -1888,7 +1889,7 @@ while %ch%
   if !%ch.affect(13538)% && !%ch.aff_flagged(!ATTACK)%
     if %ch.is_pc% || %ch.vnum% < 13500 || %ch.vnum% > 13599
       dg_affect #13538 %ch% SLOW on 300
-      dg_affect #13538 %ch% RESIST-PHYSICAL -50 300
+      dg_affect #13537 %ch% RESIST-PHYSICAL -50 300
     end
   end
   set ch %ch.next_in_room%

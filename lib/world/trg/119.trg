@@ -954,7 +954,7 @@ racework countdown %max_time%
 ~
 #11913
 Pixy Races: Catch pixy in jar command~
-1 c 2 33
+1 c 2 35
 L b 615
 L b 616
 L b 10042
@@ -985,9 +985,11 @@ L b 11887
 L b 11963
 L b 11982
 L b 13553
+L b 13554
 L b 16624
 L b 16625
 L c 11914
+L c 13532
 catch~
 set ok_list 615 616 10042 11520 11521 11522 11523 11524 11525 11526 11820 16624 16625 11963 13553 13554
 set clever_list 11819 11982

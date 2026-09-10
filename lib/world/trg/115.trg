@@ -212,7 +212,7 @@ L c 11520
 ~
 #11521
 Pixy Pursuit: catch~
-1 c 2 31
+1 c 2 33
 L b 615
 L b 616
 L b 10042
@@ -241,9 +241,11 @@ L b 11886
 L b 11887
 L b 11982
 L b 13553
+L b 13554
 L c 11521
 L c 11522
 L c 11535
+L c 13532
 catch~
 * This is the command for capturing pixies for the Pixy Pursuit event
 return 1

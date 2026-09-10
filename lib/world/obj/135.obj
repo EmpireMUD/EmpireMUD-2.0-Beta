@@ -436,6 +436,18 @@ _
 Triggers a delayed subzone echo.
 ~
 S
+#13522
+ash ashes layer thick glimmering~
+the ashes~
+A thick layer of ash covers nearly everything.~
+   Everything from the floor to the jars to the statues in the alcoves has a
+layer of ash. Something quite large must have burned here.
+~
+3 0 0 0 0 3
+0 0 0
+7 48
+T 9683
+S
 #13523
 falling pit~
 falling in the pit~
@@ -481,6 +493,52 @@ covered in fine layer of gray-brown fur with the slightest green tinge.
 C
 250 350
 S
+#13526
+books stacks dozens scattered notes scrolls~
+the notes and stacks of books~
+Dozens of books are stacked in piles, along with scattered notes.~
+   Countless books, scrolls, and scraps of paper are piled about the area, some
+in an alcove and some just sitting upon the stone floor. The books range from
+quite old to pristinely new. Some are labeled as histories, others as spell
+books. Oddly, though, you cannot lift or move any of them. Some magic affixes
+them permanently in place. Here and there, the stubs of long-burnt candles sit
+on the edge of the alcove, atop stacks of books, and on the floor.
+Some of the texts you can see are:
+   Tome of Arthropod Embiggening
+   Spell to hex a person into a rat
+~
+3 0 0 0 0 3
+0 0 0
+0 0
+E
+notes~
+   You can't decipher any of the notes. If this is a language, it's not one
+you've read before. Most of them, though, look more like the scribblings of a
+madman.
+~
+E
+tome arthropod embiggening~
+   The tome is open to a page describing the use of herbs and magic words to
+turn regular bugs into monstrous ones. Unfortunately, you don't understand any
+of the magic words on the page and cannot read them.
+~
+E
+spell hex rat~
+   A scroll atop one of the stacks describes a hex that transforms a person
+into a gigantic rat. Unfortunately, every attempt to move or unroll the scroll
+fails. It feels as solid and as cold as stone. Whatever enchantment holds it
+here, you cannot undo it, and thus cannot read the rest of the spell.
+~
+E
+alcove~
+A stack of books sits on the alcove shelf.
+~
+E
+candles stubs burnt wax~
+   The stubs of old candles adorn the books, the alcove, and the floor.
+Someone has spent a lot of time down here studying these.
+~
+S
 #13530
 champion dead horned body corpse~
 the dead champion~
@@ -495,13 +553,27 @@ embroidered tunic reveal the cause of death. Some champion.
 C
 250 350
 S
+#13532
+guardian wokestone stone corpse body~
+the wokestone guardian~
+A wokestone guardian lies on the ground, motionless.~
+   The little homunculus is made of the same stone as the labyrinth, as if it
+was carved from the very walls. Its arms are a little long, with short, steady
+legs. There's no face. It lies perfectly motionless, with no sign of life.
+~
+10 kp a 0 0 1
+13554 2 0
+1 0
+C
+250 350
+S
 #13533
-scenery labyrinth bowl basalt bubbling circle glyphs symbols arcane chalk bull golden plinth stone statuette books stacks notes scattered nest bones pile grave rocks dirt drawing chalk woman horse garden glowing plants mushrooms fungi table stone~
+scenery labyrinth arcane basalt bones bowl bubbles bubbling bull chalk circle dirt drawing fungi garden glowing glyphs golden grave horse large makeshift mushrooms nest oblong pile plants plinth rocks small statuette stone symbols woman~
 labyrinth scenery~
 Some labyrinth scenery is here.~
 It looks scenic.
 ~
-3 0 0 0 0 4
+3 0 0 0 0 5
 0 0 0
 0 0
 T 13533
