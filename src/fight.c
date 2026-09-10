@@ -2719,11 +2719,11 @@ int skill_message(int dam, char_data *ch, char_data *vict, int attacktype, attac
 					else {	// no damage numbers
 						safe_snprintf(message, sizeof(message), "\ty%s\t0", msg->msg[MSG_DIE].attacker_msg);
 					}
-					act(message, FALSE, ch, weap, vict, TO_CHAR | hit_flags);
+					act(message, FALSE, ch, weap, vict, TO_CHAR | hit_flags | ACT_DIE);
 				}
 				
 				if (msg->msg[MSG_DIE].room_msg) {
-					act(msg->msg[MSG_DIE].room_msg, FALSE, ch, weap, vict, TO_NOTVICT | hit_flags);
+					act(msg->msg[MSG_DIE].room_msg, FALSE, ch, weap, vict, TO_NOTVICT | hit_flags | ACT_DIE);
 				}
 			}
 			
@@ -2735,7 +2735,7 @@ int skill_message(int dam, char_data *ch, char_data *vict, int attacktype, attac
 				else {	// no damage numbers
 					safe_snprintf(message, sizeof(message), "\tr%s\t0", msg->msg[MSG_DIE].victim_msg);
 				}
-				act(message, FALSE, ch, weap, vict, TO_VICT | TO_SLEEP | hit_flags);
+				act(message, FALSE, ch, weap, vict, TO_VICT | TO_SLEEP | hit_flags | ACT_DIE);
 			}
 		}
 		else {

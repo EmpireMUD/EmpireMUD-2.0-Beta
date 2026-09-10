@@ -92,6 +92,7 @@ void update_reboot();
 #define ACT_AFFECT		BIT(22)	// indicates it's an affect apply/wear-off for FM_*_AFFECTS_IN_COMBAT
 #define ACT_ABILITY		BIT(23)	// indicates it's an ability, for FM_ ability flags
 #define ACT_HEAL		BIT(24)	// is a heal, for FM_ flags
+#define ACT_DIE			BIT(25)	// character is dying (overrides some FM_ flags)
 
 // shorthand flags
 #define ACT_NON_OBJ_OBJ		(ACT_STR_OBJ | ACT_VEH_OBJ)
