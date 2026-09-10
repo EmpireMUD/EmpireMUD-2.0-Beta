@@ -1772,7 +1772,7 @@ obj_data *make_corpse(char_data *ch) {
 	if (!IS_NPC(ch)) {
 		GET_LAST_CORPSE_ID(ch) = obj_script_id(corpse);
 	}
-	else if (MOB_CUSTOM_CORPSE(ch) != NOTHING) {	// mob corpse setup, unless custom corpse given
+	else if (MOB_CUSTOM_CORPSE(ch) == NOTHING) {	// mob corpse setup, unless custom corpse given
 		if (!size_data[size].can_take_corpse) {
 			REMOVE_BIT(GET_OBJ_WEAR(corpse), ITEM_WEAR_TAKE);
 		}
