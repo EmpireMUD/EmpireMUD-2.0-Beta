@@ -989,7 +989,7 @@ L b 16624
 L b 16625
 L c 11914
 catch~
-set ok_list 615 616 10042 11520 11521 11522 11523 11524 11525 11526 11820 16624 16625 11963 13553
+set ok_list 615 616 10042 11520 11521 11522 11523 11524 11525 11526 11820 16624 16625 11963 13553 13554
 set clever_list 11819 11982
 set error_list 11873 11874 11875 11876 11877 11878 11879 11880 11881 11882 11883 11884 11885 11886 11887
 set jar_vnum 11914
@@ -1024,6 +1024,7 @@ elseif !(%ok_list% ~= %target.vnum%)
   halt
 end
 * switch will validate the target vnum and set up stats
+set tar_name ~%target%
 set speed 1
 set guile 1
 set luck 1
@@ -1071,6 +1072,14 @@ switch %target.vnum%
     eval guile 1 + %random.4%
     eval luck %random.2%
   break
+  case 13554
+    * blind cave pixy on a wokestone guardian
+    set tar_name the blind cave pixy on the back of ~%target%
+    set pixy a blind cave pixy
+    set speed 1
+    eval guile 1 + %random.4%
+    eval luck %random.2%
+  break
   default
     * all other vnums in the pixy_list
     set speed %random.2%
@@ -1079,8 +1088,8 @@ switch %target.vnum%
     set pixy %target.name%
   break
 done
-%send% %actor% You swoop toward ~%target% with an enchanted jar...
-%echoaround% %actor% ~%actor% swoops toward ~%target% with an enchanted jar...
+%send% %actor% You swoop toward %tar_name% with an enchanted jar...
+%echoaround% %actor% ~%actor% swoops toward %tar_name% with an enchanted jar...
 * short wait, then re-validate
 wait 2 sec
 if !%target%
@@ -1110,8 +1119,17 @@ remote losses %jar.id%
 set last_race 0
 remote last_race %jar.id%
 * messaging
-%send% %actor% You catch ~%target% in a jar!
-%echoaround% %actor% ~%actor% catches ~%target% in a jar!
+%send% %actor% You catch %tar_name% in a jar!
+%echoaround% %actor% ~%actor% catches %tar_name% in a jar!
+if %target.vnum% == 13554
+  * cave pixy on a wokestone guardian
+  %echo% ~%target% falls to the ground, motionless.
+  %load% obj 13532 %target.room%
+  set obj %target.room.contents%
+  if %obj.vnum% == 13532
+    nop %obj.bind(%actor%)%
+  end
+end
 %purge% %target%
 %purge% %self%
 ~

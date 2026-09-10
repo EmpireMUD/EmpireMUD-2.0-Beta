@@ -271,6 +271,7 @@ elseif %target.fighting%
   halt
 end
 * switch will validate the target vnum and set up chances: needs, has -- default needs is random.15 (attribute roll)
+set tar_name ~%target%
 set needs %random.15%
 set jar_vnum 11522
 switch %target.vnum%
@@ -322,6 +323,12 @@ switch %target.vnum%
   break
   case 13553
     * blind cave pixy
+    set needs %random.400%
+    set has %actor.level%
+  break
+  case 13554
+    * blind cave pixy on a wokestone guardian
+    set tar_name the blind cave pixy on the back of ~%target%
     set needs %random.500%
     set has %actor.level%
   break
@@ -355,13 +362,22 @@ elseif %target.fighting% || %actor.fighting% || %actor.room% != %target.room% ||
 elseif %has% >= %needs%
   * Success!
   %load% obj %jar_vnum% %actor% inv
-  %send% %actor% You catch ~%target% in a jar!
-  %echoaround% %actor% ~%actor% catches ~%target% in a jar!
+  %send% %actor% You catch %tar_name% in a jar!
+  %echoaround% %actor% ~%actor% catches %tar_name% in a jar!
 else
   * Fail
   %load% obj 11521 %actor% inv
-  %send% %actor% You miss and ~%target% gets away, leaving behind a little pixy dust.
-  %echoaround% %actor% ~%actor% misses ~%target%, who gets away!
+  %send% %actor% You miss and %tar_name% gets away, leaving behind a little pixy dust.
+  %echoaround% %actor% ~%actor% misses %tar_name%, who gets away!
+end
+if %target.vnum% == 13554
+  * cave pixy on a wokestone guardian
+  %echo% ~%target% falls to the ground, motionless.
+  %load% obj 13532 %target.room%
+  set obj %target.room.contents%
+  if %obj.vnum% == 13532
+    nop %obj.bind(%actor%)%
+  end
 end
 * Purge the target either way
 %purge% %target%
