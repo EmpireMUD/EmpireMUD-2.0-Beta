@@ -1995,7 +1995,7 @@ Labyrinth: Bone slime combat~
 L w 13544
 ~
 if %hit% && !%self.aff_flagged(DISARMED)%
-  %dot% #13544 %actor% 20 physical 15
+  %dot% #13544 %actor% 20 30 physical 15
 end
 ~
 #13543
@@ -2168,6 +2168,35 @@ while %ch%
     end
   end
   set ch %next_ch%
+done
+~
+#13546
+Labyrinth: Reject pickpocket~
+0 p 100 4
+L b 13510
+L b 13544
+L b 13545
+L o 142
+~
+switch %self.vnum%
+  case 13510
+    * Cyclopean Minotaur
+    %send% %actor% You can't reach |%self% pocket... but you've reached ^%self% notice!
+    %aggro% %actor%
+    return 0
+  break
+  case 13544
+    * bone slime
+    %send% %actor% You're not exactly sure which part of it is the pocket.
+    return 0
+  break
+  case 13545
+    %send% %actor% You've got bigger things to worry about... YOU'RE in its pocket!
+    return 0
+  break
+  default
+    return 1
+  break
 done
 ~
 #13547
@@ -2403,8 +2432,20 @@ switch %room.template%
       end
       *
       set jar %room.contents(13515)%
-      if !%jar.var(water_done)% || !%jar.var(blood_done)% || !%jar.var(fiend_done)%
+      if !%jar.var(water_done)% && !%jar.var(blood_done)% && !%jar.var(fiend_done)%
         %send% %actor% You try to inspect the great jar but it is sealed.
+      elseif !%jar.var(water_done)% && !%jar.var(blood_done)%
+        %send% %actor% You try to inspect the great jar... but the water seal and blood seal are still intact.
+      elseif !%jar.var(blood_done)% && !%jar.var(fiend_done)%
+        %send% %actor% You try to inspect the great jar... but the blood seal and fiend seal are still intact.
+      elseif !%jar.var(water_done)% && !%jar.var(fiend_done)%
+        %send% %actor% You try to inspect the great jar... but the water seal and fiend seal are still intact.
+      elseif !%jar.var(water_done)%
+        %send% %actor% You try to inspect the great jar... but the water seal is still intact.
+      elseif !%jar.var(blood_done)%
+        %send% %actor% You try to inspect the great jar... but the blood seal is still intact.
+      elseif !%jar.var(fiend_done)%
+        %send% %actor% You try to inspect the great jar... but the fiend seal is still intact.
       elseif !%jar.var(open)%
         %send% %actor% You notice the seals on the great jar have broken!
       end

@@ -459,9 +459,12 @@ enough to remind you of a place you once were. Of a memory that might slip away
 or a thought half-forgotten.
    This memento is required to craft certain items.
 ~
-3 0 a 0 0 2
+3 0 a 0 0 3
 0 0 0
 1 0
+M
+33
+This item is used to craft items from High Temple: Long-Lost Labyrinth.~
 R
 4 5193 0
 S
@@ -695,7 +698,7 @@ R
 4 5119 0
 S
 #13546
-sponge sponge-like spongelike spongey vast craggy hive mass~
+sponge sponge-like spongelike spongey vast craggy hive mass growth~
 the sponge on the ceiling~
 A vast, craggy mass of sponge-like growth hangs from the ceiling overhead.~
    The mass extends further into the darkness than you can see, covering a
@@ -705,7 +708,7 @@ them, quickly vanishing into the hive's interior. It has the gray color of
 dust. Here and there, you see small shelves that protrude like mushrooms from
 the larger structure.
 ~
-3 0 0 0 0 5
+3 0 0 0 0 6
 0 0 0
 7 0
 E
@@ -1310,7 +1313,7 @@ the mantle of the cyclopean king~
 The mantle of the cyclopean king is lying here.~
    A set of sturdy, blackened argentine plates cover the shoulders, chest, and
 back in this elegant mantle. The whole of it is covered in filigree in three
-shades of brone. The lowest layer is a polished, gleaming bronze. The outer
+shades of bronze. The lowest layer is a polished, gleaming bronze. The outer
 layer is a dark, tarnished bronze. And between them, verdigris. The whole of
 the mantle is set with thirteen purple gems, the largest of which is over the
 heart.
