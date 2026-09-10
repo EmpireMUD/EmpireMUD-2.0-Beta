@@ -1069,6 +1069,7 @@ switch %target.vnum%
   break
   case 13553
     * blind cave pixy
+    set tar_name a blind cave pixy from the cluster
     set pixy a blind cave pixy
     set speed 1
     eval guile 1 + %random.4%

@@ -325,6 +325,7 @@ switch %target.vnum%
   break
   case 13553
     * blind cave pixy
+    set targ_name a blind cave pixy from the cluster
     set needs %random.400%
     set has %actor.level%
   break
