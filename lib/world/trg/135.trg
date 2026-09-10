@@ -638,8 +638,8 @@ elseif %cmd% == close
   else
     %send% %actor% It's already closed.
   end
-elseif kick /= %cmd%
-  if !(door /= %arg%) || !%actor.ability(96)%
+elseif (kick /= %cmd% || break /= %cmd%) && %actor.ability(96)%
+  if !(door /= %arg%)
     * fall thru to regular command
     return 0
   else
@@ -649,8 +649,8 @@ elseif kick /= %cmd%
     set will_open 1
     set broke 1
   end
-elseif bash /= %cmd%
-  if !(door /= %arg%) || !%actor.ability(97)%
+elseif (bash /= %cmd% || break /= %cmd%) && %actor.ability(97)%
+  if !(door /= %arg%)
     * fall thru to regular command
     return 0
   else
@@ -1183,8 +1183,9 @@ if %cmd% == open
   else
     * ok
     %send% %actor% You summon all your might and push the heavy lid off the great jar... it falls to the ground with a CRASH!
+    %echoaround% %actor% ~%actor% plants ^%actor% feet and heaves ^%actor% weight against the lid of the great jar... which falls to the ground with a CRASH!
     wait 1 sec
-    %echo% A terrible death whinny echoes out of the great jar as swirls of color fly out and fly around the chamber!
+    %echo% A terrible death whinny echoes out of the great jar as swirls of color fly out and streak up the chamber!
     wait 1 sec
     %load% mob 13512
     set mob %self.room.people(13512)%
