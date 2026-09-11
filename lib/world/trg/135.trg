@@ -430,7 +430,10 @@ end
 ~
 #13505
 Labyrinth: Trash Spawner~
-0 n 100 18
+0 n 100 21
+L b 13545
+L b 13551
+L b 13557
 L j 13510
 L j 13514
 L j 13515
@@ -509,11 +512,17 @@ while %room_count% > 0 && %size% > 0
   %load% mob %mobv%
   set mob %self.room.people%
   remote diff %mob.id%
+  if %diff% == 4
+    nop %mob.add_mob_flag(TANK)%
+  end
   * load 2?
   if %diff% > 2
     %load% mob %mobv%
     set mob %self.room.people%
     remote diff %mob.id%
+    if %diff% == 4
+      nop %mob.add_mob_flag(TANK)%
+    end
   end
   eval room_count %room_count% - 1
 done
@@ -523,6 +532,28 @@ if %elite% && %elitev%
   %load% mob %elitev%
   set mob %self.room.people%
   remote diff %mob.id%
+  switch %diff%
+    case 2
+      if %elitev% == 13551 || %elitev% == 13557
+        nop %mob.add_mob_flag(DPS)%
+      end
+      if %elitev% != 13545 && %elitev% != 13551
+        nop %mob.add_mob_flag(TANK)%
+      end
+    break
+    case 3
+      if %elitev% != 13545
+        nop %mob.add_mob_flag(HARD)%
+      end
+    break
+    case 4
+      if %elitev% == 13551 || %elitev% == 13557
+        nop %mob.add_mob_flag(DPS)%
+      end
+      nop %mob.add_mob_flag(TANK)%
+      nop %mob.add_mob_flag(HARD)%
+    break
+  done
 end
 %purge% %self%
 ~
@@ -1248,7 +1279,9 @@ elseif %self.vnum% == 13523
       %echoaround% %actor% ~%actor% SCREAMS in pain as &%actor% falls onto the spikes!
       %subecho% %actor.room% A blood-curdling scream echoes through the labyrinth.
       dg_affect #13523 %actor% IMMOBILIZED on 20
-      %dot% %actor% 500 60 physical
+      if !%actor.aff_flagged(IMMUNE-PHYSICAL-DEBUFFS)%
+        %dot% %actor% 500 60 physical
+      end
       %damage% %actor% 200 physical
     end
     * check blood seal
@@ -1307,7 +1340,7 @@ Labyrinth: Wily madman combat script~
 0 k 34 1
 L w 13520
 ~
-if %hit% && !%self.aff_flagged(DISARMED)%
+if %hit% && !%self.aff_flagged(DISARMED)% && !%actor.aff_flagged(IMMUNE-PHYSICAL-DEBUFFS)%
   %dot% #13520 %actor% 20 fire 15
 end
 ~
@@ -1543,7 +1576,7 @@ end
 ~
 #13533
 Labyrinth: Scenery setup~
-1 n 100 28
+1 n 100 29
 L b 13502
 L b 13510
 L c 851
@@ -1551,6 +1584,7 @@ L c 940
 L c 2038
 L c 13517
 L c 13526
+L c 13527
 L c 13533
 L c 13534
 L c 13549
@@ -1697,12 +1731,9 @@ else
       %purge% %self%
     break
     case 7
-      * tiny garden with a magical light
-      %mod% %self% keywords garden glowing plants mushrooms fungi
-      %mod% %self% shortdesc the glowing garden
-      %mod% %self% longdesc A garden of glowing plants and mushrooms grows over the alcove.
-      %mod% %self% lookdesc Dozens of tiny things grow across the alcove in the wall, all of them glowing in soft, mesmerizing hues of blue, green, and orange.
-      nop %self.flag(LIGHT)%
+      * tiny edible garden with a magical light
+      %load% obj 13527 %self.room%
+      %purge% %self%
     break
     case 8
       * lost stash: contains cyclopean palace
@@ -1886,7 +1917,7 @@ L w 13538
 ~
 set ch %self.room.people%
 while %ch%
-  if !%ch.affect(13538)% && !%ch.aff_flagged(!ATTACK)%
+  if !%ch.affect(13538)% && !%ch.aff_flagged(!ATTACK)% && !%ch.aff_flagged(IMMUNE-PHYSICAL-DEBUFFS)%
     if %ch.is_pc% || %ch.vnum% < 13500 || %ch.vnum% > 13599
       dg_affect #13538 %ch% SLOW on 300
       dg_affect #13537 %ch% RESIST-PHYSICAL -50 300
@@ -1995,7 +2026,7 @@ Labyrinth: Bone slime combat~
 0 k 34 1
 L w 13544
 ~
-if %hit% && !%self.aff_flagged(DISARMED)%
+if %hit% && !%self.aff_flagged(DISARMED)% && !%actor.aff_flagged(IMMUNE-PHYSICAL-DEBUFFS)%
   %dot% #13544 %actor% 20 30 physical 15
 end
 ~
@@ -2213,7 +2244,7 @@ Labyrinth: Mirror spider venom~
 0 k 75 1
 L w 13548
 ~
-if %hit% && !%actor.has_tech(!Poison)%
+if %hit% && !%actor.has_tech(!Poison)% && !%actor.aff_flagged(IMMUNE-POISON-DEBUFFS)%
   %dot% #13548 %actor% 35 30 poison 30
 end
 ~
@@ -2222,7 +2253,7 @@ Labyrinth: Monstrous centipede venom~
 0 k 100 1
 L w 13551
 ~
-if %hit% && !%actor.has_tech(!Poison)%
+if %hit% && !%actor.has_tech(!Poison)% && !%actor.aff_flagged(IMMUNE-POISON-DEBUFFS)%
   dg_affect #13551 %actor% SLOW on 30
   %dot% #13551 %actor% 10 30 poison 60
 end

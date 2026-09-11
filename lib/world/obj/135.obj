@@ -443,9 +443,12 @@ A thick layer of ash covers nearly everything.~
    Everything from the floor to the jars to the statues in the alcoves has a
 layer of ash. Something quite large must have burned here.
 ~
-3 0 0 0 0 3
+3 0 0 0 0 4
 0 0 0
 7 48
+M
+18
+The ashes scatter in the breeze.~
 T 9683
 S
 #13523
@@ -539,6 +542,52 @@ candles stubs burnt wax~
 Someone has spent a lot of time down here studying these.
 ~
 S
+#13527
+garden glowing plants mushrooms fungi~
+the glowing garden~
+A garden of glowing plants and mushrooms grows over the alcove.~
+   Dozens of tiny things grow across the alcove in the wall, all of them
+glowing in soft, mesmerizing hues of blue, green, and orange. The wall is moist
+to the touch -- not enough to drink, but the plants are thriving.
+~
+6 cB 0 0 0 1
+96 0 0
+0 0
+B
+hQ
+C
+250 250
+M
+4
+You pluck a glowing mushroom and chew it up -- it tastes like honey!~
+M
+5
+$n grabs a glowing mushroom from the wall and pops it in $s mouth.~
+M
+4
+You pick a glowing green plant and chew it quickly. It's not great, but it's surprisingly filling.~
+M
+5
+$n grabs a glowing plant from the wall and eats it.~
+M
+4
+You grab a tasty bite of fungus... it tastes more like meat.~
+M
+5
+$n grabs a little fungus and eats it with a smile.~
+M
+4
+You pull a fat little plant from the wall and eat it. Not bad!~
+M
+5
+$n pulls a fat little plant from the wall and eats it.~
+M
+4
+You grab a long, skinny mushroom and eat it -- it tastes like old cheese.~
+M
+5
+$n grabs a long, skinny mushroom and eats it.~
+S
 #13530
 champion dead horned body corpse~
 the dead champion~
@@ -568,12 +617,12 @@ C
 250 350
 S
 #13533
-scenery labyrinth arcane basalt bones bowl bubbles bubbling bull chalk circle dirt drawing fungi garden glowing glyphs golden grave horse large makeshift mushrooms nest oblong pile plants plinth rocks small statuette stone symbols woman~
+cenery labyrinth arcane basalt bones bowl bubbles bubbling bull chalk circle dirt drawing glyphs golden grave horse large makeshift nest oblong pile plinth rocks small statuette stone symbols woman~
 labyrinth scenery~
 Some labyrinth scenery is here.~
 It looks scenic.
 ~
-3 0 0 0 0 5
+3 0 0 0 0 6
 0 0 0
 0 0
 T 13533
@@ -730,11 +779,17 @@ A small body lies desiccated in the corner.~
 oddly square and bear a gray-green tinge. The skin, dried and brittle, has a
 pale gray color to it. This hapless fellow has been dead for quite some time.
 ~
-10 gkp a 0 0 4
+10 gkp a 0 0 5
 13540 2 0
 7 72
 C
 100 100
+M
+18
+$p crumbles away to nothing.~
+M
+17
+$p crumbles away to nothing.~
 S
 #13544
 meat gooey hunk~
@@ -743,11 +798,17 @@ A hunk of gooey meat is rotting on the ground.~
    It smells like bugs. But, this is what you've got to hand, so perhaps you
 could cook a 'dungeon steak' and have a meal.
 ~
-6 g a 0 0 10
+6 g a 0 0 11
 2 0 0
 7 12
 C
 1 1
+M
+17
+You discard $p as it begins to stink.~
+M
+18
+$p is consumed by maggots.~
 R
 4 5119 0
 S
@@ -758,11 +819,17 @@ A scrumptious dungeon steak is sitting on the ground.~
    This chitin cutlet doesn't look half bad. It doesn't necessarily look half
 good, either, but when you're lost in a dungeon, any meat is a feast.
 ~
-6 gE a 0 0 2
+6 gE a 0 0 3
 12 0 0
 7 336
 C
 1 1
+M
+17
+$p goes rotten and you throw it out.~
+M
+18
+A horde of insects devours $p.~
 O+ 1 6220
 R
 4 5619 0
@@ -1839,12 +1906,18 @@ fist. The fruits have a sweet armoa but a notoriously tart flavor. Only the
 seeds and pulp are edible, but they make a colorful addition to fruitcakes and
 salads.
 ~
-6 bgC a 0 0 16
+6 bgC a 0 0 17
 24 13589 0
 7 672
 C
 1 1
 I 15 13590 100.00 4 x  # SEPARATE: juicy pomegranate
+M
+17
+You throw out $p as it begins to stink.~
+M
+18
+Insects consume what remains of $p.~
 O+ 1 6134
 R
 4 5215 0
@@ -1856,7 +1929,7 @@ A juicy pomegranate is lying on the ground.~
    The red-purple fruit has a thick husk to protect its tart juice and precious
 seeds. There's a sweet aroma when you press the pomegranate to your nose.
 ~
-6 gC a 0 0 14
+6 gC a 0 0 15
 4 0 0
 7 672
 C
@@ -1865,6 +1938,12 @@ I 14 13589 100.00 4 x  # COMBINE: basket of pomegranates
 M
 34
 Combine a few of these to get something you can plant.~
+M
+17
+You throw out $p as it rots.~
+M
+18
+A mass of insects overrun $p and devour it.~
 O+ 1 6124
 R
 4 5215 0
@@ -1877,7 +1956,7 @@ Some over-ripe pomegranates are lying here.~
 slightly sharp, slightly sour aroma. But if you're lost somewhere without any
 food, you eat what's at hand.
 ~
-6 g a 0 0 20
+6 g a 0 0 21
 12 0 0
 7 672
 C
@@ -1888,6 +1967,12 @@ You eat $p and feel a little funny.~
 M
 33
 It has begun to ferment.~
+M
+17
+You realize $p have gone bad, and throw them out.~
+M
+18
+$p rot away on the ground.~
 O+ 1 6134
 R
 4 5619 0

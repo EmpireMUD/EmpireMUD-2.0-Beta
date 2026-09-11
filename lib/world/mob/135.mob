@@ -313,7 +313,7 @@ skeleton bronze polished~
 the polished bronze skeleton~
 &gThere's a bronze skeleton on the floor.&y
 ~
-250 350 abdhuyJK chCDG 3
+250 350 abdhuJK chCDG 3
 0 0 0 3 -1 -1
 D
    Its bones twinkle a brilliant bronze color in the dim light, each one clean
@@ -384,7 +384,7 @@ shadow wailing long~
 the wailing shadow~
 A long shadow stretches across the wall.
 ~
-250 350 abduyJK chCEG 0
+250 350 abduJK chCEG 0
 0 0 0 13539 -1 13543
 D
    The shadow screams and shrieks as it passes over the rough stones of the old
@@ -486,7 +486,7 @@ queen mole-rat molerat rat mammoth~
 the mole-rat queen~
 A mammoth mole-rat queen gnashes her teeth as you approach!
 ~
-250 350 abduyJ cE 4
+250 350 abduJ cE 4
 2 0 0 13541 -1 -1
 D
    This gray-pink fleshy creature is so large she can barely move through the
@@ -636,7 +636,7 @@ spider giant glimmer gold~
 the gold spider~
 A giant spider glimmers with gold in the dim light.
 ~
-250 350 abduyJ cCG 3
+250 350 abduJ cCG 3
 0 0 8 13547 -1 -1
 D
    The yellow sheen of gold covers the enormous spider, casting flecks of
@@ -705,7 +705,7 @@ centipede monstrous~
 the monstrous centipede~
 A monstrous centipede rears up taller than a horse and menaces you with countless legs!
 ~
-250 350 abduzJ cDG 4
+250 350 abduJ cDG 4
 0 0 8 13547 -1 -1
 D
    The hideous creature's body is such a deep brown that it nearly vanishes
@@ -795,7 +795,7 @@ guardian wokestone stone pixy creature~
 the wokestone guardian~
 A stone creature lumbers toward you with a pixy on its back!
 ~
-250 350 abduxyJ chCGU 1
+250 350 abduxJ chCGU 1
 0 0 28 5 -1 13532
 D
    The little thing looks as if the very stone of the labyrinth has been
@@ -866,7 +866,7 @@ S
 #n~
 #n leans against the wall, sharpening a sword.
 ~
-250 350 abdyz cM 3
+250 350 abd cM 3
 0 0 0 1 -1 -1
 M
 1
