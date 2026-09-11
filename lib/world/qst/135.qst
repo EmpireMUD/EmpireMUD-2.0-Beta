@@ -13,20 +13,48 @@ say?'
    Use 'finish Out of My Depth' to accept and gain the meek adventurer as a
 permanent companion, or 'quest drop Out of My Depth' to decline.
 ~
-'You won't regret this,' says the meek adventurer, getting up.
+   'You won't regret this,' says the meek adventurer, getting up.
+   Use the 'companion' command to summon the meek adventurer.
 ~
-2 bc 250 350 -1
+3 bc 250 350 -1
 A
 1 13502
 P
 54 13503 0 1 -
 R
 17 13503 13503
+R
+6 13503 13503
 W+
 54 13503 0 1 a
 Agree to get me out of here~
 Z
 1 13502
+S
+#13503
+Labyrinth: Free to a Good Home~
+   'Oh, let's talk again when we get out,' the adventurer adds.
+   Use the 'companion' command to summon the meek adventurer when you're
+outside the labyrinth in order to complete this quest.
+~
+   'I never thought I'd get out of there. I can't possibly thank you enough,'
+the adventurer says. 'You're a good friend for this. I'll stick around as long
+as you'll have me. One favor, though. I found this little guy in the dark and
+I can't really afford to feed him. I missed so much work while I was stuck down
+there. Think you can give him a good home?'
+   A cream-white dog peers out from behind the adventurer and looks up at you
+with the biggest, saddest eyes you've ever seen.
+~
+2 0 250 350 -1
+A
+5 13502
+R
+19 13579 13579
+W+
+53 13503 0 1 a
+Meet me outside the labyrinth~
+Z
+1 13503
 S
 #13526
 Labyrinth: See You On The Other Side~
@@ -82,6 +110,8 @@ in the rafters high above the labyrinth to receive it.
 ~
    The little goblin looks up at you with a crooked smile. 'Been nothing but
 trouble,' she says. 'Should be right up your alley.'
+   Her shadow peeks out from behind her leg, and then runs over and tackles
+your shadow with all its might!
 ~
 1 0 250 350 -1
 A

@@ -1576,6 +1576,17 @@ else
   end
 end
 ~
+#13531
+Labyrinth: Meek adventurer setup~
+0 n 100 1
+L f 13531
+~
+wait 1
+set name %self.pc_name%
+set newname %name.car% the Meek
+%mod% %self% shortdesc %newname%
+detach 13531 %self.id%
+~
 #13533
 Labyrinth: Scenery setup~
 1 n 100 29
@@ -2881,6 +2892,20 @@ if %actor%
   end
 end
 detach 13578 %self.id%
+~
+#13579
+Labyrinth: Free to a Good Home turn-in qualifier~
+0 v 0 3
+L j 13501
+L j 13592
+L t 13503
+~
+if %questvnum% == 13503 && %self.room.template% >= 13501 && %self.room.template% <= 13592
+  %send% %actor% You need to get ~%self% out of the Labyrinth before you can finish %questname%.
+  return 0
+else
+  return 1
+end
 ~
 #13591
 Labyrinth: Consume fermented pomegranates~

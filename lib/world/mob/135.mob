@@ -13,8 +13,8 @@ has tucked into a corner to wait out the coming horrors.
 T 13598
 S
 #13503
-#n meek~
-#n the Meek~
+#n meek adventurer~
+a meek adventurer~
 #n the Meek is standing here.
 ~
 250 350 dozG cm 3
@@ -25,6 +25,8 @@ a labyrinth and the heroic rescue that followed.
 ~
 T 9809
 T 9803
+T 13531
+T 13579
 S
 #13505
 spawner mob labyrinth~
@@ -895,6 +897,43 @@ T 13523
 _
 Look desc set by trig 13540.
 ~
+S
+#13579
+dog rescue~
+a rescue dog~
+A rescue dog stands here, wagging its curled tail.
+~
+1 1 bdoD mn 2
+1 0 43 9 -1 -1
+D
+   The scrawny dog has a creamy white coat with a tail that curls back onto his
+back. His head is wedge-shaped, with a long nose and his ears are constantly on
+the move, turning toward every sound, real or imagined.
+~
+M
+0
+$n wags its curly tail.~
+M
+0
+$n looks up at you and turns its head.~
+M
+0
+$n bites at its own butt.~
+M
+0
+$n notices its tail and begins spinning in circles.~
+M
+0
+$n darts around like a madman.~
+M
+0
+$n sits at your feet, only for a moment.~
+M
+0
+$n shakes itself off.~
+M
+0
+$n lets its tongue hang out.~
 S
 #13580
 shadow lost~
