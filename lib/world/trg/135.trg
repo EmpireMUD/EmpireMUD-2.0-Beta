@@ -2888,7 +2888,7 @@ nop %actor.drunk(%quantity%)%
 ~
 #13592
 Labyrinth: Boss loot controllers~
-1 n 100 39
+1 n 100 38
 L c 13550
 L c 13551
 L c 13552
@@ -2918,7 +2918,6 @@ L c 13576
 L c 13577
 L c 13578
 L c 13579
-L c 13580
 L c 13581
 L c 13582
 L c 13583
@@ -2947,7 +2946,7 @@ if %self.vnum% == 13592
   elseif %roll% <= 25
     set loot_list 13584 13585 13586 13587
   else
-    set loot_list 13578 13579 13580 13581 13582 13583 13588
+    set loot_list 13578 13579 13581 13582 13583 13588
   end
   * count list
   set temp %loot_list%

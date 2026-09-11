@@ -897,15 +897,45 @@ Look desc set by trig 13540.
 ~
 S
 #13580
-minipet~
-a minipet~
-A minipet is here.
+shadow lost~
+a lost shadow~
+A shadow stretches across the ground.
 ~
-1 1 bdoD mn 1
+1 1 bdoD dmn 1
 0 0 0 5 -1 -1
 D
-tbd
+It seems to have a mind of its own.
 ~
+M
+0
+$n kicks your shadow in the knee.~
+M
+0
+$n dances around.~
+M
+0
+$n holds a pair of fingers over your shadow like bunny ears.~
+M
+0
+$n bites your shadow. Ouch!~
+M
+0
+$n tugs at your shadow.~
+M
+0
+$n vanishes for a minute before reappearing between your legs.~
+M
+0
+$n hides in your shadow.~
+M
+0
+$n tugs at your shadow, trying to pull it away.~
+M
+0
+$n tries to sew itself to your feet.~
+M
+0
+$n waves at you.~
 S
 #13581
 bull golden glorious~

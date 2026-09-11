@@ -61,12 +61,36 @@ other goblin casting a spell and BAM! Rats...
 I can go back to being Goblin King, neither. Maybe I can find Babe, though.
 Human luck to you, friend-o. Or whatever you say.'
 ~
-1 bci 250 350 -1
+2 bci 250 350 -1
 A
 1 13526
+R
+6 13527 13527
 W+
 13 13592 0 1 -
 Get past the minotaur~
+Z
+1 13527
+S
+#13527
+Labyrinth: Shadow Play~
+   'Oh!' the goblin says. 'One more thing. Thought you might want a memento of
+your, erm, stay. I'm done with this thing, if you want it.'
+   Turn in this quest to receive a new minipet. You must visit the fuzzy goblin
+in the rafters high above the labyrinth to receive it.
+
+~
+   The little goblin looks up at you with a crooked smile. 'Been nothing but
+trouble,' she says. 'Should be right up your alley.'
+~
+1 0 250 350 -1
+A
+5 13526
+R
+19 13580 13580
+W+
+13 13592 0 1 -
+Get one more thing from the fuzzy goblin~
 Z
 1 13527
 S
