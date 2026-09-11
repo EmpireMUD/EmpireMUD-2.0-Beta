@@ -3867,7 +3867,7 @@ $n drenches $N in searing acid, but it fails to harm $M.
 
 M13545 b 0 +
 acid digestion for gelatinous cube~
-has dissolved in a cube at~
+has dissolved in a gelatinous cube at~
 crush~
 crushes~
 crushing mass~
@@ -3887,7 +3887,7 @@ $n's gelatinous body contracts around $N, but its crushing pressure has no effec
 
 M13545 b 0 
 acid digestion for gelatinous cube~
-has dissolved in a cube at~
+has dissolved in a gelatinous cube at~
 You sear $N within your acidic mass, dissolving $S flesh as you digest $M!
 Your flesh sears and burns as $n's acidic body digests you alive!
 $n's acidic mass sears $N, dissolving $S flesh as the gelatinous cube digests $M!

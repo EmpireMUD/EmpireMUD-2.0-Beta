@@ -550,8 +550,10 @@ if %elite% && %elitev%
       if %elitev% == 13551 || %elitev% == 13557
         nop %mob.add_mob_flag(DPS)%
       end
+      if %elitev% != 13545
+        nop %mob.add_mob_flag(HARD)%
+      end
       nop %mob.add_mob_flag(TANK)%
-      nop %mob.add_mob_flag(HARD)%
     break
   done
 end
@@ -2192,7 +2194,7 @@ while %ch%
       rdelete timer_%ch.id% %self.id%
       %send% %ch% &&rThe world goes black as even the pain of your skin dissolving cannot keep you conscious... you're dead!&&0
       %echoaround% %ch% ~%ch% succumbs to the burning acid and lack of air... &%ch% is dead!
-      %slay% %ch% %ch.real_name% has died in a gelatinous cube at %person.room.coords%!
+      %slay% %ch% %ch.real_name% has dissolved in a gelatinous cube at %self.room.coords%!
     elseif %timer% >= 3
       %send% %ch% &&rYou can't breathe!&&0
     elseif
@@ -2210,6 +2212,10 @@ L b 13544
 L b 13545
 L o 142
 ~
+if %ability% != 142
+  return 1
+  halt
+end
 switch %self.vnum%
   case 13510
     * Cyclopean Minotaur
