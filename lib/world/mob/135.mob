@@ -898,6 +898,41 @@ _
 Look desc set by trig 13540.
 ~
 S
+#13578
+foal golden~
+a golden foal~
+A golden foal prances about, gleaming.
+~
+1 1 bdoD mn 2
+1 0 14 9021 -1 -1
+D
+   The little horse isn't just golden -- it's made of solid gold! The light
+twinkling off its coat is almost blinding. Whatever charm has animated this
+sweet statue, the foal is still worth its weight. But all attempts to catch it
+come up short as it darts away at the slightest motion.
+~
+M
+0
+$n glints in the light.~
+M
+0
+$n gleams in the light.~
+M
+0
+$n gallops past you.~
+M
+0
+$n darts in a circle.~
+M
+0
+$n bucks and kicks and dances about.~
+M
+0
+$n whinnies and leaps into the air.~
+M
+0
+$n nuzzles your hand and then darts away.~
+S
 #13579
 dog rescue~
 a rescue dog~

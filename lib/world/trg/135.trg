@@ -1229,10 +1229,19 @@ if %cmd% == open
     wait 1 sec
     %echo% A terrible death whinny echoes out of the great jar as swirls of color fly out and streak up the chamber!
     wait 1 sec
-    %quest% %actor% trigger 13515
+    * quest trigger
+    set ch %self.room.people%
+    while %ch%
+      if %ch.is_pc%
+        %quest% %ch% trigger 13515
+      end
+      set ch %ch.next_in_room%
+    done
+    * quest finish
     if %actor.quest_finished(13515)%
       %quest% %actor% finish 13515
     end
+    * load mob
     wait 1
     %load% mob 13512
     set mob %self.room.people(13512)%

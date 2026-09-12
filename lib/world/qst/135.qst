@@ -45,7 +45,7 @@ grand hidden down here.
    But it seems you aren't the first to find it.
 ~
    You press yourself through the tight passage and it opens into a grand
-chamber. It tooks some work, but it looks like you've found the center. There's
+chamber. It took some work, but it looks like you've found the center. There's
 just the minotaur between you and the ladder.
 ~
 5 0 250 350 -1
@@ -154,6 +154,48 @@ Z
 3 13592
 Z
 3 13593
+S
+#13512
+Labyrinth: Return of the Nightmare Queen~
+   The Nightmare Queen is real... and she is risen!
+   This is the point in the story where the rational adventurer would be
+reconsidering their actions. Each seal has been broken with little thought as
+to why they were sealed. Now, the ancient abomination stands over you -- and
+if the flames are any indication, she is mad.
+   As the one who unleashed her on this world, it falls to you to find a way
+to put her back in the jar. Or, barring that, find some other way to stop her.
+The lid is smashed and broken on the floor. Worse, the Nightmare Queen blocks
+the exit. Whatever you're going to do, you're on your own.
+   Once it's done, seek out the priest in the temple above.
+~
+   The priest listens intently, hands folded, as you weave the tale of the
+Nightmare Queen, once sealed away, then accidentally released.
+   'I had never heard the legend,' the priest says. 'Who knew such an ancient
+evil was buried right beneath our feet. It's lucky the temple is here to
+contain it, or she might have escaped. But how did you defeat her?'
+   You continue the tale, recounting every detail of the fiery battle from
+which you narrowly emerged victorious. The priest hangs on your every word.
+   'I would have liked to see it for myself, risk of death be damned,' he says
+when the story draws to a close. 'I used to be an adventurer like you, you
+know. Until I took an arrow to the knee.'
+   The priest thanks you for the story, promising to commit it to parchment for
+posterity. He then excuses himself and returns to his duties, still musing over
+the epic tale.
+   A glint of gold catches your eye. You're not sure where it came from, but a
+young horse is following you, gleaming golden in the light.
+~
+4 0 250 350 -1
+A
+1 13512
+P
+0 13515 0 1 -
+R
+19 13578 13578
+W+
+3 13512 0 1 -
+Return the Nightmare Queen to the ashes~
+Z
+1 244
 S
 #13515
 Labyrinth: Sealed Away~
