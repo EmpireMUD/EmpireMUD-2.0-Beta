@@ -255,7 +255,7 @@ char *list_one_craft(craft_data *craft, bool detail) {
 			*abil = '\0';
 		}
 		if (GET_CRAFT_REQUIRES_OBJ(craft) != NOTHING) {
-			safe_snprintf(abil, sizeof(abil), " [%s]", skip_filler(get_obj_name_by_proto(GET_CRAFT_REQUIRES_OBJ(craft))));
+			safe_snprintf(obj, sizeof(obj), " [%s]", skip_filler(get_obj_name_by_proto(GET_CRAFT_REQUIRES_OBJ(craft))));
 		}
 		else {
 			*obj = '\0';
