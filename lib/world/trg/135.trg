@@ -216,9 +216,10 @@ end
 ~
 #13502
 Labyrinth: Chute helper object~
-1 bn 100 3
+1 bn 100 4
 L j 13501
 L j 13505
+L t 13500
 L w 13502
 ~
 set cycle 0
@@ -273,6 +274,10 @@ while %cycle% < 5
       * move actor
       %teleport% %actor% i13505
       %echoaround% %actor% ~%actor% falls in from above!
+      wait 1 sec
+      if !%actor.completed_quest(13500)%
+        %quest% %actor% start 13500
+      end
       %purge% %self%
       halt
     break
@@ -1182,9 +1187,10 @@ end
 ~
 #13518
 Labyrinth: Open the great jar~
-1 c 4 2
+1 c 4 3
 L b 13510
 L b 13512
+L t 13515
 open close~
 if %actor.obj_target(%arg.argument1)% != %self%
   if %arg.argument1% == jars || smaller /= %arg.argument1%
@@ -1217,11 +1223,17 @@ if %cmd% == open
     %send% %actor% You can't get the great jar open... the fiend seal is still intact.
   else
     * ok
+    dg_affect %actor% HARD-STUNNED on 3
     %send% %actor% You summon all your might and push the heavy lid off the great jar... it falls to the ground with a CRASH!
     %echoaround% %actor% ~%actor% plants ^%actor% feet and heaves ^%actor% weight against the lid of the great jar... which falls to the ground with a CRASH!
     wait 1 sec
     %echo% A terrible death whinny echoes out of the great jar as swirls of color fly out and streak up the chamber!
     wait 1 sec
+    %quest% %actor% trigger 13515
+    if %actor.quest_finished(13515)%
+      %quest% %actor% finish 13515
+    end
+    wait 1
     %load% mob 13512
     set mob %self.room.people(13512)%
     set diff %self.var(diff,1)%
@@ -1578,7 +1590,7 @@ end
 ~
 #13531
 Labyrinth: Meek adventurer setup~
-0 n 100 1
+0 nt 100 1
 L f 13531
 ~
 wait 1
@@ -2265,6 +2277,33 @@ if %hit% && !%actor.has_tech(!Poison)% && !%actor.aff_flagged(IMMUNE-POISON-DEBU
   %dot% #13548 %actor% 35 30 poison 30
 end
 ~
+#13549
+Labyrinth: Look at a particular page~
+1 c 4 1
+L t 13515
+look examine~
+return 0
+* shortcut
+if %actor.is_npc%
+  halt
+elseif %actor.on_quest(13515)% || %actor.completed_quest(13515)%
+  halt
+end
+*
+set targ %arg.argument1%
+* parse out number-dot syntax like 3.page
+eval dotpos %targ.index_of(.)% + 1
+if %dotpos% > 0
+  set keyword %targ.substr(%dotpos%)%
+else
+  set keyword %targ%
+end
+* attempt to start quest
+if (page /= %keyword% || torn /= %keyword%) && !%actor.obj_target(%targ%)%
+  wait 1
+  %quest% %actor% start 13515
+end
+~
 #13551
 Labyrinth: Monstrous centipede venom~
 0 k 100 1
@@ -2895,7 +2934,7 @@ detach 13578 %self.id%
 ~
 #13579
 Labyrinth: Free to a Good Home turn-in qualifier~
-0 v 0 3
+0 tv 0 3
 L j 13501
 L j 13592
 L t 13503

@@ -509,8 +509,9 @@ on the edge of the alcove, atop stacks of books, and on the floor.
 Some of the texts you can see are:
    Tome of Arthropod Embiggening
    Spell to hex a person into a rat
+   A page torn from a book
 ~
-3 0 0 0 0 3
+3 0 0 0 0 5
 0 0 0
 0 0
 E
@@ -541,6 +542,21 @@ candles stubs burnt wax~
    The stubs of old candles adorn the books, the alcove, and the floor.
 Someone has spent a lot of time down here studying these.
 ~
+E
+page torn~
+   A page, torn on one side, lays atop one of the books. Though it's frozen in
+place, like everything else here, and cannot be moved, you're able to read the
+side of it that faces up. Most of the writing is in a language you've never
+seen, but some notes in the margins are legible:
+   nightmare empire
+   a portion interred?
+   blood seal
+   water seal
+   fiend seal
+   urns?
+... But what does any of it mean?
+~
+T 13549
 S
 #13527
 garden glowing plants mushrooms fungi~

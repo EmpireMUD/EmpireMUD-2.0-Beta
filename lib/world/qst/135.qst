@@ -1,3 +1,68 @@
+#13500
+Labyrinth: Oubliette~
+   You awaken in an unfamiliar place. The walls and floor are cold stone. The
+ceiling is so high you cannot see the chute that dropped you here, at least,
+not in the dark. You've really done it this time.
+   A drip echoes in the distance. A shuffle. Perhaps a scurry. And a creak. A
+long moment of silence, broken by the sound of pottery shattering, echoing back
+and forth. And then silence again.
+   And then a voice.
+   What is this place?
+~
+   Relief washes over you as you press yourself through the tight passage and
+it opens into such a grand chamber. But it's brief. The exit is blocked by the
+minotaur.
+~
+5 0 250 350 -1
+A
+4 13502
+P
+5 13501 0 1 a
+P
+6 13501 0 1 a
+R
+6 13510 13510
+W+
+13 13590 0 1 a
+Find the center of the labyrinth~
+Z
+3 13590
+_
+player does 13500 or 13501 but not both
+~
+S
+#13501
+Labyrinth: Descent~
+   You cast a glance upward to the chute, now so high above that you can't make
+it out in the dark. The walls are cold stone, stretching out into the darkness
+in each direction. A drip echoes from the distance; you can't tell which way it
+came from as it echoes back again.
+   Then it's silent.
+   A scurrying sound. A creak.
+   Then more silence.
+   No one would bury a place as impressive as this if there isn't something
+grand hidden down here.
+   But it seems you aren't the first to find it.
+~
+   You press yourself through the tight passage and it opens into a grand
+chamber. It tooks some work, but it looks like you've found the center. There's
+just the minotaur between you and the ladder.
+~
+5 0 250 350 -1
+A
+3 13505
+P
+5 13500 0 1 a
+P
+6 13500 0 1 a
+R
+6 13510 13510
+W+
+13 13590 0 1 a
+Find the center of the labyrinth~
+Z
+3 13590
+S
 #13502
 Labyrinth: Out of My Depth~
    At first, there's no movement, as if the adventurer in the corner hopes you
@@ -55,6 +120,69 @@ W+
 Meet me outside the labyrinth~
 Z
 1 13503
+S
+#13510
+Labyrinth: The Only Way Out Is Through~
+   Nevermind the maze, nevermind the darkness, nevermind the horrors. The
+labyrinth holds a minotaur! There's real glory to be had in taking on a mythic
+creature. They'll sing stories of this battle... if you survive.
+~
+   A cloud of ash billows out from beneath the minotaur as he collapses to the
+chamber floor, dead. Silence washes down the walls and across the floor. True
+silence. No scurry, no creaks, no thudding footfalls.
+   Silence.
+   And with the minotaur dead, you can finally reach the ladder out. Not a
+moment too soon. This place feels like a tomb.
+~
+3 0 250 350 -1
+A
+5 13500
+A
+5 13501
+A
+1 13510
+P
+0 13500 0 1 -
+P
+0 13501 0 1 -
+W+
+3 13510 0 1 a
+Slay the minotaur~
+Z
+3 13590
+Z
+3 13592
+Z
+3 13593
+S
+#13515
+Labyrinth: Sealed Away~
+   Though you can make little sense of the torn page, the marginal notes seem
+to suggest something is sealed away in some kind of urn or jar. Whoever wrote
+those notes must also have been the person who tore the page from the book for
+reference. But the page was enchanted to be immovable and you cannot take it
+along -- or even see the other side -- so you will have to figure this one out
+on your own.
+   The notes suggested three seals must be broken: the blood seal, the water
+seal, and the fiend seal.
+   It doesn't indicate how.
+   The author seemed to think they were onto something, but those notes were
+long-abandoned. Did the author break the seals and abscond with the treasure?
+Or did they meet some other fate in the dark?
+   The only way to find out is to break the seals. And then you'll just have to
+find the correct jar... and open it.
+~
+   All three seals are broken and the great jar is open! But perhaps the power
+contained therein isn't what you were expecting...
+~
+3 i 250 350 -1
+A
+4 13549
+W+
+11 0 0 1 a
+Break the seals and open the jar~
+Z
+2 13515
 S
 #13526
 Labyrinth: See You On The Other Side~
