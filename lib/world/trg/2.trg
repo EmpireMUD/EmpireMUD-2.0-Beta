@@ -1,6 +1,6 @@
 #205
 Bodyguard refresh and cooldown on death~
-0 ft 100 1
+0 ftA 100 1
 L w 2030
 ~
 * partial copy of 9803

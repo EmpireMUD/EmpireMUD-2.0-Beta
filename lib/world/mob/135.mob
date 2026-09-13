@@ -88,6 +88,7 @@ I+ 6 0  # Boss
 T 13515
 T 13511
 T 13513
+T 13597
 S
 #13516
 adventurer hapless~
@@ -898,13 +899,55 @@ _
 Look desc set by trig 13540.
 ~
 S
+#13576
+slime teeny~
+a teeny slime~
+A teeny slime scoots along.
+~
+1 1 bdoD mn 2
+0 0 72 13544 -1 -1
+D
+   The rippling surface of the little thing glimmers as it catches the light.
+The slime is no larger than your fist, as round as a ball, and near ceaseless
+in its mission to gobble up every tiny crumb or mote, leaving a trail of goo in
+its path. It pays no attention to you or anyone else.
+~
+S
+#13577
+mini-taur minitaur taur~
+a mini-taur~
+A mini-taur charges back and forth, horns down.
+~
+1 1 bdoD mn 2
+0 0 39 42 -1 -1
+D
+   Although at first glance it appears to be a tiny minotaur, its entire body
+-- from its cloven feet to the horns atop its head -- is made of stone, painted
+to look lifelike, but stone. This doesn't seem to dampen its spirits.
+~
+M
+0
+$n stomps its hoof and pouts.~
+M
+0
+$n stomps its hoof.~
+M
+0
+$n charges toward you, veering off at the last second.~
+M
+0
+$n charges past you.~
+M
+0
+$n charges in a circle.~
+S
 #13578
 foal golden~
 a golden foal~
 A golden foal prances about, gleaming.
 ~
 1 1 bdoD mn 2
-1 0 14 9021 -1 -1
+0 0 14 9021 -1 -1
 D
    The little horse isn't just golden -- it's made of solid gold! The light
 twinkling off its coat is almost blinding. Whatever charm has animated this

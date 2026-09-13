@@ -1232,15 +1232,14 @@ if %cmd% == open
     * quest trigger
     set ch %self.room.people%
     while %ch%
-      if %ch.is_pc%
+      if %ch.is_pc% && %ch.on_quest(13515)%
         %quest% %ch% trigger 13515
+        if %ch.quest_finished(13515)%
+          %quest% %ch% finish 13515
+        end
       end
       set ch %ch.next_in_room%
     done
-    * quest finish
-    if %actor.quest_finished(13515)%
-      %quest% %actor% finish 13515
-    end
     * load mob
     wait 1
     %load% mob 13512
@@ -1369,36 +1368,45 @@ end
 ~
 #13521
 Labyrinth: Drink the murky basin water~
-1 c 6 4
+1 c 6 5
 L c 13514
 L c 13515
 L f 13521
 L j 13590
+L t 13514
 drink sip fill pour~
 return 0
 set ok 0
 if (%cmd% == sip || %cmd% == drink || %cmd% == pour) && %actor.obj_target(%arg.argument1%)% == %self%
   set val1 %self.val1%
-  wait 1 sec
+  wait 1
   if %self.val1% < %val1% || %cmd% == sip || %actor.nothirst%
     set ok 1
   end
 elseif %cmd% == fill && %actor.obj_target(%arg.argument2%)% == %self%
   set val1 %self.val1%
-  wait 1 sec
+  wait 1
   if %self.val1% < %val1%
     set ok 1
   end
 end
 if %ok%
-  %subecho% %self.room% The haunting beat of an unseen drum echoes through the labyrinth.
+  * update quest
+  if %actor.on_quest(13514)%
+    %quest% %actor% trigger 13514
+    %quest% %actor% finish 13514
+  end
+  * update jars?
   makeuid bossroom room i13590
   set jar %bossroom.contents(13515)%
   if %jar%
-    set water_done 1
-    remote water_done %jar.id%
+    wait 1
+    if !%jar.var(water_done)%
+      %subecho% %self.room% The haunting beat of an unseen drum echoes through the labyrinth.
+      set water_done 1
+      remote water_done %jar.id%
+    end
   end
-  detach 13521 %self.id%
 end
 ~
 #13522
@@ -1408,7 +1416,7 @@ L c 13523
 L j 13524
 ~
 set ignore_methods enter exit login respawn summon system transport goto transfer
-if %was_in% && %was_in.template% == 13524
+if %was_in% && %was_in.template% == 13524 && %method% == move
   * climb down ladder: ok
   halt
 elseif %ignore_methods% ~= %method%
@@ -1577,8 +1585,9 @@ set obj %self.inventory%
 ~
 #13529
 Labyrinth: Lost in the dark check~
-2 g 100 1
+2 g 100 2
 L c 13519
+L y 13500
 ~
 if %actor.is_npc%
   halt
@@ -1594,6 +1603,13 @@ else
     * whoops
     rdelete labyrinth_dark_count %actor.id%
     %load% obj 13519 %actor% inv
+  end
+end
+* ensure progress goal
+if %actor.empire%
+  set emp %actor.empire%
+  if !%emp.is_on_progress(13500)% && !%emp.has_progress(13500)%
+    nop %emp.start_progress(13500)%
   end
 end
 ~
@@ -1920,7 +1936,10 @@ elseif %self.vnum% == 13545
   * death cube
   %send% %actor% You can't escape the gelatinous cube!
   return 0
-elseif (%self.vnum% == 13538 || %self.vnum% == 13539) && %actor.can_see_in_room% && %direction% != up && %direction% != down
+elseif !%actor.can_see_in_room%
+  * the rest of these are skipped if the actor cannot see in the dark
+  halt
+elseif (%self.vnum% == 13538 || %self.vnum% == 13539) && %direction% != up && %direction% != down
   * shadows (selectively block certain moves)
   %send% %actor% You walk for a ways but end up at the same spot.
   %load% obj 9680 %actor% inv
@@ -2273,7 +2292,7 @@ done
 Labyrinth: Hidden spider~
 0 b 100 0
 ~
-if !%self.fighting% && !%self.disabled% && %room.players_present% == 0
+if !%self.fighting% && !%self.disabled% && %self.room.players_present% == 0
   hide
 end
 ~
@@ -2949,7 +2968,7 @@ L j 13592
 L t 13503
 ~
 if %questvnum% == 13503 && %self.room.template% >= 13501 && %self.room.template% <= 13592
-  %send% %actor% You need to get ~%self% out of the Labyrinth before you can finish %questname%.
+  %send% %actor% You need to get ~%self% out of the maze before you can finish %questname%.
   return 0
 else
   return 1
@@ -3071,6 +3090,23 @@ set target %instance.location%
 if %target% && !%room.down(room)%
   %door% %room% down room %target%
 end
+~
+#13597
+Labyrinth: Start Nightmare Queen progress~
+0 hnA 100 1
+L y 13502
+~
+wait 0
+set ch %self.room.people%
+while %ch%
+  if %ch.is_pc% && %ch.empire%
+    set emp %ch.empire%
+    if !%emp.is_on_progress(13502)% && !%emp.has_progress(13502)%
+      nop %emp.start_progress(13502)%
+    end
+  end
+  set ch %ch.next_in_room%
+done
 ~
 #13598
 Labyrinth: Adventurer leaves after quest completion~

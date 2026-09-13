@@ -75,11 +75,11 @@ and then... this. Just this. This maddening place.'
    There's a heavy sigh.
    'If you can get me out of here, I'll owe you one. Maybe several. What do you
 say?'
-   Use 'finish Out of My Depth' to accept and gain the meek adventurer as a
-permanent companion, or 'quest drop Out of My Depth' to decline.
+   Use '&cfinish Out of My Depth&0' to accept and gain the meek adventurer as a
+permanent companion, or '&cquest drop Out of My Depth&0' to decline.
 ~
    'You won't regret this,' says the meek adventurer, getting up.
-   Use the 'companion' command to summon the meek adventurer.
+   Use the '&ccompanion&0' command to summon the meek adventurer.
 ~
 3 bc 250 350 -1
 A
@@ -99,7 +99,7 @@ S
 #13503
 Labyrinth: Free to a Good Home~
    'Oh, let's talk again when we get out,' the adventurer adds.
-   Use the 'companion' command to summon the meek adventurer when you're
+   Use the '&ccompanion&0' command to summon the meek adventurer when you're
 outside the labyrinth in order to complete this quest.
 ~
    'I never thought I'd get out of there. I can't possibly thank you enough,'
@@ -134,7 +134,7 @@ silence. No scurry, no creaks, no thudding footfalls.
    And with the minotaur dead, you can finally reach the ladder out. Not a
 moment too soon. This place feels like a tomb.
 ~
-3 0 250 350 -1
+4 0 250 350 -1
 A
 5 13500
 A
@@ -145,6 +145,8 @@ P
 0 13500 0 1 -
 P
 0 13501 0 1 -
+R
+19 13577 13577
 W+
 3 13510 0 1 a
 Slay the minotaur~
@@ -197,6 +199,34 @@ Return the Nightmare Queen to the ashes~
 Z
 1 244
 S
+#13514
+Labyrinth: Beneath the Aquifer~
+   Dry air stings your nose as you realize the labyrinth's entrance was a one-
+way trip and there may be no source of fresh water. And then there's a drip.
+Drip. Drip. It echoes in the distance. There's water down here somewhere. And
+where there's water, perhaps there's a way out.
+   Seek a source of drinking water and drink from it (or, at least, sip it). It
+seems you might be stuck in this stone tomb for some time.
+~
+   The dripping echoes back and back again as each droplet splashes down into
+the basin. But the water is stale, hard, and more than a little bitter. There's
+another flavor there, too. Someone must've been washing up in this basin.
+   Worse, there's no way out.
+   The water seeps through the narrowest seam in the cyclopean stone walls. The
+opening is so fine you couldn't fit a razor through it.
+   Yet the dripping continues.
+~
+3 0 250 350 -1
+A
+3 13505
+R
+19 13576 13576
+W+
+11 0 0 1 -
+Find a source of drinking water in the labyrinth~
+Z
+3 13514
+S
 #13515
 Labyrinth: Sealed Away~
    Though you can make little sense of the torn page, the marginal notes seem
@@ -217,7 +247,7 @@ find the correct jar... and open it.
    All three seals are broken and the great jar is open! But perhaps the power
 contained therein isn't what you were expecting...
 ~
-3 i 250 350 -1
+4 0 250 350 -1
 A
 4 13549
 W+

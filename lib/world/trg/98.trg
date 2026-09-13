@@ -29,7 +29,7 @@ return 0
 ~
 #9803
 Companion dies permanently~
-0 ft 100 1
+0 ftA 100 1
 L f 9809
 ~
 * This script deletes a companion's entry when it dies.
@@ -221,7 +221,7 @@ end
 ~
 #9809
 Companion initialization for perma-death~
-0 n 100 1
+0 ntA 100 1
 L f 9803
 ~
 * permanently store leader ID in order to detect deaths correctly
