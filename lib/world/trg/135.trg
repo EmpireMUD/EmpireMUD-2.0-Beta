@@ -101,19 +101,26 @@ while %pos% > 0
   eval pos %pos% - 1
 done
 if %random.2% == 2
+  set spare_loc %route_list.car%
   set mini_loc %route_list.cdr%
+  set mini_loc %mini_loc.car%
 else
   set mini_loc %route_list.car%
+  set spare_loc %route_list.cdr%
+  set spare_loc %spare_loc.car%
 end
 switch %random.3%
   case 1
     set mini_vnum 13520
+    set spare_corpse 13525
   break
   case 2
     set mini_vnum 13525
+    set spare_corpse 13530
   break
   case 3
     set mini_vnum 13530
+    set spare_corpse 13520
   break
 done
 * Store route to the campsite
@@ -171,6 +178,15 @@ if %where%
       dg_affect #13525 %miniboss% IMMUNE-WHERE on -1
     end
     nop %miniboss.unscale_and_reset%
+  end
+end
+* Spare corpse?
+if %spare_loc% && %spare_corpse%
+  makeuid spare room i%spare_loc%
+  %load% obj %spare_corpse% %spare%
+  set obj %spare.contents%
+  if %obj.vnum% == %spare_corpse%
+    %scale% %obj% 250
   end
 end
 * Trash mobs

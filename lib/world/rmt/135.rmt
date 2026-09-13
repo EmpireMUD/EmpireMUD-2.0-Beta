@@ -213,7 +213,7 @@ corridors halls paths~
 difficult to get any sense of direction or find a good path through.
 ~
 E
-floor down~
+floor down slope~
    The floor is made of the same stone as the walls and strewn with sand, which
 collects at the edges. The floor is sloped, gradually leading further down.
 ~
@@ -253,6 +253,10 @@ D14
 ~
 0 13515
 E
+north east south west northeast ne southeast se southwest sw northwest nw~
+You can't make sense of the directions in this labyrinth -- it goes on forever.
+~
+E
 alcove~
 There's an empty alcove in the far wall.
 ~
@@ -290,16 +294,12 @@ The wholy place is a labyrinth.
 ~
 E
 seams~
-   The stones come together so well that the seams are all but invisible. 
+   The stones come together so well that the seams are all but invisible.
 Water seems to be coming from one of the seams along the ceiling and wall.
 ~
 E
 moss~
 Dead moss clings to the wall.
-~
-E
-north east south west northeast ne southeast se southwest sw northwest nw~
-You can't make sense of the directions in this labyrinth -- it goes on forever.
 ~
 M 1 13514 100.00 1
 T 13504
@@ -342,7 +342,7 @@ corridors halls paths~
 difficult to get any sense of direction or find a good path through.
 ~
 E
-floor down~
+floor down slope~
    The sloped floor is made of the same stone as the walls. A fine layer of
 sand covers parts of it and collects at the edges.
 ~
@@ -396,7 +396,7 @@ corridors halls paths~
 difficult to get any sense of direction or find a good path through.
 ~
 E
-floor down~
+floor down slope~
    The floor is strewn with sand, which piles up at the edges. The floor is
 sloped gradually downward.
 ~
@@ -604,9 +604,10 @@ darkness distance~
 In the distance, you see only darkness.
 ~
 E
-sand floor down~
+sand floor down slope~
    A fine layer of sand covers parts of the floor and collects in small piles
-along the edges.
+along the edges. As with the rest of this maze, the floor slopes gradually,
+though it's hard to tell if downward or upward is the right path.
 ~
 E
 up ceiling~
@@ -659,7 +660,7 @@ statue smashed marble broken~
 statue in the alcove. The rest of it is merely debris on the floor.
 ~
 E
-floor down debris~
+floor down debris slope~
    The floor, always sloping and never flat, is strewn with sand that collects
 along the edges and in the seams between the stones. Littered below the alcove
 are unidentifiable bits of crushed marble.
@@ -737,7 +738,7 @@ the floors. Here a hand, there an ear, occasionally a hoof or horn. No statue
 remains intact.
 ~
 E
-floor down~
+floor down slope~
    The floor around the alcoves has broken statues and bits of marble dust. No
 part of the floor is even; it always seems to lead further down.
 ~
@@ -783,8 +784,9 @@ scorch burn~
 There are no scorch or burn marks here.
 ~
 E
-floor down~
-You can hardly see the floor tiles here. Piles of sand and ash cover the floor.
+floor down slope~
+   You can hardly see the floor tiles here. Piles of sand and ash cover the
+floor. The floor slopes up away from the door.
 ~
 E
 bricks~
@@ -890,7 +892,7 @@ darkness distance~
 In the distance, you see only darkness.
 ~
 E
-floor down~
+floor down slope~
    The floor has a long, gradual slope. Potsherds and clay dust collect along
 the edges, along with loose sand.
 ~
@@ -932,7 +934,7 @@ corridors halls paths~
 The path ends here. In the opposite direction, you can see only darkness.
 ~
 E
-floor down~
+floor down slope uneven~
 Sand covers part of the uneven floor. There are also some small potsherds.
 ~
 E
@@ -1013,7 +1015,7 @@ sand~
 along the edges.
 ~
 E
-floor down~
+floor down slope~
    The stone floor slopes ever so slightly; you can't tell whether a higher or
 lower level counts as progress through the maze.
 ~
@@ -1085,7 +1087,7 @@ alcoves~
 alcoves is strewn with bits of smashed marble.
 ~
 E
-floor down~
+floor down slope~
 Bits of broken statuary litter the sloping stone floor.
 ~
 E
@@ -1144,10 +1146,12 @@ puddle water~
 and splashes into the puddle with an echoing ping.
 ~
 E
-floor down~
+floor down slope~
    The stone floor has a puddle in an impression in the center and sand
 collecting near the walls. Here and there, bits of broken marble statues
-decorate the area in front of the alcoves.
+decorate the area in front of the alcoves. The floor here, as everywhere, has
+a gradual slope, though you cannot determine if heading upward or downward gets
+you closer to your goal.
 ~
 E
 stones walls~
@@ -1556,7 +1560,7 @@ fitting them together. The walls have no mortar, only fine seems where the
 rocks meet.
 ~
 E
-floor down~
+floor down slope~
    Along the stone floors, sand collects in the seams and bits of broken clay
 litter the edges. The floor has a slow, gradual slope as the labyrinth leads
 further and further underground.
@@ -1623,9 +1627,10 @@ together without any binder between them, in contrast to the wall that blocks
 passage at the end, which is made from brick and mortar.
 ~
 E
-sand floor~
-   Sand piles up against the wall and covers much of the floor. There's an old
-trail that seems to lead to the corner.
+sand floor down slope~
+   Sand piles up against the wall, where the slope of the floor reaches its
+lowest point, and covers much of the ground. There's an old trail that seems to
+lead to the corner.
 ~
 E
 trail~
@@ -1693,7 +1698,7 @@ corridors halls paths~
 indicates there was once another path here.
 ~
 E
-floor down~
+floor down slope~
    The floor slopes ever so slightly downward. There's sand in places, mostly
 stuck in the floor seams or piled along the edges.
 ~
@@ -1790,7 +1795,7 @@ labyrinth wall. It has small shelf-like bits along with redder hairs that
 bristle out toward you when you move too close.
 ~
 E
-floor down~
+floor down slope~
 The floor is sloped, gradually leading further down.
 ~
 E
@@ -1910,7 +1915,7 @@ sand~
 The floor is strewn with sand.
 ~
 E
-floor down~
+floor down uneven slope~
    The floor is uneven, but generally flat compared to the sloping floors of
 the rest of the labyrinth. It's made from stone and strewn with smashed
 statues.
@@ -1979,7 +1984,7 @@ together so precisely that there is no mortar or gap between them. Where the
 corridor splits, the stones have been carved in an intricate relief.
 ~
 E
-floor down~
+floor down uneven slope~
 Sand drifts line the cold, uneven stone floor.
 ~
 E
@@ -2230,7 +2235,7 @@ clay potsherds sherds shards bits~
 Broken bits of clay -- likely from old pots -- litter the floor.
 ~
 E
-floor down~
+floor down slope~
    Potsherds and bits of broken clay litter the stone floors. The floor has a
 long, gradual slope to it. You can't tell how far underground you are.
 ~
@@ -2275,7 +2280,7 @@ corridors halls paths~
 The corridor extends off into the darkness.
 ~
 E
-floor down~
+floor down slope~
    The floor is made of the same stone as the walls and strewn with sand, which
 collects at the edges. It slopes upwards from here, away from the brick wall.
 ~
@@ -2350,10 +2355,14 @@ end bricks~
 the wall remains sturdy.
 ~
 E
-mosaic stunning floor down~
+mosaic stunning floor down tiles~
    The floor is paved with a mosaic of colorful tiles depicting a man and
 woman, though their heads and feet are missing. Indeed, sections of tile have
 been removed all over the mosaic.
+~
+E
+slope~
+The floor is fairly flat here.
 ~
 E
 alcoves~
@@ -2425,6 +2434,10 @@ E
 chunks ground ash floor down~
    The floor is littered with bits of broken bricks and a thin layer of ash,
 except around the wall, where gaps in the mortar allow a small breeze through.
+~
+E
+slope~
+The floor levels off as it approaches the brick wall.
 ~
 E
 breeze~
@@ -2503,7 +2516,7 @@ a winged man, and a winged woman. All the lower statues have been destroyed,
 however so the alcoves nearest the floor have little more than feet and ankles.
 ~
 E
-sand floor~
+sand~
 The floor is covered in fine arena sand.
 ~
 E
@@ -2552,8 +2565,8 @@ wall near the passage.
 ~
 E
 floor down~
-   The stone floor is covered in a fine layer of ash, disturbed by the many
-footprints of the pacing minotaur.
+   The stone floor is covered arena sand with a fine layer of ash in most
+places, disturbed by the many footprints of the pacing minotaur.
 ~
 E
 footprints prints~
