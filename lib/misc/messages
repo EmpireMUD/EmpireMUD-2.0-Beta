@@ -4021,6 +4021,150 @@ Your pixies surround $N in a cloud of strange magic, but $E remains unaffected.
 Strange pixy magic washes over you, but cannot harm you.
 Pixies surround $N in a cloud of strange magic, but $N remains unaffected.
 
+M13584 b 27 +
+horned champion~
+~
+gore~
+gores~
+long horns~
+0 1 3.7 4.1 4.5
+You charge into $N and impale $M upon your massive horns!
+$n charges into you, impaling you upon $s massive horns!
+$n charges into $N, impaling $M upon $s massive horns!
+You charge toward $N, but $E leaps aside at the last moment!
+You leap aside as $n charges toward you!
+$n charges toward $N, but $N leaps aside at the last moment!
+#
+#
+#
+You charge toward $N with your horns lowered, but $E is beyond your reach.
+$n charges toward you with $s horns lowered, but you remain untouched.
+$n charges toward $N with $s horns lowered, but $N remains untouched.
+
+M13584 b 27 
+horned champion~
+~
+You charge into $N horns-first, tackling $M to the ground with bone-crushing force!
+$n charges into you horns-first, crushing you beneath the impact!
+$n charges into $N horns-first, tackling $M to the ground with bone-crushing force!
+You charge toward $N, but stumble and go sprawling before you can reach $M!
+You watch as $n charges toward you, only to stumble and go sprawling!
+$n charges toward $N, but stumbles and goes sprawling before reaching $M!
+#
+#
+#
+You charge toward $N horns-first, but stumble to a halt before reaching $M.
+$n charges toward you horns-first, but somehow stumbles to a halt before reaching you.
+$n charges toward $N horns-first, but stumbles to a halt before reaching $M.
+
+M13585 b 27 +
+horned percipient~
+~
+hex~
+hexes~
+horned magic~
+1 2 3.8 4.2 4.6
+You bend the unseen forces of fate through your white horns, bringing $N's life to an abrupt end!
+$n's white horns glow with strange power as fate itself turns against you!
+$n's white horns glow with strange power as $N's fate is suddenly sealed!
+You invoke the power of fate through your white horns, but $N escapes your vision!
+A strange light gleams from $n's white horns, but somehow you escape its reach!
+A strange light gleams from $n's white horns as $n reaches into the unseen, but $N escapes!
+#
+#
+#
+You invoke the power of fate through your white horns, but $E's destiny cannot be altered.
+$n invokes strange power through $s white horns, but your destiny remains untouched.
+Strange power gathers around $n's white horns, but even $n cannot alter $N's destiny.
+
+M13585 b 27 
+horned percipient~
+~
+You unleash a terrible hex through your gleaming white horns, reducing $N to a lifeless husk!
+A terrible hex pours from $n's gleaming white horns, withering your body and stealing your life!
+A terrible hex pours from $n's gleaming white horns, withering $N into a lifeless husk!
+You unleash a terrible hex at $N, but $E breaks free of its grasp!
+A terrible hex washes over you from $n's gleaming white horns, but you break free of its grasp!
+A terrible hex washes over $N from $n's gleaming white horns, but $N breaks free!
+#
+#
+#
+You unleash a terrible hex through your gleaming white horns, but $E is beyond its power.
+A terrible hex pours from $n's gleaming white horns, but it cannot touch you.
+A terrible hex pours from $n's gleaming white horns, but even its ancient power cannot touch $N.
+
+M13586 b 27 +
+horned raider~
+~
+gore~
+gores~
+sharp horns~
+0 1 3.3 3.7 4.1
+You hook your sharp horns into $N and rip $M open!
+$n's sharp horns hook into you and rip you open!
+$n hooks $s sharp horns into $N and rips $M open!
+You slash at $N with your sharp horns, but $E twists away!
+You twist away as $n slashes at you with $s sharp horns!
+$n slashes at $N with $s sharp horns, but $N twists away!
+#
+#
+#
+You slash your sharp horns at $N, but $E is beyond harm.
+$n slashes at you with $s sharp horns, but they cannot harm you.
+$n slashes at $N with $s sharp horns, but $N remains unharmed.
+
+M13586 b 27 
+horned raider~
+~
+You gore $N with your sharp horns, lifting $M from the ground and tearing $M apart!
+$n's sharp horns gore you and lift you helplessly from the ground!
+$n gores $N with $s sharp horns, lifting $M from the ground and tearing $M apart!
+You sweep your horns toward $N, but $E ducks beneath them!
+You duck beneath $n's sweeping horns!
+$n sweeps $s horns toward $N, but $N ducks beneath them!
+#
+#
+#
+You sweep your sharp horns toward $N, but $E remains untouched.
+$n sweeps $s sharp horns toward you, but you remain untouched.
+$n sweeps $s sharp horns toward $N, but $N remains untouched.
+
+M13587 b 27 +
+horned disciple~
+~
+fracture~
+fractures~
+horned sorcery~
+1 2 3.4 3.8 4.2
+You flare with otherworldly light, and $N simply burns away beneath its radiance!
+Otherworldly light pours from $n's starlight horns, burning you away beneath its radiance!
+Otherworldly light pours from $n's starlight horns, and $N burns away beneath its radiance!
+You flare with otherworldly light, but $N slips beyond its reach!
+Otherworldly light pours from $n's horns, but you slip beyond its reach!
+Otherworldly light pours from $n's horns toward $N, but $N slips beyond its reach!
+#
+#
+#
+You flare with otherworldly light at $N, but $E remains beyond its power.
+Otherworldly light pours from $n's horns, but it cannot touch you.
+Otherworldly light pours from $n's horns toward $N, but $N remains beyond its power.
+
+M13587 b 27 
+horned disciple~
+~
+You call down a shower of stars upon $N, burying $M beneath celestial fire!
+A shower of burning stars crashes down upon you, engulfing you in celestial fire!
+A shower of burning stars crashes down upon $N, engulfing $M in celestial fire!
+You call down a shower of stars upon $N, but $E escapes the falling destruction!
+Burning stars rain down around you, but you escape the destruction!
+Burning stars rain down around $N, but $N escapes the falling destruction!
+#
+#
+#
+You call down a shower of stars upon $N, but $E remains untouched.
+Burning stars crash down around you, but somehow leave you unharmed.
+Burning stars crash down around $N, but leave $M completely unharmed.
+
 M16688 abc 32 +
 toy blaster~
 ~
