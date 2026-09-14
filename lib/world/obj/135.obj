@@ -1,5 +1,5 @@
 #13500
-seal passage further~
+seal passage further sealed~
 the sealed passage~
 Further progress down the passage is blocked by a seal. (difficulty)~
    The seal is carved in stone by a rough chisel, with the general shape of a
@@ -8,7 +8,7 @@ time, such that you cannot make out any word except one: Forbidden. You'll have
 to break the seal to continue.
 Usage:  difficulty <normal | hard | group | boss>
 ~
-3 B 0 0 0 11
+3 B 0 0 0 12
 0 0 0
 1 0
 T 13500
@@ -38,12 +38,12 @@ A steep chute leads to the darkness below.
 ~
 S
 #13502
-chute falling~
+chute falling down~
 falling down the chute~
 You are falling down the chute!~
 You are falling down the chute!
 ~
-3 0 a 0 0 3
+3 0 a 0 0 4
 0 0 0
 0 0
 T 13502
@@ -892,14 +892,14 @@ Mushroom-like shelves grow out of the sides of the hive.
 ~
 S
 #13547
-pixies bodies corpses body dead cave~
+pixies bodies corpses body dead cave pile~
 a pile of dead cave pixies~
 Dead cave pixies litter the floor.~
    The poor little creatures have died. Their bodies have started to darken and
 the stubby wings on their little backs have snapped off. Parts of them have
 already begun to crumble to dust.
 ~
-10 gkp a 0 0 5
+10 gkp a 0 0 6
 13553 1 0
 7 6
 C
@@ -1287,12 +1287,12 @@ S
 #13561
 boots fur cyclopean king pair~
 the fur boots of the cyclopean king~
-The fur boots of the cyclopean king stand here~
+The fur boots of the cyclopean king stand here.~
    The dark gray-green leather is covered in bronze filigree in a knotted
 pattern, coming together near the top in the shape of an eye, with a dazzling
 purple gem at its center. Gray and white fur pours out at the knee.
 ~
-27 mp ag 0 0 20
+27 mp ag 0 0 21
 2 0 0
 2 0
 A
@@ -1985,7 +1985,7 @@ M
 You eat $p and feel a little funny.~
 M
 33
-It has begun to ferment.~
+They have begun to ferment.~
 M
 17
 You realize $p have gone bad, and throw them out.~

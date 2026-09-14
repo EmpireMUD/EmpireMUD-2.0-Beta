@@ -674,7 +674,7 @@ L j 13534
 L o 96
 L o 97
 L q 4
-open close kick bash unlock pick~
+open close kick bash unlock pick break~
 set will_open 0
 set broke 0
 *
@@ -1052,6 +1052,26 @@ else
   done
 end
 ~
+#13514
+Labyrinth: Minotaur greeting~
+0 h 100 2
+L t 13500
+L t 13501
+~
+wait 1 sec
+%echo% ~%self% clenches ^%self% fists and bellows out a massive, fetid roar!
+%subecho% %self.room% A deep roar echoes through the halls of the labyrinth.
+wait 1 sec
+set ch %self.room.people%
+while %ch%
+  if %ch.on_quest(13500)%
+    %quest% %ch% finish 13500
+  elseif %ch.on_quest(13501)%
+    %quest% %ch% finish 13501
+  end
+  set ch %ch.next_in_room%
+done
+~
 #13515
 Labyrinth: Boss must-fight trigger~
 0 q 100 2
@@ -1219,7 +1239,9 @@ if %actor.obj_target(%arg.argument1)% != %self% && %cmd% != search
   halt
 end
 *
-if %cmd% == open || unseal /= %cmd%
+if %actor.fighting% || %actor.disabled%
+  %send% %actor% You're a bit busy at the moment.
+elseif %cmd% == open || unseal /= %cmd%
   if %self.var(open)%
     %send% %actor% The great jar is already open.
   elseif %room.people(13510)%
@@ -1276,6 +1298,17 @@ if %cmd% == open || unseal /= %cmd%
     %echo% ~%mob% arises from the ashes!
     set open 1
     remote open %self.id%
+    wait 3 sec
+    %echo% ~%mob% spurts fire and slams ^%mob% fists against the chamber ceiling!
+    %subecho% %self.room% The entire labyrinth shakes!
+    wait 4 sec
+    %echo% ~%mob% looks down at you and huffs a plume of smoke from ^%self% nostrils.
+    wait 2 sec
+    if !%mob.fighting%
+      %echo% The queen is not pleased by your presence.
+      wait 1
+      %force% %mob% maggro
+    end
   end
 elseif %cmd% == close
   if %self.var(open)%
@@ -1887,6 +1920,8 @@ L w 13533
 taste drink sip use search get take dig push pull rub dust~
 if !%actor.can_see(%self%)%
   return 0
+elseif %actor.fighting% || %actor.disabled%
+  %send% %actor% You're a bit busy at the moment.
 elseif "taste drink sip use" ~= %cmd% && %self.var(bubbles)%
   if %actor.obj_target(%arg.argument1%)% == %self%
     return 1
@@ -2434,6 +2469,9 @@ eval has_abil %actor.ability(18)% || %actor.ability(300)%
 * always do regular search too
 return 0
 *
+if %actor.fighting% || %actor.disabled%
+  halt
+end
 switch %room.template%
   case 13500
     if %has_abil%
@@ -2784,7 +2822,7 @@ else
   end
   * restringing: add to the look desc
   %mod% %self% append-lookdesc It looks like the last owner's fateful underground encounter has left it a bit %adjective%.
-  if %item.is_flagged(HARD-DROP)% || %item.is_flagged(GROUP-DROP)%
+  if %self.is_flagged(HARD-DROP)% || %self.is_flagged(GROUP-DROP)%
     set keywords %self.keywords%
     %mod% %self% append-lookdesc-noformat Type 'study %keywords.car%' to take it apart and learn to craft it.
     %mod% %self% append-lookdesc-noformat (Be sure to 'keep' any copies of it you don't want to lose.)

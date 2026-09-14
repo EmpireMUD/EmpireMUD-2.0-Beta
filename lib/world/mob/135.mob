@@ -66,6 +66,7 @@ T 13515
 T 13511
 T 13513
 T 13546
+T 13514
 S
 #13512
 queen nightmare~
@@ -852,6 +853,9 @@ S
 ~
 250 350 abd c 3
 0 0 0 15 -1 -1
+D
+They look hungry.
+~
 M
 0
 $n moves a little closer to the fire.~
@@ -890,6 +894,9 @@ S
 ~
 250 350 abd cM 3
 0 0 0 1 -1 -1
+D
+They look hungry.
+~
 M
 1
 Move along.~
