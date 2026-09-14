@@ -3587,7 +3587,7 @@ void do_stat_character(char_data *ch, char_data *k, bool details) {
 	}
 	
 	// notes on proto only
-	if (!IN_ROOM(k) && MOB_NOTES(k) && *MOB_NOTES(k)) {
+	if ((!IN_ROOM(k) || GET_ROOM_VNUM(IN_ROOM(k)) == 0) && MOB_NOTES(k) && *MOB_NOTES(k)) {
 		build_page_display(ch, "Notes:\r\n%s", MOB_NOTES(k));
 	}
 
