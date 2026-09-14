@@ -161,6 +161,7 @@ $n picks at $s nose.~
 T 13523
 T 13511
 T 13520
+T 13596
 S
 #13525
 rat gigantic giant goblin~
@@ -196,6 +197,7 @@ $n grooms $s whiskers.~
 T 13523
 T 13526
 T 13511
+T 13596
 S
 #13526
 Cherrith goblin fuzzy~
@@ -231,6 +233,7 @@ M
 $n scratches behind $s ear.~
 T 13527
 T 13511
+T 13596
 S
 #13527
 Cherrith goblin fuzzy~
@@ -285,6 +288,7 @@ I 4 13512 100.00 1  # LOOT: tarnished key
 I 4 13592 100.00 1  # LOOT: labyrinthine miniboss loot controller
 T 13523
 T 13511
+T 13596
 S
 #13535
 skeleton pale green~
@@ -310,6 +314,7 @@ T 13537
 T 13543
 T 13511
 T 13540
+T 13596
 S
 #13536
 skeleton bronze polished~
@@ -331,6 +336,7 @@ The skeleton rattles its jaw with a clack clack clack.~
 T 13537
 T 13543
 T 13511
+T 13596
 S
 #13538
 shadow dead strange~
@@ -381,6 +387,7 @@ T 13543
 T 13511
 T 13540
 T 13538
+T 13596
 S
 #13539
 shadow wailing long~
@@ -429,6 +436,7 @@ T 13537
 T 13543
 T 13511
 T 13538
+T 13596
 S
 #13540
 goblin lost~
@@ -483,6 +491,7 @@ $n gnashes its long teeth.~
 T 13540
 T 13537
 T 13543
+T 13596
 S
 #13542
 queen mole-rat molerat rat mammoth~
@@ -523,6 +532,7 @@ $n rears up and looms over you.~
 T 13540
 T 13537
 T 13543
+T 13596
 S
 #13544
 slime bone ball~
@@ -569,6 +579,7 @@ T 13544
 T 13511
 T 13542
 T 13546
+T 13596
 S
 #13545
 cube death gelatinous~
@@ -610,6 +621,7 @@ T 13543
 T 13511
 T 13545
 T 13546
+T 13596
 S
 #13547
 spider silvery mirror giant~
@@ -633,6 +645,7 @@ T 13537
 T 13543
 T 13511
 T 13548
+T 13596
 S
 #13548
 spider giant glimmer gold~
@@ -655,6 +668,7 @@ T 13537
 T 13543
 T 13511
 T 13548
+T 13596
 S
 #13550
 termite giant~
@@ -702,6 +716,7 @@ T 13540
 T 13537
 T 13543
 T 13511
+T 13596
 S
 #13551
 centipede monstrous~
@@ -743,6 +758,7 @@ T 13537
 T 13543
 T 13511
 T 13551
+T 13596
 S
 #13553
 pixies pixy cluster blind cave~
@@ -792,6 +808,7 @@ T 13537
 T 13543
 T 13511
 T 13540
+T 13596
 S
 #13554
 guardian wokestone stone pixy creature~
@@ -826,6 +843,7 @@ T 13537
 T 13543
 T 13511
 T 13540
+T 13596
 S
 #13556
 #n~
@@ -860,6 +878,7 @@ M
 Find your own spot.~
 T 13511
 T 13540
+T 13596
 _
 Look desc set by trig 13540.
 ~
@@ -895,6 +914,7 @@ $n picks at $s nails with the sword.~
 T 13511
 T 13540
 T 13523
+T 13596
 _
 Look desc set by trig 13540.
 ~

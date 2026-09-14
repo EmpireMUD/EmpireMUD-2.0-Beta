@@ -604,6 +604,22 @@ M
 5
 $n grabs a long, skinny mushroom and eats it.~
 S
+#13528
+passage secret removed stone~
+the secret passage~
+A removed stone reveals a secret passage through the wall.~
+   A stone has been pulled from the wall, revealing a short tunnel. But where
+does it lead?
+~
+8 0 0 0 0 1
+-1 0 0
+1 0
+E
+wall~
+   A stone has been pulled from the wall at the base -- an unexpected feat
+since all the stones are so tightly fit together.
+~
+S
 #13530
 champion dead horned body corpse~
 the dead champion~
@@ -1094,7 +1110,7 @@ The fur-lined gloves of the cyclopean king are here.~
 pattern, coming together at the wrist in the shape of an eye, with a gleaming
 purple gem at its center. Gray and white fur flares out below the wrist.
 ~
-27 mp ah 0 0 15
+27 mp ah 0 0 17
 2 0 0
 2 0
 A
@@ -1112,7 +1128,7 @@ A
 A
 19 1 0
 C
-250 375
+125 375
 T 13573
 _
 'pair' is added to keywords for trig 13573 to name it correctly.
@@ -1276,7 +1292,7 @@ The fur boots of the cyclopean king stand here~
 pattern, coming together near the top in the shape of an eye, with a dazzling
 purple gem at its center. Gray and white fur pours out at the knee.
 ~
-27 mp ag 0 0 19
+27 mp ag 0 0 20
 2 0 0
 2 0
 A
@@ -1294,7 +1310,7 @@ A
 A
 19 1 0
 C
-250 375
+125 375
 T 13573
 _
 'pair' is added to keywords for trig 13573 to name it correctly.
@@ -1473,7 +1489,7 @@ layer is a dark, tarnished bronze. And between them, verdigris. The whole of
 the mantle is set with thirteen purple gems, the largest of which is over the
 heart.
 ~
-27 mp ak 0 0 24
+27 mp ak 0 0 25
 2 0 0
 2 0
 A
@@ -1491,7 +1507,7 @@ A
 A
 19 1 0
 C
-250 375
+125 375
 T 13573
 S
 #13568
@@ -1661,7 +1677,7 @@ bottom, the shape of a door is cut from the pendant. From the door, a path
 twists and turns and curves back on itself as it works its way, unbranching,
 to the top, passing a large, circular ruby-red gem on its path.
 ~
-2 amp ak 0 0 30
+2 amp ak 0 0 31
 0 0 0
 2 0
 A
@@ -1679,7 +1695,7 @@ A
 A
 19 1 0
 C
-250 375
+125 375
 T 13573
 S
 #13574

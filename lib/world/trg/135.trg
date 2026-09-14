@@ -1202,14 +1202,15 @@ if !%self.contents%
 end
 ~
 #13518
-Labyrinth: Open the great jar~
-1 c 4 3
+Labyrinth: Great jar commands: open, close, search, unseal~
+1 c 4 4
 L b 13510
 L b 13512
+L o 18
 L t 13515
-open close~
-if %actor.obj_target(%arg.argument1)% != %self%
-  if %arg.argument1% == jars || smaller /= %arg.argument1%
+open close search unseal~
+if %actor.obj_target(%arg.argument1)% != %self% && %cmd% != search
+  if %cmd% == open && (%arg.argument1% == jars || smaller /= %arg.argument1%)
     %send% %actor% You open some of the smaller jars, but they contain only ash.
   else
     * targeting something else
@@ -1218,7 +1219,7 @@ if %actor.obj_target(%arg.argument1)% != %self%
   halt
 end
 *
-if %cmd% == open
+if %cmd% == open || unseal /= %cmd%
   if %self.var(open)%
     %send% %actor% The great jar is already open.
   elseif %room.people(13510)%
@@ -1282,6 +1283,35 @@ elseif %cmd% == close
   else
     %send% %actor% The great jar is already closed.
   end
+elseif %cmd% == search
+  return 0
+  if %actor.ability(18)%
+    if %self.room.people(13510)%
+      %send% %actor% The minotaur is blocking the way to the ladder... if only you could fly over his head.
+    elseif %self.room.people(13512)%
+      %send% %actor% You can't get past the Nightmare Queen!
+    else
+      %send% %actor% The chamber has been sealed off for a long time, but it looks like the ladder leads to an exit.
+    end
+    *
+    if !%self.var(water_done)% && !%self.var(blood_done)% && !%self.var(fiend_done)%
+      %send% %actor% You try to inspect the great jar but it is sealed.
+    elseif !%self.var(water_done)% && !%self.var(blood_done)%
+      %send% %actor% You try to inspect the great jar... but the water seal and blood seal are still intact.
+    elseif !%self.var(blood_done)% && !%self.var(fiend_done)%
+      %send% %actor% You try to inspect the great jar... but the blood seal and fiend seal are still intact.
+    elseif !%self.var(water_done)% && !%self.var(fiend_done)%
+      %send% %actor% You try to inspect the great jar... but the water seal and fiend seal are still intact.
+    elseif !%self.var(water_done)%
+      %send% %actor% You try to inspect the great jar... but the water seal is still intact.
+    elseif !%self.var(blood_done)%
+      %send% %actor% You try to inspect the great jar... but the blood seal is still intact.
+    elseif !%self.var(fiend_done)%
+      %send% %actor% You try to inspect the great jar... but the fiend seal is still intact.
+    elseif !%self.var(open)%
+      %send% %actor% You notice the seals on the great jar have broken!
+    end
+  end
 end
 ~
 #13519
@@ -1309,7 +1339,7 @@ elseif %self.vnum% == 13523
   set actor %self.carried_by%
   if %actor%
     wait 1
-    if %actor.is_flying%
+    if %actor.is_flying% && %actor.can_see_in_room%
       %send% %actor% &&rYou manage to stop yourself just as you reach the spikes! You only lose a droplet of blood.&&0
       %echoaround% %actor% ~%actor% manages to stop *%person%self just above the spikes!
     else
@@ -2360,12 +2390,13 @@ end
 ~
 #13553
 Labyrinth: Search for clues~
-2 c 0 36
+2 c 0 38
 L c 13503
 L c 13507
 L c 13511
 L c 13513
 L c 13518
+L c 13528
 L c 13534
 L j 13500
 L j 13505
@@ -2388,6 +2419,7 @@ L j 13553
 L j 13554
 L j 13558
 L j 13559
+L j 13560
 L j 13563
 L j 13564
 L j 13565
@@ -2467,7 +2499,9 @@ switch %room.template%
   case 13564
   case 13565
     * shelves
-    if %has_abil%
+    if %room.contents(13528)%
+      %send% %actor% There's a secret passage here!
+    elseif %has_abil%
       %send% %actor% You search each of the shelves and every stone, but come up empty.
     end
   break
@@ -2538,6 +2572,26 @@ switch %room.template%
       %send% %actor% You search through the rubble from the broken statues but find nothing of interest.
     end
   break
+  case 13560
+    if %room.contents(13528)%
+      %send% %actor% There's a secret passage here!
+    elseif %has_abil%
+      %send% %actor% As you search the stones of the wall, you find one with air coming from the seams... it's loose!
+      wait 1
+      %send% %actor% You manage to pull the loose stone free and find a secret passage!
+      %echoaround% %actor% ~%actor% pulls a loose stone out and finds a secret passage!
+      makeuid other room i13564
+      *
+      %load% obj 13528 %room%
+      set port %room.contents(13528)%
+      nop %port.val0(%other.vnum%)%
+      *
+      %load% obj 13528 %other%
+      set port %other.contents(13528)%
+      nop %port.val0(%room.vnum%)%
+      %at% %other% %echo% Someone pushes a small stone loose from the other side... there's a secret passage here!
+    end
+  break
   case 13563
     if %has_abil%
       %send% %actor% You search around the area for a bit, digging through the pile of broken jars, but come up with nothing of any use.
@@ -2551,36 +2605,6 @@ switch %room.template%
       %send% %actor% This is it! A passageway through the bricks leads right to the center of the maze!
     elseif %has_abil%
       %send% %actor% Gaps in the bricks allow a little stale air through, but the wall is solid and you find no way through it.
-    end
-  break
-  case 13590
-    if %has_abil%
-      if %room.people(13510)%
-        %send% %actor% The minotaur is blocking the way to the ladder... if only you could fly over his head.
-      elseif %room.people(13512)%
-        %send% %actor% You can't get past the Nightmare Queen!
-      else
-        %send% %actor% The chamber has been sealed off for a long time, but it looks like the ladder leads to an exit.
-      end
-      *
-      set jar %room.contents(13515)%
-      if !%jar.var(water_done)% && !%jar.var(blood_done)% && !%jar.var(fiend_done)%
-        %send% %actor% You try to inspect the great jar but it is sealed.
-      elseif !%jar.var(water_done)% && !%jar.var(blood_done)%
-        %send% %actor% You try to inspect the great jar... but the water seal and blood seal are still intact.
-      elseif !%jar.var(blood_done)% && !%jar.var(fiend_done)%
-        %send% %actor% You try to inspect the great jar... but the blood seal and fiend seal are still intact.
-      elseif !%jar.var(water_done)% && !%jar.var(fiend_done)%
-        %send% %actor% You try to inspect the great jar... but the water seal and fiend seal are still intact.
-      elseif !%jar.var(water_done)%
-        %send% %actor% You try to inspect the great jar... but the water seal is still intact.
-      elseif !%jar.var(blood_done)%
-        %send% %actor% You try to inspect the great jar... but the blood seal is still intact.
-      elseif !%jar.var(fiend_done)%
-        %send% %actor% You try to inspect the great jar... but the fiend seal is still intact.
-      elseif !%jar.var(open)%
-        %send% %actor% You notice the seals on the great jar have broken!
-      end
     end
   break
   default
@@ -3059,8 +3083,10 @@ if %self.vnum% == 13592
     set loot_list 13576
   elseif %roll% <= 25
     set loot_list 13584 13585 13586 13587
+  elseif %roll% <= 35
+    set loot_list 13582
   else
-    set loot_list 13578 13579 13581 13582 13583 13588
+    set loot_list 13578 13579 13581 13583 13588
   end
   * count list
   set temp %loot_list%
@@ -3107,6 +3133,26 @@ if %target% && !%room.down(room)%
   %door% %room% down room %target%
 end
 ~
+#13596
+Labyrinth: Song of the Nightmare Queen~
+0 l 15 3
+L j 13505
+L j 13591
+L w 13596
+~
+if %self.affect(13596)%
+  halt
+end
+*
+set room %self.room%
+if %room.template% < 13505 || %room.template% >= 13591
+  %echo% Eerie instrumental music echoes in the distance.
+else
+  %subecho% %room% Eerie instrumental music echoes through the labyrinth.
+end
+*
+dg_affect #13596 %self% HASTE on 300
+~
 #13597
 Labyrinth: Start Nightmare Queen progress~
 0 hnA 100 1
@@ -3138,7 +3184,7 @@ end
 ~
 #13599
 Labyrinth: Admin controller~
-1 c 2 52
+1 c 2 53
 L b 13510
 L b 13512
 L b 13520
@@ -3152,6 +3198,7 @@ L c 13507
 L c 13511
 L c 13515
 L c 13518
+L c 13528
 L j 13500
 L j 13501
 L j 13505
@@ -3271,12 +3318,31 @@ elseif status /= %arg.car%
   elseif %c_end% && %c_end.contents(13503)%
     %send% %actor% Path to the minotaur: wing C
   end
+  *
   makeuid passage room i13553
   if %passage%
     if %passage.contents(13518)%
       %send% %actor% Passage A-B open: yes
     else
       %send% %actor% Passage A-B open: no
+    end
+  end
+  *
+  makeuid passage room i13560
+  if %passage%
+    if %passage.contents(13528)%
+      %send% %actor% Passage B-C open: yes
+    else
+      %send% %actor% Passage B-C open: no
+    end
+  end
+  *
+  makeuid passage room i13554
+  if %passage%
+    if %passage.up(room)%
+      %send% %actor% Passage C-A open: yes
+    else
+      %send% %actor% Passage C-A open: no
     end
   end
   * Miniboss
