@@ -2,7 +2,7 @@
 #n champion horned~
 Horned Champion #n~
 The horned champion, #n, stands over you.~
-0 5 0 350 0 3
+0 13584 0 350 0 3
 1 50 -1 13584
 A
 2 1
@@ -25,7 +25,7 @@ S
 #n horned percipient~
 Horned Percipient #n~
 The horned percipient, #n, stands solemnly.~
-0 22 0 350 0 3
+0 13585 0 350 0 3
 2 50 -1 13585
 A
 8 1
@@ -43,7 +43,7 @@ S
 #n horned raider~
 Horned Raider #n~
 The horned raider, #n, threatens nearby.~
-0 42 0 350 0 3
+0 13586 0 350 0 3
 1 50 -1 13586
 A
 1 1
@@ -64,7 +64,7 @@ S
 #n horned disciple~
 Horned Disciple #n~
 The horned disciple, #n, stands in reverence.~
-0 22 0 350 0 3
+0 13587 0 350 0 3
 2 50 -1 13587
 A
 8 1
