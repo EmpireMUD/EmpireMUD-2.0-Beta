@@ -2081,6 +2081,7 @@ L c 13548
 L r 13556
 ~
 * save this for later
+wait 0
 set existing %self.room.contents%
 * accessory items
 switch %self.vnum%
@@ -2089,6 +2090,19 @@ switch %self.vnum%
     * mole rat tunnel
     if !%self.room.contents(13537)%
       %load% obj 13537
+      set portal %self.room.contents(13537)%
+      *
+      set mino %instance.mob(13510)%
+      eval tunnel_vnum %mino.var(tunnel_vnum,13593)% + 1
+      remote tunnel_vnum %mino.id%
+      *
+      makeuid tunnel room i%tunnel_vnum%
+      nop %portal.val0(%tunnel.vnum%)%
+      %load% obj 13537 %tunnel%
+      set ret %tunnel.contents(13537)%
+      nop %ret.val0(%self.room.vnum%)%
+      %mod% %ret% longdesc There is another tunnel off to the side.
+      %mod% %ret% lookdesc The tunnel would be a tight squeeze for a mammoth mole-rat but you could crawl through it comfortably. It's covered in the footprints of the beasts that dug it.
     end
   break
   case 13544

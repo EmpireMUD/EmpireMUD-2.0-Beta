@@ -2679,4 +2679,116 @@ You're high above the temple, in the rafters.
 ~
 T 13593
 S
+#13594
+An Earthen Tunnel~
+   The rough-cut tunnel straddles the boundary between bedrock and soil, though
+you don't seem to be close to the surface. Scraggly woody roots dangle through
+the top of the tunnel, though most of them have been gnawed to stubs.
+~
+b 0 0 13594
+D14
+~
+0 13599
+T 13529
+Z1 2
+_
+Exterior area available from mole-rat wing
+~
+S
+#13595
+A Rocky Tunnel~
+   The tunnel reaches its deepest point just at the water table, wetting the
+soil at your feet. The walls are solid bedrock, apparently cut away by strong
+pairs of teeth. The tunnel rises up through the bedrock at a steep pitch, but
+there's no light at the end; you are not near the surface.
+~
+b 0 0 13594
+D14
+~
+0 13599
+T 13529
+Z1 2
+_
+Exterior area available from mole-rat wing
+~
+S
+#13596
+An Earthen Hollow~
+   Paired grooves cover the dirt walls of the large, round chamber, apparently
+excavated by the teeth of rodents. Thin roots protrude from the ceiling, though
+any roots of any substance have been chewed to nubs. A tunnel leads down from
+here, deeper into the burrow.
+~
+b 0 0 13594
+D14
+~
+0 13598
+T 13529
+Z1 2
+_
+Exterior area available from mole-rat wing
+~
+S
+#13597
+An Earthen Hollow~
+   The immense chamber is situated at the point where soil meets bedrock; the
+dividing line is visible all across the rounded chamber wall. The floor is
+loosely packed with soft dirt, trampled flat by tiny feet. A tunnel leads out
+from here though you can see only darkness from here.
+~
+b 0 0 13594
+D14
+~
+0 13598
+T 13529
+Z1 2
+_
+Exterior area available from mole-rat wing
+~
+S
+#13598
+A Rocky Tunnel~
+   The sides of the passage have been scraped clear by powerful teeth, leaving
+rubble and dirt on the tunnel floor, covered in tracks. The rough tunnel parts,
+though no direction looks any different from the others in the dark.
+~
+b 0 0 13594
+D14
+~
+0 13596
+D14
+~
+0 13597
+D14
+~
+0 13599
+T 13529
+Z1 2
+_
+Exterior area available from mole-rat wing
+~
+S
+#13599
+A Rocky Tunnel~
+   The hole cuts through solid bedrock, winding in a long arc that makes it
+hard to see what's ahead of you. Loose dirt and rubble cover the bottom of the
+tunnel, covered in countless scurry prints. The path branches, though from here
+all directions look exactly the same.
+~
+b 0 0 13594
+D14
+~
+0 13594
+D14
+~
+0 13595
+D14
+~
+0 13598
+T 13529
+Z1 2
+_
+Exterior area available from mole-rat wing
+~
+S
 $

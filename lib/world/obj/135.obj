@@ -712,14 +712,15 @@ R
 4 5611 a
 S
 #13537
-tunnel collapsed damaged~
-the collapsed tunnel~
-You can see the remains of a tunnel where the wall is damaged.~
-   A rather large tunnel through the earth once ended here, but it looks as
-though it has collapsed.
+tunnel side~
+the side tunnel~
+There is a tunnel through the wall.~
+   The tunnel would be a tight squeeze for a mammoth mole-rat but you could
+crawl through it comfortably. It looks like the creatures have pushed a stone
+out of place in order to burrow their way in.
 ~
-3 0 0 0 0 1
-0 0 0
+8 0 0 0 0 3
+-1 0 0
 1 0
 E
 wall~
