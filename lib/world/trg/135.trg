@@ -1999,14 +1999,19 @@ L c 9680
 L j 13505
 L j 13534
 ~
-if %method% != move || %actor.nohassle%
+if !("move portal" ~= %method%) || %actor.nohassle%
   * ignore
   halt
 elseif %self.room.template% < 13505 || %self.room.template% > 13599
   * out of bounds
   halt
-end
-if %self.vnum% == 13547 || %self.vnum% == 13548
+elseif %method% == portal
+  if %self.vnum% == 13541 || %self.vnum% == 13542
+    %send% %actor% ~%self% blocks you as you try to enter.
+    return 0
+  end
+  * no other portal entries are blocked
+elseif %self.vnum% == 13547 || %self.vnum% == 13548
   * spider!
   if !%self.fighting% && !%self.disabled%
     %send% %actor% Looks like you're stuck on part of the web!
@@ -3185,6 +3190,25 @@ if %target% && !%room.down(room)%
   %door% %room% down room %target%
 end
 ~
+#13594
+Labyrinth: Burrow track and search~
+2 c 0 2
+L c 13537
+L o 73
+search track~
+return 0
+if !%actor.can_see_in_room%
+  %send% %actor% It's too dark to do that.
+  return 1
+elseif %cmd% == search
+  if %room.contents(13537)%
+    %send% %actor% Looks like there's a side tunnel leading back to the labyrinth.
+  end
+elseif %cmd% == track% && %actor.ability(73)%
+  %send% %actor% The dirt floor is absolutely covered in mole-rat tracks going in all directionss.
+  return 1
+end
+~
 #13596
 Labyrinth: Song of the Nightmare Queen~
 0 l 15 3
@@ -3236,7 +3260,7 @@ end
 ~
 #13599
 Labyrinth: Admin controller~
-1 c 2 53
+1 c 2 59
 L b 13510
 L b 13512
 L b 13520
@@ -3290,6 +3314,12 @@ L j 13590
 L j 13591
 L j 13592
 L j 13593
+L j 13594
+L j 13595
+L j 13596
+L j 13597
+L j 13598
+L j 13599
 labyrinth~
 * modes: labyrinth goto <template>; labyrinth status; labyrinth unseal
 if goto /= %arg.car%
@@ -3317,6 +3347,7 @@ elseif status /= %arg.car%
   set wing_c_side 13534 13546 13547 13548 13549 13563 13564
   set boss_area 13590
   set exit_area 13591 13592 13593
+  set burrow_area 13594 13595 13596 13597 13598 13599
   *
   set room %actor.room%
   set find_dir 1
@@ -3342,6 +3373,9 @@ elseif status /= %arg.car%
     set find_dir 0
   elseif %exit_area% ~= %room.template%
     %send% %actor% Labyrinth region: exit area
+    set find_dir 0
+  elseif %burrow_area% ~= %room.template%
+    %send% %actor% Labyrinth region: mole-rat burrow
     set find_dir 0
   elseif %room.template% >= 13500 && %room.template% <= 13599
     %send% %actor% Labyrinth region: unknown

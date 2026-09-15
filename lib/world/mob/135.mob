@@ -463,8 +463,8 @@ A mammoth mole-rat blocks the path!
 D
    The gray-pink fleshy creature is nearly the size of a horse! Its naked,
 wrinkled skin swishes against the stone walls as it bustles about, probing
-everything with its four long, thin ivory teeth. Its eyes are surprisingly
-tiny, like black beads on either side of its face.
+everything with its four long, thin ivory teeth, stained dark orange. Its eyes
+are surprisingly tiny, like black beads on either side of its face.
 ~
 I 0 3012 100.00 2  # BUTCHER: fillet of raw meat
 I 1 1351 100.00 1  # SKIN: large skin
@@ -505,7 +505,7 @@ D
    This gray-pink fleshy creature is so large she can barely move through the
 narrow passageway. Her skin, deeply wrinkled, shows impressions from the stone
 walls. Her tiny eyes glisten in the dim light, trained on you as you move. Her
-teeth, like long white sabers, gnash up and down at your approach.
+teeth, like long, orange-stained sabers, gnash up and down at your approach.
 ~
 I 0 3012 100.00 3  # BUTCHER: fillet of raw meat
 I 1 1351 100.00 2  # SKIN: large skin
@@ -534,6 +534,21 @@ T 13540
 T 13537
 T 13543
 T 13596
+S
+#13543
+pup mole-rat molerat rat mammoth~
+a mammoth mole-rat pup~
+A mammoth mole-rat pup cowers against the wall.
+~
+250 350 abdJ c 3
+0 0 0 13541 -1 -1
+D
+   Though it looks like a young mole-rat, it's larger than a full-grown sow and
+already has the long ivory teeth its brothers and sisters used to carve out
+this burrow. It dares not move, especially while you're watching it.
+~
+I 0 3012 100.00 1  # BUTCHER: fillet of raw meat
+I 1 1351 100.00 1  # SKIN: large skin
 S
 #13544
 slime bone ball~

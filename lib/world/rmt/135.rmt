@@ -2689,7 +2689,46 @@ b 0 0 13594
 D14
 ~
 0 13599
+E
+north east south west northeast ne southeast se southwest sw northwest nw~
+The winding tunnels allow little light to pass; it's dark in every direction.
+~
+E
+tunnels passages burrow hole path~
+tbd
+~
+E
+bedrock rock~
+tbd
+~
+E
+soil~
+tbd
+~
+E
+roots woody scraggly top ceiling up stubs~
+tbd
+~
+E
+sides~
+tbd
+~
+E
+dirt rubble floor down ground bottom~
+tbd
+~
+E
+grooves~
+tbd
+~
+E
+tracks prints~
+tbd
+~
+I 5 102 50.00 40 x  # DIG: flint stone
+I 5 100 50.00 40 x  # DIG: rock
 T 13529
+T 13594
 Z1 2
 _
 Exterior area available from mole-rat wing
@@ -2698,7 +2737,7 @@ S
 #13595
 A Rocky Tunnel~
    The tunnel reaches its deepest point just at the water table, wetting the
-soil at your feet. The walls are solid bedrock, apparently cut away by strong
+soil at your feet. The sides are solid bedrock, apparently cut away by strong
 pairs of teeth. The tunnel rises up through the bedrock at a steep pitch, but
 there's no light at the end; you are not near the surface.
 ~
@@ -2706,7 +2745,54 @@ b 0 0 13594
 D14
 ~
 0 13599
+E
+north east south west northeast ne southeast se southwest sw northwest nw~
+The winding tunnels allow little light to pass; it's dark in every direction.
+~
+E
+tunnels passages burrow hole path~
+tbd
+~
+E
+water table~
+tbd
+~
+E
+soil wet~
+tbd
+~
+E
+dirt rubble floor down ground bottom~
+tbd
+~
+E
+bedrock rock~
+tbd
+~
+E
+sides~
+tbd
+~
+E
+steep slope pitch~
+tbd
+~
+E
+grooves~
+tbd
+~
+E
+tracks prints~
+tbd
+~
+E
+ceiling up top~
+tbd
+~
+I 5 102 50.00 20 x  # DIG: flint stone
+I 5 100 50.00 20 x  # DIG: rock
 T 13529
+T 13594
 Z1 2
 _
 Exterior area available from mole-rat wing
@@ -2714,7 +2800,7 @@ Exterior area available from mole-rat wing
 S
 #13596
 An Earthen Hollow~
-   Paired grooves cover the dirt walls of the large, round chamber, apparently
+   Paired grooves cover the dirt sides of the large, round chamber, apparently
 excavated by the teeth of rodents. Thin roots protrude from the ceiling, though
 any roots of any substance have been chewed to nubs. A tunnel leads down from
 here, deeper into the burrow.
@@ -2723,7 +2809,43 @@ b 0 0 13594
 D14
 ~
 0 13598
+E
+north east south west northeast ne southeast se southwest sw northwest nw~
+The winding tunnels allow little light to pass; it's dark in every direction.
+~
+E
+grooves~
+tbd
+~
+E
+chamber burrow round around~
+tbd
+~
+E
+tunnels passages hole path~
+tbd
+~
+E
+roots thin ceiling up nubs top~
+tbd
+~
+E
+dirt rubble floor down ground bottom~
+tbd
+~
+E
+sides~
+tbd
+~
+E
+tracks prints~
+tbd
+~
+I 5 102 50.00 40 x  # DIG: flint stone
+I 5 100 50.00 40 x  # DIG: rock
+M 0 13543 100.00 2
 T 13529
+T 13594
 Z1 2
 _
 Exterior area available from mole-rat wing
@@ -2740,7 +2862,51 @@ b 0 0 13594
 D14
 ~
 0 13598
+E
+north east south west northeast ne southeast se southwest sw northwest nw~
+The winding tunnels allow little light to pass; it's dark in every direction.
+~
+E
+chamber burrow~
+tbd
+~
+E
+tunnels passages hole path~
+tbd
+~
+E
+soil~
+tbd
+~
+E
+bedrock rock~
+tbd
+~
+E
+dirt rubble floor down ground bottom~
+tbd
+~
+E
+sides~
+tbd
+~
+E
+grooves~
+tbd
+~
+E
+ceiling up top~
+tbd
+~
+E
+tracks prints~
+tbd
+~
+I 5 102 50.00 20 x  # DIG: flint stone
+I 5 100 50.00 20 x  # DIG: rock
+M 0 13543 100.00 2
 T 13529
+T 13594
 Z1 2
 _
 Exterior area available from mole-rat wing
@@ -2749,7 +2915,7 @@ S
 #13598
 A Rocky Tunnel~
    The sides of the passage have been scraped clear by powerful teeth, leaving
-rubble and dirt on the tunnel floor, covered in tracks. The rough tunnel parts,
+rubble and dirt on the tunnel floor, covered in tracks. The rough tunnel forks,
 though no direction looks any different from the others in the dark.
 ~
 b 0 0 13594
@@ -2762,7 +2928,42 @@ D14
 D14
 ~
 0 13599
+E
+north east south west northeast ne southeast se southwest sw northwest nw~
+The winding tunnels allow little light to pass; it's dark in every direction.
+~
+E
+sides~
+tbd
+~
+E
+grooves~
+tbd
+~
+E
+tunnels passages burrow hole path~
+tbd
+~
+E
+ceiling up top~
+tbd
+~
+E
+dirt rubble floor down ground bottom~
+tbd
+~
+E
+tracks prints~
+tbd
+~
+E
+fork~
+tbd
+~
+I 5 102 50.00 20 x  # DIG: flint stone
+I 5 100 50.00 20 x  # DIG: rock
 T 13529
+T 13594
 Z1 2
 _
 Exterior area available from mole-rat wing
@@ -2785,7 +2986,46 @@ D14
 D14
 ~
 0 13598
+E
+north east south west northeast ne southeast se southwest sw northwest nw~
+The winding tunnels allow little light to pass; it's dark in every direction.
+~
+E
+bedrock rock~
+tbd
+~
+E
+tunnels passages burrow hole path~
+tbd
+~
+E
+dirt rubble floor down ground bottom~
+tbd
+~
+E
+arc~
+tbd
+~
+E
+prints tracks~
+tbd
+~
+E
+ceiling up top~
+tbd
+~
+E
+sides~
+tbd
+~
+E
+grooves~
+tbd
+~
+I 5 102 50.00 20 x  # DIG: flint stone
+I 5 100 50.00 20 x  # DIG: rock
 T 13529
+T 13594
 Z1 2
 _
 Exterior area available from mole-rat wing
