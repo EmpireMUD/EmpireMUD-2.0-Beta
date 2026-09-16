@@ -2002,9 +2002,16 @@ if !%self.carried_by% && %vnum% >= 13505 && %vnum% <= 13590
   %load% mob %self.vnum%
   set mob %self.room.people%
   if %mob.vnum% == %self.vnum%
-    set reload 1
-    remote reload %mob.id%
+    set standing 1
+    remote standing %mob.id%
     %echo% ~%mob% gets back up!
+    if %mob.vnum% == 13535
+      %mod% %mob% longdesc A pale green skeleton watches you intently through hollow eyes.
+      %echo% ~%mob% gets back up!
+    else
+      %mod% %mob% longdesc A polished bronze skeleton stands in your path.
+      %echo% ~%mob% stands back up and readies ^%mob% spear!
+    end
     %purge% %self%
   end
 end
