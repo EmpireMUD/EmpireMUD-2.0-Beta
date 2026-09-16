@@ -687,13 +687,14 @@ in places, with hints of brown at its wrists. The green color stains its heavy
 white robe at the neck and arms. The robe, frayed and dirty at the bottom, is
 tied at the waist with a simple length of rope.
 ~
-15 e a 0 0 3
+15 e a 0 0 4
 4 0 0
 14 0
 C
 250 250
 R
 4 5611 a
+T 13536
 S
 #13536
 skeleton bronze polished~
@@ -703,13 +704,14 @@ A polished bronze skeleton is piled here.~
 polished. Its helmet, equal in luster, is topped with a comb of short red hair
 that stands straight up. It wears nothing else except a stone breastplate.
 ~
-15 e a 0 0 3
+15 e a 0 0 4
 4 0 0
 14 0
 C
 250 250
 R
 4 5611 a
+T 13536
 S
 #13537
 tunnel side~
@@ -1520,7 +1522,7 @@ with a smaller door shape cut out from the bottom. It shows a twisting, curved,
 unbranching line that wends toward a grand violet gem near the top. A cluster
 of three smaller gems in the same color decorate the bottom corner.
 ~
-2 amp ak 0 0 25
+2 amp ac 0 0 26
 0 0 0
 2 0
 A
@@ -1552,7 +1554,7 @@ is cut from the bottom, leading to a winding, re-curving line that spirals,
 unbranching, to a shining golden gem at the top, surrounding by bronze rays.
 The scrolled sides are set with smaller topaz gems among a floral flourish.
 ~
-2 amp ak 0 0 26
+2 amp ac 0 0 27
 0 0 0
 2 0
 A
@@ -1578,7 +1580,7 @@ at the top, set in an eight-direction compass rose. At the bottom of, the shape
 of a door is cut out of the metal. The doorway connects to the gem by a
 twisting, curved but unbroken line that wends its way upward.
 ~
-2 amp ak 0 0 27
+2 amp ac 0 0 28
 0 0 0
 2 0
 A
@@ -1609,7 +1611,7 @@ blue gems are set in the bottom corners. Between them, the arched shape of a
 doorway is cut from the talisman. A curving path rises from it, twisting and
 winding, but never branching, as it rises toward the stars in the sky.
 ~
-2 amp ak 0 0 28
+2 amp ac 0 0 29
 0 0 0
 2 0
 A
@@ -1639,7 +1641,7 @@ low relief. Round, heavy teal gems are set un the upper left and lower right
 corners. An arched doorway us notched from the bottom of the talisman. Above
 it, a twisting path wriggles like a snake upward toward the top.
 ~
-2 amp ak 0 0 29
+2 amp ac 0 0 30
 0 0 0
 2 0
 A
@@ -1678,7 +1680,7 @@ bottom, the shape of a door is cut from the pendant. From the door, a path
 twists and turns and curves back on itself as it works its way, unbranching,
 to the top, passing a large, circular ruby-red gem on its path.
 ~
-2 amp ak 0 0 31
+2 amp ac 0 0 32
 0 0 0
 2 0
 A

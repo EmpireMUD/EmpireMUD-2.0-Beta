@@ -1986,6 +1986,30 @@ if !%self.contents%
   detach 13535 %self.id%
 end
 ~
+#13536
+Labyrinth: Dead don't die~
+1 n 100 5
+L b 13535
+L b 13536
+L f 13536
+L j 13505
+L j 13590
+~
+wait 60 s
+set vnum %self.room.template%
+if !%self.carried_by% && %vnum% >= 13505 && %vnum% <= 13590
+  * replace with mob of the same vnum
+  %load% mob %self.vnum%
+  set mob %self.room.people%
+  if %mob.vnum% == %self.vnum%
+    set reload 1
+    remote reload %mob.id%
+    %echo% ~%mob% gets back up!
+    %purge% %self%
+  end
+end
+detach 13536 %self.id%
+~
 #13537
 Labyrinth: Trash mob exit blocking~
 0 q 100 9
