@@ -62,6 +62,9 @@ sculpture, carved in high relief from the stone wall.
 M 1 13500 100.00 1
 T 13508
 T 13553
+_
+Entry area / difficulty selection, player will be dropped in after diff-sel if not flying
+~
 S
 #13501
 A Steep, Dark Chute~
@@ -100,6 +103,9 @@ It's quite steep.
 T 13507
 T 13501
 T 13503
+_
+Entry chute - non-flying players are stunned, dropped down to 13505, and penalized
+~
 S
 #13505
 An Old Campsite, Deep Underground~
@@ -183,6 +189,9 @@ T 13507
 T 13504
 T 13529
 T 13553
+_
+Central hub connecting 3 wings - players enter here
+~
 S
 #13510
 Lost in the Labyrinth~
@@ -416,6 +425,9 @@ You're quite close to the campsite, such as it is.
 T 13504
 T 13529
 T 13553
+_
+Wing C - room 1
+~
 S
 #13523
 A Rancid Pit of Jagged Spikes~
@@ -829,6 +841,9 @@ T 13504
 T 13524
 T 13529
 T 13553
+_
+Wing C, side path
+~
 S
 #13535
 Lost in the Labyrinth~
@@ -907,6 +922,9 @@ There are some ashes spread out on the shelves.
 T 13504
 T 13529
 T 13553
+_
+Wing C - room 2
+~
 S
 #13539
 Lost in the Labyrinth~
@@ -969,6 +987,9 @@ T 13504
 T 13524
 T 13529
 T 13553
+_
+Wing A, side path with alcove
+~
 S
 #13540
 Lost in the Labyrinth~
@@ -1104,6 +1125,9 @@ T 13504
 T 13524
 T 13529
 T 13553
+_
+Wing b side path
+~
 S
 #13545
 Lost in the Labyrinth~
@@ -1186,6 +1210,9 @@ The water has certainly made an impression on the floor.
 T 13504
 T 13529
 T 13553
+_
+Wing B room 3
+~
 S
 #13546
 Lost in the Labyrinth~
@@ -1353,6 +1380,9 @@ T 13504
 T 13524
 T 13529
 T 13553
+_
+Wing C side path, low end
+~
 S
 #13548
 Lost in the Labyrinth~
@@ -1422,6 +1452,9 @@ T 13504
 T 13524
 T 13529
 T 13553
+_
+Wing C, side path end with small shelves
+~
 S
 #13549
 Lost in the Labyrinth~
@@ -1504,6 +1537,9 @@ The ceiling is made of gray stone.
 T 13504
 T 13529
 T 13553
+_
+Wing C, side path with shelves
+~
 S
 #13550
 Lost in the Labyrinth~
@@ -1582,6 +1618,9 @@ collects here on the floor.
 T 13504
 T 13529
 T 13553
+_
+Wing C room 3
+~
 S
 #13553
 Lost in the Labyrinth~
@@ -1862,6 +1901,9 @@ T 13504
 T 13558
 T 13529
 T 13553
+_
+A-B Passage
+~
 S
 #13559
 Lost in the Labyrinth~
@@ -2008,6 +2050,9 @@ every ten steps or so.
 T 13504
 T 13529
 T 13553
+_
+Wing B, room 4
+~
 S
 #13563
 Lost in the Labyrinth~
@@ -2087,6 +2132,9 @@ T 13504
 T 13524
 T 13529
 T 13553
+_
+Wing C, side room with broken jar pile
+~
 S
 #13564
 Lost in the Labyrinth~
@@ -2172,6 +2220,9 @@ loves Ingr' into the stone.
 T 13504
 T 13529
 T 13553
+_
+Wing C, side path with shelves
+~
 S
 #13565
 Lost in the Labyrinth~
@@ -2259,6 +2310,9 @@ The ceiling is made of gray stone.
 T 13504
 T 13529
 T 13553
+_
+Wing C room 4
+~
 S
 #13570
 Lost in the Labyrinth~
@@ -2385,6 +2439,9 @@ T 13504
 T 13524
 T 13529
 T 13553
+_
+Wing B room 5 / end - possible boss path
+~
 S
 #13580
 Lost in the Labyrinth~
@@ -2482,6 +2539,9 @@ T 13504
 T 13524
 T 13529
 T 13553
+_
+Wing C, room 5 - end - possible boss path
+~
 S
 #13590
 The Chamber at the Center of the Labyrinth~
@@ -2610,6 +2670,9 @@ E
 down~
 You've climbed so far that you can hardly see the chamber below.
 ~
+_
+Exit area
+~
 S
 #13592
 In the Temple Rafters~
@@ -2649,6 +2712,10 @@ E
 down temple~
 You're high above the temple floor, in the rafters.
 ~
+_
+Exit area, over the temple
+Fuzzy goblin appears here
+~
 S
 #13593
 In the Temple Rafters~
@@ -2678,6 +2745,9 @@ temple~
 You're high above the temple, in the rafters.
 ~
 T 13593
+_
+Exit area, over the temple, exits back to the original building
+~
 S
 #13594
 An Earthen Tunnel~

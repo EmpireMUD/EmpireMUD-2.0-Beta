@@ -679,7 +679,7 @@ One of the smaller wall blocks has been prised out, leaving a cavity behind it.
 T 13535
 S
 #13535
-skeleton pale green~
+skeleton pale green pile~
 a pale green skeleton~
 A pale green skeleton is piled on the ground.~
    The skeleton has a mottled patina all over, fading from pale green to gray
@@ -687,7 +687,7 @@ in places, with hints of brown at its wrists. The green color stains its heavy
 white robe at the neck and arms. The robe, frayed and dirty at the bottom, is
 tied at the waist with a simple length of rope.
 ~
-15 e a 0 0 4
+15 e a 0 0 5
 4 0 0
 14 0
 C
@@ -697,14 +697,14 @@ R
 T 13536
 S
 #13536
-skeleton bronze polished~
+skeleton bronze polished pile~
 a polished bronze skeleton~
 A polished bronze skeleton is piled here.~
    Its bones twinkle a brilliant bronze color in the light, each one clean and
 polished. Its helmet, equal in luster, is topped with a comb of short red hair
 that stands straight up. It wears nothing else except a stone breastplate.
 ~
-15 e a 0 0 4
+15 e a 0 0 5
 4 0 0
 14 0
 C
