@@ -2004,7 +2004,6 @@ if !%self.carried_by% && %vnum% >= 13505 && %vnum% <= 13590
   if %mob.vnum% == %self.vnum%
     set standing 1
     remote standing %mob.id%
-    %echo% ~%mob% gets back up!
     if %mob.vnum% == 13535
       %mod% %mob% longdesc A pale green skeleton watches you intently through hollow eyes.
       %echo% ~%mob% gets back up!
