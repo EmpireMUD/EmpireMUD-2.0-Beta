@@ -89,6 +89,19 @@ You're seeing stars!~
 T5
 ...$e seems to be stunned!~
 S
+#13530
+champion's embrace~
+4 0
+0 0 0 0
+T0
+You recover from the champion's embrace.~
+T2
+You pass out for a moment as the champion drops you.~
+T3
+$n passes out as the champion drops $m.~
+T5
+...$e has passed out!~
+S
 #13533
 bubbly~
 4 0

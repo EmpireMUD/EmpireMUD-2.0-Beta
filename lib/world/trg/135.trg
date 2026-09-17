@@ -543,6 +543,7 @@ while %room_count% > 0 && %size% > 0
   remote diff %mob.id%
   if %diff% == 4
     nop %mob.add_mob_flag(TANK)%
+    nop %mob.unscale_and_reset%
   end
   * load 2?
   if %diff% > 2
@@ -551,6 +552,7 @@ while %room_count% > 0 && %size% > 0
     remote diff %mob.id%
     if %diff% == 4
       nop %mob.add_mob_flag(TANK)%
+      nop %mob.unscale_and_reset%
     end
   end
   eval room_count %room_count% - 1
@@ -569,10 +571,12 @@ if %elite% && %elitev%
       if %elitev% != 13545 && %elitev% != 13551
         nop %mob.add_mob_flag(TANK)%
       end
+      nop %mob.unscale_and_reset%
     break
     case 3
       if %elitev% != 13545
         nop %mob.add_mob_flag(HARD)%
+        nop %mob.unscale_and_reset%
       end
     break
     case 4
@@ -583,6 +587,7 @@ if %elite% && %elitev%
         nop %mob.add_mob_flag(HARD)%
       end
       nop %mob.add_mob_flag(TANK)%
+      nop %mob.unscale_and_reset%
     break
   done
 end
@@ -904,7 +909,7 @@ elseif %cmd% == fist
 elseif %cmd% == grab
   * Crushing Grab (solo struggle)
   scfight clear struggle
-  %echo% &&J~%self% cracks his knuckles...
+  %echo% &&J~%self% cracks his knuckles...&&0
   wait 3 sec
   set targ %random.enemy%
   if !%targ%
@@ -935,7 +940,7 @@ elseif %cmd% == grab
     wait 4 s
     set ongoing 0
     if %targ.id% != %targ_id% || %targ.dead%
-      set done 1
+      * done
     else
       if %targ.affect(9602)%
         set ongoing 1
@@ -1088,6 +1093,7 @@ switch %self.vnum%
         if %self.mob_flagged(GROUP)%
           nop %gobtwo.add_mob_flag(GROUP)%
         end
+        nop %gobtwo.unscale_and_reset%
       end
     end
   break
@@ -1832,15 +1838,17 @@ elseif %cmd% == orb
   scfight clear dodge
   %echo% &&J~%self% plucks a glass orb, apparently from nowhere, and rolls it down her arm...&&0
   if %diff% == 1
-    nop %self.add_mob_flag(NO-ATTACK)%
+    ndg_affect #13510 %self% HARD-STUNNED on 30
   end
   set ch %room.people%
   while %ch%
     set next_ch %ch.next_in_room%
-    set next_id %next_ch.id%
+    if %next_ch%
+      set next_id %next_ch.id%
+    end
     set ch_id %ch.id%
     wait 1 s
-    if %ch.id% == %ch_id%
+    if %ch.id% == %ch_id% && %self.is_enemy(%ch%)%
       scfight setup dodge %ch%
       %send% %ch% &&J**** &&Z~%self% takes aim... at you! ****&&0 (dodge)
       %echoaround% %ch% &&J~%self% takes aim at ~%ch%...&&0
@@ -1848,7 +1856,9 @@ elseif %cmd% == orb
       if %ch.id == %ch_id%
         * re-store next
         set next_ch %ch.next_in_room%
-        set next_id %next_ch.id%
+        if %next_ch%
+          set next_id %next_ch.id%
+        end
         if %ch.var(did_scfdodge)%
           %echo% &&J~%self% throws the glass orb at ~%ch% but it misses and bounces back to her hand.&&0
           if %diff% == 1
@@ -1907,6 +1917,7 @@ if %ok%
   if %self.mob_flagged(GROUP)%
     nop %mob.add_mob_flag(GROUP)%
   end
+  nop %mob.unscale_and_reset%
   %purge% %self%
 end
 ~
@@ -1973,15 +1984,18 @@ if !%instance.mob(13510)%
   say Oh? Don't hear him! I'll go check.
   wait 1 sec
   %echo% ~%self% leaves.
-  %at% i13592 %load% mob 13527
-  %at% i13592 %echo% A fuzzy goblin comes scrambling up the ladder.
-  set other %instance.mob(13527)%
+  makeuid rafter room i13592
+  %at% %rafter% %load% mob 13527
+  %at% %rafter% %echo% A fuzzy goblin comes scrambling up the ladder.
+  set other %rafter.people(13527)%
   if %self.mob_flagged(HARD)%
     nop %other.add_mob_flag(HARD)%
   end
   if %self.mob_flagged(GROUP)%
     nop %other.add_mob_flag(GROUP)%
   end
+  nop %other.link_instance%
+  nop %other.unscale_and_reset%
   %purge% %self%
 end
 ~
@@ -2038,7 +2052,7 @@ if %actor.empire%
 end
 ~
 #13530
-Labyrinth: Horned champion fight~
+Labyrinth: Horned champion fight: Champion's Embrace~
 0 c 0 0
 !choke !bull !talisman~
 set targ %arg%
@@ -2048,9 +2062,58 @@ set cmd %cmd.substr(1)%
 if %actor% != %self% || !%targ% || %targ.id% == %self.id%
   halt
 elseif %cmd% == choke
+  * Champion's Embrace (solo struggle)
+  scfight clear struggle
+  %echo% &&J~%self% crouches...&&0
+  wait 3 sec
+  set targ %random.enemy%
+  if !%targ%
+    halt
+  end
+  set targ_id %targ.id%
+  %send% %targ% &&J**** &&Z~%self% runs toward you, ducking under your arm and grabbing you from behind! ****&&0 (struggle)
+  %echoaround% %targ% &&J~%self% runs toward ~%targ%, ducking under ^%targ% arm and grabbing *%targ% from behind!&&0
+  if %diff% == 1
+    dg_affect #13510 %self% HARD-STUNNED on 30
+  end
+  scfight setup struggle %targ% 24
+  if %targ.affect(9602)%
+    set scf_strug_char You struggle to get free... but the champion has you by the neck!
+    set scf_strug_room ~%%actor%% struggles to get free but the champion has *%%actor%% by the neck!
+    set scf_free_char You manage to slip loose of the champion's grip... and not a moment too soon!
+    set scf_free_room ~%%actor%% manages to slip loose of the champion's grip.
+    remote scf_strug_char %targ.id%
+    remote scf_strug_room %targ.id%
+    remote scf_free_char %targ.id%
+    remote scf_free_room %targ.id%
+  end
+  * messages
+  eval pain 50 * %diff%
+  set cycle 0
+  set ongoing 1
+  while %cycle% < 6 && %ongoing%
+    wait 4 s
+    set ongoing 0
+    if %targ.id% != %targ_id% || %targ.dead%
+      * done
+    else
+      if %targ.affect(9602)%
+        set ongoing 1
+        %send% %targ% &&J**** The champion's arm squeezes your neck! It doesn't look good for you! ****&&0 (struggle)
+        %echoaround% %targ% &&J~%targ% taps frantically at the champion's arm as &%targ% struggles to get free!&&0
+        %damage% %targ% %pain% direct
+        if %cycle% == 5
+          dg_affect #13530 %targ% STUNNED on 30
+        end
+      end
+    end
+    eval cycle %cycle% + 1
+  done
+  scfight clear struggle
 elseif %cmd% == bull
 elseif %cmd% == talisman
 end
+dg_affect #13510 %self% off
 ~
 #13531
 Labyrinth: Meek adventurer setup~
