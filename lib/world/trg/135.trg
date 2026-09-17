@@ -2052,8 +2052,14 @@ if %actor.empire%
 end
 ~
 #13530
-Labyrinth: Horned champion fight: Champion's Embrace~
-0 c 0 0
+Labyrinth: Horned champion fight: Champion's Embrace, Raging Bull, Talisman of the Dark Epilogue~
+0 c 0 6
+L w 9602
+L w 13510
+L w 13511
+L w 13530
+L w 13531
+L w 13532
 !choke !bull !talisman~
 set targ %arg%
 set room %self.room%
@@ -2111,7 +2117,81 @@ elseif %cmd% == choke
   done
   scfight clear struggle
 elseif %cmd% == bull
+  * Raging Bull (repeat group dodge)
+  scfight clear dodge
+  %echo% &&J~%self% stomps ^%self% hoof and lowers ^%self% horns...&&0
+  eval dodge %diff% * 40
+  dg_affect #13531 %self% DODGE %dodge% 20
+  if %diff% == 1
+    dg_affect #13510 %self% HARD-STUNNED on 20
+  end
+  scfight setup dodge all
+  wait 5 s
+  if %self.disabled%
+    dg_affect #13531 %self% off
+    dg_affect #13510 %self% off
+    halt
+  end
+  %echo% &&J**** &&Z~%self% comes charging down the corridor, horns-first! ****&&0 (dodge)
+  eval ouch 50 * %diff%
+  set cycle 1
+  set hit 0
+  eval wait 9 - %diff%
+  while %cycle% <= %diff%
+    scfight setup dodge all
+    wait %wait% s
+    set ch %room.people%
+    while %ch%
+      set next_ch %ch.next_in_room%
+      if %self.is_enemy(%ch%)%
+        if !%ch.var(did_scfdodge)%
+          set hit 1
+          %echo% &&J~%self% thrashes ^%self% head to the side, goring ~%ch% with ^%self% horns as &%self% charges past!&&0
+          %send% %ch% That really hurt!
+          %damage% %ch% %ouch% physical
+        elseif %ch.is_pc%
+          %send% %ch% &&JYou leap over |%self% horns as &%self% rages past you!&&0
+          if %diff% == 1
+            dg_affect #13511 %ch% TO-HIT 25 10
+          end
+        end
+        if %cycle% < %diff%
+          %send% %ch% &&J**** Uh oh... &&Z&%self%'s turning around and coming back through! ****&&0 (dodge)
+        end
+      end
+      set ch %next_ch%
+    done
+    scfight clear dodge
+    eval cycle %cycle% + 1
+  done
+  dg_affect #13531 %self% off
 elseif %cmd% == talisman
+  * Talisman of the Dark Epilogue (group interrupt)
+  scfight clear interrupt
+  %echo% &&J**** &&Z~%self% raises up the talisman of the dark epilogue... ****&&0 (interrupt)
+  if %diff% == 1
+    dg_affect #13510 %self% HARD-STUNNED on 20
+  end
+  scfight setup interrupt all
+  wait 3 s
+  if %diff% > 2
+    set needed %room.players_present%
+  else
+    set needed 1
+  end
+  if %self.var(count_scfinterrupt,0)% < %needed%
+    %echo% &&J**** The talisman glows with an eerie violet light... ****&&0 (interrupt)
+  end
+  wait 3 s
+  if %self.var(count_scfinterrupt,0)% >= %needed%
+    %echo% &&JThe talisman goes dark as you manage to interrupt |%self% ritual!&&0
+    wait 20 s
+  else
+    %echo% &&JThe violet glow of the talisman of the dark epilogue washes over ~%self%!&&0
+    eval amount %self.level% / 7
+    dg_affect #13532 %self% BONUS-PHYSICAL %amount% 60
+  end
+  scfight clear interrupt
 end
 dg_affect #13510 %self% off
 ~

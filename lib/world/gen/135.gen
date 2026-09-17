@@ -102,6 +102,24 @@ $n passes out as the champion drops $m.~
 T5
 ...$e has passed out!~
 S
+#13531
+hard to hit~
+4 0
+0 0 0 0
+T5
+...$e is charging down the corridor!~
+S
+#13532
+dark epilogue~
+4 0
+0 0 0 0
+T1
+$n shrinks back to $s original size, which is still quite large.~
+T3
+$n seems to grow... this fight is almost over and it doesn't look good!~
+T5
+...$e has become huge!~
+S
 #13533
 bubbly~
 4 0
