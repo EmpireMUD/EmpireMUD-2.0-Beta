@@ -39,6 +39,26 @@ timely dodge~
 4 0
 0 0 0 0
 S
+#13512
+curse of agony~
+4 0
+0 0 0 0
+T0
+You manage to clear your eyes of the curse!~
+T2
+You can't see!~
+T5
+...$e can't see!~
+S
+#13513
+accursed fate~
+4 0
+0 0 0 0
+T0
+You finally escape your accursed fate.~
+T5
+...$e suffers an accursed fate.~
+S
 #13514
 basin water~
 1 0

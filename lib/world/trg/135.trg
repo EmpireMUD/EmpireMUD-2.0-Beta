@@ -1182,7 +1182,7 @@ if %miniboss%
 end
 ~
 #13512
-Labyrinth: Nightmare Queen fight~
+Labyrinth: Nightmare Queen fight: Curse of Agony, Accursed Fate, Burning Embers, Statue Smite~
 0 c 0 0
 !curse !accursed !embers !fling~
 set targ %arg%
@@ -1192,10 +1192,175 @@ set cmd %cmd.substr(1)%
 if %actor% != %self% || !%targ% || %targ.id% == %self.id%
   halt
 elseif %cmd% == curse
+  * Curse of Agony (group interrupt)
+  scfight clear interrupt
+  %echo% &&J**** &&Z~%self% throws her head back and whinnies, echoing through the chamber... ****&&0 (interrupt)
+  if %diff% == 1
+    dg_affect #13510 %self% HARD-STUNNED on 20
+  end
+  scfight setup interrupt all
+  eval pain 50 * %diff%
+  wait 3 s
+  if %diff% > 2
+    set needed %room.players_present%
+  else
+    set needed 1
+  end
+  %echo% &&J**** Ashes stir into the air like snow and burn your lungs as ~%self% chants ancient words... ****&&0 (interrupt)
+  if %self.var(count_scfinterrupt,0)% < %needed%
+    %aoe% %pain% direct
+  end
+  scfight clear interrupt
+  scfight setup interrupt all
+  wait 3 s
+  %echo% &&J**** Your eyes sting and go blurry as ~%self% continues to chant... ****&&0 (interrupt)
+  if %self.var(count_scfinterrupt,0)% < %needed%
+    %aoe% %pain% direct
+  end
+  * no reset
+  wait 3 s
+  if %self.var(count_scfinterrupt,0)% >= %needed%
+    %echo% &&J~%self% is interrupted before she completes the curse... thankfully.&&0
+  else
+    %echo% &&J~%self% completes the curse of agony as the ashes choke your throat and eyes!&&0
+    set ch %self.room.people%
+    eval pain 50 * %diff%
+    while %ch%
+      set next_ch %ch.next_in_room%
+      if %self.is_enemy(%ch%)%
+        if %diff% < 4 || (%self.level% + 100) < %ch.level%
+          if !%ch.aff_flagged(IMMUNE-MAGICAL-DEBUFFS)%
+            dg_affect #13512 %ch% BLIND on 30
+          end
+          %damage% %ch% %pain% magical
+        else
+          %send% %ch% You can't breathe!
+          %echoaround% %ch% ~%ch% collapses to the ground, grasping at ^%ch% throat!
+          %slay% %ch% %ch.real_name% has released the Nightmare Queen at %ch.room.coords%!
+        end
+      end
+      set ch %next_ch%
+    done
+  end
+  scfight clear interrupt
 elseif %cmd% == accursed
+  * Accursed Fate (group struggle)
+  scfight clear struggle
+  %echo% &&J**** &&Z~%self% raises her arms and lets out a fateful whinny! ****&&0 (struggle)
+  if %diff% == 1
+    dg_affect #13510 %self% HARD-STUNNED on 20
+  end
+  scfight setup struggle all 20
+  set ch %room.people%
+  while %ch%
+    if %ch.affect(9602)%
+      set scf_strug_char You struggle against your accursed fate...
+      set scf_strug_room ~%%actor%% struggles against ^%%actor%% accursed fate...
+      set scf_free_char You avoid certain doom, if only temporarily.
+      set scf_free_room ~%%actor%% manages to avoid the accursed fate.
+      remote scf_strug_char %ch.id%
+      remote scf_strug_room %ch.id%
+      remote scf_free_char %ch.id%
+      remote scf_free_room %ch.id%
+    end
+    set ch %ch.next_in_room%
+  done
+  * messages
+  set cycle 0
+  set ongoing 1
+  while %cycle% < 5 && %ongoing%
+    wait 4 s
+    set ongoing 0
+    set ch %room.people%
+    while %ch%
+      set next_ch %ch.next_in_room%
+      if %ch.affect(9602)%
+        set ongoing 1
+        %send% %ch% &&J**** Unseen forces claw at your very essence as you suffer an accursed fate! ****&&0 (struggle)
+        if %diff% > 1
+          %dot% #13513 %ch% 50 30 direct 5
+        end
+      end
+      set ch %next_ch%
+    done
+    eval cycle %cycle% + 1
+  done
 elseif %cmd% == embers
+  * Burning Embers (group jump)
+  scfight clear jump
+  %echo% &&J~%self% lifts up her hands as the ashes on the ground begin to turn red...&&0
+  if %diff% == 1
+    dg_affect #13510 %self% HARD-STUNNED on 20
+  end
+  wait 3 s
+  %echo% &&J**** &&Z~%self% whinnies a fiery whinny as the ashes on the ground start to sizzle... ****&&0 (jump)
+  eval pain 50 * %diff%
+  set cycle 1
+  eval wait 10 - %diff%
+  while %cycle% <= %diff%
+    scfight setup jump all
+    wait %wait% s
+    %echo% &&JThe ground burns with red-hot embers!&&0
+    set ch %room.people%
+    while %ch%
+      set next_ch %ch.next_in_room%
+      if %self.is_enemy(%ch%)%
+        if !%ch.var(did_scfjump)% && !%ch.aff_flagged(IMMUNE-PHYSICAL-DEBUFFS)%
+          %echo% &&JThe burning embers scorch ~%ch% and light *%ch% aflame!&&0
+          %dot% %ch% %pain% fire 4
+        elseif %ch.is_pc%
+          %send% %ch% &&JYou jump free of the embers and hang onto an alcove for a moment!&&0
+          if %diff% == 1
+            dg_affect #13511 %ch% TO-HIT 25 20
+          end
+        end
+        if %cycle% < %diff%
+          %send% %ch% &&J**** Just as you think it's over, the embers flare up again! ****&&0 (jump)
+        end
+      end
+      set ch %next_ch%
+    done
+    scfight clear jump
+    eval cycle %cycle% + 1
+  done
 elseif %cmd% == fling
+  * Statue Smite (solo dodge)
+  scfight clear dodge
+  %echo% &&J~%self% gestures toward a statue in a high alcove...&&0
+  wait 3 s
+  if %self.disabled%
+    halt
+  end
+  set targ %random.enemy%
+  if !%targ%
+    halt
+  end
+  set targ_id %targ.id%
+  if %diff% == 1
+    dg_affect #13510 %self% HARD-STUNNED on 20
+  end
+  %send% %targ% &&J**** &&Z~%self% twists her wrist toward you... ****&&0 (dodge)
+  %echoaround% %targ% &&J~%self% twists her wrist toward ~%targ%...&&0
+  scfight setup dodge %targ%
+  eval ouch 100 * %diff%
+  wait 6 sec
+  if %targ.id% != %targ_id%
+    * dedz
+  elseif %targ.var(did_scfdodge)%
+    %send% %targ% &&JYou narrowly manage to dodge as the statue hurls toward you and shatters on the floor!&&0
+    %echoaround% %targ% &&J~%targ% dodges just the statue comes crashing down where *%targ% was standing!&&0
+  else
+    %echo% &&JThe statue flies down and smashes down on |%targ% head with a deafening CRASH!&&0
+    if %diff% < 4 || (%self.level% + 100) <= %targ.level%
+      %send% %targ% That really hurts!
+      %damage% %targ% %ouch% physical
+    else
+      %slay% %targ% %targ.real_name% has been smited by the Nightmare Queen at %targ.room.coords%!
+    end
+  end
+  scfight clear dodge
 end
+dg_affect #13510 %self% off
 ~
 #13513
 Labyrinth: Boss subzone threat spammer~
@@ -1796,12 +1961,12 @@ elseif %cmd% == telestab
     * dedz
   elseif %targ.var(did_scfdodge)%
     %send% %targ% &&JYou manage a timely dodge as ~%self% appears behind you and brings a dagger down on thin air!&&0
-    %echoaround% %targ% &&J~%targ% dodges just ~%self% appears behind *%targ% and brings a dagger down on thin air!&&0
+    %echoaround% %targ% &&J~%targ% dodges just as ~%self% appears behind *%targ% and brings a dagger down on thin air!&&0
   else
     %echo% &&J~%self% appears on |%targ% back and plunges a dagger into ^%targ% neck!&&0
-    if %diff% < 4 || %self.level% + 100 <= %targ.level%
-      %damage% %targ% %ouch% physical
+    if %diff% < 4 || (%self.level% + 100) <= %targ.level%
       %send% %targ% That really hurts!
+      %damage% %targ% %ouch% physical
     else
       %slay% %targ% %targ.real_name% has crossed the wrong Goblin King at %targ.room.coords%!
     end
