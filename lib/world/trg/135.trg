@@ -1799,7 +1799,7 @@ elseif %cmd% == telestab
     %echoaround% %targ% &&J~%targ% dodges just ~%self% appears behind *%targ% and brings a dagger down on thin air!&&0
   else
     %echo% &&J~%self% appears on |%targ% back and plunges a dagger into ^%targ% neck!&&0
-    if %diff% < 4 || %self.level% + 100 <= %actor.level%
+    if %diff% < 4 || %self.level% + 100 <= %targ.level%
       %damage% %targ% %ouch% physical
       %send% %targ% That really hurts!
     else
@@ -1853,7 +1853,7 @@ elseif %cmd% == orb
       %send% %ch% &&J**** &&Z~%self% takes aim... at you! ****&&0 (dodge)
       %echoaround% %ch% &&J~%self% takes aim at ~%ch%...&&0
       wait 5 s
-      if %ch.id == %ch_id%
+      if %ch.id% == %ch_id%
         * re-store next
         set next_ch %ch.next_in_room%
         if %next_ch%
