@@ -62,11 +62,19 @@ I+ 6 0  # Boss
 M
 0
 $n paces back and forth around the room.~
+M
+11
+!fist !grab !horn !shockwave~
 T 13515
 T 13511
 T 13513
 T 13546
 T 13514
+T 9600
+T 9601
+T 9604
+T 9609
+T 13510
 S
 #13512
 queen nightmare~
@@ -86,11 +94,19 @@ I 4 13574 100.00 1  # LOOT: labyrinthine boss loot controller
 I 4 13524 100.00 1  # LOOT: memento of interment
 I 4 13524 100.00 1  # LOOT: memento of interment
 I+ 6 0  # Boss
+M
+11
+!curse !accursed !embers !fling~
 T 13515
 T 13511
 T 13513
 T 13597
 T 13546
+T 9600
+T 9601
+T 9604
+T 9609
+T 13512
 S
 #13516
 adventurer hapless~
@@ -234,9 +250,17 @@ $n peers around.~
 M
 0
 $n scratches behind $s ear.~
+M
+11
+!telestab !whistle !orb~
 T 13527
 T 13511
 T 13596
+T 9600
+T 9601
+T 9604
+T 9609
+T 13525
 S
 #13527
 Cherrith goblin fuzzy~
@@ -269,8 +293,16 @@ $n rolls a glass orb over the back of $s hand.~
 M
 0
 $n rolls a glass orb back and forth.~
+M
+11
+!telestab !whistle !orb~
 T 13511
 T 13528
+T 9600
+T 9601
+T 9604
+T 9609
+T 13525
 S
 #13530
 champion horned #n~
@@ -289,9 +321,17 @@ you can make out a sleeveless, knee-length woolen tunic with heavy embroidery.
 ~
 I 4 13512 100.00 1  # LOOT: tarnished key
 I 4 13592 100.00 1  # LOOT: labyrinthine miniboss loot controller
+M
+11
+!choke !bull !talisman~
 T 13523
 T 13511
 T 13596
+T 9600
+T 9601
+T 9604
+T 9609
+T 13530
 S
 #13535
 skeleton pale green~

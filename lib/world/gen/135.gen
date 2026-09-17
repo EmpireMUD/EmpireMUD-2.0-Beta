@@ -5,6 +5,40 @@ oh chute~
 T5
 ...$e is falling down the chute!~
 S
+#13508
+shockwave~
+4 0
+0 0 0 0
+T0
+You recover from being flung into the wall.~
+T2
+All you can see is stars!~
+T5
+...$e is stunned!~
+S
+#13509
+horn sweep~
+4 0
+0 0 0 0
+T0
+You recover from being flung into the wall.~
+T2
+All you can see is stars!~
+T5
+...$e is stunned!~
+S
+#13510
+vulnerable~
+4 0
+0 0 0 0
+T5
+...$e's not looking -- now is the time to strike!~
+S
+#13511
+timely dodge~
+4 0
+0 0 0 0
+S
 #13514
 basin water~
 1 0

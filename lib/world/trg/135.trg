@@ -831,6 +831,210 @@ if %will_open%
   %purge% %self%
 end
 ~
+#13510
+Labyrinth: Minotaur fight~
+0 c 0 5
+L w 9602
+L w 13508
+L w 13509
+L w 13510
+L w 13511
+!fist !grab !horn !shockwave~
+set targ %arg%
+set room %self.room%
+set diff %self.var(diff,1)%
+set cmd %cmd.substr(1)%
+if %actor% != %self% || !%targ% || %targ.id% == %self.id%
+  halt
+elseif %cmd% == fist
+  * Fist Slam
+  scfight clear dodge
+  %echo% &&J~%self% pounds his fists together over his head...&&0
+  wait 3 s
+  if %self.disabled% || %self.aff_flagged(BLIND)%
+    halt
+  end
+  set targ %random.enemy%
+  if !%targ%
+    halt
+  end
+  set targ_id %targ.id%
+  if %diff% == 1
+    dg_affect #13510 %self% HARD-STUNNED on 20
+  end
+  %send% %targ% &&J**** &&Z~%self% eyes you... ****&&0 (dodge)
+  %echoaround% %targ% &&J~%self% eyes ~%targ%...&&0
+  scfight setup dodge %targ%
+  if %diff% > 1
+    set ouch 200
+  else
+    set ouch 100
+  end
+  set cycle 0
+  eval times %diff%
+  eval when 9 - %diff%
+  set done 0
+  while %cycle% < %times% && !%done%
+    wait %when% s
+    if %targ.id% != %targ_id%
+      set done 1
+    elseif %targ.var(did_scfdodge)%
+      %send% %targ% &&JYou leap out of the way as ~%self% slams his massive fist down where you stood!&&0
+      %echoaround% %targ% &&J~%targ% leaps out of the way as ~%self% slams his massive fist down where &%targ% stood!&&0
+    else
+      %echo% &&J~%self% slams his massive fist down on ~%targt%!&&0
+      %send% %targ% That really hurts!
+      %damage% %targ% %ouch% physical
+    end
+    eval cycle %cycle% + 1
+    if %cycle% < %times% && !%done%
+      wait 1
+      if %targ.id% == %targ_id%
+        %send% %targ% &&J**** &&Z~%self% is about to bring down the other fist! ****&&0 (dodge)
+        %echoaround% %targ% &&J~%self% isn't done yet!&&0
+        scfight clear dodge
+        scfight setup dodge %targ%
+      end
+    elseif %done% && %targ.id% == %targ_id% && %diff% == 1
+      dg_affect #13511 %targ% TO-HIT 25 20
+    end
+  done
+  scfight clear dodge
+  dg_affect #13510 %self% off
+elseif %cmd% == grab
+  * Crushing Grab
+  scfight clear struggle
+  %echo% &&J~%self% cracks his knuckles...
+  wait 3 sec
+  set targ %random.enemy%
+  if !%targ%
+    halt
+  end
+  set targ_id %targ.id%
+  %send% %targ% &&J**** &&Z~%self% grabs you in his massive fist! ****&&0 (struggle)
+  %echoaround% %targ% &&J~%self% grabs ~%targ% in his massive fist!&&0
+  if %diff% == 1
+    dg_affect #13510 %self% HARD-STUNNED on 20
+  end
+  scfight setup struggle %targ% 20
+  if %targ.affect(9602)%
+    set scf_strug_char You try to squeeze out of his crushing grip.
+    set scf_strug_room ~%%actor%% struggles to squeeze out of the minotaur's crushing grip.
+    set scf_free_char You finally find the leverage you need to squeeze out of the minotaur's crushing grip!
+    set scf_free_room ~%%actor%% squeezes free of the minotaur's crushing grip!
+    remote scf_strug_char %targ.id%
+    remote scf_strug_room %targ.id%
+    remote scf_free_char %targ.id%
+    remote scf_free_room %targ.id%
+  end
+  * messages
+  eval pain 50 * %diff%
+  set cycle 0
+  set ongoing 1
+  while %cycle% < 5 && %ongoing%
+    wait 4 s
+    set ongoing 0
+    if %targ.id% != %targ_id% || %targ.dead%
+      set done 1
+    else
+      if %targ.affect(9602)%
+        set ongoing 1
+        %send% %targ% &&J**** The minotaur's massive fist crushes the life from you! ****&&0 (struggle)
+        %echoaround% %targ% &&J~%targ% shouts in pain as the minotaur's massive fist crushes *%targ%!&&0
+        %damage% %targ% %pain% direct
+      end
+    end
+    eval cycle %cycle% + 1
+  done
+  scfight clear struggle
+  dg_affect #13510 %self% off
+elseif %cmd% == horn
+  * Horn Sweep
+  scfight clear duck
+  %echo% &&J~%self% roars as he lowers his horns!&&0
+  if %diff% == 1
+    dg_affect #13510 %self% HARD-STUNNED on 20
+  end
+  wait 3 s
+  %echo% &&J**** &&Z~%self% sweeps his long ivory horns around the chamber! ****&&0 (duck)
+  set cycle 1
+  eval wait 10 - %diff%
+  while %cycle% <= %diff%
+    scfight setup duck all
+    wait %wait% s
+    set ch %room.people%
+    while %ch%
+      set next_ch %ch.next_in_room%
+      if %self.is_enemy(%ch%)%
+        if !%ch.var(did_scfduck)%
+          %echo% &&JThe minotaur's horn sends ~%ch% flying into the wall!&&0
+          if !%ch.aff_flagged(NO-STUN)%
+            dg_affect #13509 %ch% STUNNED on 10
+          end
+          %damage% %ch% 50 physical
+        elseif %ch.is_pc%
+          %send% %ch% &&JYou feel the air whoosh over your head as you duck just in time to avoid the horns!&&0
+          if %diff% == 1
+            dg_affect #13511 %ch% TO-HIT 25 20
+          end
+        end
+        if %cycle% < %diff%
+          %send% %ch% &&J**** He's not done yet! ****&&0 (duck)
+        end
+      end
+      set ch %next_ch%
+    done
+    scfight clear duck
+    eval cycle %cycle% + 1
+  done
+  wait 8 s
+  dg_affect #13510 %self% off
+elseif %cmd% == shockwave
+  * Shockwave
+  scfight clear jump
+  %echo% &&J~%self% crouches and prepares to leap...&&0
+  if %diff% == 1
+    dg_affect #13510 %self% HARD-STUNNED on 20
+  end
+  wait 3 s
+  %echo% &&J**** &&Z~%self% leaps into the air... this cannot be good! ****&&0 (jump)
+  eval pain 50 * %diff%
+  set cycle 1
+  eval wait 10 - %diff%
+  while %cycle% <= %diff%
+    scfight setup jump all
+    wait %wait% s
+    %echo% &&J~%self% slams both fists into the floor as he lands, releasing a shockwave of sand and debris...&&0
+    set ch %room.people%
+    while %ch%
+      set next_ch %ch.next_in_room%
+      if %self.is_enemy(%ch%)%
+        if !%ch.var(did_scfjump)%
+          if %ch.aff_flagged(NO-STUN)%
+            %echo% &&JThe shockwave knocks ~%ch% into the sand!&&0
+          else
+            %echo% &&JThe shockwave slams ~%ch% into the wall!&&0
+            dg_affect #13508 %ch% STUNNED on 10
+          end
+          %damage% %ch% %pain% physical
+        elseif %ch.is_pc%
+          %send% %ch% &&JYou time your jump perfectly to avoid the shockwave!&&0
+          if %diff% == 1
+            dg_affect #13511 %ch% TO-HIT 25 20
+          end
+        end
+        if %cycle% < %diff%
+          %send% %ch% &&J**** &&Z~%self% leaps again! ****&&0 (jump)
+        end
+      end
+      set ch %next_ch%
+    done
+    scfight clear jump
+    eval cycle %cycle% + 1
+  done
+  wait 8 s
+end
+~
 #13511
 Labyrinth: Shared death trigger~
 0 fA 100 24
@@ -969,6 +1173,22 @@ if %miniboss%
       remote fiend_done %jar.id%
     end
   end
+end
+~
+#13512
+Labyrinth: Nightmare Queen fight~
+0 c 0 0
+!curse !accursed !embers !fling~
+set targ %arg%
+set room %self.room%
+set diff %self.var(diff,1)%
+set cmd %cmd.substr(1)%
+if %actor% != %self% || !%targ% || %targ.id% == %self.id%
+  halt
+elseif %cmd% == curse
+elseif %cmd% == accursed
+elseif %cmd% == embers
+elseif %cmd% == fling
 end
 ~
 #13513
@@ -1532,6 +1752,21 @@ L w 13524
 dg_affect_room #13524 %room% !TELEPORT on -1
 detach 13524 %room.id%
 ~
+#13525
+Labyrinth: Cherrith combat~
+0 c 0 0
+!telestab !whistle !orb~
+set targ %arg%
+set room %self.room%
+set diff %self.var(diff,1)%
+set cmd %cmd.substr(1)%
+if %actor% != %self% || !%targ% || %targ.id% == %self.id%
+  halt
+elseif %cmd% == telestab
+elseif %cmd% == whistle
+elseif %cmd% == orb
+end
+~
 #13526
 Labyrinth: Dispel/cleanse the giant goblin rat~
 0 c 0 5
@@ -1698,6 +1933,21 @@ if %actor.empire%
   if !%emp.is_on_progress(13500)% && !%emp.has_progress(13500)%
     nop %emp.start_progress(13500)%
   end
+end
+~
+#13530
+Labyrinth: Horned champion fight~
+0 c 0 0
+!choke !bull !talisman~
+set targ %arg%
+set room %self.room%
+set diff %self.var(diff,1)%
+set cmd %cmd.substr(1)%
+if %actor% != %self% || !%targ% || %targ.id% == %self.id%
+  halt
+elseif %cmd% == choke
+elseif %cmd% == bull
+elseif %cmd% == talisman
 end
 ~
 #13531
