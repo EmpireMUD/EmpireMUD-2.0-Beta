@@ -90,6 +90,7 @@ T 13515
 T 13511
 T 13513
 T 13597
+T 13546
 S
 #13516
 adventurer hapless~
@@ -199,6 +200,7 @@ T 13523
 T 13526
 T 13511
 T 13596
+T 13546
 S
 #13526
 Cherrith goblin fuzzy~
@@ -338,6 +340,7 @@ T 13537
 T 13543
 T 13511
 T 13596
+T 13546
 S
 #13538
 shadow dead strange~
@@ -389,6 +392,7 @@ T 13511
 T 13540
 T 13538
 T 13596
+T 13546
 S
 #13539
 shadow wailing long~
@@ -438,6 +442,7 @@ T 13543
 T 13511
 T 13538
 T 13596
+T 13546
 S
 #13540
 goblin lost~
@@ -495,6 +500,7 @@ T 13540
 T 13537
 T 13543
 T 13596
+T 13546
 S
 #13542
 queen mole-rat molerat rat mammoth~
@@ -537,6 +543,7 @@ T 13540
 T 13537
 T 13543
 T 13596
+T 13546
 S
 #13543
 pup mole-rat molerat rat mammoth~
@@ -553,6 +560,7 @@ especially while you're watching it.
 ~
 I 0 3012 100.00 1  # BUTCHER: fillet of raw meat
 I 1 1351 100.00 1  # SKIN: large skin
+T 13546
 S
 #13544
 slime bone ball~
@@ -666,6 +674,7 @@ T 13543
 T 13511
 T 13548
 T 13596
+T 13546
 S
 #13548
 spider giant glimmer gold~
@@ -689,6 +698,7 @@ T 13543
 T 13511
 T 13548
 T 13596
+T 13546
 S
 #13550
 termite giant~
@@ -737,6 +747,7 @@ T 13537
 T 13543
 T 13511
 T 13596
+T 13546
 S
 #13551
 centipede monstrous~
@@ -779,6 +790,7 @@ T 13543
 T 13511
 T 13551
 T 13596
+T 13546
 S
 #13553
 pixies pixy cluster blind cave~
@@ -829,6 +841,7 @@ T 13543
 T 13511
 T 13540
 T 13596
+T 13546
 S
 #13554
 guardian wokestone stone pixy creature~
@@ -864,6 +877,7 @@ T 13543
 T 13511
 T 13540
 T 13596
+T 13546
 S
 #13556
 #n~

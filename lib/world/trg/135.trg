@@ -674,7 +674,7 @@ L j 13534
 L o 96
 L o 97
 L q 4
-open close kick bash unlock pick break~
+open close kick bash unlock pick lockpick break~
 set will_open 0
 set broke 0
 *
@@ -748,10 +748,10 @@ elseif unlock /= %cmd%
     set will_open 1
     %purge% %key%
   end
-elseif pick /= %cmd%
+elseif pick /= %cmd% || lockpick /= %cmd%
   if !%arg%
     %send% %actor% Pick what?
-  elseif !(door /= %arg%) && !(lock /= %arg%)
+  elseif !(door /= %arg%) && !(lock /= %arg%) && !(lockpick /= %cmd%)
     %send% %actor% You can't pick that.
   elseif %actor.skill(Stealth)% < 50
     %send% %actor% You don't really know how to pick a lock.
@@ -2387,10 +2387,24 @@ done
 ~
 #13546
 Labyrinth: Reject pickpocket~
-0 p 100 4
+0 p 100 18
 L b 13510
+L b 13512
+L b 13525
+L b 13536
+L b 13538
+L b 13539
+L b 13541
+L b 13542
+L b 13543
 L b 13544
 L b 13545
+L b 13547
+L b 13548
+L b 13550
+L b 13551
+L b 13553
+L b 13554
 L o 142
 ~
 if %ability% != 142
@@ -2404,6 +2418,34 @@ switch %self.vnum%
     %aggro% %actor%
     return 0
   break
+  case 13512
+    * Nightmare Queen
+    %send% %actor% If she has pockets, you certainly can't reach them.
+    return 0
+  break
+  case 13525
+    * gigantic goblin rat
+    %send% %actor% It doesn't really have any pockets.
+    return 0
+  break
+  case 13536
+    * polished bronze skeleton
+    %send% %actor% The skeleton has no pockets.
+    return 0
+  break
+  case 13538
+  case 13539
+    * the shadow of the dead, wailing shadow
+    %send% %actor% What kind of shadowplay is this? It doesn't have a pocket.
+    return 0
+  break
+  case 13541
+  case 13542
+  case 13543
+    * mammoth mole-rat,  mole-rat queen, mammoth mole-rat pup
+    %send% %actor% There are a lot of folds of skin, but no pocket on it.
+    return 0
+  break
   case 13544
     * bone slime
     %send% %actor% You're not exactly sure which part of it is the pocket.
@@ -2411,6 +2453,33 @@ switch %self.vnum%
   break
   case 13545
     %send% %actor% You've got bigger things to worry about... YOU'RE in its pocket!
+    return 0
+  break
+  case 13547
+  case 13548
+    * silver mirror spider, gold spider
+    %send% %actor% Which part do you think is the pocket?
+    return 0
+  break
+  case 13550
+    * a giant termite
+    %send% %actor% It doesn't seem to have a pocket.
+    return 0
+  break
+  case 13551
+    * the monstrous centipede
+    %send% %actor% You try to find a pocket, but it only seems to anger the centipede!
+    %aggro% %actor%
+    return 0
+  break
+  case 13553
+    * a cluster of blind cave pixies
+    %send% %actor% If they have any pockets, they're too tiny to pick.
+    return 0
+  break
+  case 13554
+    * the wokestone guardian
+    %send% %actor% The guardian is solid stone -- there's no pocket.
     return 0
   break
   default
