@@ -2752,8 +2752,9 @@ S
 #13594
 An Earthen Tunnel~
    The rough-cut tunnel straddles the boundary between bedrock and soil, though
-you don't seem to be close to the surface. Scraggly woody roots dangle through
-the top of the passage, though most of them have been gnawed to stubs.
+you don't seem to be close to the surface. The tunnel once went further up, but
+part of it has collapsed. Scraggly woody roots dangle through the top of the
+passage, though most of them have been gnawed to stubs.
 ~
 b 0 0 13594
 D14
@@ -2775,11 +2776,11 @@ pressed to put even the sturdiest mining pick through it.
 ~
 E
 soil~
-   Part of the tunnel is made from packed soil, some of which is now on the
-ground.
+Much of the tunnel is made from packed soil, some of which has spilled out on the floor as the upper tunnel has caved in.
+fi
 ~
 E
-roots woody scraggly top ceiling up stubs~
+roots woody scraggly top ceiling stubs~
    The ends of old roots poke through the top of the tunnel, but most of them
 have been gnawed bare, flush with the tunnel ceiling.
 ~
@@ -2790,11 +2791,21 @@ of a giant beast.
 ~
 E
 dirt rubble floor down ground bottom stone~
-The ground is packed with dirt and stone rubble from the tunnel's excavation.
+   The ground is packed with dirt and stone rubble from the tunnel's
+excavation. There's also a fair amount of dirt from the cave-in piled here.
 ~
 E
 tracks prints~
 Countless animal prints cover every part of the dirt floor, in all directions.
+~
+E
+up~
+   The passage appears to have once traveled further up toward the surface, but
+it has caved in.
+~
+E
+piled~
+Dirt from the caved-in tunnel is piled here.
 ~
 I 5 102 50.00 40 x  # DIG: flint stone
 I 5 100 50.00 40 x  # DIG: rock

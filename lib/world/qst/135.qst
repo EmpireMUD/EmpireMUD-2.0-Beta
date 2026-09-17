@@ -122,7 +122,7 @@ Z
 1 13503
 S
 #13510
-Labyrinth: The Only Way Out Is Through~
+Labyrinth: The Only Way Out is Through~
    Nevermind the maze, nevermind the darkness, nevermind the horrors. The
 labyrinth holds a minotaur! There's real glory to be had in taking on a mythic
 creature. They'll sing stories of this battle... if you survive.
@@ -257,7 +257,7 @@ Z
 2 13515
 S
 #13526
-Labyrinth: See You On The Other Side~
+Labyrinth: See You on the Other Side~
    The fuzzy goblin scratches behind her ear and checks herself all over before
 thanking you for the rescue.
    'Not gonna lie,' she says. 'Most harrowing experience of my entire life. And
@@ -323,5 +323,33 @@ W+
 Get one more thing from the fuzzy goblin~
 Z
 1 13527
+S
+#13543
+Labyrinth: Belly of the Beast~
+   You find the pup alone, cowering at the back of the burrow, shivering in
+silence. Its beadly little black eyes look up at you with the pleading naivete
+of a puppy, though it's much, much larger. The mammoth mole-rat is already as
+large as a full-size pig, with hideously long chisels for teeth. And just as
+you wonder what it wants, you hear it...
+   A low, rumbling growl from the poor creature's stomach.
+   It's hungry.
+   The adults are nowhere to be seen. If you have any pity for the wretched
+pup, bring it something to eat.
+~
+   You cautiously offer a snack to the mammoth mole-rat pup, who snatches the
+veggies from your hands and gobbles them down whole. It rubs its whiskers with
+its pink little paws and then trots over and plops down by your feet. It would
+seem you've made a friend.
+~
+2 cd 250 350 -1
+A
+1 13543
+R
+19 13575 13575
+W+
+1 6150 0 1 -
+Bring some (large vegetables) for the mole-rat pup~
+Z
+1 13543
 S
 $

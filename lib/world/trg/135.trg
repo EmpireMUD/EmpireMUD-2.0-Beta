@@ -68,6 +68,7 @@ if !%self.room.down(room)%
   %door% %self.room% down room i13501
 end
 * Check for rope
+makeuid campsite room i13505
 set rope %self.room.contents(13511)%
 if %rope%
   * rope attached, no drop
@@ -76,14 +77,22 @@ if %rope%
   %echo% ... luckily you catch yourself on the rope as it drops down the chute.
 else
   * no rope: send everyone down
+  makeuid chute room i13501
   set ch %self.room.people%
   while %ch%
     set next_ch %ch.next_in_room%
     if !%ch.is_flying%
       %echoaround% %ch% ~%ch% falls down the chute!
       %send% %ch% You fall down the chute! You can't seem to find your footing...
-      %teleport% %ch% i13501
+      %teleport% %ch% %chute%
       * look will be handled by the greet script in
+    elseif %ch.is_npc% && %ch.leader%
+      if %ch.leader.room% == %chute% || (%ch.leader.room% == %ch.room% && !%ch.leader.is_flying%)
+        * send straight down
+        %echoaround% %ch% ~%ch% falls down the chute!
+        %teleport% %ch% %campsite%
+        %at% %campsite% %echo% ~%ch% falls down from the chute!
+      end
     end
     set ch %next_ch%
   done
@@ -124,7 +133,6 @@ switch %random.3%
   break
 done
 * Store route to the campsite
-makeuid campsite room i13505
 remote route %campsite.id%
 * Link boss room
 makeuid linkroom room i%route%
@@ -2808,6 +2816,17 @@ if %down% && !%down.up(room)%
 end
 *
 detach 13558 %room.id%
+~
+#13559
+Labyrinth: Mole-rat pup quest turn-in~
+0 v 0 1
+L t 13543
+~
+if %questvnum% == 13543
+  wait 1
+  %echoaround% %actor% ~%self% goes and joins ~%actor%.
+  %purge% %self%
+end
 ~
 #13573
 Labyrinth: loot/craft bop/boe twiddler and restringer~

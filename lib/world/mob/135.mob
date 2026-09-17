@@ -561,6 +561,8 @@ especially while you're watching it.
 I 0 3012 100.00 1  # BUTCHER: fillet of raw meat
 I 1 1351 100.00 1  # SKIN: large skin
 T 13546
+T 13559
+T 9802
 S
 #13544
 slime bone ball~
@@ -957,6 +959,20 @@ T 13523
 T 13596
 _
 Look desc set by trig 13540.
+~
+S
+#13575
+pup mole-rat molerat rat mammoth~
+a mammoth mole-rat pup~
+A mammoth mole-rat pup is poking around.
+~
+1 1 bdoD mn 2
+0 0 11 13541 -1 -1
+D
+   Though it looks like a young mole-rat, it's larger than a full-grown sow and
+already has a twin pair of long, sharp, ivory teeth. Its pink skin wrinkles as
+it runs along the ground on clawed little feet. It pokes at everything it comes
+across with its whisker-covered nose, then darts away to safety.
 ~
 S
 #13576
