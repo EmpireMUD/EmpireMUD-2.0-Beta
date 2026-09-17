@@ -78,6 +78,17 @@ gnawing hex~
 4 0
 0 0 0 0
 S
+#13527
+stun orb~
+4 0
+0 0 0 0
+T0
+You recover from the stun orb.~
+T2
+You're seeing stars!~
+T5
+...$e seems to be stunned!~
+S
 #13533
 bubbly~
 4 0

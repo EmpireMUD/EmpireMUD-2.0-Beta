@@ -832,7 +832,7 @@ if %will_open%
 end
 ~
 #13510
-Labyrinth: Minotaur fight~
+Labyrinth: Minotaur fight: Fist Slam, Crushing Grab, Horn Sweep, Shockwave~
 0 c 0 5
 L w 9602
 L w 13508
@@ -847,7 +847,7 @@ set cmd %cmd.substr(1)%
 if %actor% != %self% || !%targ% || %targ.id% == %self.id%
   halt
 elseif %cmd% == fist
-  * Fist Slam
+  * Fist Slam (solo dodge)
   scfight clear dodge
   %echo% &&J~%self% pounds his fists together over his head...&&0
   wait 3 s
@@ -882,7 +882,7 @@ elseif %cmd% == fist
       %send% %targ% &&JYou leap out of the way as ~%self% slams his massive fist down where you stood!&&0
       %echoaround% %targ% &&J~%targ% leaps out of the way as ~%self% slams his massive fist down where &%targ% stood!&&0
     else
-      %echo% &&J~%self% slams his massive fist down on ~%targt%!&&0
+      %echo% &&J~%self% slams his massive fist down on ~%targ%!&&0
       %send% %targ% That really hurts!
       %damage% %targ% %ouch% physical
     end
@@ -902,7 +902,7 @@ elseif %cmd% == fist
   scfight clear dodge
   dg_affect #13510 %self% off
 elseif %cmd% == grab
-  * Crushing Grab
+  * Crushing Grab (solo struggle)
   scfight clear struggle
   %echo% &&J~%self% cracks his knuckles...
   wait 3 sec
@@ -920,7 +920,7 @@ elseif %cmd% == grab
   if %targ.affect(9602)%
     set scf_strug_char You try to squeeze out of his crushing grip.
     set scf_strug_room ~%%actor%% struggles to squeeze out of the minotaur's crushing grip.
-    set scf_free_char You finally find the leverage you need to squeeze out of the minotaur's crushing grip!
+    set scf_free_char You find the leverage you need to squeeze out of the minotaur's crushing grip!
     set scf_free_room ~%%actor%% squeezes free of the minotaur's crushing grip!
     remote scf_strug_char %targ.id%
     remote scf_strug_room %targ.id%
@@ -949,7 +949,7 @@ elseif %cmd% == grab
   scfight clear struggle
   dg_affect #13510 %self% off
 elseif %cmd% == horn
-  * Horn Sweep
+  * Horn Sweep (group duck)
   scfight clear duck
   %echo% &&J~%self% roars as he lowers his horns!&&0
   if %diff% == 1
@@ -990,7 +990,7 @@ elseif %cmd% == horn
   wait 8 s
   dg_affect #13510 %self% off
 elseif %cmd% == shockwave
-  * Shockwave
+  * Shockwave (group jump)
   scfight clear jump
   %echo% &&J~%self% crouches and prepares to leap...&&0
   if %diff% == 1
@@ -1753,8 +1753,11 @@ dg_affect_room #13524 %room% !TELEPORT on -1
 detach 13524 %room.id%
 ~
 #13525
-Labyrinth: Cherrith combat~
-0 c 0 0
+Labyrinth: Cherrith fight: Teleport Stab, Sharp Whistle, Stun Orb~
+0 c 0 3
+L w 13510
+L w 13511
+L w 13527
 !telestab !whistle !orb~
 set targ %arg%
 set room %self.room%
@@ -1763,9 +1766,108 @@ set cmd %cmd.substr(1)%
 if %actor% != %self% || !%targ% || %targ.id% == %self.id%
   halt
 elseif %cmd% == telestab
+  * Teleport Stab (solo dodge)
+  scfight clear dodge
+  %echo% &&J~%self% steps into a shadow...&&0
+  wait 3 s
+  if %self.disabled% || %self.aff_flagged(BLIND)%
+    halt
+  end
+  set targ %random.enemy%
+  if !%targ%
+    halt
+  end
+  set targ_id %targ.id%
+  if %diff% == 1
+    dg_affect #13510 %self% HARD-STUNNED on 20
+  end
+  %send% %targ% &&J**** &&Z~%self% locks her eyes on you and then vanishes into the shadow... ****&&0 (dodge)
+  %echoaround% %targ% &&J~%self% locks her eyes on ~%targ% and then vanishes into the shadow...&&0
+  scfight setup dodge %targ%
+  eval ouch 100 * %diff%
+  wait 6 sec
+  if %targ.id% != %targ_id%
+    * dedz
+  elseif %targ.var(did_scfdodge)%
+    %send% %targ% &&JYou manage a timely dodge as ~%self% appears behind you and brings a dagger down on thin air!&&0
+    %echoaround% %targ% &&J~%targ% dodges just ~%self% appears behind *%targ% and brings a dagger down on thin air!&&0
+  else
+    %echo% &&J~%self% appears on |%targ% back and plunges a dagger into ^%targ% neck!&&0
+    if %diff% < 4 || %self.level% + 100 <= %actor.level%
+      %damage% %targ% %ouch% physical
+      %send% %targ% That really hurts!
+    else
+      %slay% %targ% %targ.real_name% has crossed the wrong Goblin King at %targ.room.coords%!
+    end
+  end
+  scfight clear dodge
 elseif %cmd% == whistle
+  * Sharp Whistle (group interrupt)
+  scfight clear interrupt
+  %echo% &&J**** &&Z~%self% puts two fingers to her lips... ****&&0 (interrupt)
+  if %diff% == 1
+    dg_affect #13510 %self% HARD-STUNNED on 20
+  end
+  scfight setup interrupt all
+  wait 3 s
+  if %diff% > 2
+    set needed %room.players_present%
+  else
+    set needed 1
+  end
+  if %self.var(count_scfinterrupt,0)% < %needed%
+    %echo% &&J**** &&Z~%self% takes a deep breath... ****&&0 (interrupt)
+  end
+  wait 3 s
+  if %self.var(count_scfinterrupt,0)% >= %needed%
+    %echo% &&J~%self% is distracted before she can whistle.&&0
+  else
+    %echo% &&J~%self% lets out a sharp whistle! Your ears feel like they're going to bleed!&&0
+    eval pain 100 * %diff%
+    %aoe% %pain% direct
+  end
+  scfight clear interrupt
 elseif %cmd% == orb
+  * Stun Orb (sequential dodge)
+  scfight clear dodge
+  %echo% &&J~%self% plucks a glass orb, apparently from nowhere, and rolls it down her arm...&&0
+  if %diff% == 1
+    nop %self.add_mob_flag(NO-ATTACK)%
+  end
+  set ch %room.people%
+  while %ch%
+    set next_ch %ch.next_in_room%
+    set next_id %next_ch.id%
+    set ch_id %ch.id%
+    wait 1 s
+    if %ch.id% == %ch_id%
+      scfight setup dodge %ch%
+      %send% %ch% &&J**** &&Z~%self% takes aim... at you! ****&&0 (dodge)
+      %echoaround% %ch% &&J~%self% takes aim at ~%ch%...&&0
+      wait 5 s
+      if %ch.id == %ch_id%
+        * re-store next
+        set next_ch %ch.next_in_room%
+        set next_id %next_ch.id%
+        if %ch.var(did_scfdodge)%
+          %echo% &&J~%self% throws the glass orb at ~%ch% but it misses and bounces back to her hand.&&0
+          if %diff% == 1
+            dg_affect #13511 %ch% TO-HIT 25 20
+          end
+        else
+          %echo% &&J~%self% throws the glass orb at ~%ch%, smacking *%ch% in the forehead!&&0
+          if !%ch.aff_flagged(NO-STUN)%
+            dg_affect #13527 %ch% STUNNED on 20
+          end
+          %damage% %ch% 50 physical
+        end
+      end
+    end
+    set ch %next_ch%
+  done
+  scfight clear dodge
 end
+dg_affect #13510 %self% off
 ~
 #13526
 Labyrinth: Dispel/cleanse the giant goblin rat~

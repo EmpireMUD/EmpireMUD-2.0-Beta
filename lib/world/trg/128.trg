@@ -2402,7 +2402,7 @@ end
 ~
 #12844
 Shard companion: Caster tier 3 auto-cast~
-0 k 67 1
+0 kt 67 1
 L w 12833
 ~
 * this ONLY appears on the Caster 3 module
