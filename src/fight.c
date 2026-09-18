@@ -3366,9 +3366,9 @@ void check_auto_assist(char_data *ch) {
 		
 		// if we got this far and hit an assist condition
 		if (assist && can_fight(ch_iter, FIGHTING(ch))) {
-			act("You jump to $N's aid!", FALSE, ch_iter, 0, ch, TO_CHAR);
-			act("$n jumps to your aid!", FALSE, ch_iter, 0, ch, TO_VICT);
-			act("$n jumps to $N's aid!", FALSE, ch_iter, 0, ch, TO_NOTVICT);
+			act("You jump to $N's aid!", FALSE, ch_iter, NULL, ch, TO_CHAR);
+			act("$n jumps to your aid!", FALSE, ch_iter, NULL, ch, TO_VICT);
+			act("$n jumps to $N's aid!", TRUE, ch_iter, NULL, ch, TO_NOTVICT);
 			engage_combat(ch_iter, FIGHTING(ch), FALSE);
 			continue;
 		}
