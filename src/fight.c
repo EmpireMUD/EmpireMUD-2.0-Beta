@@ -4601,14 +4601,14 @@ void fight_wait_run(char_data *ch, double speed) {
 		return;
 	}
 
-	act("You run toward $N!", FALSE, ch, 0, FIGHTING(ch), TO_CHAR);
-	act("$n runs toward you!", FALSE, ch, 0, FIGHTING(ch), TO_VICT);
+	act("You run toward $N!", FALSE, ch, NULL, FIGHTING(ch), TO_CHAR);
+	act("$n runs toward you!", TRUE, ch, NULL, FIGHTING(ch), TO_VICT);
 	
 	--FIGHT_WAIT(ch);
 	
 	if (FIGHT_WAIT(ch) <= 0 || FIGHT_MODE(FIGHTING(ch)) != FMODE_MISSILE) {
-		act("You engage $M in melee combat!", FALSE, ch, 0, FIGHTING(ch), TO_CHAR);
-		act("$e engages you in melee combat!", FALSE, ch, 0, FIGHTING(ch), TO_VICT);
+		act("You engage $M in melee combat!", FALSE, ch, NULL, FIGHTING(ch), TO_CHAR);
+		act("$e engages you in melee combat!", TRUE, ch, NULL, FIGHTING(ch), TO_VICT);
 		
 		FIGHT_MODE(ch) = FMODE_MELEE;
 		
