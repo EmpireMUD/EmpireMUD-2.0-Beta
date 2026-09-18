@@ -634,6 +634,29 @@ embroidered tunic reveal the cause of death. Some champion.
 C
 250 350
 S
+#13531
+mass burning ceiling~
+a burning mass~
+A burning mass on the ceiling casts flickering light around the passage.~
+   The craggy mass on the ceiling crisps and crackles as it burns away, filling
+the air with soot and ash. It shrinks smaller and smaller as bits of it burn
+away. Ash falls to the ground like snow. The fire is spreading quickly; soon
+nothing will remain.
+~
+29 0 0 0 0 4
+3 1 23
+7 0
+C
+250 250
+E
+ash ashes snow~
+Ash floats down from the burning mass like snow.
+~
+M
+18
+$p crumbles away to ash.~
+T 13532
+S
 #13532
 guardian wokestone stone corpse body~
 the wokestone guardian~
@@ -882,7 +905,7 @@ them, quickly vanishing into the hive's interior. It has the gray color of
 dust. Here and there, you see small shelves that protrude like mushrooms from
 the larger structure.
 ~
-3 0 0 0 0 6
+3 0 0 0 0 7
 0 0 0
 7 0
 E
@@ -893,6 +916,7 @@ E
 mushrooms~
 Mushroom-like shelves grow out of the sides of the hive.
 ~
+I 11 13531 100.00 1 x  # LIGHT: burning mass
 S
 #13547
 pixies bodies corpses body dead cave pile~

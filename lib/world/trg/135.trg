@@ -1183,7 +1183,12 @@ end
 ~
 #13512
 Labyrinth: Nightmare Queen fight: Curse of Agony, Accursed Fate, Burning Embers, Statue Smite~
-0 c 0 0
+0 c 0 5
+L w 9602
+L w 13510
+L w 13511
+L w 13512
+L w 13513
 !curse !accursed !embers !fling~
 set targ %arg%
 set room %self.room%
@@ -1701,10 +1706,10 @@ elseif %cmd% == open || unseal /= %cmd%
     %echo% ~%mob% spurts fire and slams ^%mob% fists against the chamber ceiling!
     %subecho% %self.room% The entire labyrinth shakes!
     wait 4 sec
-    %echo% ~%mob% looks down at you and huffs a plume of smoke from ^%self% nostrils.
+    %echo% ~%mob% looks down at you and huffs a plume of smoke from ^%mob% nostrils.
     wait 2 sec
     if !%mob.fighting%
-      %echo% The queen is not pleased by your presence.
+      %echo% The Queen is not pleased by your presence.
       wait 1
       %force% %mob% maggro
     end
@@ -2370,6 +2375,19 @@ set name %self.pc_name%
 set newname %name.car% the Meek
 %mod% %self% shortdesc %newname%
 detach 13531 %self.id%
+~
+#13532
+Labyrinth: Burn pixy hive~
+1 n 100 1
+L b 13553
+~
+set pix %self.room.people(13553)%
+while %pix%
+  wait 1 sec
+  %echo% Some of the pixies run up the walls and into the burning mass, screaming as they try to extinguish the flames!
+  %purge% %pix%
+  set pix %self.room.people(13553)%
+done
 ~
 #13533
 Labyrinth: Scenery setup~
