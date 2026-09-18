@@ -2781,6 +2781,15 @@ while %ch%
   set ch %ch.next_in_room%
 done
 ~
+#13539
+Labyrinth: Gigantic goblin rat festering bite~
+0 k 20 1
+L w 13540
+~
+if %hit% && !%actor.aff_flagged(IMMUNE-PHYSICAL-DEBUFFS)%
+  %dot% #13540 %actor% 100 60 physical 30
+end
+~
 #13540
 Labyrinth: Trash mob load/setup~
 0 n 100 16
@@ -3229,13 +3238,15 @@ end
 ~
 #13553
 Labyrinth: Search for clues~
-2 c 0 38
+2 c 0 40
+L c 13500
 L c 13503
 L c 13507
 L c 13511
 L c 13513
 L c 13518
 L c 13528
+L c 13533
 L c 13534
 L j 13500
 L j 13505
@@ -3857,10 +3868,10 @@ detach 13578 %self.id%
 Labyrinth: Free to a Good Home turn-in qualifier~
 0 tv 0 3
 L j 13501
-L j 13592
+L j 13591
 L t 13503
 ~
-if %questvnum% == 13503 && %self.room.template% >= 13501 && %self.room.template% <= 13592
+if %questvnum% == 13503 && %self.room.template% >= 13501 && %self.room.template% <= 13591
   %send% %actor% You need to get ~%self% out of the maze before you can finish %questname%.
   return 0
 else

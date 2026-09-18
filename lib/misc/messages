@@ -3569,6 +3569,38 @@ You send a lance of black fire toward $N, but $E remains untouched.
 A lance of black fire tears toward you, but cannot harm you.
 $n sends a lance of black fire screaming toward $N, but it passes harmlessly through $M.
 
+M13513 e 0 
+Accursed Fate DoT~
+~
+$N succumbs to $S accursed fate, and dies!
+You succumb to your accursed fate and die!
+$N succumbs to $S accursed fate, and dies!
+#
+#
+#
+$N shudders as $S accursed fate takes hold!
+You shudder as your accursed fate takes hold!
+$N shudders as $S accursed fate takes hold!
+#
+#
+#
+
+M13513 e 0 
+Accursed Fate DoT~
+~
+$N tears apart as $S accursed fate claims $M, and dies!
+You tear apart as your accursed fate claims you, and die!
+$N tears apart as $S accursed fate claims $M, and dies!
+#
+#
+#
+$N's body begins to come apart under $S accursed fate!
+Your body begins to come apart under your accursed fate!
+$N's body begins to come apart under $S accursed fate!
+#
+#
+#
+
 M13520 bc 12 +
 crazy torch burn~
 has been torched at~

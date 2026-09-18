@@ -53,7 +53,7 @@ S
 #13513
 accursed fate~
 4 0
-0 0 0 0
+13513 0 0 0
 T0
 You finally escape your accursed fate.~
 T5
@@ -170,6 +170,17 @@ T2
 You feel the cold approach of death...~
 T5
 ...$e looks pale.~
+S
+#13540
+festering bite~
+4 0
+0 0 0 0
+T0
+You recover from the festering bite.~
+T2
+You don't feel so good.~
+T4
+$e looks a little bit ill.~
 S
 #13544
 acid spray~
