@@ -236,7 +236,9 @@ EVASION EVADE
 Evasion (Battle ability)
 
 This ability is part of basic combat training and improves your ability to
-fight. It gains experience whenever someone is trying to hit you in combat.
+fight -- by helping you avoid attacks. With this ability, you automatically try
+to dodge all incoming attacks. It gains experience whenever someone is trying
+to hit you in combat.
 #
 EXHAUST
 
