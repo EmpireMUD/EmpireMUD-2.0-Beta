@@ -4606,7 +4606,7 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 						obj_data *targ;
 						*str = '\0';	// default to no-target
 						if (subfield && *subfield) {
-							if ((targ = get_obj_in_list_vis(c, subfield, NULL, ROOM_OBJECTS(IN_ROOM(c))))) {
+							if ((targ = get_obj_in_list_vis(c, subfield, NULL, ROOM_CONTENTS(IN_ROOM(c))))) {
 								safe_snprintf(str, slen, "%c%d", UID_CHAR, obj_script_id(targ));
 							}
 						}
