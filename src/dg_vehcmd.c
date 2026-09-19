@@ -1065,7 +1065,7 @@ VCMD(do_vload) {
 	room_data *room, *in_room;
 	char_data *mob, *tch;
 	obj_data *object, *cnt;
-	vehicle_data *vehicle;
+	vehicle_data *vehicle, *cnt_veh;
 	char *target;
 	struct empire_storage_data *store;
 
@@ -1226,6 +1226,12 @@ VCMD(do_vload) {
 		cnt = get_obj_near_vehicle(veh, arg1);
 		if (cnt && (GET_OBJ_TYPE(cnt) == ITEM_CONTAINER || GET_OBJ_TYPE(cnt) == ITEM_CORPSE)) {
 			obj_to_obj(object, cnt);
+			load_otrigger(object);
+			return;
+		}
+		cnt_veh = get_vehicle_near_vehicle(veh, arg1);
+		if (cnt_veh && VEH_FLAGGED(cnt_veh, VEH_CONTAINER)) {
+			obj_to_vehicle(object, cnt_veh);
 			load_otrigger(object);
 			return;
 		}

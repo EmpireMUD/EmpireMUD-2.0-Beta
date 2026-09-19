@@ -450,7 +450,7 @@ See also: EXPRESSIONS, NESTED-IFS
 %LOAD% MLOAD OLOAD VLOAD WLOAD
 
 %load% obj <vnum> [name <position>] [scale level]
-%load% obj <vnum> <in-obj> [scale level]
+%load% obj <vnum> <in-obj | in-vehicle> [scale level]
 %load% obj <vnum> <room> [scale level]
 %load% mob <vnum> [ally] [scale level]
 %load% veh <vnum> [scale level]

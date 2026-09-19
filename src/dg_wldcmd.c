@@ -1131,7 +1131,7 @@ WCMD(do_wload) {
 	char_data *mob, *tch;
 	obj_data *object, *cnt;
 	room_data *in_room;
-	vehicle_data *veh;
+	vehicle_data *veh, *cnt_veh;
 	struct empire_storage_data *store;
 	char *target;
 
@@ -1296,6 +1296,12 @@ WCMD(do_wload) {
 		cnt = get_obj_in_room(room, arg1);
 		if (cnt && (GET_OBJ_TYPE(cnt) == ITEM_CONTAINER || GET_OBJ_TYPE(cnt) == ITEM_CORPSE)) {
 			obj_to_obj(object, cnt);
+			load_otrigger(object);
+			return;
+		}
+		cnt_veh = get_vehicle_room(room, arg1, NULL);
+		if (cnt_veh && VEH_FLAGGED(cnt_veh, VEH_CONTAINER)) {
+			obj_to_vehicle(object, cnt_veh);
 			load_otrigger(object);
 			return;
 		}
