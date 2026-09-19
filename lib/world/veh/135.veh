@@ -1,7 +1,7 @@
 #13505
 tent tattered old~
 the tattered tent~
-A tattered old tent lies crumpled in the corner.~
+A tattered old tent lies half-collapsed in the corner.~
    It's a simple canvas tent with frayed edges and a constellation of moth
 holes that have left it with little purpose. The tent is barely supported by
 what's left of its remaining pole. Nearby, a rotting length of rope is the only
@@ -11,7 +11,7 @@ other sign that anybody else was ever here.
 ghxE 19 2 0 0 d 0 0 0 0 -1 0
 E
 pole~
-tbd
+A single pole holds up the tent.
 ~
 E
 corner~
