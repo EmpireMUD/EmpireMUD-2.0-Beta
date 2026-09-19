@@ -127,7 +127,7 @@ A bobbin of silver thread is lying here.~
    An incredibly fine strand of silver thread is wound tightly around the
 bobbin. It glints and gleams as you move it around in the light.
 ~
-15 0 a 0 0 3
+15 0 a 0 0 5
 6 0 0
 3 0
 C
@@ -293,12 +293,13 @@ An old basin stands in the corner.~
    The wooden basin shows wear from many years of use. It looks as if it would
 fall apart if someone tried to move it.
 ~
-5 0 0 0 0 4
+5 0 0 0 0 5
 48 48 13514
 0 0
 C
 1 1
 T 13521
+T 13554
 S
 #13515
 jar great~
@@ -620,6 +621,24 @@ wall~
 since all the stones are so tightly fit together.
 ~
 S
+#13529
+chalk brittle~
+some brittle chalk~
+Some brittle chalk is lying here.~
+   The hunk of white chalk is crumbling on all sides, but it's still large
+enough that you might use it to make marks on stone.
+Use 'write <message>' and 'erase message' to write on the Labyrinth.
+~
+3 k a 0 0 3
+0 0 0
+1 0
+C
+1 1
+M
+33
+Use 'write <message>' and 'erase message' to write on the Labyrinth.~
+T 13581
+S
 #13530
 champion dead horned body corpse~
 the dead champion~
@@ -687,7 +706,7 @@ Keywords for this include most keywords for items it becomes.
 ~
 S
 #13534
-stash secret~
+stash secret cache block stone~
 the stash~
 A small stone block has been pushed aside, revealing a secret stash.~
 There's a small hiding place in the wall where a stone has been removed.
@@ -1820,6 +1839,22 @@ A
 C
 250 350
 T 13578
+S
+#13580
+markings marks chalk wall message~
+the markings~
+There are markings on the wall.~
+Someone has marked on the wall with chalk.
+~
+3 0 0 0 0 4
+0 0 0
+1 0
+C
+1 1
+T 13580
+_
+Written on the wall by the player using chalk item.
+~
 S
 #13581
 whistle mount bull golden glorious~

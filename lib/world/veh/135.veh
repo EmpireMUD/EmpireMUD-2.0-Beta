@@ -8,7 +8,7 @@ what's left of its remaining pole. Nearby, a rotting length of rope is the only
 other sign that anybody else was ever here.
 ~
 ~
-ghxE 19 2 0 0 d 0 0 0 0 -1 0
+ghixE 19 2 1 0 d 0 0 0 0 -1 0
 E
 pole~
 A single pole holds up the tent.
@@ -19,6 +19,7 @@ An old tent sits in the corner, half-collapsed.
 ~
 P
 2
+T 13582
 S
 #13533
 chair old wooden~

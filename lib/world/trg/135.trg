@@ -3263,6 +3263,19 @@ if %hit% && !%actor.has_tech(!Poison)% && !%actor.aff_flagged(IMMUNE-POISON-DEBU
   %dot% #13551 %actor% 10 30 poison 60
 end
 ~
+#13552
+Labyrinth: Fake up exit / unusable chute~
+2 c 0 0
+up~
+if %room.up(room)%
+  * real up
+  return 0
+elseif %actor.is_flying%
+  %send% %actor% On closer inspection, the hole in the ceiling is too small for you to squeeze through.
+else
+  %send% %actor% You can't reach the hole in the ceiling from here.
+end
+~
 #13553
 Labyrinth: Search for clues~
 2 c 0 40
@@ -3505,6 +3518,19 @@ set stash %room.contents(13534)%
 if %stash% && %stash.contents%
   %send% %actor% A loose stone has been pushed aside; something is hidden in the secret stash!
 end
+~
+#13554
+Labyring: Try to move the basin~
+1 c 4 0
+push pull drag move~
+if %actor.obj_target(%arg.argument1%)% != %self%
+  return 0
+  halt
+end
+%send% %actor% You start to move @%self% but it gives way without warning and breaks apart!
+%echoaround% %actor% ~%actor% starts to move @%self% but it breaks apart!
+%echo% The stale water splashes to the floor and soaks into the thin seams.
+%purge% %self%
 ~
 #13558
 Labyrinth: Open A-wing secret passage, inside~
@@ -3904,6 +3930,53 @@ if %questvnum% == 13503 && %self.room.template% >= 13501 && %self.room.template%
 else
   return 1
 end
+~
+#13580
+Labyrinth: Erase chalk message~
+1 c 4 0
+erase~
+if !%arg%
+  %send% %actor% Erase what?
+elseif %actor.obj_target(%arg.argument1%)% != %self%
+  %send% %actor% You can't erase that.
+else
+  %send% %actor% You rub out the chalk markings.
+  %echoaround% %actor% ~%actor% rubs out the chalk markings.
+  %purge% %self%
+end
+~
+#13581
+Labyrinth: Write with chalk~
+1 c 2 3
+L c 13580
+L j 13500
+L j 13599
+write~
+set room %self.room%
+if %room.template% < 13500 || %room.template% > 13599
+  %send% %actor% You go to write with the chalk but it crumbles away to dust!
+  %purge% %self%
+elseif %room.contents(13580)%
+  %send% %actor% Something is already written in chalk here; erase that first or this might get confusing.
+elseif !%arg%
+  %send% %actor% What do you want to write?
+else
+  %send% %actor% You write on the wall with chalk.
+  %echoaround% %actor% ~%actor% writes on the wall with chalk.
+  %load% obj 13580
+  set marks %room.contents(13580)%
+  if %marks%
+    %mod% %marks% look %arg%
+    %mod% %marks% append-lookdesc-noformat Use 'erase markings' to remove this message.
+  end
+end
+~
+#13582
+Labyrinth: Chalk in tent~
+5 n 100 1
+L c 13529
+~
+%load% obj 13529 %self%
 ~
 #13591
 Labyrinth: Consume fermented pomegranates~

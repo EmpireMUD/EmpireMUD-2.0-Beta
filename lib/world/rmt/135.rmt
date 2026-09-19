@@ -290,7 +290,7 @@ minerals deposits white~
 of unchecked flow.
 ~
 E
-ceiling mushrooms~
+ceiling mushrooms up~
 Mushrooms grow along the seams of the ceiling stones.
 ~
 E
@@ -421,6 +421,10 @@ In the distance, you see only darkness.
 E
 makeshift camp~
 You're quite close to the campsite, such as it is.
+~
+E
+up ceiling~
+The ceiling is made of gray stone.
 ~
 T 13504
 T 13529
@@ -694,6 +698,7 @@ T 13504
 T 13524
 T 13529
 T 13553
+T 13552
 _
 Wing b side room
 ~
@@ -987,6 +992,7 @@ T 13504
 T 13524
 T 13529
 T 13553
+T 13552
 _
 Wing A, side path with alcove
 ~
@@ -1769,6 +1775,7 @@ T 13524
 T 13529
 T 13507
 T 13553
+T 13552
 _
 Wing A side wing leading to secret passage
 ~
@@ -1902,6 +1909,7 @@ T 13504
 T 13558
 T 13529
 T 13553
+T 13552
 _
 A-B Passage
 ~
@@ -1976,6 +1984,7 @@ T 13504
 T 13524
 T 13529
 T 13553
+T 13552
 _
    Gains 'A rope ladder leads up into the chute above.' in its long desc from
 trigger 13558 if the secret passage opens.
@@ -2440,6 +2449,7 @@ T 13504
 T 13524
 T 13529
 T 13553
+T 13552
 _
 Wing B room 5 / end - possible boss path
 ~
