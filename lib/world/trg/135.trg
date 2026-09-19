@@ -1312,7 +1312,7 @@ elseif %cmd% == embers
       if %self.is_enemy(%ch%)%
         if !%ch.var(did_scfjump)% && !%ch.aff_flagged(IMMUNE-PHYSICAL-DEBUFFS)%
           %echo% &&JThe burning embers scorch ~%ch% and light *%ch% aflame!&&0
-          %dot% %ch% %pain% fire 4
+          %dot% %ch% %pain% 60 fire 4
         elseif %ch.is_pc%
           %send% %ch% &&JYou jump free of the embers and hang onto an alcove for a moment!&&0
           if %diff% == 1
@@ -2899,6 +2899,18 @@ if %change%
   end
 end
 ~
+#13541
+Labyrinth: Give item to mole-rat pup~
+0 j 100 1
+L t 13543
+~
+if %actor.on_quest(13543)% && %object.is_component(large vegetable)% && %actor.quest_finished(13543)%
+  %quest% %actor% finish 13543
+else
+  %send% %actor% You can't give items to ~%self%.
+end
+return 0
+~
 #13542
 Labyrinth: Bone slime combat~
 0 k 34 1
@@ -3224,6 +3236,21 @@ end
 if (page /= %keyword% || torn /= %keyword%) && !%actor.obj_target(%targ%)%
   wait 1
   %quest% %actor% start 13515
+end
+~
+#13550
+Labyrinth: Try to drink puddle~
+2 c 0 0
+sip drink~
+if !%arg% || %actor.obj_target(%arg.argument1%)%
+  return 0
+elseif puddle /= %arg.argument1% || water /= %arg.argument1%
+  %send% %actor% You try desperately to drink from the puddle but it's too shallow to scoop any water.
+  %echoaround% %actor% ~%actor% tries desperately to drink from the puddle but it's too shallow.
+  return 1
+else
+  * something else?
+  return 0
 end
 ~
 #13551

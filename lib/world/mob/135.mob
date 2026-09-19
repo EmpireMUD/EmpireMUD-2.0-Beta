@@ -87,8 +87,8 @@ D
    The specter of the Nightmare Queen is so large as to fill most of the
 chamber! Her face is that of a horse, with fiery eyes and steam rising from her
 flaring nostrils. Her torso and arms, wrapped in strips of red linen, are that
-of a woman. Her waist is at floor level, semi-transparent, unconstrained by the
-geometry of the floor. There's no way past her!
+of a woman. Her waistline is level with the floor, semi-transparent, entirely
+unconstrained by the geometry of the room. There's no way past her!
 ~
 I 4 13574 100.00 1  # LOOT: labyrinthine boss loot controller
 I 4 13524 100.00 1  # LOOT: memento of interment
@@ -603,7 +603,7 @@ I 0 3012 100.00 1  # BUTCHER: fillet of raw meat
 I 1 1351 100.00 1  # SKIN: large skin
 T 13546
 T 13559
-T 9802
+T 13541
 S
 #13544
 slime bone ball~
