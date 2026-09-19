@@ -2624,7 +2624,7 @@ elseif "taste drink sip use" ~= %cmd% && %self.var(bubbles)%
   end
   * end bubbles
 elseif "get take use push pull rub dust" ~= %cmd% && %self.var(statue)%
-  if %arg% == all || %actor.obj_target(%arg.argument1%)% == %self%
+  if %arg% == all || %actor.obj_target_room(%arg.argument1%)% == %self%
     %send% %actor% You reach out to grab the golden statuette...
     %echoaround% %actor% ~%actor% reaches out to grab the golden statuette...
     %echo% The stone floor in front of the plinth drops open for a moment, swallowing ~%actor%!

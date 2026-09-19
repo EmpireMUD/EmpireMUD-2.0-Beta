@@ -4602,6 +4602,15 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 							}
 						}
 					}
+					else if (!str_cmp(field, "obj_target_room")) {
+						obj_data *targ;
+						*str = '\0';	// default to no-target
+						if (subfield && *subfield) {
+							if ((targ = get_obj_in_list_vis(c, subfield, NULL, ROOM_OBJECTS(IN_ROOM(c))))) {
+								safe_snprintf(str, slen, "%c%d", UID_CHAR, obj_script_id(targ));
+							}
+						}
+					}
 					else if (!str_cmp(field, "on_quest")) {
 						if (subfield && *subfield && isdigit(*subfield)) {
 							any_vnum vnum = atoi(subfield);

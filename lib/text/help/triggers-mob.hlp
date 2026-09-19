@@ -598,6 +598,7 @@ When using field  - The variable returns:
 &cnothirst&0 - If TRUE, player never gets thirsty.
 &cobj_target(name)&0 - Finds a targeted object the character can see/has.
 &cobj_target_inv(name)&0 - Finds a targeted object in the character's inventory.
+&cobj_target_room(name)&0 - Finds a targeted object in the room only (like 'get').
 &con_quest(vnum)&0 - TRUE if the player is currently on that quest.
 &cparse_dir(dir)&0 - Gets the real direction that the char thinks is 'dir',
    based on whether or not they have Navigation/alcohol. Bad directions return
