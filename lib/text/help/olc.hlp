@@ -663,6 +663,8 @@ fire damage.
 Hooked abilities send normal &cpre-&0, &ctarg-&0, &cself-&0, and &cfail-&0
 messages. You can set custom messages to * to silence them, as usual.
 
+Hooked abilities gain experience when they activate.
+
 See also: OLC ABILITIES
 #d
 "ABILEDIT APPLY" "ABILEDIT APPLIES"
@@ -9086,6 +9088,10 @@ Available reward types:
  &cUNLOCK-ARCHETYPE&0 - Grants the player/account a locked archetype for new chars.
  &cBONUS-ABILITY&0 - Grants the player a bonus ability.
  &cREMOVE-ABILITY&0 - Revokes a bonus ability from a player.
+ &cCOMPANION&0 - Grants a companion to the companion list (an npc that assists
+    in battle).
+ &cREMOVE-COMPANION&0 - Removes a companion from the companion list, if present.
+ &cMINIPET&0 - Grants a minipet (an npc that does not engage in combat).
 
 Note: If you set empire coins as the reward, but the mob is not part of an
 empire, the player will receive misc coins instead.
@@ -9162,16 +9168,17 @@ See also: OLC ROOM TEMPLATES, REDIT MATCH EXITS, VNUM
 Usage:  .flags [add | remove] <flags>
 
 The following room template flags are available:
- &cOUTDOOR&0 - Affected by sun.
+ &cOUTDOOR&0 - Affected by sun and weather; player can mount.
  &cDARK&0 - Always requires a light. (By default, rooms are dark at night.)
  &cLIGHT&0 - Never requires a light.
  &c!MOB&0 - Mobs will not wander into the room (they may still be spawned there).
  &cPEACEFUL&0 - No combat allowed.
  &cNEED-BOAT&0 - Requires a boat, swimming, waterwalking, or flying.
  &c!TELEPORT&0 - Cannot teleport in or out.
- &cLOOK-OUT&0 - can see the map using "look out"
- &c!LOCATION&0 - no location shown; disables "where"
- &cWATER-DESCRIPTIONS&0 - mobs use water-long-desc
+ &cLOOK-OUT&0 - Can see the map using "look out".
+ &c!LOCATION&0 - No location shown; disables "where".
+ &cWATER-DESCRIPTIONS&0 - Mobs use water-long-desc.
+ &cALLOW-MOUNTS&0 - Player can mount (not needed if OUTDOOR is set).
 
 See also: OLC ROOM TEMPLATES
 #d
@@ -9347,6 +9354,8 @@ Available tasks:
  &cEMPIRE-LACKS-PROGRESS&0 - Empire has not completed a progress goal.
  &cEMPIRE-ON-PROGRESS&0 - Empire has started and is working on a progress goal.
  &cEMPIRE-NOT-ON-PROGRESS&0 - Empire is not currently working on a progress goal.
+ &cHAVE-COMPANION&0 - Player has a companion in their list (quests only).
+ &cNOT-HAVE-COMPANION&0 - Player doesn't have a companion in their list (quests).
 
 &r*&0 Some types require a trackable quest, and cannot be used as prereqs.
 ^ If a type requires flags and you use more than one flag, you MUST put the
@@ -11031,47 +11040,48 @@ Flags let you specify certain properties about the vehicle. Many different
 types of vehicles can be constructed this way.
 
 Available flags:
- *INCOMPLETE - vehicle is not fully constructed (triggered by crafting)
- DRIVING - vehicle moves on land**
- SAILING - vehicle moves on water**
- FLYING - vehicle moves through the air**
- ALLOW-ROUGH - drag/drive work on rough terrain (e.g. mountains)
- SIT - player can sit on the vehicle
- IN - changes text from "on" to "in", and "aboard" to "inside"
- BURNABLE - can be burnt using the "burn" command
- CONTAINER - items can be placed inside
- SHIPPING - can be used by the shipping system
- CUSTOMIZABLE - allows "customize vehicle"
- DRAGGABLE - players can move it on land with "drag"
- !BUILDING - cannot be dragged/driven into a building (e.g. too large)
- CAN-PORTAL - can be dragged/driven/led through portals
- LEADABLE - can be pulled around with the "lead" command
- CARRY-VEHICLES - vehicles can be put inside (usually via drag/lead)
- CARRY-MOBS - mobs can be put inside (usually via lead)
- SIEGE-WEAPONS - can fire on buildings and vehicles
- ON-FIRE - currently burning (via the "burn" command)
- !LOAD-ONTO-VEHICLE - cannot be loaded onto another vehicle
- VISIBLE-IN-DARK - can be seen at night without a light
- !CLAIM - cannot be claimed
- BUILDING - acts more like a building than a vehicle
- NEVER-DISMANTLE - can never be dismantled
- *PLAYER-NO-DISMANTLE - player has toggled no-dismantle on
- *DISMANTLING - is being dismantled
- *PLAYER-NO-WORK - player has toggled no-work on
- CHAMELEON - vehicle cannot be seen at a distance (when in good repair)
- INTERLINK - rooms can be interlinked with other interlink-flagged places
- IS-RUINS - counts as ruins for city status and building decay
- SLEEP - can sleep and rest in/on it
- !PAINT - cannot be painted
- *BRIGHT-PAINT - is brightly painted (set by the paint command)
- DEDICATE - can be dedicated
- RUIN-SLOWLY-FROM-CLIMATE - always ruins slowly no matter what climate change
- RUIN-QUICKLY-FROM-CLIMATE - always ruins quickly due to climate change
- OBSCURE-VISION - blocks tiles behind it on the map
- *INSTANCE - vehicle has an instance attached
- *TEMPORARY - vehicle will be removed when the instance ends
- TINY - like furniture, can go be made/moved places vehicles normally can't go
- HIDE-STORAGE-UNOWNED - only shows as storage when identifying objects if owned
+ &c*INCOMPLETE&0 - vehicle is not fully constructed (triggered by crafting)
+ &cDRIVING&0 - vehicle moves on land**
+ &cSAILING&0 - vehicle moves on water**
+ &cFLYING&0 - vehicle moves through the air**
+ &cALLOW-ROUGH&0 - drag/drive work on rough terrain (e.g. mountains)
+ &cSIT&0 - player can sit on the vehicle
+ &cIN&0 - changes text from "on" to "in", and "aboard" to "inside"
+ &cBURNABLE&0 - can be burnt using the "burn" command
+ &cCONTAINER&0 - items can be placed inside
+ &cSHIPPING&0 - can be used by the shipping system
+ &cCUSTOMIZABLE&0 - allows "customize vehicle"
+ &cDRAGGABLE&0 - players can move it on land with "drag"
+ &c!BUILDING&0 - cannot be dragged/driven into a building (e.g. too large)
+ &cCAN-PORTAL&0 - can be dragged/driven/led through portals
+ &cLEADABLE&0 - can be pulled around with the "lead" command
+ &cCARRY-VEHICLES&0 - vehicles can be put inside (usually via drag/lead)
+ &cCARRY-MOBS&0 - mobs can be put inside (usually via lead)
+ &cSIEGE-WEAPONS&0 - can fire on buildings and vehicles
+ &cON-FIRE&0 - currently burning (via the "burn" command)
+ &c!LOAD-ONTO-VEHICLE&0 - cannot be loaded onto another vehicle
+ &cVISIBLE-IN-DARK&0 - can be seen at night without a light
+ &c!CLAIM&0 - cannot be claimed
+ &cBUILDING&0 - acts more like a building than a vehicle
+ &cNEVER-DISMANTLE&0 - can never be dismantled
+ &c*PLAYER-NO-DISMANTLE&0 - player has toggled no-dismantle on
+ &c*DISMANTLING&0 - is being dismantled
+ &c*PLAYER-NO-WORK&0 - player has toggled no-work on
+ &cCHAMELEON&0 - vehicle cannot be seen at a distance (when in good repair)
+ &cINTERLINK&0 - rooms can be interlinked with other interlink-flagged places
+ &cIS-RUINS&0 - counts as ruins for city status and building decay
+ &cSLEEP&0 - can sleep and rest in/on it
+ &c!PAINT&0 - cannot be painted
+ &c*BRIGHT-PAINT&0 - is brightly painted (set by the paint command)
+ &cDEDICATE&0 - can be dedicated
+ &cRUIN-SLOWLY-FROM-CLIMATE&0 - always ruins slowly no matter what climate change
+ &cRUIN-QUICKLY-FROM-CLIMATE&0 - always ruins quickly due to climate change
+ &cOBSCURE-VISION&0 - blocks tiles behind it on the map
+ &c*INSTANCE&0 - vehicle has an instance attached
+ &c*TEMPORARY&0 - vehicle will be removed when the instance ends
+ &cTINY&0 - like furniture, can go be made/moved places vehicles normally can't go
+ &cHIDE-STORAGE-UNOWNED&0 - only shows as storage when identifying objects if owned
+ &cLIGHT&0 - vehicle provides light
 
 ** The DRIVING/SAILING/FLYING flags each enable specific commands for moving
 the vehicle. If it has more than one of these, each command will work. Usually

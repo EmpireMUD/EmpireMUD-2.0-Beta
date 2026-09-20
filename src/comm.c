@@ -1290,7 +1290,7 @@ void perform_act(const char *orig, char_data *ch, const void *obj, const void *v
 	}
 	
 	// check fight messages (may exit early)
-	if (!IS_NPC(to) && FIGHTING(to) && IAF(ACT_BUFF)) {
+	if (!IS_NPC(to) && FIGHTING(to) && IAF(ACT_BUFF) && !IAF(ACT_DIE)) {
 		show = any = FALSE;
 		if (!show && vict_obj && to == vict_obj) {
 			any = TRUE;
@@ -1313,7 +1313,7 @@ void perform_act(const char *orig, char_data *ch, const void *obj, const void *v
 			return;
 		}
 	}
-	if (!IS_NPC(to) && FIGHTING(to) && IAF(ACT_AFFECT)) {
+	if (!IS_NPC(to) && FIGHTING(to) && IAF(ACT_AFFECT) && !IAF(ACT_DIE)) {
 		// aff flags in combat
 		show = any = FALSE;
 		if (!show && to == ch) {
@@ -1336,7 +1336,7 @@ void perform_act(const char *orig, char_data *ch, const void *obj, const void *v
 			return;
 		}
 	}
-	if (!IS_NPC(to) && FIGHTING(to) && IAF(ACT_ABILITY)) {
+	if (!IS_NPC(to) && FIGHTING(to) && IAF(ACT_ABILITY) && !IAF(ACT_DIE)) {
 		show = any = FALSE;
 		if (!show && to == ch) {
 			any = TRUE;
@@ -1371,7 +1371,7 @@ void perform_act(const char *orig, char_data *ch, const void *obj, const void *v
 			return;
 		}
 	}
-	if (!IS_NPC(to) && FIGHTING(to) && IAF(ACT_HEAL)) {
+	if (!IS_NPC(to) && FIGHTING(to) && IAF(ACT_HEAL) && !IAF(ACT_DIE)) {
 		show = any = FALSE;
 		if (!show && to == ch) {
 			any = TRUE;
@@ -1402,7 +1402,7 @@ void perform_act(const char *orig, char_data *ch, const void *obj, const void *v
 			return;
 		}
 	}
-	if (!IS_NPC(to) && ch != vict_obj && IAF(ACT_COMBAT_HIT | ACT_COMBAT_MISS)) {
+	if (!IS_NPC(to) && ch != vict_obj && IAF(ACT_COMBAT_HIT | ACT_COMBAT_MISS) && !IAF(ACT_DIE)) {
 		show = any = FALSE;
 		// hits
 		if (IAF(ACT_COMBAT_HIT)) {
@@ -1439,7 +1439,7 @@ void perform_act(const char *orig, char_data *ch, const void *obj, const void *v
 			}
 		}
 		// misses
-		if (IAF(ACT_COMBAT_MISS)) {
+		if (IAF(ACT_COMBAT_MISS) && !IAF(ACT_DIE)) {
 			if (!show && to == ch && !vict_obj) {
 				any = TRUE;	// hitting self with no vict-obj
 				show |= SHOW_FIGHT_MESSAGES(to, FM_MISSES_AGAINST_ME);

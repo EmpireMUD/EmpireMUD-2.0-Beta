@@ -492,7 +492,7 @@ int apply_poison(char_data *ch, char_data *vict) {
 	}
 	
 	// fire a consume trigger but it can't block execution here
-	if (consume_otrigger(obj, ch, OCMD_POISON, (!EXTRACTED(vict) && !IS_DEAD(vict)) ? vict : NULL)) {
+	if (consume_otrigger(obj, ch, OCMD_POISON, (!EXTRACTED(vict) && !IS_DEAD(vict)) ? vict : NULL, 1)) {
 		if (GET_POISON_CHARGES(obj) <= 0) {
 			run_interactions(ch, GET_OBJ_INTERACTIONS(obj), INTERACT_CONSUMES_TO, IN_ROOM(ch), NULL, obj, NULL, consumes_or_decays_interact);
 			extract_obj(obj);

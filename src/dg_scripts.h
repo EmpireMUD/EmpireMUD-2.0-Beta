@@ -445,7 +445,7 @@ int give_otrigger(obj_data *obj, char_data *actor, char_data *victim);
 int load_otrigger(obj_data *obj);
 int ability_otrigger(char_data *actor, obj_data *obj, any_vnum abil);
 int leave_otrigger(room_data *room, char_data *actor, int dir, char *custom_dir, char *method);
-int consume_otrigger(obj_data *obj, char_data *actor, int cmd, char_data *target);
+int consume_otrigger(obj_data *obj, char_data *actor, int cmd, char_data *target, int quantity);
 int finish_otrigger(obj_data *obj, char_data *actor);
 void reboot_otrigger(obj_data *obj);
 

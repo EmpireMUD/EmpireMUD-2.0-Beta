@@ -212,7 +212,7 @@ L c 11520
 ~
 #11521
 Pixy Pursuit: catch~
-1 c 2 30
+1 c 2 33
 L b 615
 L b 616
 L b 10042
@@ -240,9 +240,12 @@ L b 11885
 L b 11886
 L b 11887
 L b 11982
+L b 13553
+L b 13554
 L c 11521
 L c 11522
 L c 11535
+L c 13532
 catch~
 * This is the command for capturing pixies for the Pixy Pursuit event
 return 1
@@ -270,6 +273,7 @@ elseif %target.fighting%
   halt
 end
 * switch will validate the target vnum and set up chances: needs, has -- default needs is random.15 (attribute roll)
+set tar_name ~%target%
 set needs %random.15%
 set jar_vnum 11522
 switch %target.vnum%
@@ -319,6 +323,18 @@ switch %target.vnum%
     * fox/wits pixy
     set has %actor.wits%
   break
+  case 13553
+    * blind cave pixy
+    set targ_name a blind cave pixy from the cluster
+    set needs %random.400%
+    set has %actor.level%
+  break
+  case 13554
+    * blind cave pixy on a wokestone guardian
+    set tar_name the blind cave pixy on the back of ~%target%
+    set needs %random.500%
+    set has %actor.level%
+  break
   default
     * all other vnums
     set clever_list 11819 11820 11982
@@ -349,13 +365,22 @@ elseif %target.fighting% || %actor.fighting% || %actor.room% != %target.room% ||
 elseif %has% >= %needs%
   * Success!
   %load% obj %jar_vnum% %actor% inv
-  %send% %actor% You catch ~%target% in a jar!
-  %echoaround% %actor% ~%actor% catches ~%target% in a jar!
+  %send% %actor% You catch %tar_name% in a jar!
+  %echoaround% %actor% ~%actor% catches %tar_name% in a jar!
 else
   * Fail
   %load% obj 11521 %actor% inv
-  %send% %actor% You miss and ~%target% gets away, leaving behind a little pixy dust.
-  %echoaround% %actor% ~%actor% misses ~%target%, who gets away!
+  %send% %actor% You miss and %tar_name% gets away, leaving behind a little pixy dust.
+  %echoaround% %actor% ~%actor% misses %tar_name%, who gets away!
+end
+if %target.vnum% == 13554
+  * cave pixy on a wokestone guardian
+  %echo% ~%target% falls to the ground, motionless.
+  %load% obj 13532 %target.room%
+  set obj %target.room.contents%
+  if %obj.vnum% == 13532
+    nop %obj.bind(%actor%)%
+  end
 end
 * Purge the target either way
 %purge% %target%

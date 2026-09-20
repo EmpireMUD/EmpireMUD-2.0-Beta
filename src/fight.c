@@ -1772,7 +1772,7 @@ obj_data *make_corpse(char_data *ch) {
 	if (!IS_NPC(ch)) {
 		GET_LAST_CORPSE_ID(ch) = obj_script_id(corpse);
 	}
-	else {	// mob corpse setup
+	else if (MOB_CUSTOM_CORPSE(ch) == NOTHING) {	// mob corpse setup, unless custom corpse given
 		if (!size_data[size].can_take_corpse) {
 			REMOVE_BIT(GET_OBJ_WEAR(corpse), ITEM_WEAR_TAKE);
 		}
@@ -1820,8 +1820,14 @@ obj_data *make_corpse(char_data *ch) {
 		// custom corpse: add replacements?
 	}
 	
-	set_obj_val(corpse, VAL_CORPSE_IDNUM, IS_NPC(ch) ? GET_MOB_VNUM(ch) : (-1 * GET_IDNUM(ch)));
-	set_obj_val(corpse, VAL_CORPSE_SIZE, size);
+	if (MOB_CUSTOM_CORPSE(ch) == NOTHING || GET_OBJ_VAL(corpse, VAL_CORPSE_IDNUM) <= 0) {
+		// only set corpse idnum if it didn't have a custom one set
+		set_obj_val(corpse, VAL_CORPSE_IDNUM, IS_NPC(ch) ? GET_MOB_VNUM(ch) : (-1 * GET_IDNUM(ch)));
+	}
+	if (MOB_CUSTOM_CORPSE(ch) == NOTHING) {
+		// only preserve size if it's not a custom corpse
+		set_obj_val(corpse, VAL_CORPSE_SIZE, size);
+	}
 	set_obj_val(corpse, VAL_CORPSE_FLAGS, (MOB_FLAGGED(ch, MOB_NO_LOOT) ? CORPSE_NO_LOOT : NOBITS));
 		
 	if (human) {
@@ -2713,11 +2719,11 @@ int skill_message(int dam, char_data *ch, char_data *vict, int attacktype, attac
 					else {	// no damage numbers
 						safe_snprintf(message, sizeof(message), "\ty%s\t0", msg->msg[MSG_DIE].attacker_msg);
 					}
-					act(message, FALSE, ch, weap, vict, TO_CHAR | hit_flags);
+					act(message, FALSE, ch, weap, vict, TO_CHAR | hit_flags | ACT_DIE);
 				}
 				
 				if (msg->msg[MSG_DIE].room_msg) {
-					act(msg->msg[MSG_DIE].room_msg, FALSE, ch, weap, vict, TO_NOTVICT | hit_flags);
+					act(msg->msg[MSG_DIE].room_msg, FALSE, ch, weap, vict, TO_NOTVICT | hit_flags | ACT_DIE);
 				}
 			}
 			
@@ -2729,7 +2735,7 @@ int skill_message(int dam, char_data *ch, char_data *vict, int attacktype, attac
 				else {	// no damage numbers
 					safe_snprintf(message, sizeof(message), "\tr%s\t0", msg->msg[MSG_DIE].victim_msg);
 				}
-				act(message, FALSE, ch, weap, vict, TO_VICT | TO_SLEEP | hit_flags);
+				act(message, FALSE, ch, weap, vict, TO_VICT | TO_SLEEP | hit_flags | ACT_DIE);
 			}
 		}
 		else {
@@ -3360,9 +3366,9 @@ void check_auto_assist(char_data *ch) {
 		
 		// if we got this far and hit an assist condition
 		if (assist && can_fight(ch_iter, FIGHTING(ch))) {
-			act("You jump to $N's aid!", FALSE, ch_iter, 0, ch, TO_CHAR);
-			act("$n jumps to your aid!", FALSE, ch_iter, 0, ch, TO_VICT);
-			act("$n jumps to $N's aid!", FALSE, ch_iter, 0, ch, TO_NOTVICT);
+			act("You jump to $N's aid!", FALSE, ch_iter, NULL, ch, TO_CHAR);
+			act("$n jumps to your aid!", FALSE, ch_iter, NULL, ch, TO_VICT);
+			act("$n jumps to $N's aid!", TRUE, ch_iter, NULL, ch, TO_NOTVICT);
 			engage_combat(ch_iter, FIGHTING(ch), FALSE);
 			continue;
 		}
@@ -3636,7 +3642,7 @@ int damage(char_data *ch, char_data *victim, int dam, int attacktype, byte damty
 		stop_fighting(victim);
 
 	/* Uh oh.  Victim died. */
-	if (GET_POS(victim) == POS_DEAD) {
+	if (GET_POS(victim) == POS_DEAD || (GET_POS(victim) <= POS_STUNNED && MOB_FLAGGED(victim, MOB_NO_UNCONSCIOUS))) {
 		if (match_attack_type(attacktype, ATTACK_VAMPIRE_BITE) && ch != victim && !AFF_FLAGGED(victim, AFF_NO_DRINK_BLOOD) && !GET_FEEDING_FROM(ch) && IN_ROOM(ch) == IN_ROOM(victim)) {
 			set_health(victim, 0);
 			GET_POS(victim) = POS_STUNNED;
@@ -4471,7 +4477,7 @@ void perform_violence_missile(char_data *ch, obj_data *weapon) {
 		}
 		
 		// fire a consume trigger but it can't block execution here
-		if (best && !consume_otrigger(best, ch, OCMD_SHOOT, (!EXTRACTED(vict) && !IS_DEAD(vict)) ? vict : NULL)) {
+		if (best && !consume_otrigger(best, ch, OCMD_SHOOT, (!EXTRACTED(vict) && !IS_DEAD(vict)) ? vict : NULL, 1)) {
 			purge = FALSE;	// ammo likely extracted
 		}
 		
@@ -4595,14 +4601,14 @@ void fight_wait_run(char_data *ch, double speed) {
 		return;
 	}
 
-	act("You run toward $N!", FALSE, ch, 0, FIGHTING(ch), TO_CHAR);
-	act("$n runs toward you!", FALSE, ch, 0, FIGHTING(ch), TO_VICT);
+	act("You run toward $N!", FALSE, ch, NULL, FIGHTING(ch), TO_CHAR);
+	act("$n runs toward you!", TRUE, ch, NULL, FIGHTING(ch), TO_VICT);
 	
 	--FIGHT_WAIT(ch);
 	
 	if (FIGHT_WAIT(ch) <= 0 || FIGHT_MODE(FIGHTING(ch)) != FMODE_MISSILE) {
-		act("You engage $M in melee combat!", FALSE, ch, 0, FIGHTING(ch), TO_CHAR);
-		act("$e engages you in melee combat!", FALSE, ch, 0, FIGHTING(ch), TO_VICT);
+		act("You engage $M in melee combat!", FALSE, ch, NULL, FIGHTING(ch), TO_CHAR);
+		act("$e engages you in melee combat!", TRUE, ch, NULL, FIGHTING(ch), TO_VICT);
 		
 		FIGHT_MODE(ch) = FMODE_MELEE;
 		

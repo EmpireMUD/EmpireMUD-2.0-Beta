@@ -63,8 +63,8 @@ void tog_pvp(char_data *ch);
 //// EMPIREMUD CONSTANTS /////////////////////////////////////////////////////
 
 // Shown on the "version" command and sent over MSSP
-const char *version = "EmpireMUD 2.0 beta 5.213";
-const char *DG_SCRIPT_VERSION = "DG Scripts 1.0.12 e5.1.22";
+const char *version = "EmpireMUD 2.0 beta 5.214";
+const char *DG_SCRIPT_VERSION = "DG Scripts 1.0.12 e5.1.23";
 
 
 // data for the built-in game levels -- this adapts itself if you reduce the number of immortal levels
@@ -751,7 +751,7 @@ const char *room_template_flags[] = {
 	"LOOK-OUT",
 	"!LOCATION",
 	"WATER-DESCRIPTIONS",
-	"*",	// 10
+	"ALLOW-MOUNTS",	// 10
 	"\n"
 };
 
@@ -3858,6 +3858,9 @@ const char *quest_reward_types[] = {
 	"UNLOCK-ARCHETYPE",
 	"BONUS-ABILITY",	// 15
 	"REMOVE-ABILITY",
+	"COMPANION",
+	"REMOVE-COMPANION",
+	"MINIPET",
 	"\n",
 };
 
@@ -5575,6 +5578,8 @@ const char *requirement_types[] = {
 	"EMPIRE-LACKS-PROGRESS",	// 50
 	"EMPIRE-ON-PROGRESS",
 	"EMPIRE-NOT-ON-PROGRESS",
+	"HAVE-COMPANION",
+	"NOT-HAVE-COMPANION",
 	"\n",
 };
 
@@ -5634,6 +5639,8 @@ const bool requirement_amt_type[] = {
 	REQ_AMT_NONE,	// 50, empire-lacks-progress
 	REQ_AMT_NONE,	// empire-on-progress
 	REQ_AMT_NONE,	// empire-not-on-progress
+	REQ_AMT_NONE,	// have-companion
+	REQ_AMT_NONE,	// not-have-companion
 };
 
 
@@ -5692,6 +5699,8 @@ const bool requirement_needs_tracker[] = {
 	FALSE,	// 50, empire-lacks-progress
 	FALSE,	// empire-on-progress
 	FALSE,	// empire-not-on-progress
+	FALSE,	// have-companion
+	FALSE,	// not-have-companion
 };
 
 
@@ -5789,6 +5798,7 @@ const char *vehicle_flags[] = {
 	"*TEMPORARY",
 	"TINY",	// 40
 	"HIDE-STORAGE-UNOWNED",
+	"LIGHT",
 	"\n"
 };
 
@@ -5837,6 +5847,7 @@ const char *identify_vehicle_flags[] = {
 	"",	// *TEMPORARY
 	"",	// TINY	// 40
 	"",	// HIDE-STORAGE-UNOWNED
+	"provides light",	// LIGHT
 	"\n"
 };
 

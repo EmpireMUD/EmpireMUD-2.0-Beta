@@ -431,6 +431,7 @@ When using field  - The variable returns:
    recognize a language. Optional on/off 2nd arg grants/removes this from the
    player. Cannot add/remove if the player speaks (instead of recognizes) it.
 &ccan_see(target)&0 - Whether the character can see a person/object/vehicle.
+&ccan_see_in_room&0 - Is not blind and room is light or char sees in dark.
 &ccan_speak(lang,on|off)&0 - Whether the character can speak a language. Optional
    on/off 2nd arg grants/removes this from the player.
 &ccan_start_quest(vnum)&0 - Whether or not the character can start a quest.
@@ -592,9 +593,12 @@ When using field  - The variable returns:
 &cnext_in_room&0 - The next actor in the room as a variable (id) nice to use
    for loops, or an empty return.
 &cnohassle&0 - If TRUE, the player is an immortal with !HASSLE on.
+&cnohunger&0 - If TRUE, player never gets hungry.
 &cnoskill(Skill)&0 - TRUE if the player has 'noskilled' that skill.
+&cnothirst&0 - If TRUE, player never gets thirsty.
 &cobj_target(name)&0 - Finds a targeted object the character can see/has.
 &cobj_target_inv(name)&0 - Finds a targeted object in the character's inventory.
+&cobj_target_room(name)&0 - Finds a targeted object in the room only (like 'get').
 &con_quest(vnum)&0 - TRUE if the player is currently on that quest.
 &cparse_dir(dir)&0 - Gets the real direction that the char thinks is 'dir',
    based on whether or not they have Navigation/alcohol. Bad directions return

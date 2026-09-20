@@ -4743,7 +4743,7 @@ bool has_resources(char_data *ch, struct resource_data *list, bool ground, bool 
 									break;
 								}
 								case RES_COMPONENT: {
-									if (GET_OBJ_COMPONENT(obj) == res->vnum || is_component_vnum(obj, res->vnum)) {
+									if (GET_OBJ_COMPONENT(obj) == res->vnum || (liter == 1 && is_component_vnum(obj, res->vnum))) {
 										--res->amount;
 										obj->search_mark = TRUE;
 									}
@@ -7519,11 +7519,16 @@ void relocate_players(room_data *room, room_data *to_room) {
 * @return bool TRUE if the room is light, FALSE if not.
 */
 bool room_is_light(room_data *room, bool count_adjacent_light, bool ignore_magic_darkness) {
+	vehicle_data *veh;
+	
 	if (!ignore_magic_darkness && MAGIC_DARKNESS(room)) {
 		return FALSE;	// always dark
 	}
 	
 	// 1. things that make the room light
+	if (IS_BURNING(room)) {
+		return TRUE;
+	}
 	if (GET_ISLAND(room) && IS_SET(GET_ISLAND(room)->flags, ISLE_ALWAYS_LIGHT) && IS_OUTDOOR_TILE(room) && !NO_LOCATION(room)) {
 		return TRUE;
 	}
@@ -7538,6 +7543,11 @@ bool room_is_light(room_data *room, bool count_adjacent_light, bool ignore_magic
 	}
 	if (count_adjacent_light && adjacent_room_is_light(room, ignore_magic_darkness)) {
 		return TRUE;	// not dark: adjacent room is light
+	}
+	DL_FOREACH2(ROOM_VEHICLES(room), veh, next_in_room) {
+		if (VEH_FLAGGED(veh, VEH_LIGHT | VEH_ON_FIRE)) {
+			return TRUE;
+		}
 	}
 	
 	// 2. things that make the room dark

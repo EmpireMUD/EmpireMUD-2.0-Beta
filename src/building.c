@@ -3096,7 +3096,7 @@ ACMD(do_paint) {
 		act("$p isn't paint!", FALSE, ch, paint, NULL, TO_CHAR);
 		return;
 	}
-	if (!consume_otrigger(paint, ch, OCMD_PAINT, NULL)) {
+	if (!consume_otrigger(paint, ch, OCMD_PAINT, NULL, 1)) {
 		return;	// check trigger
 	}
 	

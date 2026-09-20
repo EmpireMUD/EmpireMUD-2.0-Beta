@@ -1,0 +1,356 @@
+#13500
+Labyrinth: Oubliette~
+   You awaken in an unfamiliar place. The walls and floor are cold stone. The
+ceiling is so high you cannot see the chute that dropped you here, at least,
+not in the dark. You've really done it this time.
+   A drip echoes in the distance. A shuffle. Perhaps a scurry. And a creak. A
+long moment of silence, broken by the sound of pottery shattering, echoing back
+and forth. And then silence again.
+   And then a voice.
+   What is this place?
+~
+   Relief washes over you as you press yourself through the tight passage and
+it opens into such a grand chamber. But it's brief. The exit is blocked by the
+minotaur.
+~
+5 0 250 350 -1
+A
+4 13502
+P
+5 13501 0 1 a
+P
+6 13501 0 1 a
+R
+6 13510 13510
+W+
+13 13590 0 1 a
+Find the center of the labyrinth~
+Z
+3 13590
+_
+player does 13500 or 13501 but not both
+~
+S
+#13501
+Labyrinth: Descent~
+   You cast a glance upward to the chute, now so high above that you can't make
+it out in the dark. The walls are cold stone, stretching out into the darkness
+in each direction. A drip echoes from the distance; you can't tell which way it
+came from as it echoes back again.
+   Then it's silent.
+   A scurrying sound. A creak.
+   Then more silence.
+   No one would bury a place as impressive as this if there isn't something
+grand hidden down here.
+   But it seems you aren't the first to find it.
+~
+   You press yourself through the tight passage and it opens into a grand
+chamber. It took some work, but it looks like you've found the center. There's
+just the minotaur between you and the ladder.
+~
+5 0 250 350 -1
+A
+3 13505
+P
+5 13500 0 1 a
+P
+6 13500 0 1 a
+R
+6 13510 13510
+W+
+13 13590 0 1 a
+Find the center of the labyrinth~
+Z
+3 13590
+S
+#13502
+Labyrinth: Out of My Depth~
+   At first, there's no movement, as if the adventurer in the corner hopes you
+haven't noticed them. There's a moment of awkward silence, and then a glance
+over the shoulder.
+   'I was worried you were that madman again,' the meek adventurer says. 'That
+will be me before long if I don't get out of here. I thought it was just a
+little ruin on the hillside, next thing I know I'm sliding down a dark chute
+and then... this. Just this. This maddening place.'
+   There's a heavy sigh.
+   'If you can get me out of here, I'll owe you one. Maybe several. What do you
+say?'
+   Use '&cfinish Out of My Depth&0' to accept and gain the meek adventurer as a
+permanent companion, or '&cquest drop Out of My Depth&0' to decline.
+~
+   'You won't regret this,' says the meek adventurer, getting up.
+   Use the '&ccompanion&0' command to summon the meek adventurer.
+~
+3 bc 250 350 -1
+A
+1 13502
+P
+54 13503 0 1 -
+R
+17 13503 13503
+R
+6 13503 13503
+W+
+54 13503 0 1 a
+Agree to get me out of here~
+Z
+1 13502
+S
+#13503
+Labyrinth: Free to a Good Home~
+   'Oh, let's talk again when we get out,' the adventurer adds.
+   Use the '&ccompanion&0' command to summon the meek adventurer when you're
+outside the labyrinth in order to complete this quest.
+~
+   'I never thought I'd get out of there. I can't possibly thank you enough,'
+the adventurer says. 'You're a good friend for this. I'll stick around as long
+as you'll have me. One favor, though. I found this little guy in the dark and
+I can't really afford to feed him. I missed so much work while I was stuck down
+there. Think you can give him a good home?'
+   A cream-white dog peers out from behind the adventurer and looks up at you
+with the biggest, saddest eyes you've ever seen.
+~
+2 0 250 350 -1
+A
+5 13502
+R
+19 13579 13579
+W+
+53 13503 0 1 a
+Meet me outside the labyrinth~
+Z
+1 13503
+S
+#13510
+Labyrinth: The Only Way Out is Through~
+   Nevermind the maze, nevermind the darkness, nevermind the horrors. The
+labyrinth holds a minotaur! There's real glory to be had in taking on a mythic
+creature. They'll sing stories of this battle... if you survive.
+~
+   A cloud of ash billows out from beneath the minotaur as he collapses to the
+chamber floor, dead. Silence washes down the walls and across the floor. True
+silence. No scurry, no creaks, no thudding footfalls.
+   Silence.
+   And with the minotaur dead, you can finally reach the ladder out. Not a
+moment too soon. This place feels like a tomb.
+~
+4 0 250 350 -1
+A
+5 13500
+A
+5 13501
+A
+1 13510
+P
+0 13500 0 1 -
+P
+0 13501 0 1 -
+R
+19 13577 13577
+W+
+3 13510 0 1 a
+Slay the minotaur~
+Z
+3 13590
+Z
+3 13592
+Z
+3 13593
+S
+#13512
+Labyrinth: Return of the Nightmare Queen~
+   The Nightmare Queen is real... and she is risen!
+   This is the point in the story where the rational adventurer would be
+reconsidering their actions. Each seal has been broken with little thought as
+to why they were sealed. Now, the ancient abomination stands over you -- and
+if the flames are any indication, she is mad.
+   As the one who unleashed her on this world, it falls to you to find a way
+to put her back in the jar. Or, barring that, find some other way to stop her.
+The lid is smashed and broken on the floor. Worse, the Nightmare Queen blocks
+the exit. Whatever you're going to do, you're on your own.
+   Once it's done, seek out the priest in the temple above.
+~
+   The priest listens intently, hands folded, as you weave the tale of the
+Nightmare Queen, once sealed away, then accidentally released.
+   'I had never heard the legend,' the priest says. 'Who knew such an ancient
+evil was buried right beneath our feet. It's lucky the temple is here to
+contain it, or she might have escaped. But how did you defeat her?'
+   You continue the tale, recounting every detail of the fiery battle from
+which you narrowly emerged victorious. The priest hangs on your every word.
+   'I would have liked to see it for myself, risk of death be damned,' he says
+when the story draws to a close. 'I used to be an adventurer like you, you
+know. Until I took an arrow to the knee.'
+   The priest thanks you for the story, promising to commit it to parchment for
+posterity. He then excuses himself and returns to his duties, still musing over
+the epic tale.
+   A glint of gold catches your eye. You're not sure where it came from, but a
+young horse is following you, gleaming golden in the light.
+~
+4 0 250 350 -1
+A
+1 13512
+P
+0 13515 0 1 -
+R
+19 13578 13578
+W+
+3 13512 0 1 -
+Return the Nightmare Queen to the ashes~
+Z
+1 244
+S
+#13514
+Labyrinth: Beneath the Aquifer~
+   Dry air stings your nose as you realize the labyrinth's entrance was a one-
+way trip and there may be no source of fresh water. And then there's a drip.
+Drip. Drip. It echoes in the distance. There's water down here somewhere. And
+where there's water, perhaps there's a way out.
+   Seek a source of drinking water and drink from it (or, at least, sip it). It
+seems you might be stuck in this stone tomb for some time.
+~
+   The dripping echoes back and back again as each droplet splashes down into
+the basin. But the water is stale, hard, and more than a little bitter. There's
+another flavor there, too. Someone must've been washing up in this basin.
+   Worse, there's no way out.
+   The water seeps through the narrowest seam in the cyclopean stone walls. The
+opening is so fine you couldn't fit a razor through it.
+   Yet the dripping continues.
+~
+3 0 250 350 -1
+A
+3 13505
+R
+19 13576 13576
+W+
+11 0 0 1 -
+Find a source of drinking water in the labyrinth~
+Z
+3 13514
+S
+#13515
+Labyrinth: Sealed Away~
+   Though you can make little sense of the torn page, the marginal notes seem
+to suggest something is sealed away in some kind of urn or jar. Whoever wrote
+those notes must also have been the person who tore the page from the book for
+reference. But the page was enchanted to be immovable and you cannot take it
+along -- or even see the other side -- so you will have to figure this one out
+on your own.
+   The notes suggested three seals must be broken: the blood seal, the water
+seal, and the fiend seal.
+   It doesn't indicate how.
+   The author seemed to think they were onto something, but those notes were
+long-abandoned. Did the author break the seals and abscond with the treasure?
+Or did they meet some other fate in the dark?
+   The only way to find out is to break the seals. And then you'll just have to
+find the correct jar... and open it.
+~
+   All three seals are broken and the great jar is open! But perhaps the power
+contained therein isn't what you were expecting...
+~
+4 0 250 350 -1
+A
+4 13549
+W+
+11 0 0 1 a
+Break the seals and open the jar~
+Z
+2 13515
+S
+#13526
+Labyrinth: See You on the Other Side~
+   The fuzzy goblin scratches behind her ear and checks herself all over before
+thanking you for the rescue.
+   'Not gonna lie,' she says. 'Most harrowing experience of my entire life. And
+I've been through plenty. Could tell you some stories... but not here. Ghost
+the nasty minotaur and meet up again outside.'
+~
+   You find the fuzzy goblin resting on a large beam up in the rafters,
+catching her breath. She leans back and nibbles at a bit of moldy cheese.
+   'All started with a woman,' she says as she licks her fingers. 'Yeah, yeah,
+same old story, I know. But here we are. Honestly thought I'd be a rat forever.
+Despite all my rage, trapped like a rat in a... well, you know.'
+   She brushes her green-tinged fur with her fingernails, trying to smooth down
+spots that seem to have a mind of their own. She looks up at you.
+   'Guess the spell hasn't worn off completely, and me having a bad fur day.
+Not my worst day, though. If I ever catch the rat that turned me...' she looks
+around at the temple. 'If he's even still alive. Don't know how long I was a
+rat. Before that, I was Cherrith. Used to be a Goblin King...
+   'Had it all, gold, silver, copper, fame, adoring followers, even my own
+labby.... But there was a woman. Something about her. She was different, wasn't
+just some sewer babe; she the babe with the power, let me tell you. Any-who,
+the crew didn't want her around because she was, well, you know...'
+   The goblin scratches behind her ear.
+   'She was a human. They kept calling me Pinko. Stabbed more than a few of
+them but was losin' follower left, right, and under. Pretty soon I hear some
+other goblin casting a spell and BAM! Rats...
+   'Couldn't even be Rat King on account of I can't dance.'
+   She pauses and looks up at you.
+   'Craziest thing you ever hear, right? No more labbies for me. Don't think
+I can go back to being Goblin King, neither. Maybe I can find Babe, though.
+Human luck to you, friend-o. Or whatever you say.'
+~
+2 bci 250 350 -1
+A
+1 13526
+R
+6 13527 13527
+W+
+13 13592 0 1 -
+Get past the minotaur~
+Z
+1 13527
+S
+#13527
+Labyrinth: Shadow Play~
+   'Oh!' the goblin says. 'One more thing. Thought you might want a memento of
+your, erm, stay. I'm done with this thing, if you want it.'
+   Turn in this quest to receive a new minipet. You must visit the fuzzy goblin
+in the rafters high above the labyrinth to receive it.
+
+~
+   The little goblin looks up at you with a crooked smile. 'Been nothing but
+trouble,' she says. 'Should be right up your alley.'
+   Her shadow peeks out from behind her leg, and then runs over and tackles
+your shadow with all its might!
+~
+1 0 250 350 -1
+A
+5 13526
+R
+19 13580 13580
+W+
+13 13592 0 1 -
+Get one more thing from the fuzzy goblin~
+Z
+1 13527
+S
+#13543
+Labyrinth: Belly of the Beast~
+   You find the pup alone, cowering at the back of the burrow, shivering in
+silence. Its beadly little black eyes look up at you with the pleading naivete
+of a puppy, though it's much, much larger. The mammoth mole-rat is already as
+large as a full-size pig, with hideously long chisels for teeth. And just as
+you wonder what it wants, you hear it...
+   A low, rumbling growl from the poor creature's stomach.
+   It's hungry.
+   The adults are nowhere to be seen. If you have any pity for the wretched
+pup, bring it something to eat. From the look of things, these beasts prefer
+roots for their supper.
+~
+   You cautiously offer a snack to the mammoth mole-rat pup, who snatches the
+veggies from your hands and gobbles them down whole. It rubs its whiskers with
+its pink little paws and then trots over and plops down by your feet. It would
+seem you've made a friend.
+~
+2 cd 250 350 -1
+A
+1 13543
+R
+19 13575 13575
+W+
+1 6150 0 1 -
+Bring some (large vegetables) for the mole-rat pup~
+Z
+1 13543
+S
+$

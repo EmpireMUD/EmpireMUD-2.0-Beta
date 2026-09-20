@@ -507,6 +507,8 @@ typedef struct vehicle_data vehicle_data;
 #define REQ_EMPIRE_LACKS_PROGRESS  50
 #define REQ_EMPIRE_ON_PROGRESS  51
 #define REQ_EMPIRE_NOT_ON_PROGRESS  52
+#define REQ_HAVE_COMPANION  53
+#define REQ_NOT_HAVE_COMPANION  54
 
 
 // REQ_AMT_x: How numbers displayed for different REQ_ types
@@ -634,7 +636,7 @@ typedef struct vehicle_data vehicle_data;
 #define RMT_LOOK_OUT  BIT(7)	// h. can see the map using "look out"
 #define RMT_NO_LOCATION  BIT(8)	// i. don't show a location, disables where
 #define RMT_WATER_DESCRIPTIONS  BIT(9)	// j. mobs/players show as floating
-	#define RMT_UNUSED2  BIT(10)
+#define RMT_ALLOW_MOUNTS  BIT(10)	// k. player can mount here
 
 
  //////////////////////////////////////////////////////////////////////////////
@@ -2721,6 +2723,9 @@ typedef enum {
 #define QR_UNLOCK_ARCHETYPE  14
 #define QR_BONUS_ABILITY  15
 #define QR_REMOVE_ABILITY  16
+#define QR_COMPANION  17
+#define QR_REMOVE_COMPANION  18
+#define QR_MINIPET  19
 
 
 // indicates empire (rather than misc) coins for a reward
@@ -2848,6 +2853,7 @@ typedef enum {
 #define VEH_TEMPORARY  BIT(39)	// N. vehicle will be removed when instance ends
 #define VEH_TINY  BIT(40)	// O. vehicle is small enough to ignore no-vehicle rooms (e.g. furniture)
 #define VEH_HIDE_STORAGE_UNOWNED  BIT(41)	// P. only shows as storage when identifying objects if owned
+#define VEH_LIGHT  BIT(42)  // Q. vehicle provides light
 
 #define HIDE_VEH_FLAGS_ON_BUILDING	(VEH_NO_BUILDING | VEH_NO_LOAD_ONTO_VEHICLE)	// not shown on craft info or identify for 'building' vehicles
 
