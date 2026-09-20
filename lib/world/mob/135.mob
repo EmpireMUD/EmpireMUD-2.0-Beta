@@ -1031,32 +1031,44 @@ its path. It pays no attention to you or anyone else.
 ~
 S
 #13577
-mini-taur minitaur taur~
-a mini-taur~
-A mini-taur charges back and forth, horns down.
+pig horned~
+a horned pig~
+A horned pig stands proudly nearby.
 ~
 1 1 bdoD mn 2
 0 0 39 42 -1 -1
 D
-   Although at first glance it appears to be a tiny minotaur, its entire body
--- from its cloven feet to the horns atop its head -- is made of stone, painted
-to look lifelike, but stone. This doesn't seem to dampen its spirits.
+   It saunters along, munching at anything it can find, sometimes using its
+up-turned horns to knock things out of its way in its endless search for food.
+When it stops, it holds its head high. Truly this is a champion among pigs.
 ~
 M
 0
-$n stomps its hoof and pouts.~
+$n snorts and prods at the ground.~
+M
+0
+$n bends down and pokes at something with its horn.~
 M
 0
 $n stomps its hoof.~
 M
 0
-$n charges toward you, veering off at the last second.~
-M
-0
 $n charges past you.~
 M
 0
-$n charges in a circle.~
+$n lowers its horns and charges you, veering off at the last moment.~
+M
+0
+$n chews something.~
+M
+0
+$n roots around at the ground.~
+M
+0
+$n reaches way back and scratches its butt with its horns.~
+M
+0
+$n beams proudly, horns held high.~
 S
 #13578
 foal golden~

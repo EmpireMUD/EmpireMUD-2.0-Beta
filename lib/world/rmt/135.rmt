@@ -189,15 +189,17 @@ T 13507
 T 13504
 T 13529
 T 13553
+T 13555
 _
 Central hub connecting 3 wings - players enter here
 ~
 S
 #13510
 Lost in the Labyrinth~
-   The long stone corridors are difficult to tell apart. This one stretches on
-into the darkness away from the makeshift camp, but there is no indication
-where it might lead or if it's the right path.
+   The corridor stretches, seemingly endless as it leads away from the
+makeshift camp. It's impossible to tell which is the correct path; even though
+each block on the wall has a unique shape and size, every part of the wall
+looks identical to the last.
 ~
 bg 0 0 13505
 D14
@@ -211,7 +213,7 @@ north east south west northeast ne southeast se southwest sw northwest nw~
 You can't make sense of the directions in this labyrinth -- it goes on forever.
 ~
 E
-stones walls~
+stones walls block~
    The massive stones of the labyrinth's walls are mismatched in size and shape
 but they all come together at neatly-hammered edges where the fit is so perfect
 that no mortar is needed to hold them perfectly in place.
@@ -246,6 +248,7 @@ The ceiling is made of gray stone.
 T 13504
 T 13529
 T 13553
+T 13555
 _
 Wing A room 1
 ~
@@ -314,6 +317,7 @@ M 1 13514 100.00 1
 T 13504
 T 13529
 T 13553
+T 13555
 _
 Wing B side room with water
 ~
@@ -372,6 +376,7 @@ interest.
 T 13504
 T 13529
 T 13553
+T 13555
 _
 Wing B room 1
 ~
@@ -380,7 +385,8 @@ S
 Lost in the Labyrinth~
    The long stone corridors are difficult to tell apart. This one stretches on
 into the darkness away from the makeshift camp, but there is no indication
-where it might lead or if it's the right path.
+where it might lead or if it's the right path. An occasional drip in the
+distance provides no guidance as it echoes back from each direction.
 ~
 bg 0 0 13505
 D14
@@ -429,6 +435,7 @@ The ceiling is made of gray stone.
 T 13504
 T 13529
 T 13553
+T 13555
 _
 Wing C - room 1
 ~
@@ -495,6 +502,7 @@ T 13504
 T 13522
 T 13529
 T 13553
+T 13555
 _
 Wing A trap room
 ~
@@ -570,6 +578,7 @@ T 13504
 T 13524
 T 13529
 T 13553
+T 13555
 _
 Wing A side room leading to spike pit
 ~
@@ -632,6 +641,7 @@ The ceiling is made of gray stone.
 T 13504
 T 13529
 T 13553
+T 13555
 _
 Wing A room 2
 ~
@@ -699,6 +709,7 @@ T 13524
 T 13529
 T 13553
 T 13552
+T 13555
 _
 Wing b side room
 ~
@@ -771,6 +782,7 @@ M 1 13513 100.00 2
 T 13504
 T 13529
 T 13553
+T 13555
 _
 Wing B room 2
 ~
@@ -846,6 +858,7 @@ T 13504
 T 13524
 T 13529
 T 13553
+T 13555
 _
 Wing C, side path
 ~
@@ -927,6 +940,7 @@ There are some ashes spread out on the shelves.
 T 13504
 T 13529
 T 13553
+T 13555
 _
 Wing C - room 2
 ~
@@ -993,6 +1007,7 @@ T 13524
 T 13529
 T 13553
 T 13552
+T 13555
 _
 Wing A, side path with alcove
 ~
@@ -1063,6 +1078,7 @@ The ceiling is made of gray stone.
 T 13504
 T 13529
 T 13553
+T 13555
 _
 Wing A room 3
 ~
@@ -1131,6 +1147,7 @@ T 13504
 T 13524
 T 13529
 T 13553
+T 13555
 _
 Wing b side path
 ~
@@ -1217,6 +1234,7 @@ T 13504
 T 13529
 T 13553
 T 13550
+T 13555
 _
 Wing B room 3
 ~
@@ -1309,6 +1327,7 @@ bucket itself is long gone, if it ever existed.
 T 13504
 T 13529
 T 13553
+T 13555
 _
 Passage C-A
 ~
@@ -1387,6 +1406,7 @@ T 13504
 T 13524
 T 13529
 T 13553
+T 13555
 _
 Wing C side path, low end
 ~
@@ -1459,6 +1479,7 @@ T 13504
 T 13524
 T 13529
 T 13553
+T 13555
 _
 Wing C, side path end with small shelves
 ~
@@ -1544,6 +1565,7 @@ The ceiling is made of gray stone.
 T 13504
 T 13529
 T 13553
+T 13555
 _
 Wing C, side path with shelves
 ~
@@ -1625,6 +1647,7 @@ collects here on the floor.
 T 13504
 T 13529
 T 13553
+T 13555
 _
 Wing C room 3
 ~
@@ -1697,6 +1720,7 @@ The ceiling stones are stained with soot.
 T 13504
 T 13553
 T 13529
+T 13555
 _
 Wing A side room leading to secret passage
 ~
@@ -1776,6 +1800,7 @@ T 13529
 T 13507
 T 13553
 T 13552
+T 13555
 _
 Wing A side wing leading to secret passage
 ~
@@ -1852,6 +1877,7 @@ The ceiling is made of gray stone.
 T 13504
 T 13529
 T 13553
+T 13555
 _
 Wing A room 4
 ~
@@ -1910,6 +1936,7 @@ T 13558
 T 13529
 T 13553
 T 13552
+T 13555
 _
 A-B Passage
 ~
@@ -1985,6 +2012,7 @@ T 13524
 T 13529
 T 13553
 T 13552
+T 13555
 _
    Gains 'A rope ladder leads up into the chute above.' in its long desc from
 trigger 13558 if the secret passage opens.
@@ -2060,6 +2088,7 @@ every ten steps or so.
 T 13504
 T 13529
 T 13553
+T 13555
 _
 Wing B, room 4
 ~
@@ -2142,6 +2171,7 @@ T 13504
 T 13524
 T 13529
 T 13553
+T 13555
 _
 Wing C, side room with broken jar pile
 ~
@@ -2230,6 +2260,7 @@ loves Ingr' into the stone.
 T 13504
 T 13529
 T 13553
+T 13555
 _
 Wing C, side path with shelves
 ~
@@ -2320,6 +2351,7 @@ The ceiling is made of gray stone.
 T 13504
 T 13529
 T 13553
+T 13555
 _
 Wing C room 4
 ~
@@ -2394,6 +2426,7 @@ T 13504
 T 13524
 T 13529
 T 13553
+T 13555
 _
 Wing A room 5 / end - possible boss path
 ~
@@ -2450,6 +2483,7 @@ T 13524
 T 13529
 T 13553
 T 13552
+T 13555
 _
 Wing B room 5 / end - possible boss path
 ~
@@ -2550,6 +2584,7 @@ T 13504
 T 13524
 T 13529
 T 13553
+T 13555
 _
 Wing C, room 5 - end - possible boss path
 ~
@@ -2647,6 +2682,7 @@ floor.
 M 1 13504 100.00 1
 M 0 13510 100.00 1
 M 1 13515 100.00 1
+T 13555
 _
 Boss arena
 ~

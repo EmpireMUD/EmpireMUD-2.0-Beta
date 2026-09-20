@@ -3532,6 +3532,49 @@ end
 %echo% The stale water splashes to the floor and soaks into the thin seams.
 %purge% %self%
 ~
+#13555
+Labyrinth: Can't sleep~
+2 bw 75 4
+L b 13512
+L c 13515
+L j 13590
+L w 13555
+~
+* Removes itself when Nightmare Queen is defeated; ignores rooms with bedrolls
+if %room.function(BEDROOM)%
+  halt
+end
+set found 0
+set ch %room.people%
+while %ch%
+  if %ch.position% == Sleeping
+    if !%found%
+      * check for nightmare queen
+      if %instance.mob(13512)%
+        set found 1
+      else
+        makeuid bossroom room i13590
+        if %bossroom%
+          set jar %bossroom.contents(13515)%
+          if !%jar.var(open)%
+            set found 1
+          end
+        end
+      end
+      if !%found%
+        detach ### %room.id%
+      end
+    end
+    * wake and punish
+    wait 1
+    %send% %ch% Horrifying dreams plague your slumber.
+    %force% %ch% wake
+    dg_affect #13555 %ch% off silent
+    dg_affect #13555 @%ch% %ch% WITS -1 300
+  end
+  set ch %ch.next_in_room%
+done
+~
 #13558
 Labyrinth: Open A-wing secret passage, inside~
 2 g 100 4
@@ -3700,10 +3743,11 @@ else
     %mod% %self% append-lookdesc It bears the sigil of the %fake_name% %fake_type%.
   end
   * restringing: add to the look desc
-  %mod% %self% append-lookdesc It looks like the last owner's fateful underground encounter has left it a bit %adjective%.
+  %mod% %self% append-lookdesc-noformat &0   It looks like the last owner's fateful underground encounter has left it a
+  %mod% %self% append-lookdesc-noformat bit %adjective%.
   if %self.is_flagged(HARD-DROP)% || %self.is_flagged(GROUP-DROP)%
     set keywords %self.keywords%
-    %mod% %self% append-lookdesc-noformat Type 'study %keywords.car%' to take it apart and learn to craft it.
+    %mod% %self% append-lookdesc-noformat &0   Type 'study %keywords.car%' to take it apart and learn to craft it.
     %mod% %self% append-lookdesc-noformat (Be sure to 'keep' any copies of it you don't want to lose.)
   end
   * add study script

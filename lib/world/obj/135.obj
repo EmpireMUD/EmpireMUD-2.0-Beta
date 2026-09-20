@@ -126,6 +126,9 @@ a bobbin of silver thread~
 A bobbin of silver thread is lying here.~
    An incredibly fine strand of silver thread is wound tightly around the
 bobbin. It glints and gleams as you move it around in the light.
+   Silver thread can be made only by the most talented artisans as it must be
+twisted with fine fiber to ensure it doesn't snap. And even then, it remains
+incredibly delicate.
 ~
 15 0 a 0 0 5
 6 0 0
@@ -142,6 +145,9 @@ a delicate silver thread~
 A delicate silver thread has been discarded here.~
    The thread is made of the finest silver and so thin that you can barely see
 it until it catches a bit of light.
+   It would be a shame to leave such a valuable thread behind. But when one is
+lost and hungry in a dark and endless maze, one uses what's at hand to mark the
+path.
 ~
 15 0 a 0 0 4
 1 0 0
@@ -265,7 +271,8 @@ S
 key tarnished~
 a tarnished key~
 A tarnished key lies on the ground.~
-The key is old and worn.
+   The key is old and worn.
+   The best way to forget something is to lock it away underground.
 ~
 3 kp a 0 0 2
 0 0 0
@@ -474,6 +481,7 @@ A memento of interment lies here.~
 enough to remind you of a place you once were. Of a memory that might slip away
 or a thought half-forgotten.
    This memento is required to craft certain items.
+   Every tombstone is a memorial, but stone outlives even memory.
 ~
 3 0 a 0 0 3
 0 0 0
@@ -627,7 +635,10 @@ some brittle chalk~
 Some brittle chalk is lying here.~
    The hunk of white chalk is crumbling on all sides, but it's still large
 enough that you might use it to make marks on stone.
-Use 'write <message>' and 'erase message' to write on the Labyrinth.
+   Use 'write <message>' and 'erase message' to write on the walls of the
+labyrinth. The chalk isn't good for anything else.
+   The tombsward knight arrived with rope, chalk, rations, beer, and hope --
+well-prepared for everything except fate... and darkness.
 ~
 3 k a 0 0 3
 0 0 0
@@ -636,7 +647,7 @@ C
 1 1
 M
 33
-Use 'write <message>' and 'erase message' to write on the Labyrinth.~
+Use 'write <message>' and 'erase message' to write on the labyrinth.~
 T 13581
 S
 #13530
@@ -683,6 +694,8 @@ A wokestone guardian lies on the ground, motionless.~
    The little homunculus is made of the same stone as the labyrinth, as if it
 was carved from the very walls. Its arms are a little long, with short, steady
 legs. There's no face. It lies perfectly motionless, with no sign of life.
+   Amongst pixies, the ability to commune with stone is held in high esteem.
+Some are even said to be able to awaken it from its long, still slumber.
 ~
 10 kp a 0 0 1
 13554 2 0
@@ -691,7 +704,7 @@ C
 250 350
 S
 #13533
-cenery labyrinth arcane basalt bones bowl bubbles bubbling bull chalk circle dirt drawing glyphs golden grave horse large makeshift nest oblong pile plinth rocks small statuette stone symbols woman~
+scenery labyrinth arcane basalt bones bowl bubbles bubbling bull chalk circle dirt drawing glyphs golden grave horse large makeshift nest oblong pile plinth rocks small statuette stone symbols woman~
 labyrinth scenery~
 Some labyrinth scenery is here.~
 It looks scenic.
@@ -728,6 +741,8 @@ A pale green skeleton is piled on the ground.~
 in places, with hints of brown at its wrists. The green color stains its heavy
 white robe at the neck and arms. The robe, frayed and dirty at the bottom, is
 tied at the waist with a simple length of rope.
+   Through sacraments of bronzed beer, the brethren forged a deeper connection
+to the cold stone labyrinths.
 ~
 15 e a 0 0 5
 4 0 0
@@ -745,6 +760,8 @@ A polished bronze skeleton is piled here.~
    Its bones twinkle a brilliant bronze color in the light, each one clean and
 polished. Its helmet, equal in luster, is topped with a comb of short red hair
 that stands straight up. It wears nothing else except a stone breastplate.
+   Though the old soldier was selected for his expertise to end the heresy
+beneath the surface, he was ill-prepared for the darkness that would follow.
 ~
 15 e a 0 0 5
 4 0 0
@@ -822,7 +839,11 @@ hoard gold small~
 a small hoard of gold~
 A small hoard of gold is scattered here.~
    On closer inspection much of this is actually bronze. But the few gold
-pieces that are here look valuable enough to keep.
+pieces that are here look valuable enough to keep. Bits of old cobweb bind the
+collection together.
+   As it reaches maturity, the speculari begins to assemble a shell of objects 
+that will help it blend into its surroundings. Its silvery body is particularly
+suited to reflecting shiny things.
 ~
 15 0 a 0 0 3
 24 0 0
@@ -874,6 +895,9 @@ a hunk of gooey meat~
 A hunk of gooey meat is rotting on the ground.~
    It smells like bugs. But, this is what you've got to hand, so perhaps you
 could cook a 'dungeon steak' and have a meal.
+   One of the big advantages of growing outsized bugs is the sheer amount of
+food you can produce from them. If there are any other advantages, no one has
+yet discovered them.
 ~
 6 g a 0 0 11
 2 0 0
@@ -895,6 +919,8 @@ a scrumptious dungeon steak~
 A scrumptious dungeon steak is sitting on the ground.~
    This chitin cutlet doesn't look half bad. It doesn't necessarily look half
 good, either, but when you're lost in a dungeon, any meat is a feast.
+   Daeron sought the darkness to experiment unseen. But at the end, he wasn't
+bright enough to survive his own work. Still, he didn't die of hunger.
 ~
 6 gE a 0 0 3
 12 0 0
@@ -985,7 +1011,9 @@ The cornerstone of a cyclopean palace lies here.~
    The cornerstone is massive. Two sides have been chiseled square so that it
 may be used in a mortarless cyclopean wall. Curiously, the top is incised with
 designs for an incredible palace, all built from stones like this one.
-   With this, you can build a 'cyclopean palace'.
+   With this, an architect can build a 'cyclopean palace' in a city.
+   Since time immemorial, powerful rulers have erected great monuments of stone
+so that their majesty might withstand the ages.
 ~
 3 e a 0 0 1
 0 0 0
@@ -1003,6 +1031,7 @@ A pair of tombsward gauntlets have been left here.~
 The metal is black enough to disappear in a dark corner. Each knuckle is
 perfectly articulated and covered in a tiny plate. Under the wrists, metal
 studs cover thick leather straps and plated buckles.
+   Many a tombsward is buried in their charge.
 ~
 27 mp ah 0 0 12
 3 0 0
@@ -1035,6 +1064,8 @@ A set of silverseer beads is lying here.~
 in a long chain, made to be looped around the hands and between the fingers
 even when holding other items. The ends of the chain dangle bronze discs with
 a spiral-and-eye motif on each side.
+   A silverseer glimpses the past as easily as the future and, as such, are
+sometimes dispatched to old sites to study the past.
 ~
 27 mp ah 0 0 13
 0 0 0
@@ -1187,6 +1218,8 @@ A pair of tombsward sabatons are lying here.~
    Heavy hand-forged plates cascade downward from the ankle, each lined with
 bronze filigree. The metal of the sabatons is so dark it could go unnoticed in
 a dark place.
+   When Garran's torch died three turns from camp, the last thing he saw was
+its glowing embers reflected in a pair of eyes.
 ~
 27 mp ag 0 0 13
 3 0 0
@@ -1218,6 +1251,8 @@ A pair of silverseer slippers have been left behind.~
    The slippers are made from pale gray strips of cloth, woven together and
 then ornamented with bronze filigree. There is a spiral-and-eye design at the
 back of each shoe, as if to watch behind.
+   Soft footsteps are a boon in an unfriendly place, where even the slightest
+sound attracts the wrong sort of attention.
 ~
 27 mp ag 0 0 14
 0 0 0
@@ -1368,6 +1403,8 @@ a cloak of tombswarding~
 A cloak of tombswarding hangs here.~
    It's a dark gray canvas, calf-length. The back is embossed with a spiral
 motif in brown thread. Beneath the canvas is stiched a fine mesh of chainmail.
+   The tombsward knight found no use for the cloak in the depths of the
+labyrinth, where neither wind nor weather reach.
 ~
 27 mp ak 0 0 20
 3 0 0
@@ -1396,6 +1433,9 @@ A silverseer shroud hangs here.~
 with the fine gray hairs of an old mare. The hooded shroud hangs lower in the
 back than the front, with bronze discs tied to the frills at the bottom. Each
 disc has a spiral-and-eye design, and there are many of these.
+   The shroud a silverseer wears is said to help them glimpse beyond the
+curtains of mortal life. But seeking death comes with a price, and many are
+interred in those same shrouds.
 ~
 27 mp ak 0 0 21
 0 0 0
@@ -1564,6 +1604,8 @@ The labyrinthine talisman of the fell crypt has fallen here.~
 with a smaller door shape cut out from the bottom. It shows a twisting, curved,
 unbranching line that wends toward a grand violet gem near the top. A cluster
 of three smaller gems in the same color decorate the bottom corner.
+   Even parted, the Nightmare Queen was never truly defeated. Only by sealing
+her away and erasing her name could they hope to free themselves.
 ~
 2 amp ac 0 0 26
 0 0 0
@@ -1596,6 +1638,8 @@ The labyrinthine talisman of the unconquered dawn has fallen here.~
 is cut from the bottom, leading to a winding, re-curving line that spirals,
 unbranching, to a shining golden gem at the top, surrounding by bronze rays.
 The scrolled sides are set with smaller topaz gems among a floral flourish.
+   Every king or queen that ever lived sought to rule the very sky. But even if
+a mortal could defeat day itself, the dawn always rises again.
 ~
 2 amp ac 0 0 27
 0 0 0
@@ -1616,12 +1660,15 @@ T 13573
 S
 #13570
 talisman labyrinthine nightmare queen~
-the labyrinthine talisman of the nightmare queen~
-The labyrinthine talisman of the nightmare queen has fallen here.~
+the labyrinthine talisman of the Nightmare Queen~
+The labyrinthine talisman of the Nightmare Queen has fallen here.~
    The dark pendant is shaped like a horned shield, with an enormous purple gem
 at the top, set in an eight-direction compass rose. At the bottom of, the shape
 of a door is cut out of the metal. The doorway connects to the gem by a
 twisting, curved but unbroken line that wends its way upward.
+   Even in death, the Nightmare Queen could never be defeated. And so, instead,
+she was parted and sealed, in the deseperate hope that she might, at least, be
+contained.
 ~
 2 amp ac 0 0 28
 0 0 0
@@ -1653,6 +1700,8 @@ blue night-blue enamel behind a foreground of polished bronze. Two glistening
 blue gems are set in the bottom corners. Between them, the arched shape of a
 doorway is cut from the talisman. A curving path rises from it, twisting and
 winding, but never branching, as it rises toward the stars in the sky.
+   When the rosy mask of day fades, mankind is allowed to look up at the stars,
+and at the infinite inky sea beyond them, and glimpse the depths of eternity.
 ~
 2 amp ac 0 0 29
 0 0 0
@@ -1683,6 +1732,9 @@ The labyrinthine talisman of the inland sea has fallen here.~
 low relief. Round, heavy teal gems are set un the upper left and lower right
 corners. An arched doorway us notched from the bottom of the talisman. Above
 it, a twisting path wriggles like a snake upward toward the top.
+   It is the normal order of nature that the salty sea surrounds the land. And
+thus, a place where land surrounds the sea can only be the work of the divine,
+or so it is said.
 ~
 2 amp ac 0 0 30
 0 0 0
@@ -1722,6 +1774,10 @@ a square key motif across the top, with a small red diamond at the top. At the
 bottom, the shape of a door is cut from the pendant. From the door, a path
 twists and turns and curves back on itself as it works its way, unbranching,
 to the top, passing a large, circular ruby-red gem on its path.
+   Tales are told of the giant who ruled as king over the whole world in an
+age, now lost, where even the beasts were as tall as trees. He is said to have
+built his palace with his own hands, heaving stones so large that no mortal man
+could ever tear them down.
 ~
 2 amp ac 0 0 32
 0 0 0
@@ -1779,6 +1835,8 @@ A double-bladed golden axe is displayed here.~
 the nameless old masters. The handle is well-burnished olive wood, inlaid with
 cedar. It isn't large enough or sharp enough for chopping wood; there are no
 wear marks on either blade.
+   Symbols of power and authority come in many shapes in sizes, but they so
+often take the form of the tools that built a land or the weapons that took it.
 ~
 15 0 a 0 0 5
 54 0 0
@@ -1791,8 +1849,11 @@ statue priceless golden horse~
 a priceless golden horse statue~
 A priceless golden horse statue is displayed here.~
    The heavy sculpture depicts a mare rearing up on its hind hooves and kicking
-its front legs in the air. Every detail is perfect down to the tail hair. From
+its front legs in the air. Every detail is perfect, down to the tail hair. From
 the weight, it might be nearly pure gold.
+   The dark place was looted in antiquity, but not every ghoul escaped with his
+ill-gotten gains. When one is desperate, the same prize may serve as grave
+goods a second time.
 ~
 15 0 a 0 0 6
 96 0 0
@@ -1804,9 +1865,11 @@ S
 satchel archaeologist's archaeologists archeologist's archeologists~
 an archaeologist's satchel~
 An archaeologist's satchel was dropped here.~
-   The well-worn leather satchel has pockets inside of pockets. I Hefty buckles
+   The well-worn leather satchel has pockets inside of pockets. Hefty buckles
 and double-stitched straps allow it to secure a tremendous number of items
 during even the roughest dungeon delves.
+   A maze might have many entrances, but only a single exit. It won't matter
+how much you can carry if you never find the way out.
 ~
 24 emo ar 0 0 8
 1 0 0
@@ -1828,6 +1891,8 @@ A toreador's elegant saddle has been left behind.~
    The aged leather saddle bears a stylized bull across both sides, stretched
 out as if in full gallop. A slab of dark stone forms a low backrest. Gilded
 cord lines the fringes of the saddle and sparkle even in low light.
+   In ages past, the greatest dancers lept over the gilded horns of charging
+bulls to please the gods, though no words remain to tell us why.
 ~
 2 emp as 0 0 6
 0 0 0
@@ -1862,7 +1927,9 @@ a glorious golden bull mount whistle~
 A glorious golden bull mount whistle is lying here.~
    It's actually more of a flute, made from reeds and bound together by fine
 string. The flute is old, but it plays a sweet tune.
-You can 'use' this whistle to summon a unique mount.
+   You can 'use' this whistle to summon a unique mount.
+   In the time, now past, when hooved beasts were held to be divine, those with
+cloven hooves were separated from those with hooves unbroken.
 ~
 3 0 a 0 0 16
 13581 0 0
@@ -1877,7 +1944,9 @@ a graven pegasus flying mount whistle~
 A graven pegasus flying mount whistle is lying here.~
    The old stone whistle has a chipped finger hole, but the other notes sound
 out melodically. The end might once have held a lanyard, but it's long gone.
-You can 'use' this whistle to summon a unique flying mount.
+   You can 'use' this whistle to summon a unique flying mount.
+   Sculpture was once considered a divine art and to the greatest artist was
+bestowed the power to bring stone to life.
 ~
 3 0 a 0 0 8
 13582 0 0
@@ -1890,7 +1959,9 @@ the keystone for a hero's grave~
 The keystone for a hero's grave is lying here.~
    It's a stone carving in miniature depicting a grand tomb with a corbeled
 vault roof. It might serve as the keystone for the real thing.
-You can build (Architect): hero's grave
+   With this stone, an architect can build a 'hero's grave'.
+   As the memories of men and women recede into history, legends grow like
+flowers on their tombs -- and the largest tombs grow the grandest legends.
 ~
 3 e a 0 0 2
 0 0 0
@@ -1906,6 +1977,8 @@ A horned champion ritual tablet lies here.~
 no meaning in them. Wedge-shaped markings form the image of a man with two
 horns on his head. A strange power radiates from the clay.
    With this, you can morph into the Horned Champion!
+   On the bull's day, bloodletting began with every able warrior wrestling the
+champion in the sand. If any challenger won, they took the horns and mantle.
 ~
 3 p a 0 0 2
 0 0 0
@@ -1922,6 +1995,8 @@ record, there's no way to read them. The meaning is lost. Wedge-shaped markings
 form the shape of a sage with two horns on her head. A soothing power emanates
 from the clay.
    With this, you can morph into the Horned Percipient!
+   On the bull's day, many sought auspicious signs, but it was a songbird
+opened by a sharp horn that revealed what was to come.
 ~
 3 p a 0 0 3
 0 0 0
@@ -1938,6 +2013,10 @@ forgotten language. The meaning doesn't matter. Wedge-shaped markings form the
 outline of a man with two horns on his head. A gnawing power radiates from the
 clay.
    With this, you can morph into the Horned Raider!
+   Bulls once belonged only to the gods, and thus, in ages past, could not be
+owned by mortal men or women. Thus, on a particular day, it was the custom that
+the bravest people would raid the countryside to bring back the greatest bull.
+Whoever achieved this would be granted a crown of horns.
 ~
 3 p a 0 0 4
 0 0 0
@@ -1954,6 +2033,8 @@ they're words. You can draw no conclusions from the text. Wedge-shaped markings
 form the impression of a woman with two horns on her head. An old and uneasy
 power flows through the clay.
    With this, you can morph into the Horned Disciple!
+   The bull's day required many long hours of ceremony by a horned priest, and
+her duties were not done until long after the darkness fell.
 ~
 3 p a 0 0 5
 0 0 0
@@ -1967,6 +2048,9 @@ a clay jar of seeds~
 A clay jar is lying here.~
    The tiny jar is made from glazed red clay with black lines. Round fruits are
 depicted on the sides. Inside, it holds dark red seeds.
+   Pomegranate blossoms were sacred in a certain part of the world, in ancient
+times. Carefully cultivated trees lined royal walks, blooming blood red to
+signal the start of the holy month.
 ~
 3 b a 0 0 13
 0 13589 0
@@ -2036,6 +2120,7 @@ Some over-ripe pomegranates are lying here.~
    The pomegranates have lost their firmness and begun to brown. There's a
 slightly sharp, slightly sour aroma. But if you're lost somewhere without any
 food, you eat what's at hand.
+   It doesn't help to stash food if you can't find the right stone again.
 ~
 6 g a 0 0 21
 12 0 0
@@ -2080,6 +2165,7 @@ A tombsward's outfit is lying on the ground.~
 are stitched on to help attach pieces of heavy armor. A brown spiral is
 stitched on the chest, just above the heart. Hooks on the shoulders allow more
 items to be carried, for long treks.
+   Tombswarding is a long task as tombs tend to outlive men.
 ~
 2 mo ad 0 0 11
 0 0 0
@@ -2108,6 +2194,8 @@ A silverseer's outfit is lying here.~
 oracle of death. The edges of the outer robes are frilled, and many of these
 frills bear a bronze disc stamped with the shape of an eye inside a spiral, and
 a spiral in the eye. Pockets and pouches adorn the waist.
+   Precognition is a double-bladed gift, for the Seraine surely knew what fate
+awaited her in the dark.
 ~
 2 mo ad 0 0 12
 0 0 0
