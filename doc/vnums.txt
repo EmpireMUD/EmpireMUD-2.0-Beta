@@ -115,6 +115,7 @@ Included Adventure Zones
 [12625] A Strange Plant [12625-12649] (0) 8 mobs, 17 objs, 2 rooms
 [12650] Magiterranean: The Grove [12650-12699] (1-75) 21 mobs, 33 objs, 22 rooms
 [12800] Celestial Forge [12800-12999] (0) 43 mobs, 158 objs, 40 rooms
+[13500] High Temple: Long-Lost Labyrinth [13500-13599] (250-350) 37 mobs, 100 objs, 45 rooms
 [15900] Shipwrecked Goblin Horde [15900-15999] (75-175) 20 mobs, 46 objs, 1 room
 [16000] Invasion of: The Goblin Necromancer [16000-16019] (125-200) 18 mobs, 16 objs, 10 rooms
 [16100] Oceanic Hydra [16100-16199] (225-325) 11 mobs, 51 objs, 1 room
