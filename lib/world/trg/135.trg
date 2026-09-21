@@ -3041,7 +3041,7 @@ switch %self.vnum%
   case 13554
     * wokestone guardian
     if %msg%
-      %echo% The pixy sees you and shrieks out! &&Z~%self% comes over to check you out.
+      %echo% The pixy notices you and shrieks out! &&Z~%self% comes over to check you out.
     end
   break
 done
