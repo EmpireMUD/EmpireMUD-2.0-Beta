@@ -693,7 +693,11 @@ open close kick bash unlock pick lockpick break~
 set will_open 0
 set broke 0
 *
-if %cmd% == open
+if %actor.fighting%
+  %send% %actor% You're a little busy right now!
+elseif %actor.position% != Standing
+  %send% %actor% You can't do that right now.
+elseif %cmd% == open
   if !(door /= %arg%)
     * fall thru to regular command
     return 0
