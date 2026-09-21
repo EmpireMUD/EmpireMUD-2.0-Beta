@@ -1353,7 +1353,7 @@ elseif %cmd% == fling
     * dedz
   elseif %targ.var(did_scfdodge)%
     %send% %targ% &&JYou narrowly manage to dodge as the statue hurls toward you and shatters on the floor!&&0
-    %echoaround% %targ% &&J~%targ% dodges just the statue comes crashing down where *%targ% was standing!&&0
+    %echoaround% %targ% &&J~%targ% dodges just as the statue comes crashing down where *%targ% was standing!&&0
   else
     %echo% &&JThe statue flies down and smashes down on |%targ% head with a deafening CRASH!&&0
     if %diff% < 4 || (%self.level% + 100) <= %targ.level%
@@ -3239,12 +3239,12 @@ if (page /= %keyword% || torn /= %keyword%) && !%actor.obj_target(%targ%)%
 end
 ~
 #13550
-Labyrinth: Try to drink puddle~
+Labyrinth: Try to drink puddle/pool~
 2 c 0 0
 sip drink~
 if !%arg% || %actor.obj_target(%arg.argument1%)%
   return 0
-elseif puddle /= %arg.argument1% || water /= %arg.argument1%
+elseif puddle /= %arg.argument1% || pool /= %arg.argument1% || water /= %arg.argument1%
   %send% %actor% You try desperately to drink from the puddle but it's too shallow to scoop any water.
   %echoaround% %actor% ~%actor% tries desperately to drink from the puddle but it's too shallow.
   return 1
