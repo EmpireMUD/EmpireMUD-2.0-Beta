@@ -421,7 +421,9 @@ while %dir_list%
   set dir_list %dir_list.cdr%
   eval to_room %%room.%dir%(room)%%
   if %to_room%
-    if %to_room.template% == %find_template%
+    if (%to_room.template% == 13534 && %room.template% == 13530) || (%to_room.template% == 13530 && %room.template% == 13534)
+      * skip doorway
+    elseif %to_room.template% == %find_template%
       set found %dir%
     elseif %to_room.template% > %room.template% && !%find_template%
       set found %dir%
