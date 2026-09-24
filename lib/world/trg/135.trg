@@ -1852,7 +1852,7 @@ Labyrinth: Wily madman combat script~
 L w 13520
 ~
 if %hit% && !%self.aff_flagged(DISARMED)% && !%actor.aff_flagged(IMMUNE-PHYSICAL-DEBUFFS)%
-  %dot% #13520 %actor% 20 fire 15
+  %dot% #13520 %actor% 20 60 fire 15
 end
 ~
 #13521
@@ -2373,7 +2373,7 @@ dg_affect #13510 %self% off
 ~
 #13531
 Labyrinth: Meek adventurer setup~
-0 nt 100 1
+0 ntA 100 1
 L f 13531
 ~
 wait 1
@@ -4016,8 +4016,12 @@ else
   %load% obj 13580
   set marks %room.contents(13580)%
   if %marks%
-    %mod% %marks% look %arg%
+    %mod% %marks% lookdesc Someone has marked on the wall with chalk:
+    %mod% %marks% append-lookdesc-noformat %arg%
     %mod% %marks% append-lookdesc-noformat Use 'erase markings' to remove this message.
+    if %arg.strlen% <= 55
+      %mod% %marks% longdesc Markings on the wall: %arg%
+    end
   end
 end
 ~
