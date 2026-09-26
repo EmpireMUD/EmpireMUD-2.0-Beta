@@ -429,7 +429,7 @@ int find_eq_pos(char_data *ch, obj_data *obj, char *arg) {
 	}
 	else {
 		if ((where = search_block(arg, wear_keywords, FALSE)) == NOTHING) {
-			sprintf(buf, "'%s'?  What part of your body is THAT?\r\n", arg);
+			sprintf(buf, "'%s'? What part of your body is THAT?\r\n", arg);
 			send_to_char(buf, ch);
 		}
 	}
@@ -7588,7 +7588,7 @@ ACMD(do_pour) {
 	}
 	if (subcmd == SCMD_POUR) {	/* pour */
 		if (!*arg2) {
-			send_to_char("Where do you want it?  Out or in what?\r\n", ch);
+			send_to_char("Where do you want it? Out or in what?\r\n", ch);
 			return;
 		}
 		if (!str_cmp(arg2, "out")) {

@@ -1912,7 +1912,7 @@ ACMD(do_confirm) {
 	}
 
 	if (GET_POS(ch) == POS_FIGHTING) {
-		msg_to_char(ch, "How can you be ready?  You're fighting for your life!\r\n");
+		msg_to_char(ch, "How can you be ready? You're fighting for your life!\r\n");
 		return;
 	}
 
