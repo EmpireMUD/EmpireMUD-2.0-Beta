@@ -3048,11 +3048,11 @@ void appear(char_data *ch) {
 	REMOVE_BIT(AFF_FLAGS(ch), AFF_HIDDEN | AFF_INVISIBLE);
 
 	if (GET_ACCESS_LEVEL(ch) < LVL_GOD) {
-		act("$n slowly fades into existence.", FALSE, ch, 0, 0, TO_ROOM);
+		act("$n slowly fades into existence.", TRUE, ch, NULL, NULL, TO_ROOM);
 		msg_to_char(ch, "You fade back into view.\r\n");
 	}
 	else {
-		act("You feel a strange presence as $n appears, seemingly from nowhere.", FALSE, ch, NULL, NULL, TO_ROOM | (IS_IMMORTAL(ch) ? DG_NO_TRIG : NOBITS));
+		act("You feel a strange presence as $n appears, seemingly from nowhere.", TRUE, ch, NULL, NULL, TO_ROOM | (IS_IMMORTAL(ch) ? DG_NO_TRIG : NOBITS));
 	}
 }
 
