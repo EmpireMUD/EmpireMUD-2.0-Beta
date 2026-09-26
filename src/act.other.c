@@ -1159,7 +1159,7 @@ void do_alt_import(char_data *ch, char *argument) {
 	char_data *alt = NULL;
 	bool file = FALSE;
 	
-	static const char *valid_fields = "Valid fields: aliases, prompt, fprompt, preferences, fightmessages, recolors, slash-channels, ignores, all\r\n";
+	static const char *valid_fields = "Valid fields: aliases, prompt, fprompt, preferences, fightmessages, statusmessages, recolors, slash-channels, ignores, all\r\n";
 	
 	two_arguments(argument, arg1, arg2);
 	
