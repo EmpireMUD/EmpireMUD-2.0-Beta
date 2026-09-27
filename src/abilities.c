@@ -2322,12 +2322,6 @@ INTERACTION_FUNC(conjure_liquid_interaction) {
 	set_obj_val(inter_item, VAL_DRINK_CONTAINER_TYPE, interaction->vnum);
 	
 	request_obj_save_in_world(inter_item);
-	
-	if (data) {
-		// for pricing -- this is now done in the prep function
-		// data->total_amount += quantity;
-	}
-	
 	return TRUE;
 }
 
