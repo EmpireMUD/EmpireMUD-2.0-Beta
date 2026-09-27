@@ -186,9 +186,11 @@ the epic tale.
    A glint of gold catches your eye. You're not sure where it came from, but a
 young horse is following you, gleaming golden in the light.
 ~
-4 0 250 350 -1
+5 0 250 350 -1
 A
 1 13512
+A
+5 13515
 P
 0 13515 0 1 -
 R
@@ -247,9 +249,11 @@ find the correct jar... and open it.
    All three seals are broken and the great jar is open! But perhaps the power
 contained therein isn't what you were expecting...
 ~
-4 0 250 350 -1
+5 0 250 350 -1
 A
 4 13549
+R
+6 13512 13512
 W+
 11 0 0 1 a
 Break the seals and open the jar~

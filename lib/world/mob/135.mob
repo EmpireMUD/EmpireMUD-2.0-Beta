@@ -3,7 +3,7 @@ adventurer huddled~
 the huddled adventurer~
 Another adventurer is huddled in the corner.
 ~
-250 350 bdvzI c 3
+250 350 bdvzI cK 3
 1 0 0 7 -1 -1
 D
    From the clothing, they're clearly an adventurer looking for treasure or
@@ -45,7 +45,7 @@ minotaur huge cyclopean~
 the Cyclopean Minotaur~
 A huge minotaur huffs as it circles the great chamber!
 ~
-250 350 bdyIJKL cEG 5
+250 350 bdyIJKL cEGK 5
 1 0 0 13510 -1 13510
 D
    The minotaur towers over you, taller than a house by half! It stomps its
@@ -81,7 +81,7 @@ queen nightmare~
 the Nightmare Queen~
 The Nightmare Queen towers over you!
 ~
-250 350 bdhyJKL cEG 5
+250 350 bdhyJKL cEGK 5
 2 0 0 13512 -1 -1
 D
    The specter of the Nightmare Queen is so large as to fill most of the
@@ -127,7 +127,7 @@ S
 Wily #n~
 A man is pacing back and forth, checking stones on the walls.
 ~
-250 350 dvJL cEM 3
+250 350 dvJL cEKM 3
 1 0 0 13520 -1 13520
 D
    At first, it looks like you've found a friendly face in these dank depths.
@@ -186,7 +186,7 @@ rat gigantic giant goblin~
 the gigantic goblin rat~
 A gigantic goblin rat paces back and forth in the labyrinth.
 ~
-250 350 djJL cE 4
+250 350 djJL cEK 4
 0 0 71 13541 -1 13525
 D
    Its size is not the only thing unusual about this particular rodent: its
@@ -224,7 +224,7 @@ Cherrith goblin fuzzy~
 the fuzzy goblin~
 A fuzzy goblin is panting and catching her breath.
 ~
-250 350 bdzJL cE 2
+250 350 bdzJL cEK 2
 2 0 0 4 -1 13525
 D
    She's got the right height for a goblin, but she's covered head to toe in a
@@ -310,7 +310,7 @@ champion horned #n~
 the horned champion~
 A horned champion emerges from the shadows, staring off into the darkness.
 ~
-250 350 duvJL cE 3
+250 350 duvJL cEK 3
 0 3 0 13530 -1 13530
 D
    The champion is imposing, with a stature that rivals the largest men you've
@@ -339,7 +339,7 @@ skeleton pale green~
 a pale green skeleton~
 &gA pale green skeleton lies on the ground.&y
 ~
-250 350 abdhuJK chCDG 3
+250 350 abdhuJK chCDGK 3
 0 0 0 15 -1 -1
 D
    The skeleton has a mottled patina all over, fading from pale green to gray
@@ -365,7 +365,7 @@ skeleton bronze polished~
 the polished bronze skeleton~
 &gThere's a bronze skeleton on the floor.&y
 ~
-250 350 abdhuJK chCDG 3
+250 350 abdhuJK chCDGK 3
 0 0 0 3 -1 -1
 D
    Its bones twinkle a brilliant bronze color in the dim light, each one clean
@@ -388,7 +388,7 @@ shadow dead strange~
 the shadow of the dead~
 A strange shadow moves along the wall.
 ~
-250 350 abduJK chCEG 0
+250 350 abduJK chCEGK 0
 0 0 27 13538 -1 13543
 D
    The shadow stretches up the stone wall, growing and shrinking as it passes
@@ -440,7 +440,7 @@ shadow wailing long~
 the wailing shadow~
 A long shadow stretches across the wall.
 ~
-250 350 abduJK chCEG 0
+250 350 abduJK chCEGK 0
 0 0 0 13539 -1 13543
 D
    The shadow screams and shrieks as it passes over the rough stones of the old
@@ -504,7 +504,7 @@ mole-rat molerat rat mammoth~
 a mammoth mole-rat~
 A mammoth mole-rat blocks the path!
 ~
-250 350 abduJ cE 4
+250 350 abduJ cEK 4
 0 0 0 13541 -1 -1
 D
    The gray-pink fleshy creature is nearly the size of a horse! Its naked,
@@ -548,7 +548,7 @@ queen mole-rat molerat rat mammoth~
 the mole-rat queen~
 A mammoth mole-rat queen gnashes her teeth as you approach!
 ~
-250 350 abduJ cE 4
+250 350 abduJ cEK 4
 2 0 0 13541 -1 -1
 D
    This gray-pink fleshy creature is so large she can barely move through the
@@ -610,7 +610,7 @@ slime bone ball~
 a bone slime~
 A ball of slime rolls across the stones.
 ~
-250 350 abduIJK chCDG 2
+250 350 abduIJK chCDGK 2
 0 0 21 13544 -1 13539
 D
    Light dances across the gleaming surface of the slime as it rolls around,
@@ -657,7 +657,7 @@ cube death gelatinous~
 the death cube~
 You are suspended in some kind of gelatinous cube! It's all around you!
 ~
-250 350 abdIJK chCDGN 5
+250 350 abdIJK chCDGKN 5
 0 0 0 15 -1 13539
 D
    The entire passage is filled with an itchy, acrid gel, and you've become
@@ -699,7 +699,7 @@ spider silvery mirror giant~
 a silver mirror spider~
 A giant, silvery spider tends to the web.
 ~
-250 350 abduJ cCG 3
+250 350 abduJ cCGK 3
 0 0 8 13547 -1 -1
 D
    Its mirror-like silver body is the size of a dog, but its long, spindly,
@@ -724,7 +724,7 @@ spider giant glimmer gold~
 the gold spider~
 A giant spider glimmers with gold in the dim light.
 ~
-250 350 abduJ cCG 3
+250 350 abduJ cCGK 3
 0 0 8 13547 -1 -1
 D
    The yellow sheen of gold covers the enormous spider, casting flecks of
@@ -748,7 +748,7 @@ termite giant~
 a giant termite~
 A giant termite gnaws at the wall.
 ~
-250 350 abduJ cDG 3
+250 350 abduJ cDGK 3
 0 0 8 13547 -1 -1
 D
    The enormous bug has a white, almost translucent body, ridged from to back,
@@ -797,7 +797,7 @@ centipede monstrous~
 the monstrous centipede~
 A monstrous centipede rears up taller than a horse and menaces you with countless legs!
 ~
-250 350 abduJ cDG 4
+250 350 abduJ cDGK 4
 0 0 8 13547 -1 -1
 D
    The hideous creature's body is such a deep brown that it nearly vanishes
@@ -840,7 +840,7 @@ pixies pixy cluster blind cave~
 a cluster of blind cave pixies~
 A cluster of blind cave pixies is gleaning the stone.
 ~
-250 350 abdxJ coG 1
+250 350 abdxJ coGK 1
 0 0 71 13553 -1 13547
 D
    Several of the pale creatures cluster together on the ground, picking at the
@@ -891,7 +891,7 @@ guardian wokestone stone pixy creature~
 the wokestone guardian~
 A stone creature lumbers toward you with a pixy on its back!
 ~
-250 350 abduxJ chCGU 1
+250 350 abduxJ chCGKU 1
 0 0 28 5 -1 13532
 D
    The little thing looks as if the very stone of the labyrinth has been
@@ -927,7 +927,7 @@ S
 #n~
 #n is sitting by the fire.
 ~
-250 350 abd c 3
+250 350 abd cK 3
 0 0 0 15 -1 -1
 D
 They look hungry.
@@ -968,7 +968,7 @@ S
 #n~
 #n leans against the wall, sharpening a sword.
 ~
-250 350 abd cM 3
+250 350 abd cKM 3
 0 0 0 1 -1 -1
 D
 They look hungry.

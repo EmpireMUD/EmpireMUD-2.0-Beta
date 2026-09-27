@@ -190,7 +190,7 @@ You watch on as $n jabs at $N, but misses!
 #
 #
 You jab at $N, and all that happens is that $E slaps himself as if a mosquito bit $M.
-Was that a bee you just felt?  Oh... wait, it was just $n.
+Was that a bee you just felt? Oh... wait, it was just $n.
 $N begins to slap at $Mself as $n tries to jab $M.
 
 M4 abcd 0 +
@@ -232,8 +232,8 @@ $N returns $n's pierce with a piercing look, hmmm...
 M4 abcd 0 
 stab~
 ~
-You stab $N through the heart!  Instant death!
-$n drives a stab at you, it pierces your heart!  RIP!
+You stab $N through the heart! Instant death!
+$n drives a stab at you, it pierces your heart! RIP!
 $n stabs brutally at $N, killing $M as $E is impaled!
 You stab at $N, missing!
 $n misses a particularly nasty stab in your direction!
@@ -241,8 +241,8 @@ $n stabs at $N, but $e misses!
 #
 #
 #
-You stab at $N!  Too bad $E's a god, huh?
-$n stabs at you!  Lucky for you that you are immune to this kind of thing.
+You stab at $N! Too bad $E's a god, huh?
+$n stabs at you! Lucky for you that you are immune to this kind of thing.
 You watch in pity as $n stabs towards $N missing in the most futile way possible!
 
 M4 abcd 0 
@@ -257,7 +257,7 @@ $N grins at $n as the stab sent by $n goes wide!
 #
 #
 #
-Gods can't be stabbed, did noone ever teach you that?  And $N just so happens to be one.
+Gods can't be stabbed, did noone ever teach you that? And $N just so happens to be one.
 It sure is nice being a god isn't it... especially since $n can't hit you with $s stabs.
 $n stabs at $N only to discover $N's immunity to stabbing weapons.
 
@@ -277,7 +277,7 @@ $n looks perturbed as $s pound misses $N!
 #
 #
 #
-You pound $N!  And $E thanks you for it?  *boggle*
+You pound $N! And $E thanks you for it? *boggle*
 $n gives you a pound. Wonder what the exchange rate is...
 $n starts giving pounds to $N who begins to count the money.
 
@@ -313,7 +313,7 @@ $n looks perturbed as $s hammer misses $N!
 #
 #
 #
-You hammer $N!  And $E thanks you for it?  *boggle*
+You hammer $N! And $E thanks you for it? *boggle*
 $n tries to hammer you.
 $n starts trying to hammer $N.
 
@@ -389,7 +389,7 @@ $n fiercely snaps $s teeth at $N but misses the mark.
 #
 #
 #
-You attempt to bite $N. Ouch!  That hurt!
+You attempt to bite $N. Ouch! That hurt!
 $n tries to bite you, how funny.
 $n tries to bite $N - funny, huh?
 
@@ -425,7 +425,7 @@ $n tries to claw at $N, missing by a hair!
 #
 #
 #
-You dummy!  Not the claw, the claw!
+You dummy! Not the claw, the claw!
 $n must be crazy - trying to claw at you!
 $n must be crazy - trying to claw at $N!
 
@@ -441,7 +441,7 @@ $n tries to claw at $N but nearly nicks $mself instead!
 #
 #
 #
-You dummy!  Not the claw, the claw!
+You dummy! Not the claw, the claw!
 $n must be crazy - trying to claw at you!
 $n must be crazy - trying to claw at $N!
 
@@ -501,7 +501,7 @@ $n tries to claw at $N, missing by a hair!
 #
 #
 #
-You dummy!  Not the claw, the claw!
+You dummy! Not the claw, the claw!
 $n must be crazy - trying to claw at you!
 $n must be crazy - trying to claw at $N!
 
@@ -517,7 +517,7 @@ $n tries to claw at $N but nearly nicks $mself instead!
 #
 #
 #
-You dummy!  Not the claw, the claw!
+You dummy! Not the claw, the claw!
 $n must be crazy - trying to claw at you!
 $n must be crazy - trying to claw at $N!
 

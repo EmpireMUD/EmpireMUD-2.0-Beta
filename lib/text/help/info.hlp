@@ -633,6 +633,9 @@ different types of resources:
    various empires if you don't have the misc coins to spend. If you cancel a
    craft before it's complete, you'll get back the specific coins you spent.
 
+&cCurrency&0 - Crafts may use adventure currencies such as the permafrost
+   tokens (Magiterranean: Permafrost), which are shown on the 'coins' command.
+
 &cPools&0 - These include mana, move, and blood points (not to be confused with
    the blood liquid, which comes from drink containers). In order to build or
    craft, you must have the entire pool cost available at once. You can't spend
@@ -651,7 +654,7 @@ The 'keep' command can be used to prevent items in your inventory from being
 used for your craft and building commands.
 
 See also: BUILD, CRAFT, DISMANTLE, FORGE, IDENTIFY, KEEP, COMPONENT TYPES
-  FREE ACTIONS
+  FREE ACTIONS, COINS
 #
 COOLDOWNS "COOL DOWNS" CD
 

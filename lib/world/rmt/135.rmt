@@ -1135,7 +1135,7 @@ Bits of broken statuary litter the sloping stone floor.
 ~
 E
 statues statuary marble broken~
-   Bits of smashed and broken marble little the floor near the alcoves. Few
+   Bits of smashed and broken marble litter the floor near the alcoves. Few
 bits of the rubble are recognizable; one of the statues might have been a horse
 or a bull.
 ~
@@ -1658,7 +1658,7 @@ Lost in the Labyrinth~
 brick wall. Sand on the floor is thicker here. A faint trail leads to the
 corner where the bricks meet stone.
 ~
-bg 0 0 13505
+bdg 0 0 13505
 D14
 ~
 0 13554
@@ -2261,6 +2261,7 @@ T 13504
 T 13529
 T 13553
 T 13555
+T 13550
 _
 Wing C, side path with shelves
 ~

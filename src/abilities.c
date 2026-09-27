@@ -2322,12 +2322,6 @@ INTERACTION_FUNC(conjure_liquid_interaction) {
 	set_obj_val(inter_item, VAL_DRINK_CONTAINER_TYPE, interaction->vnum);
 	
 	request_obj_save_in_world(inter_item);
-	
-	if (data) {
-		// for pricing
-		data->total_amount += quantity;
-	}
-	
 	return TRUE;
 }
 
@@ -4168,6 +4162,16 @@ PREP_ABIL(prep_conjure_liquid_ability) {
 		}
 	}
 	
+	// check amount needed in container
+	if (data->conjure_liquid_max == 0 || data->conjure_liquid_max > (GET_DRINK_CONTAINER_CAPACITY(ovict) - GET_DRINK_CONTAINER_CONTENTS(ovict))) {
+		data->conjure_liquid_max = (GET_DRINK_CONTAINER_CAPACITY(ovict) - GET_DRINK_CONTAINER_CONTENTS(ovict));
+		if (data->conjure_liquid_max == 0) {
+			act("$p seems to be full.", FALSE, ch, ovict, NULL, TO_CHAR | TO_SLEEP);
+			CANCEL_ABILITY(data);
+			return;
+		}
+	}
+	
 	// check costs and set maximum based on available mana/etc
 	if (ABIL_COST_PER_AMOUNT(abil) != 0.0) {
 		check_available_ability_cost(ch, abil, data, &avail, NULL);
@@ -4178,6 +4182,7 @@ PREP_ABIL(prep_conjure_liquid_ability) {
 			data->conjure_liquid_max = MIN(data->conjure_liquid_max, avail);
 		}
 		
+		// TODO: this should not be necessary because it's now checked later by data->total_amount
 		if (avail < 1) {
 			msg_to_char(ch, "You are too low on %s to do that.\r\n", pool_types[ABIL_COST_TYPE(abil)]);
 			CANCEL_ABILITY(data);
@@ -4186,6 +4191,7 @@ PREP_ABIL(prep_conjure_liquid_ability) {
 	}
 	
 	// otherwise it seems ok
+	data->total_amount += data->conjure_liquid_max;
 }
 
 

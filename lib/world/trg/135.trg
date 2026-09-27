@@ -421,7 +421,9 @@ while %dir_list%
   set dir_list %dir_list.cdr%
   eval to_room %%room.%dir%(room)%%
   if %to_room%
-    if %to_room.template% == %find_template%
+    if (%to_room.template% == 13534 && %room.template% == 13530) || (%to_room.template% == 13530 && %room.template% == 13534)
+      * skip doorway
+    elseif %to_room.template% == %find_template%
       set found %dir%
     elseif %to_room.template% > %room.template% && !%find_template%
       set found %dir%
@@ -691,7 +693,11 @@ open close kick bash unlock pick lockpick break~
 set will_open 0
 set broke 0
 *
-if %cmd% == open
+if %actor.fighting%
+  %send% %actor% You're a little busy right now!
+elseif %actor.position% != Standing
+  %send% %actor% You can't do that right now.
+elseif %cmd% == open
   if !(door /= %arg%)
     * fall thru to regular command
     return 0
@@ -1353,7 +1359,7 @@ elseif %cmd% == fling
     * dedz
   elseif %targ.var(did_scfdodge)%
     %send% %targ% &&JYou narrowly manage to dodge as the statue hurls toward you and shatters on the floor!&&0
-    %echoaround% %targ% &&J~%targ% dodges just the statue comes crashing down where *%targ% was standing!&&0
+    %echoaround% %targ% &&J~%targ% dodges just as the statue comes crashing down where *%targ% was standing!&&0
   else
     %echo% &&JThe statue flies down and smashes down on |%targ% head with a deafening CRASH!&&0
     if %diff% < 4 || (%self.level% + 100) <= %targ.level%
@@ -1846,7 +1852,7 @@ Labyrinth: Wily madman combat script~
 L w 13520
 ~
 if %hit% && !%self.aff_flagged(DISARMED)% && !%actor.aff_flagged(IMMUNE-PHYSICAL-DEBUFFS)%
-  %dot% #13520 %actor% 20 fire 15
+  %dot% #13520 %actor% 20 60 fire 15
 end
 ~
 #13521
@@ -2367,7 +2373,7 @@ dg_affect #13510 %self% off
 ~
 #13531
 Labyrinth: Meek adventurer setup~
-0 nt 100 1
+0 ntA 100 1
 L f 13531
 ~
 wait 1
@@ -3041,7 +3047,7 @@ switch %self.vnum%
   case 13554
     * wokestone guardian
     if %msg%
-      %echo% The pixy sees you and shrieks out! &&Z~%self% comes over to check you out.
+      %echo% The pixy notices you and shrieks out! &&Z~%self% comes over to check you out.
     end
   break
 done
@@ -3239,12 +3245,12 @@ if (page /= %keyword% || torn /= %keyword%) && !%actor.obj_target(%targ%)%
 end
 ~
 #13550
-Labyrinth: Try to drink puddle~
+Labyrinth: Try to drink puddle/pool~
 2 c 0 0
 sip drink~
 if !%arg% || %actor.obj_target(%arg.argument1%)%
   return 0
-elseif puddle /= %arg.argument1% || water /= %arg.argument1%
+elseif puddle /= %arg.argument1% || pool /= %arg.argument1% || water /= %arg.argument1%
   %send% %actor% You try desperately to drink from the puddle but it's too shallow to scoop any water.
   %echoaround% %actor% ~%actor% tries desperately to drink from the puddle but it's too shallow.
   return 1
@@ -3877,10 +3883,11 @@ if %pattern.vnum% != 13575
   halt
 end
 nop %pattern.val0(%recipe_vnum%)%
+set shortdesc %_obj.name(%self.vnum%)%
 %mod% %pattern% keywords study %self.keywords% %empire_adjective%
-%mod% %pattern% shortdesc %empire_adjective.ana% %empire_adjective% study of %self.shortdesc%
-%mod% %pattern% longdesc %empire_adjective.ana.cap% %empire_adjective% study of %self.shortdesc% is lying here.
-%mod% %pattern% lookdesc It looks like someone from %empire_name% has written notes on %self.shortdesc% that %actor.heshe% was studying.
+%mod% %pattern% shortdesc %empire_adjective.ana% %empire_adjective% study of %shortdesc%
+%mod% %pattern% longdesc %empire_adjective.ana.cap% %empire_adjective% study of %shortdesc% is lying here.
+%mod% %pattern% lookdesc It looks like someone from %empire_name% has written notes on %shortdesc% that %actor.heshe% was studying.
 %mod% %pattern% append-lookdesc-noformat Type 'learn study' to learn to make this pattern.
 remote empire_name %pattern.id%
 remote empire_id %pattern.id%
@@ -4010,8 +4017,12 @@ else
   %load% obj 13580
   set marks %room.contents(13580)%
   if %marks%
-    %mod% %marks% look %arg%
+    %mod% %marks% lookdesc Someone has marked on the wall with chalk:
+    %mod% %marks% append-lookdesc-noformat %arg%
     %mod% %marks% append-lookdesc-noformat Use 'erase markings' to remove this message.
+    if %arg.strlen% <= 55
+      %mod% %marks% longdesc Markings on the wall: %arg%
+    end
   end
 end
 ~

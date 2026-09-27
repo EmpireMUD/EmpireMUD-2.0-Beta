@@ -1096,6 +1096,9 @@ A pair of shadow vaulter gloves is hidden here.~
 knuckles and backs of the hand, fine bronze stitching forms complex geometric
 patterns in a single unbroken line. But the fingers are plain black. All the
 harder to see them move in the dark.
+   The shadow vaulter moves where light does not reach. They seek the secrets
+of tombs and the knowledge buried with the dead. They take nothing for
+themselves. 'We pass between. We leave no trace. The dead keep their trust.'
 ~
 27 mp ah 0 0 14
 1 0 0
@@ -1125,6 +1128,10 @@ A pair of barrow weaver handwraps are lying here.~
    The long, embroidered strands of forest green cloth shimmer in the dark with
 the magic of nature. White stitching outlines stems and leaves, while purple
 thread covers the length of it with delicate flowers.
+   Daeron studied in the barrows of old, learning through great effort to draw
+long-buried mana to the surface and weave it into powerful magic. But life
+magic and death are two sides of the same coin, and in the end, his search drew
+him to his own demise.
 ~
 27 mp ah 0 0 15
 0 0 0
@@ -1155,6 +1162,9 @@ A pair of dolmen freeblade gauntlets have been left here.~
 color. Dark gray cloth forms the gloves and arms, covered in thin plates of
 black metal. There is a bronze spiral emblem on the back of the hand, and a
 second below the wrist.
+   When Greta couldn't find other work, she hired on as a freeblade. She worked
+best alone, so the tomb watch felt like a natural fit. She didn't plan to share
+the pay; she certainly didn't intend to share the tomb.
 ~
 27 mp ah 0 0 13
 2 0 0
@@ -1186,6 +1196,9 @@ The fur-lined gloves of the cyclopean king are here.~
    The dark gray-green leather is covered in bronze filigree in a knotted
 pattern, coming together at the wrist in the shape of an eye, with a gleaming
 purple gem at its center. Gray and white fur flares out below the wrist.
+   Leontes was enamored by the tales of the kings of old, even as a small
+child. He set out on a quest to uncover their palaces and monuments, but he
+was useless without his servants.
 ~
 27 mp ah 0 0 17
 2 0 0
@@ -1282,6 +1295,9 @@ A pair of shadow vaulter boots are standing here.~
    The black leather boots have a smooth sole that makes no sound in even the
 quietest place. The ankles are made from overlapping leather plates, each one
 stitched with bronze thread.
+   The nameless shadow vaulter stepped lightly on the stones -- lighter than
+ever after two weeks with no food. Any stone might give up its secret. But in
+the end, she hoped most of all for the stone that hid the way out.
 ~
 27 mp ag 0 0 15
 1 0 0
@@ -1313,6 +1329,9 @@ embroidered strips of forest green cloth. Each is made to be wrapped precisely
 around the feet and ankles, then bound with the accompanying bronzed leather
 cord. The cloth is stitched with hundreds of delicate purple flowers and the
 white outlines of tiny leaves.
+   The barrow weavers rely on powerful magic to slip in and out of the resting
+places of the dead. When the thick stone walls of the maze blocked this power,
+it became a tomb once again.
 ~
 27 mp ag 0 0 16
 0 0 0
@@ -1341,6 +1360,8 @@ dolmen freeblade sabatons~
 A pair of dolmen freeblade sabatons are lying here.~
    Black metal plates cover lightweight leather boots. The shinguard has a
 double spiral emblem.
+   The stalwart freeblade never feared the dark. Even when her lantern oil ran
+out, she never abandoned her post. And thus, she never saw her doom coming.
 ~
 27 mp ag 0 0 17
 2 0 0
@@ -1372,6 +1393,9 @@ The fur boots of the cyclopean king stand here.~
    The dark gray-green leather is covered in bronze filigree in a knotted
 pattern, coming together near the top in the shape of an eye, with a dazzling
 purple gem at its center. Gray and white fur pours out at the knee.
+   The kings of old are known to be monument builders. Excavators and
+antiquarians unearth their temples and tombs with alarming frequency, but myth
+overtakes history as even the most decorated stones are devoid of writing.
 ~
 27 mp ag 0 0 21
 2 0 0
@@ -1469,6 +1493,8 @@ chainmail inside. The leather is black, dyed over and over until it resembles
 a void. The underside is stitched with a circular emblem depicting a shadowy
 figure standing in a stone archway flanked by large wings, beneath a downward-
 facing crescent moon.
+   In her youth, the vaulter lived among the dead -- a habit she never outgrew.
+And in the end, she died as she lived.
 ~
 27 mp ak 0 0 21
 1 0 0
@@ -1506,6 +1532,9 @@ neck. The back of the cloak is stitched with white thread in a grand spiral of
 vines and leaves surrounding a circle in the center which bears the shape of
 a skull between the roots and branches of a tree. To the left, a crescent moon
 and many-pointed star. To the right, the sigil of the sun.
+   Daeron was the cleverest of his generation, mastering the power of the sun
+and moon to work miracles. So he was all the more surprised to find himself at
+a loss without them, and the other barrow weavers never learned of his fate.
 ~
 27 mp ak 0 0 22
 0 0 0
@@ -1540,6 +1569,9 @@ a dolmen freeblade cape~
 A dolmen freeblade cape hangs here.~
    The dark green-gray cape is covered in scales of black metal that help
 deflect the blows of swords and axes. It's surprisingly light.
+   Nightmares weren't new for Greta, not after her time as a soldier. But the
+nightmares that plagued her in the labyrinth were something new and in the
+dark, she couldn't escape them again.
 ~
 27 mp ak 0 0 23
 2 0 0
@@ -1574,6 +1606,9 @@ shades of bronze. The lowest layer is a polished, gleaming bronze. The outer
 layer is a dark, tarnished bronze. And between them, verdigris. The whole of
 the mantle is set with thirteen purple gems, the largest of which is over the
 heart.
+   Leontes imagined himself king of the Bronze Age as he donned the cyclopean
+mantle in the flickering, torch-lit corridor of the ancient labyrinth. In the
+end, he was more like those kings than he hoped -- as he shared their tomb.
 ~
 27 mp ak 0 0 25
 2 0 0
@@ -2163,8 +2198,7 @@ a tombsward's outfit~
 A tombsward's outfit is lying on the ground.~
    This padded leather outfit is stained dark gray, almost black. Many buckles
 are stitched on to help attach pieces of heavy armor. A brown spiral is
-stitched on the chest, just above the heart. Hooks on the shoulders allow more
-items to be carried, for long treks.
+stitched on the chest, just above the heart.
    Tombswarding is a long task as tombs tend to outlive men.
 ~
 2 mo ad 0 0 11
@@ -2193,7 +2227,7 @@ A silverseer's outfit is lying here.~
    Layers of pale gray and white robes make up the silverseer set, the hooded
 oracle of death. The edges of the outer robes are frilled, and many of these
 frills bear a bronze disc stamped with the shape of an eye inside a spiral, and
-a spiral in the eye. Pockets and pouches adorn the waist.
+a spiral in the eye.
    Precognition is a double-bladed gift, for the Seraine surely knew what fate
 awaited her in the dark.
 ~
@@ -2223,7 +2257,8 @@ A shadow vaulter's outfit is hidden here.~
    The outfit is made of black leather, hard to see in the shadows; all but
 invisible in the night. Bronze stitching in geometric patterns covers many of
 the under parts. A downward-facing crescent emblem is embossed on the chest.
-On the inside, it is possessed of many hidden pockets.
+   A shadow vaulter is rarely seen, for the secrets of the dead require a
+certain discretion.
 ~
 2 mo ad 0 0 13
 0 0 0
@@ -2250,8 +2285,7 @@ a barrow weaver outfit~
 A barrow weaver outfit is folded on the ground.~
    The layered purple and white robes are made to hang loosely over fitted
 leather trousers, accented with white and bronze threads stitched in the shapes
-of all different types of leaf. The belt is hung with many pouches to carry
-supplies and tools.
+of all different types of leaf.
 ~
 2 mo ad 0 0 14
 0 0 0
@@ -2279,6 +2313,10 @@ A dolmen freeblade outfit is lying here.~
    Dark gray cloth and black leather make up the sturdy field outfit of the
 dolmen freeblade, made to carry supplies on the deepest, darkest adventures.
 An emblem over the heart shows a sword and dagger beneath a trilithon.
+   Old stories told of the Nightmare Queen, a demon of the old world,
+worshipped in countless cities and towns. Armies died in the night to defeat
+her, but no amount of fodder could kill her. So every child knows the Nightmare
+Queen will come for them in the dark if they leave the safety of their bed.
 ~
 2 mo ad 0 0 15
 0 0 0
@@ -2306,6 +2344,9 @@ A set of cyclopean regalia is lying here.~
    The pale green-gray garment is made from elegant cloth and stitched with
 bronze and gold thread, with a purple shroud, equally embellished. About the
 shoulders, it bears a heavy bronze mantle beset with gems.
+   A great ruler must build monuments that will withstand the ages and serve as
+testament to the past, and thus did the cyclopean kings build their monuments
+from stone alone. If they left anything else, nothing of it is known.
 ~
 2 mo ad 0 0 16
 0 0 0

@@ -977,7 +977,7 @@ end
 #18240
 Adventurer Guild mount requires Liked~
 0 c 0 1
-L w 18200
+L v 18200
 mount ride~
 * Sanity check
 * I don't know why we'd have a mount called 'swap' but you never know
@@ -1001,7 +1001,7 @@ return 0
 #18241
 Adventurer Guild mount requires Venerated~
 0 c 0 1
-L w 18200
+L v 18200
 mount ride~
 * Sanity check
 * I don't know why we'd have a mount called 'swap' but you never know
