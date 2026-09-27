@@ -3883,10 +3883,11 @@ if %pattern.vnum% != 13575
   halt
 end
 nop %pattern.val0(%recipe_vnum%)%
+set shortdesc %_obj.name(%self.vnum%)%
 %mod% %pattern% keywords study %self.keywords% %empire_adjective%
-%mod% %pattern% shortdesc %empire_adjective.ana% %empire_adjective% study of %self.shortdesc%
-%mod% %pattern% longdesc %empire_adjective.ana.cap% %empire_adjective% study of %self.shortdesc% is lying here.
-%mod% %pattern% lookdesc It looks like someone from %empire_name% has written notes on %self.shortdesc% that %actor.heshe% was studying.
+%mod% %pattern% shortdesc %empire_adjective.ana% %empire_adjective% study of %shortdesc%
+%mod% %pattern% longdesc %empire_adjective.ana.cap% %empire_adjective% study of %shortdesc% is lying here.
+%mod% %pattern% lookdesc It looks like someone from %empire_name% has written notes on %shortdesc% that %actor.heshe% was studying.
 %mod% %pattern% append-lookdesc-noformat Type 'learn study' to learn to make this pattern.
 remote empire_name %pattern.id%
 remote empire_id %pattern.id%
