@@ -2324,8 +2324,8 @@ INTERACTION_FUNC(conjure_liquid_interaction) {
 	request_obj_save_in_world(inter_item);
 	
 	if (data) {
-		// for pricing
-		data->total_amount += quantity;
+		// for pricing -- this is now done in the prep function
+		// data->total_amount += quantity;
 	}
 	
 	return TRUE;
@@ -4163,6 +4163,16 @@ PREP_ABIL(prep_conjure_liquid_ability) {
 		
 		if (data->conjure_liquid_max < 1) {
 			msg_to_char(ch, "You'll have to pick an amount larger than 0.\r\n");
+			CANCEL_ABILITY(data);
+			return;
+		}
+	}
+	
+	// check amount needed in container
+	if (data->conjure_liquid_max == 0 || data->conjure_liquid_max > (GET_DRINK_CONTAINER_CAPACITY(ovict) - GET_DRINK_CONTAINER_CONTENTS(ovict))) {
+		data->conjure_liquid_max = (GET_DRINK_CONTAINER_CAPACITY(ovict) - GET_DRINK_CONTAINER_CONTENTS(ovict));
+		if (data->conjure_liquid_max == 0) {
+			act("$p seems to be full.", FALSE, ch, ovict, NULL, TO_CHAR | TO_SLEEP);
 			CANCEL_ABILITY(data);
 			return;
 		}
