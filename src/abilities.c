@@ -4178,6 +4178,7 @@ PREP_ABIL(prep_conjure_liquid_ability) {
 			data->conjure_liquid_max = MIN(data->conjure_liquid_max, avail);
 		}
 		
+		// TODO: this should not be necessary because it's now checked later by data->total_amount
 		if (avail < 1) {
 			msg_to_char(ch, "You are too low on %s to do that.\r\n", pool_types[ABIL_COST_TYPE(abil)]);
 			CANCEL_ABILITY(data);
@@ -4186,6 +4187,7 @@ PREP_ABIL(prep_conjure_liquid_ability) {
 	}
 	
 	// otherwise it seems ok
+	data->total_amount += data->conjure_liquid_max;
 }
 
 
