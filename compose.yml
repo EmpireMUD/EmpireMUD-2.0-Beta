@@ -1,0 +1,34 @@
+volumes:
+  mud_data:
+  mud_logs:
+  mud_maps:           
+
+services:
+  mud:
+    build: .
+    container_name: empiremud-beta
+    ports:
+      - "4000:4000"
+    volumes:
+      - mud_data:/opt/empiremud/lib
+      - mud_logs:/opt/empiremud/log
+      - mud_maps:/var/www/html
+    #command: > 
+     # sh -c 'cp /opt/empiremud/map /opt/empiremud/lib/world/wld/' 
+    restart: unless-stopped
+    tty: true
+
+  map:
+    image: php:8.3-apache
+    container_name: empiremap
+    depends_on: [mud]
+    ports:
+      - "8081:80"
+    volumes:
+      - mud_data:/opt/empiremud/lib
+      - mud_maps:/var/www/html
+    environment:
+      APACHE_RUN_USER: www-data
+      APACHE_RUN_GROUP: www-data
+    restart: unless-stopped
+

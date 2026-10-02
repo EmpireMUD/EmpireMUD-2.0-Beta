@@ -1,0 +1,9 @@
+.git
+# build artefacts / runtime data
+log/
+*.o
+*.a
+/src/*.dSYM
+# editor junk
+*~ 
+
