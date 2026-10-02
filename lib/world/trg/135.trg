@@ -3697,7 +3697,8 @@ else
     set adjective dilapidated
   end
   * restringing: determine start
-  set short_car %self.shortdesc.car%
+  set myshort %self.shortdesc%
+  set short_car %myshort.car%
   if (%self.keywords% ~= pair && !(%self.shortdesc% ~= pair)) && %short_car% != the
     * add anything that would make this need a "some"
     set prefix some
