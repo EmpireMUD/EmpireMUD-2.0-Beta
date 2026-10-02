@@ -420,21 +420,22 @@ else
     set adjective dilapidated
   end
   * restringing: determine start
-  set short_car %self.shortdesc.car%
+  set shortdesc %_obj.name(%self.vnum%)%
+  set short_car %shortdesc.car%
   if (%self.keywords% ~= pair && !(%self.shortdesc% ~= pair))
     * add anything that would make this need a "some"
     set prefix some
-    set short %self.shortdesc%
+    set short %shortdesc%
     set is_are are
   elseif %short_car% == a || %short_car% == an || %short_car% == the
     * basic insert
     set prefix %adjective.ana%
-    set short %self.shortdesc.cdr%
+    set short %shortdesc.cdr%
     set is_are is
   else
     * this is a guess? might also just set it to 0 to skip prefixes
     set prefix %adjective.ana%
-    set short %self.shortdesc%
+    set short %shortdesc%
     set is_are is
   end
   * restringing: build strings
