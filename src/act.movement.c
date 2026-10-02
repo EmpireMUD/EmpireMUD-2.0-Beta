@@ -2318,7 +2318,7 @@ ACMD(do_climb) {
 		msg_to_char(ch, "You can't go that way!\r\n");
 	}
 	else if (!ROOM_SECT_FLAGGED(to_room, SECTF_ROUGH) && !ROOM_SECT_FLAGGED(IN_ROOM(ch), SECTF_ROUGH)) {
-		msg_to_char(ch, "You can only climb onto rough terrain.\r\n");
+		msg_to_char(ch, "You only need to use 'climb' for rough terrain.\r\n");
 	}
 	else {
 		perform_move(ch, dir, NULL, MOVE_CLIMB);
