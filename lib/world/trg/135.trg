@@ -3698,7 +3698,7 @@ else
   end
   * restringing: determine start
   set short_car %self.shortdesc.car%
-  if (%self.keywords% ~= pair && !(%self.shortdesc% ~= pair))
+  if (%self.keywords% ~= pair && !(%self.shortdesc% ~= pair)) && %short_car% != the
     * add anything that would make this need a "some"
     set prefix some
     set short %self.shortdesc%
