@@ -5084,8 +5084,14 @@ char *delete_doubledollar(char *string) {
 */
 bool ends_in_punct(const char *string) {
 	char buf[MAX_STRING_LENGTH];
+	int pos;
+	
 	strcpy(buf, strip_color(NULLSAFE(string)));
-	return ispunct(buf[strlen(buf) - 1]) ? TRUE : FALSE;
+	
+	// search backwards for the true end
+	for (pos = strlen(buf) - 1; pos > 0 && (isspace(buf[pos]) || buf[pos] == '\r' || buf[pos] == '\n'); --pos);
+	
+	return ispunct(buf[pos]) ? TRUE : FALSE;
 }
 
 
