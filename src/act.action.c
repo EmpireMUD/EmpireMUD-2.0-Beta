@@ -3373,6 +3373,9 @@ bool can_gen_interact_room(char_data *ch, room_data *room, const struct gen_inte
 		// allow it if we got here and have this flag
 		return TRUE;
 	}
+	else if (room == IN_ROOM(ch) && IS_SET(data->flags, GI_ALLOW_DIRECTION)) {
+		msg_to_char(ch, "You can't %s here (try %s in a direction to %s an adjacent %s).\r\n", data->command, data->verb, data->command, (GET_ROOM_VNUM(IN_ROOM(ch)) < MAP_SIZE) ? "tile" : "room");
+	}
 	else {
 		msg_to_char(ch, "You can't %s %s.\r\n", data->command, (room == IN_ROOM(ch) ? "here" : "there"));
 	}
