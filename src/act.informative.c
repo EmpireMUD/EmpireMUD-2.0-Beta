@@ -3133,17 +3133,15 @@ ACMD(do_chart) {
 		
 		// alternate names
 		if (isle->id != NO_ISLAND) {
+			num = 0;
+			
 			if (GET_LOYALTY(ch) && (e_isle = get_empire_island(GET_LOYALTY(ch), isle->id)) && e_isle->name && strcmp(e_isle->name, isle->name)) {
 				// show global name if different
 				msg_to_char(ch, "Also known as: %s", isle->name);
 				num = 1;
 			}
-			else {
-				num = 0;	// not shown yet
-			}
 		
 			// alternate names
-			num = 0;
 			HASH_ITER(hh, empire_table, emp, next_emp) {
 				if (EMPIRE_IS_TIMED_OUT(emp) || emp == GET_LOYALTY(ch)) {
 					continue;
