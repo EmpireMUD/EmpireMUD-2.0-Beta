@@ -967,6 +967,12 @@ void show_craft_info(char_data *ch, char *argument, int craft_type) {
 	}
 	else if ((proto = obj_proto(GET_CRAFT_OBJECT(craft)))) {
 		craft_level = get_craft_scale_level(ch, craft);
+		
+		// rounding?
+		if (round_level_scaling_to_nearest > 1 && craft_level > 1 && (craft_level % round_level_scaling_to_nearest) > 0) {
+			craft_level += (round_level_scaling_to_nearest - (craft_level % round_level_scaling_to_nearest));
+		}
+		
 		// build info string
 		sprintf(buf, " (%s", item_types[(int) GET_OBJ_TYPE(proto)]);
 		if (GET_OBJ_MIN_SCALE_LEVEL(proto) > 0 || GET_OBJ_MAX_SCALE_LEVEL(proto) > 0) {
