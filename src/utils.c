@@ -5077,6 +5077,19 @@ char *delete_doubledollar(char *string) {
 
 
 /**
+* Determines if a string ends in punctuation, ignoring color codes.
+*
+* @param const char *string The string.
+* @return bool TRUE if the string ends in punctuation, FALSE if not.
+*/
+bool ends_in_punct(const char *string) {
+	char buf[MAX_STRING_LENGTH];
+	strcpy(buf, strip_color(NULLSAFE(string)));
+	return ispunct(buf[strlen(buf) - 1]) ? TRUE : FALSE;
+}
+
+
+/**
 * This converts bitvector flags into the human-readable sequence used in db
 * files, e.g. "adoO", where each letter represents a bit starting with a=1.
 * If there are no bits, it returns the string "0".
@@ -6003,10 +6016,10 @@ char *str_replace(const char *search, const char *replace, const char *subject) 
 /**
 * Strips out the color codes and returns the string.
 *
-* @param char *input
+* @param const char *input
 * @return char *result (no memory allocated, so str_dup if you want to keep it)
 */
-char *strip_color(char *input) {
+char *strip_color(const char *input) {
 	static char lbuf[MAX_STRING_LENGTH];
 	char *ptr;
 	int iter, pos;

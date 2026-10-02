@@ -588,7 +588,7 @@ bool audit_archetype(archetype_data *arch, char_data *ch) {
 			}
 		}
 		
-		if (ispunct(*(GET_ARCH_LORE(arch) + strlen(GET_ARCH_LORE(arch)) - 1))) {
+		if (ends_in_punct(GET_ARCH_LORE(arch))) {
 			olc_audit_msg(ch, GET_ARCH_VNUM(arch), "Lore ends with punctuation");
 			problem = TRUE;
 		}

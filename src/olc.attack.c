@@ -528,7 +528,7 @@ bool audit_attack_message(attack_message_data *amd, char_data *ch) {
 			olc_audit_msg(ch, ATTACK_VNUM(amd), "Death log should not start with capital letter");
 			problem = TRUE;
 		}
-		if (ispunct(*(ATTACK_DEATH_LOG(amd) + strlen(ATTACK_DEATH_LOG(amd)) - 1))) {
+		if (ends_in_punct(ATTACK_DEATH_LOG(amd))) {
 			olc_audit_msg(ch, ATTACK_VNUM(amd), "Death log should not end with punctuation");
 			problem = TRUE;
 		}

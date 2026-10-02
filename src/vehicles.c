@@ -1696,7 +1696,7 @@ bool audit_vehicle(vehicle_data *veh, char_data *ch) {
 		olc_audit_msg(ch, VEH_VNUM(veh), "Long desc not set");
 		problem = TRUE;
 	}
-	if (!ispunct(VEH_LONG_DESC(veh)[strlen(VEH_LONG_DESC(veh)) - 1])) {
+	if (!ends_in_punct(VEH_LONG_DESC(veh))) {
 		olc_audit_msg(ch, VEH_VNUM(veh), "Long desc missing punctuation");
 		problem = TRUE;
 	}
@@ -1713,7 +1713,7 @@ bool audit_vehicle(vehicle_data *veh, char_data *ch) {
 		olc_audit_msg(ch, VEH_VNUM(veh), "Short desc capitalized");
 		problem = TRUE;
 	}
-	if (ispunct(VEH_SHORT_DESC(veh)[strlen(VEH_SHORT_DESC(veh)) - 1])) {
+	if (ends_in_punct(VEH_SHORT_DESC(veh))) {
 		olc_audit_msg(ch, VEH_VNUM(veh), "Short desc has punctuation");
 		problem = TRUE;
 	}

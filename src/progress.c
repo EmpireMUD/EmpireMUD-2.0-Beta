@@ -1925,7 +1925,7 @@ bool audit_progress(progress_data *prg, char_data *ch) {
 		olc_audit_msg(ch, PRG_VNUM(prg), "No name set");
 		problem = TRUE;
 	}
-	if (ispunct(*(PRG_NAME(prg) + strlen(PRG_NAME(prg)) - 1))) {
+	if (ends_in_punct(PRG_NAME(prg))) {
 		olc_audit_msg(ch, PRG_VNUM(prg), "Name ends with punctuation");
 		problem = TRUE;
 	}
