@@ -415,7 +415,7 @@ void do_customize_island(char_data *ch, char *argument) {
 			msg_to_char(ch, "That name is already taken by another island.\r\n");
 		}
 		else {
-			log_to_empire(GET_LOYALTY(ch), ELOG_TERRITORY, "%s has given %s the custom name of %s", PERS(ch, ch, TRUE), get_island_name_for(island->id, ch), argument);
+			log_to_empire(GET_LOYALTY(ch), ELOG_TERRITORY, "%s has given the %s of %s the custom name of %s", PERS(ch, ch, TRUE), (IS_SET(island->flags, ISLE_CONTINENT) ? "continent" : "island"), get_island_name_for(island->id, ch), argument);
 			msg_to_char(ch, "It is now called \"%s\".\r\n", argument);
 			
 			if (eisle->name) {
