@@ -7557,7 +7557,6 @@ void olc_process_extra_desc(char_data *ch, char *argument, struct extra_descr_da
 void olc_process_icons(char_data *ch, char *argument, struct icon_data **list) {
 	char arg1[MAX_INPUT_LENGTH], arg2[MAX_INPUT_LENGTH], arg3[MAX_INPUT_LENGTH], arg4[MAX_INPUT_LENGTH];
 	char num_arg[MAX_INPUT_LENGTH], type_arg[MAX_INPUT_LENGTH], val_arg[MAX_INPUT_LENGTH];
-	char lbuf[MAX_INPUT_LENGTH];
 	struct icon_data *icon, *change, *temp, *copyfrom;
 	int iter, loc, num, findtype;
 	any_vnum vnum;
@@ -7621,8 +7620,8 @@ void olc_process_icons(char_data *ch, char *argument, struct icon_data **list) {
 			LL_APPEND(*list, temp);
 
 			LL_SORT(*list, sort_icon_set);
-			strcpy(lbuf, show_color_codes(arg4));
-			msg_to_char(ch, "You add %s: %s %s%s&0 %s\r\n", icon_types[loc], show_color_codes(arg3), arg3, arg4, lbuf);
+			
+			msg_to_char(ch, "You add %s: %s\r\n", icon_types[loc], one_icon_display(temp->icon, temp->color));
 		}
 	}
 	else if (is_abbrev(arg1, "copy")) {
@@ -7735,7 +7734,7 @@ void olc_process_icons(char_data *ch, char *argument, struct icon_data **list) {
 					free(change->icon);
 				}
 				change->icon = str_dup(val_arg);
-				msg_to_char(ch, "Icon %d changed to: %s%s&0 %s\r\n", atoi(num_arg), icon->color, val_arg, show_color_codes(val_arg));
+				msg_to_char(ch, "Icon %d changed to: %s\r\n", atoi(num_arg), one_icon_display(icon->icon, icon->color));
 			}
 		}
 		else {
