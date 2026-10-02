@@ -332,7 +332,7 @@ int Board_show_board(int board_type, char_data *ch, char *arg, obj_data *board) 
 			}
 		}
 	}
-	//send_page_display(ch);
+	send_page_display(ch);
 
 	return (1);
 }
