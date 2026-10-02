@@ -3699,12 +3699,21 @@ else
   * restringing: determine start
   set myshort %self.shortdesc%
   set short_car %myshort.car%
-  if (%self.keywords% ~= pair && !(%self.shortdesc% ~= pair)) && %short_car% != the
+  if (%self.keywords% ~= pair && !(%self.shortdesc% ~= pair))
     * add anything that would make this need a "some"
     set prefix some
-    set short %self.shortdesc%
+    if %short_car% == the
+      set short %self.shortdesc.cdr%
+    else
+      set short %self.shortdesc%
+    end
     set is_are are
-  elseif %short_car% == a || %short_car% == an || %short_car% == the
+  elseif %short_car% == the
+    * basic insert
+    set prefix the
+    set short %self.shortdesc.cdr%
+    set is_are is
+  elseif %short_car% == a || %short_car% == an
     * basic insert
     set prefix %adjective.ana%
     set short %self.shortdesc.cdr%
