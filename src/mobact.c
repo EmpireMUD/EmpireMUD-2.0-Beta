@@ -189,8 +189,10 @@ bool return_to_pursuit_location(char_data *ch) {
 		return FALSE;
 	}
 	
-	act("$n goes back to where $e was.", TRUE, ch, NULL, NULL, TO_ROOM);
-	char_to_room(ch, loc);
+	if (IN_ROOM(ch) != loc) {
+		act("$n goes back to where $e was.", TRUE, ch, NULL, NULL, TO_ROOM);
+		char_to_room(ch, loc);
+	}
 	act("$n returns to what $e was doing.", TRUE, ch, NULL, NULL, TO_ROOM);
 	MOB_PURSUIT_LEASH_LOC(ch) = NOWHERE;
 	
