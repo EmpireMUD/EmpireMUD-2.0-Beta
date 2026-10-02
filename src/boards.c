@@ -312,7 +312,7 @@ int Board_show_board(int board_type, char_data *ch, char *arg, obj_data *board) 
 	build_page_display_str(ch, "You will need to look at the board to save your message.");
 	
 	if (!num_of_msgs[board_type]) {
-		build_page_display_str(ch, "The board is empty.\r\n");
+		build_page_display_str(ch, "The board is empty.");
 	}
 	else {
 		build_page_display(ch, "There are %d messages on the board.", num_of_msgs[board_type]);
@@ -327,12 +327,12 @@ int Board_show_board(int board_type, char_data *ch, char *arg, obj_data *board) 
 			}
 			else {
 				log("SYSERR: The board is fubar'd.");
-				build_page_display_str(ch, "Sorry, the board isn't working.\r\n");
+				build_page_display_str(ch, "Sorry, the board isn't working.");
 				return (1);
 			}
 		}
 	}
-	send_page_display(ch);
+	//send_page_display(ch);
 
 	return (1);
 }
