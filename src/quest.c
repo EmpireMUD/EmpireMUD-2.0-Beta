@@ -3870,6 +3870,10 @@ bool audit_quest(quest_data *quest, char_data *ch) {
 	}
 	
 	// QR_x: audit rewards
+	if (!QUEST_REWARDS(quest)) {
+		olc_audit_msg(ch, QUEST_VNUM(quest), "No rewards");
+		problem = TRUE;
+	}
 	LL_FOREACH(QUEST_REWARDS(quest), rew) {
 		switch (rew->type) {
 			case QR_BONUS_EXP:
