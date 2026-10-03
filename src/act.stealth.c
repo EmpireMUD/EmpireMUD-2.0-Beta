@@ -809,7 +809,10 @@ ACMD(do_search) {
 	char_data *targ;
 	bool found = FALSE, earthmeld = FALSE;
 	
-	if (AFF_FLAGGED(ch, AFF_BLIND)) {
+	if (get_cooldown_time(ch, COOLDOWN_SEARCH)) {
+		msg_to_char(ch, "You can't search again yet.\r\n");
+	}
+	else if (AFF_FLAGGED(ch, AFF_BLIND)) {
 		msg_to_char(ch, "How can you do that? You're blind!\r\n");
 	}
 	else if (!has_player_tech(ch, PTECH_SEARCH_COMMAND) || !can_see_in_dark_room(ch, IN_ROOM(ch), TRUE)) {
