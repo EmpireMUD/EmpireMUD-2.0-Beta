@@ -2186,7 +2186,7 @@ ACMD(do_gen_craft) {
 			}
 			
 			// match so far...
-			if (!str_cmp(arg, GET_CRAFT_NAME(craft)) || (*short_arg && !str_cmp(short_arg, GET_CRAFT_NAME(craft)))) {
+			if (!str_cmp(arg, GET_CRAFT_NAME(craft)) || (CRAFT_IS_BUILDING(craft) && *short_arg && !str_cmp(short_arg, GET_CRAFT_NAME(craft)))) {
 				// prior to b5.207, short_arg was only checked here for buildings with facing: if (!str_cmp(arg, GET_CRAFT_NAME(craft)) || (GET_CRAFT_BUILD_FACING(craft) && *short_arg && !str_cmp(short_arg, GET_CRAFT_NAME(craft)))) {
 				
 				// do this last because it records if they are on the wrong command or just missing an ability
@@ -2203,7 +2203,7 @@ ACMD(do_gen_craft) {
 				type = craft;
 				break;
 			}
-			else if (!abbrev_match && (is_abbrev(arg, GET_CRAFT_NAME(craft)) || (*short_arg && is_abbrev(short_arg, GET_CRAFT_NAME(craft))))) {
+			else if (!abbrev_match && (is_abbrev(arg, GET_CRAFT_NAME(craft)) || (CRAFT_IS_BUILDING(craft) && *short_arg && is_abbrev(short_arg, GET_CRAFT_NAME(craft))))) {
 				// prior to b5.207, also checked GET_CRAFT_BUILD_FACING(craft) for short_arg
 				
 				// do this last because it records if they are on the wrong command or just missing an ability
@@ -2224,7 +2224,7 @@ ACMD(do_gen_craft) {
 					abbrev_no_res = craft;
 				}
 			}
-			else if (!multi_match && (multi_isname(arg, GET_CRAFT_NAME(craft)) || (*short_arg && multi_isname(short_arg, GET_CRAFT_NAME(craft))))) {
+			else if (!multi_match && (multi_isname(arg, GET_CRAFT_NAME(craft)) || (CRAFT_IS_BUILDING(craft) && *short_arg && multi_isname(short_arg, GET_CRAFT_NAME(craft))))) {
 				// prior to b5.207, also checked GET_CRAFT_BUILD_FACING(craft) for short_arg
 				
 				// do this last because it records if they are on the wrong command or just missing an ability
@@ -2324,7 +2324,7 @@ ACMD(do_gen_craft) {
 			if (IS_SET(GET_CRAFT_FLAGS(craft), CRAFT_LEARNED) && !has_learned_craft(ch, GET_CRAFT_VNUM(craft))) {
 				continue;	// not learned
 			}
-			if (*arg && !multi_isname(arg, GET_CRAFT_NAME(craft)) && (!GET_CRAFT_BUILD_FACING(craft) || !*short_arg || !multi_isname(short_arg, GET_CRAFT_NAME(craft)))) {
+			if (*arg && !multi_isname(arg, GET_CRAFT_NAME(craft)) && (!GET_CRAFT_BUILD_FACING(craft) || !CRAFT_IS_BUILDING(craft) || !*short_arg || !multi_isname(short_arg, GET_CRAFT_NAME(craft)))) {
 				continue;	// search exclusion
 			}
 			
