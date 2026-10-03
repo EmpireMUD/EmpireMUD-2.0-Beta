@@ -752,10 +752,42 @@ end
 ~
 #10256
 Primeval: Start delayed despawn~
-0 f 100 2
+0 f 100 8
+L b 10252
+L b 10253
+L b 10254
+L b 10255
+L b 10256
+L b 10258
 L b 10276
 L j 10251
 ~
+switch %self.vnum%
+  case 10252
+    * the King of the Dracosaurs
+    %echo% ~%self% lets out a dry gasp as &%self% collapses to the ground, dead!
+  break
+  case 10253
+    * the Terrosaur
+    %echo% ~%self% lets out a truncated screech as &%self% falls to the ground, dead!
+  break
+  case 10254
+    * Archsorcerer Malfernes
+    %echo% ~%self% clutches ^%self% chest and collapses, dead!
+  break
+  case 10255
+    * the three-horned dracosaur
+    %echo% ~%self% collapses in a heap, dead!
+  break
+  case 10256
+    * a feathered dracosaur
+    %echo% Feathers fly as the dracosaur collapses, dead!
+  break
+  case 10258
+    * the mage #n
+    %echo% |%self% eyes go wide as &%self% falls down, dead!
+  break
+done
 %buildingecho% %self.room% A bone-shattering roar echoes through the air!
 %at% i10251 %load% mob 10276
 return 0

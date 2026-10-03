@@ -305,16 +305,16 @@ T 9901
 T 9902
 S
 #10965
-giant hill~
+giant hill #n~
 the hill giant~
 A hill giant towers over you, swinging a club the size of a tree! (difficulty)
 ~
 100 175 dkuvAILM cEG 6
 0 0 26 5 -1 -1
 D
-   The hill giant towers over you with an entire tree slung over its shoulder
-as a club. Luckily, the giant seems to be focused on problems its own size, and
-isn't even looking down at you.
+   The hill giant towers over you with an entire tree slung over one shoulder
+as a club. Luckily, the giant seems to be focused on bigger problems, and isn't
+even looking down at you.
 Set difficulty with: difficulty <normal | hard | group | boss>
 ~
 I 4 10973 100.00 1  # LOOT: giant wooden club
@@ -359,7 +359,7 @@ T 10974
 T 10969
 S
 #10966
-giant river~
+giant river #n~
 the river giant~
 A river giant towers over you, barely missing you on its path across the countryside! (difficulty)
 ~
@@ -367,8 +367,8 @@ A river giant towers over you, barely missing you on its path across the country
 0 0 26 5 -1 -1
 D
    This giant is dressed mainly in gigantic nets, which appear to double as
-fishing tools. Its height dominates the landscape, taller than most trees. In
-fact, it has a tree slung over its shoulder like a club.
+fishing tools. Taller than most trees, the giant dominates the landscape. In
+fact, there's a tree slung over one shoulder like a club.
 Set difficulty with: difficulty <normal | hard | group | boss>
 ~
 I 4 10973 100.00 1  # LOOT: giant wooden club
@@ -413,16 +413,15 @@ T 10974
 T 10969
 S
 #10967
-giant dune~
+giant dune #n~
 the dune giant~
 A dune giant towers above you, with a tree over its shoulder! (difficulty)
 ~
 100 175 dkuvAILM cEG 6
 0 0 26 5 -1 -1
 D
-   This gigantic desert nomad has a massive tree slung over its shoulder like a
-club. The giant is so large that it doesn't even appear to notice you down
-here.
+   This gigantic desert nomad has a massive tree slung over one shoulder like a
+club. The giant is so large that you seem to escape notice down here.
 Set difficulty with: difficulty <normal | hard | group | boss>
 ~
 I 4 10973 100.00 1  # LOOT: giant wooden club
