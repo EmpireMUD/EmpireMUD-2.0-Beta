@@ -1220,6 +1220,7 @@ hungry.
 ~
 I 0 3012 100.00 3  # BUTCHER: fillet of raw meat
 I 1 9177 100.00 1  # SKIN: polar bear fur
+T 9118
 S
 #9178
 narwhal narwal huge~
@@ -1273,7 +1274,7 @@ wolverine bristling~
 a bristling wolverine~
 A bristling wolverine watches you menacingly.
 ~
-75 100 cdjo c 2
+75 100 djo c 2
 0 0 7 10 -1 -1
 D
    This small predator has the shape of a weasel, the bulk of a bear, the claws
@@ -1282,6 +1283,7 @@ prized, but hard to remove as you must first get past the claws.
 ~
 I 0 3012 100.00 2  # BUTCHER: fillet of raw meat
 I 1 9181 100.00 1  # SKIN: wolverine fur
+T 9118
 S
 #9182
 puffin rainbow-billed rainbowbilled~

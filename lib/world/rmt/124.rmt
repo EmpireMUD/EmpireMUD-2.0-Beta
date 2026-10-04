@@ -88,7 +88,7 @@ underwater cavern. You struggle to catch your breath but cough up more salt and
 water than air. For a moment, you struggle to hold onto the wall, but the
 seaweed is slippery and you lose your grip.
 ~
-cg 0 0 -1
+cg 0 0 12406
 T 12416
 S
 #12406
@@ -98,7 +98,7 @@ otherwise fully-submerged cavern. The walls are thick with seaweed and odd
 creatures, and the cavern smells of old fish. In the center, a small fire burns
 to warm the air, and its smoke billows up into the water above.
 ~
-cd 0 G -1
+cd 0 G 12406
 D0
 ~
 0 12410
@@ -116,7 +116,7 @@ Backtracking Toward the Start~
 air bubble before your breath runs out. It looks like you found the right way
 as you can hear the goblin sea witch chanting in the distance.
 ~
-cdg 0 0 -1
+cdg 0 0 12406
 D2
 ~
 0 12406
@@ -128,7 +128,7 @@ A Flooded Cavern~
 cavern looks the same. You might be able to backtrack to the sea hag's air
 bubble, if you can hold your breath that long.
 ~
-cg 0 0 -1
+cg 0 0 12406
 D2
 ~
 0 12407
@@ -152,7 +152,7 @@ A Flooded Cavern~
 cavern looks the same. You might be able to backtrack to the sea hag's air
 bubble, if you can hold your breath that long.
 ~
-cg 0 0 -1
+cg 0 0 12406
 D2
 ~
 0 12407
@@ -176,7 +176,7 @@ A Flooded Cavern~
 cavern looks the same. You might be able to backtrack to the sea hag's air
 bubble, if you can hold your breath that long.
 ~
-cg 0 0 -1
+cg 0 0 12406
 D2
 ~
 0 12407
@@ -200,7 +200,7 @@ A Flooded Cavern~
 cavern looks the same. You might be able to backtrack to the sea hag's air
 bubble, if you can hold your breath that long.
 ~
-cg 0 0 -1
+cg 0 0 12406
 D2
 ~
 0 12407
@@ -224,7 +224,7 @@ A Flooded Cavern~
 cavern looks the same. You might be able to backtrack to the sea hag's air
 bubble, if you can hold your breath that long.
 ~
-cg 0 0 -1
+cg 0 0 12406
 D2
 ~
 0 12407
@@ -248,7 +248,7 @@ A Flooded Cavern~
 cavern looks the same. You might be able to backtrack to the sea hag's air
 bubble, if you can hold your breath that long.
 ~
-cg 0 0 -1
+cg 0 0 12406
 D2
 ~
 0 12407
@@ -272,7 +272,7 @@ A Flooded Cavern~
 cavern looks the same. You might be able to backtrack to the sea hag's air
 bubble, if you can hold your breath that long.
 ~
-cg 0 0 -1
+cg 0 0 12406
 D2
 ~
 0 12407
@@ -295,7 +295,7 @@ A Flooded Cavern~
 cavern looks the same. You might be able to backtrack to the sea hag's air
 bubble, if you can hold your breath that long.
 ~
-cg 0 0 -1
+cg 0 0 12406
 D2
 ~
 0 12407
@@ -319,7 +319,7 @@ A Flooded Cavern~
 cavern looks the same. You might be able to backtrack to the sea hag's air
 bubble, if you can hold your breath that long.
 ~
-cg 0 0 -1
+cg 0 0 12406
 D2
 ~
 0 12407
@@ -343,7 +343,7 @@ A Flooded Cavern~
 cavern looks the same. You might be able to backtrack to the sea hag's air
 bubble, if you can hold your breath that long.
 ~
-cg 0 0 -1
+cg 0 0 12406
 D2
 ~
 0 12407
@@ -366,7 +366,7 @@ A Flooded Cavern~
 cavern looks the same. You might be able to backtrack to the sea hag's air
 bubble, if you can hold your breath that long.
 ~
-cg 0 0 -1
+cg 0 0 12406
 D2
 ~
 0 12407
@@ -391,7 +391,7 @@ underwater, there still appears to be a pool in the center of the cavern. As
 you enter, the walls tremble around you and bits of sand and debris fall from
 the ceiling.
 ~
-cg 0 0 -1
+cg 0 0 12406
 D3
 ~
 0 12415
@@ -409,7 +409,7 @@ A Grand Cavern~
 gold and bones, both from humans and from animals. There appears to be no exit
 from this room except the way you came.
 ~
-cg 0 0 -1
+cg 0 0 12406
 D2
 ~
 0 12418
