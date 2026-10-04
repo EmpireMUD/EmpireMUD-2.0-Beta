@@ -404,7 +404,7 @@ ACMD(do_hit) {
 				hit(ch, vict, GET_EQ(ch, WEAR_WIELD), FIGHTING(ch) ? FALSE : TRUE);	// count as exp only if not already fighting
 				
 				// ensure hitting
-				if (vict && !EXTRACTED(vict) && !IS_DEAD(vict) && !EXTRACTED(ch) && !IS_DEAD(ch)) {
+				if (vict && !EXTRACTED(vict) && !IS_DEAD(vict) && !EXTRACTED(ch) && !IS_DEAD(ch) && GET_POS(vict) > POS_STUNNED) {
 					// ch->vict
 					if (FIGHTING(ch) && FIGHTING(ch) != vict) {
 						FIGHTING(ch) = vict;
@@ -437,7 +437,7 @@ ACMD(do_hit) {
 					FIGHT_WAIT(ch) = 0;
 				}
 				
-				if (!FIGHTING(vict)) {
+				if (!FIGHTING(vict) && !IS_DEAD(vict) && GET_POS(vict) > POS_STUNNED) {
 					set_fighting(vict, ch, FMODE_MELEE);
 				}
 			}

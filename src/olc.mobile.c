@@ -77,7 +77,7 @@ bool audit_mobile(char_data *mob, char_data *ch) {
 		olc_audit_msg(ch, GET_MOB_VNUM(mob), "Short desc capitalized");
 		problem = TRUE;
 	}
-	if (ispunct(GET_SHORT_DESC(mob)[strlen(GET_SHORT_DESC(mob)) - 1])) {
+	if (ends_in_punct(GET_SHORT_DESC(mob))) {
 		olc_audit_msg(ch, GET_MOB_VNUM(mob), "Short desc has punctuation");
 		problem = TRUE;
 	}
@@ -99,7 +99,7 @@ bool audit_mobile(char_data *mob, char_data *ch) {
 		olc_audit_msg(ch, GET_MOB_VNUM(mob), "Long desc not set");
 		problem = TRUE;
 	}
-	if (!ispunct(GET_LONG_DESC(mob)[strlen(GET_LONG_DESC(mob)) - 3])) {
+	if (!ends_in_punct(GET_LONG_DESC(mob))) {
 		olc_audit_msg(ch, GET_MOB_VNUM(mob), "Long desc missing punctuation");
 		problem = TRUE;
 	}

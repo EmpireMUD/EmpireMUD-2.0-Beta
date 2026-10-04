@@ -4743,7 +4743,7 @@ bool has_resources(char_data *ch, struct resource_data *list, bool ground, bool 
 									break;
 								}
 								case RES_COMPONENT: {
-									if (GET_OBJ_COMPONENT(obj) == res->vnum || (liter == 1 && is_component_vnum(obj, res->vnum))) {
+									if (GET_OBJ_COMPONENT(obj) == res->vnum || is_component_vnum(obj, res->vnum)) {
 										--res->amount;
 										obj->search_mark = TRUE;
 									}
@@ -5073,6 +5073,25 @@ char *delete_doubledollar(char *string) {
 	*write = '\0';
 
 	return (string);
+}
+
+
+/**
+* Determines if a string ends in punctuation, ignoring color codes.
+*
+* @param const char *string The string.
+* @return bool TRUE if the string ends in punctuation, FALSE if not.
+*/
+bool ends_in_punct(const char *string) {
+	char buf[MAX_STRING_LENGTH];
+	int pos;
+	
+	strcpy(buf, strip_color(NULLSAFE(string)));
+	
+	// search backwards for the true end
+	for (pos = strlen(buf) - 1; pos > 0 && (isspace(buf[pos]) || buf[pos] == '\r' || buf[pos] == '\n'); --pos);
+	
+	return ispunct(buf[pos]) ? TRUE : FALSE;
 }
 
 
@@ -6003,10 +6022,10 @@ char *str_replace(const char *search, const char *replace, const char *subject) 
 /**
 * Strips out the color codes and returns the string.
 *
-* @param char *input
+* @param const char *input
 * @return char *result (no memory allocated, so str_dup if you want to keep it)
 */
-char *strip_color(char *input) {
+char *strip_color(const char *input) {
 	static char lbuf[MAX_STRING_LENGTH];
 	char *ptr;
 	int iter, pos;

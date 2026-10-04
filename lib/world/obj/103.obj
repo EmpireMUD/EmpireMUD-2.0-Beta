@@ -41,7 +41,7 @@ A firefruit is flickering and sputtering on the ground.~
    The firefruit flickers shades of red, orange and yellow. It's warm to the
 touch, but juicy and delicious. It's probably bright enough to see by.
 ~
-6 bcelC a 0 0 10
+6 bcelC a 0 0 12
 24 10300 0
 7 336
 A
@@ -52,6 +52,7 @@ You begin to sweat as you eat $p.~
 M
 5
 $n seems to sweat as $e eats $p.~
+O+ 1 6124
 R
 4 5114 0
 S
@@ -320,10 +321,11 @@ a scaly dragonfruit~
 A scaly dragonfruit is lying here.~
 This exotic red fruit has green, scaly leaves coming out of its leathery skin.
 ~
-6 C a 0 0 8
+6 C a 0 0 9
 2 0 0
 7 336
 I 14 10339 100.00 4 x  # COMBINE: basket of dragonfruit
+O+ 1 6124
 R
 4 5619 0
 S
@@ -335,10 +337,11 @@ A basket of dragonfruit is sitting here.~
 on a cactus, and as they require little water, they should be easy to farm in
 the desert. You could probably preserve the dragonfruit by making it into jam.
 ~
-6 bC a 0 0 7
+6 bC a 0 0 8
 24 10338 0
 7 336
 I 15 10338 100.00 4 x  # SEPARATE: scaly dragonfruit
+O+ 1 6134
 R
 4 5114 0
 S

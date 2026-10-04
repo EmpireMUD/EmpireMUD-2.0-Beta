@@ -643,6 +643,7 @@ cpp_extern const struct command_info cmd_info[] = {
 	SIMPLE_CMD( "empty", POS_STANDING, do_empty, NO_MIN, CTYPE_UTIL ),
 	SCMD_CMD( "einventory", POS_DEAD, do_empire_inventory, NO_MIN, CTYPE_EMPIRE, SCMD_EINVENTORY ),
 	SCMD_CMD( "eidentify", POS_DEAD, do_empire_inventory, NO_MIN, CTYPE_EMPIRE, SCMD_EIDENTIFY ),
+	SIMPLE_CMD( "effects", POS_DEAD, do_affects, NO_MIN, CTYPE_UTIL ),
 	SIMPLE_CMD( "emotd", POS_DEAD, do_emotd, NO_MIN, CTYPE_EMPIRE ),
 	SCMD_CMD( "emote", POS_RESTING, do_echo, NO_MIN, CTYPE_COMM, SCMD_EMOTE ),
 	SCMD_CMD( ":", POS_RESTING, do_echo, NO_MIN, CTYPE_COMM, SCMD_EMOTE ),

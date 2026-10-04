@@ -1137,7 +1137,7 @@ if %actor.room% != %room%
   halt
 end
 * Skill check
-set chance %random.100%
+set chance %random.75%
 if %chance% > %actor.skill(Stealth)%
   * Fail
   %send% %actor% You hear someone approaching!

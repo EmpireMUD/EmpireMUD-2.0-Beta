@@ -415,7 +415,7 @@ void do_customize_island(char_data *ch, char *argument) {
 			msg_to_char(ch, "That name is already taken by another island.\r\n");
 		}
 		else {
-			log_to_empire(GET_LOYALTY(ch), ELOG_TERRITORY, "%s has given %s the custom name of %s", PERS(ch, ch, TRUE), get_island_name_for(island->id, ch), argument);
+			log_to_empire(GET_LOYALTY(ch), ELOG_TERRITORY, "%s has given the %s of %s the custom name of %s", PERS(ch, ch, TRUE), (IS_SET(island->flags, ISLE_CONTINENT) ? "continent" : "island"), get_island_name_for(island->id, ch), argument);
 			msg_to_char(ch, "It is now called \"%s\".\r\n", argument);
 			
 			if (eisle->name) {
@@ -1067,9 +1067,10 @@ int sort_territory_nodes_by_distance(struct find_territory_node *a, struct find_
 * @param char *argument The requested inventory item, if any.
 */
 static void show_empire_inventory_to_char(char_data *ch, empire_data *emp, char *argument) {
-	char vstr[256], keepstr[256], totalstr[256];
+	char compstr[256], vstr[256], keepstr[256], totalstr[256], arg1[MAX_INPUT_LENGTH], arg2[MAX_INPUT_LENGTH];
 	struct einv_type *einv, *next_einv, *list = NULL;
 	obj_vnum vnum, last_vnum = NOTHING;
+	generic_data *find_component = NULL;
 	struct empire_dropped_item *edi, *next_edi;
 	struct empire_storage_data *store, *next_store;
 	struct empire_island *isle, *next_isle;
@@ -1085,6 +1086,23 @@ static void show_empire_inventory_to_char(char_data *ch, empire_data *emp, char 
 		*argument = '\0';
 		all = TRUE;
 	}
+	else if (!strn_cmp(argument, "-c", 2)) {
+		half_chop(argument, arg1, arg2);
+		if (is_abbrev(arg1, "-component")) {
+			if (!*arg2) {
+				msg_to_char(ch, "Search for which component type?\r\n");
+				return;
+			}
+			else if (!(find_component = find_generic_component(arg2))) {
+				msg_to_char(ch, "Unknown component type '%s'.\r\n", arg2);
+				return;
+			}
+			// else we've got a good component
+			
+			// clear this out for component search
+			*argument = '\0';
+		}
+	}
 	
 	if (!GET_ISLAND(IN_ROOM(ch)) && !IS_IMMORTAL(ch) && !all && !*argument) {
 		msg_to_char(ch, "You don't have anything stored at sea.\r\n");
@@ -1098,18 +1116,17 @@ static void show_empire_inventory_to_char(char_data *ch, empire_data *emp, char 
 				continue;	// none in storage here
 			}
 			
-			// prototype lookup
-			if (store->vnum != last_vnum) {
-				proto = store->proto;
-				last_vnum = store->vnum;
+			if (!store->proto) {
+				continue;
 			}
 			
-			if (!proto) {
+			// component requested but doesn't match?
+			if (find_component && !is_component(store->proto, find_component)) {
 				continue;
 			}
 			
 			// argument given but doesn't match
-			if (*argument && !multi_isname(argument, GET_OBJ_KEYWORDS(proto))) {
+			if (*argument && !multi_isname(argument, GET_OBJ_KEYWORDS(store->proto))) {
 				continue;
 			}
 			
@@ -1199,13 +1216,21 @@ static void show_empire_inventory_to_char(char_data *ch, empire_data *emp, char 
 	
 	HASH_ITER(hh, list, einv, next_einv) {
 		// only display it if it's on the requested island, or if they requested it by name, or all
-		if (all || einv->local > 0 || *argument) {
+		if ((all || einv->local > 0 || *argument || find_component) && (proto = obj_proto(einv->vnum))) {
 			// prefix
 			if (PRF_FLAGGED(ch, PRF_ROOMFLAGS)) {
 				sprintf(vstr, "[%5d] ", einv->vnum);
 			}
 			else {
 				*vstr = '\0';
+			}
+			
+			// component partial-match string
+			if (find_component && GET_OBJ_COMPONENT(proto) != GEN_VNUM(find_component)) {
+				safe_snprintf(compstr, sizeof(compstr), " (%s)", get_generic_name_by_vnum(GET_OBJ_COMPONENT(proto)));
+			}
+			else {
+				*compstr = '\0';
 			}
 			
 			// keep section
@@ -1236,7 +1261,7 @@ static void show_empire_inventory_to_char(char_data *ch, empire_data *emp, char 
 			}
 			
 			// actual line
-			build_page_display(ch, "(%4d) %s%s%s%s", einv->local, vstr, get_obj_name_by_proto(einv->vnum), keepstr, totalstr);
+			build_page_display(ch, "(%4d) %s%s%s%s%s", einv->local, vstr, GET_OBJ_SHORT_DESC(proto), compstr, keepstr, totalstr);
 			any = TRUE;
 		}
 		

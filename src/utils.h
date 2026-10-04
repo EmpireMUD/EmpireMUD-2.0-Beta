@@ -1922,6 +1922,7 @@ extern struct weather_data weather_info;	// db.c
 void add_pair_hash(struct pair_hash **hash, int id, int value);
 void add_string_hash(struct string_hash **hash, const char *string, int count);
 void add_vnum_hash(struct vnum_hash **hash, any_vnum vnum, int count);
+bool ends_in_punct(const char *string);
 struct pair_hash *find_in_pair_hash(struct pair_hash *hash, int id);
 struct string_hash *find_in_string_hash(struct string_hash *hash, const char *string);
 struct vnum_hash *find_in_vnum_hash(struct vnum_hash *hash, any_vnum vnum);
@@ -2114,7 +2115,7 @@ char *show_color_codes(char *string);
 char *str_dup(const char *source);
 char *str_replace(const char *search, const char *replace, const char *subject);
 char *str_str(const char *cs, const char *ct);
-char *strip_color(char *input);
+char *strip_color(const char *input);
 char *stripcr(char *dest, const char *src);
 void strip_crlf(char *buffer);
 char *strtolower(char *str);

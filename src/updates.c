@@ -5048,6 +5048,25 @@ void b5_213_immortal_empire_update(void) {
 }
 
 
+// b5.216: Purchased goals no longer count toward points.
+void b5_216_progress_points_update(void) {
+	empire_data *emp, *next_emp;
+	progress_data *prg;
+	struct empire_completed_goal *goal, *next_goal;
+	
+	HASH_ITER(hh, empire_table, emp, next_emp) {
+		HASH_ITER(hh, EMPIRE_COMPLETED_GOALS(emp), goal, next_goal) {
+			if ((prg = real_progress(goal->vnum))) {
+				if (PRG_COST(prg)) {
+					SAFE_ADD(EMPIRE_PROGRESS_POINTS(emp, PRG_TYPE(prg)), -PRG_COST(prg), INT_MIN, INT_MAX, FALSE);
+					EMPIRE_NEEDS_SAVE(emp) = TRUE;
+				}
+			}
+		}
+	}
+}
+
+
 // ADD HERE, above: more beta 5 update functions
 
 
@@ -5181,6 +5200,7 @@ const struct {
 	{ "b5.212a", b5_212a_stables_update, NULL, "Removing learned recipe for Stables; this now just requires the Build ability" },
 	{ "b5.212b", NULL, b5_212_update_player_informative, "Updating players with new private informative flag" },
 	{ "b5.213", b5_213_immortal_empire_update, NULL, "Adding new admin flag to immortal empires" },
+	{ "b5.216", b5_216_progress_points_update, NULL, "Updating progress points because purchases no longer add points" },
 	
 	// ADD HERE, above: more beta 5 update lines
 	

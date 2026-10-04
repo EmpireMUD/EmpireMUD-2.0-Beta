@@ -7137,10 +7137,10 @@ ACMD(do_moveeinv) {
 
 
 ACMD(do_oset) {
-	char obj_arg[MAX_INPUT_LENGTH], field_arg[MAX_INPUT_LENGTH], val_arg[MAX_INPUT_LENGTH];
+	char obj_arg[MAX_INPUT_LENGTH], field_arg[MAX_INPUT_LENGTH], val_arg[MAX_INPUT_LENGTH], was_str[MAX_STRING_LENGTH];
 	char *obj_arg_ptr = obj_arg;
 	obj_data *obj;
-	int number, which;
+	int number, which, was_int;
 	bool was_lit;
 	
 	argument = one_argument(argument, obj_arg);
@@ -7180,8 +7180,10 @@ ACMD(do_oset) {
 				msg_to_char(ch, "You restore its original keywords.\r\n");
 			}
 			else {
+				strcpy(was_str, NULLSAFE(GET_OBJ_KEYWORDS(obj)));
 				set_obj_keywords(obj, argument);
 				msg_to_char(ch, "You change its keywords to '%s'.\r\n", GET_OBJ_KEYWORDS(obj));
+				msg_to_char(ch, "Previous value: %s\r\n", was_str);
 			}
 		}
 	}
@@ -7195,8 +7197,10 @@ ACMD(do_oset) {
 				msg_to_char(ch, "You restore its original long description.\r\n");
 			}
 			else {
+				strcpy(was_str, NULLSAFE(GET_OBJ_LONG_DESC(obj)));
 				set_obj_long_desc(obj, argument);
 				msg_to_char(ch, "You change its long description to '%s'.\r\n", GET_OBJ_LONG_DESC(obj));
+				msg_to_char(ch, "Previous value: %s\r\n", was_str);
 			}
 		}
 	}
@@ -7210,8 +7214,10 @@ ACMD(do_oset) {
 				msg_to_char(ch, "You restore its original short description.\r\n");
 			}
 			else {
+				strcpy(was_str, NULLSAFE(GET_OBJ_SHORT_DESC(obj)));
 				set_obj_short_desc(obj, argument);
 				msg_to_char(ch, "You change its short description to '%s'.\r\n", GET_OBJ_SHORT_DESC(obj));
+				msg_to_char(ch, "Previous value: %s\r\n", was_str);
 			}
 		}
 	}
@@ -7220,10 +7226,11 @@ ACMD(do_oset) {
 			msg_to_char(ch, "Set the timer to what?\r\n");
 		}
 		else {
+			was_int = GET_OBJ_TIMER(obj);
 			GET_OBJ_TIMER(obj) = atoi(argument);
 			schedule_obj_timer_update(obj, TRUE);
 			request_obj_save_in_world(obj);
-			msg_to_char(ch, "You change its timer to %d.\r\n", GET_OBJ_TIMER(obj));
+			msg_to_char(ch, "You change its timer to %d (from %d).\r\n", GET_OBJ_TIMER(obj), was_int);
 		}
 	}
 	else if (is_abbrev(field_arg, "value")) {
@@ -7244,9 +7251,10 @@ ACMD(do_oset) {
 		}
 		else {
 			// ok:
+			was_int = GET_OBJ_VAL(obj, which);
 			set_obj_val(obj, which, atoi(argument));
 			syslog(SYS_GC, GET_ACCESS_LEVEL(ch), TRUE, "ABUSE: %s has set value %d of obj %s to %d at %s", GET_NAME(ch), which, GET_OBJ_SHORT_DESC(obj), GET_OBJ_VAL(obj, which), room_log_identifier(IN_ROOM(ch)));
-			msg_to_char(ch, "You set value %d to %d.\r\n", which, GET_OBJ_VAL(obj, which));
+			msg_to_char(ch, "You set value %d to %d (from %d).\r\n", which, GET_OBJ_VAL(obj, which), was_int);
 		}
 	}
 	else {

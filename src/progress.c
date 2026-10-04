@@ -608,14 +608,10 @@ void apply_progress_to_empire(empire_data *emp, progress_data *prg, bool add) {
 		return;	// sanitation
 	}
 	
-	// apply points/cost
+	// apply value as points (costs are not applied to this as of b5.216)
 	if (PRG_VALUE(prg)) {	// adds to point total and pool
 		SAFE_ADD(EMPIRE_PROGRESS_POINTS(emp, PRG_TYPE(prg)), (add ? PRG_VALUE(prg) : -PRG_VALUE(prg)), INT_MIN, INT_MAX, FALSE);
 		SAFE_ADD(EMPIRE_ATTRIBUTE(emp, EATT_PROGRESS_POOL), (add ? PRG_VALUE(prg) : -PRG_VALUE(prg)), INT_MIN, INT_MAX, FALSE);
-	}
-	if (PRG_COST(prg)) {	// adds to point total, subtracts from pool
-		SAFE_ADD(EMPIRE_PROGRESS_POINTS(emp, PRG_TYPE(prg)), (add ? PRG_COST(prg) : -PRG_COST(prg)), INT_MIN, INT_MAX, FALSE);
-		SAFE_ADD(EMPIRE_ATTRIBUTE(emp, EATT_PROGRESS_POOL), (add ? -PRG_COST(prg) : PRG_COST(prg)), INT_MIN, INT_MAX, FALSE);
 	}
 	
 	// PRG_PERK_x: apply perks
@@ -1925,7 +1921,7 @@ bool audit_progress(progress_data *prg, char_data *ch) {
 		olc_audit_msg(ch, PRG_VNUM(prg), "No name set");
 		problem = TRUE;
 	}
-	if (ispunct(*(PRG_NAME(prg) + strlen(PRG_NAME(prg)) - 1))) {
+	if (ends_in_punct(PRG_NAME(prg))) {
 		olc_audit_msg(ch, PRG_VNUM(prg), "Name ends with punctuation");
 		problem = TRUE;
 	}

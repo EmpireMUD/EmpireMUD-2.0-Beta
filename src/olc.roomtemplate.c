@@ -66,7 +66,7 @@ bool audit_room_template(room_template *rmt, char_data *ch) {
 		olc_audit_msg(ch, GET_RMT_VNUM(rmt), "Title not capitalized");
 		problem = TRUE;
 	}
-	if (ispunct(GET_RMT_TITLE(rmt)[strlen(GET_RMT_TITLE(rmt)) - 1])) {
+	if (ends_in_punct(GET_RMT_TITLE(rmt))) {
 		olc_audit_msg(ch, GET_RMT_VNUM(rmt), "Title is punctuated");
 		problem = TRUE;
 	}

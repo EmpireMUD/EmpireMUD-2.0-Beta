@@ -579,6 +579,7 @@ EMPIREINVENTORY EINVENTORY EINV
 
 Usage:  empireinventory [item | all]
         einventory [item | all]
+        einventory -c <component type>
        
 The EInventory command shows the contents of all storage buildings and rooms
 for the island you're currently on. It won't work out in the ocean. You can
@@ -587,7 +588,7 @@ use the ship command to move resources between multiple islands.
 You can specify an item name to see only matching items. If you specify a name,
 it'll show them whether or not the item is stored on your current island. If
 you don't specify a name, you can see all items regardless of where they are
-stored using "EInv all".
+stored using "EInv all". You can also search by component type.
 
 You can use "warehouse inventory" to see items in warehouse (unique) storage.
 
@@ -595,7 +596,7 @@ You can use "warehouse inventory" to see items in warehouse (unique) storage.
 their own empire. If the empire name has more than one word, you can use
 quotation marks.
 
-See also: AUTOSTORE, EFIND, SHIPPING, WORKFORCE, EIDENTIFY
+See also: AUTOSTORE, COMPONENT TYPES, EFIND, SHIPPING, WORKFORCE, EIDENTIFY
 #
 "EMPIRE SCORE" ESCORE
 

@@ -748,6 +748,7 @@ int sort_chart_hash(struct chart_territory *a, struct chart_territory *b) {
 */
 void look_at_target(char_data *ch, char *arg, char *more_args, bool look_inside) {
 	char targ_arg[MAX_INPUT_LENGTH];
+	char *desc_ptr;
 	int found = FALSE, fnum;
 	bitvector_t bits;
 	char_data *found_char = NULL, *proto, *ch_iter;
@@ -838,7 +839,10 @@ void look_at_target(char_data *ch, char *arg, char *more_args, bool look_inside)
 			else {
 				act("You look at $p:", FALSE, ch, found_obj, NULL, TO_CHAR | TO_PAGE_DISPLAY);
 			}
-			build_page_display_str(ch, obj_desc_for_char(found_obj, ch, OBJ_DESC_LOOK_AT));	/* Show no-description */
+			desc_ptr = obj_desc_for_char(found_obj, ch, OBJ_DESC_LOOK_AT);
+			if (desc_ptr && *desc_ptr) {
+				build_page_display_str(ch, desc_ptr);	/* Show no-description */
+			}
 			
 			found = TRUE;
 			if (look_inside && (IS_CONTAINER(found_obj) || IS_CORPSE(found_obj) || IS_DRINK_CONTAINER(found_obj))) {
@@ -3133,17 +3137,15 @@ ACMD(do_chart) {
 		
 		// alternate names
 		if (isle->id != NO_ISLAND) {
+			num = 0;
+			
 			if (GET_LOYALTY(ch) && (e_isle = get_empire_island(GET_LOYALTY(ch), isle->id)) && e_isle->name && strcmp(e_isle->name, isle->name)) {
 				// show global name if different
 				msg_to_char(ch, "Also known as: %s", isle->name);
 				num = 1;
 			}
-			else {
-				num = 0;	// not shown yet
-			}
 		
 			// alternate names
-			num = 0;
 			HASH_ITER(hh, empire_table, emp, next_emp) {
 				if (EMPIRE_IS_TIMED_OUT(emp) || emp == GET_LOYALTY(ch)) {
 					continue;

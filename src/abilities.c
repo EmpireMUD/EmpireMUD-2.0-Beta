@@ -7498,6 +7498,7 @@ void perform_ability_command(char_data *ch, ability_data *abil, char *argument) 
 	}
 	else if (!validate_ability_target(ch, abil, vict, ovict, vvict, room_targ, multi_targ, TRUE, NULL)) {
 		// sent own message
+		command_lag(ch, ABIL_WAIT_TYPE(abil));
 		return;
 	}
 	

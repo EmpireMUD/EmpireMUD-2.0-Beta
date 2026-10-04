@@ -54,7 +54,7 @@ int Board_show_board(int board_type, char_data *ch, char *arg, obj_data *board);
 int Board_remove_msg(int board_type, char_data *ch, char *arg, obj_data *board);
 int Board_write_message(int board_type, char_data *ch, char *arg, obj_data *board);
 int Board_respond_message(int board_type, char_data *ch, char *arg, obj_data *board);
-void Board_display_response(int board_type, int slot_num, char *output, obj_data *board, bool reply);
+void Board_display_response(int board_type, int slot_num, char_data *ch, obj_data *board, bool reply);
 void Board_save_board(int board_type);
 void Board_load_board(int board_type);
 void Board_reset_board(int board_num);

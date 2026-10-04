@@ -82,7 +82,7 @@ bool audit_object(obj_data *obj, char_data *ch) {
 		olc_audit_msg(ch, GET_OBJ_VNUM(obj), "Long desc not set");
 		problem = TRUE;
 	}
-	if (!ispunct(GET_OBJ_LONG_DESC(obj)[strlen(GET_OBJ_LONG_DESC(obj)) - 1])) {
+	if (!ends_in_punct(GET_OBJ_LONG_DESC(obj))) {
 		olc_audit_msg(ch, GET_OBJ_VNUM(obj), "Long desc missing punctuation");
 		problem = TRUE;
 	}
@@ -99,7 +99,7 @@ bool audit_object(obj_data *obj, char_data *ch) {
 		olc_audit_msg(ch, GET_OBJ_VNUM(obj), "Short desc capitalized");
 		problem = TRUE;
 	}
-	if (ispunct(GET_OBJ_SHORT_DESC(obj)[strlen(GET_OBJ_SHORT_DESC(obj)) - 1])) {
+	if (ends_in_punct(GET_OBJ_SHORT_DESC(obj))) {
 		olc_audit_msg(ch, GET_OBJ_VNUM(obj), "Short desc has punctuation");
 		problem = TRUE;
 	}
@@ -369,7 +369,7 @@ bool audit_object(obj_data *obj, char_data *ch) {
 			break;
 		}
 		case ITEM_LIGHT: {
-			if (GET_LIGHT_HOURS_REMAINING(obj) == UNLIMITED && GET_OBJ_TIMER(obj) <= 0) {
+			if (GET_LIGHT_HOURS_REMAINING(obj) == UNLIMITED && GET_OBJ_TIMER(obj) <= 0 && CAN_WEAR(obj, ITEM_WEAR_TAKE)) {
 				olc_audit_msg(ch, GET_OBJ_VNUM(obj), "Infinite light (LIGHT item type)");
 				problem = TRUE;
 			}

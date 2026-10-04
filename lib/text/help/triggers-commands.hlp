@@ -968,6 +968,8 @@ Examples:
 
 This command is grantable under the 'triggers' grant.
 
+Note: You cannot attach triggers to empires.
+
 See also: TATTACH, TRIG-DETACH, TRIG-ATTACH, OLC, TRIGEDIT, STAT
 #d
 %TELEPORT% MTELEPORT OTELEPORT VTELEPORT WTELEPORT
@@ -994,8 +996,6 @@ room template vnum instead of live room number (if used in an instanced zone).
 Examples:
   %teleport% all i17401
   %teleport% %actor% %actor.home%
-
-Note: You cannot attach triggers to empires.
 #d
 %TERRACROP% MTERRACROP OTERRACROP VTERRACROP WTERRACROP
 

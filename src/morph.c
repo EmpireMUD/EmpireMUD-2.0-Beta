@@ -436,7 +436,7 @@ bool audit_morph(morph_data *morph, char_data *ch) {
 		olc_audit_msg(ch, MORPH_VNUM(morph), "Short desc capitalized");
 		problem = TRUE;
 	}
-	if (ispunct(MORPH_SHORT_DESC(morph)[strlen(MORPH_SHORT_DESC(morph)) - 1])) {
+	if (ends_in_punct(MORPH_SHORT_DESC(morph))) {
 		olc_audit_msg(ch, MORPH_VNUM(morph), "Short desc has punctuation");
 		problem = TRUE;
 	}
@@ -445,7 +445,7 @@ bool audit_morph(morph_data *morph, char_data *ch) {
 		olc_audit_msg(ch, MORPH_VNUM(morph), "No long description");
 		problem = TRUE;
 	}
-	if (!ispunct(MORPH_LONG_DESC(morph)[strlen(MORPH_LONG_DESC(morph)) - 1])) {
+	if (!ends_in_punct(MORPH_LONG_DESC(morph))) {
 		olc_audit_msg(ch, MORPH_VNUM(morph), "Long desc missing punctuation");
 		problem = TRUE;
 	}
