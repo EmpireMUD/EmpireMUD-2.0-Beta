@@ -613,6 +613,11 @@ void apply_progress_to_empire(empire_data *emp, progress_data *prg, bool add) {
 		SAFE_ADD(EMPIRE_PROGRESS_POINTS(emp, PRG_TYPE(prg)), (add ? PRG_VALUE(prg) : -PRG_VALUE(prg)), INT_MIN, INT_MAX, FALSE);
 		SAFE_ADD(EMPIRE_ATTRIBUTE(emp, EATT_PROGRESS_POOL), (add ? PRG_VALUE(prg) : -PRG_VALUE(prg)), INT_MIN, INT_MAX, FALSE);
 	}
+	if (PRG_COST(prg)) {	// subtracts from pool
+		// no longer adds cost to the points total as of b5.216
+		// SAFE_ADD(EMPIRE_PROGRESS_POINTS(emp, PRG_TYPE(prg)), (add ? PRG_COST(prg) : -PRG_COST(prg)), INT_MIN, INT_MAX, FALSE);
+		SAFE_ADD(EMPIRE_ATTRIBUTE(emp, EATT_PROGRESS_POOL), (add ? -PRG_COST(prg) : PRG_COST(prg)), INT_MIN, INT_MAX, FALSE);
+	}
 	
 	// PRG_PERK_x: apply perks
 	LL_FOREACH(PRG_PERKS(prg), perk) {
