@@ -1487,7 +1487,7 @@ unleash~
 return 1
 * word list for adjectives
 set adj_list horrifying monstrous terrifying gargantuan dreadful nightmarish eldritch spectral otherworldly ghastly unearthly macabre sinister diabolical phantom hulking beastly grim cursed accursed demonic infernal
-set adj_size 23
+set adj_size 22
 * basics
 if !%arg%
   %send% %actor% Unleash what?
