@@ -7480,7 +7480,7 @@ ACMD(do_progress) {
 		}
 		
 		// show current progress in that category
-		build_page_display(ch, "%s goals (%d points):", progress_types[cat], EMPIRE_PROGRESS_POINTS(emp, cat));
+		build_page_display(ch, "%s goals (%d point%s):", progress_types[cat], EMPIRE_PROGRESS_POINTS(emp, cat), PLURAL(EMPIRE_PROGRESS_POINTS(emp, cat)));
 		
 		// show current goals
 		any = 0;
@@ -7544,7 +7544,7 @@ ACMD(do_progress) {
 				}
 			}
 		}
-		build_page_display(ch, "- %d completed goals, %d rewards bought", complete, bought);
+		build_page_display(ch, "- %d completed goal%s, %d reward%s bought", complete, PLURAL(complete), bought, PLURAL(bought));
 		
 		send_page_display(ch);
 	}
