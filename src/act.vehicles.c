@@ -1573,7 +1573,7 @@ ACMD(do_dispatch) {
 	
 	// ready ready go
 	else {
-		if (!(worker = find_chore_worker_in_room(GET_LOYALTY(ch), IN_ROOM(veh), veh, OVERSEER))) {
+		if (!(worker = find_chore_worker_in_room(GET_LOYALTY(ch), IN_ROOM(veh), NULL, OVERSEER))) {
 			if ((npc = find_free_npc_for_chore(GET_LOYALTY(ch), IN_ROOM(veh)))) {
 				worker = spawn_empire_npc_to_room(GET_LOYALTY(ch), npc, IN_ROOM(veh), OVERSEER);
 			}
