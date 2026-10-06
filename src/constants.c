@@ -955,7 +955,7 @@ const char *condition_types[] = {
 // CUSTOM_COLOR_x
 const char *custom_color_types[] = {
 	"emote",	// 0
-	"esay",
+	"etalk",
 	"gsay",
 	"oocsay",
 	"say",
