@@ -539,7 +539,7 @@ different language for a single say/shout with #language-name. For example:
 
 You can join or create new slash-channels with /join and leave with /leave.
 
-See also: TOGGLE, SAY, SLASH-CHANNELS, LANGUAGE
+See also: TOGGLE, RECOLOR, SAY, SLASH-CHANNELS, LANGUAGE
 #
 CHARISMA CHA
 
@@ -668,7 +668,7 @@ game balance.
 If you don't want to see alerts when your cooldowns expire, you can turn them
 off with the "smessages" command.
 
-See also: STATUS MESSAGES
+See also: RECOLOR, STATUS MESSAGES
 #
 DAMAGE "DAMAGE TEXT" "DAMAGE MESSAGES" SCRATCH BATTER WALLOP FEROCIOUSLY RUTHLESSLY MAUL RAVAGE MASSACRE DECIMATE BRUTALLY VICIOUSLY CRUSH WRECK OBLITERATE ANNIHILATE MUTILATE SLAUGHTER DEMOLISH DEVASTATE ERADICATE LIQUIDATE EXTERMINATE VANQUISH CONQUER
 
@@ -1903,7 +1903,7 @@ Example:
 Immortals may also:  /recase <channel> <new capitalization>
                      /echo <channel> <text>  (this requires the GECHO grant)
 
-See also: CHANNELS
+See also: CHANNELS, RECOLOR
 #
 SPEAR
 
@@ -2015,7 +2015,7 @@ off sunrise and sunset messages.
 You can check the current time of day with the "time" command, which will also
 tell you whether it's daytime or nighttime.
 
-See also: PROMPT, STATUS MESSAGES, TIME
+See also: RECOLOR, PROMPT, STATUS MESSAGES, TIME
 #
 TAGS "MOB TAGS" TAGGING "MOB TAGGING"
 
