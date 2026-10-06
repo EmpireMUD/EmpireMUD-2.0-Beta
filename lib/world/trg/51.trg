@@ -617,7 +617,7 @@ end
 * 301~400: 5103
 * 401~500: 5104
 eval shard_type 5100 + ((%level_modified%-1) / 100)
-eval currency_name %%currency.%shard_type%%%
+eval currency_name %%currency.%shard_type%(%shard_value%)%%
 if !%currency_name% || %currency_name% == UNKNOWN
   %send% %actor% @%target% is too high level to shatter into any current type of shard!
   halt
@@ -627,7 +627,7 @@ if %shard_value% < 1 || %target.quest%
   halt
 end
 %send% %actor% You shatter @%target% into %shard_value% %currency_name%.
-%echoaround% %actor% ~%actor% shatters @%target% into %currency_name%.
+%echoaround% %actor% ~%actor% shatters @%target% into %shard_value% %currency_name%.
 eval money %%actor.give_currency(%shard_type%, %shard_value%)%%
 nop %money%
 %purge% %target%
