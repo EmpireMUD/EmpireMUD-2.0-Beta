@@ -345,9 +345,9 @@ C
 50 150
 S
 #10222
-whistle warg~
-a warg whistle~
-A warg whistle is lying here.~
+whistle warg mount~
+a warg mount whistle~
+A warg mount whistle is lying here.~
 It looks like you could use it to summon a land mount.
 ~
 3 p a 0 0 13
@@ -356,9 +356,9 @@ It looks like you could use it to summon a land mount.
 T 9910
 S
 #10224
-whistle winged wolf~
-a winged wolf whistle~
-A winged wolf whistle is lying here.~
+whistle winged wolf flying mount~
+a winged wolf flying mount whistle~
+A winged wolf flying mount whistle is lying here.~
 It looks like you could use it to summon a flying mount.
 ~
 3 p a 0 0 14
@@ -837,9 +837,9 @@ The burning branch spits and sparks as pockets of sap catch fire.
 0 0
 S
 #10263
-whistle bone small dracosaur~
-a dracosaur whistle~
-A small bone whistle is lying on the ground.~
+whistle bone small dracosaur mount~
+a dracosaur mount whistle~
+A small bone mount whistle is lying on the ground.~
 This whistle can be used just once, to summon a dracosaur mount.
 ~
 3 0 a 0 0 2
@@ -1298,10 +1298,10 @@ C
 1 1
 S
 #10286
-whistle bone strange terrosaur~
-a terrosaur whistle~
-A strange bone whistle is lying on the ground.~
-This whistle can be used just once, to summon a terrosaur mount.
+whistle bone strange terrosaur flying mount~
+a terrosaur flying mount whistle~
+A strange bone flying mount whistle is lying on the ground.~
+This whistle can be used just once, to summon a flying terrosaur mount.
 ~
 3 0 a 0 0 2
 10286 0 0
