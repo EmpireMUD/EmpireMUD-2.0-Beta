@@ -1145,7 +1145,7 @@ if %chance% > %actor.skill(Stealth)%
   %at% %room% %echo% A guard arrives!
   %at% %room% %load% mob 18824 %actor.level%
   set guard %room.people%
-  if %guard.vnum% == 18824
+  if %guard.vnum% == 18824 && %guard.room% == %actor.room% && %guard.can_see(%actor%)%
     %force% %guard% mhunt %actor%
   end
 else
