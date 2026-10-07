@@ -11,7 +11,7 @@ dg_affect %actor% INFRA on 300
 ~
 #10501
 Magiterranean Terracrop~
-0 in 100 36
+0 in 100 41
 L e 5112
 L e 5174
 L g 10500
@@ -47,10 +47,15 @@ L h 50
 L h 54
 L h 56
 L h 90
+L h 10562
+L h 10563
+L h 10564
+L h 10565
+L h 10566
 L j 10500
 ~
 * Valid terrains:
-set valid_sects 0 1 2 3 4 7 13 36 37 38 39 40 41 42 43 44 45 50 54 56 90
+set valid_sects 0 1 2 3 4 7 13 36 37 38 39 40 41 42 43 44 45 50 54 56 90 10562 10563 10564 10565 10566
 *
 * Same list exists in #10507 for cleaning up
 *
