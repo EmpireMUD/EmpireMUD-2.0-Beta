@@ -408,9 +408,9 @@ This looks like someone has thrown a bog roll over the house, repeatedly!
 0 144
 S
 #18826
-whistle psychic~
-a psychic whistle~
-A whistle that's slightly psychic has been left here.~
+whistle psychic minipet~
+a psychic minipet whistle~
+A minipet whistle that's slightly psychic has been left here.~
 This whistle can grant you a minipet!
 Type 'use whistle' to get it.
 ~
@@ -627,9 +627,9 @@ Usage:  upgrade <item>
 T 18838
 S
 #18839
-whistle headless horse~
-a headless horse whistle~
-A headless horse whistle is lying here.~
+whistle headless horse mount~
+a headless horse mount whistle~
+A headless horse mount whistle is lying here.~
 This whistle will summon an eerie new mount.
 ~
 3 p a 0 0 6
@@ -638,9 +638,9 @@ This whistle will summon an eerie new mount.
 T 9910
 S
 #18840
-whistle nightmare~
-a nightmare whistle~
-A nightmare whistle dangles in the air.~
+whistle nightmare flying mount~
+a nightmare flying mount whistle~
+A nightmare flying mount whistle dangles in the air.~
 This whistle will summon an eerie flying mount.
 ~
 3 p a 0 0 7
@@ -649,9 +649,9 @@ This whistle will summon an eerie flying mount.
 T 9910
 S
 #18841
-whistle ghoul~
-a ghoul whistle~
-A ghoul whistle has been dropped here.~
+whistle ghoul minipet~
+a ghoul minipet whistle~
+A ghoul minipet whistle has been dropped here.~
 This whistle can grant you a minipet!
 Type 'use whistle' to get it.
 ~
@@ -908,9 +908,9 @@ C
 1 400
 S
 #18859
-whistle bone fading~
-a fading bone whistle~
-A fading bone whistle floats before you.~
+whistle bone fading minipet~
+a fading bone minipet whistle~
+A fading bone minipet whistle floats before you.~
    This curious whistle appears to be made of bone, but you can see right
 through it and you have trouble grasping or blowing the whistle. What sort of
 thing is both bone and ghost at once?
@@ -1055,9 +1055,9 @@ C
 Q 18873
 S
 #18875
-whistle tooth hollow~
-a tooth whistle~
-A hollowed out tooth has been shaped into a whistle.~
+whistle tooth hollow mount~
+a tooth mount whistle~
+A hollowed out tooth has been shaped into a mount whistle.~
    Use this whistle to call a special zombie mount, whom this tooth was
 originally ripped from.
 ~
@@ -1136,9 +1136,9 @@ Usage:  use ooze <headless horse OR giant tarantula>
 T 18878
 S
 #18879
-whistle tarantula~
-a tarantula whistle~
-A tarantula whistle is lying here.~
+whistle tarantula mount~
+a tarantula mount whistle~
+A tarantula mount whistle is lying here.~
    Using this whistle will summon a giant tarantula mount. If it's as hairy as
 the whistle, you're not sure you want to see it.
 ~
@@ -1242,9 +1242,9 @@ A
 T 18884
 S
 #18885
-whistle well-stitched stitched~
-a well-stitched whistle~
-A well-stitched whistle is lying here.~
+whistle well-stitched stitched minipet~
+a well-stitched minipet whistle~
+A well-stitched minipet whistle is lying here.~
 This whistle grants you a zombie terrier minipet. Use the whistle to get it.
 ~
 19 p a 0 0 6

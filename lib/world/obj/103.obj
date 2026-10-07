@@ -265,9 +265,9 @@ There's nothing in the nest.
 T 10331
 S
 #10334
-whistle wyvern~
-a wyvern whistle~
-A wyvern whistle is lying here.~
+whistle wyvern minipet~
+a wyvern minipet whistle~
+A wyvern minipet whistle is lying here.~
 The wyvern whistle can be used to summon a noncombat pet!
 Type 'use whistle' to summon it.
 ~
@@ -276,9 +276,9 @@ Type 'use whistle' to summon it.
 14 0
 S
 #10335
-whistle emerald~
-an emerald whistle~
-An emerald whistle is lying here.~
+whistle emerald dragon flying mount~
+an emerald dragon flying mount whistle~
+An emerald dragon flying mount whistle is lying here.~
 This whistle is sure to summon an emerald dragon mount.
 Type 'use whistle' to use it.
 ~

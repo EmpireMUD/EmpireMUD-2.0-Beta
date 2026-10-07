@@ -80,9 +80,9 @@ M
 The swamp hag, $n, is standing here.~
 S
 #19007
-whistle swamp rat~
-a swamp rat whistle~
-A swamp rat whistle is on the ground.~
+whistle swamp rat minipet~
+a swamp rat minipet whistle~
+A swamp rat  minipetwhistle is on the ground.~
 This whistle can summon a noncombat pet!
 Type 'use whistle' to summon it.
 ~
@@ -91,9 +91,9 @@ Type 'use whistle' to summon it.
 0 0
 S
 #19008
-whistle rous r.o.u.s.~
-an R.O.U.S. whistle~
-An R.O.U.S. whistle is lying here.~
+whistle rous r.o.u.s. mount~
+an R.O.U.S. mount whistle~
+An R.O.U.S. mount whistle is lying here.~
    This whistle is made mostly from rat hair. It looks like you could use it to
 summon a land mount.
 ~
@@ -103,9 +103,9 @@ summon a land mount.
 T 9910
 S
 #19009
-whistle manatee~
-a manatee whistle~
-A manatee whistle is here.~
+whistle manatee aquatic mount~
+a manatee aquatic mount whistle~
+A manatee aquatic mount whistle is here.~
    This whistle is made mostly from rat hair. It looks like you could use it to
 summon a aquatic mount.
 ~

@@ -297,9 +297,9 @@ C
 225 225
 S
 #12016
-whistle hawk~
-a hawk whistle~
-A hawk whistle is lying here.~
+whistle hawk minipet~
+a hawk minipet whistle~
+A hawk minipet whistle is lying here.~
 This whistle can summon a noncombat pet!
 Type 'use whistle' to summon it.
 ~
@@ -321,9 +321,9 @@ Usage: build tombofanat <direction>
 7 0
 S
 #12018
-whistle Yatpans Yatpan's~
-Yatpan's whistle~
-Yatpan's whistle is lying here.~
+whistle Yatpans Yatpan's flying mount~
+Yatpan's flying mount whistle~
+Yatpan's flying mount whistle is lying here.~
    This old wooden whistle looks like it has seen better days. But it is
 inscribed with the dual symbols of the old god Anat and her faithful attendant
 Yatpan, who takes the form of a hawk. Type 'use whistle' to summon a flying
@@ -677,9 +677,9 @@ M
 $n opens a jar of thunder, which swirls into the air and becomes $V!~
 S
 #12047
-whistle bronze bull~
-a bronze bull whistle~
-A bronze bull whistle is lying here.~
+whistle bronze bull minipet~
+a bronze bull minipet whistle~
+A bronze bull minipet whistle is lying here.~
 This whistle can summon a noncombat pet!
 Type 'use whistle' to summon it.
 ~
@@ -688,9 +688,9 @@ Type 'use whistle' to summon it.
 2 0
 S
 #12048
-whistle lightning~
-a lightning whistle~
-A lightning whistle is lying here.~
+whistle lightning flying mount~
+a lightning flying mount whistle~
+A lightning flying mount whistle is lying here.~
    This strange bronze whistle has a lightningbolt carved on it, along with the
 name Ba'al Hadad. Type 'use whistle' to summon a new flying mount.
 ~

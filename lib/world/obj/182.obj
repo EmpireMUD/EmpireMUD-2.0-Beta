@@ -311,8 +311,8 @@ Q 18245
 T 18229
 S
 #18225
-whistle tortoise baby~
-a baby tortoise whistle~
+whistle tortoise baby minipet~
+a baby tortoise minipet whistle~
 A baby tortoise is lying here.~
 This whistle can summon a noncombat pet!
 Type 'use whistle' to summon it.
@@ -322,9 +322,9 @@ Type 'use whistle' to summon it.
 2 0
 S
 #18226
-whistle ninja tortoise~
-a ninja tortoise whistle~
-A ninja tortoise whistle is lying here.~
+whistle ninja tortoise minipet~
+a ninja tortoise minipet whistle~
+A ninja tortoise minipet whistle is lying here.~
 This whistle can summon a noncombat pet!
 Type 'use whistle' to summon it.
 ~
@@ -333,9 +333,9 @@ Type 'use whistle' to summon it.
 2 0
 S
 #18227
-whistle dragon turtle~
-a dragon turtle whistle~
-A dragon turtle whistle is lying here.~
+whistle dragon turtle minipet~
+a dragon turtle minipet whistle~
+A dragon turtle minipet whistle is lying here.~
 This whistle can summon a noncombat pet!
 Type 'use whistle' to summon it.
 ~
@@ -866,9 +866,9 @@ off...
 Q 18281
 S
 #18284
-whistle imaginary~
-an imaginary whistle~
-An imaginary whistle might be here.~
+whistle imaginary flying mount~
+an imaginary flying mount whistle~
+An imaginary flying mount whistle might be here.~
    This whistle might or might not summon a flying mount who might or might not
 be real, if you 'use whistle'.
 ~
