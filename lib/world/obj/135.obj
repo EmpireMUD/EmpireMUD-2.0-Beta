@@ -274,9 +274,11 @@ A tarnished key lies on the ground.~
    The key is old and worn.
    The best way to forget something is to lock it away underground.
 ~
-3 kp a 0 0 2
+3 kp a 0 0 3
 0 0 0
 3 0
+C
+1 1
 T 13519
 S
 #13513
@@ -483,9 +485,11 @@ or a thought half-forgotten.
    This memento is required to craft certain items.
    Every tombstone is a memorial, but stone outlives even memory.
 ~
-3 0 a 0 0 3
+3 0 a 0 0 4
 0 0 0
 1 0
+C
+1 1
 M
 33
 This item is used to craft items from High Temple: Long-Lost Labyrinth.~
@@ -841,7 +845,7 @@ A small hoard of gold is scattered here.~
    On closer inspection much of this is actually bronze. But the few gold
 pieces that are here look valuable enough to keep. Bits of old cobweb bind the
 collection together.
-   As it reaches maturity, the speculari begins to assemble a shell of objects 
+   As it reaches maturity, the speculari begins to assemble a shell of objects
 that will help it blend into its surroundings. Its silvery body is particularly
 suited to reflecting shiny things.
 ~
@@ -1873,9 +1877,11 @@ wear marks on either blade.
    Symbols of power and authority come in many shapes in sizes, but they so
 often take the form of the tools that built a land or the weapons that took it.
 ~
-15 0 a 0 0 5
+15 0 a 0 0 6
 54 0 0
 4 0
+C
+1 1
 R
 4 5611 a
 S
@@ -1890,9 +1896,11 @@ the weight, it might be nearly pure gold.
 ill-gotten gains. When one is desperate, the same prize may serve as grave
 goods a second time.
 ~
-15 0 a 0 0 6
+15 0 a 0 0 7
 96 0 0
 4 0
+C
+1 1
 R
 4 5611 a
 S
@@ -1983,9 +1991,11 @@ out melodically. The end might once have held a lanyard, but it's long gone.
    Sculpture was once considered a divine art and to the greatest artist was
 bestowed the power to bring stone to life.
 ~
-3 0 a 0 0 8
+3 0 a 0 0 9
 13582 0 0
 1 0
+C
+1 1
 T 9910
 S
 #13583
