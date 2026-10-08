@@ -437,7 +437,9 @@ Halloween: Bobbing for Apples~
 gift you with an apple bobbing bucket, and now its time to have some fun.
 Challenge another player to an apple bobbing contest and get the biggest one to
 complete this quest.
-   Put the bucket on the ground, type 'challenge <player>', then 'bob bucket.
+   Put the bucket on the ground, type 'challenge <player>', then 'bob bucket'
+when prompted. Then type 'stand' when you're ready to stand up with an apple.
+Both players will take a turn; the largest apple wins.
 ~
 Good job finding the bigger apple. Hopefully you had some fun doing it.
 ~

@@ -2437,7 +2437,7 @@ if %self.varexists(same_round)%
   return 1
   halt
 end
-%send% %actor% You dip your head into the water of the bucket and start looking for an apple.
+%send% %actor% You dip your head into the water of the bucket and start looking for an apple. Type 'stand' when you're ready to grab one and complete your turn.
 %echoaround% %actor% ~%actor% sticks ^%actor% head into the bucket and starts looking for an apple.
 set start_bob %timestamp%
 remote start_bob %self.id%
@@ -2520,6 +2520,9 @@ if %cmd% == stand
   if %time% == 0
     %send% %actor% You stand back up immediately, with no apple.
     %echoaround% %actor% ~%actor% stands back up immediately with no apple in ^%actor% mouth.
+    if %actor% != %self.owner%
+      %send% %self.owner% It's your turn next. Type 'bob bucket' to start.
+    end
     return 1
     halt
   end
@@ -2588,6 +2591,7 @@ if %cmd% == stand
     remote ch_apple %self.id%
     set turn %self.owner%
     remote turn %self.id%
+    %send% %self.owner% It's your turn next. Type 'bob bucket' to start.
   elseif %actor% == %self.owner%
     set ow_apple %apple_val%
     set ch_apple %self.ch_apple%
