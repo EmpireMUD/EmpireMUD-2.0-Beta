@@ -442,7 +442,7 @@ set Candy18810 %self.Candy18810%
 set Candy18811 %self.Candy18811%
 * only looking at it?
 if %cmd% == look || %cmd% == examine
-  if %actor.obj_target(%arg.argument1%)% != %self%
+  if %actor.obj_target(%arg.argument1%)% != %self% && %actor.obj_target(%arg.argument2%)% != %self%
     return 0
     halt
   end
