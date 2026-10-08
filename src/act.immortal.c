@@ -2219,6 +2219,10 @@ int perform_set(char_data *ch, char_data *vict, int mode, char *val_arg) {
 		}
 	}
 	else if SET_CASE("access") {
+		if (!isdigit(*val_arg)) {
+			msg_to_char(ch, "You must specify an access level by number; '%s' is invalid.\r\n", val_arg);
+			return (0);
+		}
 		if (value > GET_ACCESS_LEVEL(ch) || value > LVL_IMPL) {
 			send_to_char("You can't do that.\r\n", ch);
 			return (0);
