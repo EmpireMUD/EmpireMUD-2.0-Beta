@@ -666,6 +666,17 @@ Example:
 
 See also: STAT
 #d
+"LEVELS COMMAND" "LEVEL COMMAND"
+
+Usage:  levels
+
+The "levels" command shows you all of the access levels.
+
+For mortals, this command merely tells them EmpireMUD does not have the normal
+levels command they might expect from CircleMUD.
+
+See also: SET
+#d
 LOAD
 
 Usage:  load <type> <virtual number>

@@ -1250,7 +1250,7 @@ Levels for mobs and items are rounded up to the next 5 (e.g. 71 to 75, 109 to
 110).
 
 See also: EVENTS, ROLE, SCALING, SYNERGY ABILITY
-Immortals see also: ACCESS LEVEL
+Immortals see also: ACCESS LEVEL, LEVELS COMMAND
 #
 "LEVEL COLORS" "COLOR BY LEVEL" "COLOR BY DIFFICULTY" "CONSIDER COLORS" "QUEST COLORS" "ADVENTURE COLORS"
 

@@ -152,7 +152,7 @@ struct wear_data_type {
 //// EXTERNS /////////////////////////////////////////////////////////////////
 
 // empiremud constants
-extern const char *level_names[][2];
+extern const char *level_names[LVL_TOP+1][2];
 extern const int num_of_reboot_strings;
 extern const char *reboot_strings[];
 extern const char *reboot_types[];

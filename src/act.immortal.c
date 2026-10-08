@@ -41,6 +41,7 @@
 // external variables
 
 // external functions
+ACMD(do_no_cmd);
 void do_stat_vehicle(char_data *ch, vehicle_data *veh, bool details);
 
 // locals
@@ -6799,6 +6800,22 @@ ACMD(do_last) {
 	
 	if (plr && file) {
 		free_char(plr);
+	}
+}
+
+
+ACMD(do_levels) {
+	int iter;
+	
+	if (IS_IMMORTAL(ch)) {
+		msg_to_char(ch, "Access levels:\r\n");
+		
+		for (iter = 0; iter <= LVL_TOP; ++iter) {
+			msg_to_char(ch, "%2d. %s (%s)\r\n", iter, level_names[iter][1], level_names[iter][0]);
+		}
+	}
+	else {
+		do_no_cmd(ch, "", 0, NOCMD_LEVELS);
 	}
 }
 

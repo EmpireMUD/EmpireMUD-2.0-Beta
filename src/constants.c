@@ -68,7 +68,7 @@ const char *DG_SCRIPT_VERSION = "DG Scripts 1.0.12 e5.1.23";
 
 
 // data for the built-in game levels -- this adapts itself if you reduce the number of immortal levels
-const char *level_names[][2] = {
+const char *level_names[LVL_TOP+1][2] = {
 		{ "N/A", "Not Started" },
 		{ "MORT", "Mortal" },
 		{ "GOD", "God" },
