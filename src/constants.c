@@ -985,7 +985,7 @@ const char *extra_attribute_types[] = {
 	"Crafting-Bonus",
 	"Blood-Upkeep",
 	"Age",
-	"Night-Vision",
+	"Light-Radius",
 	"Nearby-Range",	// 15
 	"Where-Range",
 	"Warmth",
@@ -2169,7 +2169,7 @@ const char *apply_types[] = {
 	"RESIST-MAGICAL",
 	"CRAFTING",	// 25
 	"BLOOD-UPKEEP",
-	"NIGHT-VISION",
+	"LIGHT-RADIUS",
 	"NEARBY-RANGE",
 	"WHERE-RANGE",
 	"WARMTH",	// 30
@@ -2207,7 +2207,7 @@ const double apply_values[] = {
 	0.3,	// RESIST-MAGICAL
 	0.01,	// 25, CRAFTING
 	1,		// BLOOD-UPKEEP
-	1,		// NIGHT-VISION
+	1,		// LIGHT-RADIUS
 	1,		// NEARBY-RANGE
 	1,		// WHERE-RANGE
 	1,		// 30, WARMTH
@@ -2244,7 +2244,7 @@ const int apply_attribute[] = {
 	NOTHING,	// resist-magical
 	NOTHING,	// 25,crafting
 	NOTHING,	// blood-upkeep
-	NOTHING,	// night-vision
+	NOTHING,	// light-radius
 	NOTHING,	// nearby-range
 	NOTHING,	// where-range
 	NOTHING,	// 30, warmth
@@ -2281,7 +2281,7 @@ const bool apply_never_scales[] = {
 	FALSE,	// RESIST-MAGICAL
 	TRUE,	// 25, CRAFTING
 	TRUE,	// BLOOD-UPKEEP
-	TRUE,	// NIGHT-VISION
+	TRUE,	// LIGHT-RADIUS
 	TRUE,	// NEARBY-RANGE
 	TRUE,	// WHERE-RANGE
 	TRUE,	// 30, WARMTH

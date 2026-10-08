@@ -107,7 +107,7 @@ bool adjacent_room_is_light(room_data *room, bool ignore_magic_darkness) {
 int distance_can_see_in_dark(char_data *ch) {
 	int dist;
 	
-	dist = compute_night_light_radius(IN_ROOM(ch)) + GET_EXTRA_ATT(ch, ATT_NIGHT_VISION);
+	dist = compute_night_light_radius(IN_ROOM(ch)) + GET_EXTRA_ATT(ch, ATT_LIGHT_RADIUS);
 	if (has_player_tech(ch, PTECH_LARGER_LIGHT_RADIUS)) {
 		dist += 1;
 	}

@@ -1665,7 +1665,7 @@ Available techs are:
  &cHide-Upgrade&0 * - Guarantees hide and protects from normal 'search'.
  &cInfiltrate&0 * - Allows the player to enter claimed/restricted buildings.
  &cInfiltrate-Upgrade&0 * - Raises the success of infiltrate.
- &cLarger-Light-Radius&0 - +1 light radius (prefer NIGHT-VISION apply instead).
+ &cLarger-Light-Radius&0 - +1 light radius (prefer LIGHT-RADIUS apply instead).
  &cLight-Fire&0 * - Can light torches/fires without any tools.
  &cMap-Invis&0 *^ - Can't be seen at a distance on the map.
  &cMill-Upgrade&0 * - Increases the number of items received from mill.
@@ -5974,7 +5974,7 @@ Scaling based on item types:
  pack - the "capacity" value
 
 The following attributes never scale: greatness, age, crafting, blood-upkeep,
-night-vision, nearby-range, where-range
+light-radius, nearby-range, where-range
 
 Applies and item values of 0 are ignored and do not get any points assigned.
 
@@ -7152,7 +7152,7 @@ Most applies are self-explanatory:
  &cRESIST-MAGICAL&0 - magical damage reduction
  &cCRAFTING&0 - bonus to craft level (unscaled)
  &cBLOOD-UPKEEP&0 - adds to how much blood vampires must spend per hour (unscaled)
- &cNIGHT-VISION&0 - adds to light radius at night (unscaled)
+ &cLIGHT-RADIUS&0 - adds to light radius at night (unscaled)
  &cNEARBY-RANGE&0 - increases the range of the player's nearby command
  &cWHERE-RANGE&0 - increases the range of the player's where command
 

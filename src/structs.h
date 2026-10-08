@@ -335,7 +335,7 @@ typedef struct vehicle_data vehicle_data;
 #define APPLY_RESIST_MAGICAL  24	// Apply to magic damage resistance
 #define APPLY_CRAFTING  25	// bonus craft levels
 #define APPLY_BLOOD_UPKEEP  26	// vampire blood requirement
-#define APPLY_NIGHT_VISION  27	// bonus to nighttime light radius
+#define APPLY_LIGHT_RADIUS  27	// bonus to nighttime light radius
 #define APPLY_NEARBY_RANGE  28	// larger "nearby"
 #define APPLY_WHERE_RANGE  29	// larger "where"
 #define APPLY_WARMTH  30	// protects against cold weather
@@ -880,7 +880,7 @@ typedef struct vehicle_data vehicle_data;
 #define ATT_CRAFTING_BONUS  11	// levels added to crafting
 #define ATT_BLOOD_UPKEEP  12	// blood cost per hour
 #define ATT_AGE_MODIFIER  13	// +/- age
-#define ATT_NIGHT_VISION  14	// bonus light radius at night
+#define ATT_LIGHT_RADIUS  14	// bonus light radius at night
 #define ATT_NEARBY_RANGE  15	// larger "nearby"
 #define ATT_WHERE_RANGE  16		// larger "where"
 #define ATT_WARMTH  17	// from gear that keeps you warm in the cold
