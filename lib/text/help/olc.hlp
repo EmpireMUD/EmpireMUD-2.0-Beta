@@ -4339,6 +4339,7 @@ Fields:
   &c-requiresobject&0 - requires any object
   &c-requiresfunction&0 - requires a function flag
   &c-time -timeover -timeunder&0 - specific craft time (in action ticks)
+  &c-tools&0 - See HELP TOOLS
   &c-vmin&0, &c-vmax&0 - VNUM range limits
 
 Examples:
