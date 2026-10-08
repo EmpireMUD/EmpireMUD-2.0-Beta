@@ -2516,13 +2516,12 @@ if %cmd% == stand
   end
   return 1
   rdelete timer_running %self.id%
+  rdelete same_round %self.id%
   eval time %timestamp% - %self.start_bob%
   if %time% == 0
     %send% %actor% You stand back up immediately, with no apple.
     %echoaround% %actor% ~%actor% stands back up immediately with no apple in ^%actor% mouth.
-    if %actor% != %self.owner%
-      %send% %self.owner% It's your turn next. Type 'bob bucket' to start.
-    end
+    %send% %actor% Type 'bob bucket' to try again.
     return 1
     halt
   end
