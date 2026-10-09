@@ -2301,6 +2301,10 @@ Usage:  respawn
 When your character has died, you can still observe for a short time. When you
 are ready to respawn, use this command.
 
+When your respawn cooldown expires, you will automatically respawn. However,
+the respawn cooldown will reset instead if other players are still in combat
+when the cooldown ends.
+
 You will come back at your tomb if it's on the same island or within 100 tiles
 of where you died. Otherwise, you'll come back at a random tomb your empire
 owns on the same island, or at a starting location if no tomb was available.

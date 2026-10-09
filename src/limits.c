@@ -610,6 +610,7 @@ void real_update_player(char_data *ch) {
 		DL_FOREACH2(ROOM_PEOPLE(IN_ROOM(ch)), room_ch, next_in_room) {
 			if (!IS_NPC(room_ch) && FIGHTING(room_ch)) {
 				// someone still fighting here -- reset respawn timer
+				msg_to_char(ch, "Players are still in combat here -- resetting respawn cooldown.\r\n");
 				add_cooldown(ch, COOLDOWN_DEATH_RESPAWN, config_get_int("death_release_minutes") * SECS_PER_REAL_MIN);
 				return;
 			}
