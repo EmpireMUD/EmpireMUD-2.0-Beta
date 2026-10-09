@@ -163,55 +163,60 @@ else
 end
 ~
 #10905
-Colossal red dragon combat + enrage~
-0 k 100 2
+Colossal red dragon combat~
+0 k 10 2
 L w 10905
 L w 10906
 ~
-set soft_enrage_rounds 140
-set hard_enrage_rounds 300
-* Count attacks until enrage
-set enrage_counter 0
-set enraged 0
-if %self.varexists(enrage_counter)%
-  set enrage_counter %self.enrage_counter%
+* Enrage removed in patch b5.217 -- if re-added, it will also need something to reset it
+* This formerly ran at 100% and included this section:
+if 0
+  set soft_enrage_rounds 140
+  set hard_enrage_rounds 300
+  * Count attacks until enrage
+  set enrage_counter 0
+  set enraged 0
+  if %self.varexists(enrage_counter)%
+    set enrage_counter %self.enrage_counter%
+  end
+  eval enrage_counter %enrage_counter%+1
+  if %enrage_counter% > %soft_enrage_rounds%
+    * Start increasing damage
+    set enraged 1
+    if %enrage_counter% > %hard_enrage_rounds%
+      set enraged 2
+    end
+    * Enrage messages
+    if %enrage_counter% == %soft_enrage_rounds%
+      %echo% |%self% eyes glow with fury! You'd better hurry up and kill *%self%!
+    end
+    if %enrage_counter% == %hard_enrage_rounds%
+      %echo% ~%self% takes to the air, letting out a fearsome roar!
+      %regionecho% %self.room% 5 |%self% roar shakes the ground!
+    end
+  end
+  remote enrage_counter %self.id%
+  * Enrage effects:
+  if %enraged%
+    if %enraged% == 2
+      * This should wipe out even a pretty determined party in a couple of shots
+      %echo% ~%self% unleashes a torrent of flame upon ^%self% foes from above!
+      %aoe% 1000 direct
+    end
+    * Don't always show the message or it would be even spammier
+    if %random.4% == 4
+      %echo% |%self% eyes glow with white-hot rage!
+    end
+    dg_affect #10905 %self% BONUS-PHYSICAL 5 3600
+  end
+  * Check chance (this was a percent on the script but the enrage counter needs to always work)
+  if %random.10%!=10
+    halt
+  end
 end
-eval enrage_counter %enrage_counter%+1
-if %enrage_counter% > %soft_enrage_rounds%
-  * Start increasing damage
-  set enraged 1
-  if %enrage_counter% > %hard_enrage_rounds%
-    set enraged 2
-  end
-  * Enrage messages
-  if %enrage_counter% == %soft_enrage_rounds%
-    %echo% |%self% eyes glow with fury! You'd better hurry up and kill *%self%!
-  end
-  if %enrage_counter% == %hard_enrage_rounds%
-    %echo% ~%self% takes to the air, letting out a fearsome roar!
-    %regionecho% %self.room% 5 |%self% roar shakes the ground!
-  end
-end
-remote enrage_counter %self.id%
-* Enrage effects:
-if %enraged%
-  if %enraged% == 2
-    * This should wipe out even a pretty determined party in a couple of shots
-    %echo% ~%self% unleashes a torrent of flame upon ^%self% foes from above!
-    %aoe% 1000 direct
-  end
-  * Don't always show the message or it would be even spammier
-  if %random.4% == 4
-    %echo% |%self% eyes glow with white-hot rage!
-  end
-  dg_affect #10905 %self% BONUS-PHYSICAL 5 3600
-end
+*
 * Start of regular combat script:
-* Check chance (this was a percent on the script but the enrage counter needs to always work)
-if %random.10%!=10
-  halt
-  * Pick an attack:
-end
+* Pick an attack:
 switch %random.4%
   * Searing burns on tank
   case 1
@@ -290,22 +295,17 @@ switch %random.4%
 done
 ~
 #10908
-Enrage Buff/Counter Reset~
+Colossal Red Dragon: Boss reset~
 0 b 25 0
 ~
-if !%self.fighting% && %self.varexists(enrage_counter)%
-  if %self.enrage_counter% == 0
-    halt
-  end
-  if %self.aff_flagged(!ATTACK)%
-    halt
-  end
+if !%self.fighting% && !%self.aff_flagged(!ATTACK)%
   if %self.aff_flagged(NO-SEE-IN-ROOM)%
+    dg_affect %self% NO-SEE-IN-ROOM off
     %echo% ~%self% returns.
   end
-  %load% mob %self.vnum%
   %echo% ~%self% settles down to rest.
-  %purge% %self%
+  %restore% %self%
+  nop %self.unscale_and_reset%
 end
 ~
 #10909
@@ -320,61 +320,66 @@ end
 return 1
 ~
 #10910
-Sir Vivor Combat + Enrage~
-0 k 100 1
+Sir Vivor Combat~
+0 k 10 1
 L w 10910
 ~
-set soft_enrage_rounds 140
-set hard_enrage_rounds 300
-* Count attacks until enrage
-set enrage_counter 0
-set enraged 0
-if %self.varexists(enrage_counter)%
-  set enrage_counter %self.enrage_counter%
-end
-eval enrage_counter %enrage_counter%+1
-if %enrage_counter% > %soft_enrage_rounds%
-  * Start increasing damage
-  set enraged 1
-  if %enrage_counter% > %hard_enrage_rounds%
-    set enraged 2
+* Enrage removed in patch b5.217 -- if re-added, it will also need something to reset it
+* This formerly ran at 100% and included this section:
+if 0
+  set soft_enrage_rounds 140
+  set hard_enrage_rounds 300
+  * Count attacks until enrage
+  set enrage_counter 0
+  set enraged 0
+  if %self.varexists(enrage_counter)%
+    set enrage_counter %self.enrage_counter%
   end
-  * Enrage messages
-  if %enrage_counter% == %soft_enrage_rounds%
-    %echo% |%self% screams and attacks with great ferocity! You'd better hurry up and kill *%self%!
-  end
-  if %enrage_counter% == %hard_enrage_rounds%
-    %echo% ~%self%, seeing that nothing is working, looks for an escape route!
-  end
-end
-remote enrage_counter %self.id%
-* Enrage effects:
-if %enraged%
-  if %enraged% == 2
-    * Pretend to flee
-    if %self.aff_flagged(HARD-STUNNED)%
-      %echo% ~%self% shakes his head and recovers from stunning!
+  eval enrage_counter %enrage_counter%+1
+  if %enrage_counter% > %soft_enrage_rounds%
+    * Start increasing damage
+    set enraged 1
+    if %enrage_counter% > %hard_enrage_rounds%
+      set enraged 2
     end
-    if %self.aff_flagged(IMMOBILIZED)%
-      %echo% ~%self% breaks free of the vines entangling him!
+    * Enrage messages
+    if %enrage_counter% == %soft_enrage_rounds%
+      %echo% |%self% screams and attacks with great ferocity! You'd better hurry up and kill *%self%!
     end
-    %echo% ~%self% tries to flee...
-    %echo% ~%self% runs behind a large stalagmite and disappears!
-    %restore% %self%
-    dg_affect %self% !ATTACK on 300
-    dg_affect %self% NO-SEE-IN-ROOM on -1
+    if %enrage_counter% == %hard_enrage_rounds%
+      %echo% ~%self%, seeing that nothing is working, looks for an escape route!
+    end
   end
-  * Don't always show the message or it would be even spammier
-  if %random.4% == 4
-    %echo% ~%self% swings his sword with strength born of terror!
+  remote enrage_counter %self.id%
+  * Enrage effects:
+  if %enraged%
+    if %enraged% == 2
+      * Pretend to flee
+      if %self.aff_flagged(HARD-STUNNED)%
+        %echo% ~%self% shakes his head and recovers from stunning!
+      end
+      if %self.aff_flagged(IMMOBILIZED)%
+        %echo% ~%self% breaks free of the vines entangling him!
+      end
+      %echo% ~%self% tries to flee...
+      %echo% ~%self% runs behind a large stalagmite and disappears!
+      %restore% %self%
+      dg_affect %self% !ATTACK on 300
+      dg_affect %self% NO-SEE-IN-ROOM on -1
+    end
+    * Don't always show the message or it would be even spammier
+    if %random.4% == 4
+      %echo% ~%self% swings his sword with strength born of terror!
+    end
+    dg_affect #10905 %self% BONUS-PHYSICAL 5 3600
   end
-  dg_affect #10905 %self% BONUS-PHYSICAL 5 3600
+  * Check chance (this was a percent on the script but the enrage counter needs to always work)
+  if %random.10%!=10
+    halt
+  end
 end
+*
 * Start of regular combat script:
-* Check chance (this was a percent on the script but the enrage counter needs to always work)
-if %random.10%!=10
-  halt
-end
 * Pick an attack:
 switch %random.4%
   * Disarm dps (whoever has most tohit)
