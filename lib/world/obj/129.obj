@@ -378,11 +378,13 @@ prongs holding them in place.
    The pair of green gemstones are cut in a trapeze shape and oriented to form
 an old healing sign.
 ~
-2 amo ab 0 0 5
+2 amo ab 0 0 6
 0 0 0
 2 0
 A
-16 2 0
+16 1 0
+A
+7 2 0
 A
 23 3 0
 A
@@ -416,7 +418,7 @@ supported on gossamer alone.
    The gems are tiny, but shine a brilliant green. They have been cut into a
 trapeze shape long associated with healing.
 ~
-2 mo am 0 0 6
+2 mo am 0 0 7
 0 0 0
 2 0
 A
@@ -424,7 +426,7 @@ A
 A
 23 8 0
 A
-16 4 3
+7 4 3
 A
 5 1 3
 C
