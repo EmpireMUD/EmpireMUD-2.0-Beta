@@ -1909,7 +1909,12 @@ void complete_vehicle(vehicle_data *veh) {
 	// only if it was incomplete:
 	if (VEH_FLAGGED(veh, VEH_INCOMPLETE)) {
 		remove_vehicle_flags(veh, VEH_INCOMPLETE);
+		finish_vehicle_setup(veh);
 		
+		// build the interior if not built?
+		get_vehicle_interior(veh);
+		
+		// apply empire after completing setup
 		if (VEH_OWNER(veh)) {
 			qt_empire_players_vehicle(VEH_OWNER(veh), qt_gain_vehicle, veh);
 			et_gain_vehicle(VEH_OWNER(veh), veh);
@@ -1920,11 +1925,6 @@ void complete_vehicle(vehicle_data *veh) {
 				adjust_building_tech(VEH_OWNER(veh), vrl->room, TRUE);
 			}
 		}
-		
-		finish_vehicle_setup(veh);
-		
-		// build the interior if not built?
-		get_vehicle_interior(veh);
 	}
 	
 	if (room) {
