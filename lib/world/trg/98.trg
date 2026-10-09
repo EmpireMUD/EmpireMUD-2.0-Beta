@@ -129,7 +129,7 @@ if %actor.varexists(stop_message_room)%
   rdelete stop_message_room %actor.id%
 end
 * prevent basic stop if needed
-if %needs_stop% && !%actor.action%
+if %needs_stop%
   * prevents basic 'stop' output
   return 1
 else
@@ -211,7 +211,7 @@ if %actor.varexists(stop_message_room)%
   rdelete stop_message_room %actor.id%
 end
 * prevent basic stop if needed
-if %needs_stop% && !%actor.action%
+if %needs_stop%
   * prevents basic 'stop' output
   return 1
 else
