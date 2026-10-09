@@ -549,7 +549,7 @@ void survey_city(char_data *ch, char *argument) {
 					HASH_FIND_STR(hash, dir_str, sct);
 					if (!sct) {
 						CREATE(sct, struct survey_city_t, 1);
-						sct->dir = dir_str;
+						sct->dir = str_dup(dir_str);
 						sct->owned_dist = sct->rough_dist = sct->ocean_dist = sct->water_dist = -1;
 						HASH_ADD_STR(hash, dir, sct);
 					}
