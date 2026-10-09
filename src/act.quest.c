@@ -131,6 +131,7 @@ void complete_quest(char_data *ch, struct player_quest *pq, empire_data *giver_e
 	struct player_completed_quest *pcq;
 	any_vnum vnum;
 	int level;
+	struct group_member_data *mem;
 	
 	if (!quest) {
 		// somehow
@@ -214,6 +215,17 @@ void complete_quest(char_data *ch, struct player_quest *pq, empire_data *giver_e
 	}
 	
 	queue_delayed_update(ch, CDU_SAVE);
+	
+	// group completion
+	if (QUEST_FLAGGED(quest, QST_GROUP_COMPLETION) && GROUP(ch)) {
+		LL_FOREACH(GROUP(ch)->members, mem) {
+			if (mem->member != ch && !IS_NPC(mem->member) && IN_ROOM(mem->member) == IN_ROOM(ch) && (pq = is_on_quest(mem->member, QUEST_VNUM(quest)))) {
+				if (check_finish_quest_trigger(mem->member, quest, get_instance_by_id(pq->instance_id))) {
+					complete_quest(mem->member, pq, giver_emp);
+				}
+			}
+		}
+	}
 }
 
 
@@ -814,7 +826,6 @@ QCMD(qcmd_drop) {
 */
 bool qcmd_finish_one(char_data *ch, struct player_quest *pq, bool show_errors) {
 	quest_data *quest = quest_proto(pq->vnum);
-	struct group_member_data *mem;
 	empire_data *giver_emp = NULL;
 	int complete, total;
 	
@@ -871,17 +882,6 @@ bool qcmd_finish_one(char_data *ch, struct player_quest *pq, bool show_errors) {
 	
 	// SUCCESS
 	complete_quest(ch, pq, giver_emp);
-	
-	// group completion
-	if (QUEST_FLAGGED(quest, QST_GROUP_COMPLETION) && GROUP(ch)) {
-		LL_FOREACH(GROUP(ch)->members, mem) {
-			if (mem->member != ch && !IS_NPC(mem->member) && IN_ROOM(mem->member) == IN_ROOM(ch) && (pq = is_on_quest(mem->member, QUEST_VNUM(quest)))) {
-				if (check_finish_quest_trigger(mem->member, quest, get_instance_by_id(pq->instance_id))) {
-					complete_quest(mem->member, pq, giver_emp);
-				}
-			}
-		}
-	}
 	
 	return TRUE;
 }
