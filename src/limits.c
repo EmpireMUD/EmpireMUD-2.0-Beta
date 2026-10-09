@@ -606,6 +606,16 @@ void real_update_player(char_data *ch) {
 	
 	// DEAD players: check for auto-respawn
 	if (IS_DEAD(ch) && ch->desc && get_cooldown_time(ch, COOLDOWN_DEATH_RESPAWN) == 0) {
+		// ensure fighting is over
+		DL_FOREACH2(ROOM_PEOPLE(IN_ROOM(ch)), room_ch, next_in_room) {
+			if (!IS_NPC(room_ch) && FIGHTING(room_ch)) {
+				// someone still fighting here -- reset respawn timer
+				add_cooldown(ch, COOLDOWN_DEATH_RESPAWN, config_get_int("death_release_minutes") * SECS_PER_REAL_MIN);
+				return;
+			}
+		}
+		
+		// if we got here, no players remain in combat
 		do_respawn(ch, "", 0, 0);
 		return;
 	}
