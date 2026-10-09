@@ -181,7 +181,7 @@ set needs_stop %actor.var(needs_stop_command,0)%
 * basic checks
 if !%needs_stop%
   * no work
-  retur n0
+  return 0
   halt
 elseif %needs_stop% && %actor.var(stop_room_lock)% && %actor.room.id% != %actor.var(stop_room_lock)%
   * wrong room, they moved, just cancel
