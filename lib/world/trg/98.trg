@@ -128,14 +128,8 @@ if %actor.varexists(stop_message_room)%
   %echoaround% %actor% %actor.stop_message_room%
   rdelete stop_message_room %actor.id%
 end
-* prevent basic stop if needed
-if %needs_stop%
-  * prevents basic 'stop' output
-  return 1
-else
-  * will show normal 'stop' output
-  return 0
-end
+* prevent basic stop
+return 1
 ~
 #9807
 No pickpocket while unkillable~
@@ -210,14 +204,8 @@ if %actor.varexists(stop_message_room)%
   %echoaround% %actor% %actor.stop_message_room%
   rdelete stop_message_room %actor.id%
 end
-* prevent basic stop if needed
-if %needs_stop%
-  * prevents basic 'stop' output
-  return 1
-else
-  * will show normal 'stop' output
-  return 0
-end
+* prevent basic stop
+return 1
 ~
 #9809
 Companion initialization for perma-death~
