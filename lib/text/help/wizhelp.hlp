@@ -1,19 +1,13 @@
-"ACCESS LEVEL"
+"ACCESS LEVEL" "ACCESS LEVELS"
 
 Access levels determine what commands a player can use. This is mainly used for
-immortals. Here is a breakdown of the access levels:
+immortals. The number of levels is dynamic and can be configured by each
+EmpireMUD. You can view all the access levels with the 'levels' command.
 
- 1 - Mortal: players
- 2 - God: an unused system for advanced players
- 3 - Immortal: the base admin level
- 4 - Assistant
- 5 - Co-Implementor: can use virtually all commands and privileges
- 6 - Implementor: the top access level
+The lowest ranks do not have access to most admin commands; instead they can
+be granted specific commands by higher administrators.
 
-Immortals and Assistants don't have access to most of the admin commands.
-Instead, they can be given specific commands with the grant system.
-
-See also: GOD SYSTEM, GRANT
+See also: LEVELS COMMAND, GOD SYSTEM, GRANT
 #d
 ADVANCE
 
@@ -28,7 +22,7 @@ Don't confuse access levels with skill/gear levels.
 Example:
   > advance rasmussen 4
 
-See also: GRANT, SET
+See also: ACCESS LEVEL, GRANT, LEVELS COMMAND, SET
 #d
 APPROVE UNAPPROVE AUTHORIZED AUTHORIZATION APPROVAL
 
@@ -666,6 +660,17 @@ Example:
 
 See also: STAT
 #d
+"LEVELS COMMAND" "LEVEL COMMAND"
+
+Usage:  levels
+
+The "levels" command shows you all of the access levels.
+
+For mortals, this command merely tells them EmpireMUD does not have the normal
+levels command they might expect from CircleMUD.
+
+See also: ACCESS LEVEL, SET
+#d
 LOAD
 
 Usage:  load <type> <virtual number>
@@ -1185,7 +1190,7 @@ wizhide        PC      BINARY       Turns on/off wizhide
 
 scale          NPC     NUMBER       Rescales a mob to a given level
 
-See also: ACCESS LEVEL, GRANT, STAT
+See also: ACCESS LEVEL, GRANT, LEVELS COMMAND, STAT
 #d
 "SET COMPANION"
 

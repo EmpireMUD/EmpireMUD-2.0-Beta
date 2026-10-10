@@ -988,4 +988,273 @@ M
 0
 $n teeters as it searches for food.~
 S
+#9946
+hedgehog hog sleepy~
+a sleepy hedgehog~
+A sleepy hedgehog is curled up nearby.
+~
+1 1 bdoD n 1
+0 0 7 9 -1 -1
+D
+   The adorable little pincushion looks up at your for a moment, yawns, and
+tucks its head back in.
+~
+M
+0
+$n yawns and curls into a tighter ball.~
+M
+0
+$n snuffles softly in $s sleep.~
+M
+0
+$n stretches, then curls back up.~
+M
+0
+$n gives a quiet little snort.~
+S
+#9947
+armadillo tiny~
+a tiny armadillo~
+A tiny armadillo is waddling about.
+~
+1 1 bdoD n 1
+0 0 7 9 -1 -1
+D
+The little guy has a beaded shell that looks like armor.
+~
+M
+0
+$n waddles about, nose twitching.~
+M
+0
+$n rolls into a little ball, then peeks out again.~
+M
+0
+$n sniffs at the air.~
+M
+0
+$n gives a little shake and keeps waddling.~
+S
+#9948
+gecko curious little~
+a curious little gecko~
+A curious little gecko is peeking around.
+~
+1 1 bdoD n 1
+0 0 64 9 -1 -1
+D
+   This feisty little creature had spots and bands down its back. It almost
+looks like a leopard, but it's a small lizard.
+~
+M
+0
+$n tilts $s head and watches you.~
+M
+0
+$n scampers a short distance, then pauses.~
+M
+0
+$n flicks $s tongue at the air.~
+M
+0
+$n grabs a bug and munches on it.~
+S
+#9949
+chinchilla fluffy little~
+a fluffy little chinchilla~
+A fluffy little chinchilla is grooming itself.
+~
+1 1 bdoD n 1
+0 0 7 9 -1 -1
+D
+   At over 110% fluff, this little chinchilla could make the mightiest dragon
+sqee with delight. Its blue-gray fur is, in no uncertain terms, the softest
+thing you have ever touched.
+~
+M
+0
+$n gives $s fur a quick grooming.~
+M
+0
+$n twitches $s whiskers and looks around.~
+M
+0
+$n bounces in place.~
+M
+0
+$n twitches $s ears.~
+M
+0
+$n gives $s fur a brisk shake.~
+S
+#9950
+moose calf miniature~
+a miniature moose calf~
+A miniature moose calf is prancing about.
+~
+1 1 bdoD n 1
+0 0 94 9 -1 -1
+D
+   The little brown mooseling is nearly 100% leg, and each leg seems to have
+its own brain. The calf totters along, nibbling as it goes, seemingly unaware
+of the legs scrambling to hold it up.
+~
+M
+0
+$n gives a tiny, uncertain hop.~
+M
+0
+$n shakes $s little head and flicks $s ears.~
+M
+0
+$n sniffs around at the air.~
+M
+0
+$n stamps one tiny hoof.~
+S
+#9951
+duckling bashful~
+a bashful duckling~
+A bashful duckling is hiding behind your feet.
+~
+1 1 bdoD n 1
+0 0 42 9 -1 -1
+D
+   The little yellow fluff-ball darts from hiding spot to hiding spot, never
+stopping for long. It could be mistaken for a bit of stuffing but for the
+orange beak.
+~
+M
+0
+$n peeps softly.~
+M
+0
+$n ducks its head.~
+M
+0
+$n peeps and tucks $s head down.~
+M
+0
+$n toddles about.~
+M
+0
+$n shuffles closer.~
+S
+#9952
+crab hermit tiny~
+a tiny hermit crab~
+A tiny hermit crab is exploring its shell.
+~
+1 1 bdoD n 1
+0 0 7 10 -1 -1
+D
+   At first it looks like a large snail, but when the claws pop out and it
+scurries across the ground, you realize it's a crab that has taken up residence
+in a snail's old house.
+~
+M
+0
+$n pokes out of $s shell.~
+M
+0
+$n scuttles a few steps.~
+M
+0
+$n waves one tiny claw.~
+M
+0
+$n retreats into $s shell for a moment.~
+S
+#9953
+meerkat pup curious~
+a curious meerkat pup~
+A curious meerkat pup is standing on its hind legs.
+~
+1 1 bdoD n 1
+0 0 42 9 -1 -1
+D
+   It looks like a little bandit with the dark marks around its eyes. Though
+it's only a pup, it stands up to watch for danger just like its parents.
+~
+M
+0
+$n stands on $s hind legs and looks around.~
+M
+0
+$n sniffs the air.~
+M
+0
+$n cocks $s head to one side.~
+M
+0
+$n sniffs around.~
+S
+#9954
+capybara miniature~
+a miniature capybara~
+A miniature capybara is dozing in a sunny spot.
+~
+1 1 bdoD n 1
+0 0 7 9 -1 -1
+D
+   The tailless little rodent seems to spend most of its time sleeping. On
+closer inspection, this might be a guinea pig.
+~
+M
+0
+$n gives a quiet, contented chuff.~
+M
+0
+$n settles down and blinks sleepily.~
+M
+0
+$n stretches out and gives a little yawn.~
+M
+0
+$n shakes $s fur and settles down again.~
+S
+#9955
+glider sugar shy~
+a shy sugar glider~
+A shy sugar glider is peeking out from nearby.
+~
+1 1 bdoD mn 1
+0 0 2 9 -1 -1
+D
+   This gray little joey has a web of skin between its arms and legs, enabling
+it to soar like a kite!
+~
+M
+0
+$n peeks out, then quickly ducks away.~
+M
+0
+$n stretches $s little paws and looks around.~
+M
+0
+$n peeks out and gives a soft chirp.~
+S
+#9956
+chameleon tiny~
+a tiny chameleon~
+You barely notice a tiny chameleon blending in.
+~
+1 1 bdoD n 1
+0 0 17 9 -1 -1
+D
+The tiny, horned reptile is hard to see when it isn't moving.
+~
+M
+0
+$n slowly swivels $s eyes.~
+M
+0
+$n flicks out $s tongue and blinks.~
+M
+0
+$n curls $s tail around itself.~
+M
+0
+$n blinks one eye, then the other.~
+S
 $

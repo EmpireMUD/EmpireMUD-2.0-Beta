@@ -168,11 +168,13 @@ you get it close to another piece of iron.
 into a trapeze shape and oriented in the same direction to create a shape long-
 associated with healing.
 ~
-2 amo ab 0 0 4
+2 amo ab 0 0 5
 0 0 0
 2 0
 A
-16 2 0
+16 1 0
+A
+7 2 0
 A
 23 3 0
 A
@@ -203,7 +205,7 @@ in the air below iron studs. They seem to pull subtly to the north.
    The lodestones glisten bright green as every stray mote of light is caught
 by the gem shards embedded in them.
 ~
-2 mo am 0 0 3
+2 mo am 0 0 4
 0 0 0
 2 0
 A
@@ -211,7 +213,7 @@ A
 A
 23 2 0
 A
-16 1 3
+7 1 3
 C
 1 100
 S
@@ -835,11 +837,13 @@ intertwined to form a single victorious loop.
    The ring bears two green gemstones held in place by tiny beads of metal.
 Both gemstones are cut in a trapeze shape and oriented to form a healing sign.
 ~
-2 amo ab 0 0 4
+2 amo ab 0 0 5
 0 0 0
 2 0
 A
-16 2 0
+16 1 0
+A
+7 2 0
 A
 23 3 0
 A
@@ -871,7 +875,7 @@ delicate chains dangling from each.
    Tiny green gems hover just below the end of the chains, suspended in the
 air by nothing at all, shimmering as they turn in the light.
 ~
-2 mo am 0 0 4
+2 mo am 0 0 5
 0 0 0
 2 0
 A
@@ -879,7 +883,7 @@ A
 A
 23 4 0
 A
-16 2 3
+7 2 3
 C
 100 200
 S
@@ -1423,11 +1427,13 @@ serrated such that a careless touch might cut into flesh.
 light. Both gemstones are cut in a trapeze shape and oriented to form a healing
 sign.
 ~
-2 amo ab 0 0 4
+2 amo ab 0 0 5
 0 0 0
 2 0
 A
-16 2 0
+16 1 0
+A
+7 2 0
 A
 23 3 0
 A
@@ -1458,7 +1464,7 @@ that casts a striking reflection in the dark, but never in the light.
    Tiny green gems dangle just below the end of the loops, fixed in the air by
 the tiniest gossamer threads of light, glinting together even in darkness.
 ~
-2 mo am 0 0 4
+2 mo am 0 0 5
 0 0 0
 2 0
 A
@@ -1466,7 +1472,7 @@ A
 A
 23 6 0
 A
-16 3 3
+7 3 3
 C
 200 300
 S

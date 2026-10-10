@@ -597,10 +597,10 @@ void survey_city(char_data *ch, char *argument) {
 		if (sct->owned_count) {
 			dist = MIN(dist, sct->owned_dist);
 			if (verbose) {
-				sprintf(buf1 + strlen(buf1), "%s%d claimed (%d away)", (*buf1 ? ", " : ""), sct->owned_count, sct->owned_dist);
+				sprintf(buf1 + strlen(buf1), "%s%d claimed by others (%d away)", (*buf1 ? ", " : ""), sct->owned_count, sct->owned_dist);
 			}
 			else {
-				sprintf(buf1 + strlen(buf1), "%sclaimed", (*buf1 ? ", " : ""));
+				sprintf(buf1 + strlen(buf1), "%sclaimed (%d away)", (*buf1 ? ", " : ""), sct->owned_dist);
 			}
 		}
 		if (sct->rough_count) {
@@ -609,7 +609,7 @@ void survey_city(char_data *ch, char *argument) {
 				sprintf(buf1 + strlen(buf1), "%s%d rough (%d away)", (*buf1 ? ", " : ""), sct->rough_count, sct->rough_dist);
 			}
 			else {
-				sprintf(buf1 + strlen(buf1), "%srough", (*buf1 ? ", " : ""));
+				sprintf(buf1 + strlen(buf1), "%srough (%d away)", (*buf1 ? ", " : ""), sct->rough_dist);
 			}
 		}
 		if (sct->ocean_count) {
@@ -618,7 +618,7 @@ void survey_city(char_data *ch, char *argument) {
 				sprintf(buf1 + strlen(buf1), "%s%d ocean (%d away)", (*buf1 ? ", " : ""), sct->ocean_count, sct->ocean_dist);
 			}
 			else {
-				sprintf(buf1 + strlen(buf1), "%socean", (*buf1 ? ", " : ""));
+				sprintf(buf1 + strlen(buf1), "%socean (%d away)", (*buf1 ? ", " : ""), sct->ocean_dist);
 			}
 		}
 		if (sct->water_count) {
@@ -627,12 +627,12 @@ void survey_city(char_data *ch, char *argument) {
 				sprintf(buf1 + strlen(buf1), "%s%d fresh water (%d away)", (*buf1 ? ", " : ""), sct->water_count, sct->water_dist);
 			}
 			else {
-				sprintf(buf1 + strlen(buf1), "%sfresh water", (*buf1 ? ", " : ""));
+				sprintf(buf1 + strlen(buf1), "%sfresh water (%d away)", (*buf1 ? ", " : ""), sct->water_dist);
 			}
 		}
 		
 		if (*buf1) {
-			msg_to_char(ch, "%d %s: %s\r\n", dist, (*sct->dir ? sct->dir : "away"), buf1);
+			msg_to_char(ch, "%s: %s\r\n", (*sct->dir ? sct->dir : "away"), buf1);
 		}
 		
 		HASH_DEL(hash, sct);
@@ -640,7 +640,7 @@ void survey_city(char_data *ch, char *argument) {
 	}
 	
 	// and totals?
-	msg_to_char(ch, "Total tiles: %d owned, %d rough, %d ocean, %d fresh water\r\n", tot_owned, tot_rough, tot_ocean, tot_water);
+	msg_to_char(ch, "Total tiles: %d claimed by others, %d rough, %d ocean, %d fresh water\r\n", tot_owned, tot_rough, tot_ocean, tot_water);
 }
 
 

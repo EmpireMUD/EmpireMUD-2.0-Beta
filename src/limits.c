@@ -606,6 +606,17 @@ void real_update_player(char_data *ch) {
 	
 	// DEAD players: check for auto-respawn
 	if (IS_DEAD(ch) && ch->desc && get_cooldown_time(ch, COOLDOWN_DEATH_RESPAWN) == 0) {
+		// ensure fighting is over
+		DL_FOREACH2(ROOM_PEOPLE(IN_ROOM(ch)), room_ch, next_in_room) {
+			if (!IS_NPC(room_ch) && FIGHTING(room_ch)) {
+				// someone still fighting here -- reset respawn timer
+				msg_to_char(ch, "Players are still in combat here -- resetting respawn cooldown.\r\n");
+				add_cooldown(ch, COOLDOWN_DEATH_RESPAWN, config_get_int("death_release_minutes") * SECS_PER_REAL_MIN);
+				return;
+			}
+		}
+		
+		// if we got here, no players remain in combat
 		do_respawn(ch, "", 0, 0);
 		return;
 	}
@@ -2275,6 +2286,7 @@ INTERACTION_FUNC(decay_in_storage_interact) {
 */
 void check_empire_storage_timers(void) {
 	bool counted;
+	int iter;
 	empire_data *emp, *next_emp;
 	obj_data *proto;
 	struct empire_island *isle, *next_isle;
@@ -2319,7 +2331,9 @@ void check_empire_storage_timers(void) {
 								run_timer_triggers_on_decaying_storage(emp, isle, proto, st->amount);
 							}
 							else if (has_interaction(GET_OBJ_INTERACTIONS(proto), INTERACT_DECAYS_TO)) {
-								run_interactions(NULL, GET_OBJ_INTERACTIONS(proto), INTERACT_DECAYS_TO, NULL, NULL, NULL, NULL, decay_in_storage_interact);
+								for (iter = 0; iter < st->amount; ++iter) {
+									run_interactions(NULL, GET_OBJ_INTERACTIONS(proto), INTERACT_DECAYS_TO, NULL, NULL, NULL, NULL, decay_in_storage_interact);
+								}
 							}
 						}
 						
@@ -2371,7 +2385,9 @@ void check_empire_storage_timers(void) {
 							counted = run_timer_triggers_on_decaying_warehouse(emp, eus, st->amount);
 						}
 						else if (has_interaction(GET_OBJ_INTERACTIONS(eus->obj), INTERACT_DECAYS_TO)) {
-							run_interactions(NULL, GET_OBJ_INTERACTIONS(eus->obj), INTERACT_DECAYS_TO, NULL, NULL, NULL, NULL, decay_in_storage_interact);
+							for (iter = 0; iter < st->amount; ++iter) {
+								run_interactions(NULL, GET_OBJ_INTERACTIONS(eus->obj), INTERACT_DECAYS_TO, NULL, NULL, NULL, NULL, decay_in_storage_interact);
+							}
 						}
 					}
 					
@@ -2438,6 +2454,7 @@ void check_empire_storage_timers(void) {
 */
 void check_home_storage_timers(char_data *ch) {
 	bool any, counted;
+	int iter;
 	room_data *home;
 	struct empire_unique_storage *eus, *next_eus;
 	struct storage_timer *st, *next_st;
@@ -2474,7 +2491,9 @@ void check_home_storage_timers(char_data *ch) {
 						counted = run_timer_triggers_on_decaying_home_storage(ch, home, eus, st->amount);
 					}
 					else if (home && has_interaction(GET_OBJ_INTERACTIONS(eus->obj), INTERACT_DECAYS_TO)) {
-						run_interactions(ch, GET_OBJ_INTERACTIONS(eus->obj), INTERACT_DECAYS_TO, home, NULL, NULL, NULL, decay_in_home_storage_interact);
+						for (iter = 0; iter < st->amount; ++iter) {
+							run_interactions(ch, GET_OBJ_INTERACTIONS(eus->obj), INTERACT_DECAYS_TO, home, NULL, NULL, NULL, decay_in_home_storage_interact);
+						}
 					}
 				}
 				

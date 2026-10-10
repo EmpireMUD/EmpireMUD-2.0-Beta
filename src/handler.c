@@ -806,8 +806,8 @@ void affect_modify(char_data *ch, byte loc, sh_int mod, bitvector_t bitv, bool a
 			SAFE_ADD(GET_EXTRA_ATT(ch, ATT_BLOOD_UPKEEP), mod, INT_MIN, INT_MAX, TRUE);
 			break;
 		}
-		case APPLY_NIGHT_VISION: {
-			SAFE_ADD(GET_EXTRA_ATT(ch, ATT_NIGHT_VISION), mod, INT_MIN, INT_MAX, TRUE);
+		case APPLY_LIGHT_RADIUS: {
+			SAFE_ADD(GET_EXTRA_ATT(ch, ATT_LIGHT_RADIUS), mod, INT_MIN, INT_MAX, TRUE);
 			break;
 		}
 		case APPLY_NEARBY_RANGE: {
@@ -6963,9 +6963,10 @@ bool identical_bindings(obj_data *obj_a, obj_data *obj_b) {
 * 
 * @param obj_data *obj_a First object to compare.
 * @param obj_data *obj_b Second object to compare.
+* @param bool ignore_timer If TRUE, does not check decay timer.
 * @return bool TRUE if the two items are functionally identical.
 */
-bool objs_are_identical(obj_data *obj_a, obj_data *obj_b) {
+bool objs_are_identical(obj_data *obj_a, obj_data *obj_b, bool ignore_timer) {
 	struct obj_apply *a_apply, *b_list, *b_apply, *b_apply_next;
 	bool found;
 	int iter;
@@ -6982,7 +6983,7 @@ bool objs_are_identical(obj_data *obj_a, obj_data *obj_b) {
 	if (GET_OBJ_AFF_FLAGS(obj_a) != GET_OBJ_AFF_FLAGS(obj_b)) {
 		return FALSE;
 	}
-	if (GET_OBJ_TIMER(obj_a) != GET_OBJ_TIMER(obj_b)) {
+	if (!ignore_timer && GET_OBJ_TIMER(obj_a) != GET_OBJ_TIMER(obj_b)) {
 		return FALSE;
 	}
 	if (GET_OBJ_TYPE(obj_a) != GET_OBJ_TYPE(obj_b)) {
@@ -11367,24 +11368,27 @@ bool delete_unique_storage_by_vnum(struct empire_unique_storage **list, obj_vnum
 * @return struct empire_unique_storage* The storage entry, if it exists (or NULL).
 */
 struct empire_unique_storage *find_eus_entry(obj_data *obj, struct empire_unique_storage *list, room_data *location) {
+	bool is_vault;
 	struct empire_unique_storage *iter;
 	
 	if (!obj) {
 		return NULL;
 	}
 	
+	is_vault = (location && room_has_function_and_city_ok(NULL, location, FNC_VAULT));
+	
 	DL_FOREACH(list, iter) {
 		if (location && GET_ISLAND_ID(location) != iter->island) {
 			continue;
 		}
-		if (location && !IS_SET(iter->flags, EUS_VAULT) && room_has_function_and_city_ok(NULL, location, FNC_VAULT)) {
+		if (location && !IS_SET(iter->flags, EUS_VAULT) && is_vault) {
 			continue;
 		}
-		if (location && IS_SET(iter->flags, EUS_VAULT) && !room_has_function_and_city_ok(NULL, location, FNC_VAULT)) {
+		if (location && IS_SET(iter->flags, EUS_VAULT) && !is_vault) {
 			continue;
 		}
 		
-		if (objs_are_identical(iter->obj, obj)) {
+		if (objs_are_identical(iter->obj, obj, TRUE)) {
 			return iter;
 		}
 	}
@@ -11448,8 +11452,11 @@ void store_unique_item(char_data *ch, struct empire_unique_storage **to_list, ob
 			return;
 		}
 		
-		// existing entry
+		// existing entry -- just add the timer
 		eus->amount += 1;
+		add_storage_timer(&eus->timers, GET_OBJ_TIMER(obj), 1);
+		
+		// and extract the duplicate
 		extract = TRUE;
 	}
 	else {
@@ -11486,12 +11493,13 @@ void store_unique_item(char_data *ch, struct empire_unique_storage **to_list, ob
 			}
 		}
 		
+		// mark storage timer -- BEFORE clearing the timer
+		add_storage_timer(&eus->timers, GET_OBJ_TIMER(obj), 1);
+		
 		// other data that can be removed
 		GET_AUTOSTORE_TIMER(obj) = 0;
+		GET_OBJ_TIMER(obj) = 0;
 	}
-	
-	// mark storage timer
-	add_storage_timer(&eus->timers, GET_OBJ_TIMER(obj), 1);
 	
 	if (ch) {
 		act("You store $p.", FALSE, ch, obj, NULL, TO_CHAR | TO_QUEUE);

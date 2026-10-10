@@ -170,9 +170,9 @@ This item spawns a mob and then purges itself.
 T 18511
 S
 #18512
-whistle jaguar riding~
-a riding jaguar whistle~
-A riding jaguar whistle is lying on the ground.~
+whistle jaguar riding mount~
+a riding jaguar mount whistle~
+A riding jaguar mount whistle is lying on the ground.~
 This whistle can be used just once, to summon a riding jaguar mount.
 ~
 3 0 a 0 0 4
@@ -181,9 +181,9 @@ This whistle can be used just once, to summon a riding jaguar mount.
 T 9910
 S
 #18513
-whistle sea serpent~
-a sea serpent whistle~
-A sea serpent whistle is lying on the ground.~
+whistle sea serpent aquatic mount~
+a sea serpent aquatic mount whistle~
+A sea serpent aquatic mount whistle is lying on the ground.~
 This whistle can be used just once, to summon a sea serpent mount.
 ~
 3 0 a 0 0 4
@@ -192,9 +192,9 @@ This whistle can be used just once, to summon a sea serpent mount.
 T 9910
 S
 #18514
-whistle feathered serpent~
-the feathered serpent whistle~
-A feathered serpent whistle is lying on the ground here.~
+whistle feathered serpent flying mount~
+the feathered serpent flying mount whistle~
+A feathered serpent flying mount whistle is lying on the ground here.~
 This whistle can be used just once, to summon a feathered serpent mount.
 ~
 3 0 a 0 0 7
@@ -203,9 +203,9 @@ This whistle can be used just once, to summon a feathered serpent mount.
 T 9910
 S
 #18515
-whistle jaguar cub~
-a jaguar cub whistle~
-A jaguar cub whistle is lying here.~
+whistle jaguar cub minipet~
+a jaguar cub minipet whistle~
+A jaguar cub minipet whistle is lying here.~
 This whistle can summon a noncombat pet!
 Type 'use whistle' to summon it.
 ~

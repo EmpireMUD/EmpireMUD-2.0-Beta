@@ -7480,7 +7480,7 @@ ACMD(do_progress) {
 		}
 		
 		// show current progress in that category
-		build_page_display(ch, "%s goals (%d points):", progress_types[cat], EMPIRE_PROGRESS_POINTS(emp, cat));
+		build_page_display(ch, "%s goals (%d point%s):", progress_types[cat], EMPIRE_PROGRESS_POINTS(emp, cat), PLURAL(EMPIRE_PROGRESS_POINTS(emp, cat)));
 		
 		// show current goals
 		any = 0;
@@ -7544,7 +7544,7 @@ ACMD(do_progress) {
 				}
 			}
 		}
-		build_page_display(ch, "- %d completed goals, %d rewards bought", complete, bought);
+		build_page_display(ch, "- %d completed goal%s, %d reward%s bought", complete, PLURAL(complete), bought, PLURAL(bought));
 		
 		send_page_display(ch);
 	}
@@ -8140,7 +8140,7 @@ ACMD(do_roster) {
 
 ACMD(do_territory) {
 	char search_str[MAX_INPUT_LENGTH], exclude_str[MAX_INPUT_LENGTH], arg[MAX_INPUT_LENGTH], arg2[MAX_INPUT_LENGTH], option_buf[1024], *remain;
-	bool ok, junk;
+	bool ok, junk, will_group;
 	bool check_city, check_outskirts, check_frontier, any_type_found;
 	bool no_abandon, no_dismantle, no_work, public_only, private_only;
 	int dist_from_me, total, ttype;
@@ -8181,6 +8181,7 @@ ACMD(do_territory) {
 	no_abandon = no_dismantle = no_work = public_only = private_only = FALSE;
 	dist_from_me = -1;
 	find_island = NULL;
+	will_group = TRUE;	// by default
 	
 	// parse options
 	while (*argument) {
@@ -8213,6 +8214,9 @@ ACMD(do_territory) {
 				check_outskirts = FALSE;
 				any_type_found = TRUE;
 			}
+		}
+		else if (is_abbrev(arg, "-all")) {
+			will_group = FALSE;
 		}
 		else if (is_abbrev(arg, "-distance")) {
 			argument = any_one_arg(argument, arg2);
@@ -8491,7 +8495,9 @@ ACMD(do_territory) {
 	}
 	
 	if (node_hash) {
-		reduce_territory_node_list(&node_hash);
+		if (will_group) {
+			reduce_territory_node_list(&node_hash);
+		}
 		
 		// start buf
 		build_page_display(ch, "%s%s&0 territory: %s", EMPIRE_BANNER(emp), EMPIRE_ADJECTIVE(emp), option_buf);

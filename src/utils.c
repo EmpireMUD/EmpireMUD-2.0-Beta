@@ -2973,8 +2973,8 @@ int get_attribute_by_apply(char_data *ch, int apply_type) {
 		case APPLY_BLOOD_UPKEEP: {
 			return GET_BLOOD_UPKEEP(ch);
 		}
-		case APPLY_NIGHT_VISION: {
-			return GET_EXTRA_ATT(ch, ATT_NIGHT_VISION);
+		case APPLY_LIGHT_RADIUS: {
+			return GET_EXTRA_ATT(ch, ATT_LIGHT_RADIUS);
 		}
 		case APPLY_NEARBY_RANGE: {
 			return GET_EXTRA_ATT(ch, ATT_NEARBY_RANGE);

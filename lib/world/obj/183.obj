@@ -526,9 +526,9 @@ Type 'use bell' to summon it.
 2 0
 S
 #18327
-whistle crocodile~
-a crocodile whistle~
-A crocodile whistle is lying on the ground.~
+whistle crocodile mount~
+a crocodile mount whistle~
+A crocodile mount whistle is lying on the ground.~
    This whistle has a crocodile carved in the side. If you type 'use whistle',
 it will summon a mount.
 ~
@@ -538,9 +538,9 @@ it will summon a mount.
 T 9910
 S
 #18328
-whistle falcon~
-a falcon whistle~
-A falcon whistle is lying here.~
+whistle falcon flying mount~
+a falcon flying mount whistle~
+A falcon flying mount whistle is lying here.~
    This whistle has a falcon carved on the top. If you type 'use whistle', it
 will summon a flying mount.
 ~

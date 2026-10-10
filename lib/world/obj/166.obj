@@ -742,9 +742,9 @@ A
 5 1 6
 S
 #16664
-whistle pet mini-grinchy grinchy~
-a mini-grinchy pet whistle~
-A mini-grinchy pet whistle is lying here.~
+whistle minipet mini-grinchy grinchy~
+a mini-grinchy minipet whistle~
+A mini-grinchy minipet whistle is lying here.~
    This whistle will teach you the tiny grinchy demon minipet. Type 'use
 whistle'.
 ~
@@ -1135,9 +1135,9 @@ event ends.
 T 16678
 S
 #16679
-whistle krampus tiny~
-a tiny krampus whistle~
-A tiny krampus whistle is lying here.~
+whistle krampus tiny minipet~
+a tiny krampus minipet whistle~
+A tiny krampus minipet whistle is lying here.~
 This whistle will teach you the tiny krampus minipet. Type 'use whistle'.
 ~
 19 p a 0 0 8
@@ -1200,9 +1200,9 @@ add it to your minipet list.
 10 0
 S
 #16685
-whistle burning straw goat~
-a burning straw goat whistle~
-A burning straw goat whistle is lying here.~
+whistle burning straw goat minipet~
+a burning straw goat minipet whistle~
+A burning straw goat minipet whistle is lying here.~
    This whistle will teach you the burning straw goat minipet. Type 'use
 whistle'.
 ~

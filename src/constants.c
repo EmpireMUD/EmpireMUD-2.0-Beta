@@ -63,12 +63,12 @@ void tog_pvp(char_data *ch);
 //// EMPIREMUD CONSTANTS /////////////////////////////////////////////////////
 
 // Shown on the "version" command and sent over MSSP
-const char *version = "EmpireMUD 2.0 beta 5.216a";
+const char *version = "EmpireMUD 2.0 beta 5.217";
 const char *DG_SCRIPT_VERSION = "DG Scripts 1.0.12 e5.1.23";
 
 
 // data for the built-in game levels -- this adapts itself if you reduce the number of immortal levels
-const char *level_names[][2] = {
+const char *level_names[LVL_TOP+1][2] = {
 		{ "N/A", "Not Started" },
 		{ "MORT", "Mortal" },
 		{ "GOD", "God" },
@@ -955,7 +955,7 @@ const char *condition_types[] = {
 // CUSTOM_COLOR_x
 const char *custom_color_types[] = {
 	"emote",	// 0
-	"esay",
+	"etalk",
 	"gsay",
 	"oocsay",
 	"say",
@@ -985,7 +985,7 @@ const char *extra_attribute_types[] = {
 	"Crafting-Bonus",
 	"Blood-Upkeep",
 	"Age",
-	"Night-Vision",
+	"Light-Radius",
 	"Nearby-Range",	// 15
 	"Where-Range",
 	"Warmth",
@@ -2169,7 +2169,7 @@ const char *apply_types[] = {
 	"RESIST-MAGICAL",
 	"CRAFTING",	// 25
 	"BLOOD-UPKEEP",
-	"NIGHT-VISION",
+	"LIGHT-RADIUS",
 	"NEARBY-RANGE",
 	"WHERE-RANGE",
 	"WARMTH",	// 30
@@ -2207,7 +2207,7 @@ const double apply_values[] = {
 	0.3,	// RESIST-MAGICAL
 	0.01,	// 25, CRAFTING
 	1,		// BLOOD-UPKEEP
-	1,		// NIGHT-VISION
+	1,		// LIGHT-RADIUS
 	1,		// NEARBY-RANGE
 	1,		// WHERE-RANGE
 	1,		// 30, WARMTH
@@ -2244,7 +2244,7 @@ const int apply_attribute[] = {
 	NOTHING,	// resist-magical
 	NOTHING,	// 25,crafting
 	NOTHING,	// blood-upkeep
-	NOTHING,	// night-vision
+	NOTHING,	// light-radius
 	NOTHING,	// nearby-range
 	NOTHING,	// where-range
 	NOTHING,	// 30, warmth
@@ -2281,7 +2281,7 @@ const bool apply_never_scales[] = {
 	FALSE,	// RESIST-MAGICAL
 	TRUE,	// 25, CRAFTING
 	TRUE,	// BLOOD-UPKEEP
-	TRUE,	// NIGHT-VISION
+	TRUE,	// LIGHT-RADIUS
 	TRUE,	// NEARBY-RANGE
 	TRUE,	// WHERE-RANGE
 	TRUE,	// 30, WARMTH

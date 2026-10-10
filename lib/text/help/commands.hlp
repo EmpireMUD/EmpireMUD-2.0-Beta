@@ -909,7 +909,7 @@ You can also do the following complex emotes:
  - Use @target to insert another person (e.g. "@wolf")
  - Use #item to insert an item (e.g. "#sword")
 
-See also: SOCIALS
+See also: RECOLOR, SOCIALS
 #
 EMPTY
 
@@ -1297,7 +1297,7 @@ Usage:  gsay <message>
 Tell something to all the members of your group, even if they're not in the
 room. You can also use the older psay/ptell command, which does the same thing.
 
-See also: DISPLAY, IGNORE, GROUP, TELL, SAY
+See also: DISPLAY, IGNORE, GROUP, TELL, RECOLOR, SAY
 #
 HELP
 
@@ -2198,6 +2198,10 @@ and affect-wear-off messages, to make them easier to see in combat.
 
 Type 'recolor' by itself to see your current custom colors.
 
+You can recolor:
+ Channels and messages: emote, etalk, gsay, oocsay, say, slash-channels, tell
+ Status messages: status, sun, temperature, weather
+
 See HELP COLOR to see a list of color codes.
 
 See also: COLOR
@@ -2296,6 +2300,10 @@ Usage:  respawn
 
 When your character has died, you can still observe for a short time. When you
 are ready to respawn, use this command.
+
+When your respawn cooldown expires, you will automatically respawn. However,
+the respawn cooldown will reset instead if other players are still in combat
+when the cooldown ends.
 
 You will come back at your tomb if it's on the same island or within 100 tiles
 of where you died. Otherwise, you'll come back at a random tomb your empire
@@ -2487,7 +2495,7 @@ You can use ' as a shorthand for say, and " for oocsay, as in:
   > 'hello there.
 
 See also: CHANNELS, GSAY, IGNORE, NOREPEAT, NOTELL, REPLY, SLASH CHANNELS,
-   SPEAK
+   RECOLOR, SPEAK
 #
 SAYHISTORY
 
@@ -2936,7 +2944,7 @@ Sweltering penalties: distracted from timed actions, damage over time
 
 You can turn off alerts about changes in temperature with "smessages".
 
-See also: SURVEY, STATUS MESSAGES, TIME, WEATHER
+See also: RECOLOR, SURVEY, STATUS MESSAGES, TIME, WEATHER
 #
 THROW
 
@@ -3199,7 +3207,7 @@ the sun or moon are up.
 You also receive alerts as the weather changes when you're outdoors or near a
 window. These messages can be disabled with the "smessages" command.
 
-See also: STATUS MESSAGES, SURVEY, TEMPERATURE, TIME
+See also: RECOLOR, STATUS MESSAGES, SURVEY, TEMPERATURE, TIME
 #
 WHO
 

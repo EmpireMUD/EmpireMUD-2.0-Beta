@@ -9,9 +9,9 @@ You shouldn't be seeing this.
 10 0
 S
 #18452
-whistle beaver~
-a beaver whistle~
-A beaver whistle is lying here.~
+whistle beaver minipet~
+a beaver minipet whistle~
+A beaver minipet whistle is lying here.~
 This whistle can summon a noncombat pet!
 Type 'use whistle' to summon it.
 ~
@@ -67,9 +67,9 @@ forever.
 10 0
 S
 #18462
-whistle owl snowy~
-a snowy owl whistle~
-A snowy owl whistle is lying here.~
+whistle owl snowy minipet~
+a snowy owl minipet whistle~
+A snowy owl minipet whistle is lying here.~
 This whistle can summon a noncombat pet!
 Type 'use whistle' to summon it.
 ~
@@ -89,9 +89,9 @@ Type 'use collar' to summon it.
 2 0
 S
 #18464
-whistle scarecrow~
-a scarecrow whistle~
-A scarecrow whistle is lying here.~
+whistle scarecrow minipet~
+a scarecrow minipet whistle~
+A scarecrow minipet whistle is lying here.~
 This whistle can summon a noncombat pet!
 Type 'use whistle' to summon it.
 ~
@@ -111,9 +111,9 @@ Type 'use cage' to summon it.
 2 0
 S
 #18466
-whistle unstable~
-an unstable whistle~
-An unstable whistle is levitating here.~
+whistle unstable minipet~
+an unstable minipet whistle~
+An unstable minipet whistle is levitating here.~
 This whistle can summon a noncombat pet!
 Type 'use whistle' to summon it.
 ~
@@ -133,9 +133,9 @@ Type 'use bell' to summon it.
 2 0
 S
 #18468
-whistle werewolf~
-a werewolf whistle~
-A werewolf whistle is lying here.~
+whistle werewolf minipet~
+a werewolf minipet whistle~
+A werewolf minipet whistle is lying here.~
 This whistle can summon a noncombat pet!
 Type 'use whistle' to summon it.
 ~
@@ -144,9 +144,9 @@ Type 'use whistle' to summon it.
 2 0
 S
 #18469
-whistle guest~
-a guest whistle~
-A guest whistle is lying here.~
+whistle guest minipet~
+a guest minipet whistle~
+A guest minipet whistle is lying here.~
 This whistle can summon a noncombat pet!
 Type 'use whistle' to summon it.
 ~
@@ -177,9 +177,9 @@ Type 'use teacup' to summon it.
 2 0
 S
 #18472
-whistle dysentery~
-a dysentery whistle~
-A dysentery whistle is lying here.~
+whistle dysentery minipet~
+a dysentery minipet whistle~
+A dysentery minipet whistle is lying here.~
 This whistle can summon a noncombat pet!
 Type 'use whistle' to summon it.
 ~
@@ -395,9 +395,9 @@ can summon an aquatic mount.
 T 9910
 S
 #18499
-whistle hippogriff hippogryph~
-a hippogriff whistle~
-A hippogriff whistle is hanging in mid-air.~
+whistle hippogriff hippogryph flying mount~
+a hippogriff flying mount whistle~
+A hippogriff flying mount whistle is hanging in mid-air.~
    This strange whistle is carved from a hollow bone, and inscribed with a
 beak, a claw, and a hoof. If you type 'use whistle', it will summon a flying
 mount.

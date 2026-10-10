@@ -599,7 +599,7 @@ S
 #10830
 Museum: Collect More Materials~
 The curator wants you to collect some more advanced resources.
-Get 2 small leather:
+Get 4 small leather:
  1. Kill small animals like squirrels, meerkats, or rabbits.
  2. Skin the corpses using a knife.
  3. Tan the small skins.
@@ -635,7 +635,7 @@ R
 W
 6 10825 0 1 a
 W
-1 6521 0 2 a
+1 6521 0 4 a
 W
 1 6090 0 2 a
 W
@@ -650,7 +650,7 @@ materials using the supplies you collected. This will require the
 Basic Crafts ability. You can type 'skill trade' to see it.
 Make 2 leather ropes:
  1. If you haven't already, type 'skill buy basic crafts'.
- 2. You should still have 2 small leather.
+ 2. You should still have 4 small leather.
  3. Type 'craft 2 leather rope'.
 Make a pile of bricks:
  1. You need 2 clay and a fire. You can make a fire by lighting some wood.
