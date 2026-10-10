@@ -1005,6 +1005,12 @@ $n yawns and curls into a tighter ball.~
 M
 0
 $n snuffles softly in $s sleep.~
+M
+0
+$n stretches, then curls back up.~
+M
+0
+$n gives a quiet little snort.~
 S
 #9947
 armadillo tiny~
@@ -1022,6 +1028,12 @@ $n waddles about, nose twitching.~
 M
 0
 $n rolls into a little ball, then peeks out again.~
+M
+0
+$n sniffs at the air.~
+M
+0
+$n gives a little shake and keeps waddling.~
 S
 #9948
 gecko curious little~
@@ -1040,6 +1052,12 @@ $n tilts $s head and watches you.~
 M
 0
 $n scampers a short distance, then pauses.~
+M
+0
+$n flicks $s tongue at the air.~
+M
+0
+$n grabs a bug and munches on it.~
 S
 #9949
 chinchilla fluffy little~
@@ -1059,6 +1077,15 @@ $n gives $s fur a quick grooming.~
 M
 0
 $n twitches $s whiskers and looks around.~
+M
+0
+$n bounces in place.~
+M
+0
+$n twitches $s ears.~
+M
+0
+$n gives $s fur a brisk shake.~
 S
 #9950
 moose calf miniature~
@@ -1078,6 +1105,12 @@ $n gives a tiny, uncertain hop.~
 M
 0
 $n shakes $s little head and flicks $s ears.~
+M
+0
+$n sniffs around at the air.~
+M
+0
+$n stamps one tiny hoof.~
 S
 #9951
 duckling bashful~
@@ -1093,10 +1126,19 @@ orange beak.
 ~
 M
 0
-$n peeps softly and shuffles closer.~
+$n peeps softly.~
 M
 0
-$n ducks its head, then peeks up at you.~
+$n ducks its head.~
+M
+0
+$n peeps and tucks $s head down.~
+M
+0
+$n toddles about.~
+M
+0
+$n shuffles closer.~
 S
 #9952
 crab hermit tiny~
@@ -1115,7 +1157,13 @@ M
 $n pokes out of $s shell.~
 M
 0
-$n scuttles a few steps, then stops.~
+$n scuttles a few steps.~
+M
+0
+$n waves one tiny claw.~
+M
+0
+$n retreats into $s shell for a moment.~
 S
 #9953
 meerkat pup curious~
@@ -1133,7 +1181,13 @@ M
 $n stands on $s hind legs and looks around.~
 M
 0
-$n sniffs the air, then drops back down.~
+$n sniffs the air.~
+M
+0
+$n cocks $s head to one side.~
+M
+0
+$n sniffs around.~
 S
 #9954
 capybara miniature~
@@ -1152,6 +1206,12 @@ $n gives a quiet, contented chuff.~
 M
 0
 $n settles down and blinks sleepily.~
+M
+0
+$n stretches out and gives a little yawn.~
+M
+0
+$n shakes $s fur and settles down again.~
 S
 #9955
 glider sugar shy~
@@ -1170,6 +1230,9 @@ $n peeks out, then quickly ducks away.~
 M
 0
 $n stretches $s little paws and looks around.~
+M
+0
+$n peeks out and gives a soft chirp.~
 S
 #9956
 chameleon tiny~
@@ -1187,5 +1250,11 @@ $n slowly swivels $s eyes.~
 M
 0
 $n flicks out $s tongue and blinks.~
+M
+0
+$n curls $s tail around itself.~
+M
+0
+$n blinks one eye, then the other.~
 S
 $
