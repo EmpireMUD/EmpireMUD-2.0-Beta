@@ -300,6 +300,8 @@ Usage:  board <vehicle>
 This command is used to board a ship or other vehicle in the same room. Not
 all vehicles can be boarded.
 
+If you were looking for message boards, try HELP BOARDS.
+
 See also: DISEMBARK, SAIL, MANUFACTURE, LOAD, SHIPS
 #
 BOTHER NOBOTHER
