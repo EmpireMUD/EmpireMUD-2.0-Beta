@@ -1386,19 +1386,24 @@ void finish_gen_craft(char_data *ch) {
 		}
 	}
 
-	// send message -- soup uses quantity for amount of soup instead of multiple items
+	// send message to char
 	if (!obj_ok) {
 		// object self-purged?
 		sprintf(buf, "You finish %s!", gen_craft_data[GET_CRAFT_TYPE(type)].verb);
 		act(buf, FALSE, ch, NULL, NULL, TO_CHAR);
 	}
-	else if (amt > 1 && !IS_SET(GET_CRAFT_FLAGS(type), CRAFT_SOUP)) {
+	else if (IS_SET(GET_CRAFT_FLAGS(type), CRAFT_SOUP)) {
+		// ignore amt for soup
+		sprintf(buf, "You finish %s %s in $p!", gen_craft_data[GET_CRAFT_TYPE(type)].verb, get_generic_string_by_vnum(GET_CRAFT_OBJECT(type), GENERIC_LIQUID, GSTR_LIQUID_NAME));
+		act(buf, FALSE, ch, obj, NULL, TO_CHAR);
+	}
+	else if (amt > 1) {
 		sprintf(buf, "You finish %s $p (x%d)!", gen_craft_data[GET_CRAFT_TYPE(type)].verb, amt);
-		act(buf, FALSE, ch, obj, 0, TO_CHAR);
+		act(buf, FALSE, ch, obj, NULL, TO_CHAR);
 	}
 	else {
 		sprintf(buf, "You finish %s $p!", gen_craft_data[GET_CRAFT_TYPE(type)].verb);
-		act(buf, FALSE, ch, obj, 0, TO_CHAR);
+		act(buf, FALSE, ch, obj, NULL, TO_CHAR);
 	}
 	
 	// to-room message
