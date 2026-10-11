@@ -1767,7 +1767,7 @@ nop %self.remove_mob_flag(NO-ATTACK)%
 Hoarfrost Serragon: Fighting characters cannot flee~
 0 c 0 0
 flee~
-if %actor.fighting%
+if %self.fighting% && %actor.fighting%
   %send% %actor% PANIC! You couldn't escape! The serragon's enormous body is coiled around the entire area!
   return 1
 else
