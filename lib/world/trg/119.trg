@@ -674,6 +674,20 @@ while %cycle% < 3
   done
   eval cycle %cycle% + 1
 done
+* followers?
+set fol %room.people%
+while %fol%
+  set next_fol %fol.next_in_room%
+  if %fol.is_npc% && %fol.leader% == %actor% && !%fol.fighting%
+    %echoaround% %fol% ~%fol% vanishes in a flash of violet light!
+    %teleport% %fol% %loc%
+    %echoaround% %fol% ~%fol% appears in a flash of violet light!
+    if %fol.position% != Sleeping
+      %force% %fol% look
+    end
+  end
+  set fol %next_fol%
+done
 * cleanup
 nop %actor.set_cooldown(%self.vnum%,%cooldown_time%)%
 nop %actor.cancel_adventure_summon%
