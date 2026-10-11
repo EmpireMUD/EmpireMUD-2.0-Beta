@@ -11254,10 +11254,15 @@ bool retrieve_resource(char_data *ch, empire_data *emp, struct empire_storage_da
 * @return int 1 -- it always returns 1
 */
 int store_resource(char_data *ch, empire_data *emp, obj_data *obj) {
+	int timer;
+	
 	act("You store $p.", FALSE, ch, obj, 0, TO_CHAR | TO_QUEUE);
 	act("$n stores $p.", TRUE, ch, obj, 0, TO_ROOM | TO_QUEUE);
-
-	add_to_empire_storage(emp, GET_ISLAND_ID(IN_ROOM(ch)), GET_OBJ_VNUM(obj), 1, GET_OBJ_TIMER(obj));
+	
+	// note drink containers don't store timers in basic storage because they'll come out with default values
+	timer = IS_DRINK_CONTAINER(obj) ? UNLIMITED : GET_OBJ_TIMER(obj);
+	
+	add_to_empire_storage(emp, GET_ISLAND_ID(IN_ROOM(ch)), GET_OBJ_VNUM(obj), 1, timer);
 	extract_obj(obj);
 	EMPIRE_NEEDS_STORAGE_SAVE(emp) = TRUE;
 	

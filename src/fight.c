@@ -945,7 +945,7 @@ bool has_stolen_items(char_data *ch) {
 */
 void return_stolen_item_one(obj_data *obj) {
 	bool extract, full;
-	int island_id, timer;
+	int island_id, timer, o_timer;
 	empire_data *emp;
 	room_data *room;
 	
@@ -978,7 +978,11 @@ void return_stolen_item_one(obj_data *obj) {
 		else {
 			log_to_empire(emp, ELOG_HOSTILITY, "%s: stolen item returned to storage!", GET_OBJ_SHORT_DESC(obj));
 		}
-		add_to_empire_storage(emp, island_id, GET_OBJ_VNUM(obj), 1, GET_OBJ_TIMER(obj));
+	
+		// note drink containers don't store timers in basic storage because they'll come out with default values
+		o_timer = IS_DRINK_CONTAINER(obj) ? UNLIMITED : GET_OBJ_TIMER(obj);
+		
+		add_to_empire_storage(emp, island_id, GET_OBJ_VNUM(obj), 1, o_timer);
 		extract = TRUE;
 	}
 	else if (UNIQUE_OBJ_CAN_STORE(obj, FALSE)) {
