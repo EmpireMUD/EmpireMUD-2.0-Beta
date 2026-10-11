@@ -1520,13 +1520,14 @@ help keep its workforce well-fed. Players can also retrieve these foods from
 the larder and take them along as long-lasting food.
 
 Examples of village foods:
- loaf of village bread
- village gruel
- village rice
- pickled village vegetables
- village oat cakes
- village fruit preserves
- pickled village eggs
+ loaf of village bread  (2x flour)
+ village gruel  (2x grain)
+ village rice  (2x rice)
+ pickled village vegetables  (2x large vegetables, 1x salt)
+ village oat cakes  (2x oatmeal)
+ village fruit preserves  (2x large raw fruit)
+ pickled village eggs  (2x raw eggs, 1x salt)
+ village smoked meat  (2x meat)
 
 See also: EINVENTORY, WORKFORCE CRAFTING
 #
