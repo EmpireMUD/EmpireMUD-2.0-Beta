@@ -629,12 +629,12 @@ S
 #10416
 citizen fleeing~
 a fleeing citizen~
-A fleeing citizen looks absolutely panicked!
+A fleeing citizen from a nearby hamlet looks absolutely panicked!
 ~
 40 80 dvDI 0 3
 2 0 0 15 -1 -1
 D
-She doesn't have time to stop.
+She doesn't have time to stop. There must be a hamlet under attack nearby!
 ~
 M
 1
@@ -644,7 +644,7 @@ M
 They've burnt down everything!~
 M
 1
-The necrocultists are burning our city!~
+The necrocultists are burning our hamlet!~
 M
 1
 There's a skeletal mammoth in the town square!~
