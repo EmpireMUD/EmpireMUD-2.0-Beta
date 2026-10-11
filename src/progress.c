@@ -1993,7 +1993,12 @@ char *list_one_progress(progress_data *prg, bool detail) {
 	static char output[MAX_STRING_LENGTH];
 	
 	if (detail) {
-		safe_snprintf(output, sizeof(output), "[%5d] %s (%s)%s", PRG_VNUM(prg), PRG_NAME(prg), progress_types[PRG_TYPE(prg)], PRG_FLAGGED(prg, PRG_IN_DEVELOPMENT) ? " (IN-DEV)" : "");
+		if (PRG_COST(prg) > 0) {
+			safe_snprintf(output, sizeof(output), "[%5d] %s (%s) [costs %d]%s", PRG_VNUM(prg), PRG_NAME(prg), progress_types[PRG_TYPE(prg)], PRG_COST(prg), PRG_FLAGGED(prg, PRG_IN_DEVELOPMENT) ? " (IN-DEV)" : "");
+		}
+		else {
+			safe_snprintf(output, sizeof(output), "[%5d] %s (%s) [%d point%s]%s", PRG_VNUM(prg), PRG_NAME(prg), progress_types[PRG_TYPE(prg)], PRG_VALUE(prg), PLURAL(PRG_VALUE(prg)), PRG_FLAGGED(prg, PRG_IN_DEVELOPMENT) ? " (IN-DEV)" : "");
+		}
 	}
 	else {
 		safe_snprintf(output, sizeof(output), "[%5d] %s%s", PRG_VNUM(prg), PRG_NAME(prg), PRG_FLAGGED(prg, PRG_IN_DEVELOPMENT) ? " (IN-DEV)" : "");
