@@ -7178,6 +7178,7 @@ ACMD(do_oset) {
 	else if (is_abbrev(field_arg, "flags")) {
 		was_lit = LIGHT_IS_LIT(obj);
 		
+		act("Flags for $p:", FALSE, ch, obj, NULL, TO_CHAR);
 		GET_OBJ_EXTRA(obj) = olc_process_flag(ch, argument, "extra", "oset name flags", extra_bits, GET_OBJ_EXTRA(obj));
 							
 		// check lights
