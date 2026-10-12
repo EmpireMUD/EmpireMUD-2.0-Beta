@@ -607,12 +607,13 @@ if !%arg%
 elseif !%target%
   %send% %actor% You don't see that to shatter here.
   halt
-end
-if !%target.carried_by%
+elseif !%target.carried_by%
   %send% %actor% Pick @%target% up first.
   halt
-end
-if !%target.wearable%
+elseif %target.vnum% < 0
+  %send% %actor% You cannot shatter that.
+  halt
+elseif !%target.wearable%
   %send% %actor% @%target% is not an equipment item.
   halt
 elseif %target.is_flagged(*KEEP)%
