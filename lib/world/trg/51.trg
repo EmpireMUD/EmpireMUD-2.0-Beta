@@ -578,7 +578,31 @@ L w 5104
 shatter~
 eval target %%actor.obj_target(%arg.argument1%)%%
 if !%arg%
+  * no-arg: just list
   %send% %actor% Shatter which piece of gear?
+  set any 0
+  set obj %actor.carrying%
+  while %obj%
+    if %obj.wearable% && !%obj.is_flagged(*KEEP)% && !%obj.is_stolen%
+      if %obj.is_flagged(GROUP-DROP)%
+        set qual &&Y superior&&0
+      elseif %obj.is_flagged(HARD-DROP)% && %obj.is_flagged(GROUP-DROP)%
+        set qual &&M boss&&0
+      elseif %obj.is_flagged(GROUP-DROP)%
+        set qual &&C group&&0
+      elseif %obj.is_flagged(HARD-DROP)%
+        set qual &&G hard&&0
+      else
+        set qual
+      end
+      %send% %actor%   @%obj%  (level %obj.level%%qual%)
+      set any 1
+    end
+    set obj %obj.next_in_list%
+  done
+  if !%any%
+    %send% %actor%  (no shatterable items found)
+  end
   halt
 elseif !%target%
   %send% %actor% You don't see that to shatter here.
@@ -591,7 +615,7 @@ end
 if !%target.wearable%
   %send% %actor% @%target% is not an equipment item.
   halt
-elseif %target.is_flagged(*keep)%
+elseif %target.is_flagged(*KEEP)%
   %send% %actor% You cannot shatter something you are keeping.
   halt
 elseif %target.is_stolen%
