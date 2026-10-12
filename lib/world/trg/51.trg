@@ -584,7 +584,7 @@ if !%arg%
   set obj %actor.inventory%
   while %obj%
     if %obj.wearable% && !%obj.is_flagged(*KEEP)% && !%obj.is_stolen%
-      if %obj.is_flagged(GROUP-DROP)%
+      if %obj.is_flagged(SUPERIOR)%
         set qual &&Y superior&&0
       elseif %obj.is_flagged(HARD-DROP)% && %obj.is_flagged(GROUP-DROP)%
         set qual &&M boss&&0
@@ -595,7 +595,7 @@ if !%arg%
       else
         set qual
       end
-      %send% %actor%   @%obj%  (level %obj.level%%qual%)
+      %send% %actor% &&0  @%obj%  (level %obj.level%%qual%)
       set any 1
     end
     set obj %obj.next_in_list%
