@@ -581,7 +581,7 @@ if !%arg%
   * no-arg: just list
   %send% %actor% Shatter which piece of gear?
   set any 0
-  set obj %actor.carrying%
+  set obj %actor.inventory%
   while %obj%
     if %obj.wearable% && !%obj.is_flagged(*KEEP)% && !%obj.is_stolen%
       if %obj.is_flagged(GROUP-DROP)%
