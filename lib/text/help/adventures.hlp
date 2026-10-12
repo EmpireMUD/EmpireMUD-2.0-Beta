@@ -473,7 +473,7 @@ The guildleader sells:
 
 See also: ADVENTURE
 #
-HALLOWEEN CANDY "HALLOWEEN CANDY" "HALLOWEEN OF THE DEAD"
+HALLOWEEN CANDY "HALLOWEEN CANDY" "HALLOWEEN OF THE DEAD" "HALLOWEEN EVENT" "UNEARTHLY MANOR" SLAUGHTERHOUSE "PUMPKIN COACH" PUMPKINS 
 
 The Halloween of the Dead event is available during the month of October
 (ending November 2) and offers daily quests to earn fun rewards. Some quests
@@ -483,6 +483,7 @@ You can start all the quests from halloween candy items that you find by
 killing mobs anywhere in the world. 
 
 Some of the rewards include:
+ marigold, chrysanthemum, or black rose - drop these at any tomb for a buff
  bunch of pumpkin seeds - try planting them
  pumpkin coach spell - make a new vehicle from a pumpkin
  costume kit - sew fun costumes
@@ -495,13 +496,14 @@ Some of the rewards include:
  vial of swirling ectoplasm - upgrade some of the reward items
  vial of magi-genic ooze - upgrade one of your Halloween mounts to fly
  reddened butcher's block - builds a slaughterhouse
+ Unearthly Manor - a large house
 
 Game admins: You must enable global 18802 by removing its IN-DEV flag to turn
 on the Halloween candy drops, and disable that global when the holiday is over.
 Start event 18800 at the beginning of October 1; it runs 33 days (to end at the
 end of November 2).
 
-See also: ADVENTURE
+See also: EVENT
 #
 "HAMLET OF THE UNDEAD" "BURNING HAMLET"
 
@@ -1177,13 +1179,27 @@ most of the loot requires you to complete it at the original difficulty of
 
 See also: ADVENTURE
 #
-"WINTER WONDERLAND"
+"WINTER WONDERLAND" "WINTER EVENT" SLEIGH "ICE PALACE" NORDLYS "GOOSE FARM"
 
 Winter Wonderland (event/adventure)
 
 This event runs from December 1 to January 6; type 'event' during that time to
 see more details. While it's running, you can find small adventure portals
 by typing 'nearby Winter Wonderland' to get quests for the event.
+
+Some of the rewards include:
+ chocolate coins, snowball cookies, or thumbprint cookies - buff food
+ hideous sweater - a great new outfit
+ sleigh schematic - build a new vehicle
+ bottomless gift sack - a large pack
+ frozen ice stone - build a grand ice palace
+ reindeer - new mounts
+ design for a goose farm - keep geese in your city
+ silver elfish omni-tool - a very useful thing
+ basket of chestnuts - try planting them
+ dreidel - give it a spin
+ shimmering magewood jar - contains a magical forest
+ snowglobe of home - better than a hestian trinket
 
 See also: ADVENTURE, EVENT
 #
