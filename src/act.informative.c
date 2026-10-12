@@ -3767,7 +3767,7 @@ ACMD(do_inventory) {
 						return;
 					}
 					
-					safe_snprintf(heading + strlen(heading), sizeof(heading) - strlen(heading), "%s'%s':", (*heading ? ", " : ""), GEN_NAME(cmp));
+					safe_snprintf(heading + strlen(heading), sizeof(heading) - strlen(heading), "%s'%s'", (*heading ? ", " : ""), GEN_NAME(cmp));
 					break;
 				}
 				case 'w': {
@@ -3782,7 +3782,7 @@ ACMD(do_inventory) {
 						return;
 					}
 					
-					safe_snprintf(heading + strlen(heading), sizeof(heading) - strlen(heading), "%sworn on %s:", (*heading ? ", " : ""), wear_bits[wear_type]);
+					safe_snprintf(heading + strlen(heading), sizeof(heading) - strlen(heading), "%sworn on %s", (*heading ? ", " : ""), wear_bits[wear_type]);
 					break;
 				}
 				case 't': {
