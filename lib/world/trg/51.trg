@@ -576,6 +576,9 @@ L w 5102
 L w 5103
 L w 5104
 shatter~
+* certain resources that are too easy to acquire
+set ban_list -1 100 102 106 131 134 135 136 142 146 148 180 181 184 616 851 852 919 2104 2140
+*
 eval target %%actor.obj_target(%arg.argument1%)%%
 if !%arg%
   * no-arg: just list
@@ -583,7 +586,7 @@ if !%arg%
   set any 0
   set obj %actor.inventory%
   while %obj%
-    if %obj.wearable% && !%obj.is_flagged(*KEEP)% && !%obj.is_stolen%
+    if %obj.wearable% && !%obj.is_flagged(*KEEP)% && !%obj.is_stolen% && !(%ban_list% ~= %obj.vnum%)
       if %obj.is_flagged(SUPERIOR)%
         set qual &&Y superior&&0
       elseif %obj.is_flagged(HARD-DROP)% && %obj.is_flagged(GROUP-DROP)%
@@ -610,7 +613,7 @@ elseif !%target%
 elseif !%target.carried_by%
   %send% %actor% Pick @%target% up first.
   halt
-elseif %target.vnum% < 0
+elseif %target.vnum% < 0 || %ban_list% ~= %target.vnum%
   %send% %actor% You cannot shatter that.
   halt
 elseif !%target.wearable%
