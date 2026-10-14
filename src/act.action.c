@@ -392,7 +392,8 @@ void stop_room_action(room_data *room, int action) {
 
 
 /**
-* This is the main processor for periodic actions (ACT_), once per second.
+* This is the main processor for periodic actions (ACT_), called 5 times per
+* second.
 */
 void update_actions(void) {
 	// prevent running multiple action rounds during a catch-up cycle
