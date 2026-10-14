@@ -2977,7 +2977,7 @@ elseif %self.vnum% == 11822
       %echo% ~%self% pulls out a small notebook and sketches the stairs and walkway from across the chamber.
     break
     case 11903
-      %echo% ~%self% leans against the wall near the door and listens non-chalantly.
+      %echo% ~%self% leans against the wall near the door and listens nonchalantly.
     break
     case 11904
       %echo% ~%self% seems to be measuring the distance from the doorway to the stairs.
