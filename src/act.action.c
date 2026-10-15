@@ -1311,7 +1311,8 @@ void process_chop(char_data *ch) {
 	obj_data *axe;
 	int amt;
 	
-	const int min_progress_per_chop = 4;	// TODO this could be a config or related to the 'chop_timer' config; prevents it from taking too long
+	// updated in b5.218 (previously just = 4) -- setting this to the action cycle time makes the chop_timer essentially be "seconds to chop a tree at the lowest speed"
+	const int min_progress_per_chop = ACTION_CYCLE_TIME;
 	
 	if (!(axe = has_tool(ch, TOOL_AXE))) {
 		send_to_char("You need to be using an axe to chop.\r\n", ch);
