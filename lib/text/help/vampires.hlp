@@ -70,7 +70,7 @@ BITE
 
 Bite (Vampire ability)
 
-Usage:  bite [target]
+Usage:  bite [victim]
 Cooldown:  12 seconds
 
 A vampire is only as good as the blood it drinks. Use this command to bite a
@@ -79,9 +79,13 @@ your victim until they have no blood remaining. This is vital to replenish
 your blood points. This WILL kill your victim, so use it cautiously. Of course,
 you could always stop before your victim dies.
 
+Physical damage-over-time effects on the victim are cured when you begin
+drinking blood -- it's important for the victim to live long enough to sate
+your thirst.
+
 You can also bite as a melee attack in combat. This deals damage based on your
 Strength, but briefly reduces your Dodge by 100%. It also has a 33% chance
-to cause the target to change its focus to you, if it was attacking someone
+to cause the victim to change its focus to you, if it was attacking someone
 else. The Brutal Bite ability changes some of these behaviors.
 
 You can use "toggle bother" to turn on and off no-bother. If you are no-bother,
