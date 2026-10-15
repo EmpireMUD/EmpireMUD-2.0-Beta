@@ -1888,6 +1888,7 @@ bool audit_vehicle(vehicle_data *veh, char_data *ch) {
 */
 void complete_vehicle(vehicle_data *veh) {
 	room_data *room = IN_ROOM(veh);	// store room in case veh is purged during a trigger
+	struct empire_vehicle_data *vter;
 	struct vehicle_room_list *vrl;
 	
 	if (VEH_IS_DISMANTLING(veh)) {
@@ -1923,6 +1924,11 @@ void complete_vehicle(vehicle_data *veh) {
 			// adjust tech on existing interior?
 			LL_FOREACH(VEH_ROOM_LIST(veh), vrl) {
 				adjust_building_tech(VEH_OWNER(veh), vrl->room, TRUE);
+			}
+			
+			// reset population timer
+			if ((vter = find_empire_vehicle_entry(VEH_OWNER(veh), veh))) {
+				vter->population_timer = config_get_int("building_population_timer");
 			}
 		}
 	}
