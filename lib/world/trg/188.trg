@@ -2445,11 +2445,14 @@ set timer_running 1
 remote timer_running %self.id%
 set same_round 1
 remote same_round %self.id%
-wait 10 s
-if %self.varexists(timer_running)%
-  %send% %actor% You can't hold your breath much longer! You need to 'stand' soon!
-end
-wait 4 s
+set count 14
+while %count% > 0 && %self.varexists(same_round)%
+  wait 1 s
+  if %count% == 5 && %self.varexists(timer_running)%
+    %send% %actor% You can't hold your breath much longer! You need to 'stand' soon!
+  end
+  eval count %count% - 1
+done
 if %self.varexists(timer_running)%
   set turn %self.turn%
   %send% %turn% You can't hold your breath any longer and pull your head out of the water.

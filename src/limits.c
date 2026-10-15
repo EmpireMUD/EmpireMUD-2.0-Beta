@@ -1453,7 +1453,7 @@ bool check_autostore(obj_data *obj, bool force, empire_data *override_emp) {
 	room_data *real_loc, *last_loc;
 	obj_data *top_obj;
 	bool store, unique, full, is_home, file;
-	int islid, home_idnum = NOBODY;
+	int islid, home_idnum = NOBODY, timer;
 	
 	// easy exclusions
 	top_obj = get_top_object(obj);
@@ -1606,7 +1606,10 @@ bool check_autostore(obj_data *obj, bool force, empire_data *override_emp) {
 			}
 			
 			if (islid != NO_ISLAND) {	// MUST be not-nowhere to autostore
-				add_to_empire_storage(emp, islid, GET_OBJ_VNUM(obj), 1, GET_OBJ_TIMER(obj));
+				// note drink containers don't store timers in basic storage because they'll come out with default values
+				timer = IS_DRINK_CONTAINER(obj) ? UNLIMITED : GET_OBJ_TIMER(obj);
+				
+				add_to_empire_storage(emp, islid, GET_OBJ_VNUM(obj), 1, timer);
 			}
 		}
 	}

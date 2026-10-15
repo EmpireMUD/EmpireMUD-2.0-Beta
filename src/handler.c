@@ -9520,7 +9520,7 @@ char *requirement_string(struct req_data *req, bool show_vnums, bool allow_custo
 			break;
 		}
 		case REQ_GET_COMPONENT: {
-			safe_snprintf(output, sizeof(output), "Get component%s: %dx (%s)", PLURAL(req->needed), req->needed, req->needed == 1 ? get_generic_name_by_vnum(req->vnum) : get_generic_string_by_vnum(req->vnum, GENERIC_COMPONENT, GSTR_COMPONENT_PLURAL));
+			safe_snprintf(output, sizeof(output), "Get component%s: %dx %s(%s)", PLURAL(req->needed), req->needed, vnum, req->needed == 1 ? get_generic_name_by_vnum(req->vnum) : get_generic_string_by_vnum(req->vnum, GENERIC_COMPONENT, GSTR_COMPONENT_PLURAL));
 			break;
 		}
 		case REQ_GET_OBJECT: {
@@ -9699,7 +9699,7 @@ char *requirement_string(struct req_data *req, bool show_vnums, bool allow_custo
 			break;
 		}
 		case REQ_EMPIRE_PRODUCED_COMPONENT: {
-			safe_snprintf(output, sizeof(output), "Empire has produced: %dx (%s)", req->needed, req->needed == 1 ? get_generic_name_by_vnum(req->vnum) : get_generic_string_by_vnum(req->vnum, GENERIC_COMPONENT, GSTR_COMPONENT_PLURAL));
+			safe_snprintf(output, sizeof(output), "Empire has produced: %dx %s(%s)", req->needed, vnum, req->needed == 1 ? get_generic_name_by_vnum(req->vnum) : get_generic_string_by_vnum(req->vnum, GENERIC_COMPONENT, GSTR_COMPONENT_PLURAL));
 			break;
 		}
 		case REQ_EVENT_RUNNING: {
@@ -11254,10 +11254,15 @@ bool retrieve_resource(char_data *ch, empire_data *emp, struct empire_storage_da
 * @return int 1 -- it always returns 1
 */
 int store_resource(char_data *ch, empire_data *emp, obj_data *obj) {
+	int timer;
+	
 	act("You store $p.", FALSE, ch, obj, 0, TO_CHAR | TO_QUEUE);
 	act("$n stores $p.", TRUE, ch, obj, 0, TO_ROOM | TO_QUEUE);
-
-	add_to_empire_storage(emp, GET_ISLAND_ID(IN_ROOM(ch)), GET_OBJ_VNUM(obj), 1, GET_OBJ_TIMER(obj));
+	
+	// note drink containers don't store timers in basic storage because they'll come out with default values
+	timer = IS_DRINK_CONTAINER(obj) ? UNLIMITED : GET_OBJ_TIMER(obj);
+	
+	add_to_empire_storage(emp, GET_ISLAND_ID(IN_ROOM(ch)), GET_OBJ_VNUM(obj), 1, timer);
 	extract_obj(obj);
 	EMPIRE_NEEDS_STORAGE_SAVE(emp) = TRUE;
 	

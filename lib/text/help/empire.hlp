@@ -707,6 +707,8 @@ with. Coins will be converted from your currency to theirs (for importing), or
 from their currency to yours (for exporting). The better your relationship with
 that empire, the more even the exchange of money will be.
 
+Imports are processed automatically; items are imported to your main island.
+
 The analyze command will show you which of your trading partners has the item
 available.
 
@@ -726,7 +728,7 @@ Examples:
   > import add 500 1 strange crystal seed
   > export add 750 5 strange crystal seed
 
-See also: COINS, EXCHANGE RATE
+See also: COINS, EXCHANGE RATE, MAIN ISLAND
 #
 "EXTENDED RADIUS" EXTENDED-RADIUS "LARGE CITY RADIUS" LARGE-CITY-RADIUS "LARGE RADIUS" LARGE-RADIUS
 
@@ -949,6 +951,19 @@ Rewards the following buildings:
   &g^/\^&0  trappers post
 
 See also: LUXURIES GOAL, PROGRESS
+#
+"MAIN ISLAND" "PRIMARY ISLAND"
+
+An empire's "main island" is the one where it has the largest city. Or, if two
+or more islands have the same city size, the main island is whichever has the
+oldest city.
+
+Situations involving the main island:
+- Imports from another empire go to your main island.
+- Vessel at sea with items stored inside autostore to the main island.
+- Stolen items that are left at sea autostore back to your main island.
+
+See also: AUTOSTORE
 #
 MANAGE MANAGEMENT "LAND MANAGEMENT" NOWORK NO-WORK NODISMANTLE NO-DISMANTLE PUBLIC PUBLICIZE PRIVATE PRIVATIZE
 
@@ -1520,13 +1535,14 @@ help keep its workforce well-fed. Players can also retrieve these foods from
 the larder and take them along as long-lasting food.
 
 Examples of village foods:
- loaf of village bread
- village gruel
- village rice
- pickled village vegetables
- village oat cakes
- village fruit preserves
- pickled village eggs
+ loaf of village bread  (2x flour)
+ village gruel  (2x grain)
+ village rice  (2x rice)
+ pickled village vegetables  (2x large vegetables, 1x salt)
+ village oat cakes  (2x oatmeal)
+ village fruit preserves  (2x large raw fruit)
+ pickled village eggs  (2x raw eggs, 1x salt)
+ village smoked meat  (2x meat)
 
 See also: EINVENTORY, WORKFORCE CRAFTING
 #

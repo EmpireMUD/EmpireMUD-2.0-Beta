@@ -4867,7 +4867,8 @@ bool has_resources(char_data *ch, struct resource_data *list, bool ground, bool 
 
 
 /**
-* Gets the resources-needed list for display to mortals.
+* Gets the resources-needed list for display to mortals. Immortals generally
+* use show_resource_display() instead.
 *
 * @param struct resource_data *list The list to show.
 * @param char *save_buffer A string to write the output to.

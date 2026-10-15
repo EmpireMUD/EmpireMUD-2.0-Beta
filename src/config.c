@@ -1862,7 +1862,7 @@ void init_config_system(void) {
 	// actions
 	init_config(CONFIG_ACTIONS, "chore_distance", CONFTYPE_INT, "tiles away from home a citizen will work");
 	init_config(CONFIG_ACTIONS, "chip_timer", CONFTYPE_INT, "ticks to chip flint");
-	init_config(CONFIG_ACTIONS, "chop_timer", CONFTYPE_INT, "weapon damage to chop 1 tree");
+	init_config(CONFIG_ACTIONS, "chop_timer", CONFTYPE_INT, "how long it takes to chop a tree at the slowest speed, in seconds");
 	init_config(CONFIG_ACTIONS, "dig_base_timer", CONFTYPE_INT, "ticks, sped up by Finder and/or shovel");
 	init_config(CONFIG_ACTIONS, "fishing_timer", CONFTYPE_INT, "time per fish, halved by high Survival");
 	init_config(CONFIG_ACTIONS, "forage_base_timer", CONFTYPE_INT, "ticks, cut in half by Finder");

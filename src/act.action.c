@@ -104,7 +104,7 @@ const struct action_data_struct action_data[] = {
 	{ "building", "is hard at work building.", ACTF_HASTE | ACTF_FAST_CHORES, process_build_action, NULL },	//  ACT_BUILDING (for any type of craft)
 	{ "dismantling", "is dismantling the building.", ACTF_HASTE | ACTF_FAST_CHORES, process_dismantle_action, NULL },	// ACT_DISMANTLING
 	{ "harvesting", "is harvesting the crop.", ACTF_HASTE | ACTF_FAST_CHORES, process_harvesting, NULL },	// ACT_HARVESTING
-	{ "planting", "is planting seeds.", ACTF_HASTE | ACTF_FAST_CHORES, process_planting, NULL },	// ACT_PLANTING
+	{ "planting", "is planting seeds.", ACTF_SHOVEL | ACTF_HASTE | ACTF_FAST_CHORES, process_planting, NULL },	// ACT_PLANTING
 	{ "mining", "is mining at the walls.", ACTF_HASTE | ACTF_FAST_CHORES, process_mining, NULL },	// ACT_MINING
 	{ "minting", "is minting coins.", ACTF_ALWAYS_FAST | ACTF_FAST_CHORES, process_minting, cancel_minting },	// ACT_MINTING
 	{ "fishing", "is fishing.", ACTF_SITTING, process_gen_interact_room, NULL },	// ACT_FISHING
@@ -129,7 +129,7 @@ const struct action_data_struct action_data[] = {
 	{ "sawing", "is sawing something.", ACTF_HASTE | ACTF_FAST_CHORES, perform_saw, cancel_resource_list },	// ACT_SAWING
 	{ "quarrying", "is quarrying stone.", ACTF_HASTE | ACTF_FAST_CHORES, process_gen_interact_room, NULL },	// ACT_QUARRYING
 	{ "driving", "is driving.", ACTF_VEHICLE_SPEEDS | ACTF_SITTING, process_driving, cancel_driving },	// ACT_DRIVING
-	{ "tanning", "is tanning leather.", ACTF_FAST_CHORES, process_tanning, cancel_resource_list },	// ACT_TANNING
+	{ "tanning", "is tanning leather.", ACTF_HASTE | ACTF_FAST_CHORES, process_tanning, cancel_resource_list },	// ACT_TANNING
 	{ "reading", "is reading a book.", ACTF_SITTING | ACTF_ALWAYS_FAST | ACTF_EVEN_FASTER | ACTF_IGNORE_COND, process_reading, NULL },	// ACT_READING
 	{ "copying", "is writing out a copy of a book.", NOBITS, process_copying_book, NULL },	// ACT_COPYING_BOOK
 	{ "crafting", "is working on something.", NOBITS, process_gen_craft, cancel_gen_craft },	// ACT_GEN_CRAFT
@@ -392,7 +392,8 @@ void stop_room_action(room_data *room, int action) {
 
 
 /**
-* This is the main processor for periodic actions (ACT_), once per second.
+* This is the main processor for periodic actions (ACT_), called 5 times per
+* second.
 */
 void update_actions(void) {
 	// prevent running multiple action rounds during a catch-up cycle
@@ -474,13 +475,13 @@ void update_actions(void) {
 			speed += ACTION_CYCLE_SECOND;
 		}
 		if (IS_SET(act_flags, ACTF_HASTE) && IS_HASTENED(ch)) {
-			speed += ACTION_CYCLE_HALF_SEC;
+			speed += ACTION_CYCLE_SECOND;
 		}
 		if (IS_SET(act_flags, ACTF_FAST_CHORES) && HAS_BONUS_TRAIT(ch, BONUS_FAST_CHORES)) {
-			speed += ACTION_CYCLE_HALF_SEC;
+			speed += ACTION_CYCLE_SECOND;
 		}
 		if (IS_SET(act_flags, ACTF_FASTER_BONUS) && HAS_BONUS_TRAIT(ch, BONUS_FASTER)) {
-			speed += ACTION_CYCLE_HALF_SEC;
+			speed += ACTION_CYCLE_SECOND;
 		}
 		if (IS_SET(act_flags, ACTF_FAST_PROSPECT) && GET_LOYALTY(ch) && EMPIRE_HAS_TECH(GET_LOYALTY(ch), TECH_FAST_PROSPECT)) {
 			speed += ACTION_CYCLE_SECOND;
@@ -1310,7 +1311,8 @@ void process_chop(char_data *ch) {
 	obj_data *axe;
 	int amt;
 	
-	const int min_progress_per_chop = 4;	// TODO this could be a config or related to the 'chop_timer' config; prevents it from taking too long
+	// updated in b5.218 (previously just = 4) -- setting this to the action cycle time makes the chop_timer essentially be "seconds to chop a tree at the lowest speed"
+	const int min_progress_per_chop = ACTION_CYCLE_TIME;
 	
 	if (!(axe = has_tool(ch, TOOL_AXE))) {
 		send_to_char("You need to be using an axe to chop.\r\n", ch);

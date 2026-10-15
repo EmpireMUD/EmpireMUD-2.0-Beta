@@ -96,8 +96,8 @@ See also: QUEST
 #
 "QUEST FINISH"
 
-Usage:  quest finish <quest name | all>
-        finish <quest name | all>
+Usage:  quest finish [quest name | all]
+        finish [quest name | all]
 
 Turn in one or more quests. You must find the correct location, person, or item
 to turn in each quest. There will be an indication if you have a quest to turn

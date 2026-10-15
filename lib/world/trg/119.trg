@@ -674,6 +674,20 @@ while %cycle% < 3
   done
   eval cycle %cycle% + 1
 done
+* followers?
+set fol %room.people%
+while %fol%
+  set next_fol %fol.next_in_room%
+  if %fol.is_npc% && %fol.leader% == %actor% && !%fol.fighting%
+    %echoaround% %fol% ~%fol% vanishes in a flash of violet light!
+    %teleport% %fol% %loc%
+    %echoaround% %fol% ~%fol% appears in a flash of violet light!
+    if %fol.position% != Sleeping
+      %force% %fol% look
+    end
+  end
+  set fol %next_fol%
+done
 * cleanup
 nop %actor.set_cooldown(%self.vnum%,%cooldown_time%)%
 nop %actor.cancel_adventure_summon%
@@ -2485,13 +2499,16 @@ while %count% < 12
     set skycleave_wake 0
     remote skycleave_wake %actor.id%
     * teleport fellows
+    set teleport_list %actor%
+    set loops 0
     set ch %room.people%
     while %ch%
       set next_ch %ch.next_in_room%
-      if %ch.leader% == %actor% && !%ch.fighting%
+      if %ch.leader% && %teleport_list% ~= %ch.leader% && !%ch.fighting%
         if %ch.is_pc% && !%ch.plr_flagged(ADV-SUMMON)% && !%room.template%
           nop %ch.mark_adventure_summoned_from%
         end
+        set teleport_list %teleport_list% %ch%
         %echoaround% %ch% ~%ch% vanishes into thin air!
         %teleport% %ch% %to_room%
         if %ch.is_pc%
@@ -2505,6 +2522,11 @@ while %count% < 12
         end
       end
       set ch %next_ch%
+      if !%ch% && !%loops%
+        * go twice to get followers of followers
+        set ch %room.people%
+        set loops 1
+      end
     done
     set teleported 1
     dg_affect #11927 %actor% off silent
@@ -4879,13 +4901,16 @@ while %count% < 12
     set skycleave_wake 0
     remote skycleave_wake %actor.id%
     * teleport fellows
+    set teleport_list %actor%
+    set loops 0
     set ch %room.people%
     while %ch%
       set next_ch %ch.next_in_room%
-      if %ch.leader% == %actor% && !%ch.fighting%
+      if %ch.leader% && %teleport_list% ~= %ch.leader% && !%ch.fighting%
         if %ch.is_pc% && !%ch.plr_flagged(ADV-SUMMON)% && !%room.template%
           nop %ch.mark_adventure_summoned_from%
         end
+        set teleport_list %teleport_list% %ch%
         %echoaround% %ch% ~%ch% vanishes into thin air!
         %teleport% %ch% %to_room%
         if %ch.is_pc%
@@ -4899,6 +4924,11 @@ while %count% < 12
         end
       end
       set ch %next_ch%
+      if !%ch% && !%loops%
+        * go twice to get followers of followers
+        set ch %room.people%
+        set loops 1
+      end
     done
     set teleported 1
     * it's actually ok to continue the loop and show the dreams
@@ -5183,13 +5213,16 @@ while %count% < 12
     set skycleave_wake 0
     remote skycleave_wake %actor.id%
     * teleport fellows
+    set teleport_list %actor%
+    set loops 0
     set ch %room.people%
     while %ch%
       set next_ch %ch.next_in_room%
-      if %ch.leader% == %actor% && !%ch.fighting%
+      if %ch.leader% && %teleport_list% ~= %ch.leader% && !%ch.fighting%
         if %ch.is_pc% && !%ch.plr_flagged(ADV-SUMMON)% && !%room.template%
           nop %ch.mark_adventure_summoned_from%
         end
+        set teleport_list %teleport_list% %ch%
         %echoaround% %ch% ~%ch% vanishes into thin air!
         %teleport% %ch% %to_room%
         if %ch.is_pc%
@@ -5203,6 +5236,11 @@ while %count% < 12
         end
       end
       set ch %next_ch%
+      if !%ch% && !%loops%
+        * go twice to get followers of followers
+        set ch %room.people%
+        set loops 1
+      end
     done
     set teleported 1
     * it's actually ok to continue the loop and show the dreams

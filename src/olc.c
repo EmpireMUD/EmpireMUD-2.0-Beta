@@ -4898,7 +4898,8 @@ void show_requirement_display(char_data *ch, struct req_data *list, bool send_ou
 
 
 /**
-* Displays a resource list.
+* Displays a resource list for immortals and stat screens -- this includes
+* vnums. Mortals instead use show_resource_list().
 *
 * @param char_data *ch Person viewing the list.
 * @param struct resource_data *list The list to show.
@@ -4919,7 +4920,7 @@ void show_resource_display(char_data *ch, struct resource_data *list, bool send_
 				break;
 			}
 			case RES_COMPONENT: {
-				sprintf(line, "%dx (%s)", res->amount, res->amount == 1 ? get_generic_name_by_vnum(res->vnum) : get_generic_string_by_vnum(res->vnum, GENERIC_COMPONENT, GSTR_COMPONENT_PLURAL));
+				sprintf(line, "%dx [%d] (%s)", res->amount, res->vnum, res->amount == 1 ? get_generic_name_by_vnum(res->vnum) : get_generic_string_by_vnum(res->vnum, GENERIC_COMPONENT, GSTR_COMPONENT_PLURAL));
 				break;
 			}
 			case RES_LIQUID: {

@@ -726,6 +726,18 @@ you mix it with copper.
 
 See also: FORGE, METALS, MINE, SEW, SMELT
 #
+OBSIDIAN
+
+Obsidian (counts as rock)
+
+Used for:  crafting
+Stored at:  Gravel Pit
+
+Obsidian is a black volcanic glass sometimes found while digging in the
+mountains. It can also be used as a regular rock.
+
+See also: ROCK
+#
 OIL OILS "OIL COMPONENT" "SEED OILS" "VEGETABLE OILS"
 
 Oil (component)
@@ -793,12 +805,12 @@ the ground.
 
 See also: STORE, INVENTORY, DIPLOMACY, WAREHOUSE
 #
-ROCKS "ROCK COMPONENT" OBSIDIAN
+ROCKS "ROCK COMPONENT"
 
 Rock (component)
 
 Used for:  basic crafting, basic building
-Stored at:  Gravel Pit, Quarry, Sand Pit
+Commonly stored at:  Gravel Pit, Quarry, Sand Pit
 
 You can find rocks by digging in the ground. They can be used as a primitive
 hammer for chipping flint, for laying roads, and as filler for many building.
