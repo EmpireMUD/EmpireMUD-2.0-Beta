@@ -432,7 +432,7 @@ void olc_fullsearch_craft(char_data *ch, char *argument) {
 		FULLSEARCH_FLAGS("requiresfunction", only_functions, function_flags)
 		FULLSEARCH_BOOL("requiresobject", requires_obj)
 		FULLSEARCH_INT("time", only_time, 0, INT_MAX)
-		FULLSEARCH_INT("timesover", time_over, 0, INT_MAX)
+		FULLSEARCH_INT("timeover", time_over, 0, INT_MAX)
 		FULLSEARCH_INT("timeunder", time_under, 0, INT_MAX)
 		FULLSEARCH_FLAGS("tools", only_tools, tool_flags)
 		FULLSEARCH_INT("vmin", vmin, 0, INT_MAX)
