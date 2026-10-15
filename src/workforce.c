@@ -3369,7 +3369,7 @@ void vehicle_chore_build(empire_data *emp, vehicle_data *veh, int chore) {
 			// messaging
 			if (ROOM_PEOPLE(IN_ROOM(worker))->next_in_room) {
 				if (use_action != NOTHING && (gen = real_generic(use_action)) && GEN_TYPE(gen) == GENERIC_ACTION && GEN_STRING(gen, chore == CHORE_MAINTENANCE ? GSTR_ACTION_REPAIR_TO_ROOM : GSTR_ACTION_CRAFT_TO_ROOM)) {
-					act(GEN_STRING(gen, chore == CHORE_MAINTENANCE ? GSTR_ACTION_REPAIR_TO_ROOM : GSTR_ACTION_CRAFT_TO_ROOM), FALSE, worker, NULL, veh, TO_ROOM | TO_SPAMMY | TO_QUEUE | TO_VEH_VICT);
+					act(GEN_STRING(gen, chore == CHORE_MAINTENANCE ? GSTR_ACTION_REPAIR_TO_ROOM : GSTR_ACTION_CRAFT_TO_ROOM), FALSE, worker, NULL, veh, TO_ROOM | TO_SPAMMY | TO_QUEUE | ACT_VEH_VICT);
 				}
 				else {
 					sprintf(buf, "$n works on %s $V.", (chore == CHORE_MAINTENANCE) ? "repairing" : "constructing");
