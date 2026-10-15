@@ -406,6 +406,7 @@ void sire_char(char_data *ch, char_data *victim) {
 void start_drinking_blood(char_data *ch, char_data *victim) {
 	struct char_event_data *data;
 	struct dg_event *ev;
+	struct over_time_effect_type *dot, *next_dot;
 	
 	// safety first
 	if (GET_FEEDING_FROM(ch)) {
@@ -420,6 +421,13 @@ void start_drinking_blood(char_data *ch, char_data *victim) {
 
 	stop_fighting(ch);
 	stop_fighting(victim);
+	
+	// cancel physical DoTs on bite (prevent bleed effects from killing the target)
+	LL_FOREACH_SAFE(victim->over_time_effects, dot, next_dot) {
+		if (dot->damage_type == DAM_PHYSICAL) {
+			dot_remove(victim, dot);
+		}
+	}
 	
 	// ensure no existing event
 	cancel_stored_event(&GET_STORED_EVENTS(ch), SEV_VAMPIRE_FEEDING);
