@@ -2465,7 +2465,7 @@ void scale_mob_to_level(char_data *mob, int level) {
 	value *= MOB_FLAGGED(mob, MOB_HARD) ? 2.5 : 1.0;
 	value *= MOB_FLAGGED(mob, MOB_GROUP) ? 3.5 : 1.0;
 	if (AFF_FLAGGED(mob, AFF_NO_DISARM) || (amd && !ATTACK_FLAGGED(amd, AMDF_DISARMABLE))) {
-		value *= 0.8;	// disarm would cut damage in half; this brings it closer together
+		value *= 0.7;	// disarm would cut damage in half; this brings it closer together
 	}
 	if (MOB_FLAGGED(mob, MOB_HARD | MOB_GROUP)) {
 		value *= 1.15;	// 15% more damage from non-Normal mobs
