@@ -523,12 +523,13 @@ Gods receive resources when items are sacrifice to them. Sacrifices are worth
 to the god to whom you are making the sacrifice. The value of a sacrifice is
 based on its gear level.
 
-See GODLIST for a list of gods to whom you can offer sacrifices.
+See GODLIST for a list of gods to whom you can offer sacrifices. See HELP GOD
+SYSTEM for more information.
 
 Example:
   > sacrifice stick Exar
 
-See also: DEDICATE, GODLIST, IDENTIFY
+See also: DEDICATE, GODLIST, GOD SYSTEM, IDENTIFY
 #
 SAW
 
