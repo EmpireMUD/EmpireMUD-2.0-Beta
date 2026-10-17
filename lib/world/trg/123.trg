@@ -1211,6 +1211,10 @@ elseif %frozen_lake% ~= %room.sector_vnum%
   set elog a lake
   %terraform% %room% 12368
 end
+* log?
+if %room.empire% && %elog%
+  %log% %room.empire% territory A hoarfrost serragon has frozen %elog% at %room.coords%!
+end
 ~
 #12354
 Hoarfrost Serragon: Start progress goal (pit)~
