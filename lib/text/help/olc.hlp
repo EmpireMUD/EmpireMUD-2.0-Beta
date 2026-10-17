@@ -8986,6 +8986,7 @@ The following quest flags are available:
  &cEVENT&0 - Quest is marked as part of an event. If it's a daily quest, it is
     separate from non-event dailies.
  &cIN-CITY-ONLY&0 - Quest only starts/ends at in-city locations.
+ &cCONFIRM-DROP&0 - Player must type 'confirm' when dropping this quest.
 
 See also: OLC QUESTS, DAILY QUEST
 #d

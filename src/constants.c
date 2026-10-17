@@ -3823,6 +3823,7 @@ const char *quest_flags[] = {
 	"GROUP-COMPLETION",
 	"EVENT",
 	"IN-CITY-ONLY",	// 10
+	"CONFIRM-DROP",
 	"\n"
 };
 

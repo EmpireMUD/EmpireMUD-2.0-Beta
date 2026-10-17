@@ -2694,6 +2694,7 @@ typedef enum {
 #define QST_GROUP_COMPLETION  BIT(8)	// group members auto-finish this quest, even if incomplete, if present when any member does
 #define QST_EVENT  BIT(9)	// shows as an event quest; splits dailies into 2 pools
 #define QST_IN_CITY_ONLY  BIT(10)	// requires that it's in a city
+#define QST_CONFIRM_DROP  BIT(11)	// player must type 'confirm' when dropping this quest
 
 
 // QG_x: quest giver types

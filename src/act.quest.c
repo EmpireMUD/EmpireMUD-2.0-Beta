@@ -838,15 +838,27 @@ QCMD(qcmd_completed) {
 
 
 QCMD(qcmd_drop) {
+	bool confirm = FALSE;
+	char part_arg[MAX_INPUT_LENGTH], last_arg[MAX_INPUT_LENGTH];
 	struct instance_data *inst;
 	struct player_quest *pq;
 	quest_data *qst;
+	
+	// check for confirm
+	chop_last_arg(argument, part_arg, last_arg);
+	if (!str_cmp(last_arg, "confirm")) {
+		confirm = TRUE;
+		argument = part_arg;
+	}
 	
 	if (!*argument) {
 		msg_to_char(ch, "Drop which quest?\r\n");
 	}
 	else if (!(qst = find_local_quest_by_name(ch, argument, TRUE, FALSE, &inst)) || !(pq = is_on_quest(ch, QUEST_VNUM(qst)))) {
 		msg_to_char(ch, "You don't seem to be on a quest called '%s'.\r\n", argument);
+	}
+	else if (QUEST_FLAGGED(qst, QST_CONFIRM_DROP) && !confirm) {
+		msg_to_char(ch, "You must type 'quest drop <name> CONFIRM' to drop that quest.\r\n");
 	}
 	else {
 		msg_to_char(ch, "You drop %s%s\t0.\r\n", QUEST_LEVEL_COLOR(ch, qst), QUEST_NAME(qst));
