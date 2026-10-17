@@ -1496,7 +1496,7 @@ void perform_swap_skill_sets(char_data *ch, int which_swap) {
 		return;
 	}
 	
-	if (which_swap < 0 || which_swap > 1) {
+	if (which_swap < 0 || which_swap >= NUM_SKILL_SETS) {
 		log("SYSERR: %s swapping to invalid skill swap %d", GET_NAME(ch), which_swap);
 	}
 	which_swap = MAX(0, MIN(1, which_swap));
