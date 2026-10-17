@@ -338,17 +338,17 @@ int Board_show_board(int board_type, char_data *ch, char *arg, obj_data *board) 
 }
 
 
-void Board_display_response(int board_type, int slot_num, char_data *ch, obj_data *board, bool reply) {
+void Board_display_response(int board_type, int pos, char_data *ch, obj_data *board, bool reply) {
 	int k;
 
 #if NEWEST_AT_TOP
-	build_page_display(ch, "%2d: %s", num_of_msgs[board_type] - slot_num, MSG_HEADING(board_type, slot_num));
+	build_page_display(ch, "%2d: %s", num_of_msgs[board_type] - pos, MSG_HEADING(board_type, pos));
 #else
-	build_page_display(ch, "%2d: %s", slot_num + 1, MSG_HEADING(board_type, slot_num));
+	build_page_display(ch, "%2d: %s", pos + 1, MSG_HEADING(board_type, pos));
 #endif
 	
-	for (k = slot_num; k < num_of_msgs[board_type]; k++)
-		if (MSG_REPLY(board_type, k) == slot_num)
+	for (k = pos; k < num_of_msgs[board_type]; k++)
+		if (MSG_REPLY(board_type, k) == pos)
 			Board_display_response(board_type, k, ch, board, 1);
 }
 
@@ -411,22 +411,28 @@ void perform_remove_message(int board_type, int slot_num, int ind) {
 	int k;
 	bool found = FALSE;
 	descriptor_data *d;
-
-	for (k = 0; k < num_of_msgs[board_type]; k++, found = FALSE) {
-		if (MSG_REPLY(board_type, k) > ind)
+	
+	// check further messages to see if they're replies of this one
+	for (k = ind + 1; k < num_of_msgs[board_type]; k++, found = FALSE) {
+		if (MSG_REPLY(board_type, k) > ind) {
 			MSG_REPLY(board_type, k) -= 1;
-		else if (MSG_REPLY(board_type, k) == slot_num) {
-			for (d = descriptor_list; d; d = d->next)
-				if (STATE(d) == CON_PLAYING && d->str == &(msg_storage[MSG_SLOTNUM(board_type, k)]))
+		}
+		else if (MSG_REPLY(board_type, k) == ind) {
+			for (d = descriptor_list; d; d = d->next) {
+				if (STATE(d) == CON_PLAYING && d->str == &(msg_storage[MSG_SLOTNUM(board_type, k)])) {
 					found = TRUE;
-			if (!found)
+				}
+			}
+			if (!found) {
+				// only remove if nobody is editing it, otherwise leave it as an orphan
 				perform_remove_message(board_type, MSG_SLOTNUM(board_type, k), k);
+			}
 		}
 	}
 
 	if (msg_storage[slot_num])
 		free(msg_storage[slot_num]);
-	msg_storage[slot_num] = 0;
+	msg_storage[slot_num] = NULL;
 	msg_storage_taken[slot_num] = 0;
 	if (MSG_HEADING(board_type, ind))
 		free(MSG_HEADING(board_type, ind));
