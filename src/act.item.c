@@ -2474,6 +2474,7 @@ void do_eq_delete(char_data *ch, char *argument) {
 */
 void do_eq_list(char_data *ch, char *argument) {
 	obj_data *obj;
+	struct eq_set_obj *oset;
 	struct player_eq_set *eq_set;
 	int iter, count = 0;
 	
@@ -2486,13 +2487,13 @@ void do_eq_list(char_data *ch, char *argument) {
 				
 				for (iter = 0; iter < NUM_WEARS; ++iter) {
 					if ((obj = GET_EQ(ch, iter)) && get_obj_eq_set_by_id(obj, eq_set->id)) {
-						build_page_display_col(ch, 2, FALSE, " %s", GET_OBJ_SHORT_DESC(obj));
+						build_page_display(ch, "%s%s", wear_data[iter].eq_prompt, obj_desc_for_char(obj, ch, OBJ_DESC_EQUIPMENT));
 					}
 				}
 				
 				DL_FOREACH2(ch->carrying, obj, next_content) {
-					if (get_obj_eq_set_by_id(obj, eq_set->id)) {
-						build_page_display_col(ch, 2, FALSE, " %s", GET_OBJ_SHORT_DESC(obj));
+					if ((oset = get_obj_eq_set_by_id(obj, eq_set->id))) {
+						build_page_display(ch, "%s%s", wear_data[oset->pos].eq_prompt, obj_desc_for_char(obj, ch, OBJ_DESC_EQUIPMENT));
 					}
 				}
 				
