@@ -2809,6 +2809,7 @@ const char *faction_flags[] = {
 	"REP-FROM-KILLS",
 	"HIDE-IN-LIST",
 	"HIDE-ON-MOB",
+	"NPC-ONLY",
 	"\n"
 };
 

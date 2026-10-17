@@ -669,7 +669,8 @@ abilities can only be used every so often, usually for reasons relating to
 game balance.
 
 If you don't want to see alerts when your cooldowns expire, you can turn them
-off with the "smessages" command.
+off with the "smessages" command. If you want cooldown messages to have a
+different color, they fall under the "status" option for "recolor".
 
 See also: RECOLOR, STATUS MESSAGES
 #

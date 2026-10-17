@@ -743,6 +743,9 @@ void gain_reputation(char_data *ch, any_vnum vnum, int amount, bool is_kill, boo
 	if (!(fct = find_faction_by_vnum(vnum)) || FACTION_FLAGGED(fct, FCT_IN_DEVELOPMENT)) {
 		return;	// faction doesn't exist?
 	}
+	if (FACTION_FLAGGED(fct, FCT_NPC_ONLY)) {
+		return;	// players cannot gain this
+	}
 	if (!(pfd = get_reputation(ch, vnum, TRUE))) {
 		return;	// unable to get a rep entry?
 	}
@@ -967,6 +970,9 @@ void set_reputation(char_data *ch, any_vnum vnum, int rep) {
 	if (!(fct = find_faction_by_vnum(vnum)) || FACTION_FLAGGED(fct, FCT_IN_DEVELOPMENT)) {
 		return;	// faction doesn't exist?
 	}
+	if (FACTION_FLAGGED(fct, FCT_NPC_ONLY)) {
+		return;	// players cannot gain this
+	}
 	if (!(pfd = get_reputation(ch, vnum, TRUE))) {
 		return;	// unable to get a rep entry?
 	}
@@ -1009,7 +1015,7 @@ void update_reputations(char_data *ch) {
 	}
 	
 	HASH_ITER(hh, GET_FACTIONS(ch), pfd, next_pfd) {
-		if (!(fct = find_faction_by_vnum(pfd->vnum)) || FACTION_FLAGGED(fct, FCT_IN_DEVELOPMENT)) {
+		if (!(fct = find_faction_by_vnum(pfd->vnum)) || FACTION_FLAGGED(fct, FCT_IN_DEVELOPMENT | FCT_NPC_ONLY)) {
 			HASH_DEL(GET_FACTIONS(ch), pfd);
 			free(pfd);
 			continue;
