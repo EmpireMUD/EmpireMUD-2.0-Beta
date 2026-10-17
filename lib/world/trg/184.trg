@@ -92,37 +92,71 @@ set irrigated_sects 70 73 74 75 76 77 78
 set irrig_forest 71
 set irrig_jungle 72
 * work
+set elog 0
 if (%room.distance(%instance.location%)% > 5)
   mgoto %instance.location%
 elseif %room.aff_flagged(*HAS-INSTANCE)%
   halt
 elseif %plains_sects% ~= %room.sector_vnum%
   %terraform% %room% 18451
+  if %room.crop%
+    set elog a %room.crop% crop
+  else
+    set elog some plains
+  end
   %echo% The rising water from the nearby river floods the plains!
 elseif %forest_sects% ~= %room.sector_vnum%
   %terraform% %room% 18452
+  set elog some forest
   %echo% The rising water from the nearby river floods the forest!
 elseif %jungle_sects% ~= %room.sector_vnum%
   %terraform% %room% 250
+  set elog some jungle
   %echo% The rising water from the nearby river floods the jungle!
-elseif %jungle_sects% ~= %room.sector_vnum%
+elseif %tropic_sects% ~= %room.sector_vnum%
   %terraform% %room% 18458
+  if %room.crop%
+    set elog a %room.crop% crop
+  else
+    set elog some grassland
+  end
   %echo% The rising water from the nearby river floods the grassland!
 elseif %desert_sects% ~= %room.sector_vnum%
   %terraform% %room% 18453
+  if %room.crop%
+    set elog a %room.crop% crop
+  else
+    set elog some desert
+  end
   %echo% The rising water from the nearby river floods the desert!
 elseif %oasis_sects% ~= %room.sector_vnum%
   %terraform% %room% 18457
+  if %room.crop%
+    set elog a %room.crop% crop
+  else
+    set elog an oasis
+  end
   %echo% The rising water from the nearby canal floods the oasis!
 elseif %irrigated_sects% ~= %room.sector_vnum%
   %terraform% %room% 18454
+  if %room.crop%
+    set elog a %room.crop% crop
+  else
+    set elog some irrigated fields
+  end
   %echo% The rising water from the nearby canal floods the area!
 elseif %irrig_forest% ~= %room.sector_vnum%
   %terraform% %room% 18455
+  set elog some irrigated forest
   %echo% The rising water from the nearby canal floods the forest!
 elseif %irrig_jungle% ~= %room.sector_vnum%
   %terraform% %room% 18456
+  set elog some irrigated jungle
   %echo% The rising water from the nearby canal floods the jungle!
+end
+* log?
+if %room.empire% && %elog%
+  %log% %room.empire% territory Flooding from a nearby dam has destroyed %elog% at %room.coords%!
 end
 ~
 #18451

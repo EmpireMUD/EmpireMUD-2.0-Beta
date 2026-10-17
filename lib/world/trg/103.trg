@@ -150,7 +150,11 @@ elseif %grove_sects% ~= %vnum%
   %terraform% %room% 10301
 elseif %oasis_sects% ~= %vnum%
   %echo% ~%self% scorches the oasis!
-  set elog an oasis
+  if %room.crop%
+    set elog a %room.crop% crop
+  else
+    set elog an oasis
+  end
   %terraform% %room% 10306
 elseif %plains_sects% ~= %vnum%
   %echo% ~%self% scorches the plains!
