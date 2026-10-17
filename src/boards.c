@@ -343,21 +343,13 @@ void Board_display_response(int board_type, int slot_num, char_data *ch, obj_dat
 
 #if NEWEST_AT_TOP
 	build_page_display(ch, "%2d: %s", num_of_msgs[board_type] - slot_num, MSG_HEADING(board_type, slot_num));
-	
-	for (k = slot_num; k >= 0; --k) {
-		if (MSG_REPLY(board_type, k) == slot_num) {
-			Board_display_response(board_type, k, ch, board, 1);
-		}
-	}
 #else
 	build_page_display(ch, "%2d: %s", slot_num + 1, MSG_HEADING(board_type, slot_num));
-	
-	for (k = slot_num; k < num_of_msgs[board_type]; ++k) {
-		if (MSG_REPLY(board_type, k) == slot_num) {
-			Board_display_response(board_type, k, ch, board, 1);
-		}
-	}
 #endif
+	
+	for (k = slot_num; k < num_of_msgs[board_type]; k++)
+		if (MSG_REPLY(board_type, k) == slot_num)
+			Board_display_response(board_type, k, ch, board, 1);
 }
 
 
