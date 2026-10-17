@@ -273,7 +273,7 @@ int Board_write_message(int board_type, char_data *ch, char *arg, obj_data *boar
 	*(tmstr + strlen(tmstr) - 1) = '\0';
 
 	sprintf(buf2, "(%s%s&0)", GET_ACCESS_LEVEL(ch) == LVL_IMPL ? "&y" : GET_ACCESS_LEVEL(ch) == LVL_GOD ? "&c" : "&0", GET_NAME(ch));
-	sprintf(buf, "%6.6s %4.4s %-14s :: -%s", (tmstr + 4), (tmstr + 17), buf2, arg);
+	sprintf(buf, "%6.6s, %4.4s %-14s :: -%s", (tmstr + 4), (tmstr + 12), buf2, arg);
 	NEW_MSG_INDEX(board_type).heading = str_dup(buf);
 	NEW_MSG_INDEX(board_type).level = GET_ACCESS_LEVEL(ch);
 	NEW_MSG_INDEX(board_type).reply_num = -1;
