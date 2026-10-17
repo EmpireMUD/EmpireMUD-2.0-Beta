@@ -1515,6 +1515,9 @@ When junking coins, if you don't specify an empire, it will default to your
 generic coins. If you need to use an empire with a multi-word name, put it in
 "quotes". You can use the empire's full name, adjective name, or number.
 
+To offer an item to a god for its resource value, use "sacrifice". To break
+down unneeded gear for shards, use "shatter".
+
 Examples:
 
   > junk cup
@@ -1523,7 +1526,7 @@ Examples:
 Were you looking for the 'JUNK' item flag? This indicates an item that cannot
 be stored anywhere. It will disappear if left on the ground too long.
 
-See also: COINS, DROP
+See also: COINS, DROP, SACRIFICE, SHATTER
 #
 KILL HIT MURDER
 

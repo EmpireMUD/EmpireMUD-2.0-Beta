@@ -526,10 +526,13 @@ based on its gear level.
 See GODLIST for a list of gods to whom you can offer sacrifices. See HELP GOD
 SYSTEM for more information.
 
+To destroy something without offering it to a god, use "junk". To break down
+unneeded gear for shards, use "shatter".
+
 Example:
   > sacrifice stick Exar
 
-See also: DEDICATE, GODLIST, GOD SYSTEM, IDENTIFY
+See also: DEDICATE, JUNK, GODLIST, GOD SYSTEM, IDENTIFY, SHATTER
 #
 SAW
 
