@@ -921,7 +921,9 @@ rounded down if there isn't an even amount to split, and you will keep the
 difference.
 
 If you type 'split' with no amount or type, it will split the last amount of
-coins you received (if you've gained coins since joining the group).
+coins you received (if you've gained coins since joining the group). Only coins
+you pick up from the ground or from objects are included in this; coins from
+quests or other sources aren't tracked for this.
 
 Example:
 > split 10 misc coins
