@@ -765,4 +765,17 @@ too large to wield.
 C
 200 200
 S
+#2151
+hatchet heirloom~
+an heirloom hatchet~
+An heirloom hatchet is lying here.~
+   The lightweight bronze hatchet holds a sharp edge and lets you make quick
+work of trees, small and large. It's been in your family a long time.
+~
+3 p a a 0 2
+0 0 0
+13 0
+C
+50 50
+S
 $

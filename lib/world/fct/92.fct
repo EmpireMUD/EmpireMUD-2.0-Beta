@@ -2,21 +2,21 @@
 Lions~
 A pride of lions sticks together.
 ~
-cd
+de
 2 2 2
 S
 #9242
 Wild Dogs~
 Wild dogs form dispersed packs that will come together in a hunt.
 ~
-cd
+de
 1 1 1
 S
 #9263
 Hyenas~
 You can always count on more hyenas to show up when there's trouble.
 ~
-cd
+de
 2 2 2
 S
 #9272
@@ -24,14 +24,14 @@ Chimpanzees~
    Though it can disperse during the day, a chimpanzee troop will still show up
 to help in a fight -- or a war.
 ~
-cd
+de
 1 1 1
 S
 #9275
 Bonobos~
 The bonobo troop shows up when called.
 ~
-cd
+de
 1 1 1
 S
 #9284
@@ -39,7 +39,7 @@ Elephants~
    Elephants are smart, social creatures. When one is in distress, other arrive
 to help.
 ~
-cd
+de
 1 1 1
 S
 $
