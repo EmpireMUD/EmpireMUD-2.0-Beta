@@ -8492,7 +8492,8 @@ ACMD(do_ship) {
 				
 				if (sd->shipping_id != -1 && (veh = find_ship_by_shipping_id(emp, sd->shipping_id))) {
 					// show with ship
-					build_page_display(ch, " %dx %s (%s to %s%s, %s, %s)", sd->amount, skip_filler(GET_OBJ_SHORT_DESC(proto)), from_isle ? get_island_name_for(from_isle->id, ch) : "unknown", to_isle ? get_island_name_for(to_isle->id, ch) : "unknown", coord_display(ch, to_room ? X_COORD(to_room) : -1, to_room ? Y_COORD(to_room) : -1, FALSE), status_type[sd->status], skip_filler(VEH_SHORT_DESC(veh)));
+					strcpy(buf, skip_filler(VEH_SHORT_DESC(veh)));
+					build_page_display(ch, " %dx %s (%s to %s%s, %s, %s)", sd->amount, skip_filler(GET_OBJ_SHORT_DESC(proto)), from_isle ? get_island_name_for(from_isle->id, ch) : "unknown", to_isle ? get_island_name_for(to_isle->id, ch) : "unknown", coord_display(ch, to_room ? X_COORD(to_room) : -1, to_room ? Y_COORD(to_room) : -1, FALSE), status_type[sd->status], buf);
 				}
 				else {
 					// no ship
