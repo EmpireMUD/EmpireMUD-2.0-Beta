@@ -173,8 +173,8 @@ elseif %vnum% == 33
   %terraform% %room% 32
 end
 * log?
-if %room.owner% && %elog%
-  %log% %room.owner% territory A flame dragon has scorched %elog% at %room.coords%!
+if %room.empire% && %elog%
+  %log% %room.empire% territory A flame dragon has scorched %elog% at %room.coords%!
 end
 ~
 #10301
