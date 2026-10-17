@@ -3029,6 +3029,7 @@ Toggles:
   item-details - shows level and some other information in inventory/equipment
   item-quality - shows superior/hard/group/boss info in inventory/equipment
   map-color - shut off color for just the map
+  no-columns - turns off column view and shows one thing per line instead
   no-empire - will not create a new empire when you try to claim or build
   no-friends - this alt is hidden from friends lists
   no-paint - turns off custom paint colors on buildings
@@ -3060,6 +3061,15 @@ dim tiles.
 
 See also: FIGHT MESSAGES, FRIENDS, MANAGE, STATUS MESSAGES, TOGGLE <type>,
   WORKFORCE
+#
+"TOGGLE NO-COLUMNS" "TOGGLE NOCOLUMNS" "NO COLUMNS" NO-COLUMNS NOCOLUMNS
+
+Usage:  toggle no-columns [on/off]
+
+This toggle turns off column display and shows one item per line instead. Some
+commands do not support this toggle yet.
+
+This toggle defaults to 'on' for screen-reader users.
 #
 "TOGGLE NO-EMPIRE" "TOGGLE NOEMPIRE" NOEMPIRE NO-EMPIRE
 

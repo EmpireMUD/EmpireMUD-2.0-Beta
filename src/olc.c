@@ -5899,7 +5899,7 @@ bitvector_t olc_process_flag(char_data *ch, char *argument, char *name, char *co
 	int iter;
 	
 	if (!*argument) {
-		one_per_line = PRF_FLAGGED(ch, PRF_SCREEN_READER) ? TRUE : FALSE;
+		one_per_line = PRF_FLAGGED(ch, PRF_NO_COLUMNS) ? TRUE : FALSE;
 		for (iter = 0; *flag_names[iter] != '\n' && !one_per_line; ++iter) {
 			if (strlen(flag_names[iter]) + 5 > 34) {
 				// too long
@@ -7022,7 +7022,7 @@ int olc_process_type(char_data *ch, char *argument, char *name, char *command, c
 	bool alldigit, found, one_per_line;
 	
 	if (!*argument) {
-		one_per_line = PRF_FLAGGED(ch, PRF_SCREEN_READER) ? TRUE : FALSE;
+		one_per_line = PRF_FLAGGED(ch, PRF_NO_COLUMNS) ? TRUE : FALSE;
 		for (iter = 0; *type_names[iter] != '\n' && !one_per_line; ++iter) {
 			if (strlen(type_names[iter]) + 10 > 34) {
 				// too long

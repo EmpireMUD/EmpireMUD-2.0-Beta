@@ -2727,7 +2727,7 @@ void nanny(descriptor_data *d, char *arg) {
 
 		case CON_Q_SCREEN_READER: {
 			if (UPPER(*arg) == 'Y') {
-				SET_BIT(PRF_FLAGS(d->character), PRF_SCREEN_READER | PRF_COMPACT | PRF_SCROLLING);
+				SET_BIT(PRF_FLAGS(d->character), PRF_SCREEN_READER | PRF_COMPACT | PRF_SCROLLING | PRF_NO_COLUMNS);
 				set_creation_state(d, CON_Q_HAS_ALT);
 			}
 			else if (UPPER(*arg) == 'N') {

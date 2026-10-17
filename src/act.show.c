@@ -1195,7 +1195,7 @@ SHOW(show_factions) {
 SHOW(show_fmessages) {
 	int count, iter;
 	char_data *plr = NULL;
-	bool on, screenreader = (PRF_FLAGGED(ch, PRF_SCREEN_READER) ? TRUE : FALSE), file = FALSE;
+	bool on, file = FALSE;
 	
 	argument = one_word(argument, arg);
 	skip_spaces(&argument);
@@ -1212,15 +1212,15 @@ SHOW(show_fmessages) {
 		count = 0;
 		for (iter = 0; *combat_message_types[iter] != '\n'; ++iter) {
 			on = (IS_SET(GET_FIGHT_MESSAGES(plr), BIT(iter)) ? TRUE : FALSE);
-			if (screenreader) {
-				msg_to_char(ch, "%s: %s\r\n", combat_message_types[iter], on ? "on" : "off");
+			if (PRF_FLAGGED(ch, PRF_SCREEN_READER)) {
+				msg_to_char(ch, "%s: %s%s", combat_message_types[iter], on ? "on" : "off", ((PRF_FLAGGED(ch, PRF_NO_COLUMNS) || !(++count % 2)) ? "\r\n" : ""));
 			}
 			else {
-				msg_to_char(ch, " [%s%3.3s\t0] %-25.25s%s", on ? "\tg" : "\tr", on ? "on" : "off", combat_message_types[iter], (!(++count % 2) ? "\r\n" : ""));
+				msg_to_char(ch, " [%s%3.3s\t0] %-25.25s%s", on ? "\tg" : "\tr", on ? "on" : "off", combat_message_types[iter], ((PRF_FLAGGED(ch, PRF_NO_COLUMNS) || !(++count % 2)) ? "\r\n" : ""));
 			}
 		}
 		
-		if (count % 2 && !screenreader) {
+		if (count % 2 && !PRF_FLAGGED(ch, PRF_NO_COLUMNS)) {
 			send_to_char("\r\n", ch);
 		}
 	}
@@ -2657,7 +2657,7 @@ SHOW(show_skills) {
 SHOW(show_smessages) {
 	int count, iter;
 	char_data *plr = NULL;
-	bool on, screenreader = (PRF_FLAGGED(ch, PRF_SCREEN_READER) ? TRUE : FALSE), file = FALSE;
+	bool on, file = FALSE;
 	
 	argument = one_word(argument, arg);
 	skip_spaces(&argument);
@@ -2674,15 +2674,15 @@ SHOW(show_smessages) {
 		count = 0;
 		for (iter = 0; *status_message_types[iter] != '\n'; ++iter) {
 			on = (IS_SET(GET_STATUS_MESSAGES(plr), BIT(iter)) ? TRUE : FALSE);
-			if (screenreader) {
-				msg_to_char(ch, "%s: %s\r\n", status_message_types[iter], on ? "on" : "off");
+			if (PRF_FLAGGED(ch, PRF_SCREEN_READER)) {
+				msg_to_char(ch, "%s: %s%s", status_message_types[iter], on ? "on" : "off", ((PRF_FLAGGED(ch, PRF_NO_COLUMNS) || !(++count % 2)) ? "\r\n" : ""));
 			}
 			else {
-				msg_to_char(ch, " [%s%3.3s\t0] %-25.25s%s", on ? "\tg" : "\tr", on ? "on" : "off", status_message_types[iter], (!(++count % 2) ? "\r\n" : ""));
+				msg_to_char(ch, " [%s%3.3s\t0] %-25.25s%s", on ? "\tg" : "\tr", on ? "on" : "off", status_message_types[iter], ((PRF_FLAGGED(ch, PRF_NO_COLUMNS) || !(++count % 3)) ? "\r\n" : ""));
 			}
 		}
 		
-		if (count % 2 && !screenreader) {
+		if (count % 2 && !PRF_FLAGGED(ch, PRF_NO_COLUMNS)) {
 			send_to_char("\r\n", ch);
 		}
 	}
@@ -3637,10 +3637,10 @@ ACMD(do_show) {
 		strcpy(buf, "Show options:\r\n");
 		for (count = 0, iter = 1; show_command_fields[iter].level; ++iter) {
 			if (show_command_fields[iter].level <= GET_ACCESS_LEVEL(ch)) {
-				sprintf(buf + strlen(buf), " %-18.18s%s", show_command_fields[iter].cmd, ((!(++count % 4) || PRF_FLAGGED(ch, PRF_SCREEN_READER)) ? "\r\n" : ""));
+				sprintf(buf + strlen(buf), " %-18.18s%s", show_command_fields[iter].cmd, ((!(++count % 4) || PRF_FLAGGED(ch, PRF_NO_COLUMNS)) ? "\r\n" : ""));
 			}
 		}
-		if (!PRF_FLAGGED(ch, PRF_SCREEN_READER) && (count % 4) != 0) {
+		if (!PRF_FLAGGED(ch, PRF_NO_COLUMNS) && (count % 4) != 0) {
 			strcat(buf, "\r\n");
 		}
 		send_to_char(buf, ch);

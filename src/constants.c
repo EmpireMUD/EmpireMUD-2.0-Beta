@@ -1183,7 +1183,7 @@ const char *preference_bits[] = {
 	"!HASSLE",
 	"!IDLE-OUT",
 	"ROOMFLAGS",
-	"	*",	// 15, formerly !CHANNEL-JOINS
+	"NO-COLUMNS",	// 15
 	"AUTOKILL",
 	"SCRL",
 	"NO-ROOM-DESCS",
@@ -1290,6 +1290,8 @@ const struct toggle_data_type toggle_data[] = {
 	{ "exits", TOG_OFFON, PRF_NO_EXITS, 0, NULL },
 	{ "short-exits", TOG_ONOFF, PRF_SHORT_EXITS, 0, NULL },
 	{ "gray-city-bg", TOG_ONOFF, PRF_GRAY_CITY_BG, 0, NULL },
+	
+	{ "no-columns", TOG_ONOFF, PRF_NO_COLUMNS, 0, NULL },
 	
 	// imm section
 	{ "wiznet", TOG_OFFON, PRF_NOWIZ, LVL_START_IMM, NULL },

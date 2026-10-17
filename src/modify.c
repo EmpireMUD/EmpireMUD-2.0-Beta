@@ -1003,7 +1003,7 @@ char *get_page_display_as_string(const struct page_display *list, const char_dat
 		strdup("");	// shortcut
 	}
 	
-	use_cols = (ch && PRF_FLAGGED(ch, PRF_SCREEN_READER)) ? FALSE : TRUE;
+	use_cols = (ch && PRF_FLAGGED(ch, PRF_NO_COLUMNS)) ? FALSE : TRUE;
 	
 	// compute size
 	size = 0;

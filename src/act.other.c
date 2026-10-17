@@ -2061,7 +2061,6 @@ ACMD(do_douse) {
 // this now also controls status messages using SCMD_FIGHT or SCMD_STATUS
 // search hints: do_fmessages, do_smessages, do_statusmessages
 ACMD(do_fightmessages) {
-	bool screenreader = PRF_FLAGGED(ch, PRF_SCREEN_READER);
 	char arg1[MAX_INPUT_LENGTH], arg2[MAX_INPUT_LENGTH];
 	int iter, type = NOTHING, count;
 	bool on = FALSE, off = FALSE, mode;
@@ -2122,15 +2121,15 @@ ACMD(do_fightmessages) {
 		count = 0;
 		for (iter = 0; *type_strings[iter] != '\n'; ++iter) {
 			on = (IS_SET(*flagset, BIT(iter)) ? TRUE : FALSE);
-			if (screenreader) {
-				msg_to_char(ch, "%s: %s\r\n", type_strings[iter], on ? "on" : "off");
+			if (PRF_FLAGGED(ch, PRF_SCREEN_READER)) {
+				msg_to_char(ch, "%s: %s%s", type_strings[iter], on ? "on" : "off", ((PRF_FLAGGED(ch, PRF_NO_COLUMNS) || !(++count % 2)) ? "\r\n" : ""));
 			}
 			else {
-				msg_to_char(ch, " [%s%3.3s\t0] %-25.25s%s", on ? "\tg" : "\tr", on ? "on" : "off", type_strings[iter], (!(++count % 2) ? "\r\n" : ""));
+				msg_to_char(ch, " [%s%3.3s\t0] %-25.25s%s", on ? "\tg" : "\tr", on ? "on" : "off", type_strings[iter], ((PRF_FLAGGED(ch, PRF_NO_COLUMNS) || !(++count % 2)) ? "\r\n" : ""));
 			}
 		}
 		
-		if (count % 2 && !screenreader) {
+		if (count % 2 && !PRF_FLAGGED(ch, PRF_NO_COLUMNS)) {
 			send_to_char("\r\n", ch);
 		}
 	}
@@ -3502,7 +3501,6 @@ ACMD(do_toggle) {
 	char arg[MAX_INPUT_LENGTH];
 	struct alpha_tog *altog;
 	bool imm;
-	bool screenreader = PRF_FLAGGED(ch, PRF_SCREEN_READER);
 	
 	if (IS_NPC(ch)) {
 		msg_to_char(ch, "NPCs do not have toggles.\r\n");
@@ -3524,7 +3522,7 @@ ACMD(do_toggle) {
 		
 		iter = count = 0;
 		LL_FOREACH(alpha_tog_list, altog) {
-			pos = screenreader ? altog->pos : iter++;	// shows in alpha order for SR; normal order for rest
+			pos = PRF_FLAGGED(ch, PRF_SCREEN_READER) ? altog->pos : iter++;	// shows in alpha order for SR; normal order for rest
 			if (*toggle_data[pos].name == '\n') {
 				break;	// this should not be possible, but just in case
 			}
@@ -3532,16 +3530,16 @@ ACMD(do_toggle) {
 			if (toggle_data[pos].level <= GET_ACCESS_LEVEL(ch)) {
 				on = (PRF_FLAGGED(ch, toggle_data[pos].bit) ? 1 : 0);
 				imm = (toggle_data[pos].level >= LVL_START_IMM);
-				if (screenreader) {
-					msg_to_char(ch, "%s: %s%s\r\n", toggle_data[pos].name, tognames[toggle_data[pos].type][on], imm ? " (immortal)" : "");
+				if (PRF_FLAGGED(ch, PRF_SCREEN_READER)) {
+					msg_to_char(ch, "%s: %s%s%s", toggle_data[pos].name, tognames[toggle_data[pos].type][on], imm ? " (immortal)" : "", ((PRF_FLAGGED(ch, PRF_NO_COLUMNS) || !(++count % 3)) ? "\r\n" : ""));
 				}
 				else {
-					msg_to_char(ch, " %s[%s%3.3s%s] %-15.15s%s%s", imm ? imm_color : "", togcols[toggle_data[pos].type][on], tognames[toggle_data[pos].type][on], imm ? imm_color : clear_color, toggle_data[pos].name, clear_color, (!(++count % 3) ? "\r\n" : ""));
+					msg_to_char(ch, " %s[%s%3.3s%s] %-15.15s%s%s", imm ? imm_color : "", togcols[toggle_data[pos].type][on], tognames[toggle_data[pos].type][on], imm ? imm_color : clear_color, toggle_data[pos].name, clear_color, ((PRF_FLAGGED(ch, PRF_NO_COLUMNS) || !(++count % 3)) ? "\r\n" : ""));
 				}
 			}
 		}
 		
-		if (count % 3 && !screenreader) {
+		if (count % 3 && !PRF_FLAGGED(ch, PRF_NO_COLUMNS)) {
 			send_to_char("\r\n", ch);
 		}
 	}

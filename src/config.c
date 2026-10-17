@@ -2187,9 +2187,9 @@ ACMD(do_config) {
 		msg_to_char(ch, "Valid types:\r\n");
 		count = 0;
 		for (iter = 0; *config_groups[iter] != '\n'; ++iter) {
-			msg_to_char(ch, " %-22.22s%s", config_groups[iter], (PRF_FLAGGED(ch, PRF_SCREEN_READER) || !(++count % 3)) ? "\r\n" : "");
+			msg_to_char(ch, " %-22.22s%s", config_groups[iter], (PRF_FLAGGED(ch, PRF_NO_COLUMNS) || !(++count % 3)) ? "\r\n" : "");
 		}
-		if (!PRF_FLAGGED(ch, PRF_SCREEN_READER) && count % 3) {
+		if (!PRF_FLAGGED(ch, PRF_NO_COLUMNS) && count % 3) {
 			msg_to_char(ch, "\r\n");
 		}
 		return;
