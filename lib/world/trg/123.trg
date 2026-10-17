@@ -1109,66 +1109,106 @@ if %instance.location% && (%dist% > 4 && %random.2% == 2)
   halt
 end
 * check if we can terraform
+set elog 0
 if %room.sector_vnum% >= 100 || %ignore_sects% ~= %room.sector_vnum%
   * everything outside of this block is forbidden
   * ignore_sects is meant to avoid single-digit vnums matching partial strings
   halt
 elseif %frozen_plains% ~= %room.sector_vnum%
   %echo% Hoarfrost grows over the grass as a bitter cold descends upon the plains.
+  if %room.crop%
+    set elog a %room.crop% crop
+  else
+    set elog some plains
+  end
   %terraform% %room% 12366
 elseif %frozen_forest% ~= %room.sector_vnum%
   %echo% The trees wither and die as hoarfrost overtakes the leaves and ice pours down the trunks!
+  set elog some trees
   %terraform% %room% 12365
 elseif %frozen_desert% ~= %room.sector_vnum%
   %echo% Hoarfrost grows on each plant and every grain of sand, until the desert is covered in ice!
+  set elog some desert
   %terraform% %room% 12350
 elseif %frozen_grove% ~= %room.sector_vnum%
   %echo% The grove is glazed with ice as hoarfrost grows on every branch and leaf!
+  if %room.crop%
+    set elog a %room.crop% crop
+  else
+    set elog a grove
+  end
   %terraform% %room% 12351
 elseif %frozen_oasis% ~= %room.sector_vnum%
-  %echo% The oases glazes over with ice as hoarfrost forms on the plants around it!
+  %echo% The oasis glazes over with ice as hoarfrost forms on the plants around it!
+  if %room.crop%
+    set elog a %room.crop% crop
+  else
+    set elog an oasis
+  end
   %terraform% %room% 12352
 elseif %room.sector_vnum% == 51
   %echo% Hoarfrost spreads across the sandy beach like an arctic wave!
+  set elog a beach
   %terraform% %room% 12353
 elseif %room.sector_vnum% == 57
   %echo% Icebergs form in the water around the frozen shore!
+  set elog the shore
   %terraform% %room% 12354
 elseif %irrigated_field% ~= %room.sector_vnum%
   %echo% Hoarfrost covers every plant as the whole field ices over!
+  if %room.crop%
+    set elog a %room.crop% crop
+  else
+    set elog some irrigated fields
+  end
   %terraform% %room% 12355
 elseif %irrigated_forest% ~= %room.sector_vnum%
   %echo% Hoarfrost grows on the trees as the entire forest freezes over!
+  set elog some forest
   %terraform% %room% 12356
 elseif %irrigated_jungle% ~= %room.sector_vnum%
   %echo% Ice and hoarfrost overtake the jungle!
+  set elog some jungle
   %terraform% %room% 12357
 elseif %dry_oasis% ~= %room.sector_vnum%
   %echo% Hoarfrost forms on every plant and rock as ice overtakes the whole area!
+  set elog some desert
   %terraform% %room% 12358
 elseif %room.sector_vnum% == 85
   %echo% The canal freezes over with thick ice!
+  set elog a canal
   %terraform% %room% 12359
 elseif %room.sector_vnum% == 87
   %echo% The canal freezes over with thick ice!
+  set elog a canal
   %terraform% %room% 12360
 elseif %room.sector_vnum% == 19
   %echo% The canal freezes over with thick ice!
+  set elog a canal
   %terraform% %room% 12361
 elseif %irrigated_oasis% ~= %room.sector_vnum%
-  %echo% The oases glazes over with ice as hoarfrost forms on the plants around it!
+  %echo% The oasis glazes over with ice as hoarfrost forms on the plants around it!
+  set elog an oasis
   %terraform% %room% 12362
 elseif %room.sector_vnum% == 5
   %echo% The river grinds to a halt as it rapidly turns to ice!
+  set elog a river
   %terraform% %room% 12363
 elseif %room.sector_vnum% == 53
   %echo% The river grinds to a halt as the entire estuary turns to ice!
+  set elog an estuary
   %terraform% %room% 12364
 elseif %frozen_foothills% ~= %room.sector_vnum%
   %echo% Hoarfrost grows on the grass as any icy cold overtakes the foothills!
+  if %room.crop%
+    set elog a %room.crop% crop
+  else
+    set elog the foothills
+  end
   %terraform% %room% 12367
 elseif %frozen_lake% ~= %room.sector_vnum%
   %echo% Frost grows on the surface of the lake, freezing it in the blink of an eye!
+  set elog a lake
   %terraform% %room% 12368
 end
 ~
