@@ -1900,6 +1900,9 @@ elseif (%room.sector% == Flowing Lava || %room.sector% == Cooling Lava || %room.
   * No Work
   halt
 else
+  if %room.crop% && %room.empire%
+    %log% %room.empire% territory Flowing lava has destroyed a %room.crop% crop at %room.coords%!
+  end
   %terraform% %room% 10190
   %load% obj 10192
   %echo% The raging lava comes crashing down the mountainside!
