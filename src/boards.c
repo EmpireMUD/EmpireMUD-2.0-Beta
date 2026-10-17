@@ -272,8 +272,8 @@ int Board_write_message(int board_type, char_data *ch, char *arg, obj_data *boar
 	tmstr = (char *) asctime(localtime(&ct));
 	*(tmstr + strlen(tmstr) - 1) = '\0';
 
-	sprintf(buf2, "(%s%s&0)", GET_ACCESS_LEVEL(ch) == LVL_IMPL ? "&y" : GET_ACCESS_LEVEL(ch) == LVL_GOD ? "&c" : "&0", GET_NAME(ch));
-	sprintf(buf, "%6.6s, %4.4s %-14s :: -%s", (tmstr + 4), (tmstr + 12), buf2, arg);
+	sprintf(buf2, "%s%s&0", GET_ACCESS_LEVEL(ch) == LVL_IMPL ? "&y" : GET_ACCESS_LEVEL(ch) == LVL_GOD ? "&c" : "&0", GET_NAME(ch));
+	sprintf(buf, "%6.6s %4.4s  %-13s :: %s", (tmstr + 4), (tmstr + 20), buf2, arg);
 	NEW_MSG_INDEX(board_type).heading = str_dup(buf);
 	NEW_MSG_INDEX(board_type).level = GET_ACCESS_LEVEL(ch);
 	NEW_MSG_INDEX(board_type).reply_num = -1;
@@ -342,9 +342,9 @@ void Board_display_response(int board_type, int slot_num, char_data *ch, obj_dat
 	int k;
 
 #if NEWEST_AT_TOP
-	build_page_display(ch, "%-2d : %s", num_of_msgs[board_type] - slot_num, MSG_HEADING(board_type, slot_num));
+	build_page_display(ch, "%2d: %s", num_of_msgs[board_type] - slot_num, MSG_HEADING(board_type, slot_num));
 #else
-	build_page_display(ch, "%-2d : %s", slot_num + 1, MSG_HEADING(board_type, slot_num));
+	build_page_display(ch, "%2d: %s", slot_num + 1, MSG_HEADING(board_type, slot_num));
 #endif
 	
 	for (k = slot_num; k < num_of_msgs[board_type]; k++)
@@ -673,8 +673,8 @@ int Board_respond_message(int board_type, char_data *ch, char *arg, obj_data *bo
 	tmstr = (char *) asctime(localtime(&ct));
 	*(tmstr + strlen(tmstr) - 1) = '\0';
 
-	sprintf(buf2, "(%s%s&0)", GET_ACCESS_LEVEL(ch) == LVL_IMPL ? "&y" : GET_ACCESS_LEVEL(ch) == LVL_GOD ? "&c" : "&0", GET_NAME(ch));
-	sprintf(buf, "%6.6s %4.4s %-14s :: -%s", (tmstr + 4), (tmstr + 12), buf2, arg);
+	sprintf(buf2, "%s%s&0", GET_ACCESS_LEVEL(ch) == LVL_IMPL ? "&y" : GET_ACCESS_LEVEL(ch) == LVL_GOD ? "&c" : "&0", GET_NAME(ch));
+	sprintf(buf, "%6.6s %4.4s  %-13s :: -%s", (tmstr + 4), (tmstr + 20), buf2, arg);
 	NEW_MSG_INDEX(board_type).heading = str_dup(buf);
 	NEW_MSG_INDEX(board_type).level = GET_ACCESS_LEVEL(ch);
 	NEW_MSG_INDEX(board_type).reply_num = MSG_SLOTNUM(board_type, ind);
