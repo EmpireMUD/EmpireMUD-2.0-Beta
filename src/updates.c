@@ -5067,6 +5067,17 @@ void b5_216_progress_points_update(void) {
 }
 
 
+// b5.219: Apply new NO-COLUMNS toggle
+PLAYER_UPDATE_FUNC(b5_219_preference_update) {
+	if (PRF_FLAGGED(ch, PRF_SCREEN_READER)) {
+		SET_BIT(PRF_FLAGS(ch), PRF_NO_COLUMNS);
+	}
+	else {
+		REMOVE_BIT(PRF_FLAGS(ch), PRF_NO_COLUMNS);
+	}
+}
+
+
 // ADD HERE, above: more beta 5 update functions
 
 
@@ -5201,6 +5212,7 @@ const struct {
 	{ "b5.212b", NULL, b5_212_update_player_informative, "Updating players with new private informative flag" },
 	{ "b5.213", b5_213_immortal_empire_update, NULL, "Adding new admin flag to immortal empires" },
 	{ "b5.216", b5_216_progress_points_update, NULL, "Updating progress points because purchases no longer add points" },
+	{ "b5.219", NULL, b5_219_preference_update, "Applying new no-columns toggle to players" },
 	
 	// ADD HERE, above: more beta 5 update lines
 	
