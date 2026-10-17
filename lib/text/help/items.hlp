@@ -913,16 +913,20 @@ See also: BAKE, COOK, GOURMET CHEF, HARVEST, FORAGE, PICK, PROCESS, SPICERY
 SPLIT
 
 Usage:  split <amount> <type> coins
+        split
 
 You can split coins you've found with members of your group using this command.
 Only group members who are present with you will receive a split. The amount is
 rounded down if there isn't an even amount to split, and you will keep the
 difference.
 
+If you type 'split' with no amount or type, it will split the last amount of
+coins you received (if you've gained coins since joining the group).
+
 Example:
 > split 10 misc coins
 
-See also: COINS
+See also: COINS, GROUP
 #
 "STICKS AND LEAVES" "THORNY BRANCHES" "TANGLED VINES" VINES
 

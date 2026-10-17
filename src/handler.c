@@ -4863,6 +4863,12 @@ void join_group(char_data *ch, struct group_data *group) {
 	if (!group->leader) {
 		group->leader = ch;
 	}
+	
+	// also reset coin split when joining a new group
+	if (!IS_NPC(ch)) {
+		GET_LAST_COINS(ch) = 0;
+		GET_LAST_COINS_EMPIRE(ch) = 0;
+	}
 
 	if (group->leader == ch) {
 		send_to_group(NULL, group, "%s becomes leader of the group.", GET_NAME(ch));

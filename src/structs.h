@@ -5027,6 +5027,8 @@ struct player_special_data {
 	int last_aff_wear_off_id;	// helps prevent duplicate wear-off messages
 	int last_aff_wear_off_vnum;	// helps prevent duplicate wear-off messages
 	time_t last_aff_wear_off_time;	// helps prevent duplicate wear-off messages
+	int last_coins_amount;	// coin amount tracking for easy-split
+	int last_coins_empire;	// coin empire tracking for easy-split
 	time_t last_cond_message_time[NUM_CONDS];	// last time we sent a message for drunk, full, thirsty
 	time_t last_cold_time;	// last time a player was told they're getting colder
 	time_t last_warm_time;	// last time a player was told they're getting warmer
