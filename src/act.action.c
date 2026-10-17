@@ -2285,10 +2285,10 @@ void process_swap_skill_sets(char_data *ch) {
 	GET_ACTION_TIMER(ch) -= 1;
 	
 	if (GET_ACTION_TIMER(ch) <= 0) {
-		msg_to_char(ch, "You swap skill sets.\r\n");
+		msg_to_char(ch, "You swap to skill set %d.\r\n", (GET_ACTION_VNUM(ch, 0) + 1));
 		act("$n swaps skill sets.", TRUE, ch, NULL, NULL, TO_ROOM);
 		
-		perform_swap_skill_sets(ch);
+		perform_swap_skill_sets(ch, GET_ACTION_VNUM(ch, 0));
 		end_action(ch);
 		
 		set_move(ch, MIN(GET_MOVE(ch), GET_MAX_MOVE(ch)/4));

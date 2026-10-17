@@ -605,7 +605,7 @@ Usage:  skills -- list all skills
         skill reset <skill> -- reset your ability points
         skill drop <skill> <level> -- lose skill levels
         skill synergy <skill 1> <skill 2> -- see list of synergy abilities
-        skill swap
+        skill swap [1 : 2]
 
 Sorting: skill -level [name]
          skill -level [min-max] [name]
@@ -694,7 +694,7 @@ See also: SKILLS, SPECIALIZE, SKILL CAPS, ABILITY POINTS, SKILL SWAP,
 #
 "SKILL SWAP" "SKILL SETS" MULTISPEC MULTI-SPEC "MULTI SPEC"
 
-Usage:  skill swap
+Usage:  skill swap [1 | 2]
 
 Players who reach a skill level* of 100 can have two different sets of ability
 purchases for their skills. When you use "skill swap", all of your skills

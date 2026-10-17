@@ -1485,8 +1485,9 @@ void mark_level_gained_from_ability(char_data *ch, ability_data *abil) {
 * Switches a player's current skill set from one to the other.
 *
 * @param char_data *ch The player to swap.
+* @param int which_swap Which set to swap to (0 or 1).
 */
-void perform_swap_skill_sets(char_data *ch) {
+void perform_swap_skill_sets(char_data *ch, int which_swap) {
 	struct player_ability_data *plab, *next_plab;
 	int cur_set, old_set;
 	ability_data *abil;
@@ -1495,9 +1496,14 @@ void perform_swap_skill_sets(char_data *ch) {
 		return;
 	}
 	
+	if (which_swap < 0 || which_swap > 1) {
+		log("SYSERR: %s swapping to invalid skill swap %d", GET_NAME(ch), which_swap);
+	}
+	which_swap = MAX(0, MIN(1, which_swap));
+	
 	// note: if you ever raise NUM_SKILL_SETS, this is going to need an update
 	old_set = GET_CURRENT_SKILL_SET(ch);
-	cur_set = (old_set == 1) ? 0 : 1;
+	cur_set = which_swap;
 	
 	// update skill set
 	GET_CURRENT_SKILL_SET(ch) = cur_set;
@@ -1843,7 +1849,7 @@ ACMD(do_skills) {
 	int points, level, iter;
 	bool found, any, line;
 	bool sort_alpha = FALSE, sort_level = FALSE, want_min = FALSE, want_max = FALSE, want_all = FALSE, show_all_info = FALSE;
-	int min_level = -1, max_level = -1;
+	int min_level = -1, max_level = -1, which = -1;
 	struct player_bonus_ability *bonus_abil, *next_bonus_abil;
 	
 	// attempt to parse the args first, to get -l [range] or -a
@@ -2064,6 +2070,12 @@ ACMD(do_skills) {
 		if (!any) {
 			build_page_display_str(ch, " none");
 		}
+		
+		// skill swap?
+		if (config_get_bool("skill_swap_allowed") && GET_SKILL_LEVEL(ch) >= config_get_int("skill_swap_min_level")) {
+			build_page_display(ch, "You are using skill set %d.\r\n", GET_CURRENT_SKILL_SET(ch) + 1);
+		}
+		
 		build_page_display_str(ch, get_skill_gain_display(ch));
 		send_page_display(ch);
 	}
@@ -2219,8 +2231,15 @@ ACMD(do_skills) {
 		}
 	}
 	else if (!str_cmp(arg, "swap")) {
-		if (IS_IMMORTAL(ch)) {
-			perform_swap_skill_sets(ch);
+		// optional choice of which set (1 or 2) which translate to pos 0 or 1
+		if (*arg2 && ((which = atoi(arg2)) < 1 || which > 2)) {
+			msg_to_char(ch, "Usage: skill swap [1 | 2]\r\n");
+		}
+		else if (which != -1 && GET_CURRENT_SKILL_SET(ch) == (which - 1)) {
+			msg_to_char(ch, "You are already using set %d.\r\n", which);
+		}
+		else if (IS_IMMORTAL(ch)) {
+			perform_swap_skill_sets(ch, (which == -1 ? (GET_CURRENT_SKILL_SET(ch) == 1 ? 0 : 1) : (which-1)));
 			msg_to_char(ch, "You swap skill sets.\r\n");
 		}
 		else if (!config_get_bool("skill_swap_allowed")) {
@@ -2240,6 +2259,7 @@ ACMD(do_skills) {
 		}
 		else {
 			start_action(ch, ACT_SWAP_SKILL_SETS, 3);
+			GET_ACTION_VNUM(ch, 0) = (which == -1 ? (GET_CURRENT_SKILL_SET(ch) == 1 ? 0 : 1) : (which-1));
 			act("You prepare to swap skill sets...", FALSE, ch, NULL, NULL, TO_CHAR);
 			act("$n prepares to swap skill sets...", TRUE, ch, NULL, NULL, TO_ROOM);
 		}
@@ -2397,6 +2417,11 @@ ACMD(do_skills) {
 		
 		if (show_all_info && !PRF_FLAGGED(ch, PRF_NO_TUTORIALS) && max_level < SKILL_MAX_LEVEL(skill)) {
 			build_page_display(ch, "(For higher level abilities, use 'skill %s -all')", SKILL_NAME(skill));
+		}
+
+		// skill swap?
+		if (config_get_bool("skill_swap_allowed") && GET_SKILL_LEVEL(ch) >= config_get_int("skill_swap_min_level")) {
+			build_page_display(ch, "Skill set: %d\r\n", GET_CURRENT_SKILL_SET(ch) + 1);
 		}
 		
 		send_page_display(ch);

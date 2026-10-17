@@ -626,7 +626,7 @@ bool has_cooking_fire(char_data *ch);
 int has_skill_flagged(char_data *ch, bitvector_t skill_flag);
 void mark_level_gained_from_ability(char_data *ch, ability_data *abil);
 void perform_npc_tie(char_data *ch, char_data *victim, int subcmd);
-void perform_swap_skill_sets(char_data *ch);
+void perform_swap_skill_sets(char_data *ch, int which_swap);
 void remove_ability(char_data *ch, ability_data *abil, bool reset_levels);
 void remove_ability_by_set(char_data *ch, ability_data *abil, int skill_set, bool reset_levels);
 bool remove_ability_from_synergy_abilities(struct synergy_ability **list, any_vnum abil_vnum);
