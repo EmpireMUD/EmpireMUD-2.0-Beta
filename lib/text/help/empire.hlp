@@ -379,6 +379,7 @@ Available options:
  rank - change the name of a rank
  ranks - change the number of ranks
  frontiertraits - set your empire's default behavior outside of cities
+ toggles - settings
 
 Ranking immortals may use the syntax:  eedit [empire] <option> <argument>
  adminflags - immortals may set admin flags on empires
@@ -404,6 +405,8 @@ Immortals with the "EMPIRES" grant can set administrative flags on empires.
  &gALL-TECHS&0 - Empire can use all empire techs (e.g. Seafaring).
  &gFREE-WAR&0 - Wars by/against the empire have no cost.
  &gALLOW-NEWBIE-ISLE&0 - Newbie island claims don't auto-clear.
+ &gROSTER-SHARING&0 - Allies can see the roster (this is an eedit toggle).
+ &cHIDDEN-PROGRESS&0 - Progress goals are not announced to the world.
 
 Both the NO-WAR and NO-STEAL flags will prevent 'reclaim' from being used by OR
 against the empire.
@@ -494,6 +497,21 @@ This was formerly 'utility rescan'.
 
 See also: GRANT
 #d
+"EEDIT TOGGLES" "EMPIRE TOGGLES"
+
+Usage:  eedit toggles
+        eedit toggle <option> [on | off]
+
+You can configure certain empire settings using "eedit toggles", if you're the
+leader or the highest rank in the empire.
+
+Available toggles:
+  Roster Sharing - Members of allied empires can view your roster.
+  Hidden Progress - Your progress goals won't announce to the world (requires
+    the Hidden Progress goal).
+
+See also: HIDDEN PROGRESS, ROSTER SHARING
+#
 EFIND
 
 Usage:  efind <name>
@@ -837,6 +855,16 @@ Rewards the following building:
   .TT.  guardtower
 
 See also: PROGRESS
+#
+"HIDDEN PROGRESS" "HIDE PROGRESS"
+
+Hidden Progress (purchasable progress goal)
+
+After purchasing this progress goal, you can turn this feature on or off with
+"eedit toggle Hidden Progress". If you enable this, your future progress goal
+achievements will not announce to the world that you have completed them.
+
+See also: EEDIT TOGGLES
 #
 "HIGH MOUNTAIN GRAZIERS" "MOUNTAIN GRAZIERS" GRAZIERS
 
@@ -1220,7 +1248,7 @@ See also: PROGRESS
 #
 ROSTER
 
-Usage:  roster [all]
+Usage:  roster [empire] [all]
 
 This command shows you the members of your empire and lets you know who's on-
 line and who's been gone a while. The color of the player's main skills (if not
@@ -1228,9 +1256,18 @@ white) indicates their role, if any: &aCaster&0, &jHealer&0, &yTank&0 or &rMelee
 
 If you don't use the "all" option, you won't see members who have timed out.
 
-High-level immortals can also target other empires with this command.
+You can view the roster of allied empires if they have toggled Roster Sharing
+on with eedit. Privileged immortals can also target other empires with this
+command.
 
-See also: WHO
+See also: ROSTER SHARING, WHO
+#
+"ROSTER SHARING" "SHARED ROSTER"
+
+You can enable or disable roster sharing with "eedit toggle Roster Sharing".
+When enabled, any empire that is allied with yours can view your roster.
+
+See also: EEDIT TOGGLES, ROSTER
 #
 "SALT OF THE EARTH"
 

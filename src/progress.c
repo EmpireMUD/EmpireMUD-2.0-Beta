@@ -804,7 +804,7 @@ void complete_goal(empire_data *emp, struct empire_goal *goal) {
 	}
 	
 	if (!PRG_FLAGGED(prg, PRG_NO_ANNOUNCE)) {
-		if (!EMPIRE_HAS_TECH(emp, TECH_HIDDEN_PROGRESS)) {
+		if (!EMPIRE_ADMIN_FLAGGED(emp, EADM_HIDDEN_PROGRESS)) {
 			log_to_slash_channel_by_name(PROGRESS_LOG_CHANNEL, NULL, "%s%s\t0 achieved %s", EMPIRE_BANNER(emp), EMPIRE_NAME(emp), PRG_NAME(prg));
 		}
 		log_to_empire(emp, ELOG_PROGRESS, "Achieved: %s", PRG_NAME(prg));
@@ -1212,7 +1212,7 @@ void script_reward_goal(empire_data *emp, progress_data *prg) {
 		return;	// nothing to do
 	}
 	
-	if (!EMPIRE_HAS_TECH(emp, TECH_HIDDEN_PROGRESS)) {
+	if (!EMPIRE_ADMIN_FLAGGED(emp, EADM_HIDDEN_PROGRESS)) {
 		log_to_slash_channel_by_name(PROGRESS_LOG_CHANNEL, NULL, "%s%s\t0 achieved %s", EMPIRE_BANNER(emp), EMPIRE_NAME(emp), PRG_NAME(prg));
 	}
 	log_to_empire(emp, ELOG_PROGRESS, "Achieved: %s", PRG_NAME(prg));

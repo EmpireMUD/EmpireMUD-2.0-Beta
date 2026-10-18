@@ -2448,6 +2448,16 @@ const char *craft_types[] = {
  //////////////////////////////////////////////////////////////////////////////
 //// EMPIRE CONSTANTS ////////////////////////////////////////////////////////
 
+// used for eedit_toggles (EADM_x: used for some admin flags)
+struct eedit_toggle_data_t eedit_toggle_data[] = {
+	// name, required-tech (optional), admin flag to toggle
+	{ "Roster Sharing", NOTHING, EADM_ROSTER_SHARING },
+	{ "Hidden Progress", TECH_HIDDEN_PROGRESS, EADM_HIDDEN_PROGRESS },
+	
+	{ "\n", NOTHING, NOBITS }	// must be last
+};
+
+
 // name, icon, radius, show-to-others, is-capital
 const struct city_metadata_type city_type[] = {
 	{ "outpost", "&0-&?C1&0-", 5, FALSE, FALSE },
@@ -2574,6 +2584,8 @@ const char *empire_admin_flags[] = {
 	"ALL-TECHS",
 	"FREE-WAR",
 	"ALLOW-NEWBIE-ISLE",	// 10
+	"ROSTER-SHARING",
+	"HIDDEN-PROGRESS",
 	"\n"
 };
 

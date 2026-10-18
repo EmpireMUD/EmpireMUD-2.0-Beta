@@ -1096,6 +1096,8 @@ typedef struct vehicle_data vehicle_data;
 #define EADM_ALL_TECHS			BIT(8)	// i. empire can use all technologies
 #define EADM_FREE_WAR			BIT(9)	// j. no war costs
 #define EADM_ALLOW_NEWBIE_ISLE	BIT(10)	// k. can keep claims on newbie island
+#define EADM_ROSTER_SHARING		BIT(11)	// l. allies can see roster
+#define EADM_HIDDEN_PROGRESS	BIT(12)	// m. no progress goal announcements to the world
 
 
 // EATT_x: empire attributes
