@@ -5082,6 +5082,9 @@ PLAYER_UPDATE_FUNC(b5_219_preference_update) {
 void b5_219_empire_toggles(void) {
 	empire_data *emp, *next_emp;
 	
+	// normally this is computed AFTER this step
+	reread_empire_tech(NULL);
+	
 	HASH_ITER(hh, empire_table, emp, next_emp) {
 		if (EMPIRE_HAS_TECH(emp, TECH_HIDDEN_PROGRESS)) {
 			SET_BIT(EMPIRE_ADMIN_FLAGS(emp), EADM_HIDDEN_PROGRESS);
