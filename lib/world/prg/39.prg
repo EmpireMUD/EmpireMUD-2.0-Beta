@@ -41,9 +41,10 @@ P 3001
 S
 #3904
 Hidden Progress~
-   Your empire dwells in the shadows of society. Other empires will no longer
-see announcements of your progress on the /progress channel and cannot see
-which technologies your empire has.
+   Your empire dwells in the shadows of society. You gain the ability to hide
+the announcements of your progress from the /progress channel and block other
+empires from seeing which technologies you possess.
+   Turn this feature on and off with 'eedit toggle Hidden Progress'.
 ~
 2 3 30 0 b
 K 0 19
