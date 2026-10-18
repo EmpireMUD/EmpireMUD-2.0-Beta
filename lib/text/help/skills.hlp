@@ -307,7 +307,9 @@ Usage:  lead [mount | vehicle]
 The lead command is used to move vehicles around. Once you are leading a
 vehicle, it will move with you until type "lead" again to stop. Some vehicles
 need you to harness animals to them before they can move. You can also lead
-any animal which is mountable.
+any animal that's mountable.
+
+Type 'lead' again to stop leading.
 
 Some vehicles can't be led. If you can't lead a mob, try 'herd' instead.
 
