@@ -263,7 +263,7 @@ Usage:  demote <person> [rank]
 Demotes a person within the empire. You can specify the name of the rank
 you'd like to demote them to, or just do it one rank at a time.
 
-See also: PRIVILEGE, PROMOTE, EXPEL
+See also: PRIVILEGE, PROMOTE, EXPEL, ROSTER
 #
 DEPOSIT
 
@@ -385,7 +385,7 @@ Ranking immortals may use the syntax:  eedit [empire] <option> <argument>
  adminflags - immortals may set admin flags on empires
  rescan - immortals can have the game rescan territory and other stats
 
-See also: PRIVILEGE, EMPIRE TRAITS
+See also: PRIVILEGE, ROSTER, EMPIRE TRAITS
 #
 "EEDIT ADMINFLAGS" "EEDIT ADMIN FLAGS" "EMPIRE ADMIN FLAGS"
 
@@ -647,7 +647,7 @@ inventory, and territory will also become part of your empire. However, if
 the newly-merged empire doesn't have enough city points available, some of
 the merged cities may lose their city status.
 
-See also: CITY, EXPEL, PROMOTE, PRIVILEGE, PLEDGE
+See also: CITY, EXPEL, PROMOTE, PRIVILEGE, PLEDGE, ROSTER
 #
 ESAY ETALK EHISTORY EMPIREHISTORY
 
@@ -1173,7 +1173,8 @@ Privileges:
   dismantle: can dismantle buildings and vehicles owned by the empire (also
     controls burning your empire's buildings and vehicles)
 
-See also: CLAIM, BUILD, HARVEST, PROMOTE, DEMOTE, CHOP, CEDE, EEDIT, ELOG
+See also: CLAIM, BUILD, HARVEST, PROMOTE, DEMOTE, CHOP, CEDE, EEDIT, ELOG,
+ROSTER
 #
 PUBLICIZE
 
