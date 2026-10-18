@@ -8027,7 +8027,7 @@ ACMD(do_roster) {
 	// mortal usage: roster [all]
 	
 	// are we using: roster <empire> (with no quotes and no -all)
-	if (*argument && *argument != '"' && (e = get_empire_by_name(argument))) {
+	if (*argument && *argument != '"' && str_cmp(arg, "all") && str_cmp(arg, "-all") && (e = get_empire_by_name(argument))) {
 		*argument = '\0';	// clear further args and accept the empire name as-is
 	}
 	
