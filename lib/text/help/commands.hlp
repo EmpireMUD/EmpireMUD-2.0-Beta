@@ -2454,7 +2454,8 @@ Examples:
  > pilot east 3, north 4, northwest 7
  > drive (415,780)
 
-Many vehicles cannot move through portals.
+Note: Only certain vehicles can pass through portals. Most, like carts and
+wagons, cannot.
 
 See also: BOARD, DISEMBARK, DRAG, LAND VEHICLES, LEAD, SHIPBUILDING, SHIPS,
 STATUS MESSAGES, STOP, TOGGLE, RUN

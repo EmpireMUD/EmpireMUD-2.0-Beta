@@ -145,16 +145,15 @@ This ability also allows you to:
 See also: CRAFT INFO, CRAFTING LEVEL, WOODWORKING, RESOURCES, KEEP, MINT, TAN,
 PRIMITIVE CRAFTS, MILL, MASTER CRAFTSMAN
 #
-CARTS WAGONS CARRIAGES CARAVANS "LAND VEHICLES"
+CART CARTS WAGON WAGONS CARRIAGE CARRIAGES CARAVANS "LAND VEHICLES"
 
-Carts and their more advanced cousins, carriages, caravans and wagons, are
-essentially large chests on wheels, allowing you to carry large piles of
-resources quickly from one place to another. They can also be ridden on and
-driven to move around without spending moves.
+Carts and their more advanced cousins (carriages, caravans, and wagons) are
+essentially large chests on wheels, allowing you to carry a pile of resources
+quickly from one place to another. You can also ride on them ("sit wagon") and
+"drive" them to move around without spending movement points.
 
-You can board caravans and carriages, and ride around inside them. Caravans can
-even have a few different rooms redesignated inside. You can also usually sit
-on/in a vehicle from the outside.
+You can also "board" caravans and carriages, and ride around inside them.
+Caravans can even have a few different rooms redesignated inside.
 
 Storage capacities (large items count twice):
 Cart: 200 items
@@ -162,7 +161,10 @@ Carriage: 200 items, 1 room inside
 Wagon: 400 items
 Caravan: 100 items: 2 rooms inside
 
-See also: DRIVE, ENTER, GET, HARNESS, LEAD, MOUNT, PUT, VEHICLE, SIT
+Note: Most vehicles cannot enter portals. To move a large number of items
+between islands, build docks and use the "ship" command.
+
+See also: DRIVE, ENTER, GET, HARNESS, LEAD, MOUNT, PUT, VEHICLE, SHIP, SIT
 #
 CHORES CHORE
 
