@@ -2135,6 +2135,19 @@ if you equip a tool like an axe that would apply stats if it were in the
 
 See also: USE
 #
+"UNIT OF WATER" "UNITS OF WATER" "UNIT OF LIQUID" "UNITS OF LIQUID" UNIT UNITS LIQUID LIQUIDS WATER
+
+The capacity of a drink container, such as a canteen or gourd bottle, is rated
+in "units" of liquid. You can see how many units of liquid are inside using the
+"identify" command.
+
+Each type of liquid is different. Examples of the value of 1 unit:
+ water: 3 hours of thirst
+ milk: 2 hours of hunger, 2 hours of thirst
+ ale: 1 hour of hunger, 1 hour of thirst, drunk for 2 hours
+
+See also: DRINK, IDENTIFY
+#
 UNSTUCK STUCK
 
 You gain the 'unstuck' effect if you're inside a building and try to leave it,
