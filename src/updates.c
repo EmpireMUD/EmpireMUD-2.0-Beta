@@ -5078,6 +5078,19 @@ PLAYER_UPDATE_FUNC(b5_219_preference_update) {
 }
 
 
+// b5.219: apply new empire toggles
+void b5_219_empire_toggles(void) {
+	empire_data *emp, *next_emp;
+	
+	HASH_ITER(hh, empire_table, emp, next_emp) {
+		if (EMPIRE_HAS_TECH(emp, TECH_HIDDEN_PROGRESS)) {
+			SET_BIT(EMPIRE_ADMIN_FLAGS(emp), EADM_HIDDEN_PROGRESS);
+			EMPIRE_NEEDS_SAVE(emp) = TRUE;
+		}
+	}
+}
+
+
 // ADD HERE, above: more beta 5 update functions
 
 
@@ -5213,6 +5226,7 @@ const struct {
 	{ "b5.213", b5_213_immortal_empire_update, NULL, "Adding new admin flag to immortal empires" },
 	{ "b5.216", b5_216_progress_points_update, NULL, "Updating progress points because purchases no longer add points" },
 	{ "b5.219", NULL, b5_219_preference_update, "Applying new no-columns toggle to players" },
+	{ "b5.219a", b5_219_empire_toggles, NULL, "Applying new toggles to empires" },
 	
 	// ADD HERE, above: more beta 5 update lines
 	
