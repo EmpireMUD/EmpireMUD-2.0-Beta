@@ -1242,7 +1242,7 @@ const char *class_role_color[] = {
 };
 
 
-// PRF_x: for do_toggle, this controls the "toggle" command and these are displayed in rows of 3	
+// PRF_x: for do_toggle, this controls the "toggles" command and these are displayed in rows of 3	
 const struct toggle_data_type toggle_data[] = {
 	// these are shown in rows of 3
 	// name, type, prf, level, func

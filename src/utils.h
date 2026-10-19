@@ -2004,6 +2004,7 @@ void comma_args(char *string, char *arg1, char *arg2);
 int fill_word(char *argument);
 void half_chop(char *string, char *arg1, char *arg2);
 int is_abbrev(const char *arg1, const char *arg2);
+bool is_abbrev_ignore_hyphen(const char *arg, const char *string);
 bool is_multiword_abbrev(const char *arg, const char *phrase);
 int is_number(const char *str);
 char *one_argument(char *argument, char *first_arg);

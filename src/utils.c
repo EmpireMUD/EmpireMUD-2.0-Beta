@@ -2296,6 +2296,44 @@ int is_abbrev(const char *arg1, const char *arg2) {
 
 
 /**
+* Determines if 'arg' is an abbrev of 'string' without regard to hyphens in
+* 'string'. For example, lets you accept 'no-tell' or 'notell' equally, and
+* the player might have typed 'no-t' or 'not' for this abbrev.
+*
+* @param const char *arg The argument typed by the player.
+* @param const char *string The string to compare to.
+* @preturn bool TRUE if 
+*/
+bool is_abbrev_ignore_hyphen(const char *arg, const char *string) {
+	bool ok;
+	char *copied;
+	int iter, pos;
+	
+	// basic abbrev
+	if (is_abbrev(arg, string)) {
+		return TRUE;
+	}
+	
+	// duplicate the string with no -
+	CREATE(copied, char, strlen(string)+1);
+	for (iter = 0, pos = 0; iter < strlen(string); ++iter) {
+		if (string[iter] != '-') {
+			copied[pos++] = string[iter];
+		}
+	}
+	copied[pos++] = '\0';
+	
+	// test, save result for later
+	ok = is_abbrev(arg, copied);
+	
+	// cleanup copy
+	free(copied);
+	
+	return ok;
+}
+
+
+/**
 * similar to is_abbrev() but compares abbreviations of multiple words, e.g.
 * "cl br" would be a multi-abbrev of "clay bricks".
 *

@@ -3511,7 +3511,7 @@ ACMD(do_toggle) {
 	skip_spaces(&argument);
 	
 	for (iter = 0; *toggle_data[iter].name != '\n' && type == NOTHING; ++iter) {
-		if (toggle_data[iter].level <= GET_ACCESS_LEVEL(ch) && is_abbrev(arg, toggle_data[iter].name)) {
+		if (toggle_data[iter].level <= GET_ACCESS_LEVEL(ch) && is_abbrev_ignore_hyphen(arg, toggle_data[iter].name)) {
 			type = iter;
 		}
 	}
