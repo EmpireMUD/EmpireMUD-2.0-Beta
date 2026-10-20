@@ -1386,8 +1386,8 @@ void list_one_char(char_data *i, char_data *ch, int num) {
 				// npc shows empire adj
 				msg_to_char(ch, "<%s> ", EMPIRE_ADJECTIVE(GET_LOYALTY(i)));
 			}
-			else {
-				// player shows rank
+			else if (!is_ignoring(ch, i)) {
+				// player shows rank -- unless ignoring
 				msg_to_char(ch, "<%s&0&y> ", EMPIRE_RANK(GET_LOYALTY(i), GET_RANK(i)-1));
 			}
 		}
@@ -2703,7 +2703,7 @@ char *one_who_line(char_data *ch, char_data *to, bool shortlist, bool screenread
 	}
 	
 	// rank
-	if (GET_LOYALTY(ch)) {
+	if (GET_LOYALTY(ch) && !is_ignoring(to, ch)) {
 		size += snprintf(out + size, sizeof(out) - size, "<%s&0> ", EMPIRE_RANK(GET_LOYALTY(ch), GET_RANK(ch)-1));
 	}
 
@@ -5353,7 +5353,12 @@ ACMD(do_whois) {
 	}
 
 	if (GET_LOYALTY(victim)) {
-		msg_to_char(ch, "%s&0 of %s%s&0\r\n", EMPIRE_RANK(GET_LOYALTY(victim), GET_RANK(victim)-1), EMPIRE_BANNER(GET_LOYALTY(victim)), EMPIRE_NAME(GET_LOYALTY(victim)));
+		if (is_ignoring(ch, victim)) {
+			msg_to_char(ch, "Member of %s%s&0\r\n", EMPIRE_BANNER(GET_LOYALTY(victim)), EMPIRE_NAME(GET_LOYALTY(victim)));
+		}
+		else {
+			msg_to_char(ch, "%s&0 of %s%s&0\r\n", EMPIRE_RANK(GET_LOYALTY(victim), GET_RANK(victim)-1), EMPIRE_BANNER(GET_LOYALTY(victim)), EMPIRE_NAME(GET_LOYALTY(victim)));
+		}
 		msg_to_char(ch, "Territory: %d, Members: %d, Greatness: %d\r\n", EMPIRE_TERRITORY(GET_LOYALTY(victim), TER_TOTAL), EMPIRE_MEMBERS(GET_LOYALTY(victim)), EMPIRE_GREATNESS(GET_LOYALTY(victim)));
 	}
 	
