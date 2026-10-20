@@ -445,7 +445,7 @@ end
 ~
 #9030
 Butcher detect~
-1 c 3 33
+1 c 3 32
 L b 9001
 L b 9002
 L b 9016
@@ -477,7 +477,6 @@ L b 9270
 L b 9279
 L b 9288
 L b 9298
-L b 9914
 L c 9030
 butcher~
 * Config list:

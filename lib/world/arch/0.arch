@@ -30,7 +30,7 @@ G
 G
 21 2104  # a torch
 G
-22 2147  # a simple skinning knife
+22 2152  # a simple skinning knife
 K
 0 10
 K
@@ -110,7 +110,7 @@ G
 G
 -1 2145  # a feather sewing kit
 G
-22 2148  # a hobby knife
+22 2153  # a hobby knife
 K
 6 30
 S
@@ -184,7 +184,7 @@ G
 G
 22 2151  # an heirloom hatchet
 G
-17 2147  # a simple skinning knife
+17 2152  # a simple skinning knife
 K
 5 20
 K
@@ -222,7 +222,7 @@ G
 G
 21 2104  # a torch
 G
-22 2147  # a simple skinning knife
+22 2152  # a simple skinning knife
 K
 5 15
 K
@@ -294,7 +294,7 @@ G
 G
 21 2104  # a torch
 G
-22 2147  # a simple skinning knife
+22 2152  # a simple skinning knife
 K
 3 20
 K
@@ -466,7 +466,7 @@ G
 G
 21 2104  # a torch
 G
-22 2148  # a hobby knife
+22 2153  # a hobby knife
 K
 3 20
 K
