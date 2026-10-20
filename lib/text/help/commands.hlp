@@ -1316,6 +1316,8 @@ Examples:
 
 Immortals may view mortal help files with: help -m <topic>
 
+Help files are also available in a web browser at http://empiremud.net/help.php
+
 See also: COMMANDS, HELPSEARCH, SOCIALS
 #
 HELPINDEX "HELP INDEX"
