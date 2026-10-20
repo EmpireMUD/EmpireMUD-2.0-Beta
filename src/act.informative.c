@@ -2723,8 +2723,11 @@ char *one_who_line(char_data *ch, char_data *to, bool shortlist, bool screenread
 		return out;
 	}
 	
-	// title
-	if (!is_ignoring(to, ch)) {
+	// title?
+	if (is_ignoring(to, ch)) {
+		size += snprintf(out + size, sizeof(out) - size, " &R(ignore)&0");
+	}
+	else {
 		size += snprintf(out + size, sizeof(out) - size, "%s&0", NULLSAFE(GET_TITLE(ch)));
 	}
 	
