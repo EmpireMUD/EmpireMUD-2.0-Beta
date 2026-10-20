@@ -151,9 +151,10 @@ end
 ~
 #15903
 Shipwrecked Goblins: Scrapboss build and repair~
-0 ab 10 42
+0 ab 10 43
 L e 15901
 L e 15905
+L e 15907
 L h 0
 L h 20
 L h 21
@@ -206,12 +207,12 @@ set dist %room.distance(%start%)%
 if %room.empire% || %self.fighting% || %self.disabled%
   * skip
   halt
-elseif %room.building_vnum% == 15901 && %room.health% < %room.maxhealth% && %room.complete%
+elseif (%room.building_vnum% == 15901 || %room.building_vnum% == 15907) && %room.health% < %room.maxhealth% && %room.complete%
   %restore% %room%
   %echo% ~%self% repairs the barricades.
 elseif %room.sector_vnum% == 57
   %echo% ~%self% uses some of the wreckage to construct a barricade.
-  %build% %room% 15901
+  %build% %room% 15907
   nop %room.add_built_with(15905,10,1)%
   nop %room.add_built_with(15903,12,1)%
   nop %room.add_built_with(15904,12,1)%
