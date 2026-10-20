@@ -80,6 +80,16 @@ The following things will speed up various chores:
 
 See also: BONUS TRAITS, FINDER, SHOVEL, TOGGLE
 #
+AGE AGING
+
+Age is a measure of how long each character has been around. New characters
+have an age of 17. Type "mudstats configs" to see how long each game year
+lasts. Age has no bearing on any game stats or effects; players are free to
+roleplay their character as any age.
+
+For vampires, age is shown as two numbers such as 25/174. The first number (25)
+is the character's apparent age; the second number (174) is their actual age.
+#
 AGGRO AGGR AGGRESSIVE
 
 Some mobs are aggressive and will attack players on sight. The Majesty ability
