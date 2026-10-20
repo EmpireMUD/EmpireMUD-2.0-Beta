@@ -1096,6 +1096,8 @@ typedef struct vehicle_data vehicle_data;
 #define EADM_ALL_TECHS			BIT(8)	// i. empire can use all technologies
 #define EADM_FREE_WAR			BIT(9)	// j. no war costs
 #define EADM_ALLOW_NEWBIE_ISLE	BIT(10)	// k. can keep claims on newbie island
+#define EADM_ROSTER_SHARING		BIT(11)	// l. allies can see roster
+#define EADM_HIDDEN_PROGRESS	BIT(12)	// m. no progress goal announcements to the world
 
 
 // EATT_x: empire attributes
@@ -1386,6 +1388,7 @@ typedef struct vehicle_data vehicle_data;
 #define FCT_REP_FROM_KILLS  BIT(1)	// b. killing mobs affects faction rating
 #define FCT_HIDE_IN_LIST  BIT(2)	// c. not shown in player's list
 #define FCT_HIDE_ON_MOB  BIT(3)	// d. does not appear under mob's description
+#define FCT_NPC_ONLY  BIT(4)	// e. won't attach to players
 
 
 // FCTR_x: Relationship flags
@@ -2447,7 +2450,7 @@ typedef enum {
 #define PRF_NOHASSLE  BIT(12)	// Ignored by mobs and triggers
 #define PRF_NO_IDLE_OUT  BIT(13)	// Player won't idle out
 #define PRF_ROOMFLAGS  BIT(14)	// Sees vnums and flags on look
-	#define PRF_UNUSED_2  BIT(15)	// was !CHANNEL-JOINS before b5.162
+#define PRF_NO_COLUMNS  BIT(15)	// Request no columns for things with a columnar view
 #define PRF_AUTOKILL  BIT(16)	// Stops from knocking players out
 #define PRF_SCROLLING  BIT(17)	// Turns off page_string
 #define PRF_NO_ROOM_DESCS  BIT(18)	// Removes room descs; formerly 'brief'
@@ -2693,6 +2696,7 @@ typedef enum {
 #define QST_GROUP_COMPLETION  BIT(8)	// group members auto-finish this quest, even if incomplete, if present when any member does
 #define QST_EVENT  BIT(9)	// shows as an event quest; splits dailies into 2 pools
 #define QST_IN_CITY_ONLY  BIT(10)	// requires that it's in a city
+#define QST_CONFIRM_DROP  BIT(11)	// player must type 'confirm' when dropping this quest
 
 
 // QG_x: quest giver types
@@ -5025,6 +5029,8 @@ struct player_special_data {
 	int last_aff_wear_off_id;	// helps prevent duplicate wear-off messages
 	int last_aff_wear_off_vnum;	// helps prevent duplicate wear-off messages
 	time_t last_aff_wear_off_time;	// helps prevent duplicate wear-off messages
+	int last_coins_amount;	// coin amount tracking for easy-split
+	int last_coins_empire;	// coin empire tracking for easy-split
 	time_t last_cond_message_time[NUM_CONDS];	// last time we sent a message for drunk, full, thirsty
 	time_t last_cold_time;	// last time a player was told they're getting colder
 	time_t last_warm_time;	// last time a player was told they're getting warmer

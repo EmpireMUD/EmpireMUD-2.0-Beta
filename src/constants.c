@@ -63,7 +63,7 @@ void tog_pvp(char_data *ch);
 //// EMPIREMUD CONSTANTS /////////////////////////////////////////////////////
 
 // Shown on the "version" command and sent over MSSP
-const char *version = "EmpireMUD 2.0 beta 5.218";
+const char *version = "EmpireMUD 2.0 beta 5.219";
 const char *DG_SCRIPT_VERSION = "DG Scripts 1.0.12 e5.1.23";
 
 
@@ -1183,7 +1183,7 @@ const char *preference_bits[] = {
 	"!HASSLE",
 	"!IDLE-OUT",
 	"ROOMFLAGS",
-	"	*",	// 15, formerly !CHANNEL-JOINS
+	"NO-COLUMNS",	// 15
 	"AUTOKILL",
 	"SCRL",
 	"NO-ROOM-DESCS",
@@ -1242,7 +1242,7 @@ const char *class_role_color[] = {
 };
 
 
-// PRF_x: for do_toggle, this controls the "toggle" command and these are displayed in rows of 3	
+// PRF_x: for do_toggle, this controls the "toggles" command and these are displayed in rows of 3	
 const struct toggle_data_type toggle_data[] = {
 	// these are shown in rows of 3
 	// name, type, prf, level, func
@@ -1290,6 +1290,8 @@ const struct toggle_data_type toggle_data[] = {
 	{ "exits", TOG_OFFON, PRF_NO_EXITS, 0, NULL },
 	{ "short-exits", TOG_ONOFF, PRF_SHORT_EXITS, 0, NULL },
 	{ "gray-city-bg", TOG_ONOFF, PRF_GRAY_CITY_BG, 0, NULL },
+	
+	{ "no-columns", TOG_ONOFF, PRF_NO_COLUMNS, 0, NULL },
 	
 	// imm section
 	{ "wiznet", TOG_OFFON, PRF_NOWIZ, LVL_START_IMM, NULL },
@@ -2446,6 +2448,16 @@ const char *craft_types[] = {
  //////////////////////////////////////////////////////////////////////////////
 //// EMPIRE CONSTANTS ////////////////////////////////////////////////////////
 
+// used for eedit_toggles (EADM_x: used for some admin flags)
+struct eedit_toggle_data_t eedit_toggle_data[] = {
+	// name, required-tech (optional), admin flag to toggle
+	{ "Roster Sharing", NOTHING, EADM_ROSTER_SHARING },
+	{ "Hidden Progress", TECH_HIDDEN_PROGRESS, EADM_HIDDEN_PROGRESS },
+	
+	{ "\n", NOTHING, NOBITS }	// must be last
+};
+
+
 // name, icon, radius, show-to-others, is-capital
 const struct city_metadata_type city_type[] = {
 	{ "outpost", "&0-&?C1&0-", 5, FALSE, FALSE },
@@ -2572,6 +2584,8 @@ const char *empire_admin_flags[] = {
 	"ALL-TECHS",
 	"FREE-WAR",
 	"ALLOW-NEWBIE-ISLE",	// 10
+	"ROSTER-SHARING",
+	"HIDDEN-PROGRESS",
 	"\n"
 };
 
@@ -2809,6 +2823,7 @@ const char *faction_flags[] = {
 	"REP-FROM-KILLS",
 	"HIDE-IN-LIST",
 	"HIDE-ON-MOB",
+	"NPC-ONLY",
 	"\n"
 };
 
@@ -3822,6 +3837,7 @@ const char *quest_flags[] = {
 	"GROUP-COMPLETION",
 	"EVENT",
 	"IN-CITY-ONLY",	// 10
+	"CONFIRM-DROP",
 	"\n"
 };
 

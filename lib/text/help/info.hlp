@@ -62,23 +62,33 @@ can shut off these messages with 'toggle action-spam'. You'll still see the
 messages for starting and stopping the action, plus any resources you get.
 
 The following things will speed up various chores:
-- Work ethic bonus trait: dig, gather, chop, build, dismantle, harvest, plant,
-   manufacture, mine, mint, repair, chip, excavate, pick, scrape, fillin, saw,
-   quarry, tan, cook, smelt, burning stumps, bake
-- Faster walking: run
-- Finder: dig, forage, gather, hunt, pan, pick
-- Haste: dig, forage, gather, chop, build, dismantle, harvest, plant,
-   manufacture, mine, repair, play (music), excavate, pick, scrape, fillin,
-   saw, tan, quarry
-- Shovel: dig, plant
-- Superior tool: chop, craft, forge, mine, process, saw, sew
-- Higher level tool: chop, fish, mine
-- Progression goals: excavate, prospect
-- Mastery abilities: forge, sew, crafts in general
-- Woodworking ability: saw, scrape
-- Certain buildings: sew (tailor), weaving (tailor), craft (clay at potter)
+- &cWork ethic bonus trait:&0 bake, build, burn stumps, chip, cook, chop, dig,
+   dismantle, excavate, fillin, gather, harvest, manufacture, mine, mint, pick,
+   plant, quarry, repair, saw, smelt, scrape, tan
+- &cFaster walking:&0 run
+- &cFinder:&0 dig, forage, gather, hunt, pan, pick
+- &cHaste:&0 build, chop, dig, dismantle, excavate, fillin, forage, gather,
+   harvest, manufacture, mine, pick, plant, play music, quarry, repair, saw,
+   scrape, tan
+- &cShovel:&0 dig, plant
+- &cSuperior tool:&0 chop, craft, forge, mine, process, saw, sew
+- &cHigher level tool:&0 chop, fish, mine
+- &cProgression goals:&0 excavate, prospect
+- &cMastery abilities:&0 forge, sew, crafts in general
+- &cWoodworking ability:&0 saw, scrape
+- &cCertain buildings:&0 craft (clay at potter), sew (tailor), weaving (tailor)
 
 See also: BONUS TRAITS, FINDER, SHOVEL, TOGGLE
+#
+AGE AGING
+
+Age is a measure of how long each character has been around. New characters
+have an age of 17. Type "mudstats configs" to see how long each game year
+lasts. Age has no bearing on any game stats or effects; players are free to
+roleplay their character as any age.
+
+For vampires, age is shown as two numbers such as 25/174. The first number (25)
+is the character's apparent age; the second number (174) is their actual age.
 #
 AGGRO AGGR AGGRESSIVE
 
@@ -657,7 +667,7 @@ The 'keep' command can be used to prevent items in your inventory from being
 used for your craft and building commands.
 
 See also: BUILD, CRAFT, DISMANTLE, FORGE, IDENTIFY, KEEP, COMPONENT TYPES
-  FREE ACTIONS, COINS
+  FREE ACTIONS, COINS, UNITS OF LIQUID
 #
 COOLDOWNS "COOL DOWNS" CD
 
@@ -669,7 +679,8 @@ abilities can only be used every so often, usually for reasons relating to
 game balance.
 
 If you don't want to see alerts when your cooldowns expire, you can turn them
-off with the "smessages" command.
+off with the "smessages" command. If you want cooldown messages to have a
+different color, they fall under the "status" option for "recolor".
 
 See also: RECOLOR, STATUS MESSAGES
 #
@@ -973,7 +984,7 @@ flavorings.
 See also: BURN, CHOP, COOK, FORAGE, HARVEST, MILL, PICK, PLANT, TAVERN, WEAVE,
    IRRIGATION, SPICES
 #
-APRICOTS CUCUMBERS GARLIC LEMONS SUGARCANE FLOWERS
+APRICOTS CUCUMBERS GARLIC LEMONS SUGARCANE
 
 See also: CROPS
 #
@@ -2133,6 +2144,19 @@ if you equip a tool like an axe that would apply stats if it were in the
 <wield> slot.
 
 See also: USE
+#
+"UNIT OF WATER" "UNITS OF WATER" "UNIT OF LIQUID" "UNITS OF LIQUID" UNIT UNITS LIQUID LIQUIDS WATER
+
+The capacity of a drink container, such as a canteen or gourd bottle, is rated
+in "units" of liquid. You can see how many units of liquid are inside using the
+"identify" command.
+
+Each type of liquid is different. Examples of the value of 1 unit:
+ water: 3 hours of thirst
+ milk: 2 hours of hunger, 2 hours of thirst
+ ale: 1 hour of hunger, 1 hour of thirst, drunk for 2 hours
+
+See also: DRINK, IDENTIFY
 #
 UNSTUCK STUCK
 

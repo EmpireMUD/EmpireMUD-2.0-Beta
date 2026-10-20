@@ -206,12 +206,12 @@ R
 4 5619 0
 S
 #3312
-flour sack~
-a sack of flour~
-A sack of flour is sitting on the ground.~
+flour sack wheat~
+a sack of wheat flour~
+A sack of wheat flour is sitting on the ground.~
 Flour is used to bake bread.
 ~
-3 lC a 0 0 6
+3 lC a 0 0 7
 0 0 0
 7 0
 C

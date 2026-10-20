@@ -113,6 +113,7 @@ set tropic_crop_sects 202 203
 set foothills_sects 58 98 99
 * some other sects are handled individually below
 *
+set elog 0
 set room %self.room%
 set vnum %room.sector_vnum%
 if (%instance.location% && (%room.template% == 10300 || (%room% != %instance.location% && %random.10% == 10)))
@@ -121,43 +122,63 @@ if (%instance.location% && (%room.template% == 10300 || (%room% != %instance.loc
   %echo% ~%self% flies into the cave!
 elseif %crop_sects% ~= %vnum%
   %echo% ~%self% scorches the crops!
+  set elog a %room.crop% crop
   %terraform% %room% 10303
 elseif %desert_crop_sects% ~= %vnum%
   %echo% ~%self% scorches the crops!
+  set elog a %room.crop% crop
   %terraform% %room% 10304
 elseif %tropic_crop_sects% ~= %vnum%
   %echo% ~%self% scorches the crops!
+  set elog a %room.crop% crop
   %terraform% %room% 10309
 elseif %desert_sects% ~= %vnum%
   %echo% ~%self% scorches the desert!
+  set elog some desert
   %terraform% %room% 10305
 elseif %woods_sects% ~= %vnum%
   %echo% ~%self% scorches the trees!
+  set elog some some trees
   %terraform% %room% 10300
 elseif %spruce_sects% ~= %vnum%
   %echo% ~%self% scorches the trees!
+  set elog some evergreen trees
   %terraform% %room% 10307
 elseif %grove_sects% ~= %vnum%
   %echo% ~%self% scorches the grove!
+  set elog a grove
   %terraform% %room% 10301
 elseif %oasis_sects% ~= %vnum%
   %echo% ~%self% scorches the oasis!
+  if %room.crop%
+    set elog a %room.crop% crop
+  else
+    set elog an oasis
+  end
   %terraform% %room% 10306
 elseif %plains_sects% ~= %vnum%
   %echo% ~%self% scorches the plains!
+  set elog some plains
   %terraform% %room% 10302
 elseif %jungle_sects% ~= %vnum%
   %echo% ~%self% scorches the jungle!
+  set elog some jungle
   %terraform% %room% 10310
 elseif %tropic_sects% ~= %vnum%
   %echo% ~%self% scorches the grassland!
+  set elog some grassland
   %terraform% %room% 10311
 elseif %foothills_sects% ~= %vnum%
   %echo% ~%self% scorches the foothills!
+  set elog the foothills
   %terraform% %room% 10308
 elseif %vnum% == 33
   %echo% ~%self% melts the frozen lake!
   %terraform% %room% 32
+end
+* log?
+if %room.empire% && %elog%
+  %log% %room.empire% territory A flame dragon has scorched %elog% at %room.coords%!
 end
 ~
 #10301

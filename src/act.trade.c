@@ -866,7 +866,7 @@ void show_craft_info(char_data *ch, char *argument, int craft_type) {
 		return;
 	}
 	if (!(craft = find_best_craft_by_name(ch, argument, craft_type, TRUE, &found_wrong_cmd))) {
-		if (found_wrong_cmd != NOTHING) {
+		if (found_wrong_cmd != NOTHING && found_wrong_cmd != CRAFT_TYPE_WORKFORCE) {
 			msg_to_char(ch, "Unknown %s. Try '%s' instead.\r\n", gen_craft_data[craft_type].command, gen_craft_data[found_wrong_cmd].command);
 		}
 		else {
@@ -2278,7 +2278,7 @@ ACMD(do_gen_craft) {
 		// attempting to resume a building by name
 		resume_craft_building(ch, type);
 	}
-	else if (*arg && !list_only && !type && wrong_cmd != NOTHING) {
+	else if (*arg && !list_only && !type && wrong_cmd != NOTHING && wrong_cmd != CRAFT_TYPE_WORKFORCE) {
 		// found no match but there was an almost-match with a different command (forge, sew, etc)
 		msg_to_char(ch, "Unknown %s. Try '%s' instead.\r\n", gen_craft_data[subcmd].command, gen_craft_data[wrong_cmd].command);
 	}

@@ -307,7 +307,9 @@ Usage:  lead [mount | vehicle]
 The lead command is used to move vehicles around. Once you are leading a
 vehicle, it will move with you until type "lead" again to stop. Some vehicles
 need you to harness animals to them before they can move. You can also lead
-any animal which is mountable.
+any animal that's mountable.
+
+Type 'lead' again to stop leading.
 
 Some vehicles can't be led. If you can't lead a mob, try 'herd' instead.
 
@@ -340,7 +342,7 @@ container to hold the milk. Cows can be milked once or twice per day.
 
 Milking requires the Animal Husbandry ability.
 
-See also: ANIMAL HUSBANDRY
+See also: ANIMAL HUSBANDRY, UNITS OF LIQUID
 #
 MILL MILLING
 
@@ -523,12 +525,16 @@ Gods receive resources when items are sacrifice to them. Sacrifices are worth
 to the god to whom you are making the sacrifice. The value of a sacrifice is
 based on its gear level.
 
-See GODLIST for a list of gods to whom you can offer sacrifices.
+See GODLIST for a list of gods to whom you can offer sacrifices. See HELP GOD
+SYSTEM for more information.
+
+To destroy something without offering it to a god, use "junk". To break down
+unneeded gear for shards, use "shatter".
 
 Example:
   > sacrifice stick Exar
 
-See also: DEDICATE, GODLIST, IDENTIFY
+See also: DEDICATE, JUNK, GODLIST, GOD SYSTEM, IDENTIFY, SHATTER
 #
 SAW
 
@@ -601,7 +607,7 @@ Usage:  skills -- list all skills
         skill reset <skill> -- reset your ability points
         skill drop <skill> <level> -- lose skill levels
         skill synergy <skill 1> <skill 2> -- see list of synergy abilities
-        skill swap
+        skill swap [1 : 2]
 
 Sorting: skill -level [name]
          skill -level [min-max] [name]
@@ -690,7 +696,7 @@ See also: SKILLS, SPECIALIZE, SKILL CAPS, ABILITY POINTS, SKILL SWAP,
 #
 "SKILL SWAP" "SKILL SETS" MULTISPEC MULTI-SPEC "MULTI SPEC"
 
-Usage:  skill swap
+Usage:  skill swap [1 | 2]
 
 Players who reach a skill level* of 100 can have two different sets of ability
 purchases for their skills. When you use "skill swap", all of your skills

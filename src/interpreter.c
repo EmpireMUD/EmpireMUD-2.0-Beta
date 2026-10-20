@@ -639,6 +639,7 @@ cpp_extern const struct command_info cmd_info[] = {
 	SIMPLE_CMD( "efind", POS_SLEEPING, do_efind, NO_MIN, CTYPE_EMPIRE ),
 	SIMPLE_CMD( "elog", POS_DEAD, do_elog, NO_MIN, CTYPE_EMPIRE ),
 	SIMPLE_CMD( "empires", POS_DEAD, do_empires, NO_MIN, CTYPE_EMPIRE ),
+	SCMD_CMD( "embark", POS_STANDING, do_board, NO_MIN, CTYPE_MOVE, SCMD_BOARD ),
 	SCMD_CMD( "empireidentify", POS_DEAD, do_empire_inventory, NO_MIN, CTYPE_EMPIRE, SCMD_EIDENTIFY ),
 	SCMD_CMD( "empireinventory", POS_DEAD, do_empire_inventory, NO_MIN, CTYPE_EMPIRE, SCMD_EINVENTORY ),
 	SIMPLE_CMD( "empty", POS_STANDING, do_empty, NO_MIN, CTYPE_UTIL ),
@@ -2726,7 +2727,7 @@ void nanny(descriptor_data *d, char *arg) {
 
 		case CON_Q_SCREEN_READER: {
 			if (UPPER(*arg) == 'Y') {
-				SET_BIT(PRF_FLAGS(d->character), PRF_SCREEN_READER | PRF_COMPACT | PRF_SCROLLING);
+				SET_BIT(PRF_FLAGS(d->character), PRF_SCREEN_READER | PRF_COMPACT | PRF_SCROLLING | PRF_NO_COLUMNS);
 				set_creation_state(d, CON_Q_HAS_ALT);
 			}
 			else if (UPPER(*arg) == 'N') {

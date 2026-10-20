@@ -713,11 +713,14 @@ A simple skinning knife stands in the ground here.~
    This knife isn't really good for fighting, but you can 'use' it to equip it
 in your tool slot and use it for skinning, butchering, and even crafting.
 ~
-3 p a f 0 1
+3 p a f 0 2
 0 0 0
 1 0
 C
 1 1
+_
+Deprecated and replaced by 2152 on all archetypes.
+~
 S
 #2148
 knife hobby~
@@ -726,11 +729,14 @@ A hobby knife has been stuck into the ground.~
    This knife isn't really good for fighting, but you can 'use' it to equip it
 in your tool slot and use it for skinning, butchering, and even crafting.
 ~
-3 p a f 0 2
+3 p a f 0 3
 0 0 0
 2 0
 C
 1 1
+_
+Replaced by 2153 on all archetypes.
+~
 S
 #2149
 whistle guard guardwhistle~
@@ -764,5 +770,50 @@ too large to wield.
 2 0
 C
 200 200
+S
+#2151
+hatchet heirloom~
+an heirloom hatchet~
+An heirloom hatchet is lying here.~
+   The lightweight bronze hatchet holds a sharp edge and lets you make quick
+work of trees, small and large. It's been in your family a long time.
+~
+3 p a a 0 2
+0 0 0
+13 0
+C
+50 50
+S
+#2152
+knife skinning simple~
+a simple skinning knife~
+A simple skinning knife stands in the ground here.~
+   This knife isn't really good for fighting, but you can 'use' it to equip it
+in your tool slot and use it for skinning, butchering, and even crafting.
+~
+1 p ano f 0 3
+0 1 4
+1 0
+C
+1 1
+_
+This is a new version of 2147 that's actually a weapon.
+~
+S
+#2153
+knife hobby~
+a hobby knife~
+A hobby knife has been stuck into the ground.~
+   This knife isn't really good for fighting, but you can 'use' it to equip it
+in your tool slot and use it for skinning, butchering, and even crafting.
+~
+1 p ano f 0 5
+0 1 4
+2 0
+C
+1 1
+_
+New version of 2148 that's a weapon.
+~
 S
 $

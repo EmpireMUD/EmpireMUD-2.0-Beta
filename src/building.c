@@ -326,6 +326,7 @@ struct resource_data *combine_resources(struct resource_data *combine_a, struct 
 void complete_building(room_data *room) {
 	char_data *ch;
 	empire_data *emp;
+	struct empire_territory_data *ter;
 	
 	// nothing to do if no building data
 	if (!COMPLEX_DATA(room)) {
@@ -369,6 +370,11 @@ void complete_building(room_data *room) {
 		if (GET_BUILDING(room)) {
 			qt_empire_players(emp, qt_gain_building, GET_BLD_VNUM(GET_BUILDING(room)));
 			et_gain_building(emp, GET_BLD_VNUM(GET_BUILDING(room)));
+		}
+		
+		// reset population timer
+		if ((ter = find_territory_entry(emp, room))) {
+			ter->population_timer = config_get_int("building_population_timer");
 		}
 	}
 	

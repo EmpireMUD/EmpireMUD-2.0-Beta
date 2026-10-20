@@ -499,7 +499,10 @@ if %cooldown_vnum% > 0 && %cooldown_time% > 0
 end
 nop %actor.cancel_adventure_summon%
 %force% %actor% stop cleardata
-%purge% %self%
+* trinket is one-use unless on a newbie island
+if !%room_var.island_flagged(NEWBIE)%
+  %purge% %self%
+end
 ~
 #263
 Letheian Icon use~

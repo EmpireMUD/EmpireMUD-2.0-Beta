@@ -775,26 +775,26 @@ A massive ancient tree is lying on the ground.~
 taller than you are. It's far too big to carry, but you could saw it up or
 scrape it where it lies.
 ~
-3 E 0 0 0 21
+3 E 0 0 0 22
 0 0 0
 0 34560
 C
 1 1
 I 11 1002 100.00 1  # LIGHT: roaring fire
 I 16 138 100.00 1  # SCRAPE: enormous mast
+I 16 136 5.00 12 p  # SCRAPE: large shoot
 I 16 136 5.00 10 p  # SCRAPE: large shoot
-I 16 136 5.00 7 p  # SCRAPE: large shoot
-I 16 136 10.00 4 p  # SCRAPE: large shoot
-I 16 136 5.00 2 p  # SCRAPE: large shoot
+I 16 136 10.00 7 p  # SCRAPE: large shoot
+I 16 136 5.00 4 p  # SCRAPE: large shoot
 I 16 121 25.00 6 s  # SCRAPE: sticks and leaves
 I 16 121 25.00 8 s  # SCRAPE: sticks and leaves
 I 16 121 25.00 10 s  # SCRAPE: sticks and leaves
 I 16 121 25.00 12 s  # SCRAPE: sticks and leaves
 I 17 125 100.00 12  # SAW: stack of lumber
+I 17 136 5.00 12 p  # SAW: large shoot
 I 17 136 5.00 10 p  # SAW: large shoot
-I 17 136 5.00 7 p  # SAW: large shoot
-I 17 136 10.00 4 p  # SAW: large shoot
-I 17 136 5.00 2 p  # SAW: large shoot
+I 17 136 10.00 7 p  # SAW: large shoot
+I 17 136 5.00 4 p  # SAW: large shoot
 I 17 121 50.00 6 s  # SAW: sticks and leaves
 I 17 121 40.00 10 s  # SAW: sticks and leaves
 I 17 121 10.00 12 s  # SAW: sticks and leaves

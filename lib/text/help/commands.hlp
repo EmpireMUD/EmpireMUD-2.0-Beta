@@ -293,7 +293,7 @@ Inviting a player to a group automatically beckons them to follow.
 
 See also: FOLLOW
 #
-BOARD
+BOARD EMBARK
 
 Usage:  board <vehicle>
 
@@ -1316,6 +1316,8 @@ Examples:
 
 Immortals may view mortal help files with: help -m <topic>
 
+Help files are also available in a web browser at http://empiremud.net/help.php
+
 See also: COMMANDS, HELPSEARCH, SOCIALS
 #
 HELPINDEX "HELP INDEX"
@@ -1515,6 +1517,9 @@ When junking coins, if you don't specify an empire, it will default to your
 generic coins. If you need to use an empire with a multi-word name, put it in
 "quotes". You can use the empire's full name, adjective name, or number.
 
+To offer an item to a god for its resource value, use "sacrifice". To break
+down unneeded gear for shards, use "shatter".
+
 Examples:
 
   > junk cup
@@ -1523,7 +1528,7 @@ Examples:
 Were you looking for the 'JUNK' item flag? This indicates an item that cannot
 be stored anywhere. It will disappear if left on the ground too long.
 
-See also: COINS, DROP
+See also: COINS, DROP, SACRIFICE, SHATTER
 #
 KILL HIT MURDER
 
@@ -2451,7 +2456,8 @@ Examples:
  > pilot east 3, north 4, northwest 7
  > drive (415,780)
 
-Many vehicles cannot move through portals.
+Note: Only certain vehicles can pass through portals. Most, like carts and
+wagons, cannot.
 
 See also: BOARD, DISEMBARK, DRAG, LAND VEHICLES, LEAD, SHIPBUILDING, SHIPS,
 STATUS MESSAGES, STOP, TOGGLE, RUN
@@ -3026,6 +3032,7 @@ Toggles:
   item-details - shows level and some other information in inventory/equipment
   item-quality - shows superior/hard/group/boss info in inventory/equipment
   map-color - shut off color for just the map
+  no-columns - turns off column view and shows one thing per line instead
   no-empire - will not create a new empire when you try to claim or build
   no-friends - this alt is hidden from friends lists
   no-paint - turns off custom paint colors on buildings
@@ -3057,6 +3064,15 @@ dim tiles.
 
 See also: FIGHT MESSAGES, FRIENDS, MANAGE, STATUS MESSAGES, TOGGLE <type>,
   WORKFORCE
+#
+"TOGGLE NO-COLUMNS" "TOGGLE NOCOLUMNS" "NO COLUMNS" NO-COLUMNS NOCOLUMNS
+
+Usage:  toggle no-columns [on/off]
+
+This toggle turns off column display and shows one item per line instead. Some
+commands do not support this toggle yet.
+
+This toggle defaults to 'on' for screen-reader users.
 #
 "TOGGLE NO-EMPIRE" "TOGGLE NOEMPIRE" NOEMPIRE NO-EMPIRE
 

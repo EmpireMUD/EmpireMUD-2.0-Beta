@@ -739,7 +739,7 @@ static void show_detailed_empire(char_data *ch, empire_data *e) {
 		build_page_display(ch, "Workforce cap: %d item%s, Max city size: %s", total, PLURAL(total), city_type[type].name);
 	}
 	
-	if (is_own_empire || !EMPIRE_HAS_TECH(e, TECH_HIDDEN_PROGRESS)) {
+	if (is_own_empire || !EMPIRE_ADMIN_FLAGGED(e, EADM_HIDDEN_PROGRESS)) {
 		pline = build_page_display(ch, "Technology: ");
 		for (iter = 0, comma = FALSE; iter < NUM_TECHS; ++iter) {
 			if (EMPIRE_HAS_TECH(e, iter)) {
@@ -1700,10 +1700,15 @@ void show_workforce_setup_to_char(empire_data *emp, char_data *ch) {
 		here = (this_isle ? (this_isle->workforce_limit[chore] != 0) : FALSE);
 		
 		safe_snprintf(part, sizeof(part), "%s: %s%s", chore_data[chore].name, here ? "&con&0" : "&yoff&0", ((on && !here) || (off && here)) ? (PRF_FLAGGED(ch, PRF_SCREEN_READER) ? (on > 1 ? " (some islands)" : " (one island)") : "*") : "");
-		size = 24 + color_code_length(part) + (PRF_FLAGGED(ch, PRF_SCREEN_READER) ? 24 : 0);
-		msg_to_char(ch, " %-*.*s%s", size, size, part, (PRF_FLAGGED(ch, PRF_SCREEN_READER) || !(count % 3)) ? "\r\n" : " ");
+		if (PRF_FLAGGED(ch, PRF_NO_COLUMNS)) {
+			msg_to_char(ch, " %s\r\n", part);
+		}
+		else {	// columns
+			size = 24 + color_code_length(part) + (PRF_FLAGGED(ch, PRF_SCREEN_READER) ? 24 : 0);
+			msg_to_char(ch, " %-*.*s%s", size, size, part, !(count % 3) ? "\r\n" : " ");
+		}
 	}
-	if (count % 3 && !PRF_FLAGGED(ch, PRF_SCREEN_READER)) {
+	if (count % 3 && !PRF_FLAGGED(ch, PRF_NO_COLUMNS)) {
 		msg_to_char(ch, "\r\n");
 	}
 }
@@ -8021,8 +8026,8 @@ ACMD(do_roster) {
 	// imm usage: roster ["empire"] [all]
 	// mortal usage: roster [all]
 	
-	// override for imm args: roster <empire> (with no quotes and no -all)
-	if (imm_access && *argument && *argument != '"' && (e = get_empire_by_name(argument))) {
+	// are we using: roster <empire> (with no quotes and no -all)
+	if (*argument && *argument != '"' && str_cmp(arg, "all") && str_cmp(arg, "-all") && (e = get_empire_by_name(argument))) {
 		*argument = '\0';	// clear further args and accept the empire name as-is
 	}
 	
@@ -8033,7 +8038,7 @@ ACMD(do_roster) {
 		if (!str_cmp(arg, "all") || is_abbrev(arg, "-all")) {
 			all = TRUE;
 		}
-		else if (*arg && imm_access) {
+		else if (*arg) {
 			if (!(e = get_empire_by_name(arg))) {
 				msg_to_char(ch, "Unknown empire.\r\n");
 				return;
@@ -8048,6 +8053,14 @@ ACMD(do_roster) {
 	if (!e) {
 		msg_to_char(ch, "You must be a member of an empire to do that.\r\n");
 		return;
+	}
+	
+	// allowed to view other empire?
+	if (!imm_access && e != GET_LOYALTY(ch)) {
+		if (!EMPIRE_ADMIN_FLAGGED(e, EADM_ROSTER_SHARING) || !has_relationship(GET_LOYALTY(ch), e, DIPL_ALLIED)) {
+			msg_to_char(ch, "You cannot view the roster for %s%s\t0.\r\n", EMPIRE_BANNER(e), EMPIRE_NAME(e));
+			return;
+		}
 	}
 	
 	// build roster:

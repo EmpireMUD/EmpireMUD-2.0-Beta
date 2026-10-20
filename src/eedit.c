@@ -42,10 +42,11 @@ EEDIT(eedit_description);
 EEDIT(eedit_frontiertraits);
 EEDIT(eedit_motd);
 EEDIT(eedit_name);
+EEDIT(eedit_num_ranks);
 EEDIT(eedit_privilege);
 EEDIT(eedit_rank);
 EEDIT(eedit_rescan);
-EEDIT(eedit_num_ranks);
+EEDIT(eedit_toggles);
 
 
  //////////////////////////////////////////////////////////////////////////////
@@ -318,6 +319,7 @@ const struct {
 	{ "privilege", eedit_privilege, NOBITS },
 	{ "rank", eedit_rank, NOBITS },
 	{ "ranks", eedit_num_ranks, NOBITS },
+	{ "toggles", eedit_toggles, NOBITS },
 	{ "rescan", eedit_rescan, EEDIT_FLAG_IMM_ONLY },
 	
 	// this goes last
@@ -1008,5 +1010,90 @@ EEDIT(eedit_rescan) {
 		refresh_empire_dropped_items(which);
 		check_ruined_cities(which);
 		send_config_msg(ch, "ok_string");
+	}
+}
+
+
+EEDIT(eedit_toggles) {
+	bool imm_access = GET_ACCESS_LEVEL(ch) >= LVL_CIMPL || IS_GRANTED(ch, GRANT_EMPIRES);
+	bool on = FALSE, off = FALSE;
+	char part_arg[MAX_INPUT_LENGTH], last_arg[MAX_INPUT_LENGTH];
+	int cmd, iter;
+	
+	// based on admin flags; different types of toggles might have different definitions of active in the future
+	#define EEDIT_TOGGLE_ACTIVE(emp, pos)  (eedit_toggle_data[(pos)].admin_flag == NOBITS || ((EMPIRE_ADMIN_FLAGS(emp) & eedit_toggle_data[(pos)].admin_flag) == eedit_toggle_data[(pos)].admin_flag))
+	
+	if (!*argument) {
+		// display only
+		build_page_display(ch, "Toggles for %s%s\t0:", EMPIRE_BANNER(emp), EMPIRE_NAME(emp));
+		
+		for (iter = 0; *eedit_toggle_data[iter].name != '\n'; ++iter) {
+			build_page_display_col(ch, 2, FALSE, "%s: %s\t0", eedit_toggle_data[iter].name, (EEDIT_TOGGLE_ACTIVE(emp, iter) ? "&gon" : "&roff"));
+		}
+		
+		send_page_display(ch);
+		return;
+	}
+	
+	// check for on/off arg
+	chop_last_arg(argument, part_arg, last_arg);
+	if (!str_cmp(last_arg, "on")) {
+		on = TRUE;
+		argument = part_arg;
+	}
+	else if (!str_cmp(last_arg, "off")) {
+		off = TRUE;
+		argument = part_arg;
+	}
+	
+	// find which toggle
+	cmd = -1;
+	for (iter = 0; *eedit_toggle_data[iter].name != '\n'; ++iter) {
+		if (is_multiword_abbrev(argument, eedit_toggle_data[iter].name)) {
+			// found!
+			cmd = iter;
+			break;
+		}
+	}
+	
+	// logic chain
+	if (cmd == -1) {
+		msg_to_char(ch, "Unknown eedit toggle '%s'.\r\n", argument);
+	}
+	else if (!imm_access && GET_RANK(ch) < EMPIRE_NUM_RANKS(emp)) {
+		msg_to_char(ch, "Your rank is too low to change empire toggles.\r\n");
+	}
+	else if (eedit_toggle_data[cmd].tech_required != NO_TECH && !EMPIRE_HAS_TECH(emp, eedit_toggle_data[cmd].tech_required)) {
+		msg_to_char(ch, "The empire does not meet the requirements to set that toggle.\r\n");
+	}
+	else if (on && EEDIT_TOGGLE_ACTIVE(emp, cmd)) {
+		msg_to_char(ch, "The %s toggle is already on.\r\n", eedit_toggle_data[cmd].name);
+	}
+	else if (off && !EEDIT_TOGGLE_ACTIVE(emp, cmd)) {
+		msg_to_char(ch, "The %s toggle is already off.\r\n", eedit_toggle_data[cmd].name);
+	}
+	else {
+		// ok to change it
+		if (eedit_toggle_data[cmd].admin_flag != NOBITS) {
+			if (on || (!off && !EEDIT_TOGGLE_ACTIVE(emp, cmd))) {
+				on = TRUE;
+				SET_BIT(EMPIRE_ADMIN_FLAGS(emp), eedit_toggle_data[cmd].admin_flag);
+			}
+			else if (off || (!on && EEDIT_TOGGLE_ACTIVE(emp, cmd))) {
+				off = TRUE;
+				REMOVE_BIT(EMPIRE_ADMIN_FLAGS(emp), eedit_toggle_data[cmd].admin_flag);
+			}
+		}
+		
+		// log
+		if (emp == GET_LOYALTY(ch)) {
+			log_to_empire(emp, ELOG_ADMIN, "%s has toggled %s %s", PERS(ch, ch, TRUE), eedit_toggle_data[cmd].name, (on ? "on" : "off"));
+			msg_to_char(ch, "You toggle %s %s for the empire.\r\n", eedit_toggle_data[cmd].name, (on ? "on" : "off"));
+		}
+		else {
+			log_to_empire(emp, ELOG_ADMIN, "%s has been toggled %s", eedit_toggle_data[cmd].name, (on ? "on" : "off"));
+			syslog(SYS_GC, GET_INVIS_LEV(ch), TRUE, "ABUSE: %s has toggled %s %s for %s", GET_NAME(ch), eedit_toggle_data[cmd].name, (on ? "on" : "off"), EMPIRE_NAME(emp));
+			msg_to_char(ch, "You toggle %s %s for %s%s\t0.\r\n", eedit_toggle_data[cmd].name, (on ? "on" : "off"), EMPIRE_BANNER(emp), EMPIRE_NAME(emp));
+		}
 	}
 }

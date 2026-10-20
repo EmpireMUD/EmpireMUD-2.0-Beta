@@ -2461,7 +2461,7 @@ void scale_mob_to_level(char_data *mob, int level) {
 	target = (low_level / 20.0) + (mid_level / 17.5) + (high_level / 15.0) + (over_level / 9.5);
 	amd = real_attack_message(MOB_ATTACK_TYPE(mob));
 	value = target * ((amd && ATTACK_SPEED(amd, SPD_NORMAL) > 0.0) ? ATTACK_SPEED(amd, SPD_NORMAL) : basic_speed);
-	value *= MOB_FLAGGED(mob, MOB_DPS) ? 2.5 : 1.0;
+	value *= MOB_FLAGGED(mob, MOB_DPS) ? 1.75 : 1.0;
 	value *= MOB_FLAGGED(mob, MOB_HARD) ? 2.5 : 1.0;
 	value *= MOB_FLAGGED(mob, MOB_GROUP) ? 3.5 : 1.0;
 	if (AFF_FLAGGED(mob, AFF_NO_DISARM) || (amd && !ATTACK_FLAGGED(amd, AMDF_DISARMABLE))) {

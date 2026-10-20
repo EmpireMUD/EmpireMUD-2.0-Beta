@@ -514,6 +514,14 @@ bool get_check_money(char_data *ch, obj_data *obj) {
 			if (ch->desc) {	// these usually appear with stacked messages
 				stack_msg_to_desc(ch->desc, "There %s %s.\r\n", (value == 1 ? "was" : "were"), money_amount(emp, value));
 			}
+			
+			// for easy-split
+			if (GET_LAST_COINS_EMPIRE(ch) != GET_COINS_EMPIRE_ID(obj)) {
+				GET_LAST_COINS_EMPIRE(ch) = GET_COINS_EMPIRE_ID(obj);
+				GET_LAST_COINS(ch) = 0;
+			}
+			GET_LAST_COINS(ch) += value;
+			
 			break;
 		}
 		case ITEM_CURRENCY: {
@@ -2466,6 +2474,7 @@ void do_eq_delete(char_data *ch, char *argument) {
 */
 void do_eq_list(char_data *ch, char *argument) {
 	obj_data *obj;
+	struct eq_set_obj *oset;
 	struct player_eq_set *eq_set;
 	int iter, count = 0;
 	
@@ -2478,13 +2487,13 @@ void do_eq_list(char_data *ch, char *argument) {
 				
 				for (iter = 0; iter < NUM_WEARS; ++iter) {
 					if ((obj = GET_EQ(ch, iter)) && get_obj_eq_set_by_id(obj, eq_set->id)) {
-						build_page_display_col(ch, 2, FALSE, " %s", GET_OBJ_SHORT_DESC(obj));
+						build_page_display(ch, "%s%s", wear_data[iter].eq_prompt, obj_desc_for_char(obj, ch, OBJ_DESC_EQUIPMENT));
 					}
 				}
 				
 				DL_FOREACH2(ch->carrying, obj, next_content) {
-					if (get_obj_eq_set_by_id(obj, eq_set->id)) {
-						build_page_display_col(ch, 2, FALSE, " %s", GET_OBJ_SHORT_DESC(obj));
+					if ((oset = get_obj_eq_set_by_id(obj, eq_set->id))) {
+						build_page_display(ch, "%s%s", wear_data[oset->pos].eq_prompt, obj_desc_for_char(obj, ch, OBJ_DESC_EQUIPMENT));
 					}
 				}
 				
@@ -8489,7 +8498,16 @@ ACMD(do_ship) {
 				from_isle = get_island(sd->from_island, TRUE);
 				to_isle = get_island(sd->to_island, TRUE);
 				to_room = sd->to_room == NOWHERE ? NULL : real_room(sd->to_room);
-				build_page_display(ch, " %dx %s (%s to %s%s, %s)", sd->amount, skip_filler(GET_OBJ_SHORT_DESC(proto)), from_isle ? get_island_name_for(from_isle->id, ch) : "unknown", to_isle ? get_island_name_for(to_isle->id, ch) : "unknown", coord_display(ch, to_room ? X_COORD(to_room) : -1, to_room ? Y_COORD(to_room) : -1, FALSE), status_type[sd->status]);
+				
+				if (sd->shipping_id != -1 && (veh = find_ship_by_shipping_id(emp, sd->shipping_id))) {
+					// show with ship
+					strcpy(buf, skip_filler(VEH_SHORT_DESC(veh)));
+					build_page_display(ch, " %dx %s (%s to %s%s, %s, %s)", sd->amount, skip_filler(GET_OBJ_SHORT_DESC(proto)), from_isle ? get_island_name_for(from_isle->id, ch) : "unknown", to_isle ? get_island_name_for(to_isle->id, ch) : "unknown", coord_display(ch, to_room ? X_COORD(to_room) : -1, to_room ? Y_COORD(to_room) : -1, FALSE), status_type[sd->status], buf);
+				}
+				else {
+					// no ship
+					build_page_display(ch, " %dx %s (%s to %s%s, %s)", sd->amount, skip_filler(GET_OBJ_SHORT_DESC(proto)), from_isle ? get_island_name_for(from_isle->id, ch) : "unknown", to_isle ? get_island_name_for(to_isle->id, ch) : "unknown", coord_display(ch, to_room ? X_COORD(to_room) : -1, to_room ? Y_COORD(to_room) : -1, FALSE), status_type[sd->status]);
+				}
 			}
 			
 			done = TRUE;
@@ -8584,6 +8602,11 @@ ACMD(do_split) {
 	char_data *vict;
 	char *pos;
 	
+	if (IS_NPC(ch)) {
+		msg_to_char(ch, "You can't do that.\r\n");
+		return;
+	}
+	
 	// count group members present
 	count = 0;
 	DL_FOREACH2(ROOM_PEOPLE(IN_ROOM(ch)), vict, next_in_room) {
@@ -8591,14 +8614,32 @@ ACMD(do_split) {
 			++count;
 		}
 	}
-
-	// parse args
-	pos = find_coin_arg(argument, &coin_emp, &coin_amt, TRUE, TRUE, NULL);
 	
-	if (!*argument || pos == argument || coin_amt <= 0) {
-		msg_to_char(ch, "Usage: split <amount> <type> coins\r\n");
+	// parse arguments OR easy-split
+	if (!*argument || !str_cmp(argument, "coins")) {
+		// easy split
+		if (GET_LAST_COINS(ch) > 0) {
+			coin_emp = real_empire(GET_LAST_COINS_EMPIRE(ch));
+			coin_amt = GET_LAST_COINS(ch);
+		}
+		else {
+			// no arg and no last-coins
+			msg_to_char(ch, "Usage: split <amount> <type> coins\r\n");
+			return;
+		}
 	}
-	else if (!GROUP(ch) || count <= 1) {
+	else {
+		// parse args
+		pos = find_coin_arg(argument, &coin_emp, &coin_amt, TRUE, TRUE, NULL);
+		
+		if (pos == argument || coin_amt <= 0) {
+			msg_to_char(ch, "Usage: split <amount> <type> coins\r\n");
+			return;
+		}
+	}
+	
+	// basic checks
+	if (!GROUP(ch) || count <= 1) {
 		msg_to_char(ch, "You don't have any group members here to split coins with.\r\n");
 	}
 	else if (coin_amt < count) {
@@ -8620,6 +8661,9 @@ ACMD(do_split) {
 				act(buf, FALSE, ch, NULL, vict, TO_VICT | TO_SLEEP);
 			}
 		}
+		
+		// reset this
+		GET_LAST_COINS(ch) = 0;
 	}
 }
 

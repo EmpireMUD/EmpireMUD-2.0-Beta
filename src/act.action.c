@@ -132,7 +132,7 @@ const struct action_data_struct action_data[] = {
 	{ "tanning", "is tanning leather.", ACTF_HASTE | ACTF_FAST_CHORES, process_tanning, cancel_resource_list },	// ACT_TANNING
 	{ "reading", "is reading a book.", ACTF_SITTING | ACTF_ALWAYS_FAST | ACTF_EVEN_FASTER | ACTF_IGNORE_COND, process_reading, NULL },	// ACT_READING
 	{ "copying", "is writing out a copy of a book.", NOBITS, process_copying_book, NULL },	// ACT_COPYING_BOOK
-	{ "crafting", "is working on something.", NOBITS, process_gen_craft, cancel_gen_craft },	// ACT_GEN_CRAFT
+	{ "crafting", "is working on something.", NOBITS, process_gen_craft, cancel_gen_craft },	// ACT_GEN_CRAFT: note this one gains ACTF_HASTE | ACTF_FAST_CHORES in some cases, below
 	{ "sailing", "is sailing the ship.", ACTF_VEHICLE_SPEEDS | ACTF_SITTING, process_driving, cancel_driving },	// ACT_SAILING
 	{ "piloting", "is piloting the vessel.", ACTF_VEHICLE_SPEEDS | ACTF_SITTING, process_driving, cancel_driving },	// ACT_PILOTING
 	{ "skill-swapping", "is swapping skill sets.", NOBITS, process_swap_skill_sets, NULL },	// ACT_SWAP_SKILL_SETS
@@ -462,6 +462,11 @@ void update_actions(void) {
 			msg_to_char(ch, "You are distracted and stop what you were doing.\r\n");
 			cancel_action(ch);
 			continue;
+		}
+		
+		// Crafts boost only specific types -- add act flags if they apply
+		if (GET_ACTION(ch) == ACT_GEN_CRAFT && (craft = craft_proto(GET_ACTION_VNUM(ch, 0))) && (CRAFT_IS_BUILDING(craft) || CRAFT_IS_VEHICLE(craft))) {
+			act_flags |= ACTF_HASTE | ACTF_FAST_CHORES;
 		}
 		
 		// action-cycle is time remaining -- compute how fast we go through it
@@ -2280,10 +2285,10 @@ void process_swap_skill_sets(char_data *ch) {
 	GET_ACTION_TIMER(ch) -= 1;
 	
 	if (GET_ACTION_TIMER(ch) <= 0) {
-		msg_to_char(ch, "You swap skill sets.\r\n");
+		msg_to_char(ch, "You swap to skill set %d.\r\n", (GET_ACTION_VNUM(ch, 0) + 1));
 		act("$n swaps skill sets.", TRUE, ch, NULL, NULL, TO_ROOM);
 		
-		perform_swap_skill_sets(ch);
+		perform_swap_skill_sets(ch, GET_ACTION_VNUM(ch, 0));
 		end_action(ch);
 		
 		set_move(ch, MIN(GET_MOVE(ch), GET_MAX_MOVE(ch)/4));

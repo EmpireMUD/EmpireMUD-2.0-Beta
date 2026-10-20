@@ -155,7 +155,8 @@ CONVEYANCE "TRINKET OF CONVEYANCE"
 
 A trinket of conveyance can be used to teleport you back to a starting location
 (such as a Tower of Souls) from anywhere in the world. This item is single-use,
-so be sure to craft a few of them.
+so be sure to craft a few of them. However, if you happen to use it while
+you're already on a newbie island, you can re-use the trinket.
 
 You can't teleport out of certain locations, such as hostile territory or
 certain adventures. If you find yourself in one of these places, find a way
@@ -319,6 +320,21 @@ Flour is a component type used in cooking. It consists of flour itself (made
 from wheat) along with similar ingredients such as cornmeal.
 
 See also: COMPONENT, MILL, CROPS
+#
+FLOWER FLOWERS "SMALL FLOWER"
+
+Flower crops:
+ &Yo&A:&Yo&A:&0  Temperate
+ &OlL&ClL  Arid
+ &A^&G|&V`&G|&0  Tropical
+
+You can grow flowers to beautify your city and to craft bouquets and wreaths.
+You can also use flowers as plant fiber, such as the stuffing for training
+dummies.
+
+Note: The 'small flower' item found while picking cannot be used for crafting.
+
+See also: CROPS, PICK, SEED, WOODWORKING
 #
 FRUITS "FRUIT COMPONENT" "SMALL FRUITS" "LARGE FRUITS"
 
@@ -912,16 +928,22 @@ See also: BAKE, COOK, GOURMET CHEF, HARVEST, FORAGE, PICK, PROCESS, SPICERY
 SPLIT
 
 Usage:  split <amount> <type> coins
+        split
 
 You can split coins you've found with members of your group using this command.
 Only group members who are present with you will receive a split. The amount is
 rounded down if there isn't an even amount to split, and you will keep the
 difference.
 
+If you type 'split' with no amount or type, it will split the last amount of
+coins you received (if you've gained coins since joining the group). Only coins
+you pick up from the ground or from objects are included in this; coins from
+quests or other sources aren't tracked for this.
+
 Example:
 > split 10 misc coins
 
-See also: COINS
+See also: COINS, GROUP
 #
 "STICKS AND LEAVES" "THORNY BRANCHES" "TANGLED VINES" VINES
 

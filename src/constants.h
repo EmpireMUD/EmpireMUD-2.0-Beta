@@ -74,6 +74,13 @@ struct climate_temperature_t {
 	double heat_modifier;	// multiplies hot temperatures by this
 };
 
+// for eedit_toggles
+struct eedit_toggle_data_t {
+	char *name;
+	int tech_required;	// TECH_ needed on the empire (may be NO_TECH)
+	bitvector_t admin_flag;	// EADM_ flag to be set (may be NOBITS)
+};
+
 // used to determine the order and value of reputations
 struct faction_reputation_type {
 	int type;	// REP_ type
@@ -152,6 +159,7 @@ struct wear_data_type {
 //// EXTERNS /////////////////////////////////////////////////////////////////
 
 // empiremud constants
+extern struct eedit_toggle_data_t eedit_toggle_data[];
 extern const char *level_names[LVL_TOP+1][2];
 extern const int num_of_reboot_strings;
 extern const char *reboot_strings[];

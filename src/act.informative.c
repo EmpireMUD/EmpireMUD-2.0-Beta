@@ -1386,8 +1386,8 @@ void list_one_char(char_data *i, char_data *ch, int num) {
 				// npc shows empire adj
 				msg_to_char(ch, "<%s> ", EMPIRE_ADJECTIVE(GET_LOYALTY(i)));
 			}
-			else {
-				// player shows rank
+			else if (!is_ignoring(ch, i)) {
+				// player shows rank -- unless ignoring
 				msg_to_char(ch, "<%s&0&y> ", EMPIRE_RANK(GET_LOYALTY(i), GET_RANK(i)-1));
 			}
 		}
@@ -2671,11 +2671,12 @@ WHO_SORTER(sort_who_role_level) {
 * Get the "who" display for one person.
 *
 * @param char_data *ch The person to get WHO info for.
+* @param char_data *to The person who will view this.
 * @param bool shortlist If TRUE, only gets a short entry.
 * @param bool screenreader If TRUE, shows slightly differently
 * @return char* A pointer to the output.
 */
-char *one_who_line(char_data *ch, bool shortlist, bool screenreader) {
+char *one_who_line(char_data *ch, char_data *to, bool shortlist, bool screenreader) {
 	static char out[MAX_STRING_LENGTH];
 	char show_role[24], part[MAX_STRING_LENGTH];
 	size_t size;
@@ -2702,7 +2703,7 @@ char *one_who_line(char_data *ch, bool shortlist, bool screenreader) {
 	}
 	
 	// rank
-	if (GET_LOYALTY(ch)) {
+	if (GET_LOYALTY(ch) && !is_ignoring(to, ch)) {
 		size += snprintf(out + size, sizeof(out) - size, "<%s&0> ", EMPIRE_RANK(GET_LOYALTY(ch), GET_RANK(ch)-1));
 	}
 
@@ -2722,8 +2723,13 @@ char *one_who_line(char_data *ch, bool shortlist, bool screenreader) {
 		return out;
 	}
 	
-	// title
-	size += snprintf(out + size, sizeof(out) - size, "%s&0", NULLSAFE(GET_TITLE(ch)));
+	// title?
+	if (is_ignoring(to, ch)) {
+		size += snprintf(out + size, sizeof(out) - size, " &R(ignore)&0");
+	}
+	else {
+		size += snprintf(out + size, sizeof(out) - size, "%s&0", NULLSAFE(GET_TITLE(ch)));
+	}
 	
 	// tags
 	if (IS_AFK(ch)) {
@@ -2852,7 +2858,7 @@ int partial_who(char_data *ch, char *name_search, int low, int high, empire_data
 		entry->access_level = GET_ACCESS_LEVEL(tch);
 		entry->computed_level = GET_COMPUTED_LEVEL(tch);
 		entry->role = GET_CLASS_ROLE(tch);
-		entry->string = str_dup(one_who_line(tch, shortlist, PRF_FLAGGED(ch, PRF_SCREEN_READER)));
+		entry->string = str_dup(one_who_line(tch, ch, shortlist, PRF_FLAGGED(ch, PRF_SCREEN_READER)));
 		LL_PREPEND(list, entry);
 		++count;
 	}
@@ -5336,7 +5342,7 @@ ACMD(do_whois) {
 	}
 	
 	// basic info
-	msg_to_char(ch, "%s%s&0\r\n", PERS(victim, victim, TRUE), NULLSAFE(GET_TITLE(victim)));
+	msg_to_char(ch, "%s%s&0\r\n", PERS(victim, victim, TRUE), (is_ignoring(ch, victim) ? "" : NULLSAFE(GET_TITLE(victim))));
 	sprinttype(GET_REAL_SEX(victim), genders, part, sizeof(part), "UNDEFINED");
 	msg_to_char(ch, "Status: %s %s%s\r\n", CAP(part), level_names[(int) GET_ACCESS_LEVEL(victim)][1], friend_part);
 
@@ -5350,7 +5356,12 @@ ACMD(do_whois) {
 	}
 
 	if (GET_LOYALTY(victim)) {
-		msg_to_char(ch, "%s&0 of %s%s&0\r\n", EMPIRE_RANK(GET_LOYALTY(victim), GET_RANK(victim)-1), EMPIRE_BANNER(GET_LOYALTY(victim)), EMPIRE_NAME(GET_LOYALTY(victim)));
+		if (is_ignoring(ch, victim)) {
+			msg_to_char(ch, "Member of %s%s&0\r\n", EMPIRE_BANNER(GET_LOYALTY(victim)), EMPIRE_NAME(GET_LOYALTY(victim)));
+		}
+		else {
+			msg_to_char(ch, "%s&0 of %s%s&0\r\n", EMPIRE_RANK(GET_LOYALTY(victim), GET_RANK(victim)-1), EMPIRE_BANNER(GET_LOYALTY(victim)), EMPIRE_NAME(GET_LOYALTY(victim)));
+		}
 		msg_to_char(ch, "Territory: %d, Members: %d, Greatness: %d\r\n", EMPIRE_TERRITORY(GET_LOYALTY(victim), TER_TOTAL), EMPIRE_MEMBERS(GET_LOYALTY(victim)), EMPIRE_GREATNESS(GET_LOYALTY(victim)));
 	}
 	
