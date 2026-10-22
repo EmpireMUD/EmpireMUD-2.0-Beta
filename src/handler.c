@@ -2324,7 +2324,7 @@ char_data *get_char_room_vis(char_data *ch, char *name, int *number) {
 			return GET_COMPANION(ch);
 		}
 		else {
-			--number;
+			--*number;
 			skip_companion = GET_COMPANION(ch);
 		}
 	}
