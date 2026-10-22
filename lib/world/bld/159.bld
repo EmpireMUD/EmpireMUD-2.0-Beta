@@ -118,6 +118,22 @@ protect nothing. What remains of them is mostly floating, unable to block even
 the largest ship.
 ~
 S
+#15907
+Sea Barricade~
+A Shoddy Sea Barricade~
+&wXXXX~
+2 0 dkn 0
+0 0 0 -1
+E
+barricades shoddy~
+   It looks as though someone has used parts from an old shipwreck to create
+massive sea barricades.
+~
+R
+6000 1 1 0
+R
+6790 1 1 0
+S
 #15912
 Crab Pens~
 The Crab Pens~
