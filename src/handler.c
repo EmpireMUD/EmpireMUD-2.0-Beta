@@ -2330,7 +2330,7 @@ char_data *get_char_room_vis(char_data *ch, char *name, int *number) {
 	}
 	
 	DL_FOREACH2(ROOM_PEOPLE(IN_ROOM(ch)), i, next_in_room) {
-		if (CAN_SEE(ch, i) && WIZHIDE_OK(ch, i) && !AFF_FLAGGED(i, AFF_NO_TARGET_IN_ROOM) && (i == skip_companion || match_char_name(ch, i, tmp, MATCH_IN_ROOM, NULL))) {
+		if (CAN_SEE(ch, i) && WIZHIDE_OK(ch, i) && !AFF_FLAGGED(i, AFF_NO_TARGET_IN_ROOM) && i != skip_companion && match_char_name(ch, i, tmp, MATCH_IN_ROOM, NULL)) {
 			if (--(*number) == 0) {
 				return i;
 			}
