@@ -6,7 +6,8 @@
 *
 * This program displays your generated graphical maps with a toggle for a
 * 100-tile grid, political mode (switches between two maps), and with mouseover
-* coordinates using javascript.
+* coordinates using javascript. Drag to pan; use the mouse wheel (or trackpad
+* pinch) to zoom toward the cursor. Double-click the map to reset the view.
 *
 * Using this file:
 *  1. update the configuration options, near the top
@@ -67,6 +68,20 @@ body {
 	position: relative;
 	overflow: hidden;
 	clear: both;
+	cursor: default;
+	touch-action: none;
+	user-select: none;
+	-webkit-user-select: none;
+}
+
+#map-stage {
+	position: absolute;
+	top: 0;
+	left: 0;
+	width: <?= $width ?>px;
+	height: <?= $height ?>px;
+	transform-origin: 0 0;
+	will-change: transform;
 }
 
 .wld {
@@ -75,6 +90,7 @@ body {
 	left: 0px;
 	width: <?= $width ?>px;
 	height: <?= $height ?>px;
+	pointer-events: none;
 }
 
 .ver {
@@ -99,7 +115,7 @@ body {
 
 .equator {
 	position: absolute;
-	left: 0;x;
+	left: 0;
 	border-top: 2px dashed blue;
 	width: <?= $width ?>px;
 }
@@ -143,7 +159,7 @@ body {
 	top: 0px;
 	border: 1px outset gray;
 	display: none;
-	cursor: default;
+	cursor: inherit;
 	z-index: 10;
 }
 
@@ -171,10 +187,12 @@ body {
 	<div title="Press 'g' to toggle the grid."><input type="checkbox" id="grid" name="grid" /> <label for="grid"><span class="underline">G</span>rid</label></div>
 	<div title="Press 'c' to toggle cities."><input type="checkbox" id="cities" name="cities" /> <label for="cities"><span class="underline">C</span>ities</label></div>
 	<div title="Press 'x' to toggle pixelation while zoomed."><input type="checkbox" id="pixelate" name="pixelate" checked /> <label for="pixelate">Pi<span class="underline">x</span>elate When Zoomed</label></div>
+	<div title="Drag to pan, scroll/pinch to zoom, double-click or press 'r' to reset.">Drag / scroll to pan &amp; zoom (<span class="underline">R</span>eset)</div>
 	<div style="clear: both;"></div>
 </div>
 <div id="coords"></div>
-<div id="map">
+<div id="map" title="Drag to pan, scroll to zoom, double-click to reset">
+<div id="map-stage">
 <img src="" class="wld pixelated" />
 <?php
 // city overlays
@@ -197,12 +215,42 @@ for ($iter = 1; $iter < $height / 100 / $scale; ++$iter) {
 	}
 }
 ?>
-<div class="equator" style="top: <?= $height/2 ?>px;"</div>
+<div class="equator" style="top: <?= $height/2 ?>px;"></div>
+</div>
 </div>
 
 
 <script type="text/javascript" src="//ajax.googleapis.com/ajax/libs/jquery/2.0.0/jquery.min.js"></script>
 <script type="text/javascript">
+/** @type {number} Display width of the map viewport in pixels. */
+var mapWidth = <?= $width ?>;
+/** @type {number} Display height of the map viewport in pixels. */
+var mapHeight = <?= $height ?>;
+/** @type {number} Pixels-per-tile scale from the PHP ?size= parameter. */
+var tileScale = <?= $scale ?>;
+/** @type {number} Minimum allowed zoom level (1 = fit viewport). */
+var minZoom = 1;
+/** @type {number} Maximum allowed zoom level. */
+var maxZoom = 16;
+/** @type {number} Current zoom multiplier applied to #map-stage. */
+var zoom = 1;
+/** @type {number} Current horizontal pan offset of #map-stage in viewport pixels. */
+var panX = 0;
+/** @type {number} Current vertical pan offset of #map-stage in viewport pixels. */
+var panY = 0;
+/** @type {boolean} True while the primary mouse button is held for panning. */
+var isDragging = false;
+/** @type {boolean} True if the current drag moved enough to count as a pan. */
+var didDrag = false;
+/** @type {number} pageX where the current drag started. */
+var dragStartX = 0;
+/** @type {number} pageY where the current drag started. */
+var dragStartY = 0;
+/** @type {number} panX value captured at the start of the current drag. */
+var panStartX = 0;
+/** @type {number} panY value captured at the start of the current drag. */
+var panStartY = 0;
+
 function checkgrid() {
 	if ($("#grid").prop("checked")) {
 		$(".ver, .hor").show();
@@ -236,28 +284,139 @@ function checkpixelate() {
 	}
 }
 
+/**
+ * Keeps panX/panY so the map cannot be dragged fully out of the viewport.
+ * When zoomed out to fit, centers the stage instead.
+ */
+function clampPan() {
+	var viewW = mapWidth;
+	var viewH = mapHeight;
+	var contentW = mapWidth * zoom;
+	var contentH = mapHeight * zoom;
+
+	if (contentW <= viewW) {
+		panX = (viewW - contentW) / 2;
+	}
+	else {
+		panX = Math.min(0, Math.max(viewW - contentW, panX));
+	}
+
+	if (contentH <= viewH) {
+		panY = (viewH - contentH) / 2;
+	}
+	else {
+		panY = Math.min(0, Math.max(viewH - contentH, panY));
+	}
+}
+
+/**
+ * Clamps the current pan and applies translate/scale to #map-stage.
+ */
+function applyViewTransform() {
+	clampPan();
+	$("#map-stage").css("transform", "translate(" + panX + "px, " + panY + "px) scale(" + zoom + ")");
+}
+
+/**
+ * Restores zoom and pan to the default 1x, top-left view.
+ */
+function resetView() {
+	zoom = 1;
+	panX = 0;
+	panY = 0;
+	applyViewTransform();
+}
+
+/**
+ * Zooms the map toward a document point so that point stays under the cursor.
+ *
+ * @param {number} pageX Document X coordinate to keep anchored (usually event.pageX).
+ * @param {number} pageY Document Y coordinate to keep anchored (usually event.pageY).
+ * @param {number} nextZoom Desired zoom level before min/max clamping.
+ */
+function zoomAt(pageX, pageY, nextZoom) {
+	nextZoom = Math.min(maxZoom, Math.max(minZoom, nextZoom));
+	if (nextZoom === zoom) {
+		return;
+	}
+
+	var offset = $("#map").offset();
+	var viewX = pageX - offset.left;
+	var viewY = pageY - offset.top;
+	var contentX = (viewX - panX) / zoom;
+	var contentY = (viewY - panY) / zoom;
+
+	zoom = nextZoom;
+	panX = viewX - contentX * zoom;
+	panY = viewY - contentY * zoom;
+	applyViewTransform();
+}
+
+/**
+ * Converts a mouse event into game-map tile coordinates, accounting for pan/zoom.
+ *
+ * @param {JQuery.Event|MouseEvent} e Mouse event with pageX/pageY.
+ * @return {{x: number, y: number}} Tile coordinates under the cursor.
+ */
+function mapCoordsFromEvent(e) {
+	var offset = $("#map").offset();
+	var viewX = e.pageX - offset.left;
+	var viewY = e.pageY - offset.top;
+	var contentX = (viewX - panX) / zoom;
+	var contentY = (viewY - panY) / zoom;
+	return {
+		x: parseInt(contentX / tileScale, 10),
+		y: parseInt((mapHeight - contentY) / tileScale, 10)
+	};
+}
+
+/**
+ * Shows the floating coordinate tooltip near the cursor for the given mouse event.
+ *
+ * @param {JQuery.Event|MouseEvent} e Mouse event used for position and tile lookup.
+ */
+function updateCoordsDisplay(e) {
+	var coords = mapCoordsFromEvent(e);
+	var coordW = 100;
+	var coordH = 20;
+	var leftl = e.pageX + 10;
+	var topl = e.pageY + 10;
+
+	if (leftl + coordW > $(window).width() + $(window).scrollLeft()) {
+		leftl += $(window).width() + $(window).scrollLeft() - (leftl + coordW);
+	}
+	if (topl + coordH > $(window).height() + $(window).scrollTop()) {
+		topl = e.pageY - 20;
+	}
+
+	$("#coords").html("(" + coords.x + ",&nbsp;" + coords.y + ")");
+	$("#coords").css("top", topl).css("left", leftl);
+	$("#coords").show();
+}
+
 $(document).ready(function() {
 	checkmap();
 	checkgrid();
 	checkcities();
 	checkpixelate();
+	applyViewTransform();
 
 	$("#pol").click(function() {
 		checkmap();
 	});
-	
+
 	$("#grid").click(function() {
 		checkgrid();
 	});
-	
+
 	$("#cities").click(function() {
 		checkcities();
 	});
-	
+
 	$("#pixelate").click(function() {
 		checkpixelate();
 	});
-	
+
 	$(document).keypress(function(e) {
 		var c = String.fromCharCode(e.which);
 		if (c == 'p' || c == 'P') {
@@ -272,35 +431,86 @@ $(document).ready(function() {
 		else if (c == 'x' || c == 'X') {
 			$("#pixelate").click();
 		}
+		else if (c == 'r' || c == 'R') {
+			resetView();
+		}
 	});
 
-	$("#map").bind("mouseover mouseout mousemove", function(e) {
-		if (e.type == "mouseout") {
+	$("#map").on("wheel", function(e) {
+		e.preventDefault();
+		var oe = e.originalEvent;
+		var delta = oe.deltaY;
+		// normalize trackpad/mouse wheel deltas into a smooth zoom factor
+		var factor = Math.exp(-delta * 0.0015);
+		zoomAt(oe.pageX, oe.pageY, zoom * factor);
+		updateCoordsDisplay(e);
+	});
+
+	$("#map").on("mousedown", function(e) {
+		if (e.which !== 1) {
+			return;
+		}
+		isDragging = true;
+		didDrag = false;
+		dragStartX = e.pageX;
+		dragStartY = e.pageY;
+		panStartX = panX;
+		panStartY = panY;
+		e.preventDefault();
+	});
+
+	$(document).on("mousemove", function(e) {
+		if (isDragging) {
+			var dx = e.pageX - dragStartX;
+			var dy = e.pageY - dragStartY;
+			if (Math.abs(dx) > 2 || Math.abs(dy) > 2) {
+				didDrag = true;
+			}
+			panX = panStartX + dx;
+			panY = panStartY + dy;
+			applyViewTransform();
+		}
+
+		var offset = $("#map").offset();
+		var overMap = (
+			e.pageX >= offset.left &&
+			e.pageX <= offset.left + mapWidth &&
+			e.pageY >= offset.top &&
+			e.pageY <= offset.top + mapHeight
+		);
+		if (overMap) {
+			updateCoordsDisplay(e);
+		}
+		else if (!isDragging) {
 			$("#coords").hide();
 		}
-		else {
-			//var parentOffset = $(this).parent().offset(); 
-			var parentOffset = $(this).offset(); 
-			//or $(this).offset(); if you really just want the current element's offset
-			var relX = parseInt((e.pageX - parentOffset.left) / <?= $scale ?>);
-			var relY = parseInt((<?= $height ?> - e.pageY + parentOffset.top) / <?= $scale ?>);
+	});
 
-			var coordW = 100;
-			var coordH = 20;
+	$(document).on("mouseup", function() {
+		if (!isDragging) {
+			return;
+		}
+		isDragging = false;
+	});
 
-			var leftl = e.pageX + 10;
-			var topl = e.pageY + 10;
+	$("#map").on("mouseleave", function() {
+		if (!isDragging) {
+			$("#coords").hide();
+		}
+	});
 
-			if (leftl + coordW > $(window).width() + $(window).scrollLeft()) {
-				leftl += $(window).width() + $(window).scrollLeft() - (leftl + coordW);
-			}
-			if (topl + coordH > $(window).height() + $(window).scrollTop()) {
-				topl = e.pageY - 20;
-			}
+	$("#map").on("dblclick", function(e) {
+		e.preventDefault();
+		resetView();
+		updateCoordsDisplay(e);
+	});
 
-			$("#coords").html("("+relX+",&nbsp;"+relY+")");
-			$("#coords").css('top', topl).css('left', leftl);
-			$("#coords").show();
+	// ignore click side-effects after a drag (e.g. accidental text selection)
+	$("#map").on("click", function(e) {
+		if (didDrag) {
+			e.preventDefault();
+			e.stopImmediatePropagation();
+			didDrag = false;
 		}
 	});
 });
